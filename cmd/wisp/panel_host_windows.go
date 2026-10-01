@@ -53,6 +53,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
@@ -63,6 +64,17 @@ import (
 	webview2 "github.com/jchv/go-webview2"
 	"golang.org/x/sys/windows"
 )
+
+// errPanelRefusedThread names the pre-create refusal below so the thread that
+// heard it can decide what to do with it. The refusal itself is unchanged: it is
+// still the reading-supported minimum (check, refuse, name the window; eat nothing).
+// What it lacked until 33-r9 was any consequence (ticket 33, 33-v2 问①): a resident
+// thread that refused and stayed alive took every later show request and refused it
+// again, so the process ended up unable to open a panel with nothing on disk saying
+// so except a log line. This sentinel exists ONLY so that leg can recognise its own
+// refusal; the nil-control error further down (runtime missing) deliberately does
+// NOT carry it, because that one is retryable and belongs to AC#5.
+var errPanelRefusedThread = errors.New("panel host: refusing to create the panel window")
 
 // Binding name the page uses to send one raw composer envelope and get the
 // router's answer back. It is a property of this host, not of the (ticket 35)
@@ -258,9 +270,29 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 	// the drain below stays, and why it is still narrow: an undispatched WM_QUIT with
 	// nothing else queued IS removable, 33-r6's nail pins that, and refusing for a
 	// latched quit we cannot even see would be a guess.
+	//
+	// 33-r9 measured the FIFTH shape the four-shape grid did not contain, the one
+	// 33-v2 问② asked for by name (.scratch/wisp/probes/33/r9/01-fifth-shape-1.txt,
+	// three runs per shape): the thread owns a window that is still ALIVE and still
+	// has a live Go owner, plus one undispatched WM_CLOSE posted at it. The check
+	// refuses that shape exactly like the orphaned one - it names the live window's
+	// own handle ("staleCloseQueued=true hwnd=0x1E10E00 (owner hwnd 0x1E10E00,
+	// same=true)"), the refusal returns in 0 ms, and the live window survives it:
+	// "AFTER the refusal: IsWindow(owner ...)=true owner.IsCreated=true ... close
+	// still queued true ... thread windows=3", while its own Show still works ("Show
+	// on the LIVE owner: ok"). The comparison shape (same window, but its owner
+	// Destroyed it and this thread dispatched that close) reads clean and creates
+	// fine ("PRE-CREATE CHECK: staleCloseQueued=false ... bringUp#2 err=<nil>
+	// created=true in 928ms"), so the two shapes ARE distinguishable to this check,
+	// and this check alone cannot tell an orphaned close from a live owner's.
+	// Consequence, now written down instead of inferred: any recovery that dispatches
+	// or purges this queue to make room for a create destroys a window somebody may
+	// still own, which is what 33-v2 问② refused. So the refusal stays the only
+	// action here, and what changed in 33-r9 is what the resident leg DOES with it -
+	// see errPanelRefusedThread.
 	drainStaleQuitBeforeCreate()
 	if dirty, closedHwnd := staleCloseQueued(); dirty {
-		return fmt.Errorf("panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x%X. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message", closedHwnd)
+		return fmt.Errorf("%w: this thread still has an undispatched WM_CLOSE queued for hwnd 0x%X. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message", errPanelRefusedThread, closedHwnd)
 	}
 
 	w := webview2.NewWithOptions(webview2.WebViewOptions{

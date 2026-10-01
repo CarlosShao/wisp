@@ -29,6 +29,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -585,6 +586,185 @@ func TestAC13BringUpRefusesAThreadWithAQueuedClose(t *testing.T) {
 	if o.leftWindows != 0 || o.head != "empty" {
 		t.Errorf("this test releases OS thread %d with windows=%d and queue head=%s; it refused to clean another owner's thread, so it must not leave one poisoned either", o.tid, o.leftWindows, o.head)
 	}
+}
+
+// ---------------------------------------------------------------------------
+// AC#13, the fifth shape's OUTLET (leg 33-r9, ticket 33 / 33-v2 问① and 问②)
+// ---------------------------------------------------------------------------
+
+var (
+	// t33r9NailPostMessage posts a WM_CLOSE at a live window without dispatching it:
+	// exactly the plant 33-v2 问② says the four-shape grid left out.
+	t33r9NailPostMessage = pnlModUser32.NewProc("PostMessageW")
+	// t33r9NailIsWindow asks user32 whether a handle is still a window. Read from the
+	// reporting goroutine, which is legal: IsWindow takes no thread affinity.
+	t33r9NailIsWindow = pnlModUser32.NewProc("IsWindow")
+)
+
+// refusalSettleBudget is how long this case lets the panel thread get as far as it
+// will on its own before it reads the verdicts below. It is an INSTRUMENT bound, not
+// a product threshold, and nothing asserts on it: the reason it is short and the
+// reason the assertions are named is the same reason - the defect being fixed is that
+// a refusal here reads as fifteen seconds of silence (33-v2 §6, §9.1), so this case
+// must not add a second shape where the red IS a timeout. Delete 甲's one line and
+// the case goes red on the first named assertion, not on a deadline.
+const refusalSettleBudget = 5 * time.Second
+
+func isLiveWindow(h uintptr) bool {
+	r, _, _ := t33r9NailIsWindow.Call(h)
+	return r != 0
+}
+
+// TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever is the outlet for
+// the named refusal, planted in the shape 33-v2 问② asked to have measured before
+// anyone was allowed to call a recovery "found": the thread owns a window that is
+// STILL ALIVE with a live Go owner, and the only message on it is one posted WM_CLOSE.
+//
+// 33-r9 ① measured that shape against the product's own check (.scratch/wisp/probes/
+// 33/r9/01-fifth-shape-1.txt, three runs per form): the check refuses it and names
+// the LIVE window's own handle ("staleCloseQueued=true hwnd=0x1E10E00 (owner hwnd
+// 0x1E10E00, same=true)"), the window survives the refusal ("AFTER the refusal:
+// IsWindow(owner ...)=true owner.IsCreated=true ... close still queued true ...
+// thread windows=3"), and its owner's own Show still works ("Show on the LIVE owner:
+// ok"). The comparison form - the same window, but its owner Destroyed it and this
+// thread dispatched that close itself - reads clean and creates fine ("PRE-CREATE
+// CHECK: staleCloseQueued=false ... bringUp#2 err=<nil> created=true in 928ms"). So
+// the two forms are distinguishable to this check, and bringUp may not resolve them
+// by pumping: pumping is what kills a live window (①'s plain-window carrier, released
+// after the readings: "dispatched 7 ... IsWindow(0x780F3C)=false").
+//
+// The outlet this case pins is therefore the thread's, not the queue's: a show request
+// refused by name marks the thread fatal, which is the one consequence
+// cmd/wisp/panel_resident_windows.go already has a channel for (the same startUp the
+// CoInitializeEx guard uses). Post() then answers false on the spot, loop retires
+// through its existing teardown, and statusLine names the reason. What stays asserted
+// the other way round is that nothing was eaten: the refused manager has no window,
+// and this case never pumps or purges to make that true.
+//
+// Reverse control: delete the errors.Is branch in showOnThread and assertions 1-3
+// below go red on the spot, by name.
+func TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever(t *testing.T) {
+	rp, mgr := startPanelForTest(t)
+
+	// The plant, on the panel thread itself and through the thread's own task port -
+	// the same route the ball's gestures use. A plain top-level window is the carrier:
+	// ①'s five-plain reading shows the product's check refuses identically on it (it
+	// names whatever hwnd the close belongs to, panel or not), and it keeps an extra
+	// msedgewebview2 process set out of AC#1's tree count.
+	type plantReading struct {
+		hwnd    uintptr
+		named   uintptr
+		queued  bool
+		namesIt bool
+		buildOK bool
+		why     string
+	}
+	plant := make(chan plantReading, 1)
+	if !rp.post(func() {
+		h, err := createEditorWindow("wisp 33r9 fifth-shape live owner")
+		if err != nil || h == 0 {
+			plant <- plantReading{why: fmt.Sprintf("the ruler could not build its live window: %v", err)}
+			return
+		}
+		r, _, errno := t33r9NailPostMessage.Call(uintptr(h), uintptr(pnlWmClose), 0, 0)
+		queued, closedHwnd := staleCloseQueued()
+		plant <- plantReading{
+			hwnd:    uintptr(h),
+			named:   closedHwnd,
+			queued:  queued,
+			namesIt: queued && closedHwnd == uintptr(h),
+			buildOK: r != 0,
+			why:     fmt.Sprintf("PostMessageW(WM_CLOSE) returned=%v lastErr=%v", r != 0, errno),
+		}
+	}) {
+		t.Fatalf("the panel thread refused the plant request (startUp error: %v)", rp.startUpErr())
+	}
+
+	var pl plantReading
+	select {
+	case pl = <-plant:
+	case <-time.After(panelThreadWait):
+		t.Fatalf("the panel thread never ran the plant within %v - the ruler's own stage failed, which is not a product verdict", panelThreadWait)
+	}
+	t.Logf("fifth-shape plant on the panel thread: hwnd=0x%X live=%v %s | check reads queued=%v names-the-live-window=%v",
+		pl.hwnd, isLiveWindow(pl.hwnd), pl.why, pl.queued, pl.namesIt)
+	if !pl.buildOK || !pl.queued {
+		t.Fatalf("the plant did not take (%s, queued=%v): no WM_CLOSE is queued on the panel thread, so this run measures nothing about the refusal", pl.why, pl.queued)
+	}
+	if !pl.namesIt {
+		t.Errorf("the plant put a WM_CLOSE on this thread but staleCloseQueued named 0x%X instead of the live window 0x%X - the refusal would report a handle nobody owns", pl.named, pl.hwnd)
+	}
+
+	// The subject: the product's own show path, asked through the product's own door.
+	if !rp.RequestShow("33r9-nail") {
+		t.Fatalf("the first RequestShow was refused before the thread ever ran it (startUp error: %v)", rp.startUpErr())
+	}
+	settled := time.Now()
+	for time.Now().Before(settled.Add(refusalSettleBudget)) {
+		if rp.startUpErr() != nil || rp.mgr.IsShown() {
+			break
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	settleElapsed := time.Since(settled)
+
+	// Assertion 1: the refusal is thread STATE now, not only a log line. This is the
+	// line that carries the reverse control.
+	err := rp.startUpErr()
+	if !errors.Is(err, errPanelRefusedThread) {
+		t.Errorf("after a show request refused by name, startUpErr() = %v: the named refusal left no consequence on the panel thread. That is ticket 33 / 33-v2 问① - the thread stays up taking every later request and refusing each one, so the process can never open a panel and never says so outside a log line. Fix: showOnThread must recognise the sentinel bringUp returns (errPanelRefusedThread) and mark the thread fatal", err)
+	}
+	if err != nil && !strings.Contains(err.Error(), "WM_CLOSE") {
+		t.Errorf("the fatal state names the wrong thing: %v - a thread that refused because of a queued WM_CLOSE must carry that reason, because it is the only sentence the operator gets", err)
+	}
+
+	// Assertion 2: post() answers on the spot. Before 33-r9 this is where a caller
+	// learned nothing: the request was accepted, refused inside the thread, and lost.
+	if rp.post(func() {}) {
+		t.Errorf("post() still accepts work on a thread that has refused this shape by name - the caller's 15-second wait is the only thing that ever reports the failure (33-v2 §9.1), which is the shape this case exists to end")
+	}
+
+	// Assertion 3: the second show does NOT walk the same road. It is refused where it
+	// stands, by the door the ball's gesture uses.
+	secondStart := time.Now()
+	accepted := rp.RequestShow("33r9-nail-second")
+	secondElapsed := time.Since(secondStart)
+	if accepted {
+		t.Errorf("a second show request was accepted onto a thread that already refused this shape by name - it will be refused again, which is the permanent-refusal road; RequestShow must answer false once the refusal is recorded")
+	}
+	if secondElapsed > refusalSettleBudget {
+		t.Errorf("RequestShow took %v to answer no; the refusal is supposed to be state the thread carries, not something the caller waits out", secondElapsed)
+	}
+	if mgr.IsCreated() {
+		t.Errorf("a panel window was created on a thread carrying a live owner's posted WM_CLOSE - created=true with the plant still owed is the half-initialised controller the refusal exists to prevent, and C27's one window per session starts here")
+	}
+
+	// Assertion 4: the thread retires instead of waiting forever for a task that can
+	// only fail. Named, bounded, and behind the three verdicts above.
+	retired := make(chan struct{})
+	go func() {
+		// owner: this case's retirement watcher; it only reads a channel.
+		select {
+		case <-rp.finished:
+			close(retired)
+		case <-time.After(refusalSettleBudget):
+		}
+	}()
+	select {
+	case <-retired:
+	case <-time.After(refusalSettleBudget + time.Second):
+		t.Errorf("the panel thread that refused by name is still up %v later: it holds a queue whose only message is somebody else's WM_CLOSE and a task port nobody should be posting to", refusalSettleBudget)
+	}
+	liveAfter := isLiveWindow(pl.hwnd)
+	t.Logf("refusal-to-retirement: settle=%v second RequestShow accepted=%v in %v | thread retired=%v isFinished=%v | the planted live window 0x%X IsWindow=%v | startUpErr=%v | statusLine=%q",
+		settleElapsed, accepted, secondElapsed, func() bool {
+			select {
+			case <-rp.finished:
+				return true
+			default:
+				return false
+			}
+		}(), rp.isFinished(), pl.hwnd, liveAfter, rp.startUpErr(), rp.statusLine())
 }
 
 // ---------------------------------------------------------------------------

@@ -45,9 +45,20 @@ package main
 // no approval channel of its own. Its teardown is a defer in runResident, the same
 // shape ticket 228 chose for the ball, so the frozen D38(e) ten-step order and its
 // closed hook roster are untouched.
+//
+// What it DOES do since 33-r9, and why that is not a new shape: a show request that
+// bringUp refuses by name (the thread owes somebody an undispatched WM_CLOSE) now
+// ends this thread instead of leaving it up, taking requests and refusing every one
+// of them forever (ticket 33, 33-v2 问①: "拒绝没有出口"). It rides the fatal path this
+// file already had for the CoInitializeEx guard, so the exit adds no thread, no pump
+// and no second window, and it removes nothing from anybody's message queue - which
+// is the thing 33-r9's fifth-shape reading says no recovery here may do: the close it
+// refuses on can belong to a window that is still alive and still owned (readings in
+// cmd/wisp/panel_host_windows.go's bringUp comment).
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"path/filepath"
@@ -320,15 +331,46 @@ func (rp *residentPanel) RequestShow(via string) bool {
 		return false
 	}
 	rp.shows.Add(1)
-	return rp.post(func() {
-		if err := rp.mgr.Show(context.Background()); err != nil {
-			slog.Error("panel host: show failed on the panel thread", "via", via, "err", err)
-			fmt.Printf("wisp: panel could not open (%v): %s\n", err, via)
-			return
-		}
+	return rp.post(func() { rp.showOnThread(via) })
+}
+
+// showOnThread runs one show request ON the panel thread and, when bringUp refuses
+// the thread by name, makes that refusal the thread's state instead of a per-request
+// log line.
+//
+// Why this exists (ticket 33, 33-v2 问①, leg 33-r9). Before this, a refusal left the
+// thread exactly as it found it: not created, not failed, still waiting in loop's
+// select for the next task. Every later show then walked the same road - post() said
+// yes, bringUp said no by name, nothing recorded it - so the process could never open
+// a panel and never said so outside a log line, and a caller with a bounded wait read
+// 15 seconds of silence instead of a refusal. 33-r7's four-shape table and 33-r9's
+// fifth shape (cmd/wisp/panel_host_windows.go's bringUp comment, with readings) both
+// say bringUp may NOT clean the queue itself: the message it refuses on can belong to
+// a window that is still alive and still owned. So the exit is at THIS level: the
+// thread stops pretending it can serve.
+//
+// The mechanism is the one this file already has for its other fatal verdict (the
+// CoInitializeEx guard at the top of loop): store the error as startUp. That makes
+// post() answer false on the spot (it already checks startUpErr before routing),
+// makes loop retire through its existing teardown instead of waiting forever for a
+// task that can only fail, and puts the reason in statusLine(), which is the sentence
+// the boot report prints. No new thread, no new pump, no second window, and nothing
+// removed or dispatched from anybody else's queue.
+func (rp *residentPanel) showOnThread(via string) {
+	err := rp.mgr.Show(context.Background())
+	if err == nil {
 		fmt.Printf("wisp: panel window is up (%s, cold %.1f ms, hot path %.1f ms)\n",
 			via, rp.mgr.LastColdMs(), rp.mgr.LastHotMs())
-	})
+		return
+	}
+	slog.Error("panel host: show failed on the panel thread", "via", via, "err", err)
+	fmt.Printf("wisp: panel could not open (%v): %s\n", err, via)
+	if errors.Is(err, errPanelRefusedThread) {
+		rp.setStartUp(err)
+		slog.Error("panel thread: retiring without a panel window after a named refusal",
+			"via", via, "err", err, "shows", rp.shows.Load())
+		fmt.Printf("wisp: panel thread will take no further requests: %v\n", err)
+	}
 }
 
 // RequestToggle is what the panel hot key and the tray item drive: an open panel
