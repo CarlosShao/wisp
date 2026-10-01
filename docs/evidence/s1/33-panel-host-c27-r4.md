@@ -135,6 +135,19 @@
 | `internal/panel` 那四枚起手常红 | 我**没动它们**，也没为它们放宽任何东西：`12:02:45` 现跑逐名＝`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`＝**恰四枚，与 v1 §A#9 逐名相同**（含落在冻结件 `tokens_fourway_test.go:441` 那枚，红因＝工作树那 16 枚 ` D` 的 `design/**`）⇒ 不是本程造成，我也没读 `design/**` 内容 |
 | ⛔ 我没有的权力 | 没删任何既有用例（唯一"消失"的名字是 AC#12 那枚换名，判据从 0 枚 `t.Errorf` 变成 5 枚）；没放宽任何既有断言（冷 1500／热 200／HWND／`IsCreated`／`h.count()!=1` 那几枚逐条仍在原位，只是**多了**断言）；没动 `TestAC228…` 一字 |
 
+### 终态复跑（第二发整包，写面已含 `c8e715e3`，`12:08:5x`→`12:12:33`，HEAD `2dd28ace`）
+
+尺：同一条 `PATH=… GOFLAGS= go test ./cmd/wisp/ -count=1 -v`（日志 `.scratch/wisp/probes/33/r4/logs/final-pkg-2.txt`，名册 `final-roster-2.txt`）。
+
+| 尺 | 读数 |
+|---|---|
+| 顶层枚数 | **149**＝146 PASS／**2 FAIL**／1 SKIP |
+| 与第一发终跑的逐名 diff | **只有 1 行翻转**：`PASS TestPanelHostRealWindowHopAndLifecycle` → `FAIL`；`TestAC4FocusReturnToPriorWindowGap33r2` 两发都 FAIL（＝本程故意的红）、SKIP 那枚两发都在 ⇒ 名册其余 146 枚逐名相同 |
+| 这枚新红的逐字 | `after Destroy the WebView2 children this process started did not exit within 2s: our tree went baseline 0 -> now 5 (tree pids 5). The machine-wide count (14 -> 19) is reported only and is NOT the denominator`（`12:10:1x`） |
+| **归因（不是我这枚改坏）** | 那一发**两个口径同时越界**：我们树 0→5、全机 14→19 ⇒ 旧尺（全机口径）在同一发也会红（`after 19 > baselineChildren 14`）＝**不是我换分母造出来的**；同一发冷值 977.297 ms 也高于同批 10 发的 608-816 ms ⇒ 那台机器当时在忙（这发跑在我连续跑 d22scan／vet／三枚副本突变之后） |
+| `-count=5` 隔离复认（派单给 flake 定的姿势） | `12:13:04`→`12:13:1x`，`-run TestPanelHostRealWindowHopAndLifecycle -count=5` ⇒ **5 枚全 PASS**，逐发 `our tree webview baseline 0 -> now 0`；⚠ 其中第 2 发 `machine-wide 14 -> 15` 而我们树 0⇒**旧尺在这一发会假红**（`15 > 14`），这一枚是"全机分母会因别人起一扇窗而假红"的**活样本**（v1 §A#26 只是推断，本程抓到了实例） |
+| 我的处置 | ⛔ 没放宽那 2 秒、没加重试、没把断言降级；登记为**负载敏感的已知抖动**：`WebView children exit ≤2s` 这一支在本机 6 发里红 1 发（整包并发那发），隔离 5 发全绿。⇒ 这条正好是票面 AC#1 那半句要抓的形状，留给 `33-r2`／验收腿判：是产码拆窗不够快，还是这台机在负载下就该报。⛔ 我不用"偶发"把它读成"不存在" |
+
 ---
 
 ## ③ 门禁四数（go build ./...／go vet ./...／d22scan／gofumpt，逐条真实读数）
@@ -194,6 +207,8 @@
 19. **`cmd/wisp` 单独包级终跑**（`11:55`→`11:57:57`，HEAD `2288265b`）：`rc=1`＝**147 PASS／1 FAIL／1 SKIP**（红与 skip 都是本程新装的尺，逐名在 §②）；⛔ 零枚既有用例由绿转红。
 20. **写面闸门**：`git status --porcelain -- cmd internal` 起手 0 行 → 全程只两枚 `*_test.go` → 收尾提交后回 0 行（§⑧ 那一发现量）。
 
+21. **终态复跑（第二发整包，HEAD `2dd28ace`）＋一枚负载敏感的红**：`146 PASS／2 FAIL／1 SKIP`，与第一发终跑逐名只差一行（`TestPanelHostRealWindowHopAndLifecycle` 由绿转红），红句与逐字归因在 §②；`-count=5` 隔离复认 5 枚全绿（其中一枚同时给出"全机 14→15、我们树 0→0"＝旧分母会假红的活样本）。⛔ 没放宽那 2 秒、没加重试、没降级成 `t.Logf`。
+
 ---
 
 ## ⑤ 我可能写错的条目（对抗我自己）
@@ -223,6 +238,9 @@
 22. **格 4 那枚 `direct-children=1` 说明我一开始的走树方式就可能是错的**：只按"直接子级"数会读成 1（甚至 0），所以递归是必须的；如果哪台机上 WebView2 把子进程挂到别的父进程下（服务重挂父），这棵树会读 0 枚＝又一枚假绿。⇒ 我在读数里同时打 `tree-pids` 与 `machine-wide` 两枚，任何一发出现"窗口期树内 0／全机涨"就能当场看出来。这条我判**本机未命中**（4 发逐发 6 枚），不是"已解决"。
 23. **`nearestRankPercentile` 是我自己实现的**（仓里没有分位库件）。n=1 时 P50＝P95＝那一枚样本，所以单发跑不会"造出分位"——它只在 `-count>=2` 时才有意义，这一点我在用例注释里写了。如果编排者认为分位应当用别种定义（线性插值那一类），红/绿判定在 n=10、尾部只差一枚的情况下会不一样，请指名，我不自己换定义。
 24. **⛔ 我没有做的事**：没动产码一字（`git diff` 可核）、没翻票面任何一枚框、没跑 `go mod tidy`、没读没写 `frontend/**`／`design/**`、没碰三枚冻结件与阈值／golden／allowlist、没把任何一枚旧断言放宽、没在仓内建 worktree、没删任何文件（副本里也是**只建不删**：MUT-* 三发都用覆盖还原，没 `rm`）。
+
+25. **那枚负载敏感的红，我的归因只走了一半**：我说"不是我把分母换坏"的证据是**同一发里两个口径同时越界**（树 0→5、全机 14→19）——这是一发样本，不是分布。反过来我也**不能**把 `-count=5` 全绿读成"没问题"：那 5 发是隔离跑的，本来就不该期待它们红。⇒ 正确的口径是：**这一支（`WebView children exit ≤2s`）在本机 6 发里红 1 发，红那发是整包并发**；要定它是产码拆窗慢还是机器忙，需要"Destroy 调用→最后一个子进程退出"的**延迟分布**，那是 `33-r2`／验收腿该量的东西，⛔ 我不拿自己这一发行程去替它下结论，也⛔ 不为了少一枚红把 2 秒改宽。
+26. **⚠ 本程可能让"包全绿"这一维从此不再成立**：除了 §⑤ 第 20 项那枚故意的红，AC#1 的退出那一支今天也开始偶发红。如果编排者要的是"`cmd/wisp` 名册必须等于起手名册"这一档闸门，本程**没做到**（终态名册比起手多了 2 枚 FAIL＋1 枚 SKIP，逐名可核），这是按派单"判据是会响，不是包全绿"的取舍，我把它写死在这里，不让它被读成疏忽。
 
 ---
 
@@ -278,11 +296,11 @@ PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= \
 |---|---|
 | `git status --porcelain -- cmd internal` | 起手（`11:30:24`，HEAD `eed229e4`）＝**0 行**；终态＝**0 行**＝等于起手名册 ✓（本程写过的两枚测试文件已全部提交，仓内零残留、零突变体） |
 | `git diff --numstat eed229e4..HEAD -- cmd internal` | `cmd/wisp/panel_host_gate_test.go 250/25`＋`cmd/wisp/panel_host_windows_test.go 516/66`＝**只有这两枚路径**，⛔ 零枚产码文件。删除列逐名解释（一共 91 行，全是"被替换掉的旧仪器"，没有一行是别人的活）：`panel_host_gate_test.go` 那 25 行＝① 旧 `TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12` 的注释与函数体（0 枚 `t.Errorf` 的那枚空尺，被 `TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` 取代）② 旧 import 块（新增 `go/ast`／`strconv`／`internal/panel` 三行，重写整块故计入删除）；`panel_host_windows_test.go` 那 66 行＝① 旧 `countWebviewChildren`（全机按名数分母）② 旧 `listenSocketsForPID`（`class=4`／`state=10`／静默 `return 0` 那枚恒真尺）③ 旧 AC#4 那一跳（只有 `t.Logf` 的 4 行）＋它头上那 8 行注释，判据整体迁进新用例 `TestAC4FocusReturnToPriorWindowGap33r2`（取样时刻修正＋4 枚真断言）。⇒ **零枚既有断言被删掉不补**，迁移逐名可对 |
-| `wc -l -c docs/evidence/s1/33-panel-host-c27-r4.md` | 交付判据＝**289 行／56,534 字节**（取数时刻 `12:07:53`，本行已入列；若与本行自身字节数有 ±一位数误差，以编排者复尺为准——本程此后不再改本件） |
+| `wc -l -c docs/evidence/s1/33-panel-host-c27-r4.md` | 交付判据＝**307 行／60,593 字节**（取数时刻 `12:14:34`，本行已入列；若与本行自身字节数有 ±一位数误差，以编排者复尺为准——本程此后不再改本件） |
 
 ### 收尾其它读数（同批发）
 
-- 本程提交清单（逐枚 `git log --format`）：`0a17c9fd`（`11:37` 证据件骨架，④⑤⑥ 起手写满）→ `2288265b`（`11:55` 六格装牙，只两枚 `*_test.go`）→ 本枚（证据件终态＋票面 Progress log 一行）。⛔ 未 push。
+- 本程提交清单（逐枚 `git log --format="%h %ad %s"` 现量）：`0a17c9fd`（`11:37` 证据件骨架，④⑤⑥ 起手写满）→ `2288265b`（`11:55` 六格装牙，只两枚 `*_test.go`，766 增／91 删）→ `c8e715e3`（`12:08` 把那枚 U+26D4 请出断言字符串，1 增／1 删）→ `2dd28ace`（`12:09` 证据件终态＋票面两条 Progress log）→ 本枚（复跑读数＋§⑤ 第 25/26 条＋这行清单）。⛔ 全程只 commit、**未 push**。
 - 每一枚提交的 pathspec 都是显式单文件／双文件；`git add -A`／`.` 零次；`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean` 零次；仓内零删除（副本里也只用覆盖还原，没有 `rm`）。
 - 票面：`git diff --numstat eed229e4..HEAD -- .scratch/wisp/issues/33-panel-host-c27.md`＝**1 增／0 删**（我那一条 Progress log 追加行），复选框**一枚未碰**；表里 §③ 已把"多出来的那枚 `- [ ]`＝AC#14"归给编排者自己的 `0ecd725c`。
 - 台件目录：`.scratch/wisp/probes/33/r4/`（`baseline-roster.txt`／`final-roster.txt`／`logs/baseline-start.txt`／`logs/targeted-1..3.txt`／`logs/focus-alone.txt`／`logs/latency-count10.txt`／`logs/mut-b-ac12.txt`／`logs/mut-d-focus.txt`／`logs/final-pkg.txt`／`logs/d22scan.txt`／`logs/d22scan-after.txt`）；仓外副本 `%TEMP%/33r4-clean/`（含 `ipv6probe/main.go`）——**只建不删**，全部留在盘上供复尺。
