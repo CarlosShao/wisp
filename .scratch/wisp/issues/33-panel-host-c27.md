@@ -32,9 +32,12 @@ owner 当场提了一条功能要求，逐字：「问题我早就说过了，�
 
 ## 新增判据（本票自加，勾仍归非实现者）
 
-- [ ] **AC#11（09-30 23:4x 编排者追加，来路＝`33-h1` ④ 节 J6）**：**清检出能建**——把仓拷进临时目录（不带未跟踪产物）后 `GOFLAGS= go build ./...` 必须通过；若今天不通过，本票**不许**用"提交 `frontend/**` 产物"或"改 `.gitignore` 加豁免"来让它通过（那两条分别撞两层禁令与 `A207` 那味 index-aware 过滤），要**停手上报**由我改派构建链那侧。判据自带反向证：把 embed 模式改成一个不存在的路径 ⇒ 构建**必须**失败（证的是"这枚判据有牙齿"，不是"我改了就红"）。
+- [x] **AC#11（09-30 23:4x 编排者追加，来路＝`33-h1` ④ 节 J6）**：**清检出能建**——把仓拷进临时目录（不带未跟踪产物）后 `GOFLAGS= go build ./...` 必须通过；若今天不通过，本票**不许**用"提交 `frontend/**` 产物"或"改 `.gitignore` 加豁免"来让它通过（那两条分别撞两层禁令与 `A207` 那味 index-aware 过滤），要**停手上报**由我改派构建链那侧。判据自带反向证：把 embed 模式改成一个不存在的路径 ⇒ 构建**必须**失败（证的是"这枚判据有牙齿"，不是"我改了就红"）。
 
 - [ ] **AC#12（10-01 00:0x 编排者追加，来路＝我自己量的那枚 `.gitkeep`；勾仍归非实现者）**：**"能构建"不等于"有页面可发"**。现量：库里 `frontend/dist` 只跟踪**一枚 `.gitkeep`**（尺：`git ls-files frontend` ⇒ `frontend/dist/.gitkeep`），而活模式是 `frontend/embed.go:19` 的 `//go:embed all:dist`——`all:` 连点文件一起收，所以**AC#11 今天很可能是绿的，而绿的原因是目录里躺着一枚占位文件**。⇒ 本票不许把 AC#11 的绿当成"面板有内容"：判据要能区分**"embed 只匹配到占位文件"**与**"真有一包页面产物"**（问能力：embed 后的文件系统条目数／关键入口是否真存在，⛔ 不问构建退出码、不问文案）。⚠ 产物由界面侧那枚 agent 产出，本编队⛔ 不写 `frontend/**` ⇒ 这一格在"谁把 dist 填上"落定前**勾不了**，与票 248 的 AC#9 是同一件事的两面（同一枚归口）。
+
+- [ ] **AC#13（10-01 11:2x 编排者追加，来路＝`33-v1` 验收表 §AC#3"供给那半"＋我自己现读；账 `A494`）：冷启动那段"往返探测"不许把真页面盖掉。** 现读时序（我 11:1x 亲自复认过行号）：`cmd/wisp/panel_host_windows.go:221` 调 `serveEntry()` → `:250` 把 embed 的入口字节 `SetHtml` 进控件，紧接着 `:227` 调 `firstRoundTripLocked(...)` → **`:372-375` 又一发 `SetHtml`，内容是一枚自造的探测页**（`<!doctype html>…<script>if(window.wispProbeRT)window.wispProbeRT();</script>…`）⇒ **每次冷启动最终显示的是那枚探测页，不是面板**。⚠ 这条不是"注释过期"：**面板真接进常驻之后，用户看到的仍然是枚空壳页**，而台件只会绿（它断的是"往返成立"，不是"页面是内容页"）。**完成判据**＝① 探测与供页面**次序重排**或改用资源请求过滤器（`AddWebResourceRequestedFilter` 在 `pkg/edge` 是**导出**的，同文件 `:34` 的注释自己就承认了这一点）；② 一枚**会响的**断言钉"最终文档里含 embed 入口的真内容"（问能力：解析出的条目／文档正文特征，⛔ 不问 `SetHtml` 被调用过）；③ 反控＝把两发 `SetHtml` 的次序调换，该用例**必须**红。⛔ 不许用"删掉探测"来糊——探测是 AC#4/冷启动"可用"判定的来源，删它会把另一格打空。
+  ⚠ **连带更正实现腿两枚停手上报里的一枚**（判语＝`33-v1`，我追认）：「多文件过滤器接不上，因为 `PutBounds` 吃模块私有类型 `w32.Rect`」**理由不成立**——不需要构造那枚类型：`(*edge.Chromium).Resize()`（`chromium_amd64.go:12-22`）是导出的、内部自己 `GetClientRect` 再调 `PutBounds`，高层 `SetSize`／创建链路用的正是它（`webview.go:429`、`:340-344`）。⇒ **这一形属"产品形状决策"，不属"依赖边界"**，任何下一程不许再拿它当阻塞。
 
 ## What to build
 The `panel` module host side: singleton PanelManager owning at most ONE WebView2 window per
@@ -236,3 +239,28 @@ declaration consumed by 37's native card.
   **未据此放宽任何断言、未改任何冻结件。**
   **撤销口令：「撤 33 progress 33-r3」**（撤＝只删本节＋留一行撤销记录，不改写上面任何一行）。
 - [ ] **AC#10（09-28 17:5x 编排者追加，来路＝`180-a1` 普查＋账 `A391`；不勾，勾要非实现者裁）**：宿主真起来那天，**`[panel]` 那五枚字段必须有生产者**——`width`／`height`／`scale` 要真去设窗口边界（`internal/config/schema.go:525-535` 是定义处，生产读取方现量＝**各 0**），且规格逐字要求 `hot` 生效（`PLAN.md:2743`＋`SPEC-03:39`）。⚠ 判据要能区分"读值并真设边界"与"只在测试里读一下"；**不许用"把 `default:"640"` 改掉"交差**（票 180 `AC#3` 同一条雷）。
+
+---
+
+## 编排者收件（10-01 **11:18**，收 `33-v1` 验收表 `docs/evidence/s1/33-panel-host-c27-v1.md`＝**219 行／60,796 字节**，四枚提交 `a75387cc`→`345b058b`→`e0ed6ef4`→`d6064656`；⛔ 票面 AC 框它一枚未碰，我核过＝现读 13 框（其中 AC#11 那一枚勾是**我**这轮翻的，其余 12 枚未勾））
+
+**判语收表（勾哪几格、各归哪一发腿）**
+- **AC#11 成立 ⇒ 已勾**。凭据我认：清检出 `go build ./...` 两发 exit 0，**反向证由验收腿自己跑**（只在仓外副本里把 embed 目标改名、零删除、未动 `frontend/**` 一字 ⇒ exit 1，红句逐字 `frontend\embed.go:19:12: pattern all:dist: no matching files found`）。⚠ 本格范围**只有"能建"两字**，不许任何程把它读成"有页面可发"（那是 AC#12）。
+- **AC#3 不成立 ⇒ 不勾，归 `33-r3`**：「无监听端口」那一维**今天没有任何会响的检**。验收腿把产码改成真开一枚 `127.0.0.1` 监听 ⇒ 断言照绿（八发全 PASS），同发仓外 PowerShell 取到 ground truth（`wisp.test` pid 28572 确有 LISTEN `127.0.0.1:62971`）。根因定位到行，**我 11:1x 自己复认**：`cmd/wisp/panel_host_windows_test.go:115` 写 `tcpTableOwnerPIDAll = 4`，而**同一仓**的 `internal/proc/treemetrics_windows.go:57` 写 `= 5`（真值 5）；`:116` 写 `tcpStateListen = 10`，而 LISTEN 真值是 2（10 不是 LISTEN）。⇒ 两枚常量错位 ⇒ 查询取错表＋状态永不匹配 ⇒ **恒真**。附带：只读 `AF_INET`、重试耗尽静默 `return 0`。
+- **AC#4 不成立 ⇒ 不勾，归 `33-r3`**：焦点回还那一跳**只有 `t.Logf`**（`panel_host_windows_test.go:249-251`），全仓 `prevFocus` **零枚断言**；且 `prior` 取在 `HotShow` 之后 ⇒ 11 发里"Show 之后的前台窗"**逐发就是面板自己的句柄**（等于把焦点还给刚被藏起来的那扇窗）。
+- **AC#1／AC#2／AC#12 ⇒ 一律不勾**（读数真，判据形不齐或归口未落）：AC#1 有牙的是 `IsCreated` 状态断言，票面要的 **process-tree** 数成了**全机按名数**（基线 14 枚属别人会话、我们贡献约 6），且**从未比较 hide→re-show 的 HWND 身份**，dispose 那一半在产品里不可达；AC#2 的 11 枚读数（冷 max 937.093／中位 760.377，热 max 45.426／中位 37.825）未越界、P11 未触发、阈值一字未动，但票面要的 10-run P50/P95＋appendix 在仓里**不存在**（`grep P50|P95`＝0），日志里那句 "HEAD 7a41db9b" 是**硬编码字面量**；AC#12 那枚用例全文只有 `t.Logf`、零 `t.Errorf`＝**空尺**（牙在 `internal/panel/assets.go:56`＋`assets_test.go:22`，我逐名复认存在）。
+- **本轮新开一格 AC#13**（写在上面「新增判据」那节）：冷启动那两发 `SetHtml` 把真页面**盖掉**了。
+
+**交我裁的五件，我此刻的答**
+1. **AC#2 按哪种形状结** ⇒ **不放宽、不改判据**：把"10-run 汇总"做成**真台件读数**，appendix 落 `docs/evidence/s1/`（⛔ 不进 `docs/SLO.md`，它在禁改清单），硬编码 HEAD 改成运行时取数。⚠ 这是修仪器，不是重定门槛。
+2. **J2／AC#5 现在开还是留** ⇒ **留给下一程**，但先具名更正实现腿那句：**"不走会 fatal 的 API"不成立**——产码入口 `webview2.NewWithOptions` 自带**三枚 `log.Fatal`**（模块 `webview.go:115/120/125`），edge 层 `:173`（运行库缺失那一支）／`:295` 也在。⇒ 任何"运行库缺失"的修法**不许声称绕开了 fatal**，要真探测再创建。
+3. **泵所有权三形** ⇒ **不摆 owner，先量**（理由具名：那句"从球的 ui-sta 再入会 panic"目前只是〔仅自述＋栈形状〕——无原始栈、无复现命令、用例自陈未提交、`probes/33/r1/` 里没有该发工件；而它**也没说**"投递原语已在、只差一枚导出包装"，`staThread.PostTask` 之所以只在包内可见是因为 `staThread`／`b.sta` 未导出，这直接改变代价）。⇒ 已派 `33-a2`（只读普查）。⛔ 任何腿不许为此动 `internal/observe` 那六枚名册或基线常量（那一档＝人工批准）。
+4. **`staticcheck` 本机版（2025.1.1）与 CI 钉的（2026.2.1）不同、`ci.yml:181-200` 自陈那一步导入期即崩** ⇒ 这一门**我不复认**，交 CI，本表结论标〔未复认〕。
+5. **AC#12 的勾** ⇒ 同意"等谁把 dist 填上"（票面 `:37`），与票 248 AC#9 同归口；但**空尺这格不等**：`33-r3` 要给它装牙（该红时红，或明确 skip 并说一句为什么），⛔ 不许留一枚"看起来在测"的用例。
+
+**另三枚登记（只登记，本票不改文件）**
+- **CI 分母错位**：`cmd/wisp/panel_host_gate_test.go:3-6` 自述"ubuntu core scope too"，实际 L1／AC#11／AC#12 三枚只在 **windows cli 腿**（`scripts/portable-tests.sh:195`＋`.github/workflows/ci.yml:475`/`388`＋`scripts/wisp-cli-tests.sh:65`），ubuntu core 那份清单（`ci.yml:341`）只有 `./internal/panel/...` ⇒ 过期指认，未改文件。⚠ 反转钉本身在 core 有分母（这条成立）。
+- **`go mod tidy -diff` 在 HEAD 上 exit 1**（webview2 记成 `// indirect`；另两枚被 tidy 会抹掉的 `x/sys v0.47.0` 行起手就在）。仓内 CI 无 tidy 门 ⇒ 今天不红，但**任何腿跑 tidy 就会造出一枚不属于它的 diff**，派单里要写死。
+- **起手 4 枚 `internal/panel` 红逐名判归因＝非本程**（`approval_test.go:129`／`composer_test.go:74`／`frontend_hygiene_test.go:216`／`tokens_fourway_test.go:441`；第四枚落在**冻结件**上，红因＝`git status` 里那 16 枚 ` D` 的 `design/**`）⇒ 与任务 #109"推送前逐名比红名集合"同源，我按**已知常红**读，不据此判任何格。
+
+**排程（本轮定的序）**：`33-r3`（仪器腿，**只改 `cmd/wisp/*_test.go`**）→ `33-r2`（功能腿：接进常驻＋AC#13 那两发 `SetHtml`）→ 票 248 落地腿。⚠ `228-a2`（只读）此刻在飞、读面含 `cmd/wisp`／`internal/ball` ⇒ **要动 `resident_*.go` 的那一发必须等它交完**。
