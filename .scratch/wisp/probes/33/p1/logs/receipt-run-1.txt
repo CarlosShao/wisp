@@ -1,0 +1,5 @@
+time=2026-10-01T12:35:52.188+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=probe33p1-watchdog owner=33-p1
+FORM=run RESULT=RUN-RETURNED (WM_QUIT consumed the library loop)
+FORM=run ECHO_CALLS=3 ROUNDS_WANT=3 WMAPP_DEQUEUED=0 WMAPP_WITH_HWND=0 OTHER_DEQUEUED=3 REPORTS=1 REPORT_FIRST="0=echo:ping-0;1=echo:ping-1;2=echo:ping-2" REPORT_LATENCY_MS=107 QUIT=not-sent (host finished on its own) PANICS=0
+FORM=run REPORT_RAW=0=echo:ping-0;1=echo:ping-1;2=echo:ping-2
+VERDICT run: receipt REACHED the page in 1 of 1 reports

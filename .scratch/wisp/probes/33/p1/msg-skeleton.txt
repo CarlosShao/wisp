@@ -1,0 +1,41 @@
+(probe 33-p1) skeleton: carrier decided, 5/6/7 sections filled first
+
+Leg 33-p1 probe (real runs allowed), ticket 33 panel host C27.
+
+This first commit is the skeleton only, per the hard budget gate: the three
+self-adversarial sections (measured rulers, undecidable cells, possible
+mistakes) are written full before either question's body is filled in.
+
+Carrier decided by measurement, not by assumption:
+- probe goes to .scratch/wisp/probes/33/p1/probe/main.go, run via `go run`
+- GOFLAGS= go list ./... = 35 packages, zero containing "scratch" and zero
+  containing "spike", so the probe cannot enter the default build graph
+- scripts/spike/ is a separate module (module github.com/CarlosShao/wisp/
+  scripts/spike), so it cannot import this repo's internal/... - it would
+  have lost the observe panic-sink half of question 1
+- cmd/wisp/testdata/ rejected: still under cmd/wisp/, and 33-v2 must diff
+  that package's file roster by name
+- d22scan's Go scope is only internal/ and cmd/ (main.go:241-246), and it
+  prunes testdata/.git at :660 and skips _test.go at :665
+
+22 rulers logged with verbatim readings: dependency thread requirements
+(webview.go:443-448 Dispatch only posts, :351-379 Run is the sole reader of
+dispatchq, :58 unexported; pkg/edge/chromium.go:95-111 blocking nested
+GetMessageW pump, :130-136 Init with nil guard absent, :224 inited set only
+in the COM callback), the JS rpc stub shape (webview.go:462-479), the
+shipping host's current self-pump (cmd/wisp/panel_host_windows.go:344-411),
+and the observe recover/debug.Stack/sink instrument (goroutine.go:262-330,
+:153, :241) used as-is with zero edits.
+
+Explicitly marked [replica], not a production reading: question 1's thread
+reproduces internal/ball's ui-sta shape (LockOSThread + COINIT_APARTMENTTHREADED
++ own window class + GetMessageW pump + wmAppTask posting), because
+b.fire/staThread/PostTask are all unexported (33-a2 R20) and internal/ball
+is write-banned for this leg. The reentrancy question is settled per shape,
+not per ball callback.
+
+No production file touched. Zero AC boxes on the ticket touched. cmd and
+internal dirty-count = 0 at start and must be 0 at delivery.
+
+next: run question 2 (receipt hop, self-pump form vs Run() form), then
+question 1 (re-entrant WebView2 create from inside a window callback).

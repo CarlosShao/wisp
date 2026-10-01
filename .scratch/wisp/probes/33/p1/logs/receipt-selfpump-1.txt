@@ -1,0 +1,4 @@
+time=2026-10-01T12:35:32.601+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=probe33p1-watchdog owner=33-p1
+FORM=selfpump ECHO_CALLS=3 ROUNDS_WANT=3 WMAPP_DEQUEUED=4 WMAPP_WITH_HWND=0 OTHER_DEQUEUED=27 REPORTS=1 REPORT_FIRST="0=NOT_RESOLVED;1=NOT_RESOLVED;2=NOT_RESOLVED" REPORT_LATENCY_MS=6150 QUIT=not-sent (host finished on its own) PANICS=0
+FORM=selfpump REPORT_RAW=0=NOT_RESOLVED;1=NOT_RESOLVED;2=NOT_RESOLVED
+VERDICT selfpump: receipt DID NOT reach the page (awaited value never resolved in 1 reports)

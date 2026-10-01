@@ -1,0 +1,5 @@
+time=2026-10-01T12:48:39.047+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=probe33p1-watchdog owner=33-p1
+FORM=selfpump EVAL_ISSUED at=800ms (direct w.Eval on the UI thread, bypassing Dispatch/dispatchq)
+FORM=selfpump ECHO_CALLS=0 ROUNDS_WANT=3 WMAPP_DEQUEUED=1 WMAPP_WITH_HWND=0 OTHER_DEQUEUED=27 REPORTS=1 REPORT_FIRST="EVAL_SEEN title=EVAL-OK-33P1 polls=4" REPORT_LATENCY_MS=907 QUIT=not-sent (host finished on its own) PANICS=0
+FORM=selfpump REPORT_RAW=EVAL_SEEN title=EVAL-OK-33P1 polls=4
+VERDICT selfpump+evalcheck: a direct Go-side Eval DID reach the page ([EVAL_SEEN title=EVAL-OK-33P1 polls=4]) even though the binding reply did not -> push and reply are two different hops

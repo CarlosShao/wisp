@@ -1,0 +1,16 @@
+STA tid=22096 locked=true com=sta
+CoInitializeEx(0x2 COINIT_APARTMENTTHREADED) r=0
+replica window hwnd=%!p(windows.HWND=77727840) class=Wisp33P1ReplicaSTA message_only=true
+STA-HANDLE-RETURNED err=<nil>
+FINAL mode=skipcreate-control create_returned=true create_nil=false create_ms=0 tasks_taken_by_nested_pump=0 tasks_after_callback=5 outer_iters=6 ping=0 panics_total=0 sink_writes=0 sink_file=C:\Users\swq\AppData\Local\Temp\wisp33p1\reentry-skipcreate-control-sta\panic-sink.txt
+SEQ CALLBACK enter outer_iters=1 tid=22096 mode=skipcreate-control
+SEQ SKIP-CREATE control: no bring-up issued; the outer pump should keep the order
+SEQ CALLBACK exit outer_iters=1
+SEQ task P1 ran after the callback, in order (outer_iter=2)
+SEQ task P2 ran after the callback, in order (outer_iter=3)
+SEQ task P3 ran after the callback, in order (outer_iter=4)
+SEQ task P4 ran after the callback, in order (outer_iter=5)
+SEQ task P5 ran after the callback, in order (outer_iter=6)
+SEQ outer GetMessageW returned 0 (WM_QUIT) at iter=6
+SEQ replica window destroyed
+VERDICT skipcreate-control: ORDER KEPT - all 5 tasks ran after the callback, the nested pump took none. This is the shape the reentrant run SHOULD have looked like.

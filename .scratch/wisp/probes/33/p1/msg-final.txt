@@ -1,0 +1,91 @@
+probe(33-p1) final: question 1 = branch (c) order-reversal, question 2 = receipt lands only under Run()
+
+Ticket 33, probe leg 33-p1 (real runs allowed). Delivers readings for exactly
+the two cells 33-a2 could not settle without running, nothing else.
+
+QUESTION 1 - re-entrant WebView2 bring-up from inside a window callback on a
+thread that is already pumping. Answer: branch (c), it returns but the order is
+broken. Not a panic, not a permanent block.
+  - replica thread (LockOSThread + CoInitializeEx(0x2) + own class +
+    GetMessageW/Translate/Dispatch + wmAppTask = WM_APP+0x201 posting, mirrored
+    from sta_windows.go:47-96 and win32_windows.go:99-102,160-183)
+  - create from inside the window proc returned in 544ms (control without the
+    outer pump on the stack: 561ms), Bind and SetHtml issued from the same frame
+  - the outer pump did not advance one step: iter=1 at callback entry, iter=1 at
+    callback exit, while all 5 tasks posted before the call ran inside it
+  - positive control (-skipcreate, same callback position, nothing blocking):
+    nested=0 after=5 spread over outer_iter 2..6, so the counter is not blind
+  - baseline also reads nested=5, and that is NOT evidence: with no outer pump
+    yet started the nested pump is the only pump. Only the frozen outer iter
+    makes it a reordering. Recorded as 5-12.
+  - predicted panic (chromium.go:106 break -> :112 -> :131 nil e.webview) is
+    reachable but had to be forced by posting WM_QUIT myself; raw stack of that
+    run: pkg/edge/chromium.go:131 in Init, captured by the repo's own
+    observe.Registry panic sink (goroutine.go:302 debug.Stack)
+  - correction to the dispatch note: the stack does NOT "land by itself".
+    SetPanicSink has zero production callers (only goroutine_test.go:117-118),
+    so goroutine.go:314 takes the nil branch and only the message, never the
+    stack, survives in h.errc. Anyone who wants the stack must install a sink.
+  - second panic shape found by my own bug: I passed 0x0 for
+    COINIT_APARTMENTTHREADED (real value is win32_windows.go:149 = 0x2) and got
+    a nil-pointer panic at pkg/edge/chromium.go:175 in EnvironmentCompleted,
+    called synchronously from Embed:87, because :171 int64(res) < 0 does not
+    catch a 32-bit error HRESULT passed as uintptr. Kept as a three-way COM
+    matrix: sta 0x2 = 561ms ok, none = 531ms ok, mta 0x0 = panic. The shipping
+    host and the test harness never call CoInitializeEx at all
+    (grep -rn CoInitialize cmd/wisp/*.go = zero hits), so today they run the
+    "none" shape while ui-sta is the "sta" shape. res真值 not captured, so this
+    is phenomenon only (7-jie-3).
+
+QUESTION 2 - who delivers the Go->page hop. Answer: nobody in ticket 33's
+current shape; Run() does.
+  - page awaits a bound Go call 3 times, racing each against a 2s timer, then
+    reports the awaited values back through a second binding, so the judge is
+    the page's own words, not "the binding was called"
+  - self-pump (verbatim pnlPumpOnce shape, plus the two fields it never decodes)
+    -> page reported 0=NOT_RESOLVED;1=NOT_RESOLVED;2=NOT_RESOLVED at 6150ms,
+    ECHO_CALLS=3 (inbound fine), WMAPP_DEQUEUED=4, WMAPP_WITH_HWND=0, no panic
+    -> thread messages were taken off the queue and DispatchMessageW routed
+    them nowhere; the closures stayed in dispatchq
+  - Run() form -> page reported 0=echo:ping-0;1=echo:ping-1;2=echo:ping-2 at
+    107ms. That settles 33-a2's heaviest self-doubt (6-5) with a machine reading
+  - third reading, deliberate because the ticket forbids conflating them: a
+    direct Go-side Eval on the UI thread DOES reach the page in the self-pump
+    shape (EVAL_SEEN title=EVAL-OK-33P1), so "push" works without Run() while
+    "binding reply" does not. Push and reply are two dimensions.
+  - exported drain does not exist: WebView interface roster (common.go:26-50)
+    has Run/Terminate/Dispatch/Destroy/Window/SetTitle and nothing else;
+    dispatchq has exactly 4 references, all inside the dependency
+
+CARRIER, decided by measurement: .scratch/wisp/probes/33/p1/<name>/main.go run
+by explicit path. GOFLAGS= go list ./... = 35 packages, zero containing
+"scratch"; d22scan Go scope is internal/ and cmd/ only (main.go:241-246,
+prunes at :660, skips _test.go at :665) so the probe is not in the default
+build graph and not in the gate's scope either. Nothing was added under
+cmd/wisp, not even testdata.
+
+Corrections I owe the fleet, both measured:
+  - the brief's reason for rejecting scripts/spike as carrier is wrong: a
+    separate module whose path is nested under github.com/CarlosShao/wisp/ CAN
+    import internal/ (built it, rc=0); the one outside the root eats
+    "use of internal package ... not allowed". scripts/spike is unusable today
+    for a different reason - no require/replace for the root module, and adding
+    one hits missing go.sum entries for the root's dependency set.
+  - "走真常驻那条路栈会自己落盘" is only half true, see above.
+
+Gates at delivery state: GOFLAGS= go build ./... rc=0, sh scripts/d22scan.sh
+rc=0 (clean; bans #1-5 internal/=224 cmd/=33, ban #8 internal/=476 cmd/=78),
+git status --porcelain -- cmd internal = 0, placeholder ruler = 0 hits.
+
+Untouched, as required: every production file (cmd/wisp non-testdata, internal,
+pkg/edge, internal/ball), ticket AC boxes, PLAN.md, specs, SLO/BUILD,
+thresholds.go, goldens, allowlist, the three frozen test files. go mod tidy and
+go get not run. No file deleted, no worktree, no push. msedgewebview2 count
+14 before and 14 after, so no orphaned children left on this box.
+
+Still undecidable by me, named for the 33-r5 brief: the ball's own callback
+(replica scope), whether frame output gets reordered, the HRESULT behind the
+MTA panic, Run() co-resident with ui-sta, and the real length of dispatchq.
+
+files: .scratch/wisp/probes/33/p1/probe.md + receipt/main.go + reentry/main.go
++ logs/ (11 verbatim run logs, placeholder pattern, start/final rosters)

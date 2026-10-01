@@ -1,0 +1,9 @@
+STA tid=10992 locked=true com=mta
+CoInitializeEx(0x0 COINIT_MULTITHREADED) r=0
+replica window hwnd=%!p(windows.HWND=10749676) class=Wisp33P1ReplicaSTA message_only=true
+SINK-EVENT goroutine=probe33p1-usta recovered="runtime error: invalid memory address or nil pointer dereference" file=C:\Users\swq\AppData\Local\Temp\wisp33p1\reentry-baseline-mta\panic-sink.txt
+STA-HANDLE-RETURNED err=internal: panic in goroutine "probe33p1-usta" (owner 33-p1): runtime error: invalid memory address or nil pointer dereference
+WATCHDOG-STILL-ALIVE
+FINAL mode=baseline create_returned=false create_nil=false create_ms=0 tasks_taken_by_nested_pump=0 tasks_after_callback=0 outer_iters=0 ping=0 panics_total=1 sink_writes=1 sink_file=C:\Users\swq\AppData\Local\Temp\wisp33p1\reentry-baseline-mta\panic-sink.txt
+SEQ CALLBACK enter outer_iters=0 tid=10992 mode=baseline
+VERDICT baseline: bring-up did not return even with no outer pump on the stack -> the re-entry question is moot, look elsewhere

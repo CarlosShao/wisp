@@ -1,0 +1,18 @@
+STA tid=27276 locked=true com=sta
+CoInitializeEx(0x2 COINIT_APARTMENTTHREADED) r=0
+replica window hwnd=%!p(windows.HWND=232261074) class=Wisp33P1ReplicaSTA message_only=true
+STA-HANDLE-RETURNED err=<nil>
+FINAL mode=reentrant create_returned=true create_nil=false create_ms=544 tasks_taken_by_nested_pump=5 tasks_after_callback=0 outer_iters=3 ping=0 panics_total=0 sink_writes=0 sink_file=C:\Users\swq\AppData\Local\Temp\wisp33p1\reentry-reentrant-sta\panic-sink.txt
+SEQ CALLBACK enter outer_iters=1 tid=27276 mode=reentrant
+SEQ task P1 ran INSIDE the callback (a pump other than the outer took it) outer_iters=1
+SEQ task P2 ran INSIDE the callback (a pump other than the outer took it) outer_iters=1
+SEQ task P3 ran INSIDE the callback (a pump other than the outer took it) outer_iters=1
+SEQ task P4 ran INSIDE the callback (a pump other than the outer took it) outer_iters=1
+SEQ task P5 ran INSIDE the callback (a pump other than the outer took it) outer_iters=1
+SEQ bring-up RETURNED a window after 544ms; still inside the same callback frame=true
+SEQ Bind from inside the callback OK
+SEQ SetHtml from inside the callback issued
+SEQ CALLBACK exit outer_iters=1
+SEQ outer GetMessageW returned 0 (WM_QUIT) at iter=3
+SEQ replica window destroyed
+VERDICT reentrant: branch (c) ORDER-REVERSAL - it returned in 544ms, but 5 tasks posted before it ran INSIDE the nested pump (outer pump frozen at iter=3 the whole time)
