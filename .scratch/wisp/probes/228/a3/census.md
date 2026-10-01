@@ -100,6 +100,16 @@
 - 仪器：**零**（同 (a)(b)）。
 - 冻结契约：与 (a)/(b) 同一枚 C18；(c) 本身**不新增决策面**，只新增一次读，所以它是否碰契约取决于它承载 (a) 还是 (b)。
 
+### 第二发补充：AC#2 那句"带正确 `Channel` 的答复"今天**没有对应的值可带**〔量 R31〕
+
+尺：`sed -n '44,125p' internal/agent/approval/approval.go` ＋ `grep -rn "Statuses()\|ChannelStatus" --include=*.go internal cmd | grep -v _test`。
+
+- `Channel` 是**四枚否决通道的闭集**，注释 `approval.go:48-50` 逐字：「The Channel is one of the four L1 **veto** channels. **The set is closed: a fifth value means a caller invented a selector, which is exactly the M-7/C-3 failure shape（a security decision keyed on an unvalidated label）**」；
+  四枚值 `:54-57`（`ball`/`esc`/`panel`/`kws`），`allChannels :61`，显示名 `channelNames :88-93`。
+- `Veto` 结构体才带 `Channel`（`:73-77`）；**"允许"这一侧没有 `Channel` 字段**：`Allow` 走 `Request{CorrelationID, Allow, Grant, Source}`（`replies.go:328-330`），`Source` 是**标签不是权威**（`replies.go:116-123` 逐字「They are LABELS, not authority (gate.go says no branch reads Request.Source)」，`gate.go:719` 把它记成 `claimed_source=%q`）。
+- ⇒ **后果逐字**：票面 AC#2（`:39`）那句"每枚按钮断『点下去 ⇒ `Gate` 收到一条带正确 `Channel` 的答复』"，对**「允许一次／拒绝／长期允许」这三枚**今天**无法按字面满足**——要它满足就得给闭集加第五枚值，而那一句注释正把这件事点名成 M-7/C-3 形状。
+  可满足的读法只有两支：**甲**把"正确 Channel"读成 `HostBinding.NativeSource` 标签（现成面，`replies.go:127-135`／`resident_approval_windows.go` 的 `nativeReplySource` 一类）；**乙**把它读成"这枚按钮只出现在 `Veto` 那一侧"（则 AC#2 里那三枚 allow 按钮这一判据今天**结构性写不出来**）。**两支都由编排者裁，本腿不选**（⇒ §⑦ F8）。
+
 ---
 
 ## ③ 诚实 advertise 的先例与同形判断
@@ -125,16 +135,36 @@
 `ErrBadGrant`→再补一句「这张卡需要重新显示才能被允许」。
 ⇒ 这就是本仓**已经付过一次代价**的那件事：**两种"不许"不许共用一句话**。
 
+**先例五（同一枚托盘文件里已经有一枚"什么都不做但说三遍"的项）**：`recordTrayExit`（`cmd/wisp/resident_ball_windows.go:253-258`）
+今天的形状＝①`const why` 一句完整因果（逐字「this process leaves when its event loop returns, which today only a console signal (Ctrl+C) asks for; the tray Exit item has no stop path attached to it」）
+＋②`slog.Warn("tray exit requested", "outcome", "ignored", "why", why)`＋③`fmt.Printf` 同一句到 stdout；
+注释 `:247-252` 逐字「**so it is reported instead of assumed**」，并把两条补法点名成新契约（与票面 `:89`/`:93` 一致）。〔量 R32〕
+⇒ **这是全仓离"托盘按下去没有执行者"最近的一枚诚实先例**：它不隐藏、不假绿，也不静默。
+
+**先例六（可用性是随卡带出去的字段，不是"不画"）**：`ChannelStatus`（`approval.go:80-85`，注释逐字「the honest, user-visible availability line for one channel. **An unloaded channel is NEVER rendered as available (B1)**」）
+＋`unavailableText`（`:102-119`，四句各不同文案，KWS 那句是 spec 逐字要求的「语音取消不可用」，注释逐字「the strip **must say this, never stay silent** about a channel that cannot fire」）
+＋`ErrChannelUnavailable`（`:121-124`，注释逐字「It is returned, not swallowed: **a silently ignored cancel attempt is how a fake channel becomes a user-visible promise**」）
+＋`Statuses()`（`:190-194`）被 `gate.go:605` 逐字 stamp 进卡片的 `Channels` 字段（结构在 `ui.go:40`）。〔量 R33〕
+⇒ 这一族的形状＝**能力自己带着"我此刻能不能用"走**，界面按 `Loaded` 画一句不可用的话，而不是把能力藏起来。
+
+**先例七（"投了一票但没人接"已被裁过一次）**：`gate.go:456-463` 逐字记录票 87 那一发：
+「a veto naming a card that is ON SCREEN used to fall through to `ErrUnknownCorrelation` here … **The user's vote was simply not heard and the call waited out the full C18 deadline**. Hand it to the queue's refusal funnel instead」。〔量 R33〕
+⇒ 本仓对"按下去落空"**已有的判决不是"让它安静"，而是"改路由，让落空本身产生一条看得见的拒绝"**。这一条与 §②(a) 的关系最直接：托盘那枚"允许一次"若无卡，本仓的先例要求它**留下一条可审计的落空**，而不是让菜单 0／被关掉那一支替它背。
+
 **共同形状（一两句）**：把"不响"分成**刻意不绑**（分类有名、不报警）与**按了落空**（必须出声、且出声的句子要说清是哪一种落空）；
 **能力入口在拿不到真通道时返回 nil／一句后果句，绝不返回一个看起来能用的假象**（`advertise 一枚按不动的键` 是被点名禁止的那一枚）。
 
-**同形／相反（只报形状匹配，不报推荐）**：
+- **同形／相反（只报形状匹配，不报推荐）**：
 - **(a) 永远显示＋按下去报错**：与先例三／先例四／先例二**同形**（按下 ⇒ 一句分过含义的实话），
   前提是它真的**把那句说出来**；若实现成"取到错误但没人接"（`internal/ball` 的回调是 `func()`，`b.fire` 只看 nil／非 nil，`ball_windows.go:728-732`），它就同时**与先例相反**——这正是派单点名的"静默失败"那一格。⇒ 本腿把 (a) 拆成 (a1) 出声／(a2) 不出声两支登记，见 §⑥ E14。
 - **(b) 灰掉／不显示**：**灰掉**与先例一同形（看得见"这里有一枚能力，此刻不可用"），
   **不显示**与先例**相反**——先例四支全都在"说清是哪一类不响"，而"整枚项消失"不留任何一句，读的人无法区分"这里从来没有这枚按钮"与"有卡但我看不见"。
 - **(c) 打开菜单时现取一次**：**同形**于先例一（在展示的那一刻按当下的真实分类决定可见性，且 `HotkeyStandby` 那条先例证明"分类本身要说得出"）；
   但它同时与先例二那条"分类要说出口"的**另一半**有张力：`showMenu` 的返回值里"被关掉"与"没选"都是 0（`:70-71`），所以取数时机再准，**选择这一侧今天仍只有"命令 id"这一维可返回**，报错那一维要靠别处（审计／球）出声。
+- **补三条与先例五／六／七的匹配（第二发）**：
+  先例五（`recordTrayExit` 的"说三遍"）与 **(a1) 同形**、与 **(a2) 相反**、与 **(b) 的"整枚消失"相反**（它那一支什么都没显示过）。
+  先例六（能力自带 `Loaded` 句、"NEVER rendered as available"）与 **(b) 的置灰支同形**、与 **(b) 的不显示支相反**、与 **(a) 同形**（(a) 正是"带着不可用那句话被按下"）；⚠ 但先例六今天**只覆盖 `Veto` 那一侧**（`ChannelStatus` 只有四枚通道，`Allow` 没有对应的 availability 面，见 §② 第二发补充）⇒ 照它的形要**新增一枚 availability 概念**，那是新面不是抄面。
+  先例七（票 87 把"落空的一票"改路由成一条看得见的拒绝）与 **(a1) 同形**；⚠ 它**不与 (b) 冲突**（(b) 从一开始不让那一票发生），这一点我不能替编排者判"哪种算落空"，归 §⑦ F4。
 
 ---
 
@@ -211,6 +241,10 @@
 | R28 | `grep -n "q.mu.Lock\|q.mu.Unlock\|q.ui\|deliver(" internal/agent/approval/queue.go`＋`sed -n '296,340p'`＋`sed -n '227,240p' replies.go` | `Depth :133-137` 持锁只 `return len(q.pending)`；`deliver :298-310` 持锁但发送是 `select/default` 非阻塞；`Pending()` `replies.go:227-240` 持 `r.mu` 只做拷贝；`allowScoped` 在 `:377` 先 Unlock、`:382` 才 `deliver` ⇒ §① 末段那句"读到不阻塞的形状"＝〔推〕，未跑测试〔量＋推〕 |
 | R29 | **本腿没有跑的尺（点名，免得被读成"跑过、结果为空"）** | `go build`／`go vet`／`go test`／`scripts/build.ps1`／`go mod tidy` **全部零发**（派单禁令：`cmd/wisp` 里正有写腿在跑测试；`go mod tidy` 在 HEAD 上会 `exit 1` 并造出不属于本腿的 diff）⇒ 本文件**没有任何编译、测试、仪器绿灯读数**；§④ 的"会不会红"全部是**读断言取数方式推出**的〔推〕 |
 | R30 | `grep -rn "h\.Allow(\|cards\.Allow(\|\.Allow(s\.ctx" --include=*.go cmd internal`（排测试）＋`grep -rn "interactiveStdin()" --include=*.go cmd/wisp \| grep -v _test` | `Replies.Allow` 的**产码调用者＝1 枚**：`cmd/wisp/approval_reply.go:215`（在 `replySurface.allow` 内）；`interactiveStdin()` 的产码消费者＝`cmd/wisp/main.go:153` 与 `cmd/wisp/resident_task_source_windows.go:218`；POSIX 半边 `cmd/wisp/approval_reply_stdin_other.go:23` 逐字 `return nil` ⇒ **GUI 常驻腿里没有控制台答复者，也就没有 `Allow` 的可达调用者**〔量，复认派单背景〕 |
+| R31 | `sed -n '44,125p' internal/agent/approval/approval.go`＋`grep -rn "Statuses()\|ChannelStatus" --include=*.go internal cmd`（排测试） | `Channel`＝**四枚 L1 否决通道的闭集**（`:48-50` 逐字「The set is closed: a fifth value means a caller invented a selector … M-7/C-3」）；值 `:54-57`、`allChannels :61`、`channelNames :88-93`、`unavailableText :102-119`、`ErrChannelUnavailable :121-124`、`ChannelStatus :80-85`、`Statuses() :190-194`；消费者只有 `gate.go:605`（进卡片 `Channels` 字段，定义 `ui.go:40`）与 `run.go:1390`／`channelRosterText`（`resident_approval_windows.go:510`）〔量〕⇒ 正文 §② 第二发补充 |
+| R32 | `sed -n '240,262p' cmd/wisp/resident_ball_windows.go` | `recordTrayExit` 在 `:253-258`：`const why`（逐字整句）＋`slog.Warn("tray exit requested","outcome","ignored","why",why)`＋`fmt.Printf`；注释 `:247-252` 逐字「it is **reported** instead of **assumed**」〔量〕⇒ §③ 先例五 |
+| R33 | `sed -n '452,470p' internal/agent/approval/gate.go`＋`sed -n '598,610p'`＋`sed -n '30,50p' internal/agent/approval/ui.go` | `gate.go:456-463` 逐字记票 87：「The user's vote was simply not heard and the call waited out the full C18 deadline. Hand it to the queue's refusal funnel instead」；`:605` `Channels: g.channels.Statuses()`；`ui.go:40` `Channels []ChannelStatus` 在**卡片视图**结构里（`PanelItem` 的注释自 `:45` 起，逐字「There is deliberately no grant field, no Allow capability and no way to name a source」）〔量〕⇒ §③ 先例六／七 |
+| R34 | `grep -rn "nativeReplySource\|NativeSource" --include=*.go cmd/wisp`（排测试） | `approval_reply.go:80-81` 两枚标签常量逐字 `nativeReplySource = "cmd-wisp-console-native"`／`panelReplySource = "cmd-wisp-console-panel-route"`；`replies.go:116-123` 注释逐字「They are LABELS, not authority」〔量，供 §② 第二发的 甲 读法〕 |
 
 > ⚠ 本节里凡是"补完时逐字登记"的字样，都在同一枚文件的后续提交里被换成现读数；
 > 若某格最终仍是空的，那代表**本腿没跑到那一发**，按 §交件判语 认它的射程，不许读成"跑过、结果为空"。
@@ -282,12 +316,29 @@
 - **F5 L1 那一发的枚举面**。现量：票面 `:19` 逐字写「**L1 的 `Gate.windows` 全仓零枚枚举口**」，并指名"要枚举 L1 那一发就撞票 220 的 AC#2 甲形，先裁甲乙"。
   ⇒ 若第五枚项要对 L1 出声，本票就要先造枚举口＝撞票 220 的"两腿各造一次＝两份枚举器"（票面 `:60`）。**这一格不在本腿射程内，只登记它挡住了哪一支。**
 - **F6 「允许一次」拿哪枚 corr**。现量：`Allow(ctx, corr)` 需要关联号（`replies.go:316`），`AwaitingHuman()` 只给一枚卡（`:252`），`Pending()` 按显示序给全部（`:227`）⇒ 若同时有两枚卡在人等，托盘那一枚"允许一次"允许的是**哪一枚**没有定义。甲＝用 `AwaitingHuman` 的那枚（L2 优先，见 `:242-245` 注释原文）；乙＝菜单里列出全部（＝第四枚以上的新面，动 `showMenu` 结构）；不做＝本票只支持单枚并发。**本腿不选**——票面 `:39` 那句"每枚按钮断一条带正确 Channel 的答复"没说并发。
+- **F8（第二发新增）AC#2 那句"带正确 `Channel` 的答复"对三枚 allow 按钮今天没有值可带**。现量：`Channel` 是**四枚否决通道的闭集**，`internal/agent/approval/approval.go:48-50` 逐字禁止第五枚值（「a fifth value means a caller invented a selector, which is exactly the M-7/C-3 failure shape」）；`Allow` 走的 `Request` 只有 `CorrelationID/Allow/Grant/Source`（`replies.go:328-330`），而 `Source` 被注释逐字定性为「LABELS, not authority」（`replies.go:116-123`）。〔量 R31/R34〕
+  - **甲**：把"正确 Channel"读成 `NativeSource` 标签（现成面，R34）⇒ AC#2 可按字面写用例，**零新契约**。
+  - **乙**：读成"要真给托盘一枚 `Channel` 值"⇒ **动闭集＝动 SPEC-06 §2 的冻结词表**，且正落在 `:48-50` 那句被点名为失败形状的描述上 ⇒ 本腿只登记"这一支要人工批准"，**不当它是可选项**。
+  - **不做**：把票面 AC#2 的判据句子改写成"带正确 `Source` 标签的答复"——那是**改票面文字**，归编排者，实现腿与本腿都不许自己动。
+  ⇒ 这一格与"有没有卡"**正交**：三枚候选谁都不影响它，但它决定落地腿能不能按票面原话写判据。
 
 ---
 
 ## 交件判语
 
-（骨架：终态在下面补完，先钉三格边界）
-- 射程：① 菜单侧状态入口的现量与代价表；② 三枚候选要动的文件／函数与今天有没有仪器看得见；③ 先例的共同形状与同形／相反判断；④ `cmd/wisp/resident_ball_228_test.go` 两枚钉的断言语义（不引行号）。
-- 没答：F2（ui-sta 同步读的锁序安全）、F3（文案复用与否，未打开 `gate.go`／`internal/perm`）、F5（L1 枚举口归属）、F6（并发卡的 corr 语义）。
-- 本腿**零产码、零脚本、零测试、零构建**：没跑 `go build`／`go vet`／`go test`／`scripts/build.ps1`／`go mod tidy`；只写了这一枚文件。
+**射程（答到了哪一格）**
+- ①：菜单侧今天**只收两枚布尔**（`tray_windows.go:72`）、那两枚布尔的推线**在生产里零调用者**（R16）、审批状态住在 `cmd/wisp` 且**已经在该侧被读三次**（R17）、依赖箭头今天只朝一个方向（R18）；三条入口路线（甲推／乙拉／丙＝乙的时机变体）各自要动谁、代价是什么，全部列了而**没选**。
+- ②：(a) 的返回语义逐字量全（四支出声＋透传支的三枚队列错误，R4/R19）；**"有卡在等"与"允许得动"是两格**这一点有原文支撑（`replies.go:262` 空 corr、`:322` L1 无 allow）；"门／权限"两套文案在**本腿读到的十句里不相交**（R26），近碰撞在 approval 族内部（E11）；(b) 的置灰需要**新增一枚不存在的 flag 常量**（R14）；(c) 的取数时机今天落在**同一次调用内、弹出之前**（R6），且 `WM_COMMAND` 那一支援射法已被票面 `:100` 逐字关掉、本腿复认其凭据未漂。
+- ③：抽出共同形状一句，并给出**七枚**先例的逐字出处（热键 `Standby`／`interactiveStdin` 返 nil／`cmdRun` 后果句／常驻腿的 claim＋`why`＋`effect`／`vetoByEsc` 无卡那句／`bindBallHost`「advertise 一枚按不动的键＝B1 禁止的形状」／`ChannelStatus`＋`unavailableText`＋`ErrChannelUnavailable`＋票 87 的"落空一票改路由"）；同形／相反逐枚报，**(a) 拆成 (a1)/(a2) 两支**（因为回调没有错误回程，R15），**没有推荐**。
+- ④：两枚钉逐字读完（名册钉的两条断言＋取数方式），并给出**三枚候选×两枚钉**的响／不响表；`internal/ball` 的 **11 枚热键状态用例逐枚点名＝不管这一格**（R22），`internal/ball` 唯一的 AST 走形用例是 C21 token 表＝不管；**托盘侧仪器现状＝零**（R20 带正控）。
+
+**没答（不许读成答了）**
+- **F2 的剩下半边**：ui-sta 上同步读的完整锁序——我只读了 `Depth`/`deliver`/`Pending`/`routes`，`queue.go` 另有 6 处 `q.mu.Lock` 与 `gate.go:288/:530` 两处 `ui.Prompt` 的持锁状态**没读**；没跑任何测试（R29）。
+- **F3 的剩下半边**：`internal/perm` 判定主路径与 `tools`/`risk` 其余出声点**没穷举**（E13）⇒ 硬规矩那一格只能写成"本腿未见违反，也未证其不存在"。
+- **F5**：L1 那一发的枚举口归票 220 裁（票面 `:19`/`:60`），本腿只登记它挡住了哪一支。
+- **F6**：多枚卡并发时"允许一次"允许哪一枚**没有定义**，票面 `:39` 没说并发。
+- **F7**：名册钉 vs 球侧分层纯度**互斥**，两维都有人在守，本腿不选。
+- **F8**：AC#2 那句"带正确 `Channel` 的答复"对 allow 按钮今天**没有值可带**（闭集，R31）；这一格与本题正交，但**最需要编排者先裁**，否则落地腿会自己去动那个闭集。
+- **未答的形状问题本身**：派单问"该长成什么样才叫诚实"。本腿能给的是判据读数——**三枚候选里没有任何一枚能单靠 `showMenu` 自身满足先例五/六/七的"出声"要求**（`fire` 无回程 R15、返回值只有命令 id 且 0 兼作"被关掉" R6），因此"诚实"那一维在今天的形状里**必然落在 `cmd/wisp` 侧（审计行／球状态／tooltip）而不是菜单里**。这是一条**约束读数，不是选形**；选哪一形仍归编排者。
+
+**纪律自证**：本腿零产码、零脚本、零测试、零构建（`go build`／`go vet`／`go test`／`scripts/build.ps1`／`go mod tidy` 全部零发，R29）；只新增并提交了 `.scratch/wisp/probes/228/a3/census.md`；票 228 只**追加** Progress log 行（`git show --numstat` 对票面文件＝**10 插 0 删**）；AC 复选框一枚未碰；`frontend/**`／`design/**` 未读未引；未新增任何裸 `go`；脏项（`design/**` 的 16 枚 ` D`、`.gitignore`、`.scratch/**` 未跟踪件）一律未动；**只 commit、未 push**。

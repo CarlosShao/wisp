@@ -145,3 +145,11 @@
   **(a) 出声支与它们同形、不出声支与它们相反；(b) 的"置灰"同形、"整枚消失"相反；(c) 与 `HotkeyStandby` 同形**（`internal/ball/hotkey_windows.go:250-259`/`:361-381`/`:275-279`）。
   新交裁一格 **F7**：第五枚 `Events` 键 ⇒ 名册钉会红（要动别人已勾的名册列表）vs 球侧自己读闭包 ⇒ 名册不响但破"球宿主对审批一无所知"的分层——两维都有人在守，本腿不选。
   F2/F3 从"零读数"升到"**部分答＋明写没穷举**"（原判未抹）。本腿零产码零脚本零测试零构建，未 push；起手锚 `eed229e4` 之后盘上多的 `f4c583db` 经逐名核对**只动台账与票 33**，零产码。
+- `228-a3` 第三发（终态）：三件新读数＋一件本腿认为最需要编排者先裁的东西。
+  ① **同一枚托盘文件里已经有"诚实的落空"先例**：`recordTrayExit`（`cmd/wisp/resident_ball_windows.go:253-258`）＝`const why` 整句因果＋`slog.Warn(... outcome=ignored, why=...)`＋`fmt.Printf` 三处出声，注释逐字「reported instead of assumed」。
+  ② **能力可用性今天自带面、但只覆盖否决那一侧**：`ChannelStatus`（`internal/agent/approval/approval.go:80-85`，逐字「An unloaded channel is **NEVER rendered as available (B1)**」）＋`unavailableText`（`:102-119`，四句各不同文案，逐字「never stay silent about a channel that cannot fire」）＋`ErrChannelUnavailable`（`:121-124`，逐字「a silently ignored cancel attempt is how a fake channel becomes a user-visible promise」）由 `gate.go:605` 随卡送出。
+  ③ **票 87 已裁过一次"按下去落空"**：`gate.go:456-463` 逐字「The user's vote was simply not heard and the call waited out the full C18 deadline. Hand it to the queue's refusal funnel instead」⇒ 本仓对落空的既有判决**不是让它安静**，是让它产生一条看得见的拒绝。
+  ⚠ **F8（最要紧的一格，与"有没有卡"正交）**：`Channel` 是**四枚 L1 否决通道的闭集**，`approval.go:48-50` 逐字「The set is closed: **a fifth value means a caller invented a selector**, which is exactly the M-7/C-3 failure shape」；
+  而 `Allow` 走的 `Request` 只有 `CorrelationID/Allow/Grant/Source`（`replies.go:328-330`），`Source` 被逐字定性为「**LABELS, not authority**」（`replies.go:116-123`）
+  ⇒ **本票 AC#2（`:39`）那句"每枚按钮断『Gate 收到一条带正确 Channel 的答复』"对「允许一次／拒绝／长期允许」三枚今天没有 `Channel` 值可带**：甲＝读成 `NativeSource` 标签（零新契约）／乙＝真加第五枚 `Channel` 值（＝动 SPEC-06 §2 冻结词表，落在 `:48-50` 点名的失败形状上，须人工批准）／不做＝改写票面判据那句（归编排者，实现腿不许自己动）。
+  本腿三发合计 34 把尺（§⑤ R1-R34），⑤⑥⑦ 三节均为终态；零产码零脚本零测试零构建，未 push。
