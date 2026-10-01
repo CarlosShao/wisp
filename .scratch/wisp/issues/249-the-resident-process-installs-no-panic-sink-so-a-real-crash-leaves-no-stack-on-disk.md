@@ -1,6 +1,6 @@
 # 249 — 常驻进程的 panic 记录面**没装**：协程观察者今天兜得住炸、但盘上不会留下任何栈
 
-Status: OPEN（编排者 10-01 **13:13** 立，料全部出自探针腿 `33-p1` 与本编排者 13:1x 的现跑尺；台账 `A502`）
+Status: OPEN（编排者 10-01 **13:13** 立，料全部出自探针腿 `33-p1` 与本编排者 13:1x 的现跑尺；台账 `A502`）→ **WITHDRAWN（10-01 14:2x 编排者自撤；出处＝台账 `A503`；⛔ 任何腿不许据此开工）** — 撤回原因：**上面标题与「现量」表第 2 行的那句前提是错的**，我立票时没去读决定它的那三行码；原文一字不抹，判定与复认尺全在文末「撤回理由」一节。撤回前它未派出、零枚提交、零格被勾。
 实现者：`249-r1`（写码腿，**按住**，见「排程」） · 裁决者：`249-v1`（必须 ≠ 实现者） · 归口：可观测性／票 08 的 JSONL 记录面
 
 ## 为什么现在立这枚票（每条带尺与取数时刻；⚠ 引用前先重跑，别把这几行当常量）
@@ -38,3 +38,25 @@ Status: OPEN（编排者 10-01 **13:13** 立，料全部出自探针腿 `33-p1` 
 ## 排程
 
 按在 **`33-r5` → 票 248 落地腿 → 票 228 AC#2／AC#11** 之后（它要动 `cmd/wisp` 的装配根，与那三发同包 ⇒ 串行）。⚠ 起腿前必跑两把尺：`git status --porcelain -- cmd internal`（有没有别的写腿）＋ `ls .scratch/wisp/probes/249/`（代号没被用过才写进题面）。
+
+---
+
+## 撤回理由（10-01 **14:2x**，我自己复跑尺抓到我自己写错的前提；⛔ 原话不抹，就地留这一节）
+
+**我错在哪一句**：标题与「现量」表第 2 行写的是「`SetPanicSink` 生产零调用者 ⇒ **真常驻炸时盘上不会留下任何栈**」。这句话的**前半是真的、后半是假的**，而我没去读决定它的那两行码就立了票。
+
+**现读复认（三条尺，同发取，`14:2x`）**：
+1. `internal/observe/goroutine.go:236`（`NewRegistry` 体内）逐字 `sink: defaultPanicSink` ⇒ **默认就装着**；`:244-245` 更写明 `SetPanicSink(nil)` 会把默认装回来 ⇒ `:314` 那句 `if sink != nil` **在生产里永远不成立**（不可能走空）。
+2. `internal/observe/goroutine.go:167-176` 的 `defaultPanicSink` 逐字在 `slog.Error("goroutine panic recovered", …, "stack", ev.Stack, …)` ⇒ **栈进 slog 记录**。
+3. `cmd/wisp/logsink.go:145-162` 的 `installLogSink` 把进程级 slog 默认设成 **tee**：`primary`＝**脱敏（redact）之后**的 JSONL 文件管线、`mirror`＝stderr。⇒ 只要数据根解析出来了，**那一枚 `debug.Stack()` 是真的落到数据根内的日志文件里**。
+
+**活样本（不是推的）**：我自己刚在 HEAD 整包复跑 `cmd/wisp` 时抓到一条真 panic，逐字含栈：`level=ERROR msg="goroutine panic recovered" goroutine=panel-sta owner="panel host (ticket 33)" root=panel-host error_class=internal recovered="runtime error: invalid memory address or nil pointer dereference" stack="goroutine 1164 [running, locked to thread]: runtime/debug.Stack() … pkg/edge.(*Chromium).Init(…) chromium.go:131 … cmd/wisp.(*PanelManager).bringUp(…) panel_host_windows.go:226"`（原文在 `.scratch/wisp/probes/orchestrator/33r5-head-roster.txt`）。这枚 panic 本身是真缺陷、已转给 **`33-r6`**（那是另一格，与本票前提无关，⛔ 不许混着读）。
+
+**还剩下的那一小块价值有多低（具名，免得被读成"完全没必要"）**：出货没装的只有「把这条记录改写成 ticket 08 那套 `PanicEvent` JSONL schema」——同一条信息、同一个文件、换个字段形状。⛔ 这不值一枚接线票，更⛔ 不值得 owner 一句话。
+
+**我的账（三条，逐条可核）**：
+- ① 我把一枚腿的**推断**（`33-p1` ⑤-13：它只看到 `:314` 的 `if sink != nil`、没看到 `:236` 的默认值）当成了读数，并且**我自己复跑的那把尺只数了调用者枚数**（`grep SetPanicSink` 排 test＝只命中定义）——那把尺证的是"没人替换默认"，⛔ 它证不了"没有默认"。我当时把这两件事写成了一句，越界了。
+- ② 这正是我记忆里第 74／83 条那一味**反过来发生**的一次：不是我采纳别人的"做不到"，而是**我自己写了一句"拿不到"**，而它比建议更容易被无条件服从。⇒ 规矩补一句：**"某样东西拿不到／盘上没有"这类否定句，落笔前必须去读"它由谁产生、谁投递、谁落地"那三行，读不全就只许写〔未证〕并禁止任何腿据此开工。**
+- ③ 立票快、撤票慢，这一来一回白占了台账一格与排程一行（`A502` 第 P4 条、任务清单）。⇒ 以后凡"新缺一枚接线票"，我先跑的那把尺应该是**能力问句**（"今天炸一次，栈在不在盘上？"＝跑一发看日志），而不是**调用者枚数**（那只说明谁替换了默认）。
+
+⛔ 本票**不再重开**，除非有人证明 `installLogSink` 在真常驻路径上没跑到（那是另一枚缺陷，归 `33-r6`／票 228 那一族，不该由这张纸背着）。撤销口令在这里语义＝"维持撤回"；若要翻案，得先交**一发真跑读数**证明盘上取不到栈。
