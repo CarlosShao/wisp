@@ -135,3 +135,13 @@
   已经量到的三句要紧读数：`showMenu` 今天只收两枚布尔（`internal/ball/tray_windows.go:72`）、`appendItem` 只有 checked 一维**不会置灰**（`:79-85`）、
   `Replies.Allow` 无卡时的返回是 `ErrNoTrackedCard`（`internal/agent/approval/replies.go:319`）而不是任何"门拒绝"文案；
   ⚠ 且 `AwaitingHuman()` 会返回 `ReplyCard{}, true`（`:262`，corr 空串）＝**"有卡在等"与"允许得动"不是一格**。票面 AC 复选框一枚未动。
+- `228-a3` 第二发（终态正文）：①②③④ 补完，⑤ 加 R14-R30（含每把负向尺的**正控**、以及 R29 点名"本腿没跑 `go build`／`go vet`／`go test`／`build.ps1`／`go mod tidy`"）。
+  本轮新增的最要紧五句读数：① **`SetTrayChecks`／`SetTrayTip` 全仓零枚生产调用者**（`internal/ball/ball_windows.go:919`/`:927` 只有定义）⇒ "推一维状态进托盘菜单"这一形**有名字、没使用者**，今天那两枚勾在产码里恒为 `false`；
+  ② 包内**没有置灰 flag**（`win32_windows.go:136-137` 只有 `mfCheckd`/`mfSepart`，`mfGrayed`/`mfDisabled` 零命中）⇒ "灰掉"必须新增常量，"不显示"不用；
+  ③ 球侧回调签名是 `func()`、`fire` 只判 nil（`internal/ball/ball_windows.go:728-732`）⇒ **托盘那一发没有错误回程**，"按下去报错"只能由 `cmd/wisp` 侧出声；
+  ④ `Replies.Allow` 的产码调用者只有 1 枚（`cmd/wisp/approval_reply.go:215`，且它挂在 `interactiveStdin()` 那扇门上，`main.go:153`）⇒ GUI 常驻腿里**无可达的允许者**（复认票面背景）；
+  ⑤ 无卡报错这一语义**已被看守**（`internal/agent/approval/replies_201_test.go:93-94`/`:101-102`），**托盘那半零枚仪器**（`showMenu`/`wmAppTray`/`OnTrayExit`/`recordTrayExit` 在全仓 `*_test.go` 零命中，正控同发给出）。
+  同形判断（只报形状，不报推荐）：`vetoByEsc` 无卡时那句实话（`resident_approval_windows.go:173-177`）＋`interactiveStdin()` 返回 nil＋`cmdRun` 的后果句（`main.go:154-158`）＋`bindBallHost`「advertise 一枚按不动的键＝B1 禁止的形状」（`resident_approval_windows.go:150`）＝同一形状；
+  **(a) 出声支与它们同形、不出声支与它们相反；(b) 的"置灰"同形、"整枚消失"相反；(c) 与 `HotkeyStandby` 同形**（`internal/ball/hotkey_windows.go:250-259`/`:361-381`/`:275-279`）。
+  新交裁一格 **F7**：第五枚 `Events` 键 ⇒ 名册钉会红（要动别人已勾的名册列表）vs 球侧自己读闭包 ⇒ 名册不响但破"球宿主对审批一无所知"的分层——两维都有人在守，本腿不选。
+  F2/F3 从"零读数"升到"**部分答＋明写没穷举**"（原判未抹）。本腿零产码零脚本零测试零构建，未 push；起手锚 `eed229e4` 之后盘上多的 `f4c583db` 经逐名核对**只动台账与票 33**，零产码。
