@@ -1,0 +1,9 @@
+probe(33-p1) restore the 5-18 line my own anchor ate
+
+Adding 5-19 used an old_string that swallowed the whole 5-18 line without
+re-emitting it, so commit cf2d90ea carried 1 insertion / 1 deletion on probe.md
+and 5-18 vanished. Restored verbatim; 5-18 is not rewritten by even one byte.
+
+Adds 5-20 logging the failure and the check, and this commit is a NEW commit
+(no amend) so the deletion stays visible in history rather than being smoothed
+over. Expect: 2 insertions / 0 deletions on probe.md, nothing else in scope.
