@@ -10397,3 +10397,14 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - **据此派 `winlive-census-1`**（只读，`33-winc1`，写面只有 `.scratch/wisp/probes/33/winc1/`）：把该族逐枚归进六族（A 依赖运行库真窗／B 依赖音频设备／C 依赖球与像素比对／D 依赖托盘与 Shell 通知／E 依赖 dist 真产物＝那枚无关红／**F 其实什么都不依赖、只是被顺手挂在 winlive 后面**），并给"能进 CI 的那几枚加进步骤要动哪几处、估时多少（标明是估的）"。⛔ 明令不许跑任何 `go`／脚本命令（同机有写码腿在测面板毫秒级指标）。
 - **纪律自记（记在我头上）**：我写进派单的参考尺 `grep -rl "//go:build winlive" --include=*.go .` **本机实测 0 命中**——真实拼写带 `windows &&`（我 18:3x 重跑：松散模式 `grep -rl winlive` 得 **8 枚文件**、其中 `^func` 行 **64 枚**，前一枚腿报的"22 函数"应是只数 `Test*`）。⇒ 派单里我当场写了"⛔ 别照抄这两个数、自己重跑，量到不同报你的实测值"，但**"凡写进派单的尺先在本机跑一遍"这条我又破了一次**（第 70 条）。这一格若让腿白烧轮次，损失记在我身上，不改它的交件判语。
 - **与推送的关系**：`A506`／`A507` 那两条"推送仍按住"的理由不变（要给毫秒计时留一台安静机器），本条**再加一条**：winlive 拆族结果没回来之前推 CI，等于在"甲＝〔旁证级〕"的前提下让门自己解释自己。当前未推枚数按 17:2x 量为 **220**（⚠ 会漂，引用要现量、别引这一句）。
+
+
+## A509（2026-10-01 18:4x，编排者自记：winlive 拆族结果＋**推翻我派单里两处事实**＋由此新派 preflight-1）
+
+- **`33-winc1` 交件已核**（commit **`412644fe`**；`.scratch/wisp/probes/33/winc1/families.md` 实测 **155 行／22,596 字节**；占位符 0；该路径 porcelain 0）。名册它自己重跑：`//go:build windows && winlive` ＝ **8 枚文件／21 枚 `Test*`**（我 18:3x 用同一把尺复现到同一个数：8／21）。
+- **两处派单事实被它推翻，两处我都现量复认＝它说得对，错记在我头上**：
+  - ① 我写的 `scripts/runtests.sh:98` **不存在**——`ls scripts/runtests.sh` 报 No such file；真身 **`tools/d22scan/runtests.sh:98`**（逐字 `runtests.sh: $skipped test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3)`），且 `ci.yml` 全部四处调用都指这枚真身（`:81`／`:317`／`:527` 等）。⇒ ⛔ 以后任何腿再写 `scripts/runtests.sh` 一律按幻影引用处理。**这是我今天第二次破"凡写进派单的尺／事实先在本机跑一遍"（第 70 条）**，第一次是同一天那把 `grep '//go:build winlive'`（0 命中，真形带 `windows &&`）。
+  - ② 我按 `33-n1` 的话把"AC#13 的 dist 跳"当成 **`winlive` 族内**问题——它实测在**默认档**：`cmd/wisp/panel_resident_windows_test.go:314` 的 `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`，`entryIDProbes(t)` 为空时 `t.Skipf`（我 18:3x 亲读该行确认）。
+- **拆族结果（这格本来没人量过）**：A 依赖运行库真窗＝**1**；B 音频设备＝**0**；C 悬浮球／GDI 像素比对＝**19**；D 托盘与 Shell 通知＝**0**；E 依赖 dist 真产物＝**0**（因为那一枚根本不在 winlive 里，见 ②）；**F 什么都不依赖、只是被顺手挂错标签＝1**：`TestLive246ExitCancelsARunningTask`（`cmd/wisp/resident_task_source_live_246_windows_test.go:238`，我只读复认该函数确在该行）。⇒ `A508` 里"winlive 整族不许进 CI"这一句**被读数加强了**：整族的 19／21 是**球与像素**，跟 WebView2 无关，塞进 CI 只会换来一片没人看的红。**"必须人眼"那半句也量出来了＝全族 1 枚**（`internal/ball/interaction_live_test.go` 的 `TestLiveNeverStealsFocus` 里"感觉不到焦点移动"那一半，逐字写成 owner 签收），⛔ 那一半继续按〔仅本机可量〕写死。
+- **F 那一枚的处置＝排队、不单派腿**：摘回默认档＝`cmd/wisp` 新增 1 枚天天跑的用例。⛔ 现在不派，因为写面撞 `cmd/wisp`（`33-r9` 在飞）且它要跑测试会污染毫秒计时。⇒ 挂到**下一枚动 `cmd/wisp` 的落地腿**顺带做，判据要带"搬过去之后 CI 那一步真执行到它"的凭据（⛔ 不许搬完就宣布成功）。
+- **新派 `pushpreflight-1`**（只读，`⛔ 零 CPU`）：把"这 220 枚推下去 CI 哪几步变色"用静态证据说清——逐步名册（谁用 `runtests.sh` 这把跳红尺）、默认档 **66 处** `t.Skip*` 逐条判"干净检出的托管 runner 上会不会跳"、只数**这批提交新增的红**、以及最小修法（⛔ 明令不许提"放宽断言／把 SKIP 当绿／注释掉那一步"）。**动机是那条已复认的链**：`frontend/dist` 只跟踪一枚 `.gitkeep` ⇒ AC#13 必跳 ⇒ `tools/d22scan/runtests.sh:98` 判红 ⇒ **一推送就有一枚与面板正确性无关的红**，而我会把它读成"面板坏了"。`A508` 那句"第一次真推送顺手当独立复核"因此**加一条前置**：先有 preflight 的名册再推，否则那发日志读不出想要的东西。
