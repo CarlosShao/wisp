@@ -23,16 +23,81 @@
 
 ---
 
-## 六件（正文在各节；本腿硬顺序＝先交 ⑤⑥⑦ 三节，再填这里）
+## 六件逐件：改前读数 — 改后读数 — 反控读数
 
-- [ ] ① 面板接进常驻（`NewPanelManager` 非 test 调用者 0 → N）
-- [ ] ② 线程形状＝P1 已裁（专用 STA 线程＋依赖库 `Run()`；⛔ 不投球的 `ui-sta`）
-- [ ] ③ AC#13：冷启动那两发 `SetHtml` 不许盖掉真页面
-- [ ] ④ AC#4：焦点回还那一跳（＋用例改名 `...Gap33r5`）
-- [ ] ⑤ "Destroy 后 2s 退净"那一支移出默认档、进 `winlive`
-- [ ] ⑥ 两处过期注释（`:34-38` 的 `PutBounds` 说辞／`:101` 的 `LockOSThread` 幻影指认）
+> 行号一律本腿自己 `grep -n`／`git grep` 现取（改前那批发在起手锚 `7a02b121` 上，改后那批发在当时的 HEAD 上，每条带时刻）。
 
-（各件"改前读数—改后读数—反控读数"在下面的 §六件正文，本骨架先交 ⑤⑥⑦。）
+### ① 面板接进常驻（生产调用者 0 → 1 枚直调 + 1 枚装配入口）
+
+| 项 | 读数 |
+|---|---|
+| 改前（尺＝`git grep -n "NewPanelManager" 7a02b121 -- cmd/wisp \| grep -v _test.go`，`14:04:50`） | 命中 **2 行**＝`panel_host_windows.go:125` 注释 + `:131` 定义本身 ⇒ **非 test 调用者 0 枚**（口径：排除定义行与注释行后的调用点枚数，`A1b=0`）。这就是票面 AC#1..AC#4 全都停在"宿主可用"的原因 |
+| 改后（同一把尺，HEAD `f549ecdc`，`14:04:28`） | 原始 grep **5 行**（`grep -rn "NewPanelManager" --include=*.go cmd/wisp \| grep -v _test.go`）＝3 行注释 + 1 行定义 + **1 行真调用点**（`cmd/wisp/panel_resident_windows.go:193`）。派单要的那枚"非 test 调用者枚数"＝**1**；⚠ 口径写死：原始 grep 行数（5）不是调用者枚数，本票两处读数都按"定义行与注释行不算"取 |
+| 改后（AST 尺＝`TestAC1SessionDisposeHasAProductionTrigger_AC1`，同一发） | 逐字 `AC#1 dispose scan: 2 production constructor(s) [panel_resident_windows.go:193 resident_windows.go:193?]`——实际那发打的是 `[panel_resident_windows.go:193 resident_windows.go:142]`＝**直调 1 枚 + 装配根经由工厂入口 1 枚**（`newResidentPanelManager` 也注册在名册里），`0 manager-teardown site(s)` 那一支是反控读数（见下） |
+| 接到哪 | `cmd/wisp/resident_windows.go:142` 建管理器 → `:148 startResidentPanel` → `:149 defer panel.stop()` → `:163 withPanelHost(...)` 注入球的两枚面板手势（`OnPanelHotkey`／`OnTrayPanel`）。⛔ 没投球的 `ui-sta`，⛔ 没动 `internal/ball/**` |
+| 两档分开说（⛔ 不许读成"面板能用了"） | **宿主可用＝落地**（真窗能建、回执能到、退出有出口）。**用户能打开＝还差三件**，都不是本腿越界：ⓐ 页面侧那一腿归票 248／界面会话（`frontend/**` 两层禁令，本腿零读零写）；ⓑ 入向白名单仍只有四枚方法、**零枚 config/凭据方法** ⇒ owner 那句"点设置自己录 key"仍不通（票面 `:16` 原话）；ⓒ AC#12 那包真页面归口未落（工作树有产物、入库只 `.gitkeep`）。⚠ 我也⛔没真按过热键去证"看得见窗"（`33-p1` §⑦-1 已判桌面注入拿不到可复核前提），那一格是 owner 手测或 `33-v2` |
+| 反控（M3/M3b，两发一起做） | 把 `teardown` 与 `RequestDispose` 里**那两枚对管理器的 `Destroy` 调用删掉** ⇒ ①`TestAC1SessionDisposeHasAProductionTrigger_AC1` 红，逐字 `a production site now constructs the panel host (panel_resident_windows.go:193, resident_windows.go:142) but no non-test file calls Destroy ON THE MANAGER. The 2 .Destroy() call(s) this package does have [panel_host_windows.go:252, panel_host_windows.go:465] release the WebView2 control inside the host's own file...`（＝裁定 4 要的那枚收紧有牙：库内 `w.Destroy()` 不再算会话拆窗）；②`TestPanelThreadIsSTAAndExitsCleanly` 同时红：`the panel thread exited with the window still marked created - teardown did not run on the owning thread` |
+
+### ② 线程形状＝P1 已裁（专用 STA 线程 + 库的 `Run()`；不投 `ui-sta`）
+
+| 项 | 读数 |
+|---|---|
+| 形状 | 新建 `cmd/wisp/panel_resident_windows.go`：`observe.Registry.Spawn("panel-sta", "panel host (ticket 33)", root, loop)`（ban #1 的正解＝有 owner、有 recover、有现成 panic 仪器，⛔ 不裸 `go func(`）；`loop` 逐字 `runtime.LockOSThread()` ＋ `CoInitializeEx(0, 0x2)` 并**查返回值**（`r != 0 && r != 1` ⇒ 具名拒绝建窗）；建窗只在那条线程上发生（`RequestShow` 把闭包投给那条线程，`post()` 在窗已存在时走 `webview.Dispatch`，也就是 `Run()` 唯一会取的那条队列） |
+| COM 起手前（`A2`，`14:04:50`） | `git grep -n "CoInitialize" 7a02b121 -- cmd/wisp \| grep -v _test.go` ⇒ **0 命中**（复认派单那句"今天零枚"，本腿自跑，未采信转述）⇒ 出货宿主与测试 harness 跑的正是 `33-p1` 那档"未初始化" |
+| 出口 | `stop()` → 把退出**投到那条线程上执行**（见下一行那枚新读数）→ `Run()` 在 `WM_QUIT` 返回 → 同一条线程上做 `teardown`（`Destroy`）→ `finished` 关闭。可观察读数＝`TestPanelThreadIsSTAAndExitsCleanly`（终态跑通，逐字日志行 `panel thread exited cleanly shows=1`＋`panel thread ending why="the library pump returned" window_opened=true`） |
+| ⚠ **本腿量到的一枚新事实（比派单更具体，具名上报）** | 库的 `Terminate()` **就是裸 `PostQuitMessage`**（`webview.go:381-383` 全文只有那一行），而 `PostQuitMessage` 投的是**调用方所在线程**的队列，不是窗所属线程。⇒ 从别的 goroutine 调 `w.Terminate()` 收不掉那条线程：本腿第一版就是这么写的，`TestPanelThreadIsSTAAndExitsCleanly` 当场红 `the panel thread did not exit after stop(): Run() has no way out in this shape`（**15 秒**有界等待用尽，⛔ 不是超时放宽）。修法＝退出请求投进那条线程自己执行（`rp.post(func(){ rp.mgr.terminateOnThisThread() })`），并留 `stopRequested` 标志覆盖"还没进 `Run()` 就被要求退出"那一岔。**探针 `33-p1` R26 能收干净正是因为它在闭包里调**（同一线程），这一点它表里没写 |
+| 名册／退出十步（两条停手上报的线，本腿**都没越**） | `git diff --numstat 7a02b121..HEAD -- internal/observe internal/proc internal/ball internal/panel` ＝**空**（逐字读数见 §收尾三把尺）。线程名 `panel-sta` 不进 `ResidentNames` ⇒ 落 `rep.Unknown`，实测日志逐字（本机 `13:59:52` 那发）：`level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"`＝**只吵不红**，与 `33-p1` §⑤-7 同形；钉这条边界的用例＝`TestPanelThreadNameIsNotInResidentRoster`（若有人把名字塞进名册它红）。退出侧走 `runResident` 的 **defer**（票 228 给球那一发同一形），⛔ 没新增第 11 步、⛔ 没碰那张闭集钩子名册 |
+| 反控（M2，形状对照） | 把 `w.Run()` 换成手工泵（`for !stopRequested { pnlPumpOnce(); Sleep(5ms) }`）⇒ **两枚 AC#14 用例都红**（各 15s 有界等待用尽）。⚠ 这一发**没有**替我分开两维，原因具名：本腿的推送与回话都要先经 `Dispatch` 才落到那条线程，手工泵取走 `WM_APP` 却不取 `dispatchq`（＝`33-p1` R25 那一形），于是连 `Eval` 那枚也没执行。⇒ **"Eval 推送在自泵形里也到"这一维本腿没有独立复现**，它仍只有 `33-p1` R27 的读数撑着；我不拿 M2 这发去否证它，也不拿它当自己的凭据（详见 §⑤ 第 24 条） |
+
+### ③ AC#13：冷启动那两发 `SetHtml` 不许盖掉真页面
+
+| 项 | 读数 |
+|---|---|
+| 改前（行号现取于 `7a02b121`） | `panel_host_windows.go:221 serveEntry()` → `:250 w.SetHtml(入口字节)` → `:227 firstRoundTripLocked(...)` → `:374-375` 又一发 `SetHtml(自造探测页)` ⇒ **每次冷启动最终显示探测页**。派单那句时序本腿逐字复认（读 `git grep`，未复跑行为） |
+| 改后 | `bringUp` 次序重排：探测在前、`serveEntry` 在后（探测**没删**，它仍是冷启"可用"判定的来源）；另加 `serveNotBuiltNoticeLocked()`——bundle 没建成时明写一枚离线提示文档，⛔ 不再把探测页留在屏上充当"页面"。`firstRoundTripLocked` 的射程在注释里写死＝**"页→Go 到达"**，⛔ 不是 AC#14 的凭据（裁定 P2 逐字） |
+| 新断言（问能力） | `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`：Go 侧 `panel.Assets.Resolve(panel.EntryFile)` 取入口字节 → 正则抽 `id="..."` 当探针 → **由页面自己**用 `document.getElementById` 逐枚回答，答案经**产品已有的那道门**（`window.wispDispatch`）送回 Go。终态读数（`14:00` 那发）逐字：`AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]` ＋ `AC#13 page answer: "1" - 1 of 1 probe id(s) present in the live document` |
+| 反控 M1（派单点名的那一发） | 把两发次序换回去（`serveEntry` 在前、探测在后）⇒ **必须红**：逐字 `after a real cold start the live document contains NONE of the 1 element ids the embedded entry declares (the page itself answered "0")`。⚠ 这条红是**第二版尺**给的：第一版尺在 M1 下**仍然绿**（它自己 re-serve 了入口文档，把突变盖掉了），处置＝重写尺，见 §⑤ 第 22 条 |
+| 没做的两件事 | ⛔ 没删探测（票面 `:39` 明禁）；⛔ 没上多文件资源过滤器——`AddWebResourceRequestedFilter` 在 `pkg/edge` 是导出的、`Resize()` 也导出了（⑥ 那处改口），所以"能不能满足 420×260"仍未证、这一形**留给编排者**当产品形状裁，⛔ 我不写成"已解决" |
+
+### ④ AC#4 焦点回还那一跳（那枚故意的红 → 绿）
+
+| 项 | 读数 |
+|---|---|
+| 改前（`7a02b121` 逐字复认，⛔ 不采信转述） | `Show`：`:261` 未创建先 `bringUp`（窗已建、前台已被拿走）→ `:269` 才 `m.prevFocus = windows.GetForegroundWindow()` ⇒ 记下来的"来处"就是面板自己；`Hide`：`:311` 只有 `if prev != 0`，除此之外没有任何"回还失败"路径 |
+| 改后 | 采样挪到 `bringUp` **之前**（`Show` 里 `prior := windows.GetForegroundWindow()` 在第一句）；记值走 `setPriorFocusLocked`＝**0 不记、面板自己或其子窗不记**（判定用 `GetAncestor(GA_ROOT)`，比"等于面板句柄"更宽）；`Hide` 把两枚 Win32 返回值取进 `lastRestoreTo/lastRestoreSetForeground/lastRestoreSetFocus`（**只记录、不重试、不 sleep**） |
+| ⚠ 一处形状改动具名（⛔ 不是放松断言） | 那枚用例的 **setup** 换了两点：(a) 窗由产品的 `Show` 建（原来用 `bringUp` 直建——产品从没那个形，而缺陷恰好是"`Show` 在建窗之后才采样"）；(b) 用例自建的**同进程 editor 窗**当"来处"，且宿主调用一律经 harness 的任务口在**窗所属线程**上执行。理由各有一条读数：非前台进程把焦点还给**别人进程**的窗会被拒（第一发逐字读数：`prevFocus 0x30176`＝终端窗、`Hide attempted restore ... 未生效`、`foreground while hidden 0x0`）；跨线程 `SetForegroundWindow` 在本机静默不生效（那一发 `after Show` 落在别窗上）。四枚断言**一字未动**，包括红句里那句 `owner 33-r2` 的过期归属（改它＝改断言，不是我这一程的权） |
+| 改名 | `TestAC4FocusReturnToPriorWindowGap33r2` → `...Gap33r5`（同一枚提交里改标识符 + 注释归属；`grep -rn Gap33r2 cmd/` 终态＝**0 命中**） |
+| 逐发句柄表（判"前台锁稳不稳"要的那份，同一用例连跑三发，`13:3x`，HEAD `fd6c9026` 之前的形状；形状定稿后另发三发在 §终跑名册） | 发 1：before `0x30176`｜editor `0xbb078e`｜prior `0x38b0d52`｜afterShow `0xbb078e`｜panel `0x38b0d52`｜recorded `0xbb078e`｜afterHide `0xbb078e` ⇒ **③红**；发 2/3：before 是上一发遗留句柄，③绿 ④绿。定稿三发（`13:4x`，同一条命令 `-count=3`）逐字三发同形：`foreground before any panel 0x30176 \| the ruler's own editor window 0x4e0e9c \| prior 0x4e0e9c \| after Show 0xc5f0c98 \| panel hwnd 0xc5f0c98 \| prevFocus recorded at Show 0x4e0e9c \| after Hide 0x4e0e9c \| Hide attempted restore to 0x4e0e9c (SetForegroundWindow 1, SetFocus 5115548)` ⇒ **三发全绿**（`--- PASS` x3） |
+| 另立一枚可确定判定的钉 | `TestAC4PriorFocusSurvivesARefusedPanelSample`：不问前台归属，只问"面板自己当样本时不覆盖诚实的来处 + 诚实的来处活过一次 Hide"。绿；`prevFocus == editor` 那一枚还打出 `the host recorded the ruler's own editor window ... as the prior`。MUT（把 `setPriorFocusLocked` 换回无条件赋值）会当场打红它——这一发我没跑（预算），⛔ 所以我不主张它，只主张 M1/M3/M2 三发跑过的 |
+| 终态那一枚用例的状态 | **绿**（整包终跑名册里逐名可核，见 §② 名册）。派单要的"本票唯一那枚故意的红"已消失 |
+
+### ⑤ "Destroy 后 2s 退净"那一支移出默认档、进 `winlive`
+
+- 搬了什么：`TestPanelHostRealWindowHopAndLifecycle` 末尾那一段**有界等待 + `TreeWebview > baseline` 判红**整支迁到新文件 `cmd/wisp/panel_host_windows_live_test.go`（`//go:build windows && winlive`），新用例名 `TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`。**上界仍是 2 秒**（`time.Now().Add(2 * time.Second)`，逐字未动），⛔ 没放宽成 5s/10s、⛔ 没加重试、⛔ 没删、⛔ 没降级成 `t.Logf`；分母仍是**本机进程树**（全机枚数只进日志）。
+- 默认档继续断可确定判定的维度：同一枚 HWND 跨 hide→re-show 复用（比对身份）、单窗、`IsCreated/IsShown` 状态、**新增一枚**"窗活着 ⇒ 我们树里 `msedgewebview2 >= 1`"（红句写明"树瞎了"与"没起浏览器"两种都算红）、Destroy 后 `IsCreated` 假 + HWND 归 0。
+- ⚠ 代价逐字写进文件与本判决：**`winlive` 在 CI 零岗位 ⇒ 这一支从此〔仅本机可量、CI 永看不见〕**；引用它的任何表必须带这句（撤销口令＝「33 退净断言回默认档」）。
+- 本腿**没有**跑 `winlive` 档（跑它要 `-tags winlive` 再开一扇真窗，桌面预算内我把它排在默认档之后、且今天没跑）⇒ 那一支的读数只有 `33-r4` 的（我未复跑，出处＝`33-panel-host-c27-r4.md` §② 第二发终跑）。这条欠账也记在 §⑦ 第 10 条。
+
+### ⑥ 两处过期注释
+
+| 位置 | 改前（`7a02b121` 现取） | 改后 |
+|---|---|---|
+| `panel_host_windows.go:33-45` 段 | 「`PutBounds` 吃模块私有 `w32.Rect` ⇒ 没法设尺寸 ⇒ 只能换依赖／fork，所以这一形属依赖边界」 | 改口：`AddWebResourceRequestedFilter` 是导出的；`(*edge.Chromium).Resize()`（`pkg/edge/chromium_amd64.go:12`）也是导出的、高层 `webview.go:343` 在 `Embed` 成功后自己就调它 ⇒ **那不是依赖边界，是产品形状决定**。⛔ 同时明写"能不能满足 420×260 的面板尺寸**仍未证**"，没写成已解决 |
+| `panel_host_windows.go:101` | 「see bringUp's `runtime.LockOSThread`」——**幻影指认**（起手 `git grep -n "LockOSThread\|UnlockOSThread" 7a02b121 -- cmd/wisp/panel_host_windows.go` ⇒ 只命中 `:101` 这行注释自己） | 改口并**补上真锁**：`PanelManager` 那段现在逐字说"这个文件里没有 LockOSThread，锁在唯一那个调用方＝`cmd/wisp/panel_resident_windows.go` 的面板线程（同时显式 STA + 把泵交给 `Run()`）"。现量：`grep -rn "LockOSThread" cmd/wisp` ⇒ 产码命中 `panel_resident_windows.go:202`（真锁）＋ 注释两行（不再指认不存在的东⻄）＋ 既有的 `notify_windows.go:138` |
+
+---
+
+## 门禁四数（终态，逐条真实 rc）
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| build | `GOFLAGS= go build ./...` | **rc=0**（`14:03:23`，HEAD `ee5d167d`，无输出） |
+| vet | `GOFLAGS= go vet ./...` | **rc=0**（同发，无输出）；另加一发 `GOFLAGS= go vet -tags winlive ./cmd/wisp/` ⇒ **rc=0**（新搬进去的那一档也编得过） |
+| d22scan | `sh scripts/d22scan.sh` | **rc=0**，逐字尾行 `d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=224, bans #1-5 cmd/=34, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=476, ban #8 cmd/=81`。⚠ 与 `33-p1` 终态那发（`cmd/=33`、`ban #8 cmd/=78`）差 **1 枚／3 枚＝本腿新增两枚产码文件里被扫进分母的枚数**（分母＝文件枚数口径，⛔ 不是违规数）；`internal/` 两栏**一字未动** |
+| gofumpt | `gofumpt -l cmd/` | 第一发列出 3 枚（`panel_host_windows_test.go`／`panel_resident_windows.go`／`panel_resident_windows_test.go`）⇒ `-w` 之后**空列表**，单独提交 `f549ecdc style(cmd/wisp): gofumpt the 33-r5 panel host files` |
+| staticcheck | — | **〔未复认〕**：本机版与 CI 钉版不同（票面 `:262`/`:296`，裁定 8），本腿未跑 |
+
+禁区自证（同发取，逐条空输出＝一字节未动）：`git diff --numstat 7a02b121..HEAD -- internal/ docs/PLAN.md docs/specs docs/SLO.md docs/BUILD.md tools/d22scan/allowlist.txt go.mod go.sum` 的**结果与本腿的归因**落在 §收尾三把尺；三枚冻结件与 `internal/**` 全树未动；`go mod tidy`／`go get` 零次；票面 `- [ ]`／`- [x]` 零枚触碰。
 
 ---
 
@@ -58,6 +123,13 @@
 18. **⛔ 我没有做的事**（免得被读成做了）：没动 `internal/**` 一字；没翻票面任何一枚框；没跑 `go mod tidy`／`go get`；没读没写 `frontend/**`／`design/**`；没动 `PLAN.md`／`specs`／`SLO.md`／`BUILD.md`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件；没加 `Allow` 方法、没造第 5 枚 veto 通道、没造"页面点一下→Go 判成 L2 批准"的任何变体；没有把 artifacts 写入做成受门控的 Tool。
 19. **可能被我写成"面板能用了"的两处夸大**。本腿落地之后仍然**不成立**的三件，我在结论里逐字保留：ⓐ 页面侧那一腿（`frontend/**`，票 248 与界面侧会话）今天仍没有人点；ⓑ 入向白名单只有四枚方法、**零枚 config/凭据方法** ⇒ owner 那句"点设置自己录 key"仍差票 248；ⓒ AC#12 的"有没有一包真页面"归口未落（工作树有产物、入库只 `.gitkeep`）。⇒ "用户能打开面板"这一句的成立条件是**上面三件之外都齐**，我在 §六件① 里按"宿主可用／用户可打开"两档分开写。
 20. **一处归属卫生**：本件的行号一律本腿自己 `grep -n` 现取（⛔ 不照抄派单或前人表里的行号；引用别人读数时写明"出处＝谁的哪一节，本腿未复跑"）。
+21. **⚠ 我的起跑名册被我自己污染的，而且是我自己的尺抓出来的**：起跑那发整包（`13:26:50` 收钟，`logs/baseline-start.txt`）＝**145 PASS／3 FAIL／1 SKIP**，其中一枚 `TestSecretRealBinaryRefusesValueFlag` 红句逐字 `go build ./cmd/wisp failed (is mingw on PATH?): exit status 1` ＋ 六行 `m.lastRestoreTo undefined...`＝**那一枚用例在运行时真去 `go build ./cmd/wisp`，读的是我改到一半的工作树**，不是"包里有别人的红"。⇒ 三条结论写死：① 那枚红**不是起手即在**、也不是别人造成，是本腿的中间态；② 派单给的在册名册（"故意的红 + 负载敏感那一支 + boot Ctrl+C flake"）只解释了另外两枚；③ **以后凡动 `cmd/wisp`，起跑名册要在动笔之前跑完**，否则起跑读数不可用。第二枚红 `TestPanelHostRealWindowHopAndLifecycle` 的退净那一支逐字 `our tree went baseline 0 -> now 2 (tree pids 2)`＋同发 `machine-wide 14 -> 16`＝两口径同向（复认 `33-r4` 的负载敏感判定，不是我换分母造的）。
+22. **我写过一枚没牙的尺，是反控当场把它打回原形的**：AC#13 第一版为了能让页面回话，注册了一枚 ruler 绑定并**重新 serve 了一次入口文档**——MUT-A（把两发 `SetHtml` 换回旧次序）跑下去它**仍然绿**。绿的原因是尺自己把最终文档又换成了入口页，**恰好把被检的缺陷盖掉**。处置＝重写（回话改走产品已有的 `window.wispDispatch` 那道门，尺不再碰文档生命周期），MUT-A 当场红、逐字读数在 §六件③。⇒ 这一格进 §⑤ 而不是只进 commit message：**"反控不红"和"产品没缺陷"是两件事，前者只说明我的尺瞎**。
+23. **一次我自己读错的形状**：`showAndWait` 第一版等的是 `IsCreated`，而 `bringUp` 在建窗那一刻就把 `created` 置真、`Show` 到末尾才置 `shown` ⇒ 两枚用例（线程那一枚与手势那一枚）读到 `created=true / IsShown=false`。那不是产品缺陷，是我的等待条件挑错了状态；改成等 `IsShown` 后同形读数消失。⚠ 反过来这条读数**有信息量**：产品的 `created` 与 `shown` 之间确实隔着探测往返与入口交付，冷启"可用"判定点落在这段里，`33-v2` 若拿 `IsCreated` 当"面板打开了"会读到半程状态。
+24. **MUT-C（手工泵）没有把它声称要分开的两维分开**，原因具名：本腿的两枚 AC#14 用例都把 JS 投递走 `rp.post → webview.Dispatch`，而手工泵根本不取 `dispatchq`（＝`33-p1` R25 那一形），于是**连推送那一枚也红**。⇒ 我能主张的只有"回话那一维在手工泵下不到、在 `Run()` 下三发全到"；**"Go 主动 `Eval` 推送在自泵形里也到"这一维本腿没独立复现**，它仍只有 R27 那一发（出处＝`33-p1` §A，本腿未复跑）。两枚用例仍是两枚钉（判据形状不同、问的事实不同），但⛔ 别把 M2 读成"两维已被我这发分离"。
+25. **`Terminate()` 的语义我是靠一枚红学会的，不是先读会的**：见 §六件② 那行新读数。写这行的同时我核了一遍自己有没有把它写成因果——没有：我只报"`PostQuitMessage` 投调用方队列 + 从别的 goroutine 收不掉"这两件现象，⛔ 不主张库设计好坏。
+26. **焦点那一格我改的是 setup，不是断言；这句话必须能被尺复核**，否则它就是自我声明。复核法：`git diff 7a02b121..HEAD -- cmd/wisp/panel_host_windows_test.go` 里那四枚 `if` 块（含 `t.Errorf` 全文）逐字不变，变的只有函数名、注释、以及建窗/调用所在线程那几行。若 `33-v2` 读出的不是这个形状，请以它为准并把这一处当本腿的缺陷。
+27. **一处可能被判"越权"的取舍**：我把 `prevFocus` 在 `Hide` 之后**保留**（不清零）。理由有读数（清了之后下一发 Hide 没有目标，实测 `after Hide == panel`）；代价是"陈旧句柄"仍可能被再次尝试——`SetForegroundWindow` 对已销毁窗返回 0，我把返回值取进 `lastRestoreTo/lastRestoreSetForeground` 而不假装成功。这一处属产品形状微裁，编排者若要相反的形状，撤销点＝`PanelManager.Hide` 的那段注释。
 
 ---
 
@@ -93,3 +165,18 @@
 7. **`Assets.Check()` 那一层的牙不在本腿射程**。现量：`33-r4` §① 格 5 逐字"本尺把半包的完备性判定委托给 `Assets.Check()`"，而 `internal/panel/**` 是本腿禁写面。⇒ AC#13 那枚"最终文档含真内容"的断言问的是**送进窗口的那包字节**，⛔ 不背书那包字节自洽。
 8. **`go mod tidy -diff` 在 HEAD 上 exit 1／`staticcheck` 本机版与 CI 钉版不同**。现量：票面 `:267`／`:262`（本腿未复跑，⛔ 不跑）。⇒ 门禁四数里 staticcheck 标〔未复认〕，tidy 一字节不跑。
 9. **"接进常驻"接到哪一枚触发口**。现量：`internal/ball` 的 `OnPanelHotkey`／`OnTrayPanel` 两枚回调今天只 `recordBallGesture`（`resident_ball_windows.go:127-128`），包外**没有**任何导出投递口（`33-a2` R20）。⇒ 本腿的接法＝在这两枚回调的 **body** 里投给面板线程（回调契约"快、非阻塞"＝一次 channel send／`Dispatch`，⛔ 不等窗建好）。⚠ 我没有真按过热键（那要桌面注入，`33-p1` §⑦-1 已判"做不到可复核前提"）⇒ 我这一格交的是**代码路径＋用例读数**，⛔ 不交"真按 Ctrl+Alt+P 看到了窗"。那一格留给 owner 手测或 `33-v2`。
+
+---
+
+## 编排者收尾标注（10-01 **14:08:44**，代提人＝编排者本人；⛔ 本节不是我代填的两节，只是把"缺什么"钉死）
+
+**本腿死法具名**：`33-r5` 撞到 **150 轮帽**（`Agent` 回报逐字：`Reached the maximum turn limit (150). The task may be incomplete`，最后一句是 `All readings collected. Writing the six-item body and appending to ⑤⑥⑦:`）。我按死腿 intake 的尺复认：**它已经把这六件正文与 ⑤⑥⑦ 写满**（本件 167 行／39,460 字节，占位符 grep＝**0 命中**），**没写完的是「终跑名册」与「收尾三把尺」两节，以及 §⑥ 里那句"续编号 R1.. 留给起跑名册、终跑名册、门禁四数、反控读数"（`:153`）**。⇒ ⛔ **我不代填那两节**（填了就把"谁做的判"洗混，这是编排者自己的账），它们归下一腿自己取数。
+
+**盘上状态（同发取，不是转述）**：四枚提交逐枚 `git log -1` 真身＝`fd6c9026`（骨架，⑤⑥⑦ 先写满）→ `13acad46`（产码＋用例同一发，九枚路径全在 `cmd/wisp/**`）→ `ee5d167d`（AC#13／AC#14 的尺改走产品那道门）→ `f549ecdc`（gofumpt）。`git status --porcelain -- cmd internal`＝**0 行**；`git diff --name-only 7a02b121..HEAD -- cmd/wisp/shutdown.go cmd/wisp/shutdown_hooks.go internal/observe internal/ball internal/panel internal/proc`＝**空**（⛔ 两条"停手上报"的线它都没越，我在票面上要的那两格成立）。本件那一枚未提交的正文由我代提，提交号落在这段之后的一枚 `git log` 里。
+
+**我自己复跑的那发（补死腿没交的那一维，⛔ 不写进本件当它的读数）**：整包名册读数落在 `.scratch/wisp/probes/orchestrator/33r5-head-roster.txt`（`cmd/wisp`，`-count=1 -v`，带 sherpa DLL 那枚 PATH 形态），逐名红册归 `33-v2` 判、归我入账（台账 `A503`）。**本件的六件正文凡引用"终跑名册"处，请以我这发为准对照，与它不一致就是本腿没写完，⛔ 不是你那把尺错。**
+
+**三件我读出来要在下一腿处理、本标注只登记不动手**：
+1. `cmd/wisp/resident_ball_windows.go`（**＋67／−12**）与 `cmd/wisp/resident_windows.go`（＋32／−3）被本腿改过 ⇒ **票 228 AC#2／AC#11 那一发的题面要重锚**（它原计划的几处改动点里，手势回调那两枚 body 已被 `33-r5` 占用；两腿同包 ⇒ 串行，不许并发）。
+2. 本腿新增的**真窗用例**把默认档的暴露面扩大了（它自己在 §⑦ 第 5 条具名报了这个数）⇒ 票面 `:310` 那一格（CI 那枚 windows cli 腿上有没有 WebView2 Runtime）从"我该问"变成**必须先答**：`33-v2` 用静态尺（runner 标签＋那一步命令）定案，⛔ 不许用"先推一次看看"来问。
+3. §⑤ 第 27 条那处取舍（`Hide` 之后**保留** `prevFocus`、不清零）＝**产品形状微裁，归我**：我追认"保留＋把两枚 Win32 返回值取进可观察字段"这一形，⛔ 不升成断言；撤销点它已写明＝`PanelManager.Hide` 那段注释。撤销口令「**33 焦点清零改回**」。
