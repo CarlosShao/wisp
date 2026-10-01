@@ -568,7 +568,7 @@ func TestAC4FocusReturnToPriorWindowGap33r2(t *testing.T) {
 		t.Errorf("the panel did not take the foreground on Show: foreground 0x%x, panel hwnd 0x%x (AC#4 says only the panel takes focus when shown)", afterShow, panelHwnd)
 	}
 	if recorded == panelHwnd {
-		t.Errorf("the host recorded the panel ITSELF as the previous foreground window (prevFocus 0x%x == the panel) - because this panel was already foreground from the earlier show, the handle of the window the user actually came from is now lost, and Hide hands focus back to the window it just hid. Product side: panel_host_windows.go:269 records unconditionally, :311-313 restores it. RED BY DESIGN, owner 33-r2; ⛔ not to be relaxed in the test", recorded)
+		t.Errorf("the host recorded the panel ITSELF as the previous foreground window (prevFocus 0x%x == the panel) - because this panel was already foreground from the earlier show, the handle of the window the user actually came from is now lost, and Hide hands focus back to the window it just hid. Product side: panel_host_windows.go:269 records unconditionally, :311-313 restores it. RED BY DESIGN, owner 33-r2; do not relax this assertion in the test", recorded)
 	}
 	if afterHide == panelHwnd {
 		t.Errorf("after Hide the foreground window is STILL the hidden panel (0x%x); the pre-Show foreground was 0x%x. No window got focus back, so D29's 'focus returns to the recorded previous foreground window' is not happening on a real host. RED BY DESIGN, owner 33-r2", afterHide, prior)
