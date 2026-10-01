@@ -142,3 +142,50 @@ md5 `3a16c129…` 复确、`git diff --stat HEAD` 空。
   真正"锁了又解"只在测试 harness ⇒ 若定性为产码面要写死，只能加注释＋一枚会响的钉，不能加 Unlock 逻辑。
 - 不做：**不**碰依赖（`pkg/edge`、module cache）；**不** `go mod`；**不**搬 AC13 进 winlive/t.Skip；
   **不**放宽那 15s；**不**把断言降级成 Logf。
+
+---
+
+## 编排者收尾标注（15:36，`84c67e7a`；本腿 15:2x 死于模型服务断线，通知一律当未验证，下列读数全是我自己在盘上取的）
+
+**本腿的死亡形状＝第二种形（正文写满了却没提交）**：它交了四枚（`31444593` 骨架／`e06e715e` 窄形修法＋第一枚钉／
+`4bd32fe0` 证据 ①②③／`4be1d3f1` **加宽**修法＋第二枚钉），但工作树里还压着**三枚未提交的改动**。我按
+「代提死腿的原话＝允许、代填它空着的两节＝禁止」处置：**逐字代提那三枚改动＝上面 `84c67e7a`**（pathspec 只有
+`cmd/wisp/panel_host_windows.go` 45/41、`panel_host_windows_test.go` 11/1、`panel_resident_windows_test.go` 5/66）。
+
+**⛔ 本表现在与代码不同步，且这是它自己改的方向造成的，不是我改坏的**：
+- §③ 与 §⑦ 写的是 `e06e715e`／`4be1d3f1` 那两形（§③＝`drainStaleQuitBeforeCreate` 窄形，§⑦ 甲＝去 harness 的 Unlock），
+  而 `4be1d3f1` 一度把产码换成**整条队列排干**；`84c67e7a` 又**收回窄形**并把 §⑦ 甲那一支（harness 不再
+  `UnlockOSThread`）真落了产码侧的镜像注释。⇒ 引用"r6 的修法"时必须带 commit 号，别引用本表当现状。
+- 它在 `84c67e7a` 的产码注释里留下一句**我没有读数的自述**：整条队列排干"不派只删"会留下
+  **zombie WebView2 controller、卡住下一次建窗**。这句在它本表里**没有对应读数**（§①②③ 都没登），我也没复跑
+  ⇒ 现按〔仅死腿自述〕处理，`33-r7`／`33-v2` 若要据它选型，得先把那一形自己复现一次。
+- **§④（整包名册）与 §⑤（门禁四数）两节它没写，我不代填**。取而代之的是我这两发现量，出处写清＝编排者本人、
+  取数时刻与锚点一并给：
+  - 我 15:27:43 在 `4be1d3f1` ＋它那三枚未提交改动之上跑整包 `cmd/wisp`（PATH 带 `third_party/sherpa-onnx`＋`build`，
+    跑前确认机器上没有别的 `go test`）＝**rc=1、319.926 s、一枚红＝`TestAC14AwaitedBindingReplyReachesThePage` (15.00s)**，
+    红句逐字 `panel_resident_windows_test.go:443: timed out after 15s waiting for the panel thread to finish Show -
+    this is a failed measurement, not a pass`；同发 recovering 出的 panic 栈＝
+    `pkg/edge/chromium.go:131 Init` ← `webview.go:340` ← `webview.go:109 NewWithOptions` ←
+    `cmd/wisp/panel_host_windows.go:249 bringUp` ← `:353 Show` ← `panel_resident_windows.go:324 RequestShow.func1`
+    ← `:250 drainTasks` ← `:210 loop`。逐字日志＝`.scratch/wisp/probes/orchestrator/33r6-head-roster.txt`（658 行）。
+  - 门禁四数（我替它补跑销账）：`go build ./...` rc=0／`go vet ./cmd/wisp` rc=0／`sh scripts/d22scan.sh` rc=0
+    （clean；ban #8 `cmd/` 81、`internal/` 476）／`gofumpt -l` 起手**点出 `panel_resident_windows_test.go` 不合规**
+    ⇒ 我 `gofumpt -w` 补格式（纯格式：该文件逐字 5/66、`-w` 后 3/64），复跑列表为空。`staticcheck` 本机版与 CI 钉版
+    不同 ⇒ 〔未复认〕。⛔ `go mod tidy` 一字节没跑。
+  - ⇒ **判语：本票这枚顺序依赖红到今天为止没有一枚腿交回过"整包绿"**。窄形我这发＝AC#13 绿、AC#14 红；
+    宽形它的读数＝AC#13 绿、AC#14 红。**两形都被量过、都不够**。
+  - 那条栈的位置有信息量：它落在 `loop` 里 `handOverPump` **之前**的第一次 `drainTasks` ⇒ 是**这条 `panel-sta`
+    的头一次建窗**就踩到毒，毒源不是"本线程上一轮自己留的"，而是**调度器把新协程放到了一枚已被别家毒过的 M 上**。
+    这一格把"再换一种排干范围"那条路当场收窄了。
+
+**一笔纪律账，记在这腿名下（不影响它的读数）**：§① 里那枚"确定性最小样本"的临时探针它写了「**已删，
+`.scratch/wisp/probes/33/r6/` 不留痕**」——本仓 `issues/README` 规则 8 是"临时件**只建不删**"。⇒ 那两行
+A/B 对照读数（`nilWindow=true` vs `false`）今天**盘上不可复算**，只值〔仅自述〕；`33-v2` 若要拿它当凭据，
+得自己重造那一形。
+
+**未提交的原始增量我已另存一份**（防"代提即丢"）：`.scratch/wisp/probes/orchestrator/r6-uncommitted.patch`
+（231 行／14,134 字节）。我没有删、没有 revert、没有 `checkout .`。
+
+**归程**：`33-r7`（修复腿，独占 `cmd/wisp`＋桌面）带着上面两发读数接着做。它要证的**不是**"再换一种排干范围"，
+而是"一枚新协程可能落到被别家毒过的 M 上、而第一次建窗就会炸"这件事**由谁在哪一层挡**。票 33 的 AC 框一枚没动
+（`.scratch/wisp/issues/33-panel-host-c27.md` 不在我上面那次 commit 的 pathspec 里，未勾数不变）。

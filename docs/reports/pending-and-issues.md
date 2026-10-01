@@ -10317,3 +10317,28 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - **连带更正**：`A502` 的 P4 那句与项目记忆里我今早写下的「`SetPanicSink` 生产零调用者⇒立票 249」**同时作废**（记忆条目就地改，⛔ 不留"看起来还成立"的旧句）；`33-p1` 表里 ⑤-13 那半句我不改它原话（那是它的自攻节，我在此处具名指向即可）。
 
 **排程更新（本轮定的序，⛔ 不并发）**：**`33-r6`（修复腿，独占 `cmd/wisp`＋桌面，题面＝上面那枚顺序依赖的 panic）** → `33-v2`（票 33 六格终裁，含"CI 有没有 WebView2 Runtime"那一格）→ 票 248 落地腿 → **票 228 AC#2／AC#11 落地腿（题面要重锚：`resident_ball_windows.go` 已被 `33-r5` 改过 ＋67／−12、`resident_windows.go` ＋32／−3，两腿同包 ⇒ 串行）** → 197-r3 → 245 AC#6..9 → 224-r3 → 242 → 票 244 → 票 247。**推送继续按住**（HEAD 现在带一枚**真红**，不是故意的红），当前 201 枚未推。
+
+## A504 — 10-01 **15:37:57**（标题钟与 `date`／`git log -1`／`rev-list --count`／porcelain／`tasklist` **同发取**；HEAD 现量 `84c67e7a`（提交时刻 `15:36:32`）；`origin/dev..HEAD`＝**208**、`cnb/dev..HEAD`＝**208**（仅在此刻有效）；`cmd internal` 脏项＝**0 行**；`go.exe` 现量 **0 枚**＝机器空；票 33 框现读 **13 未勾／1 已勾**＝本程一枚未碰）：收 `33-r6`（**写码腿·修复**，⛔ 死于模型服务断线，不是死于轮次帽）⇒ **它把问题从"排干哪几枚消息"挪到了"谁把一枚毒过的线程还给了池"，而我这发整包读数判它今天还没修好**
+
+### ① 死法与体量（三把尺全在盘上取，通知那句"failed: connection interrupted"我只当线索）
+
+- **它交了四枚、漏了三枚在工作树里**：`31444593`(14:23 骨架)→`e06e715e`(14:37 窄形修法＋第一枚钉)→`4bd32fe0`(14:51 证据①②③)→`4be1d3f1`(15:04 **加宽**修法＋第二枚钉)，随后 15:2x 断线，工作树里压着 `panel_host_windows.go` 45/41、`panel_host_windows_test.go` 11/1、`panel_resident_windows_test.go` 3/64 三枚**未提交**改动。⇒ 按死腿规矩处置：**代提原话＝允许**（我那一枚 `84c67e7a`，逐字提交它那三枚，⛔ 不重设计、不补句子）；**代填它空着的 §④（整包名册）与 §⑤（门禁四数）＝禁止**（我把这两格的空缺具名写进它表尾的「编排者收尾标注」，读数由我另取、出处写我）。
+- **我那枚代提里唯一一处不是它原话的改动，我逐名归因**：`gofumpt -l` 起手点出 `panel_resident_windows_test.go` 不合规 ⇒ 我 `gofumpt -w` 补格式。该文件逐字 `git diff --numstat`＝**5/66**、`git diff -w`＝**3/64** ⇒ 差的 2 增 2 删全在花括号与换行那一类，无标识符、无断言变化。
+- **门禁四数（它没跑，我补跑销账）**：`GOFLAGS= go build ./...` rc=0／`go vet ./cmd/wisp` rc=0／`sh scripts/d22scan.sh` rc=0（clean；ban #8 `cmd/` 81、`internal/` 476）／gofumpt 如上。`staticcheck` 本机版与 CI 钉版不同 ⇒ 〔未复认〕。⛔ `go mod tidy` 一字节没跑。
+
+### ② 决定性那一发：我自己在它最终形状上跑整包＝**仍然红**（这一格它没有读数，我不能推定）
+
+- 15:27:43 在 `4be1d3f1` ＋它那三枚未提交改动之上（跑前 `tasklist` 确认零枚 `go.exe`，PATH 带 `third_party/sherpa-onnx`＋`build`）＝**rc=1、319.926 s、一枚红＝`TestAC14AwaitedBindingReplyReachesThePage` (15.00s)**，红句逐字 `panel_resident_windows_test.go:443: timed out after 15s waiting for the panel thread to finish Show - this is a failed measurement, not a pass`；日志 658 行存 `.scratch/wisp/probes/orchestrator/33r6-head-roster.txt`。
+- 同发 recovering 出的栈是**本案到目前最有用的一行**：`pkg/edge/chromium.go:131 Init` ← `webview.go:340` ← `webview.go:109 NewWithOptions` ← `cmd/wisp/panel_host_windows.go:249 bringUp` ← `:353 Show` ← `panel_resident_windows.go:324 RequestShow.func1` ← `:250 drainTasks` ← **`:210 loop`**。
+- ⇒ **我的判读（是判读，不是它的读数）**：`loop` 里 `:210` 那处 `drainTasks` 在 `handOverPump`/`Run()` **之前** ⇒ 这是**那条 `panel-sta` 的头一次建窗**，队列里不可能有"本线程上一轮自己留的"消息 ⇒ 毒源是**调度器把新协程放到了一枚已被别家毒过的 OS 线程（M）上**，而 `WM_QUIT`-only 的排干拦不住非-quit 那一形。**这一条把"再换一种排干范围"那条路当场收窄**：两形都已被量过（窄形＝我这发 AC#13 绿／AC#14 红；宽形＝它 15:04 那发同样 AC#13 绿／AC#14 红，且代价是它注释里那句 zombie controller），⛔ 都不够。
+
+### ③ 两笔记在我名下（它推翻了我写给它的两句）
+
+- **我 `A503` 那句归因方向"任何人从错误的协程调一次 `Terminate()` 就会毒掉一条日后建窗的线程"——方向对、机制不准**，它 §② 已就地更正成「不是『错协程』，是**任何泵过窗关闭的线程被复用**」。我**追认**这句更正，并把上面那发栈升成它的佐证（第一次建窗就炸＝毒来自池里的别的 M，不来自本线程的历史）。
+- **我派单里那句 `WM_QUIT` 假设今天只成立一半**：`WM_QUIT` 那一形是真的（它 §① 的确定性单线程样本 A/B 证了"建前排干 quit 就转绿"），但**不是唯一形**（`WM_CLOSE` 那一形另起）。⇒ 我在派单里写的"读数若指别的形、以你的为准、把我那句当错的写在表里"**这一条被正常执行了**，无需追惩；教训照旧：我给下一程的因果句＝一枚待验断言（用户域第 74/83/85 条同一族，今天又是第四发实例）。
+
+### ④ 一笔纪律账（记在这腿名下，不影响它的读数）
+
+它 §① 那枚"确定性最小样本"的临时探针自陈「**已删，`.scratch/wisp/probes/33/r6/` 不留痕**」⇒ 违反 `issues/README` 规则 8（临时件**只建不删**）。那两行 A/B 对照读数（`nilWindow=true` vs `false`）今天**盘上不可复算**，一律降〔仅自述〕；`33-r7`／`33-v2` 若要据它选型，得**自己重造那一形**。另：它把 `panel_host_windows.go` 的 610 行 `.bak` 提交进了 `.scratch`（合规，只建不删那一侧），我不清理。
+
+**排程更新（本轮定的序，⛔ 不并发）**：**`33-r7`（修复腿，独占 `cmd/wisp`＋桌面，题面＝"谁该挡住一枚被毒过的 M 被拿去建窗"，⛔ 不是"再换一种排干范围"）** → `33-v2`（票 33 六格终裁，含"CI 有没有 WebView2 Runtime"那一格＋兜我这两枚代提 `a842e5b8`／`84c67e7a`）→ 票 248 落地腿 → **票 228 AC#2／AC#11 落地腿（题面仍要重锚：`resident_ball_windows.go`／`resident_windows.go` 被 `33-r5` 改过）** → 197-r3 → 245 AC#6..9 → 224-r3 → 242 → 票 244 → 票 247。**推送继续按住**（HEAD 那枚仍是**真红**），当前 **208** 枚未推。
