@@ -9,14 +9,18 @@ package main
 import (
 	"archive/zip"
 	"bytes"
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/CarlosShao/wisp/internal/panel"
 )
 
 // TestPanelHostOpensNoListeningSocketL1 is AC#3's L1 half: the host production
@@ -41,39 +45,200 @@ func TestPanelHostOpensNoListeningSocketL1(t *testing.T) {
 	}
 }
 
-// TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12 states the AC#12 truth in
-// a runnable form: what is COMMITTED under frontend/dist decides whether the
-// panel can show a real page. In this repo the tracked embed content is only the
-// .gitkeep anchor, so a clean checkout embeds no page. The capability to tell
-// "placeholder only" from "a real bundle" is already nailed in internal/panel's
-// TestAnchorOnlyBundleIsNotBuiltAndFailsClosed (assets_test.go:22); this test
-// records the current tracked manifest and, if a real bundle is ever committed,
-// fails closed on a half-bundle rather than a clean either-way.
-func TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12(t *testing.T) {
-	// go test runs with the package dir as cwd (cmd/wisp), so git ls-files must be
-	// aimed at the repo root or it resolves "frontend/dist" against the wrong tree
-	// and reports 0 tracked entries. (This is a real尺 measurement, so the path is
-	// made explicit rather than trusted to cwd.)
-	root := repoRootForTest(t)
-	g := exec.Command("git", "ls-files", "frontend/dist")
-	g.Dir = root
-	out, err := g.Output()
+// TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12 is AC#12's ruler, re-tooled
+// by 33-r4. The version it replaces
+// (TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12) contained ZERO t.Errorf:
+// every finding - the non-anchor entries and the count - went to t.Logf, so it
+// could not go red under any bundle at all (33-v1 §A#31: "the fails-closed claim
+// in its comment has no counterpart in the code").
+//
+// AC#12's question is "can this instrument tell 'the embed only matched the
+// placeholder' apart from 'there really is a page bundle'?". Both shapes are asked
+// through Go-side capability doors (panel.Assets: Built / Resolve / Check /
+// Manifest). Nothing here asks a build exit code, prints marketing text, or opens
+// a frontend file: frontend/** is on the two-layer ban list for this leg, and the
+// tracked/ignored axes are read as ENTRY NAMES from git only.
+//
+// The assertions are the two invariants that make the shapes separable:
+//   - anchor-only shape  -> every door must fail closed (a placeholder served as a
+//     page is the false green AC#12 exists to stop);
+//   - page-bundle shape  -> the entry must resolve as html and the entry's own
+//     references must resolve from the same tree (the "half-bundle" shape, which
+//     the pre-33-r4 file only promised in a comment);
+//   - provenance axis    -> a page cannot exist in the binary with nothing in this
+//     tree to build it from, and committed bundle content cannot produce a
+//     not-built binary.
+//
+// The reading today (docs/evidence/s1/33-panel-host-c27-r4.md §①格 5): this tree
+// carries a page built from GITIGNORED working-tree products, so the ticked answer
+// is still "not yet" - that is the orchestrator's归口 call (ticket 33 AC#12 says
+// the box cannot be ticked until whoever fills dist is settled), not a red this
+// leg gets to file on the frontend side.
+func TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12(t *testing.T) {
+	assets, err := panel.BuiltinAssets()
 	if err != nil {
-		t.Fatalf("git ls-files frontend/dist in %s: %v", root, err)
+		t.Fatalf("panel.BuiltinAssets() cannot answer what this binary carries: %v", err)
 	}
-	entries := strings.FieldsFunc(string(out), func(r rune) bool { return r == '\n' || r == '\r' })
-	for _, e := range entries {
-		if e == "" {
+	built := assets.Built()
+	entry, entryCT, entryErr := assets.Resolve(panel.EntryFile)
+	refs, checkErr := assets.Check()
+	manifest, manifestErr := assets.Manifest()
+
+	root, haveGit := gitRepoRootForTest()
+	var tracked, ignoredOrUntracked []string
+	if haveGit {
+		tracked, _ = gitLinesInDir(root, "ls-files", "frontend/dist")
+		ignoredOrUntracked, _ = gitLinesInDir(root, "status", "--porcelain", "--ignored", "--", "frontend/dist")
+	}
+	trackedBeyondAnchor := 0
+	trackedHasEntry := false
+	for _, e := range tracked {
+		if filepath.Base(filepath.ToSlash(e)) == ".gitkeep" {
 			continue
 		}
-		if filepath.Base(e) == ".gitkeep" {
-			continue
+		trackedBeyondAnchor++
+		if filepath.ToSlash(e) == "frontend/dist/"+panel.EntryFile {
+			trackedHasEntry = true
 		}
-		// A committed non-anchor under dist/ means someone filled the bundle.
-		t.Logf("AC#12: tracked embed content beyond the anchor: %s", e)
 	}
-	t.Logf("AC#12 present count: tracked frontend/dist entries = %d (clean-checkout embed content)", len(entries))
+
+	shape := "anchor-only"
+	if built {
+		shape = "page-bundle"
+	}
+	t.Logf("AC#12 reading (head %s): shape=%s built=%t entry-bytes=%d entry-ctype=%q entry-err=%v refs=%d check-err=%v manifest-entries=%d manifest-err=%v | git-metadata=%t tracked=%d tracked-beyond-anchor=%d tracked-has-entry=%t ignored-or-untracked=%d",
+		gitHeadShortForTest(t), shape, built, len(entry), entryCT, entryErr, len(refs), checkErr, len(manifest), manifestErr,
+		haveGit, len(tracked), trackedBeyondAnchor, trackedHasEntry, len(ignoredOrUntracked))
+
+	if built {
+		if entryErr != nil {
+			t.Fatalf("the embed reports built=true yet Resolve(%q) failed: %v", panel.EntryFile, entryErr)
+		}
+		if len(entry) == 0 {
+			t.Errorf("built=true but the embedded entry file is 0 bytes - that is a bundle that renders nothing while still claiming to be built")
+		}
+		if !strings.Contains(strings.ToLower(entryCT), "text/html") {
+			t.Errorf("the embedded entry resolves as content type %q, want an html document", entryCT)
+		}
+		if checkErr != nil {
+			t.Errorf("half-bundle: built=true and the entry resolves, but the entry's own asset references do not all resolve from the same embed tree: %v (resolved %d of them before failing)", checkErr, len(refs))
+		}
+		if manifestErr != nil || len(manifest) == 0 {
+			t.Errorf("built=true yet Manifest() carried nothing (err=%v)", manifestErr)
+		}
+	} else {
+		if entryErr == nil {
+			t.Errorf("the embed reports built=false (placeholder only), yet Resolve(%q) handed back %d bytes - a placeholder-only bundle is being served as a page", panel.EntryFile, len(entry))
+		}
+		if checkErr == nil {
+			t.Errorf("the embed reports built=false, yet Check() passed and resolved %d asset reference(s) - the not-built fail-closed door is open", len(refs))
+		}
+		if manifestErr == nil {
+			t.Errorf("the embed reports built=false, yet Manifest() listed %d entr(y/ies) - a placeholder-only tree must not hand out a bundle manifest", len(manifest))
+		}
+	}
+
+	if haveGit {
+		if built && trackedBeyondAnchor == 0 && len(ignoredOrUntracked) == 0 {
+			t.Errorf("AC#12's two shapes have just been conflated: the binary carries a page (built=true) while this tree tracks nothing under frontend/dist beyond the anchor and reports no untracked/ignored entry there either - there is nothing this embed could have been built from, so 'built' is not being decided by the bundle")
+		}
+		if !built && trackedBeyondAnchor > 0 {
+			if trackedHasEntry {
+				t.Errorf("%d bundle file(s) including the entry are committed under frontend/dist, yet the embed reports built=false - the go:embed pattern is not matching committed content", trackedBeyondAnchor)
+			} else {
+				t.Errorf("committed half-bundle: %d file(s) are tracked under frontend/dist but the entry %s is not - the binary would ship a bundle that can never render, which is the exact shape the pre-33-r4 file only promised to fail closed on", trackedBeyondAnchor, panel.EntryFile)
+			}
+		}
+	} else {
+		t.Logf("AC#12 provenance axis not measurable in this tree (no git metadata - e.g. a git-archive copy); the capability assertions above still ran")
+	}
 }
+
+// TestAC1SessionDisposeHasNoProductionTriggerYet_AC1 turns 33-v1 §A#14's reading
+// ("NewPanelManager has exactly one call site in the whole repo, and it is a
+// test") into an instrument. AC#1's second clause is "session dispose destroys",
+// which the product path cannot reach today: nothing outside _test.go constructs a
+// host, so there is no session whose dispose could tear one down. The explicit
+// Destroy mechanism itself IS asserted (in the winlive lifecycle test).
+//
+// It skips while no production constructor exists and turns into a red that
+// demands a destroy call site the moment someone wires the host - so this is not a
+// permanent exemption, and it is not an empty t.Logf ruler either.
+//
+// ⛔ Deliberately imprecise on purpose, and named here: once a production
+// constructor exists the second leg only requires SOME `.Destroy()` call in a non-
+// test file of this package, not one proven to be on the session-teardown path.
+// Tightening that is 33-r2's job (and the orchestrator's, for the ticket's tick).
+func TestAC1SessionDisposeHasNoProductionTriggerYet_AC1(t *testing.T) {
+	ctorHits, destroyHits := panelHostProductionSites(t)
+	t.Logf("AC#1 dispose scan: %d production constructor(s) %v | %d .Destroy() call site(s) %v",
+		len(ctorHits), ctorHits, len(destroyHits), destroyHits)
+	if len(ctorHits) == 0 {
+		t.Skipf("AC#1's 'session dispose destroys' clause is unreachable in the product path: this package has 0 non-test call sites of NewPanelManager (destroy sites found: %d). The resident legs still only record the gesture (33-v1 §A#15 - OnPanelHotkey / OnTrayPanel bodies are recordBallGesture calls), so there is no session teardown path to hook. Explicit Destroy is asserted in TestPanelHostRealWindowHopAndLifecycle; the dispose half belongs to 33-r2.", len(destroyHits))
+	}
+	if len(destroyHits) == 0 {
+		t.Errorf("a production site now constructs the panel host (%s) but no non-test file in this package calls Destroy - the window would outlive the session, which is AC#1's second clause", strings.Join(ctorHits, ", "))
+	}
+	t.Logf("AC#1 dispose reachability: %d production constructor(s) [%s], %d Destroy call site(s) [%s]",
+		len(ctorHits), strings.Join(ctorHits, ", "), len(destroyHits), strings.Join(destroyHits, ", "))
+}
+
+// panelHostProductionSites walks the NON-TEST Go files of this package (the go
+// test working directory is the package dir) and returns file:line for (a) calls
+// that construct the host and (b) method calls named Destroy. A parse failure is a
+// failed measurement, not a zero.
+func panelHostProductionSites(t *testing.T) (ctorHits, destroyHits []string) {
+	t.Helper()
+	entries, err := os.ReadDir(".")
+	if err != nil {
+		t.Fatalf("read package dir for the dispose scan: %v", err)
+	}
+	fset := token.NewFileSet()
+	scanned := 0
+	for _, e := range entries {
+		name := e.Name()
+		if e.IsDir() || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		f, err := parser.ParseFile(fset, name, nil, 0)
+		if err != nil {
+			t.Fatalf("parse production file %s for the dispose scan: %v", name, err)
+		}
+		scanned++
+		ast.Inspect(f, func(n ast.Node) bool {
+			call, ok := n.(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+			switch fun := call.Fun.(type) {
+			case *ast.Ident:
+				if fun.Name == "NewPanelManager" {
+					ctorHits = append(ctorHits, fmtPos(fset, name, fun))
+				}
+			case *ast.SelectorExpr:
+				if fun.Sel != nil && fun.Sel.Name == "Destroy" {
+					destroyHits = append(destroyHits, fmtPos(fset, name, fun.Sel))
+				}
+			}
+			return true
+		})
+	}
+	if scanned == 0 {
+		t.Fatalf("the dispose scan parsed 0 production files - the instrument is not looking at the package it claims to cover")
+	}
+	return ctorHits, destroyHits
+}
+
+func fmtPos(fset *token.FileSet, file string, pos ast.Node) string {
+	p := fset.Position(pos.Pos())
+	return file + ":" + strconv.Itoa(p.Line)
+}
+
+// TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12 was the pre-33-r4 AC#12
+// ruler. It is replaced by
+// TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12 above; the reason is in
+// 33-v1 §A#31 - the body had no t.Errorf at all, so it could not go red whatever
+// the embed carried.
 
 // repoRootForTest asks git for the toplevel of the working tree the tests live in.
 func repoRootForTest(t *testing.T) string {
@@ -83,6 +248,66 @@ func repoRootForTest(t *testing.T) string {
 		t.Fatalf("git rev-parse --show-toplevel: %v", err)
 	}
 	return strings.TrimSpace(string(out))
+}
+
+// gitRepoRootForTest is the non-fatal form: a git-archive copy of this tree (which
+// is what TestCleanCheckoutBuilds_AC11 builds, and what the 33-r4 reverse controls
+// run in) has no .git, and "no git metadata" is a different fact from "no tracked
+// files". Callers must handle the false case explicitly.
+func gitRepoRootForTest() (string, bool) {
+	out, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
+	if err != nil {
+		return "", false
+	}
+	root := strings.TrimSpace(string(out))
+	if root == "" {
+		return "", false
+	}
+	return root, true
+}
+
+// gitHeadShortForTest reads the current commit at run time. The pre-33-r4 latency
+// log line carried the literal text "HEAD 7a41db9b", so eleven runs taken on a
+// later commit each claimed to be taken on that one (33-v1 §A#21). When there is
+// no git metadata it returns HEAD-unknown rather than a value that would read like
+// a real anchor.
+func gitHeadShortForTest(t *testing.T) string {
+	t.Helper()
+	out, err := exec.Command("git", "rev-parse", "--short", "HEAD").Output()
+	if err != nil {
+		return "HEAD-unknown"
+	}
+	head := strings.TrimSpace(string(out))
+	if head == "" {
+		return "HEAD-unknown"
+	}
+	return head
+}
+
+// gitLinesInDir runs git in dir and splits its stdout into lines. ok=false means
+// git itself failed, which the caller must not read as "empty list".
+func gitLinesInDir(dir string, args ...string) ([]string, bool) {
+	cmd := exec.Command("git", args...)
+	cmd.Dir = dir
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, false
+	}
+	lines := strings.FieldsFunc(string(out), func(r rune) bool { return r == '\n' || r == '\r' })
+	keep := make([]string, 0, len(lines))
+	for _, l := range lines {
+		l = strings.TrimSpace(l)
+		if l == "" {
+			continue
+		}
+		// git status --porcelain --ignored prefixes each row with two columns
+		// (`!! path`, `?? path`, ` M path`); strip to the path.
+		if len(l) > 3 && (strings.HasPrefix(l, "!! ") || strings.HasPrefix(l, "?? ")) {
+			l = l[3:]
+		}
+		keep = append(keep, l)
+	}
+	return keep, true
 }
 
 // TestCleanCheckoutBuilds_AC11 copies the committed tree (git archive HEAD, so no
