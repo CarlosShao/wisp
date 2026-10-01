@@ -153,3 +153,5 @@
   而 `Allow` 走的 `Request` 只有 `CorrelationID/Allow/Grant/Source`（`replies.go:328-330`），`Source` 被逐字定性为「**LABELS, not authority**」（`replies.go:116-123`）
   ⇒ **本票 AC#2（`:39`）那句"每枚按钮断『Gate 收到一条带正确 Channel 的答复』"对「允许一次／拒绝／长期允许」三枚今天没有 `Channel` 值可带**：甲＝读成 `NativeSource` 标签（零新契约）／乙＝真加第五枚 `Channel` 值（＝动 SPEC-06 §2 冻结词表，落在 `:48-50` 点名的失败形状上，须人工批准）／不做＝改写票面判据那句（归编排者，实现腿不许自己动）。
   本腿三发合计 34 把尺（§⑤ R1-R34），⑤⑥⑦ 三节均为终态；零产码零脚本零测试零构建，未 push。
+- `228-a3` 收尾复尺（第四发，只加一行）：`git status --porcelain=v1 -- cmd internal` 在交件时刻**只有两枚 `*_test.go` 脏**（写腿 `33-r4` 的活，逐名 `panel_host_gate_test.go`／`panel_host_windows_test.go`）
+  ⇒ 本腿引过的**非测试** `cmd/wisp` 文件在这几发之间没被动过，census §⑥ E15 的残余风险降一格（仍只算这一瞬，落地时现读）；§⑤ 补 **R35**。本腿累计 **35 把尺**，交件终态 344＋1 行。未 push。
