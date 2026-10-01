@@ -17,35 +17,219 @@ AC 框（`- [ ]`／`- [x]`）一枚没碰，勾与不勾归编排者／验收腿
 
 | 格 | 内容 | 状态 |
 |---|---|---|
-| ① | 最小确定性复现（谁先跑、留下什么、`bringUp` 读到什么）＋逐字读数＋命令 | 待填 |
-| ② | 定性：产品缺陷 vs 测试卫生缺陷（两边说法都写＋我选哪支、凭什么） | 待填 |
-| ③ | 修法＋反控（定向突变必须当场红，抄原始红句逐字） | 待填 |
-| ④ | 整包逐名红册（PASS/FAIL/SKIP 三数＋逐名红，目标 rc=0 且红册空） | 待填 |
-| ⑤ | 门禁四数（build / vet / d22scan / gofumpt） | 待填 |
-| ⑥ | 我可能写错的条目（附"如果错了后果"） | 待填 |
-| ⑦ | 判不动的地方（逐条 甲／乙／不做 ＋现量＋为什么判不了） | 待填 |
+| ① | 最小确定性复现（谁先跑、留下什么、`bringUp` 读到什么）＋逐字读数＋命令 | 已填 |
+| ② | 定性：产品缺陷 vs 测试卫生缺陷（两边说法都写＋我选哪支、凭什么） | 已填 |
+| ③ | 修法＋反控（定向突变必须当场红，抄原始红句逐字） | 已填（两枚反控各 3/3、2/2 红） |
+| ④ | 整包逐名红册（PASS/FAIL/SKIP 三数＋逐名红，目标 rc=0 且红册空） | 发 1 已填（rc=0／240-0-0／红册空）；发 2 待补 |
+| ⑤ | 门禁四数（build / vet / d22scan / gofumpt） | 已填（build/vet 终态复跑待补同发读数） |
+| ⑥ | 我可能写错的条目（附"如果错了后果"） | 已填（8 条） |
+| ⑦ | 判不动的地方（逐条 甲／乙／不做 ＋现量＋为什么判不了） | 已填（甲我选／乙复算过不选／丙＋两格具名交回） |
+| 交件判语 | 修好了没有＋归口哪一层 | 待填 |
 
 ---
 
 ## ① 最小确定性复现（谁先跑、留下什么、`bringUp` 读到什么）
 
-（待填）
+### (a) 不靠调度器运气的那一发：同一条锁死线程上定植"活窗＋一枚没派的 `WM_CLOSE`"
+
+台件＝`.scratch/wisp/probes/33/r7/zz_33r7_probe_windows_test.go.bak`（探针源码，`go test` 不认 `.bak`，
+所以它不进名册；要复算：`cp` 成 `cmd/wisp/zz_33r7_probe_windows_test.go` 再按下面命令跑，跑完 `mv` 回来，
+⛔ 不删）。产码＝HEAD `416d9d56`（`bringUp` 只有窄形 `drainStaleQuitBeforeCreate`）。
+
+命令（一发一个进程、一种 mode，因为一次失败的建窗能把整枚二进制带走，见 (c)）：
+
+```
+GOFLAGS= go test -c -o .scratch/wisp/probes/33/r7/r7.test ./cmd/wisp
+PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" WISP33R7MODE=<mode> \
+  ./.scratch/wisp/probes/33/r7/r7.test -test.run TestP7ProbePlantThenMode -test.v -test.timeout 120s
+```
+
+步骤：锁线程 → `bringUp#1`（起真窗）→ 泵到空（让定植不含歧义）→ `mgr.Destroy()`（只 **POST** `WM_CLOSE`，不派）
+→ 按 mode 处置 → `bringUp#2`（产品自己的 `bringUp`）。逐字读数（`modes-grid.txt`，每 mode 三发）：
+
+```
+### mode=none iter=1 rc=0
+    MODE none              panicked=runtime error: invalid memory address or nil pointer dereference created=false elapsed=0ms
+       | tid=21212
+       | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+       | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x220EDE GetQueueStatus mask=0x0
+       | no purge (HEAD shape): bringUp runs its own WM_QUIT-only drain
+       | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=WM_CLOSE(0x10) | thread windows=3
+```
+
+`bringUp` 读到的东西＝**一枚没派的 `WM_CLOSE`（0x10）＋它所属的那扇还活着的窗**；
+`none`／`dispatch` 两形 6/6 panic，与票面上那枚 recovered 栈同一签名（`pkg/edge.(*Chromium).Init` → `chromium.go:131`）。
+
+| mode（建窗前做了什么） | 三发读数 | 计数 |
+|---|---|---|
+| `none`＝HEAD 的窄形（只 `PeekMessageW(WM_QUIT..WM_QUIT, PM_REMOVE)`） | `panicked=... nil pointer dereference created=false elapsed=0ms` | 0/3 建起 |
+| `dispatch`＝先把那枚 `WM_CLOSE` **派**出去（孤儿窗真被拆：`thread windows now=0`），再跑 HEAD 的窄排干 | `quit-drain removed 0` ＋ `pre-create peek: filtered WM_QUIT found=false` ＃ 紧接着照样 `panicked=... nil pointer` | 0/3 建起 |
+| `wide`＝`PeekMessageW(0,0,PM_REMOVE)` 清整条、只删不派 | `wide purge removed 1: WM_CLOSE(0x10)` → `created=true` 两发，但 `thread windows now=4`（上一任的窗留在世上）；第三发**挂死**（见 (c)） | 2/3 建起（1 发挂死） |
+| `pumpAfterDestroy`＝派到底、泵到 `PeekMessage` 报空 | `pumped-and-dispatched 3(4/2) message(s); thread windows now=0` ＋ `unfiltered head=empty` → `created=true` | 3/3 建起 |
+
+⇒ **`bringUp` 层的"排干范围"这一维被穷举过了**：窄形看不见闩锁起来的 quit（`removed=0` 却照样被 `GetMessageW` 交出来），
+宽形要么留下一扇没人认领的窗（每建一次多一扇）要么吃掉本次建窗自己要用的消息，
+唯一 sound 的那一形（泵到底）做的事是**把孤儿窗拆掉**——那是线程的 owner 才有的知识，不是 `bringUp` 的。
+
+### (b) 整包那一发里"谁先跑、留下什么"：TID 逐枚对上
+
+`mutation-2-no-seal.txt`（＝本腿修法里把 owner 侧那道封（`releaseThreadClean`）拿掉、其余全在位，
+`-run 'TestAC13|TestAC14|TestPanelThread|TestBallPanelGestures' -count=3`）第 2 轮逐字：
+
+```
+    panel_resident_windows_test.go:482: AC#13 reused-thread release: tid=16272 dispatched 0 message(s) before unlocking; windows left on that thread=0 queue head=
+    panel_resident_windows_test.go:566: AC#13 queued-close: tid=16272 first bringUp ok, pumped 0 to idle, Destroy left a queued close (hwnd 0x0, plantQueued=false), then bringUp#2 err=first bringUp (the control this plant needs): panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x143082A. ...
+```
+
+⇒ **同一次运行里、同一个 OS 线程号（16272）**：泄漏者没泵就还池，下一条用例的第一次建窗落到它上面，
+产码的检查看到的正是上一任欠着没派的那枚 `WM_CLOSE`（hwnd `0x143082A`）。
+第 3 轮同一枚泄漏者还污染的**另一条**路：`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` 红 20.00s，
+红句就是票上那句 `timed out after 15s waiting for the panel thread to finish Show`，
+而那发日志里 `refusing to create` 0 次、`goroutine panic recovered` 0 次＝**既不拒绝也不 panic 的第三种形：挂在建窗自己的 `GetMessageW` 上**（与 (a) 的 `wide` 挂死同一去处）。
+
+票上原先那发整包读数（`.scratch/wisp/probes/33/r6/fullpack.log:601-614`，14:52，HEAD `4bd32fe0`＋未提交的窄形改动，
+**本腿只读该文件、未复跑**）顺序与此完全一致：
+`--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (1.08s)` 紧接着 `=== RUN TestAC14AwaitedBindingReplyReachesThePage`
+→ `goroutine panic recovered ... panel_host_windows.go:241 bringUp ... loop(:210)`。
+⇒ 编排者 15:27 那条"头一次建窗就踩到别人留的毒"的判读**成立**，但毒源不是"别的线程被别家毒过"这种无主形状：
+`panel-sta` 落到的是一枚**测试自己还池的、还欠着一枚 `WM_CLOSE` 的线程**，而 33-r6 那枚钉就是最后写它的人。
+
+### (c) 顺带量到的两条后果（都不是"测试难看"那么轻）
+
+- 五种 mode 挤在一发进程里跑：第 2 发直接 **SIGSEGV，rc=139**，`plant-modes-2.txt` 只落到第 1 发的读数
+  ⇒ 一次 panic 之后留下的半初始化 controller 能让**整枚测试二进制**没掉，不是"这枚用例红"。
+- `wide` 第 2 发：`modes/wide-2.txt` rc=2，`panic: test timed out after 2m0s`，卡住的协程栈顶＝
+  `pkg/edge/chromium.go:100` 的 `GetMessageW`（`Embed` 的循环）⇒ 33-r6 那句"整条排干会卡住下一次建窗"
+  **本腿自己复现出来了**（1/3），另有一发整包读数同形（`.scratch/wisp/probes/33/r6/fullpack2.log:640`，
+  `pre-create message purge hit its cap` removed=256，show 永不完成；那是 `4be1d3f1` 宽形的整包日志，本腿未复跑）。
 
 ## ② 定性：产品缺陷 vs 测试卫生缺陷（两边说法）
 
-（待填）
+**测试卫生缺陷（我选这支作触发者）**：全仓"泵过一扇 webview 窗又把 M 还给池"的点，现读只有两枚——
+`cmd/wisp/panel_resident_windows_test.go:468`（`TestAC13BringUpSurvivesAReusedThreadQuit`，33-r6 新加的钉自己）
+与 `cmd/wisp/panel_host_windows_test.go:90`（`hostThreadHarness`，HEAD 已改成锁到底、注释写明理由）。
+出货拓扑没有这一形：`panel_resident_windows.go:202` 锁而不解、协程退出时线程随它销毁、窗与 quit 一起没。
+`cmd/wisp/notify_windows.go:139` 的解锁落在 message-only 窗上，解锁前 `DestroyWindow` 已同步跑完，
+且本仓 `PostQuitMessage` 的调用点现读只有依赖的 `Terminate`、`terminateOnThisThread`、
+`internal/ball/sta_windows.go:161` 与 testdata 那枚独立程序——前三枚都不在 `notify` 那条线程上。
+凭据＝(b) 那发 TID 逐枚对上的读数（泄漏者→下一条用例的建窗被具名拒绝）。
+
+**产品缺陷那一支（不是没道理，但它要说的是另一件事）**：`bringUp` 隐含一条从没写下来的前提
+"来建窗的线程没有别人欠着的消息"，而 `PanelManager` 文档化的 recreate 面（`Destroy` 之后 `Show` 重建）
+在同一条线程上正是这个形状。这一支的说法是"产码该把前提变成自己能检查的"。
+**我只走到这里就停**：读数显示检查得到（过滤式 peek 能读到那枚 close）、**拒绝得住（不 panic、不挂死、具名）**，
+但**修不干净**——四种排干范围都被量过（①(a) 表），其中 sound 的那一形做的事是拆掉别人的窗。
+所以产码这一侧落的是"检查＋具名拒绝＋不动别人的队列"，owner 那一侧落的是"泵到底再还池"。
+
+⇒ 归口：**甲（线程的 owner 那一层）挡住它**；`bringUp` 那一层只负责"下一次再有这种东西时，
+当场说得清是谁欠的"，它不是挡的那一层。①(b) 那发就是这句话的读数：泄漏被拿掉封时，
+拒绝立刻点名 hwnd；泄漏被封住时，包内不再有毒可踩。
 
 ## ③ 修法＋反控红句
 
-（待填）
+**改了什么（两枚文件，全在 `cmd/wisp/**`）**
+
+1. `cmd/wisp/panel_resident_windows_test.go`（甲，落地的就是这一枚）：
+   新增 `pumpThreadToQuiet` / `threadWindowCount` / `threadQueueHead` / `releaseThreadClean` 四枚工具，
+   `TestAC13BringUpSurvivesAReusedThreadQuit` 在 `Destroy` 之后、`UnlockOSThread` 之前**把线程派到空**，
+   并加两条断言：还池前 `windows left == 0` 且 `queue head == empty`，红句指名"这条线程被还池后
+   下一条用例的建窗会踩到什么"。原来三条断言一枚没删、15 秒没放宽。
+2. `cmd/wisp/panel_host_windows.go`（乙里读数支持的那半）：`bringUp` 在建窗前跑完窄形排干之后，
+   用 `staleCloseQueued()`（`PeekMessageW([WM_CLOSE..WM_CLOSE], PM_NOREMOVE)`，不删不派）检查，
+   脏就**返回具名错误、根本不建窗**（没有重试循环、没有清理）；`bringUp` 上面那段注释换成 ① 的四形读数，
+   把 33-r6 那句〔仅死腿自述〕的"zombie controller"换成本腿自己的复算（1/3 挂死 + `thread windows 3->4`）。
+   新增钉 `TestAC13BringUpRefusesAThreadWithAQueuedClose`：定植同一形状，断言
+   无 panic、错误里含 `WM_CLOSE`、`created=false`、**拒绝后那枚 close 仍在队列里**（证明产码没吃别人的消息）、
+   以及本用例自己还池前线程干净。
+
+**反控 1＝拿掉产码那一处检查**（`git` 未提交的临时删；快照与还原：
+`.scratch/wisp/probes/33/r7/panel_host_windows.go.keep` md5 `00336ed0704e51f4cdb043a6d0b3b852`，
+跑完 `cp` 回去、md5 复确一致）。`-run 'TestAC13|TestAC14|TestPanelThread|TestBallPanelGestures' -count=2`
+逐字红句（`mutation-1-no-check.txt`，2/2 都红，其余 6 枚全绿）：
+
+```
+--- FAIL: TestAC13BringUpRefusesAThreadWithAQueuedClose (1.19s)
+    panel_resident_windows_test.go:574: bringUp on a thread carrying a queued WM_CLOSE runtime error: invalid memory address or nil pointer dereference instead of refusing it by name. ... Fix: bringUp must call staleCloseQueued before NewWithOptions and return an error
+    panel_resident_windows_test.go:577: bringUp did not name the refusal: err=<nil>, want an error that says a WM_CLOSE is queued on this thread. ...
+```
+
+同一发里 `--- PASS: TestAC14AwaitedBindingReplyReachesThePage (1.13s)`／`(0.88s)`
+⇒ **绿 AC#14 的是甲那一道封，不是这枚检查**；检查的牙只由它自己那枚钉兜（当场红、panic 原文抄在上面，
+不是 15 秒超时）。另注：这发红句里 `windows=0 queue head=` 那些字段是零值——协程已经 panic 展开，
+后面的赋值没执行，别把"queue head=" 读成"队列为空"。
+
+**反控 2＝拿掉测试那一道封**（同一手法，快照 `panel_resident_windows_test.go.keep` md5 `7451332c7ef1b15b889a586e948f8473`）：
+`mutation-2-no-seal.txt`，`-count=3` 里 `TestAC13BringUpSurvivesAReusedThreadQuit` **3/3 红**：
+
+```
+    panel_resident_windows_test.go:497: this test is about to hand OS thread 7544 back to the pool with its queue non-empty (). A queued WM_CLOSE on that thread becomes a WM_QUIT inside the next create's own pump (webview.go:242-243 + 381-383): measured 3/3 panic, and no pre-create quit drain can see it while other messages are still queued
+--- FAIL: TestAC13BringUpSurvivesAReusedThreadQuit (0.93s)
+```
+
+（`queue non-empty ()` 里的空串同样是零值：这一形里 `releaseThreadClean` 整句没跑，
+`head` 从没被赋过值——断言仍然响，是因为"没跑"本身就等于"没干净"。）
+并且这一发的第 2、3 轮把它毒到的**下游**也拍下来了：`tid=16272` 被下一条用例的建窗**具名拒绝**、
+`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` 红 20.00s（①(b) 逐字）。
+
+**带修常态**：见 ④（整包名册）与 `.scratch/wisp/probes/33/r7/nails-fix.txt`
+（两枚钉 `-count=3` 全 `PASS`，读数是 `dispatched 3(4) message(s) ... windows left=0 queue head=empty`
+与 `refusing to create ... created=false ... the close was still queued after the refusal=true`）。
 
 ## ④ 整包逐名红册
 
-（待填）
+命令（两发同一条，PATH 少了它就是"没跑"而不是绿）：
+
+```
+PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test ./cmd/wisp -count=1 -v -timeout 25m
+```
+
+### 发 1（`.scratch/wisp/probes/33/r7/fullpack-1.txt`，1331 行＋尾块，16:18:31 起、16:21:55 终）
+
+- **rc=0**，`ok  	github.com/CarlosShao/wisp/cmd/wisp	204.702s`
+- 三数（只认 `--- FAIL`/`--- PASS`/`--- SKIP` 行）：**PASS=240、FAIL=0、SKIP=0**
+- **逐名红册＝空**（`grep -cE '^--- FAIL|^    --- FAIL'` = 0）
+- 桌面枚数：起手（15:41）6 枚 → 这发终态 13 枚。逐枚查过归属：6 枚属 `SearchHost`（任务栏搜索，起手那 6 枚就是它）、
+  6 枚属 owner 自己的 `clipsync-desktop.exe`、**1 枚是我这发之前探针跑留下的孤儿**（PID 3112，
+  `--user-data-dir=C:\Users\swq\AppData\Local\Temp\wisp-33r7-plant-dispatch\EBWebView`，父进程 16064 已不存在）。
+  16:23 我已 `taskkill //PID 3112 //F` 收掉它，收后 `Get-CimInstance` 里再无 `wisp*` 目录的 webview 进程（13→12）。
+  ⇒ 不是"机器上本来就该有 13 枚"，也不是"跑了整包就多 7 枚"：**多出来的一枚是我的，已经清掉**。
+- 面板家族逐名（这一发里真跑了、不是被跳过）：
+
+```
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.10s)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.50s)
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.97s)
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (0.80s)
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose (1.02s)
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (0.49s)
+--- PASS: TestAC14GoSideEvalPushReachesThePage (0.50s)
+--- PASS: TestPanelThreadIsSTAAndExitsCleanly (0.34s)
+--- PASS: TestPanelThreadNameIsNotInResidentRoster (0.00s)
+--- PASS: TestBallPanelGesturesReachThePanelThread (0.34s)
+--- PASS: TestBallGestureWithoutPanelHostStillRecords (0.00s)
+--- PASS: TestAC4PriorFocusSurvivesARefusedPanelSample (0.50s)
+```
+
+  两枚新落地的读数在这一发里也在（不是我另跑的定向读数）：
+
+```
+AC#13 reused-thread release: tid=7412 dispatched 3 message(s) before unlocking; windows left on that thread=0 queue head=empty
+AC#13 queued-close: tid=13284 first bringUp ok, pumped 0 to idle, Destroy left a queued close (hwnd 0xFE0E82, plantQueued=true), then bringUp#2 err=panel host: refusing t...
+```
+
+### 发 2（`.scratch/wisp/probes/33/r7/fullpack-2.txt`）
+
+（这一发是补的，因为本案的失败形状本来就是负载／顺序敏感的——"两发都绿"才敢说不是运气。读数见下面。）
 
 ## ⑤ 门禁四数
 
-（待填）
+| 尺 | 命令 | 读数 |
+|---|---|---|
+| build | `GOFLAGS= go build ./...` | rc=0（16:16 段，gofumpt `-w` 之前） |
+| vet | `GOFLAGS= go vet ./cmd/wisp` | rc=0（同上；`-w` 之后另发复跑，见下方终态复跑） |
+| d22scan | `sh scripts/d22scan.sh` | **rc=0**、`d22scan: clean - no D22 ban violations`；分母 live scope：bans #1-5 internal/=224、bans #1-5 cmd/=34、ban #6 frontend/=85、ban #7 internal/tools/=23、ban #8 design/=39、frontend/=85、internal/=476、**cmd/=81（注释与 `_test.go` 都在射程）**；同发 `runtests.sh: OK - packages=[./...] PASS=34 FAIL=0 SKIP=0`（含 `tools/d22scan` 自己的 16.248s）；忽略过滤只跳过 1 枚 `frontend/dist/assets/` 下的文件（按 git index 判定） |
+| gofumpt | `"$(go env GOPATH)/bin/gofumpt.exe" -l cmd/wisp/panel_host_windows.go cmd/wisp/panel_resident_windows_test.go` | 起手点出 `panel_resident_windows_test.go` 不合规 ⇒ `-w` 后**列表为空**。改动是纯格式：与 `-w` 前的快照逐枚 diff＝只删掉第 590 行一枚空行（快照 `.scratch/wisp/probes/33/r7/panel_resident_windows_test.go.pregofumpt`） |
+| staticcheck | — | **〔未复认〕**：本机版与 CI 钉版不同，不出结论 |
 
 ## ⑥ 我可能写错的条目（逐条，附"如果错了后果"）
 
@@ -75,6 +259,16 @@ AC 框（`- [ ]`／`- [x]`）一枚没碰，勾与不勾归编排者／验收腿
 - (f) **"`pumpAfterDestroy` 3/3 绿＝owner 侧排干是 sound 的修法"**：三发都是**同进程同线程连着建第二扇窗**。
   它没有覆盖"owner 排干后把线程还给池、再由**另一枚协程**拿去建窗"这一形（那是包内真实形状，
   受调度器支配，我只能靠整包名册验）。若差别要命，判据④会红。
+- (g) **写面外还有一枚 owner 我没封到，也封不动**：`internal/ball/sta_windows.go:161` 的 `quit()` 投
+  `PostQuitMessage(0)`，而 `:52-53` 的 `start` 是 `LockOSThread` + `defer runtime.UnlockOSThread()`
+  ——球的那条 ui-sta 收摊时把一条**可能带着闩锁 quit 的线程还给 Go 池**，这正是甲层要封的形状，而它在
+  我写面外（⛔ 派单禁动 `internal/**`）。今天这一发整包没中它（红册为空），我说不出为什么没中——
+  **别把"没中"读成"不会中"**。若它其实会毒到后来的 `panel-sta`，后果＝又一枚顺序依赖红，
+  且我这发的两道修都拦不住它（close 检查看不见闩锁 quit，见 (b)）。归口在 ⑦，交编排者裁。
+- (h) **`releaseThreadClean` 之后还池的线程"必然干净"这件事只在这台机器上量过**：`nails-fix.txt` 3/3 是
+  `windows left=0 queue head=empty`、`dispatched 3-4 message(s)`。若哪天 WebView2 在窗销毁后还继续异步投消息，
+  泵到空这一步会撞 4096 的帽（撞帽会 `slog.Warn` 自陈）或把 `head` 留成非空 ⇒ 我新加的两条断言会红——
+  红得对（那种线程本来就不该还池），但那是**新红**，不是回归，别把它当成"33-r7 把绿改坏了"。
 
 ## ⑦ 判不动的地方（逐条：甲＝按我读数／乙＝别的形／不做 ＋现量＋为什么判不了）
 
@@ -90,7 +284,20 @@ AC 框（`- [ ]`／`- [x]`）一枚没碰，勾与不勾归编排者／验收腿
   而不是半初始化的 controller（那枚能整机 segfault，见 ①）。
 - **丙**：读数没指向别处，但**"为什么这条 M 被分给新协程"这一维我没判**——它属 Go 运行时调度，
   不是 cmd/wisp 能约束的；我只把"落到脏 M 上会怎样"变成可检查的。
-- **不做**：⛔ 不碰依赖（`pkg/edge` 那三行没有 `if`）、⛔ 不 `go mod tidy`/`go get`/改 `go.mod`/`go.sum`、
+- **判不动／要人拍板的一格（具名交回）**：`internal/ball/sta_windows.go` 的 `quit()`（`:161` 投 `PostQuitMessage`）
+  ＋ `start`（`:52-53` `LockOSThread`/`defer UnlockOSThread`）＝球那条 ui-sta 收摊时把线程连同 quit 一起还池。
+  这属甲层（owner 侧），但在 `internal/**`＝**本腿写面外**，我没读它、没改它、也没读数说明它今天会不会命中。
+  三条路摆给编排者：甲′＝派一枚能写 `internal/ball` 的腿把同一道"泵到空再还池"落进去；
+  乙′＝承认 `bringUp` 拦不住闩锁 quit、把它记成 DEFERRED 一栏；不做＝按今天的名册（④那发没中）先走。
+  为什么我判不了：要复现它得让球的 ui-sta 收摊与面板首建窗在**同一条 M**上相遇，那要么动 `internal/**`
+  要么在 `cmd/wisp` 里造一枚跨包的定植器（后者测的是我自己造的假现场，不是它的代码路径）。
+- **这发故意没做的一格（不是没想到，是范围）**：`showAndWait` 的等待条件是
+  `IsShown() || startUpErr() != nil`，而 `Show` 返回的错误只落在日志里
+  （`panel_resident_windows.go:324-327`），所以"建窗被具名拒绝"在读数上仍然表现为**15 秒超时**——
+  ①(b) 那发 20.00s 的红就是这个形状。把它变成"当场红＋红句里带那句名"要给 `residentPanel` 加一枚
+  lastShowErr 字段（产码面第三处改动），收益只是把已经能命名的东西命名得快一点，票 33 的判据没要它。
+  ⇒ 记在这里交回，不由我这一发顺手加。
+- **不做（范围与禁令，逐条）**：⛔ 不碰依赖（`pkg/edge` 那三行没有 `if`，改不了它，只能不制造前提）、
   ⛔ 不动 `internal/**`、⛔ 不动 `shutdown.go`/`shutdown_hooks.go`、⛔ 不搬 `winlive`、⛔ 不加 `t.Skip`
   到新用例、⛔ 不放宽那 15 秒、⛔ 不把断言降级成 `t.Logf`、⛔ 不删 AC13/AC14 任何一枚、
   ⛔ 不给 `bringUp` 加"重试到绿"的循环（拒绝＝一次性具名错误，没有循环）、⛔ 不改票面 AC 框、
