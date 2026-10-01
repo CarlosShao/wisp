@@ -247,7 +247,7 @@ declaration consumed by 37's native card.
 **判语收表（勾哪几格、各归哪一发腿）**
 - **AC#11 成立 ⇒ 已勾**。凭据我认：清检出 `go build ./...` 两发 exit 0，**反向证由验收腿自己跑**（只在仓外副本里把 embed 目标改名、零删除、未动 `frontend/**` 一字 ⇒ exit 1，红句逐字 `frontend\embed.go:19:12: pattern all:dist: no matching files found`）。⚠ 本格范围**只有"能建"两字**，不许任何程把它读成"有页面可发"（那是 AC#12）。
 - **AC#3 不成立 ⇒ 不勾，归 `33-r3`**：「无监听端口」那一维**今天没有任何会响的检**。验收腿把产码改成真开一枚 `127.0.0.1` 监听 ⇒ 断言照绿（八发全 PASS），同发仓外 PowerShell 取到 ground truth（`wisp.test` pid 28572 确有 LISTEN `127.0.0.1:62971`）。根因定位到行，**我 11:1x 自己复认**：`cmd/wisp/panel_host_windows_test.go:115` 写 `tcpTableOwnerPIDAll = 4`，而**同一仓**的 `internal/proc/treemetrics_windows.go:57` 写 `= 5`（真值 5）；`:116` 写 `tcpStateListen = 10`，而 LISTEN 真值是 2（10 不是 LISTEN）。⇒ 两枚常量错位 ⇒ 查询取错表＋状态永不匹配 ⇒ **恒真**。附带：只读 `AF_INET`、重试耗尽静默 `return 0`。
-- **AC#4 不成立 ⇒ 不勾，归 `33-r3`**：焦点回还那一跳**只有 `t.Logf`**（`panel_host_windows_test.go:249-251`），全仓 `prevFocus` **零枚断言**；且 `prior` 取在 `HotShow` 之后 ⇒ 11 发里"Show 之后的前台窗"**逐发就是面板自己的句柄**（等于把焦点还给刚被藏起来的那扇窗）。
+- **AC#4 不成立 ⇒ 不勾，归 `33-r4`**（⚠ 10-01 更正：这里原先写 `33-r3`，**那枚代号 09-28 已被"入向听众"那一发用过**、它的台件目录 `.scratch/wisp/probes/33/r3/` 还在——我把新腿错派成同名，那枚新腿随即因连接报错死掉且**盘上零残留**（我核过：`git status --porcelain` 里 `cmd`／`internal` 零行、无 `33-panel-host-c27-r3.md`、票面无它的进度行）。重派代号为 `33-r4`，账 `A496`）：焦点回还那一跳**只有 `t.Logf`**（`panel_host_windows_test.go:249-251`），全仓 `prevFocus` **零枚断言**；且 `prior` 取在 `HotShow` 之后 ⇒ 11 发里"Show 之后的前台窗"**逐发就是面板自己的句柄**（等于把焦点还给刚被藏起来的那扇窗）。
 - **AC#1／AC#2／AC#12 ⇒ 一律不勾**（读数真，判据形不齐或归口未落）：AC#1 有牙的是 `IsCreated` 状态断言，票面要的 **process-tree** 数成了**全机按名数**（基线 14 枚属别人会话、我们贡献约 6），且**从未比较 hide→re-show 的 HWND 身份**，dispose 那一半在产品里不可达；AC#2 的 11 枚读数（冷 max 937.093／中位 760.377，热 max 45.426／中位 37.825）未越界、P11 未触发、阈值一字未动，但票面要的 10-run P50/P95＋appendix 在仓里**不存在**（`grep P50|P95`＝0），日志里那句 "HEAD 7a41db9b" 是**硬编码字面量**；AC#12 那枚用例全文只有 `t.Logf`、零 `t.Errorf`＝**空尺**（牙在 `internal/panel/assets.go:56`＋`assets_test.go:22`，我逐名复认存在）。
 - **本轮新开一格 AC#13**（写在上面「新增判据」那节）：冷启动那两发 `SetHtml` 把真页面**盖掉**了。
 
@@ -256,13 +256,13 @@ declaration consumed by 37's native card.
 2. **J2／AC#5 现在开还是留** ⇒ **留给下一程**，但先具名更正实现腿那句：**"不走会 fatal 的 API"不成立**——产码入口 `webview2.NewWithOptions` 自带**三枚 `log.Fatal`**（模块 `webview.go:115/120/125`），edge 层 `:173`（运行库缺失那一支）／`:295` 也在。⇒ 任何"运行库缺失"的修法**不许声称绕开了 fatal**，要真探测再创建。
 3. **泵所有权三形** ⇒ **不摆 owner，先量**（理由具名：那句"从球的 ui-sta 再入会 panic"目前只是〔仅自述＋栈形状〕——无原始栈、无复现命令、用例自陈未提交、`probes/33/r1/` 里没有该发工件；而它**也没说**"投递原语已在、只差一枚导出包装"，`staThread.PostTask` 之所以只在包内可见是因为 `staThread`／`b.sta` 未导出，这直接改变代价）。⇒ 已派 `33-a2`（只读普查）。⛔ 任何腿不许为此动 `internal/observe` 那六枚名册或基线常量（那一档＝人工批准）。
 4. **`staticcheck` 本机版（2025.1.1）与 CI 钉的（2026.2.1）不同、`ci.yml:181-200` 自陈那一步导入期即崩** ⇒ 这一门**我不复认**，交 CI，本表结论标〔未复认〕。
-5. **AC#12 的勾** ⇒ 同意"等谁把 dist 填上"（票面 `:37`），与票 248 AC#9 同归口；但**空尺这格不等**：`33-r3` 要给它装牙（该红时红，或明确 skip 并说一句为什么），⛔ 不许留一枚"看起来在测"的用例。
+5. **AC#12 的勾** ⇒ 同意"等谁把 dist 填上"（票面 `:37`），与票 248 AC#9 同归口；但**空尺这格不等**：`33-r4` 要给它装牙（该红时红，或明确 skip 并说一句为什么），⛔ 不许留一枚"看起来在测"的用例。
 
 **另三枚登记（只登记，本票不改文件）**
 - **CI 分母错位**：`cmd/wisp/panel_host_gate_test.go:3-6` 自述"ubuntu core scope too"，实际 L1／AC#11／AC#12 三枚只在 **windows cli 腿**（`scripts/portable-tests.sh:195`＋`.github/workflows/ci.yml:475`/`388`＋`scripts/wisp-cli-tests.sh:65`），ubuntu core 那份清单（`ci.yml:341`）只有 `./internal/panel/...` ⇒ 过期指认，未改文件。⚠ 反转钉本身在 core 有分母（这条成立）。
 - **`go mod tidy -diff` 在 HEAD 上 exit 1**（webview2 记成 `// indirect`；另两枚被 tidy 会抹掉的 `x/sys v0.47.0` 行起手就在）。仓内 CI 无 tidy 门 ⇒ 今天不红，但**任何腿跑 tidy 就会造出一枚不属于它的 diff**，派单里要写死。
 - **起手 4 枚 `internal/panel` 红逐名判归因＝非本程**（`approval_test.go:129`／`composer_test.go:74`／`frontend_hygiene_test.go:216`／`tokens_fourway_test.go:441`；第四枚落在**冻结件**上，红因＝`git status` 里那 16 枚 ` D` 的 `design/**`）⇒ 与任务 #109"推送前逐名比红名集合"同源，我按**已知常红**读，不据此判任何格。
 
-**排程（本轮定的序）**：`33-r3`（仪器腿，**只改 `cmd/wisp/*_test.go`**）→ `33-r2`（功能腿：接进常驻＋AC#13 那两发 `SetHtml`）→ 票 248 落地腿。⚠ `228-a2`（只读）此刻在飞、读面含 `cmd/wisp`／`internal/ball` ⇒ **要动 `resident_*.go` 的那一发必须等它交完**。
+**排程（本轮定的序）**：`33-r4`（仪器腿，**只改 `cmd/wisp/*_test.go`**；原写 `33-r3`，代号与 09-28 那一发撞名，见上面 AC#4 那行的更正）→ `33-r2`（功能腿：接进常驻＋AC#13 那两发 `SetHtml`）→ 票 248 落地腿。⚠ `228-a2`（只读）此刻在飞、读面含 `cmd/wisp`／`internal/ball` ⇒ **要动 `resident_*.go` 的那一发必须等它交完**。
 
 - `agent=33-a2 did=只读普查（零产码／零跑）：①库侧线程要求逐处 file:line（pkg/edge/chromium.go:95-111 阻塞嵌套泵、:130-136 无 nil 判定；库根无 chromium.go、真身 pkg/edge/）②.scratch/wisp/probes/33/ 零该发 panic 工件（唯一栈＝33-panel-host-c27-r1.md:73 散文）③甲形射程＝internal/ball 现零导出投递面（staThread/PostTask/b.sta 全未导出），会被叫红的三族逐枚点名（observe 名册钉只乙形打红；hostThreadHarness 与球侧 PostTask 取数＝行为型钉）④第四形：仓内无第二枚独立泵线程（notify_windows.go 尚未读，已挂欠账） next=编排者裁 ⑦-A（panic／阻塞／乱序唯有真跑可定）与 ⑦-E/⑦-C。文件=.scratch/wisp/probes/33/a2/census.md`
