@@ -205,6 +205,7 @@
 
 - 交付判据（不是回执）：`wc -l -c docs/evidence/s1/33-panel-host-c27-v1.md`。
 - 票面卫生：`git diff --numstat 7a41db9b..HEAD -- .scratch/wisp/issues/33-panel-host-c27.md`＝实现腿**零行**；我自己全程没碰票面任何一枚 `- [ ]`／`- [x]`（勾框归编排者）。
+  - ⚠ 一枚**归因要说清**的读数（`11:13:58` 现跑，HEAD `e0ed6ef4`）：`git diff --numstat 94bd133e..HEAD -- <票面>`＝**10 增／0 删**——那 10 行**不是我、也不是实现腿**，是编排者自己那枚 `0d993d66`（`ledger(A492)＋票33编排者收件`，他代记的进度节，正文明说"派单漏写了每枚提交必须追加票面 Progress log 一行"）。同一发的 `git diff 94bd133e..HEAD -- <票面> | grep -cE "^[+-] *- \[[ x]\]"`＝**0**（无一行框被翻），现读 `^- [ ]`＝**12**／`^- [x]`＝**0**。⛔ 我把这一处写死，免得下一程把"票面有增量"误读成验收腿动了框。
 - 我这两枚提交的 pathspec 都是显式单文件（`docs/evidence/s1/33-panel-host-c27-v1.md`）；`git add -A`／`.`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean` **零次**；⛔ 未 push。
 - 我只读未动的禁区清单终态：`go.mod`／`go.sum`／`internal/observe/thresholds.go`／`docs/SLO.md`／`docs/BUILD.md`／`docs/PLAN.md`／`docs/specs/**`／三枚冻结件／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` ⇒ 全部由 `git status`＋`git diff --numstat` 双尺现量为零改动（`frontend/dist` 里那 3 枚别人未跟踪产物我只数过条目名、⛔ 未读内容）。
 - 我跑过的全部构建/测试都在 `PATH` 带 `third_party/sherpa-onnx:build` 的前提下取数（§A#9/#19/#23/#26），无一条是 `0xc0000135` 那种"用例根本没跑"的空读数。
