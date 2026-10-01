@@ -112,24 +112,127 @@
 
 ## 4. 三枚代提增量的承重判断（派单 §4(甲)）
 
-（填写中）
+尺：`git show --numstat <枚>` ＋ `git diff <枚>^ <枚> -- <路径>` 逐名读删除列。原话都是死腿写的、由编排者落盘——**本腿问的是"这些增量会不会让下一程读错"**。
+
+| 枚 | 盘上现量 | 本腿判语 |
+|---|---|---|
+| `a842e5b8`（r5 六件正文） | **1 枚文件**：`docs/evidence/s1/33-panel-host-c27-r5.md 95/8`。删除列逐名读＝**全是它自己骨架里的小标题与占位句**（`## 六件（正文在各节；本腿硬顺序＝…）` 那行、`（各件"改前读数—改后读数—反控读数"在下面的 §六件正文，本骨架先交 ⑤⑥⑦。）`），⛔ 零枚代码／票面／他人件 | **承重的部分不在这枚里**：r5 自己 `:173` 逐字写着"没写完的是「终跑名册」与「收尾三把尺」两节"，而 `grep -c "待填\|（填写中）" = 0` ⇒ **它不是留占位符死的，是留整节死的**，编排者那句"我没代填"复认成立。⇒ 这两节缺的那一维（终跑名册）由本表 §2.2／§2.3 **自己取数补上**，⛔ 不冒充 r5 的读数 |
+| `84c67e7a`（r6 三枚未提交改动） | 3 枚文件：`panel_host_windows.go 45/41`／`panel_host_windows_test.go 11/1`／`panel_resident_windows_test.go 5/66`。逐名核到：① `mibTcp…` 无关；② **窄形排干收回**＝`panel_host_windows.go` 那 45/41（`drainStaleQuitBeforeCreate` 回到 `[WM_QUIT,WM_QUIT]`＋帽 64＋`slog.Warn`）；③ **harness 删掉 `runtime.UnlockOSThread()`**＝`panel_host_windows_test.go` 唯一那行删除，替换成 11 行注释（逐字 `DO NOT runtime.UnlockOSThread() here…`）；④ **删掉它自己刚加的用例**＝`git diff` 里逐字 `-func TestAC13BringUpSurvivesAStaleCloseOnAReusedThread(t *testing.T) {` | **承重，而且承的是本案那一枚的命**：②③④ 三件是一件事——"还池前不许欠消息"。⚠ **但"这枚只动了空白"那句话要分两读**：若指"编排者那次 `gofumpt -w` 只动空白"——**成立**，我复跑两把尺逐字 `5 66` vs `-w` 后 `3 64`，差值 2/2 全落在空白；若指"`84c67e7a` 这枚提交只动空白"——**不成立**，同发还删了 64 行内容（其中一整枚用例）。⇒ 请只在第一读下引用它。⚠ ④ 的删除我判**正当而非遮掩**：它期望的是"带着 stale close 也能建起来"，而 `f7d28ef0` 把产码改成"具名拒绝"，那枚钉与产品互相矛盾，留着必红；替代钉 `TestAC13BringUpRefusesAThreadWithAQueuedClose` 的牙由我 M2 亲验 |
+| `096aafad`（r7 那 89 行正文） | **1 枚文件**：`33-panel-host-c27-r7.md 89/7`。7 行删除**逐名读**（不采信"全是小标题/旧判语被替换"那句）：`### (b) 整包那一发里"谁先跑、留下什么"：TID 逐枚对上`／`### 发 1（…）`／`### 发 2（…）` 三行是**小标题改写**；另 4 行是它自己那两枚 caveat 的**同句重写**——`+` 侧逐字仍在：`若错（真凶是别的还池点，或根本是 dataPath 复用/并发建窗），判据④仍会红，且我的修法（甲封点）不解决问题；` 与 `是**归因**` | ⚠ **这一枚我要具名更正一处普遍会读错的形状**：它把 `(b)` 那节从"整包那一发"改成"家族 A/B 一发里 TID 逐枚对上（**不是整包那发**）"，并给了 `tid=16272` 那种逐枚读数——**方向是收紧不是放宽**（原来说"凭具名 A/B ＋时刻相邻"，现在说"我 TID 对上了，但用的是我另造的 A/B 发"）。⇒ **判语：不承重为缺陷、承重为读数升级**；但那两行 TID 读数在本腿**不可复跑**（载体 `zz_33r7_probe_windows_test.go` 已改名成 `.bak` 封存，不在树里，⛔ 我不删不改名去复活它）⇒ 引用它一律带〔死腿自述＋载体在盘但不在构建图〕 |
+| 旁证：`f7d28ef0`（产码那枚，非代提） | `66/22 panel_host_windows.go` ＋ `194/3 panel_resident_windows_test.go` | 建窗前提（`staleCloseQueued`＋具名拒绝）落在这枚，**它的牙由我 M1/M2 两发分别验过**（§5） |
+
+**另核一项派单 §4(甲) 要的话**：那两枚 `1/1` 与 `11/1` 的删除列**里没有票面 AC 框**（`git diff --name-only` 三枚全是 `cmd/wisp/*.go`），与 `33-r4` 自报的"票面 3 枚删除不是我的"不冲突。
 
 ## 5. 定向突变台账（每把尺都可能恒绿吗）
 
-（填写中）
+统一流程：取 md5 → 突变 → `grep -c MUT-` 证落地 → 指名用例单跑 → `git cat-file blob HEAD:<path> > <path>` 还原 → 再取 md5 → 核 `git diff --stat HEAD -- cmd internal` 为空。⛔ 零枚 `checkout/restore/stash/clean`，⛔ 零枚删除，⛔ 零枚突变体进提交。
 
-## 6. CI 那格（静态必答①）
+| # | 突变（文件:行 ＋ 改坏的那一处） | 指名用例 | 读数（逐字） | 判语 |
+|---|---|---|---|---|
+| **M1** | `panel_host_windows.go:261` 把 `drainStaleQuitBeforeCreate()` 塞进 `if false` | `TestAC13BringUpSurvivesAReusedThreadQuit` | `--- FAIL … (0.00s)`，红因逐字 `err=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x0` | **有牙，但抓到一枚新缺陷**：它没有按注释预测的那样 panic，而是被**后加的 close 检查**拦下来——检查报的是 `WM_CLOSE … hwnd 0x0`，而那枚线程里躺的是 `PostQuitMessage` 种的 **WM_QUIT**。⇒ `staleCloseQueued()` **不专指 WM_CLOSE**：队列里有 latched quit 时它返回 `(true, 0)`，红句会点一枚**不存在的 hwnd**（细节与后果见 §5b） |
+| **M2** | `panel_host_windows.go:262-264` 把 `staleCloseQueued` 那段拒绝改成死枝 | `TestAC13BringUpRefusesAThreadWithAQueuedClose` | `--- FAIL … (0.80s)`，红句逐字 `bringUp on a thread carrying a queued WM_CLOSE runtime error: invalid memory address or nil pointer dereference instead of refusing it by name` | **有牙**，且顺带把票面那枚因果链复认成读数：摘掉拒绝 ⇒ **真的**在 `chromium.go:131`  deref nil（不是"15 秒超时"那一形） |
+| **M3** | `panel_host_windows.go:308-312` 两发手递换回旧序（先 `serveEntry` 后探测） | `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` | `--- FAIL … (0.70s)`，逐字 `AC#13 page answer (head 5cae4cf8): "0" - 0 of 1 probe id(s) present in the live document` | **有牙**（这就是票面 `:39` ③ 要的那发反控，本腿亲跑）。同时暴露弱处：入口只声明得到 1 枚 id `root` ⇒ 尺的分辨率是"1 枚"，见 §1 AC#13 注 |
+| **M4** | `panel_host_windows.go:404` `setPriorFocusLocked` 的自记拒绝加 `&& false` | `TestAC4PriorFocusSurvivesARefusedPanelSample` ＋ `TestAC4FocusReturnToPriorWindowGap33r5` | **两枚逐枚 `--- PASS`**（0.82s／0.74s），`ok … 1.720s` | ⛔ **拿掉仍绿＝这把尺是瞎的**。瞎在哪：`...RefusedPanelSample:838-840` 要先用 `SetForegroundWindow` 把面板顶到前台才喂得到"样本就是面板自己"那一支，而这台桌面会话没让它生效 ⇒ `Show` 采到的 prior 仍是编辑器，拒绝那支**从未被执行**，断言自然两边都过。用例注释 `:791-799` 自称"不依赖前台权限"——**这句是错的**（`33-r5` 自己在 `:70` 就记过"发 1 ⇒ ③红"，说明它确实依赖） |
+| **M5** | `panel_resident_windows.go:239` 把 `w.Run()` 换成 Go 侧自泵（`drainTasks`＋`pnlPumpOnce`），同发 `post()` 不再走 `Dispatch`（`:297 && false`） | 两枚 AC#14 钉**配对** | nail 1：`--- FAIL … (7.09s)`，逐字 `page's own words: "TIMEOUT-2S,TIMEOUT-2S,TIMEOUT-2S" (Go's handler was reached by 3 of the 3 real requests)`；**同一发** nail 2：`--- PASS … title="PUSHED-33R5-OK"` | ⭐ **本表最强的一枚**：两维当场分家——页→Go 到、Go→页的回话不到，正是裁定 P2 要的形状；且证明 `Run()` 那一行**承重**、两枚钉不互相冒充 |
+| **M6** | `panel_host_windows_test.go:368` `mibTcpStateListen` 由 2 改回 10（判据侧突变） | `TestAC3ListeningSocketRulerSeesItsOwnListener` | `--- FAIL … (0.01s)`，逐字 `this pid owned 0 before / 0 while 127.0.0.1:57505 is listening` ＋ `the ruler's IPv6 layout is blind` | **有牙**；还原后同尺逐字 `0 -> 1` 两族 ＋ `--- PASS` ⇒ 33-r4 修的那两枚常量不是装饰。⚠ 同发 `TestPanelHostOpensNoListeningSocketL1` **照旧绿** ⇒ 再次证明"import 扫"看不见"运行时真开 socket" |
 
-（填写中）
+**还原自证（逐枚，五把尺）**：`panel_host_windows.go` 三次还原后 md5 均＝起手 `00336ed0704e51f4cdb043a6d0b3b852`；`panel_resident_windows.go` 还原后＝起手 `1c8decbc94efea82e4809bc1baf72918`；`panel_host_windows_test.go` 还原后＝起手 `38e113669fdde37a23a3032f2eae17e8`；每次还原后 `git diff --stat HEAD -- cmd internal` **空**；`grep -c MUT- cmd/wisp/*.go` 非零者**零枚**。终态另发整包一发确认（§2.2 之后又跑一次同命令＝名册一致，见 §9）。
 
-## 7. 两处过期指认＋`go.mod` 那格（静态必答②）
+**未做突变的尺（⛔ 不许被读成"我验过没红"，对应 N9）**：
+- AC#1 的 `same HWND` 断言与 dispose 那枚 AST 尺（我只做了静态复认＋读了我自己那发的两口径读数）。
+- AC#11 `TestCleanCheckoutBuilds_AC11`（`33-v1` 自报跑过反向证，本腿不重跑前人读数＝派单 §0）。
+- AC#12 `TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12`（`33-r4` 自报做过，不采信）。
+- AC#8 两枚分支（ⓐ 把 `summaryClamp` 改成天文数字、ⓑ 摘 `run.go:1243` 的 `changed = true`，再跑整包看名册）。
+- AC#2 那四行预算断言我只**读码**确认它们是 `t.Errorf` 而非 `t.Logf`（`:549/:600/:814/:817`），没做"把预算读成 log"的突变。
+- AC#4 端到端那枚（`...Gap33r5`）：M4 只证明"拒绝自记"那一半无牙，⛔ 不能反推这枚也瞎——它在我这发里给的是完整句柄链读数。
 
-（填写中）
+## 5b. 新落修法（建窗前那道检查）的可达面——派单 §4(乙) 两问
 
-## 8. 时延分位复跑（派单 §4(丙)）
+### 问①：拒绝之后还有没有恢复路径？⇒ **没有。今天这形是"永久拒绝"，我判它是缺陷，不是正确的 fail-closed**
 
-（填写中）
+构造与读数（不靠猜，逐处指行）：`Show` 被拒 ⇒ `panel_host_windows.go:262-264` 返回 error，**队列一字节没动**（`staleCloseQueued` 是 `PM_NOREMOVE`，`:659-667`；这一点由在册用例 `panel_resident_windows_test.go:563/:582-584` 正面钉住"拒绝之后那枚 close 还在"）。线程那一侧：`panel_resident_windows.go:209-224` 的循环条件是 `rp.isCreated() || rp.startUpErr() != nil`，**被拒既不置 created、也不置 startUp**（`RequestShow:324-327` 只 `slog.Error`＋`Printf`，见 §6 那格欠账）⇒ 线程留在循环里等下一条任务；此后每一次 `Show` 都走同一条拒绝路。**盘上没有任何一段产码把该线程的队列派到空**：`pumpThreadToQuiet`／`releaseThreadClean` 只存在于 `panel_resident_windows_test.go:374/:409`（⛔ 零枚产码调用者，`grep -rn "pumpThreadToQuiet" cmd/wisp` 只命中测试文件）。⇒ **"每次都被拒、而拒绝不清队列 ⇒ 面板永久开不出来"这一形在生产路径可达**，且对用户的形状是"按了没反应"。
+
+那它算不算正确姿势？分两层判：
+- **"不吃别人的消息"这一层成立**：M1/M2 两发把替代形都量过了——摘掉检查 ⇒ `chromium.go:131` nil deref（M2 红句），摘掉排干 ⇒ 拒绝误触发（M1 红句）。remove-only 那一形 33-r7 量到"每次建窗漏一扇窗＋3 发挂 1 发"（`modes-grid.txt` mode=wide：`iter=2 rc=2`）。所以产码"只检查、只具名拒绝"是当前读数支持的**最小安全动作**，⛔ 不许谁顺手改成"替它排干"。
+- **"没有出口"这一层是缺陷**：一个进程一旦落到该形就**再也开不出面板**，而它手上明明有两条读数支持的出口——(i) `stop()` 已能终止线程（`:363-401`，`TestPanelThreadIsSTAAndExitsCleanly` 钉着），线程重起就是干净队列；(ii) 拒绝时把 `startUp` 置上，让 `post()` 当场回 `false`（`:293-295`）而不是让人等 15 秒超时（§6）。⇒ 最小修法＝**把"被具名拒绝"升成线程级致命（或让 `stop()` 之后允许一次重起）**，⛔ 不是"让 `bringUp` 去排别人的队"。**归口**：`cmd/wisp/**` 的下一枚落地腿（票 248 或 228 那两发之一，与编排者 §3 条第 4 格那枚欠账同一条线）；本腿不改产码，只出这一句判语。
+
+### 问②：四形对照（`modes-grid.txt`，每形三发）有没有假绿形状？⇒ **有一枚，且它问的正是"泵到空会不会拆别人的窗"**
+
+先复认那格的读数没写歪（我逐行读了 83 行那份）：`none` 3/3 panic、`dispatch` 3/3 panic（`pre-create peek: filtered WM_QUIT found=false … unfiltered head=WM_USER+1(0x401)`）、`wide` 2/3 建起且 `thread windows now=4`＋`iter=2 rc=2`（挂死那发）、`pumpAfterDestroy` 3/3 建起且 `thread windows now=0`→再建回 3。⇒ **"只有泵到空成功"这一句在它那三发里是真的**。
+
+**但整张表里"上一任"永远是同一个人**：每形的前置都是 `bringUp#1 ok … after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=…`——那扇窗的 **Go owner 已经先被 `Destroy` 掉了**，所以"泵到空"拆的是一枚**没人在认领的窗**（读数里 `thread windows 3 -> 0` 是它的效果）。**表里没有第五形**：*"这线程上有一扇窗，它的 Go owner 还活着、没被 Destroy，队列里另躺着一枚 WM_CLOSE"*。而产品要的恢复动作（问① 那条出口）一旦落地，就必然要在**不区分这两形**的前提下泵到空——那时"泵"拆掉的就是**还活着的合法 owner 的窗**。⇒ **判语：这不是测试卫生问题，是产品形状缺口**——那张四形表支撑的是"检查＋拒绝"，⛔ 它**不支撑**"任何腿可以据它实现自动排干恢复"。谁要做问① 那条恢复出口，**必须先补第五形**（一扇活窗＋一枚外来 WM_CLOSE，断言"恢复动作不许拆那扇活窗"），否则它就是拿一张没测过的表当许可证。
+⛔ 本腿不实现那一形（要动 `cmd/wisp` 写面或另起探针载体并自建真窗，且派单 §4 只要求我出判语）；⚠ 我要过它就得自己重造载体——r7 那枚 `.bak` 我不能改名复活（§7 禁删纪律同样禁我改名他人件）。
+
+## 6. CI 那格（静态必答①）——结论：**推送之后 windows cli 腿会红，而且红的成因不是运行库**
+
+**默认档里"真开窗户"的用例枚数（现量，名册口径逐字）**：`grep -cE "TestPanelHost|TestAC13|TestAC14|TestPanelThread|TestBallPanel|TestAC4" .scratch/wisp/probes/33/v2/rosters/top-mine.txt`＝**14 枚命中**，扣掉三枚不起窗的（`TestPanelHostOpensNoListeningSocketL1`＝go/ast 扫 import、`TestPanelThreadNameIsNotInResidentRoster`＝名册比对、`TestPanelHostLatencyPercentilesAC2`＝复用别人记的样本）⇒ **11 枚今天会在这台机器上真建 WebView2 窗**，逐名：`TestPanelHostRealWindowHopAndLifecycle`／`TestAC4FocusReturnToPriorWindowGap33r5`／`TestAC4PriorFocusSurvivesARefusedPanelSample`／`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC13BringUpSurvivesAReusedThreadQuit`／`TestAC13BringUpRefusesAThreadWithAQueuedClose`／`TestAC14AwaitedBindingReplyReachesThePage`／`TestAC14GoSideEvalPushReachesThePage`／`TestPanelThreadIsSTAAndExitsCleanly`／`TestBallPanelGesturesReachThePanelThread`（＋ `TestAC13ColdStart` 家族里的 dispose 复用那一枚）。⚠ 它们**没有 build tag**：`panel_resident_windows_test.go:25-28` 逐字写着"Real windows, default windows tier like the rest of this family: **a machine that cannot create one is red, not skipped**"。
+
+**进不进 CI**：进。`ci.yml:388 runs-on: windows-latest` → `test-windows` 第 4 步 `bash scripts/wisp-cli-tests.sh`（`ci.yml` 里 `shell: bash`）→ 末行逐字 `bash "$portable" --scope=cli` → `portable-tests.sh:191-197 cli) scope=(./cmd/wisp/)` → `tools/d22scan/runtests.sh`。⇒ **这 11 枚全部在 CI 分母里**。
+
+**三条独立会红的成因，按"最坏产物"排序**：
+1. **干净检出没有页面产物 ⇒ 必有一枚 SKIP ⇒ 腿红（与运行库无关，这一条今天已经成立）**。链条：CI 用 `actions/checkout@v4` ⇒ `frontend/dist` 里只有被跟踪的那枚 `.gitkeep`（票面 `:37`）⇒ `panel.BuiltinAssets()` 走 `shape=anchor-only` 那一支（`33-r4` 两口径读数一致）⇒ `entryIDProbes` 返回 nil ⇒ `panel_resident_windows_test.go:316` 命中 `t.Skipf("AC#13 has no subject in this tree…")` ⇒ `runtests.sh:88` 数 `^--- SKIP`、`:98` 逐字 `if [ "$skipped" -ne 0 ]; then` 判红。**本腿在这台机器上量到 0 枚 SKIP，正因为这是工作树、不是干净检出**（`git ls-files` 那把尺只能证库里有什么，⛔ 我没读 `frontend/**` 内容）。
+2. **运行库有没有**＝盘上读不出（N1）：`ci.yml` 全文 `webview`／`msedge` **0 命中**，两步 `go install` 是 gofumpt 与 staticcheck ⇒ 没有任何一步装它。若镜像不带 Evergreen 运行库 ⇒ 那 11 枚当场红（`NewWithOptions` 返回 nil 那支还会撞 `webview.go:115/120/125` 的 `log.Fatal`＝**整个 test 二进制挂掉**，比红更糟：名册采不到）。
+3. **负载敏感那一族**：AC#1 的树枚数代理尺我自己 10 发里红 2 发（§1 AC#1），且 `slo-full` 就跑在这台机器上、每次 push 自启抢 CPU ⇒ 推送后这一枚可能随机红。⚠ 这条我**不建议**用重试或降档处理（编排者 12:12 裁定 1 那条禁区照旧），要处理就处理**尺**（那句 "single-window reuse broken" 的错归因）。
+
+**`winlive` 零岗位复认（本腿自己跑，不引票面）**：`grep -rn "winlive" .github/workflows/ scripts/` ＝ **0 命中**；而默认档那 11 枚**全在 CI**、`winlive` 那 1 枚（`TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`）**只在带 tag 的本机跑得到** ⇒ 今天真实的错位是**反的**：票面担心的"真机时序断言被搬到别人机器"确实搬了（11 枚在托管镜像上建真窗），而唯一被搬去 `winlive` 的那一枚反而是最需要安静桌面的那一枚。**登记，不重开**（裁定 7 已定：单开 workflow＝契约级）。
+
+## 7. 两处过期指认（静态必答②）——判语：**都算该登记的债，且都归落地腿顺带改**
+
+### ① `cmd/wisp/approval_always.go:165` 那句（逐字）
+
+> the ball is built only by cmd/balldebug, and this binary links no WebView2 host (internal/panel/pump.go:16, ticket 33 unclaimed)
+
+**一句话里两枚断言，今天对 `cmd/wisp` 两枚都不成立**：
+- "ball is built only by cmd/balldebug"：现量 `grep -rn "ball\.New(" --include=*.go cmd/ \| grep -v _test` ＝ **两枚命中**，`cmd/balldebug/main.go:189` ＋ **`cmd/wisp/resident_ball_windows.go:165`**。⇒ 常驻进程今天自己造球。
+- "this binary links no WebView2 host"：`go.mod:19 github.com/jchv/go-webview2 …` ＋ 非测试调用点 `cmd/wisp/panel_resident_windows.go:193 return NewPanelManager(...)`、`cmd/wisp/resident_windows.go:142 rp, rpErr := newResidentPanelManager(...)`。⇒ **链接且装配了**。
+- **对 `cmd/balldebug` 仍成立**：`main.go:199` 逐字 `OnTrayPanel: func() { fmt.Println("tray: open panel (stub, ticket 33)") }`、`main.go:611` 逐字 `fmt.Println("hotkey: panel (stub, ticket 33)")`，且 `grep -c webview cmd/balldebug/main.go`＝**0**。⇒ 那两枚 stub 是真的，⛔ 谁都不许把本条判语说成"balldebug 也接上了"。
+- **连带第三处**（同一族的过期指认，我在读它的出处时撞到的）：`internal/panel/pump.go:15-17` 逐字 "There is no Go -> page channel in this tree today - **no WebView2 host (ticket 33 is unclaimed)**, no postMessage writer…" ⇒ 前半今天由 AC#14 那两枚钉正面推翻（M5 读数），"ticket 33 unclaimed" 也已不成立（票面有 33-r1..r7 六段进度）。
+- **判语＝债，该登记**：这类"词面型过期指认"在本仓只可**抽样纠**、不可当门（记忆第 77 条那条反例）。修法＝一枚动 `cmd/wisp` 或 `internal/panel` 的落地腿**顺带改口这三处注释**；按记忆第 83 条定式，"改口那句注释"本身要写成那一腿的**一格判据**，否则下一程还会照着它推理。⛔ 本腿一字未改（含注释）。
+
+### ② `go.mod` 把直接依赖标在 `// indirect` 那一节
+
+现量：`go.mod:19`＝`github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808 // indirect`，而 `cmd/wisp/panel_host_windows.go:63` 逐字 `webview2 "github.com/jchv/go-webview2"` 是**非测试文件的直接 import**。⇒ 注释与事实不符，且**不会自愈**：`go mod tidy` 在 HEAD 上 exit 1（票面 `:267` 编排者复认，并写死"派单里要写死不许跑"；本腿⛔ 未跑）。
+- **判语＝债，但不影响任何正确性**：Go 的构建/版本选择**不看这枚注释**（它只是给人与 `go mod tidy` 读的标签），今天编译、链接、整包 159/0/0 都是在标着 indirect 的状态下发生的；风险只在"有人拿那一节当依赖图读"——比如据此说"这枚依赖不是我们的直接依赖，可以随便换/升"。
+- **不跑 tidy 的表达方式（两档，都归编排者点，本腿都不做）**：
+  - **甲（推荐，零文件面）**：在真相源台账 `docs/reports/pending-and-issues.md` 记一条 `A##`，字段写全——"现象＝`go.mod:19` 标 indirect 而 `panel_host_windows.go:63` 直接 import；成因＝tidy 在 HEAD 上 exit 1 故注释不自愈；后果＝词面读者会低估这条依赖边；解除条件＝任何一次使 tidy 回到 exit 0 的变更落地时**由那次变更顺带消掉**，⛔ 不许为它单跑 tidy 造出一枚不属于它的 diff"。（这条是账目归位，按记忆第 14 款不上 owner 清单。）
+  - **乙（要新判据）**：加一枚**不调 tidy** 的静态尺——`go/parser` 扫全仓非 test import 集合，与 `go.mod` require 段每行的 `// indirect` 注释比对，"直接 import 却标 indirect" ⇒ 红；自带正控（把某枚真直接依赖的注释塞回去必须红）。⚠ 这是**新增判据件＝产码面变更**，且它一旦落地就会把今天这条债变成门红，⇒ **必须编排者拍**，本腿只把它列成选项，不代做、不代选。
+
+## 8. 时延分位复跑＋那两枚热重显红怎么判（派单 §4(丙)）
+
+### 8.1 本腿自己的一发（⛔ 不与 r4/r7 合并成一句）
+
+起跑前安静度（`17:04` 现量）：`go.exe`＝**0 枚**、`msedgewebview2.exe`＝**12 枚**（全部归因于系统 CBS 与第三方 clipsync，§2.4）。命令逐字：
+`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test ./cmd/wisp -count=10 -v -run 'TestPanelHostRealWindowHopAndLifecycle|TestPanelHostLatencyPercentilesAC2'`
+台件 `.scratch/wisp/probes/33/v2/latency-10x.txt`。**口径**＝nearest-rank ＋ **同进程连续 10 发**（量的是热重复，不是冷机首启）＋ HEAD 取数时刻逐字 `5cae4cf8`（＝本腿那枚门禁读数提交，⛔ 不是硬编码）。
+
+| 维 | 本腿 10 发 | 对照：本腿单发（17:05，`latency-1.txt`） | 对照：`33-r4` §⑦（表内自述，本腿未复跑） |
+|---|---|---|---|
+| cold | **P50 291.882／P95 852.634**（max 852.634，budget 1500） | 732.598 | P50 633.534／P95 815.826 |
+| hot | **P50 32.506／P95 66.987**（max 66.987，budget 200） | 34.595 | P50 32.913／P95 45.058 |
+| P11（冷 >2000ms） | **未触发**（逐字 `max cold observed … 852.634 ms`） | 未触发 | 未触 |
+
+⛔ 三行各自带时刻＋HEAD，⛔ 不许并成"冷启 P95"一枚数（裁定 6 的引用规矩）；⛔ 阈值、`thresholds.go`、`docs/SLO.md`、判据一字未动。
+
+### 8.2 那两枚热重显红算不算 D32／AC#2 那一行没达标
+
+**判语：那一发算"没达标"，而这一格今天算"达标"——两句话不冲突，因为票面没定"在什么负载态下判"。** 逐条给凭据：
+1. `292.1 ms` 不是仪器假读数：断言是 `t.Errorf` 不是 `t.Logf`（`panel_host_windows_test.go:600` 逐字 `hot re-show %.1f ms exceeds D32 panel hot budget 200 ms`），且它取的是 `mgr.LastHotMs()`＝**产码自己量的 `HotShow` 全程**（`:429-438`），没有中间件能把 292ms 造出来。我**不能**判它假。
+2. 我也**不能**判它是本票缺陷：我这 10 发在较安静的机器上最大 66.987ms，同一枚断言一次没响；`33-r7` 自报那一发同发记录"整包慢两成、机器 webview 进程 6→19"。⇒ 现有读数只支持"**这一行负载敏感**"，不支持"热路径超预算"这一结论，也不支持"那一发是仪器噪声"。⛔ 我不拿我这一发去抹它那一发（派单 §4 丙明令不许挑一发好看的代替）。
+3. **缺口在口径不在阈值**：票面 `:74` 逐字要的是 **10 发 P50/P95**，而今天同一格上挂着**两把不同口径的尺**——单发门（`:549`／`:600`）与 P95 尾门（`:814`／`:817`）。单发门会让**一整包的负载态**去否决 AC#2，而 P95 门（票面真正要的那一枚）在我这 10 发里 66.987 < 200 从容通过。⇒ **要裁的是"AC#2 按哪一把尺结"**：我建议按票面原句＝**P95 那把算 AC#2，单发那两把是回归探针**，⛔ 但这要改判据语义＝**归编排者裁，本腿不动一字**。
+4. ⚠ 顺带一枚只有整包才看得见的事实（对本票不利，具名）：`-count=10` 那发里 **`TestPanelHostRealWindowHopAndLifecycle` 红了 2 次（样本 6、10）而 `TestPanelHostLatencyPercentilesAC2` 十次全绿** ⇒ 喂给它样本的那枚用例失败时，百分位那把尺照样报"达标"。**AC#2 的绿与 AC#1 的红可以同时为真**，引用时不许互相顶。
 
 ## 9. 总裁
 
-（填写中）
+**票 33 今天不能结。** 13 枚未勾逐枚判语枚数：**成立 5／不成立 7／无法判 1**（勾不勾归编排者，本表不翻任何框）。
+
+- **成立（带注）**：AC#2、AC#3、AC#9、AC#13、AC#14。其中 **AC#13／AC#14／AC#3 三枚的牙是我自己突变出来的**（M3／M5／M6），不引任何前人读数。
+- **不成立**：AC#1（票面原句四段里，"进程树枚数稳定"那一维的尺**会把正常子进程回收判红并错归因成 reuse broken**，10 发里 2 发；"≤2s 退净"已进 `winlive` 且本腿未量）、AC#4（端到端在我这发真绿，但"M4 摘掉拒绝⇒两枚用例照绿"证的那一半**无牙**，且票面要的 manual 那半无人交读数）、AC#5（`panel.unavailable` **0 命中**、无 fixture、无 L2 标志生产者）、AC#6（CSP 连注入点都没有，**grep 0 命中**）、AC#7（实质前件已成立但用例不存在）、AC#8（两枚分支都还在、都无尺）、AC#10（三个字段零生产者，尺寸写死 420x260）。
+- **无法判**：AC#12（尺齐了；票面 `:37` 自己把它绑在"谁把 dist 填上"那枚归口上，那不是我判得动的）。
+- **决定性那几枚的凭据**：AC#6／AC#10／AC#5 三枚是**词面＋生产者枚数**级读数（各一把 grep，逐字在本表），最硬；AC#4 的"无牙"是**突变存活**，次硬；AC#1 的错归因是**本腿 10 发名册里的两枚红句原文**。
+- **今天这六格新落地的东西我认它承重**：`Run()` 那一行、建窗前的检查、AC#13 的次序、AC#14 的两枚分维钉、netstat 那两枚常量、harness 不再 `UnlockOSThread`——每一枚我都指到行并给了一发读数或一次突变。
+- **最该被编排者看见的三枚**（不是清单，是后果）：① **CI windows cli 腿一推送就红**，成因第一枚是"干净检出没页面产物 ⇒ AC#13 那枚 `t.Skipf` ⇒ `runtests.sh:98` 把 SKIP 判红"，与 WebView2 运行库**无关**（§6）；② **派单 §4(丁) 那句"156 涨到 240"是口径混用**（顶层 vs 含子项），真实名册增长＝**+3 枚、零枚静悄悄消失**（§2.2/§2.3）；③ **"被具名拒绝"在读数上仍表现为 15 秒超时**这条欠账今天没被任何一格踩到（本腿整包 0 枚 15 秒红），但它在 AC#13／AC#14／AC#4／AC#1(手势) 四族里**都可能被踩**——凡见这些族里 `--- FAIL … (15.0x s)` 一律先按"拒绝"读、不按"卡住"读（历史上 `33-r5` 那一发 15.01 s 正是这一形）。
+
+### 9.1 一格已定案欠账的读法核对（派单 §6）
+
+`showAndWait`（`panel_resident_windows_test.go:103-117`）等的是 `IsShown() || startUpErr()`，而 `Show` 的拒绝只落日志（`panel_resident_windows.go:324-327`）⇒ 被拒时 `waitPanelTrue` 在 `panelThreadWait = 15s` 处 `t.Fatalf("timed out after 15s waiting for the panel thread to finish Show - this is a failed measurement, not a pass")`。
+**本腿答案：今天没有任何一格判语被这条错读过**——我这发整包 0 枚 FAIL、6 次突变里 5 次给出的都是**具名**红句（M2 直接点 nil deref、M3 点 "0 of 1 probe id(s)"、M5 点 "TIMEOUT-2S"、M6 点 "owned 0 before / 0"），没有一枚落成 15 秒超时。**但两条标注规矩**要写进后续每一张表：① AC#13／AC#14／AC#4／AC#1(手势) 四族的 `--- FAIL … (≈15 s)` ＝"被具名拒绝的伪装"，⛔ 不许写成"卡住"；② 派单 §6 那句"编排者裁＝记欠账、不单开票"我遵守——**本腿没有加 `lastShowErr`、没有改 `showAndWait`、没有动 `RequestShow` 那三行日志**，只登记"这一形会让读数说谎"。
