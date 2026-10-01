@@ -129,3 +129,9 @@
   新增 `internal/ball.Events` 键 → `cmd/wisp/resident_ball_228_test.go:319-322`。
   交裁 7 格：census §⑦ F1（托盘命令可确定性送达）／F2（拒绝猜修法）／F3（空窗最小形状甲乙）／F4（`-H=windowsgui` 第二产物）／
   F5（真机侧十步读面）／F6（族② 沉默是否算缺陷）／F7（winlive 两包桌面互斥）。本腿零产码零构建，未 push。
+- `228-a3`（只读普查腿，10-01 起手，HEAD `eed229e48cb9599c29f72fea6a1170739a5f2b41`，branch dev，起手 `date` 逐字 `2026-10-01 11:27:59 +0800`）：
+  交付 `.scratch/wisp/probes/228/a3/census.md`。射程＝**托盘「允许一次」在"此刻没有卡在人等"时该长成什么样**（AC#2 那一枚入口的前置读数）。
+  本发为起手骨架：**⑤⑥⑦ 三节一次写满**（⑤ 尺 R1-R13 现读、⑥ 自我对抗 E1-E9、⑦ 判不动 F1-F6 按甲／乙／丙／不做），①②③④ 正文待补。
+  已经量到的三句要紧读数：`showMenu` 今天只收两枚布尔（`internal/ball/tray_windows.go:72`）、`appendItem` 只有 checked 一维**不会置灰**（`:79-85`）、
+  `Replies.Allow` 无卡时的返回是 `ErrNoTrackedCard`（`internal/agent/approval/replies.go:319`）而不是任何"门拒绝"文案；
+  ⚠ 且 `AwaitingHuman()` 会返回 `ReplyCard{}, true`（`:262`，corr 空串）＝**"有卡在等"与"允许得动"不是一格**。票面 AC 复选框一枚未动。
