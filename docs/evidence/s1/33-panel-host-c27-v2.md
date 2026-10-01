@@ -91,10 +91,25 @@
 | 桌面卫生（起手 16:49:45 ／ 终态 16:55:23） | `tasklist //FI "IMAGENAME eq msedgewebview2.exe" //FO CSV \| grep -c msedgewebview2` | **12 → 12**（零增量）。逐枚按 `--user-data-dir` 归因（PowerShell `Get-CimInstance Win32_Process`）：5 枚 `MicrosoftWindows.Client.CBS_*`（系统自带）＋6 枚 `com.clipsync.desktop`（第三方应用）＋1 枚 CBS 子项＝12；**零枚指向本仓**（既无 `%TEMP%\wisp-33r5-panel-profile` 也无 `%APPDATA%\wisp`）。⛔ 不指控谁泄漏，只报数 |
 | 孤儿子进程 | `tasklist //FI "IMAGENAME eq wisp.test.exe"`／`eq go.exe` | **0／0** |
 
-### 2.5 ⛔ 本腿写面自证
+### 2.6 突变循环之后的终态复跑（同一命令口径，逐字）
+
+⛔ 这不是"再取一次前人读数"，是**自证那六枚突变没留痕**——还原只靠 md5 相同不够，还要行为与名册相同。
+
+| 尺 | 命令 | 终态读数 |
+|---|---|---|
+| 整包第二发 | 同 §2.2 那条，`17:14` 起／`17:18:32` 终，台件 `.scratch/wisp/probes/33/v2/fullpack-final.txt` | 逐字 `ok  	github.com/CarlosShao/wisp/cmd/wisp	254.271s` ＋ `RC=0`；顶层 **159** PASS／**0** FAIL／**0** SKIP，含子项 **240**／0／0 ⇒ **与 §2.2 那一发四数全同**（耗时 203.831 → 254.271，同一口径下负载差，⛔ 不据此判任何格） |
+| 名册逐名 | `diff rosters/top-mine.txt rosters/top-final.txt` | **IDENTICAL**（159 枚逐名同集 ⇒ 六枚突变进出没吞掉、没新增任何用例） |
+| d22scan | `sh scripts/d22scan.sh` | **rc=0**（终态件 `.scratch/wisp/probes/33/v2/d22scan-final.txt`；分母逐字不变：bans #1-5 `internal/=224` `cmd/=34`，ban #8 `internal/=476` `cmd/=81`） |
+| gofumpt | `"D:/work/base/gopath/bin/gofumpt" -l cmd/ internal/` | **0 行输出** |
+| 写面 | `git status --porcelain -- cmd internal docs/evidence` | **0 行**（⛔ 产码与测试文件一字未留改动；⛔ 零枚删除、零枚改名） |
+| 桌面 | `tasklist //FI "IMAGENAME eq msedgewebview2.exe" //FO CSV \| grep -c` | 起手 12 → 终态 **12**；`go.exe` **0** 枚（没留孤儿子进程） |
+| 本腿提交枚数 | `git log --oneline 096aafad..HEAD` | `8fb99755`（骨架）／`5cae4cf8`（门禁读数）／`eeaded86`（13 格判语）／`5ce429ff`（突变台账＋CI＋过期指认＋时延＋总裁）＝**四枚，逐枚只带 `docs/evidence/s1/33-panel-host-c27-v2.md` 这一枚 pathspec**，⛔ 未 push |
+
+### 2.7 ⛔ 本腿写面自证（这一节的标题在我插 §2.6 时被吞掉过一次，本节现按盘上重编为 2.7；内容未改一句）
 
 本腿**未改**任何产码或测试文件。所有定向突变（§5）都用 `git cat-file blob HEAD:<path> > <path>` 还原，
 还原前后各一次 `certutil -hashfile <path> MD5`，且每次还原后核 `git diff --stat HEAD` 为空。逐枚读数在 §5 每节末尾。
+终态复跑见 §2.6。
 
 ## 3. 判不动的地方（逐条：甲／乙／不做 ＋现量＋为什么判不了＋具名交回）
 

@@ -1,0 +1,9 @@
+docs(evidence): 33-v2 acceptance table - skeleton committed first
+
+Per the anti-dead-leg rule (three legs died at 150 rounds today), the
+skeleton lands before any measurement: starting anchor taken live
+(HEAD 3216ba6da5e53b5239e6dfb3d1f4ed9f3e54959e, dev, 2026-10-01 16:47 +08),
+the 13 currently unchecked ticket-33 AC boxes each with one row and an
+empty verdict, plus the "gate readings" and "cannot judge" section
+headings. No verdict is filled yet; no checkbox is touched; no production
+or test file is modified.

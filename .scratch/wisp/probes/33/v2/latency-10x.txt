@@ -1,0 +1,183 @@
+time=2026-10-01T17:06:17.416+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 852.634 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:18+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0xc10b90 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 66.987 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=207 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 0 -> now 7, machine-wide 12 -> 19. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.05s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=1, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 1 runs (nearest-rank): cold P50=852.634 P95=852.634 (budget 1500) | hot P50=66.987 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 381.623 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:18+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x5d0f3c across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 30.194 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=207 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 6 -> now 7, machine-wide 18 -> 19. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.54s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=2, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 2 runs (nearest-rank): cold P50=381.623 P95=852.634 (budget 1500) | hot P50=30.194 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 291.882 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:19+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x5e0f3c across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 32.506 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=207 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 6 -> now 7, machine-wide 18 -> 19. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.44s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=3, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  3: cold=291.882 ms hot=32.506 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 3 runs (nearest-rank): cold P50=381.623 P95=852.634 (budget 1500) | hot P50=32.506 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 321.665 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:19+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x16590bc6 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 31.411 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=219 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 7 -> now 7, machine-wide 19 -> 19. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.48s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=4, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  3: cold=291.882 ms hot=32.506 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  4: cold=321.665 ms hot=31.411 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 4 runs (nearest-rank): cold P50=321.665 P95=852.634 (budget 1500) | hot P50=31.411 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 283.032 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:20+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x165a0bc6 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 59.687 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=213 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.46s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=5, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  3: cold=291.882 ms hot=32.506 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  4: cold=321.665 ms hot=31.411 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  5: cold=283.032 ms hot=59.687 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 5 runs (nearest-rank): cold P50=321.665 P95=852.634 (budget 1500) | hot P50=32.506 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 288.256 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:20+08:00)
+    panel_host_windows_test.go:585: hide -> re-show changed the msedgewebview2 set inside THIS process tree: 7 -> 6 (tree root pid 19976; single-window reuse broken). Machine-wide count went 19 -> 18 and is reported only - it counts other sessions too
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0x7d0cd4 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 40.557 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=215 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (0.43s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=6, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  3: cold=291.882 ms hot=32.506 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  4: cold=321.665 ms hot=31.411 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  5: cold=283.032 ms hot=59.687 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  6: cold=288.256 ms hot=40.557 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 6 runs (nearest-rank): cold P50=291.882 P95=852.634 (budget 1500) | hot P50=32.506 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 270.741 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:21+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x2360288 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 30.997 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=215 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 6 -> now 7, machine-wide 18 -> 19. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.43s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=7, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  3: cold=291.882 ms hot=32.506 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  4: cold=321.665 ms hot=31.411 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  5: cold=283.032 ms hot=59.687 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  6: cold=288.256 ms hot=40.557 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  7: cold=270.741 ms hot=30.997 ms at 2026-10-01T17:06:21+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 7 runs (nearest-rank): cold P50=291.882 P95=852.634 (budget 1500) | hot P50=32.506 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 315.926 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:21+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x2370288 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 28.953 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=215 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 6 -> now 7, machine-wide 18 -> 19. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.48s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=8, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  3: cold=291.882 ms hot=32.506 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  4: cold=321.665 ms hot=31.411 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  5: cold=283.032 ms hot=59.687 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  6: cold=288.256 ms hot=40.557 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  7: cold=270.741 ms hot=30.997 ms at 2026-10-01T17:06:21+08:00
+    panel_host_windows_test.go:802:   sample  8: cold=315.926 ms hot=28.953 ms at 2026-10-01T17:06:21+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 8 runs (nearest-rank): cold P50=291.882 P95=852.634 (budget 1500) | hot P50=31.411 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 276.618 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:22+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0xcb0b90 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 36.431 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=213 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 6 -> now 7, machine-wide 18 -> 19. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.44s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=9, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  3: cold=291.882 ms hot=32.506 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  4: cold=321.665 ms hot=31.411 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  5: cold=283.032 ms hot=59.687 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  6: cold=288.256 ms hot=40.557 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  7: cold=270.741 ms hot=30.997 ms at 2026-10-01T17:06:21+08:00
+    panel_host_windows_test.go:802:   sample  8: cold=315.926 ms hot=28.953 ms at 2026-10-01T17:06:21+08:00
+    panel_host_windows_test.go:802:   sample  9: cold=276.618 ms hot=36.431 ms at 2026-10-01T17:06:22+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 9 runs (nearest-rank): cold P50=291.882 P95=852.634 (budget 1500) | hot P50=32.506 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 304.721 ms (HEAD 5cae4cf8 at read time, 2026-10-01T17:06:22+08:00)
+    panel_host_windows_test.go:585: hide -> re-show changed the msedgewebview2 set inside THIS process tree: 7 -> 6 (tree root pid 19976; single-window reuse broken). Machine-wide count went 19 -> 18 and is reported only - it counts other sessions too
+    panel_host_windows_test.go:591: AC#1 denominators (head 5cae4cf8): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0x1540cfe across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 53.768 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 5cae4cf8): IPv4 rows=213 LISTEN-owned-by-tree=0 ; IPv6 rows=496 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 5cae4cf8), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (0.47s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 5cae4cf8, n=10, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=852.634 ms hot=66.987 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  2: cold=381.623 ms hot=30.194 ms at 2026-10-01T17:06:18+08:00
+    panel_host_windows_test.go:802:   sample  3: cold=291.882 ms hot=32.506 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  4: cold=321.665 ms hot=31.411 ms at 2026-10-01T17:06:19+08:00
+    panel_host_windows_test.go:802:   sample  5: cold=283.032 ms hot=59.687 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  6: cold=288.256 ms hot=40.557 ms at 2026-10-01T17:06:20+08:00
+    panel_host_windows_test.go:802:   sample  7: cold=270.741 ms hot=30.997 ms at 2026-10-01T17:06:21+08:00
+    panel_host_windows_test.go:802:   sample  8: cold=315.926 ms hot=28.953 ms at 2026-10-01T17:06:21+08:00
+    panel_host_windows_test.go:802:   sample  9: cold=276.618 ms hot=36.431 ms at 2026-10-01T17:06:22+08:00
+    panel_host_windows_test.go:802:   sample 10: cold=304.721 ms hot=53.768 ms at 2026-10-01T17:06:22+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 10 runs (nearest-rank): cold P50=291.882 P95=852.634 (budget 1500) | hot P50=32.506 P95=66.987 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 852.634 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	5.381s
+FAIL
+RC=1
+Thu Oct  1 17:06:22 CST 2026
