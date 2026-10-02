@@ -1,0 +1,13 @@
+2026-10-02T10:49:56+08:00
+=== internal/config full ===
+--- FAIL: TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure (0.01s)
+--- FAIL: TestAC7InvalidValueLeavesTheFileByteIdentical (0.03s)
+    --- FAIL: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.01s)
+    --- FAIL: TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	1.080s
+FAIL
+=== cmd/wisp AC7 ===
+--- PASS: TestAC7InvalidSettingsValueIsRefusedBeforeTheFile (0.02s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.092s
+2026-10-02T10:50:06+08:00

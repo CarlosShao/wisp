@@ -1,0 +1,11 @@
+2026-10-02T10:53:29+08:00
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.13s)
+--- FAIL: TestPlantedGrantWiringGoesRedInASnapshot (0.04s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	2.789s
+FAIL
+--- named FAIL roster (whole package, M6b) ---
+2026-10-02T10:53:36+08:00

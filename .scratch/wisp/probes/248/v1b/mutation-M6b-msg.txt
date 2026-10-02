@@ -1,0 +1,7 @@
+2026-10-02T10:56:12+08:00
+    l2_grant_boundary_test.go:2208: plant B has no anchor: the route guard's case list is not this package's declared roster (declared Method* constant MethodConfigFoo is absent from the guard's case list: a route that exists but is never asked of the guard) - the enumeration in this file has gone stale
+--- FAIL: TestPlantedGrantWiringGoesRedInASnapshot (0.04s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.083s
+FAIL
+2026-10-02T10:56:17+08:00

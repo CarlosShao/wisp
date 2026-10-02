@@ -1,0 +1,12 @@
+2026-10-02T10:51:25+08:00
+=== cmd/wisp envelope+sentinel ===
+--- PASS: TestAC2CredentialSentinelAppearsInNoArtifact (0.03s)
+--- FAIL: TestAC2SharedEnvelopeCannotCarryTheCredentialValue (0.00s)
+--- FAIL: TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope (0.00s)
+--- PASS: TestAC1InboundLegAnswersSettingsRouteEndToEnd (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.138s
+FAIL
+=== internal/panel 248 ===
+ok  	github.com/CarlosShao/wisp/internal/panel	0.383s
+2026-10-02T10:51:35+08:00

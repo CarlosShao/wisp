@@ -1,0 +1,25 @@
+2026-10-02T10:39:16+08:00
+580d6153126a13ef861656c9485b66dec5023912
+=== GOFUMPT -l ===
+gofumpt-list-count=0
+=== GOFUMPT whole repo ===
+.scratch\wisp\probes\161\r1\runs\b8-probe-bands\internal\a\p_b8.go
+.scratch\wisp\probes\161\r1\runs\unp-bad\internal\a\p_unp.go:5:14: expected ')', found '{'
+.scratch\wisp\probes\161\r1\runs\unp-bad\internal\a\p_unp.go:6:8: missing ',' before newline in parameter list
+.scratch\wisp\probes\161\r1\runs\unp-hides-bans\internal\a\p_unp.go:15:14: expected ')', found '{'
+.scratch\wisp\probes\161\r1\runs\unp-hides-bans\internal\a\p_unp.go:16:8: missing ',' before newline in parameter list
+.scratch\wisp\probes\161\r3\pre-format\guard.no1.go
+.scratch\wisp\probes\161\r3\pre-format\guard.no2.go
+.scratch\wisp\probes\161\r3\pre-format\guard.no3.go
+.scratch\wisp\probes\161\r5\negative-control\bad-sample.go
+.scratch\wisp\probes\162\r4\fs_write_m2.go
+.scratch\wisp\probes\163\a1\main.go
+.scratch\wisp\probes\174\c2\zz174c2_wiring_pair_windows_test.go
+.scratch\wisp\probes\183\r2\mut\task-boxset-off.go
+.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations
+.scratch\wisp\probes\185\r1\mut-m1\hostpath_185.go
+.scratch\wisp\probes\197\r1c\pre\subagent_197.go
+.scratch\wisp\probes\197\r1c\pre\subagent_197_test.go
+.scratch\wisp\probes\222\v1\mutations\m11-budget-50ms-gated\subagent_222_test.go
+.scratch\wisp\probes\224\v2\dialect_probe_test.go
+.scratch\wisp\probes\224\v2\posctrl.go

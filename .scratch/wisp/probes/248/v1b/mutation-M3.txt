@@ -1,0 +1,16 @@
+2026-10-02T10:50:55+08:00
+=== build check ===
+=== cmd/wisp AC2+AC3 ===
+--- FAIL: TestAC2CredentialSentinelAppearsInNoArtifact (0.03s)
+--- PASS: TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere (0.01s)
+--- PASS: TestAC3CredentialLivesInOneStoreAndConfigKeepsOnlyARef (0.04s)
+--- PASS: TestAC2SharedEnvelopeCannotCarryTheCredentialValue (0.00s)
+--- PASS: TestAC2SnapshotReportsRefWithoutBlobAsAPartState (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.189s
+FAIL
+=== internal/config AC3 ===
+--- PASS: TestAC11SettingWriteKeepsAForeignHandEditedKey (0.03s)
+--- PASS: TestAC3SettingWriteStoresARefNeverAValue (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/config	0.081s
+2026-10-02T10:51:02+08:00

@@ -1,0 +1,37 @@
+2026-10-02T10:54:25+08:00
+9060331b25530bcb91ef101d31a843a03856922a
+=== internal/config 248 PASS roster ===
+--- PASS: TestAC11SettingWriteReportsTheKeyPathItChanged (0.02s)
+--- PASS: TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure (0.01s)
+--- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical (0.03s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list (0.00s)
+--- PASS: TestAC11SettingWriteKeepsAForeignHandEditedKey (0.02s)
+--- PASS: TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.02s)
+--- PASS: TestAC3SettingWriteStoresARefNeverAValue (0.01s)
+--- PASS: TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/config	0.154s
+=== internal/panel 248 PASS roster ===
+--- PASS: TestAC1BothSettingsNamesAreWhitelistedAndRouted (0.00s)
+    --- PASS: TestAC1BothSettingsNamesAreWhitelistedAndRouted/config.get_reaches_the_leg_once_and_its_answer_comes_back (0.00s)
+    --- PASS: TestAC1BothSettingsNamesAreWhitelistedAndRouted/config.set_reaches_the_leg_once_with_the_parsed_selectors (0.00s)
+--- PASS: TestAC1UnlistedMethodIsRefusedAndTheLegNeverRuns (0.00s)
+--- PASS: TestAC1RosteredSettingWithoutALegRefusesLoudly (0.00s)
+--- PASS: TestAC1DispatchTableNamesEveryWhitelistedSettingMethod (0.00s)
+--- PASS: TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg (0.00s)
+--- PASS: TestAC1FieldTableCarriesNoApprovalVocabulary (0.00s)
+--- PASS: TestAC1SelectorAndEmptyValueRefusals (0.00s)
+--- PASS: TestAC8ReceiptNamesTheTierAndNeverClaimsLiveSave (0.00s)
+--- PASS: TestAC2CredentialRouteNeverEchoesTheValueItWasGiven (0.00s)
+--- PASS: TestAC2UnreadableConfigIsToldAsUnreadable (0.00s)
+--- PASS: TestAC2SettingsViewCarriesNoCredentialMaterial (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/panel	0.056s
+=== the two baseline-only panel names today ===
+--- PASS: TestComposerRenderFixtureTellsTheTruth (0.00s)
+--- PASS: TestReadGitOnThisRepositoryIsSelfConsistent (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/panel	0.050s
+2026-10-02T10:54:29+08:00

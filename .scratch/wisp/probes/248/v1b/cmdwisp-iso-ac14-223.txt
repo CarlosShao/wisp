@@ -1,0 +1,13 @@
+2026-10-02T10:43:16+08:00
+=== RUN   TestTicket223HandEditedFsLooseningCostsAnL2Card
+--- PASS: TestTicket223HandEditedFsLooseningCostsAnL2Card (2.65s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+--- PASS: TestAC14GoSideEvalPushReachesThePage (1.27s)
+=== RUN   TestTicket223HandEditedFsLooseningCostsAnL2Card
+--- PASS: TestTicket223HandEditedFsLooseningCostsAnL2Card (2.79s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+--- PASS: TestAC14GoSideEvalPushReachesThePage (0.59s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	7.443s
+iso rc=0
+2026-10-02T10:43:27+08:00

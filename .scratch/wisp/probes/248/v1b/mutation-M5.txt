@@ -1,0 +1,12 @@
+2026-10-02T10:52:14+08:00
+=== RUN   TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg
+    config_route_248_test.go:236: refusal for "fs.allowed_dirs" does not name where that key does live: panel: 配置字段不在可写名册内: "fs.allowed_dirs" 不在可写名册内；可写的只有 model_context_window/model_price_in/model_price_out/provider_api_key_ref/provider_base_url/provider_credential/role_chat_model（requestId="r-lock"）
+--- FAIL: TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg (0.00s)
+=== RUN   TestAC1FieldTableCarriesNoApprovalVocabulary
+--- PASS: TestAC1FieldTableCarriesNoApprovalVocabulary (0.00s)
+=== RUN   TestAC1SelectorAndEmptyValueRefusals
+--- PASS: TestAC1SelectorAndEmptyValueRefusals (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.072s
+FAIL
+2026-10-02T10:52:18+08:00
