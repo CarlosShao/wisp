@@ -1,0 +1,14 @@
+portable-tests.sh: GUARD C - go list's stdout carried 10 line(s) that are not
+portable-tests.sh:   import paths, so this 35-line denominator cannot be trusted:
+portable-tests.sh:   go: downloading github.com/dustin/go-humanize v1.0.1
+portable-tests.sh:   go: downloading github.com/google/uuid v1.6.0
+portable-tests.sh:   go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+portable-tests.sh:   go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+portable-tests.sh:   go: downloading golang.org/x/crypto v0.57.0
+portable-tests.sh:   go: downloading golang.org/x/sys v0.48.0
+portable-tests.sh:   go: downloading modernc.org/libc v1.75.7
+portable-tests.sh:   go: downloading modernc.org/mathutil v1.7.1
+portable-tests.sh:   go: downloading modernc.org/memory v1.12.1
+portable-tests.sh:   go: downloading modernc.org/sqlite v1.59.0
+portable-tests.sh: refused rather than filtered: a guard that drops the lines it does not
+portable-tests.sh: recognise measures less than it claims to (ticket 250 AC#2).

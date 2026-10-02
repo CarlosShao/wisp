@@ -1,0 +1,6 @@
+portable-tests.sh: GUARD A - these packages are declared in scope mode=core but
+portable-tests.sh:   compile NO test file at all for GOOS=linux:
+portable-tests.sh:   EMPTY github.com/CarlosShao/wisp/internal/session
+portable-tests.sh: a scope entry with no denominator cannot fail, so keeping it there
+portable-tests.sh: is a false claim of coverage (ticket 111 AC#3). Give the package a
+portable-tests.sh: test, or take the entry out and say where its coverage lives.

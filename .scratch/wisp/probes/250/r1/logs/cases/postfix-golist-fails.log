@@ -1,0 +1,39 @@
+portable-tests.sh: go list [./internal/agent/ ./internal/agent/approval/ ./internal/llm/... ./internal/config/... ./internal/memory/... ./internal/observe/... ./internal/secret/... ./internal/risk/... ./internal/statemachine/... ./internal/tools/... ./internal/models/... ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... ./internal/panel/... ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/winsec/] exited non-zero. Its stdout was:
+portable-tests.sh:   out| github.com/CarlosShao/wisp/cmd/llmrecord
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/agent
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/agent/approval
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/audio
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/ball
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/buildinfo
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/config
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/llm
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/llm/adaptertest
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/llm/anthropic
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/llm/golden
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/llm/openaichat
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/llm/openairesponses
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/memory
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/models
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/observe
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/panel
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/perm
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/plugin
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/proc
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/risk
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/secret
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/statemachine
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/tools
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/winsec
+portable-tests.sh:   out| github.com/CarlosShao/wisp/internal/partiallyresolved
+portable-tests.sh: its stderr was:
+portable-tests.sh:   err| go: downloading github.com/dustin/go-humanize v1.0.1
+portable-tests.sh:   err| go: downloading github.com/google/uuid v1.6.0
+portable-tests.sh:   err| go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+portable-tests.sh:   err| go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+portable-tests.sh:   err| go: downloading golang.org/x/crypto v0.57.0
+portable-tests.sh:   err| go: downloading golang.org/x/sys v0.48.0
+portable-tests.sh:   err| go: downloading modernc.org/libc v1.75.7
+portable-tests.sh:   err| go: downloading modernc.org/mathutil v1.7.1
+portable-tests.sh:   err| go: downloading modernc.org/memory v1.12.1
+portable-tests.sh:   err| go: downloading modernc.org/sqlite v1.59.0
+portable-tests.sh: go list [./internal/agent/ ./internal/agent/approval/ ./internal/llm/... ./internal/config/... ./internal/memory/... ./internal/observe/... ./internal/secret/... ./internal/risk/... ./internal/statemachine/... ./internal/tools/... ./internal/models/... ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... ./internal/panel/... ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/winsec/] failed - the scope cannot be audited against a pattern that does not resolve.

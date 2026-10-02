@@ -1,0 +1,50 @@
+### ticket250 second-victim ruler: is GUARD C the only casualty?
+
+GUARD C is INERT in this shape: the explicit-path branch (`scripts/portable-tests.sh:247-253`
+pre-fix numbering, unchanged) sets `pinned=''`, so the pin comparison never runs. Only
+GUARD B reads `$resolved` afterwards (`done <"$resolved"`). If the stderr poison were only
+a GUARD C problem, this shape would go green. It does not.
+
+Command (both legs identical but for which portable-tests.sh is executed; `go` is the
+carrier's shim at `scripts/testdata/portable-tests/go`, so no real test binary runs):
+
+    PATH="$bin:$PATH" FAKEGO_PIN_FILE="$pin" FAKEGO_STDERR_FILE="$prog" \
+      bash <script> ./internal/observe/
+
+    $bin  = a dir holding scripts/testdata/portable-tests/go
+    $pin  = core_pin sliced out of scripts/portable-tests.sh by awk (25 import paths)
+    $prog = the ten `go: downloading ...` lines of CI run 36889094435, verbatim
+
+----- PRE-FIX (git show 50d7a88172f397befcac49e08778bbc6f6355ead:scripts/portable-tests.sh)
+
+    rc=1
+    own-line rows (the 25 real packages):            25
+    rows GUARD B booked as having no result line:    10
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading github.com/dustin/go-humanize v1.0.1
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading github.com/google/uuid v1.6.0
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading golang.org/x/crypto v0.57.0
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading golang.org/x/sys v0.48.0
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading modernc.org/libc v1.75.7
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading modernc.org/mathutil v1.7.1
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading modernc.org/memory v1.12.1
+    portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing go: downloading modernc.org/sqlite v1.59.0
+    portable-tests.sh: GUARD B - 10 of 35 packages in scope mode=core printed
+    portable-tests.sh:   NO top-level result line, so this step tested them ZERO times:
+
+  (the `four numbers` line in the same log still reads `=== RUN=25 --- PASS=25 --- FAIL=0
+   --- SKIP=0` - the ten ghosts do not show up there, only in GUARD B's per-package audit.
+   That is the sense in which the ticket's "GUARD C kills the step first" UNDERSTATES the
+   cost: with GUARD C disabled or already satisfied, the same poison turns GUARD B into a
+   report that ten packages named `go: downloading ...` were tested zero times.)
+
+----- POST-FIX (working tree, same injection, same command)
+
+    rc=0
+    own-line rows:                                    25
+    rows booked as missing:                            0
+    portable-tests.sh: go list wrote 10 line(s) to stderr (progress, not packages, not in the denominator):
+
+  GUARD C's own first-look reading of the same injection is in
+  logs/cases/prefix-coldcache-stderr.log: `Pinned: 25, resolved: 35.` byte-for-byte the CI line.

@@ -1,0 +1,7 @@
+portable-tests.sh: GUARD C - scope mode=core resolved to a DIFFERENT package
+portable-tests.sh:   set than the one pinned next to it. Pinned: 25, resolved: 24.
+portable-tests.sh:   25d24
+portable-tests.sh:   < github.com/CarlosShao/wisp/internal/winsec
+portable-tests.sh: a deleted or newly-uncovered package must fail the step, not
+portable-tests.sh: shorten it. Either restore the scope entry or update the pin
+portable-tests.sh: in the SAME commit and say why in the CI log.

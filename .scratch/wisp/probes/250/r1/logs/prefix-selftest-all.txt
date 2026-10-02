@@ -1,0 +1,67 @@
+portable-tests-selftest.sh: judging /tmp/portable-tests-prefix-250.sh in a shadow root at /tmp/tmp.u7wsyLM9xC
+portable-tests-selftest.sh: core_pin extracted from /tmp/tmp.u7wsyLM9xC/scripts/portable-tests.sh = 25 import paths
+
+== case clean: rc=0 log=/tmp/tmp.UwYGaGA50z/clean.log
+   ok   exit 0, as expected
+   ok   denominator (GUARD B rows, one per resolved line) = 25
+   ok   /GUARD [ABC] -/ absent
+   ok   /^runtests\.sh: OK/ appears 1 time(s)
+
+== case coldcache-stderr: rc=1 log=/tmp/tmp.UwYGaGA50z/coldcache-stderr.log
+   FAIL exit 1, expected 0
+   FAIL denominator = 0, expected 25
+   FAIL /GUARD [ABC] -/ appeared 1 time(s):
+        1:portable-tests.sh: GUARD C - scope mode=core resolved to a DIFFERENT package
+   FAIL /stderr \(progress, not packages, not in the denominator\)/ appeared 0 time(s), wanted at least 1
+   FAIL /^portable-tests\.sh:   err\| go: downloading / appeared 0 time(s), wanted at least 10
+
+== case seed-stdout-space: rc=1 log=/tmp/tmp.UwYGaGA50z/seed-stdout-space.log
+   ok   exit 1, as expected
+   FAIL /GUARD C - go list's stdout carried 1 line\(s\) that are not/ appeared 0 time(s), wanted at least 1
+   ok   /github.com/CarlosShao/wisp/internal/fake pkg/ appears 1 time(s)
+   ok   /^runtests\.sh: OK/ absent
+
+== case seed-stdout-progress: rc=1 log=/tmp/tmp.UwYGaGA50z/seed-stdout-progress.log
+   ok   exit 1, as expected
+   FAIL /GUARD C - go list's stdout carried 10 line\(s\) that are not/ appeared 0 time(s), wanted at least 1
+   ok   /^runtests\.sh: OK/ absent
+
+== case seed-stdout-valid-but-unpinned: rc=1 log=/tmp/tmp.UwYGaGA50z/seed-stdout-valid-but-unpinned.log
+   ok   exit 1, as expected
+   ok   /GUARD C - scope mode=core resolved to a DIFFERENT package/ appears 1 time(s)
+   ok   /> github.com/CarlosShao/wisp/internal/notpinned/ appears 1 time(s)
+
+== case golist-fails: rc=1 log=/tmp/tmp.UwYGaGA50z/golist-fails.log
+   ok   exit 1, as expected
+   FAIL /exited non-zero. Its stdout was:/ appeared 0 time(s), wanted at least 1
+   FAIL /^portable-tests\.sh:   out\| github.com/CarlosShao/wisp/internal/partiallyresolved/ appeared 0 time(s), wanted at least 1
+   FAIL /^portable-tests\.sh:   err\| go: downloading modernc.org/sqlite v1.59.0/ appeared 0 time(s), wanted at least 1
+   ok   /the scope cannot be audited/ appears 1 time(s)
+
+== case pin-drift-one-package-missing: rc=1 log=/tmp/tmp.UwYGaGA50z/pin-drift-one-package-missing.log
+   ok   exit 1, as expected
+   ok   /GUARD C - scope mode=core resolved to a DIFFERENT package/ appears 1 time(s)
+   ok   /< github.com/CarlosShao/wisp/internal/winsec/ appears 1 time(s)
+
+== case guard-a-empty-test-package: rc=1 log=/tmp/tmp.UwYGaGA50z/guard-a-empty-test-package.log
+   ok   exit 1, as expected
+   ok   /GUARD A - these packages are declared in scope mode=core/ appears 1 time(s)
+   ok   /github.com/CarlosShao/wisp/internal/session/ appears 1 time(s)
+
+== case guard-b-no-result-line: rc=1 log=/tmp/tmp.UwYGaGA50z/guard-b-no-result-line.log
+   ok   exit 1, as expected
+   ok   /GUARD B - 1 of .* packages in scope mode=core printed/ appears 1 time(s)
+   ok   /github.com/CarlosShao/wisp/internal/perm/ appears 2 time(s)
+
+== case empty-scope-slice: 4 line(s) sliced verbatim from /tmp/tmp.u7wsyLM9xC/scripts/portable-tests.sh
+   slice| if [ ${#scope[@]} -eq 0 ]; then
+   slice|     echo "portable-tests.sh: empty scope (mode=$mode) - refusing to be a green no-op" >&2
+   slice|     exit 2
+   slice| fi
+   (log: /tmp/tmp.UwYGaGA50z/empty-scope-slice.log)
+   ok   exit 2, as expected
+   ok   /refusing to be a green no-op/ appears 1 time(s)
+
+portable-tests-selftest.sh: 10 case(s) ran, 10 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.UwYGaGA50z (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.

@@ -1,0 +1,16 @@
+portable-tests.sh: GUARD C - scope mode=core resolved to a DIFFERENT package
+portable-tests.sh:   set than the one pinned next to it. Pinned: 25, resolved: 35.
+portable-tests.sh:   25a26,35
+portable-tests.sh:   > go: downloading github.com/dustin/go-humanize v1.0.1
+portable-tests.sh:   > go: downloading github.com/google/uuid v1.6.0
+portable-tests.sh:   > go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+portable-tests.sh:   > go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+portable-tests.sh:   > go: downloading golang.org/x/crypto v0.57.0
+portable-tests.sh:   > go: downloading golang.org/x/sys v0.48.0
+portable-tests.sh:   > go: downloading modernc.org/libc v1.75.7
+portable-tests.sh:   > go: downloading modernc.org/mathutil v1.7.1
+portable-tests.sh:   > go: downloading modernc.org/memory v1.12.1
+portable-tests.sh:   > go: downloading modernc.org/sqlite v1.59.0
+portable-tests.sh: a deleted or newly-uncovered package must fail the step, not
+portable-tests.sh: shorten it. Either restore the scope entry or update the pin
+portable-tests.sh: in the SAME commit and say why in the CI log.

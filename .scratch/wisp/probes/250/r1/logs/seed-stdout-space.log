@@ -1,0 +1,5 @@
+portable-tests.sh: GUARD C - go list's stdout carried 1 line(s) that are not
+portable-tests.sh:   import paths, so this 26-line denominator cannot be trusted:
+portable-tests.sh:   github.com/CarlosShao/wisp/internal/fake pkg
+portable-tests.sh: refused rather than filtered: a guard that drops the lines it does not
+portable-tests.sh: recognise measures less than it claims to (ticket 250 AC#2).
