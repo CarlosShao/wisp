@@ -14,7 +14,7 @@
 
 ## 要建什么（本票只管"改了以谁为准"这一件；⛔ 不碰界面、不碰凭据）
 
-- [ ] **AC#0（本票第一格，且是闸门）＝先把三问答出来，⛔ 不许直接开写**：① 常驻腿要把配置里的四枚热键交出去，**构造期**该改哪一处、`DefaultHotkeys()` 那枚默认还要不要留作"配置缺失时的那一份"；② **改过之后**谁去重新注册——是把 `ball.NewHotkeyReloader` 那台机器接进常驻腿，还是让 `config_reload.go` 那一跳多调一次注册，两形的**代价与线程约束**各是什么；③ 四枚里有一枚注册失败（被别的程序占了）时，**今天那句 `hotkeys live %d/4` 会怎么说、应该怎么说**。交件判据＝逐处带 `file:line`＋尺读数；量不到的**具名说量不到**，⛔ 不许用"应该没问题"填空；⛔ 不许改任何产码。
+- [x] **AC#0（本票第一格，且是闸门）＝先把三问答出来，⛔ 不许直接开写**：① 常驻腿要把配置里的四枚热键交出去，**构造期**该改哪一处、`DefaultHotkeys()` 那枚默认还要不要留作"配置缺失时的那一份"；② **改过之后**谁去重新注册——是把 `ball.NewHotkeyReloader` 那台机器接进常驻腿，还是让 `config_reload.go` 那一跳多调一次注册，两形的**代价与线程约束**各是什么；③ 四枚里有一枚注册失败（被别的程序占了）时，**今天那句 `hotkeys live %d/4` 会怎么说、应该怎么说**。交件判据＝逐处带 `file:line`＋尺读数；量不到的**具名说量不到**，⛔ 不许用"应该没问题"填空；⛔ 不许改任何产码。**〔16:4x 编排者翻勾：`258-a1` 交件 `1286382d`（104 行，占位 0，禁 Go 遵守），我抽验两把尺（`ApplyHotkeyDefaults` 真身 `hotkey_windows.go:87`＋唯一非测试调用者 balldebug:239；`NewHotkeyReloader` 全仓非测试调用点确实只有 balldebug:237）逐字命中；选形与裁定在下面第 7 节〕**
 - [ ] **AC#1 只在 AC#0 交完、并由编排者落一枚具名 `A##` 批准选形之后才许动**：`wisp run` 与**常驻腿**两条入口建出来的球，四枚热键**以 `config.toml` 的 `[hotkey]` 为准**；配置文件缺失／那一节缺失时**退回 `DefaultHotkeys()` 并说得出这句话**（不许静默换成另一套）。
 - [ ] **AC#2 说实话的判据（负向必配正控）**：种一发"把 `summon` 改成别的组合键" ⇒ **下一次建球注册的就是新值**（正控）；⛔ 反向不许做成词面尺（不许只扫注释里有没有 `hot-tier` 那个词），要问能力。⚠ 若量出来"重新注册必须回到 `ui-sta` 才安全"，那**属票 33 那批线程裁定的射程**，停下来上报、不许自填。
 - [ ] **AC#3 越界检查**：`git diff` 出现 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` 任一路径 ⇒ 直接退回。⛔ 三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）一字不许动。
@@ -32,3 +32,17 @@
 
 写面＝`cmd/wisp`＋`internal/ball` ⇒ ⛔ 与 `198-r2`（在飞，写 `cmd/wisp`）**串行**。AC#0 是只读普查，可先派（⛔ 禁跑 `go build`/`vet`/`test`，与写腿的整包测量同机即互洗）。
 **默认不排落地腿**：本票排在票 198 与票 248 那两片交完之后。撤销口令「**258 撤**」。
+
+---
+
+## 7. `258-a1` 收档 ⇒ AC#0 翻勾＋**选形＝形 A**（编排者裁定，账 `A538`，2026-10-02 16:4x，现量 HEAD `3df8b82b`）
+
+**1. 交件核过**：`1286382d`（76/8），census **104 行／17,841 字节**、占位 0、全程零 Go 命令、写面 porcelain＝0。**它没推翻我票面任何一句**（五条现量逐字复认全中），两处补充：① **票面"两条入口建球"对 `wisp run` 是空集**——`wisp run` 产码零 `ball.` 引用、**不建球**（这处补充记我：我立票时把 run 腿当成了建球入口之一）；② "从没进过球"的机制更具体＝常驻进程里有**两枚** config.Manager（任务管线＋面板链），都进不了 `startResidentBall` 的参数表。
+
+**2. 三问判语（读数全在 census §1–§3，都带 file:line）**：① 形状四枚**同名同序**但**缺省值不一致**——schema 只有 `cancel` 带 `default:"Esc"`（`schema.go:182`），summon/mute/panel 无 tag ⇒ 配置路产物三枚 `""`，缝由 `ApplyHotkeyDefaults`（`hotkey_windows.go:87`）补，**唯一非测试调用者＝balldebug:239**；② `config_reload.go:153` 之后**无任何产码**把新值交给球（`OnReload` 只吃 reload 档、hot 档不触发；`manager.go:278` 闭包只换内存值无人被通知）；③ 失败句链条完整（`HotkeyTaken` 逐行进 `Problems()`＋verdict `live 2/4` 形），但 **`Problems()` 那句"去 [hotkey] 挑组合"指向一扇常驻腿今天没有的门**——诚实缺口，AC#2 的尺要顺手钉它。
+
+**3. 两形代价（census §2，本编排者裁）**：**形 A**＝把 `ball.NewHotkeyReloader` 那台现成机器接进常驻腿（balldebug:237-253 有跑通的全套：diff/panic 隔离/轮询闭包）；代价＝rb 与 mgr 两对象不同层（建球 `resident_windows.go:163` 早于任务管线 `:206`），要在装配次序里给桥一个位置。**形 B**＝`config_reload.go` 那一跳多调一次注册；代价＝`agentRuntime` 无 ball 字段（要动装配根结构）、run 腿无球、"reload tick 在非 ui-sta 线程调 rebind"的新线程形状、`RebindHotkeys` 全量 churn。**线程形状两形都合法**（rebind 经 `uiRun` post-and-wait 到球自己的 ui-sta＝D38b 冻结名第 1 枚；`Check()` 注释"Safe from any goroutine EXCEPT the ball's UI thread"）⇒ **不触票 33 十一裁的停手上报线**。
+
+**4. ★ 选形＝形 A（具名裁定五样齐）**：**文件**＝`cmd/wisp/resident_ball_windows.go`（`Hotkeys: ball.DefaultHotkeys()` 那一发改吃 `ApplyHotkeyDefaults(mgr.Config().Hotkey)` 那条链）＋`cmd/wisp/resident_windows.go`（桥的装配位）；**理由**＝零新发明（balldebug 全套现成、票 246/228 的装配次序判例都在）、不动 `agentRuntime` 结构、不新增线程形状；**边界**＝⛔ 两形共有的已登记残留**不归本票修**：rebind 丢 in-flight Esc borrow（`ball_windows.go:807-812`，票 245 在册）——落地腿不许顺手做；⛔ `Problems()` 那句指向"没有的门"只许在 AC#2 的尺里钉住诚实形（文案改动若要做＝另落一格，不许夹带）；**撤销口令**＝**「258 改形 B」**。
+
+**5. 落地腿（`258-r1`）判据预告（AC#1／AC#2，暂不派——cmd/wisp 测试面被 `253-r1` 占着，包级互斥）**：AC#1＝常驻腿建出的球四枚热键以 `config.toml` 为准、缺失时退 `DefaultHotkeys()` 且说得出那句话；AC#2＝正控（种一发改 `summon` ⇒ 下次建球注册新值）＋反向不词面尺＋**三枚既有钉全盖不到这一格**（census §3：`:45` 是常量、`:144` 无断言、`:160/:163` 只钉两极端）⇒ 尺新造不撞钉；正控还要钉"改配置后 reloader 真把新值交给球"（现在零产码路径）。**写面＝`cmd/wisp`＋`internal/ball`（只读后者）**。
