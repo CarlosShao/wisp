@@ -1,0 +1,89 @@
+224-c2 原始读数件（逐字摘录，供 224-r3 对照；本枚没跑任何东西，以下全是已落盘日志的原文行）
+
+出处 A：.scratch/wisp/probes/orchestrator/ci-delta-1/logs_new_all.txt（test-windows job，新发＝8ae4c23e）
+出处 B：.scratch/wisp/probes/orchestrator/ci-delta-1/logs_base_all.txt（基线发＝0589fd9c）
+（引号内是日志原文，前缀 "<ts>Z " 省略；日志列分隔是 TAB，这里逐字保留行内容）
+
+--------------------------------------------------------------------------
+[A] 本枚用例：TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking
+--------------------------------------------------------------------------
+:3397  --- PASS: TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun (1.50s)
+:3398  === RUN   TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking
+:3402  2026-10-01 16:16:22 mockllm: serving on http://127.0.0.1:63862 (golden dir D:\a\wisp\wisp\internal\llm\testdata\golden)
+:3406  msg="schema migration complete" component=memory schema_version=2          （ts=2026-10-01T16:16:22.498Z）
+:3407  msg="startup WAL checkpoint (TRUNCATE) done" ...                              （ts=16:16:22.499Z）
+:3408      ticket224_assembly_test.go:269: the control call errored: the L1 window running out means execute
+:3409      ticket224_assembly_test.go:293: the granted call errored: true
+:3410      ticket224_assembly_test.go:311: a live session grant left 1 cards on screen for the covered call: 「命中授权就不再弹卡」 is not happening in the assembled run (ledger id=sess_1a0d59d3b4b3afed9833b3516fd42598, pattern="C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking81779933\\002\\granted-in-this-session.txt", row=1)
+:3411      ticket224_assembly_test.go:316: covered call booked decision="timeout", want "allow_session_grant"
+:3412      ticket224_assembly_test.go:319: covered call booked grant_id=<nil>, want the covering row 1: tool_call.grant_id is the column D45-2 promised for forensics
+:3413      ticket224_assembly_test.go:324: audit is missing the GRANT-USE line naming row 1; got:
+:3414          [audit] wisp run: SESSION-MINT id=sess_1a0d59d3b4b3afed9833b3516fd42598 (结束点＝本进程退出，A435 第 2 条)
+:3415          [audit] session: GRANT-RECORD id=1 tool=fs.write pattern="C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking81779933\\002\\granted-in-this-session.txt" session=sess_1a0d59d3b4b3afed9833b3516fd42598 expires_at=1793463402
+:3416      ticket224_assembly_test.go:327: the covered call should have written C:\Users\RUNNER~1\AppData\Local\Temp\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking81779933\002\granted-in-this-session.txt: GetFileAttributesEx C:\Users\RUNNER~1\AppData\Local\Temp\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking81779933\002\granted-in-this-session.txt: The system cannot find the file specified.
+:3417  msg="startup WAL checkpoint (TRUNCATE) done" ...                              （ts=2026-10-01T16:17:02.589Z）
+:3418  --- FAIL: TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking (41.72s)
+:3419  === RUN   TestTicket224ProductionSessionDoesNotSurviveRestart
+        （该枚在 fails_new.tsv 零命中＝CI 绿；见 census §5-J3 的"绿得没有分量"一句）
+
+时刻换算（本枚用 date -u 现算，不是抄来的）：
+  expires_at=1793463402 -> 2026-10-31T16:16:42Z；TTL=clockCeilingDefault=memory.GrantAuditTTL=30*24h
+  1793463402 - 2592000 = 1790871402 -> 2026-10-01T16:16:42Z ＝ 落行时刻
+  落行时刻 - 开机完成(16:16:22.498) = 19.5s  ≈ confirm_timeout_sec=20（载具自己写的）
+  收尾 16:17:02.589 - 落行 16:16:42 = 20.6s  ≈ 第二个 20s
+  合计 ≈ 41.7s ＝ 日志报的 41.72s
+
+--------------------------------------------------------------------------
+[B/A] 同发、同因的另外两枚 witness（都早于票 224）
+--------------------------------------------------------------------------
+[A:3010]     run_mode101_test.go:506: control write should NOT error under auto_approve (审批超时（1 秒未确认），C18 一律判拒绝，已自动拒绝); the control half is broken, so the refusal above proves nothing
+[A:3012] --- FAIL: TestTicket101SessionGrantDoesNotCrossRestart (4.36s)
+[A:3095]     run_test.go:378: an unvetoed L1 window means EXECUTE, got: 审批超时（300 秒未确认），C18 一律判拒绝，已自动拒绝
+[A:3099] --- FAIL: TestComposedGateBlocksAWriteForTwoSeconds (301.70s)
+[B:3709] --- FAIL: TestComposedGateBlocksAWriteForTwoSeconds (301.12s)      （基线发就红 ⇒ 不是这一发引入）
+
+本机同码对照（不是本枚跑的，是归档件）：
+  .scratch/wisp/probes/33/r9/09-fullpack-1.txt:1015  --- PASS: TestComposedGateBlocksAWriteForTwoSeconds (3.46s)
+  .scratch/wisp/probes/33/r9/09-fullpack-1.txt:1325  --- PASS: TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking (3.20s)
+  .scratch/wisp/probes/33/r9/11-fullpack-2.txt:1324  同枚 (3.17s)
+  .scratch/wisp/probes/245/v1/gate-cmdwisp-full.txt:1095  同枚 (3.23s)
+  本机 temp 根逐字：C:\Users\swq\AppData\Local\Temp\...（长名，无 8.3 分裂）
+
+--------------------------------------------------------------------------
+[A] 拼法分裂的正面读数（risk 包，与票 224 无关，两发都红）
+--------------------------------------------------------------------------
+[A:4063] === RUN   TestPathResolverShortNameAListDenied
+[A:4064]     pathresolver_junction_windows_test.go:135: short name did not expand to long path: got "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied3856570368\\001\\.git-credentials" want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied3856570368\\001\\.git-credentials"
+[A:4065] --- FAIL: TestPathResolverShortNameAListDenied (0.03s)
+[A:4067]     pathresolver_junction_windows_test.go:164: UNC spelling "\\\\?\\UNC\\localhost\\c$\\Users\\RUNNER~1\\..." normalized to "C:\\Users\\runneradmin\\...", want "C:\\Users\\RUNNER~1\\..."
+[A:4069] --- FAIL: TestPathResolverUNCAListDenied (0.03s)
+[A:4071]     pathresolver_junction_windows_test.go:182: \\?\ spelling normalized to "C:\\Users\\runneradmin\\...", want "C:\\Users\\RUNNER~1\\..."
+[A:4073] --- FAIL: TestBListDefaultDenyAndOverride (0.01s)  （报错逐字 {Allow:false NeedL2:true Class:B Reason:B-list sensitive path; single-file override requires one L2 confirm: .env*}）
+
+--------------------------------------------------------------------------
+[A] "带 file:line: 前缀但不红"的标本（口径坑，census §3.1/U10 引的就是这段）
+--------------------------------------------------------------------------
+[A:4055]     pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~/wisp102-tilde-probe/artifacts: refused as required: ...
+[A:4056]     pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ...: refused as required: ...
+[A:4057]     pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ...: refused as required: ...
+[A:4058] --- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree (0.01s)
+        ⇒ 三行 :95/:98/:101 是 t.Logf，挂在同一发的 PASS 之下；⛔ 按 "file:line:" 数红必错
+
+--------------------------------------------------------------------------
+红名册（口径：test-windows job 的那两枚脚本步；本枚 awk NR / cut | sort | uniq -c 现量，取数 10-02 09:2x）
+--------------------------------------------------------------------------
+fails_base.tsv ＝ **25 行**（`portable-tests.sh --scope=core` 4／`--scope=windows` 12／`wisp-cli-tests.sh` 9）
+fails_new.tsv   ＝ **26 行**（`--scope=windows` 13／`wisp-cli-tests.sh` 13；⛔ 本发零 core-scope 红）
+按测试名去重后取差集：
+  只在基线红（4 枚，全是面板/前端契约那一族，本枚射程外）：
+    TestApprovalCardViewJSONKeysMatchFrontendTypes / TestC21DesignTokensFourWayAgree /
+    TestComposerContractTypesMatchFrontend / TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+  只在新发红（5 枚）：
+    TestAC246ResidentPipelineAsksThroughTheOneGate / TestPanelHostRealWindowHopAndLifecycle /
+    TestResolvePerCallBudget / TestTicket223HandEditedFsLooseningCostsAnL2Card /
+    TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking
+  两发都红（21 枚，去重后）——本枚只逐字读了其中三枚的报错（见上面 witness 段）。
+⚠ 归因口径：`--scope=windows` 那 13 行**不等于**"全在 internal/risk"——本枚没逐枚数包名，
+  ⛔ 别把"同一发"读成"同一个包"。⛔ 本枚不复制整份名册（免得漂），请直接读那两枚 tsv：
+  .scratch/wisp/probes/orchestrator/ci-delta-1/fails_base.tsv 与 fails_new.tsv
+
