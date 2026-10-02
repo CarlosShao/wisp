@@ -1,0 +1,10 @@
+2026-10-02T11:18:04+08:00
+=== V-4: fs. locked-family reason weakened to a bare refusal ===
+    config_route_248_test.go:236: refusal for "fs.allowed_dirs" does not name where that key does live: panel: 配置字段不在可写名册内: "fs.allowed_dirs" 属于 fs. 族，本路由不写它：该字段不可写（requestId="r-lock"）
+--- FAIL: TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg (0.00s)
+--- PASS: TestAC1FieldTableCarriesNoApprovalVocabulary (0.00s)
+--- PASS: TestAC1SelectorAndEmptyValueRefusals (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.053s
+FAIL
+2026-10-02T11:18:07+08:00

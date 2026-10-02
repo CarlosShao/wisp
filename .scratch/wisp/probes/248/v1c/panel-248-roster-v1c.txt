@@ -1,0 +1,21 @@
+2026-10-02T11:12:26+08:00
+rc=0
+--- top-level PASS/FAIL count ---
+11
+--- PASS: TestAC1BothSettingsNamesAreWhitelistedAndRouted (0.00s)
+    --- PASS: TestAC1BothSettingsNamesAreWhitelistedAndRouted/config.get_reaches_the_leg_once_and_its_answer_comes_back (0.00s)
+    --- PASS: TestAC1BothSettingsNamesAreWhitelistedAndRouted/config.set_reaches_the_leg_once_with_the_parsed_selectors (0.00s)
+--- PASS: TestAC1UnlistedMethodIsRefusedAndTheLegNeverRuns (0.00s)
+--- PASS: TestAC1RosteredSettingWithoutALegRefusesLoudly (0.00s)
+--- PASS: TestAC1DispatchTableNamesEveryWhitelistedSettingMethod (0.00s)
+--- PASS: TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg (0.00s)
+--- PASS: TestAC1FieldTableCarriesNoApprovalVocabulary (0.00s)
+--- PASS: TestAC1SelectorAndEmptyValueRefusals (0.00s)
+--- PASS: TestAC8ReceiptNamesTheTierAndNeverClaimsLiveSave (0.00s)
+--- PASS: TestAC2CredentialRouteNeverEchoesTheValueItWasGiven (0.00s)
+--- PASS: TestAC2UnreadableConfigIsToldAsUnreadable (0.00s)
+--- PASS: TestAC2SettingsViewCarriesNoCredentialMaterial (0.00s)
+--- PASS: TestAC2SettingsViewCarriesNoCredentialMaterial (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.039s
+2026-10-02T11:12:27+08:00

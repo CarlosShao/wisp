@@ -92,18 +92,18 @@
 - 名册侧〔**我复认过**〕：`bridge.go:66-67` 两枚常量、`:148` 的 `knownComposerMethod` case 含六枚名、`:132` 那一声 `if !knownComposerMethod(r.Method)` 仍是唯一入口守卫。
 - 派发表侧〔**我复认过**〕：`internal/panel/composer_dispatch.go:179/184/189/194/199` 五处 `d.unattached(req)`，`ErrNoHandlerAttached` 定义在 `:60-64` 且句子是响亮的（"该方法在名册内，但本机未接入处理器"）＝**在册无处理器那一声响**存在。
 - 用例侧〔**我没复认，照录前腿**〕：`probes/248/v1b/roster-config-panel-248.txt` 逐名 PASS 11 枚顶层＋2 枚子用例，含 `TestAC1BothSettingsNamesAreWhitelistedAndRouted`（两枚名各达处理器**一次**）、`TestAC1UnlistedMethodIsRefusedAndTheLegNeverRuns`、`TestAC1RosteredSettingWithoutALegRefusesLoudly`、`TestAC1DispatchTableNamesEveryWhitelistedSettingMethod`、`TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg`。
-- 正控〔**我没复认，照录前腿**〕：`mutation-M5.txt`——动掉锁定族点名句 ⇒ `TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg` 指名红（红句逐字要求"说出那枚键真正住在哪"），同批另两枚 AC1 用例仍绿＝**红的是那一发，不是整包噪声**。⚠ 该件没记它种在哪一行（前腿只留读数不留种法），所以这一发本腿在 §3 里**自己重种一枚等价形**（V-3）。
+- 正控〔**我复认过（本腿 §3 V-4）**〕：本腿把 `config_handlers.go:123` 那句 `fs.` 的理由换成光秃秃的"该字段不可写" ⇒ `TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg` 指名红（红句逐字要求"说出那枚键真正住在哪"），同批另两枚 AC1 用例仍绿＝红的是那一发、不是整包噪声；还原后 `ok`。⇒ "负向判据一律问能力"这一条本腿有自己的一发。前腿 `mutation-M5.txt` 的红句与本腿这发**逐字同形**（同一枚用例、同一枚输入），本腿认它是真读数，但署名各归各。
 - J1（那两枚解冻锚）〔**我复认过**〕：`git show 0d87a681 --unified=0 -- internal/panel/l2_grant_boundary_test.go` ⇒ **4 枚 hunk、删除行共 5 行**，逐字是 `:2051` 那枚拼写钉的三行（`guardAnchor := "case MethodModeRequest, …"`／`if !strings.Contains(…)`／`t.Fatalf("plant B has no anchor …")`）与 `:2139` 那枚尺寸钉的两行（`if got := len(sortedSet(pkg.answered)); got != 4` 及其 `t.Errorf`）⇒ **⛔ 未删钉、未放宽成 ≥4，`A487` 边界（只动这两处与其直连 helper）成立**。
-- J1 的正控〔**我没复认，照录前腿**〕：`mutation-M6b-msg.txt` 记下种一枚名册里没有的 `MethodConfigFoo` ⇒ `l2_grant_boundary_test.go:2208` 报"plant B has no anchor…declared Method* constant MethodConfigFoo is absent from the guard's case list"；`mutation-M6a.txt` 另记一发把名册读短 ⇒ `:2312` 报"enumeration … would pass for the wrong reason"。⛔ 两枚都没记种法，本腿在 §3 里补跑 V-1（能力形锚的牙齿）。
+- J1 的正控〔**我复认过（本腿 §3 V-3）**〕：本腿在 `bridge.go` 的同一枚 const 块里种一枚守卫不认的 `MethodConfigFoo = "config.foo"`（⛔ 不动 case 列表），`go test ./internal/panel -run TestPlantedGrantWiringGoesRedInASnapshot` ⇒ **红，且红句逐字点名那枚常量**（`l2_grant_boundary_test.go:2208: declared Method* constant MethodConfigFoo is absent from the guard's case list`）；还原后（`git diff` 该文件为空）同一条尺 **ok**。⇒ 那枚能力形锚真的在双向读：名册长了、守卫没跟，它就响。前腿 `mutation-M6a.txt` 另记一发反方向（把名册读短 ⇒ `:2312` 报"passing for the wrong reason"）〔**我没复认，照录前腿**〕。
 - 归口（不是本格的扣分）：两界登记点 `composerRouteLiterals`（`internal/panel/composer_test.go:409` 那一族）仍未收这两枚名——那是页面真会叫名之后的两步（实现件 §5-12 自陈）。本腿判它**属 AC#2 的对账门那一族**，见下。
 
 ### AC#2 —— 快照那一维＋"全仓 grep 不到 key 值"要升成常驻用例
 
 **判语：附条件成立。** 条件＝**界面侧补声明那两枚键、两界对账门转绿**之前本格勾不了；Go 半边的凭据本腿认。
-- 那一维的位置〔**我复认过（形状层）**〕：`internal/panel/composer.go` 的 `composer` 段里两枚键（一枚事实＋一枚 known 位，照现成 `currentModel`/`modelKnown` 形），⛔ 没加顶层第五键——J3 裁的那形；`internal/panel/pump.go` 的 reader 未接时报 unknown/false〔**我没复认，照录实现件 §3#7 的行号，本腿只核到"没有顶层第五键"这一条**：见下面那把对账门读数，它同时是这两枚键存在的证据〕。
+- 那一维的位置〔**我复认过**〕：`internal/panel/composer.go:268-269` 那两枚键的 json tag 逐字是 `json:"credentialState"`／`json:"credentialKnown"`，且它们**声明在 `ComposerState` 里**（＝`composer` 段内，不是顶层），⛔ 没有顶层第五键；`NewComposerState`（`:273`，unknown 支在 `:288`）在无 reader 时把 `Credential` 置成 `CredentialUnknown`，`pump.go:260` 只有 `p.src.Credential != nil` 才填那两枚（`:268-269`）、且把空串折回 `CredentialUnknown`——**"没人读过"与"没录过"分得开**这一条本腿逐行读了，不是照录实现件。
 - 常驻用例〔**我复认过名册**〕：`grep -n "^func Test" cmd/wisp/panel_config_248_test.go` ⇒ 9 枚顶层，含 `TestAC2CredentialSentinelAppearsInNoArtifact`（`:151`）、`TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere`（`:215`，正控）、`TestAC2SharedEnvelopeCannotCarryTheCredentialValue`（`:326`）、`TestAC2SnapshotReportsRefWithoutBlobAsAPartState`（`:507`）；本腿另跑一把尺：三枚新测试文件里 `t.Skip`／`testing.Short` **零命中**＝不是靠跳过装绿〔**我复认过**〕。
 - 零命中尺的射程＝6 枚表面（回执/audit/slog/快照/ledger 行/数据根全文件）＋两枚正控：实现件 §5-3 自陈第一版漏了 ledger 那一面、后来补进尺与正控——**这条"读数分两发"的自暴我照收，且它恰是本格能被判成立的前提**（少了 ledger 那一面，AC#2 的"持久 sink"就没尺）。
-- 尺有牙齿〔**我没复认，照录前腿**〕：`mutation-M3.txt`——种真值进产物路径 ⇒ `TestAC2CredentialSentinelAppearsInNoArtifact` **红**、同批 `TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere` **绿**＝尺看得见东西；`mutation-M4.txt`——种一枚把凭据键声明进共用封套的类型 ⇒ `TestAC2SharedEnvelopeCannotCarryTheCredentialValue` 与 `TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope` 双双指名红。⇒ 本腿在 §3 跑 **V-2** 自己复认其中一发（这是 AC#2 判语唯一缺的那一发）。
+- 尺有牙齿〔**我复认过（本腿 §3 V-2）**〕：本腿在**产码**里把凭据值逐字接进回执那一行（`panel_config_store.go:277` 的 `res.Note`）⇒ 常驻用例 `TestAC2CredentialSentinelAppearsInNoArtifact` **红**，红句点名表面是 `receipt`、报两枚命中（字面哨兵那一枚＋`sk-` 形状那一枚），⛔ 不打印值；同发常驻正控 `TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere` **绿**；还原后两枚同绿。⇒ "零命中不是因为尺瞎"这一条本腿自己抓到了。前腿那两发（`mutation-M3.txt` 种进产物那一发、`mutation-M4.txt` 把凭据键声明进共用封套 ⇒ `TestAC2SharedEnvelopeCannotCarryTheCredentialValue` 与 `TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope` 双双指名红）〔**我没复认，照录前腿**；种法两枚都没记，见 §3 末表〕。
 - 洗红的那一枚对账门〔**我复认过（读数在 §2）**〕：`internal/panel` 整包里 `TestComposerContractTypesMatchFrontend` 与 `TestApprovalCardViewJSONKeysMatchFrontendTypes` 红，红句逐字是 Go 侧 emit 的键集里那两枚新键"interface ComposerState does not declare"＝**双向对账门在界面侧补声明之前必然差一枚**。⚠ 这不是"实现者放宽断言"——本腿核到那两枚门的断言原文在 `0d87a681` 里**一字未动**（`git show --numstat` ⇒ `composer_test.go` 零改动、`composer_dispatch_test.go` 只 2/1 行的签名调用点）。本格两栖，Go 半枚做不到 self-green，实现件 §6-4 已具名交回。
 
 ### AC#3 —— 只走一枚凭据存储、不落明文、不新增回显方法
@@ -141,7 +141,7 @@
 - 落点〔**我复认过**〕：`internal/config/settings.go:228-232` 那一发 `if err := validate(candidate); err != nil` **在** `:242` 的 `m.mergeWrite` **之前**，且校验对象是"这发写会产出的那枚 base"；拒绝路径的错误句逐字带 `config.toml is unchanged`。这与票面 AC#11-3 指定的落点（新导出 setter 内、进 `mergeWrite` 之前）一字不差。
 - ⛔ 没改 `mergeWrite` 本体（`internal/config/writeguard.go` 不在 15 枚路径名册里，尺同 AC#5）；⛔ 没放宽任何断言。
 - 前提复认〔**我复认过**〕：`grep -n "validate" internal/config/writeguard.go` ⇒ 本腿现跑**零命中**＝票面 AC#11-3 那句"校验今天不在这条写路径上"在 HEAD 仍成立，所以 AC#7 是真缺口、真补上了，不是"本来就有"。
-- 用例＋正控〔**我没复认，照录前腿**〕：`roster-config-panel-248.txt` ⇒ `TestAC7InvalidValueLeavesTheFileByteIdentical` 顶层＋6 枚子用例（明文密钥塞进引用位／负上下文档／负价格／目录里没有的 chat_model／文件没声明的 provider／provider 目录里没列的 model）逐名 PASS；`mutation-M2.txt` ⇒ 动掉校验闸门后 `internal/config` 里 `TestAC7*` 与 `TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure` 指名红。⚠ 同一发里 `cmd/wisp` 的 `TestAC7InvalidSettingsValueIsRefusedBeforeTheFile` **仍然 PASS**——本腿**自己重跑那一发**并把它记成判语（§3 V-1）：若复认成立，结论是"`cmd/wisp` 那枚 AC7 用例不吃 `internal/config` 的闸门"＝两枚同名用例的守卫视野不同，本格判语要写清是哪一枚在守磁盘。
+- 用例＋正控〔**我复认过（本腿 §3 V-1）**〕：本腿自己把 `settings.go:230` 那枚 `validate()` 闸门换成永不成立的判据，量到的形状**比前腿那发更细**：`TestAC7InvalidValueLeavesTheFileByteIdentical` 六枚子用例里**只有两枚转红**——`plaintext_credential_in_the_reference_field` 与 `chat_model_that_is_not_in_the_catalog`（红句逐字 "was accepted into config.toml"／"AC#7's gate did not run"），另外四枚（负上下文窗、负价格、文件没声明的 provider、provider 目录里没列的 model）**仍然绿**＝那四类由 setter 自己的字段级检查拦、不靠 `validate()`。同发 `TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure` 转红。⇒ 本格的诚实口径是：**"落盘前过同一套 `validate()`"这条判据成立且它不是摆设（两类非法值只有它拦得住）**，但"六发非法值磁盘不变"这句话的守门人是**两层**（字段级检查＋`validate()`），不是一层。⚠ 同一发里 `cmd/wisp` 的 `TestAC7InvalidSettingsValueIsRefusedBeforeTheFile` **仍 PASS**＝两枚同名用例视野不同，**守磁盘那一格的是 `internal/config` 那枚**；这一点本腿复认到并写在这里，前腿 `mutation-M2.txt` 的读数与本腿同形（照录，见 §3）。还原尺痕与逐名终态在 §3。
 
 ### AC#8 —— 回执带生效档；不许出现"保存即生效"；"要重启"要到页面可见面
 
@@ -154,8 +154,7 @@
 ### AC#9 —— 宿主在、内容不在（embed 之后页面产物真存在）
 
 **判语：判不了（本格在本编队的禁令面之外，按票面原文"落定前勾不了"记不成立）。**
-- 本腿唯一能给的仍是名册级事实：`frontend/dist` 只跟踪一枚占位件这一条出自票面 §2b 与实现件 §6-3，本腿**没有重跑**（`git ls-files frontend` 会列到禁令层的文件名，本件因此不引其输出）。
-- ⛔ 本腿不据"能构建"（§2 build rc=0）反推"有内容"——票面 AC#9 原文就禁止这么读。
+- 本腿唯一能给的仍是**名册级**事实（页面产物那一层的跟踪名册里只有一枚占位件），且这一条**本腿没有重跑**——那把尺会列出禁令层里的文件名，所以本件连它的输出都不引。⛔ 本腿不据"能构建"（§2 build rc=0）反推"有内容"——票面 AC#9 原文就禁止这么读。
 - 归口：谁把页面产物填上没落定之前这一格勾不了（票面 AC#9 同判）。
 
 ### AC#10 —— 常驻腿吃不吃 `[risk]` 那两项：接上、或写明是常量
@@ -199,12 +198,33 @@
 **248 自己那批用例的逐名终态（本腿自跑，非照录）**
 
 - `internal/config` 整包：`ok 0.842s`（零 FAIL、零 SKIP）。
-- `internal/panel` 里 248 那 11＋2 枚：本腿 §3 的 V-3 那一发顺带跑过名册；逐名 PASS 的前腿读数在 `probes/248/v1b/roster-config-panel-248.txt`〔照录前腿，本腿只复认了 `TestPlantedGrantWiringGoesRedInASnapshot` 与 248 名册中的一部分〕。
-- `cmd/wisp` 里 248 那 9 枚：在本腿整包 `ok` 那一发里全部跑到（rc=0 蕴含零 FAIL）。
+- `internal/panel` 里 248 那 11 枚顶层＋2 枚子用例：**本腿自己跑过名册**（`-run 'TestAC1|TestAC2|TestAC8' -count=1 -v`，11:12:26，取数件 `panel-248-roster-v1c.txt`）⇒ **11 枚 `--- PASS`、零 FAIL、零 SKIP**，含 `TestAC8ReceiptNamesTheTierAndNeverClaimsLiveSave` 与三枚 `TestAC2*`（本腿第一次那发把三枚 `TestAC2*` 截在了 `head` 之外，所以本腿重跑了一次逐名数过＝11）。前腿同批名册在 `probes/248/v1b/roster-config-panel-248.txt`〔**与本腿同名同终态**，本腿复认成立〕。
+- `cmd/wisp` 里 248 那 9 枚：本腿逐名跑了 5 枚（`V2-restored-ctrl.txt`，带 `-v`：哨兵零命中／常驻正控／AC3 单一存储／AC1 端到端／AC7 落盘前拒），**全 PASS、零 SKIP**；余 4 枚只在那一发**不带 `-v`** 的整包 `ok 177.139s` 里跑到——⚠ 那把尺**只证零 FAIL，不证零 SKIP**（Go 在有跳过时同样打 `ok`），本腿为此现量过：`grep -c '^=== RUN'` 在那件里＝**0**、`--- SKIP`＝0，两枚都是"没采到"而不是"零枚跳过"。⇒ 那 4 枚的"未 SKIP"本腿**没有**凭据，只有"没 FAIL"的凭据；本腿不去把 `ok` 读成"逐名跑过且真断言了"。
 
 ## 3. 变异清单
 
-本腿只种"判语所缺的那几发"（⛔ 不把 M1–M6 重跑一遍）。前两枚腿入库的 `mutation-M*.txt` 只留读数、没留种法，所以本腿自己重种的三发具名 V-1／V-2／V-3；照录前腿的每一发在末尾单列。
+> 本腿只种"判语所缺的那几发"（⛔ 不把 M1–M6 重跑一遍——那是前两枚腿的死因）。四发都留"还原后 `git diff` 该文件为空"的尺痕；取数件同名放在 `.scratch/wisp/probes/248/v1c/`。
+> ⛔ 四发变异**零提交**：每发跑完立刻 `git cat-file blob HEAD:<path> > <path>` 还原；交件前最后一把尺＝`git status --porcelain -- cmd internal tools` **0 行**（在下面"收尾尺痕"那条）。
+
+| # | 种在哪（文件:行） | 种法（一句话） | 指名红的用例与红句 | 还原尺痕 | 本格判语的哪一句靠它 |
+|---|---|---|---|---|---|
+| **V-1** | `internal/config/settings.go:230` | 把 AC#7 那枚 `validate(candidate)` 闸门换成永不成立的判据（⛔ 不删别的行） | `TestAC7InvalidValueLeavesTheFileByteIdentical` **只红两枚子用例**：`plaintext_credential_in_the_reference_field`、`chat_model_that_is_not_in_the_catalog`（红句逐字"was accepted into config.toml"／"AC#7's gate did not run"）；另两枚同族：`TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure` 红。**四枚子用例仍绿**（负上下文窗、负价格、未声明的 provider、目录里没有的 model）＝那四类由 setter 自己的字段级检查拦，不靠 `validate()`。⚠ 同发里 `cmd/wisp` 的 `TestAC7InvalidSettingsValueIsRefusedBeforeTheFile` **仍 PASS** | `git diff --numstat`＝**0 行**；还原后 `-run 'TestAC7\|TestAC11MultiFieldSave' ./internal/config` ⇒ **ok** | AC#7 的"闸门真在写之前、且它拦得住东西"＝〔我复认过〕；同时把"哪两类只有它拦"这条本腿自己量到的射程写进 AC#7 判语 |
+| **V-2** | `cmd/wisp/panel_config_store.go:277`（`StoreCredential` 的 `res.Note`） | 把凭据值**逐字接进回执那一行**（＝一条真实的产码泄漏形状，不是测试输入） | `TestAC2CredentialSentinelAppearsInNoArtifact` **红**：`the credential value reached an artifact (2 hits)`＋`leak surface: receipt matches sk-[A-Za-z0-9]{12,}`／`leak surface: receipt matches <canary-redacted>`（红句只报尺与表面，⛔ 不打印值）；同发常驻正控 `TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere` **PASS** | `diff-lines=0`；还原后两枚用例＋AC1/AC3/AC7 共 5 枚 **全 PASS**（`V2-restored-ctrl.txt`） | AC#2 的"零命中尺看得见东西"＝〔我复认过〕；⛔ 前腿 `mutation-M3.txt` 的种法本腿仍然不知道，那一发不署我的名 |
+| **V-3** | `internal/panel/bridge.go:68`（同一枚 const 块） | 种一枚守卫不认的路由常量 `MethodConfigFoo = "config.foo"`（⛔ 不动 `knownComposerMethod` 的 case 列表） | `TestPlantedGrantWiringGoesRedInASnapshot` **红**：`l2_grant_boundary_test.go:2208: plant B has no anchor … declared Method* constant MethodConfigFoo is absent from the guard's case list: a route that exists but is never asked of the guard` | `git diff -- internal/panel/bridge.go` **空**；还原后同一条尺 **ok 0.266s** | AC#1 里 J1 那枚**能力形锚的正控**＝〔我复认过〕；与前腿 `mutation-M6b-msg.txt` 的红句逐字同形（＝前腿那发读数本腿认可为真，但署名各归各） |
+| **V-4** | `internal/panel/config_handlers.go:122-123`（`fs.` 那一支的理由句） | 把"点名该键真正住在哪"那句换成一句光秃秃的"该字段不可写" | `TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg` **红**：`config_route_248_test.go:236: refusal for "fs.allowed_dirs" does not name where that key does live: … 属于 fs. 族，本路由不写它：该字段不可写`；同发另两枚（`TestAC1FieldTableCarriesNoApprovalVocabulary`／`TestAC1SelectorAndEmptyValueRefusals`）**绿** | `diff-lines=0`；还原后 `-run 'TestAC1\|TestAC2\|TestAC8' ./internal/panel` ⇒ **ok** | AC#1 的"负向配正控、且拒写得说出去哪儿"＝〔我复认过〕（这一发同时把前腿 `mutation-M5.txt` 那发红句复现到逐字同形） |
+
+**收尾尺痕（交件前一把，逐字）**：`git status --porcelain -- cmd internal tools` ⇒ **0 行**；本腿全程⛔未 commit 任何产码/测试文件（尺＝`git log --oneline` 里本腿那几枚的 pathspec 只有 `docs/evidence/s1/248-settings-write-path-v1.md` 与本腿台件目录）。
+
+**照录前腿、本腿没复跑的那几发（⛔ 不署我的名，具名列出）**
+
+| 前腿件（`probes/248/v1b/`） | 它记到的读数（一句话） | 本腿为什么没复跑 |
+|---|---|---|
+| `mutation-M1.txt`＋`mutation-M1-restored-ctrl.txt` | 种在 `bridge.go` 的一发：`internal/panel` 4 枚红＋`internal/config` ok；`cmd/wisp` 那一发红的是 `TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink`，**还原后红的是另一枚 `TestAC1ResidentLegInstallsItsLogListenerOnDisk`** | ⚠ 这一对本腿有用但不是任何一格的凭据：它说明**还原前后红的不是同一枚常驻用例**＝那一族是时序抖动，与 §2 里 `cmd/wisp` 整包"前腿红、本腿绿"互相印证。⛔ 且它没记种法，本腿不据此判任何格 |
+| `mutation-M4.txt` | 把凭据键声明进共用封套那一形 ⇒ `TestAC2SharedEnvelopeCannotCarryTheCredentialValue` 与 `TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope` 双双指名红 | AC#0/AC#3 那一维本腿另有凭据（名册＋常量表）；这一发的成本是再编译两包，收益不抵 §4 的时限 |
+| `mutation-M6a.txt` | 把守卫名册"读短"那一发 ⇒ `:2312` 报"passing for the wrong reason"（能力形锚的**另一侧**牙齿） | 与本腿 V-3 是同枚锚的两个方向；V-3 已足够支撑 AC#1，另一向照录不重跑 |
+| `rulers-*.txt`／`cmdwisp-full.txt`／`roster-config-panel-248.txt` | 见 §1/§2 逐条标注 | 四把尺与两包整包本腿**全部自己重跑过**（§2）；`roster` 那枚里本腿复认了 `internal/panel` 与 `cmd/wisp` 两侧 248 用例名册（本腿自跑读数在下面这条） |
+
+**本腿自跑的 248 用例名册（不是照录）**：`internal/panel` ⇒ **11 枚顶层＋2 枚子用例全 PASS、零 SKIP**（`panel-248-roster-v1c.txt`，11:12:26）；`cmd/wisp` ⇒ 5 枚指名 PASS（`V2-restored-ctrl.txt`，含端到端那枚 `TestAC1InboundLegAnswersSettingsRouteEndToEnd`），另 9 枚整包在本腿 `ok 177.139s` 那一发里全跑到；`internal/config` ⇒ 整包 `ok 0.842s`（前腿逐名 PASS 名册 10 枚含 6 枚子用例，本腿复认同名册）。
 
 ## 4. 退回与否
 
@@ -235,12 +255,12 @@
 2. **AC#6 里"假报"这个定性可能过重**。实现件 §0 自己写了那枚腿是**死腿代提**（`b644d310` 的标题逐字含"死腿收尾代提"），它 §4 的占位更可能是"没来得及写"而不是"写了假的"。但 §7 那句"四数在 §4（build/vet/d22scan/gofumpt 全 rc=0）"是**一句主动陈述**，且与两腿独立读到的 rc≠0 相矛盾——本腿按盘面事实记"假报"，若编排者改记"未完成"，**AC#6 不成立本身不变**，变的只是要不要在台账里挂它一笔。
 3. **4 枚 `internal/panel` 指名红的归因**，是我这轮最可能被翻的一条判语。我的凭据是三条：① 本腿 HEAD 与 v1b 的 `580d6153` 之间**零动 prod**，两枚 HEAD 同名册（与 198/155 那批无关）；② 红句自己报的原因是两界声明面／样式源／设计层令牌文件此刻在工作树里处于已删状态（`git status` 名册可见那几枚是 ` D`，不是本腿读了它们的内容）；③ 独立前史——`docs/evidence/s1/181-rewrite-account-r2.md:223`（该文件首枚提交 `5d619b4f`，2026-09-28）就把 `TestComposerContractTypesMatchFrontend`／`TestPanelColourLiterals…`／`TestC21DesignTokensFourWayAgree` 三枚**逐名照实记成红**，早于 `0d87a681` 五天，票 145-r3／188 同记。**我可能错的点**：我今天这 4 枚里第 4 枚（`TestApprovalCardViewJSONKeysMatchFrontendTypes`）不在 09-28 那枚名册里，且第 1 枚的红句今天**多列了本票新增的两枚键**——也就是说本票**让一枚本来就红的门更红**（红的名册没变，红的清单变长）。如果编排者读票面 AC#6 的意思是"交件时终态必须 rc=0"，那我这条归因救不了 AC#6，AC#2 的"附条件"会升级成整片退回。
 4. **`cmd/wisp` 那两枚指名红的"时序争用"归因我只部分站得住**。前腿 `248-v1b` 的整包跑（`cmdwisp-full.txt`，HEAD `580d6153`，10:38–10:42）红两枚：`TestTicket223HandEditedFsLooseningCostsAnL2Card`／`TestAC14GoSideEvalPushReachesThePage`，它另有一发隔离跑（`cmdwisp-iso-ac14-223.txt`）两枚都 PASS。**本腿自己在 HEAD `6bcb934a` 上重跑整包那一发是 `ok 177.139s`、rc=0**（§2）⇒ 我复认到"这两枚在整包里今天不红"，也就复认了"它们是争用/时序那一族，不是稳定红"。⚠ 我**没有**拿到"同一时刻、同一负载下整包红＋隔离绿"的同发对照（那要把整包跑两遍，超预算），也**没有**指认是谁抢的 CPU。⇒ 若下一枚腿在整包里又采到这两枚红，本腿这句"已复认"要退回成"未定"。
-5. **前腿那六发变异我只照录了读数、没照录到种法**（`probes/248/v1b/mutation-M*.txt` 通篇只有时间戳＋终态名册，没写改了哪一行）。⇒ 若某一发其实种在了测试自己的输入上（＝正控打在纸面上），我照录那一格就站不住。本腿自己重种的三发（§3 V-1/V-2/V-3）就是为把这个洞填掉；**如果 V-2 复认失败，本腿当场把 AC#2 从"附条件成立"降为"不成立"**，不等别人来纠。
+5. **前腿那六发变异我只照录了读数、没照录到种法**（`probes/248/v1b/mutation-M*.txt` 通篇只有时间戳＋终态名册，没写改了哪一行）。⇒ 若某一发其实种在了测试自己的输入上（＝正控打在纸面上），我照录那一格就站不住。本腿自己重种了四发（§3 的 V-1/V-2/V-3/V-4）把**四格判语所依赖的正控**换成自己的读数，其中 **V-4 复现出与前腿 `mutation-M5.txt` 逐字同形的红句、V-1 与前腿 `mutation-M2.txt` 同终态（且本腿量得更细：只有 6 枚子用例里的 2 枚吃 `validate()`）**⇒ 那两发前腿读数本腿认可为真。⚠ 仍**没复现**的三发：`M3`（种进产物）、`M4`（把凭据键声明进共用封套）、`M6a`（把守卫名册读短）——前两发的结论本腿另有 V-2 与名册尺顶着，`M6a` 那一向（锚的另一侧牙齿）本腿**只有前腿的读数**，AC#1 里我把它单列成〔照录前腿〕。
 6. **AC#1 的"判据一律问能力、不许扫注释词面"我是按名册＋红句形状判的，没逐枚读完 11 枚用例的断言原文**。其中 `TestAC1FieldTableCarriesNoApprovalVocabulary` 名字像词面型；本腿采它的理由是 `mutation-M5.txt` 那发红句报的是"某枚锁定族字段没说出真正住在哪"（能力形），以及同批 `TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg` 断言的是拒写＋处理器调用计数。⛔ 如果那枚"审批词汇"用例其实只是 `strings.Contains(常量表)` 的注释扫描，AC#1 的这句判语要改写成"除一枚外皆问能力"。
 7. **AC#11 我采信了"回执＝文件前后差"的宽度**（实现件 §5-5 自暴：第三方同一瞬间的改动也会被列进来）。我采它的理由＝票面 AC#11-2 点名要 `diffKeyPaths` 那一族的"实际落盘键路径"。**我可能错的点**：若编排者把那句读成"必须等于本次所有权"，AC#11 要改判，且改法是把 `written` 与 `ownedKey` 求交——而那恰恰是票 226 反对的方向，所以我认为这一读法不成立，但它是**我的读法**。
 8. **AC#10 我用"不成立·挂账"可能比票面想的重**。票面自己写了本格"只许两选一"，而选形那一半是编排者 10-01 12:0x 明令"本轮不裁"的。⇒ 严格讲这一格今天是**尚未生效**而不是"交付失败"。本腿仍写"不成立"，是为了让下一枚腿不去勾它；如果台账更想要"挂账不判"这一枚词，改词不改账。
 9. **§0c 那把 blob 尺里 `run.go` 一枚 DIFF 我归给票 198**，凭据是前腿 §0a 记的"`0d87a681..HEAD` 里动过被测三包的只有 `613606c0`"＋本腿自己现读的 `run.go:431/:710` 两枚锚仍在。**我可能错的点**：本腿没有逐枚读 `613606c0` 的 diff 内容，也没排除"第三枚腿在同一路径上的增量"。这不牵动判语（判语用的是 HEAD 现读），只牵动"这句归因"的措辞。
-10. **AC#2 里"没有顶层第五键"这一条我只算部分复认**：我用的是对账门的红句（它逐名列出 Go 侧 emit 的键集，里面没有第五枚顶层键）＋快照键名在 `composer` 段内出现。⛔ 我没有把 `composer.go` 的构造分支逐行读完，也没跑 §3 里那发"未接 reader ⇒ unknown/false"的用例。
+10. **AC#2 的"没有顶层第五键"本腿改成〔我复认过〕，但留下窄窄的一条没盖住**：本腿逐行读了 `composer.go:268-269`（两枚 tag 在 `ComposerState` 里）＋`:273/:288`（无 reader ⇒ `CredentialUnknown`）＋`pump.go:260/268-269`（reader 为 nil 就不填那两枚）。⛔ 本腿**没有单独跑**"未接 reader ⇒ `credentialKnown:false`"那一发的逐名终态——它的断言原文在 `cmd/wisp/panel_config_248_test.go:544`（本腿读过那三行），而那枚用例（`TestAC2SnapshotReportsRefWithoutBlobAsAPartState`）只在本腿**不带 `-v` 的整包 `ok`** 那一发里跑到 ⇒ 本腿对它只有"没 FAIL"的凭据、没有"逐名 PASS 且未 SKIP"的凭据（口径见 §2 末段那两条）。
 
 ## 6. 判不动的地方
 

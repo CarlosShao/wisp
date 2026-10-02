@@ -1,0 +1,6 @@
+2026-10-02T11:18:15+08:00
+=== restore ruler ===
+diff-lines=0
+(empty = 全还原)
+ok  	github.com/CarlosShao/wisp/internal/panel	0.039s
+2026-10-02T11:18:16+08:00

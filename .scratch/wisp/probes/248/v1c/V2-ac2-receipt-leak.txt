@@ -1,0 +1,11 @@
+2026-10-02T11:14:55+08:00
+=== V-2: credential value appended to the receipt note in panel_config_store.go ===
+    panel_config_248_test.go:191: the credential value reached an artifact (2 hits); the artifacts are not printed here on purpose
+    panel_config_248_test.go:195: leak surface: receipt matches sk-[A-Za-z0-9]{12,}
+    panel_config_248_test.go:195: leak surface: receipt matches <canary-redacted>
+--- FAIL: TestAC2CredentialSentinelAppearsInNoArtifact (0.06s)
+--- PASS: TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.210s
+FAIL
+2026-10-02T11:15:03+08:00

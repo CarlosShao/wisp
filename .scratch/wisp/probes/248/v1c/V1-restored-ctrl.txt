@@ -1,0 +1,6 @@
+2026-10-02T11:14:01+08:00
+=== restore ruler for settings.go ===
+diff-lines=0
+=== restored control ===
+ok  	github.com/CarlosShao/wisp/internal/config	0.061s
+2026-10-02T11:14:02+08:00

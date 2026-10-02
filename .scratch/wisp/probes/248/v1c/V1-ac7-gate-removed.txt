@@ -1,0 +1,20 @@
+2026-10-02T11:13:13+08:00
+=== V-1: AC#7 validate gate removed from settings.go writeOneKey ===
+    settings_248_test.go:94: a plaintext credential value was accepted into config.toml: [llm.providers.deepseek.api_key_ref（写后无法复读文件，键路径以本 setter 所持的键为准）]
+--- FAIL: TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure (0.02s)
+    settings_248_test.go:143: the write was accepted (reported [llm.providers.deepseek.api_key_ref（写后无法复读文件，键路径以本 setter 所持的键为准）]): AC#7's gate did not run
+    settings_248_test.go:143: the write was accepted (reported [llm.roles.chat.model（写后无法复读文件，键路径以本 setter 所持的键为准）]): AC#7's gate did not run
+--- FAIL: TestAC7InvalidValueLeavesTheFileByteIdentical (0.03s)
+    --- FAIL: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.01s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price (0.00s)
+    --- FAIL: TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog (0.01s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.079s
+FAIL
+config rc=0
+--- PASS: TestAC7InvalidSettingsValueIsRefusedBeforeTheFile (0.02s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.080s
+2026-10-02T11:13:19+08:00
