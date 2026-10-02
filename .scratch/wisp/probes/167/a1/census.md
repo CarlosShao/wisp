@@ -94,7 +94,7 @@ census(114-a2)：§1 调用者名册＋§2 逐格三态交齐——ParseComposer
 
 | 问 | 读数 |
 |---|---|
-| ① Go 侧生产者 | **现场记录：非测试生产者，在跑**。恢复边界 `internal/observe/goroutine.go:296` 一带的 `recover()` 把 panic 变成结构化记录 `internal/observe/goroutine.go:153-161` `PanicEvent{Goroutine,Owner,RootID,Class,Recovered,Stack,At}`，默认落 `internal/observe/goroutine.go:167-177` `defaultPanicSink` → `slog.Error("goroutine panic recovered", …)`；产码里这条 slog 会进滚动 JSONL 文件（`cmd/wisp/logsink.go:144` `installLogSink`，产码调用者 `cmd/wisp/models.go:284`；目录由 `cmd/wisp/logsink.go:87` `logSinkDir` 决定）。⚠ **专门给"崩溃现场"的那枚钩子没人接**：`internal/observe/goroutine.go:241` `Registry.SetPanicSink` 的调用者**只有 `internal/observe/goroutine_test.go:117` 一枚**（尺：`grep -rn "SetPanicSink\|PanicSink\|PanicEvent" cmd internal tools --include=*.go`，`cmd/` 下**零命中**）⇒ 覆盖不了默认 sink 的自定义出口今天**只在测试里存在**。**"禁用插件后重启"：那一枚能力盘上没有**——`internal/plugin/` 只有 `doc.go`＋`disposal.go` 两枚文件，`doc.go` 末段逐字写着 `DEFERRED(manifest/goja): implemented by tickets 50 (Tier-1) and 51 (Tier-2 goja). This ticket implements only DisposalScope`；库里那枚 `enabled` 列确实存在（`internal/memory/schema.go:114` `enabled INTEGER NOT NULL DEFAULT 1`），DAO 也在（`internal/memory/dao_misc.go:188` `UpsertPluginState`／`:222` `PluginStateByID`／`:243` `ListPluginStates`），⚠ **三枚 DAO 的产码调用者＝零枚**（尺：`grep -rn "UpsertPluginState\|PluginStateByID\|ListPluginStates" cmd internal tools --include=*.go | grep -v "_test.go:" | grep -v "internal/memory/dao_misc.go"` ⇒ 空）。**自救指令文本：无生产者**（`grep -rn -i "self.?rescue\|fatal-recovery\|disablePlugins" cmd internal tools` 零命中）。 |
+| ① Go 侧生产者 | **现场记录：非测试生产者，在跑**。恢复边界 `internal/observe/goroutine.go:296` 一带的 `recover()` 把 panic 变成结构化记录 `internal/observe/goroutine.go:153-161` `PanicEvent{Goroutine,Owner,RootID,Class,Recovered,Stack,At}`，默认落 `internal/observe/goroutine.go:167-177` `defaultPanicSink` → `slog.Error("goroutine panic recovered", …)`；产码里这条 slog 会进滚动 JSONL 文件（`cmd/wisp/logsink.go:144` `installLogSink`，产码调用者 `cmd/wisp/models.go:284`；目录由 `cmd/wisp/logsink.go:87` `logSinkDir` 决定）。⚠ **专门给"崩溃现场"的那枚钩子没人接**：`internal/observe/goroutine.go:241` `Registry.SetPanicSink` 的调用者**只有 `internal/observe/goroutine_test.go:117` 一枚**（尺：`grep -rn "SetPanicSink\|PanicSink\|PanicEvent" cmd internal tools --include=*.go`，`cmd/` 下**零命中**）⇒ 覆盖不了默认 sink 的自定义出口今天**只在测试里存在**。**"禁用插件后重启"：那一枚能力盘上没有**——`internal/plugin/` 只有 `doc.go`＋`disposal.go` 两枚文件，`doc.go` 末段逐字写着 `DEFERRED(manifest/goja): implemented by tickets 50 (Tier-1) and 51 (Tier-2 goja). This ticket implements only DisposalScope`；库里那枚 `enabled` 列确实存在（`internal/memory/schema.go:114` `enabled INTEGER NOT NULL DEFAULT 1`），DAO 也在（`internal/memory/dao_misc.go:188` `UpsertPluginState`／`:222` `PluginStateByID`／`:243` `ListPluginStates`），⚠ **三枚 DAO 的产码调用者＝零枚**（尺：`grep -rn "UpsertPluginState\|PluginStateByID\|ListPluginStates" cmd internal tools --include=*.go | grep -v "_test.go:" | grep -v "internal/memory/dao_misc.go"` ⇒ 空）。**自救指令文本：无生产者**（尺：`grep -rnE "self.?rescue|fatal-recovery|disablePlugins|自救" cmd internal tools --include=*.go` ⇒ 现量 **0 行**；我第一版把这条写成 BRE 的 `\|` 拼法，那把尺的 `?` 不是量词，已在本节按 ERE 重跑）。 |
 | ② 到面板的通路 | **无字段**。`Snapshot`／`ComposerState` 里没有任何崩溃/上次退出维度（名册见 1.1②）；`PumpSources` 亦无。最近的一枚"给人读的诊断出口"是另一条 CLI：`cmd/wisp/doctor.go`（构建链自检，逐行 `pass/fail/info`，`main.go:47` 那条 usage 行之外另有命令表），它**不吃运行时快照、也不落"上一次为什么没了"**。 |
 | ③ 动作方向 | **无入向方法**（6 枚名册里没有）。"禁用插件后重启"若将来要做，写面至少跨三枚：`internal/plugin`（装不存在的清单加载器，票 50/51）＋`internal/memory/dao_misc.go`（那三枚没人调的 DAO）＋配置侧的禁用叶；而 `internal/panel/config_handlers.go:108` `lockedFieldFamilies` 把 `"plugins."` 逐字列进**设置页永不许写**的族名册 ⇒ **今天连"从面板禁用一枚插件"的路都是明令封着的**。 |
 | ④ 判据 | **正向钉：只钉"panic 变成结构化记录"这一格，且仅在包内**——`internal/observe/goroutine_test.go:116-118` 造了一枚自定义 sink 收 `PanicEvent`（我读到定义为止，未跑）。⚠ **没有一枚用例把"记下来的那发抵达用户可复制的地方"钉住**，也没有一枚钉"自救指令必须存在"；`cmd/wisp/logsink_test.go` 存在（在列，见 `cmd/wisp` 文件清单）但我**未读到它的用例名册**，所以本表不引用它＝§5 那条判不动。**"能禁用插件重启"今天无任何判据，也不该有**（票面 AC#6 自己写了那一格未裁）。 |
@@ -118,11 +118,59 @@ census(114-a2)：§1 调用者名册＋§2 逐格三态交齐——ParseComposer
 
 ## 4. 我可能判错的条目
 
-（后续 commit）
+> 每条附「如果错了后果」。本节是本腿的自我对抗面，不是免责声明：判错的代价我写成可核的动作。
+
+1. **"零调用者"这类断言全部靠 `grep` 的形状匹配，接口值／函数值／方法表能溜过去。**
+   射程内我扫的是名字本身：`Steer`／`.History()`／`TotalTokens(`／`RunningTask.Cancel`／`Control:`／`UpsertPluginState|PluginStateByID|ListPluginStates`／`SetPanicSink`。若某处把 `Loop.Steer` 取成一枚 `func(string) bool` 字段、或经接口方法表分派，我的尺看不见。
+   **如果错了后果**＝§2 那行"用户消息队列＝盘上没有"里"`Steer` 调用者零枚"这一支撑是假否证，真正缺的只是把它接到面板；落地腿会去新建一条已经存在的链。**缓解**：这一枚的**另一半证据不依赖数调用者**——`cmd/wisp/resident_task_source_windows.go:411-414` 逐字在运行中拒绝第二发，那是产码里的显式分支，不是零命中。⇒ 即使 `Steer` 被我读错，**"没有面向用户的排队"仍成立**。
+
+2. **我把"分母不出包"的措辞写重了。** `cmd/wisp/run.go:1109` `agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets())` 已经**把整枚 `Budgets` 结构体递到 `internal/agent` 之外**，只是没有一格被命名为"分母"。
+   **如果错了后果**＝实现程读了我那句"没有一枚把 `.ContextWindow` 递出去"，以为要先加一层导出面，白建一处 API。**正确读法**：`Loop.Budgets()`（`internal/agent/loop.go:253`）已经是导出读口且已有 3 枚产码调用者（`run.go:1056/:1062/:1109`），**新加一字段就够，不需要新接口**。
+
+3. **占用那一枚，我列了三枚候选分子而没有替 owner 选。** `internal/agent/guard.go:132` `TokensUsed()`＝**跨轮累积**的 in+out；`internal/agent/compress.go:110` `TotalTokens(hist)`＝**当前历史**成本；`internal/agent/prompt.go:181` `Assembler.TotalTokens()`＝**段预算上限之和**（D39 那 2300 那一族，压根不是"已用"）。三枚语义互不等价，我在 §1.1 里都给了出处，但**"占用条该说哪一件"不是读数能答的**。
+   **如果错了后果**＝按"还剩多少空间"画出来的条用累积消耗做分子，会在第 8 轮显示 95% 而当下历史只有 30%（反之亦然），用户照着它决定要不要"继续"，而那条数**是假的**——这正撞票面硬约束 1"不许填个假数"。**处置**＝这一条落进 §5 第 2 项，摆给 owner 一个词。
+
+4. **分母可能永远不是用户填的那个数。** `internal/panel/config_handlers.go:60` `FieldModelContextWindow` 是目录里 per-provider+model 的可写叶，而 `cmd/wisp/run.go:1012` 读的是**解析后的** `ep.ContextWindow`；`internal/agent/budgets.go:86-87` 逐字写着 `if ctxWindow <= 0 || ctxWindow > ReferenceContextWindow { ctxWindow = ReferenceContextWindow }`，`ReferenceContextWindow = 128000`（`internal/agent/budgets.go:18`）。⇒ 目录没声明、或声明值**大于** 128000 时，缩放用的都是 128000，不是用户填的那个。
+   **如果错了后果**＝我若把这写成"分母现成"，占用条会给用户显示一个他从来没配过的分母；我若把它写成"分母是配置叶"，实现程会把 128000 当成假数。**处置**＝§5 第 2 项一并摆。
+
+5. **四"已存在"的字段名册我只对 `Snapshot`/`ComposerState`/`PumpSources` 三处核过，没有核 `internal/observe` 的 SLO 出口。** `internal/watchdog/doc.go` 逐字写着它 non-responsibility 是"no sampling backend itself (observe provides SLO plumbing)"，而 `cmd/wisp/slo_windows.go`/`internal/observe/thresholds.go` 那条 D32 资源线是**另一族占用**（内存/CPU）。票面 line 4 断言"这枚占用条的数据源就是 D32"，我在 §1.1 里按**上下文窗口**回答了这一枚。
+   **如果错了后果**＝owner 要的其实是"D32 那两枚资源数上屏"，那我这整节都答在另一枚对象上——而那一枚**已有读法**（票面 line 37 自己写"不做成本页（D32 那两个数已有读法）"⇒ 我据此判票面 line 4 那句与 line 37 自相矛盾，见 §6 第 2 项）。**缓解**：两条我都量了，编排者按对象挑。
+
+6. **新增快照字段会不会多打红一枚尺，我判不了，只能给出射程。** 我知道的：`internal/panel/pump_test.go:123`／`:291`、`internal/panel/subagent_roster_197_test.go:214`、`internal/panel/subagent_stream_197_test.go:130` 逐字钉"无 reader 的泵恰好发四枚键"（`composer,generatedAt,pending,results`），所以新字段**必须**是指针＋`omitempty` 才不动这四枚（先例＝`internal/panel/composer.go:74` `Instructions`／`:91` `Tasks`）；我也读到 `internal/panel/composer_test.go:49` 与 `internal/panel/approval_test.go:105` 那两把**双向**尺会拿 Go 的 JSON 键去对界面声明，逐键比。
+   **如果错了后果**＝落地腿加了字段、那两把尺红了，它以为是"契约变更被拦"，其实那是 `docs/reports/HANDOVER.md:467` 那张红名册里**已在册的历史红**（该节同时自述"红名册本轮不复量"、引用要带锚点并当过期）。⇒ 我不引用那四枚具体用例名作结论，改在 §5 第 1 项登记"今天还在不在，判不了"。
+
+7. **`plugin_state` 的"零调用者"不等于"禁用插件的地基缺"。** 表列在（`internal/memory/schema.go:114`）、DAO 三枚在（`internal/memory/dao_misc.go:188/:222/:243`），我把"缺"落在 `internal/plugin` 的清单加载器（`internal/plugin/doc.go` 末段具名 `DEFERRED` 50/51）。
+   **如果错了后果**＝我把 §2 那一行写重了：真实形状是"存储与 DAO 已存在、只有没人调用；缺的是插件本体"——那和"盘上没有"的下一步动作不同（前者只要接，后者要先建）。⇒ 我在 §2 那行**没有**用"盘上没有"评整枚崩溃自救，只评"自救指令文本"那一支。
+
+8. **崩溃自救这一枚我踩在编排者自己刚收回过的那同一格上。** `docs/reports/HANDOVER.md` §4.0y 第 1 笔逐字登记：编排者曾写"生产没装 panic sink ⇒ 真崩时盘上零栈"并据此立票 249，后被现量推翻（`internal/observe/goroutine.go:236` `NewRegistry` 就装了 `defaultPanicSink`、`:167-176` 带 `"stack", ev.Stack`、`cmd/wisp/logsink.go:145-162` 把默认 slog 做成"脱敏 JSONL 文件＋stderr"两路），并立了新规矩：**"'盘上没有 X'这类负向句，落笔前先读'谁产出／谁投递／谁落盘'三处；能力问题要跑一遍回答，不许靠数调用者回答"。** 我按这条规矩把 §1.5① 写成"记录已存在（产出→投递→落盘三处逐枚读到）、只有'自定义出口'与'自救指令文本'缺"，**没有**写"真崩时零栈"。
+   **如果错了后果**＝我仍可能低估了一格：`cmd/wisp/run.go:1009` 给根环路的是**私有 registry**（`observe.NewRegistry()`），`internal/tools/subagent_197.go:294` 给每个孩子又是一枚私有 registry，而 `observe.Default`（`internal/observe/goroutine.go:230`）是第三枚。三枚都在 `NewRegistry` 里装了 `defaultPanicSink` ⇒ **栈都能落盘**，但"给崩溃装一枚自定义自救出口"这件事必须**逐枚装**，只装 `Default` 会漏掉所有 agent 任务的 panic。这一条我写进 §3.5，因为它是会咬落地腿的形状。
+
+9. **我没有排除"草稿其实归界面自己管"这一支。** 禁令所限我未读 `frontend/**`，所以"Go 侧盘上没有"是我的全部读数；如果未发出文本今天由页面自己存着，那 §2 那行在 Go 侧仍成立、但**不是缺口**。
+   **如果错了后果**＝编排者按我这张表派一枚 Go 侧草稿落地腿，做出来的东西和页面自己那套**各存一份**，用户看到的"发不出去的那条"会有两个来源——这正是票面 AC#5 要防的"用户以为丢了半段话"的镜像。**处置**＝归 §5 第 3 项，只有 owner/他那枚界面 agent 能一句话定。
 
 ## 5. 判不动的地方
 
-（后续 commit）
+> 甲＝谁补得上、怎么补；乙＝补不上，明写不做。
+
+1. **`internal/panel` 那四枚契约/令牌尺今天红不红。** 判不了的两条腿都硬：我不能跑 `go test`（`198-r1`／`33-r8b` 此刻在飞；本腿交件时两者都已落树，但我仍**没有**跑），也不能读 `frontend/src/lib/panel.ts`（两层禁令）。唯一在册读数是 `docs/reports/HANDOVER.md:467`（§4.0v）那张逐名表，它自己写着"引用要带口径＋锚点 sha"、且同节另一处写"红名册本轮不复量"⇒ **当过期**。
+   **甲**＝编排者在编队空时整包复跑（口径已在 `docs/reports/HANDOVER.md:161` 那条：带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/...`，**不是 `-run` 单跑**）＋逐名比红名集合，出一版带锚点的新表；这一步买到的东西＝§3.1 那一步到底会不会"多红一枚"当场可判。
+   **乙**＝不跑就不判。⇒ 本表**不**把任何"红/绿"当结论写；§3 里凡涉及那两把双向尺的地方，我都只写"射程"与"撞 `Q-51`"，不写"会红几枚"。
+
+2. **占用那枚数到底该说什么。** 三枚候选分子（`guard.go:132` 累积 / `compress.go:110` 当前历史 / `prompt.go:181` 段预算上限）与两枚候选分母（`budgets.go:54` 缩放后窗口 / `FieldModelContextWindow` 目录叶）**语义互不等价**，选哪一对是产品裁定。
+   **甲**＝编排者把一句话摆给 owner：「占用条要说的是'这一次对话还剩多少'还是'这次任务一共花了多少'？」——两支各对应一组现成读口，答完 §3.2 立刻能定形，**零新依赖边**。
+   **乙**＝不答则**不做占用那一枚**。任何腿替 owner 选一对，都是在硬约束 1 上赌一个假数。
+
+3. **常驻腿要不要真的排队。** `cmd/wisp/resident_task_source_windows.go:396-400` 把单槽写成**一条决定**并给了理由（"the loop's per-task budgets, the panel roster and the L1 window were all designed around one operator waiting on one orb, and a queue of tasks in a leg that cannot show a page would be a queue nobody can read"），不是漏。推翻它要连 `internal/agent/budgets.go:47` `MaxToolConcurrency = 4` 与名册槽位一起重算。
+   **甲**＝编排者先问"那句 'a queue nobody can read' 的前提（面板不能显示一页）今天还成立吗"——票 33 交完后它**可能已经过期**；过期成立则这一枚从"产品裁定"降级为"落地活"。
+   **乙**＝我不判这一枚。§2 那一行只登记"盘上没有"，不写"该建"。
+
+4. **`cmd/wisp/logsink_test.go` 里有没有已经钉住"panic 栈能落盘"的用例。** 文件我 `ls` 到了（在 `cmd/wisp` 清单里），但**未逐枚读它的用例名册**；按派单规矩"要引用一枚用例名必须自己读到它的定义为止"，我没读就不引用。
+   **甲**＝任何腿 `grep -n "^func Test" cmd/wisp/logsink_test.go` 再逐枚读定义（只读，不吃 CPU）。
+   **乙**＝§1.5④ 那一格维持"无（对自救指令而言）"，并且**不**把它当成"崩溃现场无人钉"的证据。
+
+5. **票面 line 4 那五枚外部路径。** `packages/client/ui-conversation/src/client/context-occupancy.ts:5,21`／`.../queue/QueueDock.tsx`／`stop-shortcut.ts`／`ui-conversation/README.md`／`apps/desktop/src/fatal-recovery.ts`——尺（**逐根分开取数**，因为这把尺的字面文本会命中票面与本文件自己）：`grep -rn "context-occupancy|QueueDock|stop-shortcut|fatal-recovery|disablePlugins"` 按根跑 `cmd:0 internal:0 tools:0 docs:0 scripts:0`，只有 `.scratch` 有命中＝**票面 line 4 那一句＋本件自己**。⇒ 这些路径在本仓无对应物。票面自己说"我读过原文／我读过接口清单"，那是**外部参考项目**，不是本仓文件。
+   **甲**＝只有 owner 或编排者能裁"要不要把那份对标转成仓内需求"；若要，请把这些路径的来源仓库/版本写进票面，否则下一程无从复核。
+   **乙**＝本腿**不**据外部形状推任何 Go 侧结论；§1/§2 的每格只引用本仓读到的 `file:line`。
 
 ## 6. 我推翻票面/派单哪一句
 
