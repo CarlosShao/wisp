@@ -1,0 +1,5 @@
+panel window is up (panel-hotkey, cold 288.6 ms, hot path 0.0 ms)
+panel window is up (test-harness, cold 196.6 ms, hot path 0.0 ms)
+panel window is up (test-harness, cold 231.2 ms, hot path 0.0 ms)
+panel window is up (test-harness, cold 735.1 ms, hot path 0.0 ms)
+panel window is up (test-harness, cold 976.8 ms, hot path 0.0 ms)

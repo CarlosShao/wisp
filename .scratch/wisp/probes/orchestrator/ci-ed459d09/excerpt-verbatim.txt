@@ -1,0 +1,71 @@
+date=2026-10-02T10:54:20+08:00  run=36956193382 head=ed459d09
+重取原日志：gh run view 36956193382 --job <id> --log ；job id 见 jobs.tsv
+
+### jobs 颜色
+110679552626	test-core	failure
+110679552676	slo-smoke	success
+110679552733	lint	failure
+110679552839	test-windows	failure
+110679552843	lint-frontend	success
+110679552847	slo-full	success
+
+### 面板窗真起来（WebView2 独立复核）
+panel window is up (panel-hotkey, cold 288.6 ms, hot path 0.0 ms)
+panel window is up (test-harness, cold 196.6 ms, hot path 0.0 ms)
+panel window is up (test-harness, cold 231.2 ms, hot path 0.0 ms)
+panel window is up (test-harness, cold 735.1 ms, hot path 0.0 ms)
+panel window is up (test-harness, cold 976.8 ms, hot path 0.0 ms)
+
+### AC#2 分位那发
+panel_host_windows_test.go:796: AC#2 appendix (head ed459d0, n=1, same-process consecutive runs):
+panel_host_windows_test.go:802:   sample  1: cold=3499.615 ms hot=40.430 ms at 2026-10-02T02:37:52Z
+panel_host_windows_test.go:808: AC#2 percentiles over 1 runs (nearest-rank): cold P50=3499.615 P95=3499.615 (budget 1500) | hot P50=40.430 P95=40.430 (budget 200)
+
+### hwnd 形状
+      1 hwnd 0x0
+      2 hwnd 0x2020E
+      1 hwnd 0x30192
+      6 hwnd 0x40232
+      1 hwnd 0x501F2
+      1 hwnd 0x70154
+
+### test-core 四数
+portable-tests.sh: four numbers (all from -v output): === RUN=1425  --- PASS=966  --- FAIL=4  --- SKIP=0
+### test-core 4 枚红名册
+TestApprovalCardViewJSONKeysMatchFrontendTypes
+TestC21DesignTokensFourWayAgree
+TestComposerContractTypesMatchFrontend
+TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+### test-windows 25 枚红名册
+TestAC14GoSideEvalPushReachesThePage
+TestAC246ResidentPipelineAsksThroughTheOneGate
+TestAListWinsWhereBothTablesHit
+TestBListDefaultDenyAndOverride
+TestCanonicalInputGainsNoSecondForm
+TestClassifyAnchorSpellingIsNotVerdict
+TestComposedGateBlocksAWriteForTwoSeconds
+TestL1VetoNeedsAChannelTheHostReallyWired
+TestPanelHostLatencyPercentilesAC2
+TestPanelHostRealWindowHopAndLifecycle
+TestPathResolverExtendedLengthPrefixAListDenied
+TestPathResolverShortNameAListDenied
+TestPathResolverUNCAListDenied
+TestResolvePerCallBudget
+TestRunPacketCarriesTheLoadedInstructionFiles
+TestSyncFallbackNotDisarmableByWeakRoot
+TestSyncFixtureFallbackAndMatch
+TestSyncSuspectFallbackIsComponentBounded
+TestSyncSuspectFallbackWhenUndetectable
+TestSyncUnverifiedRootKeepsFallback
+TestTicket101ManualSwitchSurvivesRestart
+TestTicket101SessionGrantDoesNotCrossRestart
+TestTicket101UntouchedConfigRestartsAtDefault
+TestTicket223PermissionDeniedSitsInItsOwnSentence
+TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking
+
+### gofumpt 那步的红因
+##[error].scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1: imports must appear before other declarations
+
+### staticcheck 指到冻结件那一条
+##[error]internal/observe/thresholds.go:42:2: const captureBufferLimitConversation is unused (U1000)
+staticcheck 诊断行数=56
