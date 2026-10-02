@@ -8,17 +8,26 @@
 # "Pinned: 25, resolved: 36" and killed the core step BEFORE `go test` ran - while
 # on a warm cache (every developer laptop) stderr is empty and the same code is
 # silent. AC#3 forbids shipping that as "only measurable on CI", so the shape is
-# reproduced here on demand: seventeen cases, each of which either has to go red or
+# reproduced here on demand: eighteen cases, each of which either has to go red or
 # has to stay green, and the carrier exits non-zero if any of them does the other.
 #
-# TICKET 251 ADDED THE LAST SEVEN, and they judge a different hole: `winsec_pin`
+# TICKET 251 ADDED THE LAST EIGHT, and they judge a different hole: `winsec_pin`
 # was a pin NOTHING compared - no `winsec)` branch existed, and the route CI really
 # takes (scripts/winsec-tests.sh:94) hands scripts/portable-tests.sh an EXPLICIT
 # package path, which landed in GUARD C's "nothing to pin" branch. So the same
 # carrier now also shoots the winsec tier by name, the explicit path winsec-tests.sh
 # passes, and the census tier roster, with the ticket's two seed shapes on each
 # (stdout gains a package the pin does not have / the pinned package disappears).
-# Cases 11-17 FAIL on the pre-fix bytes by design - that is this ticket's 改前必红
+# Case 18 is the counterfactual that makes the choice provable: the same seed on the
+# same pin, but with the tier scope left in the caller's DIRECTORY form, stays GREEN,
+# because a real `go list ./internal/winsec/` names the one package in that directory
+# and can never see a second one created beside it. Only the GLOB form of the tier's
+# scope puts a split into the resolved set, so the glob is load-bearing - and that is
+# a reading in this carrier, not an argument in a comment.
+# The fake go resolves its arguments the way go does when FAKEGO_SCOPE_FILTER is set
+# (scripts/testdata/portable-tests/go, added by this ticket), which is what lets case
+# 18 tell the two forms apart at all.
+# Cases 11-18 FAIL on the pre-fix bytes by design - that is this ticket's 改前必红
 # reading:  bash scripts/portable-tests-selftest.sh all /tmp/prefix.sh
 #
 # WHAT IS REAL AND WHAT IS NOT. The `go` process is scripts/testdata/portable-tests/go
@@ -362,8 +371,12 @@ fi
 
 # 11. ticket 251 AC#1's control for the new tier: --scope=winsec resolves to exactly
 #     winsec_pin. Without this the next three cases could pass for the wrong reason.
+#     FAKEGO_SCOPE_FILTER makes the fake go resolve the args the way real go does
+#     (./internal/winsec/ is ONE package; ./internal/winsec/... is the subtree), so
+#     "the pin and the resolved set differ" below is a claim about resolution, not
+#     about a file of names.
 if selected winsec-tier-clean; then
-    run_with winsec-tier-clean "$winsec_pin_file" -- --scope=winsec
+    run_with winsec-tier-clean "$winsec_pin_file" "FAKEGO_SCOPE_FILTER=1" -- --scope=winsec
     want_rc 0
     denominator_is "$winc"
     hasnt 'GUARD [ABC] -'
@@ -373,7 +386,7 @@ fi
 # 12. AC#1 + AC#2, seed '种假包名' on the NAMED tier: the tier's glob resolves a
 #     second package under internal/winsec that no pin row claims.
 if selected winsec-tier-split-goes-red; then
-    run_with winsec-tier-split-goes-red "$winsec_split" -- --scope=winsec
+    run_with winsec-tier-split-goes-red "$winsec_split" "FAKEGO_SCOPE_FILTER=1" -- --scope=winsec
     want_rc 1
     has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
     has 'Pinned: 1, resolved: 2'
@@ -386,7 +399,7 @@ fi
 #     must say the explicit list was recognised as the tier's own scope - otherwise
 #     this is just case 12 again, not the CI route being pinned.
 if selected winsec-explicit-split-goes-red; then
-    run_with winsec-explicit-split-goes-red "$winsec_split" -- ./internal/winsec/
+    run_with winsec-explicit-split-goes-red "$winsec_split" "FAKEGO_SCOPE_FILTER=1" -- ./internal/winsec/
     want_rc 1
     has 'explicit scope .*IS the winsec tier'
     has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
@@ -400,7 +413,7 @@ fi
 #     empty denominator and GUARD C had nothing to pin.
 if selected winsec-explicit-pin-gone-goes-red; then
     run_with winsec-explicit-pin-gone-goes-red "$winsec_pin_file" \
-        "FAKEGO_LIST_DROP=$winsec_path" -- ./internal/winsec/
+        "FAKEGO_SCOPE_FILTER=1" "FAKEGO_LIST_DROP=$winsec_path" -- ./internal/winsec/
     want_rc 1
     has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
     has 'Pinned: 1, resolved: 0'
@@ -456,6 +469,49 @@ if selected unknown-scope-still-hard; then
     has 'unknown --scope=winsecfoo \(known: core, windows, cli, winsec, census\)'
     hasnt 'refusing to be a green no-op'
     hasnt '^runtests\.sh: OK'
+fi
+
+# 18. AC#1's 选型凭据. The ticket offers two ways to close the hole and asks for
+#     evidence from whoever picks the second one, so here it is, as a reading instead
+#     of an argument: a MUTATED copy of the current script that pins winsec_pin on the
+#     explicit route but leaves the caller's DIRECTORY form as the scope - the literal
+#     shape of option (b). Same seed, fake go resolving like real go:
+#       real script (tier scope = ./internal/winsec/...)  -> RED,  Pinned: 1, resolved: 2
+#       mutant    (scope = the caller's ./internal/winsec/) -> GREEN
+#     because `go list ./internal/winsec/` names the one package in that directory and
+#     can never see a second one created beside it. "The tier's scope is a glob" is
+#     therefore load-bearing, not decoration - and the counterfactual is pinned here so
+#     it cannot be quietly dropped later.
+if selected winsec-explicit-glob-is-what-bites; then
+    noglob="$work/portable-tests-noglob.sh"
+    awk -v old='        scope=("$winsec_scope")' -v new='        scope=("$@")' \
+        '$0 == old { print new; next } { print }' "$script" >"$noglob"
+    touched=$(diff "$script" "$noglob" | grep -c '^<' || true)
+    printf '\n== case winsec-explicit-glob-is-what-bites: mutant replaced %s line (the scope of the explicit-path branch)\n' "$touched"
+    ran=$((ran + 1))
+    if [ "$touched" -ne 1 ]; then
+        printf '   FAIL the mutant seed took %s line(s), expected exactly 1 - this case cannot judge a' "$touched"
+        printf ' shape it did not find\n        (the explicit-path substitution moved; re-read the script, not the carrier)\n'
+        failed=$((failed + 1))
+    else
+        last_log="$work/winsec-explicit-glob-is-what-bites-real.log"
+        ( PATH="$work/bin:$PATH" FAKEGO_PIN_FILE="$winsec_split" FAKEGO_SCOPE_FILTER=1 \
+            bash "$script" ./internal/winsec/ ) >"$last_log" 2>&1
+        last_rc=$?
+        printf '   real bytes (tier scope is the glob):\n'
+        want_rc 1
+        has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
+        nshadow=$(make_shadow_root "$noglob")
+        last_log="$work/winsec-explicit-glob-is-what-bites-mutant.log"
+        ( PATH="$work/bin:$PATH" FAKEGO_PIN_FILE="$winsec_split" FAKEGO_SCOPE_FILTER=1 \
+            bash "$nshadow/scripts/portable-tests.sh" ./internal/winsec/ ) >"$last_log" 2>&1
+        last_rc=$?
+        printf '   mutant (same pin, caller keeps the directory form) - the counterfactual:\n'
+        want_rc 0
+        hasnt 'GUARD C - scope mode=winsec'
+        has '^runtests\.sh: OK'
+        printf '   (logs: %s / %s)\n' "${last_log%-mutant.log}-real.log" "$last_log"
+    fi
 fi
 
 if [ "$only" != "" ] && [ "$ran" -eq 0 ]; then

@@ -17,6 +17,9 @@
 # Contract, all driven by env vars the carrier sets (unset means "boring success"):
 #   FAKEGO_GOOS             what `go env GOOS` prints            (default linux)
 #   FAKEGO_PIN_FILE         file holding the import paths `go list` prints to stdout
+#   FAKEGO_SCOPE_FILTER     resolve the args like real go does (see the list branch:
+#                           ./a/b/ is one package, ./a/b/... is the subtree, ./... is
+#                           everything) instead of printing the whole pin file
 #   FAKEGO_STDERR_FILE      lines `go list` prints to stderr (progress text)
 #   FAKEGO_STDOUT_EXTRA_FILE lines `go list` prints to stdout AFTER the pin
 #                           (a seeded anomaly - this is what the shape check eats)
@@ -55,10 +58,50 @@ list)
     if [ -n "${FAKEGO_STDERR_FILE-}" ] && [ -s "$FAKEGO_STDERR_FILE" ]; then
         cat "$FAKEGO_STDERR_FILE" >&2
     fi
+    body="$FAKEGO_PIN_FILE"
+    if [ -n "${FAKEGO_SCOPE_FILTER-}" ]; then
+        # TICKET 251: model what a REAL `go list` does with the args it is handed,
+        # because "the pin and the resolved set differ" is a claim about resolution,
+        # not about a file of names:
+        #   ./internal/winsec/     -> the ONE package in that directory, never a
+        #                             second package created beside it
+        #   ./internal/winsec/...  -> that package AND every package under it
+        #   ./...                  -> the whole module (census reads it this way)
+        # Without this the shim would print every name it knows for ANY scope, and a
+        # split seed would look like it bit on the directory form too - which real go
+        # does not do. That difference is the whole reason ticket 251's tier scope is
+        # the glob; see the carrier's winsec-explicit-glob-is-what-bites case.
+        module=$(sed -n 's/^module[ \t][ \t]*\([^ \t]*\).*/\1/p' go.mod | sed -n '1p')
+        if [ -z "$module" ]; then
+            echo "fake-go: FAKEGO_SCOPE_FILTER is set but go.mod has no module line" >&2
+            exit 99
+        fi
+        scoped=$(mktemp 2>/dev/null || echo "./fake-go-scoped.$$.txt")
+        : >"$scoped"
+        for a in "$@"; do
+            case $a in
+            -*) continue ;;
+            esac
+            rel=${a#./}
+            subtree=0
+            case $rel in
+            *...) subtree=1; rel=${rel%...} ;;
+            esac
+            rel=${rel%/}
+            if [ -z "$rel" ] || [ "$rel" = "." ]; then
+                cat "$body" >>"$scoped"
+            elif [ "$subtree" -eq 1 ]; then
+                awk -v m="$module/$rel" '$0 == m || index($0, m "/") == 1' "$body" >>"$scoped"
+            else
+                awk -v m="$module/$rel" '$0 == m' "$body" >>"$scoped"
+            fi
+        done
+        body="$scoped"
+    fi
     if [ -n "${FAKEGO_LIST_DROP-}" ]; then
-        grep -vxF "$FAKEGO_LIST_DROP" "$FAKEGO_PIN_FILE" || true
+        grep -vxF "$FAKEGO_LIST_DROP" "$body" || true
     else
-        cat "$FAKEGO_PIN_FILE"
+        cat "$body"
     fi
     if [ -n "${FAKEGO_STDOUT_EXTRA_FILE-}" ] && [ -s "$FAKEGO_STDOUT_EXTRA_FILE" ]; then
         cat "$FAKEGO_STDOUT_EXTRA_FILE"
