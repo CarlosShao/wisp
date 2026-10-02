@@ -32,3 +32,21 @@
 - 写面＝`internal/config`＋`cmd/wisp`（AC#1／AC#2／AC#4 三格都碰）⇒ **此刻 `248-v1` 正在整包跑 `cmd/wisp`** ⇒ **按住**，起跑判据：`248-v1` 退出＋`git status --porcelain cmd/wisp internal/config` 为空。
 - AC#3 那把尺属 `scripts/`＋`internal/config` 测试，可与 `254-r1`（只写 `scripts/`）串行不并发。
 - ⛔ 拆腿建议两枚：**255-r1**＝AC#1＋AC#3（说实话＋会响的尺，纯 Go 测试与文案）；**255-r2**＝AC#4（真窗口尺寸，本机可量那一族）；AC#2 待我裁 ⓐ／ⓑ 之后再排。
+
+## 编排者裁定（2026-10-02 11:00:02+0800，台账 `A527`；料＝只读腿 `255-a1` 的 `.scratch/wisp/probes/255/a1/census.md` 404 行／47,058 字节，我自己在 HEAD `59381f4a` 上逐条复认过下面五行）
+
+**AC#2 裁＝ⓑ（具名登记＋一把会响的尺），ⓐ 不派。** 复认过的形状（**"生效级别"今天是四套词表，唯一真在跑的那套通篇不写 "tier" 这个词**）：
+
+| | 词表 | 我复认到的 |
+|---|---|---|
+| T1 | `config.Tier` 三值（`internal/config/schema.go:31/36/39/43`） | 非测试写者 0、读者 0 |
+| T2 | `restartTierKeys`（`cmd/wisp/config_reload.go:296-301`） | 段名/键路径硬编码；**`:297` 注释自称 "and by a test"，而 `grep -rn restartTierKeys --include=*_test.go cmd internal`＝0 命中＝那句没有 test** |
+| T3 | `panel.EffectiveTier` 四值（`internal/panel/config_handlers.go:196-202`） | 写点全在 `cmd/wisp/panel_config_store.go`；`EffectiveNow`/`EffectiveNextTask` 的**非测试写者 0 枚**（实际只活两枚值） |
+| **T4** | **`Report{Hot,Reload,Restart}`（`internal/config/manager.go:87-97`）** | **这才是真在跑的那套**；档名不在任何字符串里，在"段名被 append 进哪一枚切片"⇒ 按档名符号量的尺天生量不到它 |
+
+- ⛔ **登记表逐"键"登记，不许逐字抄我票面那句"粒度只到段"**：`planApp:349/:355` 与 `planVoice:412/:415` 已是**一段双档的键级分档**（我 sed 复认），照票面原文登记＝**把诚实的码判红**——**这一处错记在我自己立的票面上，不改原话，就地具名更正。**
+- ⛔ **`config.Tier` 那三枚常量不许"顺手接上线"了事**：它连的是死类型，买到的是编译期好看、运行时零改变。
+
+**AC#5（本格由本裁定新增，⛔ 未勾，判语要非实现者裁）＝同一项设置在两套词表里答相反**：现量＝`cmd/wisp/panel_config_store.go:227` 逐字 `res.Tier = panel.EffectiveRestart`，而 `:222-229` 那一段**前面没有任何按键/按段的判断**；同时 `internal/config/manager.go:281` 把 `llm` 段列在**热应用段表**里。⇒ 面板对 `[llm]` 说"重启才生效"，热加载那条路把它当立即档，**两套之间零行码互相翻译**。判据＝**写入回执那句"什么时候生效"必须由 ⓑ 那张登记表产出**；正控＝改一枚表里标 hot 的键 ⇒ 回执**不许**出现"重启才生效"；反控＝`app.autostart` 那类 restart 键 ⇒ **必须**说重启。⛔ 不许为了让这格好看而把 `EffectiveNow`/`EffectiveNextTask` 那两枚零写者的值"用起来"——那是造出第五套；要么登记进同一张表，要么具名留着。
+
+**排程（收 `255-a1` 给的两枚耦合点）**：ⓑ 与 AC#3 **共用同一枚反射枚举器**（"新增一枚哑键必红"那枚正控要真改 `schema.go` 的结构声明，纯测试侧造不出）⇒ **`255-r1`＝AC#2-ⓑ＋AC#3**（写面 `internal/config`）；**`255-r2`＝AC#1＋AC#5**（写面 `cmd/wisp`＋`internal/panel` 的回执与文案）；**`255-r3`＝AC#4**（真窗尺寸，〔只有本机可量〕那一族）。⛔ 上面"拆腿建议两枚"那行**被本段取代**，原话留着不删。AC#2 本格**不勾**：勾要非实现者裁，且 ⓑ 落地本身归 `255-r1`。

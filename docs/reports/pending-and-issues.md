@@ -10705,3 +10705,59 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 **4. 编队与推送（2026-10-02 10:43:07+0800 现量，HEAD `a4b221ac`）**：在飞 **2 枚**＝`248-v1b`（验收，整包 `cmd/wisp`）／`255-a1`（只读，禁 Go 工具链）。⛔ 写腿**全部**按住：`254-r2`（新，接替死腿 `254-r1`，写面 `scripts/`）／`255-r1`／`198-r2`／`167-r1`／`252-r1`／`197-r3`／`253-r1`／`195-r1`／`174 AC#2b`／`33-v3`／`242` 的撞钉预检（它要跑 `go test ./internal/agent/approval/ ./cmd/wisp/` ⇒ 与 `248-v1b` 同机即互洗）。
 - ⛔ **这 3 枚未推的我按到 `248-v1b` 退出之后再双远端一起推**：`slo-full` 跑在本机 self-hosted runner、**每次 push 自启抢 CPU**（`wisp-ci-selfhosted-topology`），现在推等于给验收腿里塞噪声。owner 的常令是"要推就双远端都推、github 网络失败下次再说"，**这条不改**，只改时机。
 - ⚠ 一件**已发生但我还没读**的事：`origin` 今天已到 `ed459d09` ⇒ **A508 那句"第一次真推送顺手当 WebView2 独立复核"的那一发日志已经在 GitHub 上了**，`248-v1`/`255-a1` 之外我该自己去读它（红名集合与 `pushpreflight-1` 的名册作差＋`[panel]` 那枚 WebView2 旁证升不升得起【已证】）。这条记在下一手，不塞进本轮。
+
+## A526（2026-10-02 10:51:34+0800，编排者自记：**那发真推送的 CI 日志我读完了**——WebView2 那一格**甲升【已证】**／⛔ 乙不升；另抓到**两枚门红是被台件和冻结件点的，不是产码坏**，还有**我 A510 那句"红名只多 1 枚"这一发没命中**）
+
+起手锚（与落笔同发）：`date`＝`2026-10-02 10:51:34+0800`／`git log -1`＝`3296bfa1`／分支 `dev`／`cmd/wisp` porcelain **0 行**。取数件全部落在 `.scratch/wisp/probes/orchestrator/ci-ed459d09/`（**只建不删**；`jobs.tsv`／`terminal.json`／逐 job 原文日志／两枚红名册 `new-test-core-fails.txt` 与 `test-windows-fails.txt`／`panel-window-up.txt`）。⚠ 全程 `gh` 只读，**本机一枚 `go` 都没跑**（`248-v1b` 在整包跑 `cmd/wisp`，我跑一把就洗它的读数）。
+
+**1. 那一发推送的终态（run `36956193382`，head `ed459d09`，push 事件，`createdAt 02:33:38Z`＝10:33 本机）**：整体 **failure**；逐步颜色＝`test-core` **failure**／`lint` **failure**／`test-windows` **failure**／`slo-smoke` success／`lint-frontend` success／**`slo-full` success**（02:38:09Z 结束，所以 10:38 之后本机没有 CPU 抢）。⛔ 归因坑复现一次：`gh run view --job … --log` 在 run 未终态时**整枚返回 0 行**（我先撞了一次，等终态才取到），且 `--log` 必须带 run 号＋`--job`，单独 `--job` 不给 run 号也会空。
+
+**2. ⭐ WebView2 那一格到账（这是 `A508` 说的"第一次真推送的那发日志就是独立复核"）**：CI 那台 Windows 机器上面板窗**真起来了**，原文逐字（`job-test-windows.log`，`panel-host` 族那步）：
+- `wisp: panel window is up (test-harness, cold 231.2 ms, hot path 0.0 ms)`——同形还有 `cold 196.6 / 288.6（panel-hotkey）/ 735.1 / 976.8 ms` 共 **5 发**（已存 `panel-window-up.txt`）；
+- `panel_resident_windows_test.go` 那步报出真句柄 `hwnd 0x40232`（还有 `0x2020E`／`0x70154`／`0x501F2`／`0x30192`，以及一枚 `hwnd 0x0`＝某次没建成的形状，我没归因）；`TestAC4FocusReturnToPriorWindowGap33r5` **PASS**。
+⇒ **甲（那台机器装了 WebView2 Runtime）由【旁证级】升为【已证】**：证的是"非测试代码路径之外的窗在那台机器上建得起来、跑得完生命周期"。**⛔ 乙（无人值守能不能建*可见*窗／像素／毫秒时序）不升档**：`TestPanelHostLatencyPercentilesAC2` 那发的 `cold=3499.615 ms`（budget 1500）是**那台机器自己的时序**，⛔ 不许当我们的性能读数，也不许据此实现"CI 自动装库／自动恢复"以外的任何事；`winlive` 里"要人眼"那几枚继续按**〔仅本机可量〕**写死。⚠ 顺带一条**没裁**的观察：cold 3.5 s 撞 2 s 那一档正是 D29／P11 写的"WebView2 冷拉起 >2s → 重评 L2 卡是否回原生"的触发形状，但触发条件说的是**owner 那台机器**，本机读数今天不在这发里 ⇒ 只登记，不立案。
+
+**3. 两枚"门红不是因为产码坏"（都是新抓的，归口见第 5 条）**：
+- **gofumpt 那一步红在一枚故意的变异台件上**：逐字 `##[error].scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1: imports must appear before other declarations` ＋ `exit code 2`。那枚 `mut/fs_broken.go` 是 `185-c1` 留给"种 X 必响"正控用的**坏样例**，而门那步的命令是 `gofumpt -l . tools/d22scan tools/mockllm`——**`.` 把 `.scratch` 整池台件都吃了**。⇒ 这不是格式化回潮，是**门的射程盖到了台件**（同族先例：`tools/d22scan/runtests.sh:98` 的"跳过即红"）。⛔ 处置不许走"删文件"（`issues/README` 规则 8 临时件只建不删），⛔ 也不许动 `.github/workflows/ci.yml` 一字（workflow 形状属契约级，`A523` 写死）。
+- **staticcheck 那一步红 53 条，其中一条指在冻结件上**：逐字 `##[error]internal/observe/thresholds.go:42:2: const captureBufferLimitConversation is unused (U1000)`。而 `internal/observe/thresholds.go` 是本仓**一字节都不许动**的冻结件（SLO 阈值）⇒ **那一步按现禁令永远不会绿**，除非要么人工批准动它、要么给门加具名豁免——这一格**今天没人裁过**，我登记。⚠ 出处口径按第 75 条分开写、不写成"上一版 vs 新版"：**09-24 本机那版 staticcheck 解不开 go1.27 产物、报 36 条且含 `(compile)` 行整批〔不可判〕**；**10-02 CI 那版报 53 条**（两数不同机器、不同日期、不同尺版本，**不可相减**，也**不构成"变多了"**）。
+- ⚠ 一枚**我还没复认**的旁枝：`##[error]frontend/embed.go:4:1: ineffectual compiler directive due to extraneous space`——这行**出现在 CI 日志里**，而我这一轮按两层禁令没读 `frontend/**`，所以**内容层面我一个字都不引**，只把"CI 的 staticcheck 步点名了 `frontend/` 下一枚 `embed.go` 的注释指令"这条**日志事实**记下来。若真要动它属界面侧地界，归 owner 带话。
+
+**4. 我 A510 那句预测**这一发**没命中**，记我**：那条写的是"推下去红名集合只多 1 枚，且那枚是 `frontend/dist` 只有 `.gitkeep` ⇒ 票 33 AC#13 必跳 ⇒ 撞 `tools/d22scan/runtests.sh:98` 的跳过即红"。现量：`test-core` 那步 `portable-tests.sh` 逐字报 `=== RUN=1425 --- PASS=966 --- FAIL=4 --- SKIP=0`，且 `runtests.sh: OK - packages=[./internal/proc/ -run TestLayoutForTestEnv] top-level: PASS=1 FAIL=0 SKIP=0`——**SKIP 零枚、那一步报的是绿**。⇒ 预测的**那一枚红今天没以我说的形状出现**；至于 AC#13 那格到底是"没跳"还是"跳了但没被那把尺看见"，**我这轮没答**（`dist` 那格属 `lint-frontend`／面板资产那族，红名册另算）。⛔ 这条不抹原句，按纪律就地写"未定论、待下一手核"。
+- `test-core` 的 4 枚红名册逐名（`new-test-core-fails.txt`，全是**页面契约族**、与票 248／33 的正确性无关）：`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestC21DesignTokensFourWayAgree`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`。其中 `TestC21DesignTokensFourWayAgree` 是 `Q-52` 撤回期**已知常红**那枚（`internal/panel/tokens_fourway_test.go` 一字不动的口径不变）。
+- `test-windows` 的红名册 **25 枚**（`test-windows-fails.txt`，含 `TestPanelHost*`／`TestAC14GoSideEvalPushReachesThePage`／`TestPathResolver*AListDenied` 三枚／`TestSync*` 五枚／`TestTicket101*` 三枚／`TestTicket223*`／`TestTicket224*` 等）。⛔ **逐枚归因没做**，且⚠ **本机整包是绿的**（`33-r9` 那发 rc=0／160／0／0）⇒ 这是**CI 才红**那一族，两个口径不可互比（第 73 条第三坑），不许写成"我们修好了又坏了"。
+
+**5. 由此立的账与排程**：gofumpt 吃到台件／staticcheck 指到冻结件——**两枚都属"门的射程形状"问题，不属产码**，⛔ 今天不派写腿（写面是 `.github/workflows/ci.yml`＝契约级禁改，或 `internal/observe/thresholds.go`＝冻结件需人工批准）。处置＝**先具名登记**，等我把两形修法（台件挪进下划线前缀目录／给门加带理由的具名豁免）各写成带代价的候选再摆；这一手排在 `248-v1b` 与 `255-a1` 之后，⛔ 不与它们抢面。
+
+**6. 编队（2026-10-02 10:51:34+0800 现量，HEAD `3296bfa1`）**：在飞 **2 枚**＝`248-v1b`（验收，整包 `cmd/wisp`，10:38 起）／`255-a1`（只读，骨架 `f44c9003`→§4/§5 先满 `3296bfa1`，**它照派单把两节写在了表前面**）。⛔ 写腿全部按住。`origin` 与 `cnb` 都在 `ed459d09`、各 **3＋N 枚未推**（本轮我又落了 `9df8cb1a` 与本条）⇒ **按到 `248-v1b` 退出之后双远端一起推**（`slo-full` 在本机自启抢 CPU 那条不变；owner 常令"要推就双远端都推、github 网络失败下次再说"照办，只改时机）。
+
+## A527（2026-10-02 11:00:02+0800，编排者自记：`255-a1` 结档——**档位今天是四套词表、唯一真在跑的那套通篇不写 "tier" 这个词**；我复认了它五处承重读数并**据此裁票 255 AC#2＝ⓑ**；另**新开 AC#5**：同一项设置两套词表答相反）
+
+起手锚（与落笔同发）：`date`＝`2026-10-02 11:00:02+0800`／`git log -1`＝`59381f4a`／分支 `dev`。交件＝`.scratch/wisp/probes/255/a1/census.md` **404 行／47,058 字节／八节齐／占位符 0／该路径 porcelain 0**；五枚 commit 我逐枚 `git log -1` 验过存在＝`f44c9003`（§0 骨架，第 3 轮）→`3296bfa1`（**§4/§5 先写满**，照派单）→`53ba9b57`＋`9060331b`（§1–§3、§6–§7）→`9dae170b`（补一枚漏提交的日志件）。⛔ 它零产码、票面零改动、四个 `- [ ]` 原样；⛔ 未跑 `go build`/`vet`/`test`/`go list`。
+
+**1. 我在 HEAD 上自己复认过的五处（这是本条的凭据层，不是我转述它）**：
+- `cmd/wisp/panel_config_store.go:222-229`：`:226` `res.Written = written`、`:227` 逐字 `res.Tier = panel.EffectiveRestart`——**前面没有任何按键／按段判断**（`sed -n '222,232p'` 原文我读了）。⇒ 面板那条写路径**对任何写入都答"重启才生效"**。
+- `internal/config/manager.go:279-283`：`:281` 逐字 `{"llm", &cur.LLM, &fresh.LLM, func() { cur.LLM = fresh.LLM }},` 坐在**热应用段表**里。⇒ 两套词表对同一项设置**答相反**，且**零行码互相翻译**。
+- `internal/config/manager.go:87-97`：`type Report struct{ Hot []string; Reload []string; Restart []string; Locked []LockedDecision }`——腿数它＝**第四套档位词表 T4**，档名不在任何字符串里，在"段名被 append 进三枚切片中的哪一枚"。⇒ 这解释了一件我一直量不到的事：**按档名符号量的尺天生量不到真在跑的那一套**（我 10:43 那条 A525 数出"三套"，少算的正是这套活的）。
+- `grep -rn "restartTierKeys" --include=*_test.go cmd internal | wc -l` ＝ **0** ⇒ `config_reload.go:296-298` 那句注释自称"can be compared … and by a test"**没有 test**（产码里一句不成立的自证，属票 255 AC#1 那一族）。
+- `grep -rn "EffectiveNow\|EffectiveNextTask" --include=*.go cmd internal | grep -v _test` ⇒ 只命中 `config_handlers.go:199/200` 的定义与 `:430/:432` 的 `case`＝**非测试写者 0 枚**（面板那套四值词表实际只活得两枚值）。
+
+**2. 裁票 255 AC#2＝ⓑ（具名登记＋一把会响的尺），ⓐ 不派**。理由三条，各带出处：
+- ⓐ 最小可信形**既不修上面那笔"答相反"**（腿 §2＋我的复认：它只把 `planApp` 的键级 `if` 搬成数据），代价却最贵——它逼红 `manager_test.go:97`（要求 `Restart` 必须空）那一枚现成钉。
+- ⓐ 完整形跨 3 包、另撞 `config_route_248_test.go:323`（按名字枚举四值 ⇒ 收敛即编译不过），并踩 `tierSentence` 那一族 **C17 面**＝要先落 `A##`；还会越**票 42 的 `hotkey_reload.go` 地界**。
+- ⓑ＝1 枚新登记文件＋1 枚新测试文件，全在 `internal/config`，**零产码改动、零枚现成钉被打红**，机制现成可抄（`unwired.go:119`＋`unwired_test.go:311`，射程差只在 `:342-345` 只喂了锁定四段）。
+- ⚠ **ⓑ 的登记表必须逐"键"登记，不许逐字抄票面那句"粒度只到段"**：腿第三句推翻成立——`planApp:349/:355`、`planVoice:412/:415` 已是**一段双档的键级分档**（我 sed 复认过这两处存在）。照票面原文登记＝**把诚实的码判红**，这一处错记在我自己立的那张票面上。
+
+**3. 新开一格 AC#5（票 255）**：判据＝**写入回执那句"什么时候生效"必须由 ⓑ 那张登记表产出**，⛔ 不许再硬填；正控＝改一枚表里标 hot 的键 ⇒ 回执不许出现"重启才生效"；反控＝`app.autostart` 那类 restart 键 ⇒ 必须说重启。⛔ **不许为了让 AC#5 好看而把 `EffectiveNow`／`EffectiveNextTask` 那两枚零写者的值"顺手用起来"**——那是造出第五套词表；要么登记进同一张表，要么具名留着。AC#5 与 AC#1 同批（都碰 `cmd/wisp` 的回执与文案）。
+
+**4. 排程（腿给的两枚耦合点，我照收）**：ⓑ 与 AC#3 **共用同一枚反射枚举器**（"新增哑键必红"那枚正控要真改 `schema.go` 的结构声明，纯测试侧造不出）⇒ **合并成一枚腿 `255-r1`＝AC#2-ⓑ＋AC#3**（写面 `internal/config`）；`255-r2`＝**AC#1＋AC#5**（写面 `cmd/wisp`＋`internal/panel` 文案）；`255-r3`＝AC#4（真窗尺寸随配置变，〔只有本机可量〕那一族）。⛔ AC#2 本格**不勾**——勾要非实现者裁，且 ⓑ 落地本身归 `255-r1`。
+
+## A528（2026-10-02 11:00:02+0800，编排者自记：**第三枚腿也死于模型服务中断**；同时纠 A525 一处编队假话——`254-r1b` 那时**已经在飞**，我却写成"待派 254-r2"）
+
+**1. `248-v1b` 死状（按盘上判，不按通知判）**：10:41 自己提交骨架 `a4b221ac`；10:53–10:56 仍在写 `roster-config-panel-248.txt`／`l2-hunk.txt`／`mutation-M6b-msg.txt`／`rulers-*`；**10:57 起该目录零写入**＝死。裁决表停在 §0＋§0a＋§0b 填实、`## 1`–`## 6` 全空（66 行／5,911 字节）⇒ ⛔ **判语我一格没代填**。取数件按原状入库 `59381f4a`（24 files／6,327 insertions／**0 deletions**）。
+- ⛔ **残留突变核查（这类腿会往跟踪文件种坏样例，死了就留在那儿）**：`git status --porcelain cmd internal tools scripts` 现量**只剩 1 行**＝`M scripts/portable-tests-selftest.sh`（那是 `254-r1b` 正在写的活，不是突变）；它 10:56:17 种在 `internal/panel/bridge.go` 的 **M6b 已还原**（`git diff -- internal/panel/bridge.go` **空输出**）。⇒ 这条以后每次"验收腿死掉"都要固定跑一遍，别忘。
+
+**2. 纠 A525 的一处编队假话（记我，第 82 条又一次）**：我在 10:43 写"待派 `254-r2`（接替死腿 `254-r1`）"，而 10:58 现量盘上证据是 **`254-r1b` 正活着**：`.scratch/wisp/probes/254/r1b/logs/` 在 10:51/10:53/10:54/10:55/10:57 连续落件（`prefix-chain-*`、`mutA-chain-split-teeth`、`mutC-guard3-scope-clause`、`mutD-target-spelling-drift`、`prefix-full-at-d253703a-parent`），且 `scripts/portable-tests-selftest.sh` 的 `+231/−5` 就是它的活（文件头新增了"CASES 19-22…TICKET 254 ADDED THE LAST FOUR"一节，逐字写着 `ci.yml:439 never says --scope=winsec`）。⇒ **我写那句"待派"时没有对 `.scratch/wisp/probes/254/` 跑 `ls`**——正是那条"代号要先 `ls` 才许写进题面"的规矩，我只对台账文字负责、没对盘负责。**更正＝`254-r1b` 在飞（写面 `scripts/`），`254-r2` 这一手作废。**
+
+**3. 已派 `248-v1c`（第三次尝试，派单里改了题形）**：前两枚都死在"把测量做完、判语没写"，所以派单把顺序钉死＝**先写 12 格判语（每格具名标〔我复认过／照录前腿〕）→ 只复跑判语所缺的那一发变异 → 第 40 轮先写满 §5/§6 → 第 80 轮先把 §4「退回与否」写成能执行的判语**；并明写"若判断做不完，正确动作是把 §4 写成'我只裁到哪几格'并 commit，而不是继续测到被掐断"。⛔ 派单同时给它划了禁区：**不读不写 `scripts/*.sh` 与 `.scratch/wisp/probes/254/**`（`254-r1b` 的活）**。
+
+**4. 编队（2026-10-02 11:00:02+0800 现量，HEAD `59381f4a`）**：在飞 **2 枚**＝`254-r1b`（写腿，`scripts/`）／`248-v1c`（验收腿，整包 `cmd/wisp`）。`255-a1` 已收（本轮第 15 枚）。⛔ 按住：`255-r1`（ⓑ＋AC#3，写 `internal/config`）／`255-r2`（AC#1＋AC#5，写 `cmd/wisp`＋`internal/panel`）／`198-r2`／`167-r1`／`252-r1`／`197-r3`／`253-r1`／`195-r1`／`174 AC#2b`／`33-v3`／`242` 撞钉预检。`origin`＝`cnb`＝`ed459d09`、**各 11 枚未推**（现量）⇒ 仍按到 `248-v1c` 退出后双远端一起推。
