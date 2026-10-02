@@ -162,11 +162,62 @@
 
 ### 4.2 尺二 · `gofumpt -l <本腿动过的目录>`
 
-〔取数中：射程与具名说明尚未落〕
+- **本腿零 Go 文件改动，gofumpt 射程＝无。** 具名：`248-r2` 的写面只有本件这一枚 markdown ⇒「本腿动过的目录」＝**空集**，`-l` 的合法目标也是空集。判定时刻 HEAD `fb1d9c19`（`12:38:29 +0800` 现量），交件前复量在 §4.7 末行。
+- ⛔ 本腿**没有**为了凑一个数去格式化别人的文件（`-w` 一枚未跑），也⛔ 没有 `-l` 别人的目录然后把别人的名册署自己的名——后者恰是 AC#6 退回这一格要防的那件事的镜像。
+- ⛔ 这一格不是从裁决腿那条 `list-count=0` 抄来的：它量的是 `cmd/wisp internal/config internal/panel` 三目录、HEAD `6bcb934a`，**那是"别人的目录格式化没有"这个命题**，与本腿这一格的"本腿动过 0 枚 Go 文件"不是同一道题。它的读数在 §4.6 只做互验。
+- 工具事实（⛔ 不是读数）：本 shell `command -v gofumpt` 未命中，真身在 `$(go env GOPATH)/bin/gofumpt.exe`。`248-r1` 那 15 枚路径的格式化状态该由**它自己**或验收腿报，本腿⛔ 不代报、不代勾。
 
 ### 4.3 尺三 · 三包整包（`./cmd/wisp ./internal/config/ ./internal/panel/`）
 
-〔取数中：本腿尚未跑。⚠ 本机 `cmd/wisp` 缺 sherpa PATH 会给 `exit status 0xc0000135` 且没有 `--- FAIL`＝用例根本没跑，那一发不能读成绿〕
+**正身那一发（本腿自己跑的，票面点名的命令）**
+
+- 命令逐字：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/config/ ./internal/panel/ -count=1`
+- ⚠ 口径差具名：票面 AC#6 原文那一发只点两包（`./cmd/wisp ./internal/panel/`），本腿按派单口径把 `./internal/config/`（本票 setter 住的那包）并进同一发，⛔ 没有替换票面任何一包。
+- 时刻：起跑 `2026-10-02 12:41:36 +0800`／终值 `12:44:27 +0800`；当时 HEAD＝**`e7521610`**（本腿 §4 骨架那一发，只动本枚 md）。
+- 合并 **rc=1**。终值行逐字（原样，含制表位）：
+
+```
+--- FAIL: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (1.97s)
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	168.747s
+ok  	github.com/CarlosShao/wisp/internal/config	0.938s
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.05s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.256s
+```
+
+⇒ **第三把尺不是 rc=0**（`internal/panel` 与 `cmd/wisp` 各 rc=1，`internal/config` 绿）。§7 原句那句"全 rc=0"因此是假报，本腿在 §4.7 把它改成逐字形。
+
+- **"用例真跑了"的正面凭据**（这台机器上那枚坑的反证，⛔ 不是靠 `ok` 反推）：同一发输出里 `grep -c '0xc0000135'`＝**0**；`cmd/wisp` 那行 `168.747s` 是真跑出来的时长；输出正文全是测试进程自己的日志（mockllm 起本地端口、SQLite 迁移到 `schema_version=2`、D38 roster 告警等）。
+- ⚠ 那一发不带 `-v` ⇒ 其输出里 `=== RUN`＝**0**、`--- PASS`＝**0**，两枚都是"**没采到**"而不是"零枚用例"（本腿⛔ 不把它读成"整包 `ok` 蕴含逐名跑过且真断言了"）。所以本腿另跑一发 `-v` 数名册，见下。
+
+**带 `-v` 的那一发（只为数名册，⛔ 不是正身那一发的替代）**
+
+- 命令逐字：`GOFLAGS= go test ./internal/config/ ./internal/panel/ -count=1 -v`（同一枚 PATH 前缀）。
+- 时刻 `12:54:56`–`12:54:58 +0800`；HEAD `41bea161`。同锚可比性尺：`git diff --name-only e7521610..41bea161 -- cmd internal tools`＝**空** ⇒ 与正身那一发同一枚被测面。
+- 读数：`ok  github.com/CarlosShao/wisp/internal/config  0.863s`／`FAIL  github.com/CarlosShao/wisp/internal/panel  1.043s`；`--- PASS`＝**290**、`--- FAIL`＝**4**、`--- SKIP`＝**0**（计数含子用例）⇒ **零枚 SKIP**，不是靠跳过装绿；那 4 枚 FAIL 与正身那一发的 panel 名册**逐名同**。
+
+**`internal/panel`：本腿这一发＝「既有那 4 枚、一枚不多」——这一句就是本仓每次推送前"逐名比红名集合"要的那根证据**
+
+1. `TestApprovalCardViewJSONKeysMatchFrontendTypes`（`0.00s`）
+2. `TestComposerContractTypesMatchFrontend`（`0.00s`）
+3. `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`（`0.05s`）
+4. `TestC21DesignTokensFourWayAgree`（`0.00s`）
+
+- 与裁决腿 `248-v1c` 那句"本腿与前腿逐名同册"的四枚比：本腿这一发**逐名同册、零枚多、零枚少** ⇒ **本票的产码这一发没有新增第 5 枚 panel 红**。
+- 归因（本腿自己量的，⛔ 不抄别人）：
+  - 前两枚是**两界双向对账门**。红句逐字（本腿只读红句、⛔ 未读禁令层一字节）：`Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare` 与 `Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare`。⇒ 那份"未声明"清单里**只有 `credentialState`/`credentialKnown` 两枚是本票新增的维**（AC#2 那一族，本件 §6-4 早就具名交回），`git`/`currentModel`/`modelKnown` 与 `instructions`/`tasks` 是**本票进场之前就在漂的键**；本票对这两枚门做的只有一件事＝让红句里多列两枚键。
+  - 第三枚红句逐字开头 `a second style source appeared in code the bundle actually ships:`，它点名禁令那层里某文件的 `文件:行` ⇒ **按两层禁令本腿不转抄那枚路径与行号**，只记它在红句里、且⛔ 不在本腿写面。
+  - 第四枚红句是"读一枚设计层令牌文件失败：系统找不到路径"——那枚文件在本腿进场名册里就是 ` D`（工作树里被 owner 删/移动、未提交）；本腿⛔ 未读该层任何文件、⛔ 未修它（本仓纪律：临时件只建不删，还原别人的活不归本腿）。
+- `internal/config`：正身那发 `ok 0.938s`、`-v` 那发 `ok 0.863s` ⇒ **本票 setter 那包整包绿**。
+
+**`cmd/wisp`：本腿这一发红 1 枚，它不在裁决腿的名册里 ⇒ 本腿自己隔离复跑了 3 发**
+
+- 红名逐字：`--- FAIL: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (1.97s)`，红句落点 `cmd/wisp/config_reload_223_test.go:445: the card does not name risk.permission_mode`。
+- 隔离复跑（同一枚 PATH 前缀，HEAD `41bea161`，`12:53:07`–`12:53:20 +0800`）：命令逐字 `GOFLAGS= go test ./cmd/wisp/ -run 'TestTicket223ModeLooseningChangesTheRunningModeAfterAllow$' -count=1 -v` ⇒ **三发全 rc=0**，终值行逐字 `--- PASS: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (2.22s)`／`(2.01s)`／`(2.01s)`，包级 `2.276s`／`2.069s`／`2.074s`。
+- 归因三把尺（本腿自己的）：① 那枚测试文件最后一次被改是 `5a755c3c`（`2026-09-29 16:40`），commit 标题逐字写着「**AC#5 间歇红改有界轮询（awaitStdout）**」＝它自己登记过这一族是间歇的；② 票 248 那批发 `git show --name-only 0d87a681 -- cmd/wisp/config_reload_223_test.go`＝**空**＝本票产码没碰它；③ 同一把尺在裁决腿那一发是 `ok 177.139s`，在 `248-v1b` 那一发是红另两枚名字（它隔离跑 PASS）⇒ 这台机器上 `cmd/wisp` 整包属**【同机可能有争用】**那一族（§4.5 并发声明那条）。
+- ⇒ **本腿的定性：既有间歇族的又一次发作，不是回归，更不是本腿造的（本腿零产码）。** ⛔ 本腿没去修它、没放宽任何断言、没 `t.Skip`、⛔ 也没把裁决腿那句"它今天不红"读成"它永远不红"。整包那 `168.747s`／`177.139s` 一类的数一律按【同机可能有争用】读。
 
 ### 4.4 尺四 · `./tools/d22scan/d22scan.exe`（独立模块，只能跑那枚 exe）
 
