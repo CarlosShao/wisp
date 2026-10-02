@@ -20,10 +20,10 @@
 
 ## 要建什么
 
-- [ ] **AC#1 让那枚钉真的咬得住**：`internal/winsec` 那一档要么进 `case $mode in` 成为第五档（则 `winsec_pin` 与解析集每次都对账），要么 GUARD C 在"显式路径模式"下**也**做一次钉-vs-解析对账（谁能证明选了后者、给出凭据）。判据＝种一枚"winsec 包名被改／少一行"的异常 ⇒ 指名那一步必须红；改之前它必须绿。
-- [ ] **AC#2 尺必须本机可判**：⛔ 不许写成〔仅 CI 可量〕。载具形沿用票 250 的 `scripts/portable-tests-selftest.sh`（同一台件、同一批 case 名风格），往 stdout 种假包名与删真包名两形各一枚正控。
-- [ ] **AC#3 不动别人的形状**：空 scope 硬退出 `exit 2`（含 `--scope=winsec` 现在那句 unknown ⇒ `rc=2`）**一字不许软**；⛔ 不许为了"让 winsec 能点"把 unknown scope 改成默认档或静默跳过。GUARD A／B／C 的既有比对块用 `git diff <锚>..HEAD -- scripts/portable-tests.sh` 证明只有本票射程内的 hunk。
-- [ ] **AC#4 顺手把 census 的自证补上**：`--scope=census` 的"这包归哪个档"读数今天没有任何钉证明它和 `case $mode in` 的档位表**同源**（两处在 `:170` 与 `:233` 各写了一遍档名）。判据＝档名集合在两处不等时，census 那一步必须红（或明确具名登记为"故意分两处、由 X 钉住"）。
+- [x] **AC#1 让那枚钉真的咬得住**：`internal/winsec` 那一档要么进 `case $mode in` 成为第五档（则 `winsec_pin` 与解析集每次都对账），要么 GUARD C 在"显式路径模式"下**也**做一次钉-vs-解析对账（谁能证明选了后者、给出凭据）。判据＝种一枚"winsec 包名被改／少一行"的异常 ⇒ 指名那一步必须红；改之前它必须绿。
+- [x] **AC#2 尺必须本机可判**：⛔ 不许写成〔仅 CI 可量〕。载具形沿用票 250 的 `scripts/portable-tests-selftest.sh`（同一台件、同一批 case 名风格），往 stdout 种假包名与删真包名两形各一枚正控。
+- [x] **AC#3 不动别人的形状**：空 scope 硬退出 `exit 2`（含 `--scope=winsec` 现在那句 unknown ⇒ `rc=2`）**一字不许软**；⛔ 不许为了"让 winsec 能点"把 unknown scope 改成默认档或静默跳过。GUARD A／B／C 的既有比对块用 `git diff <锚>..HEAD -- scripts/portable-tests.sh` 证明只有本票射程内的 hunk。
+- [x] **AC#4 顺手把 census 的自证补上**：`--scope=census` 的"这包归哪个档"读数今天没有任何钉证明它和 `case $mode in` 的档位表**同源**（两处在 `:170` 与 `:233` 各写了一遍档名）。判据＝档名集合在两处不等时，census 那一步必须红（或明确具名登记为"故意分两处、由 X 钉住"）。
 
 ## 禁区
 
@@ -87,3 +87,24 @@
 - `scripts/winsec-tests.sh` 不在本腿写面 ⇒ 改它去点 `--scope=winsec` 这件事留给编排者（§5 第 1 条）。
 - core 档里那行 `./internal/winsec/`（`:211`）未改成 glob：改了会把新子包算进 core 的解析集、进而要求 `core_pin` 同步加行＝射程外（§5 第 3 条）。
 - 占位符尺（字符类）交件前 **0 命中**；尺寸 `wc -l -c`：`portable-tests.sh` 668/38629 · `portable-tests-selftest.sh` 529/24878 · `testdata/portable-tests/go` 143/6280。
+
+
+## 10-02 10:2x 编排者落地回执（四格我勾；未结案的残余另立票 254）
+
+产码三枚提交：`709d2589`（`portable-tests.sh` 102/8＋`selftest` 162/2）／`4cca2c0e`（census 对账提到 `go list` 之前，11/9）／`aa0dbb69`（`selftest` 63/7＋假 `go` 45/2）；证据件 `ad18cbeb`＋`59c01e88`＋`4bb2dcab`；骨架 `2ca152d7`。`git diff --numstat f5f9cc34..HEAD -- scripts/` 现读＝`portable-tests.sh` **104/8（7 个 hunk）**、`selftest` 218/2、假 `go` 45/2。
+
+**我自己现跑的三把尺（勾四格的凭据只用我自己跑出来的）**：
+- `bash scripts/portable-tests-selftest.sh` ⇒ 逐字 **`18 case(s) ran, 0 assertion(s) failed`**、`rc=0`（载具从票 250 那版的 10 枚长到 18 枚）。
+- `bash scripts/portable-tests.sh --scope=winsecfoo` ⇒ 逐字 `unknown --scope=winsecfoo (known: core, windows, cli, winsec, census)`、**`rc=2`** ⇒ **AC#3 那句"响亮失败一字不许软"没被软**（第五档进来了，未知档仍然当场拒答）。
+- `wc -l -c .scratch/wisp/probes/251/r1/verdict.md` ＝ **171 / 22436**，占位符尺（字符类）对该件与 `scripts/portable-tests.sh` 各 **0 命中**。
+
+**改前必红那一发我认它成立**（同一载具打在锚点 `f5f9cc34` 的字节上）：改前 **`rc=0`**、全日志零枚 `GUARD`、末行逐字 `four numbers ... === RUN=2 --- PASS=2 --- FAIL=0 --- SKIP=0`；改后逐字 `GUARD C - scope mode=winsec resolved to a DIFFERENT package`＋`Pinned: 1, resolved: 2.`＋`> .../internal/winsec/acl`；整台件打在改前 ⇒ **`18 case(s) ran, 20 assertion(s) failed`**。⇒ 这一格是本票最硬的凭据：**同一颗拆包种子，改前安静、改后响亮**。
+
+**它推翻我四处，我认（台账原话不改，新读数以 A523 为准）**：
+1. 我票面 `:11` 说 `case $mode in` "只有 core/windows/cli/`*)` 四支"——**漏计 `census)`**，实为 **5 支**。
+2. 我票面 `:15` 引的 `winsec-tests.sh:97` **行号错**，真身在 **`:94`**（`:97` 是 `ran=$(count '^=== RUN')`）；⚠ **同一个错号我已写进台账 `:10505`**（`A516` 那条批次里），腿没改台账（正确），**更正由我在新条目落**。
+3. 我票面 `:10` 的"唯一读者"成立，但那圈 census 循环的行号应是 **`:226-242`**。
+4. ★ **我 AC#1 原判据覆盖不到票面 `:19` 自己那句"拆出第二包"**——腿跑了那一形的作用面：**配了钉、scope 仍用调用方给的目录形 ⇒ 在同一颗拆包种子上 `rc=0` 照绿** ⇒ ⇒ **"钉必须配 glob 解析集"这条是我漏的**，腿把它固化成载具 case 18。⚠ 这条记我：**判据写成了"看起来覆盖"、没跑过最坏那一形**。
+5. 另一枚仪器坑值得传播：假 `go` 那枚 shim 原本**对任何参数打印整份名册** ⇒ "假 `go` 的输出＝解析读数"这个隐含前提不成立（腿第一次跑就中雷、那两发自己标作废并加了 `FAKEGO_SCOPE_FILTER`）。
+
+**⛔ 本票不 -done 的原因**：四格做完了，但**第五档今天在 CI 里没有调用者**（CI 仍走 `ci.yml:439` 的 `winsec-tests.sh`），且"unknown 消息里 known 列表要不要算射程"这类两处口径**腿按派单停手没动**（⛔ `ci.yml` 属契约级形状，见 [[wisp-ci-selfhosted-topology]]）⇒ 这两条**另立票 254 具名登记**，不留在本票正文里含糊。
