@@ -10562,3 +10562,33 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - 同发第三枚翻面样本：`TestPanelHostLatencyPercentilesAC2` 在 push 里 `cold=-1.000 ms`⇒SKIP、在 schedule 里 `cold=3496.853 ms`（预算 1500）⇒**FAIL**。⇒ 与票 33 那句"只在真桌面"直接对冲：**同一份码在云端 VM 上冷拉起量到 3.5 秒且超预算**；这一条交 `33-v3` 读，⛔ 不许我此刻替它定性。
 
 **6. 编队（2026-10-02 09:37:50+0800 现量，HEAD `b5b8a09e`）**：本轮已收 6 枚（`250-r1`／`195-a1`／`224-c2`／`vm-draw-1`／死腿 `33-r8`／`ci-delta-1`）。在飞 **5 枚**＝写码 3（`198-r1`：`cmd/wisp`＋`internal/config`／`33-r8b`：`internal/ball`／`251-r1`：`scripts`）＋写探针 1（`252-p1`：只新增 `internal/tools`／`internal/risk` 的 `_252_probe_test.go`＋证据件，⚠ 我已现量该两包 porcelain＝**0 行**才派的）＋只读 1（`167-a1`；`114-a2` 仍未收）。⛔ 门禁复跑窗口（223 频次／`internal/risk` 同机对照／票 248 四把尺／三包整包）**继续按住**：起跑判据是"没有别的 `go test` 在跑"。待派队列头两名＝`248-v1`（要跑 `cmd/wisp`，撞 `198-r1`）／`224-r3`（第一格改判为"随票 252 结线"）。
+
+## A519（2026-10-02 09:43:53+0800，编排者自记：主链链首 `198-r1` 落地＋`33-r8b` 把死腿那 106 行**接上线**（我"未验证半成品"那句**太轻**）＋`114-a2` 结档＋我现跑的四把尺＋**cnb 已同步**＋界面侧带话落成可复制 prompt）
+
+起手锚（与落笔同发）：`date`＝`2026-10-02 09:43:53+0800`／`git log -1`＝`5fad9a00`／分支 `dev`。
+
+**1. `198-r1`（新机器第一次跑能不能起来＝主链链首）交件我已核盘**：产码 `613606c0`（`cmd/wisp/run.go` **+15/0**、新增 `firstrun.go` 98／`firstrun_198_test.go` 283／`firstrun_acl_198_windows_test.go` 36）＋`9edeba1f`；证据件 `.scratch/wisp/probes/198/r1/verdict.md` **251 行 / 39384 字节**、占位符 0。它按我的 J1 硬裁定做了——**首建只挂 `wisp run`**，`internal/config/**` 一字未碰、票面与两枚常驻钉未动。三发读数（零配置首跑建出 2,571 字节且**退码仍是 2**＝没放宽；二次跑分毫未动；删了再跑字节一致）由我逐字抄来，⛔ **尚未经非实现者复跑**⇒ 已派 `198-v1`（对抗验收，`docs/evidence/s1/198-firstrun-config-v1.md`）。
+- 它推翻我票面 §4 **第一枚陷阱形的因果**（M1 变异现量）：把判据换成"装载失败就建"之后**目录形那枚用例仍绿**（`atomicWrite` 的 temp+rename 在 Windows 上本来就翻不动目录），真正被绕过而红的是"存储损坏"／"版本不认识"两枚子用例 ⇒ 我原话"判据必须用 `fileMissing`／`errors.Is(err, fs.ErrNotExist)`"**结论仍然对、理由错了**（它守的是票 101 那一侧，不是"覆成写坏"）。原话不改，`198-v1` 复认中。
+- 它另推翻普查件两处：§5-J3"静态 18 section 各出现一次"不精确（实测 17 枚带 `toml:` 标签的头＋`[plugins]` 由 `marshalPlugins` 自落一次，`Plugins` 是 `toml:"-"`）；§0/N11 的 `[untracked-197]` 已过期（`internal/config/settings.go` 现已跟踪）。
+- ⚠ **它自报复踩了我记在案上那一发翻车**：第一版 §8 把自查尺的拼法逐字写进结论文件，自查当场读到 1＝命中是尺文本自己 ⇒ `9edeba1f` 改为不落面。**这条我今天已经写进三张派单，仍然被复踩一次——说明"别把尺写进被扫文件"要写成派单里的正句而不是注脚**（下一轮起我改写法）。
+
+**2. `33-r8b` 结档，并**把我的措辞纠正了**：`ebe3bd57` 那 106 行**不只是"未验证"，是根本没接线**——`releaseThread` **零调用者**，活调用点仍停在 `internal/ball/sta_windows.go:72` 那句 `defer s.releaseCOM()`（注释写着"TEMP pre-fix shape…reverted immediately"，而那次 revert **从未执行**）。
+- 它把那一行换成 `defer s.releaseThread()`（**一枚产码行**，净 −66 字节），并新增一枚"响的读数"用例；**六发变异 6/6 各红**（M0 未接线红 2 枚／M1 不拆窗红 2 枚／M2 不泵队列红 1 枚／M3 记账不清红 1 枚／M3b `Close` 不 forget 红 1 枚／M4 `PM_NOREMOVE` 红 2 枚）。**新发现**：加日志断言之前 **M3b 是 `rc=0`（零红）**⇒ `ball_windows.go:964` 那行是一枚**无人看的承重线**。
+- ⛔ **诚实的反面**：把 M0 打回去之后，`winlive` 整包**仍只有那 3 枚红、零连带、零 `panic`**⇒ 规矩 86 那枚"顺序依赖毒源"**在本机没复现**。所以现在的凭据是**"不变量已钉住＋还池的线程可复用（`-count=2`：18 PASS）"**，⛔ 不是"毒已证排除"。这一格留给 `33-v3`。
+- 名册纠正：`internal/ball` 的 winlive 顶层**14 枚**（6 真球生命周期＋4 热键＋4 交互）＋它自己 3 枚；我那句"球与像素 19 枚"**在这一包里量不出来**（若指 `cmd/wisp` 则它被禁止跑，归我量）。基线自取：`go test ./internal/ball/ -count=1 -v` rc=1，顶层 **52/3/0**，其中两枚红是死腿自己新钉的（**钉有牙、职责没落地**），第三枚是 `TestC21TableColourRowsMatchTokensCSS`（`design/assets/tokens.css` 不在树里，既有无关红，未动）。
+- 提交四枚：`3ef6cf41` 骨架＋基线／`49448d7f` 接线＋钉／`c38bc731` 证据件＋18 张台件／`bc6e1ff9` 票面进度一行（⛔ AC 框未碰）。证据件 `.scratch/wisp/probes/33/r8b/verdict.md` **308 行 / 31213 字节**、占位符 0。`staticcheck` **未跑**＝那一格未署名（CI only）。
+- 两条仪器坑值得传播：变异台架中途挂掉是因为 **Python 用 GBK 本地码打开 `go test` 输出**，把 `MUT-M1` 留在 `sta_windows.go` 里（已还原、0 残留、md5 复核）⇒ 一律先落文件再在 `finally` 里还原；以及 **`go vet … | head; echo $?` 报的是 `head` 的退码**（那一轮"vet rc=0"旁边就是 `build failed`）。⚠ 这第二条与我自己的第 70 条同族，**我写进派单的尺没带这个坑，记我**。
+
+**3. `114-a2` 结档（`.scratch/wisp/probes/114/a2/census.md` 241 行 / 57999 字节，`8d9f4102`→`f5f9cc34`→`981f08b2`，占位符 0）**：我派单里那句"`ParseComposerRequest` 生产零调用者"＝**过期读数**，而且**不是被 248-r1 修好的**：产码调用者＝**1**（`internal/panel/composer_dispatch.go:155`），其上游 `ComposerDispatch.Handle` 有**两枚产码听众**（`cmd/wisp/panel_inbound.go:163`；`cmd/wisp/panel_host_windows.go:551` 由常驻进程 WebView2 绑定驱动）。⇒ **下一枚腿是"补差集"不是"新建接线"**。票面 9 枚未勾（⛔ 不是我以为的 8 枚）里没有一枚被 248-r1 整格做掉；档位那一格只欠 `panel_inbound.go:242`/`:252` 两枚 `Confirm: nil` 的**来源**。
+- ⚠ 它报出一条**我的尺看不见门**的新形：248 新增的 `config.get`/`config.set` **不带 `panel.` 前缀** ⇒ 掉在 `routeLiteralRe`（`internal/panel/composer_test.go:394`）与 `panelMethodRe`（`cmd/wisp/git_test.go:394`）之外 ⇒ **AC#8 那个洞被削宽**；可达性钉只认 `.postMessage(`（`composer_test.go:381`），而生产那扇门是 `w.Bind("wispDispatch")`；另加一条**新缺陷**：旧封套直接 `postMessage` 会被宿主库**静默 `resolve(null)`、Go 侧零审计**（`go-webview2` 的 `webview.go:162-168`）。⇒ 这三条**待我裁成票**，本条只登记。
+- 它的 J1 我认："常驻面板拿什么举那张 C18 卡"**没有任何一处 spec／票面具名过**——我挑就是在造契约 ⇒ 停手，等真读数之后按 `SPEC`／票面归口再裁。
+
+**4. 我现跑的门禁四把尺**（HEAD `5fad9a00`，带 sherpa PATH）：`go build` 4 包 **rc=0**／`go vet` 4 包 **rc=0**／`gofumpt -l cmd/wisp internal/config internal/ball internal/panel` **零命中**／`sh scripts/d22scan.sh` **`clean`**（分母逐字 ban#8 `internal/`=481、`cmd/`=86、`frontend/`=85、`design/`=39）。⇒ 票 248 那条"四数此刻无凭据"里的**三把我已代跑**（`staticcheck` 仍无凭据，本机版会产假绿）。
+
+**5. 一枚盘面事实纠正我自己**（`A508`/`A512` 里我写过"`frontend/dist` 只有 `.gitkeep`"）：**入库集**确实只有 `.gitkeep`（`git ls-files frontend/dist`＝1 行，我现量），但**本机磁盘上** `frontend/dist/index.html`（1044 字节）与 `frontend/dist/assets/`（约 50KB CSS＋540KB JS）**存在，时间戳 09-27 10:59，被 `.gitignore` 挡着**。⇒ 后果分层：AC#13 那枚具名 skip **在 CI（全新检出）必跳**、**在本机不跳**（靠磁盘上那份旧产物），这正是"本机绿 CI 红"里最难读的一种；⛔ 谁都不许把本机不跳读成"已修"。这一格我已单独写进给界面侧的带话（ⓐ 产物入库／ⓑ CI 可跑的确定性构建命令，二选一）。
+
+**6. 两件按 owner 本轮指令做完的事**（他原话「1. cnb同步 2. 界面侧带话…最好是一段可复制的prompt 3. 无所谓的，你想测试或者抢我的鼠标都没事」）：
+- **cnb 已同步**：`0589fd9c..f832fcbb`（先 `git rev-list --count HEAD..cnb/dev`＝**0** 且 `merge-base --is-ancestor` ＝ YES 才推；推后逐字复核对齐到当时 HEAD）。⛔ **origin 没推**——他那句授权只到上一批，本批要推 origin 得再等一句；且 `cnb.cool` 那份**不触发 workflow**（见 [[wisp-ci-selfhosted-topology]]）。
+- **界面侧带话落成可复制 prompt**：`.scratch/wisp/probes/orchestrator/frontend-handoff-1002.md`（提交 `5fad9a00`，69 行）。内容全是 Go 侧盘上真读数＋出处：`config.get`/`config.set`（`internal/panel/bridge.go:66-67`）、七枚可写字段名册（含**只写不回显**的 `provider_credential`）、七枚被结构拒绝的族前缀、生效档位；凭据五条硬约束按他原话来；⛔ 我**没有**替界面侧写任何码，也没调任何跨会话工具（只落盘＋给他复制）。
+
+**7. 编队（2026-10-02 09:43:53+0800 现量，HEAD `5fad9a00`）**：在飞 **4 枚**＝`251-r1`（`scripts/`）／`252-p1`（`internal/tools`＋`internal/risk` 两枚 `_252_probe_test.go`，探针只交读数）／`167-a1`（只读，`probes/167/a1/census.md`）／`198-v1`（对抗验收，正在整包跑 `cmd/wisp`）。本轮累计已收 9 枚。⛔ 验收腿**串行**（两枚同时跑变异会互相洗读数）⇒ `33-v3`（含 33-r8b 那六发变异的复认）与 `248-v1` 排队等 `198-v1` 退出。门禁复跑窗口里**仍未做**的两件：223 那枚单发＋频次复量、`internal/risk` 毫秒钉同机对照（都要机器空）。
