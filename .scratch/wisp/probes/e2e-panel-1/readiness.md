@@ -53,7 +53,7 @@ $ git status --porcelain -- cmd internal | wc -l
 ## §2 今天已经通的跳（每跳一把调用点尺＋真实读数）
 
 > 读数口径统一：`grep -rn <符号> cmd internal tools --include=*.go | grep -v _test.go` ⇒ 命中数拆成「定义 1 枚＋产码调用点 N 枚」。
-> 下面每一枚 N 都是本腿自己现跑的，⛔ 没有一条是"应该有"。
+> 下面每一枚 N 都是本腿自己现跑的，⛔ 没有一条是"应该有"。时刻 `12:11:34` 起（HEAD `21a15d2`），全部行号在 `12:46:21` 的新 HEAD 上逐枚重量过，一字未变（见 §0 第三发）。
 
 | 跳 | 尺（问的那一句） | 现量读数（时刻 `12:11:34` 起，全部 HEAD `21a15d2`，`cmd internal` 分母 0） |
 |---|---|---|
@@ -155,3 +155,20 @@ $ git status --porcelain -- cmd internal | wc -l
 6. **H13** 写下去之后那套"什么时候生效"的说法只剩一套（恒 restart vs `llm` 在 hot 段表）、宿主拿到配置对象、`[panel]` 那五枚键有读者；H14（面板侧快照泵与 Go→页推送）在它之后才有意义。
 
 一句话：**H2 与 H11 是"今天连门都进不去"那两跳，H5 与 H6 是"进去了也看不见那页"那两跳，H4 与 H13 是"看见了也存不成机主要的那种生效"那两跳。**
+
+---
+
+### 交件态（本腿自己量到的收尾，供编排者拿三把尺复量）
+
+- 写点一枚：`.scratch/wisp/probes/e2e-panel-1/readiness.md`。两发 commit 都带**显式 pathspec**、只含这一枚文件：`4a9851d6`（§0＋§4/§5 先写满）、`41bea161`（§1/§2/§3/§6/§7 正身）。⛔ 未 push。
+- 零跑复述：`go build`／`go vet`／`go test`／任何 `./...`／`go list -deps` **一次都没执行**（本腿全程只用 `grep`／`sed`／`ls`／`wc`／`git log`／`git show --stat`／`git status`／`git cat-file blob HEAD:`／`git ls-files`）。
+- 零污染自证（三发现量，逐发带时刻，⛔ 不是一句"0 行"糊过去）：
+  `git status --porcelain -- cmd internal tools scripts` 在 `12:52`／`12:57:25`／`12:59:36` 三发**都是 0 行**。
+  `docs/**` 那一枚根另有一发读数：`12:57:25` 量到 **1 行** ` M docs/evidence/s1/248-settings-write-path-r1.md`，
+  `12:59:36` 复量该根 **0 行**（其间那枚文件被别的腿自己 commit 掉了）。⇒ **那枚 M 不是我写的**（本腿写点只有 §下面那枚 md，
+  两发 commit 的 `--name-only` 合起来也只有它），但它证明一件事：**本仓的 `docs/evidence/s1/` 此刻确实有另一枚腿在写**，
+  我第一发把这条写成"交件前现量 0 行"是**说快了的假话**，就地改成带时刻的分根读数。
+- 冻结件（`docs/PLAN.md`／`docs/specs/**`／`docs/BUILD.md`／`docs/SLO.md`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`internal/panel/tokens_fourway_test.go`）**一字未动**；
+  其中 `manager.go` 与 `runtests.sh` 那两枚属"允许读"射程，本腿**只读不写**（引用为内容引用的地方逐处可见：§1 H13、§6 第 3/4 条）。
+- 未定义即停共四处，全部只在件里具名上报、⛔ 没有一处被我自己填掉：**H4 的双击那一形是否票 33 射程**（§3 H4）、**H9 的回话形状要不要结构化字段**（C17 面，§4 第 6 条）、**H14 出向那一半的归口（码内注释叫票 35，本腿没读那张票面）**（§3 H14／§5 第 9 条）、**改 `[hotkey]` 没人执行这一格归谁**（§3 H4 末段）。
+- 我只量到 H14 为止：H1..H14 十四跳每跳都给了四问，⛔ 没有任何一跳是"应该有"；判不了的那几格一律落在 §5 并带**为什么判不了**的具名尺（零跑／禁令树／需真机时序），没有一格被含糊过去。
