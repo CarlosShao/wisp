@@ -265,7 +265,7 @@
 | 号 | pathspec（提交时显式写的） | numstat |
 |---|---|---|
 | `6bcb934a` | `scripts/portable-tests-selftest.sh`、`.scratch/wisp/probes/254/r1b` | 15 文件／+2427／−5；其中 `scripts/` 只有那一行 `231 5 scripts/portable-tests-selftest.sh` |
-| 本文件所在那一枚 | `.scratch/wisp/probes/254/r1/verdict.md`、`.scratch/wisp/probes/254/r1b/logs/prefix-full-at-d253703a-parent.txt`、`.scratch/wisp/probes/254/r1b/logs/carrier-all-at-HEAD.txt` | 由 `git show --numstat` 在下一程取；⛔ 本腿不给自己编号（编过的号在台账里出过事） |
+| 本文件所在那一枚 | `.scratch/wisp/probes/254/r1/verdict.md`、`.scratch/wisp/probes/254/r1b/logs/prefix-full-at-d253703a-parent.txt`（**只这两条**；`carrier-all-at-HEAD.txt` 已在上表那一枚里） | `git show --numstat` 逐枚：verdict `231 0`、那枚日志 `56 32`（32 删＝被覆盖的夭折版，见自纠 1）。⛔ 本腿不给自己编号——写了号就读不回本文件 |
 
 ⚠ **两处必须记着的自纠**：
 
