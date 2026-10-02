@@ -1,0 +1,1 @@
+test(198-r2) 四格落地：AC#2 装上牙（期望侧只读 schema 的 default 标签、与盘上文件逐字节比，自带八枚"种下必红"的正控）＋AC#5 失败支补上用例（secrets 被普通文件占位＝winsec 拒密封，钉响亮句／不留半份／仍退码 2）＋AC#4 的"去哪儿补"改成走得通的那条路（wisp secret set 进 DPAPI、文件里补的是名字不是明文；模型只有改这份文件一条路，wisp providers 读它不写它）＋J1 落点收回本票自己的仪器（两枚同样干净的空目录：组装根不建、run 入口建）——新增 cmd/wisp/firstrun_198r2_test.go 五枚用例，产码只动 firstrun.go 的回执文案；AC 勾选框一枚未碰
