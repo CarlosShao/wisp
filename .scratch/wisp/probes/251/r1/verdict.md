@@ -164,7 +164,8 @@
 | `709d2589` | `scripts/portable-tests.sh scripts/portable-tests-selftest.sh` | 162/2 载具，102/8 脚本 |
 | `4cca2c0e` | `scripts/portable-tests.sh` | 11/9（census 对账提到 `go list` 之前） |
 | `aa0dbb69` | `scripts/portable-tests-selftest.sh scripts/testdata/portable-tests/go` | 63/7 载具，45/2 假 go |
-| 本笔（docs） | `.scratch/wisp/probes/251 .scratch/wisp/issues/251-*.md` | 见提交信息 |
+| `ad18cbeb` | `.scratch/wisp/probes/251 .scratch/wisp/issues/251-*.md` | 16 files +817/-44（44 枚删除全在 `verdict.md` 的骨架版上；**票面 44 added / 0 deleted**） |
+| `59c01e88` | `.scratch/wisp/probes/251/r1/verdict.md` | 2/3（两枚空种子 case 的逐字话头、§4 行号指向） |
 
 证据件：`.scratch/wisp/probes/251/r1/{verdict.md,seed-winsec.sh,logs/}`（日志 **17 份**：起手 4 份〔census-prefix / prefix-scope-winsec / prefix-scope-unknown / selftest-baseline〕、改后 4 份〔census-postfix / postfix-scope-unknown / selftest-postfix / postfix-census-drift-full〕、改前整台件 1 份〔selftest-prefix-full〕、探针 2 份〔seed-prefix / seed-postfix〕、逐字红绿 4 份〔prefix/postfix × split/gone-full〕、**作废 2 份**〔`logs/variant-b-*.txt`＝本腿第一次跑反证时还没给假 `go` 装按参数解析，那两发的 rc 不可当凭据，留着只为记录踩坑〕）。
 临时件一律只建不删（各 `mktemp -d` 影子根与假 go 工作目录留在 `/tmp` 下）。
