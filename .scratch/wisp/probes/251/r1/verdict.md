@@ -52,8 +52,7 @@
 **`18 case(s) ran, 20 assertion(s) failed`、rc=1**（`logs/selftest-prefix-full.txt`）。
 逐 case 退码：票 250 那 10 枚仍全部维持原判（`clean`/`coldcache-stderr` rc=0，其余 rc=1）；
 本票新增的 `winsec-explicit-split-goes-red` 与 `winsec-explicit-pin-gone-goes-red` 在改前都是 **rc=0**（＝缺口本体），
-`winsec-tier-*` 两枚是 rc=2（档不存在），`census-tier-roster-drift-goes-red` 与 `winsec-explicit-glob-is-what-bites` 报
-"seed took 0 line(s)"——**种子在这份字节上没有可下的地方，载具拒绝把空种子当读数**（不是绿）。
+`winsec-tier-*` 两枚是 rc=2（档不存在），`census-tier-roster-drift-goes-red` 报 `seed diff shows 0 line(s)`、`winsec-explicit-glob-is-what-bites` 报 `mutant replaced 0 line`——**种子在这份字节上没有可下的地方，载具拒绝把空种子当读数**（不是绿）。
 
 ### 1.4 反证：票面 (b) 支的**字面形**咬不住"拆包"（本腿跑了作用面才这么写）
 
@@ -70,7 +69,7 @@
 `winsec-explicit-glob-is-what-bites`（真字节 rc=1 ＋ 变异体 rc=0 两枚断言）。
 ⇒ 结论：**只做"给显式路径配钉"不够，钉还得配 glob 形的解析集**；本腿因此两半都交（第五档 + 显式路径对账）。
 ⚠ 这条反证在**没有** `FAKEGO_SCOPE_FILTER` 的假 `go` 上是跑不出来的——原假 `go` 对任何参数都打印整份名册，
-会让字面形"看起来也响"（本腿第一次跑就中了这个雷，见 §4 末行）。
+会让字面形"看起来也响"（本腿第一次跑就中了这个雷，见 §4 第 6 行）。
 
 ## 2. 逐格 AC
 
