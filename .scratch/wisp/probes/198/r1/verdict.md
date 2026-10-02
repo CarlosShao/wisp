@@ -246,6 +246,6 @@ FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.127s
 | `go vet ./cmd/wisp` | 静默 rc=0 |
 | `cd tools/d22scan && go run . -root ../..` | `d22scan: clean - no D22 ban violations`；`ban #8 cmd/ examined 86 Go files`（含本腿 4 枚新/改文件） |
 | `"$(go env GOPATH)/bin/gofumpt.exe" -l` 四枚文件 | 零命中（`FUMPT-CLEAN`） |
-| `grep -cE '[Tt][Oo][Dd][Oo]\|MUTATION\|待补\|占位\|FIXME'` 四枚 `.go` ＋ 本件 | 逐枚 **0**（本件终态亦 0；`grep -n MUTATION cmd/wisp/firstrun.go` ⇒ exit 1＝零命中，三枚变异已全部回滚且无残留） |
+| 逐枚字符类等价式自查（四枚 `.go` ＋ 本件 ＋ `git diff -U0 cmd/wisp/run.go`） | 全部 **0 命中**（尺的拼法不在本件里逐字落面，落面即自匹配——这正是题面 §9 点过的那一发翻车；三枚变异产生的临时标记词已随回滚清零，`grep` 复跑本件那枚临时标记词＝零命中） |
 | `git diff -U0 cmd/wisp/run.go \| grep -cE '<同一把尺>'` | **0** |
 | `wc -l -c .scratch/wisp/probes/198/r1/verdict.md` | 见交件回执（本行写作时未量，避免自引过期读数） |
