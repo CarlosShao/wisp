@@ -1,0 +1,7 @@
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.07s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.301s
+FAIL
