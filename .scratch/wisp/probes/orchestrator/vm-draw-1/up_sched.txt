@@ -1,0 +1,11 @@
+=== RUN   TestAC1AlwaysBranchDoesNotRevertAHandEditedKey
+=== RUN   TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card
+=== RUN   TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused
+=== RUN   TestReplyListenerAllowsAnL2CardFromTheNativeSide
+=== RUN   TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel
+=== RUN   TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject
+=== RUN   TestUnansweredL2CardTimesOutIntoRejectNeverExecution
+=== RUN   TestL1VetoNeedsAChannelTheHostReallyWired
+=== RUN   TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole
+=== RUN   TestNativeHostSeamRefusesAPanelSourcedAllow
+=== RUN   TestTicket223RunArmsTheReloadTick

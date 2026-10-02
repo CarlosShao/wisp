@@ -1,0 +1,865 @@
+lint	UNKNOWN STEP	﻿2026-10-01T23:23:25.8821452Z Current runner version: '2.337.0'
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8841555Z ##[group]Runner Image Provisioner
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8842303Z Hosted Compute Agent
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8842792Z Version: 20260901.588
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8843291Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8843977Z Build Date: 2026-09-01T19:56:44Z
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8844544Z Worker ID: {dc42347a-ef9b-4b35-949f-e5aea5adcc72}
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8845154Z Azure Region: northcentralus
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8845671Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8847129Z ##[group]Operating System
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8847746Z Ubuntu
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8848315Z 24.04.5
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8848765Z LTS
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8849213Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8849669Z ##[group]Runner Image
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8850242Z Image: ubuntu-24.04
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8850711Z Version: 20260927.320.1
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8851765Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8853025Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8853860Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8854828Z ##[group]GITHUB_TOKEN Permissions
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8856553Z Contents: read
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8857051Z Metadata: read
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8857621Z Packages: read
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8858220Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8860180Z Secret source: Actions
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8861029Z Cache mode: write
+lint	UNKNOWN STEP	2026-10-01T23:23:25.8861569Z Prepare workflow directory
+lint	UNKNOWN STEP	2026-10-01T23:23:25.9709366Z Prepare all required actions
+lint	UNKNOWN STEP	2026-10-01T23:23:25.9762905Z Getting action download info
+lint	UNKNOWN STEP	2026-10-01T23:23:26.1796770Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+lint	UNKNOWN STEP	2026-10-01T23:23:26.7790258Z Download action repository 'actions/setup-go@v5' (SHA:40f1582b2485089dde7abd97c1529aa768e1baff)
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2352670Z Complete job name: lint
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2977931Z ##[group]Run actions/checkout@v4
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2978824Z with:
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2979206Z   repository: CarlosShao/wisp
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2982561Z   token: ***
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2982929Z   ssh-strict: true
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2983317Z   ssh-user: git
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2983718Z   persist-credentials: true
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2984127Z   clean: true
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2984503Z   sparse-checkout-cone-mode: true
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2984954Z   fetch-depth: 1
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2985318Z   fetch-tags: false
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2985696Z   show-progress: true
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2986085Z   lfs: false
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2986441Z   submodules: false
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2986828Z   set-safe-directory: true
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2987255Z   allow-unsafe-pr-checkout: false
+lint	UNKNOWN STEP	2026-10-01T23:23:27.2987834Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3821188Z Syncing repository: CarlosShao/wisp
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3823236Z ##[group]Getting Git version info
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3824238Z Working directory is '/home/runner/work/wisp/wisp'
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3825570Z [command]/usr/bin/git version
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3846876Z git version 2.55.0
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3863197Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3874456Z Temporarily overriding HOME='/home/runner/work/_temp/11858d3b-6681-401a-97c2-945365d6b179' before making global git config changes
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3876502Z Adding repository directory to the temporary git global config as a safe directory
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3878269Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3918394Z Deleting the contents of '/home/runner/work/wisp/wisp'
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3925428Z ##[group]Initializing the repository
+lint	UNKNOWN STEP	2026-10-01T23:23:27.3934912Z [command]/usr/bin/git init /home/runner/work/wisp/wisp
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4006272Z hint: Using 'master' as the name for the initial branch. This default branch name
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4007674Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4012975Z hint: to use in all of your new repositories, which will suppress this warning,
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4014481Z hint: call:
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4015064Z hint:
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4015805Z hint: 	git config --global init.defaultBranch <name>
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4016707Z hint:
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4017550Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4019090Z hint: 'development'. The just-created branch can be renamed via this command:
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4020235Z hint:
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4020884Z hint: 	git branch -m <name>
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4021576Z hint:
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4022480Z hint: Disable this message with "git config set advice.defaultBranchName false"
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4023956Z Initialized empty Git repository in /home/runner/work/wisp/wisp/.git/
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4026093Z [command]/usr/bin/git remote add origin https://github.com/CarlosShao/wisp
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4064149Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4065272Z ##[group]Disabling automatic garbage collection
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4067373Z [command]/usr/bin/git config --local gc.auto 0
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4094911Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4095992Z ##[group]Setting up auth
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4101137Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4128815Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4426104Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4461067Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4665046Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4698298Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4886342Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4921605Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4922653Z ##[group]Fetching the repository
+lint	UNKNOWN STEP	2026-10-01T23:23:27.4929414Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8ae4c23e2ab4e1bda87ba6d280430db75527670b:refs/remotes/origin/dev
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3397044Z From https://github.com/CarlosShao/wisp
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3398490Z  * [new ref]         8ae4c23e2ab4e1bda87ba6d280430db75527670b -> origin/dev
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3403315Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3403779Z ##[group]Determining the checkout info
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3404211Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3407946Z [command]/usr/bin/git sparse-checkout disable
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3475981Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3503421Z ##[group]Checking out the ref
+lint	UNKNOWN STEP	2026-10-01T23:23:29.3507246Z [command]/usr/bin/git checkout --progress --force -B dev refs/remotes/origin/dev
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6630024Z Switched to a new branch 'dev'
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6653073Z branch 'dev' set up to track 'origin/dev'.
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6669232Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6710007Z [command]/usr/bin/git log -1 --format=%H
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6733345Z 8ae4c23e2ab4e1bda87ba6d280430db75527670b
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6955085Z ##[group]Run actions/setup-go@v5
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6955339Z with:
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6955510Z   go-version-file: go.mod
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6955706Z   check-latest: false
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6957628Z   token: ***
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6957802Z   cache: true
+lint	UNKNOWN STEP	2026-10-01T23:23:29.6957970Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:29.7968940Z Setup go version spec 1.27
+lint	UNKNOWN STEP	2026-10-01T23:23:29.8006677Z Attempting to download 1.27...
+lint	UNKNOWN STEP	2026-10-01T23:23:29.8090771Z (node:2082) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+lint	UNKNOWN STEP	2026-10-01T23:23:29.8092170Z (Use `node --trace-deprecation ...` to show where the warning was created)
+lint	UNKNOWN STEP	2026-10-01T23:23:30.3952016Z matching 1.27...
+lint	UNKNOWN STEP	2026-10-01T23:23:30.3957820Z Acquiring 1.27.1 from https://github.com/actions/go-versions/releases/download/1.27.1-33583469715/go-1.27.1-linux-x64.tar.gz
+lint	UNKNOWN STEP	2026-10-01T23:23:30.8078809Z Extracting Go...
+lint	UNKNOWN STEP	2026-10-01T23:23:30.8170643Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/df67ceba-c036-45a0-8284-922184bed05f -f /home/runner/work/_temp/13dfc200-2607-4b76-a475-b872eae2688f
+lint	UNKNOWN STEP	2026-10-01T23:23:32.2487576Z Successfully extracted go to /home/runner/work/_temp/df67ceba-c036-45a0-8284-922184bed05f
+lint	UNKNOWN STEP	2026-10-01T23:23:32.2488502Z Adding to the cache ...
+lint	UNKNOWN STEP	2026-10-01T23:23:38.2906807Z Successfully cached go to /opt/hostedtoolcache/go/1.27.1/x64
+lint	UNKNOWN STEP	2026-10-01T23:23:38.2907434Z Added go to the path
+lint	UNKNOWN STEP	2026-10-01T23:23:38.2907773Z Successfully set up Go version 1.27
+lint	UNKNOWN STEP	2026-10-01T23:23:38.3031188Z [command]/opt/hostedtoolcache/go/1.27.1/x64/bin/go env GOMODCACHE
+lint	UNKNOWN STEP	2026-10-01T23:23:38.3063913Z [command]/opt/hostedtoolcache/go/1.27.1/x64/bin/go env GOCACHE
+lint	UNKNOWN STEP	2026-10-01T23:23:38.3099090Z /home/runner/go/pkg/mod
+lint	UNKNOWN STEP	2026-10-01T23:23:38.3114393Z /home/runner/.cache/go-build
+lint	UNKNOWN STEP	2026-10-01T23:23:38.4392642Z Cache is not found
+lint	UNKNOWN STEP	2026-10-01T23:23:38.4416018Z go version go1.27.1 linux/amd64
+lint	UNKNOWN STEP	2026-10-01T23:23:38.4416177Z 
+lint	UNKNOWN STEP	2026-10-01T23:23:38.4416420Z ##[group]go env
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5435573Z AR='ar'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5435894Z CC='gcc'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5436173Z CGO_CFLAGS='-O2 -g'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5436460Z CGO_CPPFLAGS=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5436675Z CGO_CXXFLAGS='-O2 -g'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5436864Z CGO_ENABLED='1'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5437041Z CGO_FFLAGS='-O2 -g'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5437215Z CGO_LDFLAGS='-O2 -g'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5437393Z CXX='g++'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5437559Z GCCGO='gccgo'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5437728Z GO111MODULE=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5437901Z GOAMD64='v1'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5438245Z GOARCH='amd64'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5438414Z GOAUTH='netrc'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5438589Z GOBIN='/home/runner/go/bin'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5438811Z GOCACHE='/home/runner/.cache/go-build'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5439031Z GOCACHEPROG=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5439191Z GODEBUG=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5439399Z GOENV='/home/runner/.config/go/env'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5439604Z GOEXE=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5439765Z GOEXPERIMENT=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5439929Z GOFIPS140='off'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5440099Z GOFLAGS=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5440614Z GOGCCFLAGS='-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build3540947722=/tmp/go-build -gno-record-gcc-switches'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5441133Z GOHOSTARCH='amd64'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5441306Z GOHOSTOS='linux'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5441471Z GOINSECURE=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5441663Z GOMOD='/home/runner/work/wisp/wisp/go.mod'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5441915Z GOMODCACHE='/home/runner/go/pkg/mod'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5442132Z GONOPROXY=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5442295Z GONOSUMDB=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5442449Z GOOS='linux'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5442621Z GOPACKAGESDRIVER=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5442803Z GOPATH='/home/runner/go'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5443016Z GOPRIVATE=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5443232Z GOPROXY='https://proxy.golang.org,direct'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5443528Z GOROOT='/opt/hostedtoolcache/go/1.27.1/x64'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5443780Z GOSUMDB='sum.golang.org'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5443973Z GOTELEMETRY='local'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5444432Z GOTELEMETRYDIR='/home/runner/.config/go/telemetry'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5444688Z GOTMPDIR=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5444859Z GOTOOLCHAIN='auto'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5445115Z GOTOOLDIR='/opt/hostedtoolcache/go/1.27.1/x64/pkg/tool/linux_amd64'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5445401Z GOVCS=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5445562Z GOVERSION='go1.27.1'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5445737Z GOWORK=''
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5445905Z PKG_CONFIG='pkg-config'
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5446019Z 
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5446334Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5619508Z ##[group]Run bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5619927Z ^[[36;1mbash tools/d22scan/runtests.sh -C tools/d22scan ./...^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5832020Z shell: /usr/bin/bash -e {0}
+lint	UNKNOWN STEP	2026-10-01T23:23:38.5832251Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9529472Z === RUN   TestScanDetectsAllSeededViolations
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9530052Z --- PASS: TestScanDetectsAllSeededViolations (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9530565Z === RUN   TestScanCleanRepoIsGreen
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9530993Z --- PASS: TestScanCleanRepoIsGreen (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9531426Z === RUN   TestAllowlistSuppressesOnlyListedPaths
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9531875Z --- PASS: TestAllowlistSuppressesOnlyListedPaths (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9532300Z === RUN   TestCheckRootRejectsBlindRoots
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9532702Z === RUN   TestCheckRootRejectsBlindRoots/empty_dir
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9533139Z === RUN   TestCheckRootRejectsBlindRoots/go.mod_only
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9533749Z === RUN   TestCheckRootRejectsBlindRoots/the_d22scan_module_itself
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9534332Z === RUN   TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9534851Z --- PASS: TestCheckRootRejectsBlindRoots (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9535421Z     --- PASS: TestCheckRootRejectsBlindRoots/empty_dir (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9536023Z     --- PASS: TestCheckRootRejectsBlindRoots/go.mod_only (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9536705Z     --- PASS: TestCheckRootRejectsBlindRoots/the_d22scan_module_itself (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9537587Z     --- PASS: TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9538359Z === RUN   TestScanAloneIsNotAFalsifier
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9538772Z --- PASS: TestScanAloneIsNotAFalsifier (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9539192Z === RUN   TestCheckRootAcceptsRealRepo
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9539917Z     scan_test.go:250: real repo production Go files in scope: 258
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9540464Z --- PASS: TestCheckRootAcceptsRealRepo (0.02s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9540935Z === RUN   TestScannerSelfScanOfRealRepoIsGreen
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9541413Z --- PASS: TestScannerSelfScanOfRealRepoIsGreen (0.37s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9541741Z === RUN   TestEmojiBanCoversGoSourcesNotJustDesign
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9542069Z --- PASS: TestEmojiBanCoversGoSourcesNotJustDesign (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9542378Z === RUN   TestBan8MathBandAndRemainingGaps
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9542771Z === RUN   TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9543264Z === RUN   TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9543766Z === RUN   TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9544263Z === RUN   TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9544739Z === RUN   TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9545245Z === RUN   TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9545734Z === RUN   TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9546163Z === RUN   TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9546586Z === RUN   TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9547168Z === RUN   TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9547557Z === RUN   TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9547893Z --- PASS: TestBan8MathBandAndRemainingGaps (0.02s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9550009Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c) (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9551091Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c) (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9552218Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c) (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9552945Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c) (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9553547Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9554183Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9554788Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9555334Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9555864Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9556381Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9556869Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9557232Z === RUN   TestBan8CommentExemptionInGoSources
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9557543Z === RUN   TestBan8CommentExemptionInGoSources/line_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9557927Z === RUN   TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9558518Z === RUN   TestBan8CommentExemptionInGoSources/one-line_block_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9558979Z === RUN   TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9559463Z === RUN   TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9559936Z === RUN   TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9560419Z === RUN   TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9560906Z === RUN   TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9561466Z === RUN   TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9561997Z === RUN   TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9562405Z --- PASS: TestBan8CommentExemptionInGoSources (0.02s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9562811Z     --- PASS: TestBan8CommentExemptionInGoSources/line_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9563318Z     --- PASS: TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9563844Z     --- PASS: TestBan8CommentExemptionInGoSources/one-line_block_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9564437Z     --- PASS: TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9565158Z     --- PASS: TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9565842Z     --- PASS: TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9566472Z     --- PASS: TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9567103Z     --- PASS: TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9567799Z     --- PASS: TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9568679Z     --- PASS: TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9569109Z === RUN   TestBan8CommentExemptionInTextScopes
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9569439Z === RUN   TestBan8CommentExemptionInTextScopes/tsx_line_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9569883Z === RUN   TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9570306Z === RUN   TestBan8CommentExemptionInTextScopes/html_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9570632Z === RUN   TestBan8CommentExemptionInTextScopes/css_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9571148Z === RUN   TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9571744Z === RUN   TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9572253Z === RUN   TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9572744Z === RUN   TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9573255Z === RUN   TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9573651Z --- PASS: TestBan8CommentExemptionInTextScopes (0.02s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9574074Z     --- PASS: TestBan8CommentExemptionInTextScopes/tsx_line_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9574642Z     --- PASS: TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9575170Z     --- PASS: TestBan8CommentExemptionInTextScopes/html_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9575606Z     --- PASS: TestBan8CommentExemptionInTextScopes/css_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9576121Z     --- PASS: TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9576748Z     --- PASS: TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9577364Z     --- PASS: TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9577986Z     --- PASS: TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9578873Z     --- PASS: TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9579293Z === RUN   TestDeclaredEmojiScopeCannotWalkZeroFiles
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9579624Z --- PASS: TestDeclaredEmojiScopeCannotWalkZeroFiles (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9579950Z === RUN   TestScopeReportMatchesRealCoverage
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9580242Z --- PASS: TestScopeReportMatchesRealCoverage (0.36s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9580534Z === RUN   TestVerdictGreenOnFullyLiveFixture
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9580815Z --- PASS: TestVerdictGreenOnFullyLiveFixture (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9581090Z === RUN   TestVerdictRedOnEmptyBan7Scope
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9581361Z --- PASS: TestVerdictRedOnEmptyBan7Scope (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9581653Z === RUN   TestVerdictRedOnGoScopeWithOnlyTestFiles
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9581974Z --- PASS: TestVerdictRedOnGoScopeWithOnlyTestFiles (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9582291Z === RUN   TestExemptScopeCannotOutliveItsAbsentTree
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9582612Z --- PASS: TestExemptScopeCannotOutliveItsAbsentTree (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9582944Z === RUN   TestBan6ScopeIsNotNarrowedByAnExtensionFilter
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9583385Z     scan_test.go:1002: ban #6 examined 7 and fired in all 7 extension classes
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9583780Z --- PASS: TestBan6ScopeIsNotNarrowedByAnExtensionFilter (0.08s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9584107Z === RUN   TestVerdictRedOnUndeclaredCounter
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9584389Z --- PASS: TestVerdictRedOnUndeclaredCounter (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9584713Z === RUN   TestRealRepoBan8CoversFrontendTreeAtBan6sCount
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9585068Z --- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount (0.36s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9585444Z === RUN   TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9586023Z     scan_test.go:1155: ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9586532Z --- PASS: TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter (0.12s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9586909Z === RUN   TestLedgerCountsMatchAnIndependentWalk
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9587288Z     scan_test.go:1261: verified bans #1-5 internal/: 224 files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9587642Z     scan_test.go:1261: verified bans #1-5 cmd/: 34 files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9588016Z     scan_test.go:1261: verified ban #7 internal/tools/: 23 files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9590665Z     scan_test.go:1261: verified ban #8 internal/: 476 files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9591133Z     scan_test.go:1261: verified ban #8 cmd/: 81 files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9591579Z     scan_test.go:1261: verified ban #6 frontend/: 85 files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9591923Z     scan_test.go:1261: verified ban #8 frontend/: 85 files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9592240Z --- PASS: TestLedgerCountsMatchAnIndependentWalk (0.37s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9592534Z === RUN   TestWalksSkipGitIgnoredPaths
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9593291Z     scan_test.go:1375: note: d22scan: skipped as git-ignored: 3 file(s) under 1 ignored director(ies) [internal/build/], decided by .gitignore (2 path(s)), frontend/.gitignore (2 path(s))
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9593881Z --- PASS: TestWalksSkipGitIgnoredPaths (0.18s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9594203Z === RUN   TestTrackedPathsAreNeverSkippedByTheIgnoreFilter
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9594577Z --- PASS: TestTrackedPathsAreNeverSkippedByTheIgnoreFilter (0.08s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9594941Z === RUN   TestFullTrackedListCoversWhatTheNarrowListCannot
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9595299Z --- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (0.03s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9595678Z === RUN   TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9596073Z --- PASS: TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules (0.04s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9596453Z === RUN   TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9596794Z --- PASS: TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9597110Z === RUN   TestGitIgnoreRuleSemantics
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9597361Z --- PASS: TestGitIgnoreRuleSemantics (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9597615Z === RUN   TestRealRepoLedgerIsHonest
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9597992Z     scan_test.go:2207: ban #6 examined 85 frontend/ text files in the real repo
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9598500Z --- PASS: TestRealRepoLedgerIsHonest (0.36s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9598761Z === RUN   TestBuiltBinaryGoesRedEndToEnd
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9599066Z === RUN   TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9600997Z     scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_11105998221/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9602931Z         d22scan: examined 16 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_11105998221/001
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9603620Z         d22scan: scope bans #1-5 internal/      examined  15 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9604106Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9604560Z         d22scan: scope ban #6 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9605042Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9605495Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9605918Z         d22scan: scope ban #8 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9606465Z         d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9607068Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9608006Z         internal/bad/leak.go:5: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9609115Z         stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9609593Z === RUN   TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9611665Z     scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_22431599722/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9613657Z         d22scan: examined 14 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_22431599722/001
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9614355Z         d22scan: scope bans #1-5 internal/      examined  13 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9614852Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9615326Z         d22scan: scope ban #6 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9615810Z         d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9616267Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9616692Z         d22scan: scope ban #8 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9617246Z         d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9617851Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9618923Z         stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9619602Z === RUN   TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9621632Z     scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel3111170228/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9623548Z         d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel3111170228/001
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9624267Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9624753Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9625209Z         d22scan: scope ban #6 frontend/         examined   2 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9625682Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9626133Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9626559Z         d22scan: scope ban #8 frontend/         examined   2 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9627095Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9627708Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9628643Z         frontend/src/app.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9629418Z         stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9629932Z === RUN   TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9632045Z     scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared557571052/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9634093Z         d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared557571052/001
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9635264Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9636083Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9636807Z         d22scan: scope ban #6 frontend/         examined   0 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9637589Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9638441Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9639153Z         d22scan: scope ban #8 frontend/         examined   0 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9639840Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9640439Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9641496Z         stderr=d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9642241Z === RUN   TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9644208Z     scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li1396203153/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9646086Z         d22scan: examined 14 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li1396203153/001
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9646783Z         d22scan: scope bans #1-5 internal/      examined  13 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9647283Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9647725Z         d22scan: scope ban #6 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9648365Z         d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9648825Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9649242Z         d22scan: scope ban #8 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9649775Z         d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9650354Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9651210Z         stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9651792Z === RUN   TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9653787Z     scan_test.go:2363: rc=0 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_04188101084/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9655729Z         d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_04188101084/001
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9656403Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9656887Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9657326Z         d22scan: scope ban #6 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9657787Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9658413Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9658835Z         d22scan: scope ban #8 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9659372Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9659954Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9661642Z         d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9662615Z         stderr=
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9662837Z --- PASS: TestBuiltBinaryGoesRedEndToEnd (0.59s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9663248Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9663712Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9664269Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9664884Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9665483Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9665999Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9666351Z === RUN   TestSelfTestEntryPassesEveryCase
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9666645Z --- PASS: TestSelfTestEntryPassesEveryCase (0.07s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9666962Z === RUN   TestSelfTestRosterAuditRejectsAHollowTable
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9667299Z --- PASS: TestSelfTestRosterAuditRejectsAHollowTable (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9667616Z === RUN   TestSelfTestRefusesToAuditAnEmptyRoster
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9667940Z === RUN   TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9668503Z === RUN   TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9668879Z --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9669302Z     --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9669803Z     --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9670180Z === RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9670493Z --- PASS: TestSelfTestFlagIsWiredInTheBuiltBinary (0.30s)
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9670751Z PASS
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9670974Z ok  	github.com/CarlosShao/wisp/tools/d22scan	3.408s
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9671420Z runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9697762Z ##[group]Run go run . -self-test
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9698029Z ^[[36;1mgo run . -self-test^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9753028Z shell: /usr/bin/bash -e {0}
+lint	UNKNOWN STEP	2026-10-01T23:23:47.9753244Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1537940Z d22scan -self-test: roster read from main.go = 8 numbered ban(s) [1 bare-goroutine, 2 pathresolver-bypass, 3 plaintext-key, 4 wallclock-timeout, 5 mirror-hash, 6 panel-approval, 7 internal-artifact-tool, 8 emoji] + 1 finding type(s); 34 cases, 9 tag(s) covered, both directions required per tag
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1539560Z d22scan -self-test: gate                       want   result what happened
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1566362Z d22scan -self-test: ban #1 bare-goroutine      ring   OK     closure form `go func(){}` (D22/D38b) | ranged on 1 finding(s): internal/probe/leak.go:4: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1589019Z d22scan -self-test: ban #1 bare-goroutine      ring   OK     named form `go worker()` (R16#1 widened the ban to this) | ranged on 1 finding(s): internal/probe/leaknamed.go:6: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1590939Z d22scan -self-test:                                          pinned because: 161-r1 §3 cell b1-named-bad. Before R16#1 the matcher saw only `go func(`, so a clean report meant "no bare closures", not "nothing bypasses Spawn".
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1611698Z d22scan -self-test: ban #1 bare-goroutine      silent OK     the words `go func()` only in a comment, real call goes through a Spawn-shaped seam | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1632847Z d22scan -self-test: ban #1 bare-goroutine      ring   OK     same shape in the cmd/ half of the Go scope | ranged on 1 finding(s): cmd/probe/leak.go:4: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1634797Z d22scan -self-test:                                          pinned because: pins that cmd/ is a live walk of its own, not a shadow of internal/ (declaredScopes lists both; ticket 71 AC#4 generalised the empty-scope guard to each).
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1654609Z d22scan -self-test: ban #2 pathresolver-bypass ring   OK     filepath.Clean and filepath.Abs, both arms in one file | ranged on 2 finding(s): internal/probe/paths.go:5: [pathresolver-bypass] filepath.Clean outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1675811Z d22scan -self-test: ban #2 pathresolver-bypass silent OK     Join/Dir/Base and a method named Clean on another receiver | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1677857Z d22scan -self-test:                                          pinned because: 161-r1 §3 cell b2-clean: the ban is a C26 PathResolver bypass, not a ban on the filepath package.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1698649Z d22scan -self-test: ban #2 pathresolver-bypass silent OK     KNOWN BLIND SPOT B1: the same call under an aliased import | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1700968Z d22scan -self-test:                                          pinned because: 161-r1 §4 B1 - the matcher compares the receiver's LOCAL NAME (main.go:715), not the package's identity, so `fp "path/filepath"` + `fp.Clean` decides outside the PathResolver and stays silent. Pinned as expect-silent to record the ban's REAL range today: if someone resolves the check by import path, this line has to be flipped to expect-ring, and that flip is a scope change belonging to Q-46 / ticket 141 (owner approval), not a test fix someone may make in passing.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1720336Z d22scan -self-test: ban #3 plaintext-key       ring   OK     const with a key-named identifier holding a 24-char literal | ranged on 1 finding(s): internal/probe/keyconst.go:3: [plaintext-key] identifier probeAPIKey holds a plaintext key literal (D22/C28: SecretStore refs only)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1721973Z d22scan -self-test:                                          pinned because: The literal is a synthetic string invented for this cell (no service, no account, no environment). 161-r1 §8 states the same rule for its samples; nothing here is or was ever a real credential.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1742034Z d22scan -self-test: ban #3 plaintext-key       ring   OK     assignment arm: identifier on the left, literal on the right | ranged on 1 finding(s): internal/probe/keyassign.go:5: [plaintext-key] identifier probeSecret assigned a plaintext key literal (D22/C28: SecretStore refs only)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1764139Z d22scan -self-test: ban #3 plaintext-key       silent OK     key-named identifiers whose values are SecretStore refs or too short | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1766428Z d22scan -self-test:                                          pinned because: looksLikePlaintextKey() (main.go:803) exempts the ref: / env: / dpapi: / placeholder prefixes and requires >=16 chars of [A-Za-z0-9._~-] - C28 says the DB may store a REFERENCE, so a reference must not read as a violation.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1786049Z d22scan -self-test: ban #3 plaintext-key       silent OK     KNOWN BLIND SPOT B2: the same literal in a composite-literal field | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1787953Z d22scan -self-test:                                          pinned because: 161-r1 §4 B2 - the AST walks ValueSpec and Ident-lvalue AssignStmt only (main.go:723-755), so a plaintext key inside a struct/map literal or an argument position is invisible. Not sampled: map literals, call-argument position, pointer fields (161-r1 §2 N3).
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1808284Z d22scan -self-test: ban #4 wallclock-timeout   ring   OK     deadline.Sub(time.Now()) - the wall-clock delta arm | ranged on 1 finding(s): internal/probe/deadline.go:6: [wallclock-timeout] wall-clock delta (Sub(time.Now())) in what must be monotonic logic (D42#9/D22)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1831028Z d22scan -self-test: ban #4 wallclock-timeout   ring   OK     time.Now().Unix() on a line that also names a timeout - the second arm | ranged on 1 finding(s): internal/probe/unixdeadline.go:6: [wallclock-timeout] unix timestamp on a timeout/deadline line - monotonic clock required (D42#9/D22)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1835173Z d22scan -self-test:                                          pinned because: The timeout WORD must be on the SAME line as the unix call: main.go:767 conjoins unixTimeRe and timeoutWordRe per line. The first draft of this case had the word only in the enclosing function name, and the self-test printed FAIL for it - the case was wrong, the gate was not. Recorded because 161-r1 §3 cell b4-unix-bad used a one-line assignment for exactly this reason, and because a self-test that never contradicts its author is not measuring anything.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1853612Z d22scan -self-test: ban #4 wallclock-timeout   silent OK     time.Until / time.Since / a.Sub(b) - the sanctioned clock shapes | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1876155Z d22scan -self-test: ban #5 mirror-hash         ring   OK     one line naming both a mirror and sha256 material | ranged on 1 finding(s): internal/probe/mirror.go:3: [mirror-hash] hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1898824Z d22scan -self-test: ban #5 mirror-hash         silent OK     the same two vocabularies on separate lines | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1900431Z d22scan -self-test:                                          pinned because: 161-r1 §4.1 A2: the check is same-line co-occurrence and reads no data flow, so it neither catches a differently-spelled mirror fetch nor ignores a benign mention. Its second ring case (`b5-bad` line 7) fires on a pure reference line for the same reason.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1921651Z d22scan -self-test: ban #6 panel-approval      ring   OK     approval.decide called from the panel | ranged on 1 finding(s): frontend/src/app.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1922722Z d22scan -self-test:                                          pinned because: D33/F2: allow decisions are native-side only, so an L2 "yes" must never originate in frontend/.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1943119Z d22scan -self-test: ban #6 panel-approval      silent OK     approval.request - the panel may ask, it may not decide | stayed silent while ban #6 frontend/ walk examined 2 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1965268Z d22scan -self-test: ban #6 panel-approval      ring   OK     TEMPERAMENT A1: the call name appears only in a comment - and rings anyway | ranged on 1 finding(s): frontend/src/notes.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1967476Z d22scan -self-test:                                          pinned because: 161-r1 §4.1 A1: bans #6 and #7 go through walkText, which strips no comments at all (unlike #8's Q-46(c) exemption and #4/#5's whole-line skip). Consequence in production today: one explanatory comment naming approval.decide turns CI red. Pinned as expect-ring because that IS the shipped range; narrowing or exempting it is a scope change (owner's call), not something a test may quietly do.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.1986722Z d22scan -self-test: ban #7 internal-artifact-tool ring   OK     artifact-ish tool names as string literals in the tool registry tree | ranged on 1 finding(s): internal/tools/gated.go:3: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2008433Z d22scan -self-test: ban #7 internal-artifact-tool silent OK     the real D34 tool names, none of them an artifact write | stayed silent while ban #7 internal/tools/ walk examined 2 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2029537Z d22scan -self-test: ban #7 internal-artifact-tool ring   OK     TEMPERAMENT A1 again: quoted name inside a comment - rings anyway | ranged on 1 finding(s): internal/tools/notes.go:1: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2030850Z d22scan -self-test:                                          pinned because: Same walkText shape as ban #6. This is the second reason 161-r1 called #6/#7 "not blind, but temperamental": prose in these two trees is judged as code.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2051290Z d22scan -self-test: ban #8 emoji               ring   OK     U+2713 inside a string literal in internal/ | ranged on 1 finding(s): internal/probe/glyph.go:3: [emoji] ban #8 glyph in scope internal/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2052626Z d22scan -self-test:                                          pinned because: Q-46(c): strings are NOT exempt, comments are. 161-r1 §3 cell b8-probe-bands measured this exact glyph ringing.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2072461Z d22scan -self-test: ban #8 emoji               ring   OK     U+1F600 in the design/ scope | ranged on 1 finding(s): design/screens/states.html:1: [emoji] ban #8 glyph in scope design/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2094457Z d22scan -self-test: ban #8 emoji               ring   OK     U+2264 in the frontend/ scope (the band ticket 141 added) | ranged on 1 finding(s): frontend/src/glyph.ts:1: [emoji] ban #8 glyph in scope frontend/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2096234Z d22scan -self-test:                                          pinned because: The frontend/ U+2713 that made three repo-wide rulers vanish for hours was ticket 169's subject; this sample is the same SCOPE with a different glyph, so a scope that stopped walking is visible here (161-r1 §4.1 A3: frontend/ is scanned with no suffix filter).
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2115407Z d22scan -self-test: ban #8 emoji               ring   OK     U+2713 in the cmd/ scope | ranged on 1 finding(s): cmd/probe/glyph.go:3: [emoji] ban #8 glyph in scope cmd/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2137063Z d22scan -self-test: ban #8 emoji               silent OK     the same glyphs only inside a comment | stayed silent while ban #8 internal/ walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2139161Z d22scan -self-test:                                          pinned because: Q-46(c) exemption, signed by the owner (ticket 141). 161-r1 §3 cell b8-comment-clean measured all four scopes silent on this shape.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2159450Z d22scan -self-test: ban #8 emoji               silent OK     KNOWN GAP: U+2192 in a string literal does not ring | stayed silent while ban #8 internal/ walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2161259Z d22scan -self-test:                                          pinned because: main.go:161-163 states the arrow band U+2190-U+21FF is deliberately absent, and AGENTS.md §1.2 draws the practical consequence ("a UI may show an arrow; the instrument cannot see it"). Pinned expect-silent so a future widening is a loud flip on this line, which belongs to Q-46 / ticket 141 and needs an owner's approval.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2180650Z d22scan -self-test: ban #8 emoji               silent OK     KNOWN GAP: U+2460 (circled number) in a string literal does not ring | stayed silent while ban #8 internal/ walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2182076Z d22scan -self-test:                                          pinned because: The second deliberate gap, U+2460-U+24FF. Same rule as the arrow pin above: TestBan8MathBandAndRemainingGaps already pins both directions in the test surface; this adds the entry-point reading a person running -self-test sees without opening a test file.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2220176Z ##[error]d22scan -self-test: type unparseable           ring   OK     a file the Go parser refuses | ranged on 1 finding(s): internal/probe/broken.go:1: [unparseable] /tmp/d22scan-selftest-4101728160/internal/probe/broken.go:5:2: expression in go must be function call
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2229450Z d22scan -self-test: type unparseable           silent OK     a well-formed file in the same position | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2250775Z ##[error]d22scan -self-test: ban #1 bare-goroutine      silent OK     KNOWN BLIND SPOT B5: a bare goroutine inside a file that will not parse | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); other tags did fire here: internal/probe/brokenhidden.go:1: [unparseable] /tmp/d22scan-selftest-2423266365/internal/probe/brokenhidden.go:5:2: expression in go must be function call
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2254625Z d22scan -self-test:                                          pinned because: 161-r1 §4 B5 - scanGoFile() returns at the parse error (main.go:684-689), so bans #1-#3 (AST) AND #4-#5 (the line loop further down the same function) are all skipped for that file; the run prints one [unparseable] line and never says "five bans did not look at this file". This is ticket 161's founding shape - the gate still reports, it just stopped seeing. Fixing it means either a regex fallback or printing the skip; both change what the tool says, so the pin is expect-silent until someone owns that change.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2271463Z d22scan -self-test: ban #2 pathresolver-bypass silent OK     KNOWN BLIND SPOT B6: one directory-prefix entry silences the whole tree | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2273997Z d22scan -self-test:                                          pinned because: 161-r1 §4 B6 - suppression is per-ban (correct) but counted nowhere and printed nowhere, so "the allowlist got one line wider" is invisible in the self-report, including for the 5 real entries in tools/d22scan/allowlist.txt. allowlist.txt itself is FROZEN by ticket 161 AC#5; this case touches only a throwaway copy in a temp fixture root. The recomputable fix is a `suppressed=N (by entry ...)` line in verdict(), which is 161-r1 §2 N2's minimal closure action and is not this program's call.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2293409Z d22scan -self-test: ban #1 bare-goroutine      ring   OK     same file, same entry: ban #1 still rings while #2 is suppressed | ranged on 1 finding(s): internal/probe/allowedalso.go:8: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2295101Z d22scan -self-test:                                          pinned because: The pair to the pin above: suppression is per-ban-id, so the B6 hole is "invisible", not "global". Stated because a reader who only saw the line above would conclude the allowlist can mute everything, which 161-r1 disproved.
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2296332Z d22scan -self-test: clean - all 34 direction checks passed (19 expect-ring, 15 expect-silent)
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2345989Z ##[group]Run sh scripts/d22scan.sh
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2346236Z ^[[36;1msh scripts/d22scan.sh^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2401781Z shell: /usr/bin/bash -e {0}
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2401991Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:48.2485875Z d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1334429Z === RUN   TestScanDetectsAllSeededViolations
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1334977Z --- PASS: TestScanDetectsAllSeededViolations (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1335319Z === RUN   TestScanCleanRepoIsGreen
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1335606Z --- PASS: TestScanCleanRepoIsGreen (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1335890Z === RUN   TestAllowlistSuppressesOnlyListedPaths
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1336205Z --- PASS: TestAllowlistSuppressesOnlyListedPaths (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1336492Z === RUN   TestCheckRootRejectsBlindRoots
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1336763Z === RUN   TestCheckRootRejectsBlindRoots/empty_dir
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1337045Z === RUN   TestCheckRootRejectsBlindRoots/go.mod_only
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1337428Z === RUN   TestCheckRootRejectsBlindRoots/the_d22scan_module_itself
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1337800Z === RUN   TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1338306Z --- PASS: TestCheckRootRejectsBlindRoots (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1338757Z     --- PASS: TestCheckRootRejectsBlindRoots/empty_dir (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1339132Z     --- PASS: TestCheckRootRejectsBlindRoots/go.mod_only (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1339550Z     --- PASS: TestCheckRootRejectsBlindRoots/the_d22scan_module_itself (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1340028Z     --- PASS: TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1340458Z === RUN   TestScanAloneIsNotAFalsifier
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1356927Z --- PASS: TestScanAloneIsNotAFalsifier (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1357340Z === RUN   TestCheckRootAcceptsRealRepo
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1357820Z     scan_test.go:250: real repo production Go files in scope: 258
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1358334Z --- PASS: TestCheckRootAcceptsRealRepo (0.02s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1358695Z === RUN   TestScannerSelfScanOfRealRepoIsGreen
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1358985Z --- PASS: TestScannerSelfScanOfRealRepoIsGreen (0.39s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1359314Z === RUN   TestEmojiBanCoversGoSourcesNotJustDesign
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1359739Z --- PASS: TestEmojiBanCoversGoSourcesNotJustDesign (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1360038Z === RUN   TestBan8MathBandAndRemainingGaps
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1360410Z === RUN   TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1361207Z === RUN   TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1361997Z === RUN   TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1362738Z === RUN   TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1363219Z === RUN   TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1363756Z === RUN   TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1364220Z === RUN   TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1364628Z === RUN   TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1365023Z === RUN   TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1365450Z === RUN   TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1365817Z === RUN   TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1366139Z --- PASS: TestBan8MathBandAndRemainingGaps (0.02s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1366622Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c) (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1367213Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c) (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1367990Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c) (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1368969Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c) (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1369553Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1370144Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1370715Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1371242Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1371749Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1372242Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1372707Z     --- PASS: TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1373055Z === RUN   TestBan8CommentExemptionInGoSources
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1373343Z === RUN   TestBan8CommentExemptionInGoSources/line_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1373698Z === RUN   TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1374085Z === RUN   TestBan8CommentExemptionInGoSources/one-line_block_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1374520Z === RUN   TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1374985Z === RUN   TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1375436Z === RUN   TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1375892Z === RUN   TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1376428Z === RUN   TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1376985Z === RUN   TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1377501Z === RUN   TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1377892Z --- PASS: TestBan8CommentExemptionInGoSources (0.02s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1378501Z     --- PASS: TestBan8CommentExemptionInGoSources/line_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1378989Z     --- PASS: TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1379636Z     --- PASS: TestBan8CommentExemptionInGoSources/one-line_block_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1380212Z     --- PASS: TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1380795Z     --- PASS: TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1381381Z     --- PASS: TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1381964Z     --- PASS: TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1382566Z     --- PASS: TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1383224Z     --- PASS: TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1383860Z     --- PASS: TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1384275Z === RUN   TestBan8CommentExemptionInTextScopes
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1384580Z === RUN   TestBan8CommentExemptionInTextScopes/tsx_line_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1384999Z === RUN   TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1385408Z === RUN   TestBan8CommentExemptionInTextScopes/html_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1385716Z === RUN   TestBan8CommentExemptionInTextScopes/css_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1386185Z === RUN   TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1386669Z === RUN   TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1387142Z === RUN   TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1387618Z === RUN   TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1388246Z === RUN   TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1388670Z --- PASS: TestBan8CommentExemptionInTextScopes (0.02s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1389080Z     --- PASS: TestBan8CommentExemptionInTextScopes/tsx_line_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1389692Z     --- PASS: TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1390198Z     --- PASS: TestBan8CommentExemptionInTextScopes/html_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1390615Z     --- PASS: TestBan8CommentExemptionInTextScopes/css_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1391099Z     --- PASS: TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1391711Z     --- PASS: TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1392302Z     --- PASS: TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1392897Z     --- PASS: TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1393489Z     --- PASS: TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1393888Z === RUN   TestDeclaredEmojiScopeCannotWalkZeroFiles
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1394203Z --- PASS: TestDeclaredEmojiScopeCannotWalkZeroFiles (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1394504Z === RUN   TestScopeReportMatchesRealCoverage
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1394783Z --- PASS: TestScopeReportMatchesRealCoverage (0.38s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1395056Z === RUN   TestVerdictGreenOnFullyLiveFixture
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1395317Z --- PASS: TestVerdictGreenOnFullyLiveFixture (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1395575Z === RUN   TestVerdictRedOnEmptyBan7Scope
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1395827Z --- PASS: TestVerdictRedOnEmptyBan7Scope (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1396103Z === RUN   TestVerdictRedOnGoScopeWithOnlyTestFiles
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1396408Z --- PASS: TestVerdictRedOnGoScopeWithOnlyTestFiles (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1396731Z === RUN   TestExemptScopeCannotOutliveItsAbsentTree
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1397166Z --- PASS: TestExemptScopeCannotOutliveItsAbsentTree (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1397499Z === RUN   TestBan6ScopeIsNotNarrowedByAnExtensionFilter
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1397908Z     scan_test.go:1002: ban #6 examined 7 and fired in all 7 extension classes
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1398499Z --- PASS: TestBan6ScopeIsNotNarrowedByAnExtensionFilter (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1398814Z === RUN   TestVerdictRedOnUndeclaredCounter
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1399088Z --- PASS: TestVerdictRedOnUndeclaredCounter (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1399393Z === RUN   TestRealRepoBan8CoversFrontendTreeAtBan6sCount
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1399728Z --- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount (0.36s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1400080Z === RUN   TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1400626Z     scan_test.go:1155: ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1401113Z --- PASS: TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1401462Z === RUN   TestLedgerCountsMatchAnIndependentWalk
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1401799Z     scan_test.go:1261: verified bans #1-5 internal/: 224 files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1402180Z     scan_test.go:1261: verified bans #1-5 cmd/: 34 files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1402588Z     scan_test.go:1261: verified ban #7 internal/tools/: 23 files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1402930Z     scan_test.go:1261: verified ban #8 internal/: 476 files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1403370Z     scan_test.go:1261: verified ban #8 cmd/: 81 files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1403701Z     scan_test.go:1261: verified ban #6 frontend/: 85 files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1404034Z     scan_test.go:1261: verified ban #8 frontend/: 85 files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1404323Z --- PASS: TestLedgerCountsMatchAnIndependentWalk (0.36s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1404600Z === RUN   TestWalksSkipGitIgnoredPaths
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1405312Z     scan_test.go:1375: note: d22scan: skipped as git-ignored: 3 file(s) under 1 ignored director(ies) [internal/build/], decided by .gitignore (2 path(s)), frontend/.gitignore (2 path(s))
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1405877Z --- PASS: TestWalksSkipGitIgnoredPaths (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1406178Z === RUN   TestTrackedPathsAreNeverSkippedByTheIgnoreFilter
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1406527Z --- PASS: TestTrackedPathsAreNeverSkippedByTheIgnoreFilter (0.08s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1406873Z === RUN   TestFullTrackedListCoversWhatTheNarrowListCannot
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1407209Z --- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (0.03s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1407561Z === RUN   TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1407927Z --- PASS: TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules (0.11s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1408489Z === RUN   TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1408825Z --- PASS: TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1409113Z === RUN   TestGitIgnoreRuleSemantics
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1409350Z --- PASS: TestGitIgnoreRuleSemantics (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1409596Z === RUN   TestRealRepoLedgerIsHonest
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1409950Z     scan_test.go:2207: ban #6 examined 85 frontend/ text files in the real repo
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1410263Z --- PASS: TestRealRepoLedgerIsHonest (0.36s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1410502Z === RUN   TestBuiltBinaryGoesRedEndToEnd
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1410786Z === RUN   TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1412650Z     scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_1128239286/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1414529Z         d22scan: examined 16 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_1128239286/001
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1415323Z         d22scan: scope bans #1-5 internal/      examined  15 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1415797Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1416232Z         d22scan: scope ban #6 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1416712Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1417146Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1417549Z         d22scan: scope ban #8 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1418062Z         d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1418874Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1419783Z         internal/bad/leak.go:5: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1420607Z         stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1421040Z === RUN   TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1422973Z     scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_21183344522/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1425415Z         d22scan: examined 14 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_21183344522/001
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1426109Z         d22scan: scope bans #1-5 internal/      examined  13 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1426660Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1427102Z         d22scan: scope ban #6 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1427559Z         d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1428023Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1428784Z         d22scan: scope ban #8 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1429690Z         d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1430503Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1431367Z         stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1432008Z === RUN   TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1433945Z     scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2008006998/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1436164Z         d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2008006998/001
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1437269Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1437865Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1438540Z         d22scan: scope ban #6 frontend/         examined   2 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1438993Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1439526Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1440059Z         d22scan: scope ban #8 frontend/         examined   2 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1440575Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1441245Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1442157Z         frontend/src/app.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1443190Z         stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1443718Z === RUN   TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1446149Z     scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared4057818498/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1448555Z         d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared4057818498/001
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1449349Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1449882Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1450333Z         d22scan: scope ban #6 frontend/         examined   0 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1450865Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1451298Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1451798Z         d22scan: scope ban #8 frontend/         examined   0 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1452415Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1453057Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1454213Z         stderr=d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1455038Z === RUN   TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1457342Z     scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li3598125088/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1459606Z         d22scan: examined 14 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li3598125088/001
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1460565Z         d22scan: scope bans #1-5 internal/      examined  13 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1461075Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1461600Z         d22scan: scope ban #6 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1462048Z         d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1462579Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1463081Z         d22scan: scope ban #8 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1463606Z         d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1464365Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1465788Z         stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1466775Z === RUN   TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1470326Z     scan_test.go:2363: rc=0 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /tmp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_01671771090/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1473511Z         d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_01671771090/001
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1474638Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1475421Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1476145Z         d22scan: scope ban #6 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1476886Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1477614Z         d22scan: scope ban #8 design/           examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1478436Z         d22scan: scope ban #8 frontend/         examined   1 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1479308Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1480270Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1483140Z         d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1484798Z         stderr=
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1485116Z --- PASS: TestBuiltBinaryGoesRedEndToEnd (0.19s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1485763Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1486524Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1487442Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1488603Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1489613Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1490470Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0 (0.01s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1491215Z === RUN   TestSelfTestEntryPassesEveryCase
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1491656Z --- PASS: TestSelfTestEntryPassesEveryCase (0.07s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1492141Z === RUN   TestSelfTestRosterAuditRejectsAHollowTable
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1492674Z --- PASS: TestSelfTestRosterAuditRejectsAHollowTable (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1493175Z === RUN   TestSelfTestRefusesToAuditAnEmptyRoster
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1493685Z === RUN   TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1494290Z === RUN   TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1494878Z --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1495548Z     --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1496341Z     --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers (0.00s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1496956Z === RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1497468Z --- PASS: TestSelfTestFlagIsWiredInTheBuiltBinary (0.30s)
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1497874Z PASS
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1498339Z ok  	github.com/CarlosShao/wisp/tools/d22scan	2.756s
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1498994Z runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+lint	UNKNOWN STEP	2026-10-01T23:23:51.1499621Z d22scan.sh: scan of /home/runner/work/wisp/wisp
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5499689Z d22scan: examined 258 production Go files under internal/ and cmd/ of /home/runner/work/wisp/wisp
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5500529Z d22scan: scope bans #1-5 internal/      examined 224 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5500905Z d22scan: scope bans #1-5 cmd/           examined  34 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5501431Z d22scan: scope ban #6 frontend/         examined  85 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5501939Z d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5502444Z d22scan: scope ban #8 design/           examined  30 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5502927Z d22scan: scope ban #8 frontend/         examined  85 text files
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5503366Z d22scan: scope ban #8 internal/         examined 476 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5503804Z d22scan: scope ban #8 cmd/              examined  81 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5504969Z d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=224, bans #1-5 cmd/=34, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=30, ban #8 frontend/=85, ban #8 internal/=476, ban #8 cmd/=81; ban #8 emoji coverage: design/ 30 text files; frontend/ 85 text files; internal/ 476 Go files, comments and _test.go included; cmd/ 81 Go files, comments and _test.go included
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5547611Z ##[group]Run go install mvdan.cc/gofumpt@latest
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5547914Z ^[[36;1mgo install mvdan.cc/gofumpt@latest^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5548424Z ^[[36;1mOUT="$(gofumpt -l . tools/d22scan tools/mockllm)"^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5548681Z ^[[36;1mif [ -n "$OUT" ]; then^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5548904Z ^[[36;1m  echo "gofumpt would reformat:"^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5549115Z ^[[36;1m  echo "$OUT"^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5549285Z ^[[36;1m  exit 1^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5549444Z ^[[36;1mfi^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5605020Z shell: /usr/bin/bash -e {0}
+lint	UNKNOWN STEP	2026-10-01T23:23:51.5605247Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:51.7088934Z go: downloading mvdan.cc/gofumpt v0.12.0
+lint	UNKNOWN STEP	2026-10-01T23:23:51.7360972Z go: downloading golang.org/x/sync v0.22.0
+lint	UNKNOWN STEP	2026-10-01T23:23:51.7363746Z go: downloading golang.org/x/mod v0.40.0
+lint	UNKNOWN STEP	2026-10-01T23:23:51.7420414Z go: downloading golang.org/x/tools v0.49.0
+lint	UNKNOWN STEP	2026-10-01T23:23:53.1037500Z ##[error].scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1: imports must appear before other declarations
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2385762Z ##[error]Process completed with exit code 2.
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2425474Z ##[group]Run go install honnef.co/go/tools/cmd/staticcheck@2026.2.1
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2425870Z ^[[36;1mgo install honnef.co/go/tools/cmd/staticcheck@2026.2.1^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2426288Z ^[[36;1mrc=0^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2426454Z ^[[36;1mmodcount=0^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2426622Z ^[[36;1mpkgs=0^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2426777Z ^[[36;1mfindings=0^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2426947Z ^[[36;1mcrashes=0^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2427147Z ^[[36;1mfor mod in . tools/d22scan tools/mockllm; do^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2427394Z ^[[36;1m  modcount=$((modcount+1))^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2427625Z ^[[36;1m  echo "=== staticcheck module: $mod ==="^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2427904Z ^[[36;1m  m_pkgs=$(cd "$mod" && go list ./... 2>/dev/null | wc -l)^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2428364Z ^[[36;1m  step_rc=0^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2428697Z ^[[36;1m  m_out=$(cd "${mod}" && staticcheck ./... 2>&1) || step_rc=$?^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2429165Z ^[[36;1m  m_find=$(printf '%s\n' "$m_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2429572Z ^[[36;1m  m_crash=$(printf '%s\n' "$m_out" | grep -c 'export data version') || true^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2429870Z ^[[36;1m  printf '%s\n' "$m_out"^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2430238Z ^[[36;1m  echo "--- module $mod: exit=$step_rc packages=$m_pkgs findings=$m_find toolchain-crash-lines=$m_crash"^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2430625Z ^[[36;1m  pkgs=$((pkgs+m_pkgs))^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2430844Z ^[[36;1m  findings=$((findings+m_find))^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2431070Z ^[[36;1m  crashes=$((crashes+m_crash))^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2431303Z ^[[36;1m  if [ "$step_rc" -ne 0 ]; then rc=1; fi^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2431521Z ^[[36;1mdone^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2432032Z ^[[36;1mecho "staticcheck self-report: version=$(staticcheck --version) modules=$modcount packages=$pkgs findings=$findings toolchain-crash-lines=$crashes (step exit is $rc)"^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2432560Z ^[[36;1mexit $rc^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2487906Z shell: /usr/bin/bash -e {0}
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2488297Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:23:53.2882645Z go: downloading honnef.co/go/tools v0.8.1
+lint	UNKNOWN STEP	2026-10-01T23:23:53.5471634Z go: downloading golang.org/x/tools v0.44.1-0.20260420230617-19499e7caabc
+lint	UNKNOWN STEP	2026-10-01T23:23:53.8286410Z go: downloading golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678
+lint	UNKNOWN STEP	2026-10-01T23:23:53.8309808Z go: downloading github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c
+lint	UNKNOWN STEP	2026-10-01T23:23:53.8354615Z go: downloading golang.org/x/sync v0.20.0
+lint	UNKNOWN STEP	2026-10-01T23:23:53.8526610Z go: downloading golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
+lint	UNKNOWN STEP	2026-10-01T23:23:53.8652574Z go: downloading golang.org/x/mod v0.35.0
+lint	UNKNOWN STEP	2026-10-01T23:24:05.2513073Z === staticcheck module: . ===
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7412448Z ##[error]cmd/wisp/approval_reply.go:91:7: const maxTrackedCards is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7413886Z ##[error]cmd/wisp/dataroot_128_test.go:60:5: error var planted128Cause should have name of the form errFoo (ST1012)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7415295Z ##[error]cmd/wisp/leg_sink_gate_131_test.go:225:6: func registerLegNail131 is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7416687Z ##[error]cmd/wisp/run.go:112:2: field probeSink is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7417939Z ##[error]cmd/wisp/run.go:356:2: field logf is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7419749Z ##[error]cmd/wisp/run.go:472:2: should replace loop with allowed = append(allowed, cfg.FS.AllowedDirs...) (S1011)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7421801Z ##[error]cmd/wisp/run_test.go:70:2: field calls is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7423543Z ##[error]cmd/wisp/subagent_selfapproval_197_test.go:580:2: should replace loop with verbs = append(verbs, planted...) (S1011)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7425152Z ##[error]cmd/wisp/subagent_selfapproval_197_test.go:598:34: field holder is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7426806Z ##[error]cmd/wisp/subagent_selfapproval_197_test.go:600:6: type carrierWithDoor197 is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7430273Z ##[error]frontend/embed.go:4:1: ineffectual compiler directive due to extraneous space: "// go:embed below is the ONLY way those bytes reach wisp.exe. There is no" (SA9009)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7432571Z ##[error]internal/agent/approval/approval.go:316:22: func (*grantStore).live is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7434400Z ##[error]internal/agent/approval/fakes_test.go:104:2: field views is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7435969Z ##[error]internal/agent/approval/fakes_test.go:394:20: func (*fakeTool).setSteps is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7438051Z ##[error]internal/agent/approval/queue.go:546:17: func (*Queue).pendingCount is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7439791Z ##[error]internal/agent/harness_test.go:69:6: func withSummarizer is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7441259Z ##[error]internal/agent/testtools_test.go:31:6: type sleepArgs is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7442592Z ##[error]internal/agent/testtools_test.go:49:2: field done is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7444048Z ##[error]internal/audio/audio.go:156:17: func (*meter).reopened is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7445400Z ##[error]internal/audio/device.go:45:6: type streamOpener is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7446709Z ##[error]internal/audio/device.go:51:6: type deviceStream is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7448045Z ##[error]internal/audio/device.go:126:6: func isDeviceInvalidated is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7450266Z ##[error]internal/ball/tokens_table_test.go:1109:2: should replace loop with tokens = append(tokens, c21SortedNames(code)...) (S1011)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7452331Z ##[error]internal/ball/tokens_table_test.go:1115:2: should replace loop with tokens = append(tokens, c21SortedKeys(c21MotionGolden)...) (S1011)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7456713Z ##[error]internal/llm/adaptertest/mockllm.go:58:25: runtime.GOROOT has been deprecated since Go 1.24: The root used during the Go build will not be meaningful if the binary is copied to another machine. Use the system path to locate the “go” binary, and use “go env GOROOT” to find its GOROOT.  (SA1019)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7459449Z ##[error]internal/llm/adaptertest/registry_test.go:222:6: func evSignature is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7461080Z ##[error]internal/llm/anthropic/adapter.go:207:4: this value of stop is never used (SA4006)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7462672Z ##[error]internal/llm/openaichat/adapter_test.go:39:6: func serveGolden is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7466214Z ##[error]internal/llm/openaichat/mockllm_integ_test.go:52:25: runtime.GOROOT has been deprecated since Go 1.24: The root used during the Go build will not be meaningful if the binary is copied to another machine. Use the system path to locate the “go” binary, and use “go env GOROOT” to find its GOROOT.  (SA1019)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7468682Z ##[error]internal/llm/ratelimit.go:200:2: field reserved is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7470272Z ##[error]internal/memory/artifacts_path_invariant_test.go:745:6: func inv76Abs is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7471797Z ##[error]internal/memory/privacy.go:262:17: func (*Store).purgeAllDomains is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7473307Z ##[error]internal/models/archive.go:31:7: type entry is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7475219Z ##[error]internal/observe/goroutine_test.go:151:5: identical expressions on the left and right side of the '||' operator (SA4000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7477022Z ##[error]internal/observe/thresholds.go:42:2: const captureBufferLimitConversation is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7478856Z ##[error]internal/panel/attachments_test.go:33:2: field openCalls is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7480379Z ##[error]internal/panel/git_test.go:448:6: func composerMethodWhitelist is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7481852Z ##[error]internal/panel/l2_grant_boundary_test.go:710:6: func quoteOrEmpty is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7483451Z ##[error]internal/panel/l2_grant_boundary_test.go:1833:21: invalid appearance of unknown `-` tag option (SA5008)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7485836Z ##[error]internal/panel/l2_grant_boundary_test.go:1833:21: malformed `json` tag: invalid character '-' at start of option (expecting Unicode letter or single quote) (SA5008)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7487688Z ##[error]internal/perm/ticket90_persist_test.go:59:22: field mu is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7491586Z ##[error]internal/proc/crossvet_test.go:59:27: runtime.GOROOT has been deprecated since Go 1.24: The root used during the Go build will not be meaningful if the binary is copied to another machine. Use the system path to locate the “go” binary, and use “go env GOROOT” to find its GOROOT.  (SA1019)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7494189Z ##[error]internal/tools/fs_staging.go:122:6: func stagingNameOf is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7495625Z ##[error]internal/tools/fs_staging.go:130:6: func stagingAttributable is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7496952Z ##[error]internal/tools/helpers_test.go:24:6: func fsBridge is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7498588Z ##[error]internal/tools/mode.go:120:24: func BlacklistNote.blacklistedSensitive is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7500026Z ##[error]internal/tools/platform_other.go:39:6: func volumeRootOf is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7501858Z ##[error]internal/tools/subagent_197.go:303:14: should convert t (type subagentSpawn) to subagentTextSink instead of using struct literal (S1016)
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7503234Z --- module .: exit=1 packages=34 findings=48 toolchain-crash-lines=0
+lint	UNKNOWN STEP	2026-10-01T23:24:30.7503717Z === staticcheck module: tools/d22scan ===
+lint	UNKNOWN STEP	2026-10-01T23:24:31.0834600Z ##[error]gitignore.go:13:1: ineffectual compiler directive due to extraneous space: "// go:embed needs the directory to exist in a clean checkout (ticket 77 AC#1)." (SA9009)
+lint	UNKNOWN STEP	2026-10-01T23:24:31.0836536Z ##[error]main.go:127:2: field failAddOn is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:31.0837538Z ##[error]main.go:143:2: var secretNameRe is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:31.0838453Z --- module tools/d22scan: exit=1 packages=1 findings=3 toolchain-crash-lines=0
+lint	UNKNOWN STEP	2026-10-01T23:24:31.0838829Z === staticcheck module: tools/mockllm ===
+lint	UNKNOWN STEP	2026-10-01T23:24:31.5111288Z ##[error]chat.go:219:6: func estimateTokens is unused (U1000)
+lint	UNKNOWN STEP	2026-10-01T23:24:31.5112412Z --- module tools/mockllm: exit=1 packages=1 findings=1 toolchain-crash-lines=0
+lint	UNKNOWN STEP	2026-10-01T23:24:31.5159434Z staticcheck self-report: version=staticcheck 2026.2.1 (0.8.1) modules=3 packages=36 findings=52 toolchain-crash-lines=0 (step exit is 1)
+lint	UNKNOWN STEP	2026-10-01T23:24:31.5162521Z ##[error]Process completed with exit code 1.
+lint	UNKNOWN STEP	2026-10-01T23:24:31.5197540Z ##[group]Run go vet ./...
+lint	UNKNOWN STEP	2026-10-01T23:24:31.5197762Z ^[[36;1mgo vet ./...^[[0m
+lint	UNKNOWN STEP	2026-10-01T23:24:31.5252334Z shell: /usr/bin/bash -e {0}
+lint	UNKNOWN STEP	2026-10-01T23:24:31.5252542Z ##[endgroup]
+lint	UNKNOWN STEP	2026-10-01T23:24:33.1109830Z Post job cleanup.
+lint	UNKNOWN STEP	2026-10-01T23:24:33.1770582Z [command]/usr/bin/git version
+lint	UNKNOWN STEP	2026-10-01T23:24:33.1807002Z git version 2.55.0
+lint	UNKNOWN STEP	2026-10-01T23:24:33.1839337Z Temporarily overriding HOME='/home/runner/work/_temp/b34e5709-03ab-4905-a1e0-b7ee77780a43' before making global git config changes
+lint	UNKNOWN STEP	2026-10-01T23:24:33.1840365Z Adding repository directory to the temporary git global config as a safe directory
+lint	UNKNOWN STEP	2026-10-01T23:24:33.1843764Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+lint	UNKNOWN STEP	2026-10-01T23:24:33.1874018Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint	UNKNOWN STEP	2026-10-01T23:24:33.1901934Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint	UNKNOWN STEP	2026-10-01T23:24:33.2125598Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint	UNKNOWN STEP	2026-10-01T23:24:33.2146694Z http.https://github.com/.extraheader
+lint	UNKNOWN STEP	2026-10-01T23:24:33.2156592Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+lint	UNKNOWN STEP	2026-10-01T23:24:33.2186406Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint	UNKNOWN STEP	2026-10-01T23:24:33.2401587Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint	UNKNOWN STEP	2026-10-01T23:24:33.2434475Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint	UNKNOWN STEP	2026-10-01T23:24:33.2766923Z Cleaning up orphan processes
+lint	UNKNOWN STEP	2026-10-01T23:24:33.2996386Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

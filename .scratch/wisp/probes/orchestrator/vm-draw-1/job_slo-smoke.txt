@@ -1,0 +1,341 @@
+slo-smoke	UNKNOWN STEP	﻿2026-10-01T23:23:26.3570901Z Current runner version: '2.337.0'
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3596842Z ##[group]Runner Image Provisioner
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3597628Z Hosted Compute Agent
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3598489Z Version: 20260901.588
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3599084Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3599809Z Build Date: 2026-09-01T19:56:44Z
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3600464Z Worker ID: {0347d843-5863-4b16-8b36-1564ed1adacc}
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3601143Z Azure Region: westus
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3601862Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3603371Z ##[group]Operating System
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3604022Z Microsoft Windows Server 2025
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3604608Z 10.0.26100
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3605072Z Datacenter
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3605529Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3606043Z ##[group]Runner Image
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3606584Z Image: windows-2025-vs2026
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3607135Z Version: 20260925.250.1
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3608530Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260925.250/images/windows/Windows2025-VS2026-Readme.md
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3610176Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260925.250
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3611186Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3612821Z ##[group]GITHUB_TOKEN Permissions
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3614987Z Contents: read
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3615558Z Metadata: read
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3616064Z Packages: read
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3616547Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3618614Z Secret source: Actions
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3619445Z Cache mode: write
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.3620152Z Prepare workflow directory
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.4068821Z Prepare all required actions
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.4120568Z Getting action download info
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.7468214Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:26.8832031Z Download action repository 'actions/setup-go@v5' (SHA:40f1582b2485089dde7abd97c1529aa768e1baff)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.2949790Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.4406349Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.8202074Z Complete job name: slo-smoke
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9841709Z ##[group]Run actions/checkout@v4
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9843181Z with:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9843955Z   repository: CarlosShao/wisp
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9852885Z   token: ***
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9853657Z   ssh-strict: true
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9854431Z   ssh-user: git
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9855222Z   persist-credentials: true
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9856089Z   clean: true
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9856881Z   sparse-checkout-cone-mode: true
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9857819Z   fetch-depth: 1
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9858588Z   fetch-tags: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9859372Z   show-progress: true
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9860165Z   lfs: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9860897Z   submodules: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9861734Z   set-safe-directory: true
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9862635Z   allow-unsafe-pr-checkout: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9863833Z env:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9864549Z   WISP_ENV: test
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:27.9865310Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.1336706Z Syncing repository: CarlosShao/wisp
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.1339252Z ##[group]Getting Git version info
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.1340319Z Working directory is 'D:\a\wisp\wisp'
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.2360091Z [command]"C:\Program Files\Git\bin\git.exe" version
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.5857478Z git version 2.55.0.windows.5
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.5911527Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.5931228Z Temporarily overriding HOME='D:\a\_temp\6883ed73-3dae-4ec7-bbe4-de5316f82ed8' before making global git config changes
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.5933592Z Adding repository directory to the temporary git global config as a safe directory
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.5942054Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\wisp\wisp
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.6558725Z Deleting the contents of 'D:\a\wisp\wisp'
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.6565203Z ##[group]Initializing the repository
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.6573970Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\wisp\wisp
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.7458242Z Initialized empty Git repository in D:/a/wisp/wisp/.git/
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.7508322Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/CarlosShao/wisp
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.8142670Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.8144057Z ##[group]Disabling automatic garbage collection
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.8151543Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.8455045Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.8456340Z ##[group]Setting up auth
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.8468118Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:28.8786304Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:30.3468505Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:30.3793820Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:30.9384824Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:30.9711303Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:31.5211544Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:31.5543823Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:31.5544766Z ##[group]Fetching the repository
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:31.5558013Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8ae4c23e2ab4e1bda87ba6d280430db75527670b:refs/remotes/origin/dev
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3162165Z From https://github.com/CarlosShao/wisp
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3163149Z  * [new ref]         8ae4c23e2ab4e1bda87ba6d280430db75527670b -> origin/dev
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3209622Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3210574Z ##[group]Determining the checkout info
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3211624Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3219270Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3647554Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3949362Z ##[group]Checking out the ref
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:34.3958245Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B dev refs/remotes/origin/dev
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.4582932Z Updating files:  75% (3214/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.4808940Z Updating files:  76% (3254/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.4970762Z Updating files:  77% (3297/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.5143973Z Updating files:  78% (3340/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.5321011Z Updating files:  79% (3382/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.5435416Z Updating files:  80% (3425/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.5584684Z Updating files:  81% (3468/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.5732473Z Updating files:  82% (3511/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.6080682Z Updating files:  83% (3554/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.6223192Z Updating files:  84% (3597/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.6346823Z Updating files:  85% (3639/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.6469840Z Updating files:  86% (3682/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.6593126Z Updating files:  87% (3725/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.6719609Z Updating files:  88% (3768/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.6844140Z Updating files:  89% (3811/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.6961039Z Updating files:  90% (3853/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.7063984Z Updating files:  91% (3896/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.7176032Z Updating files:  92% (3939/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.7309102Z Updating files:  93% (3982/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.7434920Z Updating files:  94% (4025/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.7550705Z Updating files:  95% (4067/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.7683047Z Updating files:  96% (4110/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.7803683Z Updating files:  97% (4153/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.7933410Z Updating files:  98% (4196/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.8071011Z Updating files:  99% (4239/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.8074385Z Updating files: 100% (4281/4281)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.8074845Z Updating files: 100% (4281/4281), done.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.8257298Z Switched to a new branch 'dev'
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.8318156Z branch 'dev' set up to track 'origin/dev'.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.8399150Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.8812443Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9131770Z 8ae4c23e2ab4e1bda87ba6d280430db75527670b
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9618280Z ##[group]Run actions/setup-go@v5
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9618604Z with:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9618808Z   go-version-file: go.mod
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9619041Z   check-latest: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9622064Z   token: ***
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9622268Z   cache: true
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9622454Z env:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9622633Z   WISP_ENV: test
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:35.9622831Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:36.1238978Z Setup go version spec 1.27
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:36.1405914Z Attempting to download 1.27...
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:36.1811002Z (node:7532) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:36.1819129Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:36.8326733Z matching 1.27...
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:36.8335690Z Acquiring 1.27.1 from https://github.com/actions/go-versions/releases/download/1.27.1-33583469715/go-1.27.1-win32-x64.zip
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:37.4939354Z Extracting Go...
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:37.6346146Z [command]"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command "$ErrorActionPreference = 'Stop' ; try { Add-Type -AssemblyName System.IO.Compression.ZipFile } catch { } ; try { [System.IO.Compression.ZipFile]::ExtractToDirectory('D:\a\_temp\go-1.27.1-win32-x64.zip', 'D:\a\_temp\e5c020aa-b4e0-435b-88e2-fbad197cca7e', $true) } catch { if (($_.Exception.GetType().FullName -eq 'System.Management.Automation.MethodException') -or ($_.Exception.GetType().FullName -eq 'System.Management.Automation.RuntimeException') ){ Expand-Archive -LiteralPath 'D:\a\_temp\go-1.27.1-win32-x64.zip' -DestinationPath 'D:\a\_temp\e5c020aa-b4e0-435b-88e2-fbad197cca7e' -Force } else { throw $_ } } ;"
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:43.2649094Z Successfully extracted go to D:\a\_temp\e5c020aa-b4e0-435b-88e2-fbad197cca7e
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:43.2649644Z Adding to the cache ...
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:54.9038073Z Created link C:\hostedtoolcache\windows\go\1.27.1\x64 => D:\hostedtoolcache\windows\go\1.27.1\x64
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:54.9042467Z Created link C:\hostedtoolcache\windows\go\1.27.1\x64.complete => D:\hostedtoolcache\windows\go\1.27.1\x64.complete
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:54.9043489Z Successfully cached go to C:\hostedtoolcache\windows\go\1.27.1\x64
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:54.9048423Z Added go to the path
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:54.9051837Z Successfully set up Go version 1.27
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:55.2494106Z [command]C:\hostedtoolcache\windows\go\1.27.1\x64\bin\go.exe env GOMODCACHE
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:55.2548921Z [command]C:\hostedtoolcache\windows\go\1.27.1\x64\bin\go.exe env GOCACHE
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:55.2802255Z C:\Users\runneradmin\go\pkg\mod
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:55.2828101Z C:\Users\runneradmin\AppData\Local\go-build
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:55.6580490Z Cache hit for: setup-go-Windows-x64-go-1.27.1-b4f3805abe958e98b99401a573c01750d23ee48da35e3229b78a44fd2da05326
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:55.6697676Z (node:7532) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:56.9448846Z Received 46137344 of 167348217 (27.6%), 43.8 MBs/sec
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:57.8502617Z Received 167348217 of 167348217 (100.0%), 83.6 MBs/sec
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:57.8505724Z Cache Size: ~160 MB (167348217 B)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:23:57.8635696Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/96282d61-c2d1-4b36-aa68-f74cd9753399/cache.tzst -P -C D:/a/wisp/wisp --force-local --use-compress-program "zstd -d"
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:14.7122863Z Cache restored successfully
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:14.7237330Z Cache restored from key: setup-go-Windows-x64-go-1.27.1-b4f3805abe958e98b99401a573c01750d23ee48da35e3229b78a44fd2da05326
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:14.7260857Z go version go1.27.1 windows/amd64
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:14.7261190Z 
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:14.7261641Z ##[group]go env
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2212902Z set AR=ar
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2213306Z set CC=gcc
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2217103Z set CGO_CFLAGS=-O2 -g
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2217779Z set CGO_CPPFLAGS=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2218211Z set CGO_CXXFLAGS=-O2 -g
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2218573Z set CGO_ENABLED=1
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2218888Z set CGO_FFLAGS=-O2 -g
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2219256Z set CGO_LDFLAGS=-O2 -g
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2219590Z set CXX=g++
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2219902Z set GCCGO=gccgo
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2220260Z set GO111MODULE=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2220584Z set GOAMD64=v1
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2220912Z set GOARCH=amd64
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2221231Z set GOAUTH=netrc
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2221594Z set GOBIN=C:\Users\runneradmin\go\bin
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2222129Z set GOCACHE=C:\Users\runneradmin\AppData\Local\go-build
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2222661Z set GOCACHEPROG=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2222978Z set GODEBUG=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2223353Z set GOENV=C:\Users\runneradmin\AppData\Roaming\go\env
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2223851Z set GOEXE=.exe
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2224194Z set GOEXPERIMENT=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2224544Z set GOFIPS140=off
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2224859Z set GOFLAGS=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2226103Z set GOGCCFLAGS=-m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=C:\Users\RUNNER~1\AppData\Local\Temp\go-build584683225=/tmp/go-build -gno-record-gcc-switches
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2227966Z set GOHOSTARCH=amd64
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2228327Z set GOHOSTOS=windows
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2228658Z set GOINSECURE=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2229000Z set GOMOD=D:\a\wisp\wisp\go.mod
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2229477Z set GOMODCACHE=C:\Users\runneradmin\go\pkg\mod
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2229955Z set GONOPROXY=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2230252Z set GONOSUMDB=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2230541Z set GOOS=windows
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2230852Z set GOPACKAGESDRIVER=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2231241Z set GOPATH=C:\Users\runneradmin\go
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2231700Z set GOPRIVATE=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2232089Z set GOPROXY=https://proxy.golang.org,direct
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2232656Z set GOROOT=C:\hostedtoolcache\windows\go\1.27.1\x64
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2233162Z set GOSUMDB=sum.golang.org
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2233497Z set GOTELEMETRY=local
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2233975Z set GOTELEMETRYDIR=C:\Users\runneradmin\AppData\Roaming\go\telemetry
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2234539Z set GOTMPDIR=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2234842Z set GOTOOLCHAIN=auto
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2235406Z set GOTOOLDIR=C:\hostedtoolcache\windows\go\1.27.1\x64\pkg\tool\windows_amd64
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2236053Z set GOVCS=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2236346Z set GOVERSION=go1.27.1
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2236664Z set GOWORK=
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2236982Z set PKG_CONFIG=pkg-config
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2237226Z 
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.2237695Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3736811Z ##[group]Run actions/cache@v4
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3737166Z with:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3737367Z   path: third_party
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3737762Z   key: wisp-third_party-9a3d98c4ac75db2e8d66e0fb02532da54e7dd1e4b7dbb44343af15438ecb5a63
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3738222Z   enableCrossOsArchive: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3738704Z   fail-on-cache-miss: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3738937Z   lookup-only: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3739134Z   save-always: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3739332Z env:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3739500Z   WISP_ENV: test
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.3739685Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.5128792Z (node:6920) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.5129518Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.8972724Z Cache hit for: wisp-third_party-9a3d98c4ac75db2e8d66e0fb02532da54e7dd1e4b7dbb44343af15438ecb5a63
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:15.9096265Z (node:6920) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:16.9405780Z Received 7901396 of 7901396 (100.0%), 9.8 MBs/sec
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:16.9407576Z Cache Size: ~8 MB (7901396 B)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:16.9434687Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/5e36c07c-ab68-4e88-97c1-6d9375cfbe37/cache.tzst -P -C D:/a/wisp/wisp --force-local --use-compress-program "zstd -d"
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:17.0202586Z Cache restored successfully
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:17.0328389Z Cache restored from key: wisp-third_party-9a3d98c4ac75db2e8d66e0fb02532da54e7dd1e4b7dbb44343af15438ecb5a63
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:17.0613162Z ##[group]Run powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:17.0613952Z ^[[36;1mpowershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev^[[0m
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:17.1078586Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:17.1079122Z env:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:17.1079384Z   WISP_ENV: test
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:17.1079664Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:20.0591781Z build.ps1: repo root D:\a\wisp\wisp (Env=dev)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:20.1936679Z build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=C:\mingw64\bin\gcc.exe (gcc.exe (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:21.2877272Z fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:21.2931204Z build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 Â§2.2)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.5483374Z build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.5611541Z build.ps1: DLLs colocated into D:\a\wisp\wisp\build
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.5643175Z build.ps1: signed model manifest colocated into D:\a\wisp\wisp\build\models
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.6447923Z build.ps1: wrote D:\a\wisp\wisp\build\SHA256SUMS
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.6456365Z build.ps1: smoke test - running wisp.exe doctor
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7219133Z time=2026-10-01T23:24:26.694Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7337299Z wisp doctor - build chain self-check
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7338586Z ------------------------------------------------------------------------
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7339556Z [INFO] wisp build                         version=0.0.0-dev commit=8ae4c23 built=2026-10-01T23:24:21Z WISP_ENV=test
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7340451Z [INFO] Go runtime                         go1.27.1 (toolchain pinned by go.mod)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7341320Z [INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7343411Z RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7344854Z [PASS] gcc (build-time)                   gcc.exe (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7345913Z [PASS] sherpa-onnx C API                  runtime 1.13.8 matches build pin (exe dir D:\a\wisp\wisp\build)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7346872Z [PASS] onnxruntime.dll colocated          file version 1.28.2.0 matches build pin 1.28.2
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7349497Z [INFO] sherpa-onnx built against onnxruntime 1.28.2
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7350651Z [PASS] DLL colocated: sherpa-onnx-c-api.dll D:\a\wisp\wisp\build\sherpa-onnx-c-api.dll
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7352019Z [PASS] DLL colocated: sherpa-onnx-cxx-api.dll D:\a\wisp\wisp\build\sherpa-onnx-cxx-api.dll
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7352869Z [PASS] deps.toml sherpa-onnx pin          1.13.8
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7353438Z [PASS] deps.toml onnxruntime pin          1.28.2
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7354578Z [PASS] deps.toml sherpa-onnx-go pin       v1.13.8
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7355510Z [PASS] data dir writable (test)           C:\Users\runneradmin\AppData\Local\Temp\wisp-test-2088
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7356180Z ------------------------------------------------------------------------
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7356544Z wisp doctor: PASS
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.7393935Z build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.9021183Z ##[group]Run powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.9022163Z ^[[36;1mpowershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4^[[0m
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.9095645Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.9096020Z env:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.9096215Z   WISP_ENV: test
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:26.9096426Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:27.6152156Z slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:31.4736356Z slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 9%
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:31.4758531Z slo-check.ps1: sampling state Sleeping for 4s
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:31.5395059Z time=2026-10-01T23:24:31.496Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:44.7185128Z slo-check.ps1: state Sleeping exit=0 pass=True
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:44.7219103Z slo-check.ps1: sampling state Warm for 4s
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:44.7824596Z time=2026-10-01T23:24:44.742Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:57.9551830Z slo-check.ps1: state Warm exit=0 pass=True
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:57.9560656Z slo-check.ps1: settle check (10s window)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:24:58.0069098Z time=2026-10-01T23:24:57.977Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:10.0565387Z slo-check.ps1: settle exit=0 pass=True
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:10.0574092Z slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:10.1099596Z time=2026-10-01T23:25:10.077Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.3024437Z slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.3529736Z slo-check.ps1: report written to D:\a\wisp\wisp\build\slo\slo-report.json (all_pass=True)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4907929Z ##[group]Run actions/upload-artifact@v4
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4908289Z with:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4908492Z   name: slo-smoke-report
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4908747Z   path: build/slo/slo-report.json
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4909006Z   if-no-files-found: error
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4909237Z   compression-level: 6
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4909460Z   overwrite: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4909671Z   include-hidden-files: false
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4909902Z env:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4910077Z   WISP_ENV: test
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.4910267Z ##[endgroup]
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.6901119Z (node:7484) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.6902618Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.6957453Z With the provided path, there will be 1 file uploaded
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.6963136Z Artifact name is valid!
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:21.6965222Z Root directory input is valid!
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.1002187Z Beginning upload of artifact content to blob storage
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.1268542Z (node:7484) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.3867044Z Uploaded bytes 7160
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.4603936Z Finished uploading artifact content to blob storage!
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.4605850Z SHA256 digest of uploaded artifact zip is 1e1ab6d019aea0ebb6592a5d5bcb194ddbcd217c2f337b3d5c01fac28823ff10
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.4608482Z Finalizing artifact upload
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.7137269Z Artifact slo-smoke-report.zip successfully finalized. Artifact ID 11199304957
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.7138901Z Artifact slo-smoke-report has been successfully uploaded! Final size is 7160 bytes. Artifact ID is 11199304957
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.7150595Z Artifact download URL: https://github.com/CarlosShao/wisp/actions/runs/36940536372/artifacts/11199304957
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:22.8527074Z Post job cleanup.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.0075822Z Cache hit occurred on the primary key wisp-third_party-9a3d98c4ac75db2e8d66e0fb02532da54e7dd1e4b7dbb44343af15438ecb5a63, not saving cache.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.0078591Z (node:608) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.0079856Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.0359571Z Post job cleanup.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.1926600Z (node:7808) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.1927896Z (Use `node --trace-deprecation ...` to show where the warning was created)
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.2872309Z [command]C:\hostedtoolcache\windows\go\1.27.1\x64\bin\go.exe env GOMODCACHE
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.2948124Z [command]C:\hostedtoolcache\windows\go\1.27.1\x64\bin\go.exe env GOCACHE
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.3211188Z C:\Users\runneradmin\go\pkg\mod
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.3266574Z C:\Users\runneradmin\AppData\Local\go-build
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.3293969Z Cache hit occurred on the primary key setup-go-Windows-x64-go-1.27.1-b4f3805abe958e98b99401a573c01750d23ee48da35e3229b78a44fd2da05326, not saving cache.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.3622127Z Post job cleanup.
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.5675201Z [command]"C:\Program Files\Git\bin\git.exe" version
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.5987693Z git version 2.55.0.windows.5
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.6073556Z Temporarily overriding HOME='D:\a\_temp\6c4f3fad-aed9-43c7-8f0a-25e99f85c348' before making global git config changes
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.6074719Z Adding repository directory to the temporary git global config as a safe directory
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.6087320Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\wisp\wisp
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.6427120Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:23.6745429Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:24.2627749Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:24.2916249Z http.https://github.com/.extraheader
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:24.2971971Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:24.3307477Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:24.9001760Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:24.9313660Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:25.5284562Z Cleaning up orphan processes
+slo-smoke	UNKNOWN STEP	2026-10-01T23:25:25.5610822Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-go@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,0 +1,288 @@
+lint-frontend	UNKNOWN STEP	﻿2026-10-01T23:23:25.1050007Z Current runner version: '2.337.0'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1085455Z ##[group]Runner Image Provisioner
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1086840Z Hosted Compute Agent
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1087803Z Version: 20260901.588
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1088886Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1090054Z Build Date: 2026-09-01T19:56:44Z
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1091198Z Worker ID: {b67d779b-4536-43d4-aca5-eb6a7afd31f5}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1092491Z Azure Region: eastus2
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1093429Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1096334Z ##[group]Operating System
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1097690Z Ubuntu
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1098630Z 24.04.5
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1099453Z LTS
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1100254Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1101301Z ##[group]Runner Image
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1102267Z Image: ubuntu-24.04
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1103233Z Version: 20260927.320.1
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1105320Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1108219Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1109905Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1111833Z ##[group]GITHUB_TOKEN Permissions
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1114858Z Contents: read
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1115892Z Metadata: read
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1117512Z Packages: read
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1118457Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1121708Z Secret source: Actions
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1123288Z Cache mode: write
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1124646Z Prepare workflow directory
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1669800Z Prepare all required actions
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.1737381Z Getting action download info
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.3596055Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.4463041Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.6362753Z Complete job name: lint-frontend
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7127781Z ##[group]Run actions/checkout@v4
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7128668Z with:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7129118Z   repository: CarlosShao/wisp
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7133296Z   token: ***
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7133761Z   ssh-strict: true
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7134200Z   ssh-user: git
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7134649Z   persist-credentials: true
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7135155Z   clean: true
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7135602Z   sparse-checkout-cone-mode: true
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7136131Z   fetch-depth: 1
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7136778Z   fetch-tags: false
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7137232Z   show-progress: true
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7137674Z   lfs: false
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7138094Z   submodules: false
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7138546Z   set-safe-directory: true
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7139044Z   allow-unsafe-pr-checkout: false
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.7139764Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8141219Z Syncing repository: CarlosShao/wisp
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8143957Z ##[group]Getting Git version info
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8145141Z Working directory is '/home/runner/work/wisp/wisp'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8146917Z [command]/usr/bin/git version
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8196452Z git version 2.55.0
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8217276Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8233507Z Temporarily overriding HOME='/home/runner/work/_temp/f8d4eeb1-9bcc-4b9e-9984-b2b4e0fbb229' before making global git config changes
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8235858Z Adding repository directory to the temporary git global config as a safe directory
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8237846Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8286385Z Deleting the contents of '/home/runner/work/wisp/wisp'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8292672Z ##[group]Initializing the repository
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8296978Z [command]/usr/bin/git init /home/runner/work/wisp/wisp
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8384595Z hint: Using 'master' as the name for the initial branch. This default branch name
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8388655Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8390382Z hint: to use in all of your new repositories, which will suppress this warning,
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8391878Z hint: call:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8392491Z hint:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8393300Z hint: 	git config --global init.defaultBranch <name>
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8394325Z hint:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8395259Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8396921Z hint: 'development'. The just-created branch can be renamed via this command:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8398139Z hint:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8398809Z hint: 	git branch -m <name>
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8399448Z hint:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8400410Z hint: Disable this message with "git config set advice.defaultBranchName false"
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8402035Z Initialized empty Git repository in /home/runner/work/wisp/wisp/.git/
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8404474Z [command]/usr/bin/git remote add origin https://github.com/CarlosShao/wisp
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8438734Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8439936Z ##[group]Disabling automatic garbage collection
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8443438Z [command]/usr/bin/git config --local gc.auto 0
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8476405Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8477728Z ##[group]Setting up auth
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8482188Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8515802Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8862444Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.8904384Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.9160994Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.9199467Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.9440639Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.9484724Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.9485506Z ##[group]Fetching the repository
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:25.9494529Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8ae4c23e2ab4e1bda87ba6d280430db75527670b:refs/remotes/origin/dev
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5282154Z From https://github.com/CarlosShao/wisp
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5283873Z  * [new ref]         8ae4c23e2ab4e1bda87ba6d280430db75527670b -> origin/dev
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5289179Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5291261Z ##[group]Determining the checkout info
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5293269Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5297258Z [command]/usr/bin/git sparse-checkout disable
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5361887Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5398379Z ##[group]Checking out the ref
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.5401603Z [command]/usr/bin/git checkout --progress --force -B dev refs/remotes/origin/dev
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9433708Z Switched to a new branch 'dev'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9437382Z branch 'dev' set up to track 'origin/dev'.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9457197Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9505345Z [command]/usr/bin/git log -1 --format=%H
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9534465Z 8ae4c23e2ab4e1bda87ba6d280430db75527670b
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9803526Z ##[group]Run actions/setup-node@v4
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9803949Z with:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9804252Z   node-version: 24
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9804555Z   cache: npm
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9804921Z   cache-dependency-path: frontend/package-lock.json
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9805381Z   always-auth: false
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9805708Z   check-latest: false
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9809259Z   token: ***
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:27.9809562Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.1202158Z Found in cache @ /opt/hostedtoolcache/node/24.21.0/x64
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.1205158Z (node:2292) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.1206048Z (Use `node --trace-deprecation ...` to show where the warning was created)
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.1208565Z ##[group]Environment details
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.4607363Z node: v24.21.0
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.4607997Z npm: 11.19.0
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.4608448Z yarn: 1.22.22
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.4609297Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.4652434Z [command]/opt/hostedtoolcache/node/24.21.0/x64/bin/npm config get cache
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.5780065Z /home/runner/.npm
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.6829798Z Cache hit for: node-cache-Linux-x64-npm-c956a6a27ad876962e31c0c16a68267331c5429432e282313a283eb36b09dfc0
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:28.6978639Z (node:2292) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.2435024Z Received 62613833 of 62613833 (100.0%), 148.2 MBs/sec
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.2435705Z Cache Size: ~60 MB (62613833 B)
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.2494431Z [command]/usr/bin/tar -xf /home/runner/work/_temp/15bfc51b-5e69-44b5-b588-711644df424c/cache.tzst -P -C /home/runner/work/wisp/wisp --use-compress-program unzstd
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.3677383Z Cache restored successfully
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.3710244Z Cache restored from key: node-cache-Linux-x64-npm-c956a6a27ad876962e31c0c16a68267331c5429432e282313a283eb36b09dfc0
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.3905594Z ##[group]Run npm ci
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.3905912Z ^[[36;1mnpm ci^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.4149405Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:29.4149729Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.0934626Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.0942252Z added 131 packages, and audited 132 packages in 4s
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.0942881Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.0943250Z 16 packages are looking for funding
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.0943800Z   run `npm fund` for details
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.0950072Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.0950428Z found 0 vulnerabilities
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.1674829Z ##[group]Run npm run typecheck
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.1675190Z ^[[36;1mnpm run typecheck^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.1747722Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.1748015Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.2793617Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.2794354Z > frontend@0.0.0 typecheck
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.2794878Z > tsc -b
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:33.2795097Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.0898941Z ##[group]Run npm run lint
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.0899262Z ^[[36;1mnpm run lint^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.0969800Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.0970083Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2002051Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2003079Z > frontend@0.0.0 lint
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2003603Z > oxlint
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2003803Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2947515Z ##[warning]scripts/vendor.mjs:15:16: Identifier 'cwd' is imported but never used.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2958529Z ##[warning]scripts/vendor.mjs:63:82: Unexpected combining class in character class.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2961362Z ##[warning]src/fixtures/harness.ts:358:70: Unnecessary escape character '会'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2964896Z ##[warning]src/components/harness/firstrun-overlay.tsx:74:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2968589Z ##[warning]scripts/gen-tokens.mjs:125:26: Parameter 'out' is declared but never used. Unused parameters should start with a '_'.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2972309Z ##[warning]src/components/harness/toast.tsx:78:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.2976381Z ##[warning]src/components/harness/workspace-picker.tsx:180:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3011210Z ##[warning]src/components/ai-native/button.tsx:42:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3014898Z ##[warning]src/components/l2-approval-card.tsx:285:16: Cannot create components during render
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3018317Z ##[warning]src/components/react-bits/magnet.tsx:59:7: Calling setState synchronously within an effect can trigger cascading renders
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3021238Z ##[warning]src/components/composer.tsx:299:12: Cannot create components during render
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3023759Z ##[warning]src/components/composer.tsx:312:8: Cannot create components during render
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3027591Z ##[warning]src/components/harness/monitor-popover.tsx:115:14: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3030860Z ##[warning]src/components/harness/monitor-popover.tsx:117:37: Unnecessary escape character 'w'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3033536Z ##[warning]src/components/harness/monitor-popover.tsx:117:42: Unnecessary escape character 'w'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3036345Z ##[warning]src/components/harness/monitor-popover.tsx:117:52: Unnecessary escape character 'p'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3039184Z ##[warning]src/components/harness/monitor-popover.tsx:117:67: Unnecessary escape character 'W'
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3042667Z ##[warning]src/components/ui/badge.tsx:61:17: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3047657Z ##[warning]src/components/ui/button.tsx:77:18: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3049533Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3049922Z Found 19 warnings and 0 errors.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3050620Z Finished in 56ms on 69 files with 116 rules using 4 threads.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3171717Z ##[group]Run npm run tokens:check
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3172071Z ^[[36;1mnpm run tokens:check^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3240541Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.3240830Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4278984Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4279782Z > frontend@0.0.0 tokens:check
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4280470Z > node scripts/gen-tokens.mjs --check
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4280796Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4657570Z gen-tokens: src/styles/tokens.generated.css matches the generator (87 keys, 43 tokens, light+dark)
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4789164Z ##[group]Run npm run build
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4789467Z ^[[36;1mnpm run build^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4858536Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.4858825Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.5883598Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.5884432Z > frontend@0.0.0 build
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.5884812Z > tsc -b && vite build
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:37.5884979Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.2826243Z ^[[36mvite v8.3.0 ^[[32mbuilding client environment for production...^[[36m^[[39m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.2924245Z transforming...
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.5604992Z ✓ 2439 modules transformed.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6094318Z rendering chunks...
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6783578Z computing gzip size...
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6881163Z dist/index.html                   1.04 kB │ gzip:   0.63 kB
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6881783Z dist/assets/index-yy8KMgdf.css   49.54 kB │ gzip:   9.84 kB
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6882367Z dist/assets/index-CZ-rxcIB.js   551.96 kB │ gzip: 170.73 kB
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6882611Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6922666Z ^[[33m[plugin builtin:vite-reporter] 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6923674Z (!) Some chunks are larger than 500 kB after minification. Consider:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6924549Z - Using dynamic import() to code-split the application
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6925905Z - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6927231Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.^[[39m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.6998005Z ^[[32m✓ built in 416ms^[[39m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.7401522Z ##[group]Run npm run render:l2 -- fixtures/l2-card-fs-delete.json
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.7402213Z ^[[36;1mnpm run render:l2 -- fixtures/l2-card-fs-delete.json^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.7468842Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.7469114Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.8475386Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.8475798Z > frontend@0.0.0 render:l2
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.8477007Z > vite build --ssr scripts/render-l2.tsx --outDir node_modules/.tmp/l2render --logLevel warn && node node_modules/.tmp/l2render/render-l2.js fixtures/l2-card-fs-delete.json
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:41.8477643Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.3943373Z <div class="flex h-screen w-full flex-col overflow-hidden bg-page text-ink"><header class="flex h-11 shrink-0 select-none items-center justify-between gap-2 border-b border-line bg-surface pl-4 pr-3"><div class="flex items-center gap-2.5"><div class="size-3.5 rounded-full bg-accent"></div><span class="text-[13px] font-medium text-ink">一缕</span></div><div class="flex items-center gap-2"><span class="inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium leading-none bg-orange-tint text-orange"><span class="size-1.5 rounded-full bg-orange"></span>待审批 1</span></div></header><div class="flex min-h-0 flex-1 overflow-hidden"><nav aria-label="面板视图" class="relative flex w-[60px] min-w-[60px] shrink-0 flex-col items-center gap-0.5 border-r border-line bg-surface py-3"><div aria-hidden="true" class="nav-glide" style="transform:translateY(12px)"></div><button aria-current="page" aria-label="对话" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-accent-ink" title="对话" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square-text" aria-hidden="true"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path><path d="M7 11h10"></path><path d="M7 15h6"></path><path d="M7 7h8"></path></svg><span class="nav-rail-label">对话</span></button><button aria-label="审批" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-3 hover:bg-hover hover:text-ink" title="审批" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg><span class="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-accent text-[9px] font-medium leading-none text-white">1</span><span class="nav-rail-label">审批</span></button><button aria-label="命令" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-3 hover:bg-hover hover:text-ink" title="命令" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-command" aria-hidden="true"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path></svg><span class="nav-rail-label">命令</span></button><button aria-label="任务" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-3 hover:bg-hover hover:text-ink" title="任务" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-checks" aria-hidden="true"><path d="M13 5h8"></path><path d="M13 12h8"></path><path d="M13 19h8"></path><path d="m3 17 2 2 4-4"></path><path d="m3 7 2 2 4-4"></path></svg><span class="nav-rail-label">任务</span></button><button aria-label="球状态" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-3 hover:bg-hover hover:text-ink" title="球状态" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-orbit" aria-hidden="true"><path d="M20.341 6.484A10 10 0 0 1 10.266 21.85"></path><path d="M3.659 17.516A10 10 0 0 1 13.74 2.152"></path><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="19" r="2"></circle></svg><span class="nav-rail-label">球状态</span></button><button aria-label="设置" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-3 hover:bg-hover hover:text-ink" title="设置" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg><span class="nav-rail-label">设置</span></button><button aria-label="安全" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-3 hover:bg-hover hover:text-ink" title="安全" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-alert" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span class="nav-rail-label">安全</span></button><button aria-label="隐私" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-3 hover:bg-hover hover:text-ink" title="隐私" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span class="nav-rail-label">隐私</span></button><button aria-label="成本" class="nav-rail-item flex size-10 shrink-0 items-center justify-center rounded-control transition-colors duration-150 text-ink-3 hover:bg-hover hover:text-ink" title="成本" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-column lucide-bar-chart-3" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg><span class="nav-rail-label">成本</span></button></nav><main class="screen-enter flex min-h-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-page px-6 pb-6 pt-5"><div data-slot="card" class="flex flex-col rounded-xl border shadow-sm relative w-full gap-0 overflow-hidden rounded-card border-line bg-surface py-0 text-ink shadow-card"><div aria-hidden="true" class="h-[2px] w-full shrink-0 bg-stop"></div><div data-slot="card-header" class="@container/card-header auto-rows-min grid-rows-[auto_auto] items-start gap-2 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 block px-4 pb-2 pt-3"><div class="flex items-start justify-between gap-3"><div class="flex min-w-0 items-center gap-2.5"><div class="flex size-8 shrink-0 items-center justify-center rounded-control bg-inset text-ink-2 shadow-hairline"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash lucide-trash-2 size-4" aria-hidden="true"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div><div class="min-w-0"><p class="text-[13px] font-medium text-ink">需要你的确认</p><div data-slot="card-title" class="mt-0.5 flex min-w-0 items-center gap-2 text-[11.5px] font-normal leading-snug text-ink-2"><span class="truncate font-mono">fs.delete</span><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full px-1.5 border-red/40 text-red"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-alert size-3" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span class="uppercase tracking-wide">L2 强确认</span></span></div></div></div></div></div><div data-slot="card-content" class="flex flex-col gap-2.5 px-4 pb-3"><div><p class="mb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-3">完整参数</p><div class="overflow-x-auto rounded-control border border-line bg-inset px-3 py-2.5 shadow-hairline"><pre class="m-0 whitespace-pre font-mono text-[11.5px] leading-[1.45] text-ink">fs.delete
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4028112Z C:/Users/swq/Documents/notes.md</pre></div></div><div><p class="mb-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-3">为什么需要确认</p><p class="text-[12.5px] leading-[1.6] text-ink-2">R1: 工具声明为下界（L1）; R8: 不可逆操作（永久删除）</p><div class="mt-2"><ul aria-label="matched risk rules" class="m-0 flex list-none flex-wrap gap-1 p-0"><li><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full border-line px-1.5 text-ink-2" style="font-family:var(--font-mono-stack);font-size:10.5px;height:20px" title="R1">R1</span></li><li><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full border-line px-1.5 text-ink-2" style="font-family:var(--font-mono-stack);font-size:10.5px;height:20px" title="R8">R8</span></li></ul></div></div><p class="font-mono text-[11.5px] text-ink-2">调用链：cli &gt; panel-assets &gt; fs.delete</p><div class="flex items-start gap-1.5 text-[11px] leading-[1.6] text-ink-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info mt-px size-3.5 shrink-0" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg><span>批准权在原生侧 · 面板不提供允许按钮</span></div></div><div data-slot="card-footer" class="flex [.border-t]:pt-6 flex-col items-stretch gap-2 border-t border-line px-4 py-2.5"><p class="flex items-center gap-1.5 text-[11px] text-ink-2"><svg aria-hidden="true" class="shrink-0 text-ink-2" height="20" viewBox="0 0 20 20" width="20"><circle class="l2-ball-ring" cx="10" cy="10" fill="none" r="8" stroke="currentColor" stroke-width="1"></circle><circle cx="10" cy="10" fill="currentColor" r="5"></circle></svg>点击悬浮球以批准</p><div class="flex items-center gap-2"><span class="mr-auto text-[11px] text-ink-3">判定来自 原生风险评估</span><button data-slot="button" data-variant="destructive" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5 rounded-control bg-red text-white hover:bg-red/90">拒绝</button><button data-slot="button" data-variant="outline" data-size="sm" class="inline-flex shrink-0 items-center justify-center text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 border shadow-xs hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 rounded-md px-3 has-[&gt;svg]:px-2.5 rounded-control border-line bg-surface text-ink hover:bg-hover">查看完整参数</button></div></div></div><div class="flex min-h-0 w-full flex-1 flex-col gap-5"><p class="text-[12.5px] text-ink-3">还没有收到结果。面板不自己生成内容，Go 侧推送的流式结果会出现在这里。</p></div><div class="mt-auto"><div class="mt-2 flex w-full flex-col gap-2.5 border-t border-line px-1 pb-1 pt-3"><div class="flex items-center gap-1.5 text-[11.5px] text-ink-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-cog lucide-folder-cog-2 size-3.5 shrink-0" aria-hidden="true"><path d="M10.3 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.98a2 2 0 0 1 1.69.9l.66 1.2A2 2 0 0 0 12 6h8a2 2 0 0 1 2 2v3.3"></path><path d="m14.305 19.53.923-.382"></path><path d="m15.228 16.852-.923-.383"></path><path d="m16.852 15.228-.383-.923"></path><path d="m16.852 20.772-.383.924"></path><path d="m19.148 15.228.383-.923"></path><path d="m19.53 21.696-.382-.924"></path><path d="m20.772 16.852.924-.383"></path><path d="m20.772 19.148.924.383"></path><circle cx="18" cy="18" r="3"></circle></svg><span class="min-w-0 flex-1 truncate font-mono" title="尚未收到原生侧的状态快照">尚未收到原生侧的状态快照</span><input aria-label="工作区路径（由原生侧解析与校验）" class="w-32 shrink-0 rounded-chip border border-line bg-surface px-1.5 py-0.5
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4057489Z             font-mono text-[11px] text-ink outline-none transition-colors duration-100
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4058760Z render-l2: OK, 1 card(s) rendered from real risk decisions, 19043 bytes of HTML
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4084812Z             focus:border-line-strong" placeholder="D:\work\project" value=""/><button class="flex shrink-0 items-center gap-0.5 rounded-chip px-1 py-0.5 text-ink-3
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4086150Z             transition-colors duration-100 hover:bg-hover hover:text-ink
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4089696Z             disabled:pointer-events-none disabled:opacity-50" disabled="" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right size-3" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>切换</button></div><div class="flex cursor-text flex-col gap-1.5 rounded-control border border-line bg-field
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4091502Z           p-2.5 shadow-btn transition-[border-color,box-shadow] duration-150
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4092695Z           focus-within:border-line-strong" role="presentation"><div class="flex items-end gap-1"><button aria-label="添加附件" class="flex size-7 shrink-0 items-center justify-center rounded-[8px] text-ink-3
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4093660Z               transition-[background-color,color,transform] duration-150 hover:bg-hover
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4097113Z               hover:text-ink active:scale-[0.94] disabled:pointer-events-none disabled:opacity-50" title="支持 ，单个 &lt;= 0 B" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-paperclip size-4" aria-hidden="true"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"></path></svg></button><input accept="" class="hidden" multiple="" type="file"/><textarea aria-label="给 Wisp 的指令" class="min-h-7 min-w-0 w-full resize-none bg-transparent px-1 py-[5px]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4099384Z               text-[13px] leading-[18px] text-ink outline-none [overflow-wrap:anywhere]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4100460Z               placeholder:text-ink-3" placeholder="输入消息或粘贴图片…" rows="1"></textarea><button aria-label="发送" class="flex size-7 shrink-0 items-center justify-center rounded-[8px]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4101378Z               transition-[background-color,color,transform] duration-200
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4106149Z               enabled:active:scale-[0.94] disabled:pointer-events-none disabled:opacity-50" disabled="" style="background:var(--line-strong);color:var(--ink-2)" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send size-4" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg></button></div></div><div class="flex flex-wrap items-center justify-between gap-2"><div aria-label="权限档位（只读显示，点击仅发起切换请求）" class="flex flex-wrap items-center gap-1.5" role="group"><button class="inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium transition-colors duration-100 bg-accent-tint text-accent-ink" type="button">档位未知</button></div><span class="shrink-0 text-[11px] text-ink-3">Enter 发送 · Shift+Enter 换行</span></div></div></div></main></div></div>
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4140015Z ##[group]Run npm run render:composer
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4140357Z ^[[36;1mnpm run render:composer^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4207752Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.4208025Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.5199054Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.5199776Z > frontend@0.0.0 render:composer
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.5201429Z > vite build --ssr scripts/render-composer.tsx --outDir node_modules/.tmp/composerrender --logLevel warn && node node_modules/.tmp/composerrender/render-composer.js
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.5202887Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9454113Z OK no host attached: 4375 bytes painted
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9491362Z OK workspace chosen, video stored: 5801 bytes painted
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9533940Z OK unsupported attachment told to the user: 5702 bytes painted
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9537029Z fixture: /home/runner/work/wisp/wisp/frontend/fixtures/composer-states.html
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9537757Z composer render: all states painted
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9693285Z ##[group]Run npm run render:stream
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9693616Z ^[[36;1mnpm run render:stream^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9761159Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:42.9761433Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.0813309Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.0813818Z > frontend@0.0.0 render:stream
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.0815334Z > vite build --ssr scripts/render-stream.tsx --outDir node_modules/.tmp/streamrender --logLevel warn && node node_modules/.tmp/streamrender/render-stream.js
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.0816380Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.3899963Z render-stream: OK, spec 1x14 --accent 1->0.2->1 1s, 8 corpus input(s), caret markup checked at count=0
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.4038352Z ##[group]Run npm run render:nav
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.4038675Z ^[[36;1mnpm run render:nav^[[0m
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.4105947Z shell: /usr/bin/bash -e {0}
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.4106231Z ##[endgroup]
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.5123583Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.5124380Z > frontend@0.0.0 render:nav
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.5125857Z > vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:43.5126964Z 
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.0323040Z panel-views: snapshot names unknown view "settings-page"
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.1092188Z render-nav: OK, 9 rail rows against 70 frozen §17.4 names + 7 owner-approved (2026-09-25 demo ruling), no substitutions, no view state in the nav layer
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.1350466Z Post job cleanup.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.2605589Z (node:2643) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.2606443Z (Use `node --trace-deprecation ...` to show where the warning was created)
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.2608949Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-c956a6a27ad876962e31c0c16a68267331c5429432e282313a283eb36b09dfc0, not saving cache.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.2759344Z Post job cleanup.
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.3652033Z [command]/usr/bin/git version
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.3696924Z git version 2.55.0
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.3739167Z Temporarily overriding HOME='/home/runner/work/_temp/444a5677-5e61-4aa0-8d50-fa1156c4fdcb' before making global git config changes
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.3740331Z Adding repository directory to the temporary git global config as a safe directory
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.3744563Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.3785821Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.3821578Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.4101357Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.4131456Z http.https://github.com/.extraheader
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.4142816Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.4183745Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.4459531Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.4527084Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.4976749Z Cleaning up orphan processes
+lint-frontend	UNKNOWN STEP	2026-10-01T23:23:44.5308766Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

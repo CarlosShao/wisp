@@ -1,0 +1,384 @@
+Current runner version: '2.337.0'
+##[group]Runner Image Provisioner
+Hosted Compute Agent
+Version: 20260901.588
+Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+Build Date: 2026-09-01T19:56:44Z
+Worker ID: {cfb7773e-4da0-4c50-b745-298b2de0a439}
+Azure Region: eastus
+##[endgroup]
+##[group]Operating System
+Ubuntu
+24.04.5
+LTS
+##[endgroup]
+##[group]Runner Image
+Image: ubuntu-24.04
+Version: 20260927.320.1
+Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+##[endgroup]
+##[group]GITHUB_TOKEN Permissions
+Contents: read
+Metadata: read
+Packages: read
+##[endgroup]
+Secret source: Actions
+Cache mode: write
+Prepare workflow directory
+Prepare all required actions
+Getting action download info
+Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Download action repository 'actions/setup-go@v5' (SHA:40f1582b2485089dde7abd97c1529aa768e1baff)
+Complete job name: test-core
+##[group]Run actions/checkout@v4
+with:
+  repository: CarlosShao/wisp
+  token: ***
+  ssh-strict: true
+  ssh-user: git
+  persist-credentials: true
+  clean: true
+  sparse-checkout-cone-mode: true
+  fetch-depth: 1
+  fetch-tags: false
+  show-progress: true
+  lfs: false
+  submodules: false
+  set-safe-directory: true
+  allow-unsafe-pr-checkout: false
+env:
+  WISP_ENV: test
+##[endgroup]
+Syncing repository: CarlosShao/wisp
+##[group]Getting Git version info
+Working directory is '/home/runner/work/wisp/wisp'
+[command]/usr/bin/git version
+git version 2.55.0
+##[endgroup]
+Temporarily overriding HOME='/home/runner/work/_temp/677f6b7e-73d5-473f-8043-9d2de0cb7c82' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+[command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+Deleting the contents of '/home/runner/work/wisp/wisp'
+##[group]Initializing the repository
+[command]/usr/bin/git init /home/runner/work/wisp/wisp
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+Initialized empty Git repository in /home/runner/work/wisp/wisp/.git/
+[command]/usr/bin/git remote add origin https://github.com/CarlosShao/wisp
+##[endgroup]
+##[group]Disabling automatic garbage collection
+[command]/usr/bin/git config --local gc.auto 0
+##[endgroup]
+##[group]Setting up auth
+[command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+[command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+[command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+[command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+[command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+[command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+[command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+##[endgroup]
+##[group]Fetching the repository
+[command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8ae4c23e2ab4e1bda87ba6d280430db75527670b:refs/remotes/origin/dev
+From https://github.com/CarlosShao/wisp
+ * [new ref]         8ae4c23e2ab4e1bda87ba6d280430db75527670b -> origin/dev
+##[endgroup]
+##[group]Determining the checkout info
+##[endgroup]
+[command]/usr/bin/git sparse-checkout disable
+[command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+##[group]Checking out the ref
+[command]/usr/bin/git checkout --progress --force -B dev refs/remotes/origin/dev
+Switched to a new branch 'dev'
+branch 'dev' set up to track 'origin/dev'.
+##[endgroup]
+[command]/usr/bin/git log -1 --format=%H
+8ae4c23e2ab4e1bda87ba6d280430db75527670b
+##[group]Run actions/setup-go@v5
+with:
+  go-version-file: go.mod
+  check-latest: false
+  token: ***
+  cache: true
+env:
+  WISP_ENV: test
+##[endgroup]
+Setup go version spec 1.27
+Attempting to download 1.27...
+(node:2073) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+matching 1.27...
+Acquiring 1.27.1 from https://github.com/actions/go-versions/releases/download/1.27.1-33583469715/go-1.27.1-linux-x64.tar.gz
+Extracting Go...
+[command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/a3647fd7-1074-42f8-a509-ff635f5650e9 -f /home/runner/work/_temp/88b8dc00-e44d-4e58-b88e-660fbfd9b2ce
+Successfully extracted go to /home/runner/work/_temp/a3647fd7-1074-42f8-a509-ff635f5650e9
+Adding to the cache ...
+Successfully cached go to /opt/hostedtoolcache/go/1.27.1/x64
+Added go to the path
+Successfully set up Go version 1.27
+[command]/opt/hostedtoolcache/go/1.27.1/x64/bin/go env GOMODCACHE
+[command]/opt/hostedtoolcache/go/1.27.1/x64/bin/go env GOCACHE
+/home/runner/go/pkg/mod
+/home/runner/.cache/go-build
+Cache is not found
+go version go1.27.1 linux/amd64
+
+##[group]go env
+AR='ar'
+CC='gcc'
+CGO_CFLAGS='-O2 -g'
+CGO_CPPFLAGS=''
+CGO_CXXFLAGS='-O2 -g'
+CGO_ENABLED='1'
+CGO_FFLAGS='-O2 -g'
+CGO_LDFLAGS='-O2 -g'
+CXX='g++'
+GCCGO='gccgo'
+GO111MODULE=''
+GOAMD64='v1'
+GOARCH='amd64'
+GOAUTH='netrc'
+GOBIN='/home/runner/go/bin'
+GOCACHE='/home/runner/.cache/go-build'
+GOCACHEPROG=''
+GODEBUG=''
+GOENV='/home/runner/.config/go/env'
+GOEXE=''
+GOEXPERIMENT=''
+GOFIPS140='off'
+GOFLAGS=''
+GOGCCFLAGS='-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build4292903164=/tmp/go-build -gno-record-gcc-switches'
+GOHOSTARCH='amd64'
+GOHOSTOS='linux'
+GOINSECURE=''
+GOMOD='/home/runner/work/wisp/wisp/go.mod'
+GOMODCACHE='/home/runner/go/pkg/mod'
+GONOPROXY=''
+GONOSUMDB=''
+GOOS='linux'
+GOPACKAGESDRIVER=''
+GOPATH='/home/runner/go'
+GOPRIVATE=''
+GOPROXY='https://proxy.golang.org,direct'
+GOROOT='/opt/hostedtoolcache/go/1.27.1/x64'
+GOSUMDB='sum.golang.org'
+GOTELEMETRY='local'
+GOTELEMETRYDIR='/home/runner/.config/go/telemetry'
+GOTMPDIR=''
+GOTOOLCHAIN='auto'
+GOTOOLDIR='/opt/hostedtoolcache/go/1.27.1/x64/pkg/tool/linux_amd64'
+GOVCS=''
+GOVERSION='go1.27.1'
+GOWORK=''
+PKG_CONFIG='pkg-config'
+
+##[endgroup]
+##[group]Run docker compose -f docker/compose.test.yml --profile test up -d --build mock-llm
+^[[36;1mdocker compose -f docker/compose.test.yml --profile test up -d --build mock-llm^[[0m
+shell: /usr/bin/bash -e {0}
+env:
+  WISP_ENV: test
+##[endgroup]
+#1 [internal] load local bake definitions
+#1 reading from stdin 379B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from mockllm.Dockerfile
+#2 transferring dockerfile: 610B done
+#2 DONE 0.0s
+
+#3 [auth] library/alpine:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [auth] library/golang:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#5 [internal] load metadata for docker.io/library/golang:1.27-alpine
+#5 DONE 0.6s
+
+#6 [internal] load metadata for docker.io/library/alpine:3.20
+#6 DONE 0.8s
+
+#7 [internal] load .dockerignore
+#7 transferring context:
+#7 transferring context: 2B done
+#7 DONE 0.7s
+
+#8 [internal] load build context
+#8 DONE 0.0s
+
+#9 [stage-1 1/2] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#9 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#9 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 0.6s done
+#9 sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 9.23kB / 9.23kB done
+#9 sha256:c64c687cbea9300178b30c95835354e34c4e4febc4badfe27102879de0483b5e 1.02kB / 1.02kB done
+#9 sha256:bf8527eb54c3680e728d5b4b383a8ba730d72dae7236fbc8dff97ed6b224a731 612B / 612B done
+#9 ...
+
+#8 [internal] load build context
+#8 transferring context: 91.23kB done
+#8 DONE 1.0s
+
+#10 [build 1/6] FROM docker.io/library/golang:1.27-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414
+#10 resolve docker.io/library/golang:1.27-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414 0.6s done
+#10 sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414 10.29kB / 10.29kB done
+#10 sha256:cd9a32216aee5667f957a62d13a10032a63fd58e14b3f3d9cc8c2122f501e95e 1.92kB / 1.92kB done
+#10 sha256:340a7d186a598086366ea5264e8c6e74e4dee36dc2d70ac0f621b6b28930a786 2.19kB / 2.19kB done
+#10 sha256:aa6e7f3ded592e443fd9ff13e0934fc149b642f26b962019d38fc8879f8764d1 247.53kB / 247.53kB 1.0s
+#10 sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 17.83MB / 71.08MB 1.3s
+#10 sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 38.80MB / 71.08MB 1.4s
+#10 sha256:aa6e7f3ded592e443fd9ff13e0934fc149b642f26b962019d38fc8879f8764d1 247.53kB / 247.53kB 1.5s done
+#10 sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 56.62MB / 71.08MB 1.6s
+#10 extracting sha256:aa6e7f3ded592e443fd9ff13e0934fc149b642f26b962019d38fc8879f8764d1
+#10 sha256:1e707d1be9b7cfef08708f1d35029e5e65c69766a1e39e2c027d0acd54b8e7b5 126B / 126B 1.6s
+#10 sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 71.08MB / 71.08MB 1.6s
+#10 extracting sha256:aa6e7f3ded592e443fd9ff13e0934fc149b642f26b962019d38fc8879f8764d1 0.1s done
+#10 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 0B / 32B 1.6s
+#10 sha256:1e707d1be9b7cfef08708f1d35029e5e65c69766a1e39e2c027d0acd54b8e7b5 126B / 126B 1.7s done
+#10 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 1.7s
+#10 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 1.8s done
+#10 sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 71.08MB / 71.08MB 2.3s done
+#10 ...
+
+#9 [stage-1 1/2] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#9 sha256:25f1d6b1951ac8eb3740558fe94cb83d377bdadf95fd9f98b50d2e1b96130471 3.63MB / 3.63MB 1.2s done
+#9 extracting sha256:25f1d6b1951ac8eb3740558fe94cb83d377bdadf95fd9f98b50d2e1b96130471 0.2s done
+#9 DONE 4.3s
+
+#10 [build 1/6] FROM docker.io/library/golang:1.27-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414
+#10 extracting sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095
+#10 extracting sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 3.5s done
+#10 extracting sha256:1e707d1be9b7cfef08708f1d35029e5e65c69766a1e39e2c027d0acd54b8e7b5
+#10 extracting sha256:1e707d1be9b7cfef08708f1d35029e5e65c69766a1e39e2c027d0acd54b8e7b5 done
+#10 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#10 DONE 12.9s
+
+#11 [build 2/6] WORKDIR /src
+#11 DONE 0.0s
+
+#12 [build 3/6] COPY tools/mockllm/go.mod ./
+#12 DONE 0.1s
+
+#13 [build 4/6] RUN go mod download || true
+#13 0.129 go: no module dependencies to download
+#13 DONE 0.1s
+
+#14 [build 5/6] COPY tools/mockllm/ ./
+#14 DONE 0.2s
+
+#15 [build 6/6] RUN CGO_ENABLED=0 go build -trimpath -o /out/mockllm .
+#15 DONE 10.2s
+
+#16 [stage-1 2/2] COPY --from=build /out/mockllm /usr/local/bin/mockllm
+#16 DONE 0.2s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 0.4s done
+#17 writing image sha256:afd4af600ebf1b694d3cacee65d12fe0c35f6beef4b0ca5ce1d370e1e1cd24c7 0.1s done
+ mock-llm  Built
+#17 naming to docker.io/wisp/mock-llm:dev done
+#17 DONE 0.4s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Network wisp-test_default  Creating
+ Network wisp-test_default  Created
+ Container wisp-mock-llm  Creating
+ Container wisp-mock-llm  Created
+ Container wisp-mock-llm  Starting
+ Container wisp-mock-llm  Started
+##[group]Run for i in $(seq 1 30); do
+^[[36;1mfor i in $(seq 1 30); do^[[0m
+^[[36;1m  if curl -fsS http://127.0.0.1:18080/v1/models > /dev/null; then^[[0m
+^[[36;1m    echo "mock-llm reachable"^[[0m
+^[[36;1m    exit 0^[[0m
+^[[36;1m  fi^[[0m
+^[[36;1m  sleep 1^[[0m
+^[[36;1mdone^[[0m
+^[[36;1mecho "mock-llm never became reachable"^[[0m
+^[[36;1mexit 1^[[0m
+shell: /usr/bin/bash -e {0}
+env:
+  WISP_ENV: test
+##[endgroup]
+mock-llm reachable
+##[group]Run bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+^[[36;1mbash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv^[[0m
+shell: /usr/bin/bash -e {0}
+env:
+  WISP_ENV: test
+##[endgroup]
+=== RUN   TestLayoutForTestEnv
+=== RUN   TestLayoutForTestEnv/explicit_WISP_TEST_DATA_DIR
+=== RUN   TestLayoutForTestEnv/falls_back_to_TEMP_per_pid
+    envfork_test.go:139: test DataDir = "/tmp/wisp-test-5663" (TMPDIR = "/tmp", which reaches "/tmp")
+--- PASS: TestLayoutForTestEnv (0.00s)
+    --- PASS: TestLayoutForTestEnv/explicit_WISP_TEST_DATA_DIR (0.00s)
+    --- PASS: TestLayoutForTestEnv/falls_back_to_TEMP_per_pid (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/proc	0.002s
+runtests.sh: OK - packages=[./internal/proc/ -run TestLayoutForTestEnv] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=3, '[no tests to run]'=0
+##[group]Run bash scripts/portable-tests.sh --scope=core
+^[[36;1mbash scripts/portable-tests.sh --scope=core^[[0m
+shell: /usr/bin/bash -e {0}
+env:
+  WISP_ENV: test
+##[endgroup]
+portable-tests.sh: GUARD C - scope mode=core resolved to a DIFFERENT package
+portable-tests.sh:   set than the one pinned next to it. Pinned: 25, resolved: 35.
+portable-tests.sh:   25a26,35
+portable-tests.sh:   > go: downloading github.com/dustin/go-humanize v1.0.1
+portable-tests.sh:   > go: downloading github.com/google/uuid v1.6.0
+portable-tests.sh:   > go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+portable-tests.sh:   > go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+portable-tests.sh:   > go: downloading golang.org/x/crypto v0.57.0
+portable-tests.sh:   > go: downloading golang.org/x/sys v0.48.0
+portable-tests.sh:   > go: downloading modernc.org/libc v1.75.7
+portable-tests.sh:   > go: downloading modernc.org/mathutil v1.7.1
+portable-tests.sh:   > go: downloading modernc.org/memory v1.12.1
+portable-tests.sh:   > go: downloading modernc.org/sqlite v1.59.0
+portable-tests.sh: a deleted or newly-uncovered package must fail the step, not
+portable-tests.sh: shorten it. Either restore the scope entry or update the pin
+portable-tests.sh: in the SAME commit and say why in the CI log.
+##[error]Process completed with exit code 1.
+##[group]Run docker compose -f docker/compose.test.yml --profile test down
+^[[36;1mdocker compose -f docker/compose.test.yml --profile test down^[[0m
+shell: /usr/bin/bash -e {0}
+env:
+  WISP_ENV: test
+##[endgroup]
+ Container wisp-mock-llm  Stopping
+ Container wisp-mock-llm  Stopped
+ Container wisp-mock-llm  Removing
+ Container wisp-mock-llm  Removed
+ Network wisp-test_default  Removing
+ Network wisp-test_default  Removed
+Post job cleanup.
+[command]/usr/bin/git version
+git version 2.55.0
+Temporarily overriding HOME='/home/runner/work/_temp/0bc96196-c94a-41bd-8cbd-e6e9e2e2a23b' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+[command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+[command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+[command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+[command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+http.https://github.com/.extraheader
+[command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+[command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+[command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+[command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Cleaning up orphan processes
+##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
