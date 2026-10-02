@@ -1,0 +1,26 @@
+portable-tests-selftest.sh: judging /tmp/mutC-dirscope.sh in a shadow root at /tmp/tmp.Gb7rj4CATX
+portable-tests-selftest.sh: core_pin extracted from /tmp/tmp.Gb7rj4CATX/scripts/portable-tests.sh = 25 import paths
+portable-tests-selftest.sh: winsec_pin extracted from /tmp/tmp.Gb7rj4CATX/scripts/portable-tests.sh = 1 import path(s)
+portable-tests-selftest.sh: split seed = github.com/CarlosShao/wisp/internal/winsec + github.com/CarlosShao/wisp/internal/winsec/acl (2 lines)
+portable-tests-selftest.sh: 254 split universe = core_pin (25) + github.com/CarlosShao/wisp/internal/winsec/acl (26 lines)
+
+== case chain-widened-scope-loses-audit: rc=2 log=/tmp/tmp.MIvw2k9E2h/chain-widened-scope-loses-audit.log
+   ok   exit 2, as expected
+   ok   /winsec-tests\.sh: GUARD 3/ appears 1 time(s)
+   ok   /the delegated audit therefore did not happen/ appears 1 time(s)
+   ok   /IS the winsec tier/ absent
+   ok   /^runtests\.sh: OK/ appears 1 time(s)
+
+== case chain-single-path-is-audited: rc=2 log=/tmp/tmp.MIvw2k9E2h/chain-single-path-is-audited.log
+   FAIL exit 2, expected 0
+   ok   /IS the winsec tier/ appears 1 time(s)
+   FAIL /winsec-tests\.sh: GUARD 3/ appeared 1 time(s):
+        92:winsec-tests.sh: GUARD 3 - the step went green WITHOUT scripts/portable-tests.sh reporting that it ran scope=[./internal/winsec/...] as the winsec tier against winsec_pin.
+
+== case chain-scope-flag-not-accepted: rc=2 log=/tmp/tmp.MIvw2k9E2h/chain-scope-flag-not-accepted.log
+   ok   exit 2, as expected
+   ok   /winsec-tests\.sh: GUARD 1 - the package list for this step does not name/ appears 1 time(s)
+
+portable-tests-selftest.sh: 3 case(s) ran, 2 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.MIvw2k9E2h (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.

@@ -1,0 +1,25 @@
+portable-tests-selftest.sh: judging /tmp/mutA-pinned-empty.sh in a shadow root at /tmp/tmp.cWm1zPKxYw
+portable-tests-selftest.sh: core_pin extracted from /tmp/tmp.cWm1zPKxYw/scripts/portable-tests.sh = 25 import paths
+portable-tests-selftest.sh: winsec_pin extracted from /tmp/tmp.cWm1zPKxYw/scripts/portable-tests.sh = 1 import path(s)
+portable-tests-selftest.sh: split seed = github.com/CarlosShao/wisp/internal/winsec + github.com/CarlosShao/wisp/internal/winsec/acl (2 lines)
+portable-tests-selftest.sh: 254 split universe = core_pin (25) + github.com/CarlosShao/wisp/internal/winsec/acl (26 lines)
+
+== case chain-explicit-split-audit-bites: rc=0 log=/tmp/tmp.yMVVjyohYC/chain-explicit-split-audit-bites.log
+   FAIL exit 0, expected 1
+   ok   /explicit scope .*IS the winsec tier/ appears 1 time(s)
+   FAIL /GUARD C - scope mode=winsec resolved to a DIFFERENT package/ appeared 0 time(s), wanted at least 1
+   FAIL /> github\.com/CarlosShao/wisp/internal/winsec/acl/ appeared 0 time(s), wanted at least 1
+   FAIL /^runtests\.sh: OK/ appeared 1 time(s):
+        20:runtests.sh: OK - packages=[./internal/winsec/... -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$] top-level: PASS=2 FAIL=0 SKIP=0, === RUN=2, '[no tests to run]'=0
+   ok   /winsec-tests\.sh: GUARD 3/ absent
+
+== case chain-explicit-clean-stays-green: rc=0 log=/tmp/tmp.yMVVjyohYC/chain-explicit-clean-stays-green.log
+   ok   exit 0, as expected
+   ok   /explicit scope .*IS the winsec tier/ appears 1 time(s)
+   ok   /^runtests\.sh: OK/ appears 1 time(s)
+   ok   /winsec-tests\.sh: GUARD/ absent
+   ok   /GUARD [ABC] -/ absent
+
+portable-tests-selftest.sh: 2 case(s) ran, 4 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.yMVVjyohYC (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.

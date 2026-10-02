@@ -1,0 +1,29 @@
+portable-tests-selftest.sh: judging .scratch/wisp/probes/254/r1b/logs/portable-tests-at-d253703a-parent.sh in a shadow root at /tmp/tmp.nGJkMVI8FN
+portable-tests-selftest.sh: core_pin extracted from /tmp/tmp.nGJkMVI8FN/scripts/portable-tests.sh = 25 import paths
+portable-tests-selftest.sh: winsec_pin extracted from /tmp/tmp.nGJkMVI8FN/scripts/portable-tests.sh = 1 import path(s)
+portable-tests-selftest.sh: split seed = github.com/CarlosShao/wisp/internal/winsec + github.com/CarlosShao/wisp/internal/winsec/acl (2 lines)
+portable-tests-selftest.sh: 254 split universe = core_pin (25) + github.com/CarlosShao/wisp/internal/winsec/acl (26 lines)
+
+== case core-tier-split-goes-red: rc=0 log=/tmp/tmp.FvU7gJpnWX/core-tier-split-goes-red.log
+   FAIL exit 0, expected 1
+   FAIL /GUARD C - scope mode=core resolved to a DIFFERENT package/ appeared 0 time(s), wanted at least 1
+   FAIL /> github\.com/CarlosShao/wisp/internal/winsec/acl/ appeared 0 time(s), wanted at least 1
+
+== case winsec-tier-split-same-seed: rc=1 log=/tmp/tmp.FvU7gJpnWX/winsec-tier-split-same-seed.log
+   ok   exit 1, as expected
+   ok   /GUARD C - scope mode=winsec resolved to a DIFFERENT package/ appears 1 time(s)
+   ok   /> github\.com/CarlosShao/wisp/internal/winsec/acl/ appears 1 time(s)
+   FAIL the two tiers disagree about what bit - core says [], the winsec tier says [github.com/CarlosShao/wisp/internal/winsec/acl].
+        One package, two answers: ticket 254 AC#2.
+   FAIL core branch carries 1 private spelling(s) of ./internal/winsec/ and 0 shared
+        reference(s) - two spellings means the two tiers can resolve one package
+        two ways (ticket 254 AC#2). Pre-d253703a bytes fail here.
+
+== case core-tier-clean-globform: rc=0 log=/tmp/tmp.FvU7gJpnWX/core-tier-clean-globform.log
+   ok   exit 0, as expected
+   ok   denominator (GUARD B rows, one per resolved line) = 25
+   ok   /GUARD [ABC] -/ absent
+
+portable-tests-selftest.sh: 3 case(s) ran, 5 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.FvU7gJpnWX (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.

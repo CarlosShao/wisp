@@ -1,0 +1,13 @@
+portable-tests-selftest.sh: judging .scratch/wisp/probes/254/r1b/logs/portable-tests-at-d253703a-parent.sh in a shadow root at /tmp/tmp.U8rQtfrmVR
+portable-tests-selftest.sh: core_pin extracted from /tmp/tmp.U8rQtfrmVR/scripts/portable-tests.sh = 25 import paths
+portable-tests-selftest.sh: winsec_pin extracted from /tmp/tmp.U8rQtfrmVR/scripts/portable-tests.sh = 1 import path(s)
+portable-tests-selftest.sh: split seed = github.com/CarlosShao/wisp/internal/winsec + github.com/CarlosShao/wisp/internal/winsec/acl (2 lines)
+portable-tests-selftest.sh: 254 split universe = core_pin (25) + github.com/CarlosShao/wisp/internal/winsec/acl (26 lines)
+
+== case core-dir-form-hides-the-split: mutant replaced 0 line (core's winsec row; 0 = nothing to mutate, and a seed that cannot take is not evidence)
+   FAIL the mutant seed took 0 line(s), expected exactly 1 - the core tier's winsec row moved
+        out from under this case; re-read the script instead of trusting it
+
+portable-tests-selftest.sh: 1 case(s) ran, 1 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.7XV0IvWHyj (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.

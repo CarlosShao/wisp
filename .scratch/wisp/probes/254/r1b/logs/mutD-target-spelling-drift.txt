@@ -1,0 +1,26 @@
+portable-tests-selftest.sh: core_pin extracted from /d/work/workspace/projects plans/Wisp/scripts/portable-tests.sh = 25 import paths
+portable-tests-selftest.sh: winsec_pin extracted from /d/work/workspace/projects plans/Wisp/scripts/portable-tests.sh = 1 import path(s)
+portable-tests-selftest.sh: split seed = github.com/CarlosShao/wisp/internal/winsec + github.com/CarlosShao/wisp/internal/winsec/acl (2 lines)
+portable-tests-selftest.sh: 254 split universe = core_pin (25) + github.com/CarlosShao/wisp/internal/winsec/acl (26 lines)
+
+== case chain-explicit-split-audit-bites: rc=2 log=/tmp/tmp.yA7M0BAyic/chain-explicit-split-audit-bites.log
+   FAIL exit 2, expected 1
+   FAIL /explicit scope .*IS the winsec tier/ appeared 0 time(s), wanted at least 1
+   FAIL /GUARD C - scope mode=winsec resolved to a DIFFERENT package/ appeared 0 time(s), wanted at least 1
+   FAIL /> github\.com/CarlosShao/wisp/internal/winsec/acl/ appeared 0 time(s), wanted at least 1
+   FAIL /^runtests\.sh: OK/ appeared 1 time(s):
+        19:runtests.sh: OK - packages=[./internal/winsec -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$] top-level: PASS=2 FAIL=0 SKIP=0, === RUN=2, '[no tests to run]'=0
+   FAIL /winsec-tests\.sh: GUARD 3/ appeared 1 time(s):
+        22:winsec-tests.sh: GUARD 3 - the step went green WITHOUT scripts/portable-tests.sh reporting that it ran scope=[./internal/winsec...] as the winsec tier against winsec_pin.
+
+== case chain-explicit-clean-stays-green: rc=2 log=/tmp/tmp.yA7M0BAyic/chain-explicit-clean-stays-green.log
+   FAIL exit 2, expected 0
+   FAIL /explicit scope .*IS the winsec tier/ appeared 0 time(s), wanted at least 1
+   ok   /^runtests\.sh: OK/ appears 1 time(s)
+   FAIL /winsec-tests\.sh: GUARD/ appeared 1 time(s):
+        19:winsec-tests.sh: GUARD 3 - the step went green WITHOUT scripts/portable-tests.sh reporting that it ran scope=[./internal/winsec...] as the winsec tier against winsec_pin.
+   ok   /GUARD [ABC] -/ absent
+
+portable-tests-selftest.sh: 2 case(s) ran, 9 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.yA7M0BAyic (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.

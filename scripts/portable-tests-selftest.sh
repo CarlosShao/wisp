@@ -8,8 +8,10 @@
 # "Pinned: 25, resolved: 36" and killed the core step BEFORE `go test` ran - while
 # on a warm cache (every developer laptop) stderr is empty and the same code is
 # silent. AC#3 forbids shipping that as "only measurable on CI", so the shape is
-# reproduced here on demand: eighteen cases, each of which either has to go red or
-# has to stay green, and the carrier exits non-zero if any of them does the other.
+# reproduced here on demand: 27 script invocations over 22 named scenarios (ticket 251
+# took it to eighteen, ticket 254's four scenarios add nine more), each of which either
+# has to go red or has to stay green, and the carrier exits non-zero if any of them
+# does the other.
 #
 # TICKET 251 ADDED THE LAST EIGHT, and they judge a different hole: `winsec_pin`
 # was a pin NOTHING compared - no `winsec)` branch existed, and the route CI really
@@ -29,6 +31,24 @@
 # 18 tell the two forms apart at all.
 # Cases 11-18 FAIL on the pre-fix bytes by design - that is this ticket's 改前必红
 # reading:  bash scripts/portable-tests-selftest.sh all /tmp/prefix.sh
+#
+# TICKET 254 ADDED THE LAST FOUR, and they judge a third thing: whether the audit is
+# still happening ON THE ROUTE CI TAKES. ci.yml:439 never says --scope=winsec - it runs
+# scripts/winsec-tests.sh, which hands scripts/portable-tests.sh an explicit package
+# path, so every claim about the winsec tier has to be re-taken through that parent.
+# Cases 19-20 drive the real chain (winsec-tests.sh -> portable-tests.sh) on the fake
+# go and show the delegated audit both bites (a split seen through the parent, case 19)
+# and is noticed when it stops (a widened explicit list silently leaves GUARD C's
+# denominator, case 20 - that is winsec-tests.sh GUARD 3). Cases 21-22 pin AC#2: the
+# core tier and the winsec tier now resolve internal/winsec through ONE variable, so on
+# one seed they must refuse over the SAME package (21), and the directory form this
+# ticket replaced is shown to hide that package outright (22, mutated copy). 20-22 go
+# red on the pre-delta bytes; 19 was already true under ticket 251 and stays green
+# there, which is why it is not the 改前必红 shot:
+#   git show d253703a^:scripts/portable-tests.sh >/tmp/pre254-portable.sh
+#   git show d253703a^:scripts/winsec-tests.sh  >/tmp/pre254-winsec.sh
+#   CARRIER_WINSEC_TESTS=/tmp/pre254-winsec.sh \
+#     bash scripts/portable-tests-selftest.sh all /tmp/pre254-portable.sh
 #
 # WHAT IS REAL AND WHAT IS NOT. The `go` process is scripts/testdata/portable-tests/go
 # (see its header for why a shim is the right tool here); everything else -
@@ -57,6 +77,10 @@
 #        derives its own root from its location and refuses to run without that
 #        strict runner. Only `go` is faked; the guards and runtests.sh are the
 #        bytes being judged.
+#   CARRIER_WINSEC_TESTS=/path/to/winsec-tests.sh
+#        Same idea for the PARENT script the chain cases (19-22) drive. Unset = the
+#        working copy. Set it together with the second argument to judge a whole
+#        commit's bytes - see the 改前必红 reading in the header.
 set -u -o pipefail
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -188,14 +212,24 @@ selected() { [ -z "$only" ] || [ "$only" = "$1" ]; }
 
 # ---- ticket 251: the helpers the winsec/census cases need -----------------------
 #
-# make_shadow_root <script> - the same shadow the second CLI argument builds: a
-# script under test derives its own root from its location and refuses to run
-# without tools/d22scan/runtests.sh next to it.
+# make_shadow_root <script> [winsec-tests.sh] - the same shadow the second CLI
+# argument builds: a script under test derives its own root from its location and
+# refuses to run without tools/d22scan/runtests.sh next to it. Ticket 254 adds the
+# optional second argument, because that ticket's claim lives in the PARENT script
+# (see the chain cases at the end of this file) and a chain shadow has to carry the
+# bytes of both links, not just the child's.
 make_shadow_root() {
     local shadow
     shadow=$(mktemp -d 2>/dev/null || echo "$root/.portable-shadow.$$")
     mkdir -p "$shadow/scripts" "$shadow/tools/d22scan"
     cp "$1" "$shadow/scripts/portable-tests.sh"
+    if [ -n "${2-}" ]; then
+        if [ ! -f "$2" ]; then
+            echo "portable-tests-selftest.sh: no such winsec-tests.sh to judge: $2" >&2
+            exit 2
+        fi
+        cp "$2" "$shadow/scripts/winsec-tests.sh"
+    fi
     cp "$root/tools/d22scan/runtests.sh" "$shadow/tools/d22scan/runtests.sh"
     cp "$root/go.mod" "$shadow/go.mod"
     cp "$root/go.sum" "$shadow/go.sum"
@@ -237,6 +271,51 @@ IFS= read -r winsec_path <"$winsec_pin_file"
 winsec_split="$work/winsec-pin-split.txt"
 { cat "$winsec_pin_file"; printf '%s\n' "$winsec_path/acl"; } >"$winsec_split"
 echo "portable-tests-selftest.sh: split seed = $winsec_path + ${winsec_path}/acl (2 lines)"
+# seed 254: the same split seen from the CORE tier's pin - a universe in which a
+# package exists beside internal/winsec that NEITHER pin row claims. Cases 21 and 22
+# run every tier against this one file, so "the two tiers disagree" can only mean one
+# thing: they were given the same world.
+core_split="$work/core-pin-split.txt"
+{ cat "$pin"; printf '%s\n' "$winsec_path/acl"; } >"$core_split"
+echo "portable-tests-selftest.sh: 254 split universe = core_pin ($pinc) + ${winsec_path}/acl ($((pinc + 1)) lines)"
+
+# TICKET 254: the chain runner. Cases 11-18 judge scripts/portable-tests.sh on its
+# own; the claim this ticket files is about the route CI REALLY takes -
+# .github/workflows/ci.yml:439 runs scripts/winsec-tests.sh, which hands the child an
+# EXPLICIT package path, and since this ticket the parent refuses to call itself green
+# unless the child says it audited that path (winsec-tests.sh GUARD 3). A guard that
+# exists only in the parent is invisible to every case above, so the chain gets its
+# own shadow root and its own runner here. Only `go` is faked; both scripts and
+# tools/d22scan/runtests.sh are the bytes being judged, executed.
+#
+# CARRIER_WINSEC_TESTS names the winsec-tests.sh bytes to judge, exactly the way the
+# second CLI argument names the portable-tests.sh bytes: the 改前必红 half of this
+# ticket points BOTH links at one commit's bytes without touching the working tree.
+# Default = the working copy.
+winsec_script=${CARRIER_WINSEC_TESTS:-$root/scripts/winsec-tests.sh}
+
+# run_chain <case-name> <universe-pin-file> [ENV=VAL ...] -- <winsec-tests.sh args...>
+# The universe file plays the role of "the packages that exist on disk": the fake go
+# resolves the scope against it the way real go does. Every shape inside one case
+# shares ONE universe file, so the only thing a case varies is the argument list the
+# parent is given - "same seed, two shapes" in the ticket's words.
+run_chain() {
+    local name=$1
+    local universe=$2
+    shift 2
+    local envs=()
+    while [ "$1" != "--" ]; do envs+=("$1"); shift; done
+    shift
+    last_log="$work/$name.log"
+    local shadow
+    shadow=$(make_shadow_root "$script" "$winsec_script")
+    ( cd "$shadow" && PATH="$work/bin:$PATH" FAKEGO_PIN_FILE="$universe" \
+        FAKEGO_SCOPE_FILTER=1 FAKEGO_GOOS=windows \
+        env ${envs[@]+"${envs[@]}"} bash scripts/winsec-tests.sh "$@" ) >"$last_log" 2>&1
+    last_rc=$?
+    ran=$((ran + 1))
+    printf '\n== case %s: rc=%d log=%s\n' "$name" "$last_rc" "$last_log"
+}
 
 # 1. control: the pin resolves, nothing on stderr. The step must be GREEN, which
 #    is what stops cases 2-9 from passing for the wrong reason.
@@ -511,6 +590,153 @@ if selected winsec-explicit-glob-is-what-bites; then
         hasnt 'GUARD C - scope mode=winsec'
         has '^runtests\.sh: OK'
         printf '   (logs: %s / %s)\n' "${last_log%-mutant.log}-real.log" "$last_log"
+    fi
+fi
+
+if selected chain-explicit-split-audit-bites; then
+    # positive: the SAME seed case 12 shoots the named tier with, handed over the route
+    # ci.yml:439 takes - and it takes it with ZERO arguments, so that is how the chain
+    # is called here (winsec-tests.sh then builds its own one-path scope). The audit has
+    # to bite THROUGH the parent, not merely be announced by it: "my scope was
+    # recognised" that nobody could falsify is the same claim as "配置里有一行 = 它跑过了".
+    run_chain chain-explicit-split-audit-bites "$winsec_split" --
+    want_rc 1
+    has 'explicit scope .*IS the winsec tier'
+    has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
+    has '> github\.com/CarlosShao/wisp/internal/winsec/acl'
+    hasnt '^runtests\.sh: OK'
+    # guard 3 declares itself only on an OTHERWISE GREEN step: a run the child already
+    # refused must not get a second, misattributed message. Pinned here because the
+    # only way to lose it is to notice it was never checked.
+    hasnt 'winsec-tests\.sh: GUARD 3'
+    # reverse face: same chain, same fake go, nothing split - green, and the parent
+    # stays quiet BECAUSE the child said it audited. Without this the case above could
+    # go red for the wrong reason (a chain that never audits anything).
+    run_chain chain-explicit-clean-stays-green "$winsec_pin_file" --
+    want_rc 0
+    has 'explicit scope .*IS the winsec tier'
+    has '^runtests\.sh: OK'
+    hasnt 'winsec-tests\.sh: GUARD'
+    hasnt 'GUARD [ABC] -'
+fi
+
+# 20. AC#1's ⓑ teeth: the hole GUARD 3 exists for. This script's own header advertises
+#     "extra packages may be appended by hand while debugging", and the moment it does,
+#     the child drops out of its one-path tier branch into "nothing to pin": the step
+#     stays GREEN (before this ticket's guard existed it measured exactly that - rc=0,
+#     zero audit lines, .scratch/wisp/probes/254/r1/logs/before-widened.txt). One
+#     universe, three shapes, only the argument list varies.
+if selected chain-widened-scope-loses-audit; then
+    run_chain chain-widened-scope-loses-audit "$pin" -- ./internal/winsec/ ./internal/agent/
+    want_rc 2
+    has 'winsec-tests\.sh: GUARD 3'
+    has 'the delegated audit therefore did not happen'
+    hasnt 'IS the winsec tier'
+    # the child WAS green - that is the whole point: rc=2 here comes from the audit
+    # going missing, not from a test failing.
+    has '^runtests\.sh: OK'
+    # reverse face, and the literal CI call (zero arguments, the parent's own one-path
+    # default): same universe, same fake go - green, because the child says it audited.
+    run_chain chain-ci-shape-is-audited "$pin" --
+    want_rc 0
+    has 'IS the winsec tier'
+    hasnt 'winsec-tests\.sh: GUARD 3'
+    # and the OTHER branch AC#1 offered (ⓐ, point the parent at --scope=winsec) is not
+    # reachable by passing arguments either: guard 1 refuses a list that does not name
+    # the package. So the ⓐ/ⓑ choice cannot be made silently from a call site - it
+    # needs an edit to this script, which is where the guards live.
+    run_chain chain-scope-flag-not-accepted "$pin" -- --scope=winsec
+    want_rc 2
+    has 'winsec-tests\.sh: GUARD 1 - the package list for this step does not name'
+fi
+
+# 21. AC#2: the two tiers that both claim internal/winsec must AGREE about a split of
+#     it. One universe with a package created beside internal/winsec; both tiers run
+#     against it; both must refuse, and the package they refuse over must be the SAME
+#     line. Two tiers, two spellings, two verdicts is the shape the ticket forbids, and
+#     the textual face of the rule is checked in the same case: the core branch may not
+#     carry its own spelling of that package, it has to name the shared variable.
+if selected core-and-winsec-see-the-same-split; then
+    run_with core-tier-split-goes-red "$core_split" "FAKEGO_SCOPE_FILTER=1" -- --scope=core
+    want_rc 1
+    has 'GUARD C - scope mode=core resolved to a DIFFERENT package'
+    has '> github\.com/CarlosShao/wisp/internal/winsec/acl'
+    run_with winsec-tier-split-same-seed "$core_split" "FAKEGO_SCOPE_FILTER=1" -- --scope=winsec
+    want_rc 1
+    has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
+    has '> github\.com/CarlosShao/wisp/internal/winsec/acl'
+    a=$(sed -n 's/^portable-tests\.sh:   > //p' "$work/core-tier-split-goes-red.log" | sort -u)
+    b=$(sed -n 's/^portable-tests\.sh:   > //p' "$work/winsec-tier-split-same-seed.log" | sort -u)
+    if [ -n "$a" ] && [ "$a" = "$b" ]; then
+        printf '   ok   both tiers refuse the same seed over the SAME package: %s\n' "$a"
+    else
+        printf '   FAIL the two tiers disagree about what bit - core says [%s], the winsec tier' "$a"
+        printf ' says [%s].\n        One package, two answers: ticket 254 AC#2.\n' "$b"
+        failed=$((failed + 1))
+    fi
+    core_branch=$(awk '/^core\)$/{f=1;next} f&&/^    ;;$/{exit} f' "$script")
+    hard=$(printf '%s\n' "$core_branch" | grep -cF './internal/winsec/' || true)
+    shared=$(printf '%s\n' "$core_branch" | grep -cF '"$winsec_scope"' || true)
+    if [ "$hard" -eq 0 ] && [ "$shared" -eq 1 ]; then
+        printf '   ok   the core branch names the winsec package through the ONE shared variable'
+        printf ' (%s reference, %s private spelling)\n' "$shared" "$hard"
+    else
+        printf '   FAIL core branch carries %s private spelling(s) of ./internal/winsec/ and %s' "$hard" "$shared"
+        printf ' shared\n        reference(s) - two spellings means the two tiers can resolve one package\n'
+        printf '        two ways (ticket 254 AC#2). Pre-d253703a bytes fail here.\n'
+        failed=$((failed + 1))
+    fi
+    # control for all of the above: on an unsplit universe BOTH tiers are green, i.e.
+    # the case above went red because of the seed and not because the tiers are broken.
+    run_with core-tier-clean-globform "$pin" "FAKEGO_SCOPE_FILTER=1" -- --scope=core
+    want_rc 0
+    denominator_is "$pinc"
+    hasnt 'GUARD [ABC] -'
+fi
+
+# 22. AC#2's counterfactual, the same shape as case 18 and for the same reason: "the
+#     core row had to change to the glob" is load-bearing only if the directory form
+#     demonstrably hides the split. MUTATED COPY, same seed, same fake go - core goes
+#     GREEN (it cannot see a package created beside the directory) while the winsec
+#     branch of the very same script goes RED over it. That asymmetry inside one file
+#     is the defect this ticket closes; pinning it is what stops a later edit from
+#     quietly restoring the directory form and calling the two tiers consistent.
+if selected core-dir-form-hides-the-split; then
+    dirform="$work/portable-tests-core-dirform.sh"
+    awk -v old='        ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"' \
+        -v new='        ./internal/plugin/ ./cmd/llmrecord/ ./internal/winsec/' \
+        '$0 == old { print new; next } { print }' "$script" >"$dirform"
+    touched=$(diff "$script" "$dirform" | grep -c '^<' || true)
+    printf '\n== case core-dir-form-hides-the-split: mutant replaced %s line (core'"'"'s winsec row;' "$touched"
+    printf ' 0 = nothing to mutate, and a seed that cannot take is not evidence)\n'
+    ran=$((ran + 1))
+    if [ "$touched" -ne 1 ]; then
+        printf '   FAIL the mutant seed took %s line(s), expected exactly 1 - the core tier'"'"'s winsec' "$touched"
+        printf ' row moved\n        out from under this case; re-read the script instead of trusting it\n'
+        failed=$((failed + 1))
+    else
+        dshadow=$(make_shadow_root "$dirform")
+        last_log="$work/core-dir-form-hides-the-split.log"
+        ( cd "$dshadow" && PATH="$work/bin:$PATH" FAKEGO_PIN_FILE="$core_split" \
+            FAKEGO_SCOPE_FILTER=1 bash scripts/portable-tests.sh --scope=core ) >"$last_log" 2>&1
+        last_rc=$?
+        printf '   mutant (core names the DIRECTORY, split package beside it invisible):\n'
+        printf '   (log: %s)\n' "$last_log"
+        want_rc 0
+        hasnt 'GUARD [ABC] -'
+        has '^runtests\.sh: OK'
+        denominator_is "$pinc"
+        # the seed is live in the same bytes: the tier branch, run by the mutant, does
+        # see it. Core green + tier red on ONE universe is the double standard.
+        last_log="$work/core-dir-form-hides-the-split-tier.log"
+        ( cd "$dshadow" && PATH="$work/bin:$PATH" FAKEGO_PIN_FILE="$core_split" \
+            FAKEGO_SCOPE_FILTER=1 bash scripts/portable-tests.sh --scope=winsec ) >"$last_log" 2>&1
+        last_rc=$?
+        printf '   same mutant, --scope=winsec, same universe - the tier it does not hide:\n'
+        want_rc 1
+        has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
+        has '> github\.com/CarlosShao/wisp/internal/winsec/acl'
+        printf '   (logs: %s / %s)\n' "$work/core-dir-form-hides-the-split.log" "$last_log"
     fi
 fi
 
