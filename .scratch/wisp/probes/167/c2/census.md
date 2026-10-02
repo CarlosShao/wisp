@@ -142,12 +142,34 @@ dev
 
 ## 4. 最小改动面（不选形）
 
-（骨架占位——待填。）
+> 前提（167-a1 §3 已立的硬规矩照抄有效）：装配根 cmd/wisp 是唯一接缝（`internal/panel/subagent_roster_197.go:43` 逐字），internal/panel 不 import internal/agent/tools；票面 AC#7 把 internal/panel 写面限在"票 145 已批解冻范围（composer/pump/panel_pump），只到新增字段为止"。下列每枚只描述**改动面**，选不选、选哪形归编排者。
+
+**① 排队序号（最小、真源已在产码）**
+- `internal/panel/pump.go`：`NativeVerdict` 加一枚 `Position int`（新增字段，在解冻范围内）。
+- `cmd/wisp/panel_pump.go`：`liveVerdicts()` 逐字段抄写里补一行 `Position: it.Position`（`it` 已在手，`:64`）。
+- `internal/panel/approval.go`：`ApprovalCardView` 加 `Position int json:"position"` ＋ `CardViewFromDecision` 带上（`:72` 一处）。
+- ⚠ 撞 `Q-51`：`ApprovalCardView` 的 JSON 键在双向尺射程内（`internal/panel/approval_test.go:105`、`internal/panel/composer_test.go:49`）——加键需要页面声明同批，而 `frontend/**` 本票禁写。**这是三枚里唯一需要 Q-51 先答的形状**。
+- 队列深度标量（"共几张"）：`PumpSources` 加 `QueueDepth func() int`＋`cmd/wisp/run.go:699` 装配 `QueueDepth: func() int { return rt.gate.Queue().Depth() }`——真源 `queue.go:133` 是现成导出方法，**零新口、零新依赖边**；落点是 ComposerState 或顶层新节（同为新增字段）。
+
+**② 占用条（两枚前置、然后是纯装配根活）**
+- 前置裁夺（产品裁定，167-a1 §5.2 已摆，本腿不再开）：分子说"当前历史成本"还是"跨轮累积"；分母用缩放后窗口（`budgets.go:54`）还是目录叶。不答则**整枚不做**（宁缺毋造）。
+- 若做，改动面：`cmd/wisp` 侧需要 loop 的常驻读口——今天 `loop` 是 `execute()` 局部变量，最小面是 execute() 里装配 `PumpSources` 之前把两个读数闭包交给 runtime（或给 runtime 加字段握 loop 的 reader），**在 cmd/wisp 内完成，不动 internal/agent**。`loop.Budgets()`（`loop.go:253`）与 `loop.History()`（`:256`）＋`agent.ApproxTokensOfMessage`（`budgets.go:150`）全是现成导出——**零 Loop 新方法，G3 不涉**。
+- `ComposerState` 加占用节（指针＋omitempty 照 `composer.go:74/:91` 先例）＋分子分母各配 `…Known`（"未知"具名态，票面 AC#2）。
+
+**③ 停止按钮（分"看得见"与"按得下"两半）**
+- **"看得见"半**（快照诚实说"有没有一发在跑/能不能停"）：真源＝`cmd/wisp/resident_task_source_windows.go:154` `src.running`＋`:159` `src.seq`，但那是常驻腿对象，`wisp run` 腿的对应物是 `agentRuntime` 自身没有的 running 维。最小面：run.go 装配处给 runtime 记 bg.ID/running 态（`MarkRoot` 之后补挂 `rt.tasks.AttachCancel(bg.ID, bg.Root().Cancel)`——一行，让根可停成为事实），快照经由既有 `Tasks` reader 的 row status/statusReason 表达（根行 status 今天恒 unknown 的洞顺带补上，机制=`internal/tools/task.go:349-357`）。全部在 cmd/wisp＋PumpSources 既有槽内。
+- **"按得下"半**：新入向方法＝C17 契约面（HANDOVER `:464` 死令）＋`guardRosterOf` 派发链（`internal/panel/l2_grant_boundary_test.go:2030` 双向推导尺，case 须保持一行逗号分隔 `:2128-2130`）——**本腿判：上报，不自决**。技术上不动冻结件可行（A481 形），但治理归 owner。
 
 ## 5. 量不到的格子
 
-（骨架占位——待填。）
+1. **两把双向尺今天红不红**——⛔ 禁跑 Go 命令（本票硬规矩）＋`frontend/src/lib/panel.ts` 两层禁令，`Q-51` 那面镜子的当前颜色判不了；在册读数（HANDOVER `:467` 红名册）自述"引用要带锚点、本轮不复量"⇒ 当过期。后果：§4① 加键"会不会多红"只能给射程不能给结论。
+2. **`Snapshot.Tasks` 根行 status 若补填，会不会撞枚"无 reader 恰好发四键"字节钉**——那四枚钉（167-a1 §3.2 点名 `pump_test.go:123/:291` 等）钉的是顶层键集；根行 status 是 section 内的值不是键，理论不撞，但未实测（不能跑），只记射程。
+3. **resident 腿的 `src.running` 能否被 `wisp run` 腿的快照读到**——两腿各有独立 `assembleRuntime` 实例（`resident_task_source_windows.go:265`），常驻腿的快照 pump 挂在 resident 自己的 runtime 上；跨腿状态共享不存在，本腿只量到"两腿各自组装"这一层，**常驻腿面板（resident panel 线程，`cmd/wisp/panel_resident_windows.go:183-205`）与 resident runtime 快照 pump 之间今天没有装配连线**——常驻面板的 disp 链（`newResidentComposerDispatch`，`:166-171`）只有入向六门，**没有接任何快照 pump**。这一格本腿现量到：常驻进程的面板今天既不发快照也不显示快照内容，票 33 只接了窗口与入向。
+4. **`Q-51`/`A383` 台账原文逐字**——台账在 `docs/reports/pending-and-issues.md`（千行级），本腿只取了 A551-A553 三条（§6 引用），未逐行检索 Q-51 段；其内容以 167-a1 §3.1 的转述为准（该件读过原文），本腿不再复读。
 
 ## 6. 推翻前人哪句
 
-（骨架占位——待填。）
+1. **推翻/修正 167-a1 §3.2 的一句**："两枚都已在 `cmd/wisp/run.go` 的同一枚 `execute()` 里够得着（`run.go:1023` 造出 loop…）"。读数属实但不完整：`loop` 是 `execute()` 的**局部变量**（`run.go:1099` 一带），execute 每任务调一次、返回即不可达；`agentRuntime`（`run.go:266-377` 全字段过目）没有任何字段握 loop/Budgets/History。⇒ "够得着"只在 execute() 存续期成立；占用条若要快照 reader（快照在 execute 外也被 `consoleApprovalUI.Prompt` 等驱动，`run.go:1344-1389`），**必须先有一跳把 loop 的读口挂上 runtime**——167-a1 的四步方案缺这枚具名跳。这不是推翻它的结论（占用分子分母读口导出是真的），是补它漏掉的第 0 步。
+2. **修正 167-a1 §1.1② 的一句**："最近的现成来源＝…两枚都已在产码"里分母 `Loop.Budgets()` 的产码调用者 3 枚——本程复认**属实但三枚全部只取 `.PromptTotal`**（`run.go:1056/:1062/:1109` 逐枚看过），其中 `:1109` 是把**整包 Budgets** 递给 `agent.NewSpiller`（a1 §4.2 自己在第 4 节修正过这句）。维持其修正后读法：`ContextWindow` 从未被单独递出，但整包已出过包一次。
+3. **对本仓派单链的一枚新读数（前人未量）**：`requestTaskStop` 在本仓 0 命中——票面 line 4 把它与 `RequestWorkspaceSwitch` 并列成"那族"，但后者本仓真有（`workspace.go:76`）、前者纯是外部项目符号。下一程若照票面字面 grep `requestTaskStop` 会白找；正确的同族名册是 §3.1 那 4 枚。
+4. **不推翻的**：167-a1 对审批序号"最便宜的一枚"判读（§2 复核属实）、停止"Esc 只否决卡不停任务"判读（§3.2 复核属实）、单槽拒绝非漏（§2.2 复核属实）——三格本程逐行独立复核，维持原文。
