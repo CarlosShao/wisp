@@ -231,6 +231,21 @@ func runTextTask(s runSpec) int {
 		defer sink.close()
 	}
 
+	// Ticket 198 AC#1: the first-run creation of config.toml hangs on THIS
+	// entry and nowhere else (ruling J1, 账 A514 - the full argument, including
+	// the two resident-leg pins this placement keeps green, is in
+	// cmd/wisp/firstrun.go's header). Order matters twice over: it is strictly
+	// after resolveDataDir succeeded (ticket 128's legs must still write
+	// nothing to the start-up directory when the root refuses) and strictly
+	// after installLogSink (a creation seal notice is exactly the record 117's
+	// ordering case says must survive into the file). A creation failure is
+	// printed loud and the run continues into assembleRuntime, which answers
+	// the still-missing file with its own classified exit 2 - this call never
+	// softens the 缺配置 path.
+	if _, frErr := ensureFirstRunConfig(s.dataDir, s.stderr); frErr != nil {
+		fmt.Fprintf(s.stderr, "wisp run: 首次配置建不出来（%v）：本轮仍按缺配置响亮失败，不会拿半份配置顶上\n", frErr)
+	}
+
 	rt, code := assembleRuntime(s)
 	if rt != nil {
 		// The store opens before the registry is filled, so a partially
