@@ -256,15 +256,14 @@ if [ "$mode" = census ]; then
     # as 0 there and non-zero on the other. A NO-SCOPE row is zero coverage said in
     # the same voice as a covered one, which is what AC#1 asked for: the ticket's
     # "CI 测了 20/33" claim is only meaningful if the other 13 are on the page.
-    all=$(go list ./... 2>/dev/null | sort -u)
-    n=$(printf '%s\n' "$all" | grep -c . || true)
-    echo "portable-tests.sh: census GOOS=$goos - go list ./... = $n packages (one row each)"
-    # AC#4 (ticket 251): this census used to read a tier roster written HERE
-    # (`for m in core windows cli winsec`) while the tiers that can actually be RUN
-    # are written AGAIN as the `case $mode in` branches above. At the ticket's own
-    # HEAD the two sets already disagreed - census printed `CLAIMED BY ... winsec`
-    # for a tier NO branch implemented, and exited 0 doing it. Census now refuses to
-    # print a single row unless the roster and this file's own branches are equal.
+    #
+    # AC#4 (ticket 251) speaks BEFORE any of that is measured: this census used to
+    # read a tier roster written HERE (`for m in core windows cli winsec`) while the
+    # tiers that can actually be RUN are written AGAIN as the `case $mode in` branches
+    # above. At the ticket's own HEAD the two sets already disagreed - census printed
+    # `CLAIMED BY ... winsec` for a tier NO branch implemented, and exited 0 doing it.
+    # Census now refuses to run at all unless the roster and this file's own branches
+    # are equal, read back out of the bytes it is standing in.
     own="$here/portable-tests.sh"
     if [ ! -r "$own" ]; then
         echo "portable-tests.sh: census - cannot read this script's own bytes at $own, so the tier" \
@@ -290,6 +289,9 @@ if [ "$mode" = census ]; then
         } >&2
         exit 1
     fi
+    all=$(go list ./... 2>/dev/null | sort -u)
+    n=$(printf '%s\n' "$all" | grep -c . || true)
+    echo "portable-tests.sh: census GOOS=$goos - go list ./... = $n packages (one row each)"
     printf 'portable-tests.sh: %-46s %-11s %s\n' PACKAGE 'TESTS(t/x)' 'CLAIMED BY'
     empty=0
     noscope=0
