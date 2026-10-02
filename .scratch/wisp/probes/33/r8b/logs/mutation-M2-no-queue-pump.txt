@@ -1,0 +1,17 @@
+=== RUN   TestSTAReleaseAfterFailedCreateHandsBackNoWindow
+    sta_release_windows_test.go:268: 33-r8 create-error door: tid=22920 planted hwnd=0x13BC0808 | after plant: ball windows=1 all windows=2 classes=[WispBallWindow IME] queue head=empty
+    sta_release_windows_test.go:270: 33-r8 create-error door: after the plants (window-addressed PostMessageW rc=1, thread-addressed PostThreadMessageW rc=1): ball windows=1 all=2 classes=[WispBallWindow IME] queue head=msg 0x82F8 on hwnd 0x13BC0808
+    sta_release_windows_test.go:272: 33-r8 create-error door: the instant start() returned: ball windows=0 all windows=0 classes=[] queue head=msg 0x82F9 on hwnd 0x0 (start err=plant: renderer init failed plant err=<nil>)
+    sta_release_windows_test.go:301: staThread.start is about to hand OS thread 22920 back with its message queue non-empty (head=msg 0x82F9 on hwnd 0x0). A thread released while it still carries messages is the order-dependent disease 33-r7 named in the panel family: whoever lands here next pumps messages that were not addressed to them. Fix: the owner dispatches its own queue to empty before it releases the thread
+--- FAIL: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.02s)
+=== RUN   TestSTAReleaseAfterPumpExitDispatchesItsQueue
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=quit-only: tid=22920 hwnd=0x13BD0808 createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=1 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=real-Close: tid=22920 hwnd=0x13BE0808 createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=0 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+--- PASS: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.01s)
+=== RUN   TestReleasePumpCapIsALoudReadingNotAGreen
+    sta_release_windows_test.go:602: 33-r8b cap leg (planted 4160, want pump to stop at the cap): tid=22920 posted=4160 postErr=<nil> pumped=4096 head-after="msg 0x82F9 on hwnd 0x0" windows(ball/all)=0/0 classes=[] | own drain moved 64, head-final="empty" | logged="time=2026-10-02T09:30:27.767+08:00 level=WARN msg=\"ball: the ui-sta release pump hit its cap before the thread's queue was empty; the thread goes back to the Go pool non-empty\" cap=4096 pumped=4096\n"
+    sta_release_windows_test.go:605: 33-r8b control leg (planted 8, under the cap): tid=22920 posted=8 postErr=<nil> pumped=8 head-after="empty" windows(ball/all)=0/0 classes=[] | own drain moved 0, head-final="empty" | logged=""
+--- PASS: TestReleasePumpCapIsALoudReadingNotAGreen (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.094s
+FAIL

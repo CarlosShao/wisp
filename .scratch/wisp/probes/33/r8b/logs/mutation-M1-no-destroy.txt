@@ -1,0 +1,18 @@
+=== RUN   TestSTAReleaseAfterFailedCreateHandsBackNoWindow
+    sta_release_windows_test.go:268: 33-r8 create-error door: tid=20364 planted hwnd=0x2D6081C | after plant: ball windows=1 all windows=2 classes=[WispBallWindow IME] queue head=empty
+    sta_release_windows_test.go:270: 33-r8 create-error door: after the plants (window-addressed PostMessageW rc=1, thread-addressed PostThreadMessageW rc=1): ball windows=1 all=2 classes=[WispBallWindow IME] queue head=msg 0x82F8 on hwnd 0x2D6081C
+    sta_release_windows_test.go:272: 33-r8 create-error door: the instant start() returned: ball windows=1 all windows=2 classes=[WispBallWindow IME] queue head=empty (start err=plant: renderer init failed plant err=<nil>)
+    sta_release_windows_test.go:297: staThread.start is about to hand OS thread 20364 back to the Go pool while it still owns 1 live WispBallWindow window(s) (planted hwnd 0x2D6081C). The create step failed, so nothing unwound it. A thread that owns a window its Go manager has already let go of is what makes the NEXT create on it fail (33-r7 shape ①), and no pre-create check on the receiving side can see it: the panel's staleCloseQueued looks at the QUEUE, not at the handle table. Fix: the owner destroys the windows it started before it releases the thread
+--- FAIL: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.02s)
+=== RUN   TestSTAReleaseAfterPumpExitDispatchesItsQueue
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=quit-only: tid=20364 hwnd=0x36006DA createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty staThread.hwnd=0x0 | plant PostMessage rc=1 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=real-Close: tid=20364 hwnd=0x13BB0808 createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=0 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:463: door=quit-only: the pump ended and staThread.start is about to hand OS thread 20364 back to the Go pool still owning 1 live WispBallWindow window(s) (hwnd 0x36006DA). Nobody unwound it, so the next owner of that thread creates beside a window no manager owns, and this process keeps a USER handle it has lost the record of. Fix: the owner destroys the windows it started before it releases the thread
+--- FAIL: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.03s)
+=== RUN   TestReleasePumpCapIsALoudReadingNotAGreen
+    sta_release_windows_test.go:602: 33-r8b cap leg (planted 4160, want pump to stop at the cap): tid=28492 posted=4160 postErr=<nil> pumped=4096 head-after="msg 0x82F9 on hwnd 0x0" windows(ball/all)=0/0 classes=[] | own drain moved 64, head-final="empty" | logged="time=2026-10-02T09:30:26.020+08:00 level=WARN msg=\"ball: the ui-sta release pump hit its cap before the thread's queue was empty; the thread goes back to the Go pool non-empty\" cap=4096 pumped=4096\n"
+    sta_release_windows_test.go:605: 33-r8b control leg (planted 8, under the cap): tid=28492 posted=8 postErr=<nil> pumped=8 head-after="empty" windows(ball/all)=0/0 classes=[] | own drain moved 0, head-final="empty" | logged=""
+--- PASS: TestReleasePumpCapIsALoudReadingNotAGreen (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.104s
+FAIL

@@ -1,0 +1,75 @@
+time=2026-10-02T09:34:12.239+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestBallLiveLifecycle
+time=2026-10-02T09:34:12.564+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+V
+time=2026-10-02T09:34:14.347+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+V
+    live_windows_test.go:141: handles: base=107 peak-suite=362 (gate <600)
+    live_windows_test.go:87: HANDLES base=107 afterNew=356 afterClose=362 delta=255 | USER objs base=1 afterClose=6
+--- PASS: TestBallLiveLifecycle (2.22s)
+=== RUN   TestBallLivePositionPersistence
+time=2026-10-02T09:34:14.497+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+V
+time=2026-10-02T09:34:14.746+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+V
+--- PASS: TestBallLivePositionPersistence (0.45s)
+=== RUN   TestBallLiveIdleBorderTransition
+time=2026-10-02T09:34:14.943+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBallLiveIdleBorderTransition (4.46s)
+=== RUN   TestBallLiveEdgeDock
+time=2026-10-02T09:34:19.401+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBallLiveEdgeDock (0.24s)
+=== RUN   TestBallLiveEdgeDockHover
+time=2026-10-02T09:34:19.642+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+    live_windows_test.go:601: pop-out driven by cursor
+--- PASS: TestBallLiveEdgeDockHover (0.27s)
+=== RUN   TestBallLiveAudioLiquidGate
+time=2026-10-02T09:34:19.913+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBallLiveAudioLiquidGate (1.11s)
+=== RUN   TestSTAReleaseAfterFailedCreateHandsBackNoWindow
+    sta_release_windows_test.go:268: 33-r8 create-error door: tid=13344 planted hwnd=0x2F0081C | after plant: ball windows=1 all windows=2 classes=[WispBallWindow IME] queue head=empty
+    sta_release_windows_test.go:270: 33-r8 create-error door: after the plants (window-addressed PostMessageW rc=1, thread-addressed PostThreadMessageW rc=1): ball windows=1 all=2 classes=[WispBallWindow IME] queue head=msg 0x82F8 on hwnd 0x2F0081C
+    sta_release_windows_test.go:272: 33-r8 create-error door: the instant start() returned: ball windows=0 all windows=0 classes=[] queue head=empty (start err=plant: renderer init failed plant err=<nil>)
+--- PASS: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.01s)
+=== RUN   TestSTAReleaseAfterPumpExitDispatchesItsQueue
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=quit-only: tid=13344 hwnd=0x2F1081C createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=1 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=real-Close: tid=13344 hwnd=0x2F2081C createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=0 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+--- PASS: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.01s)
+=== RUN   TestReleasePumpCapIsALoudReadingNotAGreen
+    sta_release_windows_test.go:602: 33-r8b cap leg (planted 4160, want pump to stop at the cap): tid=13344 posted=4160 postErr=<nil> pumped=4096 head-after="msg 0x82F9 on hwnd 0x0" windows(ball/all)=0/0 classes=[] | own drain moved 64, head-final="empty" | logged="time=2026-10-02T09:34:21.040+08:00 level=WARN msg=\"ball: the ui-sta release pump hit its cap before the thread's queue was empty; the thread goes back to the Go pool non-empty\" cap=4096 pumped=4096\n"
+    sta_release_windows_test.go:605: 33-r8b control leg (planted 8, under the cap): tid=13344 posted=8 postErr=<nil> pumped=8 head-after="empty" windows(ball/all)=0/0 classes=[] | own drain moved 0, head-final="empty" | logged=""
+--- PASS: TestReleasePumpCapIsALoudReadingNotAGreen (0.03s)
+=== RUN   TestBallLiveLifecycle
+time=2026-10-02T09:34:21.069+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+V
+time=2026-10-02T09:34:22.838+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+V
+    live_windows_test.go:141: handles: base=393 peak-suite=394 (gate <600)
+    live_windows_test.go:87: HANDLES base=393 afterNew=395 afterClose=393 delta=0 | USER objs base=8 afterClose=8
+--- PASS: TestBallLiveLifecycle (1.91s)
+=== RUN   TestBallLivePositionPersistence
+time=2026-10-02T09:34:22.981+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+V
+time=2026-10-02T09:34:23.232+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+V
+--- PASS: TestBallLivePositionPersistence (0.45s)
+=== RUN   TestBallLiveIdleBorderTransition
+time=2026-10-02T09:34:23.418+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBallLiveIdleBorderTransition (4.40s)
+=== RUN   TestBallLiveEdgeDock
+time=2026-10-02T09:34:27.818+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBallLiveEdgeDock (0.24s)
+=== RUN   TestBallLiveEdgeDockHover
+time=2026-10-02T09:34:28.063+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+    live_windows_test.go:601: pop-out driven by cursor
+--- PASS: TestBallLiveEdgeDockHover (0.32s)
+=== RUN   TestBallLiveAudioLiquidGate
+time=2026-10-02T09:34:28.387+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBallLiveAudioLiquidGate (1.13s)
+=== RUN   TestSTAReleaseAfterFailedCreateHandsBackNoWindow
+    sta_release_windows_test.go:268: 33-r8 create-error door: tid=14020 planted hwnd=0x2FA081C | after plant: ball windows=1 all windows=2 classes=[WispBallWindow IME] queue head=empty
+    sta_release_windows_test.go:270: 33-r8 create-error door: after the plants (window-addressed PostMessageW rc=1, thread-addressed PostThreadMessageW rc=1): ball windows=1 all=2 classes=[WispBallWindow IME] queue head=msg 0x82F8 on hwnd 0x2FA081C
+    sta_release_windows_test.go:272: 33-r8 create-error door: the instant start() returned: ball windows=0 all windows=0 classes=[] queue head=empty (start err=plant: renderer init failed plant err=<nil>)
+--- PASS: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.01s)
+=== RUN   TestSTAReleaseAfterPumpExitDispatchesItsQueue
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=quit-only: tid=14020 hwnd=0x2FB081C createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=1 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=real-Close: tid=14020 hwnd=0x2FC081C createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=0 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+--- PASS: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.02s)
+=== RUN   TestReleasePumpCapIsALoudReadingNotAGreen
+    sta_release_windows_test.go:602: 33-r8b cap leg (planted 4160, want pump to stop at the cap): tid=14020 posted=4160 postErr=<nil> pumped=4096 head-after="msg 0x82F9 on hwnd 0x0" windows(ball/all)=0/0 classes=[] | own drain moved 64, head-final="empty" | logged="time=2026-10-02T09:34:29.578+08:00 level=WARN msg=\"ball: the ui-sta release pump hit its cap before the thread's queue was empty; the thread goes back to the Go pool non-empty\" cap=4096 pumped=4096\n"
+    sta_release_windows_test.go:605: 33-r8b control leg (planted 8, under the cap): tid=14020 posted=8 postErr=<nil> pumped=8 head-after="empty" windows(ball/all)=0/0 classes=[] | own drain moved 0, head-final="empty" | logged=""
+--- PASS: TestReleasePumpCapIsALoudReadingNotAGreen (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/ball	17.470s

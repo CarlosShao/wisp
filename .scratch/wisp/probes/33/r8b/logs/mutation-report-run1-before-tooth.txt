@@ -1,0 +1,20 @@
+# 转录件：突变网格第一次运行的脚本回显（补牙之前）
+
+来源＝本腿 09:30:0x 在 `49448d7f` **之前**那个工作树态上跑
+`python .scratch/wisp/probes/33/r8b/mutate.py 'TestSTARelease|TestReleasePumpCap'` 的**终端回显逐字抄录**。
+⚠ 为什么需要这份转录：`mutate.py` 把摘要写到固定路径 `logs/mutation-report.txt`，
+本腿补了牙（`sta_release_windows_test.go:484` 那条 `releaseLogged` 断言）之后**第二次**运行把那个文件覆写了，
+于是"补牙之前 M3b 无人看守"这一发只剩回显。逐字日志 `logs/mutation-M3b-close-does-not-forget.txt`
+也被第二次运行覆写成红的那一发 ⇒ **补牙前那一发的 `no red` 只有这份转录**。
+第一次运行里 `mutation-M3b-*.txt` 的内容本腿当时未另拷，⛔ 不可再生；能再生的判据是：
+把 `:484` 那条断言注掉再跑同一枚 M3b ⇒ 会回到 `(no red)`（本腿**没有**跑这一发去证它，
+跑了就得再动一次写文件；这里只登记"它没被独立复现过"，见 verdict ⑦ 第 9 条）。
+
+pristine md5: {'D:\\work\\workspace\\projects plans\\Wisp\\internal\\ball\\sta_windows.go': '643a3a6bfdd36864120242775a59d2d4', 'D:\\work\\workspace\\projects plans\\Wisp\\internal\\ball\\ball_windows.go': '84e1b005f2d53d2ac420511750441f81'}
+M0-not-wired rc=1 FAIL=2 PASS=1 restored_md5=yes build_failed=False | --- FAIL: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.02s) ; --- FAIL: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.01s)
+M1-no-destroy rc=1 FAIL=2 PASS=1 restored_md5=yes build_failed=False | --- FAIL: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.02s) ; --- FAIL: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.02s)
+M2-no-queue-pump rc=1 FAIL=1 PASS=2 restored_md5=yes build_failed=False | --- FAIL: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.02s)
+M3-hwnd-not-forgotten rc=1 FAIL=1 PASS=2 restored_md5=yes build_failed=False | --- FAIL: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.01s)
+M3b-close-does-not-forget rc=0 FAIL=0 PASS=3 restored_md5=yes build_failed=False | (no red)
+M4-pm-noremove rc=1 FAIL=2 PASS=1 restored_md5=yes build_failed=False | --- FAIL: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.03s) ; --- FAIL: TestReleasePumpCapIsALoudReadingNotAGreen (0.05s)
+final md5: {'D:\\work\\workspace\\projects plans\\Wisp\\internal\\ball\\sta_windows.go': '643a3a6bfdd36864120242775a59d2d4', 'D:\\work\\workspace\\projects plans\\Wisp\\internal\\ball\\ball_windows.go': '84e1b005f2d53d2ac420511750441f81'}
