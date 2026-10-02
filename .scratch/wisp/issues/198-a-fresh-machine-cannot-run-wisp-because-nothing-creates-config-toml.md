@@ -3,6 +3,16 @@
 - Status: **未派（等票 197 那两枚写腿交完腾出 `cmd/wisp/**` 写面）**。
 - 来源：09-28 只读现状普查（账 `A403`），owner 18:1x 那句「**必须特么做完整功能**」「**别把什么都自己主动舍弃了**」。
 
+## ⚠ 10-02 09:0x 更正（只读普查腿 `198-a1` 顶回本票四处，我逐枚现量复认；**原话一字不改**，账 `A514`）
+
+- ⛔ **上面那张表里"全仓无一处创建 `config.toml`"这枚核心事实不成立**：`internal/config/writeguard.go:125-131` 有一支 `case fileMissing(statErr)`，注释逐字「writing it creates what first-run did not」⇒ **生产创建点今天就在**（它落 `SaveFile`＝`internal/config/loader.go:238`，**已导出**；默认值来自 `internal/config/defaults.go:58` 的 `NewDefaults()`，**也已导出**），只是**首达不到**——缺文件时 `config.NewManager` 先失败。⇒ 本票那件事**从"从无到有造一条写路径"降成"把那条已经存在的路在正确的入口接上"**；⛔ 落地腿**不许新写模板字符串**（那会造出 70 枚 TOML 标签的第二真相源，且没有仪器看守）。
+- **"16 个 section"读少了**：我 09:0x 现跑 `grep -cE "type [A-Za-z]*Section struct" internal/config/schema.go` ＝ **18**（那枚腿的第二把尺＝结构体字段 18，同向）。
+- **我自己那把 grep 数错过枚数（记我，不记账面）**：现量＝**163 行命中**；我 08:4x 在派单里写"12 行"，那是 `| head -12` 的**截断**、不是计数。⇒ 定式：**截断过的输出一律不许当枚数引**。**方向仍成立**：那 163 行里没有一处是首建入口。
+- **三处行号已漂**（09-28 写时是对的＝过期、不是错写）：`internal/config/manager.go:76-84` → 今 `:99-111`；`cmd/wisp/run.go:282-291` → 真退码点在 `:389-398`；`internal/config/loader.go:39-43` → 缺文件之错实际造于 `:65-68`（loader 从不产生退码）。
+- ★ **决定落点的那枚钉（本票最大的形状约束）**：`cmd/wisp/resident_task_source_246_windows_test.go:389-391` 明文断言**常驻腿的 `config.toml` 必须保持不存在**（红句逐字 "the leg created a config.toml it was never asked for"），而 `assembleRuntime` 被常驻腿共用（`cmd/wisp/resident_task_source_windows.go:265`）⇒ **首建一旦放进 `assembleRuntime`，今天就红 3 处**；另 `cmd/wisp/logsink_windows_test.go:163-164` 的用例意图逐字写着"这里没有 config.toml 所以停在 Unconfigured，**那是要点不是偶然**"。
+  ⇒ **编排者裁定（J1，账 `A514`）＝首建只挂在 `wisp run` 这一条"用户明确发起"的入口；⛔ 不许进 `assembleRuntime`；⛔ 不许改那两枚钉**（"为了让自己落地而去放宽别人票的 AC 判据"就在本仓禁止清单上，不是可选项）。若 CLI 入口需要数据根先存在，**只许调用同一个现成判定者**（`secret.NewStore(dataDir)`，`internal/secret/store.go:49`，它今天就先于 `NewManager` 把根逐层建好并封权），⛔ 不许自己拼路径（`risk.PathResolver` 之外做文件系统决策＝`d22scan` 直接判违规）。
+- **另五句"今天已是假话"的注释/文案**由该腿具名登记在 `.scratch/wisp/probes/198/a1/census.md` §3.3（含 `internal/config/settings.go:271` 那句「A missing file is not an error (first-run writes one)」——它**此刻只在未跟踪文件里**，⛔ 任何腿不许读成现状）。
+
 ## 现量（锚点自取，尺可复制）
 | 事实 | 读数 | 尺 |
 |---|---|---|
