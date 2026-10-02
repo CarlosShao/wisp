@@ -15,11 +15,219 @@
 
 ## §1 全名册：叶子键 → 读者 → 非测试／仅测试／无
 
-（表头先行；枚数在 §1 正文，尺与射程逐条附。）
+**起手 HEAD**：`00e7efe`（本表所有 `file:line` 均在此号上读；终态复核见 §8 末条）。
 
-| 段 | 叶子键（TOML 路径） | Go 字段 | 生产读者 file:line | 判 |
-|---|---|---|---|---|
-| — | — | — | — | — |
+### 1.1 先把"多少枚"钉住（三把独立尺）
+
+- 段数：**18 枚 section ＋ 1 枚根表裸键 `schema_version`**。
+  甲尺：`Config` struct 的段字段枚数＝18（`internal/config/schema.go:110-133`）。
+  乙尺：票 198 的首建真件 `.scratch/wisp/probes/198/r1/firstrun-defaults.dump.txt`
+  有 33 个表头 ＝ 18 顶层 ＋ 15 子表；它的 `key =` 行 **115** 枚。
+  丙尺：`schema.go` 静态叶子走查＝**115** 枚，与首建真件逐枚 `comm` 差集只差
+  `models.local_override`（空 map 不落盘）与 dump 里一行 `time`（非 schema 键）。
+- 叶子键：**150 枚**＝静态 115 ＋ 动态子表模板 35
+  （`llm.providers.<id>` 10 ＋ 其下 `models.<id>` 21 ＋ `plugins.<id>` 4）。
+  动态子表按**模板**计数、不按实例；换口径的后果见 §6 第 1 条。
+- 带 `default:` 标签的行 **69** 枚 —— 与票面 09-28 记录里 `180-c1` 报的 69 独立对上。
+
+### 1.2 判据与三条反查尺
+
+判定问的是"**有没有人把这个键的值读出去做事**"，不是"有没有人提到这个名字"。
+射程：`cmd internal tools`（显式根，**不含** `frontend/**`、`design/**`、`testdata`），排除 `*_test.go`。
+`internal/config` 包内的命中单列——那是管道（填默认、校枚举、算放宽方向、整块拷贝比较），不是消费者。
+
+三条反查（防"名字没提但值被读走"）：
+① 反射按名取值：`FieldByName|NumField()|reflect.TypeOf` 在射程内非测试码 **零命中**
+   （反射只在 `internal/config/defaults.go` 里把 `default:` 标签**写进**字段）。
+② 按点分路径字符串寻址：全路径字面量在 `internal/config` 之外只命中
+   `cmd/wisp/config_reload.go:300`（重启档三枚键名，只用于说话）
+   ＋两枚同名巧合（`internal/statemachine/events.go:21` 事件名、`internal/memory/schema.go:149` SQLite meta 键）。
+③ 生产里取得 `*Config` 的入口枚数：**8 处**（`cmd/wisp/run.go:423`、`cmd/wisp/providers.go:98`、
+   `cmd/wisp/models.go:184`、`cmd/wisp/panel_config_store.go:92`、`cmd/wisp/approval_always.go:155`、
+   `internal/perm/store.go:159`、`cmd/wisp/firstrun.go:82`（建默认文件）、`cmd/balldebug/main.go:238`（旁路））。
+   ⇒ 一切配置消费都必须经过这 8 处，这就是逐枚判定的收敛面。
+
+### 1.3 判读图例（七档）
+
+| 档 | 含义 |
+|---|---|
+| R | 有生产读者：值被读出去驱动行为，具名 file:line |
+| B | 有读者但只作旁注：`internal/llm/probe_health.go:95-97` 逐字 "It exists ONLY to name mismatches; it never feeds a verdict" |
+| W | 类型在场、生产零赋值：`config.Price` 被 `internal/agent/cost.go:38` 消费，但生产没有一处给它赋值 ⇒ 值恒为零价卡 |
+| S | 只有旁路调试程序读者（`cmd/balldebug`），出货路径 `wisp run` 零读者 |
+| G | 无人读，**已在 `unwiredKeys` 登记**：写非默认值直接加载失败（有出口） |
+| L | 无人读，**只在 `lockedKeyDisposition` 登记** not built：写它不报错、也不生效（无出口） |
+| D | 无人读、名册外 ⇒ 票 180 那一族的本体 |
+
+### 1.4 枚数总账（逐枚名列 §1.5）
+
+| 档 | 全 150 枚 | 仅静态 115 枚 |
+|---|---|---|
+| R | 50 | 40 |
+| B | 4 | 0 |
+| W | 5 | 0 |
+| S | 4 | 4 |
+| G | 6 | 6 |
+| L | 5 | 1 |
+| D | 76 | 64 |
+| 合计校验 | 150 | 115 |
+| 无人读／无实效（B＋W＋S＋G＋L＋D） | 100 | 75 |
+| **既无人读又不在任何名册（D）** | **76** | **64** |
+
+### 1.5 逐枚名册（150 行）
+
+| TOML 路径 | Go 字段 | 判 | 凭据／备注 |
+|---|---|---|---|
+| `schema_version` | `Config.SchemaVersion` | R | internal/config/loader.go + migrate.go：包内迁移判定就是它的用途 |
+| `agent.loop_guard.repeat_thresholds` | `LoopGuard.RepeatThresholds` | D | 同上：loop.go:220 兜回 3,5,8 ⇒ 改这枚数组不改变刹车阶梯 |
+| `agent.max_rounds` | `AgentSection.MaxRounds` | D | agent.Config 有这枚字段（internal/agent/loop.go:115），cmd/wisp/run.go:1010 的字面量不填 ⇒ loop.go:216-217 兜回 50 |
+| `agent.per_tool_timeout_ms` | `AgentSection.PerToolTimeoutMS` | R | cmd/wisp/run.go:763 与 :1014 |
+| `agent.project_instructions_enabled` | `AgentSection.ProjectInstructionsEnabled` | R | cmd/wisp/run.go:1055,1060 |
+| `agent.steering_enabled` | `AgentSection.SteeringEnabled` | R | cmd/wisp/run.go:1016 |
+| `agent.token_budget` | `AgentSection.TokenBudget` | D | 同上：loop.go:218-219 兜回 scaled 默认，run.go 不填 |
+| `app.autostart` | `AppSection.Autostart` | D | 开机自启注册码上不存在读它的地方 |
+| `app.language` | `AppSection.Language` | D | SPEC-03:26 写 restart；重启那句台词点名它（cmd/wisp/config_reload.go:300）但无 boot 读者 ⇒「重启后生效」今天兑现不了 |
+| `app.single_instance` | `AppSection.SingleInstance` | D | internal/proc/singleinstance_windows.go:40 用 rt.Layout.MutexName（环境布局），不是 cfg.App.SingleInstance |
+| `app.theme` | `AppSection.Theme` | D | manager.go:343-348 只比较与拷贝；全仓无人据它换肤（SPEC-03:26 写 hot） |
+| `audio.half_duplex` | `AudioSection.HalfDuplex` | D | 只有 validate.go 把 false 判成加载错误（硬编码只读三枚的正解形状：出口是拒绝，不是告知） |
+| `audio.input_device` | `AudioSection.InputDevice` | D | 零读者（internal/audio 不读配置） |
+| `audio.mic_muted_default` | `AudioSection.MicMutedDefault` | D | internal/audio/gate.go:56 注释逐字点名 "(config AudioSection.MicMutedDefault) here at boot wiring"——只有注释没有代码（注释指名的接线一律当待验断言） |
+| `audio.sample_rate` | `AudioSection.SampleRate` | D | 零读者 |
+| `ball.click_through` | `BallSection.ClickThrough` | D | 零读者 |
+| `ball.hide_on_fullscreen` | `BallSection.HideOnFullscreen` | D | 零读者 |
+| `ball.opacity_idle` | `BallSection.OpacityIdle` | D | 零读者 |
+| `ball.position.monitor` | `BallPos.Monitor` | D | 同 ball.position.x |
+| `ball.position.x` | `BallPos.X` | D | internal/ball/position.go 用的是自己的 Pos 类型，不是 BallPos ⇒ 拖完不存、存了不读 |
+| `ball.position.y` | `BallPos.Y` | D | 同 ball.position.x |
+| `ball.size` | `BallSection.Size` | D | 球尺寸实走 internal/ball/ball_windows.go:64 的 opts.SizePx（默认与钳位 :144-151），cfg.Ball 从未参与 |
+| `cost.alert_threshold` | `CostSection.AlertThreshold` | D | 只有 validate.go 校枚举 |
+| `cost.daily_budget` | `CostSection.DailyBudget` | D | 注释说达 100% 暂停新任务（C23 票 44），零读者 |
+| `cost.monthly_budget` | `CostSection.MonthlyBudget` | D | 同 cost.daily_budget |
+| `cost.over_budget` | `CostSection.OverBudget` | D | 只有 validate.go 校枚举 pause|warn |
+| `fs.allowed_dirs` | `FSSection.AllowedDirs` | R | cmd/wisp/run.go:497-498 |
+| `fs.delete_enabled` | `FSSection.DeleteEnabled` | R | cmd/wisp/run.go:517 |
+| `fs.reparse_point_exceptions` | `FSSection.ReparsePointExceptions` | R | cmd/wisp/run.go:501 |
+| `hotkey.cancel` | `HotkeySection.Cancel` | S | 唯一读者 cmd/balldebug/main.go:238；出货路径 cmd/wisp/resident_ball_windows.go:171 用 ball.DefaultHotkeys() |
+| `hotkey.mute` | `HotkeySection.Mute` | S | 唯一读者 cmd/balldebug/main.go:238；出货路径 cmd/wisp/resident_ball_windows.go:171 用 ball.DefaultHotkeys() |
+| `hotkey.panel` | `HotkeySection.Panel` | S | 唯一读者 cmd/balldebug/main.go:238；出货路径 cmd/wisp/resident_ball_windows.go:171 用 ball.DefaultHotkeys() |
+| `hotkey.summon` | `HotkeySection.Summon` | S | 唯一读者 cmd/balldebug/main.go:238；出货路径 cmd/wisp/resident_ball_windows.go:171 用 ball.DefaultHotkeys() |
+| `llm.providers.<id>.api_key_ref` | `Provider.APIKeyRef` | R | internal/llm/resolver.go:136 / cmd/wisp/providers.go:124-125 |
+| `llm.providers.<id>.base_url` | `Provider.BaseURL` | R | internal/llm/anthropic/adapter.go:146、openaichat/adapter.go:81、openairesponses/adapter.go |
+| `llm.providers.<id>.billing` | `Provider.Billing` | D | 只有 validate.go 校枚举 |
+| `llm.providers.<id>.compat.allow_missing_usage` | `Compat.AllowMissingUsage` | R | internal/llm/anthropic/adapter.go:265,300 与 openaichat/adapter.go:224,253（三适配器各一枚） |
+| `llm.providers.<id>.compat.extra_headers` | `Compat.ExtraHeaders` | R | internal/llm/anthropic/adapter.go:158 等三适配器逐条 range |
+| `llm.providers.<id>.compat.loose` | `Compat.Loose` | R | internal/llm/anthropic/adapter.go:314 等三适配器各一枚 loose() |
+| `llm.providers.<id>.models.<id>.billing` | `ModelSpec.Billing` | D | 只有 validate.go 校枚举 |
+| `llm.providers.<id>.models.<id>.capabilities.audio_in` | `Capabilities.AudioIn` | B | internal/llm/probe_health.go:98-110 declaredCapability（注释逐字 "it never feeds a verdict"） |
+| `llm.providers.<id>.models.<id>.capabilities.audio_out` | `Capabilities.AudioOut` | D | 零读者：declaredCapability 的 switch 里只有 fc/vision/thinking/audio_in 这四支 |
+| `llm.providers.<id>.models.<id>.capabilities.fc` | `Capabilities.FC` | B | internal/llm/probe_health.go:98-110 declaredCapability（注释逐字 "it never feeds a verdict"） |
+| `llm.providers.<id>.models.<id>.capabilities.realtime` | `Capabilities.Realtime` | D | 零读者：declaredCapability 的 switch 里只有 fc/vision/thinking/audio_in 这四支 |
+| `llm.providers.<id>.models.<id>.capabilities.stream` | `Capabilities.Stream` | D | 零读者：declaredCapability 的 switch 里只有 fc/vision/thinking/audio_in 这四支 |
+| `llm.providers.<id>.models.<id>.capabilities.text` | `Capabilities.Text` | D | 零读者：declaredCapability 的 switch 里只有 fc/vision/thinking/audio_in 这四支 |
+| `llm.providers.<id>.models.<id>.capabilities.thinking` | `Capabilities.Thinking` | B | internal/llm/probe_health.go:98-110 declaredCapability（注释逐字 "it never feeds a verdict"） |
+| `llm.providers.<id>.models.<id>.capabilities.vision` | `Capabilities.Vision` | B | internal/llm/probe_health.go:98-110 declaredCapability（注释逐字 "it never feeds a verdict"） |
+| `llm.providers.<id>.models.<id>.context_window` | `ModelSpec.ContextWindow` | R | internal/llm/resolver.go:68 → 三适配器 MaxContextWindow |
+| `llm.providers.<id>.models.<id>.display` | `ModelSpec.Display` | D | 注释说 human-facing name，本包外零读者 |
+| `llm.providers.<id>.models.<id>.enabled` | `ModelSpec.Enabled` | D | schema.go:369-371 注释逐字 "removes the model from discovery/selection"：resolver.go:288 的 DiscoveredModels 与 :119 取 spec 都不查它 ⇒ 注释描述的规矩码上没人执行 |
+| `llm.providers.<id>.models.<id>.max_output_tokens` | `ModelSpec.MaxOutputTokens` | R | internal/llm/resolver.go:134 → anthropic/request.go:103 |
+| `llm.providers.<id>.models.<id>.price.audio_in` | `Price.AudioIn` | W | 类型 config.Price 被 internal/agent/cost.go:38 消费，但生产里 Price: 赋值零枚（cmd/wisp/run.go:1010 的 agent.Config{} 不填）⇒ 值永远是零价卡 |
+| `llm.providers.<id>.models.<id>.price.audio_out` | `Price.AudioOut` | W | 类型 config.Price 被 internal/agent/cost.go:38 消费，但生产里 Price: 赋值零枚（cmd/wisp/run.go:1010 的 agent.Config{} 不填）⇒ 值永远是零价卡 |
+| `llm.providers.<id>.models.<id>.price.cached` | `Price.Cached` | W | 类型 config.Price 被 internal/agent/cost.go:38 消费，但生产里 Price: 赋值零枚（cmd/wisp/run.go:1010 的 agent.Config{} 不填）⇒ 值永远是零价卡 |
+| `llm.providers.<id>.models.<id>.price.in` | `Price.In` | W | 类型 config.Price 被 internal/agent/cost.go:38 消费，但生产里 Price: 赋值零枚（cmd/wisp/run.go:1010 的 agent.Config{} 不填）⇒ 值永远是零价卡 |
+| `llm.providers.<id>.models.<id>.price.out` | `Price.Out` | W | 类型 config.Price 被 internal/agent/cost.go:38 消费，但生产里 Price: 赋值零枚（cmd/wisp/run.go:1010 的 agent.Config{} 不填）⇒ 值永远是零价卡 |
+| `llm.providers.<id>.models.<id>.quota_daily_micro` | `ModelSpec.QuotaDailyMicro` | D | 注释指向 C23 pre-dispatch hook（票 44），未落 ⇒ 零读者 |
+| `llm.providers.<id>.models.<id>.quota_monthly_micro` | `ModelSpec.QuotaMonthlyMicro` | D | 同 quota_daily_micro |
+| `llm.providers.<id>.models.<id>.thinking_levels` | `ModelSpec.ThinkingLevels` | D | 只有 validate.go 校枚举，无人据它限制档位 |
+| `llm.providers.<id>.plan_credit_total_micro` | `Provider.PlanCreditTotalMicro` | D | 注释说 plan 模式据此核算，零读者 |
+| `llm.providers.<id>.protocol` | `Provider.Protocol` | R | internal/llm/resolver.go:65 → internal/llm/provider.go:219 |
+| `llm.providers.<id>.rpm` | `Provider.RPM` | R | internal/llm/resolver.go:130 → :276 |
+| `llm.providers.<id>.tpm` | `Provider.TPM` | R | internal/llm/resolver.go:131 → :276 |
+| `llm.retry.backoff_ms` | `RetryConfig.BackoffMS` | R | cmd/wisp/run.go:1226 |
+| `llm.retry.max` | `RetryConfig.Max` | R | cmd/wisp/run.go:1227 |
+| `llm.roles.chat.max_output_tokens` | `Role.MaxOutputTokens` | R | internal/llm/resolver.go:197 |
+| `llm.roles.chat.model` | `Role.Model` | R | internal/llm/resolver.go:119 用 provider/model 对取 spec |
+| `llm.roles.chat.provider` | `Role.Provider` | R | internal/llm/resolver.go:179 取 role → :194 建 endpoint |
+| `llm.roles.chat.temperature` | `Role.Temperature` | R | internal/llm/resolver.go:195 |
+| `llm.roles.chat.thinking_intensity` | `Role.ThinkingIntensity` | R | internal/llm/resolver.go:196 |
+| `llm.roles.handoff.max_output_tokens` | `Role.MaxOutputTokens` | R | internal/llm/resolver.go:197 |
+| `llm.roles.handoff.model` | `Role.Model` | R | internal/llm/resolver.go:119 用 provider/model 对取 spec |
+| `llm.roles.handoff.provider` | `Role.Provider` | R | internal/llm/resolver.go:179 取 role → :194 建 endpoint |
+| `llm.roles.handoff.temperature` | `Role.Temperature` | R | internal/llm/resolver.go:195 |
+| `llm.roles.handoff.thinking_intensity` | `Role.ThinkingIntensity` | R | internal/llm/resolver.go:196 |
+| `llm.roles.memory_extract.max_output_tokens` | `Role.MaxOutputTokens` | R | internal/llm/resolver.go:197 |
+| `llm.roles.memory_extract.model` | `Role.Model` | R | internal/llm/resolver.go:119 用 provider/model 对取 spec |
+| `llm.roles.memory_extract.provider` | `Role.Provider` | R | internal/llm/resolver.go:179 取 role → :194 建 endpoint |
+| `llm.roles.memory_extract.temperature` | `Role.Temperature` | R | internal/llm/resolver.go:195 |
+| `llm.roles.memory_extract.thinking_intensity` | `Role.ThinkingIntensity` | R | internal/llm/resolver.go:196 |
+| `llm.roles.summarize.max_output_tokens` | `Role.MaxOutputTokens` | R | internal/llm/resolver.go:197 |
+| `llm.roles.summarize.model` | `Role.Model` | R | internal/llm/resolver.go:119 用 provider/model 对取 spec |
+| `llm.roles.summarize.provider` | `Role.Provider` | R | internal/llm/resolver.go:179 取 role → :194 建 endpoint |
+| `llm.roles.summarize.temperature` | `Role.Temperature` | R | internal/llm/resolver.go:195 |
+| `llm.roles.summarize.thinking_intensity` | `Role.ThinkingIntensity` | R | internal/llm/resolver.go:196 |
+| `llm.text_chain` | `LLMSection.TextChain` | R | internal/llm/resolver.go:96 |
+| `llm.timeout_ms` | `LLMSection.TimeoutMS` | R | cmd/wisp/run.go:1086 |
+| `memory.extract_model` | `MemorySection.ExtractModel` | D | 零读者（注释指向 roles.memory_extract，那枚真被读） |
+| `memory.l1_enabled` | `MemorySection.L1Enabled` | D | 零读者；L1 开关不在配置上 |
+| `memory.l1_max` | `MemorySection.L1Max` | D | 零读者 |
+| `memory.l3_retention_days` | `MemorySection.L3RetentionDays` | D | 零读者；与 privacy.retention_days 同族两枚都没人清理 |
+| `models.dir` | `ModelsSection.Dir` | R | cmd/wisp/models.go:192-196 |
+| `models.local_override` | `ModelsSection.LocalOverride` | R | cmd/wisp/models.go:164 |
+| `models.mirror` | `ModelsSection.Mirror` | R | cmd/wisp/models.go:163 |
+| `models.verify_signature` | `ModelsSection.VerifySignature` | R | internal/models/downloader.go（validate.go 另把 false 判成加载错误） |
+| `net.allowlist` | `NetSection.Allowlist` | G | unwiredKeys 第 5 行（:85-90）；internal/risk/rules_network.go:74 读的是 risk.NetTarget.Allowlist，同样无生产者 |
+| `net.block_private_ranges` | `NetSection.BlockPrivateRanges` | G | unwiredKeys 第 6 行（:91-96） |
+| `net.proxy.mode` | `ProxyConfig.Mode` | R | cmd/wisp/run.go:1224 / cmd/wisp/providers.go:138 |
+| `net.proxy.url` | `ProxyConfig.URL` | R | cmd/wisp/run.go:1225 / cmd/wisp/providers.go:138 |
+| `observe.level` | `ObserveSection.Level` | D | LogConfig.Level 由 cmd/wisp/logsink.go:149 的 logSinkLevel 与 slo_windows.go:274 的字面量 "info" 填，不读 cfg.Observe.Level |
+| `observe.roll.days` | `RollConfig.Days` | D | observe.LogConfig.RollDays 同上 |
+| `observe.roll.size_mb` | `RollConfig.SizeMB` | D | observe.LogConfig.RollSizeMB 两处生产调用点都没填 |
+| `observe.slo_sample_interval_sec` | `ObserveSection.SLOSampleIntervalSec` | D | 本包外零命中；D32 采样节奏仍走 internal/observe 自己的常数 |
+| `panel.enabled` | `PanelSection.Enabled` | D | 见 §5 尺：段级令牌 .Panel 在本包外零命中 |
+| `panel.height` | `PanelSection.Height` | D | 同 panel.enabled |
+| `panel.keep_alive_in_session` | `PanelSection.KeepAliveInSession` | D | 同 panel.enabled |
+| `panel.scale` | `PanelSection.Scale` | D | 同 panel.enabled |
+| `panel.width` | `PanelSection.Width` | D | 票面那一枚；断点见 §5 |
+| `plugins.Entries.<id>.capabilities` | `PluginEntry.Capabilities` | L | lockedKeyDisposition 登记 not built（unwired.go:142-146），不在 unwiredKeys ⇒ 无拦截 |
+| `plugins.Entries.<id>.enabled` | `PluginEntry.Enabled` | L | lockedKeyDisposition 登记 not built（unwired.go:142-146），不在 unwiredKeys ⇒ 无拦截 |
+| `plugins.Entries.<id>.host_api` | `PluginEntry.HostAPI` | L | lockedKeyDisposition 登记 not built（unwired.go:142-146），不在 unwiredKeys ⇒ 无拦截 |
+| `plugins.Entries.<id>.net_allowlist` | `PluginEntry.NetAllowlist` | L | lockedKeyDisposition 登记 not built（unwired.go:142-146），不在 unwiredKeys ⇒ 无拦截 |
+| `plugins.tier2_enabled` | `PluginsSection.Tier2Enabled` | L | lockedKeyDisposition 登记 not built（unwired.go:141），不在 unwiredKeys ⇒ 写它不报错也不生效 |
+| `privacy.diagnostics_opt_in` | `PrivacySection.DiagnosticsOptIn` | D | 零读者 |
+| `privacy.keep_audio` | `PrivacySection.KeepAudio` | D | 同 half_duplex：validate.go 把 true 判成错误 |
+| `privacy.keep_transcript` | `PrivacySection.KeepTranscript` | D | 同 half_duplex |
+| `privacy.redact_paths` | `PrivacySection.RedactPaths` | D | internal/observe/logging.go:50 与 diagnostics.go:43 各有 RedactPaths 字段（注释逐字 "mirrors [privacy] redact_paths"），但两处生产 InitLog（cmd/wisp/logsink.go:149、cmd/wisp/slo_windows.go:272）只填 Dir+Level ⇒ 建了但没接 |
+| `privacy.retention_days` | `PrivacySection.RetentionDays` | D | 零读者 |
+| `risk.allow_shell_string` | `RiskSection.AllowShellString` | G | unwiredKeys 第 2 行（:66-72） |
+| `risk.blacklist_overrides` | `RiskSection.BlacklistOverrides` | G | unwiredKeys 第 4 行（:79-84） |
+| `risk.confirm_timeout_sec` | `RiskSection.ConfirmTimeoutSec` | R | cmd/wisp/run.go:616 |
+| `risk.l1_window_sec` | `RiskSection.L1WindowSec` | R | cmd/wisp/run.go:615 |
+| `risk.permission_mode` | `RiskSection.PermissionMode` | R | cmd/wisp/approval_always.go:155 + internal/perm/store.go:159 |
+| `risk.shell_allowlist` | `RiskSection.ShellAllowlist` | G | unwiredKeys 第 3 行（:73-78）；internal/risk/rules_shell.go:41 读的是 risk.Facts.ShellAllowlist，无生产者 |
+| `risk.shell_enabled` | `RiskSection.ShellEnabled` | G | unwiredKeys 第 1 行（unwired.go:61-66）⇒ 写非默认值直接加载失败 |
+| `session.conversation_idle_sec` | `SessionSection.ConversationIdleSec` | D | 同 session.warm_timeout_sec |
+| `session.settling_sec` | `SessionSection.SettlingSec` | D | 同 session.warm_timeout_sec |
+| `session.warm_timeout_sec` | `SessionSection.WarmTimeoutSec` | D | 零读者；会话三枚超时全在文档上 |
+| `voice.aec.echo_ref` | `AECConfig.EchoRef` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.aec.enabled` | `AECConfig.Enabled` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.asr.model` | `ASRConfig.Model` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.asr.provider` | `ASRConfig.Provider` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.cloud_asr_chain` | `VoiceSection.CloudASRChain` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.cloud_tts_chain` | `VoiceSection.CloudTTSChain` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.conversation_mode` | `VoiceSection.ConversationMode` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.enabled` | `VoiceSection.Enabled` | D | 整个 [voice] 21 枚：段级令牌 .Voice 在本包外零命中（§6 第 4 条） |
+| `voice.punctuation` | `VoiceSection.Punctuation` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.realtime.api_key_ref` | `RealtimeConfig.APIKeyRef` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.realtime.base_url` | `RealtimeConfig.BaseURL` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.realtime.enabled` | `RealtimeConfig.Enabled` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.realtime.model` | `RealtimeConfig.Model` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.realtime.provider` | `RealtimeConfig.Provider` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.tts.provider` | `TTSConfig.Provider` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.tts.speed` | `TTSConfig.Speed` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.tts.voice` | `TTSConfig.Voice` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.wake_word.enabled` | `WakeWord.Enabled` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.wake_word.keywords` | `WakeWord.Keywords` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.wake_word.thresholds` | `WakeWord.Thresholds` | D | 本包外零命中（尺见 §1 头部三条反查） |
+| `voice.wake_word.veto_words` | `WakeWord.VetoWords` | D | 本包外零命中（尺见 §1 头部三条反查） |
 
 ## §2 `unwiredKeys` 名册覆盖率
 
