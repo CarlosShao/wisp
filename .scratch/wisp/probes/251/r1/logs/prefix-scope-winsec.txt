@@ -1,0 +1,1 @@
+portable-tests.sh: unknown --scope=winsec (known: core, windows, cli, census)
