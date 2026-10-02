@@ -1,109 +1,109 @@
-portable-tests-selftest.sh: judging .scratch/wisp/probes/254/r1b/logs/portable-tests-at-d253703a-parent.sh in a shadow root at /tmp/tmp.2XKYJBGmv5
-portable-tests-selftest.sh: core_pin extracted from /tmp/tmp.2XKYJBGmv5/scripts/portable-tests.sh = 25 import paths
-portable-tests-selftest.sh: winsec_pin extracted from /tmp/tmp.2XKYJBGmv5/scripts/portable-tests.sh = 1 import path(s)
+portable-tests-selftest.sh: judging .scratch/wisp/probes/254/r1b/logs/portable-tests-at-d253703a-parent.sh in a shadow root at /tmp/tmp.suFYGNSOXv
+portable-tests-selftest.sh: core_pin extracted from /tmp/tmp.suFYGNSOXv/scripts/portable-tests.sh = 25 import paths
+portable-tests-selftest.sh: winsec_pin extracted from /tmp/tmp.suFYGNSOXv/scripts/portable-tests.sh = 1 import path(s)
 portable-tests-selftest.sh: split seed = github.com/CarlosShao/wisp/internal/winsec + github.com/CarlosShao/wisp/internal/winsec/acl (2 lines)
 portable-tests-selftest.sh: 254 split universe = core_pin (25) + github.com/CarlosShao/wisp/internal/winsec/acl (26 lines)
 
-== case clean: rc=0 log=/tmp/tmp.VFHoEofbjJ/clean.log
+== case clean: rc=0 log=/tmp/tmp.6s0rXOgyDU/clean.log
    ok   exit 0, as expected
    ok   denominator (GUARD B rows, one per resolved line) = 25
    ok   /GUARD [ABC] -/ absent
    ok   /^runtests\.sh: OK/ appears 1 time(s)
 
-== case coldcache-stderr: rc=0 log=/tmp/tmp.VFHoEofbjJ/coldcache-stderr.log
+== case coldcache-stderr: rc=0 log=/tmp/tmp.6s0rXOgyDU/coldcache-stderr.log
    ok   exit 0, as expected
    ok   denominator (GUARD B rows, one per resolved line) = 25
    ok   /GUARD [ABC] -/ absent
    ok   /stderr \(progress, not packages, not in the denominator\)/ appears 1 time(s)
    ok   /^portable-tests\.sh:   err\| go: downloading / appears 10 time(s)
 
-== case seed-stdout-space: rc=1 log=/tmp/tmp.VFHoEofbjJ/seed-stdout-space.log
+== case seed-stdout-space: rc=1 log=/tmp/tmp.6s0rXOgyDU/seed-stdout-space.log
    ok   exit 1, as expected
    ok   /GUARD C - go list's stdout carried 1 line\(s\) that are not/ appears 1 time(s)
    ok   /github.com/CarlosShao/wisp/internal/fake pkg/ appears 1 time(s)
    ok   /^runtests\.sh: OK/ absent
 
-== case seed-stdout-progress: rc=1 log=/tmp/tmp.VFHoEofbjJ/seed-stdout-progress.log
+== case seed-stdout-progress: rc=1 log=/tmp/tmp.6s0rXOgyDU/seed-stdout-progress.log
    ok   exit 1, as expected
    ok   /GUARD C - go list's stdout carried 10 line\(s\) that are not/ appears 1 time(s)
    ok   /^runtests\.sh: OK/ absent
 
-== case seed-stdout-valid-but-unpinned: rc=1 log=/tmp/tmp.VFHoEofbjJ/seed-stdout-valid-but-unpinned.log
+== case seed-stdout-valid-but-unpinned: rc=1 log=/tmp/tmp.6s0rXOgyDU/seed-stdout-valid-but-unpinned.log
    ok   exit 1, as expected
    ok   /GUARD C - scope mode=core resolved to a DIFFERENT package/ appears 1 time(s)
    ok   /> github.com/CarlosShao/wisp/internal/notpinned/ appears 1 time(s)
 
-== case golist-fails: rc=1 log=/tmp/tmp.VFHoEofbjJ/golist-fails.log
+== case golist-fails: rc=1 log=/tmp/tmp.6s0rXOgyDU/golist-fails.log
    ok   exit 1, as expected
    ok   /exited non-zero. Its stdout was:/ appears 1 time(s)
    ok   /^portable-tests\.sh:   out\| github.com/CarlosShao/wisp/internal/partiallyresolved/ appears 1 time(s)
    ok   /^portable-tests\.sh:   err\| go: downloading modernc.org/sqlite v1.59.0/ appears 1 time(s)
    ok   /the scope cannot be audited/ appears 1 time(s)
 
-== case pin-drift-one-package-missing: rc=1 log=/tmp/tmp.VFHoEofbjJ/pin-drift-one-package-missing.log
+== case pin-drift-one-package-missing: rc=1 log=/tmp/tmp.6s0rXOgyDU/pin-drift-one-package-missing.log
    ok   exit 1, as expected
    ok   /GUARD C - scope mode=core resolved to a DIFFERENT package/ appears 1 time(s)
    ok   /< github.com/CarlosShao/wisp/internal/winsec/ appears 1 time(s)
 
-== case guard-a-empty-test-package: rc=1 log=/tmp/tmp.VFHoEofbjJ/guard-a-empty-test-package.log
+== case guard-a-empty-test-package: rc=1 log=/tmp/tmp.6s0rXOgyDU/guard-a-empty-test-package.log
    ok   exit 1, as expected
    ok   /GUARD A - these packages are declared in scope mode=core/ appears 1 time(s)
    ok   /github.com/CarlosShao/wisp/internal/session/ appears 1 time(s)
 
-== case guard-b-no-result-line: rc=1 log=/tmp/tmp.VFHoEofbjJ/guard-b-no-result-line.log
+== case guard-b-no-result-line: rc=1 log=/tmp/tmp.6s0rXOgyDU/guard-b-no-result-line.log
    ok   exit 1, as expected
    ok   /GUARD B - 1 of .* packages in scope mode=core printed/ appears 1 time(s)
    ok   /github.com/CarlosShao/wisp/internal/perm/ appears 2 time(s)
 
-== case empty-scope-slice: 4 line(s) sliced verbatim from /tmp/tmp.2XKYJBGmv5/scripts/portable-tests.sh
+== case empty-scope-slice: 4 line(s) sliced verbatim from /tmp/tmp.suFYGNSOXv/scripts/portable-tests.sh
    slice| if [ ${#scope[@]} -eq 0 ]; then
    slice|     echo "portable-tests.sh: empty scope (mode=$mode) - refusing to be a green no-op" >&2
    slice|     exit 2
    slice| fi
-   (log: /tmp/tmp.VFHoEofbjJ/empty-scope-slice.log)
+   (log: /tmp/tmp.6s0rXOgyDU/empty-scope-slice.log)
    ok   exit 2, as expected
    ok   /refusing to be a green no-op/ appears 1 time(s)
 
-== case winsec-tier-clean: rc=0 log=/tmp/tmp.VFHoEofbjJ/winsec-tier-clean.log
+== case winsec-tier-clean: rc=0 log=/tmp/tmp.6s0rXOgyDU/winsec-tier-clean.log
    ok   exit 0, as expected
    ok   denominator (GUARD B rows, one per resolved line) = 1
    ok   /GUARD [ABC] -/ absent
    ok   /^runtests\.sh: OK/ appears 1 time(s)
 
-== case winsec-tier-split-goes-red: rc=1 log=/tmp/tmp.VFHoEofbjJ/winsec-tier-split-goes-red.log
+== case winsec-tier-split-goes-red: rc=1 log=/tmp/tmp.6s0rXOgyDU/winsec-tier-split-goes-red.log
    ok   exit 1, as expected
    ok   /GUARD C - scope mode=winsec resolved to a DIFFERENT package/ appears 1 time(s)
    ok   /Pinned: 1, resolved: 2/ appears 1 time(s)
    ok   /> github\.com/CarlosShao/wisp/internal/winsec/acl/ appears 1 time(s)
    ok   /^runtests\.sh: OK/ absent
 
-== case winsec-explicit-split-goes-red: rc=1 log=/tmp/tmp.VFHoEofbjJ/winsec-explicit-split-goes-red.log
+== case winsec-explicit-split-goes-red: rc=1 log=/tmp/tmp.6s0rXOgyDU/winsec-explicit-split-goes-red.log
    ok   exit 1, as expected
    ok   /explicit scope .*IS the winsec tier/ appears 1 time(s)
    ok   /GUARD C - scope mode=winsec resolved to a DIFFERENT package/ appears 1 time(s)
    ok   /> github\.com/CarlosShao/wisp/internal/winsec/acl/ appears 1 time(s)
    ok   /^runtests\.sh: OK/ absent
 
-== case winsec-explicit-pin-gone-goes-red: rc=1 log=/tmp/tmp.VFHoEofbjJ/winsec-explicit-pin-gone-goes-red.log
+== case winsec-explicit-pin-gone-goes-red: rc=1 log=/tmp/tmp.6s0rXOgyDU/winsec-explicit-pin-gone-goes-red.log
    ok   exit 1, as expected
    ok   /GUARD C - scope mode=winsec resolved to a DIFFERENT package/ appears 1 time(s)
    ok   /Pinned: 1, resolved: 0/ appears 1 time(s)
    ok   /< github\.com/CarlosShao/wisp/internal/winsec/ appears 1 time(s)
    ok   /^runtests\.sh: OK/ absent
 
-== case census-tier-roster-clean: rc=0 log=/tmp/tmp.VFHoEofbjJ/census-tier-roster-clean.log
+== case census-tier-roster-clean: rc=0 log=/tmp/tmp.6s0rXOgyDU/census-tier-roster-clean.log
    ok   exit 0, as expected
    ok   /census totals: packages=/ appears 1 time(s)
    ok   /github\.com/CarlosShao/wisp/internal/winsec .*corewinsec/ appears 1 time(s)
 
 == case census-tier-roster-drift-goes-red: seed diff shows 2 line(s) (2 = the one tiers= line replaced, 0 = nothing to mutate)
-   (log: /tmp/tmp.VFHoEofbjJ/census-tier-roster-drift-goes-red.log)
+   (log: /tmp/tmp.6s0rXOgyDU/census-tier-roster-drift-goes-red.log)
    ok   exit 1, as expected
    ok   /census - the tier roster \(tiers=\) and the/ appears 1 time(s)
    ok   /branches : .*winsec/ appears 1 time(s)
    ok   /census totals: packages=/ absent
 
-== case unknown-scope-still-hard: rc=2 log=/tmp/tmp.VFHoEofbjJ/unknown-scope-still-hard.log
+== case unknown-scope-still-hard: rc=2 log=/tmp/tmp.6s0rXOgyDU/unknown-scope-still-hard.log
    ok   exit 2, as expected
    ok   /unknown --scope=winsecfoo \(known: core, windows, cli, winsec, census\)/ appears 1 time(s)
    ok   /refusing to be a green no-op/ absent
@@ -117,9 +117,9 @@ portable-tests-selftest.sh: 254 split universe = core_pin (25) + github.com/Carl
    ok   exit 0, as expected
    ok   /GUARD C - scope mode=winsec/ absent
    ok   /^runtests\.sh: OK/ appears 1 time(s)
-   (logs: /tmp/tmp.VFHoEofbjJ/winsec-explicit-glob-is-what-bites-real.log / /tmp/tmp.VFHoEofbjJ/winsec-explicit-glob-is-what-bites-mutant.log)
+   (logs: /tmp/tmp.6s0rXOgyDU/winsec-explicit-glob-is-what-bites-real.log / /tmp/tmp.6s0rXOgyDU/winsec-explicit-glob-is-what-bites-mutant.log)
 
-== case chain-explicit-split-audit-bites: rc=1 log=/tmp/tmp.VFHoEofbjJ/chain-explicit-split-audit-bites.log
+== case chain-explicit-split-audit-bites: rc=1 log=/tmp/tmp.6s0rXOgyDU/chain-explicit-split-audit-bites.log
    ok   exit 1, as expected
    ok   /explicit scope .*IS the winsec tier/ appears 1 time(s)
    ok   /GUARD C - scope mode=winsec resolved to a DIFFERENT package/ appears 1 time(s)
@@ -127,30 +127,54 @@ portable-tests-selftest.sh: 254 split universe = core_pin (25) + github.com/Carl
    ok   /^runtests\.sh: OK/ absent
    ok   /winsec-tests\.sh: GUARD 3/ absent
 
-== case chain-explicit-clean-stays-green: rc=0 log=/tmp/tmp.VFHoEofbjJ/chain-explicit-clean-stays-green.log
+== case chain-explicit-clean-stays-green: rc=0 log=/tmp/tmp.6s0rXOgyDU/chain-explicit-clean-stays-green.log
    ok   exit 0, as expected
    ok   /explicit scope .*IS the winsec tier/ appears 1 time(s)
    ok   /^runtests\.sh: OK/ appears 1 time(s)
    ok   /winsec-tests\.sh: GUARD/ absent
    ok   /GUARD [ABC] -/ absent
 
-== case chain-widened-scope-loses-audit: rc=0 log=/tmp/tmp.VFHoEofbjJ/chain-widened-scope-loses-audit.log
+== case chain-widened-scope-loses-audit: rc=0 log=/tmp/tmp.6s0rXOgyDU/chain-widened-scope-loses-audit.log
    FAIL exit 0, expected 2
    FAIL /winsec-tests\.sh: GUARD 3/ appeared 0 time(s), wanted at least 1
    FAIL /the delegated audit therefore did not happen/ appeared 0 time(s), wanted at least 1
    ok   /IS the winsec tier/ absent
    ok   /^runtests\.sh: OK/ appears 1 time(s)
 
-== case chain-single-path-is-audited: rc=0 log=/tmp/tmp.VFHoEofbjJ/chain-single-path-is-audited.log
+== case chain-ci-shape-is-audited: rc=0 log=/tmp/tmp.6s0rXOgyDU/chain-ci-shape-is-audited.log
    ok   exit 0, as expected
    ok   /IS the winsec tier/ appears 1 time(s)
    ok   /winsec-tests\.sh: GUARD 3/ absent
 
-== case chain-scope-flag-not-accepted: rc=2 log=/tmp/tmp.VFHoEofbjJ/chain-scope-flag-not-accepted.log
+== case chain-scope-flag-not-accepted: rc=2 log=/tmp/tmp.6s0rXOgyDU/chain-scope-flag-not-accepted.log
    ok   exit 2, as expected
    ok   /winsec-tests\.sh: GUARD 1 - the package list for this step does not name/ appears 1 time(s)
-scripts/portable-tests-selftest.sh: line 650: ain-scope-flag-not-accepted: command not found
-   ok   exit 2, as expected
-   ok   /winsec-tests\.sh: GUARD 1 - the package list for this step does not name/ appears 1 time(s)
-scripts/portable-tests-selftest.sh: line 653: syntax error near unexpected token `fi'
-scripts/portable-tests-selftest.sh: line 653: `fi'
+
+== case core-tier-split-goes-red: rc=0 log=/tmp/tmp.6s0rXOgyDU/core-tier-split-goes-red.log
+   FAIL exit 0, expected 1
+   FAIL /GUARD C - scope mode=core resolved to a DIFFERENT package/ appeared 0 time(s), wanted at least 1
+   FAIL /> github\.com/CarlosShao/wisp/internal/winsec/acl/ appeared 0 time(s), wanted at least 1
+
+== case winsec-tier-split-same-seed: rc=1 log=/tmp/tmp.6s0rXOgyDU/winsec-tier-split-same-seed.log
+   ok   exit 1, as expected
+   ok   /GUARD C - scope mode=winsec resolved to a DIFFERENT package/ appears 1 time(s)
+   ok   /> github\.com/CarlosShao/wisp/internal/winsec/acl/ appears 1 time(s)
+   FAIL the two tiers disagree about what bit - core says [], the winsec tier says [github.com/CarlosShao/wisp/internal/winsec/acl].
+        One package, two answers: ticket 254 AC#2.
+   FAIL core branch carries 1 private spelling(s) of ./internal/winsec/ and 0 shared
+        reference(s) - two spellings means the two tiers can resolve one package
+        two ways (ticket 254 AC#2). Pre-d253703a bytes fail here.
+
+== case core-tier-clean-globform: rc=0 log=/tmp/tmp.6s0rXOgyDU/core-tier-clean-globform.log
+   ok   exit 0, as expected
+   ok   denominator (GUARD B rows, one per resolved line) = 25
+   ok   /GUARD [ABC] -/ absent
+
+== case core-dir-form-hides-the-split: mutant replaced 0 line (core's winsec row; 0 = nothing to mutate, and a seed that cannot take is not evidence)
+   FAIL the mutant seed took 0 line(s), expected exactly 1 - the core tier's winsec row moved
+        out from under this case; re-read the script instead of trusting it
+
+portable-tests-selftest.sh: 27 case(s) ran, 9 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.6s0rXOgyDU (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.
+carrier rc=1
