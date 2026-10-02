@@ -1,0 +1,6 @@
+time=2026-10-02T19:38:05.946+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestEverySectionHasATierInRegistry (0.00s)
+    tiers_255_test.go:44: section "dumb" has no tier in TierRegistry (ticket 255 AC#3: a new section with no tier is a dumb key)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.030s
+FAIL

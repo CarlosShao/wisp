@@ -1,0 +1,8 @@
+time=2026-10-02T19:39:17.262+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestEverySectionHasATierInRegistry (0.00s)
+    tiers_255_test.go:44: section "cost" has no tier in TierRegistry (ticket 255 AC#3: a new section with no tier is a dumb key)
+--- FAIL: TestRegistryCoversSchemaSectionsGreen (0.00s)
+    tiers_255_test.go:98: registered whole-section rows = 15, want 16 (schema fields 18 = 17 sections + schema_version scalar; -2 per-key app/voice; +1 plugins `toml:"-"`); a row was added or removed without the schema following
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.037s
+FAIL

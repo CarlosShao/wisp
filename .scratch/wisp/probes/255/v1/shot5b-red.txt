@@ -1,0 +1,8 @@
+time=2026-10-02T19:43:26.880+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestEverySectionHasATierInRegistry (0.00s)
+    tiers_255_test.go:30: Plugins (`toml:"-"`, dynamic sub-tables) must stay registered as locked in TierRegistry; got tier="" ok=false
+--- FAIL: TestRegistryCoversSchemaSectionsGreen (0.00s)
+    tiers_255_test.go:98: registered whole-section rows = 15, want 16 (schema fields 18 = 17 sections + schema_version scalar; -2 per-key app/voice; +1 plugins `toml:"-"`); a row was added or removed without the schema following
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.040s
+FAIL

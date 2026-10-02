@@ -1,0 +1,6 @@
+time=2026-10-02T19:49:14.032+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestVoicePerKeyRowsMirrorPlanVoiceWalks (0.00s)
+    tiers_255_test.go:169: voice key "fake_key" is in schema but has no tier row in TierRegistry (planVoice reads it for one of the two tiers; ticket 255 AC#3)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.042s
+FAIL

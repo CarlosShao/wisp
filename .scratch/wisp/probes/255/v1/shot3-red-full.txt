@@ -1,0 +1,14 @@
+time=2026-10-02T19:39:40.636+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+panic: config: section llm is hot-applied by plan() but not registered as "hot" in TierRegistry (tiers.go)
+
+goroutine 57 [running]:
+github.com/CarlosShao/wisp/internal/config.(*Manager).plan(0x1e1d3043b80, 0x1e1d3070108)
+	D:/work/workspace/projects plans/Wisp/internal/config/manager.go:299 +0xee5
+github.com/CarlosShao/wisp/internal/config.(*Manager).CheckAndReload(0x1e1d3043b80)
+	D:/work/workspace/projects plans/Wisp/internal/config/manager.go:169 +0x253
+github.com/CarlosShao/wisp/internal/config.TestConfirmLockedRunsOutsideTheManagerLock.func3()
+	D:/work/workspace/projects plans/Wisp/internal/config/manager_223_test.go:102 +0x25
+created by github.com/CarlosShao/wisp/internal/config.TestConfirmLockedRunsOutsideTheManagerLock in goroutine 56
+	D:/work/workspace/projects plans/Wisp/internal/config/manager_223_test.go:101 +0x2b6
+FAIL	github.com/CarlosShao/wisp/internal/config	0.198s
+FAIL

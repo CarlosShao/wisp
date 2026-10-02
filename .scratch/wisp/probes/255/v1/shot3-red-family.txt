@@ -1,0 +1,23 @@
+time=2026-10-02T19:39:53.734+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestManagerHotTierAppliesImmediately (0.02s)
+panic: config: section llm is hot-applied by plan() but not registered as "hot" in TierRegistry (tiers.go) [recovered, repanicked]
+
+goroutine 8 [running]:
+testing.tRunner.func1.2({0x7ff6c0960360, 0x2027ee8cd590})
+	D:/work/base/go/src/testing/testing.go:2123 +0x239
+testing.tRunner.func1()
+	D:/work/base/go/src/testing/testing.go:2126 +0x329
+panic({0x7ff6c0960360?, 0x2027ee8cd590?})
+	D:/work/base/go/src/runtime/panic.go:859 +0x125
+github.com/CarlosShao/wisp/internal/config.(*Manager).plan(0x2027ee994000, 0x2027ee9ae008)
+	D:/work/workspace/projects plans/Wisp/internal/config/manager.go:299 +0xee5
+github.com/CarlosShao/wisp/internal/config.(*Manager).CheckAndReload(0x2027ee994000)
+	D:/work/workspace/projects plans/Wisp/internal/config/manager.go:169 +0x253
+github.com/CarlosShao/wisp/internal/config.TestManagerHotTierAppliesImmediately(0x2027ee89e400)
+	D:/work/workspace/projects plans/Wisp/internal/config/manager_test.go:61 +0x7e
+testing.tRunner(0x2027ee89e400, 0x7ff6c0992080)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/config	0.054s
+FAIL
