@@ -100,13 +100,19 @@ if ($null -ne $git) {
     if ($LASTEXITCODE -eq 0 -and $short) { $commit = $short }
 }
 $buildDate = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+# -H=windowsgui (SPEC-11 §2.2: no-arg launch = GUI): the win32 desktop binary must
+# not pop a black console window when double-clicked. CLI legs (`wisp run` etc.)
+# keep their stdout because attachParentConsole (cmd/wisp/console_windows.go:33-43)
+# returns early when a usable stdout already exists (redirected or parent console)
+# and otherwise attaches ATTACH_PARENT_PROCESS and rebinds the std handles.
 $ldflags = (
     "-X $BuildInfoPkg.Version=0.0.0-dev",
     "-X $BuildInfoPkg.Commit=$commit",
     "-X $BuildInfoPkg.BuildDate=$buildDate",
     "-X $BuildInfoPkg.DefaultEnv=$Env",
     "-X $BuildInfoPkg.SherpaOnnxVersion=$sherpaVersion",
-    "-X $BuildInfoPkg.OnnxRuntimeVersion=$ortVersion"
+    "-X $BuildInfoPkg.OnnxRuntimeVersion=$ortVersion",
+    "-H=windowsgui"
 ) -join ' '
 
 $outDir = Join-Path $RepoRoot 'build'
