@@ -50,3 +50,24 @@
 
 - 票 224 的会话授权实现（H1–H9 接线）由 `224-c2` 判为**已齐**⇒ `224-r3` 那一格从"接授权"改成**"随本票结线"**；票 224 自己的 6 枚未勾格不在本票射程。
 - `ci-delta-1` §6 B 里那枚 `TestComposedGateBlocksAWriteForTwoSeconds` 的 300s 账**由本票接管**（AC#4）；结线时在那件证据件上具名指回本票，⛔ 别删原句。
+
+## AC#1 读数（腿 `252-p1`，2026-10-02 09:4x +08，只追加本节，不碰任何勾选框）
+
+证据件＝`.scratch/wisp/probes/252/p1/verdict.md`（212 行 / 23,702 字节）＋ `probe-run.log`（171 行 / 20,502 字节）。
+载具＝`internal/tools/paths_shortname_252_probe_test.go`（314 行，`//go:build windows`，同包直调生产的 `foldPath`/`rootsContain`/`resolvedForm`/`Roots()`；短名一律 `GetShortPathNameW` 现取，拿不到即 `t.Fatalf`，0 枚 `t.Skip`）。
+跑法＝`go test -count=1 -v -run 'TestTicket252P1' ./internal/tools/`，一遍：9 枚 `--- PASS`／0 枚 `--- FAIL`／0 枚 SKIP。未跑整包、未碰 `cmd/wisp`、未跑 `internal/risk` 任何测试。
+
+1. **先失配的是第一段（词法，`paths.go:140`），不是 `resolvedForm` 那一腿。** roots 长名／asked 短名且叶子不存在 ⇒ `InAllowlist=false`，逐字三样：
+   `Roots()=["d:\work\workspace\projects plans\wisp"]`、`foldPath(canonical)="d:\work\worksp~1\projec~1\wisp\q252p1-never-created.txt"`、
+   `resolvedForm(canonical)="D:\work\workspace\projects plans\Wisp\q252p1-never-created.txt" ok=true` ⇒ **第一段 false、第二段 true**。
+2. **反向那一发不红**：roots 配短名／asked 长名＋叶子不存在 ⇒ `InAllowlist=true`（两段都过）。原因看得见：`NewPathCanonicalizer` 把 roots 也过一次 C26（`paths.go:56/93`），根**存在**⇒必折长，`Roots()` 与配置拼法无关。
+3. **正控**：长/长＋缺失叶子、roots 长／asked 短但指向**真存在**的目录、roots 短／asked 短且真存在 ⇒ 三枚全 `true`（载具可信）。⚠ 但"两侧**配置**同形（都写短名）"**不是正控**：roots 配短＋asked 短＋叶子缺失 ⇒ `false`，仍响在第一段。
+4. **AC#6 本机可达性（半答，缺的那半写明在证据件 §5 甲-1）**：允许根＝真仓库根、asked＝`docs` 与 `internal\tools` 下**真工作区目录**里一个还不存在的文件名 ⇒ 长名 `true`、短名 `false`（响在第一段）。**形状上 owner 撞得到。** 但本机喂入者不存在：`USERPROFILE`/`APPDATA`/`LOCALAPPDATA`/`TEMP`/`TMP`/`HOME`/`os.TempDir()`/`os.UserHomeDir()` 实测**全部 same-as-long（无可用别名）**，进程 cwd 以长名到达；仓内**没有任何生产码调用 `GetShortPathNameW`**（`grep -rn GetShortPathName cmd internal tools scripts docs .scratch` 的命中全在 `*_test.go` 与注释里）⇒ runner 那一族的入口（C26 第 1 步的环境替换，`pathresolver.go:159-202`）在本机为空，剩下的唯一来源是"asked 字符串本身就带短名"（模型/CLI/面板递进来），超出本探针射程。
+
+**推翻票面之处（详见证据件 §4 全表）**：
+- `:12` 的「这两次包含就不可能同时成立」＝**推翻**。实测是一次成立一次不成立，且**两段对同一条物理路径给出相反答复**（第二段是宽容的那一段）。票面 现量 1 的因果句需按读数改写。
+- `:10-11` 把分岔写成"短名侧留短、长名侧折长"（拼法决定）＝**表述推翻**：真正的变量是**存在性**（存在的树一定折长，含 roots；缺失的叶子一定照抄 `pathresolver.go:138`）。
+- `:30` 的行号精度：`:283-300` 是注释块（`RUNNER~1` 那句在 `:291`），实现体在 `:303-375`。
+- `:31` 的「本仓既有规矩：拿不到短名就必须红、不许 skip」＝**全称推翻**：出处 `bridge_junction_windows_test.go:77/84` 为真，但同一 8.3 前置条件在 `internal/risk/pathresolver_junction_windows_test.go:128`、`internal/winsec/tree_ownership_112_windows_test.go:122`、`internal/winsec/absoluteness_attribution_129_windows_test.go:311` 三处用的是 `t.Skip`。
+- `:9-11` 的行号尺与 `:16-17` 的两串长短名读数＝**全部复证为真**（`:133/:140/:152/:153/:127/:138/rules_gateway.go:45/bridge.go:334`）。
+- `:23` 那枚 301 秒 witness 的归因＝**本腿既不支持也不推翻**（`cmd/wisp` 是 `198-r1` 脏面，本腿一枚没跑）；⛔ 不许拿本件当任何候选修法（AC#2 ⓐ／ⓑ）的否证，本腿一枚候选形的作用面都没跑过。

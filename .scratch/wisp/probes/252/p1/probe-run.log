@@ -1,0 +1,171 @@
+time=2026-10-02T09:43:58.497+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket252P1AllowlistLegs
+    paths_shortname_252_probe_test.go:229: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_probe_test.go:232: long spelling : "D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_probe_test.go:233: short spelling: "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+    paths_shortname_252_probe_test.go:234: equal?        : false
+=== RUN   TestTicket252P1AllowlistLegs/Q1_roots=LONG_asked=SHORT+missing-leaf
+    paths_shortname_252_probe_test.go:252: CASE Q1 roots=LONG asked=SHORT+missing-leaf
+    paths_shortname_252_probe_test.go:252:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_probe_test.go:252:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   risk.Resolve        : err=<nil> Canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252p1-never-created.txt" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:252:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_probe_test.go:252:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt" ok=true
+    paths_shortname_252_probe_test.go:252:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : false
+    paths_shortname_252_probe_test.go:252:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+=== RUN   TestTicket252P1AllowlistLegs/Q2_roots=SHORT_asked=LONG+missing-leaf
+    paths_shortname_252_probe_test.go:252: CASE Q2 roots=SHORT asked=LONG+missing-leaf
+    paths_shortname_252_probe_test.go:252:   roots as configured : ["D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"]
+    paths_shortname_252_probe_test.go:252:   asked raw           : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   risk.Resolve        : err=<nil> Canonical="D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:252:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt" ok=true
+    paths_shortname_252_probe_test.go:252:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252:   FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252P1AllowlistLegs/P1_roots=LONG_asked=LONG+missing-leaf
+    paths_shortname_252_probe_test.go:252: CASE P1 roots=LONG asked=LONG+missing-leaf
+    paths_shortname_252_probe_test.go:252:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_probe_test.go:252:   asked raw           : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   risk.Resolve        : err=<nil> Canonical="D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:252:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt" ok=true
+    paths_shortname_252_probe_test.go:252:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252:   FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252P1AllowlistLegs/P2_roots=LONG_asked=SHORT_of_an_EXISTING_dir
+    paths_shortname_252_probe_test.go:252: CASE P2 roots=LONG asked=SHORT of an EXISTING dir
+    paths_shortname_252_probe_test.go:252:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_probe_test.go:252:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+    paths_shortname_252_probe_test.go:252:   risk.Resolve        : err=<nil> Canonical="D:\\work\\workspace\\projects plans\\Wisp" Resolved=true Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_probe_test.go:252:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:252:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp" ok=true
+    paths_shortname_252_probe_test.go:252:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252:   FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252P1AllowlistLegs/P3_roots=SHORT_asked=SHORT_of_an_EXISTING_dir
+    paths_shortname_252_probe_test.go:252: CASE P3 roots=SHORT asked=SHORT of an EXISTING dir
+    paths_shortname_252_probe_test.go:252:   roots as configured : ["D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"]
+    paths_shortname_252_probe_test.go:252:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+    paths_shortname_252_probe_test.go:252:   risk.Resolve        : err=<nil> Canonical="D:\\work\\workspace\\projects plans\\Wisp" Resolved=true Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_probe_test.go:252:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:252:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp" ok=true
+    paths_shortname_252_probe_test.go:252:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252:   FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252P1AllowlistLegs/Q3b_roots=SHORT_asked=SHORT+missing-leaf
+    paths_shortname_252_probe_test.go:252: CASE Q3b roots=SHORT asked=SHORT+missing-leaf
+    paths_shortname_252_probe_test.go:252:   roots as configured : ["D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"]
+    paths_shortname_252_probe_test.go:252:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   risk.Resolve        : err=<nil> Canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252p1-never-created.txt" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:252:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_probe_test.go:252:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt" ok=true
+    paths_shortname_252_probe_test.go:252:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : false
+    paths_shortname_252_probe_test.go:252:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+--- PASS: TestTicket252P1AllowlistLegs (0.01s)
+    --- PASS: TestTicket252P1AllowlistLegs/Q1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/Q2_roots=SHORT_asked=LONG+missing-leaf (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/P1_roots=LONG_asked=LONG+missing-leaf (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/P2_roots=LONG_asked=SHORT_of_an_EXISTING_dir (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/P3_roots=SHORT_asked=SHORT_of_an_EXISTING_dir (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/Q3b_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+=== RUN   TestTicket252P1OwnerMachineReachability
+    paths_shortname_252_probe_test.go:260: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_probe_test.go:270: workspace dir="D:\\work\\workspace\\projects plans\\Wisp\\docs" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs"
+    paths_shortname_252_probe_test.go:271: CASE W-long docs
+    paths_shortname_252_probe_test.go:271:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_probe_test.go:271:   asked raw           : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   risk.Resolve        : err=<nil> Canonical="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252p1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:271:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:271:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:271:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252p1-new-note.md" ok=true
+    paths_shortname_252_probe_test.go:271:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:271:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:271:   FIRST FAILING LEG              : none: both legs hold
+    paths_shortname_252_probe_test.go:272: CASE W-short docs
+    paths_shortname_252_probe_test.go:272:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_probe_test.go:272:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   risk.Resolve        : err=<nil> Canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252p1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:272:   Canonicalize        : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:272:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_probe_test.go:272:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252p1-new-note.md" ok=true
+    paths_shortname_252_probe_test.go:272:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:272:   InAllowlist(canonical)         : false
+    paths_shortname_252_probe_test.go:272:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+    paths_shortname_252_probe_test.go:270: workspace dir="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools"
+    paths_shortname_252_probe_test.go:271: CASE W-long internal\tools
+    paths_shortname_252_probe_test.go:271:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_probe_test.go:271:   asked raw           : "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   risk.Resolve        : err=<nil> Canonical="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252p1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:271:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:271:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:271:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252p1-new-note.md" ok=true
+    paths_shortname_252_probe_test.go:271:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:271:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:271:   FIRST FAILING LEG              : none: both legs hold
+    paths_shortname_252_probe_test.go:272: CASE W-short internal\tools
+    paths_shortname_252_probe_test.go:272:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_probe_test.go:272:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   risk.Resolve        : err=<nil> Canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252p1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:272:   Canonicalize        : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_probe_test.go:272:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_probe_test.go:272:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252p1-new-note.md" ok=true
+    paths_shortname_252_probe_test.go:272:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:272:   InAllowlist(canonical)         : false
+    paths_shortname_252_probe_test.go:272:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+--- PASS: TestTicket252P1OwnerMachineReachability (0.00s)
+=== RUN   TestTicket252P1EnvSpellingCensus
+    paths_shortname_252_probe_test.go:294: env USERPROFILE  : value="C:\\Users\\swq" alias="C:\\Users\\swq" -> same-as-long (no usable alias) lstat_err=<nil>
+    paths_shortname_252_probe_test.go:294: env APPDATA      : value="C:\\Users\\swq\\AppData\\Roaming" alias="C:\\Users\\swq\\AppData\\Roaming" -> same-as-long (no usable alias) lstat_err=<nil>
+    paths_shortname_252_probe_test.go:294: env LOCALAPPDATA : value="C:\\Users\\swq\\AppData\\Local" alias="C:\\Users\\swq\\AppData\\Local" -> same-as-long (no usable alias) lstat_err=<nil>
+    paths_shortname_252_probe_test.go:294: env TEMP         : value="C:\\Users\\swq\\AppData\\Local\\Temp" alias="C:\\Users\\swq\\AppData\\Local\\Temp" -> same-as-long (no usable alias) lstat_err=<nil>
+    paths_shortname_252_probe_test.go:294: env TMP          : value="C:\\Users\\swq\\AppData\\Local\\Temp" alias="C:\\Users\\swq\\AppData\\Local\\Temp" -> same-as-long (no usable alias) lstat_err=<nil>
+    paths_shortname_252_probe_test.go:289: env CD           : (unset)
+    paths_shortname_252_probe_test.go:294: env HOME         : value="C:\\Users\\swq" alias="C:\\Users\\swq" -> same-as-long (no usable alias) lstat_err=<nil>
+    paths_shortname_252_probe_test.go:297: process cwd     : value="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" alias="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools" -> DIFFERENT spelling exists
+    paths_shortname_252_probe_test.go:299: os.TempDir()    : value="C:\\Users\\swq\\AppData\\Local\\Temp" alias="C:\\Users\\swq\\AppData\\Local\\Temp" -> same-as-long (no usable alias)
+    paths_shortname_252_probe_test.go:305: os.UserHomeDir(): value="C:\\Users\\swq" err=<nil> alias="C:\\Users\\swq" -> same-as-long (no usable alias)
+    paths_shortname_252_probe_test.go:309: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_probe_test.go:312: Resolve("D:\\work\\workspace\\projects plans\\Wisp") -> Canonical="D:\\work\\workspace\\projects plans\\Wisp" Resolved=true Rewritten=false err=<nil>
+    paths_shortname_252_probe_test.go:312: Resolve("D:\\work\\WORKSP~1\\PROJEC~1\\Wisp") -> Canonical="D:\\work\\workspace\\projects plans\\Wisp" Resolved=true Rewritten=false err=<nil>
+--- PASS: TestTicket252P1EnvSpellingCensus (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.045s
