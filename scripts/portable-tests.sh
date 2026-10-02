@@ -257,17 +257,92 @@ if [ ${#scope[@]} -eq 0 ]; then
 fi
 
 # ---- resolve the scope once, so all three guards read the same truth ---------
+#
+# TICKET 250: THE DENOMINATOR IS STDOUT ALONE. This block used to read
+#
+#     if ! go list "${scope[@]}" >"$resolved" 2>&1; then
+#
+# and then counted EVERY line of that file - `pkgcount` below, and GUARD B's
+# per-package loop at the bottom of the script, both read "$resolved". `go list`
+# writes package paths to stdout and progress/diagnostics to stderr, so on a cold
+# module cache the `go: downloading ...` lines were counted as packages while the
+# package set itself was untouched. Measured on this host 2026-10-02 08:5x with
+# GOMODCACHE pointed at an empty directory and nothing else changed:
+#
+#     portable-tests.sh:   set than the one pinned next to it. Pinned: 25, resolved: 36.
+#
+# - eleven `go: downloading` lines, exit 1, twelve seconds in, BEFORE `go test`
+# ever started, so the whole core scope's readings went missing. A warm cache prints
+# nothing to stderr (measured: stdout 25 lines / stderr 0 bytes at this same HEAD),
+# which is why it is silent on every developer laptop and red only on CI.
+#
+# Keeping stderr out of the denominator is not the same as throwing it away: a
+# successful `go list` echoes its stderr into the step log verbatim, and a FAILED
+# one still exits 1 with BOTH streams printed - the pre-fix failure branch (it used
+# to `cat` the one merged file) is preserved, not softened (ticket 250 AC#1's
+# reverse face).
+#
+# The standing carrier that judges this block both ways on a laptop, ten cases, no
+# real test binary involved, is scripts/portable-tests-selftest.sh (ticket 250
+# AC#3). Run it before editing anything between here and GUARD C below.
 resolved=$(mktemp 2>/dev/null || echo "$root/.portable-resolved.$$.txt")
-if ! go list "${scope[@]}" >"$resolved" 2>&1; then
-    cat "$resolved"
-    echo "portable-tests.sh: go list [${scope[*]}] failed - the scope cannot be audited" \
-        "against a pattern that does not resolve." >&2
-    rm -f "$resolved"
+resolved_err=$(mktemp 2>/dev/null || echo "$root/.portable-resolved-err.$$.txt")
+if ! go list "${scope[@]}" >"$resolved" 2>"$resolved_err"; then
+    {
+        echo "portable-tests.sh: go list [${scope[*]}] exited non-zero. Its stdout was:"
+        sed 's/^/portable-tests.sh:   out| /' "$resolved"
+        echo "portable-tests.sh: its stderr was:"
+        sed 's/^/portable-tests.sh:   err| /' "$resolved_err"
+        echo "portable-tests.sh: go list [${scope[*]}] failed - the scope cannot be audited" \
+            "against a pattern that does not resolve."
+    } >&2
+    rm -f "$resolved" "$resolved_err"
     exit 1
 fi
+if [ -s "$resolved_err" ]; then
+    echo "portable-tests.sh: go list wrote $(grep -c . "$resolved_err" || true) line(s) to stderr" \
+        "(progress, not packages, not in the denominator):"
+    sed 's/^/portable-tests.sh:   err| /' "$resolved_err"
+fi
+rm -f "$resolved_err"
 grep -v '^$' "$resolved" | sort -u >"$resolved.sorted" || true
 mv "$resolved.sorted" "$resolved"
 pkgcount=$(wc -l <"$resolved" | tr -d '[:space:]')
+
+# Ticket 250 AC#2: the shape check, in capability form, NOT a word list.
+#
+# Every line that made it into the denominator has to BE an import path. Asserting
+# "this is not the text `go: downloading`" would be the wrong instrument - Go rewords
+# its progress output and the guard goes blind again - so what is asserted is the
+# grammar a path has (go/src/internal/module check.go: an element is a non-empty run
+# of letters, digits and - . _ + ~, starting alphanumeric, with ! for the case
+# escape; elements joined by /). No whitespace anywhere in the line is the part that
+# progress text, diagnostics and "matched no packages" prose all fail and no import
+# path can.
+#
+# A line that fails is REFUSED, not filtered. Dropping the unrecognised lines and
+# carrying on would make GUARD B audit a smaller scope than the pin claims while
+# printing the same green - the exact shape the comment below stands guard over, so
+# the whole step goes red and says which lines it choked on.
+import_path_re='^[A-Za-z0-9][A-Za-z0-9._+~!-]*(/[A-Za-z0-9][A-Za-z0-9._+~!-]*)*$'
+notpaths=''
+notpathcount=0
+while IFS= read -r line || [ -n "$line" ]; do
+    [[ $line =~ $import_path_re ]] && continue
+    notpaths="$notpaths$line"$'\n'
+    notpathcount=$((notpathcount + 1))
+done <"$resolved"
+if [ "$notpathcount" -ne 0 ]; then
+    {
+        echo "portable-tests.sh: GUARD C - go list's stdout carried $notpathcount line(s) that are not"
+        echo "portable-tests.sh:   import paths, so this $pkgcount-line denominator cannot be trusted:"
+        printf '%s' "$notpaths" | sed 's/^/portable-tests.sh:   /'
+        echo "portable-tests.sh: refused rather than filtered: a guard that drops the lines it does not"
+        echo "portable-tests.sh: recognise measures less than it claims to (ticket 250 AC#2)."
+    } >&2
+    rm -f "$resolved"
+    exit 1
+fi
 
 # GUARD C: the named scopes pin their own resolved set. Deleting an entry from the
 # list above, or letting a glob quietly stop covering a package, is a red step -
