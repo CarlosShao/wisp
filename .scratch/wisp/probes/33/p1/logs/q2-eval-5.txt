@@ -1,0 +1,9 @@
+time=2026-10-02T19:50:53.629+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-watchdog owner=33-p1-q2
+time=2026-10-02T19:50:53.630+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-usta owner=33-p1-q2
+MODE=eval CREATE1 ok in 0ms
+PUSH issued via w1.Eval (ExecuteScript) on UI thread at_ms=600
+REPORT_TEXT page-said="EVAL_SEEN title=P1Q2-OK-33 polls=3" at_ms=741
+WATCHDOG clean exit: page reported, WM_QUIT posted to tid=32788
+MODE=eval RESULT=RUN-RETURNED
+MODE=eval WMAPP_DEQUEUED=0 REPORTS=1 FIRST_REPORT_MS=741 EVAL_ISSUED=true EVAL_AT_MS=600 QUIT_FORCED=false PANICS=0 SINK_WRITES=0
+VERDICT eval: page reported (1) - see REPORT_TEXT for EVAL_SEEN / EVAL_NOT_SEEN

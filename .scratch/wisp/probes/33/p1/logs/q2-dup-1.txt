@@ -1,0 +1,10 @@
+time=2026-10-02T19:50:36.234+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-watchdog owner=33-p1-q2
+time=2026-10-02T19:50:36.235+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-usta owner=33-p1-q2
+MODE=dup-manager CREATE1 ok in 0ms
+MODE=dup-manager RESULT=CREATE2-RETURNED-WINDOW ms=679 bind2err=<nil>
+REPORT_TEXT w2-page-said="W2-LIVE" at_ms=1282
+WATCHDOG clean exit: page reported, WM_QUIT posted to tid=32804
+MODE=dup-manager W2 destroyed after its window
+MODE=dup-manager RESULT=DONE w1 destroyed last
+MODE=dup-manager WMAPP_DEQUEUED=1 REPORTS=1 FIRST_REPORT_MS=1282 EVAL_ISSUED=false EVAL_AT_MS=0 QUIT_FORCED=false PANICS=0 SINK_WRITES=0
+VERDICT dup-manager: see RESULT line above for the second create's fate

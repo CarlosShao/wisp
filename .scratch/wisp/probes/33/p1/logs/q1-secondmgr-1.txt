@@ -1,0 +1,12 @@
+time=2026-10-02T19:52:27.526+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q1-watchdog owner=33-p1-q1
+time=2026-10-02T19:52:27.527+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q1-host owner=33-p1-q1
+HOST tid=30424 com=sta
+L1 two constructors done: m1=0x154463480b00 m2=0x154463480b40 (pure struct fill, no window)
+L2 first create ok hwnd=0x1C80F1E ms=667
+NOTE M1-LIVE
+L2 second create ok hwnd=0x30A0F32 ms=561 (both windows now on tid=30424)
+NOTE2 M2-LIVE
+L3 serial Run() on m2's loop for 1s (first window idle-pumping via pumpOnce)
+TEARDOWN m2 destroyed
+TEARDOWN m1 destroyed
+FINAL panics=0 sink_writes=0 sink_file=C:\Users\swq\AppData\Local\Temp\wisp33p1q1\secondmgr\panic-sink.txt

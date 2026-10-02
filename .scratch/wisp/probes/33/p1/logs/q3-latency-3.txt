@@ -1,0 +1,9 @@
+time=2026-10-02T19:54:42.051+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q3-watchdog owner=33-p1-q3
+time=2026-10-02T19:54:42.056+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q3-host owner=33-p1-q3
+HOST tid=32860 com=sta
+COLD create alone: 850.303 ms
+COLD (create+roundtrip) = 1038.696 ms (roundtrip calls=1)
+HOT-approx round 1 = 157.227 ms
+HOT-approx round 2 = 203.220 ms
+TEARDOWN destroyed+pumped
+FINAL panics=0 sink_writes=0 tainted=false sink_file=C:\Users\swq\AppData\Local\Temp\wisp33p1q3\latency\panic-sink.txt
