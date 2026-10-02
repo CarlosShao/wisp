@@ -69,8 +69,11 @@
 #   bash scripts/portable-tests.sh                    # the core (ubuntu) CI scope
 #   bash scripts/portable-tests.sh --scope=windows    # the test-windows scope
 #   bash scripts/portable-tests.sh --scope=cli        # cmd/wisp, after third_party
+#   bash scripts/portable-tests.sh --scope=winsec     # the internal/winsec tier (ticket 251)
 #   bash scripts/portable-tests.sh ./internal/proc/   # explicit scope (A and B still
-#                                                     # apply; C has nothing to pin)
+#                                                     # apply; C has nothing to pin -
+#                                                     # UNLESS the list IS one tier's own
+#                                                     # scope, see the ticket 251 AC#1 block)
 set -eu -o pipefail
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -101,6 +104,19 @@ fi
 #   windows test-windows' portable step.
 #   cli     cmd/wisp, whose test binary needs the sherpa DLLs (ticket 98's load
 #           hole) - run by scripts/wisp-cli-tests.sh, which stages them first.
+#   winsec  the internal/winsec tier (ticket 251 AC#1). This tier is NEW: the pin
+#           below has existed since ticket 111 with NO reader but the census roster,
+#           because `case $mode in` had no winsec branch AND the route CI actually
+#           takes (scripts/winsec-tests.sh:94, which hands this script explicit
+#           package paths) arrived in GUARD C's "nothing to pin" branch. So a split
+#           of or a rename inside internal/winsec was, until ticket 251, a step that
+#           kept passing while testing one package less. The tier's scope is written
+#           as the GLOB ./internal/winsec/... on purpose: unlike the bare directory,
+#           the glob puts a newly created subpackage INTO the resolved set, where
+#           GUARD C's pin comparison is what makes it a red step.
+#           census is not a scope - it is the audit of the four above, and it is in
+#           the tiers= roster below because AC#4 (ticket 251) requires the tier names
+#           census reads and the branches that give a tier its scope to be ONE list.
 #
 # ./internal/winsec/ joined the core list for ticket 111 AC#9: the ubuntu leg ran
 # 16 globs that never named it, so the whole `!windows` half of the package that
@@ -165,6 +181,21 @@ winsec_pin='
 github.com/CarlosShao/wisp/internal/winsec
 '
 
+# TICKET 251 AC#4 - ONE ROSTER, READ BY EVERYONE. The tier names used to be written
+# TWICE in this file: as the `case $mode in` branches, and again as
+# `for m in core windows cli winsec` inside the census loop. Two lists that can
+# disagree, and at the ticket's own HEAD they DID (census printed `CLAIMED BY ...
+# winsec` for a tier no branch implemented) while census exited 0. tiers= is now the
+# only place the names are written; the census step re-reads THIS FILE's own
+# `case $mode in` block and refuses to report anything unless the two sets are equal
+# in both directions, so the roster cannot be maintained apart from the branches.
+tiers='core windows cli winsec census'
+# The winsec tier's scope, named once: the branch below and the explicit-path audit
+# further down both read it, so "what the tier covers" cannot drift from "what the
+# tier's pin claims" the way the tier NAME just did.
+winsec_dir=./internal/winsec/
+winsec_scope=./internal/winsec/...
+
 scope=()
 pinned=''
 case $mode in
@@ -195,12 +226,20 @@ cli)
     scope=(./cmd/wisp/)
     pinned=$cli_pin
     ;;
+winsec)
+    # Ticket 251 AC#1: winsec_pin existed with no branch to resolve it, so the pin
+    # was never compared to anything this script actually ran. Glob scope + that
+    # pin, both read from the declarations above; GUARD C then bites on a split,
+    # a rename or a package that stopped resolving, in BOTH directions.
+    scope=("$winsec_scope")
+    pinned=$winsec_pin
+    ;;
 census)
     scope=()
     pinned=''
     ;;
 *)
-    echo "portable-tests.sh: unknown --scope=$mode (known: core, windows, cli, census)" >&2
+    echo "portable-tests.sh: unknown --scope=$mode (known: ${tiers// /, })" >&2
     exit 2
     ;;
 esac
@@ -220,6 +259,37 @@ if [ "$mode" = census ]; then
     all=$(go list ./... 2>/dev/null | sort -u)
     n=$(printf '%s\n' "$all" | grep -c . || true)
     echo "portable-tests.sh: census GOOS=$goos - go list ./... = $n packages (one row each)"
+    # AC#4 (ticket 251): this census used to read a tier roster written HERE
+    # (`for m in core windows cli winsec`) while the tiers that can actually be RUN
+    # are written AGAIN as the `case $mode in` branches above. At the ticket's own
+    # HEAD the two sets already disagreed - census printed `CLAIMED BY ... winsec`
+    # for a tier NO branch implemented, and exited 0 doing it. Census now refuses to
+    # print a single row unless the roster and this file's own branches are equal.
+    own="$here/portable-tests.sh"
+    if [ ! -r "$own" ]; then
+        echo "portable-tests.sh: census - cannot read this script's own bytes at $own, so the tier" \
+            "roster cannot be compared with the case branches. Refused (ticket 251 AC#4)." >&2
+        exit 1
+    fi
+    branches=$(awk '
+        /^case \$mode in$/ { f = 1; next }
+        f && /^esac$/ { exit }
+        f && /^\*\)$/ { print "*"; next }
+        f && /^[a-z][a-z0-9]*\)$/ { print substr($0, 1, length($0) - 1) }' "$own" | sort -u | tr '\n' ' ')
+    roster=$(printf '%s\n' $tiers '*' | sort -u | tr '\n' ' ')
+    if [ "$branches" != "$roster" ]; then
+        {
+            echo "portable-tests.sh: census - the tier roster (tiers=) and the 'case \$mode in'"
+            echo "portable-tests.sh:   branches are NOT the same set, so the CLAIMED BY column below"
+            echo "portable-tests.sh:   would name tiers that cannot be run, or hide tiers that can:"
+            printf 'portable-tests.sh:   tiers=   : %s\n' "$roster"
+            printf 'portable-tests.sh:   branches : %s\n' "$branches"
+            echo "portable-tests.sh: refused rather than reported - a census whose roster drifted from"
+            echo "portable-tests.sh: the runnable tiers is '配置里有一行 = 它跑过了' wearing a table"
+            echo "portable-tests.sh: (ticket 251 AC#4)."
+        } >&2
+        exit 1
+    fi
     printf 'portable-tests.sh: %-46s %-11s %s\n' PACKAGE 'TESTS(t/x)' 'CLAIMED BY'
     empty=0
     noscope=0
@@ -227,10 +297,19 @@ if [ "$mode" = census ]; then
         [ -n "$p" ] || continue
         counts=$(go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' "$p" 2>/dev/null || echo '?/?')
         where=''
-        for m in core windows cli winsec; do
+        for m in $tiers; do
+            if [ "$m" = census ]; then continue; fi # the auditor owns no pin (ticket 251 AC#4)
             case $m in
             core) pin=$core_pin ;; windows) pin=$win_pin ;; cli) pin=$cli_pin ;;
             winsec) pin=$winsec_pin ;;
+            *)
+                {
+                    echo "portable-tests.sh: census - tier '$m' is in tiers= but this loop has no pin for"
+                    echo "portable-tests.sh:   it, so census could only ever report it as covering nothing."
+                    echo "portable-tests.sh: Name the pin (ticket 251 AC#4), do not add a tier silently."
+                } >&2
+                exit 1
+                ;;
             esac
             if printf '%s\n' "$pin" | grep -qxF "$p"; then where="$where$m"; fi
         done
@@ -245,11 +324,26 @@ if [ "$mode" = census ]; then
 fi
 
 if [ $# -gt 0 ]; then
-    # Explicit paths are the local-debug form (and how winsec-tests.sh delegates).
-    # GUARD A and GUARD B still apply to whatever is named; only GUARD C's pin is
-    # skipped, because an ad-hoc list has no expectation to be faithful to.
-    scope=("$@")
-    pinned=''
+    # Explicit paths are the local-debug form (and, until ticket 251, the way
+    # scripts/winsec-tests.sh delegated). GUARD A and GUARD B have always applied to
+    # whatever is named. GUARD C used to be skipped wholesale here, "because an
+    # ad-hoc list has no expectation to be faithful to" - true of an ad-hoc list,
+    # false of the one call CI really makes: winsec-tests.sh:94 hands over exactly
+    # ./internal/winsec/, which IS a tier's own scope and does have an expectation to
+    # be faithful to. So that list, and only that list, is run as its tier and pinned
+    # (AC#1's option (b), on the route the gate actually takes - the tier branch above
+    # alone would have left CI's real path unpinned). Any other explicit list keeps
+    # today's meaning: nothing to pin, A and B still apply.
+    if [ $# -eq 1 ] && { [ "$1" = "$winsec_dir" ] || [ "$1" = "$winsec_scope" ]; }; then
+        mode=winsec
+        scope=("$winsec_scope")
+        pinned=$winsec_pin
+        echo "portable-tests.sh: explicit scope [$1] IS the winsec tier's own scope - running it" \
+            "as mode=$mode against winsec_pin (ticket 251 AC#1)"
+    else
+        scope=("$@")
+        pinned=''
+    fi
 fi
 if [ ${#scope[@]} -eq 0 ]; then
     echo "portable-tests.sh: empty scope (mode=$mode) - refusing to be a green no-op" >&2

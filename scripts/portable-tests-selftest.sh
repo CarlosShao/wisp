@@ -8,8 +8,18 @@
 # "Pinned: 25, resolved: 36" and killed the core step BEFORE `go test` ran - while
 # on a warm cache (every developer laptop) stderr is empty and the same code is
 # silent. AC#3 forbids shipping that as "only measurable on CI", so the shape is
-# reproduced here on demand: nine cases, each of which either has to go red or has
-# to stay green, and the carrier exits non-zero if any of them does the other.
+# reproduced here on demand: seventeen cases, each of which either has to go red or
+# has to stay green, and the carrier exits non-zero if any of them does the other.
+#
+# TICKET 251 ADDED THE LAST SEVEN, and they judge a different hole: `winsec_pin`
+# was a pin NOTHING compared - no `winsec)` branch existed, and the route CI really
+# takes (scripts/winsec-tests.sh:94) hands scripts/portable-tests.sh an EXPLICIT
+# package path, which landed in GUARD C's "nothing to pin" branch. So the same
+# carrier now also shoots the winsec tier by name, the explicit path winsec-tests.sh
+# passes, and the census tier roster, with the ticket's two seed shapes on each
+# (stdout gains a package the pin does not have / the pinned package disappears).
+# Cases 11-17 FAIL on the pre-fix bytes by design - that is this ticket's 改前必红
+# reading:  bash scripts/portable-tests-selftest.sh all /tmp/prefix.sh
 #
 # WHAT IS REAL AND WHAT IS NOT. The `go` process is scripts/testdata/portable-tests/go
 # (see its header for why a shim is the right tool here); everything else -
@@ -167,6 +177,58 @@ denominator_is() {
 skip() { printf '\n== case %s: skipped (single-case run)\n' "$1"; }
 selected() { [ -z "$only" ] || [ "$only" = "$1" ]; }
 
+# ---- ticket 251: the helpers the winsec/census cases need -----------------------
+#
+# make_shadow_root <script> - the same shadow the second CLI argument builds: a
+# script under test derives its own root from its location and refuses to run
+# without tools/d22scan/runtests.sh next to it.
+make_shadow_root() {
+    local shadow
+    shadow=$(mktemp -d 2>/dev/null || echo "$root/.portable-shadow.$$")
+    mkdir -p "$shadow/scripts" "$shadow/tools/d22scan"
+    cp "$1" "$shadow/scripts/portable-tests.sh"
+    cp "$root/tools/d22scan/runtests.sh" "$shadow/tools/d22scan/runtests.sh"
+    cp "$root/go.mod" "$shadow/go.mod"
+    cp "$root/go.sum" "$shadow/go.sum"
+    printf '%s' "$shadow"
+}
+
+# run_with <case-name> <pin-file> [ENV=VAL ...] -- <script args...>
+# run() with the scope no longer hardwired: ticket 251's cases have to point the
+# winsec tier by name AND pass the explicit path winsec-tests.sh passes.
+run_with() {
+    local name=$1
+    local pinfile=$2
+    shift 2
+    local envs=()
+    while [ "$1" != "--" ]; do envs+=("$1"); shift; done
+    shift
+    last_log="$work/$name.log"
+    ( PATH="$work/bin:$PATH" FAKEGO_PIN_FILE="$pinfile" \
+        env ${envs[@]+"${envs[@]}"} bash "$script" "$@" ) >"$last_log" 2>&1
+    last_rc=$?
+    ran=$((ran + 1))
+    printf '\n== case %s: rc=%d log=%s\n' "$name" "$last_rc" "$last_log"
+}
+
+# One truth again: the winsec tier's pin comes out of the script under test, so the
+# carrier cannot drift from what the script claims. Its cases go red on the pre-fix
+# bytes on purpose (no branch, no explicit-path pin) - see the header.
+winsec_pin_file="$work/winsec-pin.txt"
+awk -v q="'" 'index($0, "winsec_pin=" q) == 1 { f = 1; next }
+    f { if ($0 == q) { f = 0; next } print }' "$script" >"$winsec_pin_file"
+winc=$(grep -c . "$winsec_pin_file" || true)
+echo "portable-tests-selftest.sh: winsec_pin extracted from $script = $winc import path(s)"
+if [ "$winc" -eq 0 ]; then
+    echo "portable-tests-selftest.sh: could not extract winsec_pin - the winsec cases would be vacuous." >&2
+    exit 2
+fi
+IFS= read -r winsec_path <"$winsec_pin_file"
+# seed 251-a: the split - a second package appears UNDER the pinned import path.
+winsec_split="$work/winsec-pin-split.txt"
+{ cat "$winsec_pin_file"; printf '%s\n' "$winsec_path/acl"; } >"$winsec_split"
+echo "portable-tests-selftest.sh: split seed = $winsec_path + ${winsec_path}/acl (2 lines)"
+
 # 1. control: the pin resolves, nothing on stderr. The step must be GREEN, which
 #    is what stops cases 2-9 from passing for the wrong reason.
 if selected clean; then
@@ -296,6 +358,104 @@ if selected empty-scope-slice; then
         want_rc 2
         has 'refusing to be a green no-op'
     fi
+fi
+
+# 11. ticket 251 AC#1's control for the new tier: --scope=winsec resolves to exactly
+#     winsec_pin. Without this the next three cases could pass for the wrong reason.
+if selected winsec-tier-clean; then
+    run_with winsec-tier-clean "$winsec_pin_file" -- --scope=winsec
+    want_rc 0
+    denominator_is "$winc"
+    hasnt 'GUARD [ABC] -'
+    has '^runtests\.sh: OK'
+fi
+
+# 12. AC#1 + AC#2, seed '种假包名' on the NAMED tier: the tier's glob resolves a
+#     second package under internal/winsec that no pin row claims.
+if selected winsec-tier-split-goes-red; then
+    run_with winsec-tier-split-goes-red "$winsec_split" -- --scope=winsec
+    want_rc 1
+    has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
+    has 'Pinned: 1, resolved: 2'
+    has '> github\.com/CarlosShao/wisp/internal/winsec/acl'
+    hasnt '^runtests\.sh: OK'
+fi
+
+# 13. AC#1's other half, and the one that matters for CI: the EXPLICIT path
+#     scripts/winsec-tests.sh:94 actually passes. Same seed as case 12, and the log
+#     must say the explicit list was recognised as the tier's own scope - otherwise
+#     this is just case 12 again, not the CI route being pinned.
+if selected winsec-explicit-split-goes-red; then
+    run_with winsec-explicit-split-goes-red "$winsec_split" -- ./internal/winsec/
+    want_rc 1
+    has 'explicit scope .*IS the winsec tier'
+    has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
+    has '> github\.com/CarlosShao/wisp/internal/winsec/acl'
+    hasnt '^runtests\.sh: OK'
+fi
+
+# 14. AC#2's '删真包名' control on the same route: the pinned package stops
+#     resolving. Pre-fix this was the loudest reading of the ticket - an explicit
+#     scope that resolved to NOTHING still exited 0, because GUARD B audited an
+#     empty denominator and GUARD C had nothing to pin.
+if selected winsec-explicit-pin-gone-goes-red; then
+    run_with winsec-explicit-pin-gone-goes-red "$winsec_pin_file" \
+        "FAKEGO_LIST_DROP=$winsec_path" -- ./internal/winsec/
+    want_rc 1
+    has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
+    has 'Pinned: 1, resolved: 0'
+    has '< github\.com/CarlosShao/wisp/internal/winsec'
+    hasnt '^runtests\.sh: OK'
+fi
+
+# 15. AC#4's control: census reports the tier roster it is about to be judged by,
+#     and the winsec row is claimed by BOTH core and winsec.
+if selected census-tier-roster-clean; then
+    run_with census-tier-roster-clean "$pin" -- --scope=census
+    want_rc 0
+    has 'census totals: packages='
+    has 'github\.com/CarlosShao/wisp/internal/winsec .*corewinsec'
+fi
+
+# 16. AC#4's seed: the tier roster loses a name while the `case $mode in` branch
+#     stays - the exact shape this ticket was filed on (census claimed a winsec tier
+#     no branch implemented, and exited 0 doing it). The seed is put on a MUTATED
+#     COPY in its own shadow root; if the copy's roster line is not there to mutate,
+#     the case says so instead of reporting a vacuous green.
+if selected census-tier-roster-drift-goes-red; then
+    newroster="tiers='core windows cli census'"
+    mutant="$work/portable-tests-drift.sh"
+    awk -v r="$newroster" '/^tiers=/{ print r; next } { print }' "$script" >"$mutant"
+    touched=$(diff "$script" "$mutant" | grep -c '^[<>]' || true)
+    printf '\n== case census-tier-roster-drift-goes-red: seed diff shows %s line(s) (2 = the one' "$touched"
+    printf " tiers= line replaced, 0 = nothing to mutate)\n"
+    ran=$((ran + 1))
+    if [ "$touched" -eq 0 ]; then
+        printf '   FAIL no tiers= roster line in the script under test - the seed cannot take, and a case that'
+        printf '   cannot seed\n        is not evidence (pre-fix bytes fail here: that is ticket 251 AC#4).\n'
+        failed=$((failed + 1))
+    else
+        mshadow=$(make_shadow_root "$mutant")
+        last_log="$work/census-tier-roster-drift-goes-red.log"
+        ( PATH="$work/bin:$PATH" FAKEGO_PIN_FILE="$pin" \
+            bash "$mshadow/scripts/portable-tests.sh" --scope=census ) >"$last_log" 2>&1
+        last_rc=$?
+        printf '   (log: %s)\n' "$last_log"
+        want_rc 1
+        has 'census - the tier roster \(tiers=\) and the'
+        has 'branches : .*winsec'
+        hasnt 'census totals: packages='
+    fi
+fi
+
+# 17. AC#3's regression pin: the fifth tier must not have softened the loud failure.
+#     An unknown --scope is still exit 2 on stderr, naming every tier that exists.
+if selected unknown-scope-still-hard; then
+    run_with unknown-scope-still-hard "$pin" -- --scope=winsecfoo
+    want_rc 2
+    has 'unknown --scope=winsecfoo \(known: core, windows, cli, winsec, census\)'
+    hasnt 'refusing to be a green no-op'
+    hasnt '^runtests\.sh: OK'
 fi
 
 if [ "$only" != "" ] && [ "$ran" -eq 0 ]; then
