@@ -28,7 +28,7 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
 - [x] **AC#3 只走一枚凭据存储**：写路径复用现成 `secret.NewStore`／DPAPI，⛔ 不许新造第二套存储、不许把 key 落进 `config.toml` 明文、不许新增任何"把值回显给页面"的方法（`api_key_ref` 才是可以上页面的东西）。
 - [ ] **AC#4 真机那一发（依赖票 33）**：一条完整链＝**面板点设置 → 填入参数与凭据 → 保存 → 下一次任务真用上刚配的模型**。⛔ **在票 33 的宿主真起来之前这一格不许勾**，也不许用"我手工改了 config.toml"来代替那一次点击。
 - [x] **AC#5 越界检查**：`git diff` 出现 `frontend/**`／`design/**`（两层禁令：不许读、不许写）／`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件 任一路径 ⇒ 直接退回。页面长什么样、按钮摆哪、文案怎么写**都不归本编队**（owner 自己带给他用的那枚 agent；本仓 09-28 为这事发过第三次火）。
-- [ ] **AC#6 门禁四数**：`GOFLAGS= go build ./...`、`gofumpt -l <动过的目录>`、`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/panel/ -count=1`、`./tools/d22scan/d22scan.exe`（独立模块，只能跑那枚 exe），逐名照抄终态。
+- [x] **AC#6 门禁四数**：`GOFLAGS= go build ./...`、`gofumpt -l <动过的目录>`、`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/panel/ -count=1`、`./tools/d22scan/d22scan.exe`（独立模块，只能跑那枚 exe），逐名照抄终态。**〔14:1x 编排者现跑自勾：四把尺我自己复跑过，读数与本票末节那条对齐；凭据署名两枚——`248-r2` 的 §4.1–§4.5 与编排者这一发〕**
 
 ## 2b. 编排者裁定（10-01 00:0x，台账 `A487`）：`248-a1` 的九问逐条判完
 
@@ -125,3 +125,27 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
 - **AC#4＝不成立·挂账**（票面自己明令"票 33 的宿主真起来之前不许勾"）；**AC#9＝判不了**（禁令面）。
 - **AC#8＝附条件成立**，并且裁决腿把我派单里那一问当场写进 §5 交裁——**我现在裁**：面板回执对 `[llm]` 说"重启才生效"而 `manager.go:281` 把它列在热应用表里，**这不是"没说'保存即生效'就过"**；AC#8 那种"不许说谎"的判据**遇到"说了另一句不成立的实话"同样算不过**。⇒ 该缺陷与票 255 新开那格 **AC#5 是同一块石头**（回执那句"什么时候生效"必须由同一份登记产出），**归 `255-r2` 落地**，本票 AC#8 那格**不因此勾**，等 `255-r2` 交完由非实现者一并裁。
 - **AC#10＝不成立·两形都没落，选形归我 ⇒ 裁 ⓑ**（不移动 `approval.New`，改在设置那几项的回执里逐字写明"这两项只作用于跑任务的进程，常驻腿今天用常量 300s／3s"）。⛔ **不裁 ⓘ**，理由写在**新立的票 256** 里：ⓘ 要改的是票 246 AC#1 裁过的乙形次序，而"移动会不会破 `Confirming` 那一维"**今天没人量过**（裁决腿 §6 第 4 条自陈没跑，前腿与实现腿也没跑）⇒ 未量不裁、未定义即停；票 256 的第一格就是先把那一问量出来，量完才轮到我落那枚具名 `A##`。⚠ ⓑ 那句话的**产出方式**并入 `255-r2`（不许硬写死一句漂亮话，要与登记表同源），⛔ 不许只写"已保存"把差异藏起来。
+
+---
+
+## 6. `248-r2` 收档＋编排者现跑四把尺 ⇒ **AC#6 翻勾**（2026-10-02 14:1x，锚 `bf498283`）
+
+**1. 交件核过（尺＝盘上）**：证据件 `docs/evidence/s1/248-settings-write-path-r1.md` §4 七小节填实、`grep -c '（待填）'`＝0；四发号都存在（`e7521610`→`69165e09`→`e7599f32`→`0b5b2a0d`），去重路径名册＝**只有那一枚 md**（票面／产码／测试／台账一枚未碰）。§7 那句"四数在 §4（build/vet/d22scan/gofumpt 全 rc=0）"的**原句逐字留在 §4.7**、作废理由两条我认：它指的 §4 当时是空的，而"全 rc=0"那个值两枚独立腿都给不出来。
+
+**2. 编排者现跑（14:0x–14:1x，HEAD `bf498283`；可比性尺＝`git diff --name-only e7599f32..HEAD -- cmd internal tools` 只有两枚 docs 路径 ⇒ Go 面零漂移）**：
+- `GOFLAGS= go build ./...` ⇒ **rc=0**（输出 0 字节，`14:04:01`）。
+- `gofumpt -l cmd/wisp internal/config internal/panel` ⇒ **rc=0、list-count=0**（`$(go env GOPATH)/bin/gofumpt.exe`，不在 shell PATH 上）。⚠ 口径差异具名：`248-r2` 那一格量的是"本腿动过 0 枚 Go 文件＝**无射程**"，我量的是"本票动过的三目录格式化没有"——**两道命题不同**，我这一发补的是后者。
+- `go test ./cmd/wisp ./internal/config ./internal/panel -count=1` ⇒ `internal/config` **ok 1.006s**／`internal/panel` **FAIL（4 枚红，逐名与 `248-v1c`、`248-r2` 三发同册：`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`）**／`cmd/wisp` **ok 198.911s**。
+- `./tools/d22scan/d22scan.exe` ⇒ **rc=0**，逐字 `clean - no D22 ban violations`、承重行 `examined 262 production Go files under internal/ and cmd/`。
+⇒ **票面点名那四发的终态都齐了，且不是同一枚腿独一份的自述** ⇒ AC#6 勾。⚠ 这枚勾的**边界**：AC#6 要的是"四数照抄终态"，它**从不要求全绿**——那 4 枚 panel 红的归因在别的票面上（两界对账门＝界面侧那一半、`tokens_fourway`＝已知常红、第二样式源＝非本票地界），⛔ 不许被读成"票 248 全绿"。
+
+**3. 那枚第五红我今天多一个读数**：`TestTicket223ModeLooseningChangesTheRunningModeAfterAllow`（红句落点 `cmd/wisp/config_reload_223_test.go:445`）——`248-r2` 整包跑到它红、隔离复跑 3 发全绿；**我这一发整包（198.911s）它绿**。⇒ 目前 5 发读数里"整包红"只出现 1 次，定性继续按**既有间歇族**（该文件最后一次被改是 `5a755c3c`，标题逐字"AC#5 间歇红改有界轮询"），⛔ 不读成回归、⛔ 不读成"永远不红"。
+
+**4. 我这一轮裁掉的两问（都归我、都不摆给机主）**：
+- **`§6-5` 的边界：实现腿把 `fs.` 连同 `net./plugins./privacy./models./audio.` 一起列进拒写族（`config_handlers.go:108`）⇒ 我判【维持保守形，不改】**。理由：`fs.allowed_dirs` 是**判级输入**（批准的 L2 卡本来就能读根外，把它做成执行时硬边界是另一码事、已定过不许顺手做），从界面写它＝**让模型可触面在没有 L2 卡的情况下变宽**，与 J5 锁 `risk.*` 同族。窄不出事故、宽出事故，方向不改。⇒ 要放宽必须**具名解冻＋落 `A##`**；机主没要过"从界面改允许根"，这一格不进他的清单。
+- **`§5-10` 的价格只做了 5 枚叶子中的 2 枚（in/out）⇒ 我判【够，本期不补】**。判据原文只写"价格"；另 3 枚（`cached`/`audio_in`/`audio_out`）零覆盖记成**残余**，等真接计费那台件时一起补，⛔ 现在不派腿（多开＝多改契约面，实现腿那句是自划线、不是我漏的洞）。
+- **`§5-1` 那枚新仪器（`guardRosterOf` 假设路由常量都在 `bridge.go` 一枚文件的 const 块里）我没判**——它正是"仪器自己会不会假红、红了的是冻结件"那一类，交回**下一枚非实现者验收腿（`248-v2`）**，与 §5-9 那枚控制支的读反风险同批。⛔ 我不既当写这批派单的人又当判它的人。
+
+**5. 一处过期指认（票面自己的话，不改原句、就地记）**：`§6-2` 报——票面 §5.4 那句"宿主还没接进常驻那条腿（`grep PanelManager`＝0 命中）"**今天不成立**：`cmd/wisp/resident_windows.go` 命中 2 行、`cmd/wisp/panel_resident_windows.go` 命中 6 行，且 `newResidentComposerDispatch`（`:166-170`）复用的正是本票动过的 `newComposerDispatchChain`。⇒ **票 33 那半边比票面写的更靠前**；但"窗口建得出"≠"机主点得出设置"，缺的是**页面产物**那一格（`frontend/dist` 只有 `.gitkeep`），仍归 AC#4／AC#9。
+
+**6. 仍未翻的 5 格与去向（14:1x 现量：未勾 5／已勾 7）**：AC#2（界面侧声明 `credentialState`/`credentialKnown`，由机主带话）／AC#4（真机那一发，缺页面产物＋入口）／AC#8（归 `255-r2` 同源登记表）／AC#9（禁令面，判不了）／AC#10（等 `256-a1` 量完才落具名 `A##`）。⇒ **本票今天不 `-done`**。
