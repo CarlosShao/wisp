@@ -268,8 +268,11 @@ func (m *Manager) plan(fresh *Config) (*Report, *reloadPlan) {
 	m.planApp(fresh, rep, plan)
 	m.planVoice(fresh, rep, plan)
 
-	// Everything else is hot-tier: apply wholesale on change.
-	rest := []struct {
+	// Everything else is hot-tier: apply wholesale on change. The roster is
+	// derived from TierRegistry (tiers.go, ticket 255 AC#2-ⓑ): a section whose
+	// registered tier is "hot" is walked here via the same field map, so the
+	// registry and this loop cannot drift apart.
+	hotSections := []struct {
 		name       string
 		oldr, newr any
 		set        func()
@@ -287,7 +290,14 @@ func (m *Manager) plan(fresh *Config) (*Report, *reloadPlan) {
 		{"models", &cur.Models, &fresh.Models, func() { cur.Models = fresh.Models }},
 		{"observe", &cur.Observe, &fresh.Observe, func() { cur.Observe = fresh.Observe }},
 	}
-	for _, s := range rest {
+	for _, s := range hotSections {
+		if tier, ok := TierRegistry[s.name]; !ok || tier != "hot" {
+			// The registry must name every section this loop walks; a missing
+			// or mis-typed row means plan() and the registry disagree, and
+			// CheckAndReload would apply a section the receipt layer cannot
+			// explain. Fail loud here rather than silently applying.
+			panic("config: section " + s.name + " is hot-applied by plan() but not registered as \"hot\" in TierRegistry (tiers.go)")
+		}
 		if !reflect.DeepEqual(s.oldr, s.newr) {
 			plan.set = append(plan.set, s.set)
 			rep.Hot = append(rep.Hot, s.name)
