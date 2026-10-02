@@ -49,7 +49,54 @@
 
 ## 2. `Confirming` 那一维今天由什么决定（以及门在它生命周期里被读的时刻）
 
-本节结论：`Confirming` 在常驻腿**不是由 D43 转移表决定的**——那张表在本仓产码里只有一枚 `statemachine.New` 的调用点，且不在常驻腿。挪动**不需要新增状态词、不需要改转移表**；但量出来一处**更硬的形状**（门的"存在时刻"与"无控制台"那一支），具名在 §2④。
+### ① 权威表里 `Confirming` 只有三枚行，而**这三枚行在常驻腿今天没有执行者**
+
+D43 转移表里凡涉 `Confirming` 的行，全表共三枚（尺：`grep -n "StateConfirming" internal/statemachine/table.go` ⇒ 三枚命中）：
+
+| 行 | 现读 | `file:line` |
+|---|---|---|
+| #17 入 | `From: StateActing, Event: EvApprovalNeeded, To: StateConfirming, Guard: "level-L1"` | `internal/statemachine/table.go:117-121`（行体 `:118`） |
+| #21 出（超时＝执行） | `From: StateConfirming, Event: EvConfirmExpired, To: StateActing, SideEffects: tools.execute` | `internal/statemachine/table.go:150-151` |
+| #22 出（否决） | `From: StateConfirming, Event: EvVeto, To: StateActing` | `internal/statemachine/table.go:154-155` |
+
+**"由谁发射"这一问，本腿量到的是：产码里没人发射。**三把尺：
+
+1. `statemachine.New` 全仓产码**只有一枚调用者**＝`cmd/wisp/models.go:303`（`Initial: statemachine.StateFirstRun`，模型下载那一趟 D43 #2/#37 的走查）。尺：`grep -rn "statemachine\.New\|statemachine\.Machine" cmd internal tools --include='*.go' \| grep -v _test.go` ⇒ **仅此一命中**（外加 `internal/statemachine/machine.go:60` 的定义自身）。⇒ 常驻腿与 `wisp run` 腿**都不持有一枚 Machine**，#17/#21/#22 这三行在两条腿里都不可能被"走"一遍。
+2. `EvApprovalNeeded` 的产码发射者＝**0 枚**（尺：`grep -rn "EvApprovalNeeded" cmd internal tools --include='*.go' \| grep -v _test.go` ⇒ 只有 `internal/statemachine/events.go:35` 的定义与 `table.go:118/:123` 的两行表体）。
+3. `EvVeto` 的产码发射者＝**只有 `cmd/balldebug/main.go:596`、`:606`、`:608` 三枚**（调试台件，不是产品进程）。`EvConfirmExpired` 的表内超时是 `internal/statemachine/timeouts.go:48`（`{state: StateConfirming}: {3 * time.Second, EvConfirmExpired}`），它属于那枚 Machine 的 timeout 机制，常驻腿不持有 Machine ⇒ 不吃这一行。
+
+### ② 常驻腿里 `Confirming` 今天真正的决定者：三行
+
+| 时刻 | 现读 `file:line` | 那句决定 |
+|---|---|---|
+| 进入 | `cmd/wisp/resident_approval_windows.go:443` `b.SetState(stateForCardLevel(p.Level))`；名字产自 `:501-506`（`if level == "L1" { return statemachine.StateConfirming }`） | **`p.Level` 这枚字符串就是全部判据**。`p` 由门在 `internal/agent/approval/gate.go:287` `p := g.promptFor(d, corr, g.window, 0, bv, "")` 组好、`:288` 交进 UI |
+| 退出（正常） | `cmd/wisp/resident_approval_windows.go:465-473`（`Update` 的 `EventDismissed`/`EventStarted` 两支）→ `:469 u.settleOrb()` → `:483-493`，其中 **`:492 b.SetState(statemachine.StateSleeping)`**，前置守卫 `:484` 是 `cards.AwaitingHuman()` | 退出**不经表**：它经账本"还有没有在等人的卡"这一枚事实 |
+| 退出（兜底） | `cmd/wisp/resident_approval_windows.go:216-228`（`askConfirmation` 的 `defer`，注释自陈"任务 ctx 被取消时门不发任何 dismissal 事件"）→ 同一枚 `settleOrb()` | 这一支存在，正是因为 `gate.go:340 case <-ctx.Done()` **不**调 `g.ui.Update`（尺：`sed -n '288,345p' internal/agent/approval/gate.go` 里 `Update` 只出现在 veto/expired 两支） |
+
+★ **球这一侧不校验转移表**（这是本节最重要的一枚尺）：`internal/ball/ball_windows.go:311-313` 的 `SetState` 只是 `b.sta.PostTask(func() { b.applyStateLocked(s) })`，而 `applyStateLocked`（`:342` 起）第一行是 `prev := b.curState; b.curState = s`（`:343-344`）——**没有 `Fire`、没有 `Transition`、没有查表**。⇒ 现读结论：**"Sleeping 直落 Confirming" 今天就能发生，且不违反任何会被执行的东西**（表里 #17 的 FROM 是 Acting）。这条现状与"挪不挪"**无关**，本腿只登记它，因为编排者问的是"会不会破那一维"，而这一维今天根本不在表的射程里。
+⛔ 本腿因此**不提**"该不该让球走表"——那是契约变更（D43 射程），超出 AC#0。
+
+### ③ 那枚门在 `Confirming` 生命周期里被读的**时刻**（逐行，尺＝`grep -n` 现取）
+
+`Confirming` 的整条生命都在 `Gate.PendingWindow` 里（`internal/agent/approval/gate.go:246` 起），门自身被读的时刻：
+
+| 时刻 | `file:line` | 读的是门的哪一半 | 值何时被定死 |
+|---|---|---|---|
+| 窗口长度 | `gate.go:285` `deadline := g.clock.After(g.window)` | `g.window` | **`approval.New` 的那一发**：`gate.go:137-145` 的钳位（`win <= 0 → DefaultL1Window`；`< MinL1Window → Min`；`> MaxL1Window → Max`）。常量在 `internal/agent/approval/queue.go:116`（3s）／`:121`（2s）／`:122`（3s） ⇒ **构造之后再无任何入口能改它**（`Window()` 只有 getter，`gate.go:170`） |
+| 卡片内容 | `gate.go:287` `g.promptFor(...)` → 本体 `:591`，其中 `:603 Window: win`、`:605 Channels: g.channels.Statuses()` | `g.window` ＋ **通道注册表** | 同上：注册表的 `Loaded` 位由 `SetLoaded` 改，常驻腿里改它的唯一地方是 `resident_approval_windows.go:157`/`:351` |
+| 交付 UI | `gate.go:288` `g.ui.Prompt(ctx, p)` | `g.ui`（＝注入的那枚 UI） | `Options.UI`，同样在构造时定死（`gate.go:129-131` 的 nil 兜底：`:131 ui = UIFuncs{}`） |
+| 否决可用否 | `gate.go:299` `if err := g.channels.check(v.Channel); err != nil` | 通道注册表 | ⚠ **这一行是 `Confirming` 那一维里唯一被"实时"读的门内状态**：不在 `escLoad`/`SetLoaded` 里定死，就在 veto 落下的那一刻判"未知/未加载通道" |
+| 超时＝执行 | `gate.go:324` `g.markStarted(...)` ＋ `:332` 的 `ANSWER-EXPIRED` 行（`after=%s` 打的正是 `g.window`） | `g.window`、`g.logf` | 构造时 |
+| 弃等 | `gate.go:340` `case <-ctx.Done()` | ctx（非常量、可后绑） | 常驻腿里这枚 ctx 是 `ra.root` 派生（`resident_approval_windows.go:262`），`ra.root` 在 `newResidentApproval` 的 `:106` 建，**与门同批但不同物** |
+
+### ④ 量出来的硬形状：这一维**不破**，但会**整维消失**——⛔ 本腿在此停手
+
+把 ①②③ 合起来读，"挪进 `assembleRuntime` 会不会破 `Confirming`"这一问的现读答案是**两段的**：
+
+- **表的那一半：不破，也不需要新增状态词或改转移表。**三枚理由：常驻腿不持有 Machine（②③尺 1）；球不查表（②★ 尺）；`Confirming` 这个名字的产生点是 `stateForCardLevel`（`:501`）与 `Replies.WaitingState`（`internal/agent/approval/replies.go:286-302`，其中 `:298 return statemachine.StateConfirming, true`），两者都只吃**卡片自己的 `Level` 字符串**，不吃门的构造时刻。⇒ **⛔ 本票不必上报"要改 D43"，那一格量到的结果是"不动表也挪得动"。**
+- **存在的那一半：会消失，条件是这台机器上有没有交互控制台。**尺：`cmd/wisp/resident_task_source_windows.go:224-231`——`if console == nil && injectedText == "" { …; return nil }`，而 `assembleRuntime` 在同一函数的 **`:265`**。`interactiveStdin()`（`cmd/wisp/approval_reply_stdin_windows.go:41`）在 stdin 不是控制台输入缓冲时回 nil（管道／文件／**无 handle**）。⇒ **挪动之后，一枚由 Explorer 双击拉起、没有控制台输入的常驻进程（正是 D2／票 228 那个"用户真正启动的进程"形状）永远走不到 `:265` ⇒ 永远没有门 ⇒ 没有 `PendingWindow` ⇒ 没有 `Prompt` ⇒ 球永不进 `Confirming`、Esc 永不借、`:157` 永不加载。**
+  这一支的形状不是"那一维变弱"，是"**那一维的载体不存在**"。⇒ 编排者要的"量不到的那一处要具名说量不到"本腿没有；要的是"**量到了一处会让两选一里 ⓘ 那一支改变产品形状的前置条件**"＝就是这一条。⛔ **本腿到此停手，不裁、不提修法**（"把门的构造挂到别处""让无控制台支也装配一次"这类都不写，那属 AC#1 之后由具名 `A##` 批准的射程）。
+- 与之同族、但**不属本票**的一枚既有账：`docs/evidence/s1/246-resident-task-source-v2.md:212` 与台账 `docs/reports/pending-and-issues.md:10107` 都记过"窗口那项即便接了也钳在 3s ⇒ 只有超时是真差异"。本腿现读**复认其钳位形状**（`gate.go:143-144` 的 `win > MaxL1Window → MaxL1Window` ＋ `queue.go:122` 的 3s），故 `l1_window_sec` 即便接上也只能在 [2s,3s] 内动；本腿**不重跑**、不引其结论之外的东西。
 
 ## 3. `Grants` 为 nil 这一条的真实边界
 
