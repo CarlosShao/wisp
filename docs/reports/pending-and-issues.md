@@ -10487,3 +10487,32 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - **J1 裁完并落进票面**（提交 `d0cd3a9b`，原话一字不改、numstat 10/0）：首建 `config.toml` **只挂 `wisp run` 那一条用户明确发起的入口**，⛔ 不进 `assembleRuntime`（`resident_task_source_246_windows_test.go:389-391` 与 `logsink_windows_test.go:163-164` 两枚钉明写常驻腿不许自己造它没被要求的东西，进去今天就红三处），⛔ 不改那两枚钉。落地腿 `198-r1` 已派，**射程只有 AC#1＋AC#3 两格**（AC#2 默认值同源仪器／AC#4 实话文案归 `198-r2`）。
 - **编队与队列（10-02 09:15:45 现量）**：在飞 **6 枚**＝写码 3（`198-r1`：`cmd/wisp`＋`internal/config`／`33-r8`：`internal/ball`／`250-r1`：`scripts`）＋只读 3（`224-c2`／`195-a1`：票 195 的地基被 `248-r1` 顺手建掉多少／`114-a2`：票 114 那八格里有几格已被 `panel_inbound.go` 做掉、⛔ 不许把"入向有了一条线"读成"114 接好了"）。**验证窗口欠账（必须同机独占，按在三枚写腿退出之后，逐枚串行）**：①223 单发＋`-count=25` 拿频率＋整包跑序对照 160/0/0 基线；②`internal/risk` 挂钟钉同机对照；③票 248 的门禁四数自己重跑；④`cmd/wisp`/`internal/panel`/`internal/config` 三包整包复跑。未推＝**`origin/dev..HEAD` 现量 **`24` 枚**（09:1x 同发复量）**、`cnb/dev..HEAD` 一批（批的是 GitHub 那份；⚠ 推 cnb 一个 workflow 都不跑）。
 
+## A516（2026-10-02 09:26:39+0800，编排者自记：`33-r8` 死于 150 轮帽（零提交）⇒ 我代提三枚文件标〔未验证半成品〕＋`250-r1`／`195-a1` 两枚交件我已独立复跑＋新立票 251）
+
+起手锚（与落笔同发）：`date`＝`2026-10-02 09:26:39+0800`／`git log -1`＝`3ef6cf41`／分支 `dev`。
+
+**1. `33-r8`（球侧 `ui-sta` 收摊把带 quit 的线程还池）撞 150 轮帽，且它一枚提交都没落。**
+- 我现量的起手凭据：`git log 8ae4c23e..HEAD -- internal/ball/` 当时＝**0 枚**，盘上只剩未提交增量（`internal/ball/sta_windows.go` +106/0、`internal/ball/ball_windows.go` +5/0、新文件 `sta_release_windows_test.go` 460 行/21469 字节）。
+- 我代提这三枚路径（显式 pathspec，提交 **`ebe3bd57`**），标题里写死**〔未验证半成品〕**。我只跑了三把尺：`gofumpt` 解析检查（干净）、`go vet ./internal/ball/`（**`rc=0`**，带 sherpa PATH 前缀）。⛔ **没跑过 `internal/ball` 整包，更没跑过 `cmd/wisp` 消费侧**。
+- 它自报的那句「Winlive smoke passes on the real ball path」＝**〔未验证〕**，理由不是我不信它，是**盘上没有名册**（没有日志件、没有用例名、没有可复跑的读数）。按本仓定式：我做的降级只能被**新读数**升回来，⛔ 不许被我的 judgement 升回来。
+- 接续腿 **`33-r8b`** 已派，写面**限 `internal/ball/**`**，判据顺序钉死：先复现基准（整包 `rc`＋三数），再证"顺序依赖那枚毒源已消"——靠一枚**指名必红的变异**，不靠"它绿了"。这条规矩的出处是我自己刚学的第 86 条（一枚真窗钉自己可能就是毒源：单跑永远绿、整包才红）——见 [[feedback-verification-blind-spots]]。
+
+**2. `250-r1`（GUARD C 把 `go list` 的 stderr 并进自己的分母）交件，四格我已自己复跑。**
+- 盘上凭据：四枚提交 `c9c8de95`（骨架）／`6307e369`（产码：`portable-tests.sh` 80/5、`portable-tests-selftest.sh` 313/0、`testdata/portable-tests/go` 100/0）／`dccf7def`＋`db06a399`（证据件与补号）；`verdict.md` 273 行/25344 字节；`git status --porcelain scripts/ .scratch/wisp/probes/250/`＝**0 行**；占位符＝**0**。
+- **我自己跑的**（不是转述）：`bash scripts/portable-tests-selftest.sh` ⇒ `10 case(s) ran, 0 assertion(s) failed`、`rc=0`（其中 `guard-a`／`guard-b` 各 `rc=1`、空 scope 切片 `exit 2` 我亲眼看到）。另外我加了一把比腿那把更硬的尺：`git diff 50d7a88 HEAD -- scripts/portable-tests.sh` **只有 1 个 hunk**（`@@ -257,18 +257,93 @@`）⇒ 守卫 A／B／C 的比对块与空 scope `exit 2` 字面上没被碰过——这是 AC#4 最省形凭据，以后这类"不许顺带动别的守卫"的格子**先用 hunk 数**，再去信腿自己算的 sha1。
+- 我认账两处推翻：① **"那 10 行"不是常数**——本机真冷缓存是 11 行、红句 `resolved: 36`，而我写进 `A512` 的 35/10 行是 CI 那一发的读数；⇒ 判据只能是"stderr 进分母的行数 ≡ 0"，把具体行数写进断言的尺在别的主机假红（**台账原话不改，按此理解**）。② 同一份 `$resolved` 还是 **GUARD B 逐包循环的分母**（十行进度被点成"测了零次的包"）——我开票时只算了 GUARD C 一枪＝**漏计了一枚受害者**。
+- 票 250 四格已由我翻勾并改名 `-done`。⛔ **这不等于 CI 颜色已知**：core scope 在 CI 上的真读数（含那 4 枚"消失"的前端契约红是变绿还是被跳过）仍未取到，那一格记在 `ci-delta-1` §C 的欠账里，要一次推送或手动 workflow。
+- **具名另立一枚＝票 251**（`.scratch/wisp/issues/251-winsec-pin-...md`，45 行/4920 字节，立而未派）：`--scope=winsec` **不存在**（我现跑 ⇒ `unknown --scope=winsec (known: core, windows, cli, census)`、**`rc=2`**＝响亮失败，不是静默绿）；真缺口是 `winsec_pin`（`:164`，1 枚包名）今天只被 `:233` 那圈 census 循环当名册查，**没有任何一步拿它和实际解析集对账**（winsec 那族走 `scripts/winsec-tests.sh:97` 的显式路径 ⇒ `pinned` 为空）。腿上报那句字面对、但容易被读成"那档悄悄少测了"，我按现量把它精确成两层。
+
+**3. `195-a1`（票 195「按节写入的地基」被 `248-r1` 顺手建掉多少）交件：`.scratch/wisp/probes/195/a1/census.md` 281 行/44388 字节，骨架 `48328fe1` → 交件 `f307b13e`（136/4），占位符 0。**
+- 它选 **乙′**：差一块地基，但不是原以为那一块。三句最要紧的（我逐条抽验过存在的部分）：
+  1) `settings.go` 是**具名叶子键枚举**、不是任意 key 透传；可写面 8 条产生点，面板那一跳已连到 `cmd/wisp/panel_host_windows.go:551`。**我现量复认**：`grep -c` 出 `cmd/wisp/panel_config_store.go` 里非测试 setter 调用＝**7 处**，与它那句"7 处"对上。
+  2) 票 195 欠的**不是**"把放宽挡住"（那有 `ui.go` 的 `PanelAPI` 无 `Allow` ＋ `config_handlers.go` 整族拒两层现成仪器），**也不是**"把写入建出来"（248 已建）；欠的是**把方向裁决从 reload 侧搬进程序化入口**——因为两枚放宽键 `fs.delete_enabled`／`fs.reparse_point_exceptions` 不在 `unwiredKeys`、有真消费者、且 `internal/config/manager.go` 已认成 loosen，**今天唯一的防线就是"没有写入者"，而 195 要建的正是那枚写入者**。⚠ 它的行号偏 2：它写 `:459`/`:460-461`，我现读 `:459`（reparse）与 `:461`/`:463`（delete_enabled）——**引它的行号前先自跑**。
+  3) 票面 AC#0 四条读数两条已不符（导出写手 1→8；"地基不存在"那把尺只否掉了三个写死的函数名 ⇒ 是**尺的拼写造出的事实，不是盘上事实**）⇒ 与我 `A514`/`A515` 里"票 195 题头已过期"同形，现量再钉一次。
+- **两枚给下一枚落地腿的警告（要紧，会打死排程）**：
+  - **N1**：`internal/panel/config_route_248_test.go:215` 钉的是「`fs.*` ⇒ 整族拒，`leg.applyCalls != 0` 即红」，**与票 195 AC#2 的「`fs` 放宽 ⇒ 转审批队列」判据互斥**；⛔ 不许靠改 `mustSay` 子串绕过去（那是把 248 的钉子拔了）。这一格归我裁，落地腿开工前必须先解。
+  - **N9**：`manager_223_test.go:55` 钉「钩子必须在 `mu` 之外跑」，而 `writeOneKey` 起手就 `m.mu.Lock()` ⇒ AC#2 若"在入口里等一张卡"会**死锁不是死红**。
+- **X6 是对我一条旧保证的更正**（不是它的错，是我写的）：我在 `A487` 具名解冻过 `internal/panel/l2_grant_boundary_test.go` 的两枚锚（`0d87a681` 已改它 179 行）⇒ 那两枚锚今天的口径是**「只许按能力形改」**，⛔ 不是「一字不许改」；我在票 248/195 派单里写过的"一字不许改"那句按现量**过期**，引之前按这句改。
+- 归口：票 195 的落点判语＝**待我裁**（六枚 J 项它都给了"谁能判＋命令＋期望读数"），⛔ 不许按票面题头开新地基。
+
+**4. 编队与队列（2026-10-02 09:26:39+0800 现量，HEAD `3ef6cf41`）**：在飞 **4 枚**＝写码 2（`198-r1`：`cmd/wisp`＋`internal/config`；`33-r8b`：`internal/ball`）＋只读 2（`224-c2`／`114-a2`；`vm-draw-1` 未收）。已收本轮 3 枚（`250-r1`／`195-a1`／`33-r8` 死腿）。`scripts/` 面此刻空 ⇒ 票 251 与 `197-r3` 可派但**同面串行**。⛔ 门禁复跑窗口（223 单发＋`-count=25` 频次、`internal/risk` 同机对照、票 248 四把尺、三包整包）仍**按住**：起跑判据是"没有别的 `go test` 在跑"，不是"写面空了"——见 [[feedback-subagent-fleet]]。
