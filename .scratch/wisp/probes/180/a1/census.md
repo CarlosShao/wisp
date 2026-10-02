@@ -231,11 +231,196 @@
 
 ## §2 `unwiredKeys` 名册覆盖率
 
-## §3 "生效级别"三档的现量
+### 2.1 名册今天登记了哪几枚
+
+`unwiredKeys`（尺：`internal/config/unwired.go`，**现量 var 块在 :60-97**，派单写的 `:57-101` 已漂）
+登记 **6 枚**，逐枚：
+
+| # | path | 出处行 |
+|---|---|---|
+| 1 | `risk.shell_enabled` | `internal/config/unwired.go:61-66` |
+| 2 | `risk.allow_shell_string` | `:66-72` |
+| 3 | `risk.shell_allowlist` | `:73-78` |
+| 4 | `risk.blacklist_overrides` | `:79-84` |
+| 5 | `net.allowlist` | `:85-90` |
+| 6 | `net.block_private_ranges` | `:91-96` |
+
+全部落在 `risk`/`net` 两段，且都是"无人读"的键（本表 §1 判 G 的那 6 枚）。
+
+还有第二本名册：`lockedKeyDisposition`（`internal/config/unwired.go:119-147`）**17 条**，
+其中 5 条只登记 not built 而不拦（`plugins.tier2_enabled` 与四条 `plugins.<id>.*`，本表判 L）。
+
+### 2.2 覆盖率（三个分母，三个数）
+
+| 口径 | 分子／分母 | 覆盖率 |
+|---|---|---|
+| 无人读／无实效的键里，被任一名册登记者 | 11／100 | **11%** |
+| 同上，但只算"会拦下来报错"的（`unwiredKeys`） | 6／100 | **6%** |
+| 锁定四段（risk＋fs＋net＋plugins）里无人读的键，被登记者 | 11／11 | **100%** |
+| **锁定四段之外**（14 段＋动态子表）无人读的键，被登记者 | **0／89** | **0%** |
+
+⇒ 名册在它的射程内是满的；**射程外一枚都没有**。
+
+### 2.3 射程是钉死的，而且比注释说的还窄
+
+- 名册自己写了边界（`internal/config/unwired.go:32-37`）逐字
+  "Deliberately NOT here: zero-consumer keys of unlocked sections (ball, panel, cost, voice, memory, ...)"。
+- 完整性钉 `TestEveryLockedSectionKeyIsAccountedFor`（`internal/config/unwired_test.go:311`，
+  **本程读到函数体为止，不是引注释**）对四段各跑一次 `collect()`：`risk`/`fs`/`net`/`plugins`。
+- 我照它的 `collect()` 逻辑复算了一遍它实际收集到的路径：**16 枚**
+  （risk 7 ＋ fs 3 ＋ net 5（含 `net.proxy` 表头）＋ plugins **只 1 枚**）。
+  ⚠ **比票面 09-28 记录的射程又窄一枚都不止**：`PluginsSection.Entries` **没有 `toml` 标签**，
+  而 `collect()` 第一句就是 `if tag == "-" || tag == "" { continue }`
+  ⇒ 那五条 `plugins.<id>.*` 名册行**永远不会被这枚钉查到**（登记了，但钉不吃）。
+- 钉只问"这枚锁定键在 `lockedKeyDisposition` 里有没有一句话"，**不问那句话是真是假**：
+  它把 `unwired:` 前缀的行去对 `unwiredKeys`（这一步是真判据），
+  但 `consumed: ...` 分支**不核实那个消费者是否在场**。⇒ 名册里写 "consumed" 而实际无人读，
+  这枚钉不会红。本程逐枚读了 6 条 `consumed:` 的说明，其中 `risk.confirm_timeout_sec`／
+  `risk.l1_window_sec`／`net.proxy.mode`／`net.proxy.url`／`fs.*`／`risk.permission_mode`
+  我都能在码上对上具名行（见 §1 表），**这一族今天没抓到假话**。
+
+### 2.4 本问最值钱那一格的答
+
+**名册里安静＝不等于全仓没有哑键，而且差的不是几枚，是 89 枚。**
+`unwiredKeys` 与 `lockedKeyDisposition` 两本名册合起来只覆盖 4/18 段；
+其余 14 段（含 owner 最关心的 `[llm]` 目录里那 12 枚动态模板哑键与 `[panel]`/`[voice]`/`[memory]`/`[cost]`/
+`[observe]` 整段）**没有任何一处登记过"写了不生效"**。
+
+## §3 "生效级别"这一维在码上到底存不存在
+
+**结论：作为"数据"不存在，作为"硬编码分支"存在，而且三档里有一档在出货进程里没有听众。**
+
+### 3.1 三档在码上的真实现场（逐档点名）
+
+| 档 | 在场形状 | 现场 file:line |
+|---|---|---|
+| 类型与常量 | `type Tier string` ＋ `TierHot`/`TierReload`/`TierRestart` 三枚常量 | `internal/config/schema.go:30-44` |
+| 逐段分发（真行为） | `Manager.plan()`：锁定段走 `planLocked`，`[app]` 走 `planApp`，`[voice]` 走 `planVoice`，其余 12 段整块 hot | `internal/config/manager.go:243-297`、`:304-334`、`:338-357`、`:361-417` |
+| restart 那一支 | `planApp` 比 `Language`/`Autostart`/`SingleInstance` 三枚，改了**不写进 cur**、只 `rep.Restart = append(rep.Restart, "app")` | `internal/config/manager.go:344-356` |
+| reload 那一支 | `planVoice` 比模型管线键，置 `reload` ⇒ `rep.Reload = append(..., "voice")` | `internal/config/manager.go:369-379`、`:411-413` |
+| 裁决的载体 | `Report{Hot, Reload, Restart []string; Locked []LockedDecision}` | `internal/config/manager.go:87-97` |
+| 台词出口（restart） | `OnRestartPending` 挂在 `rt.reportRestartPending`，说出段名＋三枚键名＋为什么不生效 | `cmd/wisp/config_reload.go:115`、`:278-294`、`:299-301` |
+| 台词出口（hot） | `rep.Hot` 逐段打进 stdout | `cmd/wisp/config_reload.go:170-172` |
+
+### 3.2 三处"只写在文档里"的形状（具名）
+
+1. **`config.Tier` 那枚类型零读者。**
+   尺：`grep -rn "Tier\b|TierHot|TierReload|TierRestart" --include=*.go cmd internal tools | grep -v _test.go`
+   ⇒ `internal/config` 之外命中的 `Tier` **全是别人的**：`panel.EffectiveTier`
+   （`internal/panel/config_handlers.go:196-203`）、`risk.Tier`（`internal/risk/assessor.go:147`）、
+   `projctx.Tier`（`internal/projctx/projctx.go:89`）、`PluginEntry` 那几处 Tier-1/Tier-2 字样。
+   `schema.go:30-44` 那三枚常量**没有任何一处 `config.TierHot` 使用点** ⇒ 词汇表在场、码上没牙。
+2. **没有逐键的级别数据。** `schema.go` 里出现过的 struct 标签只有 `toml:` 与 `default:` 两种
+   （尺：`grep -oE '`[^`]*`' internal/config/schema.go` 取标签键名去重 ⇒ `default:` 69 枚，无 `tier:`）；
+   ⇒ 级别不在字段上，只在 `plan()` 的分支里，且粒度是**段**不是键（唯一到键粒度的是 `planApp`/`planVoice` 那两处手比）。
+3. **`Report` 载的是段名，不是键名**（除 `Locked.Keys`）。⇒ 一句"panel 立即生效"能覆盖
+   `[panel]` 里五枚全都无人读的实话（见 §5）。
+
+### 3.3 reload 档：引擎在、事件在、听众不在
+
+`Manager.CheckAndReload` 在 `len(rep.Reload) > 0 && m.OnReload != nil` 时才发事件
+（`internal/config/manager.go:198-200`）。
+`OnReload` 的**非测试赋值点全仓一枚**：`cmd/balldebug/main.go:244`（旁路调试程序）。
+`cmd/wisp/config_reload.go` 只挂了 `ConfirmLocked`（`:114`）与 `OnRestartPending`（`:115`）。
+⇒ 出货进程里 `OnReload == nil`：**换 ASR/TTS 模型不会触发模型加载或卸载**，
+而 SPEC-03:134 逐字要求"reload 段触发重载事件"。这一格归 §7 甲#3（是分工未到期还是漏，本程不裁）。
+
+### 3.4 第二套词汇：面板侧的 `EffectiveTier` 是四档，不是三档
+
+`internal/panel/config_handlers.go:196-203`：`now`／`next_task`／`restart`／`not_applied`，
+台词在 `tierSentence`（`:428-441`）。
+它和 D36 的 hot/reload/restart **不同名也不同数**（`now`↔hot，`next_task` 无对应，
+`reload` 无对应，多出 `not_applied`），且只走**设置写入的回执**那一条路。
+⇒ "生效级别"这一维今天在码上是**两套并行词汇**，一套死词汇（`config.Tier`）、
+一套只服务写入回执（`EffectiveTier`），没有一套是逐键的数据。
 
 ## §4 "此项今天不生效"有没有出口 ＋ 最近可扩展点
 
-## §5 `[panel] width` 那一环断在哪
+### 4.1 四条候选出口逐条量
+
+| 候选出口 | 能不能承载"我读到了这枚键，但它没人用" | 凭据 |
+|---|---|---|
+| **加载期硬错误** | **能，但只对 6 枚**：`validateUnwired` 逐枚比 `unwiredKeys.fires()`，命中就回 "config.toml: X is written but does nothing: ... " | `internal/config/unwired.go:100-111` |
+| **重启档台词** | 能，但只对 3 枚（`app.language`/`app.autostart`/`app.single_instance`），且说的是"要重启"而不是"没人读" | `cmd/wisp/config_reload.go:278-294`、`:299-301` |
+| **设置写回执** | **能，且已经是现成的档**：`SettingWriteResult.Tier` ＝ `EffectiveNotApplied` ⇒ `tierSentence` 回"这一项没有被应用。" | `internal/panel/config_handlers.go:196-203`、`:210-217`、`:428-441` |
+| **面板快照** | **不能**：`Snapshot` 六个 JSON 键（`pending`/`results`/`composer`/`generatedAt` 在 `:58-61`，`instructions` 在 `:74`，`tasks` 在 `:91`）里没有任何一栏承载配置键状态 | `internal/panel/composer.go:57-92`（键集尺：`awk '/^type Snapshot struct/,/^}/' internal/panel/composer.go` 数 `json:"` ⇒ 6） |
+| **`config.get` 的返回** | **不能**：`config.get` → `renderSettingsView` 只说可读性／服务商数／凭据状态／聊天模型，**没有逐键状态** | `internal/panel/config_handlers.go:292-303`（`read`）、`:445-462`（渲染） |
+
+### 4.2 判语
+
+**读侧盘上没有这句话；写侧有一模一样的档，但只有 7 枚字段能走到它面前。**
+
+- 写侧那档是**现成的**：`EffectiveNotApplied` ＋ "这一项没有被应用。"
+  但它只在 `config.set` 被**受理**之后才存在。`[panel] width` 这枚名字
+  过不了受理关——白名单只有 7 枚字段（`internal/panel/config_handlers.go:57-69`），
+  且在到白名单之前还有一道拒绝（`:315-326`：`unlisted-field`）。
+  ⇒ 用户手改 `config.toml` 里的 `width`，**连那句话都走不到**（那条路只服务面板发起的写）。
+- 手改 `config.toml` 这条路唯一会说的话，是 §5 里那句**反方向**的话："这些段已立即生效"。
+
+### 4.3 最近的可扩展点（具名到字段；⛔ 本程不选、不裁）
+
+按"改动半径从小到大"排，每一处都点名到字段：
+
+1. `internal/config/unwired.go:119-147` `lockedKeyDisposition` ＋ `:60-97` `unwiredKeys`
+   ——登记面**已经存在**，缺的只是把射程从 4 段扩到 18 段（纯数据行）。
+   ⚠ 但扩了之后 `validateUnwired`（`:100-111`）会把它们变成**加载失败**，
+   那是"拒绝写入"而不是"告知不生效"，形状与硬编码只读三枚一样重（`audio.half_duplex` 那一族）。
+2. `internal/panel/config_handlers.go:142-156` `SettingsView` —— `config.get` 的返回类型。
+   它已经有"状态而不是空值"的先例（`Readable` 字段、`CredentialUnknown` 那一族五档）。
+3. 同文件 `:445-462` `renderSettingsView` —— 句子成形处，`:447-450` 已经把"配置不可读"当一状态说出来，
+   是"此项没人读"这句话最自然的近邻落点。
+4. 同文件 `:210-217` `SettingWriteResult.Tier` —— 写侧的 `not_applied` 已在，
+   把它引到读侧需要 2 的新栏。
+5. `internal/panel/composer.go:57-92` `Snapshot` —— **最不该先动**：那六枚键是有钉的名册，
+   `:40-56` 的注释逐字记着"**FOUR, not one**……加一枚要同批改 `panel.ts` 与两枚字节钉"，
+   且 Q-51（谁能写 `panel.ts`）仍开。
+   ⚠ 顺带一枚过期读数：那段注释今天仍写着"四枚"，而 struct 里已经是**六枚** `json:` 标签
+   （`:58-61` 四枚 ＋ `:74` `instructions`（票 200）＋ `:91` `tasks`（票 197））——
+   注释在钉数量上已经过期，这正是"注释里的计数一律当待验断言"的又一例。
+
+⛔ 以上第 2／3／5 条都落在 **C17／契约面**（快照键集与方法白名单）。
+**本程不裁该不该加、加哪一栏**——按 AGENTS §0 第 2 句与 §2「未定义即停」，
+这一格交编排者落批准记录。
+
+## §5 `[panel] width` 那一枚具体走到哪一步断的
+
+### 5.1 逐环点名（HEAD `00e7efe`）
+
+| 环 | 现场 | 值在不在 |
+|---|---|---|
+| 1 文件 | `config.toml` 的 `[panel] width` | 在 |
+| 2 解码 | `internal/config/parse.go` ＋ `loader.go` → `PanelSection`（`internal/config/schema.go:529-539`，`Width` 在 **`:532`** `toml:"width" default:"640"`） | 在 |
+| 3 默认 | `internal/config/defaults.go:60` 反射把 `default:` 标签**写进**字段 | 在 |
+| 4 内存 | `Manager.cur`（`internal/config/manager.go:106`），`Config()` 深拷贝交出去（`:115-119`） | 在 |
+| 5 热加载 | `plan()` 的 `rest` 表里 `{"panel", &cur.Panel, &fresh.Panel, ...}`（`internal/config/manager.go:285`）⇒ 变了就整块拷贝并 `rep.Hot = append(rep.Hot, "panel")`（`:290-295`） | 在，**而且会说话** |
+| 6 台词 | `reportReload` 把 `rep.Hot` 打进 stdout："wisp run: 配置热加载：这些段已立即生效（D36 立即档）：[panel]"（`cmd/wisp/config_reload.go:170-172`） | **它说生效了** |
+| 7 消费者 | **零枚**。尺：`grep -rn "\.Panel\b" --include=*.go cmd internal tools \| grep -v _test.go` ⇒ 命中全是 `HotkeySection.Panel`（`internal/ball/hotkey_windows.go:98,455`）与审批面板方法 `g.Panel()`（`internal/agent/approval/replies.go:478,487`）；`config.PanelSection` 在本包外**一名读者都没有** | **断在这里** |
+| 8 窗口实际尺寸 | `cmd/wisp/panel_host_windows.go:298-307`：`webview2.NewWithOptions(... WindowOptions{Title: panelTitle, Width: 420, Height: 260})`——两枚**字面量** | 顶替了配置 |
+| 9 宿主能不能拿到配置 | 不能：`PanelManager`（`:137-167`）没有 config 字段；构造函数 `NewPanelManager(disp, assets, dataPath)`（`:175-177`）不收配置；生产调用点 `cmd/wisp/panel_resident_windows.go:204` 也只传这三样 | 缺整根管道 |
+| 10 事后重设 | 无：`SetBounds\|MoveWindow\|SetWindowPos\|Resize(` 在 `cmd/wisp internal/panel` 非测试码里只命中 `panel_host_windows.go:45` 的**注释** | 无第二条路 |
+
+### 5.2 断在哪一环（一句话）
+
+**断在第 7 环：面板宿主从来拿不到配置对象，尺寸在建窗那一行（第 8 环）是写死的 420×260 字面量——
+`Width` 的值走完了"文件→解码→内存→热加载→台词"整条路，最后一步被两枚字面量顶替。**
+
+### 5.3 比票面更糟的一格（本程新读数，票面与 09-28 两程都没写过）
+
+第 5→6 环不是静默：`manager.go:285` 那行会让 stdout 逐字说
+**"这些段已立即生效（D36 立即档）：[panel]"**。
+⇒ 手改 `[panel] width` 的用户得到的不是"没有回应"，而是**一句主动的误报**。
+这与票面 §为什么值得做 那句"他没有任何一处能读到'这项今天不生效'"相比更坏一档：
+那里还有一句说它生效了。同一句误报覆盖 `[panel]` **全部五枚**（§1 表里 `panel.*` 判 D 的那五行）。
+
+### 5.4 票面 AC#1 那一问今天的答复变了
+
+票面 09-28 两程的结论是"今天没有人决定面板窗口尺寸，因为这棵树里根本没有面板窗口"。
+**该读数已过期**：`go.mod:19` 已有 `github.com/jchv/go-webview2`，
+`cmd/wisp/panel_host_windows.go` 与 `cmd/wisp/panel_resident_windows.go` 在场且真的建窗。
+⇒ "谁决定尺寸"的答案从**没有人**变成**`panel_host_windows.go:304-305` 那两枚字面量**；
+⇒ AC#2 的"缺整条链"今天缩成两件事：把配置递进 `NewPanelManager`（第 9 环缺参数），
+以及让 `:304-305` 读它。编排者 09-28 那句排程结论（AC#2 排在票 33 之后）
+的前置条件**已经满足**，这一格值得重排。
 
 ## §6 我可能判错的条目
 
@@ -359,3 +544,33 @@
 本程看不见、也不引它行号；"此项不生效没有出口"这句的射程因此**只到 Go 侧为止**。
 
 ## §8 我推翻票面与派单哪一句
+
+> 起手 HEAD `00e7efe`。每条都给现量尺。
+
+1. **派单："18 个 section"——成立，不是我猜的。**
+   两把独立尺（`Config` struct 段字段枚数＝18；首建真件 33 个表头＝18 顶层＋15 子表）。
+   另加一句修正：严格说是 **18 段 ＋ 1 枚根表裸键 `schema_version`**，
+   有人按 19 数会被我这句绊到。
+2. **派单：`internal/config/unwired.go:57-101`——行号已漂。**
+   现量：`unwiredKeys` var 块在 **`:60-97`**；第二本名册 `lockedKeyDisposition` 在 **`:119-147`**。
+3. **票面现量第 1 条：`internal/config/schema.go:527-528`——行号已漂。**
+   现量：`PanelSection` 在 **`:529-539`**，`Width` 那句在 **`:532`**。字段与 `default:"640"` 都在，
+   只是不在那一行。
+4. **票面现量第 2 条的尺（`grep "\.Width"` 空输出）——仍然成立。** 本程独立复跑，仍空。
+5. **票面 09-28 两程的"这棵树今天没有面板窗口"——已过期。** 见 §5.4。
+   这条最重：它直接决定 AC#2 的排程前置（票 33 宿主）是不是还在等人。
+6. **票面 AC#4"还有几枚"——现量答案比 09-28 的 18 枚大得多：名册外哑键 76 枚。**
+   原因：`180-c1` 那一遍只数了**带 `default:` 标签**的字段（69 行 / 61 个去重字段名），
+   本程按叶子键全量数（150 枚）。两个数不矛盾，分母不同。
+7. **票面 09-28 记录"这 18 枚全部已在票 83 的 AC#1 全量表里登记并归口"——我未复认。**
+   按派单硬边界，`issues/83-...md:155` 那一行本程没读到，**当待验断言**引用（见 §7 乙#1）。
+8. **派单问 3 的预设（"三档在码上有没有真实现场"）——答案是分裂的，比"存在/不存在"都更难看。**
+   级别**分发**在场（`plan()`／`planApp`／`planVoice`），但 `config.Tier` 那枚类型
+   与三枚常量**零读者**，且没有任何逐键的级别数据（无 `tier:` 标签，见 §3.2）。
+   另加一句派单没写的：面板侧另有一套**四档**词汇 `EffectiveTier`，与 D36 三档不同名不同数。
+9. **派单问 4 的预设（"没有就明写盘上没有"）——部分推翻。**
+   写侧**已经有**这一档（`EffectiveNotApplied` ⇒ "这一项没有被应用。"，票 248 落的），
+   缺的是**读侧与快照侧**。照"明写盘上没有"交出去会把已有的一块现成设施说没。
+10. **终态复认**：本程落笔期间未主动跑 `git log -1` 第二把尺的每一枚行号。
+    终态读数与差集见本节末（下一次 commit 回执里逐条给）。
+    若终态 HEAD ≠ `00e7efe`，本文件所有行号按"取自如未复认的 `00e7efe`"读。
