@@ -41,15 +41,18 @@ package main
 // WHAT THIS IS NOT, stated so nobody infers it from the file's existence:
 //   - it is not the WebView2 receiver (H2/H3). The page's postMessage still has
 //     no listener in this tree, and no go.mod dependency moved for this slice.
-//   - it is not the reply path (H10). Handle returns the refusal sentence; this
-//     leg prints it on the console. A page still gets nothing back, and the
-//     sentence a user sees in the panel stays ticket 35's host's to render.
+//   - it is not the reply path (H10). Handle returns the refusal sentence and,
+//     since ticket 248, the settings receipt; this leg prints both on the console.
+//     A page still gets nothing back from THIS process - the WebView2 host hands
+//     Handle's return value to the awaiting binding (panel_host_windows.go's bind
+//     closure), and that host is ticket 33's, not this leg's.
 //   - it installs no persistent log sink (installLogSink). That call would make
 //     this leg a records-booking leg under ticket 131's AC#4 and owe that gate a
 //     registered nail; the honest, smaller step is to keep the audit on stderr
 //     here (the "[audit]" family, same prefix rt.auditf uses) and let the sink
 //     decision be made when this leg grows into the resident process.
-//   - it answers ONE of the four whitelisted methods. workspace/attachment/
+//   - it answers two of the six whitelisted methods. The mode write is ticket
+//     114's leg and the settings read/write is ticket 248's; workspace/attachment/
 //     message handlers are ticket 186 / ticket 92 / ticket 35's land, so those
 //     three sockets stay nil and the router refuses them by name (ErrNoHandlerAttached)
 //     rather than pretending.
@@ -70,6 +73,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/perm"
+	"github.com/CarlosShao/wisp/internal/secret"
 )
 
 // panelInboundActor is how perm's switch record names whoever rang the doorbell
@@ -166,10 +170,17 @@ func cmdPanelInbound(args []string, s panelInboundIO) int {
 			continue
 		}
 		accepted++
-		// An accepted request returns no text on purpose (slice A: the router must
-		// not become the second voice in the room), so the receipt line is this
-		// leg's own and says exactly which hop happened - not what the page will
-		// show, because there is no page attached (H10 is open).
+		// An accepted request returns no text on purpose for the four doors slice A
+		// shipped (the router must not become the second voice in the room), so the
+		// receipt line below is this leg's own and says exactly which hop happened.
+		// A settings request does return a sentence, and ticket 248 AC#8 is why: which
+		// key paths landed, and that a restart is required, must reach the surface the
+		// user reads instead of only the log. Printing Handle's own words keeps this leg
+		// a pipe rather than an author.
+		if reply != "" {
+			fmt.Fprintf(s.stdout, "wisp panel-inbound: 第 %d 行回执：%s\n", lineNo+1, reply)
+			continue
+		}
 		fmt.Fprintf(s.stdout, "wisp panel-inbound: 第 %d 行已受理，处理器已被调用\n", lineNo+1)
 	}
 	if err := sc.Err(); err != nil {
@@ -242,6 +253,21 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string) 
 		Audit:   auditf,
 		Actor:   actor,
 	}
+	// Ticket 248 AC#1/AC#3: the settings leg. It writes through the SAME Manager
+	// object as the mode chain above (one truth, no second loader) and through the
+	// one secret store this repository has (internal/secret, DPAPI), so this route
+	// creates no second place a key could live. A store-directory failure is an
+	// assembly failure here, not a degraded settings page that quietly accepts
+	// writes it cannot persist.
+	secrets, err := secret.NewStore(dir)
+	if err != nil {
+		return nil, fmt.Errorf("凭据存储不可用（%s）：%w", dir, err)
+	}
+	configWrites := &panel.ConfigWriteHandler{
+		Store: newConfigStore(mgr, secrets, auditf, actor),
+		Audit: auditf,
+		Actor: actor,
+	}
 	return &panel.ComposerDispatch{
 		Mode: modeWrites,
 		// Untouched by this slice, and refused by name when they arrive:
@@ -249,7 +275,9 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string) 
 		Workspace:  nil,
 		Attachment: nil,
 		Message:    nil,
-		Audit:      auditf,
+		// Ticket 248's two settings doors are answered by the leg above.
+		Config: configWrites,
+		Audit:  auditf,
 	}, nil
 }
 

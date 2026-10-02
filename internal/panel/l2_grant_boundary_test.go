@@ -2010,6 +2010,153 @@ func TestGrantWireShapesAreRefusedAtTheDoor(t *testing.T) {
 	})
 }
 
+// guardRosterOf reads one bridge.go and returns the three facts facet 4's plants
+// are built on: the verbatim text of the route guard's case list, the route
+// values its declared Method* constants carry (sorted), and a problem string
+// that is empty only when the two are ONE roster in both directions.
+//
+// It returns a problem instead of calling t.Fatal because the caller asserts on
+// both sides of it: the pristine package must read clean, and a plant that
+// answers a route the roster never declared must read dirty (ticket 248 / ledger
+// A487's positive control for the two anchors this helper replaced).
+//
+// Why a derivation and not a longer literal: this file exists to notice a wiring
+// commit opening a panel-side door. A literal listing today's names notices the
+// roster changing (it breaks the plant), and it notices nothing about a door that
+// bypasses the roster. What is pinned here is the relationship - every label the
+// guard answers is a declared constant, every declared constant the guard does not
+// answer is missing from the roster - which survives the roster growing by any
+// number of names and still refuses the shape it was written for.
+func guardRosterOf(bridgeSrc string) (caseAnchor string, routes []string, problem string) {
+	fset := token.NewFileSet()
+	af, err := parser.ParseFile(fset, "bridge.go", bridgeSrc, 0)
+	if err != nil {
+		return "", nil, "bridge.go does not parse: " + err.Error()
+	}
+	declared := map[string]string{}
+	var declaredNames []string
+	var guard *ast.FuncDecl
+	ast.Inspect(af, func(n ast.Node) bool {
+		switch d := n.(type) {
+		case *ast.GenDecl:
+			if d.Tok != token.CONST {
+				return true
+			}
+			for _, spec := range d.Specs {
+				vs, ok := spec.(*ast.ValueSpec)
+				if !ok {
+					continue
+				}
+				for i, id := range vs.Names {
+					if !strings.HasPrefix(id.Name, "Method") || i >= len(vs.Values) {
+						continue
+					}
+					lit, ok := vs.Values[i].(*ast.BasicLit)
+					if !ok || lit.Kind != token.STRING {
+						continue
+					}
+					if _, seen := declared[id.Name]; seen {
+						continue
+					}
+					declared[id.Name] = unquoteGo(lit.Value)
+					declaredNames = append(declaredNames, id.Name)
+				}
+			}
+		case *ast.FuncDecl:
+			if d.Name.Name == "knownComposerMethod" && guard == nil {
+				guard = d
+			}
+		}
+		return true
+	})
+	if guard == nil {
+		return "", nil, "no knownComposerMethod function: the guard this file enumerates was renamed or removed"
+	}
+	if len(declaredNames) == 0 {
+		return "", nil, "bridge.go declares no Method* string constant, so nothing here can be checked against a roster"
+	}
+
+	var labelNames, labelValues []string
+	var clauses int
+	ast.Inspect(guard, func(n ast.Node) bool {
+		sw, ok := n.(*ast.SwitchStmt)
+		if !ok {
+			return true
+		}
+		for _, stmt := range sw.Body.List {
+			cs, ok := stmt.(*ast.CaseClause)
+			if !ok {
+				continue
+			}
+			clauses++
+			if len(cs.List) == 0 {
+				problem = "the guard carries a default branch, which answers every route its labels do not name"
+				return true
+			}
+			for _, e := range cs.List {
+				id, ok := e.(*ast.Ident)
+				if !ok {
+					problem = "guard label " + renderExpr(fset, e) + " is not an identifier naming a declared constant"
+					continue
+				}
+				val, ok := declared[id.Name]
+				if !ok {
+					problem = "the guard answers " + id.Name + ", which no declared Method* constant of this file names"
+					continue
+				}
+				labelNames = append(labelNames, id.Name)
+				labelValues = append(labelValues, val)
+			}
+		}
+		return true
+	})
+	if problem != "" {
+		return "", nil, problem
+	}
+	if clauses != 1 {
+		return "", nil, "the guard's route labels are spread over " + strconv.Itoa(clauses) +
+			" case clauses; this file's plants replace one line and would plant into the wrong one"
+	}
+	if len(labelNames) == 0 {
+		return "", nil, "the guard's single case clause names no route at all"
+	}
+	for _, name := range declaredNames {
+		if !slicesContains(labelNames, name) {
+			return "", nil, "declared Method* constant " + name + " is absent from the guard's case list: a route that exists but is never asked of the guard"
+		}
+	}
+	caseAnchor = "case " + strings.Join(labelNames, ", ") + ":"
+	if !strings.Contains(bridgeSrc, caseAnchor) {
+		return "", nil, "the guard's case list is not written as one comma-separated line (" + caseAnchor + " is not in the file), so a plant built from it would replace nothing"
+	}
+	routes = labelValues
+	sort.Strings(routes)
+	routes = dedupeSorted(routes)
+	return caseAnchor, routes, ""
+}
+
+// dedupeSorted collapses repeated values in a sorted list: two constants naming
+// one route would otherwise make the roster comparison below claim a set it is not.
+func dedupeSorted(in []string) []string {
+	out := make([]string, 0, len(in))
+	for i, v := range in {
+		if i > 0 && v == in[i-1] {
+			continue
+		}
+		out = append(out, v)
+	}
+	return out
+}
+
+func slicesContains(hay []string, needle string) bool {
+	for _, v := range hay {
+		if v == needle {
+			return true
+		}
+	}
+	return false
+}
+
 // TestPlantedGrantWiringGoesRedInASnapshot is facet 4: the teeth. It copies this
 // package's Go sources into a temporary directory and plants the shapes the ban
 // exists for, then requires the same instrument to name the planted lines.
@@ -2048,14 +2195,30 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 	plantABridge := strings.Replace(string(bridgeReal), fieldAnchor,
 		fieldAnchor+"\n\tOutcome string `json:\"outcome,omitempty\"`", 1)
 
-	guardAnchor := "case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend:"
-	if !strings.Contains(string(bridgeReal), guardAnchor) {
-		t.Fatalf("plant B has no anchor: the route guard's case list is no longer %q - the enumeration in this file has gone stale", guardAnchor)
+	// The guard's own roster, read off the source instead of spelled out here.
+	// This anchor used to hard-code the four names this file had seen, which made
+	// the one change it existed to notice - a whitelist that grows by a name -
+	// the change that broke it. Unfrozen by named ruling (ticket 248, ledger
+	// A487) with a condition: the replacement is a CAPABILITY, not a bigger
+	// literal, so the check below is "the guard's case list and this package's
+	// declared Method* constants are one roster, both directions", which is
+	// strictly harder than the sentence it replaces.
+	guardAnchor, answeredRoutes, rosterProblem := guardRosterOf(string(bridgeReal))
+	if rosterProblem != "" {
+		t.Fatalf("plant B has no anchor: the route guard's case list is not this package's declared roster (%s) - the enumeration in this file has gone stale", rosterProblem)
 	}
 	// Plant B: Go starts answering the approval route. Derived from the pristine
 	// bridge, so B tests exactly one change.
 	plantBBridge := strings.Replace(string(bridgeReal), guardAnchor,
 		strings.Replace(guardAnchor, ":", ", \"panel.approval.request\":", 1), 1)
+	// A487's positive control for this anchor, and it is the same plant the facet
+	// already carries: a guard that answers a route no Method* constant declares
+	// must be refused BY THE ROSTER DERIVATION, not only by the scan below. If
+	// this line ever goes green while the derivation above still accepts the
+	// pristine file, the anchor has become a formality.
+	if _, _, plantedProblem := guardRosterOf(plantBBridge); plantedProblem == "" {
+		t.Fatal("plant B's guard answers a route no declared Method* constant names, and the roster derivation accepted that file anyway: the anchor no longer asks the guard to match the roster")
+	}
 
 	// Plant E: the F-1 shape. The guard reaches two routes through expressions
 	// this scan cannot resolve - a package-level var and a concatenation - which
@@ -2136,8 +2299,14 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 			t.Fatalf("planted 2 unreadable case labels, the enumeration reported %d - the drop list is not reading the guard:%s",
 				len(pkg.dropped), joinUnresolved(pkg.dropped))
 		}
-		if got := len(sortedSet(pkg.answered)); got != 4 {
-			t.Errorf("the plant must still resolve the 4 declared routes so this run cannot be passing by having stopped reading the guard, got %d", got)
+		// The same capability form as the anchor above (ticket 248 / A487): the
+		// plant must still resolve EXACTLY the routes the guard's own roster
+		// declares - not "four of them". A counted 4 here would have gone red for
+		// a whitelist that grew by a name and green for an enumeration that
+		// silently stopped reading two of the six, which is the opposite of what
+		// this line is for.
+		if got := sortedSet(pkg.answered); !reflect.DeepEqual(got, answeredRoutes) {
+			t.Errorf("the plant must still resolve every route the guard's roster declares (want %v, got %v): an enumeration that stopped reading part of the guard would report a shorter list and this file would then pass for the wrong reason", answeredRoutes, got)
 		}
 		problem := instrumentBlindnessProblem(dir, pkg)
 		if problem == "" {

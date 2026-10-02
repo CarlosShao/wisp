@@ -254,6 +254,19 @@ type ComposerState struct {
 	// "nobody read it", and the renderer must not show that as "no model".
 	CurrentModel string `json:"currentModel"`
 	ModelKnown   bool   `json:"modelKnown"`
+	// CredentialState is ticket 248 AC#2's dimension: whether this machine has a
+	// credential recorded, and whether the config could be read at all. It is a
+	// STATE and a count, never a value - no key material, no reference-with-its-
+	// vendor, not even the last four characters that internal/secret's terminal
+	// redactor prints for a human at a console. A page that can display only
+	// recorded/not-recorded cannot leak by refreshing, and a snapshot that carries
+	// only a state cannot be the thing a log line turns into a key.
+	//
+	// CredentialKnown is the second half of the same rule the model dimension above
+	// follows: a pump assembled without a credential reader says "nobody asked",
+	// which is a different fact from "nothing is recorded" and must not render as it.
+	Credential      CredentialState `json:"credentialState"`
+	CredentialKnown bool            `json:"credentialKnown"`
 }
 
 // NewComposerState assembles the composer section from native state.
@@ -270,6 +283,9 @@ func NewComposerState(mode risk.Mode, ws WorkspaceView, atts []AttachmentRef, ma
 		// A section built without a git reader says so, the way the mode says
 		// "unknown" rather than naming the safest档 (AC#4 of ticket 92, inherited).
 		Git: GitViewNotProbed(),
+		// Same rule, ticket 248's dimension: a constructor nobody handed a credential
+		// reader answers "unknown", never "no key is recorded".
+		Credential: CredentialUnknown,
 	}
 }
 

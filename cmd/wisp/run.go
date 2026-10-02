@@ -249,11 +249,16 @@ func runTextTask(s runSpec) int {
 
 // runtime is the assembled S1 stack.
 type agentRuntime struct {
-	spec  runSpec
-	cfg   *config.Config
-	mgr   *config.Manager
-	paths *tools.PathCanonicalizer
-	store *memory.Store
+	spec runSpec
+	cfg  *config.Config
+	mgr  *config.Manager
+	// settings is ticket 248's leg: the same config.Manager plus the same
+	// secret.Store this boot built, behind the panel's settings socket. It also
+	// answers the snapshot's credential dimension, which is why the pump reads it
+	// rather than the packet guessing.
+	settings *configStore
+	paths    *tools.PathCanonicalizer
+	store    *memory.Store
 	// session is ticket 224's D45 grants ledger for THIS process: it holds the
 	// minted session identity, writes the rows a native 「本会话内允许」 answer
 	// produces, and is the read side the bridge consults. nil means this boot
@@ -403,6 +408,12 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	cfg := mgr.Config()
 	rt.cfg = cfg
 	rt.mgr = mgr
+	// Ticket 248's settings leg, built from the SAME Manager and the SAME DPAPI
+	// store this boot already assembled - not a second loader and not a second
+	// secret place. The panel route reaches it through panel.ConfigWriteHandler
+	// (cmd/wisp/panel_config_store.go); the snapshot reaches its credential
+	// dimension through the reader below, so both halves answer from one truth.
+	rt.settings = newConfigStore(mgr, st, rt.auditf, "cli-run")
 
 	// Role -> endpoint -> provider, with the key resolved through the DPAPI
 	// store by the resolver (A8's whole point).
@@ -676,7 +687,13 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Workspace: rt.workspaceView,
 		Git:       rt.gitView,
 		Model:     rt.currentModel,
-		Results:   rt.stream.Chunks,
+		// Ticket 248 AC#2's reader: it asks the settings leg, which asks the store
+		// whether a reference has a blob behind it. What comes back on the wire is a
+		// state ("all_recorded" / "partly_missing" / ...), never a value, and never a
+		// count of bytes - the dimension exists so the page can say 已录入/未录入
+		// without this process ever having to show a key.
+		Credential: rt.settings.credentialStatus,
+		Results:    rt.stream.Chunks,
 		// ticket 200 AC#7's second hop, closed by 200-r2: the carrier existed at
 		// r1 and NOTHING read it, which is the same shape as ledger A408's
 		// "文案在、控件不在" moved from the widget side to the wire side. This

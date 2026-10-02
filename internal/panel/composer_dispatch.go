@@ -9,14 +9,16 @@ package panel
 // single common hole across H4-H9 (docs/evidence/s1/33-inbound-hop-design-a1.md
 // §4), and it is the reason the mode write leg at composer_handlers.go:141 has
 // been written and assembled with nobody able to ring it. This file is that one
-// hop: raw in, method + args out, four doors.
+// hop: raw in, method + args out, one door per whitelisted method. Four when
+// slice A shipped; the two settings doors ticket 248 added make six, and the
+// roster they are read from is bridge.go's, never a copy written here.
 //
 // IT IS NOT A SECOND GATE, and the reason is checkable rather than asserted.
 // The whitelist decision is made exactly once, inside ParseComposerRequest, and
 // this file reaches it and nothing else - it never calls knownComposerMethod
 // itself, it never re-derives the answered set, and it spells no method name of
-// its own: every case label below is one of bridge.go's four exported
-// constants. That last part is not tidiness. This package's own AST instrument
+// its own: every case label below is one of bridge.go's exported constants. That
+// last part is not tidiness. This package's own AST instrument
 // (l2_grant_boundary_test.go, poolJudgedByRealGuard) collects every route-shaped
 // name written anywhere in the package and asks the RUNNING guard about each one;
 // a name the guard answers but the guard's own case list never named is reported
@@ -87,6 +89,28 @@ type MessageRequestHandler interface {
 	HandleMessageRequest(ctx context.Context, req ComposerRequest) error
 }
 
+// ConfigRequestHandler answers one settings request (ticket 248 AC#1/AC#8).
+//
+// Its signature is not the same as the other four, and the reason is a ruling
+// rather than a slip: the credential write's VALUE must never live on the shared
+// ComposerRequest (bridge.go's envelope serves every answered method, so a value
+// field added there is readable from the message route too, and the frozen
+// instrument's verdict vocabulary has no word that stops a value-shaped key).
+// The leg therefore receives the raw envelope as well and decodes the credential
+// into a write-only shape it owns alone, uses it once, and keeps nothing. Every
+// other field this route reads comes off the parsed req.
+//
+// It returns the one sentence the user is told, where the other four handlers
+// return none: for settings there is no second voice to defer to - H10's page
+// text is the *approval* card's story, and the awaited binding reply is a plain
+// return value from this hop (cmd/wisp/panel_host_windows.go's bind closure
+// hands whatever Handle returns back to the page). Ticket 248 AC#8 needs a
+// visible "when does this take effect", and a return value is the only
+// page-reachable surface this tree has for it today.
+type ConfigRequestHandler interface {
+	HandleConfigRequest(ctx context.Context, req ComposerRequest, raw string) (string, error)
+}
+
 // ComposerDispatch is the inbound entry for one postMessage string: the host's
 // receive callback hands it the text it was given and reads back the one
 // sentence the user should see.
@@ -104,6 +128,10 @@ type ComposerDispatch struct {
 	Attachment AttachmentRequestHandler
 	// Message answers the message request. Untouched by this slice.
 	Message MessageRequestHandler
+	// Config answers the two settings requests (ticket 248). nil is the same
+	// refusal as the three above, not a silent drop: the two names are on the
+	// whitelist, so a machine with no settings leg attached must say so by name.
+	Config ConfigRequestHandler
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// A refusal is returned whether or not it is attached; a nil sink silences
 	// the line, never the refusal.
@@ -114,9 +142,14 @@ type ComposerDispatch struct {
 // out. The error is the same refusal that text describes, so a caller can count
 // refusals without parsing prose.
 //
-// An accepted request returns ("", nil): this slice deliberately does not invent
-// a success line, because deciding what the page is told is H10's business and a
-// router that writes its own confirmation would be the second voice in the room.
+// An accepted request returns no text except for the two settings routes: this
+// slice deliberately does not invent a success line for mode / workspace /
+// attachment / message, because deciding what the page is told about THOSE is
+// H10's business and a router that writes its own confirmation would be the
+// second voice in the room. A settings request has no other voice at all yet, and
+// ticket 248 AC#8 requires "when this takes effect" to reach a page-visible
+// surface, so the config handler's receipt is what comes back (dispatch's own
+// "" for the four older doors is unchanged).
 func (d *ComposerDispatch) Handle(ctx context.Context, raw string) (string, error) {
 	// One gate, the existing one. Everything parse refuses never gets routed.
 	req, err := ParseComposerRequest(raw)
@@ -124,40 +157,55 @@ func (d *ComposerDispatch) Handle(ctx context.Context, raw string) (string, erro
 		d.record(req, err)
 		return RefusedEnvelopeForUser(req, err), err
 	}
-	if err := d.dispatch(ctx, req); err != nil {
+	receipt, err := d.dispatch(ctx, req, raw)
+	if err != nil {
 		return RefusedEnvelopeForUser(req, err), err
 	}
-	return "", nil
+	return receipt, nil
 }
 
 // dispatch is the routing table, kept apart from Handle so the backstop branch
 // is reachable from inside this package: from outside, parse gets there first,
 // and a default branch that no test can ever run is a branch nobody can prove
 // refuses anything.
-func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest) error {
+//
+// The string it returns is the page-visible receipt, and only the settings doors
+// ever fill it; every other branch returns "" with its outcome, so the sentence
+// Handle hands back for those stays exactly what it was before ticket 248.
+func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, raw string) (string, error) {
 	switch req.Method {
 	case MethodModeRequest:
 		if d == nil || d.Mode == nil {
-			return d.unattached(req)
+			return "", d.unattached(req)
 		}
-		return d.Mode.HandleModeRequest(ctx, req)
+		return "", d.Mode.HandleModeRequest(ctx, req)
 	case MethodWorkspaceRequest:
 		if d == nil || d.Workspace == nil {
-			return d.unattached(req)
+			return "", d.unattached(req)
 		}
-		return d.Workspace.HandleWorkspaceRequest(ctx, req)
+		return "", d.Workspace.HandleWorkspaceRequest(ctx, req)
 	case MethodAttachmentAdd:
 		if d == nil || d.Attachment == nil {
-			return d.unattached(req)
+			return "", d.unattached(req)
 		}
-		return d.Attachment.HandleAttachmentRequest(ctx, req)
+		return "", d.Attachment.HandleAttachmentRequest(ctx, req)
 	case MethodMessageSend:
 		if d == nil || d.Message == nil {
-			return d.unattached(req)
+			return "", d.unattached(req)
 		}
-		return d.Message.HandleMessageRequest(ctx, req)
+		return "", d.Message.HandleMessageRequest(ctx, req)
+	case MethodConfigGet:
+		if d == nil || d.Config == nil {
+			return "", d.unattached(req)
+		}
+		return d.Config.HandleConfigRequest(ctx, req, raw)
+	case MethodConfigSet:
+		if d == nil || d.Config == nil {
+			return "", d.unattached(req)
+		}
+		return d.Config.HandleConfigRequest(ctx, req, raw)
 	default:
-		return d.rosterMismatch(req)
+		return "", d.rosterMismatch(req)
 	}
 }
 
@@ -178,9 +226,9 @@ func (d *ComposerDispatch) rosterMismatch(req ComposerRequest) error {
 var ErrRosterMismatch = errors.New("panel: 方法在白名单内而派发表未列出")
 
 // unattached refuses a listed method whose handler socket is nil, and says so in
-// the audit. This is the honest state of three of the four doors in this tree.
+// the audit. This is the honest state of three of the six doors in this tree.
 func (d *ComposerDispatch) unattached(req ComposerRequest) error {
-	err := fmt.Errorf("%w: 方法 %q 的处理器未接入（requestId=%q），档位/工作区/附件/消息均未变化",
+	err := fmt.Errorf("%w: 方法 %q 的处理器未接入（requestId=%q），档位/工作区/附件/消息/设置均未变化",
 		ErrNoHandlerAttached, req.Method, req.RequestID)
 	d.record(req, err)
 	return err

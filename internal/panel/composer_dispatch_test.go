@@ -232,7 +232,8 @@ func TestRosterMismatchBackstopRefusesInsteadOfAccepting(t *testing.T) {
 	audit := &hop33Audit{}
 	d := &ComposerDispatch{Audit: audit.fn()}
 	req := ComposerRequest{Method: "panel.a.future.fifth.method", RequestID: "rid-backstop", Source: ComposerRequestSource}
-	err := d.dispatch(context.Background(), req)
+	_, err := d.dispatch(context.Background(), req,
+		hop33Raw(t, map[string]any{"method": req.Method, "requestId": req.RequestID, "source": req.Source}))
 	if !errors.Is(err, ErrRosterMismatch) {
 		t.Fatalf("default branch returned %v, want %v: an unhandled whitelisted name must never be accepted",
 			err, ErrRosterMismatch)

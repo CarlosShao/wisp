@@ -22,10 +22,20 @@ package panel
 // here either - a file the renderer polls would be a second channel, which
 // composer.go:14 ("no second channel") and D29 both refuse.
 //
-// NO NEW KEYS. Snapshot keeps its four JSON keys and frontend/src/lib/panel.ts
-// is untouched, so TestComposerContractTypesMatchFrontend (composer_test.go:48)
-// stays the two-way ruler it is. Adding the fifth key - the "which screen" one -
-// is Q-51 territory and ticket 145 AC#3 already answered it: not in this slice.
+// NO NEW TOP-LEVEL KEYS. Snapshot keeps its four JSON keys and
+// frontend/src/lib/panel.ts is untouched, so TestComposerContractTypesMatchFrontend
+// (composer_test.go:48) stays the two-way ruler it is. Adding the fifth key - the
+// "which screen" one - is Q-51 territory and ticket 145 AC#3 already answered it:
+// not in this slice.
+//
+// Ticket 248 did move keys - two of them, inside the composer SECTION and not at
+// the top level, which is the placement its ruling named (the credential dimension
+// goes where currentModel/modelKnown already live). That is the change the same
+// two-way reconciliation exists to catch: Go now emits credentialState and
+// credentialKnown, the page-side interface does not declare them, and the ruler says
+// so out loud. The reading is not "the ruler is broken" and not "write the page from
+// here" (this leg may not touch frontend/): it is that this half cannot go
+// self-green, which is recorded in docs/evidence/s1/248-settings-write-path-r1.md.
 // Nor does this file reach for the six fields ticket 145 marks as having no
 // vocabulary in the repository (thinkingMs / reasoningMs / durationMs / humanText
 // / fragment / IconClass): a pump that fills a field with a constant to look
@@ -128,6 +138,12 @@ type PumpSources struct {
 	// means nobody read it, and the packet then reports modelKnown=false
 	// instead of naming a model or blanking one.
 	Model func() string
+	// Credential reads whether this machine has a credential recorded (ticket 248
+	// AC#2). It is a reader like every field above, and the answer it returns is a
+	// STATE: the pump never asks for, holds or renders a credential value, and a
+	// host assembled without this reader says credentialKnown=false rather than
+	// advertising "not recorded".
+	Credential func() CredentialState
 	// Results reads the streamed assistant text so far.
 	Results func() []ResultChunk
 	// Instructions reads what this process's project-instruction loader actually
@@ -240,6 +256,17 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		// Only a reader that exists can fill either half.
 		composer.CurrentModel = p.src.Model()
 		composer.ModelKnown = composer.CurrentModel != ""
+	}
+	if p.src.Credential != nil {
+		// Ticket 248 AC#2's dimension, same two-line rule: nobody read it is not the
+		// same fact as nothing is recorded, and the reader is the only thing that can
+		// tell them apart.
+		state := p.src.Credential()
+		if strings.TrimSpace(string(state)) == "" {
+			state = CredentialUnknown
+		}
+		composer.Credential = state
+		composer.CredentialKnown = true
 	}
 
 	now := time.Now

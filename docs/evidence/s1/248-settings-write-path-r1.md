@@ -125,7 +125,22 @@
 
 ## 3. 产码改动清单（做完一节更新一行，带 `文件:行`）
 
-（待填）
+| # | 文件 | 改了什么 | 现读锚（改后） |
+|---|---|---|---|
+| 1 | `internal/panel/bridge.go` | 名册加 `MethodConfigGet="config.get"`／`MethodConfigSet="config.set"`；封套加四枚**非值**选择子（`configField`/`configProvider`/`configModel`/`configValue`，全 `omitempty`）；守卫 case 从四枚变六枚（**同一枚 case 子句、逗号接排**，冻结件那枚能力形锚就是照这个形状读的） | `:41-70`（常量与来历，`MethodConfigGet` 在 `:66`）、`:95-121`（封套新字段，`configField` 在 `:117`）、`:146-152`（`knownComposerMethod`） |
+| 2 | `internal/panel/composer_dispatch.go` | 新增 `ConfigRequestHandler`（签名带 raw，理由＝J4 甲：值不进共用封套）＋`ComposerDispatch.Config` 槽＋两枚 case；`dispatch` 返回值改 `(string, error)`（只有设置那两枚门填回执，其余四枚仍返空串，所以 `Handle` 对旧四门的句子里没变） | `:90-113`（接口与理由，声明在 `:110`）、`:134`（槽）、`:175-215`（dispatch 六枚 case＋default） |
+| 3 | `internal/panel/config_handlers.go`（**新增**） | 可写字段枚举 7 枚＋锁定族显式拒写（`risk.`/`fs.`/`net.`/`plugins.`/`privacy.`/`models.`/`audio.`）＋选择子必配齐＋空值拒；回执形状带 tier；`ConfigStore` 接口**本地声明、不 import `internal/config`**（照 `ModeWriter` 先例，零新依赖边） | `:57-104`（字段表与 `WritableFields`）、`:108-140`（锁定族与逐族理由）、`:307-365`（write 闸门）、`:428-442`（`tierSentence` 文案律） |
+| 4 | `internal/config/settings.go`（**新增**） | 六枚导出 setter（`SetProviderBaseURL`／`SetProviderAPIKeyRef`／`SetModelContextWindow`／`SetModelPriceIn`／`SetModelPriceOut`／`SetRoleChatModel`），全走 `mergeWrite` 那枚按键受保护写；**AC#7 的 `validate()` 闸门落在这里、进 `mergeWrite` 之前**；落盘后按"文件前后差"报实际键路径 | `:60-190`（setter 群）、`:199-249`（`writeOneKey`：预读→check→apply→`validate`→`mergeWrite`→回滚）、`:254-272`（`writtenKeyPaths`） |
+| 5 | `cmd/wisp/panel_config_store.go`（**新增**） | 装配根那半：`configStore` 实现 `panel.ConfigStore`；凭据值只由本文件的**只写形状** `credentialWriteRequest` 绑定（JSON 键 `credentialValue` 不在共用封套上）；`secret.NewRef`→`Store.Store`（DPAPI）→`SetProviderAPIKeyRef`；tier 一律 `restart` | `:44-68`（`credentialValueKey` 与只写形状）、`:238-283`（`StoreCredential`）、`:285-292`（`credentialStatus`＝泵的 reader） |
+| 6 | `cmd/wisp/panel_inbound.go` | `newComposerDispatchChain` 里接上 `Config` 槽（复用同一枚 `config.Manager` ＋ 现成 `secret.NewStore`）；受理支现在把 `Handle` 的回执打出来（AC#8 的可见面） | `:176-186`（回执支）、`:262-280`（装配，`Config: configWrites` 在 `:279`） |
+| 7 | `internal/panel/composer.go` + `internal/panel/pump.go` | 快照那一维进 `composer` 段（`credentialState`＋`credentialKnown`，照 `currentModel`/`modelKnown` 的"一枚事实＋一枚 known 位"形）；`PumpSources.Credential` 是 reader，没接 reader 就报 `unknown`/`false` | `composer.go:258-269`（两枚键）、`:288`（构造器的 unread 支）、`pump.go:146`（reader）、`pump.go:260-268`（填充） |
+| 8 | `cmd/wisp/run.go` | 装配根把凭据 reader 递给泵（`rt.settings` 用的就是 `wisp run` 已有的那枚 Manager 与那枚 `secret.Store`，⛔ 没有第二份加载、没有第二套存储） | `:259`（字段）、`:416`（装配）、`:695`（`Credential:` reader） |
+| 9 | `internal/panel/l2_grant_boundary_test.go` | **只在 `A487` 具名解冻的那两枚锚上动**：`:2051` 拼写钉 → 从"这枚包声明的 `Method*` 名册"推出的能力形锚（含正控：种一枚不在名册里的路由标签 ⇒ 派生必报错）；`:2139` 尺寸钉 `!= 4` → `sortedSet(pkg.answered)` 与名册值集合全等（⛔ 未删钉、未放宽成 ≥4）；直连 helper＝同文件相邻位置新增 `guardRosterOf`/`dedupeSorted`/`slicesContains` | 改后现读：`:2030-2138`（`guardRosterOf`）、`:2140-2158`（两枚 helper）、`:2206-2226`（锚＋plant B 正控）、`:2308-2313`（名册全等支） |
+| 10 | 测试（新增 3 枚文件＋1 处调用点） | `internal/panel/config_route_248_test.go`（AC#1/AC#8，**11 枚顶层用例＋2 枚子用例**，逐枚带正控）、`internal/config/settings_248_test.go`（AC#7/AC#11/AC#3，**7＋1 子**）、`cmd/wisp/panel_config_248_test.go`（AC#2/AC#3 端到端＋结构形正控，**9 枚**）；`composer_dispatch_test.go:235` 只是 `dispatch` 换签名的调用点（断言原文一字未改） | 尺＝`grep -c "^func Test"`／`grep -c "t.Run("`，`09:0x` 现量 |
+
+
+**没动的东西（具名，供越界尺对照）**：`internal/secret/**` 一字未改（只调用现成 `NewStore/Store/Exists/Resolve/NewRef/ParseRef`，存储格式没动）；`internal/ball/**` 未碰；票面／台账／HANDOVER／规格／阈值／golden／allowlist／CI／scripts 未碰；`SaveFile` 与 `mergeWrite` 本体未碰。
+
 
 ---
 
