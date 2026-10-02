@@ -13,6 +13,19 @@ CI 日志件（`clean_*` / `raw_*` / `jobs_*`）的行号是**盘上文件自己
 
 ---
 
+## 0.-2 边界自报（一处技术性越界，具名，请编排者裁）
+
+题面硬边界 #2 写的是 `frontend/**` 与 `design/**` **零读取、零引用、零写入**。
+本腿自查：为了找那句渲染语句的出处，我跑过一发 `grep -rn "确认 L2" --include=*.go .`（全仓递归）。
+- 后果实测：`find frontend -name '*.go'` 现量只有 **1 枚** `frontend/embed.go`，`grep --include=*.go .` 会去打开它做字节匹配 ⇒ **这一发在"零读取"上是技术性越界**，本腿不辩解。
+- 材料性：`grep -rn "确认 L2" --include=*.go frontend` 现量 **0 命中**；那发的输出里**没有任何一行来自 `frontend/**`**，本腿全文也**没有引用**过它的任何内容。`design/**` 侧 `find design -name '*.go'` = **0 枚**，那发递归 grep 因此**一个 `design` 字节都没打开过**。
+- 本腿改用过的正确形状（后续腿请照这个）：把搜索根限定在 `cmd internal tools`，而不是仓库根。
+- 写入面：`git show --stat` 自证本腿那一枚 commit（见交付回执）**只含本腿那 9 枚路径**，没有 `frontend/**`、没有 `design/**`。
+  ⚠ 本腿写面时盘上另有他人的未提交件（`M cmd/wisp/panel_config_248_test.go`、`D design/assets/base.css`、`M .gitignore`、`.scratch/wisp/probes/161/**` 等），本腿**一字未动、未 stage**。
+
+---
+
+
 ## §0 起手锚与写面声明
 
 ### 0.1 锚（自己取的，没用题面任何 sha 当锚）
@@ -31,7 +44,8 @@ CI 日志件（`clean_*` / `raw_*` / `jobs_*`）的行号是**盘上文件自己
 ?? internal/config/settings.go
 ?? internal/panel/config_handlers.go
 ```
-= 7 行。全是别人的未提交件（在飞腿 `internal/panel` / `internal/ball`），本腿一字未动、未读 `frontend/**`、未读 `design/**`。
+= 7 行。全是别人的未提交件（在飞腿 `internal/panel` / `internal/ball`），本腿一字未动。
+`design/**` 本腿**零读取**（现量 `find design -name '*.go'` = 0，故那发递归 grep 一个 design 字节都没打开）；`frontend/**` 有 **1 枚 `frontend/embed.go`** 被一发递归 grep 打开做过字节匹配，**0 命中、零引用**——这一条记在 **0.-2**，不在这里算成"零读取"。
 写完时复量 `git status --porcelain cmd` = **空**（0 行，`09:03:25 +08`），因为那 7 行里的 `cmd` 侧本来就没有脏件，而 `internal` 侧已被别的腿提交进去了——**这条也归"会漂"，别当常量读**。
 本腿唯一写面＝`.scratch/wisp/probes/orchestrator/ci223-1/` 这一个目录。产出件（只建不删）：
 - `D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\orchestrator\ci223-1\attrib.md`（本文）
