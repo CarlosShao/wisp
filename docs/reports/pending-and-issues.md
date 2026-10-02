@@ -10592,3 +10592,26 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - **界面侧带话落成可复制 prompt**：`.scratch/wisp/probes/orchestrator/frontend-handoff-1002.md`（提交 `5fad9a00`，69 行）。内容全是 Go 侧盘上真读数＋出处：`config.get`/`config.set`（`internal/panel/bridge.go:66-67`）、七枚可写字段名册（含**只写不回显**的 `provider_credential`）、七枚被结构拒绝的族前缀、生效档位；凭据五条硬约束按他原话来；⛔ 我**没有**替界面侧写任何码，也没调任何跨会话工具（只落盘＋给他复制）。
 
 **7. 编队（2026-10-02 09:43:53+0800 现量，HEAD `5fad9a00`）**：在飞 **4 枚**＝`251-r1`（`scripts/`）／`252-p1`（`internal/tools`＋`internal/risk` 两枚 `_252_probe_test.go`，探针只交读数）／`167-a1`（只读，`probes/167/a1/census.md`）／`198-v1`（对抗验收，正在整包跑 `cmd/wisp`）。本轮累计已收 9 枚。⛔ 验收腿**串行**（两枚同时跑变异会互相洗读数）⇒ `33-v3`（含 33-r8b 那六发变异的复认）与 `248-v1` 排队等 `198-v1` 退出。门禁复跑窗口里**仍未做**的两件：223 那枚单发＋频次复量、`internal/risk` 毫秒钉同机对照（都要机器空）。
+
+## A520（2026-10-02 09:54:14+0800，编排者自记：`252-p1` 结档——**AC#1 已答且我的两句票面因果被推翻**（先失配的是词法那一段；分岔变量是存在性不是拼法）＋AC#2 我据读数当场裁形＋另立票 253 收三枚入向尺洞）
+
+起手锚（与落笔同发）：`date`＝`2026-10-02 09:54:14+0800`／`git log -1`＝`f25f9572`／分支 `dev`。
+
+**1. 交件凭据**：探针 `internal/tools/paths_shortname_252_probe_test.go` **314/12626**；`.scratch/wisp/probes/252/p1/verdict.md` **212/23702**（另有 `probe-run.log` 171/20502、`d22scan.log` 249/22985）；提交 `f832fcbb`→`3465dcee`→`4b293c95`；读数来自**单发** `go test -count=1 -v -run 'TestTicket252P1' ./internal/tools/` ⇒ **9 PASS／0 FAIL／0 SKIP**；终态 `git status --porcelain internal/tools internal/risk` **与起手名册逐枚相等**；票面 6 枚 AC 框未动；门禁 `d22scan` `clean`（分母 ban#8 `internal/`=482＝本探针自己在射程内且未踩）、`go vet ./internal/tools/` 净、`gofmt -l` 0。
+
+**2. AC#1 判死**：**先失配的是第一段（词法，`paths.go:140`），不是 `resolvedForm`**。逐字：roots 长／asked 短且叶子不存在 ⇒ `InAllowlist=false`，`foldPath`＝短串，而 `resolvedForm(...)`＝**长串且 `ok=true`** ⇒ **LEG1 false／LEG2 true**。
+- ★ 推翻我票面"这两次包含就不可能同时成立"：实测**一次成立一次不成立**，**两段对同一条物理路径给出相反答复**，宽容的那段是 `resolvedForm`——比我原判断更糟（不是整体判不出，是各说各话）。
+- ★ 推翻我票面"短名侧留短／长名侧折长"：分岔变量是**存在性**（存在⇒必折长，**roots 也被折**，见 `NewPathCanonicalizer` `paths.go:56/93`；缺失叶子⇒照抄原拼法 `pathresolver.go:138`）⇒ 反向那一发（roots 配短／asked 长／缺叶子）实测 **`true`**。
+- ⇒ **AC#2 我据读数当场裁形**（落地腿不许再选边）：进 `InAllowlist` 之前把 asked 与 roots **折成同形**，让两段各拿同一个形再各自作差；⛔ 不许并成一段、⛔ 不许改 `paths.go:153` 的 `!ok` 语义（"解析不到＝未授权"属票 102／107 地界）、⛔ 不许碰判级（R2→L2 归 D4）。
+- 我抄进派单的尺**全部复证为真**（`paths.go:133/140/152/153`、`pathresolver.go:127/138`、`rules_gateway.go:45` 体内 `:47-48`、`bridge.go:334`、仓库根两串不等）——**这是我今天第 N 次"派单里的尺先自跑"带来的正收益**，也是第一次由腿把我的行号精度纠干净（`:283-300` 是注释块，实现体在 `:303-375`）。
+
+**3. AC#6 半答，剩那一半不该由探针答**：**形状上 owner 撞得到**（真仓库根下、`docs\`／`internal	ools\` 里不存在的新文件名：长名 `true`、短名 `false`）；**但本机喂入者为空**——`USERPROFILE/APPDATA/LOCALAPPDATA/TEMP/TMP/HOME/os.TempDir()/os.UserHomeDir()` 全 `same-as-long (no usable alias)`、进程 cwd 以长名到达、**仓内无任何生产码调 `GetShortPathNameW`** ⇒ 短名只能由外部参数递进来。⛔ 谁都不许把"形状上撞得到"读成"他已经在撞"；那一半要一发 owner 真机的 `[fs] allowed_dirs` ＋真 `wisp run` 的 `in_allowlist_scope=` 审计行。
+- ⛔ **本件不构成 AC#2 ⓐ／ⓑ 的否证**（腿自己写明：它一枚候选修法的作用面都没跑，且 `cmd/wisp` 当时是脏面）——第 74／83 条守住了，记它一条好。
+
+**4. 又纠掉我一句"既有定式"**：我票面写的"拿不到短名就**必须红不许 skip**"是**全称、不成立**——出处 `bridge_junction_windows_test.go:77/84` 为真，但同前置条件在 `pathresolver_junction_windows_test.go:128`、`tree_ownership_112_windows_test.go:122`、`absoluteness_attribution_129_windows_test.go:311` 三处**是 `t.Skip`**。⇒ 今后这类句子**只能写成"这一枚探针不许 skip"**，不许当既有规矩引用。
+- 顺带记我自己一条：**我把自查尺的字面文本写进了票面**（腿复跑命中票 252 `:47`）——正是我天天写进派单的那条坑，这次是我自己踩的；已就地改成描述形（那枚删除行在 `f25f9572` 的 numstat 里可见）。
+
+**5. 新立票 253**（`.scratch/wisp/issues/253-panel-inbound-has-three-ruler-holes-...md`，4 格，⛔ 不吞票 114 那 9 枚差集）：收 `114-a2` 的 R9／R10 与它新增那枚——① 可达性钉只认 `.postMessage(` 而生产的门是 `w.Bind("wispDispatch")`；② `config.get`/`config.set` 不带 `panel.` 前缀 ⇒ 掉在 `routeLiteralRe`／`panelMethodRe` 两把名册尺之外（**新增方法名今天可以在不触发任何名册尺的情况下进树**）；③ 旧封套直接 `postMessage` 被宿主库**静默 `resolve(null)`、Go 侧零审计**（⚠ 这一枚算产品行为：用户点了按钮、什么都没发生、日志里也什么都没有）。第三枚**不许改上游库**，本仓射程＝Go 侧给"收到但形状不认识"落一条现场＋页面不许拿到无声 `null`。**按住**：写面是 `internal/panel`＋`cmd/wisp`，此刻 `198-v1` 正在整包跑 `cmd/wisp`。
+- 同因还牵出一枚待办：`197-r3`（修那把尺的 C1／C2／C3：第七枚载具恒空＝宣称了没测／`:254` 六枚用例共用一枚两值集合⇒分不清"门拦的"与"权限拦的"／文件末尾脚注 `M1` 指向进不了快照字节的形）——**它的写面也是 `cmd/wisp`（被测文件是测试文件）** ⇒ 一并按住到 `198-v1` 退出。
+
+**6. 编队（2026-10-02 09:54:14+0800 现量，HEAD `f25f9572`）**：在飞 **3 枚**＝`251-r1`（`scripts/`）／`167-a1`（只读）／`198-v1`（对抗验收，整包 `cmd/wisp`）。本轮累计已收 11 枚。**按住队列**（等 `198-v1` 退出且面空）：`252-r1`（AC#2 落地，写 `internal/tools`）、`197-r3`＋`253-r1`（写 `cmd/wisp`／`internal/panel`）、`248-v1`／`33-v3`（另两枚验收腿，⛔ 与 `198-v1` 并发会互洗读数）、`195-r1`（写 `internal/config`）、`174 AC#2b`（写 `cmd/wisp`）。
