@@ -1,0 +1,14 @@
+winsec-tests.sh: platform=windows gate=internal/winsec scope=[./internal/winsec/] package=github.com/CarlosShao/wisp/internal/winsec
+portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+portable-tests.sh: GUARD C - scope mode=winsec resolved to a DIFFERENT package
+portable-tests.sh:   set than the one pinned next to it. Pinned: 1, resolved: 2.
+portable-tests.sh:   1a2
+portable-tests.sh:   > github.com/CarlosShao/wisp/internal/winsec/acl
+portable-tests.sh: a deleted or newly-uncovered package must fail the step, not
+portable-tests.sh: shorten it. Either restore the scope entry or update the pin
+portable-tests.sh: in the SAME commit and say why in the CI log.
+winsec-tests.sh: GUARD 2 - the run printed NO top-level result line for github.com/CarlosShao/wisp/internal/winsec, so this step tested the package it is named for zero times.
+winsec-tests.sh: a build tag or a rename that empties the package is a red step here (ticket 110 AC#3), not a green short-circuit.
+winsec-tests.sh: winsec result line: <none>
+winsec-tests.sh: four numbers (all from -v output): === RUN=0  --- PASS=0  --- FAIL=0  --- SKIP=0
+winsec-tests.sh: gate is RED (rc=1) for scope=[./internal/winsec/]

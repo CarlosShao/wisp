@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# scripts/testdata/portable-tests/go - a stand-in `go` binary for
+# scripts/portable-tests-selftest.sh (ticket 250 AC#3).
+#
+# WHY A SHIM AND NOT A REAL COLD MODULE CACHE: the reading this carrier has to
+# take is "GUARD C's denominator with stderr contaminated, several times, on
+# demand, on a laptop". The real cold-cache form does produce it (see
+# scripts/portable-tests-selftest.sh's header: 12 s per shot, 303 MB of module
+# downloads), but it also produces it ONCE per cache, at the mercy of a network,
+# and - after the fix - the same run walks on into `go test` over the whole core
+# scope, which is milliseconds-sensitive territory this carrier must never enter.
+# So only the `go` PROCESS is replaced here; everything downstream of it
+# (scripts/portable-tests.sh, its three guards, tools/d22scan/runtests.sh) is the
+# real code, run for real. No test claim is made from this shim: it asserts
+# nothing about the product, only about how one shell script counts lines.
+#
+# Contract, all driven by env vars the carrier sets (unset means "boring success"):
+#   FAKEGO_GOOS             what `go env GOOS` prints            (default linux)
+#   FAKEGO_PIN_FILE         file holding the import paths `go list` prints to stdout
+#   FAKEGO_SCOPE_FILTER     resolve the args like real go does (see the list branch:
+#                           ./a/b/ is one package, ./a/b/... is the subtree, ./... is
+#                           everything) instead of printing the whole pin file
+#   FAKEGO_STDERR_FILE      lines `go list` prints to stderr (progress text)
+#   FAKEGO_STDOUT_EXTRA_FILE lines `go list` prints to stdout AFTER the pin
+#                           (a seeded anomaly - this is what the shape check eats)
+#   FAKEGO_LIST_DROP        one import path to withhold from `go list` stdout
+#   FAKEGO_LIST_RC          exit code of `go list`                  (default 0)
+#   FAKEGO_GUARD_A_SEED     makes `go list -f ...` print "EMPTY <this>"
+#   FAKEGO_DROP_PKG         no package result line for this import path
+# Anything else is a mis-wired carrier and exits 99 loudly rather than printing
+# an empty success.
+set -u
+
+cmd=${1-}
+[ $# -gt 0 ] && shift
+
+case $cmd in
+env)
+    # scripts/portable-tests.sh only ever asks `go env GOOS`. Answer nothing else
+    # rather than inventing a plausible-looking empty string.
+    case "${1-}" in
+    GOOS) printf '%s\n' "${FAKEGO_GOOS:-linux}" ;;
+    *)
+        echo "fake-go: only 'go env GOOS' is supported, got: go env ${1-unused}" >&2
+        exit 99
+        ;;
+    esac
+    ;;
+list)
+    if [ "${1-}" = "-f" ]; then
+        # GUARD A's denominator probe: go list -f '<fmt>' <scope...>
+        if [ -n "${FAKEGO_GUARD_A_SEED-}" ]; then
+            printf 'EMPTY %s\n' "$FAKEGO_GUARD_A_SEED"
+        fi
+        exit 0
+    fi
+    [ -n "${FAKEGO_PIN_FILE-}" ] || { echo "fake-go: FAKEGO_PIN_FILE unset" >&2; exit 99; }
+    if [ -n "${FAKEGO_STDERR_FILE-}" ] && [ -s "$FAKEGO_STDERR_FILE" ]; then
+        cat "$FAKEGO_STDERR_FILE" >&2
+    fi
+    body="$FAKEGO_PIN_FILE"
+    if [ -n "${FAKEGO_SCOPE_FILTER-}" ]; then
+        # TICKET 251: model what a REAL `go list` does with the args it is handed,
+        # because "the pin and the resolved set differ" is a claim about resolution,
+        # not about a file of names:
+        #   ./internal/winsec/     -> the ONE package in that directory, never a
+        #                             second package created beside it
+        #   ./internal/winsec/...  -> that package AND every package under it
+        #   ./...                  -> the whole module (census reads it this way)
+        # Without this the shim would print every name it knows for ANY scope, and a
+        # split seed would look like it bit on the directory form too - which real go
+        # does not do. That difference is the whole reason ticket 251's tier scope is
+        # the glob; see the carrier's winsec-explicit-glob-is-what-bites case.
+        module=$(sed -n 's/^module[ \t][ \t]*\([^ \t]*\).*/\1/p' go.mod | sed -n '1p')
+        if [ -z "$module" ]; then
+            echo "fake-go: FAKEGO_SCOPE_FILTER is set but go.mod has no module line" >&2
+            exit 99
+        fi
+        scoped=$(mktemp 2>/dev/null || echo "./fake-go-scoped.$$.txt")
+        : >"$scoped"
+        for a in "$@"; do
+            case $a in
+            -*) continue ;;
+            esac
+            rel=${a#./}
+            subtree=0
+            case $rel in
+            *...) subtree=1; rel=${rel%...} ;;
+            esac
+            rel=${rel%/}
+            if [ -z "$rel" ] || [ "$rel" = "." ]; then
+                cat "$body" >>"$scoped"
+            elif [ "$subtree" -eq 1 ]; then
+                awk -v m="$module/$rel" '$0 == m || index($0, m "/") == 1' "$body" >>"$scoped"
+            else
+                awk -v m="$module/$rel" '$0 == m' "$body" >>"$scoped"
+            fi
+        done
+        body="$scoped"
+    fi
+    if [ -n "${FAKEGO_LIST_DROP-}" ]; then
+        grep -vxF "$FAKEGO_LIST_DROP" "$body" || true
+    else
+        cat "$body"
+    fi
+    if [ -n "${FAKEGO_STDOUT_EXTRA_FILE-}" ] && [ -s "$FAKEGO_STDOUT_EXTRA_FILE" ]; then
+        cat "$FAKEGO_STDOUT_EXTRA_FILE"
+    fi
+    exit "${FAKEGO_LIST_RC:-0}"
+    ;;
+test)
+    # Two shapes: `go test -list <pat> <pkgs...>` (the ledger's staleness check and
+    # the -list universe) and the real run the strict runner issues
+    # (`go test -v -count=1 <pkgs...> -count=1 -skip <pat>`).
+    pat=''
+    prev=''
+    for a in "$@"; do
+        if [ "$prev" = "-list" ]; then pat=$a; fi
+        prev=$a
+    done
+    if [ -n "$pat" ]; then
+        if [ "$pat" = '.*' ]; then
+            exit 0 # universe file; nothing downstream counts it
+        fi
+        printf '%s\n' "$pat" | sed -e 's/^\^//' -e 's/\$$//'
+        exit 0
+    fi
+    [ -n "${FAKEGO_PIN_FILE-}" ] || { echo "fake-go: FAKEGO_PIN_FILE unset" >&2; exit 99; }
+    while IFS= read -r pkg; do
+        [ -n "$pkg" ] || continue
+        [ "$pkg" = "${FAKEGO_DROP_PKG-}" ] && continue
+        printf '=== RUN   TestFakeGoCarrier\n'
+        printf -- '--- PASS: TestFakeGoCarrier (0.00s)\n'
+        printf 'ok  \t%s\t0.01s\n' "$pkg"
+    done <"$FAKEGO_PIN_FILE"
+    printf 'PASS\n'
+    exit 0
+    ;;
+*)
+    echo "fake-go: unexpected invocation: go $cmd $*" >&2
+    exit 99
+    ;;
+esac

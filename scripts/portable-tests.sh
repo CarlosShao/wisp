@@ -190,9 +190,13 @@ github.com/CarlosShao/wisp/internal/winsec
 # `case $mode in` block and refuses to report anything unless the two sets are equal
 # in both directions, so the roster cannot be maintained apart from the branches.
 tiers='core windows cli winsec census'
-# The winsec tier's scope, named once: the branch below and the explicit-path audit
-# further down both read it, so "what the tier covers" cannot drift from "what the
-# tier's pin claims" the way the tier NAME just did.
+# The winsec tier's scope, named once: the tier branch below, the explicit-path audit
+# further down and the core tier's winsec row ALL read it, so "what the tier covers"
+# cannot drift from "what the tier's pin claims" the way the tier NAME used to, and
+# the two tiers that claim internal/winsec cannot resolve it two different ways
+# (ticket 254 AC#2: core used to name the DIRECTORY here while the tier names the
+# GLOB, which is exactly the shape that lets one tier go green on a package split
+# while the other goes red on it).
 winsec_dir=./internal/winsec/
 winsec_scope=./internal/winsec/...
 
@@ -208,7 +212,7 @@ core)
         ./internal/tools/... ./internal/models/...
         ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
         ./internal/panel/... ./internal/ball/ ./internal/perm/
-        ./internal/plugin/ ./cmd/llmrecord/ ./internal/winsec/
+        ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
     )
     pinned=$core_pin
     ;;

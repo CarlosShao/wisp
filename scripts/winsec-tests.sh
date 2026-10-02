@@ -130,6 +130,43 @@ if [ -z "$result_line" ]; then
     result_line='<none>'
 fi
 
+# guard 3 (ticket 254 AC#1): a GREEN step must say it was AUDITED.
+#
+# GUARD C of scripts/portable-tests.sh pins the winsec tier's resolved set against
+# winsec_pin, and since ticket 251 it also recognises the explicit path this script
+# hands over (portable-tests.sh's "explicit scope ... IS the winsec tier's own
+# scope" branch). But that recognition fires ONLY when this script passes exactly
+# one path. Append a second package by hand - the affordance this script's own
+# header advertises above - and the child silently falls back to the nothing-pinned
+# branch: the step stays green, guards 1 and 2 both pass, and the denominator that
+# used to be compared against winsec_pin simply stops being compared. Measured at
+# HEAD c0aab35b (guard C bytes unchanged from 5801b91f) before this line existed:
+# rc=0, zero audit lines, with [./internal/winsec/ ./internal/agent/] as the scope
+# (.scratch/wisp/probes/254/r1/logs/before-widened.txt).
+#
+# "The scope I passed was recognised as a tier and pinned" is a claim about the
+# CHILD's output, so that is what is checked here, in two parts, both read out of
+# the captured bytes instead of re-deriving the child's logic:
+#   1. the child says it took the tier's own scope, and
+#   2. the denominator it then ran IS the tier's glob (dir form + "..."), because
+#      the directory form cannot see a package created beside it - which is the
+#      reading ticket 251's case 18 pins as load-bearing.
+# Only a run that would otherwise be GREEN is judged: when the child already went
+# red the step is red, and piling a second message on it would blame the wrong guard.
+if [ "$rc" -eq 0 ]; then
+    if ! { grep -qF "IS the winsec tier" "$capture" \
+        && grep -qF "scope=[${target}...]" "$capture"; }; then
+        echo "winsec-tests.sh: GUARD 3 - the step went green WITHOUT scripts/portable-tests.sh" \
+            "reporting that it ran scope=[${target}...] as the winsec tier against winsec_pin." >&2
+        echo "winsec-tests.sh: the delegated audit therefore did not happen: GUARD C only pins a" \
+            "one-path winsec scope, so a widened list like [${scope[*]}] ran with NOTHING to" \
+            "compare its resolved set against (ticket 254 AC#1)." >&2
+        echo "winsec-tests.sh: run the tier by its own scope, or take the extra paths out of this" \
+            "step - do not relax this line, it is what keeps this gate audited." >&2
+        rc=2
+    fi
+fi
+
 echo "winsec-tests.sh: winsec result line: $result_line"
 echo "winsec-tests.sh: four numbers (all from -v output): === RUN=$ran  --- PASS=$passed  --- FAIL=$failed  --- SKIP=$skipped"
 rm -f "$capture"

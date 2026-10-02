@@ -1,0 +1,21 @@
+winsec-tests.sh: platform=windows gate=internal/winsec scope=[./internal/winsec/] package=github.com/CarlosShao/wisp/internal/winsec
+portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+portable-tests.sh: platform=windows scope=[./internal/winsec/...]
+portable-tests.sh: 11 ledger entries, 7 accounted on this platform:
+portable-tests.sh:   TestDefaultDeadlineWallClockMeasurement              [opt-in] 300s wall-clock measurement gated by WISP_84_MEASURE=1 (ticket84_no_owner_test.go:224, docs/evidence/s1/84-ac1-bounded-wait.md); it measures a deadline instead of asserting a property, so a CI run of it produces a duration nobody checks
+portable-tests.sh:   TestSubprocessCrashWriter                            [reexec] child-process entry point of TestCrashRecoveryKillMidWrite (concurrent_test.go:186); not a test of its own, it skips whenever it is not the re-exec'd child
+portable-tests.sh:   TestHelperProcess                                    [reexec] child-process entry point of the job-object cases (jobscope_windows_test.go:87, //go:build windows); skips unless re-exec'd with the helper env var set
+portable-tests.sh:   TestLiveWasapiSmoke                                  [fixture] live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio endpoint, so the case has no subject there. Real-hardware smoke is ticket 16's
+portable-tests.sh:   TestRealDownloadVadThroughPipeline                   [opt-in] real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:120); CI has no business pulling model archives from a third-party mirror
+portable-tests.sh:   TestRealDownloadPuncArchiveThroughPipeline           [opt-in] real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:147); same reason as the VAD row
+portable-tests.sh:   TestSyncRegistryProbeLive                            [fixture] P12 live registry evidence; on ubuntu it is now out of scope by platform instead of by skip (ticket 93 AC#2 moved it verbatim into syncdirs_windows_test.go), and on a Windows host whose HKCU Accounts key carries no UserFolder the hive has nothing to say. Measured on a windows host at HEAD 84e43af: --- SKIP at syncdirs_windows_test.go:133. As of ticket 110 AC#4 the windows leg carries ./internal/risk/ in its scope, so this row is re-verified against the compiled WINDOWS test binary (go test -list) and printed with its reason in that step's log - which is the step-level answer R-93-4 asked for. Remedy for a real run: a host with a sync record, or fold the shape check into the fixture-driven case. next= on ticket 93
+portable-tests.sh: -skip pattern built from the ledger: ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$
+=== RUN   TestFakeGoCarrier
+--- PASS: TestFakeGoCarrier (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.01s
+PASS
+runtests.sh: OK - packages=[./internal/winsec/... -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+portable-tests.sh: four numbers (all from -v output): === RUN=1  --- PASS=1  --- FAIL=0  --- SKIP=0
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/winsec
+winsec-tests.sh: winsec result line: ok  	github.com/CarlosShao/wisp/internal/winsec	0.01s
+winsec-tests.sh: four numbers (all from -v output): === RUN=1  --- PASS=1  --- FAIL=0  --- SKIP=0
