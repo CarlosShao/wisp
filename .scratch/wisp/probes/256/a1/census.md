@@ -16,6 +16,7 @@
 | 分支 | `dev` |
 | `git status --porcelain -- cmd internal \| wc -l` | `0` |
 | 写点 | `.scratch/wisp/probes/256/a1/census.md`（本文件，目录本腿自建） |
+| **交件时刻补记**（最后一发 `date -Iseconds` 现取） | `2026-10-02T13:12:00+08:00`；`git status --porcelain -- cmd internal \| wc -l` 复测＝**0**（＝本腿读过的两棵子树到交件此刻仍未被别人改动，§1–§3 的行号可直接复核）。⚠ 本腿**两发** `date -Iseconds` 返回**同一时刻** ⇒ 钟点在本会话里不可分辨，这两枚时间戳只当"起手／交件各一发的逐字读数"用，**不当区间长度读数** |
 
 ⚠ 共享工作树整树永远非空——本腿只按上面的**显式 pathspec 计数**判"我读的两棵子树在我读的时刻是干净的"，不当异常、也不当作"别人没在动"的证据。
 票面落款锚点是 `4a9851d6`，起手 HEAD 已是 `cf87f7a2` ⇒ **票面行号自锚点之后可能被别人挪过**，本文件所有行号＝**本腿在 `cf87f7a2` 上现读**，不抄票面。
@@ -44,7 +45,7 @@
 | 10 | 托盘「**允许一次**」（票面 AC#0 点名的一处） | **不存在**。托盘菜单项在 `internal/ball/tray_windows.go:86-91`，四枚 id 定义在 `:20-23`：`menuOpenPanel`／`menuMute`／`menuPauseWake`／`menuExit`，标签逐字「打开面板」「静音」「暂停唤醒」「退出」。常驻腿的挂接点在 `cmd/wisp/resident_ball_windows.go:179-182`（`OnTrayPanel`／`OnTrayMute`／`OnTrayPauseWake`／`OnTrayExit`），**四枚里没有一枚碰门、账本或答复面**（`OnTrayExit` 只做 `recordTrayExit`，本体 `:308-312` 只写日志） | 无 | **量不到——这一处今天没有**。尺：`grep -rn "允许\|Allow" internal/ball/*.go \| grep -v _test.go` ⇒ **零命中**；`grep -rn "\.Allow(" cmd internal --include='*.go' \| grep -v _test.go` ⇒ 唯一命中 `cmd/wisp/approval_reply.go:215`（控制台答复面的 `yes` 支，不是托盘）。⇒ 票面把"托盘「允许一次」"和"卡片 UI／热键答复"并列为三处现状，**这一并列不成立**：那一处是**待建**（票 244 的 J9 射程），不是**待挪** | 见上三条 grep |
 | 11 | 原生侧 `NativeSource` | `cmd/wisp/resident_approval_windows.go:62-65` 两枚常量 → `HostBinding` 的 `:118-119` → `replies.go:116-124`（注释：它们是 LABELS，不是 authority） → 落到 `gate.go:719`、`:733` 两处 `logf` | 只把门当**日志汇**用 | **不读门本体**（`r.Source` 在全仓产码里没有任何分支读它，尺：`grep -rn "\.Source\b" internal/agent/approval/gate.go internal/agent/approval/queue.go` ⇒ 只有 :719/:733 两枚 `logf` 参数位）。⇒ 挪动对这一处的影响**等价于第 1 处**：门没绑 ⇒ 那句 audit 行根本写不出来。⚠ 引文性质＝**内容引用**（`gate.go:705-707` 的 "Source is ADVISORY ONLY … no branch in this package reads it"） | 见上 |
 
-**§1 小结（只报形状）**：常驻腿在 `assembleRuntime` 之前**真的读那枚 `*Gate` 指针**的地方共 **3 处**＝第 1（`:116` 绑账本）、第 2（`:157` 加载 Esc）、第 5（`:351` 卸载 Esc，被第 2 处的结果挡着）；**经账本间接读门**的 **2 处**＝第 3（热键答复）、第 4（退出第 3 步）；**不读门**的 **3 处**＝第 6、第 7、第 11。**票面点名的"托盘「允许一次」"＝0 处**（第 10 行现读不存在）。
+**§1 小结（只报形状，11 行全部对上号）**：常驻腿在 `assembleRuntime` 之前**真的读那枚 `*Gate` 指针**的地方共 **3 处**＝第 1（`:116` 绑账本）、第 2（`:157` 加载 Esc）、第 5（`:351` 卸载 Esc，被第 2 处的结果挡着）；**经账本间接读门**的 **2 处**＝第 3（热键答复）、第 4（退出第 3 步）；**不读门**的 **3 处**＝第 6（启动报告）、第 7（控制台答复面，读的是 `rt.gate` 字段）、第 11（`NativeSource` 只是审计标签）；**只读"nil 与否"、决定走哪一支**的 **1 处**＝第 8；**量不到**的 **1 处**＝第 9（举卡入口产码调用者＝0）；**票面点名但今天不存在**的 **1 处**＝第 10（托盘「允许一次」）。
 ⇒ 挪动的最小爆炸半径读数是**第 1、2 两行**：`:116` 与 `:157` 都要求"门在 boot 时点已经存在"，而 `assembleRuntime` 在 `resident_windows.go:206` 之后才可能被叫到（`resident_task_source_windows.go:265`）。
 
 ## 2. `Confirming` 那一维今天由什么决定（以及门在它生命周期里被读的时刻）
@@ -100,20 +101,81 @@ D43 转移表里凡涉 `Confirming` 的行，全表共三枚（尺：`grep -n "S
 
 ## 3. `Grants` 为 nil 这一条的真实边界
 
-本节结论：「本会话内允许」在常驻腿今天有**三道前置门槛**，`Grants` 为 nil 只是第三道；这一条**确实有一行审计记着**，产生点与落盘点本腿都读到了源码行（`file:line` 在下面），但**本腿没跑过它**，所以那是"这一行会写这句话"的读数、不是"今天真写过"的读数。
+### ① 这枚 nil 是从哪儿进来的（一行）
+
+`cmd/wisp/resident_approval_windows.go:109-113` 的 `approval.New(approval.Options{` 只填 `UI`／`Channels`／`Logf` 三枚字段 ⇒ `internal/agent/approval/gate.go:154` 的 `grants: o.Grants` 收下一枚 nil。
+尺（构造点的字段枚数）：`sed -n '109,113p' cmd/wisp/resident_approval_windows.go` ⇒ 三行字段、无 `Grants`、无 `Window`、无 `ApprovalTimeout`。
+
+### ② `g.grants` 在整个包里有几处被读——**两行、一支**
+
+尺：`grep -n "g\.grants" internal/agent/approval/gate.go` ⇒ **两枚命中，同在一条分支里**：`gate.go:667` 的 `if g.grants == nil {` 与 `:678` 的 `id, err := g.grants.Record(ctx, tool, p)`。两枚都在 `(*Gate).allowSession`（本体 `gate.go:652` 起）里。⇒ **`Grants` 为 nil 不改任何判定，只改"落不落盘＋写哪一句审计"**，与本票 §0 的姿态一致（只读、不改）。
+
+### ③ 「本会话内允许」在常驻腿今天真实的前置门槛是**四道**，`Grants` 为 nil 只是第四道
+
+| 门槛 | 现读 `file:line` | 常驻腿今天的状态 |
+|---|---|---|
+| 甲：只能是 **L2** 卡 | `internal/agent/approval/replies.go:356-358` `if card.Grant == "" { return ErrRouteHasNoAllow }`；而 L1 那一支的 grant 参数在 `gate.go:287` 就是空串（`g.promptFor(d, corr, g.window, 0, bv, "")`） | 成立：常驻腿能举 L1 也能举 L2（`resident_approval_windows.go:242`／`:244`），所以这一道**只挡 L1**，不是"常驻腿没有会话档"的理由 |
+| 乙：账上要有这张卡且门已绑 | `replies.go:351-362`（`ErrNoTrackedCard` → `ErrNoGateAttached`）；卡由 `resident_approval_windows.go:439 u.ra.cards.Record(p)` 记 | 成立（今天门在 boot 就绑了，`:115-120`） |
+| 丙：得有人**说得出** `session` 这个词 | 动词表 `cmd/wisp/approval_reply.go:566 case "session":` → `:567 return s.session(corr)` → 本体 `:257`；循环 `runReplyLoop` 定义在 `:530`。**常驻腿里 `AllowSession` 的产码调用链只有这一条**（尺：`grep -rn "AllowSession" cmd internal tools --include='*.go' \| grep -v _test.go` ⇒ 除 `replies.go`／`gate.go` 的定义与注释外，产品侧命中只有 `approval_reply.go`） | **这一道才是真边界**：常驻腿的答复面在 `resident_task_source_windows.go:288` 才建，而它前面是同一函数 `:224-231` 的"无控制台 ⇒ return nil"与 `:265` 的装配失败分支。⇒ **无交互控制台的常驻进程今天根本没有 `session` 这个词的入口**，`Grants` 是不是 nil 对它无关 |
+| 丁：`Grants` 非 nil | `gate.go:667` | **不成立**（§3①）。⇒ 前三道全过之后，才轮到这一道把规则吞掉 |
+
+### ④ "有没有一行日志记着这件事"——有，两形，且本腿读的是产生那行的源码（⛔ 不是实跑读数）
+
+| 形 | `file:line` | 触发条件（现读） |
+|---|---|---|
+| 第一形 | `internal/agent/approval/gate.go:667-670`：`g.logf("approval: GRANT-DROPPED corr=%s tool=%s paths=%d (本机没有接入会话授权记账，本次按「仅本次」放行，没有落盘任何规则)", …)` | `g.grants == nil`，**且在放行已经成功之后**（`gate.go:664` 的 `allowScoped` 先跑；顺序由 `gate.go:642-649` 的注释钉着：先放行、后记账） |
+| 第二形 | `internal/agent/approval/gate.go:673-675`：`g.logf("approval: GRANT-DROPPED corr=%s (卡片主题在答复前已离开队列，未落盘任何规则)", corr)` | `tool == ""`，即 `:657` 的 `g.q.sessionSubject(corr)` 返回 `!ok`。**这一形与 `Grants` 无关**——见下面 ★★ |
+
+落盘路径（常驻腿侧的 `Logf` 是谁）：`resident_approval_windows.go:112 Logf: ra.residentAuditf` → 本体 `:129-133`，它**同时**做 `slog.Info("audit: " + line)` 与 `fmt.Printf("wisp: [audit] %s\n", line)`。slog 那条能到硬盘，是因为 `installLogSink` 在 `cmd/wisp/resident_windows.go:63` 就装上了，**早于** `:123` 建门。⇒ 现读结论：**两形都既有 stdout 也有落盘审计行**，不是"只到 stderr 的哑支"。
+⚠ 但这两句是**"这一行源码会写这句话"**的读数；本腿禁跑，**没有**"今天真写过一发"的实跑凭据。这一格与既有账同向：`docs/evidence/s1/248-settings-write-path-v1.md:277` 逐字记着"本腿…没读到用户按了本次会话内允许、今天不生效的实跑一行"（**内容引用**，非本腿实跑）。
+
+★★ **一枚会影响 AC#2 判据形状的量读数**（本腿不改判据、只报形状）：AC#2 写的是"`GRANT-DROPPED` 那行**必须不再出现**"。上表第二形（`gate.go:673-675`）的产生条件里**不含** `Grants`——它是"卡片主题在答复前已离开队列"，挪门挪不掉它。⇒ 判据字面读下来，一枚接了 `Grants` 的常驻腿仍可能因第二形写出 `GRANT-DROPPED`；**"不再出现"要不要区分两形，是 AC#1/AC#2 的定案题，本腿只登记**。（既有仪器对这两形**不加区分**：尺 `internal/agent/approval/ticket224_reply_grant_test.go:283` 只查 `f.log.has("approval: GRANT-DROPPED")` 这个前缀。）
+
+### ⑤ 有没有一枚钉守住"常驻腿这一格"——现读：没有
+
+尺：`grep -rn "GRANT-DROPPED" cmd/wisp/*_test.go internal/agent/approval/*_test.go` ⇒ 三枚命中，**没有一枚在常驻腿**：
+- `cmd/wisp/ticket224_assembly_test.go:194`：反向钉，"**有** ledger 的宿主不许出现 GRANT-DROPPED"；
+- `internal/agent/approval/ticket224_reply_grant_test.go:128`、`:283`：包内仪器，测的是"没给 recorder 时要说真话"，与 `cmd/wisp` 的装配次序无关。
+另：`grep -rn "Grants" cmd/wisp/*_test.go` 的命中全在 `run_mode101_test.go`／`ticket224_assembly_test.go` 的 **run 腿**侧。⇒ **常驻腿的"会话档不落盘"这一格今天无钉**：它只被两处**注释**与三处**文档**记着（`resident_task_source_windows.go:43`、`run.go:596`、`pending-and-issues.md:10107`）。
 
 ## 4. 我可能判错的条目
 
-见 §4 正文（六条，逐条带"错在哪／用什么尺能验"）。
+1. **§1 的"两个时点"只覆盖两枚产码调用者**。尺：`grep -rn "assembleRuntime(" cmd internal tools --include='*.go' \| grep -v _test.go` ⇒ 今天**只有两枚**：`cmd/wisp/run.go:249`（`wisp run` 腿）与 `cmd/wisp/resident_task_source_windows.go:265`（常驻腿）。⇒ 若票 244 的 GUI 子系统那一串后来在 boot 更早处多装配一次，我的"六处全在 `resident_windows.go:206` 之前"要重画（爆炸半径那两行 `:116`/`:157` 大概不变，行号会变）。
+2. **§2① 的"产码无人发射 D43 那三行"可能因 grep 面窄而漏**。我只扫了 `statemachine.New`／`statemachine.Machine`／`Fire(` 三组模式，`Fire(` 那一组我只扫到 `cmd/wisp/approval_reply.go`、`internal/ball`、`internal/agent` 三处附近（**未做全仓 `Fire(` 穷举**）。⇒ 若某处以接口值或别名导入的方式走表（例如 `sm "…/statemachine"`），①要改写。能验的尺：`grep -rn "\.Fire(" cmd internal tools --include='*.go' \| grep -v _test.go` 全量。
+3. **§2④ 那枚"必然"是静态推断，不是实跑**。它成立的前提是"双击／Explorer 拉起的常驻进程 `interactiveStdin()` 回 nil"，而我只读了 `cmd/wisp/approval_reply_stdin_windows.go:41` 那一段 Win32 判定（`GetStdHandle` ＋ `GetConsoleMode`）。⇒ 若 `-H=windowsgui` 那一支（票 244 K1/AC#5 在册）另有形状，"必然"应降级为"取决于链接旗标与启动方式"。**本腿无法把这两者分开**（不能跑）。
+4. **§1 第 5 处（detachBall 空转）判语依赖 `escLoad` 只有两枚写点**。尺（本腿已跑）：`grep -n "escLoad" cmd/wisp/resident_approval_windows.go` ⇒ 命中 **5 行**：`:93` 声明、`:154 = true`、`:347` 读、`:348 = false`、`:361` 读。⇒ 写点确实只有两枚，判语成立；但若将来有人在别的文件里给这枚字段加第三枚写点（同包可写），该行判语作废。
+5. **§3③ 丙"会话档入口链只有一条"用的是字面 grep**（模式 `AllowSession`）。若有一枚经 `NativeAPI` 接口值的间接调用不出现方法名，我会漏。能验的尺：`grep -rn "Native()\.AllowSession\|NativeAPI" cmd internal tools --include='*.go' \| grep -v _test.go`。
+6. **§3④"审计行能落盘"我只量到了装配次序**（`installLogSink` 在 `resident_windows.go:63`、建门在 `:123`），**没有量到 `slog.Info` 走的 handler 是不是那枚 sink**（`installLogSink` 本体在 `cmd/wisp/logsink.go`，本腿只读它的注释射程）。⇒ 若 handler 不是全局替换，"落盘"那半句要撤回，只保留 stdout 那半句。
+7. **本文件全部行号钉在起手 HEAD `cf87f7a2`**。本腿自己已在此之上产生多枚 commit（全是新增普查件，未碰 `cmd`／`internal`）；交付前那枚 `git status --porcelain -- cmd internal` 若不再为 0，说明有别的腿动了我读的树，§1–§3 的行号需按新 HEAD 复量。
+8. **§1 第 8 行"掉进 else 支"是编译期分支推断，不是运行读数**：我没有量"`s.gate` 为 nil 时 `resident_windows.go` 还会不会把 `ra.ui` 递给别处"——递 UI 这件事本身发生在 `resident_task_source_windows.go:257`，挪动之后那一行填什么**属未定**（属 AC#1 射程，本腿不猜）。
 
 ## 5. 判不动／没测到的地方
 
-见 §5 正文（八条，含"必须跑测试才拿得到"的那一类，本腿一律不做）。
+1. **一切"真打印／真落盘／真钳位"的运行读数**：本腿禁跑 `go build`／`vet`／`test`／`list`（同机 `248-r2` 在跑那三包）。⇒ `GRANT-DROPPED` 有没有在谁的机器上真写过一发、`ANSWER-EXPIRED` 的 `after=` 真值、球真进 `Confirming` 的帧，三格**全空**。
+2. **挪之后门的"存活时刻分布"**：`assembleRuntime` 自身可能先失败（`run.go:392-395` 的 `secret.NewStore` 失败 ⇒ `return nil, 2`；`run.go:417-418` 配置未就绪 ⇒ `return rt, 2`），⇒ 门的存活窗口在不同失败支下不是同一形状，量它要真跑常驻 exe。
+3. **D43 表侧的守钉**：`internal/statemachine/table_test.go` **本腿未读**（不属 AC#0 射程）。若那里含"产码可达性"级别的断言，§2① 的"0 枚执行者"要与之对表。⚠ 我刻意不去动那枚文件的判语，因为表本身是冻结契约（D43）。
+4. **`nativeCards` 与 `Replies` 在常驻腿是不是同一枚账本**：静态读下来 `run.go:608 rt.liveCards = &nativeCards{h: s.cards}` 让 `rt.liveCards.h == ra.cards`，但这是**指针同一性的推断**，本腿没有仪器凭据（钉它属 AC#1 之后）。
+5. **干净机器上那枚 panel 句真会打印**：我只静态读到链条 `resident_windows.go:142 → panel_resident_windows.go:189 → panel_inbound.go:230-233 → internal/config/manager.go:102-104 → internal/config/loader.go:67-69（os.ReadFile 失败即返错）`。⇒ "缺 `config.toml` ⇒ 那一句必然出现在启动输出里"是**链条读**，不是实跑读。
+6. **票 244 J9（托盘「允许一次」）有无实现腿已落**：§1 第 10 行量的是起手 HEAD 的现状。若那格已在别的分支/工作树里落码而没进 `cmd`／`internal` 的我这一份读面，我的"不存在"要重判（本腿 `git status -- cmd internal` 为 0，看不到未提交的他腿产码）。
+7. **真机 Esc 占用形状**：`resident_approval_windows.go:454-458` 那支（借键被 Win32 拒）在本腿射程内只读到源码，没读运行时。
+8. **`248-r2` 那枚腿的门禁读数**：与本腿无关，也读不到（它的产物不在我读的树里）。
 
 ## 6. 我推翻／更正编排者哪一句
 
-见 §6 正文。要点：编排者给的两处现读**都还成立**（逐字复认），但**第一处的行号已漂 1 行**、**票面 AC#0 里"托盘「允许一次」"这一处今天不存在**（它是票 244 的射程，不是常驻腿的现状）。
+**复认（两处现读都还在，都是成立断言）**：
 
-## 末节（一句话，只报形状，不替编排者裁）
+- **read #1 成立，但区间起点偏一行**。票面 `§现量.1` 写的是 `cmd/wisp/resident_approval_windows.go:108-113`；现读 **`:109` 才是 `ra.gate = approval.New(approval.Options{`**，`:108` 是 `ra.ui = &ballCardUI{ra: ra}`，三枚字段在 `:110 UI`／`:111 Channels`／`:112 Logf`，闭括号在 `:113`。⇒ 断言内容（"只给 UI／Channels／Logf 三项，没有 `Grants`、没有超时、没有 L1 窗口"）**逐字成立**，尺＝`sed -n '109,113p' cmd/wisp/resident_approval_windows.go`。⚠ 既有账里 `docs/evidence/s1/248-settings-write-path-v1.md:163` 用的是 `:109-113`，与本腿一致（**内容引用**）。
+- **read #2 成立，且我把"由哪个条件决定"量全了**。句子逐字还在：`cmd/wisp/resident_windows.go:146` 的 `fmt.Printf("wisp: panel host unavailable (%v): the panel hot key and the tray item will be recorded, not executed\n", rpErr)`。**决定它的是 `:144` 的 `if rpErr != nil`**（不是 `panel.statusLine()`、也不是球窗那一枚），`rpErr` 来自 `:142` 的 `newResidentPanelManager(rt.Layout.DataDir)`，该函数**唯一**的非 nil error 出口是 `panel_resident_windows.go:189-192`（转 `:166 newResidentComposerDispatch` → `panel_inbound.go:228`，两枚 return：`:230-233` 配置未就绪、`:237-247` 权限档位不可用）。⇒ 顺带量到两枚下游（同一枚 nil `panel`）：boot 报告 `resident_windows.go:216` 打 `"this process has NO panel thread (the panel host never started)"`（`panel_resident_windows.go:494-496`）；热键／托盘那一按走 `resident_ball_windows.go:92-97` 的"**executor 回了 false**"支（warn ＋ "the panel thread took no request…"），**不是** `:89-91` 的 `recordBallGesture` 支——所以"recorded" 一词在这句里指的是 `:95` 那枚 `slog.Warn`，与票 33 之前"根本没有 executor"那种记录不是同一支。**这是对编排者那句读数的一次精化，不是推翻。**
 
-见文件末行。
+**推翻／具名不成立（三条）**：
+
+1. **票面 AC#0 的三处并列不成立**：`常驻卡片 UI／热键答复／托盘「允许一次」各一处` —— 第三处**今天不存在**（§1 第 10 行，尺：`internal/ball/tray_windows.go:86-91` 的四枚菜单项 ＋ `grep -rn "Allow" internal/ball/*.go \| grep -v _test.go` 零命中）。⇒ AC#0 能交的"现状逐处"只有两处，第三处只能是"待建，且它的归口在票 244 J9"。
+2. **票面 `§现量.2` 把"钳位在 `gate.go:139-145`"标成母票 `246-v2` 的行号、属待验**——本腿复认：**内容成立、行号是 `gate.go:137-145`**（`:137 win := o.Window`，`:139-140` 是 `win <= 0 → DefaultL1Window`，`:141-144` 是 `<Min`／`>Max` 两枚钳位）。常量三枚在 `internal/agent/approval/queue.go:116`（3s）／`:121`（2s）／`:122`（3s），`DefaultApprovalTimeout` 在 `:107`（300s）——**与票面写的 300s／3s／3s 一致**。
+3. **"ⓘ 那一支会不会破 `Confirming`"这一问，本腿把问题换了**：表的那一半**没有可破的东西**（§2①②：常驻腿不持有 Machine、球不查表、名字只吃 `p.Level`）；真有形状变化的是"**门在哪一刻存在**"（§2④：`resident_task_source_windows.go:224-231` 那一枚提前 return 让 `assembleRuntime` 在无交互控制台时永不被叫）。⇒ 编排者若按原问法裁"不破就可以挪"，会裁在一枚**没被那一问问到**的前置条件上。**本腿不替编排者补这一裁。**
+
+**顺带复认（未推翻）**：既有账里"`[risk]` 两项在产码里的读取点只有 `cmd/wisp/run.go:615-616`"这一格，本腿现读**逐字命中**（`:615 Window: time.Duration(cfg.Risk.L1WindowSec) * time.Second`、`:616 ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second`），且这两枚只在 `run.go:610` 的 else 支里（＝没注入门时才走到）。⚠ 性质＝**内容引用＋行号复认**，非本腿实跑。
+
+## 末节（一句话）
+
+**现读形状：表那一维不动也不破（不需要新增状态词、不需要碰 D43 转移表）；但"挪"会把那枚门的存在时刻从"进程启动即存在"改成"仅当这台机器上这发常驻进程有交互控制台、且装配根没先失败"——在无控制台那一支里 `Confirming` 不是变弱，是没有载体（`resident_task_source_windows.go:224-231` 挡住 `:265`）。**
+⇒ 三选一本腿报：**要动的不是转移表，是"装配次序 × 入口条件"那一格**；⛔ 本腿不裁ⓘ／ⓑ。
