@@ -69,7 +69,7 @@ func (s *staThread) start(create func(s *staThread) error) {
 	// the Go pool. Whoever the scheduler puts here next inherits whatever is
 	// still on it, so the unwinding is THIS function's duty, not the create
 	// step's and not the window's first user's (LIFO: this defer runs first).
-	defer s.releaseCOM() // TEMP pre-fix shape for the winlive baseline, reverted immediately
+	defer s.releaseThread()
 	// Remember who owns this thread: a caller already on it must run inline
 	// (see Ball.uiRun) - post-and-wait from inside the pump is a deadlock.
 	s.mu.Lock()

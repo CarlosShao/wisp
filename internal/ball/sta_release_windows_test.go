@@ -23,9 +23,13 @@ package ball
 // owner lets go of it.
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"log/slog"
 	"runtime"
+	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"unsafe"
@@ -336,6 +340,12 @@ func TestSTAReleaseAfterPumpExitDispatchesItsQueue(t *testing.T) {
 		pumpedAtRel int
 		atRelease   releaseReading
 		afterOwn    releaseReading
+		// releaseLogged is everything the production unwind said while it ran.
+		// It is the only way to see whether the release step reached for a handle
+		// the ball had already destroyed: staThread.hwnd is the owner's record, and
+		// by the time this goroutine can read it again releaseThread has already
+		// cleared it, so the record itself cannot show who forgot to.
+		releaseLogged string
 	}
 	type outcome struct {
 		panicked any
@@ -395,6 +405,13 @@ func TestSTAReleaseAfterPumpExitDispatchesItsQueue(t *testing.T) {
 				<-done
 			}()
 
+			// start() does not return until the pump has exited and its deferred
+			// releaseThread has run on this thread, so the handler installed here
+			// captures exactly the unwind this door produces. Error level only:
+			// this is about what the release step had to complain about.
+			releaseLog := &t33r8LockedWriter{}
+			previousLogger := slog.Default()
+			slog.SetDefault(slog.New(slog.NewTextHandler(releaseLog, &slog.HandlerOptions{Level: slog.LevelError})))
 			s.start(func(st *staThread) error {
 				h, err := t33r8OwnWindow(st)
 				if err != nil {
@@ -405,6 +422,8 @@ func TestSTAReleaseAfterPumpExitDispatchesItsQueue(t *testing.T) {
 				r.afterCreate = readThisThread()
 				return nil // production door: the pump now runs
 			})
+			slog.SetDefault(previousLogger)
+			r.releaseLogged = releaseLog.String()
 			r.createErr = s.waitStarted()
 			r.atRelease = readThisThread()
 			s.mu.Lock()
@@ -426,11 +445,11 @@ func TestSTAReleaseAfterPumpExitDispatchesItsQueue(t *testing.T) {
 		t.Fatalf("got %d runs, want 2 (kept-window door and close-shaped door)", len(o.runs))
 	}
 	for _, r := range o.runs {
-		t.Logf("33-r8 pump-exit door=%s: tid=%d hwnd=0x%X createErr=%v | after create: ball windows=%d all=%d classes=%s head=%s | AT RELEASE: ball windows=%d all=%d classes=%s head=%s staThread.hwnd=0x%X | plant PostMessage rc=%d | this file's own pump moved %d | after own teardown: ball windows=%d head=%s",
+		t.Logf("33-r8 pump-exit door=%s: tid=%d hwnd=0x%X createErr=%v | after create: ball windows=%d all=%d classes=%s head=%s | AT RELEASE: ball windows=%d all=%d classes=%s head=%s staThread.hwnd=0x%X | plant PostMessage rc=%d | this file's own pump moved %d | after own teardown: ball windows=%d head=%s | what the release unwind logged=%q",
 			r.door, r.atRelease.tid, uintptr(r.hwnd), r.createErr,
 			r.afterCreate.ballWins, r.afterCreate.allWins, r.afterCreate.classes, r.afterCreate.head,
 			r.atRelease.ballWins, r.atRelease.allWins, r.atRelease.classes, r.atRelease.head, r.staHwnd,
-			r.leftoverRc, r.pumpedAtRel, r.afterOwn.ballWins, r.afterOwn.head)
+			r.leftoverRc, r.pumpedAtRel, r.afterOwn.ballWins, r.afterOwn.head, r.releaseLogged)
 	}
 
 	for _, r := range o.runs {
@@ -452,9 +471,184 @@ func TestSTAReleaseAfterPumpExitDispatchesItsQueue(t *testing.T) {
 			t.Errorf("door=%s: the thread is about to go back to the Go pool with staThread.hwnd still holding 0x%X. That field is the owner's list of what it started: left set, the release step reaches for a handle this process no longer owns (Win32 may hand it to another thread's window in the meantime), and PostTask keeps posting messages to a window that has no pump any more. Fix: whoever destroys the window forgets it in the same step",
 				r.door, r.staHwnd)
 		}
+		// The record and the truth are read at the release door, and the release
+		// duty clears the record before anyone can look again. So the only way to
+		// catch a destroyer that did not forget is the complaint it leaves behind:
+		// releaseThread destroys what the record still names, and destroying a
+		// window somebody else already destroyed is an error it logs. Measured as a
+		// mutation (M3b, .scratch/wisp/probes/33/r8b/logs/mutation-M3b.txt): with
+		// that single forgetWindow() call skipped in Ball.Close, every other
+		// assertion in this file stayed green - the window really is gone, the queue
+		// really is empty, the record really ends up zero - so this one is what keeps
+		// ball_windows.go:964 from being load-bearing code nobody is watching.
+		if r.releaseLogged != "" {
+			t.Errorf("door=%s: the release unwind said something while unwinding (%q). On this door the window is supposed to already be destroyed AND forgotten, so the release step should have nothing to destroy and nothing to complain about; an error here means the owner's record still named a window this process had already lost",
+				r.door, r.releaseLogged)
+		}
 		if r.afterOwn.ballWins != 0 || r.afterOwn.head != "empty" {
 			t.Errorf("this case released OS thread %d with ball windows=%d and queue head=%s AFTER its own teardown (door=%s): a red run here would now poison whichever later test the scheduler puts on this thread",
 				r.afterOwn.tid, r.afterOwn.ballWins, r.afterOwn.head, r.door)
 		}
+	}
+}
+
+// t33r8LockedWriter is a bytes.Buffer a slog handler may write to from any
+// goroutine. The cap leg below swaps the process default logger for a capturing
+// one to read WHAT the production release pump says out loud when it gives up,
+// and -race must not turn that capture into a data race if anything else logs in
+// the same window.
+type t33r8LockedWriter struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (w *t33r8LockedWriter) Write(p []byte) (int, error) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.buf.Write(p)
+}
+
+func (w *t33r8LockedWriter) String() string {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.buf.String()
+}
+
+// t33r8PumpLeg is one trip through the production release pump on a thread this
+// test owns: plant N thread-addressed messages (no window involved at all), run
+// releaseOwnQueueToQuiet once, and record what it returned, what the queue still
+// reports, and what the pump logged. Everything is read on the owner thread,
+// because PeekMessage only ever examines the calling thread's queue.
+type t33r8PumpLeg struct {
+	tid       uint32
+	posted    int
+	postErr   string
+	pumped    int
+	headAfter string
+	logged    string
+	ballWins  int
+	allWins   int
+	classes   string
+	drained   int
+	headFinal string
+	panicked  any
+}
+
+// t33r8RunPumpLeg runs one leg on a thread it locks for the purpose.
+//
+// This file's own hygiene duty is the 86th-rule shape: a leg that measures a
+// non-empty queue must not then BE the thing that hands that queue to the Go
+// pool, so the remainder is drained here and headFinal is the reading that
+// proves the thread went back clean.
+func t33r8RunPumpLeg(plant int) t33r8PumpLeg {
+	res := make(chan t33r8PumpLeg, 1)
+	go func() {
+		// owner: this leg's goroutine. It locks its thread, plants, calls the
+		// production pump once, reads the queue it left, drains the remainder
+		// and recovers below so a panic reaches the report, not the binary.
+		var o t33r8PumpLeg
+		defer func() {
+			o.panicked = recover()
+			res <- o
+		}()
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+
+		o.tid = uint32(windows.GetCurrentThreadId())
+		var postErr error
+		for i := 0; i < plant; i++ {
+			r, _, e := t33r8PostThreadMessage.Call(uintptr(o.tid), t33r8WmLeftover+1, 0, 0)
+			if r == 0 {
+				postErr = fmt.Errorf("PostThreadMessageW at plant %d: %w", i, e)
+				break
+			}
+			o.posted++
+		}
+		o.postErr = fmt.Sprint(postErr)
+
+		w := &t33r8LockedWriter{}
+		old := slog.Default()
+		slog.SetDefault(slog.New(slog.NewTextHandler(w, &slog.HandlerOptions{Level: slog.LevelWarn})))
+		o.pumped = releaseOwnQueueToQuiet()
+		o.logged = w.String()
+		slog.SetDefault(old)
+
+		o.headAfter = queueHead()
+		o.drained = pumpThisThreadToQuiet(4 * t33r8PumpCap)
+		o.headFinal = queueHead()
+		o.ballWins, o.allWins, o.classes = threadWindowTally(o.tid)
+	}()
+	return <-res
+}
+
+// TestReleasePumpCapIsALoudReadingNotAGreen is the third door 33-r8b had to open:
+// releasePumpCap exists so that a release pump which cannot reach an empty queue
+// says so instead of pretending. "Says so" has to be MEASURED, because the two
+// ways it could silently be a green are both one-character bugs away: return the
+// count and let the caller read it as success, or exit the loop as if the queue
+// were drained. Both legs below run on thread-addressed messages only, so this
+// case creates no window at all.
+//
+// Leg 1 (over the cap) asserts the loud reading: the pump returns EXACTLY
+// releasePumpCap - never more, so it cannot be claiming to have finished - the
+// queue it leaves still REPORTS a message, and the warning naming the cap is on
+// the record. Leg 2 (under the cap) is the control that keeps leg 1 from being a
+// ruler that always answers "cap": the same production function, planted below
+// the cap, must report a smaller count and an empty queue and must log nothing.
+func TestReleasePumpCapIsALoudReadingNotAGreen(t *testing.T) {
+	over := t33r8RunPumpLeg(releasePumpCap + 64)
+	under := t33r8RunPumpLeg(8)
+
+	t.Logf("33-r8b cap leg (planted %d, want pump to stop at the cap): tid=%d posted=%d postErr=%s pumped=%d head-after=%q windows(ball/all)=%d/%d classes=%s | own drain moved %d, head-final=%q | logged=%q",
+		releasePumpCap+64, over.tid, over.posted, over.postErr, over.pumped, over.headAfter,
+		over.ballWins, over.allWins, over.classes, over.drained, over.headFinal, over.logged)
+	t.Logf("33-r8b control leg (planted 8, under the cap): tid=%d posted=%d postErr=%s pumped=%d head-after=%q windows(ball/all)=%d/%d classes=%s | own drain moved %d, head-final=%q | logged=%q",
+		under.tid, under.posted, under.postErr, under.pumped, under.headAfter,
+		under.ballWins, under.allWins, under.classes, under.drained, under.headFinal, under.logged)
+
+	for _, leg := range []struct {
+		name string
+		o    t33r8PumpLeg
+	}{{"cap leg", over}, {"control leg", under}} {
+		if leg.o.panicked != nil {
+			t.Fatalf("%s: the leg goroutine panicked: %v", leg.name, leg.o.panicked)
+		}
+		if leg.o.headFinal != "empty" {
+			t.Errorf("%s: this case is about to hand OS thread %d back to the Go pool with queue head=%q after its own drain - the very order-dependent poison this file exists to prevent, now contributed by the measuring leg itself (drain moved %d)",
+				leg.name, leg.o.tid, leg.o.headFinal, leg.o.drained)
+		}
+		if leg.o.ballWins != 0 {
+			t.Errorf("%s: OS thread %d goes back owning %d live %s window(s) (classes=%s); this leg promised to plant no window at all",
+				leg.name, leg.o.tid, leg.o.ballWins, t33r8BallClass, leg.o.classes)
+		}
+	}
+
+	if over.posted != releasePumpCap+64 {
+		t.Fatalf("cap leg planted %d of %d messages (%s), so it cannot tell a pump that stopped at the cap from one that ran out of plants",
+			over.posted, releasePumpCap+64, over.postErr)
+	}
+	if over.pumped != releasePumpCap {
+		t.Errorf("cap leg: releaseOwnQueueToQuiet returned %d with %d messages queued and releasePumpCap=%d. Anything but exactly the cap means the pump is reporting a queue state it did not reach: less than the cap says it stopped early, more is impossible in this shape",
+			over.pumped, over.posted, releasePumpCap)
+	}
+	if over.headAfter == "empty" {
+		t.Errorf("cap leg: the queue reports EMPTY after the pump stopped at the cap with %d planted and %d moved - the instrument that reads the queue is then blind to a non-empty thread, and every door assertion in this file that asks for head==empty would pass on a dirty thread (head-after=%q)",
+			over.posted, over.pumped, over.headAfter)
+	}
+	if !strings.Contains(over.logged, "hit its cap") || !strings.Contains(over.logged, fmt.Sprintf("cap=%d", releasePumpCap)) {
+		t.Errorf("cap leg: giving up on a still-non-empty queue is only a loud reading if it is said out loud. Captured warn-level output was %q; it must contain the cap sentence and its cap=%d attribute, otherwise the return value is the only clue and every caller that ignores it turns this into a silent green",
+			over.logged, releasePumpCap)
+	}
+
+	if under.posted != 8 {
+		t.Fatalf("control leg planted %d of 8 messages (%s), so the control cannot calibrate the cap leg",
+			under.posted, under.postErr)
+	}
+	if under.pumped != 8 || under.headAfter != "empty" {
+		t.Errorf("control leg: the same production function, planted under the cap, must count what it moved and report a quiet queue; it returned pumped=%d head-after=%q. If this is red the cap leg proves nothing, because a pump that always answers %q would also 'pass' it",
+			under.pumped, under.headAfter, fmt.Sprintf("%d", releasePumpCap))
+	}
+	if under.logged != "" {
+		t.Errorf("control leg: a pump that reached an empty queue must not warn; it logged %q. A warning on a clean drain makes the cap leg's warning assertion unfalsifiable", under.logged)
 	}
 }
