@@ -957,6 +957,11 @@ func (b *Ball) Close() {
 					"hwnd", uintptr(b.hwnd), "err", err)
 			}
 			b.hwnd = 0
+			// The STA's own record goes with it. staThread.hwnd is what the
+			// thread owner destroys on its way out of start(); if Close left a
+			// handle in there, the release step would be looking at a window this
+			// process no longer owns (and PostTask would keep posting to it).
+			b.sta.forgetWindow()
 		}
 		activeBall.CompareAndSwap(b, nil)
 		b.sta.quit()
