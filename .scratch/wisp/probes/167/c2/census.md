@@ -108,7 +108,37 @@ dev
 
 ## 3. 问三：停止按钮（入向停口现在有几个、各缺哪一跳）
 
-（骨架占位——待填。）
+> 票面原话点名 `requestTaskStop`／`RequestWorkspaceSwitch` 那族"带判据零调用方"的入向。**本程现量：`requestTaskStop` 在本仓任何根（cmd internal tools docs scripts）＝0 命中**（尺：`grep -rn "requestTaskStop" cmd internal tools docs scripts`）——那是票面写作参考的外部项目符号，本仓没有对应物。本仓同族（"处理函数写好了、生产调用者零枚"）的入向停口/请求口，本程枚到 **4 枚**，逐一列下。
+
+### 3.1 名册：4 枚"已写好、零生产调用方"的入向/停口
+
+| # | 口 | 真源 | 生产调用者 | file:line |
+|---|---|---|---|---|
+| 1 | `Loop.Steer(text)`（忙时插话，非停但同族"写好了没人调"） | 已存在 | **0 枚** | `internal/agent/loop.go:275-283` |
+| 2 | `RunningTask.Cancel()`（异步任务的取消口） | 已存在 | **0 枚**（cmd/wisp 全树 `grep "\.Cancel()"` 只命中 observe/root 侧，无 RunningTask） | `internal/agent/loop.go:300` |
+| 3 | `RequestWorkspaceSwitch`（工作区切换请求） | 已存在 | **0 枚产码**——2 枚全在测试（`cmd/wisp/panel_pump_test.go:357`、`cmd/wisp/instructions_200r2_test.go:124`）；它前面的 socket `ComposerDispatch.Workspace` 在产码装配里**写死 nil** | `internal/panel/workspace.go:76`；socket=`internal/panel/composer_dispatch.go:76-78`；nil 装配=`cmd/wisp/panel_inbound.go:275` |
+| 4 | `Options.Control ControlHandler`（宿主控制词执行体） | 已存在 | **0 枚产码赋值**（尺：`grep -rn "Control:\s" cmd internal tools --include=*.go` ⇒ 只命中 `internal/llm/anthropic/request.go` 的 CacheControl，无关） | `internal/agent/loop.go:158` |
+
+### 3.2 今天真正能"按停"的两枚，都不在面板上
+
+1. **Esc 快捷键否决卡**：`cmd/wisp/resident_approval_windows.go:171-184` `vetoByEsc()`——**只否决正在等人的那张卡**（`ra.cards.AwaitingHuman()` 为假时答"按下的取消键没有可否决的确认项"，`:177`）；注入点 `cmd/wisp/resident_windows.go:163`。⚠ **它停的是审批卡，不是正在跑的任务**。
+2. **退出序列第 3 步**：`cmd/wisp/resident_approval_windows.go:283` `cancelTaskRoots`，注册于 `cmd/wisp/resident_windows.go:186`——那是关机，不是用户按停。
+3. 模型侧 `task.cancel`（`internal/tools/task.go:625`）是 C4 工具不是面板入向，且**根任务从不 `AttachCancel`**（产码唯一调用者＝孩子侧 `internal/tools/subagent_197.go:346`）；对根 id 调 `TaskRoster.Cancel` 走 `internal/tools/task.go:458-459` 答"没有可停的句柄"。
+
+### 3.3 面板按钮缺哪几跳（逐枚口各缺的跳）
+
+**共同缺的上半截（面板→Go）**：入向名册 6 枚（`internal/panel/bridge.go:42-45` 四枚 `panel.*`＋`:66-67` 两枚 config），**无一枚与停止有关**；`knownComposerMethod` 的 case（`bridge.go:146-152`）与派发表（`internal/panel/composer_dispatch.go:175-210`）都没有停的字。新增入向方法＝C17 契约面，HANDOVER `:464` 逐字裁定"停手上报，不许自己加"——本腿不选形，只把成本量清（§4）。
+
+**枚 1（Steer）**：缺①调用者（谁在忙时把用户的话送进来——这先要面板有 message 通路，而 `ComposerDispatch.Message` socket 产码也写死 nil，`cmd/wisp/panel_inbound.go:277`）；且 Steer 只插话不停任务，**与停止按钮不是同一枚出口**。
+**枚 2（RunningTask.Cancel）**：缺两跳——①没有人握着 `*RunningTask`：`bg` 是 `cmd/wisp/run.go:1099` `execute()` 局部变量，任务结束后不可达，`agentRuntime`（`run.go:266-377`）无字段存它；②没有入向方法把它递进面板链。
+**枚 3（RequestWorkspaceSwitch）**：只缺一跳——`ComposerDispatch.Workspace` 处理器（interface `composer_dispatch.go:76-78` 已声明，native leg `workspace.go:76` 已写好）；在 `newComposerDispatchChain`（`cmd/wisp/panel_inbound.go:271-281`）里把 nil 换成真处理器即通。**这是四枚里唯一"下一跳已具名到函数"的**。但它接的是工作区切换，不是停止。
+**枚 4（Options.Control）**：缺①装配根一行赋值（`defaultControl`（`loop.go:524-537`）已能对 `l.current` 做 stop/cancel，宿主执行体是可选增强）；②入口：`MatchControl` 唯一产码调用点在 `internal/agent/loop.go:341` `run()` 开头，控制词必须以**新任务输入**的形态到达，而常驻腿忙时拒绝第二发（`resident_task_source_windows.go:411-414`）⇒ **正忙时控制词到不了 loop**，这正是票面 AC#4"停止必须正忙时可达"的机制性障碍。
+**根任务停的句柄**：`TaskRoster.AttachCancel`（`internal/tools/task.go:420`）存在，但根任务从未挂（`cmd/wisp/run.go:1099-1105` 只 `RunAsync`+`MarkRoot`，没 `AttachCancel(bg.ID, …)`）。给根挂＝在 `cmd/wisp/run.go` 装配处补一行（`bg.Root().Cancel` 或闭包），不动 `internal/tools` 一字——这是"让名册知道根可停"的最小一跳，但它是**出向能力**，离"面板按钮"仍隔整个入向契约面。
+
+### 3.4 判据钉（现量）
+
+- 正向钉（退出支，非用户按停）：`cmd/wisp/resident_task_source_246_windows_test.go:183`、`cmd/wisp/resident_task_source_live_246_windows_test.go:238`（读到定义为止，未跑）。
+- 票面 AC#4 要的"正忙时可到达"与"停止后不留还在写的尾巴"：**无钉**（尺：`grep -in "stop" internal/panel/*_test.go cmd/wisp/panel*_test.go` 零命中）。
 
 ## 4. 最小改动面（不选形）
 
