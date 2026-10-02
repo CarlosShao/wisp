@@ -89,10 +89,32 @@ func ensureFirstRunConfig(dataDir string, stderr io.Writer) (bool, error) {
 	// + 本轮仍缺什么）。它刻意 NOT 复用 cause=missing 那一句（config_reload.go
 	// :317-320 是热加载"缺文件"分支的台词，说的是"继续用内存里的旧配置"，而首
 	// 建场景根本没有旧配置；票 223 的名册钉着四句归因互斥，198-a1 §4-N9）。
-	// "去哪儿补 key" 那一跳是 AC#4，归 198-r2，本腿不顺手做。
 	fmt.Fprintf(stderr,
 		"wisp run: 已在 %s 新建默认配置：全部取值来自内置默认表（schema 的 default 标签），"+
 			"未替你选任何模型；[llm] 的模型与 api_key_ref 仍缺，本轮仍按未配置失败退码\n",
 		cfgPath)
+	// AC#4（票面"去哪儿补"，198-r2）：下面两句只写用户今天真走得通的那条路，
+	// 逐枚现读得来，不写票面原话那句"再补一行配置"：
+	//   - key 的录入者是 cmdSecret 的 set 支（secret.go:333-387 runSet）：明文只
+	//     经隐藏输入或 --from-stdin 进 internal/secret 的 DPAPI 存储
+	//     （store.go:64-83 Store），命令回显一行 api_key_ref = "dpapi:<blob 名>"
+	//     （secret.go:380）。config.toml 里根本没有承载明文的字段
+	//     （schema.go:384-387，D36 rule 5：只许 dpapi:/env: 引用），所以手改文件
+	//     补的是那个 *名字*、不是 key 本身；env: 那一支的值由系统环境提供
+	//     （store.go:95-103 Resolve，没有明文兜底）。
+	//   - 模型目录没有任何 CLI 写入者：cmdProviders 的 discover/probe 先 LoadFile
+	//     才动作（providers.go:99-103、:118-133 目录里没有该 provider 就退），
+	//     wisp models 是 C29 的本地签名模型库（models.go:60-74），不是 LLM 目录。
+	//     所以模型这一格今天只有改这份文件一条路，文案就照实说。
+	// 两句里只许出现命令名、字段名、占位名，绝不出现任何凭据值（C28；票 63 的
+	// argv/日志两把尺对同一个边界已在别处钉着）。
+	fmt.Fprint(stderr,
+		"wisp run: 缺的两样各有各的入口。key：先跑 wisp secret set <blob 名>（隐藏输入，"+
+			"不进 argv 也不进日志，也可以 --from-stdin 从管道喂），它把明文交给 DPAPI 存储，"+
+			"并回显一行 api_key_ref = \"dpapi:<blob 名>\"；这份文件里没有写明文 key 的字段，"+
+			"要补的是那个名字。不想用 DPAPI 就把 api_key_ref 写成 env:<环境变量名>，值由系统环境提供。\n"+
+			"wisp run: 模型：在同一份文件的 [llm.providers.<名>] 里补 api_key_ref、base_url 与 models.<id>"+
+			"（名字对上内置预设的，protocol 与 base_url 可以留空），再在 [llm] 的 text_chain 或 roles.chat "+
+			"里点名 provider/model；wisp providers discover 与 probe 读这份文件去问真实端点，不替你写。\n")
 	return true, nil
 }
