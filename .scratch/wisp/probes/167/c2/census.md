@@ -77,7 +77,34 @@ dev
 
 ## 2. 问二：排队序号（"第几项"这个数能不能拿到面板）
 
-（骨架占位——待填。）
+> G3 警告逐字有效：**不许建议加 Loop 方法**。本节只量"现有什么缝可用"；`Loop` 的导出方法面一枚不碰。真正的序号真源也不在 `Loop` 上，在 `approval.Queue` 上——下面逐枚量。
+
+### 2.1 "第几项"这个数：真源在、已在产码被填、最后一跳被丢
+
+| 层 | 现量 | file:line |
+|---|---|---|
+| **真源①：每卡序号** | `position(it)`＝1-based FIFO 位次，`LiveApprovals()` 逐行填进 `LiveApproval.Position`（字段声明 `:49`，填充 `:118`）。**这是产码非测试路径** | `internal/agent/approval/queue.go:268-275`；`internal/agent/approval/pending_read.go:104-122` |
+| **真源②：队列深度** | `Queue.Depth()`＝`len(q.pending)`，导出；产码调用者 1 枚（`cmd/wisp/approval_reply.go:377` 的 CLI 提示行）。pump 侧**没接**（`cmd/wisp/run.go:699-726` 装配无 Depth 槽） | `internal/agent/approval/queue.go:133-137` |
+| **真源③：卡上深度** | `Prompt.Depth`＝`g.q.Depth()`（gate 举卡时填）；`PanelItem.Depth`＝`q.position(it)`（`viewLocked` 里 `:531`）。**`PanelItem` 一枚都不进 Snapshot**——A551 已核（平行路），唯一生产消费者是 console 的 `head/view`（`cmd/wisp/approval_reply.go:375/:384`） | `internal/agent/approval/gate.go:529`；`internal/agent/approval/queue.go:524-533` |
+| **载体** | `NativeVerdict`（pump 读队列的载体）字段名册＝`CorrelationID/Tool/Args/CallChain/Level/RulesHit/Reason/SessionOverrideBlocked`——**没有 Position**（`sed -n 77,91p` 现量） | `internal/panel/pump.go:77-91` |
+| **断点** | `liveVerdicts()` 逐字段抄 `it.Decision`/`it.Corr`，**`it.Position` 一个字节没抄**。因为载体没那枚字段 | `cmd/wisp/panel_pump.go:58-76` |
+| **卡面** | `ApprovalCardView` 也没有 position 键（字段册＝correlationId/tool/args/level/rulesHit/reason/reasonKnown/sessionOverrideBlocked/callChain/decidedBy，`internal/panel/approval.go:39-59`） | `internal/panel/approval.go:39-59` |
+
+**结论**：`LiveApproval.Position` 就是"第几项"，真源在产码、非测试形状；从真源到面板断在两处——`NativeVerdict` 无字段（`pump.go:77`）＋`liveVerdicts()` 未抄（`panel_pump.go:65-73`）。这与 167-a1 §1.2② 判读一致（本程逐行复核无误）。
+
+### 2.2 用户消息队列（"我发的第几条"）：明写拒绝，不是漏
+
+- 常驻腿单槽规则：`cmd/wisp/resident_task_source_windows.go:411-414` `if src.running { … return errors.New("本进程此刻已有一发任务在跑：常驻腿一次只接一发，等它结束再提交") }`；理由逐字在 `:396-400`（"a queue of tasks in a leg that cannot show a page would be a queue nobody can read"）。
+- 环内插话通道 `Loop.Steer()`（`internal/agent/loop.go:275-283`）**调用者＝0 枚**（尺：`grep -rn "Steer" cmd internal tools --include=*.go` 只命中定义、`SteeringEnabled` 配置行与测试；本程复认）。⚠ 提醒：`Steer` 不是 `Loop` 的新增方法——它已存在，问题是零调用。
+- 序号旁证：`cmd/wisp/resident_task_source_windows.go:159` `src.seq`（`:416-417` 自增），只进 goroutine 名与审计行（`:422/:425/:437`），不外递。
+- **判定**：用户消息队列＝**盘上没有**（是决定不是缺口），推翻它属产品裁定，本腿不选形。
+
+### 2.3 现有可用的缝（不加 Loop 方法、不加新依赖边）
+
+1. `rt.gate.Queue()` 已是 cmd/wisp 产码既有的读法（`cmd/wisp/panel_pump.go:62` `rt.gate.Queue().LiveApprovals()`、`cmd/wisp/approval_reply.go:377` `s.gate.Queue().Depth()`）——**队列深度 reader 不需要任何新口**，`Depth()` 是现成导出方法，在 cmd/wisp 侧直接可调。
+2. 每卡 `Position` 已随 `LiveApprovals()` 的返回值递到 `panel_pump.go:64` 的 `it` 手里——**抄一行就到**，前提是载体给字段（载体改动见 §4）。
+3. `PumpSources` 加一枚 reader 槽是既有形状（`internal/panel/pump.go:121-188` 12 槽先例；`cmd/wisp/run.go:699-726` 已在填 9 枚）。
+4. ⛔ G3 红线复核：`.scratch/wisp/probes/154/gate-clauses.sh:363-367` G3 腿的尺是 `^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID`（`internal/agent`，want quiet want_n 0）——本腿三枚接线的任何形状都**不落在 internal/agent**，G3 不涉；但任何未来"给 Loop 加收 taskID 导出方法"的形状都先停手上报（HANDOVER 18:5x 裁定在册）。
 
 ## 3. 问三：停止按钮（入向停口现在有几个、各缺哪一跳）
 
