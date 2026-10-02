@@ -1,0 +1,74 @@
+lint | 1 | Set up job | success
+lint | 2 | Run actions/checkout@v4 | success
+lint | 3 | Run actions/setup-go@v5 | success
+lint | 4 | D22 scanner positive control (tools/d22scan tests, seeded red) | success
+lint | 5 | D22 scanner self-test (ticket 161 AC#2 - every ban, both directions) | success
+lint | 6 | D22 seven-ban + emoji scan (tools/d22scan) | success
+lint | 7 | gofmt (gofumpt) | failure
+lint | 8 | gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A) | skipped
+lint | 9 | go vet (module) | skipped
+lint | 10 | go vet (tools/d22scan module) | skipped
+lint | 11 | staticcheck | failure
+lint | 12 | mockllm module vet | success
+lint | 23 | Post Run actions/setup-go@v5 | skipped
+lint | 24 | Post Run actions/checkout@v4 | success
+lint | 25 | Complete job | success
+slo-full | 1 | Set up job | success
+slo-full | 2 | Run actions/checkout@v4 | success
+slo-full | 3 | Run actions/setup-go@v5 | success
+slo-full | 4 | Build wisp.exe (deps cached on the runner) | success
+slo-full | 5 | SLO full gate (six states + settle + leak) | success
+slo-full | 6 | Upload SLO report | success
+slo-full | 11 | Post Run actions/setup-go@v5 | success
+slo-full | 12 | Post Run actions/checkout@v4 | success
+slo-full | 13 | Complete job | success
+test-windows | 1 | Set up job | success
+test-windows | 2 | Run actions/checkout@v4 | success
+test-windows | 3 | Run actions/setup-go@v5 | success
+test-windows | 4 | Windows ACL sealing gate (internal/winsec's own tests, ticket 110) | success
+test-windows | 5 | Cache third_party (deps.toml key) | success
+test-windows | 6 | cgo build smoke (build.ps1 fetch-deps + mingw link + doctor) | success
+test-windows | 7 | cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4) | failure
+test-windows | 8 | Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord) | failure
+test-windows | 9 | PathResolver junction placeholder (real cases tickets 18/20) | success
+test-windows | 16 | Post Cache third_party (deps.toml key) | skipped
+test-windows | 17 | Post Run actions/setup-go@v5 | skipped
+test-windows | 18 | Post Run actions/checkout@v4 | success
+test-windows | 19 | Complete job | success
+lint-frontend | 1 | Set up job | success
+lint-frontend | 2 | Run actions/checkout@v4 | success
+lint-frontend | 3 | Run actions/setup-node@v4 | success
+lint-frontend | 4 | npm ci (lockfile is the only source of deps) | success
+lint-frontend | 5 | typecheck (tsc -b, noEmit per tsconfig.*.json) | success
+lint-frontend | 6 | lint (oxlint) | success
+lint-frontend | 7 | token drift guard (generated theme must equal the C21 table) | success
+lint-frontend | 8 | build (vite build -> frontend/dist, the bytes go:embed carries) | success
+lint-frontend | 9 | L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence) | success
+lint-frontend | 10 | Composer states paint the real envelope (render evidence) | success
+lint-frontend | 11 | Streaming output honours PLAN.md's SSE row (render evidence) | success
+lint-frontend | 12 | Nav rail names only icons PLAN.md's frozen list carries (render evidence) | success
+lint-frontend | 23 | Post Run actions/setup-node@v4 | success
+lint-frontend | 24 | Post Run actions/checkout@v4 | success
+lint-frontend | 25 | Complete job | success
+test-core | 1 | Set up job | success
+test-core | 2 | Run actions/checkout@v4 | success
+test-core | 3 | Run actions/setup-go@v5 | success
+test-core | 4 | Start compose test services (mock-llm on 18080) | success
+test-core | 5 | Probe mock-llm | success
+test-core | 6 | Environment fork assertion (WISP_ENV=test data dir) | success
+test-core | 7 | Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh) | failure
+test-core | 8 | Stop compose services | success
+test-core | 15 | Post Run actions/setup-go@v5 | skipped
+test-core | 16 | Post Run actions/checkout@v4 | success
+test-core | 17 | Complete job | success
+slo-smoke | 1 | Set up job | success
+slo-smoke | 2 | Run actions/checkout@v4 | success
+slo-smoke | 3 | Run actions/setup-go@v5 | success
+slo-smoke | 4 | Cache third_party (deps.toml key) | success
+slo-smoke | 5 | Build wisp.exe | success
+slo-smoke | 6 | SLO smoke gate | success
+slo-smoke | 7 | Upload SLO report | success
+slo-smoke | 12 | Post Cache third_party (deps.toml key) | success
+slo-smoke | 13 | Post Run actions/setup-go@v5 | success
+slo-smoke | 14 | Post Run actions/checkout@v4 | success
+slo-smoke | 15 | Complete job | success

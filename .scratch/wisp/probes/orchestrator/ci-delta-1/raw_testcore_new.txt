@@ -1,0 +1,373 @@
+﻿2026-10-01T16:03:38.6510528Z Current runner version: '2.337.0'
+2026-10-01T16:03:38.6543911Z ##[group]Runner Image Provisioner
+2026-10-01T16:03:38.6545165Z Hosted Compute Agent
+2026-10-01T16:03:38.6546139Z Version: 20260901.588
+2026-10-01T16:03:38.6547290Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-01T16:03:38.6548526Z Build Date: 2026-09-01T19:56:44Z
+2026-10-01T16:03:38.6550118Z Worker ID: {69787d8a-14ca-4965-99e9-44691501f62a}
+2026-10-01T16:03:38.6551308Z Azure Region: eastus
+2026-10-01T16:03:38.6552234Z ##[endgroup]
+2026-10-01T16:03:38.6554520Z ##[group]Operating System
+2026-10-01T16:03:38.6555535Z Ubuntu
+2026-10-01T16:03:38.6556583Z 24.04.5
+2026-10-01T16:03:38.6557428Z LTS
+2026-10-01T16:03:38.6558240Z ##[endgroup]
+2026-10-01T16:03:38.6559290Z ##[group]Runner Image
+2026-10-01T16:03:38.6560639Z Image: ubuntu-24.04
+2026-10-01T16:03:38.6561673Z Version: 20260927.320.1
+2026-10-01T16:03:38.6563696Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-01T16:03:38.6566529Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-01T16:03:38.6568149Z ##[endgroup]
+2026-10-01T16:03:38.6570536Z ##[group]GITHUB_TOKEN Permissions
+2026-10-01T16:03:38.6573226Z Contents: read
+2026-10-01T16:03:38.6574209Z Metadata: read
+2026-10-01T16:03:38.6575078Z Packages: read
+2026-10-01T16:03:38.6576104Z ##[endgroup]
+2026-10-01T16:03:38.6579016Z Secret source: Actions
+2026-10-01T16:03:38.6581011Z Cache mode: write
+2026-10-01T16:03:38.6582129Z Prepare workflow directory
+2026-10-01T16:03:38.7138294Z Prepare all required actions
+2026-10-01T16:03:38.7210052Z Getting action download info
+2026-10-01T16:03:38.9617242Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-01T16:03:39.0840025Z Download action repository 'actions/setup-go@v5' (SHA:40f1582b2485089dde7abd97c1529aa768e1baff)
+2026-10-01T16:03:39.3777252Z Complete job name: test-core
+2026-10-01T16:03:39.4598582Z ##[group]Run actions/checkout@v4
+2026-10-01T16:03:39.4599716Z with:
+2026-10-01T16:03:39.4600241Z   repository: CarlosShao/wisp
+2026-10-01T16:03:39.4604492Z   token: ***
+2026-10-01T16:03:39.4604993Z   ssh-strict: true
+2026-10-01T16:03:39.4605442Z   ssh-user: git
+2026-10-01T16:03:39.4605907Z   persist-credentials: true
+2026-10-01T16:03:39.4606408Z   clean: true
+2026-10-01T16:03:39.4606859Z   sparse-checkout-cone-mode: true
+2026-10-01T16:03:39.4607395Z   fetch-depth: 1
+2026-10-01T16:03:39.4607829Z   fetch-tags: false
+2026-10-01T16:03:39.4608279Z   show-progress: true
+2026-10-01T16:03:39.4608727Z   lfs: false
+2026-10-01T16:03:39.4609153Z   submodules: false
+2026-10-01T16:03:39.4609815Z   set-safe-directory: true
+2026-10-01T16:03:39.4610342Z   allow-unsafe-pr-checkout: false
+2026-10-01T16:03:39.4611126Z env:
+2026-10-01T16:03:39.4611546Z   WISP_ENV: test
+2026-10-01T16:03:39.4611981Z ##[endgroup]
+2026-10-01T16:03:39.5633333Z Syncing repository: CarlosShao/wisp
+2026-10-01T16:03:39.5636231Z ##[group]Getting Git version info
+2026-10-01T16:03:39.5637369Z Working directory is '/home/runner/work/wisp/wisp'
+2026-10-01T16:03:39.5639187Z [command]/usr/bin/git version
+2026-10-01T16:03:39.5710718Z git version 2.55.0
+2026-10-01T16:03:39.5772702Z ##[endgroup]
+2026-10-01T16:03:39.5791147Z Temporarily overriding HOME='/home/runner/work/_temp/a04bed0f-1a18-4b37-953c-d9c677eb5f74' before making global git config changes
+2026-10-01T16:03:39.5793631Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-01T16:03:39.5798111Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+2026-10-01T16:03:39.5854726Z Deleting the contents of '/home/runner/work/wisp/wisp'
+2026-10-01T16:03:39.5858498Z ##[group]Initializing the repository
+2026-10-01T16:03:39.5862710Z [command]/usr/bin/git init /home/runner/work/wisp/wisp
+2026-10-01T16:03:39.5964308Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-01T16:03:39.5966338Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-01T16:03:39.5967815Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-01T16:03:39.5969249Z hint: call:
+2026-10-01T16:03:39.5970250Z hint:
+2026-10-01T16:03:39.5971243Z hint: 	git config --global init.defaultBranch <name>
+2026-10-01T16:03:39.5972414Z hint:
+2026-10-01T16:03:39.5973565Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-01T16:03:39.5975301Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-01T16:03:39.5976685Z hint:
+2026-10-01T16:03:39.5977435Z hint: 	git branch -m <name>
+2026-10-01T16:03:39.5978265Z hint:
+2026-10-01T16:03:39.5979420Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-01T16:03:39.5981507Z Initialized empty Git repository in /home/runner/work/wisp/wisp/.git/
+2026-10-01T16:03:39.6001482Z [command]/usr/bin/git remote add origin https://github.com/CarlosShao/wisp
+2026-10-01T16:03:39.6031875Z ##[endgroup]
+2026-10-01T16:03:39.6033644Z ##[group]Disabling automatic garbage collection
+2026-10-01T16:03:39.6037758Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-01T16:03:39.6074692Z ##[endgroup]
+2026-10-01T16:03:39.6075426Z ##[group]Setting up auth
+2026-10-01T16:03:39.6092086Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-01T16:03:39.6149786Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-01T16:03:39.6580176Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-01T16:03:39.6632230Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-01T16:03:39.6886705Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-01T16:03:39.6932336Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-01T16:03:39.7184208Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-01T16:03:39.7225330Z ##[endgroup]
+2026-10-01T16:03:39.7226264Z ##[group]Fetching the repository
+2026-10-01T16:03:39.7237479Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8ae4c23e2ab4e1bda87ba6d280430db75527670b:refs/remotes/origin/dev
+2026-10-01T16:03:41.3073314Z From https://github.com/CarlosShao/wisp
+2026-10-01T16:03:41.3074683Z  * [new ref]         8ae4c23e2ab4e1bda87ba6d280430db75527670b -> origin/dev
+2026-10-01T16:03:41.3078576Z ##[endgroup]
+2026-10-01T16:03:41.3080338Z ##[group]Determining the checkout info
+2026-10-01T16:03:41.3081876Z ##[endgroup]
+2026-10-01T16:03:41.3083524Z [command]/usr/bin/git sparse-checkout disable
+2026-10-01T16:03:41.3136126Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-01T16:03:41.3168766Z ##[group]Checking out the ref
+2026-10-01T16:03:41.3173100Z [command]/usr/bin/git checkout --progress --force -B dev refs/remotes/origin/dev
+2026-10-01T16:03:41.7066286Z Switched to a new branch 'dev'
+2026-10-01T16:03:41.7070554Z branch 'dev' set up to track 'origin/dev'.
+2026-10-01T16:03:41.7090979Z ##[endgroup]
+2026-10-01T16:03:41.7137066Z [command]/usr/bin/git log -1 --format=%H
+2026-10-01T16:03:41.7164930Z 8ae4c23e2ab4e1bda87ba6d280430db75527670b
+2026-10-01T16:03:41.7531056Z ##[group]Run actions/setup-go@v5
+2026-10-01T16:03:41.7532539Z with:
+2026-10-01T16:03:41.7533692Z   go-version-file: go.mod
+2026-10-01T16:03:41.7535013Z   check-latest: false
+2026-10-01T16:03:41.7546756Z   token: ***
+2026-10-01T16:03:41.7547930Z   cache: true
+2026-10-01T16:03:41.7549058Z env:
+2026-10-01T16:03:41.7550306Z   WISP_ENV: test
+2026-10-01T16:03:41.7551489Z ##[endgroup]
+2026-10-01T16:03:41.8866192Z Setup go version spec 1.27
+2026-10-01T16:03:41.9096445Z Attempting to download 1.27...
+2026-10-01T16:03:41.9207892Z (node:2303) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-01T16:03:41.9211666Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-01T16:03:42.3621125Z matching 1.27...
+2026-10-01T16:03:42.3630127Z Acquiring 1.27.1 from https://github.com/actions/go-versions/releases/download/1.27.1-33583469715/go-1.27.1-linux-x64.tar.gz
+2026-10-01T16:03:42.8316696Z Extracting Go...
+2026-10-01T16:03:42.8433204Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/90ab2eb6-1e02-4d6a-9ef7-cb9135cf3a0d -f /home/runner/work/_temp/8dda7242-318c-4508-938b-28c7cb35eed9
+2026-10-01T16:03:44.5662023Z Successfully extracted go to /home/runner/work/_temp/90ab2eb6-1e02-4d6a-9ef7-cb9135cf3a0d
+2026-10-01T16:03:44.5663020Z Adding to the cache ...
+2026-10-01T16:03:50.3668155Z Successfully cached go to /opt/hostedtoolcache/go/1.27.1/x64
+2026-10-01T16:03:50.3678825Z Added go to the path
+2026-10-01T16:03:50.3679478Z Successfully set up Go version 1.27
+2026-10-01T16:03:50.3954039Z [command]/opt/hostedtoolcache/go/1.27.1/x64/bin/go env GOMODCACHE
+2026-10-01T16:03:50.3997442Z [command]/opt/hostedtoolcache/go/1.27.1/x64/bin/go env GOCACHE
+2026-10-01T16:03:50.4061774Z /home/runner/go/pkg/mod
+2026-10-01T16:03:50.4077781Z /home/runner/.cache/go-build
+2026-10-01T16:03:50.5025135Z Cache is not found
+2026-10-01T16:03:50.5048699Z go version go1.27.1 linux/amd64
+2026-10-01T16:03:50.5049117Z 
+2026-10-01T16:03:50.5050062Z ##[group]go env
+2026-10-01T16:03:50.6376877Z AR='ar'
+2026-10-01T16:03:50.6377277Z CC='gcc'
+2026-10-01T16:03:50.6377632Z CGO_CFLAGS='-O2 -g'
+2026-10-01T16:03:50.6378046Z CGO_CPPFLAGS=''
+2026-10-01T16:03:50.6378436Z CGO_CXXFLAGS='-O2 -g'
+2026-10-01T16:03:50.6378842Z CGO_ENABLED='1'
+2026-10-01T16:03:50.6379225Z CGO_FFLAGS='-O2 -g'
+2026-10-01T16:03:50.6379853Z CGO_LDFLAGS='-O2 -g'
+2026-10-01T16:03:50.6380306Z CXX='g++'
+2026-10-01T16:03:50.6380651Z GCCGO='gccgo'
+2026-10-01T16:03:50.6380996Z GO111MODULE=''
+2026-10-01T16:03:50.6381343Z GOAMD64='v1'
+2026-10-01T16:03:50.6381708Z GOARCH='amd64'
+2026-10-01T16:03:50.6382060Z GOAUTH='netrc'
+2026-10-01T16:03:50.6382434Z GOBIN='/home/runner/go/bin'
+2026-10-01T16:03:50.6382918Z GOCACHE='/home/runner/.cache/go-build'
+2026-10-01T16:03:50.6383456Z GOCACHEPROG=''
+2026-10-01T16:03:50.6383838Z GODEBUG=''
+2026-10-01T16:03:50.6384270Z GOENV='/home/runner/.config/go/env'
+2026-10-01T16:03:50.6384739Z GOEXE=''
+2026-10-01T16:03:50.6385112Z GOEXPERIMENT=''
+2026-10-01T16:03:50.6385477Z GOFIPS140='off'
+2026-10-01T16:03:50.6385817Z GOFLAGS=''
+2026-10-01T16:03:50.6387066Z GOGCCFLAGS='-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build1969401678=/tmp/go-build -gno-record-gcc-switches'
+2026-10-01T16:03:50.6388381Z GOHOSTARCH='amd64'
+2026-10-01T16:03:50.6388752Z GOHOSTOS='linux'
+2026-10-01T16:03:50.6389112Z GOINSECURE=''
+2026-10-01T16:03:50.6389720Z GOMOD='/home/runner/work/wisp/wisp/go.mod'
+2026-10-01T16:03:50.6390301Z GOMODCACHE='/home/runner/go/pkg/mod'
+2026-10-01T16:03:50.6390777Z GONOPROXY=''
+2026-10-01T16:03:50.6391117Z GONOSUMDB=''
+2026-10-01T16:03:50.6391450Z GOOS='linux'
+2026-10-01T16:03:50.6391802Z GOPACKAGESDRIVER=''
+2026-10-01T16:03:50.6392197Z GOPATH='/home/runner/go'
+2026-10-01T16:03:50.6392596Z GOPRIVATE=''
+2026-10-01T16:03:50.6393058Z GOPROXY='https://proxy.golang.org,direct'
+2026-10-01T16:03:50.6393666Z GOROOT='/opt/hostedtoolcache/go/1.27.1/x64'
+2026-10-01T16:03:50.6394600Z GOSUMDB='sum.golang.org'
+2026-10-01T16:03:50.6395035Z GOTELEMETRY='local'
+2026-10-01T16:03:50.6395512Z GOTELEMETRYDIR='/home/runner/.config/go/telemetry'
+2026-10-01T16:03:50.6396067Z GOTMPDIR=''
+2026-10-01T16:03:50.6396452Z GOTOOLCHAIN='auto'
+2026-10-01T16:03:50.6397069Z GOTOOLDIR='/opt/hostedtoolcache/go/1.27.1/x64/pkg/tool/linux_amd64'
+2026-10-01T16:03:50.6397763Z GOVCS=''
+2026-10-01T16:03:50.6398099Z GOVERSION='go1.27.1'
+2026-10-01T16:03:50.6398721Z GOWORK=''
+2026-10-01T16:03:50.6399141Z PKG_CONFIG='pkg-config'
+2026-10-01T16:03:50.6399646Z 
+2026-10-01T16:03:50.6400368Z ##[endgroup]
+2026-10-01T16:03:50.6618641Z ##[group]Run docker compose -f docker/compose.test.yml --profile test up -d --build mock-llm
+2026-10-01T16:03:50.6620325Z ^[[36;1mdocker compose -f docker/compose.test.yml --profile test up -d --build mock-llm^[[0m
+2026-10-01T16:03:50.6874095Z shell: /usr/bin/bash -e {0}
+2026-10-01T16:03:50.6874415Z env:
+2026-10-01T16:03:50.6874636Z   WISP_ENV: test
+2026-10-01T16:03:50.6874890Z ##[endgroup]
+2026-10-01T16:03:51.2660009Z #1 [internal] load local bake definitions
+2026-10-01T16:03:51.3894499Z #1 reading from stdin 379B done
+2026-10-01T16:03:51.3895699Z #1 DONE 0.0s
+2026-10-01T16:03:51.6137179Z 
+2026-10-01T16:03:51.6138307Z #2 [internal] load build definition from mockllm.Dockerfile
+2026-10-01T16:03:51.6139014Z #2 transferring dockerfile: 610B 0.0s done
+2026-10-01T16:03:51.6139749Z #2 DONE 0.0s
+2026-10-01T16:03:51.6139954Z 
+2026-10-01T16:03:51.6140294Z #3 [auth] library/alpine:pull token for registry-1.docker.io
+2026-10-01T16:03:51.6140879Z #3 DONE 0.0s
+2026-10-01T16:03:51.6141074Z 
+2026-10-01T16:03:51.6141421Z #4 [auth] library/golang:pull token for registry-1.docker.io
+2026-10-01T16:03:51.6141992Z #4 DONE 0.0s
+2026-10-01T16:03:51.6142171Z 
+2026-10-01T16:03:51.6142477Z #5 [internal] load metadata for docker.io/library/alpine:3.20
+2026-10-01T16:03:51.7730901Z #5 ...
+2026-10-01T16:03:51.7731130Z 
+2026-10-01T16:03:51.7731650Z #6 [internal] load metadata for docker.io/library/golang:1.27-alpine
+2026-10-01T16:03:51.7732300Z #6 DONE 0.3s
+2026-10-01T16:03:51.9017555Z 
+2026-10-01T16:03:51.9018532Z #5 [internal] load metadata for docker.io/library/alpine:3.20
+2026-10-01T16:03:51.9019228Z #5 DONE 0.3s
+2026-10-01T16:03:51.9019796Z 
+2026-10-01T16:03:51.9020196Z #7 [internal] load .dockerignore
+2026-10-01T16:03:51.9020667Z #7 transferring context: 2B done
+2026-10-01T16:03:51.9021081Z #7 DONE 0.0s
+2026-10-01T16:03:51.9021343Z 
+2026-10-01T16:03:51.9021663Z #8 [internal] load build context
+2026-10-01T16:03:51.9022379Z #8 transferring context: 91.23kB done
+2026-10-01T16:03:51.9022894Z #8 DONE 0.0s
+2026-10-01T16:03:51.9030882Z 
+2026-10-01T16:03:51.9031893Z #9 [build 1/6] FROM docker.io/library/golang:1.27-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414
+2026-10-01T16:03:51.9061322Z #9 resolve docker.io/library/golang:1.27-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414 done
+2026-10-01T16:03:51.9064753Z #9 extracting sha256:aa6e7f3ded592e443fd9ff13e0934fc149b642f26b962019d38fc8879f8764d1
+2026-10-01T16:03:51.9110855Z #9 sha256:1e707d1be9b7cfef08708f1d35029e5e65c69766a1e39e2c027d0acd54b8e7b5 126B / 126B 0.0s done
+2026-10-01T16:03:51.9112471Z #9 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 0.1s done
+2026-10-01T16:03:51.9113957Z #9 sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414 10.29kB / 10.29kB done
+2026-10-01T16:03:51.9115410Z #9 sha256:cd9a32216aee5667f957a62d13a10032a63fd58e14b3f3d9cc8c2122f501e95e 1.92kB / 1.92kB done
+2026-10-01T16:03:51.9116921Z #9 sha256:340a7d186a598086366ea5264e8c6e74e4dee36dc2d70ac0f621b6b28930a786 2.19kB / 2.19kB done
+2026-10-01T16:03:51.9118259Z #9 sha256:aa6e7f3ded592e443fd9ff13e0934fc149b642f26b962019d38fc8879f8764d1 247.53kB / 247.53kB 0.0s done
+2026-10-01T16:03:51.9119822Z #9 sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 22.02MB / 71.08MB 0.1s
+2026-10-01T16:03:52.0712029Z #9 ...
+2026-10-01T16:03:52.0712969Z 
+2026-10-01T16:03:52.0723725Z #10 [stage-1 1/2] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+2026-10-01T16:03:52.0724801Z #10 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc done
+2026-10-01T16:03:52.0725713Z #10 extracting sha256:25f1d6b1951ac8eb3740558fe94cb83d377bdadf95fd9f98b50d2e1b96130471 0.1s done
+2026-10-01T16:03:52.0726581Z #10 sha256:25f1d6b1951ac8eb3740558fe94cb83d377bdadf95fd9f98b50d2e1b96130471 3.63MB / 3.63MB 0.1s done
+2026-10-01T16:03:52.0727927Z #10 sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 9.23kB / 9.23kB done
+2026-10-01T16:03:52.0728758Z #10 sha256:c64c687cbea9300178b30c95835354e34c4e4febc4badfe27102879de0483b5e 1.02kB / 1.02kB done
+2026-10-01T16:03:52.0729823Z #10 sha256:bf8527eb54c3680e728d5b4b383a8ba730d72dae7236fbc8dff97ed6b224a731 612B / 612B done
+2026-10-01T16:03:52.0730848Z #10 DONE 0.3s
+2026-10-01T16:03:52.0731162Z 
+2026-10-01T16:03:52.0732025Z #9 [build 1/6] FROM docker.io/library/golang:1.27-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414
+2026-10-01T16:03:52.0733608Z #9 extracting sha256:aa6e7f3ded592e443fd9ff13e0934fc149b642f26b962019d38fc8879f8764d1 0.1s done
+2026-10-01T16:03:52.0735026Z #9 sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 54.53MB / 71.08MB 0.2s
+2026-10-01T16:03:53.1997041Z #9 extracting sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095
+2026-10-01T16:03:57.8511370Z #9 extracting sha256:ef1dbfdbb5d59bdeac07b1398a9f0808b453513bf6a76eb3ffd509a284483095 4.7s done
+2026-10-01T16:03:58.5411567Z #9 extracting sha256:1e707d1be9b7cfef08708f1d35029e5e65c69766a1e39e2c027d0acd54b8e7b5
+2026-10-01T16:03:58.7397148Z #9 extracting sha256:1e707d1be9b7cfef08708f1d35029e5e65c69766a1e39e2c027d0acd54b8e7b5 done
+2026-10-01T16:03:58.7397978Z #9 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+2026-10-01T16:03:58.7398508Z #9 DONE 6.8s
+2026-10-01T16:03:58.7398636Z 
+2026-10-01T16:03:58.7398753Z #11 [build 2/6] WORKDIR /src
+2026-10-01T16:03:58.7399019Z #11 DONE 0.0s
+2026-10-01T16:03:58.7399146Z 
+2026-10-01T16:03:58.7399280Z #12 [build 3/6] COPY tools/mockllm/go.mod ./
+2026-10-01T16:03:58.7399873Z #12 DONE 0.0s
+2026-10-01T16:03:58.7400005Z 
+2026-10-01T16:03:58.7400139Z #13 [build 4/6] RUN go mod download || true
+2026-10-01T16:03:58.8126575Z #13 0.223 go: no module dependencies to download
+2026-10-01T16:03:58.9878296Z #13 DONE 0.2s
+2026-10-01T16:03:58.9878689Z 
+2026-10-01T16:03:58.9878908Z #14 [build 5/6] COPY tools/mockllm/ ./
+2026-10-01T16:03:58.9879395Z #14 DONE 0.0s
+2026-10-01T16:03:58.9879836Z 
+2026-10-01T16:03:58.9880133Z #15 [build 6/6] RUN CGO_ENABLED=0 go build -trimpath -o /out/mockllm .
+2026-10-01T16:04:10.7848303Z #15 DONE 11.9s
+2026-10-01T16:04:10.9732073Z 
+2026-10-01T16:04:10.9732891Z #16 [stage-1 2/2] COPY --from=build /out/mockllm /usr/local/bin/mockllm
+2026-10-01T16:04:10.9733703Z #16 DONE 0.0s
+2026-10-01T16:04:10.9733878Z 
+2026-10-01T16:04:10.9734023Z #17 exporting to image
+2026-10-01T16:04:10.9734358Z #17 exporting layers
+2026-10-01T16:04:11.0043922Z #17 exporting layers 0.2s done
+2026-10-01T16:04:11.0044657Z #17 writing image sha256:2635a45d148af3c31d3d7eb8f501a4e8938ea861a4b350d28e7fb3bd01f12766
+2026-10-01T16:04:11.0314364Z #17 writing image sha256:2635a45d148af3c31d3d7eb8f501a4e8938ea861a4b350d28e7fb3bd01f12766 done
+2026-10-01T16:04:11.0315358Z #17 naming to docker.io/wisp/mock-llm:dev done
+2026-10-01T16:04:11.0315951Z #17 DONE 0.2s
+2026-10-01T16:04:11.0316114Z 
+2026-10-01T16:04:11.0316252Z #18 resolving provenance for metadata file
+2026-10-01T16:04:11.0316708Z #18 DONE 0.0s
+2026-10-01T16:04:11.0317166Z  mock-llm  Built
+2026-10-01T16:04:11.0330770Z  Network wisp-test_default  Creating
+2026-10-01T16:04:11.0706151Z  Network wisp-test_default  Created
+2026-10-01T16:04:11.0714783Z  Container wisp-mock-llm  Creating
+2026-10-01T16:04:11.0889407Z  Container wisp-mock-llm  Created
+2026-10-01T16:04:11.0894941Z  Container wisp-mock-llm  Starting
+2026-10-01T16:04:11.2727481Z  Container wisp-mock-llm  Started
+2026-10-01T16:04:11.2800900Z ##[group]Run for i in $(seq 1 30); do
+2026-10-01T16:04:11.2801261Z ^[[36;1mfor i in $(seq 1 30); do^[[0m
+2026-10-01T16:04:11.2801655Z ^[[36;1m  if curl -fsS http://127.0.0.1:18080/v1/models > /dev/null; then^[[0m
+2026-10-01T16:04:11.2802079Z ^[[36;1m    echo "mock-llm reachable"^[[0m
+2026-10-01T16:04:11.2802345Z ^[[36;1m    exit 0^[[0m
+2026-10-01T16:04:11.2802553Z ^[[36;1m  fi^[[0m
+2026-10-01T16:04:11.2802942Z ^[[36;1m  sleep 1^[[0m
+2026-10-01T16:04:11.2803149Z ^[[36;1mdone^[[0m
+2026-10-01T16:04:11.2803377Z ^[[36;1mecho "mock-llm never became reachable"^[[0m
+2026-10-01T16:04:11.2803670Z ^[[36;1mexit 1^[[0m
+2026-10-01T16:04:11.2869403Z shell: /usr/bin/bash -e {0}
+2026-10-01T16:04:11.2869958Z env:
+2026-10-01T16:04:11.2870182Z   WISP_ENV: test
+2026-10-01T16:04:11.2870406Z ##[endgroup]
+2026-10-01T16:04:11.3079785Z mock-llm reachable
+2026-10-01T16:04:11.3114790Z ##[group]Run bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+2026-10-01T16:04:11.3115486Z ^[[36;1mbash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv^[[0m
+2026-10-01T16:04:11.3181718Z shell: /usr/bin/bash -e {0}
+2026-10-01T16:04:11.3182014Z env:
+2026-10-01T16:04:11.3182234Z   WISP_ENV: test
+2026-10-01T16:04:11.3182478Z ##[endgroup]
+2026-10-01T16:04:19.7554785Z === RUN   TestLayoutForTestEnv
+2026-10-01T16:04:19.7555300Z === RUN   TestLayoutForTestEnv/explicit_WISP_TEST_DATA_DIR
+2026-10-01T16:04:19.7562100Z === RUN   TestLayoutForTestEnv/falls_back_to_TEMP_per_pid
+2026-10-01T16:04:19.7564530Z     envfork_test.go:139: test DataDir = "/tmp/wisp-test-5895" (TMPDIR = "/tmp", which reaches "/tmp")
+2026-10-01T16:04:19.7565292Z --- PASS: TestLayoutForTestEnv (0.00s)
+2026-10-01T16:04:19.7565924Z     --- PASS: TestLayoutForTestEnv/explicit_WISP_TEST_DATA_DIR (0.00s)
+2026-10-01T16:04:19.7566739Z     --- PASS: TestLayoutForTestEnv/falls_back_to_TEMP_per_pid (0.00s)
+2026-10-01T16:04:19.7567418Z PASS
+2026-10-01T16:04:19.7567955Z ok  	github.com/CarlosShao/wisp/internal/proc	0.003s
+2026-10-01T16:04:19.7691501Z runtests.sh: OK - packages=[./internal/proc/ -run TestLayoutForTestEnv] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=3, '[no tests to run]'=0
+2026-10-01T16:04:19.7748865Z ##[group]Run bash scripts/portable-tests.sh --scope=core
+2026-10-01T16:04:19.7749331Z ^[[36;1mbash scripts/portable-tests.sh --scope=core^[[0m
+2026-10-01T16:04:19.7812362Z shell: /usr/bin/bash -e {0}
+2026-10-01T16:04:19.7812637Z env:
+2026-10-01T16:04:19.7812848Z   WISP_ENV: test
+2026-10-01T16:04:19.7813089Z ##[endgroup]
+2026-10-01T16:04:23.0837378Z portable-tests.sh: GUARD C - scope mode=core resolved to a DIFFERENT package
+2026-10-01T16:04:23.0856750Z portable-tests.sh:   set than the one pinned next to it. Pinned: 25, resolved: 35.
+2026-10-01T16:04:23.0881550Z portable-tests.sh:   25a26,35
+2026-10-01T16:04:23.0882415Z portable-tests.sh:   > go: downloading github.com/dustin/go-humanize v1.0.1
+2026-10-01T16:04:23.0883575Z portable-tests.sh:   > go: downloading github.com/google/uuid v1.6.0
+2026-10-01T16:04:23.0884751Z portable-tests.sh:   > go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+2026-10-01T16:04:23.0886217Z portable-tests.sh:   > go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+2026-10-01T16:04:23.0887600Z portable-tests.sh:   > go: downloading golang.org/x/crypto v0.57.0
+2026-10-01T16:04:23.0888450Z portable-tests.sh:   > go: downloading golang.org/x/sys v0.48.0
+2026-10-01T16:04:23.0889267Z portable-tests.sh:   > go: downloading modernc.org/libc v1.75.7
+2026-10-01T16:04:23.0890365Z portable-tests.sh:   > go: downloading modernc.org/mathutil v1.7.1
+2026-10-01T16:04:23.0890961Z portable-tests.sh:   > go: downloading modernc.org/memory v1.12.1
+2026-10-01T16:04:23.0891518Z portable-tests.sh:   > go: downloading modernc.org/sqlite v1.59.0
+2026-10-01T16:04:23.0892142Z portable-tests.sh: a deleted or newly-uncovered package must fail the step, not
+2026-10-01T16:04:23.0892832Z portable-tests.sh: shorten it. Either restore the scope entry or update the pin
+2026-10-01T16:04:23.0893457Z portable-tests.sh: in the SAME commit and say why in the CI log.
+2026-10-01T16:04:23.0911869Z ##[error]Process completed with exit code 1.
+2026-10-01T16:04:23.0967099Z ##[group]Run docker compose -f docker/compose.test.yml --profile test down
+2026-10-01T16:04:23.0967699Z ^[[36;1mdocker compose -f docker/compose.test.yml --profile test down^[[0m
+2026-10-01T16:04:23.1033106Z shell: /usr/bin/bash -e {0}
+2026-10-01T16:04:23.1033404Z env:
+2026-10-01T16:04:23.1033812Z   WISP_ENV: test
+2026-10-01T16:04:23.1034058Z ##[endgroup]
+2026-10-01T16:04:23.1829695Z  Container wisp-mock-llm  Stopping
+2026-10-01T16:04:23.5701702Z  Container wisp-mock-llm  Stopped
+2026-10-01T16:04:23.5702573Z  Container wisp-mock-llm  Removing
+2026-10-01T16:04:23.5755630Z  Container wisp-mock-llm  Removed
+2026-10-01T16:04:23.5762296Z  Network wisp-test_default  Removing
+2026-10-01T16:04:23.6586552Z  Network wisp-test_default  Removed
+2026-10-01T16:04:23.6750567Z Post job cleanup.
+2026-10-01T16:04:23.7628466Z [command]/usr/bin/git version
+2026-10-01T16:04:23.7679414Z git version 2.55.0
+2026-10-01T16:04:23.7727690Z Temporarily overriding HOME='/home/runner/work/_temp/3ee53f25-523d-4b55-84a6-7146b78e990c' before making global git config changes
+2026-10-01T16:04:23.7730002Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-01T16:04:23.7734378Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wisp/wisp
+2026-10-01T16:04:23.7779690Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-01T16:04:23.7818073Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-01T16:04:23.8093190Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-01T16:04:23.8118254Z http.https://github.com/.extraheader
+2026-10-01T16:04:23.8137208Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-01T16:04:23.8189920Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-01T16:04:23.8464779Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-01T16:04:23.8502872Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-01T16:04:23.8902493Z Cleaning up orphan processes
+2026-10-01T16:04:23.9228840Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

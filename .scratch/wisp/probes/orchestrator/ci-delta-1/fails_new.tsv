@@ -1,0 +1,26 @@
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestAListWinsWhereBothTablesHit
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestBListDefaultDenyAndOverride
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestCanonicalInputGainsNoSecondForm
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestClassifyAnchorSpellingIsNotVerdict
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestPathResolverExtendedLengthPrefixAListDenied
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestPathResolverShortNameAListDenied
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestPathResolverUNCAListDenied
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestResolvePerCallBudget
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestSyncFallbackNotDisarmableByWeakRoot
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestSyncFixtureFallbackAndMatch
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestSyncSuspectFallbackIsComponentBounded
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestSyncSuspectFallbackWhenUndetectable
+test-windows	bash scripts/portable-tests.sh --scope=windows	TestSyncUnverifiedRootKeepsFallback
+test-windows	bash scripts/wisp-cli-tests.sh	TestAC246ResidentPipelineAsksThroughTheOneGate
+test-windows	bash scripts/wisp-cli-tests.sh	TestComposedGateBlocksAWriteForTwoSeconds
+test-windows	bash scripts/wisp-cli-tests.sh	TestL1VetoNeedsAChannelTheHostReallyWired
+test-windows	bash scripts/wisp-cli-tests.sh	TestL1VetoNeedsAChannelTheHostReallyWired/console_posture:_veto_refused,_window_still_executes
+test-windows	bash scripts/wisp-cli-tests.sh	TestL1VetoNeedsAChannelTheHostReallyWired/host_declares_and_loads_esc,_veto_lands
+test-windows	bash scripts/wisp-cli-tests.sh	TestPanelHostRealWindowHopAndLifecycle
+test-windows	bash scripts/wisp-cli-tests.sh	TestRunPacketCarriesTheLoadedInstructionFiles
+test-windows	bash scripts/wisp-cli-tests.sh	TestTicket101ManualSwitchSurvivesRestart
+test-windows	bash scripts/wisp-cli-tests.sh	TestTicket101SessionGrantDoesNotCrossRestart
+test-windows	bash scripts/wisp-cli-tests.sh	TestTicket101UntouchedConfigRestartsAtDefault
+test-windows	bash scripts/wisp-cli-tests.sh	TestTicket223HandEditedFsLooseningCostsAnL2Card
+test-windows	bash scripts/wisp-cli-tests.sh	TestTicket223PermissionDeniedSitsInItsOwnSentence
+test-windows	bash scripts/wisp-cli-tests.sh	TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking

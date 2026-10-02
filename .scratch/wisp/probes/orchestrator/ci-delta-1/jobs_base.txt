@@ -1,0 +1,6 @@
+JOB=lint id=110139308449 conclusion=failure sl=GitHub Actions 1000001149
+JOB=slo-full id=110139308604 conclusion=success sl=wisp-selfhosted-01
+JOB=test-windows id=110139308648 conclusion=failure sl=GitHub Actions 1000001150
+JOB=lint-frontend id=110139308664 conclusion=success sl=GitHub Actions 1000001151
+JOB=test-core id=110139308728 conclusion=failure sl=GitHub Actions 1000001152
+JOB=slo-smoke id=110139308748 conclusion=success sl=GitHub Actions 1000001153
