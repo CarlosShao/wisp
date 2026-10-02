@@ -100,25 +100,157 @@
 
 ## §2 195 的每一格 AC 现在能不能只靠 `settings.go` 勾
 
-（本轮回填）
+判"已满足"的姿势＝**问生产调用者，不只数定义**；并区分"函数存在"与"面板口能走通"。
+⚠ 一处全局降档：`248-r1` 自己的**门禁四数无凭据**（台账编排者裁定，其证据件 §4 是空的），
+所以本表凡引 `settings.go`／`config_handlers.go` 的"能用"，成立层级＝**静态 grep 可证**，不等于今天绿。
+
+| 格 | 三态 | 凭据／差哪一句 |
+|---|---|---|
+| **AC#0 前提现量对得上** | **不成立（该响亮报回）** | §0.1 四条里两条不符（导出写手 1→8、"地基不存在"那把尺是空心的）。票面自己写的处置＝"任何一条不符 ⇒ 停下报回，不许按票面硬改"——本腿就是那次报回。**这一格永远勾不了**，它的作用是把票头换掉 |
+| **AC#1 分节写入面存在且被生产调用者用** | **部分满足** | **满足的那半枚（且不是"只有测试听众"）**：真实现＝`internal/config/settings.go:199`（`writeOneKey`）＋六枚导出 setter；非测试调用方＝`cmd/wisp/panel_config_store.go:184 :194 :201 :208 :215 :217 :267`（**7 处**）；再往上两枚装配根生产点＝`cmd/wisp/run.go:416`（`rt.settings = newConfigStore(...)`，被 `:695` 的快照 reader 用）与 `cmd/wisp/panel_inbound.go:266-279`（`configWrites` 建在 `:266`、`Config:` 槽挂在 `:279`）；**面板口那一跳也真能走通**：`panel_inbound.go:228 newComposerDispatchChain` 被常驻腿经 `panel_resident_windows.go:170`（由 `:189` 那一发走到）复用，`resident_windows.go:142` 建它，宿主 `panel_host_windows.go:551` 逐字 `m.disp.Handle(ctx, raw)` ⇒ 链路＝`panel.host → ComposerDispatch.Handle → composer_dispatch.go:197/202 → ConfigWriteHandler → configStore.ApplySetting → Manager.Set* → writeOneKey → mergeWrite`。<br>**不满足的那半枚**：入口**不接 section／key 参数**（§1.1），可写面只有 §1.2 那 8 条具名叶子键。票面要的"按节写入"那一形——一枚能用 section 与 key 寻址的入口——**今天不存在** |
+| **AC#2 安全节"放宽"不落盘、进队列** | **完全没做**（`internal/config` 那一层），但**反向那发已满足、且三断言的形在 `cmd/wisp` 已有可复用先例** | 尺＝`grep -rn "PendingApproval\|approval\." --include=*.go internal/config/ \| grep -v _test.go` ⇒ **0 命中**＝这枚包今天与审批队列**零耦合**，没有任何入口能把一枚放宽转成待决项。<br>① **反向那发（收紧直接写成功）今天成立并被钉住**：`writeguard_226_test.go:308 TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber` 要求删除条目**必须落盘**（红句逐字 "the revoked entry is still in the file"），`allowdirs.go:95-102` 注释逐字"收紧这一节不需要 L2 重新确认"。⇒ 票面 AC#2 末句担心的"把 fail-closed 方向一起禁掉"那一支，**现成的防呆已经在**。<br>② **三断言的形在 cmd 层已经成立**：`cmd/wisp/approval_always.go:112-147 runWidening`＝第二张 L2 卡在前、`AddAllowedDir` 在后，卡未答允 ⇒ 磁盘 `allowed_dirs` 不动、队列多一枚、`record("WIDEN-REFUSED"/"WIDEN-APPLIED", ...)` 带 `fromCorr`/`tool`/`section=fs key=allowed_dirs` 归因；钉＝`cmd/wisp/approval_always_201_test.go:121 TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card`／`:163 TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused`。⇒ **这一格欠的不是行为，是"把它搬进 `internal/config` 的一枚按节入口里"** |
+| **AC#3 面板来源不许冒充原生** | **部分满足，且今天的满足是"空成立"** | 现成仪器三层都在：`internal/agent/approval/ui.go:167-171` 的 `PanelAPI` 只有 `Reject`/`Head`/`View`、**没有 `Allow`**（`:166` 注释逐字 "it is a method that does not exist"）；`internal/panel/config_handlers.go:108 lockedFieldFamilies`＝`risk.`/`fs.`/`net.`/`plugins.`/`privacy.`/`models.`/`audio.` 七族，在 `:315` 于到达写入腿**之前**整族拒；结构性后果＝**今天压根没有一枚"面板来源的安全节放宽"路径存在**，所以"它被挡住了"目前没有可挡之物。<br>**差的那一句**：AC#3 真正要判的是"195 建出那枚按节入口**之后**，来源＝面板的放宽仍然结构性进不来"。今天这一格从"空成立"变成"要真挡"，只差那一枚入口 |
+| **AC#4 `SetPermissionMode` 没被冒充分节写** | **已满足**（起手名册＝终态名册那一格，今天对 195 尚无新增） | 尺（票面原文，本腿实跑）＝`grep -rn "SetPermissionMode" --include=*.go internal/ cmd/ \| grep -v _test.go` ⇒ **8 行**，逐枚：`internal/config/allowdirs.go:18`（注释）／`internal/config/permmode.go:47`（注释）／`permmode.go:70`（定义）／`internal/config/unwired.go:127`（**判决文本**）／`internal/perm/store.go:49`（接口注释）／`store.go:50`（接口方法）／`store.go:208`（**唯一生产调用点**）／`cmd/wisp/run.go:391`（注释）。<br>**新地基与它的关系＝0**：尺＝`grep -c SetPermissionMode internal/config/settings.go` ⇒ **0** ⇒ `settings.go` 没走那枚捷径。⚠ 一枚要点名的副作用：名册里 `unwired.go:127` 那句"persisted by `Manager.SetPermissionMode`; ticket 90"是**描述性**命中——落地后若持久化归属变了，那枚字符串必须同批改口，否则会出现"名册枚数不变、句意变假"这一形（本仓第 29ⓑ 族） |
+| **AC#5 门禁四数＋`gofumpt`** | **本腿不量** | 见 J1／J2。**但有三枚 d22scan 的牙现在就能点名，落地腿必须绕**（这些是**形状**判断，不是"今天红"的判断）：① `tools/d22scan/main.go:707` 红句逐字 "bare `go func(` is banned (D22/D38b): use `observe.Registry.Spawn`"——AC#2 若把"等一张卡"写成新 goroutine 必踩；② ban#2＝`filepath.Clean`/`Abs` 在 `risk.PathResolver` 之外做文件系统决策（`main.go:15`）——按节入口**不许**自己拼配置文件路径，`writeOneKey` 走的是 `m.path`（`settings.go:275`、`:283`）那枚既有路径，照它就不踩；③ `emojiRe`（`main.go:164`）扫**字符串不豁免**——新回执文案里 `✓`(U+2713)／`≤`(U+2264) 会红，`→` 抓不到但规格禁 |
+| **AC#6 本票没顺手接面板口** | **对票 195 自己：已满足；对票面的次序假设：已被 248 推翻** | 尺实跑＝`grep -nE '=\s*"panel\.' internal/panel/bridge.go` ⇒ **4 行**，`:42 :43 :44 :45` 名字与顺序一字未动；`internal/panel/` 里也**没有**新增 `panel.*` 常量。<br>但票面末句"名册那两枚要等本票地基绿了再按票 194 堆1 单独入账（每枚一枚 `A##`）"**已经被执行掉了、且不是按 194 那条形执行的**：`config.get`／`config.set` 现在就在 `bridge.go:66`／`:67`（无 `panel.` 前缀），入账凭据是台账 **`A487`（10-01 00:03 那枚具名解冻＋九问裁完）**，不是"票 194 堆1 一枚一枚 `A##`"。⇒ 下一枚落地腿读 AC#6 时**别把它当"别看板"**：面板口已接，且接的是 248 那枚**只覆盖非锁定族**的地基 |
 
 ---
 
 ## §3 仍欠的那一块到底是不是"安全节 L2 那一支"
 
-（本轮回填）
+**具名答：不完全是。"把放宽挡住"这一支今天已经挡住了（两层，且都是现成仪器）；欠的是"把方向裁决搬进入口层"，
+因为按节入口一开，会被它顺手变可写的东西，今天只靠"没人写它"挡着。**
+
+### 3.1 "挡住"那一支的现成仪器（逐枚，都在，不必新建）
+
+| 仪器 | 位置 | 它挡的是哪一形 |
+|---|---|---|
+| `PanelAPI` **没有 `Allow` 方法** | `internal/agent/approval/ui.go:167-171`；作者注释 `:166` 逐字："PanelAPI has no Allow method: 'panel-sourced allow is structurally rejected' is then not a check that could be forgotten, **it is a method that does not exist**" | 面板侧宿主**压根没有可调的授权出口**（对照 `NativeAPI:143-161` 才有 `Allow`/`AllowSession`） |
+| 面板口的**整族拒** | `internal/panel/config_handlers.go:108`（七族名册）→ `:115 refusedLockedFamily` → 在 `:315` 于**进写入腿之前**拒 | `risk.*`／`fs.*`／`net.*`／`plugins.*`／`privacy.*`／`models.*`／`audio.*` 从 `config.set` 一条都进不来；`:129-133` 还兜住不带点分的裸名 `permission_mode`／`allowed_dirs` |
+| 程序化写的**义务外包** | `permmode.go:47-58`／`allowdirs.go:16-24` 注释逐字：程序化那一条"由**它的调用方**确认"；`cmd/wisp/approval_always.go:112-147` 就是那个调用方 | 放宽必须先有第二张原生 L2 卡 |
+| reload 侧的**方向裁决** | `manager.go:304 planLocked`：`len(loosen)>0` ⇒ 排进 `plan.confirm`（`:314`）**未答完不写 `cur`**；`len(tighten)>0` ⇒ 直接热生效（`:321`）。方向裁决器＝`riskDirection:421`／`fsDirection:457`／`netDirection:470`／`pluginsDirection:490`／`setDirection:521`；生产接线＝`cmd/wisp/config_reload.go:114 rt.mgr.ConfirmLocked = rt.confirmLockedLoosening`，`confirmLockedLoosening` 定义在 `:221`、真调队列在 `:246 rt.gate.PendingApproval(...)` | 手改放宽 ⇒ 进 C18 队列、只吃原生 allow |
+| 冻结仪器（**射程判断，非内容引用**） | `internal/panel/l2_grant_boundary_test.go`：词表 `grantFieldWords:183`（18 枚）／`grantRouteWords:192`（11 枚）／前缀 `:1316`（8 枚，**全是 `panel*` 族**）／后缀 `:1324`（3 枚）／长度钉 `:1334 :1335 :1336`；总闸 `TestRealGuardRefusesEveryAssemblableApprovalRouteName:1530`（528 枚拼装名问**真守卫**）；封套面 `TestNoInboundEnvelopeCanBindAnApprovalVerdict:1547`；守卫名册能力形 `guardRosterOf:2030`（用在 `:2207`、`:2308`） | "被真守卫应答过的名字里不许有授权形的拼写"。**射程边界（该文件自己写的）**：`grantRoutePrefixes` 之外＝不在网里，所以 `config.get`／`config.set` **今天不被那 528 格问起**；同理任何新造的 `config.*`／非 `panel*` 命名都不被问 |
+| 规格与口径 | `SPEC-08:168` 逐字"安全节放宽走 L2 重新确认（SPEC-03 §4.2）"（本腿 `sed -n '166,170p'` 复跑命中）；`SPEC-06:19` L2 那一行逐字"「允许」只接受原生侧来源……面板只能「拒绝/查看完整参数」"；`AGENTS.md` §1.2 禁令"由面板侧来源的 L2「允许」" | 判"是不是越界"的三处文字凭据 |
+
+### 3.2 那一块真正的缺口（★ 本普查最要紧的一句）
+
+`internal/config` 里**按节寻址的写入口**一旦开出来，下面这两枚键就从"没人能写"变成"能写"，
+而它们**都是 `manager.go` 已经认过的放宽键**，且**都不在 `unwiredKeys` 的六枚名册里**
+（名册尺＝`grep -c "path:" internal/config/unwired.go` ⇒ 6）：
+
+| 键 | 方向裁决 | 有没有 unwired 守卫 | 消费者 | 今天为什么还安全 |
+|---|---|---|---|---|
+| `fs.delete_enabled` | `manager.go:460-461` 逐字：`!old.DeleteEnabled && new.DeleteEnabled ⇒ loosen` | **无**（默认 `false`，`schema.go:481`；不在 `unwiredKeys`） | `unwired.go:131` 逐字 "consumed: cmd/wisp/run.go gates the delete-capable tools" | **只因为一枚写入者都不存在** |
+| `fs.reparse_point_exceptions` | `manager.go:459` 走 `setDirection` ⇒ 增项即 loosen | **无** | `unwired.go:130` "consumed: cmd/wisp/run.go feeds the C26 canonicalizer" | 同上 |
+
+对照：`risk.shell_enabled`／`risk.allow_shell_string`／`risk.shell_allowlist`／`risk.blacklist_overrides`／
+`net.allowlist`／`net.block_private_ranges` 这六枚**非默认值会被 `validateUnwired`（`unwired.go:100-110`）
+直接判错**，而 `settings.go:230` 的写前 `validate` 会撞上它 ⇒ 这一族即便有了按节入口也**写不进去**（fail-closed，好）。
+⇒ **所以缺口不是"放宽没挡住"，是"两枚有真消费者的锁定族放宽键，其唯一防线是'没有写入者'，
+而 195 要建的正是那枚写入者"。** 这句话就是 §5 那把会响的尺要钉的东西。
+
+### 3.3 那三张词表对新造入向名的射程（具名比过）
+
+195 若要新增**入向名**（方法名或封套键），逐枚比：
+- 非 `panel*` 命名（例如再走 `config.*` 那一族）⇒ **不在** `grantRoutePrefixes` 那 8 枚里 ⇒ 不被 528 格问到；
+  但仍受 `guardRosterOf` 那条"守卫 case 表 ⇔ `Method*` 常量名册双向全等"约束（新增常量不改守卫＝红）。
+- 任何带那 11 枚路由词根之一（`approve`/`approval`/`grant`/`allow`/`permit`/`ratify`/`authorize`/`authorised`/`decide`/`decision`/`verdict`）
+  的路由名 ⇒ 若命名落在 `panel*` 前缀内即被网格问到、真守卫应答就红；落在 `panel*` 之外则**今天问不到**，
+  但会撞 `internal/panel/config_route_248_test.go:259 TestAC1FieldTableCarriesNoApprovalVocabulary`
+  里**同一份 11 枚词表的手抄版**（它对 `MethodConfigGet/Set` 与 `WritableFields()` 两批名字做子串筛查）。
+- 任何带那 18 枚字段词根之一的 JSON 键、挂在 `ComposerRequest` 可达面上 ⇒ 撞 `l2_grant_boundary_test.go:1547`。
+- ⛔ 三条都**不许**为了躲词表去动那三枚表（它在冻结件里，`A487` 只解冻 `:2051`/`:2139` 两枚锚，
+  且那两枚锚已被换成能力形）。**唯一安全形＝新名字里不含任何裁决词根，且不进 `panel*` 前缀族。**
 
 ---
 
 ## §4 撞钉预检（名册，不是颜色）
 
-（本轮回填）
+⛔ 本腿不跑测试 ⇒ **每一枚的"今天绿不绿"一律＝待落地腿自量**；命令与期望读数在 §4 末。
+名册＝**会挡住 195 落地**的现存钉（行为型优先，光 grep 新符号名不算预检）。
+
+| # | 用例名 | `file:line` | 断言原文（要点） | 存在理由 | 对 195 的后果 |
+|---|---|---|---|---|---|
+| **N1** | `TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg` | `internal/panel/config_route_248_test.go:215`（红句 `:232`／`:239`） | 五枚锁定族字段（`risk.permission_mode`／`fs.allowed_dirs`／`permission_mode`／`net.proxy.mode`／`privacy.keep_transcript`）必须 `errors.Is(err, ErrConfigFieldRefused)`、回执必须**点名那把门**（`mustSay` 分别是 `panel.mode.request`／`L2`／`锁定族`），且 `leg.applyCalls != 0` 即红 | 票 248 AC#1／J5：整族拒，"⛔ 任意 key 透传"的机器可读形 | ★ **本票最硬的一枚**：195 的 AC#2 要的是"`fs.*` 放宽 ⇒ 转队列、不落盘"，而这枚钉要的是"`fs.*` ⇒ 压根到不了写入腿"。**两枚判据互斥**。落地腿不许靠"改 `mustSay` 的子串"绕开——那正是"为变绿放宽断言" |
+| **N2** | `TestAC1FieldTableCarriesNoApprovalVocabulary` | `internal/panel/config_route_248_test.go:259`（等值钉 `:275`，写死的名册在 `:271-274`） | `WritableFields()` 必须 `reflect.DeepEqual` 那**七枚**（`:271-274` 写死），且两枚路由名与七枚字段名都不许含 11 枚授权词根 | 名册＝白名单；扩表是契约变更 | 195 若往面板可写名册加**任何一枚**（含"安全节"字段）⇒ 必红。**195 的按节入口必须留在 `internal/config`，不许挂到这张表上**（这也正是 AC#6 的意思） |
+| **N3** | `TestNoInboundEnvelopeCanBindAnApprovalVerdict` | `internal/panel/l2_grant_boundary_test.go:1547`（词表 `:183`；谓词 `carriesGrantWord:242`、`grantCarryingKeys:324`） | `ComposerRequest` 及其可达类型绑出的每一枚 JSON 键都不许含 18 枚裁决词根；同一条规则再跑一遍 `ModeRequest`／`AttachmentPayload`；末了还有一发 AST 面扫整个 `internal/panel` | D33/F2、R20、`AGENTS.md` §1.2 禁令#6 | 195 若要新增入向字段（`configSection` 之类可以，`confirmWiden`/`allowLoosen` 之类必红）⇒ **逐枚比那 18 枚词根**，且⛔不动表 |
+| **N4** | `TestRealGuardRefusesEveryAssemblableApprovalRouteName` | 同上 `:1530`，网格 `sweepAssembledNames:1433`，长度钉 `:1334/:1335/:1336`（8×11×3×2＝528） | 528 枚**运行时拼装**的授权形路由名，真守卫一枚都不应答；三张表任一因子被缩 ⇒ `t.Fatalf` | 抓"名字从不完整写在任何一处"那一形 | 射程只盖 `panel*` 八枚前缀。195 若新增 `panel.<动词>` 形 ⇒ 有被命中风险 ⇒ **改判成不用 `panel.` 前缀**（248 已经这么做了，`bridge.go:66/67`），⛔ 不去扩那张表 |
+| **N5** | `TestPlantedGrantWiringGoesRedInASnapshot` 的守卫名册两枚锚 | 同上 `:2168`，锚在 `:2207`（`rosterProblem != ""`）与 `:2308`（`reflect.DeepEqual(got, answeredRoutes)`），派生器 `guardRosterOf:2030` | 守卫 case 表与本包声明的 `Method*` 常量**双向全等**，且必须写成一整行逗号分隔；正控＝植一枚"守卫答了无名册常量的路由"必须被派生器拒绝 | `A487` 把"数一枚 4"换成能力形 | 195 一旦新增／删除任何 `Method*` 常量而不同步守卫（或反之）⇒ 红。⚠ 这也意味着**那两枚锚今天不再是"一字不许改"**（见 X6） |
+| **N6** | `TestEveryLockedSectionKeyIsAccountedFor` | `internal/config/unwired_test.go:311`（表在 `internal/config/unwired.go:119-147`） | 反射走 `[risk]`/`[fs]`/`[net]`/`[plugins]` 每一枚键，缺 `lockedKeyDisposition` 判决即 `t.Errorf`；`unwired:` 前缀者必须与 `unwiredKeys` **双向 1:1**（多一枚守卫没人指、少一枚判决都红） | 票 83 AC#1：完整性可执行化 | 195 若新增任何锁定族键（含子表）⇒ 红；若为了"给放宽留个位"往 `unwiredKeys` 加行而不同批加判决 ⇒ 也红。**它是 §3.2 那两枚键的现成登记面**——把 `fs.delete_enabled` 的处置改成"放宽走队列"要在同一批动这张表 |
+| **N7** | `TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber` | `internal/config/writeguard_226_test.go:308`（红句 `:318`／`:321`／`:324`） | 收紧那一发**必须真落盘**、内存与文件不得分叉、且不得回滚掉别人的手改 | 票 226 AC#5 落库半枚 | **这是 AC#2"反向那发"的防呆**：195 若把"安全节写入"一律改成不落盘，此钉必红。票面 AC#2 末句"别把批准和次生收紧绑一体"＝指的就是它 |
+| **N8** | `TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card`／`...StoresNothingWhenTheSecondCardIsRefused` | `cmd/wisp/approval_always_201_test.go:121`／`:163` | 「一直」那支**第二张卡答允之后**才存；拒绝 ⇒ 什么都不存 | 票 201：放宽的 L2 义务在调用方 | 195 把确认搬进入口层 ⇒ **调用方那一层会重复确认或空确认**。这两枚就是"改完之后哪些既有测试的语义会过期"的那一批（J6 要摊开的两枚之一） |
+| **N9** | `TestConfirmLockedRunsOutsideTheManagerLock`／`TestCheckAndReloadAsksOncePerFileChange` | `internal/config/manager_223_test.go:55`／`:152` | 钩子必须在 `mu` **之外**跑（可在里面读自己的配置、可阻塞等人）；一次文件变更只问一次 | 票 223：一枚未答的 C18 卡曾冻结所有 `Config()` 读者 300s | ★ 195 的入口若"在 `writeOneKey` 里等一张卡"⇒ **必须同守这条锁序**（`writeOneKey:202-203` 起手就 `m.mu.Lock()`）。**这一枚会死锁而不是死红**，是本轮唯一一枚"红了看不出为什么"形状的钉 |
+| **N10** | `TestWhitelistMethods...`（票 181 反漂移那枚） | `internal/panel/git_test.go:385`（比对 `:381-383` 写死的四枚常量）、尺 `whitelistMethodsFromSource:407`、正则 `panelMethodRe:394`、枚数钉 `:517`（`len(real) != 4`） | 从 `bridge.go` **源码**抽 `"panel.*"` 双引号字面量，必须＝四枚；正控＝植第五枚 `panel.*` 必须被数到 | 票 181：显示半枚不许被接回动作半枚 | 195 若在 `bridge.go` 里新增任何 `panel.` 前缀字面量（**连注释里带双引号的那一枚也算**，正则不剥注释）⇒ 红，且与 N4/N5 同时叫。守 AC#6 就不踩 |
+| **N11** | `TestAC11SettingWriteReportsTheKeyPathItChanged` 一族 | `internal/config/settings_248_test.go:57 :79 :113 :166 :192 :213 :238` | 逐枚键各一发受保护写、非法值⇒文件**逐字节不变**、外来手改保住、写前 `validate` 生效 | 票 248 AC#7／AC#11 | **不是阻挡，是要接的既有契约**：195 的按节入口若复用 `writeOneKey` 就自动继承；若新造第二形（例如绕开 `pre` 快照）⇒ 这族里的字节比对会红 |
+| **N12** | `TestBoundaryNoRuntimeObservationFields`／`TestBoundaryNoPlaintextSecretFields` | `internal/config/boundary_test.go:59`（禁词八枚）／`:38` | 反射扫 `Config{}` 全部字段名，含 `health`/`probe`/`latency`/`lasterror`/`last_error`/`successrate`/`success_rate`/`verified` 即红 | 存储切分：运行期观测态归 SQLite | 195 若为"待决项"往 `Config` 加字段（例如 `PendingWiden`）⇒ 名字里带 `last*`／`verified` 之类就踩。**入口返回类型不是 `Config`，别加进去** |
+
+### §4 末：命令与期望读数（本腿不跑，落地腿逐名照抄终态）
+
+```
+# 1) 包内（票 195 AC#5 的字面判据）
+go test -count=1 ./internal/config/                                    # 期望：全绿，无 --- FAIL
+# 2) 面板＋装配根：必须带 PATH 前缀，否则 exit status 0xc0000135 且【没有 --- FAIL】＝用例根本没跑
+PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 ./internal/panel/ ./cmd/wisp/
+# 3) 门禁
+sh scripts/d22scan.sh                                                  # 期望：clean（注意 ban#8 那格报的是【被扫文件数】，不是违规数）
+bash .scratch/wisp/probes/154/gate-clauses.sh                          # 期望：BAD 腿名册只 G6neg（在册常红）
+"$(go env GOPATH)/bin/gofumpt" -l internal/config cmd/wisp internal/panel   # 期望：空
+```
+⚠ 第 2 发那串 PATH 前缀**不是可选项**：`cmd/wisp` 那族缺它会给 `exit status 0xc0000135` ＋ `0.0xxs`、
+**且不打印任何 `--- FAIL`**——本仓 09-28 已有人把这判成"写手报错"。
+⚠ 另：`cmd/wisp` 起手即在的一枚 boot Ctrl+C 时序 flake 已知 ⇒ 报红绿时要给**整包序＋隔离跑两形**才作数。
 
 ---
 
 ## §5 落点建议（只给形状，不给码）
 
-（本轮回填）
+### 我选：**乙′（差一块地基，但那一块不是我原以为的那一块）**
+
+不是甲（195 没被 248 整枚满足），不是丙（面板口那一跳 248 已经接完了）。
+**准确形状＝248 顺手建掉了"逐枚具名叶子键的受保护写"这一半地基，
+195 欠的是"按节寻址 + 方向分流"那一半**：一枚能用 `(section, key, value)` 表态的入口，
+它对**非锁定族**直接走 `writeOneKey` 那一族落盘，对**锁定族**按 `manager.go:421/457/470/490` 现成的
+方向裁决分流——**收紧 ⇒ 直接写；放宽 ⇒ 交进 C18 队列、不落盘**（`ui.go:167-171` 保证这枚队列的 allow
+只有原生侧给得了）。它落在哪几枚文件，具名：
+
+| 落点 | 为什么是它 |
+|---|---|
+| `internal/config/` 新增**一枚**入口（不新增文件也行，与 `settings.go` 同包） | 三枚方向裁决器与 `validate`/`mergeWrite`/`diffKeyPaths` 全在同包，**零新导出面、零新依赖边**就能复用；`writeOneKey:199` 已经是那枚"共同体"，缺的只是把 `ownedKey` 从"闭包顺手写死的名字"升成"入参" |
+| `internal/config/manager.go`：把 `riskDirection`/`fsDirection`/`netDirection`/`pluginsDirection` 的调用面从"整节比较"具化成"单键判定" | 今天这四枚只被 `planLocked` 用（reload 侧）。按节入口必须吃**同一个**裁决器，⛔ 不许在入口处另写一套"什么是放宽"（那是第二真相源，本仓最贵的那一形） |
+| `internal/config/unwired.go:118-147` 的 `lockedKeyDisposition` | §3.2 那两枚键（`fs.delete_enabled`／`fs.reparse_point_exceptions`）的处置行必须与入口**同批**改，否则 N6 红、且注释变假话 |
+| ⛔ **不动**：`bridge.go:42-45` 四枚、`config_handlers.go:90` 那张 7 枚字段表、`l2_grant_boundary_test.go` 三张词表、`writeguard.go` 的 `mergeWrite` 本体 | AC#6＋N1／N2／N4／N5／票 226 地界。**尤其：195 不许以"给面板口加一枚安全节字段"的形式落地**——那会同时打红 N1+N2 并把 AGENTS 禁令#6 变成一扇开着的门 |
+
+### 三档各自的代价与"选错会在盘上留下什么形状"
+
+**甲＝"195 整枚已被 248 满足，只立残余"**
+- 选它的代价：**把 AC#2 那两枚有真消费者的锁定族放宽键（`fs.delete_enabled`／`fs.reparse_point_exceptions`）
+  继续留在"只靠没有写入者挡着"这一形上**，并把票 195 那一格在追踪矩阵里划成已交付。
+- 选错会在盘上留下：一枚**看起来已被保护、其实只是没人碰**的放宽面。等任何后续票（票 114 那族"档位/工作区"、
+  票 128/132、或界面侧那句"我想自己配"）第一次调"什么键都能写"的入口，它就**静默生效**，
+  且新增的那枚 setter 会带着一份"这是 195 那枚地基"的信心。⚠ 本仓定式：**错误的信心与正确的信心在盘上长得一模一样**
+  ——所以甲的判据不能是"现在没有写入者"（会随时间翻），必须是下面那把尺。
+- **会响的尺**（甲这一档唯一诚实的形，落成常驻用例）：
+  具名一枚 `internal/config/` 内的枚举——**锁定族每一枚 loosen 键都必须显式声明它的处置**
+  （`unwired` / `queue` / `direct-tighten-only`），并把 §3.2 那两枚键**点名**进去；
+  尺的形＝`fsDirection`/`riskDirection` 的**输出集**逐个查处置表，缺项即红（形状照 N6，别照词表）。
+
+**乙＝"差一块地基"（我选的档）**
+- 选它的代价：195 落地要**同时**动 N6（判决表）、N8（cmd 侧那两枚"调用方确认"钉的语义）、
+  N9（锁序，⚠ 这枚是**死锁**不是死红）与 §3.2 那两枚键 ⇒ 它是**一枚中型腿，不是一枚补差集的小腿**，
+  而且它和 248 已落的那半枚地基**共用 `writeOneKey`**，两枚验收腿的射程会重叠（`248-v1` 与 195 的验收者要提前分工）。
+- 选错（把范围做大了）会在盘上留下：把 C18 队列搬进 `internal/config` ⇒ 那枚包今天对审批层**零耦合**
+  （尺＝§2 AC#2 那一发 0 命中）。搬进去＝新一条依赖边（`internal/config → internal/agent/approval`），
+  而本仓对"装配根之外新增依赖边"是要单独 `A##` 的。⇒ **判据形状要反过来**：入口只**返回**"这一发是放宽、
+  需交队列"这一枚**判定**，谁去举卡仍归装配根（`cmd/wisp`）——与 `ui.go` 那两枚 API 的分工同形。
+
+**丙＝"地基已在、只差面板口那一跳"（归 194／145／114 之一）**
+- 选它的代价：**这一档已经不成立**，因为它的前提"那一跳没接"今天为假：`bridge.go:66/67`、
+  `composer_dispatch.go:197/202`、`panel_inbound.go:266-279`、`panel_resident_windows.go:170`＋`:189`、
+  `panel_host_windows.go:551` 五枚点连成的那条线**已经在盘上**（静态可证；绿不绿＝J1）。
+- 选错会在盘上留下：最坏的一种——**再补一跳**。`Config` 槽已经有人接了，第二枚入口意味着两个真相源
+  （两个"谁被允许写 `config.toml`"），而那正是票 248 头部注释和 `run.go:412-415` 逐字在防的那一形。
+- ⛔ **不许选丙**，除非有人能指出上面五枚点里哪一枚今天不存在。**指得出＝丙；指不出＝读漏了。**
+
 
 ---
 
