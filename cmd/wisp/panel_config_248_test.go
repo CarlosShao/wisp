@@ -29,6 +29,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/panel"
+	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/secret"
 )
 
@@ -160,8 +161,9 @@ func TestAC2CredentialSentinelAppearsInNoArtifact(t *testing.T) {
 		t.Fatalf("the credential write was refused: %v", err)
 	}
 
-	snap := panel.NewSnapshotPump(panel.PumpSources{Credential: leg.credentialStatus})
-	snapshotBytes, err := snap.Marshal()
+	pump := panel.NewSnapshotPump(panel.PumpSources{Credential: leg.credentialStatus})
+	snapObj := pump.Snapshot()
+	snapshotBytes, err := pump.Marshal()
 	if err != nil {
 		t.Fatalf("marshal snapshot: %v", err)
 	}
@@ -172,12 +174,18 @@ func TestAC2CredentialSentinelAppearsInNoArtifact(t *testing.T) {
 	auditBytes := []byte(strings.Join(audit, "\n"))
 	logBytes := logbuf.Bytes()
 	fileBytes := readAllFiles248(t, dir)
+	// The persistent ledger's own line (ticket 35's booking surface, which clamps
+	// to summaryClamp and carries a digest rather than bytes) belongs in this grep
+	// exactly as much as the snapshot does: AC#2 names "快照／[audit]／持久 sink",
+	// and a ruler that skips the third of the three is not covering the surface.
+	ledgerLine := []byte(panelSnapshotSummary(snapObj, snapshotBytes))
 
 	var hits []string
 	hits = append(hits, hits248("receipt", []byte(reply))...)
 	hits = append(hits, hits248("audit", auditBytes)...)
 	hits = append(hits, hits248("slog-sink", logBytes)...)
 	hits = append(hits, hits248("snapshot", snapshotBytes)...)
+	hits = append(hits, hits248("ledger-line", ledgerLine)...)
 	hits = append(hits, hits248("data-root", fileBytes...)...)
 	if len(hits) > 0 {
 		t.Errorf("the credential value reached an artifact (%d hits); the artifacts are not printed here on purpose",
@@ -223,6 +231,24 @@ func TestAC2LeakRulerFiresWhenTheCanaryIsReallyThere(t *testing.T) {
 	}
 	if got := hits248("planted-snapshot", data); len(got) == 0 {
 		t.Fatal("the credential ruler did not fire on a snapshot that carries the sentinel: the zero-hit case above proves nothing")
+	}
+	// The ledger line is a *summary*: it carries the pending correlation ids, the
+	// mode, the counts and a digest, and no result text at all. So the plant that
+	// has to reach it is a card id wearing the sentinel - which is the same shape
+	// as a real leak through that surface, and the reason the zero-hit case above
+	// checks this line as well as the packet.
+	cards := panel.NewSnapshotPump(panel.PumpSources{
+		Credential: leg.credentialStatus,
+		Verdicts: func() []panel.NativeVerdict {
+			return []panel.NativeVerdict{{CorrelationID: "ctl-" + canary248, Tool: "fs.write", Level: risk.L2}}
+		},
+	})
+	cardSnap, cardData, cerr := cards.Publish()
+	if cerr == nil {
+		t.Fatalf("the pump was expected to refuse with no exit attached, got %v", cerr)
+	}
+	if planted := panelSnapshotSummary(cardSnap, cardData); len(hits248("planted-ledger-line", []byte(planted))) == 0 {
+		t.Fatal("the credential ruler did not fire on a ledger line that carries the sentinel: the zero-hit case's ledger surface proves nothing")
 	}
 	if got := hits248("planted-audit", []byte("audit line: "+canary248)); len(got) == 0 {
 		t.Fatal("the credential ruler did not fire on an audit line that carries the sentinel")

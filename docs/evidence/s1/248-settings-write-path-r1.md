@@ -152,16 +152,57 @@
 
 ## 5. 我可能写错的条目（对抗我自己；⛔ 交件时不许留"待填"）
 
-（待填）
+1. **那两枚解冻锚的"能力形"是我写的新仪器，它读的是 `bridge.go` 一枚文件的 const 块**。`guardRosterOf`（现读 `internal/panel/l2_grant_boundary_test.go:2030`）把"守卫的 case 标签"与"本文件声明的 `Method*` 常量"做双向全等。如果日后有人把某枚路由常量挪去 `bridge.go` 之外（同包另一枚文件），派生会报"the guard answers X, which no declared Method* constant of this file names"⇒ **假红**，而且红的是冻结件。我按 `A487` 的边界（"只许改这两处与其直连 helper"）把 helper 写在同文件相邻位置，没有扩大射程去读整包；**代价就是这条单文件假设**。验收腿若要判它，判这枚。
+2. **`dispatch` 的返回值从 `error` 变成 `(string, error)`**，为它改了一枚既有用例的**调用点**（`internal/panel/composer_dispatch_test.go:235`，`err := ` ⇒ `_, err := `，断言原文一字未动）。⚠ 如果验收腿或别人的突变脚本按老签名直接调 `dispatch`，会编译不过而不是红一句——这不是我能在自己文件里预防的，具名报出来。
+3. **AC#2 的 grep 面我第一版漏了"持久 sink"那一枚**。派单与票面写的表面是三样：快照／`[audit]` 行／持久 sink。我第一版只跑了快照＋audit＋slog sink＋数据根，**没跑 `wisp run` 记账那行**（`cmd/wisp/panel_pump.go:331 panelSnapshotSummary`，它自带 440 字符钳并把摘要与 sha256 落 ledger）。`09:0x` 那一发之后我把 `ledger-line` 补进了零命中尺**和**正控尺（补了才交，没补我就会在 §7 里把它写成欠账）。⚠ 读数因此分两发：第一发零命中是 4 面，终态是 6 面。
+4. **哨兵尺的形状正则只认 `sk-` 族**。尺面是"字面哨兵 ＋ `sk-[A-Za-z0-9]{12,}`"。真实服务商里 OpenAI 形是 `sk-`，Anthropic 是 `sk-ant-`（也在射程），但**别家的形状（纯 32 hex、含下划线的长串）今天不在尺上**——我刻意没写宽泛的 `[A-Za-z0-9]{32,}`，因为 `dpapi:<32 hex>` 合法地出现在 `config.toml` 与 blob 文件名上，宽正则会把**允许上页面的引用**判成泄漏（假红→有人会去放宽它，那才是真坑）。⇒ 这条尺**是"哨兵零命中"而非"一切密钥形状零命中"**；票面 AC#2 原文那句"grep 不到任何 key 值"要按这个射程读，不是我替它扩了判据。
+5. **`writtenKeyPaths` 报的是"文件前后差"**，不是我这次写的内容清单。这正是 AC#11-1 要的凭据形状（写前写后各读一次文件比对），但**归因是宽的**：如果同一瞬间第三方改了另一枚键，那份改动也会被列进这枚回执。我没有把它与 `ownedKey` 求交，因为求交就等于把"文件实际发生了什么"改回"我以为我写了什么"（票 226 报的就是前者）。⚠ 若验收腿认为回执必须严格等于本次所有权，那一格不是我判的。
+6. **字段名册在两处**：可写枚举在 `internal/panel/config_handlers.go:57-104`，枚举→setter 的映射在 `cmd/wisp/panel_config_store.go:158-196`。两枚表可以漂——漂的后果我按响亮那一侧设计：leg 的 `default` 支拒写、`WritableFields()` 有独立用例钉住那 7 枚，所以"panel 收了、leg 不写"是红句不是静默。⛔ 但我**没有**做一个"两枚表必须同枚数"的断言（跨包不可反射，leg 在 `package main`）⇒ 这是结构约束而非机读约束。
+7. **`credentialStatus` 的 `env:` 一支读的是本进程的环境**。`os.Getenv(value)` 为空就算"未录入"，可这只说明**这个进程**没看到那枚变量，不代表操作者的 shell 里没有。枚举名 `partly_missing` 在这种一发里会说略重（逐服务商行里我另给了 `CredentialError`/布尔，聚合值没有）。我没找到不引入新键的解法（J3 禁顶层第五键），所以**这是已知会说糙话的一枚聚合值**，不是我没看见。
+8. **`role_chat_model` 等四枚 `[llm]` 字段我一律回 `restart`**，而 `SPEC-03 §4.2` 的表把 `[llm]` 记成 hot。我按 J9/AC#8 的实践面写（endpoint 只在装配时构造、`OnReload` 在 `cmd/wisp` 零生产赋值点——两样本腿都复认过，见 §4 的尺），所以**表与我说的话不一致时，说重的不是我错**；但一旦哪天真接了重建那一跳（票 223 地界），这批回执文案就变成过度保守，要跟着改。
+9. **`TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit` 是靠"控制支必须仍然会覆写"来给正控的**（照票 226 的同名形）。如果哪天 `SaveFile` 被改成 merge 语义（那是票 226 的地界，不是本票），这枚控制会红——红的含义是"控制失去牙齿"，不是"设置写入坏了"。我在用例注释里写了这句话，但**它仍然可能被下一个人读反**。
+10. **`model_price_in/out` 我只做了两枚**（`Price` 有 5 枚叶子：in/out/cached/audio_in/audio_out）。票面 §5 那句给界面侧的话只写"价格"，owner 的表单没枚枚点名，所以我按"最常被问的两枚"落地，⛔ 没有把 5 枚全开（多开就是多改契约面）。**这是我自己划的线，归编排者判够不够。**
+11. **§3 的行号是 `09:0x` 现量的，`internal/ball/**` 那枚并发腿不吃我的文件，但 `cmd/wisp/**` 是共享目录**：如果有人在我之后动 `cmd/wisp/run.go` 或 `panel_inbound.go`，我这张表里的行号会漂。派单要求"cmd/wisp 行号落地现读为准"，我照做了；引用的人请重跑。
+12. **我没有把新名登记进 `composerRouteLiterals()`**（`internal/panel/composer_test.go:409`）。那枚集合是**硬编码**的四枚常量＋`panel.approval.request`，注释自己写着"Growing it is a two-sided change on purpose"——它是"页面一旦真叫 `config.get`"那一步的登记点。页面还不会叫（本编队不写 `frontend/**`），所以我按"两界接缝不在本腿"处理；⚠ 若验收腿认为现在就该登记，那一格是**我对触发条件的读法**，不是漏码。
+13. **`frontend/dist` 我只用了两枚 git/d22scan 侧读数**：`git ls-files frontend` 里 `dist` 只有 `.gitkeep`，与 `sh scripts/d22scan.sh` 自己吐的 `d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/]`。后者说明**本机存在未跟踪的 dist/assets 目录**；我没有读它、没有列它，也没有据此判"AC#9 能勾"。如果有人按我这条读数说"内容已经有了"，那是我没说过的话。
 
 ---
 
 ## 6. 判不动的地方（逐条具名交回；⛔ 交件时不许留"待填"）
 
-（待填）
+1. **AC#10 的 ⓘ／ⓑ 二选一**——**不做，选形归编排者**（派单与 `ticket248-ruling-248a2` 末段都写"本轮不裁、⛔ 不许实现腿自选"；口令「248 别动常驻门」）。我这发只做**读数**（复认前人 `246-v2` 的断言，⛔ 不是转述）：
+   - 常驻那扇门的构造：`cmd/wisp/resident_approval_windows.go:109-113` ⇒ `approval.New(approval.Options{UI, Channels, Logf})`，**没有 `Window`、没有 `ApprovalTimeout`、没有 `Grants`**（同文件 `grep -n "Risk.L1WindowSec\|Risk.ConfirmTimeoutSec" cmd/wisp/resident*.go`＝**零命中**）。
+   - 对照：跑任务那条腿 `cmd/wisp/run.go:600-603` 三项都给了（`Window: cfg.Risk.L1WindowSec`／`ApprovalTimeout: cfg.Risk.ConfirmTimeoutSec`／`Grants: grantWrite`），而 `session.NewLedger` 在 `run.go:463`，建在 gate 之前。
+   - 常量与钳位（现读，前人那三行我逐行复认，路径是 `internal/agent/approval/` 不是 `internal/approval/`）：`queue.go:107 DefaultApprovalTimeout = 300s`／`:116 DefaultL1Window = 3s`／`:121-122 MinL1Window = 2s`/`MaxL1Window = 3s`；`queue.go:86` 缺省回落到 300s；`gate.go:139-144` 是 `win<=0 → DefaultL1Window` 再夹进 `[2s,3s]`。
+   - 记账被丢那两行：`gate.go:668` 与 `:674` 的 `"approval: GRANT-DROPPED ..."`（本腿只读，⛔ 未跑那套仪器）。
+   ⇒ **读数结论＝"读不到"**：`[risk]` 的 `confirm_timeout_sec` 对常驻腿**无影响**（走常量 300s），`l1_window_sec` 今天对常驻腿也无影响，且即便接上，`>3s` 会被 `MaxL1Window` 钳回；真正有差异的是超时那一枚。**回执文案要不要逐字声明这件事（ⓑ 形）＝归编排者裁**，本腿不自选也不落地。
+2. **AC#4（真机那一发）——本腿不做也不勾**（派单明令）。缺的两样具名，都在别人手里：
+   - **一样：受版的页面产物。** `git ls-files frontend` ⇒ `frontend/dist/.gitkeep` 是 `dist` 下唯一被跟踪的东西（本腿 `08:31:49` 复量）；`frontend/embed.go` 的活模式是 `//go:embed all:dist` ⇒ 能建，但**没有一包页面可发**。产物由界面侧那枚 agent 出，本编队⛔ 不写 `frontend/**`。
+   - 二样：**"点设置"那枚入口与那枚只写不回显的密钥框**（页面侧），加上页面真叫 `config.get`/`config.set` 之后那步两界登记（`composer_test.go:409` 的 `composerRouteLiterals`）。Go 这侧的接法已经就位（§3#1/#2/#3）。
+   - ⚠ 前人票面 §5.4 那句"宿主还没接进常驻那条腿（`grep PanelManager`＝0 命中）"**今天已经不成立**，本腿复量：`cmd/wisp/resident_windows.go` 命中 2 行、`cmd/wisp/panel_resident_windows.go` 命中 6 行，且 `newResidentComposerDispatch`（`panel_resident_windows.go:166-170`）复用的正是本腿动的那枚 `newComposerDispatchChain`。⇒ **票 33 那半边比票面写的更靠前**；但"窗口能建"不等于"owner 真点得出设置"，那一格仍归编排者与验收腿（本腿没跑过任何真窗，也读不到页面）。
+3. **AC#9（宿主在、内容不在）——本腿判不了**：尺要问的是 embed 之后文件系统里的条目数与关键入口文件，而那在 `frontend/**` 的两层禁令里（读了也不许引）。我只有上面那枚 git 名册读数＋d22scan 自己报的一行 ignored-path 提示。**归口：谁把 dist 填上没落定之前这一格勾不了**（票面 AC#9 原文同判）。
+4. **AC#2 的页面那一半（Q-51）**：`credentialState`/`credentialKnown` 两枚键要让 `frontend/src/lib/panel.ts` 的 `ComposerState` 声明，否则双向对账门一直红。本腿⛔ 不动 `frontend/**` 一字，也没有放宽那枚门（改法只有"页面同批补声明"，那是界面侧的活）。⚠ 读数见 §4：那枚门在我之前**就已经**为 `[git currentModel modelKnown]` 三枚键红着。
+5. **`fs.*` 到底禁不禁由 `config.set` 写**——**判不了，这是编排者的边界**。J5 逐字锁的是 `risk.*` 全族；`fs.allowed_dirs` 只被 `allowdirs.go:16-24` 那句"这里的写放宽的锁定段，调用者欠那张 L2 卡"覆盖。**我取了保守形**（`config_handlers.go:108` 把 `fs.` 连同 `net.`/`plugins.`/`privacy.`/`models.`/`audio.` 一起列进拒写族），如果编排者的边界是"只锁 `risk.*`，其余段可写"，那我这一拒比裁的更窄——**窄不会造成安全事故，宽会**，所以这个方向我不改，但具名报出来等一句判语。
+6. **票 33 那侧的面板毫秒级红（冷 ≤1500ms／热 ≤200ms 那一族）算不算缺陷**——**不判**。同机另有一枚腿（`internal/ball/**`）在跑，且云端 CI 今天不在这台机器上；我只登记逐字读数（§4）＋"并发负载可能"的归因线索。阈值一字节没动，那一格归编排者与验收腿。
+7. **`staticcheck`**——**〔未复认〕**。本机版与 CI 钉版不同，跑了会出假绿，派单明令不跑，本腿没跑。
 
 ---
 
-## 7. 交件判语与欠账（AC#4 缺哪两样在此归口）
+## 7. 交件判语（逐格读数归口；勾与不勾不归本腿）
 
-（待填）
+| 格 | 本腿做到了什么（读数在 §4，凭据在 §3） | 欠什么／归谁 |
+|---|---|---|
+| AC#0 | 三问在 §1，各带 `文件:行`＋本腿自己跑的尺（`08:31:49`／`09:0x` 两批）；三问都定得下来，**没有触发"停手上报"** | — |
+| AC#1 | 两枚名真进白名单（`bridge.go:66-71`、守卫 `:146-152`）与派发表（`composer_dispatch.go:197-212`）；负向（`panel.review.allow`/`approval.decide`/`config.write`/`panel.config.set` 必拒）与正控（同形封套换成在册名 ⇒ 处理器调用计数＝1）同用例落地；在册无处理器 ⇒ `ErrNoHandlerAttached` 响亮 | 两界登记点（`composerRouteLiterals`）等页面，见 §6-12/#12 |
+| AC#2 | 那一维进 `composer` 段（非顶层键）；哨兵零命中尺覆盖 6 枚表面（回执/audit/slog/快照/ledger 行/数据根全文件）＋**两枚正控**（种进快照必须被抓、种进 ledger 行必须被抓）＋结构形尺（共用封套不许声明凭据键，种一枚声明了的类型必须报重叠） | `panel.ts` 声明归界面侧（§6-4） |
+| AC#3 | 只调 `secret.NewStore`/`Store.Store`/`Exists`/`NewRef`（`internal/secret/**` 一字未改）；`config.toml` 只落 `dpapi:` 引用；没有任何"把值回显给页面"的方法；用例证明 blob 里解得回来且全树无明文哨兵 | — |
+| AC#4 | **未做、未勾**（派单明令） | 缺"受版页面产物"＋"设置入口页"两样（§6-2）；票 33 宿主那段比票面靠前（§6-2 末） |
+| AC#5 | 越界三把尺逐 commit 自证：`git diff --cached --name-only` 两次（15 枚路径，全在我写面）＋终态名册差集＋d22scan | — |
+| AC#6 | 四数在 §4（build/vet/d22scan/gofumpt 全 rc=0）；`staticcheck`〔未复认〕 | 面板毫秒级红的定性归编排者 |
+| AC#7 | `validate()` 落在新增导出 setter 内、进 `mergeWrite` 之前（`settings.go:199-249`）；种 6 发非法值 ⇒ 磁盘逐字节不变＋下次仍起得来＋内存不漂（真跑过，不是推） | — |
+| AC#8 | 回执带 tier，`[llm]` 全族按重启写死；全文（票面、代码、回执、用例断言）grep 不到"保存即生效"；页面可达面：`Handle` 返回串（票 33 的 bind 闭包 `panel_host_windows.go:319-322` 把它交页面）＋本腿把 console 支也接上 | "页面上真看得见"要真窗那一发，归 AC#4 同族欠账 |
+| AC#9 | 本腿未判（禁令），只交名册读数 | 界面侧＋编排者 |
+| AC#10 | 读数完成（§6-1，结论＝常驻腿**读不到**那两项）；⛔ 未选形、未动常驻门 | 选形归编排者 |
+| AC#11 | 三子判据都在：只走 `mergeWrite`（⛔ 未用 `SaveFile`，未改 `mergeWrite` 本体）；并发保 B 键用例＋"若改用快照序列化器则此控制必失效"的控制支；多枚字段＝逐枚键各一发＋回执逐枚列键路径（取"文件前后差"） | 回执归因宽度见 §5-5 |
+| J1（冻结钉） | 两枚锚换成能力形（名册双向全等）＋自带正控（种一枚不在名册的路由标签 ⇒ 派生必报错），未删钉、未放宽成 ≥4；冻结件其余一字未动（`git diff` 逐 hunk 见 §4） | 判语与勾归验收腿 |
+
