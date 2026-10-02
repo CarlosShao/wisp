@@ -73,3 +73,84 @@
   票面问的"缺哪一跳"今天答案是**整条链**——宿主（票 33）与载体（票 35）都不在，
   且尺寸这一维在快照名册里也不存在（`internal/panel/composer.go:57-62` 只有四枚 key）。
 - 09-28 17:5x 编排者收 `180-a1`（只读普查，两枚 commit `cb14a8b2`／`35abbc40` 只动票面与它自己证据件）：`AC#1` 勾（我复跑对格）。**排程结论（这一条比表更重要）**：面板尺寸这一维缺的**不是"接线那一行"，是整整一个窗口**——今天这棵树里没有面板窗口，所以 `AC#2`（正向落地）**排在票 33 的 WebView2 宿主之后**（H2／H3），本轮不排进队列；为免它再空一次，我已把"宿主必须读 `[panel] width/height/scale` 并真去设边界"追加成**票 33 的新格 `AC#10`**。另记一枚过期注释（`internal/panel/pump.go:15-17` 逐字写着"ticket 33 is unclaimed"——**33 早已被认领、片 A／片 B 都已落**）：归 `145-r2` 交件后的下一枚 `internal/panel` 写腿顺带更正，**现在不动那枚文件**（它在别人写面上）。
+
+## 10-02 现量（追加节，正文与上面所有 AC 框一字未改）
+
+- 10-02 10:2x `180-a1`（**第二程**·只读全名册普查，非 09-28 那一程；派单五问逐问落表；
+  表 `.scratch/wisp/probes/180/a1/census.md`，588 行／53744 字节，占位符尺 **0** 命中）：
+  **AC 框一枚未碰、产码零字节未动**。起手 HEAD `00e7efe`（10-02 09:57:47 +08）、
+  终态 HEAD `f51cfef4`（10:27:45 +08）；
+  尺 `git diff --stat 00e7efe..HEAD -- internal/config internal/panel cmd/wisp go.mod` ⇒ **空输出**
+  ⇒ 本程引用的 12 处承重行号在两枚 HEAD 上**同立**（票面 `schema.go:527-528` 已漂到 `:532`，
+  派单 `unwired.go:57-101` 已漂到 `:60-97`）。
+  1. **全名册现量（问 1）**：段数 **18 枚 section ＋ 1 枚根表裸键 `schema_version`**
+     （派单那句"18 个 section"**成立**，两把独立尺：`Config` struct 段字段枚数＝18；
+     票 198 首建真件 33 个表头＝18 顶层＋15 子表）。叶子键 **150 枚**＝静态 115 ＋ 动态子表模板 35
+     （`providers.<id>` 10 ＋ `models.<id>` 21 ＋ `plugins.<id>` 4）；
+     静态 115 与首建真件的 115 行 `key =` 逐枚 `comm` 只差 `models.local_override`（空 map 不落盘）。
+     带 `default:` 标签 **69** 枚（与 09-28 `180-c1` 独立对上）。
+  2. **七档判读（150 枚全表见证据件 §1.5）**：
+     R 有生产读者 **50** ／ B 读了只作旁注 **4** ／ W 类型在场·生产零赋值 **5**（`price` 五枚）／
+     S 仅旁路调试程序 `cmd/balldebug` **4**（`[hotkey]` 全段）／
+     G 无人读但 `unwiredKeys` 拦成加载错误 **6** ／ L 无人读仅登记 `lockedKeyDisposition` not built **5** ／
+     **D 无人读且名册外 76**。⇒ **无人读或读了不做事 100／150**；**既无人读又不在任何名册 76／150**。
+     整段无人读的段：`[voice]` 21／21、`[ball]` 7／7、`[audio]` 4／4、`[session]` 3／3、
+     `[memory]` 4／4、`[cost]` 4／4、`[observe]` 4／4、`[privacy]` 5／5、`[app]` 4／4、`[panel]` 5／5。
+  3. **`unwiredKeys` 覆盖率（问 2，本程最值钱那一格）**：名册 **6 枚**（`unwired.go:60-97`）。
+     四个分母四个数——无人读的键里被任一名册登记者 **11／100＝11%**；
+     会拦下来报错的 **6／100＝6%**；锁定四段之内 **11／11＝100%**；
+     **锁定四段之外 0／89＝0%**。⇒ **"名册里安静"确实不等于"全仓没有哑键"，差的不是几枚是 89 枚。**
+     完整性钉 `TestEveryLockedSectionKeyIsAccountedFor`（`unwired_test.go:311`，本程读到函数体为止）
+     对四段各跑一次 `collect()`，我照它的逻辑复算 ⇒ 实际收集 **16 枚**路径，
+     其中 `plugins` 只 1 枚：`PluginsSection.Entries` **没有 `toml` 标签**，而 `collect()` 首句
+     `if tag == "-" || tag == "" { continue }` ⇒ 名册里那五条 `plugins.<id>.*` 行**这枚钉永远查不到**。
+     且钉只问"有没有一句话"，`consumed:` 分支**不核实消费者是否在场**（本程逐枚读了 6 条 `consumed:`，
+     都能在码上对上具名行 ⇒ 这一族今天没抓到假话）。
+  4. **生效级别三档（问 3）**：作为**数据不存在**，作为**硬编码分支存在**。
+     `type Tier string` ＋ `TierHot`/`TierReload`/`TierRestart`（`schema.go:30-44`）**零读者**
+     （尺：`grep -rn "Tier\b|TierHot|TierReload|TierRestart" --include=*.go cmd internal tools | grep -v _test.go`
+     ⇒ 命中全是别人的 `Tier`：`panel.EffectiveTier`、`risk.Tier`、`projctx.Tier`）；
+     `schema.go` 里只有 `toml:` 与 `default:` 两种标签，**没有 `tier:`** ⇒ 级别不在字段上，
+     只在 `plan()`／`planApp`（`manager.go:338-357`）／`planVoice`（`:361-417`）的分支里，**粒度是段不是键**。
+     ⚠ 本程新量一枚：**reload 档在出货进程里没有听众**——`Manager.OnReload` 的非测试赋值点全仓只有
+     `cmd/balldebug/main.go:244`，`cmd/wisp/config_reload.go` 只挂 `ConfirmLocked`（`:114`）与
+     `OnRestartPending`（`:115`）⇒ 换 ASR/TTS 模型不会触发模型加载/卸载，
+     而 SPEC-03:134 逐字要求"reload 段触发重载事件"。
+     另：面板侧另有**四档**词汇 `EffectiveTier`（`config_handlers.go:196-203`：now/next_task/restart/not_applied），
+     与 D36 三档**不同名也不同数**，且只走设置写入回执那一条路。
+  5. **"此项今天不生效"有没有出口（问 4）**：**读侧盘上没有这句话；写侧已经有现成的一档。**
+     现成＝`SettingWriteResult.Tier` ＝ `EffectiveNotApplied` ⇒ `tierSentence` 回"这一项没有被应用。"
+     （`config_handlers.go:196-203`、`:210-217`、`:428-441`，票 248 落的）。
+     但它只在 `config.set` 被**受理**之后存在，而白名单只有 **7 枚字段**（`:57-69`），
+     `[panel] width` 过不了受理关（`:321-326` `unlisted-field`）⇒ 手改 `config.toml` 的人**连那句话都走不到**。
+     快照侧也不能：`Snapshot`（`composer.go:57-92`）六个 `json:` 键里没有一栏承载配置键状态；
+     `config.get` 走 `renderSettingsView`（`:445-462`）只说可读性／服务商数／凭据状态／聊天模型。
+     最近的可扩展点具名到字段：`SettingsView`（`:142-156`）／`renderSettingsView`（`:445-462`）／
+     `SettingWriteResult.Tier`（`:210-217`）／登记面 `lockedKeyDisposition`（`unwired.go:119-147`）。
+     ⛔ 前三处属 **C17／契约面**（快照键集与方法白名单）——**本程不裁该不该加、加哪一栏**，交编排者落批准记录。
+  6. **`[panel] width` 断在哪一环（问 5）**：十环逐点（证据件 §5.1）。
+     值走完了"文件→`parse.go`/`loader.go`→`defaults.go:60`→`Manager.cur`（`manager.go:106`）→
+     `Config()` 深拷贝（`:115`）"，**断在第 7 环：面板宿主从来拿不到配置对象**——
+     `PanelManager`（`cmd/wisp/panel_host_windows.go:137-167`）没有 config 字段，
+     构造函数 `NewPanelManager(disp, assets, dataPath)`（`:175-177`）不收配置，
+     生产调用点 `cmd/wisp/panel_resident_windows.go:204` 也只传这三样；
+     第 8 环尺寸在建窗那一行是**写死的字面量** `Width: 420, Height: 260`（`:304-305`），
+     第 10 环没有第二条路（`SetBounds|MoveWindow|SetWindowPos|Resize(` 在本包外非测试码只命中
+     `:45` 的注释）。
+  7. **本程推翻票面／09-28 两程三句**（全表见证据件 §8）：
+     ① 09-28 两程的"**这棵树今天没有面板窗口**"**已过期**——`go.mod:19` 已有
+     `github.com/jchv/go-webview2`，`cmd/wisp/panel_host_windows.go` 与 `panel_resident_windows.go` 在场且真建窗。
+     ⇒ 票面 AC#1 那问"谁决定尺寸"的答案从**没有人**变成**`:304-305` 那两枚字面量**；
+     ⇒ 编排者 09-28 那句排程结论（AC#2 排在票 33 的宿主之后）**前置条件已满足**，这一格值得重排。
+     ② **比票面"他没有任何一处能读到这项今天不生效"更坏一档**：手改 `[panel] width` 不是没回应，
+     是收到一句**主动误报**——`manager.go:285` 把 panel 段列进 `rep.Hot`，
+     `cmd/wisp/config_reload.go:170-172` 逐字打 stdout"配置热加载：这些段已立即生效（D36 立即档）：[panel]"。
+     同一句误报覆盖 `[panel]` **全部五枚**（不只 `width`）。
+     ③ 票面 AC#4 那句"还有几枚"：本程现量 **76 枚名册外哑键**（不是 09-28 的 18 枚）——
+     两个数不矛盾，`180-c1` 那一遍只数了带 `default:` 标签的字段，本程按叶子键全量数。
+     ④ 票面 09-28 记录"这 18 枚全部已在票 83 的 AC#1 表里登记并归口"：`issues/83-...md:155` 那一行
+     本程**未读到**，按派单硬边界一律当待验断言引用，不据它追认任何格。
+  8. **本程没做（明写，不写成"以后加固"）**：没跑任何编译／测试类尺（`198-v1` 在整包跑 `cmd/wisp`）
+     ⇒ 全部枚数出自文本尺与 Python 走查，没有一把是编译器给的；
+     没做 76 枚的逐枚归口（要读全工单池，超一条只读腿射程）；
+     未读、未引 `frontend/**`／`design/**` 任何内容 ⇒ "读侧没有出口"这句的射程**只到 Go 侧为止**。
