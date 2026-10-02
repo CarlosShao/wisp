@@ -44,7 +44,7 @@
 
 ## 交件要求（腿只交读数，判语归非实现者）
 
-起手 `date -Iseconds`＋`git log -1` 取锚；**第一轮内先落骨架并 commit**；跑到第 100 轮前必须把「门禁读数」与「判不动的地方」两节写满并 commit（空着不算交件）。占位符自查 `grep -nE '待[填]|填写[中]|TBD|FIXME'` 必须 0（⛔ 别把尺的字面文本写进被扫文件）；计数尺一律 `| wc -l` 收尾。⛔ 表里任何一行不许引用一节空的凭据。写明**它推翻编排者上面哪一句**（上面所有行号、枚数与"两次包含"的因果都是我写的待验断言）。
+起手 `date -Iseconds`＋`git log -1` 取锚；**第一轮内先落骨架并 commit**；跑到第 100 轮前必须把「门禁读数」与「判不动的地方」两节写满并 commit（空着不算交件）。占位符自查（尺的字面文本不落在本票面里，含义：抓未填写的骨架残句与 TBD/FIXIT 一类标记，用字符类等价式在命令行上跑）必须 0（⛔ 别把尺的字面文本写进被扫文件）；计数尺一律 `| wc -l` 收尾。⛔ 表里任何一行不许引用一节空的凭据。写明**它推翻编排者上面哪一句**（上面所有行号、枚数与"两次包含"的因果都是我写的待验断言）。
 
 ## 归口
 
@@ -71,3 +71,21 @@
 - `:31` 的「本仓既有规矩：拿不到短名就必须红、不许 skip」＝**全称推翻**：出处 `bridge_junction_windows_test.go:77/84` 为真，但同一 8.3 前置条件在 `internal/risk/pathresolver_junction_windows_test.go:128`、`internal/winsec/tree_ownership_112_windows_test.go:122`、`internal/winsec/absoluteness_attribution_129_windows_test.go:311` 三处用的是 `t.Skip`。
 - `:9-11` 的行号尺与 `:16-17` 的两串长短名读数＝**全部复证为真**（`:133/:140/:152/:153/:127/:138/rules_gateway.go:45/bridge.go:334`）。
 - `:23` 那枚 301 秒 witness 的归因＝**本腿既不支持也不推翻**（`cmd/wisp` 是 `198-r1` 脏面，本腿一枚没跑）；⛔ 不许拿本件当任何候选修法（AC#2 ⓐ／ⓑ）的否证，本腿一枚候选形的作用面都没跑过。
+
+
+## 10-02 10:0x 编排者裁定（`252-p1` 交件后；票面上我那三句被推翻，原话不改、就地打旧）
+
+`252-p1` 的交件凭据：探针 `internal/tools/paths_shortname_252_probe_test.go` **314 行 / 12626 字节**；`.scratch/wisp/probes/252/p1/verdict.md` **212 / 23702**、`probe-run.log` 171/20502、`d22scan.log` 249/22985；提交 `f832fcbb`→`3465dcee`→`4b293c95`；终态 `git status --porcelain internal/tools internal/risk`＝**与起手名册逐枚相等**（都是空）；读数来自单发 `go test -count=1 -v -run 'TestTicket252P1' ./internal/tools/` ⇒ **9 PASS／0 FAIL／0 SKIP**。
+
+**1. AC#1 已答（这是本票最硬那一格）**：**先失配的是第一段（词法，`paths.go:140`），不是 `resolvedForm` 那一腿**。逐字读数：roots 长／asked 短且叶子不存在 ⇒ `InAllowlist=false`，`foldPath(canonical)`＝`d:\work\worksp~1\projec~1\wisp\q252p1-never-created.txt`（短），而 `resolvedForm(...)`＝`D:\work\workspace\projects plans\Wisp\q252p1-never-created.txt`、**`ok=true`（长）** ⇒ **LEG1 false／LEG2 true**。
+- ★ **推翻我票面 §12 那句"两次包含就不可能同时成立"**：实测是**一次成立一次不成立**，且**两段对同一条物理路径给出相反答复**——宽容的那段是 `resolvedForm`。⚠ 这条比原判断更糟：不是"整体判不出"，是**两段各说各话**。
+- ★ **推翻我票面 §10-11 的"短名侧留短／长名侧折长"**：分岔变量是**存在性**，不是拼法（存在 ⇒ 必折长，**roots 也被折**；缺失叶子 ⇒ 照抄原拼法，`pathresolver.go:138`）。⇒ Q2（roots 配短／asked 长／缺叶子）实测 **`true`**，原因正是 `NewPathCanonicalizer`（`paths.go:56/93`）把 roots 也过 C26。
+- ⇒ **AC#2 我据此当场裁形**（⛔ 落地腿不许再选边，有异议就停手上报）：**把进 `InAllowlist` 之前那一步补齐成"两侧同形"**——asked 与 roots **一律走同一条已存在的折叠**（`resolvedForm` 已证能给缺失叶子返回长名且 `ok=true`），使第一段与第二段拿到**同一个形**再各自作差。⛔ **绝不许**把两段并成一段、⛔ 不许改 `paths.go:153` 的 `!ok` 语义（那是"解析不到＝未授权"那一支，属票 102／107 地界）、⛔ 不许动判级策略（R2→L2 那一跳归 D4／票 102）。
+- 另记它复认真凭据：我抄进派单的尺**全部为真**（`paths.go:133/140/152/153`、`pathresolver.go:127/138`、`rules_gateway.go:45` 体内 `:47-48`＝R2/L2、`bridge.go:334`、仓库根两串不等）。行号精度纠一处：`:283-300` 是注释块（`RUNNER~1` 在 `:291`），实现体在 `:303-375`。
+
+**2. AC#6 半答、剩那一半不在探针射程**：**形状上 owner 撞得到**（允许根＝真仓库根，`docs\`、`internal	ools\` 下不存在的新文件名：长名 `true`、短名 **`false`**，响在第一段）。**但本机喂入者为空**：`USERPROFILE/APPDATA/LOCALAPPDATA/TEMP/TMP/HOME/os.TempDir()/os.UserHomeDir()` 实测全 `same-as-long (no usable alias)`、进程 cwd 以长名到达，且**仓内没有任何生产码调 `GetShortPathNameW`**（命中全在 `_test.go`／注释）⇒ **短名只能由外部参数递进来**。⇒ 剩下那一半我裁给后续腿：要一发 owner 真机的 `[fs] allowed_dirs` 配置＋一次真 `wisp run` 的 `in_allowlist_scope=` 审计行才能定"他今天到底撞不撞"。⛔ 谁都不许把"形状上撞得到"读成"他已经在撞"。
+
+**3. 一处纪律纠我自己**：我票面 §31 写的"本仓既有规矩：拿不到短名就**必须红不许 skip**"是**全称、不成立**——出处 `bridge_junction_windows_test.go:77/84` 为真，但同前置条件在 `pathresolver_junction_windows_test.go:128`、`tree_ownership_112_windows_test.go:122`、`absoluteness_attribution_129_windows_test.go:311` 三处**是 `t.Skip`**。⇒ AC#3 的判据按"**这一枚探针不许 skip**"来写，⛔ 不许再拿那句全称当既有定式派单。
+- 顺带纠我自己一处：票面 §47 那行把**自查尺的字面文本写进了票面**（腿复跑命中 `:47`，正是我天天写进派单的那条坑）⇒ 已就地改成描述形。
+
+**4. 那枚 301 秒 witness**：`252-p1` 明确**既不支持也不推翻**（`cmd/wisp` 当时是脏面，它一枚没跑），⛔ 且它**没跑过任何候选修法的作用面**⇒ **本件不构成 AC#2 ⓐ／ⓑ 的否证**（第 74 条那条规矩，腿自己守住了）。
