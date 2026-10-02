@@ -198,10 +198,16 @@ portable-tests.sh: recognise measures less than it claims to (ticket 250 AC#2).
 
 ## ⑤ 越界检查
 
-- 本腿提交两枚 commit，各带**显式 pathspec**（`git add -- <逐枚路径>`；`git add -A`/`.`/`commit -a` 一次未用）：
-  - 代码：`scripts/portable-tests.sh`、`scripts/portable-tests-selftest.sh`、`scripts/testdata/portable-tests/go`
-  - 证据：`.scratch/wisp/probes/250/r1/verdict.md` 与 `logs/**`
-- 骨架 commit：`c9c8de95be8ce6ef0f49175215c6392cb8f53f55`（只含 `verdict.md` + `logs/prefix-real-coldcache.txt` 两枚路径）。
+- 本腿提交三枚 commit，各带**显式 pathspec**（`git add -- <逐枚路径>`；`git add -A`/`.`/`commit -a` 一次未用）：
+  - `c9c8de95be8ce6ef0f49175215c6392cb8f53f55`（08:5x 骨架）＝ `verdict.md` + `logs/prefix-real-coldcache.txt` 两枚路径。
+  - `6307e3699dfa9ca36fc3f5af3401353e76c78a48`（09:19 代码）＝ `scripts/portable-tests.sh`、`scripts/portable-tests-selftest.sh`、
+    `scripts/testdata/portable-tests/go` 三枚，`git show --stat` 读回 `3 files changed, 493 insertions(+), 5 deletions(-)`。
+  - 其后另有一枚 verdict-only commit 把本件补全（哈希取 `git log -1 --format=%H`，本文件里不自报一个还没生的号）。
+  提交后 `git status --porcelain scripts/` ＝**空**（09:20 现跑）。
+- ⚠ 一条 git 卫生读数：`.gitattributes` 是 `* text=auto` 且 `.log`/`.txt` 不在覆盖列表里，所以 `git add` 证据件时逐枚报了
+  `warning: in the working copy of '...log', LF will be replaced by CRLF the next time Git touches it`——
+  **入库 blob 是 LF，工作副本下次 checkout 会变 CRLF**。这不影响本件读数的字节性（比较都在工作副本内做的），
+  但"逐字存档"的日志若被别的腿 checkout 出去比 sha1 会不一致，具名报编排者（要不要给 `probes/**.log` 补一条 `eol=lf` 不是本票射程）。
 - 写面前后差集（09:11 现跑 `git status --porcelain scripts/ .scratch/wisp/probes/250/`）：
   `M scripts/portable-tests.sh` ＋ `?? scripts/portable-tests-selftest.sh` ＋ `?? scripts/testdata/` ＋ `?? .scratch/wisp/probes/250/r1/...`
   ——**没有第 5 枚路径是本腿写的**。起手 08:49 `scripts/` 为空 ⇒ 无他人写面被卷入。
