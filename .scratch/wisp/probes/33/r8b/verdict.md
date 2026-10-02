@@ -246,7 +246,7 @@ control leg (planted 8, under the cap): tid=30848 posted=8 postErr=<nil> pumped=
 | 门 | 命令逐字 | 读数 |
 |---|---|---|
 | build | `go build ./internal/ball/` | **rc=0**（无输出） |
-| vet | `go vet ./internal/ball/` | **rc=0**（`logs/vet-1.txt` 空）⚠ 见下方那条坑 |
+| vet | `go vet ./internal/ball/` | **rc=0**；终态那一发（含本腿全部判据改动之后）与 build/gofumpt 同批取，逐字在 `logs/gates-final.txt`：那一发起于 `2026-10-02 09:40:30 +0800`、当时 `HEAD=613606c0`（⚠ 不是本腿的 `49448d7f`——别人在这中间推进过三枚提交，本腿 `internal` 写面在那一发里是 **0 行脏项**，即"已入库且无人改动"） |
 | gofumpt | `"$(go env GOPATH)/bin/gofumpt.exe" -l internal/ball/sta_windows.go internal/ball/ball_windows.go internal/ball/sta_release_windows_test.go` | **输出为空** ⇒ 三枚文件都已格式化（含未改的 `ball_windows.go`） |
 | 整包（默认档） | `go test ./internal/ball/ -count=1 -v` | **rc=1**、顶层 **55 PASS／1 FAIL／0 SKIP**（含子用例 61／1）＝`logs/fix-fullpkg.txt`；那 1 枚 FAIL 是 ② 第 3 行那枚常红，⛔ 不是"本腿把它调剩下的" |
 | 整包（winlive） | `go test ./internal/ball/ -tags=winlive -count=1 -v` | **rc=1**、顶层 **69／1／0** ＝ ⑤ 全表 |

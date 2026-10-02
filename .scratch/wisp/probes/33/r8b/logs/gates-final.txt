@@ -1,0 +1,5 @@
+# 33-r8b final gate pass, taken on 2026-10-02 09:40:30 +0800 with HEAD=613606c0
+go build rc=0
+go vet rc=0
+gofumpt -l output (empty=clean): []
+git status --porcelain internal: 0
