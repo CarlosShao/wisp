@@ -114,7 +114,55 @@ census(114-a2)：§1 调用者名册＋§2 逐格三态交齐——ParseComposer
 
 ## 3. 最小落地面
 
-（后续 commit）
+> 前提复述（它决定下面每一步的边界）：**装配根是唯一接缝**这一既有裁定在本仓是硬的——`internal/panel/subagent_roster_197.go:43` 逐字写着「internal/panel must not import internal/tools, so the composition root does the mapping」，同一句话也排除了 `internal/panel` 直接 import `internal/agent`。⇒ **下面每一跳读口都必须落在 `cmd/wisp`；凡是要让 panel 直接够到 agent/tools 的形状＝新开依赖边＝上报，不许自决。**
+> 顺序按"最便宜的先落"。
+
+### 3.1 审批卡的"第几条"（最便宜的一枚：真源已在产码，只差最后一跳没抄）
+
+按序四步：
+
+1. `internal/panel/pump.go:77` `NativeVerdict` —— 追加一枚 `Position int`（载体，不是判断；它的兄弟字段全是从队列抄来的）。
+2. `cmd/wisp/panel_pump.go:58` `(*agentRuntime).liveVerdicts()` —— 在已有的那段逐字段抄写里补一行 `Position: it.Position`。真源：`internal/agent/approval/pending_read.go:49` 字段声明＋`:118` 填充（`q.position(it)`，定义 `internal/agent/approval/queue.go:268`，1-based FIFO）。
+3. `internal/panel/approval.go:39` `ApprovalCardView` —— 追加 `Position int json:"position"`，并在纯函数半边 `internal/panel/approval.go:72` `CardViewFromDecision` 里带上它；`NativeVerdict.CardView()`（`internal/panel/pump.go:99`）是唯一的产码入口，所以只有这一处会填。
+4. 判据**只能进新文件**：票 194 的普查件 `docs/evidence/s1/194-method-roster-census-c1.md:140` 已裁定「AC#6 点名 `tokens_fourway_test.go`／`composer_test.go`／`l2_grant_boundary_test.go` 三枚不许动 ⇒ 判据只能进新文件」。票面 AC#3 后半"取消排队不许把后面的挤掉"今天无对象（没有用户消息队列，见 §2），只能钉前半。
+
+⚠ **这一枚撞 `Q-51`，且撞得最直接**：第 3 步加的是 `ApprovalCardView` 的 JSON 键，正落在 `internal/panel/approval_test.go:105` `TestApprovalCardViewJSONKeysMatchFrontendTypes` 与 `internal/panel/composer_test.go:49` `TestComposerContractTypesMatchFrontend` 那两把**双向**尺的射程里（我读到断言本体：`internal/panel/composer_test.go:73-78` 两个方向各一次 `t.Errorf`）。`Q-51`（台账 `docs/reports/pending-and-issues.md:1086`）**仍未答**，口径在 `A383` 那条及其后果句（`docs/reports/pending-and-issues.md:8497` 逐字：加字段很可能让那把尺更红 ⇒ **照实记进证据件、不修、不放宽、不动前端**）。
+⇒ **给编排者的形状**：要么按 3.1 走完并在同一枚 commit 里带页面那份声明（＝`Q-51` 甲支，需 owner 点头），要么走一条不动契约的替代——**页面自己数 `Snapshot.Pending` 的下标**；但那是页面推出来的数，不是票面 AC#3 要的"Go 侧可读出口"，选它就得有人明写"AC#3 按页面自数结"。⛔ 这不是本腿能替 owner 选的。
+**新开依赖边：零。** `NativeVerdict` 与 `ApprovalCardView` 同包、`cmd/wisp` 已握着队列（装配点 `cmd/wisp/run.go:700` `Verdicts: rt.liveVerdicts` 是既有的）。
+
+### 3.2 占用（两个数齐之前整枚不显示那一枚）
+
+1. **先裁"说哪一件"**（§5 第 2 项）。裁完才谈下面。
+2. 分子与分母的读法**都不需要新接口**——本节最值钱的一句：
+   - 分母：`internal/agent/loop.go:253` `Loop.Budgets()` 已是导出读口，`cmd/wisp` 已有三枚产码调用者（`run.go:1056`／`:1062`／`:1109`），`.ContextWindow`（`internal/agent/budgets.go:54`）就在那枚返回值里，**只是没人取**。
+   - 分子：`internal/agent/loop.go:256` `Loop.History()` 是导出的，`internal/agent/budgets.go:150` `ApproxTokensOfMessage` 也是导出的 ⇒ **在 `cmd/wisp` 侧用这两枚现成的就能算出"当前历史成本"**，不必给 `Loop` 加方法。
+   ⚠ 反过来才是雷：停车点登记过「给 `internal/agent.Loop` 加一个"收 `taskID` 的导出方法"会把 `gate-clauses.sh` 的 G3 腿从安静打成 BAD ⇒ 裁定＝入口放 tools 侧，非放 Loop 不可就停手上报」（`docs/reports/HANDOVER.md:495`，18:5x 那一段）。占用这一枚用不到 taskID，**但任何"给 Loop 加导出方法"的实现形状都必须先按那条停手上报**。
+3. `internal/panel/composer.go:235` `ComposerState` —— 新加**必须是指针＋`omitempty` 的一节**，照 `internal/panel/composer.go:74` `Instructions`／`:91` `Tasks` 那两枚的先例；否则 `internal/panel/pump_test.go:123`／`:291`、`internal/panel/subagent_roster_197_test.go:214`、`internal/panel/subagent_stream_197_test.go:130` 那四枚"无 reader 恰好发四枚键"的字节钉会红（这四枚我逐枚读到断言字面才写，非转述他人读数）。
+4. **"未知"必须是具名状态，不许退化成 0／空串**（票面 AC#2）——本仓已有现成形状可抄：`internal/panel/composer.go:255-256` `CurrentModel`+`ModelKnown`、`:268-269` `Credential`+`CredentialKnown`（"没读过"与"读出来是空"是两件事）。分子分母各配一枚 `…Known`，或一节里放 `Occupied/Total/BothKnown`，都落在"新增字段"那一寸（票面 AC#7 逐字：`internal/panel/**` 写面"只到新增字段为止"）。
+5. `cmd/wisp/run.go:699` `rt.pump = panel.NewSnapshotPump(panel.PumpSources{…})` —— 在这一枚已有字面量里补 reader 槽（`internal/panel/pump.go:121` `PumpSources` 现 12 枚槽、`:699` 处已在填 8 枚）。**这是"装配根是唯一接缝"的既有位置，不是新边。**
+⚠ 同 3.1：新增 `ComposerState` 键也在那把双向尺射程里 ⇒ 同一句 `Q-51`。
+
+### 3.3 停止（今天能在 Go 侧落的只有"看得见"，不是"按得下"）
+
+- 能在 `internal/panel` 解冻那一寸里落的：**把"此刻有没有一发在跑／它能不能被停"送进快照**。现成源两枚都在 `cmd/wisp`：`cmd/wisp/resident_task_source_windows.go:154` `src.running`（正是 `:411-414` 用来拒绝第二发的那枚）与 `:159` `src.seq`（`:416-417` 自增，今天只进 goroutine 名与审计行 `:422/:425/:437`）。再带上"根任务没有停的句柄"这一枚事实（`internal/tools/task.go:458-459` 会答"没有可停的句柄"），快照就能诚实说"现在不能停"，而不是画一枚按下去没反应的按钮——**这就是票面硬约束"宁缺毋造"落在停止这一枚上的形状**。
+- 不能自决的两枚，具名上报：① 给**根任务**挂停的句柄＝动 `internal/tools`（`TaskRoster.AttachCancel`（`internal/tools/task.go:420`）今天唯一产码调用者是孩子侧 `internal/tools/subagent_197.go:346`），**不在票 167 AC#7 的 `internal/panel` 解冻范围内**；② 让面板"按停"＝新增 C17 入向方法，见 3.4。
+
+### 3.4 必须上报、写腿不许自决的三枚
+
+1. **任何新入向方法**（停止按钮、草稿存取都算）。依据＝`docs/reports/HANDOVER.md:464` 逐字「若 r3 认为要新增入向方法＝C17 契约面，停手上报，不许自己加」，加上票面 AC#7 把 `internal/panel/**` 写面限定在"票 145 已批的局部解冻范围（composer/pump/panel_pump，且只到新增字段）"——**入向名册不在那一寸里**。
+   ⚠ **同时给编排者一枚可能改变裁定的读数**：那枚会数名册的冻结尺 `internal/panel/l2_grant_boundary_test.go:2030` `guardRosterOf` **不是硬编码名单**——它从 `bridge.go` 的 `Method*` 常量与 `knownComposerMethod` 的 case 标签**双向推导**，函数头注释逐字写着「which survives the roster growing by any number of names and still refuses the shape it was written for」（`internal/panel/l2_grant_boundary_test.go:2028`，函数体 `:2030`）。⇒ 加一枚方法**不需要改那枚冻结件**，只要：新常量声明在 `internal/panel/bridge.go` 的 const 块（名字以 `Method` 开头、值为字面串），且 `internal/panel/bridge.go:148` 那枚 `case` **仍写成一行逗号分隔**（`internal/panel/l2_grant_boundary_test.go:2128-2130` 有一条"case 列表不是一行就判脏"的形状钉）。但"技术上不用改冻结件"≠"治理上过得了"——**这一枚仍按停手上报走，我只是把成本量清给编排者**。另注意 `docs/evidence/s1/248-settings-write-path-r1.md:155` 已登记的代价：`guardRosterOf` 只读 `bridge.go` 一枚文件的 const 块，把新常量挪去同包另一枚文件会**假红**。
+2. **草稿若要落库**＝动 `internal/memory/schema.go` 的 DDL 与 `SchemaVersionTarget`（`:129` 现量 `= 2`），而该文件注释自述与 `docs/specs/SPEC-02-data-storage.md` §3 逐字节镜像 ⇒ 属票面 AC#7 的 `docs/specs/**` 零字节名单。⇒ **本腿建议：草稿走内存＋快照，不走落库**；要走落库是规格变更，需人工批准。
+3. **崩溃自救里"禁用插件后重启"那一支**——票面 AC#6 已明写未裁，本腿量到三重空：`internal/plugin/` 只有 `doc.go`＋`disposal.go`（清单加载器具名 `DEFERRED` 50/51）、那三枚 `plugin_state` DAO 产码调用者 0（`internal/memory/dao_misc.go:188/:222/:243`）、而 `internal/panel/config_handlers.go:108` `lockedFieldFamilies` 把 `"plugins."` 逐字列进设置页**永不许写**的族。⇒ **明写不做**（票面硬约束 4 同向）。
+
+### 3.5 崩溃自救今天能落的那半（记一笔＋给一条可复制的指令）
+
+- "记一笔"**已经成立**：`internal/observe/goroutine.go:236` `NewRegistry` 就装了 `defaultPanicSink`（`internal/observe/goroutine.go:167-176` 带 `"stack", ev.Stack`）→ `slog` 默认被 `cmd/wisp/logsink.go:144` `installLogSink`（调用者 `cmd/wisp/models.go:284`）做成"脱敏 JSONL 文件＋stderr"两路。⇒ 落地腿**不要新造记录通路**，只做"让人拿到那个文件"：路径由 `cmd/wisp/logsink.go:87` `logSinkDir(dataDir)` 决定，把它连同一条指令文案送进快照或一条 CLI 出口即可。
+- ⚠ **会咬人的一格**（本腿现量）：生产进程里 `observe.Registry` **有三枚实例**——`internal/observe/goroutine.go:230` `var Default = NewRegistry()`、`cmd/wisp/run.go:1009` 给根环路的 `Registry: observe.NewRegistry()`（私有）、`internal/tools/subagent_197.go:294` 给每个孩子又是一枚私有。三枚都装了 `defaultPanicSink` ⇒ 栈都能落盘，但**只往 `Default` 上装自定义出口会漏掉所有 agent 任务与所有子代理的 panic**（今天动过这枚钩子的只有 `internal/observe/goroutine_test.go:117`）。⇒ 要装就得逐枚装，或在装配根收一处。
+- **零新开依赖边**：`Registry`、`installLogSink`、`logSinkDir` 都已在 `cmd/wisp` 被调用。
+
+### 3.6 若 owner 明天就要用上那四个数：一句实话
+
+按上面的量法，**明天能用上的只有 3.1（第几条）与 3.2（占用）两枚，而两枚都卡在 `Q-51` 那一寸**（新 JSON 键要有人写页面那份声明）。停止那一枚今天能给的是"显示不能停"；草稿那一枚三层都缺（Go 侧字段、库表、入向方法）。⇒ 如果"四个数明天都要"是硬期限，要先答的是 `Q-51`，不是派落地腿。
 
 ## 4. 我可能判错的条目
 
@@ -172,6 +220,15 @@ census(114-a2)：§1 调用者名册＋§2 逐格三态交齐——ParseComposer
    **甲**＝只有 owner 或编排者能裁"要不要把那份对标转成仓内需求"；若要，请把这些路径的来源仓库/版本写进票面，否则下一程无从复核。
    **乙**＝本腿**不**据外部形状推任何 Go 侧结论；§1/§2 的每格只引用本仓读到的 `file:line`。
 
-## 6. 我推翻票面/派单哪一句
+## 6. 我推翻票面／派单哪一句
 
-（后续 commit）
+> 派单要求本节不空，且给我的所有断言都标了待验。逐条对，每条给尺与读数。
+
+1. **票面 line 25（AC#1）自述"我写票时没有逐枚现量过这四枚的出口状态"** ⇒ 这一条不是推翻，是**兑现**：本件 §1/§2 就是那一格要的"命令／API／快照字段名逐枚列 有／无／有但没接"。四枚里没有一枚判"已存在"，也没有一枚该"硬造第二套"——**唯一一枚真源已在产码、只差最后一跳没抄的是审批序号**（`internal/agent/approval/pending_read.go:118` 已填 `Position`，`cmd/wisp/panel_pump.go:58` `liveVerdicts()` 未抄，因为载体 `internal/panel/pump.go:77` `NativeVerdict` 没那枚字段）。按 AC#1 末句"量到'已有'就报回、不许硬造第二套"→ **报回**。
+2. **推翻票面 line 4 那半句**：「`D32`（资源 SLO——**这枚占用条的数据源就是它**）」。读数＝票面自己在 line 37 写着「不做成本页（`D32` 那两个数已有读法，界面归界面）」，而 D32 那一族是**内存/CPU 资源带**（尺：`internal/watchdog/doc.go:8-11` 逐字——per-state limits、`proc.TreePrivateBytes`、GDI/User objects、handles、goroutine/thread count；`internal/observe/thresholds.go` 是本腿未读的阈值件），跟"这次对话还剩多少空间"不是同一枚对象；上下文那一路的真源在 `internal/agent/budgets.go:16` `ReferenceContextWindow`／`:54` `ContextWindow`，归 `D15` 那一族。**两枚"占用"的数据源不同，而票面 line 4 把它们写成同一枚** ⇒ 落地腿若照 line 4 去接 D32，接到的是一条内存条。⚠ 这条**不推翻 D 表本身**（D32／D15 各是什么以 `docs/PLAN.md` 为准），推翻的是"占用条的数据源就是 D32"那一句归属。
+3. **推翻派单与既有普查件共用的那句"入向 `Handle` 生产调用者＝零枚"**：`docs/evidence/s1/194-method-roster-census-c1.md` §5 逐字写着「`ComposerDispatch` 的入向入口 `Handle` `internal/panel/composer_dispatch.go:120` 的生产调用者＝**零枚**…⇒ 本表 18 枚里没有任何一枚今天有真听众」。现量已推翻：**两枚产码调用者**——`cmd/wisp/panel_host_windows.go:551` `return m.disp.Handle(ctx, raw)`（真 WebView2 回调那侧）＋`cmd/wisp/panel_inbound.go:163` `reply, err := disp.Handle(ctx, raw)`（CLI 腿）；常驻那条链也接上了（`cmd/wisp/panel_resident_windows.go:170` → `newComposerDispatchChain`，由 `cmd/wisp/resident_windows.go:142` 调）。
+   ⚠ **但派单要我防的那一误同时成立，别翻到另一头**："入向有了一条线"≠"所有口都接好了"——`cmd/wisp/panel_inbound.go:271-281` 那枚字面量里 `Workspace`/`Attachment`/`Message` **逐枚写死 nil**（注释自述归属：workspace＝票 186、attachment＝票 92、message＝票 35），到达即走 `internal/panel/composer_dispatch.go:230` `unattached()` 按名拒绝。
+4. **推翻派单里"票 114 那条线接的是 `config.get`/`config.set`"这句的覆盖面**：同一条链里 `Mode: modeWrites`（`cmd/wisp/panel_inbound.go:272`）**也已接**，处理器是 `internal/panel/composer_handlers.go:86` `ModeWriteHandler`；只是 `Confirm` 为 nil，`cmd/wisp/panel_inbound.go:239-242` 注释逐字「no L2 card on this leg, so auto_approve is unreachable and every widening request is refused before Store.Set is ever reached」。⇒ 只提 config 那两枚会**低估**入向现状；本表 §1.2③／§3.4 按"两枚有名处理器（Mode、Config）＋四枚按名拒绝"写。
+5. **推翻票面 line 4 末段给人的错觉**：「崩溃时给一个"禁用插件后重启"的出口（`apps/desktop/src/fatal-recovery.ts`，里面真有一枚 `disablePlugins()`，我读过接口清单）」——那是**外部项目**的接口清单。本仓对应物是三重空（§3.4 第 3 条：`internal/plugin/` 只有两枚文件且具名 `DEFERRED` 50/51／那三枚 `plugin_state` DAO 产码调用者 0／`internal/panel/config_handlers.go:108` 把 `"plugins."` 封在设置页永不许写的族里）。票面 AC#6 与硬约束 4 已经把这一支拦住了，所以这条推翻的是**来源描述的口径**（"里面有真东西"读起来像本仓也有），不是推翻判据。
+6. **一处推翻不了也证实不了、但必须点名给编排者的**：§3.1／§3.2 依赖的那两把双向尺的**当前颜色**我没判（§5 第 1 项）。如果它们在今天的 HEAD 上其实已绿（＝页面那份声明已被界面那支补上 `instructions`/`tasks`），那"加字段必多红一枚"的顾虑就只剩"声明要同批跟上"，`Q-51` 的实际成本比我写的低。⇒ 这条**不改变 §3 的任何文件清单**，只改变"要不要现在就去催 `Q-51`"。
+7. **本腿自己写坏过又改掉的两把尺（记下来，免得下一程复踩）**：① 我第一版把"自救指令文本"那把尺写成 BRE 的转义或形，`?` 在那里不是量词——已按 ERE `grep -rnE "self.?rescue|fatal-recovery|disablePlugins|自救" cmd internal tools --include=*.go` 重跑，现量 **0 行**。② 我第一版把票面那五枚外部路径写成"本仓零命中"，而那把尺的字面文本**会命中票面与本文件自己**（`.scratch` 两根）；已改成**逐根取数**：`cmd:0 internal:0 tools:0 docs:0 scripts:0`。⇒ 这与 `docs/reports/HANDOVER.md` §4.0y 第 1 笔那条新规矩同源（负向句落笔前先读"谁产出／谁投递／谁落盘"），也与 198-r1 那条提交说明同一形（尺的拼法写进结论文件 ⇒ 自查尺当场读到命中是尺文本自己）。
