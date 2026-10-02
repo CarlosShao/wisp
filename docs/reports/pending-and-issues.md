@@ -10516,3 +10516,32 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - 归口：票 195 的落点判语＝**待我裁**（六枚 J 项它都给了"谁能判＋命令＋期望读数"），⛔ 不许按票面题头开新地基。
 
 **4. 编队与队列（2026-10-02 09:26:39+0800 现量，HEAD `3ef6cf41`）**：在飞 **4 枚**＝写码 2（`198-r1`：`cmd/wisp`＋`internal/config`；`33-r8b`：`internal/ball`）＋只读 2（`224-c2`／`114-a2`；`vm-draw-1` 未收）。已收本轮 3 枚（`250-r1`／`195-a1`／`33-r8` 死腿）。`scripts/` 面此刻空 ⇒ 票 251 与 `197-r3` 可派但**同面串行**。⛔ 门禁复跑窗口（223 单发＋`-count=25` 频次、`internal/risk` 同机对照、票 248 四把尺、三包整包）仍**按住**：起跑判据是"没有别的 `go test` 在跑"，不是"写面空了"——见 [[feedback-subagent-fleet]]。
+
+## A517（2026-10-02 09:35:43+0800，编排者自记：`224-c2` 结档——**它推翻我派单里那句根因（"会话授权没接进装配"）判为不成立**＋新立票 252（同一物理路径两种拼法在允许根判定里分家）＋我在 owner 本机第一次量到短名别名）
+
+起手锚（与落笔同发）：`date`＝`2026-10-02 09:35:43+0800`／`git log -1`＝`6d525342`／分支 `dev`。
+
+**1. 交件凭据**：`.scratch/wisp/probes/224/c2/census.md` **607 行 / 57,124 字节**（骨架 `530ba16f` → 交件 `ecbb7e86`），同目录 `01-ci-raw-readings.txt` 89/8773；占位符尺（`待[填]|填写[中]|TODO|TBD|本发未覆盖`）＝**0**；全程零 `go test`/`build`/`vet`。腿自报 `origin/dev..HEAD`＝36 枚（取数 09:30:38，与我此刻同向）。
+
+**2. 我独立抽验的部分（只读源码，没跑任何东西）**：
+- `internal/tools/bridge.go:334` 起那一段逐字读到 `if !sil.Silenced && sil.Level == risk.L1 {` ⇒ **会话授权只在 L1 分支被查询**，这一条腿说对了；"等级一旦降到 L2，授权连被查的机会都没有"是**码的形状**，不是推断。
+- `internal/tools/paths.go:133` 起的 `InAllowlist`：先 `rootsContain(p.roots, f)`（词法），再 `rf, ok := resolvedForm(canonical)`＋`if !ok || !rootsContain(p.roots, foldPath(rf))` ⇒ **两次包含都要成立**，注释自陈 "Requiring both is strictly narrower"（出处＝票 107 第二轮）＋"Unresolvable means unauthorized"。
+- `internal/risk/pathresolver.go:127-139`：存在的路径折长名、**缺失叶子 `res.Canonical = p` 原拼法照抄**（注释逐字 `lexical fallback, classification still enforced - fail-closed`）。
+- ⚠ **一把差点指错的尺，记我**：腿引的是不带目录的 `paths.go:133`，我第一反应当它是 `internal/risk/paths.go` ⇒ `sed` 回 `No such file`。按第 81 条（短引必先 `find -name`）我先 `find` 再判，真身＝**`internal/tools/paths.go`**。⇒ 票面里这类引用我此后**一律写全路径**。
+- ⛔ 腿说的 `rules_gateway.go:45 出 R2` 与 `grantLinesOf 在 :206-217` 我**没逐行读**，票 252 里就地标〔行号待验〕。
+
+**3. ★ 纠我自己 `A512`／`A515` 的归因（原话不改，就地打旧）**：我在那两笔里把 CI 新发的 `TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking` 判成**"代码级：D45-2 装配侧没接——会话授权未被查询，卡片等到超时"**。**这一句不成立**：H1-H9 接线齐（`run.go:547-552/592/726`、`grant.go:63-97`、`bridge.go:334-342/427-436/1116-1119`，腿现读、我上条抽验了 `:334` 那一处），真正的因是**被装配的 `wisp run` 在 runner 上把"授权目录内、文件还不存在的 `fs.write`"判成 L2**，于是等审批队列（20s→自动拒绝），而授权那一支**在 L2 上根本不被咨询**。⇒ ⚠ **这一枚不该记在票 224 名下**（同因在基线发就红），改记**票 252**。
+- **同一枚根因的第二、第三枚 witness**：`run_test.go:378` 那对 301.70s／基线 301.12s（`TestComposedGateBlocksAWriteForTwoSeconds`——名字说 2 秒、实跑 301 秒＝等审批超时）与 `run_mode101_test.go:506`（`auto_approve` 档下仍撞 L2 卡，因 R2 不可静默）。⇒ 我在 `ci-delta-1`／`A512` 里把那 301 秒挂成"C18 超时的既有一笔、别记在本次推送头上"——**那句归口要改**：那笔账自本条起**归票 252 AC#4**，⛔ 不许两处各记一笔。
+- ⚠ **未定性、明写没做**：其余 21 枚共红里有多少同因，腿只登记未逐枚归因（它的 J4）。⛔ 谁都不许把"同族"读成"已解释"。
+
+**4. 新立票 252**（`.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-...md`，6 格）：**这枚算产品行为**——它决定一次真操作要不要弹你没请求过的审批卡、要不要等到超时。AC#1 判死哪一次包含先失配（先读数后码）／AC#2 双形比较落点（⛔ 不许把两次包含改成一次、⛔ 不许把"解析不到＝未授权"改软）／AC#3 本机可判定载具（拿不到短名**必须红不许 skip**）／AC#4 三枚 witness 逐枚结线／AC#5 别再把自己的等级审计行滤掉（`grantLinesOf`）／**AC#6 owner 本机可达性要有答案**。
+
+**5. owner 本机第一次量到短名别名（这一条决定我要不要摆给他）**——现量，PowerShell FSO，逐字：
+- `REPO_LONG=D:\work\workspace\projects plans\Wisp` ／ `REPO_SHORT=D:\work\WORKSP~1\PROJEC~1\Wisp` ⇒ **两种拼法真不相等**（`workspace` 9 字符＋目录名带空格 ⇒ 该卷短名生成**开着**）。
+- `TEMP_LONG=C:\Users\swq\AppData\Local\Temp` ／ `TEMP_SHORT=` **同串** ⇒ CI runner 那个具体触发物（`C:\Users\RUNNER~1\...`）在他机器上不成立。
+- `fsutil 8dot3name query C:` 我跑不动（`Error 5: Access is denied`，需管理员）⇒ 短名生成状态**只用上面两串别名存在性证明**，⛔ 不许引 fsutil 结论。
+⇒ 我的判断：这一枚**今天不作为待拍板项摆给他**（他答不了"撞不撞"，那要一发读数），改成票 252 的 **AC#6 由腿量**；量出来撞＝产品缺陷要告知他，不撞＝CI 形状为主但仍修。**这条判断记我，不记腿。**
+
+**6. 顺带结掉我 `A516` 末尾遗留的裁定**：**票 195 我裁完并写进票面**——N1＝⛔ 不许动面板那条整族拒绝（`lockedFieldFamilies` 含 `"fs."` 前缀；出处不是那枚测试而是 `AGENTS §1.2` 禁"由面板侧来源的 L2『允许』"＋本票自己的 AC#3），⇒ **AC#2 的判据载体定在 `internal/config` 那层、不经过面板 `config.set`**；N9＝方向裁决必须在拿锁之前做完、入口一律不阻塞（⛔ 不许"在入口里等一张卡"＝死锁不是死红，还会把 C18 那 300s 拖进写路径）；J4 更正我自己的旧口径（那两枚锚今天是〔只许按能力形改〕）；J5 不许开；J6 落 `internal/config`；J1/J2/J3 归落地腿读数＋`195-v1`。⚠ `195-r1` **按住**到 `198-r1` 退出。
+
+**7. 编队与队列（2026-10-02 09:35:43+0800 现量，HEAD `6d525342`）**：在飞 **4 枚**＝写码 3（`198-r1`：`cmd/wisp`＋`internal/config`／`33-r8b`：`internal/ball`／`251-r1`：`scripts`）＋只读 1（`167-a1`；`114-a2`、`vm-draw-1` 仍未收）。本轮已收 4 枚（`250-r1`／`195-a1`／`224-c2`／死腿 `33-r8`）。已落但我仍未自跑的：`33-r8b` 起手骨架 `3ef6cf41`（它自报基线整包 52/3/0——⚠ 那三枚红我**没验过**）。待派按面：`internal/tools`＋`internal/risk` 空 ⇒ 票 252 的 AC#1 探针可派；`cmd/wisp` 满 ⇒ 尺 B／尺 C（要跑 `TestTicket224...` 那发）**一律按住**到 `198-r1` 退出。
