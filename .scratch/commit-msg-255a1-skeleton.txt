@@ -1,0 +1,19 @@
+probe(255-a1) 骨架：AC#2 的 ⓐ／ⓑ 两形缺的是代价读数不是判断——本腿只读取证「生效级别」词表现状
+
+起手锚逐字落盘：date 10:43:11+08 一发、git log -1 得 a4b221ac、分支 dev；
+git status --porcelain internal/config internal/panel cmd/wisp 在 10:43:11 量得 0 行，
+10:44:35 复跑量得 1 行（M internal/panel/config_handlers.go，od -c 复认首列空格＝未暂存）。
+那一枚是对抗验收腿 248-v1b 的植入变异（把 knownWritableField 的表查询替成恒真），
+不是本腿所作；本腿动产码零字节。
+
+行号锚已按 HEAD blob 校正：git diff --stat 读得 1 insertion 6 deletions，变异落在 :368 之后，
+故 EffectiveTier 定义区 :193-202 与 :213 在脏树与 HEAD 里行号全等；tierSentence 一枚不等——
+git cat-file blob HEAD 读 428、工作树读 423。本件凡引 internal/panel/config_handlers.go 的行号一律以 HEAD 为准。
+
+纪律：未跑 go build/vet/test/./...（248-v1b 正在整包跑 cmd/wisp，跑一把就把它的读数洗掉）；
+未跑 go list（依赖边由 import 与 pkg 前缀现读得出，用不上）；grep/find 的根逐条显式写 cmd internal tools scripts，
+未用 . 当根；frontend 与 design 两层禁令未触及（不读不引）；票面 255 只读，AC 框一枚未碰。
+
+§4／§5 按票规先写满再回填 §1-§3——本仓死过三条腿的规矩。
+
+本格判据由编排者裁，本腿未裁。
