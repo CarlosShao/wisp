@@ -153,7 +153,12 @@
 
 ### 4.1 尺一 · `GOFLAGS= go build ./...`
 
-〔取数中：本腿尚未跑〕
+- 命令逐字：`GOFLAGS= go build ./...`（票面原文带着那枚**空赋值**，为的是不吃环境里 `GOFLAGS` 的任何默认值）。
+- 时刻：起跑 `2026-10-02 12:37:56 +0800`／终值 `12:38:00 +0800`；当时的 HEAD＝**`fb1d9c19`**（`e2e-panel-1` 那枚只读腿 12:30:28 的 commit）。
+- **逐字终值行：`rc=0`，输出 `0` 字节**（stdout＋stderr 合并后 `wc -c` 现量＝`0`，本腿另发复量过一次文件尺寸，时刻 `12:38:29 +0800`）。
+- ⚠ 这一发的"零输出"怎么读：`go build` 成功时**本来就不打印任何东西**，所以"零输出"在这里是终值而不是"没跑"的形——"没跑"的形是 rc≠0 且带错误行（对照 §4.3 那枚 `0xc0000135` 坑，那一族才有 rc≠0 却没有 `--- FAIL`）。
+- 归因：本腿到 `12:40:47` 才落第一发 commit（`e7521610`＝本件 §4 骨架），`git diff --name-only fb1d9c19..e7521610` 只有本枚 md ⇒ **这一发 build 量的是 HEAD 那批已入库产码，本腿对它零贡献**。
+- 署名：〔**`248-r2` 自己跑的**〕。裁决腿 `248-v1c` §2 同一把尺的读数是它在 HEAD `6bcb934a` 上那一发，⛔ 不署本腿的名，互验见 §4.6。
 
 ### 4.2 尺二 · `gofumpt -l <本腿动过的目录>`
 
@@ -165,11 +170,29 @@
 
 ### 4.4 尺四 · `./tools/d22scan/d22scan.exe`（独立模块，只能跑那枚 exe）
 
-〔取数中：本腿尚未跑〕
+- 命令逐字：`./tools/d22scan/d22scan.exe`。⛔ 不是 `go run ./tools/d22scan`——`tools/d22scan` 是**独立 module**（`module github.com/CarlosShao/wisp/tools/d22scan`，本腿现读那枚 `go.mod` 首行），从根 module 里 `go run` 它必失败；本腿按票面点名跑 exe 本体，`-root` 由它自己推导。
+- 时刻：`2026-10-02 12:40:04 +0800` 起／`12:40:05 +0800` 终值；当时的 HEAD＝**`fb1d9c19`**。
+- **rc=0**。逐字末行的判决段（本腿只截到判决句为止，见下面那条禁令说明）：
+  - `d22scan: clean - no D22 ban violations`
+  - 承重的那一行逐字：`d22scan: examined 262 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp`
+  - 射程的那几行逐字（摘本腿需要的三行）：`d22scan: scope bans #1-5 internal/      examined 226 production Go files`／`d22scan: scope bans #1-5 cmd/           examined  36 production Go files`／`d22scan: scope ban #8 internal/         examined 482 Go files, comments and _test.go included`
+- ⚠ **两层禁令在这把尺上的处理**：那发输出里另有几行是它自报的 git-ignored 提示与 scope 复述，点名 `frontend/`／`design/` 那两层。本腿**没有读那两层的任何一字节**，也⛔ 不把它们的文件路径／行号写进本件——所以那一行本腿只记"存在、且不是违规"（违规会 rc≠0），判决段后半截的 scope 复述本腿不整行转抄。
+- 归因：本腿零产码改动 ⇒ 这一发**不可能**是本腿造的；它量的是 HEAD `fb1d9c19` 上那批已入库产码（含 `248-r1` 那 15 枚路径）。
+- 署名：〔**`248-r2` 自己跑的**〕，与裁决腿 §2 的 `sh scripts/d22scan.sh` 那一行**不是同一发**（它跑的是脚本、HEAD `6bcb934a`；本腿跑的是 exe 本体），互验见 §4.6。
 
-### 4.5 起手锚与并发声明
+### 4.5 起手锚与并发声明（`date` 每发现取，不复用）
 
-〔取数中〕
+| 尺 | 读数（时刻逐条带在旁边） |
+|---|---|
+| `date '+%Y-%m-%d %H:%M:%S %z'` 进场第一发 | `2026-10-02 12:27:01 +0800` |
+| 进场时 `git rev-parse --short HEAD` | `4a9851d6`（`e2e-panel-1 起手：§0 锚＋§4/§5 先写满并落第一发 commit`） |
+| 四把尺各自的 HEAD | 尺一 `fb1d9c19`（12:37:56）· 尺二 无射程（判定时刻 `fb1d9c19`，见 §4.2）· 尺三 `e7521610`（本腿 §4 骨架那一发，时刻见 §4.3）· 尺四 `fb1d9c19`（12:40:04） |
+| `git rev-parse --abbrev-ref HEAD` | `dev` |
+| `git status --porcelain -- cmd internal tools` | **`0` 行**（`12:40:47` commit 后现量同值）⇒ 本腿读到的是 **HEAD 的形状**，不是谁的未提交半片 |
+| 工作树整体脏度 | 非空且**永远**非空（owner 在 `design/**` 下的移动／删除与几十枚他人台件）。⛔ 本腿不修它、不动它一个字；本腿⛔ 没有把名册另存成文件（写面只有本枚 md），对照尺就是上面那行"三包 0 行"＋§4.3 的逐名红名册 |
+| 并发声明 | 取数期间同机另有一枚**只读**腿 `e2e-panel-1` 在飞（派单具名：它不跑任何 Go 命令 ⇒ 不洗本腿读数）。但本仓已知 `slo-full` 那类负载会在这台机器上抢 CPU ⇒ **§4.3 一切时序类读数（整包秒数、面板冷/热毫秒、任何超时类用例）一律标【同机可能有争用】**，⛔ 偶发慢不当回归 |
+| 本腿写面 | 仅 `docs/evidence/s1/248-settings-write-path-r1.md` 这一枚。⛔ 零产码、零测试文件、零票面改动、AC 勾选框一枚未碰（复量尺见 §4.6） |
+| 本机工具事实 | `gofumpt.exe` 确实在 `$(go env GOPATH)/bin`（本腿 `ls` 现量，那枚目录里还有 `staticcheck.exe`）但**不在本 shell 的 PATH** 上（`command -v gofumpt` ⇒ 未命中）；`go version go1.27.1 windows/amd64`；`third_party/sherpa-onnx`（3 枚 dll）与 `build` 目录都在，所以尺三的 PATH 前缀是跑得起来的 |
 
 ### 4.6 与裁决腿 §2 的同锚互验（具名指回，不署本腿的名）
 
