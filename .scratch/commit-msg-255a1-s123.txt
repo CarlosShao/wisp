@@ -1,0 +1,28 @@
+probe(255-a1) §1／§2／§3 回填：档位词表现量＝四套数档加一套同名异事，真正在跑的那套通篇不写 tier
+
+§1 现状表：T1 config.Tier 三枚常量非测试写者 0、读者 0（尺 grep -rn TierHot|TierReload|TierRestart|type Tier 全根，
+除 schema.go:30-43 自身外只命中 internal/risk/assessor.go:147 一枚同名异事）；
+T2 restartTierKeys 包外零读者；T3 panel.EffectiveTier 十一枚写点全在 panel_config_store.go 且 EffectiveNow／EffectiveNextTask
+非测试写者为 0（生产可达只两值）；**编排者锚 4 漏的那一枚是 T4：Report 的三枚 []string（manager.go:87-97），
+它的档名不在任何字符串里，在"落进哪一枚切片"里，所以按 tier 字样量的尺天生看不见它。**
+T4 非测试写者五枚 append 点、读者四枚（reportReload／reportRestartPending／hotkey_reload.Sections）。
+
+跨套映射现量＝四对之间全都没有。两处要紧的：restartTierKeys 的注释自称 kept as data so ... and by a test
+can be compared，但 grep 它包外零引用，测试零引用 ⇒ 那句 and by a test 今天没有 test；
+panel_config_store.go:226-229 无条件 res.Tier = panel.EffectiveRestart ⇒ 写入腿不看键不看段不查表，
+而 [llm] 今天坐在 rest 表 hot 档 manager.go:281 ⇒ 两套词表对同一次写入答相反。
+依赖边现量：internal/panel 零 import config（与 AC#4 禁令一致），两包唯一同视处＝cmd/wisp/panel_config_store.go
+⇒ 任何映射只能落装配根，ⓐ 新增包级边 0 枚。
+
+§2 ⓐ 代价：最小可信 3 枚文件、完整版 6 枚跨 3 包；钉逐枚读断言体共九枚 N1-N9，
+其中 N3 TestManagerThemeIsHotInsideApp（manager_test.go:97 要求 Restart 必须空）是 ⓐ 最贵的一格——
+它使 ⓐ 不能"只给死类型接线"，必须把 planApp 的键级 if 搬成数据。另具名上报：动 tierSentence 属 C17 面，先落 A##。
+
+§3 ⓑ 代价：仓里已有同形尺可抄（unwired_test.go:311 TestEveryLockedSectionKeyIsAccountedFor ＋
+unwired.go:119 lockedKeyDisposition，射程只到锁定四段 :342-345）；ⓑ 落点＝internal/config 同包新增登记表＋测试，
+实现侧真调未导出 plan() 量档，⛔ 不改产码。造不造得出：正身造得出；
+"新键必红"那一枚正控与 AC#3 共用同一枚举器（要真改 schema.go 结构声明）；T3 那一套 ⓑ 管不到。
+一处读数更正留给 §6：票面"粒度只到段"在码上不完全真，app 与 voice 已按段内键分档、只是不可枚举。
+
+纪律同 §0：未跑 go build/vet/test/./...，未跑 go list，grep 根逐条显式，frontend design 不读不引，票面未碰。
+本格判据由编排者裁，本腿未裁。
