@@ -38,7 +38,8 @@
 **禁跑尺的遵守**：本腿未跑 `go build`／`go vet`／`go test`／任何 `./...`；未跑 `go list`（依赖边全部由 `grep` 的
 `import`／`pkg.` 前缀现读得出，不需依赖图，故按票面「用不上就别用」省掉）。
 
-本节以下 §1／§2／§3 的表格在后续 commit 填写；本腿按票规**先写满 §4、§5 再回填**。
+**本件的落盘顺序（票规：§4／§5 先写满再回填）**：§0 骨架 → §4＋§5 写满 → §1／§2／§3 回填 → §6／§7。
+每节一 commit，未攒。
 
 ---
 
@@ -337,4 +338,67 @@ pipeline→reload、thresholds/speed/punctuation→hot），只是这套分档�
 
 ## §6 我推翻编排者哪一句
 
-## §7 结论
+**V1（推翻）锚 4 的"三套"数少了，真数是"四套数档 ＋ 一套同名异事"。**
+编排者点名的是 `config.Tier`（T1）／`panel.EffectiveTier`（T3）／`restartTierKeys`（T2）。
+**缺席的那一枚是 T4＝`Report{Hot, Reload, Restart []string}`（`internal/config/manager.go:87-97`）——今天唯一真在跑的档位口径。**
+⇒ 漏它的机制是尺型的，不是眼力的：编排者那把尺 `grep -rln "EffectiveTier\|EffectiveNow\|..." --include=*.go cmd internal | grep -v _test`
+按**档名符号**找档位，而 T4 的档名**不存在于任何字符串里**，它存在于"某枚段名被 append 进了三枚切片中的哪一枚"。
+⇒ 要补的尺（本腿跑过，逐字 11 行命中）：`grep -rn "\.Hot\b\|\.Reload\b\|\.Restart\b" --include=*.go cmd internal tools scripts | grep -v _test`。
+⇒ **对 AC#2 的直接影响**：ⓐ／ⓑ 的靶子该打在 T4 上，不是打在 T1 上。
+T1 只有装饰价值（§1.2(a)：**纯装饰类型——定义了三档、命名了三档、没有一处代码经由它做判断**），
+而 T4 已经有生产读者（§1.1 表第四行四枚）。所以"三档零读者"这句**不完整**：零读者的是 T1；三档本身有读者，只是它不以 `Tier` 类型活着。
+
+**V2（推翻，小格但会误导派单）`restartTierKeys` 是**三枚键路径**，不是编排者写的"三枚段名"。**
+逐字（`cmd/wisp/config_reload.go:300`）：`"app.language", "app.autostart", "app.single_instance"` ——
+**全在 `app` 一枚段之内**，段名只有一个。⇒ 它不是"第三套档位词表"，它是 **T4 里 `planApp` 那一条 restart 分支的手工旁注**（§1.2(b)）。
+把它当"另一套枚举"来裁，会得出"要统一三套枚举"的结论，而实际只有两档枚举（T1 装饰 / T3 回执）＋一份硬编码旁注（T2）＋一份在跑的段级裁决（T4）。
+
+**V3（推翻票面措辞，ⓑ 形若照抄会登记一句假话）「粒度只到段」这句在码上不完全成立。**
+尺证：`planApp`（`manager.go:338-357`）里 `themeChanged`→`rep.Hot`（`:349`）、`restartChanged`→`rep.Restart`（`:355`）**同一段两支并存**；
+`planVoice`（`:361-417`）里 `reload`→`rep.Reload`（`:412`）、`hot`→`rep.Hot`（`:415`）同样两支并存。
+⇒ **`app` 与 `voice` 今天已经是键级分档**（theme 对 language/autostart/single_instance；pipeline 11 条件对 thresholds/speed/punctuation 4 条件）。
+⇒ 准确的降级口径不是"粒度只到段"，而是**「粒度只到 `planApp`／`planVoice` 的 `if` 条件式，且这套分档不可枚举、不在任何数据里；
+其余 16 枚段是段级整块（`rest` 表 `:277-288` 一枚段一行）」。
+⇒ 后果（这条要给 ⓑ 的登记表定形状，见 §3.4 反控第 2 枚）：ⓑ 若逐字登记"一段一档"，尺会把诚实的码判红。
+
+**V4（不推翻，复认得上并加一句）锚 1／锚 3／锚 4 的那把 `grep -rln` 尺我都复跑得上。**
+- 锚 1：`Tier` 类型在 `schema.go:31`、三枚常量在 `:36 :39 :43` ⇒ 编排者写的区间 `:31-43` 对。
+- 锚 3：`rest` 表实为 **12 枚段**、逐名对得上；`{"panel", ...}` 确在 `:285`（尺：`grep -n '{"panel"' internal/config/manager.go` ⇒ `285:`），`{"llm"...}` 在 `:281`。
+- 锚 4 的尺：扩根到 `cmd internal tools scripts` 后**仍是恰好 2 枚文件**（`cmd/wisp/panel_config_store.go`、`internal/panel/config_handlers.go`）⇒ 编排者那句"命中恰好 2 枚"成立。
+
+**V5（专门回答编排者"特别怀疑自己过期了"那一条）锚 2 没有过期，但它给错了靶。**
+现量尺：`grep -rn "TierHot\|TierReload\|TierRestart\|type Tier " --include=*.go cmd internal tools scripts`
+⇒ 命中除 `internal/risk/assessor.go:147` 那枚同名异事外，**全落在 `internal/config/schema.go:30-43` 自身**（8 枚：1 类型＋3 常量＋4 行紧贴注释）。
+⇒ 我另外复认了 `180-a1` 当时那把尺的原文（`.scratch/wisp/probes/180/a1/census.md:308`，它当时写的是
+`grep -rn "Tier\b|TierHot|TierReload|TierRestart" --include=*.go cmd internal tools | grep -v _test.go`）
+⇒ **两把尺独立得到同一件事：`config.Tier` 非测试读者至今为零。这条读数不是过期的 180-a1 报的，是本腿 2026-10-02 10:4x 现跑的。**
+⇒ 但 `180-a1` 其实**已经把 T4 抓在手里**（同件 `:301` 逐字把 `Report{Hot, Reload, Restart []string; Locked []LockedDecision}`
+记为"裁决的载体"，并指 `manager.go:87-97`），只是它把 T4 当成"三档的实现现场"而不是"另一套待数的词汇"。
+⇒ 所以对编排者的实际意思：**锚 2 可信、不必重跑；不可用的是拿它当 AC#2 的题面**——
+"零读者"读起来像"给一枚死类型接上线就行"，真形状是"有一枚活着的段级裁决器（T4）不在任何枚举类型里，
+外加一枚活着的回执档（T3）在答反话"。
+
+## §7 结论一句话（ⓐ／ⓑ／两形都做／都不做，各配代价）
+
+**本格判据由编排者裁，本腿未裁。** 本腿只交到"代价读数"这一层，下面四行是把读数称好的形状，不是裁定。
+
+| 形 | 一句话 | 动的文件 | 新增包级依赖边 | 撞钉 | 代价读数 |
+|---|---|---|---|---|---|
+| **ⓐ 最小可信** | 只让 T1 有读者、T4 载荷形状不动 | 3 枚（`internal/config/schema.go`＋`internal/config/manager.go`＋视情况 `cmd/wisp/config_reload.go`） | 0 | N1–N4 四枚（**其中 N3 `manager_test.go:97` 最贵**：它逼 ⓐ 把 `planApp` 的键级 `if` 搬成数据，否则 `Restart` 非空即红） | 中。**且不修 §1.2(c) 那笔相反答复**（T3 仍硬接常量） |
+| **ⓐ 完整** | 再让面板回执查表 | ＋3 枚（`cmd/wisp/panel_config_store.go`、`internal/panel/config_handlers.go`、`internal/ball/hotkey_reload.go`） | 0（映射只能落 `cmd/wisp`，边已存在，见 §1.2(d)） | ＋N8（`config_route_248_test.go:323` 按名字枚举四值 ⇒ 收敛即编译不过）、＋**C17 契约面**（禁区第 2 条 ⇒ 须先落 `A##`） | 高；且与 AC#1 抢 `config_reload.go:167-171` 同一枚函数 |
+| **ⓑ** | 具名登记＋一把同包会响的尺 | **1 枚新登记文件 ＋ 1 枚新测试文件**，全在 `internal/config`；⛔ 零产码改动、⛔ 不碰 `docs/PLAN.md` | 0 | **零枚现成钉被 ⓑ 打红**（N1–N9 全活），且 N3／N7 与 ⓑ **同向**（它们已经是 ⓑ 要的"实现侧"读数来源） | 低。**机制现成可抄**（`unwired_test.go:311` ＋ `unwired.go:119`，射程差在 `:342-345` 只喂了锁定四段） |
+| **都不做** | 维持 T1 纯装饰 ＋ T2 手工旁注 ＋ T3 答反话 | 0 | 0 | — | 三处已具名的假话原地留着：`config_reload.go:297` 的 "and by a test" 无 test、`schema.go:30` 的 "three-tier semantics" 无码、面板回执对 hot 段说"要重启" |
+
+**两枚本腿量出来、会改变裁形的耦合**（具名，不代裁）：
+1. **ⓑ 与 AC#3 是同一把尺的两半**（§3.5-①）：AC#2 ⓑ 要的"会响的尺"与 AC#3 要的"新增一枚叶子键既无读者又无名册 ⇒ 红"
+   共用同一枚反射枚举器与同一张登记表形；分开裁会**重复造一次枚举器**。
+   ⇒ 且票面排程末行本来就建议 `255-r1`＝AC#1＋AC#3（同写面），把 AC#2 单拎出来裁反而把它拆散了。
+2. **ⓑ 的登记表结构必须先允许"一段多档"**（V3），否则 ⓑ 一落地就把 `app`／`voice` 的诚实实现判红——
+   这一格决定 ⓑ 的登记表长什么样，不决定 ⓑ 贵不贵（贵贱已在表里给）。
+
+**顺带量到、不在 AC#2 射程内但同根的一枚事实**（具名上报，不派单不裁定）：
+`internal/ball/hotkey_reload.go:26-31` 注释自陈 `[hotkey]` 是 HOT 档而 `OnReload` 只为 RELOAD 档响
+（逐字："a hotkey edit would never reach a callback installed there"），
+而票 255 禁区第 3 条已把"`OnReload` 出货进程没听众"那一格**归票 42** ⇒ 本腿按那条边界**不并票**，只留一句：
+若裁 ⓐ 完整版，第 6 枚文件（`hotkey_reload.go`）正是票 42 的射程，会越界。
+
