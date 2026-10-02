@@ -1,0 +1,25 @@
+time=2026-10-02T16:21:40.454+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags
+time=2026-10-02T16:21:40.460+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTa2507651944\001\logs min_level=info early_records=1 early_dropped=0
+    firstrun_198r2_test.go:237: tag-derived default leaves: 70; file: 2572 bytes
+    firstrun_198r2_test.go:239: AC#2 RED: the config.toml first-run wrote is not the schema's `default` tags rendered: first difference at line 5 (byte 54): want "theme = 'dark'", got "theme = 'light'"; total bytes want 2571 got 2572
+        every value in that file must be traceable to a default tag (D36 rule 3) - a value the writer typed, or a default table edited away from its tags, is exactly what this case exists to catch
+    firstrun_198r2_test.go:264: AC#2 仪器自证失败：种下「app.theme 改成合法非默认（198-v1 的 V3a 那一形）」之后渲染仍与盘上文件逐字节相同 ⇒ 这一类值进不了比较
+--- FAIL: TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags (0.02s)
+=== RUN   TestTicket198R2AC2ExportedDefaultTableStillRendersAsItsTags
+    firstrun_198r2_test.go:279: AC#2 RED: internal/config's default table is no longer just its `default` tags: first difference at line 5 (byte 54): want "theme = 'dark'", got "theme = 'light'"; total bytes want 2571 got 2572
+--- FAIL: TestTicket198R2AC2ExportedDefaultTableStillRendersAsItsTags (0.00s)
+=== RUN   TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile
+time=2026-10-02T16:21:40.480+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile2656053125\001\data\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile (0.01s)
+=== RUN   TestTicket198R2AC4ReceiptNamesTheRealEntryPoints
+time=2026-10-02T16:21:40.487+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints1152171497\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-02T16:21:40.561+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints1152171497\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2AC4ReceiptNamesTheRealEntryPoints (0.08s)
+=== RUN   TestTicket198R2J1TheAssemblyRootStillCreatesNothing
+time=2026-10-02T16:21:40.573+08:00 level=INFO msg="audit: perm: MODE-READ-FAILED path=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing3528624793\\\\001\\\\config.toml\" err=config: config.toml read: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing3528624793\\001\\config.toml: The system cannot find the file specified. mode=ask_every_step origin=startup result=fail-closed detail=\"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）\""
+time=2026-10-02T16:21:40.577+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2J1TheAssemblyRootStillCreatesNothing3528624793\002\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2J1TheAssemblyRootStillCreatesNothing (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.217s
+FAIL

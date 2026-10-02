@@ -1,0 +1,16 @@
+time=2026-10-02T16:23:28.537+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket198FirstRunCallerIsTheRunEntryOnly
+    firstrun_198_test.go:281: AC J1 RED: ensureFirstRunConfig is called by [assembleRuntime], want exactly [runTextTask] - the resident leg reaches the assembly root directly, and first-run creation shared there writes a config.toml its pins forbid
+--- FAIL: TestTicket198FirstRunCallerIsTheRunEntryOnly (0.07s)
+=== RUN   TestTicket198R2J1TheAssemblyRootStillCreatesNothing
+    firstrun_198r2_test.go:449: J1 RED: the assembly root created a config.toml nobody asked it for (stat err <nil>) - the resident leg reaches this function directly, and ticket 246's pin is the only other thing standing between that and a written root
+    firstrun_198r2_test.go:453: J1 RED: the creation receipt fired inside the assembly root:
+        wisp run: 已在 C:\Users\swq\AppData\Local\Temp\TestTicket198R2J1TheAssemblyRootStillCreatesNothing2864342506\001\config.toml 新建默认配置：全部取值来自内置默认表（schema 的 default 标签），未替你选任何模型；[llm] 的模型与 api_key_ref 仍缺，本轮仍按未配置失败退码
+        wisp run: 缺的两样各有各的入口。key：先跑 wisp secret set <blob 名>（隐藏输入，不进 argv 也不进日志，也可以 --from-stdin 从管道喂），它把明文交给 DPAPI 存储，并回显一行 api_key_ref = "dpapi:<blob 名>"；这份文件里没有写明文 key 的字段，要补的是那个名字。不想用 DPAPI 就把 api_key_ref 写成 env:<环境变量名>，值由系统环境提供。
+        wisp run: 模型：在同一份文件的 [llm.providers.<名>] 里补 api_key_ref、base_url 与 models.<id>（名字对上内置预设的，protocol 与 base_url 可以留空），再在 [llm] 的 text_chain 或 roles.chat 里点名 provider/model；wisp providers discover 与 probe 读这份文件去问真实端点，不替你写。
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: role "chat" is unset and text_chain is empty (Unconfigured)
+time=2026-10-02T16:23:28.620+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2J1TheAssemblyRootStillCreatesNothing2864342506\002\logs min_level=info early_records=1 early_dropped=0
+--- FAIL: TestTicket198R2J1TheAssemblyRootStillCreatesNothing (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.160s
+FAIL

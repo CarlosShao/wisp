@@ -1,0 +1,9 @@
+time=2026-10-02T16:22:57.039+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket198R2AC4ReceiptNamesTheRealEntryPoints
+time=2026-10-02T16:22:57.044+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints2802136830\001\logs min_level=info early_records=1 early_dropped=0
+    firstrun_198r2_test.go:407: AC#4 RED: the guidance sends the user to entry points this build does not dispatch: [wisp catalog (no cmdCatalog in package main)]
+time=2026-10-02T16:22:57.123+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints2802136830\001\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket198R2AC4ReceiptNamesTheRealEntryPoints (0.09s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.150s
+FAIL
