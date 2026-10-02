@@ -1,0 +1,6 @@
+2026-10-02T11:55:15+08:00
+=== v1c: the two remaining cmd/wisp 248 names, by name ===
+--- PASS: TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope (0.00s)
+--- PASS: TestAC1OtherDoorsStillRefuseByNameAfterTheSettingsSocket (0.02s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.086s
+2026-10-02T11:55:18+08:00

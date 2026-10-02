@@ -91,7 +91,7 @@
 **判语：成立（Go 半边），随附一条归口。**
 - 名册侧〔**我复认过**〕：`bridge.go:66-67` 两枚常量、`:148` 的 `knownComposerMethod` case 含六枚名、`:132` 那一声 `if !knownComposerMethod(r.Method)` 仍是唯一入口守卫。
 - 派发表侧〔**我复认过**〕：`internal/panel/composer_dispatch.go:179/184/189/194/199` 五处 `d.unattached(req)`，`ErrNoHandlerAttached` 定义在 `:60-64` 且句子是响亮的（"该方法在名册内，但本机未接入处理器"）＝**在册无处理器那一声响**存在。
-- 用例侧〔**我没复认，照录前腿**〕：`probes/248/v1b/roster-config-panel-248.txt` 逐名 PASS 11 枚顶层＋2 枚子用例，含 `TestAC1BothSettingsNamesAreWhitelistedAndRouted`（两枚名各达处理器**一次**）、`TestAC1UnlistedMethodIsRefusedAndTheLegNeverRuns`、`TestAC1RosteredSettingWithoutALegRefusesLoudly`、`TestAC1DispatchTableNamesEveryWhitelistedSettingMethod`、`TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg`。
+- 用例侧〔**我复认过（本腿逐名跑过、带 `-v`，见 §2 末段）**〕：本腿名册与前腿 `probes/248/v1b/roster-config-panel-248.txt` 同名同终态，11 枚顶层＋2 枚子用例，含 `TestAC1BothSettingsNamesAreWhitelistedAndRouted`（两枚名各达处理器**一次**）、`TestAC1UnlistedMethodIsRefusedAndTheLegNeverRuns`、`TestAC1RosteredSettingWithoutALegRefusesLoudly`、`TestAC1DispatchTableNamesEveryWhitelistedSettingMethod`、`TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg`。
 - 正控〔**我复认过（本腿 §3 V-4）**〕：本腿把 `config_handlers.go:123` 那句 `fs.` 的理由换成光秃秃的"该字段不可写" ⇒ `TestAC1LockedFamilyFieldsAreRefusedBeforeTheLeg` 指名红（红句逐字要求"说出那枚键真正住在哪"），同批另两枚 AC1 用例仍绿＝红的是那一发、不是整包噪声；还原后 `ok`。⇒ "负向判据一律问能力"这一条本腿有自己的一发。前腿 `mutation-M5.txt` 的红句与本腿这发**逐字同形**（同一枚用例、同一枚输入），本腿认它是真读数，但署名各归各。
 - J1（那两枚解冻锚）〔**我复认过**〕：`git show 0d87a681 --unified=0 -- internal/panel/l2_grant_boundary_test.go` ⇒ **4 枚 hunk、删除行共 5 行**，逐字是 `:2051` 那枚拼写钉的三行（`guardAnchor := "case MethodModeRequest, …"`／`if !strings.Contains(…)`／`t.Fatalf("plant B has no anchor …")`）与 `:2139` 那枚尺寸钉的两行（`if got := len(sortedSet(pkg.answered)); got != 4` 及其 `t.Errorf`）⇒ **⛔ 未删钉、未放宽成 ≥4，`A487` 边界（只动这两处与其直连 helper）成立**。
 - J1 的正控〔**我复认过（本腿 §3 V-3）**〕：本腿在 `bridge.go` 的同一枚 const 块里种一枚守卫不认的 `MethodConfigFoo = "config.foo"`（⛔ 不动 case 列表），`go test ./internal/panel -run TestPlantedGrantWiringGoesRedInASnapshot` ⇒ **红，且红句逐字点名那枚常量**（`l2_grant_boundary_test.go:2208: declared Method* constant MethodConfigFoo is absent from the guard's case list`）；还原后（`git diff` 该文件为空）同一条尺 **ok**。⇒ 那枚能力形锚真的在双向读：名册长了、守卫没跟，它就响。前腿 `mutation-M6a.txt` 另记一发反方向（把名册读短 ⇒ `:2312` 报"passing for the wrong reason"）〔**我没复认，照录前腿**〕。
@@ -111,7 +111,7 @@
 **判语：成立。**
 - 存储侧〔**我复认过**〕：`0d87a681` 的 15 枚路径名册里**零枚 `internal/secret/**`**（尺＝`git show --numstat --format='' 0d87a681`）⇒ "没新造第二套存储"是名册级事实，不是读码印象。
 - 写侧〔**我复认过**〕：`internal/config/settings.go` 六枚导出 setter（`:60/:81/:103/:132/:137/:177`）全部经同一枚 `m.mergeWrite`（唯一调用点在 `:242`）；`:79` 注释逐字写明那枚字段收的是**引用**（`dpapi:<id>`／`env:NAME`）而不是密钥，且 `validateAPIKeyRefs` 会拒裸密钥——本腿核到全仓新代码里没有任何把值写进 `config.toml` 的调用点（同一把 `grep` 尺：`SaveFile` 只出现在注释里，见 AC#11）。
-- 用例侧〔**我没复认，照录前腿**〕：`roster-config-panel-248.txt` ⇒ `TestAC3SettingWriteStoresARefNeverAValue`（`internal/config`）与 `TestAC3CredentialLivesInOneStoreAndConfigKeepsOnlyARef`（`cmd/wisp`）双双 PASS；`mutation-M2.txt` 的另一半显示种非法引用时 `internal/config` 红而 `cmd/wisp` 那枚 AC7 用例仍绿——那一发本腿**自己重跑**（§3 V-1），因为它同时是 AC#7 的落点凭据。
+- 用例侧〔**我复认过（本腿逐名跑过、带 `-v`，见 §2 末段）**〕：本腿与 `roster-config-panel-248.txt` 同名同终态 ⇒ `TestAC3SettingWriteStoresARefNeverAValue`（`internal/config`）与 `TestAC3CredentialLivesInOneStoreAndConfigKeepsOnlyARef`（`cmd/wisp`）双双 PASS；`mutation-M2.txt` 的另一半显示种非法引用时 `internal/config` 红而 `cmd/wisp` 那枚 AC7 用例仍绿——那一发本腿**自己重跑**（§3 V-1），因为它同时是 AC#7 的落点凭据。
 - 回显面〔**我复认过**〕：`config_handlers.go:64-68` 把 `provider_credential` 标为只写；本腿 grep `internal/panel`＋`cmd/wisp` 的新代码，没有任何把 `Store.Resolve` 的值接进回执/快照的调用点（`Resolve` 在非测试产码里只出现在装配/存在性判断那侧）。
 
 ### AC#4 —— 真机那一发（面板点设置 → 填 → 保存 → 下一次任务真用上）
@@ -168,7 +168,7 @@
 
 **判语：成立。**
 - 子判据 3（落点）＝AC#7 那一格〔**我复认过**，同上〕。
-- 子判据 1（并发保 B 键）：形状侧〔**我复认过**〕——`internal/config/settings.go` 里 `SaveFile` **只出现在注释里**（`:5`／`:6` 那两行解释它为什么是序列化器不是合并），受保护写只有 `:242` 那一处 `m.mergeWrite`；`writeguard.go`／`loader.go` 均不在 15 枚路径名册里＝票 226 修好的洞没被重新打开。行为侧〔**我没复认，照录前腿**〕——`roster-config-panel-248.txt` ⇒ `TestAC11SettingWriteKeepsAForeignHandEditedKey`、`TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit`（那枚"控制必须仍然会覆写"的正控）、`TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes` 逐名 PASS。
+- 子判据 1（并发保 B 键）：形状侧〔**我复认过**〕——`internal/config/settings.go` 里 `SaveFile` **只出现在注释里**（`:5`／`:6` 那两行解释它为什么是序列化器不是合并），受保护写只有 `:242` 那一处 `m.mergeWrite`；`writeguard.go`／`loader.go` 均不在 15 枚路径名册里＝票 226 修好的洞没被重新打开。行为侧〔**我复认过（本腿逐名跑，带 `-v`）**〕——`TestAC11SettingWriteKeepsAForeignHandEditedKey`、`TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit`（那枚"控制必须仍然会覆写"的正控）、`TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes`、`TestAC11SettingWriteReportsTheKeyPathItChanged` 逐名 **PASS、零 SKIP**（取数件 `probes/248/v1c/roster-config-and-ac2.txt`；前腿 `roster-config-panel-248.txt` 同名同终态）。
 - 子判据 2（多枚字段＝逐枚键各一发＋回执逐枚列键路径）：`writeOneKey` 每次只交一枚 `ownedKey` 进 `mergeWrite`，回执取"文件前后差"（`settings.go:249` `m.writtenKeyPaths(pre, preExists, ownedKey)`，函数在 `:254` 起）；`TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure` 与 `TestAC11SettingWriteReportsTheKeyPathItChanged` PASS〔**我没复认，照录前腿**〕，而 `mutation-M2.txt` 那一发让它指名红＝它有牙齿〔同上，本腿在 §3 V-1 里自己重跑同一族〕。
 - ⚠ 一条已知宽度（不是缺陷，是实现者自暴）：回执报的是"文件实际发生了什么"，第三方同一瞬间的改动也会被列进来（实现件 §5-5）。本腿采它的理由：票面 AC#11-2 点名要 `diffKeyPaths` 那一族的"实际落盘键路径"，求交反而背离题面。⇒ 记在 §5。
 
@@ -197,9 +197,9 @@
 
 **248 自己那批用例的逐名终态（本腿自跑，非照录）**
 
-- `internal/config` 整包：`ok 0.842s`（零 FAIL、零 SKIP）。
+- `internal/config`：整包 `ok 0.842s`；248 那批**本腿逐名跑过、带 `-v`**（`roster-config-and-ac2.txt`，11:54:12）⇒ `TestAC11SettingWriteReportsTheKeyPathItChanged`／`TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure`／`TestAC7InvalidValueLeavesTheFileByteIdentical`＋**6 枚子用例全 PASS**／`TestAC11SettingWriteKeepsAForeignHandEditedKey`／`TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit`／`TestAC3SettingWriteStoresARefNeverAValue`／`TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes`＝**10 枚（含子用例）全 PASS、零 SKIP**。⚠ 顺带量到一枚命名撞车：`-run 'TestAC3'` 在这包里还捞出两枚**不属于本票**的用例（`TestAC3AdoptionClaimsOnlyWhatThisWriteProduced`／`TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory`，票 226 那一族）——本腿没把它们记进 248 的名册。
 - `internal/panel` 里 248 那 11 枚顶层＋2 枚子用例：**本腿自己跑过名册**（`-run 'TestAC1|TestAC2|TestAC8' -count=1 -v`，11:12:26，取数件 `panel-248-roster-v1c.txt`）⇒ **11 枚 `--- PASS`、零 FAIL、零 SKIP**，含 `TestAC8ReceiptNamesTheTierAndNeverClaimsLiveSave` 与三枚 `TestAC2*`（本腿第一次那发把三枚 `TestAC2*` 截在了 `head` 之外，所以本腿重跑了一次逐名数过＝11）。前腿同批名册在 `probes/248/v1b/roster-config-panel-248.txt`〔**与本腿同名同终态**，本腿复认成立〕。
-- `cmd/wisp` 里 248 那 9 枚：本腿逐名跑了 5 枚（`V2-restored-ctrl.txt`，带 `-v`：哨兵零命中／常驻正控／AC3 单一存储／AC1 端到端／AC7 落盘前拒），**全 PASS、零 SKIP**；余 4 枚只在那一发**不带 `-v`** 的整包 `ok 177.139s` 里跑到——⚠ 那把尺**只证零 FAIL，不证零 SKIP**（Go 在有跳过时同样打 `ok`），本腿为此现量过：`grep -c '^=== RUN'` 在那件里＝**0**、`--- SKIP`＝0，两枚都是"没采到"而不是"零枚跳过"。⇒ 那 4 枚的"未 SKIP"本腿**没有**凭据，只有"没 FAIL"的凭据；本腿不去把 `ok` 读成"逐名跑过且真断言了"。
+- `cmd/wisp` 里 248 那 9 枚：**本腿逐名跑过、带 `-v`，9 枚全 PASS、零 SKIP**（`V2-restored-ctrl.txt` 5 枚＋`roster-config-and-ac2.txt` 里 `TestAC2SharedEnvelopeCannotCarryTheCredentialValue`／`TestAC2SnapshotReportsRefWithoutBlobAsAPartState` 2 枚＋`roster-cmdwisp-last-two.txt` 末 2 枚）。⇒ 本腿**不再依赖**"整包 `ok` 蕴含逐名跑过"那种读法：那发不带 `-v`，其存档件里 `grep -c '^=== RUN'`＝**0**、`--- SKIP`＝0，两枚都是"没采到"而不是"零枚跳过"——⛔ 不许把 `ok` 读成"逐名跑过且真断言了"（这条口径写在 §5 第 11 条）。
 
 ## 3. 变异清单
 
@@ -261,6 +261,8 @@
 8. **AC#10 我用"不成立·挂账"可能比票面想的重**。票面自己写了本格"只许两选一"，而选形那一半是编排者 10-01 12:0x 明令"本轮不裁"的。⇒ 严格讲这一格今天是**尚未生效**而不是"交付失败"。本腿仍写"不成立"，是为了让下一枚腿不去勾它；如果台账更想要"挂账不判"这一枚词，改词不改账。
 9. **§0c 那把 blob 尺里 `run.go` 一枚 DIFF 我归给票 198**，凭据是前腿 §0a 记的"`0d87a681..HEAD` 里动过被测三包的只有 `613606c0`"＋本腿自己现读的 `run.go:431/:710` 两枚锚仍在。**我可能错的点**：本腿没有逐枚读 `613606c0` 的 diff 内容，也没排除"第三枚腿在同一路径上的增量"。这不牵动判语（判语用的是 HEAD 现读），只牵动"这句归因"的措辞。
 10. **AC#2 的"没有顶层第五键"本腿改成〔我复认过〕，但留下窄窄的一条没盖住**：本腿逐行读了 `composer.go:268-269`（两枚 tag 在 `ComposerState` 里）＋`:273/:288`（无 reader ⇒ `CredentialUnknown`）＋`pump.go:260/268-269`（reader 为 nil 就不填那两枚）。⛔ 本腿**没有单独跑**"未接 reader ⇒ `credentialKnown:false`"那一发的逐名终态——它的断言原文在 `cmd/wisp/panel_config_248_test.go:544`（本腿读过那三行），而那枚用例（`TestAC2SnapshotReportsRefWithoutBlobAsAPartState`）只在本腿**不带 `-v` 的整包 `ok`** 那一发里跑到 ⇒ 本腿对它只有"没 FAIL"的凭据、没有"逐名 PASS 且未 SKIP"的凭据（口径见 §2 末段那两条）。
+11. **追加一发（交件前最后一把尺，11:55）＋一条仪器口径**：上面第 10 句"只有『没 FAIL』的凭据"已**当场补掉**——本腿把 `cmd/wisp` 那 9 枚 248 用例**逐名**带 `-v` 跑完（`TestAC2SnapshotReportsRefWithoutBlobAsAPartState`／`TestAC2SharedEnvelopeCannotCarryTheCredentialValue`／`TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope`／`TestAC1OtherDoorsStillRefuseByNameAfterTheSettingsSocket` 等；取数件 `roster-config-and-ac2.txt`＋`roster-cmdwisp-last-two.txt`）⇒ **9 枚全 PASS、零 SKIP**，`internal/config` 那批同样逐名（10 枚含 6 枚子用例全 PASS）。⇒ §1 里 AC#1／AC#3／AC#11 三格的"用例侧"标记从〔照录前腿〕改成〔我复认过〕，⛔ **十二格判语一枚没改**。
+    ⚠ 顺手留给下一枚腿的口径：**"整包 `ok`"不证明逐名跑过、也不证明没跳过**（不带 `-v` 时存档件里 `=== RUN` 计数＝0，而有 SKIP 时 Go 照样打 `ok`）；要写"常驻用例真在跑"这种凭据，必须带 `-v` 逐名抄。本腿第一版 §2 差点把 `ok` 读成后者，具名留在表里。
 
 ## 6. 判不动的地方
 
