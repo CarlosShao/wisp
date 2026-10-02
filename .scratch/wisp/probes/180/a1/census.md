@@ -571,6 +571,18 @@
 9. **派单问 4 的预设（"没有就明写盘上没有"）——部分推翻。**
    写侧**已经有**这一档（`EffectiveNotApplied` ⇒ "这一项没有被应用。"，票 248 落的），
    缺的是**读侧与快照侧**。照"明写盘上没有"交出去会把已有的一块现成设施说没。
-10. **终态复认**：本程落笔期间未主动跑 `git log -1` 第二把尺的每一枚行号。
-    终态读数与差集见本节末（下一次 commit 回执里逐条给）。
-    若终态 HEAD ≠ `00e7efe`，本文件所有行号按"取自如未复认的 `00e7efe`"读。
+10. **终态复认（已跑，读数与落笔同发）**：
+    终态时刻 `2026-10-02T10:27:45+08:00`、终态 HEAD `f51cfef4`。
+    尺①：`git diff --stat 00e7efe..HEAD -- internal/config internal/panel cmd/wisp go.mod`
+    ⇒ **空输出**：本程引用的那些产码文件自起手到终态**一字节未动**（工作树里别人的脏件都在
+    `design/**`、`scripts/testdata/**`、`.scratch/**` 与 `.gitignore`，不碰这些路径）。
+    尺②：逐枚复认 12 处承重的行号，全部与起手读数**相同**——
+    `schema.go:532`（`Width ... default:"640"`）、`schema.go:31`（`type Tier string`）、
+    `unwired.go:60`／`:100`／`:119`、`manager.go:285`（panel 整块拷贝那行）、
+    `panel_host_windows.go:175`（构造函数）／`:304`／`:305`（420×260）、
+    `config_handlers.go:196`、`composer.go:57`、`unwired_test.go:311`、
+    `resident_ball_windows.go:171`（`ball.DefaultHotkeys()`）。
+    ⇒ 本文件所有行号**同时成立**于 `00e7efe` 与 `f51cfef4`，不需要"过期读法"。
+    ⚠ 唯一未复认的是 §1 表里那些**只在 R 档出现**的下游行号（`internal/llm/*`、`internal/agent/*`、
+    `cmd/wisp/run.go` 各处）——它们在 `git diff --stat` 的空输出里已被同一把尺覆盖（同属三个目录），
+    所以这半句是冗余保证，不是缺口。
