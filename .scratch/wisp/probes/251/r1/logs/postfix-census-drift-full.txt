@@ -1,0 +1,9 @@
+portable-tests.sh: census GOOS=linux - go list ./... = 1 packages (one row each)
+portable-tests.sh: census - the tier roster (tiers=) and the 'case $mode in'
+portable-tests.sh:   branches are NOT the same set, so the CLAIMED BY column below
+portable-tests.sh:   would name tiers that cannot be run, or hide tiers that can:
+portable-tests.sh:   tiers=   : * census cli core windows 
+portable-tests.sh:   branches : * census cli core windows winsec 
+portable-tests.sh: refused rather than reported - a census whose roster drifted from
+portable-tests.sh: the runnable tiers is '配置里有一行 = 它跑过了' wearing a table
+portable-tests.sh: (ticket 251 AC#4).

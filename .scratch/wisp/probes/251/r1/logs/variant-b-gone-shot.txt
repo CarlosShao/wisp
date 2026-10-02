@@ -1,0 +1,10 @@
+portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+portable-tests.sh: GUARD C - scope mode=winsec resolved to a DIFFERENT package
+portable-tests.sh:   set than the one pinned next to it. Pinned: 1, resolved: 0.
+portable-tests.sh:   1c1
+portable-tests.sh:   < github.com/CarlosShao/wisp/internal/winsec
+portable-tests.sh:   ---
+portable-tests.sh:   > 
+portable-tests.sh: a deleted or newly-uncovered package must fail the step, not
+portable-tests.sh: shorten it. Either restore the scope entry or update the pin
+portable-tests.sh: in the SAME commit and say why in the CI log.

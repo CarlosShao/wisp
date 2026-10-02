@@ -1,0 +1,77 @@
+seed-winsec.sh: judging the WORKING TREE bytes
+seed-winsec.sh: winsec_pin read from the script under test = 1 line(s)
+
+
+== control-explicit-winsec: rc=0  [args: ./internal/winsec/]
+   | 1:portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+   | 17:runtests.sh: OK - packages=[./internal/winsec/... -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+   | 18:portable-tests.sh: four numbers (all from -v output): === RUN=1  --- PASS=1  --- FAIL=0  --- SKIP=0
+   (log: /tmp/tmp.OHxTwlG38u/logs/control-explicit-winsec.txt, 19 non-empty line(s))
+
+== split-explicit-winsec: rc=1  [args: ./internal/winsec/]
+   | 1:portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+   | 2:portable-tests.sh: GUARD C - scope mode=winsec resolved to a DIFFERENT package
+   | 3:portable-tests.sh:   set than the one pinned next to it. Pinned: 1, resolved: 2.
+   (log: /tmp/tmp.OHxTwlG38u/logs/split-explicit-winsec.txt, 8 non-empty line(s))
+
+== gone-explicit-winsec: rc=1  [args: ./internal/winsec/]
+   | 1:portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+   | 2:portable-tests.sh: GUARD C - scope mode=winsec resolved to a DIFFERENT package
+   | 3:portable-tests.sh:   set than the one pinned next to it. Pinned: 1, resolved: 0.
+   (log: /tmp/tmp.OHxTwlG38u/logs/gone-explicit-winsec.txt, 10 non-empty line(s))
+
+== scope-winsec: rc=0  [args: --scope=winsec]
+   | 16:runtests.sh: OK - packages=[./internal/winsec/... -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+   | 17:portable-tests.sh: four numbers (all from -v output): === RUN=1  --- PASS=1  --- FAIL=0  --- SKIP=0
+   (log: /tmp/tmp.OHxTwlG38u/logs/scope-winsec.txt, 18 non-empty line(s))
+
+== unknown-scope: rc=2  [args: --scope=winsecfoo]
+   | 1:portable-tests.sh: unknown --scope=winsecfoo (known: core, windows, cli, winsec, census)
+   (log: /tmp/tmp.OHxTwlG38u/logs/unknown-scope.txt, 1 non-empty line(s))
+
+== winsec-missing-from-core: rc=1  [args: --scope=core]
+   | 1:portable-tests.sh: GUARD C - scope mode=core resolved to a DIFFERENT package
+   | 2:portable-tests.sh:   set than the one pinned next to it. Pinned: 25, resolved: 0.
+   (log: /tmp/tmp.OHxTwlG38u/logs/winsec-missing-from-core.txt, 33 non-empty line(s))
+
+### (filtered) the same three seeds, resolution modelled like real go
+
+== split-explicit-filtered: rc=1  [args: ./internal/winsec/]
+   | 1:portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+   | 2:portable-tests.sh: GUARD C - scope mode=winsec resolved to a DIFFERENT package
+   | 3:portable-tests.sh:   set than the one pinned next to it. Pinned: 1, resolved: 2.
+   (log: /tmp/tmp.OHxTwlG38u/logs/split-explicit-filtered.txt, 8 non-empty line(s))
+
+== scope-winsec-filtered: rc=1  [args: --scope=winsec]
+   | 1:portable-tests.sh: GUARD C - scope mode=winsec resolved to a DIFFERENT package
+   | 2:portable-tests.sh:   set than the one pinned next to it. Pinned: 1, resolved: 2.
+   (log: /tmp/tmp.OHxTwlG38u/logs/scope-winsec-filtered.txt, 7 non-empty line(s))
+
+== gone-explicit-filtered: rc=1  [args: ./internal/winsec/]
+   | 1:portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+   | 2:portable-tests.sh: GUARD C - scope mode=winsec resolved to a DIFFERENT package
+   | 3:portable-tests.sh:   set than the one pinned next to it. Pinned: 1, resolved: 0.
+   (log: /tmp/tmp.OHxTwlG38u/logs/gone-explicit-filtered.txt, 10 non-empty line(s))
+
+### counterfactual: pinned but still the caller's directory form
+   mutant replaced 1 line (the explicit branch scope)
+
+== counterfactual-noglob: rc=0  [args: ./internal/winsec/]
+   | 1:portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+   | 20:runtests.sh: OK - packages=[./internal/winsec/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$] top-level: PASS=2 FAIL=0 SKIP=0, === RUN=2, '[no tests to run]'=0
+   | 21:portable-tests.sh: four numbers (all from -v output): === RUN=2  --- PASS=2  --- FAIL=0  --- SKIP=0
+   (log: /tmp/tmp.OHxTwlG38u/logs/counterfactual-noglob.txt, 22 non-empty line(s))
+
+== real-bytes-glob-bites: rc=1  [args: ./internal/winsec/]
+   | 1:portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+   | 2:portable-tests.sh: GUARD C - scope mode=winsec resolved to a DIFFERENT package
+   | 3:portable-tests.sh:   set than the one pinned next to it. Pinned: 1, resolved: 2.
+   (log: /tmp/tmp.OHxTwlG38u/logs/real-bytes-glob-bites.txt, 8 non-empty line(s))
+
+== roster-mutation-seed: 2 line(s) changed in tiers= (0 would make this seed vacuous)
+
+== census-roster-drift: rc=1  [args: --scope=census]
+   | 1:portable-tests.sh: census - the tier roster (tiers=) and the 'case $mode in'
+   | 4:portable-tests.sh:   tiers=   : * census cli core windows 
+   | 5:portable-tests.sh:   branches : * census cli core windows winsec 
+   (log: /tmp/tmp.OHxTwlG38u/logs/census-roster-drift.txt, 8 non-empty line(s))

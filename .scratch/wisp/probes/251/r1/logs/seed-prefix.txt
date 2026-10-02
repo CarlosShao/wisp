@@ -1,0 +1,56 @@
+seed-winsec.sh: judging /tmp/251-prefix-portable-tests.sh in a shadow root at /tmp/tmp.bZIz1osCgG
+seed-winsec.sh: winsec_pin read from the script under test = 1 line(s)
+
+
+== control-explicit-winsec: rc=0  [args: ./internal/winsec/]
+   | 16:runtests.sh: OK - packages=[./internal/winsec/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+   | 17:portable-tests.sh: four numbers (all from -v output): === RUN=1  --- PASS=1  --- FAIL=0  --- SKIP=0
+   (log: /tmp/tmp.AJbC4zHM5q/logs/control-explicit-winsec.txt, 18 non-empty line(s))
+
+== split-explicit-winsec: rc=0  [args: ./internal/winsec/]
+   | 19:runtests.sh: OK - packages=[./internal/winsec/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$] top-level: PASS=2 FAIL=0 SKIP=0, === RUN=2, '[no tests to run]'=0
+   | 20:portable-tests.sh: four numbers (all from -v output): === RUN=2  --- PASS=2  --- FAIL=0  --- SKIP=0
+   (log: /tmp/tmp.AJbC4zHM5q/logs/split-explicit-winsec.txt, 22 non-empty line(s))
+
+== gone-explicit-winsec: rc=0  [args: ./internal/winsec/]
+   | 16:runtests.sh: OK - packages=[./internal/winsec/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+   | 17:portable-tests.sh: four numbers (all from -v output): === RUN=1  --- PASS=1  --- FAIL=0  --- SKIP=0
+   (log: /tmp/tmp.AJbC4zHM5q/logs/gone-explicit-winsec.txt, 17 non-empty line(s))
+
+== scope-winsec: rc=2  [args: --scope=winsec]
+   | 1:portable-tests.sh: unknown --scope=winsec (known: core, windows, cli, census)
+   (log: /tmp/tmp.AJbC4zHM5q/logs/scope-winsec.txt, 1 non-empty line(s))
+
+== unknown-scope: rc=2  [args: --scope=winsecfoo]
+   | 1:portable-tests.sh: unknown --scope=winsecfoo (known: core, windows, cli, census)
+   (log: /tmp/tmp.AJbC4zHM5q/logs/unknown-scope.txt, 1 non-empty line(s))
+
+== winsec-missing-from-core: rc=1  [args: --scope=core]
+   | 1:portable-tests.sh: GUARD C - scope mode=core resolved to a DIFFERENT package
+   | 2:portable-tests.sh:   set than the one pinned next to it. Pinned: 25, resolved: 0.
+   (log: /tmp/tmp.AJbC4zHM5q/logs/winsec-missing-from-core.txt, 33 non-empty line(s))
+
+### (filtered) the same three seeds, resolution modelled like real go
+
+== split-explicit-filtered: rc=0  [args: ./internal/winsec/]
+   | 19:runtests.sh: OK - packages=[./internal/winsec/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$] top-level: PASS=2 FAIL=0 SKIP=0, === RUN=2, '[no tests to run]'=0
+   | 20:portable-tests.sh: four numbers (all from -v output): === RUN=2  --- PASS=2  --- FAIL=0  --- SKIP=0
+   (log: /tmp/tmp.AJbC4zHM5q/logs/split-explicit-filtered.txt, 21 non-empty line(s))
+
+== scope-winsec-filtered: rc=2  [args: --scope=winsec]
+   | 1:portable-tests.sh: unknown --scope=winsec (known: core, windows, cli, census)
+   (log: /tmp/tmp.AJbC4zHM5q/logs/scope-winsec-filtered.txt, 1 non-empty line(s))
+
+== gone-explicit-filtered: rc=0  [args: ./internal/winsec/]
+   | 16:runtests.sh: OK - packages=[./internal/winsec/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+   | 17:portable-tests.sh: four numbers (all from -v output): === RUN=1  --- PASS=1  --- FAIL=0  --- SKIP=0
+   (log: /tmp/tmp.AJbC4zHM5q/logs/gone-explicit-filtered.txt, 17 non-empty line(s))
+
+### counterfactual: pinned but still the caller's directory form
+   (no explicit-path substitution in the script under test - 改前 bytes: the
+    counterfactual has nothing to mutate; the 改前 split shot above IS the
+    reading, and it came back rc=0)
+
+== census-roster-drift: this script has no tiers= roster (改前 bytes) - the drift is
+   its NATURAL state there: census prints 'CLAIMED BY ... winsec' for a tier no branch
+   implements and exits 0. That reading is logs/census-prefix.txt (real go, not a seed).
