@@ -1,0 +1,6 @@
+248-c3 fill §6 + §7, deliver census
+
+§6 names every measurement requiring a Go run or real window (who does it).
+§7 submission verdict: read-only, zero Go commands, not pushed, ticket AC
+boxes untouched (5 unchecked/7 checked), credentials not leaked, frontend
+and design layers not read. All placeholders cleared. Census complete.

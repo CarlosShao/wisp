@@ -114,8 +114,30 @@
 
 ## §6 量不到的地方（具名）
 
-（取数中）
+> 派单第一硬规＝一枚 Go 命令都不跑；且三枚写腿在飞（`cmd/wisp`＋`internal/config`、`internal/agent/approval`、`internal/tools`＋`internal/risk`），⚠ `internal/panel` 编译会带上正被改写的 `internal/agent/approval` ⇒ 凡"跑一遍才知道"的读数本腿一律拿不到。下面逐条具名"缺哪把尺、要谁来量"，⛔ 不推测填空。
+
+1. **对账门当前真红/真绿**（AC#2）：`go test ./internal/panel -run 'TestComposerContractTypesMatchFrontend'` 一发即定。本腿只读了门的比对机制，红读数出自 v1c。⇒ 由能跑测试的验收腿量。
+2. **TierOf 首个生产调用者是否已落库、落库后回执档位是否真由 `TierOf` 产出**（AC#8/AC#10）：要 255-r2 提交后跑 `go test ./cmd/wisp ./internal/config`＋读 `panel_config_store.go` 那两枚赋值是否从硬填 `EffectiveRestart` 改成查表。本腿只看到未提交的雏形。⇒ 归 255-r2 交件后的一枚非实现者腿。
+3. **窗口真开不 panic**（AC#4）：`bringUp` 真创建窗时嵌套消息泵重入到底会不会 panic（A492 那条）。只有 `go run`/真机才答得了。⇒ 编排者本机自跑或 owner 桌面操作。
+4. **GRANT-DROPPED 实跑**（AC#10）：用户按"本会话内允许"、`Grants` nil ⇒ 只放行不落盘那一行今天是否真出现。要真跑常驻腿＋球交互，且票面点名复用票 224 r2 那套授权仪器（⛔ 不新造）。⇒ 真机 session / 专门授权仪器腿。
+5. **`frontend/dist` 磁盘上到底有没有一包页面产物**（AC#9）：`git ls-files` 只证 git 跟踪面；embed 读真实目录。要 `ls frontend/dist`（禁令层，本腿不碰）或跑 embed 后查产物条目数。⇒ owner / 前端 agent。
+6. **`config.set` 那枚具名字段枚举的写侧全链值流**（AC#3，已勾格没重审）：`provider_credential` 的值确不进共用封套/日志/快照，靠 v1c 的 V-2 变异读数＋名册尺。本腿未种变异（⛔ 跑不了）。⇒ 若要复认，需一枚能跑变异的裁决腿。
+7. **门禁四数（build/gofumpt/test/d22scan）**：AC#6 已由编排者 10-02 §6 现跑勾过（且那 4 枚 `internal/panel` 红的归因在别的票面）。本腿不重跑，也不引那终态当自己的读数。
+8. **staticcheck / CI 终态**：本机版与 CI 钉版不同、派单明令不跑；v1c §6 亦记云端那发采不到逐名红。⇒ 不在本腿射程。
+9. **时序/负载类读数**：取数期间同机三枚写腿在飞，任何毫秒级/超时判据本腿一律不采（即便能跑也应【可能被抢 CPU】标注）。
 
 ## §7 交件判语
 
-（取数中）
+- **只读性**：本腿全部动作＝Read／`git grep`／`git show HEAD:`／`git ls-files`（取 committed blob 与跟踪名册）。7 枚提交只动 `.scratch/wisp/probes/248/c3/**`（尺＝`git log --all` 里 7 枚 `248-c3` 提交的 `--name-only` 去重后**只列 c3 路径**）。未改任何已跟踪的非证据件文件。
+- **零 Go 命令**：`go build`/`vet`/`test`/任何带 `./...` 的一枚没跑。派单第一硬规照办；"跑了才知道"的读数一律进 §6 具名，⛔ 没推测填空。
+- **未 push**：只 commit，无 push／无改写历史。
+- **AC 框未碰**：票 248 面现量 `grep -cE '^- \[ \]'`＝**5**、`'^- \[x\]'`＝**7**（未勾 5＝AC#2/4/8/9/10，已勾 7＝AC#0/1/3/5/6/7/11），与票面 §151 那句"未勾 5／已勾 7"逐字一致＝本腿零改动票面。§1 的"题面逐字摘句"只引不改。
+- **凭据零外泄**：全文只出现变量名／字段名／枚举名／文件名／env 位（`credentialState`／`credentialKnown`／`provider_credential`／`api_key_ref`／`provider_api_key_ref`／`EffectiveRestart`／`TierOf`／`restartTierKeys` 等），⛔ 无任何凭据值、无哨兵常量的值、无 key 串。
+- **两层禁令**：未读 `frontend/**`／`design/**` 任何一字节、未在其文件上取行号。AC#9 只用了 git 跟踪名册（`git ls-files frontend/dist`＝1 枚 `.gitkeep`，此 `.gitkeep` 文件名亦出自票面 §49 而非本腿读那层得来），§4-Q1/Q2/Q3 的"抄给页面侧的问句"只述 Go 侧事实＋问句，⛔ 不转述那两层内容。
+- **禁区未碰**：`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件／`ci.yml` 一枚未改（本腿只读，且读的是 tiers/manager/composer/bridge/pump/config_handlers/resident/approval-queue 等非冻结面；`config_readers_255.go`／`tiers_app_255r2_test.go` 属他腿未提交件、本腿未写未引其结论为凭）。
+- **临时件只建不删**：c3 下 8 枚文件全建、零删。
+
+**三枚最重要结论（回报正文重述，各带现取 file:line）**：
+1. AC#8／AC#10 的 Go 半句卡在**同一枚未接线的读口** `internal/config/tiers.go:93 TierOf`（HEAD 生产调用点 0），正解雏形是未提交的 `cmd/wisp/config_readers_255.go:174`＝"TierOf's first production caller"；而回执今天硬填 `cmd/wisp/panel_config_store.go:228` 与 `:275` 的 `res.Tier = panel.EffectiveRestart`，与 `internal/config/tiers.go:30 "llm":"hot"` 相矛盾 ⇒ **这两格真依赖票 255-r2，不是票 33、不是前端**（§3）。
+2. AC#2 的 Go 半边**已全写好且已接线**（`internal/panel/composer.go:268-269` 两枚键、`cmd/wisp/run.go:710` 的 reader 生产接线），唯一拦路是 `internal/panel/composer_test.go:48` 那枚双向对账门要前端 interface 补声明 ⇒ **只等前端那半，今天前端就能独立解**（§4-Q1）。
+3. AC#4 的**开窗链今天已生产接线**（`cmd/wisp/resident_windows.go:163 withPanelHost(...RequestToggle...)` → `panel_resident_windows.go:378/329/360` → `panel_host_windows.go:395/230 Show/bringUp`），票面 §96/§149 那句"零命中/没接"已过期；仍缺的是**真机确认那扇窗开时不 panic ＋ `frontend/dist` 一包真页面（现量只剩一枚 `.gitkeep`）＋ 一次真点击** ⇒ AC#4 是 33＋前端＋真机三合一，⛔ 别当成"Go 一块没写"。
