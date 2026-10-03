@@ -1,0 +1,3 @@
+d22scan -self-test: FATAL the table does not cover the tool (2 hole(s)); an unrun self-test is not a green self-test
+d22scan -self-test:   HOLE ban #9 phantom-citation is documented in the `// Bans` block but no emission site (a literal finding tag, or a walkText call naming it) can print it - the walk was removed, or the tag was renamed in only one of the two places
+d22scan -self-test:   HOLE a self-test case names tag "phantom-citation", which no emission site in this tool can print - the sample is testing a ban that does not exist

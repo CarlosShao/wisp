@@ -1,0 +1,24 @@
+pre-image 5e8748b3^ production (non-test) Go files under internal/+cmd: 266
+distinct repoPathRe tokens cited in whole-line comments that DO NOT exist on disk: 11
+docs/evidence/s1/62-
+    cited in: internal/ball/statevisual.go
+internal/buildinfo.Name
+    cited in: internal/buildinfo/buildinfo.go
+internal/engines
+    cited in: cmd/wisp/models.go
+internal/proc.WithRegistry
+    cited in: cmd/wisp/resident_ball_windows.go
+internal/provider
+    cited in: internal/tools/bridge.go
+internal/tool
+    cited in: internal/agent/tools.go
+internal/tools.Result.AppliedSteps
+    cited in: internal/agent/approval/report.go
+scripts/check-pathclean-ban.sh
+    cited in: internal/risk/pathresolver.go
+tools/agent/cmd
+    cited in: internal/risk/provenance.go
+tools/bridge.go
+    cited in: internal/agent/approval/queue.go
+tools/gate.go
+    cited in: internal/agent/approval/pending_read.go
