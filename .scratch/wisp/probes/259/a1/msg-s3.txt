@@ -1,0 +1,16 @@
+259-a1 section 3: spend and issue call-site roster with argument sources
+
+One literal spend site in production code (queue.go:376), reached by three
+named entrances: DecideFromNative (the only one a live host actually uses,
+via the console verb "yes"), allowScoped through AllowSession (verb
+"session"), and NativeAPI.Allow which today has zero production callers -
+tests are the only thing that presses it. One literal issue site
+(queue.go:336), whose sole caller is grantNonce at gate.go:506 with the
+item push returned one line earlier.
+
+Both ends read the same field of the same object; the reply surface never
+carries a digest at all, and the Request struct has no tool/args/level/seq
+to rebuild one from. Named the two shapes the ticket asked about: the tray
+has no allow item (four items, none of them an allow), the resident GUI has
+no allow entry at all, and the panel route never spends - it revokes the
+whole store, which does not read bind.

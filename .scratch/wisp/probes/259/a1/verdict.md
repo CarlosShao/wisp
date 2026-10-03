@@ -82,7 +82,64 @@
 
 ## §3 `spend`／`issue` 调用点全名册 + 实参来源
 
-尚未作答。
+### 3.1 字面调用点（`grep -rn --include=*.go '\.spend(' cmd internal tools scripts` 全量）
+
+**产码：一处，没有第二处。**
+
+| 号 | 位置 | 实参一（nonce）来源 | 实参二（bind）来源 |
+|---|---|---|---|
+| S1 | `internal/agent/approval/queue.go:376`（`allowScoped` 函数体内） | 形参 `nonce`，即 `allowScoped(corr, nonce string, forSession bool)` 的第二参（`queue.go:361`） | **`it.bind`**，其中 `it` 是同一函数 `queue.go:363` 由 `q.lookupForAllowLocked(corr)` 取回的那枚 item；receiver 是 `it.grants`——**bind 与 store 同出一枚对象** |
+
+`internal/agent/approval/ticket242_binding_test.go:23/29/40/50/104` 是五发**测试内**直接调 store，
+`104` 那发递的还是另一枚 item 的 `itB.bind`——⛔ 这不是生产路由，本件 §1·现量 5 已具名。
+
+### 3.2 能走到 S1 那一句的入口路（答复入口全名册）
+
+`allow`／`allowScoped` 的字面调用点共三处，全部在 `internal/agent/approval/`：
+
+| 号 | 位置 | 通向 | 产码调用者（包外可达性） |
+|---|---|---|---|
+| E1 | `internal/agent/approval/gate.go:625`（`nativeAPI.Allow`） | `q.allow` → `queue.go:344` → `allowScoped(...,false)` | **零**。全仓 `grep -rn '\.Native()' cmd internal tools`：非测试命中只有定义处 `gate.go:616` 与 `replies.go:363` 那发 `AllowSession`；`Native().Allow(...)` 只出现在测试（`queue_test.go`、`batch_test.go`、`ticket87_*`、`ticket97_*`、`internal/tools/wiring_test.go`、`cmd/wisp/subagent_selfapproval_197_test.go`）。⇒ 这枚导出方法今天**只被测试按** |
+| E2 | `internal/agent/approval/gate.go:723`（`Gate.DecideFromNative` 的 `r.Allow` 真分支） | 同上 | 一处：`internal/agent/approval/replies.go:328`（`Replies.Allow`，`Grant: card.Grant`）← `cmd/wisp/approval_reply.go:215`（`replySurface.allow`）← 动词 `yes`（`cmd/wisp/approval_reply.go:564`）← 两枚控制台循环：`cmd/wisp/approval_reply.go` 的 `runReplyLoop`（`:530`）与 `cmd/wisp/resident_task_source_windows.go:381` 的 `runConsoleLoop` |
+| E3 | `internal/agent/approval/gate.go:664`（`Gate.allowSession` 里 `q.allowScoped(corr, grant, true)`） | 直接进 S1 | 一处：`gate.go:648`（`nativeAPI.AllowSession`）← `internal/agent/approval/replies.go:363`（`Replies.AllowSession`，`card.Grant`）← `cmd/wisp/approval_reply.go:259`（`replySurface.session`）← 动词 `session`（`cmd/wisp/approval_reply.go:566`） |
+
+三条路的 `bind` 实参**都是 S1 那一句里现读的 `it.bind`**，没有任何一条把摘要当参数往外接：
+`NativeAPI` 的两个 allow 方法签名是 `Allow(ctx, correlationID, grant string)`（`ui.go:146`）与
+`AllowSession(ctx, correlationID, grant string)`（`ui.go:158`），答复侧的 `Request` 结构体
+（`gate.go:709-715`）字段只有 `CorrelationID/Allow/Grant/Reason/Source` 五枚——
+**答复侧连 tool／args／level／seq 都递不进来**，所以"花侧从答复侧递交的请求重算摘要"
+在现签名上**没有原料**（这是作用面读数，不是"某修法做不到"的结论；选边归编排者）。
+
+**任务点名的两条要具名的形状，读数如下：**
+- **托盘「允许一次」那条路：今天不存在。** 托盘右键菜单的在册项是
+  `internal/ball/tray_windows.go:86/88/89/91` 那四枚——「打开面板」「静音」「暂停唤醒」「退出」，
+  没有任何 allow 项；球侧非测试码对 `approval.` 的引用为零
+  （`grep -rn 'approval\.' internal/ball/*.go` 去掉测试后无命中），它只接否决键
+  （`cmd/wisp/resident_ball_windows.go:279-286` 的 `recordCancelHotkey` →
+  `cmd/wisp/resident_approval_windows.go:179` 的 `ra.cards.Veto(...)`，走的是 veto 那一路）。
+  顺带一枚同族读数：**常驻 GUI 这条腿今天根本没有 allow 入口**——
+  `grep -rn --include=*.go '\.Allow(\|\.AllowSession(' cmd/wisp/resident_*.go` 非测试命中为零，
+  它只挂 Esc 否决通道（`cmd/wisp/resident_approval_windows.go:157-159` 明写
+  「单击球／KWS 否决词／面板拒绝三条仍按各自归口未接入」）。
+  ⇒ 票面问的"第二处答复入口"在盘上只有 E2／E3 两枚（＋E1 那枚测试专用）。
+- **面板侧的 allow：走不到 S1，够到的是另一件事。**
+  `Gate.DecideFromPanel`（`gate.go:730`）在 `r.Allow` 真时直接
+  `gate.go:740` 返回 `ErrPanelAllow`，在此之前只做 `gate.go:738` 的 `q.revokeGrants(corr)`
+  （→ `queue.go:422-428` → `it.grants.revoke()`，`approval.go:309-313` 把整张 map 换成空 map）。
+  **那是"烧掉这枚 item 全部在册 nonce"，不是 spend**：它一次都不读 `bind`；
+  `revokeGrants` 的调用者全仓只有 `gate.go:738` 这一处。
+
+### 3.3 `issue` 的调用点与 `bind` 来源
+
+| 号 | 位置 | 存的值 | 上游 |
+|---|---|---|---|
+| I1 | `internal/agent/approval/queue.go:336`（`grantNonce` 内，`q.mu` 已持，`:335-337`） | **`it.bind`**——与 S1 读的是同一枚对象的同一个字段 | `grantNonce` 的调用者全仓只有 `internal/agent/approval/gate.go:506` 一处，传的是 `gate.go:501` 那次 `g.q.push(d)` 刚返回的 `it`；`nonce` 则是 `queue.go:327` 现 `mintGrant()`（`approval.go:242-248`）出来的 |
+
+⇒ 一条 item 的 `issue` 只发生在 `push` 之后、`Prompt` 之前
+（`gate.go:501 → :506 → :528 → :530`），且 `grantNonce` 每枚 item 只被叫一次。
+store 侧还有一件事要钉住：`s.values` 的**唯一写点**是 `approval.go:287`（`issue`），
+其余 `s.values` 出现处是 `approval.go:298`（读）、`:302`（删）、`:312`（`revoke` 换成空 map）、
+`:319`（`live()` 计数）。**没有任何一条路能绕过 `issue` 往 store 里塞一份别的摘要。**
 
 ## §4 store 归属（per-item 与否）+ 跨卡今天被谁拦
 
