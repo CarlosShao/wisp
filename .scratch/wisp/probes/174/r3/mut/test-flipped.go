@@ -482,7 +482,7 @@ func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3(t *testing.T) {
 		"未接线",          // the judge IS wired here
 		"不可找回",         // a pointer is given; that announcement is the no-pointer arm
 	} {
-		if strings.Contains(notice, banned) {
+		if !strings.Contains(notice, banned) {
 			t.Errorf("the canonicalize-error notice must not relay %q: notice %q", banned, notice)
 		}
 	}

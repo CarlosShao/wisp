@@ -1,0 +1,35 @@
+test(tools): 174-r3 票 174 AC#2d 第二半——Canonicalize 返错那支的注意句不许转述毒值（泄漏断言两枚判据，零产码）
+
+174-r2 钉了那支"说了没有"，欠的"err.Error() 里不许带什么"由本程落：
+junction fixture（mklink /J，毒值埋在 link 名与 target 名里）让"路径原文/
+根列表"两半在不动画着产码的前提下绿着钉死；"C26 内部状态词"那半今天真的
+在漏（ErrReparseDenied 原文进回执），判不动上报，不把红断言 commit 进名册
+（照 174-r2 / A375 先例）。
+
+判据两枚（internal/tools/task_output_pointer_notice_test.go 只追加，既有
+八枚一字未动；产码 task.go 零字节，md5 复归 4138177e）：
+- TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3（:420）：正向半
+  （Truncated/注意/连规范化都没通过/指针仍给）＋泄漏扫（注意句切出射程：
+  第一个"注意："到"，全文见 "，恰是拼进去那段的字面）禁十一项——filed
+  原文、ALLOWLIST-LEAK-PROBE-174r3、RESOLVED-LEAK-PROBE-174r3、rootA、
+  rootB、读得回来/随时可读/可以读回、不在你被授权的目录范围内、未接线、
+  不可找回。
+- TestLeakProbeTokenOnALegalPathStaysSilent174r3（:497）：同一毒值 token 在
+  根内合法普通文件上走健康臂＝零注意＋指针照印＋同桥 fs.read L0 全文——
+  尺按支区分不按 token 在场区分。
+
+自证（-overlay，跟踪树零改动，台件 probes/174/r3/mut/ 只建不删）：
+- MUT-A 摘整句文案 ⇒ 判据一红，红句"the reply must name normalization as
+  the step that failed"（logs/mutA-leak-criterion-run.txt）；
+- MUT-B2 把禁表毒值本体种进注意句 ⇒ 泄漏扫红，"must not relay
+  ALLOWLIST-LEAK-PROBE-174r3"（logs/mutB2-poison-token-run.txt）＝尺有牙；
+- 反形探针（判据翻成"必须含毒值"）跑在干净产码上 ⇒ 红＝不是恒真尺
+  （logs/flipped-criterion-run.txt）；
+- MUT-B（自造词不在禁表）绿＝刻意留的口径证词：扫的是具体毒值。
+
+门禁四数：go vet ./internal/tools/ rc=0；sh scripts/d22scan.sh rc=0 clean
+（internal/=498）；gofumpt -l 空（v0.12.0）；go test -count=1
+./internal/tools/ ok 13.966s，名册 191 PASS / 0 FAIL / 0 SKIP。
+证据件 .scratch/wisp/probes/174/r3/impl.md（§0-§8 全满，含判不动与推翻
+清单）；⛔ 未跑全仓（cmd/wisp 有 261-r2 写腿在飞、internal/llm 刚落门）。
+零删除、零产码、只 commit 未 push。

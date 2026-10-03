@@ -1,0 +1,2 @@
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+7179c7597ffb6c669045ebcaa9960f99 *internal/tools/task_output_pointer_notice_test.go

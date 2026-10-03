@@ -1,0 +1,8 @@
+time=2026-10-03T17:56:28.874+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.10s)
+    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true announce="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，C26 连规范化都没通过（risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions 处理时查过 ALLOWLIST-LEAK-PROBE-174r3 这一项）；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状），全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r34111659553\\001\\ALLOWLIST-LEAK-PROBE-174r3…]"
+    task_output_pointer_notice_test.go:470: notice region under the leak sweep: "注意：这条路径现在读不到，C26 连规范化都没通过（risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions 处理时查过 ALLOWLIST-LEAK-PROBE-174r3 这一项）；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状）"
+    task_output_pointer_notice_test.go:486: the canonicalize-error notice must not relay "ALLOWLIST-LEAK-PROBE-174r3": notice "注意：这条路径现在读不到，C26 连规范化都没通过（risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions 处理时查过 ALLOWLIST-LEAK-PROBE-174r3 这一项）；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状）"
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.177s
+FAIL

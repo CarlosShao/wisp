@@ -1,0 +1,7 @@
+time=2026-10-03T17:55:50.808+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true announce="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状），全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3870702370\\001\\ALLOWLIST-LEAK-PROBE-174r3…]"
+    task_output_pointer_notice_test.go:451: the reply must name normalization as the step that failed, got "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状），全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3870702370\\001\\ALLOWLIST-LEAK-PROBE-174r3…]"
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.121s
+FAIL
