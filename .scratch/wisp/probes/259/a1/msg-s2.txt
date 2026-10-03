@@ -1,0 +1,16 @@
+259-a1 section 2: every write point of the item's own binding digest
+
+Four shapes were hunted, not one grep: assignment, composite literal,
+address-of, and reflection/unsafe escape. Result: one reachable write
+(queue.go:162, inside push, under q.mu, before the item is visible), one
+zero-value write no goroutine can observe (queue.go:155-161, the item is
+registered only at :163-165), one struct-copy write in replay
+(queue.go:562) whose value is thrown away at :572 and whose entrance
+Gate.Replay has zero production callers, and two test-planted qitem
+literals (pending_read_test.go:195-196) that never reach the allow route
+because the allow lookup reads only q.byID.
+
+Also fixed one line number the draft got wrong (test append is :198, not
+:202), and recorded the distinction that a "registered fresh" future would
+weaken what the digest covers without ever making the stored and the
+spent value differ.

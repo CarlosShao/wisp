@@ -42,7 +42,43 @@
 
 ## §2 `it.bind` 写点全名册
 
-尚未作答。
+字段本体：`internal/agent/approval/queue.go:48` = `	bind   string`，宿主是
+`type qitem struct`（`queue.go:31`）。**类型未导出、字段未导出**，且 `*qitem` 在全仓只出现在
+未导出函数与未导出字段上（`queue.go:69/70/76/77/141/195/208/231/250`），`Queue` 的导出面
+只有 `NewQueue`/`Timeout`(`:126`)/`WarningLead`(`:129`)/`Depth`(`:133`)/`LiveApprovals`
+（`pending_read.go:104`，返回的是值拷贝）——**没有任何导出方法把 `*qitem` 递出去**。
+⇒ 包外既不能命名这枚字段，也不能拿到那枚指针。
+
+写点名册（穷举方式：`grep -rn '\.bind = ' cmd internal tools` 一发 + `grep -rn 'qitem{' cmd internal tools`
+一发 + `grep -rn '&it\.bind\|&fresh\.bind'` 一发 + 全包 `grep unsafe|linkname|reflect` 一发；
+四发合起来覆盖赋值、复合字面量初始化、取地址、反射/绕过四条形状）：
+
+| 号 | 位置 | 形状 | 能否进入 `issue`／`spend` 那两条路 |
+|---|---|---|---|
+| W1 | `internal/agent/approval/queue.go:162` | `it.bind = bindDigest(corr, d.TaskID, d.Tool, d.LevelString(), q.seq, d.Args)`——生产里**唯一一处对活item的赋值** | 能，且是唯一被用的那份值。`corr` 是 push 自己刚算出的那枚（`:148-154`：空则 `"approval-"+seq`，撞键则 `原corr#seq`），与 `it.Corr`（`:156`）同一个字符串 |
+| W2 | `internal/agent/approval/queue.go:155-161` | 复合字面量 `it := &qitem{…}` **不含 `bind:`** ⇒ 该字段此刻是零值 `""` | 观察不到：`push` 整个函数体在 `q.mu` 里（`:142-143` 上锁 / `defer` 解锁），item 直到 `:163-165` 才进 `q.pending`/`q.byID`/别名索引，而这三行都在 W1（`:162`）**之后**。⇒ 没有任何一条路能拿到 bind 还是 `""` 的活item |
+| W3 | `internal/agent/approval/queue.go:562` | `fresh := *it`（`replay` 里的结构体拷贝）——严格讲这是**第二次写 `bind` 字段**（写到一枚新栈上 item 的字段），值＝历史item那份摘要 | **不能**：`fresh` 之后只被赋 `grants/state/answer/replayOf`（`:563-566`），从未 append 进 `q.pending`/`q.byID`/`q.history`，函数在 `:572` 返回的是 `d, d.CorrelationID` 就结束 ⇒ `fresh` 被丢弃。再加一枚独立事实：`Gate.Replay`（`gate.go:749`）**在生产码里零调用者**（`grep -rn '\.Replay(' cmd internal tools scripts` 只命中 `internal/agent/approval/queue_test.go:283`） |
+| W4 | `internal/agent/approval/pending_read_test.go:195-196` | 测试在包内手搓 `&qitem{Corr: "ghost-answered", Dec: dLive, state: stateAnswered}` 与 `stateDropped` 那枚，塞进 `q.pending`（`:198`）——bind 是零值 `""`，**且 `grants` 是 nil** | 不能：这两枚只进 `q.pending`，**没进 `q.byID`**，而允许侧只读 `q.byID`（`lookupForAllowLocked`，`queue.go:231-236`）⇒ 任何针对它们的 allow 落在 `queue.go:366` 的 `ErrUnknownCorrelation`，走不到 `queue.go:376`，也就碰不到那枚 nil store |
+
+⚠ 关于 W3 的一句必要区分（免得被当成"这条路本来会不同值"）：
+就算未来有腿把那枚被丢弃的 `fresh` 真登记进队列（那行死代码看起来正是这个意图），
+它的 `bind` 会带着**旧 corr** 的摘要而 item 的键是 `corr#replay`/`corr#seq`
+（`queue.go:568-570` 只改 `d.CorrelationID`，从不重算摘要）——
+那削弱的是"**摘要覆盖了什么**"，⛔ 不是"存的那份与花的那份会不会不同"：
+`issue` 与 `spend` 读的是**同一个字段的同一份值**，两端仍然同值。
+本件的 §8 只判后者，前者是票面 AC#1 ⓑ 那一支的问题，不归本腿选边。
+
+读点（不是写，列出来是为了让"写一次读两次"这件事可核）：`queue.go:336`（喂 `issue`）、
+`queue.go:376`（喂 `spend`），包外零读点，测试读在
+`ticket242_binding_test.go:68/72/82/104`。
+
+自我对抗（这一节里我唯一没能证死的方向）：W1 之后**没有任何代码再改这份摘要**这件事，
+我是靠上面那四发 grep 的组合来支撑的，不是靠通读全部包外码。剩下的形状——
+`go:linkname`、`unsafe` 指针运算、把 `*qitem` 藏进某个 `any` 里再断言回来——
+在 `internal/agent/approval` 里**一枚都没有**（`grep -rn 'unsafe\|linkname\|reflect' internal/agent/approval`
+的非注释命中全在测试文件，且只走 `tools.Decision` 与 `PanelItem` 两枚导出类型的反射；
+反射也设不了未导出字段）。⇒ 就这枚字段而言，"包外改不动"我是认账的，但它属"读过作用面才说的否证"，
+不属"grep 一次就结案"。
 
 ## §3 `spend`／`issue` 调用点全名册 + 实参来源
 
