@@ -1,0 +1,7 @@
+falsified ruler: /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/171/r3/fixtures/gate-lie-columns.sh (from .scratch/wisp/probes/154/gate-clauses.sh:169; diff lines=2, expected 2)
+   the line it now prints:
+     169:		STALE="$STALE# STALE 腿=$LEG 声明=$EXPECT 基线=${COUNT}枚 实测=${COUNT}枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+
+r3-flip-columns.sh: mode=post   pinned anchor=4f2a777b60770744adabbd92144d261812a025a0
+
+===== (1) the unmodified door, against the falsified 实测/差 columns =====

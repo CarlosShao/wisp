@@ -342,6 +342,21 @@ D2→D1 的 5→4 差额逐枚可归因：共用同一条射程的 `G6neg` 从 B
   命中的只有 `⚠` 与 `≥`，且逐枚都在**注释行**（尺上四处 `:21`/`:53`/`:62`/`:516` 全是改前既有的注释行，
   与我新加注释同形；仪器"注释豁免、字符串不豁免"那一味＝`Q-46(c)`，出处 `AGENTS.md` §1.2）。
   裸 `go func(`：本程不写 Go，除本件 §7 引用那把门的名字外命中 0。明文密钥：0（`secret` 那几枚命中全是文件名）。
+- 提交之后在自己那枚提交上重跑尺本体：`git rev-parse HEAD` ＝ `2a5489d3e49b0b868074c9dcf155db4e883b8a06`，
+  `sh .scratch/wisp/probes/154/gate-clauses.sh`（默认锚＝HEAD）⇒ **rc=2**、`腿数＝14 声明与实测不符＝2`、
+  `基线过期枚数＝0`，两枚 BAD 仍是 §3.4 那两枚他票的（`G1b`、`G6neg`），逐字读数＝`logs/gate-at-lownhead.txt`。
+- **提交后的确认性复跑：我停在了中途，具名在此**。`sh r3-flip-columns.sh post` 在提交后又起了一遍
+  （部分日志留在 `logs/harness-flip-columns-post-rerun.txt`，它跑到第 (1) 发的门禁第 3 格里被我叫停）——
+  理由不是结果不对，是这台机器上同机两程正在落码，一把门的十一轮 `git grep` 从提交前的约 20 分钟涨到了
+  每轮 2 分钟（三发约一小时），超出本程的轮次预算。叫停的方式与时点：`taskkill //F //T //PID 13468`
+  （那是本程自己 nohup 起来的 `r3-flip-columns.sh`，不是别的程）；它当时已经开始覆写
+  `logs/lie-door-unmodified.txt`（tracked），我按仓里那唯一许可的方式还原了它：
+  `git cat-file blob HEAD:.scratch/wisp/probes/171/r3/logs/lie-door-unmodified.txt > 同路径`，
+  还原后 `git status --porcelain -- probes/154 probes/161 probes/171` 在我这几个面上**只剩未跟踪的新件**。
+- §4.1／§4.2 那三向读数为什么仍然算"提交后的字节"：
+  `cmp <(git cat-file blob HEAD:.scratch/wisp/probes/161/r6/flip-declaration.sh) .scratch/wisp/probes/161/r6/flip-declaration.sh`
+  与同样一条对 `probes/154/gate-clauses.sh` 的 cmp 都报相同 ⇒ 落进提交的尺与门，和跑出那三向读数的尺与门，
+  是同一份字节。**但复跑整轮仍归下一程**（本件不拿"字节相同"冒充"这一小时也跑过一遍"）。
 - 删除命令：**仓内 0 次**（丢弃树内换态不算）；worktree／checkout／branch 切换：**0 次**；权限拒绝：**0 次**。
 - 盘上留在本程目录里、**故意不入提交**的一件：`probes/171/r3/doors/`（三枚门禁副本
   `door-lie-pre.sh`／`door-lie-post.sh`／`door-honest-post.sh` ＋它们自己写出的 `doors/logs/*.txt`，
@@ -399,5 +414,10 @@ D2→D1 的 5→4 差额逐枚可归因：共用同一条射程的 `G6neg` 从 B
 - 尺 `probes/161/r6/flip-declaration.sh:19`–`:20`（"6 of 14 legs ringing"）与 `:194`（"7 ringing／7 silent"）
   那两句过期文字（171-r2 的 next=④）：一字未动。它不是判据是打印；本程量到的今天的分法是
   响 7 静 7（`基线过期枚数＝0`、BAD 两枚属他票），但那两格句子的归属仍在 AC#8 的 `>` 账上。
+- **一格留给编排者的残余（本程没修、也不擅自修）**：AC#9② 跑完剩下的第三形是
+  "删掉一枚样本、而剩下的枚数**恰好等于** `want_n`" ⇒ `ok`、表里也没有它——枚数基线这一形在数学上就看不见它
+  （要看得见，得让每一腿再登记"样本名册逐枚是谁"，那是新的一味，不在 AC#9② 的判据文字里：票面那一格只要求
+  "造一发台件，并答未修码上响不响"）。本程按判据交台件与答案（§4.4），这一形按**发现**登记在此等定档，
+  ⛔ 不记成"已收"。
 - "下一次在更新的 HEAD 上重跑本尺会得到什么数"：**判不动**。同机两程仍在落码；本件的十四腿基线只在与 §0
   同一枚锚（`4f2a777b`）那棵树上成立，越靠近它们落地的提交，`G1b`／`G6neg` 那一类差额越可能再动。
