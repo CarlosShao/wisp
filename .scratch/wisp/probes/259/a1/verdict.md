@@ -29,7 +29,7 @@
 |---|---|---|---|
 | 1 | 花侧第二实参就是那枚 item 自己身上存的 `it.bind`；`it.bind` 全程只有一处写 | **真**（写点那一半要加两条具名限定，见 §2） | `internal/agent/approval/queue.go:376` = `	spent := it.grants.spend(nonce, it.bind)`；`queue.go:162` = `	it.bind = bindDigest(corr, d.TaskID, d.Tool, d.LevelString(), q.seq, d.Args)`。全仓 `grep -rn '\.bind = ' cmd internal tools` 只命中 `queue.go:162` 这一行 |
 | 2 | 存的那一份来自同一个值；比对两端在经由路由的调用里永远同值 | **真**（前两行读数真；"永远同值"是本件 §8 要判的那半句，此处只登记它的两个来源行） | `internal/agent/approval/approval.go:287` = `	s.values[nonce] = bind`；`approval.go:303` = `		return equalSecret(stored, bind)`；喂进 `issue` 的那一份 = `queue.go:336` = `	it.grants.issue(nonce, it.bind)` |
-| 3 | 绑定那句结构上不可能为 false；真拦下跨卡的是 ① store 成员检查 ② item 状态检查 | **真**（两处行号都在；两检查的分工见 §4，不许混着说） | `approval.go:298` = `	for v, stored := range s.values {`，`approval.go:305` = `	return false`（圈走完没命中就落到这里）；`queue.go:368` = `	if it.state != statePending {`，`queue.go:370` = `		return ErrNotPending`。另外本腿补一枚票面没写的第三道：**item 选择本身是精确键**（`queue.go:231-236` 的 `lookupForAllowLocked` 只读 `q.byID`，不读别名索引） |
+| 3 | 绑定那句结构上不可能为 false；真拦下跨卡的是 ① store 成员检查 ② item 状态检查 | **①真／②不真（本腿具名推翻，详见 §4.3）**：跨卡时 B 本来就 pending，那道状态关是**放行**的，把两件事并列会让人以为撤掉成员检查还有状态检查兜着；另外经由路由的调用今天走不到 `queue.go:368` 的"不等"分支（`q.byID` 里不存在非 pending item） | `approval.go:298` = `	for v, stored := range s.values {`，`approval.go:305` = `	return false`（圈走完没命中就落到这里）；`queue.go:368` = `	if it.state != statePending {`，`queue.go:370` = `		return ErrNotPending`。另外本腿补一枚票面没写的第三道：**item 选择本身是精确键**（`queue.go:231-236` 的 `lookupForAllowLocked` 只读 `q.byID`，不读别名索引） |
 | 4 | `spend` 返回 `bool`；API 侧只有 `ErrBadGrant`，注释明写故意不区分 | **真**，一处精度要修正：那句注释本体在 **127–129**，130 是值行，票面写的「127-130」把值行也算进注释范围了 | `approval.go:292` = `func (s *grantStore) spend(nonce, bind string) bool`；`internal/agent/approval/ui.go:130` = `	ErrBadGrant = errors.New("approval: 原生令牌无效（缺失/已用/与本次请求不绑定）")`；`ui.go:127-129` = 「…The message never says which, so the API cannot be used to probe for valid nonces.」 |
 | 5 | `ticket242_binding_test.go` 那**六枚**用例直接调 store、自己递不匹配的 `bind`，测不到生产路由 | **半真**：性质真、**枚数不真**。该文件在盘上是 **4 枚** `Test*` 函数（`grep -c '^func Test'` = 4，无 `t.Run` 子用例），⛔ 没有"六枚"这个数；4 枚里 3 枚真直接调 store，1 枚（`:58`）只走 `q.push` 后比对 `it.bind` 与自算摘要。**4 枚无一枚调用 `q.allow` / `allowScoped` / `DecideFromNative`**（该文件 `grep -n 'Allow(\|allowScoped\|DecideFromNative'` 零命中）⇒ 票面那句"测不到生产路由会不会让它比出不同值"成立 | `internal/agent/approval/ticket242_binding_test.go:20-21`（`newGrantStore` + `s.issue("nonce-live", …)`）、`:23`（`s.spend("nonce-live", …)` 递不匹配摘要）、`:39-40`、`:48-50`、`:104` = `	if itA.grants.spend("leaked-or-guessed-nonce", itB.bind) {`；自指复算在 `:71` = `	want := bindDigest(itA.Corr, d.TaskID, d.Tool, d.LevelString(), itA.Seq, d.Args)`（票面引的 `:71` 无漂移）。票面那个"六枚"若在指本文件 + `ticket242_panelface_test.go`（2 枚反射尺，`:30`、`:53`），那 2 枚根本不碰 store ⇒ **无论怎么凑，"六枚都直接调 store"这句话在盘上对不上**，属现量 5 的缺陷 |
 | 6 | 四发突变的读数（M-B／M-C3／M-D2／M-E），编排者自述"我只复认了结构、读数在它表里" | **结构复认真／读数本腿判不动**（读数要跑 `go test`，本腿禁跑 ⇒ 见 §7） | M-B 引的 `queue.go:235` 现量逐字 = `	return q.byID[corr]`（允许侧可见面的全部，真）；M-C3 的根因复认真：`queue.go:147-153` 里 `corr` 为空时落 `"approval-" + strconv.FormatUint(q.seq, 10)`，所以同一 `Decision` 连推两枚必然拿到**不同 corr**，摘要在 seq 被消掉后仍不同（`:78` 那枚测试正是这么写的）；M-D2 复认真：出向读面名单 `ticket242_panelface_test.go:21-28` 是**裸字符串名**列表，`:59` 的禁用词只有 `{"grant","allow","approve","nonce","token"}`，`Permitted` 一枚都不沾 ⇒ "改名即绕过"是结构事实；M-E 复认真：`ui.go:167-171` 的 `PanelAPI` 今天只有 `Reject`/`Head`/`View`，**无 `Allow`** |
@@ -143,7 +143,67 @@ store 侧还有一件事要钉住：`s.values` 的**唯一写点**是 `approval.
 
 ## §4 store 归属（per-item 与否）+ 跨卡今天被谁拦
 
-尚未作答。
+### 4.1 store 是 per-item 的：构造点复量
+
+- 字段：`internal/agent/approval/queue.go:49` = `	grants *grantStore`——挂在 `qitem` 上，**不在 `Queue` 上**。
+  `Queue` 的字段全表在 `queue.go:62-79`（`mu/timeout/warn/maxPend/maxRepl/seq/pending/byID/alias/history/logf`），
+  **没有任何一枚 store／map 形式的"全局令牌池"**。
+- 类型本体：`internal/agent/approval/approval.go:276-279`，构造函数
+  `approval.go:281` = `func newGrantStore() *grantStore { return &grantStore{values: map[string]string{}} }`。
+- `newGrantStore()` 的全部调用点（`grep -rn 'newGrantStore' cmd internal tools`）＝
+  `queue.go:158`（`push` 里给每枚新 item 一枚）、`queue.go:563`（`replay` 里那枚**被丢弃的** `fresh`，见 §2·W3）、
+  以及 `internal/agent/approval/ticket242_binding_test.go:20/38/47`（测试自建）。
+  ⇒ **每枚经路由的 item 有且只有自己的那一枚 store；两枚 item 今天不可能共享同一枚。**
+
+⛔ 两枚**同名不同物**的东西，不许混进这张账（本腿特意点名）：
+`internal/agent/approval/gate.go:88` 的 `grants GrantRecorder` 与
+`internal/tools/bridge.go:194` 的 `grants: o.Grants` 都是 **D45 会话授权记账**
+（接口定义 `gate.go:66-68`，只有一个 `Record(ctx, tool, pattern)`，落盘实现是
+`internal/session/grants.go:146` 那条 `approval_grant` 行），
+跟 `qitem.grants` 那枚内存 nonce 池**没有类型关系也没有调用关系**。
+
+### 4.2 跨卡花令牌（A 的 nonce 拿去 allow B）今天被谁拦住
+
+逐行走一遍这条路，产码上唯一可能的形状是 `allowScoped(corr_B, N_A)`：
+
+1. `internal/agent/approval/queue.go:363` `it := q.lookupForAllowLocked(corr)` →
+   `queue.go:231-236` 只读 `q.byID[corr]`（**精确键**，别名索引 `q.alias` 在这条路上看不见，
+   `queue.go:71-76` 的注释与 `internal/agent/approval/ticket97_alias_direction_test.go` 钉的就是这个方向）。
+   ⇒ 这一关拦的是"借名字把 allow 引到别的 item"，⛔ 不是摘要比对。
+2. `internal/agent/approval/queue.go:368` 状态关（见 4.3，这一关在跨卡形状里**必然是放行**的，
+   因为 B 本来就 pending）。
+3. `internal/agent/approval/queue.go:376` → `internal/agent/approval/approval.go:292`：
+   `approval.go:298` `for v, stored := range s.values` 遍历的是**B 自己那枚 store**；
+   A 的 nonce 从来只被 `approval.go:287` 写进 **A 的 store**（§3.3 已钉：`s.values` 唯一写点就是 `issue`），
+   所以 `approval.go:299` `if !equalSecret(v, nonce)` 对 B 的每个 key 都成立 → 一路 `continue`
+   → 圈走完落到 `approval.go:305` `return false`。
+
+**结论（这一栏只回答"是谁拦的"）：拦下跨卡的是成员检查，即 `approval.go:298-305` 那一圈加 `:305`
+那句落空 return；绑定比对 `approval.go:303` 在跨卡形状里连执行都没被执行到**（它只在
+"nonce 命中了本 store 的某个 key"之后才跑）。⇒ 票面现量 3 的 ① **真**。
+
+### 4.3 顺手推翻现量 3 的 ②（这一条要说清，不能混着算）
+
+票面把「`queue.go:368-371` 的 `it.state != statePending` ⇒ `ErrNotPending`」列为"真正拦下 A 的令牌花在 B 上"
+的两处之一。**这半句在本腿的读数里不成立，两个理由：**
+
+- **它拦的不是跨卡。** 跨卡时 B 是活着的 pending item，这道关**直接放行**，
+  真正让调用失败的是下一句（成员检查）。把这两件事并列成"两处防线"会让人以为
+  拿掉成员检查还剩状态检查兜着——事实是拿掉成员检查后 `:303` 才是唯一还能跑的，而那正是本票要判的恒等式。
+- **经由路由的调用今天走不到 `:368` 的不等分支。** 全仓 `grep -rn 'it\.state = ' internal/agent/approval`
+  的非测试命中只有两行：`queue.go:304`（`deliver` 里置 `stateAnswered`）与 `queue.go:330`
+  （`grantNonce` 出错时置 `stateDropped`），**两行都紧跟一次 `q.dropLocked(...)`**
+  （`:305` / `:331`）且都在同一个 `q.mu` 临界区里；而 `dropLocked` 在 `queue.go:286`
+  `delete(q.byID, it.Corr)`。⇒ **`q.byID` 里不存在"非 pending 的 item"**，
+  而允许侧只可能从 `q.byID` 拿到 item，所以 `:368` 的"不等"分支是**结构上空转**的。
+  真正拦住"答复一枚已结算的卡"的是 `queue.go:366` 的 `ErrUnknownCorrelation`（查不到）。
+- 同一族里**真在跑**的两道是：`queue.go:301-303`（`deliver` 自己的状态守卫，
+  它拿的是调用方手里的 `it` 指针，能撞上"`:376` 花完锁、`:382` 之前被别人抢先结算"这发竞态 ⇒
+  `queue.go:383` 返回 `ErrNotPending`），以及 `queue.go:288` 的 `it.grants.revoke()`
+  （每枚 item 一离开队列就把整张 nonce 池换成空 map，`:288` → `approval.go:309-313`）。
+
+⚠ 本腿没有跑过任何 `go` 命令，所以"今天走不到"这句是**从上述赋值/删除都在同一临界区这一码上读出来的**，
+不是从覆盖率或插桩读出来的；要把它升级为仪器，属 §7 那一条。
 
 ## §5 烧牌语义那一问
 

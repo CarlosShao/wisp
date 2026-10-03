@@ -1,0 +1,20 @@
+259-a1 section 4: the grant store is per-item, and cross-card is stopped by membership
+
+newGrantStore is called once per pushed item (queue.go:158), Queue itself
+holds no token pool (queue.go:62-79), and the only other construction sites
+are replay's discarded copy and three test stores. So two items never share
+a store, and s.values has exactly one write point (approval.go:287, issue).
+
+Walking allowScoped(corr_B, N_A) line by line: the exact-key lookup at
+queue.go:231-236, then the state gate, then the loop over B's own map at
+approval.go:298 - A's nonce is not a key there, so every iteration continues
+and the call lands on approval.go:305. The binding compare at approval.go:303
+is never executed in the cross-card shape. Reading 3's clause 1 is true.
+
+Clause 2 is overturned, named: when the nonce belongs to another card, that
+card is pending, so the state check passes rather than blocks - and by
+construction q.byID cannot hold a non-pending item (both state writes,
+queue.go:304 and queue.go:330, sit in the same locked section as the
+dropLocked that deletes the byID row at queue.go:286). What actually stops a
+second answer is ErrUnknownCorrelation at queue.go:366, plus deliver's own
+guard and the revoke on leave. Section 1's grade for reading 3 amended.
