@@ -1,0 +1,9 @@
+197-subagent-entity-r1b.md	expect=A:1-exists	got=[('1', '')]
+197-subagent-entity-r1b.md	expect=B:1-exists	got=[('1', '')]
+152-	expect=C:3-ellipsis(+full-name 1)	got=[('1', 'scratch-prefix-hit'), ('1', ''), ('3', 'ellipsis'), ('1', ''), ('3', 'ellipsis')]
+restart_tier_keys_255r2_test.go	expect=D:1-exists	got=[('1', '')]
+jsonl-unique-tokens=['.html/.jsonl', '/wisp-test-3164/logs/wisp-20260924-001.jsonl', 'agent-<agentId>.jsonl', 'cwd-A/wisp-dev/logs/wisp-20260923-001.jsonl', 'cwd-B/wisp-dev/logs/wisp-20260923-001.jsonl', 'ebb8a1a3.jsonl', 'path.jsonl', 'root>/logs/wisp-20260923-001.jsonl', 'wisp-*.jsonl', 'wisp-20260916-001.jsonl', 'wisp-20260918-001.jsonl', 'wisp-20260922-001.jsonl', 'wisp-20260923-001.jsonl', 'wisp-<YYYYMMDD>-001.jsonl', 'wisp-<date>-001.jsonl', 'wisp-<day>-<seq>.jsonl']
+artifact1-literal-lines(path-before-marker)=[]
+artifact1-leak-assertion=PASS
+url-in-code-leak=PASS
+ruler-stats={'url_stripped': 63, 'stemless_dropped': 19}

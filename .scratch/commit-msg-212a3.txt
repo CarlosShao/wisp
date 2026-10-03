@@ -1,0 +1,23 @@
+212-a3: AC#1 census complete — denominator 1033, code-side true-2 = 1, true-3 = 1
+
+Harvest on final anchor 4d67ace5 (denominator go 620 / md 399 / script 14).
+Ruler carries a2's two artifact fixes (token-after-marker with string-aware
+comment detection; longest-first ext alternation + tsx/jsx/mjs) plus nine new
+fixes (block comments, placeholders, root-relative vs posix-abs, in-index vs
+true-absent, dot-led tokens, URL stripping, suffix resolution, stemless,
+multi-ext), all calibrated on a2's four known samples with unchanged verdicts.
+
+Reconciliation vs ticket face: Go-citing-.md 292 (face said 188), s1/issues 92
+(face said 78) — overturned as caliber deltas. 2 = 0 OVERTURNED: one genuine
+citation of an absent file, internal/risk/pathresolver.go:28 naming
+scripts/check-pathclean-ban.sh (zero same-name/stem repo-wide incl. untracked).
+3 = 1 HOLDS (slo_report_144_windows_test.go:851 ellipsis form), plus 5
+half-names that resolve uniquely to s1 files (flagged as ruler-gap should-be-1,
+for AC#2 to rule). All 37 code-side class-2 candidates individually
+adjudicated; md-side class-2 (2246) listed separately as out of AC#1 scope.
+
+Evidence: probes/212/a3/census.md (sections 0-8 filled), work/ holds
+harvest.py, counts.json, classified.tsv (42572 rows), roster{2,3,4}.tsv,
+code2-final.txt, calibration.txt, final-run.txt. Zero Go commands, zero
+production-tree edits; frontend/design contents never opened (three test -f
+existence checks named in section 7).
