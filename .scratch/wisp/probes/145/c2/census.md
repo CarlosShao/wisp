@@ -31,7 +31,7 @@
 | `Pending []ApprovalCardView` | `pending` | `pump.go:211-218` ← `Verdicts` 读口 ← `cmd/wisp/panel_pump.go:58 liveVerdicts` ← `rt.gate.Queue().LiveApprovals()` | **有源、已接** |
 | `Results []ResultChunk` | `results` | `pump.go:220-223` ← `Results` 读口 ← `rt.stream.Chunks`（`pump.go:522` StreamLog） | **有源、已接** |
 | `Composer ComposerState` | `composer` | `pump.go:242` `NewComposerState(...)`＋段内逐维覆盖 | **有源、已接**（见 1B，其中 2 枚恒空） |
-| `GeneratedAt string` | `generatedAt` | `composer.go:131` `now.UTC()`（`run.go` 未注 `Now` 读口 ⇒ `pump.go:272` 取 `time.Now`）；仅显示、不推状态（`panel.ts:132-134` 语义） | **有源、已接** |
+| `GeneratedAt string` | `generatedAt` | `composer.go:131` `now.UTC()`（`run.go` 未注 `Now` 读口 ⇒ `pump.go:272` 取 `time.Now`）；`pump.go:179-182` 注释述其为 display-only（不推状态、非 deadline） | **有源、已接** |
 | `Instructions *InstructionsSection` | `instructions`（omitempty） | `pump.go:277-282` ← `Instructions` 读口 ← `run.go:718 rt.instructionBundle`（`panel_pump.go:108` 读 `instrLoader.Last()`） | **有源、已接**；nil 读口＝键缺席（诚实态） |
 | `Tasks *TaskRosterSection` | `tasks`（omitempty） | `pump.go:283-291` ← `Tasks` 读口 ← `run.go:724 rt.taskRosterState`（`panel_pump.go:146` 走 roster） | **有源、已接** |
 
@@ -156,14 +156,41 @@
 
 - **r1 §2.6（行 5，`DurationMs`）"tool_call.started_at 在生产路径上没有任何写者"**——本程**未复认**这枚否证（不跑码、未读到 record-point 的 `TaskLog.ToolCall.StartedAt` 赋值处）。现量只到：DB 列与 DAO 齐（`internal/memory/dao_toolcall.go:25,29,174`、`models.go:60 StartedAt int64`、`dao_tasklog.go:27,33` task 级 started_at **确有写者**）。⇒ "工具级 duration 无写者"是 r1 的否证、本程既没坐实也没推翻，落 §6 待量；**下游勿据此否证安静绕路**。
 
-## §5 我可能写错的条目（自我对抗）
+## §5 我可能写错的条目（自我对抗，不许留空）
 
-〔待填〕
+1. **"6 枚字段"是结构体声明口径，不是线上传输口径。** `Instructions`/`Tasks` 是指针＋omitempty：读口在才发键。我把顶层判为"6 全有源已接"，前提是装配根 `run.go:718/724` 接了这两枚读口（我读到了）——但**一次真实 `wisp run` 究竟发 4 还是 6 枚键，我没跑、量不到**（见 §6）。若某条构造路径（`cmd/wisp/panel_assets.go:68` CLI 诊断支、或测试泵）不接读口，那条路径就发 4 枚键。⇒ "结构体 6 字段"稳；"线上恒 6 键"过强，我并未坐实。
+2. **"泵已驱动/第四态已解除"是从静态接线推的，非执行所得。** 我读到 `pump.go:276` 调 `NewSnapshot`、`run.go:699` 调 `NewSnapshotPump`、`run.go:734-736` 把 `rt.ui.publish` 接到 `publishPanelSnapshot`。⇒ 装配与出口路径**存在**，但"真跑一次 `wisp run` 确实 publish 过、快照真进了 ledger"我没执行验证。措辞应是"接线在、构造者不再是零"，而非"已确证在产线发出"。
+3. **行 6"能画"依赖"L2 审批项确实进 `LiveApprovals()`"。** `liveVerdicts`（`panel_pump.go:62`）读 `rt.gate.Queue().LiveApprovals()`；我未逐行确认一枚 L2 gate 项被放进 LiveApprovals 快照可见集（依票面⑤/r3"pending cards 喂 L2"推）。若 L2 项不在该集，行 6 的 depth 与行 7 的卡都落空。⇒ 中风险，标此待复。
+4. **行 8 我说"部分/否"并把 L1 是否进 pending 挂"视是否进 LiveApprovals"。** 我**未量** L1 窗口（`gate.go:246 PendingWindow`）是否作为一个 pending 卡出现在快照里，还是仅走事件流不进 LiveApprovals。若不进，则行 8 连工具名/参数都无载体（升为"否"），不只是倒计时缺。
+5. **EvToolStart 计数措辞。** r1 说全仓 3 处引用（声明 2＋`run.go` 消费 1）；我 grep `EvToolStart` 只回显 `sink.go:24,25` 声明，**没显出 `run.go:~689` 消费支**（可能被我 grep 式样漏掉）。⇒ "零发射者"我认同，但"引用共几处"我复算比 r1 少一处，勿据此改 r1。
+6. **`credentials` 一路我未开 `rt.settings.credentialStatus` 的实现体。** 我只读到 `run.go:710` 接线＋`config_handlers.go` 五态常量＋`pump.go:260-269` 段填法。"credential 已接"＝接线级，非"该函数真返回非 unknown 值"级。
+7. **timing 从"③纯无源"改判"③-lite：primitive 有、实例缺"** —— 这个软化是我加的推理（据 `observe.Timeout` 存在）。若编排者要的是严格三态，此格应回落"③（对快照而言无现役生产者）"。我把它摆明，不偷换。
+8. **行 11/13 我标"待量（可能经 Tasks 带出）"。** 若 `tools.TaskOutput.StateAnswer` 的 D43 词表其实不含 Stuck/Cancelled（或 loop 的 finish/brakeStuck 不把它们折进 per-task filed status），则应改判"否＋②"。我没读 StateAnswer 词表全集。
 
-## §6 量不到的地方（具名）
+## §6 量不到的地方（具名，⛔ 未推测填空）
 
-〔待填〕
+以下必须跑码／执行／读他程状态才能拿，本程零 Go 命令，一律**只列"需要谁来量"**：
+
+1. **真实 `wisp run` 发出的快照键数（4／5／6）与逐段真值。** ⇒ 需一枚能跑 `cmd/wisp` 的腿（带 sherpa DLL 或 `scripts/wisp-cli-tests.sh` 基线），喂两模型/两档位假配置＋真实 run，读 ledger 里的 SNAPSHOT 摘要行＋`lastPanelSnapshot()`（`panel_pump.go:383`）取证。
+2. **行 11/13：`Tasks[].status/statusReason` 是否已带 D43 的 Stuck/Cancelled 词。** ⇒ 需读 `tools.TaskOutput.StateAnswer`（`internal/tools/task.go` 一带）的 D43 词表全集，并核 `internal/agent/loop.go` 的 `finish/brakeStuck`（`:378,382-388`）是否把该二态填进 per-task filed status。**tools 腿或一枚带 run 的探针**。
+3. **行 5：`tool_call.started_at` 在生产路径到底有没有写者（r1 的未复认否证）。** ⇒ 需读 `cmd/wisp` 记录点向 `memory` 写 `TaskLog.ToolCall.StartedAt/EndedAt` 的赋值处（`dao_toolcall.go` 是 DAO，写者是调用侧），坐实或推翻 r1。⇒ **run.go 记录点的腿**（现被票 151/153 射程占，非本票）。
+4. **行 14：`risk.Provenance` 的 `RiskHit.Fragment`（`provenance.go:278`）在卡片渲染那一刻是否可回读。** ⇒ 需读 provenance→gateway→decision 的运行期数据流，判"源在别处但不上 Decision"能否补一条读口。⇒ **risk 腿**（在飞）。
+5. **行 1/3：thinking/reasoning 的计时起点是否存在。** ⇒ 需在 `loop.stream`/请求发出处找 `observe.Timeout` 实例或任何 turn-started 记录。⇒ **agent loop 腿**。
+6. **`composer.models`／`efforts` 现状（票 187 射程）。** ⇒ 需 config＋llm 腿汇报是否已导出档位访问器；本票快照现量二者皆无（`composer.go:235-270` 无此二维）。
+7. **门禁读数（`go test ./internal/panel/ ./cmd/wisp/`、`gofmt`/`vet`、`sh scripts/d22scan.sh`、三枚在册红名）。** ⇒ 本程**一律未跑**（第一硬规）。r3 记录的三枚红（`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`）是否仍红、`pump_test.go` 键集钉具体行（各前人件在 `:111-124/:270-276` 与 `:123/:291` 间口径不一）⇒ **验收腿复量**。
+8. **`PumpSources.AttachmentMax`/`Now` 未接线的影响面。** r3 判 AttachmentMax 接进去＝"把常量搬个家"拒收；本程认同其对 `composer.maxAttachmentBytes` 无新增信息，但未逐行复跑。
 
 ## §7 交件判语
 
-〔待填〕
+- **只读**：本程全程 Read/grep/find/git log·show·diff，**未改任何已跟踪文件**；写面仅 `.scratch/wisp/probes/145/c2/census.md` 与其 gitignore 域内；临时件只建不删。
+- **零 Go 命令**：一枚 `go test`/`build`/`vet`/`run`、`scripts/*.sh` 门禁**均未跑**（第一硬规）；相关读数一律落 §6"量不到"，未推测填空。
+- **未 push**：只 commit（骨架＋§1＋§2＋§3＋§4 共数枚），每次 `git add -- <显式 pathspec>` 与 `git commit ... -- <同一路径>` 串发、起手核 `git diff --cached --name-only`＝空；⛔ `add -A`/`commit -a`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`restore`/`clean`/merge/worktree 均未用。
+- **禁面零字节**：`docs/PLAN.md`（只读）、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结测试件（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`ticket90_persist_test.go`）、`internal/risk/**` **一字未动**（且全程未写产码）。
+- **AC 框未碰**：票面任何 AC 勾/文未改，未加 `-done`。
+- **禁区两层遵守**：`frontend/**`／`design/**` **未读、未转述其内容**；涉及"页面侧要什么"仅以路径名（如"须同 commit 带 `frontend/src/lib/panel.ts`"，抄自票面裁定）与"可抄给页面侧的一句问句"呈现——见下。
+- **凭据零外泄**：全程只写变量名/字段名/状态枚举名（`credentialStatus`、`CredentialState` 五态、`llm.Endpoint.Model` 等），无任何 key 值/引用串/末四字符进本件或对话。
+- **未复认的否证已单列**：§4C＋§5.8＋§6 把"未坐实的否证/未量的读数"具名摆明，不冒充结论。
+- **未提议放宽任何既有断言**：键集钉、双向尺、三枚在册红一律照其在位陈述。
+
+**可抄给页面侧的一句问句（由 owner 自己带给其前端 agent，本程不代转、不联系任何其它会话）**：
+> 面板快照的 Go 侧现量已含 `pending`／`results`／`composer`（内建 mode/workspace/git/currentModel/modelKnown/credentialState/credentialKnown 等）／`generatedAt`，并条件性含 `instructions`／`tasks` 两段；**其中"实时 token 计数、reasoning 正文、工具调用条目与四值状态、错误人话文案、Stuck 重复计数、成本金额、实时倒计时、当前屏"这八维今天没有可画的输入**。页面侧对**已可画**的 `pending` 卡（行 7/14）与 `tasks` 名册，需要的**逐键清单与渲染期望**是什么？（本程不猜前端形状，只把这一问递回去。）
