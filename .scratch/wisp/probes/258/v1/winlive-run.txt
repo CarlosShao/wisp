@@ -1,0 +1,40 @@
+time=2026-10-03T21:48:40.654+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLive258ResidentBootNamesProvenanceAndDefaults
+    resident_hotkey_live_258_windows_test.go:56: AC#1 LIVE verdict fragment: hotkeys from defaults, hotkeys live 3/4: summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (
+--- PASS: TestLive258ResidentBootNamesProvenanceAndDefaults (3.96s)
+=== RUN   TestLive258ResidentBootTakesConfigHotkeys
+--- PASS: TestLive258ResidentBootTakesConfigHotkeys (3.33s)
+=== RUN   TestLive258ResidentRebindsWithoutRestart
+    resident_hotkey_live_258_windows_test.go:156: AC#2 LIVE RED: 12s after the [hotkey] edit the process has not rebound the live keys (no 'hotkeys rebound after config change' with summon=Ctrl+Alt+R in the sink).
+        sink tail:
+        {"time":"2026-10-03T21:48:50.9778351+08:00","level":"INFO","msg":"winsec: sealing path resolver installed","resolver":"risk.c26Pipeline","probes_passed":2}
+        {"time":"2026-10-03T21:48:50.9812378+08:00","level":"INFO","msg":"wisp: persistent log sink installed","dir":"C:\\Users\\swq\\AppData\\Local\\Temp\\TestLive258ResidentRebindsWithoutRestart798401712\\002\\logs","min_level":"info","early_records":1,"early_dropped":0}
+        {"time":"2026-10-03T21:48:50.9812378+08:00","level":"INFO","msg":"panel host: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed"}
+        {"time":"2026-10-03T21:48:50.9907705+08:00","level":"INFO","msg":"panel host: config: PANEL-GEOMETRY state=per-create reads=[panel] width/height detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值。本腿不轮询 config.toml，所以其余热加载段仍要重启进程才生效，已建好的窗口也不会自己改大小（今天没有 resize 路）。\""}
+        {"time":"2026-10-03T21:48:50.9913423+08:00","level":"WARN","msg":"goroutine outside the D38 roster (leak symptom)","goroutine":"panel-sta","owner":"panel host (ticket 33)"}
+        {"time":"2026-10-03T21:48:50.9913423+08:00","level":"INFO","msg":"ball: [hotkey] bindings taken from config.toml","summon":"Ctrl+Alt+Q","mute":"Ctrl+Alt+M","cancel":"Esc","panel":"Ctrl+Alt+P","empty_slots_note":"empty slots are filled from the product defaults by ball.ApplyHotkeyDefaults"}
+        {"time":"2026-10-03T21:48:51.2534695+08:00","level":"INFO","msg":"cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)","hotkey":"cancel","binding":"Esc"}
+        {"time":"2026-10-03T21:48:51.267113+08:00","level":"INFO","msg":"ball: hotkey reload bridge armed (polls config, rebinds on change)","poll":"1s","provenance":"config"}
+        {"time":"2026-10-03T21:48:51.2676535+08:00","level":"INFO","msg":"ball: the resident leg created the floating ball window","hotkeys_provenance":"config","hotkeys_live":3,"hotkeys":"summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live","gestures":"recorded only except the cancel key: this leg has no task pipeline and no microphone, and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)"}
+        {"time":"2026-10-03T21:48:51.2676535+08:00","level":"INFO","msg":"audit: resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）"}
+        {"time":"2026-10-03T21:48:51.2676535+08:00","level":"WARN","msg":"task source: 任务入口未启用","why":"interactiveStdin() 返回 nil：标准输入不是本进程拥有的控制台输入缓冲","effect":"没有东西会去举一张确认卡片；球、托盘与退出序列照旧"}
+        {"time":"2026-10-03T21:48:52.2721191+08:00","level":"INFO","msg":"cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)","hotkey":"cancel","binding":"Esc"}
+        {"time":"2026-10-03T21:48:52.2721191+08:00","level":"INFO","msg":"ball: hotkeys rebound after config change","summon":"Ctrl+Alt+R","mute":"Ctrl+Alt+M","cancel":"Esc","panel":"Ctrl+Alt+P","live":3}
+--- FAIL: TestLive258ResidentRebindsWithoutRestart (15.59s)
+=== RUN   TestLive258ResidentOccupiedCombinationNamesTheNewValue
+    resident_hotkey_live_258_windows_test.go:192: AC#3 RED: an occupied panel combination did not produce the honest Problems() line naming Ctrl+Alt+U:
+        wisp 0.0.0-dev (unknown, built unknown)
+        WISP_ENV=test (data dir rules: SPEC-03 §5)
+        sherpa-onnx runtime version: 1.13.8
+        wisp: resident runtime booted (Wisp · test, data dir = C:\Users\swq\AppData\Local\Temp\TestLive258ResidentOccupiedCombinationNamesTheNewValue1005947524\002, portable = false, job object = on, single instance = false)
+        wisp: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed
+        wisp: config: PANEL-GEOMETRY state=per-create reads=[panel] width/height detail="面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值。本腿不轮询 config.toml，所以其余热加载段仍要重启进程才生效，已建好的窗口也不会自己改大小（今天没有 resize 路）。"
+        wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+        wisp: [audit] resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）
+        wisp: 任务入口未启用（本机没有可交互控制台）：本进程仍然带球常驻、仍然会在退出时拒绝挂起的卡片，但没有任何东西会去举一张卡
+        wisp: 审批门已装配进本进程（取消通道：Esc 已加载；等待中的确认项：0）; 任务来源：无（任务入口未启用，理由见上面那行）; 面板：panel thread up (STA, dedicated pump; window not created yet, 0 show request(s), 0 toggle(s)); D38(e) steps with an owner in this process: 3:cancel-task-roots
+        wisp: resident event loop running (task source: 无（任务入口未启用，理由见上面那行）); the floating ball window is up in this process (tray icon added, hotkeys from config, hotkeys live 3/4: summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+U live) (Ctrl+C exits cleanly)
+--- FAIL: TestLive258ResidentOccupiedCombinationNamesTheNewValue (3.41s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	26.360s
+FAIL

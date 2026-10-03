@@ -1,0 +1,19 @@
+time=2026-10-03T21:56:33.686+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLive258ResidentBootTakesConfigHotkeys
+    resident_hotkey_live_258_windows_test.go:95: AC#1 RED: a boot with planted [hotkey] values did not name config as the source. Want "hotkeys from config":
+        wisp 0.0.0-dev (unknown, built unknown)
+        WISP_ENV=test (data dir rules: SPEC-03 §5)
+        sherpa-onnx runtime version: 1.13.8
+        wisp: resident runtime booted (Wisp · test, data dir = C:\Users\swq\AppData\Local\Temp\TestLive258ResidentBootTakesConfigHotkeys661416465\002, portable = false, job object = on, single instance = false)
+        wisp: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed
+        wisp: config: PANEL-GEOMETRY state=per-create reads=[panel] width/height detail="面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值。本腿不轮询 config.toml，所以其余热加载段仍要重启进程才生效，已建好的窗口也不会自己改大小（今天没有 resize 路）。"
+        wisp: ball [hotkey]: config.toml unreadable (<nil>); the four hotkeys fall back to the compiled defaults (DefaultHotkeys)
+        wisp: ball hotkey reload bridge armed (provenance=defaults); a hand edit of [hotkey] rebinds the live keys without a restart
+        wisp: [audit] resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）
+        wisp: 任务入口未启用（本机没有可交互控制台）：本进程仍然带球常驻、仍然会在退出时拒绝挂起的卡片，但没有任何东西会去举一张卡
+        wisp: 审批门已装配进本进程（取消通道：Esc 已加载；等待中的确认项：0）; 任务来源：无（任务入口未启用，理由见上面那行）; 面板：panel thread up (STA, dedicated pump; window not created yet, 0 show request(s), 0 toggle(s)); D38(e) steps with an owner in this process: 3:cancel-task-roots
+        wisp: resident event loop running (task source: 无（任务入口未启用，理由见上面那行）); the floating ball window is up in this process (tray icon added, hotkeys from defaults, hotkeys live 3/4: summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live) (Ctrl+C exits cleanly)
+--- FAIL: TestLive258ResidentBootTakesConfigHotkeys (4.13s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	4.194s
+FAIL

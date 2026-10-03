@@ -1,0 +1,4 @@
+04e50ea3d97708fb75121ba42046ba49 *cmd/wisp/resident_windows.go
+2e53bf1fd8532319900b2a2dff5b57ff *cmd/wisp/resident_ball_windows.go
+6590a97deb0750b7e5482e1dfbe33e30 *cmd/wisp/resident_hotkey_258_seam_windows.go
+04e50ea3d97708fb75121ba42046ba49 *cmd/wisp/resident_windows.go

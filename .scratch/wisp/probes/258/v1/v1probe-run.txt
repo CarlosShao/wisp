@@ -1,0 +1,16 @@
+time=2026-10-03T21:44:07.235+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test258V1ProbeSummonEditRebindsLiveBall
+time=2026-10-03T21:44:07.533+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-03T21:44:07.544+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-03T21:44:07.544+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=3 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live" gestures="recorded only except the cancel key: this leg has no task pipeline and no microphone, and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)"
+time=2026-10-03T21:44:07.548+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=summon binding=Ctrl+Alt+W err="Hot key is already registered."
+time=2026-10-03T21:44:07.549+08:00 level=INFO msg="cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-03T21:44:07.549+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey summon = \"Ctrl+Alt+W\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-03T21:44:07.549+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+W mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=2
+    resident_hotkey_v1probe_test.go:87: 258-v1 PROBE RED: the [hotkey] edit never reached Win32: summon VK = 0x0 (map[2:{Mods:16387 VK:77} 4:{Mods:16387 VK:80}]), want 'W'
+time=2026-10-03T21:44:08.601+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (1.36s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.456s
+FAIL

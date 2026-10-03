@@ -1,0 +1,4 @@
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+.\.scratch\wisp\probes\258\v1\mut0\cmd\wisp\resident_windows.go:198:2: declared and not used: hotReload258
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL

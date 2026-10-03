@@ -1,0 +1,5 @@
+time=2026-10-03T21:52:20.532+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLive258ResidentBootTakesConfigHotkeys
+--- PASS: TestLive258ResidentBootTakesConfigHotkeys (3.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.178s
