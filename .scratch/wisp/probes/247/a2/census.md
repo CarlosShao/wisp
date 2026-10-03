@@ -174,4 +174,15 @@ _§4 量数时刻：`2026-10-03 10:0x +0800`。_
 
 ## §5 量不到的格子
 
+如实记本腿**量不到**的格子与原因，不拿推测填：
+
+1. **传递依赖名册差（"甲只多 1 枚边"）没有本腿现跑读数。** 派单禁 `go list`/`go build`，故 §1.3 那句"新增包级边恰好 1 枚 `cmd/wisp→internal/audio`"是**结构推读**（逐枚 Read `import` 块 + `grep` 路径，见 §1.2），并交叉 `247-a1` 的 `comm -23 deps-audio deps-cmdwisp`（那三枚 `deps-*.txt` 名册在 `.scratch/wisp/probes/247/a1/`，属〔待验〕旧读）。⇒ **要确证需一枚被许可的腿现跑 `GOOS=windows go list -deps ./cmd/wisp` 前后各一发**，本腿不替它背书。
+2. **`case StepStopAudio` 那枚 switch 分支没跑到。** `shutdown_hooks.go:118` 是**读到**的分支不是**跑到**的分支（禁 build/test）。⇒ 与 `247-a1` E5 同源，交 `247-v1` 钉"注册后 `StepRecord.Name == "stop-audio"` 且非 skipped"。
+3. **AC#2 的真机读数今天无法取，本腿也没取。** 需要（a）H1/H2 接线存在（没有）＋（b）真设备＋`WISP_LIVE_MIC=1`（本腿禁碰设备、且没跑任何 go 命令）。⇒ 本腿只交付 §4.3 的"取这枚读数要开哪些闸、属本机档"的**地图**，不交付读数本身。
+4. **pinned 循环加了电平之后的周期读数没量。** `A485`-P8 要求"投递路径进 pinned 线程后，`wasapimic_windows.go` 那个循环的周期读数要复量一次并进表"——那是**真机 + 跑起来**才有的数，本腿（只读）量不到，留给落地/验收腿。
+5. **现树能否编译，本腿不判。** 票 33/246/248 刚并进、且同机有未提交改动（`cmd/wisp/config_receipt_255_test.go` M 等，见 §0 口径）。禁 build ⇒ 本腿不断"能不能编过"，只报"我引的每一行在文件系统里是什么"。
+6. **球的手势到底有没有接上任务管线，本腿没追到底。** 我读到 `resident_ball_windows.go:211`/`:257` 的注释与日志字面仍写"this process has no task pipeline and no microphone"，而 `resident_windows.go:206 startResidentTaskSource` 已给了这枚进程一条任务管线（票 246 AC#7）——两者**方向相反**，我把 :257 那句标为**疑似过期**（详见 §6-E类）；但"summon/mute 手势是否真的经 startResidentTaskSource 走到执行者"需要运行时或更深静态追踪，本腿**未证**，只点名不结论。
+
+_§5 量数时刻：`2026-10-03 10:0x +0800`。_
+
 ## §6 我推翻前人哪几句（含票面、A5xx、`247-a1`）

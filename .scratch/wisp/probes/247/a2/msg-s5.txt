@@ -1,0 +1,11 @@
+docs(247-a2): §5 量不到的格子如实落账
+
+六格本腿量不到、逐格具名原因（禁 go 命令/只读/文件系统-at-time）：
+1 "甲只多1枚边"是结构推读+247-a1 go-list旧册(待验)，确证需许可腿现跑 go list 前后；
+2 case StepStopAudio 只读到没跑到(交 247-v1 钉非 skipped)；
+3 AC#2 真机读数今天取不到、本腿也没取，只给开闸地图不给读数；
+4 pinned 循环加电平后周期读数需真机跑，本只读腿量不到；
+5 现树能否编译不判(票33/246/248刚并+同机有未提交M件)；
+6 球手势是否真接上任务管线未追到底，仅标 resident_ball_windows.go:211/:257 的
+"no task pipeline"注释与 resident_windows.go:206 startResidentTaskSource 方向相反、疑过期(见§6)。
+不拿推测填空。
