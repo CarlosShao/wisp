@@ -74,3 +74,22 @@
 | `spill.go:18` 一带自陈是 stub | **推翻行号** | `:18` 逐字是 `// D15(3) long-output spill (SPEC-05 §4.2): a single tool result over the`；"stub" 在 `:48`／`:51`。实质（这一支是 D15(3) 长输出桩）成立 |
 | 票 177 已裁完这一条（AC#2c 的排程前提） | **成立** | §2.1 三条凭据（`Q-61`甲／`Q-63`甲已批、甲形已落进 `task.go:558`＋`internal/risk/shape_a_exemption_test.go`、落点＝逐次调用 box 的窗口排除） |
 | "同一句'全文见'在两条腿上" | **成立** | 产码名下整仓只有那两枚命中，其余全在测试夹具/证据件 |
+
+---
+
+## 编排者补记（2026-10-03 15:5x，代跑不代判；§3/§4 两节「⚠ 待填」保持原样，我不代填）
+
+本腿死于宿主"每日 Chat 额度用尽"（与 166-a2／255-r4／261-a2 同一波），死前已落三枚 commit：
+`fad39b2c`（骨架＋现量台件）→ `5b14afe5`（产码，形ⓐ）→ `081019c0`（341 行测试）。以下三发读数全部以
+**"编排者代跑"** 名义入账，判留给验收腿自己取数复认：
+
+1. **包级绿尺**：`PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 -run "Ticket174|Spill|PointerNotice" ./internal/agent/`
+   ⇒ 21 枚 PASS／0 FAIL（其中 **7 枚是本腿新增的 `*174` 尺**：`TestSpillPointerUnwiredJudgeFailsClosed174`／
+   `TestSpillPointerOutsideAllowlistNamesBothRoadsBack174`／`TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText174`／
+   `TestSpillHealthyPointerStillMatchesThePreFixSentence174`／`TestSpillPointerNoticeAddsNoSecondPath174`／
+   `TestSpillPointerNoticeKeepsHeadTailAndBudget174`／`TestLoopSpillNoticeReachesHistoryUnwired174`）。
+2. **变异 M1（种回静默形）**：把 `pointerNotice` 开头插 `if true { return "" }` ⇒ **5 枚具名用例当场红**
+   （①④⑤⑦与 `TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText174`）；还原用
+   `git cat-file blob HEAD:internal/agent/spill.go >`，md5 还原前后一致（`f31147b4…`）。
+3. **死腿残面**：它在跟踪树里留了一枚未还原的突变（`MUT-174R2-M1`，即上式）＝编排者已还原、`git diff` 归零。
+   另有它自己的三份 commit 信息草稿与 `mut-m1-silent-shape.txt` 读数随本补记同批入库。**AC 框一枚未碰。**

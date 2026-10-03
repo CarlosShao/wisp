@@ -1,0 +1,28 @@
+feat(174/ac2c): spill.go 的 D15(3) 桩按同一判据说实话（形ⓐ，零新依赖边）
+
+票 174 AC#2c：`internal/agent/spill.go` 那枚桩过去只说"全文见 <路径>"，
+从没问过"这条路径默认读不读得回来"——`[fs] allowed_dirs` 出厂是空的，
+artifacts 目录也从没进授权根（票 174 的向一读数＝`fs.read` 落 L2/`R2`）。
+
+- 新增**消费侧窄接口** `PointerJudge{Canonicalize; InAllowlist}`，声明在本包内：
+  `package agent` 改前不引 `internal/risk`，本格也不为一句文案去引 `internal/tools`
+  ⇒ **零新依赖边**；组成根现有的 `*tools.PathCanonicalizer` 结构上直接满足，
+  所以判"在不在根里"用的是与 `fs.read` **同一枚** C26 实例（AC#3(ii) 要求的形状）。
+  本包内 `filepath.` 调用零新增，⛔ 不在 C26 之外手工规范化路径。
+- 从句插在 `约 %d token` 与 `，全文见 %s` **之间**——与 `internal/tools/task.go:562`
+  那枚 `%s` 槽同一个位置＝**成句定式复制、字符串常量不共享**（解析器复制不抽公共）。
+  `internal/tools/**` 一字节未改。
+- 三支说话：判定者未接线＝fail-closed 明说"无法核实，按读不到处理"；`Canonicalize`
+  出错＝只说"没通过"，**不拼 `err.Error()`**（AC#2d 量出 `task.go` 那支会把上游文本
+  原样端进模型可见上下文，我这一支第一天就不开这个口）；根外＝说清"要一张 L2 卡"并
+  **给出两条回来的路**（加 `[fs] allowed_dirs` 或批那张卡——`174-c2` 现量授权根是判级
+  输入、不是执行硬边界，只写一条＝又一枚半谎）。
+- 健康正例（根内）**零说明**：本腿不补 `os.Stat` 那一支，桩文本是在同一次调用写下那枚
+  文件之后才拼的、三条失败路全在那之前 return ⇒ 存在性由构造保证，加一发 stat＝恒真尺。
+- 缝留成两枚各一行：`WithPointerJudge(...)`（外部构造的 spiller，如
+  `cmd/wisp/run.go:1109`）与 `Config.PointerJudge`（loop 自造的那枚，`loop.go:238`）。
+  生产接线在 `cmd/**`＝本程禁改面，已具名记进 impl.md §5.1。
+
+门禁：`go build ./...` rc=0、`go vet ./internal/agent/` rc=0、
+`gofumpt -l` 名下三枚为空、`go test -count=1 ./internal/agent/` ok。
+AC 框一枚不勾（勾它＝另一枚程）。

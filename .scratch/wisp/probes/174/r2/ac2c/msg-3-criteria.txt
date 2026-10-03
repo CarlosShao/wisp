@@ -1,0 +1,26 @@
+test(174/ac2c): 八枚判据钉住 spill.go 那枚桩的诚实（含两向接线对拼）
+
+票 174 AC#2c 的判据件 `internal/agent/spill_pointer_honesty_174_test.go`，
+问四件事＋一枚接线对拼（⛔ 不数"显式调用者枚数"）：
+
+1. `TestSpillPointerUnwiredJudgeFailsClosed174`：判定者没接线＝"无法核实/按读不到处理"，
+   而指针仍在（诚实是加一句，不是把许诺收回去）。
+2. `TestSpillPointerOutsideAllowlistNamesBothRoadsBack174`：根外那支说清"要一张 L2 卡"
+   ＋两条回来的路；同时反手钉"判定者的根列表／内部状态不许被转述给模型"，
+   并钉这一发**确实过了 C26 那两个方法、且喂的就是被印出来的那条路径**。
+3. `TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText174`：`Canonicalize` 返错那一支
+   只说事实，错误文本一个字都不端出去（AC#2d 在另一条腿上还没钉的那半格，本腿第一天就钉）。
+4. `TestSpillHealthyPointerStillMatchesThePreFixSentence174`：根内＝**逐字节等于改码前那句**，
+   `注意：` 出现 0 次。期望值是从**原始 payload** 用同一预算重切的，
+   不是从被测文本里回切的（174-v1 判 tools 腿那枚 #8 是"自回声"，这里不复用那个写法）。
+5. `TestSpillPointerNoticeAddsNoSecondPath174`（三支子发）：`全文见` 恰好 1 次、
+   指针仍可解析、从句里不含 `/` 或 `\` ⇒ **本格没有改变票 177 豁免窗口所锚的文本形状**。
+6. `TestSpillPointerNoticeKeepsHeadTailAndBudget174`：从句落在括号内（头仍是头、尾仍是尾、
+   桩仍小于原文），且与 `truncated=true` 硬上限公告共存。
+7/8. 接线对拼：`TestLoopSpillNoticeReachesHistoryUnwired174`（未接线臂：从句进
+   `ToolLog[0].Text` **且**进 round-2 history，且被指的那枚产物真在盘上＝"谁产出／谁投递／
+   谁落盘"三问齐）与 `TestLoopHonorsConfigPointerJudgeQuietly174`（接线臂：
+   `Config.PointerJudge` 被真调用、根内保持安静）。**两臂缺一，一枚死字段就能骗过 1–6。**
+
+`go test -count=1 -v -run 174 ./internal/agent/`＝八枚全 PASS（3 枚子发另计）。
+AC 框一枚不勾。

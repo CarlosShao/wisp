@@ -1,0 +1,14 @@
+docs(174/ac2c): 落 174-r2 骨架与现量台件（选形ⓐ＝让 spill.go 走同一判据）
+
+票 174 AC#2c 本格＝`internal/agent/spill.go` 那枚 D15(3) 桩的回执。
+起手锚 `796b33ea`（dev），`git status --porcelain -- internal/agent`＝空。
+
+复跑编排者三句现量：`task.go:562` 多一枚 `%s` 槽、`spill.go:141` 没有那枚从句
+——两句逐字成立；第三句"`spill.go:18` 一带自陈是 stub"**行号不成立**，`:18` 是
+D15(3) 落盘契约的自述头，"stub" 在 `:48`／`:50`（实质不变）。
+AC#2c 的排程前提（等票 177 裁完）我自己读了台账：`Q-61`＝甲、`Q-63`＝甲已批
+（`pending-and-issues.md:1101`／`:1100`），甲形已落进 `task.go:558` 的逐次调用 box
+与 `internal/risk/shape_a_exemption_test.go` ⇒ 豁免落点已定，可以动文案。
+
+选 ⓐ 不选 ⓑ，理由与四句形状见 impl.md §2；判不动的三格见 §5；
+推翻清单见 §6。本格不动 `internal/tools/**` 一字、AC 框一枚不勾。
