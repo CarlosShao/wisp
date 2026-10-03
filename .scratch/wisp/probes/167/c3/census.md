@@ -83,7 +83,36 @@ dev
 
 ## 2. 序号落点候选：现读有没有"已存在但恒 0/恒空"的字段可承载
 
-（取数中）
+> 问法拆两问才有效：**（a）快照的出向键里有没有一枚今天空着、名字与语义都还给得起序号的？**（b）如果没有，序号要进来最少要动几跳？
+
+### 2.1 (a) 逐枚过目的结果：**没有可复用的槽**
+
+尺：`grep -rn "json:\"" internal/panel/*.go | grep -v _test.go` 全 **112** 命中逐枚过目并按结构体归并（名册见 §1）。判据＝"这枚键今天恒 0/恒空，且它的名字与语义承载'第几条'不算说谎"。
+
+- **`ApprovalCardView` 里没有任何整数键**（§1.2 那 10 枚＝8 枚字符串/布尔＋2 枚字符串切片）。序号是个整数，**同型可复用的槽＝零枚**。
+- 唯一一枚在快照路线上**恒空**的卡面键＝`callChain`（`approval.go:55`，`[]string`）。它恒空是**产码事实**：`liveVerdicts()`（`cmd/wisp/panel_pump.go:65-73`）逐字段抄写里**没有 CallChain**，`NativeVerdict.CallChain`（`pump.go:86`）因此是 nil，`approval.go:95-97` 把 nil 归一成 `[]`。
+  ⛔ **但它不能承载序号**，两条独立理由：①型不对（`[]string` vs 序数）；②语义已被占且被**明文保护**——`pump.go:84-86` 逐字："inventing `["session","agent-loop",tool]` here would put a string no code produced onto a security card"；`cmd/wisp/panel_pump.go:50` 逐字 "CallChain stays empty"，`:55-56` 同一意思的第二处措辞（"a sentence no producer wrote onto a security card"），`:53-54` 并把原因钉死："the only caller that ever filled CallChain is the CLI probe"。
+  ⇒ **它不是全仓恒空、只是快照路线恒空**：`cmd/wisp/panel_assets.go:72` 真填 `[]string{"cli","panel-assets",*l2}`。动它＝同时动两枚出向消费者。
+- 整数键候选逐枚排除（都在别的段，语义已满）：`maxAttachmentBytes`（`composer.go:240`，`pump.go:238-240` 有兜底真值）· `sizeBytes`（`attachments.go:94`/`:370`）· `depth`（`instructions_200.go:52`，**产码有真生产者**：`instructions_200.go:145` `Depth: f.Depth`）· `bytes`/`truncatedBytes`（`:54`/`:56`）· `inFlightSlots`/`poolCap`/`streamElidedRunes`（`subagent_roster_197.go:152`/`:153`/`:131`）。
+- ⚠ **`depth` 这一枚键名在快照里已经被占用**（＝指令文件嵌套层数，`instructions_200.go:52`），而且 `instructions_200_test.go:300` 把词面 `"depth":0` 钉进了那一段的字节里。若把"共几张卡"命名成 `depth`：不同父对象（`composer` 段 vs `instructions.files[]`）⇒ **上线上不撞**，但**页面侧读者会撞**——同一份 `panel.ts` 里两枚 `depth` 两种意思。
+- 另有一枚**已经存在的"队列总数"读数，但它不在快照 JSON 里**：账本摘要行的 `depth=<len(snap.Pending)>`（`cmd/wisp/panel_pump.go:350` 的 `fmt.Sprintf`，超限时 `:357` 换一条同样带 `depth=` 的窄形），被 `cmd/wisp/panel_pump_test.go:97` 钉住 `rec["depth"] == fmt.Sprint(len(snap.Pending))`。⚠ 它是 **log record 的 `msg` 串里的一个 `k=v` token，不是出向 JSON 的键**——测试先在 `:63` 用 `Msg string \`json:"msg"\`` 解出整条消息，再在 `:73` 用 `strings.Cut(f, "=")` 现拆（tag 常量在 `:59`）。⇒ "共几张"这个数今天**已经外递了，只是递在账本里**，票面 AC#3 要的"可读出口"不认这条。
+
+**(a) 结论：必须新增键**（要 Go 侧出口这条前提立着的话）。唯一不动契约的替代＝页面自己数 `pending[]` 下标（167-a1 §3.1 已具名，本腿不再展开），那是"页面推出来的数"。
+
+### 2.2 (b) 序号要走到卡面，缺的是**三跳**不是一跳
+
+现量链路（每一跳都点名，⛔ 不选形）：
+
+| 跳 | 现状 | file:line |
+|---|---|---|
+| 真源 | `LiveApproval.Position` 有、产码已填 | `internal/agent/approval/pending_read.go:49`（声明）· `:118`（填，`q.position(it)`） |
+| 跳 1 | `liveVerdicts()` 抄了 7 枚字段，`it.Position` 一个字节没抄 | `cmd/wisp/panel_pump.go:65-73` |
+| 跳 2 | 载体 `NativeVerdict` 只有 8 枚字段、**无 Position**（它也无 json tag ⇒ 本跳不撞任何契约） | `internal/panel/pump.go:77-91` |
+| 跳 3 | 卡面由 `CardView()` 现造：`CardViewFromDecision(ApprovalSubject{…}, risk.Decision{…})`，**两枚入参结构体都没有序号位**，返回值直接 append 进 `cards` | `internal/panel/pump.go:98-112`（`CardView`）· `:215-217`（`Snapshot()` 里 `cards = append(cards, v.CardView())`）· `internal/panel/approval.go:27-36`（`ApprovalSubject`）· `:72`（`CardViewFromDecision`） |
+| 落点 | `ApprovalCardView` 加一枚带 tag 的键 ⇒ **撞 Q-51**（射程见 §3） | `internal/panel/approval.go:39-59` |
+
+⚠ 167-c2 §2.1 把这判成"断点两处"（载体无字段＋抄写未抄）——**在"到 NativeVerdict 为止"这个口径下属实**；但 c2 §4① 自己列的改动面是三份文件，本腿把第三跳的**形状**量清：`CardView()` 是纯函数、只吃 `(ApprovalSubject, risk.Decision)`，序号进不了它的任何一枚入参，除非 ①`ApprovalSubject` 也加一枚字段，或 ②在 `pump.go:217` 那行之后对返回值做一次赋值（`cards[i].Position = v.Position`）。
+**①有一个 AC#2 型的副作用必须点名**：`NewApprovalCardView`（`approval.go:64-67`）与 `CardViewFromDecision` 是**同一条构造路**，CLI 诊断腿 `cmd/wisp/panel_assets.go:68` 也走它——那条路上**根本没有队列**，序号只能填零 ⇒ `wisp panel-assets` 的 stdout 会打印一枚 `"position":0`，这正是票面 AC#2"不许退化成 0"点名的形状（且 `cardView143` 因 §1.3 的宽松解码**不会红**）。走②则 CLI 路线那枚键压根不发。⇒ **两形的差别在契约上看得见，本腿只登记，不选形。**
 
 ## 3. 冲突面：哪几把尺会响
 
