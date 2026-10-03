@@ -1,0 +1,20 @@
+docs(139-a1): §4 零读者七跳三态 + §5 可复用定式 + §6 量不到的格子 + §7 推翻清单（10 条）
+
+证据件 .scratch/wisp/probes/139/a1/census.md 收尾三节＋H 表。产码零字节改动，全程未跑任何 go 子命令。
+
+- §4 名字更正为现树形状：字段 internal/agent/loop.go:100、类型 compress.go:61；
+  读取者名册：生产侧空集（\.Compression 非测试 1 行＝那枚赋值），测试侧逐名 compress_trace_test.go:343/344/346/347/349/350/521；
+  正控 res.Usage 10 / res.Rounds 3 / res.ToolLog 6 / res.Compression 1 ⇒ Compression、ReminderLevels、RootPending 同族。
+- §4 七跳三态：H0-H2 已接（票面说的"只差一行赋值"其实已在 loop.go:404）；H3 差一行（cmd/wisp/run.go:1144-1145 那句摘要行没读它）；
+  H3b task_log 一整块没写（schema.go:53-65 无列＝D35 契约面）；H4 TaskOutput 无字段位；
+  H5 面板快照=契约面（composer.go:86-90 原话＋双向差集尺 approval_test.go:105 / composer_test.go:48）；
+  H6 BuildDiagnosticsBundle 零产码调用者（非测试 1 行＝定义本身，含测试 4 行）；H7 日志文件到盘但全仓无读者。
+- §5 五族现成定式：auditf 双通道（run.go:931-935）、计数型 Info 带 why（logsink.go:184-185 那句"没发生 vs 没运行"）、
+  快照摘要句（panel_pump.go:323/:331-35x）、不沉默的降级（resident_task_source_windows.go:268-272）、
+  隐私两探针＋先证尺（compress_trace_test.go:116-124/:186/:257-258/:261-263/:111-113）；
+  并点名 requireTraceAttrs 只钉 6 枚键而真打 9 枚（msgs_before/msgs_after 漏钉）。
+- §7 十条：推翻票面标题与 §0 第 5 行（compress.go 现 1 枚 Info，d25f139b=0→1acdd032=1）、
+  推翻台账 :1017 与 :1008 的"连日志都没有"、改掉实现件对 (b) 的判词原因（缺的是消费面不是字段）、
+  补强 A271② 的"为什么能到盘"（Logger: 生产侧 0 命中＋两条腿 sink 都在建 Loop 前装）、
+  加强 09-26 那句"第 4 枚 user 轮"（每任务现造 Loop 且 history 不播种 ⇒ 攒历史这条路今天不存在）、
+  钉住 D28-1 在 SPEC-12 仍 0 命中、并提醒票面五枚行号已漂三枚。
