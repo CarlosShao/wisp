@@ -1,0 +1,13 @@
+docs(139-a1): 普查证据件落骨架 + 前两节读数——压缩链七跳逐枚行号、run 局部那一格的第二次命中、装配面两枚 Leg
+
+证据件 .scratch/wisp/probes/139/a1/census.md（只读普查腿，产码零字节改动，未跑任何 go 子命令）。
+
+- 锚点 2026-10-03 10:01 +0800 / ccd9543b3d86f3f627d331b3c399cb3d4ee99eec / dev。
+- §0 口径：grep 分母排除 .scratch/**（一枚完整的 loop.go 变异副本
+  .scratch/wisp/probes/183/a1/mut/loop.go:404 就在 res.Compression = rep 上命中，不排除会虚报生产侧读者）。
+- §1 压缩在哪跑：构造 loop.go:239 → 判 Need :393 → Compress :399 → 失败 Warn :401 → 成功边 :402-404 →
+  痕本身 compress.go:240（把门在 :216）；整条链在轮次循环体 :376 内，一枚任务可走 N 次。
+- §1.3 「活在 run 局部」第二次命中：res 是 run 局部 :369，生产侧拿到 Result 的只有
+  cmd/wisp/run.go:1099→:1106 与 internal/tools/subagent_197.go:344→:383 两枚腿。
+- §1.4 装配面：cmd/wisp/run.go:995 的 agent.Options 没有 Logger 一项 ⇒ 压缩机吃 slog.Default()；
+  生产侧 agent.New 只有 2 枚命中，常驻面板腿按 panel_inbound.go:49 明写不装 sink。
