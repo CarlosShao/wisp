@@ -1,0 +1,6 @@
+{
+  "Replace": {
+    "D:/work/workspace/projects plans/Wisp/internal/tools/paths_twocontainments_252_r2_windows_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/252/v1/overlay-inv/w1-inverted.go",
+    "D:/work/workspace/projects plans/Wisp/internal/tools/paths_twocontainments_252_r2_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/252/v1/overlay-inv/w2s1-inverted.go"
+  }
+}

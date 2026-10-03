@@ -1,0 +1,88 @@
+time=2026-10-03T16:33:35.760+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket252V1NonImplAc1Readings
+    paths_252v1_probe_test.go:55: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    paths_252v1_probe_test.go:57: REPO LONG : "D:\\work\\workspace\\projects plans\\Wisp"
+    paths_252v1_probe_test.go:58: REPO SHORT: "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+    paths_252v1_probe_test.go:59: EQUAL? false
+    paths_252v1_probe_test.go:65: Roots() = ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_252v1_probe_test.go:69: CELL C1 short-root + missing-leaf, through Canonicalize (post-fix reference shape)
+    paths_252v1_probe_test.go:69:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:69:   Canonicalize(asked) : "D:\\work\\workspace\\projects plans\\Wisp\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:69:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_252v1_probe_test.go:69:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:69:   LEG1 rootsContain(roots,folded): true
+    paths_252v1_probe_test.go:69:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252v1-never-created.txt" ok=true
+    paths_252v1_probe_test.go:69:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:69:   LEG2 rootsContain(roots,foldRF): true
+    paths_252v1_probe_test.go:69:   InAllowlist(canonical)         : true
+    paths_252v1_probe_test.go:69:   FIRST FAILING LEG              : none: both legs hold
+    paths_252v1_probe_test.go:72: CELL C2 short + docs + missing-leaf, through Canonicalize
+    paths_252v1_probe_test.go:72:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:72:   Canonicalize(asked) : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:72:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_252v1_probe_test.go:72:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\docs\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:72:   LEG1 rootsContain(roots,folded): true
+    paths_252v1_probe_test.go:72:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252v1-never-created.txt" ok=true
+    paths_252v1_probe_test.go:72:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\docs\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:72:   LEG2 rootsContain(roots,foldRF): true
+    paths_252v1_probe_test.go:72:   InAllowlist(canonical)         : true
+    paths_252v1_probe_test.go:72:   FIRST FAILING LEG              : none: both legs hold
+    paths_252v1_probe_test.go:75: CELL C3 long-name control, through Canonicalize
+    paths_252v1_probe_test.go:75:   asked raw           : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:75:   Canonicalize(asked) : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:75:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_252v1_probe_test.go:75:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\docs\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:75:   LEG1 rootsContain(roots,folded): true
+    paths_252v1_probe_test.go:75:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252v1-never-created.txt" ok=true
+    paths_252v1_probe_test.go:75:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\docs\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:75:   LEG2 rootsContain(roots,foldRF): true
+    paths_252v1_probe_test.go:75:   InAllowlist(canonical)         : true
+    paths_252v1_probe_test.go:75:   FIRST FAILING LEG              : none: both legs hold
+    paths_252v1_probe_test.go:83: CELL D1 raw short + missing-leaf, STRAIGHT to InAllowlist (no Canonicalize)
+    paths_252v1_probe_test.go:84:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_252v1_probe_test.go:84:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:84:   LEG1 rootsContain(roots,folded): false
+    paths_252v1_probe_test.go:84:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252v1-never-created.txt" ok=true
+    paths_252v1_probe_test.go:84:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252v1-never-created.txt"
+    paths_252v1_probe_test.go:84:   LEG2 rootsContain(roots,foldRF): true
+    paths_252v1_probe_test.go:84:   InAllowlist(canonical)         : false
+    paths_252v1_probe_test.go:84:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+--- PASS: TestTicket252V1NonImplAc1Readings (0.01s)
+=== RUN   TestTicket252V1OwnerReach
+    paths_252v1_probe_test.go:89: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    paths_252v1_probe_test.go:105: CELL O1 in-root create via 8.3 spelling (full production round)
+    paths_252v1_probe_test.go:106:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252v1-owner-reach-probe.txt"
+    paths_252v1_probe_test.go:107:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252v1-owner-reach-probe.txt"
+    paths_252v1_probe_test.go:108:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_252v1_probe_test.go:108:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252v1-owner-reach-probe.txt"
+    paths_252v1_probe_test.go:108:   LEG1 rootsContain(roots,folded): true
+    paths_252v1_probe_test.go:108:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252v1-owner-reach-probe.txt" ok=true
+    paths_252v1_probe_test.go:108:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252v1-owner-reach-probe.txt"
+    paths_252v1_probe_test.go:108:   LEG2 rootsContain(roots,foldRF): true
+    paths_252v1_probe_test.go:108:   InAllowlist(canonical)         : true
+    paths_252v1_probe_test.go:108:   FIRST FAILING LEG              : none: both legs hold
+    paths_252v1_probe_test.go:116: CELL O2 long-name control for the same in-root create ask
+    paths_252v1_probe_test.go:116:   asked raw           : "D:\\work\\workspace\\projects plans\\Wisp\\q252v1-owner-reach-probe.txt"
+    paths_252v1_probe_test.go:116:   Canonicalize(asked) : "D:\\work\\workspace\\projects plans\\Wisp\\q252v1-owner-reach-probe.txt"
+    paths_252v1_probe_test.go:116:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_252v1_probe_test.go:116:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252v1-owner-reach-probe.txt"
+    paths_252v1_probe_test.go:116:   LEG1 rootsContain(roots,folded): true
+    paths_252v1_probe_test.go:116:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252v1-owner-reach-probe.txt" ok=true
+    paths_252v1_probe_test.go:116:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252v1-owner-reach-probe.txt"
+    paths_252v1_probe_test.go:116:   LEG2 rootsContain(roots,foldRF): true
+    paths_252v1_probe_test.go:116:   InAllowlist(canonical)         : true
+    paths_252v1_probe_test.go:116:   FIRST FAILING LEG              : none: both legs hold
+    paths_252v1_probe_test.go:124: CELL O3 outside-root ask (long spelling), straight reading
+    paths_252v1_probe_test.go:125:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_252v1_probe_test.go:125:   foldPath(canonical)           : "c:\\users\\swq\\appdata\\local\\temp\\testticket252v1ownerreach269182648\\001\\q252v1-outside-ask.txt"
+    paths_252v1_probe_test.go:125:   LEG1 rootsContain(roots,folded): false
+    paths_252v1_probe_test.go:125:   resolvedForm(canonical)        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252V1OwnerReach269182648\\001\\q252v1-outside-ask.txt" ok=true
+    paths_252v1_probe_test.go:125:   foldPath(resolvedForm)         : "c:\\users\\swq\\appdata\\local\\temp\\testticket252v1ownerreach269182648\\001\\q252v1-outside-ask.txt"
+    paths_252v1_probe_test.go:125:   LEG2 rootsContain(roots,foldRF): false
+    paths_252v1_probe_test.go:125:   InAllowlist(canonical)         : false
+    paths_252v1_probe_test.go:125:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+    paths_252v1_probe_test.go:140: CELL O4 scratch root="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252V1OwnerReach269182648\\001\\q252v1-scratch-root" alias="C:\\Users\\swq\\AppData\\Local\\Temp\\TESTTI~1\\001\\Q252V1~1" (DIFFERENT spelling exists)
+    paths_252v1_probe_test.go:163: O4 READING: created via "C:\\Users\\swq\\AppData\\Local\\Temp\\TESTTI~1\\001\\Q252V1~1\\q252v1-via-short.txt", visible via "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252V1OwnerReach269182648\\001\\q252v1-scratch-root\\q252v1-via-short.txt" (size=11 read-back="ticket252v1" err=<nil>): the two spellings name ONE file
+--- PASS: TestTicket252V1OwnerReach (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.054s

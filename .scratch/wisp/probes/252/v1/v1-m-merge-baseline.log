@@ -1,0 +1,116 @@
+time=2026-10-03T16:54:26.114+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-03T16:54:28.930+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing982469959\003\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:54:28.939+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:54:28Z duration_ms=9
+time=2026-10-03T16:54:28.949+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing982469959\003\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:54:28.959+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:54:28Z duration_ms=9
+time=2026-10-03T16:54:28.965+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:54:28.968+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:54:29.177+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete4275443649\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:54:29.187+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:54:29Z duration_ms=10
+time=2026-10-03T16:54:29.198+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete4275443649\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:54:29.204+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:54:29Z duration_ms=6
+time=2026-10-03T16:54:29.211+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:54:29.215+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:54:31.668+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1687590529\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:54:31.679+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:54:31Z duration_ms=11
+time=2026-10-03T16:54:31.691+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1687590529\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:54:31.698+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:54:31Z duration_ms=7
+time=2026-10-03T16:54:31.702+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:54:31.705+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+    paths_shortname_252_r1_test.go:163: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    --- FAIL: TestTicket252R1AlignmentAddsNoAuthorization/N7_inside_the_root_but_unresolvable (0.00s)
+        paths_shortname_252_r1_test.go:226:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_shortname_252_r1_test.go:226:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r1<invalid>:*?.md"
+        paths_shortname_252_r1_test.go:226:   LEG1 rootsContain(roots,folded): true
+        paths_shortname_252_r1_test.go:226:   resolvedForm(canonical)        : "" ok=false
+        paths_shortname_252_r1_test.go:226:   foldPath(resolvedForm)         : ""
+        paths_shortname_252_r1_test.go:226:   LEG2 rootsContain(roots,foldRF): false
+        paths_shortname_252_r1_test.go:226:   InAllowlist(canonical)         : true
+        paths_shortname_252_r1_test.go:226:   FIRST FAILING LEG              : LEG 2 resolvedForm (paths.go:152-153)
+        paths_shortname_252_r1_test.go:234: AC#2 RED (widening): an unresolvable path inside the root was authorized (leg1=true leg2=false ok=false rf=""): "cannot be resolved means not authorized" must stay
+    paths_shortname_252_r1_test.go:244: short ask roots check
+--- FAIL: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.09s)
+    paths_ticket107b_probes_test.go:158: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\001\outside
+    paths_ticket107b_probes_test.go:159: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_ticket107b_probes_test.go:165: roots=[c:\users\swq\appdata\local\temp\testticket107bprobeclinkinsideallowedrootstaysoutside3058843227\001\proj] rewritten=["%WISP107B_C_ROOT%\\proj" -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\001\proj (env)] unusable=[]
+    paths_ticket107b_probes_test.go:178: Canonicalize("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\proj\\esc\\marker.txt") refused: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions (judging the lexical spelling instead)
+    paths_ticket107b_probes_test.go:180: AC#3 RED: InAllowlist("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\proj\\esc\\marker.txt") = true: it leaves the allowed root "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\proj" through the link "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\proj\\esc" and lands on "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3058843227\\001\\proj\\esc\\marker.txt"
+--- FAIL: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.11s)
+    paths_twocontainments_252_r2_test.go:105: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\001\outside
+    paths_twocontainments_252_r2_test.go:106: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_twocontainments_252_r2_test.go:139: allowed root        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\proj" -> roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses3542199382\\001\\proj"]
+    paths_twocontainments_252_r2_test.go:140: escaping ask        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:141: LEG1 lexical        : true
+    paths_twocontainments_252_r2_test.go:142: resolvedForm        : "" ok=false
+    paths_twocontainments_252_r2_test.go:143: LEG2 resolved       : false (refused because ok=false, or because the answer is outside the root)
+    paths_twocontainments_252_r2_test.go:144: InAllowlist         : true
+    paths_twocontainments_252_r2_test.go:145: link target written : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\outside"
+    paths_twocontainments_252_r2_test.go:146: what the link gives : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:158: TICKET 252 BAN RED (resolvedForm leg missing / two containments merged into one): InAllowlist("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\proj\\esc\\marker.txt") = true while the lexical leg is the only one that vouched for it (leg1=true leg2=false, resolvedForm="" ok=false, roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses3542199382\\001\\proj"]): that path leaves the allowed root "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\proj" through the link "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\proj\\esc", which the OS reports as "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3542199382\\001\\outside". Either half of the second leg - "it will not answer" or "its answer is elsewhere" - is the refusal, and both are the same containment in paths.go. Ticket 107's hole re-opened: the pair looks redundant on aligned input by design, and AC#2's "绝不许把两次包含改成一次" is what keeps it that way.
+--- FAIL: TestTicket252R2BothContainmentsReachable (0.02s)
+    paths_twocontainments_252_r2_test.go:283: S1 scanned 23 non-test .go files of this package; InAllowlist is declared at paths.go:189
+    paths_twocontainments_252_r2_test.go:301: TICKET 252 BAN RED (assertion a: two containments, not one): InAllowlist's body asks the authorization book 1 times, want 2 (found: [paths.go:196 key=f]). AC#2's "绝不许把两次包含改成一次" is a hard ban, and the shape this fires on is exactly the one no value test can see: after 2b1a3071 every string production hands this function is already one form, so the two legs agree on all of them and a missing leg is invisible from outside. If this deletion was NOT intended, restore both legs at paths.go:196 and paths.go:209. If the code is right and the ruler is stale, the ruler is the thing that needs a human approval, not a green test run.
+    paths_twocontainments_252_r2_test.go:344: S1 carrier: receiver="p" parameter="canonical" decl=paths.go:189
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:196 key=f calls=[foldPath] tainted=false refuses=true
+    paths_twocontainments_252_r2_test.go:350: S1 re-resolution names: []
+    paths_twocontainments_252_r2_test.go:351: S1 names an if-with-return-false consults: [f p roots rootsContain string workspace]
+time=2026-10-03T16:54:32.922+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8ddfb3a8-1751-4967-81c9-bafcff65b7ee owner=tools
+time=2026-10-03T16:54:32.924+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d1d92135-68ab-4500-9c0c-0faa4e81bb08 owner=tools
+time=2026-10-03T16:54:32.925+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2a9c716a-2a7f-44ba-8f61-0096d56b3c6c owner=tools
+time=2026-10-03T16:54:32.926+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-86c92c78-d95d-4963-a85b-9fe4bb8efcf6 owner=tools
+time=2026-10-03T16:54:32.926+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-163eeb1d-b2f2-48dd-9588-fe2a5e2e51b5 owner=tools
+time=2026-10-03T16:54:32.926+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e0188b26-4476-4a30-8011-67e3aa9ac20a owner=tools
+time=2026-10-03T16:54:32.927+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5653d84f-20ad-4ec0-82cd-72a0a3e25539 owner=tools
+time=2026-10-03T16:54:32.927+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ff76aa74-4d9f-4edd-9e12-ae28cec63807 owner=tools
+time=2026-10-03T16:54:32.928+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-377e1f85-25b9-47fb-9583-ccdbb8bbb44f owner=tools
+time=2026-10-03T16:54:32.928+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-81a42ab9-0da1-4a25-9db1-551ad31a73f2 owner=tools
+time=2026-10-03T16:54:32.928+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-57aa8056-5c9a-4b69-ba48-d7ec2aca43ef owner=tools
+time=2026-10-03T16:54:32.928+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e58502b0-1fe9-4e73-ba5d-3e85d675befe owner=tools
+time=2026-10-03T16:54:32.928+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-65f27449-7ee5-43cb-a59c-2f6013dcc32f owner=tools
+time=2026-10-03T16:54:32.929+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a0833d37-e7e8-48b0-a4b0-5f17bc6095c4 owner=tools
+time=2026-10-03T16:54:32.929+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-bf4adf6a-db4f-43e7-9fa4-7fa062df705a owner=tools
+time=2026-10-03T16:54:32.930+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0f9fcb42-5fad-4eb3-b76f-39d52bc71ffe owner=tools
+time=2026-10-03T16:54:32.930+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ca1099ea-d9ad-4b8a-adf7-59e1defba69e owner=tools
+time=2026-10-03T16:54:32.930+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-612557d3-d446-48bd-90d4-1b441dbd1497 owner=tools
+time=2026-10-03T16:54:32.930+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-aca48e7f-8161-45d1-8b1b-3df0b21a7f7c owner=tools
+time=2026-10-03T16:54:32.931+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ef15b492-1af9-4def-bd7f-a4296265527a owner=tools
+time=2026-10-03T16:54:32.931+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3b576fbe-fea5-445f-83b5-25aa08886f3c owner=tools
+time=2026-10-03T16:54:32.931+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-25860bde-9814-49e9-8ef3-8e219613a863 owner=tools
+time=2026-10-03T16:54:32.931+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c2e9eb64-7c50-4636-83aa-0c4db6da340e owner=tools
+time=2026-10-03T16:54:32.932+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-187f2e53-ded4-43ad-9719-b79a1db31662 owner=tools
+time=2026-10-03T16:54:32.932+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-67cc6f25-2a11-4d5c-b7f7-479ff4089cfb owner=tools
+time=2026-10-03T16:54:32.932+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2537a6ab-6ba3-49a4-b5d6-995fb8a3a7b5 owner=tools
+time=2026-10-03T16:54:32.932+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-53c16caf-1338-496a-9ea1-33fd392ce898 owner=tools
+time=2026-10-03T16:54:32.933+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e7754879-439a-40cd-9fd1-23483e15909f owner=tools
+time=2026-10-03T16:54:32.971+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle987219430\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:54:32.981+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:54:32Z duration_ms=10
+time=2026-10-03T16:54:32.991+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle987219430\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:54:32.998+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:54:32Z duration_ms=7
+time=2026-10-03T16:54:33.005+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:54:33.007+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:54:33.011+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-42b3d121-e744-4824-9b4c-1c560dce9f48 owner=tools
+time=2026-10-03T16:54:33.023+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c9f62742-2e88-48ea-8bd6-776f98ca156a owner=tools
+time=2026-10-03T16:54:33.023+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-60fcb341-f302-410e-ae37-792f1e099bd0 owner=tools
+time=2026-10-03T16:54:33.024+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-20068bcf-7e63-4ba7-911a-767bc2096a77 owner=tools
+time=2026-10-03T16:54:33.549+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore644942328\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:54:33.571+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:54:33Z duration_ms=17
+time=2026-10-03T16:54:33.588+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore644942328\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:54:33.596+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:54:33Z duration_ms=8
+time=2026-10-03T16:54:33.603+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:54:33.608+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:54:33.703+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate3588321752\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:54:33.711+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:54:33Z duration_ms=8
+time=2026-10-03T16:54:33.721+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate3588321752\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:54:33.728+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:54:33Z duration_ms=6
+time=2026-10-03T16:54:33.734+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:54:33.735+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:54:36.812+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered2304052068\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:54:36.823+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:54:36Z duration_ms=11
+time=2026-10-03T16:54:36.833+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered2304052068\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:54:36.841+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:54:36Z duration_ms=7
+time=2026-10-03T16:54:36.847+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:54:36.850+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	16.915s
+FAIL

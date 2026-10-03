@@ -1,0 +1,67 @@
+time=2026-10-03T16:45:02.869+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses
+    paths_twocontainments_252_r2_test.go:105: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\001\outside
+    paths_twocontainments_252_r2_test.go:106: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_twocontainments_252_r2_test.go:139: allowed root        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\proj" -> roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses2170265601\\001\\proj"]
+    paths_twocontainments_252_r2_test.go:140: escaping ask        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:141: LEG1 lexical        : true
+    paths_twocontainments_252_r2_test.go:142: resolvedForm        : "" ok=false
+    paths_twocontainments_252_r2_test.go:143: LEG2 resolved       : false (refused because ok=false, or because the answer is outside the root)
+    paths_twocontainments_252_r2_test.go:144: InAllowlist         : false
+    paths_twocontainments_252_r2_test.go:145: link target written : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\outside"
+    paths_twocontainments_252_r2_test.go:146: what the link gives : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:158: TICKET 252 BAN RED (resolvedForm leg missing / two containments merged into one): InAllowlist("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\proj\\esc\\marker.txt") = true while the lexical leg is the only one that vouched for it (leg1=true leg2=false, resolvedForm="" ok=false, roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses2170265601\\001\\proj"]): that path leaves the allowed root "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\proj" through the link "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\proj\\esc", which the OS reports as "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses2170265601\\001\\outside". Either half of the second leg - "it will not answer" or "its answer is elsewhere" - is the refusal, and both are the same containment in paths.go. Ticket 107's hole re-opened: the pair looks redundant on aligned input by design, and AC#2's "绝不许把两次包含改成一次" is what keeps it that way.
+--- FAIL: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.08s)
+=== RUN   TestTicket252R2BothContainmentsReachable
+    paths_twocontainments_252_r2_test.go:283: S1 scanned 23 non-test .go files of this package; InAllowlist is declared at paths.go:189
+    paths_twocontainments_252_r2_test.go:301: TICKET 252 BAN RED (assertion a: two containments, not one): InAllowlist's body asks the authorization book 2 times, want 2 (found: [paths.go:196 key=f paths.go:209 key=foldPath(rf)]). AC#2's "绝不许把两次包含改成一次" is a hard ban, and the shape this fires on is exactly the one no value test can see: after 2b1a3071 every string production hands this function is already one form, so the two legs agree on all of them and a missing leg is invisible from outside. If this deletion was NOT intended, restore both legs at paths.go:196 and paths.go:209. If the code is right and the ruler is stale, the ruler is the thing that needs a human approval, not a green test run.
+    paths_twocontainments_252_r2_test.go:344: S1 carrier: receiver="p" parameter="canonical" decl=paths.go:189
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:196 key=f calls=[foldPath] tainted=false refuses=true
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:209 key=foldPath(rf) calls=[foldPath resolvedForm] tainted=true refuses=true
+    paths_twocontainments_252_r2_test.go:350: S1 re-resolution names: [ok rf]
+    paths_twocontainments_252_r2_test.go:351: S1 names an if-with-return-false consults: [f foldPath ok p rf roots rootsContain string workspace]
+--- FAIL: TestTicket252R2BothContainmentsReachable (0.01s)
+=== RUN   TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses
+    paths_twocontainments_252_r2_windows_test.go:44: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+=== RUN   TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf
+    paths_twocontainments_252_r2_windows_test.go:76:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG1 rootsContain(roots,folded): false
+    paths_twocontainments_252_r2_windows_test.go:76:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:76:   InAllowlist(canonical)         : false
+    paths_twocontainments_252_r2_windows_test.go:76:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+    paths_twocontainments_252_r2_windows_test.go:89: TICKET 252 BAN RED (lexical containment missing / two containments merged into one): InAllowlist("D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r2-lexical-leg-only.md") = true (the 8.3 spelling of the allowed root, new file under it) although the lexical leg refuses it: foldPath(canonical)="d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md" sits under no root in ["d:\\work\\workspace\\projects plans\\wisp"], and only resolvedForm="D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" (ok=true) would. AC#2's "绝不许把两次包含改成一次" is what keeps that leg in the code; ticket 107 round 2's own note (paths.go:199-207, "Requiring both is strictly narrower") is the reason it may not be called redundant and removed.
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG1 rootsContain(roots,folded): true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned InAllowlist(canonical)         : true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B2_short-of-existing-tree_itself
+    paths_twocontainments_252_r2_windows_test.go:76:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG1 rootsContain(roots,folded): false
+    paths_twocontainments_252_r2_windows_test.go:76:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp" ok=true
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:76:   InAllowlist(canonical)         : false
+    paths_twocontainments_252_r2_windows_test.go:76:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+    paths_twocontainments_252_r2_windows_test.go:89: TICKET 252 BAN RED (lexical containment missing / two containments merged into one): InAllowlist("D:\\work\\WORKSP~1\\PROJEC~1\\Wisp") = true (the allowed root spelled by its own alias) although the lexical leg refuses it: foldPath(canonical)="d:\\work\\worksp~1\\projec~1\\wisp" sits under no root in ["d:\\work\\workspace\\projects plans\\wisp"], and only resolvedForm="D:\\work\\workspace\\projects plans\\Wisp" (ok=true) would. AC#2's "绝不许把两次包含改成一次" is what keeps that leg in the code; ticket 107 round 2's own note (paths.go:199-207, "Requiring both is strictly narrower") is the reason it may not be called redundant and removed.
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG1 rootsContain(roots,folded): true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp" ok=true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned InAllowlist(canonical)         : true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned FIRST FAILING LEG              : none: both legs hold
+--- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.00s)
+    --- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf (0.00s)
+    --- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B2_short-of-existing-tree_itself (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.141s
+FAIL

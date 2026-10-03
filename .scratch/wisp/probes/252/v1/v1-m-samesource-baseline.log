@@ -1,0 +1,125 @@
+time=2026-10-03T16:41:40.940+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-03T16:41:41.872+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing3020367990\003\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:41:41.879+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:41:41Z duration_ms=6
+time=2026-10-03T16:41:41.888+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing3020367990\003\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:41:41.893+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:41:41Z duration_ms=5
+time=2026-10-03T16:41:41.898+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:41:41.900+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:41:42.103+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete169902265\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:41:42.110+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:41:42Z duration_ms=7
+time=2026-10-03T16:41:42.118+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete169902265\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:41:42.125+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:41:42Z duration_ms=6
+time=2026-10-03T16:41:42.130+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:41:42.133+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:41:43.925+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1944076809\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:41:43.932+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:41:43Z duration_ms=7
+time=2026-10-03T16:41:43.939+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1944076809\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:41:43.945+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:41:43Z duration_ms=5
+time=2026-10-03T16:41:43.954+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:41:43.956+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestTicket252R2BothContainmentsReachable (0.02s)
+    paths_twocontainments_252_r2_test.go:283: S1 scanned 23 non-test .go files of this package; InAllowlist is declared at paths.go:189
+    paths_twocontainments_252_r2_test.go:321: TICKET 252 BAN RED (assertion c: the two containments must not share one source): both keys are built by the same chain of calls ([foldPath resolvedForm]) - two calls, one check. Measured at anchor e16e3037 this shape passes all 257 cases of this package (M-samesource), which is why the count alone is not enough.
+    paths_twocontainments_252_r2_test.go:335: TICKET 252 BAN RED (assertion d: one lexical leg and one re-resolving leg, exactly): found clean=0 tainted=2 (keys "foldPath(rf)" / "foldPath(rf)", tainted-name set [ok rf], guards [f foldPath ok p rf roots rootsContain string workspace]). The pair exists because the lexical spelling and the resolved spelling can name different trees; if both legs read the same one, only one tree is ever being asked about.
+    paths_twocontainments_252_r2_test.go:344: S1 carrier: receiver="p" parameter="canonical" decl=paths.go:189
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:197 key=foldPath(rf) calls=[foldPath resolvedForm] tainted=true refuses=true
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:209 key=foldPath(rf) calls=[foldPath resolvedForm] tainted=true refuses=true
+    paths_twocontainments_252_r2_test.go:350: S1 re-resolution names: [ok rf]
+    paths_twocontainments_252_r2_test.go:351: S1 names an if-with-return-false consults: [f foldPath ok p rf roots rootsContain string workspace]
+--- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.00s)
+    paths_twocontainments_252_r2_windows_test.go:44: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    --- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf (0.00s)
+        paths_twocontainments_252_r2_windows_test.go:76:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_twocontainments_252_r2_windows_test.go:76:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md"
+        paths_twocontainments_252_r2_windows_test.go:76:   LEG1 rootsContain(roots,folded): false
+        paths_twocontainments_252_r2_windows_test.go:76:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+        paths_twocontainments_252_r2_windows_test.go:76:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+        paths_twocontainments_252_r2_windows_test.go:76:   LEG2 rootsContain(roots,foldRF): true
+        paths_twocontainments_252_r2_windows_test.go:76:   InAllowlist(canonical)         : true
+        paths_twocontainments_252_r2_windows_test.go:76:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+        paths_twocontainments_252_r2_windows_test.go:89: TICKET 252 BAN RED (lexical containment missing / two containments merged into one): InAllowlist("D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r2-lexical-leg-only.md") = true (the 8.3 spelling of the allowed root, new file under it) although the lexical leg refuses it: foldPath(canonical)="d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md" sits under no root in ["d:\\work\\workspace\\projects plans\\wisp"], and only resolvedForm="D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" (ok=true) would. AC#2's "绝不许把两次包含改成一次" is what keeps that leg in the code; ticket 107 round 2's own note (paths.go:199-207, "Requiring both is strictly narrower") is the reason it may not be called redundant and removed.
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG1 rootsContain(roots,folded): true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG2 rootsContain(roots,foldRF): true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned InAllowlist(canonical)         : true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned FIRST FAILING LEG              : none: both legs hold
+    --- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B2_short-of-existing-tree_itself (0.00s)
+        paths_twocontainments_252_r2_windows_test.go:76:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_twocontainments_252_r2_windows_test.go:76:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp"
+        paths_twocontainments_252_r2_windows_test.go:76:   LEG1 rootsContain(roots,folded): false
+        paths_twocontainments_252_r2_windows_test.go:76:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp" ok=true
+        paths_twocontainments_252_r2_windows_test.go:76:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp"
+        paths_twocontainments_252_r2_windows_test.go:76:   LEG2 rootsContain(roots,foldRF): true
+        paths_twocontainments_252_r2_windows_test.go:76:   InAllowlist(canonical)         : true
+        paths_twocontainments_252_r2_windows_test.go:76:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+        paths_twocontainments_252_r2_windows_test.go:89: TICKET 252 BAN RED (lexical containment missing / two containments merged into one): InAllowlist("D:\\work\\WORKSP~1\\PROJEC~1\\Wisp") = true (the allowed root spelled by its own alias) although the lexical leg refuses it: foldPath(canonical)="d:\\work\\worksp~1\\projec~1\\wisp" sits under no root in ["d:\\work\\workspace\\projects plans\\wisp"], and only resolvedForm="D:\\work\\workspace\\projects plans\\Wisp" (ok=true) would. AC#2's "绝不许把两次包含改成一次" is what keeps that leg in the code; ticket 107 round 2's own note (paths.go:199-207, "Requiring both is strictly narrower") is the reason it may not be called redundant and removed.
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp"
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG1 rootsContain(roots,folded): true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp" ok=true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp"
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG2 rootsContain(roots,foldRF): true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned InAllowlist(canonical)         : true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned FIRST FAILING LEG              : none: both legs hold
+time=2026-10-03T16:41:44.912+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f6e3fa10-4e8c-45e3-89c1-785468ce4ad9 owner=tools
+time=2026-10-03T16:41:44.913+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6e81acd2-abc4-4ca7-9d01-687a86fb5a57 owner=tools
+time=2026-10-03T16:41:44.915+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e7d82ee5-7fd0-4f38-9acf-55916d3a362f owner=tools
+time=2026-10-03T16:41:44.915+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f47868ee-681e-4d1c-a2fc-1a3b39ee5ba7 owner=tools
+time=2026-10-03T16:41:44.915+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3e0355b0-0b0d-4d96-8eda-372b773c73a6 owner=tools
+time=2026-10-03T16:41:44.915+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c01b353e-e19a-4920-ba49-f240cfd61783 owner=tools
+time=2026-10-03T16:41:44.916+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a6f37a93-beec-4eae-8922-95f9b8ddabb8 owner=tools
+time=2026-10-03T16:41:44.916+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-08ca7933-dd22-4e5d-9c1d-82383ed48a13 owner=tools
+time=2026-10-03T16:41:44.916+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-63c85fdb-7755-4fee-9047-e4f58b3182c0 owner=tools
+time=2026-10-03T16:41:44.916+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-eb1580a8-f103-4125-96ac-1a06e065ccaa owner=tools
+time=2026-10-03T16:41:44.917+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b6ac32db-8240-4874-bd39-2ecf73b912c7 owner=tools
+time=2026-10-03T16:41:44.917+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-648a6acd-d56c-4ca9-bbc2-f941fecfc7b2 owner=tools
+time=2026-10-03T16:41:44.917+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ce67f5e2-54f8-4a4b-9edc-5a8d7a526e4e owner=tools
+time=2026-10-03T16:41:44.917+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2c7a570d-e662-4b35-8bff-ca1fdc37ca11 owner=tools
+time=2026-10-03T16:41:44.918+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b752534d-4254-4e73-95e9-3deb24ea0822 owner=tools
+time=2026-10-03T16:41:44.918+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6cda0a10-c88e-4f37-aeed-e7a5133ff528 owner=tools
+time=2026-10-03T16:41:44.918+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a6ed2743-713c-47fe-a1f2-c1f9e83b4b21 owner=tools
+time=2026-10-03T16:41:44.918+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2273fd9c-ce52-4cf9-953e-763500023e31 owner=tools
+time=2026-10-03T16:41:44.918+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-07c07eeb-c6a1-4997-a451-3c2d8d79793a owner=tools
+time=2026-10-03T16:41:44.919+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-94684991-8420-404f-80e3-0508c480f6c8 owner=tools
+time=2026-10-03T16:41:44.919+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c0ee965e-a420-4b64-8369-b44af6c062f3 owner=tools
+time=2026-10-03T16:41:44.919+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-792ad2b7-38c0-4bcd-b8df-9b6cb3451dd5 owner=tools
+time=2026-10-03T16:41:44.919+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f9c1147b-7d37-4f9c-af1d-ea01df8e7272 owner=tools
+time=2026-10-03T16:41:44.920+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ada12010-d240-4202-b888-87758bf68397 owner=tools
+time=2026-10-03T16:41:44.920+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-19186951-4e53-4af2-932c-967049fbdb4d owner=tools
+time=2026-10-03T16:41:44.920+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-44faf146-e177-4595-9373-2a7de05938be owner=tools
+time=2026-10-03T16:41:44.920+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6fef0f1c-2a12-46ba-9898-36a03871b0fb owner=tools
+time=2026-10-03T16:41:44.920+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fe4cae99-67b8-4f58-bd38-5cc9b8dc2cb6 owner=tools
+time=2026-10-03T16:41:44.945+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle274608604\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:41:44.955+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:41:44Z duration_ms=9
+time=2026-10-03T16:41:44.964+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle274608604\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:41:44.970+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:41:44Z duration_ms=5
+time=2026-10-03T16:41:44.974+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:41:44.977+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:41:44.982+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ef755dcc-884b-4dc3-ad35-4d3440cf6882 owner=tools
+time=2026-10-03T16:41:44.996+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-98097769-a6cb-468a-b44f-d076c344f469 owner=tools
+time=2026-10-03T16:41:44.996+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-648befe6-3f90-4cf1-bb01-3a6bc8ad9964 owner=tools
+time=2026-10-03T16:41:44.997+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d8ce1d7a-1e50-437a-86f8-287efc0b5a16 owner=tools
+time=2026-10-03T16:41:45.360+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore1323086420\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:41:45.368+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:41:45Z duration_ms=7
+time=2026-10-03T16:41:45.377+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore1323086420\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:41:45.383+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:41:45Z duration_ms=5
+time=2026-10-03T16:41:45.388+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:41:45.390+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:41:45.469+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate985571424\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:41:45.477+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:41:45Z duration_ms=7
+time=2026-10-03T16:41:45.486+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate985571424\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:41:45.492+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:41:45Z duration_ms=5
+time=2026-10-03T16:41:45.498+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:41:45.501+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T16:41:48.559+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered2674736005\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:41:48.567+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:41:48Z duration_ms=7
+time=2026-10-03T16:41:48.576+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered2674736005\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:41:48.581+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:41:48Z duration_ms=5
+time=2026-10-03T16:41:48.592+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:41:48.595+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	13.770s
+FAIL
