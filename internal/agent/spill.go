@@ -19,8 +19,11 @@ import (
 // scaled spill threshold is written in full to
 // <artifacts>\tool-output-<encoded id>.txt and the context keeps only the head,
 // the tail, the total length and the path; the model can re-read it with fs.read
-// on demand. Raw output over the scaled hard cap is truncated first and
-// marked truncated=true (the same 1MB ceiling D15 gives shell.exec stdout).
+// on demand - "on demand" only as far as [fs] allowed_dirs reaches, which by
+// default is not here, so the stub says so itself instead of pointing quietly
+// (ticket 174 AC#2c, pointerNotice). Raw output over the scaled hard cap is
+// truncated first and marked truncated=true (the same 1MB ceiling D15 gives
+// shell.exec stdout).
 //
 // "<encoded id>", not "<id>": the name is an injective encoding of the
 // model-supplied tool-call id, because a name two different ids share lets one
@@ -35,12 +38,50 @@ type Spiller struct {
 	dir string
 	b   Budgets
 
+	// judge answers the one question the stub's pointer sentence is not
+	// allowed to leave unasked: can the model actually read this path back
+	// (ticket 174 AC#2c). nil means NOT "assume readable" - see pointerNotice.
+	judge PointerJudge
+
 	mu       sync.Mutex
 	sequence int
 }
 
 // NewSpiller builds a spiller writing into dir (the store's artifacts dir).
 func NewSpiller(dir string, b Budgets) *Spiller { return &Spiller{dir: dir, b: b} }
+
+// PointerJudge is C26 as this package consumes it: canonicalize, then ask the
+// authorized-directory allowlist. It is declared HERE as a consumer-side
+// interface of exactly the two methods the verdict uses - the same shape
+// internal/risk/assessor.go:139 already uses for C26 - so that
+//   - package agent gains no new import edge at all (it did not import
+//     internal/risk before this file, and internal/tools is not pulled in for
+//     the sake of one sentence), and
+//   - the concrete *tools.PathCanonicalizer the composition root already builds
+//     for fs.read satisfies it structurally, so the judge the stub quotes is
+//     THE SAME instance that will judge the model's fs.read call - which is the
+//     whole point. A second, hand-rolled notion of "in a root" is ticket 174
+//     AC#3(ii)'s forbidden shape.
+//
+// Nothing here normalizes a path by hand: filepath.Clean|Abs outside C26's
+// resolver is a verbatim ban (AGENTS §1.2 / D22).
+type PointerJudge interface {
+	Canonicalize(raw string) (string, error)
+	InAllowlist(canonical string) bool
+}
+
+// WithPointerJudge wires the C26 judge and returns the receiver, so a
+// composition root builds a spiller in one expression. Until it does, every
+// spilled pointer on this leg says it could not be verified (fail-closed)
+// rather than silently promising a road back. Wiring is set once at assembly
+// time, before the Loop shares the Spiller with its goroutines, exactly like
+// dir and b above. Hand this a working judge or nothing at all: an interface
+// holding a typed nil is a wiring bug and surfaces as a panic in the verdict,
+// which is on purpose - a quiet pass is the failure mode ticket 174 is about.
+func (s *Spiller) WithPointerJudge(j PointerJudge) *Spiller {
+	s.judge = j
+	return s
+}
 
 // Spill is the outcome of preparing one tool result for the context.
 type Spill struct {
@@ -137,14 +178,62 @@ func (s *Spiller) Prepare(callID, text string) (Spill, error) {
 	tail := takeTokensLast(capped, s.b.SpillTailTokens)
 	out.KeptHead = ApproxTokens(head)
 	out.KeptTail = ApproxTokens(tail)
+	// The notice slot sits BETWEEN "约 %d token" and "，全文见 %s" - the same
+	// position ticket 174's already-accepted tools leg put it in - so the
+	// pointer sentence keeps its shape, the tail stays the tail, and a reader
+	// that parses the pointer (全文见 (\S+)…) still finds exactly one.
 	out.Text = fmt.Sprintf(
-		"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token，全文见 %s…]\n%s",
-		head, len(capped)-len(head)-len(tail), out.TotalBytes, out.TotalTokens, path, tail) +
+		"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token%s，全文见 %s…]\n%s",
+		head, len(capped)-len(head)-len(tail), out.TotalBytes, out.TotalTokens,
+		s.pointerNotice(path), path, tail) +
 		notice
 	out.Spilled = true
 	out.Path = path
 	out.Name = name
 	return out, nil
+}
+
+// pointerNotice answers, in the words the model will read, whether the copy
+// file this stub points at can actually be fetched right now. "" means yes -
+// the path canonicalized and sits inside an authorized root - and then this
+// leg stays quiet, because a stub that warned about every healthy pointer is
+// noise, not honesty (ticket 174 AC#2's reverse criterion, re-armed here as
+// AC#2c).
+//
+// Why this leg speaks only the authorization fact and has no existence branch:
+// the path handed in was written by THIS function a few lines above, and all
+// three failure paths before that (make dir, create, rename) returned an error
+// instead of building a stub. A stat here could only ever agree with itself - a
+// tautological ruler. The 「path given but not there / is a directory」 shape
+// lives on the tools leg, where the path comes from a roster record somebody
+// else filled in, and it is judged there (ticket 174 AC#2's shape (b)).
+//
+// Deliberately NOT copied from that leg: it splices err.Error() into
+// model-visible text, and 174-v1 measured that as an unbounded opening (any
+// future C26 error text, path or internal state included, would be quoted to
+// the model). Whether those two sentences may be re-worded is a frozen-text
+// question (Q-63's boundary) that is not this cell's to settle, so this leg
+// just never starts the leak: it names the fact and stops.
+//
+// And the road back is two roads, not one: [fs] allowed_dirs is a risk-tier
+// input, not an execution wall (174-c2's reading of fs.go's open leg), so a
+// single approved card does fetch the bytes today. Saying only "add it to the
+// allowlist" would be the same species of half-truth this ticket exists to
+// clear - "will be refused" is only true of the no-approval case.
+func (s *Spiller) pointerNotice(path string) string {
+	if s.judge == nil {
+		return "；注意：路径授权判定者未接线（fail-closed：C26 没接进来，这条路径是否还读得回来无法核实，按读不到处理）"
+	}
+	canon, err := s.judge.Canonicalize(path)
+	if err != nil {
+		return "；注意：这条路径现在读不到，C26 连规范化都没通过"
+	}
+	if !s.judge.InAllowlist(canon) {
+		return "；注意：这条路径现在读不到，它不在你被授权的目录范围内：" +
+			"fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——" +
+			"要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡"
+	}
+	return ""
 }
 
 func (s *Spiller) nextSequence() int {

@@ -122,6 +122,13 @@ type Config struct {
 	// tool-output-<id>.txt there; ticket 04's 500MB LRU job owns their life).
 	ArtifactsDir string
 
+	// PointerJudge is the C26 judge the spill stub quotes when it tells the
+	// model whether the path it just printed is re-readable (ticket 174
+	// AC#2c). The composition root should hand it the SAME canonicalizer fs.read
+	// is judged by; nil is not "assume readable", it is the stub saying it
+	// cannot verify.
+	PointerJudge PointerJudge
+
 	// PassThroughUnclassifiedRisk routes calls whose provider reports no risk
 	// level as L0 pass-through. Ticket 21 replaces this with the C19 gate;
 	// with the flag off an unclassified call fails closed instead.
@@ -235,7 +242,7 @@ func New(opt Options) (*Loop, error) {
 		reg:      opt.Registry,
 		provider: opt.Provider,
 		asm:      NewAssembler(model, b, info.Cache),
-		sp:       NewSpiller(opt.Config.ArtifactsDir, b),
+		sp:       NewSpiller(opt.Config.ArtifactsDir, b).WithPointerJudge(opt.Config.PointerJudge),
 		comp:     NewCompressor(b, opt.Summarizer, WithLogger(opt.Logger)),
 		guard: GuardConfig{
 			RepeatThresholds: opt.Config.RepeatThresholds,
