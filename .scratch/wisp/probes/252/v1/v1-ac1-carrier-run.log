@@ -1,0 +1,64 @@
+### AC#1 carrier run start 2026-10-03T15:06:49+08:00
+time=2026-10-03T15:06:51.155+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses
+    paths_twocontainments_252_r2_test.go:105: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\001\outside
+    paths_twocontainments_252_r2_test.go:106: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_twocontainments_252_r2_test.go:139: allowed root        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\\001\\proj" -> roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses3784532881\\001\\proj"]
+    paths_twocontainments_252_r2_test.go:140: escaping ask        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:141: LEG1 lexical        : true
+    paths_twocontainments_252_r2_test.go:142: resolvedForm        : "" ok=false
+    paths_twocontainments_252_r2_test.go:143: LEG2 resolved       : false (refused because ok=false, or because the answer is outside the root)
+    paths_twocontainments_252_r2_test.go:144: InAllowlist         : false
+    paths_twocontainments_252_r2_test.go:145: link target written : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\\001\\outside"
+    paths_twocontainments_252_r2_test.go:146: what the link gives : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3784532881\\001\\proj\\esc\\marker.txt"
+--- PASS: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.09s)
+=== RUN   TestTicket252R2BothContainmentsReachable
+    paths_twocontainments_252_r2_test.go:283: S1 scanned 23 non-test .go files of this package; InAllowlist is declared at paths.go:189
+    paths_twocontainments_252_r2_test.go:344: S1 carrier: receiver="p" parameter="canonical" decl=paths.go:189
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:196 key=f calls=[foldPath] tainted=false refuses=true
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:209 key=foldPath(rf) calls=[foldPath resolvedForm] tainted=true refuses=true
+    paths_twocontainments_252_r2_test.go:350: S1 re-resolution names: [ok rf]
+    paths_twocontainments_252_r2_test.go:351: S1 names an if-with-return-false consults: [f foldPath ok p rf roots rootsContain string workspace]
+--- PASS: TestTicket252R2BothContainmentsReachable (0.02s)
+=== RUN   TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses
+    paths_twocontainments_252_r2_windows_test.go:44: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+=== RUN   TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf
+    paths_twocontainments_252_r2_windows_test.go:76:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG1 rootsContain(roots,folded): false
+    paths_twocontainments_252_r2_windows_test.go:76:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:76:   InAllowlist(canonical)         : false
+    paths_twocontainments_252_r2_windows_test.go:76:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG1 rootsContain(roots,folded): true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned InAllowlist(canonical)         : true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B2_short-of-existing-tree_itself
+    paths_twocontainments_252_r2_windows_test.go:76:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG1 rootsContain(roots,folded): false
+    paths_twocontainments_252_r2_windows_test.go:76:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp" ok=true
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:76:   InAllowlist(canonical)         : false
+    paths_twocontainments_252_r2_windows_test.go:76:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG1 rootsContain(roots,folded): true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp" ok=true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp"
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned InAllowlist(canonical)         : true
+    paths_twocontainments_252_r2_windows_test.go:107:   aligned FIRST FAILING LEG              : none: both legs hold
+--- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.00s)
+    --- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf (0.00s)
+    --- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B2_short-of-existing-tree_itself (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.157s
+### rc=0 end 2026-10-03T15:06:51+08:00

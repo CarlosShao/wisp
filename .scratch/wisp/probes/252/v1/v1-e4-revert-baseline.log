@@ -1,0 +1,255 @@
+time=2026-10-03T17:04:25.518+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-03T17:04:26.440+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing847368647\003\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T17:04:26.447+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T09:04:26Z duration_ms=6
+time=2026-10-03T17:04:26.454+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing847368647\003\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T17:04:26.459+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T09:04:26Z duration_ms=5
+time=2026-10-03T17:04:26.470+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T17:04:26.472+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T17:04:26.645+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete101424189\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T17:04:26.652+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T09:04:26Z duration_ms=6
+time=2026-10-03T17:04:26.663+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete101424189\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T17:04:26.668+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T09:04:26Z duration_ms=5
+time=2026-10-03T17:04:26.674+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T17:04:26.677+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T17:04:28.195+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1346595361\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T17:04:28.201+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T09:04:28Z duration_ms=6
+time=2026-10-03T17:04:28.212+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1346595361\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T17:04:28.217+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T09:04:28Z duration_ms=4
+time=2026-10-03T17:04:28.227+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T17:04:28.229+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.00s)
+    paths_shortname_252_r1_test.go:76: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_r1_test.go:79: root long : "D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_r1_test.go:80: root short: "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+        paths_shortname_252_r1_test.go:98: CASE A1 roots=LONG asked=SHORT+missing-leaf
+        paths_shortname_252_r1_test.go:98:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+        paths_shortname_252_r1_test.go:98:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md"
+        paths_shortname_252_r1_test.go:98:   risk.Resolve        : err=<nil> Canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+        paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md"
+        paths_shortname_252_r1_test.go:98:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_shortname_252_r1_test.go:98:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252r1-new-note.md"
+        paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): false
+        paths_shortname_252_r1_test.go:98:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" ok=true
+        paths_shortname_252_r1_test.go:98:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+        paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+        paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : false
+        paths_shortname_252_r1_test.go:98:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+        paths_shortname_252_r1_test.go:98: POSITIVE CONTROL RED for A1 roots=LONG asked=SHORT+missing-leaf: same-shape ask was refused, so this probe's carrier is broken and no negative reading from it can be trusted
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A3_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+        paths_shortname_252_r1_test.go:98: CASE A3 roots=SHORT asked=SHORT+missing-leaf
+        paths_shortname_252_r1_test.go:98:   roots as configured : ["D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"]
+        paths_shortname_252_r1_test.go:98:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md"
+        paths_shortname_252_r1_test.go:98:   risk.Resolve        : err=<nil> Canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+        paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md"
+        paths_shortname_252_r1_test.go:98:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_shortname_252_r1_test.go:98:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252r1-new-note.md"
+        paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): false
+        paths_shortname_252_r1_test.go:98:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" ok=true
+        paths_shortname_252_r1_test.go:98:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+        paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+        paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : false
+        paths_shortname_252_r1_test.go:98:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+        paths_shortname_252_r1_test.go:98: POSITIVE CONTROL RED for A3 roots=SHORT asked=SHORT+missing-leaf: same-shape ask was refused, so this probe's carrier is broken and no negative reading from it can be trusted
+--- FAIL: TestTicket252R1BothSpellingsAnswerTheSame (0.01s)
+    paths_shortname_252_r1_test.go:107: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/Wisp (0.00s)
+        paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md" (roots=[D:\work\workspace\projects plans\Wisp])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\workspace\projects plans\Wisp]) SHORT=false (roots=[D:\work\workspace\projects plans\Wisp]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\workspace\projects plans\Wisp])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp]) SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp]) SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/docs (0.00s)
+        paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp\\docs" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs"
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md" (roots=[D:\work\workspace\projects plans\Wisp])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\workspace\projects plans\Wisp]) SHORT=false (roots=[D:\work\workspace\projects plans\Wisp]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\workspace\projects plans\Wisp])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs]) SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp]) SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/tools (0.01s)
+        paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools"
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md" (roots=[D:\work\workspace\projects plans\Wisp])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\workspace\projects plans\Wisp]) SHORT=false (roots=[D:\work\workspace\projects plans\Wisp]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\workspace\projects plans\Wisp])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools]) SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+        paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+        paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=false leg2=true final=false
+        paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+        paths_shortname_252_r1_test.go:131: AC#2 RED: InAllowlist gives two answers to one physical path: LONG=true (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp]) SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp]); canonicals "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md" / "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+        paths_shortname_252_r1_test.go:136: AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+        paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+    paths_shortname_252_r1_test.go:163: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    --- FAIL: TestTicket252R1AlignmentAddsNoAuthorization/N7_inside_the_root_but_unresolvable (0.00s)
+        paths_shortname_252_r1_test.go:226:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_shortname_252_r1_test.go:226:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r1<invalid>:*?.md"
+        paths_shortname_252_r1_test.go:226:   LEG1 rootsContain(roots,folded): true
+        paths_shortname_252_r1_test.go:226:   resolvedForm(canonical)        : "" ok=false
+        paths_shortname_252_r1_test.go:226:   foldPath(resolvedForm)         : ""
+        paths_shortname_252_r1_test.go:226:   LEG2 rootsContain(roots,foldRF): false
+        paths_shortname_252_r1_test.go:226:   InAllowlist(canonical)         : true
+        paths_shortname_252_r1_test.go:226:   FIRST FAILING LEG              : LEG 2 resolvedForm (paths.go:152-153)
+        paths_shortname_252_r1_test.go:234: AC#2 RED (widening): an unresolvable path inside the root was authorized (leg1=true leg2=false ok=false rf=""): "cannot be resolved means not authorized" must stay
+    paths_shortname_252_r1_test.go:244: short ask roots check
+    paths_shortname_252_r1_test.go:252: AC#2 RED: the short spelling of a new file was still refused under its own root ("D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-out-of-scope.md"): the same-form step is not in effect (leg1=false leg2=true folded="d:\\work\\worksp~1\\projec~1\\wisp\\q252r1-out-of-scope.md")
+--- FAIL: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+    paths_shortname_252_r1_test.go:262: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_r1_test.go:276: two spellings of one path still canonicalize to two strings: "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md"
+--- FAIL: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.05s)
+    paths_ticket107b_probes_test.go:158: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\001\outside
+    paths_ticket107b_probes_test.go:159: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_ticket107b_probes_test.go:165: roots=[c:\users\swq\appdata\local\temp\testticket107bprobeclinkinsideallowedrootstaysoutside938726920\001\proj] rewritten=["%WISP107B_C_ROOT%\\proj" -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\001\proj (env)] unusable=[]
+    paths_ticket107b_probes_test.go:178: Canonicalize("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\proj\\esc\\marker.txt") refused: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions (judging the lexical spelling instead)
+    paths_ticket107b_probes_test.go:180: AC#3 RED: InAllowlist("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\proj\\esc\\marker.txt") = true: it leaves the allowed root "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\proj" through the link "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\proj\\esc" and lands on "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside938726920\\001\\proj\\esc\\marker.txt"
+--- FAIL: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.06s)
+    paths_twocontainments_252_r2_test.go:105: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\001\outside
+    paths_twocontainments_252_r2_test.go:106: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_twocontainments_252_r2_test.go:139: allowed root        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\proj" -> roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses1966309112\\001\\proj"]
+    paths_twocontainments_252_r2_test.go:140: escaping ask        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:141: LEG1 lexical        : true
+    paths_twocontainments_252_r2_test.go:142: resolvedForm        : "" ok=false
+    paths_twocontainments_252_r2_test.go:143: LEG2 resolved       : false (refused because ok=false, or because the answer is outside the root)
+    paths_twocontainments_252_r2_test.go:144: InAllowlist         : true
+    paths_twocontainments_252_r2_test.go:145: link target written : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\outside"
+    paths_twocontainments_252_r2_test.go:146: what the link gives : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:158: TICKET 252 BAN RED (resolvedForm leg missing / two containments merged into one): InAllowlist("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\proj\\esc\\marker.txt") = true while the lexical leg is the only one that vouched for it (leg1=true leg2=false, resolvedForm="" ok=false, roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses1966309112\\001\\proj"]): that path leaves the allowed root "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\proj" through the link "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\proj\\esc", which the OS reports as "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses1966309112\\001\\outside". Either half of the second leg - "it will not answer" or "its answer is elsewhere" - is the refusal, and both are the same containment in paths.go. Ticket 107's hole re-opened: the pair looks redundant on aligned input by design, and AC#2's "绝不许把两次包含改成一次" is what keeps it that way.
+--- FAIL: TestTicket252R2BothContainmentsReachable (0.01s)
+    paths_twocontainments_252_r2_test.go:283: S1 scanned 23 non-test .go files of this package; InAllowlist is declared at paths.go:189
+    paths_twocontainments_252_r2_test.go:301: TICKET 252 BAN RED (assertion a: two containments, not one): InAllowlist's body asks the authorization book 1 times, want 2 (found: [paths.go:196 key=f]). AC#2's "绝不许把两次包含改成一次" is a hard ban, and the shape this fires on is exactly the one no value test can see: after 2b1a3071 every string production hands this function is already one form, so the two legs agree on all of them and a missing leg is invisible from outside. If this deletion was NOT intended, restore both legs at paths.go:196 and paths.go:209. If the code is right and the ruler is stale, the ruler is the thing that needs a human approval, not a green test run.
+    paths_twocontainments_252_r2_test.go:344: S1 carrier: receiver="p" parameter="canonical" decl=paths.go:189
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:196 key=f calls=[foldPath] tainted=false refuses=true
+    paths_twocontainments_252_r2_test.go:350: S1 re-resolution names: []
+    paths_twocontainments_252_r2_test.go:351: S1 names an if-with-return-false consults: [f p roots rootsContain string workspace]
+--- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.00s)
+    paths_twocontainments_252_r2_windows_test.go:44: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    --- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf (0.00s)
+        paths_twocontainments_252_r2_windows_test.go:76:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_twocontainments_252_r2_windows_test.go:76:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md"
+        paths_twocontainments_252_r2_windows_test.go:76:   LEG1 rootsContain(roots,folded): false
+        paths_twocontainments_252_r2_windows_test.go:76:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+        paths_twocontainments_252_r2_windows_test.go:76:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+        paths_twocontainments_252_r2_windows_test.go:76:   LEG2 rootsContain(roots,foldRF): true
+        paths_twocontainments_252_r2_windows_test.go:76:   InAllowlist(canonical)         : false
+        paths_twocontainments_252_r2_windows_test.go:76:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md"
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG1 rootsContain(roots,folded): false
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned LEG2 rootsContain(roots,foldRF): true
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned InAllowlist(canonical)         : false
+        paths_twocontainments_252_r2_windows_test.go:107:   aligned FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+        paths_twocontainments_252_r2_windows_test.go:109: POSITIVE CONTROL RED for W1: "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r2-lexical-leg-only.md" through the production round trip is still refused (canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r2-lexical-leg-only.md" leg1=false leg2=true roots=["d:\\work\\workspace\\projects plans\\wisp"]), so this ruler is being satisfied by a judge that refuses both spellings and its negative reading means nothing
+        paths_twocontainments_252_r2_windows_test.go:115: AC#1's split is live again on an aligned input: leg1=false leg2=true (canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r2-lexical-leg-only.md")
+time=2026-10-03T17:04:28.871+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5761ce4b-d399-4226-b222-859b97eedd2a owner=tools
+time=2026-10-03T17:04:28.871+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-97b7c79a-ce33-46e2-bb96-6ab97c0c3ed7 owner=tools
+time=2026-10-03T17:04:28.872+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1e005ad2-8d5a-4109-8b68-21cd6910d56a owner=tools
+time=2026-10-03T17:04:28.872+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5e04e4ee-a4c9-4733-accd-12bf05975381 owner=tools
+time=2026-10-03T17:04:28.872+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-388f0c47-6b58-4217-b1d5-c6e9f1523347 owner=tools
+time=2026-10-03T17:04:28.872+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a713a94b-cf55-43f7-ab98-8d76bd85f376 owner=tools
+time=2026-10-03T17:04:28.872+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b3ea80e9-5679-4f15-954f-a80153771515 owner=tools
+time=2026-10-03T17:04:28.872+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3aa581c1-fa9d-45ee-bb0c-e007e4c0fd71 owner=tools
+time=2026-10-03T17:04:28.872+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1be160bd-8020-4741-9b7c-292c28db8802 owner=tools
+time=2026-10-03T17:04:28.872+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c81a2c6a-3008-4985-b8b0-d9768890e23b owner=tools
+time=2026-10-03T17:04:28.873+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4ef0a75e-232f-41d2-a313-02ce232b0bc4 owner=tools
+time=2026-10-03T17:04:28.873+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f2cdb097-bd53-48f9-a01d-da158cdb9f2c owner=tools
+time=2026-10-03T17:04:28.873+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f8a1b799-a687-4f55-89d8-98f85dabb941 owner=tools
+time=2026-10-03T17:04:28.873+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-51594fb2-5b18-4559-9bfb-3b8670ef32be owner=tools
+time=2026-10-03T17:04:28.875+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-42634d6a-0a9d-417f-b838-225f4a554b0e owner=tools
+time=2026-10-03T17:04:28.875+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-96f23197-0f81-4fb4-85e5-04f6f7a14bb2 owner=tools
+time=2026-10-03T17:04:28.875+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6ab9f7df-d01d-42a0-85d0-e370be9ef704 owner=tools
+time=2026-10-03T17:04:28.875+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-54fca022-bbe0-4d20-9742-d5e3729eaec2 owner=tools
+time=2026-10-03T17:04:28.875+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5377c37c-e6a6-4970-9317-30e084c61fc0 owner=tools
+time=2026-10-03T17:04:28.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e356f663-4e45-470d-a90b-bdb2658cd269 owner=tools
+time=2026-10-03T17:04:28.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9fd0c466-26ef-404f-87d9-373ca080973d owner=tools
+time=2026-10-03T17:04:28.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3c3d29db-a47b-4772-b469-6689f37d4d8a owner=tools
+time=2026-10-03T17:04:28.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ff40bc9f-a134-4d17-8e10-74dfd87c46dd owner=tools
+time=2026-10-03T17:04:28.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1ffa4fb8-44b9-49a1-87d4-36e5148579d3 owner=tools
+time=2026-10-03T17:04:28.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-882f2ed6-23a3-4dc0-ab67-56732759af5e owner=tools
+time=2026-10-03T17:04:28.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-25c8f0c5-9395-4644-b3b5-e847794abb39 owner=tools
+time=2026-10-03T17:04:28.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2315484b-f864-4ae0-bfd3-ae0f9db29f50 owner=tools
+time=2026-10-03T17:04:28.877+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-30c40c5c-24e5-4f04-9cd3-40563d52cacb owner=tools
+time=2026-10-03T17:04:28.897+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle4068202908\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T17:04:28.904+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T09:04:28Z duration_ms=6
+time=2026-10-03T17:04:28.912+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle4068202908\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T17:04:28.923+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T09:04:28Z duration_ms=10
+time=2026-10-03T17:04:28.928+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T17:04:28.930+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T17:04:28.933+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8f500288-6fa7-44e5-9f1c-c24ef518515b owner=tools
+time=2026-10-03T17:04:28.944+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-7b4906da-a471-4c7a-8db2-b4ada5d96629 owner=tools
+time=2026-10-03T17:04:28.944+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-7377f731-192d-4d6f-a9ac-44b2cdc99e53 owner=tools
+time=2026-10-03T17:04:28.945+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-7a8e2933-fa5b-47e3-a79e-d6fe62be0382 owner=tools
+time=2026-10-03T17:04:29.184+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore589508444\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T17:04:29.191+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T09:04:29Z duration_ms=6
+time=2026-10-03T17:04:29.199+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore589508444\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T17:04:29.205+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T09:04:29Z duration_ms=5
+time=2026-10-03T17:04:29.210+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T17:04:29.212+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T17:04:29.278+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate3458675320\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T17:04:29.284+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T09:04:29Z duration_ms=5
+time=2026-10-03T17:04:29.295+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate3458675320\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T17:04:29.303+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T09:04:29Z duration_ms=7
+time=2026-10-03T17:04:29.308+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T17:04:29.309+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T17:04:32.366+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered3264738733\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T17:04:32.372+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T09:04:32Z duration_ms=6
+time=2026-10-03T17:04:32.380+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered3264738733\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T17:04:32.385+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T09:04:32Z duration_ms=4
+time=2026-10-03T17:04:32.390+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T17:04:32.392+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	12.981s
+FAIL

@@ -1,0 +1,109 @@
+warning: in the working copy of '.scratch/wisp/probes/252/v1-tmp-porcelain.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/backup/backup-md5.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/backup/paths.go.orig', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/backup/paths_shortname_252_r1_test.go.orig', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/base-252p1-roster.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/base-252r1-roster.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/commit-01.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/detail-final.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/final-d22scan.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/final-twopkg.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/four-commit-files.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/gate-d22scan.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/gate-twopkg.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/gates-01-build.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/inallowlist-callsites.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/msg-01-skeleton.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/msg-02-full-table.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M1-failnames.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M1-redtext.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M1-run.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M2-exit.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M2-failnames.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M2-redsentences.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M2-redtext.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M2-run.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M3-detail.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M3-failnames.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M3-risk.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M3-run.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M5a-envoff.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M5b-envon.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M5c-M1-envon.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M5c-detail.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-M5d-inverted.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-MERGE-failnames.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-MERGE-risk.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/mut-MERGE-run.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q1-inallowlist-body.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q1-paths-go-lineage.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q3-callsite-provenance.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q3-decision-paths-provenance.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q3-displaypaths.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q3-tools-decision-paths.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q4-existence-fork-readings.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q6-boundary-checks.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/q6-carrier-history.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/restore-check-after-M3.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/restore-check-after-merge.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/roster-diff-nameonly.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/start-porcelain-fullrepo.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/252/v1/tools-testfiles.txt', LF will be replaced by CRLF the next time Git touches it
+[dev 44bd75c8] docs(evidence/252-v1): 填满 §1–§7——四发突变复跑＋★落点偏差裁决（附条件成立）
+ 57 files changed, 7675 insertions(+), 23 deletions(-)
+ create mode 100644 .scratch/wisp/probes/252/v1-tmp-porcelain.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/backup/backup-md5.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/backup/paths.go.orig
+ create mode 100644 .scratch/wisp/probes/252/v1/backup/paths_shortname_252_r1_test.go.orig
+ create mode 100644 .scratch/wisp/probes/252/v1/base-252p1-roster.log
+ create mode 100644 .scratch/wisp/probes/252/v1/base-252r1-roster.log
+ create mode 100644 .scratch/wisp/probes/252/v1/commit-01.log
+ create mode 100644 .scratch/wisp/probes/252/v1/detail-final.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/final-build.log
+ create mode 100644 .scratch/wisp/probes/252/v1/final-d22scan.log
+ create mode 100644 .scratch/wisp/probes/252/v1/final-gofumpt.log
+ create mode 100644 .scratch/wisp/probes/252/v1/final-twopkg.log
+ create mode 100644 .scratch/wisp/probes/252/v1/four-commit-files.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/gate-build.log
+ create mode 100644 .scratch/wisp/probes/252/v1/gate-d22scan.log
+ create mode 100644 .scratch/wisp/probes/252/v1/gate-gofumpt.log
+ create mode 100644 .scratch/wisp/probes/252/v1/gate-twopkg.log
+ create mode 100644 .scratch/wisp/probes/252/v1/gates-01-build.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/inallowlist-callsites.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/msg-01-skeleton.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/msg-02-full-table.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M1-failnames.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M1-redtext.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M1-run.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M2-exit.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M2-failnames.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M2-redsentences.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M2-redtext.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M2-run.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M3-detail.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M3-failnames.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M3-risk.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M3-run.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M5a-envoff.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M5b-envon.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M5c-M1-envon.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M5c-detail.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-M5d-inverted.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-MERGE-failnames.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-MERGE-risk.log
+ create mode 100644 .scratch/wisp/probes/252/v1/mut-MERGE-run.log
+ create mode 100644 .scratch/wisp/probes/252/v1/q1-inallowlist-body.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/q1-paths-go-lineage.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/q3-callsite-provenance.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/q3-decision-paths-provenance.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/q3-displaypaths.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/q3-tools-decision-paths.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/q4-existence-fork-readings.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/q6-boundary-checks.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/q6-carrier-history.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/restore-check-after-M3.log
+ create mode 100644 .scratch/wisp/probes/252/v1/restore-check-after-merge.log
+ create mode 100644 .scratch/wisp/probes/252/v1/roster-diff-nameonly.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/start-porcelain-fullrepo.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/start-porcelain-internal-tools.txt
+ create mode 100644 .scratch/wisp/probes/252/v1/tools-testfiles.txt

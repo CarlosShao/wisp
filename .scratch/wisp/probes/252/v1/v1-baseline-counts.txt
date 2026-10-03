@@ -1,0 +1,16 @@
+--- tail of log
+--- PASS: TestFragmentIndexShortSourceNeverMatches (0.00s)
+=== RUN   TestFragmentHashCollisionCannotFakeHit
+--- PASS: TestFragmentHashCollisionCannotFakeHit (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	5.084s
+=== rc=0 end 2026-10-03T15:02:24+08:00
+--- counts (regex ^[[:space:]]*--- (PASS|FAIL|SKIP))
+459
+0
+1
+--- orchestrator-style regex ^(--- )?(PASS|FAIL|SKIP)
+321
+--- package lines
+ok  	github.com/CarlosShao/wisp/internal/tools	16.738s
+ok  	github.com/CarlosShao/wisp/internal/risk	5.084s
