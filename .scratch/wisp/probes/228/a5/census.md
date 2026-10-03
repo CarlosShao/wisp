@@ -20,13 +20,110 @@
 
 ## §1 「允许」入口全名册（三态）
 
-（待填：托盘／球 Esc／命令行 stdin／面板／其它，逐枚三态 + "接"的凭据行号 + `Gate.Replay` 产码调用者判死）
+链路的六个环（先立环，再逐枚入口点名落在哪一环）：
+**手 → 原生事件 → `cmd/wisp` 回调 → `approval` 路由 → 队列落答 → 审计／球态**。
+
+### 六环各是谁（承重行的现读位置）
+
+| 环 | 位置 |
+|---|---|
+| 原生事件 | `internal/ball/ball_windows.go:656-686`（`wmHotkey` 与 `wmAppTray` 分流）＋`internal/ball/tray_windows.go:72-107`（`showMenu` 建菜单＋取选择） |
+| `cmd/wisp` 回调 | `internal/ball/ball_windows.go:50-59`（`Events` 十枚 `func()` 键）→ `cmd/wisp/resident_ball_windows.go:173-184`（常驻宿主填的那张字面量） |
+| `approval` 路由 | `internal/agent/approval/replies.go:316`（`Replies.Allow`）→ `:328`（`g.DecideFromNative`）→ `internal/agent/approval/gate.go:718`→`:723`（`g.q.allow`） |
+| 队列落答 | `internal/agent/approval/queue.go:396`（`ANSWER-ALLOW … decision=allow`）／`:391`（`allow-session` 那一支） |
+| 审计 | 门侧 `queue.go:396` 经 `Options.Logf`：常驻＝`cmd/wisp/resident_approval_windows.go:129`，CLI 腿＝`cmd/wisp/run.go:931`；宿主侧另加一行＝`cmd/wisp/approval_reply.go:232`→`:414` |
+| 球态 | `cmd/wisp/resident_approval_windows.go:465-474`（`Update`/`EventDismissed`）→`:483-493`（`settleOrb`：还 Esc ＋ 回 `Sleeping`） |
+
+### 入口逐枚三态
+
+| # | 入口 | 三态 | "接"的凭据（谁调谁，行号）／缺的那一环 |
+|---|---|---|---|
+| 1 | **控制台 stdin @ `wisp run`**（一发即退那条腿） | **存在** | `cmd/wisp/run.go:802 attachReplyListener(s.reply, s.replyVeto)` → `cmd/wisp/approval_reply.go:451` Spawn `approval-waiter` → `:530 runReplyLoop` → `:562 handle`（动词名册 `:563-583`，`yes`＝`:564`）→ `:213 replySurface.allow` → `replies.go:316 Replies.Allow` → `replies.go:328` → `gate.go:718/723` → `queue.go:396` |
+| 2 | **控制台 stdin @ 常驻腿**（owner 双击那枚 `wisp.exe`） | **存在** | `cmd/wisp/resident_windows.go:206 startResidentTaskSource(rt, ra)` → `cmd/wisp/resident_task_source_windows.go:218 interactiveStdin()` → `:288 run.newReplySurface(...)` → `:318 observe.Default.Spawn(taskSourceConsoleGoroutine…)` → `:345 runConsoleLoop` → `:381 src.surface.handle(verb, corr, arg)` → 同 1 的后半条漏斗（同一张动词表，不是副本） |
+| 3 | **全局 Esc 热键 @ 常驻腿** | **存在，但只有否决那一支** | `cmd/wisp/resident_windows.go:163 startResidentBall(…, ra.vetoByEsc, …)` → `cmd/wisp/resident_ball_windows.go:177 OnCancelHotkey: func(){ recordCancelHotkey(onCancelEsc) }` → `:279` → `cmd/wisp/resident_approval_windows.go:171 vetoByEsc` → `:179 ra.cards.Veto` → `replies.go:463 g.Veto` → `gate.go:415`。**「允许」在这一支＝一块没写**：`Replies.Allow` 全仓没有任何 GUI 调用者（尺 R8/R10） |
+| 4 | **托盘菜单** | **一块没写** | 菜单在册只有四枚：`internal/ball/tray_windows.go:20-24`（id 1..4）＋`:86/:88/:89/:91`（打开面板／静音／暂停唤醒／退出）；分流 `internal/ball/ball_windows.go:676-683`；`Events` 十枚键里**没有一枚通向允许**（`ball_windows.go:50-59`）。⇒ 五环里**前三环全缺**（没有手能按的那一枚、没有 id、没有 `Events` 键），后三环（路由／落答／审计）现成可接 |
+| 5 | **单击球（`ChannelBall`）** | **写了没接**（三处都在，中间那一环是空的） | 「写」的部分：`internal/ball/ball_windows.go:632 b.fire(b.opts.Events.OnClickBall)` 有发；`cmd/wisp/resident_ball_windows.go:174 OnClickBall: func(){ recordBallGesture("click") }` 有听。**「没接」的部分**：那枚回调只记账不答复（`ballGestureWhy` 逐字见 `:257-259`），且 `ChannelBall` **从未被 `SetLoaded`**（尺 R50：全仓非测试 `SetLoaded` 调用点＝`approval_reply.go:512`、`resident_approval_windows.go:157`/`:351`，命中的通道只有 `ChannelEsc`／传进来的 `vetoChannel`） |
+| 6 | **面板 WebView** | **契约上就不该有这一支**（结构性无门，不是漏接） | `internal/agent/approval/ui.go:167-171` `PanelAPI` 只有 `Reject/Head/View`，**没有 `Allow` 方法**（`:164-166` 逐字「a panel-sourced allow is structurally rejected … it is a method that does not exist」）；C17 入向名册四枚 `internal/panel/bridge.go:42-45`，**无 `approval.decide`**；`cmd/wisp/panel_inbound.go:271-277` 的 `Workspace/Attachment/Message` 全为 `nil` |
+| 7 | **KWS 否决词（`ChannelKWS`）** | **一块没写** | 尺 R50：`ChannelKWS` 在非测试码里只出现在定义／名册／文案三处（`internal/agent/approval/approval.go:57/:61/:92/:105`），**零枚 `SetLoaded`、零枚宿主** |
+| 8 | **一次性 CLI 子命令（例：`wisp approve <corr>`）** | **一块没写** | 子命令名册＝`cmd/wisp/main.go:89-124` 的十枚（`run/providers/doctor/secret/models/slo/panel-assets/panel-inbound/version/help`），**没有一枚是答复用的**；答复只活在 1／2 那两条 stdin 环里 |
+
+### 特别判死：`Gate.Replay` 有没有产码调用者
+
+**复认腿报＝零枚。成立。**
+
+- 尺 R1 字面命令：`grep -rn "\.Replay(" --include=*.go internal cmd tools scripts`
+  全量读数＝**1 行**：`internal/agent/approval/queue_test.go:283`（测试）。
+- 第二把尺 R52 防止"绕过方法名"这一形：`grep -rn "\.replay(\|replay(" --include=*.go internal cmd`（剥 `_test.go`）
+  读数＝**2 行**：`internal/agent/approval/gate.go:753`（`Gate.Replay` 自己去调 `q.replay`）＋`internal/agent/approval/queue.go:552`（定义）。
+  ⇒ 队侧那半（`queue.go:279-291` 的 `keepForReplay`/`maxRepl`、`:113-114 DefaultReplayHistory = 8`）**在生产里一直往里存**，**取的那一枚没人调**。
+- 定义与语义：`internal/agent/approval/gate.go:745-748` 逐字「Replay re-displays a refused or expired L2 request under a fresh correlation id (C18 一键重放) … it is NOT an answer」。
+  ⇒ 对本格的影响：**被拒／超时的卡今天没有任何一条路能被重新问一次**；"允许"入口即使补上，也只能答**此刻还挂着**的那一枚。
+- 正控（证明这把尺不瞎）：同一把 `\.Method\(` 形尺在**同包**能命中生产调用者——
+  `grep -rn "g\.Native()" --include=*.go internal cmd` 命中 `internal/agent/approval/replies.go:363`（产码），
+  `grep -rn "q\.allow(\|g\.q\.allow(" --include=*.go internal/agent/approval`（R54）命中 `gate.go:625` 与 `gate.go:723`（产码）。
+  尺能命中别的方法的生产调用者 ⇒ `Replay` 那个零是**真的零**，不是尺的形状不对。
 
 ---
 
 ## §2 托盘加一枚「允许一次」的最小改动面
 
-（待填：菜单项在哪建／点击回调走哪条／常驻腿握着哪枚对象／approval 侧接哪枚方法名／要不要新增方法名＝C17 面）
+### 2.1 逐处列（改动面＝五处产码 + 一处名册）
+
+| 处 | 文件:行 | 要动什么 | 现读凭据 |
+|---|---|---|---|
+| ① 菜单项在哪建 | `internal/ball/tray_windows.go:20-24`、`:86-91` | 加一枚命令 id（在册是 `1..4`，下一枚＝`5`）＋一行 `appendItem(id, 标签, false)` | `appendItem` 闭包在 `:79-85`，签名 `(id uintptr, label string, checked bool)`；`showMenu` 只收两枚布尔（`:72`） |
+| ② 事件怎么发出来 | `internal/ball/ball_windows.go:669-685` | `switch sel` 加一条 `case` → `b.fire(...)` | 分流今天只有四条：`:676/:678/:680/:682` |
+| ③ 回调键 | `internal/ball/ball_windows.go:50-59` | `Events` 加第 11 枚 `func()` 字段 | `fire` 的形＝`func(fn func())`（`:728-732`），只判 nil |
+| ④ 常驻宿主填哪 | `cmd/wisp/resident_ball_windows.go:173-184` | 那张字面量加一枚键，值走"注入函数值"形（同 `:177` 的 `onCancelEsc` 形） | 宿主对审批一无所知的分层写在 `:23`、`:56-61`、`:195-203` |
+| ⑤ `approval` 侧接哪枚方法 | **现成，不用新增**：`internal/agent/approval/replies.go:316 (*Replies).Allow(ctx, corr) error` | 关联号取 `AwaitingHuman()`（`replies.go:252`，L2 优先的注释在 `:242-251`） | 它自己走 `:328 DecideFromNative` → `gate.go:718/723` → `queue.go:396`；无卡返回 `ErrNoTrackedCard`（`:57`） |
+| ⑥ 会被打红的名册 | `cmd/wisp/resident_ball_228_test.go:50-53`（列表）＋`:319-322`（`len(set) > len(list)` 那一支） | 见 §5，落地时**只许扩列表** | 该钉用 AST 扫 `Events` 字面量的 key，两向都判 |
+
+**常驻腿握着的是哪枚对象**：`*residentApproval`——`cmd/wisp/resident_windows.go:123` 由 `newResidentApproval()` 构造，
+字段在 `cmd/wisp/resident_approval_windows.go:81-94`：`gate *approval.Gate`（:82）、`cards *approval.Replies`（:83）、`ui *ballCardUI`（:84）。
+`cards` 与 `gate` 在 `:115-120` 由 `HostBinding{Gate, VetoChannel: approval.ChannelEsc, NativeSource, PanelSource}` 绑成一对。
+⇒ 托盘那一发要够到的就是这枚 `ra.cards`，而 `ra` 今天已经通过 `:163` 的函数值注入够得着球宿主——**同一枚注入形状，不必新开装配点**。
+
+### 2.2 「要不要新增方法名」——只报事实，⛔ 不替编排者裁
+
+三层逐个报名字与它在不在 C17 那张表上：
+
+1. `internal/ball` 层：加的是**一枚 Go 结构体字段**（`Events` 的第 11 枚）与**一枚命令 id 常量**。C17 那张方法表在
+   `internal/panel/bridge.go:42-45`（在册只有 4 枚 `panel.*`），**托盘这一支不碰这四个名字中的任何一个**。
+2. `cmd/wisp` 层：加的是**一枚函数值**（`startResidentBall` 的入参/回调），不是方法名，也不是线协议名——
+   `cmd/wisp/approval_reply.go:561` 逐字「not a wire protocol, and nothing here is a C17 method name」，那枚 `switch verb`（`:563-583`）就是这条判断的现读形状：控制台动词同样不算 C17。
+3. `approval` 层：`Allow` / `AllowSession` / `Reject` / `Veto` **四枚名字全在册**
+   （`internal/agent/approval/ui.go:146`、`:158`、`:161`；`replies.go:316`、`:351`、`:372`、`:455` 一带），
+   托盘**不需要任何一枚新名字**。
+
+⇒ 事实结论：**托盘这一支的三层里没有一处需要新增 `panel.*` 入向方法名**。
+⚠ 但有一枚**别的在册闭集**会被"顺手扩"打到：`internal/agent/approval/approval.go:48-50`
+逐字「The set is closed: a fifth value means a caller invented a selector, which is exactly the M-7/C-3 failure shape」，
+名册在 `:61 var allChannels = []Channel{ChannelBall, ChannelEsc, ChannelPanel, ChannelKWS}`。
+⇒ 若实现者想让审计行"带正确 `Channel`"，就会撞上这四枚的闭集；归 **`A498` F8 已裁的那一格（裁甲＝`Source` 标签是标签、不是权威）**，本腿只标出**碰哪一行**（`approval.go:48-50`/`:61`）。
+
+### 2.3 与票 245「稳态不绑裸 Esc、只在确认那两三秒借」的关系——只写碰哪一行／不碰
+
+**不碰**（现读为证，四处）：
+- 借／还那对机制的两个作者点：`internal/ball/hotkey_windows.go` 的 `takeEsc`／`releaseEsc` 一支，与
+  `internal/ball/ball_windows.go:250` 的 `registerAll(b.hwnd, b.opts.Hotkeys)`（开窗即绑稳态三枚）——
+  **托盘菜单项不是键绑定**：`showMenu` 全程只调 `CreatePopupMenu`/`AppendMenuW`/`TrackPopupMenu`（`tray_windows.go:73-102`），零处 `RegisterHotKey`。
+- 稳态枚数那枚钉：`internal/ball/live_windows_test.go` 一族锚的是**注册集枚数**，托盘项不进注册集 ⇒ 不会因这枚改动变红。
+- 常驻腿那行 `hotkeys live %d/4` 文案（`cmd/wisp/resident_ball_windows.go:207`）：分子是 `len(rep.Live())`，与菜单枚数无关。
+- **借期条件本身**：`cmd/wisp/resident_approval_windows.go:440-442` 逐字 `if p.Level == "L1" { b.TakeEscForCancel() }`
+  ⇒ **L2 卡根本不借 Esc**，而按 `A498` F6 那一裁，托盘「允许一次」永远作用于队头那枚 **L2** 卡（`AwaitingHuman` 的 L2 优先写在 `replies.go:242-251`）
+  ⇒ **两件事作用域不重叠，不冲突。**
+
+**碰**（两处，都是"必须一起改口／一起扩"的账，不是矛盾）：
+1. `cmd/wisp/resident_ball_windows.go:173-184` 那张 `Events` 字面量枚数 +1 ⇒ `cmd/wisp/resident_ball_228_test.go:50-53`
+   列表要同步扩（`A498` F7 已裁："只许扩列表、不许扩断言维度"）。
+2. 托盘一次选择会**把一张 L2 卡答掉**，答掉之后走 `Update(EventDismissed)` → `settleOrb`（`cmd/wisp/resident_approval_windows.go:465-474`、`:483-493`）。
+   那枚函数末尾正是"还 Esc ＋回 `Sleeping`"那一支。
+   ⇒ **碰的是它的调用者枚数**（今天只有 CLI 答复与退出序列两条会走到这里，`ball_windows`/托盘是第三条），
+   **不改它的判据**：`settleOrb` 首行 `if _, awaiting := u.ra.cards.AwaitingHuman(); awaiting { return }` 已经保证"两张卡时第一张落不惊动第二张"。
+3. ⚠ 一条**回调线程**的在册坑（票 228 `A493` 已经写死同一形状）：`b.fire(...)` 是**内联在 `ui-sta` 线程上跑**
+   （`internal/ball/ball_windows.go:728-732`；同文件 `:734-736` 注释逐字「every Events callback」跑在 UI 线程上），
+   而 `Ball.Close()` 那形是 `sta.PostTask + <-done`（`:904` 一带）⇒ **托盘 `Allow` 回调里不许同步等任何球侧收口**；
+   合法形状＝今天 `vetoByEsc` 那一形（`cmd/wisp/resident_approval_windows.go:163-171` 逐字「It runs ON the ui-sta thread … so it waits on nothing」）。
 
 ---
 

@@ -1,0 +1,18 @@
+228-a5: fill section 1 and 2 (allow entry roster, tray change surface)
+
+§1 「允许」入口全名册（三态）：
+八枚入口逐枚点名——控制台 stdin 两条腿（wisp run 与常驻腿）都是「存在」，
+全局 Esc 只有否决那一支，托盘菜单一块没写（在册只有四枚 id、Events 十枚键无一通向允许），
+单击球写了没接（ChannelBall 零枚 SetLoaded），面板是结构性无门（PanelAPI 没有 Allow 方法），
+KWS 一块没写，一次性 CLI 子命令一块没写（main.go 十枚名册里没有答复用的）。
+Gate.Replay 判死＝复认零枚产码调用者，第二把尺防绕过方法名，正控是同包两处生产调用命中。
+
+§2 托盘加一枚「允许一次」的最小改动面：
+六处逐列（菜单 id 与 appendItem、wndproc 分流、Events 第十一枚键、常驻宿主字面量、
+现成的 Replies.Allow、会被打红的名册钉）；
+「要不要新增方法名」只报事实＝三层里没有一处需要新增 panel 入向方法名，
+但会撞 approval.go 那四枚 Channel 闭集；
+与票 245 的冲突面：不碰四处、碰两处（Events 枚数与 settleOrb 的调用者枚数），
+外加一条回调线程坑（fire 内联在 ui-sta 上，不许同步等收口）。
+
+本程零 Go 命令，零读零转述 frontend 与 design。锚点 ccd9543。
