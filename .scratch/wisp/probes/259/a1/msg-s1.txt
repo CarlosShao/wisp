@@ -1,0 +1,17 @@
+259-a1 section 1: re-measure the ticket's own readings 1-7
+
+Six of seven hold verbatim at anchor 3138e012 (no line drift on
+queue.go:162/336/376, approval.go:287/292/298-305/303, ui.go:130,
+subagent_selfapproval_197_test.go:109). Two corrections, both named:
+
+- reading 5 says six cases in ticket242_binding_test.go; the file holds
+  four Test functions and none of them routes an allow through
+  q.allow/allowScoped/DecideFromNative (grep returns nothing), so the
+  substance stands and the count does not.
+- reading 4 dates the "deliberately indistinguishable" comment to
+  ui.go:127-130; the comment body is 127-129, line 130 is the value.
+
+Also recorded: Gate.Replay has zero production callers, which is the
+fact the ticket's "replay" shape turns on, and the four mutations'
+structure re-measures true while their pass/fail counts are out of
+reach for a leg that may not run go.
