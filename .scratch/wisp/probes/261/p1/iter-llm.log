@@ -1,0 +1,16 @@
+time=2026-10-03T12:41:31.454+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket261P1EnumerationAndSelectionAdmitDisabled
+--- PASS: TestTicket261P1EnumerationAndSelectionAdmitDisabled (0.00s)
+=== RUN   TestTicket261P1DisabledModelReachesProviderAndCost
+time=2026-10-03T12:41:32.821+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 12:41:32 mockllm: serving on http://127.0.0.1:60034 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+    enabled_reach_261_test.go:188: mockllm captured no request on route "chat"
+--- FAIL: TestTicket261P1DisabledModelReachesProviderAndCost (1.41s)
+=== RUN   TestTicket261P1FlagInversionChangesNoReading
+time=2026-10-03T12:41:33.972+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 12:41:33 mockllm: serving on http://127.0.0.1:60037 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+    enabled_reach_261_test.go:219: mockllm captured no request on route "chat"
+--- FAIL: TestTicket261P1FlagInversionChangesNoReading (1.13s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/llm	2.580s
+FAIL

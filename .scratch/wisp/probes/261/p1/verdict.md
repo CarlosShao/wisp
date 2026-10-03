@@ -17,10 +17,48 @@
   - `go test -count=1 -v ./internal/llm/ ./internal/config/` rc=0；
     `--- PASS` 顶格 **147** 枚、`--- FAIL` **0**、`--- SKIP` **0**；两包 `ok`（llm 46.841s／config 1.334s）。
     名册逐名存 `base-roster.txt`（147 行），收尾 comm 对比。
+- 提交：骨架件＝`29047c99`（verdict 骨架＋基线四 log＋名册）；终态件＝本腿最后一次 commit
+  （两枚测试文件＋§1/§4 全部凭据 log＋`mut/` 突变台三件），`git log -1` 即得。
 
 ## 1. 三向读数（AC#0 ⓐ，必须现跑）
 
-（待填：跑 `internal/llm/enabled_reach_261_test.go` 与 `internal/config/enabled_261_test.go` 与 `.scratch/wisp/probes/261/p1/mut/` 突变台后逐条落读数。判据形状＝①枚路与选路给不给 false；②计费/真请求那一跳认不认它；③补回 true 同一把尺是否反转；④突变台证明尺是活的。）
+仪器：`internal/config/enabled_261_test.go`（2 枚尺）＋`internal/llm/enabled_reach_261_test.go`（3 枚尺）＋
+`.scratch/wisp/probes/261/p1/mut/`（overlay 突变台，⛔ 未动任何跟踪文件）。全部真跑：`config.LoadFile`
+真解析手写 TOML、`llm.NewResolver`→`ResolveChain`/`ResolveRole`→`BuildEndpointProvider`→live mockllm HTTP、
+计费用生产函数 `internal/agent/cost.go` 的 `Cost.AddUsage` 本身（llm 测试以外部测试包 `llm_test` 引入 agent，
+无环）。终态名册＝基线 147＋新 5，0 FAIL／0 SKIP／0 丢名（§4）。
+
+1. **读数① 枚举与选择认不认 false**：`DiscoveredModels("mock261")` 返回 `[t261-nokey, t261-off, t261-on]` 全部三枚
+   （显式 `enabled=false` 与缺键落 false 两形都给）；`ResolveChain` 对 `["mock261/t261-off"]` 返回
+   `err=nil` 且 `eps[0].Model=="t261-off"`；`ResolveRole(RoleChat)`（run.go:436 同款回退）同收。
+   **＝认。**（`TestTicket261P1EnumerationAndSelectionAdmitDisabled` PASS）
+2. **读数② 派发/计费那一跳认不认 false**：生产装配形状把该端点构造成 provider 后 `Stream` 打真 HTTP：
+   mockllm 自己计数 `chat` 路由＝**1 次**（非我方记账），录制 transport 抓到的出网请求体含逐字
+   `"model":"t261-off"`；回合 usage＝12 in／6 out；`agent.Cost.AddUsage(该 false 条目自带价卡, usage)` ＝
+   **90 micros > 0**（日志行 `TICKET261-COST-HOP READING`）。
+   **＝认（一条可计费的真实 dispatch 今天对 false 照常发生）。**
+   （`TestTicket261P1DisabledModelReachesProviderAndCost` PASS）
+3. **读数③ 补回 true，同一把尺反不反**：同一枚条目文件里只翻 `enabled = false`→`true`、重跑全套尺：
+   listed／resolved／reachedProvider／micros 四项**逐项不变（90 对 90），不反转** ⇒ `Enabled` 在生产码里是死键。
+   同测里的活体对照：目录中不存在的 `t261-ghost` 在**同一行选择代码**被拒（`unknown model` 错误）
+   ⇒ 尺对"在不在目录"敏感，只对 `enabled` 不敏感——不是钝尺。（`TestTicket261P1FlagInversionChangesNoReading` PASS）
+4. **读数④ 突变台（尺的标定，只在 .scratch）**：`go test -overlay` 把 `resolver.go` 换成
+   `mut/resolver.gated.go`（仅在 `resolveEndpoint` 加 `if !spec.Enabled {拒绝}`＋枚举跳过 false），
+   同一套尺三枚全反：枚举只回 `[t261-on]`、`ResolveChain(t261-off)` 报
+   `model "t261-off" ... is disabled (mutation bench)`、cost-hop `off=0 / on=90`
+   （`mut/mut-run.log`，mut_rc=1＝预期红）。⇒ 读数③的"不反转"确因**门不存在**，恒真嫌疑排除。
+5. **config 侧配套读数**：手写文件缺 `enabled` 键 → 解码 `false`（tag `default:"true"` 对 map 条目零执法，
+   `TestTicket261P1MissingEnabledKeyDecodesFalse` PASS）；一次真实 `SetModelContextWindow` 写后，
+   文件里出现逐字 `enabled = false`（mergeWrite→SaveFile→MarshalCanonical 无 omitempty 的物化放大），
+   且 ghost 条目写入被 `refusing to invent one` 拒（`TestTicket261P1SettingsWriteMaterializesFalse` PASS）。
+
+**ⓐ 判定（跑出来的）**：**真路径存在。** 形状＝手写（或任何缺键）条目 → `config.LoadFile` 落 `false` →
+`text_chain`／`roles.chat` 点名它 → 验证层放行（`catalog.go:66` 只问存在）→ 枚举给出、选择解析、
+provider 真收带该 model id 的计费请求、计费函数照算价卡。全程**没有任何一处读 `Enabled`**。
+生产入口逐枚名册（谁读/谁不读）：发现＝`ImportDiscovered` 写 true 但**生产调用者零枚**；
+选择＝`resolver.go:119/287-288` 不读；派发＝`cmd/wisp/run.go:435-442`、`providers.go:168-175` 不读；
+计费＝`internal/agent/loop.go:435`→`cost.go:38/50` 不读；回执＝`cmd/wisp/panel_config_store.go:112`
+（`for range p.Models { row.ModelCount++ }`）不读。**ModelSpec.Enabled 生产读者＝零枚（复认＋现跑双证）。**
 
 ## 2. 「手写那一支」今天可达不可达（逐枚带 file:line）
 
@@ -55,6 +93,10 @@
 **小结（读码侧）**：今天造出 `enabled=false` 条目的路径＝手写（firstrun 官方教的就是它）；
 发现器与迁移写侧都显式写 true（`internal/llm/discover.go:119`、`internal/config/migrate.go:146`），
 而读侧零枚读者（见 §3 复认）。真路径成立与否以 §1 现跑读数为准。
+**现跑已证（2026-10-03 终态）**：第 1 枚的解码落 false＋验证放行＝§1 config 尺两枚 PASS；
+第 2 枚的"文案不提 enabled"＝生产引导原文（firstrun.go:111-118，无 SaveFile 之外的建行写者，
+`ImportDiscovered` 生产调用者零枚，全仓 grep 复认）；第 3 枚"不产行但物化"＝§1 读数末条
+（写后文件逐字出现 `enabled = false`，ghost 写被拒）。三枚的可达性判定与读数一致：**手写那一支今天可达。**
 
 ## 3. 我对编排者现量节的复认与推翻清单
 
@@ -80,11 +122,16 @@
 
 | 门禁 | 基线（起手） | 终态 |
 |---|---|---|
-| `go build ./...` rc | 0 | （待填） |
-| `go vet ./internal/llm/ ./internal/config/` rc | 0 | （待填） |
-| `sh scripts/d22scan.sh` rc | 0 | （待填） |
-| `go test -count=1 ./internal/llm/ ./internal/config/` | 147 PASS / 0 FAIL / 0 SKIP | （待填，逐名 comm 对 `base-roster.txt`，不许丢名） |
-| 终态 `git status --porcelain internal/llm internal/config` | 空 | （待填，必须与起手名册逐枚相等＝仍为空） |
+| `go build ./...` rc | 0 | **0**（`final-build.log` 空） |
+| `go vet ./internal/llm/ ./internal/config/` rc | 0 | **0**（`final-vet.log` 空） |
+| `sh scripts/d22scan.sh` rc | 0 | **0 clean**（`final-d22scan.log`：bans #1-5 internal/=228、cmd/=37、#6 frontend/=85、#7 tools/=23、#8 含 _test.go 与注释 internal/=496、cmd/=92，无违例） |
+| `go test -count=1 -v ./internal/llm/ ./internal/config/` | 147 PASS / 0 FAIL / 0 SKIP，两包 ok | **152 PASS / 0 FAIL / 0 SKIP，两包 ok**（llm 43.365s／config 1.046s，rc=0）。`comm -23 base-roster.txt final-roster.txt`＝**0 行**（基线 147 名逐名未丢）；增量恰为 5 枚 `TestTicket261P1*`（§1 所列）。判红绿只认顶格 `--- FAIL`（0 枚）；`t.Logf` 的 `file:line:` 前缀行不当失败读 |
+| 终态 `git status --porcelain internal/llm internal/config` | 空 | 见末段（提交本腿两枚测试文件后必须复归空；突变台只活在 `.scratch`＋`-overlay`，跟踪文件从未被改） |
+| overlay 突变台 | —（不属于门禁） | `mut_rc=1`＝预期红（§1 读数④），发生在 `go test -overlay` 的合成输入上，⛔ 不落跟踪树 |
+
+红绿判读备注：iter-config/iter-llm/iter-llm2 三份是开发回路（iter-llm 首跑的红是
+mockllm `chat` 路由不录请求体的仪器事实——`tools/mockllm/server.go` 注释逐字 "the chat route is untouched"，
+改在测试侧加录制 RoundTripper 解决，⛔ 未动 tools/）。
 
 ## 5. 我判不动的地方（具名，不含糊）
 

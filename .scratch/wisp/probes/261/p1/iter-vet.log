@@ -1,0 +1,3 @@
+# github.com/CarlosShao/wisp/internal/llm_test
+# [github.com/CarlosShao/wisp/internal/llm_test]
+vet.exe: internal\llm\enabled_reach_261_test.go:165:35: undefined: http
