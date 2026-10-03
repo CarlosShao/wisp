@@ -103,7 +103,14 @@
 
 ## §5 我可能写错的条目（自我对抗）
 
-（取数中）
+1. **AC#2 那枚对账门的红，我照 v1c＋编排者 §151 的读数、没自己跑。** 我只读了 `composer_test.go:48` 的比对机制（Go emit 键集 ↔ 前端 interface 双向减集）。若前端 agent 在 10-02 之后已把那两枚键声明进 interface，AC#2 现在可能已可翻——**我⛔读不了 `frontend/**` 证实或证伪**。⇒ 下一枚能跑测试的腿：`go test ./internal/panel -run TestComposerContractTypesMatchFrontend` 一发即可定。
+2. **"TierOf 零生产调用者"是 HEAD 快照，工作树正在变。** 未提交的 `config_readers_255.go:174` 是它的第一个生产调用者、正被 255-r2 写。若 255-r2 在我交件前落库，AC#8/AC#10 的 Go 半句可能已就绪、"零调用者"这句随之过期。⇒ 本腿的读数只对"我这几发 `git grep HEAD` 的时刻"负责。
+3. **AC#4 我判"开窗链已生产接线"是顺着调用点＋注释读出来的推断，没端到端确认那枚回调真被热键/托盘触发。** 我核到 `resident_windows.go:163 withPanelHost(...RequestToggle...)` 把回调交给了 `startResidentBall`、注释说热键/托盘驱动，但**没逐行追到热键注册处确会调那枚回调**。可能形状：接了但回调挂在没人发的 event 上（写了没接的另一种）。⇒ 需要跑／真机的那腿确认；本腿只敢说"代码路径连通、非零调用"。
+4. **行号会漂，且我引的那几包正被写。** `manager.go` 的 llm 热应用项我从 v1c 的 `:281` 更正为现量 `:284`（`:281` 现为 `hotkey`）；但 `cmd/wisp`＋`internal/config` 此刻有写腿在飞，我引用的若含工作树行号（尤其未提交的 255-r2 文件）可能随其写入而变。我尽量用 `git show HEAD:`／`git grep HEAD` 取committed 形状，未committed 的 255-r2 两处我**具名标了"未提交、属 255-r2"**。
+5. **我把 AC#8 从编排者的"两栖"标签里摘出来、改判"等 255-r2 而非前端"。** 依据是 §126"归 255-r2 落地…等 255-r2 交完由非实现者一并裁"这句把翻勾条件钉在 255-r2＋裁。但"两栖"一词也许本意含"页面可见"要前端——我承认 AC#8 带一枚前端传输尾巴（§4-3），只主张那尾巴不是它的翻勾前置。这是我读法，非定论。
+6. **AC#9"只剩一枚 `.gitkeep`"是 `git ls-files` 的名册级读数＝"内容不在 git 跟踪面"，不等于"内容不在磁盘"。** `//go:embed all:dist` 读的是构建时的**真实文件系统目录**，不是 git；若前端 agent 本机 build 出过 dist 内容但没 commit（或被 gitignore），磁盘上可能有包、而我这把尺看不见。⇒ 我⛔不 `ls frontend/dist`（禁令层）、也跑不了 embed——"真有没有内容"这发只能由能碰那层或能跑 embed 的腿/owner 定。**这一条足以推翻"AC#9 判不了"里的"判不了"三字之外的半句**，单列。
+7. **`EffectiveNow/EffectiveNextTask` "零非测试写者"我只扫了 `= panel.EffectiveNow` 这类赋值形。** 若 255-r2 用别的写法（如 map 赋值、具名函数返回）给 `res.Tier` 赋 now/next_task，我这把 grep 尺量不到。方向上仍支持"HEAD 只活 restart 一枚"，但非穷尽。
+8. **凭据具名字段那套（`provider_credential` 只写不回显）我没逐个 setter 追它的值流向**，只采信 v1c §AC#0/AC#3 的"值不走共用封套、只上 `api_key_ref`"名册级判语（已勾格）。本腿复核集中在未勾的 5 格，勾过的没重审。
 
 ## §6 量不到的地方（具名）
 

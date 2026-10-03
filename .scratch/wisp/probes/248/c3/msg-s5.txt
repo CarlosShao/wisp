@@ -1,0 +1,5 @@
+248-c3 fill §5: self-adversarial list
+
+8 items, notably #6 (git ls-files proves only git-tracked absence, not
+on-disk absence for embed) and #1 (recon-test red inherited from v1c, not
+self-run). No placeholder left in this section.
