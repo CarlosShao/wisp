@@ -75,6 +75,12 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go.orig
   把 `PanelAPI` 的出向读面扩到'能改变卡的状态'那一形也要红"。落地件里**零枚仪器碰 `PanelAPI`**：
   全仓 `_test.go` 里 `PanelAPI` 只出现在 `queue_test.go:136` 的一句**注释**（不是断言），
   `approval` 包内没有任何 `NumMethod`／方法名集尺（`NumMethod` 的在册用法只在 `internal/tools` 三包测试里，射程不含 `PanelAPI`）。
+- **能力侧我照票面那一形真的种了（§2 M-E）**：给 `PanelAPI` 接口加 `Allow(correlationID, grant string) error`，
+  并在 `panelAPI`（`gate.go:695` 那枚 `Gate.Panel()` 返回的具体类型）上实现成 `p.q.allow(corr, grant)`——
+  即**面板侧拿到了一枚真能改变卡状态的授权动词**。结果：**包内 66 `--- PASS`／0 `--- FAIL`**。
+  ⇒ 票面那一形**不红**；而且"面板那面不带 Allow"这句话今天仍只由注释守着
+  （`approval.go:223-224`、`ui.go:155`、`ui.go:164-166`、`gate.go:632`、`queue.go:358` 五处逐字），
+  **本票立项理由的那半句话没有被这次交付改掉**。
 - **词面名单可被改名绕过（实测 M-D2）**：`PanelItem.Permitted bool` ＋ 把 `"Permitted"` 补进 `panelItemReadFace`
   ⇒ **包内 66 枚全绿、0 红**（`.scratch/wisp/probes/242/v1/m-d2.txt`）。
   字段语义就是"这卡被允许了"，两枚尺都看不见它。⇒ 名单尺是**词面**的，且名单与被它管的字段**由同一只手维护**（镜像检查自声明）。
@@ -114,11 +120,23 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go.orig
 | **M-C3** **seq 从摘要里彻底消失**（digest 内掏空） | `approval.go:255` `strconv.FormatUint(seq, 10)` → `strconv.FormatUint(seq-seq, 10)`（值恒 `"0"`，用法保留、编译通过） | 票面 AC#1 主张"重放同一身份因 seq 折入必不同 digest" ⇒ 该红 | **无红句**：六枚 `TestTicket242*` 逐枚 `--- PASS`，**全包 66 PASS／0 FAIL，`ok 0.345s`**（`m-c3.txt`） | ⇒ "seq 折入"这半句**反形全绿＝不敏感**，不许当凭据。根因两处：① 测试的 `want` 用**同一个** `bindDigest` 复算（`ticket242_binding_test.go:71` 自指），函数内部怎么改都追不上；② 那两枚"重放"项 `corr` 本来就不同（`queue.go:150` 由 `seq` 生成 `approval-<seq>`），`corr` 一项就把它们分开了，**同身份重放在这个载具里构造不出来** | md5 回 `d97267a8…`，porcelain 空 |
 | **M-D1** 种下带味道的字段（＝编排者自报的 M3） | `ui.go:57` `PanelItem` 末尾加 `GrantToken    string` | 两枚 panelface 尺 | `ticket242_panelface_test.go:39: AC#2 RED: PanelItem.GrantToken (string) is visible to the panel but not declared in panelItemReadFace (ticket 242: a new field on the panel read face must be declared, not slipped in)` ／ `ticket242_panelface_test.go:61: AC#2 RED: PanelItem.GrantToken (string) smells like an allow channel ("grant"); …` ／ 同 `:61` 第二行 `… ("token"); …` | 红数＝**2**；四枚 binding 用例全 `--- PASS`（两族互不敏感） | md5 回 `a4cee69e…`，porcelain 空 |
 | **M-D2** **改个字段名绕过词面名单**（能力侧反证） | `ui.go:57` 加 `Permitted     bool` **且** `ticket242_panelface_test.go:28` 把 `"Permitted"` 补进 `panelItemReadFace`（＝同一只手补名单的真实场景） | 票面 AC#2 要求的能力侧那一形 ⇒ 该红 | **无红句**：两枚尺逐枚 `--- PASS`，**全包 66 PASS／0 FAIL，`ok 0.347s`**（`m-d2.txt`） | ⇒ 一个语义即"这张卡被允许了"的字段能带着名单一起静默过审；名单尺只认词，不认能力 | md5 回 `a4cee69e…`＋`dc997384…`，porcelain 空 |
+| **M-E** **照票面那一形种能力侧**（本表最重的一发） | `ui.go:167-171` `PanelAPI` 接口加 `Allow(correlationID, grant string) error` ＋ `gate.go:702` 实现 `func (p panelAPI) Allow(corr, grant string) error { return p.q.allow(corr, grant) }`（真花令牌、真改卡状态） | 票面 AC#2 那句"扩到能改变卡的状态那一形也要红" | **无红句**：**全包 66 `--- PASS`／0 `--- FAIL`，`ok 0.340s`**，两枚 `TestTicket242Panel*` 逐枚 `--- PASS`（`m-e.txt`；已验非编译失败：`grep "build failed"` 零命中，六枚 `TestTicket242*` 全部有 `--- PASS` 行） | ⇒ 面板侧现在**结构上就有一枚 allow** 而 CI 不响；"PanelAPI has no Allow method"仍只有注释（五处，见 §1 AC#2） | md5 回 `a4cee69e…`＋`4a2532d3…` |
 
-**终态复跑（全部还原之后，同一次 `-count=1 -v`）**：
-`PASS=66 / FAIL=0`，`ok github.com/CarlosShao/wisp/internal/agent/approval 0.338s`，
-五枚被改文件 md5 逐枚回到 §0 锚（`diff` 备份表＝`backups_match_HEAD=YES`），`git status --porcelain -- internal cmd`＝**空**。
-证据件：`m-a2.txt`／`m-b.txt`／`m-c1.txt`／`m-c2.txt`／`m-c3.txt`／`m-d1.txt`／`m-d2.txt`／`base-v.txt`／`final-v.txt`／`backup/`。
+**终态复跑（八发全部还原之后，同一次 `-count=1 -v`）**：
+`PASS=66 / FAIL=0`，`ok github.com/CarlosShao/wisp/internal/agent/approval 0.348s`（`.scratch/wisp/probes/242/v1/final2-v.txt`），
+六枚被改文件（`approval.go`／`queue.go`／`ui.go`／`gate.go`／两枚 judge 件）md5 逐枚回到 §0 锚，
+`grep -rn "M-E probe\|M-D2 probe\|len(bind) >= 0\|seq-seq" internal/agent/approval/`＝**0 命中**（盘上无残留突变）。
+证据件：`m-a2.txt`／`m-b.txt`／`m-c1.txt`／`m-c2.txt`／`m-c3.txt`／`m-d1.txt`／`m-d2.txt`／`m-e.txt`／`base-v.txt`／`final-v.txt`／`final2-v.txt`／`d22scan.txt`／`backup/`。
+
+**porcelain 归因（两发之间的复位量）**：`internal/agent/approval/` 每一发还原后 md5 均回锚、porcelain 对该目录**零命中**。
+末次 `git status --porcelain -- internal cmd` 出现 `M cmd/wisp/config_reload.go` ＋ `?? cmd/wisp/config_readers_255.go`
+＝**另一枚腿正在写 `cmd/wisp`**（派单已声明的他人写面），不是我未还原的痕；我那六枚文件与 `cmd/wisp` 无交集。
+
+**门禁**：`./tools/d22scan/d22scan.exe` rc=0，正文 `clean - no D22 ban violations`（`d22scan.txt`）。
+⚠ 同发有一枚 SKIP：`skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/]`——
+按"SKIP 算红"的口径这一行要记红；它是 `frontend/.gitignore` 决定的既有仓库状态
+（同样句子在 `docs/evidence/s1/` 的 138／142／143／145 等前人表里逐字在册），**不在本地界、也不归本票**。
+`gofumpt`／`go build` 我未跑：本腿**零 Go 产码改动**（六枚文件全部回到 HEAD 字节），无物可形检。
 
 ---
 
@@ -168,10 +186,14 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go.orig
    - **"重放 seq"那一半**：M-C3 全绿＝反形不敏感。要它成立必须造"同 corr 两次入队（第一次已离队）"的尺；
      现在那两枚项 `corr` 天生不同（`queue.go:150`），构造不出同一身份。⛔ 不许用"改名"糊过去——`bindDigest` 的自指复算（`:71`）会让函数内部的任何删改都追不上。
 3. **AC#2：不许翻**（不成立）。缺的零件是**一枚能力尺，可在甲内补，不必解冻乙**：
-   - 最小形 A：`reflect.TypeOf(PanelAPI(nil)).NumMethod()` 与方法名集**恰好** `{Reject, Head, View}`，出现任何第四个或任何 allow-ish 同义形状即红；
-   - 最小形 B（打 M-D2 那一发）：`PanelItem` 的字段集必须是**封闭名单**且**只读**——
-     "没有任何产码函数以 `PanelItem` 为参、把其中字段读回队列状态"（这条能咬住 `Permitted bool`，词面尺咬不住）。
-   - 顺手：M-D2 这一发应作为**常驻**自证（种下→红→还原）留在票的验收脚注里，否则下一枚腿还会读成"这格有牙"。
+   - 最小形 A（打 §2 M-E 那一发）：`PanelAPI` 的**方法名集**必须是封闭名单恰好 `{Reject, Head, View}`，
+     出现第四枚（`Allow`／`Permit`／`Answer` 任一）即红。我实测 M-E 现在**全绿**，所以这枚尺今天不存在。
+   - 最小形 B（打 M-D2 那一发）：`PanelItem` 字段集除"已声明"外还要**封名单上限**（枚数＋名字双向钉死），
+     否则"加字段＋把名字补进名单"这一步永远静默（名单与被管字段由同一只手维护）。
+   - 最小形 C（语义侧，比词面强）：产码里任何以 `PanelItem` 为参／返回、且**调用队列状态改变函数**
+     （`allow`／`deliver`／`reject`）的形要红——这条才真正对应票面"能改变卡的状态"。
+   - ⛔ 别把这三枚省成"把 `PanelItem` 名字改得更像 grant 一点"：M-D2 已证明词面尺对改名零敏感。
+   - 顺手：M-E 与 M-D2 应作为**常驻**自证（种下→红→还原）留在票的验收脚注里，否则下一枚腿还会读成"这格有牙"。
 4. **AC#3：不许翻**，理由＝甲形现量不够（§1 AC#3），且**不是**"等 owner 解冻 `internal/panel/l2_grant_boundary_test.go`"。
    `Q-74` 那一刀可以先不问：补甲内能力尺不碰任何冻结件。
 5. **两枚判据不是同一块石头**＝值两格，这点可以直接采信（§1 AC#3 的互敏感实测）。
@@ -197,19 +219,31 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go.orig
 7. **票面"零尺"那行旧读数我复算成"现量已非零"**：`grep -rln "bindDigest" --include=*_test.go internal cmd` 今天命中
    `cmd/wisp/subagent_selfapproval_197_test.go` 与新的 `ticket242_binding_test.go` ＝**2 枚文件**（票面写 1 枚）。
    这是票面被这次交付改写了，不是矛盾；只是别按票面的"1 枚"读现状。
+8. **M-E 的读数只在 `internal/agent/approval/` 包内成立**。我给 `PanelAPI` 接口加了方法，
+   跨包若有别的实现者（fake／stub）会**编译失败**，而派单禁止我做跨包测量，所以我没量 `cmd/wisp`／`internal/panel` 的颜色。
+   ⇒ 正确引用方式："本包两枚 AC#2 尺对面板侧多出的一枚真 `Allow` 全绿"，
+   ⛔ 不许引成"全仓都不响"。反过来说：如果 `cmd/wisp` 那侧真有一枚尺因此变红，
+   那 AC#2 的能力侧就有人守着，我的"不成立"要降级——**这一格我没资格关，也没读数**，请编排者或 253 系腿在 `cmd/wisp` 全空窗时补量一发。
+9. **`cmd/wisp` 里是否有针对"面板侧不得有 allow 方法"的能力尺，我只做了 `grep -l PanelAPI`**（命中三枚产码文件：
+   `approval_reply.go`／`panel_resident_windows.go`／`resident_ball_windows.go`，未命中 `_test.go`），
+   但那是词面 grep 不是行为尺，⛔ 按本票 AC#2 自己的标准（"光 grep 新符号名不算预检"）这句也不能算凭据。
 
 ---
 
 ## §6 判语
 
 - **AC#1＝附条件成立**（铸／花 store 层有牙：M-A2 两枚红、M-C1 一枚红；真·跨卡路由与"拒因指名绑定"两半＝零尺：M-B 六枚全绿、名字叫跨卡那枚在绑定层掏空后仍绿）。
-- **AC#2＝不成立**（名字尺有牙：M-D1 两枚红；能力尺＝零仪器，词面名单一发改名即全绿：M-D2 66 PASS）。
+- **AC#2＝不成立**（名字尺有牙：M-D1 两枚红；能力尺＝零仪器：M-D2 改名＋补名单 66 PASS，
+  M-E 更重——照票面那一形给 `PanelAPI` 加一枚真能花令牌的 `Allow`，本包**仍 66 PASS／0 FAIL**。
+  "面板那面不带 allow"这句话今天仍然只由五处注释守着）。
 - **AC#3＝不成立／不许勾**（两枚判据不是同一块石头这点成立；"甲形够不够"答"不够"，且缺的零件不必解冻乙形）。
 - **生产接线**：`bindDigest` 铸 1 点（`queue.go:162`）、花 1 点（`queue.go:376`）＝**已接**；
   但花侧比对两端读同一个 `it.bind` ⇒ **绑定摘要在生产里恒等**，实际防线是 per-item store 的成员检查。
   `go build`／`go vet` 的颜色不作证据（现例：`ticket242_binding_test.go:111` 零调用者函数，包仍 `ok`）。
 - **建议**：只按 §4 第 1 条的收窄口径翻 AC#1；AC#2／AC#3 不翻；§4 第 2 条两半退回，其中"拒因指名"那一刀归人拍板。
 - **纪律自证**：AC 框一枚未碰（票面三格仍 `[ ]`，本表没有写进票面一个字）；⛔ 未 push（只 commit）；
-  写面只有 `internal/agent/approval/`（突变，五枚文件逐一还原并 md5 回锚）＋`.scratch/wisp/probes/242/v1/**`＋本表；
+  写面只有 `internal/agent/approval/`（突变，六枚文件逐一还原并 md5 回锚：
+  `approval.go`／`queue.go`／`ui.go`／`gate.go`／`ticket242_panelface_test.go`／`ticket242_binding_test.go`，
+  盘上残留突变 grep＝0 命中）＋`.scratch/wisp/probes/242/v1/**`＋本表；
   `cmd/wisp`／`internal/config`／`internal/risk`／`internal/tools` 零写；无全仓 `go test ./...`；无 `t.Skip`；无放宽断言；
   无 SKIP 读成通过；`frontend/**`／`design/**` 零读零转述；`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件一字未动。
