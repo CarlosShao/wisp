@@ -112,7 +112,8 @@ dev
 | 落点 | `ApprovalCardView` 加一枚带 tag 的键 ⇒ **撞 Q-51**（射程见 §3） | `internal/panel/approval.go:39-59` |
 
 ⚠ 167-c2 §2.1 把这判成"断点两处"（载体无字段＋抄写未抄）——**在"到 NativeVerdict 为止"这个口径下属实**；但 c2 §4① 自己列的改动面是三份文件，本腿把第三跳的**形状**量清：`CardView()` 是纯函数、只吃 `(ApprovalSubject, risk.Decision)`，序号进不了它的任何一枚入参，除非 ①`ApprovalSubject` 也加一枚字段，或 ②在 `pump.go:217` 那行之后对返回值做一次赋值（`cards[i].Position = v.Position`）。
-**①有一个 AC#2 型的副作用必须点名**：`NewApprovalCardView`（`approval.go:64-67`）与 `CardViewFromDecision` 是**同一条构造路**，CLI 诊断腿 `cmd/wisp/panel_assets.go:68` 也走它——那条路上**根本没有队列**，序号只能填零 ⇒ `wisp panel-assets` 的 stdout 会打印一枚 `"position":0`，这正是票面 AC#2"不许退化成 0"点名的形状（且 `cardView143` 因 §1.3 的宽松解码**不会红**）。走②则 CLI 路线那枚键压根不发。⇒ **两形的差别在契约上看得见，本腿只登记，不选形。**
+⚠ **副作用与选形无关，只与 tag 写法有关（这是本腿写完 §2 后回头推翻自己的一句，详见 §5 枚 2）**：`NewApprovalCardView`（`approval.go:64-67`）与 `CardViewFromDecision`（`:72`）是**同一条构造路**，CLI 诊断腿 `cmd/wisp/panel_assets.go:68` 也走它，而那条路上**根本没有队列**。本腿先前写"走②则 CLI 路线压根不发这枚键"——**不成立**：`encoding/json` 对没有 `omitempty` 的 int 字段**恒发 0** ⇒ 只要 `ApprovalCardView` 上多出 `position`，`wisp panel-assets` 的 stdout 就**必然**带 `"position":0`，而这正是票面 AC#2"不许退化成 0"点名的形状（且 `cardView143` 因 §1.3 的宽松解码**不会红**）。
+⇒ 真正决定发不发的不是构造路径而是 **tag 写法**：带 `omitempty` 或指针形才谈得上"没有队列就不发这枚键"，而这一枚恰好适用——`Position` 是 **1-based**（`pending_read.go:44-45` 注释逐字 "the 1-based place in the FIFO"）⇒ 0 从来不是合法序号，被 `omitempty` 省掉的只会是"根本没有队列"那条路。两形差别本腿只登记，不选形。
 
 ## 3. 冲突面：哪几把尺会响
 
@@ -164,6 +165,15 @@ dev
 `pump.go:47-49` 逐字："**the reconciliations read json tags, so an untagged exported field passes them while encoding/json still emits it** (registered, not used)"。机制复核属实：`jsonKeysOf`（`approval_test.go:182`）只在 `f.Tag.Get("json") != ""` 时才收键名，而 `encoding/json` 会把无 tag 的导出字段按 **Go 字段名**发出去。
 ⇒ **给 `ApprovalCardView` 加一枚不带 tag 的 `Position int`，两把尺都不响，而线上会多一枚 `"Position"` 键**（PascalCase，页面按 camelCase 读必然 `undefined`）。这不是建议这么做——恰恰相反，它说明**"尺没响"在本寸地上不等于"没撞契约"**，Q-51 的成本不能只按尺的读数结。
 
+### 3.6 补一枚 §3.1 名册之外的射程：页面侧声明**自己也在 Go 仪器的扫描面里**
+
+落地若要"同批带上页面声明"，那批改动除了 §3.1 两把尺，还落在三族**只读页面树、不读键名**的尺射程里（⚠ 射程判断，非内容引用；本腿未跑它们，见 §6 枚 4）：
+
+- `internal/panel/frontend_hygiene_test.go` 六枚测试：`TestPanelFrontendIsStateless`（`:169`，走 `frontendSrcFiles`→`frontend/src` 的 `.ts/.tsx/.css`，`:79`/`:86`）· `TestFrontendHasNoEmoji`（`:246`，走 `frontend/src`＋`frontend/scripts`）· `TestFrontendNeverNamesAnApprovalDecision`（`:281`，走**整棵 `frontend/`**，但 `:290-292` 明确跳过 `/dist/` 与 `node_modules/`；其尺体 `panelDecisionIdentifierRe` 只有一条正则，`tools/d22scan/../frontend_hygiene_test.go:73`＝`approval\.decide`）。
+- CI 仪器 `tools/d22scan/main.go:249` 把 `frontend/` 列为 ban #6 的声明扫描面，ban #8 的 emoji 面覆盖 `design/`＋`frontend/`（同文件 `:23-24`、`:40` 的清单）。
+⇒ 三条对"position"这种拼写都**不设障**（判读依据＝上面三把尺的字面量本体），但它们是**真实存在的相邻火源**：页面那份声明里若出现被禁的存储 API／emoji／`approval.decide` 字样，红的是 `internal/panel` 与 CI，不是页面自己的构建。
+⚠ 另一枚**布局事实**（据 `.gitignore:22-23` 与 `git ls-files`，非页面内容）：`frontend/` 下受版本控制的条目＝**85 枚**，`frontend/src/lib/panel.ts` **在版本控制里**；`frontend/dist/*` 被 ignore、只留 `!frontend/dist/.gitkeep` 锚（`internal/panel/assets.go:63` 注释自述这枚锚是给 `go:embed` 保命用的）。⇒ **`dist` 是构建产物、不入库**，`cmd/wisp/panel_host_gate_test.go:144-155` 那枚 AC#12 对账钉数的正是"`frontend/dist` 下被 git 跟踪的文件数 vs embed 报的 built 位"。
+
 ## 4. 停止那一半：4 枚入向名册＋最少一行
 
 > 167-c2 §3.1 已枚过这四枚；本腿**独立复测**（不抄读数），并把"看得见／按得下"两半分开答。`requestTaskStop` 本仓 0 命中这一条 c2 已定案，本腿不复量、不重开。
@@ -204,16 +214,38 @@ dev
 
 ## 5. 我可能写错的条目（自我对抗）
 
-（取数中）
+1. **"全仓只有两把双向尺"的尺有口径边界**。我的尺是 `grep -rn "jsonKeysOf\|tsInterfaceKeys" internal/panel/*_test.go`（调用点 4 行）。⚠ 它只能证明"`internal/panel` 包里没有第三处"；`cmd/wisp` 的测试**无法调用这两枚未导出 helper**，理论上可以自带一把。补尺：`grep -rln "panel\.ts" cmd internal tools` ⇒ `cmd/wisp` **零命中**；`tools/d22scan/scan_test.go` 的命中（`:616`、`:739`、`:1813`、`:1979`）全是 `t.TempDir()` 里 `seedFile` 种下去的**合成 fixture**（同文件 `:606` `root := t.TempDir()`），不是真树。⇒ 结论站得住，但站的是"两把尺＋一次补尺"，不是"证明全仓唯一"。
+2. **§2.2 我原话错了一句，已就地更正**："走②则 CLI 路线那枚键压根不发"——**不成立**。`encoding/json` 对**没有 `omitempty` 的 int 字段恒发 0**，所以只要 `ApprovalCardView` 上多出 `position`，`wisp panel-assets` 的 stdout 无论走①还是②都会带 `"position":0`。正确的说法是：**要么带 `omitempty`／指针形，要么接受诊断输出里多一枚 0**。⚠ 而 `omitempty` 在这一枚上恰好是安全的：`Position` 是 **1-based**（`internal/agent/approval/pending_read.go:44-45` 注释逐字 "the 1-based place in the FIFO"）⇒ 0 从来不是合法序号，被省略的只会是"根本没有队列"的那条路。这句是本腿写完 §2 之后回头推翻自己的，**如果编排者只信 §2 的第一版，就会把一个"选形决定契约"的差别读丢**。
+3. **§1.0 那句"approval 包零 json tag"只覆盖了包自身**，而序号真源是经 `LiveApproval.Decision`（`pending_read.go:48`）这枚**跨包类型**（`tools.Decision`）把卡面字段带出来的。补尺：`awk '/^type Decision struct/,/^}/' internal/tools/gate.go`（声明在 `internal/tools/gate.go:15`）里 `json:"` 计数＝**0** ⇒ `tools.Decision` 同样无 tag，§1.0 的结论（这一族今天不出向）不因跨包而松动。`internal/tools` 确有 json tag（`fs.go:114-115`、`fs_edit.go:52-58`、`fs_write.go:225-226` 等），但那些是**工具入参 schema**（模型侧），与面板出向不同一路。
+4. **§3.1 的两把尺读的是一张写在测试里的字面量表**（`composer_test.go:55-66`、`approval_test.go:113-121`）。⇒ 我 §3.2 表里"嵌套段 0 枚尺响"这一格**只对当前 HEAD 成立**：谁往 `pairs` 里补一行 `GitView`／`TaskRosterSection`，那一格立刻从 0 变 1，而这一改动**不需要动任何产码、不需要解冻任何冻结件**，所以它是本件里最容易过期的一格。
+5. **§3.3 那句"只有入向才受这份词表约束"可能被读成"出向永远不受"**。前一句对今天成立（registry 只有 4 型，`:1720-1726`）；但那把尺的注释 `:142` 明写"一个第二解码目标若不在 registry 里，AST 半就没被对账"⇒ 它是**会被补的**，不是设计成永不出向。我给 `position` 的"无交集"判读只覆盖那 24 枚判决词，不覆盖未来词表。
+6. **§4.2 的 `bg.Cancel` 是读码判读，没编译过**。我核了三个形参/返回类型：`RunAsync` 返回 `*RunningTask`（`internal/agent/loop.go:321`）、`Cancel()` 是 `*RunningTask` 的指针接收者方法（`:300`）⇒ `bg.Cancel` 作方法值合法、类型 `func()`；`AttachCancel` 第二形参正是 `cancel func()`（`internal/tools/task.go:420`），且 `:421-423` 自带 `cancel == nil` 防护。⛔ 但"能编过"是 Go 命令才给的读数，本腿禁跑 ⇒ 这一行我只签"形状对"，不签"编译过"。
+7. **§1.2 那枚"11 枚"是对 c2"14 枚"的更正，可能是口径差不是事实差**。我的口径＝"带 json tag 且真的发射出去的键"（尺：`grep -c "json:\"" internal/panel/*.go` ⇒ 七个产码文件分别 10/13/11/34/15/11/18，总 **112**，与本件 §1 全册逐枚相加一致）。c2 若把 `PumpSources` 的读口槽位或嵌套段的子键算进"字段"，14 也能自洽。**我只签我的口径下的 11**。
+8. **§2 的"必须新增"依赖票面 AC#3 的口径**（"Go 侧可读出口"）。若编排者改判"页面自数 `pending[]` 下标即算 AC#3"（167-a1 §3.1 那条替代），则**一枚键都不用加、Q-51 整个不必动**——那是裁定不是我的读数，本腿不替他选。
+9. **我把"看得见"与"按得下"切成两半，可能切错了缝**。c2 也这么切；但 `TaskRoster.Cancel`（`task.go:447`）的返回值 `(bool, string)` 同时带"能不能"与"为什么不能"，理论上"看得见"可以经由它而不必新增出向键。本腿没找到把 `(bool, string)` 递到快照的任何现装读口（`taskRosterState`，`cmd/wisp/panel_pump.go:146-200` 只读 `Look`/`Descendants`/`InFlightSubagents`，不调 `Cancel`——它也不该调，那是会动手的方法），所以维持两半切法，但**登记这一格是我读出来的、不是量出来的**。
 
-## 6. 量不到的地方
+## 6. 量不到的地方（具名）
 
-（取数中）
+1. **页面侧今天到底声明了哪几枚键**——`frontend/src/lib/panel.ts`（尺 A/B 的另一半输入）在两层禁令内，本腿**未读、未转述**。⇒ §3.2 那张格表给的是**尺的射程**（哪些结构体在册、哪把尺的 `pairs` 里有它），**不是"会不会红"的结论**：射程说"卡面加键落在尺 B 一次"，落不下来还得看那枚 interface 现在声明了什么。这一格**要 owner 或他委托的前端 agent 带问题去问他用的那枚前端 agent**——票派单里"⛔ 不许读 `frontend/**` 源码；如需要它的信息，写进量不到"点名的就是这一格。
+2. **两把尺今天的颜色**（在册红几枚）——判它要跑 `go test ./internal/panel`，⛔ 本腿一枚 Go 命令都没跑。167-c2 §5 枚 1 已把这条列为量不到并注"在册读数引用要带锚点、本轮不复量⇒当过期"；本腿维持，不复量、不引用旧锚当现数。⇒ 本腿所有"响/不响"只能与"红/绿"分开写，§3 全节按此口径。
+3. **`frontend/dist` 里有没有读 JSON 键的静态产物**——两层禁令覆盖 `frontend/**` 整棵（含 `dist`），本腿**没读、没列目录、没 grep**。本腿只从**仓外元数据**（`.gitignore:22-23`、`git ls-files -- frontend`＝85、`internal/panel/assets.go:63` 的注释）拿到三条布局事实并写进 §3.6：dist 被 ignore（留一枚 `.gitkeep` 锚给 `go:embed`）、页面**源码**才是在版本控制里的那 85 枚。**"dist 内容里有没有 JSON 键消费者"这一问的答案在 dist 文件里，不在 git 元数据里 ⇒ 量不到**。旁证一枚（可读范围内的 Go 尺）：`frontend_hygiene_test.go:290-292` 自己**跳过 `/dist/`**，`tools/d22scan` 的扫描面按 `main.go:23-24`/`:40` 的声明走——⇒ Go 侧仪器里没有一把以 dist 的键名为输入，但**这不等于 dist 里没有消费者**（WebView 读的正是 dist）。
+4. **`tools/d22scan` 那三族（ban #6／ban #8／emoji 面）今天扫不扫得到新键**——要跑 `sh scripts/d22scan.sh`，禁。§3.6 只写"扫描面声明里有 `frontend/`"这一条读自 `main.go` 的事实，**不写"会不会红"**。
+5. **`bg.Cancel` 那一行能否编过**——要跑 `go build ./cmd/wisp`，禁。§5 枚 6 已把签名逐枚核对（三处 file:line），但"编译过"与"能跑"是跑出来的，不是读出来的。
+6. **票面 AC#1 要求的"逐枚现量出口状态"里那三枚今天实不实现得了**——本件只答 Q-51 与停止的"看得见/按得下"缝，占用条（AC#2）的分子分母、草稿（AC#5）、崩溃自救（AC#6）三格**一枚未量**（归 167-c2 §1 与后续票），本腿不重复普查、也不替它们说"已量过"。
 
 ## 7. Q-51 的答案一句话
 
-（取数中）
+**必须新增**——不能复用任何现有键（`ApprovalCardView` 那 10 枚键里**零枚整数槽**，唯一在快照路线上恒空的 `callChain` 是 `[]string` 且被 `pump.go:84-86`／`panel_pump.go:50` 两处明文挡着不许填假话），而新增这一枚的冲突面是**一把尺、一次声明**（尺 B `approval_test.go:105`/`:118`，尺 A 的 `pairs` 里根本没有 `ApprovalCardView`），⛔ **不是 167-c2 写的两把**；凭据行＝`internal/panel/composer_test.go:55-66` 与 `internal/panel/approval_test.go:113-121` 那两张 `pairs` 字面量名册（本腿逐枚抄过）＋`internal/panel/approval.go:39-59` 的键册。
+**仍要 owner 答的那半**不是"撞不撞"（这一半已答：不撞键名、只撞尺 B 一次），而是"**谁有权在同一批里写页面那份声明**"——那一半的输入在 `frontend/**` 里，本腿两层禁令不许读（§6 枚 1）。
 
 ## 8. 交件判语
 
-（取数中）
+- **只读**：**起手**（§0，`3736f0dd`）`git status --porcelain cmd internal tools docs scripts`＝**空**。⚠ **交件时不再为空**，且**没有一行是本腿写的**：此刻五根上是 `M cmd/wisp/config_reload.go`／`M cmd/wisp/config_reload_223_test.go`／`M internal/tools/paths_shortname_252_r1_test.go`＋`?? cmd/wisp/config_readers_255.go`／`?? cmd/wisp/config_receipt_255_test.go`／`?? internal/config/tiers_app_255r2_test.go`——正是派单点名"在飞"的那三枚写腿（`cmd/wisp`／`internal/config`／`internal/tools`＋`internal/risk`）的工作面。
+  **本腿自己的面已逐枚核过**：`git show --name-only` 对 `bdbf2a08`/`bcce2b8a`/`e569a507`/`62ca6c34` 各发一次 ⇒ 四发**只含 `.scratch/wisp/probes/167/c3/census.md` 与同目录 `msgN.txt`**。
+  ⛔ 本腿未 `add -A`/`.`/`-a`，每发都是 `git add -- <两枚路径> && git commit -F <msg.txt> -- <同两枚路径>` 串成一条命令（索引共享期未带走别人的已 add 面）。
+- **零 Go 命令**：未跑 `go test`/`go build`/`go vet`/`go run`/`gofumpt`/`d22scan`/`staticcheck` 中的任何一枚。所有需要跑才能拿到的读数都具名进了 §6，⛔ 未用推测填空。
+- **未 push**：本腿共 5 枚 commit——骨架＋§0 `bdbf2a08` · §1 `bcce2b8a` · §2 `e569a507` · §3＋§4 `62ca6c34` · §3.6＋§5＋§6＋§7＋§8＋两处自我更正＝含本节的末枚。`git show --name-only` 逐枚核过：前四发各只含 `census.md`＋同目录一枚 `msgN.txt`。**全部只在本地**，本腿无一次 `git push`。
+- **AC 框一枚未碰**：`git status --porcelain .scratch/wisp/issues` 交件读数＝`M 244-…`＋`?? 259-…`（**都是他程**），**167 那枚票面不在其中**；本腿 pathspec 自始至终只含 `.scratch/wisp/probes/167/c3/**`（逐枚核过，见上一条）。
+- **禁区**：`frontend/**`（含 `dist`）与 `design/**` **未读、未在正文转述内容**；本件出现的只有仓库元数据（`.gitignore` 行、`git ls-files` 计数）与 Go 侧尺体里指向它们的路径字符串。冻结件（`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`／`.github/workflows/ci.yml`）一字未动，其中 `l2_grant_boundary_test.go` 本腿**只读尺体**（`:1720-1726`、`:1779`、`:1807`、`:1878-1906`）。
+- **临时件只建不删**：`.scratch/wisp/probes/167/c3/` 下 `census.md`＋`msg1..msg5.txt` 五枚消息件全部留存，无删除动作。
+- **给下一程的一句话**：本件 §3.2 那张格表是"按落点算尺"的，不是"按尺算落点"的——**分子分母照旧归编排者后裁**（编排者在 167-c2 收档时的裁定有效），本腿只把 Q-51 从"没人量过"改成"量过、且成本是一枚 interface 不是一棵前端树"。

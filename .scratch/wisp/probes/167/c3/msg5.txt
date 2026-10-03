@@ -1,0 +1,9 @@
+probe(167-c3)：交件——§3.6＋§5＋§6＋§7＋§8 填满，占位符清零（251 行）。
+
+Q-51 的答案：必须新增（不复用）。凭据＝卡面 ApprovalCardView 十枚键零枚整数槽（approval.go:39-59）、唯一"快照路线恒空"的 callChain 是 []string 且被 pump.go:84-86 与 panel_pump.go:50 两处明文挡着；冲突面＝一把尺一次声明（尺 B approval_test.go:105/:118；尺 A 的 pairs 里没有 ApprovalCardView）——**推翻 167-c2 "两把尺并列"的判读**。owner 那半只剩"谁有权同批写页面声明"。
+
+四处自我对抗更正：①§2.2 原写"走②则 CLI 那枚键压根不发"不成立——encoding/json 对无 omitempty 的 int 恒发 0，副作用与选形无关、只与 tag 写法有关，而 Position 是 1-based（pending_read.go:44-45）故 omitempty 恰好安全；②ComposerState 十一枚非 c2 的十四枚；③"两把尺全仓唯一"补了一把尺（cmd/wisp 零命中 panel.ts，d22scan 那四处是 TempDir 合成 fixture）；④§3.6 一节错位插到 §4 之后，已搬回。
+
+新量：全仓双向对账尺只有两把且 pairs 名册不同（尺 A 六型／尺 B 三型），GitView/InstructionsSection/TaskRosterSection 一族在射程之外（＝A395"嵌子格"裁度的机制）；在册盲区 pump.go:47-49（无 tag 字段两把尺全盲而线上多一枚 PascalCase 键）；停止那半最少一行＝run.go:1105 后补 AttachCancel(bg.ID, bg.Cancel)，但它买到的是"按得下去的前提"买不到"看得见"（TaskRoster 十三枚导出方法无"能不能停"谓词、TaskRowView 十二枚键无 cancellable 位、根行 statusKnown 被票 196/A394 占）。
+
+零 Go 命令（未跑 test/build/vet/run/gofumpt/d22scan/staticcheck）；frontend 与 design 未读未转述（只取 .gitignore 与 git ls-files 的布局元数据）；冻结件只读尺体；AC 框未碰；本腿四发 commit 的 name-only 逐枚核过＝只含 probes/167/c3/**；未 push。
