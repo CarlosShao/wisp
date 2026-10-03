@@ -1,0 +1,1496 @@
+.scratch/wisp/probes/151-accept/accept151_control_test.go:5:// The E2E case (accept151_e2e_test.go) got a REAL model-initiated fs.read all
+.scratch/wisp/probes/151-accept/accept151_control_test.go:10://	internal/tools/fs.go:298      FSReadDecl -> Declared: risk.L0
+.scratch/wisp/probes/151-accept/accept151_control_test.go:11://	internal/tools/bridge.go:224  ToolInfo.RiskLevel = levelString(e.Decl.Declared)
+.scratch/wisp/probes/151-accept/accept151_control_test.go:12://	internal/agent/loop.go:776-789  decideRisk: only L1/L2 pass the switch; the
+.scratch/wisp/probes/151-accept/accept151_control_test.go:15://	                              cmd/wisp/run.go:588-595 never sets it.
+.scratch/wisp/probes/151-accept/accept151_control_test.go:38:// once the data dir is known), points a real config.toml at it and drives the
+.scratch/wisp/probes/151-accept/accept151_control_test.go:136:	// row when a call really reaches it (cmd/wisp/run.go:578-581 leaves
+.scratch/wisp/probes/151-accept/accept151_e2e_test.go:15:// points config.toml at it, and drives the real composition root. If the
+.scratch/wisp/probes/151-accept/bridge.shipped.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/151-accept/bridge.shipped.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/151-accept/bridge.shipped.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/151-accept/bridge.shipped.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/151-accept/bridge.shipped.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/151-accept/bridge.shipped.go:644:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/151-accept/bridge.shipped.go:674:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/151-accept/bridge.shipped.go:712:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/151-accept/bridge.shipped.go:803:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/151-accept/run.shipped.go:25:// file's current shape: the permission mode is READ from config.toml here and
+.scratch/wisp/probes/151-accept/run.shipped.go:93:// it with the real Windows implementation in notify_windows.go.
+.scratch/wisp/probes/151-accept/run.shipped.go:104:	// dataDir is the env's data root (config.toml, secrets\, memory.db).
+.scratch/wisp/probes/151-accept/run.shipped.go:159:			// to answer "." and write its logs, config.toml and DPAPI store
+.scratch/wisp/probes/151-accept/run.shipped.go:194:		// wisp.db holds the per-session file open after the process is gone.
+.scratch/wisp/probes/151-accept/run.shipped.go:234:	// see panel_pump.go for what its exit is and what it deliberately is not.
+.scratch/wisp/probes/151-accept/run.shipped.go:371:	// boot learned to read config.toml (PLAN.md:1640, pinned by AC#2(c)).
+.scratch/wisp/probes/151-accept/run.shipped.go:419:	// still open. panel_pump.go states the whole rule.
+.scratch/wisp/probes/151-accept/run.shipped.go:531://     the rolling JSONL file under <data>\logs (see logsink.go) - so the
+.scratch/wisp/probes/151-accept/run.shipped.go:543:// defers (internal/agent/loop.go:366). The revocation now also closes the
+.scratch/wisp/probes/151-accept/run.shipped.go:763:		// (panel.ResultChunk, composer.go:51-56); the reasoning field is
+.scratch/wisp/probes/151/bridge.head.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/151/bridge.head.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/151/bridge.head.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/151/bridge.head.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/151/bridge.head.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/151/bridge.head.go:661:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/151/bridge.head.go:699:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/151/bridge.head.go:790:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/151/run.head.go:25:// file's current shape: the permission mode is READ from config.toml here and
+.scratch/wisp/probes/151/run.head.go:93:// it with the real Windows implementation in notify_windows.go.
+.scratch/wisp/probes/151/run.head.go:104:	// dataDir is the env's data root (config.toml, secrets\, memory.db).
+.scratch/wisp/probes/151/run.head.go:159:			// to answer "." and write its logs, config.toml and DPAPI store
+.scratch/wisp/probes/151/run.head.go:194:		// wisp.db holds the per-session file open after the process is gone.
+.scratch/wisp/probes/151/run.head.go:234:	// see panel_pump.go for what its exit is and what it deliberately is not.
+.scratch/wisp/probes/151/run.head.go:371:	// boot learned to read config.toml (PLAN.md:1640, pinned by AC#2(c)).
+.scratch/wisp/probes/151/run.head.go:419:	// still open. panel_pump.go states the whole rule.
+.scratch/wisp/probes/151/run.head.go:531://     the rolling JSONL file under <data>\logs (see logsink.go) - so the
+.scratch/wisp/probes/151/run.head.go:735:		// (panel.ResultChunk, composer.go:51-56); the reasoning field is
+.scratch/wisp/probes/151/run.mut-noclose.go:25:// file's current shape: the permission mode is READ from config.toml here and
+.scratch/wisp/probes/151/run.mut-noclose.go:93:// it with the real Windows implementation in notify_windows.go.
+.scratch/wisp/probes/151/run.mut-noclose.go:104:	// dataDir is the env's data root (config.toml, secrets\, memory.db).
+.scratch/wisp/probes/151/run.mut-noclose.go:159:			// to answer "." and write its logs, config.toml and DPAPI store
+.scratch/wisp/probes/151/run.mut-noclose.go:194:		// wisp.db holds the per-session file open after the process is gone.
+.scratch/wisp/probes/151/run.mut-noclose.go:234:	// see panel_pump.go for what its exit is and what it deliberately is not.
+.scratch/wisp/probes/151/run.mut-noclose.go:371:	// boot learned to read config.toml (PLAN.md:1640, pinned by AC#2(c)).
+.scratch/wisp/probes/151/run.mut-noclose.go:419:	// still open. panel_pump.go states the whole rule.
+.scratch/wisp/probes/151/run.mut-noclose.go:531://     the rolling JSONL file under <data>\logs (see logsink.go) - so the
+.scratch/wisp/probes/151/run.mut-noclose.go:543:// defers (internal/agent/loop.go:366). The revocation now also closes the
+.scratch/wisp/probes/151/run.mut-noclose.go:762:		// (panel.ResultChunk, composer.go:51-56); the reasoning field is
+.scratch/wisp/probes/152/zz152bprobe_windows_test.go:7:// waitReady() (slo_windows.go:514-529) asks the very same s.exited() before
+.scratch/wisp/probes/152/zz152probe_windows_test.go:7:// cmd/wisp/zz152probe_windows_test.go, so no probe byte ever lands in the tree.
+.scratch/wisp/probes/152/zz152probe_windows_test.go:12://	case 13 of slo_report_144_windows_test.go reaches the loop's s.exited()
+.scratch/wisp/probes/155-accept/30-zzaccept155-parsed-ondisk_test.go:53:	// leg 3 - the production leg: a real Loop.Run; only loop.go hands the id over.
+.scratch/wisp/probes/156-accept/anchor/slo_exit_os_156_test.go:28:// 4-14 of slo_report_144_windows_test.go hand it literal parameters for the same
+.scratch/wisp/probes/156-accept/anchor/slo_exit_os_156_test.go:31:// ticket 152's second outlet (slo_windows.go:520, now :522) never produced.
+.scratch/wisp/probes/156-accept/anchor/slo_exit_os_156_test.go:34:// .scratch/wisp/probes/156/zz156probe_windows_test.go), so no cmd.exe or ping.exe
+.scratch/wisp/probes/156-accept/anchor/slo_exit_os_156_test.go:92:// ruler says so out loud (my156.py has no cell that renames this test).
+.scratch/wisp/probes/156-accept/anchor/slo_exit_os_156_test.go:96:// rc=1, FAIL=2, red = cases 17 and 18, with slo_windows.go at the SHIPPED bytes.
+.scratch/wisp/probes/156-accept/anchor/slo_exit_os_156_test.go:263:// slo_windows.go:520 is the other caller of the same predicate, and ticket 152's
+.scratch/wisp/probes/156-accept/anchor/slo_exit_os_156_test.go:394:	// asymmetry slo_windows.go's queryProcess side-steps by only ever comparing
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:12:// see scripts/wisp-cli-tests.sh for why `go test ./cmd/wisp/` cannot even start
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:371:// docs/evidence/s1/147-offset-naming-r1.md). Nothing here waits on wall-clock
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:525:// Ticket 147's acceptance run (docs/evidence/s1/147-offset-naming-r1-accept-r1.md
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:746:// SKIP=0 - probes/156/my156-r2.py cell r2-152g1-case14off, log
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:754:// case 14's claim read 21/14/0 at slo_report_144_windows_test.go:739, measured
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:768:// choice in docs/evidence/s1/156-exited-asks-os-r1.md, AC#4 section.
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:770:// 与 mut-shipped/" at docs/evidence/s1/152-subject-death-never-measured-r1.md:380
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:851:// docs/evidence/s1/152-...-accept-r1.md §2.2; the line is verbatim from
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:852:// `git show 10e3585 -- cmd/wisp/slo_report_144_windows_test.go`, the one `^-//`
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:863://     cmd/wisp/slo_report_144_windows_test.go | grep '^-//' yields 1 hit, and the
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:867://   - the record of the deletion is docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md,
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:869://     The elided form of that path, "152-...-accept-r1.md" at line 851 above, is
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:875:// the last reading stopped" at cmd/wisp/slo_report_144_windows_test.go:835 puts no
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:30:// This subcommand is the seam scripts/slo-check.ps1 (and CI) drive: it boots
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:36:// WHO MEASURES WHOM (ticket 66 / docs/SLO.md registry A15, orchestrator
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:49:// Measurement protocol (docs/SLO.md §7, the spike's own methodology): after
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:55:// observe/thresholds.go.
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:113:	// docs/SLO.md §7 already flagged for the spike.
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:185:// (observe.InitLog, slo_windows.go) rather than going through installLogSink,
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:192:// enumeration gate in leg_sink_gate_131_test.go reads this function's own doc
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:200:// this package: its driver is scripts/slo-check.ps1 and the CI SLO jobs, which
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:346://     skeleton, apply the SLO.md §7 settle protocol, then sit still). The
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:432:	// Inside the tree: demote the CPU row to a record (observe/thresholds.go
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:707:// os.WriteFile (slo_windows.go, writeSLO): the whole JSON document is produced
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:967:	// not startup residue (same SLO.md §7 protocol).
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go:1021:// settleBeforeSample applies the SLO.md §7 measurement protocol: GC twice,
+.scratch/wisp/probes/156/zz156probe_windows_test.go:7:// to `go test -overlay` as cmd/wisp/zz156probe_windows_test.go, so no probe byte
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:648:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:663:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:665:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:668:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:669:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:703:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:741:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:832:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:648:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:663:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:665:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:668:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:669:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:703:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:741:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:832:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:647:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:662:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:664:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:667:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:668:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:702:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:740:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:831:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:647:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:662:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:664:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:667:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:668:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:702:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:740:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:831:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:648:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:663:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:665:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:668:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:669:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:703:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:741:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:832:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:648:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:663:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:665:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:668:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:669:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:703:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:741:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:832:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:648:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:663:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:665:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:668:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:669:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:703:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:741:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:832:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/accept-r1/mut/guard.as-is.go:5:// 来路：票 154 非实现者验收表 D-6 记的正控 P-2 —— 摘掉 bridge.go 里 mark() 的那一发
+.scratch/wisp/probes/158/accept-r1/mut/guard.as-is.go:7:// （cmd/wisp/task_scope_close_151_test.go）。也就是说这件事唯一的守卫长在**另一个包**里，
+.scratch/wisp/probes/158/accept-r1/mut/guard.as-is.go:20:// 从没 OpenScope 的 scope 被 Mark 之后同样会在表上出现并带着污点（provenance.go:394，
+.scratch/wisp/probes/158/accept-r1/mut/guard.as-is.go:22:// "Mark 之后 ScopeTaints 非空"这把尺**量不出 OpenTask 在不在**——本包 fs_test.go:35 正是
+.scratch/wisp/probes/158/accept-r1/mut/guard.as-is.go:45:// the shape this package already uses for its own seams (fs_test.go:72).
+.scratch/wisp/probes/158/accept-r1/mut/guard.no1.go:5:// 来路：票 154 非实现者验收表 D-6 记的正控 P-2 —— 摘掉 bridge.go 里 mark() 的那一发
+.scratch/wisp/probes/158/accept-r1/mut/guard.no1.go:7:// （cmd/wisp/task_scope_close_151_test.go）。也就是说这件事唯一的守卫长在**另一个包**里，
+.scratch/wisp/probes/158/accept-r1/mut/guard.no1.go:20:// 从没 OpenScope 的 scope 被 Mark 之后同样会在表上出现并带着污点（provenance.go:394，
+.scratch/wisp/probes/158/accept-r1/mut/guard.no1.go:22:// "Mark 之后 ScopeTaints 非空"这把尺**量不出 OpenTask 在不在**——本包 fs_test.go:35 正是
+.scratch/wisp/probes/158/accept-r1/mut/guard.no1.go:45:// the shape this package already uses for its own seams (fs_test.go:72).
+.scratch/wisp/probes/158/accept-r1/mut/guard.no2.go:5:// 来路：票 154 非实现者验收表 D-6 记的正控 P-2 —— 摘掉 bridge.go 里 mark() 的那一发
+.scratch/wisp/probes/158/accept-r1/mut/guard.no2.go:7:// （cmd/wisp/task_scope_close_151_test.go）。也就是说这件事唯一的守卫长在**另一个包**里，
+.scratch/wisp/probes/158/accept-r1/mut/guard.no2.go:20:// 从没 OpenScope 的 scope 被 Mark 之后同样会在表上出现并带着污点（provenance.go:394，
+.scratch/wisp/probes/158/accept-r1/mut/guard.no2.go:22:// "Mark 之后 ScopeTaints 非空"这把尺**量不出 OpenTask 在不在**——本包 fs_test.go:35 正是
+.scratch/wisp/probes/158/accept-r1/mut/guard.no2.go:45:// the shape this package already uses for its own seams (fs_test.go:72).
+.scratch/wisp/probes/158/accept-r1/mut/guard.no3.go:5:// 来路：票 154 非实现者验收表 D-6 记的正控 P-2 —— 摘掉 bridge.go 里 mark() 的那一发
+.scratch/wisp/probes/158/accept-r1/mut/guard.no3.go:7:// （cmd/wisp/task_scope_close_151_test.go）。也就是说这件事唯一的守卫长在**另一个包**里，
+.scratch/wisp/probes/158/accept-r1/mut/guard.no3.go:20:// 从没 OpenScope 的 scope 被 Mark 之后同样会在表上出现并带着污点（provenance.go:394，
+.scratch/wisp/probes/158/accept-r1/mut/guard.no3.go:22:// "Mark 之后 ScopeTaints 非空"这把尺**量不出 OpenTask 在不在**——本包 fs_test.go:35 正是
+.scratch/wisp/probes/158/accept-r1/mut/guard.no3.go:45:// the shape this package already uses for its own seams (fs_test.go:72).
+.scratch/wisp/probes/158/mut/bridge.canary.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/mut/bridge.canary.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/mut/bridge.canary.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/mut/bridge.canary.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/mut/bridge.canary.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/mut/bridge.canary.go:648:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/mut/bridge.canary.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/mut/bridge.canary.go:663:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/mut/bridge.canary.go:665:// happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses
+.scratch/wisp/probes/158/mut/bridge.canary.go:699:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/mut/bridge.canary.go:737:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/mut/bridge.canary.go:828:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:647:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:662:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:664:// happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:698:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:736:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/mut/bridge.noopentask.go:827:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:648:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:663:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:665:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:668:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:669:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:703:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:741:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:832:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:647:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:662:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:664:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:667:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:668:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:702:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:740:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:831:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/160/c1/shape160.go:110:	// cmd/wisp/panel_assets.go's leg (a CLI probe that owns no task scope).
+.scratch/wisp/probes/160/r1/ac1-closebyid/closebyid.go:3:// internal/tools/bridge.go:695 uses today.
+.scratch/wisp/probes/160/r1/ac1/ac1open.go:3:// shape160.go, which re-implemented both candidate shapes instead of importing
+.scratch/wisp/probes/160/r1/ac1/ac1open.go:6:// The shape is copied from cmd/wisp/panel_assets.go's detector(): build a
+.scratch/wisp/probes/160/r1/mut/provenance.no-identity.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/160/r1/mut/provenance.no-identity.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/160/r1/mut/provenance.no-identity.go:256:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/160/r1/mut/provenance.no-identity.go:367:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/160/r1/mut/provenance.no-identity.go:370:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/160/r1/mut/provenance.no-identity.go:635:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/160/v1/mut/base-provenance.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/160/v1/mut/base-provenance.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/160/v1/mut/base-provenance.go:256:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/160/v1/mut/base-provenance.go:367:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/160/v1/mut/base-provenance.go:370:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/160/v1/mut/base-provenance.go:636:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/160/v1/mut/provenance.m1-idem-split-off.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/160/v1/mut/provenance.m1-idem-split-off.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/160/v1/mut/provenance.m1-idem-split-off.go:256:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/160/v1/mut/provenance.m1-idem-split-off.go:367:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/160/v1/mut/provenance.m1-idem-split-off.go:370:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/160/v1/mut/provenance.m1-idem-split-off.go:636:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/160/v1/mut/provenance.m2-accept-foreign.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/160/v1/mut/provenance.m2-accept-foreign.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/160/v1/mut/provenance.m2-accept-foreign.go:256:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/160/v1/mut/provenance.m2-accept-foreign.go:367:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/160/v1/mut/provenance.m2-accept-foreign.go:370:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/160/v1/mut/provenance.m2-accept-foreign.go:636:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/160/v1/mut/provenance.m3-nilguard-off.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/160/v1/mut/provenance.m3-nilguard-off.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/160/v1/mut/provenance.m3-nilguard-off.go:256:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/160/v1/mut/provenance.m3-nilguard-off.go:367:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/160/v1/mut/provenance.m3-nilguard-off.go:370:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/160/v1/mut/provenance.m3-nilguard-off.go:636:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-baregoroutine-ring1.go:4:// live in selftest.go; this file is the samples, so that the one edit AC#4 asks
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-baregoroutine-ring1.go:9:// from the 27 measurements in docs/evidence/s1/161-gate-blindspot-r1.md §3 (the
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-baregoroutine-ring1.go:24:// (main.go:161-163), and their cases below pin that gap rather than wish it away.
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-baregoroutine-ring1.go:187:		src:     "package probe\n\nconst mirrorSHA256URL = \"https://mirror.example/file.sha256\"\n",
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-mirror-ring.go:4:// live in selftest.go; this file is the samples, so that the one edit AC#4 asks
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-mirror-ring.go:9:// from the 27 measurements in docs/evidence/s1/161-gate-blindspot-r1.md §3 (the
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-mirror-ring.go:24:// (main.go:161-163), and their cases below pin that gap rather than wish it away.
+.scratch/wisp/probes/162/r3/mut/base/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/r3/mut/base/fs_edit.go:21:// claim on unmodified code (internal/tools/fswrite_silentloss_ac1_test.go) -
+.scratch/wisp/probes/162/r3/mut/base/fs_edit.go:224:	// atomic rename (PLAN.md 的那条工程要求；票面 判据形状 6 明令不许照抄上游
+.scratch/wisp/probes/162/r3/mut/base/fs_edit.go:256:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/r3/mut/m3/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/r3/mut/m3/fs_edit.go:21:// claim on unmodified code (internal/tools/fswrite_silentloss_ac1_test.go) -
+.scratch/wisp/probes/162/r3/mut/m3/fs_edit.go:269:	// atomic rename (PLAN.md 的那条工程要求；票面 判据形状 6 明令不许照抄上游
+.scratch/wisp/probes/162/r3/mut/m3/fs_edit.go:382:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/r3/mut/m4/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/r3/mut/m4/fs_edit.go:21:// claim on unmodified code (internal/tools/fswrite_silentloss_ac1_test.go) -
+.scratch/wisp/probes/162/r3/mut/m4/fs_edit.go:269:	// atomic rename (PLAN.md 的那条工程要求；票面 判据形状 6 明令不许照抄上游
+.scratch/wisp/probes/162/r3/mut/m4/fs_edit.go:395:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/mut/m1/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v1/mut/m1/fs_edit.go:21:// claim on unmodified code (internal/tools/fswrite_silentloss_ac1_test.go) -
+.scratch/wisp/probes/162/v1/mut/m1/fs_edit.go:222:	// atomic rename (PLAN.md 的那条工程要求；票面 判据形状 6 明令不许照抄上游
+.scratch/wisp/probes/162/v1/mut/m1/fs_edit.go:254:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/mut/m2/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v1/mut/m2/fs_edit.go:21:// claim on unmodified code (internal/tools/fswrite_silentloss_ac1_test.go) -
+.scratch/wisp/probes/162/v1/mut/m2/fs_edit.go:224:	// atomic rename (PLAN.md 的那条工程要求；票面 判据形状 6 明令不许照抄上游
+.scratch/wisp/probes/162/v1/mut/m2/fs_edit.go:256:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/mut/m3/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v1/mut/m3/fs_edit.go:21:// claim on unmodified code (internal/tools/fswrite_silentloss_ac1_test.go) -
+.scratch/wisp/probes/162/v1/mut/m3/fs_edit.go:224:	// atomic rename (PLAN.md 的那条工程要求；票面 判据形状 6 明令不许照抄上游
+.scratch/wisp/probes/162/v1/mut/m3/fs_edit.go:256:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/mut/m4/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v1/mut/m4/fs_edit.go:21:// claim on unmodified code (internal/tools/fswrite_silentloss_ac1_test.go) -
+.scratch/wisp/probes/162/v1/mut/m4/fs_edit.go:224:	// atomic rename (PLAN.md 的那条工程要求；票面 判据形状 6 明令不许照抄上游
+.scratch/wisp/probes/162/v1/mut/m4/fs_edit.go:269:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/probe162v1_ac13_test.go:110:	mustStartTask(t, store, "task-1") // req() books under this fixed task id (bridge_test.go:147)
+.scratch/wisp/probes/162/v2/mut/t1/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v2/mut/t1/fs_edit.go:21:// claim on unmodified code (internal/tools/fswrite_silentloss_ac1_test.go) -
+.scratch/wisp/probes/162/v2/mut/t1/fs_edit.go:269:	// atomic rename (PLAN.md 的那条工程要求；票面 判据形状 6 明令不许照抄上游
+.scratch/wisp/probes/162/v2/mut/t1/fs_edit.go:382:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/163/a1/main.go:2://  1. 真注册表（照 cmd/wisp/run.go 的组合形状）里 shell.exec / shell.session 在不在；
+.scratch/wisp/probes/163/a1/main.go:5:// logdir 由旗标传入，调用方（gotest.sh）取脚本自身目录，不继承 CWD。
+.scratch/wisp/probes/163/a1/main.go:41:	// ---- 发 1：真注册表，形状照 cmd/wisp/run.go:333-366 ----
+.scratch/wisp/probes/174/c1/zz174c1_windows_test.go:10://	dir 1: default config (allowed_dirs = [], exactly the run.go:327-331
+.scratch/wisp/probes/174/c1/zz174c1_windows_test.go:11://	       shape) - a REAL spill lands in <dataDir>\artifacts (run.go:609
+.scratch/wisp/probes/174/c1/zz174c1_windows_test.go:18://	       stay silent (branch = task.go:227, `rec.ArtifactPath != ""`,
+.scratch/wisp/probes/174/c1/zz174c1_windows_test.go:72:	pc := tools.NewPathCanonicalizer(allowed, nil) // same call as run.go:331
+.scratch/wisp/probes/174/c1/zz174c1_windows_test.go:136:	artifacts = filepath.Join(dataDir, "artifacts") // run.go:609 shape, verbatim join
+.scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go:4:// It compiles into package tools through `go test -overlay` (see overlay.json
+.scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go:9:// cmd/wisp/run.go. This probe therefore builds BOTH arms side by side:
+.scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go:11://	before = tools.TaskDeps{Roster: roster}            (what run.go wires today)
+.scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go:89:	artifacts = filepath.Join(dataDir, "artifacts") // cmd/wisp/run.go:612 shape
+.scratch/wisp/probes/174/r1/zz174r1_before_windows_test.go:8:// and nothing else, i.e. what cmd/wisp/run.go:362 builds today - so the
+.scratch/wisp/probes/174/r1/zz174r1_before_windows_test.go:14://	          the allowlist is the default empty list (run.go:327-331 shape).
+.scratch/wisp/probes/174/r1/zz174r1_before_windows_test.go:25:// zz174r1_after_windows_test.go, which additionally wires a path judge.
+.scratch/wisp/probes/174/r1/zz174r1_before_windows_test.go:151:	// A REAL spill under <dataDir>\artifacts (run.go:609 shape).
+.scratch/wisp/probes/174/r1/zz174r1_windows_test.go:6:// readings in zz174r1_before_windows_test.go stay reproducible on the pre-fix
+.scratch/wisp/probes/174/r1/zz174r1_windows_test.go:21:// (TaskDeps with no judge = what cmd/wisp/run.go:362 wires today).
+.scratch/wisp/probes/174/r1/zz174r1_windows_test.go:47:	artifacts := filepath.Join(dataDir, "artifacts") // run.go:609 shape
+.scratch/wisp/probes/174/r1/zz174r1_windows_test.go:91:	// A-outside: default allowlist (empty), exactly run.go:327-331.
+.scratch/wisp/probes/174/r2/mut/task-M1.go:20://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/174/r2/mut/task-M1.go:21://	task.cancel  -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/174/r2/mut/task-M1.go:53:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/174/r2/mut/task-M1.go:162:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/174/r2/mut/task-M1.go:172:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/174/r2/mut/task-M1.go:195://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/174/r2/mut/task-M1.go:238:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/174/r2/mut/task-M1.go:251:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/174/r2/mut/task-M1.go:273:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/174/r2/mut/task-M1.go:275:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/174/r2/mut/task-M1.go:348:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/174/r2/mut/task-M2.go:20://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/174/r2/mut/task-M2.go:21://	task.cancel  -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/174/r2/mut/task-M2.go:53:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/174/r2/mut/task-M2.go:162:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/174/r2/mut/task-M2.go:172:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/174/r2/mut/task-M2.go:195://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/174/r2/mut/task-M2.go:238:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/174/r2/mut/task-M2.go:251:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/174/r2/mut/task-M2.go:273:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/174/r2/mut/task-M2.go:275:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/174/r2/mut/task-M2.go:350:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/174/v1/zz174v1_pos_windows_test.go:3:// overlay.json next to it), so internal/tools/ stays byte-clean.
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:552:// sources. The roster in internal/risk/provenance.go is an illustrative list of
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:555:// provenance.go:489-491, pinned by internal/risk/provenance_test.go), so the
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:557:// in docs/evidence/s1/175-c25-marking-roster-scope-c1.md (branch A).
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:560:// task printed" (D34 row PLAN.md:2564): the bytes came from outside the model,
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:668:// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:669:// that, not the compiler (measured, 160-handle-r1.md §3).
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:684:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:694:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:699:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:701:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:704:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:705:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:745:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:783:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:874:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:637:// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:638:// that, not the compiler (measured, 160-handle-r1.md §3).
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:653:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:663:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:668:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:670:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:673:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:674:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:714:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:752:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:843:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/175/r2/bak1-bridge.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/175/r2/bak1-bridge.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/175/r2/bak1-bridge.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/175/r2/bak1-bridge.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+.scratch/wisp/probes/175/r2/bak1-bridge.go:234:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/175/r2/bak1-bridge.go:563:// in internal/tools/ticket175r2_stamp_live_test.go.
+.scratch/wisp/probes/175/r2/bak1-bridge.go:598:// result (context built by a test or another caller, not by Bridge.execute)
+.scratch/wisp/probes/175/r2/bak1-bridge.go:695:// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+.scratch/wisp/probes/175/r2/bak1-bridge.go:696:// that, not the compiler (measured, 160-handle-r1.md §3).
+.scratch/wisp/probes/175/r2/bak1-bridge.go:711:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/175/r2/bak1-bridge.go:721:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/175/r2/bak1-bridge.go:726:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/175/r2/bak1-bridge.go:728:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/175/r2/bak1-bridge.go:731:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/175/r2/bak1-bridge.go:732:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/175/r2/bak1-bridge.go:772:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/175/r2/bak1-bridge.go:810:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/175/r2/bak1-bridge.go:901:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/175/r2/bak1-provenance.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/175/r2/bak1-provenance.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/175/r2/bak1-provenance.go:260:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/175/r2/bak1-provenance.go:371:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/175/r2/bak1-provenance.go:374:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/175/r2/bak1-provenance.go:683:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/175/r2/bak1-task.go:20://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/175/r2/bak1-task.go:21://	task.cancel  -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/175/r2/bak1-task.go:53:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/175/r2/bak1-task.go:162:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/175/r2/bak1-task.go:172:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/175/r2/bak1-task.go:195://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/175/r2/bak1-task.go:238:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/175/r2/bak1-task.go:251:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/175/r2/bak1-task.go:273:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/175/r2/bak1-task.go:275:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/175/r2/bak1-task.go:347:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:11:// (Loop.RunAsync, loop.go:321) with zero production call sites, so
+.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:19://     (task.go's own comment states that verbatim, and D15(3) documents the same
+.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:25://     probes/154/gate-clauses.sh). Everything here runs on already-exported
+.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:31:// its own spawned task in the D38 roster (loop.go:324,
+.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:35:// is derived from whatever key it is handed (agent.spill.go artifactName), and
+.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:39:// same name land on the same file, where spill.go:117-131 documents
+.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:68:// quiet. Stopped is the existing tools helper (cancel.go:74): the task's ctx is
+.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:71:// terminal journal write at loop.go:956-958 is built, and the one legitimate
+.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:11:// (Loop.RunAsync, loop.go:321) with zero production call sites, so
+.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:19://     (task.go's own comment states that verbatim, and D15(3) documents the same
+.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:25://     probes/154/gate-clauses.sh). Everything here runs on already-exported
+.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:31:// its own spawned task in the D38 roster (loop.go:324,
+.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:35:// is derived from whatever key it is handed (agent.spill.go artifactName), and
+.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:39:// same name land on the same file, where spill.go:117-131 documents
+.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:68:// quiet. Stopped is the existing tools helper (cancel.go:74): the task's ctx is
+.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:71:// terminal journal write at loop.go:956-958 is built, and the one legitimate
+.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:11:// (Loop.RunAsync, loop.go:321) with zero production call sites, so
+.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:19://     (task.go's own comment states that verbatim, and D15(3) documents the same
+.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:25://     probes/154/gate-clauses.sh). Everything here runs on already-exported
+.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:31:// its own spawned task in the D38 roster (loop.go:324,
+.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:35:// is derived from whatever key it is handed (agent.spill.go artifactName), and
+.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:39:// same name land on the same file, where spill.go:117-131 documents
+.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:68:// quiet. Stopped is the existing tools helper (cancel.go:74): the task's ctx is
+.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:71:// terminal journal write at loop.go:956-958 is built, and the one legitimate
+.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:11:// (Loop.RunAsync, loop.go:321) with zero production call sites, so
+.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:19://     (task.go's own comment states that verbatim, and D15(3) documents the same
+.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:25://     probes/154/gate-clauses.sh). Everything here runs on already-exported
+.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:31:// its own spawned task in the D38 roster (loop.go:324,
+.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:35:// is derived from whatever key it is handed (agent.spill.go artifactName), and
+.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:39:// same name land on the same file, where spill.go:117-131 documents
+.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:68:// quiet. Stopped is the existing tools helper (cancel.go:74): the task's ctx is
+.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:71:// terminal journal write at loop.go:956-958 is built, and the one legitimate
+.scratch/wisp/probes/176/r1/zz176r1_e2e_test.go:26:// `go test -overlay` from .scratch/wisp/probes/176/r1/overlay-e2e.json, and it
+.scratch/wisp/probes/179/r1/zz179r1_e2e_test.go:23:// `go test -overlay=.scratch/wisp/probes/179/r1/overlay-e2e.json`, readings
+.scratch/wisp/probes/179/r2/zz179r2_e2e_test.go:11:// (internal/agent/loop.go:715 -> toolResultMessage(c.ID, ...)). That is why its
+.scratch/wisp/probes/179/r2/zz179r2_e2e_test.go:21:// `go test -overlay=.scratch/wisp/probes/179/r2/overlay-e2e.json`; readings land
+.scratch/wisp/probes/179/r2/zz179r2_e2e_test.go:471:// runtime.Caller reports the VIRTUAL path (cmd/wisp/zz179r2_e2e_test.go), which
+.scratch/wisp/probes/183/a1/mut/loop.go:739:		// timed-out call as an error (tools.go:82-85), and returning it here
+.scratch/wisp/probes/183/a1/mut/loop.go:768://     (docs/PLAN.md:127-129) fixes that tier as "只读，无副作用 - 直接执行，
+.scratch/wisp/probes/183/a1/mut/loop.go:833:// the golden level (testdata/golden/max-tokens-toolcall.sse). The return value
+.scratch/wisp/probes/183/a1/mut/provenance.go:49://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/183/a1/mut/provenance.go:90:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/183/a1/mut/provenance.go:278:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/183/a1/mut/provenance.go:389:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/183/a1/mut/provenance.go:392:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/183/a1/mut/provenance.go:718:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/183/a1/mut/task.go:20://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/183/a1/mut/task.go:21://	task.cancel  -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/183/a1/mut/task.go:53:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/183/a1/mut/task.go:162:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/183/a1/mut/task.go:172:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/183/a1/mut/task.go:195://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/183/a1/mut/task.go:238:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/183/a1/mut/task.go:251:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/183/a1/mut/task.go:273:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/183/a1/mut/task.go:275:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/183/a1/mut/task.go:347:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/183/a1/zz183a1_e2e_test.go:11:// (internal/agent/loop.go:715 -> toolResultMessage(c.ID, ...)). That is why its
+.scratch/wisp/probes/183/a1/zz183a1_e2e_test.go:21:// `go test -overlay=.scratch/wisp/probes/179/r2/overlay-e2e.json`; readings land
+.scratch/wisp/probes/183/a1/zz183a1_e2e_test.go:479:// runtime.Caller reports the VIRTUAL path (cmd/wisp/zz183a1_e2e_test.go), which
+.scratch/wisp/probes/183/orch/mut-prefix/provenance.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/183/orch/mut-prefix/provenance.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/183/orch/mut-prefix/provenance.go:260:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/183/orch/mut-prefix/provenance.go:371:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/183/orch/mut-prefix/provenance.go:374:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/183/orch/mut-prefix/provenance.go:683:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/183/r1/mut-f1/provenance.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/183/r1/mut-f1/provenance.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/183/r1/mut-f1/provenance.go:260:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/183/r1/mut-f1/provenance.go:371:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/183/r1/mut-f1/provenance.go:374:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/183/r1/mut-f1/provenance.go:691:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/183/r1/mut-f2/provenance.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/183/r1/mut-f2/provenance.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/183/r1/mut-f2/provenance.go:260:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/183/r1/mut-f2/provenance.go:371:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/183/r1/mut-f2/provenance.go:374:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/183/r1/mut-f2/provenance.go:685:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/183/r1/mut-freq/zz183freq_test.go:9:// .scratch/wisp/probes/183/r1/overlay-freq-head.json, which pins
+.scratch/wisp/probes/183/r1/mut-freq/zz183freq_test.go:10:// provenance.go + taintmatch.go to their HEAD blobs (git show HEAD:<path>) so
+.scratch/wisp/probes/183/r1/mut-freq/zz183freq_test.go:16://	go test -count=1 -overlay=.scratch/wisp/probes/183/r1/overlay-freq-head.json -run TestFreq183 -v ./internal/risk/
+.scratch/wisp/probes/183/r1/mut-head/provenance.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/183/r1/mut-head/provenance.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/183/r1/mut-head/provenance.go:260:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/183/r1/mut-head/provenance.go:371:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/183/r1/mut-head/provenance.go:374:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/183/r1/mut-head/provenance.go:683:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/183/r1/zz183r1_e2e_test.go:11:// (internal/agent/loop.go:715 -> toolResultMessage(c.ID, ...)). That is why its
+.scratch/wisp/probes/183/r1/zz183r1_e2e_test.go:21:// `go test -overlay=.scratch/wisp/probes/179/r2/overlay-e2e.json`; readings land
+.scratch/wisp/probes/183/r1/zz183r1_e2e_test.go:486:// runtime.Caller reports the VIRTUAL path (cmd/wisp/zz183a1_e2e_test.go), which
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:260:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:371:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:374:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:516:// (taintmatch.go attachDeclaredPath, read by contains), so a candidate fragment
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:525:// is not per-token taint tracking - taintmatch.go's header still rules that out
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:534:// of internal/risk/pointer_183_test.go (ruler: grep -n "^func Test"
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:535:// internal/risk/pointer_183_test.go). Known cost, pinned by
+.scratch/wisp/probes/183/r2/mut/provenance-M3.go:731:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:20://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:21://	task.cancel  -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:53:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:162:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:172:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:195://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:238:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:251:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:271:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:273:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:345:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/183/v2/zz183v2_probe_test.go:6:// internal/risk/zz183v2_probe_test.go; NOT part of the resident criteria set.
+.scratch/wisp/probes/185/c1/mut/fs.go:23:// delete_enabled-gated fs.delete) is in fs_write.go and, for fs.edit (ticket
+.scratch/wisp/probes/185/c1/mut/fs.go:24:// 162), in fs_edit.go; all of it shares this file's FSDeps: same C26 resolver,
+.scratch/wisp/probes/185/c1/mut/fs.go:27:// still open (see doc.go).
+.scratch/wisp/probes/185/c1/mut/fs_broken.go:24:// delete_enabled-gated fs.delete) is in fs_write.go and, for fs.edit (ticket
+.scratch/wisp/probes/185/c1/mut/fs_broken.go:25:// 162), in fs_edit.go; all of it shares this file's FSDeps: same C26 resolver,
+.scratch/wisp/probes/185/c1/mut/fs_broken.go:28:// still open (see doc.go).
+.scratch/wisp/probes/185/c1/mut/taintmatch.go:100:	// (see provenance.go MarkWithHostPath) when THIS mark declared one, and nil
+.scratch/wisp/probes/185/c1/pointer_185_c1_ac7_probe_test.go:11:// internal/risk/pointer_185_c1_ac7_probe_test.go (see
+.scratch/wisp/probes/185/c1/pointer_185_c1_ac7_probe_test.go:12:// .scratch/wisp/probes/185/c1/overlay-ac7.json for the unmutated leg and
+.scratch/wisp/probes/185/c1/pointer_185_c1_ac7_probe_test.go:13:// overlay-ac7-mutant.json for the basename-widening mutation).
+.scratch/wisp/probes/185/c1/pointer_185_c1_ac7_probe_test.go:17://	grep -n "^func Test" internal/risk/pointer_183_test.go
+.scratch/wisp/probes/185/c1/pointer_185_c1_ac7_probe_test.go:18://	grep -n "spellsDeclaredPath\|attachDeclaredPath" internal/risk/taintmatch.go | grep -v _test.go
+.scratch/wisp/probes/185/c1/pointer_185_c1_ac7_probe_test.go:45:// taintmatch.go (unmutated leg) as well as against the mutant copy.
+.scratch/wisp/probes/185/r1/mut-m1/hostpath_185.go:16:// was not approved (A353; the sentence in taintmatch.go that said so is corrected
+.scratch/wisp/probes/185/r1/mut-m1/hostpath_185.go:38://     never sees it (internal/risk/pointer_185_test.go L5/L6 and the CLI-seam leg
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:260:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:371:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:374:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:516:// (taintmatch.go attachDeclaredPath, read by contains), so a candidate fragment
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:525:// is not per-token taint tracking - taintmatch.go's header still rules that out
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:534:// of internal/risk/pointer_183_test.go (ruler: grep -n "^func Test"
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:535:// internal/risk/pointer_183_test.go). Known cost, pinned by
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:549:// (hostpath_185.go hostMintedPathFor; the leg that cannot be satisfied without
+.scratch/wisp/probes/185/r1/mut-m2/provenance.go:763:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:31://	5  fs.write INTO A SYNC DIR (P12 detection; see syncdirs.go)
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:72:// Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:260:// those two halves together on purpose — internal/tools/bridge.go keeping its
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:371:// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:374:// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:516:// (taintmatch.go attachDeclaredPath, read by contains), so a candidate fragment
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:525:// is not per-token taint tracking - taintmatch.go's header still rules that out
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:534:// of internal/risk/pointer_183_test.go (ruler: grep -n "^func Test"
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:535:// internal/risk/pointer_183_test.go). Known cost, pinned by
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:549:// (hostpath_185.go hostMintedPathFor; the leg that cannot be satisfied without
+.scratch/wisp/probes/185/r1/mut-m3/provenance.go:763:		// docs/PRECHECK.md §P12.
+.scratch/wisp/probes/185/r1/mut-m4/hostpath_185.go:16:// was not approved (A353; the sentence in taintmatch.go that said so is corrected
+.scratch/wisp/probes/185/r1/mut-m4/hostpath_185.go:38://     never sees it (internal/risk/pointer_185_test.go L5/L6 and the CLI-seam leg
+.scratch/wisp/probes/197/r1c/pre/subagent_197.go:29://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/197/r1c/pre/subagent_197.go:34://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/197/r1c/pre/subagent_197.go:45:	// through verbatim with no processing. internal/panel/pump.go carries the
+.scratch/wisp/probes/197/r1c/pre/subagent_197.go:47:	// other, so cmd/wisp/subagent_stream_key_197_test.go pins them equal.
+.scratch/wisp/probes/197/r1c/pre/subagent_197.go:236:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/197/r1c/pre/subagent_197.go:259:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/197/r1c/pre/subagent_197.go:261:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:8:// state rows as already sourced) but because nothing built it. composer.go:41-43
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:14:// HTTP/SSE server, and D29 through assets.go:8 forbids the last one. So the
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:21:// the second channel composer.go:14 refuses.
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:50:// CallChain stays empty. ApprovalCardView's header (panel/approval.go:9-11)
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:167:		// carrier and is deliberately NOT built here)" (internal/tools/task.go:145).
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:234:// The source is the single endpoint the runtime built (run.go:308 assigns it,
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:235:// and llm.Endpoint.Model is internal/llm/resolver.go:46) - the bytes the
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:294:// `wisp run` has is its own ledger (cmd/wisp/logsink.go), and every string that
+.scratch/wisp/probes/197/r3b/pre/panel_pump.go:299:// written down (票 35 fix r1, docs/evidence/s1/35-panel-snapshot-pump-fix-r1.md
+.scratch/wisp/probes/197/r3b/pre/pump.go:6:// WHAT WAS TRUE BEFORE THIS FILE. Snapshot (composer.go:44) has four fields and
+.scratch/wisp/probes/197/r3b/pre/pump.go:7:// NewSnapshot (composer.go:63) had zero non-test callers, so "the panel displays
+.scratch/wisp/probes/197/r3b/pre/pump.go:8:// authority and requests it" (composer.go:6-12) described a packet nobody sent.
+.scratch/wisp/probes/197/r3b/pre/pump.go:10:// disease in composer.go:41-43: "a view model that only a test can build is a
+.scratch/wisp/probes/197/r3b/pre/pump.go:17:// no local HTTP/SSE/websocket server, and assets.go:8 quotes D29 saying there
+.scratch/wisp/probes/197/r3b/pre/pump.go:18:// must not be one. docs/evidence/s1/35-panel-snapshot-pump-r1.md §1.2 measures
+.scratch/wisp/probes/197/r3b/pre/pump.go:23:// composer.go:14 ("no second channel") and D29 both refuse.
+.scratch/wisp/probes/197/r3b/pre/pump.go:25:// NO NEW KEYS. Snapshot keeps its four JSON keys and frontend/src/lib/panel.ts
+.scratch/wisp/probes/197/r3b/pre/pump.go:26:// is untouched, so TestComposerContractTypesMatchFrontend (composer_test.go:48)
+.scratch/wisp/probes/197/r3b/pre/pump.go:36:// reddens approval_test.go:105 and the two byte-level key-set nails in
+.scratch/wisp/probes/197/r3b/pre/pump.go:37:// pump_test.go (:111-124, :270-276), which is the sharper of the two guards -
+.scratch/wisp/probes/197/r3b/pre/pump.go:43:// static window length (gate.go:274, :387, :510-513), and the live countdown
+.scratch/wisp/probes/197/r3b/pre/pump.go:44:// is gate.go:257's clock.After, which exposes no "how much is left". What the
+.scratch/wisp/probes/197/r3b/pre/pump.go:46:// removal check behind each one: docs/evidence/s1/145-snapshot-fields-landed-r1.md.
+.scratch/wisp/probes/197/r3b/pre/pump.go:84:// same pure half NewApprovalCardView uses (approval.go:72) - which is the point:
+.scratch/wisp/probes/197/r3b/pre/pump.go:143:	// "this project has no AGENTS.md" indistinguishable on the wire.
+.scratch/wisp/probes/197/r3b/pre/pump.go:155:	// (internal/tools/task_state_188_test.go) walks this package for a panel-side
+.scratch/wisp/probes/197/r3b/pre/pump.go:160:	// (attachments.go:186), so the packet never advertises a ceiling that the
+.scratch/wisp/probes/197/r3b/pre/pump.go:164:	// display stamp and nothing else (panel.ts:132-134: "display only, never
+.scratch/wisp/probes/197/r3b/pre/pump.go:262:		// (PLAN.md:1127 records that as somebody else's real incident).
+.scratch/wisp/probes/197/r3b/pre/pump.go:348:// three JSON keys (composer.go:65-69, mirrored by frontend/src/lib/panel.ts's
+.scratch/wisp/probes/197/r3b/pre/pump.go:615:	// bound is counted in runes on purpose (pump.go's streamTruncateKeepRunes),
+.scratch/wisp/probes/197/r3b/pre/run.go:25:// file's current shape: the permission mode is READ from config.toml here and
+.scratch/wisp/probes/197/r3b/pre/run.go:94:// it with the real Windows implementation in notify_windows.go.
+.scratch/wisp/probes/197/r3b/pre/run.go:105:	// dataDir is the env's data root (config.toml, secrets\, memory.db).
+.scratch/wisp/probes/197/r3b/pre/run.go:160:			// to answer "." and write its logs, config.toml and DPAPI store
+.scratch/wisp/probes/197/r3b/pre/run.go:195:		// wisp.db holds the per-session file open after the process is gone.
+.scratch/wisp/probes/197/r3b/pre/run.go:252:	// see panel_pump.go for what its exit is and what it deliberately is not.
+.scratch/wisp/probes/197/r3b/pre/run.go:259:	// them pass through (internal/agent/loop.go:360, and task.spawn wraps the
+.scratch/wisp/probes/197/r3b/pre/run.go:260:	// same hook at internal/tools/subagent_197.go's opt.AdmitTask). It is the
+.scratch/wisp/probes/197/r3b/pre/run.go:384:	// task.output (ticket 164 AC#3, D34 row PLAN.md:2564, L0) reads the
+.scratch/wisp/probes/197/r3b/pre/run.go:390:	// 164-task-output-impl-r1-ac2-ac3.md §4 recorded it). Until a spawner
+.scratch/wisp/probes/197/r3b/pre/run.go:422:	// boot learned to read config.toml (PLAN.md:1640, pinned by AC#2(c)).
+.scratch/wisp/probes/197/r3b/pre/run.go:470:	// still open. panel_pump.go states the whole rule.
+.scratch/wisp/probes/197/r3b/pre/run.go:490:		// the stream log this process is writing - see panel_pump.go.
+.scratch/wisp/probes/197/r3b/pre/run.go:631://     the rolling JSONL file under <data>\logs (see logsink.go) - so the
+.scratch/wisp/probes/197/r3b/pre/run.go:643:// defers (internal/agent/loop.go:366). The revocation now also closes the
+.scratch/wisp/probes/197/r3b/pre/run.go:725:	// ticket 200: read the project's own instruction files (AGENTS.md and its
+.scratch/wisp/probes/197/r3b/pre/run.go:731:	// (the same dir config.toml lives in), the budget from this loop's own scaled
+.scratch/wisp/probes/197/r3b/pre/run.go:774:	// internal/agent/loop.go:321，而不是新造一枚同类函数。三件事是这条线的全部要求：
+.scratch/wisp/probes/197/r3b/pre/run.go:780:	//      判据本体与反向读数在 internal/tools/ticket176r1_start_port_test.go）。
+.scratch/wisp/probes/197/r3b/pre/run.go:783:	// 不与模型 supplied 的 call id 共用命名空间（internal/tools/task_backfill.go）。
+.scratch/wisp/probes/197/r3b/pre/run.go:957:		// (panel.ResultChunk, composer.go:51-56); the reasoning field is
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:73:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:291:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:314:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:316:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:458:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/197/r3b/pre/subagent_197.go:480:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:16://     answered by tools.TaskOutput.StateAnswer (internal/tools/task.go:153) at
+.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:20://     (internal/tools/task_state_188_test.go:343) walks every non-test source in
+.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:35://     (docs/reports/survey-2026-09-28-dsh-ui-packages.md §3.2). An inbound
+.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:42:// not-judgement shape as NativeVerdict above (pump.go:59). internal/panel must
+.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:52:	// loop dispatches with CorrelationID == TaskID (internal/agent/loop.go:647),
+.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:114:	// printing a verdict (internal/tools/task.go:145-152).
+.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:140:// (composer.go:62-74): the only way this key stays absent is the only way it
+.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:173:// with CorrelationID == TaskID (internal/agent/loop.go:647); a host that used a
+.scratch/wisp/probes/198/v2/backup/firstrun.go:3:// Ticket 198: the first-run creation of config.toml, hooked to ONE entry.
+.scratch/wisp/probes/198/v2/backup/firstrun.go:7:// (NewDefaults, defaults.go:58 - the `default:"..."` tags in schema.go are the
+.scratch/wisp/probes/198/v2/backup/firstrun.go:9:// loader.go:238), and writeguard.go:125-131 already proves a missing file is
+.scratch/wisp/probes/198/v2/backup/firstrun.go:13:// died at run.go's 配置未就绪 branch with exit 2, quoting a missing file as
+.scratch/wisp/probes/198/v2/backup/firstrun.go:18:// (resident_task_source_windows.go:265). Two existing pins forbid the resident
+.scratch/wisp/probes/198/v2/backup/firstrun.go:19:// leg from ever producing a config.toml nobody asked it for:
+.scratch/wisp/probes/198/v2/backup/firstrun.go:20:// resident_task_source_246_windows_test.go:389-391 (red sentence "the leg
+.scratch/wisp/probes/198/v2/backup/firstrun.go:21:// created a config.toml it was never asked for") and logsink_windows_test.go
+.scratch/wisp/probes/198/v2/backup/firstrun.go:22:// :159-164 (a run-leg boot that stops at Unconfigured because no config.toml
+.scratch/wisp/probes/198/v2/backup/firstrun.go:25:// pins to land this ticket is on the forbidden list (AGENTS.md §1.1), so
+.scratch/wisp/probes/198/v2/backup/firstrun.go:27:// runTextTask - the single production caller chain main.go cmdRun ->
+.scratch/wisp/probes/198/v2/backup/firstrun.go:35:// run.go's ResolveRole branch still fails loudly with 2 afterwards (R13).
+.scratch/wisp/probes/198/v2/backup/firstrun.go:50:// ensureFirstRunConfig creates <dataDir>\config.toml from the exported
+.scratch/wisp/probes/198/v2/backup/firstrun.go:54:// equivalent of internal/config's unexported fileMissing (parse.go:232-235):
+.scratch/wisp/probes/198/v2/backup/firstrun.go:56://     stand-in, run_mode101_test.go:621-633) stats clean, so it is not missing
+.scratch/wisp/probes/198/v2/backup/firstrun.go:58://     try to rename over it (atomicWrite, parse.go:226) and turn an honest
+.scratch/wisp/probes/198/v2/backup/firstrun.go:66:// winsec.PrivateDirAll, store.go:49), so this function calls that and never
+.scratch/wisp/probes/198/v2/backup/firstrun.go:68:// configFileName constant (the same join run.go:391 already performs inside
+.scratch/wisp/probes/198/v2/backup/firstrun.go:71:// risk.PathResolver, PLAN.md:1288, not on Join over a resolved root).
+.scratch/wisp/probes/198/v2/backup/firstrun.go:83:		// atomicWrite is temp+rename (parse.go:196), so a failure here leaves
+.scratch/wisp/probes/198/v2/backup/firstrun.go:89:	// + 本轮仍缺什么）。它刻意 NOT 复用 cause=missing 那一句（config_reload.go
+.scratch/wisp/probes/198/v2/backup/firstrun.go:98:	//   - key 的录入者是 cmdSecret 的 set 支（secret.go:333-387 runSet）：明文只
+.scratch/wisp/probes/198/v2/backup/firstrun.go:100:	//     （store.go:64-83 Store），命令回显一行 api_key_ref = "dpapi:<blob 名>"
+.scratch/wisp/probes/198/v2/backup/firstrun.go:101:	//     （secret.go:380）。config.toml 里根本没有承载明文的字段
+.scratch/wisp/probes/198/v2/backup/firstrun.go:102:	//     （schema.go:384-387，D36 rule 5：只许 dpapi:/env: 引用），所以手改文件
+.scratch/wisp/probes/198/v2/backup/firstrun.go:104:	//     （store.go:95-103 Resolve，没有明文兜底）。
+.scratch/wisp/probes/198/v2/backup/firstrun.go:106:	//     才动作（providers.go:99-103、:118-133 目录里没有该 provider 就退），
+.scratch/wisp/probes/198/v2/backup/firstrun.go:107:	//     wisp models 是 C29 的本地签名模型库（models.go:60-74），不是 LLM 目录。
+.scratch/wisp/probes/198/v2/backup/run.go:25:// file's current shape: the permission mode is READ from config.toml here and
+.scratch/wisp/probes/198/v2/backup/run.go:95:// it with the real Windows implementation in notify_windows.go.
+.scratch/wisp/probes/198/v2/backup/run.go:106:	// dataDir is the env's data root (config.toml, secrets\, memory.db).
+.scratch/wisp/probes/198/v2/backup/run.go:137:	// with a scripted reader, which is the injection seam AGENTS.md §1.3 names
+.scratch/wisp/probes/198/v2/backup/run.go:150:	// leg builds its gate at boot (resident_approval_windows.go, form 乙 per
+.scratch/wisp/probes/198/v2/backup/run.go:203:			// to answer "." and write its logs, config.toml and DPAPI store
+.scratch/wisp/probes/198/v2/backup/run.go:234:	// Ticket 198 AC#1: the first-run creation of config.toml hangs on THIS
+.scratch/wisp/probes/198/v2/backup/run.go:237:	// cmd/wisp/firstrun.go's header). Order matters twice over: it is strictly
+.scratch/wisp/probes/198/v2/backup/run.go:253:		// wisp.db holds the per-session file open after the process is gone.
+.scratch/wisp/probes/198/v2/backup/run.go:342:	// see panel_pump.go for what its exit is and what it deliberately is not.
+.scratch/wisp/probes/198/v2/backup/run.go:349:	// them pass through (internal/agent/loop.go:360, and task.spawn wraps the
+.scratch/wisp/probes/198/v2/backup/run.go:350:	// same hook at internal/tools/subagent_197.go's opt.AdmitTask). It is the
+.scratch/wisp/probes/198/v2/backup/run.go:429:	// (cmd/wisp/panel_config_store.go); the snapshot reaches its credential
+.scratch/wisp/probes/198/v2/backup/run.go:463:	// back, which is the permanent免审通行证 internal/perm/store.go:19-27 and
+.scratch/wisp/probes/198/v2/backup/run.go:464:	// PLAN.md:1642 name as the thing to keep out. Clause 2 - the session ends
+.scratch/wisp/probes/198/v2/backup/run.go:534:	// exactly one hit now, internal/tools/task.go's taskCancel.Execute; the
+.scratch/wisp/probes/198/v2/backup/run.go:561:	// and approval_reply.go says what both of those choices protect.
+.scratch/wisp/probes/198/v2/backup/run.go:597:	// on the route (gate.go's allowSession). resident_windows.go prints the same
+.scratch/wisp/probes/198/v2/backup/run.go:644:	//     (internal/tools/grant.go). R20/M3 still persists the MODE and nothing
+.scratch/wisp/probes/198/v2/backup/run.go:646:	//     learned to read config.toml". It comes back only ever keyed by the
+.scratch/wisp/probes/198/v2/backup/run.go:648:	//     条), so PLAN.md:1642's "会话结束后授权必须失效" is the property the read
+.scratch/wisp/probes/198/v2/backup/run.go:697:	// still open. panel_pump.go states the whole rule.
+.scratch/wisp/probes/198/v2/backup/run.go:723:		// the stream log this process is writing - see panel_pump.go.
+.scratch/wisp/probes/198/v2/backup/run.go:733:	// bytes keep landing in this run's ledger, exactly as panel_pump.go says.
+.scratch/wisp/probes/198/v2/backup/run.go:810:	// what the operator wrote. config_reload.go owns the three lines this call
+.scratch/wisp/probes/198/v2/backup/run.go:873:// It is an interface rather than the concrete resident type because run.go is
+.scratch/wisp/probes/198/v2/backup/run.go:874:// not build-tagged and the ball surface is (resident_approval_windows.go), and
+.scratch/wisp/probes/198/v2/backup/run.go:927://     the rolling JSONL file under <data>\logs (see logsink.go) - so the
+.scratch/wisp/probes/198/v2/backup/run.go:939:// defers (internal/agent/loop.go:366). The revocation now also closes the
+.scratch/wisp/probes/198/v2/backup/run.go:1028:	// ticket 200: read the project's own instruction files (AGENTS.md and its
+.scratch/wisp/probes/198/v2/backup/run.go:1034:	// (the same dir config.toml lives in), the budget from this loop's own scaled
+.scratch/wisp/probes/198/v2/backup/run.go:1089:	// internal/agent/loop.go:321，而不是新造一枚同类函数。三件事是这条线的全部要求：
+.scratch/wisp/probes/198/v2/backup/run.go:1095:	//      判据本体与反向读数在 internal/tools/ticket176r1_start_port_test.go）。
+.scratch/wisp/probes/198/v2/backup/run.go:1098:	// 不与模型 supplied 的 call id 共用命名空间（internal/tools/task_backfill.go）。
+.scratch/wisp/probes/198/v2/backup/run.go:1272:		// (panel.ResultChunk, composer.go:51-56); the reasoning field is
+.scratch/wisp/probes/198/v2/backup/run.go:1351:	// lives here and nowhere the page can reach (approval.go's grant comment,
+.scratch/wisp/probes/198/v2/backup/run.go:1379:	// the cross-surface card comparison in panel_pump_test.go.
+.scratch/wisp/probes/220/r1/prechange/prechange220_probe_test.go:7:// resident cases live in subagent_blocked_220_test.go.
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:607:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:645:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:857:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:852:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:850:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:495:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:517:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:495:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:517:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:495:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:517:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/221/v1/mutations/control-task.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/control-task.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/control-task.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/control-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/control-task.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/control-task.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/control-task.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/control-task.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/control-task.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/control-task.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/control-task.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/control-task.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/control-task.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/control-task.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/control-task.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/control-task.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/control-task.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/control-task.go:858:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:607:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:645:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:857:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:495:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:517:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/221/v1/mutations/m11-census-answer-deleted.go:12:// internal/risk level in shape_a_exemption_test.go, but on the real bridge it
+.scratch/wisp/probes/221/v1/mutations/m11-census-answer-deleted.go:22://	       docs/evidence/s1/175-task-output-stamped-r2.md).
+.scratch/wisp/probes/221/v1/mutations/m11-census-answer-deleted.go:32://	    -> deleting the tool's declaration (the box.set in task.go) while
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:496:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:518:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:59:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:112:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:114:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:116:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:120:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:122:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:136:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:466:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:476:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:499://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:542:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:555:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:577:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:579:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:607:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:645:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:857:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:61:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:114:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:116:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:118:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:122:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:124:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:138:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:468:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:478:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:501://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:544:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:557:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:579:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:581:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:609:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:647:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:859:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:858:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:858:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:858:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:858:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:860:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:60:// (internal/agent/budgets.go:32-34, PLAN.md:431): a single tool result over
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:121:	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:123:	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:137:	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:477:// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:500://	                    (PLAN.md:2564), so a long output with no copy file
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:543:	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:556:		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:578:// Declared L0: PLAN.md:2564 puts this row at L0, so it must never raise an
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:580:// PLAN.md:2564's fourth column has for it (a "—", the same spelling as
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:858:// (internal/agent/spill.go takeTokens/takeTokensLast) rather than new exported
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:306:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:329:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:331:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:494:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:516:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:494:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:516:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:4:// lives in task_cancel_221_test.go).
+.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:13:// ⚠ Why these legs do NOT reuse subagent_197_test.go's harness bridge: that one
+.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:15:// task.cancel call (D34 freezes it at L1, PLAN.md:2564) would be refused by the
+.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:61:// answers: it runs out, and running out MEANS EXECUTE (bridge.go's L1 arm).
+.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:131:// subagent_197_test.go's AC#5 leg uses).
+.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:263:		"停掉父任务不会级联",   // subagent_197_test.go:797 钉的字面量，不是装饰
+.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:450:// shape at subagent_197.go's context.WithoutCancel call must not be broken by
+.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:4:// lives in task_cancel_221_test.go).
+.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:13:// ⚠ Why these legs do NOT reuse subagent_197_test.go's harness bridge: that one
+.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:15:// task.cancel call (D34 freezes it at L1, PLAN.md:2564) would be refused by the
+.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:61:// answers: it runs out, and running out MEANS EXECUTE (bridge.go's L1 arm).
+.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:131:// subagent_197_test.go's AC#5 leg uses).
+.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:263:		"停掉父任务不会级联",   // subagent_197_test.go:797 钉的字面量，不是装饰
+.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:450:// shape at subagent_197.go's context.WithoutCancel call must not be broken by
+.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:4:// lives in task_cancel_221_test.go).
+.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:13:// ⚠ Why these legs do NOT reuse subagent_197_test.go's harness bridge: that one
+.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:15:// task.cancel call (D34 freezes it at L1, PLAN.md:2564) would be refused by the
+.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:61:// answers: it runs out, and running out MEANS EXECUTE (bridge.go's L1 arm).
+.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:131:// subagent_197_test.go's AC#5 leg uses).
+.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:263:		"停掉父任务不会级联",   // subagent_197_test.go:797 钉的字面量，不是装饰
+.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:450:// shape at subagent_197.go's context.WithoutCancel call must not be broken by
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:236:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:568:// in internal/tools/ticket175r2_stamp_live_test.go.
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:603:// result (context built by a test or another caller, not by Bridge.execute)
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:641:// ceiling (PLAN.md D38d) is one turn must not swamp the machine, and a call that
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:773:// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:774:// that, not the compiler (measured, 160-handle-r1.md §3).
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:789:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:799:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:804:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:806:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:809:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:810:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:850:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:888:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:979:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:298:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:321:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:323:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:484:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:506:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:298:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:321:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:323:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:483:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:505:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:50:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:60:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:271:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:50:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:60:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:275:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:236:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:568:// in internal/tools/ticket175r2_stamp_live_test.go.
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:603:// result (context built by a test or another caller, not by Bridge.execute)
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:641:// ceiling (PLAN.md D38d) is one turn must not swamp the machine, and a call that
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:771:// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:772:// that, not the compiler (measured, 160-handle-r1.md §3).
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:787:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:797:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:802:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:804:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:807:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:808:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:848:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:886:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:977:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:50:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:60:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:271:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:50:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:60:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:271:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:236:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:568:// in internal/tools/ticket175r2_stamp_live_test.go.
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:603:// result (context built by a test or another caller, not by Bridge.execute)
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:641:// ceiling (PLAN.md D38d) is one turn must not swamp the machine, and a call that
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:773:// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:774:// that, not the compiler (measured, 160-handle-r1.md §3).
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:789:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:799:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:804:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:806:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:809:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:810:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:850:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:888:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:979:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:298:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:321:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:323:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:484:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:506:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:298:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:321:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:323:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:484:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:506:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:236:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:568:// in internal/tools/ticket175r2_stamp_live_test.go.
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:603:// result (context built by a test or another caller, not by Bridge.execute)
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:641:// ceiling (PLAN.md D38d) is one turn must not swamp the machine, and a call that
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:766:// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:767:// that, not the compiler (measured, 160-handle-r1.md §3).
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:782:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:792:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:797:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:799:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:802:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:803:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:843:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:881:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:972:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:101:// consumer-side seam the agent loop already calls (loop.go:563 and
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:102:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:213:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:236:// (loop.go:654-657) and books a class the model cannot self-correct against.
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:568:// in internal/tools/ticket175r2_stamp_live_test.go.
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:603:// result (context built by a test or another caller, not by Bridge.execute)
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:641:// ceiling (PLAN.md D38d) is one turn must not swamp the machine, and a call that
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:772:// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:773:// that, not the compiler (measured, 160-handle-r1.md §3).
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:788:// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:798:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:803:// Today no production code dispatches on the bridge except loop.go, so being
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:805:// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:808:// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:809:// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:849:// (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:887:// vocabulary (agent/journal.go:30-46).
+.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:978:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+.scratch/wisp/probes/223/v1/overlay/zz_v1probe_cmdwisp_test.go:6:// 目的：把同一批对抗输入喂给**生产分类器** describeReloadFailure（cmd/wisp/config_reload.go:315），
+.scratch/wisp/probes/223/v1/overlay/zz_v1probe_config_test.go:6:// 目的：把 loader.go 新造的 declaredSchemaVersion 按行扫描器逼到边界上，实测
+.scratch/wisp/probes/224/v1/probe_a_prod_test.go:7:// (internal/session/grants_test.go:20/:94/:134 and internal/tools/grant_test.go:7),
+.scratch/wisp/probes/224/v1/probe_a_prod_test.go:25://     cover (SPEC-06 §8.3 bullet 1 / PLAN.md:2148 D45-3) - so it cannot either.
+.scratch/wisp/probes/224/v1/probe_a_prod_test.go:40://	  -overlay=.scratch/wisp/probes/224/v1/overlay.json
+.scratch/wisp/probes/228/v1/twobreak/main.go:2:// repository: it starts a built wisp.exe in a temp data dir and sends it console
+.scratch/wisp/probes/228/v1/twobreak/main.go:10:// cmd/wisp/resident_windows.go registers signal.Notify(bootExit, os.Interrupt,
+.scratch/wisp/probes/228/v1/twobreak/main.go:22://	go build -o "$TEMP/twobreak.exe" .scratch/wisp/probes/228/v1/twobreak
+.scratch/wisp/probes/228/v1/twobreak/main.go:23://	"$TEMP/twobreak.exe" -exe "$TEMP/wispprobe/wisp.exe" -rounds 3
+.scratch/wisp/probes/235/r1/mut-ac3-commentback/subagent_197_test.go:392:// the literal 4 in subagent_197.go, MaxToolConcurrency is the D38d ceiling in
+.scratch/wisp/probes/235/r1/mut-ac3-commentback/subagent_197_test.go:393:// bridge.go, which this ticket did not touch by one byte), so it is not the
+.scratch/wisp/probes/235/r1/mut-ac3-commentback/subagent_197_test.go:396:// docs/evidence/s1/197-subagent-entity-r1b.md.
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:61:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:71:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:295:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:61:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:71:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:295:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:50:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:60:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:271:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:495:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:517:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/235/v1/mut/base-1d2ad737-222.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/v1/mut/base-1d2ad737-222.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/v1/mut/base-1d2ad737-222.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/base-1d2ad737-222.go:50:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/v1/mut/base-1d2ad737-222.go:60:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/v1/mut/base-1d2ad737-222.go:271:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/v1/mut/base-head-197.go:392:// the literal 4 in subagent_197.go, MaxToolConcurrency is the D38d ceiling in
+.scratch/wisp/probes/235/v1/mut/base-head-197.go:393:// bridge.go, which this ticket did not touch by one byte), so it is not the
+.scratch/wisp/probes/235/v1/mut/base-head-197.go:396:// docs/evidence/s1/197-subagent-entity-r1b.md.
+.scratch/wisp/probes/235/v1/mut/base-head-197.go:401:// subagent_197.go), so a waiting parent holds none of the four permits and the
+.scratch/wisp/probes/235/v1/mut/base-head-197.go:410:// docs/evidence/s1/222-spawn-holds-bridge-permit-v1.md.
+.scratch/wisp/probes/235/v1/mut/base-head-222.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/v1/mut/base-head-222.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/v1/mut/base-head-222.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/base-head-222.go:61:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/v1/mut/base-head-222.go:71:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/v1/mut/base-head-222.go:295:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:495:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:517:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/235/v1/mut/commentback_197_test.go:392:// the literal 4 in subagent_197.go, MaxToolConcurrency is the D38d ceiling in
+.scratch/wisp/probes/235/v1/mut/commentback_197_test.go:393:// bridge.go, which this ticket did not touch by one byte), so it is not the
+.scratch/wisp/probes/235/v1/mut/commentback_197_test.go:396:// docs/evidence/s1/197-subagent-entity-r1b.md.
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:61:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:71:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:295:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:50:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:60:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:271:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:61:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:71:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:295:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:35://     internal/risk/provenance.go:92-94). No "subagent.output" name is invented:
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:49:	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:66:	// internal/tools/bridge.go, which is a frozen contract and not tunable
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:80:	// internal/tools/subagent_197_test.go's
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:201:// (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:307:	// (the loop calls this before its first model call, internal/agent/loop.go:360).
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:330:	// internal/agent/loop.go:321-327, which mints the id BEFORE reg.Spawn), and
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:332:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:495:// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+.scratch/wisp/probes/235/v1/mut/pool8_197.go:517:// RESULT (internal/panel/composer.go's ResultChunk header).
+.scratch/wisp/probes/235/v1/mut/pre235-197_test.go:392:// the literal 4 in subagent_197.go, MaxToolConcurrency is the D38d ceiling in
+.scratch/wisp/probes/235/v1/mut/pre235-197_test.go:393:// bridge.go, which this ticket did not touch by one byte), so it is not the
+.scratch/wisp/probes/235/v1/mut/pre235-197_test.go:396:// docs/evidence/s1/197-subagent-entity-r1b.md.
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:50:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:60:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:271:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:61:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:71:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:295:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:22:// REAL bridge. subagent_197_test.go's harness drives the parent through
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:27:// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:61:// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:71:	// and for the same reason subagent_197.go writes MaxConcurrentSubagents as 4:
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:295:// subagent_197_test.go's harness, whose children get h.dir.
+.scratch/wisp/probes/241/v1/mut-C0-comment-only-control.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-C0-comment-only-control.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-C0-comment-only-control.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M1-numerator-zero.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M1-numerator-zero.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M1-numerator-zero.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M10-framelength-too-lax.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M10-framelength-too-lax.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M10-framelength-too-lax.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M11-mean-divisor-off-by-one.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M11-mean-divisor-off-by-one.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M11-mean-divisor-off-by-one.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M12-decode-byte-order-swapped.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M12-decode-byte-order-swapped.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M12-decode-byte-order-swapped.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M13-hidden-state-accumulator.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M13-hidden-state-accumulator.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M13-hidden-state-accumulator.go:75:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M14-mean-abs-detector.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M14-mean-abs-detector.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M14-mean-abs-detector.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M15-mean-abs-at-admitted-ceiling.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M15-mean-abs-at-admitted-ceiling.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M15-mean-abs-at-admitted-ceiling.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M17-r1-claimed-X3.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M17-r1-claimed-X3.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M17-r1-claimed-X3.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M2-return-constant-half.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M2-return-constant-half.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M2-return-constant-half.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M3-tolerance-wide-1e9.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M3-tolerance-wide-1e9.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M3-tolerance-wide-1e9.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M4-tolerance-narrow-1e-9.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M4-tolerance-narrow-1e-9.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M4-tolerance-narrow-1e-9.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M5-tolerance-at-bound-1e-3.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M5-tolerance-at-bound-1e-3.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M5-tolerance-at-bound-1e-3.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M6-denominator-32767.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M6-denominator-32767.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M6-denominator-32767.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M7-negative-scale.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M7-negative-scale.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M7-negative-scale.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M8-gain-two-x.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M8-gain-two-x.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M8-gain-two-x.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/241/v1/mut-M9-compress-sqrt.go:12:// was the render side's doc line (internal/ball/liquid_windows.go:35, "RMS of
+.scratch/wisp/probes/241/v1/mut-M9-compress-sqrt.go:14:// (internal/ball/liquid.go:30), which is a silence threshold, not a range.
+.scratch/wisp/probes/241/v1/mut-M9-compress-sqrt.go:73:// level_test.go: 2.31e-5. 5e-5 is that bound with headroom and still 160x
+.scratch/wisp/probes/255/v1/backup/schema.go:3:// Full config.toml schema (D36 / SPEC-03 sec 3 + sec 3.1 LLM catalog v2, 2026-09-19
+.scratch/wisp/probes/255/v1/backup/schema.go:14:// `api_key` field, and none ever may (pinned by boundary_test.go, which also
+.scratch/wisp/probes/255/v1/backup/schema.go:19:// SchemaVersionCurrent is the config.toml schema version this build writes
+.scratch/wisp/probes/255/v1/backup/schema.go:101:// Config is the whole config.toml (D36 section tree). Field order is the
+.scratch/wisp/probes/255/v1/backup/schema.go:127:	// and decoded through the raw-map absorber in parse.go (single code path,
+.scratch/wisp/probes/255/v1/backup/schema.go:146:	// never by config.toml: it is not serialized and a literal `portable`
+.scratch/wisp/probes/255/v1/backup/schema.go:274:	// writing `false` in config.toml is a load error, never a setting.
+.scratch/wisp/probes/255/v1/backup/schema.go:442:	// project's own instruction files (AGENTS.md / CLAUDE.md and friends).
+.scratch/wisp/probes/255/v1/backup/schema.go:467:	// session-scoped and dies with the process (PLAN.md:1640, ticket 49), so
+.scratch/wisp/probes/255/v1/backup/schema.go:568:// by parse.go (single code path, covered by round-trip tests); the Config
+.scratch/wisp/probes/255/v1/backup/tiers.go:6:// manager.go's plan(): a section named here with tier "hot" is exactly the
+.scratch/wisp/probes/255/v1/backup/tiers.go:7:// set plan() walks. Adding a new top-level section to schema.go without
+.scratch/wisp/probes/255/v1/backup/tiers.go:9:// keeps this table from going stale the way the [risk] four did (unwired.go
+.scratch/wisp/probes/255/v1/backup/tiers.go:25:	// Whole-section hot (the hot-apply table in manager.go is derived from
+.scratch/wisp/probes/255/v1/backup/tiers.go:46:	// (manager.go planApp; ticket 255 AC#2-ⓑ - registered per key).
+.scratch/wisp/probes/255/v1/backup/tiers.go:52:	// tuning keys are hot (manager.go planVoice; SPEC-03 sec 3).
+.scratch/wisp/probes/255/v1/backup/tiers_255_test.go:10:// top-level section declared in schema.go must be accounted for in
+.scratch/wisp/probes/255/v1/backup/tiers_255_test.go:19:	// per-plugin sub-tables absorbed via the raw map in parse.go) but is a
+.scratch/wisp/probes/255/v1/backup/tiers_255_test.go:56:// TierRegistry goes red here even without adding anything to schema.go.
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_gate_261_r1_inverted_test.go:4:// (impl.md section 3). This file never compiles inside the tracked tree.
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_gate_261_r1_inverted_test.go:5:// Each assertion below is the OPPOSITE of enabled_gate_261_r1_test.go: if
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:9:// (cmd/wisp/run.go:435-442: config.LoadFile -> llm.NewResolver ->
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:12:// (internal/agent/cost.go:38 Cost.AddUsage, called by loop.go:435).
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:15://   - ruler 1: enumeration (resolver.go:287-288 `for id := range p.Models`)
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:16://     and selection (resolver.go:119 `spec, ok := p.Models[model]`) asked
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:109:// HTTP isolation reuses the package's existing noProxyClient (matrix_14_2_test.go).
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:111:// routes (server.go comment "the chat route is untouched"), so ruler 2/3 read
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:165:	// Enumeration hop (resolver.go:287-288): every id is listed, flag unseen.
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:173:	// Selection hop (resolver.go:119 via ResolveChain): text_chain already
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:179:	// The unset-role fallback takes the first chain element (run.go:436's
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:184:	// The nokey shape, driven exactly like cmd/wisp/providers.go:169 drives
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:236:	// The cost hop: the SHIPPED pricing function (internal/agent/cost.go,
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:237:	// the call loop.go:435 makes) against the disabled entry's own card.
+.scratch/wisp/probes/33/p1/q1/main.go:12://       constructor (panel_host_windows.go:175-177: it only fills the struct).
+.scratch/wisp/probes/33/p1/q1/main.go:16://       thread. That is what -mode dup-create measures (main.go does it too,
+.scratch/wisp/probes/33/p1/q2/main.go:9:// resident panel thread (cmd/wisp/panel_resident_windows.go) now hands the pump
+.scratch/wisp/probes/33/p1/q2/main.go:13://   - Eval  = ExecuteScript under the hood (chromium.go:138-145: direct COM call
+.scratch/wisp/probes/33/p1/q2/main.go:17://     dependency's own message handler (chromium.go:242 echoes the received
+.scratch/wisp/probes/33/p1/q2/main.go:91:// pumpOnce drains the thread queue exactly like panel_host_windows.go:621-632,
+.scratch/wisp/probes/33/p1/q2/main.go:206:// thread's own guard shape, panel_resident_windows.go:214), create window #1,
+.scratch/wisp/probes/33/p1/q2/main.go:264:		// the loop. Eval = ExecuteScript (chromium.go:138-145): a direct COM
+.scratch/wisp/probes/33/p1/q3/main.go:8:// The shipping measurement lives in cmd/wisp/panel_host_windows.go
+.scratch/wisp/probes/33/p1/receipt/main.go:7:// Ticket 33 AC#14 / docs/PLAN.md C17 ("Go -> front-end event push; replies must
+.scratch/wisp/probes/33/p1/receipt/main.go:9:// webview.go's dispatchq is only drained inside Run(); it could not run, so the
+.scratch/wisp/probes/33/p1/receipt/main.go:19://	-selfpump : host pumps like cmd/wisp/panel_host_windows.go pnlPumpOnce does
+.scratch/wisp/probes/33/p1/receipt/main.go:48:	wmApp    = 0x8000 // internal/w32/w32.go:96
+.scratch/wisp/probes/33/p1/receipt/main.go:49:	wmQuit   = 0x0012 // internal/w32/w32.go:92
+.scratch/wisp/probes/33/p1/receipt/main.go:61:// pnlMsg shape, copied field-for-field from cmd/wisp/panel_host_windows.go:89-97
+.scratch/wisp/probes/33/p1/receipt/main.go:62:// (itself a mirror of internal/ball/win32_windows.go:175-183). Unlike the
+.scratch/wisp/probes/33/p1/receipt/main.go:243:			// library itself does (webview.go:381-383 -> PostQuitMessage).
+.scratch/wisp/probes/33/p1/receipt/main.go:279:			// Go-initiated push straight through browser.Eval (webview.go:439-440),
+.scratch/wisp/probes/33/p1/receipt/main.go:297:// pumpOnce is the shipping pnlPumpOnce (panel_host_windows.go:400-411) with the
+.scratch/wisp/probes/33/p1/reentry/main.go:16:// from sta_windows.go:47-96 / :127-143 and win32_windows.go:99-102,160-183:
+.scratch/wisp/probes/33/p1/reentry/main.go:38://	                       so the library's loop breaks at chromium.go:106 with
+.scratch/wisp/probes/33/p1/reentry/main.go:44:// debug.Stack() to the sink (internal/observe/goroutine.go:294-326, :153, :241).
+.scratch/wisp/probes/33/p1/reentry/main.go:66:	wmAppTask   = wmApp + 0x201 // internal/ball/win32_windows.go:102
+.scratch/wisp/probes/33/p1/reentry/main.go:73:	coinitSTA   = 0x2    // internal/ball/win32_windows.go:149 coinitApartmentThreaded
+.scratch/wisp/probes/33/p1/reentry/main.go:98:// mirrors internal/ball/win32_windows.go:160-173 (layout, not names).
+.scratch/wisp/probes/33/p1/reentry/main.go:114:// mirrors internal/ball/win32_windows.go:175-183.
+.scratch/wisp/probes/33/p1/reentry/main.go:316:// runSTA mirrors sta_windows.go:47-96 shape, then drives the mode.
+.scratch/wisp/probes/33/p1/reentry/main.go:371:	// share. Identical shape to sta_windows.go:78-92.
+.scratch/wisp/probes/33/p1/reentry/main.go:446:			// Force chromium.go:106 (r == 0 -> break) before the COM callback can
+.scratch/wisp/probes/33/p1/reentry/main.go:490:// postTask mirrors sta_windows.go:127-143: assign an id, store the closure,
+.scratch/wisp/probes/33/r8b/logs/pristine-ball_windows.go:106:	// liquid.go (UI-thread-owned, no locks); liqRaw keeps the last delivered
+.scratch/wisp/probes/33/r8b/logs/pristine-ball_windows.go:118:	// window-position event. See dock.go/dock_windows.go.
+.scratch/wisp/probes/33/r8b/logs/pristine-sta_windows.go:133://     never reach Close - createOnSTA failing after ball_windows.go recorded
+.scratch/wisp/probes/33/r8b/logs/pristine-sta_windows.go:139://     contact with a window is dispatching (docs/evidence/s1/33-panel-host-c27-r7.md
+.scratch/wisp/probes/gate-rerun-1/m1-mutant-placement_windows.go:13:// internal/risk/winsec_c26.go). Like the portable half in resolve.go it can only
+.scratch/wisp/probes/gate-rerun-1/m2a-mutant.go:96:// already uses (sameTree in resolve.go). Nothing here normalizes anything: no
+.scratch/wisp/probes/gate-rerun-1/m2a-mutant.go:313:		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+.scratch/wisp/probes/gate-rerun-1/m2a-mutant.go:715:// winsec_other.go could not have been used here.
+.scratch/wisp/probes/gate-rerun-1/m2b-mutant.go:96:// already uses (sameTree in resolve.go). Nothing here normalizes anything: no
+.scratch/wisp/probes/gate-rerun-1/m2b-mutant.go:313:		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+.scratch/wisp/probes/gate-rerun-1/m2b-mutant.go:715:// winsec_other.go could not have been used here.
+.scratch/wisp/probes/gate-rerun-1/m2c-mutant.go:96:// already uses (sameTree in resolve.go). Nothing here normalizes anything: no
+.scratch/wisp/probes/gate-rerun-1/m2c-mutant.go:313:		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+.scratch/wisp/probes/gate-rerun-1/m2c-mutant.go:715:// winsec_other.go could not have been used here.
+.scratch/wisp/probes/gate-rerun-1/m5a-mutant.go:96:// already uses (sameTree in resolve.go). Nothing here normalizes anything: no
+.scratch/wisp/probes/gate-rerun-1/m5a-mutant.go:314:		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+.scratch/wisp/probes/gate-rerun-1/m5a-mutant.go:716:// winsec_other.go could not have been used here.
+.scratch/wisp/probes/gate-rerun-1/m5b-mutant.go:96:// already uses (sameTree in resolve.go). Nothing here normalizes anything: no
+.scratch/wisp/probes/gate-rerun-1/m5b-mutant.go:314:		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+.scratch/wisp/probes/gate-rerun-1/m5b-mutant.go:716:// winsec_other.go could not have been used here.

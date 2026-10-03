@@ -1,0 +1,14 @@
+scripts/build.ps1
+scripts/d22scan.sh
+scripts/dev/ball-cycle.ps1
+scripts/dev/gen_fixtures11.py
+scripts/fetch-deps.ps1
+scripts/portable-tests-selftest.sh
+scripts/portable-tests.sh
+scripts/sign-models.ps1
+scripts/slo-check.ps1
+scripts/slo-freshness.sh
+scripts/spike/run.ps1
+scripts/winsec-tests.sh
+scripts/wisp-cli-tests.sh
+tools/d22scan/runtests.sh
