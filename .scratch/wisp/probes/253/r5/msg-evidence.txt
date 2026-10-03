@@ -1,0 +1,41 @@
+253-r5: 证据件 §1–§7 填齐（票 253 AC#2 落地腿，形ⓐ；只 commit 未 push）
+
+`.scratch/wisp/probes/253/r5/impl.md`（298 行）：
+- §1 现量（行号本腿自取，⛔ 未抄 p4/编排者给的）：`bridge.go` 入向名册全貌
+  （`panel.*` 四名 :42-45、`config.*` 两名 :66-67、guard :146/:148、router :175-208）＋
+  两把旧尺各数什么集合（`git_test.go:394` 的 `panelMethodRe` 单文件抽取器 :407-423、
+  `composer_test.go:394` 的 `routeLiteralRe` 走 frontend/src）＋冻结尺那把的射程。
+  **本腿新量到一条**：冻结尺的 `answered` 只从 `knownComposerMethod` 导出
+  （`l2_grant_boundary_test.go:777` 显式排除别的函数）⇒ `composer_dispatch.go` 的 router case 列表
+  此前不在任何尺的分母里，本尺分母 4（ROUTER AST）补的就是这一格。
+- §2 新尺定义：`internal/panel/inbound_roster_253_test.go`（834 行）——一枚**写死的六名封闭名册**
+  ＋两枚写死的计数（`wantFullInboundRosterSize253 = 6`、`wantNonPanelPrefixedInbound253 = 2`）
+  ＋五个独立分母、每个双向对账（DECLARED＝标识符 `Method` 前缀 **或** 值取点分形状，⛔ 不认命名空间；
+  RUNNING GUARD 真调 `knownComposerMethod`；GUARD AST；ROUTER AST 并要求 `default:` 必调 `rosterMismatch`；
+  ANSWERED 字面）。为形ⓐ"不需人工批准"复证了四处跳 `_test.go`／单文件的分母事实。
+- §3 门禁：`go build ./...` 净｜gofumpt `-l internal/panel` 空｜`./tools/d22scan/d22scan.exe` exit 0
+  "clean"（ban #8 自述含 `_test.go`、489 枚）｜`go test ./internal/panel/ -count=1` 终态
+  **111 PASS / 4 FAIL / 0 SKIP**，那 4 枚 FAIL 与起手基线逐名相同（253-r3 §ⓔ 在册页面契约族常红，
+  ⛔ 不算凭据、未修、未放宽）。⛔ 全程未跑全仓、未跑 `cmd/wisp`／`internal/config`／`internal/tools`／
+  `internal/risk`／`internal/agent/approval`。
+- §4 三发自证（原始日志逐字）：
+  - 正控：真树 `bridge.go` 末尾**只加**一枚 `const ConfigPeek253 = "config.peek"` ⇒
+    `TestFullInboundMethodRosterIsClosed` 指名红（`bridge.go declares the inbound method name config.peek
+    at bridge.go:170 const ConfigPeek253 and the closed roster does not carry it`）；
+    同刻 `git_test.go:385`/`:517` 两枚 want-4 锚与 l2 那族**全部仍 PASS**（种形刻意不带 `panel.` 前缀）；
+    `bridge.go` 还原后 md5 与行数逐字节相同（`63e69a79422b577cca6a320c52915261`／167 行／diff 空）。
+  - 反控：⛔ 未让 `bridge.go` 真多出第五枚 `panel.*`；want-4 两枚锚用例名与终态读数
+    `--- PASS: TestGitDimensionHasNoModelCallableTool (0.00s)`／`--- PASS: TestPlantedGitToolShapesGoRed (0.01s)`；
+    并具名纠一处易误读（`grep -c '"panel\.' bridge.go` 给 5 是文档注释那一行，尺的正则匹配不到 ⇒ 仍是 4）。
+  - 恒真自查：把分母 1 换成反形（空集也算过 ＋ 只查 subset 那一向）后**在同棵种了假腿的树上 `--- PASS`**
+    ⇒ 反形对这件事不敏感、不可作凭据；此结论另有两枚在册测量长存
+    （`TestSubsetOnlyRosterDirectionIsBlindToAPlantedName`、`TestFullInboundRosterRefusesAnEmptyDeclarationFile`）。
+  - 补登记后不响：只补名册＝仍红（红在"名册有名而 Go 不答"三支）；声明＋答侧＋名册三处一并补＝
+    `missing=(none) extra=(none)`（在 TempDir 副本里量，真树那一发要动 guard 行＝契约面，本腿不许）。
+- §5 十条自我对抗（含行号归因：`:466/:480/:504/:521` 属当时那两份被临时改过的文件，终态同条断言在
+  `:465/:479/:503`；含 `ComposerRequestSource` 若值改成带点会被本尺误伤这一未测风险）。
+- §6 具名量不到：`frontend/**` 那半（两层禁令）、真树完整登记（契约面）、`cmd/wisp/config_reload.go:86`
+  那枚 `config.reload` 算不算入向名〔半量，那包有 255-r2 在写〕、want-4 该不该扩〔契约判断〕、
+  d22scan 判据内部〔半量，只跑现成 exe〕。
+- §7 三句必写：**AC 勾选框一枚未碰**｜**未 push**｜**want-4 两枚锚一行未动**；零产码改动、
+  冻结件零触碰、未解冻任何契约件、临时件只建不删。
