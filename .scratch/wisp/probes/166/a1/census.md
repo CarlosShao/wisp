@@ -38,7 +38,7 @@
 |---|---|---|
 | 存储层有没有那一跳 | **有**（但列的是任务不是会话）：`internal/memory/dao_tasklog.go:93` `ListTaskLogs`，SQL `ORDER BY started_at DESC, id DESC`（`:97`） | 读 `dao_tasklog.go:92-111` |
 | Go 有没有导出方法 | **有**，且另有一枚更宽的：`internal/memory/privacy.go:47` `ListPrivacy`（对 `profile/memory/task_log/tool_call/artifacts` 五域统一列） | `grep -n "^func (s \*Store)" internal/memory/*.go` |
-| 有没有生产调用者 | `ListTaskLogs` 非测试引用行 **4 枚**（注释 1 + 定义 1 + 调用 2），两处调用**都在 `internal/memory` 自己家里**（`privacy.go:76`、`privacy.go:214`）⇒ **包外生产调用者＝0**。`ListPrivacy` 非测试引用 **2 枚**（注释＋定义），**调用者＝0**；命中只在 `internal/memory/privacy_test.go`、`internal/memory/artifacts_path_invariant_test.go:412` | `grep -rn "ListTaskLogs" cmd internal tools scripts --include='*.go' \| grep -v "_test.go" \| wc -l` ⇒ 4（逐行核为 1 注释 + 1 定义 + 2 调用） |
+| 有没有生产调用者 | `ListTaskLogs` 非测试引用行 **4 枚**（注释 1 + 定义 1 + 调用 2），两处调用**都在 `internal/memory` 自己家里**（`privacy.go:76`、`privacy.go:214`）⇒ **包外生产调用者＝0**。`ListPrivacy` 非测试引用 **2 枚**（注释＋定义），**调用者＝0**；命中只在 `internal/memory/privacy_test.go`、`internal/memory/artifacts_path_invariant_test.go:412` | `grep -rn "ListTaskLogs" cmd internal tools scripts --include='*.go' | grep -v "_test.go" | wc -l` ⇒ 4（逐行核为 1 注释 + 1 定义 + 2 调用） |
 | 面板/CLI 能不能触发 | **都不能**。CLI：`cmd/wisp/main.go:88-132` 的 switch 共 **10 枚命令**（run/providers/doctor/secret/models/slo/panel-assets/panel-inbound/version/help）＋default 拒绝，**无一枚列历史**。面板：快照 `Snapshot` 只有 `pending/results/composer/generatedAt`（+两枚可选 `instructions/tasks`），`internal/panel/composer.go:57-91`，**没有会话名册字段**；入向六枚方法名册（`internal/panel/bridge.go:42-45,66-67`）也**没有列会话那一枚** | 读 `main.go:88-132`；读 `bridge.go:42-67`；读 `composer.go:57-91` |
 
 三处各是谁：**产出＝`memory.Store.ListTaskLogs`（存在）**；**投递＝无人**（`internal/memory` 包外零调用者）；**落盘（到用户眼前）＝无处**（CLI 不印、快照不带）。
@@ -50,8 +50,8 @@
 |---|---|
 | 存储层有没有那一跳 | **对会话没有**。四枚显式根里唯一一枚真做检索的 SQL 是 `internal/memory/dao_memory.go:52` `SearchMemory`——它搜的是 **L2 显式记忆表 `memory`（`keywords` 列，`schema.go:40-50`）**，`LIKE … ESCAPE`（转义助手 `models.go:215 escapeLike` 已在，可复用）。`task_log` 侧**零枚** LIKE/全文：`FROM task_log` 只出现在 `dao_tasklog.go:82,97,116,132` 四枚（by-id / list / delete / purge）。**没有 FTS 虚表**（`grep -rn "CREATE VIRTUAL TABLE" cmd internal tools scripts --include='*.go' | wc -l` ⇒ **0**） |
 | Go 有没有导出方法 | 有 `SearchMemory`（但那不是会话搜索） |
-| 有没有生产调用者 | **0 枚**。`grep -rn "SearchMemory" cmd internal tools scripts --include='*.go' \| grep -v _test` ⇒ **2 行，逐行为 `dao_memory.go:47` 注释与 `:52` 定义**，无一行调用。命中只在 `internal/memory/dao_test.go` |
-| 面板/CLI 能不能触发 | 都不能。D34 声明的 `search.content`/`search.files`/`memory.recall` 今天**无实现**（`grep -rn "MemorySearch\|Recall" --include='*.go' \| grep -v _test` ⇒ 0 命中）；台账 `A308`（`docs/reports/pending-and-issues.md:7658`）自陈那 30 枚"声明了但不可及" |
+| 有没有生产调用者 | **0 枚**。`grep -rn "SearchMemory" cmd internal tools scripts --include='*.go' | grep -v _test` ⇒ **2 行，逐行为 `dao_memory.go:47` 注释与 `:52` 定义**，无一行调用。命中只在 `internal/memory/dao_test.go` |
+| 面板/CLI 能不能触发 | 都不能。D34 声明的 `search.content`/`search.files`/`memory.recall` 今天**无实现**（`grep -rn "MemorySearch|Recall" --include='*.go' | grep -v _test` ⇒ 0 命中）；台账 `A308`（`docs/reports/pending-and-issues.md:7658`）自陈那 30 枚"声明了但不可及" |
 
 三处：**产出＝只有 L2 那一跳（且它自己也没人调）**；**投递＝无**；**落盘＝无**。
 
@@ -60,7 +60,7 @@
 | 四问 | 读数 |
 |---|---|
 | 存储层有没有那一跳 | **没有"标题"这一枚列**。`task_log` 十二枚列见 `schema.go:53-65` 与 `models.go:58-70`：`id/started_at/ended_at/state/query_text/summary_text/cost_tokens_in/cost_tokens_out/cost_amount_micro/currency/error_class`。**没有 title/name/label**。最接近的两枚都不是标题：`query_text` 是**已脱敏的用户原话**（`schema.go:58` 注释 + §14.4），`summary_text` 是**模型产出的收尾摘要**，由 `FinishTaskLog`（`dao_tasklog.go:49-74`，SQL `:58-61`）在任务结束时**一次性写**，生产写点＝`cmd/wisp/run.go:1135` |
-| Go 有没有导出方法 | **没有改名方法**：`internal/memory` 全族 `func (s *Store)` 名册里无任何 `Rename*/SetTitle*/UpdateTitle*`（尺：`grep -rn "^func (s \*Store)" internal/memory --include='*.go' \| grep -v _test`，逐枚看过） |
+| Go 有没有导出方法 | **没有改名方法**：`internal/memory` 全族 `func (s *Store)` 名册里无任何 `Rename*/SetTitle*/UpdateTitle*`（尺：`grep -rn "^func (s \*Store)" internal/memory --include='*.go' | grep -v _test`，逐枚看过） |
 | 有没有生产调用者 | 不适用（无方法可调用） |
 | 面板/CLI 能不能触发 | 都不能 |
 
@@ -71,8 +71,8 @@
 | 四问 | 读数 |
 |---|---|
 | 存储层有没有那一跳 | **没有**。今天唯一像"归档"的两个东西都不是归档：① `state` 列（`schema.go:57`）是一枚**自由文本、无 CHECK**（`validateTaskLog` 只要求非空，`models.go:185-197`；`grep -rn "CHECK(" internal/memory --include='*.go' | wc -l` ⇒ **0**，`PRAGMA foreign_keys` 在 `cmd internal tools scripts` 源码里 ⇒ **0**，只以二进制字符串出现在编译产物 `build/*.exe` 里，那是驱动的自带串、不等于我们开了它）；② **保留期清理**（`internal/memory/retention.go:32 TaskLogTTL = 30*24h`，删行 SQL 在 `:194-204`：`DELETE FROM <table> WHERE <ts> IS NOT NULL AND <ts> < ?`） |
-| Go 有没有导出方法 | **没有 Archive*/Unarchive*。⚠ 且"撤销"这一形在真相源只追加的规矩下今天无处可放（`DeleteTaskLog:114`/`PurgeTaskLogs:129` 都是**真删**，不可逆）** | 
-| 有没有生产调用者 | `RetentionJob` **生产调用者＝0**：`grep -rn "RetentionJob" cmd internal tools scripts --include='*.go' \| grep -v "^internal/memory/"` ⇒ **1 行，且是注释**（`internal/observe/doc.go:20`）；`NewRetention*`/`StartRetention` 0 命中。⇒ 30 天窗口今天**没有任何东西在跑**（这与"归档会不会让它消失"直接相关，见 B） |
+| Go 有没有导出方法 | **没有 `Archive*`／`Unarchive*`**（`grep -rn "^func (s \*Store)" internal/memory --include='*.go'` 的名册逐枚看过，无此类名）。⚠ 且"撤销"这一形在"真相源只追加"的规矩下今天无处可放——`DeleteTaskLog`（`:114`）与 `PurgeTaskLogs`（`:129`）都是**真删、不可逆** |
+| 有没有生产调用者 | **0 枚**，且现在点名到方法（本程先前那句"RetentionJob 零调用者"读的是类型名，这里给真身）：入口是 `internal/memory/retention.go:98 StartRetentionJob` 与 `:235 RunRetentionOnce`——`grep -rn "StartRetentionJob" cmd internal tools scripts --include='*.go'` ⇒ 5 行，**全在 `retention.go` 自己（注释/定义/一枚 panic 串）＋ `retention_test.go:198` 那一枚用例**；`RunRetentionOnce` ⇒ 2 行，都在 `retention.go:233-234` 的注释里，**零调用**。⇒ **30 天窗口今天没有任何东西在跑**（这与"归档会不会让它消失"直接相关，见 B3）。⚠ 另有一处近邻会误导：`internal/observe/goroutine.go:58` 的 D38 名册里**确实预留了 `"retention-job"` 这个 goroutine 名**——名册认得它、生产里没人启动它（"名字在册"不等于"腿在跑"，正是本仓反复吃亏的那一形） |
 | 面板/CLI 能不能触发 | 都不能。隐私页那一族（`ListPrivacy/DeletePrivacyItem:135/PurgePrivacy:170/ExportPrivacy:198`）是**规格要求的归档邻居**（`docs/specs/SPEC-02:167-168`、`docs/PLAN.md:2715-2716` 规则 2 逐字要"一键清空/导出/逐条删除"），**四枚生产调用者全为 0** |
 
 三处：**产出＝无**；**投递＝无**；**落盘＝无**。
@@ -81,7 +81,7 @@
 
 | 四问 | 读数 |
 |---|---|
-| 存储层有没有那一跳 | **没有**。`grep -rniE "\bfork\b" cmd internal tools scripts --include='*.go' \| grep -v _test` 的命中**逐枚都不是会话分叉**：`cmd/wisp/doctor.go:226,290-297`、`cmd/wisp/secret.go:88,98,154`（数据根/环境**布局分叉**）、`cmd/wisp/resident_approval_windows.go:270`（注释指票 246-a1 的"分叉"）、`cmd/wisp/testdata/esclistener/main.go:179-183`（测试桩里的一枚 goroutine 起名 fork）、`internal/models/archive.go`（tar 解包，与"归档"同名不同物） |
+| 存储层有没有那一跳 | **没有**。`grep -rniE "\bfork\b" cmd internal tools scripts --include='*.go' | grep -v _test` 的命中**逐枚都不是会话分叉**：`cmd/wisp/doctor.go:226,290-297`、`cmd/wisp/secret.go:88,98,154`（数据根/环境**布局分叉**）、`cmd/wisp/resident_approval_windows.go:270`（注释指票 246-a1 的"分叉"）、`cmd/wisp/testdata/esclistener/main.go:179-183`（测试桩里的一枚 goroutine 起名 fork）、`internal/models/archive.go`（tar 解包，与"归档"同名不同物） |
 | Go 有没有导出方法 | 无 |
 | 有没有生产调用者 | 不适用 |
 | 面板/CLI 能不能触发 | 都不能 |
@@ -92,7 +92,7 @@
 
 | 载体 | 位置 | 是否落盘 | 边界 |
 |---|---|---|---|
-| 对话消息（`llm.Message` 序列） | `internal/agent/loop.go:187 history` | **否** | `History()` 只给内存副本（`:256-262`）；`Reset()` 清空（`:264-270`），且 **`Reset()` 全仓零生产调用者**（尺：`grep -rn "\.Reset()" cmd internal tools --include='*.go' \| grep -v _test` ⇒ 3 行，全在 `internal/llm/golden/replay.go:112`、`tools/d22scan/main.go:175,183`、`tools/mockllm/chat.go:431`，**没有一枚是 `Loop.Reset`**）⇒ 连"会话结束"这个动作都没人按 |
+| 对话消息（`llm.Message` 序列） | `internal/agent/loop.go:187 history` | **否** | `History()` 只给内存副本（`:256-262`）；`Reset()` 清空（`:264-270`），且 **`Reset()` 全仓零生产调用者**（尺：`grep -rn "\.Reset()" cmd internal tools --include='*.go' | grep -v _test` ⇒ 3 行，全在 `internal/llm/golden/replay.go:112`、`tools/d22scan/main.go:175,183`、`tools/mockllm/chat.go:431`，**没有一枚是 `Loop.Reset`**）⇒ 连"会话结束"这个动作都没人按 |
 | 流式片段（面板看到的正文） | `internal/panel/pump.go:416 StreamLog`（`cmd/wisp/run.go:698` 装配，`DefaultStreamKeys` 上限） | **否**（内存，按 key 数封顶，溢出改名/截断） | 快照 `results` 只带 `{correlationId, text, done}`（`composer.go:95-99`） |
 | 任务收尾摘要/成本 | `task_log.summary_text`/`cost_*`（`cmd/wisp/run.go:1124-1141`） | **是** | 每任务一行，非消息级 |
 | 工具取证 | `tool_call`（`dao_toolcall.go`） | 是 | `correlation_id == task_id`（`loop.go:356` 逐字"C18: correlation == task id"） |
@@ -128,7 +128,7 @@
 
 | 形 | 会不会从名册消失 | 依据 |
 |---|---|---|
-| **甲：`state` 列塞一个 `archived`** | **会从"当前任务名册"消失，且是静默的**。`ListTaskLogs`（`dao_tasklog.go:97`）**不带 WHERE**、列**全部**行；而 `RetentionJob` 的删行谓词是 `WHERE started_at < cutoff`（`retention.go:196-198`），**不看 state** ⇒ 归档**挡不住 30 天删除**，也**不会因归档而多活一天**。另撞一枚已登记的缺陷：状态词表今天有两套且互不相认（票 196 现量：真写进库的 `running/succeeded/cancelled/done` 一枚都不在 D43；schema 无 CHECK ⇒ **第五个词加进去门不会响**）。⇒ 甲形＝把"归档"塞进一枚**无人校验的枚举**，正是票 196 警告的形状 |
+| **甲：`state` 列塞一个 `archived`** | **会从"当前任务名册"消失，且是静默的**。`ListTaskLogs`（`dao_tasklog.go:97`）**不带 WHERE**、列**全部**行；而保留期那道删行的谓词是 `deleteOlderThan`（`retention.go:195-204`）里的 `WHERE <ts> IS NOT NULL AND <ts> < ?`，**不看 state** ⇒ 归档**挡不住 30 天删除**，也**不会因归档而多活一天**（且那枚删除今天根本没人启动，见 A4/F11）。另撞一枚已登记的缺陷：状态词表今天有两套且互不相认（票 196 现量：真写进库的 `running/succeeded/cancelled/done` 一枚都不在 D43；schema 无 CHECK ⇒ **第五个词加进去门不会响**）。⇒ 甲形＝把"归档"塞进一枚**无人校验的枚举**，正是票 196 警告的形状 |
 | **乙：新加 `archived_at INTEGER NULL` 一列** | **不会从名册消失**（`ListTaskLogs` 仍会带它，只要 SQL 不改），但**必红 schema 契约钉**（`schema_test.go:259` 逐表列数＝`contractSpec`；`:195` 表枚数＝9；`:229/:233` 语句枚数＝15/1；`:222` 版本值＝"2"）；且 `schema.go:10-13` 要求 DDL 与 `SPEC-02 §3` **逐字节相同**，而 AC#5 禁改 `docs/specs/**` |
 | **丙：真删 / `purgeAllDomains`** | **永久消失且无撤销**（`DeleteTaskLog:114`、`PurgeTaskLogs:129`、`privacy.go:262`），与票面硬约束 3"不许静默删历史"、`issues/README` 真相源只追加**直接相冲** ⇒ 丙形**不能当归档用** |
 
@@ -195,7 +195,7 @@
 
 1. **撤销要有可逆对象**：今天 `task_log` 没有归档位（A4），而"撤销"要么记旧值要么记事件；`internal/memory` 全族**没有任何 append-only 事件表**（九张表名册见 `schema.go:22-120,134-146`）。⇒ 撤销那一格的最小面积＝**再一张表或一列 + 一条幂等键**，落在与 DDL 契约钉同一枚面上。
 2. **分叉要有可复制的历史**：A5——历史本体不落盘（A6 第一行）。⇒ fork 的前置是 transcript 持久化（票 36 B 槽那一格），**不是本票的 DAO**。
-3. **归档别与保留期混**：`retention.go:32 TaskLogTTL` 的删行谓词不看 state（B3 甲），而 `RetentionJob` 今天**零生产调用者**（A4）⇒ "归档 30 天后真清"这一形今天**两头都不成立**。
+3. **归档别与保留期混**：`retention.go:32 TaskLogTTL` 的删行谓词不看 state（B3 甲），而入口 `StartRetentionJob`／`RunRetentionOnce` 今天**零生产调用者**（A4）⇒ "归档 30 天后真清"这一形今天**两头都不成立**。
 
 ---
 
@@ -227,10 +227,11 @@
 | F4 | "生产可达的工具只有 `fs.*` 六枚"（票 166 来源行引 W1 底盘普查、台账 `A308`） | 今天 `cmd/wisp/run.go` 的注册循环共**三处**：`:515`（fs 族）、`:544`（task 族）、`:780`（subagent 族）。fs 族＝`fs.read`/`fs.list`（`internal/tools/fs.go:326-329`）＋ `fs.write`/`fs.edit`/`fs.trash`/`fs.move`＋受 `[fs] delete_enabled` 门的 `fs.delete`（`fs_write.go:772-783`）；task 族＝`task.output`/`task.cancel`（`task.go:600-604`）；subagent 族＝`task.spawn`（`subagent_197.go:218`） | **推翻（过期）**：现量 **恒在 8 枚（fs 六 + task 二）＋ 门控 1 枚（`fs.delete`）＋ 子代理 1 枚（`task.spawn`）**。`A308`（`pending-and-issues.md:7656-7658`）那句"实现 6 枚"锚在 `192ad56`，票 162/164/221/197 落地后已不覆盖 |
 | F5 | "候选归口票＝145／167／182／197／213／214／215／216"（派单 C） | 票池实际相关名册里**至少漏三枚**：**票 36**（`36-result-history-panel.md:28` 逐字要 "task list (30d) → task detail … from SQLite via bridge"，`Status: ready-for-agent`、`Claimed by: —`＝未派未领）；**票 194**（入向方法名册对齐，owner 已裁）；**票 196**（状态词表/CHECK，正是"归档"那一格的地盘，且自陈**未派、待 owner 拍**） | **推翻（名册级）**：候选清单必须补这 3 枚，否则"归档/逐条删/导出"会被错并进 145/167/182 |
 | F6 | "`D35` 那张表是定过的；加列要走迁移"（票 166 硬约束 1） | 前半句成立（`schema.go:22-146` 九张表、迁移链 `:168-171`、事务内 + 前置备份）。**但"加列走迁移就够了"这一句不成立**：`schema.go:10-13` 逐字要求 DDL 与 `docs/specs/SPEC-02-data-storage.md §3` 的 ```sql 块**逐字节相同**，"No added or removed columns, tables, indexes or constraints"；`schema_test.go:173` 那族钉把表枚数/列枚数/语句枚数/版本值全钉死；而票 166 AC#5 要求 `docs/specs/**` 零字节 | **推翻（前提级）**：**"加列"与"`docs/specs/**` 零字节"在现仓规下互斥**。这一格必须 owner 拍（H#1），**不是落地腿可以自行放宽任何一侧的**（`AGENTS.md` §1.1：SLO/golden/阈值一字节不许动；spec 文字改动＝契约变更） |
-| F7 | "minimax 那条迁移不是崩溃原子的教训：两枚改名＋预写日志那一形"（票 166 硬约束 1） | 本仓**读不到对应物**，三把尺：`grep -rln "崩溃原子\|不是崩溃原子" docs .scratch` ⇒ **2 枚文件，一枚是票 166 面自己、一枚是本件**；`grep -rn "两枚改名" docs .scratch/wisp/issues` ⇒ **0**；`grep -rn "迁移" docs/evidence/s1/*.md` 与 `minimax`/`原子` 同现 ⇒ **0 行**（minimax 那族外部对标只出现在审批面，如 `docs/evidence/s1/219-approval-reply-surface-c1.md:406,441`，与迁移无关）。另：本仓的 WAL 是**连接串 pragma**（`internal/memory/open.go:148-151`：`_pragma=journal_mode(WAL)`＋`busy_timeout`＋`wal_autocheckpoint`），**不是迁移手段**（`grep -rn "journal_mode" internal/memory --include='*.go' \| grep -v _test`） | **登记为外部经验、本仓无对应尺**：不推翻票面那句教训，但**不许把它读成"本仓已有防线"**。崩溃原子性的本仓真凭据是现成可借的两枚：`internal/memory/schema_test.go:458 TestMigrationFailedStepIsAtomic` 与 `internal/memory/concurrent_test.go:179`（"Crash recovery with a real subprocess"） |
+| F7 | "minimax 那条迁移不是崩溃原子的教训：两枚改名＋预写日志那一形"（票 166 硬约束 1） | 本仓**读不到对应物**，三把尺：`grep -rln "崩溃原子|不是崩溃原子" docs .scratch` ⇒ **2 枚文件，一枚是票 166 面自己、一枚是本件**；`grep -rn "两枚改名" docs .scratch/wisp/issues` ⇒ **0**；`grep -rn "迁移" docs/evidence/s1/*.md` 与 `minimax`/`原子` 同现 ⇒ **0 行**（minimax 那族外部对标只出现在审批面，如 `docs/evidence/s1/219-approval-reply-surface-c1.md:406,441`，与迁移无关）。另：本仓的 WAL 是**连接串 pragma**（`internal/memory/open.go:148-151`：`_pragma=journal_mode(WAL)`＋`busy_timeout`＋`wal_autocheckpoint`），**不是迁移手段**（`grep -rn "journal_mode" internal/memory --include='*.go' | grep -v _test`） | **登记为外部经验、本仓无对应尺**：不推翻票面那句教训，但**不许把它读成"本仓已有防线"**。崩溃原子性的本仓真凭据是现成可借的两枚：`internal/memory/schema_test.go:458 TestMigrationFailedStepIsAtomic` 与 `internal/memory/concurrent_test.go:179`（"Crash recovery with a real subprocess"） |
 | F8 | "`session id／task id／correlation id 的分工`"（派单 B 假设三者已分工） | 现量：**correlation id 与 task id 今天不是分工，是别名**——`internal/agent/loop.go:356 newTaskJournal(l.opt.Journal, taskID, taskID)`，注释逐字"C18: correlation == task id"；`session id` 独立（`cmd/wisp/run.go:473` 铸，随进程死） | **推翻（分工级）**：三枚里只有两枚是真分工（task vs session）。任何"按 correlation 归组会话"的想法今天**等价于按 task 归组**，别把它读成"已经有会话维度的关联键" |
 | F9 | "票 145 那格'十四态里十一态无输入可画'会一直闭不掉——缺的就是这层数据"（票 166 §为什么值得做） | 票 145 面自陈：`AC#2/AC#6` **未勾**，且 AC#2 的**量出来的答案是"落地集＝空"**（`145-…` Status 追加段，逐字）。十四态对照表的行来源是 `docs/PLAN.md` 的 §17.5 那张表，真身坐标＝`:3481-3494`（见 F10，不是票面引的 `:3473-3488`） | **部分成立**：145 的"未闭"确实与"没有会话/历史这一层数据"同源（快照里确无会话字段，`composer.go:57-91`）；但**"缺的就是这层数据"这句偏大**——票 145 自己列的缺项里还有 token 计数、推理过程、错误分类、重复计数、成本、取消原因、当前屏（`145-…` §现量），**这些与"会话名册"是不同源的两批**。别在派单时把 145 整枚挂在 166 上 |
-| F10 | "`docs/PLAN.md:3473-3488` 那张十四行表"（票 145/182 引用、派单 C 借来的坐标） | 现量该区的真身：`:3474` 是 `## 17.5 Agent 工作状态的无 emoji 视觉设计` 标题行，`:3479` 表头「状态｜视觉｜动效｜明确不用」，**十四枚状态行落在 `:3481-3494`**（尺：`awk 'NR>=3474 && NR<=3500 && /^\| \*\*/ {c++} END {print c+0}' docs/PLAN.md` ⇒ **14**；逐行首列＝思考中/SSE 流式/推理过程/工具调用/工具调用（展开）/审批等待/L2 确认卡/L1 阻止窗口/L2 原生降级卡/错误/Stuck/成本/已取消·被打断/注入检出）⇒ **票面写的 `:3473-3488` 少算了 `:3489-3494` 六行，多算了 `:3473` 一行** | **推翻（坐标过期，且是双向偏）**：十四行表今天真身＝`docs/PLAN.md:3481-3494`。⚠ 本票**未改 `docs/PLAN.md` 一字**，只给坐标读数。这一格对票 145 的账有实际后果：按 `:3473-3488` 数只能数到 8 行，会**把后六行（含 `成本`、`注入检出`）读成不存在** |
+| F10 | "`docs/PLAN.md:3473-3488` 那张十四行表"（票 145/182 引用、派单 C 借来的坐标） | 现量该区的真身：`:3474` 是 `## 17.5 Agent 工作状态的无 emoji 视觉设计` 标题行，`:3479` 表头「状态｜视觉｜动效｜明确不用」，**十四枚状态行落在 `:3481-3494`**（尺：`awk 'NR>=3474 && NR<=3500 && /^| \*\*/ {c++} END {print c+0}' docs/PLAN.md` ⇒ **14**；逐行首列＝思考中／SSE 流式／推理过程／工具调用／工具调用（展开）／审批等待／L2 确认卡／L1 阻止窗口／L2 原生降级卡／错误／Stuck／成本／已取消·被打断／注入检出）⇒ **票面写的 `:3473-3488` 少算了 `:3489-3494` 六行、多算了 `:3473` 一行** | **推翻（坐标过期，且是双向偏）**：十四行表今天真身＝`docs/PLAN.md:3481-3494`。⚠ 本程**未改 `docs/PLAN.md` 一字**，只给坐标读数。这一格对票 145 的账有实际后果：按 `:3473-3488` 数只能数到 8 行，会**把后六行（含 `成本`、`注入检出`）读成不存在** |
+| F11 | "`docs/PLAN.md` 规则 1 已定：保留期的清理由 `memory` 模块的 `RetentionJob` 负责"（`docs/PLAN.md:2710-2712` 逐字，票 166 硬约束 1 与 AC#3 都默认它兑现） | 代码在、**启动点不在**：`internal/memory/retention.go:98 StartRetentionJob`／`:235 RunRetentionOnce` 非测试引用**逐枚是自家注释与定义**，唯一调用者是 `internal/memory/retention_test.go:198`；`internal/observe/goroutine.go:58` 的 D38 goroutine 名册里预留了 `"retention-job"` 这个名字（名册认得、生产没人启动） | **推翻（兑现级）**：30 天窗口今天**不会自动兑现**。对票 166 的后果有二：①"归档行到期即清"这一形今天两头都不成立（D3#3）；②落地腿若把会话表纳入保留期，**必须先有人把那枚启动点接上**，否则新表只是无限增长的堆。⚠ 这一格属不属于本票射程由编排者裁（本程只报读数，不派活） |
 
 ---
 
