@@ -133,7 +133,28 @@
 
 ## §4 复认/推翻前人件（具名）
 
-〔待填〕
+前人件：①`docs/evidence/s1/145-snapshot-field-census-r1.md`（AC#1 普查，锚 `88eab34`）＋票面 ①–⑦ 更正；②`145-snapshot-growth-r2.md`（14 候选逐枚）；③`145-snapshot-growth-r3.md`（落 1 维）。本程对 HEAD `5f9ff9d4` 现读复认。**注意：多处前人读数并非"错"，而是被 r1 之后落地的票（181/197/200/248）与票 35 装配根"跑在了前面"——本程区分"错"与"过期"。**
+
+### 4A · 复认（与现量一致）
+
+1. **票面① / r1 P7："十一行"不成立，面板侧完全无输入＝8（＋行 8 半＝9，＋行 9 原生＝10）。** ⇒ **复认**，且本程 §3 给出更强理由：快照虽长到 6 字段，**新增维度（git/model/credential/instructions/tasks）无一喂这十四行工作态**，"缺"的方向仍成立。
+2. **r3：`composer.currentModel`＋`modelKnown` 已落、真源＝`llm.Endpoint.Model`。** ⇒ **复认**：`composer.go:255-256`、`pump.go:253-259`、`run.go:704`、`panel_pump.go:242-247`、源 `internal/llm/resolver.go:46`＋赋值 `run.go:308`。
+3. **r1/r3：`ApprovalCardView.callChain` 无生产者（run 路径不记链路）。** ⇒ **复认**：`approval.go:55` 字段在、`panel_pump.go:65-73 liveVerdicts` 不置 CallChain、`pump.go:80-86` 与 `panel_pump.go:50-57` 具名。
+4. **r1 §2.4（行 4）"工具运行中不是无源，是接缝有、转发无"。** ⇒ **复认**：`agent.EvToolStart` 声明于 `internal/agent/sink.go:25`，全仓**零枚发射点**（本程 grep 只命中声明＋`run.go` 消费分支）；而底层 `llm.EvToolCallStart` 真发（`internal/llm/anthropic/stream.go:262`、`events.go:34`）。⇒ 工具条目属 ②（源在 llm 事件，缺 agent 级转发＋快照承载）。
+5. **r2/r3：`approval.remainingMs` 实时剩余无生产者。** ⇒ **复认并现量钉死**：`approval.EventTick` 声明于 `internal/agent/approval/ui.go:64`、**零发射者**；`gate.go:302/431` 的 `Remaining: g.window` 是**静态窗口全长**（`Gate.Window()` `gate.go:170`），非"还剩多少"。
+6. **票面④（行 14）：注入来源链今天通（非"送不到面板"）。** ⇒ **复认**：卡片 `Reason` 一路带过来（`approval.go:82`，`rules_gateway→gate→card`），"含来自 `<url>` 的内容"今天能画；缺的只是**可展开的命中片段**（见 4C）。
+
+### 4B · 推翻 / 需修正（现量与旧读冲突）
+
+7. **r1 §2.4（行 8）判 L1 `RemainingMs/Channels/WindowMs` "全有源"——本程判其把"静态窗长"与"实时剩余"混为一谈。** ⇒ **推翻这一枚"全有源"**（与 r2/r3 一致、与现量一致）：WindowMs（窗长）确可读，但行 8 视觉要的是**环形递减**＝实时 remaining，而 EventTick 零发射 ⇒ 那枚具体读数无生产者。**注**：`observe.Timeout.Remaining()`（`internal/observe/clock.go:43`）是一枚现成的单调剩余原语，`agent/tools.go:180` 已用它做工具超时——**L1 若开一枚 Timeout 记窗起即可派"还剩多少"**，所以此行不是"永远无源"，是"尚未为 L1 建实例＋接线"（比 r2/r3 的纯"无源"更精确）。
+8. **r2 进度栏（票内 151–153）"真正没源的仍是那 7 枚"一句，把 cost/usage/reasoning/repeat 也扫进"无源"——本程推翻其措辞、收窄其范围。** ⇒ 现量：**cost/usage 有活源**（`internal/agent/cost.go:23` `Cost{Usage,Micros,Currency}`＋`guard.go:80-84` `tokensIn/tokensOut/CostMicros`＋`llm.Usage` `events.go:90`）；**reasoning 正文有源**（`llm.EvReasoningDelta` `events.go:33`＋收集器 `events.go:189,258`）；**repeat/stuck 有源**（`guard.go:165 ObserveTurn`→`Reminder{Repeat,Tool,Stuck}` `guard.go:47-58`）。它们的阻塞是**跨 seam**（这些都活在 `internal/agent/loop.go:367` 每次 run 的**局部** `guard`/`cost` 上，`Loop` 结构 `loop.go:176-190` 只存配置不存活体，cmd/wisp 泵读口无一触及）＝ **② 非 ③**。⚠ 但 r2 的**详表**（§2/§3.2/P5/P7/P8）其实自己就写了 models/capabilities 是"有源无读者/半有源"——所以这是**r2 进度栏一行话与 r2 详表内部的张力**，本程站详表那侧。
+9. **票面⑤ / r1 §3(1)："今天没有任何一处生产代码构造快照"（`NewSnapshot` 非测试调用者＝0）。** ⇒ **过期推翻**（非 r1 之错）：票 35 装配根已落地——`pump.go:276` 调 `NewSnapshot`，`run.go:699` 调 `NewSnapshotPump` 并接满十枚读口，`panel_pump.go:401 publishPanelSnapshot` 在状态移动时驱动。r1 立的第四态"无生产者"对**已落地的那些维**（pending/results/composer 各维/instructions/tasks）**已解除**。
+10. **票面标题 / r1 P1："`Snapshot` 恰四字段"（`composer.go:44-49`）。** ⇒ **过期推翻（针对当前 HEAD）**：现量 6 枚直接字段（`composer.go:57-92`）。根因＝Instructions(200)、Tasks(197) 在 r1 锚 `88eab34` 之后加进结构体；r1 当时"四枚"成立。⚠ **连 `composer.go:40-56` 自己的头注释都还写着"FOUR, not one"并引装配根"`run.go:421-427`"**（现 `:699`）——这是一处**文档漂移**（本程只读、不改，据"薄索引≠权威"规约上报）。
+11. **前人所有行号相对 HEAD 均漂。** ⇒ 本程现读为准：`Snapshot` type `:57`（字段 `:58-61`＋`:74`＋`:91`）、`NewSnapshot` `:106`（return `:127`）、`ComposerState` `:235-270`、装配根 `run.go:699-726`、十四行表头 `PLAN.md:3479`／行体 `:3481-3494`。r3 引的 `run.go:442` 现量＝旧行（现 `:699`），`run.go:800-816`"记录点"现量已非记录点（`:801-813` 是 attachReplyListener/startConfigReload）。
+
+### 4C · 一处本程**未复认**的否证（不据此下结论）
+
+- **r1 §2.6（行 5，`DurationMs`）"tool_call.started_at 在生产路径上没有任何写者"**——本程**未复认**这枚否证（不跑码、未读到 record-point 的 `TaskLog.ToolCall.StartedAt` 赋值处）。现量只到：DB 列与 DAO 齐（`internal/memory/dao_toolcall.go:25,29,174`、`models.go:60 StartedAt int64`、`dao_tasklog.go:27,33` task 级 started_at **确有写者**）。⇒ "工具级 duration 无写者"是 r1 的否证、本程既没坐实也没推翻，落 §6 待量；**下游勿据此否证安静绕路**。
 
 ## §5 我可能写错的条目（自我对抗）
 
