@@ -42,24 +42,24 @@
 
 ## 要建什么
 
-- [ ] **AC#0 先把两件事判死，本票的第一格必须是读数不是码**：
+- [x] **AC#0 先把两件事判死，本票的第一格必须是读数不是码**：
   ⓐ **谁该读 `ModelSpec.Enabled`**——把"发现（`internal/llm/discover.go`）／选择（`internal/llm/resolver.go` 的枚举与 `:119` 那一问）／回执（面板清单）"三条路逐枚列出**今天谁读、谁不读**，
   并判死：**有没有任何一条真路径能让一枚 `enabled=false` 的模型被选中并产生花费**（判据＝一发跑起来的读数，⛔ 不许只按读码推断）；
   ⓑ **`discover.go:117` 那个构造体到底显不显式写 `Enabled: true`**（我上面 §4 明写我没读，这一格必须有人读它并给逐字）。
-- [ ] **AC#1 修法二选一（⛔ 不许两形都不落就把本票结案；先让我落具名 `A##` 选边再派落地腿）**：
+- [x] **AC#1 修法二选一（⛔ 不许两形都不落就把本票结案；先让我落具名 `A##` 选边再派落地腿）**：
   ⓐ **让承诺兑现**＝在**唯一那一处枚举点**（`resolver.go:287-288` 那一路）按 `Enabled` 过滤，
   并给一发**会响的尺**：种一枚 `enabled=false` 的条目 ⇒ 它⛔ 不许出现在枚举结果里；补回 `true` ⇒ 出现（**两向都要实测**）；
   ⛔ **不许**把过滤写进三张 provider 适配器（`145-a2` 报：那形会把写面扩到 `internal/llm` 三枚文件＝写面扩张，要另裁）；
   ⛔ **不许**顺手把 `settings.go` 的写侧改成"写 false 就等于删行"（那会改掉"条目还在目录里"这半句承诺）。
   ⓑ **具名降级**＝承认"今天 `enabled` 不生效"，把 `schema.go` 那句承诺注释**改成诚实形**并登记 `DEFERRED`（五字段齐全，`SPEC-12 §5`），
   同时票 145 AC#2b 那句"∩ `enabled=true`"必须跟着摘掉——⚠ **这一支会碰承诺文字**，代价要摊清才许选。
-- [ ] **AC#2 `default:"true"` 那一维的射程普查**：`applyDefaults`（`internal/config/defaults.go:75-80`）不进 map ⇒
+- [x] **AC#2 `default:"true"` 那一维的射程普查**：`applyDefaults`（`internal/config/defaults.go:75-80`）不进 map ⇒
   **全仓 map 型结构里还有几枚字段带 `default` tag**（尺＝逐枚列 map 字段＋带 tag 的条目枚数，给推导式与口径），
   每一枚答一句"缺键时落零值会不会被当成有意义的值"（例：`false` 会不会被读成"用户主动关了"）。⛔ 不许顺手改 `defaults.go` 的行为——那是**第二件事**，要另格。
-- [ ] **AC#3 契约轴**：`docs/PLAN.md`（含 D36 的 `[llm.providers]`／`[app]` 那一节）／`docs/specs/**` 一字节不许动；
+- [x] **AC#3 契约轴**：`docs/PLAN.md`（含 D36 的 `[llm.providers]`／`[app]` 那一节）／`docs/specs/**` 一字节不许动；
   `thresholds.go`／golden／`allowlist.txt` 不许动。⚠ **若有人主张"干脆摘掉 `enabled` 这个键"＝碰 D36 段树＝契约变更**，
   那一支**必须停下来摆 owner**（本票两形都不含它，⛔ 不许把它塞进"顺手清理"）。
-- [ ] **AC#4 门禁**：逐包 `go test -count=1 ./internal/llm/ ./internal/config/`＋`go build ./...`＋`sh scripts/d22scan.sh`；
+- [x] **AC#4 门禁**：逐包 `go test -count=1 ./internal/llm/ ./internal/config/`＋`go build ./...`＋`sh scripts/d22scan.sh`；
   ⛔ 不为变绿放宽任何断言、⛔ 不动 `internal/panel/tokens_fourway_test.go` 一字；
   `internal/panel` 那 2 枚 colour/token 已知常红按已知读（起因＝`design/**` 在工作树里被删未 staged，与本票无关）。
 
@@ -77,3 +77,17 @@
 2. **写面**＝`internal/llm`＋`internal/config` ⇒ 与在飞的 `255-r3`（`cmd/wisp`）、`252-r2`（`internal/tools`）**不互斥**，
    但**起手必跑** `git status --porcelain internal/llm internal/config` 并具名报回，撞面就停手上报。
 3. ⛔ **AC 框归编排者**，产码腿一枚都不许碰；判语必须由**非实现者**验收腿给。
+
+---
+
+## 编排者翻勾节（2026-10-03 17:0x，锚 `16e47045`；撤销口令「261 退回 ⓑ」）
+
+**五格全翻**，凭据＝`261-p1`（AC#0 三向现跑，`29047c99`→`efc13061`）＋`261-r1`（AC#1ⓐ 落地三 commit `2bbe7086`→`e2bfd7c8`→`9d0cd518`，我复跑两包整包绿）＋`261-a2`（AC#2 普查 `1ba22d25`，123 行）＋**`261-v1` 非实现者验收**（`bdabee2c`→`16e47045`，132 行零待填）：
+- **AC#0**：ⓐ 真路径存在（90 micros 出网计价、补 true 不反转＝死键）；ⓑ discover `:119` 显式写 true＝成立但带条件（`ImportDiscovered` 生产调用者零枚）。
+- **AC#1**：ⓐ 两处门（枚举＋选择点＝我扩的射程，落地腿已具名登记）；`261-v1` 撤门 6/6 红＋反形判据 6/6 红（两形都不恒真＝门有牙）＋三入口（text_chain／roles.chat 回退／roles.chat 直配）逐字拒绝句＋两向反转实测。
+- **AC#2**：3 枚全中（Enabled／ModelSpec.Billing／**Provider.Billing 本腿新报**）；v1 独立复推一致（五张 map 值结构恰 3 枚）。
+- **AC#3**：v1 核 `e2bfd7c8` 全名单禁区零触碰。
+- **AC#4**：v1 终态 155/0/0＋d22scan clean＋**`go build ./...` rc=0（编排者 17:0x 补跑）**。
+
+**⚠ v1 的新钉（本票欠账的下一格，已裁归 `261-r2`）**：**firstrun 引导教的"缺 `enabled` 键"形状会被新门拒**（引导文案通篇零提 enabled、预设不带 `Enabled`）⇒ 跟引导走的新用户会把模型配成被拒形状。修法三选一（Ⓐ firstrun 引导与预设带 `Enabled: true`／Ⓑ 错误文案里加"缺键视为关闭，把 `enabled = true` 写进条目即可"一句指路／Ⓒ `defaults.go` 的 map 分支补默认执法＝原"第二件事"）——**我裁 Ⓑ＋Ⓐ 同批落（Ⓒ 仍另格）**：Ⓑ 让被拒的人立刻知道怎么回来，Ⓐ 让新形状不再产生。⛔ `defaults.go` 不许动。
+**残留记账**：面板 `ModelCount` 不过滤＝票 145 格；`checkChainElement` 前移与否归编排者后裁；写侧无"重开"路径（设置页本就没有"关模型"开关＝v1 纠正我派单前提，照单入账）。
