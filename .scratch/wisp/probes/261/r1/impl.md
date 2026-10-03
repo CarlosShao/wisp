@@ -176,7 +176,10 @@ config: llm: model "m-off" of provider "p261" is disabled (enabled=false); re-en
 | `$(go env GOPATH)/bin/gofumpt -l`（三枚写过的 .go） | **空列表**（rc=0，零格式欠账） |
 | `go test -count=1 -v ./internal/llm/ ./internal/config/` | **rc=0，155 PASS / 0 FAIL / 0 SKIP**，两包 ok（llm 59.037s／config 1.301s）。名册对账（comm，剥时延后缀）：丢名＝**恰 3 枚被改写的 p1 旧名**；增名＝**恰 6 枚**（3 改写新名＋3 枚新 R1）；config 侧两枚 `TestTicket261P1MissingEnabledKeyDecodesFalse`/`TestTicket261P1SettingsWriteMaterializesFalse` **原样在册且 PASS**（它们没被打红＝本腿改动零渗漏到 config 侧） |
 | `go build ./...` | **⛔ 未跑**（派单禁区：本机还有别的测量排队） |
-| 终态 `git status --porcelain internal/llm internal/config` | 提交后应**复归起手名册＝空**（本腿三件全部入库；突变台全在 `.scratch`） |
+| 终态 `git status --porcelain internal/llm internal/config` | **复归起手名册＝空**（实测 0 行；本腿三件已入库，突变台全在 `.scratch`） |
+
+**本腿 commit**：骨架＝`2bbe7086`；主体（产码＋尺＋突变台＋本证据件）＝`e2bfd7c8`；
+本行所在的小补丁＝最后一枚 commit（`git log --oneline -3` 自取）。全部只 commit 不 push。
 
 ## §5 我判不动的地方（具名）
 
