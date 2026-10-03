@@ -1,0 +1,4 @@
+248-c3 fill §2: unwired vs not-written rosters (call-site counts)
+
+TierOf 0 production callers; bringUp transitively wired; credentialStatus
+wired 1 caller; EffectiveNow/NextTask 0 non-test writers. No Go run.

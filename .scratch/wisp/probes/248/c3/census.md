@@ -49,7 +49,24 @@
 
 ## §2 「写了没接」vs「一块没写」两套名册
 
-（取数中）
+> 判据＝生产调用点枚数（`git grep HEAD`，非测试文件）。⛔ 本腿一枚 `go build`/`vet` 都没跑，`rc=0` 证明不了接线；下面每枚都只写本腿实际 grep 到的枚数。
+
+**2A 「写了但没接线」（符号在 HEAD 已落库、非测试生产调用点＝0）**
+- `internal/config/tiers.go:93 TierOf(path) (tier, ok)` — 尺＝`git grep "TierOf" HEAD -- cmd internal` ⇒ HEAD 只有**定义行 + 它自己的注释行**，生产调用点 **0 枚**（连测试都没有）。它是 AC#8/AC#10 的"按键查档"读口：函数写了、能编译，但没人调 ⇒ 回执档位今天靠硬填。
+- 正解雏形此刻在**未提交工作树**里长：`cmd/wisp/config_readers_255.go:174` 注释逐字 "TierOf's first production caller"（该文件 `??` 未跟踪，属飞动的 255-r2）。⇒ 属"另一枚腿正在接、本腿不能替它勾"，不算本票可独立落的格。
+
+**2B 「写了且已接线」（函数在、非测试生产调用点 ≥1，⛔ 别当没接）**
+- `cmd/wisp/panel_config_store.go:285 credentialStatus()` — 唯一生产接线点 `cmd/wisp/run.go:710 Credential: rt.settings.credentialStatus`（**1 枚**）⇒ AC#2 的 reader 已接进常驻快照泵。
+- `cmd/wisp/panel_host_windows.go:230 bringUp()` — 直接调用点是同文件 `:402`（在 `PanelManager.Show` 内）；`Show` 被 `panel_resident_windows.go:360 showOnThread` 调；`showOnThread` 经 `rp.tasks` 由 `RequestShow`(`:329`)/`RequestToggle`(`:378`) 投；`RequestToggle` 的生产驱动点＝`cmd/wisp/resident_windows.go:163 withPanelHost(...RequestToggle...)`（交给球的热键/托盘）。⇒ **传递可达、非"没接"**，只是创建按设计延迟到手势。AC#4 因此不是"Go 侧一块没接"（见 §1 AC#4 更正）。
+- `internal/agent/approval`：`run.go:615-616` 真把 `cfg.Risk.L1WindowSec/ConfirmTimeoutSec` 灌进 `Window`/`ApprovalTimeout`（跑任务那腿，接了）；`resident_approval_windows.go:109-113` 那枚 `approval.New` **故意不接**这三项（`Window`/`ApprovalTimeout`/`Grants` 缺省）⇒ AC#10 的前提，见 2D。
+
+**2C 「写了枚举但零非测试写者」（值定义了、没人赋）**
+- `internal/panel/config_handlers.go:199 EffectiveNow`／`:200 EffectiveNextTask` — 尺＝`git grep "EffectiveNow\|EffectiveNextTask" HEAD -- cmd internal | grep -v _test` ⇒ 只命中**两枚常量定义**（199/200）与 `tierSentence` 的 **case 分支**（430/432），**赋 `res.Tier` 为它们的＝0 枚**（回执永远只赋 `EffectiveRestart`，`panel_config_store.go:228/:275`）。⇒ 票 255 那句"别为了好看把这两枚零写者的值用起来＝造第五套"正是针对此形状。
+
+**2D 「一块没写」（HEAD 上该产物/该调用点根本不存在）**
+- 回执里那枚"按键/按段查 `TierOf` 得档位"的**调用点**在 HEAD 不存在（只有硬填 `EffectiveRestart`）；被调的函数存在但 0 调用者 ⇒ AC#8/AC#10 缺的是**那一枚调用点**（255-r2 正在写），不是"整块没名字"。
+- `cmd/wisp/resident_approval_windows.go:109-113` 里 `approval.New` 的 `Grants`/`Window`/`ApprovalTimeout` 三项赋值＝**一块没写**（ⓑ 裁定不补，改在回执文案里写常量事实）。
+- ⛔ 前端两块（`interface ComposerState` 的 `credentialState`/`credentialKnown` 声明；`frontend/dist` 那一包页面产物）本腿**不读禁令层、无法自证其形状**——只从名册级尺（`git ls-files frontend/dist`＝1 枚 `.gitkeep`）与 v1c 跑那枚对账门红的读数**间接**知其未声明，⛔ 不署本腿的名、不引那两层任何行号。
 
 ## §3 依赖票 33 的那几格 vs 今天能独立落的那几格
 
