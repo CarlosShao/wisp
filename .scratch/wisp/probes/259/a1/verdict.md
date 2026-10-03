@@ -348,8 +348,80 @@ happened** in user-safe terms"，而签名是 `func (s *grantStore) spend(nonce,
 
 ## §8 结论（恒等式成立／不成立 + 凭据行号）
 
-尚未作答。
+**判：恒等式成立。** 锚点 `3138e012` 上，本腿**找不到任何一条真路径**能让
+`spend(nonce, bind)` 收到的 `bind` 与当初 `issue(nonce, bind)` 存进同一枚 store 的那一份**不同**。
+凭据链五步，每步一枚具名行：
+
+1. store 属于每枚 item 自己：字段 `internal/agent/approval/queue.go:49`，
+   构造 `queue.go:158`（`push` 内），唯一构造函数 `internal/agent/approval/approval.go:281`；
+   `Queue` 自己身上没有池子（`queue.go:62-79`）。
+2. 唯一的 `issue` 点喂的就是这枚 item 的字段：`queue.go:336`；
+   而 `grantNonce` 全仓唯一的调用者是 `internal/agent/approval/gate.go:506`，
+   传的是同一函数 `gate.go:501` 那次 `push` 刚返回的 `it`。
+3. 唯一的 `spend` 点的 receiver 与第二实参**同出一枚对象**：
+   `it` 来自 `queue.go:363`（`lookupForAllowLocked`，只读 `q.byID`），
+   句子是 `queue.go:376` = `it.grants.spend(nonce, it.bind)`。
+4. `it.bind` 在 `issue` 之后再没有被写过：可达写点唯一 = `queue.go:162`（`push` 内、
+   item 进 `byID` 之前）；`queue.go:562` 那枚结构体拷贝写的是 `fresh.bind`，
+   而 `fresh` 在 `queue.go:572` 就被丢弃；测试手搓的 `&qitem{}`
+   （`internal/agent/approval/pending_read_test.go:195-196`）进不了 `:363` 的查找。
+   写点普查四发的名字与边界在 §2、§6。
+5. store 里那份摘要也没有第二条进去的路：`s.values` 唯一写点 =
+   `internal/agent/approval/approval.go:287`（`issue` 体内），
+   其余出现处是 `:298` 读、`:302` 删、`:312` 整张换空、`:319` 计数。
+
+⇒ 于是 `approval.go:303` 的 `equalSecret(stored, bind)` 两端在同一次调用里读的是
+**同一个字符串**：`stored` 是 `it.bind` 在 `queue.go:336` 那一刻的副本，`bind` 是
+`it.bind` 在 `queue.go:376` 那一刻的读数，而这两者之间该字段没有任何写点（第 4 步）。
+`internal/agent/approval/approval.go:267-269` 那个"任一端为空即 false"的早退也不构成例外分支：
+`bindDigest`（`approval.go:253-261`，`hex.EncodeToString(sha256.Sum)` 于 `:260`）恒返回 64 个十六进制字符。
+
+票面点名要走的形状，逐条给结论（每条都能对上上面五步之一）：
+
+| 形状 | 经这条路两端会不会不同值 | 凭据 |
+|---|---|---|
+| 重新铸造（对同一枚 item 再签一张牌） | **不会**。今天每枚 item 只被签一次；即便签两次，第二次存的还是同一个 `it.bind` | `gate.go:506`（唯一调用者）／`queue.go:336` |
+| 重放 | **不会**。`Gate.Replay` 零产码调用者；`queue.replay` 里那枚带旧摘要的拷贝在 `:572` 被丢弃；重放出去的 `Decision` 要再进队列只能重新 `push`，`bind` 重算 | `gate.go:749-761`／`queue.go:552-575`（`:562`、`:563`、`:572`） |
+| `revoke` | **不会**，而且它根本不碰摘要：只把 map 换成空的 | `approval.go:309-313`；调用处 `queue.go:288`、`queue.go:426` |
+| 超时 | **不会**——第二发 allow 连 item 都拿不到 | `queue.go:476-497` → `deliver`（`:304-305`）→ `dropLocked`（`:286` 删 `byID`、`:288` revoke）→ `queue.go:366` `ErrUnknownCorrelation` |
+| 答复后再答复 | **不会**。同上；退一步就算摸到 `:376`，nonce 已不在 map ⇒ `approval.go:305` | `queue.go:301-303`、`:286`、`:288` |
+| 面板侧递交 allow | **不会**：这条路一次都不花牌，只做整池 revoke | `gate.go:731-740`（`:738` 是 `revokeGrants`） |
+| 跨卡（A 的 nonce 拿去 allow B） | **不会不同值**——因为**根本到不了比对那一句**：B 的池子里没那把 key，`approval.go:299` 逐枚 `continue`，落 `:305` | `approval.go:298-305`＋`queue.go:231-236` |
+| 包内直调 store | **会不同值**，⛔ 但它不是真路径：调用者在 `*_test.go` 里自己造两枚摘要递进去 | `internal/agent/approval/ticket242_binding_test.go:23`、`:104`（§1·现量 5 已具名；该包外没有任何码能拿到 `*grantStore`，它是未导出类型） |
+
+**边界声明（这一句必须和上面一起读）：** 恒等式说的是"存的那份 == 花的那份"，
+它⛔ **不等于**"这份摘要覆盖了实际执行的那一发请求"。后者要的是 `bindDigest` 的六个入参
+在**答复时刻**被重算，而答复侧能递进来的只有 `CorrelationID/Allow/Grant/Reason/Source`
+五枚字段（`gate.go:709-715`；两个 allow 方法的签名 `ui.go:146`、`ui.go:158`）——
+**tool／args／level／seq 在答复面上没有原料**。本腿把这一格量成读数，⛔ 不把它写成
+"ⓑ 做不到"，也⛔ 不写成"ⓐ 更安全"：**ⓐ／ⓑ 选边归编排者**（票面「未定义即停」与本腿任务同一条）。
 
 ## §9 交件判语
 
-尚未作答。
+- **只读**：本腿只跑过 `date`／`git log`／`git status`／`git show`／`ls`／`find`／`grep`／`sed -n`
+  与对 `.scratch/wisp/probes/259/a1/**` 的写入。
+- **零 Go 命令**：`go build`／`go test`／`go vet`／`go run`／`go list` 一次都没跑过；
+  因此所有需要跑起来的读数都写在 §7 并具名留空，⛔ 未用推测填空。
+- **未 push**：本腿共 8 枚 commit（skeleton、§1、§2、§3、§4、§5、§6＋§7、这枚交件），
+  全部只在本地 `dev` 上；未跑过 `git push`。
+- **AC 框未碰**：`.scratch/wisp/issues/259-*.md` 一字未改（不在本腿任何一次 `git add` 的
+  pathspec 里）；本件对票面只做引用与复量，复量不真的条目在 §1 具名推翻、
+  并按本腿规矩**没有**替票面改写。
+- **凭据零外泄**：本件不含任何真实 nonce／digest 的字节，也不含任何 API key／令牌值；
+  凡触及令牌处一律写变量名与形状（`it.bind`、`nonce`、`stored`、`s.values`）。
+  §1·现量 5 那一格原先抄了测试文件里的两枚 fixture 字面量，本腿在 §1 定稿时
+  已改写成"形状描述＋行号"，⛔ 未留字面量。
+- **冻结件**：`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、
+  `internal/perm/ticket90_persist_test.go` 只做了**射程判断，非内容引用**
+  （前者 550 行、对 `approval.／spend(／bindDigest／grantStore` 零命中；中者 2549 行，管的是
+  入站方法名名单、不数 `approval.PanelItem` 的字段；后者 430 行，同样零命中）；
+  `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／
+  `tools/d22scan/allowlist.txt`／`.github/workflows/ci.yml` 一次都没读过。
+- **两层禁令**：`frontend/**` 与 `design/**` 本腿**零读取**，本件亦未转述其任何内容
+  （工作树里 `design/**` 此刻正处于被删除状态，那是别人的写面，本腿未碰、不判）。
+- **临时件只建不删**：`.scratch/wisp/probes/259/a1/` 下 `verdict.md` 加八枚 `msg-*.txt`
+  （每枚 commit 的 `-F` 消息件，含本枚），全部保留、全部提交，未删任何仓内文件。
+- **未联系其它会话**，未代转任何消息给前端。
+- **本件的射程**：锚点 `3138e012`（`2026-10-03 09:42:10 +0800`）的码面。
+  三枚写腿在飞，`internal/agent/approval` 的写面按票面归本票自己，但 §7 第 5 条已声明
+  AC#1 动手前须重取 §2／§3 那两批发点。⛔ 本腿不选 ⓐⓑ，不判 AC#1–AC#5。

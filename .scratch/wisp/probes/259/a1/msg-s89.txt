@@ -1,0 +1,22 @@
+259-a1 sections 8 and 9: the verdict is identity holds, and the delivery statement
+
+AC#0's one question - is there any real path where the bind spend receives
+differs from the bind issue stored - answers NO at anchor 3138e012, on a
+five-step chain: the store belongs to the item (queue.go:49/158), the one
+issue site feeds it.bind and its only caller passes the item push just
+returned (queue.go:336, gate.go:501/506), the one spend site takes receiver
+and second argument from the same looked-up object (queue.go:363/376), that
+field has no reachable write after push (queue.go:162; the replay copy dies
+at :572; the test-planted literals never enter byID), and the stored digest
+has no other way in (approval.go:287).
+
+Each shape the ticket named is answered in its own row: re-mint, replay,
+revoke, expiry, answer-after-answer, panel allow and cross-card all fail to
+produce a differing pair, and the only place that does is an in-package
+direct store call, which is a test fixture and not a route.
+
+The boundary sentence is written next to the verdict so the identity cannot
+be read as "the digest covers the request that executes": the reply surface
+carries no tool, args, level or seq to rebuild it from. No side chosen on
+A or B - that is the orchestrator's call, and it is recorded here as a
+reading of the argument surface only.
