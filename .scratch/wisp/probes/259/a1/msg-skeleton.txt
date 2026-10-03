@@ -1,0 +1,9 @@
+259-a1 skeleton: AC#0 read-only census, anchor + empty sections
+
+Ticket 259 AC#0 is a reading, not code. This leg runs zero go commands
+(three write legs are in flight on the same working tree), so every
+number below is taken from source by grep/sed, never from a test run.
+
+Section 0 carries the start anchor (date + HEAD + dirty count of
+cmd/internal, one command). Sections 1-9 are the ticket's own headings,
+still unfilled; they get committed one question at a time.
