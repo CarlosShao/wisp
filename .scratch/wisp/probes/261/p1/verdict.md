@@ -132,6 +132,10 @@ provider 真收带该 model id 的计费请求、计费函数照算价卡。全�
 红绿判读备注：iter-config/iter-llm/iter-llm2 三份是开发回路（iter-llm 首跑的红是
 mockllm `chat` 路由不录请求体的仪器事实——`tools/mockllm/server.go` 注释逐字 "the chat route is untouched"，
 改在测试侧加录制 RoundTripper 解决，⛔ 未动 tools/）。
+中途入树核对：本腿在飞期间他人 commit `4658dbb6`（255-r3，"编排者代提·未验证"）落了 dev，
+`git show --name-only 4658dbb6 -- internal/llm internal/config`＝**零行**（它动 cmd/wisp／internal/panel／
+probes/255，与本腿两包不撞面）；本腿终态 status 两包仍复归空＝与起手名册相等。
+本腿全部读数出自无 overlay 的跟踪树。
 
 ## 5. 我判不动的地方（具名，不含糊）
 
