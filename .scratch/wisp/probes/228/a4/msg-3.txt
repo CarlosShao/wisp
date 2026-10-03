@@ -1,0 +1,13 @@
+228-a4: section 3 - minimal change face for shutdown and allow-once
+
+Section 3 lays out, from opened code only, the minimal change surface for
+AC#11 (tray Exit -> a new stop-request bit in internal/proc wired into both
+the RunEventLoop select and the resident boot-window select; recordTrayExit
+becomes record-and-return, no shutdown/exit on the ui-sta thread) and for
+AC#2 tray "allow once" (a fifth menu id + switch branches + Events key +
+cmd/wisp executor calling Allow/Reject/always, honest no-card outcome voiced
+only from cmd/wisp since ball callbacks have no error return). Three
+categories kept split per cell: written-but-unwired call-site counts,
+machine-only real tray click, and one copy-ready question for the page side.
+Shapes already ruled by orchestrator (A493, A498) are cited, not re-decided.
+No Go command run; frontend/design not read; AC boxes untouched.

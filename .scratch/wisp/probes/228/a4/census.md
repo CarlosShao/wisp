@@ -143,7 +143,44 @@
 
 ## §3 停机那一格（AC#11）与「允许一次」那一格（AC#2／F4）的最少改动面
 
-（取数中）
+> 本节只写**读到的形状**（作用面代码本腿都打开过），不推荐、不裁形（形已由编排者裁死：AC#11＝乙-1、AC#2＝F4 永远显示＋落空出声）。
+> 每格把**三类**分开：①写了没接线／②只有真机量得到／③属前端那半。
+
+### 3.1 AC#11（「退出」真执行者＝记请求、立刻返回，常驻腿自结束环路）
+
+**方向（盘上已定，非本腿裁）**：票面 `:91` 裁**乙-1＝`internal/proc` 的 stop-request 位**，⛔ 协程形（乙-2c）被三条读数否掉（`:93`：`RunEventLoop` 的 `sigCtx` 是函数内局部、`Runtime` 无 stop 位、动名册要改 `PLAN.md:2831` 冻结正文＋`thresholds.go:36`＝人工批准）。
+
+**要动的面（读到的作用点，行号本腿现读）**：
+1. **新增停机位**：`internal/proc/boot_windows.go:127 RunEventLoop` 今天唯一输入 `:128 signal.NotifyContext(os.Interrupt, SIGTERM)`；全仓 `RequestStop|StopRequest|shutdownRequest|stopRequest`＝**0 命中**（本腿现跑，复认 a2 R3）⇒ 这一位是**全新面**。环路本体每拍 50ms（`:133` `WaitForSingleObject(...ActivateEvent, 50)`＋`:145-150` 的 `select`），**加一支 `case` 不需新协程**。
+2. **接进两枚 select（AC#11 ⓐ 那个隐藏的坑）**：既要接 `RunEventLoop` 内 `boot_windows.go:145` 那支，**也要接进 `cmd/wisp/resident_windows.go:225 case sig := <-bootExit:` 那枚开机空窗 `select`**（`bootExit` 在 `:106-108` 注册、`:231` 才进 `RunEventLoop`）——球在 `:163` 起、环路在 `:231` 才进，**只接环路会让"球起来后、环路进入前"按下的退出被吞**，而 `resident_ball_228_windows_test.go:172-215` 那枚用例的存在理由就是这段空窗。
+3. **`recordTrayExit` 改口＋改形**：今天 `cmd/wisp/resident_ball_windows.go:308-311` 只 `slog.Warn outcome=ignored`＋`fmt.Printf`；⛔ 不许在回调里 `rt.Shutdown`＋`os.Exit`（跳 defer＝十步一步不走，票面 `:92` 反面判据）；托盘回调跑在 `ui-sta` 线程内（`internal/ball/ball_windows.go:669-686` 的 wndproc），`Ball.Close()` 是 `PostTask+<-done`（`:904`）⇒ **同步收口＝自等待死锁**。合法形＝"记一笔请求、立刻返回"（照 `vetoByEsc` 在 `resident_approval_windows.go:173-177` 那句"runs ON the ui-sta thread, waits on nothing"）。
+4. **注释改口（随 AC#10）**：`resident_ball_windows.go:300-307` 那句"两条补法都是新契约、AC#1 不授权任一"今天**不准确**（协程形单独完不成停机），票面 `:94 ⓒ` 要落地时具名改掉。
+
+**三类分开**：
+- **①写了没接线**：`OnTrayExit: recordTrayExit`（`resident_ball_windows.go:182`）**是接了的**、但它是个**只打日志的 no-op**——这一格不是"零调用者"，是"有调用者、没执行者"，与 AC#11 要的"记请求即返回"差**那一枚停机位的连线**。
+- **②只有真机量得到**：完成判据 ⓐ（空窗按下不被吞）＋ⓑ-1（进程内读满 10 条 `[]StepRecord` 逐名断序，照 `resident_approval_246_windows_test.go:145-158`）**可由跑测试的腿量到**；ⓑ-2（"那一次触发导致进程以退出码 0 结束＋审计仍有 install 记录"）**只有真机/`winlive` 量得到**，且⛔ **只准钉这一半**——"审计 1..10 全序"结构性读不到（`shutdown.go:150/:180/:186` 成功步零日志，本腿复认）。⛔ 投 `WM_COMMAND`＋菜单 id 那一支**已被票面 `:100` 证伪**（`tray_windows.go:15-16`）。由 owner 眼睛签收"真点一次退出→进程干净退"这一发。
+- **③属前端那半**：不属（纯 Go 侧停机）。
+- **待人裁定**：票面 `:95` 留了一枚**停手上报**点——若落地发现必须动 `hookableRoster` 闭集八枚（`shutdown_hooks.go:47-56`）才能做成，就从"加触发"滑成"改契约"，**当场停、不许顺手加第九枚槽**；另触发名册 doc（`boot_windows.go:122-126`「Ctrl+C / console close / WM_ENDSESSION...」）落地时必须改口成完整名册＋落一枚具名 `A##`（＝`A493`，本腿判定这一档不摆 owner，是编排者已推广的裁）。
+
+### 3.2 AC#2（「允许一次」那一枚入口，形状＝编排者已裁 F4/F6/F7/F8）
+
+**方向（盘上已定，非本腿裁）**：`A498` 四裁——**F4＝永远显示、按下去若无卡就出声**（不显示／置灰两支不选）；**F6＝拿 `AwaitingHuman()` 那枚（L2 优先）**；**F7＝新增第五枚 `Events` 键**（只扩名册列表、不扩断言维度）；**F8＝判据改写成"带正确 `Source` 标签、权威由关联号被花掉来证"，⛔ 乙支（加第五枚 `Channel`）永久不开**。
+
+**要动的面（读到的作用点）**：
+1. **托盘第五枚项今天不存在**：`internal/ball/tray_windows.go:20-23` 只到 `menuExit=4`；本格要加 `menuAllowOnce`（及 `menuReject`/`menuAlways`）一枚以上 id ＋ `appendItem(...)` 一行（`:86-91` 现逐条 append 形）。⚠ 这一枚 id 无论哪形都是对 `docs/specs/SPEC-08-ui-ball-panel.md:229`（逐字只列四枚右键项）的**增补**（a3 §②(b) 只登记这一句存在、不裁它算不算 spec 变更——那归编排者）。
+2. **分流三支**：`internal/ball/ball_windows.go:675-684` 的 `switch sel` 现只有四支 ⇒ 各加一支 `b.fire(b.opts.Events.OnTrayAllowOnce)` 等。⚠ `Events` 回调签名是 `func()`、`fire` 只判 nil（`:728-732`，本腿复认 a3 R15）⇒ **无错误回程**。
+3. **执行者接进 `cmd/wisp`**：`resident_ball_windows.go:173-184` 的 `Events` 字面量把新键接到真执行者——调 `Replies.Allow`（`replies.go:316`，本腿现读需 corr）、`Replies.Reject`（`:372`）、`replySurface.always`（`approval_always.go:70`，自带第二张 L2 卡、⛔ 不许绕过）。按 F6 从 `AwaitingHuman()`（`:252`）取那枚 L2 卡 corr。
+4. **落空出声只能在 `cmd/wisp` 侧（F4＋硬附 (b)）**：`Allow` 无卡走 `Look` 不中→`ErrNoTrackedCard`（本腿现读 `:316-320`）；因球侧回调无回程，**"这枚按钮此刻没对象"必须由 `cmd/wisp` 出声（审计行／球状态）**，⛔ 不许设计成 `showMenu` 返回值带错误；⛔ 出声文案**不许复用门拒绝/权限判定文案**（`A498` F4 (a)）。同文件已有诚实先例 `recordTrayExit`（`why`＋`slog.Warn outcome=ignored`）。
+
+**三类分开**：
+- **①写了没接线（本腿数到的枚数）**：
+  - `Replies.Allow/Reject` ＋ `replySurface.always` 三枚执行体**都在场**，但**从托盘指向它们的调用点＝0 枚**（托盘今天没有审批项）；`Replies.Allow` 的唯一产码调用者是控制台那支（`approval_reply.go`，a3 R30＝1 枚，挂 `interactiveStdin()` 门上），GUI 常驻腿里**无可达的允许者**。
+  - `SetTrayChecks`/`SetTrayTip`（`ball_windows.go:919`/`:927`）**生产调用者＝0**（本腿复认 a3 R16）——"推一维进托盘"这形有名字没使用者。
+  - `AwaitingHuman()`（`replies.go:252`）产码调用者＝3 枚、**全在 `cmd/wisp`**（a3 R17），**没有一条线把它送进 `internal/ball`**。⇒ 以上三处是"写了没接线"的判据形状；⛔ 本腿一枚 `go build`/`vet` 没跑，`rc=0` 不证明接线，只报**读到的调用点枚数**。
+- **②只有真机量得到**：判据"点下去⇒`Gate` 收到带正确 `Source` 的答复"里，**"真点一次托盘允许"这一发只能由 owner 眼睛签收或另造导出面**（`winlive` 测不了托盘菜单，凭据 a2/a3 否定尺＋`TrackPopupMenu` 同步返回）；"回调接反/接空判红"那半**可由跑测试的腿在进程内做**（在装配处拿被注入的函数值直接调，照 `A495` ⓑ-1 形，⛔ 不许用 `WM_COMMAND`）。⚠ "第五枚 `Events` 键会让名册钉 `resident_ball_228_test.go:319-322` 红"这一维——本腿读到名册数的是宿主 `Events{…}` 字面量里的 key（a2/a3 两发同口径），但**它今天会不会真响要跑测试才知道**，本腿量不到。
+- **③属前端那半（可抄给页面侧的一句问句）**：本格是**托盘（Go 侧）**；但面板卡片上的允许/拒绝是另一枚**页面侧消费者**，且撞 AC#5 那条硬禁。⛔ 本腿不读 `frontend/**`、不代转，只把问题写成一句可抄的问句：
+  > "面板卡片上那枚『允许』按钮，点了之后 Go 侧 `Gate.DecideFromPanel` 对 `Allow=true` 一律回 `ErrPanelAllow`（只接受拒绝/查看完整参数，`gate.go:730/:740`）——页面侧因此**不该**提供可点的『允许』；那么允许动作是不是**只走原生托盘那半**（本格 AC#2），面板这一侧只保留『拒绝』和『查看参数』？"
+- **待人裁定**：F4/F6/F7/F8 已被编排者裁（不再是待裁）；本腿未见残留待 owner 拍的分支，除了 SPEC-08 §7 那行"第四枚→第五枚"算不算 spec 变更（a3 只登记、票面未明裁）——若落地腿要引那枚 spec 行，属**人工批准档**，本腿不替它拍。
 
 ---
 
