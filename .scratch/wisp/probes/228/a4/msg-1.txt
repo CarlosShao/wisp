@@ -1,0 +1,11 @@
+228-a4: section 1 - eleven unchecked cells, three categories split
+
+Section 1 fills the per-cell verdict for all 11 unchecked AC cells of ticket
+228 (lines 39 40 41 42 43 66 82 84 86 89 91), each stating what is missing
+(reading / code / wiring / awaiting ruling / front-end half), the current
+disk evidence file:line, and the minimal change face. The three categories
+are kept separate: written-but-unwired (call-site count), machine-only
+real window/tray/hotkey, and front-end page-side consumer. Line numbers
+read at 09:17 across in-flight cmd/wisp and internal/agent/approval may
+drift; internal/ball and internal/proc are stable. No Go command run;
+frontend/design not read; AC boxes untouched.
