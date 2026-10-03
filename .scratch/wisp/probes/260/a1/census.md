@@ -193,11 +193,41 @@
 
 ### 4.0 全称否定清单（尺的字面＋正控）
 
+本件里的每一枚全称否定都先给尺、再给正控（证明那把尺认得出"应该命中的样子"），逐枚现跑。
+
+| # | 否定句 | 尺（字面命令） | 读数 | 正控 |
+|---|---|---|---|---|
+| N1 | 出厂主机 `cmd/wisp` 里读 `config.HotkeySection` 的代码＝**零枚** | `git grep -n "\.Hotkey\b" -- '*.go'` | 11 命中：`cmd/balldebug/main.go:238`（旁支主机）／`cmd/wisp/config_readers_255.go:110`、`:113`（名册表的注释＋**字符串字面量**，不是读配置的代码）／`cmd/wisp/config_receipt_255_test.go:332`（测试注释）／`internal/ball/hotkey_live_test.go:500`、`:509`（测试）／`internal/ball/hotkey_reload.go:17`（注释）／`internal/ball/hotkey_windows.go:75`（注释）／`internal/config/boundary_test.go:87`（测试）／`internal/config/manager.go:281`（包内合并表）⇒ `cmd/wisp` 非注释读者 0 | 同一把尺**抓到了**已知真读者 `cmd/balldebug/main.go:238`（`h := mgr.Config().Hotkey`）⇒ 形状认得出，`cmd/wisp` 那 0 是"没有"而不是"瞎" |
+| N2 | 借用体从未拿到过配置来的加速器 | `git grep -n "reg(hkCancel" -- '*.go'` | 3 命中，全在 `internal/ball/hotkey_windows.go:532`（unreg 那手）／`:533`（唯一注册：`reg(hkCancel, escBorrowAcc())`）／`:553`（归还） | 同工具换成 `git grep -n "reg(p.id, acc)" -- internal/ball/hotkey_windows.go` ⇒ 命中 `:477`（idle 遍对另外三枚槽的注册）⇒ "注册调用"这个形状扫得到 |
+| N3 | `RebindHotkeys` 在 `cmd/wisp` 里零调用者 | `git grep -n "RebindHotkeys" -- '*.go' \| grep -v '^\.scratch'` | 12 命中：产码只有 `internal/ball/ball_windows.go:813`（定义）＋`internal/ball/hotkey_reload.go:45`（接口）／`:96`（桥里的唯一调用）；其余 9 枚是注释与测试；`cmd/wisp/**` 0 命中 | 同一把尺命中真调用点 `internal/ball/hotkey_live_test.go:247`/`:272`/`:297` 与假实现 `internal/ball/hotkey_status_test.go:444` ⇒ 会抓调用 |
+| N4 | `winlive` 那批借还钉不在 CI 射程里 | `git grep -n "winlive" -- '*.sh' '*.yml' '*.yaml'` | 0 命中；口径另有两枚：`internal/ball/hotkey_live_test.go:1` 与 `internal/ball/live_windows_test.go:1` 逐字 `//go:build windows && winlive`；CI 的 Go 步＝`.github/workflows/ci.yml:341`（`bash scripts/portable-tests.sh --scope=core`）、`:475`（`bash scripts/wisp-cli-tests.sh`）、`:511`（`--scope=windows`），三处都不带 `-tags` | 两把：① 同一把尺不限定后缀 ⇒ `winlive` 命中 >20 份文件（含票 245／246／255／258 面）；② `git grep -n -- "-tags" -- scripts .github` ⇒ 命中 `scripts/spike/run.ps1:47`（`$args += @("-tags", $Tags)`）⇒ `-tags` 这一形状在 CI 面里扫得着 |
+
 ### 4.1 量不到：需要真机 Win32 读数的三格
+
+1. **"借的那把键今天有没有真的成键"**＝桌面事实，只有真 `RegisterHotKey` 能答。尺在仓里（`internal/ball/hotkey_live_test.go:57` `escBorrowProbe`，注册那一手在 `:61-62`；`cmd/wisp/resident_approval_live_246_windows_test.go:350` `requireIdleCancelSlot246`／`:444` `observeEsc246`），但**必须跑**；本程零 Go 命令（同机三枚写腿在飞）⇒ 量不到。落点应归 AC#2（票 260 面 `:18` 要求的"会响的尺"），本格不替它预判。
+2. **"用户改完 `config.toml` 之后看得见哪句话"**：本程只能给落点不给读数。今天最响的一枚是 `internal/ball/hotkey_windows.go:444-446` 那条 slog Info，逐字「cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)」＋同段带 `"binding", b.Binding`（`:446`）——**句子里的键名是写死的 `Esc`，`binding` 字段是配置值**，两者并列时用户会看见"我配的组合键被叫成 Esc"。另两枚候选：`cmd/wisp/resident_ball_windows.go:127-130`（自述"THREE at idle … because its production binding is a bare Esc"）与 `internal/agent/approval/approval.go:90`（卡片文案 `按 Esc 键`）。
+3. **面板侧那枚取消键的现役显示形状**：`internal/panel` 此刻有写腿在飞（见 §4.4），本程判它的现役形状会读到别人的半成品 ⇒ 不判，只留名字给 AC#1 落地腿自己去现读。
 
 ### 4.2 量不到：需要跑测试才能证的判据形状
 
-### 4.3 量不到：票面引用了本仓不存在的形状
+- "§3.2 那批钉子会不会被打红"：我静态给了**每枚锚判的是 VK 还是 Mods 还是枚数**（`internal/ball/hotkey_status_test.go:223` 双判、`internal/ball/hotkey_live_test.go:107` 只判 VK、枚数锚四枚），但"红不红"是运行事实；本程不跑 ⇒ 量不到。
+- "非默认配置串的解析结果"：`ParseAccelerator` 的分支（`internal/ball/hotkey_windows.go:145-155` 未知键名报错、`:153-155` 无键报错）**静态可读、可推导**，默认档那一枚我已在 §3.2 推完；但"某一枚具体用户串实解出什么"要靠用例，本程不造运行事实 ⇒ 不写读数。
+- "AC#2 那发突变种下去必红"：突变＝跑码 ⇒ 明确不在本格射程（票 260 面 `:16` 也写着"本格不许改产码"）。
+
+### 4.3 量不到／对不上：票面与前人引用与本盘不符的几处（只报读数，不判形）
+
+- 票面 `:10` 写"借还成对体在 `internal/ball/ball_windows.go:875-901`" ⇒ 现跑：借体 `:873-889`、还体 `:895-907`；`875-901` 把 `:902-907` 关在区间外，而 `:904` 恰是全仓唯一一处归还时读配置串的行（详见 §2.4）。
+- 票面 `:10` 写"`:521` `escBorrowAcc`" ⇒ 现跑：`:521` 是注释首行，函数声明在 `:524`。
+- 票面 `:9` 的尺射程＝`internal cmd` ⇒ 见 §5 第 2 条（我在 `scripts/spike/common/winshell.go:437` 现读到第二枚真实调用点）。
+- 票面 `:12` 的 3 秒窗口＝`internal/agent/approval/queue.go:116` 现读 `DefaultL1Window = 3 * time.Second` **成立**；同一常量块 `:120` `MinL1Window = 2 * time.Second`／`:122` `MaxL1Window = 3 * time.Second`（票面未提，不矛盾，记它一笔：可配窗口今天被夹在 2–3 秒，借期上限不因本票变长）。
+- 票面 `:12` 的 `gate.go:319`→`:332`（`:338`）现读全部成立：`:319` `case <-deadline:`、`:332` `g.logf("approval: ANSWER-EXPIRED corr=%s tool=%s decision=timeout->execute after=%s",`、`:338` `return tools.AnswerTimeout, ""`。
+
+### 4.4 取数期间的写面状态（影响上面几处 cmd/wisp 读数的时效）
+
+- 本程最后一次 `git status --porcelain -- cmd internal` 现跑：` M cmd/wisp/config_receipt_255_test.go`（一枚在飞写腿改的文件，N1 里那枚 `:332` 注释命中读的是**工作树**版本，不是 HEAD 版本）。
+- 本件引用的其它 `cmd/wisp` 文件（`resident_ball_windows.go`／`resident_approval_windows.go`／`config_readers_255.go`）当时均无未提交改动；`internal/ball` 写面为 0 行。
+- ⚠ 时效口径：`cmd/wisp` 与 `internal/panel`、`internal/tools` 三枚写腿在飞，**引用前先重跑**（票面 `:7` 同一句规矩，本件照说一遍给自己）。
+
 
 ---
 
