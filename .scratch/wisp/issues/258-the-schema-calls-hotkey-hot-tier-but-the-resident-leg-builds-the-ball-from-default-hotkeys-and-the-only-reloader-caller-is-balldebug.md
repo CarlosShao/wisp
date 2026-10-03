@@ -15,9 +15,9 @@
 ## 要建什么（本票只管"改了以谁为准"这一件；⛔ 不碰界面、不碰凭据）
 
 - [x] **AC#0（本票第一格，且是闸门）＝先把三问答出来，⛔ 不许直接开写**：① 常驻腿要把配置里的四枚热键交出去，**构造期**该改哪一处、`DefaultHotkeys()` 那枚默认还要不要留作"配置缺失时的那一份"；② **改过之后**谁去重新注册——是把 `ball.NewHotkeyReloader` 那台机器接进常驻腿，还是让 `config_reload.go` 那一跳多调一次注册，两形的**代价与线程约束**各是什么；③ 四枚里有一枚注册失败（被别的程序占了）时，**今天那句 `hotkeys live %d/4` 会怎么说、应该怎么说**。交件判据＝逐处带 `file:line`＋尺读数；量不到的**具名说量不到**，⛔ 不许用"应该没问题"填空；⛔ 不许改任何产码。**〔16:4x 编排者翻勾：`258-a1` 交件 `1286382d`（104 行，占位 0，禁 Go 遵守），我抽验两把尺（`ApplyHotkeyDefaults` 真身 `hotkey_windows.go:87`＋唯一非测试调用者 balldebug:239；`NewHotkeyReloader` 全仓非测试调用点确实只有 balldebug:237）逐字命中；选形与裁定在下面第 7 节〕**
-- [ ] **AC#1 只在 AC#0 交完、并由编排者落一枚具名 `A##` 批准选形之后才许动**：`wisp run` 与**常驻腿**两条入口建出来的球，四枚热键**以 `config.toml` 的 `[hotkey]` 为准**；配置文件缺失／那一节缺失时**退回 `DefaultHotkeys()` 并说得出这句话**（不许静默换成另一套）。
-- [ ] **AC#2 说实话的判据（负向必配正控）**：种一发"把 `summon` 改成别的组合键" ⇒ **下一次建球注册的就是新值**（正控）；⛔ 反向不许做成词面尺（不许只扫注释里有没有 `hot-tier` 那个词），要问能力。⚠ 若量出来"重新注册必须回到 `ui-sta` 才安全"，那**属票 33 那批线程裁定的射程**，停下来上报、不许自填。
-- [ ] **AC#3 越界检查**：`git diff` 出现 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` 任一路径 ⇒ 直接退回。⛔ 三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）一字不许动。
+- [x] **AC#1 只在 AC#0 交完、并由编排者落一枚具名 `A##` 批准选形之后才许动**：`wisp run` 与**常驻腿**两条入口建出来的球，四枚热键**以 `config.toml` 的 `[hotkey]` 为准**；配置文件缺失／那一节缺失时**退回 `DefaultHotkeys()` 并说得出这句话**（不许静默换成另一套）。
+- [x] **AC#2 说实话的判据（负向必配正控）**：种一发"把 `summon` 改成别的组合键" ⇒ **下一次建球注册的就是新值**（正控）；⛔ 反向不许做成词面尺（不许只扫注释里有没有 `hot-tier` 那个词），要问能力。⚠ 若量出来"重新注册必须回到 `ui-sta` 才安全"，那**属票 33 那批线程裁定的射程**，停下来上报、不许自填。
+- [x] **AC#3 越界检查**：`git diff` 出现 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` 任一路径 ⇒ 直接退回。⛔ 三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）一字不许动。
 
 ## 禁区（本票全程）
 
