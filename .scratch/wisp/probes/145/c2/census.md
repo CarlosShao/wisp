@@ -75,7 +75,36 @@
 
 ## §2 零值冒充真值的名册＋"未知 vs 零"的形状候选
 
-〔待填〕
+**结论先给**：本仓对"宁缺毋造"已相当自律——**§1 里后来新增的每一维都带着一枚"未知守卫"**，没有发现"把没测过画成空闲/零"的现役字段。真正恒空的字段是 `attachments`/`attachmentError` 两枚（无真源/无读口），它们的空是"确实没有附件"意义上的诚实空，但**缺 known 位**，于是"看不见附件"与"没有附件"在页面上塌成同一读——这正是票面要防的那一形。下面分"已有的三种守卫形状"＋"残余风险名册"＋"最少形状候选"三段。
+
+### 2A · 本仓已落的三种"区分未知与零"形状（现量 file:line）
+
+| 形状 | 用在哪枚字段 | 赋值行 | 说明 |
+|---|---|---|---|
+| **伴生 `xxxKnown bool`** | `ModelKnown`/`CredentialKnown`（`composer.go:256,269`）、`TaskRowView.StatusKnown`（`subagent_roster_197.go:110`）、`ApprovalCardView.ReasonKnown`（`approval.go:52`） | `pump.go:258/269`（读口存在才置 true）、`subagent_roster_197.go:215-223`（StatusKnown=false 时把 Status 抹成 ""＋填 fail-closed reason） | 标量维的标准做法：值＋一枚"我到底读没读到"。计数类维度（0 是合法值）**只能**用这一形，没有天然 sentinel。 |
+| **保留 sentinel 枚举成员** | `ModeView.Current="unknown"`、`CredentialState="unknown"/"config_unreadable"`、`GitView.Kind="unreadable"`、`InstructionsSection.Status="not_run"/"none_found"/"off"/"refused"` | `composer.go:117`、`config_handlers.go:180,183`、`git.go:151 GitViewNotProbed`、`instructions_200.go:159-164` | 字符串/枚举维的标准做法：给"没读数"留一个**具名**档位，而不是留空串。 |
+| **非真态强制 `Reason` 非空** | `GitView.Reason`（`git.go:120`"mandatory, never empty"）、`WorkspaceView.Reason`（`composer.go:222-224` Set=false 时必带）、`InstructionsSection.Reason`、`TaskRowView.StatusReason` | 上述各构造点 | 前两者再配一句"为什么没有"，杜绝渲染侧自行补"没有风险/没有仓库"。 |
+| **段级 `*`＋omitempty＝键存在性表意** | `Snapshot.Instructions`/`Snapshot.Tasks`（`composer.go:74,91`） | `pump.go:277-282/283-291`（读口在才挂段；读口在但空内容仍发键，读口无才让键缺席） | 整段级："这个 host 根本看不见子代理/没接加载器"靠**键缺席**表达，而非靠一段全零——`composer.go:66-73` 明写这不是绕 byte-nail 的近路。 |
+
+⇒ **顶层六段＋composer 内 9/11 维都已被上述某种形状守住了**；构造器 `NewSnapshot` 自己还兜了两道（`composer.go:115-126`：mode 空→unknown、git 空→NotProbed）。
+
+### 2B · 残余"零值冒充真值"风险名册（具名到行）
+
+1. **`ComposerState.AttachmentReason`（json `attachmentError`，`composer.go:241`）——无 known 位的恒空**。泵从不填（`pump.go:242` 只传 nil，段内无一处写它），页面读到的一直是 `""`＝"没有附件错误"。风险等级低（因为 `Attachments` 也恒空，两者自洽），但它**没走 2A 任一种形状**：将来若接上"有读口但本轮读失败"，`""` 会把"读失败"画成"没错误"。**这是本程唯一发现的、现役字段缺未知守卫处。**
+2. **`StreamLog.TruncationFor` 未知键→零值**（`pump.go:655-668`：`s.kept[key]` 不存在即 `return StreamTruncation{}`）。于是 `TaskRowView` 的 `streamTruncated=false / streamElidedRunes=0 / streamDropped=false`（`subagent_roster_197.go:130-132`、填于 `panel_pump.go:172,182-184`）对"这条流从没写过"与"这条流完整没截"给同一读数。`pump.go:651-655` 的注释**自知并接受了这一塌合**（"the row that exists is the row in full"）；不算新 bug，但属"零冒充真"的既登记缺口，页面若把 `elided=0` 画成"已确认全文"就越了界。
+3. **假想的 `remainingMs`**（当前快照**没有**这枚字段）：若某写腿把 `gate.go:302/431` 的静态 `Remaining: g.window` 直接搬进快照当"还剩多少"，就会**把"刚开满格窗口"画成"还在倒数"**——`pump.go:50-56` 具名此坑（`EventTick` 零发射、无"还剩多少"读口）。**现状＝字段不存在，所以没违反；风险在下一步 naiive 接法**。r2/r3 正是因此拒收 `remainingMs`。
+4. **`Cost.Micros` / `Guard.tokensIn+Out` 若接进快照而不带 known 位**：金额/计数 0 是合法值（任务确实没花钱），"没读到 Cost（loop 局部，泵拿不到）"与"确实 0"必须分开——接的时候**必须**用 2A 第一形（伴生 known bool），否则就是把"无源"画成"零成本"。
+
+### 2C · "未知 vs 零"最少需要的形状候选（只列形状与代价，⛔ 不选形、不动手）
+
+给编排者排形用，按维类型分列，代价＝对**契约/前端对齐/泵**三处的连带成本：
+
+- **标量字符串/枚举维**（如 model、mode、credential 一族）→ **形状＝保留 sentinel 成员**（2A 第二形）。代价：新增一个枚举名（前端 TS 要能识别；`composer_test.go:48` 双向尺只认 json 键不认值， sentinel 不触发它），零新增字段。
+- **标量计数/布尔维**（0/"" 是合法真值，如 cost、elided、remaining）→ **形状＝伴生 `xxxKnown bool`**（2A 第一形）。代价：**+1 字段/维＝+1 个 json 键＝扩契约**，会撞 `approval_test.go:105`/`composer_test.go:48` 双向尺与 `pump_test.go` 键集钉（须同 commit 带 `frontend/src/lib/panel.ts`＝`Q-51` 未决）；泵侧多一条"读口在才置 true"的赋值线。
+- **整段/整块维**（如 tasks、instructions、未来的 tools[]/failures[]）→ **形状＝`*Section`＋omitempty，键存在性表意**（2A 第四形）。代价：段对象一个 json 键（比逐维 known 少扩），但要保住 4 键地板的 byte-nail（`composer.go:66-73` 已论证指针 omitempty 不违反），且前端要为"键缺席"与"键在但空数组"写两套文案。
+- **最少之我见（不选，只摆）**：一维若"没读到"与"值本身是零"都可能出现 → **非要有某种 unknown 表示，三形择一**；纯计数维**排除 sentinel 形**（没有天然"未知"数值可借），只 `known bool` 或 `*int`（nil＝未知）二者之一——但 `*int` 也是扩一个可空键、代价同上。
+
+> ⚠ 本节仅**列形状＋代价**，选形归编排者；本程未动任何产码、未提议放宽任何既有断言（键集钉 `pump_test.go:111-124/:270-276`、双向尺 `composer_test.go:48`/`approval_test.go:105` 一律照其在位）。
 
 ## §3 状态↔缺字段对照表（十四枚逐行）
 
