@@ -1,0 +1,5 @@
+248-c3 fill §4: real-machine readings list + frontend questions
+
+Lists the 4 real-window readings (who: owner eyes vs orchestrator
+self-run) and 3 copy-to-frontend questions for AC#2/AC#9/AC#4. No frontend
+content read or referenced.
