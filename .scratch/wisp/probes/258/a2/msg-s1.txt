@@ -1,0 +1,19 @@
+docs(probes/258-a2): section 1 - hotkey reloader wiring surface (read-only)
+
+Answer census question 1 with package-level file:line for every point:
+
+- real signature of NewHotkeyReloader plus its whole driver/bookkeeping handle
+  set, and the stale b.HotkeyConfig() example in its own header comment
+- the caller roster measured with the ticket's own ruler: one non-test call site
+  (cmd/balldebug) and, harder than the ticket says, cmd/wisp has zero RebindHotkeys
+  edges at all
+- construction-time site (the hardcoded DefaultHotkeys) and the two legal carriers
+  into startResidentBall, with all five call sites named
+- the two config Managers in the resident process and why neither reaches the ball,
+  including the early-return doors that leave the reload tick unarmed
+- the teardown hazard: uiRun post-and-wait against a forgotten STA window hangs,
+  so the bridge must be joined before rb.stop()
+- which existing rulers the landing leg collides with (range reading, no quoting
+  of frozen content)
+
+No production code touched, no AC checkboxes touched, zero Go commands run.
