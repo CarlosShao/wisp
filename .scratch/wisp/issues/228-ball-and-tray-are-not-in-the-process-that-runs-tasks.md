@@ -171,3 +171,12 @@
 - **F6 ⇒ 裁甲＝拿 `AwaitingHuman()` 那一枚（L2 优先），并把并发语义写进判据。** 现量：`Allow(ctx, corr)` 需要关联号（`replies.go:316`），`AwaitingHuman()` 只给那一枚（`:252`），`Pending()` 按显示序给全部（`:227`），而 `:242-245` 的注释原文就写着 L2 优先。⇒ 托盘那一枚「允许一次」**永远作用于队头那枚 L2 卡**；⛔ 不许写成"支持单枚并发"（`Pending()` 明摆着能有多枚，那句是假前提）。乙支（菜单里列出全部卡）＝新面、动 `showMenu` 结构，**不做**。
 - **F5 ⇒ 登记不在本块射程**：托盘那枚第五项只对 **L2** 出声；若要它枚举 L1 那一发，就撞票 220 AC#2 那格"两腿各造一次枚举器＝两份真相源"（票面 `:60`，且 `:19` 逐字「L1 的 `Gate.windows` 全仓零枚枚举口」）⇒ **本票不做 L1 枚举**，谁要做得先在票 220 那格裁甲乙。
 - **落地腿判据补一条（来自 `33-a2` 的 F4 同味教训）**：改 `cmd/wisp` 那侧的**文件布局**时，注意 `cmd/wisp/panel_host_gate_test.go:27` 那枚反转钉**按文件名寻址**——搬文件不打红它，只会把 L1 那一格掏成假绿。本票的落地腿若搬动 `resident_ball*` 相关文件，**必须同时改那类尺的射程并给"种 X 必响"的正控**；没搬就什么都不做。
+
+## 编排者收 228-a5（10-03 10:2x，只读分诊；台账 `A564`；⛔ 上面原话一字不改，就地打旧两处）
+
+- **交件为真**：`.scratch/wisp/probes/228/a5/census.md` **444 行／46,733 字节**，四枚 commit `6d86eeaa`→`a51da6ad`→`4f2a777b`→`00d1e02e`，零产码、零 Go 命令、未 push。
+- ★**票面"允许入口枚数＝1"过期**：按宿主计今天**已有 2 枚**——命令行那扇（`cmd/wisp/run.go` 的答复听众，`228-a5` 报 `:802` 一带的 `attachReplyListener`，我读了 `:800-804` 形状对得上）＋常驻 GUI 腿复用**同一张动词表**（`cmd/wisp/resident_task_source_windows.go`，`:160` 逐字注释 "the answer side, built from approval_reply.go's own verb table"）。**仍全缺的是 GUI 手势那三扇**（托盘／球单击／唤醒词），面板侧是**结构性无门**（C17 里没有 allow）。
+- ★**★一句幻影引文，就地打旧**：本票 Progress log 第 ③ 条（`:116`）引的 `internal/ball/interaction_live_test.go:12` 那句逐字 "needs a real mouse in the notification area"——**文件真存在，但那句话全仓找不到**（我现跑 `grep -rn "needs a real mouse" --include=*.go internal cmd`＝零命中；该文件 `:12` 一带逐字是 "Where a clause needs a human hand that no harness can supply (a second monitor, the felt experience of focus)"）。⇒ **方向成立（winlive 族确实测不了托盘菜单），证据要换成机制形**：那文件靠 `//go:build windows && winlive` 档、而 CI 不带该 tag。⚠ 这条是我把腿的引文**未经自己复跑就写进票面**的又一枚（第 85 条同源），记我。
+- **`Gate.Replay` 产码零调用者＝复认**（我现跑尺只命中它自己的定义 `gate.go:749`）。
+- **托盘加一枚"允许一次"的落地料（这是本票 AC#2／待派那格的开工前提）**：**五处产码＋一处名册**；三层都⛔ **不需要新增任何 `panel.*` 方法名**⇒ **不触 C17 契约面**（与 `Q-76` 那格分清：那一格要的是**面板按下去**，这一格是**托盘按下去**）；"没卡时不许假话"有五族现成形状可复用（`ErrNoTrackedCard` 及其三枚钉／控制台那两句成句／`vetoByEsc` 无卡句／`recordTrayExit` 的 `outcome=ignored`／B1 通道族），⛔ 不许造第二套词；一次 allow 从入口到审计走六处，**零仪器三段**＝常驻腿那行 `ANSWER-ALLOW`、菜单枚数／id／标签、"没卡要出声"那一发。
+- ⚠ **落地腿开工前必读的两条排程变化**：① 它复尺抓到 **`220-r1` 此刻正在给 `Gate` 加 L1 只读枚举口**（未跟踪的 `window_read.go`，具名批准见台账 `A562` §1）⇒ **本票的 F5 那条"不在本块射程／不许两腿各造一次枚举器"继续生效**，托盘那枚第五项**只对 L2 出声**，要碰 L1 一律走票 220 那一份真相源；② `259-a1` 报的 "`NativeAPI.Allow` 零产码调用者" 本格**收窄**：产码里真在用的是 `*approval.Replies` 那一层（`replies.go:316→:328`），不是 `NativeAPI` 那个接口——⛔ 谁也不许据那句把"允许入口"读成"根本没实现过"。
