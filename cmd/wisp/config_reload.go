@@ -184,13 +184,13 @@ func (rt *agentRuntime) reportReload(rep *config.Report) {
 			rt.auditf("config: HOT-RELOAD-READER section=%s %s", name, split.verdictFor(name))
 		}
 		if len(split.claimable) > 0 {
-			fmt.Fprintf(rt.stdout, "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：%v\n", split.claimable)
+			fmt.Fprintf(rt.stdout, "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：%s\n", bracketed(split.claimable))
 		}
 		if len(split.quiet) > 0 {
 			fmt.Fprintf(rt.stdout,
 				"wisp run: 配置热加载：这些段的值已换进本进程内存，但本宿主没有会按新值做事的读者，"+
 					"本次运行不会因此改变行为（票 255 AC#1：这一半不许说成「已立即生效」；"+
-					"逐段的读者判定见 HOT-RELOAD-READER 行）：%v\n", split.quiet)
+					"逐段的读者判定见 HOT-RELOAD-READER 行）：%s\n", bracketed(split.quiet))
 		}
 		for _, name := range split.disagree {
 			// plan() hot-applied a name the tier registry cannot explain. The

@@ -1,0 +1,13 @@
+票 255 r2 · 回执逐名加方括号 + 句子装配的确定性钉
+
+一处格式改动：两句回执的热档名单改为每段自带方括号（bracketed()），不再用
+`%v` 的 `[ball session panel]` 形状。理由具名：票 255 AC#1 的判据是"那句话里不许
+出现 `[panel]`"，`%v` 多元素时段名不带括号，人和 grep 都会漏看——谎报因此能在抽查
+里活下来；逐枚括号也是本仓 restart/locked 两句已有的形状。
+
+新增 TestTicket255ReceiptSentenceAssemblyIsFiltered：直接把生产函数 reportReload
+喂一枚生产类型的 Report（14 枚热档名），钉「已立即生效」那行只许出现 [llm]、
+诚实行必须逐枚点到其余各段、台账 HOT-RELOAD-READER 每段必须列出它背后的
+TierRegistry 行（[voice] 必须点名 voice.* 键级行）。它存在的理由已写进注释：
+种回 pre-255 形状（打印 rep.Hot 全集）时，判据那一行本身就红，而不是靠
+"缺句"的超时兜住。AC 勾选框一枚未碰；只 commit 不 push。

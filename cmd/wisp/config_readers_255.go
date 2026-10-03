@@ -248,6 +248,26 @@ func (s hotSectionSplit) verdictFor(name string) string {
 	return fmt.Sprintf("tier_row=%v claims=[%s]", rows, strings.Join(parts, " | "))
 }
 
+// bracketed renders a hot-tier name list as `[panel] [llm]`, one bracket per
+// section, instead of `%v`'s `[panel llm]`.
+//
+// WHY, since the old line used `%v`: the receipt's claim is checked per section
+// (票 255 AC#1's judgement is literally "那句话里不许出现 `[panel]`"). With `%v` a
+// multi-element list reads `[ball session panel]`, where a section is present but
+// un-bracketed - so a reader or a grep looking for `[panel]` misses it, which is
+// how a lying claim survives a spot check. The restart sentence already names
+// sections one bracket at a time (「[fs] 的放宽…」), so this is the house shape too.
+func bracketed(names []string) string {
+	if len(names) == 0 {
+		return "[]"
+	}
+	parts := make([]string, 0, len(names))
+	for _, n := range names {
+		parts = append(parts, "["+n+"]")
+	}
+	return strings.Join(parts, " ")
+}
+
 // configSectionsForScan returns the Config fields whose section the roster claims
 // to have adjudicated, as Go field names. It walks the schema by reflection so a
 // new hot section cannot slip past the roster - the same shape as

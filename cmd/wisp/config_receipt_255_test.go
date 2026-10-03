@@ -493,6 +493,58 @@ func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
 	})
 }
 
+// TestTicket255ReceiptSentenceAssemblyIsFiltered pins the sentence-building half
+// without the tick's timing: it hands reportReload a Report carrying every hot name
+// plan() can book, and demands that the 「已立即生效」 line list only the live-read
+// section while the honest line carries the rest. The two cases above measure the
+// plant-driven production reading; this one exists so a regression that puts
+// rep.Hot back into the claim (the pre-255 shape) reddens on the judgement line
+// itself, not on a missing-sentence deadline. The Report is the production type and
+// reportReload is the production function - nothing here re-implements the sentence.
+func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
+	r := newReloadRun223(t, 40*time.Second)
+	r.live(t, func() {
+		r.awaitAudit(t, "config: HOT-RELOAD state=armed")
+		r.rt.reportReload(&config.Report{
+			Hot: []string{"ball", "session", "audio", "llm", "agent", "privacy", "memory",
+				"panel", "cost", "models", "observe", "hotkey", "app", "voice"},
+		})
+		out := r.awaitStdout(t, "值已换进本进程内存")
+		immediate := lastLineWith(out, "这些段已立即生效")
+		if immediate == "" {
+			t.Fatalf("the immediate-tier sentence disappeared - AC#1 forbids 摘尺当修尺:\n%s", out)
+		}
+		if !strings.Contains(immediate, "[llm]") {
+			t.Errorf("the live-read section is not claimed: %q", immediate)
+		}
+		for _, forbidden := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[agent]", "[models]", "[hotkey]"} {
+			if strings.Contains(immediate, forbidden) {
+				t.Errorf("ticket 255 AC#1: the 已立即生效 sentence claims %s, which has no live reader in this host: %q", forbidden, immediate)
+			}
+		}
+		honest := lastLineWith(out, "值已换进本进程内存")
+		for _, want := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[agent]", "[models]", "[hotkey]"} {
+			if !strings.Contains(honest, want) {
+				t.Errorf("the honest sentence omits %s, so the edit vanished from the receipt: %q", want, honest)
+			}
+		}
+		if strings.Contains(honest, "[llm]") {
+			t.Errorf("[llm] is in both buckets: %q", honest)
+		}
+		// Every hot name owes a ledger line naming its rows and verdicts.
+		for _, name := range []string{"panel", "llm", "app", "voice"} {
+			line := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section="+name)
+			if !strings.Contains(line, "tier_row=") {
+				t.Errorf("the ledger line for %s does not name the tier rows behind the claim: %q", name, line)
+			}
+		}
+		perKey := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=voice")
+		if !strings.Contains(perKey, "voice.tts.speed") {
+			t.Errorf("[voice] is a per-key section, so its ledger line must list the key rows: %q", perKey)
+		}
+	})
+}
+
 func lastLineWith(haystack, needle string) string {
 	lines := strings.Split(haystack, "\n")
 	for i := len(lines) - 1; i >= 0; i-- {
