@@ -183,7 +183,42 @@
 
 - `internal/ball/ball_windows.go:64` `SizePx int // configured orb size 44..72 (0 = default 56)`，`internal/ball/ball_windows.go:144-151` 给了"0→缺省、越界夹住"的三步处理。⇒ §1.3 那枚"`[panel] height` 缺省是 0 还是 260"的纠结，**仓里有现成的表达模板**（一枚具名缺省常量＋显式夹取），但**选哪个语义仍要编排者裁**（§3.5），本腿只指出模板存在。
 - 对照：常驻球腿根本没设这枚字段（`cmd/wisp/resident_ball_windows.go:165-185` 的 `ball.Options{}` 里无 `SizePx`）⇒ 面板之外的 `[ball]` 段犯的是同一枚病（在飞判词 `cmd/wisp/config_readers_255.go:117` 亦如此记）。
-- §5 不依赖真窗口的机读判据候选
+## §5 不依赖真窗口的机读判据：有没有、长什么样、落在哪
+
+**直接答案：有，而且不止一枚。票面 AC#4 那句"改 width ⇒ 真窗口宽度随之变"确实只有本机可量，但"配置值真被面板宿主用上了"这件事可以拆成两枚机读断言：(i) 创建窗口那一步**收到的实参**取自配置；(ii) 装配根到宿主那一段真跑过一次。二者都不需要 WebView2 窗口。**
+
+先例（本仓已有同族尺，⛔ 不是本腿新造的规矩）：
+- `internal/ball/hotkey_reload.go:42-43` —— `HotkeyBinder` 的注释原文 "the seam exists so the diff logic is testable with no window"（类型体 `:44-46`）；假件实现在 `internal/ball/hotkey_status_test.go:444`（`func (r *recorder) RebindHotkeys(...)`），配合 `NewHotkeyReloader(..., func() HotkeyConfig { return src })` 用（`internal/ball/hotkey_status_test.go:458`、`:511`）。⇒ **"窗口那一侧不可测 ⇒ 把决定窗口参数的那一步做成无窗口可测的 seam"是本仓已经付过钱的走法。**
+
+### 候选 A｜字段被赋成配置值（最便宜，但只钉一半）
+- 形状：default tier 测试里 `NewPanelManager(disp, nil, dataPath, <planted>)` ⇒ 断言 `mgr` 的那枚新字段 == planted。
+- 落点候选：`cmd/wisp/panel_host_windows_test.go`（已有同族构造点 `:516`、`:689`，⛔ 不必新建文件、不必进 winlive 档）。
+- 钉得住：配置值进了宿主。**钉不住**：`bringUp` 到底有没有拿它去建窗（§1.1 已量：那是全宿主唯一一处用几何的地方）。⇒ **A 不许单独当 AC#4 的判据。**
+
+### 候选 B｜把 `WindowOptions` 的组装抽成纯函数，断言返回值（推荐的主判据）
+- 形状：`bringUp` 里 `cmd/wisp/panel_host_windows.go:298-307` 那块字面量改成一枚可单测的构造（`func (m *PanelManager) windowOptions() webview2.WebViewOptions` 或包级 `panelWindowOptions(geom)`），缺省值以**具名常量**留在同文件；测试不调 `bringUp`、不建窗，直接叫这枚函数，断言 `Width` 随注入值变、⛔ 注入为零时才等于那枚缺省常量。
+- 落点候选：被测函数留 `cmd/wisp/panel_host_windows.go`；尺放 `cmd/wisp/panel_host_windows_test.go`。
+- 为什么它比 A 强：它钉的是**建窗那一步的实参**，正是票面 AC#4 "写死的 420×260 变成配置缺省时的值"的可读投影。
+- ⛔ 这条⛔ 不许顶掉真窗那一格：它证的是"参数从哪来"，不是"Win32 真把窗口开成多宽"（§1.1 那条注释 `panel_host_windows.go:50-52` 自己就写着 `WindowOptions` 与实际客户区尺寸的关系**尚未被证明**）。
+
+### 候选 C｜把"造窗口"本身做成可注入函数值（最接近端到端，成本最高）
+- 形状：`PanelManager` 加一枚默认＝`webview2.NewWithOptions` 的函数字段；测试注入 recorder 捕获实参并返回 nil/假件，`bringUp` 走到那一步即被断言"确实调了、且实参来自配置"。
+- 先例同族：`Refresh` 那枚可注入函数字段（`cmd/balldebug/main.go:243` 装配）。
+- ⚠ 具名风险：这一枚引入了"生产永远走默认值"的注入点 ⇒ 按 AGENTS §1.3 与票面禁区"⛔ 不许用 mock 代替真的来假报完成"，**C 必须与真窗那一格同发**，并配一把"默认值没被偷偷换掉"的尺（形如：产码构造路径里那枚字段仍为 nil 的断言）。本腿把 C 列为候选，不是列为推荐。
+
+### 候选 D｜装配根那一段真跑一次（种一枚临时 config.toml，不建窗）
+- 形状：测试直接叫 `newResidentPanelManager(dir)`（`cmd/wisp/panel_resident_windows.go:183`），事先在 `dir` 里写好 `[panel] width = <planted>`，断言返回的 manager 携带 planted。
+- 这条真正测的是 §3.3 第 5 点那格改动（`newComposerDispatchChain` 把 `cmd/wisp/panel_inbound.go:230` 造出的那枚 `mgr` 交出来）：**只要它变红，就说明"配置→装配根→宿主"这条路又断了**，而它既不需要 WebView2 也不需要真窗口。
+- 落点候选：`cmd/wisp/panel_resident_windows_test.go`（同包、default tier、已有 `NewPanelManager` 构造先例 `:63`、`:449`、`:526`、`:527`）。
+- ⚠ 排程预警：`cmd/wisp` 的测试在这台机与 CI 上都要先把 sherpa DLL 摆进 PATH（`scripts/wisp-cli-tests.sh:7-16` 记的就是这个坑；`docs/reports/HANDOVER.md:143` 第②条又记了一次）。本腿⛔ 没跑过，只转述那两处的**射程**。
+
+### 候选 E｜复用**已存在**的那把证据行尺，把"宽度来自配置"挂上去长期盯
+- 现量：`cmd/wisp/config_receipt_255_test.go:172` `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` 会把 roster 里每枚 `file.go:LINE [token]` cite 的**那一行读回来**要 token 还在（`:190`、`:200-202`）。
+- 形状：AC#4 落地时，把 `cmd/wisp/config_readers_255.go:130` 那行 panel 判词的 cite 从"硬编码那行"改指**新的取值处**（宿主字段/`windowOptions` 那一步）。此后任何人把宽度改回写死，**这把已经在跑的尺自己会红**。
+- ⇒ 这不是新机制，是**把新事实挂到旧尺上**；也正是 §3.4 那格冲突的解法（冲突不是靠删断言消，是靠重判那一行消）。
+
+### 关于"做不到"这句
+本腿**不**提交"AC#4 没有无窗口判据"这种否证。上面 A/B/D/E 四枚都可从盘上读出来、都不新建机制、都不放宽任何既有断言（B/D/E 只做加法；C 需要额外一把防 mock 的尺）。真窗那一格照票面留在"只有本机可量"族，⛔ 不伪装成 CI 测过。
 - §6 我可能写错的条目（自我对抗）
 - §7 量不到的地方（具名）
 - §8 交件判语
