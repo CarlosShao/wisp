@@ -133,6 +133,45 @@ _§3 量数时刻：`2026-10-03 10:0x +0800`。_
 
 ## §4 真机读数怎么量
 
+### 4.1 今天有没有"把电平打进日志/仪器"的现成出口：**没有**（尺＋正控）
+
+- 唯一**接收**电平的产码口＝`Ball.SetAudioLevel(float32)`（`internal/ball/liquid_windows.go:42`）。它本身**不打日志**：`:46` 只是 `b.sta.PostTask(func(){ b.applyLevel(level) })`；而 `applyLevel` 第一行 `:52 if !prototypeVisuals { return }`，在 `:55 b.liqRaw = level` **之前** ⇒ 默认档（prototypeVisuals 关）下连"最后收到的电平"都不落到球里可读。
+- 尺（有没有任何电平日志出口）：`grep -rn "level|Level" internal/ball/liquid_windows.go | grep -i "slog|Print|printf|log\."` ⇒ 空（`level_log_exit=1`）⇒ **没有现成的电平读数出口**。
+- 正控（尺能认电平这个词）：同文件 `grep -n "SetAudioLevel\|applyLevel\|liqRaw\|level float32"` 大量命中（`:42/:51/:55`）⇒ 尺不是对 "level" 失明，是真的没有打点。
+- `observe` 侧的"事件名"里也**没有一枚载电平**：`ClassAudioDevice = "audio_device"`（`internal/observe/errors.go:25`）、`EvAudioDeviceLost = "audio.device-lost"`（`internal/statemachine/events.go:30`）、`EvKwsEnabled = "kws.enabled"`（`:18`）——全是分类/状态事件，不带 `float32` 电平。
+
+### 4.2 可复用的台架（逐字 flag）——但它喂的是**合成数**，不能当 AC#2 的证
+
+`cmd/balldebug/main.go` 现读 flag 定义：
+
+| flag（逐字） | 行 | 作用 |
+|---|---|---|
+| `level := flag.Float64("level", 0, "synthetic audio envelope 0..1 pushed to the ball at ~30fps (0 = feed nothing)")` | `:106` | 手填一个合成包络常量 |
+| `diffLevel := flag.Float64("diff-level", 0, "with -diff: the -level handed to each child")` | `:107` | -diff 子进程用的 level |
+| `frozen := flag.Bool("frozen", false, "render the frozen SPEC-08 §2.1 visuals instead of the ticket 62 prototype")` | `:97` | `:122 EnablePrototypeVisuals(!*frozen)` 是**唯一**打开可见性的产码 |
+| `state := flag.String("state", "", "show one state for 2s (name as in D43)")` | `:91` | 把球摆进 liquidDriven 内的态（否则电平被 §2-H5 丢） |
+| `tour := flag.Bool("tour", false, ...)` | `:111` | 引导走查 |
+
+- 调用链：`feedLevels`（`:404`）→ `b.SetAudioLevel(v)`（`:418`）；起协程 `spawnLevelFeeder`（`:427`）→ `observe.Default.Spawn(goroutineLevelFeeder, "balldebug", root, ...)`（`:432`），`goroutineLevelFeeder = "balldebug-level-feeder"`（`:46`，名册外名，owner 标 "balldebug"）。
+- `SetAudioLevel` 的调用者名册（尺 `grep -rn "SetAudioLevel" --include=*.go internal cmd` 现读）：产码＝`cmd/balldebug/main.go:418`/`:477` 两枚；测试＝`internal/ball/live_windows_test.go:637/648/656/685`（且该文件 `//go:build windows && winlive`）；`cmd/wisp`＝**零**。⇒ 票面现量 2 那句"非测试生产者只有 cmd/balldebug"**现树仍成立**（无翻转）。
+
+### 4.3 "本机可量"与"CI 可覆盖"必须分开——本枚读数属"本机可量"，且今天还量不到
+
+**（甲）真机那一半＝只有本机可量，不是 CI 可覆盖。** 现读的闸：
+
+- `TestLiveWasapiSmoke`（`internal/audio/hotplug_test.go:525`）：`if os.Getenv("WISP_LIVE_MIC") != "1" { t.Skip("live WASAPI smoke requires WISP_LIVE_MIC=1 and a real microphone (真机冒烟待票 16)") }`（`:526-527`）⇒ 默认跳过。
+- `TestPinnedThreadStable10s`（`:443`）：`if testing.Short() { t.Skip(...) }`（`:444-445`）⇒ `-short`（CI 常见跑法）跳过。
+- 球的 `live_windows_test.go`／`hotkey_live_test.go`／`interaction_live_test.go`／`live_guard_windows_test.go` 全带 `//go:build windows && winlive` ⇒ 不打 `-tags winlive` 连编译都不进。
+- ⛔ 本腿**一枚 `go` 命令都没跑**（§0 自证），上面全是读到的闸，不是跑到的闸。
+
+**（乙）AC#2 那枚"说话 vs 不说话 → `SetAudioLevel` 收到的值不同"的具体读数：**
+
+- 它需要（1）H1/H2 的接线存在（今天**没有**，见 §2）＋（2）一枚真读设备、并把测得的 `float32` 在送进球之前先打出来（今天也**没有**，见 4.1）。⇒ **今天根本没有能取这枚读数的地方**；它是 `247-r1` 落地之后、在**本机**、开着 `WISP_LIVE_MIC`/真设备条件下取的一次性人工读数。
+- **CI 可覆盖的只有代理形，不是真机形**：audio 侧有 `NewWavInjector(path string, opts...) (*WavInjector, error)`（`internal/audio/wavinjector.go:48`）→ `Start(ctx, buf)`（`:75`），它从**磁盘 wav 文件**喂 PCM、不碰设备。⇒ 一枚 CI 用例可拿"响 wav vs 静音 wav"过 `FrameLevel`（`level.go:118`）→ `SetAudioLevel`，证"管线能把 PCM 折成不同的 `float32`"。但那是**接缝代理**，证的是 H3+投递，**不是"真麦克风被读了"**。
+- ⇒ 具名分档：**"真麦 PCM 使 `SetAudioLevel` 收到两个不同值"＝本机可量、且此刻不可量（等接线）**；**"wav 注入使消费者得到两个不同 `float32`"＝CI 可覆盖（代理）**。本腿把 AC#2 判给前者，并明确警告：若有人拿后者的绿去勾 AC#2，就是把"接缝代理"读成"真机结论"——本仓吃过三次"只在本机成立却写成全局结论"，这枚反向亦然（只在 CI 绿不代表真机过）。
+
+_§4 量数时刻：`2026-10-03 10:0x +0800`。_
+
 ## §5 量不到的格子
 
 ## §6 我推翻前人哪几句（含票面、A5xx、`247-a1`）

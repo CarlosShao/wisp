@@ -1,0 +1,12 @@
+docs(247-a2): §4 真机读数怎么量填满
+
+4.1 现量：今天没有把电平打进日志的出口。唯一接收口 Ball.SetAudioLevel(liquid_windows.go:42) 不打日志，
+applyLevel:52 在写 liqRaw(:55) 前就 return；grep level+slog/Print 排空(e=1)，正控同文件认得 level。
+observe 侧 ClassAudioDevice/evAudioDeviceLost/EvKwsEnabled 全是分类/状态事件、不载 float32。
+4.2 台架 cmd/balldebug flag 逐字：-level(:106 "synthetic audio envelope...")、-frozen(:97→:122 唯一开可见性)、
+-state(:91)、-tour(:111)；SetAudioLevel 调用者名册现读=产码只有 balldebug:418/477、测试 live_windows_test、
+cmd/wisp 零 ⇒ 票面现量2 现树仍成立。合成包络不能当 AC#2 的证。
+4.3 本机可量 vs CI 可覆盖分开：TestLiveWasapiSmoke 要 WISP_LIVE_MIC=1(:526-527)、TestPinnedThreadStable10s
+跳 -short(:444)、球 live 测试要 //go:build windows && winlive ⇒ AC#2 真机那枚=本机可量且此刻不可量(接线未落)。
+CI 只能覆盖代理形 NewWavInjector(wavinjector.go:48 读磁盘wav 不碰设备)→FrameLevel→SetAudioLevel，
+证"PCM 折成不同 float32"而非"真麦被读"。警告别拿代理绿勾真机 AC#2（本仓三次"只本机成立写成全局"教训）。
