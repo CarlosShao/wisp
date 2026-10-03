@@ -1,0 +1,9 @@
+docs(247-a2): §1 落点甲乙与依赖边名册填满
+
+现量（HEAD 47b38765，票 33/246/248 并入后）：internal/audio 非测试 importer 仍＝0（尺+正控）；
+audio 唯一 wisp 依赖是 observe、ball↔audio 两头无边；形甲只开 1 枚 cmd/wisp→audio，形乙-1 多开
+audio→ball 且破 wasapi_other.go 跨 GOOS 承诺、形乙-2 与甲同边。observe owner 名册两侧各点名
+（wasapimic:83/wavinjector:84 写死 Default；cmd/wisp approval_always:99·config_reload:119·
+panel_resident:153 reg.Spawn）。纠 247-a1：runResident 无 WithRegistry ⇒ rt.Registry==observe.Default，
+今天两枚注册表并存不成立、风险是潜伏。D38(e) 十步不动、StepStopAudio 那格无人注册正待填、
+mic.Stop 已带 2s 单调 join。电平协程 D38b 无槽（level.go:86-87），甲乙都得在 audio-capture 内算完投递。
