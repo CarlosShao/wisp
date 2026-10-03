@@ -130,7 +130,7 @@
 
 ⇒ 票面四环在本腿复认成立。**注册表为什么是 nil**：`applyDefaults` 的 `case reflect.Map:` 后一句 `// leave nil (see NewDefaults)`（`internal/config/defaults.go:77-78`），理由写在 `defaults.go:54-57`；并且就算文件里写一节空 `[llm.providers]`，`normalizeZero`（`defaults.go:148-152`）也把它归零回 nil（`// empty map -> nil, matching the absent-key decode state`）。首建文件＝`SaveFile(cfgPath, config.NewDefaults())`（`cmd/wisp/firstrun.go:82`），所以里面没有 provider 行。
 
-## 2.3 要让它**能创建行**：最小改动面（逐枚，附代价）
+### 2.3 要让它**能创建行**：最小改动面（逐枚，附代价）
 
 1. **八枚分支**：四枚 setter 各两层——`settings.go:63-66`/`:71-73`、`:84-87`/`:92-94`、`:111-118`/`:124`、`:150-156`/`:169`（后两枚还要 `requireCatalogEntry` `:298-306` 的 model 半边）。"拒"改"建"要两层同改，不然门①放行、门②仍 `apply=false` ⇒ 走到 `:224-227` 那句"does not exist in the file"。
 2. **nil map 会 panic（新踩的坑，票面/a1 都没点到）**：门②的写法是 `base.LLM.Providers[provider] = p`（`settings.go:68`/`:89`/`:121`/`:166`）。干净机上 `base.LLM.Providers` 恰是 **nil**（§2.2 末）——向 nil map 赋值是运行时 panic。⇒ 建行必须先补 map 初始化（`defaults.go:77-78` 那条"go-toml merges into pre-existing maps ⇒ 预填会泄漏幻影条目"的理由在此处反转：一旦写侧能建 map，"默认表里不许有值"与"落笔处要能建"就得由**谁负责 new**来决定）。model 级同理（`p.Models` 为 nil，`settings.go:115` 的 `p.Models[model]` 判读之前得先建）。
