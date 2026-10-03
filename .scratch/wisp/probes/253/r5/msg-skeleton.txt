@@ -1,0 +1,16 @@
+253-r5: 起手锚＋骨架落盘（票 253 AC#2 落地腿，形ⓐ）
+
+证据件 `.scratch/wisp/probes/253/r5/impl.md`：§0 起手锚已填（同发三取
+2026-10-03 09:36:33+0800 / HEAD `ebd5da2b` / porcelain 366 行），
+§1–§7 骨架与待填标记就位。
+
+本腿只做一格：票 253 的 AC#2，且只走编排者 `A558`/票面 §8 已裁死的形ⓐ
+＝另立一枚"全量入向名册"尺，⛔ 不改 `internal/panel/bridge.go` 任何既有行为、
+⛔ 不往 C17 那四名里加真方法、⛔ 不解冻任何冻结件。
+AC#1／AC#3／AC#4 写面在 `cmd/wisp`，此刻由别的腿占着，本腿零碰。
+
+此刻写面：`.scratch/wisp/probes/253/r5/impl.md`（本文件）＋
+后续 `internal/panel/` 下新增 `*_test.go`；正控那一小步临时在
+`internal/panel/bridge.go` 只加一枚新常量，种→跑→还原串同一条命令。
+
+只 commit 不 push；显式 pathspec；AC 勾选框未碰。
