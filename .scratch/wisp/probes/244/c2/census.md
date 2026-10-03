@@ -100,12 +100,26 @@
 
 ## §5 我可能写错的条目（自我对抗）
 
-（取数中）
+1. **"出厂链今天产 GUI"是旗标文本＋调用链静态判断，不等于"盘上那枚 exe 现在是 GUI"。** ⚠ 现量一枚反证形状的读数：`build/wisp.exe` 盘上 mtime＝**09-30 23:43**（早于 r1 commit `cc6eaa65` 的 10-02 19:39），而 r1 的 GUI 产物落的是 `.scratch/probes-244-r1/` 临时台件目录、**没覆盖 `build/`**（`A548` 第 2 条逐字"台上 `build/` 旧 exe 未动（CUI(3) 仍在）"，本腿 `ls` 复认）。⇒ 若谁把本件 §2/§3 读成"今天双击 `build/wisp.exe` 已经没有黑窗口"＝**错**；旗标只对**下一次真跑 build.ps1 重新构建**才兑现，这一兑现本身要靠 AC#1 的"改后读数"入账，本腿量不到。
+2. **§1 #8 枚举口径**：`internal/llm/openaichat/mockllm_integ_test.go:65` 我算进"现做 exe 的测试命令行"，但它产的是 `mockllm`（LLM 测试替身）、**不是 `wisp.exe`**。严格按"产出厂 wisp.exe 的入口"该枚应剔除；c1 的 #8 只列了 4 枚 wisp/d22scan 台件。本腿取宽口径（任何会产 PE 的测试构建），可能与 c1 尺不完全对齐——差一枚、不影响"仍零 `-H`"的方向。
+3. **CI "继承 -H"＝射程判断，非产物读数。** 本腿只 grep 了 `ci.yml` 全文（无 `GOFLAGS`/`-ldflags`/`-H=` 注入，见 §2 ③），据此静态判"三 step 跟 build.ps1"。但 slo-full 跑在 **self-hosted runner**（票面 §排程）上，机器级 `GOFLAGS`/env 会不会洗掉 ldflags，不在 yml 文件里、本腿读不到也量不到。
+4. **§4 时序推断的前提**：结论"两态应仍可见"依赖 `rebindStdHandle` 真的重绑成功、且 `rt.stdout` 在 attach 之后才捕获。若 GUI 子进程被 cmd 拉起时 `GetStdHandle(STD_OUTPUT_HANDLE)` 已返回可用继承句柄（走 `console_windows.go:35` 早返回），则 `rt.stdout`＝cmd 传下来的句柄——输出**到得了终端，但与 cmd 提示符并发交叠**（c1 §3.2 同点）。"看得见"与"排版对不对"是两件事，本腿只断了前者，且未跑。
+5. **名册"11 枚"沿用 c1 框架**：`go test -c`、`docker run builder.Dockerfile && go build` 这类间接现做路径本腿未逐一证伪（`builder.Dockerfile` 全文只 10 行、确无 go build，但谁 `docker run` 它再手敲命令不在射程）。若边界再宽，枚数只增不减，而"增的都是非出厂件、都不带 -H"这一方向不变。
 
 ## §6 量不到的地方（具名）
 
-（取数中）
+1. **AC#1 的"改后产物 PE subsystem＝GUI(2)"读数**：要跑 `scripts/build.ps1` 产 exe、再 `objdump -p` 读之。本腿⛔零构建；且 sanctioned 法（对 tracked exe 用 objdump）**无米下锅**——`git ls-files '*.exe'`＝**0**，`build/` 与 `*.exe` 全在 `.gitignore:2/14`；盘上 `build/wisp.exe` 是 **untracked 且早于 r1**，读它既非 sanctioned、也不代表"改后"。**需要能构建的落地腿带命令全文交这两枚读数。**
+2. **AC#2 三条真机读数**：① 父控制台里 `wisp run "…"` 回复文本真出现；② `wisp doctor > out.txt` 重定向仍有效；③ 双击／`explorer` 拉起不再出黑框且常驻腿照起——**全要构建＋真机＋桌面**，本腿零构建、不跑产码，一条都量不到。这也是 §4 那发唯一能定它的读数（见 §4 末段）。
+3. **"会响的 subsystem 尺"装上后的红/绿**：任何一把读 subsystem 的尺，其"种错必红"的突变验证要跑，本腿不跑（票面 AC#5 ⓑ 那把能力尺同此，归 `A548` 第 3 条的 `255-r2`/`258-r1` 落地腿）。
+4. **CI 三 step 产物真身 subsystem**：无 self-hosted runner 访问、无 CI 产物、本腿不 push ⇒ 量不到。
+5. **GUI 子系统进程被 cmd 拉起时 `GetStdHandle` 的实际返回**（决定 §4 走 attach 还是早返回、进而决定 stdout 交叠形态）：纯读码不能定，只有 AC#2 ① 那一发真机能定。
 
 ## §7 交件判语
 
-（取数中）
+- **只读普查**：全程**零 Go 命令**（`go build`/`test`/`vet`/`run` 一枚未跑）、**零构建脚本**（`build.ps1`/`slo-check.ps1` 等未执行）、**零 PowerShell 构建**；`objdump` 亦**未跑**（无 tracked exe 可 sanctioned 读，见 §6 第 1 条）。所有 PE/旗标判语＝源码＋脚本＋文档的静态读码。
+- **冻结件一字未动**：`docs/BUILD.md`／`.github/workflows/ci.yml`／`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／三枚冻结测试——只 grep 行号与形状，`ci.yml` 的内部判语具名标为"射程判断，非内容引用"。
+- **`frontend/**`／`design/**` 两层禁令遵守**：零读零写；一发全仓 grep 被动命中过 frontend 路径名，本腿**未打开、本件不引用转述**。
+- **票面 AC 框一枚未碰**：不改任何票面／脚本／产码；写面唯一＝`.scratch/wisp/probes/244/c2/**`（临时件只建不删）。
+- **git 纪律**：只 commit **不 push**；每次 `git add -- <path> && git commit -F <msg> -- <同一 path>` 串同一条命令、带显式 pathspec；⛔ `add -A`/`.`/`-a`、`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`restore`/`clean`/merge/worktree 一枚未用；仓内未删任何文件。
+- **占位符清零**：§0–§7 全满，正文无「（取数中）」残留。
+- **与 c1 的差异枚数（回报正文要点）**：c1 写"11 枚入口全零 `-H`"，本腿对现树复量＝**出厂链 3 枚（build.ps1 直接带 + CI/slo-check 继承）已带 `-H`、转 GUI**；仍零 `-H` 的只剩 3 枚非出厂件入口（ball-cycle/spike/测试台件），台件枚举较 c1 多 `mockllm_integ_test.go:65` 一枚。**票面 AC#1 未翻勾**：缺的是 AC#2 那两发真机读数（要构建，本腿⛔不做）＋ §6 第 1 条那枚"改后 objdump"读数。

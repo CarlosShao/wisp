@@ -1,0 +1,1 @@
+244-c2 §3+§4：全仓零把读 PE subsystem 的尺（build.ps1 冒烟只跑 doctor、d22scan 不扫 -H、无 tracked exe 可离线读），最小落点形甲/形乙列形状不选、需能构建的落地腿（AC#1/AC#2）量；stdout 可见性〔读码推断未跑〕：attach 在 main.go:90 早于 cmdRun 捕获 os.Stdout，rt.stdout 拿到重绑后句柄，父控制台/重定向两态应仍可见，attach 失败且无重定向才写进死柄无输出，定它靠 AC#2 真机读数

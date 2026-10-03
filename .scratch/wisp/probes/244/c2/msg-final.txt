@@ -1,0 +1,1 @@
+244-c2 收尾 §5-§7 + 交件：自我对抗 5 条（含关键反证 build/wisp.exe mtime 09-30 早于 r1、GUI 产物落临时目录未覆盖 build/ ⇒ 旗标已落≠台上 exe 现 GUI）；量不到 5 格具名（AC#1 改后 objdump 读数需构建、库内 0 tracked exe、AC#2 三形态真机全缺）；交件判语（只读零 Go 零构建、冻结件只读、frontend/design 零读零转述、AC 框未碰、只 commit 未 push、占位清零）。与 c1 差异：出厂链 3 枚已带 -H 转 GUI，仍零 -H 只剩 3 枚非出厂入口
