@@ -1,0 +1,8 @@
+docs(probes/258-a2): precision pass on section 4 sourcing
+
+Separates the 258-a1 citations this leg recomputed against today's HEAD from the
+one that still rests on the prior leg's reading (the schema default-tag seam),
+names where that seam lives, and admits this leg read only the overlapping cells
+of 258-a1's census rather than all 104 lines.
+
+Still read-only, still zero Go commands, still not pushed.

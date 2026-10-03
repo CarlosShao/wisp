@@ -524,10 +524,12 @@ N3 到点之后**执行了**（`AnswerTimeout` 那一路，audit 行 `ANSWER-EXP
    不影响"键没人换"这个总结论。
 8. **`ApplyHotkeyDefaults` 与 `default:"Esc"` tag 谁先补缝，我没量。**
    `internal/config/schema.go:182` 只给 `cancel` 带 tag；loader 是否把 tag 落到
-   `Config()` 的缺省里我**没读 loader.go**（`grep '"default"' internal/config/loader.go` 零命中，
+   `Config()` 的缺省里我**没读实现**（`grep '"default"' internal/config/loader.go` 零命中，
    但这既可能是 tag 在别处解，也可能在我没看的文件里）⇒
    §1.3 我只说"要过 ApplyHotkeyDefaults 这条链"，⛔ 没说"缺 [hotkey] 一节时三枚是空串"，
-   那句是 258-a1 §2 ① 的读数，我没独立复核（列进 §5 第 4 格）。
+   那句是 `258-a1` 的读数（`.scratch/wisp/probes/258/a1/census.md:22`，
+   它把缝的出处点到 `internal/config/defaults.go:73-87` 的 `applyDefaults`），
+   **本腿只复核到 tag 现场（schema.go:182 只有 cancel 带），没复核那段实现**（列进 §5 第 4 格）。
 9. **行号漂移风险集中在 `cmd/wisp`。** 本腿起手 HEAD `8a3790f0`，写件期间 HEAD 已推进
    （我的三枚 commit 之后又落了别人的件，含 `21f85d95 / c02f59d0 / a21611ce`）；
    `internal/config/manager.go` 的票面 `:278`→今天 `:281` 就是**已经发生**的漂移例子。
@@ -537,6 +539,14 @@ N3 到点之后**执行了**（`AnswerTimeout` 那一路，audit 行 `ANSWER-EXP
     没逐一核 246 三枚例子里**每一处** `Live()` 断言是否存在替代品；
     我"最强形钉仍成立"的依据是"第二进程桌面读数在钉里"（`:145-147/:177-179`），
     这一点逐行看过，结论稳。
+11. **对 `258-a1` 的引用我分了两档，别当同一档读。**
+    不依赖 a1 权威性的三处（我按今天 HEAD 独立复算）：常驻进程两枚 Manager
+    （构造点 `cmd/wisp/run.go:409` ＋ `cmd/wisp/panel_inbound.go:230`）、
+    `resident_ball_228_windows_test.go:45` 是常量、
+    `resident_ball_live_228_windows_test.go:144` 无断言／`:160/:163` 只钉两极端。
+    依赖 a1 的一处＝缺省值那道缝（见第 8 条）。
+    ⚠ 另：a1 的件我只翻到它与本腿重叠的那几格（`:17-23 / :31-34 / :39-48 / :54-57 / :70-78`），
+    **没逐行读它那 104 行的全文**——如果它别处还有一枚本腿该复认的读数，那是我的漏。
 
 ## §5 量不到的地方（具名弃权；⛔ 不用"应该没问题"填空）
 
