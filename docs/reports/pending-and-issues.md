@@ -11279,3 +11279,11 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 
 - 死因＝宿主 "Sorry, something went wrong"（与"额度墙"同族的服务不稳，但**这枚死得干净**：37 轮只落一发改前基线读数 `baseline-d22scan-pre.txt`，跟踪树零改动）。处置：残面留给续任复用（省一发基线跑），派单加两枚防死闸——①骨架 commit 提前到第 20 轮（前任的教训：预检做完还没动笔就断）；②基线复用声明进证据件 §0。
 - 编队（18:3x）：写 2＝`258-r1`（cmd/wisp＋internal/ball）＋`212-r1` 二任（tools/d22scan）；只读 0。下界 3 的破口延续 A575 的诚实登记（无第三枚干净写面，不硬凑）。
+
+## A578（2026-10-03 20:5x，编排者自记：**★编排者本人代笔两枚（A544 预授权）：`212-r1` ban #9 判据落地全绿＋`258-r1` 残局代提全绿；★记我一条：python 行尾手术吞掉 runSelfCase 70 行（已还原重做，教训入库）**）
+
+- **`212-r1` 代笔落地**（d22scan ban #9 phantom-citation）：判据走 f.Comments（"token 在 // 之后"由构造保证，非行正则）＋symRefRe 排除 package.Symbol API 引用（首发 10 枚分类后加的）；名册第 9 行＋自测两向样本（ring/silent）＋cover 映射；活体猎物 10 枚全部改注释为诚实形。门禁：-self-test 36/36 clean、包测试 ok、scripts/d22scan.sh **全仓 clean**（新计数：bans #1-5 internal/=228 cmd/=38、#6 frontend/=85、#7 internal/tools/=23、#8 design/=39 frontend/=85 internal/=498 cmd/=96）、gofumpt 零偏差。
+- **★记我（工具教训）**：selftest.go 被 python 按 CRLF/LF 混合行尾手术时**吞掉 runSelfCase 70 行**（`git diff --stat`＝-70 行亲眼所见才抓到）；`git checkout --` 从 HEAD 整枚还原后**改用 Edit 工具**重做成功。⇒ 定式：**python 字符串/行尾手术碰混合行尾 Go 文件必毁；对已有文件的修改一律 Edit 工具**（与 A567 的"行号引用同批改"同族）。
+- **`258-r1` 残局代提**（死于 150 轮帽、零 commit、产码全在树）：vet 过＋7 枚 Test258 全 PASS＋整包三发两绿一 C18 间歇形。红名一枚＝255 收据名册引用 `resident_ball_windows.go:257` 被推到 `:269` ⇒ 两处行号引用同步更新（A567 定式）。⚠ 未代填：winlive 真窗族读数（死腿自报"须单独跑"）＋AC#2 的 live 重绑只有非真窗读数覆盖 ⇒ AC#1/AC#2/AC#3 翻勾归 258-v1 验收腿。
+- **ball 的 TestC21 红定性**：design/assets/tokens.css 早已删除的既有红（stash 撤我的改动它照红），与本批无关；不追认不 revert。
+- **编队（20:5x）**：写 0 只读 0＝两枚写腿死后编队空，我代笔即编队。**AC 框本轮翻 0 勾**。**下一步**：派 212-v1＋258-v1 两枚验收（实现者＝我，验收必须非我，D22 双角色）；票 174 AC#2b／167-r1／256-r1 队列在验收腿交件后解锁。
