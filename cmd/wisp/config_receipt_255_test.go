@@ -533,12 +533,18 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 		if strings.Contains(honest, "[llm]") {
 			t.Errorf("[llm] is in both buckets: %q", honest)
 		}
+		// Logged for the evidence file (run with -v) so both sentences are quoted
+		// off the product, not retyped from the format strings.
+		t.Logf("SENTENCES\n  IMMEDIATE %q\n  HONEST    %q", immediate, honest)
 		// Every hot name owes a ledger line naming its rows and verdicts.
 		for _, name := range []string{"panel", "llm", "app", "voice"} {
 			line := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section="+name)
 			if !strings.Contains(line, "tier_row=") {
 				t.Errorf("the ledger line for %s does not name the tier rows behind the claim: %q", name, line)
 			}
+			// Logged so the evidence file quotes the production ledger line
+			// instead of re-typing it (go test -v).
+			t.Logf("LEDGER %s", line)
 		}
 		perKey := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=voice")
 		if !strings.Contains(perKey, "voice.tts.speed") {

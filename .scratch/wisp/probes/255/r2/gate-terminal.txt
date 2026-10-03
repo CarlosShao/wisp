@@ -1,0 +1,6 @@
+BUILD_RC=0
+GOFUMPT_RC=0
+D22_RC=0
+ok  	github.com/CarlosShao/wisp/internal/config	1.049s
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL

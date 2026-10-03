@@ -1,0 +1,15 @@
+票 255 r2 · 证据件终值 + 台账两句从产品流里 log 出来
+
+`.scratch/wisp/probes/255/r2/impl.md` 补满 §1—§7：
+§1 现量（pre-255 那三行逐字、rep.Hot 三处生产者 manager.go:303/:359/:425、
+TierOf 生产调用点 0→1 枚、17 枚 hot 行的逐名读者 file:line 与实测扫描、
+(A)/(B) 两种"有读者"读法的取舍写明）、§2 两格修法、§3 门禁四数终值
+（build rc=0／gofumpt -l 空／两包 -count=1 ok 1.092s + ok 238.415s／d22scan rc=0 clean）、
+§4 变异自证表四发逐字红句（m1 退回 pre-255 形状、m1b 把 panel 判成有读者、
+m2a 种未登记的 [app] 假新键、m2b 补登记后不响）＋还原 md5 复量、
+§5 我可能写错的九条、§6 判不动的六条（含两枚他票用例在同机争用下偶发的归因边界）、
+§7 交件判语（AC 框未碰＋未 push）。
+
+代码侧只加两行 t.Logf：把生产 reportReload 实际印出的两句与四行
+HOT-RELOAD-READER 台账从测试流里 log 出来（-v 可读），
+证据件因此是引用产品输出而不是重打字面。AC 勾选框一枚未碰；只 commit 不 push。

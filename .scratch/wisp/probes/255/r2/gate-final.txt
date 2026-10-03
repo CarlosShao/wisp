@@ -1,0 +1,10 @@
+BUILD_RC=0
+cmd\wisp\config_receipt_255_test.go
+GOFUMPT_RC=0
+time=2026-10-03T09:53:09.019+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-03T09:53:11.088+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	233.698s
+FAIL
+TEST_RC=0
+D22_RC=0
