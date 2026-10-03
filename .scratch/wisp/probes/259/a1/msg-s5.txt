@@ -1,0 +1,22 @@
+259-a1 section 5: the burn-on-reject reading, and the second-attempt question
+
+The comment at approval.go:302 is true on disk - delete runs before the
+binding result is computed. Three bounds named so it is not read too wide:
+an empty nonce returns at :293 without deleting, an unknown nonce falls to
+:305 without deleting, and revoke (approval.go:309-313) is a different
+burner that never touches :302.
+
+On the ticket's question: no path lets a misbound-and-rejected nonce be
+consumed again - after the delete the key is gone, so a second attempt
+cannot even reach the compare. And today production cannot produce the
+first attempt either, since the stored and spent digests are the same
+field; the burn-and-refuse branch is only reachable from in-package white
+box calls. The masking is therefore about legibility, not about count:
+both attempts emit the same audit line at queue.go:379 and the same
+ErrBadGrant.
+
+Also registered: spend's own doc comment at approval.go:290-291 claims it
+"reports why a rejection happened" while the signature returns a bare bool
+- a comment testifying for an ability the code does not have. No side
+chosen; the interaction between burn-on-reject and a live binding is handed
+to the orchestrator as a scope reading.

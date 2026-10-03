@@ -207,7 +207,56 @@ store 侧还有一件事要钉住：`s.values` 的**唯一写点**是 `approval.
 
 ## §5 烧牌语义那一问
 
-尚未作答。
+### 5.1 那句注释在盘上是否为真
+
+`internal/agent/approval/approval.go:302` 盘上逐字：
+
+```go
+		delete(s.values, v) // consumed whether or not the binding matched
+```
+
+**真。** `delete` 在 `:302`，返回值在 `:303`（`return equalSecret(stored, bind)`），
+删除发生在绑定结果被算出来**之前**，且在"nonce 命中本 store 某个 key"这一条路径上无条件下发。
+所以"错绑的那一发照样把 nonce 烧掉"这句话与码一致。
+
+作用面要说清的三条边界（免得这句话被读大）：
+- **只有 key 命中才烧。** `nonce == ""` 在 `approval.go:293-295` 早退，**一次 `delete` 都不跑**；
+  nonce 非空但不在本 store ⇒ 圈走完落到 `approval.go:305`，同样**不烧任何东西**（别的 item 的池子更不会被碰）。
+- **`revoke` 是另一枚烧牌器，不走 `:302`。** `approval.go:309-313` 是整张 map 换新，
+  面板侧那条路（`gate.go:738` → `queue.go:426`）与每次结算（`queue.go:288`）用的都是它。
+- 仪器侧：钉住 `:302` 这语义的是
+  `internal/agent/approval/ticket242_binding_test.go:26-28` 与 `:43-45`（`s.live() != 0` 那两发），
+  两发都是**包内直调 store**，不是路由级（见 §1·现量 5）。
+
+顺带一枚与本问直接相邻的码/注不符（票面 AC#2 的靶子就在这儿）：
+`approval.go:290-291` 的注释自称 "spend validates and consumes. **It reports why a rejection
+happened** in user-safe terms"，而签名是 `func (s *grantStore) spend(nonce, bind string) bool`
+（`approval.go:292`）——**它什么都没能 report**，四种落空（空 nonce／查不到／已烧／绑定不合）
+在返回值上全是同一个 `false`。这是注释在替一个不存在的能力作证，本腿按读数登记，⛔ 不改码。
+
+### 5.2 有没有一条路让一枚错绑 nonce 被拒后**又**被同一枚 item 的花费路径再消费一次
+
+**没有。** 逐段凭据：
+
+- 烧掉之后 map 里**没有那个 key 了**（`:302`），第二发同 nonce 走进 `approval.go:298` 的圈时
+  每一枚 `equalSecret(v, nonce)`（`:299`）都不成立 ⇒ 落到 `:305` `return false`。
+  ⇒ "再消费一次"这件事在数据结构上不成立：**没有东西可消费**，第二发连 `:302`、`:303` 都到不了。
+- 而且**今天生产里根本没有第一发**：本件 §8 判的是"存的那份＝花的那份"，因此经路由的
+  `spend` 只可能返回两种值——nonce 命中且摘要同值 ⇒ `:303` 恒为 `true`（成功），
+  或 nonce 空/不在本 store ⇒ `:293`／`:305` 的 `false`（**不发 `delete`**）。
+  ⇒ **`delete` 与 `false` 同时发生的那条支路（错绑烧牌）今天从生产路由不可达**，
+  它只在包内直调 store 的白盒测试里跑得起来。
+- **"烧牌会不会掩盖第二次尝试"**：会，但掩盖的是**可读性**不是**次数**。
+  `spend` 只回 `bool`，两发落在 `internal/agent/approval/queue.go:378-381` 同一条支路：
+  同一条审计行文本（`queue.go:379` 的 `"approval: FORGED-OR-STALE allow rejected corr=%s (native grant missing/spent/misbound)"`）
+  与同一个 `ErrBadGrant`（`internal/agent/approval/ui.go:130`）。
+  ⇒ 盘上能区分的只有**这行出现了几次**，区分不了"第一次是错绑、第二次是查无此牌"。
+  这正是票面现量 4 那条"拒因今天不可指名"的同一件事，本腿不重复裁。
+- 一枚相邻形状（作用面读数，非结论）：若绑定那一支将来真能返回 `false`（ⓑ 那一支才会出现），
+  由于 `:302` 在 `:303` **之前**，一发"真 nonce + 错摘要"的尝试会把**合法用户手里那张卡唯一能用的牌烧掉**
+  ——那张卡随后再也 allow 不动（`grantNonce` 每枚 item 只被叫一次，`gate.go:506`），
+  只能重新显示成新卡片。烧牌语义与活绑定语义叠在一起时的这一格，编排者裁 ⓐ／ⓑ 时要拿在手里。
+  ⛔ 本腿不据此选边，也不判"ⓑ 做不到"。
 
 ## §6 我可能写错的条目（自我对抗）
 
