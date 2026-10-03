@@ -161,7 +161,29 @@
 
 ### 3.1 票 245 裁的是哪一句（原文落点）
 
+- 裁定原文：`.scratch/wisp/issues/245-the-bare-esc-cancel-default-is-a-global-hotkey-so-the-resident-process-steals-esc-from-every-other-app.md:21` 逐字「**走乙：稳态不绑 cancel 那一枚，只在进入 `Confirming` 时 `takeEsc`、离开时 `releaseEsc`。**」；三支理由在 `:22-24`（不动冻结文字／复用现成机制／丙形与既有设计相反）。
+- 那半代价与残余：同一票 `:26`（"确实在等人批那几秒里别的程序的 Esc 仍会被抢走"）＋五字段残余表 `:93-99`（落点栏逐字写「落 `internal/ball`（`takeEscWith`／`releaseEscWith` 这一对）」）。
+- 收件状态（哪句已生效、哪句还没）：AC#1 翻勾＝`:59`；AC#3 翻勾＝`:61`；AC#5 翻勾＝`:63`；**AC#4 不翻**＝`:62`（"阻塞于票 228 如实"）；**AC#6 两半都不翻**＝`:64`。
+- ⚠ 与本格唯一相关的**未决**裁：同一票 `:47`（AC#6②）编排者自己写「用户把 `[hotkey] cancel` 配成**带修饰键**的组合时**应当常绑**（那不会吞别的程序…）；配成**裸键**时仍走借用」，并把"今天零行为差别"就地更正为"差别在另一条腿上今天就能量到"（`:64`）。这一枚**框未勾** ⇒ 它是**待生效的判形**，不是盘上现成的规矩；票 260 不许替它定，票 260 面 `:23` 自己也是这么写的（"要动它的边界＝人工批准"）。
+- 那条裁定在盘上的**实现落点**（两行，仅此两行）：`internal/ball/hotkey_windows.go:457-463`（idle 遍按 **id** 无条件跳过 hkCancel，`:458` 注释「The one slot an idle ball must not register」）＋`internal/ball/hotkey_windows.go:553`（归还只丢不 rebind，理由在 `:547-552`）。
+
 ### 3.2 改加速器来源会碰哪一行／不碰哪一行
+
+| 改动 | 碰不碰 245 那句 | 依据（现跑 `file:line`） |
+|---|---|---|
+| `escBorrowAcc()` 参数化、`takeEscWith`/`takeEsc` 加一枚键（§2.2 第 2/3 条） | **不碰** | 借用的加速器来源在 `internal/ball/hotkey_windows.go:524`；245 那句的两个落点（`:457-463`、`:553`）判的是 id 与"还不还 rebind"，与 acc 从哪来无涉 |
+| 默认档下的注册形状 | **不碰，且逐位相同** | `ParseAccelerator("Esc")`：`internal/ball/hotkey_windows.go:126`（零值 acc）→ `:141-142`（`case "esc", "escape": acc.VK = vkEscape`，**不加修饰键**）→ `:156`（`acc.Mods |= modNoRepeat`）＝`{Mods:0x4000, VK:0x1B}`；`internal/ball/hotkey_windows.go:524` 手写的是同一对常量 ⇒ 只要默认还是 `Cancel: "Esc"`（`internal/ball/hotkey_windows.go:69`，并被 `internal/ball/hotkey_status_test.go:190-192` 反向钉住），形ⓐ 在默认档**一发出册都不变** |
+| "借来的那把键是不是裸键"这一维 | **碰（只碰这一维）** | 用户配成组合键后借到的是组合键 ⇒ 与 245 `:47` 那句"组合键**应当常绑**"直接相抵，而"常绑"要动的是 `internal/ball/hotkey_windows.go:457-463`（把"按 id 跳过"改成"按有无修饰键跳过"）。**本格只报这一行，不判形** |
+| 归还那一手 | **不碰行为，碰注释** | 行为：`internal/ball/hotkey_windows.go:553` 只 `unreg(hkCancel)`；钉在 `internal/ball/hotkey_status_test.go:239-242`（「never re-bind the configured binding」）＋枚数 `:245-247`。注释 `:547-552` 那句"re-registering the configured binding on the way out would put the production default (a bare Esc) straight back"在"用户配的是组合键"那一支**不再覆盖真实形状**＝注释过期类，与票 245 `:35`（AC#3③"改成带条件的事实句"）同一族 |
+| 报表行的拼法 | **不碰** | `internal/ball/hotkey_windows.go:513-519` 那句"the bare Esc, whatever the configured binding says"是本票要改的对象本身，245 未裁它；245 只裁"idle 不绑／借—还成对" |
+| 冻结文字 | **不碰** | `docs/PLAN.md:3082`（D43 第 22 行，逐字含「否决（**单击球 / `Esc` / KWS 否决词 / 面板拒绝**，B1）」）＝C12 冻结，本件一字未动；默认档不换键名 ⇒ 无需触碰 |
+| 用户可见文案 | **落点在，判形不在本格** | `internal/agent/approval/approval.go:90` 逐字 `ChannelEsc: "按 Esc 键",`（枚举声明 `:55`）＝卡片上那句"按 Esc 取消"的现役出处；改它不改 `PLAN.md` 一字，但它就是 AC#1 那句"改了配置之后用户看得见什么"要回答的第一枚 |
+
+**钉子清单（改形ⓐ 会响的钉，逐枚具名，不当"做不到"用）**：
+字面锚（借到的键换身份就响）＝`internal/ball/hotkey_status_test.go:223`、`internal/ball/hotkey_live_test.go:107`、`internal/ball/hotkey_status_test.go:216`（`if !reg.bindsEsc()`）、真机探针 `internal/ball/hotkey_live_test.go:61-62`；
+枚数锚（借—还区间不变就不响，配组合键后"idle 多一枚"才会响）＝`internal/ball/live_windows_test.go:74`、`internal/ball/hotkey_status_test.go:119`/`:129`/`:181`/`:245`；
+反向锚（不许把默认键名改掉）＝`internal/ball/hotkey_status_test.go:190-192`。
+
 
 ---
 
