@@ -1,0 +1,11 @@
+docs(247-a2): §2 管道逐跳三态填满
+
+真麦 PCM→球上 float32→液态 = 5 跳，逐跳三态现量（HEAD 47b38765）：
+H1 构造采集栈=一整块没写（NewWASAPIMicrophone/NewHalfDuplexGate/NewBoundedFrames 产码零构造者,
+尺 grep ... cmd internal tools 排 audio 包与 _test ⇒ e=1, 正控包内大量命中）；H2 读 buf 的消费者=一整块没写
+（pinned 循环 wasapimic:186-234 只 EncodeFrame+push 不算电平, grep FrameLevel/level e=1）；
+H3 []byte→float32 函数存在调用者零（FrameLevel level.go:118, math.Sqrt :105, DecodeFrame :137,
+EncodeFrame wavinjector:138, 分母 32768 :54 ⇒ 241-r1 已闭合生产者半）；H4 SetAudioLevel 方法存在、
+产码调用者只有 balldebug:418/477，cmd/wisp 零；H5 prototypeVisuals 独立闸默认关（applyLevel:52 在写 liqRaw 前 return）。
+关键纠偏：票面"只差一行赋值"是假象——真欠的是 H1+H2 一整块，按"补一行"只会补出喂假数的死赋值；
+"全仓零 Sqrt" 是历史读数，现树 level.go:105 就有。

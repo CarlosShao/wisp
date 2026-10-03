@@ -70,6 +70,24 @@ _§1 量数时刻：`2026-10-03 10:0x +0800`。_
 
 ## §2 管道逐跳三态
 
+真麦克风 PCM → 球上那个 `float32` → 液态，一共 5 跳。逐跳三态＝**今天存在**／**差一行赋值**／**一整块没写**。尺：`grep -rn "NewWASAPIMicrophone\|NewHalfDuplexGate\|NewBoundedFrames" --include=*.go cmd internal tools | grep -v "internal/audio/" | grep -v _test` ⇒ `h1_exit=1`（正控：同三名去掉排段后在 `internal/audio/*_test.go` 与 `wavinjector.go`/`wasapimic_windows.go` 大量命中，尺不瞎）。
+
+| 跳 | 这一跳要做什么 | 三态 | 现读凭据 |
+|---|---|---|---|
+| **H1** | 有人**构造**采集栈：`NewWASAPIMicrophone()`＋`NewHalfDuplexGate(...)`＋`NewBoundedFrames()`，并 `mic.Start(ctx, buf)` | **一整块没写** | 三名产码零构造者（`h1_exit=1`）；`NewWASAPIMicrophone` `wasapimic_windows.go:52`、`NewHalfDuplexGate` `gate.go:84`、`NewBoundedFrames` `audio.go:65` 全在库内、只被测试与包内占位用 |
+| **H2** | 有人**读那枚 `buf chan<- []byte`**（消费者侧循环） | **一整块没写** | `buf` 由源写（`meter.push` `audio.go:115`、被 `wasapimic_windows.go:231` 调）；全仓**没有一枚产码 reader**（audio 零 importer，见 §1.1）；pinned 循环体 `wasapimic_windows.go:186-234` 只 open/wait/drain/`EncodeFrame`+push，**不算电平**（尺 `grep -n "FrameLevel\|float32\|level" wasapimic_windows.go` ⇒ `e=1`） |
+| **H3** | `[]byte` → 一枚 `float32` 电平 | **函数存在，调用者零** | `FrameLevel(frame []byte) (float32, error)` `level.go:118`；`LevelOfSamples` `:96`（内用 `math.Sqrt` `:105`）；`DecodeFrame` `:137`、`EncodeFrame` `wavinjector.go:138`；分母 `LevelFullScale = 32768.0` `level.go:54`。⇒ 生产者半**已写、已测**（票 241），只差没人调 |
+| **H4** | 把 `float32` 交给球：`b.SetAudioLevel(v)` | **方法存在，产码调用者只有 balldebug** | 定义 `liquid_windows.go:42`（`:46 b.sta.PostTask(func(){ b.applyLevel(level) })`）；产码调用者＝`cmd/balldebug/main.go:418`/`:477`；**`cmd/wisp` 里零 SetAudioLevel**（尺 §1.1 同域，`cmdwisp_audio_exit=1` 的另一面） |
+| **H5** | 球把电平变成看得见的液态 | **一道独立闸，默认关，非本票地界** | `applyLevel` `liquid_windows.go:51` 第一行 `:52 if !prototypeVisuals { return }`（**在把 `b.liqRaw = level` 之前**，`:55`）；`var prototypeVisuals bool` `statevisual.go:102` 默认关，开关 `EnablePrototypeVisuals` `:106`，产码只有 `cmd/balldebug/main.go:122` 打开；即便打开，`:56 if !liquidDriven(b.curState)` 仍把非会话态的电平丢弃（`liquidDriven` 六态 `liquid.go:62-70`，不含常驻腿能到达的 Sleeping/Confirming） |
+
+### 关键纠偏（这一节最重要）
+
+- **"只差一行赋值"是假象**：H4 那行 `SetAudioLevel` 调用看起来最省，但它**挂在 H1＋H2 之后**——今天 H1、H2 **一整块都没写**。若有人按"补一行"去做，只会补出一枚**喂着假数的死赋值**（要么塞 balldebug 那种合成包络＝票面现量 2 要剪掉的东西，要么写一句编译得过、永远不被调的调用）。⇒ 本腿明确：真正欠的是 H1（构造＋Start＋config＋shutdown 钩子）与 H2（读 buf 的消费者协程，且撞 §1.7 名册无槽），不是 H4。
+- **`09-30` 傍晚 241-r1 之后，"全仓零 Sqrt" 是历史读数**：本腿现读 `level.go:105` 就有 `math.Sqrt`，`FrameLevel`/`DecodeFrame`/`EncodeFrame` 与 32768 分母都落地了。⇒ H3 的**生产者半已闭合**，别再引"PCM→电平这一整段都没定义"。欠的只在 H1/H2/H4 接线。
+- **证据落点受 H5 牵连**：`applyLevel` 在 `:52` 就 return，连 `b.liqRaw` 都不写。⇒ 想拿"电平进了球"当证据，**不能靠读球内部**（默认档下球里啥也没留），只能在接线侧（H4 之前那一步）把 `float32` 自己打出来。这直接决定 §4 的取证形态。
+
+_§2 量数时刻：`2026-10-03 10:0x +0800`。_
+
 ## §3 两把开关与默认档自证
 
 ## §4 真机读数怎么量
