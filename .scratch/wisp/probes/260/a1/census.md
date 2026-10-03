@@ -94,11 +94,64 @@
 
 ### 2.1 `Accelerator`（修饰键＋虚拟键）从哪来
 
-### 2.2 `mods` 怎么带进借用体（现成的载体字段逐枚）
+| 零件 | 落点 | 字面／作用 |
+|---|---|---|
+| 类型 | `internal/ball/hotkey_windows.go:105-108` | `type Accelerator struct { Mods uint32; VK uint32 }` |
+| 解析器（串→加速器） | `internal/ball/hotkey_windows.go:125-158` | `func ParseAccelerator(s string) (Accelerator, error)`；`:131-151` 逐段吃 `ctrl/alt/shift/win/esc/space`＋`parseVK`；`:156` `acc.Mods |= modNoRepeat`（**每条解析出来的组合都自带 NOREPEAT**，与借用体现在手写的 `Mods: modNoRepeat` 同形） |
+| 修饰键常量 | `internal/ball/hotkey_windows.go:112-116` | `modAlt 0x0001` / `modControl 0x0002` / `modShift 0x0004` / `modWin 0x0008` / `modNoRepeat 0x4000` |
+| 虚拟键常量 | `internal/ball/hotkey_windows.go:118-119`＋`parseVK :161-226` | `vkEscape = 0x1B`、`vkSpace = 0x20`，其余走 `parseVK`（F1-F12／方向键／单字符） |
+| 注入口（seam） | `internal/ball/hotkey_windows.go:386`／`:389-401` | `type registerFn func(id uint32, acc Accelerator) error`；`hotkeyRegisterer(hwnd)` 就是它到 Win32 的那一手 |
+| 已经解出来、又丢掉的那一枚 | `internal/ball/hotkey_windows.go:435` | `if _, err := ParseAccelerator(bind); err != nil {` —— **`_` 里躺着的就是"配置来的 cancel 加速器"**；同一行注释 `:425-427` 逐字承认「It parses the binding even though the parse result is thrown away」 |
+
+⇒ "吃配置"不需要新造类型、不需要新解析器、不需要新 Win32 手：**解出来的加速器已经在 `cancelIdleLine` 的手上，只是被扔了。**
+
+### 2.2 `mods` 怎么带进借用体
+
+现状：§1.3 那条链上的四枚签名（`TakeEscForCancel()`／`takeEsc(hwnd)`／`takeEscWith(unreg, reg)`／`escBorrowAcc()`）**零枚携带键**，所以 mods 今天进不去。要进去，零件按"最少改动"排：
+
+1. **键的来源字段（仓里已有，借用体没去读）**：
+   - `internal/ball/ball_windows.go:124` `boundCfg HotkeyConfig // the set the last pass was given (rebind updates it)`，写在 `:254`（开机 `= b.opts.Hotkeys`）与 `:819`（rebind `= cfg`），读口 `ConfiguredHotkeys()` `:840-844`；
+   - `internal/ball/ball_windows.go:126` `cancelBinding string // configured cancel binding, for B1 release`，写在 `:253` 与 `:821`。
+   ⇒ 最短的一条是：**`TakeEscForCancel` 在 UI 线程里读 `b.cancelBinding`／`b.boundCfg.Cancel`，导出签名不动**（外部调用者 `cmd/wisp/resident_approval_windows.go:441`、`cmd/balldebug/main.go:635` 一字不改）。
+2. **`escBorrowAcc()`（`internal/ball/hotkey_windows.go:524`）参数化**：从"零参返回字面量"变成"吃一枚 `Accelerator` 或吃配置串"。它是借用体唯一的加速器来源（引用者见 §2.3）。
+3. **`takeEscWith` 加一枚键参数（`internal/ball/hotkey_windows.go:531`）**：这一动会波及它的**五处测试调用**（`internal/ball/hotkey_status_test.go:210`／`:235`／`:259`／`:270`／`:340`，形状逐枚见 §2.3）＋`takeEsc(hwnd)`（`:543-545`）。这是签名变更面最大的一枚，也是唯一能让"注入口测试"继续成立的做法——现 seam 的形状就是 `registerFn`（`:386`），传 acc 不动 seam。
+4. **报表行的拼法**（行为不变也得改，否则报表说谎）：`escBorrowBinding`（`:519`）与 `cancelBorrowedLine()`（`:578-586`，字段 `Binding: escBorrowBinding`＋`Acc: escBorrowAcc()`）；`cancelFailedLine(err)`（`:591-596`）由 `cancelBorrowedLine()` 派生，跟着走。
+5. **不需要动的**：WM_HOTKEY 的路由按 **id** 不按键——`internal/ball/ball_windows.go:662-663` 逐字 `case hkCancel:` → `b.fire(b.opts.Events.OnCancelHotkey)`，出厂接法在 `cmd/wisp/resident_ball_windows.go:177` `OnCancelHotkey: func() { recordCancelHotkey(onCancelEsc) }`。换掉加速器**不改**取消的落地路径；归还那一手也只按 id 丢（见 §2.4 第 4 条）。
 
 ### 2.3 `escBorrowAcc`／`escBorrowBinding` 的引用者（逐枚，含测试）
 
+**直接引用（产码，包 `internal/ball`）**
+- `internal/ball/hotkey_windows.go:524` 定义 `escBorrowAcc`（注释 `:521-523` 自述「VK_ESCAPE with nothing but the no-repeat flag. Same spelling ParseAccelerator("Esc") produces」）。
+- `internal/ball/hotkey_windows.go:533` 借用体：`if err := reg(hkCancel, escBorrowAcc()); err != nil {`。
+- `internal/ball/hotkey_windows.go:584` 报表行：`Acc: escBorrowAcc(),`。
+- `internal/ball/hotkey_windows.go:519` 定义 `const escBorrowBinding = "Esc"` → 被 `:535`（失败日志 `"binding", escBorrowBinding`）与 `:582`（`Binding: escBorrowBinding`）引用。
+- 派生者：`cancelBorrowedLine()`（`:578-586`）→ `cancelFailedLine(err)`（`:591-596`）→ 两处调用在 `internal/ball/ball_windows.go:881`／`:886`。
+
+**间接引用（按"裸 Esc 的字面"断言的测试）**
+- `internal/ball/hotkey_live_test.go:107` `if got := rep.Live()[hkCancel]; got.VK != vkEscape {` —— **只判 VK、不判 Mods**；红句 `the borrowed cancel slot holds VK 0x%X, want VK_ESCAPE 0x1B`（`:108`）。
+- `internal/ball/hotkey_status_test.go:223` `if got := borrowed.Live()[hkCancel]; got.VK != vkEscape || got.Mods != modNoRepeat {` —— VK＋Mods 双判，`t.Errorf` 字面「want the bare VK_ESCAPE with MOD_NOREPEAT」（`:224`）。
+- `internal/ball/hotkey_status_test.go:85-91` helper `bindsEsc()`（`:87` `if acc.VK == vkEscape && acc.Mods == modNoRepeat {`），**四处调用**：`:140`（idle 遍必须 false）、`:178`（生产默认那遍必须 false）、`:216`（借之后必须 true）。
+- `internal/ball/hotkey_live_test.go:61-62` 真机探针 `escBorrowProbe` 自己拿 `spareHKID` 向 Win32 注册裸 Esc（`:61-62` `pRegisterHotKey.Call(uintptr(b.hwnd), uintptr(spareHKID), uintptr(modNoRepeat), uintptr(vkEscape))`）——**探针也锚在同一枚裸键上**，配置一改它问的就不是借走的那把键。
+- `internal/ball/hotkey_live_test.go:41-43` `liveHotkeys()` 把 cancel 定成 `Ctrl+Alt+V`（注释 `:32-40` 逐字解释为什么真机用例躲开裸键）⇒ 这批用例的"配置值"与"借到的值"**今天本来就是两枚不同的键**，改形ⓐ 之后两者的关系会翻转。
+- 无关的那两枚同名常量引用（不动）：`internal/ball/hotkey_test.go:24-25` `{"Esc", 0, vkEscape, false}` / `{"Escape", 0, vkEscape, false}` —— 它们测的是 `ParseAccelerator` 本身，不测借用。
+
 ### 2.4 借还两处按"裸 Esc"写死的字面（逐处行号＋字面）
+
+票面给的范围 `internal/ball/ball_windows.go:875-901` 比实际**窄**：借体是 `:873-889`、还体是 `:895-907`（`875-901` 把还体的 `:902-907` 切掉了，而那 6 行里正好有全仓唯一一处"归还时读配置"的 `:904`）。逐处：
+
+| # | 落点 | 字面 | 按裸 Esc 写死？ |
+|---|---|---|---|
+| 1 | `internal/ball/ball_windows.go:878` | `if err := takeEsc(b.hwnd); err != nil {` | **是（间接）**：调用只传 hwnd，键由 callee 的字面量决定（`internal/ball/hotkey_windows.go:524`） |
+| 2 | `internal/ball/ball_windows.go:881` | `b.hotkeyReport = b.hotkeyReport.withCancel(cancelFailedLine(err))` | **是**：`cancelFailedLine` → `cancelBorrowedLine()` → `Binding: escBorrowBinding`／`Acc: escBorrowAcc()`（`internal/ball/hotkey_windows.go:582-584`） |
+| 3 | `internal/ball/ball_windows.go:886` | `b.hotkeyReport = b.hotkeyReport.withCancel(cancelBorrowedLine())` | **是**（同上） |
+| 4 | `internal/ball/ball_windows.go:900` | `releaseEsc(b.hwnd)` | **否**：`internal/ball/hotkey_windows.go:553` 逐字 `func releaseEscWith(unreg unregisterFn) { unreg(hkCancel) }` —— 只按 id 丢，与借的是哪枚键无关 ⇒ 改形ⓐ 不需要动归还的第一性形状 |
+| 5 | `internal/ball/ball_windows.go:904` | `b.hotkeyReport = b.hotkeyReport.withCancel(cancelIdleLine(b.cancelBinding))` | **否（这处吃配置）**：`b.cancelBinding` 来自 `:253`／`:821`；只用于报表分类，不注册 |
+| 6 | `internal/ball/ball_windows.go:875`／`:885`／`:897`／`:901` | `if b.escTakenOver {`／`b.escTakenOver = true`／`if !b.escTakenOver {`／`b.escTakenOver = false` | 否（布尔位，字段名带 esc 但值与键无关；字段声明 `internal/ball/ball_windows.go:125`） |
+
+**注释／自述层按裸 Esc 写死、改形后会变假的句子**（不是行为，但票 245 AC#3 那族"改成带条件的事实句"的规矩会管到它们）：
+`internal/ball/hotkey_windows.go:7-15`（B1 头条，`:11-12` 「the production cancel binding IS the bare "Esc", DefaultHotkeys below」）、`:513-518`（`escBorrowBinding` 的"whatever the configured binding says"，**这句是明示的写死自述**）、`:521-523`、`:541-542`（「It is the ONLY path that registers the cancel id」）、`:547-552`（release 那段「re-registering the configured binding on the way out would put the production default (a bare Esc) straight back」）、`:250-258`（`HotkeyStandby` 文档）；`internal/ball/ball_windows.go:863-872`（`TakeEscForCancel` doc「temporarily binds Esc as the cancel key」）、`:891-894`（`ReleaseEscAfterSession` doc）、`:242-247`（开机注释）；`cmd/wisp/resident_ball_windows.go:127-130`（「the fourth slot, cancel, is left standby by internal/ball because its production binding is a bare Esc」）、`:132-140`（ticket 246 那段）；`cmd/wisp/resident_approval_windows.go:13`。
+另有**面向用户的字面**：`internal/agent/approval/approval.go:90` `ChannelEsc: "按 Esc 键",`（通道枚举声明 `:55` `ChannelEsc Channel = "esc" // global Esc hotkey`）——改形ⓐ 之后卡片上这句会不会跟着配置变，属"用户看得见什么"那一格，AC#1 必答（本格只报落点）。
+
 
 ---
 
