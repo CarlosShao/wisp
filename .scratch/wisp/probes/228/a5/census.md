@@ -15,6 +15,35 @@
 - ⛔ 零读、零转述 `frontend/**` 与 `design/**`（两层禁令）。
 - 路径口径：所有引用报到**包／目录级 + 文件:行号**。
 - "零 X" 的入账规矩：每枚负向结论自带**那把尺的字面命令 + 一处正控**（已知命中的行）。
+- **本件的行号一律对锚点 `ccd9543` 负责**。交件前复尺时发现：
+  `git status --short -- internal/agent/approval cmd/wisp internal/ball` ⇒
+  除 `internal/agent/approval/gate.go`（`M`）与两枚**未跟踪**新件
+  （`internal/agent/approval/window_read.go`、`ticket220_l1_window_read_test.go`）之外，
+  本腿引过的每一枚文件都**干净**（复尺 V7，逐名清单见 §7 第 6 条）⇒ 干净文件的现读＝锚点读数。
+  `gate.go` 那一处是**另一枚在飞腿（票 220）的未提交改动**（`git diff --stat`＝`7 insertions(+), 1 deletion(-)`），
+  它把该文件 `:346` 之后的行号整体推下 **+6／+7**：
+  锚点读数（`git show ccd9543:internal/agent/approval/gate.go | grep -n "func (g \*Gate) ..."`，复尺 V11）
+  ＝`Veto :415`／`Native :616`／`nativeAPI.Allow :624`／`nativeAPI.AllowSession :647`／`Gate.allowSession :652`／
+  `DecideFromNative :718`／`Replay :749`；
+  同一把尺在**当前工作树**上读到 `421/622/630/653/658/724/755`（复尺 V8）。
+  ⇒ 本件正文一律用**锚点那组**；按图找不到的那一枚就用后一组，差值即那 7 行。
+
+---
+
+## §0b 尺名册
+
+本程尺位**共 95 枚、编号不复用**：`R1`–`R80` 内联在 §1–§7 正文里（编号紧挨每把尺的字面命令），
+`V1`–`V15` 是**交件前的复尺与自我核对**（换前缀以免与 R 混）——它们不复测结论，只复核**我自己写进本件的行号与枚数**，
+并抓到三处（**更正就地写在本件里、原读数不抹**）：§0b 的 `V1` 那枚方法枚数、§5 表头那枚 grep 枚数、§7 第 1 条那枚调用链。
+`V7`–`V12` 另抓到一件时态事件（另一枚在飞腿正在改 `gate.go`），具名在 §7 第 6 条。
+`V1` `Replies` 方法声明逐名（**更正：本节首发把枚数记成了"十七枚"，逐名点数为十八枚**；
+原读数不抹＝`replies.go:155/170/199/211/227/252/286/306/316/351/372/378/384/400/431/455/473/482`，逐名可点数）、
+`V2`–`V8` `gate.go` 锚点读数与在飞改动、`V9`–`V12` 干净度复尺与那枚未跟踪新件的导出面、
+`V3` `interactiveStdin` 声明行（`cmd/wisp/approval_reply_stdin_windows.go:41`）、
+`V4` `internal/agent/approval/approval.go:47-51` 那枚闭集注释的原文位置、
+`V5` §5 两枚 grep 的**枚数**（各 **20**）、
+`V6` 名册钉的 AST 扫描与两支 Fatal 的行位（`resident_ball_228_test.go:288`/`:308`/`:319`）。
+零 Go 命令：`V1`–`V12` 全是 `grep`／`sed`／`git show`／`git status`／`git diff --stat`／`ls`。
 
 ---
 
@@ -241,16 +270,175 @@
 
 ## §5 既有钉名册与射程
 
-（待填：`internal/agent/approval`／`cmd/wisp` 里 allow／replay／tray 相关用例逐枚点名 + 哪几枚盖得到"新增托盘入口"）
+尺字面（两枚同名尺，各自的正控在 §1／§4 已给）：
+`grep -rn "^func Test" internal/agent/approval/*_test.go | grep -iE "allow|replay|veto|tray|reply|native|panel"`
+`grep -rn "^func Test" cmd/wisp/*_test.go | grep -iE "allow|replay|veto|tray|reply|esc|gesture"`
+⇒ 枚数**各 20**（复尺 V5；**更正：本节首发把第一枚记成了"30 枚命中"，复点＝20，原句不抹在这里**）。
+
+### 5.1 `internal/agent/approval`（与 allow／replay 有关，逐枚）
+
+| 用例 | 位置 | 管到哪一层 |
+|---|---|---|
+| `TestL2NativeAllowExecutesThroughTheBridge` | `queue_test.go:22` | L2 允许穿过桥真执行（门＋队列） |
+| `TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis` | `queue_test.go:89` | 面板来源的 allow 每条可伪造轴都拒 |
+| `TestReplayRedisplaysUnderAFreshGrant` | `queue_test.go:269` | **全仓唯一一枚 `Gate.Replay` 用例**（进程内；不读审计） |
+| `TestReplySeamWaitingStateNamesTheTwoD43Rows` | `replies_201_test.go:40` | 账本 → D43 那两枚态名 |
+| `TestReplySeamCarriesNoAllowWithoutAGrant` | `replies_201_test.go:75` | **⚠ 这枚管"没卡／没令牌"的返回码**：`:81` `ErrNoGateAttached`、`:93-94` `ErrNoTrackedCard`、`:101-102` L1 `ErrRouteHasNoAllow`、`:106` 被拒不 retire 卡 |
+| `TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed` | `ticket224_reply_grant_test.go:179` | 会话档落盘（`Native().AllowSession` 那一支） |
+| `TestTicket224ForgedSessionAnswerRecordsNothing` | `ticket224_reply_grant_test.go:236` | 伪造会话答复什么都不记 |
+| `TestTicket224SessionAnswerWithoutARecorderSaysTheScopeWasDropped` | `ticket224_reply_grant_test.go:273` | `GRANT-DROPPED` 那一支 |
+| `TestTicket224RecordingFailureReleasesTheCallButClaimsNoRow` | `ticket224_reply_grant_test.go:297` | 记账失败仍放行但不声称落了行 |
+| `TestTicket242PanelItemReadFaceIsFullyDeclared`／`...StaysGrantFree` | `ticket242_panelface_test.go:30`／`:53` | 面板读面**不许带 grant** |
+| `TestAVetoAgainstAnOnScreenL2CardEndsTheWaitNowAndStillRefuses` 等四枚 | `ticket87_veto_l2_test.go:60`/`:129`/`:159`/`:203` | L2 上 veto 的语义（票 87 那判"落空要出声"的落点） |
+| `TestAnAliasCanNeverBuyAnAllow` | `ticket97_alias_direction_test.go:75` | 别名／改写号买不到允许 |
+| `TestL1WindowVetoedByEachLoadedChannel` 等四枚 | `window_test.go:55`/`:144`/`:207`/`:264` | **按"已加载通道"遍历**的那一族（与四枚 `Channel` 闭集同轴） |
+| `TestEveryAnswerRouteForAnUnknownCorrelationFailsFast` | `ticket84_no_owner_test.go:122` | 未知关联号在每条答复路由上都**快速失败**（内含 `Native().Allow`／`Panel().Reject` 两形） |
+
+### 5.2 `cmd/wisp`（宿主侧，逐枚）
+
+| 用例 | 位置 | 管到哪一层 |
+|---|---|---|
+| `TestReplyListenerAllowsAnL2CardFromTheNativeSide` | `approval_reply_201_test.go:196` | **控制台一发 `yes` → 两行审计**（承重断言在 `:252-253`） |
+| `TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel` | `approval_reply_201_test.go:266` | 理由回给模型（票 219 那框的前半） |
+| `TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject` | `approval_reply_201_test.go:340` | 面板路线 allow＝拒＋烧令牌（`:410`／`:416`） |
+| `TestUnansweredL2CardTimesOutIntoRejectNeverExecution` | `approval_reply_201_test.go:429` | 超时落拒绝 |
+| `TestL1VetoNeedsAChannelTheHostReallyWired` | `approval_reply_201_test.go:492` | **⚠ 宿主没接通道就不许声称能否决**（`:549-553`、`:631` 逐字比对审计里的 `channel=esc`） |
+| `TestNativeHostSeamRefusesAPanelSourcedAllow` | `approval_seam_201_test.go:137`（＋`:89`／`:119`／`:178`） | 接缝层的同一条；`:128` 反向断"这条路上不许出现宿主语法的 `REPLY` 行" |
+| `TestAC246CancelGestureUsesTheInjectedExecutor` | `resident_approval_246_windows_test.go:40` | **⚠ 与"托盘加一枚"同形的最近一枚**：注入函数值 → 回调 → 记账 |
+| `TestAC246EscChannelStaysUnloadedWithoutABallWindow` | `resident_approval_246_windows_test.go:62` | 没窗不许加载通道 |
+| `TestAC246VetoSentenceWithNoCard` | `resident_approval_246_windows_test.go:341` | **⚠ 按下去没对象时那句话**（§3(c)） |
+| `TestAC246StatusLineSaysWhatTheLegDoesNot` | `resident_approval_246_windows_test.go:358` | 状态句不许谎称卡片可见 |
+| `TestAC246ResidentPipelineAsksThroughTheOneGate` 等七枚 | `resident_task_source_246_windows_test.go:68`/`:146`/`:183`/`:233`/`:296`/`:358`/`:414` | 常驻腿任务源四枚 posture；`:296`＝出货进程无控制台即拒 |
+| `TestAC228BallHostAnswersEveryGesture` | `resident_ball_228_test.go:275` | **⚠⚠ 见 5.3 第一行——它必红** |
+| `TestAC228ResidentLegIsTheBallHost` | `resident_ball_228_test.go:198` | `internal/ball` 的生产 importer 计数（AST，剥 `_test.go`） |
+| `TestAC228ResidentLegReportsAndBooksItsBall` | `resident_ball_228_windows_test.go:53` | 报告句＋磁盘记账 |
+| `TestAC228ExitRequestDuringBootStillLeavesThroughD38E` | `resident_ball_228_windows_test.go:184` | **只打控制台信号那一支**（＝`A493` 注的那枚"空窗"用例，不是托盘分支） |
+| `TestLive228ResidentLegOwnsABallWindowOnTheDesktop` | `resident_ball_live_228_windows_test.go:89` | 真机进程×跨进程真窗句柄；`:144` 不断热键枚数、`:151` 只在 `0/4` 红 |
+| `TestLive246ConfirmingCardBorrowsEscVetoesAndReturns` | `resident_approval_live_246_windows_test.go:72` | 真机借 Esc→否决→归还（`:164` 读 `ANSWER-VETO`、`:265` 读 `ANSWER-REJECT`） |
+| `TestLive246ResidentPipelineRaisesACardAndEscVetoesIt` | `resident_task_source_live_246_windows_test.go:77` | 出货进程里那一发的完整四步（`:164` 在**文件里**找 `ANSWER-VETO`） |
+| `Test197NoAllowDoorIsReachableFromASubagentsAssembly` | `subagent_selfapproval_197_test.go:557`（承重读数 `:428-472`） | 子代理装配拿不到允许门；`:450`＝同令牌第二次花必失败 |
+| `TestBallPanelGesturesReachThePanelThread`／`TestBallGestureWithoutPanelHostStillRecords` | `panel_resident_windows_test.go:932`／`:959` | 只覆盖**面板那两枚手势**的执行者与 nil 分支，**不枚举 `Events`** |
+
+### 5.3 哪几枚的射程盖得到"新增一枚托盘入口"
+
+| 档 | 具名 | 现读依据 |
+|---|---|---|
+| **必红**（改了托盘就撞，改法已被裁） | `cmd/wisp/resident_ball_228_test.go:275` **一枚** | 它 AST 扫常驻宿主里所有 `ball.Events` 复合字面量的 key（`:287-303`），**两向判**：名册缺项红（`:313-317`）、宿主设的比名册多也红（`:319-322`）。名册是字面列表＝`:50-53`（十枚） |
+| **条件红**（选错形才红） | ① 若把"允许"接成任何**面板可及**的方法名／字段 → `queue_test.go:89`、`approval_reply_201_test.go:340`、`approval_seam_201_test.go:137`、`ticket242_panelface_test.go:53`、`subagent_selfapproval_197_test.go:557` 这一族；② 若扩第五枚 `Channel` 值 → `approval.go:48-50`/`:61` 闭集，且 `window_test.go:55` 那族按 loaded 通道遍历、`gate.go:276` 的 veto 通道缓冲按 `len(allChannels)+1` 算；③ 若**搬动** `resident_ball*`／面板宿主文件 → `cmd/wisp/panel_host_gate_test.go:31` 用 `filepath.Join("panel_host_windows.go")` 按**文件名**寻址（票面 `A498` 落地附条点名的正是这一形） | 上面各行 |
+| **不会红（＝这一格今天零仪器，落地时没人守）** | ① 菜单**枚数／命令 id／标签文案／`showMenu` 入参**——全仓 `*_test.go` 里对 `打开面板\|暂停唤醒\|静音\|menuExit\|showMenu\|OnTray` 的命中**只有那一枚名字册里的字符串**（尺 R38；正控＝去掉 `--include=*_test.go` 后同尺在产码命中 12 行，R39）；② 常驻腿那一行的 `ANSWER-ALLOW`（尺 R62 零命中，正控＝同文件能命中 `ANSWER-VETO`/`ANSWER-REJECT`）；③ "托盘按下去但此刻没卡"**出声没有**——§3(c) 那枚钉只管 Esc 那支；④ `SetTrayChecks`／`SetTrayTip` 两枚"推一维状态进菜单"的口**全仓零枚调用者（含测试）**（尺 R40：8 行命中全是定义与字段读，唯一读点在 `ball_windows.go:674`） | 同上 |
 
 ---
 
 ## §6 量不到的格子
 
-（待填：量不到 + 为什么；⛔ 不用推测填空）
+按"量不到＋为什么"写，⛔ 不拿推测填。
+
+1. **托盘菜单真被按下这一维**：本程零 Go 命令，且 `TrackPopupMenu(TPM_RETURNCMD)` 的返回值只在 wndproc 内联取
+   （`internal/ball/tray_windows.go:101-106`；`:15-16` 明写不走 `WM_COMMAND`）⇒ **测试进程无法确定性地送达一次选择**，
+   我没有可复算的读数，只能说"今天的码里没有投递路径"。（⚠ 前人把这句证成"winlive 族自己承认测不了托盘"的那行引错了地方，见 §7 第 3 条。）
+2. **一次 allow 的两行审计在盘上是否落在同一枚文件、相对顺序如何**：需要跑一发真进程读日志文件；
+   本程只读到绑定关系（§4.1 那条 ⚠）。⇒ **量不到，需要写腿或验收腿实跑。**
+3. **`-H=windowsgui` 之后 §1 第 2 枚入口（常驻腿控制台 stdin）还在不在**：
+   尺只有 `cmd/wisp/approval_reply_stdin_windows.go:41-50` 的 `GetStdHandle`+`GetConsoleMode` 这一枚判据，
+   GUI 子系统构建下它返回什么**必须实跑才知道**，而那一版构建今天不在盘上（票 244 未落地）⇒ **量不到，且它的前置是另一枚票。**
+4. **"卡片真的看得见吗"**：常驻腿自己声明不声称这一点（`cmd/wisp/resident_approval_windows.go:32-37` 逐字
+   「"the card is on screen" is NOT a claim this file makes」，另见 `resident_task_source_windows.go:51-55`）。
+   球面能显示的只有 20 态视觉那一族，**没有卡片文本位**⇒ **我无法从 Go 侧量出"用户看见了哪张卡"。**
+5. **`Gate.Replay` 零入口的实际后果面**：`q.history` 今天真存了几枚可重放项、`DefaultReplayHistory = 8`（`queue.go:113-114`）
+   够不够用，要跑起来读；本程只量到"取的那一枚没人调"。⇒ **量不到。**
+6. **winlive 那一档的真实读数**：`.github/workflows/ci.yml` 里 `winlive` 零命中（尺 R65）⇒ 表 §4.2 里"有钉但只在 winlive"那几枚
+   **在 CI 没有读数**；真机跑一次超出本程射程（零 Go 命令）。⇒ **量不到，只能具名说"这一维的读数此刻不存在"。**
 
 ---
 
 ## §7 我推翻前人哪几句
 
-（待填：含 `259-a1` 两条线索与编排者 `A4xx` 若干句）
+### 1. 复认 `259-a1` 线索①（并收窄它）
+
+**成立，但要说准。** 尺 R6：`grep -rn "\.Native()" --include=*.go internal cmd tools scripts` ⇒
+非测试命中**只有 1 行**＝`internal/agent/approval/replies.go:363`，而那枚调的是 **`AllowSession`**。
+⇒ 准确说法＝「`NativeAPI` 这枚接口有 1 枚生产调用者，那枚调用者用的是 `AllowSession`；
+`NativeAPI.Allow`（`ui.go:146`）这一枚方法＝**生产零调用者**」。
+⛔ 若把这条读成"整枚 `NativeAPI` 是死的"就是假话——`replies.go:363` 活着，
+且它下游是 `gate.go:647`（`nativeAPI.AllowSession`）→ `gate.go:652`（`Gate.allowSession`）→ `queue.go:391` 那行 `decision=allow-session`。
+**更正：本节首发把那枚下游写成了"`gate.go:625 → queue.go:391`"——那是 `Allow` 那一支的行位（`gate.go:624`/`:625`），
+不是 `AllowSession` 的；复尺 V11 逐名点数后改成上面这组，原句不抹在这里。**
+正控：同一条尺（`\.Method\(` 形）在 `replies.go:363` 有命中，证明尺读得到接口调用。
+
+### 2. 复认 `259-a1` 线索②，但**枚数它写虚了**
+
+线索原话"在册只有四**到五**枚"。现读＝**恰好四枚**，没有第五枚：
+`internal/ball/tray_windows.go:86`、`:88`、`:89`、`:91` 四行 `appendItem`（id 名册 `:20-24` 只有 `1..4`），
+中间两行 `pAppendMenuW.Call(menu, mfSepart, 0, 0)`（`:87`、`:90`）是**分隔条、不是项**。
+⇒ "五枚"那一读极可能是把分隔条数进去了。"没有『允许一次』"这一半**复认成立**（尺 R4＋R38＋正控 R39）。
+
+### 3. 推翻票 228 Progress log 里 `228-a2` 那句引文（**引到了一枚不含该句的文件**）
+
+票面 `:116`（`228-a2` 承重现量③）逐字写：
+「`internal/ball/interaction_live_test.go:12` 逐字承认 winlive 族测不了托盘菜单（"needs a real mouse in the notification area"）」。**现读不成立**，三条尺：
+
+- 尺 R79：`sed -n '1,20p' internal/ball/interaction_live_test.go` ⇒ `:12-16` 逐字是
+  「Where a clause needs a human hand that no harness can supply **(a second monitor, the felt experience of focus)**
+  the test says so in this file rather than faking a proof」——**没有托盘、没有鼠标、没有通知区**。
+  文件头 `:5-8` 自陈射程是「The four SPEC-08 §2 interaction clauses」＝点击／Esc／焦点／穿透，不是菜单。
+- 尺 R78（全仓负向尺）：`grep -rn "real mouse\|notification area" --include=*.go .`（剥 `.scratch`）⇒ **零命中**，
+  即这句引文在**整棵 Go 树里不存在**。
+  正控＝**同一把尺、同一文件集**换已知字面：`grep -rn "felt experience of focus" --include=*.go .` ⇒
+  命中 `./internal/ball/interaction_live_test.go:14`。⇒ **尺没坏，是引文坏。**
+- 尺 R80（枚数级旁证）：`grep -c "tray\|Tray" internal/ball/interaction_live_test.go` ⇒ **0**；
+  正控＝`grep -c "Esc"` 同一枚文件 ⇒ **35**。另：全仓 `*_test.go` 里含 `[Tt]ray` 的 29 枚文件**不含这枚**（尺 R35）。
+
+⚠ **要紧的不是引文错，是"结论的证据"错**：那句"winlive 测不了托盘菜单"的**方向**我复认成立，
+但成立理由是**机制**（`tray_windows.go:15-16`＋`:101-106`）＋**名册**（`--include=*_test.go` 全仓零枚碰 `showMenu`），
+**不是**某文件里的一条自陈。⇒ 谁按票面那句去找那行注释，会白跑一趟（＝本仓登记过的"拿过期指认当现读"同一族）。
+
+### 4. 推翻票 228 现量表里那句「入口枚数仍＝1（控制台 stdin）」（票面 `:18`，09-29 口径）
+
+今天**按宿主计＝2 枚**，两枚都是"允许"的真入口：CLI 腿 `cmd/wisp/run.go:802`，
+常驻腿 `cmd/wisp/resident_windows.go:206` → `cmd/wisp/resident_task_source_windows.go:218/:288/:318/:381`
+（动词表复用 `cmd/wisp/approval_reply.go:562-583`，**不是第二份表**）。
+⇒ 这句在票 246 AC#7 落地后过期（`resident_task_source_windows.go:5-17` 就是那一格的落码自述）。
+⛔ 这一处更正会改变派单口径：**"缺的不是能答的入口枚数，是 GUI 那半侧（托盘／球单击）根本没接"**——
+"只有控制台一条路"这句会让人以为常驻腿连答都答不了，而它答得了（前提：那台机器上有控制台，见 §6 第 3 格）。
+
+### 5. 复认＋行号更正：票面 `:39`（AC#2）与 `:19` 那组映射行号
+
+- 「「长期允许」→`replySurface.always`（`approval_always.go:70`）」 ⇒ **复认精确**（现读 `:70` 逐字 `func (s *replySurface) always(corr string) (string, error) {`）。
+- 「「允许一次」→`Replies.Allow`（`replies.go:313`）」 ⇒ 今天**漂到 `:316`**。
+- 「「拒绝」→`Replies.Reject`（`:336`）」 ⇒ 今天**漂到 `:372`**（差 36 行，`AllowSession` 那一整段挤在中间）。
+- 票面 `:19`／`A495` 那句「`Gate.windows` 全仓零枚枚举口，只有 `:321/:324/:330/:393` 四处」⇒
+  **枚数与结论复认**（现读四处＝`gate.go:349` 查重／`:352` 写／`:358` 删／`:421` 按 corr 查），**行号整体漂 +28**。
+  ⇒ 顺带一条对**本格**有用的推论（只报形状）：`AwaitingHuman()` 会从**宿主账本**里把 L1 卡挑出来
+  （`replies.go:264-273` 那两枚循环），所以"托盘只作用于 L2"**不是结构强制**，是 `A498` F6 那一裁选的；
+  两族的差别只在"门的 `windows` 表"与"宿主的账本"不是同一枚对象。
+- 票面 `:20`／`A472` 那句「`DefaultChannels()` 生产零调用者」⇒ **复认**，唯一命中是兜底
+  （`gate.go:133-135`：`o.Channels` 为 nil 才走），两枚宿主都显式传空：`resident_approval_windows.go:111`、`run.go:614`。
+- 顺带一枚**只报形状不裁**的在场事实：`Replies` 上在册的答复方法名共六枚
+  （V1 逐名：`Allow :316`／`AllowSession :351`／`Reject :372`／`PanelReject :378`／`PanelAllow :431`／`Veto :455`），
+  托盘那枚"允许一次"要用的名字**已经在册**。
+
+### 6. 交件前复尺抓到一件会改变派单时态的事（不是推翻某句，是**那句正在变旧**）
+
+尺 V7（字面）：`git status --short -- internal/agent/approval cmd/wisp internal/ball` ⇒
+本程引过的文件里只有三枚不干净，且**都不是本腿写的**：
+
+- `M internal/agent/approval/gate.go` —— `git diff --stat`＝`7 insertions(+), 1 deletion(-)`，
+  加的是 `window` 结构里的一枚 `taskID string` 字段与它的构造点，注释逐字
+  「It exists for one thing only: the read-only enumeration in **window_read.go**, so a roster that joins rows by
+  task id can read an L1 window at all (**ticket 220 AC#2**)」。
+- `?? internal/agent/approval/window_read.go`（**未跟踪**，即尚未提交）——导出面一枚：`func (g *Gate) LiveL1Windows() []L1Window`（`:63`，尺 V12），
+  文件头自陈「ticket 220 AC#2, landing point 甲 as ruled by the orchestrator and booked in the ledger as **A562**」，
+  并逐字写着「the one dimension "which tasks are blocked in the 2-3s block right now" had **NO producer** anywhere in the tree」。
+- `?? internal/agent/approval/ticket220_l1_window_read_test.go`（未跟踪）。
+
+⇒ **三句后果，逐句只报事实**：
+
+1. 票面 `:19`／`A495` 那句「L1 的 `Gate.windows` 全仓零枚枚举口」**在锚点 `ccd9543` 上成立**
+   （复尺＝`git show ccd9543:internal/agent/approval/gate.go | grep -n "g\.windows"` ⇒ 四枚：查重／写／删／按 corr 查），
+   但它**正在被另一枚票的写腿改掉**。本件不改判、不等它落地——**排程上这意味着 228 的落地腿要在"已有一枚 L1 只读枚举口"的前提上开工**，
+   票面 `:60` 警告的那句"两腿各造一次＝两份枚举器"这一风险，此刻**已被 220 单方面兑现掉一半**（220 造了，228 若再造才是第二份）。
+2. **本格（托盘那一枚）不受它影响**：按 `A498` F6 那一裁，托盘「允许一次」永远作用于队头那枚 **L2** 卡，
+   走 `AwaitingHuman()`（`replies.go:252`）／`Pending()`（`:227`）这一族，`LiveL1Windows()` 是 L1 那一侧的面。
+   ⇒ 具名说：**这是"别再造第二枚"的账，不是本格的前置**。
+3. `gate.go` 的行号会漂（差值与两组读数已写在 §0 末行）⇒ **任何按本件行号办事的腿，动手前先对 `git diff --quiet -- internal/agent/approval/gate.go` 复一次尺**；
+   那枚 `M` 若已被它的作者提交，锚点就不是 `ccd9543` 了。
