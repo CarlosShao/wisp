@@ -97,9 +97,15 @@ type Gate struct {
 
 // window is one live L1 block window.
 type window struct {
-	ctx    context.Context
-	corr   string
-	tool   string
+	ctx  context.Context
+	corr string
+	tool string
+	// taskID is the task the call belongs to, filed alongside the correlation and
+	// not derived from it (the two differ as soon as a host supplies its own
+	// correlation id). It exists for one thing only: the read-only enumeration in
+	// window_read.go, so a roster that joins rows by task id can read an L1 window
+	// at all (ticket 220 AC#2). No judgement branch reads or writes it.
+	taskID string
 	vetoes chan Veto
 }
 
@@ -273,7 +279,7 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 
 	bv := Aggregate(d)
 	corr := orDefaultText(d.CorrelationID, d.TaskID)
-	w := &window{ctx: ctx, corr: corr, tool: d.Tool, vetoes: make(chan Veto, len(allChannels)+1)}
+	w := &window{ctx: ctx, corr: corr, tool: d.Tool, taskID: d.TaskID, vetoes: make(chan Veto, len(allChannels)+1)}
 	if !g.openWindow(w) {
 		return tools.AnswerReject, "同一 correlation_id 已有确认窗口在跑，无法重复登记，已 fail-closed 拒绝"
 	}
