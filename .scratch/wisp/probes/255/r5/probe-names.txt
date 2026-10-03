@@ -1,0 +1,25 @@
+time=2026-10-03T16:45:35.017+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:580: cold bring-up measured on this box: 983.297 ms (HEAD a924fa17 at read time, 2026-10-03T16:45:36+08:00)
+    panel_host_windows_test.go:606: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:641: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 23476 ppid 24700 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 26704 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 22764 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 24468 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 31608 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 4532 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 23476 ppid 24700 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 26704 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 22764 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 24468 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 31608 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 4532 ppid 23476 msedgewebview2.exe
+    panel_host_windows_test.go:666: AC#1 denominators (head a924fa17): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x60d0a2e across hide->re-show=true
+    panel_host_windows_test.go:671: hot re-show measured on this box: 62.500 ms
+    panel_host_windows_test.go:698: AC#3 listening-socket ruler (head a924fa17): IPv4 rows=344 LISTEN-owned-by-tree=0 ; IPv6 rows=84 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:724: AC#1 after Destroy (head a924fa17), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 12 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.27s)
+PASS
+[1003/164536.299:ERROR:ui\gfx\win\window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1412
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.376s

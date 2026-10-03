@@ -1,0 +1,35 @@
+time=2026-10-03T16:50:34.589+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:629: cold bring-up measured on this box: 934.588 ms (HEAD ef8266db at read time, 2026-10-03T16:50:35+08:00)
+    panel_host_windows_test.go:675: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:704: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:725: AC#1 denominators (head ef8266db): our tree webview=7 direct-children=1 tree-pids=7 browser-host-pids=[24180] same-set=true | machine-wide msedgewebview2=19 | same HWND 0xc6d0c9e across hide->re-show=true
+    panel_host_windows_test.go:730: AC#1 denominators (head ef8266db): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0xc6d0c9e across hide->re-show=true
+    panel_host_windows_test.go:735: hot re-show measured on this box: 60.973 ms
+    panel_host_windows_test.go:762: AC#3 listening-socket ruler (head ef8266db): IPv4 rows=128 LISTEN-owned-by-tree=0 ; IPv6 rows=111 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:788: AC#1 after Destroy (head ef8266db), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 12 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.16s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:629: cold bring-up measured on this box: 904.983 ms (HEAD ef8266db at read time, 2026-10-03T16:50:36+08:00)
+    panel_host_windows_test.go:675: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=9 (machine-wide 21)
+    panel_host_windows_test.go:704: AC#1 re-show tree settle: reading held after 2 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:719: hide -> re-show swapped the browser serving this window: host pid(s) removed [24180], added [] (tree root pid 22108; single-window reuse broken - AC#1 words 'second show within session reuses window' mean the SAME browser, and a helper-process count 9 -> 6 is not the identity). Machine-wide count went 21 -> 18 and is reported only - it counts other sessions too
+    panel_host_windows_test.go:725: AC#1 denominators (head ef8266db): our tree webview=6 direct-children=1 tree-pids=6 browser-host-pids=[24116] same-set=false | machine-wide msedgewebview2=18 | same HWND 0x5d00aa6 across hide->re-show=true
+    panel_host_windows_test.go:730: AC#1 denominators (head ef8266db): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0x5d00aa6 across hide->re-show=true
+    panel_host_windows_test.go:735: hot re-show measured on this box: 77.187 ms
+    panel_host_windows_test.go:762: AC#3 listening-socket ruler (head ef8266db): IPv4 rows=128 LISTEN-owned-by-tree=0 ; IPv6 rows=109 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:788: AC#1 after Destroy (head ef8266db), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (1.29s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:629: cold bring-up measured on this box: 425.928 ms (HEAD ef8266db at read time, 2026-10-03T16:50:37+08:00)
+    panel_host_windows_test.go:675: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:704: AC#1 re-show tree settle: reading held after 2 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:725: AC#1 denominators (head ef8266db): our tree webview=6 direct-children=1 tree-pids=6 browser-host-pids=[24116] same-set=true | machine-wide msedgewebview2=18 | same HWND 0x44a0e36 across hide->re-show=true
+    panel_host_windows_test.go:730: AC#1 denominators (head ef8266db): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0x44a0e36 across hide->re-show=true
+    panel_host_windows_test.go:735: hot re-show measured on this box: 57.563 ms
+    panel_host_windows_test.go:762: AC#3 listening-socket ruler (head ef8266db): IPv4 rows=129 LISTEN-owned-by-tree=0 ; IPv6 rows=109 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:788: AC#1 after Destroy (head ef8266db), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.77s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.328s
+FAIL

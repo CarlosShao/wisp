@@ -1,0 +1,242 @@
+time=2026-10-03T17:00:40.084+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-03T17:00:41.442+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:41 mockllm: serving on http://127.0.0.1:55499 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:41.468+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC1AlwaysBranchDoesNotRevertAHandEditedKey134097988\002\logs min_level=info early_records=2 early_dropped=0
+--- FAIL: TestAC1AlwaysBranchDoesNotRevertAHandEditedKey (1.40s)
+    always_write_no_clobber_226_test.go:63: exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:42.722+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:42 mockllm: serving on http://127.0.0.1:53024 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:42.745+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2219383975\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card (1.27s)
+    approval_always_201_test.go:127: exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:43.856+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:43 mockllm: serving on http://127.0.0.1:62849 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:43.877+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused1168121845\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused (1.13s)
+    approval_always_201_test.go:169: exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:44.995+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:45 mockllm: serving on http://127.0.0.1:62851 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:45.016+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestReplyListenerAllowsAnL2CardFromTheNativeSide1027643268\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestReplyListenerAllowsAnL2CardFromTheNativeSide (1.13s)
+    approval_reply_201_test.go:231: exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:46.105+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:46 mockllm: serving on http://127.0.0.1:62852 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:46.124+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel2147490691\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel (1.11s)
+    approval_reply_201_test.go:305: exit 2
+        
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:47.212+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:47 mockllm: serving on http://127.0.0.1:62853 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:47.237+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject3348337626\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject (1.11s)
+    approval_reply_201_test.go:394: exit 2
+        
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:48.307+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:48 mockllm: serving on http://127.0.0.1:62854 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:48.329+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution240112547\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestUnansweredL2CardTimesOutIntoRejectNeverExecution (1.09s)
+    approval_reply_201_test.go:465: exit 2
+        
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:49.415+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:49 mockllm: serving on http://127.0.0.1:62855 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:49.438+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestL1VetoNeedsAChannelTheHostReallyWiredconsole_posture_veto_114492340\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-03T17:00:50.638+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:50 mockllm: serving on http://127.0.0.1:62856 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:50.660+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestL1VetoNeedsAChannelTheHostReallyWiredhost_declares_and_load2017355472\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestL1VetoNeedsAChannelTheHostReallyWired (2.34s)
+    --- FAIL: TestL1VetoNeedsAChannelTheHostReallyWired/console_posture:_veto_refused,_window_still_executes (1.12s)
+        approval_reply_201_test.go:536: exit 2
+            
+            wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+    --- FAIL: TestL1VetoNeedsAChannelTheHostReallyWired/host_declares_and_loads_esc,_veto_lands (1.22s)
+        approval_reply_201_test.go:618: exit 2
+            
+            wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:51.744+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:51 mockllm: serving on http://127.0.0.1:62857 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:51.767+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole25237542\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole (1.10s)
+    approval_seam_201_test.go:101: exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:52.852+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:52 mockllm: serving on http://127.0.0.1:62858 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:52.871+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamRefusesAPanelSourcedAllow553354923\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestNativeHostSeamRefusesAPanelSourcedAllow (1.12s)
+    approval_seam_201_test.go:190: exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:54.672+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:54 mockllm: serving on http://127.0.0.1:62882 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:54.694+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence2164432109\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket255ReceiptOmitsPanelFromTheImmediateSentence (1.20s)
+    config_receipt_255_test.go:401: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:55.826+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:55 mockllm: serving on http://127.0.0.1:62321 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:55.846+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere2674827818\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere (1.14s)
+    config_receipt_255_test.go:469: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:57.106+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:57 mockllm: serving on http://127.0.0.1:60672 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:57.126+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection3858918278\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket255ReceiptStillNamesTheLiveReadSection (1.27s)
+    config_receipt_255_test.go:508: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:58.208+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:58 mockllm: serving on http://127.0.0.1:60673 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:58.234+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered2491253225\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket255ReceiptSentenceAssemblyIsFiltered (1.11s)
+    config_receipt_255_test.go:565: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:00:59.330+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:00:59 mockllm: serving on http://127.0.0.1:60675 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:00:59.350+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RunArmsTheReloadTick522848869\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket223RunArmsTheReloadTick (1.12s)
+    config_reload_223_test.go:248: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:01:00.443+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:00 mockllm: serving on http://127.0.0.1:60678 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:00.463+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card1944832474\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket223HandEditedFsLooseningCostsAnL2Card (1.12s)
+    config_reload_223_test.go:301: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:01:01.533+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:01 mockllm: serving on http://127.0.0.1:60679 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:01.552+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RefusedLooseningKeepsOldValues419592501\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket223RefusedLooseningKeepsOldValues (1.09s)
+    config_reload_223_test.go:374: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:01:02.631+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:02 mockllm: serving on http://127.0.0.1:60680 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:02.652+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223TighteningRaisesNoCard906259702\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket223TighteningRaisesNoCard (1.10s)
+    config_reload_223_test.go:414: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:01:03.815+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:03 mockllm: serving on http://127.0.0.1:60682 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:03.838+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow2900699921\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (1.19s)
+    config_reload_223_test.go:446: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:01:04.973+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:04 mockllm: serving on http://127.0.0.1:60683 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:04.993+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply1460311583\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket223RestartTierSaysItWillNotApply (1.14s)
+    config_reload_223_test.go:473: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:01:06.099+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:06 mockllm: serving on http://127.0.0.1:60684 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:06.121+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct缺失2655063859\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-03T17:01:07.342+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:07 mockllm: serving on http://127.0.0.1:60687 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:07.364+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct语法错389078276\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-03T17:01:08.555+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:08 mockllm: serving on http://127.0.0.1:60691 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:08.576+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct声明了版本但坏723303720\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-03T17:01:09.815+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:09 mockllm: serving on http://127.0.0.1:60692 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:09.836+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinctschema未知键1271259914\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket223FailureSentencesAreDistinct (4.85s)
+    --- FAIL: TestTicket223FailureSentencesAreDistinct/缺失 (1.14s)
+        config_reload_223_test.go:577: wisp run exit 2
+            stdout:
+            
+            stderr:
+            wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+    --- FAIL: TestTicket223FailureSentencesAreDistinct/语法错 (1.25s)
+        config_reload_223_test.go:577: wisp run exit 2
+            stdout:
+            
+            stderr:
+            wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+    --- FAIL: TestTicket223FailureSentencesAreDistinct/声明了版本但坏在后面 (1.21s)
+        config_reload_223_test.go:577: wisp run exit 2
+            stdout:
+            
+            stderr:
+            wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+    --- FAIL: TestTicket223FailureSentencesAreDistinct/schema未知键 (1.24s)
+        config_reload_223_test.go:577: wisp run exit 2
+            stdout:
+            
+            stderr:
+            wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+time=2026-10-03T17:01:10.987+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 17:01:11 mockllm: serving on http://127.0.0.1:60699 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T17:01:11.012+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223PermissionDeniedSitsInItsOwnSentence2689212772\002\logs min_level=info early_records=0 early_dropped=0
+--- FAIL: TestTicket223PermissionDeniedSitsInItsOwnSentence (1.16s)
+    config_reload_perm_223_windows_test.go:62: wisp run exit 2
+        stdout:
+        
+        stderr:
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: model "m1" of provider "acme" is disabled (enabled=false); re-enable it or remove the entry
+panic: Fail in goroutine after TestAC1AlwaysBranchDoesNotRevertAHandEditedKey has completed
+
+goroutine 19 [running]:
+testing.(*common).Fail(0x12bb03ba4200)
+	D:/work/base/go/src/testing/testing.go:1053 +0xca
+testing.(*common).Errorf(0x12bb03ba4200, {0x7ff6976369dd?, 0x7ff697fb6dc0?}, {0x12bb03badea8?, 0x8810a9d206448d70?, 0x0?})
+	D:/work/base/go/src/testing/testing.go:1357 +0x5e
+github.com/CarlosShao/wisp/cmd/wisp.waitForSentence187(0x12bb03ba4200, 0x12bb03a9e1b0, {0x7ff697604c77, 0xf}, {0x7ff69764299f, 0x41})
+	D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_reply_201_test.go:672 +0x22b
+github.com/CarlosShao/wisp/cmd/wisp.driveAlways(0x12bb03ba4200, 0x12bb03b7a300, 0x12bb03b26120, 0x1)
+	D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always_201_test.go:201 +0xd5
+created by github.com/CarlosShao/wisp/cmd/wisp.TestAC1AlwaysBranchDoesNotRevertAHandEditedKey in goroutine 18
+	D:/work/workspace/projects plans/Wisp/cmd/wisp/always_write_no_clobber_226_test.go:60 +0x1f9
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	31.461s
+FAIL

@@ -1,0 +1,49 @@
+time=2026-10-03T16:19:11.392+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 932.019 ms (HEAD 66fc537f at read time, 2026-10-03T16:19:12+08:00)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:600: AC#1 denominators (head 66fc537f): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x7d10abc across hide->re-show=true
+    panel_host_windows_test.go:605: hot re-show measured on this box: 53.900 ms
+    panel_host_windows_test.go:632: AC#3 listening-socket ruler (head 66fc537f): IPv4 rows=120 LISTEN-owned-by-tree=0 ; IPv6 rows=89 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:658: AC#1 after Destroy (head 66fc537f), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 12 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (5.34s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 293.604 ms (HEAD e2bfd7c8 at read time, 2026-10-03T16:19:17+08:00)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:590: PROBE re-show tree curve: 7 -> 6 (machine 19 -> 18)
+    panel_host_windows_test.go:600: AC#1 denominators (head e2bfd7c8): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x1f10f08 across hide->re-show=true
+    panel_host_windows_test.go:605: hot re-show measured on this box: 30.831 ms
+    panel_host_windows_test.go:632: AC#3 listening-socket ruler (head e2bfd7c8): IPv4 rows=120 LISTEN-owned-by-tree=0 ; IPv6 rows=95 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:658: AC#1 after Destroy (head e2bfd7c8), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (4.60s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	10.026s

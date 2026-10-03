@@ -1,0 +1,91 @@
+time=2026-10-03T16:45:47.765+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:580: cold bring-up measured on this box: 865.270 ms (HEAD a924fa17 at read time, 2026-10-03T16:45:48+08:00)
+    panel_host_windows_test.go:606: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:641: AC#1 re-show tree settle: reading held after 2 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 33380 ppid 24420 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 22736 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 20872 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 30220 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 3396 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 26636 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 33380 ppid 24420 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 22736 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 20872 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 30220 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 3396 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 26636 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:660: hide -> re-show changed the msedgewebview2 set inside THIS process tree: 7 -> 6 after 2 settle sample(s) inside the 3s bound (tree root pid 24420; single-window reuse broken - the settled reading did not return to the pre-hide count). Machine-wide count went 19 -> 18 and is reported only - it counts other sessions too
+    panel_host_windows_test.go:666: AC#1 denominators (head a924fa17): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0x2660f0c across hide->re-show=true
+    panel_host_windows_test.go:671: hot re-show measured on this box: 67.222 ms
+    panel_host_windows_test.go:698: AC#3 listening-socket ruler (head a924fa17): IPv4 rows=319 LISTEN-owned-by-tree=0 ; IPv6 rows=73 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:724: AC#1 after Destroy (head a924fa17), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 12 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (1.20s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:580: cold bring-up measured on this box: 340.900 ms (HEAD a924fa17 at read time, 2026-10-03T16:45:49+08:00)
+    panel_host_windows_test.go:606: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:641: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 33380 ppid 24420 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 22736 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 20872 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 30220 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 3396 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 16000 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 33380 ppid 24420 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 22736 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 20872 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 30220 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 3396 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 16000 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:666: AC#1 denominators (head a924fa17): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x4110562 across hide->re-show=true
+    panel_host_windows_test.go:671: hot re-show measured on this box: 61.459 ms
+    panel_host_windows_test.go:698: AC#3 listening-socket ruler (head a924fa17): IPv4 rows=319 LISTEN-owned-by-tree=0 ; IPv6 rows=73 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:724: AC#1 after Destroy (head a924fa17), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.56s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:580: cold bring-up measured on this box: 345.491 ms (HEAD a924fa17 at read time, 2026-10-03T16:45:49+08:00)
+    panel_host_windows_test.go:606: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:641: AC#1 re-show tree settle: reading held after 2 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 33380 ppid 24420 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 22736 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 20872 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 30220 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 3396 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 29996 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 33380 ppid 24420 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 22736 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 20872 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 30220 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 3396 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 29996 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:660: hide -> re-show changed the msedgewebview2 set inside THIS process tree: 7 -> 6 after 2 settle sample(s) inside the 3s bound (tree root pid 24420; single-window reuse broken - the settled reading did not return to the pre-hide count). Machine-wide count went 19 -> 18 and is reported only - it counts other sessions too
+    panel_host_windows_test.go:666: AC#1 denominators (head a924fa17): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0x3e20daa across hide->re-show=true
+    panel_host_windows_test.go:671: hot re-show measured on this box: 80.847 ms
+    panel_host_windows_test.go:698: AC#3 listening-socket ruler (head a924fa17): IPv4 rows=319 LISTEN-owned-by-tree=0 ; IPv6 rows=73 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:724: AC#1 after Destroy (head a924fa17), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (0.72s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:580: cold bring-up measured on this box: 352.205 ms (HEAD a924fa17 at read time, 2026-10-03T16:45:50+08:00)
+    panel_host_windows_test.go:606: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:641: AC#1 re-show tree settle: reading held after 2 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 33380 ppid 24420 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 22736 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 20872 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 30220 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 3396 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree pre-hide: pid 31268 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 33380 ppid 24420 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 22736 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 20872 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 30220 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 3396 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:653: PROBE tree post-reshow: pid 31268 ppid 33380 msedgewebview2.exe
+    panel_host_windows_test.go:660: hide -> re-show changed the msedgewebview2 set inside THIS process tree: 7 -> 6 after 2 settle sample(s) inside the 3s bound (tree root pid 24420; single-window reuse broken - the settled reading did not return to the pre-hide count). Machine-wide count went 19 -> 18 and is reported only - it counts other sessions too
+    panel_host_windows_test.go:666: AC#1 denominators (head a924fa17): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0xb600752 across hide->re-show=true
+    panel_host_windows_test.go:671: hot re-show measured on this box: 54.546 ms
+    panel_host_windows_test.go:698: AC#3 listening-socket ruler (head a924fa17): IPv4 rows=311 LISTEN-owned-by-tree=0 ; IPv6 rows=73 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:724: AC#1 after Destroy (head a924fa17), ONE sample and no timing claim: our tree webview baseline 6 -> now 6, machine-wide 18 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (0.68s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.269s
+FAIL

@@ -1,0 +1,28 @@
+time=2026-10-03T16:10:34.735+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 1689.464 ms (HEAD 1ba22d25 at read time, 2026-10-03T16:10:36+08:00)
+    panel_host_windows_test.go:549: cold bring-up 1689.5 ms exceeds D32 panel cold budget 1500 ms
+    panel_host_windows_test.go:585: hide -> re-show changed the msedgewebview2 set inside THIS process tree: 8 -> 6 (tree root pid 24176; single-window reuse broken). Machine-wide count went 20 -> 18 and is reported only - it counts other sessions too
+    panel_host_windows_test.go:591: AC#1 denominators (head 1ba22d25): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0x2e0068e across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 81.676 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 1ba22d25): IPv4 rows=1258 LISTEN-owned-by-tree=0 ; IPv6 rows=92 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 1ba22d25), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 12 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (2.16s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 804.892 ms (HEAD 1ba22d25 at read time, 2026-10-03T16:10:37+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 1ba22d25): our tree webview=9 direct-children=1 tree-pids=9 | machine-wide msedgewebview2=21 | same HWND 0x70e0c96 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 55.275 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 1ba22d25): IPv4 rows=1259 LISTEN-owned-by-tree=0 ; IPv6 rows=92 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 1ba22d25), ONE sample and no timing claim: our tree webview baseline 6 -> now 9, machine-wide 18 -> 21. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.09s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 411.998 ms (HEAD 1ba22d25 at read time, 2026-10-03T16:10:38+08:00)
+    panel_host_windows_test.go:585: hide -> re-show changed the msedgewebview2 set inside THIS process tree: 11 -> 10 (tree root pid 24176; single-window reuse broken). Machine-wide count went 23 -> 22 and is reported only - it counts other sessions too
+    panel_host_windows_test.go:591: AC#1 denominators (head 1ba22d25): our tree webview=10 direct-children=1 tree-pids=10 | machine-wide msedgewebview2=22 | same HWND 0x3c40d6e across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 78.214 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 1ba22d25): IPv4 rows=1259 LISTEN-owned-by-tree=0 ; IPv6 rows=92 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 1ba22d25), ONE sample and no timing claim: our tree webview baseline 9 -> now 10, machine-wide 21 -> 22. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (0.68s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	4.269s
+FAIL

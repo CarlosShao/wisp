@@ -1,0 +1,23 @@
+time=2026-10-03T16:57:01.060+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: 919.526 ms (HEAD ef8266db at read time, 2026-10-03T16:57:02+08:00)
+    panel_host_windows_test.go:706: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:739: AC#1 re-show tree settle: reading held after 2 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:761: AC#1 denominators (head ef8266db): our tree webview=6 direct-children=1 tree-pids=6 browser-host-pids=[30228] same-set=true | machine-wide msedgewebview2=18 | same HWND 0x6570da0 across hide->re-show=true
+    panel_host_windows_test.go:769: hot re-show measured on this box: 32.048 ms
+    panel_host_windows_test.go:796: AC#3 listening-socket ruler (head ef8266db): IPv4 rows=163 LISTEN-owned-by-tree=0 ; IPv6 rows=556 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:822: AC#1 after Destroy (head ef8266db), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 12 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.25s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: 371.290 ms (HEAD ef8266db at read time, 2026-10-03T16:57:02+08:00)
+    panel_host_windows_test.go:706: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:714: every msedgewebview2 child of this test process already existed before bring-up - no browser was started for this window (pre-hide hosts [30228], baseline hosts [30228])
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (0.49s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: 328.488 ms (HEAD ef8266db at read time, 2026-10-03T16:57:03+08:00)
+    panel_host_windows_test.go:706: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:714: every msedgewebview2 child of this test process already existed before bring-up - no browser was started for this window (pre-hide hosts [30228], baseline hosts [30228])
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (0.47s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.388s
+FAIL

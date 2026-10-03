@@ -1,0 +1,39 @@
+time=2026-10-03T16:23:08.496+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 1293.719 ms (HEAD 9d0cd518 at read time, 2026-10-03T16:23:09+08:00)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:573: PROBE no-hide tree curve: 6 (machine 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:600: PROBE re-show tree curve: 6 -> 6 (machine 18 -> 18)
+    panel_host_windows_test.go:610: AC#1 denominators (head 9d0cd518): our tree webview=6 direct-children=1 tree-pids=6 | machine-wide msedgewebview2=18 | same HWND 0xb0f0336 across hide->re-show=true
+    panel_host_windows_test.go:615: hot re-show measured on this box: 38.645 ms
+    panel_host_windows_test.go:642: AC#3 listening-socket ruler (head 9d0cd518): IPv4 rows=410 LISTEN-owned-by-tree=0 ; IPv6 rows=153 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:668: AC#1 after Destroy (head 9d0cd518), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 12 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (11.96s)
+PASS
+[1003/162320.467:ERROR:ui\gfx\win\window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1412
+ok  	github.com/CarlosShao/wisp/cmd/wisp	12.122s

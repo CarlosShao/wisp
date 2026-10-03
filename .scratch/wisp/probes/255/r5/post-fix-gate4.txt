@@ -1,0 +1,75 @@
+time=2026-10-03T17:00:07.754+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: 779.419 ms (HEAD ef8266db at read time, 2026-10-03T17:00:08+08:00)
+    panel_host_windows_test.go:713: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:749: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:779: AC#1 denominators (head ef8266db): our tree webview=6 direct-children=1 tree-pids=6 | browser hosts pre=[30464] mine=[30464] post=[30464] added=[] mine-died=[] | machine-wide msedgewebview2=18 | same HWND 0x55f0eae across hide->re-show=true
+    panel_host_windows_test.go:787: hot re-show measured on this box: 47.071 ms
+    panel_host_windows_test.go:814: AC#3 listening-socket ruler (head ef8266db): IPv4 rows=109 LISTEN-owned-by-tree=0 ; IPv6 rows=52 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:840: AC#1 after Destroy (head ef8266db), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 12 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.99s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head ef8266db): foreground before any panel 0x7240d4a | the ruler's own editor window 0x4d407e6 | foreground while hidden (prior) 0x4d407e6 | after Show 0x3a70e90 | panel hwnd 0x3a70e90 | prevFocus recorded at Show 0x4d407e6 | after Hide 0x4d407e6 | Hide attempted restore to 0x4d407e6 (SetForegroundWindow 1, SetFocus 81004518)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.44s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:987: AC#2 appendix (head ef8266db, n=1, same-process consecutive runs):
+    panel_host_windows_test.go:993:   sample  1: cold=779.419 ms hot=47.071 ms at 2026-10-03T17:00:08+08:00
+    panel_host_windows_test.go:999: AC#2 percentiles over 1 runs (nearest-rank): cold P50=779.419 P95=779.419 (budget 1500) | hot P50=47.071 P95=47.071 (budget 200)
+    panel_host_windows_test.go:1003: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 779.419 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestAC3ListeningSocketRulerSeesItsOwnListener
+    panel_host_windows_test.go:1054: AC#3 positive control: IPv4 table rows=111, this pid owned 0 before / 1 while 127.0.0.1:55470 is listening
+    panel_host_windows_test.go:1076: AC#3 positive control, IPv6 family: listening on [::1]:55471, table rows=53, this pid owns 1 LISTEN rows (baseline 0)
+    panel_host_windows_test.go:1102: AC#3 positive control verdict: ruler counts a real listener (0 -> 1) and stops after Close (0)
+--- PASS: TestAC3ListeningSocketRulerSeesItsOwnListener (0.01s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: 330.446 ms (HEAD ef8266db at read time, 2026-10-03T17:00:09+08:00)
+    panel_host_windows_test.go:713: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:749: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:779: AC#1 denominators (head ef8266db): our tree webview=6 direct-children=1 tree-pids=6 | browser hosts pre=[30464] mine=[] post=[30464] added=[] mine-died=[] | machine-wide msedgewebview2=18 | same HWND 0x11790c0e across hide->re-show=true
+    panel_host_windows_test.go:787: hot re-show measured on this box: 40.671 ms
+    panel_host_windows_test.go:814: AC#3 listening-socket ruler (head ef8266db): IPv4 rows=111 LISTEN-owned-by-tree=0 ; IPv6 rows=52 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:840: AC#1 after Destroy (head ef8266db), ONE sample and no timing claim: our tree webview baseline 7 -> now 6, machine-wide 19 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.54s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head ef8266db): foreground before any panel 0x7240d4a | the ruler's own editor window 0x39c0f1e | foreground while hidden (prior) 0x39c0f1e | after Show 0x343068e | panel hwnd 0x343068e | prevFocus recorded at Show 0x39c0f1e | after Hide 0x39c0f1e | Hide attempted restore to 0x39c0f1e (SetForegroundWindow 1, SetFocus 60559134)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.45s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:987: AC#2 appendix (head ef8266db, n=2, same-process consecutive runs):
+    panel_host_windows_test.go:993:   sample  1: cold=779.419 ms hot=47.071 ms at 2026-10-03T17:00:08+08:00
+    panel_host_windows_test.go:993:   sample  2: cold=330.446 ms hot=40.671 ms at 2026-10-03T17:00:09+08:00
+    panel_host_windows_test.go:999: AC#2 percentiles over 2 runs (nearest-rank): cold P50=330.446 P95=779.419 (budget 1500) | hot P50=40.671 P95=47.071 (budget 200)
+    panel_host_windows_test.go:1003: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 779.419 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestAC3ListeningSocketRulerSeesItsOwnListener
+    panel_host_windows_test.go:1054: AC#3 positive control: IPv4 table rows=111, this pid owned 0 before / 1 while 127.0.0.1:55472 is listening
+    panel_host_windows_test.go:1076: AC#3 positive control, IPv6 family: listening on [::1]:55473, table rows=53, this pid owns 1 LISTEN rows (baseline 0)
+    panel_host_windows_test.go:1102: AC#3 positive control verdict: ruler counts a real listener (0 -> 1) and stops after Close (0)
+--- PASS: TestAC3ListeningSocketRulerSeesItsOwnListener (0.01s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: 339.043 ms (HEAD ef8266db at read time, 2026-10-03T17:00:10+08:00)
+    panel_host_windows_test.go:713: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 19)
+    panel_host_windows_test.go:749: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=6 (machine-wide 18)
+    panel_host_windows_test.go:779: AC#1 denominators (head ef8266db): our tree webview=6 direct-children=1 tree-pids=6 | browser hosts pre=[30464] mine=[] post=[30464] added=[] mine-died=[] | machine-wide msedgewebview2=18 | same HWND 0xc3806ce across hide->re-show=true
+    panel_host_windows_test.go:787: hot re-show measured on this box: 43.690 ms
+    panel_host_windows_test.go:814: AC#3 listening-socket ruler (head ef8266db): IPv4 rows=111 LISTEN-owned-by-tree=0 ; IPv6 rows=52 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:840: AC#1 after Destroy (head ef8266db), ONE sample and no timing claim: our tree webview baseline 7 -> now 6, machine-wide 19 -> 18. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.56s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head ef8266db): foreground before any panel 0x7240d4a | the ruler's own editor window 0x34d0d6c | foreground while hidden (prior) 0x34d0d6c | after Show 0xed10b26 | panel hwnd 0xed10b26 | prevFocus recorded at Show 0x34d0d6c | after Hide 0x34d0d6c | Hide attempted restore to 0x34d0d6c (SetForegroundWindow 1, SetFocus 55381356)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.46s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:987: AC#2 appendix (head ef8266db, n=3, same-process consecutive runs):
+    panel_host_windows_test.go:993:   sample  1: cold=779.419 ms hot=47.071 ms at 2026-10-03T17:00:08+08:00
+    panel_host_windows_test.go:993:   sample  2: cold=330.446 ms hot=40.671 ms at 2026-10-03T17:00:09+08:00
+    panel_host_windows_test.go:993:   sample  3: cold=339.043 ms hot=43.690 ms at 2026-10-03T17:00:10+08:00
+    panel_host_windows_test.go:999: AC#2 percentiles over 3 runs (nearest-rank): cold P50=339.043 P95=779.419 (budget 1500) | hot P50=43.690 P95=47.071 (budget 200)
+    panel_host_windows_test.go:1003: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 779.419 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestAC3ListeningSocketRulerSeesItsOwnListener
+    panel_host_windows_test.go:1054: AC#3 positive control: IPv4 table rows=110, this pid owned 0 before / 1 while 127.0.0.1:55474 is listening
+    panel_host_windows_test.go:1076: AC#3 positive control, IPv6 family: listening on [::1]:55475, table rows=53, this pid owns 1 LISTEN rows (baseline 0)
+    panel_host_windows_test.go:1102: AC#3 positive control verdict: ruler counts a real listener (0 -> 1) and stops after Close (0)
+--- PASS: TestAC3ListeningSocketRulerSeesItsOwnListener (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.624s
