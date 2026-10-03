@@ -1,0 +1,8 @@
+228-a4: skeleton + section 0 anchor (read-only census, zero go commands)
+
+Read-only census leg 228-a4 for ticket 228's 11 unchecked AC cells.
+Section 0 captures the same-command anchor (date / git log -1 / dirty count)
+and re-runs the ticket checkbox survey: 16 top-level boxes = 5 checked / 11
+unchecked (lines 39 40 41 42 43 66 82 84 86 89 91 unchecked).
+Skeleton sections 1-6 are placeholders to be filled. No Go command run;
+frontend/design not read; AC boxes untouched; not pushed.
