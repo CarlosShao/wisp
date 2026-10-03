@@ -1,0 +1,10 @@
+ticket 261 leg r1: evidence skeleton + on-entry preflight readings (AC#1 shape a)
+
+- .scratch/wisp/probes/261/r1/impl.md: skeleton with sections 0/0b filled:
+  anchor 6c7a12b6 (dev), start porcelain clean, baseline 152 PASS / 0 FAIL /
+  0 SKIP, comm vs 261-p1 final roster = 0 diff both directions, spike-pin
+  preflight (all resolver-consuming fixtures carry explicit Enabled: true;
+  zero fixture rewrites needed), LoadFile second-arg survey (no caller injects
+  *llm.Resolver), wisp run default path unaffected (no preset model entries).
+- intermediate roster artifacts kept (built-not-deleted discipline).
+- no production code, no test code touched in this commit.
