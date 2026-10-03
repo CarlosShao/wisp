@@ -1,0 +1,23 @@
+docs(probes/258-a2): section 3 - which hotkey paths actually run today
+
+Answers census question 3 as three hops plus a named path roster, and surfaces
+two things the ticket did not list.
+
+- hop 1 file-to-memory: engine alive, but its arming is conditional - a true
+  double-click resident leg has no console, so the task source returns nil,
+  assembleRuntime never runs, and this process holds neither a Manager nor a
+  reload tick; only a terminal-launched bare wisp gets one
+- hop 2 memory-to-ball: zero everywhere in cmd/wisp; run.go has zero ball
+  references, so the wisp run entry is a bigger empty set than the ticket says
+- hop 3 ball-to-Win32: only the boot pass and the borrow, and the borrow is
+  always bare Esc regardless of the configured cancel value
+- roster of seven paths with the one and only route that can trigger a rebind
+  today (balldebug with -config) and why it proves the machine, not the wiring
+- new: ticket 255's receipt roster already verdicts hotkey as
+  debug-host-only, so the gap is no longer silent to a wisp run operator - and
+  form A landing will redden two 255 rulers, so the landing leg owes two edits
+  in config_readers_255.go that the ticket never listed
+- named a wording defect in that in-flight file: it attributes the hardcoded
+  default hotkeys to wisp run, which builds no ball at all
+
+No production code touched, no AC checkboxes touched, zero Go commands run.

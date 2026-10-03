@@ -351,7 +351,134 @@ N3 到点之后**执行了**（`AnswerTimeout` 那一路，audit 行 `ANSWER-EXP
 
 ## §3 今天可达路径名册
 
-（取数中）
+> 判据拆成三跳，逐跳量"今天有没有人在跑"：**跳 1 文件→内存**（hot 档应用）、
+> **跳 2 内存→球**（把新值交给宿主）、**跳 3 球→Win32**（真注册）。
+> ⚠ 本节所有 `cmd/wisp` 行号是**工作树现读**（09:3x）：`config_reload.go` 此刻是 dirty
+> （`git status --porcelain` 读数 `M cmd/wisp/config_reload.go`＋`?? cmd/wisp/config_readers_255.go`，
+> 一枚 255 的写在飞的腿正在这个包里补回执），**半前一节的函数起始行未漂**
+> （复量：`startConfigReload` 仍在 `:105`、Spawn watchdog 仍在 `:119`、`reloadOnce` 仍在 `:152`、
+> `rt.mgr.CheckAndReload()` 仍在 `:153`——与票 258 现量 4 逐字同），漂的是 `reportReload` 的函数体。
+
+### 3.1 跳 1（文件 → 内存）：引擎活着，但**跑不跑取决于这个常驻进程是从哪拉起来的**
+
+- 应用表本体：`internal/config/manager.go:281`
+  `{"hotkey", &cur.Hotkey, &fresh.Hotkey, func() { cur.Hotkey = fresh.Hotkey }}`
+  ⇒ 值会跟着文件换（票面现量 1 复认，**但行号从票面的 `:278` 漂到今天的 `:281`**，
+  漂因＝票 255 AC#2-ⓑ 把 hot 名册改成从 `TierRegistry` 派生并加了 `:293-300` 的同源 panic）。
+- 唯一的驱动原语：`internal/config/manager.go:142 CheckAndReload`（mtime+size 指纹早退在 `:156`）。
+  产码调用点**全仓只有两枚**（尺＝`grep -rn "CheckAndReload()" cmd internal tools --include=*.go`
+  去掉 `_test.go`）：
+  1. `cmd/wisp/config_reload.go:153`（watchdog tick，**下面第 3 层**），
+  2. `cmd/balldebug/main.go:243`（桥的 `Refresh`，旁支调试进程）。
+- ⚠ **`OnReload` 这条路对 `[hotkey]` 结构性不通**（不是"没接"，是接不上）：
+  `internal/config/manager.go:198` 的触发条件是 `len(rep.Reload) > 0`，字段注释 `:52-54`
+  具名"reload-tier sections"；`[hotkey]` 是 hot 档、永不进 `rep.Reload` ⇒
+  谁把 `bridge.OnReload()` 挂上去都不会为热键改动响。这一条与
+  `internal/ball/hotkey_reload.go:26-32` 的自我说明一致，本腿独立复核成立。
+- **tick 的武装条件**（票面现量 4 说"重载的引擎在常驻腿是活的"——**这句要加限定**）：
+  武装点只有一枚 `cmd/wisp/run.go:813 rt.startConfigReload()`，它在 `assembleRuntime`
+  （`cmd/wisp/run.go:382`）**函数尾部**，前面任何一条 `return rt, 2` 都＝不武装。而
+  `assembleRuntime` 在常驻腿只被 `cmd/wisp/resident_task_source_windows.go:265` 调一次，
+  调用点在 `:221-231` 那道门**之后**：
+  - 那道门的谓词＝`interactiveStdin()`（`cmd/wisp/approval_reply_stdin_windows.go:41-52`：
+    标准输入不是控制台输入缓冲就返回 nil，`:47-49` 具名"a pipe, a file, or no console"）；
+  - 常驻那条腿自己的场景自述正是这件事：`cmd/wisp/resident_windows.go:52-57`
+    逐字 "the resident process is the leg owner actually uses - double click the icon,
+    no terminal attached, stderr going nowhere"，`main.go:60-67` 的无参数分支先
+    `attachParentConsole()` 再 `runResident()` ⇒
+    **真·双击起来的常驻进程：既没有 `rt.mgr`、也没有 tick、连"内存里的 `[hotkey]` 会跟着文件变"这一句都不成立**；
+  - 反过来，**从终端里裸跑 `wisp`（无参数）**这一形有控制台 ⇒ 过门 ⇒
+    `assembleRuntime` ⇒ `run.go:409` 建 mgr ⇒ `run.go:813` 武装 tick ⇒ 跳 1 活。
+    ⛔ 这一条我只按读码给形状，**"我的常驻腿今天到底是被谁拉起来的"是实机读数，见 §5**。
+- 常驻进程里另一枚 mgr（面板链）从不 tick：`cmd/wisp/panel_resident_windows.go:162-164`
+  逐字自陈，构造点在 `cmd/wisp/panel_resident_windows.go:166-171` → `cmd/wisp/panel_inbound.go:228-233`。
+- **谁来写 `[hotkey]`**：全仓设置写面只有 provider/model/role 五枝
+  （`cmd/wisp/panel_config_store.go:173-217` 的 `ApplySetting` 分支表，逐条是
+  `SetProviderBaseURL / SetProviderAPIKeyRef / SetModelContextWindow / SetModelPriceIn /
+  SetModelPriceOut / SetRoleChatModel`）⇒ **产码里没有任何一条路径写 `[hotkey]`**，
+  改动只能来自**人手编辑 config.toml**（票面说的就是这一形）。
+
+### 3.2 跳 2（内存 → 球）：**今天整条为零**
+
+- 球侧唯一的"交给新值"入口＝`internal/ball/ball_windows.go:813 RebindHotkeys`；
+  产码调用者只有桥（`internal/ball/hotkey_reload.go:96`）⇒ 于是问题归到"谁 new 了桥"：
+  **`cmd/balldebug/main.go:237` 一枚**（§1.2 那把尺的全文读数）。
+- 桥自己还挂在 `cmd/balldebug/main.go:230` 的 `-config` 分支里 ⇒ **不带 `-config` 连它也不活**。
+- `cmd/wisp` 侧对 `[hotkey]` 的读取次数：**零**（尺＝
+  `grep -rn "\.Hotkey\b" cmd internal tools --include=*.go` 去测试 ⇒ 命中只有
+  `cmd/balldebug/main.go:238`、`cmd/wisp/config_readers_255.go:110/:113`（这两处是**引用句**、
+  不是读值）、`internal/config/manager.go:281`（hot 应用表）、以及两处注释）。
+  ⇒ **258-a1 §7 第 1 点补的"`wisp run` 不建球"复认且加码**：
+  `cmd/wisp/run.go` 里 `ball.` 出现次数＝**0**（尺＝`grep -c "ball\." cmd/wisp/run.go`），
+  全仓 `cmd` 下 import `wisp/internal/ball` 的产码文件只有
+  `cmd/balldebug/main.go`、`cmd/wisp/resident_approval_windows.go`、`cmd/wisp/resident_ball_windows.go` 三枚。
+
+### 3.3 跳 3（球 → Win32）：今天只有两条，且都与 `[hotkey]` 无关
+
+- 启动那一遍：`internal/ball/ball_windows.go:255`（`registerAll(b.hwnd, b.opts.Hotkeys)`），
+  而 `b.opts.Hotkeys` 在常驻腿是 `cmd/wisp/resident_ball_windows.go:171` 那枚写死值；
+  ⚠ 另有 `internal/ball/ball_windows.go:153-154` 的零值兜底（§1.3 已具名）。
+- 借用那一跳：`internal/ball/hotkey_windows.go:531-539`，**恒为裸 Esc**（`:524`）⇒
+  它注册的是"球自己决定的那把键"，不是配置里那把（§2.3 ★）。
+- 归档旁证（球"从来没吃过配置"的机制面，258-a1 §7 第 1 点的②复认）：
+  常驻进程里两枚 mgr（`run.go:409` ＋ `panel_inbound.go:230`）
+  都不在 `startResidentBall` 的参数表（`cmd/wisp/resident_ball_windows.go:158`）上。
+
+### 3.4 名册（任务书点名"哪条路今天真能触发、哪条不能"）
+
+| # | 路径 | 三跳状态 | 现量 | 今天能不能让改过的 `[hotkey]` 变成手上真按得动的键 |
+|---|---|---|---|---|
+| 1 | **`wisp`（无参数，终端里起）＝常驻腿** | 跳 1 活 / **跳 2 零** / 跳 3 只吃写死值 | `resident_windows.go:163→206`、`run.go:813`、§3.2 | **不能**。改完文件内存会换，**没人次日或当场把它交给球**；重启进程才会（下一次 `ball.New` 仍吃 `DefaultHotkeys()` ⇒ **连重启都不解决**，这一格比票面更狠） |
+| 2 | **`wisp`（真·双击/GUI 无控制台）** | **跳 1 也不活** / 跳 2 零 / 跳 3 写死 | `resident_task_source_windows.go:221-231`＋`approval_reply_stdin_windows.go:41-52` | **不能**，且比 #1 更空：这个进程里连 mgr 与 tick 都没有（`[hotkey]` 的**内存值**都不换） |
+| 3 | **`wisp run <文本>`** | 跳 1 活 / 跳 2 零 / **跳 3 不存在（不建球）** | `main.go:89-91`→`run.go:181→249→813`；`grep -c "ball\." cmd/wisp/run.go`＝0 | **不能**（258-a1 的"对 `wisp run` 是空集"复认）。但它会**把这句老实话打给你看**，见 §3.5 |
+| 4 | **`wisp panel-inbound`** | 跳 1 不武装 / 无球 | `config_reload.go:91-99`（`hotReloadDisabledPanelInbound` 自陈） | **不能**，且自己会说明不能 |
+| 5 | **常驻面板链** | 有自己的 mgr、从不 tick | `panel_resident_windows.go:162-164` | **不能** |
+| 6 | **`cmd/balldebug -config <path>`** | 三跳全活 | `main.go:230-255` | **能——全仓唯一一条今天真能触发 rebind 的路**。⚠ 它是旁支调试进程：球在它自己的进程里、`observe.Default`、无审批门 ⇒ 它**证明机器能跑，不证明出厂腿接上了** |
+| 7 | **手改 config.toml 之后不重启** | 见 #1/#2 | — | 与票面题目同义：**热改了没人接** |
+
+### 3.5 今天这条缺口**已经有一枚回执在替它说实话**（票面未列，本腿新量）
+
+`cmd/wisp` 里刚落地的票 255 AC#1 回执名册**已经为 `[hotkey]` 写了一行判定**：
+`cmd/wisp/config_readers_255.go:113` ＝ `hotClaimDebugHostOnly` ＋
+`"cmd/balldebug/main.go:238 [h := mgr.Config().Hotkey] - cmd/balldebug is not the shipped host, and wisp run binds ball.DefaultHotkeys()"`。
+⇒ 效果：手改 `[hotkey]` 后不再说"已立即生效"，改说"值已换进本进程内存，
+但本宿主没有会按新值做事的读者"（那句在 `cmd/wisp/config_reload.go:189-194` 的 quiet 分支，
+工作树现读）。**缺口对用户不再静默**，且这行话**常驻腿也打得出来**：
+名册 #1（终端里裸跑 `wisp`）走的是同一枚 `agentRuntime`，
+`cmd/wisp/resident_task_source_windows.go:252-264` 把 `stdout: os.Stdout` 交给了装配根，
+所以 quiet 那句会打到操作者的控制台上；只有名册 #2（真·双击、无控制台）
+是"打了但没人看"（`cmd/wisp/resident_windows.go:52-57` 自陈 stderr going nowhere）。
+⛔ 两形共同点：**这句话改不了任何一枚键的注册**——票 258 要修的仍是那半。
+
+⚠ 顺带一处**该句自身的现量错误**（新落地的文件，趁早报）：`:113` 写的是
+"`wisp run` binds `ball.DefaultHotkeys()`"，而 §3.4 #3 量到 `wisp run` **零 `ball.` 引用、不建球**；
+真正吃 `DefaultHotkeys()` 的是**常驻腿** `cmd/wisp/resident_ball_windows.go:171`——
+同一枚文件的 `:112` 其实引对了行（它引 `resident_ball_windows.go:171`），
+**句子里的主语却写成了 `wisp run`**。这是 `cmd/wisp` 在飞文件里的一处措辞缺陷，⛔ 不改、只具名。
+
+### 3.6 ★ 形 A 落地**必配**的两处 255 侧改写（票面 §15-20 与 §48 都没列这一族）
+
+`cmd/wisp/config_readers_255.go` 的两枚字段是被**测试**当"可核断言"用的
+（该文件 `:78-81` 与 `:142-147` 自陈两枚尺名：
+`TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`、
+`TestTicket255RosterStillMatchesTheActualReadSites`；⚠ **这两枚测试此刻还没落盘**——
+`grep -rn "TestTicket255" cmd tools --include=*.go` 只命中这三处**注释**，
+说明 255 的测试腿与回执腿都在飞）：
+
+1. `cmd/wisp/config_readers_255.go:112-113` 引
+   `cmd/wisp/resident_ball_windows.go:171 [Hotkeys:  ball.DefaultHotkeys(),]` 作**证据行**
+   ⇒ 形 A 把那一行改掉的那一刻，"证据行仍说着它说的话"这枚尺**必红**（若它要求行号也命中，
+   连 `:171` 这个数都要跟着重算）。
+2. `cmd/wisp/config_readers_255.go:162` 的 `sectionReadSites["Hotkey"] = {"cmd/balldebug/main.go"}`
+   ⇒ 常驻腿一旦真的开始读 `[hotkey]`，读值文件集合就**多出一枚**，"名册与实际读点对齐"这枚尺**必红**。
+
+⇒ **给落地腿的最小改动面补两枚**（都在写面 `cmd/wisp` 内、都是这张表的行）：
+`:110-113` 的 hotkey 判定要从 `debug-host-only` 换成 `consumed:` 那一档
+（并照 `:92` 那行的规矩带上"读值处 file:line ＋ `[token]`"），`:162` 的读点名册要加上新落点。
+⚠ 这是**回执与实现必须同步**的形状，不是可选清洁工；漏改＝要么 255 的尺红、
+要么 `[hotkey]` 从此被回执说成"已立即生效"而**读者仍然不存在**（那正是票 255 AC#1  forbids 的
+"摘尺当修尺"的反向版本）。
+⚠ 另：**这两枚尺今天还不存在**⇒ 落地腿开工时必须先复量 255 交没交件（§5 具名）。
 
 ## §4 我可能写错的条目（自我对抗）
 
