@@ -321,6 +321,8 @@ base_url = %q
 api_key_ref = "dpapi:acme"
 
 [llm.providers.acme.models.m1]
+# 261-r2: explicit enabled, same reason as run_test.go's fixture comment.
+enabled = true
 context_window = 128000
 
 [fs]

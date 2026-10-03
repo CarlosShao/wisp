@@ -115,6 +115,10 @@ func ensureFirstRunConfig(dataDir string, stderr io.Writer) (bool, error) {
 			"要补的是那个名字。不想用 DPAPI 就把 api_key_ref 写成 env:<环境变量名>，值由系统环境提供。\n"+
 			"wisp run: 模型：在同一份文件的 [llm.providers.<名>] 里补 api_key_ref、base_url 与 models.<id>"+
 			"（名字对上内置预设的，protocol 与 base_url 可以留空），再在 [llm] 的 text_chain 或 roles.chat "+
-			"里点名 provider/model；wisp providers discover 与 probe 读这份文件去问真实端点，不替你写。\n")
+			"里点名 provider/model；wisp providers discover 与 probe 读这份文件去问真实端点，不替你写。"+
+			// 票 261 Ⓐ（A571）：引导教的条目形状必须能过 llm 门的形状——手写条目缺
+			// enabled 键＝视为关闭（defaults 不进 map，解码落 false），点名一条没写
+			// enabled = true 的模型会在起动时被具名拒绝。只加这一句指路，不重写引导。
+			"注意：models.<id> 条目里要写 enabled = true——缺这枚键的条目视为关闭，点名它会在起动时被拒。\n")
 	return true, nil
 }

@@ -194,6 +194,13 @@ func TestTicket261P1EnumerationSkipsAndSelectionRefusesDisabled(t *testing.T) {
 	if !strings.Contains(err.Error(), "disabled") {
 		t.Errorf("ResolveChain(disabled) error = %v, want it to name the model as disabled", err)
 	}
+	// Leg r2 (A571 fix B): the refusal carries the missing-key guidance as well
+	// (wording addition, description updated with it).
+	for _, guidance := range []string{"缺 enabled 键的条目视为关闭", "enabled = true"} {
+		if !strings.Contains(err.Error(), guidance) {
+			t.Errorf("ResolveChain(disabled) error = %v, want the missing-key guidance %q", err, guidance)
+		}
+	}
 	if strings.Contains(err.Error(), "unknown model") {
 		t.Errorf("ResolveChain(disabled) error = %v, must NOT reuse the unknown-model wording", err)
 	}
@@ -211,6 +218,10 @@ func TestTicket261P1EnumerationSkipsAndSelectionRefusesDisabled(t *testing.T) {
 	res.TextChain = []string{"mock261/t261-nokey"}
 	if _, err := res.ResolveChain(); err == nil || !strings.Contains(err.Error(), "disabled") {
 		t.Errorf("ResolveChain(hand-written nokey) = %v, want the disabled refusal (missing key decodes to false)", err)
+	} else if !strings.Contains(err.Error(), "enabled = true") {
+		// Leg r2 (A571 fix B): the nokey shape is exactly the shape the refusal's
+		// guidance answers, so this control must carry it verbatim.
+		t.Errorf("ResolveChain(hand-written nokey) error = %v, want the guidance sentence (enabled = true) on the nokey control too", err)
 	}
 }
 

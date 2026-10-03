@@ -131,6 +131,11 @@ base_url = %q
 api_key_ref = "dpapi:acme"
 
 [llm.providers.acme.models.m1]
+# 261-r2: without an enabled key this entry decodes to enabled=false and the
+# llm resolver's gate refuses it, so the assembled run dies before the card
+# these cases measure even exists. The cases measure the 201/223/226/255 routes,
+# not the gate, so the entry says enabled explicitly.
+enabled = true
 context_window = 128000
 
 [fs]

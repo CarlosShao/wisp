@@ -93,6 +93,10 @@ base_url = %q
 api_key_ref = "dpapi:acme"
 
 [llm.providers.acme.models.m1]
+# 261-r2: an enabled key omitted decodes to false (defaults never enter maps)
+# and the resolver gate refuses the entry; these cases measure the composition
+# root, so the entry says enabled explicitly.
+enabled = true
 context_window = 128000
 
 [fs]

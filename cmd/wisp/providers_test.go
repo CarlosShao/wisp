@@ -48,6 +48,9 @@ protocol = "openai-chat"
 base_url = %q
 
 [llm.providers.acme.models.mock-small]
+# 261-r2: explicit enabled for shape consistency with the other assembled-run
+# fixtures; providers.go reads the catalog directly and never consults the flag.
+enabled = true
 context_window = 128000
 
 [llm.providers.acme.models.mock-small.capabilities]

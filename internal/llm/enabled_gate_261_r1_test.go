@@ -92,6 +92,17 @@ func TestTicket261R1SelectionRefusesDisabledByExactWording(t *testing.T) {
 	if strings.Contains(msg, "unknown model") {
 		t.Errorf("error = %q, must not reuse the unknown-model wording", msg)
 	}
+	// Leg r2 (A571 fix B): the refusal also carries the missing-key guidance -
+	// "an entry without an enabled key counts as off; write enabled = true to
+	// turn it back on" - so an operator refused by the gate knows the way back
+	// without re-reading the schema. Asserted as an ADDITION to the wording
+	// above (a description update, not a loosening); the ghost control below
+	// must NOT carry it, keeping the two refusals distinguishable.
+	for _, guidance := range []string{"缺 enabled 键的条目视为关闭", "enabled = true"} {
+		if !strings.Contains(msg, guidance) {
+			t.Errorf("error = %q, want the refusal to carry the missing-key guidance %q", msg, guidance)
+		}
+	}
 	// Ghost control at the same line: absent entry keeps the old wording, so
 	// the two refusals are distinguishable in logs.
 	res.TextChain = []string{"p261/ghost"}
@@ -104,6 +115,9 @@ func TestTicket261R1SelectionRefusesDisabledByExactWording(t *testing.T) {
 	}
 	if strings.Contains(ghostErr.Error(), "disabled") {
 		t.Errorf("ghost error = %q, must not mention disabled", ghostErr)
+	}
+	if strings.Contains(ghostErr.Error(), "缺 enabled 键") {
+		t.Errorf("ghost error = %q, must not carry the disabled-entry guidance", ghostErr)
 	}
 }
 

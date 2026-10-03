@@ -1089,7 +1089,7 @@ func TestSecretEndToEndConfigRefResolvesAtRequestTime(t *testing.T) {
 
 	// 2. config.toml carries only the reference (D36 rule 5).
 	configPath := filepath.Join(dir, "config.toml")
-	body := "schema_version = 2\n\n[llm.providers.acme]\nprotocol = \"openai-chat\"\nbase_url = \"http://127.0.0.1:1/v1\"\napi_key_ref = \"" + ref + "\"\n\n[llm.providers.acme.models.m1]\n"
+	body := "schema_version = 2\n\n[llm.providers.acme]\nprotocol = \"openai-chat\"\nbase_url = \"http://127.0.0.1:1/v1\"\napi_key_ref = \"" + ref + "\"\n\n[llm.providers.acme.models.m1]\nenabled = true\n"
 	if err := os.WriteFile(configPath, []byte(body), 0o600); err != nil {
 		t.Fatalf("write config: %v", err)
 	}

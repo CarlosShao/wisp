@@ -77,6 +77,9 @@ model = "deepseek-chat"
 api_key_ref = "env:DEEPSEEK_KEY"
 
 [llm.providers.deepseek.models.deepseek-chat]
+# 261-r2: explicit enabled for shape consistency; the settings leg never
+# resolves the chain, but a hand-written entry that omits the key decodes false.
+enabled = true
 context_window = 64000
 `
 

@@ -127,7 +127,7 @@ func (r *Resolver) resolveEndpoint(provider, model string) (Endpoint, error) {
 	// never be selected through text_chain, roles.* or role fallback.
 	if !spec.Enabled {
 		return Endpoint{}, observe.New(observe.ClassConfig,
-			fmt.Sprintf("llm: model %q of provider %q is disabled (enabled=false); re-enable it or remove the entry", model, provider))
+			fmt.Sprintf("llm: model %q of provider %q is disabled (enabled=false); re-enable it or remove the entry（缺 enabled 键的条目视为关闭；在条目里写 enabled = true 即可重新启用）", model, provider))
 	}
 	ep := Endpoint{
 		Provider:      provider,
