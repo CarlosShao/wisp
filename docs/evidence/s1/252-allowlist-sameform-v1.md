@@ -32,7 +32,7 @@
 | `go test -count=1 -v -run 'TestTicket252P1' ./internal/tools/` | `--- PASS` **9**／`--- FAIL` **0**／SKIP **0**＝自述复量为真 |
 | `$(go env GOPATH)/bin/gofumpt.exe -l internal/tools internal/risk` | 输出 **0 行** |
 | `./tools/d22scan/d22scan.exe` | `D22_EXIT=0`，末行 `d22scan: clean - no D22 ban violations`。⚠ 该跑里另有一行 `skipped as git-ignored: 1 file(s) … [frontend/dist/assets/]`（本腿终态跑同样命中 1 次）——按派单"SKIP 算红"的口径本腿**不替它判无害**，只具名它存在，见 §6 甲-9 |
-| 载具 `t.Skip` 枚数 | **0**：`grep -nE '(^|[^.[:alnum:]_])t\.Skip\(' internal/tools/paths_shortname_252_r1_test.go` 命中 `0`（唯一的 `t.Skip` 字样是 `:39` 的注释自陈） |
+| 载具 `t.Skip` 枚数 | **0**：按调用形（行首或非标点后的 `t.Skip(` 模式）grep `internal/tools/paths_shortname_252_r1_test.go` 命中 `0`（唯一的 `t.Skip` 字样是 `:39` 的注释自陈） |
 
 ⛔ 本机 staticcheck 产假绿，本腿未跑。⛔ 本腿未跑 `cmd/wisp`／`internal/config`／`internal/panel` 任何一枚测试，未跑全仓 `go test ./...`。
 
@@ -44,7 +44,7 @@
 |---|---|---|---|
 | 1 | 「两次包含没合一」 | **成立**（附一条仪器告警，见下） | `internal/tools/paths.go` 现读：`InAllowlist`＝`:189-219`，内含 `rootsContain` **3 次**——`:196`（词法腿，对 `p.roots`）／`:209`（解析腿，对 `p.roots`）／`:215`（票 92 的 workspace 收窄，对 `p.workspace`，**不是**第三次根包含）。⇒ 对 `p.roots` 的包含仍是**两段**。本腿自算段体哈希：`2b1a3071^` 的 `:133-163` 与 `HEAD` 的 `:189-219` 都是 `e4aac2d53fe6bca6f43e5505b03e4202`，且 `diff` 输出 `IDENTICAL`；连注释块（`:129-163`／`:185-219`）都是 `b4a7e9bb6f8cd015c1701eea89b4d83b`。`git diff -U0 2b1a3071^..2b1a3071 -- internal/tools/paths.go` hunk 枚数 **1**＝`@@ -127 +127,57 @@`（全文 `.scratch/wisp/probes/252/v1/q1-inallowlist-body.txt`、`q1-paths-go-lineage.txt`） |
 | 1b | ⚠ 那条硬禁**还有没有仪器** | **不成立（指仪器侧）** | 本腿亲手种 **M-merge**：把 `:196-198` 那一段词法包含整块删掉（＝票面"绝不许"的那件事实做出来），整包 `./internal/tools/` 跑＝**257 PASS／0 FAIL**，`./internal/risk/` 亦 `ok`（`mut-MERGE-run.log`、`mut-MERGE-risk.log`）。⇒ **修完之后，盘上没有任何一把尺能区分"两段"与"一段"**（原因见 §2：折叠保证了同形，`measure252` 的 `final == leg1 && leg2` 恒等式因此恒成立）。这条不改判第 1 格，但要单独报编排者 |
-| 2 | fail-closed「解析不到＝未授权」没被改软 | **成立** | 那一支原样在 `internal/tools/paths.go:208-211`（`rf, ok := resolvedForm(canonical)`／`if !ok || !rootsContain(...)`／`return false`），且第 1 格已证段体逐字节未动。**M2 本腿自己复跑**（`if !ok \|\| …` → `if ok && …`）：`--- FAIL` **3**／`--- PASS` **254**，红句逐字见 §4 的 M2 行；其中**既有件** `TestTicket107bProbeCLinkInsideAllowedRootStaysOutside`（`internal/tools/paths_ticket107b_probes_test.go:180`）确实红 ⇒ 那把尺对"改软"敏感，不是形式上保留。机制也复认：M2 日志里 `N7` 读数是 `ok=false rf=""`，而票 107 那枚探针在 M2 下的 `resolvedForm` 同样走 `ok=false`（`paths.go:300-302` 自陈"there, but I could not look through it"），拒绝确实来自 `!ok` 那一支 |
+| 2 | fail-closed「解析不到＝未授权」没被改软 | **成立** | 那一支原样在 `internal/tools/paths.go:208-211`（先 `rf, ok := resolvedForm(canonical)`，再 `if !ok \|\| !rootsContain(...)` 即 `return false`），且第 1 格已证段体逐字节未动。**M2 本腿自己复跑**（`if !ok \|\| …` → `if ok && …`）：`--- FAIL` **3**／`--- PASS` **254**，红句逐字见 §4 的 M2 行；其中**既有件** `TestTicket107bProbeCLinkInsideAllowedRootStaysOutside`（`internal/tools/paths_ticket107b_probes_test.go:180`）确实红 ⇒ 那把尺对"改软"敏感，不是形式上保留。机制也复认：M2 日志里 `N7` 读数是 `ok=false rf=""`，而票 107 那枚探针在 M2 下的 `resolvedForm` 同样走 `ok=false`（`paths.go:300-302` 自陈"there, but I could not look through it"），拒绝确实来自 `!ok` 那一支 |
 | 3 | ★落点偏差算不算遵守裁的形 | **附条件成立** | 见 §2（一句话裁决＋凭据行） |
 | 4 | 存在性分岔有没有被改出新岔 | **成立**（没改出新答案岔；实现路径有一岔但输出同形） | 前一枚只读腿定的分岔＝存在性（`internal/risk/pathresolver.go:138` 缺失叶子照抄原拼法）。本次**没动 `internal/risk` 一个文件**：`git diff --name-only bbbb3593^..ebd5da2b -- internal/risk` ＝ **0 行**。本腿用现有载具的 `-v` 日志做四格对照（`.scratch/wisp/probes/252/v1/q4-existence-fork-readings.txt`，逐字）：<br>·存在的目录＋短名 ask（p1 的 `P2`/`P3`）⇒ `Canonicalize = "D:\\work\\workspace\\projects plans\\Wisp"`（长）<br>·缺失叶子＋短名 ask（p1 的 `Q1`/`Q3b`、r1 的 `A1`/`A3`）⇒ `Canonicalize = "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"`（长前缀＋逐字尾巴）<br>·缺失叶子＋长名 ask（`P1`/`A2`/`A4`）⇒ 同一串长名<br>⇒ **两支的输出同形、`InAllowlist` 同答（`true`）**，两形四组合（A1–A4）也同答。新增的岔在 `paths.go:145-148`（`res.Resolved` 真⇒原样返；假⇒走折叠），那是**代码路径的岔、不是答案的岔**；票 252 要的"同一物理路径同一个答复"在判定面成立 |
 | 5 | 正控的恒真自查（换形还绿不绿） | **成立（载具有牙，不是恒真）** | 三发都在 §4：**M5c**＝把 `paths_shortname_252_r1_test.go:126`（两侧同形串比较）与 `:130`（两侧同答）两枚断言换成恒真开关，**同时**种回缺陷（M1）⇒ 仍然 `--- FAIL` **9**，且 `TestTicket252R1BothSpellingsAnswerTheSame/{Wisp,docs,tools}` 依旧红，红句换到 `:136`（`AC#2 RED: both spellings must be authorized inside their own root, got LONG=true SHORT=false`）与 `:148`（`AC#1's split is still live: the two containments disagree on one input`）⇒ 恒真化之后同一格仍抓得住，**不是靠那两枚断言撑着**。<br>**M5d**＝在**修好的**生产码上把 `:126` 倒置成 `==` ⇒ 立刻 4 枚红（母格＋3 子格）⇒ 该断言在读真值、可失败，非空转。**M5b**＝恒真化＋生产码修好 ⇒ 4 PASS（与基线一致，说明开关没把测试挖空成永真失败） |
@@ -54,7 +54,7 @@
 
 ## §2 ★第 3 问：偏差裁决（算不算遵守编排者裁的形）
 
-**裁决（一句话）**：**算遵守——但只在"生产面"这一半算，另一半（把裁语字面塞进 `InAllowlist`）本腿实测会打红票 252 自己的 AC#1 仪器，因此落点判**附条件成立**，条件＝把"进 `InAllowlist` 的串必先过 `Canonicalize`"这条不变量补一把尺钉住。
+**裁决（一句话）**：**附条件成立——算遵守**：它的落点正是裁语点名的那一步（"进 `InAllowlist` 之前那一步"＝`Canonicalize`），生产三个判定方都先过它，所以裁语的"两侧同形"在判定界面成立；条件＝把"进 `InAllowlist` 的串必先过 `Canonicalize`"这条不变量补一把尺钉住，因为另一条路（把折叠塞进 `InAllowlist` 第一段）本腿实测会打红票 252 自己的 AC#1 仪器。
 
 凭据与推理，逐条带行号：
 
@@ -64,7 +64,7 @@
    - `internal/risk/rules_gateway.go:37` → `:45`；
    - `internal/tools/task.go:834` → `:838`；
    - `internal/tools/bridge.go:290`（`dec.Paths = b.displayPaths(rawPaths)`）→ `bridge.go:928-942` 的 `displayPaths` 里 `:934` 逐枚 `b.paths.Canonicalize(p)` → `bridge.go:1145` 的 `b.paths.InAllowlist(p)`；失败支以 `" (无法规范化: …)"` 后缀入串并被同一行的 `strings.Contains(p, "无法规范化")` 单独拦成不在册。
-   - `cmd/` 里非测试码对 `InAllowlist` 的调用＝**0 枚**（`grep -rn InAllowlist cmd --include=*.go \| grep -v _test` 计数 0）。
+   - `cmd/` 里非测试码对 `InAllowlist` 的调用＝**0 枚**（`grep -rn InAllowlist cmd --include=*.go` 去掉 `_test.go` 后计数 0）。
    ⇒ 它自述"把短名字面直接递给 `InAllowlist` 这条路只剩测试面"**为真**（测试面的确还留着：`paths_shortname_252_probe_test.go:114-126` 的 `measure252` 用词法串重算 leg1、`paths_ticket107b_probes_test.go:85-93` 的 `judge107b` 在 `Canonicalize` 报错时回落成词法串）。
 4. **它隐含的那句否证，本腿复跑了实际作用面才入账**。种 **M3**＝按"字面喂给两条腿"的另一种落点实现（`Canonicalize` 摘掉折叠、把 `sameFormOfUnresolved` 塞进 `InAllowlist` 第一段 `:190`）：
    - 结果 `--- FAIL` **12**／`--- PASS` 245，红句逐字（`mut-M3-run.log`）：`paths_shortname_252_probe_test.go:252: leg breakdown does not explain the boolean: InAllowlist=true but leg1=false leg2=true`（同一句还在 `:272` 与 `paths_shortname_252_r1_test.go:98` 各响若干枚）＋ `paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes`。
