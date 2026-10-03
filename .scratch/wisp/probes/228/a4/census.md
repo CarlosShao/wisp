@@ -107,7 +107,37 @@
 
 ## §2 复认／推翻 a1–a3 三节（具名说哪条被推翻）
 
-（取数中）
+> 起手实盘：`.scratch/wisp/probes/228/` 下五节＝`a1/ a2/ a3/ r1/ v1/`（本腿 09:18 `ls`）。
+> 主体件行数（本腿 `wc -l`）：**a1 cost-table.md 354 行／69,717 字节**、**a2 census.md 735 行／65,148 字节**、**a3 census.md 345 行／67,173 字节**（另有 r1 台件读数 625＋156＋72＋1 行、v1 一枚 commit-msg 15 行）。
+
+### a1（cost-table，方向已由编排者按 owner 长期原话裁死＝走甲；本腿只作背景复认）
+
+- **复认 C-2「看门狗不存在」**：`internal/watchdog/doc.go:18` 逐字 `// DEFERRED(watchdog loop/thresholds): implemented by ticket 42` 今天仍在位（本腿现跑）。⇒ a1 那句"本腿只能证今天零判据路径、不能证将来不误报"照旧成立；归票 42，本票不吞（票面 `:3` 同口径）。
+- **复认 C-1「常驻名额按角色分别计——判不了」**：`internal/observe/goroutine.go:64 ClassifyGoroutine(name)` 入参只有名字、`Resident` 只累加 `Category == CategoryResident`；名册外名落 `rep.Unknown`、不进 `Resident`、碰不到门禁——**与 a2 §⑥"附一条复算更正"（`boot_windows.go:115-118` 只在挪用在册名时才拒 Boot）一致**。⇒ 走甲后"CLI 腿里起 `ui-sta` 会不会被判泄漏"今天**仍无角色维度那行代码**，属未定义即停（票面 `:27`/`:3`），本腿不填值。
+- **复认"分母 1→2"**：a1 §8 有限尺说 `cmd/wisp` 测试层零枚仪器断句柄被 join；本腿现读 `cmd/wisp/run.go` 坐实 `replyHandle`（`:318`）＋`reloadHandle`（`:326`）两枚**都在场**、`close()`（`:902`）对二者**只 `Cancel` 不 join**（`:896` 注释逐字 "The cancel is not a join"）⇒ AC#4 的"两枚一起 join"前提成立。
+- **⚠ 一处过期须具名（非推翻 a1，是其引用面已被 r1/v1/246 改写）**：a1 通篇假设"球只在 `cmd/balldebug`"——`228-r1` 已把球接进 `cmd/wisp` 常驻腿（本腿见 `resident_ball_windows.go:165 ball.New`、`resident_windows.go:163 startResidentBall`）。⇒ a1 的**乙支（CLI 腿宿主球）代价表**已非现量，只是历史；走甲方向不受影响（甲本就是接常驻腿）。
+
+### a2（"停机那一支会响的仪器"——本腿逐条复认其承重现量，并复认它自己的两处更正）
+
+- **复认「全仓零 stop 位」**：本腿现跑 `grep RequestStop|StopRequest|shutdownRequest|stopRequest`（`internal/proc`＋`cmd/wisp`）＝**零命中**；`RunEventLoop` 唯一定义 `internal/proc/boot_windows.go:127`、唯一停机输入 `:128 signal.NotifyContext(os.Interrupt, SIGTERM)`。⇒ AC#11 要的位确是**全新面**。
+- **复认 D-3「真机侧 1..10 结构性读不到」（这是本腿最看重的一格，`internal/proc` 未飞、行号稳）**：`shutdown.go` 出声四支＝skipped `:130`／abandoned `:145`／failed `:147`／fast `:172`；**成功步 `:150` 只 `append(records, rec)` 零日志**、第 8 步 `:180`、第 10 步 `:186` 同样零日志。⇒ 与票面 `:97`（编排者据 a2 F5 把 ⓑ 拆成两枚钉、⛔ 不许写成"读到 1..10 全序"）**逐字对齐**。
+- **复认 a2 §⑥ E4 对票面 `:116` 的自我更正**：票面 Progress log `:116` 把 a2 承重现量③写成「`interaction_live_test.go:12` 逐字承认 winlive 族测不了托盘菜单（'needs a real mouse in the notification area'）」。**本腿现跑 `grep "notification area\|real mouse" internal/ball/*_test.go cmd/wisp/*_test.go`＝零命中**——该措辞在盘上不存在。a2 自己在 census `:12` 真词面是"a second monitor / the felt experience of focus"（`:13-14`）、并在 §⑥ E4 具名改正了首发。⇒ **推翻的是票面 `:116` 那句引用（它沿用了 a2 首发未抹的旧抄），不是 a2 的结论**；"winlive 测不了托盘"这一结论**仍成立**，凭据换成否定尺：`wmAppTray/showMenu/menuExit/recordTrayExit` 在全仓 `*_test.go` 零命中（本腿未重跑，a2 R13＋a3 R20 两发同向）。
+- **复认「投 `WM_COMMAND`＋id 模拟托盘选择」被证伪**：`internal/ball/tray_windows.go:15-16` 明写不用 `WM_COMMAND`、选择值只从 `TrackPopupMenu` 同步返回拿（`:101-106`）。本腿现读该文件仍在位（行号未漂）。⇒ 票面 `:100`/`:112` 与 a2 A-1 第 1 支**三方一致**，本腿不加新据。
+
+### a3（托盘「允许一次」在没卡时的诚实形状——本腿复认其承重读数；关键：它交的 F4/F6/F7/F8 已被编排者裁死）
+
+- **复认「推一维状态进托盘＝有名字、没使用者」**：本腿现跑 `grep SetTrayChecks|SetTrayTip cmd internal | grep -v _test | grep -v probes` ⇒ **只命中 `internal/ball/ball_windows.go:919`/`:927` 两枚定义本身、生产调用者＝0 枚**（复认 a3 R16）。⇒ "今天那两枚勾在产码里恒 `false`"照旧。
+- **复认「置灰需要新增 flag 常量、不显示不用」**：`grep mfGrayed|MF_GRAYED internal/ball/*.go`＝**零命中**（复认 a3 R14 正控）。
+- **复认「无卡时 `Allow` 返 `ErrNoTrackedCard`、且'有卡在等'≠'允许得动'」**：`AwaitingHuman()` 本腿现读在 `replies.go:252`（票面 `:39` 写 `:313` 是 Allow、a3 E1 已记漂移）；其体 `:256-262` 在 `queueAwaitsHuman()` 为真时遍历 `Pending()` 找 L2——**没有 L2 卡就 fall through 返 `ReplyCard{}, true`（corr 空串）**，而 `Allow(corr)` 拿空串走 `Look` 不中→`ErrNoTrackedCard`。⇒ a3 E6 那格"两格对诚实的要求不一样"复认。
+- **⚠ 复认 a3 的分层结论、但记下签名漂移（不算推翻）**：a3 §① 记 `startResidentBall(reg, onCancelEsc escVetoFunc)` 两参。本腿现读＝`cmd/wisp/resident_ball_windows.go:158 startResidentBall(reg, onCancelEsc, hooks ...ballHostHook)` **多了第三枚变参**，`hooks` 是 `func(*panelHostHooks)`、由 `resident_windows.go:163 withPanelHost(...)` 递**开面板能力**（票 33/248 那半）。⇒ a3 的结论"**球宿主对审批一无所知、反向不存在**"**仍成立**（这枚 hook 喂的是 panel、不是 approval；`ball.New` 仍在 `:165` 写死、无造球失败的缝），但 a3 记的**签名已过时**、`attachBall` 那条注入方向之外多了一条"面板开合"注入。本腿不据此改判 F7。
+- **具名：a3 交的 8 格判不动里 F4/F6/F7/F8 已被编排者裁死（票面 `:163-174`，账 `A498`）**——不再是"待裁"，是"已裁、等落地"：
+  - **F8→裁甲**：AC#2 那句"带正确 `Channel`"改写为"带正确 `Source` 标签、权威由关联号被花掉来证"；⛔ 乙支（给托盘加第五枚 `Channel` 值）**永久不开**（动 SPEC-06 冻结词表、正落 `approval.go:48-50` 点名的失败形状）。
+  - **F4→裁"永远显示＋按下去落空就出声"**那一支（不出声／置灰／整枚消失都不选），⛔ 出声文案**不复用门拒绝/权限判定文案**、且因 `Events` 回调 `func()` 无回程（a3 R15）⇒ **只能由 `cmd/wisp` 侧出声**。
+  - **F6→裁拿 `AwaitingHuman()` 那枚（L2 优先）**、⛔ 不许写"支持单枚并发"。
+  - **F7→裁甲＝新增第五枚 `Events` 键**（落地腿只许扩名册**列表**、⛔ 不许扩**断言维度**）。
+- **复认 F5 仍在别的票地界**：L1 那一发枚举口＝`gate.go` 的 `g.windows` 全仓零枚枚举口（a1 §8 复认、票面 `:19`），要做得先在**票 220 AC#2 甲乙**裁——**不属本票、也不属本腿**。
+
+（本节"推翻"仅指**票面 `:116` 那句引用**与 **a1 的乙支代价表已被 r1/246 变旧**；对 a2/a3 三节本身，本腿**全部复认其承重读数**，只另记两处签名/措辞漂移。）
 
 ---
 

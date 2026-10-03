@@ -1,0 +1,14 @@
+228-a4: section 2 - reconfirm a1/a2/a3 prior probes
+
+Section 2 reconfirms the load-bearing readings of prior probe legs a1 (cost
+table, direction already ruled 甲), a2 (shutdown instrument that would ring),
+a3 (tray "allow once" honest shape when no card is pending). Verifies on
+current disk: watchdog DEFERRED marker present; shutdown.go success steps
+append with no log (a2 D-3); RequestStop/StopRequest zero hits repo-wide;
+SetTrayChecks/SetTrayTip zero production callers; mfGrayed absent;
+AwaitingHuman empty-corr fall-through. Names two overturns: ticket line 116
+quote (notification area / real mouse) is absent on disk, already self-
+corrected by a2 E4; and a1's branch-乙 cost table is stale since 228-r1/246.
+Records signature drift on startResidentBall (hooks param added, still
+panel not approval). Notes F4/F6/F7/F8 already ruled by orchestrator A498.
+No Go command run; frontend/design not read; AC boxes untouched.
