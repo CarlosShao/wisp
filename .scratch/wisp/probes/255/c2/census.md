@@ -14,6 +14,14 @@
   - `?? internal/config/tiers_app_255r2_test.go`（他人新增、未跟踪，`[app]` 键级补尺归 `255-r2`）
   ⇒ 这三枚的路径本腿**只读不写**。凡本腿引用到 `config_reload.go` / `config_readers_255.go` 的行号，都是**工作树现量**（可能随对方落盘再漂），会在具名处标注；`git show HEAD:` 对照过的会写明。
 
+### §0.2 交件前的锚刷新（`2026-10-03 09:42:27+0800`）
+
+盘在这半小时里被别的腿推着走了 **41 枚 commit**：HEAD 已从起手锚 `5f9ff9d4` 进到 `3138e012`，其中 **`ae60a87c`「票 255 r2 · AC#1 回执只说真话 + AC#3 [app] 键级补尺」把本腿 §2.4／§3.4／§5-E 引的那两枚"未跟踪在飞文件"落进了 HEAD**。现量：
+
+- `git status --porcelain -- cmd/wisp internal/config internal/panel` 现为：`M cmd/wisp/config_readers_255.go`／`M cmd/wisp/config_receipt_255_test.go`／`M cmd/wisp/config_reload.go`／`?? internal/panel/inbound_roster_253_test.go`（另一枚腿 `253-r5` 的新文件）。
+- ⛔ **本腿承重结论未变**（逐枚复量过）：`cmd/wisp/panel_host_windows.go:304` 仍是 `Width:  420,`、`:305` 仍是 `Height: 260,`；roster 里 panel 那行判词逐字未变（**行号 `:130` → `:134`**）；`config.TierOf(` 的产码调用点仍只有 `cmd/wisp/config_readers_255.go:178` 一枚。
+- ⇒ **§2.4 的"HEAD＝0 枚"已被时间推翻**，现更正为"起手锚 `5f9ff9d4`＝0 枚、交件锚 `3138e012`＝1 枚"，见该节就地更正。
+
 ## §0.1 硬规自检
 
 - ⛔ 本腿未跑任何 Go 命令（`go test`／`go build`／`go vet`／`go run` 全部零次）。需要跑才拿到的读数一律进 §7。
@@ -78,7 +86,7 @@
 | 命中 | 是不是 `config.Config.Panel` 的读者 |
 |---|---|
 | `internal/config/manager.go:288` | **是**，但在 `internal/config` 内部（热应用表本身），票面早就算过 |
-| `cmd/wisp/config_readers_255.go:130` | **不是**：那是一枚**字符串**（在飞腿 `255-r2` 给 panel 写的 no-reader 判词），不是读值 |
+| `cmd/wisp/config_readers_255.go:134` | **不是**：那是一枚**字符串**（`255-r2` 落盘的 panel 判词，见 §0.2 的行号漂移），不是读值 |
 | `cmd/balldebug/main.go:240`、`internal/ball/hotkey_reload.go:19/:102`、`internal/ball/hotkey_windows.go:98/:99/:455` | **不是**：这些是 `ball.HotkeyConfig.Panel`（热键字符串字段）与 panel 钩子，跟 `[panel]` 段无关 —— 同名陷阱，本仓有多枚同名文件/字段，这五处逐枚看过定义才敢归类 |
 
 ⇒ **`PanelSection` 的五枚字段在生产码全部零读者**：`grep -rn "Panel\.Width\|Panel\.Height\|Panel\.Enabled\|Panel\.Scale\|Panel\.KeepAlive" cmd internal tools scripts --include=*.go` 的非测试命中＝只剩上面那枚字符串。
@@ -88,10 +96,10 @@
 
 - 定义：`internal/config/tiers.go:93-96`。
 - 尺：`grep -rn "TierOf(" cmd internal tools scripts --include=*.go`（**含测试**，本尺无 mock 面）。
-- **HEAD `5f9ff9d4`：生产调用者 0 枚**。依据：`git show HEAD:cmd/wisp/config_reload.go` 里 `TierOf`／`TierRegistry` **零命中**（本腿实跑，grep rc 非 0＝无匹配），HEAD 上其余命中只有定义行与注释。
-- **工作树（在飞）：生产调用者 1 枚**＝`cmd/wisp/config_readers_255.go:178`（同行注释自称 "TierOf's first production caller"）。**该文件未跟踪（`??`，属正在写 `cmd/wisp`＋`internal/config` 的 `255-r2`）**，所以这一枚**不属 HEAD、也随时可能被对方改写**。
+- **起手锚 `5f9ff9d4`：生产调用者 0 枚**。依据：`git show HEAD:cmd/wisp/config_reload.go` 里 `TierOf`／`TierRegistry` **零命中**（本腿实跑，grep rc 非 0＝无匹配），该锚上其余命中只有定义行与注释。
+- **交件锚 `3138e012`（含 `ae60a87c`，255-r2 落盘）：生产调用者 1 枚**——`git show HEAD:cmd/wisp/config_readers_255.go | grep -n "config.TierOf("` 现命中 **`:178`** 一枚（同行注释自称 "TierOf's first production caller"）。⚠ **就地更正**：本腿初稿把这一枚记成"未跟踪、不属 HEAD"，那是 `09:2x` 的真相，`09:42` 已随对方落盘翻掉；两枚锚的读数都留着，免得下一枚腿又对不上。
 - ⚠ 本腿实测到的**同一次会话内漂移**（记下来防后来人误读我的行号）：同一枚调用我在 `09:2x` 读到的是 `:174`，`09:3x` 再读已是 `:178` —— 对方在写这个文件。
-- 另有**不经 `TierOf` 直读 map** 的产码点两枚：`internal/config/manager.go:294`（同源守卫）与 `cmd/wisp/config_readers_255.go:187`（在飞）；测试侧直读点在 `internal/config/tiers_255_test.go` 与 `cmd/wisp/config_receipt_255_test.go`（后者亦未跟踪）。
+- 另有**不经 `TierOf` 直读 map** 的产码点两枚：`internal/config/manager.go:294`（同源守卫）与 `cmd/wisp/config_readers_255.go:187`（在飞，交件时该文件工作树比 HEAD 多 20 行）；测试侧直读点在 `internal/config/tiers_255_test.go` 与 `cmd/wisp/config_receipt_255_test.go`（后者交件时也已进 HEAD，工作树比 HEAD 多 52 行）。
 - ⛔ 本腿**没跑过任何** go 命令，也没打算用 `go build` 的 rc=0 当"接上了"的证明；上面每一枚都是 grep 计数。
 ## §3 装配根接缝与最小改动面
 
@@ -135,19 +143,20 @@
 - 生效语义：多一条真生效路径——`RequestDispose`（`cmd/wisp/panel_resident_windows.go:393-399`）销毁后 `RequestShow` 重建窗口，会读到**热加载后**的新值。**不需要任何 resize 机制**（§1.1 已量：本宿主没有 `MoveWindow`/`SetWindowPos`/`Resize`，`Show` 只 `ShowWindow`）。
 - ⛔ 本腿不裁 A／B：这一格直接决定票 255 AC#1 那句"已立即生效"对 `[panel]` 能不能说真话（见 §3.4），属编排者裁。
 
-### 3.4 ⚠ 与在飞腿 `255-r2` 的**硬耦合**（本腿认为是最要紧的一条排程事实）
+### 3.4 ⚠ 与 `255-r2` 已落盘判据的**硬耦合**（本腿认为是最要紧的一条排程事实；行号按交件锚 `3138e012`＋工作树刷新，见 §0.2）
 
-在飞的 `cmd/wisp` 写面已经把 `panel_host_windows.go:304` 那行**写进了机读判据**：
-- `cmd/wisp/config_readers_255.go:130`（未跟踪，在飞）给 panel 的判词逐字含 `cmd/wisp/panel_host_windows.go:304 [Width:  420,] is hard-coded and NewPanelManager receives no config (票 255 AC#4 owns that break)`。
-- 尺子＝`cmd/wisp/config_receipt_255_test.go:172` `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`：`:190` `os.ReadFile` 把 cite 指向的文件读回来、`:200-202` 要求**那一行仍然含那个 token**，否则红（"the evidence drifted, so re-adjudicate this row"）。
-- 同一枚未跟踪文件里 `:406-412` 还要求热加载审计行含 `config: HOT-RELOAD-READER section=panel` + `no-reader` + `panel_host_windows.go:304`；`:369` `TestTicket255ReceiptOmitsPanelFromTheImmediateSentence` 的整条正控就是拿 `[panel] width = 641` 种的。
+`255-r2`（commit `ae60a87c`「票 255 r2 · AC#1 回执只说真话 + AC#3 [app] 键级补尺」）**已经把 `panel_host_windows.go:304` 那行写进了机读判据**：
+- `cmd/wisp/config_readers_255.go:134` 给 panel 的判词逐字含 `cmd/wisp/panel_host_windows.go:304 [Width:  420,] is hard-coded and NewPanelManager receives no config (票 255 AC#4 owns that break)`（初稿记作 `:130`，对方落盘后漂到 `:134`）。
+- 尺子＝`cmd/wisp/config_receipt_255_test.go:176` `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`：把 cite 指向的文件读回来、要求**那一行仍然含那个 token**，否则红（红句逐字 "the evidence drifted, so re-adjudicate this row"）。
+- 同一枚文件里 `:425` 要求热加载审计行含 `config: HOT-RELOAD-READER section=panel`、`:426` 要求它含 `no-reader`、**`:429` 要求它含 `panel_host_windows.go:304`**；`:388` `TestTicket255ReceiptOmitsPanelFromTheImmediateSentence` 的整条正控就是拿 `[panel] width = 641` 种的（初稿记作 `:406-412`／`:369`，同因落盘漂移）。
 
-⇒ **AC#4 一动 `:304`（不动就谈不上"变成缺省值"），这三处必红。** 这不是"断言被放宽"的问题，而是**判据的证据行moved ⇒ 那一行必须重判**：写腿必须在同一次改动里把 panel 的判词从 `hotClaimNoReader` 换形（形 A ⇒ `hotClaimSnapshotOnly`，与 `cmd/wisp/config_readers_255.go:99` 那枚 `[agent]` 行同族；形 B ⇒ 可争 `hotClaimConsumed`），并给一把新的正控替掉 `[panel]` 那枚"读者为零"的样本（⛔ 摘尺不许当修尺：票面第 17 行那句仍然管着 AC#1 那把尺，`[session]`／`[observe]` 这类真无读者段在 `cmd/wisp/config_readers_255.go:118`、`:123` 已具名，可以接手当样本）。
-⇒ 排程后果：AC#4 **不能**在 `255-r2` 落盘之前动 `cmd/wisp/panel_host_windows.go:304`，否则两边互相把对方的测试改红；票面第 32-34 行那条起跑判据（`git status --porcelain cmd/wisp internal/config` 为空）对 AC#4 同样适用。
+⇒ **AC#4 一动 `:304`（不动就谈不上"变成缺省值"），这几处必红。** 这不是"断言被放宽"的问题，而是**判据的证据行 moved ⇒ 那一行必须重判**：写腿必须在同一次改动里把 panel 的判词从 `hotClaimNoReader` 换形（形 A ⇒ `hotClaimSnapshotOnly`，与 `cmd/wisp/config_readers_255.go:99` 那枚 `[agent]` 行同族；形 B ⇒ 可争 `hotClaimConsumed`），并给一把新的正控替掉 `[panel]` 那枚"读者为零"的样本（⛔ 摘尺不许当修尺：票面第 17 行那句仍然管着 AC#1 那把尺；`[session]` 那行现在写的是 `扫描零命中` 标记（`cmd/wisp/config_readers_255.go:122`）、`[observe]` 那行 cite 的是 `cmd/wisp/logsink.go:149`（`:127`），两枚都可接手当"真无读者"样本）。
+⇒ **排程后果（形态已随 `ae60a87c` 落盘而变）**：初稿写的"AC#4 不许在 255-r2 之前动 `:304`"如今**已经不适用**——r2 先落了。剩下的真约束是：**AC#4 落地那一次必须同时重判 roster 行＋那三处断言的样本**，⛔ 不许只改产码让 r2 的尺变红，也⛔ 不许靠删 r2 的断言换绿。票面第 32 行那条起跑判据（`git status --porcelain cmd/wisp internal/config` 为空）对 AC#4 仍然适用，且此刻 `cmd/wisp` 仍脏（§0.2）⇒ **还没到起跑点**。
 
 ### 3.5 ⛔ 本腿**不**停手上报"非开那条边不可"
 
-量到的事实是反的：那条边**根本不需要开**。本腿唯一想标为"未定义即停"的是 §1.3 那格——`[panel] height` 的配置缺省是 **0 且 schema 注释说 0＝auto from content**（`internal/config/schema.go:533-534`），与票面"写死的 260 变成配置缺省时的值"在字面上互相拉扯（0 到底翻成 260 还是翻成让内容定高？票面与裁定都没写）。这枚**留给编排者具名裁**，本腿不按自己的判断填。
+量到的事实是反的：那条边**根本不需要开**。本腿唯一想标为"未定义即停"的是 §1.3 那格——`[panel] height` 的配置缺省是 **0 且 schema 注释说 0＝auto from content**（`internal/config/schema.go:533-534`），而宿主侧**没有任何实现读过 "auto" 这个语义**（`grep -rn "auto" cmd/wisp/panel_host_windows.go cmd/wisp/panel_resident_windows.go` ＝零命中，见 §6-4），与票面"写死的 260 变成配置缺省时的值"在字面上互相拉扯（0 到底翻成 260 还是翻成让内容定高？票面与裁定都没写）。这枚**留给编排者具名裁**，本腿不按自己的判断填。
+
 ## §4 仓里现成的同类定式（AC#4 能不能照抄、不新造机制）
 
 **能照抄，而且至少有三枚现成形**。按"与 AC#4 的相似度"排：
@@ -182,7 +191,7 @@
 ### 定式 ⑤（顺手一枚：几何类选项的缺省/夹取模板）
 
 - `internal/ball/ball_windows.go:64` `SizePx int // configured orb size 44..72 (0 = default 56)`，`internal/ball/ball_windows.go:144-151` 给了"0→缺省、越界夹住"的三步处理。⇒ §1.3 那枚"`[panel] height` 缺省是 0 还是 260"的纠结，**仓里有现成的表达模板**（一枚具名缺省常量＋显式夹取），但**选哪个语义仍要编排者裁**（§3.5），本腿只指出模板存在。
-- 对照：常驻球腿根本没设这枚字段（`cmd/wisp/resident_ball_windows.go:165-185` 的 `ball.Options{}` 里无 `SizePx`）⇒ 面板之外的 `[ball]` 段犯的是同一枚病（在飞判词 `cmd/wisp/config_readers_255.go:117` 亦如此记）。
+- 对照：常驻球腿根本没设这枚字段（`cmd/wisp/resident_ball_windows.go:165-185` 的 `ball.Options{}` 里无 `SizePx`）⇒ 面板之外的 `[ball]` 段犯的是同一枚病（`cmd/wisp/config_readers_255.go:121` 那行判词亦如此记，且它 cite 的正是 `internal/ball/ball_windows.go:64 [SizePx]`）。
 ## §5 不依赖真窗口的机读判据：有没有、长什么样、落在哪
 
 **直接答案：有，而且不止一枚。票面 AC#4 那句"改 width ⇒ 真窗口宽度随之变"确实只有本机可量，但"配置值真被面板宿主用上了"这件事可以拆成两枚机读断言：(i) 创建窗口那一步**收到的实参**取自配置；(ii) 装配根到宿主那一段真跑过一次。二者都不需要 WebView2 窗口。**
@@ -213,12 +222,45 @@
 - ⚠ 排程预警：`cmd/wisp` 的测试在这台机与 CI 上都要先把 sherpa DLL 摆进 PATH（`scripts/wisp-cli-tests.sh:7-16` 记的就是这个坑；`docs/reports/HANDOVER.md:143` 第②条又记了一次）。本腿⛔ 没跑过，只转述那两处的**射程**。
 
 ### 候选 E｜复用**已存在**的那把证据行尺，把"宽度来自配置"挂上去长期盯
-- 现量：`cmd/wisp/config_receipt_255_test.go:172` `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` 会把 roster 里每枚 `file.go:LINE [token]` cite 的**那一行读回来**要 token 还在（`:190`、`:200-202`）。
-- 形状：AC#4 落地时，把 `cmd/wisp/config_readers_255.go:130` 那行 panel 判词的 cite 从"硬编码那行"改指**新的取值处**（宿主字段/`windowOptions` 那一步）。此后任何人把宽度改回写死，**这把已经在跑的尺自己会红**。
+- 现量：`cmd/wisp/config_receipt_255_test.go:176` `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` 会把 roster 里每枚 `file.go:LINE [token]` cite 的**那一行读回来**要 token 还在（`:194` `os.ReadFile`、`:205` 比 token、`:206` 红句 "the evidence drifted, so re-adjudicate this row"）。
+- 形状：AC#4 落地时，把 `cmd/wisp/config_readers_255.go:134` 那行 panel 判词的 cite 从"硬编码那行"改指**新的取值处**（宿主字段/`windowOptions` 那一步）。此后任何人把宽度改回写死，**这把已经在跑的尺自己会红**。
 - ⇒ 这不是新机制，是**把新事实挂到旧尺上**；也正是 §3.4 那格冲突的解法（冲突不是靠删断言消，是靠重判那一行消）。
 
 ### 关于"做不到"这句
 本腿**不**提交"AC#4 没有无窗口判据"这种否证。上面 A/B/D/E 四枚都可从盘上读出来、都不新建机制、都不放宽任何既有断言（B/D/E 只做加法；C 需要额外一把防 mock 的尺）。真窗那一格照票面留在"只有本机可量"族，⛔ 不伪装成 CI 测过。
-- §6 我可能写错的条目（自我对抗）
-- §7 量不到的地方（具名）
-- §8 交件判语
+## §6 我可能写错的条目（自我对抗，逐枚具名）
+
+1. **行号会漂，而且我抓到不止一次**：在飞腿正写着 `cmd/wisp`。同一枚 `config.TierOf(` 调用我在 `09:2x` 读到 `cmd/wisp/config_readers_255.go:174`，`09:3x` 复读已是 `:178`；panel 判词行从 `:130` 漂到 `:134`；`config_receipt_255_test.go` 里三枚断言从 `:369/:406/:410` 漂到 `:388/:425/:429`。⇒ §2.4／§3.4／§5-E 引的 `config_readers_255.go`、`config_receipt_255_test.go` 行号**在交件前已全部按 `3138e012`＋工作树复量刷新**（见 §0.2），但这两枚文件仍脏（工作树比 HEAD 各多 20/52 行），**下一枚腿开工时必须自己再复量一次，别抄我的数字**。我引的 `cmd/wisp/panel_host_windows.go`、`internal/config/*`、`cmd/wisp/panel_inbound.go`、`cmd/wisp/panel_resident_windows.go` 不受此影响（那几枚 `git status` 干净，工作树＝HEAD）。
+2. **"真窗只有本机可量"这句我原本当票面事实转述，盘上其实不一致**：`cmd/wisp/panel_host_windows_live_test.go:1` 是 `//go:build windows && winlive`，而**同族默认档**的 `cmd/wisp/panel_host_windows_test.go:1` 只带 `//go:build windows`——它 `:6` 的注释自称 "these ... belong to the winlive tier, which has NO CI job"，但**标签没跟上**。加上我现量的 `.github/workflows/ci.yml` 里 `-tags`／`GOFLAGS` **零命中**（`grep -c GOFLAGS`＝0）、`scripts/portable-tests.sh` 与 `tools/d22scan/runtests.sh` 也没有 `-tags`（本腿只判断"标签集合里不含 winlive"这一射程，⛔ 未引用冻结件内容）⇒ **按盘上标签读，`TestPanelHostRealWindowHopAndLifecycle`（`cmd/wisp/panel_host_windows_test.go:507`）是会编进 CI windows 档的那一枚**。这一格我只报到"注释与标签不一致"为止，⛔ 不裁谁对，也不裁"AC#4 因此可以进 CI"。
+3. **§1.2 那枚"internal/panel 零硬编码"用的尺可能偏窄**：我主尺是 `Width|Height`。⇒ 已补跑更宽的 `grep -rnE "\bSize\b|\bRect\b|\bPx\b|pixels?" internal/panel --include=*.go`（非测试）＝**零命中**，所以这一格从"没找到"升级为"两把尺都没找到"。⚠ 但若尺寸藏在 `internal/panel` 的**测试文件**里（冻结件），我第二把尺排除了 `_test.go`，那里我没量。
+4. **§3.5 那格"height=0 没有实现"我当时是推的，现已验**：`grep -rn "auto" cmd/wisp/panel_host_windows.go cmd/wisp/panel_resident_windows.go` ＝**零命中** ⇒ `internal/config/schema.go:533` 注释那句 "0 = auto from content" 在宿主侧**没有任何实现**（不只是"没被读"）。若我原来只按"没人读"写、没补这一刀，§3.5 的停手理由会显得比实际弱。
+5. **§2.3 我把 `internal/ball/hotkey_windows.go:98/:99/:455` 的 `cfg.Panel` 排除出"Config.Panel 的读者"——依据是同名两枚类型**。现已逐字看过定义：`internal/ball/hotkey_windows.go:49-54` 的 `type HotkeyConfig struct{ Summon; Mute; Cancel; Panel string }`（Panel 在 `:53`）。⇒ 归类成立。但**提醒下一枚腿**：本仓 `Panel` 这枚名字至少三处同形（`config.PanelSection`／`ball.HotkeyConfig.Panel`／`cmd/wisp` 的 panel 宿主钩子），我的 grep 结论全是按**定义**归的类，不是按名字。
+6. **§3.4 的耦合我原本是**只从对方未跟踪文件的字节**推的**，没有对方自述**。⇒ 已找到佐证：`.scratch/wisp/probes/255/r2/impl.md:134` 逐字写着 "⛔ 没去接线 AC#4：`panel_host_windows.go:304` 的 `420` 一个字节没动"、`:152` 写着台账断言 "section=panel 必须含 `no-reader` 与 `panel_host_windows.go:304`"。**两枚来源同向 ⇒ §3.4 从"推断"升为"互证"。**
+7. **"唯一的产码构造点"这句的范围**：我跑的是 `grep -rn "func NewPanelManager" . --include=*.go`（显式排除 `frontend`／`design` 两枚我不读的根），结果只有 `cmd/wisp/panel_host_windows.go:175` 一枚 ⇒ 这句我敢写。但**"仓库外没有别的 main 用它"我量不到**（本仓不是库，`cmd/` 之外无第二个 module，见 `go.mod`，但这不等于没有外部消费者；这条按铁律写进 §7）。
+8. **§4 定式①我说热键桥"出货进程没接上"**：尺是 `grep -rn "NewHotkeyReloader|RebindHotkeys" cmd internal tools --include=*.go | grep -v _test` ⇒ 产码只剩 `cmd/balldebug/main.go:237` 一处、`internal/ball/ball_windows.go:813` 是定义。**⛔ 没扫 `.scratch`**（那里有探针副本会假命中）。若"生产读者"的口径包含 `cmd/balldebug`，我的"没接上"就重了——我在 §4 里给的措辞是"这格已被在飞腿写成 `hotClaimDebugHostOnly`"，与对方判词同向，⛔ 不是本腿另立口径。
+9. **§5 候选 B 的落点可能撞冻结件**：我推荐尺放 `cmd/wisp/panel_host_windows_test.go`（默认档、非冻结）。**冻结名单里没有这一枚**（本腿按任务给的禁区清单核：冻结的是 `internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`、`tools/d22scan/allowlist.txt`、`docs/**`、golden、`thresholds.go`）⇒ 落点安全。但**如果**编排者后来把它列进冻结，这条要重挑。
+10. **`grep -rn "420\|260" cmd/wisp` 那把尺会漏别的写法**：例如有人把宽度写成 `0x1A4`、`42*10` 或从常量表取。我**没有**跑这种全形状扫描。⇒ 若 §1.1 的"唯一两处"被后续复量推翻，先怀疑我这把尺。
+
+## §7 量不到的地方（具名；⛔ 不推测填空）
+
+| # | 量不到的读数 | 为什么必须跑/必须真机 |
+|---|---|---|
+| 1 | 真窗口的实际客户区宽度／高度；`WindowOptions{Width,Height}` 传下去 Win32 到底开成多大 | 只有本机可量（票面 AC#4 原话那一族）。本腿⛔ 一枚 go 命令都没跑 |
+| 2 | `go test ./cmd/wisp` / `go build` / `go vet` 的任何 rc 与 PASS/FAIL | 第一硬规（三枚写在飞）。⇒ §2.4 的"调用者枚数"只有 grep 级证据，⛔ 无编译级证明 |
+| 3 | **§3.2 那句"零新依赖边"的 deps 图级证明** | 定式③指定的尺是 `GOOS=windows go list -deps ./cmd/wisp` 改前/改后对照（`cmd/wisp/resident_windows.go:121-122` 自己就这么写的）。本腿不跑 ⇒ 我只给到"文件级 import 普查"这一层，**这一条必须由写腿自己补跑**，我不替它盖章 |
+| 4 | hosted windows runner 能不能真的建出 WebView2 窗口（§6-2 那格不一致的后果） | 要跑 CI 或要真机；盘上只读不决定 |
+| 5 | `webview2.WindowOptions.Width/Height` 的**单位语义**（物理 px 还是 96-DPI 逻辑单位） | 库源码在模块缓存里、⛔ 不在仓内，本腿无 `vendor/`（`ls vendor` 已验不存在）；`go.mod:19` 只给 `github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808 // indirect`。⇒ **§1.3 那句"640 vs 420 差 220px"默认了两边同单位，这一条我未经证** |
+| 6 | `[panel] scale`/DPI 与 `[panel] keep_alive_in_session` 有没有**间接**消费者（例如藏在 `internal/panel` 冻结测试里的形状尺被当成"读者"） | 我按产码 grep 判零读者；冻结测试文件里我只做了"命中是字符串巧合"的射程判断，⛔ 未逐枚读完 |
+| 7 | 在飞腿 `255-r2` **最终**形状 | 它已落 `ae60a87c`（AC#1＋AC#3），但 `cmd/wisp/config_readers_255.go`／`config_receipt_255_test.go` 在工作树里仍比 HEAD 各多 20／52 行＝**还在写**。§3.4 描述的是"交件那一刻盘上"的冲突面，⛔ 不是它收工后的样子 |
+| 8 | `wisp run` 那条路将来会不会也建面板宿主（若是，§3.3 的"唯一产码构造点"会变成两处，最小面重算） | 现量＝零处（`assembleRuntime` `cmd/wisp/run.go:382` 不建 `PanelManager`），趋势量不到 |
+| 9 | 依赖方：仓外是否有别的 main/module 引用 `cmd/wisp`（它是 `package main`，理论上不可能，但我没跑 `go list -m`） | 同 #2/#3 的硬规 |
+
+## §8 交件判语
+
+- **本腿只读**：⛔ 零写产码、⛔ 零 AC 框改动、⛔ 零票面改动、⛔ 零冻结件改动。唯一的落盘件＝`.scratch/wisp/probes/255/c2/census.md`（＋本腿的 commit 消息文件未落盘，消息用 `-m` 内联短英文）。
+- ⛔ **一枚 Go 命令都没跑**：`go test`／`go build`／`go vet`／`go run`／`go list`／`go env` 全部零次。手段只有 `Read`／`grep`／`find`／`git log|show|diff|status|ls-files|check-ignore`。所有"必须跑才有"的读数在 §7 具名，⛔ 未推测填空。
+- ⛔ `frontend/**`、`design/**` 全程未读、未引、未转述（连 `grep` 的根里都没有它们；§6-5 那次全库 `grep` 显式排除了这两枚根）。
+- **页面侧唯一可抄的问句**（owner 自己带给他那枚前端 agent 用，本腿⛔ 未联系任何其它会话、⛔ 未代转）：**"面板页面侧有没有任何一处按宿主窗口的实际宽高做布局或断言（例如依赖 420/260 这两个数、或依赖 `Height=0 时由内容定高` 这句注释语义）？若有，AC#4 把宿主尺寸改成配置驱动时需要同步的是哪一处？"**
+- ⚠ 判语里不含"残留空节"那五个字面；骨架 8 节全部真填完，占位符 0。
+- **未 push**：本腿只 commit（`git add -- <显式路径> && git commit -- <同批路径>` 串发执行），远端未动。
+- **交件判语的一句结论**：AC#4 **今天就能不靠真窗口钉住"配置值真被面板宿主用上"**（§5 候选 B＋D＋E 三枚，零新机制、零 import 新边、零断言放宽），而"真窗口宽度随之变"那一格仍归本机可量、⛔ 不许伪装成 CI 测过。
