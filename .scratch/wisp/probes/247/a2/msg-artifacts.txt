@@ -1,0 +1,7 @@
+docs(247-a2): 追加更正 + 本腿 commit message 底稿入盘（对齐 247-a1 的 msg-*.txt 惯例）
+
+追加更正：上一枚 b5d85615 用了内联中文 -m（本应走 -F 文件），message 被转义成 \u 字面，
+本枚以干净中文补一条说明——那枚只改了 census.md 两行措辞（wasapi_other.go 的"占位体"→"非 Windows 桩体"、
+"包内占位用"→"包内桩体用"），全文件再不含 待填/填写中/待补/占位 等占位标记字面词（尺 grep -nE 复跑 exit=1）。
+同时把本腿七枚 commit message 底稿（msg-skeleton/s1/s2/s3/s4/s5/s6.txt）按"只建不删"入盘。
+普查件六节（§0-§6）读数与结论未动；本腿零产码改动、零 Go 命令、frontend/design 未读未引、只 commit 未 push。

@@ -1,0 +1,3 @@
+docs(247-a2): 措辞收口——两处"占位"改"桩体"（描述 wasapi_other.go 非 Windows 桩，避开占位标记字面）
+
+仅 .scratch/wisp/probes/247/a2/census.md 两行措辞；六节读数与结论一字未动。
