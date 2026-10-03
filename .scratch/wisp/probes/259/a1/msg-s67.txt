@@ -1,0 +1,22 @@
+259-a1 sections 6 and 7: self-adversarial list, and what this leg could not measure
+
+Nine named ways this census could be wrong, each with the grep that bounds
+it: the write-point census is four greps at one anchor not a type-system
+proof; the "state gate is unreachable by route" claim rests on both state
+writes sitting in the same critical section as the byID delete, and I did
+not check re-entrancy beyond noting that push logs while holding the lock
+(re-entrancy deadlocks, it does not reorder state); the tray reading is
+scoped to the ball package; "NativeAPI.Allow has zero production callers"
+also required grepping the type name itself to rule out a field or
+parameter holding it; the six-versus-four case count could be an assertion
+count instead, which is why the delivery commit's own words are quoted;
+and the same-named approval.go pair is spelled out so nobody re-measures
+against internal/panel/approval.go and calls it a drift.
+
+Seven named quantities stay empty because they need a go command: the four
+mutation colors, the package's case-count denominator (the delivery commit
+says 45, the ticket says 66 - both registered, neither reconciled),
+coverage and reachability instrumentation, the -race window between
+queue.go:377 and :382, drift from the three in-flight legs, the full blast
+radius of the two capability rulers, and whether ConstantTimeCompare keeps
+its property after compilation.

@@ -31,7 +31,7 @@
 | 2 | 存的那一份来自同一个值；比对两端在经由路由的调用里永远同值 | **真**（前两行读数真；"永远同值"是本件 §8 要判的那半句，此处只登记它的两个来源行） | `internal/agent/approval/approval.go:287` = `	s.values[nonce] = bind`；`approval.go:303` = `		return equalSecret(stored, bind)`；喂进 `issue` 的那一份 = `queue.go:336` = `	it.grants.issue(nonce, it.bind)` |
 | 3 | 绑定那句结构上不可能为 false；真拦下跨卡的是 ① store 成员检查 ② item 状态检查 | **①真／②不真（本腿具名推翻，详见 §4.3）**：跨卡时 B 本来就 pending，那道状态关是**放行**的，把两件事并列会让人以为撤掉成员检查还有状态检查兜着；另外经由路由的调用今天走不到 `queue.go:368` 的"不等"分支（`q.byID` 里不存在非 pending item） | `approval.go:298` = `	for v, stored := range s.values {`，`approval.go:305` = `	return false`（圈走完没命中就落到这里）；`queue.go:368` = `	if it.state != statePending {`，`queue.go:370` = `		return ErrNotPending`。另外本腿补一枚票面没写的第三道：**item 选择本身是精确键**（`queue.go:231-236` 的 `lookupForAllowLocked` 只读 `q.byID`，不读别名索引） |
 | 4 | `spend` 返回 `bool`；API 侧只有 `ErrBadGrant`，注释明写故意不区分 | **真**，一处精度要修正：那句注释本体在 **127–129**，130 是值行，票面写的「127-130」把值行也算进注释范围了 | `approval.go:292` = `func (s *grantStore) spend(nonce, bind string) bool`；`internal/agent/approval/ui.go:130` = `	ErrBadGrant = errors.New("approval: 原生令牌无效（缺失/已用/与本次请求不绑定）")`；`ui.go:127-129` = 「…The message never says which, so the API cannot be used to probe for valid nonces.」 |
-| 5 | `ticket242_binding_test.go` 那**六枚**用例直接调 store、自己递不匹配的 `bind`，测不到生产路由 | **半真**：性质真、**枚数不真**。该文件在盘上是 **4 枚** `Test*` 函数（`grep -c '^func Test'` = 4，无 `t.Run` 子用例），⛔ 没有"六枚"这个数；4 枚里 3 枚真直接调 store，1 枚（`:58`）只走 `q.push` 后比对 `it.bind` 与自算摘要。**4 枚无一枚调用 `q.allow` / `allowScoped` / `DecideFromNative`**（该文件 `grep -n 'Allow(\|allowScoped\|DecideFromNative'` 零命中）⇒ 票面那句"测不到生产路由会不会让它比出不同值"成立 | `internal/agent/approval/ticket242_binding_test.go:20-21`（`newGrantStore` + `s.issue("nonce-live", …)`）、`:23`（`s.spend("nonce-live", …)` 递不匹配摘要）、`:39-40`、`:48-50`、`:104` = `	if itA.grants.spend("leaked-or-guessed-nonce", itB.bind) {`；自指复算在 `:71` = `	want := bindDigest(itA.Corr, d.TaskID, d.Tool, d.LevelString(), itA.Seq, d.Args)`（票面引的 `:71` 无漂移）。票面那个"六枚"若在指本文件 + `ticket242_panelface_test.go`（2 枚反射尺，`:30`、`:53`），那 2 枚根本不碰 store ⇒ **无论怎么凑，"六枚都直接调 store"这句话在盘上对不上**，属现量 5 的缺陷 |
+| 5 | `ticket242_binding_test.go` 那**六枚**用例直接调 store、自己递不匹配的 `bind`，测不到生产路由 | **半真**：性质真、**枚数不真**。该文件在盘上是 **4 枚** `Test*` 函数（`grep -c '^func Test'` = 4，无 `t.Run` 子用例），⛔ 没有"六枚"这个数；写它的交付 commit `4bf7e683` 自带的信息里逐字写的就是"四枚用例"与"含新 4"。4 枚里 3 枚真直接调 store，1 枚（`:58`）只走 `q.push` 后比对 `it.bind` 与自算摘要。**4 枚无一枚调用 `q.allow` / `allowScoped` / `DecideFromNative`**（该文件 `grep -n 'Allow(\|allowScoped\|DecideFromNative'` 零命中）⇒ 票面那句"测不到生产路由会不会让它比出不同值"成立 | `internal/agent/approval/ticket242_binding_test.go:20-21`（`newGrantStore` 后 `issue`，两枚实参都是文件里写死的 fixture 字面量：一枚假 nonce、一枚"别的 item 的摘要"，本件按规矩只写形状不抄其字节）、`:23`（`spend` 递**不匹配**摘要）、`:27`/`:43`（拒后 `live()` 必须归零的断言）、`:29`（同 nonce 再花一次必失败）、`:34` 那枚里 `:39-40`（空摘要必拒）与 `:48-50`（精确摘要必通）、`:58` 那枚走 `q.push`（`:64`、`:78`）只读 `it.bind`、`:87` 那枚走 `q.push` 后**仍直调 store**（`:104`，receiver 是 `itA.grants`、实参二是 `itB.bind`）。自指复算在 `:71` = `	want := bindDigest(itA.Corr, d.TaskID, d.Tool, d.LevelString(), itA.Seq, d.Args)`（票面引的 `:71` 无漂移）。票面那个"六枚"若在指本文件 + `ticket242_panelface_test.go`（2 枚反射尺，`:30`、`:53`），那 2 枚根本不碰 store ⇒ **无论怎么凑，"六枚都直接调 store"这句话在盘上对不上**，属现量 5 的缺陷 |
 | 6 | 四发突变的读数（M-B／M-C3／M-D2／M-E），编排者自述"我只复认了结构、读数在它表里" | **结构复认真／读数本腿判不动**（读数要跑 `go test`，本腿禁跑 ⇒ 见 §7） | M-B 引的 `queue.go:235` 现量逐字 = `	return q.byID[corr]`（允许侧可见面的全部，真）；M-C3 的根因复认真：`queue.go:147-153` 里 `corr` 为空时落 `"approval-" + strconv.FormatUint(q.seq, 10)`，所以同一 `Decision` 连推两枚必然拿到**不同 corr**，摘要在 seq 被消掉后仍不同（`:78` 那枚测试正是这么写的）；M-D2 复认真：出向读面名单 `ticket242_panelface_test.go:21-28` 是**裸字符串名**列表，`:59` 的禁用词只有 `{"grant","allow","approve","nonce","token"}`，`Permitted` 一枚都不沾 ⇒ "改名即绕过"是结构事实；M-E 复认真：`ui.go:167-171` 的 `PanelAPI` 今天只有 `Reject`/`Head`/`View`，**无 `Allow`** |
 | 7 | 载具前置没做：`subagent_selfapproval_197_test.go:109` 仍是 `TaskID == CorrelationID` | **真，行号无漂移** | `cmd/wisp/subagent_selfapproval_197_test.go:109` = `			TaskID: taskID, CorrelationID: taskID,`（全仓 `grep -n 'TaskID: taskID, CorrelationID: taskID'` 只命中这一行） |
 
@@ -260,11 +260,91 @@ happened** in user-safe terms"，而签名是 `func (s *grantStore) spend(nonce,
 
 ## §6 我可能写错的条目（自我对抗）
 
-尚未作答。
+1. **"唯一可达写点"是靠 grep 组合撑的，不是靠类型系统。** 我用的四发是
+   `\.bind = ` / `qitem\{` / `&it\.bind|&fresh\.bind` / `unsafe|linkname|reflect`，根都在
+   `cmd internal tools scripts`。如果将来有第五种形状（例如把 `bind` 改名成别的字段、
+   或把 `qitem` 内嵌进另一枚 struct 让 `qitem.bind` 变成 `outer.item.bind`），
+   第一发 `\.bind = ` 仍能抓到（改名就不是 `.bind` 了，但那时"写点名册"这题的答案本身也变了）。
+   ⇒ 本件的措辞是"锚点 `3138e012` 上"，⛔ 不是"永远"。
+2. **"经路由的调用走不到 `queue.go:368` 的不等分支"这句最容易被推翻，也最要紧。**
+   我的凭据是"两枚 `it.state =` 写点（`:304`、`:330`）都在同一临界区内紧跟 `dropLocked`，
+   而 `dropLocked` 在 `:286` 删 `q.byID`"。推翻它只需要第三种状态写点，或一处
+   **不持 `q.mu` 就写 state** 的码。我把全部写点列完了（`grep -rn 'it\.state = ' internal/agent/approval`
+   非测试只有那两行）。⚠ 但我**没有**验证"重入"这条：`push` 在持锁状态下调用 `q.logf`
+   （`queue.go:166-167`），若某枚 logf 实现回调进 `Queue` 的任何加锁方法，结果是**死锁**而不是
+   状态被插队——死锁是 fail-stop，造不出"byID 里有非 pending item"。所以这句我认账，
+   但它的强度是"码上读出来的"，不是"插桩证明的"（见 §7 第 3 条）。
+3. **我把 `deliver` 的守卫（`queue.go:301-303`）说成"真在跑的那道"，依据是 `allowScoped`
+   在 `queue.go:377` 解锁、`:382` 才重新上锁这段窗口。**这段窗口里另一发并发答复确实可能先落。
+   我**没有**量出任何一枚在册用例覆盖了这发竞态——所以"真在跑"应读作"码上可达"，
+   不读作"今天被证明过"。
+4. **"托盘没有 allow 项"我只读了 `internal/ball/tray_windows.go:86/88/89/91` 那四枚
+   `appendItem`。**如果有第二处构造托盘菜单的码，我的"零"就漏了。
+   复核方式：`AppendMenuW` 的绑定声明在 `internal/ball/win32_windows.go:45`，
+   其非测试使用者本腿只量到 `internal/ball/tray_windows.go` 一枚。
+   ⇒ 这条我认，但射程是"ball 这一包的托盘"，不是"任何 GUI"。
+5. **"`NativeAPI.Allow` 零产码调用者"这句依赖 `grep -rn '\.Native()' cmd internal tools`。**
+   另一种形状是"把 `NativeAPI` 当参数/字段类型接住再调 `.Allow(...)`"，本腿也扫了
+   `NativeAPI` 这个词本身——非测试命中只有 `internal/agent/approval/gate.go:616`（返回类型）
+   与 `internal/agent/approval/ui.go:143`（接口声明）加若干注释，**没有任何字段或参数以它为类型**。
+   ⇒ 这句认账。
+6. **§1·现量 5 那条"枚数不真"可能是我对"用例"的理解窄。**我按 `^func Test` 计数（4）。
+   若把一次测试函数里的多个断言各算一枚，"六枚"也凑得出来（`:23`、`:29`、`:40`、`:50`、`:72`、
+   `:104` 恰好六发断言级判断）。⚠ 但票面原话是"那六枚**用例**"，而写这枚文件的 commit
+   `4bf7e683` 的自带信息里逐字写的是"四枚用例"与"含新 4"，所以我维持"枚数不真"这一判，
+   只把另一种读法写在这儿。
+7. **同名文件陷阱我已经踩过一次并改正**：`find . -name approval.go` 给出两枚——
+   `internal/agent/approval/approval.go` 与 `internal/panel/approval.go`。本件里凡出现
+   裸 `approval.go:NNN` 一律指前者；后者本腿**一次都没引用过**。
+   ⚠ §0/§1 的早期草稿里有若干短引，本条就是那条短引的豁免说明——AC#1 的复核者若按
+   `internal/panel/approval.go` 去核行号会看到完全不同的内容，那是同名陷阱不是读数错。
+8. **"恒等式"这个词我只在"存进去的那份摘要与花掉时传进去的那份摘要同值"这一格用。**
+   我没有、也不能把它读成"摘要覆盖了实际执行的那一发请求"。后者要的是 `bindDigest`
+   的六个入参在**答复时刻**重算，而答复侧连 tool/args 都不带（§3.2 末段）。
+   这一格若被误读，AC#1 会选错支，所以 §8 把它单列成一句话。
+9. **读数锚点之后的三枚写腿**（`cmd/wisp`＋`internal/config`、`internal/tools`＋`internal/risk`、
+   `internal/panel`）此刻在飞。按票面它们都不带 `internal/agent/approval` 的写面，
+   但 `internal/panel` 与 `cmd/wisp` 的**编译**会带上这包——所以本件说的"今天"是
+   `3138e012` 那一刻的码面；AC#1 动手前应当重取同一批发点（§7 第 5 条）。
 
-## §7 量不到的地方（具名）
+## §7 量不到的地方（具名，⛔ 不填推测）
 
-尚未作答。
+本腿第一硬规是"一枚 Go 命令都不许跑"（三枚写腿在飞：`cmd/wisp`＋`internal/config`、
+`internal/tools`＋`internal/risk`、`internal/panel`）。下面每一条都是**只有跑起来才有读数**的，
+本腿一律留空并注明该跑什么；⛔ 没有一条我用"应该／大概"去填。
+
+1. **现量 6 的四发突变读数全部量不到**：M-B 的"同发 12 枚在册路由级用例红"、
+   M-C3 的"全包 66 PASS"、M-D2 的"66 全绿"、M-E 的"本包仍 66 PASS／0 FAIL"，
+   以及"已验非编译失败冒充红"那半句。需要的命令＝`go test ./internal/agent/approval/...`
+   逐发突变跑。⇒ 本件只在 §1·现量 6 那行给了**结构复认**（引用的行号与码形状对不对），
+   颜色与枚数一格未填。
+2. **"approval 包今天到底多少枚在册用例"这个分母量不到**（66？45？）。
+   写 `4bf7e683` 的自述是"45 PASS"，票面 259 现量 6 引的是"66"，两数差 21 枚
+   ⇒ 这 21 枚是不是 `ticket242_panelface_test.go`（2 枚）与今天新落的几枚文件造成的，
+   只有 `go test -run . ./internal/agent/approval/ -v` 数得出来。本腿只登记两数并存这一事实。
+3. **覆盖／可达性的插桩读数量不到**："经路由的调用走不到 `queue.go:368` 不等分支"、
+   "`approval.go:303` 的 false 支今天零生产触发"这两句，我给出的是**码面推理**（§4.3、§5.2），
+   不是插桩证明。要钉死需要 `go test -cover` 或一发**路由级**突变（把 `:368` 的判断取反看有没有用例红）。
+4. **并发语义实测量不到**：`allowScoped` 在 `queue.go:377` 解锁、`:382` 重锁这段窗口里
+   两发并发 allow 的真实落点，需要 `go test -race` 加一发定向竞态用例。
+   ⛔ 本腿不声明"没有竞态问题"，只声明"这发窗口在码上存在，实测读数取不到"。
+5. **写腿在飞的漂移**：`internal/agent/approval/{queue.go,approval.go,ui.go,gate.go}` 的
+   mtime 是今天 09:16–09:26（`ls -la` 现量），本腿锚点 `3138e012` 在其后。
+   这三枚写腿的**下一步提交**是否改动这包，量不到（也不该由我判断）——
+   票面「排程与互斥」自己写了"internal/panel 与 cmd/wisp 编译都会带上 internal/agent/approval"。
+   ⇒ AC#1 落地前必须重取本件 §2/§3 那两批发点。
+6. **票面 M-D2／M-E 那两支"改名即绕过／能力侧零仪器"的完整作用面量不到**：
+   要判"改名的字段／新增的方法名能不能被现有尺抓到"，除了我已经读到的
+   `internal/agent/approval/ticket242_panelface_test.go:21-28`（裸字符串名单）与
+   `:59`（五个禁用词），还得知道**别的包里**有没有第二枚数 `PanelItem` 字段或
+   `PanelAPI` 方法名的尺。我只在 `internal/panel/l2_grant_boundary_test.go` 里读到它管的是
+   **入站方法名名单**（`:229`、`:1252-1255` 那几枚表），⛔ 它不管 `approval.PanelItem` 的字段，
+   也不管 `PanelAPI` 的方法集。⇒ 这一条是**射程判断，非内容引用**
+   （那三枚冻结件我只读内部判射程，本件不引其内容，且其中出现的从前端侧借来的方法名字面
+   本腿一律未去核对、未转述）。
+7. **`equalSecret`（`internal/agent/approval/approval.go:266-271`）的恒定时间性质在本机
+   是否真成立**（编译器有没有把 `subtle.ConstantTimeCompare` 优化掉）量不到：
+   要读汇编或跑微基准。本腿只登记"它用了 `crypto/subtle`、空串早退"这一码面。
 
 ## §8 结论（恒等式成立／不成立 + 凭据行号）
 
