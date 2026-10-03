@@ -233,7 +233,49 @@
 
 ## §5 我推翻前人（含编排者 `A560`）哪几句
 
-逐句指认：哪一句、原文在哪、我的反证 `file:line`、我为什么认为它过期或不成立。
+逐句指认：哪一句、原文在哪、我的反证 `file:line`、我为什么认为它过期或不成立。共 **6 指＋1 组复认**。
+
+### 5.1 票面 `:9`／台账 `A560` §1② 「Win32 注册全仓产码只有一枚调用点」——量词是尺的射程喂出来的
+
+- 原句（票面 `.scratch/wisp/issues/260-*.md:9`）：尺写作 `grep -rn "pRegisterHotKey" --include=*.go internal cmd | grep -v _test`，结论写作「**全仓**产码只有一枚调用点」。
+- 反证一（射程外真有第二枚调用点）：`scripts/spike/common/winshell.go:437` 逐字 `r1, _, _ := pRegisterHotKey.Call(uintptr(owner), 0x5702, uintptr(c.mods), uintptr(c.vk))`（proc 声明在 `scripts/spike/common/winshell.go:45`）。这把尺的射程是 `internal cmd`，`scripts/**` 从未进过它。
+- 反证二（**射程内**也漏了一枚，而且是尺的名字决定的）：`cmd/wisp/testdata/esclistener/main.go:243` 逐字 `r, _, e := procRegisterHotKey.Call(hwnd, spareHKID, modNoRepeat, vkEscape)`，proc 声明在 `:71` `procRegisterHotKey = user32.NewProc("RegisterHotKey")` —— 该文件的变量前缀是 `proc` 不是 `p`，模式 `pRegisterHotKey` **结构上不可能命中它**。
+- 正控（证明不是我在瞎猜）：同一射程、同一文件，把模式换成 `RegisterHotKey` ⇒ `cmd/wisp/testdata/esclistener/main.go` 命中 `:71`／`:190`／`:243` 三处（我现跑 `git grep -n "RegisterHotKey" -- '*.go' | grep -v '^\.scratch'` ⇒ **28 命中**，尺明显不瞎）。
+- 为什么这一条值得推翻而不只是"措辞"：① 那句"只有一枚调用点"若被下一枚腿读成"改借用体不用看别处"，它会**漏掉唯一一枚现成的"吃 mods＋vk 参数"的注册手**（`scripts/spike/common/winshell.go:437`），而票 245 AC#9（`.scratch/wisp/issues/245-*.md:68`）缺的正是"第二个进程真收到 Esc"那套台件；② "全仓"与"出厂树"不是一回事，本票的 AC#3 越界检查按路径判，措辞按"全仓"写会让人以为 `scripts/**` 也在写面里。
+
+### 5.2 台账 `A560` §1① 「`RebindHotkeys` 的非测试调用者只有 `cmd/balldebug/main.go:237`」——指认对象错位
+
+- 我复跑那把尺的字面：`grep -n RebindHotkeys cmd/wisp/*.go | grep -v _test` ⇒ **0 命中（rc=1，与台账一致）**；但 `grep -rn RebindHotkeys cmd/balldebug/main.go` ⇒ **也 0 命中**。
+- 现读的真实形状：`cmd/balldebug/main.go:237` 调的是 `ball.NewHotkeyReloader(...)`；`RebindHotkeys` 的**唯一非测试调用者在桥里面**＝`internal/ball/hotkey_reload.go:96` `rep := r.binder.RebindHotkeys(cfg)`（接口声明 `internal/ball/hotkey_reload.go:45`，实现 `internal/ball/ball_windows.go:813`）。
+- 对本票的后果（不是抠字眼）：AC#1 选形ⓐ 时**能接的缝是 `HotkeySource` 闭包＋`HotkeyReloader`**（`cmd/balldebug/main.go:237-242` 就是现成样板），不是"在 `cmd/wisp` 里直接调 `RebindHotkeys`"；把账记成"balldebug 调 RebindHotkeys"会让落地腿去找一条不存在的调用边。
+
+### 5.3 票面 `:11` 「任何"四枚热键都以配置为准"的句子今天**只对三枚成立**（summon／mute／panel）」——出厂主机里是**一枚都不成立**
+
+- 反证：`cmd/wisp/resident_ball_windows.go:165` `b, err := ball.New(ball.Options{` → `:171` 逐字 `Hotkeys:  ball.DefaultHotkeys(),` ⇒ 出厂那三枚（summon／mute／panel）注册的也是**编译默认值**，与 `config.toml` 无关；库内还会再兜一层（`internal/ball/ball_windows.go:153-154`）。
+- "三枚成立"这一读法**只在旁支调试主机上真**：`cmd/balldebug/main.go:237-242`（`-config` 才走，见该文件 `:228-229` 自述「Without -config the ball keeps the compiled defaults and no config poll runs」）。
+- 为什么算推翻：AC#1 若走形ⓑ（"把不生效说到明处"），要说的是**四枚都不吃配置**（外加 `cmd/wisp/config_readers_255.go:113` 名册行今天就把 `"hotkey"` 归类为「debug host only」），写成"只有 cancel 一枚不生效"会让回执在出厂主机上说出半假话——这正是票 260 面 `:17` 自己禁止的形状。
+
+### 5.4 票 245 `:60` AC#2 条件②（其结论仍被 `A560` §1 使用）「出厂常驻进程既没有卡片、也就永远走不到"借"那一支」——已被票 246 取代，本票因此不是"将来式"
+
+- 反证：`cmd/wisp/resident_approval_windows.go:441` 逐字 `b.TakeEscForCancel()`，守卫在它上面两行（`:439-440` `if p.Level == "L1" {`），调用点是"卡片显示完之后"那一手（同一函数体 `:438` `u.ra.cards.Record(p)`）；`cmd/wisp/resident_ball_windows.go:132-136` 逐字自述「Since ticket 246 the Confirming borrow is reachable FROM this leg … that card's Prompt is what calls Ball.TakeEscForCancel」。
+- 边界要说准（免得我反向写歪）：**L2 队列卡不借**——同一处注释 `cmd/wisp/resident_ball_windows.go:139` 逐字「an L2 queue card does not borrow the key at all」。
+- 对本票的后果：票 260 面 `:5` 那句「⚠ 算产品行为——用户会以为那枚键能用」**今天就已经成立**，不用等票 228/258 把配置接进 `Options.Hotkeys`：**每一发 L1 卡都在借一枚用户根本没配的裸 Esc**。AC#0 的判语因此从"链路上无载体"升级为"链路上无载体 ＋ 该链路现在每次确认都会走"。
+
+### 5.5 票面 `:10` 的两枚行号指认——一处错位、一处区间切窄
+
+- 「`:521` `escBorrowAcc`」⇒ 现跑：`:521` 是注释首行，声明在 **`internal/ball/hotkey_windows.go:524`**。
+- 「借还成对体在 `internal/ball/ball_windows.go:875-901`」⇒ 现跑：借体 **`:873-889`**、还体 **`:895-907`**；`875-901` 恰好把 `:902-907` 关在区间外，而 `:904`（`cancelIdleLine(b.cancelBinding)`）是**全仓唯一一处归还时读配置串**的行 ⇒ 拿票面区间去判"还的那一遍读不读配置"会得出与盘上相反的结论（详见 §2.4 表第 5 行）。台账 `A560` §1② 用的是同一枚区间，同一处错位。
+
+### 5.6 新指认（票面与 `A560` 都没提）：idle 日志把"键名"和"配置值"并列，出厂时**永远暴露不出断链**
+
+- 落点：`internal/ball/hotkey_windows.go:444-446`，逐字「cancel hotkey left unbound while idle: Esc is borrowed only during Confirming and handed back at session end (ticket 245)」＋字段 `"binding", b.Binding`。
+- 现跑口径：出厂主机里 `b.Binding` 恒等于默认 `"Esc"`（`cmd/wisp/resident_ball_windows.go:171` → `internal/ball/hotkey_windows.go:69`），所以这条句子**今天自洽**；一旦票 228/258 把 `[hotkey]` 接进 `Options.Hotkeys`，同一行会开始打印「用户配的组合键」＋句子里写死的「Esc」＝**一枚用户看得见的自相矛盾句**。
+- 为什么值得记：这是形ⓑ（"说到明处"）**最省的一枚落点**——它就在那条已经在打的日志里；也是票面 `:17` 那句"⛔ 不许留'四枚都吃配置'这类句子"目前在盘上唯一会**主动说谎**的那一处文案候选（另一处候选：`internal/agent/approval/approval.go:90` `ChannelEsc: "按 Esc 键",`）。
+
+### 5.7 复认成立（不推翻，逐枚现跑）
+
+`internal/ball/hotkey_windows.go:458`「The one slot an idle ball must not register」✓；`:118` `vkEscape = 0x1B` ✓；`:365` `case HotkeyLive, HotkeyDisabled, HotkeyStandby:`（`Standby` 不进 `Problems()`）✓；`internal/agent/approval/gate.go:319`/`:332`/`:338` 与 `internal/agent/approval/queue.go:116` ✓（票面 `:12` 全部成立）；`internal/ball/hotkey_windows.go:69` 默认仍是 `Cancel: "Esc"` ⇒ 票 245 AC#1 那句"未触碰 C12／D43"今天仍成立，`docs/PLAN.md:3082` 一字未动（本件零写）。
+
 
 ---
 
