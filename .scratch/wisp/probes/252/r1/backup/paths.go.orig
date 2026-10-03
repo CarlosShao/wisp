@@ -124,63 +124,7 @@ func (p *PathCanonicalizer) Canonicalize(raw string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// Ticket 252 AC#2: the same-form step, one place before the two
-	// containments run. C26's handle query (the step that expands 8.3 short
-	// names) only answers for paths that exist, so a name that does not exist
-	// yet came back here in whatever spelling the caller used, while an
-	// [fs] allowed_dirs root - always an existing tree - went into the book
-	// fully expanded. One physical path therefore reached InAllowlist as two
-	// shapes, and the 252-p1 reading (paths_shortname_252_probe_test.go)
-	// measured which leg notices: the lexical one at paths.go:140 says false
-	// while resolvedForm at paths.go:152 says true for the SAME input, so an
-	// fs.write creating a new file inside an allowed root was judged out of
-	// scope, became R2, and paid for an L2 card.
-	//
-	// The alignment adds no normalization: it calls the resolvedForm this file
-	// already uses and re-spells only the part of the chain the OS can confirm,
-	// which is the same folding allowed_dirs roots already went through. The
-	// two containments and the "unresolvable means unauthorized" branch below
-	// are deliberately untouched, so this cannot widen any layer: the value it
-	// produces is one resolvedForm already vouches for.
-	if res.Resolved {
-		return res.Canonical, nil
-	}
-	return sameFormOfUnresolved(res.Canonical), nil
-}
-
-// sameFormOfUnresolved re-spells a canonical C26 could not confirm, which - on
-// the only shipping platform - means a path whose chain breaks at a component
-// that does not exist yet (a write creating a file, a mkdir not yet made).
-// Everything the OS does answer for is put into its own spelling and the missing
-// remainder is re-appended verbatim, exactly the shape ticket 124's
-// syncSet.resolveTarget (risk/syncdirs.go) already uses for write verdicts.
-//
-// It returns the input untouched whenever there is nothing to align:
-//   - platforms without an 8.3 namespace and without handle resolution, where
-//     this file's comparisons have always run on the lexical spelling and must
-//     stay byte-identical (the branch is a compile-time constant, as in
-//     unifySeparators);
-//   - a canonical that exists but whose handle query failed (ACL, offline
-//     volume): C26's own answer stands, this is not a spelling question;
-//   - a chain the resolver refuses to walk ("there, but I could not look
-//     through it"), or an extended-prefix / UNC shape the pipeline's UNC step
-//     never produced. Here the original spelling is kept and InAllowlist's
-//     !ok branch goes on refusing it - fail-closed, unchanged.
-func sameFormOfUnresolved(canonical string) string {
-	if filepath.Separator != '\\' || canonical == "" {
-		return canonical
-	}
-	if _, err := os.Lstat(canonical); !errors.Is(err, os.ErrNotExist) {
-		return canonical
-	}
-	if strings.HasPrefix(canonical, `\\?\`) || strings.HasPrefix(canonical, `\\`) {
-		return canonical
-	}
-	rf, ok := resolvedForm(canonical)
-	if !ok || rf == "" || strings.HasPrefix(rf, `\\?\`) {
-		return canonical
-	}
-	return rf
+	return res.Canonical, nil
 }
 
 // InAllowlist implements risk.PathCanonicalizer against already-canonical

@@ -1,0 +1,196 @@
+time=2026-10-03T09:26:41.525+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket252R1ShortSpellingOfNewFileIsAuthorized
+    paths_shortname_252_r1_test.go:76: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_r1_test.go:79: root long : "D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_r1_test.go:80: root short: "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+=== RUN   TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A1_roots=LONG_asked=SHORT+missing-leaf
+    paths_shortname_252_r1_test.go:98: CASE A1 roots=LONG asked=SHORT+missing-leaf
+    paths_shortname_252_r1_test.go:98:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_r1_test.go:98:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   risk.Resolve        : err=<nil> Canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   NOTE: Canonicalize and risk.Resolve disagree: "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:98:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:98:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" ok=true
+    paths_shortname_252_r1_test.go:98:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : true
+    paths_shortname_252_r1_test.go:98:   FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A2_roots=SHORT_asked=LONG+missing-leaf
+    paths_shortname_252_r1_test.go:98: CASE A2 roots=SHORT asked=LONG+missing-leaf
+    paths_shortname_252_r1_test.go:98:   roots as configured : ["D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"]
+    paths_shortname_252_r1_test.go:98:   asked raw           : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   risk.Resolve        : err=<nil> Canonical="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:98:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:98:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" ok=true
+    paths_shortname_252_r1_test.go:98:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : true
+    paths_shortname_252_r1_test.go:98:   FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A3_roots=SHORT_asked=SHORT+missing-leaf
+    paths_shortname_252_r1_test.go:98: CASE A3 roots=SHORT asked=SHORT+missing-leaf
+    paths_shortname_252_r1_test.go:98:   roots as configured : ["D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"]
+    paths_shortname_252_r1_test.go:98:   asked raw           : "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   risk.Resolve        : err=<nil> Canonical="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   NOTE: Canonicalize and risk.Resolve disagree: "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:98:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:98:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" ok=true
+    paths_shortname_252_r1_test.go:98:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : true
+    paths_shortname_252_r1_test.go:98:   FIRST FAILING LEG              : none: both legs hold
+=== RUN   TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A4_roots=LONG_asked=LONG+missing-leaf
+    paths_shortname_252_r1_test.go:98: CASE A4 roots=LONG asked=LONG+missing-leaf
+    paths_shortname_252_r1_test.go:98:   roots as configured : ["D:\\work\\workspace\\projects plans\\Wisp"]
+    paths_shortname_252_r1_test.go:98:   asked raw           : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   risk.Resolve        : err=<nil> Canonical="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:98:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:98:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md" ok=true
+    paths_shortname_252_r1_test.go:98:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : true
+    paths_shortname_252_r1_test.go:98:   FIRST FAILING LEG              : none: both legs hold
+--- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A2_roots=SHORT_asked=LONG+missing-leaf (0.00s)
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A3_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A4_roots=LONG_asked=LONG+missing-leaf (0.00s)
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame
+    paths_shortname_252_r1_test.go:107: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/Wisp
+    paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=true leg2=true final=true
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/docs
+    paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp\\docs" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs"
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=true leg2=true final=true
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/tools
+    paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools"
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=true leg2=true final=true
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.03s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/Wisp (0.01s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/docs (0.01s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/tools (0.01s)
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization
+    paths_shortname_252_r1_test.go:163: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization/N1_sibling_tree,_long
+    paths_shortname_252_r1_test.go:198:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:198:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\q252r1-no-such-tree\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:198:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\q252r1-no-such-tree\\q252r1-out-of-scope.md" ok=true
+    paths_shortname_252_r1_test.go:198:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\q252r1-no-such-tree\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:198:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:198:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization/N2_sibling_tree,_short_spelling_of_the_parent
+    paths_shortname_252_r1_test.go:198:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:198:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\q252r1-no-such-tree\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:198:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\q252r1-no-such-tree\\q252r1-out-of-scope.md" ok=true
+    paths_shortname_252_r1_test.go:198:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\q252r1-no-such-tree\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:198:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:198:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization/N3_the_root's_own_parent
+    paths_shortname_252_r1_test.go:198:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:198:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:198:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\q252r1-out-of-scope.md" ok=true
+    paths_shortname_252_r1_test.go:198:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:198:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:198:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization/N4_the_root's_parent_spelled_short
+    paths_shortname_252_r1_test.go:198:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:198:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:198:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\q252r1-out-of-scope.md" ok=true
+    paths_shortname_252_r1_test.go:198:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:198:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:198:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization/N5_one_character_off_the_root's_tail
+    paths_shortname_252_r1_test.go:198:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:198:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp-evil\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:198:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp-evil\\q252r1-out-of-scope.md" ok=true
+    paths_shortname_252_r1_test.go:198:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp-evil\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:198:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:198:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization/N6_a_name_on_a_volume_that_is_not_there
+    paths_shortname_252_r1_test.go:198:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:198:   foldPath(canonical)           : "z:\\q252r1-dead-volume\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:198:   resolvedForm(canonical)        : "Z:\\q252r1-dead-volume\\q252r1-out-of-scope.md" ok=true
+    paths_shortname_252_r1_test.go:198:   foldPath(resolvedForm)         : "z:\\q252r1-dead-volume\\q252r1-out-of-scope.md"
+    paths_shortname_252_r1_test.go:198:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:198:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:198:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization/N7_inside_the_root_but_unresolvable
+    paths_shortname_252_r1_test.go:214:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_shortname_252_r1_test.go:214:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r1<invalid>:*?.md"
+    paths_shortname_252_r1_test.go:214:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:214:   resolvedForm(canonical)        : "" ok=false
+    paths_shortname_252_r1_test.go:214:   foldPath(resolvedForm)         : ""
+    paths_shortname_252_r1_test.go:214:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:214:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:214:   FIRST FAILING LEG              : LEG 2 resolvedForm (paths.go:152-153)
+=== NAME  TestTicket252R1AlignmentAddsNoAuthorization
+    paths_shortname_252_r1_test.go:232: short ask roots check
+--- PASS: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N1_sibling_tree,_long (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N2_sibling_tree,_short_spelling_of_the_parent (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N3_the_root's_own_parent (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N4_the_root's_parent_spelled_short (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N5_one_character_off_the_root's_tail (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N6_a_name_on_a_volume_that_is_not_there (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N7_inside_the_root_but_unresolvable (0.00s)
+=== RUN   TestTicket252R1CanonicalStillNamesOneTree
+    paths_shortname_252_r1_test.go:248: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.085s

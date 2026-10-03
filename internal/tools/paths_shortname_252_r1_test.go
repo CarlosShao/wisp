@@ -172,24 +172,36 @@ func TestTicket252R1AlignmentAddsNoAuthorization(t *testing.T) {
 		asked    string
 		why      string
 	}{
-		{name: "N1 sibling tree, long", rootsCfg: []string{long},
+		{
+			name: "N1 sibling tree, long", rootsCfg: []string{long},
 			asked: parent + pathSep + "q252r1-no-such-tree" + pathSep + leaf,
-			why:   "a sibling of the allowed root is not the allowed root"},
-		{name: "N2 sibling tree, short spelling of the parent", rootsCfg: []string{long},
+			why:   "a sibling of the allowed root is not the allowed root",
+		},
+		{
+			name: "N2 sibling tree, short spelling of the parent", rootsCfg: []string{long},
 			asked: shortParent + pathSep + "q252r1-no-such-tree" + pathSep + leaf,
-			why:   "an 8.3 alias above the root must not become a way in"},
-		{name: "N3 the root's own parent", rootsCfg: []string{long},
+			why:   "an 8.3 alias above the root must not become a way in",
+		},
+		{
+			name: "N3 the root's own parent", rootsCfg: []string{long},
 			asked: parent + pathSep + leaf,
-			why:   "a root authorizes its subtree, not its parent (ticket 107's boundary guard)"},
-		{name: "N4 the root's parent spelled short", rootsCfg: []string{short},
+			why:   "a root authorizes its subtree, not its parent (ticket 107's boundary guard)",
+		},
+		{
+			name: "N4 the root's parent spelled short", rootsCfg: []string{short},
 			asked: shortParent + pathSep + leaf,
-			why:   "same question with the root configured by its alias"},
-		{name: "N5 one character off the root's tail", rootsCfg: []string{long},
+			why:   "same question with the root configured by its alias",
+		},
+		{
+			name: "N5 one character off the root's tail", rootsCfg: []string{long},
 			asked: long + "-evil" + pathSep + leaf,
-			why:   "component boundaries may not fold into a prefix match"},
-		{name: "N6 a name on a volume that is not there", rootsCfg: []string{long},
+			why:   "component boundaries may not fold into a prefix match",
+		},
+		{
+			name: "N6 a name on a volume that is not there", rootsCfg: []string{long},
 			asked: `Z:\q252r1-dead-volume\` + leaf,
-			why:   "unresolvable means unauthorized: paths.go:153's !ok leg must keep refusing"},
+			why:   "unresolvable means unauthorized: paths.go:153's !ok leg must keep refusing",
+		},
 	}
 	for _, c := range cases {
 		c := c
