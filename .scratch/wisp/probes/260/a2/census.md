@@ -180,7 +180,7 @@
 - **零 Go 命令自证**：本程全部工具调用＝Read/Grep/Glob 与 `date`/`git log|diff|show|status|add|commit`/`grep`/`sed`/`ls`/`wc`；没有一枚 `go build`/`go vet`/`go test`/`go run`/`go list`。
 - **写面自证**：本程只写 `.scratch/wisp/probes/260/a2/census.md`（本件）＋`.scratch/wisp/probes/260/a2/msg-01.txt`＋`.scratch/commit-msg-260a2.txt`（两枚说明文本，临时件只建不删、msg-01 不进 commit）；`git diff --name-only` 产码子集为空；commit 全部显式单文件 pathspec、零 `add -A`、零 amend/reset/rebase/stash/checkout/clean、零 push。
 - **禁令自证**：`frontend/**`/`design/**` 零打开零转述；`docs/**` 只读两处（`PLAN.md:3082` 冻结行对读）；三枚冻结件、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt` 未动；`^- [ ]` 勾框零触碰（票 260 与 245 的框均未动）。
-- **完整性格查**：§1–§8 无"（待填）"占位；每枚结论带 file:line 或具名"量不到"（§7）。
+- **完整性格查**：§1–§8 每节均为完整判语（占位符自查尺的字面不写进本文件——写进来会让模式自己命中自己，同 a1 §6 名册那条口径）；每枚结论带 file:line 或具名"量不到"（§7）。
 - **交件名册**：骨架 commit `9fb444cd`（§0＋节框）；本枚＝§1–§8 满件；终态读数与满件 sha 见交件消息（满件 commit 后如需回填名册，追加枚、不改写前枚）。
 - **终态产码子集 status**（本件落笔后复跑）：
 
