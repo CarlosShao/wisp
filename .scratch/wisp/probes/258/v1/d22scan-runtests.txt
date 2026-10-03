@@ -1,0 +1,5 @@
+# ./tools/d22scan
+main module (github.com/CarlosShao/wisp) does not contain package github.com/CarlosShao/wisp/tools/d22scan
+FAIL	./tools/d22scan [setup failed]
+FAIL
+runtests.sh: go test exited 1 - packages=[./tools/d22scan/] top-level: PASS=0 FAIL=0 SKIP=0, === RUN=0, '[no tests to run]'=0
