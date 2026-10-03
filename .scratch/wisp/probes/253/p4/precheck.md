@@ -110,12 +110,32 @@
 
 ## §4 我可能写错的条目（自我对抗）
 
-（取数中）
+1. **want-4 双锚里 `:517` 的可达性**：`:517` 在 `TestPlantedGitToolShapesGoRed` 内、读的是**真 bridge.go**（"clean half must stay quiet"）。我判形ⓑ（往真 bridge.go 加 `panel.` 名）会**同时**红 `:385`（主尺）与 `:517`（正控尺的干净半）。若落地腿把第五名加进 `wantMethods`/plant 而只修一处，另一处仍红——这条我按"两枚都读真树"判，未实跑，落地须复跑确认二者同红。
+2. **"没有既有尺数测试文件字面"是靠排除法，不是穷举**：已核 `gitToolNamesUnder` 跳 `_test.go`（`git_test.go:464`）、`whitelistMethodsFromSource` 只点名单文件、`scanRendererHostDoors` 只走 `frontend/src`、**l2 的产码枚举亦跳 `_test.go`（`l2_grant_boundary_test.go:369` `strings.HasSuffix(p,"_test.go")` → 只 AST 产码）**。⇒ 形ⓐ新测试文件确不进任何 want。但 `tools/d22scan`（CI，非 `go test`）本腿**未读其源**，我"ⓐ 不是契约变更"那句里对 d22scan 的判断**仅据 AGENTS.md §1.2 的禁止清单**（其中无"尺射程"一项），非现读——列为〔半量〕。
+3. **emoji/仪器射程**：新尺若把 `config.get` 之类当**串面**种进测试，`d22scan` 的 emoji 尺"注释豁免、字符串不豁免"——但那是 emoji 维，与方法名无关；我未在新尺设计里引入 emoji，若落地腿引入则另论。低风险，登记不裁。
+4. **AC#1 复用的"活文档确有 `window.wispDispatch`"前提**：`startPanelForTest`→真 `PanelManager`→产码 `Bind("wispDispatch")`，逻辑上门必在；但 embed 未构建的树里 AC#13 自己 `t.Skipf`（`:317`）。⇒ 我"生产门可达性已被 AC#13/AC#14 行为覆盖"这一推翻，**成立与否取决于测试机上 bundle 是否已构建**（运行时事实，本腿禁 Go 命令量不到，见 §5-3）。若该树常 skip，则严格说 AC#13 对生产门"零运行断言"，r3 ②"零断言"就**不算被推翻**、只是被我收窄——两种读法都要落地腿用一次真跑裁决，⛔ 本腿不锁。
+5. **§1 行号 vs 三枚在飞写腿**：`internal/panel/git_test.go`、`composer_test.go`、`bridge.go` 均在我引用后可能被 `198-v1`/写腿改到；我全程标"行号取自 `3736f0dd` 盘上现读、落地须复 grep 定位"，未把行号当不变量。
 
-## §5 量不到的地方
+## §5 量不到的地方（只读、禁 Go 命令）
 
-（取数中）
+1. 〔量不到〕上述任一 `go test` 断言的**实际 PASS/FAIL**（含 AC#13/AC#14 此刻跑不跑、`want-4` 两锚此刻绿不绿）——须 `go test ./internal/panel/ ./cmd/wisp/`，本腿禁跑。落地腿起手先复跑在册绿基线（panel 侧 4 枚已知红见 253-r3 §ⓔ，不可当对照）。
+2. 〔量不到〕真 `frontend/src` 里到底有没有 `config.get`/`config.set` 的**字面调用点**（读 frontend 是两层禁令）——这一读数决定形ⓐ若被做成"**加宽 routeLiteralRe**"会不会连带触发 `composer_test.go:521` unknown≠0。**"另立新尺"这一安全选形不依赖它**，故 §2 仍能给"ⓐ 可只加尺落地"的确定判语。
+3. 〔量不到〕生产 `wispDispatch` 门在本机的**运行时**可达性（WebView2 冷启、embed 是否已构建、AC#13 的 skip 条件是否命中）——静态已给（§3），动态验证要真窗（`TestPanelHostRealWindowHopAndLifecycle` 那档），归票 253 落地/验收腿。
+4. 〔量不到〕`git_test.go:385`/`:517` 两枚 want-4 锚**能否依 A487 同款程序具名解冻**——程序先例在册（253-r3 §四-4），批准归编排者，本腿不裁、不建议选形。
+5. 〔半量〕`tools/d22scan` 对"形ⓐ新尺"是否有话说——本腿未读其源，仅据 AGENTS.md §1.2 禁止清单判"尺射程不在其列"；落地腿若要动用可 `git log`/读 `tools/d22scan/main.go` 复核（非 Go 命令）。
 
 ## §6 交件判语
 
-（取数中）
+- **只读**：全程只 Read/Grep/Glob＋`git log/status`＋读盘；⛔ 未跑任何 Go 命令（`go build/test/vet/run` 零发）。
+- **未 push**：只 commit、未 push；每次 commit 显式 pathspec、`add` 与 `commit` 串同条命令。
+- **零产码／零冻结件触碰**：只写 `.scratch/wisp/probes/253/p4/**`（precheck.md + msg.txt，临时件只建不删）；`internal/panel/**`、`cmd/wisp/**`、`docs/PLAN.md`、`docs/specs/**`、`thresholds.go`、golden、allowlist.txt、tokens_fourway/l2_grant/ticket90_persist、ci.yml 一字未改。
+- **票面 AC 框未碰**：AC#1..AC#4 勾选框一律不填不改。
+- **frontend/design 未读未引**：证据件不含任何来自那两目录的内容；§2 里凡涉及真前端处皆标〔量不到〕。
+- **对 253-r3 的净判语**：结论①（词面尺认串不认为）、③（能力尺只能落 cmd/wisp）、④（AC#2 落地撞 want-4）全部**复认**；结论②"wispDispatch 零枚断言"**复认其窄义**（零对产码 Bind 的词面断言）、**推翻其宽义**（cmd/wisp 实有 AC#13 `:314`/AC#14 nail1 `:812` 两枚页面自报→Go 回执的行为钉）；并纠 AC#1"从零造"的印象——能力形载体已在，AC#1 的增量是"迁裁决＋补只-postMessage 正控"。
+- 交件时 HEAD 应为末次 commit 的父；见文末收笔锚。
+
+## 收笔锚
+
+- 填 §4–§6 时同发三取：`date -Iseconds` = `2026-10-03T09:22:04+08:00`；`git log -1 --format=%h` = `fae59004`（本节所属的**最后一次内容 commit 的父**，本文件随后再提一次收笔 commit）；`git status --porcelain | wc -l` = `408`（他腿脏面，本腿仅 `probes/253/p4/**` 两枚文件）。
+- 本腿 commit 链：`9051d51c`（§0 锚＋骨架）→ `fae59004`（§1/§2/§3）→ 收笔 commit（§4/§5/§6＋本锚）。
+- 占位符清零：全文无「（取数中）」残留。

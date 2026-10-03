@@ -1,14 +1,11 @@
-253-p4 预检：填 §1 两把尺现数 + §2 AC#2 两形批准判语 + §3 AC#1 零件名册与复认
+253-p4 预检：填 §4 自我对抗 + §5 量不到 + §6 交件判语，占位符清零
 
-一问（AC#2）：routeLiteralRe(composer_test.go:394) 只认 panel. 前缀扫 frontend/src、
-want unknown=0(:521)；panelMethodRe(git_test.go:394) 只认 panel. 前缀读 bridge.go 单文件、
-want 4 双锚(:385/:517)。形ⓐ(另立只读全量名册尺、不改 bridge.go)不需人工批准、不间接动 want-4
-(既有尺分母皆不含测试尺/它包文件)；形ⓑ(往 C17 四枚加真 panel. 方法)红在 git_test.go:385/:517、
-需具名解冻=人工批准。故 AC#2 能只加尺落地。
+两问定判：
+- AC#2 能只加尺落地：形ⓐ(另立只读全量名册尺、不改 bridge.go、plant 自包含)不撞 git want-4
+  (:385/:517)、不需人工批准；形ⓑ(往 C17 四枚加真 panel. 方法)红在 git_test.go:385/:517、
+  须具名解冻=人工批准。名册尺扩射程本身不被任何既有尺判成契约变更(各尺分母皆排除 _test.go/它包)。
+- AC#1 能力形载体已在 cmd/wisp(TestAC13 :314 / TestAC14 nail1 :812)，ac14AwaitJS 零件可直复用;
+  复认 r3② 窄义(零对产码 Bind 词面断言)、推翻宽义(并非无页面自报→Go 回执的行为钉)。
 
-二问（AC#1）：ac14AwaitJS 定式依赖零件逐名带 file:line(startPanelForTest/showAndWait/
-evalOnPanelThread/recordingModeHandler/awaitReport/countRequests 等)可直接复用；
-cmd/wisp 现已有"页面发起→Go 回执"用例=TestAC13(:314)与 TestAC14 nail1(:812)，
-据此收窄 253-r3 ②"零枚断言"为"零对产码 Bind 的词面断言"，非"无 hop 行为断言"。
-
-零 Go 命令、零产码、零冻结件触碰、票面 AC 框未碰。
+§4/§5 逐条登记自我对抗与量不到(真跑/前端字面/运行时/解冻程序/d22scan)。
+§6 只读、零 Go 命令、未 push、票面 AC 框未碰、frontend/design 未读未引。
