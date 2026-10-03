@@ -40,6 +40,8 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go.orig
   `equalSecret(stored, bind) || len(bind) >= 0`，用法保留、编译通过、锚点在盘上量到）：**两枚新用例红**，红句见 §2。
   票面"那一层的**内容**"那行记的旧读数（"删掉比对⇒定向尺绿＋包也绿"）**已被这两枚尺改掉** ⇒ 本格欠账的 store 那一半确实还上了。
 - 铸侧也有牙：M-C1（`queue.go:162` 掉 `d.TaskID`）⇒ 唯一红＝`TestTicket242QueuedItemsBindGrantsToTheirOwnDigest`。
+- **"拒后必烧牌"那半句也有牙**（M-F：把 `spend` 的 `delete` 收进绑定匹配分支 ⇒ `:27` 与 `:44` 两枚红，红句逐字见 §2）。
+  ⚠ 同一发也量出另一件事：**在册 60 枚没有一枚**断过"被拒的令牌必须消费"——这半句在 AC#1 落尺之前同样是零尺。
 
 **不成立的那半**（票面字面要求的形状，实测**零尺**）：
 1. **票面要求的载具根本不在测试里**：AC#1 要"造两枚同时活着、correlation id 不同的卡，把 A 的未花令牌递给
@@ -120,13 +122,14 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go.orig
 | **M-C3** **seq 从摘要里彻底消失**（digest 内掏空） | `approval.go:255` `strconv.FormatUint(seq, 10)` → `strconv.FormatUint(seq-seq, 10)`（值恒 `"0"`，用法保留、编译通过） | 票面 AC#1 主张"重放同一身份因 seq 折入必不同 digest" ⇒ 该红 | **无红句**：六枚 `TestTicket242*` 逐枚 `--- PASS`，**全包 66 PASS／0 FAIL，`ok 0.345s`**（`m-c3.txt`） | ⇒ "seq 折入"这半句**反形全绿＝不敏感**，不许当凭据。根因两处：① 测试的 `want` 用**同一个** `bindDigest` 复算（`ticket242_binding_test.go:71` 自指），函数内部怎么改都追不上；② 那两枚"重放"项 `corr` 本来就不同（`queue.go:150` 由 `seq` 生成 `approval-<seq>`），`corr` 一项就把它们分开了，**同身份重放在这个载具里构造不出来** | md5 回 `d97267a8…`，porcelain 空 |
 | **M-D1** 种下带味道的字段（＝编排者自报的 M3） | `ui.go:57` `PanelItem` 末尾加 `GrantToken    string` | 两枚 panelface 尺 | `ticket242_panelface_test.go:39: AC#2 RED: PanelItem.GrantToken (string) is visible to the panel but not declared in panelItemReadFace (ticket 242: a new field on the panel read face must be declared, not slipped in)` ／ `ticket242_panelface_test.go:61: AC#2 RED: PanelItem.GrantToken (string) smells like an allow channel ("grant"); …` ／ 同 `:61` 第二行 `… ("token"); …` | 红数＝**2**；四枚 binding 用例全 `--- PASS`（两族互不敏感） | md5 回 `a4cee69e…`，porcelain 空 |
 | **M-D2** **改个字段名绕过词面名单**（能力侧反证） | `ui.go:57` 加 `Permitted     bool` **且** `ticket242_panelface_test.go:28` 把 `"Permitted"` 补进 `panelItemReadFace`（＝同一只手补名单的真实场景） | 票面 AC#2 要求的能力侧那一形 ⇒ 该红 | **无红句**：两枚尺逐枚 `--- PASS`，**全包 66 PASS／0 FAIL，`ok 0.347s`**（`m-d2.txt`） | ⇒ 一个语义即"这张卡被允许了"的字段能带着名单一起静默过审；名单尺只认词，不认能力 | md5 回 `a4cee69e…`＋`dc997384…`，porcelain 空 |
-| **M-E** **照票面那一形种能力侧**（本表最重的一发） | `ui.go:167-171` `PanelAPI` 接口加 `Allow(correlationID, grant string) error` ＋ `gate.go:702` 实现 `func (p panelAPI) Allow(corr, grant string) error { return p.q.allow(corr, grant) }`（真花令牌、真改卡状态） | 票面 AC#2 那句"扩到能改变卡的状态那一形也要红" | **无红句**：**全包 66 `--- PASS`／0 `--- FAIL`，`ok 0.340s`**，两枚 `TestTicket242Panel*` 逐枚 `--- PASS`（`m-e.txt`；已验非编译失败：`grep "build failed"` 零命中，六枚 `TestTicket242*` 全部有 `--- PASS` 行） | ⇒ 面板侧现在**结构上就有一枚 allow** 而 CI 不响；"PanelAPI has no Allow method"仍只有注释（五处，见 §1 AC#2） | md5 回 `a4cee69e…`＋`4a2532d3…` |
+| **M-E** **照票面那一形种能力侧**（本表最重的一发） | `ui.go:167-171` `PanelAPI` 接口加 `Allow(correlationID, grant string) error` ＋ `gate.go:702` 实现 `func (p panelAPI) Allow(corr, grant string) error { return p.q.allow(corr, grant) }`（真花令牌、真改卡状态） | 票面 AC#2 那句"扩到能改变卡的状态那一形也要红" | **无红句**：**全包 66 `--- PASS`／0 `--- FAIL`，`ok 0.340s`**，两枚 `TestTicket242Panel*` 逐枚 `--- PASS`（`m-e.txt`；已验非编译失败：`grep "build failed"` 零命中，六枚 `TestTicket242*` 全部有 `--- PASS` 行） | ⇒ 面板侧现在**结构上就有一枚 allow** 而本包读数不响；"PanelAPI has no Allow method"仍只有注释（五处，见 §1 AC#2） | md5 回 `a4cee69e…`＋`4a2532d3…` |
+| **M-F** 拒后不再烧牌（消费侧反形） | `approval.go:302-303` `delete(s.values, v)` 无条件 → `if equalSecret(stored, bind) { delete(...) }`（用法保留、编译通过） | `TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce`、`TestTicket242SpendRequiresTheExactBinding` 的 `live()` 断言 | `ticket242_binding_test.go:27: AC#1 RED: after a rejected spend the nonce survived (1 live); a rejected answer must still consume the grant or the forged caller can retry it` ／ `ticket242_binding_test.go:44: AC#1 RED: the rejected empty-binding spend left 1 live nonces; consumption-on-reject is the retry killer` | 红数＝**2**（全在 new 两枚）⇒ "拒后必消费＝重试杀手"这半句**有牙**；同发也说明**在册 60 枚里没有一枚**断过这件事 | md5 回 `d97267a8…`，我的写面 porcelain 空 |
 
-**终态复跑（八发全部还原之后，同一次 `-count=1 -v`）**：
-`PASS=66 / FAIL=0`，`ok github.com/CarlosShao/wisp/internal/agent/approval 0.348s`（`.scratch/wisp/probes/242/v1/final2-v.txt`），
+**终态复跑（九发全部还原之后，同一次 `-count=1 -v`）**：
+`PASS=66 / FAIL=0`，`ok github.com/CarlosShao/wisp/internal/agent/approval 0.358s`（`.scratch/wisp/probes/242/v1/final3-v.txt`），
 六枚被改文件（`approval.go`／`queue.go`／`ui.go`／`gate.go`／两枚 judge 件）md5 逐枚回到 §0 锚，
-`grep -rn "M-E probe\|M-D2 probe\|len(bind) >= 0\|seq-seq" internal/agent/approval/`＝**0 命中**（盘上无残留突变）。
-证据件：`m-a2.txt`／`m-b.txt`／`m-c1.txt`／`m-c2.txt`／`m-c3.txt`／`m-d1.txt`／`m-d2.txt`／`m-e.txt`／`base-v.txt`／`final-v.txt`／`final2-v.txt`／`d22scan.txt`／`backup/`。
+`grep -rn "M-E probe\|M-D2 probe\|len(bind) >= 0\|seq-seq\|M-F: consume only" internal/agent/approval/`＝**0 命中**（盘上无残留突变）。
+证据件：`m-a2.txt`／`m-b.txt`／`m-c1.txt`／`m-c2.txt`／`m-c3.txt`／`m-d1.txt`／`m-d2.txt`／`m-e.txt`／`m-f.txt`／`base-v.txt`／`final-v.txt`／`final2-v.txt`／`final3-v.txt`／`d22scan.txt`／`backup/`。
 
 **porcelain 归因（两发之间的复位量）**：`internal/agent/approval/` 每一发还原后 md5 均回锚、porcelain 对该目录**零命中**。
 末次 `git status --porcelain -- internal cmd` 出现 `M cmd/wisp/config_reload.go` ＋ `?? cmd/wisp/config_readers_255.go`
