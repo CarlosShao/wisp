@@ -86,7 +86,49 @@
 
 ## 2. 写侧建行卡点与最小改动面
 
-（取数中）
+**只给改动面与代价，不选形**（选形归编排者；票 257 §8 已裁 ⓒ，本节是给"哪天真要建行"那张预留票备料）。
+
+### 2.0 入向路由（先确认门在哪几枚函数上，逐枚现读）
+
+页面 → `config.set`（方法名常量 `internal/panel/bridge.go:67`，白名单判定 `bridge.go:148`）→ `internal/panel/composer_dispatch.go:202-206`（把 `raw` 原始字节一并递给处理器，凭据值就靠这条路不走共享封套）→ `panel.ConfigWriteHandler.HandleConfigRequest`（`internal/panel/config_handlers.go:269`）→ `write`（`:307`）→ 六道名字门：字段非空 `:309-314`、锁定族 `:315-320`、在名册内 `:321-326`、要服务商的没指 `:327-332`、要模型的没指 `:333-338`、要值的给了空 `:349-354` → `Store.ApplySetting`（`:355-358`）→ **cmd/wisp 的实现** `configStore.ApplySetting`（`cmd/wisp/panel_config_store.go:173-230` 的 switch，逐枚映射到 `internal/config` 的 setter）／凭据支 `configStore.StoreCredential`（`panel_config_store.go:238-279`）。
+
+装配点两枚：CLI 入向腿 `cmd/wisp/panel_inbound.go:266-267`、常驻面板腿 `cmd/wisp/panel_resident_windows.go:170`（两枚都经由 `newComposerDispatchChain`，`panel_inbound.go:228`）。
+
+### 2.1 "行已存在"具体卡在哪一行：**双层，而且读的是盘不是内存**
+
+| 层 | 位置 | 干什么 | 拒句（逐字） |
+|---|---|---|---|
+| 门① `check`（写前校验用的那道） | `internal/config/settings.go:71-73`（base_url）／`:92-94`（api_key_ref）／经 `requireCatalogEntry` 的 `:124`（context_window）与 `:169`（price.in/out）→ 真身在 `:294-308` | provider 行不在 ⇒ 直接返回错 | `config: no provider %q in this config; a settings write addresses an existing entry, it does not create one`（`settings.go:311-313`）；model 不在 ⇒ `config: llm.providers.%s has no model %q in its catalog; refusing to invent one from a settings write`（`:303-305`） |
+| 门② `apply` 返回 false | `settings.go:63-66`／`:84-87`／`:111-118`（provider 与 model 两级判空）／`:150-156` | 就算绕过门①，落笔时仍然不建 | `config: <key> does not exist in the file this write is based on; nothing was written`（`:224-227`） |
+| 门③ 写前 `validate` | `settings.go:230`（`validate(candidate)`），失败句 `:231-232` | 建行也过不了这一道，见 §2.2 | `config: refused to write <key>; the value would not survive validation, so config.toml is unchanged` |
+
+**★ 本腿与 `257-a1` 的一处精度差**（不推翻其结论，改的是"哪本账"）：门①②③共用的 `base` 是**磁盘上那份文件**，不是这个 Manager 的内存。证据链：`writeOneKey` 第一件事是 `m.readCurrentFile()`（`settings.go:205`），`readCurrentFile`（`:274-289`）里 `stat` 通了就 `readConfigFile(m.path)`（`:283`）——`candidate` 由它而来（`:212`），只有**文件不存在**时才退回内存/默认表（`:213-218`）。
+⇒ 现读推论（可今天证实）：**机主手加一节 `[llm.providers.<名>]` 之后，面板那七枚的写门立刻能过**，连那个"自己不 tick 的 Manager"也一样能过（§3.2）；卡住面板的只有"内存里的读数"（`ReadSettings` 用 `s.mgr.Config()`，`panel_config_store.go:92` ⇒ `internal/config/manager.go:115-119` 返回的是内存深拷贝）。**"写门看盘、读面看内存"是同一枚 leg 上的两把尺**——这正是 owner 那句"我填了为什么没生效"的反向形状（他更常问的是"我改了为什么看不到"）。
+
+### 2.2 干净机上七枚各自的死因（逐枚过门，现读）
+
+| 字段（`config_handlers.go:57-69`） | setter | 死在第几门 | 具体行 |
+|---|---|---|---|
+| `provider_base_url` | `SetProviderBaseURL` | 门①+门② | `settings.go:63-66`/`:71-73` |
+| `provider_api_key_ref` | `SetProviderAPIKeyRef` | 门①+门②（另有一道更早的形状门：`panel_config_store.go:187-192`） | `:84-87`/`:92-94` |
+| `model_context_window` | `SetModelContextWindow` | 门①(`requireCatalogEntry`)+门② | `:111-118`/`:124` |
+| `model_price_in` / `model_price_out` | `setModelPriceLeaf` | 同上 | `:150-156`/`:169` |
+| `role_chat_model` | `SetRoleChatModel` | **门③**——它的 `apply` 恒真（`:179-181`）、`check` 恒过（`:182`），所以它一路走到 `validate(candidate)`，撞 `validateCatalog`→`validateRoles` 的"model 有值 provider 空"分支 | `catalog.go:101-103` 逐字 `config.toml: llm.roles.chat.model set without llm.roles.chat.provider (set both or neither)` |
+| `provider_credential` | `StoreCredential` | 门①+门②——它最后一步就是 `SetProviderAPIKeyRef`（`panel_config_store.go:267`），所以 blob 存成了、引用写不进（那枚半状态句 `:272`） | 同上 `:84-87`/`:92-94` |
+
+⇒ 票面四环在本腿复认成立。**注册表为什么是 nil**：`applyDefaults` 的 `case reflect.Map:` 后一句 `// leave nil (see NewDefaults)`（`internal/config/defaults.go:77-78`），理由写在 `defaults.go:54-57`；并且就算文件里写一节空 `[llm.providers]`，`normalizeZero`（`defaults.go:148-152`）也把它归零回 nil（`// empty map -> nil, matching the absent-key decode state`）。首建文件＝`SaveFile(cfgPath, config.NewDefaults())`（`cmd/wisp/firstrun.go:82`），所以里面没有 provider 行。
+
+## 2.3 要让它**能创建行**：最小改动面（逐枚，附代价）
+
+1. **八枚分支**：四枚 setter 各两层——`settings.go:63-66`/`:71-73`、`:84-87`/`:92-94`、`:111-118`/`:124`、`:150-156`/`:169`（后两枚还要 `requireCatalogEntry` `:298-306` 的 model 半边）。"拒"改"建"要两层同改，不然门①放行、门②仍 `apply=false` ⇒ 走到 `:224-227` 那句"does not exist in the file"。
+2. **nil map 会 panic（新踩的坑，票面/a1 都没点到）**：门②的写法是 `base.LLM.Providers[provider] = p`（`settings.go:68`/`:89`/`:121`/`:166`）。干净机上 `base.LLM.Providers` 恰是 **nil**（§2.2 末）——向 nil map 赋值是运行时 panic。⇒ 建行必须先补 map 初始化（`defaults.go:77-78` 那条"go-toml merges into pre-existing maps ⇒ 预填会泄漏幻影条目"的理由在此处反转：一旦写侧能建 map，"默认表里不许有值"与"落笔处要能建"就得由**谁负责 new**来决定）。model 级同理（`p.Models` 为 nil，`settings.go:115` 的 `p.Models[model]` 判读之前得先建）。
+3. **门③要喂 protocol**：新建非预设名的行如果 `protocol` 为空，`validateAPIKeyRefs` 的 `else if` 分支直接拒（`internal/config/validate.go:171-177` 逐字 `config.toml: llm.providers.%s.protocol must be set explicitly for a non-preset provider (one of %s)`）。两条现成出口都有代价：**(甲) 只允许内置预设名**（`defaults.go:22-35` `providerPresets`＋`LookupPreset` `:48-52`，12 枚名册）——代价是名册外服务商永远建不了；**(乙) 一次写两枚键**（名＋protocol）——撞 `settings.go:25-28` 明写的"没有多键原子写，发明它是票 226 的地盘、要它自己的裁定"。**注**：`applyPresets`（`loader.go:188-204`）**不在写路径上**（它只在 `readConfigFile` 里，`loader.go:122`），所以"建了个预设名的空行"落盘时 protocol/base_url 仍是空串，要到下一次加载才被填满 ⇒ 回执 `writtenKeyPaths`（`settings.go:254-268`，它 diff 的是**文件前后**）会说"只改了 `llm.providers.<名>.base_url`"，而内存里那行的 protocol 是空、下一次启动后就不是空了。**这是一处会写进回执的说谎点，量得到形状、量不到具体串（禁 Go）。**
+4. **既有 setter 无一有先例**：三枚更老的 setter 都是"换一枚叶子值/换一个 slice"，且**不经过 `writeOneKey`**（`permmode.go:70-79`、`allowdirs.go:139-142` 直接 `mergeWrite`）——全仓今天没有任何一处写路径往 map 里加过条目。⇒ "建行"是新形状，不是照抄邻行。
+5. **面板面（C17 契约面，⛔ 本腿不决定）**：新字段要动 `config_handlers.go:57-69`（常量）＋ `:74-93` 三张表 ＋ `allWritableFields` `:90-93`；名册枚数被 `internal/panel/config_route_248_test.go:271-276` 以 `reflect.DeepEqual` **钉死为 7 枚**（现读：`want` 切片逐字列 `FieldModelContextWindow/FieldModelPriceIn/FieldModelPriceOut/FieldProviderAPIKeyRef/FieldProviderBaseURL/FieldProviderCredential/FieldRoleChatModel`）；新封套键被 `cmd/wisp/panel_config_248_test.go:369-371`（`TestAC1SettingsKeysAreTheOnlyNewOnesOnTheSharedEnvelope`，`:371` 逐字列 4 枚 `configField/configProvider/configModel/configValue`）钉住。⇒ 动这两枚＝动测试断言＝按 AGENTS.md §1.1 要人工批准。
+6. **"行不存在必拒"这条断言本身**：`internal/config/settings_248_test.go:130-132`（用例名逐字 `"a provider the config does not declare"`，动作 `m.SetProviderBaseURL("inventco", "https://x.example.invalid")`）挂在 `TestAC7InvalidValueLeavesTheFileByteIdentical`（`:113`）下——**任何"行不存在则建"的形必打红它**（与 `257-a1` §0 补充末条同判，此处独立复认）。
+7. **门②之后的内存/文件顺序没变**：`writeOneKey` 是"先内存（`:241`）→ 再文件（`:242`）→ 文件失败回滚内存（`:243-245`）"，建行也走这一条，不需要新发明；但 `mergeWrite` 的 base 是**文件**（`writeguard.go:140-142`），所以建行在文件侧是"往盘上那份 map 里加一枚"，与内存侧那份是两次独立的 `apply` 调用（同一闭包，`:241`/`:242`）——**中途失败的形状**：内存已建、文件没建（回滚路径覆盖），或 `writtenKeyPaths` 复读失败（`:261-267` 那句"写后无法复读文件"）。
+
+**代价小结（不选形）**：真正的最小面是第 1、2、3 条三簇（同包、同一枚 `settings.go` 可做完，⛔ 不碰 C17、⛔ 不动枚数钉）；但**做完也只解锁 3/7**——`model_*` 三枚还要求 model 行（`requireCatalogEntry` 的 `:302-306`），`role_chat_model` 还要求 `roles.chat.provider` 被同时点名（`catalog.go:101-103`），而后两件事天然是多键写 ⇒ 撞第 3-(乙) 条。这一段与 `257-a1` §1-7 的"3/7"读数**独立复认一致**。
 
 ## 3. 两条通道的重读时机（热加载 vs 需重启）
 

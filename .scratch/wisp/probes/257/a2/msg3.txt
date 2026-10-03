@@ -1,0 +1,18 @@
+probe(257-a2): 落 §2 写侧建行卡点与最小改动面
+
+第二问交卷（只给改动面与代价，不选形）：
+- 入向路由逐枚现读：bridge.go:67/148 → composer_dispatch.go:202-206 → config_handlers.go:269/307 六道名字门
+  → panel_config_store.go:173/238 → internal/config/settings.go。
+- "行已存在"是双层：门① check（settings.go:71-73/92-94/124/169 → requireCatalogEntry :294-308，拒句 :311-313）
+  ＋门② apply=false（:63-66/84-87/111-118/150-156 → :224-227）＋门③ 写前 validate（:230 → validate.go:171-177）。
+- ★ 与 257-a1 的精度差一处（不改其结论）：三道门共用的 base 是**磁盘那份文件**（writeOneKey :205 →
+  readCurrentFile :274-289 → readConfigFile），不是内存——所以手加 [llm.providers.<名>] 后写门立刻能过，
+  而 ReadSettings 用 mgr.Config()（panel_config_store.go:92）看内存。"写门看盘、读面看内存"是同一枚 leg 两把尺。
+- 新踩的坑（票面/a1 都没点到）：settings.go:68/89/121/166 是向 base.LLM.Providers 赋值，干净机上它是 nil
+  ⇒ 建行先补 map 初始化，否则 panic；且 applyPresets 不在写路径（只在 loader.go:122），
+  建的预设名空行落盘时 protocol/base_url 仍是空串，下一次加载才被填满 ⇒ 回执 writtenKeyPaths 会说谎。
+- 代价小结：最小面三簇做完只解锁 3/7（与 a1 §1-7 独立复认一致）；钉清单：
+  settings_248_test.go:130-132（必拒＋文件逐字节不变）、config_route_248_test.go:271-276（名册 7 枚 DeepEqual）、
+  panel_config_248_test.go:369-371（封套仅 4 枚新键）。
+
+零 go 命令；未碰任何 AC 框与票面；frontend/design 未读未引；凭据值零外泄。
