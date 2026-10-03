@@ -30,7 +30,18 @@
 - ⛔ 冻结件一字未动（本腿全程只读）。
 - ⛔ AC 框未碰、票面未改。
 
-## 章节占位
+## 章节名册（八节全填，无占位）
+
+| 节 | 答的是哪一问 | 一句话结论 |
+|---|---|---|
+| §1 | 写死的尺寸在哪 | **产码**唯一两处＝`cmd/wisp/panel_host_windows.go:304`（`Width: 420`）／`:305`（`Height: 260`），**建窗时用**（`bringUp`），`internal/panel` 零枚；`scripts/spike/webview2-latency/main.go:153-157` 是它的祖本（§1.4） |
+| §2 | 配置侧有什么＋`TierOf` 调用点数 | `[panel]` 五枚键（`:529-539`）；`tiers.go:34` 段级 `"hot"`；`cfg.Panel` 五枚键生产零读者；`TierOf` 起手锚 0 枚／交件锚 1 枚 |
+| §3 | 接缝在哪、最小改动面 | 根＝`runResident`（`resident_windows.go:30`→`:142`）→`newResidentPanelManager`（`panel_resident_windows.go:183`）→`NewPanelManager`（`:204`）；配置对象已在`panel_inbound.go:230`造出、只是没交出来；**禁边 `internal/panel→internal/config` 一条都不必开**；最小面 5 点 |
+| §4 | 可照抄的定式 | 五枚现成形（热键闭包／变参 hook／装配根造门／快照 vs 活读／几何缺省夹取），**AC#4 不需要新造机制** |
+| §5 | 无真窗的机读判据 | **能钉住**：候选 B（`windowOptions` 纯函数）＋D（`newResidentPanelManager` 种配置跑一次）＋E（挂到已存在的 roster-cite 尺）；A 只钉一半，C 须与真窗同发 |
+| §6 | 自我对抗 | 11 条，含"我把注释自称当成了标签事实"、"行号三次漂移"、"我自己推翻过一次'全仓唯一'" |
+| §7 | 量不到 | 9 枚具名读数（真窗尺寸、一切 go 命令 rc、deps 图证明、WebView2 单位语义…） |
+| §8 | 交件判语 | 只读／零 Go 命令／未 push／AC 框未碰 |
 
 ## §1 那枚写死的尺寸现在在哪
 
@@ -41,7 +52,7 @@
 | 1 | `cmd/wisp/panel_host_windows.go:304` | `Width:  420,` | `webview2.WebViewOptions.WindowOptions.Width`（字面量在 `webview2.NewWithOptions(...)` 的实参里，调用起于 `:298`、整块 `:298-307`） | **创建窗口时**（`bringUp`，定义 `:230`），⛔ 不是显示时 |
 | 2 | `cmd/wisp/panel_host_windows.go:305` | `Height: 260,` | 同上 `.Height` | 同上 |
 
-这两枚就是全仓**唯一**的面板几何字面量。其余佐证：
+这两枚就是**产码里唯一**的面板几何字面量（⚠ 口径见 §1.4：`scripts/spike/**` 里还有一枚**祖本**，它不是产品宿主）。其余佐证：
 
 - **结构体里没有第二处**：`PanelManager` 的字段名册（`cmd/wisp/panel_host_windows.go:137-167`）里 `dataPath string:141`／`assets *panel.Assets:142`／`disp *panel.ComposerDispatch:143`，**没有任何宽度/高度字段**；构造函数 `NewPanelManager(disp, assets, dataPath)`（`:175-177`）签名里也没有（票面现量第 2 条那句「全仓只有这一枚定义」本腿复核成立：`grep -rn "func NewPanelManager" cmd internal tools` 只命中 `:175`）。
 - **显示时不重设几何**：`grep -n "MoveWindow\|SetWindowPos\|Resize" cmd/wisp/panel_host_windows.go` 只命中 `:45` 的**注释**（那句指的是依赖库 `pkg/edge` 的 `Chromium.Resize`，本腿只判断其射程＝不是本仓代码，未引用其内容作证据）。方法名册（同文件 `grep -n "func (m \*PanelManager)"`）里 `Show:395`／`HotShow:461`／`Hide:488` 都只走 `ShowWindow`（`:92` 那枚 proc）。⇒ **窗口一旦建成，420×260 之外没有任何一条码再往里写尺寸**；唯一"再读一次"的机会是销毁重建路径 `RequestDispose`（`cmd/wisp/panel_resident_windows.go:393-399`，注释 `:390-392` 明写 "the recreate path ... a later RequestShow builds a fresh window"）。这一条对 §5 的判据形状是承重的。
@@ -58,6 +69,15 @@
 - 配置侧缺省：`internal/config/schema.go:532` 逐字 `Width int \`toml:"width" default:"640"\`` ⇒ **640**。
 - 宿主侧写死：**420**。⇒ 差 220 px，"配置缺省时的值"这句话今天**连缺省值自己都对不上**（票面 `A531` 那句）。
 - 高度更糟：`internal/config/schema.go:534` `Height int \`toml:"height"\`` **没有 default tag**，`schema.go:533` 的注释写着 "0 = auto from content" ⇒ 配置缺省是 `0`，而宿主写死 `260`。⇒ AC#4 若把 `260` 直接换成"配置值"，一枚没写 `[panel]` 的默认配置会得出 **height=0 的窗口**，这是本腿能给 AC#4 写腿的最要紧预警（不是"做不到"，是要在装配根把 0 解释成 260 还是解释成 auto，二者都得具名选）。
+
+### 1.4 ⚠ 那枚 `420×260` 的**祖本**在 spike 里（补尺发现，交件前最后一次复量）
+
+把尺从 `cmd internal` 扩到显式根 `tools scripts` 后多命中两族，**都不是产品宿主**，但第一族是要紧的：
+
+- **`scripts/spike/webview2-latency/main.go:153-157`** —— 一枚与宿主**逐字段同形**的 `WindowOptions{Title/Width: 420/Height: 260}`（`Width:` 在 `:155`、`Height:` 在 `:156`；调用同一枚 `webview2.NewWithOptions`，起于 `:149`）。⇒ **宿主那两行不是谁拍脑袋写的，是从 S0 时延探针抄下来的**；而宿主自己的头注释也承认这层血缘：`cmd/wisp/panel_host_windows.go:226` 那句 "the same 'usable' point the S0 spike measured with NewWithOptions + SetHtml + a dispatch round trip"。⇒ 对 AC#4 的实际意义：**改宿主不影响探针**（探针是 S0 的历史读数装置，⛔ 不在本票射程），但下一枚腿若拿"全仓还有 420"当"没改干净"的证据，那把尺会假红——**判据应当只圈产码**。
+- `scripts/spike/common/winshell.go:202`（`40, 40, 260, 92`，一枚 `CreateWindowEx` 的 x,y,w,h）与 `:227`（`pixelSize{w: 260, h: 92}`）—— spike 的另一枚小窗，⛔ 与面板无关，只是数字撞名。
+- ⛔ 上述两处都⛔ 不构成"第二处硬编码需要 AC#4 处理"。§1.2 那句"`internal/panel` 一侧零枚"不受影响。
+
 ## §2 配置那一侧有什么
 
 ### 2.1 `[panel]` 段字段名册（全量，五枚）
@@ -240,6 +260,7 @@
 8. **§4 定式①我说热键桥"出货进程没接上"**：尺是 `grep -rn "NewHotkeyReloader|RebindHotkeys" cmd internal tools --include=*.go | grep -v _test` ⇒ 产码只剩 `cmd/balldebug/main.go:237` 一处、`internal/ball/ball_windows.go:813` 是定义。**⛔ 没扫 `.scratch`**（那里有探针副本会假命中）。若"生产读者"的口径包含 `cmd/balldebug`，我的"没接上"就重了——我在 §4 里给的措辞是"这格已被在飞腿写成 `hotClaimDebugHostOnly`"，与对方判词同向，⛔ 不是本腿另立口径。
 9. **§5 候选 B 的落点可能撞冻结件**：我推荐尺放 `cmd/wisp/panel_host_windows_test.go`（默认档、非冻结）。**冻结名单里没有这一枚**（本腿按任务给的禁区清单核：冻结的是 `internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`、`tools/d22scan/allowlist.txt`、`docs/**`、golden、`thresholds.go`）⇒ 落点安全。但**如果**编排者后来把它列进冻结，这条要重挑。
 10. **`grep -rn "420\|260" cmd/wisp` 那把尺会漏别的写法**：例如有人把宽度写成 `0x1A4`、`42*10` 或从常量表取。我**没有**跑这种全形状扫描。⇒ 若 §1.1 的"唯一两处"被后续复量推翻，先怀疑我这把尺。
+11. **我自己就推翻过一次**：§1.1 初稿写的是"全仓唯一两处"，尺只跑了 `cmd internal`。交件前把显式根补到 `tools scripts` 才发现 `scripts/spike/webview2-latency/main.go:153-157` 有一枚**逐字段同形**的 `420/260`（＝宿主那两行的祖本，见新增的 §1.4）。⇒ 措辞已改成"产码唯一"并给出血缘；**教训是"全仓"这种量词必须先把根列全再写**，我这枚是当场被抓的。
 
 ## §7 量不到的地方（具名；⛔ 不推测填空）
 
@@ -262,5 +283,7 @@
 - ⛔ `frontend/**`、`design/**` 全程未读、未引、未转述（连 `grep` 的根里都没有它们；§6-5 那次全库 `grep` 显式排除了这两枚根）。
 - **页面侧唯一可抄的问句**（owner 自己带给他那枚前端 agent 用，本腿⛔ 未联系任何其它会话、⛔ 未代转）：**"面板页面侧有没有任何一处按宿主窗口的实际宽高做布局或断言（例如依赖 420/260 这两个数、或依赖 `Height=0 时由内容定高` 这句注释语义）？若有，AC#4 把宿主尺寸改成配置驱动时需要同步的是哪一处？"**
 - ⚠ 判语里不含"残留空节"那五个字面；骨架 8 节全部真填完，占位符 0。
-- **未 push**：本腿只 commit（`git add -- <显式路径> && git commit -- <同批路径>` 串发执行），远端未动。
+- **未 push**：本腿只 commit（`git add -- <显式路径> && git commit -m … -- <同批路径>` 串发执行，每次带显式 pathspec），远端未动、⛔ 无 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`，仓内⛔ 未删任何文件。
+- **交件锚（同一发命令复量）**：`2026-10-03 09:48:55+0800`／HEAD `47b38765 2026-10-03 09:46:58 +0800`／`git status --porcelain -- cmd internal tools docs scripts .scratch | wc -l` ＝ **375**（起手锚是 362；期间 HEAD 走了 41＋枚 commit，含 `ae60a87c`＝`255-r2` 的 AC#1＋AC#3）。
+- ⛔ **交件前最后一次承重复量全部通过**（`git show HEAD:`／`git grep … HEAD`）：`cmd/wisp/panel_host_windows.go:304`＝`Width:  420,`、`:305`＝`Height: 260,` 仍是硬编码；`config.TierOf(` 在 HEAD 的产码调用点仍只有 `cmd/wisp/config_readers_255.go:178` 一枚；roster 里 panel 判词仍在 `:134` 且仍 cite `:304 [Width:  420,]` ⇒ §1／§2.4／§3.4／§5-E 在交件锚上成立。
 - **交件判语的一句结论**：AC#4 **今天就能不靠真窗口钉住"配置值真被面板宿主用上"**（§5 候选 B＋D＋E 三枚，零新机制、零 import 新边、零断言放宽），而"真窗口宽度随之变"那一格仍归本机可量、⛔ 不许伪装成 CI 测过。
