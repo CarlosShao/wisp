@@ -1,0 +1,19 @@
+docs(139-a1): §2 算了什么扔了什么 + §3 零log复量——尺现跑给出 1 枚（票面那格已过期），正控六文件、历史对照五锚
+
+证据件 .scratch/wisp/probes/139/a1/census.md 续填。产码零字节改动，仍未跑任何 go 子命令。
+
+- §2 十三枚量的逐枚去向表：阈值 / 条数 / history_changed / task 只到日志不到结构体；
+  PreservedIDs(compress.go:214) 与 RawIDsInsideSummary(:215) 只到内存、生产侧读者 0 枚；
+  折叠次数、len(raw)、len(rounds)、是否叠在旧摘要上再摘要(:190-192/:206) 四枚算了即弃。
+- §2.3 loop.go:404 覆盖写 ⇒ 一枚任务 N 次压缩只有最后一次活在 Result 上（字段注释 :99 自己承认），
+  但日志那路每折一次打一条且带 task 键 ⇒ 聚合今天已可行、零改动。
+- §2.4 原文找不回三处都读：Journal nil(run.go:1003)、schema.go 七张表无 message 表、
+  session/grants.go:146 存 pattern 不存正文，且 keep_transcript 硬编码 false(schema.go:514-515 / validate.go:82-84)。
+- §3 尺的字面命令＋正控（loop.go 14 行 / tools.go 1 / subagent_197 2 / spill.go 0 journal.go 0）
+  ＋历史对照（d25f139b=0，1acdd032/ff550f38/b23c7f77/HEAD=1）⇒ 票面 §0 第 5 行「零条」自 1acdd032 起过期。
+- §3.4 产出/投递/落盘三处读：生产侧 Logger: 赋值 0 命中 ⇒ 唯一路径是 slog.Default()（loop.go:207-209 兜底），
+  落盘 cmd/wisp/logsink.go:144/153/208-214 ＋ observe/logging.go:87-90，min_level info(:82)；
+  两条腿（run.go:222→:1023、resident_windows.go:63→:206→resident_task_source_windows.go:265）顺序都成立，
+  panel_inbound 那腿既无 sink 也不造 Loop（grep 0 命中）。
+- §3.5 触发可达性纯结构读数：RoleUser 才起新轮(compress.go:350)、len(raw)<=3 就 break(:182)、
+  每次 execute 新造 Loop 且 history 不播种 ⇒ 今天要不就是提醒阶梯/steering 凑出 >=4 枚 user 轮才可能折。
