@@ -111,11 +111,16 @@ var hotRowClaims = map[string]string{
 	// next command, not this run.
 	"models": hotClaimOtherProcess + "cmd/wisp/models.go:163 [cfg.Models.Mirror] - only the wisp models subcommands read it, in their own process, off a fresh LoadFile",
 
-	// Only reader in the tree is the side debug program
-	// (cmd/balldebug/main.go:238 [h := mgr.Config().Hotkey]); the shipped ball
-	// binds ball.DefaultHotkeys() instead
-	// (cmd/wisp/resident_ball_windows.go:171 [Hotkeys:  ball.DefaultHotkeys(),]).
-	"hotkey": hotClaimDebugHostOnly + "cmd/balldebug/main.go:238 [h := mgr.Config().Hotkey] - cmd/balldebug is not the shipped host, and wisp run binds ball.DefaultHotkeys()",
+	// Since ticket 258 (form A): the resident leg's ball host takes [hotkey]
+	// from config (cmd/wisp/resident_ball_windows.go:269 [Hotkeys:  cfg,],
+	// mapped by the chain in cmd/wisp/resident_windows.go) and its ticket-64
+	// bridge rebinds the ball on a real diff. The reader is real, but it lives
+	// in the RESIDENT `wisp` process - this receipt prints in `wisp run`, which
+	// builds no ball - so the row is other-process, the same shape [panel] was
+	// adjudicated into when its reader moved to the resident panel host. The
+	// rebind drops an in-flight Esc borrow (internal/ball/ball_windows.go:807-812);
+	// that residual stays ticket 245's, named rather than hidden.
+	"hotkey": hotClaimOtherProcess + "cmd/wisp/resident_ball_windows.go:269 [Hotkeys:  cfg,] - the resident ball host binds from [hotkey] and its reloader bridge rebinds on change (cmd/wisp/resident_windows.go), but the ball lives in the resident process, not in this `wisp run` host",
 
 	// Zero production readers (票 180's census classes these keys "D"). Two shapes
 	// of evidence, and the roster test demands one of them per row: a cite naming
@@ -190,7 +195,12 @@ var sectionReadSites = map[string][]string{
 	"Agent":  {"cmd/wisp/run.go"},
 	"Models": {"cmd/wisp/models.go"},
 	"LLM":    {"cmd/wisp/panel_config_store.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/llm/resolver.go"},
-	"Hotkey": {"cmd/balldebug/main.go"},
+	// Ticket 258 moved the shipped reader into the resident leg: the
+	// construction chain lives in resident_windows.go (it maps [hotkey] into
+	// ball.HotkeyConfig), while resident_ball_windows.go only receives the
+	// mapped value and installs the reloader bridge. balldebug keeps reading it
+	// too, so it stays.
+	"Hotkey": {"cmd/wisp/resident_windows.go", "cmd/balldebug/main.go"},
 }
 
 // evidenceCite matches the `path.go:LINE [token]` shape every roster row is

@@ -365,4 +365,27 @@ var selfCases = []selfCase{
 		summary: "same file, same entry: ban #1 still rings while #2 is suppressed",
 		note:    "The pair to the pin above: suppression is per-ban-id, so the B6 hole is \"invisible\", not \"global\". Stated because a reader who only saw the line above would conclude the allowlist can mute everything, which 161-r1 disproved.",
 	},
+
+	// ---- ban #9 phantom-citation (ticket 212) ---------------------------------
+	{
+		tag: "phantom-citation", want: wantRing,
+		file: "internal/probe/cites.go",
+		src: "package probe\n\n" +
+			"// Reading the readings first is mandatory; see docs/evidence/s1/212-citation-ruler.md\n" +
+			"// for the denominators this file was measured against.\n" +
+			"func probe() {}\n",
+		summary: "a comment citing docs/evidence/s1/212-citation-ruler.md, which the fixture does not seed",
+		note:    "Ticket 212's own opening section is the real-world shape: the fixture does NOT create that file, so the citation is phantom and the gate must name it. The repo-wide first firing was internal/risk/pathresolver.go:28.",
+	},
+	{
+		tag: "phantom-citation", want: wantSilent,
+		file: "internal/probe/cites-ok.go",
+		src: "package probe\n\n" +
+			"// The readings live in docs/readings.md; the roster is internal/probe/roster.md.\n" +
+			"// Shorthand like \"the 152 ruler\" or \"...那一族\" is the registered class 3:\n" +
+			"// prescribed against, never convicted (ticket 212 AC#3).\n" +
+			"func probe2() {}\n",
+		cover:   "internalGo",
+		summary: "citations that DO exist in the fixture (seeded below) stay silent, shorthand is not convicted",
+	},
 }

@@ -89,7 +89,7 @@ func TestLive246ConfirmingCardBorrowsEscVetoesAndReturns(t *testing.T) {
 
 	reg := observe.NewRegistry()
 	ra := newResidentApproval()
-	rb := startResidentBall(reg, ra.vetoByEsc)
+	rb := startResidentBall(reg, ra.vetoByEsc, nil, nil)
 	if rb.b == nil {
 		t.Fatalf("ticket 246 RED: this leg could not create the ball window, so there is no key to borrow: %s",
 			rb.verdict)
@@ -199,7 +199,7 @@ func TestLive246ExitRefusesAHangingL2Card(t *testing.T) {
 		t.Fatalf("proc.Boot(test): %v", err)
 	}
 	ra := newResidentApproval()
-	rb := startResidentBall(reg, ra.vetoByEsc)
+	rb := startResidentBall(reg, ra.vetoByEsc, nil, nil)
 	if rb.b == nil {
 		t.Fatalf("no ball window, so no card can hang: %s", rb.verdict)
 	}
@@ -293,7 +293,7 @@ func TestLive246ExitAbandonsAHangingL1Window(t *testing.T) {
 		t.Fatalf("proc.Boot(test): %v", err)
 	}
 	ra := newResidentApproval()
-	rb := startResidentBall(reg, ra.vetoByEsc)
+	rb := startResidentBall(reg, ra.vetoByEsc, nil, nil)
 	if rb.b == nil {
 		t.Fatalf("no ball window: %s", rb.verdict)
 	}

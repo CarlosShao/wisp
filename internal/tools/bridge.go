@@ -249,7 +249,7 @@ func (b *Bridge) Tools(_ context.Context) ([]agent.ToolInfo, error) {
 // Execute implements agent.ToolProvider - the choke point.
 //
 // The returned error is reserved for host-internal faults (D37 class
-// internal/provider), because the loop treats non-nil as "the provider broke"
+// internal-provider), because the loop treats non-nil as "the provider broke"
 // (loop.go:654-657) and books a class the model cannot self-correct against.
 //
 // A REJECT IS NOT A FAULT. SPEC-07 §2 states the C3 rule as "未声明即拒绝调用

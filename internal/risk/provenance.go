@@ -60,7 +60,7 @@ import (
 // the boundary that owns the task — LANDED as a SHAPE by ticket 160: OpenScope
 // now returns *Scope, the close is a method on it, and it refuses a caller who
 // does not hold it. Still OPEN inside (1): the "Defer it onto the task's
-// DisposalScope" half, because no *plugin.DisposalScope reaches tools/agent/cmd
+// DisposalScope" half, because no *plugin.DisposalScope reaches the plugin agent command
 // in production today (160-c1 §2.2) and laying that pipe means touching
 // internal/agent — outside what ticket 160 was approved to open. Remaining
 // items, unchanged: (2) call Mark(...) on every SPEC-06 §5 sensitive

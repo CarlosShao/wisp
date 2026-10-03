@@ -35,7 +35,7 @@ type qitem struct {
 
 	// names are the OTHER strings this one card can legitimately be addressed
 	// by: the correlation id as it arrived before the queue re-stamped it, and
-	// the task id the host keys its own bookkeeping on (tools/bridge.go routes
+	// the task id the host keys its own bookkeeping on (internal/tools/bridge.go routes
 	// cancels by orDefault(CorrelationID, TaskID)). Ticket 87: a card that is
 	// on screen is addressable by whatever the display was built from, and a
 	// reply carrying one of those names is not a reply for a different request.
@@ -465,7 +465,7 @@ func (q *Queue) reject(corr, reason string) error {
 	// channel) land, so booking the settled answer HERE is what makes the
 	// ledger complete without any route having to remember to write its own.
 	// The reason is carried verbatim because it is the same string the model
-	// reads back (tools/bridge.go's orDefault(why, …) on the reject branches) -
+	// reads back (internal/tools/bridge.go's orDefault(why, …) on the reject branches) -
 	// a human's 「no, because …」 has to be inspectable in the audit, not only
 	// in the conversation. observe's handler bounds a logged string itself.
 	q.logf("approval: ANSWER-REJECT corr=%s tool=%s decision=reject reason=%q", corr, tool, why)

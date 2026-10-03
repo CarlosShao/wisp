@@ -24,8 +24,8 @@ import (
 // listed in the user's [fs] reparse_point_exceptions.
 //
 // D22: filepath.Clean / filepath.Abs are sanctioned ONLY inside this file.
-// Any other use for fs decisions is a CI-failing violation (see
-// scripts/check-pathclean-ban.sh).
+// Any other use for fs decisions is a CI-failing violation (enforced by
+// tools/d22scan's pathresolver-bypass ban; see tools/d22scan/main.go).
 //
 // The same pipeline also serves the ANCHOR side of a security comparison
 // (formsOf / anchorForms below): classification must not depend on which

@@ -371,6 +371,10 @@ func selfSkeleton() map[string]string {
 		"frontend/index.html":         "<html><body>ok</body></html>\n",
 		"design/index.html":           "<html><body>ok</body></html>\n",
 		"tools/d22scan/allowlist.txt": "# empty allowlist: this fixture tests the bans, not the exemptions\n",
+		// Ticket 212's wantSilent case cites these two; the fixture must seed
+		// them so those citations EXIST and the gate stays silent on them.
+		"docs/readings.md":            "readings\n",
+		"internal/probe/roster.md":    "roster\n",
 	}
 }
 
@@ -522,6 +526,7 @@ var selfCoverForTag = map[string]string{
 	"panel-approval":         "panel",
 	"internal-artifact-tool": "artifact",
 	"emoji":                  "emojiInternal",
+	"phantom-citation":       "internalGo",
 }
 
 // runSelfTest is the body of the -self-test flag and of the Go test that calls it

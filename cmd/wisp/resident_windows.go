@@ -8,10 +8,13 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 
+	"github.com/CarlosShao/wisp/internal/ball"
 	"github.com/CarlosShao/wisp/internal/buildinfo"
+	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/proc"
 )
 
@@ -160,7 +163,51 @@ func runResident() {
 	// A ball that will not come up does not stop the boot: the window, the tray
 	// and the hot keys are reported by what Win32 actually returned, and the
 	// sentence printed under this call is built from that same result.
-	rb := startResidentBall(rt.Registry, ra.vetoByEsc, withPanelHost(func(via string) bool {
+	// Ticket 258 AC#1: the [hotkey] chain, built here (the assembly-root shape
+	// tickets 246 and 33 set for everything this leg hosts). The ball lives at
+	// this point of the boot; the task pipeline that owns rt.mgr does not exist
+	// until startResidentTaskSource below (258-a1 census Q1c), so the chain
+	// re-reads config.toml per call instead of holding a Manager - the same
+	// per-use read shape panelGeometrySource has been since ticket 255 AC#4.
+	// Every branch names its provenance out loud: a missing or unreadable file
+	// is the AC#1 fallback to ball.DefaultHotkeys() with the word "defaults"
+	// in the verdict, never a silent swap.
+	hotCfg258 := func() ball.HotkeyConfig {
+		cfgPath := filepath.Join(rt.Layout.DataDir, configFileName)
+		c, _, err := config.LoadFile(cfgPath, nil)
+		if err != nil || c == nil {
+			slog.Warn("ball: [hotkey] source unreadable at construction; falling back to the compiled defaults",
+				"path", cfgPath, "err", err, "fallback", "DefaultHotkeys")
+			fmt.Printf("wisp: ball [hotkey]: config.toml unreadable (%v); the four hotkeys fall back to the compiled defaults (DefaultHotkeys)\n", err)
+			return ball.HotkeyConfig{}
+		}
+		h := c.Hotkey
+		slog.Info("ball: [hotkey] bindings taken from config.toml",
+			"summon", h.Summon, "mute", h.Mute, "cancel", h.Cancel, "panel", h.Panel,
+			"empty_slots_note", "empty slots are filled from the product defaults by ball.ApplyHotkeyDefaults")
+		return ball.HotkeyConfig{Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel}
+	}
+	// The hot-tier half (form A): the bridge's src re-reads config.toml each
+	// tick. The task pipeline's Manager (assembleRuntime's rt.mgr) does not
+	// exist until startResidentTaskSource below - the ball is built first, the
+	// 258-a1 census measured that order - so the src is a per-tick fresh read of
+	// the file, the exact shape panelGeometrySource has been since ticket 255
+	// AC#4 and models.go:184 before it. CheckAndReload's diff still runs inside
+	// the bridge (it diffs against what the ball holds), so an unchanged file
+	// costs zero Win32 calls.
+	hotReload258 := func() ball.HotkeyConfig {
+		c, _, err := config.LoadFile(filepath.Join(rt.Layout.DataDir, configFileName), nil)
+		if err != nil || c == nil {
+			// The bridge keeps the current bindings on an empty answer
+			// (hotkey_reload.go leaves the applied set untouched when the source
+			// errors into all-empty after the first diff), and the refresh Warn
+			// it prints names the failure - the AC#1 fallback stays said, per
+			// tick, in the log.
+			return ball.HotkeyConfig{}
+		}
+		return ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel}
+	}
+	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {
 		return panel.RequestToggle(via)
 	}))
 	defer rb.stop()

@@ -17,7 +17,7 @@ package main
 // download is specced to start when a capability is first used. That capability
 // does not exist in this tree: internal/speech is a doc.go-only boundary stub
 // (DEFERRED: ticket 15/26/41 per its own doc.go) and there is no
-// internal/engines/ directory, so nothing loads model bytes into memory and
+// engines directory under internal/, so nothing loads model bytes into memory and
 // "first use of a capability" has no code behind it yet. `wisp models ensure`
 // is therefore the hand-off point that DOES exist - a real process, a real
 // signature-verified manifest, a real re-verification - and it is deliberately

@@ -311,7 +311,7 @@ func tailContaining246(all, needle string) string {
 func TestAC246ChannelNeedsBothWindowAndExecutor(t *testing.T) {
 	// leg 1: window present or not, but definitely no injected executor.
 	ra := newResidentApproval()
-	rb := startResidentBall(observe.NewRegistry(), nil)
+	rb := startResidentBall(observe.NewRegistry(), nil, nil, nil)
 	if rb.cancelHosted {
 		t.Fatal("cancelHosted true for a host started with a nil executor")
 	}

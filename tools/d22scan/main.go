@@ -47,6 +47,12 @@
 //	                      and walkEmoji for the reasons, and pin any change
 //	                      there in scan_test.go rather than in the footer,
 //	                      which is generated from the scope list.
+//	9 phantom-citation    a production-file comment citing a repo-relative
+//	                      path that does not exist on disk (ticket 212: the
+//	                      citation is the next leg's navigation beacon, and a
+//	                      phantom one is worse than none). Judged against the
+//	                      scanned root; shorthand forms are a separate
+//	                      prescription (AC#3), not a violation.
 //
 // Findings are suppressed only via allowlist.txt entries of the form
 // "ban-id<TAB>repo-relative path prefix<TAB>reason" (committed, reviewable,
@@ -121,12 +127,14 @@ func (f Finding) String() string {
 
 // scanner carries the allowlist and the findings.
 type scanner struct {
-	root      string
-	allow     map[string]map[string]bool // ban-id -> path prefix set
-	findings  []Finding
-	failAddOn string         // unused placeholder guard
-	emojiSeen map[string]int // ban #8: scope label -> files actually line-scanned
-	examined  map[string]int // bans #1-7: scope key -> files actually walked
+	root             string
+	allow            map[string]map[string]bool // ban-id -> path prefix set
+	findings         []Finding
+	failAddOn        string          // unused placeholder guard
+	citationReported map[string]bool // ban #9: phantom tokens already reported in this scan
+	citationExists   map[string]bool // ban #9: token -> existence, judged once per scan
+	emojiSeen        map[string]int  // ban #8: scope label -> files actually line-scanned
+	examined         map[string]int  // bans #1-7: scope key -> files actually walked
 	// ign answers "would git decline to track this path?" - the scanned tree's own
 	// .gitignore files for the pattern half and `git ls-files` for the index half.
 	// Every walk consults it, so the denominators count the files a verdict can be
@@ -773,8 +781,73 @@ func (s *scanner) scanGoFile(path string) error {
 				"hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)")
 		}
 	}
+
+	// Ban #9 (ticket 212): a production-file comment citing a repo-relative path
+	// that does not exist. The citation is the navigation beacon the next leg
+	// follows; a phantom one is worse than none (ticket 212's opening section).
+	// Comments come from f.Comments, which ParseComments populated from the same
+	// parse the other bans share - so the "token position after //" shape the
+	// census (212-a2/a3) calibrated is guaranteed by construction here, not by a
+	// line regex. Only fully-spelled repo-relative paths count; shorthand
+	// ("the 152 ruler", "…那一族") is the registered ③ class and is NOT a
+	// violation (AC#3: prescribe, do not convict). Existence is judged against
+	// the scanned root so a fixture's citations are judged inside that fixture.
+	for _, cg := range f.Comments {
+		for _, c := range cg.List {
+			pos := fset.Position(c.Pos())
+			for _, tok := range repoPathRe.FindAllString(c.Text, -1) {
+				if s.citationReported[tok] {
+					continue // one finding per phantom token per scan
+				}
+				// A token ending in a capital-letter segment is a qualified
+				// symbol reference (internal/tools.Result.AppliedSteps,
+				// internal/proc.WithRegistry, class internal/tool) - an API
+				// citation, not a file citation (ticket 212's census classifies
+				// these non-citations; a .go file is never excluded because
+				// files are lowercase on disk).
+				if symRefRe.MatchString(tok) {
+					continue
+				}
+				exists, judged := s.citationExists[tok]
+				if !judged {
+					_, statErr := os.Stat(filepath.Join(s.root, filepath.FromSlash(tok)))
+					exists = statErr == nil
+					if s.citationExists == nil {
+						s.citationExists = map[string]bool{}
+					}
+					s.citationExists[tok] = exists
+				}
+				if exists {
+					continue
+				}
+				if s.citationReported == nil {
+					s.citationReported = map[string]bool{}
+				}
+				s.citationReported[tok] = true
+				s.add("phantom-citation", path, pos.Line,
+					"comment cites repo path \""+tok+"\" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation")
+			}
+		}
+	}
 	return nil
 }
+
+// repoPathRe matches a fully-spelled repo-relative path token inside a comment.
+// The leading directories are the ones the repo actually uses for navigation
+// (census 212-a3 §2: denominator 1033 files, four classes). The token must carry
+// at least one directory separator beyond the prefix so bare "docs" never
+// matches, and must not end mid-word (trailing punctuation like ) , . : is
+// trimmed by the regex via the character class).
+var repoPathRe = regexp.MustCompile(
+	`(?:docs|\.scratch|internal|cmd|tools|scripts)/[A-Za-z0-9_./\-\x{4e00}-\x{9fff}]*[A-Za-z0-9_\-]`)
+
+// symRefRe matches "package.Symbol" and "package.Type.Field" shapes so ban #9
+// does not convict qualified symbol references (internal/tools.Result.AppliedSteps
+// is an API citation, not a file citation; measured against the real repo's first
+// ten findings, 2026-10-03). A token ending in ".go" is still a file citation
+// because file names are lowercase on disk and end in "go", not an uppercase.
+var symRefRe = regexp.MustCompile(
+	`^[a-z][a-z0-9]*(/[a-z][a-z0-9]*)*\.[A-Z]`)
 
 // goStmtText renders a compact "go f()" spelling of a go statement for the
 // finding message, so a named call reads distinctly from a closure literal.

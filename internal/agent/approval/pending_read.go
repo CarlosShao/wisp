@@ -40,7 +40,7 @@ import "github.com/CarlosShao/wisp/internal/tools"
 // LiveApproval is one approval still waiting for an answer, as an in-process
 // observer sees it. Decision is the verdict as it was admitted (RulesHit,
 // Reason, Level and SessionOverrideBlocked are the fields the L2 card shows
-// verbatim, ticket 17's frozen-contract note in tools/gate.go), copied per
+// verbatim, ticket 17's frozen-contract note (enforced by tools/d22scan's pathresolver-bypass ban since the scanner landed), copied per
 // LiveApprovals so writing to it cannot reach the queue; Position is the
 // 1-based place in the FIFO, i.e. the depth badge C18 puts on the card.
 type LiveApproval struct {

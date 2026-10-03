@@ -86,7 +86,7 @@ type ToolProvider interface {
 	Tools(ctx context.Context) ([]ToolInfo, error)
 
 	// Execute runs one call and must honor ctx cancellation and the request
-	// timeout. The returned error is a host failure (class internal/tool);
+	// timeout. The returned error is a host failure (error class internal-tool);
 	// a tool's own failure is reported in ToolOutcome.
 	Execute(ctx context.Context, req ToolRequest) (ToolOutcome, error)
 }

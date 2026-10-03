@@ -65,7 +65,7 @@ type Visual struct {
 
 // SizePx's DPI treatment is asymmetric, and ticket 68 AC#1 records it as found
 // rather than fixing it here (every diff number in docs/SLO.md A.2 and
-// docs/evidence/s1/62-* was measured at 96 DPI, where the asymmetry is a
+// the ticket-62 evidence tables (the ticket-62 evidence tables under docs/evidence/s1) were measured at 96 DPI, where the asymmetry is a
 // no-op): the DC render target is created with dpiX/dpiY = 96, so its units ARE
 // physical pixels, and drawFrame uses R = SizePx/2 unscaled - while the stroke
 // widths and ring margins get the dpi/96 factor and the window edge gets

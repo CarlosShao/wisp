@@ -913,6 +913,24 @@ func (b *Ball) EscTakenOver() bool {
 	return ok
 }
 
+// DebugRegisterHotkeySquat registers an arbitrary id/accelerator pair on the
+// ball's own window, on its STA thread (ticket 258's AC#3 seam). RegisterHotKey
+// is desktop-wide and id-blind, so from any other binding's point of view this
+// is exactly "another program owns the combination". Production callers: none -
+// the shipped host only ever registers through registerAll; this seam exists so
+// a test can plant the occupied shape without a second window on the desktop.
+func (b *Ball) DebugRegisterHotkeySquat(id uint32, acc Accelerator) error {
+	var err error
+	b.uiRun(func() { err = hotkeyRegisterer(b.hwnd)(id, acc) })
+	return err
+}
+
+// DebugUnregisterHotkeySquat drops an arbitrary id on the ball's own window
+// (the squat seam's release half; a No-op for ids the ball does not hold).
+func (b *Ball) DebugUnregisterHotkeySquat(id uint32) {
+	b.uiRun(func() { hotkeyUnregisterer(b.hwnd)(id) })
+}
+
 // --------------------------------------------------------------------- tray
 
 // SetTrayChecks updates the mute / pause-wake checkmarks.
