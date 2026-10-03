@@ -1,0 +1,5 @@
+248-c3 fill §3: dependency map (33 vs 255-r2 vs frontend)
+
+Only AC#4 truly waits on ticket 33. AC#8/AC#10 wait on ticket 255-r2
+(TierOf registry), AC#2/AC#9 wait only on the frontend half. Distinguishes
+so none gets wrongly lumped under "waiting for 33".
