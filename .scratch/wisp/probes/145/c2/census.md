@@ -108,7 +108,28 @@
 
 ## §3 状态↔缺字段对照表（十四枚逐行）
 
-〔待填〕
+**十四行来源＝`docs/PLAN.md:3481-3494`（本程现读；票面引的 `:3473-3488` 已漂，表头在 `:3479`，行体从 `:3481` 起——见 §5）。**
+**关键再框定**：本票标题说"快照只 4 字段→11 态无输入"。现量快照确实长到 6＋11 字段，但**新长的维度（git/model/credential/instructions/tasks）几乎没有一枚喂这十四行"工作态"**——它们是"设置/名册"侧的维，不是"这一轮 agent 正在干什么"的侧。⇒ 十四行里的**工作态**基本**仍未接**；下表逐行标"今天能否画"。
+
+| # | 状态（PLAN 行） | 今天能画？ | 缺的字段（Go 侧候选名） | 该字段属哪种"没做" | 盘上证据 |
+|---|---|---|---|---|---|
+| 1 | 思考中（等 LLM 首 token） | **否** | `run.phase`（"正在思考"这一相）＋ `thinkingElapsedMs`（已耗时） | phase＝**③**（无 phase/状态映射表，r2/r3）；elapsed＝**③**（无 turn-started 时戳读口） | 快照无 phase 字段；`grep` 计时读口无果（§6 待量） |
+| 2 | SSE 流式输出 | **部分**（文字有，实时 token 无） | `results[].tokens`（实时 token 计数） | **②**（源＝`agent.Cost.Usage`/`llm.Usage` `cost.go:24`、`events.go:90`，卡在 loop 局部跨不到泵） | 文字：`composer.go:97 Results[].text`（已接）；计数：无字段 |
+| 3 | 推理过程（reasoning delta） | **否** | `run.reasoning`（正文）＋ `reasoningElapsedMs` | 正文＝**②**（源＝`llm.EvReasoningDelta` `events.go:33`，收集器 `events.go:189,258 Reasoning`；记录点被打印未入快照）；elapsed＝**③** | r2 §2 `run.reasoning` 行：源真、卡在 `run.go` 记录点 |
+| 4 | 工具调用（chip） | **仅被 L2 门控的那几枚**（=卡片）；运行中/非门控工具调用**无法画** | `tools[]`（条目＋四值状态 running/success/fail/rejected＋风险徽标） | **②**（条目源＝record point `run.go:816` 一带 / `agent` 事件；四值状态无快照承载；非门控调用完全无读口） | 门控调用＝`pending[].ApprovalCardView`（level/tool/args 有，`approval.go:39-59`）；其余无 |
+| 5 | 工具调用（展开） | **部分**（门控调用有全参数，结果摘要/耗时无） | `tools[].result`＋`tools[].durationMs`＋`correlationId`（已有） | result＝**②**；durationMs＝**③**（无计时生产者） | 全参数＝`approval.go:42 args`；correlationId=`approval.go:40`；result/duration 无字段 |
+| 6 | 审批等待（L2 队列深度角标） | **能画**（`depth = len(pending)` 客户端可算） | 无（**不需新字段**：r2 把 `approval.depth` 判为"复述字段当装饰"拒收） | —（可派生） | `composer.go:58 Pending`；`panel_pump.go:333-339` 摘要已用 `len(snap.Pending)` |
+| 7 | L2 确认卡（面板内） | **能画**（唯一"已有"的一行，除 callChain 外齐） | `callChain`（链路）＝缺 | **③**（`pump.go:80-86`/`panel_pump.go:50-57`：run 路径不记链路，`tools.Decision` 无 chain 字段） | `approval.go:39-59` 九枚已接；`approval.go:55 callChain` 恒空 |
+| 8 | L1 阻止窗口 | **部分/否**（工具名与参数摘要视是否进 LiveApprovals 而定；环形倒计时**无法画**） | `approval.remainingMs`（实时还剩多少） | **③**（`EventTick` 零发射 `ui.go:64`；`gate.go:302/431 Remaining` 带的是静态 `g.window` 非实时剩余） | `pump.go:50-56` 具名此坑；静态窗长可经 `Gate.Window()` `gate.go:170` 取但会"停在满格" |
+| 9 | L2 原生降级卡（C27，面板不可用时） | **面板快照射程外**（原生球侧弹出，非 Go→页面快照） | —（非本载体） | —（票面①：原生侧、面板契约够不着） | 归 C27 原生路径，非 `Snapshot` |
+| 10 | 错误 | **否** | `failures[]`（class＋detail）＋`failures[].humanText`（人话） | 载体/class＝**②**（`observe.Error` Class/Detail `guard.go:271 ErrorClassOfTurnError`；事件在 record point，`agent.Event.Err` 真发不留存）；humanText＝**③**（class→中文映射不存在，r2 §2） | 无任何 error 字段 |
+| 11 | Stuck（梯度刹车 C22） | **待量**（若 `Tasks[].status/statusReason` 已带 Stuck 词则可画；否则否） | `stuck`（＋重复的工具名与次数） | 源＝**②**（`agent.Guard.Reminder{Repeat,Tool,Stuck}` `guard.go:47-58,165`，阶梯 `[3,5,8]` `guard.go:97`；loop 局部、未入快照）；是否已折进 task status＝§6 待量 | `loop.go:382-388 brakeStuck`；快照无独立 stuck 字段 |
+| 12 | 成本（C23） | **否** | `cost`（IN/OUT/CACHED token＋金额） | **②**（源＝`agent.Cost{Usage,Micros,Currency}` `cost.go:23`、`guard.go:80-84`）；⚠ 单位口径 micro-USD vs CNY **未定案**（`cost.go:16-20`"never invents exchange rate"）⇒ 属**待裁**非纯字段 | 快照无 cost 字段；r2 §2 拒收（单位＋跨 seam 双因） |
+| 13 | 已取消/被打断 | **待量**（取消原因串源在 `loop.go:378 finish(...StatusCancelled,"任务已取消")`→可能经 `Tasks[].status/statusReason` 带出；否则否） | `cancelReason`（若未经 tasks 带出） | 原因串＝源存在（`queue.go:501 abandon(why)`、`loop.go:378`），是否达快照＝§6 待量；若不达＝**②** | 无顶层 cancel 字段 |
+| 14 | 注入检出（C25/R4） | **部分**（"含来自 `<url>` 的内容"这句 reason **能画**；"可展开看命中的片段"**不能**） | `card.fragment`（命中片段） | **③ 对卡片路径**（`RiskHit.Fragment` `provenance.go:278` 有源，但**不在 `risk.Decision`** `assessor.go:90-97`→不到卡；渲染时可否回读＝§6） | 票面④：来源链 rules_gateway→`approval.go:83 Reason`→卡 **是通的**；缺陷只是硬编码文案（前端自改），非等 Go |
+
+**小结（本程现量口径）**：十四行里 **今天能画的＝行 6、行 7（除 callChain）** 两行完全、**部分能画＝行 2/4/5/14** 四行、**待量（可能经 Tasks 带出）＝行 11/13** 两行、**完全不能画＝行 1/3/8/10/12** 五行、**射程外＝行 9（原生）**。
+⇒ **对"工作态"而言票面①的"缺 8～10"判断方向仍成立**：快照新增的 6 字段（git/model/credential/instructions/tasks）解决的是"设置/名册"侧可读性，**没有一枚落进这十四行的工作态缺口**。真正的跨-seam 阻塞仍是那句"数据在 `internal/agent` 的 loop 局部/记录点算得出、泵读不到"（行 2/3/10/11/12）＋"纯无源"（计时 elapsed、人话文案、命中片段、实时剩余、phase 映射）。
 
 ## §4 复认/推翻前人件（具名）
 
