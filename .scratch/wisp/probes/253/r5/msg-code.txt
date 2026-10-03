@@ -1,0 +1,53 @@
+253-r5: 票 253 AC#2 落地（形ⓐ）—— 另立一枚"全量入向名册"尺，⛔ 未改 bridge.go 一字
+
+新增唯一产码文件：`internal/panel/inbound_roster_253_test.go`（package panel）。
+
+缺陷本体（票面 §现量-2，台账 A519）：`config.get`／`config.set`
+（`internal/panel/bridge.go:66-67`）不带 `panel.` 前缀，因此掉在两把旧名册尺之外——
+`internal/panel/git_test.go:394` 的 `panelMethodRe` 与
+`internal/panel/composer_test.go:394` 的 `routeLiteralRe` 都把前缀写进了正则，
+⇒ 一枚新增入向方法名可以在**不触发任何既有尺**的情况下进树（今天它是绿的，这就是洞）。
+
+本件另立一枚封闭名册尺，射程按**结构**取、⛔ 不认任何命名空间前缀，五个分母各自独立、
+每个都双向对账：
+  1. DECLARED —— `bridge.go` 里每一枚包级字符串常量：标识符以 `Method` 开头 **或**
+     取值是点分名（两条独立信号取并集 ⇒ `config.peek`／`settings.read`／`x.y` 全在射程内）；
+  2. RUNNING GUARD —— 名册里每名都问一次**真的** `knownComposerMethod`（不复刻判据）；
+  3. GUARD AST —— `bridge.go:146` 那枚 switch 的 case 标签逐个解析到常量取值；
+  4. ROUTER AST —— `internal/panel/composer_dispatch.go:175` 的 dispatch case 标签
+     （其 `default:` 具名要求仍走 `rosterMismatch`，回填票 240 那族"backstop 被摘"形）；
+  5. ANSWERED 字面 —— 全包产码里任何点分字符串字面，只要**运行中的 guard 答它**，
+     就必须在名册上（专治"名字只写在表达式里、从未成为可登记的常量"那一形）。
+另钉两枚写死的数：`wantFullInboundRosterSize253 = 6`、
+`wantNonPanelPrefixedInbound253 = 2`（无前缀那批的枚数＝AC#2 的靶心）。
+
+判据形状（票面 AC#2 那句"种一枚新增方法名没进名册 ⇒ 指名那一步必须红"）：
+  - `TestPlantedUnregisteredInboundMethodNameGoesRed` 三发 plant 全在 `t.TempDir` 副本里：
+    普通标识符常量／`Method` 名常量／guard case 里的裸字面 ⇒ 尺**指名红**；
+    末了同一条 helper 复读真树必须安静（"clean half"定式）。
+  - `TestFullInboundRosterRefusesAnEmptyDeclarationFile` ＝反"恒真"那一发：
+    指向一枚什么常量都没有的 decoy，必须报"6 名全缺"，⛔ 不许"名单为空也算过"。
+  - `TestSubsetOnlyRosterDirectionIsBlindToAPlantedName` 把**反形**（只查子集那一向）
+    当场量一遍并登记其失明：plant 在树里时反形无话可说 ⇒ 反形不可作凭据。
+  - `TestRegistrationSilencesTheRosterRuler` 给"补登记后不响"那一半的两式读数：
+    声明＋被答＝安静；只补名册＝仍红（红在"名册有名而 Go 不答"那三支）。
+
+⛔ 本腿零改产码：`internal/panel/bridge.go` 与 HEAD blob 逐字节相同
+（md5 `63e69a79422b577cca6a320c52915261`，167 行，`git diff --stat` 空）；
+两枚 want-4 锚（`git_test.go:385` 的 `TestGitDimensionHasNoModelCallableTool` 与
+`:517` 的 `TestPlantedGitToolShapesGoRed`）一行未动，终态读数 PASS；
+冻结件 `tokens_fourway_test.go`／`l2_grant_boundary_test.go` 一字未改（只读来判射程）。
+正控那两小步曾在 `bridge.go` 末尾**只加**一枚新常量（种→跑→还原同一条命令内完成）。
+
+终态读数：`GOFLAGS= go build ./...` 净｜gofumpt `-l internal/panel` 空｜
+`./tools/d22scan/d22scan.exe` exit 0 "clean"（ban #8 扫 internal/ 489 枚 Go 文件，
+含 `_test.go` ⇒ 本件也被扫过）｜`go test ./internal/panel/ -count=1` =
+111 PASS / 4 FAIL / 0 SKIP，四枚 FAIL 与起手基线**逐名相同**
+（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／
+`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`，
+票 253-r3 §ⓔ 在册页面契约族常红，⛔ 不算本腿凭据、不许修）。
+
+AC 勾选框一枚未碰；只 commit 未 push；`frontend/**`／`design/**` 零读零引。
+证据件＝`.scratch/wisp/probes/253/r5/impl.md`（§1–§7 随后一次 commit 填齐），
+原始日志同目录：`baseline-run.log`／`plant-run.log`／`reverse-form-run.log`／
+`registered-run.log`／`final-run.log`／`inbound_roster_253_test.shipped-copy.txt`。

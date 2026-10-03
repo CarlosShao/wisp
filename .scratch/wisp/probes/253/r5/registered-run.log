@@ -1,0 +1,10 @@
+time=2026-10-03T09:49:32.960+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:466: ticket 253 AC#2: the roster carries config.peek but the running guard knownComposerMethod refuses it - a rostered inbound name Go does not answer is a page-visible dead door
+    inbound_roster_253_test.go:480: ticket 253 AC#2: the roster carries config.peek but knownComposerMethod's case list no longer names it - the guard stopped answering a door this file still claims is open
+    inbound_roster_253_test.go:504: ticket 253 AC#2: the roster carries config.peek but composer_dispatch.go's dispatch has no case for it - the guard would answer it and the router would fall through to the roster-mismatch backstop
+    inbound_roster_253_test.go:520: full inbound roster held: 7 names declared in bridge.go, 6 guard case labels, 6 router case labels, 3 of them carrying no "panel." prefix ("config.get", "config.peek", "config.set")
+--- FAIL: TestFullInboundMethodRosterIsClosed (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.066s
+FAIL

@@ -1,0 +1,6 @@
+time=2026-10-03T09:48:00.050+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:521: full inbound roster held: 7 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- PASS: TestFullInboundMethodRosterIsClosed (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.050s
