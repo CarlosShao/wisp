@@ -31,7 +31,8 @@ $ git status --porcelain -- cmd internal
 
 > 范围披露：`[app]` 新增键不在键级尺射程（固定名单非反射走查）——我裁＝记范围不算欠账，补尺（一行循环）归 `255-r2` 顺手做
 
-本腿 commit 序列：`c8480bce`（§0 骨架）→ `ae60a87c`（AC#1 名册＋回执＋AC#3 尺）→ `a4906b6c`（逐名方括号＋句子装配钉）→ `17ff058d`（gofumpt 归零）→ 本件终值 commit。
+本腿 commit 序列：`c8480bce`（§0 骨架）→ `ae60a87c`（AC#1 名册＋回执＋AC#3 尺）→ `a4906b6c`（逐名方括号＋句子装配钉）→
+`17ff058d`（gofumpt 归零）→ `13dd60b4`（证据件 §1—§7 终值）→ 本件最后一枚（A549 判给本腿的 `restartTierKeys` 幻影注释清理，§2.4＋§4 m3）。
 
 ---
 
@@ -191,7 +192,32 @@ wisp run: 配置热加载：这些段的值已换进本进程内存，但本宿�
   **刻意是下界不是等式**：等式会让"补登记后不响"这条正控失败（登记完还得回去改一个数字），而票面要的正是"补登记后不响"。
   等式那把保险在段级已有（`tiers_255_test.go` 的 `TestRegistryCoversSchemaSectionsGreen`），本腿没动。
 
-### 2.3 我动了别人的一张既有断言（具名，不藏）
+### 2.3 第三格（派单没写、台账写了）：`restartTierKeys` 的幻影注释
+
+台账 `A549`（commit `69c9094c`，编排者收 `255-v1` 时裁）逐字：
+「判不动五条我裁两条＝… **restartTierKeys 幻影注释归 `255-r2` 清**」。票面 §1.1 的 T2 行也早记着同一件事：
+`cmd/wisp/config_reload.go` 那句注释自称 "and by a test"，而 `grep -rn restartTierKeys --include=*_test.go cmd internal`＝**0 命中**。
+
+本腿起手复量（`2026-10-03`，还原后仍成立）：
+
+```
+$ grep -rn --include=*.go "restartTierKeys" cmd internal tools scripts
+cmd/wisp/config_reload.go:320 / :326 / :329 / :332      ← 四枚全在同一文件，测试侧零枚
+```
+
+**清法＝把那句谎变成读得到**（⛔ 不是把注释里 "and by a test" 删掉了事——那是摘尺）：
+新增 `cmd/wisp/restart_tier_keys_255r2_test.go` 的 `TestTicket255RestartTierKeysAreBackedByATest` 做四件事：
+
+1. `restartTierKeys` 逐名钉死（`app.language app.autostart app.single_instance`）；
+2. 每枚键必须在 `config.TierRegistry` 里登记成 `restart`（第二枚 `TierOf` 生产消费点，T2 词表与 ⓑ 登记表不许各说一套）；
+3. **行为形**：逐枚只改那一枚键，走真的 `config.SaveFile → NewManager → CheckAndReload`，
+   要求落进 `Report.Restart` 且**不落进** `Report.Hot`；
+4. 反面正控：`app.theme` 单独改 ⇒ 必须落 `Report.Hot`、不落 `Report.Restart`。
+
+同批把注释里那枚不存在的符号 `applyApp` 改成真身 `planApp`（`grep -rn applyApp cmd internal`＝除该行本身外零命中），
+并把新读者的名字写进注释。产品行为一字未改（该文件只有注释与名册文字变化）。
+
+### 2.4 我动了别人的一张既有断言（具名，不藏）
 
 `cmd/wisp/config_reload_223_test.go` 的 `TestTicket223RunArmsTheReloadTick` 原三行：
 
@@ -286,7 +312,7 @@ m1 的诚实自我批评：种回 pre-255 形状时，三枚用例都是**先**�
 7. **`sectionReadSites` 的排除清单**：排掉了 `internal/config/`、`*_test.go`、`testdata/`、注释行与本票名册文件。
    排掉名册文件是因为它的裁决字符串**引用**代码（如 `cfg.Models.Mirror`）。如果有人往这个文件里写真读配置的代码，
    这条排除会把它藏住——目前它只做字符串比对与反射，且排除是按精确文件名（不是模式）。
-8. **我改了他票的一枚断言**（§2.3）。若裁"任何既有断言都不许动"，这一处要退回；退回去的结果是
+8. **我改了他票的一枚断言**（§2.4）。若裁"任何既有断言都不许动"，这一处要退回；退回去的结果是
    `TestTicket223RunArmsTheReloadTick` 在 AC#1 修复下必红（它钉的正是被禁的谎）。这条冲突需要编排者裁，不是我裁。
 9. **`bracketed()` 改了产品文案的形状**（`[ball session]` ⇒ `[ball] [session]`）。若有我没找到的下游/测试按 `%v` 形状解析那句，
    它会红。我在 `cmd internal tools scripts docs` 里搜过"这些段已立即生效"，除我改的两枚之外只有 `config_reload_223_test.go:495`
@@ -330,5 +356,5 @@ m1 的诚实自我批评：种回 pre-255 形状时，三枚用例都是**先**�
   `internal/risk/` 一字未写；`docs/PLAN.md`、`docs/specs/**`、`thresholds.go`、golden、`allowlist.txt`、
   `tokens_fourway_test.go`、`ticket90_persist_test.go`、`.github/workflows/ci.yml` 一字未动。
 - 未放宽任何既有断言、无 `t.Skip`、无把 SKIP 读成通过；仓内**没有删任何文件**（备份、日志、msg 全部只建不删）。
-- 请验收者**特别核**三处：①§1.5 的口径选择（(A)/(B)）；②§2.3 我改了 223 的一枚断言；③§4 m1 的红因是"缺句超时 + dump 里的谎句"，
+- 请验收者**特别核**三处：①§1.5 的口径选择（(A)/(B)）；②§2.4 我改了 223 的一枚断言；③§4 m1 的红因是"缺句超时 + dump 里的谎句"，
   而 m1b 才是判据行直响。

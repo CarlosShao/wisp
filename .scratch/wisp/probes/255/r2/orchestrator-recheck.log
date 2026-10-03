@@ -1,0 +1,11 @@
+time=2026-10-03T10:35:54.195+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.language
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.autostart
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.single_instance
+--- PASS: TestTicket255RestartTierKeysAreBackedByATest (0.12s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.language (0.03s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.autostart (0.03s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.single_instance (0.03s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.191s

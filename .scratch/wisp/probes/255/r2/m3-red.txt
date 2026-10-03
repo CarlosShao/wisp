@@ -1,0 +1,5 @@
+--- FAIL: TestTicket255RestartTierKeysAreBackedByATest (0.15s)
+    restart_tier_keys_255r2_test.go:55: restartTierKeys = "app.language app.autostart", want the three keys planApp defers - the sentence in reportRestartPending prints this list verbatim
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.258s
+FAIL
