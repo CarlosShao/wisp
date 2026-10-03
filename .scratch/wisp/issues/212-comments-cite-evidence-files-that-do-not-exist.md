@@ -65,3 +65,7 @@
 - **AC#5 成立**：八枚 ban 读数逐名零漂移（cmd/#8 96→97＝258-v1 并发腿落的 untracked 测试件，mtime 在案，非实现件所致）。
 - **归 212-r2 的清单（两任合并）**：①ⓐ 修法＋silent 样本；②main.go:802-805 symRefRe 自述与行为不符（`internal/tool` 实际不被排除）改注释；③三处"诚实化"半假——`internal-tool`/`internal-provider` 不在 D37 17 类枚举（实测 booking＝ClassInternal）、pending_read.go 嫁接句真身是 internal/tools/gate.go:13 只缺前缀——逐枚改成实话；④票面"10 枚"与树不符（11 token/8 真②/9 hunk）＝计数口径在 212-r2 证据件里重述。
 - **三实例碰撞对账（A580 事故的收尾）**：第一实例 `verdict-first-instance.md`（54742783）与第三任 `verdict.md`（fd8fce1f）**独立取数、结论一致**（symRefRe 三发/恒真/AC#5 三处互证）＝验收结论可信度因冗余反升；第二任（死于 §2 中途）骨架被复用、其"基线"叙述与树不符处已在第三任 verdict 具名。两枚验收腿均非实现者（实现＝编排者 5e8748b3）＝D22 双角色成立。
+
+
+### Progress log 补一行（2026-10-03 22:3x）
+- 22:3x 终裁落定：六格全勾（AC#1..AC#5）；AC#3 带条件＝裁ⓐ（regex 排除缩写形）归 212-r2，口令「212 改ⓑ」；212-r2 清单四枚（ⓐ修法＋样本／symRefRe 自述改注释／三处半假诚实化改实话／计数口径重述）。两任验收（第一实例 54742783／第三任 fd8fce1f）独立取数结论一致。**AC#4 那格（若有）与 258 的 AC#4 同形：build 销账下轮带。**
