@@ -1,0 +1,10 @@
+docs(247-a2): §3 两把开关与默认档自证填满
+
+三把开关现读：voice.enabled=true(schema.go:245)、wake_word.enabled=false(:197)、
+audio.mic_muted_default=true(:277)；默认值由 defaults.go:58/96-101 逐叶读标签落地（正控 sed 197/245/277）。
+尺+票255自己的名册 config_readers_255.go:123/140-143 同证：Voice.Enabled/WakeWord.Enabled 产码只在
+manager.go:380/394/395（reload，非开麦），mic_muted_default 产码读取处=零（只有 gate.go:55 注释）。
+纠 247-a1/A485：引的 manager.go:370/384/385 现树是 380/394/395。
+"默认档不开麦"靠的是哪一行：诚答=现树靠"没有那一行"（resident_windows.go:14-16 import 块无 audio、mic.Start
+零调用者）；接线后须由 gate.go:108×gate.go:235×WithStartMuted(gate.go:57)×voice=false不构造(A485-P1待新增)
+组合保证；反面 wasapimic_windows.go:88 不装门=一双击就开麦。与 A485-P1 裁甲一致，本腿不裁。

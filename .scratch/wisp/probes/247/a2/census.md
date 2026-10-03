@@ -90,6 +90,47 @@ _§2 量数时刻：`2026-10-03 10:0x +0800`。_
 
 ## §3 两把开关与默认档自证
 
+### 3.1 三把开关：字段、默认值、读取处（默认值是代码事实，不是文档口径）
+
+| 语义 | Go 字段 | toml 路径 | 默认值（现读） | 默认值怎么落地 |
+|---|---|---|---|---|
+| `voice.enabled` | `VoiceSection.Enabled` | `voice.enabled` | **true** | `schema.go:245`（struct 头 `:244`，section 挂点 `:114`），标签 `default:"true"` |
+| `wake_word.enabled` | `WakeWord.Enabled` | `voice.wake_word.enabled` | **false** | `schema.go:197`（struct 头 `:196`，嵌在 VoiceSection 里 `:247`），标签 `default:"false"` |
+| `audio.mic_muted_default`（第三枚，票面没点名、唯一真挡得住麦的） | `AudioSection.MicMutedDefault` | `audio.mic_muted_default` | **true** | `schema.go:277`（struct 头 `:269`），注释 `:276` "starts every session muted" |
+
+- 默认值由标签单点决定（D36）：`NewDefaults()` `defaults.go:58` → `applyDefaults` `:65` 逐叶读 `default:"…"`，Bool 分支 `setDefault` `:96-101`（`strconv.ParseBool`）。正控：`sed -n '197p;245p;277p' schema.go` 逐字回 `default:"false"` / `default:"true"` / `default:"true"`。
+- **本腿零改动**：AC#4 的"一字不改"由"我没动 schema.go 任何一个字节"满足（写点唯一＝本件，`git show --stat` 每发都只有 `.scratch/wisp/probes/247/a2/**`）。
+
+### 3.2 这两把开关今天**没有**任何产码用来决定开麦
+
+- 尺：`grep -rn "Voice\.Enabled\|WakeWord\.Enabled" --include=*.go . | grep -v _test` ⇒ 产码命中只有 `internal/config/manager.go:380`（reload 分层比较）、`:394`、`:395`（把新值抄回活配置）。**用途是"改了要不要重载"，不是"要不要开麦"**。
+- 正控：同尺排测试前会多命中 `internal/config/boundary_test.go:91`（`c.Voice.Enabled = false`）；且票 255 自己的读取名册 `cmd/wisp/config_readers_255.go:123` 逐字 *"扫描零命中：nothing outside internal/config reads cfg.Audio"*、`:140-143` 对 `voice.*` 同样判 no-reader ⇒ 与我的 grep 同向、且是**盘上现成的第三方读数**。
+- ⚠ 纠 `247-a1`/`A485`：U13/现量引的是 `manager.go:370/:384/:385`，现树是 `:380/:394/:395`（见 §6）。
+- `mic_muted_default` 的产码读取处＝**零**（尺 `grep -rn "MicMutedDefault\|mic_muted_default" --include=*.go . | grep -v _test | grep -v ".scratch"` ⇒ 只剩 `schema.go:277` 定义与 `gate.go:55-56` 的**注释**"map … here at boot wiring"；没有任何产码真的把它传给 `WithStartMuted`）。⇒ 三把开关今天对"开麦"**都没有方向**，因为没消费者。
+
+### 3.3 "默认档下这条路根本不启动"在现树里靠哪一行做到
+
+**诚答：现树里它靠的是"没有那一行"，不是靠任一开关。** 决定"不启动"的，是 §1.1/§2-H1 的**缺席**本身——`cmd/wisp/resident_windows.go` 的 import 块（`:14-16`）里**没有 `internal/audio`**，`mic.Start` 产码零调用者。一双击 `wisp.exe` 起的是 `runResident`：它建球（`:163`）、建面板（`:148`）、建任务源（`:206`），**从不构造采集器**。所以默认档（voice=true × wake_word=false）下麦克风不会被这条路打开——因为这条路今天不存在，不是因为那两枚布尔值挡的。
+
+**一旦接线（`247-r1` 之后），"默认档不开麦"这件事必须由下列几枚行的组合来保证**（缺一即破，交 `247-v1` 逐枚钉）：
+
+| 保证 | 决定它的行 | 形状 |
+|---|---|---|
+| 装了门且 `mic_muted_default` 真传进去 | `gate.go:108`（`if g.effectiveOpen()`）× `gate.go:235`（`effectiveOpen` 首行 `if g.muted { return false }`）× 接线侧调 `WithStartMuted(c.Audio.MicMutedDefault)`（`gate.go:57`） | muted=true ⇒ `openInnerLocked`（`gate.go:247`）不跑 ⇒ 内层 `mic.Start` 不跑 ⇒ `wasapi_windows.go:210 Open` 不跑 |
+| `voice.enabled=false` 视为"根本不构造采集器" | **今天没有这一行**——`A485`-P1 要求 `247-r1` **新增**（现树没有任何产码读 `Voice.Enabled` 做开麦决策，见 3.2） | 若不补这行，`voice.enabled=false` 在默认档下挡不住任何东西 |
+| ⛔ 反面：不装门、直接 `mic.Start(ctx, buf)` | `wasapimic_windows.go:88`（`return <-started`＝同步等设备开成功） | **一双击就开麦**（`started` 只有在 `run` 里 open 成功后才送 nil） |
+
+⇒ 结论句：**挡住默认档采音的既不是 `voice.enabled=true` 也不是 `wake_word.enabled=false`，而是"没人接线"这件事本身**；接线时唯一自带的默认是 `audio.mic_muted_default=true`，而它**只在门被装上、且有人把它传进 `WithStartMuted` 时才生效**（今天连"传进去"这步都还没有产码做）。这与 `A485`-P1 裁"甲"完全一致，本腿不裁、只把"改哪几行会失效"摆明。
+
+### 3.4 "如果动了默认值会怎样"（本票零改动，只讲清）
+
+- `audio.mic_muted_default` → false：装了门也会在启动时开设备（`WithStartMuted(false)` ⇒ `effectiveOpen()` 真 ⇒ `openInnerLocked` 跑）。三枚里唯一**直接改开麦行为**的默认。
+- `voice.enabled` → false：**今天零后果**（无决策读取处，3.2）；只有 `247-r1` 补上"voice.enabled=false 不构造采集器"那行后它才开始挡。它的约束力是**接线造成的，不是默认值自带的**。
+- `voice.wake_word.enabled` → true：**今天同样零后果**；KWS 落地属唤醒词票（票面 AC#7 明列唤醒词/ASR/TTS 都不属于本票）。同向证据：进 Armed 的 `EvKwsEnabled`（`events.go:18`）产码零发射者（`table.go:55` 只有表行）。
+- ⚠ 别把"零后果"读成"无关"：`voice`/`wake_word` 的 `Enabled` 都在 reload-tier，改值会走重载计划（`manager.go:380` 的比较、`:394/:395` 的抄回），不是设备开麦决策。
+
+_§3 量数时刻：`2026-10-03 10:0x +0800`。_
+
 ## §4 真机读数怎么量
 
 ## §5 量不到的格子
