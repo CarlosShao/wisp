@@ -129,13 +129,113 @@
 
 ## §3 「没卡时按允许」该说什么
 
-（待填：现成的诚实形状逐枚 `file:line`；⛔ 不造第二套词）
+**结论先报**：这一格**不需要造词**——现成的诚实形状有**五族**，而且**同一枚错误码已经被钉过**。
+下面逐枚给位置，⛔ 不推荐、不裁。
+
+### (a) 语义层：`Allow` 无卡时返回的那一枚 sentinel（今天就已经是这个返回）
+
+- `internal/agent/approval/replies.go:57` 逐字
+  `ErrNoTrackedCard = errors.New("approval: 本机账上没有这张卡（从未显示、已答复，或已经离开屏幕）")`
+  ——**三支含义它自己列全了**（未显示／已答复／已离屏）。
+- 送出点：`replies.go:317-319`（`Look` 不中即返回它）；姊妹两支在同一处开关里：
+  `:60` `ErrRouteHasNoAllow`「这一路线只有否决、没有允许」（L1 窗口那支，`:321-322`）、
+  `:64` `ErrNoGateAttached`（半接线那支，`:325-326`）。
+- **已被看守**（＝不需要新语义的证据）：`internal/agent/approval/replies_201_test.go:93-94`
+  断 `Allow(ctx,"never-displayed")` 必 `ErrNoTrackedCard`；`:99-102` 断 L1 窗口上必 `ErrRouteHasNoAllow`；
+  `:104-107` 反向断"被拒的 allow 不许顺手把卡片 retire 掉"（`Look("w-1")` 仍在）。
+
+### (b) 宿主成句：控制台那一侧已经把同一枚码翻成给人看的那一句
+
+- `cmd/wisp/approval_reply.go:217-219`：`ErrNoTrackedCard` →
+  「没有找到待答复的卡片 %q：它可能已经结束，**从未显示的卡片这里也没有令牌可花**」，
+  并且**同时**记一行 `s.record("REFUSED", corr, "", "native/allow", "本机没有这张卡的记录")`（`:218`）。
+- 姊妹支：`:220-223`（L1 只有否决）、`:226-229`（令牌失效＝要重新显示才能被允许）。
+  ⇒ 这一族的形状＝**"人读的因果句" + "机读的 route 标签"两句一起出**，不是只印一个错误码。
+
+### (c) GUI 同线程同形状的现成实话（离托盘最近的一枚）
+
+- `cmd/wisp/resident_approval_windows.go:171-178` `vetoByEsc()`：`AwaitingHuman()` 不中即返回
+  「按下的取消键没有可否决的确认项：本进程此刻没有卡片在等人」，注释逐字
+  「Said out loud rather than left silent」。
+- **它被钉着**：`cmd/wisp/resident_approval_246_windows_test.go:341-346`
+  `TestAC246VetoSentenceWithNoCard` 断那句里必须出现「没有可否决的确认项」，
+  并反向断空账上 `AwaitingHuman()`/`WaitingState()` 都不许说"有人在等"。
+  ⇒ **"按下那一枚、此刻没有对象"这一形状在本仓已有一条会响的钉**，托盘那枚只是它的第二条。
+
+### (d) **同一枚托盘文件**里的"诚实落空"先例（两枚）
+
+- `cmd/wisp/resident_ball_windows.go:301-312` `recordTrayExit()`：`const why` 一整句因果
+  ＋`slog.Warn("tray exit requested", "outcome", "ignored", "why", why)` ＋`fmt.Printf`，
+  注释逐字「it is **reported instead of assumed**」。
+- `cmd/wisp/resident_ball_windows.go:261-269` `recordBallGesture()`：`slog.Warn("ball gesture arrived with no executor", …)`
+  ＋控制台一行，共用的 `why` 常量在 `:249-259`。
+  ⇒ **出声的通道只有一条能选**：`b.fire(fn func())`（`internal/ball/ball_windows.go:728-732`）没有回程值，
+  所以落空的话**只能由 `cmd/wisp` 侧说**（这与 `A498` F4 的"⛔ 不许让 `showMenu` 的返回值带出错误"是同一枚事实）。
+
+### (e) B1 那一族（通道可用性），⚠ 与 (a)-(d) **不是一族**
+
+- `internal/agent/approval/approval.go:80` 逐字「An unloaded channel is NEVER rendered as available (B1)」，
+  `:95-119 unavailableText()`（四枚通道各一句不同文案），`:121-124 ErrChannelUnavailable`
+  逐字「a silently ignored cancel attempt is how a fake channel becomes a user-visible promise」。
+- 送出点：`internal/agent/approval/gate.go:605` `Channels: g.channels.Statuses()`（随卡片一起给宿主）。
+- ⚠ **族的边界**（这一行只报名字在哪，不裁该用哪族）：
+  (a)–(d) 说的是**"此刻没有对象"**；(e) 说的是**"这条路不能开"**。
+  后者的"被拒"句在 `internal/agent/approval/ui.go:124-136`（`ErrUnknownCorrelation`/`ErrNotPending`/`ErrBadGrant`/`ErrPanelAllow`/`ErrNotAdmitted`）
+  与 `internal/agent/approval/gate.go:740`（面板来源的「允许」被服务端 API 直接拒），
+  以及 `cmd/wisp/resident_approval_windows.go:292-293`（退出时"未获批准，按拒绝处理"）。
+  ⇒ 若落地腿要把"没卡"翻成上面任何一句，**改的就是这一族的语义**。
+
+### 还有一族"入口不存在时说什么"的在册形状（同一条腿、同一批常量）
+
+- `cmd/wisp/resident_task_source_windows.go:84-111`：五枚 claim 常量（`taskEntryDisabledClaim`/`taskEntryConsoleClaim`/
+  `taskEntryInjectedClaim`/`taskEntryRefusedClaim`/`pipelineAbsentClaim`）＋四枚 posture 常量，
+  每个 return 分支一枚，打印在 `:220-246`。钉在 `cmd/wisp/resident_task_source_246_windows_test.go`。
+  ⇒ 本仓对"这一条腿今天能不能被用"已经**按分支各给一句**，不是一句兜底。
 
 ---
 
 ## §4 审计链与零仪器段
 
-（待填：一次 allow 从入口到落审计行经过几处，逐处行号；哪一段零钉）
+### 4.1 一次 allow 从入口到落审计行经过的处数＝**六处**（现走通的那条＝控制台）
+
+| 序 | 处 | 行号 |
+|---|---|---|
+| 1 | 入口分发 → 答复面 | `cmd/wisp/approval_reply.go:564`（`yes`）→ `:565`→`:213 (*replySurface).allow` → `:215 s.live.h.Allow(s.ctx, corr)` |
+| 2 | 账本 → 路由 | `internal/agent/approval/replies.go:316-335`：`Look`→`Grant` 判→`:328 g.DecideFromNative(Request{CorrelationID, Allow:true, Grant, Source:native})` |
+| 3 | 门 → 队列 | `internal/agent/approval/gate.go:718` `DecideFromNative` → `:723 return g.q.allow(r.CorrelationID, r.Grant)` |
+| 4 | **第一行审计**（门自己的） | `internal/agent/approval/queue.go:396` `approval: ANSWER-ALLOW corr=… tool=… route=native decision=allow`（会话那一支＝`:391` 的 `decision=allow-session`）；写入器＝`Options.Logf`，两枚宿主各一枚：控制台＝`cmd/wisp/run.go:617`→`run.go:931-935`（stderr `[audit] ` ＋ `spec.sink.logger()` 落盘），常驻＝`cmd/wisp/resident_approval_windows.go:112`→`:129-133`（`slog.Info("audit: "+line)` ＋ **stdout** `fmt.Printf("wisp: [audit] %s")`） |
+| 5 | **第二行审计**（宿主自己的） | `cmd/wisp/approval_reply.go:232 s.record("ANSWERED", corr, card.Tool, "native/allow", "原生侧允许")` → `:414-419`（`s.audit` 就是第 4 行那枚 `rt.auditf`） |
+| 6 | 账本收口＋球态 | `replies.go:333 r.Forget(corr)`；球侧经 `cmd/wisp/resident_approval_windows.go:465-474 Update(EventDismissed)` → `:483-493 settleOrb()`（还 Esc ＋ 回 `Sleeping`），**这一段零枚审计行**（只有 `slog.Info`/`slog.Warn` 的是别的分支） |
+
+⚠ 一处**读数**（不是判语）：常驻腿里一次 allow 的两行审计**由两枚不同的 writer 出声**——
+门那行走 `ra.residentAuditf`（stdout ＋ 当时那枚进程默认 slog），宿主那行走 `rt.auditf`（stderr ＋ 钉死在它自己那枚 `spec.sink`）。
+而常驻腿里 `installLogSink` **被调用两次**：`cmd/wisp/resident_windows.go:63` 与嵌套装配 `cmd/wisp/run.go:222`；
+`installLogSink` 无条件 `slog.SetDefault(...)`（`cmd/wisp/logsink.go:152`）⇒ 后一次会**替换**进程默认。
+⇒ 事实＝两行落在哪个文件／哪个流，取决于第 4 行与第 5 行各自的绑定，今天**没有一枚用例读过这两行的相对位置**。
+
+### 4.2 哪一段有会响的钉（尺＝钉，不是注释）
+
+| 段 | 有钉？ | 具名 |
+|---|---|---|
+| 控制台 `yes` → 两行审计 | **有** | `cmd/wisp/approval_reply_201_test.go:252-253`（**同时**断门那行 `ANSWER-ALLOW …decision=allow` 与宿主那行 `REPLY ANSWERED route="native/allow"`）；`cmd/wisp/approval_seam_201_test.go:119` |
+| 无卡／L1／半接线三种落空各返回什么 | **有** | `internal/agent/approval/replies_201_test.go:93-94`/`:101-102`/`:81`/`:106` |
+| grant 花掉后第二次花必失败 | **有** | `cmd/wisp/subagent_selfapproval_197_test.go:450`、`:466-472`；`internal/agent/approval/queue_test.go:161-166` |
+| 面板路线的 allow 必被判红 | **有** | `internal/agent/approval/queue_test.go:89`、`cmd/wisp/approval_reply_201_test.go:340`、`cmd/wisp/approval_seam_201_test.go:137` |
+| 常驻腿**否决／退出拒绝**那两族的审计行 | **有，但只在 `winlive` 档** | `cmd/wisp/resident_approval_live_246_windows_test.go:164`（`ANSWER-VETO`）、`:265`（`ANSWER-REJECT`）；`cmd/wisp/resident_task_source_live_246_windows_test.go:164`（出货进程日志里找 `ANSWER-VETO`）。文件头 tag＝`//go:build windows && winlive`（现读 `:1`） |
+
+### 4.3 零仪器的三段（只报"哪一段零枚钉"，不写能不能做到）
+
+1. **常驻腿的 `ANSWER-ALLOW` 那一行**：尺字面
+   `grep -rn "ANSWER-ALLOW" cmd/wisp/resident_*_test.go` ⇒ **零命中**（正控＝同一把尺在同名文件里能命中 `ANSWER-VETO`／`ANSWER-REJECT`，见 `resident_approval_live_246_windows_test.go:164`/`:265`）。
+   ⇒ 今天**没有任何用例读过常驻那条腿的一发"允许"落在审计里长什么样**，因为那条腿上今天也没有允许入口（§1 第 4/5/7 枚）。
+2. **"GUI 那一次点击 → 路由"整段**：尺字面
+   `grep -rn "打开面板\|暂停唤醒\|静音\|menuExit\|showMenu\|OnTray" --include=*_test.go internal cmd` ⇒ **唯一命中是 `cmd/wisp/resident_ball_228_test.go:52` 那枚字面名字册**（正控＝同尺去掉 `--include=*_test.go` 在产码里命中 12 行，见 R39）。
+   ⇒ 菜单枚数／命令 id／标签文案／`showMenu` 入参**四者今天零枚钉**；能被"多一枚键"打红的只有那枚名字册（§5）。
+3. **`Gate.Replay` 的审计行 `approval: replay …`（`internal/agent/approval/gate.go:758`）**：
+   该方法产码零枚调用者（§1 判死），故这一行**今天不可能出现在任何盘上**；
+   唯一覆盖 `Replay` 语义的是**进程内**用例 `internal/agent/approval/queue_test.go:269 TestReplayRedisplaysUnderAFreshGrant`，它不读审计。
+   ⚠ 另：`winlive` 那一档在 CI 里**零命中**（尺字面 `grep -n "winlive" .github/workflows/ci.yml` ⇒ 零；正控＝同一条命令换成 `grep -n "winlive\|go test"` 时 `go test` 侧命中 10 行，证明这把尺读得到那个文件）。
+   ⇒ 上表第 4 行里"有钉但只在 `winlive`"那几枚，**CI 默认档零读数**。
 
 ---
 

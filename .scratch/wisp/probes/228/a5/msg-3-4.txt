@@ -1,0 +1,14 @@
+228-a5: fill section 3 and 4 (no-card wording, audit chain and ruler-less spans)
+
+§3 「没卡时按允许」该说什么：不需要造词，现成诚实形状五族逐枚给位置——
+ErrNoTrackedCard 的三支含义与它的三枚已看守用例、控制台侧那三句人读因果句加 route 标签、
+GUI 同线程最近的一枚（vetoByEsc 无卡那句，另有一枚按语气的钉）、
+同一枚托盘文件里的 outcome=ignored 先例两枚、B1 通道可用性那一族并标明它与前四族的语义边界；
+外加常驻任务源那五枚 claim 常量与四枚 posture 的按分支各给一句。
+
+§4 审计链与零仪器段：一次 allow 经过六处，逐处行号，含两枚宿主各自的 Logf 绑定；
+报一处读数——常驻腿里一次 allow 的两行审计由两枚不同 writer 出声，
+且 installLogSink 在那条腿里被调用两次、后一次替换进程默认；
+有钉的五段具名（其中常驻腿那两枚只在 winlive 档），零仪器的三段各带尺字面命令与正控。
+
+本程零 Go 命令，零读零转述 frontend 与 design。锚点 ccd9543。
