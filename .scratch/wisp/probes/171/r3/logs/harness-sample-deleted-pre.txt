@@ -1,0 +1,42 @@
+r3-sample-deleted.sh: ruler with G6 登记两枚样本 = /tmp/wisp-171-r3-samples.VGssb9/gate-wantn2.sh (one line changed: want_n 1 -> 2)
+
+===== D2: both registered samples present (the honest state) =====
+warning: in the working copy of 'internal/fake171/d_sample_a.go', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'internal/fake171/d_sample_b.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'D2' committed at 28ba636 in /tmp/wisp-171-r3-samples-tree.45k8bt (2 sample file(s) present)
+   G6 row : # ok   腿=G6 声明=ring 基线=2枚 实测=2枚
+   STALE  : 
+   表内枚数=0 (打印值=0)  聚合退码=5
+   BAD 名册：G5 G5neg G6neg G7 G7neg 
+  ok    D2: 实测 equals the registered baseline, no table row, no BAD
+  ok    D2: the 基线过期 table is empty
+  ok    D2: G6 is not in the BAD list
+
+===== D1: ONE sample deleted, the leg and its declaration untouched =====
+warning: in the working copy of 'internal/fake171/d_sample_a.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'D1' committed at 9f2b1b6 in /tmp/wisp-171-r3-samples-tree.45k8bt (1 sample file(s) present)
+   G6 row : # SHR  腿=G6 声明=ring 基线=2枚 实测=1枚 注=读数变好了，基线过期，下一程把 want_n 核下来
+   STALE  : # STALE 腿=G6 声明=ring 基线=2枚 实测=1枚 差=1枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+   表内枚数=2 (打印值=2)  聚合退码=4
+   BAD 名册：G5 G5neg G7 G7neg 
+  ok    D1: the leg is flagged SHR (measured below baseline) - the deletion is readable
+  ok    D1: the standalone 基线过期 table names G6
+  ANSWER  D1 未修码上**不响**：腿 G6 一枚样本被摘掉（2 枚→1 枚）之后不在 BAD 名册里，
+          退码里不含它那一味（5 -> 4 的差额全部来自共用同一条射程的别腿，
+          逐枚见上面两张 BAD 名册：G5 G5neg G6neg G7 G7neg  => G5 G5neg G7 G7neg ）；
+          它只在【基线过期】那一格里看得见（表内 2 枚）。
+
+===== D0: the LAST sample deleted (leg still declared, still run) =====
+-- state 'D0' committed at 4775fc6 in /tmp/wisp-171-r3-samples-tree.45k8bt (0 sample file(s) present)
+   G6 row : # BAD  腿=G6 声明=ring 基线=2枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   表内枚数=0 (打印值=0)  聚合退码=7
+   BAD 名册：G2 G5 G5neg G6 G6neg G7 G7neg 
+  ok    D0: the emptied leg is a BAD on the 空/非空 dimension (票 161 AC#6①那一味)
+  ANSWER  D0 未修码上**响**：腿 G6 的样本被删空（腿还在跑、声明还在）⇒ 它进了 BAD 名册，
+          聚合退码 4 -> 7（差额的逐枚归属见上面两张名册，本态里共用射程的别腿也一起掉下来）。
+
+r3-sample-deleted.sh: what this answers for AC#9-2 - 摘掉一枚样本（退码不动、单列表 1 枚）与
+  摘光一条腿的样本（退码跟着动）两形都有读数；台件＝probes/171/r3/fixtures/d_sample_*.go.txt，
+  读数＝probes/171/r3/logs/samples-D[012].txt。
+
+r3-sample-deleted.sh: GREEN.

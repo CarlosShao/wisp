@@ -1,0 +1,22 @@
+falsified ruler: /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/171/r3/fixtures/gate-lie-columns.sh (from .scratch/wisp/probes/154/gate-clauses.sh:157; diff lines=2, expected 2)
+   the line it now prints:
+     157:		STALE="$STALE# STALE 腿=$LEG 声明=$EXPECT 基线=${COUNT}枚 实测=${COUNT}枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+
+r3-flip-columns.sh: mode=pre   pinned anchor=4f2a777b60770744adabbd92144d261812a025a0
+   NOTE  the committed door and the working-copy door are byte-identical right now,
+         which is expected when this runs before the AC#9-1 fix lands.
+
+===== (1) the unmodified door, against the falsified 实测/差 columns =====
+   the cell said:
+     == (stale) raise one baseline above its own measurement: rc must stay 0 AND a table must appear
+        the baseline line this run differs by:
+        < want_n 8
+        > want_n 9
+       FAIL  G5neg 基线 8->9（实测 8）still exits 0 (变好了不算言行不一) -> rc=3 (want zero)
+       ok    the stale baseline is its own readable table row: # STALE 腿=G5neg 声明=ring 基线=9枚 实测=9枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+   row-claim=GREEN  columns-claim=NO-CLAIM  whole-cell verdict=RED  whole-door rc=1
+  ok    unmodified door: the falsified row passes for a reading (that is AC#9-1's hole, 171-v2's ③-limit)
+  ok    unmodified door: it never asserts anything about the 实测/差 columns (NO-CLAIM = no such check exists)
+
+
+r3-flip-columns.sh: GREEN - mode=pre.

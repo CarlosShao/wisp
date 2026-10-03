@@ -149,78 +149,31 @@ flip "G1 quiet->ring AND G4 quiet->ring together (expect rc to be 2, not 1)" 2 \
     's/^want G1 quiet$/want G1 ring/' 's/^want G4 quiet$/want G4 ring/'
 
 # ---- NEW CELL, added by 171-r2 (ticket 171 AC#8-2). The nine cells above are untouched. ----
-# ---- EXTENDED by 171-r3 (ticket 171 AC#9-1): the cell now checks the row's OWN NUMBERS. ----
 # SHR (measured BELOW the registered want_n) is allowed to stay out of the exit code - a reading
 # that got better is not a broken promise (that is the constant-red shape A320/A321 retired).
 # But it may no longer be only an inline note in the aggregate list, which is human-eyes-only:
-# the gate must print a standalone 基线过期 table, and this door must check the table exists
-# AND says true things - 171-v2's ③-limit (docs/evidence/s1/171-run-legs-accept-v2.md §14) measured
-# that a row falsifying its 实测/差 columns still passed, i.e. the cell was checking the printout.
-# Pre-fix readings (same anchor, this very sed): row said 实测=9枚 差=0枚 with 基线=9枚 and
-# 枚数=1, the cell said ok - that is the hole; 台件与读数＝.scratch/wisp/probes/171/r3/.
-#
-# WHY THE BASELINE IS LOOKED UP BY LEG INSTEAD OF HARDCODED AS "want_n 8"
-# Ticket 171 AC#1 changed what counts as a call site, so a leg's registered baseline is now a
-# number this door must READ, not a number it may remember. A hardcoded digit would either stop
-# matching (the cell then dies with "changed not one byte") or - worse - start matching some
-# OTHER leg's want_n line and flip the wrong leg. Both shapes turn this cell into decoration the
-# next time anyone re-baselines, which is the failure mode the whole ticket exists to close.
-printf '== (stale) raise one leg baseline above its own measurement: rc must stay 0 AND a table must appear with its own numbers right\n'
+# the gate must print a standalone 基线过期 table, and this door must check the table exists.
+# Pre-fix reading (same anchor, this very sed): rc=0 and 0 table rows - see the evidence file §4.
+printf '== (stale) raise one baseline above its own measurement: rc must stay 0 AND a table must appear\n'
 seq=$((seq + 1))
 stale="$work/gate-$seq-stale.sh"
-stale_leg=G5neg
-want_ln=$(grep -nE "^want $stale_leg (ring|quiet)" "$pristine" | head -1 | cut -d: -f1 || true)
-base_n=''
-[ -n "$want_ln" ] && base_n=$(awk -v ln="$((want_ln + 1))" 'NR == ln && /^want_n [0-9]+$/ { sub(/^want_n /, ""); print }' "$pristine") || true
-case $base_n in
-'' | *[!0-9]*)
-    printf '  FAIL  leg %s has no want_n line right after its want line (want line=%s) - this cell cannot answer, which is not a pass\n' "$stale_leg" "${want_ln:-none}"
+sed 's/^want_n 8$/want_n 9/' "$pristine" >"$stale"
+if cmp -s "$pristine" "$stale"; then
+    printf '  FAIL  want_n 8 -> 9 changed not one byte - G5neg has no such baseline line any more, so this cell cannot answer\n'
     fail=1
-    base_n=''
-    ;;
-esac
-if [ -n "$base_n" ]; then
-    new_n=$((base_n + 1))
-    awk -v ln="$((want_ln + 1))" -v v="$new_n" 'NR == ln { print "want_n " v; next } { print }' "$pristine" >"$stale"
-    if cmp -s "$pristine" "$stale"; then
-        printf '  FAIL  want_n %s -> %s for leg %s changed not one byte - that is not a reading\n' "$base_n" "$new_n" "$stale_leg"
-        fail=1
+else
+    printf '   the baseline line this run differs by:\n'
+    diff "$pristine" "$stale" | grep -E '^[<>] want_n ' | sed -e 's/^/   /'
+    got=$(run_gate "$stale" "$logdir/flip-$seq.txt")
+    expect "G5neg 基线 8->9（实测 8）still exits 0 (变好了不算言行不一)" "$got" zero
+    if grep -q '^## 基线过期' "$logdir/flip-$seq.txt" &&
+        grep -q '^# STALE 腿=G5neg ' "$logdir/flip-$seq.txt" &&
+        grep -q '^# 基线过期枚数＝1' "$logdir/flip-$seq.txt"; then
+        printf '  ok    the stale baseline is its own readable table row: %s\n' \
+            "$(grep -m1 '^# STALE ' "$logdir/flip-$seq.txt")"
     else
-        printf '   the baseline line this run differs by (leg %s, looked up by leg number, not by a remembered digit):\n' "$stale_leg"
-        diff "$pristine" "$stale" | grep -E '^[<>] want_n ' | sed -e 's/^/   /'
-        got=$(run_gate "$stale" "$logdir/flip-$seq.txt")
-        expect "$stale_leg 基线 $base_n->$new_n still exits 0 (变好了不算言行不一)" "$got" zero
-        if grep -q '^## 基线过期' "$logdir/flip-$seq.txt" &&
-            grep -q "^# STALE 腿=$stale_leg " "$logdir/flip-$seq.txt" &&
-            grep -q '^# 基线过期枚数＝1' "$logdir/flip-$seq.txt"; then
-            printf '  ok    the stale baseline is its own readable table row: %s\n' \
-                "$(grep -m1 '^# STALE ' "$logdir/flip-$seq.txt")"
-        else
-            printf '  FAIL  no standalone 基线过期 table naming %s - SHR is still human-eyes-only\n' "$stale_leg"
-            fail=1
-        fi
-        # ---- AC#9-1: the two columns the row prints must themselves be checked ----------------
-        # 实测 must equal what the SAME ruler measured for this leg in the untouched baseline run
-        # (flip-baseline.txt, same anchor, one line up), and 差 must equal 基线 minus 实测. Anything
-        # else is a row that exists and lies.
-        m0=$(grep -E "^# (ok|SHR|BAD) *腿=$stale_leg " "$logdir/flip-baseline.txt" | tail -1 |
-            sed -e 's/.*实测=\([0-9][0-9]*\)枚.*/\1/')
-        case $m0 in
-        '' | *[!0-9]*)
-            printf '  FAIL  the row prints its own numbers - cannot read %s measured from the baseline run, so the columns cannot be checked\n' "$stale_leg"
-            fail=1
-            ;;
-        *)
-            want_row="基线=${new_n}枚 实测=${m0}枚 差=$((new_n - m0))枚"
-            row=$(grep -m1 "^# STALE 腿=$stale_leg " "$logdir/flip-$seq.txt" || true)
-            if [ -n "$row" ] && printf '%s' "$row" | grep -qF "$want_row"; then
-                printf '  ok    the row prints its own numbers: %s\n' "$row"
-            else
-                printf '  FAIL  the row prints its own numbers - row got [%s] want [%s]\n' "$row" "$want_row"
-                fail=1
-            fi
-            ;;
-        esac
+        printf '  FAIL  no standalone 基线过期 table naming G5neg - SHR is still human-eyes-only\n'
+        fail=1
     fi
 fi
 

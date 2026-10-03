@@ -1,0 +1,11 @@
+// Ticket 171 AC#9-2, sample B: the second registered opening call of the same leg.
+// Deleting exactly one of A/B is the D1 state; deleting both is D0.
+// Not compiled here; copied into a throwaway repository under $TMPDIR.
+
+package fake171
+
+func openSampleB(rt routerB, id string) error {
+	return rt.OpenTask(id)
+}
+
+type routerB struct{}

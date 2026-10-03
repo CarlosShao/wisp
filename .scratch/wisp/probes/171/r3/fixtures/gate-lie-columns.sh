@@ -166,7 +166,7 @@ book_count() {
 		# 变好＝不算言行不一，但基线于是过期了：行进聚合表（逐字照改前），同时进文末单列的那张表。
 		verdict='SHR '
 		why=' 注=读数变好了，基线过期，下一程把 want_n 核下来'
-		STALE="$STALE# STALE 腿=$LEG 声明=$EXPECT 基线=${COUNT}枚 实测=${n}枚 差=$((COUNT - n))枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+		STALE="$STALE# STALE 腿=$LEG 声明=$EXPECT 基线=${COUNT}枚 实测=${COUNT}枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
 "
 		STALE_COUNT=$((STALE_COUNT + 1))
 	else

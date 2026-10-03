@@ -1,0 +1,19 @@
+// Ticket 171 AC#1, pair+run counterexample fixture (state S2, "real call site").
+//
+// This is the positive control of the pair: an actual call to the opening side, no
+// closing side anywhere in the file. The ruler must count it both before and after
+// the AC#1 fix - "真调用点必须计入". No comment in this file mentions a word root.
+//
+// Not part of any Go package: copied into a throwaway repository under $TMPDIR by
+// r3-trailing-comment.sh, never compiled here.
+
+package fake171
+
+func startReal(rt router, taskID string) error {
+	if err := rt.OpenTask(taskID); err != nil {
+		return err
+	}
+	return nil
+}
+
+type router struct{}

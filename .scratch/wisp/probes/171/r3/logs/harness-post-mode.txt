@@ -1,0 +1,62 @@
+r3-trailing-comment.sh: mode=post
+r3-trailing-comment.sh: unmodified ruler = /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/171/r3/gate-prefix-f78d3cb.sh
+r3-trailing-comment.sh: working-copy ruler = /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/154/gate-clauses.sh
+r3-trailing-comment.sh: synthetic tree (deliberately OUTSIDE /d/work/workspace/projects plans/Wisp) at /tmp/wisp-171-r3-tree.ljnceE
+
+===== S1: word root only in a TRAILING comment (AC#1's 'mention is not a call') =====
+warning: in the working copy of 'internal/fake171/s1_only_trailing_comment.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'S1' committed at 83d3a9b in /tmp/wisp-171-r3-tree.ljnceE (outside /d/work/workspace/projects plans/Wisp)
+  --    gofumpt not on PATH; sample formatting left unchecked (named, not guessed)
+  pair  G6 未成对枚数：unmodified=1   working-copy=0
+  run   G2 命中行数 ：unmodified=1   working-copy=0
+  pair  G6 点名名册（unmodified）：
+     #   UNPAIRED internal/fake171/s1_only_trailing_comment.go 
+  pair  G6 点名名册（working-copy）：
+  ok    unmodified: the trailing-comment file IS counted (未成对=1 枚)
+  ok    unmodified: the trailing-comment file IS a run hit (命中行数=1)
+  ok    fixed: the trailing-comment file is NOT counted (未成对=0)
+  ok    fixed: the trailing-comment file is NOT a run hit (命中行数=0)
+
+===== S2: a REAL opening call (AC#1's 'must be counted', both rulers) =====
+warning: in the working copy of 'internal/fake171/s2_real_call.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'S2' committed at 2cd1432 in /tmp/wisp-171-r3-tree.ljnceE (outside /d/work/workspace/projects plans/Wisp)
+  pair  G6 未成对枚数：unmodified=1   working-copy=1
+  run   G2 命中行数 ：unmodified=1   working-copy=1
+     #   UNPAIRED internal/fake171/s2_real_call.go 
+     #   UNPAIRED internal/fake171/s2_real_call.go 
+  ok    unmodified: the real call is counted (未成对=1)
+  ok    unmodified: the real call is a run hit (命中行数=1)
+  ok    fixed: the real call is STILL counted (未成对=1)
+  ok    fixed: the real call is STILL a run hit (命中行数=1)
+
+===== S3: real opening call, closing side only in a trailing comment =====
+warning: in the working copy of 'internal/fake171/s3_fake_close_comment.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'S3' committed at b5ae9ef in /tmp/wisp-171-r3-tree.ljnceE (outside /d/work/workspace/projects plans/Wisp)
+  pair  G6 未成对枚数：unmodified=0   working-copy=1
+  run   G2 命中行数 ：unmodified=2   working-copy=1
+  pair  G6 点名名册（unmodified）：
+  pair  G6 点名名册（working-copy）：
+     #   UNPAIRED internal/fake171/s3_fake_close_comment.go 
+  ok    unmodified: the leak is SILENT (未成对=0, the comment bought it a close)
+  ok    unmodified: the run numerator counts 2 lines, one of them a comment
+  ok    fixed: the leak is now NAMED (未成对=1)
+  ok    fixed: the run numerator is 1 (the call), not 2
+
+===== S4: word roots only in a WHOLE-LINE comment (the run side of the hole) =====
+warning: in the working copy of 'internal/fake171/s4_full_line_comment.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'S4' committed at af426d6 in /tmp/wisp-171-r3-tree.ljnceE (outside /d/work/workspace/projects plans/Wisp)
+  pair  G6 未成对枚数：unmodified=0   working-copy=0
+  run   G2 命中行数 ：unmodified=1   working-copy=0
+  ok    unmodified: pair() already drops the whole-line comment (未成对=0)
+  ok    unmodified: run() counts that comment line as a hit (命中行数=1)
+  ok    fixed: pair() still drops it (未成对=0)
+  ok    fixed: run() no longer counts the comment (命中行数=0)
+
+r3-trailing-comment.sh: aggregate exit codes seen (informational; the synthetic tree holds no
+  registered samples, so want/want_n noise there is expected and is NOT what AC#1 judges):
+   state S1  unmodified rc=# 聚合退码＝4   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）  working-copy rc=# 聚合退码＝7   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）
+   state S2  unmodified rc=# 聚合退码＝4   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）  working-copy rc=# 聚合退码＝4   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）
+   state S3  unmodified rc=# 聚合退码＝6   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）  working-copy rc=# 聚合退码＝4   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）
+   state S4  unmodified rc=# 聚合退码＝6   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）  working-copy rc=# 聚合退码＝7   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）
+
+r3-trailing-comment.sh: GREEN - mode=post, every assertion above held.

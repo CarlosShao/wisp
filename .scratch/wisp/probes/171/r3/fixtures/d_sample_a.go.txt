@@ -1,0 +1,12 @@
+// Ticket 171 AC#9-2, sample A: one registered opening call, no closing side.
+// r3-sample-deleted.sh keeps two of these in the synthetic tree so that "one sample
+// deleted, the leg still declared and still run" is a reading instead of a sentence.
+// Not compiled here; copied into a throwaway repository under $TMPDIR.
+
+package fake171
+
+func openSampleA(rt routerA, id string) error {
+	return rt.OpenTask(id)
+}
+
+type routerA struct{}

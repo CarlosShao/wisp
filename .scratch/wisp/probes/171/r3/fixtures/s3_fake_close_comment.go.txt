@@ -1,0 +1,21 @@
+// Ticket 171 AC#1, pair counterexample fixture (state S3, "closing side exists only as
+// a trailing comment").
+//
+// This is the other face of the same hole, and the more dangerous one: the opening side
+// is a real call, the closing side is only asserted by a sentence at the end of a line.
+// The ruler that counts that comment as a closing call site reads this file as PAIRED,
+// i.e. it is silent on a leak that is standing right there.
+//
+// Not part of any Go package: copied into a throwaway repository under $TMPDIR by
+// r3-trailing-comment.sh, never compiled here.
+
+package fake171
+
+func startLeak(rt router, taskID string) error {
+	if err := rt.OpenTask(taskID); err != nil {
+		return err
+	}
+	return nil // and it is closed later, see CloseTask in the disposal hook
+}
+
+type router struct{}

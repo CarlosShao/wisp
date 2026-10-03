@@ -1,0 +1,15 @@
+// Ticket 171 AC#1, run-family fixture (state S4, "word roots only in a whole-line comment").
+//
+// The run() legs take their numerator from the whole roster (hits = number of roster
+// lines), so this file is counted as a hit by the unmodified ruler even though nothing
+// in it is code: pair() already drops such a line, run() does not. Keeping S4 separate
+// from S1 is what lets the two families' numerator be fixed in one pass and reported
+// separately: S1 = trailing comment, S4 = whole-line comment, S2 = real call.
+//
+// Not part of any Go package: copied into a throwaway repository under $TMPDIR by
+// r3-trailing-comment.sh, never compiled here.
+
+package fake171
+
+// A task lifecycle is: OpenTask first, CloseTask last, never the other way round.
+func mentionOnlyInBlockComment() {}

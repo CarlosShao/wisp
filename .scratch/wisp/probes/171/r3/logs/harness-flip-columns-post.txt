@@ -1,0 +1,42 @@
+falsified ruler: /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/171/r3/fixtures/gate-lie-columns.sh (from .scratch/wisp/probes/154/gate-clauses.sh:169; diff lines=2, expected 2)
+   the line it now prints:
+     169:		STALE="$STALE# STALE 腿=$LEG 声明=$EXPECT 基线=${COUNT}枚 实测=${COUNT}枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+
+r3-flip-columns.sh: mode=post   pinned anchor=4f2a777b60770744adabbd92144d261812a025a0
+
+===== (1) the unmodified door, against the falsified 实测/差 columns =====
+   the cell said:
+     == (stale) raise one baseline above its own measurement: rc must stay 0 AND a table must appear
+        the baseline line this run differs by:
+        < want_n 8
+        > want_n 9
+       FAIL  G5neg 基线 8->9（实测 8）still exits 0 (变好了不算言行不一) -> rc=2 (want zero)
+       ok    the stale baseline is its own readable table row: # STALE 腿=G5neg 声明=ring 基线=9枚 实测=9枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+   row-claim=GREEN  columns-claim=NO-CLAIM  whole-cell verdict=RED  whole-door rc=1
+  ok    unmodified door still fooled by the falsified row (the comparison is intact)
+  ok    unmodified door: still no assertion on the two columns
+
+===== (2) the fixed door, against the same falsified columns =====
+     == (stale) raise one leg baseline above its own measurement: rc must stay 0 AND a table must appear with its own numbers right
+        the baseline line this run differs by (leg G5neg, looked up by leg number, not by a remembered digit):
+        < want_n 8
+        > want_n 9
+       FAIL  G5neg 基线 8->9 still exits 0 (变好了不算言行不一) -> rc=2 (want zero)
+       ok    the stale baseline is its own readable table row: # STALE 腿=G5neg 声明=ring 基线=9枚 实测=9枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+       FAIL  the row prints its own numbers - row got [# STALE 腿=G5neg 声明=ring 基线=9枚 实测=9枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的] want [基线=9枚 实测=8枚 差=1枚]
+   row-claim=GREEN  columns-claim=RED  whole-door rc=1
+  ok    fixed door: the falsified 实测/差 columns are now called out (AC#9-1 has teeth)
+
+===== (3) the fixed door, against the HONEST working-copy ruler (positive control) =====
+     == (stale) raise one leg baseline above its own measurement: rc must stay 0 AND a table must appear with its own numbers right
+        the baseline line this run differs by (leg G5neg, looked up by leg number, not by a remembered digit):
+        < want_n 8
+        > want_n 9
+       FAIL  G5neg 基线 8->9 still exits 0 (变好了不算言行不一) -> rc=2 (want zero)
+       ok    the stale baseline is its own readable table row: # STALE 腿=G5neg 声明=ring 基线=9枚 实测=8枚 差=1枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+       ok    the row prints its own numbers: # STALE 腿=G5neg 声明=ring 基线=9枚 实测=8枚 差=1枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+   row-claim=GREEN  columns-claim=GREEN  whole-door rc=1
+  ok    fixed door on the honest ruler: the new claim still says ok (it is not a constant red)
+  ok    fixed door on the honest ruler: the pre-existing row claim is untouched
+
+r3-flip-columns.sh: GREEN - mode=post.

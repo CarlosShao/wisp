@@ -1,0 +1,21 @@
+// Ticket 171 AC#1, pair+run counterexample fixture (state S1, "mention only").
+//
+// The lifecycle word roots below appear ONLY inside a trailing comment on a line of
+// real code. The ruler under test is supposed to count call sites: an整行 comment is
+// already stripped by pair(), a行尾 comment is not - that is the hole AC#1 names.
+// Deliberately no整行 comment in this file mentions a word root, so the only thing
+// that can put this file into a roster is the trailing comment on the assignment.
+//
+// Not part of any Go package: this file is copied into a throwaway repository under
+// $TMPDIR by r3-trailing-comment.sh and is never compiled here.
+
+package fake171
+
+type taskConfig struct {
+	Name string
+}
+
+func mentionOnly(cfg taskConfig) error {
+	cfg.Name = "retention-job" // scheduled through OpenTask by the caller, not here
+	return nil
+}
