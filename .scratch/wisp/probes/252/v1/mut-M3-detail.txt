@@ -1,0 +1,21 @@
+=== all TestTicket107b lines in M3 log ===
+--- PASS: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing (0.08s)
+--- PASS: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.08s)
+--- PASS: TestTicket107bProbeBJudgedTreeIsTheOpenedTree (0.07s)
+=== N1..N7 under M3 (widening check) ===
+--- PASS: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N1_sibling_tree,_long (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N2_sibling_tree,_short_spelling_of_the_parent (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N3_the_root's_own_parent (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N4_the_root's_parent_spelled_short (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N5_one_character_off_the_root's_tail (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N6_a_name_on_a_volume_that_is_not_there (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N7_inside_the_root_but_unresolvable (0.00s)
+=== A2/A4 under M3 ===
+--- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A2_roots=SHORT_asked=LONG+missing-leaf (0.00s)
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A3_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A4_roots=LONG_asked=LONG+missing-leaf (0.00s)
+=== does any 107b probe error under M3? ===
+0

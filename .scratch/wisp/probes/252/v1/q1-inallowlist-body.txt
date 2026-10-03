@@ -1,0 +1,42 @@
+=== PRE (2b1a3071^) lines 133-163 ===
+func (p *PathCanonicalizer) InAllowlist(canonical string) bool {
+	f := foldPath(canonical)
+	if f == "" {
+...
+	}
+	return true
+}
+=== POST (HEAD) lines 189-219 ===
+func (p *PathCanonicalizer) InAllowlist(canonical string) bool {
+	f := foldPath(canonical)
+	if f == "" {
+...
+	}
+	return true
+}
+
+=== md5 PRE 133-163 ===
+e4aac2d53fe6bca6f43e5505b03e4202 *-
+=== md5 POST 189-219 ===
+e4aac2d53fe6bca6f43e5505b03e4202 *-
+=== md5 PRE whole-func incl doc (129-163) ===
+b4a7e9bb6f8cd015c1701eea89b4d83b *-
+=== md5 POST whole-func incl doc (185-219) ===
+b4a7e9bb6f8cd015c1701eea89b4d83b *-
+=== byte-diff PRE-frag vs POST-frag (empty = identical) ===
+IDENTICAL
+
+=== rootsContain occurrences inside InAllowlist body (POST) ===
+8:	if !rootsContain(p.roots, f) {
+21:	if !ok || !rootsContain(p.roots, foldPath(rf)) {
+27:	if p.workspace != "" && !rootsContain([]string{p.workspace}, f) {
+count=3
+=== and PRE ===
+count=3
+=== 'return false' count POST body ===
+count=4
+=== !ok branch line POST ===
+	rf, ok := resolvedForm(canonical)
+	if !ok || !rootsContain(p.roots, foldPath(rf)) {
+		return false
+	}

@@ -1,0 +1,104 @@
+=== bridge.go 260-300 (dec.Paths assignment) ===
+// refusal. Returning a Go error instead would surface a policy decision as
+// "Wisp crashed", which is the failure mode the constraint exists to prevent.
+func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.ToolOutcome, error) {
+	if req.CorrelationID == "" {
+		req.CorrelationID = req.TaskID
+	}
+	entry, ok := b.reg.Lookup(req.Name)
+	if !ok {
+		// Unknown tool: class tool (self-correctable, D37), never internal.
+		return b.reject(ctx, req, Decision{Tool: req.Name},
+			"未知工具 "+req.Name+"，可用工具见 list_tools",
+			string(observe.ClassTool), OutcomeKindNotFound)
+	}
+
+	// --- C3: capability enforcement, ahead of any risk work or execution ----
+	dec, why := b.checkCaps(req, entry)
+	if why != "" {
+		return b.reject(ctx, req, dec, why, string(observe.ClassPermissionDenied), OutcomeKindCapability)
+	}
+
+	// --- parameter decode ---------------------------------------------------
+	params, err := decodeArgs(req.Args)
+	if err != nil {
+		return b.reject(ctx, req, dec, "参数不是合法的 JSON 对象："+err.Error(),
+			string(observe.ClassTool), OutcomeKindBadArgs)
+	}
+	dec.Params = params
+
+	// --- C19: the one risk verdict (R1..R9 over C26 paths + C25 taint) ------
+	rawPaths := pathArgs(params, entry.Decl.PathParams)
+	dec.Paths = b.displayPaths(rawPaths)
+	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+		b.factsFor(ctx, entry, params, rawPaths))
+	dec.Level = verdict.Level
+	dec.RulesHit = verdict.RulesHit
+	dec.Reason = verdict.Reason
+	dec.SessionOverrideBlocked = verdict.SessionOverrideBlocked
+
+	// --- ticket 90: the permission mode screens that verdict -----------------
+	// Read once per call (AC#1: an explicit value, never a package global), then
+	// handed to route as a PARAMETER. dec.Level keeps the assessed level, because
+
+=== displayPaths definition ===
+922-}
+923-
+924-// displayPaths resolves each raw path for the audit line and the card. The
+925-// ASSessor is fed the RAW values instead, because R2/R3 own canonicalization
+926-// through this same seam; handing a judge pre-resolved paths would let a second
+927-// fold decide what the gate sees.
+928:func (b *Bridge) displayPaths(raw []string) []string {
+929-	if b.paths == nil || len(raw) == 0 {
+930-		return nil
+931-	}
+932-	out := make([]string, 0, len(raw))
+933-	for _, p := range raw {
+934-		c, err := b.paths.Canonicalize(p)
+935-		if err != nil {
+936-			out = append(out, p+" (无法规范化: "+err.Error()+")")
+937-			continue
+938-		}
+939-		out = append(out, c)
+940-	}
+941-	return out
+942-}
+943-
+944-// ---------------------------------------------------------------------------
+945-// forensics: the tool_call row
+946-// ---------------------------------------------------------------------------
+947-
+948-// OutcomeKind classifies how a call left the bridge, for the audit line and
+949-// the tests. It is NOT a storage enum: the columns stay in agent's frozen
+950-// vocabulary (agent/journal.go:30-46).
+951-type OutcomeKind string
+952-
+953-// The bridge's dispositions.
+954-const (
+955-	OutcomeKindSuccess         OutcomeKind = "success"
+956-	OutcomeKindError           OutcomeKind = "error"
+957-	OutcomeKindCancelled       OutcomeKind = "cancelled"
+958-	OutcomeKindTimeout         OutcomeKind = "tool-timeout"
+
+=== bridge.go 795-815 (f.Paths = rawPaths) ===
+// the judge. Everything else (R8's irreversibility classes, R7's batch count)
+// comes from the host-side Decl.Facts hook, because only the tool can tell
+// whether the target already exists or whether a move leaves its volume: the
+// frozen rules are fed facts, not opinions. A hook that panics contributes one
+// unknown irreversibility class, which R8 fail-closes to L2 rather than letting
+// a broken judge read as "nothing to worry about".
+func (b *Bridge) factsFor(ctx context.Context, entry Entry, params map[string]any,
+	rawPaths []string,
+) risk.Facts {
+	var f risk.Facts
+	if hook := entry.Decl.Facts; hook != nil {
+		f = safeFacts(ctx, hook, params, rawPaths)
+	}
+	f.Declared = entry.Decl.Declared
+	f.Paths = rawPaths
+	return f
+}
+
+func safeFacts(ctx context.Context, hook func(context.Context, map[string]any, []string) risk.Facts,
+	params map[string]any, rawPaths []string,
+) (f risk.Facts) {

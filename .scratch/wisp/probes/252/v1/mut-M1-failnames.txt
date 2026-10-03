@@ -1,0 +1,42 @@
+=== FAIL roster (M1: same-form step removed) ===
+--- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A3_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+--- FAIL: TestTicket252R1BothSpellingsAnswerTheSame (0.02s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/Wisp (0.01s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/docs (0.01s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/tools (0.01s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+--- FAIL: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	13.972s
+FAIL
+PASS=248 FAIL=9
+
+=== p1 probe under M1 ===
+9
+--- PASS: TestTicket252P1AllowlistLegs (0.01s)
+    --- PASS: TestTicket252P1AllowlistLegs/Q1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/Q2_roots=SHORT_asked=LONG+missing-leaf (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/P1_roots=LONG_asked=LONG+missing-leaf (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/P2_roots=LONG_asked=SHORT_of_an_EXISTING_dir (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/P3_roots=SHORT_asked=SHORT_of_an_EXISTING_dir (0.00s)
+    --- PASS: TestTicket252P1AllowlistLegs/Q3b_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+--- PASS: TestTicket252P1OwnerMachineReachability (0.01s)
+--- PASS: TestTicket252P1EnvSpellingCensus (0.00s)
+
+=== verbatim red sentences (first 12) ===
+311:    fswrite_silentloss_ac1_test.go:124: AC#1(a) 落盘前 672 字节 / 24 行；落盘后 450 字节 / 18 行；少了 6 行 222 字节
+312:    fswrite_silentloss_ac1_test.go:142: AC#1(b) IsError=false Truncated=false RiskLevel=L2 ErrorClass=""
+313:    fswrite_silentloss_ac1_test.go:144: AC#1(b) Result.Text="已写入 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported124273697\\001\\notes.txt（450 字节，临时文件+原子重命名）"
+314:    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[0]="在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported124273697\\001 创建临时文件 .wisp-tmp-9320b4a1-14604-4107978027"
+315:    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[1]="向临时文件写入 450 字节"
+316:    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[2]="临时文件已落盘并关闭"
+317:    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[3]="原子重命名 .wisp-tmp-9320b4a1-14604-4107978027 → C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported124273697\\001\\notes.txt（目标此刻起为新内容）"
+318:    fswrite_silentloss_ac1_test.go:174: AC#1(c) tool_call 行：tool=fs.write risk=L2 decision=allow outcome=success error_class=""
+319:    fswrite_silentloss_ac1_test.go:176: AC#1(c) tool_call 行的全部列名：[ID TaskID Seq Tool ArgsJSON RiskLevel Decision DecidedAt StartedAt EndedAt Outcome ErrorClass CorrelationID GrantID]
+320:    fswrite_silentloss_ac1_test.go:193: AC#1(c) audit: "tools: call kind=success task=task-1 corr=corr-1 tool=fs.write risk=L2 decision=allow outcome=success rules_hit=[R1 R8] in_allowlist_scope=true grant_id=0 reason=\"R1: 工具声明为下界（L1）; R8: 不可逆操作（覆盖已有内容）\""
+321:    fswrite_silentloss_ac1_test.go:193: AC#1(c) audit: "tools: PATH-ACCOUNT task=task-1 tool=fs.write roots=1 rewritten=[] unusable=[]"
+322:    fswrite_silentloss_ac1_test.go:205: AC#1(c) fs.read 事后复读：450 字节，Truncated=false，文本里没有任何行数/大小字段（Text 就是文件内容本身）
+323:    fswrite_silentloss_ac1_test.go:211: AC#1 读数结论：丢了 6 行 222 字节；Result.Text / AppliedSteps / tool_call 行 / audit 行 / fs.read 事后复读 五处信号全部为零 ⇒ 今天的 fs.write 对"整文件写回时漏抄"没有任何检测
+533:    paths_shortname_252_r1_test.go:98: POSITIVE CONTROL RED for A1 roots=LONG asked=SHORT+missing-leaf: same-shape ask was refused, so this probe's carrier is broken and no negative reading from it can be trusted

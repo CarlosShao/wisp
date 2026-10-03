@@ -1,0 +1,13 @@
+internal/risk/assessor.go:137:// entry (SPEC-06 §4); InAllowlist judges canonical paths against the
+internal/risk/assessor.go:141:	InAllowlist(canonical string) bool
+internal/risk/rules_gateway.go:45:		if !ctx.canon.InAllowlist(canonical) {
+internal/tools/bridge.go:1145:		if strings.Contains(p, "无法规范化") || !b.paths.InAllowlist(p) {
+internal/tools/paths.go:45:	// It can only ever TIGHTEN InAllowlist - a workspace outside the roots is
+internal/tools/paths.go:132:	// fully expanded. One physical path therefore reached InAllowlist as two
+internal/tools/paths.go:167://     never produced. Here the original spelling is kept and InAllowlist's
+internal/tools/paths.go:186:// InAllowlist implements risk.PathCanonicalizer against already-canonical
+internal/tools/paths.go:189:func (p *PathCanonicalizer) InAllowlist(canonical string) bool {
+internal/tools/paths.go:223:// compose it (InAllowlist) without re-entering p.mu.
+internal/tools/paths_workspace.go:28://     a workspace switch can only ever NARROW scope (see InAllowlist below),
+internal/tools/task.go:819://	               is judged by: Canonicalize, then InAllowlist. Nothing here
+internal/tools/task.go:838:	case !d.Paths.InAllowlist(canon):

@@ -1,0 +1,57 @@
+=== test file touched by which commits in range ===
+--- 34d89191
+
+ internal/tools/paths_shortname_252_r1_test.go | 282 ++++++++++++++++++++++++++
+ 1 file changed, 282 insertions(+)
+--- 2b1a3071
+
+ internal/tools/paths_shortname_252_r1_test.go | 36 ++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 12 deletions(-)
+--- ebd5da2b
+
+ internal/tools/paths_shortname_252_r1_test.go | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+=== what changed in the test file at 2b1a3071 (non-comment?) ===
+-		{name: "N1 sibling tree, long", rootsCfg: []string{long},
++		{
++			name: "N1 sibling tree, long", rootsCfg: []string{long},
+-			why:   "a sibling of the allowed root is not the allowed root"},
+-		{name: "N2 sibling tree, short spelling of the parent", rootsCfg: []string{long},
++			why:   "a sibling of the allowed root is not the allowed root",
++		},
++		{
++			name: "N2 sibling tree, short spelling of the parent", rootsCfg: []string{long},
+-			why:   "an 8.3 alias above the root must not become a way in"},
+-		{name: "N3 the root's own parent", rootsCfg: []string{long},
++			why:   "an 8.3 alias above the root must not become a way in",
++		},
++		{
++			name: "N3 the root's own parent", rootsCfg: []string{long},
+-			why:   "a root authorizes its subtree, not its parent (ticket 107's boundary guard)"},
+-		{name: "N4 the root's parent spelled short", rootsCfg: []string{short},
++			why:   "a root authorizes its subtree, not its parent (ticket 107's boundary guard)",
++		},
++		{
++			name: "N4 the root's parent spelled short", rootsCfg: []string{short},
+-			why:   "same question with the root configured by its alias"},
+-		{name: "N5 one character off the root's tail", rootsCfg: []string{long},
++			why:   "same question with the root configured by its alias",
++		},
++		{
++			name: "N5 one character off the root's tail", rootsCfg: []string{long},
+-			why:   "component boundaries may not fold into a prefix match"},
+-		{name: "N6 a name on a volume that is not there", rootsCfg: []string{long},
++			why:   "component boundaries may not fold into a prefix match",
++		},
++		{
++			name: "N6 a name on a volume that is not there", rootsCfg: []string{long},
+-			why:   "unresolvable means unauthorized: paths.go:153's !ok leg must keep refusing"},
++			why:   "unresolvable means unauthorized: paths.go:153's !ok leg must keep refusing",
++		},
+
+=== what changed in the test file at ebd5da2b ===
+-		t.Errorf("carrier moved under the test: %q should now be authorized under %q", short+pathSep+leaf, long)
++		t.Errorf("AC#2 RED: the short spelling of a new file was still refused under its own root (%q): "+
++			"the same-form step is not in effect (leg1=%v leg2=%v folded=%q)",
++			short+pathSep+leaf, lShort.leg1, lShort.leg2, lShort.folded)

@@ -1,0 +1,55 @@
+=== FAIL roster (M3: fold moved INTO InAllowlist leg1) ===
+--- FAIL: TestTicket252P1AllowlistLegs (0.01s)
+    --- FAIL: TestTicket252P1AllowlistLegs/Q1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+    --- FAIL: TestTicket252P1AllowlistLegs/Q3b_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+--- FAIL: TestTicket252P1OwnerMachineReachability (0.01s)
+--- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A3_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+--- FAIL: TestTicket252R1BothSpellingsAnswerTheSame (0.03s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/Wisp (0.01s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/docs (0.01s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/tools (0.01s)
+--- FAIL: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	14.948s
+FAIL
+PASS=245 FAIL=12
+
+=== do the 252 AC#2 verdict cells go red? ===
+--- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A1_roots=LONG_asked=SHORT+missing-leaf (0.00s)
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A2_roots=SHORT_asked=LONG+missing-leaf (0.00s)
+    --- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A3_roots=SHORT_asked=SHORT+missing-leaf (0.00s)
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A4_roots=LONG_asked=LONG+missing-leaf (0.00s)
+--- FAIL: TestTicket252R1BothSpellingsAnswerTheSame (0.03s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/Wisp (0.01s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/docs (0.01s)
+    --- FAIL: TestTicket252R1BothSpellingsAnswerTheSame/tools (0.01s)
+
+=== verbatim red sentences (scoped) ===
+366:    paths_shortname_252_probe_test.go:252: leg breakdown does not explain the boolean: InAllowlist=true but leg1=false leg2=true (the workspace leg at paths.go:159 is inert in this probe - if it is not, the carrier changed under us)
+437:    paths_shortname_252_probe_test.go:252: leg breakdown does not explain the boolean: InAllowlist=true but leg1=false leg2=true (the workspace leg at paths.go:159 is inert in this probe - if it is not, the carrier changed under us)
+474:    paths_shortname_252_probe_test.go:272: leg breakdown does not explain the boolean: InAllowlist=true but leg1=false leg2=true (the workspace leg at paths.go:159 is inert in this probe - if it is not, the carrier changed under us)
+502:    paths_shortname_252_probe_test.go:272: leg breakdown does not explain the boolean: InAllowlist=true but leg1=false leg2=true (the workspace leg at paths.go:159 is inert in this probe - if it is not, the carrier changed under us)
+537:    paths_shortname_252_r1_test.go:98: leg breakdown does not explain the boolean: InAllowlist=true but leg1=false leg2=true (the workspace leg at paths.go:159 is inert in this probe - if it is not, the carrier changed under us)
+566:    paths_shortname_252_r1_test.go:98: leg breakdown does not explain the boolean: InAllowlist=true but leg1=false leg2=true (the workspace leg at paths.go:159 is inert in this probe - if it is not, the carrier changed under us)
+594:    paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md" (roots=[D:\work\workspace\projects plans\Wisp])
+595:    paths_shortname_252_r1_test.go:144: leg breakdown no longer explains the boolean: LONG true/true/true SHORT false/true/true
+596:    paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+601:    paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+602:    paths_shortname_252_r1_test.go:144: leg breakdown no longer explains the boolean: LONG true/true/true SHORT false/true/true
+603:    paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+608:    paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp])
+609:    paths_shortname_252_r1_test.go:144: leg breakdown no longer explains the boolean: LONG true/true/true SHORT false/true/true
+610:    paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+617:    paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md" (roots=[D:\work\workspace\projects plans\Wisp])
+618:    paths_shortname_252_r1_test.go:144: leg breakdown no longer explains the boolean: LONG true/true/true SHORT false/true/true
+619:    paths_shortname_252_r1_test.go:148: AC#1's split is still live: the two containments disagree on one input (LONG leg1=true leg2=true, SHORT leg1=false leg2=true)
+624:    paths_shortname_252_r1_test.go:127: one physical path still reaches the judge as two shapes: "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md" vs "D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs\\q252r1-round-trip.md" (roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs])
+625:    paths_shortname_252_r1_test.go:144: leg breakdown no longer explains the boolean: LONG true/true/true SHORT false/true/true
+
+=== 107b probes under M3 ===
+--- PASS: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing (0.08s)
+--- PASS: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.08s)
+--- PASS: TestTicket107bProbeBJudgedTreeIsTheOpenedTree (0.07s)

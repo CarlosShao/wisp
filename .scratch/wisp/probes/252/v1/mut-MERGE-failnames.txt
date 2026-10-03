@@ -1,0 +1,5 @@
+=== FAIL roster (MERGE: two containments merged into one) ===
+ok  	github.com/CarlosShao/wisp/internal/tools	14.106s
+PASS=257  FAIL=0
+
+=== verbatim red sentences ===

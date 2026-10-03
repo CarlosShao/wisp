@@ -1,0 +1,96 @@
+=== p1 roster: CASE / Canonicalize / LEG1 / LEG2 / InAllowlist lines ===
+    paths_shortname_252_probe_test.go:252: CASE Q1 roots=LONG asked=SHORT+missing-leaf
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252: CASE Q2 roots=SHORT asked=LONG+missing-leaf
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252: CASE P1 roots=LONG asked=LONG+missing-leaf
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252: CASE P2 roots=LONG asked=SHORT of an EXISTING dir
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252: CASE P3 roots=SHORT asked=SHORT of an EXISTING dir
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:252: CASE Q3b roots=SHORT asked=SHORT+missing-leaf
+    paths_shortname_252_probe_test.go:252:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252p1-never-created.txt"
+    paths_shortname_252_probe_test.go:252:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:252:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:252:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:270: workspace dir="D:\\work\\workspace\\projects plans\\Wisp\\docs" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs"
+    paths_shortname_252_probe_test.go:271: CASE W-long docs
+    paths_shortname_252_probe_test.go:271:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:271:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:271:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:272: CASE W-short docs
+    paths_shortname_252_probe_test.go:272:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:272:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:272:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:270: workspace dir="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools"
+    paths_shortname_252_probe_test.go:271: CASE W-long internal\tools
+    paths_shortname_252_probe_test.go:271:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:271:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:271:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:272: CASE W-short internal\tools
+    paths_shortname_252_probe_test.go:272:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:272:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:272:   InAllowlist(canonical)         : true
+
+=== r1 roster: A1..A4 Canonicalize + legs ===
+    paths_shortname_252_r1_test.go:98: CASE A1 roots=LONG asked=SHORT+missing-leaf
+    paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : true
+    paths_shortname_252_r1_test.go:98: CASE A2 roots=SHORT asked=LONG+missing-leaf
+    paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : true
+    paths_shortname_252_r1_test.go:98: CASE A3 roots=SHORT asked=SHORT+missing-leaf
+    paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : true
+    paths_shortname_252_r1_test.go:98: CASE A4 roots=LONG asked=LONG+missing-leaf
+    paths_shortname_252_r1_test.go:98:   Canonicalize        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r1-new-note.md"
+    paths_shortname_252_r1_test.go:98:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:98:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_r1_test.go:98:   InAllowlist(canonical)         : true
+    paths_shortname_252_r1_test.go:210:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:210:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:210:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:210:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:210:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:210:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:210:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:210:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:210:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:210:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:210:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:210:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:210:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:210:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:210:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:210:   LEG1 rootsContain(roots,folded): false
+    paths_shortname_252_r1_test.go:210:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:210:   InAllowlist(canonical)         : false
+    paths_shortname_252_r1_test.go:226:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_r1_test.go:226:   LEG2 rootsContain(roots,foldRF): false
+    paths_shortname_252_r1_test.go:226:   InAllowlist(canonical)         : false

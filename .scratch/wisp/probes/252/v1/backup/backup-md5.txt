@@ -1,0 +1,11 @@
+### backup md5 (HEAD blobs) ###
+7a86da7aeba8420639491cd252a47a0c *.scratch/wisp/probes/252/v1/backup/paths.go.orig
+cc9e50e4533fc5d0c37b7826ac982586 *.scratch/wisp/probes/252/v1/backup/paths_shortname_252_r1_test.go.orig
+### worktree md5 (must equal) ###
+7a86da7aeba8420639491cd252a47a0c *internal/tools/paths.go
+cc9e50e4533fc5d0c37b7826ac982586 *internal/tools/paths_shortname_252_r1_test.go
+### HEAD at backup time ###
+aaf94ee1
+### porcelain internal tools (start state, must be empty) ###
+?? internal/panel/inbound_roster_253_test.go
+[lines=1]

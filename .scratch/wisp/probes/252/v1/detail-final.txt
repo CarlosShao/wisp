@@ -1,0 +1,58 @@
+=== pre-fix paths.go:119-131 (the one replaced line) ===
+119: func (p *PathCanonicalizer) Canonicalize(raw string) (string, error) {
+120: 	if strings.TrimSpace(raw) == "" {
+121: 		return "", fmt.Errorf("tools: empty path")
+122: 	}
+123: 	res, err := p.resolve(raw)
+124: 	if err != nil {
+125: 		return "", err
+126: 	}
+127: 	return res.Canonical, nil
+128: }
+129: 
+130: // InAllowlist implements risk.PathCanonicalizer against already-canonical
+131: // input, component-boundary and case-folded (Windows is the only shipping
+
+=== post-fix :143-149 ===
+143: 	// are deliberately untouched, so this cannot widen any layer: the value it
+144: 	// produces is one resolvedForm already vouches for.
+145: 	if res.Resolved {
+146: 		return res.Canonical, nil
+147: 	}
+148: 	return sameFormOfUnresolved(res.Canonical), nil
+149: }
+
+=== post-fix :167-184 (sameFormOfUnresolved actual span) ===
+167: //     never produced. Here the original spelling is kept and InAllowlist's
+168: //     !ok branch goes on refusing it - fail-closed, unchanged.
+169: func sameFormOfUnresolved(canonical string) string {
+170: 	if filepath.Separator != '\\' || canonical == "" {
+171: 		return canonical
+172: 	}
+173: 	if _, err := os.Lstat(canonical); !errors.Is(err, os.ErrNotExist) {
+174: 		return canonical
+175: 	}
+176: 	if strings.HasPrefix(canonical, `\\?\`) || strings.HasPrefix(canonical, `\\`) {
+177: 		return canonical
+178: 	}
+179: 	rf, ok := resolvedForm(canonical)
+180: 	if !ok || rf == "" || strings.HasPrefix(rf, `\\?\`) {
+181: 		return canonical
+182: 	}
+183: 	return rf
+184: }
+
+=== d22scan git-ignored line still present? ===
+1
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+
+=== grep t.Skip in the carrier and probe ===
+internal/tools/paths_shortname_252_r1_test.go:1
+internal/tools/paths_shortname_252_probe_test.go:0
+
+=== carrier test func count ===
+4
+75:func TestTicket252R1ShortSpellingOfNewFileIsAuthorized(t *testing.T) {
+106:func TestTicket252R1BothSpellingsAnswerTheSame(t *testing.T) {
+162:func TestTicket252R1AlignmentAddsNoAuthorization(t *testing.T) {
+261:func TestTicket252R1CanonicalStillNamesOneTree(t *testing.T) {

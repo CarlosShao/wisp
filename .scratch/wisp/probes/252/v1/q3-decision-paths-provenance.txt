@@ -1,0 +1,31 @@
+=== where Decision.Paths is built (internal/risk) ===
+internal/risk/assessor.go:105:	// Paths are the raw affected target paths (R2 allowlist, R3 sensitive tiers,
+internal/risk/assessor.go:107:	Paths []string
+internal/risk/assessor.go:109:	// back to len(Paths).
+internal/risk/rules_gateway.go:33:	if len(ctx.facts.Paths) == 0 || ctx.canon == nil {
+internal/risk/rules_gateway.go:36:	for _, raw := range ctx.facts.Paths {
+internal/risk/rules_gateway.go:61:	if len(ctx.facts.Paths) == 0 || ctx.canon == nil || ctx.classifier == nil {
+internal/risk/rules_gateway.go:65:	for _, raw := range ctx.facts.Paths {
+internal/risk/rules_scale.go:11:// The authoritative count is Facts.BatchCount; when unset, len(Paths) is the
+internal/risk/rules_scale.go:16:		n = len(ctx.facts.Paths)
+
+=== Decision struct def ===
+90:type Decision struct {
+91-	Level    Level
+92-	RulesHit []RuleID
+93-	Reason   string
+94-	// SessionOverrideBlocked is true when the verdict must not be covered by a
+95-	// D45 scope session authorization (R4 taint hits, SPEC-06 §8.3).
+96-	SessionOverrideBlocked bool
+97-}
+98-
+99-// Facts is the per-call context the rules judge. It is an INPUT bundle: the
+100-// tool provider fills it before calling Assess. All fields are optional; a
+101-// rule whose inputs are absent does not fire.
+102-type Facts struct {
+103-	// Declared is the tool manifest's declared RiskLevel (R1: the lower bound).
+104-	Declared Level
+105-	// Paths are the raw affected target paths (R2 allowlist, R3 sensitive tiers,
+106-	// R7 fallback count). Unresolved — the wired PathCanonicalizer owns C26.
+107-	Paths []string
+108-	// BatchCount is how many files this single call affects (R7). Zero falls

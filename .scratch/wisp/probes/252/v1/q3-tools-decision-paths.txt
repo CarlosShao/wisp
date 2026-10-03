@@ -1,0 +1,30 @@
+=== tools.Decision definition ===
+internal/tools/gate.go:15:type Decision struct {
+internal/tools/gate.go-16-	Tool         string
+internal/tools/gate.go-17-	Provider     Kind
+internal/tools/gate.go-18-	Params       map[string]any
+internal/tools/gate.go-19-	Args         json.RawMessage
+internal/tools/gate.go-20-	Level        risk.Level
+internal/tools/gate.go-21-	RulesHit     []risk.RuleID
+internal/tools/gate.go-22-	Reason       string
+internal/tools/gate.go-23-	Paths        []string // canonical, as judged by R2/R3
+internal/tools/gate.go-24-	Capabilities []Capability
+internal/tools/gate.go-25-	// SessionOverrideBlocked is R4's "no D45 grant covers this" flag.
+internal/tools/gate.go-26-	SessionOverrideBlocked bool
+internal/tools/gate.go-27-	// Mode is the user-facing permission mode this call was screened under
+internal/tools/gate.go-28-	// (ticket 90, R20). It travels with the verdict because "why was I not
+internal/tools/gate.go-29-	// asked?" is a question the audit trail has to answer from the record, not
+internal/tools/gate.go-30-	// from the config file's current contents.
+internal/tools/gate.go-31-	Mode risk.Mode
+
+=== every write to .Paths in internal/tools (non-test) ===
+internal/tools/bridge.go:290:	dec.Paths = b.displayPaths(rawPaths)
+internal/tools/bridge.go:809:	f.Paths = rawPaths
+internal/tools/fs.go:94:	if d.Paths == nil {
+internal/tools/fs_write.go:171:	if d.Paths == nil {
+internal/tools/grant.go:113:// (Options.Paths, bridge.go:35-38), so it has no canonicalized path for a grant
+internal/tools/task.go:830:	if d.Paths == nil {
+
+=== where inScope is called ===
+internal/tools/bridge.go:1073:		dec.RulesHit, b.inScope(dec), grantID, dec.Reason)
+internal/tools/bridge.go:1140:func (b *Bridge) inScope(dec Decision) bool {

@@ -1,0 +1,26 @@
+docs(evidence/252-v1): 填满 §1–§7——四发突变复跑＋★落点偏差裁决（附条件成立）
+
+被验收件＝252-r1 的 internal/tools/paths.go（Canonicalize:119-149 ＋ sameFormOfUnresolved:169-184）
+与载具 paths_shortname_252_r1_test.go，链 bbbb3593→34d89191→2b1a3071→ebd5da2b（已复量 HEAD＝该链之后）。
+
+本腿自己取的数（未抄自述）：
+- InAllowlist 段体 2b1a3071^:133-163 与 HEAD:189-219 逐字节 IDENTICAL，本腿自算 md5 e4aac2d53fe6bca6f43e5505b03e4202；
+  函数内 rootsContain 3 次，对 p.roots 仍是 2 段（:196 词法／:209 解析），:215 是票 92 的 workspace 收窄 ⇒ 两次包含未合一。
+- M2 复跑（!ok 那支改软）：3 FAIL／254 PASS，红句含既有件 TestTicket107bProbeCLinkInsideAllowedRootStaysOutside
+  （paths_ticket107b_probes_test.go:180）⇒ "解析不到＝未授权"那把尺确有牙。⚠ 纠正自述一处归因：:252 尾判在 M2 下没响
+  （grep 计数 0），第三枚 FAIL 是 N7 的母格聚合行。
+- M-merge（真把词法那腿删掉）：整包 257 PASS／0 FAIL、internal/risk ok ⇒ 修完之后"绝不许合一"这条硬禁没有仪器，已建议补尺。
+- M3（裁语另一落点：折叠挪进 InAllowlist 第一段）：12 FAIL，红在 AC#1 的恒等式尺
+  （probe:252 "leg breakdown does not explain the boolean: InAllowlist=true but leg1=false leg2=true"）；
+  但 N1–N7 与 107b A/B/C 全绿、AC#3 RED 计数 0 ⇒ 实现腿那句"会新增一次授权"本腿量不到，不为它背书。
+- M1 复跑 9 FAIL／248 PASS＝自述枚数复量为真；恒真自查：把载具 :126/:130 换恒真＋种回缺陷仍 9 红，
+  把 :126 倒置在修好的码上立刻 4 红 ⇒ 载具有牙。
+- ★第 3 问裁决＝附条件成立：落点正是裁语点名的那一步，且生产三枚判定方都先 Canonicalize
+  （rules_gateway.go:37→45／task.go:834→838／bridge.go:290→displayPaths:934→inScope:1145，含实现腿自陈没追的 bridge 那枚）；
+  条件＝合一失去仪器，须另派尺。
+- 越界＝零：四枚 commit 非 .scratch 只有 paths.go 与载具；internal/risk 区间内 0 文件；点名禁改清单命中 0。
+- 门禁：build 0／两包 ok／0 FAIL／gofumpt 空／d22scan clean（git-ignore 那行按"SKIP 算红"具名不解释）。
+
+AC 框一枚未碰（票面 6 枚仍 - [ ]）；未 push；internal/tools 的改动全是临时突变且已还原
+（prod md5 7a86da7aeba8420639491cd252a47a0c／carrier cc9e50e4533fc5d0c37b7826ac982586，
+git status --porcelain -- internal tools 终态 0 行）；未在全仓跑 go test ./...，未碰 cmd/wisp／internal/config／internal/panel。

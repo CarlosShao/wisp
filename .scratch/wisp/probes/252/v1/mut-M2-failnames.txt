@@ -1,0 +1,12 @@
+=== FAIL roster (M2) ===
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+    --- FAIL: TestTicket252R1AlignmentAddsNoAuthorization/N7_inside_the_root_but_unresolvable (0.00s)
+--- FAIL: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	13.390s
+FAIL
+
+grep: unknown option -- - SKIP
+Usage: grep [OPTION]... PATTERN [FILE]...
+Try 'grep --help' for more information.
+counts: PASS=254 FAIL=3 SKIP=

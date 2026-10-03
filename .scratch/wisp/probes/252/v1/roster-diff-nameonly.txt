@@ -1,0 +1,91 @@
+=== range bbbb3593^..ebd5da2b name-only ===
+.scratch/wisp/issues/242-the-grant-binding-layer-and-the-panel-facing-read-surface-both-have-zero-rulers.md
+.scratch/wisp/issues/244-spec-11-wants-the-gui-subsystem-build.md
+.scratch/wisp/issues/253-panel-inbound-has-three-ruler-holes-reachability-nail-only-recognizes-postmessage-config-methods-fall-outside-both-rosters-and-the-legacy-envelope-resolves-null-with-zero-audit.md
+.scratch/wisp/issues/259-the-grant-binding-layer-is-an-identity-in-production-code-because-spend-is-fed-the-items-own-stored-digest-while-panelapi-and-panelitem-have-capability-side-ruler-holes.md
+.scratch/wisp/probes/145/c2/census.md
+.scratch/wisp/probes/167/c3/census.md
+.scratch/wisp/probes/167/c3/msg2.txt
+.scratch/wisp/probes/167/c3/msg3.txt
+.scratch/wisp/probes/167/c3/msg4.txt
+.scratch/wisp/probes/228/a4/census.md
+.scratch/wisp/probes/228/a4/msg-0.txt
+.scratch/wisp/probes/228/a4/msg-1.txt
+.scratch/wisp/probes/228/a4/msg-2.txt
+.scratch/wisp/probes/228/a4/msg-3.txt
+.scratch/wisp/probes/228/a4/msg-4.txt
+.scratch/wisp/probes/244/c2/census.md
+.scratch/wisp/probes/244/c2/msg-12.txt
+.scratch/wisp/probes/244/c2/msg-34.txt
+.scratch/wisp/probes/244/c2/msg-final.txt
+.scratch/wisp/probes/244/c2/msg-skeleton.txt
+.scratch/wisp/probes/248/c3/census.md
+.scratch/wisp/probes/248/c3/msg-s1.txt
+.scratch/wisp/probes/248/c3/msg-s1fix.txt
+.scratch/wisp/probes/248/c3/msg-skeleton.txt
+.scratch/wisp/probes/252/r1/backup/paths.go.orig
+.scratch/wisp/probes/252/r1/baseline-gotest.txt
+.scratch/wisp/probes/252/r1/final-packages.log
+.scratch/wisp/probes/252/r1/final-r1-run.log
+.scratch/wisp/probes/252/r1/gate-build.log
+.scratch/wisp/probes/252/r1/gate-d22scan-final.log
+.scratch/wisp/probes/252/r1/gate-d22scan.log
+.scratch/wisp/probes/252/r1/impl.md
+.scratch/wisp/probes/252/r1/msg-01-skeleton.txt
+.scratch/wisp/probes/252/r1/msg-02-tests-red.txt
+.scratch/wisp/probes/252/r1/msg-03-fix.txt
+.scratch/wisp/probes/252/r1/msg-04-evidence.txt
+.scratch/wisp/probes/252/r1/mutation-M1.log
+.scratch/wisp/probes/252/r1/mutation-M2.log
+.scratch/wisp/probes/252/r1/post-fix-p1-probe.log
+.scratch/wisp/probes/252/r1/post-fix-packages.log
+.scratch/wisp/probes/252/r1/post-fix-run.log
+.scratch/wisp/probes/252/r1/pre-fix-run.log
+.scratch/wisp/probes/253/p4/msg.txt
+.scratch/wisp/probes/253/p4/precheck.md
+.scratch/wisp/probes/255/c2/census.md
+.scratch/wisp/probes/257/a2/census.md
+.scratch/wisp/probes/257/a2/msg3.txt
+.scratch/wisp/probes/257/a2/msg4.txt
+.scratch/wisp/probes/257/a2/msg5.txt
+.scratch/wisp/probes/257/a2/msg6.txt
+.scratch/wisp/probes/258/a2/census.md
+.scratch/wisp/probes/258/a2/msg-final.txt
+.scratch/wisp/probes/258/a2/msg-fix.txt
+.scratch/wisp/probes/258/a2/msg-s1.txt
+.scratch/wisp/probes/258/a2/msg-s2.txt
+.scratch/wisp/probes/258/a2/msg-s3.txt
+docs/evidence/s1/242-grant-binding-v1.md
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+internal/tools/paths.go
+internal/tools/paths_shortname_252_r1_test.go
+
+=== per-commit name-status ===
+--- bbbb3593 docs(probes/252-r1): skeleton + section 0 starting anchor
+A	.scratch/wisp/probes/252/r1/impl.md
+--- 34d89191 test(tools/paths): ticket 252 AC#3 carrier, red before the fix
+A	.scratch/wisp/probes/252/r1/baseline-gotest.txt
+A	.scratch/wisp/probes/252/r1/msg-02-tests-red.txt
+A	.scratch/wisp/probes/252/r1/pre-fix-run.log
+A	internal/tools/paths_shortname_252_r1_test.go
+--- 2b1a3071 fix(tools/paths): ticket 252 AC#2, one form for one path before the allowlist legs
+A	.scratch/wisp/probes/252/r1/backup/paths.go.orig
+A	.scratch/wisp/probes/252/r1/post-fix-p1-probe.log
+A	.scratch/wisp/probes/252/r1/post-fix-packages.log
+A	.scratch/wisp/probes/252/r1/post-fix-run.log
+M	internal/tools/paths.go
+M	internal/tools/paths_shortname_252_r1_test.go
+--- ebd5da2b docs(probes/252-r1): AC#2/AC#3 evidence, gate readings and two mutation self-proofs
+A	.scratch/wisp/probes/252/r1/final-packages.log
+A	.scratch/wisp/probes/252/r1/final-r1-run.log
+A	.scratch/wisp/probes/252/r1/gate-build.log
+A	.scratch/wisp/probes/252/r1/gate-d22scan-final.log
+A	.scratch/wisp/probes/252/r1/gate-d22scan.log
+M	.scratch/wisp/probes/252/r1/impl.md
+A	.scratch/wisp/probes/252/r1/msg-01-skeleton.txt
+A	.scratch/wisp/probes/252/r1/msg-03-fix.txt
+A	.scratch/wisp/probes/252/r1/msg-04-evidence.txt
+A	.scratch/wisp/probes/252/r1/mutation-M1.log
+A	.scratch/wisp/probes/252/r1/mutation-M2.log
+M	internal/tools/paths_shortname_252_r1_test.go

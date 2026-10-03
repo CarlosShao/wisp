@@ -1,0 +1,30 @@
+=== grant.go 105-125 (Options.Paths seam, scope boundary only) ===
+	if b.paths == nil {
+		return "", errNoCanonicalizer
+	}
+	return b.paths.Canonicalize(p)
+}
+
+// errNoCanonicalizer names the state "this bridge was built without C26". A
+// bridge in that state judges every path fail-closed as out-of-scope L2
+// (Options.Paths, bridge.go:35-38), so it has no canonicalized path for a grant
+// row to be keyed on either: no resolver, no match, no silence.
+var errNoCanonicalizer = errors.New("tools: 未装配 C26 路径规范化器，会话授权无从比对")
+
+=== ticket 252 AC checkboxes on disk (must all be unchecked) ===
+29:- [ ] **AC#1 判死到底哪一次包含先失配**（腿的 J1，本票的第一格必须是读数不是码）：`InAllowlist` 里先失败的是**词法那一腿**（`paths.go:133` 起第一段）还是 **`resolvedForm` 那一腿**？判据＝一发探针打印 `Roots()` 与两次 `Canonicalize` 的结果，逐字进证据件。⛔ 不许用"看起来两支都会失败"代替读数。
+30:- [ ] **AC#2 双形比较的落点与形状**（修法候选，⛔ 不是"放宽"）：允许根判定对**同一物理路径的两种拼法**必须给出**同一个答案**。候选形（至少两形、附代价）：ⓐ 进 `InAllowlist` 之前把 asked 与 roots **两侧都规范化到同一形**（长名优先、缺失叶子按父目录折长后重拼）；ⓑ 沿用 `pathresolver.go:283-300` 里那条**已经写下的** runner 差异处理，把它从 A/B 黑名单侧**扩到 `[fs] allowed_dirs` 这一腿**（`224-c2` 报："那次修复只给了 A/B 黑名单侧"）。⛔ **绝不许**把两次包含改成一次（那是把票 107 的洞重新打开）、⛔ 绝不许把"解析不到＝未授权"那条 fail-closed 改软。
+31:- [ ] **AC#3 本机可判的载具**（⛔ 不许挂〔仅 CI 可量〕）：`224-c2` §3 给的尺 C 形——在本机用**真短名**当临时根复刻 runner 形状。前提＝那枚目录真拿得到短名（本机仓库根已证可拿到，见现量 4）；⚠ 本仓既有规矩：**拿不到短名就"必须红、不许 skip"**（出处 `bridge_junction_windows_test.go:77-88` 那一族的定式）。
+32:- [ ] **AC#4 三枚 witness 逐枚结线**：`TestTicket224…`／`run_test.go:378`／`run_mode101_test.go:506` 各配"改前必红、改后必绿"的同机对照读数。⚠ 结案时**必须明说** `TestComposedGateBlocksAWriteForTwoSeconds` 那 301 秒的账**从"C18 超时既有一笔"改归本票**，别留两笔。
+33:- [ ] **AC#5 审计现场那一行别再被自己滤掉**（仪器的牙）：`224-c2` 报 `grantLinesOf`（`cmd/wisp/ticket224_assembly_test.go:206-217`，**行号待验**）把自己的 `tools: call … risk=… in_allowlist_scope=…` 审计行**过滤掉了**，所以 CI 红名册天生看不见"等级"这一维 ⇒ 判据＝载具**必须 dump 那行等级**；这样下次同因红一眼可读，不用再派一枚取证腿。
+34:- [ ] **AC#6 owner 本机可达性那一格要有答案**：按现量 4，他机器上仓库根**有**短名别名、临时目录**没有** ⇒ 本票修完之后，必须有一发读数回答**"在他这台机器上，一次允许根内的新建操作到底撞不撞"**（撞＝产品缺陷、影响他；不撞＝CI 形状为主，但仍要修）。⛔ 不许按"他大概撞不到"结案。
+
+=== history of the ticket file (who touched it) ===
+f25f9572 docs(issues)：票 195 的编排者裁定补提交（上一条 ledger(A517) 漏带这枚 pathspec，票面裁定当时未入库）＋票 252 的 AC#1 裁定入票面
+4b293c95 probes(252): AC#1 + AC#6 readings from leg 252-p1, appended to the ticket
+b5b8a09e ledger(A517)：224-c2 结档——它推翻我派单那句根因（"会话授权没接进装配"判为不成立）＋新立票 252（同一路径两种拼法在允许根判定里分家 ⇒ 允许根内新建被判越界 R2 升 L2）＋票 195 我裁完写进票面
+
+=== did internal/risk change in the accepted range? ===
+[risk files touched: 0]
+=== per-commit: any banned path? ===
+/usr/bin/bash: line 4: for c in bbbb3593 34d89191: value too great for base (error token is "34d89191")

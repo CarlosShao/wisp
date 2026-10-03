@@ -1,0 +1,8 @@
+docs(evidence/252-v1): 骨架＋§0 起手锚（票 252 AC#2 两侧同形修法对抗验收，腿先落表）
+
+本腿＝252-v1，被验收件＝252-r1 的 internal/tools/paths.go（Canonicalize＋sameFormOfUnresolved）
+与新载具 paths_shortname_252_r1_test.go，提交链 bbbb3593→34d89191→2b1a3071→ebd5da2b。
+本枚只落骨架与 §0 锚（本仓硬门：验收腿先 commit 表再攒读数）。
+已复量的两枚凭据写进 §0：paths.go HEAD＝2b1a3071＝工作区（md5 7a86da7aeba8420639491cd252a47a0c）、
+-U0 只有一枚 hunk、InAllowlist 段体改前（133-163）改后（189-219）本腿自算 md5 一致且 diff 逐字节相等。
+AC 框一枚未碰；未 push；写面只用显式 pathspec。

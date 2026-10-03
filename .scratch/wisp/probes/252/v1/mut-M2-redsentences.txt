@@ -1,0 +1,18 @@
+=== verbatim FAIL blocks (M2) ===
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N1_sibling_tree,_long (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N2_sibling_tree,_short_spelling_of_the_parent (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N3_the_root's_own_parent (0.00s)
+    --- PASS: TestTicket252R1AlignmentAddsNoAuthorization/N4_the_root's_parent_spelled_short (0.00s)
+--
+    --- FAIL: TestTicket252R1AlignmentAddsNoAuthorization/N7_inside_the_root_but_unresolvable (0.00s)
+=== RUN   TestTicket252R1CanonicalStillNamesOneTree
+    paths_shortname_252_r1_test.go:262: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+=== RUN   TestTicket107AllowlistJudgmentTwoShapes
+--
+--- FAIL: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.06s)
+=== RUN   TestTicket107bProbeBJudgedTreeIsTheOpenedTree
+    paths_ticket107b_probes_test.go:201: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\001\proj -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\001\proj <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\001\outside
+    paths_ticket107b_probes_test.go:202: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\\001\\proj" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\\001\\proj",<nil> eval(through)="",The system cannot find the path specified.
+    paths_ticket107b_probes_test.go:209: Canonicalize("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree2717728653\\001\\proj\\marker.txt") refused: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions (judging the lexical spelling instead)

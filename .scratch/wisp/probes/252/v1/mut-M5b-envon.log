@@ -1,0 +1,51 @@
+time=2026-10-03T09:53:43.706+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame
+    paths_shortname_252_r1_test.go:107: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/Wisp
+    paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp"
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=true leg2=true final=true
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/docs
+    paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp\\docs" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\docs"
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\docs] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=true leg2=true final=true
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/tools
+    paths_shortname_252_r1_test.go:116: tree long="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" short="D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\internal\\tools"
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\workspace\projects plans\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\workspace\projects plans\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\workspace\projects plans\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\workspace\projects plans\Wisp] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp\internal\tools] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(LONG)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] canonical(SHORT)="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\work\WORKSP~1\PROJEC~1\Wisp] legs(SHORT): leg1=true leg2=true final=true
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.03s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/Wisp (0.01s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/docs (0.01s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/tools (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.067s
