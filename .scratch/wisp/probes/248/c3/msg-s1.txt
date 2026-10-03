@@ -1,0 +1,4 @@
+248-c3 fill §1: remaining-cell triage table
+
+Triage the 5 unchecked cells (AC#2/4/8/9/10) with current-HEAD file:line
+evidence. No Go commands run. Frontend/design not read.
