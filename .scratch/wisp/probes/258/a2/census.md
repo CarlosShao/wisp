@@ -176,7 +176,178 @@ balldebug 那一套全套把手（形 A 的现成样板，逐行）：
 
 ## §2 rebind×borrow 现量与那枚自钉要长在哪
 
-（取数中）
+> 本节按任务书三问之问二逐行量：**谁持有热键表／rebind 是全拆重装还是增量改／借用那一跳走的
+> 是不是同一条路径**，然后回答"要把这枚钉装上需要哪几枚零件、今天可达吗"。
+> 对前一腿 `245-c1`（`.scratch/wisp/probes/245/c1/census.md`，起手 `19b63425`）的判语在 §2.6。
+
+### 2.1 热键表有两层，两层的持有者不是同一枚对象
+
+| 层 | 持有者 | 现量 |
+|---|---|---|
+| Win32 真表（桌面级，按 `id + 调用线程` 生效） | **ui-sta 那枚线程**；`RegisterHotKey` 全部用同一个 `b.hwnd` 作 host | `internal/ball/hotkey_windows.go:389-401`（registerer）/`:407-409`（unregisterer）；id 名册 `:29-34`（`hkSummon=1 / hkMute=2 / hkCancel=3 / hkPanel=4`），注册顺序表 `:38-46` |
+| 球内记账（5 枚字段） | `*Ball` 结构体字段，**没有 mutex** | `internal/ball/ball_windows.go:122-126`：`registeredHotkeys / hotkeyReport / boundCfg / escTakenOver / cancelBinding`；构造期直接写（不经 uiRun）在 `:253-256` |
+
+- 这 5 枚字段的**唯一并发保护机制**＝"只在 ui-sta 上碰"：读写的公开入口
+  （`HotkeyReport` `internal/ball/ball_windows.go:830-834`、`ConfiguredHotkeys` `:840-844`、
+  `RegisteredHotkeys` `:849-853`、`EscTakenOver` `:910-914`、`RebindHotkeys` `:813-825`、
+  `TakeEscForCancel` `:873-889`、`ReleaseEscAfterSession` `:895-907`）**全部**套在
+  `b.uiRun` 里，而 `uiRun`（`:741-752`）非本线程时是 post-and-wait（`:746-751`）。
+  ⇒ 结论先摆明：**rebind 与 borrow 之间不会撕裂、不会 data race，会的是"谁先排进那条线程"。**
+- ⚠ 一处注释与实现不符（影响落地腿的判断，具名记在 §4）：
+  `internal/ball/hotkey_reload.go:78-80` 说 `Check()` 在球自己的 UI 线程上调用"would deadlock"；
+  `uiRun` 的实现（`internal/ball/ball_windows.go:742-745`）在**同一线程时是 inline 执行**，
+  不会 deadlock。真正会挂的是**另一条**：`staThread.PostTask`
+  （`internal/ball/sta_windows.go:233-249`）在 `hwnd == 0` 时 `:243-246` 把任务删掉就 return
+  （注释写"run inline as last resort"，代码里没有 inline），闭包不执行 ⇒ `uiRun` 的
+  `<-done`（`internal/ball/ball_windows.go:751`）**永久阻塞**。
+  这条才是"桥必须早于 `Ball.Close` 收口"的真理由（Close 会 `forgetWindow`：
+  `internal/ball/ball_windows.go:964` → `internal/ball/sta_windows.go:169-173`）。
+
+### 2.2 rebind ＝ 全拆重装，不是增量改（逐行）
+
+`internal/ball/ball_windows.go:813-825`，整段在**一枚** `uiRun` 闭包里，故对 ui-sta 是原子的：
+
+1. `:816 unregisterAll(b.hwnd)` → `internal/ball/hotkey_windows.go:503-511`：
+   对 `hkNames` **全部四枚 id 逐个 `unreg`**，其中含 `hkCancel(3)`。
+   `:498-502` 注释逐字承认这一刀的目的就是"连我们不跟自己记账的那枚 takeover id 一起拆掉"
+   ——**takeover id 就是借用的裸 Esc**。
+2. `:817 registerAll(b.hwnd, cfg)` → `:416-418` → `registerAllWith :453-496`；
+   `:457-463` 的 `hkCancel` 分支**只分类、continue、绝不注册**（idle 集里没有 cancel）。
+3. `:818-822` 换记账：`hotkeyReport`／`boundCfg`／`registeredHotkeys = rep.Live()`／
+   `cancelBinding = cfg.Cancel`／**`escTakenOver = false`**。
+   ⇒ `:822` 那一行就是"丢借用"的**记账面**；`:816` 是它的 **Win32 面**。两处同闭包，所以两者必然同时发生。
+4. 增量改的可能性：`registerAllWith` 只吃 `HotkeyConfig` 全量四枚（`:455` 把它摊成
+   `[]string{Summon, Mute, Cancel, Panel}` 按 `hkNames` 顺序对位），**没有**"只改动了的那一枚"
+   这种入口 ⇒ 库层面 rebind 只有全拆重装一形。
+
+### 2.3 借用那一跳走的是同一条路径吗：同槽同原语，不同入口，且**键名不受配置影响**
+
+| 对照项 | rebind | borrow（借） | return（还） |
+|---|---|---|---|
+| 公开入口 | `ball_windows.go:813` | `:873` | `:895` |
+| 用到 hkCancel(3) | `unreg(3)`（经 `unregisterAll`）**从不 reg(3)** | `reg(3, escBorrowAcc())` | `unreg(3)` |
+| 底层原语 | `hotkey_windows.go:503-511 / 453-496` | `:531-539 takeEscWith`（`:532` 先 `unreg(3)` 清残、`:533` 再 reg） | `:553 releaseEscWith`（只 `unreg(3)`） |
+| 注册的那把键 | **cfg 里那枚（cancel 除外）** | **永远裸 Esc**：`:524 escBorrowAcc() = {modNoRepeat, vkEscape}`，`:519` 注释逐字 "the bare Esc, whatever the configured binding says" | — |
+| 改 `escTakenOver` | `:822` 无条件 false | `:885` true（`:875-877` 幂等早退） | `:901` false（`:897-899` 幂等早退） |
+| 报告行来源 | 整份新 `HotkeyReport`（cancel＝`cancelIdleLine`） | `:886 withCancel(cancelBorrowedLine())`；被拒时 `:881 cancelFailedLine` | `:904 withCancel(cancelIdleLine(b.cancelBinding))` |
+
+⇒ **判语（任务书问"是不是同一条路径"）**：三者操作的是**同一枚 Win32 槽位与同一组 5 枚记账字段**，
+所以任何两跳的先后**会互相覆盖**；但它们**不是同一条代码路径**（rebind 走 `registerAllWith` 的
+skip 分支＋盲拆，借还走 `takeEscWith/releaseEscWith` 这对专用原语）。
+"不是同一条路径"正是丢借用的**机制**：rebind 没有任何一行读过 `escTakenOver` 再决定要不要保留它。
+
+★ **本节最要紧的一条外延（245-c1 未说，且它直接改写 AC#1 的射程）**：
+`[hotkey] cancel` 那枚值在**产线任何路径上都不会被注册成键**——
+idle 遍跳过它（`hotkey_windows.go:457-463`），借用那一跳硬编码裸 Esc（`:524/:533`），
+归还再显式拒绝重绑配置值（`:547-553` 注释逐字："re-binding the configured default is the
+defect this ticket is about"）。⇒ 形 A 落地后，用户把 `cancel` 改成 `Ctrl+Alt+X` 的**全部效果**
+＝报告里那行 standby 的拼写变了；idle 时 Ctrl+Alt+X 按了没事、Confirming 时裸 Esc 照样被借走。
+这一格不是"接线漏了一枚"，是**hot 档承诺在第四枚上今天就没有兑现面**，
+票 258 AC#1 那句"四枚热键以 `config.toml` 为准"按现读码只对三枚成立 ⇒ **必须上报，⛔ 我不自填修法**。
+
+### 2.4 交错矩阵：rebind 撞上借用在飞会怎样（四种时序，逐行给依据）
+
+前提（产线形 A 落地后）：借＝`cmd/wisp/resident_approval_windows.go:441`（`Prompt` 内，仅
+`p.Level == "L1"`，`:440`）；还＝`settleOrb` `:491`；rebind＝桥的 `Check()`
+（`internal/ball/hotkey_reload.go:96`）→ `RebindHotkeys`。窗口＝3s
+（`internal/agent/approval/queue.go:116 DefaultL1Window`，界 `:120/:122` = 2s/3s）。
+
+| # | 时序 | 结果（依据） |
+|---|---|---|
+| 1 | **借已完成、窗口还开着，rebind 后到**（任务书直问的那一格） | `unreg(3)`＋`escTakenOver=false`（`ball_windows.go:816/822`）⇒ 窗口剩余时间里**没有 cancel 键**；报告回 standby 行（`:817-820`）⇒ `Problems()` 为空（`hotkey_windows.go:365` 具名把 Standby 排除在问题行之外）⇒ **症状为零的降级**。之后 `settleOrb` 的 `ReleaseEscAfterSession` 走 `:897-899` 幂等早退，**不会二次 unreg、也不会把报告写烂**（这条不变量值得钉）。 |
+| 2 | rebind 的闭包与借的闭包**同时在排队** | 二者都经 `uiRun` post 到同一条 ui-sta 队列 ⇒ **串行，不分先后顺序地二选一**。rebind 先排 ⇒ `Prompt` 里 `:441` 之后 `:454 !EscTakenOver()` 读出 true（`:885` 已置位）⇒ 有键；borrow 先排 ⇒ rebind 把它抹掉 ⇒ 无键。**同一发配置改动可以两种结局**，胜负手＝两次 post 的落地顺序，产线无人可预测、也无人记录。 |
+| 3 | 借在飞、rebind 之后**又来一次借**（第二张 L1 卡） | `:875` 的幂等位已被 `:822` 清成 false ⇒ 第二张卡**能正常借到**（`:532` 先清残），这一形反而健康。 |
+| 4 | 桥的 `Refresh`（`:82-86`）与 `Check` 撞上球的收口 | 见 §2.1 末条：`PostTask` 在 `hwnd==0` 时**丢任务不执行** ⇒ `uiRun` 永久阻塞 ⇒ 挂住的正是退出序列（`cmd/wisp/resident_ball_windows.go:237-244`）。**这跟 rebind×borrow 是同一枚雷的两半**，落地腿的收口次序必须一起处理。 |
+
+**★ #1 的真实代价比注释里说的重一档**（现读码，245-c1 未写）：cancel 键没了之后，那张 L1 卡
+**不会永远挂着**——它到点**执行**。`internal/agent/approval/gate.go:319 case <-deadline:` →
+`:332` 记 `ANSWER-EXPIRED decision=timeout->execute` → `:338 return tools.AnswerTimeout`；
+同文件 `:243` 注释逐字 "the window ending unopposed means EXECUTE (AnswerTimeout)"，
+`gate.go:320-323` 再补一句"Timeout MEANS EXECUTE on the L1 route (SPEC-06 §2)"。
+⇒ 一次撞在借用在飞时的 rebind，等价于**把一张本可否决的确认卡变成必然放行**，而且用户
+看不出区别（报告干净、控制台无话）。这条应写进票 258 落地腿的判据射程；
+⛔ 我不改票面、不自填修法。
+
+### 2.5 全仓现役钉的射程（复量"零钉"）
+
+尺＝`grep -rn "RebindHotkeys" cmd internal tools --include=*.go`（全文读数见 §1.2）。
+逐枚核过、确认**没有一枚把 rebind 与在飞借用并置**：
+
+- `internal/ball/hotkey_live_test.go` `TestLiveHotkeyOccupiedVsNotAttempted`：rebind 在
+  `:247 / :272 / :297`，借还在 `:310-313`（`requireIdleRoster → TakeEscForCancel →
+  requireEscBorrowed → ReleaseEscAfterSession → requireEscReturned`）——**严格串行，
+  最后一次 rebind（:297）之后才借**。逐行读过 `:294-313`，中间没有任何 borrow 挂起中的 rebind。
+- `internal/ball/hotkey_status_test.go`：`TestHotkeyReloaderRebindsOnConfigChange` 用假 binder
+  （`:444 recorder.RebindHotkeys`）⇒ 碰不到 `escTakenOver`；`TestCancelBorrowRoundTrip`
+  （`:202` 起）走的是 `registerAllWith/takeEscWith/releaseEscWith` 原语，**不经 RebindHotkeys**。
+- `cmd/wisp/resident_approval_live_246_windows_test.go` 三枚：`:72` 的借还在无 rebind 的窗口里；
+  `:195` 是 L2（不借，`:240`）；`:289` 是退出弃窗。⇒ **零钉复认成立**。
+
+### 2.6 ★ 对 `245-c1` 那句结论的判语：复认其三、外延其二、修正其一
+
+`245-c1`（`.scratch/wisp/probes/245/c1/census.md` §3.3／§4.1）的结论拆开是三句：
+
+1. **"借还那一对已有最强形钉，复用不新增"——复认。**
+   `cmd/wisp/resident_approval_live_246_windows_test.go:72 TestLive246ConfirmingCardBorrowsEscVetoesAndReturns`
+   仍在，形状未变：正控 `-steal`（`:76-81`）＋无 Wisp 基线（`:83-86`）＋idle（`:108`）＋
+   借（`:136 EscTakenOver` / `:139 len(rep.Live())!=4`）＋桌面被借（`:145-147 keydown_esc==0`）＋
+   否决（`:157 AnswerVeto`）＋还（`:173`、`:176` idle 名册、`:177-179 keydown==1`）＋
+   无残留（`:183`）。**全仓唯一带第二进程桌面读数的借还钉**，新腿照抄不得、复用即可。
+2. **"rebind×borrow 零钉"——复认**（§2.5 用今天的 HEAD 重新逐枚数过，一枚不多一枚不少）。
+3. **"今天产线不可达"——复认**，而且**更强**：不止"没接重载器"，是 `cmd/wisp` 连
+   `RebindHotkeys` 的边都为零（§1.2 那把尺）；两条既有驱动路径都断在装配层
+   （`config_reload.go` 的 tick 只到 `rt.mgr.CheckAndReload()`，见 §3）。
+4. **外延 A（245-c1 未量到）＝§2.3 那条 ★**：`[hotkey] cancel` 在产线任何路径上都不成键，
+   所以"rebind 会不会影响借用那把键"这个问题的答案今天**恒为"不会"**——借用那把键
+   从来不看配置。这条**加重**而非推翻它的结论。
+5. **外延 B＝§2.4 #1 的"到点执行"**：丢借用的后果不是"一张卡少个键"，是"一张卡必然放行"。
+   这条同样**加重**。
+6. **修正（只修可装性，不修结论）＝"要等形 A 落地才谈得上钉"不成立**：`245-c1` §1.3 末句
+   说"A539 形 A 落地后常驻腿才长出这个面，残余才从注释里的话变成可发生的事"——
+   对**产线**成立；对**钉**不成立，见 §2.7。
+
+### 2.7 这枚自钉要长在哪：零件表与今天可达性（任务书点名要答的那半）
+
+**需要的五枚零件，逐枚验货（全部现成、全部在票 258 落地腿的写面 `cmd/wisp` 内）**：
+
+| # | 零件 | 现量（file:line） | 今天可用？ |
+|---|---|---|---|
+| 1 | 真球＋真 `residentBall` 句柄 | `cmd/wisp/resident_ball_windows.go:158 startResidentBall`；既有非 winlive 用法判例 `cmd/wisp/resident_approval_246_windows_test.go:314` | 是（但见下方"tag 陷阱"） |
+| 2 | 真 L1 卡把借举起来 | `cmd/wisp/resident_approval_windows.go:139 bindBallHost` / `:261 AskOnTaskRoot`；`Prompt` 内 `:440-441` 借、`:454` 读回 | 是（246 族全套跑通） |
+| 3 | 一次 rebind，且**要用形 A 那台机器本身**而不是裸调 `RebindHotkeys` | 导出的 `internal/ball/hotkey_reload.go:73 NewHotkeyReloader`（binder 是导出接口 `:44-46`，`*Ball` 已实现）；样板闭包 `cmd/balldebug/main.go:237-243` | **是——不需要等形 A**：这枚桥是导出 API，测试可在 `cmd/wisp` 内自己 new 一枚挂到 `rb.b` 上，"改 config.toml ⇒ Check() ⇒ rebind"整条链今天在测试进程里就能闭合 |
+| 4 | 桌面侧读数（判"真注册／真注销"，不信报告行） | `cmd/wisp/resident_approval_live_246_windows_test.go:405 buildEscListener246` / `:444 observeEsc246`（`-steal`/`-watch` 两形，字段读数 `:502-503`） | 是（同包可复用） |
+| 5 | 收尾不变量的既有尺 | `:350 requireIdleCancelSlot246`（内部 `:352 HotkeyReport`、`:357 EscTakenOver`）、`:534 waitFor246`、`:365 captureAudit246` | 是 |
+
+**钉该断言什么（三头，形状而已，⛔ 不写码）**：
+N1 借在飞时 rebind ⇒ `EscTakenOver()==false` 且 `RegisteredHotkeys()` 里**没有 id 3**
+（⛔ 别只读 `HotkeyReport()`：`245-c1` §4.3 已警告"报告烂了骗得过去"，本腿复认——
+`requireIdleCancelSlot246:352` 读的正是报告；纯 Win32 名册面在 `internal/ball/ball_windows.go:849`）；
+N2 **窗口仍开着**（`AwaitingHuman()` 仍 true，`:125` 同形）——这一句才是这枚钉区别于 246 第一例的地方；
+N3 到点之后**执行了**（`AnswerTimeout` 那一路，audit 行 `ANSWER-EXPIRED ... timeout->execute`，
+尺＝`captureAudit246`）＋ `Problems()` 仍为空（把"症状为零"这件事本身钉住，
+`internal/ball/hotkey_windows.go:365` 是它之所以无声的原因）。
+红绿两向：残余未修时 N1/N3 就是**具名红灯**；将来票 245 那笔在册残余真去修（rebind 保留借用或重借）时，
+同一枚钉翻期望值即成绿钉——**一枚钉承担两档**，不需要新增第二枚。
+
+**"能不能在今天可达的路径上装"——分两层答，⛔ 混说会误导落地腿**：
+
+- **装得上**：五枚零件全现成，且**不依赖形 A 先落地**（零件 3 就是那一处修正）。
+- **装在哪一层有讲究（tag 陷阱）**：
+  - 装进 `//go:build windows && winlive`（`cmd/wisp/resident_approval_live_246_windows_test.go`，`:1`）
+    ⇒ 基建全套复用、零新造，**但 CI 不跑它**：windows job 那枚 cmd/wisp 步骤走的是
+    `scripts/wisp-cli-tests.sh`（`.github/workflows/ci.yml:455-475`），该脚本不含 winlive tag
+    （尺＝`grep -n "tags" scripts/wisp-cli-tests.sh .github/workflows/ci.yml` 均无 winlive 命中）。
+    ⇒ 这是一枚"要人跑才会红"的钉，**属自钉、不属门禁**。
+  - 装进 `//go:build windows`（会进 CI 分母）⇒ 必须先解决"桌面不在场时它算什么"：
+    既有那枚同 tag 的球测试**故意容忍无桌面**
+    （`cmd/wisp/resident_approval_246_windows_test.go:309-310` 逐字 "On a machine with no
+    desktop both legs collapse to the second reading"，断言的是 flag 而不是窗口存在），
+    而这枚新钉的三个断言**全部**以"真借到键"为前提 ⇒ 无桌面时它只能 `t.Fatal`（＝CI 永久红）
+    或 `t.Skip`（＝票 258 禁区明文禁止，且 `tools/d22scan/runtests.sh` 把 SKIP 判红）。
+    ⇒ **本腿判：这枚钉今天该装在 winlive 层，不装在 CI 层**；若编排者要它进门禁，
+    那是"CI windows runner 有没有可交互桌面"这台机器的读数，⛔ 我量不到（见 §5）。
+- **要不要新造第六枚零件**：不要。唯一"新"的东西是零件 3 那枚**测试内自搭的桥**，
+  它用的是导出 API，⛔ 不需要给 `internal/ball` 加把手（那一层是本票只读面）。
 
 ## §3 今天可达路径名册
 

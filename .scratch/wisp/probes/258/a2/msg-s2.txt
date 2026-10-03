@@ -1,0 +1,23 @@
+docs(probes/258-a2): section 2 - rebind x borrow cell measured line by line
+
+Answers census question 2 with row-level evidence and re-verdicts 245-c1.
+
+- two-layer hotkey table: Win32 registration lives on the ui-sta thread, the
+  ball's five bookkeeping fields have no mutex and are guarded only by uiRun
+  serialization, so rebind and borrow never tear - they only race for order
+- rebind is a full teardown plus rebuild in one closure (unregisterAll drops the
+  cancel id, registerAllWith refuses to bind it, escTakenOver is cleared), no
+  incremental form exists
+- borrow and rebind share the same slot and the same bookkeeping but not the
+  same code path; that is the mechanism of the loss
+- extension 245-c1 missed: the configured cancel binding is never registered by
+  any production path, so the borrow's key is bare Esc regardless of config, and
+  the hot-tier promise has no delivery surface for the fourth slot
+- extension: a dropped in-flight borrow does not leave a stuck card - the L1
+  window expires into EXECUTE, silently, with an empty Problems() list
+- pin inventory: five parts, all present in the ticket's write face, and the
+  bridge itself is constructible today from exported API, so the pin does not
+  have to wait for form A; but it belongs on the winlive layer because CI runs
+  no winlive tag
+
+No production code touched, no AC checkboxes touched, zero Go commands run.
