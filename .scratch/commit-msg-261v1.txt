@@ -1,0 +1,8 @@
+ticket 261 leg v1: evidence skeleton + start anchors (non-implementer verdict)
+
+- .scratch/wisp/probes/261/v1/verdict.md: sections 0-8 titled; section 0
+  filled with start anchor 89c863f1 (dev, 2026-10-03T16:25:51+08:00),
+  start md5s of the four gate-relevant files, start porcelain of
+  internal/llm + internal/config = empty (rc=0), and the running roster
+  placeholder to be filled by comm at close.
+- scratch only; zero production/test code touched.
