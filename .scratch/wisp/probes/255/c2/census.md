@@ -93,7 +93,61 @@
 - ⚠ 本腿实测到的**同一次会话内漂移**（记下来防后来人误读我的行号）：同一枚调用我在 `09:2x` 读到的是 `:174`，`09:3x` 再读已是 `:178` —— 对方在写这个文件。
 - 另有**不经 `TierOf` 直读 map** 的产码点两枚：`internal/config/manager.go:294`（同源守卫）与 `cmd/wisp/config_readers_255.go:187`（在飞）；测试侧直读点在 `internal/config/tiers_255_test.go` 与 `cmd/wisp/config_receipt_255_test.go`（后者亦未跟踪）。
 - ⛔ 本腿**没跑过任何** go 命令，也没打算用 `go build` 的 rc=0 当"接上了"的证明；上面每一枚都是 grep 计数。
-- §3 装配根接缝与最小改动面
+## §3 装配根接缝与最小改动面
+
+### 3.1 装配根是哪一段（具名函数＋行号）
+
+面板宿主**只有一条生产构造路径**，在**常驻进程**那一族（不是 `wisp run`）：
+
+| 层 | 函数 | file:line | 今天递给面板宿主什么 |
+|---|---|---|---|
+| 进程根 | `runResident()` | `cmd/wisp/resident_windows.go:30`；面板那一行 `:142` `rp, rpErr := newResidentPanelManager(rt.Layout.DataDir)` | **只有一个字符串** `rt.Layout.DataDir`（`rt` 是 `proc.Boot(env)` 的产物，`:39`），⛔ 没有任何配置对象 |
+| 装配助手 | `newResidentPanelManager(dataDir string)` | `cmd/wisp/panel_resident_windows.go:183-205` | 组装三样：`disp`（`:189`）、`assets`（`:193` `panel.BuiltinAssets()`）、`dataPath`（`:203` `filepath.Join(dataDir, "panel-webview2")`），最后一行 `:204` `return NewPanelManager(disp, assets, dataPath), nil` |
+| 入向链 | `newResidentComposerDispatch` → `newComposerDispatchChain` | `cmd/wisp/panel_resident_windows.go:166-171` → `cmd/wisp/panel_inbound.go:228` | **配置对象就在这儿被造出来又丢掉**：`cmd/wisp/panel_inbound.go:230` `mgr, err := config.NewManager(cfgPath, nil)`，它只喂给 `perm.New`（`:237-244`）与 `newConfigStore(mgr, ...)`（`:267`），**函数签名 `:228` 只返回 `(*panel.ComposerDispatch, error)`，mgr 出不去** |
+
+⇒ **断点的精确形状**：装配根手里其实**已经有**这一进程唯一的那枚 `*config.Manager`（`cmd/wisp/panel_inbound.go:230` 造的），只是它被**关在 `newComposerDispatchChain` 的返回值之外**。AC#4 缺的不是"去读盘"，是"把已经在手上的那枚对象交出去"。
+⇒ 常驻进程的球腿与审批腿**完全不读配置**（`grep -rn "config\.|internal/config" cmd/wisp/resident_windows.go cmd/wisp/resident_approval_windows.go cmd/wisp/resident_ball_windows.go` 零命中），所以"再造一枚 Manager"这条路等于**同一文件第二个加载者**，正是票里第 25 行、`cmd/wisp/panel_inbound.go:204-208` 写着的"one truth / ticket 101 的分裂状态"禁令。
+
+### 3.2 ⛔ 会不会被迫新开 `internal/panel → internal/config` 那条边：**不会，一条都不必开**
+
+- 决定性事实：**面板宿主根本不在 `internal/panel` 里**。`PanelManager` 与 `NewPanelManager` 都在 `cmd/wisp/panel_host_windows.go`，**`package main`**（同文件 `:3`），而 `cmd/wisp` 的产码**本来就 import `internal/config`**（`cmd/wisp/panel_inbound.go:73`、`cmd/wisp/panel_config_store.go:39`）。
+- `internal/panel` 今天**不** import `internal/config`：`grep -rn "internal/config" internal/panel --include=*.go` 只命中两处**注释**（`internal/panel/config_handlers.go:30`、`:208`，本腿只判断其射程＝文字提及而非 import，未取内容作规矩）。
+- ⇒ 只要那枚"宽度"落点是 **`PanelManager` 的字段（package main）**，AC#4 的改动**一行 import 都不新增**。
+- ⚠ **唯一会踩禁区的走法**（点名防下一枚腿顺手做）：把几何塞进 `internal/panel` 的某个类型（例如给 `panel.ComposerDispatch`／`SettingsView`／某个 handler 加个 width 字段）——那条路要么新开被禁的边、要么撞 C17 契约面（票面禁区第 25 行"新增面板快照字段／新方法名＝先停手上报"）。**本腿量到的结论是：AC#4 不需要碰 C17，也不需要碰那条边。**
+
+### 3.3 最小改动面（逐枚 file:line，按"改动点数"排序，两形都给）
+
+**共同必动（无论哪形，4 点）**
+1. `cmd/wisp/panel_host_windows.go:137-167` —— `PanelManager` 加落点字段（今天**没有**任何几何字段，见 §1.1）。
+2. `cmd/wisp/panel_host_windows.go:175-177` —— `NewPanelManager` 的签名/构造体。
+3. `cmd/wisp/panel_host_windows.go:302-306` —— `WindowOptions{Title/Width/Height}` 那三行里，`Width: 420` / `Height: 260` 改为"读宿主字段，字段为缺省时才落到 420/260"（票面 AC#4 原话：写死值变成"配置缺省时的值"而⛔ 不是唯一来源）。
+4. `cmd/wisp/panel_resident_windows.go:204` —— 唯一的产码构造点，把值/闭包递进去。
+
+**为了"值从哪来"必动（1–2 点）**
+5. `cmd/wisp/panel_inbound.go:228` —— `newComposerDispatchChain` 的签名多返回一枚 `*config.Manager`（或返回已解析好的几何），并在 `:230-233` 之后把它带出去；连带它的两枚调用者 `cmd/wisp/panel_inbound.go:219` 与 `cmd/wisp/panel_resident_windows.go:170` 各改一行。**这是"不开第二条 import 边、又不再造第二个 Manager"两条约束逼出来的唯一走法。**
+
+**形 A：值快照（装配时定型）**——就是上面 5 点。
+- 若用**第 4 枚位置参数**：还得改 7 处测试构造点 `cmd/wisp/panel_host_windows_test.go:516`、`:689`、`cmd/wisp/panel_host_windows_live_test.go:39`、`cmd/wisp/panel_resident_windows_test.go:63`、`:449`、`:526`、`:527`（现量 `grep -rn "NewPanelManager(" cmd internal tools --include=*.go`）。
+- 若用**变参 hook**（照抄 §4 的 `ballHostHook` 定式）：这 7 处**一行都不用改**。⇒ 差异纯粹在改动面大小。
+- 生效语义：值在 `runResident` 起跑那刻定型；**改配置要重启才看得见**（因为 `bringUp` 用的是构造时的快照）。
+
+**形 B：provider 闭包（用时才读）**——1–5 点同上，只是字段类型是 `func() (int,int)`，在 `bringUp`（`cmd/wisp/panel_host_windows.go:298` 那块字面量处）调用。
+- 生效语义：多一条真生效路径——`RequestDispose`（`cmd/wisp/panel_resident_windows.go:393-399`）销毁后 `RequestShow` 重建窗口，会读到**热加载后**的新值。**不需要任何 resize 机制**（§1.1 已量：本宿主没有 `MoveWindow`/`SetWindowPos`/`Resize`，`Show` 只 `ShowWindow`）。
+- ⛔ 本腿不裁 A／B：这一格直接决定票 255 AC#1 那句"已立即生效"对 `[panel]` 能不能说真话（见 §3.4），属编排者裁。
+
+### 3.4 ⚠ 与在飞腿 `255-r2` 的**硬耦合**（本腿认为是最要紧的一条排程事实）
+
+在飞的 `cmd/wisp` 写面已经把 `panel_host_windows.go:304` 那行**写进了机读判据**：
+- `cmd/wisp/config_readers_255.go:130`（未跟踪，在飞）给 panel 的判词逐字含 `cmd/wisp/panel_host_windows.go:304 [Width:  420,] is hard-coded and NewPanelManager receives no config (票 255 AC#4 owns that break)`。
+- 尺子＝`cmd/wisp/config_receipt_255_test.go:172` `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`：`:190` `os.ReadFile` 把 cite 指向的文件读回来、`:200-202` 要求**那一行仍然含那个 token**，否则红（"the evidence drifted, so re-adjudicate this row"）。
+- 同一枚未跟踪文件里 `:406-412` 还要求热加载审计行含 `config: HOT-RELOAD-READER section=panel` + `no-reader` + `panel_host_windows.go:304`；`:369` `TestTicket255ReceiptOmitsPanelFromTheImmediateSentence` 的整条正控就是拿 `[panel] width = 641` 种的。
+
+⇒ **AC#4 一动 `:304`（不动就谈不上"变成缺省值"），这三处必红。** 这不是"断言被放宽"的问题，而是**判据的证据行moved ⇒ 那一行必须重判**：写腿必须在同一次改动里把 panel 的判词从 `hotClaimNoReader` 换形（形 A ⇒ `hotClaimSnapshotOnly`，与 `cmd/wisp/config_readers_255.go:99` 那枚 `[agent]` 行同族；形 B ⇒ 可争 `hotClaimConsumed`），并给一把新的正控替掉 `[panel]` 那枚"读者为零"的样本（⛔ 摘尺不许当修尺：票面第 17 行那句仍然管着 AC#1 那把尺，`[session]`／`[observe]` 这类真无读者段在 `cmd/wisp/config_readers_255.go:118`、`:123` 已具名，可以接手当样本）。
+⇒ 排程后果：AC#4 **不能**在 `255-r2` 落盘之前动 `cmd/wisp/panel_host_windows.go:304`，否则两边互相把对方的测试改红；票面第 32-34 行那条起跑判据（`git status --porcelain cmd/wisp internal/config` 为空）对 AC#4 同样适用。
+
+### 3.5 ⛔ 本腿**不**停手上报"非开那条边不可"
+
+量到的事实是反的：那条边**根本不需要开**。本腿唯一想标为"未定义即停"的是 §1.3 那格——`[panel] height` 的配置缺省是 **0 且 schema 注释说 0＝auto from content**（`internal/config/schema.go:533-534`），与票面"写死的 260 变成配置缺省时的值"在字面上互相拉扯（0 到底翻成 260 还是翻成让内容定高？票面与裁定都没写）。这枚**留给编排者具名裁**，本腿不按自己的判断填。
 - §4 可照抄的注入先例
 - §5 不依赖真窗口的机读判据候选
 - §6 我可能写错的条目（自我对抗）
