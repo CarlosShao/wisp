@@ -1,0 +1,27 @@
+time=2026-10-03T16:13:38.563+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTicket261R1EnumerationSkipsDisabled (0.00s)
+    enabled_gate_261_r1_test.go:37: INVERTED: enabled entry "m-on" listed, want NOT listed
+    enabled_gate_261_r1_test.go:40: INVERTED: disabled entry missing from "m-on", want it listed
+--- FAIL: TestTicket261R1SelectionRefusesDisabledByExactWording (0.00s)
+    enabled_gate_261_r1_test.go:48: INVERTED: ResolveChain(disabled) = config: llm: model "m-off" of provider "p261" is disabled (enabled=false); re-enable it or remove the entry, want nil (admitted)
+    enabled_gate_261_r1_test.go:52: INVERTED: ResolveChain(ghost) = config: llm: unknown model "ghost" of provider "p261", want nil (admitted)
+--- FAIL: TestTicket261R1RoleFallbackAlsoGated (0.00s)
+    enabled_gate_261_r1_test.go:60: INVERTED: ResolveRole(disabled head) = config: llm: model "m-off" of provider "p261" is disabled (enabled=false); re-enable it or remove the entry, want nil
+--- FAIL: TestTicket261P1EnumerationAndSelectionAdmitDisabled (0.00s)
+    enabled_reach_261_test.go:169: DiscoveredModels = [t261-on], want it to contain "t261-nokey" (this is what the enumeration point does TODAY: no Enabled check)
+    enabled_reach_261_test.go:169: DiscoveredModels = [t261-on], want it to contain "t261-off" (this is what the enumeration point does TODAY: no Enabled check)
+    enabled_reach_261_test.go:177: ResolveChain(disabled) = [], config: llm: model "t261-off" of provider "mock261" is disabled (enabled=false); re-enable it or remove the entry; want the disabled model resolved with no error
+time=2026-10-03T16:13:39.918+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:13:39 mockllm: serving on http://127.0.0.1:50684 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- FAIL: TestTicket261P1DisabledModelReachesProviderAndCost (1.38s)
+    enabled_reach_261_test.go:204: ResolveChain: config: llm: model "t261-off" of provider "mock261" is disabled (enabled=false); re-enable it or remove the entry ([])
+time=2026-10-03T16:13:41.473+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:13:41 mockllm: serving on http://127.0.0.1:50686 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- FAIL: TestTicket261P1FlagInversionChangesNoReading (1.56s)
+    enabled_reach_261_test.go:283: enumeration asymmetry: off listed=false on listed=true
+    enabled_reach_261_test.go:286: selection asymmetry: off resolved=false on resolved=true
+    enabled_reach_261_test.go:289: provider-hop asymmetry: off=false on=true
+    enabled_reach_261_test.go:292: cost-hop asymmetry: off=0 on=90 (both must be positive: the ruler says the disabled entry is billable TODAY)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/llm	2.984s
+FAIL

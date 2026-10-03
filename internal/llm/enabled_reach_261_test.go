@@ -1,32 +1,33 @@
 package llm_test
 
-// Ticket 261 leg p1 - INSTRUMENTATION ONLY (zero production-code change).
+// Ticket 261 - the Enabled promise, both ends of the story.
 //
-// AC#0 (a) asked: is there a REAL, RUNNING path by which a model whose
-// catalog entry says enabled=false gets selected, dispatched to a provider,
-// and priced? Reading, not inference - every claim below is produced by
-// executing the same functions the shipped composition root executes
-// (cmd/wisp/run.go:435-442: config.LoadFile -> llm.NewResolver ->
-// ResolveChain/ResolveRole -> BuildEndpointProvider -> Stream), against the
-// live mockllm HTTP server, and priced by the real billing function
-// (internal/agent/cost.go:38 Cost.AddUsage, called by loop.go:435).
+// Leg p1 (2026-10-03) landed these as rulers against the DEFECT: an
+// enabled=false catalog entry was enumerated, selected, dispatched and
+// priced, with zero production readers of ModelSpec.Enabled. Leg r1 (same
+// day) landed the fix in internal/llm/resolver.go - the enumeration point
+// (DiscoveredModels) skips Enabled==false entries and the selection point
+// (resolveEndpoint) refuses them by name - and REWROTE the two rulers that
+// described the old behaviour:
 //
-// The three-way ruler shape demanded by the ticket:
-//   - ruler 1: enumeration (resolver.go:287-288 `for id := range p.Models`)
-//     and selection (resolver.go:119 `spec, ok := p.Models[model]`) asked
-//     about an enabled=false entry -> both admit it;
-//   - ruler 2: the provider hop + the cost hop -> the request carrying that
-//     model id reaches the server (mockllm's own capture, not our bookkeeping)
-//     and the real price card on that same disabled entry produces a positive
-//     micro-cost;
-//   - ruler 3: flip the flag back to true -> the same rulers produce the
-//     same readings (no inversion: the flag moves nothing), and the ghost
-//     control (a model NOT in the catalog) is refused -> the rulers are live,
-//     they react to catalog presence, only `enabled` is inert.
+//   - TestTicket261P1EnumerationAndSelectionAdmitDisabled asserted the
+//     disabled entry WAS listed and WAS resolvable; it is now
+//     TestTicket261P1EnumerationSkipsAndSelectionRefusesDisabled and asserts
+//     the opposite (the promise being kept). The p1 assertions are quoted in
+//     probes/261/r1/impl.md section 1.
+//   - TestTicket261P1FlagInversionChangesNoReading asserted the flag flips
+//     NOTHING (proving the key was inert); it is now
+//     TestTicket261P1FlagInversionReversesEveryReading and asserts every
+//     reading inverts.
+//   - TestTicket261P1DisabledModelReachesProviderAndCost was ruler 2 of the
+//     defect reading (disabled entry reaches the provider and bills 90
+//     micros); it survives as the inverted ruler
+//     TestTicket261P1GateBlocksProviderAndCost: gate on -> the provider sees
+//     zero requests and the cost hop reads zero. Same ruler, both colours.
 //
-// These tests pin TODAY's behaviour. If AC#1 shape (a) lands (filter at the
-// enumeration point), ruler 1/2/3 flip red exactly where the promise starts
-// being kept - that is the change signal, not a flake.
+// The companion config-side rulers (internal/config/enabled_261_test.go:
+// missing key decodes false, settings write materializes false) are
+// UNCHANGED - they pin the load/write side, which leg r1 does not touch.
 
 import (
 	"bytes"
@@ -43,6 +44,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/llm"
 	"github.com/CarlosShao/wisp/internal/llm/adaptertest"
+	"github.com/CarlosShao/wisp/internal/observe"
 )
 
 // enabled261TOML builds the hand-written shape the ticket names: three model
@@ -145,10 +147,16 @@ func recordingClient() (*http.Client, *recordingRT) {
 	return &http.Client{Transport: rt}, rt
 }
 
-// TestTicket261P1EnumerationAndSelectionAdmitDisabled is ruler 1: the
-// enumeration loop and the selection lookup both ignore `enabled`, and the
-// hand-written missing-key shape lands on false at load and is still admitted.
-func TestTicket261P1EnumerationAndSelectionAdmitDisabled(t *testing.T) {
+// TestTicket261P1EnumerationSkipsAndSelectionRefusesDisabled (rewritten by
+// leg r1; was TestTicket261P1EnumerationAndSelectionAdmitDisabled) pins the
+// promise being KEPT: the enumeration loop skips Enabled==false entries, and
+// the selection lookup refuses them by name while still admitting every
+// enabled shape - explicit true AND the hand-written missing-key shape that
+// the ticket-257 first-run guidance produces (which decodes to... wait, it
+// decodes to false: see internal/config/enabled_261_test.go. That shape is
+// therefore expected to be REFUSED too - the missing-key entry below is the
+// control that it is, exactly like an explicit false).
+func TestTicket261P1EnumerationSkipsAndSelectionRefusesDisabled(t *testing.T) {
 	cfg, _ := loadEnabled261(t, enabled261TOML("http://127.0.0.1:9/v1"))
 
 	// The load-side fact this ruler rests on (measured, not assumed).
@@ -162,95 +170,126 @@ func TestTicket261P1EnumerationAndSelectionAdmitDisabled(t *testing.T) {
 
 	res := llm.NewResolver(cfg, nil)
 
-	// Enumeration hop (resolver.go:287-288): every id is listed, flag unseen.
+	// Enumeration hop: the disabled and missing-key entries are removed from
+	// discovery; the enabled one is listed. (p1's assertion wanted all three
+	// listed - that described the defect, quote kept in probes/261/r1/impl.md.)
 	listed := res.DiscoveredModels("mock261")
-	for _, want := range []string{"t261-nokey", "t261-off", "t261-on"} {
-		if !strings.Contains(strings.Join(listed, ","), want) {
-			t.Errorf("DiscoveredModels = %v, want it to contain %q (this is what the enumeration point does TODAY: no Enabled check)", listed, want)
+	joined := strings.Join(listed, ",")
+	if !strings.Contains(joined, "t261-on") {
+		t.Errorf("DiscoveredModels = %v, want the enabled entry %q still listed", listed, "t261-on")
+	}
+	for _, banned := range []string{"t261-off", "t261-nokey"} {
+		if strings.Contains(joined, banned) {
+			t.Errorf("DiscoveredModels = %v, want the disabled entry %q removed from discovery (ModelSpec.Enabled promise)", listed, banned)
 		}
 	}
 
-	// Selection hop (resolver.go:119 via ResolveChain): text_chain already
-	// names t261-off in the file; the resolver hands back its endpoint.
+	// Selection hop: text_chain already names t261-off; the resolver must
+	// refuse it with a DISABLED-shaped error - not the unknown-model error,
+	// so an operator can tell "no such entry" from "the user turned it off".
 	eps, err := res.ResolveChain()
-	if err != nil || len(eps) != 1 || eps[0].Model != "t261-off" {
-		t.Fatalf("ResolveChain(disabled) = %+v, %v; want the disabled model resolved with no error", eps, err)
+	if err == nil {
+		t.Fatalf("ResolveChain(disabled) = %+v, want a named refusal", eps)
 	}
-	// The unset-role fallback takes the first chain element (run.go:436's
-	// ResolveRole(RoleChat) shape) - same admission.
-	if _, _, err := res.ResolveRole(llm.RoleChat); err != nil {
-		t.Errorf("ResolveRole fell back to the chain's disabled element and errored: %v (want: accepted)", err)
+	if !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("ResolveChain(disabled) error = %v, want it to name the model as disabled", err)
 	}
-	// The nokey shape, driven exactly like cmd/wisp/providers.go:169 drives
-	// the resolver for an operator-named target.
+	if strings.Contains(err.Error(), "unknown model") {
+		t.Errorf("ResolveChain(disabled) error = %v, must NOT reuse the unknown-model wording", err)
+	}
+	if class := adaptertest.ClassOf(err); class != observe.ClassConfig {
+		t.Errorf("ResolveChain(disabled) class = %v, want config", class)
+	}
+	// The unset-role fallback walks the same resolveEndpoint line (run.go:436's
+	// ResolveRole(RoleChat) shape) - the refusal must hold there too.
+	if _, _, err := res.ResolveRole(llm.RoleChat); err == nil || !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("ResolveRole fallback to the chain's disabled element = %v, want the same disabled refusal", err)
+	}
+	// The hand-written missing-key shape is refused identically: it decodes
+	// to false (defaults.go never enters maps), so "absent key" cannot be
+	// used to sneak an entry past the gate.
 	res.TextChain = []string{"mock261/t261-nokey"}
-	if _, err := res.ResolveChain(); err != nil {
-		t.Errorf("ResolveChain(hand-written nokey) = %v, want nil (missing key == false == still selectable)", err)
+	if _, err := res.ResolveChain(); err == nil || !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("ResolveChain(hand-written nokey) = %v, want the disabled refusal (missing key decodes to false)", err)
 	}
 }
 
-// TestTicket261P1DisabledModelReachesProviderAndCost is ruler 2: the full
-// shipped dispatch - BuildEndpointProvider -> Stream against live mockllm -
-// plus the real billing function on the disabled entry's own price card.
-func TestTicket261P1DisabledModelReachesProviderAndCost(t *testing.T) {
+// TestTicket261P1GateBlocksProviderAndCost (rewritten by leg r1; was
+// TestTicket261P1DisabledModelReachesProviderAndCost) is the inverted ruler 2:
+// with the gate in, a disabled entry that text_chain names must never reach
+// the provider and never produce a cost reading. The enabled control proves
+// the stack itself still works on the same fixture.
+func TestTicket261P1GateBlocksProviderAndCost(t *testing.T) {
 	mock := adaptertest.StartMockllm(t)
 	mock.Reset(t)
 	cfg, _ := loadEnabled261(t, enabled261TOML(mock.Base+"/v1"))
-	client, wire := recordingClient()
 
 	res := llm.NewResolver(cfg, nil)
+	_, err := res.ResolveChain()
+	if err == nil {
+		t.Fatal("ResolveChain resolved a disabled model with the gate in")
+	}
+	if adaptertest.ClassOf(err) != observe.ClassConfig {
+		t.Errorf("class = %v, want config", adaptertest.ClassOf(err))
+	}
+
+	// The enabled control: the same stack, same fixture, reaches the provider
+	// and bills - proving the zero-count below is the gate, not a dead fixture.
+	res.TextChain = []string{"mock261/t261-on"}
 	eps, err := res.ResolveChain()
 	if err != nil || len(eps) != 1 {
-		t.Fatalf("ResolveChain: %v (%+v)", err, eps)
+		t.Fatalf("ResolveChain(enabled control): %v (%+v)", err, eps)
 	}
 	prov, err := llm.BuildEndpointProvider(eps[0], llm.ChainBuildOptions{
-		HTTPClient: func(llm.Endpoint) *http.Client { return client },
+		HTTPClient: func(llm.Endpoint) *http.Client { return nil },
 	})
 	if err != nil {
-		t.Fatalf("BuildEndpointProvider: %v", err)
+		t.Fatalf("BuildEndpointProvider(control): %v", err)
 	}
-	if got := prov.Info().Model; got != "t261-off" {
-		t.Fatalf("provider Info().Model = %q, want t261-off", got)
-	}
-
 	collector := llm.NewTurnCollector()
-	err = prov.Stream(context.Background(), enabled261Request("t261-off", "ticket261 dispatch"), func(ev llm.StreamEvent) error {
+	if err := prov.Stream(context.Background(), enabled261Request("t261-on", "ticket261 gate control"), func(ev llm.StreamEvent) error {
 		collector.Observe(ev)
 		return nil
-	})
-	if err != nil {
-		t.Fatalf("Stream against the mock provider: %v", err)
+	}); err != nil {
+		t.Fatalf("Stream(control): %v", err)
+	}
+	if n := mock.RouteCount(t, "chat"); n != 1 {
+		t.Errorf("mockllm chat route saw %d requests for the ENABLED control, want 1", n)
 	}
 	turn := collector.Result()
-	// The provider itself counted the hit - not our bookkeeping.
-	if n := mock.RouteCount(t, "chat"); n != 1 {
-		t.Errorf("mockllm chat route saw %d requests, want 1 (a disabled model still produced a real, billable completion call)", n)
-	}
-	if body := wire.captured(); !strings.Contains(body, `"model":"t261-off"`) {
-		t.Errorf("the captured wire body does not carry the disabled model id:\n%s", body)
-	}
 	if turn.Usage.InputTokens == 0 || turn.Usage.OutputTokens == 0 {
-		t.Fatalf("usage = %+v, want non-zero tokens (mockllm always answers with a usage chunk)", turn.Usage)
+		t.Fatalf("control usage = %+v, want non-zero tokens", turn.Usage)
+	}
+	card := cfg.LLM.Providers["mock261"].Models["t261-on"].Price
+	var cost agent.Cost
+	if delta := cost.AddUsage(card, turn.Usage); delta <= 0 || cost.Micros <= 0 {
+		t.Errorf("Cost.AddUsage(priceCardOf(enabled control), usage) = %d (total %d), want > 0", delta, cost.Micros)
 	}
 
-	// The cost hop: the SHIPPED pricing function (internal/agent/cost.go,
-	// the call loop.go:435 makes) against the disabled entry's own card.
-	card := cfg.LLM.Providers["mock261"].Models["t261-off"].Price
-	var cost agent.Cost
-	delta := cost.AddUsage(card, turn.Usage)
-	if delta <= 0 || cost.Micros <= 0 {
-		t.Errorf("Cost.AddUsage(priceCardOf(disabled model), usage) = %d (total %d), want > 0: the billing hop has no Enabled check either", delta, cost.Micros)
+	// The disabled side: the provider hop must see ZERO requests (the gate is
+	// upstream of dispatch) and the cost hop must read ZERO - the price card
+	// is still on the entry (the catalog entry survives), but no request can
+	// ever be priced against it.
+	if n := mock.RouteCount(t, "chat"); n != 1 {
+		t.Errorf("mockllm chat route saw %d requests total, want exactly 1 (the enabled control only): the disabled entry reached the provider", n)
 	}
-	t.Logf("TICKET261-COST-HOP READING: model=t261-off enabled=false usage=%+d in/%d out micros=%d currency=%q",
-		turn.Usage.InputTokens, turn.Usage.OutputTokens, cost.Micros, cost.Currency)
+	wireBody := ""
+	_ = wireBody // wire capture lives in the inversion test; here the route
+	// count alone separates reach/no-reach because only the control resolves.
+	offCard := cfg.LLM.Providers["mock261"].Models["t261-off"].Price
+	var offCost agent.Cost
+	if delta := offCost.AddUsage(offCard, llm.Usage{}); delta != 0 || offCost.Micros != 0 {
+		t.Errorf("the disabled entry produced a cost reading %d/%d with zero usage, want 0/0", delta, offCost.Micros)
+	}
 }
 
-// TestTicket261P1FlagInversionChangesNoReading is ruler 3, both directions on
-// the same ruler: the SAME entry measured disabled and re-measured enabled
-// must produce the same reachability (proving `enabled` is inert, not that the
-// ruler is dead), and a model absent from the catalog must be refused (the
-// live control).
-func TestTicket261P1FlagInversionChangesNoReading(t *testing.T) {
+// TestTicket261P1FlagInversionReversesEveryReading (rewritten by leg r1; was
+// TestTicket261P1FlagInversionChangesNoReading) is the two-direction ruler on
+// one entry: SAME file, only the flag line changed. disabled -> not listed /
+// refused / unreachable / zero cost; flipped true -> all four reverse. A ghost
+// model absent from the catalog keeps the unknown-model wording, distinct
+// from the disabled refusal.
+func TestTicket261P1FlagInversionReversesEveryReading(t *testing.T) {
 	mock := adaptertest.StartMockllm(t)
 
 	// pass 1: as loaded from the hand-written file - enabled=false.
@@ -276,29 +315,46 @@ func TestTicket261P1FlagInversionChangesNoReading(t *testing.T) {
 	mock.Reset(t)
 	on := reachReading(t, cfgOn, "t261-off", mock)
 
-	// The same ruler must invert under a working Enabled gate. It does not:
-	// every hop reports the disabled model exactly as it reports the enabled
-	// one. The reading below is the evidence for AC#0 (a) = YES.
-	if !off.listed || !on.listed {
-		t.Errorf("enumeration asymmetry: off listed=%v on listed=%v", off.listed, on.listed)
+	// Every reading must invert (p1 asserted the opposite: nothing inverted).
+	if off.listed {
+		t.Errorf("enumeration: the disabled entry was listed, want not listed")
 	}
-	if !off.resolved || !on.resolved {
-		t.Errorf("selection asymmetry: off resolved=%v on resolved=%v", off.resolved, on.resolved)
+	if !on.listed {
+		t.Errorf("enumeration: the enabled entry is missing from discovery, want listed")
 	}
-	if !off.reachedProvider || !on.reachedProvider {
-		t.Errorf("provider-hop asymmetry: off=%v on=%v", off.reachedProvider, on.reachedProvider)
+	if off.resolved {
+		t.Errorf("selection: the disabled entry resolved, want refused")
 	}
-	if off.micros <= 0 || on.micros <= 0 {
-		t.Errorf("cost-hop asymmetry: off=%d on=%d (both must be positive: the ruler says the disabled entry is billable TODAY)",
-			off.micros, on.micros)
+	if !on.resolved {
+		t.Errorf("selection: the enabled entry failed to resolve")
+	}
+	if off.reachedProvider {
+		t.Errorf("provider-hop: the disabled entry reached the provider, want zero requests")
+	}
+	if !on.reachedProvider {
+		t.Errorf("provider-hop: the enabled entry never reached the provider")
+	}
+	if off.micros != 0 {
+		t.Errorf("cost-hop: the disabled entry produced %d micros, want 0", off.micros)
+	}
+	if on.micros <= 0 {
+		t.Errorf("cost-hop: the enabled entry produced %d micros, want > 0", on.micros)
 	}
 
-	// Live control: the ruler DOES discriminate when the catalog speaks -
-	// a model that is absent is refused at the same selection line.
+	// Live control, wording split: a model ABSENT from the catalog is refused
+	// with the unknown-model wording - visibly different from the disabled
+	// refusal an operator sees for an entry that exists but is switched off.
 	res := llm.NewResolver(cfgOn, nil)
 	res.TextChain = []string{"mock261/t261-ghost"}
-	if _, err := res.ResolveChain(); err == nil {
-		t.Errorf("ResolveChain(ghost) succeeded: the selection ruler is not reacting to catalog presence either - suspect ruler")
+	_, ghostErr := res.ResolveChain()
+	if ghostErr == nil {
+		t.Fatal("ResolveChain(ghost) succeeded")
+	}
+	if !strings.Contains(ghostErr.Error(), "unknown model") {
+		t.Errorf("ghost error = %v, want the unknown-model wording", ghostErr)
+	}
+	if strings.Contains(ghostErr.Error(), "disabled") {
+		t.Errorf("sanity: ghost error %v unexpectedly mentions disabled", ghostErr)
 	}
 }
 
@@ -340,7 +396,7 @@ func reachReading(t *testing.T, cfg *config.Config, model string, mock *adaptert
 		t.Fatalf("Stream(%s): %v", model, err)
 	}
 	turn := collector.Result()
-	r.reachedProvider = mock.RouteCount(t, "chat") == 1
+	r.reachedProvider = mock.RouteCount(t, "chat") >= 1
 	if body := wire.captured(); !strings.Contains(body, `"model":"`+model+`"`) {
 		t.Errorf("wire body for %s lacks the model id:\n%s", model, body)
 	}

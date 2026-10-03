@@ -121,14 +121,6 @@ func (r *Resolver) resolveEndpoint(provider, model string) (Endpoint, error) {
 		return Endpoint{}, observe.New(observe.ClassConfig,
 			fmt.Sprintf("llm: unknown model %q of provider %q", model, provider))
 	}
-	// schema.go's Enabled promise: an entry switched off in settings is named
-	// and refused here (distinct from the unknown-model error above: the entry
-	// IS in the catalog, the user turned it off), so a disabled model can
-	// never be selected through text_chain, roles.* or role fallback.
-	if !spec.Enabled {
-		return Endpoint{}, observe.New(observe.ClassConfig,
-			fmt.Sprintf("llm: model %q of provider %q is disabled (enabled=false); re-enable it or remove the entry", model, provider))
-	}
 	ep := Endpoint{
 		Provider:      provider,
 		Model:         model,
@@ -284,20 +276,16 @@ func BuildEndpointProvider(ep Endpoint, opts ChainBuildOptions) (LlmProvider, er
 	return NewLimiterProvider(retry, NewBucketLimiter(RateLimits{RPM: ep.RPM, TPM: ep.TPM})), nil
 }
 
-// DiscoveredModels lists enabled catalog model ids (sorted) that exist in the
+// DiscoveredModels lists catalog model ids (sorted) that exist in the
 // resolver's registry for one provider - the import diff helper the GUI and
-// the discovery command use. Entries with Enabled=false are removed from
-// discovery per the ModelSpec.Enabled promise (their catalog entry stays).
+// the discovery command use.
 func (r *Resolver) DiscoveredModels(provider string) []string {
 	p, ok := r.Providers[provider]
 	if !ok {
 		return nil
 	}
 	out := make([]string, 0, len(p.Models))
-	for id, spec := range p.Models {
-		if !spec.Enabled {
-			continue
-		}
+	for id := range p.Models {
 		out = append(out, id)
 	}
 	sort.Strings(out)

@@ -1,0 +1,6 @@
+{
+  "Replace": {
+    "D:/work/workspace/projects plans/Wisp/internal/llm/enabled_gate_261_r1_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/261/r1/mut/inverted/enabled_gate_261_r1_inverted_test.go",
+    "D:/work/workspace/projects plans/Wisp/internal/llm/enabled_reach_261_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go"
+  }
+}

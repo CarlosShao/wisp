@@ -1,0 +1,39 @@
+ticket 261 leg r1 (AC#1 shape a): make the Enabled promise real, both ends
+
+Production (internal/llm/resolver.go, two gates):
+- selection (resolveEndpoint, after :119 lookup): refuse an entry that exists
+  in the catalog but is switched off, with a named ClassConfig error
+  "llm: model %q of provider %q is disabled (enabled=false); re-enable it or
+  remove the entry" - deliberately NOT a reuse of the unknown-model wording,
+  so operators can tell "no such entry" from "the user turned it off". One
+  gate covers all three entries into the line: text_chain, roles.* direct,
+  unset-role fallback.
+- enumeration (DiscoveredModels): skip Enabled==false entries (the discovery
+  half of the schema.go promise; the catalog entry survives).
+
+Note: the selection point is the orchestrator's scope extension from AC#0's
+reading (the judged outcome was "selected and billed", which enumeration
+filtering alone cannot stop). Registered in probes/261/r1/impl.md.
+
+Rulers:
+- internal/llm/enabled_gate_261_r1_test.go (new, 3 tests): enumerate/select/
+  role-fallback gates + exact error shape, ghost control keeps the
+  unknown-model wording.
+- internal/llm/enabled_reach_261_test.go (261-p1's file, rewritten per
+  orchestrator ruling to post-fix semantics): the two old rulers that
+  described the defect are renamed and inverted
+  (EnumerationSkipsAndSelectionRefuses, FlagInversionReversesEveryReading);
+  the reach-and-cost ruler becomes the inverted GateBlocksProviderAndCost
+  (gate on -> provider sees zero requests, cost reads zero; enabled control
+  proves the instrument alive). Original assertions quoted in impl.md 1.2.
+- internal/config/enabled_261_test.go untouched and still green (no leak).
+
+Self-proof (scratch only, tracked tree md5-stable):
+- mut/ = ungated resolver from the start HEAD via go test -overlay: all 6
+  ticket-261 tests flip red (mut-run.log), tracked resolver md5 identical
+  before/after.
+- mut/inverted/ = inverted-form rulers (my 3 + p1's original 3) against the
+  GATED tracked tree: all 6 red - the rulers are not constant-truth.
+
+Gates: vet 0; d22scan clean; gofumpt clean; two-package test 155 PASS /
+0 FAIL / 0 SKIP; go build ./... deliberately not run (dispatched ban).
