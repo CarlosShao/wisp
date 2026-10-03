@@ -1,0 +1,22 @@
+docs(probes/258-a2): sections 4-6, census delivered - placeholder zero
+
+Self-adversarial list, named abstentions, and the handover verdict close the
+read-only census for ticket 258 form A.
+
+Section 4 names the ten things most likely wrong in this file, led by the fact
+that section 3's headline finding rests on an untracked in-flight file
+(config_readers_255.go, git status ?? ) plus a dirty one (config_reload.go, M),
+and that the two ticket-255 rulers I predict will redden exist today only as
+comment intent, not as test functions on disk.
+
+Section 5 abstains by name on nine readings that require running something:
+whether the current hotkey pins are green today, whether the proposed
+rebind-while-borrowed pin actually reddens, whether this desktop already has a
+foreign owner of bare Esc, whether the loader applies the schema default tag,
+whether a CI windows runner can host a ball window, whether the build accepts
+the parameter change, d22scan's real range, the landed rebind frequency, and
+what the 255 rulers finally assert.
+
+Section 6 records the verdict: read-only, zero Go commands, not pushed, AC
+checkboxes untouched, no frontend or design access, and no frozen file touched
+beyond one labeled range judgement of the CI workflow's tag coverage.

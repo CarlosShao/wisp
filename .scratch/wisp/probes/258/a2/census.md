@@ -108,7 +108,7 @@ balldebug 那一套全套把手（形 A 的现成样板，逐行）：
    而常驻进程里**第一枚** `config.Manager` 直到 `cmd/wisp/resident_windows.go:206`
    （`startResidentTaskSource`）→ `cmd/wisp/resident_task_source_windows.go:265`
    （`assembleRuntime`）→ `cmd/wisp/run.go:409` 才存在。`:163` 与 `:206` 之间没有任何 mgr。
-2. **那枚 mgr 还可能压根不存在**：`cmd/wisp/resident_task_source_windows.go:221-231`
+2. **那枚 mgr 还可能压根不存在**：`cmd/wisp/resident_task_source_windows.go:224-231`
    在没有可交互控制台且没有注入任务时**直接 `return nil`**（连 `assembleRuntime` 都不进）；
    即便进去了，`assembleRuntime` 在 `cmd/wisp/run.go:410-419`（`config.NewManager` 失败）
    与 `:437-446` 等多处 `return rt, 2`，而重载 tick 挂在函数尾部的
@@ -379,9 +379,12 @@ N3 到点之后**执行了**（`AnswerTimeout` 那一路，audit 行 `ANSWER-EXP
   武装点只有一枚 `cmd/wisp/run.go:813 rt.startConfigReload()`，它在 `assembleRuntime`
   （`cmd/wisp/run.go:382`）**函数尾部**，前面任何一条 `return rt, 2` 都＝不武装。而
   `assembleRuntime` 在常驻腿只被 `cmd/wisp/resident_task_source_windows.go:265` 调一次，
-  调用点在 `:221-231` 那道门**之后**：
+  调用点在 `:224-231` 那道门**之后**（谓词在 `:224`，`return nil` 在 `:230`）：
   - 那道门的谓词＝`interactiveStdin()`（`cmd/wisp/approval_reply_stdin_windows.go:41-52`：
     标准输入不是控制台输入缓冲就返回 nil，`:47-49` 具名"a pipe, a file, or no console"）；
+    ⚠ 同一道门还认一枚**只在本机测试台件里受理**的注入文本
+    （`cmd/wisp/resident_task_source_windows.go:219` 的 `residentTestTaskText`）⇒
+    "没有控制台但注入了任务文本"这一形也会过门，产线不该指望它；
   - 常驻那条腿自己的场景自述正是这件事：`cmd/wisp/resident_windows.go:52-57`
     逐字 "the resident process is the leg owner actually uses - double click the icon,
     no terminal attached, stderr going nowhere"，`main.go:60-67` 的无参数分支先
@@ -429,7 +432,7 @@ N3 到点之后**执行了**（`AnswerTimeout` 那一路，audit 行 `ANSWER-EXP
 | # | 路径 | 三跳状态 | 现量 | 今天能不能让改过的 `[hotkey]` 变成手上真按得动的键 |
 |---|---|---|---|---|
 | 1 | **`wisp`（无参数，终端里起）＝常驻腿** | 跳 1 活 / **跳 2 零** / 跳 3 只吃写死值 | `resident_windows.go:163→206`、`run.go:813`、§3.2 | **不能**。改完文件内存会换，**没人次日或当场把它交给球**；重启进程才会（下一次 `ball.New` 仍吃 `DefaultHotkeys()` ⇒ **连重启都不解决**，这一格比票面更狠） |
-| 2 | **`wisp`（真·双击/GUI 无控制台）** | **跳 1 也不活** / 跳 2 零 / 跳 3 写死 | `resident_task_source_windows.go:221-231`＋`approval_reply_stdin_windows.go:41-52` | **不能**，且比 #1 更空：这个进程里连 mgr 与 tick 都没有（`[hotkey]` 的**内存值**都不换） |
+| 2 | **`wisp`（真·双击/GUI 无控制台）** | **跳 1 也不活** / 跳 2 零 / 跳 3 写死 | `resident_task_source_windows.go:224-231`＋`approval_reply_stdin_windows.go:41-52` | **不能**，且比 #1 更空：这个进程里连 mgr 与 tick 都没有（`[hotkey]` 的**内存值**都不换） |
 | 3 | **`wisp run <文本>`** | 跳 1 活 / 跳 2 零 / **跳 3 不存在（不建球）** | `main.go:89-91`→`run.go:181→249→813`；`grep -c "ball\." cmd/wisp/run.go`＝0 | **不能**（258-a1 的"对 `wisp run` 是空集"复认）。但它会**把这句老实话打给你看**，见 §3.5 |
 | 4 | **`wisp panel-inbound`** | 跳 1 不武装 / 无球 | `config_reload.go:91-99`（`hotReloadDisabledPanelInbound` 自陈） | **不能**，且自己会说明不能 |
 | 5 | **常驻面板链** | 有自己的 mgr、从不 tick | `panel_resident_windows.go:162-164` | **不能** |
@@ -480,14 +483,114 @@ N3 到点之后**执行了**（`AnswerTimeout` 那一路，audit 行 `ANSWER-EXP
 "摘尺当修尺"的反向版本）。
 ⚠ 另：**这两枚尺今天还不存在**⇒ 落地腿开工时必须先复量 255 交没交件（§5 具名）。
 
-## §4 我可能写错的条目（自我对抗）
+## §4 我可能写错的条目（自我对抗，不许留空）
 
-（取数中）
+1. **§3.5／§3.6 全节挂在"在飞"的文件上——本件最脆的一处。**
+   现量：`git status --porcelain -- cmd/wisp/config_reload.go cmd/wisp/config_readers_255.go`
+   ＝ `M` ＋ `??`（后者**根本没被 tracked**）。⇒ 我引的 `config_readers_255.go:110-113 / :162`
+   与 `config_reload.go:189-194` 都是**别人此刻正在写的字节**：255 那条腿在提交前
+   完全可能改这些行、改措辞（包括我指认的那处 `wisp run` 主语错）、甚至换掉这两枚尺的形状。
+   ⇒ **引用前必重跑**；我这段的价值是"提醒落地腿去看这张表存在"，不是"这张表长这样"。
+2. **§3.6 预测的两枚"必红"可能落空**——因为那两枚尺（`TestTicket255RosterEvidenceLines...`／
+   `...StillMatchesTheActualReadSites`）**今天只存在于注释里**
+   （尺＝`grep -rn "TestTicket255" cmd tools --include=*.go`，命中三处**全是注释**）。
+   它们最终断言什么、是否真去 re-read 源文件、是否把行号也算进去，我看不到；
+   若 255 的测试腿只钉"名册覆盖 registry"而不钉证据行，我那两枚红就只剩"注释里的意图"。
+3. **§2.4 矩阵 #2 的"谁先排队"是读码推断，不是量出来的。**
+   我核到的只有：泵是 `GetMessageW(hwnd=0, 0, 0)`（`internal/ball/sta_windows.go:97`）、
+   投递是 `PostMessageW(hwnd, wmAppTask, id, 0)`（`:248`）、任务是按 id 从 map 取（`:252`）。
+   "同线程 post 之间按投递先后执行"是我对这个形状的**常规 Win32 理解**，
+   本腿没查 MSDN、没跑任何交错实验；`uiRun` 的串行结论不依赖这条，但"两种结局"那条依赖。
+4. **§1.5（§2.7 末）的"tag 陷阱"里我推荐了 winlive 层，这属越界半步。**
+   任务书要我答"能不能在今天可达的路径上装"，我给的是"装在哪层不会假红"——
+   但**选哪层是编排者的裁定面**。可核的事实只有两条：
+   CI 那枚 cmd/wisp 步骤不跑 winlive tag（尺＝`grep -n "tags\|winlive" scripts/wisp-cli-tests.sh
+   .github/workflows/ci.yml`，**零命中**），以及同 tag 的既有球测试**故意容忍无桌面**
+   （`cmd/wisp/resident_approval_246_windows_test.go:309-310`）。
+   "CI 的 windows runner 到底有没有可交互桌面"我量不到（§5 第 5 格）。
+5. **§2.3 ★ 那条我写成"恒为裸 Esc"——它成立只因为注册入口全仓唯一。**
+   我这一步核的是 `grep -rn "pRegisterHotKey" internal cmd tools --include=*.go`：
+   产码命中**只有** `internal/ball/hotkey_windows.go:391` 一枚（另两枚在测试里直接调）。
+   若将来任何新宿主绕过 `registerAllWith/takeEscWith` 自己注册，这条就失效——
+   它是一条**依赖"唯一入口"的现在时结论**，不是一条定律。
+6. **§1.3 的"variadic hook 今天只能塞进 `panelHostHooks`"是对现有代码的描述，不是唯一合法形状。**
+   落地腿完全可以定义第二枚 hook 类型（那要动 `startResidentBall` 的形参或加一枚 option 结构），
+   我只说明"照抄既有 hook 通道会撞上'它是面板专用结构'这一点"。⛔ 我没有、也不该替他选。
+7. **§3.1 的"真·双击常驻进程没有 mgr、没有 tick"依赖一个我对启动方式的假设。**
+   代码能证的只有：`interactiveStdin()` 返回 nil 且无注入文本 ⇒
+   `startResidentTaskSource` 走 `:224-231` 早退。
+   "操作者今天到底怎么起这个进程"是**现场事实**（他可能在 cmd 里跑 `wisp`），
+   名册 #1 与 #2 谁在场我不知道；两形的差异只在"回执有没有人看得见"，
+   不影响"键没人换"这个总结论。
+8. **`ApplyHotkeyDefaults` 与 `default:"Esc"` tag 谁先补缝，我没量。**
+   `internal/config/schema.go:182` 只给 `cancel` 带 tag；loader 是否把 tag 落到
+   `Config()` 的缺省里我**没读 loader.go**（`grep '"default"' internal/config/loader.go` 零命中，
+   但这既可能是 tag 在别处解，也可能在我没看的文件里）⇒
+   §1.3 我只说"要过 ApplyHotkeyDefaults 这条链"，⛔ 没说"缺 [hotkey] 一节时三枚是空串"，
+   那句是 258-a1 §2 ① 的读数，我没独立复核（列进 §5 第 4 格）。
+9. **行号漂移风险集中在 `cmd/wisp`。** 本腿起手 HEAD `8a3790f0`，写件期间 HEAD 已推进
+   （我的三枚 commit 之后又落了别人的件，含 `21f85d95 / c02f59d0 / a21611ce`）；
+   `internal/config/manager.go` 的票面 `:278`→今天 `:281` 就是**已经发生**的漂移例子。
+   票面现量 1 那句"引用前先重跑"对我自己同样成立。
+10. **§2.6 判"复认其三"时我按今天的 HEAD 重数了钉，但 245-c1 §4.3 那条
+    "helper 读的是报告不是 Win32 名册"我只复核了 `requireIdleCancelSlot246`（`:352/:357`）**，
+    没逐一核 246 三枚例子里**每一处** `Live()` 断言是否存在替代品；
+    我"最强形钉仍成立"的依据是"第二进程桌面读数在钉里"（`:145-147/:177-179`），
+    这一点逐行看过，结论稳。
 
-## §5 量不到的地方（具名）
+## §5 量不到的地方（具名弃权；⛔ 不用"应该没问题"填空）
 
-（取数中）
+本腿零 Go 命令（同机三枚写腿在飞，跑任何包级测量都会与对方互洗读数并撞编译）。
+下面每一格都是**"必须跑／必须到场才拿得到"的读数**，本腿**弃权**，并写明谁能拿到：
+
+1. **今天这套热键钉是不是绿的**：`go test -tags winlive ./internal/ball`
+   （`TestLiveHotkeyRebindEndToEnd` / `TestLiveHotkeyOccupiedVsNotAttempted` /
+   `TestLiveConfirmingCancelAndEscReturned`）与 `go test -tags winlive ./cmd/wisp -run TestLive246`
+   的当日 PASS/FAIL 计数——⛔ 未跑。§2.6 的"复认"只到"钉存在且形状未变"，⛔ 不到"钉今天绿"。
+2. **我提议的 N1/N2/N3 三枚断言会不会真红**：要有人把 §2.7 那五枚零件装起来跑一发；
+   尤其"N2 窗口仍开着"要排在 3s（`internal/agent/approval/queue.go:116`）到点之前，
+   排不排得进去只有真跑知道（245-c1 §4.4 同格弃权，同因）。
+3. **这台桌面今天有没有别人占着裸 Esc**：`-steal`／`-watch` 两形的现场数值
+   （尺件打印的读数行在 `cmd/wisp/testdata/esclistener/main.go:187` 与 `:293` 的
+   `keydown_esc= / wm_hotkey=` 两行）——⛔ 未跑；
+   这直接决定 §2.7 那枚钉在这台机器上是绿、是"响亮红"还是必须换机跑。
+4. **`[hotkey]` 整节缺失时 `mgr.Config().Hotkey` 是三枚空串还是三枚缺省值**：
+   需要跑一次 loader/manager（或读 `internal/config` 的 tag 处理实现）——⛔ 两者本腿都没做
+   （tag 的 grep 零命中不等于没实现，见 §4 第 8 条）。
+5. **CI 的 `windows-latest` runner 上球窗能不能真建起来**（决定"非 winlive 层能不能装这枚钉"）：
+   ⛔ 我没有 runner，也没读任何 CI 运行读数；我只量到"该 step 的命令里不出现 winlive"。
+6. **`go build`／`go vet` 对我在 §1 描述的每一处改动是否接受**（例如给 `startResidentBall`
+   加形参会不会撞上别处未列的调用者）：⛔ 未编译。我的调用者名册来自 `grep`（§1.3 那 5 处），
+   `grep` 看不见构建约束（同名不同包、build tag 组合、`_test` 之外的第二个 main）。
+7. **d22scan 的真实射程**：桥的 spawn、新加的 boot 文案会不会被七禁／emoji 扫判红——
+   ⛔ 本腿未跑 `sh scripts/d22scan.sh`，也**没读 `tools/d22scan/main.go` 的检查集原文**
+   （只按 AGENTS.md §1.2 的摘要判断"经 `observe.Registry.Spawn` 起的不属裸 `go func`"）⇒
+   这一格属"仪器射程"，要落地腿自己跑一次并附读数。
+8. **常驻腿形 A 落地后的实际 rebind 频率与 1s tick 的交错成本**：要真机长跑或 SLO 采样——⛔ 弃权
+   （245-c1 §4.4 末格同弃权；本腿也没有新增可量的东西）。
+9. **票 255 那两枚尺最终落不落地、断什么**：⛔ 现在仓里没有这两枚测试函数
+   （§4 第 2 条的 grep 读数），所以"它们会红"这件事今天**不可量**，只能等 255 交件后重跑。
 
 ## §6 交件判语
 
-（取数中）
+- **只读**：本腿全程只 Read／grep／find／git log-status，产码文件**零改动**；
+  写面只有 `.scratch/wisp/probes/258/a2/**`（census 本体＋commit msg 临时件，
+  按 `issues/README` 规则 8 只建不删）。票面文件与 AC 勾选框**一枚未碰**；
+  冻结件（`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／
+  `tools/d22scan/allowlist.txt`／三枚具名测试件／`.github/workflows/ci.yml`）**零字节改动**，
+  其中对 `ci.yml` 只做了一次"这枚尺跑不跑 winlive"的**射程判断，非内容引用**。
+  `frontend/**`／`design/**` **未进入、未转述**。
+- **零 Go 命令**：未跑 `go test`／`go build`／`go vet`／`go run`／`gofumpt`／`d22scan`／`staticcheck`；
+  凡"必须跑才有"的读数逐枚具名记在 §5（九格），⛔ 无一处以"应该没问题"代。
+- **未 push**：commit 全部只在本地 `dev`
+  （骨架 `3736f0dd`／§1 `06d89e25`／§2 `5c3c22d8`／§3 `761b5d45`／§4-§6 随本条同一形状落盘），
+  `git add` 与 `git commit` 同发一条命令、commit 带显式 pathspec；
+  `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／worktree 全部未用。
+- **对 `245-c1` 那句的判语（详 §2.6）**：复认其三（借还那对有最强形钉、rebind×borrow 零钉、
+  产线今天不可达），外延其二（`[hotkey] cancel` 在产线根本不成键；丢借用之后卡片会**到点执行**），
+  修正其一（**这枚钉不需要等形 A 才装得上**——桥是导出 API，五枚零件全在 `cmd/wisp` 写面内）。
+- **本腿新报、票面未列的两件事**：
+  ① 形 A 落地会打红票 255 那张 hot 读者名册的两处（`cmd/wisp/config_readers_255.go:110-113 / :162`）
+  ⇒ 落地腿的最小改动面要加这两枚；
+  ② 该名册此刻自身有一句主语错（把"吃写死默认键"归给 `wisp run`，实际是常驻腿），
+  且它所在的文件**还没被 tracked**——趁早报，比事后当常量引用便宜。
