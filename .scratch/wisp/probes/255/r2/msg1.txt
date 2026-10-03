@@ -1,0 +1,8 @@
+票 255 r2 · 证据件起手：§0 起手锚 + 七节骨架
+
+锚点 HEAD 8a3790f0，起手时刻 2026-10-03 09:10 +08。
+本件只落 §0（date / git log -1 / porcelain 行数 / 写面 cmd internal 为空）
+与票面 AC#1、AC#3 残余补尺两格的判据原文逐字抄录，
+§1—§7 先立标题占位「（取数中）」，读数随后逐节补。
+
+本腿写面＝cmd/wisp + internal/config；AC 勾选框一枚未碰；只 commit 不 push。
