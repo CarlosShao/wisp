@@ -186,16 +186,55 @@
 
 ## §4 我可能写错的条目（自我对抗，不许留空）
 
-（取数中）
+- **E1｜五包行号本腿只读一发、落地前必漂。** `cmd/wisp`/`internal/agent/approval`/`internal/tools`/`internal/risk`/`internal/config` 此刻有写腿在飞；我引的 `run.go:902/904/910`、`resident_ball_windows.go:158/211/257/300-311`、`resident_windows.go:106/225/231`、`approval_always.go:70/171`、`main.go:8/25`、`replies.go:252/316/372`、`gate.go:730/740` **全是 09:17 单发读数**（票面自己 `:8` 也写"别信这里的行号"）。⚠ 我只做了"现读一次"，没做 a2 §⑥ E11 那种**两把独立尺同向**的复核；off-by-one 或整段重构都可能。⇒ 所有 `cmd/wisp`/`internal/agent/approval` 引用请以落地时现读为准。
+- **E2｜AC#9 第二声的位置我和票面对不上，具名留给落地腿裁。** 票面 `:84` 写"两处各说一次＝`resident_ball_windows.go:96` 与 `internal/proc` 的 boot 报告"。本腿现读：第一声＝`resident_ball_windows.go:189`（失败支 `fmt.Printf(rb.verdict)`）、第二声＝**`cmd/wisp/resident_windows.go:227/:229`（boot 报告经 `rb.statusLine()`）**，而 `grep "floating ball" internal/proc/*.go`（非测试）**只命中 `boot_windows.go:139` 那枚 second-launch**、没有一枚 ball-absent 出声。⇒ 要么票面"internal/proc 的 boot 报告"是**把常驻腿 boot 报告 loosely 归给了 internal/proc**、要么**另有一枚 internal/proc 侧出声我没找到**（我 grep 词面只试了 floating ball/NO ball 几种）。这一格我**不能肯定**，落地腿须现读确认"两处出声到底在哪两枚文件"。
+- **E3｜§2/§3 里若干"复认"是**转引 a1/a2/a3、非本腿独立现读**，具名切开**：本腿**自己现读**并复认的＝`internal/ball`（tray_windows/ball_windows/`mfGrayed` 零/`SetTrayChecks|Tip` 零调用者）＋`internal/proc`（`shutdown.go` 成功步零日志、`boot_windows.go:127/:128`、`watchdog/doc.go:18`）＋`replies.go`（`AwaitingHuman`/`Allow` 体）＋`gate.go:730/:740`＋`run.go close()`。本腿**没重开、只转引**的＝`internal/observe/goroutine.go` 全部行号（`:44/:64/:409-411/:419/:422`、`ResidentNames` 六枚——§2 C-1 那段是转引 a1/a2）；`secret_argv_windows_test.go:174` 的 `buildWispForTest` 零 `-ldflags`（转引 a2 R16）；`resident_approval_246_windows_test.go:145-158`／`resident_ball_228_test.go:319-322`（转引 a2/a3）；`SPEC-08 §7:229`、`PLAN.md C18:1368`/`D43:3077`、`approval.go:48-50` 闭集（转引 a1/a3）；`tools/d22scan` 三枚 ban 行号（转引票面 `:48`）。⇒ 这些"复认"的强度＝前腿强度，不是本腿的。
+- **E4｜三枚测试文件我只 `ls` 没读内容（合规：其中两枚是冻结件）。** `internal/panel/l2_grant_boundary_test.go`（109,415 字节）与 `tokens_fourway_test.go` 我**没打开**（冻结件，读内部判射程可、但不必为这格读），`resident_ball_228_test.go:319-322` 那枚名册钉也**没现读**。⇒ §1 格 4/格 11 里"名册钉会不会响""边界测试今天是否绿"是**从前腿断言语义推的形状**，不是本腿读到的；一律归 §5 量不到。
+- **E5｜AC#2 那句前端问句是我从 Go 侧推出的，不保证页面侧今天有没有、要不要那枚按钮。** 我**没读 `frontend/**`**（两层禁令），"面板卡片是否渲染允许/拒绝"纯是从 `gate.go:740` 拒绝边界＋C17 PanelBridge 的存在**反推**的一问。⇒ 那是**问句、不是结论**；owner 自行带给他那枚前端 agent，本腿不代转、不断前端有没有这形。
+- **E6｜AC#3 我可能把'加一行 SetState'说轻了。** `bookWaitingState` 挂 `agentRuntime`（CLI 腿），球在常驻腿；**常驻腿那侧是否已有同一套 `liveCards`/`waitingState()` 卡片来源、能否直接喂 resident ball，我没逐枚读通**。⇒ 本格真实前置可能是"任务管线＋卡片源接进常驻腿"那半（票 246 地界），比"加一行"重；落地腿须现读 resident 侧卡片来源再定面。⛔ 本腿**不把'做不到'写成本腿结论**（我没读完那半作用面就没资格说做不到）。
+- **E7｜我把线 66 判成"待人裁定/记账"而非"欠产码"。** 依据＝`main.go:24-29` usage 已是带条件事实句（本腿现读）＋票面 `:72` 把余下 25 枚注释明划给票 243。⇒ 若编排者其实想让线 66 继续挂着追踪票 243 那批，我这个"无产码可欠、可勾"的判语就偏乐观；但它**确实不是本票的产码活**。
+- **E8｜"第五枚 id 不存在"我只看了 `tray_windows.go:20-24`。** 没核 `internal/ball` 之外是否有别处定义同值菜单 id（同 a3 E17）。风险低、未穷举。
+- **E9｜AC#11 我写"加一支 case 不需新协程"是从 50ms 拍读出来的形状、非实测。** `boot_windows.go:133/:145` 每拍轮询 ⇒ 加 `select` 一支理论无需新协程；但**若停机位实现成需要单独监听线程/命名事件**，就会撞 D38b 名册六枚（转引 a2/a3）与 ban #1。这一格是形状判断，落地按票面 `:95` 的停手上报办。
 
 ---
 
 ## §5 量不到的地方（具名，⛔ 不推测填空）
 
-（取数中）
+> 本腿**一枚 Go 命令都没跑**（`go build`/`vet`/`test`/`scripts/build.ps1`/`go mod tidy` 全零发，第一硬规＋三枚写腿在飞），也**不在真机/带桌面会话**。下面每一条＝量不到、并点名**该由谁量**。
+
+- **N1｜AC#6 整包终态＝纯跑测试，本腿结构量不到。** `PATH="…sherpa-onnx:…build:…" go test ./cmd/wisp ./internal/... -count=1` 到终态＋逐名比红名册（历史在册 `internal/ball` 1＋`internal/panel` 4＝别人地界；`internal/risk TestResolvePerCallBudget` 争用型假红按 `-count=3` 为准）——**必须由能跑测试的腿做**（⛔ 本腿跑会撞 `internal/tools`/`internal/risk` 在飞那枚）。
+- **N2｜"仪器今天绿不绿"三枚，本腿量不到，须跑测试腿：**
+  - AC#4：`rt.close()` 真 join 两枚句柄后、"不 join 就红"那枚正控**存不存在/会不会红**——a1 §8 有限尺说 `cmd/wisp` 测试层零枚仪器断 join，本腿没跑、不能证今天有没有。
+  - AC#5：`l2_grant_boundary_test.go`/`gate.go:730` 那枚"面板来源允许必判红"的正控**今天是否绿**——本腿只 `ls` 见其在位，未读内容未跑。
+  - AC#2：新增第五枚 `Events` 键会让 `resident_ball_228_test.go:319-322` 名册钉**真红**这一维——前腿读了断言取数方式推出，本腿没跑、不能坐实"真会响"。
+- **N3｜真窗口／真托盘点击／真热键／真进程退出码——只有 owner 本机眼睛签收或 `winlive` 腿量：**
+  - AC#2："真点一次托盘『允许一次』⇒ 那张卡真被允许"——`winlive` **测不了托盘菜单**（`TrackPopupMenu` 同步返回、不走 `WM_COMMAND`），⇒ **只能 owner 眼睛签收**（票面 `:105` 明写"球的十枚手势一次没真按过、不替 AC#2 背书"）。
+  - AC#3：球肉眼进"等人/确认"那一态——真窗口，owner 看。
+  - AC#9：失败支**自然走到**（`ball.New` 返回 err）——本腿读到 `:165` 写死、无注入缝 ⇒ 只能**突变**现形；且 `winlive` 在 `ci.yml` 零命中（票面 `:84`）⇒ **CI 里零读数**，要量得先造注入面或台件。
+  - AC#11 ⓑ-2：那一次触发导致进程**以退出码 0 结束＋审计仍有 install 记录**——`winlive`/真机腿（照 `resident_ball_live_228_windows_test.go:89` 形）；⛔ **"审计 1..10 全序"谁都读不到**（`shutdown.go:150/:180/:186` 成功步零日志，本腿现读复认 a2 D-3），要读得先动 D38(e) 日志面（本票禁区）。
+  - AC#11 ⓐ：球起来后、环路进入前那一发"退出"不被吞——要真进程＋时刻锚（`observe.CountLogFiles`），`winlive`/真机腿；控制台那一支现有台件只打它、**托盘那一支落地后现有台件不会自动变红/变绿**（票面 `:93`③）。
+- **N4｜句柄／RSS／D32 25MB/40MB 那扇门：本腿量不到。** 票面 `:33` 写"资源与 SLO 代价没量过"、`cmd/balldebug/main.go handleCount()` 是现成量具但在 debug 件里；常驻装配后带球口径**没实测**（a1 §4/§7.3 转引，且 a1 自记 SLO.md 有"窗口后 vs 全栈稳态"口径冲突未合）。⇒ 要量＝跑 `wisp slo` 或量具腿，本票 AC#6 也不含它。
+- **N5｜GitHub runner 能不能建窗口：本腿量不到、前腿也判不动。** `winlive`/真窗在 CI 有没有桌面会话——票面 `:105` v1 列"判不动"；属构建/调度问题，本腿没读构建脚本、跑不了。
+- **N6｜"接线枚数"本腿只给读到的静态计数，编译/测试绿灯不等于接线。** 三处"写了没接线"（`Replies.Allow/Reject/always` 无托盘调用者＝0、`SetTrayChecks/Tip` 生产调用者＝0、`AwaitingHuman()` 3 枚调用者无一进 `internal/ball`）＝**本腿 grep 读到的枚数**；⛔ `go build`/`vet` `rc=0` 证不了接线（Go 不为未用方法报错），本腿一枚都没跑，所以只报枚数、不报"绿"。
+- **N7｜五包行号会再漂（见 E1）。** 本腿引的 `cmd/wisp`/`internal/agent/approval` 行号是 09:17 单发；落地腿**必须以现读为准**，别拿本件的号当权威。
 
 ---
 
 ## §6 交件判语
 
-（取数中）
+**射程（答到哪）**
+- §1：票面 11 枚未勾格（`39 40 41 42 43 66 82 84 86 89 91`）逐枚给了「缺什么（读数／产码／装配连线／待人裁定／属前端那半）＋现盘证据 `file:line`＋最少动哪几行」，并把三类（写了没接线／只有真机量得到／属前端那半）逐格分开。起手 `grep -n "^- \["` 复尺＝**顶层 16 框、5 勾 11 未勾**，与编排者 09-30 17:0x 那句对上。
+- §2：**复认** a1（走甲方向、C-1/C-2/C-3 三判不了、分母 1→2）＋ a2（全仓零 stop 位、`shutdown.go` 成功步零日志那枚结构性障碍、`WM_COMMAND` 那一支被证伪）＋ a3（`SetTrayChecks/Tip` 零调用者、无 `mfGrayed`、`AwaitingHuman` 空 corr、无卡 `ErrNoTrackedCard`）；具名**两处过期**＝票面 `:116` 那句"notification area"引用（盘上零命中，a2 §⑥ E4 已自纠）与 a1 乙支代价表（被 `228-r1`/票 246 变旧）；记两处签名漂移＝`startResidentBall` 多 `hooks` 变参（喂 panel 非 approval，分层结论不改）、AC#9 第二声本腿定位在 `resident_windows.go:227/:229` 与票面"internal/proc"对不上。
+- §3：AC#11（停机＝乙-1 位、接进两枚 select 含空窗那枚、`recordTrayExit` 改记请求即返回、两枚钉 + 一枚停手上报点）与 AC#2（允许一次＝F4/F6/F7/F8 已裁、第五枚 id＋分流＋执行者连线＋落空只能在 `cmd/wisp` 出声＋一枚可抄给页面侧的问句）的最少改动面，全部落在本腿打开过的作用面上。
+
+**纪律自证**
+- ⛔ **一枚 Go 命令都没跑**：`go build`/`go vet`/`go test`/`scripts/build.ps1`/`go mod tidy` **全零发**（第一硬规；三枚写腿在飞 `cmd/wisp`＋`internal/config`、`internal/agent/approval`、`internal/tools`＋`internal/risk`）。所有"仪器绿不绿/接线真不真/退出码 0/资源数"一律进 §5 N1–N7 具名为量不到，**未推测填空**。
+- **只读、零产码**：本腿只新增并提交本件 `.scratch/wisp/probes/228/a4/**`（`census.md`＋`msg-*.txt`）；**未改任何 `*.go`、未碰票面任何 AC 框**（票面 11 枚未勾框一枚未动）。
+- **冻结件一字未动**：`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／三枚冻结件（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`ticket90_persist_test.go`）／`.github/workflows/ci.yml`——本腿对后两枚测试件**只 `ls` 见其在位、未读内容**（射程判断，非内容引用）。
+- ⛔ **`frontend/**`／`design/**` 两层禁令遵守**：未读、未转述、本件零引用；AC#2 的前端那一问是从 Go 侧 `gate.go:740` 拒绝边界**反推的问句**，不含任何前端内容，也不代 owner 转给任何会话。
+- **凭据零外泄**：全程只写变量名/字段名/错误名/符号名（`replyHandle`/`reloadHandle`/`ballHostHook`/`ErrPanelAllow`/`ErrNoTrackedCard` 一类），**无 API key、无 DPAPI blob 内容、无 env 值**进入本件。
+- **引用报到包/目录级**：`internal/ball`（`tray_windows.go`/`ball_windows.go`/`win32_windows.go`）、`internal/proc`（`boot_windows.go`/`shutdown.go`/`doc.go`）、`internal/agent/approval`（`replies.go`/`gate.go`）、`cmd/wisp`（`run.go`/`main.go`/`resident_windows.go`/`resident_ball_windows.go`/`approval_always.go`）；短引均写全路径，未把同名 `models.go` 那类歧义文件当已读。
+- **Git**：只 commit、未 push；每发带**显式 pathspec**、`add` 与 `commit` 串在同一条命令；未用 `add -A`/`.`、`commit -a`、`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；仓内文件**只建不删**（`msg-*.txt` 与 `census.md` 全留）。首发遇一次 `.git/index.lock` 竞争（他腿正在提交），**未强删锁**、直接重试同条命令即成（`c7b5539b`）。
+- **占位符清零**：§0–§6 无一处「（取数中）」残留。
+
+**本腿不做的**：不推荐修法（形状已由编排者 `A493`/`A498` 裁死）、不代转前端、不联系任何其它会话、不碰任何 AC 框、不在写腿在飞时抢跑测试/构建。11 枚里 **AC#6 整格、AC#2/AC#5/AC#11 的"仪器绿不绿"、AC#3 的"能不能一行接上"、AC#9 的"失败支自然走到"、AC#11 的"1..10 全序"都点名交回编排者/真机腿/跑测试腿去量**（§5），本腿只把静态盘上证据与三类分开说清楚。

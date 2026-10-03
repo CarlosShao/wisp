@@ -1,0 +1,14 @@
+228-a4: sections 4/5/6 - self-adversary, unmeasurable, delivery verdict
+
+Section 4 names where this leg may be wrong: single-pass line reads across
+in-flight packages may drift; AC#9 second-voice location (resident_windows.go
+via statusLine) does not match the ticket's "internal/proc" wording; several
+"reconfirms" in section 2/3 are transcribed from a1/a2/a3, not independently
+re-read; the three test files were only ls'd not read; the AC#3 "one line"
+estimate may be heavier than stated; frontend question is an inference.
+Section 5 lists everything unmeasurable by a read-only zero-go-command leg
+(whole-package terminal state, instrument green/red, real window/tray/hotkey/
+exit code, handles/RSS, runner desktop) and names who must measure each.
+Section 6 is the delivery verdict: read-only, zero Go commands, not pushed,
+AC boxes untouched, frozen files untouched, credentials not leaked.
+Placeholders cleared.
