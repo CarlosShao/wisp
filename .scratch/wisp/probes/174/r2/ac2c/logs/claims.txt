@@ -1,0 +1,84 @@
+### date: 2026-10-03T13:56:57+08:00  HEAD: 7cb9d570
+
+$ grep -n "输出已落文件" internal/tools/task.go internal/agent/spill.go
+internal/tools/task.go:562:			"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token%s，全文见 %s…]\n%s",
+internal/agent/spill.go:141:		"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token，全文见 %s…]\n%s",
+
+$ grep -n "全文见" internal/tools/task.go internal/agent/spill.go
+internal/tools/task.go:562:			"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token%s，全文见 %s…]\n%s",
+internal/agent/spill.go:141:		"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token，全文见 %s…]\n%s",
+
+$ sed -n "18p;48p;51p" internal/agent/spill.go
+// D15(3) long-output spill (SPEC-05 §4.2): a single tool result over the
+	// head/tail stub.
+	Spilled bool
+
+$ grep -n "stub" internal/agent/spill.go
+48:	// head/tail stub.
+50:	// Spilled is true when the full text went to a file and Text is a stub.
+61:	// KeptHead / KeptTail report the stub sizes in tokens.
+89:	// marker baked into the text right off the stub.
+114:	// The capped bytes, not the raw ones: TotalBytes below is what the stub
+
+$ sed -n "548p;558p" internal/tools/task.go
+		notice := t.d.pointerNotice(rec.ArtifactPath)
+		if box := hostPathBoxFromCtx(ctx); box != nil {
+
+$ grep -rn "全文见" --include=*.go internal | grep -v _test.go   (production only)
+internal/agent/spill.go:141:		"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token，全文见 %s…]\n%s",
+internal/tools/task.go:562:			"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token%s，全文见 %s…]\n%s",
+
+$ grep -rn "输出已落文件" --include=*_test.go internal/  (all test hits)
+internal/agent/spill_test.go:139:	for _, needle := range []string{"输出已落文件", fmt.Sprintf("%d 字节", s.TotalBytes), s.Path} {
+internal/agent/spill_test.go:226:	if !strings.Contains(log.Text, "输出已落文件") || !strings.Contains(log.Text, artifact) {
+internal/agent/spill_test.go:229:	if !historyHasResultContaining(hTiny.loop.History(), "输出已落文件") {
+internal/risk/pointer_183_test.go:53:	ptr183Body = "报告头部 " + ptr183Secret + " 中段 […输出已落文件：省略 17200 字符，" +
+internal/risk/pointer_183_test.go:60:	ptr183BodyNoTwin = "报告头部 " + ptr183Secret + " 中段 […输出已落文件：省略 17200 字符，" +
+internal/risk/pointer_183_test.go:347:	" 中段 […输出已落文件：省略 17200 字符，总长 20000 字节，全文都在 " +
+internal/risk/pointer_185_test.go:79:const ptr185Stub = "报告头部 " + ptr185Secret + " 中段 […输出已落文件：省略 17200 字符，" +
+internal/risk/shape_a_exemption_test.go:36:	shapeAStub = "报告头部 " + shapeASecret + " 中段 […输出已落文件：省略 4321 字符，" +
+internal/risk/shape_a_exemption_test.go:48:	shapeACorrupt = "报告头部 " + shapeASecret + " 中段 […输出已落文件：省略 4321 字符，" +
+internal/tools/task_output_pointer_notice_test.go:360:		"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token，全文见 %s…]\n%s",
+
+$ grep -rn "输出已落文件" internal/agent/  (agent-side, any)
+internal/agent/spill.go:141:		"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token，全文见 %s…]\n%s",
+internal/agent/spill_test.go:139:	for _, needle := range []string{"输出已落文件", fmt.Sprintf("%d 字节", s.TotalBytes), s.Path} {
+internal/agent/spill_test.go:226:	if !strings.Contains(log.Text, "输出已落文件") || !strings.Contains(log.Text, artifact) {
+internal/agent/spill_test.go:229:	if !historyHasResultContaining(hTiny.loop.History(), "输出已落文件") {
+
+$ sed -n "299p;349p" internal/tools/task.go
+// Descendants returns every row this task derived, directly or through a chain,
+// MarkRoot files the root identity for a task the host is running itself.
+
+$ grep -n "Q-61\|Q-63" docs/reports/pending-and-issues.md | cut -c1-8
+1100:| *
+1101:| *
+8031:- *
+8033:## 
+8040:- *
+8042:## 
+8047:- *
+8048:- *
+8057:- *
+8064:- *
+8066:- *
+8068:## 
+8070:- *
+8072:- *
+8081:- *
+8098:- *
+8108:- *
+8110:## 
+8112:- �
+8113:- *
+8115:- *
+8116:- *
+8125:- *
+8126:- *
+8224:  �
+8238:- *
+8364:- *
+8633:- *
+
+$ ls internal/risk/shape_a_exemption_test.go
+internal/risk/shape_a_exemption_test.go
