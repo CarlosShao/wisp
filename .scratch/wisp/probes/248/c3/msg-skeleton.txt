@@ -1,0 +1,5 @@
+248-c3 census skeleton + §0 anchor
+
+Read-only triage leg for ticket 248 remaining cells. Skeleton with
+section headers plus §0 start anchor (date/HEAD/porcelain captured in
+one command during active write-leg churn). No Go commands run.
