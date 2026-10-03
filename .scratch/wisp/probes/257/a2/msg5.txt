@@ -1,0 +1,18 @@
+probe(257-a2): 补 §1.6 明文迁移路＋落 §4/§5/§6，交件
+
+§1.6（普查中自己撞出来的一条通道，票面与 257-a1 都没列）：internal/secret/migrate.go 那台
+"明文 api_key → dpapi: 引用"的机器**今天零生产调用者**（grep MigratePlaintext 非定义命中只有两枚
+测试与两句注释）；另一处会留明文的是 migrate.go:82-95 的迁移前备份（注释自陈"那是这里唯一还带着
+plaintext api_key 的文件"，故经 winsec.PrivateFile 收窄）。⇒ firstrun.go:114 那句"这份文件里没有
+写明文 key 的字段"对 schema 成立，但对 .bak-1、对"明文写进去会得到 unknown key 而不是叫你改用
+wisp secret set"、对"带明文的 v1 文件今天迁不动（migrate.go:127 取 llm.providers、明文不在被搬名单、
+:70 dry-check 拒、:71-73 留原样）"三处不完整——回执别承诺"帮你搬走"。
+
+§4 自我对抗九条（含本腿就地打过的一处自我纠正：§3.2 原本把"常驻必有两枚 Manager"写死了，
+真形状是三道闸——resident_task_source_windows.go:224-231 的 interactiveStdin 控制台闸没过就没有
+第二枚、也就全进程无 tick）；§5 量不到八格具名（AC#1 那发真跑、七枚实值句、同秒可读性、
+用户落哪一格、v1 明文迁移实测、页面侧属禁地、便携档实跑、仪器）；§6 交件判语：
+只读、零 go 命令、未 push、AC 框未碰、冻结件未碰、frontend/design 未读未引、凭据零值外泄。
+
+★ 对 257-a1 那句 [llm.providers.<名>] 拼法：**复认成立**（parse.go:72 的 DisallowUnknownFields、
+:145-148 的 unknown key 句形、后果链到 panel_inbound.go:230-232 / run.go:417）。
