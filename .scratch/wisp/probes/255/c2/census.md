@@ -148,7 +148,41 @@
 ### 3.5 ⛔ 本腿**不**停手上报"非开那条边不可"
 
 量到的事实是反的：那条边**根本不需要开**。本腿唯一想标为"未定义即停"的是 §1.3 那格——`[panel] height` 的配置缺省是 **0 且 schema 注释说 0＝auto from content**（`internal/config/schema.go:533-534`），与票面"写死的 260 变成配置缺省时的值"在字面上互相拉扯（0 到底翻成 260 还是翻成让内容定高？票面与裁定都没写）。这枚**留给编排者具名裁**，本腿不按自己的判断填。
-- §4 可照抄的注入先例
+## §4 仓里现成的同类定式（AC#4 能不能照抄、不新造机制）
+
+**能照抄，而且至少有三枚现成形**。按"与 AC#4 的相似度"排：
+
+### 定式 ①（最像）：消费侧⛔ 不 import 配置，装配根递一枚**取值闭包**进去 —— 热键桥
+
+- 规矩原文：`internal/ball/hotkey_reload.go:11-13` —— "The bridge is deliberately free of any config import - internal/ball owns no business/config knowledge (SPEC-01 §3) - so **the host supplies two closures and one optional refresh hook**"（`:16-21` 就是那段用法示例）。
+- 类型：`internal/ball/hotkey_reload.go:50` 逐字 `type HotkeySource func() HotkeyConfig`；构造器 `internal/ball/hotkey_reload.go:73` `func NewHotkeyReloader(binder HotkeyBinder, current HotkeyConfig, src HotkeySource) *HotkeyReloader`。
+- 装配根那一头的实配点：`cmd/balldebug/main.go:231` `mgr, errC := config.NewManager(*configPath, nil)` → `:237-242` `bridge := ball.NewHotkeyReloader(b, b.ConfiguredHotkeys(), func() ball.HotkeyConfig { h := mgr.Config().Hotkey; ... })` → `:243` `bridge.Refresh = func() error { _, err := mgr.CheckAndReload(); return err }` → `:244` `mgr.OnReload = bridge.OnReload()`。
+- **⇒ 这一枚的形状与 AC#4 的形 B 逐字同构**：`internal/ball` 不开 `→internal/config` 的边、自己绝不读盘；配置由宿主以闭包供给；消费包只看得到 `HotkeyConfig` 这种自己的类型。AC#4 只要把 `HotkeyConfig` 换成"面板几何"那一枚 package-main 里的小类型即可，⛔ 不需要新机制。
+- ⚠ 同一枚定式在**出货进程里其实没接上**：全仓产码里 `NewHotkeyReloader` 只有 `cmd/balldebug/main.go:237` 一处调用，常驻球腿用的是编译期缺省（`cmd/wisp/resident_ball_windows.go:171` 逐字 `Hotkeys:  ball.DefaultHotkeys(),`）。这格已被在飞腿写进判词（`cmd/wisp/config_readers_255.go:113` 的 `hotClaimDebugHostOnly` 行）。⇒ **别把 balldebug 当"已经接好了"的先例来省掉自己那一步**，它的价值只在形状。
+
+### 定式 ②（改动面最小）：装配根用**变参 hook**递能力，旧调用点一行不改
+
+- `cmd/wisp/resident_ball_windows.go:63-68`：`// ballHostHook is how the assembly root hands the ball host one capability it does not know how to build ... the resident ball file receives a function value and stays ignorant of what is behind it`；类型 `:68` `type ballHostHook func(*panelHostHooks)`；载体 `:70-74` `panelHostHooks{showPanel func(via string) bool}`。
+- **原文替本腿说话**：`cmd/wisp/resident_ball_windows.go:76-78` —— "It is a hook and not a parameter **so the three existing two-argument call sites of startResidentBall keep compiling untouched**."
+- 实配点：`cmd/wisp/resident_windows.go:163-165` `startResidentBall(rt.Registry, ra.vetoByEsc, withPanelHost(func(via string) bool { return panel.RequestToggle(via) }))`；被注入方签名 `cmd/wisp/resident_ball_windows.go:158` `func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hooks ...ballHostHook)`，收 hook 的循环 `:160-163`。
+- **⇒ AC#4 若给 `NewPanelManager` 加第 4 枚位置参数，要连带改 7 处测试构造点（§3.3 列了）；照这一枚定式走变参 hook，那 7 处一行不动。** 这正是"不新造机制"最省的那条路。
+
+### 定式 ③（同一条裁定）：审批门"根上造、往下递"，且明写**一条新依赖边都不开**
+
+- `cmd/wisp/resident_windows.go:110-115`：the approval gate is **BUILT HERE, by the assembly root**, and handed down as a function value and a binding. The resident file does not compose a gate of its own ... 同段还引了裁定原文（`:114` "两枚正向依赖边一律不开、改注入"）。
+- `cmd/wisp/resident_windows.go:117-122`："Zero new package-level dependency edges"，并把尺子写成 `go list -deps ./cmd/wisp` 改前改后对照（⛔ 本腿不跑，见 §7）。
+- 实配点：`:123` `ra := newResidentApproval()` → `:174` `ra.bindBallHost(rb)` → `:163` 把 `ra.vetoByEsc` 作为函数值递给球腿。
+- ⇒ **AC#4 的"落点＝装配根把配置递给面板宿主"不是新裁定**，`:125-128` 那段注释已经把面板宿主纳进同一个形："It is BUILT here, by the assembly root, and handed to the ball host as a function value - the same shape ticket 246's ruling (ledger A481) set"。
+
+### 定式 ④（配置**值**→组件的两枚老样本，供对照语义）
+
+- 快照形：`cmd/wisp/run.go:423` `cfg := mgr.Config()` → `:424` `rt.cfg = cfg`（`:420-422` 注释自称 "A snapshot copy ... stay frozen at what this boot read"），消费点 `cmd/wisp/run.go:763` `DefaultTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) * time.Millisecond`、`cmd/wisp/run.go:1014`、`:1016`。⇒ **这就是"值递到了、但热加载追不上"的那一族**，在飞腿给 `[agent]` 的判词正是它（`cmd/wisp/config_readers_255.go:99` `hotClaimSnapshotOnly`）。
+- 活读形：`cmd/wisp/panel_config_store.go:88` `cfg := s.mgr.Config()`（在 `ReadSettings` 里，每次调用现读），配置对象持有在 `cmd/wisp/panel_config_store.go:66-71` `type configStore struct{ mgr *config.Manager ... }`，构造 `:75` `newConfigStore(mgr, secrets, auditf, actor)`，socket 侧只有接口 `internal/panel/config_handlers.go:232` `type ConfigStore interface`（三枚方法 `:234/:238/:242`）。⇒ **这是"面板这一族今天唯一真在读配置的那条路"，也是"接口声明在 `internal/panel`、配置对象留在 `package main`"这一分工的原样先例**——AC#4 要的正是同一分工，只是把"读设置"换成"读几何"。
+
+### 定式 ⑤（顺手一枚：几何类选项的缺省/夹取模板）
+
+- `internal/ball/ball_windows.go:64` `SizePx int // configured orb size 44..72 (0 = default 56)`，`internal/ball/ball_windows.go:144-151` 给了"0→缺省、越界夹住"的三步处理。⇒ §1.3 那枚"`[panel] height` 缺省是 0 还是 260"的纠结，**仓里有现成的表达模板**（一枚具名缺省常量＋显式夹取），但**选哪个语义仍要编排者裁**（§3.5），本腿只指出模板存在。
+- 对照：常驻球腿根本没设这枚字段（`cmd/wisp/resident_ball_windows.go:165-185` 的 `ball.Options{}` 里无 `SizePx`）⇒ 面板之外的 `[ball]` 段犯的是同一枚病（在飞判词 `cmd/wisp/config_readers_255.go:117` 亦如此记）。
 - §5 不依赖真窗口的机读判据候选
 - §6 我可能写错的条目（自我对抗）
 - §7 量不到的地方（具名）
