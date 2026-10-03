@@ -164,11 +164,44 @@ func (rt *agentRuntime) reloadOnce() {
 // reportReload books the tier verdicts this reload produced. One line per
 // locked section, so "did my edit take effect" is a reading off the ledger and
 // never an inference; one user-visible line for the tiers an operator can act on.
+//
+// Ticket 255 AC#1 narrowed what the hot line is allowed to say. rep.Hot is booked
+// by internal/config/manager.go's plan() off "the values differed and the memory
+// got overwritten" - it never asks whether anything reads the section. Printing it
+// verbatim claimed 「已立即生效」 for [panel] (zero production readers, and
+// panel_host_windows.go hard-codes its own geometry), which is the sentence this
+// ticket was立 for. The hot list is now filtered by cmd/wisp/config_readers_255.go's
+// roster, resolved through config.TierOf rather than a copied word table: sections
+// whose hot rows all name a live reader keep this line, the rest get their own
+// honest sentence. Neither line is ever dropped, because taking the ruler down is
+// not fixing it.
 func (rt *agentRuntime) reportReload(rep *config.Report) {
 	rt.auditf("config: HOT-RELOAD state=applied hot=%v reload=%v restart=%v locked=%d",
 		rep.Hot, rep.Reload, rep.Restart, len(rep.Locked))
 	if len(rep.Hot) > 0 {
-		fmt.Fprintf(rt.stdout, "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：%v\n", rep.Hot)
+		split := splitHotTier(rep.Hot)
+		for _, name := range rep.Hot {
+			rt.auditf("config: HOT-RELOAD-READER section=%s %s", name, split.verdictFor(name))
+		}
+		if len(split.claimable) > 0 {
+			fmt.Fprintf(rt.stdout, "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：%v\n", split.claimable)
+		}
+		if len(split.quiet) > 0 {
+			fmt.Fprintf(rt.stdout,
+				"wisp run: 配置热加载：这些段的值已换进本进程内存，但本宿主没有会按新值做事的读者，"+
+					"本次运行不会因此改变行为（票 255 AC#1：这一半不许说成「已立即生效」；"+
+					"逐段的读者判定见 HOT-RELOAD-READER 行）：%v\n", split.quiet)
+		}
+		for _, name := range split.disagree {
+			// plan() hot-applied a name the tier registry cannot explain. The
+			// manager.go guard makes this unreachable for whole sections; it is
+			// loud anyway so a future per-key split cannot land as silence.
+			rt.auditf("config: HOT-RELOAD state=tier-disagreement section=%s %s",
+				name, split.verdictFor(name))
+			fmt.Fprintf(rt.stdout,
+				"wisp run: 配置热加载：[%s] 被热应用了，但 config.TierRegistry 里查不到它的 hot 行，"+
+					"回执没有资格判断它是否真有人读（票 255 AC#2-ⓑ：登记表与实现不符，请上报）。\n", name)
+		}
 	}
 	for _, d := range rep.Locked {
 		effect := "applied"

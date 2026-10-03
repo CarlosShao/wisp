@@ -271,9 +271,18 @@ func TestTicket223RunArmsTheReloadTick(t *testing.T) {
 		if got := r.rt.cfg.Ball.Size; got == plantedSize {
 			t.Fatalf("the boot snapshot moved too, so nothing here proves a mid-run change: %d", got)
 		}
-		if !strings.Contains(r.h.out.String(), "这些段已立即生效") {
-			t.Errorf("no user-visible line names the immediately-effective tier; stdout:\n%s",
-				r.h.out.String())
+		// Ticket 255 AC#1 rewrote these three lines. They used to demand
+		// 「这些段已立即生效」 for a [ball] edit - and [ball] has no production
+		// reader (cmd/wisp/config_readers_255.go's `ball` row, 票 180's census
+		// class "D"), so that sentence was precisely the lie 票 255 was立 for. The
+		// rewrite is two-sided, not a loosening: the operator must still get a
+		// user-visible line naming this edit, AND the forbidden claim must be absent.
+		out := r.awaitStdout(t, "值已换进本进程内存")
+		if !strings.Contains(out, "[ball]") {
+			t.Errorf("no user-visible line names the hot edit at all; stdout:\n%s", out)
+		}
+		if strings.Contains(out, "这些段已立即生效") {
+			t.Errorf("ticket 255 AC#1: a reader-less hot edit was reported as 已立即生效; stdout:\n%s", out)
 		}
 		// AC#3's other half, in one reading: a hot edit costs no card.
 		if n := r.rt.windowCount(); n != 0 {
