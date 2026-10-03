@@ -52,6 +52,8 @@
 
 ⇒ **出厂路径上配置断了两截**：第一截在这里（`Options.Hotkeys` 压根没吃配置），第二截在借用体里（§1.3）。两截都得算进票 260 的射程；AC#1 若只修第二截，出厂主机仍然读不到（`cmd/wisp/resident_ball_windows.go:171` 不改＝配不进来）。
 
+⇒ 库内兜底之外，**全仓 `HotkeyConfig{…}` 构造/出现点共 13 枚**（尺＝`git grep -n "HotkeyConfig{" -- '*.go' | grep -v '^\.scratch'`；正控＝该尺命中已知默认值那枚 `internal/ball/hotkey_windows.go:69`）。逐枚分类：真做"配置→球"映射的只有上表 A／B 两枚（`cmd/balldebug/main.go:239`、`internal/ball/hotkey_live_test.go:501`）；其余 11 枚里 1 枚是**零值守卫不是构造**（`internal/ball/ball_windows.go:153`）、1 枚是**注释示例不是代码**（`internal/ball/hotkey_reload.go:18`）、9 枚是**字面常量**（出厂默认 `internal/ball/hotkey_windows.go:69`；测试夹具 `internal/ball/hotkey_live_test.go:42`、`internal/ball/hotkey_status_test.go:97`/`:302`/`:307`/`:325`/`:362`/`:472`/`:525`）。⇒ 不存在第四枚"从配置取值"的通路。
+
 ### 1.3 借用那一遍用的是哪一枚值（链条逐处）
 
 | 环节 | 落点 | 盘上字面 | 携带键信息？ |
@@ -281,4 +283,20 @@
 
 ## §6 交件名册
 
-本件按节分枚提交，每枚 `git show --name-only` 只含本文件一枚路径；下面逐枚记 sha、时刻、覆盖的节。末枚记行数与字节数。
+本件按节分枚提交，每枚 `git show --name-only --format= HEAD` 现跑只含本文件一行（`.scratch/wisp/probes/260/a1/census.md`），下面逐枚记 sha、时刻、覆盖的节。
+
+| 枚 | sha | 时刻（+0800） | 覆盖 |
+|---|---|---|---|
+| 1 | `aed125d0f690f0d49cbcec72a0898cd6b14dda7b` | 09:51 | 骨架＋§0 锚点与口径 |
+| 2 | `068be1cba68fc208b3d071b73430ee1f4110c745` | 09:55 | §1 全节（判死：不读） |
+| 3 | `82741b98bb6acb5ece2f65617ab990ca51f855de` | 09:58 | §2 全节（零件与写死字面） |
+| 4 | `da86873e2d7d7fd71b5cb34eb57a631dd4ec4c06` | 10:00 | §3 全节（245 边界） |
+| 5 | `5c3f84403782d0331deb14118eeca16be946551f` | 10:03 | §4 全节（量不到＋四枚全称否定的尺与正控） |
+| 6 | `a761dd23ce44bbf92cb2a449c2ca9ec40aeca82a` | 10:05 | §5 全节（推翻六指＋复认一组） |
+| 7 | 本枚 | 10:07 | §1.2 追加"13 枚构造点"那把尺＋§6 名册＋终态读数 |
+
+- 终态读数（本枚 `wc -l -c` 现跑）：**302 行／43,285 字节**（数字取本文件落笔后实测，与磁盘一致）。
+- 自证零 Go 命令：本程全部工具调用＝`Read`／`Grep`／`Glob` 与 `date`／`git log|show|status|add|commit`／`grep`／`sed`／`wc`；**没有一枚 `go build`／`go vet`／`go test`／`go run`**（同机三枚写腿在飞，跑 Go 会互洗它们的读数）。
+- 未完成标记自查：本件通篇为完整判语句子，无省略号式空框、无"某节尚无结论"那类自指空壳；该自查尺的字面我**不写进本文件**（写进来会让模式自己命中自己），随本回报交给编排者。
+- 交件后写面：本程唯一新增件＝本文件＋`.scratch/wisp/probes/260/a1/msg-01.txt`（起手那枚 commit 的说明文本，临时件按规矩**只建不删**、未进任何 commit）。
+
