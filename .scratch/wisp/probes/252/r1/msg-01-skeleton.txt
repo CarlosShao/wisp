@@ -1,0 +1,7 @@
+docs(probes/252-r1): skeleton + section 0 starting anchor
+
+Ticket 252 implementation leg 252-r1, AC#2 + AC#3 only.
+Lays down the evidence file with the starting anchor triple
+(date -Iseconds / git log -1 / porcelain counts for the owned face)
+and names AC#4/AC#5/AC#6 as not done because cmd/wisp is another
+leg's write face right now.

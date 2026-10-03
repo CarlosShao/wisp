@@ -1,0 +1,24 @@
+docs(probes/252-r1): AC#2/AC#3 evidence, gate readings and two mutation self-proofs
+
+Fills sections 0 through 7 of .scratch/wisp/probes/252/r1/impl.md:
+
+- section 1 re-measures AC#1 on this machine (leg 1 lexical fails first,
+  resolvedForm is the lenient leg) and shows the before/after of the two
+  lines this leg changed,
+- section 2 records why the same-form step sits in Canonicalize, that it
+  calls the already-present resolvedForm instead of writing a second
+  normalizer, and the byte-level proof that InAllowlist is untouched
+  (single diff hunk, body hash e4aac2d53fe6bca6f43e5505b03e4202 before
+  and after, lines 133-163 shifted to 189-219),
+- section 3 gives the four gate readings verbatim, including the
+  d22scan git-ignore line this leg cannot make disappear,
+- section 4 carries the red-before / green-after table per cell plus the
+  M1 (alignment dropped: 9 named cells red, N1-N7 still green) and M2
+  (!ok softened: N7 and the existing ticket-107 probe C go red) mutation
+  proofs with restore verification,
+- section 5 lists nine ways this leg may be wrong, section 6 names
+  AC#4/AC#5/AC#6 as not done because cmd/wisp is another leg's write
+  face, section 7 the hand-off statement.
+
+Also lands the run logs and the reworded assertion message in the new
+test file.

@@ -249,7 +249,9 @@ func TestTicket252R1AlignmentAddsNoAuthorization(t *testing.T) {
 			got, want)
 	}
 	if !lShort.final {
-		t.Errorf("carrier moved under the test: %q should now be authorized under %q", short+pathSep+leaf, long)
+		t.Errorf("AC#2 RED: the short spelling of a new file was still refused under its own root (%q): "+
+			"the same-form step is not in effect (leg1=%v leg2=%v folded=%q)",
+			short+pathSep+leaf, lShort.leg1, lShort.leg2, lShort.folded)
 	}
 }
 

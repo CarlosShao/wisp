@@ -1,0 +1,11 @@
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 264 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 227 production Go files
+d22scan: scope bans #1-5 cmd/           examined  37 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 488 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  89 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=227, bans #1-5 cmd/=37, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=488, ban #8 cmd/=89; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 488 Go files, comments and _test.go included; cmd/ 89 Go files, comments and _test.go included

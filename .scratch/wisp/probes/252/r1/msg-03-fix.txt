@@ -1,0 +1,28 @@
+fix(tools/paths): ticket 252 AC#2, one form for one path before the allowlist legs
+
+C26's handle query only answers for paths that exist, so an allowed_dirs
+root entered the book fully expanded while a not-yet-existing write
+target kept the caller's spelling. On a tree that has an 8.3 alias that
+made one physical path reach InAllowlist as two shapes: the 252-p1
+reading measured the lexical containment (paths.go:140, now :196) saying
+false while resolvedForm (now :209) said true for the same input, so
+fs.write of a new file inside an allowed root was judged out of scope,
+became R2 and paid for an L2 card.
+
+The alignment sits one step BEFORE the two containments, in Canonicalize:
+when C26 could not confirm the path and the leaf really is absent, the
+part of the chain the OS does answer for is re-spelled through the
+resolvedForm this file already uses and the missing remainder is
+re-appended verbatim (the shape risk/syncdirs.go's resolveTarget already
+uses for write verdicts). No second normalizer, no copied folding logic,
+no platform branch except the compile-time constant already used by
+unifySeparators.
+
+InAllowlist itself is untouched: its body hashes the same as HEAD
+(e4aac2d53fe6bca6f43e5505b03e4202, lines 133-163 -> 189-219), so neither
+ban is even reachable here - the two containments stay two and
+"unresolvable means unauthorized" still refuses.
+
+Readings: the AC#3 carrier goes 9 FAIL -> 0 FAIL (18 PASS / 0 SKIP);
+paths_test and risk_test both ok; the 252-p1 probe still 9 PASS and its
+three positive controls are untouched.
