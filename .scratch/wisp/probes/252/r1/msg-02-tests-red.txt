@@ -1,0 +1,14 @@
+test(tools/paths): ticket 252 AC#3 carrier, red before the fix
+
+Adds internal/tools/paths_shortname_252_r1_test.go: the same-machine
+carrier for AC#2, built on the 252-p1 probe's helpers (measure252 /
+run252 / shortName252 / repoRoot252, no second instrument) and using
+only real GetShortPathNameW aliases, zero t.Skip.
+
+Reading before the change: 9 FAIL / 9 PASS / 0 SKIP. The reds are the
+two-spellings cells; the greens are the "adds no authorization" guards
+(N1-N7), which must stay green afterwards, plus A2/A4 which are the
+directions that already agreed.
+
+Also lands the baseline package run (both owned packages ok) and the
+pre-fix run log.
