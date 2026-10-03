@@ -62,3 +62,15 @@
 - **(c) rebind×借还那枚自钉只能装 `winlive` 层**：CI 的 `cmd/wisp` 测试步不跑该 tag（尺＝`grep -E 'tags|winlive' scripts/wisp-cli-tests.sh .github/workflows/ci.yml` 零命中〔**射程判断，非内容引用**〕），而非 winlive 的同 tag 球测试 `cmd/wisp/resident_approval_246_windows_test.go:309-310` 故意容忍无桌面，这枚钉三条断言全以"真借到键"为前提。⚠ 五枚零件今天在 `cmd/wisp` 写面内**全齐**（`startResidentBall`／`bindBallHost:139`／`AskOnTaskRoot:261`／导出的 `NewHotkeyReloader`／`observeEsc246:444`／`requireIdleCancelSlot246:350`），测试里自搭一枚桥即可闭合"改 config ⇒ Check ⇒ rebind"整条链 ⇒ **推翻 `245-c1` §1.3 那句"形 A 落地后残余才成为可发生的事"的"对钉也成立"那半**（对产线成立）。
 - **(d) 丢借用不是"卡片少个键"，是"卡片到点必执行"**：`internal/agent/approval/gate.go:319→:332` 逐字 `ANSWER-EXPIRED decision=timeout->execute`（`:338`），窗口 3s＝`queue.go:116`；且 `Standby` 不进 `Problems()`（`hotkey_windows.go:365`）⇒ **零症状**。这正是 §4 里"⛔ 已登记残留不归本票"那一枚的**代价读数**，落地腿要在证据件里把它写成"为什么必须自钉"，⛔ 不许因为"今天产线不可达"就不装。
 **今天可达性另加一条它的新事实**：票 255 的回执今天**已替这格说实话**（quiet 分支 `cmd/wisp/config_reload.go:189-194`），⚠ 但**主语写错**（把"吃默认键"归给不建球的 `wisp run`，实为常驻腿 `resident_ball_windows.go:171`）；且 `OnReload` 对 hot 档结构性不通（`internal/config/manager.go:198` 只吃 `rep.Reload`，`tiers.go:38` 把 hotkey 记成 `hot`）⇒ 归 `255-r2` 那一格的措辞，⛔ 本票不修它。
+
+---
+
+## 编排者翻勾节（2026-10-03 22:0x，锚 `bd5c049f`/`d9bce7ce`；258-v1 非实现者判决书收档）
+
+**AC#1/AC#2/AC#3 三格翻勾**（口令「258 退回」），凭据＝`.scratch/wisp/probes/258/v1/verdict.md`（145 行，13 份读数档）＋v1 判语：
+- **AC#1 成立但带条件**（我照判语翻勾，两枚条件写死）：①"节缺失⇒终值 DefaultHotkeys() 但档位词印 config"的措辞裁定点＝**归 258-r2 一句修**（印 "defaults" 才诚实）；②R1 洞（6 主判据 untracked）已由 `bd5c049f` 补 commit 封口。
+- **AC#2 成立但带条件**：死腿"非真窗"自报**判错**（v1 纠正＝默认档就是真窗读数，PASS 非 SKIP）；真缺口＝两枚 winlive 尺子自身缺陷（rebind 枚 grep 等号格式 vs JSON sink、occupied 枚赌 Ctrl+Alt+U 未被占无 squat 兜底）＝**尺子修复归 258-r2**，不是行为缺陷。
+- **AC#3 成立**：禁区零触碰、agentRuntime 零结构改动、Esc borrow 零顺手修（+19 行全是 Debug squat seam）、d22scan clean。
+- **恒真四突变**：M1 摘桥红 2 枚具名（Rebinds＋Occupied）＝桥有牙；M0/M2/M3 默认档绿＝**判据覆盖洞**（6 主判据自带闭包注入不读装配根）——v1 具名登记，不动判据、留给后续程补"读装配根"那一发。
+- **意外收获**：自写正控首发撞上 `Ctrl+Alt+W` 被第三方真占用 ⇒ AC#3 的占用语义被实测（`hotkeys live 3/4`＋`binding=Ctrl+Alt+W` 逐字）＝票 260 AC#0 关心的"占用时说什么"有了活体样本。
+- **R2 纠我**：A576 记的"死腿报的红名是 C18 形"实测倒的是 `TestTicket223…`（solo PASS＝挤压间歇）——归因换名，间歇形结论不变。
