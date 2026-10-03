@@ -37,7 +37,7 @@
   1. **新增** `cmd/wisp/resident_audio_windows.go`（`//go:build windows`）：`NewWASAPIMicrophone()`(`wasapimic_windows.go:52`) → `NewHalfDuplexGate(inner, PathT, WithStartMuted(c.Audio.MicMutedDefault))`(`gate.go:84`/`:57`) → `NewBoundedFrames()`(`audio.go:65`) → `mic.Start(ctx, buf)` → 消费侧读 buf → `FrameLevel(frame)`(`level.go:118`, 返回 `float32`) → `rb.b.SetAudioLevel(v)`(`internal/ball/liquid_windows.go:42`)。球句柄就在同包 `rb.b`（`resident_ball_windows.go:106` `b *ball.Ball`，包 main 可直接取）。
   2. `resident_windows.go`：在 :163 之后接这段，并 `rt.RegisterShutdownHook(proc.StepStopAudio, ...)`（见 1.5 join）。
 - **一笔藏不住、`247-a1` 已预警、现树仍在的代价**：`runResident` 手里那枚 `rt` 是 `proc.Runtime`，字段只有 `Env/Layout/Job/Instance/Registry/StartedAt/shutdownHooks`（`boot_windows.go:28-42`），**没有 cfg**；`agentRuntime.cfg`（`run.go:268`）在 `startResidentTaskSource`→run 那条子装配里才取（`run.go:424 rt.cfg=cfg`、`run.go:991 cfg := rt.cfg`）。⇒ 甲形要在 runResident 层读 `audio.mic_muted_default`/`voice.enabled`，得**自己 `config.LoadFile(filepath.Join(rt.Layout.DataDir, configFileName), nil)`**（`configFileName`＝`cmd/wisp/secret.go:63` "config.toml"，同一枚调用形状现成在 `providers.go:98`/`models.go:184`）。这不是装饰，是甲形的第一笔。
-- 不需要非 Windows 桩：`cmd/wisp/resident_other.go` 已 `os.Exit(2)` 拒起常驻；但消费体若调 `mic.Err()/ThreadID()/Endpoints()`（这三枚只在 `wasapimic_windows.go:119/130/137`，`wasapi_other.go` 占位体没给）⇒ 那枚消费文件**必须** windows-tagged。
+- 不需要非 Windows 桩：`cmd/wisp/resident_other.go` 已 `os.Exit(2)` 拒起常驻；但消费体若调 `mic.Err()/ThreadID()/Endpoints()`（这三枚只在 `wasapimic_windows.go:119/130/137`，`wasapi_other.go` 的非 Windows 桩体没给）⇒ 那枚消费文件**必须** windows-tagged。
 
 ### 1.4 形乙（`internal/audio` 自起协程并推到球）——两支，代价不对称
 
@@ -74,7 +74,7 @@ _§1 量数时刻：`2026-10-03 10:0x +0800`。_
 
 | 跳 | 这一跳要做什么 | 三态 | 现读凭据 |
 |---|---|---|---|
-| **H1** | 有人**构造**采集栈：`NewWASAPIMicrophone()`＋`NewHalfDuplexGate(...)`＋`NewBoundedFrames()`，并 `mic.Start(ctx, buf)` | **一整块没写** | 三名产码零构造者（`h1_exit=1`）；`NewWASAPIMicrophone` `wasapimic_windows.go:52`、`NewHalfDuplexGate` `gate.go:84`、`NewBoundedFrames` `audio.go:65` 全在库内、只被测试与包内占位用 |
+| **H1** | 有人**构造**采集栈：`NewWASAPIMicrophone()`＋`NewHalfDuplexGate(...)`＋`NewBoundedFrames()`，并 `mic.Start(ctx, buf)` | **一整块没写** | 三名产码零构造者（`h1_exit=1`）；`NewWASAPIMicrophone` `wasapimic_windows.go:52`、`NewHalfDuplexGate` `gate.go:84`、`NewBoundedFrames` `audio.go:65` 全在库内、只被测试与包内桩体用 |
 | **H2** | 有人**读那枚 `buf chan<- []byte`**（消费者侧循环） | **一整块没写** | `buf` 由源写（`meter.push` `audio.go:115`、被 `wasapimic_windows.go:231` 调）；全仓**没有一枚产码 reader**（audio 零 importer，见 §1.1）；pinned 循环体 `wasapimic_windows.go:186-234` 只 open/wait/drain/`EncodeFrame`+push，**不算电平**（尺 `grep -n "FrameLevel\|float32\|level" wasapimic_windows.go` ⇒ `e=1`） |
 | **H3** | `[]byte` → 一枚 `float32` 电平 | **函数存在，调用者零** | `FrameLevel(frame []byte) (float32, error)` `level.go:118`；`LevelOfSamples` `:96`（内用 `math.Sqrt` `:105`）；`DecodeFrame` `:137`、`EncodeFrame` `wavinjector.go:138`；分母 `LevelFullScale = 32768.0` `level.go:54`。⇒ 生产者半**已写、已测**（票 241），只差没人调 |
 | **H4** | 把 `float32` 交给球：`b.SetAudioLevel(v)` | **方法存在，产码调用者只有 balldebug** | 定义 `liquid_windows.go:42`（`:46 b.sta.PostTask(func(){ b.applyLevel(level) })`）；产码调用者＝`cmd/balldebug/main.go:418`/`:477`；**`cmd/wisp` 里零 SetAudioLevel**（尺 §1.1 同域，`cmdwisp_audio_exit=1` 的另一面） |
