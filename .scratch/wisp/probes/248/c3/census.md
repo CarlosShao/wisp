@@ -26,9 +26,11 @@
 - 要落地最少动哪几行：Go 侧 0 行（已就绪）。差的是页面侧那枚 `interface ComposerState` 补两字段声明 ⇒ 门转绿。抄给页面侧的问句见 §4-Q1。
 
 **AC#4｜题面逐字**："一条完整链＝面板点设置 → 填入参数与凭据 → 保存 → 下一次任务真用上刚配的模型……⛔ 在票 33 的宿主真起来之前这一格不许勾，也不许用'我手工改了 config.toml'来代替那一次点击"。
-- 缺的是：【依赖票 33 那块宿主】＋真机读数＋【属前端那半】，三样叠在一格。
-- 盘上现证：宿主**线程建了、窗没开**——`cmd/wisp/resident_windows.go:142 newResidentPanelManager`、`:148 startResidentPanel` 各 1 枚生产调用；`cmd/wisp/panel_resident_windows.go:138` 注释逐字 "startResidentPanel builds the thread but NOT the window: nothing is created until the user asks (a ball gesture, a tray item, a test)"。开窗那枚 `bringUp` 定义在 `cmd/wisp/panel_host_windows.go:230`，**除自身文件外零枚生产调用点**（尺见 §2）。前端产物缺：`git ls-files frontend/dist`＝1 枚 `.gitkeep`（见 AC#9）。同一次运行重建那条今天不通：`cmd/wisp/panel_config_store.go:27` 注释逐字 "once at assembly (run.go) and never rebuilt by a reload - OnReload has no [listener]"（J9 现量仍在 HEAD 成立）。
-- 要落地最少动哪几行：不是本票/本腿能落的量——需 (a) 票 33 把 `bringUp` 接进"球手势/托盘 → rp.tasks → loop 调 bringUp"那一跳且真机不 panic（A492 那条故意没接的坑）；(b) 前端把 dist 填上一包；(c) 一次真机点击＋下次重启真用上。Go 装配侧本票已备好（setter/reader/派发俱全）。真机读数归谁见 §4。
+- 缺的是：【依赖票 33 那块宿主】＋真机读数＋【属前端那半】，三样叠在一格。⚠ **不是"窗没接"**——开窗那一跳今天已生产接线（详见下与 §2），本腿初判曾把它读成"线程建了窗没开"，就地更正。
+- 盘上现证：
+  - 开窗链**已接**：`cmd/wisp/resident_windows.go:148 startResidentPanel`（1 枚生产调用）→ `cmd/wisp/resident_windows.go:163` 把 `withPanelHost(func(via) bool { return panel.RequestToggle(via) })` 交给球宿主；`panel_resident_windows.go:376` 注释逐字 "RequestToggle is what the panel hot key and the tray item drive"；`RequestToggle`(`:378`)→`RequestShow`(`:329`)→投 `rp.tasks`(`:315`)→`loop`(`:232 case fn := <-rp.tasks:`)→`showOnThread`(`:360 err := rp.mgr.Show(...)`)→`PanelManager.Show`(`panel_host_windows.go:395`)→`bringUp`(`:230`, 其直接调用点是同文件 `:402`)。⇒ `bringUp` 的**直接**生产调用点只有同文件 `:402`，但**传递可达**且由热键/托盘驱动，`startResidentPanel` 那句 "nothing is created until the user asks"＝**设计上延迟到手势**，不是没接。
+  - 仍缺的三样：① **真机才知**这扇窗真开时会不会撞上嵌套消息泵重入（`:325` 声称 "Safe from a ui-sta callback"、`panel_resident_windows.go:15-16` 却警告嵌套泵会乱序球的手势队列——A492 那条老坑到底解没解，本腿与 v1c §120 "三枚新测试文件没有任何一枚真开窗" 都没量，⛔ 不跑）；② 前端产物缺——`cmd/wisp/panel_host_windows.go:368 serveEntry` 要 `m.assets.Built()` 才推页面，否则 `:362` 只 serve 一枚 "panel assets unavailable: the embedded bundle is not built" 占位，而 `git ls-files frontend/dist`＝1 枚 `.gitkeep`（＝AC#9）；③ 设置页入口＋写回＋真机点击＋重启真用上（`panel_config_store.go:27` 注释逐字 "never rebuilt by a reload - OnReload has no [listener]"，J9 仍在 HEAD 成立）。
+- 要落地最少动哪几行：Go 开窗链本票/票 33 已备；差的是 (a) 33-v1/真机确认那一跳不 panic、(b) 前端把 dist 填上一包、(c) 一次真机点击＋下次重启真用上。这些都不是本腿能产码或能跑量的。
 
 **AC#8｜题面逐字**："票面与回执文案不许出现'保存即生效'，且'要重启'必须到达页面可见面"；编排者 §126 补："AC#8 那种'不许说谎'的判据遇到'说了另一句不成立的实话'同样算不过"。
 - 缺的是：【产码】（回执档位须由登记表同源产出，归票 255-r2）＋【待人裁定】（翻勾交非实现者）；"页面可见"那一半共用 AC#4 的传输路（票 33＋前端），但编排者把本格翻勾条件钉在 255-r2 而非前端。

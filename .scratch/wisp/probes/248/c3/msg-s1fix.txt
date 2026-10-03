@@ -1,0 +1,7 @@
+248-c3 correct §1 AC#4: window-open hop is production-wired
+
+bringUp is transitively reachable from hot key/tray via
+resident_windows.go:163 withPanelHost -> RequestToggle -> RequestShow ->
+thread loop -> showOnThread -> mgr.Show -> bringUp. Creation is deferred
+by design, not unwired. Remaining AC#4 gaps: real-machine panic check,
+frontend dist product, real click.
