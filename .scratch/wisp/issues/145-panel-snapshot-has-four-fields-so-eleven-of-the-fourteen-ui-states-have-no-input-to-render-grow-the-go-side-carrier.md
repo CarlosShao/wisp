@@ -170,3 +170,11 @@
 - **Git**：只 commit、**未 push**；三枚产码／判据 commit `4db5f3f6`／`1ba16de0`／`0e5c0d4a`＋台件一枚，每枚带显式 pathspec；禁面（`go.mod`／`go.sum`／`thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／`bridge.go:42-45`／三枚冻结测试件）零字节；仓内零删除；被拒调用 0。
 - **超预算具名**：硬顶 ≤35、实跑 ≈39（去向：写面与真源逐枚核 5＋选型 3＋门禁两遍 2＋台件 4；详见证据件 §8）。**未据此放宽任何断言。**
 - **离"那十四态能真画"还差什么（本程现量口径）**：装配根那把锁（`A393` 的真锁）**已开并已用掉一根读口**；现在最贵的两把新锁是 ①`approval_test.go:105` 那枚**绿的**双向尺（它把 `pending[]`／`results[]`／顶层三族全钉在 `frontend/src/lib/panel.ts` 上，`Q-51` 不答就一枚都进不去）②记录点 `run.go:800-816`（`reasoning`／`usage`／`tools[]`／`failures[]` 四维的数据只在被打印的那一刻存在，泵读不到）。`AC#2` 的落地集今天**不为空**（1 维 2 键），但十四行表里那些行**仍没画全**。
+
+## 标题级读数更正＋再框定（10-03 09:5x，只读腿 `145-c2`＝`.scratch/wisp/probes/145/c2/census.md`，锚 `5f9ff9d4`，六枚 pathspec commit；⛔ 原句不改，就地追加；落账 `A560`）
+
+- **两枚标题级读数已过期**（腿的数，我按〔腿报，未复核〕挂着，翻任何勾之前要我自己现跑）：`Snapshot` 现在**6 枚直接字段**（`internal/panel/composer.go:57-92`）⛔ 不是标题那句"恰四字段"；`ComposerState` **11 枚**（`:235-270`）⛔ 不是 AC#2b 的"6 枚"也不是 r2 的"7→7"。顶层 6 枚**全部有生产者并已接**，唯一装配根 `cmd/wisp/run.go:699-726`，十枚读口全接线 ⇒ **推翻票面⑤"Snapshot 从来没有生产代码构造过"**（该论在 r1 锚点成立、后被票 35 的装配根取代＝**过期非错**）。
+- ★**对我有用的一记再框定**：新增这 6 枚喂的是**"设置／名册"侧**，**无一枚喂那十四行工作态** ⇒ 票面①"缺 8~10"的方向**仍成立**；真卡点两类＝**跨-seam**（`cost`／`usage`／`reasoning`／`stuck` 有活源，但活在 `internal/agent/loop.go:367` 的 run 局部、泵读不到）＋**纯无源**（计时 elapsed／人话文案／命中片段／实时剩余／phase 映射）。恒空两枚＝`ComposerState.Attachments`（`internal/panel/pump.go:242` 硬写 nil）与 `attachmentError`（泵从不填）。
+- **"宁缺毋造"这侧的现量**：现役字段**没发现**把"没测过"画成"空闲／零"（每个后加维都带未知守卫，三形已落＝伴生 `*Known`／保留 sentinel 枚举／非真态强制 Reason 非空）；残余两枚＝`attachmentError` 无 known 位、`StreamLog.TruncationFor` 未知塌零值（`pump.go:651-655` 自知）。
+- 一枚**未复认的否证**留在册上不下结论：前人 r1 §2.6"`tool_call.started_at` 无写者"——本程不据它派腿，要派先按第 74 条规矩把那支的"作用面"跑一遍。
+- ⚠ **与票 167 的关系**：`Q-51`（序号落哪枚 JSON 键）**已由 `167-c3` 答死＝必须新增键、不能复用**，判语与凭据在票 167 新节；本票那把双向尺（`approval_test.go:105`）的解冻条件随 167-r2 一起走，⛔ 两条腿不许各加各的。

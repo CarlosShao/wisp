@@ -39,3 +39,11 @@
 ## 派单前置条件
 
 票 145 交完（同一批快照字段，别两条腿各加各的）＋票 158 验收交完＋编队空。
+
+## Q-51 已答＋落地拆分（10-03 09:5x，编排者具名裁定；料＝只读腿 `167-c3` 251 行／42,515 字节最末 `daac0e34`，死线三行我本人复量，落账 `A560`）
+
+- ★**Q-51 的答案＝序号必须新增一枚 JSON 键，不能复用**。现量（我复量）：`internal/agent/approval` 全包 `json:` tag＝**0 枚**（⇒ `PanelItem`／`LiveApproval` 今天一次都不出向）；`internal/panel/approval.go:39-59` 的 `ApprovalCardView`＝**10 枚出向键、零枚整数槽**。冲突面是**一把尺不是两把**（尺 A `internal/panel/composer_test.go:55-66` 六型不含卡面／尺 B `internal/panel/approval_test.go:113-121` 三型含）⇒ 卡面加 `position` 只响尺 B 一次、**同批要跟上一枚 interface**。⚠ 在册盲区（`internal/panel/pump.go:47-49` 自述＋尺体复核）：**两把尺只认 json tag ⇒ 无 tag 字段全盲、而线上多一枚 PascalCase 键** ⇒"尺没响"≠"没撞契约"。
+- ★**tag 写法是分水岭，不是构造路径**（`167-c3` 推翻自己第一版那发很值钱）：`encoding/json` 对**无 `omitempty`** 的 int **恒发 0** ⇒ `wisp panel-assets` 那条 CLI 路必带 `"position":0`＝票面 AC#2 点名的退化形状，而 `cardView143` 用裸 `Unmarshal` **不会红**；又因 `Position` 是 **1-based**（`internal/agent/pending_read.go:44-45`）⇒ **`omitempty` 恰好安全**。落地腿必须把这条钉住（正向种 0＋反向种 2 各一发）。
+- **落地拆两半（⛔ 不按"三枚输出"一起派）**：**167-r2＝序号＋"看得见"**（不新造任何入向方法名）；**"按得下去"那一行我另落**＝`cmd/wisp/run.go:1105` 之后补 `rt.tasks.AttachCancel(bg.ID, bg.Cancel)`（定义 `internal/tools/task.go:420`；我复量：唯一产码调用者 `internal/tools/subagent_197.go:346`＝子代理那条，**主 run 那条零调用**），等此刻在飞的 `252-v1`（同机跑突变）交件再动。
+- ⚠ **"面板真能按下去"这一格动契约面**：需要一个入向方法名＝**C17 白名单从四枚变五枚**（`SPEC-12 §4.1` 人工批准；两枚 want-4 锚射程 `internal/panel/git_test.go:381-387`/`:517` 只数 `panel.*` 字面量，这事实我具名认）。已按他既有规矩**接单＋摆批准**登记为 **`Q-76`**（⛔ "改契约"只决定要不要先落批准记录，**永不决定做不做**）；未答期间本票只做"看得见"那一半。
+- **"看得见"缺位三处逐枚在册**：`TaskRoster` 13 枚导出方法里没有"能不能停"的谓词、`TaskRowView` 12 枚键无 cancellable 位、根行 `statusKnown` 那一维被票 196／`A394` 占着（⛔ 不许顺手把那一维改了）。

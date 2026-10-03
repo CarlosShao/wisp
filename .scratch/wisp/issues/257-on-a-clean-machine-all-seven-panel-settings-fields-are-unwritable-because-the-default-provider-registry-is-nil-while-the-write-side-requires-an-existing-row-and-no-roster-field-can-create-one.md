@@ -41,3 +41,8 @@
 **3. ★ 选形＝ⓒ（五样齐）**：**文件**＝`cmd/wisp/firstrun.go`（回执文案）＋对应测试；**理由**＝ⓐ 撞钉＋自杀形、ⓑ 两件契约面、ⓒ 零产码结构改动＋owner 自己能走通＋7/7；**边界**＝① 回执必须分清**两条通道**："热加载认手改（run 腿 1s tick）"与"设置页写入要重启"并存且都对，不许混成一句（census §ⓒ 诚实边界）；② 写侧那道"行不存在拒写"**不动**——机主按指引手加后，设置页那 7 枚就落在已有行上可写了，这正是"诚实"所在：界面不替他建行，但告诉他怎么建；③ ⓑ 的两件契约面（C17 新增＋多键写）**单开一张票**留给"哪天真要从界面建行"那一天，本轮不立（owner 没要过"界面建行"，他要的是"能配上模型"）。**撤销口令「257 改形 ⓐ」**。
 
 **4. 落地腿 `257-r1` 判据预告（暂不派——写面 `cmd/wisp` 被 `253-r2` 占着，包级互斥）**：AC#1 干净机真跑（选形 ⓒ 兑现＝回执给出 `[llm.providers.<名>]` 三样指引）／AC#2 三句不同的拒写原因各一句／AC#3 凭据面不动／AC#4 越界。写面＝`cmd/wisp`（firstrun.go 文案＋测试），⛔ 不碰 `internal/config`。
+
+**5. 同族生产死线收档（10-03 09:5x，只读腿 `257-a2` 257 行／54,036 字节最末 `cbf4f1b2`；★死线那三行由编排者本人复量坐实，落账 `A560`）**
+- ★`config.NewManager(path, res)` 的**第二参数产线三处全传 `nil`**（我复量逐字＝`cmd/wisp/run.go:409`／`cmd/wisp/panel_inbound.go:230`／`cmd/balldebug/main.go:231`；`internal/ball/hotkey_reload.go:15` 那处只是注释示例）⇒ `internal/config/loader.go:46` 的 `resolveRefs` **生产里永不执行**、`(*Manager).Resolved()`（`manager.go:123`）**非测试调用者 0 枚** ⇒ 配置层那条"引用形凭据"解引用通道**今天没接**。⇒ 对本票的直接影响：**回执⛔ 不许把那通道列成入口**（列了＝指一条走不通的路）；凭据真走的是另一条（`run.go:435-436`→`internal/llm/resolver.go:141`，每建一次 Endpoint 解一次）。另具名登记：`voice.realtime.api_key_ref` 今天**没有运行时消费者**。
+- 两处留〔腿报，未复核〕：`internal/secret/migrate.go:86` 明文→DPAPI 那台机零生产调用者；**写门读盘／读面看内存**（`internal/config/settings.go:205`→`readCurrentFile :274-289` vs `cmd/wisp/panel_config_store.go:92`）＝owner 那句"我填了为什么没生效"的反向形状，⚠ 属票 248 那一族不吞进本票。
+- ★**它就地打过自己一处，这条对我有反噬**：常驻进程**并非必然有两枚 Manager**——`cmd/wisp/resident_task_source_windows.go:224-231` 那道 `interactiveStdin()` 闸没过时**该进程连一个重读盘的东西都没有** ⇒ 我在 `A542`／票 248 面上用过的"手改＝热加载认／面板写＝要重启"**两格措辞本身是半谎**，登记为过期；**落地回执要按三形状写**（有控制台／无控制台／面板写入）。撤销／更正都不改上面原句，按台账追加规矩走。
