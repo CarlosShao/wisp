@@ -1,0 +1,9 @@
+docs(probes/258-a2): skeleton + section 0 anchor (read-only census, zero Go commands)
+
+Leg 258-a2 read-only census of ticket 258 form-A wiring surface, the
+rebind x borrow cell, and today's reachable paths. Skeleton commit lands
+section 0 (start anchor HEAD 8a3790f0, dirty count 353) plus empty section
+headers before any measurement, per the hard gate "not on disk first = lost work".
+
+No production code touched, no AC checkboxes touched, no frontend/design access,
+not pushed.
