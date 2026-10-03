@@ -1,0 +1,6 @@
+票 255 r2 · 名册测试格式化（gofumpt -l 归零）
+
+`$(go env GOPATH)/bin/gofumpt.exe -l cmd/wisp internal/config` 在 commit a4906b6c
+之后仍点名 cmd/wisp/config_receipt_255_test.go（新增的句子装配用例里 map/slice
+字面量未对齐），gofumpt -w 之后该目录读数归空。无代码语义改动。
+AC 勾选框一枚未碰；只 commit 不 push。

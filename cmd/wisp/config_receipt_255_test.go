@@ -506,8 +506,10 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 	r.live(t, func() {
 		r.awaitAudit(t, "config: HOT-RELOAD state=armed")
 		r.rt.reportReload(&config.Report{
-			Hot: []string{"ball", "session", "audio", "llm", "agent", "privacy", "memory",
-				"panel", "cost", "models", "observe", "hotkey", "app", "voice"},
+			Hot: []string{
+				"ball", "session", "audio", "llm", "agent", "privacy", "memory",
+				"panel", "cost", "models", "observe", "hotkey", "app", "voice",
+			},
 		})
 		out := r.awaitStdout(t, "值已换进本进程内存")
 		immediate := lastLineWith(out, "这些段已立即生效")
