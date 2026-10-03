@@ -79,3 +79,13 @@
 - 动 `scripts/build.ps1`（构建链）＋`cmd/wisp/console_other.go`／`console_windows.go` ⇒ ⛔ **与 `228-r1` 串行**（它此刻正在 `cmd/wisp` 写，且新增了一枚 `cmd/wisp/resident_ball_windows.go`；同包并发＝互相洗读数）。
 - ⚠ **改构建 flag 会改变 CI 产物形态**：`slo-full` 跑在本机 self-hosted runner 上、每次 push 自启抢 CPU ⇒ **取数期间不改构建链**；本票排在**票 228 主体落地之后**（球进常驻之后再看"双击起什么"，一次改对，免得为同一件事改两次构建链）。
 - 派单前必做**撞钉预检**：先跑 `go test ./cmd/wisp/ -count=1`（带 sherpa PATH）把**今天绿的用例名**抄进派单，并逐枚读 `console_*`／`attachParentConsole`／`stdout` 相关的断言——本仓已知一枚"读盘的 AST 测试对 `-overlay` 失明"的坑，构建形态改动同样可能只被真机看得见。
+
+## 9. 收只读复量腿 `244-c2`＋编排者裁定（2026-10-03 09:2x；台账 `A558`；票面原话一字未改）
+
+交件凭据（盘上尺复量）：`.scratch/wisp/probes/244/c2/census.md` **125 行／23,866 字节**，commit `67fcc145`→`a21611ce`→`c02f59d0` 逐枚存在；只读、零构建、零 Go 命令、AC 框未碰。
+
+1. **c1 那句"11 枚入口全零 `-H`"是落地前读数**（就地打旧，不删原句）：现量出厂链 **3 枚已带／继承**（`scripts/build.ps1:115` 逐字 `"-H=windowsgui"`，上面 5 行 why 注释从 `:103` 起、六枚 `-X` 一字未动；CI 三步 `ci.yml:453/:550/:613` 全走 build.ps1 ⇒ 继承；slo-check 缺件自建同形）。仍零 `-H` 的只剩 **3 枚、且全是非出厂件入口**：`scripts/dev/ball-cycle.ps1:30`（balldebug）、`scripts/spike/run.ps1:46`（spike bins）、测试台件（复认 `cmd/wisp/secret_argv_windows_test.go:174` 的 `buildWispForTest`、`resident_approval_live_246_windows_test.go:417`、`panel_host_gate_test.go:407`、`tools/d22scan/{selftest_test.go:181,scan_test.go:2256}`）；⚠ **较 c1 补上一枚 `internal/llm/openaichat/mockllm_integ_test.go:65`**＝c1 那枚名册漏计，记它不漏计我。
+2. ★**"旗标已落" ≠ "台上那枚 exe 现在双击没黑窗"**：`build/wisp.exe` mtime＝**09-30 23:43**（编排者 `ls` 复量），比 `244-r1`（10-02 19:39）**早**——r1 的 GUI 产物落在 `.scratch/probes-244-r1/` 临时目录、没覆盖 `build/`。⇒ **AC#1 的"改后必绿"那一发只有真跑一次 `scripts/build.ps1` 才兑现**；在它发生之前，任何"双击没黑窗了"的句子都不许说。这也正是本票 AC#2 那两发真机读数的位置。
+3. **"会响的尺"今天是真空**（不是被谁放宽过）：全仓零枚测试/脚本读 PE subsystem——build.ps1 step6 冒烟只跑 `doctor`（`:166-169`）、`tools/d22scan` 的 ban 不含 `-H`/subsystem、`internal/tools` 无 `debug/pe` 解析。要装一把，**不能不构建就测**（库里 tracked exe＝0 枚，subsystem 仅链接后存在）。⛔ 本票不采纳"做不到"这句作否证——它一枚候选形的作用面都没跑过（第 74 条那条规矩）；落点候选两形（甲＝build.ps1 冒烟区、乙＝独立后台件）留给我在 AC#2 落地时选。
+4. `docs/BUILD.md:52-53` 正文只列 `-X` 不提 `-H`、`:87` 仍写"推迟到票 07"＝**过期文本**；照它手敲 `go build` 会漏 `-H`。⚠ 本票 §禁区 第 71 行已把这件事写死在前：**该冻结件一字不改，由票面具名更正**——本节就是那次具名更正，⛔ 不动 `BUILD.md` 一个字。
+5. stdout 可见性那条只算〔读码推断，未跑〕：`attachParentConsole()` 在 `cmd/wisp/main.go:90` **早于** `cmdRun` 捕获 `os.Stdout`（`main.go:161`→`run.go:390`），attach 成功时把 `os.Stdout` 重绑成新 `CONOUT$`（`cmd/wisp/console_windows.go:55`）⇒ 有父控制台或有重定向两态句子应仍可见，仅"attach 失败且无重定向"那一态写进死柄（无输出但无害）。**定它的那一发＝票面 AC#2 ①②，归编排者本机跑，⛔ 不许在本票里当已证。**

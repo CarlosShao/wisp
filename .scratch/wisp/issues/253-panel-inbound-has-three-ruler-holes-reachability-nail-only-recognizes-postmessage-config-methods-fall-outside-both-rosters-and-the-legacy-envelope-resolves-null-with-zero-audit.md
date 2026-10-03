@@ -30,3 +30,14 @@
 - 写面＝`internal/panel/**`＋`cmd/wisp/**` ⇒ **两枚包此刻都有验收腿在飞**（`198-v1` 正在整包跑 `cmd/wisp`）⇒ **本票按住**，起跑判据：`198-v1` 退出且 `git status --porcelain internal/panel cmd/wisp` 为空。
 - 与票 114（差集九格）、票 242（`bindDigest` 绑定层与出向读面零仪器）**互不吞并**：那两票各自的名字与格子不许并进本票。
 - 需要界面侧配合的只有一件：**把面板里的调用统一走 `wispDispatch`**（不带 `panel.` 前缀的那两名除外，它们就是 `config.get`/`config.set`）。这一句要 owner 带给界面侧 agent，⛔ 本编队永不转达。
+
+## 8. 收只读预检腿 `253-p4`＋编排者裁定（2026-10-03 09:2x；台账 `A558`；票面原话一字未改，就地打旧）
+
+交件凭据（盘上尺复量）：`.scratch/wisp/probes/253/p4/precheck.md` **141 行／22,709 字节**；三枚 commit `9051d51c`（锚＋骨架）→ `fae59004`（§1–§3）→ `f79c3a0b`（§4–§6）；只读、零 Go 命令、未 push、AC 框未碰。
+
+- ★ **AC#2 我改裁＝走形ⓐ，⛔ 不解冻任何枚、⛔ 不摆给 owner**。这条**推翻我在 `A555` 里写的"AC#2 落地必撞 want-4、须具名解冻"**。p4 现量的根据：既有尺的分母里**不含"另一枚测试尺"**——`internal/panel/git_test.go:464` 的 `gitToolNamesUnder` 显式跳 `_test.go`、`whitelistMethodsFromSource` 只点名单文件 `bridge.go`、`scanRendererHostDoors` 只走 `frontend/src`、连冻结件 `internal/panel/l2_grant_boundary_test.go:369` 的产码枚举也跳 `_test.go` ⇒ **另立一枚"全量入向名册"尺（不改 `bridge.go`、不往 C17 四名里加真方法）属纯仪器面**。
+- 形ⓑ（往 C17 加一枚真 `panel.` 方法）才红在 `internal/panel/git_test.go:385`（`equalStrings`，文案自述 "the four methods this ticket may not extend"）与 **`:517`**（`len(real) != 4`）；要变绿就得放宽名册尺＝撞本票禁区＋属契约面（`SPEC-12 §4.1` 人工批准）。**而且形ⓑ不对靶**：`config.get`/`config.set` 的要害正是"不带 `panel.` 前缀"（现读：`internal/panel/bridge.go:66-67` 的 `MethodConfigGet`/`MethodConfigSet`），加 `panel.` 方法不解决这个洞。
+- ⛔ **AC#2 落地腿一条硬约束（我从 p4 读数推出来的）**：那发"新增方法名没进名册 ⇒ 指名那一步必须红"的正控**只能种不带 `panel.` 前缀的名字**（如 `config.foo`）。种 `panel.x` 会同时打红 `:385`/`:517`＝误伤别人的锚，会被误判成我方修法的错。
+- **两处行号纠我自己**：`A555` 里我写的第二锚 **`:509` 错，真身 `:517`**（`sed` 现量）；`panelMethodRe` 在 `internal/panel/git_test.go:394`（不在 `cmd/wisp`，与 `253-r3` 同判、复认）；`routeLiteralRe` 真身 `internal/panel/composer_test.go:394`、闭集 `composerRouteLiterals()` 在 `:409-419`（5 名）、红点 `:521`。
+- **AC#1 的增量改窄（推翻本票排程节里我给的宽义口径）**：`cmd/wisp` **今天确实已有"页面发起、Go 侧回执"的行为用例**——`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`（`cmd/wisp/panel_resident_windows_test.go:314`）与 `TestAC14AwaitedBindingReplyReachesThePage`（`:812`，两半互证：`countRequests==3` 且页面 `REPLIED`）。⇒ 真洞只在窄义：**没有任何词面/AST 尺断言产码里 `w.Bind("wispDispatch")` 存在**。所以 AC#1＝"把可达性裁决从词面尺迁到能力形＋补一发只 `postMessage` 不 `wispDispatch` 的正控"，⛔ 不是从零造一台仪器。可复用零件逐名（p4 现量）：`startPanelForTest:59-67`／`showAndWait:104-118`／`waitPanelTrue:85-95`／`evalOnPanelThread:166-189`／`recordingModeHandler`（`panel_host_windows_test.go:227-243`，`all()` 在 `:206-210`）／`awaitReport:215-229`／`reportJSEnv:250-253`／`countRequests:837-845`／`panelThreadWait:53`。三条复用红线＝自开 requestId 桶、别再 `SetHtml`（撞 AC#13 那枚次序钉 `:314`）、handler 只答 mode 路。
+- **排程更新**：AC#1／AC#3 写面＝`cmd/wisp`（`255-r2` 在飞）⇒ 按住到它交件；AC#2 写面＝`internal/panel` 新增测试，但 `internal/panel` **编译带上了正被 `242-v1` 临时改写的 `internal/agent/approval`**（现量 1 枚 import）⇒ 同机跑测试互洗读数，按住到 `242-v1` 交件。**三格都无需 owner 介入。**
