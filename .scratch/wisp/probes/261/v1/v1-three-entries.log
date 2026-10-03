@@ -1,0 +1,8 @@
+time=2026-10-03T16:31:13.991+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+ENTRY1 text_chain ResolveChain: err="config: llm: model \"t-off\" of provider \"mock261\" is disabled (enabled=false); re-enable it or remove the entry" eps=[]
+ENTRY2 role-fallback ResolveRole(chat): err="config: llm: model \"t-off\" of provider \"mock261\" is disabled (enabled=false); re-enable it or remove the entry"
+ENTRY2b role-direct ResolveRole(chat): err="config: llm: model \"t-off\" of provider \"mock261\" is disabled (enabled=false); re-enable it or remove the entry"
+ENTRY3 DiscoveredModels(mock261) = [t-on]
+FLIP text_chain ResolveChain: err="<nil>" eps=[mock261/t-off (openai-chat http://127.0.0.1:9/v1)]
+FLIP role-fallback ResolveRole(chat): err="<nil>"
+FLIP DiscoveredModels(mock261) = [t-off t-on]

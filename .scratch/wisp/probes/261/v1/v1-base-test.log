@@ -1,0 +1,660 @@
+time=2026-10-03T16:25:53.341+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestResolveChainConsumesCatalog
+--- PASS: TestResolveChainConsumesCatalog (0.00s)
+=== RUN   TestResolveChainKeylessRefWithoutResolverIsAuth
+--- PASS: TestResolveChainKeylessRefWithoutResolverIsAuth (0.00s)
+=== RUN   TestResolveRoleAndFallback
+--- PASS: TestResolveRoleAndFallback (0.00s)
+=== RUN   TestBuildChainReportsUnimplementedProtocol
+--- PASS: TestBuildChainReportsUnimplementedProtocol (0.00s)
+=== RUN   TestPresetTableCoversTwelveProviders
+--- PASS: TestPresetTableCoversTwelveProviders (0.00s)
+=== RUN   TestDiscoverModelsAndImportUnknownCapabilities
+--- PASS: TestDiscoverModelsAndImportUnknownCapabilities (0.01s)
+=== RUN   TestDiscoverModelsClassifiesErrors
+--- PASS: TestDiscoverModelsClassifiesErrors (0.00s)
+=== RUN   TestProbeContractFourCapabilities
+--- PASS: TestProbeContractFourCapabilities (0.00s)
+=== RUN   TestRunProbeNeverFakesAPass
+--- PASS: TestRunProbeNeverFakesAPass (0.00s)
+=== RUN   TestProbeRequestJSONShapes
+--- PASS: TestProbeRequestJSONShapes (0.00s)
+=== RUN   TestContentSealed
+--- PASS: TestContentSealed (0.00s)
+=== RUN   TestRedactContentNeverShowsImageRefs
+--- PASS: TestRedactContentNeverShowsImageRefs (0.00s)
+=== RUN   TestUsageMaxMergeAggregation
+--- PASS: TestUsageMaxMergeAggregation (0.00s)
+=== RUN   TestTurnCollectorAssemblesAndMarksIncomplete
+--- PASS: TestTurnCollectorAssemblesAndMarksIncomplete (0.00s)
+=== RUN   TestTurnCollectorCompleteToolCallAndMaxTokens
+--- PASS: TestTurnCollectorCompleteToolCallAndMaxTokens (0.00s)
+=== RUN   TestStopReasonEnumIsExact
+--- PASS: TestStopReasonEnumIsExact (0.00s)
+=== RUN   TestClassifyHTTPStatusTable
+--- PASS: TestClassifyHTTPStatusTable (0.00s)
+=== RUN   TestNewHTTPError429CarriesRetryAfter
+--- PASS: TestNewHTTPError429CarriesRetryAfter (0.00s)
+=== RUN   TestParseRetryAfter
+--- PASS: TestParseRetryAfter (0.00s)
+=== RUN   TestClassifyTransportErrorDiscriminatesNetworkCauses
+--- PASS: TestClassifyTransportErrorDiscriminatesNetworkCauses (0.00s)
+=== RUN   TestRetryLadderExponentialBackoff
+--- PASS: TestRetryLadderExponentialBackoff (0.00s)
+=== RUN   TestRetryStopsAtMaxAttempts
+--- PASS: TestRetryStopsAtMaxAttempts (0.00s)
+=== RUN   TestRetryNeverForAuthBudgetCancelled
+--- PASS: TestRetryNeverForAuthBudgetCancelled (0.00s)
+=== RUN   TestRetryRateLimitWithoutHintIsNotRetried
+--- PASS: TestRetryRateLimitWithoutHintIsNotRetried (0.00s)
+=== RUN   TestRetryRateLimitHonorsHintVerbatim
+--- PASS: TestRetryRateLimitHonorsHintVerbatim (0.00s)
+=== RUN   TestRetryNeverAfterPayloadDelivered
+--- PASS: TestRetryNeverAfterPayloadDelivered (0.00s)
+=== RUN   TestRetryNoRetrySentinel
+--- PASS: TestRetryNoRetrySentinel (0.00s)
+=== RUN   TestChainFailoverOrderAndCallback
+--- PASS: TestChainFailoverOrderAndCallback (0.00s)
+=== RUN   TestChainExhaustedReturnsLastClassifiedError
+--- PASS: TestChainExhaustedReturnsLastClassifiedError (0.00s)
+=== RUN   TestChainNoFailoverAfterPartialPayload
+--- PASS: TestChainNoFailoverAfterPartialPayload (0.00s)
+=== RUN   TestBucketLimiterPacesRPM
+--- PASS: TestBucketLimiterPacesRPM (1.00s)
+=== RUN   TestBucketLimiterTightTPMWaitsAndCtxCancels
+--- PASS: TestBucketLimiterTightTPMWaitsAndCtxCancels (0.25s)
+=== RUN   TestLimiterProviderReconcilesUsage
+--- PASS: TestLimiterProviderReconcilesUsage (0.00s)
+=== RUN   TestProxyFuncModes
+--- PASS: TestProxyFuncModes (0.00s)
+=== RUN   TestRequestEstimateTokensAndValidate
+--- PASS: TestRequestEstimateTokensAndValidate (0.00s)
+=== RUN   TestTicket261R1EnumerationSkipsDisabled
+--- PASS: TestTicket261R1EnumerationSkipsDisabled (0.00s)
+=== RUN   TestTicket261R1SelectionRefusesDisabledByExactWording
+--- PASS: TestTicket261R1SelectionRefusesDisabledByExactWording (0.00s)
+=== RUN   TestTicket261R1RoleFallbackAlsoGated
+--- PASS: TestTicket261R1RoleFallbackAlsoGated (0.00s)
+=== RUN   TestTicket261P1EnumerationSkipsAndSelectionRefusesDisabled
+--- PASS: TestTicket261P1EnumerationSkipsAndSelectionRefusesDisabled (0.00s)
+=== RUN   TestTicket261P1GateBlocksProviderAndCost
+time=2026-10-03T16:25:55.936+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:25:55 mockllm: serving on http://127.0.0.1:53957 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- PASS: TestTicket261P1GateBlocksProviderAndCost (1.36s)
+=== RUN   TestTicket261P1FlagInversionReversesEveryReading
+time=2026-10-03T16:25:56.988+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:25:57 mockllm: serving on http://127.0.0.1:53960 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- PASS: TestTicket261P1FlagInversionReversesEveryReading (1.05s)
+=== RUN   TestFailoverAfterPrimaryExhaustion
+time=2026-10-03T16:25:58.152+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:25:58 mockllm: serving on http://127.0.0.1:53963 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:25:59.269+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:25:59 mockllm: serving on http://127.0.0.1:53965 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- PASS: TestFailoverAfterPrimaryExhaustion (2.30s)
+=== RUN   TestDoubleFailureKeepsTaskContextAndIsResumable
+time=2026-10-03T16:26:00.374+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:00 mockllm: serving on http://127.0.0.1:53971 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:01.441+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:01 mockllm: serving on http://127.0.0.1:53972 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- PASS: TestDoubleFailureKeepsTaskContextAndIsResumable (2.19s)
+=== RUN   TestNoFailoverAfterDeliveredPayload
+time=2026-10-03T16:26:02.638+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:02 mockllm: serving on http://127.0.0.1:53978 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:03.779+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:03 mockllm: serving on http://127.0.0.1:53979 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- PASS: TestNoFailoverAfterDeliveredPayload (2.31s)
+=== RUN   TestFailoverChainOrderHealthyPrimary
+time=2026-10-03T16:26:04.941+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:04 mockllm: serving on http://127.0.0.1:53985 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:06.032+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:06 mockllm: serving on http://127.0.0.1:53988 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- PASS: TestFailoverChainOrderHealthyPrimary (2.25s)
+=== RUN   TestResolverRejectsUnknownChainElement
+--- PASS: TestResolverRejectsUnknownChainElement (0.00s)
+=== RUN   TestMatrixRow1RetryStaysThinkingAndNoticesAfterFiveSeconds
+--- PASS: TestMatrixRow1RetryStaysThinkingAndNoticesAfterFiveSeconds (0.00s)
+=== RUN   TestMatrixRow2ExhaustedIsExplicitErrorNotSilence
+--- PASS: TestMatrixRow2ExhaustedIsExplicitErrorNotSilence (0.00s)
+=== RUN   TestMatrixRow3AuthIsUnconfiguredAndNeverRetried
+time=2026-10-03T16:26:07.120+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:07 mockllm: serving on http://127.0.0.1:53992 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:08.247+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:08 mockllm: serving on http://127.0.0.1:62069 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- PASS: TestMatrixRow3AuthIsUnconfiguredAndNeverRetried (2.22s)
+=== RUN   TestMatrixRow4QuotaIsAccountNotNetwork
+time=2026-10-03T16:26:09.360+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:09 mockllm: serving on http://127.0.0.1:62072 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+--- PASS: TestMatrixRow4QuotaIsAccountNotNetwork (1.09s)
+=== RUN   TestMatrixRow5MidStreamDropKeepsPartialAndFailsOpenCalls
+=== RUN   TestMatrixRow5MidStreamDropKeepsPartialAndFailsOpenCalls/openai-chat
+=== RUN   TestMatrixRow5MidStreamDropKeepsPartialAndFailsOpenCalls/anthropic
+=== RUN   TestMatrixRow5MidStreamDropKeepsPartialAndFailsOpenCalls/openai-responses
+--- PASS: TestMatrixRow5MidStreamDropKeepsPartialAndFailsOpenCalls (0.01s)
+    --- PASS: TestMatrixRow5MidStreamDropKeepsPartialAndFailsOpenCalls/openai-chat (0.00s)
+    --- PASS: TestMatrixRow5MidStreamDropKeepsPartialAndFailsOpenCalls/anthropic (0.00s)
+    --- PASS: TestMatrixRow5MidStreamDropKeepsPartialAndFailsOpenCalls/openai-responses (0.00s)
+=== RUN   TestProbeSuiteMeasuresBrokenFC
+time=2026-10-03T16:26:10.485+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:10 mockllm: serving on http://127.0.0.1:62082 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:10.524+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteMeasuresBrokenFC1863790563\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:10.536+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:10Z duration_ms=12
+time=2026-10-03T16:26:10.551+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteMeasuresBrokenFC1863790563\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:10.560+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:10Z duration_ms=8
+time=2026-10-03T16:26:10.564+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:10.566+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteMeasuresBrokenFC (1.20s)
+=== RUN   TestProbeSuiteMeasuresBrokenVision
+time=2026-10-03T16:26:11.659+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:11 mockllm: serving on http://127.0.0.1:62085 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:11.698+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteMeasuresBrokenVision986686501\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:11.704+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:11Z duration_ms=6
+time=2026-10-03T16:26:11.716+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteMeasuresBrokenVision986686501\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:11.722+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:11Z duration_ms=6
+time=2026-10-03T16:26:11.726+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:11.729+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteMeasuresBrokenVision (1.17s)
+=== RUN   TestProbeSuiteHonestProviderRecordsNoMismatch
+time=2026-10-03T16:26:12.814+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:12 mockllm: serving on http://127.0.0.1:62088 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:12.850+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteHonestProviderRecordsNoMismatch1787893712\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:12.862+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:12Z duration_ms=12
+time=2026-10-03T16:26:12.874+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteHonestProviderRecordsNoMismatch1787893712\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:12.880+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:12Z duration_ms=5
+time=2026-10-03T16:26:12.888+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:12.890+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteHonestProviderRecordsNoMismatch (1.16s)
+=== RUN   TestProbeSuiteHonestNegativeIsNotAMismatch
+time=2026-10-03T16:26:14.019+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:14 mockllm: serving on http://127.0.0.1:62092 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:14.062+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteHonestNegativeIsNotAMismatch1561548596\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:14.070+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:14Z duration_ms=7
+time=2026-10-03T16:26:14.080+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteHonestNegativeIsNotAMismatch1561548596\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:14.086+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:14Z duration_ms=6
+time=2026-10-03T16:26:14.096+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:14.097+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteHonestNegativeIsNotAMismatch (1.22s)
+=== RUN   TestProbeSuiteBrokenOnAllThreeDialects
+=== RUN   TestProbeSuiteBrokenOnAllThreeDialects/openai-chat
+time=2026-10-03T16:26:15.322+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:15 mockllm: serving on http://127.0.0.1:62095 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:15.361+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteBrokenOnAllThreeDialectsopenai-chat132479683\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:15.368+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:15Z duration_ms=6
+time=2026-10-03T16:26:15.383+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteBrokenOnAllThreeDialectsopenai-chat132479683\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:15.388+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:15Z duration_ms=5
+time=2026-10-03T16:26:15.392+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:15.395+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestProbeSuiteBrokenOnAllThreeDialects/anthropic
+time=2026-10-03T16:26:16.667+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:16 mockllm: serving on http://127.0.0.1:62099 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:16.719+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteBrokenOnAllThreeDialectsanthropic1060176418\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:16.729+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:16Z duration_ms=10
+time=2026-10-03T16:26:16.743+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteBrokenOnAllThreeDialectsanthropic1060176418\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:16.751+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:16Z duration_ms=7
+time=2026-10-03T16:26:16.757+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:16.760+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestProbeSuiteBrokenOnAllThreeDialects/openai-responses
+time=2026-10-03T16:26:17.975+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:17 mockllm: serving on http://127.0.0.1:62102 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:18.025+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteBrokenOnAllThreeDialectsopenai-responses898565477\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:18.032+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:18Z duration_ms=7
+time=2026-10-03T16:26:18.044+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteBrokenOnAllThreeDialectsopenai-responses898565477\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:18.056+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:18Z duration_ms=11
+time=2026-10-03T16:26:18.060+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:18.062+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteBrokenOnAllThreeDialects (3.96s)
+    --- PASS: TestProbeSuiteBrokenOnAllThreeDialects/openai-chat (1.29s)
+    --- PASS: TestProbeSuiteBrokenOnAllThreeDialects/anthropic (1.38s)
+    --- PASS: TestProbeSuiteBrokenOnAllThreeDialects/openai-responses (1.28s)
+=== RUN   TestProbeSuiteCapableOnAllThreeDialects
+=== RUN   TestProbeSuiteCapableOnAllThreeDialects/openai-chat
+time=2026-10-03T16:26:19.350+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:19 mockllm: serving on http://127.0.0.1:60075 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:19.385+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteCapableOnAllThreeDialectsopenai-chat4276877006\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:19.392+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:19Z duration_ms=7
+time=2026-10-03T16:26:19.401+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteCapableOnAllThreeDialectsopenai-chat4276877006\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:19.408+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:19Z duration_ms=6
+time=2026-10-03T16:26:19.412+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:19.414+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestProbeSuiteCapableOnAllThreeDialects/anthropic
+time=2026-10-03T16:26:20.642+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:20 mockllm: serving on http://127.0.0.1:60079 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:20.675+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteCapableOnAllThreeDialectsanthropic2550991116\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:20.682+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:20Z duration_ms=7
+time=2026-10-03T16:26:20.690+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteCapableOnAllThreeDialectsanthropic2550991116\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:20.695+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:20Z duration_ms=5
+time=2026-10-03T16:26:20.700+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:20.702+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestProbeSuiteCapableOnAllThreeDialects/openai-responses
+time=2026-10-03T16:26:21.787+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:21 mockllm: serving on http://127.0.0.1:60082 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:21.821+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteCapableOnAllThreeDialectsopenai-responses2088016241\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:21.829+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:21Z duration_ms=7
+time=2026-10-03T16:26:21.837+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteCapableOnAllThreeDialectsopenai-responses2088016241\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:21.843+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:21Z duration_ms=5
+time=2026-10-03T16:26:21.848+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:21.849+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteCapableOnAllThreeDialects (3.78s)
+    --- PASS: TestProbeSuiteCapableOnAllThreeDialects/openai-chat (1.35s)
+    --- PASS: TestProbeSuiteCapableOnAllThreeDialects/anthropic (1.29s)
+    --- PASS: TestProbeSuiteCapableOnAllThreeDialects/openai-responses (1.15s)
+=== RUN   TestProbeSuiteRefusesSilentRuns
+time=2026-10-03T16:26:23.141+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:23 mockllm: serving on http://127.0.0.1:60085 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:23.179+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteRefusesSilentRuns2561647519\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:23.188+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:23Z duration_ms=8
+time=2026-10-03T16:26:23.196+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteRefusesSilentRuns2561647519\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:23.202+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:23Z duration_ms=6
+time=2026-10-03T16:26:23.207+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:23.210+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteRefusesSilentRuns (1.35s)
+=== RUN   TestProbeSuiteSinkFailurePropagates
+time=2026-10-03T16:26:24.576+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:24 mockllm: serving on http://127.0.0.1:60088 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:24.614+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteSinkFailurePropagates1307307160\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:24.622+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:24Z duration_ms=7
+time=2026-10-03T16:26:24.630+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteSinkFailurePropagates1307307160\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:24.637+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:24Z duration_ms=6
+time=2026-10-03T16:26:24.642+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:24.644+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteSinkFailurePropagates (1.44s)
+=== RUN   TestProbeSuiteAudioStaysUnprobed
+time=2026-10-03T16:26:25.996+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:26 mockllm: serving on http://127.0.0.1:60093 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:26.032+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteAudioStaysUnprobed2523216669\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:26.040+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:26Z duration_ms=8
+time=2026-10-03T16:26:26.048+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteAudioStaysUnprobed2523216669\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:26.053+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:26Z duration_ms=4
+time=2026-10-03T16:26:26.058+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:26.061+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteAudioStaysUnprobed (1.42s)
+=== RUN   TestThinkingCheckRejectsPlainTextAnswer
+--- PASS: TestThinkingCheckRejectsPlainTextAnswer (0.00s)
+=== RUN   TestThinkingProbeRequestCarriesTheHarnessMarker
+--- PASS: TestThinkingProbeRequestCarriesTheHarnessMarker (0.00s)
+=== RUN   TestProbeSuiteMeasuresBrokenThinking
+time=2026-10-03T16:26:27.322+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:27 mockllm: serving on http://127.0.0.1:60101 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:27.368+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteMeasuresBrokenThinking208931471\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:27.376+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:27Z duration_ms=8
+time=2026-10-03T16:26:27.385+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteMeasuresBrokenThinking208931471\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:27.391+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:27Z duration_ms=6
+time=2026-10-03T16:26:27.397+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:27.399+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteMeasuresBrokenThinking (1.34s)
+=== RUN   TestProbeSuiteThinkingCapableIsNotTheSameAsBroken
+time=2026-10-03T16:26:28.721+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/03 16:26:28 mockllm: serving on http://127.0.0.1:60104 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-03T16:26:28.760+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteThinkingCapableIsNotTheSameAsBroken343313631\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-03T16:26:28.770+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-03T08:26:28Z duration_ms=10
+time=2026-10-03T16:26:28.788+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbeSuiteThinkingCapableIsNotTheSameAsBroken343313631\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-03T16:26:28.796+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-03T08:26:28Z duration_ms=7
+time=2026-10-03T16:26:28.801+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-03T16:26:28.805+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProbeSuiteThinkingCapableIsNotTheSameAsBroken (1.41s)
+=== RUN   TestRPM10EleventhRequestWaitsLocally
+--- PASS: TestRPM10EleventhRequestWaitsLocally (0.01s)
+=== RUN   TestRPM10RefillQuantumIsOneTokenPerSixSeconds
+--- PASS: TestRPM10RefillQuantumIsOneTokenPerSixSeconds (0.00s)
+=== RUN   TestClockJumpCannotMintTokens
+--- PASS: TestClockJumpCannotMintTokens (0.00s)
+=== RUN   TestUnpacedLimitsNeverBlock
+--- PASS: TestUnpacedLimitsNeverBlock (0.00s)
+=== RUN   TestCancellationWhilePacingIsNotAProviderFailure
+--- PASS: TestCancellationWhilePacingIsNotAProviderFailure (0.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/llm	35.585s
+time=2026-10-03T16:25:53.339+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestBoundaryNoPlaintextSecretFields
+--- PASS: TestBoundaryNoPlaintextSecretFields (0.00s)
+=== RUN   TestBoundaryNoRuntimeObservationFields
+--- PASS: TestBoundaryNoRuntimeObservationFields (0.00s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.02s)
+=== RUN   TestRoundTripBytes
+--- PASS: TestRoundTripBytes (0.00s)
+=== RUN   TestResolvedNeverPersists
+--- PASS: TestResolvedNeverPersists (0.00s)
+=== RUN   TestValidateTextChainValid
+--- PASS: TestValidateTextChainValid (0.00s)
+=== RUN   TestValidateTextChainUnknownElement
+--- PASS: TestValidateTextChainUnknownElement (0.00s)
+=== RUN   TestValidateVoiceCloudChains
+=== RUN   TestValidateVoiceCloudChains/valid_cloud_chains
+=== RUN   TestValidateVoiceCloudChains/unknown_element_named
+=== RUN   TestValidateVoiceCloudChains/local-sherpa_never_in_chains
+--- PASS: TestValidateVoiceCloudChains (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/valid_cloud_chains (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/unknown_element_named (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/local-sherpa_never_in_chains (0.00s)
+=== RUN   TestValidateRoleReferences
+=== RUN   TestValidateRoleReferences/both_empty_is_unset-ok
+=== RUN   TestValidateRoleReferences/provider_without_model
+=== RUN   TestValidateRoleReferences/model_without_provider
+=== RUN   TestValidateRoleReferences/unknown_provider_named
+=== RUN   TestValidateRoleReferences/unknown_model_named
+=== RUN   TestValidateRoleReferences/valid_pair
+--- PASS: TestValidateRoleReferences (0.00s)
+    --- PASS: TestValidateRoleReferences/both_empty_is_unset-ok (0.00s)
+    --- PASS: TestValidateRoleReferences/provider_without_model (0.00s)
+    --- PASS: TestValidateRoleReferences/model_without_provider (0.00s)
+    --- PASS: TestValidateRoleReferences/unknown_provider_named (0.00s)
+    --- PASS: TestValidateRoleReferences/unknown_model_named (0.00s)
+    --- PASS: TestValidateRoleReferences/valid_pair (0.00s)
+=== RUN   TestValidateRealtimeReferences
+=== RUN   TestValidateRealtimeReferences/disabled_with_dangling_pair_tolerated
+=== RUN   TestValidateRealtimeReferences/enabled_requires_existing_pair
+=== RUN   TestValidateRealtimeReferences/enabled_without_pair_rejected
+=== RUN   TestValidateRealtimeReferences/enabled_valid_pair
+--- PASS: TestValidateRealtimeReferences (0.00s)
+    --- PASS: TestValidateRealtimeReferences/disabled_with_dangling_pair_tolerated (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_requires_existing_pair (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_without_pair_rejected (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_valid_pair (0.00s)
+=== RUN   TestSplitChainElement
+--- PASS: TestSplitChainElement (0.00s)
+=== RUN   TestTicket261P1MissingEnabledKeyDecodesFalse
+--- PASS: TestTicket261P1MissingEnabledKeyDecodesFalse (0.00s)
+=== RUN   TestTicket261P1SettingsWriteMaterializesFalse
+time=2026-10-03T16:25:53.370+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.mock261.models.t261-nokey.context_window wrote=[llm.providers.mock261.models.t261-nokey.context_window]
+--- PASS: TestTicket261P1SettingsWriteMaterializesFalse (0.01s)
+=== RUN   TestLoadFileMergesDefaultsAndOverrides
+--- PASS: TestLoadFileMergesDefaultsAndOverrides (0.00s)
+=== RUN   TestLoadFileUnknownKeyErrorNamesLine
+--- PASS: TestLoadFileUnknownKeyErrorNamesLine (0.00s)
+=== RUN   TestLoadFileUnknownKeyLineNumbersAreOneBased
+--- PASS: TestLoadFileUnknownKeyLineNumbersAreOneBased (0.00s)
+=== RUN   TestLoadFileWrongTypeErrorHasPosition
+--- PASS: TestLoadFileWrongTypeErrorHasPosition (0.00s)
+=== RUN   TestLoadFileRejectsInvalidValues
+--- PASS: TestLoadFileRejectsInvalidValues (0.00s)
+=== RUN   TestLoadFilePresetInheritance
+--- PASS: TestLoadFilePresetInheritance (0.00s)
+=== RUN   TestLoadFileUnknownProviderNeedsProtocol
+--- PASS: TestLoadFileUnknownProviderNeedsProtocol (0.00s)
+=== RUN   TestLoadFileResolvesSecrets
+--- PASS: TestLoadFileResolvesSecrets (0.00s)
+=== RUN   TestLoadFileResolveFailureIsError
+--- PASS: TestLoadFileResolveFailureIsError (0.00s)
+=== RUN   TestLoadFileNilResolverSkipsResolution
+--- PASS: TestLoadFileNilResolverSkipsResolution (0.00s)
+=== RUN   TestLoadFileNewerSchemaVersionRejected
+--- PASS: TestLoadFileNewerSchemaVersionRejected (0.00s)
+=== RUN   TestSaveFileRoundTripsThroughLoad
+--- PASS: TestSaveFileRoundTripsThroughLoad (0.00s)
+=== RUN   TestConfirmLockedRunsOutsideTheManagerLock
+time=2026-10-03T16:25:53.424+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestConfirmLockedRunsOutsideTheManagerLock (0.01s)
+=== RUN   TestCheckAndReloadAsksOncePerFileChange
+time=2026-10-03T16:25:53.437+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestCheckAndReloadAsksOncePerFileChange (0.01s)
+=== RUN   TestManagerHotTierAppliesImmediately
+--- PASS: TestManagerHotTierAppliesImmediately (0.01s)
+=== RUN   TestManagerRestartTierKeepsOldValues
+--- PASS: TestManagerRestartTierKeepsOldValues (0.01s)
+=== RUN   TestManagerThemeIsHotInsideApp
+--- PASS: TestManagerThemeIsHotInsideApp (0.01s)
+=== RUN   TestManagerReloadTierEmitsEvent
+--- PASS: TestManagerReloadTierEmitsEvent (0.01s)
+=== RUN   TestManagerVoiceHotKeysDoNotEmitReload
+--- PASS: TestManagerVoiceHotKeysDoNotEmitReload (0.01s)
+=== RUN   TestManagerLockedLooseningRejectedKeepsOld
+time=2026-10-03T16:25:53.519+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedLooseningRejectedKeepsOld (0.01s)
+=== RUN   TestManagerLockedLooseningApprovedApplies
+time=2026-10-03T16:25:53.533+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedLooseningApprovedApplies (0.01s)
+=== RUN   TestManagerLockedTighteningHotAppliesWithoutHook
+time=2026-10-03T16:25:53.546+08:00 level=INFO msg="config: locked section tightened, hot-applied" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedTighteningHotAppliesWithoutHook (0.01s)
+=== RUN   TestManagerLockedNilConfirmHookDenies
+time=2026-10-03T16:25:53.559+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedNilConfirmHookDenies (0.01s)
+=== RUN   TestManagerLockedBothDirectionsLogged
+--- PASS: TestManagerLockedBothDirectionsLogged (0.02s)
+=== RUN   TestManagerLoadErrorKeepsCurrentConfig
+--- PASS: TestManagerLoadErrorKeepsCurrentConfig (0.03s)
+=== RUN   TestManagerMissingFileKeepsCurrentAndErrors
+--- PASS: TestManagerMissingFileKeepsCurrentAndErrors (0.00s)
+=== RUN   TestMigrateV1Fixture
+--- PASS: TestMigrateV1Fixture (0.01s)
+=== RUN   TestMigrateNoVersionKeyAssumedV1
+--- PASS: TestMigrateNoVersionKeyAssumedV1 (0.01s)
+=== RUN   TestMigrateCorruptFileUntouched
+--- PASS: TestMigrateCorruptFileUntouched (0.00s)
+=== RUN   TestMigrateUnsupportedVersionUntouched
+--- PASS: TestMigrateUnsupportedVersionUntouched (0.00s)
+=== RUN   TestMigrateHigherIntermediateVersionRejected
+--- PASS: TestMigrateHigherIntermediateVersionRejected (0.00s)
+=== RUN   TestAC2BaselineModeIsDecorative
+    private_acl_windows_test.go:56: seeded wide parent C:\Users\swq\AppData\Local\Temp\TestAC2BaselineModeIsDecorative1918432466\001\data
+        C:\Users\swq\AppData\Local\Temp\TestAC2BaselineModeIsDecorative1918432466\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                           NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                           BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                           DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:63: BASELINE (pre-wiring shape) icacls C:\Users\swq\AppData\Local\Temp\TestAC2BaselineModeIsDecorative1918432466\001\data\config.toml.bak-1
+        C:\Users\swq\AppData\Local\Temp\TestAC2BaselineModeIsDecorative1918432466\001\data\config.toml.bak-1 BUILTIN\Users:(I)(RX)
+                                                                                                             NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                             BUILTIN\Administrators:(I)(F)
+                                                                                                             DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2BaselineModeIsDecorative (0.07s)
+=== RUN   TestAC2MigrationBackupLandsPrivate
+    private_acl_windows_test.go:77: seeded wide parent C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate3353745266\001\data
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate3353745266\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                              NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                              BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                              DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+time=2026-10-03T16:25:53.752+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate3353745266\001\data\config.toml.bak-1 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-03T16:25:53.753+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate3353745266\001\data\.wisp-config-3062234192.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    private_acl_windows_test.go:89: icacls C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate3353745266\001\data\config.toml.bak-1
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate3353745266\001\data\config.toml.bak-1 NT AUTHORITY\SYSTEM:(F)
+                                                                                                                BUILTIN\Administrators:(F)
+                                                                                                                DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:90: icacls C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate3353745266\001\data\config.toml
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate3353745266\001\data\config.toml NT AUTHORITY\SYSTEM:(F)
+                                                                                                          BUILTIN\Administrators:(F)
+                                                                                                          DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2MigrationBackupLandsPrivate (0.09s)
+=== RUN   TestAC2SaveFileLandsPrivate
+    private_acl_windows_test.go:108: seeded wide parent C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate2069180445\001\data
+        C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate2069180445\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                       NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                       BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                       DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:122: BASELINE (pre-wiring shape) icacls C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate2069180445\001\data\config.toml
+        C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate2069180445\001\data\config.toml BUILTIN\Users:(I)(RX)
+                                                                                                   NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                   BUILTIN\Administrators:(I)(F)
+                                                                                                   DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+time=2026-10-03T16:25:53.857+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate2069180445\001\data\.wisp-config-1830557455.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    private_acl_windows_test.go:130: icacls C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate2069180445\001\data\config.toml
+        C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate2069180445\001\data\config.toml NT AUTHORITY\SYSTEM:(F)
+                                                                                                   BUILTIN\Administrators:(F)
+                                                                                                   DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2SaveFileLandsPrivate (0.08s)
+=== RUN   TestAC11SettingWriteReportsTheKeyPathItChanged
+time=2026-10-03T16:25:53.882+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+--- PASS: TestAC11SettingWriteReportsTheKeyPathItChanged (0.01s)
+=== RUN   TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure
+time=2026-10-03T16:25:53.889+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+--- PASS: TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure (0.01s)
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list
+--- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical (0.02s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list (0.00s)
+=== RUN   TestAC11SettingWriteKeepsAForeignHandEditedKey
+time=2026-10-03T16:25:53.924+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC11SettingWriteKeepsAForeignHandEditedKey (0.02s)
+=== RUN   TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit
+time=2026-10-03T16:25:53.941+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.02s)
+=== RUN   TestAC3SettingWriteStoresARefNeverAValue
+time=2026-10-03T16:25:53.948+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestAC3SettingWriteStoresARefNeverAValue (0.01s)
+=== RUN   TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes
+time=2026-10-03T16:25:53.955+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-03T16:25:53.956+08:00 level=INFO msg="config: config.toml already carries this key; nothing written" key=llm.providers.deepseek.base_url
+--- PASS: TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes (0.01s)
+=== RUN   TestEverySectionHasATierInRegistry
+--- PASS: TestEverySectionHasATierInRegistry (0.00s)
+=== RUN   TestRegistryCoversSchemaSectionsGreen
+--- PASS: TestRegistryCoversSchemaSectionsGreen (0.00s)
+=== RUN   TestPerKeySectionsAreRegisteredPerKey
+--- PASS: TestPerKeySectionsAreRegisteredPerKey (0.00s)
+=== RUN   TestVoicePerKeyRowsMirrorPlanVoiceWalks
+--- PASS: TestVoicePerKeyRowsMirrorPlanVoiceWalks (0.00s)
+=== RUN   TestEveryAppKeyIsRegisteredInTierRegistry
+--- PASS: TestEveryAppKeyIsRegisteredInTierRegistry (0.00s)
+=== RUN   TestAppKeyWalkSeesTheRosterItClaims
+--- PASS: TestAppKeyWalkSeesTheRosterItClaims (0.00s)
+=== RUN   TestUnwiredSecurityKeysFailLoudly
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides
+=== RUN   TestUnwiredSecurityKeysFailLoudly/net.allowlist
+=== RUN   TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges
+--- PASS: TestUnwiredSecurityKeysFailLoudly (0.02s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/net.allowlist (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges (0.00s)
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/empty_file
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected
+--- PASS: TestUnwiredGuardLeavesHonestConfigsAlone (0.01s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/empty_file (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected (0.00s)
+=== RUN   TestUnwiredGuardFiresBeforeAnyFileWrite
+--- PASS: TestUnwiredGuardFiresBeforeAnyFileWrite (0.00s)
+=== RUN   TestUnwiredGuardIsScopedNotABigStick
+--- PASS: TestUnwiredGuardIsScopedNotABigStick (0.01s)
+=== RUN   TestUnwiredKeysStillRoundTripAtTheByteLevel
+--- PASS: TestUnwiredKeysStillRoundTripAtTheByteLevel (0.00s)
+=== RUN   TestEveryLockedSectionKeyIsAccountedFor
+--- PASS: TestEveryLockedSectionKeyIsAccountedFor (0.00s)
+=== RUN   TestValidateDefaultsPass
+--- PASS: TestValidateDefaultsPass (0.00s)
+=== RUN   TestValidateEnumErrors
+=== RUN   TestValidateEnumErrors/theme
+=== RUN   TestValidateEnumErrors/observe.level
+=== RUN   TestValidateEnumErrors/proxy.mode
+=== RUN   TestValidateEnumErrors/over_budget
+=== RUN   TestValidateEnumErrors/protocol
+=== RUN   TestValidateEnumErrors/provider_billing
+=== RUN   TestValidateEnumErrors/model_billing
+=== RUN   TestValidateEnumErrors/thinking_intensity
+=== RUN   TestValidateEnumErrors/thinking_levels_element
+--- PASS: TestValidateEnumErrors (0.00s)
+    --- PASS: TestValidateEnumErrors/theme (0.00s)
+    --- PASS: TestValidateEnumErrors/observe.level (0.00s)
+    --- PASS: TestValidateEnumErrors/proxy.mode (0.00s)
+    --- PASS: TestValidateEnumErrors/over_budget (0.00s)
+    --- PASS: TestValidateEnumErrors/protocol (0.00s)
+    --- PASS: TestValidateEnumErrors/provider_billing (0.00s)
+    --- PASS: TestValidateEnumErrors/model_billing (0.00s)
+    --- PASS: TestValidateEnumErrors/thinking_intensity (0.00s)
+    --- PASS: TestValidateEnumErrors/thinking_levels_element (0.00s)
+=== RUN   TestValidateEnumAcceptsEveryListedValue
+--- PASS: TestValidateEnumAcceptsEveryListedValue (0.00s)
+=== RUN   TestValidateHardcodedReadOnly
+=== RUN   TestValidateHardcodedReadOnly/audio.half_duplex=false
+=== RUN   TestValidateHardcodedReadOnly/privacy.keep_transcript=true
+=== RUN   TestValidateHardcodedReadOnly/privacy.keep_audio=true
+=== RUN   TestValidateHardcodedReadOnly/models.verify_signature=false
+--- PASS: TestValidateHardcodedReadOnly (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/audio.half_duplex=false (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/privacy.keep_transcript=true (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/privacy.keep_audio=true (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/models.verify_signature=false (0.00s)
+=== RUN   TestValidateBallSizeRange
+--- PASS: TestValidateBallSizeRange (0.00s)
+=== RUN   TestValidateAPIKeyRefFormat
+=== RUN   TestValidateAPIKeyRefFormat/empty_is_keyless
+=== RUN   TestValidateAPIKeyRefFormat/dpapi_ref
+=== RUN   TestValidateAPIKeyRefFormat/env_ref
+=== RUN   TestValidateAPIKeyRefFormat/plaintext_key
+=== RUN   TestValidateAPIKeyRefFormat/bare_blob_id
+=== RUN   TestValidateAPIKeyRefFormat/traversal_blob_id
+=== RUN   TestValidateAPIKeyRefFormat/empty_env_name
+=== RUN   TestValidateAPIKeyRefFormat/unknown_scheme
+--- PASS: TestValidateAPIKeyRefFormat (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/empty_is_keyless (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/dpapi_ref (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/env_ref (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/plaintext_key (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/bare_blob_id (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/traversal_blob_id (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/empty_env_name (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/unknown_scheme (0.00s)
+=== RUN   TestValidateRealtimeAPIKeyRefFormat
+--- PASS: TestValidateRealtimeAPIKeyRefFormat (0.00s)
+=== RUN   TestAC1AllowedDirsWriteKeepsAHandEditedKey
+time=2026-10-03T16:25:54.015+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC1AllowedDirsWriteKeepsAHandEditedKey (0.02s)
+=== RUN   TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit
+--- PASS: TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.02s)
+=== RUN   TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept
+--- PASS: TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept (0.02s)
+=== RUN   TestAC2CleanWriteReportsOneKeyAtInfoLevel
+--- PASS: TestAC2CleanWriteReportsOneKeyAtInfoLevel (0.00s)
+=== RUN   TestAC2UnreadableFileIsRefusedAndNothingIsWritten
+--- PASS: TestAC2UnreadableFileIsRefusedAndNothingIsWritten (0.01s)
+=== RUN   TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+time=2026-10-03T16:25:54.073+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-10-03T16:25:54.099+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC3AdoptionClaimsOnlyWhatThisWriteProduced (0.03s)
+=== RUN   TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory
+time=2026-10-03T16:25:54.117+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[fs.allowed_dirs]
+time=2026-10-03T16:25:54.118+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory (0.02s)
+=== RUN   TestAC4PermissionModeWriteKeepsAHandEditedKey
+time=2026-10-03T16:25:54.135+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=risk.permission_mode wrote=[risk.permission_mode] kept_in_file_not_in_memory=[ball.size]
+time=2026-10-03T16:25:54.139+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+--- PASS: TestAC4PermissionModeWriteKeepsAHandEditedKey (0.02s)
+=== RUN   TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber
+time=2026-10-03T16:25:54.156+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber (0.02s)
+=== RUN   TestAddAllowedDirStillRefusesARelativeHop
+--- PASS: TestAddAllowedDirStillRefusesARelativeHop (0.01s)
+=== RUN   TestGuardedWriteFailureRollsBackMemory
+--- PASS: TestGuardedWriteFailureRollsBackMemory (0.00s)
+=== RUN   TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt
+time=2026-10-03T16:25:54.188+08:00 level=INFO msg="config: config.toml already carries this key; nothing written" key=fs.allowed_dirs
+--- PASS: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.01s)
+=== RUN   TestDiffKeyPathsNamesRealKeyPaths
+--- PASS: TestDiffKeyPathsNamesRealKeyPaths (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	0.880s
+base_rc=0

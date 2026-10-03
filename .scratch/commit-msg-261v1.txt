@@ -1,8 +1,41 @@
-ticket 261 leg v1: evidence skeleton + start anchors (non-implementer verdict)
+ticket 261 leg v1: full verdict (non-implementer acceptance of 261-r1's gate)
 
-- .scratch/wisp/probes/261/v1/verdict.md: sections 0-8 titled; section 0
-  filled with start anchor 89c863f1 (dev, 2026-10-03T16:25:51+08:00),
-  start md5s of the four gate-relevant files, start porcelain of
-  internal/llm + internal/config = empty (rc=0), and the running roster
-  placeholder to be filled by comm at close.
-- scratch only; zero production/test code touched.
+- .scratch/wisp/probes/261/v1/verdict.md filled 0-8, no placeholder left:
+  - start anchor 89c863f1; start roster 155 PASS/0 FAIL/0 SKIP, comm vs
+    r1-final = 0 diff both directions; final md5s and porcelain restored
+    (zero tracked-tree residue); d22scan re-run clean.
+  - s1 mutation re-certification, both forms self-run: ungated overlay 6/6
+    red (verbatim red sentences match r1's archived log, two extra double
+    reds captured), inverted overlay 6/6 red (2 spot-checked verbatim);
+    method note: rc=1 must be backed by a --- FAIL count (my own first
+    inverted run was a path-typo setup-failed, caught and re-run).
+  - s2 constant-truth: named cases red under gate removal; inverted form
+    red against the gated tree; no constant-truth direction.
+  - s3 three production entries live-probed via throwaway probe (temp file
+    + config.LoadFile, zero tracked code): text_chain name, roles.chat
+    fallback, roles.chat direct all refused with the exact disabled
+    wording; DiscoveredModels filters disabled AND missing-key; hand-edit
+    flip to true re-admits all three. New pin: the firstrun guidance
+    teaches exactly the missing-key shape (no enabled mention, presets
+    carry no Enabled) => first-run shortest path is now refused by the
+    gate (promise-vs-guidance conflict, escalated to orchestrator).
+  - s4 non-test resolveEndpoint caller roster = run.go:436, providers.go:170
+    (its :193 direct read is post-refusal, not a bypass); verdict: behavior
+    DID change for the only real "off" path (hand-editing config.toml) -
+    and corrected the dispatch premise: settings write side has zero
+    enabled writers, "switching off a model in settings" does not exist
+    today.
+  - s5 side-cases untouched (defaults.go :77-78, settings.go :115/:153,
+    panel_config_store.go :112, last-touched commits all pre-261-window).
+  - s6 AC verdicts: AC#0a holds; AC#0b holds-with-conditions (writer true,
+    zero production reach); AC#1a holds-with-conditions (four named:
+    load-time vs resolve-time, panel ModelCount gap, no re-enable path,
+    firstrun conflict); AC#2 holds (independently re-derived: exactly 3
+    default-tagged fields across the five schema maps). No checkbox
+    touched.
+  - s7 overturns: 2 substantive (dispatch premise; r1 impl did not surface
+    the firstrun missing-key conflict) + 4 precision/re-confirmation rows.
+  - s8 unjudgeable roster (external billing, frontend toggle existence,
+    refusal timing product call, firstrun fix ownership, go build banned,
+    ImportDiscovered reach).
+- scratch + verdict only; zero production/test code touched.
