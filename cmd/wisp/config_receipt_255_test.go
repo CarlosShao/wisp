@@ -17,10 +17,13 @@ package main
 //     verdict, a drifted evidence line, or a reader appearing where the receipt
 //     said "no reader" each redden here.
 //  3. TestTicket255ReceiptOmitsPanelFromTheImmediateSentence /
-//     TestTicket255ReceiptStillNamesTheLiveReadSection - the two stdout readings the
+//     TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere /
+//     TestTicket255ReceiptStillNamesTheLiveReadSection - the stdout readings the
 //     ticket asks for, taken through the injection seam AGENTS.md §1.3 names
 //     (`wisp run` with a scripted answer stream, the harness ticket 223 already
-//     built, so the sentence measured is the production one and not a re-typed copy).
+//     built, so the sentence measured is the production one and not a re-typed
+//     copy). The middle one is [panel]'s control re-pointed at [session] once
+//     票 255 AC#4 gave [panel] a reader in another process.
 //
 // The positive control is 票 255's own words: 手改 `[panel] width` ⇒ the sentence
 // "这些段已立即生效" must not contain `[panel]`. The negative control is a section
@@ -379,12 +382,19 @@ func slicesEqualSorted(a, b []string) bool {
 
 // --- the two stdout readings, through the `wisp run` seam ----------------------
 
-// TestTicket255ReceiptOmitsPanelFromTheImmediateSentence is AC#1's positive control,
-// read off a live process: hand-edit [panel] width while `wisp run` is up, and the
-// sentence that says 「已立即生效」 must not name [panel]. The edit is not nothing -
-// plan() really overwrote the memory, and the receipt says that in its own honest
-// line - but nobody acts on the new width, and 票 255 AC#4 (not this ticket, not
-// this leg) is what would change that.
+// TestTicket255ReceiptOmitsPanelFromTheImmediateSentence is AC#1's original
+// positive control, read off a live process: hand-edit [panel] width while
+// `wisp run` is up, and the sentence that says 「已立即生效」 must not name
+// [panel].
+//
+// WHAT 票 255 AC#4 CHANGED HERE, and what it did not. The judgement still holds,
+// for a reason that got more specific rather than weaker: [panel] now HAS a
+// production reader - the resident panel host's assembly root re-reads it at every
+// window creation - but that reader lives in the `wisp` process, and the host
+// measured here (`wisp run`) builds no panel window at all. So this seam still may
+// not say 已立即生效 about [panel], and the honest line still has to name the edit.
+// The strongest form of "no reader anywhere" moved to
+// TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere, which samples [session].
 func TestTicket255ReceiptOmitsPanelFromTheImmediateSentence(t *testing.T) {
 	const plantedWidth = 641 // the schema default is 640 (schema.go's PanelSection.Width tag)
 	r := newReloadRun223(t, 40*time.Second)
@@ -423,14 +433,63 @@ func TestTicket255ReceiptOmitsPanelFromTheImmediateSentence(t *testing.T) {
 		// The ledger carries the per-section verdict, so "who reads it" is a
 		// reading off the trail and not an inference from the console.
 		line := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=panel")
-		if !strings.Contains(line, "no-reader") {
-			t.Errorf("the ledger does not name panel as reader-less: %q", line)
+		if !strings.Contains(line, "other-process") {
+			t.Errorf("the ledger does not name panel's reader as living in another process: %q", line)
 		}
-		if !strings.Contains(line, "panel_host_windows.go:304") {
-			t.Errorf("the ledger's verdict for panel must cite the hard-coded geometry: %q", line)
+		// Re-adjudicated in the 票 255 AC#4 batch. This row used to demand
+		// "no-reader" plus panel_host_windows.go:304's hard-coded literal, and AC#4
+		// removed both: the geometry literal is gone from the create block and the
+		// read site moved into the resident assembly root. The cite below is checked
+		// line-by-line by TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim, so
+		// it is a reading and not a memory.
+		if !strings.Contains(line, "panel_resident_windows.go:207") {
+			t.Errorf("the ledger's verdict for panel must cite the per-create read site AC#4 installed: %q", line)
 		}
 		if n := r.rt.windowCount(); n != 0 {
-			t.Errorf("a reader-less hot edit displayed %d cards, want 0", n)
+			t.Errorf("a hot edit with no reader in THIS process displayed %d cards, want 0", n)
+		}
+	})
+}
+
+// TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere is AC#1's positive control
+// in the shape the ticket asked for, moved off [panel] by AC#4.
+//
+// WHY IT MOVED HERE. Until 票 255 AC#4 landed, [panel] was the section that proved
+// the sentence can lie: its width was hot-applied into memory and read by nobody
+// anywhere. That is no longer true of it - the resident panel host re-reads it at
+// every window creation - so leaving the strongest form of the control on [panel]
+// would measure "no reader in this process" while claiming "no reader at all",
+// which is the same word doing two jobs AC#1 exists to separate. [session] takes
+// the sample over: three keys, hot-tier by internal/config/tiers.go, and still
+// zero production readers in every process of this repository (the roster row and
+// TestTicket255RosterStillMatchesTheActualReadSites both say so, and the scan
+// re-measures it on every run).
+func TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere(t *testing.T) {
+	r := newReloadRun223(t, 40*time.Second)
+	r.live(t, func() {
+		r.awaitAudit(t, "config: HOT-RELOAD state=armed")
+		r.plant(t, "[fs]", "[session]\nwarm_timeout_sec = 91\n\n[fs]")
+
+		applied := r.awaitAudit(t, "config: HOT-RELOAD state=applied")
+		if !strings.Contains(applied, "hot=[session]") {
+			t.Errorf("the reload did not book session as hot-tier, so this proves nothing: %q", applied)
+		}
+		out := r.awaitStdout(t, "值已换进本进程内存")
+		for _, line := range strings.Split(out, "\n") {
+			if strings.Contains(line, "这些段已立即生效") && strings.Contains(line, "[session]") {
+				t.Errorf("ticket 255 AC#1: the receipt claimed a section with no reader anywhere took effect immediately: %q", line)
+			}
+		}
+		honest := lastLineWith(out, "值已换进本进程内存")
+		if !strings.Contains(honest, "[session]") {
+			t.Errorf("the honest sentence did not name [session], so the edit vanished from the receipt: %q", honest)
+		}
+		line := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=session")
+		if !strings.Contains(line, "no-reader") {
+			t.Errorf("[session] is the reader-less sample now, so its ledger row must still say no-reader: %q", line)
+		}
+		if strings.Contains(line, "panel") {
+			t.Errorf("the [session] ledger row names panel, so the two verdicts are not separable: %q", line)
 		}
 	})
 }

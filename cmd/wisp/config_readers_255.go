@@ -12,11 +12,16 @@ package main
 // in that path asks whether any component reads the section. So the sentence
 // reported "已立即生效" off a memory write. 票 255's 现量 says the same thing in
 // the owner's words: 「它报的是内存里的值换掉了，不是有人按新值做了事」. A hand edit
-// of [panel] width therefore printed a claim that cannot be true: the shipped
-// panel host never receives a config object at all
-// (cmd/wisp/panel_host_windows.go:304-306 hard-codes Width: 420 / Height: 260, and
-// NewPanelManager takes no config - that break is ticket 255 AC#4's job, not this
-// file's).
+// of [panel] width therefore printed a claim that could not be true: at the time
+// this file was written the shipped panel host received no config object at all
+// (cmd/wisp/panel_host_windows.go:304-305 at HEAD 67ab595d hard-coded
+// Width: 420 / Height: 260 inside the create call, and NewPanelManager took no
+// config parameter). 票 255 AC#4 has since landed in this same package: the
+// resident assembly root hands the host a per-creation geometry closure, and the
+// [panel] row below is what that changed in THIS file's claim. What did not
+// change is the judgement this file exists to enforce - a section is only claimed
+// 立即生效 when a reader in this host acts on the new value, and the panel host is
+// still not that reader in `wisp run`.
 //
 // WHAT THIS FILE ADDS. One roster, keyed by the SAME paths internal/config's
 // TierRegistry uses, saying for each hot-tier row what this host's reader is. The
@@ -126,12 +131,29 @@ var hotRowClaims = map[string]string{
 	"cost":    hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Cost - the C23 budget knobs (ticket 44) are not landed",
 	"observe": hotClaimNoReader + "cmd/wisp/logsink.go:149 [Level: logSinkLevel] - the log sinks choose their level themselves, never from cfg.Observe",
 
-	// [panel]: THE section 票 255 was立 for. Zero production readers, and the
-	// host that would use width/height hard-codes its own geometry
-	// (cmd/wisp/panel_host_windows.go:304 [Width:  420,]). Wiring it is AC#4
-	// and needs a real window-width reading, which is why this row is a verdict
-	// and not a wire-up done here.
-	"panel": hotClaimNoReader + "nothing outside internal/config reads cfg.Panel - cmd/wisp/panel_host_windows.go:304 [Width:  420,] is hard-coded and NewPanelManager receives no config (票 255 AC#4 owns that break)",
+	// [panel]: the section 票 255 was 立 for, and AC#4 landed while this file was
+	// open. The host used to hard-code its own geometry here
+	// (`Width: 420 / Height: 260` in cmd/wisp/panel_host_windows.go's create block
+	// at HEAD 67ab595d) and received no config at all; both halves of that are
+	// gone, and what replaced them is NOT a reader in this host:
+	//
+	// cmd/wisp/panel_resident_windows.go's assembly root now hands the host a
+	// closure that re-reads [panel] width/height at every window creation, and the
+	// host asks it for the number the window is born with. So a value DOES act,
+	// and the row says which value acts where rather than claiming a reader this
+	// command never had. Two facts the wording has to carry, both measured:
+	//   - the reader lives in the resident `wisp` process, which is the only
+	//     process that builds a panel host at all (NewPanelManager's one non-test
+	//     call site, cmd/wisp/panel_resident_windows.go:253). `wisp run` never
+	//     opens a panel window, so on THIS seam nothing acts on the new number -
+	//     the same shape [models] is booked in above, which is why this row is
+	//     other-process and not consumed.
+	//   - the effect is "close it and reopen it" (关窗再开), never "drag it and it
+	//     resizes": this host contains no MoveWindow / SetWindowPos / SetBounds
+	//     call, so an already-created window keeps its geometry until it is
+	//     destroyed and rebuilt. Pinned by
+	//     TestTicket255PanelRosterVerdictIsTheHonestShape.
+	"panel": hotClaimOtherProcess + "cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)], reached from the create at :392); 面板关窗再开即跟上新值, and this `wisp run` process builds no panel host at all",
 
 	// Per-key sections: planApp/planVoice book the SECTION name into rep.Hot, so
 	// the claim must be settled per key row and only claimed when every hot row
@@ -155,15 +177,20 @@ var sectionReadSites = map[string][]string{
 	"Audio":   nil,
 	"Privacy": nil,
 	"Memory":  nil,
-	"Panel":   nil,
 	"Cost":    nil,
 	"Observe": nil,
-	"App":     nil,
-	"Voice":   nil,
-	"Agent":   {"cmd/wisp/run.go"},
-	"Models":  {"cmd/wisp/models.go"},
-	"LLM":     {"cmd/wisp/panel_config_store.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/llm/resolver.go"},
-	"Hotkey":  {"cmd/balldebug/main.go"},
+	// Read by the resident panel host's assembly root, per window creation, since
+	// 票 255 AC#4. The host file itself is NOT in this list and must stay out of
+	// it: it receives a function value, and cmd/wisp/panel_host_windows.go
+	// importing internal/config or naming config.toml would be the dependency edge
+	// AC#4 forbids (TestTicket255HostStillDoesNotParseConfigItself checks both).
+	"Panel":  {"cmd/wisp/panel_resident_windows.go"},
+	"App":    nil,
+	"Voice":  nil,
+	"Agent":  {"cmd/wisp/run.go"},
+	"Models": {"cmd/wisp/models.go"},
+	"LLM":    {"cmd/wisp/panel_config_store.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/llm/resolver.go"},
+	"Hotkey": {"cmd/balldebug/main.go"},
 }
 
 // evidenceCite matches the `path.go:LINE [token]` shape every roster row is

@@ -76,10 +76,19 @@ import (
 // NOT carry it, because that one is retryable and belongs to AC#5.
 var errPanelRefusedThread = errors.New("panel host: refusing to create the panel window")
 
-// Binding name the page uses to send one raw composer envelope and get the
-// router's answer back. It is a property of this host, not of the (ticket 35)
-// bridge protocol, so it is spelled here and only here.
-const panelDispatchBinding = "wispDispatch"
+const (
+	panelDispatchBinding = "wispDispatch"
+	// panelWidthPx / panelHeightPx are what the host asks WebView2 for when NOBODY
+	// handed it a geometry source (票 255 AC#4: these two are now "the value when
+	// config is absent", not the only source). The shipping assembly root does hand
+	// one - cmd/wisp/panel_resident_windows.go's newResidentPanelManager - so a real
+	// window is sized off [panel]. These two still answer for every construction
+	// site that passes no hook, which is what keeps the seven pre-AC#4 TEST call
+	// sites of NewPanelManager sizing exactly what they sized before this ticket
+	// (the one production call site is the resident leg's, and it hands a source).
+	panelWidthPx  = 420
+	panelHeightPx = 260
+)
 
 // panelWindowClass is the Win32 class go-webview2's high-level wrapper creates
 // for us; kept only for diagnostics. panelOrigin is the opaque page origin that
@@ -164,6 +173,31 @@ type PanelManager struct {
 	// internal/observe/thresholds.go, untouched here.
 	lastColdMs float64
 	lastHotMs  float64
+
+	// geometry answers "how big is the NEXT window", called once per create by
+	// windowOptions. nil means nobody handed this host a source, and the host then
+	// sizes itself at panelWidthPx x panelHeightPx. It is a function value and not
+	// a config object on purpose: 票 255 AC#4 forbids a panel->config dependency
+	// edge and forbids this host reading config.toml by itself, so the assembly
+	// root keeps the parsing and this file keeps only the asking. Set by
+	// withGeometrySource; never mutated after construction, so it needs no lock.
+	geometry func() (width, height int)
+}
+
+// panelHostOption is one thing the assembly root may hand the panel host at
+// construction. It is a variadic option and not a fourth parameter for the same
+// reason cmd/wisp/resident_ball_windows.go:73's withPanelHost is a hook and not a
+// parameter (its own words: "a hook and not a parameter so the three existing
+// two-argument call sites of startResidentBall keep compiling untouched"): the
+// seven pre-AC#4 NewPanelManager call sites in this package's tests stay as they
+// are, and a missing option is a default, not a compile error.
+type panelHostOption func(*PanelManager)
+
+// withGeometrySource hands the host the thing that knows the panel's size. See
+// PanelManager.geometry for why that has to be a closure from the assembly root.
+// A nil src, or one answering <=0, falls back to the constants in this file.
+func withGeometrySource(src func() (width, height int)) panelHostOption {
+	return func(m *PanelManager) { m.geometry = src }
 }
 
 // NewPanelManager wires one host to the inbound router and the embedded asset
@@ -172,8 +206,62 @@ type PanelManager struct {
 // face onto it. assets may be nil (the host then reports "not built" and still
 // answers the dispatch binding). dataPath is the WebView2 user-data folder; an
 // empty string lets go-webview2 default it under %AppData%.
-func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPath string) *PanelManager {
-	return &PanelManager{disp: disp, assets: assets, dataPath: dataPath}
+//
+// opts is where 票 255 AC#4 enters: the assembly root hands this host a geometry
+// source and nothing else. Passing no option keeps the host at the constants in
+// this file, which is why the seven pre-AC#4 test call sites are untouched.
+func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPath string, opts ...panelHostOption) *PanelManager {
+	m := &PanelManager{disp: disp, assets: assets, dataPath: dataPath}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// windowOptions builds the WindowOptions block of the ONE
+// webview2.NewWithOptions call in this file - that is, the geometry the window is
+// actually created at. It is a method and not a composite literal so that the
+// number handed to the create is a value this package can be asked about, and so
+// the create site cannot drift back to a literal without failing
+// TestTicket255PanelHostBuildsItsWindowOptions (cmd/wisp/panel_geometry_255_test.go
+// parses this file and demands the WindowOptions: key's value be a call to
+// windowOptions, not a literal).
+//
+// The source is consulted HERE, on every call, and windowOptions is called from
+// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+// config says at that moment. That is the whole of what "改了要有反应" can mean on
+// today's host, and it is stated as such rather than as a resize: this host has no
+// MoveWindow/SetWindowPos/SetBounds call at all (measured, 票 255 AC#4's 现量), so
+// an ALREADY CREATED window keeps its geometry until it is destroyed and rebuilt.
+func (m *PanelManager) windowOptions() webview2.WindowOptions {
+	width, height := panelWidthPx, panelHeightPx
+	if m.geometry != nil {
+		// ONE call per create. Two would be two reads of the same disk file with
+		// nothing guaranteeing they answer the same question, and "the number the
+		// window was born with is the one the config held at that instant" is the
+		// claim AC#4 is here to make; cmd/wisp/panel_geometry_255_test.go counts
+		// this call.
+		gw, gh := m.geometry()
+		if gw > 0 {
+			width = gw
+		}
+		// h == 0 is what internal/config/schema.go's PanelSection.Height answers
+		// for a config that says nothing, and its own comment calls that value
+		// "auto from content". NOBODY implements auto-height: this host has no
+		// content-metric read, so 票 255's ruling lands the minimum-honest form -
+		// 0 keeps the constant 260, and "由内容定高" stays registered as NOT DONE
+		// (cmd/wisp/panel_geometry_255_test.go pins both halves of that). A
+		// negative answer is a garbage value, not a second spelling of 0, and it
+		// falls back the same way rather than inventing a rule for itself.
+		if gh > 0 {
+			height = gh
+		}
+	}
+	return webview2.WindowOptions{
+		Title:  panelTitle,
+		Width:  uint(width),
+		Height: uint(height),
+	}
 }
 
 // IsCreated reports whether the window has been brought up in this session.
@@ -299,11 +387,9 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 		Debug:     false,
 		DataPath:  m.dataPath,
 		AutoFocus: false,
-		WindowOptions: webview2.WindowOptions{
-			Title:  panelTitle,
-			Width:  420,
-			Height: 260,
-		},
+		// One call, one read: the geometry the window is born with is what this
+		// host's source answers RIGHT NOW (票 255 AC#4). See windowOptions.
+		WindowOptions: m.windowOptions(),
 	})
 	if w == nil {
 		return fmt.Errorf("panel host: WebView2 window creation returned nil (runtime missing or blocked)")

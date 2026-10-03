@@ -1,0 +1,7 @@
+time=2026-10-03T13:15:16.304+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RealWindowWidthFollowsTheConfig
+    panel_geometry_255_winlive_test.go:173: REAL WINDOW 255: asked 640x400 -> GetWindowRect 640x400 (hwnd 0x8450AC8); after dispose+show asked 900x400 -> 900x400 (hwnd 0x31009E2); implied scale 1.0000; geometry source read 2 time(s) for 2 creates
+    panel_geometry_255_winlive_test.go:214: TEARDOWN NAIL: thread 27552 windows=0, staleCloseQueued=false (a latched WM_QUIT is expected and is why the harness never unlocks this thread)
+--- PASS: TestTicket255RealWindowWidthFollowsTheConfig (1.90s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.967s

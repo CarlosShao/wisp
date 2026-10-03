@@ -1,0 +1,9 @@
+time=2026-10-03T12:29:59.536+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RealWindowWidthFollowsTheConfig
+    panel_geometry_255_winlive_test.go:137: after Destroy the panel thread (tid 20956) still owns 3 window(s): that is the leak shape this case exists to nail, and the second create below is being attempted anyway so the reading is reported, not skipped
+    panel_geometry_255_winlive_test.go:166: REAL WINDOW 255: asked 640x400 -> GetWindowRect 640x400 (hwnd 0x7420826); after dispose+show asked 900x400 -> 900x400 (hwnd 0xE430B26); implied scale 1.0000; geometry source read 2 time(s) for 2 creates
+    panel_geometry_255_winlive_test.go:216: TEARDOWN NAIL: thread 20956 windows=0, staleCloseQueued=false (a latched WM_QUIT is expected and is why the harness never unlocks this thread)
+--- FAIL: TestTicket255RealWindowWidthFollowsTheConfig (1.67s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.749s
+FAIL

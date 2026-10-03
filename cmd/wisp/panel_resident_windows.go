@@ -67,6 +67,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
 	webview2 "github.com/jchv/go-webview2"
@@ -163,6 +164,50 @@ const residentPanelHotReloadNote = "panel host (resident): this leg does not tic
 	"the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening " +
 	"it could read would have nowhere to be confirmed"
 
+// residentPanelGeometryNote is the third sentence this leg owes about config.toml,
+// and it is not the same claim as residentPanelHotReloadNote above. 票 255 AC#4
+// wired [panel] width/height into the window, and the way it could be wired in
+// THIS process is not through a Manager: the panel host is built at
+// cmd/wisp/resident_windows.go:142, long before the run.go pipeline that owns
+// config.NewManager exists, so what the assembly root hands the host is a closure
+// that re-reads config.toml at every window creation (panelGeometrySource below).
+// What still does not move, and this line says so out loud instead of letting the
+// operator infer it: the tick, and with it every OTHER hot section of this
+// process, keeps needing a restart.
+const residentPanelGeometryNote = "config: PANEL-GEOMETRY state=per-create reads=[panel] width/height " +
+	"detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值。本腿不轮询 config.toml，" +
+	"所以其余热加载段仍要重启进程才生效，已建好的窗口也不会自己改大小（今天没有 resize 路）。\""
+
+// panelGeometrySource is [panel] width/height, re-read from disk every time the
+// panel host is about to create a window. Built by the assembly root, handed down
+// as a function value: cmd/wisp/panel_host_windows.go imports nothing that parses
+// config.toml (票 255 AC#4's ⛔ no panel->config edge, ⛔ no host reading the disk
+// itself), and the host's own constants stay what they were for a host nobody
+// sized.
+//
+// WHY a fresh config.LoadFile and not a Manager: the only Manager-shaped reader in
+// this repo is internal/config's Manager, and this leg owns none (its header
+// comment above, and `grep -n 'config\.' cmd/wisp/resident_windows.go` answers zero
+// production hits). Standing one up here would make residentPanelHotReloadNote's
+// 「this leg does not tick config.toml」 false, which is another leg's ruling. The
+// one-shot load is this repository's existing shape for "read what is on disk in
+// this process" - cmd/wisp/models.go:184 does exactly that for `wisp models`.
+//
+// The failure branch is loud and stays at the constants: a host whose config could
+// not be parsed says so rather than silently answering someone else's number.
+func panelGeometrySource(dataDir string) func() (width, height int) {
+	cfgPath := filepath.Join(dataDir, configFileName)
+	return func() (width, height int) {
+		cfg, _, err := config.LoadFile(cfgPath, nil)
+		if err != nil {
+			slog.Warn("panel host: [panel] geometry source unreadable, sizing at the host's own default",
+				"path", cfgPath, "err", err, "default", fmt.Sprintf("%dx%d", panelWidthPx, panelHeightPx))
+			return 0, 0
+		}
+		return cfg.Panel.Width, cfg.Panel.Height
+	}
+}
+
 func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel.ComposerDispatch, error) {
 	// Said once per start, same posture the CLI seam takes: name the tier that was
 	// not taken rather than leave the operator to infer it.
@@ -201,7 +246,11 @@ func newResidentPanelManager(dataDir string) (*PanelManager, error) {
 	// The WebView2 user-data folder lives under the data root the boot already
 	// resolved; this leg parses no data root of its own (ticket 128's leg table).
 	dataPath := filepath.Join(dataDir, "panel-webview2")
-	return NewPanelManager(disp, assets, dataPath), nil
+	// 票 255 AC#4: the one thing this leg now reads out of config.toml, and it reads
+	// it per window creation rather than holding it. Said once per start, in the
+	// same posture as the hot-reload note above.
+	auditf("%s", residentPanelGeometryNote)
+	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), nil
 }
 
 // loop is the panel thread. Registry.Spawn owns the recover and the panic sink,
