@@ -1,0 +1,13 @@
+docs(247-a2): §6 推翻/复认清单填满，普查件六节齐
+
+推翻 6 句（全带现读 file:line 反证，无一动到四问骨架）：
+R1 wasapimic Default.Spawn :78→现:83（证 A485-P4、证伪 247-a1 旧读）；
+R2 audio 里写死 Default 的协程是两枚 wasapimic:83+wavinjector:84（a1 漏计，A485-P4 已两条都点）；
+R3 Voice/WakeWord.Enabled 读取处 manager.go:370/384/385→现 380/394/395（票面表与 A485 行号现全错，正控 boundary_test:91）；
+R4 247-a1 E6"两枚注册表并存假绿"＝runResident 不带 WithRegistry、rt.Registry==observe.Default（boot_windows:79，
+WithRegistry 产码调用者=0），那风险是潜伏不是现红；
+R5 RegisterShutdownHook"3处"→真实调用点2枚(:186/:311)+注释(:268)，且:157/:289行号漂；
+R6 resident_ball_windows:211/:257 字面"no task pipeline"与 resident_windows:206 startResidentTaskSource(票246 AC#7
+已给常驻进程任务管线)相左（no microphone 半句仍真；手势是否真走到执行者本腿未追=§5.6，仅点名不判 bug）。
+另复认票面现量1/2/3/4/6 与 A485-P1/P4/P8 机制句逐条（免得被误当一并推翻）。净：推翻全是行号漂移/清点漏项/
+潜伏当现红/旧日志字面，四问骨架不动。

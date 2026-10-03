@@ -186,3 +186,31 @@ _§4 量数时刻：`2026-10-03 10:0x +0800`。_
 _§5 量数时刻：`2026-10-03 10:0x +0800`。_
 
 ## §6 我推翻前人哪几句（含票面、A5xx、`247-a1`）
+
+规则：只推翻**复量后不认**的句子，每句给反证 file:line；复认的也逐条列出，免得后续程以为我默认。HEAD `47b38765`、时刻 09:49–10:0x。
+
+### 6.1 推翻（复量后不认）
+
+| # | 谁说的、原句 | 我的反证（现读 file:line + 尺） | 性质 |
+|---|---|---|---|
+| **R1** | `247-a1` U22/①：audio 侧写死 Default 的协程＝"`wasapimic_windows.go:78`" | 现读＝`wasapimic_windows.go:83`（`observe.Default.Spawn("audio-capture",...)` 在 Start 体内，行号自 09-30 已漂 +5）。且 `A485`-P4 **早已改成 :83** ⇒ 本条**证实编排者、证伪 `247-a1` 旧读** | 行号过期 |
+| **R2** | `247-a1` U22：audio 里**只有一枚**写死 `observe.Default` 的采集协程 | 现读有**两枚**：`wasapimic_windows.go:83`（真麦）**＋** `wavinjector.go:84`（WAV 注入，同名 `audio-capture`）。尺 `grep -rn "observe.Default.Spawn" internal/audio`。`A485`-P4 两条都点了 ⇒ 又是证伪 a1 的清点 | 漏计 |
+| **R3** | 票面现量 4 与 `A485`-P1 与 `247-a1` U13：`Voice.Enabled`/`WakeWord.Enabled` 的产码读取处＝`manager.go:370/:384/:385` | 现读＝`manager.go:380/:394/:395`（reload 比较＋抄回），整段自 09-30 漂约 +10 行。结论（只 reload、无开麦决策）不变，但**票面表与 A485 引的三枚行号现在都错**。正控：同尺未排测试时多命中 `boundary_test.go:91` | 行号过期 |
+| **R4** | `247-a1` E6/P4（含其 ⑤bis 语气）："两枚注册表**并存**时，`boot_windows.go:115` 看不见采集协程＝假绿" | 现跑 `runResident` 路径**不并存**：`resident_windows.go:39 proc.Boot(env)` **不带** `WithRegistry`（`WithRegistry(` 的 cmd/tools 产码调用者＝0，尺 `grep ... \| grep -v _test` ⇒ `wr_exit=1`），走 `boot_windows.go:79` else 支 ⇒ `rt.Registry == observe.Default`。⇒ 球用的 `reg`（`panel_resident_windows.go:153`）与 wasapimic 写死的 `observe.Default` 是**同一枚对象**。那枚假绿是**潜伏**（有 caller 传 WithRegistry 才现形，今天只有测试传），不是"a1 语气里的当下正在发生"。A485-P4 让采集吃传入 registry 的**方向仍对**，但把定性从"现红"降为"潜伏" | 结论过强 |
+| **R5** | `A485`-P7 / `247-a1` ⑤bis："`RegisterShutdownHook` 的注册点从 1 处变 **3 处**" | 现读**真实调用点＝2 枚**：`resident_windows.go:186`（StepCancelTasks）＋`resident_task_source_windows.go:311`（循环注册）；第三枚 `resident_approval_windows.go:268` 是**注释**不是调用点。且 a1 引的 `:157`→现 `:186`、`:289`→现 `:311` 都漂了 | 计数 + 行号 |
+| **R6** | 票面现量/我台账里"跑任务的进程里没有球"这一**类**句子的反向残留：`resident_ball_windows.go:211` 日志正文与 `:257` `ballGestureWhy` 常量仍逐字写 "this process has **no task pipeline** and no microphone" | 现读 `resident_windows.go:206 startResidentTaskSource(rt, ra)`（票 246 AC#7）已**给了这枚常驻进程一条任务管线** ⇒ ":257/:211 no task pipeline" 那半句与代码事实相左（"no microphone" 那半仍真，§1.1）。⛔ 但"summon/mute 手势是否真走到执行者"本腿**未追**（§5.6），故我只判"这句字面已与一条代码事实冲突、须重读它是否还会被打印"，不判它是 bug | 疑过期（仅点名） |
+
+### 6.2 复认（我量了，认旧账——列出来免得被当成我也推翻）
+
+- 票面现量 1："internal/audio **非测试 importer＝0**；`wasapi_windows.go:210 Open`／`:361 Drain`；`level.go:96 LevelOfSamples`／`:118 FrameLevel`／`:137 DecodeFrame`；`wavinjector.go:138 EncodeFrame`" —— **逐枚复认**（尺见 §1.1、§2；`sed -n '210p;361p' wasapi_windows.go`、`grep -n "func (.*Opener) Open\|func .*Drain"` ⇒ :210/:361 精确）。⚠ 唯一收紧同 `247-a1` E1：那把尺认的是"文本里出现 import 路径"，注释也算 ⇒ 验收 AC#1 要换 `go list` 反查（本腿禁跑，未换）。
+- 票面现量 2／§4.2：`SetAudioLevel` 的**产码生产者只有 `cmd/balldebug`**（`:418`/`:477`）—— **复认，现树仍成立**（无翻转）。
+- 票面现量 3：`internal/speech` **只有 `doc.go`** —— **复认**（`ls internal/speech/` ⇒ `doc.go` 一枚）。
+- 票面现量 4：`voice.enabled=true`（`schema.go:245`）× `wake_word.enabled=false`（`schema.go:197`）方向相反 —— **复认默认值**（只 6.1-R3 纠了它们的**读取处行号**）。
+- 票面现量 6／§2-H5：`liquidDriven`（`liquid.go:62-70`）只 6 态、**不含 Armed** —— **复认**（票面写的 `:60-68` 窗口略偏，函数体是 `:62-70`，内容不差）。
+- `A485`-P4："现成的 `audio.go:180 SpawnCapture(registry, run)` 就是那枚接缝，今天**零调用者**" —— **复认**（`grep -rn SpawnCapture` 排 `.scratch`/`_test` 只剩 audio.go:176/180 定义）。
+- `A485`-P1/P8 的机制句：`mic_muted_default` 只在装门时生效（`gate.go:108` × `gate.go:235` × `WithStartMuted` `gate.go:57`）；不装门直接 `mic.Start` 在 `wasapimic_windows.go:88`（`return <-started`）**同步等设备开成功**；D38b 无电平协程槽（`level.go:86-87` 逐字）—— **逐条复认**。
+
+⇒ 净结论：**没有一枚推翻动到四问的骨架判断**（甲形、H1/H2 一整块欠、默认档靠"没接线"、真机读数本机档）；被推翻的全是**行号漂移（R1/R3/R5）、清点漏项（R2）、把潜伏风险当现红（R4）、和一句与代码事实冲突的旧日志字面（R6）**。这类正是"归档快照被当现读"的形状，故 §0 已把"引用前先重跑"写进口径。
+
+---
+_交件：本件 `.scratch/wisp/probes/247/a2/census.md`；本腿零产码改动、零 Go 命令、`frontend/**`/`design/**` 未读未引；只 commit 未 push。_
