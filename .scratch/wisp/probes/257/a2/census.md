@@ -132,7 +132,73 @@
 
 ## 3. 两条通道的重读时机（热加载 vs 需重启）
 
-（取数中）
+**一句话结论（现读）**：全仓只有**一枚** tick 会重读盘，它挂在 `wisp run`／常驻任务腿自己的那枚 Manager 上；设置页写入腿用的**往往是另一枚 Manager**（不 tick）。写盘之后**没有任何事件**发给持有旧值的组件——一件都没有，连"给自己的 tick 报警"都被 `statOwnWrite` 主动压掉了。所以"手改能被看到"与"面板写要重启"两句**都真**，但它们不是同一件事的两种说法，而是**四件事**：① 盘被重写 ② 写它的那枚内存被更新 ③ 别的 Manager 的 1s 轮询把新值拉进自己内存 ④ 本进程真正干活的那条模型通路**只在装配时建一次**，谁都更新不了它。
+
+### 3.1 谁在什么时候重读盘（唯一一枚）
+
+| 步 | file:line | 要点／逐字 |
+|---|---|---|
+| 装配处接线 | `cmd/wisp/config_reload.go:114-115` | `rt.mgr.ConfirmLocked = rt.confirmLockedLoosening`／`rt.mgr.OnRestartPending = rt.reportRestartPending` |
+| 起协程 | `config_reload.go:119` | `observe.Default.Spawn("watchdog", "config", rt.reloadRoot, rt.configReloadTick)`；形状自陈在 `:23-33`（"常驻 tick，不是文件通知"） |
+| tick 体 | `config_reload.go:131-147` | `time.NewTicker(configReloadPollInterval)`，`configReloadPollInterval = time.Second`（`:88`） |
+| 一次轮询 | `config_reload.go:152-162` | `rep, err := rt.mgr.CheckAndReload()` |
+| **谁被接线** | `cmd/wisp/run.go:813`（`rt.startConfigReload()`，在 `assembleRuntime` 体内） | ⛔ 除此之外全仓无第二枚生产调用：`grep startConfigReload` 命中＝定义 `config_reload.go:105` ＋ `run.go:813` ＋测试 |
+| 重读的是什么 | `internal/config/manager.go:149-160` | `os.Stat` → mtime+size 与 `seen*` 相同即 `return nil, nil`（`:156-159`）；不同才 `LoadFile(m.path, m.res)`（`:160`）——**整条管线重跑、含 `resolveRefs`**（`loader.go:46`），但因 §1.3 那处 `res==nil`，实际一枚凭据都不解 |
+| 重读后落到哪 | `manager.go:169` `plan(fresh)` → `:192-196` `plan.commit()`＋`m.resolved = resolved` | `[llm]` 在 hot 名册（`manager.go:284`），改了就整段覆盖 `cur.LLM`；尺在 `tiers.go:30`（`"llm": "hot"`），名册与尺对不上会 `panic`（`manager.go:294-300`） |
+
+⇒ **"手改配置文件能被热加载看到"这一句今天可证实**，但它的确切射程只是：`wisp run`（控制台）与常驻进程的**任务腿那枚 Manager** 的内存与 `Report`。**不**覆盖面板读写腿那枚（§3.2）。
+
+### 3.2 一台机器上到底有几枚 Manager（owner 那句"我填了为什么没生效"的真身）
+
+三枚生产装配点，各自独立持有一份 `cur`：
+
+| 装配点 | Manager | 会不会重读盘 | 谁在用它 |
+|---|---|---|---|
+| `cmd/wisp/run.go:409` `config.NewManager(cfgPath, nil)` | `rt.mgr` | **会**（`run.go:813` 起了 tick） | `rt.settings`（`run.go:431`）→ 只被快照的凭据维度用（`run.go:710` `Credential: rt.settings.credentialStatus`）；`rt.permissionMode()`（`cmd/wisp/approval_always.go:151-156`，每次调用现读 `rt.mgr.Config()`）；`perm.Store.PermissionMode()`（`internal/perm/store.go:155-164`，经 `internal/tools/mode.go:35-47` 每次工具调用拉一次） |
+| `cmd/wisp/panel_inbound.go:230`（同 `newComposerDispatchChain`，定义 `:228`） | 链上的 `mgr` | **不会**，且**明说自己不会**：`hotReloadDisabledPanelInbound` 逐字在 `config_reload.go:97-99`（"本宿主没有接 config.toml 轮询，这次运行期间手改配置不会生效……要生效请重启进程并用 wisp run"），由 `panel_inbound.go:218` 每启动播一次 | `config.set`／`config.get` 的全部写入与读数（`panel_inbound.go:266-267`） |
+| `cmd/wisp/panel_resident_windows.go:170` → 同一枚 `newComposerDispatchChain` → 同一个 `panel_inbound.go:230` | 常驻面板链上的第二枚 | **不会**——`residentPanelHotReloadNote` 逐字在 `panel_resident_windows.go:162-165`（"panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run`…"），由 `:169` 播一次 | 同上 |
+
+⇒ **常驻进程里同时存在两枚 Manager**（任务腿 `run.go:409` 一枚，面板链 `panel_inbound.go:230` 又一枚；前者由 `resident_task_source_windows.go:265` 调 `assembleRuntime` 而起 tick，后者无 tick）。二者读同一个文件、各持一份内存：
+
+- **今天可证（静态）**：面板 `config.get` 的读数（`ReadSettings` → `panel_config_store.go:92` `s.mgr.Config()` → `manager.go:115-119` 内存深拷贝）**只反映面板链那枚内存**，手改文件对它**在这枚进程活着的期间永远不可见**；而快照的凭据维度（`run.go:710`）走 `rt.mgr`，**1 秒内可见**。⇒ 同一台机器同一时刻这两把尺**可给出互不相容的答案**（例：手加一节 provider 后凭据维度可由 `no_ref_declared` 变为 `partly_missing`/`all_recorded`，而 `config.get` 那句仍是 `服务商 0 家；凭据状态 no_ref_declared`——句在 `internal/panel/config_handlers.go:451`）。
+- **只有跑起来量得到**：这两句在真常驻进程里是否会被**同一秒**读到（取决于谁触发快照，§3.3 末行）。→ §5 N3。
+- ⚠ 反过来的一条也要写进回执：**写门看盘、读面看内存**（§2.1 末）。所以"手加一节之后那七枚写不写得进"与"那一节显不显示在页面上"是两回事，前者立刻、后者在这枚进程里不。
+
+### 3.3 写盘之后有没有事件发给持有旧值的组件：**逐枚否证**
+
+| 候选事件 | 现读结果 |
+|---|---|
+| setter 直接通知谁 | **没有**。`writeOneKey`（`settings.go:199-249`）的出口只有 `check` 错／`apply` 假／`mergeWrite` 错或成；`grep "OnReload\|OnRestartPending"` 在非测试代码里的**赋值**只有 `config_reload.go:114-115` 两枚 ＋ `cmd/balldebug/main.go:244`（另一枚命令，不是 wisp run）；两枚钩子的**调用**只在 `manager.go:198-203`——即**只有 tick 会发**，写路径永远不发 |
+| 写完让本 Manager 自己的 tick 再读一遍 | **主动压制**：`mergeWrite` 成功且文件与内存一致时 `m.statOwnWrite()`（`writeguard.go:175` → `allowdirs.go:157-163` adopt mtime+size）——写它的这枚 Manager 永远**不会因自己这次写而 reload**。只有文件里带着本机没读过的他人手改时才**不** adopt（`writeguard.go:178-186` 那支 `slog.Warn`），下一 tick 才读回来 |
+| 让**别**的持有者知道 | **没有任何跨 Manager 机制**（无注册表、无 channel、无回调；三枚各自 `NewManager`）。唯一的"传播"就是别的 tick 各自 poll 到 mtime 变化 |
+| 让装配期就快照走的组件知道 | 不可知，且代码自陈：`run.go:423-424` `cfg := mgr.Config()` 是深拷贝快照并 `rt.cfg = cfg`；模型通路由它一次建好——`run.go:435` `llm.NewResolver(cfg, st)`＋`:436` `ResolveRole`＋`:442` `BuildEndpointProvider`＋`:447` `rt.provs`；凭据也在同一步被烤进适配器（§1.1）。同一形状在 `config_reload.go:55-61` 写得很白：C26 canonicalizer 只在装配时建一次（`run.go:390`），所以**已批准的 [fs] 放宽也不改本次运行的路径判定**，并专门为此播一句（`:201-203`） |
+| 让**页面**知道 | 页面只被**不相关的状态移动**推：`cmd/wisp/panel_pump.go:392-396` 注释逐字 "Called where a state the panel shows actually moved: a card opened, a card went away, a tool call started or ended, the stream closed."——**配置写成功不在这张单上**；`rt.pump.Publish()` 生产调用面只 `panel_pump.go:405` 一枚，函数值经 `run.go:735`／`run.go:998` 交出去。⇒ "写完不刷页面就看不到新数"是**今天可证的形状** |
+
+### 3.4 两条通道今天各自说到用户嘴上的句子（逐字）
+
+**通道甲（手改文件 → tick）**，`cmd/wisp/config_reload.go`：
+- 装 tick 时（`:124-127`）：`wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。`
+- 段被立即生效时（`:171`）：`wisp run: 配置热加载：这些段已立即生效（D36 立即档）：%v` ← **`[llm]` 的改动会落进这一句**
+- reload 失败归因（`describeReloadFailure` `:315-370`）：`cause=missing`／`cause=permission`／`cause=syntax`／`cause=unknown-key`／`cause=migration`／`cause=invalid`／`cause=unclassified`（票 223 AC#4 的四分法今天已是七分）
+- 不 tick 的宿主各播一句：`config_reload.go:97-99`（panel-inbound）／`panel_resident_windows.go:162-165`（常驻面板腿）
+
+**通道乙（面板写 → 回执）**，`internal/panel/config_handlers.go`＋`cmd/wisp/panel_config_store.go`：
+- 级别句（`tierSentence` `:428-441`）——写侧全部返回 `EffectiveRestart`（`panel_config_store.go:228`／`:275`），所以页面拿到的必然是 `:435` 那句：`这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。`
+- 受理句（`renderSettingReceipt` `:381-396`）：`设置已写入。 实际落盘的键路径：<diff 出的键>。 这一项要重启…`；文件本来就是这个值时：`本次没有任何键路径发生变化（文件里已经是这个值）。`（`:385`）
+- 凭据句（`renderCredentialReceipt` `:401-423`）：`密钥已录入（只写不回显：这一页任何时候都不会再显示它的值，只会显示已录入/未录入）。 服务商 <名>。 记录的是引用 <ref>。 …`
+- 拒写三因（票 257 AC#2 要的就是这三句别折成一句）：**① 文件没建** → 面板链根本装配不出来，句在 `panel_inbound.go:148`（`wisp panel-inbound: 入向装配未完成（Unconfigured）：%v`）套 `panel_inbound.go:232`（`配置未就绪（%s）：%w`）套 `manager.go:102`→`loader.go:67`（`config.toml read`）——**这一因今天没有 Wisp 自己的中文句子**（那是票 198 首建腿的地盘）；**② 行不存在** → `settings.go:311-313` 或 `:303-305`，**英文**；**③ 校验不过** → `settings.go:231-232` 包着 `validate.go` 的英文句。
+
+### 3.5 那么回执要说什么才不说谎（给 257-r1 备料；⛔ 不新建第二台回执机器）
+
+**先点名已有那台**：三段式首启回执已在库里——`cmd/wisp/firstrun.go:92-95`（建件句）＋`:111-115`（key 句）＋`:116-118`（模型句），且**已点到真入口名**：`wisp secret set <blob 名>`、`--from-stdin`、`api_key_ref = "dpapi:<blob 名>"`、`env:<环境变量名>`、`[llm.providers.<名>]`、`text_chain`/`roles.chat`、`wisp providers discover`/`probe`。⇒ **本腿判读：257 的增量只应是这三段的措辞，不应出现第二个打印点。**
+
+它今天缺的、且 §3 已用现读证实的五件事（措辞要点，逐条指回上面）：
+
+1. **两条通道要分名，不能合成一句**（票 257 §8 边界①）。今天可证的分裂：手改 → `config_reload.go:171` 会说"已立即生效（D36 立即档）：[llm]"；面板写 → `config_handlers.go:435` 会说"要重启"。**两句都对，说的却不是同一样东西**：前者是那枚 tick 着的 Manager 的**内存**，后者是 `run.go:435-447` 那条**装配一次**的模型通路。
+2. **"面板写要重启"的理由要说到底是两重的**：除"模型通路不重建"外，还有 §3.2 那枚**不 tick 的 Manager**。常驻机上这两重都在；`wisp panel-inbound`（一次性进程）只有第一重。
+3. **反向的诚实也要给**：手改对**面板那一页的读数**同样不生效（§3.2/§2.1）。若回执只写"手改＝热加载认、面板写＝要重启"，仍是半谎——正确形状是"手改会被**运行中的 `wisp run`** 在 1 秒内读进它自己的内存；这一页上的读数不跟着它变；两处的通路都要重启才算用上"。现成邻居句可指：`config_reload.go:97-99`／`panel_resident_windows.go:162-165`。
+4. **`[llm]` 是 hot 段这条规格话今天仍在码里**（`schema.go:403-405` 注释逐字 "entirely hot-tier (api_key_ref changes trigger re-resolution of the reference, never a restart)"; `tiers.go:30` `"llm": "hot"`）——它与 `panel_config_store.go:25-32` 那段自陈（"every accepted write answers restart required, even though the spec's table calls [llm] hot"）**并存且已知不一致**；而 §1.3 的"`res` 恒为 nil"更进一步：**api_key_ref 的重新解引用今天在生产里根本不发生**（无 resolver）或**只在新建 Endpoint 时发生**（`resolver.go:141`）。回执不应引用那句注释。⚠ 这属"注释与规格文字"层面，改它需人工批准，本腿只具名不提议。
+5. **三因句子的语言不一致**：②③ 是英文（`settings.go:303-305`/`:311-313`/`:231-232`），①只有装配错的英文＋中文混合句（§3.4 末）；面板侧唯一成体系的中文拒句是名册/选择器那六道（`config_handlers.go:310-353`）。票 257 AC#2 要"三种拒因各配一句不同的话"——今天**只有第②与第③在结构上分得开**（门①/门② vs 门③），第①在面板链上是"根本没有这条腿"，与②③不在同一层。
 
 ## 4. 我可能写错的条目（自我对抗）
 

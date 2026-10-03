@@ -1,0 +1,21 @@
+probe(257-a2): 落 §3 两条通道的重读时机
+
+第三问交卷（回执备料，⛔ 不新建第二台回执机器）：
+- §3.1 全仓唯一一枚重读盘的 tick：config_reload.go:114-119（watchdog／1s，:88）→ :152-162 CheckAndReload
+  → manager.go:149-160（mtime+size 不变即返回 nil,nil）→ :169/:192-196；生产调用面只有 run.go:813。
+- §3.2 一台机器上三枚 Manager 装配点：run.go:409（tick）、panel_inbound.go:230（不 tick，
+  config_reload.go:97-99 自陈）、panel_resident_windows.go:170→同前（不 tick，:162-165 自陈）。
+  常驻进程同时有两枚 ⇒ 快照凭据维度走 tick 那枚（run.go:710）、config.get 读数走不 tick 那枚 ⇒ 两把尺可给互斥答案
+  （config_handlers.go:451 那句「服务商 0 家」）。
+- §3.3 写盘后事件＝逐枚否证：setter 不通知任何人（OnReload/OnRestartPending 只在 manager.go:198-203 被 tick 调）；
+  mergeWrite 成功且文件==内存时 statOwnWrite（writeguard.go:175→allowdirs.go:157-163）**主动**让自己永不 reload；
+  无跨 Manager 机制；装配期快照走掉的（run.go:423-424/435-447、C26 canonicalizer run.go:390）不可知；
+  页面只被不相关状态移动推（panel_pump.go:392-396 注释逐字，Publish 调用面 :405 一枚）。
+- §3.4 两条通道今天的原句逐字抄：热加载七分归因（describeReloadFailure :315-370）、
+  「这些段已立即生效（D36 立即档）」:171 vs 「这一项要重启…同一次运行里模型通路不会重建」config_handlers.go:435。
+- §3.5 回执五点：两点通道分名、面板写要重启的理由是两重的（通路＋不 tick 的 Manager）、
+  反向诚实（手改对面板读数同样不生效，只写"手改=不用重启"仍是半谎）、schema.go:403-405 那句 hot-tier 注释
+  与 panel_config_store.go:25-32 并存已知不一致（且 res 恒 nil ⇒ 重新解引用根本不发生）——具名不提议改、
+  三因句子的语言与层级今天不齐。
+
+零 go 命令；未碰 AC 框与票面；frontend/design 未读未引；凭据值零外泄。
