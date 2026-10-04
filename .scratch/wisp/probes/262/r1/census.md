@@ -507,13 +507,14 @@ $ wc -c scripts/check-path-length-budget.sh
 | 待+填 | 0 | 0 | — |
 | 待+补 | 0 | 0 | — |
 | place+holder | 0 | 0 | — |
-| CALL+‑SITE | **2** | **2** | 两枚都**不是占位符**：见下一段那对历史工单名 |
+| CALL+‑SITE（连写那枚） | **2** | **1** | **都不是占位符**：见下一段 |
 
-⇒ 那 2 枚（连写的 CALL‑SITE）命中**都不是占位符**：`grep -c` 数的是**行**不是出现次数，
-本件这 2 行＝§3.3"旧名可追"那对历史工单名在本节被引用的两行（本件 `:490-491`：
-`…-production-call-sites-and-taskroster-…` 与它的现名 `…-no-spawner-zero-production-call-sites.md`），
-脚本那 2 行＝同一对在 `scripts/check-path-length-budget.sh:200-201`。
-逐字复核：`grep -n -i 'call.site' scripts/check-path-length-budget.sh` → 命中 5 行，
+⇒ 脚本那 2 行＝§3.3"旧名可追"里那对历史工单名（`scripts/check-path-length-budget.sh:200-201`：
+曾名 `…-production-call-sites-and-taskroster-…` 与现名 `…-no-spawner-zero-production-call-sites.md`）。
+⇒ 本件那 1 行＝本节引用现名那一串的自己。⚠ **这一列的读数在 2 与 1 之间动过一次**——本腿把它记下来而不是抹掉：
+它和上面"初版得 3、二版得 1＋1＋1"是同一件事的第三种形态（**尺一旦能匹配到自己，读数就不是树上的读数**），
+也正因为这样，本件只对**脚本**那一列下"零占位符"的判，本件自己这一列的判语是"每一枚命中都是被引用的历史路径名，
+无一枚是空缺的读数项"。逐字复核：`grep -n -i 'call.site' scripts/check-path-length-budget.sh` → 5 行，
 其中 3 行是散文里的 "call site(s)"（空格形，不计入上表），2 行是那对历史路径。
 ⇒ **判：脚本与本件都不含占位符，也不含未填的表行**（表里那些 0 是读数，不是缺项）。
 ⚠ `grep -c` 零命中返回 rc=1，所以这一格的"没命中"＝好消息那一侧，别当失败读。
