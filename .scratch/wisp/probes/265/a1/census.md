@@ -198,8 +198,43 @@
 
 ## 6. 判不动／量不到（具名＋归口）
 
-（本节答：本腿受"禁跑 go"约束量不到的读数，逐枚具名：需要什么尺、谁能跑、归哪一票；
- ⛔ 不许用"读起来成立"冒充实测，也不许用"应该没问题"填空。）
+### 6.1 本腿**没跑**的尺，逐枚具名（每枚都写了"为什么跑不了＋谁能跑＋跑了会读到什么"）
+
+⛔ 下面每一枚都是**该票判据要用、而本腿只能给读码预测**的。凡在本件其它节里被引用为结论的，都已就地标〔仅读码，未跑〕。
+
+| # | 没跑的尺（原样命令） | 为什么本腿跑不了 | 归口／跑了会读到什么 |
+|---|---|---|---|
+| U1 | `go build ./...` | §1 禁令（禁任何 go 命令）；`260-v1` 独占取数期 | 门禁读数由编排者事后补（票 265 AC#4）。本腿只保证**没让盘多脏一枚**（见 §6.3） |
+| U2 | `go vet ./cmd/wisp/ ./internal/agent/approval/` | 同 U1 | AC#4 四门之一 |
+| U3 | `go test -count=1 ./cmd/wisp/ ./internal/agent/approval/ ./internal/tools/ ./internal/session/` | 同 U1，且**这正是会洗掉 `260-v1` 读数的动作** | **本件 §4 全部"会不会红"的判语，今天只有读码凭据**。尤其 N#3（256 的 AST 钉）与 N#9（255 的行号钉）在 ⓐ 下**本腿断言必红但没跑** |
+| U4 | `go test -count=1 -run 'TestTicket224' ./cmd/wisp/ ./internal/agent/approval/`（两枚极性相反钉的基线） | 同 U1 | 编排者若要核"两枚今天各自绿在哪一支"，只有这一发能答；本腿 §1.3／§4 的极性是**读断言源码**读出来的 |
+| U5 | 定向正控（票 265 AC#3 那一发）：ⓐ 形＝摘掉那处接线必须让指名用例红 | 需要产码＋测试同时存在，本腿不写产码不写测试 | 归 ⓐ 的落地腿；⚠ 本件已具名"今天常驻腿那一格**零枚用例守**"（§5.2），所以**这一发今天无处可摘**——先要有钉 |
+| U6 | `sh scripts/d22scan.sh`（卫生门） | 该脚本第一步就编 `tools/d22scan` ⇒ 属禁跑的 go 命令族 | AC#4。⚠ 票 265 AC#4 自己写了"那两枚『CI 红／本机绿』属票 212 射程，看到具名上报"——本腿**连看都没看到**（没跑），故 §5.4 报的是"量不到"而不是"没发现" |
+| U7 | `powershell scripts/slo-check.ps1` | §1 明令禁跑 | AC#4 无关本票，但票面排程写了；未跑 |
+| U8 | `gofumpt -l cmd internal` ＋ 票 212 ban #9 的实跑 | 前者要 go tool；后者是 d22scan 的一条 ban ⇒ 同 U6 | AC#4。**注意**：ban #9（phantom-citation）对本票特别相关——§1.4① 那句假话正是"引用了一条不存在的打印"，而 `resident_windows.go` **存在**，所以 ban #9 结构上抓不到它（它只判路径存在性，不判句子真伪）。见 §5.4 |
+| U9 | 真跑一发常驻进程（`wisp.exe` 无参，带控制台／不带控制台两形），看 GRANT-DROPPED 到底出现在哪几路 | 需要 build ＋ 起进程 | **这是 §2.4／§2.5 那两条"看得见／看不见"判语唯一能证伪的尺**。归 ⓐ／ⓑ 落地腿的凭据档；本腿全部标〔仅读码，未跑〕 |
+| U10 | 突变：删掉 `gate.go:673-677` 那一支 ⇒ 哪一枚用例红 | 需要 go test | 用来验"第一形有没有牙"。本腿只报 §5.2 的**尺在场／缺席**读数 |
+| U11 | 突变：把 `resident_approval_windows.go:219` 那枚字面量加上 `Grants:` ⇒ N#3 红、别的钉动不动 | 需要 go test | **这是 ⓐ 的作用面读数**，本件 §3.1 的"必须先解冻／会撞的钉"全是读码预演，⛔ 不许被读成实测 |
+| U12 | 突变：删掉 `approval_reply.go:279-281` 那句成功回执 ⇒ 有没有一枚尺红 | 需要 go test | 本腿读码判**零枚**（§2.5／§5.2）。这一发是 ⓑ 的正控原型（票 265 AC#3 ⓑ 支要求的正是这个形状） |
+
+### 6.2 判不动的地方（⛔ 不用"应该没问题"填空）
+
+| # | 判不动的那一格 | 本腿读到哪一步就停了 | 归口 |
+|---|---|---|---|
+| I1 | **"双击 GUI 那一支今天到底有没有任何一张卡片"** | 读满的部分：`resident_task_source_windows.go:218→:224-230` 无控制台即 `return nil`（管线不装配）；`AskOnTaskRoot`／`askConfirmation` 产码调用者 **0 枚**（尺 R38）；面板那侧 `Message: nil`（`panel_inbound.go:277`）＋ `panel.approval.request` **在 Go 的受理表里不存在**（`internal/panel/bridge.go:146-152 knownComposerMethod` 六枚：mode/workspace/attachment/message/config.get/config.set）。⛔ 判不动的部分：**我没有把整棵 `cmd`＋`internal` 的每一枚 `PendingApproval`／`PendingWindow` 产码调用者穷举**，所以"这一支今天一张卡都举不出"这句**全称负向我不写**，只写"本腿穷举到的三条入口都不通" | ⓐ／ⓑ 定形前必须补 U9（真跑一发无控制台的常驻进程）；归口票 265 AC#1 |
+| I2 | **⭐ ⓑ 那枚"已按『本会话内允许』答复…不再重复提问"要不要按支拆句** | 本腿量到了形状（§2.5），**判不了形**：拆句要 `replySurface` 知道"我这枚 gate 有没有记账位"，而 `approval.Gate` **今天没有任何一枚导出方法把 `g.grants` 报出去**（导出名册尺 R43：`Queue`/`Channels`/`Window`/`AdmitTextTask`/`PendingWindow`/`Complete`/`Veto`/`LateVeto`/`PendingApproval`/`Native`/`Panel`/`DecideFromNative`/`DecideFromPanel`/`Replay`/`Bus`/`Report`/`ToolsCancelBus`/`LiveL1Windows`——**没有 `HasGrantWriter` 之类**）。⇒ ⓑ 的最小写面里**藏着一枚新接缝（新增导出读面）**，而那要撞 `gate.go:86-88` 那句"No method on Gate reads it back"——这枚边界是不是 D45 的契约面，**归人工批准**（`SPEC-12 §4.1`），不是腿能定的 | 编排者裁；裁之前 ⓑ 的"最小写面"只能写"待定" |
+| I3 | **ⓐ 走 (a) 第二枚 mint 会不会破 A435 第 1 条** | `run.go:459-467` 注释逐字 "One mint per process, from crypto/rand, and nothing derived: A435 clause 1 forbids recomputing it…"。**这句是注释还是契约条文，本腿判不了**：`PLAN.md:1642` 我读了射程（ledger A591 引它"A435 第 1 条"），但 **A435 原文里"一枚 mint"是硬约束还是描述**——本件不裁 | ⛔ 不许任何腿据此选 (a)。要选 ⓐ 先由编排者把 A435 原文那一格贴出来 |
+| I4 | **常驻腿上"会话"这个词对用户的含义** | 票面禁口令「224 会话时长改跨重启」＝"本次会话内＝一次进程存活期"是既有裁定。本腿读到：**常驻进程"一次进程存活期"对用户来说＝"开机到关机"**（`resident_windows.go` 无重启路径），而 `run` 腿的＝"一次命令"。**同两个汉字，两种长度**。判不动：这是不是要算 D45 的语义漂移，属产品裁量 | 摆给编排者＋机主，⛔ 本腿不改票面那句 |
+| I5 | **N#3 那枚 AST 钉翻了以后算"修 bug"还是"改契约"** | 本腿能说的是：它的错误文本**自己写了**"the half was filed as pending ticket 265"（`resident_approval_risk_256_windows_test.go:453-455`），**即它是票 256 主动留在盘上、让票 265 去翻的**。但"票 256 的 AC#1 期望集是 5 枚字段"这件事被写成了钉死形态 ⇒ **翻它需要编排者落一枚具名 `A##`**，⛔ 腿不许自己判成"修 bug" | 归编排者；本件 §4 N#3 已给结论 |
+| I6 | **`GRANT-DROPPED` 该不该由"日志行"升级成"界面事件"** | 这是 ⓐ／ⓑ 之外的第四形（把 drop 做成 D43 状态或面板一行）。本腿能判的是：`bookWaitingState`（`approval_always.go:158-180`）已经给了"名字从冻结表里出来"的先例，而 D43 转移表＝C12 冻结件 ⇒ **任何新状态名一律是人工批准面** | ⛔ 本腿不列进三形表（票面只给三形），只在此登记 |
+| I7 | **本腿能不能证实 `run.go:597` 那句"prints"是"从来没印过"还是"曾经印过后来丢了"** | `git log -S`／`-G` 三发都跑了：`-S"prints the same limit"` 只命中**票 265 立票那一发**（`35e852f9`，因为票面正文含这句），`-G"prints the same limit" -- cmd/wisp/run.go` **0 命中**，`-S"会话" -- cmd/wisp/resident_windows.go` **0 命中**。⇒ 读起来支持"从未印过"，但 `-G` 在重命名／折叠行上是**出了名的钝尺**，⛔ 我不把"从来是假话"写成判死 | 若 ⓑ 定形需要归因（是谁写的假话），需要一发 `git log -L` 型尺，归编排者或产码腿 |
+
+### 6.3 本腿对盘的污染面（自证）
+
+- `git status --porcelain -- cmd internal` 交件时刻＝**仍只有 `M cmd/wisp/resident_approval_windows.go`** 一枚（`260-v1` 的突变体，⛔ 不是本腿写的，本腿没动它）。
+- 本腿写面＝`.scratch/wisp/probes/265/a1/**` 一枚文件（本件）。临时件全在 `/tmp`（`gate_head.go`／`raw_head.go`／`run_head.go`／`rw_head.go`／`rts_head.go`／`ar_head.go`／`t256.go`／`t260r3.go`），**都在仓外**；仓内临时件只建不删这条对本腿不适用（本腿没在仓内建临时件）。
+- `sh scripts/check-path-length-budget.sh --with-self-test` 本腿**跑过一发**（纯 shell，不碰 Go，§1.2 那把尺的分母要引用它）：VERDICT GREEN；`tracked paths=5536／over-budget=57／roster entries=57／not in roster=0`；三发正控全 ok（正控台件 `bench=/tmp/tmp.nG43jn8EhK`，脚本逐字写着"kept on disk; this project never deletes temp artifacts"⇒ 该台件在 `/tmp` 下，不在仓内）。
+- ⚠ 本件的**路径长度**自量：`.scratch/wisp/probes/265/a1/census.md` ＝ 37 字符，远低于 issues 目录那枚 100／121 的帽子（帽子读数见上一行 `hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121`）。
 
 ## 7. 本腿自己写错的尺与读数（全数留下，不当笔误藏）
 
