@@ -55,3 +55,27 @@
 
 **6. AC#2 判据字面有洞（我票面自己写的"必须不再出现"，就地定形，原句不改）**：普查件 §3④★★ 量到 `GRANT-DROPPED` 有**两形**——第一形 `gate.go:667-670`（`g.grants == nil`，且发生在放行**成功之后**），第二形 `gate.go:673-675`（"卡片主题在答复前已离开队列"，**与 `Grants` 无关、挪门挪不掉它**）；而既有仪器 `internal/agent/approval/ticket224_reply_grant_test.go:283` 只查前缀 `approval: GRANT-DROPPED`、对两形**不加区分**。⇒ AC#2 真到那天定形＝**只禁第一形**，第二形必须仍能出现；⛔ 不许为了"前缀零命中"去动第二形那句。
 **另记一枚无钉的格（§3⑤）**：常驻腿"会话档不落盘"这一格今天**零用例守**（`GRANT-DROPPED` 的三枚命中里没有一枚在常驻腿：`cmd/wisp/ticket224_assembly_test.go:194` 是反向钉、`ticket224_reply_grant_test.go:128`／`:283` 是包内仪器），只被两处注释与三处文档记着 ⇒ 这一格归本票 AC#2 那天的凭据，⛔ 现在不派腿。
+
+---
+
+## 8. 收只读腿 `256-a2` ⇒ ★**AC#1 那一句被量成两半，命运不同**＋排程裁定（编排者，账 `A591`，2026-10-04 09:5x，现量 HEAD 见 `A591` §0）
+
+**件**＝`.scratch/wisp/probes/256/a2/census.md`（**由编排者代落**——该腿的运行类型没有写文件工具⇒零 commit，同小时内第二次，定式收紧记在 `A591` §1；本票原话一字未改）。
+
+**1. ★ 判死（这是本票今天最值钱的一格，直接改本票的排程）**：票面 **AC#1 那句"补 `Grants` ＋ 来自 `[risk]` 的两项"是两半，不能当一个整体派**。
+- **`[risk]` 两枚字段（`Window`/`ApprovalTimeout`）＝与 ⓑ"不移动"同件事的两半，可派**：值来自 `config.toml`，`config.LoadFile` 返回纯数据，构造时刻常驻腿拿得到（`cmd/wisp/resident_windows.go:177`/`:200` 已有两处 per-use 先例，且 `rt.Layout.DataDir` 在门构造点 `:126` 之前已可用）。
+- **`Grants` 那一枚＝互斥的一半，今天不可派**：账本的唯一产码构造点在 `cmd/wisp/run.go:473`（Mint）→ `:478`（NewLedger）→ `:487`，**在门构造点之后约 129 行、且被 `resident_task_source_windows.go:230` 的条件提前 return 罩着**；`g.grants` 全仓只有 `gate.go:160` 一枚写点、**无任何晚绑定入口**（`SetGrants|AttachGrants|WithGrants` 三词 0 命中〔编排者复跑〕）。⇒ 要让它"原地补上"，只有 **新铸第二枚 ledger**（撞 `run.go:459-466` 那句 "One mint per process"）或 **新造一枚 holder 类型**两条路——**两条都是新增接缝，不是"补字段"**。⇒ **`Grants` 这一半就地归口成独立票（见第 5 条），⛔ 不许混进 `256-r1`。**
+
+**2. 我裁的落地形状（`256-r1`，形ⓐ：签名不加参，避免 13 枚既有钉搬家）**：普查件 §7 给了枚数与雷区——**给 `newResidentApproval()` 加参数＝13 枚测试调用点编译红**（`resident_approval_246_windows_test.go` 7 枚／`resident_task_source_windows_246` 3 枚／`resident_approval_live_246` 3 枚 winlive 档；枚数编排者复跑＝13）。⇒ **裁定＝不动那枚签名**：新增 `newResidentApprovalWithConfig(dataDir string)`，旧签名保留并委托给它、传"没有宿主配置视图"那形（**照票 258 已落地的 provenance 形状：无 host 视图 ⇒ 常量兜底＋那句说出来，`cmd/wisp/resident_ball_windows.go:190-202` 是同形先例**），产码唯一调用点 `resident_windows.go:126` 改成带 `rt.Layout.DataDir` 的那枚。
+  - **⚠ 这句是我的判断层，不是读数**：若落地腿发现"不加参就走不通"（例如 dataDir 在 `:126` 那处拿不到），**停下来上报**，⛔ 不许自行改 13 枚钉、⛔ 不许为变绿放宽任何断言（票面禁区逐字）。
+- **另两条硬边界**：① **⛔ 本轮不许碰 `cmd/wisp/run.go`**——普查件 §4.2 的 **P7** 量到：任何让 `run.go` 第 424 行以后整体位移的改动（**含给 `runSpec` 加字段**）＝`TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`（`cmd/wisp/config_receipt_255_test.go:179`）四处 evidence drift **必红**，而那枚名册归票 255／248 AC#8，不在本票写面；② 起手与收尾各跑一发定向尺 `go test -count=1 -run 'TestTicket255Roster' cmd/wisp`，把两发读数逐字抄进证据件。
+
+**3. AC#2 的正控该长什么样（普查件 §5，我认下并定形）**：**唯一有效正控＝`ra.gate.Queue().Timeout()`**（`gate.go:169`＋`queue.go:126`，同形先例 `ticket84_no_owner_test.go:108`/`queue_test.go:48`）；`Window()` 被 `gate.go:149-151`＋`queue.go:122`（`MaxL1Window=3s`）钳死 ⇒ **拿它当正控会读出恒绿假象，只能当"钳位仍在"的反控**。禁现那格**钉 `gate.go:675` 那句独有词组「本机没有接入会话授权记账」，⛔ 不许钉前缀 `approval: GRANT-DROPPED`**（前缀两形同吃＝票面 §7-6 已定的洞；`ticket224_reply_grant_test.go:283` 用的正是前缀，**不可复用、也不许为让前缀零命中去改它**）。⚠ 还有一条形状级事实要写进判据：**接了之后也不会随改而动**（`g.window`/`q.timeout` 都是构造期定值，全仓无 re-apply 路径）⇒ AC#2 只能钉"带着种子值启动这一发"，**不许写成"改配置活进程立刻跟着变"**。
+
+**4. ★ 记我（口径错，票面原话不改）**：票面 §7-4③ 那句"`statemachine.New` 全仓产码只一枚调用者 `cmd/wisp/models.go:303`"**字面不成立**——第二枚产码调用者＝**`cmd/balldebug/main.go:188`**（`//go:build windows` 调试台件）。**被引范围（`cmd/wisp`）与实质读数（表那一半没有可破的东西）仍成立，"全仓"二字是我当时写窄了**；这条与 `A589`/`A590` 那两处不同，属**同一形第 N 次**：短引没带范围限定词。⇒ **定式：写"全仓只一枚"这类全称负向句时，句内就带射程（`cmd/wisp` 还是 全仓产码），不许留给读者猜。**
+
+**5. `Grants` 那一半的归口＝待立票（本轮只登记，不派）**：要"常驻腿里『本会话内允许』真落一行"，缺的是**一枚接缝**而不是勇气。两形代价已由普查件 §0 量到边界：**(a) 第二枚 mint**（撞 `run.go:459-466` 注释那句 "One mint per process"，并造成 gate 写 id-A／bridge 读 id-B 的错配）；**(b) 晚绑定 holder 新类型**（仓里今天没有这种形状；⚠ 还要回答"注入时刻 gate 已答复过卡片怎么办"）。⇒ 下一枚票（暂名 **票 265**）的 AC#0＝**把这两形的代价与线程/时序约束量齐再裁**，⛔ 在此之前任何腿不许"顺手把 grants 接上"。另：票 244 那条"面板不许给 Allow"的修法禁区对本票同样成立（`AllowSession` 只在 `NativeAPI` 上，`approval/ui.go:147`/`:158`）。
+
+**6. ⓑ 那句话的归口现状（普查件 §7 末条，我复跑前属〔仅自述〕）**：`grep -rn "只作用于跑任务的进程|常驻腿今天用常量"` 在 `cmd internal tools frontend` ＝ **0 命中** ⇒ 母票 248 AC#10 定的 ⓑ **今天还没落到任何产码**，且票 255 的登记表 `hotRowClaims` 里**没有 `risk` 这一行** ⇒ "由登记表同源产出"这句话**那张表今天没有格子**。⇒ 归 `255-r2` 那一格（同族措辞）＋票 265 一并考虑，⛔ 本票不代它落。
+
+**7. 排程**：`256-r1` **可派**（第 2 条那形，写面＝`cmd/wisp/resident_approval_windows.go` ＋ `cmd/wisp/resident_windows.go:126` 一处 ＋ 新增判据），**但此刻不派**——写码位已 3 枚（`262-r1`／`260-r1`／验收突变腿 `212-v2`），按"写码 3 枚（极限 4）"排队补位；派之前先跑包级互斥尺（`cmd/wisp` 此刻有没有别家在写）。撤销口令沿用「**258 撤**」同族的「**256 撤**」；形ⓐ 的撤销口令＝「**256 改加参**」（那形会惊动 13 枚钉）。
