@@ -1,0 +1,8 @@
+174-r4 判据（AC#3 ii · spill 腿）：问 InAllowlist 的必须是 Canonicalize 的答复
+
+同一条禁区在另一条腿上今天零凭据：174-r2 的 fake174Judge.InAllowlist 是
+return f.inRoot（不看入参），八枚判据对"问错了对象"全盲。新尺改用按入参答复的
+judge：向一＝规范形在内／登记形在外 ⇒ 必须安静且记录到的问对象＝规范形；
+反形＝两枚答复对调 ⇒ 必须说话并给两条回来的路。
+MUT-174R4-S1（canon→path）现量：恰 1 枚红＝本枚，174-r2 名下八枚全绿（PASS=81 FAIL=1 SKIP=0）。
+174-r2 的判据文件一字未动（那八枚待非实现者翻勾）。

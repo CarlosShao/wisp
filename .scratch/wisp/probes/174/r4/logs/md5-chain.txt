@@ -1,0 +1,7 @@
+4138177e29ffff427776a73eb0d61a9b *.scratch/wisp/probes/174/r4/pristine-task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+4138177e29ffff427776a73eb0d61a9b *.scratch/wisp/probes/174/r4/pristine-task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+f31147b4264a9c7111479d5b85e30f65 *.scratch/wisp/probes/174/r4/pristine-spill.go
+f31147b4264a9c7111479d5b85e30f65 *internal/agent/spill.go

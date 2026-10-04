@@ -136,7 +136,7 @@ task_pointer_authority_ac3_174r4_windows_test.go:135: a pointer C26 authorizes m
 
 ### §9 那枚（spill 腿）的突变
 
-未判——见 §9（本节末追加，读数先落 §9 再引）。
+已落：MUT-174R4-S1 的落地证明、`PASS=81 FAIL=1 SKIP=0` 与三条红句逐字、还原 md5 三点链，全在 **§9**（写满之后才在本节引用它，不是回头补空表）。⚠ 本节初稿在这里留的是"未判"占位，本程在同一枚提交里把它换成指回 §9 的一行——占位从未随任何一表格交付。
 
 ## 6. 门禁读数（带时刻） —— 本节打算答：`d22scan` / `check-path-length-budget` / `gofumpt -l` / `go vet` / 定向 `go test -count=1 -v` 的现跑值与红名集合逐名比对（哪几枚是既有红、不归我）
 
@@ -154,12 +154,54 @@ task_pointer_authority_ac3_174r4_windows_test.go:135: a pointer C26 authorizes m
 
 ## 7. 我攻不动／判不动的地方（具名＋归口） —— 本节打算答：本程量不到、写不得、须他人拍板的每一格，各自归谁
 
-未判。
+| # | 具名 | 为什么动不了／量不到（现量凭据） | 归口 |
+|---|---|---|---|
+| 1 | **AC#3(iii)**（`[fs] allowed_dirs` 默认值与 `SPEC-03:35` 一字节不改） | 默认值真身在 `internal/config/**`，本程现量那包**正在别人手上写**：`git status --porcelain -- internal/config`＝` M loader.go`、` M settings.go`、`?? settings_257_test.go`（`257-r1` 在飞）；且本票写面明令"不碰 `[fs]` 的默认值那一类配置面"。⇒ 我**没有为它写任何判据**，只能自证我没动：`SPEC-03:35` 逐字（只读）＝`\| 🔒 \`[fs]\` \| \`allowed_dirs[]=[]\` \`reparse_point_exceptions[]=[]\`（按具体路径）\`delete_enabled(bool)=false\` \| 🔒 同上 \|` | 编排者：要么派一枚只读普查腿做"默认值名册"，要么并入 `257-r1` 交件后的对数（那时那包不再抖） |
+| 2 | **AC#2b 的端到端三臂**（接上前只能说"未接线"／接上后给精确文案／安静正例仍然安静） | 接线那一行在 `cmd/wisp/run.go:365`——不在我写面，`265-r1` 正在写该包（` M cmd/wisp/resident_approval_windows.go` 等 3 枚＋1 枚未跟踪）。⛔ 按派单我**没跑** `./cmd/wisp/`，也没在那包上取任何数。⇒ 我交的四枚判据**全是接缝级**；"真机上就是这样"这句话今天**仍不成立**（本机 exe 起不动是 174-c1 的读数〔来路，本程未复算〕） | 票 174 **AC#2b**（等 `cmd/wisp` 空出，且换一台不缺 DLL 的宿主） |
+| 3 | **`task.go` 那两句精确文案的两条回路**（AC#2b 的文案半格） | 受同文件 `:299`／`:349` 两枚模板冻结钉系着、措辞挂在 `PLAN.md:2564` ⇒ 契约轴（`Q-63` 边界，须 owner 裁）。⚠ 本程**新增一条同族失真**并具名：工作区收窄那一形（§5 MUT-A2 的输入形）下，tools 腿的回执说"要用户先把所属目录加进 `[fs] allowed_dirs`"，而那枚目录**本来就在根里**——真正收窄它的是票 92 AC#3 的工作区面。我**没有**把这一形写成"接受今天的样子"的断言（那等于把失真写成规矩），只在判据里断"说了没有＋与 `fs.read` 的 `L2` 对齐" | `AC#2b`／`Q-63`（建议进下一批 owner 大白话清单） |
+| 4 | **junction／reparse 那一形在本格四枚判据里未覆盖** | 该形今天走的是 `Canonicalize` 返错那一支（`task.go:836`），`174-r3` 名下已有两枚判据钉它（票面 AC#2d 已翻勾）。我没有重跑 junction，也没有把它并进我的授权臂——两枚管的不是同一件事 | 无缺口；具名为"本程未覆盖，凭据在 `task_output_pointer_notice_test.go` 的两枚 `*174r3`" |
+| 5 | **`InAllowlist` 的第二重包含（`resolvedForm`）与 pointerNotice 的交互** | 要造这一形就得用 link／junction，落点与 #4 同源且属票 252 那根管子（`paths_twocontainments_252_r2_*`），本程刻意不扩面 | 票 252／`174-a4` 那根错误文本链（票 264 名下） |
+| 6 | **名册只增不减的 `comm` 双向尺** | 我交的是"顶层 PASS 275→276、FAIL=0、SKIP=0"（§6），**没有**跑 174-r1／r3 那种前后名册 `comm` diff ⇒ 我不能声称"名册只增不减"，只能说"没有一枚既有用例被我改动或删除"（凭据＝`git show --numstat` 里我名下所有产码面删除列为 0，§4） | 非实现者验收腿（`174-v2` 之类） |
+| 7 | **`internal/panel`／`internal/ball` 的既有常红** | 本程按定向口径只跑 `./internal/tools/ ./internal/agent/`，那两包**未跑**，所以既不在我的红名集合里也不由我判；派单写死那是 design 资产删除的既有红 | 不归我，⛔ 未"顺手修" |
+| 8 | **`scripts/d22scan.sh` rc=1** | 唯一 finding 是 `cmd/wisp/resident_approval_windows.go:38 [phantom-citation]`；两侧现量：工作树 `grep -c panel_pump`＝**1**、`git cat-file blob HEAD:…`＝**0**、该文件 ` M` ⇒ 属 `265-r1` 的在飞窗口，不是我这发的产物 | 归 `265` 那根腿；本程未动它一字 |
 
 ## 8. 结题账：本格对票面各 AC 的推进位（含与 `Q-59` 的分开结线） —— 本节打算答：我这枚做完之后 AC#3 三半各是什么状态、`Q-59` 与本票为何不是一处断口
 
-未判。
+**AC#3 三半的状态（本程交完之后）**：
+
+- **(i) 逐字禁止项**（"把宿主内部 artifacts 写入实现成受门控的 Tool"）：判定腿的**只读性**从今天"散文注释＋验收腿读码"变成**有判据**（`TestPointerCheckWritesNothing174r4`，牙证＝§5 MUT-B 三条红句，含目录条目集与 `Lstat` 两条 FS 事实）。名册那一面已有 `D34` 钉（六枚文件，§1 尺），我未重钉。
+- **(ii) 判定必须走 C26**：**两条腿都有牙了**——tools 腿 `TestPointerAuthorityFollowsC26NotTheSpelling174r4`＋`TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4`（短名＝过报方向、收窄＝欠报方向，各带反形），spill 腿 `TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4`（问对象＝`Canonicalize` 的答复）。并且**具名量到了静态扫的盲区**：MUT-A2 那发（手搓 `HasPrefix` 包含判定）在盘上时 `internal/tools/` 零 finding ⇒ **d22scan 不能当 AC#3(ii) 的凭据**，这一句本程有读数，不是推断。
+- **(iii) 默认值一字节不改**：本程**零字节**（写面自证在 §4），但**仍无判据** ⇒ 这一半我判不动，见 §7#1。⇒ 所以**我不声称 AC#3 结题**，只声称"三半里的两半从今天没有凭据变成有凭据"。
+
+**其余四枚未勾框**：本程一字未推进（AC#2b 双堵见 §7#2/#3；AC#2c 已由 `174-r2` 落地**待非实现者翻勾**，我只在它旁边加了判据、未动它八枚中任何一枚；AC#4 契约轴未批；AC#5 归翻勾那枚程，本节即其读数）。**票面框尺复量（18:16:42+0800）**：`grep -c "^- \[ \]"`＝**5**、`grep -c "^- \[x\]"`＝**3**＝与起手逐字相同 ⇒ AC 框我一枚没碰。
+
+**与 `Q-59` 的分开结线（AC#5 只要这一句，我按它的要求逐条答）**：
+
+- `Q-59` 问的是**偏移参数**：读回一次能拿到"头一段"，拿不到后半截，要不要给 `fs.read` 加分页参数。
+- 本票（174）问的是**授权根可达性**：那条路径今天**在不在**模型能走通的范围内。
+- 本程四枚判据**没有一枚触及偏移参数**；相反，两枚 `fs.read` 全文断言（§3/§5：短名臂与收窄臂反形下都是 `isError=false level=L0` 且 `Text` 逐字节等于 20000 字节的原文）证明**今天能整发读回、不是被分页截断**——也就是说，`Q-59` 那枚断口在本格**一根字节都没被动过**，也**没被本格"顺带解决"**。
+- 反向也不成立：本票这格修得再干净，`fs.read` 仍然没有分页参数，超长副本"读得到头、读不到尾"那一形照旧。⇒ **同一根管子的两处，修一处不通另一处**（票面 AC#5 原话，本程给的是支持它的读数）。
+- `Q-59` 状态：〔仅登记，本程未复算〕票面 §关联与 `A375` 一带写它已由 owner 批过**乙**支、落地归独立格；本程对 `Q-59` **零产码零判据**，不替它作结。
 
 ## 9. spill 腿（`internal/agent`）—— 本节打算答：同一条禁区在另一条腿上有没有牙
 
-未判。
+**为什么还要这一枚**：AC#3 的原文是"**任何修法**都要自证"，而 AC#2 的原文并列点名 `task.output` **与** `spill.go` 的桩。本程现读 174-r2 那八枚的判据底座：`internal/agent/spill_pointer_honesty_174_test.go:79-82` 的 `func (f *fake174Judge) InAllowlist(canonical string) bool { return f.inRoot }`——**入参根本不看**。⇒ "问错了对象"那一形在那八枚上是**不可见**的。
+
+**落点**＝`internal/agent/spill_pointer_authority_ac3_174r4_test.go`（124 行，新增，⛔ 未动 174-r2 的任何一枚、未动 `spill.go` 一字）。它换上一枚**按入参答复**的 judge：
+
+- **向一**：规范形＝在内、登记形＝在外 ⇒ 回执必须**零 `注意：`**，并记录到 `InAllowlist` 收到的那枚串**逐字等于 `Canonicalize` 的返回**（＝第二枚独立观察，安静不是买来的）。
+- **反形**：两枚答复对调（规范形＝在外、登记形＝在内）⇒ 必须说话，且必须**同时给两条回来的路**（`allowed_dirs` 与 `L2 卡`，这一句是 174-r2 已有的文案，我在此臂把它钉在自己的形状上）。
+
+**未加判据时的现跑**（18:02:31+0800，`gofumpt -l` 空、`go vet ./internal/agent/` rc=0、`go test -count=1 -run 174r4 ./internal/agent/`＝`ok 0.045s`）⇒ 现场行为已经是对的，缺的是尺。
+
+**MUT-174R4-S1 牙证**（18:12:02+0800）：种下 `spill.go:232 if !s.judge.InAllowlist(path) { // MUT-174R4-S1`（＋`:228 _ = canon` 落地标记）。整包 `-v` 现量：**`PASS=81 FAIL=1 SKIP=0`**，红名**恰一枚**＝`TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4`；174-r2 名下八枚**全绿**＝那句"对这件事不敏感"的定量版。红句逐字（三条，`logs/mutS1.txt`）：
+
+```
+spill_pointer_authority_ac3_174r4_test.go:89: C26 answers INSIDE for the string it returned, so a pointer to it must stay quiet; got a notice in "[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token；注意：这条路径现在读不到，它不在你被授权的目录范围内：fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡，全文见 …\tool-output-call_honesty.txt…]" - the authorization question was not asked with C26's answer (asked with: [C:\Users\swq\AppData\Local\Temp\…\001\tool-output-call_honesty.txt], canonical: "C:\mock\filed\tool-output-174-r4.txt")
+spill_pointer_authority_ac3_174r4_test.go:98: InAllowlist must be asked with Canonicalize's answer, not with the filed string: got [C:\Users\swq\AppData\Local\Temp\…\001\tool-output-call_honesty.txt], want [C:\mock\filed\tool-output-174-r4.txt]
+spill_pointer_authority_ac3_174r4_test.go:122: the reverse arm must ask with the same string the forward arm did: got [C:\Users\swq\AppData\Local\Temp\…\002\tool-output-call_honesty.txt]
+```
+
+**还原**：`git cat-file blob HEAD:internal/agent/spill.go > internal/agent/spill.go` ⇒ `f31147b4264a9c7111479d5b85e30f65`，与起手抽的 `pristine-spill.go` 逐字节同值（三点链全等，`logs/md5-chain.txt`），`git status --porcelain -- internal/agent/` 之后只剩我自己的新判据文件（随后 `2549a18a` 提交）。⚠ 一枚巧合如实记下：编排者 `A571` §1 给 174-r2 的还原值也是 `f31147b4…`——那是**同一枚 HEAD blob 的自然结果**，不是我复用它的读数。
+
+**终态门禁复量（两枚判据都在树、产码已还原，18:16:42／18:17:07+0800）**：`gofumpt -l` 两枚＝空；`go vet ./internal/tools/ ./internal/agent/` rc=0；`go test -count=1 -v` 定向两包 **rc=0、`ok 13.334s`／`ok 1.786s`、顶层 PASS=276 FAIL=0 SKIP=0**（275→276＝新增的那一枚，无既有用例消失）；`check-path-length-budget.sh --with-self-test` **rc=0**，逐字 `tracked paths=5654  over-budget=57  covered by roster=57  not in roster=0`、`VERDICT GREEN`（分母从 5634 涨到 5654＝别家腿在提交，与我无关，我的两枚文件名都在预算内）；`scripts/d22scan.sh` **rc=1**，finding 仍只有 §7#8 那一条（`265-r1` 在飞的工作树），`internal/tools` 段 examined 23 枚零 finding。

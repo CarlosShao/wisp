@@ -1,0 +1,15 @@
+time=2026-10-04T17:21:20.599+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointerToMissingCopyFileSpeaks
+    task_output_pointer_notice_test.go:162: shape (b) missing file verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerToMissingCopyFileSpeaks1746073041\\001\\tool-output-does-not-exist.txt…]"
+    task_output_pointer_notice_test.go:165: a pointer at a missing copy file must say so, got "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerToMissingCopyFileSpeaks1746073041\\001\\tool-output-does-not-exist.txt…]"
+--- FAIL: TestPointerToMissingCopyFileSpeaks (0.01s)
+=== RUN   TestPointerCheckWritesNothing174r4
+    task_pointer_authority_ac3_174r4_windows_test.go:265: ghost arm verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerCheckWritesNothing174r41380621741\\001\\tool-output-174r4-ghost.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:271: a pointer at a missing copy file must say so, got "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerCheckWritesNothing174r41380621741\\001\\tool-output-174r4-ghost.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:274: answering a pointer at an absent copy file must NOT create it: Lstat=<nil>
+    task_pointer_authority_ac3_174r4_windows_test.go:278: intact arm verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerCheckWritesNothing174r41380621741\\001\\tool-output-174r4-intact.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:288: the pointer check wrote into the artifacts tree: before=[tool-output-174r4-intact.txt] after=[tool-output-174r4-ghost.txt tool-output-174r4-intact.txt]
+--- FAIL: TestPointerCheckWritesNothing174r4 (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.050s
+FAIL

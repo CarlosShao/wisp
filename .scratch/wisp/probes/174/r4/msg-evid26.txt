@@ -1,0 +1,7 @@
+174-r4 证据件 §2–§6 写满：判据形状／BEFORE 逐字／改动清单／三发突变红句／四门读数
+
+要点三条：
+1) AC#3 是自证格，"未修码响不响"的答法＝行为今天已对但零尺钉着，凭据是三发突变（不是自述）。
+2) d22scan 只扫 filepath.Clean|Abs 两枚 token：手搓 HasPrefix 包含判定扫不到（MUT-A2 在盘上时 internal/tools 零 finding）。
+3) d22scan rc=1 的一条 finding 属 265-r1 在飞的 cmd/wisp 工作树（HEAD blob 上 0 命中），不归我、我没修。
+§9（spill 腿）与 §7/§8 仍标未判。AC 框零改动（未勾框复量仍 5、已勾仍 3）。
