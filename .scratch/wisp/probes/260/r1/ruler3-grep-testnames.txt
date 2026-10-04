@@ -1,0 +1,10 @@
+internal/ball/hotkey_live_test.go
+internal/ball/hotkey_status_test.go
+internal/ball/interaction_live_test.go
+internal/ball/live_windows_test.go
+cmd/wisp/panel_resident_windows_test.go
+cmd/wisp/resident_approval_live_246_windows_test.go
+cmd/wisp/resident_ball_live_228_windows_test.go
+cmd/wisp/resident_hotkey_258_windows_test.go
+cmd/wisp/resident_hotkey_live_258_windows_test.go
+cmd/wisp/resident_hotkey_v1probe_test.go

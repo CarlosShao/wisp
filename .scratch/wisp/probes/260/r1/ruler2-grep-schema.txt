@@ -1,0 +1,4 @@
+177:// Empty string = binding unset (feature key disabled). `cancel` temporarily
+182:	Cancel string `toml:"cancel" default:"Esc"`
+221:// AECConfig is voice.aec (echo cancellation for conversation mode).
+255:	// AEC echo cancellation.

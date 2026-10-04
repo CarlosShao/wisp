@@ -1,0 +1,15 @@
+260-r1 证据件骨架：形ⓐ三条件＋四枚判据的表壳先落盘
+
+票面＝.scratch/wisp/issues/260-configured-cancel-hotkey-never-registers.md 最后一节
+（编排者选形裁定，账 A588）＝借用那遍吃 [hotkey] cancel 的配置值，附三条硬条件
+（① 默认档逐位不许漂 ② 回执说到做到 ③ 配坏了要响亮＝新零件 P6）。
+本格只做 AC#1；AC#2（丢借用要有声）归编排者另排的一格，本件不顺手做。
+
+本轮这一发只交骨架：七节标题＋空表，外加三把起手尺的原始读数档
+（ruler1 借用遍落点／ruler2 schema 只有 cancel 带 default:"Esc" 的不对称／
+ruler3 今天已钉住这形状的用例名册）。产码与判据在后续 commit 落，读数随后填。
+
+未修码基线（现跑，未改任何码）：go test -count=1 ./internal/ball/ 顶层 56 枚，
+55 PASS／1 FAIL。唯一那枚红＝TestC21TableColourRowsMatchTokensCSS，红因是共享工作树里
+别家在飞的 design/assets/tokens.css 被删（git status 现见 " D design/assets/tokens.css"），
+与本票无关，本格不去动它、也不去放宽它；名单存 baseline-gotest-names.txt。

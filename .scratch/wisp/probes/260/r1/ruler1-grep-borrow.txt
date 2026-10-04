@@ -1,0 +1,33 @@
+internal/ball/ball_windows.go:244:	// production cancel binding is a bare Esc, and RegisterHotKey is
+internal/ball/ball_windows.go:917:// ball's own window, on its STA thread (ticket 258's AC#3 seam). RegisterHotKey
+internal/ball/hotkey_live_test.go:6:// desktop and the REAL RegisterHotKey, which is the only way to answer the
+internal/ball/hotkey_live_test.go:36:// RegisterHotKey would take Esc from every other app on the desktop for the
+internal/ball/hotkey_live_test.go:61:		r, _, e := pRegisterHotKey.Call(uintptr(b.hwnd), uintptr(spareHKID),
+internal/ball/hotkey_live_test.go:62:			uintptr(modNoRepeat), uintptr(vkEscape))
+internal/ball/hotkey_live_test.go:107:	if got := rep.Live()[hkCancel]; got.VK != vkEscape {
+internal/ball/hotkey_live_test.go:233:	// owns this combination" as far as RegisterHotKey is concerned. Register
+internal/ball/hotkey_live_test.go:242:		t.Fatalf("squat RegisterHotKey failed: %v", e)
+internal/ball/hotkey_live_test.go:472:		r, _, e := pRegisterHotKey.Call(uintptr(b.hwnd), uintptr(id), uintptr(acc.Mods), uintptr(acc.VK))
+internal/ball/hotkey_status_test.go:9:// back from the real RegisterHotKey.
+internal/ball/hotkey_status_test.go:21:// fakeRegistry is an in-memory RegisterHotKey: it records what was attempted
+internal/ball/hotkey_status_test.go:56:// attemptsOf counts RegisterHotKey calls made for one id (the return leg of the
+internal/ball/hotkey_status_test.go:81:// modifier but MOD_NOREPEAT - the spelling RegisterHotKey takes desktop-wide.
+internal/ball/hotkey_status_test.go:87:		if acc.VK == vkEscape && acc.Mods == modNoRepeat {
+internal/ball/hotkey_status_test.go:223:	if got := borrowed.Live()[hkCancel]; got.VK != vkEscape || got.Mods != modNoRepeat {
+internal/ball/hotkey_status_test.go:358:			t.Fatal("an unparsable binding reached RegisterHotKey")
+internal/ball/hotkey_test.go:24:		{"Esc", 0, vkEscape, false},
+internal/ball/hotkey_test.go:25:		{"Escape", 0, vkEscape, false},
+internal/ball/hotkey_windows.go:9:// end. "Borrowed" means exactly that - RegisterHotKey is desktop-wide, so an
+internal/ball/hotkey_windows.go:118:	vkEscape = 0x1B
+internal/ball/hotkey_windows.go:142:			acc.VK = vkEscape
+internal/ball/hotkey_windows.go:236:	// HotkeyLive: RegisterHotKey succeeded, the binding is ours and presses
+internal/ball/hotkey_windows.go:253:	// and RegisterHotKey takes a bare key from the WHOLE desktop. The cancel
+internal/ball/hotkey_windows.go:284:// Attempted reports whether a RegisterHotKey call was made for this binding.
+internal/ball/hotkey_windows.go:388:// hotkeyRegisterer is the Win32 RegisterHotKey for a fixed window.
+internal/ball/hotkey_windows.go:391:		r, _, err := pRegisterHotKey.Call(uintptr(hwnd), uintptr(id),
+internal/ball/hotkey_windows.go:399:		return syscall.EINVAL // RegisterHotKey returned FALSE with no error info
+internal/ball/hotkey_windows.go:521:// escBorrowAcc is the accelerator the borrow registers: VK_ESCAPE with nothing
+internal/ball/hotkey_windows.go:524:func escBorrowAcc() Accelerator { return Accelerator{Mods: modNoRepeat, VK: vkEscape} }
+internal/ball/hotkey_windows.go:533:	if err := reg(hkCancel, escBorrowAcc()); err != nil {
+internal/ball/hotkey_windows.go:584:		Acc:     escBorrowAcc(),
+internal/ball/win32_windows.go:42:	pRegisterHotKey                = modUser32.NewProc("RegisterHotKey")
