@@ -1,0 +1,22 @@
+260-r2 占位自量（取数 2026-10-04 10:41 +08，对已提交的三枚 84dbda52/e3e19e8e/971a5f15）
+
+命令：grep -c '待填\|填写中\|TODO' <证据件目录里三份正文件>
+读数：
+.scratch/wisp/probes/260/r2/sync.md:0
+.scratch/wisp/probes/260/r2/msg-code.txt:0
+.scratch/wisp/probes/260/r2/msg-final.txt:1
+.scratch/wisp/probes/260/r2/msg-skeleton.txt:0
+
+sync.md＝0（真占位为零）。
+msg-final.txt＝1 的那一枚命中＝它自己那句「全文无"待填/填写中/TODO"」里引的这三个词，
+  不是未写的节；原件逐字：
+3:证据件 `.scratch/wisp/probes/260/r2/sync.md`（盘上 `wc -c` ＝ 31,894 字节，占位 0：全文无"待填/填写中/TODO"）＋
+
+盘上字节数（交件判据）：
+31894 .scratch/wisp/probes/260/r2/sync.md
+
+本枚写面是否全部进树：git status --short 对 .scratch/wisp/probes/260/r2/ 与 internal/ball/ ＝ 空（同一时刻取，见上）。
+补记（2026-10-04 10:41 +08）：sync.md 又加了上面那条指针行，字节数随之变；最新盘上读数：
+32181 .scratch/wisp/probes/260/r2/sync.md
+占位自量对新字节数同一把尺复跑：
+0

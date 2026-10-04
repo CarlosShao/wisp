@@ -292,6 +292,9 @@ VK 值：`'V'` = `0x56`，mods = `MOD_ALT|MOD_CONTROL|MOD_NOREPEAT` = `0x0001|0x
 - 起手 `git status` 里那批 ` M`／` D`（`design/**` 16 枚删除、`tools/d22scan/**`、`cmd/wisp/**`、
   `internal/agent/approval/pending_read.go`、`.gitignore`、别家 probes）**一律不是本枚写的**；
   本枚 add 只带显式 pathspec，共树别人的增量留在原地不动。
+- 占位自量与字节数（含 `msg-final.txt` 那一枚命中＝它自己引用那三个词的自指句，⛔ 不是没写的节）
+  ＝`placeholder-selfcheck.txt`；三枚进树件 `84dbda52`／`e3e19e8e`／`971a5f15` 之后再补第四枚
+  （只带这份自量件与本行）。
 
 ### 5.5 突变＝本枚尺的正控（红句逐字）
 
