@@ -1,0 +1,94 @@
+# R18 sec5(c) ticket-face conflicts + gate defaults, HEAD=f9dc152c UTC=2026-10-04T09:44:33Z
+## Q1 gate.go New() defaults for Logf/tracked
+// never a downgrade.
+func New(o Options) *Gate {
+	clock := o.Clock
+	if clock == nil {
+		clock = SystemClock{}
+	}
+	logf := o.Logf
+	if logf == nil {
+		logf = func(string, ...any) {}
+	}
+	ui := o.UI
+	if ui == nil {
+		ui = UIFuncs{}
+	}
+	ch := o.Channels
+	if ch == nil {
+		ch = DefaultChannels()
+	}
+	win := o.Window
+	switch {
+	case win <= 0:
+		win = DefaultL1Window
+	case win < MinL1Window:
+		win = MinL1Window
+	case win > MaxL1Window:
+		win = MaxL1Window
+	}
+	tracked := o.MaxTracked
+	if tracked <= 0 {
+		tracked = 64
+	}
+	return &Gate{
+		ui: ui, clock: clock, channels: ch, window: win, track: tracked,
+		q:        NewQueue(o.ApprovalTimeout, o.WarningLead, o.MaxPending, logf),
+		logf:     logf,
+		grants:   o.Grants,
+		windows:  map[string]*window{},
+		running:  map[string]*runEntry{},
+		admitted: map[string]bool{},
+	}
+}
+## Q2 RECORD-FAILED test hits at HEAD (which files)
+HEAD:internal/agent/approval/ticket224_reply_grant_test.go:308:	if !f.log.has("GRANT-RECORD-FAILED") {
+--count--
+1
+## Q3 the 265-r1 in-flight hunk around 256 test :473
+10:-// Options.Grants stays unset. The session ledger is constructed only inside
+12:-// and behind a conditional early return (256-a2 census §0/§2), and g.grants has
+15:-// ticket 265, and ④ deliberately asserts Grants is ABSENT so nobody can quietly
+18:+// Options.Grants stayed unset, because the session ledger is constructed only
+21:+// (256-a2 census §0/§2) - and g.grants had one writer and no late-binding entry.
+22:+// Ticket 265 adjudicated that half as form ⓐ-Ⅰ (a holder type inside cmd/wisp,
+24:+// ruler ④ turned over with it: it now asserts Grants is PRESENT. The absence this
+25:+// block used to insist on is the reason A602 exists as a named unfreeze; reading
+26:+// this file as "Grants must not be passed" is the stale reading.
+38:+// 265's form ⓐ-Ⅰ made it 6 by adding Grants - the named unfreeze A602 covers
+43:-// Grants is asserted ABSENT on purpose. AC#1's other half is not this leg's work
+45:-// pending ticket 265), so this ruler refuses to let the shipped shape be read as
+47:+// The name still reads "Five" and is not renamed: A602's boundary says this file
+52:+// Grants is asserted PRESENT now. It was asserted ABSENT until ticket 265 was
+54:+// 265"), and this is that nail turning over: it is now the ⓐ-Ⅰ positive control
+55:+// AC#3 asks for, because removing the wiring - the Grants field, or the holder
+64:-	want := []string{"UI", "Channels", "Window", "ApprovalTimeout", "Logf"}
+65:+	want := []string{"UI", "Channels", "Window", "ApprovalTimeout", "Logf", "Grants"}
+72:-	if got["Grants"] {
+73:-		t.Errorf("the resident leg now passes Options.Grants. That is NOT ticket 256-r1's scope: the session " +
+75:-			"pending ticket 265. Either a seam was minted outside that ticket, or this leg grew.")
+76:+	// Grants, asserted PRESENT. The block here until ticket 265 asserted the exact
+77:+	// opposite ("the resident leg now passes Options.Grants … the half was filed
+78:+	// as pending ticket 265"); that ticket is now adjudicated as form ⓐ-Ⅰ and this
+80:+	// asks for: delete the Grants field from resident_approval_windows.go's
+## Q4 ticket 256 face: 129 / 108-113 / 会话 / 265
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:8:1. 常驻那枚门是**在会话账本之前**建的：`cmd/wisp/resident_approval_windows.go:108-113` 逐字 `ra.gate = approval.New(approval.Options{` 里只有 `UI`／`Channels`／`Logf` 三项——**没有 `Grants`、没有超时、没有 L1 窗口**。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:24:- ★ **这一格现在整体归口票 265**：`Grants` 那半格的正身＝`A601` §4 裁好的 **ⓐ-Ⅰ**（写腿 `265-r1` 已在飞），而那枚 AST 钉的期望集搬家＝`A602` 具名解冻（五样齐，口令「265 撤 AST 钉解冻」）。⇒ **票 256 的 AC#1/AC#2 只能等票 265 落地后由另一枚非实现者腿复判；本票不先结案、不加 `-done`**。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:25:- **AC#2 ✗ 停勾＝正控半成立／禁现半不成立**：V1（`Options` 两枚值换成字面 `0`）⇒ ①配对正控红、②五枚红四、③setup 红，但 **④⑤ 全绿**；V2（窗口换成字面 `2s`）⇒ **只有 `l1_window_sec=99` 那枚红**。⇒ ①②③ 真读门，**④⑤ 属"形状尺"、不背值的账**（`256-r1` 的 M2 用"删两行"这种更强的形，所以没暴露 ④ 对值不敏感）；**没有任何一枚 case 同时看住 V1 与 V2**。`GRANT-DROPPED 必须不再出现`那一半随 `Grants` 未接而**根本无法构造**⇒ 同归票 265。⚠ 建议后续单立一枚"值真流进门"的正控（**那是我的写面，验收腿没动框面**，本轮先不立，等 265 落地一起处理）。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:34:**它纠正我派单里的一句（记我）**：我在派单里写"复用**在位的**那枚既有钉"——`256-v1` 现跑指出**那枚负向 AST 钉不是既有资产，就是 `2a10134e`（`256-r1` 自己那一发）新加的**（`grep Grants --include=*_test.go` 里唯一一枚）。⇒ "复用不新增"这条我把对象写错了；真正在位的外部凭据是票 265 §现量.2。定式：**派单里"这是既有资产、直接复用"这类断言，落笔前要先跑一次 per-sha 名册**——否则实现方新造的仪器会被下一任读成"仓里本来就有"。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:58:- `cmd/wisp/resident_approval_windows.go:109-113` 逐字只有 `UI`／`Channels`／`Logf` 三枚字段 ⇒ **本票 §现量.1 内容成立、区间起点偏一行**（真身 `:109`；我票面写 `:108-113`）。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:60:- `cmd/wisp/resident_task_source_windows.go`：`:218 console := interactiveStdin()` → `:230 return nil` → `:265 run, code := assembleRuntime(spec)` ⇒ **那枚提前 return 确实在装配之前**。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:71:- **理由（现量，不是我的判断）**：ⓘ 若做，门的存在时刻从"进程启动即存在"改成"仅当这发常驻进程有交互控制台、且装配根没先失败"（`resident_task_source_windows.go:218→:230→:265`）⇒ **双击／Explorer 拉起那一支（正是 D2／票 228 那个"用户真正启动的进程"形状）永远走不到装配**＝没有门、没有 `PendingWindow`、球永不进 `Confirming`、Esc 永不借、`:157` 永不加载。⛔ 这不是"那一维变弱"，是**载体不存在**。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:86:- **`Grants` 那一枚＝互斥的一半，今天不可派**：账本的唯一产码构造点在 `cmd/wisp/run.go:473`（Mint）→ `:478`（NewLedger）→ `:487`，**在门构造点之后约 129 行、且被 `resident_task_source_windows.go:230` 的条件提前 return 罩着**；`g.grants` 全仓只有 `gate.go:160` 一枚写点、**无任何晚绑定入口**（`SetGrants|AttachGrants|WithGrants` 三词 0 命中〔编排者复跑〕）。⇒ 要让它"原地补上"，只有 **新铸第二枚 ledger**（撞 `run.go:459-466` 那句 "One mint per process"）或 **新造一枚 holder 类型**两条路——**两条都是新增接缝，不是"补字段"**。⇒ **`Grants` 这一半就地归口成独立票（见第 5 条），⛔ 不许混进 `256-r1`。**
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:92:**3. AC#2 的正控该长什么样（普查件 §5，我认下并定形）**：**唯一有效正控＝`ra.gate.Queue().Timeout()`**（`gate.go:169`＋`queue.go:126`，同形先例 `ticket84_no_owner_test.go:108`/`queue_test.go:48`）；`Window()` 被 `gate.go:149-151`＋`queue.go:122`（`MaxL1Window=3s`）钳死 ⇒ **拿它当正控会读出恒绿假象，只能当"钳位仍在"的反控**。禁现那格**钉 `gate.go:675` 那句独有词组「本机没有接入会话授权记账」，⛔ 不许钉前缀 `approval: GRANT-DROPPED`**（前缀两形同吃＝票面 §7-6 已定的洞；`ticket224_reply_grant_test.go:283` 用的正是前缀，**不可复用、也不许为让前缀零命中去改它**）。⚠ 还有一条形状级事实要写进判据：**接了之后也不会随改而动**（`g.window`/`q.timeout` 都是构造期定值，全仓无 re-apply 路径）⇒ AC#2 只能钉"带着种子值启动这一发"，**不许写成"改配置活进程立刻跟着变"**。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:96:**5. `Grants` 那一半的归口＝待立票（本轮只登记，不派）**：要"常驻腿里『本会话内允许』真落一行"，缺的是**一枚接缝**而不是勇气。两形代价已由普查件 §0 量到边界：**(a) 第二枚 mint**（撞 `run.go:459-466` 注释那句 "One mint per process"，并造成 gate 写 id-A／bridge 读 id-B 的错配）；**(b) 晚绑定 holder 新类型**（仓里今天没有这种形状；⚠ 还要回答"注入时刻 gate 已答复过卡片怎么办"）。⇒ 下一枚票（暂名 **票 265**）的 AC#0＝**把这两形的代价与线程/时序约束量齐再裁**，⛔ 在此之前任何腿不许"顺手把 grants 接上"。另：票 244 那条"面板不许给 Allow"的修法禁区对本票同样成立（`AllowSession` 只在 `NativeAPI` 上，`approval/ui.go:147`/`:158`）。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:98:**6. ⓑ 那句话的归口现状（普查件 §7 末条，我复跑前属〔仅自述〕）**：`grep -rn "只作用于跑任务的进程|常驻腿今天用常量"` 在 `cmd internal tools frontend` ＝ **0 命中** ⇒ 母票 248 AC#10 定的 ⓑ **今天还没落到任何产码**，且票 255 的登记表 `hotRowClaims` 里**没有 `risk` 这一行** ⇒ "由登记表同源产出"这句话**那张表今天没有格子**。⇒ 归 `255-r2` 那一格（同族措辞）＋票 265 一并考虑，⛔ 本票不代它落。
+## Q5 ticket 260 face: 文案撤回 / 279-281 / 会话授权
+.scratch/wisp/issues/260-configured-cancel-hotkey-never-registers.md:63:形ⓐ 落地后（260-r1，`eb2c0173`→`ba2a8358`），**借哪枚键**已经吃配置了，但**给人看的那句话还写死着"Esc"**＝A588 条件②禁的那一形。这一格是本票的**最后一格**，授权凭据＝**A595 的具名解冻五样齐**（文件／行／理由／边界／撤销口令「260 文案撤回」），⛔ 本票其余四格的条件都不因这一格改变。
+## Q6 ticket 224 face: 零写手 / 生产 / 会话时长
+.scratch/wisp/issues/224-session-scoped-grant-has-zero-executors-and-no-session-identity.md:1:# 224 — **"本次会话内允许"这一格今天零执行者**：`SessionID` 只活在 DAO 里、生产不铸造会话身份、`approval_grant` 没有生产写手
+.scratch/wisp/issues/224-session-scoped-grant-has-zero-executors-and-no-session-identity.md:19:| ⛔ **生产零写手／零读者** | 那几枚 DAO 方法的**非测试调用者＝0**；`internal/agent/journal.go` 的 `DecisionAllowGrant` 决策类型**零写者** | `grep -rn 'InsertGrant\|ListGrantsBySession\|DecisionAllowGrant' --include='*.go' internal cmd \| grep -v _test` |
+.scratch/wisp/issues/224-session-scoped-grant-has-zero-executors-and-no-session-identity.md:72:- [x] **N#4 「本次会话内」的时长定案**（编排者 09-30 已按现状裁＝**一次进程存活期，重启即失效**，与已落地实现一致；owner 若要"跨重启仍算同一会话"是**契约级改动**，撤销口令「224 会话时长改跨重启」）。
+## Q7 ticket 266 subject + grant words
+266-no-external-tooth-over-the-slo-check-self-locking-nails.md
+.scratch/wisp/issues/266-no-external-tooth-over-the-slo-check-self-locking-nails.md:52:- ⛔ 不动 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／任何 golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**`／三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）。

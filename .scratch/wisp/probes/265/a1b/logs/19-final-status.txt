@@ -1,0 +1,36 @@
+# R19 污染面终态 + 节长, HEAD=89aa72d5 UTC=2026-10-04T09:58:26Z
+## porcelain (tracked changes only, M/D/A)
+ M .scratch/wisp/issues/263-slo-check-dies-on-unset-lastexitcode.md
+ M .scratch/wisp/issues/266-no-external-tooth-over-the-slo-check-self-locking-nails.md
+ M .scratch/wisp/probes/152/my152.py
+ M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+ M .scratch/wisp/probes/265/r1/evidence.md
+ M cmd/wisp/resident_approval_risk_256_windows_test.go
+ M cmd/wisp/resident_approval_windows.go
+ M cmd/wisp/resident_task_source_windows.go
+ M internal/config/loader.go
+ M internal/config/settings.go
+--count tracked-dirty--
+17
+## untracked count (whole repo scope of that pathspec set)
+564
+## my own writes in this run (pathspec-scoped)
+?? .scratch/wisp/probes/265/a1b/logs/18-sec5c-conflicts.txt
+?? .scratch/wisp/probes/265/a1b/logs/19-final-status.txt
+--end--
+## 我的件的 log 清单
+00-open-ruler.txt 01-family-a-ast.txt 01b-counts.txt 02-families-bcde.txt 03-family-c-evidence.txt 04-family-c-mech.txt 05-family-c-narrow.txt 06-session-reply.txt 07-source-gates.txt 08-gate-entrypoints.txt 09-ruling-markers.txt 10-leg-keys.txt 11-write-face-anchors.txt 12-head-vs-inflight.txt 13-sec5-ab.txt 14-sec5a-fields.txt 15-queue-and-drift.txt 16-clock-status.txt 17-last-checks.txt 18-sec5c-conflicts.txt 19-final-status.txt 
+## §4 正文行数
+124
+## §5 正文行数
+50
+## 我的 commits
+89aa72d5 265-a1b 交 §5 顺带上报（票 265 AC#0 接续程第二格）
+06b899ad 265-a1b 交 §4 撞钉名册（票 265 AC#0 点名的最后一枚交付物）
