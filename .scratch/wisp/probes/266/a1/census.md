@@ -254,3 +254,5 @@
 
 - 本腿开工时刻：`2026-10-04 14:0x +08`；开工 HEAD＝`86440487`（`256-v1 骨架：验收表九节标题与每节打算答什么（非实现者腿，未跑产码改动）`，`git log -1 --date=iso` ＝ 2026-10-04 14:05:04 +0800）。
 - 立票锚点（票面 §标题）＝`515ca5c5`，与本腿锚点不同代；⚠ 本件所有 `file:line` 一律取**本腿时刻**的盘上内容，`scripts/slo-check.ps1`／`scripts/slo-freshness.sh`／`tools/d22scan/main.go`／`.github/workflows/*.yml` 四棵在本腿全程 `git status --porcelain -- scripts tools .github` 为空（工作树＝HEAD，未被人动过），所以行号可对 `86440487` 复核。
+- **交件时刻复确认（17:0x，HEAD 已推到 `7c5f2316`，其间别的腿在 `cmd/wisp`、`internal/tools`、`docs/reports/pending-and-issues.md` 上有在飞改动）**：`git status --porcelain -- scripts tools .github` ＝ **空**，逐字复跑过，⇒ 本件全部 `file:line` 在交件时刻仍对盘上成立；⛔ 本腿未碰那三棵在飞的树，也未引用它们的读数。
+- 本腿 commit 清单（只含 `.scratch/wisp/probes/266/a1/census.md` 一枚路径，逐枚带显式 pathspec，⛔ 无 `add -A`/`--amend`）：`d3059bfb`（骨架＋§1）→ `f78c32ff`（§2 五问）→ `6d82eceb`（§3–§7）→ `e3574b91`（就地更正三处读数）→ `5be8821e`（补"外层步看不到前步 stdout"那枚形状约束）。⛔ 只 commit、未 push。
