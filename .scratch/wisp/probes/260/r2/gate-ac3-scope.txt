@@ -1,0 +1,43 @@
+260-r2 AC#3 越界面读数（取数时刻 2026-10-04 10:38 +08，HEAD 起手 5ad8ec27）
+
+--- 起手 5ad8ec27..HEAD 整段区间（⚠ 同一 git user，--author 分不开别家：这一列里只有
+    84dbda52 与 e3e19e8e 是本枚，其余 256-r1／264-a1／ledger 是别家在飞与编排者的账）：
+e3e19e8e test(ball)〔260-r2〕把"借到的必是裸 Esc"改成"借到的必是配置里那枚键"（同步到 A588 已裁行为，非放宽）
+826d7a54 256-r1 证据件收尾：§8 补第三发 sha ＋已提交树上的一发复认（rc=0，27.5s 全绿），§9 自量随正文重算
+2708289f 256-r1 证据件写满：九节＋自量节全填（起手撞钉预检／落地形状／四枚判据／两发突变红句／GRANT-DROPPED 归口／门禁读数／判不动十一条／Git 流水）
+6354815d 264-a1 满稿：§5 既有钉名册（正文级 8 枚必红＋4 枚同向负钉）＋§6 排程结论＋六处读数自查更正
+b2f646e9 ledger(A596) 更正 A593 §3：224 与 (206,217] 是两种单位，我自己把两个数放进了一次比较
+2a10134e 256-r1 落地：常驻那条腿的审批门改吃 [risk] 两枚配置（形ⓐ 签名不加参）
+b831ef02 ledger(A595) 票 260 条件②的十枚 Esc 文案：现量＋撞钉预检做完 ⇒ 具名解冻五样齐
+84dbda52 260-r2 骨架：名册 12 枚（requireEscBorrowed 的过期断言其实是两格，不止 :107）
+263658e0 264-a1 填 §3＋§4：甲本身不要求改任何 D/C 字面，撞的是"落点①碰 C25"与"改默认碰两处冻结字面"
+7fb4ae90 ledger(A594) 收 260-r1：形ⓐ 真接上＋被顶到的 winlive 尺我现读复认＝预测非实测，裁同步不拆
+f6112ee2 264-a1 填 §1＋§2：开关只管日志侧、且今天那一侧也关着；另量到四族带路径，并更正票面一处归因
+
+--- 逐枚 name-only:
+[84dbda52]
+84dbda52 260-r2 骨架：名册 12 枚（requireEscBorrowed 的过期断言其实是两格，不止 :107）
+.scratch/wisp/probes/260/r2/gate-test-ball-baseline-verbose.txt
+.scratch/wisp/probes/260/r2/gate-vet-ball-baseline.txt
+.scratch/wisp/probes/260/r2/gate-vet-ball-winelive-baseline.txt
+.scratch/wisp/probes/260/r2/msg-skeleton.txt
+.scratch/wisp/probes/260/r2/sync.md
+[e3e19e8e]
+e3e19e8e test(ball)〔260-r2〕把"借到的必是裸 Esc"改成"借到的必是配置里那枚键"（同步到 A588 已裁行为，非放宽）
+.scratch/wisp/probes/260/r2/msg-code.txt
+internal/ball/hotkey_cancel_borrow_expect_260r2_test.go
+internal/ball/hotkey_live_test.go
+
+--- 禁面命中计数（对以上两枚的文件清单）:
+0
+(0 = 未触；grep -c 返回 rc=1 只表示零命中)
+
+--- 票面/台账/冻结件/在飞包 命中计数:
+0
+(0 = 未触)
+
+--- 产码 md5 起手/终值（证本枚未改产码）:
+be79cbda486a334d74fe9d278558acba *internal/ball/hotkey_windows.go
+29789970990d83686b01e2e73a09c18e *internal/ball/hotkey_cancel_borrow_expect_260r2_test.go
+be79cbda486a334d74fe9d278558acba *internal/ball/hotkey_windows.go
+(numstat 空 = 干净)

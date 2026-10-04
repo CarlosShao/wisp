@@ -1,0 +1,20 @@
+== N1 applied to internal\ball\hotkey_cancel_borrow_expect_260r2_test.go ==
+package exit=1
+failing tests: --- FAIL: TestBorrowWishFollowsSeed260r2 (0.00s), --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+== N1 restored ==
+
+== N2 applied to internal\ball\hotkey_windows.go ==
+package exit=1
+failing tests: --- FAIL: TestBorrowFollowsConfiguredBinding260 (0.00s), --- FAIL: TestBorrowReceiptSharesOneSourceWithRegistration260 (0.00s), --- FAIL: TestLiveBorrowHelperPremiseIsConfigDependent260 (0.00s), --- FAIL: TestBorrowWishFollowsSeed260r2 (0.00s), --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+== N2 restored ==
+
+== N3 applied to internal\ball\hotkey_cancel_borrow_expect_260r2_test.go ==
+package exit=1
+failing tests: --- FAIL: TestBorrowWishRefusedSeedIsNotSilent260r2 (0.00s), --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+== N3 restored ==
+
+== N4 applied to internal\ball\hotkey_cancel_borrow_expect_260r2_test.go ==
+package exit=1
+failing tests: --- FAIL: TestBorrowWishFollowsSeed260r2 (0.00s), --- FAIL: TestBorrowWishDefaultCellIsBitIdentical260r2 (0.00s), --- FAIL: TestBorrowWishRefusedSeedIsNotSilent260r2 (0.00s), --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+== N4 restored ==
+

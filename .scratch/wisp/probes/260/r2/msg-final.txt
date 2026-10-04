@@ -1,0 +1,38 @@
+260-r2 满稿：冲突原文逐字＋名册 12 枚＋改前改后逐字＋四发突变红句＋门禁终值＋欠账与判不动六条
+
+证据件 `.scratch/wisp/probes/260/r2/sync.md`（盘上 `wc -c` ＝ 31,894 字节，占位 0：全文无"待填/填写中/TODO"）＋
+原件 18 份（三份门禁改前改后、四份突变读数、三份 md5、HEAD 版扫描器读数、AC#3 名册、diff 原件、两份驱动、
+两份突变汇总）＋本 message 自身。
+
+要点（细节全在件里，逐节可复算）：
+  §1 编排者给的 `:42` 种子与 `:107-108` 断言＝**现读逐字命中、零漂移**；本枚多读出同一 helper 的
+     第二格 `:110-115`（拿只探裸 Esc 的 escBorrowProbe 要求"桌面不许空闲"）也建立在旧行为上，
+     所以"过期断言"是两格不是一格。
+  §2 名册 12 枚（逐枚读函数体，词面 grep 命中注释不算）：R1/R2/R8 同步、R3/R4 措辞同步、
+     R5/R6/R7 本体合法、R9（hotkey_status_test.go:223 等）与 R10（260-r1 的上报尺）＝**不是冲突**、
+     R11＝`interaction_live_test.go:232-239` 注入裸 Esc 那格同类过期但**在写面外**、R12＝六句散文。
+  §4 改前/改后逐字；4.5 专节写"为什么是同步不是放宽"：helper 判红支数 5→9、旧尺只比 VK 新尺比整枚
+     {Mods,VK} 且期望来自配置种子、红→绿唯一一支就是已裁行为、默认种子那一支判定链与改前逐位同形、
+     期望走 ParseAccelerator(种子) 而实际走 resolveCancelBorrow(种子) 两条独立路径（非同义反复）。
+  §5 门禁终值：整包 go test -count=1 -v ./internal/ball/ ＝ PASS 65／FAIL 1／SKIP 0（红名＝基线同名
+     TestC21TableColourRowsMatchTokensCSS，别家删了 tokens.css，⛔ 不算本腿回归）；
+     go vet ./internal/ball/＝0、go vet -tags winlive ./internal/ball/＝0（只编译，⛔ 真窗一次没跑）；
+     gofmt／gofumpt 皆空；t.Skip 计数改前改后都是 4。
+     突变四发（N1 期望退回常量／N2 产码退回写死／N3 静默 fallback／N4 默认位对被搬动）
+     红句逐字进件；⚠ 第一版驱动 M1/M2 被自己的读数否掉（改动让变量没人用＝死在编译，不算红），
+     旧驱动与旧读数按"临时件只建不删"留在盘上。
+     D22 门今天被别家卡住：sh scripts/d22scan.sh 停在第一步正控（tools/d22scan 三枚未提交增量里
+     ban #9 self-test 4/40 支失败，⛔ 不由本枚修），同跑里 TestScannerSelfScanOfRealRepoIsGreen PASS；
+     另用 git cat-file blob 从 HEAD 取源码到 $TEMP 编一发扫描器补量 ⇒ clean、ban #8 internal/=501
+     ＝r1 的 500 ＋ 本枚新档。
+  §5.4/AC#3：本枚两枚 commit（84dbda52／e3e19e8e）的文件清单对禁面（PLAN/specs/thresholds/golden/
+     allowlist/frontend/design）命中 0，对票面/台账/三枚冻结件/两个在飞包命中 0；
+     产码 internal/ball/hotkey_windows.go md5 起手＝终值、git diff --numstat 空。
+  §6/§7 欠账与判不动：真窗那几枚"会红"是**预测不是读数**（R1/R2/R8 同步后的真窗行为与
+     默认档那一支的同判都还没量，取数口令写在里面，归 260-v1／真窗窗口）；R11/R12 在写面外交回；
+     helper 改名要动 4 枚文件不属本枚；桌面探测"我们占 vs 别家占"的固有歧义没假装解决，
+     两种读数都判不通过；requireEscReturned 那一格是补回被形ⓐ 拆掉的覆盖，回退范围＝一个函数体。
+
+Git：只 commit 不 push；add 与 commit 同发、显式 pathspec；⛔ add -A／--amend／reset／rebase／stash／
+checkout .／clean；共树别人的未提交增量（design/** 那批删除、tools/d22scan/**、cmd/wisp/**、
+internal/agent/approval/pending_read.go）一律留在原地不碰。

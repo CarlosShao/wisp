@@ -1,0 +1,313 @@
+d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+=== RUN   TestScanDetectsAllSeededViolations
+--- PASS: TestScanDetectsAllSeededViolations (0.04s)
+=== RUN   TestScanCleanRepoIsGreen
+--- PASS: TestScanCleanRepoIsGreen (0.03s)
+=== RUN   TestAllowlistSuppressesOnlyListedPaths
+--- PASS: TestAllowlistSuppressesOnlyListedPaths (0.03s)
+=== RUN   TestCheckRootRejectsBlindRoots
+=== RUN   TestCheckRootRejectsBlindRoots/empty_dir
+=== RUN   TestCheckRootRejectsBlindRoots/go.mod_only
+=== RUN   TestCheckRootRejectsBlindRoots/the_d22scan_module_itself
+=== RUN   TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files
+--- PASS: TestCheckRootRejectsBlindRoots (0.04s)
+    --- PASS: TestCheckRootRejectsBlindRoots/empty_dir (0.00s)
+    --- PASS: TestCheckRootRejectsBlindRoots/go.mod_only (0.00s)
+    --- PASS: TestCheckRootRejectsBlindRoots/the_d22scan_module_itself (0.00s)
+    --- PASS: TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files (0.04s)
+=== RUN   TestScanAloneIsNotAFalsifier
+--- PASS: TestScanAloneIsNotAFalsifier (0.00s)
+=== RUN   TestCheckRootAcceptsRealRepo
+    scan_test.go:250: real repo production Go files in scope: 266
+--- PASS: TestCheckRootAcceptsRealRepo (0.15s)
+=== RUN   TestScannerSelfScanOfRealRepoIsGreen
+--- PASS: TestScannerSelfScanOfRealRepoIsGreen (1.08s)
+=== RUN   TestEmojiBanCoversGoSourcesNotJustDesign
+--- PASS: TestEmojiBanCoversGoSourcesNotJustDesign (0.03s)
+=== RUN   TestBan8MathBandAndRemainingGaps
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band
+=== RUN   TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band
+=== RUN   TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept
+--- PASS: TestBan8MathBandAndRemainingGaps (0.31s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c) (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c) (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c) (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c) (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept (0.03s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept (0.03s)
+=== RUN   TestBan8CommentExemptionInGoSources
+=== RUN   TestBan8CommentExemptionInGoSources/line_comment
+=== RUN   TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration
+=== RUN   TestBan8CommentExemptionInGoSources/one-line_block_comment
+=== RUN   TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line
+=== RUN   TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code
+=== RUN   TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment
+=== RUN   TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment
+=== RUN   TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker
+=== RUN   TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment
+=== RUN   TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all
+--- PASS: TestBan8CommentExemptionInGoSources (0.28s)
+    --- PASS: TestBan8CommentExemptionInGoSources/line_comment (0.03s)
+    --- PASS: TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration (0.03s)
+    --- PASS: TestBan8CommentExemptionInGoSources/one-line_block_comment (0.04s)
+    --- PASS: TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line (0.03s)
+    --- PASS: TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code (0.03s)
+    --- PASS: TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment (0.03s)
+    --- PASS: TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment (0.03s)
+    --- PASS: TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker (0.03s)
+    --- PASS: TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment (0.03s)
+    --- PASS: TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all (0.03s)
+=== RUN   TestBan8CommentExemptionInTextScopes
+=== RUN   TestBan8CommentExemptionInTextScopes/tsx_line_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line
+=== RUN   TestBan8CommentExemptionInTextScopes/html_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/css_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph
+=== RUN   TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line
+=== RUN   TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope
+=== RUN   TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line
+--- PASS: TestBan8CommentExemptionInTextScopes (0.30s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/tsx_line_comment (0.03s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line (0.03s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/html_comment (0.03s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/css_comment (0.03s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph (0.04s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line (0.03s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment (0.04s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope (0.03s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line (0.03s)
+=== RUN   TestDeclaredEmojiScopeCannotWalkZeroFiles
+--- PASS: TestDeclaredEmojiScopeCannotWalkZeroFiles (0.08s)
+=== RUN   TestScopeReportMatchesRealCoverage
+--- PASS: TestScopeReportMatchesRealCoverage (1.19s)
+=== RUN   TestVerdictGreenOnFullyLiveFixture
+--- PASS: TestVerdictGreenOnFullyLiveFixture (0.05s)
+=== RUN   TestVerdictRedOnEmptyBan7Scope
+--- PASS: TestVerdictRedOnEmptyBan7Scope (0.04s)
+=== RUN   TestVerdictRedOnGoScopeWithOnlyTestFiles
+--- PASS: TestVerdictRedOnGoScopeWithOnlyTestFiles (0.04s)
+=== RUN   TestExemptScopeCannotOutliveItsAbsentTree
+--- PASS: TestExemptScopeCannotOutliveItsAbsentTree (0.07s)
+=== RUN   TestBan6ScopeIsNotNarrowedByAnExtensionFilter
+    scan_test.go:1002: ban #6 examined 7 and fired in all 7 extension classes
+--- PASS: TestBan6ScopeIsNotNarrowedByAnExtensionFilter (0.05s)
+=== RUN   TestVerdictRedOnUndeclaredCounter
+--- PASS: TestVerdictRedOnUndeclaredCounter (0.04s)
+=== RUN   TestRealRepoBan8CoversFrontendTreeAtBan6sCount
+--- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount (1.27s)
+=== RUN   TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter
+    scan_test.go:1155: ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+--- PASS: TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter (0.06s)
+=== RUN   TestLedgerCountsMatchAnIndependentWalk
+    scan_test.go:1261: verified bans #1-5 internal/: 228 files
+    scan_test.go:1261: verified bans #1-5 cmd/: 38 files
+    scan_test.go:1261: verified ban #7 internal/tools/: 23 files
+    scan_test.go:1261: verified ban #8 internal/: 501 files
+    scan_test.go:1261: verified ban #8 cmd/: 98 files
+    scan_test.go:1261: verified ban #6 frontend/: 85 files
+    scan_test.go:1261: verified ban #8 frontend/: 85 files
+--- PASS: TestLedgerCountsMatchAnIndependentWalk (1.56s)
+=== RUN   TestWalksSkipGitIgnoredPaths
+    scan_test.go:1375: note: d22scan: skipped as git-ignored: 3 file(s) under 1 ignored director(ies) [internal/build/], decided by .gitignore (2 path(s)), frontend/.gitignore (2 path(s))
+--- PASS: TestWalksSkipGitIgnoredPaths (0.27s)
+=== RUN   TestTrackedPathsAreNeverSkippedByTheIgnoreFilter
+--- PASS: TestTrackedPathsAreNeverSkippedByTheIgnoreFilter (0.65s)
+=== RUN   TestFullTrackedListCoversWhatTheNarrowListCannot
+--- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (0.62s)
+=== RUN   TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules
+--- PASS: TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules (0.76s)
+=== RUN   TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked
+--- PASS: TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked (0.10s)
+=== RUN   TestGitIgnoreRuleSemantics
+--- PASS: TestGitIgnoreRuleSemantics (0.00s)
+=== RUN   TestRealRepoLedgerIsHonest
+    scan_test.go:2207: ban #6 examined 85 frontend/ text files in the real repo
+--- PASS: TestRealRepoLedgerIsHonest (1.35s)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_133814583/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 16 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_133814583/001
+        d22scan: scope bans #1-5 internal/      examined  15 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        internal/bad/leak.go:5: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+        stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_22346152243/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_22346152243/001
+        d22scan: scope bans #1-5 internal/      examined  13 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2517237179/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2517237179/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   2 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   2 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        frontend/src/app.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+        stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared889787271/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared889787271/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   0 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   0 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li4065832734/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li4065832734/001
+        d22scan: scope bans #1-5 internal/      examined  13 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0
+    scan_test.go:2363: rc=0 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_01325427257/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_01325427257/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+        stderr=
+--- PASS: TestBuiltBinaryGoesRedEndToEnd (1.47s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1 (0.11s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2 (0.10s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1 (0.11s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2 (0.11s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2 (0.11s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0 (0.10s)
+=== RUN   TestBan9PrefixTablesAreTheSameList
+--- PASS: TestBan9PrefixTablesAreTheSameList (0.00s)
+=== RUN   TestSelfTestEntryPassesEveryCase
+--- PASS: TestSelfTestEntryPassesEveryCase (1.62s)
+=== RUN   TestSelfTestRosterAuditRejectsAHollowTable
+--- PASS: TestSelfTestRosterAuditRejectsAHollowTable (0.00s)
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers
+--- PASS: TestSelfTestRefusesToAuditAnEmptyRoster (0.00s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster (0.00s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers (0.00s)
+=== RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+    selftest_test.go:205: rc=1 want 0 for [-self-test]
+        stdout:
+        d22scan -self-test: roster read from main.go = 9 numbered ban(s) [1 bare-goroutine, 2 pathresolver-bypass, 3 plaintext-key, 4 wallclock-timeout, 5 mirror-hash, 6 panel-approval, 7 internal-artifact-tool, 8 emoji, 9 phantom-citation] + 1 finding type(s); 40 cases, 10 tag(s) covered, both directions required per tag
+        d22scan -self-test: gate                       want   result what happened
+        d22scan -self-test: ban #1 bare-goroutine      ring   OK     closure form `go func(){}` (D22/D38b) | ranged on 1 finding(s): internal/probe/leak.go:4: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)
+        d22scan -self-test: ban #1 bare-goroutine      ring   OK     named form `go worker()` (R16#1 widened the ban to this) | ranged on 1 finding(s): internal/probe/leaknamed.go:6: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+        d22scan -self-test:                                          pinned because: 161-r1 §3 cell b1-named-bad. Before R16#1 the matcher saw only `go func(`, so a clean report meant "no bare closures", not "nothing bypasses Spawn".
+        d22scan -self-test: ban #1 bare-goroutine      silent OK     the words `go func()` only in a comment, real call goes through a Spawn-shaped seam | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test: ban #1 bare-goroutine      ring   OK     same shape in the cmd/ half of the Go scope | ranged on 1 finding(s): cmd/probe/leak.go:4: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)
+        d22scan -self-test:                                          pinned because: pins that cmd/ is a live walk of its own, not a shadow of internal/ (declaredScopes lists both; ticket 71 AC#4 generalised the empty-scope guard to each).
+        d22scan -self-test: ban #2 pathresolver-bypass ring   OK     filepath.Clean and filepath.Abs, both arms in one file | ranged on 2 finding(s): internal/probe/paths.go:5: [pathresolver-bypass] filepath.Clean outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions
+        d22scan -self-test: ban #2 pathresolver-bypass silent OK     Join/Dir/Base and a method named Clean on another receiver | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: 161-r1 §3 cell b2-clean: the ban is a C26 PathResolver bypass, not a ban on the filepath package.
+        d22scan -self-test: ban #2 pathresolver-bypass silent OK     KNOWN BLIND SPOT B1: the same call under an aliased import | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: 161-r1 §4 B1 - the matcher compares the receiver's LOCAL NAME (main.go:715), not the package's identity, so `fp "path/filepath"` + `fp.Clean` decides outside the PathResolver and stays silent. Pinned as expect-silent to record the ban's REAL range today: if someone resolves the check by import path, this line has to be flipped to expect-ring, and that flip is a scope change belonging to Q-46 / ticket 141 (owner approval), not a test fix someone may make in passing.
+        d22scan -self-test: ban #3 plaintext-key       ring   OK     const with a key-named identifier holding a 24-char literal | ranged on 1 finding(s): internal/probe/keyconst.go:3: [plaintext-key] identifier probeAPIKey holds a plaintext key literal (D22/C28: SecretStore refs only)
+        d22scan -self-test:                                          pinned because: The literal is a synthetic string invented for this cell (no service, no account, no environment). 161-r1 §8 states the same rule for its samples; nothing here is or was ever a real credential.
+        d22scan -self-test: ban #3 plaintext-key       ring   OK     assignment arm: identifier on the left, literal on the right | ranged on 1 finding(s): internal/probe/keyassign.go:5: [plaintext-key] identifier probeSecret assigned a plaintext key literal (D22/C28: SecretStore refs only)
+        d22scan -self-test: ban #3 plaintext-key       silent OK     key-named identifiers whose values are SecretStore refs or too short | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: looksLikePlaintextKey() (main.go:803) exempts the ref: / env: / dpapi: / placeholder prefixes and requires >=16 chars of [A-Za-z0-9._~-] - C28 says the DB may store a REFERENCE, so a reference must not read as a violation.
+        d22scan -self-test: ban #3 plaintext-key       silent OK     KNOWN BLIND SPOT B2: the same literal in a composite-literal field | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: 161-r1 §4 B2 - the AST walks ValueSpec and Ident-lvalue AssignStmt only (main.go:723-755), so a plaintext key inside a struct/map literal or an argument position is invisible. Not sampled: map literals, call-argument position, pointer fields (161-r1 §2 N3).
+        d22scan -self-test: ban #4 wallclock-timeout   ring   OK     deadline.Sub(time.Now()) - the wall-clock delta arm | ranged on 1 finding(s): internal/probe/deadline.go:6: [wallclock-timeout] wall-clock delta (Sub(time.Now())) in what must be monotonic logic (D42#9/D22)
+        d22scan -self-test: ban #4 wallclock-timeout   ring   OK     time.Now().Unix() on a line that also names a timeout - the second arm | ranged on 1 finding(s): internal/probe/unixdeadline.go:6: [wallclock-timeout] unix timestamp on a timeout/deadline line - monotonic clock required (D42#9/D22)
+        d22scan -self-test:                                          pinned because: The timeout WORD must be on the SAME line as the unix call: main.go:767 conjoins unixTimeRe and timeoutWordRe per line. The first draft of this case had the word only in the enclosing function name, and the self-test printed FAIL for it - the case was wrong, the gate was not. Recorded because 161-r1 §3 cell b4-unix-bad used a one-line assignment for exactly this reason, and because a self-test that never contradicts its author is not measuring anything.
+        d22scan -self-test: ban #4 wallclock-timeout   silent OK     time.Until / time.Since / a.Sub(b) - the sanctioned clock shapes | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test: ban #5 mirror-hash         ring   OK     one line naming both a mirror and sha256 material | ranged on 1 finding(s): internal/probe/mirror.go:3: [mirror-hash] hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)
+        d22scan -self-test: ban #5 mirror-hash         silent OK     the same two vocabularies on separate lines | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: 161-r1 §4.1 A2: the check is same-line co-occurrence and reads no data flow, so it neither catches a differently-spelled mirror fetch nor ignores a benign mention. Its second ring case (`b5-bad` line 7) fires on a pure reference line for the same reason.
+        d22scan -self-test: ban #6 panel-approval      ring   OK     approval.decide called from the panel | ranged on 1 finding(s): frontend/src/app.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+        d22scan -self-test:                                          pinned because: D33/F2: allow decisions are native-side only, so an L2 "yes" must never originate in frontend/.
+        d22scan -self-test: ban #6 panel-approval      silent OK     approval.request - the panel may ask, it may not decide | stayed silent while ban #6 frontend/ walk examined 2 file(s); the fixture produced zero findings at all
+        d22scan -self-test: ban #6 panel-approval      ring   OK     TEMPERAMENT A1: the call name appears only in a comment - and rings anyway | ranged on 1 finding(s): frontend/src/notes.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+        d22scan -self-test:                                          pinned because: 161-r1 §4.1 A1: bans #6 and #7 go through walkText, which strips no comments at all (unlike #8's Q-46(c) exemption and #4/#5's whole-line skip). Consequence in production today: one explanatory comment naming approval.decide turns CI red. Pinned as expect-ring because that IS the shipped range; narrowing or exempting it is a scope change (owner's call), not something a test may quietly do.
+        d22scan -self-test: ban #7 internal-artifact-tool ring   OK     artifact-ish tool names as string literals in the tool registry tree | ranged on 1 finding(s): internal/tools/gated.go:3: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+        d22scan -self-test: ban #7 internal-artifact-tool silent OK     the real D34 tool names, none of them an artifact write | stayed silent while ban #7 internal/tools/ walk examined 2 file(s); the fixture produced zero findings at all
+        d22scan -self-test: ban #7 internal-artifact-tool ring   OK     TEMPERAMENT A1 again: quoted name inside a comment - rings anyway | ranged on 1 finding(s): internal/tools/notes.go:1: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+        d22scan -self-test:                                          pinned because: Same walkText shape as ban #6. This is the second reason 161-r1 called #6/#7 "not blind, but temperamental": prose in these two trees is judged as code.
+        d22scan -self-test: ban #8 emoji               ring   OK     U+2713 inside a string literal in internal/ | ranged on 1 finding(s): internal/probe/glyph.go:3: [emoji] ban #8 glyph in scope internal/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+        d22scan -self-test:                                          pinned because: Q-46(c): strings are NOT exempt, comments are. 161-r1 §3 cell b8-probe-bands measured this exact glyph ringing.
+        d22scan -self-test: ban #8 emoji               ring   OK     U+1F600 in the design/ scope | ranged on 1 finding(s): design/screens/states.html:1: [emoji] ban #8 glyph in scope design/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+        d22scan -self-test: ban #8 emoji               ring   OK     U+2264 in the frontend/ scope (the band ticket 141 added) | ranged on 1 finding(s): frontend/src/glyph.ts:1: [emoji] ban #8 glyph in scope frontend/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+        d22scan -self-test:                                          pinned because: The frontend/ U+2713 that made three repo-wide rulers vanish for hours was ticket 169's subject; this sample is the same SCOPE with a different glyph, so a scope that stopped walking is visible here (161-r1 §4.1 A3: frontend/ is scanned with no suffix filter).
+        d22scan -self-test: ban #8 emoji               ring   OK     U+2713 in the cmd/ scope | ranged on 1 finding(s): cmd/probe/glyph.go:3: [emoji] ban #8 glyph in scope cmd/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+        d22scan -self-test: ban #8 emoji               silent OK     the same glyphs only inside a comment | stayed silent while ban #8 internal/ walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: Q-46(c) exemption, signed by the owner (ticket 141). 161-r1 §3 cell b8-comment-clean measured all four scopes silent on this shape.
+        d22scan -self-test: ban #8 emoji               silent OK     KNOWN GAP: U+2192 in a string literal does not ring | stayed silent while ban #8 internal/ walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: main.go:161-163 states the arrow band U+2190-U+21FF is deliberately absent, and AGENTS.md §1.2 draws the practical consequence ("a UI may show an arrow; the instrument cannot see it"). Pinned expect-silent so a future widening is a loud flip on this line, which belongs to Q-46 / ticket 141 and needs an owner's approval.
+        d22scan -self-test: ban #8 emoji               silent OK     KNOWN GAP: U+2460 (circled number) in a string literal does not ring | stayed silent while ban #8 internal/ walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: The second deliberate gap, U+2460-U+24FF. Same rule as the arrow pin above: TestBan8MathBandAndRemainingGaps already pins both directions in the test surface; this adds the entry-point reading a person running -self-test sees without opening a test file.
+        d22scan -self-test: type unparseable           ring   OK     a file the Go parser refuses | ranged on 1 finding(s): internal/probe/broken.go:1: [unparseable] C:\Users\swq\AppData\Local\Temp\d22scan-selftest-3031544972\internal\probe\broken.go:5:2: expression in go must be function call
+        d22scan -self-test: type unparseable           silent OK     a well-formed file in the same position | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test: ban #1 bare-goroutine      silent OK     KNOWN BLIND SPOT B5: a bare goroutine inside a file that will not parse | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); other tags did fire here: internal/probe/brokenhidden.go:1: [unparseable] C:\Users\swq\AppData\Local\Temp\d22scan-selftest-3590990355\internal\probe\brokenhidden.go:5:2: expression in go must be function call
+        d22scan -self-test:                                          pinned because: 161-r1 §4 B5 - scanGoFile() returns at the parse error (main.go:684-689), so bans #1-#3 (AST) AND #4-#5 (the line loop further down the same function) are all skipped for that file; the run prints one [unparseable] line and never says "five bans did not look at this file". This is ticket 161's founding shape - the gate still reports, it just stopped seeing. Fixing it means either a regex fallback or printing the skip; both change what the tool says, so the pin is expect-silent until someone owns that change.
+        d22scan -self-test: ban #2 pathresolver-bypass silent OK     KNOWN BLIND SPOT B6: one directory-prefix entry silences the whole tree | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: 161-r1 §4 B6 - suppression is per-ban (correct) but counted nowhere and printed nowhere, so "the allowlist got one line wider" is invisible in the self-report, including for the 5 real entries in tools/d22scan/allowlist.txt. allowlist.txt itself is FROZEN by ticket 161 AC#5; this case touches only a throwaway copy in a temp fixture root. The recomputable fix is a `suppressed=N (by entry ...)` line in verdict(), which is 161-r1 §2 N2's minimal closure action and is not this program's call.
+        d22scan -self-test: ban #1 bare-goroutine      ring   OK     same file, same entry: ban #1 still rings while #2 is suppressed | ranged on 1 finding(s): internal/probe/allowedalso.go:8: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)
+        d22scan -self-test:                                          pinned because: The pair to the pin above: suppression is per-ban-id, so the B6 hole is "invisible", not "global". Stated because a reader who only saw the line above would conclude the allowlist can mute everything, which 161-r1 disproved.
+        d22scan -self-test: ban #9 phantom-citation    ring   OK     a comment citing docs/evidence/s1/212-comments-phantom-citation-v2.md, which the fixture does not seed | ranged on 1 finding(s): internal/probe/cites.go:3: [phantom-citation] comment cites repo path "docs/evidence/s1/212-comments-phantom-citation-v2.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+        d22scan -self-test:                                          pinned because: Ticket 212's own opening section is the real-world shape: the fixture does NOT create that file, so the citation is phantom and the gate must name it. The repo-wide first firing was internal/risk/pathresolver.go:28. This token is deliberately a page that EXISTS in the real repo but is not seeded in the fixture: the path 212-r2 first wrote here (docs/evidence/s1/212-citation-ruler.md) existed neither in the fixture nor on disk, which is ticket 212's own shape reported inside the instrument (212-v2 §8 #4) - and tools/** is outside ban #9's range today, so nothing in the real scan could catch it. Re-pointing the string is the fix 212-r3 was told to make; widening the range to tools/** is NOT, and needs an owner.
+        d22scan -self-test: ban #9 phantom-citation    silent OK     citations that DO exist in the fixture (seeded below) stay silent, prose shorthand has no path token to convict | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); the fixture produced zero findings at all
+        d22scan -self-test:                                          pinned because: This case's second and third lines carry NO repo-relative path token at all, so repoPathRe never sees them - 212-v1 measured that the silent side of ban #9 therefore said nothing about the shape ticket 212 actually names in class 3, an abbreviated PATH (docs/evidence/s1/152-...-accept-r1.md). That hole is the next case's job, not this one's: keeping the two apart is what makes each flip mean one thing.
+        d22scan -self-test: ban #9 phantom-citation    silent FAIL   CLASS 3 AS A PATH: "...", "*" and U+2026 inside a repo-relative token stay silent (ticket 212 裁 ⓐ) | rang on a sample that must stay silent: internal/probe/cites-shorthand.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/152-...-accept-r2.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation | internal/probe/cites-shorthand.go:5: [phantom-citation] comment cites repo path "docs/evidence/s1/212-" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation | internal/probe/cites-shorthand.go:5: [phantom-citation] comment cites repo path "docs/evidence/s1/152" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+        d22scan -self-test:                                          pinned because: 212-v1 §2(d)/§5 AC#3: before the fix, repoPathRe's own character class swallowed the dots, so an abbreviated path reached os.Stat as a full citation and RANG - contradicting the ban's roster line, its scanGoFile comment and this table's own note, all three of which say shorthand is prescribed and not convicted. The exclusion is shorthandPathStarts() in tools/d22scan/main.go. The three spellings here are the three marks the 终裁节 names; all three stand for files the fixture does not seed, so if the exclusion is removed this case rings on every one of them, which is why it is the mutation this leg ran (readings in .scratch/wisp/probes/212/r2/fix-and-readings.md §4, ticket 212-r2). Removing the exemption is a WIDENING of the ban back to the 2026-10-03 shape and needs the same owner approval that adding it did.
+        d22scan -self-test: ban #9 phantom-citation    silent FAIL   SHAPE 1 (P3): a complete phantom path TRAILING "…" stays silent - the exemption is keyed to the region start, not to the mark's position | rang on a sample that must stay silent: internal/probe/cites-tail-ellipsis.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/probe-tail-ellipsis.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+        d22scan -self-test:                                          pinned because: Why this is silent and not a hole to hide: shorthandPathStarts() marks the byte offset where an abbreviation REGION starts, and ban #9 skips every repoPathRe token that starts there. Here repoPathRe's own token (docs/evidence/s1/probe-tail-ellipsis.md, without the mark) starts on exactly that offset, so a complete path whose page does not exist goes free because someone typed one glyph after it. 212-v2 measured the live count of this shape in the repo at 0 (its clean-tree fixed/mut token difference is empty), which is the only reason the orchestrator accepted the range instead of narrowing it. NARROWING is a scope change needing an owner (口令 「212 收窄豁免」 on the ticket face) - and the moment someone does it, THIS case rings while it is marked expect-silent, which is the loud flip the pin is for. Readings of the paired mutation: .scratch/wisp/probes/212/r3/fix-and-readings.md §2.
+        d22scan -self-test: ban #9 phantom-citation    silent FAIL   SHAPE 2 (P4): a complete phantom path TRAILING "*" stays silent - same region-start key, second mark | rang on a sample that must stay silent: internal/probe/cites-tail-star.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/probe-tail-star.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+        d22scan -self-test:                                          pinned because: The mirror of the case above with the other trailing mark, kept as its own sample because the two marks reach the exemption by different regex steps: repoPathRe's class already swallows ".", so "…" only ever appears AFTER a token has ended, while "*" is absent from repoPathRe's class and present in shorthandRegionRe's - so "*" is the mark that can truncate a token (see the r2 case's docs/evidence/s1/212-* shape) AND the mark that can trail a whole one. Both consequences are pinned, because a range described once in prose is a range nobody has to obey.
+        d22scan -self-test: ban #9 phantom-citation    silent FAIL   SHAPE 3 (P5): a CJK-glued tail segment swallows a complete phantom path on the same line | rang on a sample that must stay silent: internal/probe/cites-cjk-attached.go:5: [phantom-citation] comment cites repo path "docs/evidence/s1/probe-swallowed.md见docs/evidence/s1" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+        d22scan -self-test:                                          pinned because: The widest of the three, and the reason the exemption cannot be described as "a mark inside a path": CJK is inside BOTH regex classes (\x{4e00}-\x{9fff}), so with no space to break the run, repoPathRe reports one token spanning both citations and shorthandRegionRe's region starts on the same offset and contains "..." - so the first, fully-spelled, non-existent page is never Stat()'d. 212-v2 §3 P6/P8/P9 bound the damage: the same glue WITHOUT a mark still rings, the exemption is computed per comment LINE (c.Text), and a space ends the region. This case is the shape a reader must not have to discover the hard way, which is why main.go's roster entry and its ban #9 comment now name all three.
+        
+        stderr:
+        d22scan -self-test: 4 direction(s) failed, 36/40 passed - the gate does not see what it claims
+--- FAIL: TestSelfTestFlagIsWiredInTheBuiltBinary (2.26s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/tools/d22scan	15.874s
+FAIL
+runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=34 FAIL=1 SKIP=0, === RUN=77, '[no tests to run]'=0

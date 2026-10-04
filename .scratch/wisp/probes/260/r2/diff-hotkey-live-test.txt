@@ -1,0 +1,225 @@
+diff --git a/internal/ball/hotkey_live_test.go b/internal/ball/hotkey_live_test.go
+index 8abd3fab..94fb0454 100644
+--- a/internal/ball/hotkey_live_test.go
++++ b/internal/ball/hotkey_live_test.go
+@@ -34,18 +34,24 @@ const spareHKID = 900
+ // keeps a modifier combination for cancel: an idle ball no longer registers
+ // cancel at all (ticket 245 - the production default is a bare Esc, and
+ // RegisterHotKey would take Esc from every other app on the desktop for the
+-// whole test run), and while the borrow is live the suite must still be able
+-// to tell "our cancel slot" apart from "the key the user configured". F11/F12
++// whole test run). Since ticket 260 形ⓐ that choice does a second job: the
++// borrow registers whatever [hotkey] cancel says, so this fixture is also the
++// non-default case, and the live rulers below have to read "the key this seed
++// names was borrowed" rather than the pre-260 "the borrowed key was Esc"
++// (requireEscBorrowed; the expectation itself is pinned in the default suite by
++// hotkey_cancel_borrow_expect_260r2_test.go). F11/F12
+ // are also occupied here (measured 2026-09-20: real 1409), which is why the
+ // previous ticket's F9-F12 fixture "passed" with nothing registered.
+ func liveHotkeys() HotkeyConfig {
+ 	return HotkeyConfig{Summon: "Ctrl+Alt+Q", Mute: "Ctrl+Alt+M", Cancel: "Ctrl+Alt+V", Panel: "Ctrl+Alt+B"}
+ }
+ 
+-// escBorrowProbe asks Win32 - not our own bookkeeping - whether the bare Esc
+-// is unclaimed on this desktop right now: register it on an id the ball never
+-// uses, then drop it immediately. ERROR_HOTKEY_ALREADY_REGISTERED means
+-// somebody holds it, and while the ball has borrowed it that somebody is us.
++// hotkeyFreeProbe asks Win32 - not our own bookkeeping - whether ONE SPECIFIC
++// combination is unclaimed on this desktop right now: register it on an id the
++// ball never uses, then drop it immediately. ERROR_HOTKEY_ALREADY_REGISTERED
++// means somebody holds it, and while a borrow is live that somebody is us - for
++// whichever key the borrow registered, which since ticket 260 形ⓐ is the key
++// [hotkey] cancel names, not a constant this file may spell out.
+ //
+ // This is the ruler behind ticket 245 AC#2's SECOND half - "还". The takeover
+ // flag alone only proves we wrote a bool; what the desktop can still use is a
+@@ -54,12 +60,16 @@ func liveHotkeys() HotkeyConfig {
+ // The call runs on the window's owning thread (Win32 refuses it anywhere else)
+ // and unregisters again before returning, so a probe that says "free" leaves
+ // nothing bound behind.
+-func escBorrowProbe(t *testing.T, b *Ball) (free bool, err error) {
++//
++// What it cannot tell apart - and could not for the bare Esc either - is "we hold
++// it" from "another program holds it". Callers pair it with the ball's own
++// registration set and say which of the two readings they got.
++func hotkeyFreeProbe(t *testing.T, b *Ball, acc Accelerator) (free bool, err error) {
+ 	t.Helper()
+ 	res := make(chan error, 1)
+ 	b.sta.PostTask(func() {
+ 		r, _, e := pRegisterHotKey.Call(uintptr(b.hwnd), uintptr(spareHKID),
+-			uintptr(modNoRepeat), uintptr(vkEscape))
++			uintptr(acc.Mods), uintptr(acc.VK))
+ 		if r == 0 {
+ 			if errno, ok := e.(syscall.Errno); ok && errno != 0 {
+ 				res <- errno
+@@ -80,38 +90,89 @@ func escBorrowProbe(t *testing.T, b *Ball) (free bool, err error) {
+ 	return true, nil
+ }
+ 
+-// requireEscBorrowed is the non-skippable form of "Confirming really took Esc".
+-// It accepts exactly two readings: the bare Esc is in OUR registration set
+-// (then the desktop probe must see it as taken), or we tried and Win32 refused
+-// it (a foreign app holds bare Esc on this machine - reported, never passed
+-// off as a borrow). A ball that never attempted the borrow reads as standby and
+-// fails here, which is the whole point: the alternative would be a ruler that
+-// cannot tell "no borrow needed" from "borrow code deleted".
++// escBorrowProbe is the bare-Esc instance of hotkeyFreeProbe. It stays exactly as
++// ticket 245 wrote it because two questions are still about the bare Esc and
++// nothing else: an idle ball must not hold the desktop's Esc whatever the user
++// configured (requireIdleRoster), and a user who left [hotkey] cancel at the
++// default must find the borrow on that same Esc (condition ①, 260-r1).
++func escBorrowProbe(t *testing.T, b *Ball) (free bool, err error) {
++	t.Helper()
++	return hotkeyFreeProbe(t, b, Accelerator{Mods: modNoRepeat, VK: vkEscape})
++}
++
++// requireEscBorrowed is the non-skippable form of "Confirming really took the
++// cancel key". The name and the bare-Esc probe are ticket 245's; WHICH key that
++// is has come from [hotkey] cancel since ticket 260 形ⓐ, so the expectation is
++// derived from the ball's own seed (wantCancelBorrow260r2, in the default-档 file
++// hotkey_cancel_borrow_expect_260r2_test.go) instead of being spelled as a
++// VK_ESCAPE constant in this file. That is a sync to the ruled behaviour, not a
++// loosening: every branch below still ends in t.Fatal/t.Error, and the two cells
++// stay two separate cells -
++//
++//   - seed unset or "Esc" (condition ①, zero drift): the expectation is the raw
++//     default pair {MOD_NOREPEAT 0x4000, VK_ESCAPE 0x1B}, and the desktop half of
++//     the check still runs against the bare Esc and still requires it NOT free;
++//   - any other seed (AC#1): the expectation is that combination, the desktop half
++//     probes THAT combination, and the bare Esc must now be free - the whole point
++//     of 形ⓐ is that a user who moved off Esc does not also lose Esc.
++//
++// It accepts exactly two readings either way: the borrowed combination is in OUR
++// registration set (then the desktop probe must see it as taken), or we tried and
++// Win32 refused it (a foreign app holds that combination on this machine -
++// reported, never passed off as a borrow). A ball that never attempted the borrow
++// reads as standby and fails here, which is the whole point: the alternative would
++// be a ruler that cannot tell "no borrow needed" from "borrow code deleted".
+ func requireEscBorrowed(t *testing.T, b *Ball) {
+ 	t.Helper()
++	seed := b.ConfiguredHotkeys().Cancel
++	wish := wantCancelBorrow260r2(seed)
+ 	rep := b.HotkeyReport()
+ 	if len(rep.Live()) != 4 {
+ 		line, _ := rep.Binding(hkCancel)
+ 		if line.Status == HotkeyStandby {
+-			t.Fatalf("ticket 245 RED: Confirming never attempted the Esc borrow (cancel line still "+
+-				"standby, live set holds %d of the 4 slots): %+v", len(rep.Live()), rep.Bindings())
++			t.Fatalf("ticket 245 RED: Confirming never attempted the cancel borrow (cancel line still "+
++				"standby, live set holds %d of the 4 slots, [hotkey] cancel = %q): %+v",
++				len(rep.Live()), seed, rep.Bindings())
+ 		}
+ 		if line.Status == HotkeyTaken || line.Status == HotkeyError {
+-			t.Logf("SKIP-LOUD: the Esc borrow was ATTEMPTED and refused by Win32 (%v) - another program on "+
+-				"this desktop owns bare Esc, so this run did not prove the borrowed key reaches the shell. "+
+-				"It did prove the ball tries (that is what ticket 245's borrow path is).", line.Err)
++			t.Logf("SKIP-LOUD: the cancel borrow was ATTEMPTED and refused by Win32 (%v) - another program on "+
++				"this desktop owns %+v, so this run did not prove the borrowed key reaches the shell. "+
++				"It did prove the ball tries (that is what ticket 245's borrow path is).", line.Err, wish.Acc)
+ 			return
+ 		}
+ 		t.Fatalf("after the borrow the live set holds %d entries, want 4: %+v", len(rep.Live()), rep.Bindings())
+ 	}
+-	if got := rep.Live()[hkCancel]; got.VK != vkEscape {
+-		t.Fatalf("the borrowed cancel slot holds VK 0x%X, want VK_ESCAPE 0x1B: %+v", got.VK, rep.Bindings())
++	if got := rep.Live()[hkCancel]; got != wish.Acc {
++		switch {
++		case wish.Refused != nil:
++			t.Fatalf("the borrowed cancel slot holds %+v, want the default pair %+v: [hotkey] cancel %q is not a "+
++				"parsable combination (%v), and condition ③ says the borrow takes the default and SAYS so: %+v",
++				got, wish.Acc, seed, wish.Refused, rep.Bindings())
++		case wish.Default:
++			t.Fatalf("ticket 260 condition ① RED: [hotkey] cancel is the default (%q), so the borrowed slot must "+
++				"hold the raw pair {mods 0x4000, VK 0x1B}, got %+v: %+v", seed, got, rep.Bindings())
++		default:
++			t.Fatalf("the borrowed cancel slot holds %+v, want the configured cancel key %q = %+v: after ticket 260 "+
++				"形ⓐ the borrow registers what the config names, so this is either the pre-260 hard-coded Esc or a "+
++				"key the config never named: %+v", got, seed, wish.Acc, rep.Bindings())
++		}
+ 	}
+-	if free, err := escBorrowProbe(t, b); err != nil {
+-		t.Fatalf("the bare-Esc probe could not run: %v", err)
++	// The desktop, not our own bookkeeping, says the borrowed combination is ours.
++	if free, err := hotkeyFreeProbe(t, b, wish.Acc); err != nil {
++		t.Fatalf("the probe for the borrowed %q (%+v) could not run: %v", seed, wish.Acc, err)
+ 	} else if free {
+-		t.Fatal("ticket 245 RED: the ball says it borrowed Esc, but the desktop still has it free - " +
+-			"the borrow registered on some other key, not on VK_ESCAPE")
++		t.Fatalf("ticket 245 RED: the ball says it borrowed %q (%+v), but the desktop still has that combination "+
++			"free - the borrow registered on some other key: %+v", seed, wish.Acc, rep.Bindings())
++	}
++	if !wish.Default {
++		// The second cell of 形ⓐ, on the same live ball: the key nobody configured
++		// must not be the one that got taken.
++		if free, err := escBorrowProbe(t, b); err != nil {
++			t.Fatalf("the bare-Esc probe could not run: %v", err)
++		} else if !free {
++			t.Errorf("bare Esc is claimed while [hotkey] cancel says %q and the borrow holds %+v - the ball is "+
++				"holding two keys: %+v", seed, wish.Acc, rep.Bindings())
++		}
+ 	}
+ }
+ 
+@@ -302,10 +363,12 @@ func TestLiveHotkeyOccupiedVsNotAttempted(t *testing.T) {
+ 		t.Fatalf("summon VK = 0x%X, want 'Q'", got)
+ 	}
+ 	// The cancel path's ability, asserted once the spare id is really free (the
+-	// probe inside these helpers registers bare Esc on that id, so it must not
+-	// still be squatted). This is what survived from ticket 64's "cancel is not
+-	// dropped when its neighbours fail": the slot is idle-unbound by design, and
+-	// the borrow that binds it has to work anyway - then give Esc back.
++	// probes inside these helpers register the borrowed combination - for this
++	// fixture [hotkey] cancel's Ctrl+Alt+V, plus the bare Esc that the idle
++	// roster insists is free - on that id, so nothing may still be squatted).
++	// This is what survived from ticket 64's "cancel is not dropped when its
++	// neighbours fail": the slot is idle-unbound by design, and the borrow that
++	// binds it has to work anyway - then give that same key back.
+ 	requireIdleRoster(t, b)
+ 	b.TakeEscForCancel()
+ 	requireEscBorrowed(t, b)
+@@ -452,13 +515,43 @@ func requireIdleRoster(t *testing.T, b *Ball) {
+ }
+ 
+ // requireEscReturned is AC#2's "还" half on a real window: the roster is idle
+-// again AND Win32 itself reports the bare Esc unclaimed.
++// again AND Win32 itself reports the key that was borrowed unclaimed.
++//
++// Before ticket 260 those were the same probe - the borrow was always the bare
++// Esc, so requireIdleRoster's bare-Esc reading doubled as the return check. Once
++// the borrow follows [hotkey] cancel (形ⓐ), a non-default seed needs its OWN
++// free-reading or a release that never unregistered would be invisible, which is
++// precisely the zero-symptom shape this ticket family exists to keep loud. For
++// the default seed the borrowed key IS the bare Esc, so this adds no second
++// probe and the default档 reading stays bit-for-bit what ticket 245 shipped.
+ func requireEscReturned(t *testing.T, b *Ball) {
+ 	t.Helper()
++	seed := b.ConfiguredHotkeys().Cancel
++	wish := wantCancelBorrow260r2(seed)
+ 	if b.EscTakenOver() {
+-		t.Fatal("ticket 245 RED: Esc still marked taken over after the session end")
++		t.Fatal("ticket 245 RED: the cancel key is still marked taken over after the session end")
+ 	}
+ 	requireIdleRoster(t, b)
++	if wish.Default {
++		return // requireIdleRoster just proved the borrowed key - the bare Esc - is free
++	}
++	free, err := hotkeyFreeProbe(t, b, wish.Acc)
++	if err != nil {
++		t.Fatalf("the probe for the key the borrow held (%q / %+v) could not run: %v", seed, wish.Acc, err)
++	}
++	if free {
++		return
++	}
++	// Still claimed. If our own set names that id, the return never happened; if
++	// the set is clean, either the UnregisterHotKey did not reach Win32 or
++	// something else took the key mid-run - and neither reading is a pass.
++	if _, ours := b.RegisteredHotkeys()[hkCancel]; ours {
++		t.Fatalf("ticket 245/260 RED: the borrowed %q (%+v) is still in the ball's own registration set after the "+
++			"session end: %s", seed, wish.Acc, accelSetString(b.RegisteredHotkeys()))
++	}
++	t.Errorf("the borrowed %q (%+v) is still claimed on this desktop after the session end while the ball's own "+
++		"set is clean: the return never reached Win32, or the key was taken again mid-run - this run cannot tell "+
++		"those apart and neither one is a pass", seed, wish.Acc)
+ }
+ 
+ // ------------------------------------------------------------------ helpers
