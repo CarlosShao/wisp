@@ -167,16 +167,24 @@ const bridgeJoinBudget258 = 3 * time.Second
 // maps the host's [hotkey] view through ball.ApplyHotkeyDefaults and names the
 // provenance of the result.
 //
+// THE RULE 258-r2 FIXED (AC#1 wording; adjudicated by 258-v1 §3 and the
+// orchestrator's 翻勾 note): the tier word describes WHAT THE LIVE SET IS, not
+// merely whether a file was readable. A readable file without a [hotkey]
+// section arrives as three empty slots plus the schema's cancel = "Esc" tag
+// (258-a1 census Q1a), and ApplyHotkeyDefaults merges exactly
+// ball.DefaultHotkeys() out of it - so it prints "defaults". Claiming
+// "config" there named a file that contributed no binding at all.
+//
 // The three shapes, and the sentence each one owes:
-//   - a non-nil hotCfg that returns a config view: the values are config's, with
-//     empty slots filled from the product defaults by ApplyHotkeyDefaults (the
-//     schema only tags cancel; summon/mute/panel arrive as "" on a fresh file -
-//     258-a1 census Q1a). provenance "config" even when every field was empty,
-//     because the FILE is what produced this set; the audit line in
-//     resident_windows.go names the per-field picture.
-//   - a non-nil hotCfg that cannot answer (unreadable config): DefaultHotkeys,
-//     provenance "defaults", and the reason said by the caller - AC#1 forbids
-//     the silent swap, so the fallback is a named sentence, not an inference.
+//   - a non-nil hotCfg whose merged set differs from the compiled defaults: at
+//     least one slot is the file's, provenance "config"; the audit line in
+//     cmd/wisp/resident_windows.go names the per-field picture.
+//   - a non-nil hotCfg whose merged set IS the compiled defaults - the file is
+//     missing or unreadable (the view answers nothing), or the file exists
+//     without a [hotkey] section (only the schema tag arrives): the result is
+//     literally ball.DefaultHotkeys(), provenance "defaults". AC#1's 不许静默
+//     换成另一套 is a VALUE statement: none of these shapes returns a fourth
+//     set; only the word could ever have lied.
 //   - nil hotCfg (no host view at all): DefaultHotkeys, provenance "no host
 //     config view" - the pre-258 shape, still sayable because a test may start
 //     the host without a config source.
@@ -184,14 +192,13 @@ func residentBallHotkeyChain258(hotCfg func() ball.HotkeyConfig) (ball.HotkeyCon
 	if hotCfg == nil {
 		return ball.DefaultHotkeys(), hotkeyProvenanceNone
 	}
-	h := hotCfg()
-	if h.Summon == "" && h.Mute == "" && h.Cancel == "" && h.Panel == "" {
-		// The view answered nothing at all: either the file is missing or the
-		// host has no config yet. The compiled defaults are the fallback AC#1
-		// names, and the provenance word below is the "说得出这句话" half.
-		return ball.DefaultHotkeys(), hotkeyProvenanceDefaults
+	cfg := ball.ApplyHotkeyDefaults(hotCfg())
+	if cfg == ball.DefaultHotkeys() {
+		// The file (or its absence) moved no slot: the live set is the compiled
+		// table and the verdict owes the word "defaults" (ticket 258-r2).
+		return cfg, hotkeyProvenanceDefaults
 	}
-	return ball.ApplyHotkeyDefaults(h), hotkeyProvenanceConfig
+	return cfg, hotkeyProvenanceConfig
 }
 
 // startResidentBall creates the floating ball window, the tray icon and the

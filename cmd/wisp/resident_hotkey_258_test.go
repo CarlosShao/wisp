@@ -78,3 +78,50 @@ func Test258AssemblyRootWiresTheChainAndTheBridge(t *testing.T) {
 		t.Errorf("resident_windows.go no longer reads config.toml for the [hotkey] chain: the construction source moved, re-adjudicate this walk")
 	}
 }
+
+// sinkRebindLineHas258 is the reading rule the winlive rebind ruler
+// (cmd/wisp/resident_hotkey_live_258_windows_test.go) uses on the raw sink
+// tail. Ticket 258-v1 §5 measured the defect it replaces: the rebind record WAS
+// in the sink and the judge still failed, because the old grep demanded the
+// console equals shape summon=VALUE while internal/ball/hotkey_reload.go's
+// Check books the slog JSON shape ("summon":"VALUE", colon form). The judge
+// now names both spellings; a tail that carries neither is read as "not
+// rebound", which is what the live case is supposed to fail on.
+func sinkRebindLineHas258(tail, summonValue string) bool {
+	const rebindMsg = "ball: hotkeys rebound after config change"
+	if !strings.Contains(tail, rebindMsg) {
+		return false
+	}
+	return strings.Contains(tail, `"summon":"`+summonValue+`"`) ||
+		strings.Contains(tail, "summon="+summonValue)
+}
+
+// Test258SinkRebindRulerReadsBothSpellings is AC#2 condition (the rebind
+// winlive ruler's format mismatch) pinned in CI: a JSON sink record of the
+// exact shape hotkey_reload.go writes must read as a rebind, the console
+// equals shape must too, and the negative shapes (old value, missing msg,
+// empty tail) must NOT. This is also the static counter-proof for the
+// "forever-true" mutation: replace the body with return true and the
+// third-block assertions below go red, which is what says the live case's
+// verdict is carried by this reading and not by the loop.
+func Test258SinkRebindRulerReadsBothSpellings(t *testing.T) {
+	jsonLine := `{"time":"2026-10-03T21:48:52.272+08:00","level":"INFO","msg":"ball: hotkeys rebound after config change","summon":"Ctrl+Alt+R","mute":"Ctrl+Alt+M","cancel":"Esc","panel":"Ctrl+Alt+P","live":3}`
+	consoleLine := `wisp: ball: hotkeys rebound after config change summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3`
+	if !sinkRebindLineHas258(jsonLine, "Ctrl+Alt+R") {
+		t.Errorf("the JSON-colon sink record the shipped process actually writes does not read as a rebind; that is the 258-v1 §5 ruler bug still in place")
+	}
+	if !sinkRebindLineHas258(consoleLine, "Ctrl+Alt+R") {
+		t.Errorf("the console equals shape stopped reading (the shape the old grep alone required)")
+	}
+	// Negative shapes: the reading must be about the NEW value, not about any
+	// line that happens to exist.
+	if sinkRebindLineHas258(jsonLine, "Ctrl+Alt+Z") {
+		t.Errorf("the matcher answered a summon value the record does not carry")
+	}
+	if sinkRebindLineHas258(`{"msg":"ball: hotkey reload","binding":"x"}`, "Ctrl+Alt+R") {
+		t.Errorf("a non-rebind record read as a rebind")
+	}
+	if sinkRebindLineHas258("", "Ctrl+Alt+R") {
+		t.Errorf("an empty sink tail read as a rebind: the live case would go green on a host whose sink never opened")
+	}
+}

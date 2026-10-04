@@ -22,9 +22,14 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
+
+	"github.com/CarlosShao/wisp/internal/ball"
+	"golang.org/x/sys/windows"
 )
 
 // TestLive258ResidentBootNamesProvenanceAndDefaults is AC#1's live sentence:
@@ -100,14 +105,26 @@ func TestLive258ResidentBootTakesConfigHotkeys(t *testing.T) {
 }
 
 // TestLive258ResidentRebindsWithoutRestart is AC#2's live form: the process is
-// UP on the default summon, then config.toml is edited underneath it; the poll
-// (1s) must rebind the live keys inside the same process. Read through the
-// process's own summary line, which the rebind updates via HotkeyReport.
+// UP on a planted non-default summon, then config.toml is edited underneath
+// it; the poll (1s) must rebind the live keys inside the same process.
+//
+// THE RULER WAS FIXED IN 258-R2 (258-v1 §5 condition (i)): the judge used to
+// grep the console equals shape (summon=VALUE) off the sink, but the sink is a
+// slog JSON file and the rebind record spells it "summon":"VALUE" - so the
+// read could never hit and the case failed on a working line. The reading now
+// goes through sinkRebindLineHas258 (cmd/wisp/resident_hotkey_258_test.go,
+// pinned in CI by Test258SinkRebindRulerReadsBothSpellings), which judges the
+// record in either spelling and reads "absent" as absent. What cannot be read
+// at all - a sink that never opened - fails named, with the tail attached, not
+// silently.
 func TestLive258ResidentRebindsWithoutRestart(t *testing.T) {
 	exe := buildWispForTest(t)
 	dataDir := t.TempDir()
 	const newSummon258 = "Ctrl+Alt+R"
-	body := "[hotkey]\nsummon = \"Ctrl+Alt+Q\"\nmute = \"Ctrl+Alt+M\"\ncancel = \"Esc\"\npanel = \"Ctrl+Alt+P\"\n"
+	// Boot summon is Z, a NON-default: with Q the boot summary below could not
+	// tell the config path from the fallback, and the ruler would read true on
+	// the M3-forever-defaults rot shape too.
+	body := "[hotkey]\nsummon = \"Ctrl+Alt+Z\"\nmute = \"Ctrl+Alt+M\"\ncancel = \"Esc\"\npanel = \"Ctrl+Alt+P\"\n"
 	if err := os.WriteFile(filepath.Join(dataDir, configFileName), []byte(body), 0o600); err != nil {
 		t.Fatalf("plant config: %v", err)
 	}
@@ -125,8 +142,11 @@ func TestLive258ResidentRebindsWithoutRestart(t *testing.T) {
 		t.Skipf("SKIP-LOUD: no ball window on this host (%q)", ballAbsentClaim)
 	}
 	out := leg.stdout.String()
-	if !strings.Contains(out, "summon=Ctrl+Alt+Q") {
-		t.Fatalf("AC#2 LIVE RED: the boot summary does not name the planted summon Ctrl+Alt+Q:\n%s", out)
+	if !strings.Contains(out, "hotkeys from config") {
+		t.Fatalf("AC#2 LIVE RED: a boot with the planted non-default summon did not name config as the source (the construction half of this ruler cannot be trusted for the rebind half):\n%s", out)
+	}
+	if !strings.Contains(out, "summon=Ctrl+Alt+Z") {
+		t.Fatalf("AC#2 LIVE RED: the boot summary does not name the planted non-default summon Ctrl+Alt+Z:\n%s", out)
 	}
 
 	// THE EDIT: same file, new summon.
@@ -136,33 +156,40 @@ func TestLive258ResidentRebindsWithoutRestart(t *testing.T) {
 	}
 
 	// The rebind books "ball: hotkeys rebound after config change" in the sink
-	// and the NEXT summary reads it; the summary itself is printed once at boot,
-	// so the durable reading is the log file the sink installed. Read the raw
-	// jsonl bytes (the rebind line is a slog record whose msg carries the
-	// phrase), with a bounded poll.
+	// (hotkey_reload.go's slog record); the summary line is printed once at
+	// boot and is not rewritten. Read the raw jsonl bytes through the fixed
+	// matcher, with a bounded poll - a sink that never produced the line ends
+	// in a named failure carrying the tail, which is the honest "cannot read"
+	// shape (readSinkTail258 says so in the tail itself when no jsonl exists).
 	rebound := false
 	var sinkTail string
 	for i := 0; i < 240 && !rebound; i++ {
 		sinkTail = readSinkTail258(t, logSinkDir(dataDir))
-		if strings.Contains(sinkTail, "hotkeys rebound after config change") &&
-			strings.Contains(sinkTail, "summon="+newSummon258) {
-			rebound = true
-		}
+		rebound = sinkRebindLineHas258(sinkTail, newSummon258)
 		if !rebound {
 			time.Sleep(50 * time.Millisecond)
 		}
 	}
 	if !rebound {
-		t.Fatalf("AC#2 LIVE RED: 12s after the [hotkey] edit the process has not rebound the live keys (no 'hotkeys rebound after config change' with summon=%s in the sink).\nsink tail:\n%s", newSummon258, sinkTail)
+		t.Fatalf("AC#2 LIVE RED: 12s after the [hotkey] edit the process has not rebound the live keys (no rebind record naming summon=%s in the sink, in either the JSON colon shape \"summon\":\"%s\" or the console shape summon=%s).\nsink tail:\n%s", newSummon258, newSummon258, newSummon258, sinkTail)
 	}
 	t.Logf("AC#2 LIVE: the same process rebound summon to %s after the file edit", newSummon258)
 }
 
 // TestLive258ResidentOccupiedCombinationNamesTheNewValue is AC#3's live form:
 // an occupied combination must be said in Problems() with the NEW value named.
-// The squat this case uses is the machine's own Ctrl+Alt+U risk
-// (internal/ball's live suite measured it free on the dev machine; if some
-// other program owns it, the case says so loudly rather than pretending).
+//
+// THE RULER WAS FIXED IN 258-R2 (258-v1 §5/§7-R7): it used to BET that some
+// third-party program happened to hold Ctrl+Alt+U, with no fallback - on a
+// machine where the key was free the child registered it, no occupied line
+// existed, and the case went red on a working product. The premise is now
+// BUILT: this process registers the combination itself (squatHotkeyForRuler258)
+// before the child boots. Either this process holds it or a third party does
+// (RegisterHotKey answered ERROR_HOTKEY_ALREADY_REGISTERED) - both readings
+// satisfy the premise, and the child's panel slot cannot bind. Anything else
+// (a RegisterHotKey failure that is neither) names the ruler red instead of
+// judging blind. The only honest skip left is the no-ball-window host, checked
+// the same way the rest of the winlive family checks it.
 func TestLive258ResidentOccupiedCombinationNamesTheNewValue(t *testing.T) {
 	exe := buildWispForTest(t)
 	dataDir := t.TempDir()
@@ -171,6 +198,12 @@ func TestLive258ResidentOccupiedCombinationNamesTheNewValue(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dataDir, configFileName), []byte(body), 0o600); err != nil {
 		t.Fatalf("plant config: %v", err)
 	}
+
+	// Build the premise BEFORE the child exists: whoever ends up holding the
+	// combination, the child's first registration attempt must be refused.
+	owner := squatHotkeyForRuler258(t, occupied258)
+	t.Logf("AC#3 LIVE premise: %s is %s", occupied258, owner)
+
 	leg := bootResidentLeg(t, exe, dataDir)
 	t.Cleanup(leg.stop)
 
@@ -189,14 +222,72 @@ func TestLive258ResidentOccupiedCombinationNamesTheNewValue(t *testing.T) {
 		t.Fatalf("AC#3 LIVE RED: the verdict does not name config as the source:\n%s", out)
 	}
 	if !strings.Contains(out, "occupied by another program") || !strings.Contains(out, "panel = \""+occupied258+"\"") {
-		t.Fatalf("AC#3 RED: an occupied panel combination did not produce the honest Problems() line naming %s:\n%s", occupied258, out)
+		t.Fatalf("AC#3 RED: the premise was built (%s), yet the occupied panel combination produced no honest Problems() line naming %s:\n%s", owner, occupied258, out)
 	}
-	if strings.Contains(out, "hotkeys live 3/4") {
-		t.Logf("AC#3 LIVE: live count reads 3/4 with panel taken (summon+mute live, cancel standby)")
+	// With the premise built, the arithmetic of the boot verdict is pinned,
+	// not logged: summon+mute can be the only live slots (cancel is standby by
+	// ticket 245, panel was refused). A 3/4 here means the child registered
+	// over the holder it should not have been able to bind past.
+	if !strings.Contains(out, "hotkeys live 2/4") {
+		t.Errorf("AC#3 RED: with %s occupied (%s) the boot verdict does not read hotkeys live 2/4:\n%s", occupied258, owner, out)
 	}
 	if !strings.Contains(out, "panel="+occupied258) {
 		t.Errorf("AC#3 RED: the per-slot summary does not name the occupied NEW binding %s (the summary must say what Win32 made of the NEW value, not keep the old one):\n%s", occupied258, out)
 	}
+}
+
+// liveSquatID258 is this process's registration id for the built premise. It
+// only ever exists inside the test binary, with hWnd 0 (the hotkey is held for
+// the locked thread's queue and released in cleanup); nothing pumps it.
+const liveSquatID258 = 0x258
+
+var (
+	pSquatRegisterHotKey258   = windows.NewLazySystemDLL("user32.dll").NewProc("RegisterHotKey")
+	pSquatUnregisterHotKey258 = windows.NewLazySystemDLL("user32.dll").NewProc("UnregisterHotKey")
+)
+
+// squatHotkeyForRuler258 turns binding into a BUILT occupancy premise for the
+// winlive occupied ruler: it registers the desktop-wide combination in THIS
+// process on a locked OS thread (RegisterHotKey is desktop-wide and
+// per-process-blind, so the shipped child sees exactly what a third-party
+// holder produces). Answers:
+//   - registration succeeded: this test process is the holder, released in
+//     t.Cleanup on the same thread that registered;
+//   - ERROR_HOTKEY_ALREADY_REGISTERED: a third party already holds it, the
+//     premise holds with that owner and nothing needs releasing;
+//   - any other answer: named t.Fatalf - the ruler will not judge an
+//     occupancy sentence on a machine where it could not build (or find) a
+//     holder.
+//
+// It returns a one-line description of who ends up holding the key, for the
+// failure messages and the premise log.
+func squatHotkeyForRuler258(t *testing.T, binding string) string {
+	t.Helper()
+	acc, err := ball.ParseAccelerator(binding)
+	if err != nil {
+		t.Fatalf("258 LIVE RULER RED: parse %s for the built premise: %v", binding, err)
+	}
+	// The registration and its release must land on one thread: pin this
+	// goroutine, register, and only unlock after UnregisterHotKey answered.
+	runtime.LockOSThread()
+	r, _, callErr := pSquatRegisterHotKey258.Call(0, uintptr(liveSquatID258), uintptr(acc.Mods), uintptr(acc.VK))
+	if r == 0 {
+		errno, ok := callErr.(syscall.Errno)
+		if !ok || errno == 0 {
+			errno = syscall.EINVAL
+		}
+		if errno == windows.ERROR_HOTKEY_ALREADY_REGISTERED {
+			runtime.UnlockOSThread()
+			return "held by a third-party program on this machine (RegisterHotKey answered ERROR_HOTKEY_ALREADY_REGISTERED before the child was even launched)"
+		}
+		runtime.UnlockOSThread()
+		t.Fatalf("258 LIVE RULER RED: cannot build the occupancy premise for %s: RegisterHotKey answered %v. The pre-r2 ruler bet on the machine and called the bet a reading; this one refuses to judge without its premise.", binding, errno)
+	}
+	t.Cleanup(func() {
+		pSquatUnregisterHotKey258.Call(0, uintptr(liveSquatID258))
+		runtime.UnlockOSThread()
+	})
+	return "held by THIS test process (squatted on a locked thread before the child booted, released in cleanup)"
 }
 
 // readSinkTail258 concatenates the raw bytes of every jsonl in the sink dir

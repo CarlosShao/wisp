@@ -182,9 +182,10 @@ func runResident() {
 			return ball.HotkeyConfig{}
 		}
 		h := c.Hotkey
-		slog.Info("ball: [hotkey] bindings taken from config.toml",
+		slog.Info("ball: [hotkey] view read from config.toml",
 			"summon", h.Summon, "mute", h.Mute, "cancel", h.Cancel, "panel", h.Panel,
-			"empty_slots_note", "empty slots are filled from the product defaults by ball.ApplyHotkeyDefaults")
+			"empty_slots_note", "empty slots are filled from the product defaults by ball.ApplyHotkeyDefaults; "+
+				"when the merged set is the compiled defaults the verdict prints the word defaults (ticket 258-r2)")
 		return ball.HotkeyConfig{Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel}
 	}
 	// The hot-tier half (form A): the bridge's src re-reads config.toml each
