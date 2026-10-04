@@ -1,0 +1,1 @@
+ok  	github.com/CarlosShao/wisp/tools/d22scan	18.889s

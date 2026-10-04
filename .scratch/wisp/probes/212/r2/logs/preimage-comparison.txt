@@ -1,0 +1,24 @@
+fixed:
+rc=1 distinct-phantom-tokens=8
+.scratch/wisp/probes/33/r6/fullpack2.log
+internal/engines
+internal/provider
+internal/tool
+scripts/check-pathclean-ban.sh
+tools/agent/cmd
+tools/bridge.go
+tools/gate.go
+
+mutated (class-3 exemption removed):
+rc=1 distinct-phantom-tokens=9
+.scratch/wisp/probes/33/r6/fullpack2.log
+docs/evidence/s1/62-
+internal/engines
+internal/provider
+internal/tool
+scripts/check-pathclean-ban.sh
+tools/agent/cmd
+tools/bridge.go
+tools/gate.go
+
+md5 before=e6d1745996e8e02c82ab691ac2cbadf8 after=e6d1745996e8e02c82ab691ac2cbadf8 identical=True

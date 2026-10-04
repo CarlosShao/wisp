@@ -1,0 +1,26 @@
+rc=1
+--- stdout ---
+d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/tmp.nRJNr83gw6/preimage: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 265 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/tmp.nRJNr83gw6/preimage
+d22scan: scope bans #1-5 internal/      examined 228 production Go files
+d22scan: scope bans #1-5 cmd/           examined  37 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  30 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 498 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  92 Go files, comments and _test.go included
+internal/agent/approval/pending_read.go:43: [phantom-citation] comment cites repo path "tools/gate.go" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/agent/approval/queue.go:38: [phantom-citation] comment cites repo path "tools/bridge.go" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/agent/tools.go:89: [phantom-citation] comment cites repo path "internal/tool" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/ball/statevisual.go:68: [phantom-citation] comment cites repo path "docs/evidence/s1/62-" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/risk/pathresolver.go:28: [phantom-citation] comment cites repo path "scripts/check-pathclean-ban.sh" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/risk/provenance.go:63: [phantom-citation] comment cites repo path "tools/agent/cmd" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/tools/bridge.go:252: [phantom-citation] comment cites repo path "internal/provider" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+cmd/wisp/models.go:20: [phantom-citation] comment cites repo path "internal/engines" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+cmd/wisp/panel_host_windows.go:343: [phantom-citation] comment cites repo path ".scratch/wisp/probes/33/r6/fullpack2.log" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+
+--- stderr ---
+d22scan: 9 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+exit status 1
+

@@ -1,0 +1,3 @@
+SCOPE-LINES-IDENTICAL
+pre-gate-full.txt:runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+post1-regex-gate-full.txt:runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0

@@ -1,0 +1,18 @@
+--- FAIL: TestScannerSelfScanOfRealRepoIsGreen (1.17s)
+    scan_test.go:269: repo HEAD violates: internal/tools/bridge.go:256: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+--- FAIL: TestRealRepoLedgerIsHonest (1.18s)
+    scan_test.go:2207: ban #6 examined 85 frontend/ text files in the real repo
+    scan_test.go:2211: HEAD must be green, rc=1 out=d22scan: examined 99 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+        d22scan: scope bans #1-5 internal/      examined 228 production Go files
+        d22scan: scope bans #1-5 cmd/           examined  38 production Go files
+        d22scan: scope ban #6 frontend/         examined  85 text files
+        d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+        d22scan: scope ban #8 design/           examined  39 text files
+        d22scan: scope ban #8 frontend/         examined  85 text files
+        d22scan: scope ban #8 internal/         examined 498 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined  97 Go files, comments and _test.go included
+        internal/tools/bridge.go:256: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+         err=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+FAIL
+FAIL	github.com/CarlosShao/wisp/tools/d22scan	16.989s
+FAIL
