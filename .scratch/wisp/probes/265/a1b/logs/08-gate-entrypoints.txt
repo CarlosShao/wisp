@@ -1,0 +1,15 @@
+# R08 the two package-wide gates: entry points + what convicts, HEAD=2d6aed92
+## H1 leg_sink_gate_131 test funcs + marker const
+cmd/wisp/leg_sink_gate_131_test.go:161:const legSinkRulingMarker = "WISP-LEG-SINK-RULING:"
+cmd/wisp/leg_sink_gate_131_test.go:249:func TestAC4EveryLegIsNailedOrRuled(t *testing.T) {
+## H2 leg_dispatch_gate_133 test funcs + ruling const
+cmd/wisp/leg_dispatch_gate_133_test.go:30://	    `func TestXxx(t *testing.T)` sitting in a file whose name carries an
+cmd/wisp/leg_dispatch_gate_133_test.go:138:	coverageRuling133 = "WISP-LEG-COVERAGE-RULING:"
+cmd/wisp/leg_dispatch_gate_133_test.go:178:func TestAC1AC2DispatchHopGate133(t *testing.T) {
+cmd/wisp/leg_dispatch_gate_133_test.go:306:	tests   map[string][]*decl133 // runnable cases in *_test.go: top-level func TestXxx(t *testing.T)
+cmd/wisp/leg_dispatch_gate_133_test.go:453:				// Go's testing package runs them - a top-level func TestXxx(t
+cmd/wisp/leg_dispatch_gate_133_test.go:1363:// file's own registry (a name that is a func TestXxx(t *testing.T) in this
+cmd/wisp/leg_dispatch_gate_133_test.go:1403:			reds = append(reds, fmt.Sprintf("this gate claims leg %q is nailed by %q, which is not a test function in this directory's sources: %s. A nail has to name a top-level func TestXxx(t *testing.T); the gate's registry is a list of cases, and the ledger row it produces is a coverage claim. A renamed or deleted case is red here, where the registry is compared with the sources. A case that is in the sources but is not in this round's binary is red one check down for the `covered=test` bucket (runRosterReds135) and disclosed, not reddened, for a registry nail - see this file's header, third limit, and the disclosure line this run prints.", c.leg, c.test, what))
+cmd/wisp/leg_dispatch_gate_133_test.go:1470:// by collectTopLevel133, which since R-133-1 admits only a top-level func TestXxx(t
+cmd/wisp/leg_dispatch_gate_133_test.go:1556:// shaped `func TestXxx(t *testing.T)` in a file whose name carries the implicit
+cmd/wisp/leg_dispatch_gate_133_test.go:1651:				"That is ticket 133's R-133-9, family shot M-G: a func TestXxx(t *testing.T) this platform does not compile cannot run, so it reads no disk, books no record and holds no behaviour, and a row crediting it is a coverage claim with no witness. This is also the reading this file cannot get from its own parser, because the parser is what the plant satisfies. Fix: put the case in a file this build takes (the usual shapes are a `_linux_test.go`/`_windows_test.go` suffix and a //go:build line this platform fails), or take the claim out and let the leg be ruled out in words next to the code that owns it.",

@@ -1,0 +1,36 @@
+# R14 sec5(a) the four zero-valued Options fields, HEAD=862d1736 UTC=2026-10-04T09:26:22Z
+## M1 where each is consumed / defaulted
+internal/agent/approval/fakes_test.go:260:			o.Clock = opts[0].Clock
+internal/agent/approval/fakes_test.go:267:		o.WarningLead = opts[0].WarningLead
+internal/agent/approval/fakes_test.go:268:		o.MaxPending = opts[0].MaxPending
+internal/agent/approval/fakes_test.go:269:		o.MaxTracked = opts[0].MaxTracked
+internal/agent/approval/gate.go:127:	clock := o.Clock
+internal/agent/approval/gate.go:152:	tracked := o.MaxTracked
+internal/agent/approval/gate.go:158:		q:        NewQueue(o.ApprovalTimeout, o.WarningLead, o.MaxPending, logf),
+## M2 tests naming them
+internal/agent/approval/batch_test.go:90:		Window: 3 * time.Second, ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second,
+internal/agent/approval/batch_test.go:123:		Window: 3 * time.Second, ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second,
+internal/agent/approval/fakes_test.go:254:	o := approval.Options{UI: ui, Clock: clk, Channels: ch}
+internal/agent/approval/queue_test.go:192:		ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second,
+internal/agent/approval/queue_test.go:335:		g, clk, _ := newGate(t, ui, approval.Options{MaxPending: 1})
+internal/agent/approval/ticket220_l1_window_read_test.go:203:	g := New(Options{UI: ui, Clock: neverClock{now: time.Unix(0, 0)}, Window: 3 * time.Second, Grants: grants})
+internal/agent/approval/ticket220_l1_window_read_test.go:383:	g := New(Options{UI: ui, Clock: neverClock{now: time.Unix(0, 0)}, Window: 3 * time.Second, Grants: grants})
+internal/agent/approval/ticket224_reply_grant_test.go:120:		Clock:    newFakeClock(),
+internal/agent/approval/ticket84_no_owner_test.go:59:		Clock:           approval.SystemClock{},
+internal/agent/approval/ticket84_no_owner_test.go:61:		WarningLead:     100 * time.Millisecond,
+internal/agent/approval/ticket84_no_owner_test.go:154:			g, _, _ := newGate(t, newFakeUI(), approval.Options{Clock: approval.SystemClock{}})
+internal/agent/approval/ticket84_no_owner_test.go:182:		Clock:           approval.SystemClock{},
+internal/agent/approval/ticket87_veto_l2_test.go:49:		Clock:           approval.SystemClock{},
+internal/agent/approval/ticket87_veto_l2_test.go:51:		WarningLead:     25 * time.Second,
+internal/agent/approval/ticket97_alias_direction_test.go:32:		Clock:           approval.SystemClock{},
+internal/agent/approval/ticket97_alias_direction_test.go:34:		WarningLead:     25 * time.Second,
+## M3 nail on the 256 declared-field denominator (>=10)
+331:// optionsFieldSet256 parses one Go file and returns, for every call of the shape
+335:func optionsFieldSet256(t *testing.T, path string) (sets [][]string, literals int) {
+376:// declaredOptionsFields256 reads the denominator off approval's own declaration
+379:func declaredOptionsFields256(t *testing.T) []string {
+427:	sets, literals := optionsFieldSet256(t, path)
+473:	declared := declaredOptionsFields256(t)
+475:		len(got), len(declared), len(declared))
+476:	if len(declared) < 10 {
+478:			"the denominator moved, so that census table has to be re-adjudicated", len(declared))

@@ -1,0 +1,60 @@
+# R01b counts only, HEAD=$(git rev-parse --short HEAD)
+A3 total approval.Options in *_test.go (incl .scratch):
+34
+A3 outside .scratch:
+36
+A4 total:
+52
+A4 hits (all):
+cmd/wisp/resident_approval_246_windows_test.go:63:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:94:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:137:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:313:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:330:	ra2 := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:342:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:359:	ra := newResidentApproval()
+cmd/wisp/resident_approval_live_246_windows_test.go:91:	ra := newResidentApproval()
+cmd/wisp/resident_approval_live_246_windows_test.go:201:	ra := newResidentApproval()
+cmd/wisp/resident_approval_live_246_windows_test.go:295:	ra := newResidentApproval()
+cmd/wisp/resident_approval_risk_256_windows_test.go:11:// read of the host's own config.toml (newResidentApprovalWithConfig, called by
+cmd/wisp/resident_approval_risk_256_windows_test.go:131:				ra = newResidentApproval()
+cmd/wisp/resident_approval_risk_256_windows_test.go:134:				ra = newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:154:			// up. If the read face were hard-wired, or if newResidentApproval were
+cmd/wisp/resident_approval_risk_256_windows_test.go:158:				seeded := newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:172:	if a, b := newResidentApproval(), newResidentApprovalWithConfig(""); a.riskProvenance != b.riskProvenance {
+cmd/wisp/resident_approval_risk_256_windows_test.go:173:		t.Errorf("newResidentApproval() and newResidentApprovalWithConfig(\"\") disagree on provenance: %q vs %q",
+cmd/wisp/resident_approval_risk_256_windows_test.go:244:			ra := newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:285:	ra := newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:322:	fresh := newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:527:		case "newResidentApprovalWithConfig":
+cmd/wisp/resident_approval_risk_256_windows_test.go:534:		case "newResidentApproval":
+cmd/wisp/resident_approval_risk_256_windows_test.go:541:		t.Errorf("runResident calls newResidentApprovalWithConfig %d times, want exactly 1", fed)
+cmd/wisp/resident_approval_risk_256_windows_test.go:544:		t.Errorf("runResident still calls the no-host-view newResidentApproval() %d time(s): the shipped "+
+cmd/wisp/resident_approval_windows.go:91:	// out on newResidentApprovalWithConfig.
+cmd/wisp/resident_approval_windows.go:159:// newResidentApproval composes the gate the resident leg runs on WITHOUT a host
+cmd/wisp/resident_approval_windows.go:170:func newResidentApproval() *residentApproval {
+cmd/wisp/resident_approval_windows.go:171:	return newResidentApprovalWithConfig("")
+cmd/wisp/resident_approval_windows.go:174:// newResidentApprovalWithConfig composes the same gate, fed with the host's
+cmd/wisp/resident_approval_windows.go:213:func newResidentApprovalWithConfig(dataDir string) *residentApproval {
+cmd/wisp/resident_approval_windows.go:286:	// the shape newResidentApproval keeps for the 246 roster). Same compiled
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:86:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:128:		ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:164:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:166:		t.Fatal("newResidentApproval 装了取消键读口：产码路径不再读球自己的回执行了")
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:83:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:96:	ra2 := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:118:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:138:	ra2 := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:161:		ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:176:		ra2 := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:209:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:220:	if ra := newResidentApproval(); ra.cancelKeyRead != nil {
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:221:		t.Fatal("newResidentApproval 装了取消键读口：产码路径不再读球自己的回执行了")
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:223:	if ra := newResidentApprovalWithConfig(""); ra.cancelKeyRead != nil {
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:224:		t.Fatal("newResidentApprovalWithConfig 装了取消键读口：同上")
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:232:	ra := newResidentApproval()
+cmd/wisp/resident_task_source_246_windows_test.go:70:	ra := newResidentApproval()
+cmd/wisp/resident_task_source_246_windows_test.go:148:	ra := newResidentApproval()
+cmd/wisp/resident_task_source_246_windows_test.go:185:	ra := newResidentApproval()
+cmd/wisp/resident_windows.go:131:	// :151). Construction time only - see newResidentApprovalWithConfig.
+cmd/wisp/resident_windows.go:132:	ra := newResidentApprovalWithConfig(rt.Layout.DataDir)

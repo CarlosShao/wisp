@@ -1,0 +1,35 @@
+# R15 queue defaults + status-line drift check, HEAD=862d1736 UTC=2026-10-04T09:28:36Z
+## N1 NewQueue zero-defaulting
+84:func NewQueue(timeout, warnBefore time.Duration, maxPending int, logf func(string, ...any)) *Queue {
+85-	if timeout <= 0 {
+86-		timeout = DefaultApprovalTimeout
+87-	}
+88-	if warnBefore <= 0 || warnBefore >= timeout {
+89-		warnBefore = DefaultApprovalWarning
+90-	}
+91-	if maxPending <= 0 {
+92-		maxPending = DefaultMaxPending
+93-	}
+94-	if logf == nil {
+95-		logf = func(string, ...any) {}
+96-	}
+97-	return &Queue{
+98-		timeout: timeout, warn: warnBefore, maxPend: maxPending,
+99-		maxRepl: DefaultReplayHistory, byID: map[string]*qitem{},
+100-		alias: map[string]map[*qitem]bool{}, logf: logf,
+101-	}
+102-}
+103-
+104-// Contract defaults (SPEC-06 §7 / ticket 21).
+105-const (
+106-	// DefaultApprovalTimeout: 「超时 300s 一律判拒绝」. Never an infinite wait.
+## N2 does the in-flight A-1 touch residentStatusLine or the four 260r3 sentences?
+--count of + or - lines mentioning status--
+0
+## N3 in-flight diff file list (who else is touched)
+ M cmd/wisp/resident_approval_risk_256_windows_test.go
+ M cmd/wisp/resident_approval_windows.go
+ M cmd/wisp/resident_task_source_windows.go
+ M internal/tools/task_pointer_authority_ac3_174r4_windows_test.go
+## N4 does the in-flight holder spawn a goroutine (d22scan ban 1 shape)?
+97:+	mu     sync.Mutex

@@ -1,0 +1,53 @@
+# R13 sec5(a)(b) rulers, HEAD=ba900551 UTC=2026-10-04T09:19:33Z
+## L1 approval.Options declared fields (HEAD gate.go)
+4:	UI UI
+6:	Clock Clock
+9:	Channels *ChannelRegistry
+13:	Window time.Duration
+16:	ApprovalTimeout time.Duration
+19:	WarningLead time.Duration
+21:	MaxPending int
+25:	MaxTracked int
+27:	Logf func(format string, args ...any)
+43:	Grants GrantRecorder
+## L2 run.go literal fields (HEAD 605-625)
+9:			UI:              rt.ui,
+10:			Channels:        approval.NewChannels(),
+11:			Window:          time.Duration(cfg.Risk.L1WindowSec) * time.Second,
+12:			ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
+13:			Logf:            rt.auditf,
+14:			Grants:          grantWrite,
+## L3 GRANT-RECORDED / RECORD-FAILED nail census
+cmd/wisp/resident_approval_risk_256_windows_test.go:473:			"GRANT-RECORD-FAILED forever and the two sentences at approval_reply.go:277-281 stay false. "+
+cmd/wisp/resident_approval_windows.go:201:// would shout GRANT-RECORDED with a real grant_id while nothing ever reads it.
+cmd/wisp/resident_approval_windows.go:205:// an error. approval.Gate turns that into its GRANT-RECORD-FAILED line
+cmd/wisp/resident_approval_windows.go:328:// call and the audit prints GRANT-RECORD-FAILED. It never returns a nil error and
+cmd/wisp/resident_task_source_windows.go:48:// unbound 「本会话内允许」 releases the call and answers with GRANT-RECORD-FAILED,
+cmd/wisp/resident_task_source_windows.go:306:	// answers with GRANT-RECORD-FAILED rather than booking an ANSWERED row for a
+cmd/wisp/ticket224_assembly_test.go:9://	       all four packages green while the log still prints GRANT-RECORDED. Its
+cmd/wisp/ticket224_assembly_test.go:79:// catches is the one that still claims GRANT-RECORDED.
+cmd/wisp/ticket224_assembly_test.go:190:		fmt.Sprintf("approval: GRANT-RECORDED corr=%s grant_id=%d tool=%s", corr, got.ID, cardTool)) {
+internal/agent/approval/gate.go:689:			g.logf("approval: GRANT-RECORD-FAILED corr=%s tool=%s pattern=%q err=%v "+
+internal/agent/approval/gate.go:693:		g.logf("approval: GRANT-RECORDED corr=%s grant_id=%d tool=%s pattern=%q", corr, id, tool, p)
+internal/agent/approval/ticket224_reply_grant_test.go:8:// "GRANT-RECORDED" audit line. Nothing went red in any of the four packages: the
+internal/agent/approval/ticket224_reply_grant_test.go:23://		  returned, so "GRANT-RECORDED grant_id=0" over a recorder that saw
+internal/agent/approval/ticket224_reply_grant_test.go:219:		line := fmt.Sprintf("approval: GRANT-RECORDED corr=%s grant_id=%d tool=%s pattern=%q",
+internal/agent/approval/ticket224_reply_grant_test.go:251:	if f.log.has("GRANT-RECORDED") {
+internal/agent/approval/ticket224_reply_grant_test.go:271:// side - a future change that prints GRANT-RECORDED while holding no recorder
+internal/agent/approval/ticket224_reply_grant_test.go:287:	if f.log.has("GRANT-RECORDED") || f.log.has("grant_id=") {
+internal/agent/approval/ticket224_reply_grant_test.go:308:	if !f.log.has("GRANT-RECORD-FAILED") {
+internal/agent/approval/ticket224_reply_grant_test.go:312:	if n := strings.Count(f.log.all(), "GRANT-RECORDED"); n != 1 {
+internal/agent/approval/ticket224_reply_grant_test.go:313:		t.Errorf("audit has %d GRANT-RECORDED lines, want exactly 1 for a 2-path answer whose "+
+internal/agent/approval/ticket224_reply_grant_test.go:318:	if !f.log.has(fmt.Sprintf("GRANT-RECORDED corr=%s grant_id=11 tool=%s pattern=%q",
+--counts--
+GRANT-RECORDED total=14
+GRANT-RECORDED in _test=12
+GRANT-RECORD-FAILED total=7
+GRANT-RECORD-FAILED in _test=2
+GRANT-DROPPED total=7
+GRANT-DROPPED in _test=3
+## L4 RECORD-FAILED in gate.go (prod shape)
+674:		g.logf("approval: GRANT-DROPPED corr=%s tool=%s paths=%d "+
+680:		g.logf("approval: GRANT-DROPPED corr=%s (卡片主题在答复前已离开队列，未落盘任何规则)", corr)
+689:			g.logf("approval: GRANT-RECORD-FAILED corr=%s tool=%s pattern=%q err=%v "+
+693:		g.logf("approval: GRANT-RECORDED corr=%s grant_id=%d tool=%s pattern=%q", corr, id, tool, p)

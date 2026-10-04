@@ -1,0 +1,33 @@
+# R12 HEAD vs in-flight A-1 shape, HEAD=ba900551 UTC=2026-10-04T09:15:23Z
+## K1 HEAD version of the literal
+219:	ra.gate = approval.New(approval.Options{
+220:		UI:              ra.ui,
+221:		Channels:        approval.NewChannels(),
+222:		Window:          window,
+223:		ApprovalTimeout: timeout,
+224:		Logf:            ra.residentAuditf,
+## K2 HEAD line of the not-closed comment
+185:// WHAT THIS DELIBERATELY DOES NOT CLOSE, NAMED SO IT IS NOT MISTAKEN FOR DONE:
+186:// Options.Grants stays unset here. The session ledger's only production
+188:// gate is built roughly 129 lines BEFORE (256-a2 census §0/§2), and g.grants has
+## K3 in-flight: holder declaration + binding sites
+97:	// grants is the late-bound session-grant writer this file hands to
+101:	grants *residentGrantHolder
+182:// New (gate.go:160, "grants: o.Grants"), and the pair it needs - the minted
+221:	target approval.GrantRecorder
+229:func (h *residentGrantHolder) bind(rec approval.GrantRecorder) {
+249:// Record implements approval.GrantRecorder (the whole interface is this one
+284:	ra.grants.bindSessionLedger(l)
+317:// residentGrantHolder, a late-bound approval.GrantRecorder implemented right
+365:	ra.grants = &residentGrantHolder{}
+374:		Grants:          ra.grants,
+## K4 in-flight: task source binding
+295:	// Ticket 265 (form ⓐ-Ⅰ, orchestrator ruling A601 §4): the session ledger this
+303:	// A nil run.session - the mint or the ledger failed, and run.go already said
+309:		ra.bindResidentGrantLedger(run.session)
+363:	"yes / session / no / veto / always / head / view 是答复那一张的路，quit 关掉这一路"
+## K5 is the 256 AST test updated in the working tree?
+ M cmd/wisp/resident_approval_risk_256_windows_test.go
+ .../resident_approval_risk_256_windows_test.go     | 60 ++++++++++++++--------
+ 1 file changed, 40 insertions(+), 20 deletions(-)
+(empty above = NOT updated)

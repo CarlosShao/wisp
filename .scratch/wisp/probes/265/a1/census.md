@@ -258,31 +258,126 @@
 
 ### 4.A 本节的锚点与尺的射程（接续腿 `265-a1b` 补，⛔ 不改上面那句意图句一字）
 
-- 本腿锚点＝HEAD `c528035f`（2026-10-04 15:34:03 +0800）；§0–§6 的锚点是 `35e852f9`。⇒ **本节行号一律现量于 `c528035f`，与前人节行号若有差，差在 §4.A 末尾逐枚具名。**
-- 裁形已定＝**ⓐ-Ⅰ**（票面「编排者裁定」节＋台账 `A601`／`A602`）⇒ 本名册的"会不会翻"那一列**只对 ⓐ-Ⅰ 答**，ⓑ／ⓒ 只在ⓐ-Ⅰ 答不出形状时附带一句。
-- 判定只用三词：**必翻／可能翻／不翻**；归类只用两词：**修 bug（本票写面自带）／改契约（须具名 `A##`）**。凡"必翻"而本腿没跑＝逐条标〔仅读码，未跑〕。
+- **锚点是散动的，本节逐把尺自带锚点**。本腿开工时 HEAD＝`c528035f`（15:34:03 +0800），交件时已推到 `862d1736`——在飞的写腿一枚接一枚上盘，所以**下面每一条读数都写着它自己的锚点与取数时刻**，原文读数存档在 `.scratch/wisp/probes/265/a1b/logs/00—17*.txt`。§0–§6 用的是 `35e852f9` ⇒ **凡本节与前人节行号不一致，差的是这 8 小时里 256/260/265 三批上盘的量，不是谁读错**（例：`resident_approval_windows.go` 的门字面量在前人节是 `:219-224`，在 HEAD `ba900551` 也是 `:219-224`，而**盘上工作副本已是 `:368-374`**）。
+- ★ **本节写作的最大变数，先说白**：ⓐ-Ⅰ 的写腿 `265-r1` **在本腿普查期间已经上盘到工作副本**（`git status --porcelain -- cmd internal` 于 08:57Z 起＝`M cmd/wisp/resident_approval_windows.go`＋`M cmd/wisp/resident_task_source_windows.go`＋`M cmd/wisp/resident_approval_risk_256_windows_test.go`）。⇒ 所以本节 **"它今天断什么"一律按 HEAD 判**（HEAD 才是 ⓐ-Ⅰ 起跑前的世界），**"ⓐ-Ⅰ 会不会让它翻"两路都答**：一路是按 ⓐ-Ⅰ 设计推演（〔仅读码，未跑〕），一路是本腿**读到在飞工作副本里那一形真身**（`Grants: ra.grants` 已进字面量、`residentGrantHolder` 已存在、256 那枚测试已被改 ＋40/−20）。⛔ 本腿**不改写、不评价**那一枚在飞件，只在 §5.D 登记两格"我在它盘上看到的、没人钉的形状"。
+- 裁形已定＝**ⓐ-Ⅰ**（票面「编排者裁定」节＋台账 `A601`／`A602`）⇒ "会不会翻"那一列**只对 ⓐ-Ⅰ 答**，ⓑ／ⓒ 只在它能反衬 ⓐ-Ⅰ 代价时附带一句（N5、N11 两枚就是这种）。
+- 判定用词：**必翻／可能翻／不翻／量不到**；归类用词：**修 bug（本票写面自带）／改契约（须具名 `A##`）**。凡"必翻"而本腿没跑，逐条标〔仅读码，未跑〕。
+- ⛔ **本腿一枚 go 命令都没跑**（派单硬约束），所以本节**没有任何一发"我跑过这枚钉，它红了/绿了"**。名册的枚数一律 `| wc -l` 收尾，⛔ 无 `head -N` 截断当枚数（唯一用了 `head` 的是为了限宽打印长文本，其计数在同一读数档里另发了 `wc -l` 一发）。
 
-| 枚号 | `file:line`（现量 `c528035f`） | 它今天断什么 | ⓐ-Ⅰ 会不会让它翻 | 翻了算哪种 | 凭据级 |
-|---|---|---|---|---|---|
-| 示范 N1 | `cmd/wisp/resident_approval_risk_256_windows_test.go:445` | 未判 | 未判 | 未判（⚠ 已由 `A602` 具名解冻，本腿只复认真身，不重复立案） | 未判 |
 
-（以下每族先跑尺再写，枚数一律 `| wc -l` 收尾。）
+### 4.B 族⓪ 起手尺（票面点名的三词族）＝**5 命中／3 枚文件／承重钉 4 枚**
 
-### 4.B 族⓪ 起手尺（票面点名的三词族）——未判
+尺＝`git grep -n 'GRANT-DROPPED\|grants == nil\|Options.Grants' -- '*_test.go'` ⇒ **5 命中**（读数档 `.scratch/wisp/probes/265/a1b/logs/00-open-ruler.txt`，取数时刻 2026-10-04 08:08:20Z，锚点 `40aae961`）。
+⚠ 那把尺的 glob 是全仓形，本腿补了一枚射程尺：`git ls-files '*_test.go'` 的一级目录分布＝`.scratch 59／cmd 62／internal 276／tools 5`（合计 402）⇒ **`.scratch/**` 里那 59 枚 `_test.go` 今天零命中**，且 go 工具不进点号目录，它们是**惰性件**，不在任何分母里。
 
-### 4.C 族(a) 语法树型 `Options` 字段集钉——未判
+| 枚号 | `file:line` | 它今天断什么 | ⓐ-Ⅰ 会不会让它翻 | 翻了算哪种 |
+|---|---|---|---|---|
+| N1 | `cmd/wisp/resident_approval_risk_256_windows_test.go:452` | `if got["Grants"] { t.Errorf(...) }`＝**读语法树**断常驻腿那枚 `approval.Options` 字面量里不许有 `Grants` | **必翻**（ⓐ-Ⅰ 的定义性动作就是加这一枚字段）〔仅读码，未跑〕 | **改契约**＝动票 256 判据面 ⇒ 已具名解冻 **`A602`**（票面「裁定」节第 3 条写的是 `A601`，**那一句指错了**，见 §5.C-3） |
+| N2 | `internal/agent/approval/ticket224_reply_grant_test.go:283` | `if !f.log.has("approval: GRANT-DROPPED")`＝断"没有记账位时这句必须在" | **不翻**（ⓐ-Ⅰ 零改动 `internal/agent/approval`） | —（但它是 ⓐ-Ⅰ 不许把 drop 句子抹掉的护栏） |
+| N3 | 同文件 `:287` | `if f.log.has("GRANT-RECORDED") \|\| f.log.has("grant_id=")`＝没有 recorder 就不许声称记了 | **不翻**（同上） | — |
+| N4 | `cmd/wisp/ticket224_assembly_test.go:194` | `if strings.Contains(h.err.String(), "GRANT-DROPPED")`＝**`wisp run` 那条腿上这句不许出现** | **不翻**（ⓐ-Ⅰ 零改动 `run.go`；且它跑的是 else 支建的门，与常驻门互斥，见 §2.3） | — |
+| （非钉） | `resident_approval_risk_256_windows_test.go:43`、`ticket224_reply_grant_test.go:128` | 两处是**注释**命中，不承重 | 不翻 | — |
 
-### 4.D 族(b) boot 打印／状态句**字面零漂移**钉——未判
+★ 这一族**漏不掉的两枚**（同文件、同函数，只是不含那三个词，所以起手尺照不到）：
+- N5 `internal/agent/approval/ticket224_reply_grant_test.go:277-279`＝`if err := f.g.Native().AllowSession(...); err != nil { t.Fatalf("a host with no ledger must still be answerable") }` ⇒ **它钉死了"没有记账位 ⇒ `AllowSession` 仍返回 nil"**。这一枚就是 §2.5 那句假话能活着印出来的**机器原因**：**ⓐ-Ⅰ 不碰它（不动 approval 包）；但任何"改用 error 路径来表达这条腿没记账"的形（＝ⓑ 的最省事走法）都会当场把它打红**，而那属**改契约**（D45 答复语义），不属修 bug。〔仅读码，未跑〕
+- N6 `cmd/wisp/ticket224_assembly_test.go:189-190`＝逐字 `fmt.Sprintf("approval: GRANT-RECORDED corr=%s grant_id=%d tool=%s", ...)` ⇒ **钉的是 `gate.go:693` 那行日志的字面格式**。ⓐ-Ⅰ 不改 `gate.go` ⇒ 不翻；⚠ 但它意味着**落地腿不许顺手给 `GRANT-RECORDED` 加"来自哪条腿"的后缀**（那会同时打红这两枚）。〔仅读码，未跑〕
 
-### 4.E 族(c) `file:line` 型 evidence 钉（票 255 那张名册）——未判
+### 4.C 族(a) 语法树型 `Options` 字段集钉＝**全仓只有一枚实例（N1 所在函数），但它内部有 6 条断言臂**
 
-### 4.F 族(d) "某词必须不出现"型反向钉——未判
+尺（本腿自拉，读数档 `logs/01-family-a-ast.txt`＋`logs/01b-counts.txt`）：
+- `git grep -ln 'parser\.ParseFile\|go/ast\|go/parser' -- cmd internal tools \| grep _test` ⇒ **19 枚文件**用语法树当尺（名册在该读数档，ⓐ-Ⅰ 射程内只有 `cmd/wisp/resident_approval_risk_256_windows_test.go` 与 `cmd/wisp/leg_dispatch_gate_133_test.go`／`leg_sink_gate_131_test.go` 三枚，后两枚见 §4.H）；
+- `git grep -n '"Grants"\|"ApprovalTimeout"\|"Channels"\|"Logf"' -- '*_test.go'` ⇒ **2 命中，全在同一枚函数里**（`:445` 期望集＋`:452` 反向断言）⇒ **这一族确实只有一枚钉，编排者的"已知一枚"读数成立**，本腿不重复立案，只复认真身。
 
-### 4.G 族(e) 单门指针同一性钉——未判
+真身与射程复认（锚点现量＝`git show HEAD:cmd/wisp/resident_approval_risk_256_windows_test.go`，函数 `TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims` 起 `:425`）：
 
-### 4.H 族(f) 本腿另拉出来的族——未判
+| 臂 | `file:line` | 逐字断什么 | ⓐ-Ⅰ（6 枚字段）之下 |
+|---|---|---|---|
+| a-1 | `:428-433` | `if literals != 1` ⇒ 那枚文件里 `approval.Options` 字面量**必须恰好 1 枚**（它自己写明是 `TestAC246ResidentPipelineAsksThroughTheOneGate` 的"更早更便宜的版本"） | **不翻**——ⓐ-Ⅰ 是往既有那一枚里加字段；⚠ 但若落地腿"另建一枚门给 holder"＝立刻红，且红句会指到 §4.G 那枚指针同一性钉 |
+| a-2 | `:445-451` | `want := []string{"UI","Channels","Window","ApprovalTimeout","Logf"}` 逐枚 `got[w]` | **不翻**（6 ⊇ 5，缺项才红） |
+| a-3 | `:452-456` | `if got["Grants"]` | **必翻** ＝ N1 |
+| a-4 | `:457-468` | 反向走查：`got` 里任何不在 `want` 的名字 ⇒ "unexpected Options field" | **必翻**（`Grants` 落进这支）——**与 a-3 是两枚独立红**，解冻时要一起改，只改 a-3 会留下一枚"a-4 红" |
+| a-5 | `:469-471` | `if len(got) != len(want)` | **必翻**（6≠5）⇒ **同一枚函数今天会连红三支**〔仅读码，未跑〕 |
+| a-6 | `:473-479` | `declared := declaredOptionsFields256(t)`（`:379` 起，读的是 **`gate.go` 里 `type Options struct` 的全字段**）＋ `if len(declared) < 10` | **不翻**（ⓐ-Ⅰ 不动 `gate.go`；本腿现数量到 `declared`＝**10 枚**：`UI/Clock/Channels/Window/ApprovalTimeout/WarningLead/MaxPending/MaxTracked/Logf/Grants`，**正好压在阈值上**⇒ 谁将来删一枚 Options 字段，这枚先红） |
 
-### 4.I 名册汇总（ⓐ-Ⅰ 作用面读数）——未判
+⇒ **对 `A602` 的射程补一句**（编排者那条写的是"期望集 5 枚→6 枚"）：**要动的不止 `:445` 一行**——a-3／a-4／a-5 三支都得跟着搬家，加上函数名与文件头注释（`:43`、`:415-424` 那段"Grants is asserted ABSENT on purpose"）也变成假话。**这仍属同一枚 `A602` 的射程，不新立案。**〔仅读码，未跑〕
+
+### 4.D 族(b) boot 打印／状态句**字面零漂移**钉＝**4 枚，ⓐ-Ⅰ 之下全部"不翻"但全是禁改面**
+
+尺＝`git grep -n 'residentStatusLine\|taskPosture\|statusLine' -- cmd internal tools` ⇒ **42 命中**（`logs/02-families-bcde.txt`）。产码那几枚（定义处）不算钉，钉在测试里，逐枚：
+
+| 枚号 | `file:line` | 它今天断什么 | ⓐ-Ⅰ | 归类 |
+|---|---|---|---|---|
+| N7 | `cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:107-109` | `if line := ra2.residentStatusLine(); line != old260r3StatusLine` ＝**逐字相等**，期望常量在 `:54`＝`"审批门已装配进本进程（取消通道：Esc 已加载；等待中的确认项：0）"` | **不翻**（本腿现量在飞写面：`git diff HEAD -- resident_approval_windows.go resident_task_source_windows.go` 里含 `residentStatusLine\|taskPosture` 的增删行＝**0 行**，读数档 `logs/15-queue-and-drift.txt`）；⚠ **但它是"ⓐ-Ⅰ 落地时不许把记账状态写进状态句"的唯一一枚钉**——写了就是零漂移红 | 翻了＝**改契约**（撞票 260 的判据面，那批有撤销口令「260 文案撤回」） |
+| N8 | 同文件 `:103-105` | `want := "wisp: [audit] " + old260r3LoadedAudit`（常量 `:50-51`）＋ `Contains`＝**装配回执那条 audit 句不许动一个字** | **不翻**（ⓐ-Ⅰ 不印新句；⚠ holder 的 error 路径走的是 `gate.go:689` 那行，不是这条） | 同上 |
+| N9 | `cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:113-116` | `status := ra.residentStatusLine()` 必须含配置里那枚键、且**不含 "Esc"**＝"两处渲染同一枚读口"的单源钉 | **不翻**（ⓐ-Ⅰ 不加第二枚读口，也不碰 `cancelKeySpelling`） | 若被撞翻＝改契约（票 260 r4 判据） |
+| N10 | `cmd/wisp/resident_task_source_246_windows_test.go:314`／`:385` | boot 那行必须含 `"任务来源："＋taskPostureAbsent／Refused`（四形常量 `resident_task_source_windows.go:107-110`） | **不翻**——⚠ 但**它是 `Contains` 不是相等**，所以"往 boot 那行**加**一段会话记账状态"这件事**它拦不住**；拦得住的只有 N7/N8 那两枚逐字钉。⇒ 本腿把这一格记为**"看加不加字"的射程差**，不许下一任把 N10 当"boot 零漂移"用 | —（不构成 ⓐ-Ⅰ 的阻挡面） |
+
+### 4.E 族(c) `file:line` 型 evidence 钉＝**这一族没有一枚是机器红；且票面点名的"票 255 名册"在 ⓐ-Ⅰ 写面下不成立**
+
+尺（读数档 `logs/03-family-c-mech.txt`＋`logs/05-family-c-narrow.txt`，取数 08:30:38Z／08:35:13Z）：
+- `git grep -n 'resident_approval_windows\.go:[0-9]\|resident_task_source_windows\.go:[0-9]' -- docs` → 命中分布在 `docs/evidence/s1/246-*`、`248-*`、`docs/reports/pending-and-issues.md`；
+- 同尺打 `-- .scratch` ⇒ **370 命中**（工单＋各家普查件，含本件 §0–§6 那 17 处）；
+- 四枚模式（含 `run.go:[0-9]`／`resident_windows.go:[0-9]`）合起来打 `docs`＋`docs/reports` ⇒ **780 命中**＝**这不是能逐枚抄的名册，是一个"全仓注释级引用"的面**。
+
+**三条判语，逐条带凭据：**
+
+1. **没有任何一枚尺机器地核 `file:line`。** `tools/d22scan` 的 ban #9 用的正则在 `tools/d22scan/main.go:890-891`（`repoPathRe`）＝`(?:docs|\.scratch|internal|cmd|tools|scripts)/[A-Za-z0-9_./\-\x{4e00}-\x{9fff}]*[A-Za-z0-9_\-]`，它判的是**路径存在性**（`:872` 才 `add("phantom-citation", ...)`），**行号不是它的射程**；`git grep -n 'docs/evidence' -- cmd internal tools scripts`＝132 命中**全是注释**（`logs/04-family-c-mech.txt` §C5）。⇒ **这族"红"只红在人核／下一枚普查的眼里，卫生四门不会为它响。** 〔仅读码，未跑〕
+2. **⛔ 更正票面／编排者起手尺的那句预期**：票 255 那两张名册（`docs/evidence/s1/255-tier-registry-r1.md`／`-v1.md`）里，指向我写面那两枚文件的带行号引用＝**0 命中**（尺＝`git grep -n 'resident_approval_windows\.go:[0-9]\|resident_task_source_windows\.go:[0-9]\|run\.go:[0-9]' -- docs/evidence/s1/255-tier-registry-{r1,v1}.md`⇒空）。255 名册钉的是 `tiers_255_test.go:44/:98/:169/:22/:30` 与 `manager.go:299/:346-367/:369-427`（`-v1.md:33/45/57/66/77/85/90/93/94`）——**全是 config 侧文件，ⓐ-Ⅰ 一枚都不动**。⇒ **"ⓐ-Ⅰ 会让票 255 名册行号漂移而红"这一格＝不成立**；真正会漂的是 **246 那两张**（下表）。〔仅读码，未跑〕
+3. **已经漂了，不是 ⓐ-Ⅰ 造成的**（这点必须写，否则下一任会把旧账算到新腿上）。现量对照（HEAD `ba900551` 的产码 vs 名册落的行号）：
+
+| 名册引用 | 落在哪 | 它说的 | HEAD 真身 | 判定 |
+|---|---|---|---|---|
+| `docs/evidence/s1/246-resident-task-source-v2.md:83` | `newResidentApproval` | `resident_approval_windows.go:105`，调用者 `resident_windows.go:123` | `:170`（定义）／`:213`（WithConfig）＋ `resident_windows.go:132` | **旧漂**（＋65／＋9 行） |
+| 同上 `:84` | `startResidentTaskSource` | `resident_task_source_windows.go:215` | 现量 `:265` 那枚 `assembleRuntime` 调用还在同一函数内，入口行号已随 256/260 两批移动 | **旧漂** |
+| 同上 `:87` | `ra.vetoByEsc` | `resident_approval_windows.go:171`↔`resident_windows.go:136` | 已随 260 那批重写 | **旧漂** |
+| `246-resident-task-source-r2.md:105-106` | MUT-A／MUT-B 突变位 | `resident_task_source_windows.go:215`／`:182` | 突变体行号＝**当时**的行号 | **不可复现型引用**（⚠ 这一类最坏：正控重跑会种错地方） |
+| `docs/reports/pending-and-issues.md` 内 10 处带行号引用 | 台账 | 逐条 | — | 台账是 append-only，**按纪律不回填更正** |
+
+⇒ **本腿对这族的净判语＝ⓐ-Ⅰ 会让写面那两枚文件的**行号级引用**全部再漂一次（本腿量到 `resident_approval_windows.go` 在飞增 ＋176 行、`resident_task_source_windows.go` ＋31 行），但：① 没有尺为此响；② 票面点名的 255 名册不在射程；③ 真正该在落地件里补一句"行号已漂，旧引用按 `git show <锚>:` 读"的是 **246 那两张 ＋ 台账 ＋ 本件 §0–§6**。归 ⓐ-Ⅰ 落地腿的证据件，⛔ 本腿不改任何一件。**
+
+### 4.F 族(d) "某词必须不出现"型反向钉＝**3 枚在场 ＋ 1 处本腿量到"零枚在场"**
+
+尺＝`git grep -n 'forbidden\|must not\|不许\|仍在念 Esc\|不再重复提问\|记入本会话\|本会话内允许' -- cmd internal tools docs`＋`git grep -n 'PanelAllowSession' -- cmd internal tools`（读数档 `logs/02-families-bcde.txt`、`logs/06-session-reply.txt`、`logs/17-last-checks.txt`）。
+
+| 枚号 | `file:line` | 它不许什么出现 | ⓐ-Ⅰ | 归类 |
+|---|---|---|---|---|
+| N11 | `cmd/wisp/resident_approval_246_windows_test.go:373-377` | `for _, forbidden := range []string{"看得见","面板已就绪","已显示卡片"}` 逐枚 `strings.Contains(ra.residentStatusLine(), forbidden)` ⇒ **状态句永远不许读成"有一张卡片看得见"** | **不翻**（ⓐ-Ⅰ 不往状态句加字）；⚠ 它同时是**票面 ⓑ 支的硬拦网**：ⓑ-Ⅱ 若把"这条路上只到本次为止"写进状态句并带上"看得见"这类词＝直接红 | 翻＝改契约（票 246 判据面） |
+| N12 | `cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:132-134` ＋ `cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:106-108` | seeded 档下"Esc"必须不在那几句里 | **不翻** | — |
+| N13 | `internal/panel/l2_grant_boundary_test.go:1241`／`:1244` | 入向路由名字若是一枚审批决定（`AGENTS.md §1.2` ban #6／D33/F2/R20）⇒ 红；且声明的 guard 集必须与 `knownComposerMethod` 一致 | **不翻**（ⓐ-Ⅰ 不加面板路由）；⚠ 这一枚就是 §2.1 表 #3"面板侧连 Allow 都没有"的**机器护栏本体**——`git grep -n 'PanelAllowSession'` 产码／测试**零枚**（只有 `replies.go:347` 那句注释），**"不许有"这件事是由 N13 的路由名走查兜的，不是由一枚同名测试兜的** | 翻＝改契约（D33 必修五项面） |
+| **N14（★零枚在场）** | `cmd/wisp/approval_reply.go:278`（审计 `记入本会话，paths=%d`）＋ `:280`（回执 `…不再重复提问`） | — | 尺＝`git grep -n '不再重复提问\|记入本会话' -- cmd internal tools docs` ⇒ 39 命中里**产码 2 枚、`*_test.go` 0 枚**（其余在 `docs/reports/pending-and-issues.md` 与本件／票件里）。⇒ **那两句"最坏后果"级假话今天没有任何一枚钉**，与 §2.5／票面 AC#1 ★ 条同读数，本腿是**独立复跑后复认**，不是照抄 | ⓐ-Ⅰ 之下它们自动变真话 ⇒ 不需翻；⚠ **但 AC#3 的正控（"种一次写侧没接上 ⇒ 这两句必须能被指出来"）今天无处可种**——要先有新钉。归 ⓐ-Ⅰ 落地腿 |
+
+### 4.G 族(e) 单门指针同一性钉＝**4 枚，ⓐ-Ⅰ 全部不翻，但它们是 ⓐ-Ⅲ 的墓碑**
+
+尺＝`git grep -n 'ThroughTheOneGate\|ar\.gate != ra\.gate\|ra\.gate != \|oneGate\|OneGate' -- cmd internal tools` ⇒ **4 命中**（`logs/02-families-bcde.txt`）。
+
+| 枚号 | `file:line` | 它今天断什么 | ⓐ-Ⅰ |
+|---|---|---|---|
+| N15 | `cmd/wisp/resident_task_source_246_windows_test.go:89-92` | `if ar.gate != ra.gate { t.Fatalf("…runs on a DIFFERENT gate than the resident leg built…two gates in one process is the shape ruling 2.2 and ledger A481 refuse") }`＝**注入的门必须就是装配根用的门**（指针相等） | **不翻**（ⓐ-Ⅰ 往那枚唯一门里塞 holder，门还是同一枚对象） |
+| N16 | 同文件 `:93-96` | `if ar.ui != nil` ⇒ 注入了门以后装配根**不许再造一枚控制台审批面** | **不翻**（`run.go:600-608` 那支未动；ⓐ-Ⅰ 零改动 `run.go`） |
+| N17 | 同文件 `:97-100` | `ar.spec.taskCtx != ra.root` | **不翻** |
+| N18 | `cmd/wisp/resident_approval_risk_256_windows_test.go:540-547` | `runResident` 体内 `newResidentApprovalWithConfig` 必须**恰好 1 次**、`newResidentApproval()` 必须 **0 次**（AST 走查，函数起 `:498`） | **不翻**（ⓐ-Ⅰ 不动 `resident_windows.go`——本腿现量在飞写面只有那两枚文件＋256 那枚测试，`logs/15-queue-and-drift.txt` §N3）；⚠ **这一枚＋ N15＋ a-1（`:428` 字面量恰好 1 枚）合起来＝ⓐ-Ⅲ"第二枚 mint"在三处各有一枚独立红**，与票面「明确不选 ⓐ-Ⅲ」那条一致：ⓐ-Ⅲ 不只是"形状不好"，它是**机器就拦着**的形状 |
+
+⇒ 本腿补一句给落地腿的**同类不同名**护栏：a-1（`:428-433`）的错误文本**自己指回 N15**，说它是"更早更便宜的版本"。⇒ **ⓐ-Ⅰ 若为了拿 ledger 而新建第二枚 `approval.Options`／第二枚门，红两次**（一便宜一贵），这是好事，写进证据件时别只引一枚。
+
+### 4.H 族(f) 本腿另拉出来、编排者起手尺点不到的两族＝**包级行为台账 2 枚 ＋ 卫生门 1 枚**
+
+| 枚号 | `file:lang`→`file:line` | 它今天断什么（本腿读断言源码，⛔ 没跑） | ⓐ-Ⅰ |
+|---|---|---|---|
+| N19 | `cmd/wisp/leg_sink_gate_131_test.go:249`（`TestAC4EveryLegIsNailedOrRuled`；枚举器 `:814-817`＝"读 `main()` 的 argv 分派"，站点串形如 `main.go:%d`） | 每一枚 leg 要么被 `registerLegNail131` 钉住、要么在产码文件里带 `WISP-LEG-SINK-RULING:`（常量 `:161`）；`:296-301` 那支＝"记了 record、没装 listener、又没裁定句"⇒ 红；`:307-312`＝"裁定句与 install 并存"⇒ 红 | **可能翻＝本腿量不到**。读到的：leg 来自 `main()` 分派 ⇒ ⓐ-Ⅰ 不加 leg；全仓那枚裁定句只在 `cmd/wisp/slo_windows.go:184`（`logs/09-ruling-markers.txt`）⇒ 常驻那一枚 leg 今天的 state 是 nailed 还是 ruled，**只有跑这枚门读它打印的 ledger 行才知道**。**归口＝新增 U 尺 U13**（见下），⛔ 我不写"不翻" | 若翻＝**修 bug 面内**（本票写面自带的那枚 leg 该有钉），⛔ 不许用加裁定句的方式绕过 |
+| N20 | `cmd/wisp/leg_dispatch_gate_133_test.go:178`（`TestAC1AC2DispatchHopGate133`）＋ `:1403`（"nail 必须是本目录源码里一枚 top-level `func TestXxx(t *testing.T)`"）＋ `:1651`（"本编译单元不采的文件里的 Test 函数＝那行是 no witness 的覆盖声明"）＋ `collectRulings133`（`:1744` 起，扫全部**非测试** `.go` 找 `WISP-LEG-COVERAGE-RULING:`，常量 `:138`；现量在场 5 枚：`main.go:74/79/83`、`panel_assets.go:16`、`slo_windows.go:199`） | **ⓐ-Ⅰ 的落地腿会被它咬的位置不是产码，是它新写的那枚测试**：新用例必须①落在本平台真编译的文件名／build tag 下（`_windows_test.go` 形），②若进 ledger 就必须真存在且可跑，③不许把覆盖声明挂在一枚不编译的 case 上 | **可能翻**（取决于落地腿怎么写测试），⛔ 本腿没跑＝**量不到具体那一支** | 翻＝**修 bug**（是新腿自己的判据没写对，不是别人的契约） |
+| N21 | `tools/d22scan`（卫生门，非测试钉）：ban #1 裸 `go func(`、ban #9 phantom-citation（`main.go:872`/`:890-891`） | 本腿**读 diff 判**：在飞 holder 只加了一枚 `mu sync.Mutex`（`git diff HEAD -- resident_approval_windows.go` 里 `^\+.*(go func\|sync\.\|filepath\.)` ⇒ 唯一命中＝`+	mu     sync.Mutex`），**没有 `go func(`、没有 `filepath.Clean/Abs`、没有新增 `docs/` 引用** | **不翻**〔仅读码，未跑；真跑属 U6〕 | — |
+
+### 4.I 名册汇总（ⓐ-Ⅰ 作用面）
+
+- **必翻 1 枚（一处函数内 3 支独立红臂）**：N1（`:452`）＋a-4（`:457-468`）＋a-5（`:469`）。三支配一处解冻（`A602`）一起吃掉，⛔ 只改 `want` 一行会留下一支红。
+- **零枚在场 1 处**：N14（那两句假话没有尺）⇒ AC#3 正控今天**无处可种**。
+- **量不到 2 枚**：N19／N20 ⇒ **本件 §6.1 的 U 尺名册要加两枚**（本腿不重跑前人读数，只登记新格）：
+  - **U13**（本腿新增，ⓐ-Ⅰ 专属）＝`go test -count=1 -run 'TestAC4EveryLegIsNailedOrRuled|TestAC1AC2DispatchHopGate133' ./cmd/wisp/` ⇒ 读那两枚台账打印的 leg 行，才知道 holder 那枚新函数进不进 `emits` 分母。归 ⓐ-Ⅰ 落地腿（它跑测试没有禁跑约束）。
+  - **U14**（本腿新增）＝`go test -count=1 ./cmd/wisp/ ./internal/agent/approval/ ./internal/panel/` 全量基线，用来证伪本件 §4.D／§4.G／§4.F 里那 12 枚"不翻"判语。
+- **不翻 12 枚**：N2／N3／N4／N5／N6（ⓐ-Ⅰ 不碰 `internal/agent/approval` 与 `run.go`）、N7／N8／N9／N10（状态句与 boot 句不写记账字）、N11／N12／N13（反向钉不撞）、N15／N16／N17／N18（同一性面）。逐条凭据在上四节，**全部〔仅读码，未跑〕**。
+- **编排者起手尺没点到、本腿新立案的**：N5（`AllowSession` 必须返回 nil ⇒ ⓑ 的隐形代价）、N6（`GRANT-RECORDED` 字面格式钉）、N7／N8（260r3 两枚**逐字相等**零漂移钉）、N9（单源键名钉）、N11（三枚禁字）、N13（`l2_grant_boundary` 那枚路由名走查才是"面板无 allow"的真护栏）、N14（零枚在场）、N15—N18（同一性 4 枚＝ⓐ-Ⅲ 的三处墓碑）、N19／N20（包级行为台账）。**合计新增立案 16 枚**（N5—N21 减去与前人 §1.3 重复的 N2／N3／N4）。
+- **本腿对票面的一处更正**：§4.E-2——"票 255 那张名册会因行号漂移而红"在 ⓐ-Ⅰ 的写面下**不成立**（255 名册零引用写面文件）；会漂的是 246 那两张＋台账＋本件。
+
 
 ## 5. 顺带上报（看到就报，⛔ 不许顺手改）
 

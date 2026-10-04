@@ -1,0 +1,48 @@
+# R04 does anything mechanically read docs/evidence line numbers? HEAD=e3574b91 UTC=2026-10-04T08:32:23Z
+## C5 go tests/tools referencing docs/evidence
+cmd/wisp/approval_reply.go:7:// (docs/evidence/s1/219-approval-reply-surface-c1.md §②A) measured one
+cmd/wisp/approval_reply.go:42://     instead (docs/evidence/s1/201-reply-listener-r1.md §⑥).
+cmd/wisp/approval_reply_201_test.go:36:// docs/evidence/s1/201-reply-listener-r1.md §⑥ instead of being done quietly.
+cmd/wisp/config_reload.go:112:	// three lines at 15:16:52 and 15:19:20; docs/evidence/s1/223-hot-reload-wiring-r1.md
+cmd/wisp/dataroot_128_test.go:5:// WHAT WAS MEASURED FIRST (AC#1, docs/evidence/s1/128-ac1-consequences.md). With
+cmd/wisp/dataroot_128_test.go:33:// docs/evidence/s1/128-ac4-gates-and-ci-divergence.md.
+cmd/wisp/dataroot_128_test.go:40:// is in docs/evidence/s1/128-ac2-refusal-and-ac3-mutation.md.
+cmd/wisp/doctor.go:242:// of answering with "." - the fallback that measured (docs/evidence/s1/
+cmd/wisp/firstrun_198r2_test.go:3:// Ticket 198 r2 - the four instruments 198-v1 (docs/evidence/s1/
+cmd/wisp/leg_dispatch_gate_133_test.go:41:// afterwards (readings in docs/evidence/s1/133-ac1-ac2-instrument.md):
+cmd/wisp/leg_sink_gate_131_test.go:32:// docs/evidence/s1/131-followup-1-three-shapes.md):
+cmd/wisp/panel_assets.go:173:// discard through (measured: docs/evidence/s1/160-handle-r1.md §3).
+cmd/wisp/panel_assets_143_test.go:157:// the external cmp recorded in docs/evidence/s1/143-panel-assets-r4-leg-r1.md.
+cmd/wisp/panel_host_gate_test.go:72:// The reading today (docs/evidence/s1/33-panel-host-c27-r4.md §①格 5): this tree
+cmd/wisp/panel_host_gate_test.go:176:// red naming what it saw. Reading in docs/evidence/s1/33-panel-host-c27-r5.md.
+cmd/wisp/panel_host_windows.go:29://     EARLY by the nested one (about 0.55s per open) - docs/evidence/s1/... the 33-p1
+cmd/wisp/panel_host_windows.go:332:	// (.scratch/wisp/probes/33/r7/modes-grid.txt, docs/evidence/s1/33-panel-host-c27-r7.md ①):
+cmd/wisp/panel_host_windows_live_test.go:18:// docs/evidence/s1/33-panel-host-c27-r5.md: winlive has NO CI job, so this clause
+cmd/wisp/panel_host_windows_test.go:248:// Why both live in this shape now: the acceptance leg (docs/evidence/s1/
+cmd/wisp/panel_host_windows_test.go:874:// production file. 33-r5's readings are in docs/evidence/s1/33-panel-host-c27-r5.md.
+--count--
+132
+## C6 d22scan phantom-citation regex (does it check :line?)
+tools/d22scan/main.go:50://	9 phantom-citation    a production-file comment citing a repo-relative
+tools/d22scan/main.go:53://	                      phantom one is worse than none). Judged against the
+tools/d22scan/main.go:57://	                      source can hold a phantom beacon (212-v2 §8 #4, and
+tools/d22scan/main.go:64://	                      TRAILING an otherwise complete phantom path ("…" or
+tools/d22scan/main.go:66://	                      complete phantom into the abbreviation that follows
+tools/d22scan/main.go:148:	citationReported map[string]bool // ban #9: phantom tokens already reported in this scan
+tools/d22scan/main.go:801:	// follows; a phantom one is worse than none (ticket 212's opening section).
+tools/d22scan/main.go:841:					continue // one finding per phantom token per scan
+tools/d22scan/main.go:872:				s.add("phantom-citation", path, pos.Line,
+tools/d22scan/main.go:924:// reach ban #9 as ONE token whose region starts before the complete phantom
+tools/d22scan/scan_test.go:2441:		t.Errorf("ban #9's two hand-copied prefix tables disagree: repoPathRe=%v, shorthandRegionRe=%v; only in repoPathRe=%v means a shorthand path there is NOT exempt and class 3 convicts again (ticket 212 AC#3), only in shorthandRegionRe=%v means a COMPLETE phantom path there gets swallowed by the region, which widens the exemption without an owner's approval. Edit both lists in one commit, and read the ban #9 comment in main.go before deciding which shape is intended.", repo, region, onlyRepo, onlyRegion)
+tools/d22scan/selftest.go:529:	"phantom-citation":       "internalGo",
+tools/d22scan/selftestsamples.go:372:	// ---- ban #9 phantom-citation (ticket 212) ---------------------------------
+tools/d22scan/selftestsamples.go:374:		tag: "phantom-citation", want: wantRing,
+tools/d22scan/selftestsamples.go:377:			"// Reading the readings first is mandatory; see docs/evidence/s1/212-comments-phantom-citation-v2.md\n" +
+tools/d22scan/selftestsamples.go:380:		summary: "a comment citing docs/evidence/s1/212-comments-phantom-citation-v2.md, which the fixture does not seed",
+tools/d22scan/selftestsamples.go:381:		note:    "Ticket 212's own opening section is the real-world shape: the fixture does NOT create that file, so the citation is phantom and the gate must name it. The repo-wide first firing was internal/risk/pathresolver.go:28. This token is deliberately a page that EXISTS in the real repo but is not seeded in the fixture: the path 212-r2 first wrote here (docs/evidence/s1/212-citation-ruler.md) existed neither in the fixture nor on disk, which is ticket 212's own shape reported inside the instrument (212-v2 §8 #4) - and tools/** is outside ban #9's range today, so nothing in the real scan could catch it. Re-pointing the string is the fix 212-r3 was told to make; widening the range to tools/** is NOT, and needs an owner.",
+tools/d22scan/selftestsamples.go:384:		tag: "phantom-citation", want: wantSilent,
+tools/d22scan/selftestsamples.go:396:		tag: "phantom-citation", want: wantSilent,
+tools/d22scan/selftestsamples.go:417:		tag: "phantom-citation", want: wantSilent,
+## C6b path-with-line citation regexp in d22scan
+## C7 255 roster nail lines
+--count in 255 files--

@@ -1,0 +1,35 @@
+# R11 current anchors of the write-face literal, HEAD=5be8821e UTC=2026-10-04T08:57:57Z
+## J1 gate-minting literals (prod)
+cmd/wisp/resident_approval_windows.go:368:	ra.gate = approval.New(approval.Options{
+cmd/wisp/run.go:612:		rt.gate = approval.New(approval.Options{
+internal/agent/approval/ticket84_no_owner_test.go:107:		g := approval.New(approval.Options{ApprovalTimeout: tc.timeout})
+internal/agent/approval/ticket84_no_owner_test.go:230:	noUI := approval.New(approval.Options{})
+internal/agent/approval/ticket84_no_owner_test.go:247:	g := approval.New(approval.Options{UI: ui})
+internal/tools/loop_approval_test.go:94:	gate := approval.New(approval.Options{UI: ui, Channels: approval.NewChannels()})
+internal/tools/wiring_test.go:83:	g := approval.New(approval.Options{UI: ui})
+## J2 resident_options lines
+369:		UI:              ra.ui,
+370:		Channels:        approval.NewChannels(),
+371:		Window:          window,
+372:		ApprovalTimeout: timeout,
+373:		Logf:            ra.residentAuditf,
+374:		Grants:          ra.grants,
+## J3 the not-closed comment block lines
+## J4 same in run.go
+597:	// on the route (gate.go's allowSession). resident_windows.go prints the same
+618:			Grants:          grantWrite,
+758:		Grants: grantRead,
+## J5 wc of the three prod files
+   932 cmd/wisp/resident_approval_windows.go
+   551 cmd/wisp/resident_task_source_windows.go
+   288 cmd/wisp/resident_windows.go
+  1427 cmd/wisp/run.go
+   637 cmd/wisp/approval_reply.go
+  3835 total
+## J6 disk vs HEAD identical?
+ M cmd/wisp/resident_approval_windows.go
+ M cmd/wisp/resident_task_source_windows.go
+?? internal/tools/task_pointer_authority_ac3_174r4_windows_test.go
+ cmd/wisp/resident_approval_windows.go    | 176 ++++++++++++++++++++++++++++---
+ cmd/wisp/resident_task_source_windows.go |  31 +++++-
+ 2 files changed, 190 insertions(+), 17 deletions(-)

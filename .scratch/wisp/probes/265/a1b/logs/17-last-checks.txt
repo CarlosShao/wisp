@@ -1,0 +1,39 @@
+# R17 last two checks, HEAD=862d1736
+## P1 260r4 status-line usage context
+	// label had been computed once at construction, this is where it goes red.
+	ra.cancelKeyRead = func() string { return r4SeededCardKey }
+	seeded := escCardLine(t, ra)
+	if !strings.Contains(seeded.Text, r4SeededCardKey) {
+		t.Errorf("改了配置以后卡片那行没念那枚键：%q（应含 %q）", seeded.Text, r4SeededCardKey)
+	}
+	if strings.Contains(seeded.Text, "Esc") {
+		t.Errorf("改了配置以后卡片那行还在念 Esc：%q", seeded.Text)
+	}
+
+	// And the sentence this file prints about the same channel agrees with the
+	// card, in the same key slot - the single-source claim: two renderings, one
+	// reader, so no edit can leave them naming different keys.
+	status := ra.residentStatusLine()
+	if !strings.Contains(status, r4SeededCardKey) || strings.Contains(status, "Esc") {
+		t.Errorf("装配根那句和卡片那行分家了：%q（键名应与卡片一致为 %q）", status, r4SeededCardKey)
+	}
+}
+
+// TestTicket260R4NoBallHostNamesNoKeyOnTheCard is the cell the orchestrator
+// refused to book overnight: with no ball window the channel is NOT loaded, and
+// the card line must then name no key at all - neither the shipped default nor a
+// configured one - because this process holds nothing to press. Both 档 are run:
+// the seeded reader is present, and printing its key here would advertise a
+// channel this process refuses (the B1 shape).
+func TestTicket260R4NoBallHostNamesNoKeyOnTheCard(t *testing.T) {
+## P2 PanelAllowSession nails
+internal/agent/approval/replies.go:347:// There is deliberately no PanelAllowSession. PanelAPI has no Allow method, so
+## P3 l2_grant_boundary_test what it forbids
+internal/panel/l2_grant_boundary_test.go:6:// AGENTS.md §1.2 lists as an absolutely-forbidden code shape:
+internal/panel/l2_grant_boundary_test.go:965:// type it must not certify).
+internal/panel/l2_grant_boundary_test.go:995:		t.Fatalf("%s", problem)
+internal/panel/l2_grant_boundary_test.go:1167:		t.Fatalf("parse %s: %v", dir, err)
+internal/panel/l2_grant_boundary_test.go:1183:		t.Fatalf("no inbound envelope type (a JSON decode destination, or anything nested in one) under %s: the instrument claims to check what a panel request can carry but cannot find the request type", dir)
+internal/panel/l2_grant_boundary_test.go:1234:		t.Fatalf("parse %s: %v", dir, err)
+internal/panel/l2_grant_boundary_test.go:1241:			t.Errorf("the guard declares %q but knownComposerMethod refuses it: the answered set read here is not the one Go runs", name)
+internal/panel/l2_grant_boundary_test.go:1244:			t.Errorf("Go answers the inbound route %q, whose own name is an approval decision (D33/F2, R20, AGENTS.md §1.2 ban #6)", name)

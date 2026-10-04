@@ -1,0 +1,15 @@
+# R00 open ruler (票面 AC#0 起手尺), HEAD=40aae961, UTC=2026-10-04T08:08:20Z
+$ git grep -n "GRANT-DROPPED\|grants == nil\|Options.Grants" -- "*_test.go"
+cmd/wisp/resident_approval_risk_256_windows_test.go:43:// Options.Grants stays unset. The session ledger is constructed only inside
+cmd/wisp/resident_approval_risk_256_windows_test.go:453:		t.Errorf("the resident leg now passes Options.Grants. That is NOT ticket 256-r1's scope: the session " +
+cmd/wisp/ticket224_assembly_test.go:194:	if strings.Contains(h.err.String(), "GRANT-DROPPED") {
+internal/agent/approval/ticket224_reply_grant_test.go:128:	// over it first, and the missing GRANT-DROPPED line is what showed it.
+internal/agent/approval/ticket224_reply_grant_test.go:283:	if !f.log.has("approval: GRANT-DROPPED") {
+--- COUNT ---
+5
+# R00b which top dirs hold *_test.go (proof glob stays in allowed roots)
+     59 .scratch
+     62 cmd
+    276 internal
+      5 tools
+402

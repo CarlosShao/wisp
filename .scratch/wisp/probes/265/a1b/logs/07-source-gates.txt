@@ -1,0 +1,87 @@
+# R07 source-scanning gates scope, HEAD=2d6aed92
+## G1 leg_sink_gate_131: which files/markers
+func loadMainPackage131(dir string) (*mainPackage131, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, fmt.Errorf("reading %s: %w", dir, err)
+	}
+	pkg := &mainPackage131{
+		fset:        token.NewFileSet(),
+		funcs:       map[string]*funcInfo131{},
+		tests:       map[string]*funcInfo131{},
+		aliases:     map[string]aliasTarget131{},
+		aliasEdges:  map[string]bool{},
+		declared:    map[string]bool{},
+		stringConst: map[string]string{},
+		rulingFiles: map[string]bool{},
+	}
+	var parsed int
+	for _, e := range entries {
+		name := e.Name()
+		if e.IsDir() || !strings.HasSuffix(name, ".go") {
+			continue
+		}
+		f, err := parser.ParseFile(pkg.fset, filepath.Join(dir, name), nil, parser.ParseComments)
+		if err != nil {
+			return nil, fmt.Errorf("parsing %s: %w", name, err)
+		}
+		parsed++
+		isTest := strings.HasSuffix(name, "_test.go")
+		// 第五形's second instrument: does this file's own text carry the ruling
+		// marker? Read off the bytes, not off the AST doc the ledger's ruled column
+		// is built from, so the two readings can disagree and say so. Test files are
+		// out of the scan: this very file states the marker in a const, which is an
+		// instrument's string, not a leg's ruling.
+		if !isTest {
+			if src, srcErr := os.ReadFile(filepath.Join(dir, name)); srcErr == nil && bytes.Contains(src, []byte(legSinkRulingMarker)) {
+				pkg.rulingFiles[name] = true
+			}
+		}
+		for _, d := range f.Decls {
+			fn, ok := d.(*ast.FuncDecl)
+			if !ok || fn.Body == nil {
+				continue
+## G2 leg_dispatch_gate_133: which files
+		}
+	}
+	sort.Strings(reds)
+	return reds
+}
+
+// collectRulings133 scans this directory's production sources for coverage rulings.
+// It is a plain line scan on purpose: the ledger is built from the AST, and a second
+// instrument that shares no code with the first is what makes a one-line loosening of
+// either reading loud (ticket 129's fifth shape, aimed at this door).
+func (p *pkg133) collectRulings133(dir string, entries []os.DirEntry) {
+	for _, e := range entries {
+		name := e.Name()
+		if e.IsDir() || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		src, err := os.ReadFile(filepath.Join(dir, name))
+		if err != nil {
+			p.blind = append(p.blind, fmt.Sprintf("cannot read %s to scan it for coverage rulings", name))
+			continue
+		}
+		for i, line := range strings.Split(string(src), "\n") {
+			idx := strings.Index(line, coverageRuling133)
+			if idx < 0 {
+				continue
+			}
+			rest := strings.TrimSpace(line[idx+len(coverageRuling133):])
+			fields := strings.Fields(rest)
+			leg := ""
+			if len(fields) > 0 {
+				leg = fields[0]
+			}
+			if leg == "" {
+				p.blind = append(p.blind, fmt.Sprintf("%s:%d carries %s with no leg name after it", name, i+1, coverageRuling133))
+				continue
+			}
+			site := fmt.Sprintf("%s:%d", name, i+1)
+			p.rulingAll = append(p.rulingAll, ruling133{leg: leg, site: site, file: name})
+			if _, seen := p.rulings[leg]; !seen {
+				p.rulings[leg] = site
+			}
+## G3 which prod files are named by these two gates
+cmd/wisp/leg_sink_gate_131_test.go:791:// has runResident in resident_windows.go and a fail-closed counterpart in

@@ -1,0 +1,415 @@
+# R01 anchor HEAD=40aae961 UTC=2026-10-04T08:09:10Z
+## A1: tests that PARSE source (syntax-tree type nails)
+cmd/wisp/leg_dispatch_gate_133_test.go
+cmd/wisp/leg_sink_gate_131_test.go
+cmd/wisp/panel_assets_143_test.go
+cmd/wisp/panel_geometry_255_test.go
+cmd/wisp/panel_host_gate_test.go
+cmd/wisp/panel_inbound_33_test.go
+cmd/wisp/resident_approval_risk_256_windows_test.go
+cmd/wisp/resident_ball_228_test.go
+cmd/wisp/resident_hotkey_258_test.go
+cmd/wisp/subagent_carrier_197_test.go
+internal/agent/spill_path_invariant_test.go
+internal/ball/tokens_table_test.go
+internal/memory/artifacts_path_invariant_test.go
+internal/panel/composer_dispatch_test.go
+internal/panel/inbound_roster_253_test.go
+internal/panel/l2_grant_boundary_test.go
+internal/projctx/projctx_test.go
+internal/tools/paths_twocontainments_252_r2_test.go
+internal/tools/task_state_188_test.go
+--count--
+19
+## A2: string-literal field-name assertions around Options (Grants/UI/Channels/Window/ApprovalTimeout/Logf)
+cmd/wisp/resident_approval_risk_256_windows_test.go:445:	want := []string{"UI", "Channels", "Window", "ApprovalTimeout", "Logf"}
+cmd/wisp/resident_approval_risk_256_windows_test.go:452:	if got["Grants"] {
+--count--
+2
+## A3: any test mentioning approval.Options at all
+.scratch/wisp/probes/174/c1/zz174c1_windows_test.go:97:	return tools.New(tools.Options{
+.scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go:52:	return New(Options{
+.scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go:55:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/174/r1/zz174r1_before_windows_test.go:93:	return tools.New(tools.Options{
+.scratch/wisp/probes/174/r1/zz174r1_before_windows_test.go:95:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/174/r1/zz174r1_windows_test.go:79:	return tools.New(tools.Options{
+.scratch/wisp/probes/174/r1/zz174r1_windows_test.go:81:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/174/v1/zz174v1_pos_windows_test.go:105:	b := New(Options{
+.scratch/wisp/probes/174/v1/zz174v1_pos_windows_test.go:107:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/197/r1c/pre/subagent_197_test.go:153:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/197/r1c/pre/subagent_197_test.go:183:			opt := agent.Options{Provider: childProvider(), Tools: h.dir}
+.scratch/wisp/probes/197/r1c/pre/subagent_197_test.go:204:	h.bridge = New(Options{Registry: reg, Provenance: h.prov, Gate: NoGate{},
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:232:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:244:	h.bridge = New(Options{
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:281:			return agent.Options{
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:236:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:248:	h.bridge = New(Options{
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:285:			return agent.Options{
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:232:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:244:	h.bridge = New(Options{
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:281:			return agent.Options{
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:232:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:244:	h.bridge = New(Options{
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:281:			return agent.Options{
+.scratch/wisp/probes/235/r1/mut-ac3-commentback/subagent_197_test.go:158:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/r1/mut-ac3-commentback/subagent_197_test.go:186:			opt := agent.Options{Provider: childProvider(), Tools: h.dir}
+.scratch/wisp/probes/235/r1/mut-ac3-commentback/subagent_197_test.go:206:	h.bridge = New(Options{
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:255:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:268:	h.bridge = New(Options{
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:305:			return agent.Options{
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:255:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:268:	h.bridge = New(Options{
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:305:			return agent.Options{
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:232:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:244:	h.bridge = New(Options{
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:281:			return agent.Options{
+.scratch/wisp/probes/235/v1/mut/commentback_197_test.go:158:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/v1/mut/commentback_197_test.go:186:			opt := agent.Options{Provider: childProvider(), Tools: h.dir}
+.scratch/wisp/probes/235/v1/mut/commentback_197_test.go:206:	h.bridge = New(Options{
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:255:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:268:	h.bridge = New(Options{
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:305:			return agent.Options{
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:232:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:244:	h.bridge = New(Options{
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:281:			return agent.Options{
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:255:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:268:	h.bridge = New(Options{
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:305:			return agent.Options{
+.scratch/wisp/probes/235/v1/mut/pre235-197_test.go:158:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/v1/mut/pre235-197_test.go:186:			opt := agent.Options{Provider: childProvider(), Tools: h.dir}
+.scratch/wisp/probes/235/v1/mut/pre235-197_test.go:206:	h.bridge = New(Options{
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:232:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:244:	h.bridge = New(Options{
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:281:			return agent.Options{
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:255:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:268:	h.bridge = New(Options{
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:305:			return agent.Options{
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:255:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:268:	h.bridge = New(Options{
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:305:			return agent.Options{
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:206:	prov, err := llm.BuildEndpointProvider(eps[0], llm.ChainBuildOptions{
+.scratch/wisp/probes/261/r1/mut/inverted/enabled_reach_261_p1orig_test.go:329:	prov, err := llm.BuildEndpointProvider(eps[0], llm.ChainBuildOptions{
+cmd/wisp/panel_config_248_test.go:141:		slog.SetDefault(slog.New(slog.NewTextHandler(logbuf, &slog.HandlerOptions{Level: slog.LevelDebug})))
+cmd/wisp/resident_approval_live_246_windows_test.go:369:	slog.SetDefault(slog.New(slog.NewTextHandler(c, &slog.HandlerOptions{Level: slog.LevelDebug})))
+cmd/wisp/resident_approval_risk_256_windows_test.go:8:// approval.Options fields (UI / Channels / Logf), so [risk]'s confirm_timeout_sec
+cmd/wisp/resident_approval_risk_256_windows_test.go:332:// <pkg>.New(<pkg>.Options{...}), the field names the composite literal really
+cmd/wisp/resident_approval_risk_256_windows_test.go:360:				t.Errorf("%s: an approval.Options element is not key: value form, so the field count "+
+cmd/wisp/resident_approval_risk_256_windows_test.go:429:		t.Fatalf("found %d approval.Options literals in %s, want exactly 1. Two would mean the resident leg "+
+cmd/wisp/resident_approval_risk_256_windows_test.go:474:	t.Logf("landing site reading: resident leg passes %d of %d declared approval.Options fields (was 3 of %d before ticket 256)",
+cmd/wisp/resident_approval_risk_256_windows_test.go:477:		t.Errorf("approval.Options now declares %d fields, fewer than the 10 the 256-a2 census §1 rostered: "+
+cmd/wisp/secret_test.go:47:	slog.SetDefault(slog.New(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug})))
+cmd/wisp/subagent_selfapproval_197_test.go:553:	{"tools.Options", reflect.TypeOf(tools.Options{})},
+cmd/wisp/subagent_selfapproval_197_test.go:554:	{"agent.Options", reflect.TypeOf(agent.Options{})},
+internal/agent/approval/batch_test.go:46:	g, clk, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/batch_test.go:89:	g, clk, _ := newGate(t, ui, approval.Options{
+internal/agent/approval/batch_test.go:122:	g, clk, _ := newGate(t, ui, approval.Options{
+internal/agent/approval/batch_test.go:144:	g, clk, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/cancel_key_label_260r4_test.go:123:	g, _, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/cancel_key_label_260r4_test.go:261:	g, _, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/fakes_test.go:250:func newGate(t *testing.T, ui approval.UI, opts ...approval.Options) (*approval.Gate, *fakeClock, *approval.ChannelRegistry) {
+internal/agent/approval/fakes_test.go:254:	o := approval.Options{UI: ui, Clock: clk, Channels: ch}
+internal/agent/approval/fakes_test.go:420:	return tools.New(tools.Options{
+internal/agent/approval/queue_test.go:191:	g, clk, _ := newGate(t, ui, approval.Options{
+internal/agent/approval/queue_test.go:335:		g, clk, _ := newGate(t, ui, approval.Options{MaxPending: 1})
+internal/agent/approval/ticket220_l1_window_read_test.go:203:	g := New(Options{UI: ui, Clock: neverClock{now: time.Unix(0, 0)}, Window: 3 * time.Second, Grants: grants})
+internal/agent/approval/ticket220_l1_window_read_test.go:383:	g := New(Options{UI: ui, Clock: neverClock{now: time.Unix(0, 0)}, Window: 3 * time.Second, Grants: grants})
+internal/agent/approval/ticket224_reply_grant_test.go:118:	o := approval.Options{
+internal/agent/approval/ticket84_no_owner_test.go:58:	g, _, _ := newGate(t, ui, approval.Options{
+internal/agent/approval/ticket84_no_owner_test.go:107:		g := approval.New(approval.Options{ApprovalTimeout: tc.timeout})
+internal/agent/approval/ticket84_no_owner_test.go:154:			g, _, _ := newGate(t, newFakeUI(), approval.Options{Clock: approval.SystemClock{}})
+internal/agent/approval/ticket84_no_owner_test.go:181:	g, _, _ := newGate(t, ui, approval.Options{
+internal/agent/approval/ticket84_no_owner_test.go:230:	noUI := approval.New(approval.Options{})
+internal/agent/approval/ticket84_no_owner_test.go:247:	g := approval.New(approval.Options{UI: ui})
+internal/agent/approval/ticket87_veto_l2_test.go:48:	g, _, _ := newGate(t, ui, approval.Options{
+internal/agent/approval/ticket97_alias_direction_test.go:31:	g, _, _ := newGate(t, ui, approval.Options{
+internal/agent/approval/window_test.go:22:	g, clk, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/window_test.go:59:			g, clk, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/window_test.go:87:	g, clk, reg := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/window_test.go:146:	g, clk, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/window_test.go:166:	g, _, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/window_test.go:183:	g, _, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/window_test.go:209:	g, clk, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/approval/window_test.go:266:	g, clk, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
+internal/agent/harness_test.go:112:	o := Options{}
+internal/agent/harness_test.go:133:	ep := llm.EndpointOptions{
+internal/agent/instructions_test.go:49:	return projctx.New(projctx.Options{
+internal/agent/instructions_test.go:72:	prov := risk.NewProvenance(risk.ProvOptions{})
+internal/agent/instructions_test.go:227:	prov := risk.NewProvenance(risk.ProvOptions{})
+internal/ball/hotkey_borrow_refused_260r5_test.go:191:	slog.SetDefault(slog.New(slog.NewTextHandler(w, &slog.HandlerOptions{Level: slog.LevelError})))
+internal/ball/hotkey_cancel_borrow_live_260_test.go:34:	b := newLiveBall(t, Options{Initial: statemachine.StateSleeping, Hotkeys: DefaultHotkeys()})
+internal/ball/hotkey_cancel_borrow_live_260_test.go:62:	b := newLiveBall(t, Options{Initial: statemachine.StateSleeping, Hotkeys: cfg})
+internal/ball/hotkey_live_test.go:194:	b := newLiveBall(t, Options{
+internal/ball/hotkey_live_test.go:287:	b := newLiveBall(t, Options{Initial: statemachine.StateSleeping, Hotkeys: liveHotkeys()})
+internal/ball/hotkey_live_test.go:382:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+internal/ball/hotkey_live_test.go:399:	b = newLiveBall(t, Options{
+internal/ball/hotkey_live_test.go:450:	b := newLiveBall(t, Options{Initial: statemachine.StateSleeping, Hotkeys: liveHotkeys()})
+internal/ball/interaction_live_test.go:54:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+internal/ball/interaction_live_test.go:58:	b = newLiveBall(t, Options{
+internal/ball/interaction_live_test.go:134:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+internal/ball/interaction_live_test.go:146:	b = newLiveBall(t, Options{
+internal/ball/interaction_live_test.go:283:	b := newLiveBall(t, Options{Initial: statemachine.StateListening, Hotkeys: liveHotkeys()})
+internal/ball/interaction_live_test.go:352:	b := newLiveBall(t, Options{Initial: statemachine.StateListening, Hotkeys: liveHotkeys()})
+internal/ball/live_windows_test.go:54:	b, err := New(Options{
+internal/ball/live_windows_test.go:155:	b, err := New(Options{
+internal/ball/live_windows_test.go:185:	b2, err := New(Options{
+internal/ball/live_windows_test.go:216:	b, err := New(Options{Initial: statemachine.StateSleeping, StartHidden: true})
+internal/ball/live_windows_test.go:321:	b, err := New(Options{Initial: statemachine.StateSleeping, StartHidden: true})
+internal/ball/live_windows_test.go:479:	b, err := New(Options{Initial: statemachine.StateSleeping})
+internal/ball/live_windows_test.go:629:	b, err := New(Options{Initial: statemachine.StateSleeping, StartHidden: true})
+internal/ball/sta_release_windows_test.go:414:			slog.SetDefault(slog.New(slog.NewTextHandler(releaseLog, &slog.HandlerOptions{Level: slog.LevelError})))
+internal/ball/sta_release_windows_test.go:571:		slog.SetDefault(slog.New(slog.NewTextHandler(w, &slog.HandlerOptions{Level: slog.LevelWarn})))
+internal/config/writeguard_226_test.go:57:	slog.SetDefault(slog.New(slog.NewTextHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug})))
+internal/llm/adaptertest/registry_test.go:111:				strict := u.New(t, base, Options{})
+internal/llm/adaptertest/registry_test.go:113:				loose := u.New(t, looseBase, Options{Loose: true})
+internal/llm/adaptertest/registry_test.go:251:				p := u.New(t, proc.Base+"/v1", Options{})
+internal/llm/catalog_test.go:136:	_, _, err := r.BuildChain(ChainBuildOptions{})
+internal/llm/catalog_test.go:196:	models, err := DiscoverModels(context.Background(), DiscoverOptions{
+internal/llm/catalog_test.go:233:	_, err := DiscoverModels(context.Background(), DiscoverOptions{BaseURL: srv.URL + "/v1"})
+internal/llm/enabled_reach_261_test.go:254:	prov, err := llm.BuildEndpointProvider(eps[0], llm.ChainBuildOptions{
+internal/llm/enabled_reach_261_test.go:396:	prov, err := llm.BuildEndpointProvider(eps[0], llm.ChainBuildOptions{
+internal/llm/fallback_test.go:58:	providers, names, err := res.BuildChain(llm.ChainBuildOptions{
+internal/llm/fallback_test.go:268:	if _, _, err := llm.NewResolver(cfg, nil).BuildChain(llm.ChainBuildOptions{}); err == nil {
+internal/llm/llm_test.go:304:	rp := NewRetrying(p, RetryOptions{Base: time.Second, Sleep: sr.sleep})
+internal/llm/llm_test.go:334:	rp := NewRetrying(p, RetryOptions{Max: 3, Base: time.Millisecond, Sleep: sr.sleep})
+internal/llm/llm_test.go:350:		rp := NewRetrying(p, RetryOptions{Base: time.Millisecond})
+internal/llm/llm_test.go:362:	rp := NewRetrying(p, RetryOptions{Base: time.Millisecond})
+internal/llm/llm_test.go:375:	rp := NewRetrying(p, RetryOptions{Base: 5 * time.Millisecond, Sleep: sr.sleep})
+internal/llm/llm_test.go:389:	rp := NewRetrying(p, RetryOptions{Base: time.Millisecond})
+internal/llm/llm_test.go:423:	rp := NewRetrying(p, RetryOptions{Base: time.Millisecond})
+internal/llm/matrix_14_2_test.go:87:	rp := llm.NewRetrying(inner, llm.RetryOptions{
+internal/llm/matrix_14_2_test.go:153:	rp := llm.NewRetrying(inner, llm.RetryOptions{
+internal/llm/matrix_14_2_test.go:198:			llm.RetryOptions{
+internal/llm/openaichat/mockllm_integ_test.go:279:	rp := llm.NewRetrying(a, llm.RetryOptions{Max: 3, Base: 5 * time.Millisecond})
+internal/llm/openaichat/mockllm_integ_test.go:306:	rp := llm.NewRetrying(a, llm.RetryOptions{Max: 3, Base: 5 * time.Millisecond})
+internal/llm/openaichat/mockllm_integ_test.go:329:	rp := llm.NewRetrying(a, llm.RetryOptions{Max: 3, Base: 5 * time.Millisecond})
+internal/llm/openaichat/mockllm_integ_test.go:401:	models, err := llm.DiscoverModels(context.Background(), llm.DiscoverOptions{
+internal/llm/probe_health_test.go:154:	rep, mismatches := runProbe(t, pf, "openai-chat", llm.ProbeSuiteOptions{Declared: declaredEverything})
+internal/llm/probe_health_test.go:216:	rep, mismatches := runProbe(t, pf, "openai-chat", llm.ProbeSuiteOptions{Declared: declaredEverything})
+internal/llm/probe_health_test.go:254:	rep, mismatches := runProbe(t, pf, "openai-chat", llm.ProbeSuiteOptions{Declared: declaredEverything})
+internal/llm/probe_health_test.go:286:	_, mismatches := runProbe(t, pf, "openai-chat", llm.ProbeSuiteOptions{
+internal/llm/probe_health_test.go:312:			rep, mismatches := runProbe(t, pf, protocol, llm.ProbeSuiteOptions{
+internal/llm/probe_health_test.go:358:			rep, mismatches := runProbe(t, pf, protocol, llm.ProbeSuiteOptions{
+internal/llm/probe_health_test.go:395:	if _, err := llm.RunProbeSuite(context.Background(), probe, llm.ProbeSuiteOptions{
+internal/llm/probe_health_test.go:403:	if _, err := llm.RunProbeSuite(context.Background(), probe, llm.ProbeSuiteOptions{
+internal/llm/probe_health_test.go:425:		mustProvider(t, "openai-chat", pf.srv.Base+"/v1"), llm.ProbeSuiteOptions{
+internal/llm/probe_health_test.go:460:	rep, mismatches := runProbe(t, pf, "openai-chat", llm.ProbeSuiteOptions{
+internal/llm/probe_thinking_test.go:87:	rep, mismatches := runProbe(t, pf, "openai-chat", llm.ProbeSuiteOptions{
+internal/llm/probe_thinking_test.go:122:	rep, mismatches := runProbe(t, pf, "openai-chat", llm.ProbeSuiteOptions{
+internal/memory/dao_test.go:49:	h := slog.NewTextHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug})
+internal/models/bridge_test.go:16:	machine := statemachine.New(statemachine.Options{
+internal/models/bridge_test.go:86:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+internal/models/downloader_test.go:152:	mgr, err := NewManager(Options{
+internal/models/downloader_test.go:308:	_, err := NewManager(Options{DataDir: t.TempDir(), Manifest: m, VerifySignature: false})
+internal/models/downloader_test.go:326:	mgr, err := NewManager(Options{
+internal/models/downloader_test.go:460:	mgr, err := NewManager(Options{
+internal/models/handoff_reuse_109_test.go:31:		mgr, err := NewManager(Options{
+internal/models/handoff_window_109_test.go:62:	return statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+internal/models/handoff_window_109_test.go:85:	mgr, err := NewManager(Options{
+internal/models/handoff_window_109_windows_test.go:79:	mgr, err := NewManager(Options{DataDir: store, Manifest: m, VerifySignature: true, Attempts: 2, BackoffBase: 0})
+internal/models/handoff_window_109_windows_test.go:113:	mgr2, err := NewManager(Options{
+internal/models/handoff_window_109_windows_test.go:160:	mgr, err := NewManager(Options{DataDir: store, Manifest: m, VerifySignature: true, Attempts: 2, BackoffBase: 0})
+internal/models/handoff_window_109_windows_test.go:177:	mgr2, err := NewManager(Options{DataDir: store2, Manifest: m2, VerifySignature: true, Attempts: 2, BackoffBase: 0})
+internal/models/manifest_real_test.go:128:	mgr, err := NewManager(Options{DataDir: dir, Manifest: m, VerifySignature: true})
+internal/models/manifest_real_test.go:155:	mgr, err := NewManager(Options{
+internal/models/manifest_real_test.go:180:	mgr, err := NewManager(Options{
+internal/models/verify_cost_121_bench_test.go:140:	mgr, err = NewManager(Options{
+internal/models/verify_tree_121_test.go:46:	m, err := NewManager(Options{
+internal/models/verify_tree_121_test.go:154:	mgr, err := NewManager(Options{
+internal/observe/diagnostics_test.go:35:	path, err := BuildDiagnosticsBundle(BundleOptions{
+internal/observe/diagnostics_test.go:125:	_, err := BuildDiagnosticsBundle(BundleOptions{
+internal/observe/diagnostics_test.go:140:	if _, err := BuildDiagnosticsBundle(BundleOptions{OutPath: out}); err != nil {
+internal/observe/earlylog_130_test.go:302:		mirror: slog.NewTextHandler(io.Discard, &slog.HandlerOptions{Level: slog.LevelWarn}),
+internal/observe/logging_test.go:25:		next: slog.NewJSONHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug}),
+internal/panel/instructions_200_test.go:93:	b := load(projctx.Options{
+internal/panel/instructions_200_test.go:123:	b2 := load(projctx.Options{
+internal/panel/instructions_200_test.go:155:			projctx.Options{WorkspaceDir: empty, GlobalDir: empty, Enabled: false},
+internal/panel/instructions_200_test.go:160:			projctx.Options{WorkspaceDir: empty, GlobalDir: empty, Enabled: true},
+internal/panel/instructions_200_test.go:165:			projctx.Options{WorkspaceDir: dir, GlobalDir: empty, Enabled: true},
+internal/panel/instructions_200_test.go:168:		{"refused", projctx.Options{
+internal/panel/instructions_200_test.go:273:	b = load(projctx.Options{WorkspaceDir: dir, GlobalDir: dir, Enabled: true})
+internal/panel/instructions_200_test.go:293:	sec := InstructionsSectionFromBundle(load(projctx.Options{WorkspaceDir: dir, Enabled: true}))
+internal/perm/store_test.go:103:	s, err := New(Options{Manager: mc, Confirm: cf, Logf: rec.logf, Now: func() time.Time {
+internal/perm/store_test.go:221:	s, err := New(Options{Manager: mc, Logf: rec.logf})
+internal/perm/ticket90_persist_test.go:103:	st, err := New(Options{Manager: mgr})
+internal/perm/ticket90_persist_test.go:121:	b := tools.New(tools.Options{Registry: reg, Gate: gate, Modes: st})
+internal/perm/ticket90_persist_test.go:143:	st, err := New(Options{
+internal/perm/ticket90_persist_test.go:194:		st, err := New(Options{Manager: mgr})
+internal/perm/ticket90_persist_test.go:346:	st, err := New(Options{
+internal/proc/shutdown_hooks_test.go:47:	records := RunShutdownSequence(hs.Hooks(), ShutdownOptions{FreeOSMemory: func() {}})
+internal/proc/shutdown_hooks_test.go:101:		RunShutdownSequence(hs.Hooks(), ShutdownOptions{FreeOSMemory: func() {}})
+internal/proc/shutdown_test.go:30:	records := RunShutdownSequence(hooks, ShutdownOptions{FreeOSMemory: func() {
+internal/proc/shutdown_test.go:91:	records := RunShutdownSequence(hooks, ShutdownOptions{
+internal/proc/shutdown_test.go:135:	records := RunShutdownSequence(hooks, ShutdownOptions{
+internal/proc/shutdown_test.go:159:	records := RunShutdownSequence(ShutdownHooks{}, ShutdownOptions{FreeOSMemory: func() {}})
+internal/projctx/projctx_test.go:71:	l := newLoader(projctx.Options{
+internal/projctx/projctx_test.go:106:	l := newLoader(projctx.Options{WorkspaceDir: leaf, Enabled: true, BudgetTokens: 100000})
+internal/projctx/projctx_test.go:136:		b := newLoader(projctx.Options{WorkspaceDir: dir, Enabled: true, BudgetTokens: 100000}).Turn()
+internal/projctx/projctx_test.go:156:	b := newLoader(projctx.Options{WorkspaceDir: inner, Enabled: true, BudgetTokens: 100000}).Turn()
+internal/projctx/projctx_test.go:195:	l := newLoader(projctx.Options{
+internal/projctx/projctx_test.go:229:	loose := newLoader(projctx.Options{WorkspaceDir: dir, Enabled: true, BudgetTokens: 100000}).Turn()
+internal/projctx/projctx_test.go:312:	prov := risk.NewProvenance(risk.ProvOptions{})
+internal/projctx/projctx_test.go:316:	l := newLoader(projctx.Options{
+internal/projctx/projctx_test.go:355:	b := newLoader(projctx.Options{WorkspaceDir: dir, Enabled: true, BudgetTokens: 100000}).Turn()
+internal/projctx/projctx_test.go:398:	off := newLoader(projctx.Options{
+internal/projctx/projctx_test.go:415:	on := newLoader(projctx.Options{
+internal/projctx/projctx_test.go:432:	b := newLoader(projctx.Options{
+internal/risk/provenance_syncdirs_other_test.go:52:	p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
+internal/risk/provenance_test.go:42:	return ProvOptions{
+internal/risk/provenance_test.go:738:	p2 := NewProvenance(ProvOptions{NoProbe: true, MaxParamDepth: 0})
+internal/risk/provenance_test.go:796:	p := NewProvenance(ProvOptions{NoProbe: true, MinFragmentChars: 12})
+internal/risk/provenance_test.go:808:	p := NewProvenance(ProvOptions{NoProbe: true, MinFragmentChars: 6})
+internal/risk/provenance_test.go:814:	p2 := NewProvenance(ProvOptions{NoProbe: true}) // default contract floor
+internal/risk/provenance_test.go:828:	p := NewProvenance(ProvOptions{NoProbe: true, MaxSourceRunes: 32})
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:139:	p := NewProvenance(ProvOptions{
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:62:	p := NewProvenance(ProvOptions{
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:118:	p := NewProvenance(ProvOptions{
+internal/risk/syncdirs_other_test.go:67:		p := NewProvenance(ProvOptions{
+internal/risk/syncdirs_redteam_windows_test.go:73:	p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
+internal/risk/syncdirs_redteam_windows_test.go:210:	p := NewProvenance(ProvOptions{}) // live env: env/registry/config/default probes
+internal/risk/syncdirs_test.go:83:	e.p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: e.home, SyncRoots: []SyncRoot{
+internal/risk/syncdirs_test.go:160:	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncFixturePath: fx})
+internal/risk/syncdirs_test.go:205:		p := NewProvenance(ProvOptions{
+internal/risk/syncdirs_test.go:226:	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
+internal/risk/syncdirs_test.go:268:	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: roots})
+internal/risk/syncdirs_test.go:353:	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home})
+internal/risk/syncdirs_test.go:396:	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home})
+internal/risk/syncdirs_test.go:412:	p := NewProvenance(ProvOptions{
+internal/risk/syncdirs_test.go:473:	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
+internal/risk/syncdirs_test.go:488:	p := NewProvenance(ProvOptions{}) // live env
+internal/risk/syncdirs_windows_test.go:47:		p := NewProvenance(ProvOptions{
+internal/risk/syncdirs_windows_test.go:85:	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
+internal/risk/taintmatch_test.go:175:	p := NewProvenance(ProvOptions{NoProbe: true})
+internal/risk/taintmatch_test.go:191:	p := NewProvenance(ProvOptions{NoProbe: true})
+internal/secret/store_test.go:33:	slog.SetDefault(slog.New(slog.NewJSONHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug})))
+internal/session/grants_test.go:70:	l, err := NewLedger(LedgerOptions{ID: id, Store: store})
+internal/session/grants_test.go:134:	if _, err := NewLedger(LedgerOptions{ID: "", Store: nil}); err == nil {
+internal/session/grants_test.go:375:	next, err := NewLedger(LedgerOptions{ID: nextID, Store: store})
+internal/session/grants_test.go:473:	l, err := NewLedger(LedgerOptions{ID: id, Store: brokenStore{err: boom}})
+internal/session/grants_test.go:485:	l2, err := NewLedger(LedgerOptions{ID: id, Store: brokenStore{err: boom}})
+internal/session/grants_test.go:501:		if _, err := NewLedger(LedgerOptions{ID: ID(lit), Store: store}); err == nil {
+internal/session/grants_test.go:506:	if _, err := NewLedger(LedgerOptions{ID: mustMint(t), Store: nil}); err == nil {
+internal/statemachine/machine_test.go:76:			m := New(Options{Initial: p.start})
+internal/statemachine/machine_test.go:110:	m := New(Options{Initial: StateWarm, Timeouts: timeouts})
+internal/statemachine/machine_test.go:127:	m2 := New(Options{Initial: StateWarm, Timeouts: timeouts})
+internal/statemachine/machine_test.go:152:		m := New(Options{Initial: StateSleeping, Timeouts: timeouts})
+internal/statemachine/machine_test.go:160:			m = New(Options{Initial: StateWarm, Timeouts: timeouts})
+internal/statemachine/machine_test.go:187:	m := New(Options{Initial: StateSleeping})
+internal/statemachine/table_test.go:298:			m := New(Options{Initial: tc.from, Sink: func(e Effect) { fired = append(fired, e) }})
+internal/statemachine/table_test.go:361:			m := New(Options{Initial: s})
+internal/statemachine/table_test.go:404:	m := New(Options{Initial: StateError})
+internal/statemachine/table_test.go:410:	m = New(Options{Initial: StateSleeping})
+internal/tools/bridge_junction_windows_test.go:201:	return New(Options{
+internal/tools/bridge_junction_windows_test.go:203:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+internal/tools/bridge_path_account_ticket105_test.go:20:// cmd/wisp/run.go builds: NewPathCanonicalizer -> tools.New(Options{Paths,
+internal/tools/bridge_path_account_ticket105_test.go:67:	return New(Options{
+internal/tools/bridge_path_account_ticket105_test.go:71:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+internal/tools/bridge_test.go:133:	b := New(Options{Registry: reg, Gate: gate})
+internal/tools/bridge_test.go:209:	b := New(Options{Registry: reg, MaxConcurrency: 99}) // 99 must clamp to 4
+internal/tools/bridge_test.go:264:	b := New(Options{Registry: reg})
+internal/tools/bridge_test.go:352:	b := New(Options{
+internal/tools/bridge_test.go:378:	b2 := New(Options{Registry: reg, Authorized: []Capability{CapFSRead}})
+internal/tools/bridge_test.go:728:	var p agent.ToolProvider = New(Options{})
+internal/tools/fs_edit_ac3b_test.go:65:	return New(Options{
+internal/tools/fs_edit_ac3b_test.go:68:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+internal/tools/fs_edit_ac5_gate_r4_test.go:51:	return New(Options{
+internal/tools/fs_edit_ac5_gate_r4_test.go:53:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+internal/tools/fs_edit_ac5_gate_r4_test.go:290:	return New(Options{
+internal/tools/fs_edit_ac5_gate_r4_test.go:292:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+internal/tools/fs_edit_test.go:55:	return New(Options{
+internal/tools/fs_edit_test.go:57:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+internal/tools/fs_write_test.go:66:	return New(Options{
+internal/tools/fs_write_test.go:68:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+internal/tools/fswrite_silentloss_ac1_test.go:79:	return New(Options{
+internal/tools/fswrite_silentloss_ac1_test.go:82:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+internal/tools/grant_test.go:159:	b := New(Options{
+internal/tools/helpers_test.go:43:	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil})
+internal/tools/helpers_test.go:50:	return New(Options{
+internal/tools/loop_approval_test.go:78:	prov, err := llm.NewProvider(llm.EndpointOptions{
+internal/tools/loop_approval_test.go:94:	gate := approval.New(approval.Options{UI: ui, Channels: approval.NewChannels()})
+internal/tools/loop_approval_test.go:103:	b := tools.New(tools.Options{
+internal/tools/loop_approval_test.go:112:	opt := agent.Options{
+internal/tools/pointer_183_cli_seam_test.go:117:	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil})
+internal/tools/pointer_183_cli_seam_test.go:118:	return New(Options{
+internal/tools/pointer_185_cli_seam_test.go:109:	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil})
+internal/tools/pointer_185_cli_seam_test.go:110:	b := New(Options{
+internal/tools/subagent_197_test.go:158:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+internal/tools/subagent_197_test.go:186:			opt := agent.Options{Provider: childProvider(), Tools: h.dir}
+internal/tools/subagent_197_test.go:206:	h.bridge = New(Options{
+internal/tools/subagent_222_test.go:255:		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+internal/tools/subagent_222_test.go:268:	h.bridge = New(Options{
+internal/tools/subagent_222_test.go:305:			return agent.Options{
+internal/tools/task_cancel_221_legs_test.go:92:			opt := agent.Options{Provider: provider(), Tools: x.h.dir}
+internal/tools/task_cancel_221_legs_test.go:106:	x.h.bridge = New(Options{
+internal/tools/task_output_leg_test.go:45:	return New(Options{
+internal/tools/task_output_leg_test.go:47:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+internal/tools/task_output_leg_test.go:126:	bare := New(Options{
+internal/tools/task_output_leg_test.go:292:	b := New(Options{
+internal/tools/task_output_leg_test.go:293:		Registry: reg, Paths: paths, Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+internal/tools/task_output_pointer_notice_test.go:59:	return New(Options{
+internal/tools/task_output_pointer_notice_test.go:61:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+internal/tools/task_output_pointer_notice_test.go:246:	b := New(Options{
+internal/tools/task_output_pointer_notice_test.go:248:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
+internal/tools/ticket175r2_stamp_live_test.go:85:	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil})
+internal/tools/ticket175r2_stamp_live_test.go:86:	return New(Options{
+internal/tools/ticket90_test.go:198:	b := New(Options{
+internal/tools/ticket90_test.go:270:		return New(Options{Registry: reg, Gate: gate, Modes: &t90Modes{m: m}}), gate
+internal/tools/ticket90_test.go:300:	b := New(Options{Registry: reg, Gate: gate}) // no Modes
+internal/tools/ticket90_test.go:330:		b := New(Options{Registry: reg, Gate: gate, Modes: &t90Modes{m: m}})
+internal/tools/ticket90_test.go:366:		b := New(Options{Registry: reg, Gate: gate, Modes: &t90Modes{m: m}, Assessor: assessor})
+internal/tools/ticket90_test.go:405:		b := New(Options{
+internal/tools/ticket90_test.go:473:	b := New(Options{Registry: reg, Gate: gate, Modes: &t90Modes{m: risk.ModeAutoApprove}})
+internal/tools/ticket90_test.go:521:		b := New(Options{
+internal/tools/wiring_test.go:83:	g := approval.New(approval.Options{UI: ui})
+internal/tools/wiring_test.go:91:	b := tools.New(tools.Options{
+internal/tools/wiring_test.go:96:		Provenance: risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+--count--
+34
+## A4: tests naming the resident gate constructor / literal
+cmd/wisp/resident_approval_246_windows_test.go:63:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:94:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:137:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:269:	// take, copied as literals on purpose: rewording resident_approval_windows.go
+cmd/wisp/resident_approval_246_windows_test.go:313:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:330:	ra2 := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:342:	ra := newResidentApproval()
+cmd/wisp/resident_approval_246_windows_test.go:359:	ra := newResidentApproval()
+cmd/wisp/resident_approval_live_246_windows_test.go:91:	ra := newResidentApproval()
+cmd/wisp/resident_approval_live_246_windows_test.go:201:	ra := newResidentApproval()
+cmd/wisp/resident_approval_live_246_windows_test.go:295:	ra := newResidentApproval()
+cmd/wisp/resident_approval_risk_256_windows_test.go:11:// read of the host's own config.toml (newResidentApprovalWithConfig, called by
+cmd/wisp/resident_approval_risk_256_windows_test.go:131:				ra = newResidentApproval()
+cmd/wisp/resident_approval_risk_256_windows_test.go:134:				ra = newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:154:			// up. If the read face were hard-wired, or if newResidentApproval were
+cmd/wisp/resident_approval_risk_256_windows_test.go:158:				seeded := newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:172:	if a, b := newResidentApproval(), newResidentApprovalWithConfig(""); a.riskProvenance != b.riskProvenance {
+cmd/wisp/resident_approval_risk_256_windows_test.go:173:		t.Errorf("newResidentApproval() and newResidentApprovalWithConfig(\"\") disagree on provenance: %q vs %q",
+cmd/wisp/resident_approval_risk_256_windows_test.go:244:			ra := newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:285:	ra := newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:322:	fresh := newResidentApprovalWithConfig(dir)
+cmd/wisp/resident_approval_risk_256_windows_test.go:426:	path := filepath.Join(risk256Dir(t), "resident_approval_windows.go")
+cmd/wisp/resident_approval_risk_256_windows_test.go:527:		case "newResidentApprovalWithConfig":
+cmd/wisp/resident_approval_risk_256_windows_test.go:534:		case "newResidentApproval":
+cmd/wisp/resident_approval_risk_256_windows_test.go:541:		t.Errorf("runResident calls newResidentApprovalWithConfig %d times, want exactly 1", fed)
+cmd/wisp/resident_approval_risk_256_windows_test.go:544:		t.Errorf("runResident still calls the no-host-view newResidentApproval() %d time(s): the shipped "+
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:86:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:128:		ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:164:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:166:		t.Fatal("newResidentApproval 装了取消键读口：产码路径不再读球自己的回执行了")
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:46:// of git show 57a33804:cmd/wisp/resident_approval_windows.go (lines 287, 309, 311,
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:83:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:96:	ra2 := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:118:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:138:	ra2 := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:161:		ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:176:		ra2 := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:209:	ra := newResidentApproval()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:220:	if ra := newResidentApproval(); ra.cancelKeyRead != nil {
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:221:		t.Fatal("newResidentApproval 装了取消键读口：产码路径不再读球自己的回执行了")
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:223:	if ra := newResidentApprovalWithConfig(""); ra.cancelKeyRead != nil {
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:224:		t.Fatal("newResidentApprovalWithConfig 装了取消键读口：同上")
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:232:	ra := newResidentApproval()
+cmd/wisp/resident_task_source_246_windows_test.go:70:	ra := newResidentApproval()
+cmd/wisp/resident_task_source_246_windows_test.go:148:	ra := newResidentApproval()
+cmd/wisp/resident_task_source_246_windows_test.go:185:	ra := newResidentApproval()
+--count--
+46

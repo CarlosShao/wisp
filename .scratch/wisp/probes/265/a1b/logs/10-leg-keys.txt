@@ -1,0 +1,72 @@
+# R10 leg keys claimed by nails, HEAD=2d6aed92
+--count--
+7
+## keys containing resident
+## enumerateLegs131 head
+// enumerateLegs131 reads main()'s dispatch: the argv-empty branch and every case
+// of the switch over args[0]. A leg's obligation is decided by what its own
+// branch can reach, transitively, through this package's production files.
+func (pkg *mainPackage131) enumerateLegs131() ([]leg131, error) {
+	var sw *ast.SwitchStmt
+	var empty *ast.BlockStmt
+	var emptyIf *ast.IfStmt
+	var emptyPos token.Position
+	argvName := ""
+	ast.Inspect(pkg.mainBody, func(n ast.Node) bool {
+		switch s := n.(type) {
+		case *ast.AssignStmt:
+			// The local main() binds os.Args to. Reading it instead of
+			// hard-coding "args" is what lets this keep working when the local is
+			// renamed, and stop working when the switch stops being a dispatch
+			// over argv at all - which is the shape an empty ledger would
+			// otherwise disguise as "no legs, so nothing to nail".
+			if len(s.Lhs) == 1 && len(s.Rhs) == 1 {
+				if id, ok := s.Lhs[0].(*ast.Ident); ok && isOsArgs131(s.Rhs[0]) {
+					argvName = id.Name
+				}
+			}
+		case *ast.SwitchStmt:
+			// The tag this package dispatches on is args[0]: an IndexExpr over
+			// that local. Matching the identifier rather than the whole
+			// expression follows a re-index; requiring it to be the argv local is
+			// what keeps some other switch in main from being read as the
+			// dispatch.
+			if argvName != "" && sw == nil {
+				if id := tagIdentOf131(s.Tag); id != nil && id.Name == argvName {
+					sw = s
+				}
+			}
+		case *ast.IfStmt:
+			if s.Body == nil || empty != nil {
+				return true
+			}
+			if isLenZeroOf131(s.Cond, argvName) {
+				empty = s.Body
+				emptyIf = s
+				emptyPos = pkg.fset.Position(s.Pos())
+			}
+		}
+		return true
+	})
+	if argvName == "" {
+		return nil, fmt.Errorf("func main never binds a local to os.Args, so this gate cannot tell a dispatch over argv from some other switch")
+	}
+	if sw == nil {
+		return nil, fmt.Errorf("func main has no `switch %s[...]`: either the dispatch moved, in which case this reader has to be pointed at where it went, or it is gone. Neither is a green", argvName)
+	}
+	pkg.argvName = argvName
+
+	// R-131-1 形 a: the ledger is complete only if nothing else in main() reads
+	// argv. Recorded here, next to the two nodes that define what "classified"
+	// means, so the definition cannot drift from the dispatch it describes.
+	pkg.strayArgvReads = pkg.strayArgvReads131(argvName, sw, emptyIf)
+
+	var legs []leg131
+	for _, cl := range sw.Body.List {
+		cc, ok := cl.(*ast.CaseClause)
+		if !ok {
+			continue
+		}
+		keys, unparsed := caseLabels131(cc, pkg)
+		site := fmt.Sprintf("main.go:%d", pkg.fset.Position(cc.Pos()).Line)
+		for _, u := range unparsed {

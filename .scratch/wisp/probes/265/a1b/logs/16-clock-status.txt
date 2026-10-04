@@ -1,0 +1,26 @@
+# R16 clock default + statusline today text, HEAD=862d1736
+// never a downgrade.
+func New(o Options) *Gate {
+	clock := o.Clock
+	if clock == nil {
+		clock = SystemClock{}
+	}
+	logf := o.Logf
+	if logf == nil {
+## statusLine body at HEAD
+func (ra *residentApproval) residentStatusLine() string {
+	ra.mu.Lock()
+	loaded := ra.escLoad
+	ra.mu.Unlock()
+	if !loaded {
+		return "审批门未装配（本进程没有可承载卡片的悬浮球窗口，或装配根没有注入取消执行者）"
+	}
+	return fmt.Sprintf("审批门已装配进本进程（取消通道：%s 已加载；等待中的确认项：%d）",
+		ra.cancelKeySpelling(), len(ra.cards.Pending()))
+}
+## 256 test HEAD lines 445-480 anchors
+428:	if literals != 1 {
+445:	want := []string{"UI", "Channels", "Window", "ApprovalTimeout", "Logf"}
+452:	if got["Grants"] {
+469:	if len(got) != len(want) {
+476:	if len(declared) < 10 {

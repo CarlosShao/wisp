@@ -1,0 +1,73 @@
+# R06 session-reply + prod-comment nails, HEAD=e3574b91 UTC=2026-10-04T08:42:01Z
+## F1 AllowSession callers in tests (the ⛔ constraint-1 blast radius)
+internal/agent/approval/ticket224_reply_grant_test.go:166:	if err := f.g.Native().AllowSession(ctx, p.CorrelationID, p.Grant); err != nil {
+internal/agent/approval/ticket224_reply_grant_test.go:167:		t.Fatalf("Native().AllowSession: %v", err)
+internal/agent/approval/ticket224_reply_grant_test.go:175:// TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed is the judge M4
+internal/agent/approval/ticket224_reply_grant_test.go:179:func TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed(t *testing.T) {
+internal/agent/approval/ticket224_reply_grant_test.go:242:		if err := f.g.Native().AllowSession(ctx, p.CorrelationID, bad); err == nil {
+internal/agent/approval/ticket224_reply_grant_test.go:243:			t.Errorf("AllowSession(nonce=%q) succeeded, want a refusal: a card the native side "+
+internal/agent/approval/ticket224_reply_grant_test.go:277:	if err := f.g.Native().AllowSession(context.Background(), p.CorrelationID, p.Grant); err != nil {
+internal/tools/grant_test.go:442:// TestTicket224GrantedCallBooksAllowSessionGrantWithItsRow is the audit half: the
+internal/tools/grant_test.go:447:func TestTicket224GrantedCallBooksAllowSessionGrantWithItsRow(t *testing.T) {
+internal/tools/ticket224_grantid_column_test.go:6:// CallBooksAllowSessionGrantWithItsRow (grant_test.go:445) asserts the row against
+--count--
+10
+## F2 AllowSession in prod
+cmd/wisp/approval_reply.go:191:// for the REMEMBERED variant: `session` reaches NativeAPI.AllowSession, and
+cmd/wisp/approval_reply.go:259:	err := s.live.h.AllowSession(s.ctx, corr)
+internal/agent/approval/gate.go:634:// AllowSession is D45-2's third card answer (ticket 224): the same native click,
+internal/agent/approval/gate.go:653:func (n nativeAPI) AllowSession(ctx context.Context, corr, grant string) error {
+internal/agent/approval/gate.go:657:// allowSession is the body behind NativeAPI.AllowSession.
+internal/agent/approval/replies.go:93://	Allow / AllowSession / Reject / Veto     the native route (DecideFromNative,
+internal/agent/approval/replies.go:94://	                           Gate.Veto); Allow and AllowSession both spend the
+internal/agent/approval/replies.go:95://	                           card's single-use nonce, AllowSession additionally
+internal/agent/approval/replies.go:337:// AllowSession is the 「本会话内允许」 answer (ticket 224, D45-2's third card
+internal/agent/approval/replies.go:347:// There is deliberately no PanelAllowSession. PanelAPI has no Allow method, so
+internal/agent/approval/replies.go:351:func (r *Replies) AllowSession(ctx context.Context, corr string) error {
+internal/agent/approval/replies.go:363:	if err := g.Native().AllowSession(ctx, corr, card.Grant); err != nil {
+internal/agent/approval/ui.go:147:	// AllowSession spends the same grant for the same card and additionally
+internal/agent/approval/ui.go:158:	AllowSession(ctx context.Context, correlationID, grant string) error
+## F3 tests that read production SOURCE TEXT and assert on a string in it
+cmd/wisp/always_write_no_clobber_226_test.go:47:		data, err := os.ReadFile(cfgPath)
+cmd/wisp/always_write_no_clobber_226_test.go:71:	text, err := os.ReadFile(cfgPath)
+cmd/wisp/approval_always_201_test.go:135:	text, err := os.ReadFile(filepath.Join(w.h.dir, configFileName))
+cmd/wisp/approval_always_201_test.go:177:	text, err := os.ReadFile(filepath.Join(w.h.dir, configFileName))
+cmd/wisp/approval_reply_201_test.go:247:	body, err := os.ReadFile(target)
+cmd/wisp/approval_reply_201_test.go:547:		if body, err := os.ReadFile(target); err != nil || !strings.Contains(string(body), "unanswered") {
+cmd/wisp/approval_seam_201_test.go:113:	body, err := os.ReadFile(target)
+cmd/wisp/config_receipt_255_test.go:90:			t.Errorf("%q is hot-applied but appears in neither bucket - it would vanish from the receipt (摘尺当修尺, forbidden by AC#1); got claimable=%v quiet=%v", name, split.claimable, split.quiet)
+cmd/wisp/config_receipt_255_test.go:197:			raw, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
+cmd/wisp/config_receipt_255_test.go:306:			raw, err := os.ReadFile(path)
+cmd/wisp/config_receipt_255_test.go:581:		for _, forbidden := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[agent]", "[models]", "[hotkey]"} {
+cmd/wisp/config_receipt_255_test.go:582:			if strings.Contains(immediate, forbidden) {
+cmd/wisp/config_receipt_255_test.go:583:				t.Errorf("ticket 255 AC#1: the 已立即生效 sentence claims %s, which has no live reader in this host: %q", forbidden, immediate)
+cmd/wisp/config_reload_223_test.go:78:	raw, err := os.ReadFile(path)
+cmd/wisp/config_reload_223_test.go:279:		// user-visible line naming this edit, AND the forbidden claim must be absent.
+cmd/wisp/config_reload_223_test.go:399:		raw, err := os.ReadFile(r.cfgPath())
+cmd/wisp/config_reload_perm_223_windows_test.go:94:			if _, err := os.ReadFile(path); err == nil {
+cmd/wisp/early_log_nail_130_windows_test.go:151:		b, err := os.ReadFile(name)
+cmd/wisp/firstrun_198_test.go:94:	first, err := os.ReadFile(cfgPath)
+cmd/wisp/firstrun_198_test.go:122:	second, err := os.ReadFile(cfgPath)
+cmd/wisp/firstrun_198_test.go:144:	third, err := os.ReadFile(cfgPath)
+cmd/wisp/firstrun_198_test.go:198:	data, err := os.ReadFile(cfgPath)
+cmd/wisp/firstrun_198_test.go:215:	for _, forbidden := range []string{"[llm.providers", "[models.local_override", "[plugins."} {
+cmd/wisp/firstrun_198_test.go:216:		if strings.Contains(text, "\n"+forbidden) {
+cmd/wisp/firstrun_198_test.go:217:			t.Errorf("the created file carries the dynamic table %q anyway - that would be an invented entry, not a default", forbidden)
+cmd/wisp/firstrun_198r2_test.go:233:	got, err := os.ReadFile(cfgPath)
+cmd/wisp/instructions_200r2_test.go:98:	old, err := os.ReadFile(cfgPath)
+cmd/wisp/leg_dispatch_gate_133_test.go:1751:		src, err := os.ReadFile(filepath.Join(dir, name))
+cmd/wisp/leg_sink_gate_131_test.go:593:			if src, srcErr := os.ReadFile(filepath.Join(dir, name)); srcErr == nil && bytes.Contains(src, []byte(legSinkRulingMarker)) {
+cmd/wisp/leg_sink_nail_131_windows_test.go:248:		b, err := os.ReadFile(name)
+--count--
+94
+## F4 tests naming the deliberate-not-closed comment block
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:9:2. **生产里建门的点只有两枚**（尺＝`git grep -n "approval.New(approval.Options{" HEAD -- cmd internal | grep -v _test`）：`cmd/wisp/run.go:612` **带** `Grants: grantWrite`（`:618`），`cmd/wisp/resident_approval_windows.go:219` **不带** `Grants`——它的 `:186` 注释逐字承认 "Options.Grants stays unset here"。⇒ **常驻（GUI）那条腿上的答复路径今天就落在 §1 的 `:673` 那一支。**
+.scratch/wisp/probes/256/v1/pre-mut-resident_approval_windows.go.pristine:185:// WHAT THIS DELIBERATELY DOES NOT CLOSE, NAMED SO IT IS NOT MISTAKEN FOR DONE:
+.scratch/wisp/probes/256/v1/pre-mut-resident_approval_windows.go.pristine:186:// Options.Grants stays unset here. The session ledger's only production
+.scratch/wisp/probes/260/v1/logs/head-copy-resident_approval_windows.go:185:// WHAT THIS DELIBERATELY DOES NOT CLOSE, NAMED SO IT IS NOT MISTAKEN FOR DONE:
+.scratch/wisp/probes/260/v1/logs/head-copy-resident_approval_windows.go:186:// Options.Grants stays unset here. The session ledger's only production
+.scratch/wisp/probes/265/a1/census.md:49:注释那句：`resident_approval_windows.go:186` 逐字 `// Options.Grants stays unset here. The session ledger's only production`——**仍是真话**（现读 `:219-225` 字面量实传 5 枚字段：`UI`/`Channels`/`Window`/`ApprovalTimeout`/`Logf`，无 `Grants`）。⚠ 同段 `:188` 那句 "this file's gate is built roughly 129 lines BEFORE" 的 **129 已漂**：真身＝`resident_windows.go:132`（建门）↔ `resident_windows.go:260`（`src := startResidentTaskSource(rt, ra)`）＝**128 行**，且两行之间还隔着 `resident_task_source_windows.go:224-230` 那枚条件 return（见 §2.2）。
+.scratch/wisp/probes/265/a1/census.md:72:**② `resident_approval_windows.go:186` "Options.Grants stays unset here"＝仍是真话。** 见 §1.2。
+.scratch/wisp/probes/265/a1/census.md:192:1. `cmd/wisp/resident_approval_windows.go` —— 新增一枚 holder 类型（或就近一个小 struct）＋ `:219-225` 字面量里加 `Grants:`（实传 5 枚 → 6 枚）；`:185-192` 那段"WHAT THIS DELIBERATELY DOES NOT CLOSE"必须同步改写。
+cmd/wisp/resident_approval_risk_256_windows_test.go:43:// Options.Grants stays unset. The session ledger is constructed only inside
+cmd/wisp/resident_approval_windows.go:200:// WHAT THIS DELIBERATELY DOES NOT CLOSE, NAMED SO IT IS NOT MISTAKEN FOR DONE:

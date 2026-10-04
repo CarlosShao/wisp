@@ -1,0 +1,15 @@
+# R09 sink-ruling markers in prod, HEAD=2d6aed92
+## I1 WISP-LEG-SINK-RULING in prod files
+cmd/wisp/slo_windows.go:184:// WISP-LEG-SINK-RULING: this leg resolves the JSONL pipeline itself
+## I2 enumerateLegs131 def
+254:	legs, err := pkg.enumerateLegs131()
+814:// enumerateLegs131 reads main()'s dispatch: the argv-empty branch and every case
+817:func (pkg *mainPackage131) enumerateLegs131() ([]leg131, error) {
+1123:// labels", which enumerateLegs131 then read as the default row - so naming a
+## I3 registerLegNail131 claims naming resident
+## I4 WISP-LEG-COVERAGE-RULING in prod
+cmd/wisp/main.go:74:	// WISP-LEG-COVERAGE-RULING: version prints buildinfo and the sherpa-onnx
+cmd/wisp/main.go:79:	// WISP-LEG-COVERAGE-RULING: help prints the usage block and exits 0. The block
+cmd/wisp/main.go:83:	// WISP-LEG-COVERAGE-RULING: default is the refusal path: unknown command,
+cmd/wisp/panel_assets.go:16:// WISP-LEG-COVERAGE-RULING: panel-assets is dispatched by main; the card branch
+cmd/wisp/slo_windows.go:199:// WISP-LEG-COVERAGE-RULING: slo is dispatched by main and driven by no case in

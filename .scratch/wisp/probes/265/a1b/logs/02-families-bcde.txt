@@ -1,0 +1,202 @@
+# R02 families b/c/d/e, HEAD=9f1e89bf UTC=2026-10-04T08:16:31Z
+## E1 (family e) one-gate pointer identity pins
+cmd/wisp/resident_approval_risk_256_windows_test.go:430:			"builds a second gate, which TestAC246ResidentPipelineAsksThroughTheOneGate (the ar.gate != ra.gate "+
+cmd/wisp/resident_task_source_246_windows_test.go:55:// TestAC246ResidentPipelineAsksThroughTheOneGate is ruling 2.2's capability half.
+cmd/wisp/resident_task_source_246_windows_test.go:68:func TestAC246ResidentPipelineAsksThroughTheOneGate(t *testing.T) {
+cmd/wisp/resident_task_source_246_windows_test.go:89:	if ar.gate != ra.gate {
+--count--
+4
+## B1 (family b) status line / boot print
+cmd/wisp/panel_resident_windows.go:405:// task that can only fail, and puts the reason in statusLine(), which is the sentence
+cmd/wisp/panel_resident_windows.go:539:// statusLine is the honest one-line answer to "does this process have a panel".
+cmd/wisp/panel_resident_windows.go:543:func (rp *residentPanel) statusLine() string {
+cmd/wisp/panel_resident_windows_test.go:640:// through its existing teardown, and statusLine names the reason. What stays asserted
+cmd/wisp/panel_resident_windows_test.go:759:	t.Logf("refusal-to-retirement: settle=%v second RequestShow accepted=%v in %v | thread retired=%v isFinished=%v | the planted live window 0x%X IsWindow=%v | startUpErr=%v | statusLine=%q",
+cmd/wisp/panel_resident_windows_test.go:767:		}(), rp.isFinished(), pl.hwnd, liveAfter, rp.startUpErr(), rp.statusLine())
+cmd/wisp/resident_approval_246_windows_test.go:324:	if line := ra.residentStatusLine(); !strings.Contains(line, "审批门未装配") {
+cmd/wisp/resident_approval_246_windows_test.go:325:		t.Fatalf("statusLine = %q while nothing was injected", line)
+cmd/wisp/resident_approval_246_windows_test.go:360:	line := ra.residentStatusLine()
+cmd/wisp/resident_approval_246_windows_test.go:362:		t.Fatalf("statusLine before any ball = %q, want the un-assembled sentence", line)
+cmd/wisp/resident_approval_246_windows_test.go:367:	if line := ra.residentStatusLine(); !strings.Contains(line, "审批门未装配") {
+cmd/wisp/resident_approval_246_windows_test.go:368:		t.Fatalf("statusLine after binding an empty host = %q, want the un-assembled sentence", line)
+cmd/wisp/resident_approval_246_windows_test.go:374:		if strings.Contains(ra.residentStatusLine(), forbidden) {
+cmd/wisp/resident_approval_246_windows_test.go:375:			t.Fatalf("statusLine says %q, which this leg cannot mean: %q", forbidden, line)
+cmd/wisp/resident_ball_windows.go:355:// statusLine is the fact this leg prints about its own ball. It is one string
+cmd/wisp/resident_ball_windows.go:358:func (rb *residentBall) statusLine() string {
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:113:	status := ra.residentStatusLine()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:107:	if line := ra2.residentStatusLine(); line != old260r3StatusLine {
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:143:	for _, line := range []string{said, ra2.residentStatusLine()} {
+cmd/wisp/resident_hotkey_258_seam_windows.go:20:	return rb.statusLine()
+cmd/wisp/resident_task_source_246_windows_test.go:314:	if !strings.Contains(out, "任务来源："+taskPostureAbsent) {
+cmd/wisp/resident_task_source_246_windows_test.go:316:			"任务来源："+taskPostureAbsent, out)
+cmd/wisp/resident_task_source_246_windows_test.go:385:	if !strings.Contains(out, "任务来源："+taskPostureRefused) {
+cmd/wisp/resident_task_source_246_windows_test.go:387:			"任务来源："+taskPostureRefused, out)
+cmd/wisp/resident_task_source_246_windows_test.go:485:		append(args, ra.residentStatusLine(), f.out.String(), f.err.String())...)
+cmd/wisp/resident_task_source_windows.go:101:	// taskPostureConsole / taskPostureInjected / taskPostureAbsent /
+cmd/wisp/resident_task_source_windows.go:102:	// taskPostureRefused are the four forms the boot report's 任务来源 field can
+cmd/wisp/resident_task_source_windows.go:107:	taskPostureConsole  = "控制台键盘（已接入）"
+cmd/wisp/resident_task_source_windows.go:108:	taskPostureInjected = "仅本发的测试注入位"
+cmd/wisp/resident_task_source_windows.go:109:	taskPostureAbsent   = "无（任务入口未启用，理由见上面那行）"
+cmd/wisp/resident_task_source_windows.go:110:	taskPostureRefused  = "无（任务管线未装配，理由见上面那行）"
+cmd/wisp/resident_task_source_windows.go:499:// taskPosture is the boot report's 任务来源 field - the half that AC#7 exists to
+cmd/wisp/resident_task_source_windows.go:502:func (src *residentTaskSource) taskPosture() string {
+cmd/wisp/resident_task_source_windows.go:505:		return taskPostureAbsent
+cmd/wisp/resident_task_source_windows.go:507:		return taskPostureRefused
+cmd/wisp/resident_task_source_windows.go:509:		return taskPostureConsole
+cmd/wisp/resident_task_source_windows.go:511:		return taskPostureInjected
+--count--
+42
+## D1 (family d) must-not-appear shapes near grants/session/审批
+.scratch/wisp/issues/219-approval-card-three-reply-buttons-and-a-reason-box.md:62:> ① ⛔ **"长期"撞两行 RESERVED**：`docs/PLAN.md:1535` 逐字「只剩**跨会话持久档**仍无实现计划…无「永久允许此工具于某路径」；每次新会话都要重新授权一次」、`:1536` 逐字「当前确认动作固定（允许一次/拒绝/**本会话内允许**）…确认卡按钮是**硬编码的三种**」。⇒ 这不是"加一枚形参落 `A##`"的事，是**要挪 RESERVED**。**批准已落 `A424`**（引 owner 09-28 22:5x 原话；三条边界＝不是工具级永久放行／必须触发一次 L2 复确认／`session` 档必须不活过重启；撤销口令「撤 A424」）。
+.scratch/wisp/issues/224-session-scoped-grant-has-zero-executors-and-no-session-identity.md:5:- ⚠ **它挡住的不止票 219 的第二枚按钮**：`docs/PLAN.md:1536` 把"本会话内允许"当作**今天已有的三种硬编码确认动作之一**来写——**而这一格今天根本没有执行者**。也就是说：**冻结文字里"已存在"那一档，实建状态是〔建了但没接〕**（表在、DAO 在、没人写没人读、身份没人铸）。
+.scratch/wisp/issues/224-session-scoped-grant-has-zero-executors-and-no-session-identity.md:26:**这正是上面 ⚠ 那一枚坑**：如果 session id 是按进程／按任务／按时间派生出来的，"本会话内允许"就会**事实上变成永久免审通行证**——那撞 `internal/perm/store.go:19-27` 的边界、`docs/PLAN.md:1642`（会话结束后授权**必须**失效），也撞那三枚故意分开的钉。**所以本票的第一问题是"什么算同一次会话"，不是"怎么写库"。** 这一问法**属于待人定案**（见"落点两支"），未定义即停。
+.scratch/wisp/issues/224-session-scoped-grant-has-zero-executors-and-no-session-identity.md:36:- [ ] **AC#2 三件套齐全**：**写**（答复"本会话内允许" ⇒ `approval_grant` 真有一行，带 session 身份＋工具＋模式＋创建时间）、**读**（下一次同类请求命中它 ⇒ **不再弹卡**）、**失效**（会话结束 ⇒ 同一身份查不到、行为回到"要问"）。三格各自有独立用例，⛔ **不许合并成一枚"持久化"用例**（`ticket90_persist_test.go` 文件头逐字"They are three test functions on purpose"）。
+.scratch/wisp/issues/224-session-scoped-grant-has-zero-executors-and-no-session-identity.md:47:- **那枚钉，我现读复认（锚点 `98df640a`）**：`cmd/wisp/run_mode101_test.go`——`:400` 有字面量 `const session = "session-before-restart"`，`:427-441` 的注释与断言逐字为「Refused with the grant live IN ITS OWN SESSION, too: the assembly hands the bridge a mode, **never a grant source** (`Options.Confirmations` nil)」＋ `if !firstErr { t.Fatalf("boot 1 already let the B-tier .env write through …") }`。⇒ 它把"**带着生效中的本会话授权，同类写入仍必须被拒**"钉成了期望；而本票 **AC#2（`:36`）要的是相反的方向**（答复"本会话内允许" ⇒ 命中授权就不再弹卡）。
+.scratch/wisp/issues/23-system-window-input-tools.md:27:  now; grant lifecycle at 49): confirm card carries "仅本次 / 本会话内允许向此应用 / 所有应用
+.scratch/wisp/issues/246-the-process-that-runs-tasks-is-not-the-process-holding-the-ball-so-no-veto-channel-has-an-executor.md:75:- **K6 注入 gate 的两处真实代价**（`Options.Grants` 为 nil ⇒「本会话内允许」放行但不落盘并写 `GRANT-DROPPED`；吃不到 `[risk] confirm_timeout_sec`——窗口那项即便接了也钳在 3s，只有超时是真差异）：**不现在改 `approval.New` 的位置**（那等于改 AC#1 裁过的乙形次序）。⇒ 落成票 248 的新 AC 一格，由"配置进得来"那票一并收。
+.scratch/wisp/issues/248-the-panel-has-no-settings-route-the-inbound-whitelist-has-zero-config-or-credential-methods.md:59:- [ ] **AC#10（新补，10-01 09:5x 编排者追加，来路＝`246-v2` §3.B＋§5 第 6 条 ⇒ 账 `A488`）**：**常驻那条腿今天吃不到 `[risk]` 那两项配置，本票要么接上、要么在票面写明它是常量——⛔ 不许留成"配置页改了它就变了"的错觉**。现量（`246-v2` 自取，我复认）：`approval/gate.go:139-145` 的钳位 `win <= 0 → DefaultL1Window`；`approval/queue.go:107/115/122`＝`DefaultApprovalTimeout = 300s`／`DefaultL1Window = 3s`／`MaxL1Window = 3s`。常驻那枚 `approval.New`（`resident_approval_windows.go:109`）建在会话账本之前 ⇒ 两处真实代价：① `Options.Grants` 为 nil ⇒「本会话内允许」**放行但不落盘**并写 `GRANT-DROPPED`（这条与票 224 那套会话授权直接冲突——用户在球上按了"本次会话内允许"，今天**不生效**，只有日志里有）；② `l1_window_sec`／`confirm_timeout_sec` 改动对常驻腿**无影响**（窗口那项即便接了也钳在 3s ⇒ **只有超时是真差异**）。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:10:3. ⇒ 真实代价两条：① 常驻腿里「本会话内允许」因为 `Options.Grants` 为 nil **落不下一行**；② `confirm_timeout_sec` 那类改动**在常驻腿不生效**，而设置页今天不说这句话（这句"不说"由 ⓑ 那一支先补上，归 `255-r2`）。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:15:- [ ] **AC#1 只在 AC#0 交完并由编排者落一枚具名 `A##` 批准之后才许动**：`approval.New` 的 `Options` 里补上 `Grants` ＋ 来自 `[risk]` 的两项（超时／L1 窗口），常驻腿那次运行里「本会话内允许」**真落一行**。凭据形状**复用票 224 r2 那套授权仪器**，⛔ 不许新造一台。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:54:- ⚠ 谁要重开 ⓘ，**必须先答两格**（都已有现量、无人给修法）：① 无控制台那一支的门从哪儿来；② §7-6 丙——"本会话内允许"在常驻腿真实的前置门槛是**四道**，`Grants` 为 nil 只是第四道，而第三道（得有人说得出具 `session` 那个词，链在 `cmd/wisp/approval_reply.go:566 case "session"` → `:567` → `:257`，产码里**只有这一条**）在无控制台形状里**根本没有入口** ⇒ **本票 AC#1 那句"真落一行"在无控制台形状里不可判**；我把它当待验断言带着，⛔ 不改票面原句。
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:77:**5. `Grants` 那一半的归口＝待立票（本轮只登记，不派）**：要"常驻腿里『本会话内允许』真落一行"，缺的是**一枚接缝**而不是勇气。两形代价已由普查件 §0 量到边界：**(a) 第二枚 mint**（撞 `run.go:459-466` 注释那句 "One mint per process"，并造成 gate 写 id-A／bridge 读 id-B 的错配）；**(b) 晚绑定 holder 新类型**（仓里今天没有这种形状；⚠ 还要回答"注入时刻 gate 已答复过卡片怎么办"）。⇒ 下一枚票（暂名 **票 265**）的 AC#0＝**把这两形的代价与线程/时序约束量齐再裁**，⛔ 在此之前任何腿不许"顺手把 grants 接上"。另：票 244 那条"面板不许给 Allow"的修法禁区对本票同样成立（`AllowSession` 只在 `NativeAPI` 上，`approval/ui.go:147`/`:158`）。
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:1:# 票 265 — 常驻（GUI）那条腿建的门**没有会话授权记账位**（`Options.Grants` 留空）⇒ 用户在那张卡片上点「本会话内允许」＝**放行但不记**，唯一的痕迹是一行 stderr；全仓没有一枚尺断"这条路上这件事用户看不看得见"
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:14:     **②答复入口全仓只有 1 枚**＝控制台的 `session <编号>` 动词（`resident_task_source_windows.go:345→:381` → `approval_reply.go:562/:566-567/:257-259` → `replies.go:351-363` → `gate.go:658 allowSession` → `:673` 命中）；尺＝`git grep -n "AllowSession" HEAD -- cmd internal | grep -v _test` ⇒ 产码调用者只有 `approval_reply.go:259` 一枚。**球／托盘／面板／原生四处都不是**（`replies.go:347-350` 逐字"There is deliberately no PanelAllowSession"；`tray_windows.go:86-91` 无 allow 位）。⇒ **票面标题那句"用户在那张卡片上点『本会话内允许』"这个动作今天不存在**——能踩到那一支的只有**在终端里跑常驻进程、且对一张 L2 卡手打 `session`** 的人。没有任何别处在别处把记账补上（`git grep -n "Grants" HEAD -- cmd ':!*_test.go'` ⇒ 赋值只有 `run.go:618`／`:758` 两枚，常驻腿那三枚文件零赋值）。
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:18:记账**没坏**——它是**被刻意留空的**（fail-closed 方向：宁可下次再问，也不悄悄放宽授权面）。问题在**可见性**：这条路上用户的"本会话内允许"会得到**行为上的立刻生效**（本次放行）＋**记忆上的零**（下次同类操作还问），而这两者之间的落差**只写在一行 stderr**，GUI 用户没有控制台。⇒ 净结果：用户以为他答应过一件事，程序没有记住；下一次同一张卡又出现时，他没有任何线索知道为什么。
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:24:- **ⓑ 不接，但说到明处**：把"这条路上『本会话内允许』只到本次为止"做到**用户看得见**（卡片/回执文案）。⚠ 文案射程刚被票 260 那批钉过（撤销口令「260 文案撤回」），动文案要先读那批钉。
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:32:- [x] **AC#1**：判"今天这条路上，用户点『本会话内允许』的最坏后果是什么形状"——是**每次都重新问**、还是**悄悄放宽**、还是**记到了别的会话**，三档只许选一档并给凭据（现跑或读码；读码要标〔仅读码〕）。
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:34:  - ★ **但这一档的"最坏后果"不是"多问一次"，本票按现量必须写成两句**（这是普查之外**我本人 14:3x 现读补出的一枚**，普查件只点了后半句）：那条答复路径上**有两处已经把话说满了**——`cmd/wisp/approval_reply.go:279-281` 给用户看的成功回执逐字"…卡片上那些路径对本会话后续的 L1 询问**不再重复提问**"，⚠ **以及它上面那一枚 `:277-278` 往审计里落的 `s.record("ANSWERED", … detail="原生侧允许并记入本会话，paths=%d")`**（尺＝`approval_reply.go:414-419`：`record` 写的是 `s.audit(...)`，在常驻腿上即 `residentAuditf` → `slog.Info("audit: " …)` → **`<dataDir>\logs\*.jsonl` 落盘件**）。⇒ 最坏后果的准确形状＝**用户被当面告知"不会再问了"、而实际会再问；并且审计文件里留下一条"已记入本会话"的记录，而那一行根本没被记过**。两句话都由 `err == nil` 那一路自然产出（`gate.allowSession` 先放行、再落 `GRANT-DROPPED`、然后 `return nil`＝`gate.go:673-677`），**没有一枚尺在钉它**（`ticket224_assembly_test.go:198` 只断那句里含 corr）。⛔ **审计那一枚属"审计留下与事实不符的记录"，比界面那一枚重一档**，本票 AC#2 落地时两句都要处理，⛔ 不许只改回执那句、把审计那句留给下一任。
+.scratch/wisp/issues/49-session-grants-d45-2.md:12:Scoped session authorization: confirmation cards gain "本会话内允许 <tool> 于 <pattern>"
+.scratch/wisp/issues/49-session-grants-d45-2.md:21:  "本会话内允许向所有应用注入" is danger-styled + expand-confirm (two clicks); swap of target
+.scratch/wisp/issues/49-session-grants-d45-2.md:29:- Confirm-card UX: three options (仅本次 / 本会话内允许此工具+模式【visually primary】 /
+.scratch/wisp/probes/16x/c1/PLAN.md.0d17647:1534:| RESERVED | Codex 的 `available_decisions`（服务端告诉客户端渲染哪些按钮） | D31：当前确认动作固定（允许一次/拒绝/**本会话内允许**，第三项由 D45 加入），无需动态 | — **无实现计划** | C18 | 确认卡按钮是硬编码的三种 |
+.scratch/wisp/probes/16x/c1/PLAN.md.0d17647:2026:| 7 | ~~**`input.type` 默认 L2 + 会话授权降级**~~ → ✅ **已定案（2026-09-18）** | **用户选定：「按目标进程分会话授权」** | **定案内容**：① `input.type` **默认 L2** ② 首次向某应用注入时确认一次，确认卡提供**三档**：<br>  · 「仅本次」（L2 逐次）<br>  · **「本会话内允许向此应用注入」**（绑定 `(工具, 目标进程名, 会话)`，**推荐档，卡片上视觉最突出**）<br>  · 「本会话内允许向所有应用注入」（**必须显式标注为更危险**，视觉降级、需二次点击展开，不得与推荐档并列）<br>③ **换目标应用要重新确认**（Word → 终端 不共用授权）—— 这是有意的：不同应用的注入后果差异极大 ④ 会话结束授权失效；面板「安全」页可查、可一键撤销 ⑤ **C25 污染命中（R4）不受本授权覆盖** ⑥ 落 **S3**（授权机制本体随 D45-2 落 S7，S3 阶段先只做「仅本次」档）。<br>**已知局限（必须写进错误文案）**：受 Windows UIPI 限制，**无法向管理员权限窗口注入**，且无解（§16.11 第 2 条） |
+.scratch/wisp/probes/16x/c1/PLAN.md.0d17647:2145:   「**本会话内允许 `<工具>` 于 `<路径模式>`**」。授权绑定 **(工具, 路径模式, 会话 ID)**，
+.scratch/wisp/probes/198/v2/backup/run.go:278:	// minted session identity, writes the rows a native 「本会话内允许」 answer
+.scratch/wisp/probes/198/v2/backup/run.go:470:	// stays nil, so 「本会话内允许」 answers as a single-use allow and says so, and
+.scratch/wisp/probes/198/v2/backup/run.go:475:		fmt.Fprintf(s.stderr, "wisp run: 本次没有会话身份（%v），「本会话内允许」将按「仅本次」答复处理\n", err)
+.scratch/wisp/probes/198/v2/backup/run.go:594:	// 「本会话内允许」 has no writer here. That is the state approval.Gate answers
+.scratch/wisp/probes/220/a2/census.md:195:⇒ 后果是 L1 长度取默认 `3s`（queue.go:116 `DefaultL1Window`，clamp 在 gate.go:143-150）且「本会话内允许」无记账（run.go:592-599 那段把这条限制写在源里）。
+.scratch/wisp/probes/224/c1/census.md:173:- `docs/PLAN.md:1536`：`| RESERVED | Codex 的 \`available_decisions\`（服务端告诉客户端渲染哪些按钮） | D31：当前确认动作固定（允许一次/拒绝/**本会话内允许**，第三项由 D45 加入），无需动态 | — **无实现计划** | C18 | 确认卡按钮是硬编码的三种 |`
+.scratch/wisp/probes/224/c1/census.md:175:- `docs/PLAN.md:2147-2149`（D45 第 2 条本体）：`「**本会话内允许 \`<工具>\` 于 \`<路径模式>\`**」。授权绑定 **(工具, 路径模式, 会话 ID)**，` / `**会话结束即失效**；面板「安全」页实时列出所有生效中的授权并可一键撤销；` / `每次使用被授权通道都写 \`tool_call\` 日志（可取证）。`
+.scratch/wisp/probes/224/c1/census.md:194:**`docs/specs/SPEC-06-security-gatekeeping.md`**：`:117` `2. **作用域会话授权（S7）**：确认卡第三选项「本会话内允许 \`<工具>\` 于 \`<路径模式>\`」；`
+.scratch/wisp/probes/224/c1/census.md:201:**`docs/specs/SPEC-00-product-overview.md`**：`:71` 场景 30 `作为用户，我想在确认卡上选择「**本会话内允许此工具于此路径模式**」，以便同类重复操作只确认一次且会话结束自动失效（D45-2）`；`:75` 场景 34 `…面板「安全」页看到**所有生效中的会话授权并可一键撤销**，以便授权永远在掌握中（D45-2）`。
+.scratch/wisp/probes/224/c1/census.md:321:### C1 写：答复「本会话内允许」→ 真落一行
+.scratch/wisp/probes/224/c1/census.md:567:| ⚠ 另一支要一并摊的事实 | 常驻腿**也存在**：`cmd/wisp/main.go:55-61`（无参数 → `runResident()`）＋ `cmd/wisp/resident_windows.go:24 func runResident()`。现读 `cmd/wisp/approval_reply.go:48` 逐字：「`cmd/wisp/resident_windows.go` runs an event loop with **no gate, no bridge and no** …」⇒ **今天常驻腿上一枚工具调用都不会发生**，所以"进程＝会话"在常驻腿上是**空值**；**一旦常驻腿接上桥（票 201/222/223 那族的方向），常驻进程的"会话"＝整个应用寿命 ⇒ 那一支上"本会话内允许"逐字变成"本次开机内永久免审"** |
+.scratch/wisp/probes/224/c1/census.md:596:| **稀释风险** | **最低**（每轮随机、每任务一个）。⚠ 但它**语义上不是"会话"**：`Run`/`RunAsync` 每次调用都铸新 id ⇒ **一枚"本会话内允许"会在一次用户回合结束时失效**，`PLAN.md:2147` 的"同类重复操作只确认一次"在多轮对话里几乎不成立（`SPEC-00:71` 场景 30 要的是整个会话内不再问） |
+.scratch/wisp/probes/224/v1/probe_a_prod_test.go:283:			"「本会话内允许」 has no executor in production.\n%s", log)
+.scratch/wisp/probes/224/v1/probe_a_prod_test.go:288:			"identity (A435 第 1 条), and it makes 「本会话内允许」 a permanent pass", id1)
+.scratch/wisp/probes/244/a2/census.md:189:| **乙＝等票 33（宿主）＋票 248（面板能举一发任务）之后再切** | 前置落地面：`go.mod:19`（HEAD 里**没有**这枚依赖；工作树里 `33-r1` 已加为 `// indirect`＋`go-winloader`，**按 S29 两态读**，S13／§⑦ 7.13）、`internal/panel/composer_dispatch.go:106` 的 `Message` 槽位（今天装配为 nil：`cmd/wisp/panel_inbound.go:238`）、`internal/panel/pump.go:16` 那句"no WebView2 host (ticket 33 is unclaimed)"会跟着变假（归票 33 改口，`A489` 已点名同族 `cmd/wisp/approval_always.go:165`）；受影响面同甲（任务源／允许／停机三格都在切的那一刻归零）；额外一格：票 248 AC#10 已裁"常驻门建在会话账本之前 ⇒ `Grants` nil ⇒ 本会话内允许放行但不落盘"——本腿现量机制成立：`cmd/wisp/resident_approval_windows.go:109-113` 的 `approval.Options{}` **没有** `Grants` 字段，而 `cmd/wisp/run.go:592` 有 `Grants: grantWrite`（⛔ **裁定与账不属本腿**，出处 `A488` 第 2 条，我只补 file:line 与"两枚门的选项面确实不同"这一读数） | **甲那三把零全部照旧**（切的那一刻一样没仪器响）；乙形**新增**的可看见面＝票 33/248 自己的用例（`cmd/wisp/panel_inbound_33_test.go` 已在；WebView2 宿主那枚还不存在）。⚠ **没有任何一枚仪器断言"面板真能举一发任务"**——那是 248 落地腿要交的尺，不在本腿射程 | **中**：切之前所有前置都已落盘，撤 flag 本身仍是单行；多出来的代价是**面板侧已按"能举任务"的形状写过用例与文案**，撤 flag 会让"GUI 里没有控制台键盘"变永久状态，且 owner 已经看到面板能举卡（心理面） |
+.scratch/wisp/probes/244/a3/census.md:67:| R44 | 现读 `internal/agent/approval/gate.go:44-59`（`Options.Grants GrantRecorder`）／`:154`＋`cmd/wisp/run.go:585-592`＋`cmd/wisp/resident_approval_windows.go:109-113` | GRANT-DROPPED 那一格与甲格的分界凭据（本件 §③ 的主尺）：`Grants` 是 `Options` 的一枚字段（`gate.go:59`），`run.go:592` 传了 `Grants: grantWrite`，**常驻腿 `:109-113` 的 `approval.Options{}` 里没有这一枚**⇒ `Gate.allowSession`（`gate.go:647`→`:668`）写不进账，只落一句 `GRANT-DROPPED`；对照：`Replies.Allow`（`replies.go:316`）根本不碰 `Grants`，它只花 nonce（⇒ 「允许一次」不受 GRANT-DROPPED 影响，「本会话内允许」才受影响） |
+.scratch/wisp/probes/244/a3/census.md:185:| 触发条件 | **要有人按下"本会话内允许"才会触发**——而今天那一枚按下的人不存在（本格），所以那句 `GRANT-DROPPED` 在双击那条路上今天**一次都不会打**（读数：它的两枚引用点 `resident_task_source_windows.go:43`、`run.go:570` 都在注释里） | 与 `Grants` 无关：`Replies.Allow`（`replies.go:316-335`）**根本不读 `Grants`**，它只花 nonce ⇒ **「允许一次」不受 GRANT-DROPPED 影响**（本腿现量） |
+.scratch/wisp/probes/244/a3/census.md:187:| ⚠ 两格唯一的**顺序依赖**（读数，不是建议） | 若甲格将来把"**本会话内允许**"补成一枚入口（今天票 228 逐字「⛔ 今天不许做——会话档归票 224」），它会**立刻**落进 GRANT-DROPPED 那一格：常驻门没有 `Grants` writer ⇒ 用户按了、调用放行了、规则没写。**所以会话档那一枚入口要补，前置是票 248 AC#10 那两个选择先裁完**，否则补出来的是一枚"看起来记住了、其实没记"的按钮——正是本仓反对的那族形状 | 反过来不成立：本格即使一枚入口都没补，`GRANT-DROPPED` 也不会多打一行（没人按它） |
+.scratch/wisp/probes/248/c3/census.md:96:4. **AC#10 的 `GRANT-DROPPED` 实跑**（票面 §59 那族：用户在球上按"本会话内允许"，今天因 `Grants` nil 只放行不落盘）：⛔ 本腿没跑常驻腿、量不到这一发的实跑证据；要真跑常驻腿＋球交互才采得到。⇒ 归 1 同一次真机 session，或票 224 r2 那套授权仪器（票面 ⓑ/ⓘ 判据点名复用，⛔ 不新造）。
+.scratch/wisp/probes/248/c3/census.md:122:4. **GRANT-DROPPED 实跑**（AC#10）：用户按"本会话内允许"、`Grants` nil ⇒ 只放行不落盘那一行今天是否真出现。要真跑常驻腿＋球交互，且票面点名复用票 224 r2 那套授权仪器（⛔ 不新造）。⇒ 真机 session / 专门授权仪器腿。
+.scratch/wisp/probes/256/a1/census.md:115:### ③ 「本会话内允许」在常驻腿今天真实的前置门槛是**四道**，`Grants` 为 nil 只是第四道
+.scratch/wisp/probes/265/a1/census.md:99:| **3** | 面板入向（`approval.decide`） | `cmd/wisp/panel_inbound.go:277 Message: nil`（产码路由没有审批消息位）；`gate.go:736-746 DecideFromPanel` 对任何 allow **按路线直接拒绝** | **否**——面板侧连 `Allow` 都没有（`approval/ui.go` PanelAPI 无 Allow；`replies.go:347-350` 逐字"There is deliberately no PanelAllowSession"）。⇒ **票面上"用户在那张卡片上**点**「本会话内允许」"这个动作今天不存在**，见 §2.5 |
+.scratch/wisp/probes/265/a1/census.md:166:`已按「本会话内允许」答复 <corr>（<tool>）：这一发已放行，卡片上那些路径对本会话后续的 L1 询问不再重复提问（L2 永不被会话授权覆盖，SPEC-06 §8.3 第 1 条）`。
+.scratch/wisp/probes/265/a1/census.md:169:**常驻腿上这句话今天照样逐字印出来**，而它承诺的"不再重复提问"在常驻腿上**不发生**（写侧孤儿，见 §2.3）。
+.scratch/wisp/probes/265/a1/census.md:171:⇒ 这一枚是"可见性缺"的**反向形**：不是"没话说"，是**说了一句做不到的话**，且它由 `err == nil` 那一路自然产出、没有一枚尺在钉它（`ticket224_assembly_test.go:198` 只断"这句里含 corr"，不断含"不再重复提问"）。
+.scratch/wisp/probes/265/a1/census.md:217:**用户看得见什么（ⓐ-Ⅰ／Ⅱ）**：带控制台那一形——他答一次「本会话内允许」，同一发进程里那条路径后续的 L1 询问**不再重复问**（`GRANT-DROPPED` 那行也不再出现）。双击那一形——**他什么都看不见，也什么都没变**（那一形根本没有卡片和答复入口，见 §3.0）。
+.scratch/wisp/probes/265/a1/census.md:234:**用户看得见什么**：ⓑ-Ⅰ＝带控制台的人会在答复那行看见"这条路上『本会话内允许』只到本次为止"；双击的人**看不见**。ⓑ-Ⅱ＝**没有用户看得见**，只有读日志的人看得见（⛔ 我不许把这一支写成"说到明处"，它写的是"说到日志"）。
+.scratch/wisp/probes/265/a1/census.md:327:| I2 | **⭐ ⓑ 那枚"已按『本会话内允许』答复…不再重复提问"要不要按支拆句** | 本腿量到了形状（§2.5），**判不了形**：拆句要 `replySurface` 知道"我这枚 gate 有没有记账位"，而 `approval.Gate` **今天没有任何一枚导出方法把 `g.grants` 报出去**（导出名册尺 R43：`Queue`/`Channels`/`Window`/`AdmitTextTask`/`PendingWindow`/`Complete`/`Veto`/`LateVeto`/`PendingApproval`/`Native`/`Panel`/`DecideFromNative`/`DecideFromPanel`/`Replay`/`Bus`/`Report`/`ToolsCancelBus`/`LiveL1Windows`——**没有 `HasGrantWriter` 之类**）。⇒ ⓑ 的最小写面里**藏着一枚新接缝（新增导出读面）**，而那要撞 `gate.go:86-88` 那句"No method on Gate reads it back"——这枚边界是不是 D45 的契约面，**归人工批准**（`SPEC-12 §4.1`），不是腿能定的 | 编排者裁；裁之前 ⓑ 的"最小写面"只能写"待定" |
+.scratch/wisp/probes/nail/1/precheck.md:60:- emoji 实际射程（引 AGENTS.md 定案）：扫 `U+1F000–1FAFF`·`U+2200–22FF`·`U+2600–27BF`·`U+2B00–2BFF`·`U+FE0F`·`U+1F1E6–1F1FF`；**注释豁免、字符串不豁免**；箭头 `U+2190–U+21FF`、带圈数字 `U+2460–U+24FF` **不扫**。⇒ 224 若在 Go 侧落"本会话内允许"卡文案：`✓`(U+2713)、`≤`(U+2264) **会被点红**，`→` 不会。
+.scratch/wisp/probes/rate-census-4a/buckets.md:122:49｜甲｜同一类操作每来一次问你一遍，按下"本会话内允许"跟没按一样；授权审计里 `grant_id` 空（号段外票 224 正是"零执行者"）｜6｜否｜票 224／242（≥200）
+.scratch/wisp/probes/v5-survey/block-A.md:257:- 我们的三档是**另一套切法**：`docs/PLAN.md:2028` 逐字三档＝「仅本次」／「**本会话内**允许向此应用注入」／「本会话内允许向**所有**应用注入」；`docs/PLAN.md:2147` 确认卡第三选项＝「本会话内允许 `<工具>` 于 `<路径模式>`」，**会话结束即失效**。
+cmd/wisp/approval_reply.go:236:// session answers with D45-2's third option, 「本会话内允许」 (ticket 224).
+cmd/wisp/approval_reply.go:278:		fmt.Sprintf("原生侧允许并记入本会话，paths=%d", len(card.Paths)))
+cmd/wisp/approval_reply.go:279:	return "已按「本会话内允许」答复 " + corr + "（" + card.Tool + "）：" +
+cmd/wisp/approval_reply.go:280:		"这一发已放行，卡片上那些路径对本会话后续的 L1 询问不再重复提问" +
+cmd/wisp/approval_reply.go:583:		return "yes/session/no/veto（原生侧；session＝本会话内允许，D45-2 第三枚答复）· " +
+cmd/wisp/resident_task_source_windows.go:42:// session ledger exists has no Grants writer, so 「本会话内允许」 releases the call
+cmd/wisp/run.go:278:	// minted session identity, writes the rows a native 「本会话内允许」 answer
+cmd/wisp/run.go:470:	// stays nil, so 「本会话内允许」 answers as a single-use allow and says so, and
+cmd/wisp/run.go:475:		fmt.Fprintf(s.stderr, "wisp run: 本次没有会话身份（%v），「本会话内允许」将按「仅本次」答复处理\n", err)
+cmd/wisp/run.go:594:	// 「本会话内允许」 has no writer here. That is the state approval.Gate answers
+cmd/wisp/ticket224_assembly_test.go:67:// N#1 - the operator's 「本会话内允许」 verb puts a row in the assembled run's db
+cmd/wisp/ticket224_assembly_test.go:104:		args := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"written after 本会话内允许"}`,
+docs/PLAN.md:1536:| RESERVED | Codex 的 `available_decisions`（服务端告诉客户端渲染哪些按钮） | D31：当前确认动作固定（允许一次/拒绝/**本会话内允许**，第三项由 D45 加入），无需动态 | — **无实现计划** | C18 | 确认卡按钮是硬编码的三种 |
+docs/PLAN.md:2028:| 7 | ~~**`input.type` 默认 L2 + 会话授权降级**~~ → ✅ **已定案（2026-09-18）** | **用户选定：「按目标进程分会话授权」** | **定案内容**：① `input.type` **默认 L2** ② 首次向某应用注入时确认一次，确认卡提供**三档**：<br>  · 「仅本次」（L2 逐次）<br>  · **「本会话内允许向此应用注入」**（绑定 `(工具, 目标进程名, 会话)`，**推荐档，卡片上视觉最突出**）<br>  · 「本会话内允许向所有应用注入」（**必须显式标注为更危险**，视觉降级、需二次点击展开，不得与推荐档并列）<br>③ **换目标应用要重新确认**（Word → 终端 不共用授权）—— 这是有意的：不同应用的注入后果差异极大 ④ 会话结束授权失效；面板「安全」页可查、可一键撤销 ⑤ **C25 污染命中（R4）不受本授权覆盖** ⑥ 落 **S3**（授权机制本体随 D45-2 落 S7，S3 阶段先只做「仅本次」档）。<br>**已知局限（必须写进错误文案）**：受 Windows UIPI 限制，**无法向管理员权限窗口注入**，且无解（§16.11 第 2 条） |
+docs/PLAN.md:2147:   「**本会话内允许 `<工具>` 于 `<路径模式>`**」。授权绑定 **(工具, 路径模式, 会话 ID)**，
+docs/evidence/s1/219-approval-reply-design-adversarial.md:54:   `:1536` 逐字"当前确认动作固定（**允许一次/拒绝/本会话内允许**，第三项由 D45 加入）……确认卡按钮是硬编码的三种"＋`available_decisions`（服务端告诉客户端渲染哪些按钮）**无实现计划**。
+docs/evidence/s1/219-approval-reply-surface-c1.md:489:| 9 | D45 全文 `PLAN.md:2137-2159` **通篇无"理由"、无 `reason`** | `sed -n '2137,2160p'` 通读复核 ✓（`:2139` 标题、`:2140` 三元组、`:2146-2149` 会话授权、`:2150-2155` 三条限制、`:2156-2159` RESERVED 改写）。**补派单要的逐字判定材料**：D45 里唯一写到"卡上选项"的一句是 `:2146-2147`「确认卡上提供第三个选项「**本会话内允许 `<工具>` 于 `<路径模式>`**」」——那是**按钮文案，不是字段**；`grep -n "\breason\b" docs/PLAN.md` 全文只命中 `:2943`／`:2947`（`Stop.reason`）；`grep -n "理由"` 唯一相关的契约格是 **C18 `:1368`**「…工具名 / **完整参数** / 风险级 / **请求理由**」＝**被问方给的理由**；票面引的 `:2183` 现读逐字＝「**（a）引入会话保活窗口 `Warm`（新态）+ C31 `SessionScope`**」，落在 **`:2174` 起的 B4「全文没有会话保活，多轮对话每轮重载模型」** | sed -n ／grep -n 现取 | **成立**（D2 结论在 `de204ff1` 上原样站住，且现在有两枚逐字行当证据） |
+docs/evidence/s1/224-session-grant-v1.md:89:票面原文：**写**（答复"本会话内允许" ⇒ `approval_grant` 真有一行，带 session 身份＋工具＋模式＋创建时间）／**读**（下一次同类请求命中它 ⇒ **不再弹卡**）／**失效**（会话结束 ⇒ 同一身份查不到、行为回到"要问"），三格各自独立用例、⛔ 不许并成一枚"持久化"用例。
+docs/evidence/s1/224-session-grant-v1.md:108:   **⇒ 今天把"本会话内允许"整档的记账摘掉，全套件仍然全绿。**这不是"覆盖薄弱"，是**该格的判据不存在**——而且它恰好是 `grant_test.go:14-17` 自己立的目标：
+docs/evidence/s1/246-resident-task-source-r2.md:84:   - 那枚 gate 是在会话账本之前建的，所以 `Options.Grants` 为 nil ⇒ 常驻腿的「本会话内允许」按 gate 现成语义**放行但不落盘**并写 `approval: GRANT-DROPPED ...`；
+docs/evidence/s1/246-resident-task-source-v2.md:212:   本腿自己核过写腿说得对（现读 `approval/gate.go:135-145` 的 `win <= 0 → DefaultL1Window` 钳位、`approval/queue.go:107/115/122` ＝ 300s／DefaultL1Window 3s／MaxL1Window 3s）：常驻那枚 `approval.New` 在会话账本之前建 ⇒ `Options.Grants` 为 nil ⇒「本会话内允许」放行但不落盘并写 `GRANT-DROPPED`；且它吃不到 `[risk] l1_window_sec`／`confirm_timeout_sec`（窗口那一项即便接了也钳在 3s ⇒ 只有超时是真差异）。要消掉就得把 `approval.New` 移进 `assembleRuntime`＝改 AC#1 的裁定次序，本腿不动、也不认为写腿有权动（它没动，正确）。
+docs/reports/pending-and-issues.md:9180:  ② **"长期"不是"要不要落 `A##`"的问题，它撞两行 RESERVED**：`PLAN.md:1535` 逐字「只剩**跨会话持久档**仍无实现计划…无「永久允许此工具于某路径」；**每次新会话都要重新授权一次**」；`PLAN.md:1536` 逐字「当前确认动作固定（允许一次/拒绝/**本会话内允许**）…**确认卡按钮是硬编码的三种**」。⇒ owner 要的"永久允许"＋第四枚答复动作＝**要挪这两行 RESERVED**，不是一枚形参的事。⇒ **处置见 `A424`（批准记录，引他原话）**：接单照做，**风险与三条安全轨一并写明**。
+docs/reports/pending-and-issues.md:9337:  1. **不许派生**：id **不得**从进程号／时间戳／工作目录／任何可重算的东西派生——**只能随机铸造**。⇒ 这条治的是票面"为什么不能顺手生成一个 id 就行"那一整节：派生式 id 会让"本会话内允许"**事实上变成永久免审通行证**（撞 `internal/perm/store.go:19-27` 与 `docs/PLAN.md:1642`，正是那四枚故意分开的钉要拦的形状，见票面 ⚠ 那一行）。
+docs/reports/pending-and-issues.md:10107:2. **票 248 新 AC#10**：常驻那枚 `approval.New`（`resident_approval_windows.go:109`）建在会话账本之前 ⇒ `Options.Grants` 为 nil ⇒「本会话内允许」**放行但不落盘**并写 `GRANT-DROPPED`（这条与票 224 那套会话授权直接冲突：用户在球上按了"本次会话内允许"，今天不生效，只有日志里有）；且 `l1_window_sec`／`confirm_timeout_sec` 对常驻腿无影响（窗口那项即便接了也钳在 3s ⇒ **只有超时是真差异**）。只许两选一：ⓘ 把 `approval.New` 移进 `assembleRuntime`＝**改票 246 AC#1 裁过的乙形次序，动手前必须先落一枚具名 `A##`**；ⓑ 不移动，则设置页回执文案逐字写明"这两项只作用于跑任务的进程"。撤销口令「248 别动常驻门」。
+docs/reports/pending-and-issues.md:10854:- **边界**：票 256 的 AC#1／AC#2／AC#3 **继续不排腿**（"默认不排"那句不变）；D43 一字未动也不需要动；⚠ 重开 ⓘ 的前置两格已具名写进票 256 §7-5（无控制台那一支的门从哪儿来／"本会话内允许"的第三道门槛在无控制台形状里根本没有入口＝**票 256 AC#1 那句"真落一行"在无控制台形状里不可判**）。
+docs/reports/pending-and-issues.md:11701:## A601（2026-10-04 15:18:03，编排者自记：**收死腿 `265-a1` ⇒ 票 265 AC#1 翻勾（三档选「每次都重新问」）＋AC#0 停勾（缺的正是它点名的钉名册）＋裁形 ⓐ-Ⅰ；★我自己补出一枚普查没提的、更重的读数（审计文件里那条"记入本会话"）；另记我签上去的那句"§0–§6 正文已写满"是假话，并由此新增一把完整性尺**）
+docs/reports/pending-and-issues.md:11717:- ★ **我 14:3x 现读补的一枚（普查件 §2.5 只点了下半句，上半句没人报）**：那条答复路径上**有两处已经把话说满**——`cmd/wisp/approval_reply.go:279-281` 给用户看的"…不再重复提问"，**以及 `:277-278` 往审计里落的那条 `s.record("ANSWERED", …, "原生侧允许并记入本会话，paths=%d")`**。尺＝`approval_reply.go:414-419`（`record` 写的是 `s.audit(...)`，在常驻腿上即 `residentAuditf` → `slog.Info("audit: "…)` → **落进 `<dataDir>\logs\*.jsonl`**）。
+docs/reports/pending-and-issues.md:11718:- ⇒ 最坏后果的准确形状＝**用户被当面告知不会再问、而实际会再问；并且审计文件里留下一条"已记入本会话"的记录，而那一行根本没被记过**。**审计那一枚比界面那一枚重一档**（它是一条与事实不符的持久记录，不是提示语），两句都归票 265 射程，⛔ 落地不许只改一句把另一句留给下一任。
+docs/specs/SPEC-00-product-overview.md:71:30. 作为用户，我想在确认卡上选择「**本会话内允许此工具于此路径模式**」，以便同类重复操作只确认一次且会话结束自动失效（D45-2）
+docs/specs/SPEC-06-security-gatekeeping.md:117:2. **作用域会话授权（S7）**：确认卡第三选项「本会话内允许 `<工具>` 于 `<路径模式>`」；
+internal/agent/approval/gate.go:45:	// one door 「本会话内允许」 goes through on its way to a stored row.
+internal/agent/approval/gate.go:56:	// nil means this host cannot answer 「本会话内允许」 at all: the verb answers
+internal/agent/approval/queue.go:348:// 「仅本次」 or 「本会话内允许」 (ticket 224, D45-2's third card option).
+internal/agent/approval/replies.go:337:// AllowSession is the 「本会话内允许」 answer (ticket 224, D45-2's third card
+internal/agent/approval/ticket224_reply_grant_test.go:200:			"answering 「本会话内允许」 without a row per path IS the silently-grants-nothing "+
+internal/session/grants.go:134:// Record writes one D45 grant: "本会话内允许 <tool> 于 <pattern>".
+internal/session/grants_test.go:122:				"(A435 clause 1 forbids it), and a derived identity turns 「本会话内允许」 "+
+internal/session/grants_test.go:184:// 「本会话内允许」 leaves a real approval_grant row carrying the terms D45-2 names
+internal/session/grants_test.go:503:				"session key is exactly what makes 「本会话内允许」 survive its session", lit)
+--count--
+94
+## C1 (family c) file:line evidence nails mentioning resident_approval_windows.go with a line number
+231
+--- which files ---
+.scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md:2
+.scratch/wisp/issues/244-spec-11-wants-the-gui-subsystem-build.md:1
+.scratch/wisp/issues/246-the-process-that-runs-tasks-is-not-the-process-holding-the-ball-so-no-veto-channel-has-an-executor.md:1
+.scratch/wisp/issues/248-the-panel-has-no-settings-route-the-inbound-whitelist-has-zero-config-or-credential-methods.md:1
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:3
+.scratch/wisp/issues/258-the-schema-calls-hotkey-hot-tier-but-the-resident-leg-builds-the-ball-from-default-hotkeys-and-the-only-reloader-caller-is-balldebug.md:1
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:1
+.scratch/wisp/probes/139/a1/census.md:1
+.scratch/wisp/probes/166/a1/census.md:1
+.scratch/wisp/probes/167/a1/census.md:1
+.scratch/wisp/probes/167/c2/census.md:2
+.scratch/wisp/probes/212/a2/work/hits-go-all.txt:14
+.scratch/wisp/probes/212/a2/work/hits-go-prod.txt:14
+.scratch/wisp/probes/212/a2/work/tokens-prod-comment.txt:7
+.scratch/wisp/probes/212/a3/work/roster3.tsv:4
+.scratch/wisp/probes/212/v1/mut/inv-out.txt:1
+.scratch/wisp/probes/212/v1/r3-inv-out.txt:1
+.scratch/wisp/probes/220/a2/census.md:5
+.scratch/wisp/probes/228/a3/census.md:7
+.scratch/wisp/probes/228/a4/census.md:1
+.scratch/wisp/probes/228/a5/census.md:14
+.scratch/wisp/probes/244/a2/census.md:6
+.scratch/wisp/probes/244/a3/census.md:10
+.scratch/wisp/probes/245/c1/census.md:7
+.scratch/wisp/probes/247/a1/census.md:4
+.scratch/wisp/probes/247/a1/msg-5bis.txt:1
+.scratch/wisp/probes/247/a2/census.md:1
+.scratch/wisp/probes/248/a2/census.md:1
+.scratch/wisp/probes/248/c3/census.md:3
+.scratch/wisp/probes/256/a1/census.md:21
+.scratch/wisp/probes/256/a2/census.md:8
+.scratch/wisp/probes/256/r1/evidence.md:3
+.scratch/wisp/probes/256/v1/verdict.md:1
+.scratch/wisp/probes/258/a2/census.md:4
+.scratch/wisp/probes/259/a1/verdict.md:2
+.scratch/wisp/probes/260/a1/census.md:4
+.scratch/wisp/probes/260/a2/census.md:4
+.scratch/wisp/probes/260/r1/landing.md:1
+.scratch/wisp/probes/260/r3/logs/mutations.txt:1
+.scratch/wisp/probes/260/r3/wording.md:1
+.scratch/wisp/probes/260/r4/label.md:9
+.scratch/wisp/probes/260/r5/logs/ruler-receipt-writesite.txt:1
+.scratch/wisp/probes/260/r5/logs/ruler-takeesc-testcallers.txt:3
+.scratch/wisp/probes/260/v1/logs/key-sentence-shapes.txt:3
+.scratch/wisp/probes/260/v1/logs/one-source-grep.txt:2
+.scratch/wisp/probes/260/v1/verdict.md:4
+.scratch/wisp/probes/265/a1/census.md:17
+.scratch/wisp/probes/265/r1/evidence.md:1
+docs/evidence/s1/246-resident-task-source-v2.md:5
+docs/evidence/s1/246-veto-channel-in-the-resident-process-r1.md:3
+docs/evidence/s1/246-veto-channel-in-the-resident-process-v1.md:4
+docs/evidence/s1/248-settings-write-path-r1.md:1
+docs/evidence/s1/248-settings-write-path-v1.md:2
+docs/reports/pending-and-issues.md:10
