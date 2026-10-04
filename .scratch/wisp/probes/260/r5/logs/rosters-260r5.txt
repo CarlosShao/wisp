@@ -1,0 +1,50 @@
+# 260-r5 名册与还原证明，generated 2026-10-04 15:07:47 +0800（收尾枚＝本档所在 commit，其名册只有这一枚文件）
+
+## git show --name-only --format= <每枚>（本腿前四枚 commit）
+--- 8174c325
+.scratch/wisp/probes/260/r5/instrument.md
+.scratch/wisp/probes/260/r5/logs/baseline-gotest-names.txt
+.scratch/wisp/probes/260/r5/logs/probe-registerhotkey-handle-refusal.txt
+.scratch/wisp/probes/260/r5/logs/ruler-build-tags.txt
+.scratch/wisp/probes/260/r5/logs/ruler-receipt-writesite.txt
+.scratch/wisp/probes/260/r5/logs/ruler-takeesc-testcallers.txt
+--- 629f146b
+internal/ball/hotkey_borrow_refused_260r5_test.go
+--- ed892e6e
+internal/ball/hotkey_borrow_refused_260r5_test.go
+--- 6ab2efdd
+.scratch/wisp/probes/260/r5/instrument.md
+.scratch/wisp/probes/260/r5/logs/ball_windows.go.head-blob
+.scratch/wisp/probes/260/r5/logs/gate-final-block.txt
+.scratch/wisp/probes/260/r5/logs/gate-gofumpt.txt
+.scratch/wisp/probes/260/r5/logs/gate-path-length-budget.txt
+.scratch/wisp/probes/260/r5/logs/gate-test-260r5-verbose.txt
+.scratch/wisp/probes/260/r5/logs/gate-vet-ball-winelive-tag.txt
+.scratch/wisp/probes/260/r5/logs/gate-vet-ball.txt
+.scratch/wisp/probes/260/r5/logs/mutation-M1-drop-receipt-write-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-M2-canned-error-receipt-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-M2b-canned-default-key-line-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-M3-no-return-after-refusal-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-md5-ledger.txt
+.scratch/wisp/probes/260/r5/logs/mutation-restored-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-summary.txt
+.scratch/wisp/probes/260/r5/mutate260r5.py
+
+## probes 之外的聚合去重名册（前四枚＝1 枚新增文件）
+internal/ball/hotkey_borrow_refused_260r5_test.go
+
+## git status --porcelain -- cmd internal tools scripts .github docs （终态＝空）
+(零行＝空。14:3x 本腿曾在此列看到一枚未跟踪的 cmd/wisp/zz256_v1_probe_windows_test.go，那是 256-v1 的地界、随后由它自己 commit 掉了，本腿一个字没碰过它)
+
+## git diff --stat -- internal/ball/ball_windows.go （终态）
+(零行＝空)
+
+## md5 复核：working vs 突变前抽好的 HEAD 副本 vs 现 HEAD blob
+2488b2ac692c99ae4e3b4831526637d7 *internal/ball/ball_windows.go
+2488b2ac692c99ae4e3b4831526637d7 *.scratch/wisp/probes/260/r5/logs/ball_windows.go.head-blob
+2488b2ac692c99ae4e3b4831526637d7 *-
+
+## 本腿名册内文件的 t.Skip 计数尺（应为 0）
+0
+## tag 尺（应只有 windows，不带 winlive）
+//go:build windows

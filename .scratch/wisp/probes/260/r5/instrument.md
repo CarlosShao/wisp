@@ -210,14 +210,18 @@ hotkey_borrow_refused_260r5_test.go:308: the rig did not reach a refused borrow 
 | `ed892e6e` | 校尺（码）：断言顺序＋nil 安全＋红句措辞 | `internal/ball/hotkey_borrow_refused_260r5_test.go` |
 | 本件枚（证据件＋全部读数档＋rig） | 见 `logs/rosters-260r5.txt` | `.scratch/wisp/probes/260/r5/**` |
 
-名册尺＝`git show --name-only --format= <每枚>`，逐枚原文与聚合结果落在 `logs/rosters-260r5.txt`（由收尾枚现跑生成并入库）。
+名册尺＝`git show --name-only --format= <每枚>`，逐枚原文与聚合结果落在 `logs/rosters-260r5.txt`（由收尾枚现跑生成并入库；
+收尾枚自己的名册只有那一枚档，故不在上表里重复列号）。
 probes 之外本腿只碰 **1 枚**路径：`internal/ball/hotkey_borrow_refused_260r5_test.go`（新增文件，路径 44 字符）。
 **⛔ 没动 `cmd/wisp/**`、`internal/agent/**`、`docs/**`、`scripts/**`、`tools/**`；⛔ 没改任何既有文件（产码尤其没改）。**
 
-还原证明（三重）：① §5 的 md5 起手＝终值（`logs/mutation-md5-ledger.txt`）；
-② 收尾枚跑 `git status --porcelain -- cmd internal tools scripts .github docs` 的终态读数落在 `logs/rosters-260r5.txt` 末段
-（本腿名册内**只剩那枚 `?? cmd/wisp/zz256_v1_probe_windows_test.go`＝别的腿（`256-v1`）的地界，本腿一个字没碰**，具名报出以免被读成"我留的脏"）；
-③ `git diff --stat -- internal/ball/ball_windows.go` 终态为空（同一档内）。
+还原证明（三重，全部落在 `logs/rosters-260r5.txt`）：
+① §5 的 md5 起手＝终值（`2488b2ac692c99ae4e3b4831526637d7`，三处一致：working／突变前抽好的 HEAD 副本／现 HEAD blob）；
+② `git status --porcelain -- cmd internal tools scripts .github docs` 终态＝**零行（空）**。
+⚠ 14:3x 本腿曾在那一列里看到一枚未跟踪的 `cmd/wisp/zz256_v1_probe_windows_test.go`——那是 `256-v1` 的地界，
+随后由它自己 commit 掉，本腿一个字没碰过它，具名报出以免被读成"本腿留的脏"；
+③ `git diff --stat -- internal/ball/ball_windows.go` 终态＝零行（空）。
+另附两枚尺：本件 `grep -c "t\.Skip("`＝**0**；首行 tag＝`//go:build windows`（无 `winlive`）。
 
 ## 9. 判不动的地方／这一格今天仍然欠的
 
