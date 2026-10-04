@@ -64,6 +64,20 @@ func LoadFile(path string, res SecretResolver) (*Config, *Resolved, error) {
 func readConfigFile(path string) (*Config, error) {
 	raw, err := os.ReadFile(path)
 	if err != nil {
+		if fileMissing(err) {
+			// Ticket 257 AC#2, reason 1 of 3: the file is not there. This is the
+			// sentence a clean machine answers with - the panel's settings leg is
+			// built through NewManager, so "no file" is refused before any row can
+			// be addressed, and it must never be reported as reason 2 (the row is
+			// not in the file) or reason 3 (the value would not validate). The
+			// original error stays in the chain: cmd/wisp's describeReloadFailure
+			// reads fs.ErrNotExist off it for cause=missing, and 票 223 AC#4
+			// forbids that branch from drifting.
+			return nil, observe.Wrap(observe.ClassConfig, err,
+				"config.toml read: no file at this path yet。"+refusalFileMissing+
+					"：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置"+
+					"（它不替你选任何模型，也不替你建任何服务商行）")
+		}
 		return nil, observe.Wrap(observe.ClassConfig, err, "config.toml read")
 	}
 	ver, peekErr := peekSchemaVersion(raw)

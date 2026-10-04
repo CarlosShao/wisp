@@ -27,6 +27,23 @@ package config
 // receipt lists five paths. There is no multi-key atomic write here, because
 // inventing one is ticket 226's territory and needs its own ruling.
 //
+// THREE REFUSALS, THREE SENTENCES (ticket 257 AC#2). A settings write can be
+// refused for three different reasons and the page must never fold them into one
+// "配置未生效" line (票 223 AC#4's discipline, same shape):
+//
+//	1. the file is not there at all  -> loader.go's readConfigFile says so by name;
+//	   a settings write never creates config.toml.
+//	2. the row the write addresses is not in the file -> the reason tags below,
+//	   which is also where ticket 257's chosen shape (c) lives: the page does not
+//	   mint a provider or a catalog row, and every refusal that is about a missing
+//	   row names the one place a row does get created - the file itself.
+//	3. the value would not survive validate() -> the pre-write gate below.
+//
+// Why the guidance spells [llm.providers.<名>] and never [providers.x]: a
+// top-level [providers] section is an unknown key to parse.go's
+// DisallowUnknownFields, so following that spelling would not unlock a row, it
+// would stop the file from loading at all (measured by 257-a1, ledger A543).
+//
 // WHAT THIS FILE CANNOT DO: it offers no method for [risk] or [fs]. Permission mode
 // changes go through the door that owes the L2 card (internal/perm plus the panel's
 // panel.mode.request), and allowed-directory widening carries the same debt - see
@@ -51,6 +68,29 @@ func keyPathProviderField(provider, leaf string) string {
 func keyPathProviderModelField(provider, model, leaf string) string {
 	return "llm.providers." + provider + ".models." + model + "." + leaf
 }
+
+// The three refusal reasons, each with its own tag (ticket 257 AC#2: 文件没建／行
+// 不存在／校验不过 are three different things an operator fixes three different
+// ways, and one shared line would be a lie by omission - the same rule 票 223 AC#4
+// set for reload failures). Every refusal carries exactly one tag, so a caller -
+// or a test - can tell which of the three it is looking at without parsing English.
+const (
+	refusalFileMissing = "第 1 种拒因：文件没建"
+	refusalRowMissing  = "第 2 种拒因：行不存在"
+	refusalInvalid     = "第 3 种拒因：校验不过"
+)
+
+// handAddGuidance is ticket 257 AC#0's chosen shape (c) in one sentence per row
+// kind: the settings page does not create rows, and it says out loud where a row
+// is created instead. The path is the one the schema actually reads.
+const (
+	guidanceProviderRow = "请在配置文件里添加一节 [llm.providers.<名>]（对上内置预设名的，protocol 与 base_url 可以留空；" +
+		"非预设名必须自己写 protocol，否则这份文件加载不过）。"
+	guidanceModelRow = "请在配置文件里添加这一节 [llm.providers.<名>.models.<模型 id>]，并写 enabled = true" +
+		"（缺这枚键的条目视为关闭，点名它会在起动时被拒）。"
+	guidanceRolePair = "请先在配置文件里添加一节 [llm.providers.<名>]，再在 [llm.roles.chat] 下把 provider 与 model " +
+		"两枚一起点名（这一页写得了 model 那一半，写不了 provider 那一半，所以它替不成这一对）。"
+)
 
 // SetProviderBaseURL writes llm.providers.<name>.base_url for a provider this
 // config already declares. An unknown provider is refused rather than created: a
@@ -174,12 +214,32 @@ func (m *Manager) setModelPriceLeaf(provider, model, leaf string, per1M float64)
 // rewritten by this call, and validateCatalog is what says whether the resulting
 // provider/model pair exists - which is exactly why this runs through the same
 // pre-write validation as every other field here.
+//
+// The one exception, and it is ticket 257's: on a config that names no chat
+// provider at all, the failure is reason 2 (the row is not there), not reason 3
+// (a value that would not validate). Saying which one it is is the whole
+// difference between "去文件里加一节" and a message that reads like the value was
+// rejected. A config that DOES name a provider still goes through validate(), so
+// an unknown pair keeps being reported as an unknown pair.
 func (m *Manager) SetRoleChatModel(model string) ([]string, error) {
 	v := strings.TrimSpace(model)
 	return m.writeOneKey("llm.roles.chat.model", func(base *Config) bool {
 		base.LLM.Roles.Chat.Model = v
 		return true
-	}, func(base *Config) error { return nil })
+	}, func(base *Config) error { return requireChatProvider(base, v) })
+}
+
+// requireChatProvider refuses the chat-model write when this config has no chat
+// provider for the model to pair with (and none is named by the write - it only
+// owns llm.roles.chat.model). Empty model = nothing to pair, so validate() decides.
+func requireChatProvider(base *Config, model string) error {
+	if base == nil || model == "" || base.LLM.Roles.Chat.Provider != "" {
+		return nil
+	}
+	return observe.New(observe.ClassConfig,
+		"config: llm.roles.chat names no provider, and this write sets llm.roles.chat.model only: "+
+			"a settings write pairs a model with a provider this config already names, it does not name one. "+
+			refusalRowMissing+"："+guidanceRolePair)
 }
 
 // writeOneKey is the shared body: pre-read the file (that snapshot is both the
@@ -229,7 +289,8 @@ func (m *Manager) writeOneKey(ownedKey string, apply func(base *Config) bool,
 	// write would produce, before a single byte is written.
 	if err := validate(candidate); err != nil {
 		return nil, observe.Wrap(observe.ClassConfig, err,
-			"config: refused to write "+ownedKey+"; the value would not survive validation, so config.toml is unchanged")
+			"config: refused to write "+ownedKey+"; the value would not survive validation, so config.toml is unchanged。"+
+				refusalInvalid+"：值本身过不了这份 schema 的校验，这一行要改的是值；文件一个字节都没动。")
 	}
 
 	// Memory first, then the file, then memory back if the file refused - the same
@@ -290,7 +351,8 @@ func (m *Manager) readCurrentFile() (*Config, bool, error) {
 
 // requireCatalogEntry refuses a model-level write for a provider or a model this
 // config does not already list, so the settings page addresses an existing entry
-// instead of minting a catalog row.
+// instead of minting a catalog row. Both branches are reason 2, and both say where
+// the row is created instead (ticket 257's shape (c)).
 func requireCatalogEntry(base *Config, provider, model string) error {
 	if base == nil {
 		return observe.New(observe.ClassConfig, "config: no config to check a catalog entry against")
@@ -301,14 +363,18 @@ func requireCatalogEntry(base *Config, provider, model string) error {
 	}
 	if _, ok := p.Models[model]; !ok {
 		return observe.New(observe.ClassConfig, fmt.Sprintf(
-			"config: llm.providers.%s has no model %q in its catalog; refusing to invent one from a settings write",
-			provider, model))
+			"config: llm.providers.%s has no model %q in its catalog; refusing to invent one from a settings write. "+
+				"%s：%s", provider, model, refusalRowMissing, guidanceModelRow))
 	}
 	return nil
 }
 
+// unknownProviderErr is reason 2 for a provider-level key: the row this write
+// would edit is not in the file. Ticket 257 AC#0 chose shape (c), so the refusal
+// also names where a provider row does come from - the file - instead of leaving
+// the operator to guess that the page cannot make one.
 func unknownProviderErr(provider string) error {
 	return observe.New(observe.ClassConfig, fmt.Sprintf(
-		"config: no provider %q in this config; a settings write addresses an existing entry, it does not create one",
-		provider))
+		"config: no provider %q in this config; a settings write addresses an existing entry, it does not create one. "+
+			"%s：这一页改不了服务商的存在性。%s", provider, refusalRowMissing, guidanceProviderRow))
 }
