@@ -147,6 +147,12 @@ cancel_key_wording_260r3_test.go:60: 取消通道不可用句还在指枚 Esc：
 | gofumpt | `"$(go env GOPATH)/bin/gofumpt" -l <碰过的五枚文件>` | **空**（输出 0 字节，`logs/gofumpt-final.txt`） |
 | ⛔ 未跑 | `slo` 全量／`-Subset full` | 未跑（本机 self-hosted runner 的活，派单明令避开）；winlive 全部未跑 |
 
+**7.1 进树后复跑（证据件 `0de321fa` 落盘之后，`2026-10-04 11:21:34 +0800`，读数存 `logs/path-length-postcommit.txt`／`logs/d22scan-postcommit.txt`）**：
+`sh scripts/check-path-length-budget.sh` ⇒ **rc=0**、逐字 `VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`、
+`tracked paths=5460`（比上表那枚 5442 多 14＝本腿刚进树的 14 枚读数与台件本身，⚠ 上面 §7 表里那行是**进树前**的读数）、`longest=180 chars relative`、`over-budget=57 covered=57 not in roster=0`、`in the wall interval=0`；
+`sh scripts/d22scan.sh` ⇒ **rc=0**、逐字 `clean - no D22 ban violations`、`ban #8 internal/=502`、`ban #8 cmd/=99`（与上表一致：`.scratch/**` 不在 d22scan 的扫描射程，进树不改分母）。
+⇒ **真终值以本节为准**；`go build`／两档 `go vet`／`gofumpt -l`／两包定向测试在本腿最后一枚 commit 之后未再改动产码，故沿用上表读数。
+
 ## 8. 判不动的地方／量不到的地方（含 `:90` 的停手上报）
 
 **8.1 唯一没落地的第十枚＝`approval.go:90` `ChannelEsc: "按 Esc 键"`（停手上报，等编排者裁）**
