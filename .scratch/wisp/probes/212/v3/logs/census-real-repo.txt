@@ -1,0 +1,7 @@
+CENSUS tracked production go files under internal/ cmd/
+RING(exempt-free phantom, i.e. what the gate reports today)=0
+EXEMPT(class 3 swallowed)=1
+SYMREF(excluded api cite)=3
+--- RING list ---
+--- EXEMPT list (token + the whole comment line) ---
+cmd/wisp/panel_host_windows.go:29	docs/evidence/s1	FULLLINE=//     EARLY by the nested one (about 0.55s per open) - docs/evidence/s1/... the 33-p1

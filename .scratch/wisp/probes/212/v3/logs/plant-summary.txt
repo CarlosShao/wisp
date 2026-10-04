@@ -1,0 +1,15 @@
+battery run at 2026-10-04 10:50:54+0800
+CASE p1-fullspelled-ring rc=1 phantom_lines=1
+    comment cites repo path "docs/evidence/s1/212-v3-plant-phantom.md"
+CASE p2-middleshrink-silent rc=0 phantom_lines=0
+CASE p3-tail-ellipsis-silent rc=0 phantom_lines=0
+CASE p4-markdown-bold rc=0 phantom_lines=0
+CASE p5-cjk-glue-mark-silent rc=0 phantom_lines=0
+CASE p6-cjk-glue-nomark-ring rc=1 phantom_lines=1
+    comment cites repo path "docs/evidence/s1/212-v3-glued-nomark.md"
+CASE p7-page-exists-silent rc=0 phantom_lines=0
+CASE p8-crossline-boundary rc=1 phantom_lines=1
+    comment cites repo path "docs/evidence/s1/212-v3-crossline.md"
+CASE p9-tail-dots-ascii rc=0 phantom_lines=0
+CASE p10-plant-removed rc=0 phantom_lines=0
+final tree state: p0.go p1.go p10.go p2.go p3.go p4.go p5.go p6.go p7.go p8.go p9.go 

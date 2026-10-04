@@ -1,0 +1,6 @@
+--- FAIL: TestBan9PrefixTablesAreTheSameList (0.00s)
+    scan_test.go:2441: ban #9's two hand-copied prefix tables disagree: repoPathRe=[docs \.scratch internal cmd tools scripts], shorthandRegionRe=[docs plugins \.scratch internal cmd tools scripts]; only in repoPathRe=[] means a shorthand path there is NOT exempt and class 3 convicts again (ticket 212 AC#3), only in shorthandRegionRe=[plugins] means a COMPLETE phantom path there gets swallowed by the region, which widens the exemption without an owner's approval. Edit both lists in one commit, and read the ban #9 comment in main.go before deciding which shape is intended.
+FAIL
+FAIL	github.com/CarlosShao/wisp/tools/d22scan	0.023s
+FAIL
+rc=1

@@ -1,0 +1,12 @@
+d22scan: gitignore rules NOT APPLIED - git cannot be consulted in D:/tmp/212v3tree: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 13 production Go files under internal/ and cmd/ of D:/tmp/212v3tree
+d22scan: scope bans #1-5 internal/      examined  12 production Go files
+d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+d22scan: scope ban #6 frontend/         examined   1 text files
+d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+d22scan: scope ban #8 design/           examined   1 text files
+d22scan: scope ban #8 frontend/         examined   1 text files
+d22scan: scope ban #8 internal/         examined  12 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=12, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=12, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 12 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+rc=0

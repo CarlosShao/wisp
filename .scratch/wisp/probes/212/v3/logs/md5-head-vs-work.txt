@@ -1,0 +1,8 @@
+tools/d22scan/main.go HEAD=442d46cadef8c641c54f7ac00984a470 *-
+tools/d22scan/main.go work=442d46cadef8c641c54f7ac00984a470 *-
+tools/d22scan/selftestsamples.go HEAD=f9e10163199a89c2614daf1ab1ad7d52 *-
+tools/d22scan/selftestsamples.go work=f9e10163199a89c2614daf1ab1ad7d52 *-
+tools/d22scan/scan_test.go HEAD=1bcf66c1bc7da3e7ff0601b66da13504 *-
+tools/d22scan/scan_test.go work=1bcf66c1bc7da3e7ff0601b66da13504 *-
+internal/agent/approval/pending_read.go HEAD=219a0465f27c469217227ef7a48b907d *-
+internal/agent/approval/pending_read.go work=acef5b1739e9446cd7118bbffa6a0a3b *-

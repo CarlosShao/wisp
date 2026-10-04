@@ -1,0 +1,14 @@
+d22scan: gitignore rules NOT APPLIED - git cannot be consulted in D:/tmp/212v3tree: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 14 production Go files under internal/ and cmd/ of D:/tmp/212v3tree
+d22scan: scope bans #1-5 internal/      examined  13 production Go files
+d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+d22scan: scope ban #6 frontend/         examined   1 text files
+d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+d22scan: scope ban #8 design/           examined   1 text files
+d22scan: scope ban #8 frontend/         examined   1 text files
+d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+internal/probe/zp11.go:3: [phantom-citation] comment cites repo path "docs/evidence/s1/212-v3-space-then-star.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+exit status 1
+rc=1

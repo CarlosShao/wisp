@@ -1,0 +1,4 @@
+442d46cadef8c641c54f7ac00984a470 *tools/d22scan/main.go
+f9e10163199a89c2614daf1ab1ad7d52 *tools/d22scan/selftestsamples.go
+1bcf66c1bc7da3e7ff0601b66da13504 *tools/d22scan/scan_test.go
+acef5b1739e9446cd7118bbffa6a0a3b *internal/agent/approval/pending_read.go

@@ -1,0 +1,6 @@
+212-v3 结尾两节写满＋读数档入账：⑧ 门禁四把尺逐字＋还原双尺＋CRLF 尺坑，⑨ 六格三档判语与判不动八枚
+
+- ⑧：门禁 rc=0、八枚 scope 行 228/38/85/23/39/85/501/98 逐字自跑；仪器自检 40/40＝20 ring/20 silent；新钉在门禁里 --- PASS（gate 档第 224 行）；md5 四枚全 OK＋git diff 空 md5；具名 pending_read.go 工作树 CRLF ≠ HEAD blob 这一枚尺坑；终态 porcelain 2 枚属并发腿 260-r3。
+- ⑨：格1 成立（种⇒响 rc=1／删⇒不响 rc=0；f.Comments 只读为真，但不做瞎 AC#4，被它做瞎的是"扩射程到 tools/**"那一格）；格2 带条件成立（五形溜过①已在盘外真树造出并复现静默，含 markdown 加粗 **path** 与尾 "..."；真仓同语义普查 RING=0／EXEMPT=1／SYMREF=3）；格3 成立（我自己的刀给 shorthandRegionRe 加 plugins|，红指第二臂，同树 self-test 仍 40/40）；格4 成立（两枚 +1 归因 e3e19e8e 与 2a10134e，具名更正腿点错的 hotkey_live_test.go）；格5 成立（gate.go:12-13／panel_pump.go:44-46／approval.go:72-88 逐枚打开对全中）；格6 成立（摘豁免后三枚新样本逐枚翻红、token 各不重叠）。
+- 判语：票 212 够格改 -done（AC#4 未被本程推翻）；两笔已知残余具名归口，不作退回理由。
+- 本枚同时提 logs/ 全部读数档与两枚种删脚本（台件只建不删）。

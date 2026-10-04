@@ -1,0 +1,77 @@
+    --- PASS: TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope (0.04s)
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_12107416019/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 16 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_12107416019/001
+        d22scan: scope bans #1-5 internal/      examined  15 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_2940485639/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_2940485639/001
+        d22scan: scope bans #1-5 internal/      examined  13 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2042288490/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2042288490/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   2 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   2 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared1949850018/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared1949850018/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   0 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   0 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li2094272681/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li2094272681/001
+        d22scan: scope bans #1-5 internal/      examined  13 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+    scan_test.go:2363: rc=0 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_02719800526/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_02719800526/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+d22scan: examined 266 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 228 production Go files
+d22scan: scope bans #1-5 cmd/           examined  38 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 501 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  98 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=228, bans #1-5 cmd/=38, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=501, ban #8 cmd/=98; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 501 Go files, comments and _test.go included; cmd/ 98 Go files, comments and _test.go included
+GATE rc=0

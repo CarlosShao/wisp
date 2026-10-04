@@ -1,0 +1,4 @@
+COMMIT e3e19e8e 10:36 test(ball)〔260-r2〕把"借到的必是裸 Esc"改成"借到的必是配置里那枚键"（同步到 A588 已裁行为，非放宽）
+A	internal/ball/hotkey_cancel_borrow_expect_260r2_test.go
+COMMIT 2a10134e 10:20 256-r1 落地：常驻那条腿的审批门改吃 [risk] 两枚配置（形ⓐ 签名不加参）
+A	cmd/wisp/resident_approval_risk_256_windows_test.go

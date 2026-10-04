@@ -1,0 +1,4 @@
+tools/d22scan/main.go: OK
+tools/d22scan/selftestsamples.go: OK
+tools/d22scan/scan_test.go: OK
+internal/agent/approval/pending_read.go: OK

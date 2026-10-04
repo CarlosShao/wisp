@@ -1,0 +1,10 @@
+second battery at 2026-10-04 10:51:30+0800
+CASE s1-string-literal rc=0 phantom_lines=0
+CASE s2-block-comment rc=1 phantom_lines=1
+    comment cites repo path "docs/evidence/s1/212-v3-blockcomment.md"
+CASE s3-underscore-test-go rc=1 phantom_lines=1
+    comment cites repo path "docs/evidence/s1/212-v3-blockcomment.md"
+CASE s4-tools-tree rc=1 phantom_lines=1
+    comment cites repo path "docs/evidence/s1/212-v3-blockcomment.md"
+CASE s5-carriers-removed rc=0 phantom_lines=0
+leftover probe dir: p0.go p1.go p10.go p2.go p3.go p4.go p5.go p6.go p7.go p8.go p9.go 
