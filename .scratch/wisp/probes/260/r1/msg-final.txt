@@ -1,0 +1,36 @@
+260-r1 满稿：七节读数齐（三把起手尺＋四道产码落点＋七枚判据＋三发突变红句＋欠账具名）
+
+证据件 .scratch/wisp/probes/260/r1/landing.md（139 行长表，28,578 字节，grep -c 待填 ＝ 0）。
+本格只交票 260 的 AC#1（形ⓐ：确认窗那两三秒借的键改吃 [hotkey] cancel 的配置值）；
+AC#2（丢借用要有声）与 AC#3 之外的格子一概未动，AC 复选框一枚未碰。
+
+件里逐字入账的几处硬读数：
+- §0 三把起手尺现跑（借用遍真实落点＝hotkey_windows.go:521-524 零参字面量＋:533 注册次序；
+  schema 只有 cancel 带 default:"Esc" 的不对称＝internal/config/schema.go:180-183；
+  今天已钉住这形状的用例名册 11 枚 ＋ 未修码基线 56 枚＝PASS 55／FAIL 1／SKIP 0，
+  那唯一一枚红是别家删掉 design/assets/tokens.css 造成的 TestC21TableColourRowsMatchTokensCSS，先于本腿存在）
+- §1 四道产码落点 file:line（改后现量），含"零参 takeEscWith／cancelBorrowedLine／cancelFailedLine
+  保留为默认档包装，票 245/64 的四枚断言一字未改也未搬迁"
+- §3 门禁终值：go build ./... = 0；go vet ./internal/ball/ = 0；go vet -tags winlive ./internal/ball/ = 0
+  （只类型检查）；gofumpt -l internal/ball/ 空；go test -count=1 -v ./internal/ball/ = PASS 62／FAIL 1／SKIP 0
+  （62＝基线 55＋本腿 7 枚，一条没掉）；sh scripts/d22scan.sh 终值 clean，
+  runtests.sh: OK - PASS=34 FAIL=0 SKIP=0（未撞见 212-v2 突变窗口那类红；提交前复跑取终值）
+- §4 三发突变两轮读数：M1 摘"吃配置"、M2 回执与注册各拼一次、M3 静默吞解析失败，
+  红句逐字抄回；还原后 hotkey_windows.go md5 三轮全等（终值 be79cbda486a334d74fe9d278558acba）、
+  git status --short internal/ball/ 行数 0。M2 那一发还原用过一次单文件 git checkout（不是 checkout .），
+  已在件里如实记这一笔并在后续改用 cp 备份还原
+- §5 欠账具名：AC#2 未做（归编排者另排一格）；winlive 两枚新尺只过类型检查未跑（〔未量有没有牙〕归 260-v1／真窗窗口）；
+  ★本包内别人的尺会被顶到＝hotkey_live_test.go:107-108 requireEscBorrowed 在 liveHotkeys() 的
+  Cancel="Ctrl+Alt+V" 下前提不再成立，预计红句逐字 the borrowed cancel slot holds VK 0x56, want VK_ESCAPE 0x1B，
+  本腿⛔ 未改那枚文件、也未跑 winlive，只在默认层把同一条路径跑成常驻判据 ⑦；
+  cmd/wisp 那一格先实测（go test ./cmd/wisp/ ⇒ exit status 0xc0000135，加载期 DLL 缺失，
+  票 98 open 记在案的既有仪器缺口）再退回静态读数：cmd/wisp 全部 cancel 种值都是 "Esc"、
+  requireIdleCancelSlot246 只数稳态集合与布尔，故判断打不红，但如实挂〔未实测〕
+- §6 越界自查：本腿三枚 commit 的文件全集只落在 internal/ball/ 四枚 ＋ .scratch/wisp/probes/260/r1/**，
+  过滤后越界面 0 行；docs/PLAN.md／docs/specs/**／thresholds.go／golden／allowlist.txt／frontend/**／design/**
+  在 528bf7bd..HEAD 整段区间命中 0；HotkeyStatus 一枚未增未减（D43 转移表未触）
+
+随件入库的读数档：gate-final-summary.txt（提交前终值复跑）、gate-d22scan-final.txt、
+gate-ac3-my-commits.txt／gate-ac3-pathspec-scope.txt（越界面逐枚清单）、
+mutation-M2-run.txt／mutation-M3-run.txt／mutation-restored-md5-final.txt（第一轮单发读数与还原核验）。
+临时件只建不删，一份没清。

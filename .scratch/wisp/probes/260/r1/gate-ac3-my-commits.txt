@@ -1,0 +1,35 @@
+### eb2c0173
+.scratch/wisp/probes/260/r1/baseline-gotest-names.txt
+.scratch/wisp/probes/260/r1/landing.md
+.scratch/wisp/probes/260/r1/msg-skeleton.txt
+.scratch/wisp/probes/260/r1/ruler1-grep-borrow.txt
+.scratch/wisp/probes/260/r1/ruler2-grep-schema.txt
+.scratch/wisp/probes/260/r1/ruler3-grep-testnames.txt
+### d9bb6817
+.scratch/wisp/probes/260/r1/gate-build-full.txt
+.scratch/wisp/probes/260/r1/gate-d22scan-after.txt
+.scratch/wisp/probes/260/r1/gate-d22scan-baseline.txt
+.scratch/wisp/probes/260/r1/gate-gofumpt.txt
+.scratch/wisp/probes/260/r1/gate-test-ball-verbose.txt
+.scratch/wisp/probes/260/r1/gate-vet-ball-winelive-tag.txt
+.scratch/wisp/probes/260/r1/gate-vet-ball.txt
+.scratch/wisp/probes/260/r1/hotkey_windows.go.260r1backup
+.scratch/wisp/probes/260/r1/msg-code.txt
+.scratch/wisp/probes/260/r1/mutation-M1-restored-md5.txt
+.scratch/wisp/probes/260/r1/mutation-M1-run.txt
+.scratch/wisp/probes/260/r1/mutation-md5-before.txt
+internal/ball/ball_windows.go
+internal/ball/hotkey_cancel_borrow_260_test.go
+internal/ball/hotkey_cancel_borrow_live_260_test.go
+internal/ball/hotkey_windows.go
+### b1e59d63
+.scratch/wisp/probes/260/r1/gate-test-ball-verbose.txt
+.scratch/wisp/probes/260/r1/hotkey_windows.go.260r1-finalbackup
+.scratch/wisp/probes/260/r1/msg-wording.txt
+.scratch/wisp/probes/260/r1/mutate.py
+.scratch/wisp/probes/260/r1/mutation-M1M2M3-final.txt
+.scratch/wisp/probes/260/r1/mutation-driver.sh
+.scratch/wisp/probes/260/r1/mutation-final-md5-baseline.txt
+.scratch/wisp/probes/260/r1/probe-cmdwisp-full.txt
+internal/ball/ball_windows.go
+internal/ball/hotkey_windows.go

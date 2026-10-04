@@ -1,0 +1,17 @@
+### 260-r1 终值复跑（提交前）  2026-10-04 10:08 +0800
+--- go build ./... ---
+exit=0
+--- go vet ./internal/ball/ ---
+exit=0
+--- go vet -tags winlive ./internal/ball/ ---
+exit=0
+--- gofumpt -l internal/ball/ ---
+exit=0 (空＝净)
+--- go test -count=1 -v ./internal/ball/ 计数 ---
+test_exit=1
+PASS=62 FAIL=1 SKIP=0
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+--- md5 现状 ---
+be79cbda486a334d74fe9d278558acba *internal/ball/hotkey_windows.go
+2488b2ac692c99ae4e3b4831526637d7 *internal/ball/ball_windows.go
+--- git status internal/ball ---
