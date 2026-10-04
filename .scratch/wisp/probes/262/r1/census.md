@@ -186,6 +186,28 @@ check-path-length-budget.sh: VERDICT GREEN - ...
 ⇒ **AC#3 两发齐**：种＝红且**逐字点名那枚路径与其长度**（138 相对／117 名／182 全路径／帽 165），拆＝绿。
 ⇒ 种的那枚是**相对 138、名 117**：违反规则 9 但离墙（206+）还远 ⇒ 正是要拦的那一档，不是撞墙才响的那一档。
 
+**再发（同一形，换到本腿终态之后的 dev 尖上跑一遍，防"读数只在自家 commit 上成立"）**
+```
+$ git clone --local --no-hardlinks --quiet "D:/work/workspace/projects plans/Wisp" /tmp/plb-clone-262r1-final
+$ cd /tmp/plb-clone-262r1-final && git log --oneline -1     # 447e0d71（＝本腿三枚之后、别的腿又落了几枚的那个尖）
+$ PLANT=".scratch/wisp/issues/controlled-<42z>-<42z>-final-head-check.md"    # 相对 137
+$ printf '%s\n' "seed" > "$PLANT" && git add -- "$PLANT"
+$ sh scripts/check-path-length-budget.sh ; echo rc=$?
+rc=1
+check-path-length-budget.sh: RED - over budget and NOT in the roster: .scratch/wisp/issues/controlled-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-final-head-check.md  (relative 137 chars, name 116 chars, full path on the self-hosted runner 181 chars, budget 165)
+check-path-length-budget.sh: RED - count guard: the roster holds 57 entries, the tree has 58 over-budget tracked paths
+check-path-length-budget.sh: VERDICT RED
+$ git rm --cached --quiet -- "$PLANT" ; rm -f "$PLANT"
+$ sh scripts/check-path-length-budget.sh ; echo rc=$?
+rc=0
+check-path-length-budget.sh: denominator: tracked paths=5289  over-budget=57  covered by roster=57  not in roster=0
+check-path-length-budget.sh: VERDICT GREEN - ...
+$ sh scripts/check-path-length-budget.sh --self-test ; echo rc=$?   # 内建正控在那枚尖上同样三态齐
+rc=0   （`control 1/3..3/3 ok` 命中 3 行）
+```
+⇒ 这发的价值不在再红一次，而在**分母从 5245 长到 5289（别的腿这期间落了 44 枚新路径）而超阈者仍恰好 57、名册仍恰好对上**
+⇒ 门不是靠"树没变"才绿的；这一点是本腿能给的、AC#3 之外的一枚附带读数。
+
 ### 2.3 脚本内建正控（`--self-test`，票 §要建什么 要的"自证"）
 
 ```
