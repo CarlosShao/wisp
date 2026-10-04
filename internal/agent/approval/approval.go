@@ -114,10 +114,15 @@ var channelNames = map[Channel]string{
 // installed no reader (a host with no hotkey chain at all - cmd/wisp's console
 // leg, and every test that never wired one). It is the SHIPPED DEFAULT KEY and
 // nothing else, and it is duplicated here on purpose rather than imported:
-// internal/ball's DefaultHotkeys().Cancel is the authority, and
-// cmd/wisp's TestTicket260R4FallbackSpellingStillMatchesBallsDefault pins the
-// two against each other, so a drift between them is a red test and not a
-// sentence on the card that names a key nobody holds.
+// internal/ball's DefaultHotkeys().Cancel is the authority, and two cmd/wisp
+// rulers keep the two from drifting silently -
+// TestTicket260R4ShippedConstructorInstallsTheReader opens with the premise
+// check `ball.DefaultHotkeys().Cancel == "Esc"` (move that ball default and the
+// cell goes red instead of the card quietly naming the old key), and
+// TestTicket260R3CancelKeyComesFromTheBallChain pins that the reader with no
+// window answers with that same ball constant, never a copied literal. So a
+// drift between them is a red test, not a sentence on the card naming a key
+// nobody holds.
 const defaultCancelKeySpelling = "Esc"
 
 // cancelKeyLabelPattern wraps a key spelling in the words the card used before

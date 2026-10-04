@@ -141,6 +141,21 @@
 
 **7.1 交件前的复跑（最后一枚测试件改动之后，`2026-10-04 12:37:14 +0800`，本机）**：`go vet ./cmd/wisp/ ./internal/agent/approval/` ⇒ rc=0；`go vet -tags winlive ./cmd/wisp/` ⇒ rc=0；`gofumpt -l <7 枚碰过的文件>` ⇒ **空**（`$(go env GOPATH)/bin/gofumpt.exe`；⚠ 从根目录直接敲 `gofumpt` 在这台机器上不在 PATH＝r3 件里那枚 rc=127 的同一个坑，写出来免得下一枚腿再当成格式红）。
 
+**7.2 交件枚之后再复跑（唯一改动＝§9.1.1 那处幻影注释，`12:41～12:45 +0800`，读数存 `logs/*-postedit.txt`）**
+
+| 门 | 命令 | 复跑读数（现跑） |
+|---|---|---|
+| build | `go build ./...` | **rc=0**（12:41） |
+| vet | `go vet ./cmd/wisp/ ./internal/agent/approval/` | **rc=0、无输出** |
+| vet·winlive | `go vet -tags winlive ./cmd/wisp/` | **rc=0、无输出**（⛔ 只编不跑） |
+| 定向·approval | `go test -count=1 -v -run 'TestTicket260' ./internal/agent/approval/` | **rc=0，`--- PASS`=7／FAIL=0／SKIP=0**，`ok ... 0.036s`＝`logs/approval-targeted-postedit.txt`（与 §7 那格同名同数） |
+| 整包·approval | `PATH=... go test -count=1 -v ./internal/agent/approval/` | **rc=0，`--- PASS`=58／FAIL=0／SKIP=1**，`ok ... 0.376s`＝`logs/approval-pkg-postedit.txt`。唯一 SKIP 仍＝`TestDefaultDeadlineWallClockMeasurement`（起手即在的那枚，§7 已具名） |
+| 定向·cmd/wisp | `PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 -v -run 'TestAC246\|TestTicket256\|TestTicket260' ./cmd/wisp/` | **rc=0，`--- PASS`=28／FAIL=0／SKIP=0**，`ok ... 17.192s`＝`logs/cmdwisp-targeted-postedit.txt` |
+| d22scan | `sh scripts/d22scan.sh` | **rc=0 clean**，八枚 scope 行逐字 `228/38/85/23/39/85/503/100`＝**与 §7 终值同**（`internal/=503`、`cmd/=100` 那各 +1 的归因不变＝本腿两枚测试件）＝`logs/d22scan-postedit.txt`；与 `logs/d22scan-final.txt` 差异仅 6 行子测试计时（0.03↔0.05s 量级），⛔ 不是名集变化 |
+| 路径长度 | `sh scripts/check-path-length-budget.sh` | **rc=0、`VERDICT GREEN`**，`over-budget=57／covered=57／not in roster=0`，最坏全路径 `224 chars`；分母现跑 `tracked paths=5508`＝`logs/path-length-postedit.txt`。**归因更正（这条差点写错，逐名落尺）**：5498→5508 那 **+10 不全归本腿** 是我为 `263-v1` 兜底的猜测，⛔ 错了——尺一 `git log --since="2026-10-04 12:25" --pretty=%h` ⇒ 窗口内只有 `f8259f5a` 一枚提交；尺二 `git show --name-status --pretty=format: f8259f5a \| grep -c '^A'` ⇒ **恰好 10 枚 A**（九份 `logs/*.txt` ＋ `mutate260r4.py`），全在本腿台件目录 `​.scratch/wisp/probes/260/r4/` 下 ⇒ **那 +10 就是本腿自己的交件枚**，`263-v1` 到此刻零枚进树（尺三 `git status --porcelain -- scripts` 现跑为空）。写清免得下一枚腿把这 +10 读成"别人在动分母"。 |
+| gofumpt | `"$(go env GOPATH)/bin/gofumpt.exe" -l <7 枚碰过的文件>` | **空输出、rc=0**＝`logs/gofumpt-postedit.txt`（0 字节） |
+
+**7.2.1 复跑没覆盖的门（具名，⛔ 不写成通过）**：`PATH=... go test -count=1 ./cmd/wisp/`（整包）在注释枚之后**没有重跑**——理由不是省事：那一枚改动按尺 `git diff -- internal/agent/approval/approval.go` 现跑读数是 `9 insertions / 4 deletions` 且**逐行都以 `//` 开头**（纯注释，产码零变化），而 §7 那格的整包终值本来就是"重跑同一枚单用例 PASS(1.15s)"之后的判定；`263-v1` 仍在 `scripts/**` 起真进程，此刻重跑整盘只会互洗读数。⛔ 谁要把这句当"整包已绿"用，那是误读：整包绿的是 §7 那次（争用枚除外，已归因）。
 
 ## 8. 判不动的地方／量不到的地方（全部具名，标〔未实测〕）
 
@@ -165,6 +180,8 @@
 6    1   internal/agent/approval/report.go
 ```
 两枚 commit：`b2e4cf00`（骨架枚，12:1x）、`79c579e2`（落地枚，12:2x）；本件与其 logs／突变台件随后另发一枚。⛔ 未 push。
+
+**9.1.1 一处我自抓的幻影注释（不藏着，单独记）**：`79c579e2` 里 `approval.go:118` 那句注释点名了一枚**不存在的用例** `TestTicket260R4FallbackSpellingStillMatchesBallsDefault`（我写注释时先起了名、后来把两枚真实尺并进了别的用例）。交件前自查（尺＝把本腿碰过的 8 枚文件里出现的所有 `Test...` 名字逐个 `grep "func <名>("` 回数）⇒ 12 枚引用**全部命中真实定义**才算过，那一枚是第一遍没过时修的：注释改成点名真实的两枚（`TestTicket260R4ShippedConstructorInstallsTheReader` 的前提 check ＋ `TestTicket260R3CancelKeyComesFromTheBallChain`），并随 §7.2 那次复跑一起进树。**产码行为一字未动**（纯注释）。
 
 **9.2 纪律自证（尺与读数）**
 - `grep -c "t.Skip"` 两枚新件＝**0 / 0**（`tools/d22scan/runtests.sh:98` 把 SKIP 判红，本腿不碰这条路）。
