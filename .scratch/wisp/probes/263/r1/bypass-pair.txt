@@ -1,0 +1,52 @@
+harness: source=D:\work\workspace\projects plans\Wisp\scripts\slo-check.ps1 bytes=32922
+mutation clean-copy: byte-identical copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-clean-copy.ps1
+=== RUN clean-copy (subset=smoke secondsPerState=1) ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: clearing 5 stale report file(s) from D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-clean-copy
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 33%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=27660 state=Sleeping seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Sleeping exit=0 pass=True
+slo-check.ps1: sampling state Warm for 1s
+probe263: sampling started pid=13228 state=Warm seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Warm exit=0 pass=True
+slo-check.ps1: settle check (10s window)
+probe263: sampling started pid=31940 state= seconds=10
+probe263: exiting with code 0
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263: sampling started pid=14252 state=Sleeping seconds=2
+probe263: exiting with code 1
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-clean-copy\slo-report.json (all_pass=True)
+=== RUN clean-copy rc=0 ===
+harness: source=D:\work\workspace\projects plans\Wisp\scripts\slo-check.ps1 bytes=32922
+mutation plant-global-used: landed, copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-plant-global-used.ps1
+=== RUN plant-global-used (subset=smoke secondsPerState=1) ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: clearing 1 stale report file(s) from D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-plant-global-used
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 38%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=10412 state=Sleeping seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Sleeping exit=0 pass=True
+slo-check.ps1: sampling state Warm for 1s
+probe263: sampling started pid=26592 state=Warm seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Warm exit=0 pass=True
+slo-check.ps1: settle check (10s window)
+probe263: sampling started pid=21232 state= seconds=10
+probe263: exiting with code 0
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263: sampling started pid=25004 state=Sleeping seconds=2
+probe263: exiting with code 1
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-plant-global-used\slo-report.json (all_pass=True)
+=== RUN plant-global-used rc=0 ===

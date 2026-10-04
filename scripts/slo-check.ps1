@@ -235,15 +235,21 @@ function Test-ScriptShapeNail {
     # variable without having waited for anything" must not come back into this
     # file. Its own pattern is assembled from char code 36 so this line does not
     # match itself, and the file's prose therefore writes the variable's name
-    # without the sigil. What it does NOT catch is stated in the message: a
-    # scope-prefixed or Get-Variable spelling of the same variable, or a read
-    # moved into another file. See the evidence file for the bypass readings.
+    # without the sigil. Scope-qualified spellings ($global:..., $script:...)
+    # ARE matched, because that was the first bypass measured in evidence.
+    # What this nail still does NOT match, stated plainly instead of claimed as
+    # a tooth: a lookup built at runtime (Get-Variable, Variable: LASTEXITCODE),
+    # a string-concatenated name, or the same read living in another file - and
+    # nothing stops somebody from deleting this function together with the wait.
+    # The outer nail for THAT is probe P3 of scripts/slo-freshness.sh, which
+    # ages on the newest uploaded SLO report and goes red when no gate verdict
+    # has landed for long. See the evidence file for the bypass readings.
     $path = $PSCommandPath
     if (-not $path) {
         Fail-InstrumentBroken 'shape nail: this script does not know its own path (PSCommandPath empty), so the exit-code read shape cannot be checked'
     }
     $sigil = [string][char]36
-    $pattern = '(?i)' + [regex]::Escape($sigil) + '\{?LASTEXITCODE'
+    $pattern = '(?i)' + [regex]::Escape($sigil) + '\{?(?:[A-Za-z]+:)?LASTEXITCODE'
     $source = Get-Content -LiteralPath $path -Raw
     $hits = @([regex]::Matches($source, $pattern))
     if ($hits.Count -gt 0) {

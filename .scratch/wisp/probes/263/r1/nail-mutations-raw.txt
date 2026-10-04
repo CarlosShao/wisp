@@ -1,0 +1,75 @@
+harness: source=D:\work\workspace\projects plans\Wisp\scripts\slo-check.ps1 bytes=32922
+mutation clean-copy: byte-identical copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-clean-copy.ps1
+=== RUN clean-copy (subset=smoke secondsPerState=1) ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 20%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=30080 state=Sleeping seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Sleeping exit=0 pass=True
+slo-check.ps1: sampling state Warm for 1s
+probe263: sampling started pid=33252 state=Warm seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Warm exit=0 pass=True
+slo-check.ps1: settle check (10s window)
+probe263: sampling started pid=9012 state= seconds=10
+probe263: exiting with code 0
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263: sampling started pid=6116 state=Sleeping seconds=2
+probe263: exiting with code 1
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-clean-copy\slo-report.json (all_pass=True)
+=== RUN clean-copy rc=0 ===
+mutation plant-bare: landed, copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-plant-bare.ps1
+=== RUN plant-bare (subset=smoke secondsPerState=1) ===
+slo-check.ps1: INSTRUMENT BROKEN: shape nail: 1 direct read(s) of the automatic exit-code variable in D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-plant-bare.ps1; every exit code must come from Invoke-ExternalProgram, which waits (ticket 263). First hit text: $LASTEXITCODE
+slo-check.ps1: INSTRUMENT BROKEN: no D32 number was produced by this run and none may be read from it.
+slo-check.ps1: INSTRUMENT BROKEN: record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-plant-bare\slo-instrument-broken.json (NOT a report; slo-report.json is not written on this path)
+=== RUN plant-bare rc=1 ===
+mutation plant-braced: landed, copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-plant-braced.ps1
+=== RUN plant-braced (subset=smoke secondsPerState=1) ===
+slo-check.ps1: INSTRUMENT BROKEN: shape nail: 1 direct read(s) of the automatic exit-code variable in D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-plant-braced.ps1; every exit code must come from Invoke-ExternalProgram, which waits (ticket 263). First hit text: ${LASTEXITCODE
+slo-check.ps1: INSTRUMENT BROKEN: no D32 number was produced by this run and none may be read from it.
+slo-check.ps1: INSTRUMENT BROKEN: record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-plant-braced\slo-instrument-broken.json (NOT a report; slo-report.json is not written on this path)
+=== RUN plant-braced rc=1 ===
+mutation plant-global: landed, copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-plant-global.ps1
+=== RUN plant-global (subset=smoke secondsPerState=1) ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 17%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=20492 state=Sleeping seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Sleeping exit=0 pass=True
+slo-check.ps1: sampling state Warm for 1s
+probe263: sampling started pid=23664 state=Warm seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Warm exit=0 pass=True
+slo-check.ps1: settle check (10s window)
+probe263: sampling started pid=25644 state= seconds=10
+probe263: exiting with code 0
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263: sampling started pid=22816 state=Sleeping seconds=2
+probe263: exiting with code 1
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-plant-global\slo-report.json (all_pass=True)
+=== RUN plant-global rc=0 ===
+mutation drop-wait: landed, copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-drop-wait.ps1
+=== RUN drop-wait (subset=smoke secondsPerState=1) ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: INSTRUMENT BROKEN: exit-code instrument: asked the shell to exit 7 and read 0; the start-wait-read path is broken (ticket 263)
+slo-check.ps1: INSTRUMENT BROKEN: no D32 number was produced by this run and none may be read from it.
+slo-check.ps1: INSTRUMENT BROKEN: record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-drop-wait\slo-instrument-broken.json (NOT a report; slo-report.json is not written on this path)
+=== RUN drop-wait rc=1 ===
+mutation hardcode-zero: landed, copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-hardcode-zero.ps1
+=== RUN hardcode-zero (subset=smoke secondsPerState=1) ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: INSTRUMENT BROKEN: exit-code instrument: asked the shell to exit 7 and read 0; the start-wait-read path is broken (ticket 263)
+slo-check.ps1: INSTRUMENT BROKEN: no D32 number was produced by this run and none may be read from it.
+slo-check.ps1: INSTRUMENT BROKEN: record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-hardcode-zero\slo-instrument-broken.json (NOT a report; slo-report.json is not written on this path)
+=== RUN hardcode-zero rc=1 ===

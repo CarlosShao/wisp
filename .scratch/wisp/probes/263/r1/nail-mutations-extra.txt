@@ -1,0 +1,58 @@
+harness: source=D:\work\workspace\projects plans\Wisp\scripts\slo-check.ps1 bytes=32922
+mutation plant-global-used: landed, copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-plant-global-used.ps1
+=== RUN plant-global-used (subset=smoke secondsPerState=1) ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 21%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=6788 state=Sleeping seconds=1
+probe263: exiting with code 0
+D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-plant-global-used.ps1 : The varia
+ble '$global:LASTEXITCODE' cannot be retrieved because it has not been set.
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\run-nail-mutations.ps1:80 char:5
++     & $path -Subset $Subset -SecondsPerState $SecondsPerState -WispEx ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (global:LASTEXITCODE:String) [slo-check-plant-global-used.ps1], Runtim 
+   eException
+    + FullyQualifiedErrorId : VariableIsUndefined,slo-check-plant-global-used.ps1
+ 
+The variable '$LASTEXITCODE' cannot be retrieved because it has not been set.
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\run-nail-mutations.ps1:81 char:11
++     $rc = $LASTEXITCODE
++           ~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (LASTEXITCODE:String) [], RuntimeException
+    + FullyQualifiedErrorId : VariableIsUndefined
+ 
+The variable '$rc' cannot be retrieved because it has not been set.
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\run-nail-mutations.ps1:83 char:52
++     Write-Host ("=== RUN {0} rc={1} ===" -f $name, $rc)
++                                                    ~~~
+    + CategoryInfo          : InvalidOperation: (rc:String) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : VariableIsUndefined
+ 
+harness: source=D:\work\workspace\projects plans\Wisp\scripts\slo-check.ps1 bytes=32922
+mutation force-state-fail: landed, copy written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\slo-check-force-state-fail.ps1
+=== RUN force-state-fail (subset=smoke secondsPerState=1) ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 24%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=30544 state=Sleeping seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Sleeping exit=0 pass=False
+slo-check.ps1: sampling state Warm for 1s
+probe263: sampling started pid=25332 state=Warm seconds=1
+probe263: exiting with code 0
+slo-check.ps1: state Warm exit=0 pass=False
+slo-check.ps1: settle check (10s window)
+probe263: sampling started pid=31420 state= seconds=10
+probe263: exiting with code 0
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263: sampling started pid=26676 state=Sleeping seconds=2
+probe263: exiting with code 1
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\mutations\out-force-state-fail\slo-report.json (all_pass=False)
+=== RUN force-state-fail rc=1 ===

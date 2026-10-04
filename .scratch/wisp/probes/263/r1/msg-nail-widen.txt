@@ -1,0 +1,25 @@
+263-r1 第二发改动：词面钉学会 scope 限定拼法（$global:LASTEXITCODE 那一枚反形是我自己量出来的）＋台件补齐
+
+为什么再动一次产码（不是顺手改，是被自己的反形读数逼的）：
+- 第一版钉的模式只认 `$LASTEXITCODE` 与 `${LASTEXITCODE}`。
+- 反形实测（`.scratch/wisp/probes/263/r1/nail-mutations-raw.txt`）：种 `$stale = $global:LASTEXITCODE`
+  那一发 ⇒ 钉全绿、门照旧出 all_pass=True rc=0 —— 也就是说钉绕得过，而且绕过去之后
+  它不是"当场死"，是**借用同一会话里上一枚程序退出留下的号**（那发里前一个副本 exit 0 留在
+  自动变量里，被当成采样结果读了出来）。同一枚反形在**新会话**里（`nail-global-fresh-session.txt`）
+  才回到"无名死"那一形。⇒ 结论：这个拼法比原缺陷更坏，不能只写在"绕得过"那一栏里当牙。
+- 因此模式扩成 `\$\{?(?:[A-Za-z]+:)?LASTEXITCODE`（作用域限定形一并点名），扩完复跑：
+  plant-global 与 plant-global-used 两发现在都由钉拦下（rc=1，INSTRUMENT BROKEN，
+  红句里逐字带 First hit text: $global:LASTEXITCODE，见 `nail-mutations-v2.txt`）。
+- 仍然绕得过的形（具名、不当牙，正形读数在 `nail-mutations-v2.txt` 的 plant-getvariable 一发）：
+  `Get-Variable`/运行期拼字符串这类"文本里不出现 sigil＋名字"的取法，钉看不见（那发 rc=0 全绿）；
+  读法挪去别的文件、或把钉和等待一起删掉，本文件也没有牙。CI 每一步是一个新进程 ⇒
+  在 CI 里 Get-Variable 那一形取到的是"没有值"，会退回 `$null` ⇒ 判据 `$null -eq 0` 为假 ⇒ 门红（fail-closed），
+  这一支是读码推的〔未实测〕，具名留在 §⑧。
+
+台件另补：run-nail-mutations.ps1 加 `-Only` 与 plant-getvariable／plant-global-used／force-state-fail
+三枚变异；harness 自己那行 `$rc = $LASTEXITCODE` 在未赋值的会话里也炸过一次（VariableIsUndefined，
+逐字在 `nail-mutations-extra.txt`）——同一枚缺陷形状在我的台件里也咬了我一口，已就地先赋再取并注明；
+新增 run-bypass-pair.ps1（借号那一发的成对读数）与 repro-probe-slow.ps1（能力钉为什么测得到"没等"：
+不等时 ExitCode 实测读回 0，不是异常）。
+
+`git status --porcelain -- scripts` 交件前后都只此一枚文件；阈值/golden/thresholds.go 仍一字未动。
