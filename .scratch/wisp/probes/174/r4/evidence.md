@@ -7,11 +7,32 @@
 
 ## 0. 起手锚与写面脏度 —— 本节打算答：我从哪一刻的哪一枚树起手的、我落笔前写面是不是干净的
 
-未判。
+- 现跑钟点 `date` ＝ **15:54:25+0800**（起手）／commit 时刻见 §4 每枚名。
+- 起手 HEAD ＝ **`40aae961`**（265-r1 的骨架枚；台账 `A591` 那批之后的在飞腿）。落盘骨架时 HEAD 已前进到 `9f1e89bf`（`257-r1` 骨架枚）⇒ 按第 82 条只记"此刻取到的是别的程的枚"。
+- 起手写面脏度：`git status --porcelain -- internal/ cmd/` ＝ **0 行**（台件 `.scratch/wisp/probes/174/r4/start-dirty-internal-cmd.txt`）。全树脏 **628 行**（共享工作树，别人在飞），⚠ 与我无关，我不清不碰。
+- 票面未勾框尺（本程现跑，非抄任何人）：`grep -c "^- \[ \]" <票面>` ＝ **5**、`grep -c "^- \[x\]"` ＝ **3**。五枚 ＝ **AC#3 / AC#2b / AC#2c / AC#4 / AC#5**。
 
 ## 1. 我选了哪一格，为什么不是别的格 —— 本节打算答：五枚未勾框里我落哪一枚、其余四枚各自卡在哪（具名到包与在飞腿）
 
-未判。
+**我落的格＝AC#3 的 (ii) 半枚为主、(i) 半枚为次**：把"判这条路径在不在授权根里"**只可能走 C26**、以及**判定腿永不写盘**这两件事，从散文注释变成**会响的判据**。写面＝`internal/tools/**` 新增一枚 `_test.go`，⛔ **零产码改动**（理由见下 AC#2b 那一条：`task.go` 那两句文案今天受模板冻结钉系着，我一个字不动它）。
+
+现量"今天没有判据钉着这件事"的尺（本程跑，逐字）：
+
+| 尺 | 值 |
+|---|---|
+| `grep -c "GetShortPathName\|shortName" internal/tools/task_output_pointer_notice_test.go` | **0** |
+| 同上 `task_output_canonicalize_fail_174_test.go` | **0** |
+| 同上 `internal/agent/spill_pointer_honesty_174_test.go` | **0** |
+| `grep -c "Workspace" task_output_pointer_notice_test.go` / `…canonicalize_fail_174_test.go` | **0 / 0** |
+| `grep -rln "pointerNotice" internal/` | `internal/agent/spill.go`、`internal/tools/task.go`、`internal/tools/task_output_canonicalize_fail_174_test.go`、`internal/tools/task_output_pointer_notice_test.go`（＝只有"说了什么话"那一族，没有"谁说了算"那一族） |
+
+**为什么不是别的格（逐枚具名卡点）**：
+
+- **AC#2b（接线＋精确文案）**：双堵。①接线那一行在 `cmd/wisp/run.go:365`——**不在我的写面**，且 `265-r1` 正在写 `cmd/wisp/**`（派单写死我不碰不跑不归因）；②剩下的文案半格在 `internal/tools/task.go:328-329`（现锚），那两句被同文件 `:299`／`:349` 两枚**模板冻结钉**系着，"要不要加'或批一张 L2 卡'那半句"＝契约轴（`Q-63` 甲同一条边界，须 owner 裁）〔来路＝`174-c2` §④ 与编排者 22:3x 第 3.3 条；**本程未复算该裁量权，只按"未裁即不动"执行〕。⇒ 我一动那两句就是替 owner 拍契约面。
+- **AC#2c（`spill.go` 的桩说实话）**：已由 `174-r2` 落地（三枚 commit `fad39b2c`→`5b14afe5`→`081019c0`，341 行判据；编排者在 `A571` §1 代跑三发证明牙是活的），**待非实现者翻勾**。我再做＝重条目＝按派单算缺陷。⇒ 不选，且我这一格刻意不去碰 `internal/agent/**`（见 §7 一处我量不到的边界）。
+- **AC#4（契约轴）**：要求是"未拿到 owner 批准前对 `PLAN.md`／`specs` **零字节**"＋七面零字节自证。它不是产码格，我做完只有"没动"可报 ⇒ 由 §4 的写面自证覆盖，不占我的选格。
+- **AC#5（与 `Q-59` 分开结线）**：票面自己写的是"**本票结题时**必须逐条说明"＝翻勾那一枚程的陈述义务。⇒ 我在 §8 供读数，不顶它的格。
+- **AC#3 里我刻意不做的两半**：**(iii)**（`[fs] allowed_dirs` 默认值与 `SPEC-03:35` 一字节不改）——默认值住在 `internal/config/**`，**`257-r1` 此刻正在写那包**⇒ 我不碰不跑不归因，且我若去钉它就是把别人的在飞面包进我的判据；**(i) 的名册那一面**（不得新增一枚受门控的 artifacts 工具）——`D34` 权威表名册钉已在 `internal/tools/fs_test.go`／`bridge_junction_windows_test.go`／`task_cancel_221_legs_test.go` 等六枚文件里（本程 `grep -rln "D34"` 现量），重钉＝重条目 ⇒ 我把 (i) 只做在**判定腿只读性**这一面上（`os.Stat` 那一步绝不变成写入/创建），那一面今天**零判据**。
 
 ## 2. 判据形状：这一发在未修码上响不响 —— 本节打算答：我新立的判据问的是什么、"未修码不响／修后响"这两侧各由哪一枚读数支撑
 
