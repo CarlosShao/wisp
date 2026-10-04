@@ -1,0 +1,4 @@
+cmd/wisp/resident_approval_windows.go:139:func residentCancelKeySpelling(b *ball.Ball) string {
+cmd/wisp/resident_approval_windows.go:156:	return residentCancelKeySpelling(ra.ui.currentBall())
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:201:	if got, want := residentCancelKeySpelling(nil), ball.DefaultHotkeys().Cancel; got != want {
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:204:	if got := residentCancelKeySpelling(nil); got == "" {

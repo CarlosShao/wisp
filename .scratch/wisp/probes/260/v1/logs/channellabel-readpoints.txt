@@ -1,0 +1,12 @@
+internal/agent/approval/approval.go:90:// at read time by channelLabel, NOT frozen in this map (ticket 260 AC#4,
+internal/agent/approval/approval.go:189:// channelLabel renders a channel whose label is being printed as a thing that IS
+internal/agent/approval/approval.go:195:func channelLabel(ch Channel) string {
+internal/agent/approval/approval.go:202:// channelStatusLabel renders the label half of one availability line. The
+internal/agent/approval/approval.go:209:func channelStatusLabel(ch Channel, loaded bool) string {
+internal/agent/approval/approval.go:213:	return channelLabel(ch)
+internal/agent/approval/approval.go:324:			st.Text = channelStatusLabel(ch, true)
+internal/agent/approval/approval.go:326:			st.Text = channelStatusLabel(ch, false) + "：" + unavailableText(ch)
+internal/agent/approval/gate.go:314:				channelLabel(v.Channel))
+internal/agent/approval/gate.go:477:		sprintf("用户在 L2 审批卡片显示期间通过「%s」否决了本次操作，未执行", channelLabel(v.Channel)))
+internal/agent/approval/report.go:142:		// channelLabel, not channelNames: this is one of the three faces outside
+internal/agent/approval/report.go:147:		b.WriteString(channelLabel(r.Channel))

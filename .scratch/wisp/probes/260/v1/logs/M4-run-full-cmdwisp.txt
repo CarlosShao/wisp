@@ -1,0 +1,4 @@
+rc=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	194.642s
+
+--- STDERR ---

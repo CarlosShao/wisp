@@ -1,0 +1,7 @@
+internal/ball/hotkey_windows.go                    b1e59d63 10-04 10:01 260-r1 补一句实话：借用吃配置之后，idle 那行日志不许再说 
+internal/ball/ball_windows.go                      b1e59d63 10-04 10:01 260-r1 补一句实话：借用吃配置之后，idle 那行日志不许再说 
+cmd/wisp/resident_approval_windows.go              79c579e2 10-04 12:23 260-r4 落地：卡片那行通道标签改成读取时求值（拼法由装配
+internal/agent/approval/approval.go                eb496ea6 10-04 12:47 260-r4〔编排者代提〕死腿最后那枚未提交增量：注释改写（�
+internal/agent/approval/gate.go                    79c579e2 10-04 12:23 260-r4 落地：卡片那行通道标签改成读取时求值（拼法由装配
+internal/agent/approval/report.go                  79c579e2 10-04 12:23 260-r4 落地：卡片那行通道标签改成读取时求值（拼法由装配
+internal/ball/hotkey_live_test.go                  e3e19e8e 10-04 10:36 test(ball)〔260-r2〕把"借到的必是裸 Esc"改成"借到的必是配置�

@@ -1,0 +1,31 @@
+start md5 2488b2ac692c99ae4e3b4831526637d7 ball_windows.go
+start md5 be79cbda486a334d74fe9d278558acba hotkey_windows.go
+start md5 000490ff133897c48bbf31e6d2b6d313 resident_cancel_key_wording_260r3_windows_test.go
+  A applied md5=b936e6befd7e7ea9a4e7d762b512f1b0
+[A-silent-borrow-failure-ball] rc=1
+   --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+       tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/internal/ball	0.168s
+   FAIL
+  B applied md5=e663676eb12a68eac55d06b62648a769
+[B-control-problems-goes-silent] rc=1
+   --- FAIL: TestBorrowFailureNamesTheKeyItTried260 (0.00s)
+       hotkey_cancel_borrow_260_test.go:278: the refused borrow does not name the key it tried: ""
+   --- FAIL: TestCancelBorrowFailureIsAProblemLine (0.00s)
+       hotkey_status_test.go:280: the failed borrow produced no user-visible line: ""
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/internal/ball	0.027s
+   FAIL
+  C applied md5=bb85e6b1cf1b6f4c6a04880bf5ea3c1e
+[C-readout-default-sentence] rc=1
+       resident_cancel_key_wording_260r3_windows_test.go:89: 默认档否决成功句漂移：got "按 Esc 否决了卡片 corr-260r3（L1 / fs.write）：该调用未执行，答案已入审计", want "260-v1 READ-OUT SENTINEL"
+   --- FAIL: TestTicket260R3DefaultWordingIsTheOldSentence (0.00s)
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.061s
+   FAIL
+restore ball_windows.go md5=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+restore hotkey_windows.go md5=be79cbda486a334d74fe9d278558acba matches_start=True
+restore resident_cancel_key_wording_260r3_windows_test.go md5=000490ff133897c48bbf31e6d2b6d313 matches_start=True
+all tracked files back at starting md5
+driver rc=0

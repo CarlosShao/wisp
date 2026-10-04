@@ -1,0 +1,17 @@
+M4 mutated: the receipt-read step is gone; md5 now 880416466dec5127a21f02640d8cea6b
+[M4-run-targeted-260] rc=0
+   --- PASS: TestTicket260R4ShippedConstructorInstallsTheReader (0.00s)
+   --- PASS: TestTicket260R4NoBallHostNamesNoKeyOnTheCard (0.00s)
+   --- PASS: TestTicket260R4SeamIsNotAProductionShortcut (0.00s)
+   --- PASS: TestTicket260R3DefaultWordingIsTheOldSentence (0.00s)
+   --- PASS: TestTicket260R3SeededKeyReplacesEsc (0.00s)
+   --- PASS: TestTicket260R3UnloadBranchesNameNoKey (0.00s)
+   --- PASS: TestTicket260R3CancelKeyComesFromTheBallChain (0.00s)
+   --- PASS: TestTicket260R3ProductionPathHasNoSeam (0.00s)
+   PASS
+   ok  	github.com/CarlosShao/wisp/cmd/wisp	0.059s
+   --- STDERR ---
+[M4-run-full-cmdwisp] rc=0
+   ok  	github.com/CarlosShao/wisp/cmd/wisp	194.642s
+   --- STDERR ---
+M4 restored: md5 7a26c7a990dbd2351bdf9898b5bdc192 ; matches starting md5 = True

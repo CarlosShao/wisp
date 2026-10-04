@@ -1,0 +1,11 @@
+subject: verdict.md  (433 lines, 46770 bytes)
+pattern （待填）   hits=0
+pattern （填写中） hits=0
+pattern 待填         hits=0
+pattern 填写中      hits=0
+pattern TODO           hits=0
+pattern TBD            hits=0
+pattern - *\[ \] *$    hits=0
+trailing-empty-cell hits=0
+VERDICT: total pattern hits=0, empty trailing cells=0
+placeholder-check.sh: CLEAN - no placeholder marker and no unwritten cell in the delivered table

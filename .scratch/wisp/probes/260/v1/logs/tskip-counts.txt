@@ -1,0 +1,8 @@
+internal/ball/hotkey_live_test.go:4
+internal/ball/hotkey_cancel_borrow_260_test.go:0
+internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:0
+internal/ball/hotkey_cancel_borrow_live_260_test.go:0
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:0
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:0
+internal/agent/approval/cancel_key_wording_260r3_test.go:0
+internal/agent/approval/cancel_key_label_260r4_test.go:0

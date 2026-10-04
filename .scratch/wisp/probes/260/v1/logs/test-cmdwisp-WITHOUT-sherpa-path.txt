@@ -1,0 +1,4 @@
+exit status 0xc0000135
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.032s
+FAIL
+rc=1

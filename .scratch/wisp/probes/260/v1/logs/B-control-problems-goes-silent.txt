@@ -1,0 +1,24 @@
+rc=1
+$ go test -count=1 -timeout 900s -run TestCancelBorrowFailureIsAProblemLine|TestBorrow ./internal/ball/
+time=2026-10-04T13:34:02.642+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T13:34:02.643+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T13:34:02.643+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T13:34:02.643+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-04T13:34:02.643+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Space
+time=2026-10-04T13:34:02.643+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=F9
+time=2026-10-04T13:34:02.643+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-04T13:34:02.643+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T13:34:02.643+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-04T13:34:02.643+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Ctrl+Alt+K err="invalid argument"
+time=2026-10-04T13:34:02.644+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- FAIL: TestBorrowFailureNamesTheKeyItTried260 (0.00s)
+    hotkey_cancel_borrow_260_test.go:278: the refused borrow does not name the key it tried: ""
+time=2026-10-04T13:34:02.644+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="invalid argument"
+time=2026-10-04T13:34:02.644+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- FAIL: TestCancelBorrowFailureIsAProblemLine (0.00s)
+    hotkey_status_test.go:280: the failed borrow produced no user-visible line: ""
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.027s
+FAIL
+
+--- STDERR ---

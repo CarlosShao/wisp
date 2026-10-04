@@ -1,0 +1,7 @@
+D applied; rc=1
+PASS=74 FAIL=3
+       cancel_key_label_260r4_test.go:93: 默认档已加载的取消通道标签漂移：got "按 F13 键", want "按 Esc 键"
+   --- FAIL: TestTicket260R4DefaultLabelIsTheOldSentence (0.00s)
+   --- FAIL: TestTicket260R4SpellingSeamCarriesNoAuthority (0.00s)
+   --- FAIL: TestTicket260R3LoadedCancelLabelIsTheNamedResidual (0.00s)
+restore approval.go md5=9326bd2b4233ea4fbb48e13ad5e28050 matches_start=True (start=9326bd2b4233ea4fbb48e13ad5e28050)

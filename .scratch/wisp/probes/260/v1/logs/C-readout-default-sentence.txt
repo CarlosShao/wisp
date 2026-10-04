@@ -1,0 +1,14 @@
+rc=1
+$ go test -count=1 -timeout 900s -v -run TestTicket260R3DefaultWordingIsTheOldSentence ./cmd/wisp/
+time=2026-10-04T13:34:06.772+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket260R3DefaultWordingIsTheOldSentence
+time=2026-10-04T13:34:06.775+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+    resident_cancel_key_wording_260r3_windows_test.go:89: 默认档否决成功句漂移：got "按 Esc 否决了卡片 corr-260r3（L1 / fs.write）：该调用未执行，答案已入审计", want "260-v1 READ-OUT SENTINEL"
+time=2026-10-04T13:34:06.775+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-04T13:34:06.775+08:00 level=INFO msg="audit: resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）"
+--- FAIL: TestTicket260R3DefaultWordingIsTheOldSentence (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.061s
+FAIL
+
+--- STDERR ---

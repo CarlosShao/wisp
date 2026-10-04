@@ -1,0 +1,8 @@
+internal/agent/approval/approval.go:87:// channelNames are the display labels the card and the ball strip show, and
+internal/agent/approval/approval.go:106:var channelNames = map[Channel]string{
+internal/agent/approval/approval.go:199:	return channelNames[ch]
+internal/agent/approval/approval.go:211:		return channelNames[ch]
+internal/agent/approval/approval.go:281:		if _, ok := channelNames[ch]; ok {
+internal/agent/approval/approval.go:312:	if _, exists := channelNames[ch]; exists {
+internal/agent/approval/approval.go:336:	if _, ok := channelNames[ch]; !ok {
+internal/agent/approval/report.go:142:		// channelLabel, not channelNames: this is one of the three faces outside

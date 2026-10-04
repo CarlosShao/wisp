@@ -1,0 +1,51 @@
+starting md5 = 7a26c7a990dbd2351bdf9898b5bdc192
+  M4b-wrong-receipt-line: mutated md5=e913af060bc940887b544646509c3310
+[M4b-wrong-receipt-line / targeted] rc=0
+   --- PASS: TestTicket260R4ShippedConstructorInstallsTheReader (0.00s)
+   --- PASS: TestTicket260R4NoBallHostNamesNoKeyOnTheCard (0.00s)
+   --- PASS: TestTicket260R4SeamIsNotAProductionShortcut (0.00s)
+   --- PASS: TestTicket260R3DefaultWordingIsTheOldSentence (0.00s)
+   --- PASS: TestTicket260R3SeededKeyReplacesEsc (0.00s)
+   --- PASS: TestTicket260R3UnloadBranchesNameNoKey (0.00s)
+   --- PASS: TestTicket260R3CancelKeyComesFromTheBallChain (0.00s)
+   --- PASS: TestTicket260R3ProductionPathHasNoSeam (0.00s)
+   PASS
+   ok  	github.com/CarlosShao/wisp/cmd/wisp	0.063s
+   --- STDERR ---
+  M4b-wrong-receipt-line: restored md5=e913af060bc940887b544646509c3310 matches_start=False
+  M4b-wrong-receipt-line: mutated md5=e913af060bc940887b544646509c3310
+[M4b-wrong-receipt-line / full] rc=0
+   ok  	github.com/CarlosShao/wisp/cmd/wisp	188.089s
+   --- STDERR ---
+  M4b-wrong-receipt-line: restored md5=e913af060bc940887b544646509c3310 matches_start=True
+  CTRL-no-assembly-injection: mutated md5=e4249531f74bd042ebcd32eace738a86
+[CTRL-no-assembly-injection / targeted] rc=1
+   --- FAIL: TestTicket260R4ShippedConstructorInstallsTheReader (0.00s)
+   --- PASS: TestTicket260R4NoBallHostNamesNoKeyOnTheCard (0.00s)
+   --- PASS: TestTicket260R4SeamIsNotAProductionShortcut (0.00s)
+   --- PASS: TestTicket260R3DefaultWordingIsTheOldSentence (0.00s)
+   --- PASS: TestTicket260R3SeededKeyReplacesEsc (0.00s)
+   --- PASS: TestTicket260R3UnloadBranchesNameNoKey (0.00s)
+   --- PASS: TestTicket260R3CancelKeyComesFromTheBallChain (0.00s)
+   --- PASS: TestTicket260R3ProductionPathHasNoSeam (0.00s)
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.067s
+   FAIL
+   --- STDERR ---
+  CTRL-no-assembly-injection: restored md5=e4249531f74bd042ebcd32eace738a86 matches_start=False
+  CTRL2-rehardcoded-esc-in-vetoDoneLine: mutated md5=cd00b28ec6ab572858d3098c26441c55
+[CTRL2-rehardcoded-esc-in-vetoDoneLine / targeted] rc=1
+   --- PASS: TestTicket260R4ShippedConstructorInstallsTheReader (0.00s)
+   --- PASS: TestTicket260R4NoBallHostNamesNoKeyOnTheCard (0.00s)
+   --- PASS: TestTicket260R4SeamIsNotAProductionShortcut (0.00s)
+   --- PASS: TestTicket260R3DefaultWordingIsTheOldSentence (0.00s)
+   --- FAIL: TestTicket260R3SeededKeyReplacesEsc (0.00s)
+   --- PASS: TestTicket260R3UnloadBranchesNameNoKey (0.00s)
+   --- PASS: TestTicket260R3CancelKeyComesFromTheBallChain (0.00s)
+   --- PASS: TestTicket260R3ProductionPathHasNoSeam (0.00s)
+   FAIL
+   FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.062s
+   FAIL
+   --- STDERR ---
+  CTRL2-rehardcoded-esc-in-vetoDoneLine: restored md5=cd00b28ec6ab572858d3098c26441c55 matches_start=False
+final md5 = cd00b28ec6ab572858d3098c26441c55 matches_start = False
