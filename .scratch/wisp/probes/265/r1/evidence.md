@@ -117,6 +117,24 @@
 
 （本节答：本腿动过的每一枚文件（包级路径＋numstat）；临时件只建在 `.scratch/wisp/probes/265/r1/`；commit 名册与 pathspec 逐枚；票面 AC 框零改动的自证。）
 
-- 8.1 写面与 numstat：**未判**
-- 8.2 提交名册：**未判**
-- 8.3 票面 AC 框零改动：**未判**
+- 8.1 写面与 numstat：**本腿＋两任合计**（尺＝`git --no-pager diff --numstat de484541..HEAD -- cmd internal`，20:3x 终量，名册四枚、无一越界）：
+  - `cmd/wisp/resident_approval_risk_256_windows_test.go` **40/20**（前任：A602 解冻）
+  - `cmd/wisp/resident_approval_windows.go` **163/13**（前任：holder＋实传＋注释；本腿：仅 :38 注释路径 phantom→真身）
+  - `cmd/wisp/resident_grant_writer_265_windows_test.go` **706/0**（前任：新判据件）
+  - `cmd/wisp/resident_task_source_windows.go` **37/8**（前任：绑定位）
+  - ⛔ 越界复证＝`internal/agent/approval/**`、`cmd/wisp/run.go` **零出现**；包级路径全部落在 `cmd/wisp`。临时件（msg-*.txt、突变副本 /tmp/m1..m3-*）只在 `.scratch/wisp/probes/265/r1/`（msg）与系统 /tmp（突变副本，不进仓）＝**只建不删**。
+- 8.2 提交名册（全部显式 pathspec、只 commit 不 push）：
+  - `a04a095f` 收编四枚（pathspec＝那四枚文件；前任产码入库）
+  - `cd58b810` §3（`.scratch/wisp/probes/265/r1/evidence.md`）
+  - `35b8b613` §4（同枚证据件）
+  - `987fd1f7` §5（同枚证据件）
+  - `7883f855` §6＋phantom-citation 修复（`cmd/wisp/resident_approval_windows.go`＋证据件）
+  - `cfd2722f` §7（证据件）
+  - 本枚 §8/§9（证据件）
+- 8.3 票面 AC 框零改动：**复证成立**（尺＝`git diff de484541..HEAD -- <票面>` 的 `^[+-]- \[` 复选框行 diff 计数＝**0**，20:34:46 现跑；本腿从未 Edit 该文件）。
+
+## 9. 交件判语
+
+- **判语**：ⓐ-Ⅰ 落地成立——前任产码（holder＋6 枚实传＋绑定位＋A602 解冻）经本腿收编后，**形状复认一致、四发突变全响、五门全绿、终态全量 `ok`**。产码不是纸面形状：M1 证未绑定必走 error 路不撒谎（A601 §4 硬约束 1 的"反而更坏"形状被钉死）、M2/M3 证两条接线摘一条即指名红（AC#3 ⓐ 支正控兑现）、M4 证 ⓐ-Ⅲ 拒绝形有仪器。AC#1 两句在已绑进程上为真、在未绑定窗口静默走 `GRANT-RECORD-FAILED`——假话的两处一句没改、全部兑现。
+- **收编前的核对**：前任 diff 与其 §0–§2 自述**逐块无矛盾**（绑定位确在 `src.run = run` 之后 `submitTask` 之前；want 集改动确在 A602 边界内），未触发派单的"停手上报"分支。
+- **没做完/判不动的**（⛔ 不藏）：① `approval_always.go:165` 第三枚过期注释不在写面，归口编排者（§7.1）；② 票 127 钉 `:497` 读侧竞态＋两枚带载偶发红，判据侧账，本腿不修（§7.2）；③ U9 真进程尺没跑（真开窗未批，§7.2）；④ `-race`/`-shuffle` 门禁清单外没跑。**AC 框一枚未碰**，翻勾归编排者。
