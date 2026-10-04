@@ -66,6 +66,7 @@
 - 2026-09-28 18:5x **145-r3 落派单 §F 具名那一行（`cmd/wisp/run.go:365`，票 174 `AC#2b` 的装配半格；commit `4db5f3f6`，证据件 `docs/evidence/s1/145-snapshot-growth-r3.md` §3）**：`tools.TaskDeps{Roster: rt.tasks}` → `tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}`——判定者＝同一枚 C26 实例（`rt.paths` 造于 `run.go:330`，早已喂 `FSDeps:346` 与桥 `:453`），本程**只改这枚字面量**，零新增注释、零逻辑、`run.go` 其余行零字节（`:651-670` 那批状态词写入者＝票 196 射程，未碰）。**`AC` 框一枚未勾**（勾要非实现者表）。
   - **`AC#2b` 未结题，缺的两半照实登记**：① 端到端**未跑**（本程只到装配行；判据要求的"接上之前只能说未接线／接上之后给精确文案／安静正例仍然安静"三臂一条都没实测，`174-c2` 那句"只动那一行 ⇒ 既有 Go 判据零枚会红"本程**未复算**）；② 派单具名"我自己先不碰"的那半句仍在场——接上后精确文案仍只给一条回来的路（加 `[fs] allowed_dirs`），缺 `174-v1` 条件②要的"**或批一张 L2 卡**"，而那两句受 `internal/tools/task.go:299`／`:349` 两枚模板冻结钉系着（＝`Q-63` 边界，须先有人裁算不算动冻结文字）；③ `AC#2d` 那半格（`err.Error()` 里不许带路径原文／根列表／C26 内部状态）也仍未钉，本程未动 `internal/tools/**` 一字。
   - 门禁（口径＝顶层 `--- FAIL` 计数）：`./cmd/wisp/` **rc=0**、`./internal/tools/` **rc=0**（改后复跑，与改前同数）、`go build ./...` 净、`sh scripts/d22scan.sh` clean rc=0。被拒调用 0；零删除；只 commit 未 push。
+- 2026-10-04 15:5x **174-r4（写码位·第四任落地程；起手锚 `40aae961`，`git status --porcelain -- internal/ cmd/` 起手＝0 行）**：`agent=174-r4 did=证据件骨架九节先落盘（`.scratch/wisp/probes/174/r4/evidence.md`，每节写"本节打算答什么"＋九格"未判"）next=填 §1 选格与 §3 BEFORE 读数，本格＝AC#3(ii) 的 C26 唯一决定者钉（lying-judge 两向对拼，写面 `internal/tools/**`）`。**AC 框一枚未碰**（勾它＝非实现者程）。
 
 ---
 
