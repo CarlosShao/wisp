@@ -54,6 +54,18 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
    引用它的读数一旦失效，那张裁决表就从〔独立复现〕掉回〔仅自述，不背书〕。
    今天实测：`/tmp` 下 `wisp*` 已有 **249 枚、合计 2.4 GB**，其中多少被证据引用**尚未清点**，所以**现在谁都不许动它们**（含编排者自己）。
 
+9. **工单文件名长度上限＝100 个字符（含 `NN-` 前缀与 `.md`）**（2026-10-04 08:5x 编排者代笔，出处 `A583`，撤销口令「撤 9 号长度帽」）：
+   起因不是洁癖，是**实测撞出来的**——`slo-full` 跑在本机 self-hosted runner，检出目录前缀
+   `E:\work\base\actions-runner\_work\wisp\wisp\`＝**42 字符**；Windows 的 `MAX_PATH` 让 git 在
+   **全路径 ≥259 字符**时报 `Filename too long` 并让 `actions/checkout` 整步失败。
+   ⇒ 2026-10-04 现量：两枚 196/198 字符的工单名把 **`slo-full` 从有它们那天起就一直打死在 checkout**，
+   而 `slo-full` 是 D32 那两个资源数字**唯一被求值的路径**（见 `docs/reports/pending-and-issues.md` 里
+   "wisp slo 不被 go test 执行"那条）。已改名为短形（`256-resident-gate-built-before-session-grants.md`、
+   `257-clean-machine-provider-registry-nil-blocks-writes.md`）。
+   ⇒ **新立票一律 `NN-短 slug.md` ≤100 字符**；因果句子写在票面第一行标题里，不要塞进文件名。
+   ⚠ 盘上现存 **9 枚**跟踪路径 >180 字符（最长＝`260-…` 206 字符 ⇒ 全路径 248，**离 259 只剩 11 字符**），
+   它们是历史遗留、**不许再往上加**；把这 9 枚装进门禁的欠账归**票 262**。
+
 ## Dependency graph (blockers in parentheses)
 
 - **S0**: 01 build-chain ✅done · 02 s0-spike ✅done (01)

@@ -11320,3 +11320,16 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 **待人项（攒着，明日一起摆）**：166/Q-77 会话层三选一（166-a2 代价表 301 行在手：最小形 10 文件＋17 钉＋6 节 spec；"会话"术语与 SPEC-05 撞车须先定名）；174 真实泄漏（ErrReparseDenied 全文含配置键名进模型可见文本＝契约轴）；22px 贴边间隙＋Q-74 票 242 落点。⚠ 全部已按"大白话＋三栏含不做"格式备好，不急。
 
 **今日事故账**：①A578 重复派单（212-v1 双实例＝转录停走≠腿死，判死须三连证）——两份独立判语反而互证，坏事变冗余好事；②python 行尾手术吞 runSelfCase 70 行（已从 HEAD 还原重做）——**python 字符串/行尾手术对已有 Go 文件必毁，一律 Edit 工具**；③翻勾节与勾框分裂 commit 两形（212/258 同犯）——**翻勾节与勾框必须同一枚 commit**。三枚定式均已入账。
+
+## A583（2026-10-04 08:5x，编排者自记：**★今晨第一把尺就抓到一枚真阻塞＝两枚超长文件名的工单把 `slo-full`（D32 那两个资源数字唯一的求值路径）从有它们那天起一直打死在 `actions/checkout`；已改名＋加长度帽规则＋立票 262 补那把没人装的尺；★记我＝这是我允许的"文件名写成因果整句"的派单形状造出来的**）
+
+**0. 起手读数（`date` 现跑＝08:49:41+08）**：HEAD `152caf25`（＝A582 日终枚）；远端 `origin/dev` 与 `cnb/dev` **tip 相同**＝`941805d0`；`rev-list --left-right --count` 两枚都是 **0/190**＝两边纯 fast-forward、远端没有任何一枚本地没有（A582 里写的"189 枚"是那枚日终 commit 之前的读数，现量 190）；代码面脏枚数 `git status --porcelain internal cmd tools scripts docs .github`＝**0**（脏的只有 `.gitignore` 一枚别家腿的未提交增量＋`design/**` 那 16 枚 owner 委托侧删除＋`.scratch/**` 台件噪声，一律不碰不提交）；编队此刻零枚在飞。
+
+**1. ★头号结论：`slo-full` 死因不是产码，是路径长度**。今晨 `gh run view 37158259050 --log`（2026-10-04T00:45Z schedule／`sha=941805d0`，1.89 MB 日志已落 `.scratch/ci-logs/run-37158259050.log`）逐字取到：`slo-full / Run actions/checkout@v4` 打两行 `##[error]error: unable to create file .scratch/wisp/issues/256-…: Filename too long` ＋ `257-…` 同形 ⇒ `fatal: Could not reset index file to revision 'HEAD'` ⇒ 整 job failure。**四把尺**：① runner 工作目录 `E:\work\base\actions-runner\_work\wisp\wisp`＝**42 字符**、git `2.54.0.windows.1`、`Machine name DESKTOP-LVS7839`＝本机；② Windows 长路径**没开**（`LongPathsEnabled 0x0`）且仓内 `core.longpaths` **未设**（`git config --get` rc=1）⇒ 墙就是 `MAX_PATH`；③ 三发对照＝256（名 196 ⇒ 全路径 **259**）**失败**、257（198 ⇒ 261）**失败**、260（名 185 ⇒ 相对 206 ⇒ 全路径 **248**）**通过** ⇒ 墙在 248–259 之间，**今天最粗那枚离墙只剩 11 字符**；④ 全仓跟踪路径长度分布＝`<=100:5076 / 101-150:89 / 151-180:19 / >180:9`，最长 **206**。⚠ 因果链关键一环来自本文件既有读数：**`wisp slo` 那两个 D32 数字不被 `go test` 执行**，唯一求值路径＝推送/定时触发的 `slo-check.ps1` ⇒ checkout 一死那道保护**整步归零，而盘上没有任何一行说它归零**（失败只在 job 颜色里，步名看不出原因）。
+
+**2. 已就地做掉的（零产码，三件都可逆）**：① `git mv` 两枚肇事工单改名＝`256-resident-gate-built-before-session-grants.md`、`257-clean-machine-provider-registry-nil-blocks-writes.md`（**票面第一行标题一字未动**；全仓引用面我先 grep 过：Go 侧**零命中**，只有 `.scratch/wisp/probes/212/a2/work/den-md.txt` 与 `probes/220/a2/census.md` 两处历史台件按旧名提到——那是**过去的读数记录，我不改它**，本条即为把它们降为〔过期指认〕的具名记录）；② `.scratch/wisp/issues/README.md` 新增**规则 9：新立票文件名 ≤100 字符**（含测量缘由与 9 枚遗留点名，撤销口令「撤 9 号长度帽」）；③ 立**票 262**（`.scratch/wisp/issues/262-tracked-path-length-gate-for-ci-checkout.md`，六格判据：脚本存在并被真调用 ≥1 处／HEAD 绿且打印分母／**种超预算必红**的正控／豁免名册每枚的理由删了要响／CI windows job 真出颜色／卫生四门读数不扩大）。⚠ 票 262 里写死一条：**加 CI 那一步属契约邻域，落地腿动手前编排者必须先落一枚具名 `A##` 解冻 ci.yml**（票 134 的 C+B 形状），我没提前解冻。
+
+**3. 记我（第 2 枚）**：这批超长名是**我自己的派单形状**造的——我把"票面标题＝一句完整因果"当成好习惯推广到了**文件名**，而从未量过 runner 那 42 字符前缀与 259 那道墙。定式入库：**长度帽属于"命名即接口"的射程，任何"让腿自己起长名"的规矩都要先量墙再定规矩**；派单模板今后自带 ≤100 字符那一行。⚠ 同时**不追认成"已修好"**：改名只让今天的检出能过，**盘上仍零仪器拦下一次更长的那一枚**，那格归票 262（未派，等写面与解冻）。
+
+**4. 推送基线（供推后逐名作差）**：从 run 37158259050 抽出 29 枚 `--- FAIL` 名册落 `.scratch/ci-logs/red-941805d0.txt`（含 `TestC21DesignTokensFourwayAgree` 等已知常红；⚠ 按第 73 条定式，这份是**旧 tip 的日志读数**，与本机 HEAD 不同口径不可互比，只作"名字有没有新长出来"的差集用）。
+
