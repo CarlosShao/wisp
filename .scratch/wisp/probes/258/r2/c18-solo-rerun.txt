@@ -1,0 +1,15 @@
+time=2026-10-04T09:23:38.445+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card
+time=2026-10-04T09:23:39.629+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/04 09:23:39 mockllm: serving on http://127.0.0.1:61912 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-04T09:23:39.653+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card802369900\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-04T09:23:39.677+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card802369900\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-04T09:23:39.685+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-04T01:23:39Z duration_ms=7
+time=2026-10-04T09:23:39.692+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card802369900\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-04T09:23:39.697+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-04T01:23:39Z duration_ms=5
+time=2026-10-04T09:23:39.702+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-04T09:23:39.703+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-04T09:23:39.718+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+--- PASS: TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card (1.29s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.369s

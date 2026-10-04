@@ -1,0 +1,14 @@
+time=2026-10-04T09:18:53.962+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test258ConstructionChainTakesConfigValues
+--- PASS: Test258ConstructionChainTakesConfigValues (0.01s)
+=== RUN   Test258ConstructionChainMissingFileFallsBackAndSaysIt
+    resident_hotkey_258_windows_test.go:158: missing-file provenance = "config", want "defaults": AC#1 requires the fallback to be named, not silent
+    resident_hotkey_258_windows_test.go:175: section-missing provenance = "config", want "defaults": the [hotkey] table is absent, the set is the compiled defaults
+--- FAIL: Test258ConstructionChainMissingFileFallsBackAndSaysIt (0.00s)
+=== RUN   Test258SectionMissingTierWordIsDefaults
+    resident_hotkey_258_windows_test.go:212: AC#1 condition-1 RED: section-missing provenance = "config", want "defaults" (the merged set IS ball.DefaultHotkeys(); "config" names a file that contributed no binding)
+    resident_hotkey_258_windows_test.go:240: a verbatim-defaults [hotkey] section answered "config": the set equals ball.DefaultHotkeys(), so only defaults is true of it
+--- FAIL: Test258SectionMissingTierWordIsDefaults (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.090s
+FAIL

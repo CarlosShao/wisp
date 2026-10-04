@@ -1,0 +1,5 @@
+## go vet -tags winlive ./cmd/wisp/ (258-r2, no winlive test execution)
+09:19:20+0800
+rc=0
+## go vet ./cmd/wisp/
+rc=0
