@@ -668,15 +668,24 @@ func (u *ballCardUI) Prompt(_ context.Context, p approval.Prompt) error {
 		// name - the one this card tried to borrow, which the ball left on its
 		// report's cancel line (cancelFailedLineFor carries exactly the accelerator
 		// it handed to RegisterHotKey). The hard-coded 「Esc」 here used to promise a
-		// key that may never have been attempted, so the name now comes from the
-		// same report line; it goes in an attribute because a slog message stays a
-		// constant in this repository (尺：grep -rn "slog\.[A-Za-z]*(fmt.Sprintf"
-		// --include=*.go internal cmd ⇒ 0 枚先例). The human-facing sentence below
-		// is the one that keeps the key inside the sentence.
+		// key that may never have been attempted, so the name now comes from that
+		// same report line, inside the sentence, like the line below it.
+		//
+		// ONE WORD HAD TO LEAVE: the old message read 「裸 Esc」, and 「裸」 (bare,
+		// no modifiers) is a claim about the key - true of the shipped default and
+		// false of any combination the user moves [hotkey] cancel to. Keeping it
+		// would have planted a second sentence of exactly the class this ticket was
+		// filed to remove, so the default 档 renders this line one word shorter than
+		// before. That single-word drift is the whole deviation from AC#4 ① and it
+		// is written up in .scratch/wisp/probes/260/r3/wording.md §5 rather than
+		// passed off as zero drift. The other shape (key name in a slog attribute,
+		// message kept constant) drifts the sentence much further; this call is the
+		// tree's first slog message built with fmt.Sprintf - 尺＝grep -rn
+		// "slog\.[A-Za-z]*(fmt.Sprintf" --include=*.go internal cmd ⇒ 0 枚先例 - and
+		// it is behaviour-neutral, which is what buys the shorter drift.
 		key := u.ra.cancelKeySpelling()
-		slog.Warn("approval: L1 窗口挂起期间取消键未借到，本张卡片无法用它否决",
-			"corr", p.CorrelationID, "key", key,
-			"why", "取消键位被占用或注册被拒，见热键报告")
+		slog.Warn(fmt.Sprintf("approval: L1 窗口挂起期间取消键 %s 未借到，本张卡片无法用 %s 否决", key, key),
+			"corr", p.CorrelationID, "why", "取消键位被占用或注册被拒，见热键报告")
 		fmt.Printf("wisp: 卡片 %s 的取消键未借到（桌面已有占位者），按 %s 不会否决它\n", p.CorrelationID, key)
 	}
 	return nil
