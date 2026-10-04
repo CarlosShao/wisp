@@ -84,15 +84,60 @@
 
 ## 4. AC#2 三种拒因各配一句（本节答：文件没建／行不存在／校验不过三句是否字字不同、各配一发**种下必红**的正控，三发不合成一句；红句逐字）
 
-未判。
+**三枚 tag 常量（`settings.go` 新增，字字不同）**：
+- `refusalFileMissing = "第 1 种拒因：文件没建"`
+- `refusalRowMissing  = "第 2 种拒因：行不存在"`
+- `refusalInvalid     = "第 3 种拒因：校验不过"`
+
+**三个拒点各挂各的**：缺文件→`loader.go` `readConfigFile`（`:76-81` 新增分支，句尾接第 1 种 tag＋"运行一次 wisp run 写出首份配置"的指引）；行不存在→`unknownProviderErr`／`requireCatalogEntry`（第 2 种 tag＋指引句）＋`requireChatProvider`（新门：config 没点名 chat provider 时，`role_chat_model` 的拒因是第 2 种而不是第 3 种）；校验不过→`writeOneKey` 的预写 `validate()` 门（第 3 种 tag＋"要改的是值；文件一个字节都没动"）。
+
+**正控三发**（`go test -count=1 -run 'TestTicket257R1AC2' -v ./internal/config/`，19:06 全绿）——每发都是"种下该因 → 断言本句在场＋另两句**不在场**＋折叠句`配置未生效`不在场"：
+
+| 发 | 测试 | 种法 | 红句逐字（断言的目标 tag） |
+|---|---|---|---|
+| 1 | `TestTicket257R1AC2MissingFileIsItsOwnSentence` | 临时目录里**根本不建** config.toml，直接 `NewManager` | `第 1 种拒因：文件没建`（并钉 `errors.Is(err, fs.ErrNotExist)` 仍在链上——`cmd/wisp` 的 `cause=missing` 分类器靠它，票 223 AC#4 的钉不许被吃掉；另钉 `LoadFile` 同句） |
+| 2 | `TestTicket257R1AC2MissingRowIsItsOwnSentence` | 文件在、行不在：干净默认配置上 `SetProviderBaseURL`（provider 行缺）＋`SetModelContextWindow`（catalog 行缺）＋已建行但模型缺（`settingsBase` 加载后写 `ghost-model`） | `第 2 种拒因：行不存在`（并钉：拒句带 `guidanceProviderRow` 指引、**不含 `[providers.`**（A543 反控）、ghost-model 那发仍带票 261 的 `refusing to invent one` 原句钉） |
+| 3 | `TestTicket257R1AC2InvalidValueIsItsOwnSentence` | 行在、值坏：`settingsBase` 上 `SetProviderAPIKeyRef("no-reference-prefix-here")`＋`SetRoleChatModel("not-in-the-catalog-9")`（此时 provider 已点名 ⇒ 走 `validate()` 正门） | `第 3 种拒因：校验不过`（并钉文件零变更） |
+
+**"不许折成一句"的牙齿**：`whichReason()` 数 msg 里的 tag——**0 枚或 ≥2 枚都判不合格**（一句含两枚 tag 也是折）；`assertOneReason()` 正控"本 tag 在、另两 tag 不在"；AC#1 前半还逐枚断言折叠句 `配置未生效`／`生效失败` 不出现。第 3 发特意选 provider **已点名**的 config，证明 `role_chat_model` 的第 3 种分支没被 `requireChatProvider` 新门堵死——门只在"没点名 provider"时改判第 2 种。
 
 ## 5. 落地改动清单（本节答：动了哪几枚文件、每枚为什么动、`git diff --numstat` 三列）
 
-未判。
+改动全部落在 `internal/config`（授权写面）＋证据件。`git diff --numstat 0c303ef3` 对三枚产码/测试件（19:1x 现量）：
+
+| 文件 | 加 | 删 | 为什么动 |
+|---|---|---|---|
+| `internal/config/loader.go` | +14 | -0 | AC#2 第 1 种拒因：`readConfigFile` 的 `os.ReadFile` 缺文件分支给出自己的那句（第 1 种 tag＋首启指引），原始 err 保持链上（`errors.Is(fs.ErrNotExist)` 不吃掉，`cmd/wisp` `cause=missing` 分类不漂） |
+| `internal/config/settings.go` | +80 | -5 | ① AC#2 三枚 tag 常量＋三句指引常量（`[llm.providers.<名>]` 拼法，A543）；② `writeOneKey` 校验门挂第 3 种句；③ `unknownProviderErr`／`requireCatalogEntry` 挂第 2 种句；④ 新增 `requireChatProvider`：`SetRoleChatModel` 在 config 未点名 provider 时改判第 2 种（形 ⓒ 的"行不存在"诚实形状） |
+| `internal/config/settings_257_test.go`（新） | +438 | -0（本树现量） | AC#1 前后半＋AC#2 三发的仪器；含起步态、nil 注册表、名册七枚行走、手加三样解锁、A543 反控、凭据面引用非值边界钉 |
+
+（证据件 `.scratch/wisp/probes/257/r1/evidence.md` 与 msg-*.txt 为过程件，逐节 commit。）
 
 ## 6. 突变自证（本节答：每一发判据的"种下必红＋还原"，还原一律用突变前 `git cat-file blob HEAD:<path>` 抽的副本，附三枚 md5：起手＝还原后＝HEAD blob）
 
-未判。
+本腿继承的产码已 commit（`8e443ed7` 收编 257-r1 的 `loader.go`/`settings.go`/`settings_257_test.go`）⇒ 突变自证对**本腿 commit 后的 blob** 做三式：起手 md5（工作树）→ 种下突变（断言必红）→ 用 `git cat-file blob` 副本还原 → 还原后 md5 与 HEAD blob md5 三枚全等。`git cat-file blob` 前缀＝`8e443ed7`。
+
+| 发 | 突变 | 预期红 | 实测 |
+|---|---|---|---|
+| M1 | `settings.go` 里 `refusalFileMissing` 值改为 `"第 1 种拒因：文件没BUILD"` | （见下）红未兑现＝同包常量同步，判语见后 | 红**未兑现**（具名判语在后） |
+| M2 | `settings.go` 里删 `requireChatProvider` 挂钩（`SetRoleChatModel` 的 check 回 `nil`） | AC#1 前半红（role_chat_model 不再报第 2 种） | 红：`role_chat_model: refusal names none of the three reasons` |
+| M3 | `settings_257_test.go` 手加段改回"追加 `[llm.roles.chat]`"（前任死法） | 发二红（duplicate table） | 红：`the hand-added shape the guidance teaches must load: config: config.toml parse: toml: table chat already exists` |
+
+**md5 三枚全等**（每发还原后实测，`git cat-file blob` 前缀＝`84ab5bf2`＝继承码收编 commit）：
+
+```
+settings.go          工作树＝6d2166b9275ca0db45ae30700a5f0cbe ＝ blob(84ab5bf2:internal/config/settings.go) 同值   （M1/M2 还原后实测）
+settings_257_test.go 工作树＝3a223edd967666ab26aa92b0fe4e1b0c ＝ blob(84ab5bf2:internal/config/settings_257_test.go) 同值（M3 还原后实测）
+```
+
+**三发实测记录（19:09–19:17）**：
+
+- **M1（tag 值改写）——红未兑现，判"该发判据对此突变不敏感"，具名不入正控清单**：把 `refusalFileMissing` 值改为 `"第 1 种拒因：文件没BUILD"` 后，`TestTicket257R1AC2MissingFileIsItsOwnSentence` 仍 PASS。根因（我先用探针测试件在包内现量了 err 文本与常量）：测试与产码**同包**（`package config`），断言用的 `refusalFileMissing` 是**同一个 Go 常量标识符**——产码里的 tag 变了，断言引用的也跟着变，二者永远同步。这类突变只能由**异包复制字面量**的判据（如 `cmd/wisp` 侧的文案钉或 grep 二进制）抓到。这不是测试虚假：它钉的是"三句互斥＋tag 逐字在场＋ErrNotExist 哨兵存活"，对"三句折成一句"这一真实缺陷形态有牙（M2 的红就是它咬的），对"常量值整体改名"无牙是同包测试的固有边界。具名登记，不补假红。**还原**：`git cat-file blob` 副本覆写，md5 `6d2166b9…` 三枚全等，`go test -count=1 -run TestTicket257` 回绿。
+- **M2（摘掉 `requireChatProvider` 挂钩）——红兑现**：`SetRoleChatModel` 的 check 回 `nil` 后，`TestTicket257R1AC1CleanMachineRefusesAllSevenFields` FAIL，红句逐字（19:1x）：
+  `role_chat_model: refusal does not name [llm.providers.<name>], so nothing tells the operator how to make the row writable: config: refused to write llm.roles.chat.model; …第 3 种拒因：校验不过…: config.toml: llm.roles.chat.model set without llm.roles.chat.provider (set both or neither)`；分发计数变 `map[第 2 种拒因：行不存在:6 第 3 种拒因：校验不过:1]`——正是 AC#2 要防的"role_chat_model 被折进校验句"形状。**还原**：blob 副本覆写，md5 全等，回绿。
+- **M3（手加段改回"追加 `[llm.roles.chat]`"，前任死法）——红兑现**：`TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields` FAIL，红句逐字：`the hand-added shape the guidance teaches must load: config: config.toml parse: toml: table chat already exists`。**还原**：blob 副本覆写，md5 `3a223edd…` 全等，回绿。
+
+三发终态：工作树两文件 md5 与 HEAD blob 全等、`git status --porcelain -- internal/config` 干净、全 ticket 测试 PASS。
 
 ## 7. 门禁读数（本节答：d22scan／path-length-budget／gofumpt／go vet／`go test -count=1 -v ./internal/config/` 五门，带时刻，红名集合逐名比对并写清哪几枚既有）
 
