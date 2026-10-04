@@ -1,0 +1,11 @@
+263-r1 骨架：证据件九节标题先立（派单节奏条＝前 15 轮内 commit），零产码
+
+票 263 落地腿起手。本发只建 `.scratch/wisp/probes/263/r1/fix-and-readings.md`
+（九节标题＋起手锚点与写面真空读数），`scripts/slo-check.ps1` 一字未动。
+〔待填〕只在本骨架发存在，交件发必为 0 枚。
+
+起手尺（同发取，2026-10-04 11:11 +0800）：
+- `git branch --show-current` = dev；HEAD = 2ae018be
+- `git status --porcelain -- scripts .github` = 空（262-r1 已收档，写面真空出）
+- `wc -l scripts/slo-check.ps1` = 397 行；`grep -n LASTEXITCODE` = :106/:326/:345/:366 四处
+- `grep -n Set-StrictMode` = 只有 :65 一处（:373 那行注释里的 "line 48" 是同文件过期指认）
