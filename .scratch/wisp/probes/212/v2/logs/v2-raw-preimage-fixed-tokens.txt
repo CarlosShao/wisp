@@ -1,0 +1,8 @@
+".scratch/wisp/probes/33/r6/fullpack2.log"
+"internal/engines"
+"internal/provider"
+"internal/tool"
+"scripts/check-pathclean-ban.sh"
+"tools/agent/cmd"
+"tools/bridge.go"
+"tools/gate.go"

@@ -1,0 +1,19 @@
+d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/212v2/tree-head: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 273 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/212v2/tree-head
+d22scan: scope bans #1-5 internal/      examined 235 production Go files
+d22scan: scope bans #1-5 cmd/           examined  38 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  30 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 505 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  97 Go files, comments and _test.go included
+internal/probe212v2/p1full.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/does-not-exist-full-name.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/probe212v2/p2mixed.go:4: [phantom-citation] comment cites repo path "internal/xxx/.../foo.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/probe212v2/p3tail.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/phantom-tail-ellipsis.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/probe212v2/p4star.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/phantom-tail-star.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/probe212v2/p5swallow.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/phantom-swallow-a.md见docs/evidence/s1" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/probe212v2/p6adjacentctl.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/phantom-cjk-adj.md见docs/evidence/s1/subdir" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+internal/probe212v2/p7exists.go:4: [phantom-citation] comment cites repo path "docs/evidence/s1/152-...-accept.md" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+cmd/wisp/panel_host_windows.go:343: [phantom-citation] comment cites repo path ".scratch/wisp/probes/33/r6/fullpack2.log" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+d22scan: 8 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
