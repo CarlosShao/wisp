@@ -68,6 +68,8 @@
   - 门禁（口径＝顶层 `--- FAIL` 计数）：`./cmd/wisp/` **rc=0**、`./internal/tools/` **rc=0**（改后复跑，与改前同数）、`go build ./...` 净、`sh scripts/d22scan.sh` clean rc=0。被拒调用 0；零删除；只 commit 未 push。
 - 2026-10-04 15:5x **174-r4（写码位·第四任落地程；起手锚 `40aae961`，`git status --porcelain -- internal/ cmd/` 起手＝0 行）**：`agent=174-r4 did=证据件骨架九节先落盘（`.scratch/wisp/probes/174/r4/evidence.md`，每节写"本节打算答什么"＋九格"未判"）next=填 §1 选格与 §3 BEFORE 读数，本格＝AC#3(ii) 的 C26 唯一决定者钉（lying-judge 两向对拼，写面 `internal/tools/**`）`。**AC 框一枚未碰**（勾它＝非实现者程）。
   - 15:5x→16:0x `agent=174-r4 did=§0 起手锚＋§1 选格写满：落 AC#3(ii) 主＋(i) 只读性次，写面 `internal/tools/**` 新增一枚判据、零产码；四枚未选格各自卡点具名（2b 双堵＝`cmd/wisp` 在飞＋`:328-329` 模板冻结钉归 `Q-63`；2c 已由 174-r2 落地待翻勾；4/5 非产码格）＋现量尺：pointer-notice 那族判据里 8.3 短名 0 次、Workspace 0 次 next=§3 BEFORE 逐字读数＋落判据`；AC 框仍未碰。
+  - 16:5x `agent=174-r4 did=判据落地＝internal/tools/task_pointer_authority_ac3_174r4_windows_test.go（三枚、每枚自带反形臂，零产码改动）；未改码上现跑三枚全 PASS，两向对拼读数逐字入 §3；gofumpt -l 归零 next=三发突变自证（canon→raw／本地字面算术／存在性探针变写）＋每发附 d22scan 盲区复量与还原 md5`；AC 框仍未碰。**★一条现场发现登记**：工作区收窄那一形（票 92 AC#3 的收窄面）今天回执说的是"要用户先把所属目录加进 `[fs] allowed_dirs`"，而那枚目录**本来就在根里**＝措辞与真因不符 ⇒ 属 AC#2b 的文案射程、受 `:299`／`:349` 模板冻结钉系着，本程一字未动。
+  - 17:0x→17:2x `agent=174-r4 did=三发突变自证全落（MUT-A1 恰 1 枚红＝我的短名臂，既有十二枚一枚不红；MUT-A2 恰 2 枚红＝两枚授权臂，同一发 d22scan 对 internal/tools 零 finding＝静态扫盲区坐实；MUT-B 第一发暴露我自己在判据里用 t.Fatalf 把两问粘连⇒改 Errorf 重跑，拿到 Lstat 与目录条目集两条 FS 红句）＋四门现跑（gofumpt 空／vet rc=0／path-length rc=0＝5634-57-57 VERDICT GREEN／定向 go test rc=0 PASS=275 FAIL=0 SKIP=0，三连 -count=3 不抖）＋d22scan rc=1 归因＝265-r1 在飞工作树里 cmd/wisp/resident_approval_windows.go:38 的 phantom-citation（HEAD blob 上该串 0 命中，我没修）next=补 spill 腿同一条禁区的判据（§9）＋§7/§8`；判据修订枚＝`f9dc152c`（产码零字节）；AC 框一枚未碰。
 
 ---
 
