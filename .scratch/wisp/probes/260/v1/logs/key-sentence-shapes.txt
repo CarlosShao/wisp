@@ -1,0 +1,4 @@
+internal/agent/approval/approval.go:132:const cancelKeyLabelPattern = "按 %s 键"
+cmd/wisp/resident_approval_windows.go:382:	return fmt.Sprintf("按 %s 否决卡片 %s 被拒：%v", key, corr, err)
+cmd/wisp/resident_approval_windows.go:386:	return fmt.Sprintf("按 %s 否决了卡片 %s（%s / %s）：该调用未执行，答案已入审计",
+cmd/wisp/resident_approval_windows.go:715:		fmt.Printf("wisp: 卡片 %s 的取消键未借到（桌面已有占位者），按 %s 不会否决它\n", p.CorrelationID, key)

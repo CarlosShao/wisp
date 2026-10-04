@@ -1,0 +1,20 @@
+### 尺：channelNames 前后两态（本腿现跑）
+### 尺A：git grep -h channelNames 79c579e2^ -- internal cmd | wc -l
+11
+### 尺B：git grep -n channelNames\[ 79c579e2^ -- internal cmd (产码直读点)
+79c579e2^:internal/agent/approval/approval.go:160:		if _, ok := channelNames[ch]; ok {
+79c579e2^:internal/agent/approval/approval.go:191:	if _, exists := channelNames[ch]; exists {
+79c579e2^:internal/agent/approval/approval.go:203:			st.Text = channelNames[ch]
+79c579e2^:internal/agent/approval/approval.go:205:			st.Text = channelNames[ch] + "：" + unavailableText(ch)
+79c579e2^:internal/agent/approval/approval.go:215:	if _, ok := channelNames[ch]; !ok {
+79c579e2^:internal/agent/approval/gate.go:314:				channelNames[v.Channel])
+79c579e2^:internal/agent/approval/gate.go:477:		sprintf("用户在 L2 审批卡片显示期间通过「%s」否决了本次操作，未执行", channelNames[v.Channel]))
+79c579e2^:internal/agent/approval/report.go:142:		b.WriteString(channelNames[r.Channel])
+### 尺C：现值行数
+8
+### 尺D：现值产码直读点
+HEAD:internal/agent/approval/approval.go:199:	return channelNames[ch]
+HEAD:internal/agent/approval/approval.go:211:		return channelNames[ch]
+HEAD:internal/agent/approval/approval.go:281:		if _, ok := channelNames[ch]; ok {
+HEAD:internal/agent/approval/approval.go:312:	if _, exists := channelNames[ch]; exists {
+HEAD:internal/agent/approval/approval.go:336:	if _, ok := channelNames[ch]; !ok {

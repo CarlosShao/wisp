@@ -179,9 +179,13 @@ CTRL／CTRL2／D 三发都红 ⇒ **本腿这把尺抓得到人尽皆知的真�
   tag 现读见 `logs/build-tags.txt`）＋产码 `cmd/wisp:671`／`cmd/balldebug:635`。
 - 票面另一句"要与票 258 的 rebind×借还自钉**分开**"：本腿核——`resident_hotkey_258_windows_test.go` 那族没被并进本票任何一句判据，
   四程的具名用例（`TestBorrow…260`／`TestBorrowWish…260r2`／`TestTicket260R3/R4…`）没有一枚用"热键接好了"这种合句结案。⇒ 这半守住了。
-- **四程对 AC#2 的表态（本腿逐件核）**：`r1` 件 §5 表里逐字 "**AC#2 … 本腿没做**，任务书写明不许顺手做"；
-  `r2`＝winlive 尺同步（AC#1 邻格）；`r3`＝文案；`r4`＝卡片标签。⇒ **没有任何一程声称做过 AC#2，也没有"用既有尺抵"这句被写成判据。**
-  本腿因此**不是**判它"追认了瞎尺"，而是判它**未落地**——但这正是票面 AC#2 那一格本身，**不能翻勾**。
+- **四程对 AC#2 的表态（本腿逐件现跑 grep，⛔ 不接受"我没越界"也不接受"我抵了"）**：
+  `r1` 件 §5 表逐字 "**AC#2 … 本腿没做**，任务书写明不许顺手做"；`r2` 件 **零次**提到 AC#2（它只碰 winlive 尺同步）；
+  `r3` 件 §9.3 逐字 "AC 框一枚没碰（票 260 现 4 枚未勾：AC#1/AC#2/AC#3/AC#4，翻勾归编排者）"；
+  `r4` 件 §9.3 逐字 "AC#2（丢借用要有声）**没顺手做**"。
+  ⇒ 四程里**没有一枚声称做过 AC#2，也没有一枚试图用别票的尺把它抵掉**——所以本腿这一格判的是"未落地"，不是"追认了瞎尺"。
+  真正的问题在别处：**票面那枚框今天没有任何一程的产出物能撑它**（`r1` 件的"今天仍只落在 `HotkeyError` 回执行与 `slog.Error`"这句，本腿读码复认为真，但它不是判据）。
+- **判语**：AC#2 ＝**不成立**，且⛔ 不许用"回执／Problems 语义层那两枚尺"抵这格——本腿的突变 A 就是那枚抵不动的证据。
 
 ### 4.3 判语
 
@@ -250,10 +254,25 @@ AC#2 ＝**不成立**（未做）。归口：要么给 `Ball` 的借到／归还
 3. **票面框**：`grep -c '^- \[ \] '`＝**4**、`'^- \[x\]'`＝**1**，票面最后一条 commit 仍是 `60767578`（编排者那枚 AC#4），
    `git log --since="2026-10-04 13:15" -- <票面>`＝**空** ⇒ **本腿与四程都没碰过票面框**（`r1`–`r4` 各自件里的"票面未碰"本腿复认）。
 
-### 5.5 依赖边（A598 §2 那句"⛔ 不许新增 `internal/agent/approval → internal/ball`"）
+### 5.5 依赖边与"读取点搬到装配根"（A598 §2 那两条边界，本腿前后两态各拉一遍）
 
-本腿现跑：`grep -rln "wisp/internal/ball" internal/agent/approval/` ⇒ **零命中**（只有注释里出现 `internal/ball` 字样，逐条核为散文）。
-拼法入口＝`approval.SetCancelKeySpelling(CancelKeySpelling)`（`approval.go:161`），由装配根在 `cmd/wisp/resident_approval_windows.go:259` 注入 `ra.cancelKeySpelling`。⇒ **边为零，注入形状成立。**
+- **依赖边＝零**：`grep -rln "wisp/internal/ball" internal/agent/approval/` ⇒ **零命中**（只有注释里出现 `internal/ball` 字样，逐条核为散文）。
+  拼法入口＝`approval.SetCancelKeySpelling(CancelKeySpelling)`（`approval.go:161`），由装配根在 `cmd/wisp/resident_approval_windows.go:259` 注入 `ra.cancelKeySpelling`。
+- **两态尺**（`git grep` 分别在 `79c579e2^` 与 `HEAD` 上跑，源＝`internal cmd`）＝**编排者给的"11 行"与本腿给的"8 行"两个数都真，差在取数时刻**：
+
+  | 态 | `channelNames` 行数（internal＋cmd） | 分布 | `channelNames[…]` 产码读取点 |
+  |---|---|---|---|
+  | `79c579e2^`（改前） | **11** | `approval.go` 7／`gate.go` 2／`report.go` 1／`cancel_key_wording_260r3_test.go` 1 | `approval.go:160/:191/:203/:205/:215` ＋ **`gate.go:314`／`gate.go:477`／`report.go:142`**（＝派单点名的那三处，逐名复认） |
+  | `HEAD`（改后，本腿现读） | **8** | `approval.go` 7／`report.go` 1（且那一行是注释：`:142` 逐字 `// channelLabel, not channelNames: …`） | `approval.go:199/:211/:281/:312/:336`——**`gate.go`、`report.go` 的直读全部消失**，改走 `channelLabel(...)`（现读 `gate.go:314`、`:477`、`report.go:147`） |
+
+  ⇒ "读取点搬到装配根注入"**在盘上成立**，且 `ChannelEsc` 的**标签**值今天只可能来自注入的读口或 `defaultCancelKeySpelling`（D 发红过 ⇒ 两条路都有尺）；
+  **没有新增 `approval → ball` 的边**，也没有在 `gate.go` 里再拼一遍组合键。
+- **"第二处再拼一遍组合键"这一问的本腿尺**（`logs/key-sentence-shapes.txt`＋`logs/channelnames-two-states.txt`，现跑）：
+  全仓带键名的产码句子＝**四枚**，`internal/agent/approval/approval.go:132`（`const cancelKeyLabelPattern = "按 %s 键"`）＋
+  `cmd/wisp/resident_approval_windows.go:382`／`:386`／`:715`——**四枚都只是把 `%s` 填进去**，键名一律走同一枚读口（`cancelKeySpelling()`／`ra.cancelKeySpelling()`）；
+  `grep -rn '"Ctrl+\|"Alt+\|"Shift+' --include=*.go internal cmd \| grep -v _test` ⇒ 命中全部落在 `internal/ball/hotkey_windows.go` 的**注释与出厂默认**（`:56-59`／`:66`／`:75 DefaultHotkeys()`，其中 `Cancel: "Esc"` 就是那枚 authority），
+  **`cmd/wisp` 与 `internal/agent/approval` 里零枚组合键字面量** ⇒ 本票要治的那个形状没有被复制第二份。
+  ⚠ 唯一的重复值＝§5.4 第 2 条那枚 `defaultCancelKeySpelling = "Esc"`（默认键名，不是拼法），且 D 发红过。
 
 ---
 
@@ -431,3 +450,13 @@ VERDICT GREEN - every over-budget tracked path is rostered by name with a reason
 - ⚠ 本表里有两枚字样不是占位、而是**产码原句引用**，逐具名留下不删：§6.1 那句「桌面已有占位者」是 `cmd/wisp/resident_approval_windows.go:715`
   渲染文案的一部分（本腿现读的字节），另一处是本节标题里"占位"这个词本身。⇒ 四枚模式串在这两处**零命中**，尺跑过存档。
 - 本腿全程未 `t.Skip`、未放宽任何断言、未动阈值／golden／`thresholds.go`／`tools/d22scan/**`／`scripts/slo-check.ps1` 一字节；未跑 `slo-check.ps1`。
+
+### 9.4 本腿自己的 commit（⛔ 只 commit 未 push；每枚都带显式 pathspec＝`.scratch/wisp/probes/260/v1`）
+
+| 枚 | 时刻 | 内容 |
+|---|---|---|
+| `d665521c` | 13:20:27 | 九节标题骨架（第 15 轮前落盘，按排程纪律） |
+| `959e0f82` | 13:48:11 | 满稿＋43 枚读数档＋三台突变脚本＋占位自量尺（48 files／+4,657） |
+| 第三枚（本表 §4.2／§5.5／§9.4 这轮补录） | 13:5x | 两处补尺：四程对 AC#2 的表态逐件 grep＋`channelNames` 前后两态尺（`logs/channelnames-two-states.txt`／`logs/key-sentence-shapes.txt`）；号取 `git log --format=%h -- .scratch/wisp/probes/260/v1` 现跑，⛔ 本表不预写枚号 |
+
+> ⚠ 编排者口径：通知正文里的 commit 号一律当未验证——以上三枚以盘上为准（`git log --format=%h -- .scratch/wisp/probes/260/v1` 现跑可核）。
