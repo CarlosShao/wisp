@@ -270,8 +270,10 @@ func TestWindowlessSTAReachesTheBorrowWiring260r5(t *testing.T) {
 			"message loop on a test goroutine and nothing below is readable", o.doorErr)
 	}
 	if o.lentKey {
-		t.Fatalf("Win32 lent the key to a handle IsWindow calls invalid (release rc=%d on the NULL door): the plant "+
-			"stopped being a refusal, so this case is no longer a refused-borrow ruler", o.unregNullRc)
+		t.Fatalf("the ball ends the borrow claiming the cancel key is its own (escTakenOver=true) on a handle IsWindow "+
+			"calls invalid: either Win32 really lent it (release rc=%d on the NULL door) or the wiring reports a key it "+
+			"never got, which is the fall-through door at ball_windows.go:897. Neither leaves this case judging a refusal",
+			o.unregNullRc)
 	}
 	line, ok := o.report.Binding(hkCancel)
 	if !ok {
@@ -303,12 +305,35 @@ func TestRefusedBorrowIsNamedOnTheReport260r5(t *testing.T) {
 	o := t260r5RunBorrow(t, cfg, false)
 
 	if o.plantIsWin != 0 || !o.entered || o.lentKey {
-		t.Fatalf("the rig did not reach a refused borrow (IsWindow=%d entered=%t lent=%t), so it cannot judge the wiring",
-			o.plantIsWin, o.entered, o.lentKey)
+		t.Fatalf("the rig did not reach a refused borrow (IsWindow=%d entered=%t the-ball-claims-the-key=%t): either the "+
+			"plant stopped being a refusal or the wiring claims a key Win32 refused - in both readings the receipt below "+
+			"would be judging a fixture and not ball_windows.go:895", o.plantIsWin, o.entered, o.lentKey)
 	}
 	line, ok := o.report.Binding(hkCancel)
 	if !ok {
 		t.Fatal("the refused borrow left no cancel line in the report: the receipt write never ran")
+	}
+	// The user-visible symptom is checked FIRST, because that is what AC#2 is about:
+	// zero problem lines before the borrow, exactly the one that names it afterwards.
+	// Deleting the write at ball_windows.go:895 lands here.
+	if len(o.seedProbs) != 0 {
+		t.Fatalf("the seed report already complained (%q) before the borrow was attempted, so counting problem "+
+			"lines below measures the fixture and not the wiring", o.seedProbs)
+	}
+	probs := o.report.Problems()
+	if len(probs) != 1 {
+		t.Fatalf("problem lines after a borrow Win32 refused = %d (%q), want the 1 that says so: the seed said %q, "+
+			"and the write at ball_windows.go:895 is the only thing between the two", len(probs), probs, o.seedProbs)
+	}
+	said := probs[0]
+	errText := "<nil>"
+	if line.Err != nil {
+		errText = line.Err.Error()
+	}
+	for _, want := range []string{"cancel", t260r5CancelBinding, t260r5RefusedLineWord, errText} {
+		if !strings.Contains(said, want) {
+			t.Errorf("the refused-borrow line does not say %q; it reads: %s", want, said)
+		}
 	}
 	if line.Status != HotkeyError || !line.Status.Attempted() {
 		t.Errorf("cancel line after a refused borrow = %q (attempted=%t), want HotkeyError and attempted: the "+
@@ -333,23 +358,6 @@ func TestRefusedBorrowIsNamedOnTheReport260r5(t *testing.T) {
 			"attempted", line.Binding, line.Acc, t260r5CancelBinding, wantAcc)
 	}
 
-	// The user-visible half: zero problem lines before the borrow, exactly the one
-	// that names it afterwards. This is the assertion AC#2's mutation turns red.
-	if len(o.seedProbs) != 0 {
-		t.Fatalf("the seed report already complained (%q) before the borrow was attempted, so counting problem "+
-			"lines below measures the fixture and not the wiring", o.seedProbs)
-	}
-	probs := o.report.Problems()
-	if len(probs) != 1 {
-		t.Fatalf("problem lines after a borrow Win32 refused = %d (%q), want the 1 that says so: the seed said %q, "+
-			"and the write at ball_windows.go:895 is the only thing between the two", len(probs), probs, o.seedProbs)
-	}
-	said := probs[0]
-	for _, want := range []string{"cancel", t260r5CancelBinding, t260r5RefusedLineWord, line.Err.Error()} {
-		if !strings.Contains(said, want) {
-			t.Errorf("the refused-borrow line does not say %q; it reads: %s", want, said)
-		}
-	}
 	// A card with no cancel key must not be reported as holding one.
 	if o.takenOver {
 		t.Errorf("escTakenOver reads true after a refused borrow: the ball claims a key Win32 never lent, and " +
