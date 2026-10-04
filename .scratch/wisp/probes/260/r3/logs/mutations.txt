@@ -1,0 +1,46 @@
+=== M1 (cmd/wisp/resident_approval_windows.go) ===
+rc=1 restore_md5_equal=True
+    resident_cancel_key_wording_260r3_windows_test.go:130: 否决成功句 没有念出配置里那枚键："按 Esc 否决了卡片 corr-260r3（L1 / fs.write）：该调用未执行，答案已入审计"（应含 "Ctrl+Alt+Q"）
+    resident_cancel_key_wording_260r3_windows_test.go:133: 否决成功句 仍在念 Esc："按 Esc 否决了卡片 corr-260r3（L1 / fs.write）：该调用未执行，答案已入审计"
+--- FAIL: TestTicket260R3SeededKeyReplacesEsc (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.101s
+FAIL
+md5_before=fc2e1940483f3a9d64a6950c326e70d6 md5_after=fc2e1940483f3a9d64a6950c326e70d6
+=== M2 (cmd/wisp/resident_approval_windows.go) ===
+rc=1 restore_md5_equal=True
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
+cmd\wisp\resident_approval_windows.go:349:2: declared and not used: key
+md5_before=fc2e1940483f3a9d64a6950c326e70d6 md5_after=fc2e1940483f3a9d64a6950c326e70d6
+=== M3 (cmd/wisp/resident_approval_windows.go) ===
+rc=1 restore_md5_equal=True
+    resident_cancel_key_wording_260r3_windows_test.go:168: 没有球窗那一支没有说「取消键无处可借」（旧句逐字 "四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）"）：got "wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）\n"
+    resident_cancel_key_wording_260r3_windows_test.go:171: 没有球窗那一支还在指枚一枚键："wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）\n"
+    resident_cancel_key_wording_260r3_windows_test.go:190: 未加载的两支指枚了键名 "Esc"："wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）\n" / "wisp: [audit] resident-approval: 本进程有悬浮球窗口，但装配根没有注入取消执行者，取消键通道保持未加载（advertise 一枚按不动的键＝B1 禁止的形状）\n"
+    resident_cancel_key_wording_260r3_windows_test.go:168: 没有球窗那一支没有说「取消键无处可借」（旧句逐字 "四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）"）：got "wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）\n"
+    resident_cancel_key_wording_260r3_windows_test.go:171: 没有球窗那一支还在指枚一枚键："wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）\n"
+--- FAIL: TestTicket260R3UnloadBranchesNameNoKey (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.120s
+FAIL
+md5_before=fc2e1940483f3a9d64a6950c326e70d6 md5_after=fc2e1940483f3a9d64a6950c326e70d6
+=== M4 (cmd/wisp/resident_approval_windows.go) ===
+rc=0 restore_md5_equal=True
+--- PASS: TestTicket260R3DefaultWordingIsTheOldSentence (0.00s)
+--- PASS: TestTicket260R3SeededKeyReplacesEsc (0.00s)
+--- PASS: TestTicket260R3UnloadBranchesNameNoKey (0.00s)
+--- PASS: TestTicket260R3CancelKeyComesFromTheBallChain (0.00s)
+--- PASS: TestTicket260R3ProductionPathHasNoSeam (0.00s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.069s
+md5_before=fc2e1940483f3a9d64a6950c326e70d6 md5_after=fc2e1940483f3a9d64a6950c326e70d6
+=== M5 (internal/agent/approval/approval.go) ===
+rc=1 restore_md5_equal=True
+    cancel_key_wording_260r3_test.go:57: 取消通道不可用句 = "Esc 取消不可用", want "快捷键取消不可用"（档一：只说通道不可用，不指枚键名）
+    cancel_key_wording_260r3_test.go:60: 取消通道不可用句还在指枚 Esc："Esc 取消不可用"
+--- FAIL: TestTicket260R3EscUnavailableLineNamesNoKey (0.00s)
+--- PASS: TestTicket260R3LoadedCancelLabelIsTheNamedResidual (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	0.037s
+FAIL
+md5_before=9f374f525e5d0081300dea47df4f379a md5_after=9f374f525e5d0081300dea47df4f379a

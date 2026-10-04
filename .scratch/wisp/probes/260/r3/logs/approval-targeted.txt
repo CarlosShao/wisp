@@ -1,0 +1,7 @@
+time=2026-10-04T11:06:18.651+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket260R3EscUnavailableLineNamesNoKey
+--- PASS: TestTicket260R3EscUnavailableLineNamesNoKey (0.00s)
+=== RUN   TestTicket260R3LoadedCancelLabelIsTheNamedResidual
+--- PASS: TestTicket260R3LoadedCancelLabelIsTheNamedResidual (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	0.034s

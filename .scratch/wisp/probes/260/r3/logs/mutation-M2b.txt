@@ -1,0 +1,9 @@
+=== M2 (cmd/wisp/resident_approval_windows.go) ===
+rc=1 restore_md5_equal=True
+    resident_cancel_key_wording_260r3_windows_test.go:145: 改过键以后的装配句没有念那枚键："wisp: [audit] resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）\n"
+    resident_cancel_key_wording_260r3_windows_test.go:148: 改过键以后的装配句仍在念 Esc："wisp: [audit] resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）\n"
+--- FAIL: TestTicket260R3SeededKeyReplacesEsc (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.062s
+FAIL
+md5_before=fc2e1940483f3a9d64a6950c326e70d6 md5_after=fc2e1940483f3a9d64a6950c326e70d6

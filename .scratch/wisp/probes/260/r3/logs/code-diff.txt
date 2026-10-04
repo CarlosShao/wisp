@@ -1,0 +1,234 @@
+diff --git a/cmd/wisp/resident_approval_windows.go b/cmd/wisp/resident_approval_windows.go
+index ccbe8763..152b8122 100644
+--- a/cmd/wisp/resident_approval_windows.go
++++ b/cmd/wisp/resident_approval_windows.go
+@@ -101,6 +101,59 @@ type residentApproval struct {
+ 	live    int // raises between "asked" and "answered"
+ 	closed  bool
+ 	escLoad bool // the Esc channel was loaded (only ever with a real ball)
++
++	// cancelKeyRead is the test seam of the two seeded-wording judges this leg
++	// owes (ticket 260-r3, ledger A595): it stands in for the ball's report line
++	// so a case can name a NON-default cancel key without opening a real window.
++	// A real window is a winlive rig and this leg is forbidden to run one (see
++	// .scratch/wisp/probes/260/r3/wording.md §6), so the ball-side half of the
++	// chain is asserted by reading, not by execution - and that limit is stated
++	// there rather than hidden here. nil is the production reader, which is what
++	// the shipped process runs: this field has no production writer.
++	cancelKeyRead func() string
++}
++
++// ---------------------------------------------------------------- the cancel key
++//
++// residentCancelKeySpelling is the ONE source for "which key does this process
++// call the cancel key", and cancelKeySpelling is the only way this file reaches
++// it. The value is read off the ball's own hotkey report: the cancel line is the
++// line TakeEscForCancel rewrites from the exact cancelBorrow it hands to
++// RegisterHotKey (internal/ball/hotkey_windows.go's cancelBorrowedLineFor), and
++// the idle pass fills it with the configured binding (cancelIdleLine). Printing
++// from that line is what ticket 260 AC#1 condition 2 ("说到做到") asks for;
++// composing a combination in this package is the shape the ticket was filed to
++// remove, so nothing here parses a binding, spells a modifier, or re-decides
++// which value wins.
++//
++// The single fallback is the ball's own default constant, not a new literal: it
++// covers the two shapes where the report has no cancel binding to show - no ball
++// window at all, and an empty [hotkey] cancel, which is exactly the input
++// resolveCancelBorrow maps to that same default. So the printed name and the
++// borrowed key still agree in both.
++//
++// It is safe to call from the cancel callback (vetoByEsc runs on the ball's UI
++// thread): HotkeyReport goes through Ball.uiRun, which runs inline when the
++// caller already IS that thread (internal/ball/ball_windows.go:741-745) instead
++// of posting and waiting on itself.
++func residentCancelKeySpelling(b *ball.Ball) string {
++	if b != nil {
++		for _, bd := range b.HotkeyReport().Bindings() {
++			if bd.Name == "cancel" && bd.Binding != "" {
++				return bd.Binding
++			}
++		}
++	}
++	return ball.DefaultHotkeys().Cancel
++}
++
++// cancelKeySpelling answers for this gate: the injected reader when a case seeded
++// one, otherwise the live ball the UI is holding.
++func (ra *residentApproval) cancelKeySpelling() string {
++	if ra.cancelKeyRead != nil {
++		return ra.cancelKeyRead()
++	}
++	return residentCancelKeySpelling(ra.ui.currentBall())
+ }
+ 
+ // newResidentApproval composes the gate the resident leg runs on WITHOUT a host
+@@ -267,16 +320,20 @@ func (ra *residentApproval) residentAuditf(format string, args ...any) {
+ // unloaded and says why once.
+ func (ra *residentApproval) bindBallHost(rb *residentBall) bool {
+ 	if rb == nil || rb.b == nil {
++		// 档一 (A595 §1 boundary ④): this branch has NO key to name - no window
++		// means nothing can be borrowed - so the sentence says the slot is empty
++		// instead of claiming a key. It used to read 「Esc 无处可借」.
+ 		ra.residentAuditf("resident-approval: 审批门已装配，但本进程没有悬浮球窗口，" +
+-			"四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）")
++			"四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）")
+ 		return false
+ 	}
+ 	if !rb.cancelHosted {
+ 		// A window with no executor behind the cancel key: the borrow would be
+ 		// advertised and the press would be booked as "no executor". Both halves
+ 		// of that are lies the channel registry is not allowed to tell.
++		// 档一 for the same reason: the channel is not loaded, so no key is named.
+ 		ra.residentAuditf("resident-approval: 本进程有悬浮球窗口，但装配根没有注入取消执行者，" +
+-			"Esc 通道保持未加载（advertise 一枚按不动的键＝B1 禁止的形状）")
++			"取消键通道保持未加载（advertise 一枚按不动的键＝B1 禁止的形状）")
+ 		return false
+ 	}
+ 	ra.mu.Lock()
+@@ -284,11 +341,34 @@ func (ra *residentApproval) bindBallHost(rb *residentBall) bool {
+ 	ra.mu.Unlock()
+ 	ra.ui.attachBall(rb.b)
+ 	ra.gate.Channels().SetLoaded(approval.ChannelEsc, true)
+-	ra.residentAuditf("resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；" +
+-		"单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）")
++	// 档二: the channel IS loaded here, so the sentence names a key - and it names
++	// the one this ball will actually borrow (its report's cancel line, filled from
++	// [hotkey] cancel). With the default 档 the rendered line is byte-for-byte the
++	// sentence this file printed before ticket 260-r3, which is the zero-drift half
++	// of the acceptance pair.
++	key := ra.cancelKeySpelling()
++	ra.residentAuditf("resident-approval: 审批门已装配进常驻进程，取消通道 %s 已加载（本票只落 %s 一条通道；"+
++		"单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）", key, key)
+ 	return true
+ }
+ 
++// vetoRejectedLine and vetoDoneLine are vetoByEsc's two answers, lifted out
++// verbatim so the wording pair this ticket owes (ledger A595 §2) has an executable
++// ruler. The reason is measurement, not design: the success sentence needs a live
++// L1 window on the gate, which only a real ball window can raise, and a real
++// window is a winlive rig this leg is forbidden to run (see
++// .scratch/wisp/probes/260/r3/wording.md §6). Nothing here changes behaviour -
++// vetoByEsc still returns exactly these two strings with exactly these arguments,
++// and the key it names still comes from the single source above.
++func vetoRejectedLine(key, corr string, err error) string {
++	return fmt.Sprintf("按 %s 否决卡片 %s 被拒：%v", key, corr, err)
++}
++
++func vetoDoneLine(key string, card approval.ReplyCard) string {
++	return fmt.Sprintf("按 %s 否决了卡片 %s（%s / %s）：该调用未执行，答案已入审计",
++		key, card.CorrelationID, card.Level, card.Tool)
++}
++
+ // vetoByEsc is the callback injected into the ball host: the resident leg's
+ // answer to "the user pressed the cancel key". It returns the sentence this
+ // process prints and books, so the ball host stays free of any knowledge of
+@@ -306,10 +386,13 @@ func (ra *residentApproval) vetoByEsc() string {
+ 		return "按下的取消键没有可否决的确认项：本进程此刻没有卡片在等人"
+ 	}
+ 	if err := ra.cards.Veto(card.CorrelationID); err != nil {
+-		return fmt.Sprintf("按 Esc 否决卡片 %s 被拒：%v", card.CorrelationID, err)
++		// 档二: the key named here is the one this card's borrow used, read off the
++		// ball's report (vetoByEsc runs on the UI thread, where that read is inline
++		// - see residentCancelKeySpelling's note). Default 档 renders the old
++		// sentence unchanged.
++		return vetoRejectedLine(ra.cancelKeySpelling(), card.CorrelationID, err)
+ 	}
+-	return fmt.Sprintf("按 Esc 否决了卡片 %s（%s / %s）：该调用未执行，答案已入审计",
+-		card.CorrelationID, card.Level, card.Tool)
++	return vetoDoneLine(ra.cancelKeySpelling(), card)
+ }
+ 
+ // residentCard is one host-initiated confirmation: the whole of what this file
+@@ -492,8 +575,8 @@ func (ra *residentApproval) residentStatusLine() string {
+ 	if !loaded {
+ 		return "审批门未装配（本进程没有可承载卡片的悬浮球窗口，或装配根没有注入取消执行者）"
+ 	}
+-	return fmt.Sprintf("审批门已装配进本进程（取消通道：Esc 已加载；等待中的确认项：%d）",
+-		len(ra.cards.Pending()))
++	return fmt.Sprintf("审批门已装配进本进程（取消通道：%s 已加载；等待中的确认项：%d）",
++		ra.cancelKeySpelling(), len(ra.cards.Pending()))
+ }
+ 
+ // --------------------------------------------------------------------- the UI
+@@ -581,9 +664,20 @@ func (u *ballCardUI) Prompt(_ context.Context, p approval.Prompt) error {
+ 	// report is the authority on that (internal/ball books the refusal there),
+ 	// so the sentence is said now rather than discovered at the deadline.
+ 	if p.Level == "L1" && !b.EscTakenOver() {
+-		slog.Warn("approval: L1 窗口挂起期间裸 Esc 未借到，本张卡片无法用 Esc 否决",
+-			"corr", p.CorrelationID, "why", "取消键位被占用或注册被拒，见热键报告")
+-		fmt.Printf("wisp: 卡片 %s 的取消键未借到（桌面已有占位者），按 Esc 不会否决它\n", p.CorrelationID)
++		// 档三: the borrow WAS attempted and Win32 refused it, so there is a key to
++		// name - the one this card tried to borrow, which the ball left on its
++		// report's cancel line (cancelFailedLineFor carries exactly the accelerator
++		// it handed to RegisterHotKey). The hard-coded 「Esc」 here used to promise a
++		// key that may never have been attempted, so the name now comes from the
++		// same report line; it goes in an attribute because a slog message stays a
++		// constant in this repository (尺：grep -rn "slog\.[A-Za-z]*(fmt.Sprintf"
++		// --include=*.go internal cmd ⇒ 0 枚先例). The human-facing sentence below
++		// is the one that keeps the key inside the sentence.
++		key := u.ra.cancelKeySpelling()
++		slog.Warn("approval: L1 窗口挂起期间取消键未借到，本张卡片无法用它否决",
++			"corr", p.CorrelationID, "key", key,
++			"why", "取消键位被占用或注册被拒，见热键报告")
++		fmt.Printf("wisp: 卡片 %s 的取消键未借到（桌面已有占位者），按 %s 不会否决它\n", p.CorrelationID, key)
+ 	}
+ 	return nil
+ }
+diff --git a/cmd/wisp/resident_task_source_live_246_windows_test.go b/cmd/wisp/resident_task_source_live_246_windows_test.go
+index 43d305e4..1659e399 100644
+--- a/cmd/wisp/resident_task_source_live_246_windows_test.go
++++ b/cmd/wisp/resident_task_source_live_246_windows_test.go
+@@ -54,6 +54,7 @@ import (
+ 	"testing"
+ 	"time"
+ 
++	"github.com/CarlosShao/wisp/internal/ball"
+ 	"github.com/CarlosShao/wisp/internal/llm/golden"
+ 	"github.com/CarlosShao/wisp/internal/observe"
+ 	"github.com/CarlosShao/wisp/internal/secret"
+@@ -66,7 +67,24 @@ const cardRaisedClaim = "wisp: 卡片挂起："
+ 
+ // vetoDoneClaim is the sentence the injected cancel executor returns and the ball
+ // host prints (residentApproval.vetoByEsc through recordCancelHotkey).
+-const vetoDoneClaim = "按 Esc 否决了卡片"
++//
++// Ticket 260-r3 (ledger A595 §2): vetoByEsc stopped hard-coding the key name and
++// prints the one this card actually borrowed, so this claim follows the same
++// source instead of repeating a literal. The default 档 is what THIS rig runs -
++// prepareResidentHarness writes a config.toml with no [hotkey] section, so
++// [hotkey] cancel resolves through ApplyHotkeyDefaults to the product default -
++// and that is exactly the value the shipped sentence renders. If this rig ever
++// writes its own cancel binding, this constant must follow THAT value, not the
++// default, or the case waits for a sentence nobody can print.
++//
++// ⚠ This file is winlive: CI never runs it (scripts/wisp-cli-tests.sh and
++// .github/workflows/ci.yml carry no -tags, so the tag never resolves) and this
++// machine cannot either (go test ./cmd/wisp/ dies at load with 0xc0000135 and no
++// --- FAIL line, ticket 98). Leaving the literal here would have been a ruler
++// that must lie the day the rig sets a key, so it is derived; the sentence pair
++// itself is pinned WITHOUT a window by
++// resident_cancel_key_wording_260r3_windows_test.go.
++var vetoDoneClaim = "按 " + ball.DefaultHotkeys().Cancel + " 否决了卡片"
+ 
+ // residentCardFileName is the file the scripted model asks to write. Its being
+ // absent after the veto is the reading that the vetoed call never executed.
+diff --git a/internal/agent/approval/approval.go b/internal/agent/approval/approval.go
+index 7cf9300d..3909e8d0 100644
+--- a/internal/agent/approval/approval.go
++++ b/internal/agent/approval/approval.go
+@@ -109,7 +109,14 @@ func unavailableText(ch Channel) string {
+ 	case ChannelBall:
+ 		return "悬浮球取消不可用"
+ 	case ChannelEsc:
+-		return "Esc 取消不可用"
++		// Ticket 260 AC#1 condition 2, ledger A595 §1 boundary ④: this line is
++		// reached ONLY when the channel is not loaded, so there is no key to
++		// name. Saying 「Esc」 here was a claim about a key this host is not
++		// holding at all - and since the borrow now follows [hotkey] cancel, the
++		// named key could not even be inferred from the default. The honest form
++		// names the SLOT, never a key, matching the "无处可借／不可用" wording
++		// the resident leg uses for the same two branches.
++		return "快捷键取消不可用"
+ 	default:
+ 		return "该取消通道不可用"
+ 	}
