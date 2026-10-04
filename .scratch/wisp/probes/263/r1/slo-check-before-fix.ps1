@@ -48,23 +48,6 @@
     FAILS if the forced leak does NOT flip the gate (a leak that passes means
     the sampler is broken).
 
-    HOW THIS SCRIPT OBTAINS AN EXIT CODE (ticket 263, read before editing):
-    every external program is started through Invoke-ExternalProgram below,
-    which WAITS for it and RETURNS the code. This script must never read the
-    automatic exit-code variable, and two nails enforce that: the capability
-    probe (prove a known exit code survives a start-and-wait before any state
-    is sampled) and the shape nail (this file must contain no read of that
-    automatic variable at all). Why that is not pedantry: since ticket 244
-    scripts/build.ps1 passes -H=windowsgui, so wisp.exe is a Windows
-    GUI-subsystem binary, and a bare call to one is NOT waited for - the
-    automatic variable then holds no value at all, Set-StrictMode turns the
-    read into a runtime death, and on 2026-10-04 that killed the only D32
-    evaluation path 0.2s into the first state (run 37166458550, ledger A586)
-    before it could even print a verdict. A death is not a verdict either, so
-    the paths that cannot measure are named INSTRUMENT BROKEN (exit 1, record
-    on disk) rather than left to throw, and never coloured as the existing
-    "NO CONCLUSION (machine-contended)" refusal (exit 0, ticket 134 AC#6).
-
 .USAGE
     scripts/slo-check.ps1 [-Subset smoke|full] [-SecondsPerState 4]
                           [-WispExe build\wisp.exe] [-OutDir build\slo]
@@ -89,167 +72,6 @@ if (-not $OutDir) { $OutDir = Join-Path $RepoRoot 'build\slo' }
 function Fail([string]$Message) {
     Write-Host "slo-check.ps1: FATAL: $Message"
     exit 1
-}
-
-function Fail-InstrumentBroken([string]$Message) {
-    # The named failure this script was missing (ticket 263, "honest column"):
-    # "the instrument cannot measure" is neither a passed gate nor a validity
-    # refusal, it is a breakage, and it has to be readable by the next person
-    # without a PowerShell stack trace. Colour stays exit 1 (same as Fail), but
-    # the cause now has a name on stdout AND a record on disk that survives the
-    # log window. It is deliberately NOT written to slo-report.json, and NOT to
-    # slo-no-conclusion.json: ci.yml's Upload step names only the report, and
-    # probe P3 of scripts/slo-freshness.sh ages only on an uploaded report, so
-    # an instrument breakage keeps aging that nail instead of hiding in it.
-    Write-Host "slo-check.ps1: INSTRUMENT BROKEN: $Message"
-    Write-Host 'slo-check.ps1: INSTRUMENT BROKEN: no D32 number was produced by this run and none may be read from it.'
-    try {
-        New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
-        $record = [pscustomobject]@{
-            generated_at = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
-            subset       = $Subset
-            machine      = $env:COMPUTERNAME
-            verdict      = 'instrument-broken'
-            reason       = $Message
-            state_files_written = 0
-            slo_report_written  = $false
-            d32_evaluated       = $false
-            meaning = 'The gate could not run its own instrument. This is a breakage (exit 1), not a performance result and not a machine-contended refusal.'
-        }
-        $recordPath = Join-Path $OutDir 'slo-instrument-broken.json'
-        $record | ConvertTo-Json -Depth 4 | Set-Content -Path $recordPath -Encoding UTF8
-        Write-Host ("slo-check.ps1: INSTRUMENT BROKEN: record written to {0} (NOT a report; slo-report.json is not written on this path)" -f $recordPath)
-    } catch {
-        # Losing the record must not lose the verdict: the exit code below is
-        # the load-bearing half, so this catch only reports that the second
-        # copy could not be made.
-        Write-Host ("slo-check.ps1: INSTRUMENT BROKEN: could not write the record file: {0}" -f $_.Exception.Message)
-    }
-    exit 1
-}
-
-function Get-NativeArgumentLine {
-    # System.Diagnostics wants ONE command-line string, and this repo's own
-    # paths contain spaces ("projects plans"), so anything with a space or a
-    # quote is wrapped the way the Windows command-line parser expects.
-    param([string[]]$Values)
-    $quoted = @(foreach ($v in $Values) {
-        $s = [string]$v
-        if ($s -match '[\s"]') { '"' + ($s -replace '"', '\"') + '"' } else { $s }
-    })
-    return ($quoted -join ' ')
-}
-
-function Invoke-ExternalProgram {
-    <#
-    .SYNOPSIS
-        Starts an external program, waits for it, and RETURNS its exit code.
-    .DESCRIPTION
-        The one way this script is allowed to obtain an exit code (ticket 263).
-        Returns [pscustomobject]@{ ok; code; why } where ok=$true means "the
-        program ran to completion and `code` is that program's real exit code",
-        and ok=$false means "there is no code to read" with `why` naming the
-        reason. Callers must branch on .ok and report a not-ok result through
-        Fail-InstrumentBroken: the try/catch blocks below exist to turn a raw
-        runtime exception into that NAMED failure, never to continue as if
-        something had been measured.
-
-        Why not `& $exe` plus the automatic exit-code variable: scripts/build.ps1
-        passes -H=windowsgui (ticket 244), so wisp.exe is a Windows GUI-subsystem
-        binary, and a bare call to one is not waited for - measured 2026-10-04
-        with bin/probe-cui.exe vs bin/probe-gui.exe in
-        .scratch/wisp/probes/263/r1: the console build returned 2049ms later with
-        exit=3, the GUI build fell through in 70ms and the next read died under
-        Set-StrictMode. Waiting is also what makes the sample real: a 6s state
-        that is not waited for has no measurement at all.
-    #>
-    param(
-        [Parameter(Mandatory)][string]$FilePath,
-        [string[]]$ArgumentList = @()
-    )
-    if (-not (Test-Path -LiteralPath $FilePath)) {
-        return [pscustomobject]@{ ok = $false; code = $null; why = "program not found: $FilePath" }
-    }
-    $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName = $FilePath
-    $psi.Arguments = (Get-NativeArgumentLine -Values $ArgumentList)
-    # $false is the measured shape: with UseShellExecute the child's own lines
-    # never reached this caller's streams (the CI log would lose wisp's output),
-    # while the exit code came back the same. Probes in ticket 263's evidence.
-    $psi.UseShellExecute = $false
-    $proc = $null
-    try {
-        $proc = [System.Diagnostics.Process]::Start($psi)
-    } catch {
-        return [pscustomobject]@{ ok = $false; code = $null; why = ("cannot start '{0}': {1}" -f $FilePath, $_.Exception.Message) }
-    }
-    if ($null -eq $proc) {
-        return [pscustomobject]@{ ok = $false; code = $null; why = ("no process object returned for '{0}'" -f $FilePath) }
-    }
-    try {
-        # The wait is the point. No timeout is invented here: the previous bare
-        # call for a console binary blocked until the program exited, and a
-        # hang is still caught by the job's own timeout (unchanged shape).
-        $proc.WaitForExit()
-        return [pscustomobject]@{ ok = $true; code = [int]$proc.ExitCode; why = '' }
-    } catch {
-        return [pscustomobject]@{ ok = $false; code = $null; why = ("'{0}' started but its exit code could not be read: {1}" -f $FilePath, $_.Exception.Message) }
-    } finally {
-        $proc.Dispose()
-    }
-}
-
-function Get-SelfHostExecutable {
-    # The program running THIS script, so the "wisp.exe missing, build it" path
-    # starts scripts/build.ps1 the same waited-for way as everything else.
-    $self = Get-Process -Id $PID -ErrorAction SilentlyContinue
-    if ($self -and $self.Path) { return [string]$self.Path }
-    foreach ($candidate in @('pwsh.exe', 'powershell.exe')) {
-        $found = Get-Command $candidate -CommandType Application -ErrorAction SilentlyContinue
-        if ($found) { return [string]$found.Source }
-    }
-    return ''
-}
-
-function Test-ExitCodeInstrument {
-    # Capability nail (ticket 263 AC#4, the strong half): before any state is
-    # sampled, prove that an exit code can be carried from a real program into
-    # this script at all. Sensitivity is directed at the failure it prevents:
-    # any shape that makes the wait or the code read lie (no wait, always 0,
-    # dropped code) trips here instead of producing a green that measured
-    # nothing. cmd.exe is asked to exit 7; anything other than 7 is a breakage.
-    $comSpec = [Environment]::GetEnvironmentVariable('ComSpec')
-    if (-not $comSpec) { $comSpec = 'cmd.exe' }
-    $probe = Invoke-ExternalProgram -FilePath $comSpec -ArgumentList @('/c', 'exit 7')
-    if (-not $probe.ok) {
-        Fail-InstrumentBroken ("exit-code instrument: {0} - the D32 gate cannot trust any exit code it would read (ticket 263)" -f $probe.why)
-    }
-    if ($probe.code -ne 7) {
-        Fail-InstrumentBroken ('exit-code instrument: asked the shell to exit 7 and read {0}; the start-wait-read path is broken (ticket 263)' -f $probe.code)
-    }
-    Write-Host 'slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)'
-}
-
-function Test-ScriptShapeNail {
-    # Shape nail (ticket 263 AC#4, the word half): "read the automatic exit-code
-    # variable without having waited for anything" must not come back into this
-    # file. Its own pattern is assembled from char code 36 so this line does not
-    # match itself, and the file's prose therefore writes the variable's name
-    # without the sigil. What it does NOT catch is stated in the message: a
-    # scope-prefixed or Get-Variable spelling of the same variable, or a read
-    # moved into another file. See the evidence file for the bypass readings.
-    $path = $PSCommandPath
-    if (-not $path) {
-        Fail-InstrumentBroken 'shape nail: this script does not know its own path (PSCommandPath empty), so the exit-code read shape cannot be checked'
-    }
-    $sigil = [string][char]36
-    $pattern = '(?i)' + [regex]::Escape($sigil) + '\{?LASTEXITCODE'
-    $source = Get-Content -LiteralPath $path -Raw
-    $hits = @([regex]::Matches($source, $pattern))
-    if ($hits.Count -gt 0) {
-        Fail-InstrumentBroken ('shape nail: {0} direct read(s) of the automatic exit-code variable in {1}; every exit code must come from Invoke-ExternalProgram, which waits (ticket 263). First hit text: {2}' -f $hits.Count, $path, $hits[0].Value)
-    }
-    Write-Host 'slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)'
 }
 
 function Get-OwnProcessTree {
@@ -277,35 +99,11 @@ function Get-OwnProcessTree {
     return @($ids | Select-Object -Unique)
 }
 
-# Both nails run before anything is measured (ticket 263): the shape nail is
-# text and costs one file read, the capability probe starts one short-lived
-# shell. A breakage here is reported as INSTRUMENT BROKEN with exit 1 - the
-# same colour the script would have died with, but named, and before a single
-# D32 sample is claimed.
-Test-ScriptShapeNail
-Test-ExitCodeInstrument
-
 if (-not (Test-Path $WispExe)) {
     # Not a skippable step: the gate builds its own binary when missing.
     Write-Host "slo-check.ps1: wisp.exe missing; building (scripts/build.ps1 -Env dev)"
-    # build.ps1 is a script, not a program, so it is started in a host of the
-    # same kind this script is running in and waited for. The old shape
-    # (call it in-process, then read the automatic exit-code variable) is the
-    # second latent copy of ticket 263's defect: it only worked because a called
-    # .ps1 happens to leave that variable reachable, and nothing here may depend
-    # on "happens to".
-    $hostExe = Get-SelfHostExecutable
-    if (-not $hostExe) {
-        Fail-InstrumentBroken "build path: cannot resolve the PowerShell host running this script, so scripts/build.ps1 cannot be started as a waited-for program (ticket 263)"
-    }
-    $build = Invoke-ExternalProgram -FilePath $hostExe -ArgumentList @(
-        '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
-        (Join-Path $RepoRoot 'scripts\build.ps1'), '-Env', 'dev'
-    )
-    if (-not $build.ok) {
-        Fail-InstrumentBroken ("build path: {0} (ticket 263)" -f $build.why)
-    }
-    if ($build.code -ne 0) { Fail ("build.ps1 failed with exit code {0}" -f $build.code) }
+    & (Join-Path $RepoRoot 'scripts\build.ps1') -Env dev
+    if ($LASTEXITCODE -ne 0) { Fail 'build.ps1 failed' }
 }
 if (-not (Test-Path $WispExe)) { Fail "wisp.exe not found at $WispExe" }
 
@@ -524,13 +322,8 @@ $results = @()
 foreach ($state in $states) {
     $outFile = Join-Path $OutDir ("state-{0}.json" -f $state)
     Write-Host ("slo-check.ps1: sampling state {0} for {1}s" -f $state, $SecondsPerState)
-    $run = Invoke-ExternalProgram -FilePath $WispExe -ArgumentList @(
-        'slo', '-state', $state, '-seconds', $SecondsPerState, '-interval-ms', 250, '-out', $outFile
-    )
-    if (-not $run.ok) {
-        Fail-InstrumentBroken ("sampling state {0}: {1} - this state was never measured, so no D32 number may come from this run (ticket 263)" -f $state, $run.why)
-    }
-    $code = $run.code
+    & $WispExe slo -state $state -seconds $SecondsPerState -interval-ms 250 -out $outFile
+    $code = $LASTEXITCODE
     $pass = $false
     $reportJson = $null
     if ($code -eq 0 -and (Test-Path $outFile)) {
@@ -548,13 +341,8 @@ foreach ($state in $states) {
 # --- settle row (D32: 10s back under cap + FreeOSMemory counter > 0) ------
 Write-Host "slo-check.ps1: settle check (10s window)"
 $settleFile = Join-Path $OutDir 'settle.json'
-$settleRun = Invoke-ExternalProgram -FilePath $WispExe -ArgumentList @(
-    'slo', '-settle', '-seconds', 10, '-out', $settleFile
-)
-if (-not $settleRun.ok) {
-    Fail-InstrumentBroken ("settle row: {0} - the settle row was never measured (ticket 263)" -f $settleRun.why)
-}
-$settleCode = $settleRun.code
+& $WispExe slo -settle -seconds 10 -out $settleFile
+$settleCode = $LASTEXITCODE
 $settlePass = $false
 $settleReport = $null
 if ($settleCode -eq 0 -and (Test-Path $settleFile)) {
@@ -574,25 +362,15 @@ Write-Host ("slo-check.ps1: settle exit={0} pass={1}" -f $settleCode, $settlePas
 
 # --- leak fixture self-test (must flip the gate RED) ----------------------
 Write-Host 'slo-check.ps1: leak fixture self-test (100MB, must FAIL)'
-$leakRun = Invoke-ExternalProgram -FilePath $WispExe -ArgumentList @(
-    'slo', '-state', 'Sleeping', '-leak', '-seconds', 2, '-interval-ms', 250,
-    '-out', (Join-Path $OutDir 'leak.json')
-)
-if (-not $leakRun.ok) {
-    # The leak fixture is this gate's own self-test. If it could not run, there
-    # is no self-test, and a gate that was never tested must not be read as
-    # passing - named breakage, exit 1 (ticket 263).
-    Fail-InstrumentBroken ("leak fixture: {0} - the gate's own self-test never ran (ticket 263)" -f $leakRun.why)
-}
-$leakCode = $leakRun.code
+& $WispExe slo -state Sleeping -leak -seconds 2 -interval-ms 250 -out (Join-Path $OutDir 'leak.json')
+$leakCode = $LASTEXITCODE
 $leakFlipped = ($leakCode -eq 1)
 Write-Host ("slo-check.ps1: leak exit={0} flipped_to_fail={1}" -f $leakCode, $leakFlipped)
 if (-not $leakFlipped) {
     Fail 'forced 100MB leak did NOT flip the gate red - the sampler is broken (D22 mode-6: gate must detect)'
 }
 
-# Force the filter into an array with @(): under Set-StrictMode 2.0 (the one
-# Set-StrictMode line near the top of this file)
+# Force the filter into an array with @(): under Set-StrictMode 2.0 (line 48)
 # a zero-match Where-Object returns $null and a one-match returns a scalar,
 # neither of which carries .Count - so the old expression threw
 # PropertyNotFoundException on exactly the ALL-PASS path, before line 141 could

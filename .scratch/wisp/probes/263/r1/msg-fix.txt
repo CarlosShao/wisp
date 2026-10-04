@@ -1,0 +1,39 @@
+263-r1 落地：slo-check.ps1 改成"起进程→等它→取它给的码"，未赋值即死那一形换成具名 INSTRUMENT BROKEN
+
+票 263 的产码一发＋台件一发。写面只有 `scripts/slo-check.ps1` 与本目录台件。
+
+成因（自己现跑现读，不是照抄票面 §现量 4 那四行）：
+真正的读取点是改前 `:326`（`$code = $LASTEXITCODE`，逐档采样循环里第一次取值），
+而 `:106/:345/:366` 三处同一形状。它今天必炸的原因不是"忘了赋值"，是票 244
+把出厂件换成 Windows GUI 子系统（`scripts/build.ps1:115` 的 `-H=windowsgui`）：
+PowerShell 对 GUI 子系统进程**不等**，所以 `:325` 那句 `& $WispExe slo ...` 立刻返回、
+自动变量从来没被写过 ⇒ `Set-StrictMode -Version 2.0` 把取值变成运行时异常 ⇒
+D32 唯一的求值路径开采 0.2 秒即死（run 37166458550 日志逐字，台账 A586）。
+台件实测：同一份 Go 程序两种子系统对照，CUI 那发等满 2049ms 拿到 exit=3，
+GUI 那发 70ms 就落到红句；改前的门（`git cat-file blob HEAD:` 抽出的 397 行副本）
+对着 GUI 子系统假 wisp 逐字重现了 CI 那句红。
+
+改法（票面许可的"跑过外部命令才读"那一支，比"先赋再取"更对，理由见证据件 §③）：
+- 新增 `Invoke-ExternalProgram`：`ProcessStartInfo` 起进程、`WaitForExit()` 等它、
+  返回 `@{ok;code;why}`；取不到码就 ok=false 并带上具名原因，绝不静默续跑。
+  四个取值点（缺件自建 / 逐档采样 / settle / leak 自检）全部改走它。
+- 诚实档：新增 `Fail-InstrumentBroken` ⇒ 仪器跑不起来 = 具名 `INSTRUMENT BROKEN`
+  ＋`exit 1`＋盘上记录 `build/slo/slo-instrument-broken.json`（不叫 report、
+  不叫 no-conclusion，Upload 步只认 slo-report.json，P3 那枚钉不会被喂假对象）。
+  既有 `NO CONCLUSION (machine-contended)`＋`exit 0` 那一支一字未动。
+- 两枚钉：能力钉 `Test-ExitCodeInstrument`（采样前先让 cmd.exe 退 7，读到的不是 7
+  就当场具名红）＋词面钉 `Test-ScriptShapeNail`（本文件不许再出现对该自动变量的读取）。
+- 一处过期指认单列：改前 `:373` 注释写 "Set-StrictMode 2.0 (line 48)"，StrictMode 真身在
+  `:65`；行号会随任何一次编辑再过期，所以换成内容锚（"the one Set-StrictMode line
+  near the top"）。这属票 212 那一族，本腿只改自己文件里这一句指认，不改扫描器一字。
+
+⛔ 四条禁自查：没用 try/catch 吞（catch 一律转成具名失败再 exit 1）、没放宽 Set-StrictMode
+（`:65` 一字未动）、阈值/golden/`internal/observe/thresholds.go` 一字节未碰（见 `git diff --stat`）、
+没把任何一步从"必须出结论"改成"跳过"（新增的两处都是 exit 1 方向）。
+
+台件（本目录，可复跑）：src/main.go＋go.mod（假 wisp，两种子系统各一枚）、
+repro-wait.ps1（改前形状）、repro-helper.ps1（UseShellExecute 两形对照：$false 才留得住
+子进程自己的日志行）、repro-leftover.ps1（那发孤儿进程实测存活 1 枚）、
+repro-child-parent.ps1＋child-*.ps1（:106 那一处今天为什么不炸的证据）、check-syntax.ps1。
+AC#5（真 run 里 slo-full 走到出结论）本腿没验证，只能靠推送，具名停在未验证。
+票面 AC 框一枚未碰。
