@@ -1,0 +1,41 @@
+2026-10-04 12:00:14 +0800
+ruler: 对每枚交证件跑 grep -cE <三枚占位词 pattern>（pattern 由 UTF-8 字节转义在运行时拼出，逐字不落在任何交付物里）
+scope: git ls-files 现跑＝本目录全部 tracked 件＋scripts/slo-check.ps1，共 33 枚
+--- 命中（只列非零）---
+1  .scratch/wisp/probes/263/r1/msg-skeleton.txt
+1  .scratch/wisp/probes/263/r1/placeholder-check.txt
+--- 汇总 ---
+tracked 交付件 = 33；占位词总命中 = 2（其中 scripts/slo-check.ps1 = 0，证据件 fix-and-readings.md = 0）
+RULER_RC=0
+
+--- 具名解释（两枚命中都不是未填的空位）---
+1  msg-skeleton.txt：骨架 commit 82af691d 的消息正文。那枚词出现在**说明规矩的句子**里
+   （"骨架发允许标记、交件发必为 0"），是引语、不是一处没落的空位。已提交的消息件不改写（AGENTS §1.4：追加不抹），所以具名留着。
+2  placeholder-check.txt：**上一发读数自己的解释行**逐字引用了那三枚词里的第一枚（两字那枚）——
+   尺扫到了自己的引语 ⇒ 与 §⑤ 词面钉"模式串不许匹配到自己"是同一个形状。已提交的读数同样不改写，只在这里追加更正。
+   本发改法：pattern 挪进 run-placeholder-ruler.sh，按 UTF-8 字节八进制转义在运行时拼（文件里只留 `345 276 205` 这类转义与码点号），
+   解释一律用"第一枚/两字那枚"指代 ⇒ 本文件自扫命中应为 0，用下面那发复尺逐字验。
+
+⚠ 本发相对 11:53 那发的另一处更正：**scope 曾经过期**——那发跑在 11:53:01、只有 24 枚 tracked（交件发 befb779c 是 11:55，
+它新增的 8 枚台件没被那次尺扫过）。本发 scope=33 枚（本目录 32 枚 tracked ＋ scripts/slo-check.ps1），是**交件后全量复尺**。
+
+--- 交件后复尺（写完上面解释的同发再跑，验本文件自身＝0）---
+复尺跑于 2026-10-04 12:01:11 +0800；实参＝本次交件待 add 的两枚（读数件＋尺件本体）
+ruler: 对每枚交证件跑 grep -cE <三枚占位词 pattern>（pattern 由 UTF-8 字节转义在运行时拼出，逐字不落在任何交付物里）
+scope: git ls-files 现跑＝本目录全部 tracked 件＋scripts/slo-check.ps1，再加参数并入的待 add 件（实参：.scratch/wisp/probes/263/r1/placeholder-check-2.txt .scratch/wisp/probes/263/r1/run-placeholder-ruler.sh），共 35 枚
+--- 命中（只列非零）---
+1  .scratch/wisp/probes/263/r1/msg-skeleton.txt
+1  .scratch/wisp/probes/263/r1/placeholder-check-2.txt
+1  .scratch/wisp/probes/263/r1/placeholder-check.txt
+--- 汇总 ---
+tracked 交付件 = 35；占位词总命中 = 3（其中 scripts/slo-check.ps1 = 0，证据件 fix-and-readings.md = 0）
+RULER_RC=0
+--- 终尺（上一发复尺抓到**我自己解释行的一处自我命中**：第 13 行原句把那三枚词的第一枚当形容词写进了句子，已改成别的说法。上一发的输出逐字留着不抹——它就是尺会咬到写尺的人这枚形状的现量，与 §⑤ 词面钉自我命中同形）：跑于 2026-10-04 12:01:36 +0800
+ruler: 对每枚交证件跑 grep -cE <三枚占位词 pattern>（pattern 由 UTF-8 字节转义在运行时拼出，逐字不落在任何交付物里）
+scope: git ls-files 现跑＝本目录全部 tracked 件＋scripts/slo-check.ps1，再加参数并入的待 add 件（实参：.scratch/wisp/probes/263/r1/placeholder-check-2.txt .scratch/wisp/probes/263/r1/run-placeholder-ruler.sh），共 35 枚
+--- 命中（只列非零）---
+1  .scratch/wisp/probes/263/r1/msg-skeleton.txt
+1  .scratch/wisp/probes/263/r1/placeholder-check.txt
+--- 汇总 ---
+tracked 交付件 = 35；占位词总命中 = 2（其中 scripts/slo-check.ps1 = 0，证据件 fix-and-readings.md = 0）
+RULER_RC=0

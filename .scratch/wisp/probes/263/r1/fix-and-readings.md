@@ -369,6 +369,24 @@ bands: over the hat=57  ...  in the wall interval=0
 远低于 121 的相对帽 ⇒ 不给 262 那扇门添名册。
 ⚠ 我这发也**没有**新增 `issues/` 长文件名（票名沿用 263 既有票面）。
 
+**2′ 交件后复跑（2026-10-04 11:56-11:58 +0800，`git log -1` 那时是 `befb779c`）**
+```
+sh scripts/d22scan.sh   -> rc=0；clean - no D22 ban violations
+  live scope work: bans #1-5 internal/=228, bans #1-5 cmd/=38, ban #6 frontend/=85, ban #7 internal/tools/=23,
+                   ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=502, ban #8 cmd/=99
+  runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+sh scripts/check-path-length-budget.sh --with-self-test -> rc=0；positive control PASSED（control 1/3、2/3、3/3 ok）
+  denominator: tracked paths=5492  over-budget=57  covered by roster=57  not in roster=0
+  longest=180 chars relative（.scratch/wisp/issues/252-...md）  worst full path=224 chars（hat budget 165、wall (206,217]）
+  bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+```
+⚠ 两门仍 rc=0，但 `tracked paths` 分母 5484 -> 5492（+8）：**归因是本腿自己**，不是他人提交——
+现跑 `git ls-tree -r HEAD~1 --name-only | wc -l` = 5484、`git ls-tree -r HEAD --name-only | wc -l` = 5492（差 8），
+`git diff --name-only HEAD~1 HEAD` = 9 枚（8 枚新增台件＋1 枚改既有 `fix-and-readings.md`）。
+over-budget / roster / not-in-roster 三格逐字未变（57/57/0），bands 亦未变 ⇒ 我没给长名册添名字（最长仍是他人的 252 票面，180 相对字符）。
+d22scan 的六枚分母与上面 11:44 那发**逐字相同**（228/38/85/23/39/85/502/99）⇒ 本腿交件没有扩大卫生射程；
+`internal/`、`cmd/` 依旧零 tracked Go 产码改动。
+
 **3. emoji 自查（ban #8 仪器实际射程，字符串不豁免）**
 ```
 perl -CSD -ne 'print if /[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}]/' scripts/slo-check.ps1
@@ -396,6 +414,20 @@ scripts/slo-check.ps1 = 0 命中
 （逐字：〔占位标记〕只出现在骨架发，交件发必为 0 枚）。已提交的消息件不改写（AGENTS §1.4 追加不抹），所以具名留在这里而不是抹掉它。
 ⚠ 另一枚小雷我也避开了并把形状写下来：**占位词的 pattern 本身不许写进被扫的文档**，否则"尺自我命中"会让命中数变成 1——
 这与 §⑤ 词面钉"模式串由 char code 36 拼出、不匹配自己"是同一个形状。
+
+**5′ 交件后全量复尺（12:00-12:01 +0800 现跑，尺件已入库 `run-placeholder-ruler.sh`，读数 `placeholder-check-2.txt`）**
+上面那发 11:53 的尺有两处不足，本发都补了并逐字入账：
+1. **scope 过期**：那次只有 24 枚 tracked（跑在交件发 `befb779c`（11:55）之前），它新增的 8 枚台件没被扫过。本发 scope=35 枚
+   （`git ls-files` 现跑的本目录 tracked＋`scripts/slo-check.ps1`，再加参数并入的"待 add"两枚——尺不能只扫已入库那一半）。
+2. **pattern 挪出被扫文档**：改由脚本按 UTF-8 字节八进制转义在运行时拼（脚本里只有 `\345\276\205` 这类转义与码点号）。
+```
+终尺 12:01:36 +0800：tracked 交付件 = 35；占位词总命中 = 2（其中 scripts/slo-check.ps1 = 0，证据件 fix-and-readings.md = 0）
+非零两枚：msg-skeleton.txt 1（骨架 commit 消息正文里**说明这条规矩的引语**）、placeholder-check.txt 1（上一发读数的解释行逐字引用了那三枚词的第一枚）
+```
+⚠ **我自己又咬到自己一次，逐字留着**：新读数件 `placeholder-check-2.txt` 的解释行里我原封写了"不是〔那两字〕的空位"，
+12:00:5x 那发复尺因此点名了它自己（`1 .scratch/wisp/probes/263/r1/placeholder-check-2.txt`）——
+那句我没抹掉，改成"不是一处没落的空位"后，终尺（12:01:36）里本文件已不在非零列表 ⇒ **本文件自身＝0**。
+这枚形状与 §⑤ 词面钉"模式串不许匹配到自己"是同一枚，与我刚在本票里说的"尺会咬到写尺的人"完全同形——我把它当读数用，不当笔误藏。
 
 ---
 

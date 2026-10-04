@@ -1,0 +1,20 @@
+263-r1 收尾（AC#6 复核）：交件后复跑两门＋全量复尺，§⑦ 补 2' 与 5' 两节
+
+一、门禁复跑（11:56-11:58 +0800，交件发 befb779c 之后现跑）
+- sh scripts/d22scan.sh -> rc=0 clean，live scope work 与 11:44 那发逐字相同：228/38/85/23/39/85/502/99
+- sh scripts/check-path-length-budget.sh --with-self-test -> rc=0 VERDICT GREEN，positive control PASSED
+- tracked paths 5484 -> 5492（+8）：归因＝本腿自己那枚交件发新增 8 枚台件
+  （git ls-tree -r HEAD~1 = 5484、HEAD = 5492；git diff --name-only HEAD~1 HEAD = 9 枚，其中 1 枚是改既有证据件）
+- over-budget / roster / not-in-roster = 57/57/0 逐字未变，bands 未变，最长仍是他人那枚 252 票面（相对 180）
+
+二、占位标记尺复尺（12:00-12:01 +0800，读数 placeholder-check-2.txt）
+- 11:53 那发有两处不足，本发都补并逐字入账：scope 过期（只有 24 枚 tracked，交件发的 8 枚没被扫）、pattern 写死在被扫文档里
+- 本发 scope=35 枚（git ls-files 现跑＋待 add 两枚由参数并入），pattern 改由 run-placeholder-ruler.sh 按 UTF-8 字节八进制转义在运行时拼
+- 终尺：占位词总命中 2，scripts/slo-check.ps1 = 0、证据件 fix-and-readings.md = 0；
+  两枚非零都是"说明这条规矩的引语"（msg-skeleton.txt、placeholder-check.txt），已提交的不改写、只追加更正
+- 我自己又咬到自己一次并留着读数：新读数件解释行原句把那三枚词的第一枚当形容词写了，12:00 那发复尺因此点名它自己；
+  改说"不是一处没落的空位"后终尺里本文件已不在非零列表。这枚形状＝§⑤ 词面钉"模式串不许匹配到自己"，同一枚
+
+三、写面
+- scripts/slo-check.ps1 本发零改动（git diff 只在本目录）；AC 框一枚未碰；internal/、cmd/ 仍零 tracked Go 产码改动
+- AC#5 仍具名停在"没验证"：本机不发 push、不用本机一发冒充 CI 读数
