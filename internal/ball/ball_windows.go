@@ -860,30 +860,44 @@ func cloneAccel(m map[uint32]Accelerator) map[uint32]Accelerator {
 	return out
 }
 
-// TakeEscForCancel temporarily binds Esc as the cancel key during Confirming
-// (B1). Idempotent. Callable from an Events callback (see uiRun): the B1 law
-// is exactly "take Esc over when the machine enters Confirming", and that
-// verdict arrives inside a gesture callback.
+// TakeEscForCancel temporarily binds the configured cancel key as the cancel
+// hotkey during Confirming (B1). Idempotent. Callable from an Events callback
+// (see uiRun): the B1 law is exactly "take the cancel key over when the machine
+// enters Confirming", and that verdict arrives inside a gesture callback.
 //
 // Ticket 245: this is the ONLY path that registers the cancel id. An idle ball
 // leaves it standby (see registerAllWith), so the bare-Esc production default is
 // not a desktop-wide hot key except for the 2-3 seconds a card is waiting - the
 // half of the cost that form B leaves on the table is named in the ticket's
 // residual entry, not hidden here.
+//
+// Ticket 260 形ⓐ: WHICH key that borrow registers now comes from this ball's
+// configured cancel binding (b.cancelBinding, the same value the idle line
+// carries and RebindHotkeys keeps current), resolved once into a cancelBorrow
+// that is handed to BOTH RegisterHotKey and the report line. Unset or unparsable
+// resolves to the product default bare Esc, bit-for-bit the pre-260 behaviour;
+// an unparsable one also puts a sentence on the report saying so (P6), because a
+// silent substitution is the one shape this ticket forbids.
 func (b *Ball) TakeEscForCancel() {
 	b.uiRun(func() {
 		if b.escTakenOver {
 			return
 		}
-		if err := takeEsc(b.hwnd); err != nil {
+		borrow := resolveCancelBorrow(b.cancelBinding)
+		if borrow.Fallback != nil {
+			slog.Error("cancel borrow fell back to the default binding: [hotkey] cancel is not a valid key combination",
+				"hotkey", "cancel", "configured", b.cancelBinding,
+				"borrowed", borrow.Binding, "err", borrow.Fallback)
+		}
+		if err := takeEscBorrow(b.hwnd, borrow); err != nil {
 			// The borrow was refused: say it on the report (Problems() names it)
 			// rather than leaving a card with no cancel key and no explanation.
-			b.hotkeyReport = b.hotkeyReport.withCancel(cancelFailedLine(err))
+			b.hotkeyReport = b.hotkeyReport.withCancel(cancelFailedLineFor(borrow, err))
 			b.registeredHotkeys = b.hotkeyReport.Live()
 			return
 		}
 		b.escTakenOver = true
-		b.hotkeyReport = b.hotkeyReport.withCancel(cancelBorrowedLine())
+		b.hotkeyReport = b.hotkeyReport.withCancel(cancelBorrowedLineFor(borrow))
 		b.registeredHotkeys = b.hotkeyReport.Live()
 	})
 }

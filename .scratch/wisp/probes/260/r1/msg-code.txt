@@ -1,0 +1,40 @@
+260-r1 落地：确认窗借用的那把 cancel 键改吃 [hotkey] cancel 的配置值（形ⓐ，AC#1）
+
+票面＝.scratch/wisp/issues/260-configured-cancel-hotkey-never-registers.md 最后一节
+「编排者选形裁定（2026-10-04 09:2x，账 A588）」＝形ⓐ＋三条硬条件。撤销口令「260 改 ⓑ」。
+本格只做 AC#1；AC#2（丢借用要有声）是编排者另排的独立一格，本 commit 没有顺手做。
+
+产码（写面只有 internal/ball/**）：
+- hotkey_windows.go 新增 resolveCancelBorrow(bind string)：借用那遍的加速器唯一取值口，
+  三种入参三种定案——能解析的按配置借；空值按产品默认裸 Esc（ApplyHotkeyDefaults 同方向，
+  且⛔ 不许把"没配"变成"不借"，那是 245 的时机裁定，须人工批准才动）；解析不了的退回默认
+  Esc 并带一条 Fallback（新零件 P6）。默认档逐位等于旧字面量 {MOD_NOREPEAT 0x4000, VK_ESCAPE 0x1B}。
+- takeEscWithAcc / takeEscBorrow 吃这条解析结果；旧的零参 takeEscWith / cancelBorrowedLine /
+  cancelFailedLine 原样留作"默认档"包装，票 245/64 钉住的那几枚断言一字未改、也未搬迁。
+- 回执与注册同源：cancelBorrowedLineFor(borrow) 与 RegisterHotKey 读同一个 cancelBorrow
+  （条件②"说到做到"）；HotkeyBinding 新增 Note 字段，Problems() 对任何状态都把 Note 念出来，
+  所以 P6 那句真能到用户眼前（cmd/wisp 的 resident_ball_windows.go 已在打 Problems()，未动它）。
+- ball_windows.go 的 TakeEscForCancel 读本球已有的 b.cancelBinding（boot :253 与
+  RebindHotkeys :821 维护），不新造第三套取值路径；退回时 slog.Error 具名报。
+
+判据（internal/ball/hotkey_cancel_borrow_260_test.go，7 枚，全在默认套件、不需要桌面）：
+① TestBorrowDefaultIsBitIdentical260——默认档逐位钉死为裸 0x4000/0x1B 字面量（⛔ 不是词面尺），
+   并核 modNoRepeat/vkEscape 常量与字面量仍相等、ParseAccelerator("Esc") 仍产出同一对；
+② TestBorrowFollowsConfiguredBinding260——种 "Ctrl+Alt+K"/"Ctrl+Alt+Space"/"F9" ⇒ 借到的随它变；
+③ TestBorrowUnparsableFallsBackLoudly260——种 "Ctrl+Alt+NotAKey+" ⇒ 退回默认＋回执那句出现
+   （断言 Problems() 恰 1 行且含坏值/"not a valid key combination"/"default Esc"/"borrowed for this card"），
+   无 t.Skip；默认档同尺必须安静（正控）；
+④ TestBorrowReceiptSharesOneSourceWithRegistration260——回执那枚 Binding 解析回来必须等于
+   真交给 RegisterHotKey 的 Acc（不是两处各拼一次）；
+⑤ TestConfiguredCancelStillNeverBoundWhileIdle260——245 边界闸：稳态依旧 0 次尝试 cancel、
+   归还后仍 0 次再注册；⑥ TestBorrowFailureNamesTheKeyItTried260——被拒的借用要念它真试过的那枚键；
+⑦ TestLiveBorrowHelperPremiseIsConfigDependent260——具名入账：winlive 层 requireEscBorrowed
+   （hotkey_live_test.go:107）在 liveHotkeys() 的 Cancel="Ctrl+Alt+V" 下前提不再成立，
+   本腿⛔ 未改那枚别人的尺、也⛔ 未跑 winlive，交回编排者裁。
+另写 hotkey_cancel_borrow_live_260_test.go（//go:build windows && winlive，只过 vet 类型检查、本轮未跑）。
+
+门禁读数（.scratch/wisp/probes/260/r1/gate-*.txt）：go build ./... = 0；go vet ./internal/ball/ = 0；
+go vet -tags winlive ./internal/ball/ = 0（只编译不跑）；go test -count=1 -v ./internal/ball/ =
+PASS 62 / FAIL 1 / SKIP 0——唯一那枚 FAIL 是 TestC21TableColourRowsMatchTokensCSS，未修码基线（55 PASS/1 FAIL）
+里就红着，红因＝共享工作树别家在飞的 design/assets/tokens.css 被删，与本票无关，本腿未动它；
+sh scripts/d22scan.sh 终值 clean、runtests.sh 顶层 PASS=34 FAIL=0 SKIP=0；gofumpt -l internal/ball/ 空。
