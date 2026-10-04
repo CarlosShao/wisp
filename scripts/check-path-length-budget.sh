@@ -174,6 +174,43 @@ WALL_HIGH=217
 # same "filed before the hat" sentence instead of carrying 57 separate stories;
 # that is the category reason ticket 262 AC#4 allows, and guard D is what stops
 # it from decaying into decoration.
+#
+# OLD NAMES ARE TRACEABLE (ticket 262 AC#7)
+#   Eleven ticket paths were shortened with `git mv` on 2026-10-04 so that
+#   `actions/checkout` could pass again: the two that actually broke the run
+#   (commit fd269de1) and the nine that were next over the old debt line (commit
+#   46079fcc). None of the eleven names below is a tracked path any more - they are
+#   recorded here as the former spelling of the file that now sits beside them, so
+#   a reader holding an old citation can find its object. Do not "fix" the old
+#   names out of .scratch/wisp/probes/** or docs/evidence/s1/**: those files are
+#   readings taken at a moment, and rewriting a reading is how a record stops
+#   being evidence. Verify the pairs with:
+#     git show --name-status -M --format= fd269de1
+#     git show --name-status -M --format= 46079fcc
+#   broke run 37158259050, former -> now:
+#     .scratch/wisp/issues/256-resident-leg-cannot-read-those-risk-config-keys-because-approval-new-is-built-before-the-session-ledger-with-grants-nil-so-move-it-into-assembleruntime-deferred-until-confirming-is-measured.md
+#       -> .scratch/wisp/issues/256-resident-gate-built-before-session-grants.md
+#     .scratch/wisp/issues/257-on-a-clean-machine-all-seven-panel-settings-fields-are-unwritable-because-the-default-provider-registry-is-nil-while-the-write-side-requires-an-existing-row-and-no-roster-field-can-create-one.md
+#       -> .scratch/wisp/issues/257-clean-machine-provider-registry-nil-blocks-writes.md
+#   nine more past the old debt line, former -> now (all in 46079fcc):
+#     .scratch/wisp/issues/149-the-corrupt-leg-of-the-offset-field-has-zero-teeth-the-new-comment-claims-a-sufficient-condition-with-counterexamples-and-the-exited-branch-drops-the-summary-done.md
+#       -> .scratch/wisp/issues/149-corrupt-offset-leg-zero-teeth-done.md
+#     .scratch/wisp/issues/154-the-close-only-covers-the-loop-task-id-so-host-supplied-task-ids-still-have-no-owner-and-concurrent-tasks-have-zero-readings-reserved-with-a-trigger-gate-done.md
+#       -> .scratch/wisp/issues/154-close-covers-loop-task-id-only-done.md
+#     .scratch/wisp/issues/176-there-is-no-spawner-runasync-has-zero-production-call-sites-and-taskroster-record-has-zero-writers-so-164-ac4-has-no-object-and-175s-unstamped-path-waits-for-one-writer.md
+#       -> .scratch/wisp/issues/176-no-spawner-zero-production-call-sites.md
+#     .scratch/wisp/issues/177-stamping-external-content-and-letting-the-model-re-read-a-spilled-artifact-are-mutually-exclusive-today-because-the-stub-embeds-the-host-minted-path-and-r4-scans-path-arguments.md
+#       -> .scratch/wisp/issues/177-stamp-vs-model-reread-spill-exclusive.md
+#     .scratch/wisp/issues/183-the-host-minted-pointer-exemption-does-not-hold-on-the-real-cli-so-r4-refuses-the-models-own-reread-and-the-spilled-output-still-cannot-be-read-back-done.md
+#       -> .scratch/wisp/issues/183-host-pointer-exemption-fails-real-cli-done.md
+#     .scratch/wisp/issues/253-panel-inbound-has-three-ruler-holes-reachability-nail-only-recognizes-postmessage-config-methods-fall-outside-both-rosters-and-the-legacy-envelope-resolves-null-with-zero-audit.md
+#       -> .scratch/wisp/issues/253-panel-inbound-three-ruler-holes.md
+#     .scratch/wisp/issues/254-the-new-fifth-tier-winsec-has-no-caller-in-ci-so-the-fresh-guard-c-never-fires-unless-winsec-tests-sh-switches-to-scope-or-explicit-paths-are-proven-audited-done.md
+#       -> .scratch/wisp/issues/254-fifth-tier-winsec-no-ci-caller-done.md
+#     .scratch/wisp/issues/259-the-grant-binding-layer-is-an-identity-in-production-code-because-spend-is-fed-the-items-own-stored-digest-while-panelapi-and-panelitem-have-capability-side-ruler-holes.md
+#       -> .scratch/wisp/issues/259-grant-binding-identity-ruler-holes.md
+#     .scratch/wisp/issues/260-the-configured-cancel-hotkey-never-registers-on-any-path-because-the-idle-pass-skips-the-slot-by-design-and-the-borrow-pass-hardcodes-bare-esc-while-a-lost-borrow-is-zero-symptom.md
+#       -> .scratch/wisp/issues/260-configured-cancel-hotkey-never-registers.md
 
 usage() {
     cat <<'EOF'
