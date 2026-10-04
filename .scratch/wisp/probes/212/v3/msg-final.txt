@@ -1,0 +1,10 @@
+212-v3 满稿：①-⑦ 判语正文齐（十发种删正控＋两发成对突变＋真仓同语义普查＋四枚 file:line 打开对）
+
+- 格1 成立：AC#4 正控有牙（种⇒rc=1 逐字红句／删⇒rc=0／造出被引件⇒静默＝存在性驱动）；`f.Comments` 只读为真（S1 字符串字面量不响、S2 块注释响），但不做瞎 AC#4，被它做瞎的是"扩射程到 tools/**"那一格（S4＋旧 212-citation-ruler 只在 :375/:378 两枚字符串里）。
+- 格2 带条件成立：P1 全拼必红／P2 带 `...` 静默双向齐；造出五形"谎报伪装成缩写"（尾 `…`／尾 `*`／CJK 粘连／**markdown 加粗 `**path**`**／"等等"式尾 `...`）全静默，边界三枚（无标记／换行／标记前空格）全红；真仓现量 RING=0／EXEMPT=1（`cmd/wisp/panel_host_windows.go:29` 是真缩写）⇒ 活体仍 0，不收窄那道不被推翻。
+- 格3 成立：非别名（两份字面量各读各的）；我自己的刀动 `shorthandRegionRe` ⇒ `scan_test.go:2441` 指名第二臂 FAIL，同树 self-test 仍 40/40；钉在门禁与 CI 的 positive control 步里真执行（gate 档 `--- PASS` 第 224 行）。
+- 格4 成立：八枚逐名＝编排者 10:40 与腿终值逐字相同；`internal/` +1 真身 `hotkey_cancel_borrow_expect_260r2_test.go`（`e3e19e8e`，⚠ 具名更正腿猜错的 `hotkey_live_test.go`＝M 不是 A）、`cmd/` +1 真身 `resident_approval_risk_256_windows_test.go`（`2a10134e`）；ls-tree 与门禁的 99/98 口径差＝`cmd/wisp/testdata/esclistener/main.go` 被 SkipDir。
+- 格5 成立：`gate.go:12-13`（两枚）／`panel_pump.go:44-46`（四枚＋"a copy, not a judgement"）／`approval.go:72-88`（四枚在 :81/:82/:83/:85）逐枚打开对全中，无新幻影；非注释改动行数＝0（main.go 与 pending_read.go 各 0 行）。
+- 格6 成立：m1 摘豁免 ⇒ `4 direction(s) failed, 36/40 passed`，三枚新样本各响在自己钉的那一形、token 互不重叠 ⇒ 无装饰。
+- 自证：md5 四枚全等起手、`git diff -- tools/d22scan internal/agent/approval/pending_read.go` 空 md5；AC 框 5 勾 0 未勾未碰；票面未碰；具名两处新账（臂编号与 SHAPE 标签错位一格、读数时刻性）。
+- 结论：票 212 够格改 `-done`（AC#4 未被本程推翻）。
