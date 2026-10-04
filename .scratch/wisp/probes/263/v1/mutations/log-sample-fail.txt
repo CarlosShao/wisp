@@ -1,0 +1,23 @@
+=== MUTATION sample-fail rc=1 ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 24%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263v1: started pid=23876 args=[slo -state Sleeping -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-sample-fail\state-Sleeping.json]
+probe263v1: exiting
+slo-check.ps1: state Sleeping exit=1 pass=False
+slo-check.ps1: sampling state Warm for 1s
+probe263v1: started pid=31624 args=[slo -state Warm -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-sample-fail\state-Warm.json]
+probe263v1: exiting
+slo-check.ps1: state Warm exit=1 pass=False
+slo-check.ps1: settle check (10s window)
+probe263v1: started pid=28504 args=[slo -settle -seconds 10 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-sample-fail\settle.json]
+probe263v1: exiting
+slo-check.ps1: settle exit=1 pass=False
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263v1: started pid=21252 args=[slo -state Sleeping -leak -seconds 2 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-sample-fail\leak.json]
+probe263v1: exiting
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-sample-fail\slo-report.json (all_pass=False)
+

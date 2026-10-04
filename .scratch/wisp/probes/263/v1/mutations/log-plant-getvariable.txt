@@ -1,0 +1,22 @@
+=== MUTATION plant-getvariable rc=1 ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: clearing 1 stale report file(s) from D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-plant-getvariable
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 24%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263v1: started pid=9368 args=[slo -state Sleeping -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-plant-getvariable\state-Sleeping.json]
+probe263v1: exiting
+probe263v1: started pid=31988 args=[slo -state Sleeping -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-plant-getvariable\state-Sleeping.json]
+probe263v1: exiting
+
+--- stderr ---
+Get-Variable : Cannot find a variable with the name 'LASTEXITCODE'.
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\slo-check-plant-getvariable.ps1:540 char
+:14
++     $code = (Get-Variable -Name 'LASTEXITCODE' -ValueOnly)
++              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (LASTEXITCODE:String) [Get-Variable], ItemNotFoundException
+    + FullyQualifiedErrorId : VariableNotFound,Microsoft.PowerShell.Commands.GetVariableCommand
+ 
+

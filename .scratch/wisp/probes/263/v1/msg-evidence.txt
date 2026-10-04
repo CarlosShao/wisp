@@ -1,0 +1,34 @@
+263-v1 交件：验收表九节写满（占位尺 0 命中）＋七格判语齐
+
+- AC#1 根因链三验齐：build.ps1:115 那枚 -H=windowsgui（git log -S 现跑独此一枚＝cc6eaa65＝票 244-r1）；
+  同旗标等价件 PE 头 Subsystem 00000002(GUI) vs 00000003(CUI)（objdump -p，本腿自己 go build 两发）；
+  PowerShell 的 & 不等 GUI 进程＝本腿亲手复现（CUI 2027ms vs GUI 14ms，红句主体逐字同 CI）；
+  再用改前 397 行门本体做子系统差分：GUI 一发即红 rc=1（盘上无 slo-report.json）、
+  CUI 同字节跑完全路径 rc=0 all_pass=True ⇒ 肇因钉在子系统这一枚变量上。
+- 名册本腿独立拉：五枚 commit 里 probes 之外只有 scripts/slo-check.ps1；禁区逐名零命中；
+  internal/observe/thresholds.go 四个锚（工作树/HEAD/82af691d^/c9411a1e）md5 全同；
+  tracked paths +8 归因独立验成立（cb8dcecc 5484 -> befb779c 5492，8 枚全在 probes/263/r1）。
+- AC#2 四条偷懒逐条给尺：catch 名册两版对拉（4 枚原样保留＋3 枚新增，新增一律 exit 1 方向）、
+  Set-StrictMode 逐字未变（:65 -> :82）、exit 名册只多一枚 exit 1（exit 0 零新增）、
+  四个读取点逐处对读且调用运算符 & 由 4 枚变 0 枚 ⇒ 没有哪一档不再向操作系统求值。
+  抓到它一处枚数错：自述"字面出现 1 次"应为 2 行（:241 注释＋:252 模式串），带 sigil 命中＝0。
+- AC#3 三发本腿全部重跑（假件是本人写的 Go 件，⛔ 未引用它的任何读数文件）；
+  tracked md5 跑前跑后同值 8a288306e95fc98c31bdb8386ea6a675，scripts 写面终态真空。
+- ★词面钉八发突变（Python 编排；副本由 HEAD 字节生成、锚不命中即抛）：两枚正控有牙
+  （drop-wait ⇒ 能力钉 read 0；plant-bare ⇒ 词面钉点名 First hit text）；
+  它自陈的三形绕过本腿全部实测通过（Get-Variable 取名／删钉 rc=0 全绿／读取挪去别的文件后
+  CI 那句原形逐字回来而两枚钉都打 ok）。另补两枚它没写的读数：
+  删钉＋删等待那一形门会伪造 exit=0，真正兜住它的是 leak 自检（第三枚牙，本腿量到的）；
+  注释里写这三个词也会把整道门打死（误报方向，响而不骗）。
+  反形并非全绿（10 发 8 红 2 绿）⇒ 这枚判据对这件事是敏感的，只是射程只到本文件文本。
+- AC#5 判"没验证"：未推 79 枚（现跑），本机 12 发全是 smoke/1s×假件，证路的形状不证那两个数；
+  通篇不写"D32 已被 CI 保护"。
+- 卫生两门本腿现跑 rc=0：d22scan clean（ban #8 internal/=503、cmd/=100，较 12:0x 各 +1，
+  归因＝260-r4 新增两枚 Go 测试件，本票零 tracked Go）；path-length VERDICT GREEN
+  （tracked 5509、over-budget/roster/not-in-roster 三格 57/57/0 逐字未变；165 与 (206,217] 未混口径）。
+- ⛔ AC 框一枚未碰（现跑尺：7 未勾／0 已勾）；⛔ 零产码改动；本件不 push。
+- 记我：PS 编排连撞四把尺（stderr 进管道变 NativeCommandError、1>/2> 不落退码、
+  $args 是函数内自动变量、ProcessStartInfo 属性赋值报错）⇒ 改 Python 起-等-取；已写进 §⑨。
+- 入库范围：证据件＋假件源码＋两门读数＋十份突变日志＋两份台件脚本＋改前字节件。
+  ⛔ 不入库：突变副本（防第二份 slo-check）、*.exe、out-* 采样目录——可由 run_mutations_v1.py
+  从 HEAD 字节逐字节重生成。

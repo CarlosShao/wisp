@@ -1,0 +1,17 @@
+=== MUTATION read-in-other-file rc=1 ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 18%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263v1: started pid=24804 args=[slo -state Sleeping -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-read-in-other-file\state-Sleeping.json]
+probe263v1: exiting
+
+--- stderr ---
+D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\slo-check-read-in-other-file.ps1 : The vari
+able '$LASTEXITCODE' cannot be retrieved because it has not been set.
+    + CategoryInfo          : InvalidOperation: (LASTEXITCODE:String) [slo-check-read-in-other-file.ps1], RuntimeExcep 
+   tion
+    + FullyQualifiedErrorId : VariableIsUndefined,slo-check-read-in-other-file.ps1
+ 
+

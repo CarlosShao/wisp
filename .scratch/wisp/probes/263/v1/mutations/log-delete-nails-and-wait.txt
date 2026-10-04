@@ -1,0 +1,21 @@
+=== MUTATION delete-nails-and-wait rc=1 ===
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 15%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263v1: started pid=21068 args=[slo -state Sleeping -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails-and-wait\state-Sleeping.json]
+slo-check.ps1: state Sleeping exit=0 pass=False
+slo-check.ps1: sampling state Warm for 1s
+slo-check.ps1: state Warm exit=0 pass=False
+slo-check.ps1: settle check (10s window)
+probe263v1: started pid=30880 args=[slo -state Warm -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails-and-wait\state-Warm.json]
+slo-check.ps1: settle exit=0 pass=False
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263v1: started pid=1344 args=[slo -settle -seconds 10 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails-and-wait\settle.json]
+slo-check.ps1: leak exit=0 flipped_to_fail=False
+slo-check.ps1: FATAL: forced 100MB leak did NOT flip the gate red - the sampler is broken (D22 mode-6: gate must detect)probe263v1: started pid=1844 args=[slo -state Sleeping -leak -seconds 2 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails-and-wait\leak.json]
+
+probe263v1: exiting
+probe263v1: exiting
+probe263v1: exiting
+probe263v1: exiting
+

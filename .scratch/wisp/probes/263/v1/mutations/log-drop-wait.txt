@@ -1,0 +1,6 @@
+=== MUTATION drop-wait rc=1 ===
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: INSTRUMENT BROKEN: exit-code instrument: asked the shell to exit 7 and read 0; the start-wait-read path is broken (ticket 263)
+slo-check.ps1: INSTRUMENT BROKEN: no D32 number was produced by this run and none may be read from it.
+slo-check.ps1: INSTRUMENT BROKEN: record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-drop-wait\slo-instrument-broken.json (NOT a report; slo-report.json is not written on this path)
+

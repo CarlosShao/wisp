@@ -1,0 +1,21 @@
+=== MUTATION delete-nails rc=0 ===
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 22%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263v1: started pid=8740 args=[slo -state Sleeping -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails\state-Sleeping.json]
+probe263v1: exiting
+slo-check.ps1: state Sleeping exit=0 pass=True
+slo-check.ps1: sampling state Warm for 1s
+probe263v1: started pid=21216 args=[slo -state Warm -seconds 1 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails\state-Warm.json]
+probe263v1: exiting
+slo-check.ps1: state Warm exit=0 pass=True
+slo-check.ps1: settle check (10s window)
+probe263v1: started pid=29420 args=[slo -settle -seconds 10 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails\settle.json]
+probe263v1: exiting
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263v1: started pid=22604 args=[slo -state Sleeping -leak -seconds 2 -interval-ms 250 -out D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails\leak.json]
+probe263v1: exiting
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-delete-nails\slo-report.json (all_pass=True)
+

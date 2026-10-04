@@ -1,0 +1,5 @@
+=== MUTATION plant-in-comment rc=1 ===
+slo-check.ps1: INSTRUMENT BROKEN: shape nail: 1 direct read(s) of the automatic exit-code variable in D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\slo-check-plant-in-comment.ps1; every exit code must come from Invoke-ExternalProgram, which waits (ticket 263). First hit text: $LASTEXITCODE
+slo-check.ps1: INSTRUMENT BROKEN: no D32 number was produced by this run and none may be read from it.
+slo-check.ps1: INSTRUMENT BROKEN: record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\v1\mutations\out-plant-in-comment\slo-instrument-broken.json (NOT a report; slo-report.json is not written on this path)
+
