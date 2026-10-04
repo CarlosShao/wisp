@@ -106,8 +106,12 @@
 
 （本节答：⛔ 不许用"应该没问题"填空。每一格给：判到哪一步就停了、归口哪张票／哪枚编排者面。）
 
-- 7.1 第三枚过期注释 `internal/agent/approval/approval_always.go:165`（不在本腿写面）：**未判**
-- 7.2 其余：**未判**
+- 7.1 第三枚过期注释 `internal/agent/approval/approval_always.go:165`（不在本腿写面）：**未动，具名归口**。本腿写面＝`cmd/wisp/**` 四枚＋证据件；`internal/agent/approval/**` 零改动（复证＝§8.1 numstat 名册无它）。A601 §5 已裁它"具名留给 `265-r1` 停手上报，⛔ 不许自行扩包"——本腿照办：该注释与已修的两枚同源（"this process links no WebView2 host" 在票 33 落地后不成立），但修它要扩包进 `internal/agent/approval`，归口＝**编排者下一枚允许触 `internal/agent/approval` 的腿**（或随票 224/256 那条线的下一程）。现状仍误导，这一格本腿判不动。
+- 7.2 其余：
+  - **`TestAC1ResidentLegInstallsItsLogListenerOnDisk` 偶发红**（票 127 钉件，`3edc11d4` 后未再触、与本腿零 diff 关联）：**量到的形状**＝四发全量复跑里出现两次（20:22:58 一次；另一次 count=3 内），失败句逐字 `the child never reached the event loop, so the disk read above proves little.`（`resident_sink_nail_127_windows_test.go:497-499`）。**根因判读**：该断言**不 poll**——同件相邻用例 `:530` 先 `pollUntil127(20, …stdout.has(residentReachedLoop))` 再断，而 `:497` 直接读捕获缓冲；子进程 stdout 异步写、`leg.stop()` 刚过后的 stdout 里 "resident event loop running" 可能尚未进缓冲 ⇒ 竞态在读侧不在产码。**隔离复量**：单跑 `-run` 该名 ×4 全绿（4.07s/4.91s/5.76s/6.25s）；`-count=3` 复量两次＝一次 FAIL（同一句）、一次 PASS——**仅在全量长跑（机器带载）下偶发**，与票 260 那族"带载时序"同形。**归口**：判据侧竞态，属票 127/246-r2 那条线的账（非实现方本腿可修：改该钉要动 `cmd/wisp` 判据件但其归属非本票）；⛔ 本腿不修不 Skip，具名上报编排者。
+  - **`TestTicket223HandEditedFsLooseningCostsAnL2Card`**（第一次全量 20:13:44 红）与 **`TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink`**（第三次全量 20:18:00 红）：各自 `-count=3` 安静复量＝**全绿**（20:13:58／20:18:49），且后续全量不再复现（第四次红的是上一行那枚、第五次全绿）＝同族带载偶发，不判产物码缺陷，归口同上（CI 若复现，按"先 -count=3 复量再判"纪律处理）。
+  - **`go test -race`／`-shuffle`**：没跑（本腿门禁清单外；四发突变已占约 40 分钟包内取数）。真想做归属票 265 后续验收腿。
+  - **真双击进程的 U9 尺**（真起一发常驻进程看 GRANT-DROPPED 的去向）：票面 AC#1 已具名"唯一能证伪的尺＝U9，归 ⓐ 落地腿凭据档"——本腿**没跑**：它与 `winlive` 同级（真起进程真举卡），机主未批真开窗，⛔ 不越。归口＝编排者决定要不要单派一枚带批准的测量腿。
 
 ## 8. 污染面自证与提交名册
 
