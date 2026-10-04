@@ -333,7 +333,7 @@ d22scan -self-test: 4 direction(s) failed, 36/40 passed - the gate does not see 
 - **(c) 没有变成新幻影**：`ls -l docs/evidence/s1/212-comments-phantom-citation-v2.md`＝**33,578 字节、mtime Oct 4 09:57**，复认编排者③；`grep -rn "212-citation-ruler" --include=*.go cmd internal tools` 只命中 `selftestsamples.go:381` 的 **`note:` 串**（那一句自己写明"该件从未存在"＝历史说明，不是路标），**产码注释零命中**⇒ 复认编排者④。
 - **行为零变化这一条我另有一把更硬的尺**：`git show d03d166f -- tools/d22scan/main.go` 与 `-- internal/agent/approval/pending_read.go` 的**全部改动行都是注释行**（`grep -E '^[+-]' | grep -v '^[+-][[:space:]]*//'` 两枚文件各 **0 行**，档 `logs/diff-main-noncomment.txt`／`logs/diff-pendingread-noncomment.txt`）；`scan_test.go` 那一枚 hunk **86 增 0 删**（未放宽、未删除任何既有断言）；`selftestsamples.go` 删除行只有 3 枚，逐枚都是 (c) 那一句的 `src`／`summary`／`note`。⇒ 腿自述"行为零变化"**成立**，且比它自己给的 `--numstat` 版更强。
 
-### ⑨.2 判不动／没跑到的地方（具名＋归口，⛔ 不写"应该没问题"）
+### ⑨.2 判不动／没跑到的地方（具名＋归口，⛔ 不许用自我安慰句充数）
 
 | 枚 | 判不动的东西 | 为什么本程判不了／没跑到 | 归口 |
 |---|---|---|---|
