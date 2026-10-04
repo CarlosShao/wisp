@@ -166,4 +166,6 @@ resident_hotkey_258_windows_test.go:240: a verbatim-defaults [hotkey] section an
 - 09:1x 变异①实跑红 4 条（§4 逐字）→ 还原绿；`-run Test258` 11 枚 rc=0。
 - 09:19 门禁：`go build ./...` rc=0（档 build-full.txt）；`go vet -tags winlive` rc=0；d22scan clean。
 - 09:2x 终跑整包 293/1/0（唯一红＝基线同款 C18 间歇，solo 复跑 PASS）；代码腿 commit `cbece45e`（六枚文件）。
-- 09:3x 本件终态＋读数档随证据 commit。
+- 09:3x 本件终态＋读数档随证据 commit `c74ab57e`（九枚档，显式 pathspec，warning 仅 autocrlf 换行提示）。
+  本腿 commit 链：骨架 `4d8763b5` → 代码 `cbece45e`（六枚 cmd/wisp 文件）→ 证据终态 `c74ab57e`；
+  最后一枚 census 收尾行 commit 只增这一行，链尾＝见 git log。未 push。
