@@ -50,32 +50,46 @@ type settingsField struct {
 
 func writableRosterWalk() []settingsField {
 	return []settingsField{
-		{"provider_base_url", "Manager.SetProviderBaseURL",
+		{
+			"provider_base_url", "Manager.SetProviderBaseURL",
 			func(m *Manager) ([]string, error) {
 				return m.SetProviderBaseURL(cleanProvider, "https://clean-machine.example.invalid/v1")
-			}},
-		{"provider_api_key_ref", "Manager.SetProviderAPIKeyRef",
+			},
+		},
+		{
+			"provider_api_key_ref", "Manager.SetProviderAPIKeyRef",
 			func(m *Manager) ([]string, error) {
 				return m.SetProviderAPIKeyRef(cleanProvider, "env:T257_R1_ENV_NAME")
-			}},
-		{"model_context_window", "Manager.SetModelContextWindow",
+			},
+		},
+		{
+			"model_context_window", "Manager.SetModelContextWindow",
 			func(m *Manager) ([]string, error) {
 				return m.SetModelContextWindow(cleanProvider, cleanModel, 128000)
-			}},
-		{"model_price_in", "Manager.SetModelPriceIn",
+			},
+		},
+		{
+			"model_price_in", "Manager.SetModelPriceIn",
 			func(m *Manager) ([]string, error) {
 				return m.SetModelPriceIn(cleanProvider, cleanModel, 3500000)
-			}},
-		{"model_price_out", "Manager.SetModelPriceOut",
+			},
+		},
+		{
+			"model_price_out", "Manager.SetModelPriceOut",
 			func(m *Manager) ([]string, error) {
 				return m.SetModelPriceOut(cleanProvider, cleanModel, 12000000)
-			}},
-		{"role_chat_model", "Manager.SetRoleChatModel",
-			func(m *Manager) ([]string, error) { return m.SetRoleChatModel(secondModel) }},
-		{"provider_credential", "Manager.SetProviderAPIKeyRef (StoreCredential's config-side leg)",
+			},
+		},
+		{
+			"role_chat_model", "Manager.SetRoleChatModel",
+			func(m *Manager) ([]string, error) { return m.SetRoleChatModel(secondModel) },
+		},
+		{
+			"provider_credential", "Manager.SetProviderAPIKeyRef (StoreCredential's config-side leg)",
 			func(m *Manager) ([]string, error) {
 				return m.SetProviderAPIKeyRef(cleanProvider, "dpapi:t257r1canaryblob01")
-			}},
+			},
+		},
 	}
 }
 
