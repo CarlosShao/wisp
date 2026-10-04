@@ -1,0 +1,99 @@
+# 260-r5 mutation rig, started 2026-10-04 14:33:01 +0800
+start: md5(working ball_windows.go)=2488b2ac692c99ae4e3b4831526637d7
+start: md5(HEAD blob copy)          =2488b2ac692c99ae4e3b4831526637d7  head_blob=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\260\r5\logs\ball_windows.go.head-blob
+start: matches_start=True (working tree must equal HEAD before any mutation)
+
+== M1-drop-receipt-write applied at 2026-10-04 14:33:01 +0800
+   md5(mutated)=51d4024f927c55a84565dee91039cac1 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M1-drop-receipt-write-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M2-canned-error-receipt applied at 2026-10-04 14:33:03 +0800
+   md5(mutated)=7d589ce44f3a7978c7d9e15fb01ef288 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M2-canned-error-receipt-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M2b-canned-default-key-line applied at 2026-10-04 14:33:04 +0800
+   md5(mutated)=84756d8564da27a9db6e77ee8f88c16e matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M2b-canned-default-key-line-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M3-no-return-after-refusal applied at 2026-10-04 14:33:06 +0800
+   md5(mutated)=41ccbf322f6792307aa8e2858a6bf104 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M3-no-return-after-refusal-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== restored control run (no mutation in the file) at 2026-10-04 14:33:07 +0800
+   go test rc=1 (rc=1 is the known environment red TestC21TableColourRowsMatchTokensCSS) reading=.scratch\wisp\probes\260\r5\logs\mutation-restored-go-test-v.txt
+
+FINAL md5(working ball_windows.go)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+   M1-drop-receipt-write: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M2-canned-error-receipt: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M2b-canned-default-key-line: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M3-no-return-after-refusal: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+# 260-r5 mutation rig, started 2026-10-04 14:40:00 +0800
+start: md5(working ball_windows.go)=2488b2ac692c99ae4e3b4831526637d7
+start: md5(HEAD blob copy)          =2488b2ac692c99ae4e3b4831526637d7  head_blob=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\260\r5\logs\ball_windows.go.head-blob
+start: matches_start=True (working tree must equal HEAD before any mutation)
+
+== M1-drop-receipt-write applied at 2026-10-04 14:40:00 +0800
+   md5(mutated)=51d4024f927c55a84565dee91039cac1 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M1-drop-receipt-write-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M2-canned-error-receipt applied at 2026-10-04 14:40:02 +0800
+   md5(mutated)=7d589ce44f3a7978c7d9e15fb01ef288 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M2-canned-error-receipt-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M2b-canned-default-key-line applied at 2026-10-04 14:40:03 +0800
+   md5(mutated)=84756d8564da27a9db6e77ee8f88c16e matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M2b-canned-default-key-line-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M3-no-return-after-refusal applied at 2026-10-04 14:40:05 +0800
+   md5(mutated)=41ccbf322f6792307aa8e2858a6bf104 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M3-no-return-after-refusal-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== restored control run (no mutation in the file) at 2026-10-04 14:40:06 +0800
+   go test rc=1 (rc=1 is the known environment red TestC21TableColourRowsMatchTokensCSS) reading=.scratch\wisp\probes\260\r5\logs\mutation-restored-go-test-v.txt
+
+FINAL md5(working ball_windows.go)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+   M1-drop-receipt-write: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M2-canned-error-receipt: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M2b-canned-default-key-line: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M3-no-return-after-refusal: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+# 260-r5 mutation rig, started 2026-10-04 14:44:22 +0800
+start: md5(working ball_windows.go)=2488b2ac692c99ae4e3b4831526637d7
+start: md5(HEAD blob copy)          =2488b2ac692c99ae4e3b4831526637d7  head_blob=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\260\r5\logs\ball_windows.go.head-blob
+start: matches_start=True (working tree must equal HEAD before any mutation)
+
+== M1-drop-receipt-write applied at 2026-10-04 14:44:23 +0800
+   md5(mutated)=51d4024f927c55a84565dee91039cac1 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M1-drop-receipt-write-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M2-canned-error-receipt applied at 2026-10-04 14:44:24 +0800
+   md5(mutated)=7d589ce44f3a7978c7d9e15fb01ef288 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M2-canned-error-receipt-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M2b-canned-default-key-line applied at 2026-10-04 14:44:26 +0800
+   md5(mutated)=84756d8564da27a9db6e77ee8f88c16e matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M2b-canned-default-key-line-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M3-no-return-after-refusal applied at 2026-10-04 14:44:27 +0800
+   md5(mutated)=41ccbf322f6792307aa8e2858a6bf104 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  reading=.scratch\wisp\probes\260\r5\logs\mutation-M3-no-return-after-refusal-go-test-v.txt
+   md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== restored control run (no mutation in the file) at 2026-10-04 14:44:29 +0800
+   go test rc=1 (rc=1 is the known environment red TestC21TableColourRowsMatchTokensCSS) reading=.scratch\wisp\probes\260\r5\logs\mutation-restored-go-test-v.txt
+
+FINAL md5(working ball_windows.go)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+   M1-drop-receipt-write: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M2-canned-error-receipt: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M2b-canned-default-key-line: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M3-no-return-after-refusal: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1

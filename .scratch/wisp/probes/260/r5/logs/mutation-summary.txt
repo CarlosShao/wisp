@@ -1,0 +1,62 @@
+# 260-r5 mutation summary, generated 2026-10-04 14:48:15 +0800
+# each run is the FULL package: go test -count=1 -v ./internal/ball/
+
+######## mutation=M1-drop-receipt-write
+-- FAIL names:
+--- FAIL: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+-- 260r5 red/log lines:
+hotkey_borrow_refused_260r5_test.go:283: the cancel line carries no error ({Name:cancel ID:3 Binding:Ctrl+Alt+F9 Status:not bound while idle (cancel is borrowed only during Confirming) Acc:{Mods:0 VK:0} Err:<nil> Note:}): the rig never met a refusal
+hotkey_borrow_refused_260r5_test.go:325: problem lines after a borrow Win32 refused = 0 ([]), want the 1 that says so: the seed said [], and the write at ball_windows.go:895 is the only thing between the two
+-- my three cases' verdicts:
+--- FAIL: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- PASS: TestRefusedBorrowIsNotAStandingAnnouncement260r5 (0.00s)
+
+######## mutation=M2-canned-error-receipt
+-- FAIL names:
+--- FAIL: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+-- 260r5 red/log lines:
+hotkey_borrow_refused_260r5_test.go:287: the cancel line carries 260-r5 M2: a canned refusal this file invented (*errors.errorString), want Win32 1400 ERROR_INVALID_WINDOW_HANDLE - the error the receipt prints has to be the one user32 set
+hotkey_borrow_refused_260r5_test.go:347: the cancel line names 260-r5 M2: a canned refusal this file invented, want the errno user32 set (1400): the receipt must print the real refusal and not a value this file could have written itself
+-- my three cases' verdicts:
+--- FAIL: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- PASS: TestRefusedBorrowIsNotAStandingAnnouncement260r5 (0.00s)
+
+######## mutation=M2b-canned-default-key-line
+-- FAIL names:
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+-- 260r5 red/log lines:
+hotkey_borrow_refused_260r5_test.go:335: the refused-borrow line does not say "Ctrl+Alt+F9"; it reads: hotkey cancel = "Esc" was not registered: Invalid window handle.
+hotkey_borrow_refused_260r5_test.go:357: the refused borrow reports "Esc" / {Mods:16384 VK:27}, want "Ctrl+Alt+F9" / {Mods:16387 VK:120} - the line names a key that was not the one attempted
+-- my three cases' verdicts:
+--- PASS: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- PASS: TestRefusedBorrowIsNotAStandingAnnouncement260r5 (0.00s)
+
+######## mutation=M3-no-return-after-refusal
+-- FAIL names:
+--- FAIL: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+-- 260r5 red/log lines:
+hotkey_borrow_refused_260r5_test.go:273: the ball ends the borrow claiming the cancel key is its own (escTakenOver=true) on a handle IsWindow calls invalid: either Win32 really lent it (release rc=0 on the NULL door) or the wiring reports a key it never got, which is the fall-through door at ball_windows.go:897. Neither leaves this case judging a refusal
+hotkey_borrow_refused_260r5_test.go:308: the rig did not reach a refused borrow (IsWindow=0 entered=true the-ball-claims-the-key=true): either the plant stopped being a refusal or the wiring claims a key Win32 refused - in both readings the receipt below would be judging a fixture and not ball_windows.go:895
+-- my three cases' verdicts:
+--- FAIL: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- PASS: TestRefusedBorrowIsNotAStandingAnnouncement260r5 (0.00s)
+
+######## mutation=restored
+-- FAIL names:
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+-- 260r5 red/log lines:
+-- my three cases' verdicts:
+--- PASS: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+--- PASS: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+--- PASS: TestRefusedBorrowIsNotAStandingAnnouncement260r5 (0.00s)
