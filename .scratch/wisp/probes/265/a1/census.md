@@ -171,17 +171,83 @@
 ⇒ 这一枚是"可见性缺"的**反向形**：不是"没话说"，是**说了一句做不到的话**，且它由 `err == nil` 那一路自然产出、没有一枚尺在钉它（`ticket224_assembly_test.go:198` 只断"这句里含 corr"，不断含"不再重复提问"）。
 ⚠ **它归 ⓑ 的射程（票面 ⓑ＝"说到明处"），但它把 ⓑ 的语义翻了一面：ⓑ 不是"补一句真话"，是"改一句已经在说的假话"。** 本腿不裁形，只把这枚摆上台。〔仅读码，未跑〕
 
-## 3. 三形代价表（⛔ 本腿不裁形，只摆料）
+## 3. 三形代价表（⛔ 本腿不裁形，只把料摆齐）
+
+### 3.0 三形共同的前置：两条腿的形状差别（先摆这一格，不然三形的"作用面"读不准）
+
+常驻进程今天有**两形**，三形各自的代价在这两形里完全不同：
+
+| 形状 | 触发条件（产码 `file:line`） | 门在不在 | ledger 在不在 | 有没有答复入口 | 有没有卡片 |
+|---|---|---|---|---|---|
+| **带控制台**（终端里跑 `wisp.exe` 无参） | `resident_windows.go:132` 建门 → `:260` → `resident_task_source_windows.go:218` 拿到 stdin → `:265 assembleRuntime` | 在（`ra.gate`） | **在**（`run.go:473→478→487` 在这一发里真跑了） | **在**（`runConsoleLoop` 的 `session` 动词） | 有（L1 窗口／L2 队列卡） |
+| **双击／Explorer**（D2／票 228 那个"用户真正启动的进程"形状） | `resident_task_source_windows.go:224-230 return nil`（`interactiveStdin()`＝nil，`approval_reply_stdin_windows.go:41-52`） | 在（`ra.gate`） | **根本不存在** | **不存在**（`src.surface == nil`，`:287-290` 那条件不成立） | **不存在**——`assembleRuntime` 没跑，没有桥、没有任务；`AskOnTaskRoot` 产码调用者 0 枚（尺 R38） |
+
+⇒ **三形都必须对着这两形各读一遍**：ⓐ 只能修上面那一行，ⓑ 只能让上面那一行的用户看见，ⓒ 两行一起登记。下面每形都按这两形分档写。
 
 ### 3.1 ⓐ 接上（常驻腿建门时也把会话记账递进去）
-（本节答：最小写面**逐枚具名文件**；必须先解冻什么／谁的写面在撞；会撞到的既有钉（含 256-r1 那枚"断 Grants 不在场"的语法树钉）；
- 改了什么形状之后用户看得见什么。）
 
-### 3.2 ⓑ 不接，但说到明处（把"只到本次为止"做到用户看得见）
-（本节答：同上四栏，另加**文案射程**——票 260 那批文案钉逐枚列，判哪一枚盖得到要写的句子。）
+**最小写面（逐枚具名；本腿按"能不改 `internal/agent/approval` 一字"那一支摆，另一支单列）**
+
+形 ⓐ-Ⅰ（**晚绑定 holder，`GrantRecorder` 由 `cmd/wisp` 自己实现**；尺＝`gate.go:66-68` 那个接口只有 `Record` 一个方法，任何包都能实现）：
+1. `cmd/wisp/resident_approval_windows.go` —— 新增一枚 holder 类型（或就近一个小 struct）＋ `:219-225` 字面量里加 `Grants:`（实传 5 枚 → 6 枚）；`:185-192` 那段"WHAT THIS DELIBERATELY DOES NOT CLOSE"必须同步改写。
+2. `cmd/wisp/resident_task_source_windows.go` —— 在 `:281 src.run = run` 之后、`:321 submitTask` 之前，把 `run.session` 绑进那枚 holder。
+3. `cmd/wisp/resident_approval_risk_256_windows_test.go` —— ④ 那枚 AST 钉的期望集（`:445 want` 5 枚→6 枚、`:452` 那句"Grants 不许在场"必须搬家）。**⚠ 这一枚不是本票写面，动它＝改票 256 的判据面。**
+⇒ 共 **3 枚文件**（2 枚产码＋1 枚测试），`internal/agent/approval` **零改动**，`cmd/wisp/run.go` **零改动**（这是它比 ⓐ-Ⅱ 值钱的地方，见 N#12）。
+
+形 ⓐ-Ⅱ（**晚绑定入口开在 approval 包里**，即 256-a2 §0 说的"新造一枚 holder 类型"落在 `internal/agent/approval`）：
+1. `internal/agent/approval/gate.go`（新增 setter／holder 类型 ⇒ `g.grants` 从"唯一写点＝构造期"变成两处写点，⚠ 那要重读 `gate.go:86-88` 那句"No method on Gate reads it back"是否仍成立）
+2. `internal/agent/approval/fakes_test.go:250-279`（`newGate` 逐字段拷贝表，见 N#15）
+3. `cmd/wisp/resident_approval_windows.go` ＋ 4. `cmd/wisp/resident_task_source_windows.go` ＋ 5. 256 那枚 AST 钉
+⇒ **5 枚**，且新增两枚包内仪器（setter 的正／反控）。
+
+形 ⓐ-Ⅲ（**第二枚 mint**，256-a2 §0 的 (a)）：
+1. `cmd/wisp/resident_windows.go`（在 `:132` 之前开 `memory.Open` ＋ `session.Mint` ＋ `NewLedger`）
+2. `cmd/wisp/resident_approval_windows.go`
+3. `cmd/wisp/run.go` —— **要么让它复用那枚 ledger，要么任它再铸一枚**
+⇒ 枚数看着少，**但它带着两枚硬伤**（本腿只摆不裁）：
+- **gate 写 id-A／bridge 读 id-B 的错配**：`grantWrite` 走 `resident_windows.go:132` 那枚 mint，`grantRead` 走 `run.go:478` 那枚——两张 `approval_grant` 行键在 A、`tools/grant.go:65` 那侧查的是 B。⇒ 净结果不是 fail-closed 而是**"记了，但没人查得到"**，审计还会逐字打印 `GRANT-RECORDED ... grant_id=N`（`gate.go:693`）——**那是比 `GRANT-DROPPED` 更响的一句假话**。这一条直接对上票 265 AC#1 三档里的**"记到了别的会话"**。〔仅读码，未跑〕
+- 同进程第二枚 store 句柄（`run.go:450 memory.Open` 之外再开一枚），D38(e) 第 7 步的关闭归属（`resident_task_source_windows.go:478-497` 只关 `src.run`）要重答。
+
+**必须先解冻什么（三形共用现量）**
+- `git status --porcelain -- cmd internal` 本腿取数＝**`M cmd/wisp/resident_approval_windows.go`（唯一一枚脏文件，`260-v1` 的突变体）**。⇒ 三形落地前都要等它变干净。
+- ⛔ **`cmd/wisp/**` 与 `internal/agent/approval/**` 此刻在 `260-v1` 的取数射程内**（它要在这两个包跑定向 `go test` 与突变）；票 265 §排程逐字"同包一律串行，不接受'改的是不同文件'这种推理"。⇒ **ⓐ 三形今天一枚都不能开工**，且 ⓐ-Ⅱ 还多撞 `internal/agent/approval`（同在其射程）。
+- ⓐ-Ⅲ 额外要**具名解冻 `cmd/wisp/run.go`**——票 256 §8.2 硬边界②那句"本轮不许碰 run.go"虽是为 `256-r1` 写的，但 P7 那枚钉（N#12）是事实约束、不因换票而失效：**动 `run.go:424` 以后的行 = 四处 evidence drift 必红**，而那枚名册归票 255／248 AC#8，不在本票写面。
+- 256 那枚 AST 钉（N#4）的期望集搬家＝**改票 256 的判据**，须编排者落一枚具名 `A##`。
+
+**用户看得见什么（ⓐ-Ⅰ／Ⅱ）**：带控制台那一形——他答一次「本会话内允许」，同一发进程里那条路径后续的 L1 询问**不再重复问**（`GRANT-DROPPED` 那行也不再出现）。双击那一形——**他什么都看不见，也什么都没变**（那一形根本没有卡片和答复入口，见 §3.0）。
+
+### 3.2 ⓑ 不接，但说到明处
+
+**★ 本腿量到的前置事实（决定 ⓑ 到底能落在哪儿）：常驻腿上今天没有任何"文字面"可写。** 逐枚尺：
+- 球画的是状态与图标，**没有一行字**：`internal/ball/statevisual.go:177-184` 的 `Confirming`／`AwaitingApproval` 只填 `RingColor`／`RingPulse`／`BadgeCount`；唯一会画字的 `renderer_windows.go:493`（`BadgeCount` 的数字）与 `:508-510`（`BadgeText`）——`SetBadge`／`SetBadgeText` 的**产码调用者只有 `cmd/balldebug/main.go`**（尺 R91/R92），常驻腿零调用。
+- 托盘 tooltip：`internal/ball/ball_windows.go:960-963 SetTrayTip` **产码调用者 0 枚**（尺 R83）；初值是常量 `"Wisp"`（`ball_windows.go:248`）。
+- 托盘菜单：`tray_windows.go:86-91` 四枚项，无审批位（尺 R15）。
+- 面板：常驻进程**确实链了 WebView2 宿主**（`panel_host_windows.go:64` import go-webview2；`resident_windows.go:151/157` 真的建了并起了），**但审批卡的数据过不去**——`run.go:734-736` 的 `rt.ui.publish = rt.publishPanelSnapshot` 只在 `rt.ui != nil` 时装，而注入支 `run.go:607` 明确 `rt.ui = nil`，`:727-733` 那段注释逐字写着"its own UI owns its publishing - which this leg does NOT give it"；快照的 `Out` 是 `rt.bookPanelSnapshot`（`run.go:725`）＝**落 ledger，不是落页面**（`panel_pump.go:12-21` 逐字："There is no Go -> page channel in this tree … the last mile is still open"）。
+  ⚠ **顺带更正三处过期声称**（票 265 AC#0 没问，但本腿读到了就具名报，见 §5.1）：`resident_approval_windows.go:32-33`、`resident_task_source_windows.go:52-53`、`approval_always.go:165` 都写着"this process links no WebView2 host"——**这一句在今天的常驻进程里不成立**（票 33 已落地）；真正成立的是"**没有到页面的通道**"，两件事别混。
+⇒ **净读数：ⓑ 的"说到明处"今天能落的可见面只有 stdout／stderr／`<dataDir>\logs\*.jsonl`**（＋带控制台那一发的终端回执本身）。**双击的 GUI 形状里 ⓑ 落不了任何用户看得见的位置**——那一形没有卡片、没有文字面、也没有能收消息的页面。这一条是本件对 ⓑ 最硬的代价读数：**ⓑ 不是"便宜的降级形"，它在机主真正用的那一形里等于零可见性。**
+
+**最小写面（按能落地的两支）**
+- ⓑ-Ⅰ（改回执，**唯一在带控制台那一形真能看见的一支**）：`cmd/wisp/approval_reply.go:257-282`（`session()` 的成功回执 `:279-281`）＋ 让 `replySurface` 能知道"我这枚门有没有记账位"。⚠ 这一步今天**做不到**：`approval.Gate` 导出的 18 枚方法里没有一枚把 `g.grants` 的有无报出去（尺 R43 名册），`gate.go:86-88` 还逐字钉着"No method on Gate reads it back" ⇒ **ⓑ-Ⅰ 必须新开一枚读面**（I2），或把事实沿构造链传下去（`resident_task_source_windows.go:252-264` 的 `runSpec` 加位 → 撞 N#12 P7）。枚数：**枚不齐**——最小也得起码 `approval_reply.go` ＋ 一枚传递形状（`run.go` 或 `gate.go`），加 1 枚新判据。
+  ⚠ 另有一枚**本腿读码判红的既有形状**：`replySurface` 是 `wisp run` 与常驻腿**共用**的（`approval_reply.go:476 newReplySurface`，两支都调），所以在 `:279` 直接改字＝**同时改掉了 `wisp run` 腿那句真话**（那一腿 `Grants` 有值、承诺是兑现的）。⇒ ⓑ 不是"加一句"，是"给一句分成两形"，而分形需要输入 ⇒ 回到 I2。
+- ⓑ-Ⅱ（改 boot／audit 句子，只对读日志的人可见）：`cmd/wisp/resident_approval_windows.go:229-234`（建门回执那条 `slog.Info`）或 `:589-598 residentStatusLine`。枚数：**1 枚产码＋1 枚判据**，最小。**但它撞两枚零漂移钉**（N#9 逐字比较 `residentStatusLine`、N#10 禁止那几行出现 `Esc`），且**对用户仍然不可见**。
+**必须先解冻**：同 3.1（`cmd/wisp/**` 在 `260-v1` 射程内）；ⓑ-Ⅰ 若走 `gate.go` 读面则连 `internal/agent/approval/**`；ⓑ-Ⅰ 若走 `runSpec` 传位则**必须具名解冻 `cmd/wisp/run.go`＋票 255 名册**。
+**用户看得见什么**：ⓑ-Ⅰ＝带控制台的人会在答复那行看见"这条路上『本会话内允许』只到本次为止"；双击的人**看不见**。ⓑ-Ⅱ＝**没有用户看得见**，只有读日志的人看得见（⛔ 我不许把这一支写成"说到明处"，它写的是"说到日志"）。
 
 ### 3.3 ⓒ 登记成 DEFERRED（五字段）
-（本节答：同上四栏，另加 `SPEC-12 §5` 五字段该填什么形状、1:1 双向对账今天有没有尺、代码标记落哪一行。）
+
+**最小写面（逐枚）**
+1. `docs/specs/SPEC-12-roadmap-governance.md` §5 表加一行（五字段现读表头＝`docs/specs/SPEC-12-roadmap-governance.md:64`：`类型 | 项 | 为什么现在不做（依据） | 完成判据 | 前置 | 当前残缺表现`）。⚠ **`docs/specs/**` 在本腿与本票 AC#2／AC#3 的禁改清单里**（票 256 §禁区、票 265 AC#2 逐字），⇒ ⓒ 落地需要**编排者自己动那一行或具名解冻**，任何产码腿都不许碰。
+2. 产码里的具名标记一枚（最自然的位置＝`cmd/wisp/resident_approval_windows.go:185-192` 那一段旁边）。
+3. 台账 `docs/reports/pending-and-issues.md` 一枚 `A##`（归编排者写）。
+⇒ 产码枚数：**1 枚**（最省的一形）。
+**★ 但本腿量到 ⓒ 的一枚硬撞（不在票面上，必须摆出来）**：`SPEC-12:95-96` 逐字规定代码内标记的形状是
+`// DEFERRED(D-xx): … → docs/DEFERRED.md#锚点`，
+而 **`docs/DEFERRED.md` 在盘上不存在**（尺＝`git ls-files docs | grep -E "DEFERRED|DECISIONS"`＝**空**；AGENTS.md §4 末段也具名说过这批交付物"截至锚点 `4e66817` 在仓里不存在"）。
+`tools/d22scan` 的 **ban #9 phantom-citation**（`main.go:799-873`，尺路径正则 `:890-891` 覆盖 `docs/…` 全拼路径）判的正是"产码注释引一条盘上不存在的仓内路径"⇒
+**照 SPEC-12 那一句写的 ⓒ 标记会被 d22scan 直接判红**（今天仓里 28 处 `DEFERRED(...)` 标记**没有一处**带 `docs/` 引用，尺 R111＝0 命中，所以这枚撞是**新造的**、不是既有的）。
+⇒ ⓒ 的落地形状必须**要么不写 `docs/DEFERRED.md` 那枚锚点、要么先由人工批准建那一枚文件**——这是 D22 闸门③意义上的"未定义即停"，本腿只摆不裁。〔仅读码，未跑——真跑 d22scan 属 U6〕
+**必须先解冻**：`docs/specs/**`（编排者面）＋ `cmd/wisp/resident_approval_windows.go`（`260-v1` 射程，等它变干净）。
+**用户看得见什么**：**没有。** ⓒ 是唯一一形"三形里对用户零变化"的——它的价值全在盘上那行登记与下一任读者能不能查到。⚠ 写这一形给机主交代时不许说"以后会看得见"。
 
 ## 4. 撞钉名册（逐枚：它今天断什么／哪一形会让它翻／翻了算修 bug 还是算改契约）
 
@@ -239,3 +305,11 @@
 ## 7. 本腿自己写错的尺与读数（全数留下，不当笔误藏）
 
 （本节答：本腿跑过的每一枚尺的原样命令与读数存档；写错／重跑／更正的行数逐条登记，⛔ 不删。）
+
+---
+
+## 〔编排者标注 2026-10-04 14:07:13 +0800（＝06:07:13 UTC）〕本腿死在 §7，两件事分开记
+
+- **本腿撞 150 轮上限**（通知逐字：`Reached the maximum turn limit (150)`，168 次工具调用／2,409,128 ms）。盘上终态＝**307 行／47,045 字节、占位尺 0 命中**；§0–§6 正文已写满（`afbeb2c7` 落了 §6，其后 §2.5／§3／§4／§5／§6.3 的增量**未提交**，由我以显式 pathspec 代提保住，⛔ 不改它一字）。
+- ⛔ **§7「本腿自己写错的尺与读数」只有标题与那句"本节打算答什么"，正文我没代填**。理由（既有定式）：那一节是实现腿对**它自己的尺**的自证，我填了就把"谁做的判"洗混；它这一枚是只读普查腿，§7 的内容只有它自己知道跑过哪些原样命令。⇒ **§1–§6 的读数我照收（它按派单逐条标了〔仅读码，未跑〕）**，§7 这一格归下一枚接手 `265-r*`／验收腿自己去量它写错的尺时补，本件不作 §7 的凭据用途。
+- ⚠ 本件里 §6.3 那句"交件时刻 `cmd/wisp/resident_approval_windows.go` 仍是 `M`"是**时序读数**（那正是 `260-v1` 的突变窗口）。编排者 13:52:00 与 14:06:29 两次现跑：`git status --porcelain -- cmd internal`＝**空**，且该文件 md5 ＝ `git cat-file blob HEAD:` 的 md5（`7a26c7a990dbd2351bdf9898b5bdc192`）⇒ **无残留突变**，那一行不必被下一任读成事故。
