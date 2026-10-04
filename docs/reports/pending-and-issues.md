@@ -11859,3 +11859,17 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - **票 257 的 AC 框仍未翻**：AC#1 的终态格里有一半（干净机真跑＋三拒因）在 `internal/config` 侧已实证，但票面 AC#1 写的是整链终态，其 `cmd/wisp` firstrun 文案半格在 257-r1c §8 具名归口"等 265-r1c 交完、cmd/wisp 空出后排程"⇒ 我等那一格排程落地后一次翻框，⛔ 不拆半翻。
 
 **2. `265-r1c` 已派**（派单要点）：第一动作＝**先收编**四枚未提交产码（我 19:5x 现量：`resident_approval_windows.go` +176／`resident_task_source_windows.go` +45／`resident_approval_risk_256_windows_test.go` ≈60 行 A602 解冻／`?? resident_grant_writer_265_windows_test.go` 27,293 B）——收编前先 Read diff 与前任 §0–§2 自述逐条对，矛盾即停手上报；然后 §3–§9 七节＋修 phantom-citation（真身待它现读 `internal/panel/pump.go`）＋四发突变自证。**串行依据**：257-r1c 已交、其 d22scan 读数已封盘，265-r1c 的突变与全仓扫描不再互洗。
+
+## A607 — 10-04 20:4x：`265-r1c` 交件核过＋**票 265 结案**（五格全勾→`-done`）＋残余归口三件
+
+**1. 交件核过为真**（99 轮／1,462 万 token，七笔 commit `a04a095f`→`f8cb18ef` 全在盘、`git status --porcelain -- cmd/wisp internal/agent internal/config`＝空）：
+- **收编纪律执行到位**：第一笔 `a04a095f`（946/41）只含那四枚写面文件、`--name-only` 逐枚核对；我复尺 `git log -- internal/agent/approval/ cmd/wisp/run.go` 最近改动全是 260 批旧账 ⇒ **ⓐ-Ⅰ 的零改动承诺兑现**。
+- **四发突变全响全还原**（证据件 §4，红句逐字＋md5 三枚全等×4）；它对 M3 诚实具名"AST 钉对移位那形未单测"——**没有用同族形状冒充覆盖**，这种判语值得记成正面样本。
+- **phantom-citation 自修**：`resident_approval_windows.go:38` 注释引用从不存在的 `internal/panel/panel_pump.go` 改为真身 `internal/panel/pump.go:12-21`（句子逐字在盘，只改路径）⇒ 我 20:4x 复跑 d22scan＝`clean - no D22 ban violations`、`go vet ./cmd/wisp/` rc=0、定向子集 `ok 0.082s`。⇒ **这台门今天实测咬过两回：一次抓死腿的幻影引用（277 行红句），一次抓修复前后的差别**——票 212 ban #9 那句"仪器有牙"现在有活体证据。
+- **它判不动的四格**（§7 具名，我全部核过归口）：① `approval_always.go:165` 第三枚过期注释（写面 `internal/agent/approval`，本票解冻只到 AST 钉 ⇒ 归我，处理窗＝票 256 收档时一并或另开小票）；② 票 127 钉 `:497` 带载偶发（隔离 ×4 绿）；③ 223/AC1-shutdown 两枚 count=3 复绿；④ **U9 真进程尺与 `-race` 未跑**＝具名"没做"——U9 挂在 winlive 那个词之下（票 265 AC#1 判语里那枚"唯一能证伪的尺"仍未跑，ⓐ-Ⅰ 落地后它更该跑，**升格为 winlive 批准后的第一件**）。
+
+**2. 票 265 结案**：五格全勾（AC#0 19:3x／AC#1 14:3x／AC#2-4 20:4x，全部带凭据）→ 改名 `-done`（`e0790a45`）。**这是本票从立票（13:2x）到结案约 7 小时的接力史：265-a1（撞轮次帽）→ 265-a1b（死于额度但真交齐）→ 265-r1（死于额度，产码未验证）→ 265-r1b（假交件）→ 265-r1c（收齐）**——五枚腿、两枚死因是平台额度，产量没丢。
+
+**3. 票 257 不结**：`internal/config` 半边九节全满＋我复尺，但票面 AC#1 的终态＝ⓒ 形整链兑现，`cmd/wisp` firstrun 文案半格还空着（257-r1c §8 具名归口）⇒ **三格保持未勾、不拆半翻**，`cmd/wisp` 写面现在空出，**下一波可派 257-r2**（只做 firstrun 文案那半＋补一把方向性读数）。
+
+**4. 队列与推送**：在飞 0。下一波候选＝257-r2（`cmd/wisp`，文案半格）／260-v2（验收，之前被突变串行按住的）／264（等 owner 三栏）／262-v1。推送仍故意按住（`git rev-list --count origin/dev..HEAD` 上次读数 121＋今日新增，取数 20:4x 前后未重跑，引用前自取）；`263 AC#5`／`262 AC#5` 仍各欠一次真 `slo-full` 结论 run。
