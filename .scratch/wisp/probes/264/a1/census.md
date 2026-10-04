@@ -13,48 +13,133 @@
 
 ### 1.1 `Redactor` 被谁构造／谁调用（产码 vs 测试分开数）
 
+`Redactor` 的定义＝`internal/observe/redact.go:45-49`；四个方法＝`Attr`（`:107`）、`String`（`:133`）、`Message`（`:145`，＝`String` 的别名）、`ConfigSnapshot`（`:221`）。
+
+**产码构造点＝3 枚，全部在 `internal/observe` 包内，包外零枚：**
+
 | # | `file:line` | 产码／测试 | 构造出来喂给谁 |
 |---|---|---|---|
-| | | | |
+| P-1 | `internal/observe/logging.go:88` `red: Redactor{RedactPaths: cfg.RedactPaths}` | 产码 | 塞进 `redactHandler{}`（`:87`，类型定义 `:123-126`）→ 挂在 `slog.NewJSONHandler` 外面（`:89-91`）→ `Handler()`（`:104`）／`InstallAsDefault()`（`:107`）→ **只有 slog 记录这一条路**：`Handle`（`:132-139`）对每条记录的 message 走 `red.Message`、对每个 attr 走 `red.Attr`，`WithAttrs`（`:141-147`）连预烤的 attr 也过 |
+| P-2 | `internal/observe/diagnostics.go:120` `red := Redactor{RedactPaths: o.RedactPaths}` | 产码 | `:121` `red.String(string(data))` → 把已经落盘的 `wisp-*.jsonl` **再洗一遍**写进诊断包 zip 的 `logs/`（`:122`） |
+| P-3 | `internal/observe/diagnostics.go:138` 同上 | 产码 | `:139` `red.ConfigSnapshot(...)` → zip 里的 `config.redacted.toml`（`:144`）；洗不干净就 fail-closed 不出包（`:140-143`） |
 
-### 1.2 调用面是不是只在日志那一侧
+方法调用点（包外）：**0 枚**。`grep -rn "Redactor" --include=*.go` 的包外命中只有测试与 `.scratch` 里的探针副本。
 
-| 待填 | |
-|---|---|
-| | |
+**测试构造点＝9 枚字面量＋3 枚经由 config 字段**（分开数，别混进产码）：
+
+| # | `file:line` | 形状 |
+|---|---|---|
+| T-1…T-8 | `internal/observe/logging_test.go:31, :53, :64, :80, :93, :106, :110, :121` | `Redactor{}` ／ `Redactor{RedactPaths: true}`（只有 `:110` 打开） |
+| T-9 | `internal/observe/diagnostics_test.go:121` | `Redactor{}.ConfigSnapshot(cfg)` |
+| T-10 | `internal/observe/logging_test.go:23`（`redactHandler{red: …}`，经 `newTestHandler` `:20`） | handler 层形状 |
+| 经字段 | `internal/observe/logging_test.go:243`（`LogConfig{… RedactPaths: true}`）、`internal/observe/diagnostics_test.go:39`（`BundleOptions{RedactPaths: true}`） | 这 2 枚＋`:110` 是全仓**仅有**的"路径掩码开着"的用例 |
+| 配置本体 | `internal/config/boundary_test.go:152` `c.Privacy.RedactPaths = true` | **唯一**一枚直接吃 `PrivacySection.RedactPaths` 的用例（测的是 config 边界，不是掩码效果） |
+| 件外 | `.scratch/wisp/probes/153/accept-r1/zzaccept153_ondisk_test.go:20`（`TestAccept153TraceOnDiskThroughRedactor`） | 票 153 的验收探针**副本**，在 `.scratch` 下，不算包内钉 |
+
+### 1.2 它的调用面是不是只在日志那一侧
+
+**是——而且是"只有"。** 三条投递线逐条具名：
+
+| 线 | 装配点 | 判 |
+|---|---|---|
+| slog → JSONL 滚动日志 | `cmd/wisp/logsink.go:149` `observe.InitLog(observe.LogConfig{Dir: dir, Level: logSinkLevel})` → `:156` `teeHandler{primary: p.Handler(), mirror: …stderr}`；`cmd/wisp/slo_windows.go:272-275` `InitLog(LogConfig{Dir:…, Level:"info"})` → `:282 pipeline.InstallAsDefault()` | 日志侧（落盘那一条被 `redactHandler` 包着；`logsink.go:154-155` 的注释自己写着"the file side keeps the non-disableable redaction"） |
+| 诊断包 zip | `internal/observe/diagnostics.go:62 BuildDiagnosticsBundle` | **产码调用者 0 枚**：`grep -rn "BuildDiagnosticsBundle" --include=*.go`（排 `.scratch`）＝定义 `:35/:61/:62` ＋ `diagnostics_test.go:35/:125/:140`。⇒ P-2／P-3 那两枚今天**在生产里到不了**（归口：这条线属票 45「diagnostics guards」） |
+| 模型可见正文 | 见 §1.3 | **一处都没有** |
+
+顺带点名一枚同名不同物的东西，免得后人当它是开关：`internal/llm/content.go:106 RedactContent` 的名字里有 Redact，注释逐字写着"for LOGGING ONLY"（`:102`），而它**产码调用者也是 0 枚**（只有 `internal/llm/llm_test.go:39` 与两处注释 `:15/:69` 提到它）。
 
 ### 1.3 模型可见文本那条链有没有任何一处过这个 Redactor（负向句）
 
-| 谁产出 | 谁投递 | 谁落盘 |
+负向句，按规矩先读满三处再落笔。
+
+| 谁产出（工具侧 → `Result.Text`） | 谁投递（进 `llm.RoleTool` → HTTP 正文） | 谁落盘 |
 |---|---|---|
-| | | |
+| `internal/tools/fs.go:137/144/148/158/201/208/212/218`、`fs_edit.go:108/119/128/132/138`、`fs_write.go:247/260/292/325/343/382/389/408/453/460/464/477`、`bridge.go:289/431/561`、`cancel.go:76`、`task.go:509/693/837`、`task_backfill.go:136`、`subagent_197.go:244/322` 各自 `return Result{Text: …}`（`tool.go` 的 C1 Result） | `bridge.go:576-581 out := agent.ToolOutcome{Text: res.Text（`:577`）…}` ⇒ `internal/agent/loop.go:698 log.Text = out.Text` ⇒ `:710 l.sp.Prepare(c.ID, log.Text)`（spill 可能改写这句并把 `全文见 <artifact 路径>` 拼进去，`spill.go:185-189`）⇒ `:722 l.append(toolResultMessage(c.ID, log.Text, …))` ⇒ `:1080-1083 toolResultMessage` 造 `llm.Message{Role: llm.RoleTool, Content: []llm.Content{llm.ToolResultPart{… llm.TextPart{Text: text}}}}` ⇒ 三枚适配器各自把它序列化进请求体：`internal/llm/openaichat/request.go:273 encodeToolResult`、`internal/llm/anthropic/request.go:370 encodeToolResult`、`internal/llm/openairesponses/request.go:218-226` | 两个落盘点，**都不经过 Redactor**：① `tool_call` 行（`internal/memory/dao_toolcall.go:17 InsertToolCall`／`:69 FinishToolCall(outcome, errorClass)`）落的是**结论与等级，没有正文**；② 只有超长输出被 spill 写成 artifacts 文件（`internal/agent/spill.go:153-174`）。`history` 正文不落盘——`internal/agent/compress.go:59` 逐字写着"[privacy] keep_transcript forbids putting history text on this…"，而 `keep_transcript` 是硬编码 false（`internal/config/schema.go:517`／`PLAN.md:2741`）。⇒ 这条链上的失败句**只在内存里进正文、不落盘** |
+
+**三处读完的结论（负向句本体）**：上面 15 个产出的 `file:line`、5 跳投递、2 个落盘点里，**没有一处出现 `Redactor`、`redactHandler`、`pathRe` 或任何路径掩码**。
+独立复跑票面现量第 3 条（⚠ 我跑的是我自己的尺，不是抄它）：`grep -rni "redact" --include=*.go internal/agent internal/tools | grep -v _test` ＝ **0 命中**；`internal/llm` 侧 7 命中全部点名过：`content.go:15/:69/:102/:106/:116`（`RedactContent`，零产码调用者）、`errors.go:168`（注释"log-safe: redaction still applies upstream"——这句注释说的"upstream"指的是 **observe 那条日志线**，不是外发线）、`anthropic/stream.go:191`（`redacted_thinking` 是 Anthropic 协议字段，与路径无关）。
 
 ### 1.4 配置键名、默认值、有没有产码填过它
 
-| 待填 | |
+| 项 | 读数 |
 |---|---|
-| | |
+| 键与 tag | `internal/config/schema.go:509` 逐字：`RedactPaths bool \`toml:"redact_paths" default:"false"\``，挂在 `PrivacySection`（`[privacy]`，定义 `:504-505` 的注释"PrivacySection is [privacy]"）⇒ **默认值就是 `false`，且是字面写死的 `default:"false"`**（不是 `default:""` 那种空串形状） |
+| 注释自己的口径 | `schema.go:508`："masks filesystem paths in **user-visible text**"；`redact.go:46-47` 同词。⚠ **这句话与实际射程不符**：实际只作用在 slog 记录与诊断包文本上（§1.2/§1.3），模型可见正文不是"user-visible"，但它才是今天真出去的那一侧 |
+| 两处 `LogConfig` 有没有填 | **都没填**（逐枚点名）：`cmd/wisp/logsink.go:149` 只有 `Dir`＋`Level`；`cmd/wisp/slo_windows.go:272-275` 只有 `Dir`＋`Level`。⇒ `RedactPaths` 走零值 `false` ⇒ **今天连日志那一侧的路径掩码都是关着的**（其余五类掩码不可关，`redact.go:13-20`／`logging.go:86`） |
+| 有没有产码从 `cfg.Privacy` 读它 | **没有**。仓里已经把这句话说在产码里了：`cmd/wisp/config_readers_255.go:134` 逐字 `"privacy": hotClaimNoReader + "internal/observe/logging.go:50 [RedactPaths] - the mirror field exists and is filled by callers, never from cfg.Privacy"`——这一行是**产码里的一张名册**，且**每轮跑都被重新量一遍**：`cmd/wisp/config_receipt_255_test.go:166`（`TestTicket255RosterStillMatchesTheActualReadSites`）＋`:179`（`TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`：file 必须存在、行号必须在range内、那一行必须还带着被引的 token，且"每个段的生产读文件集合必须正好等于名册点名的集合"） |
+| `unwired.go` 里有没有它 | **没有**。`internal/config/unwired.go:61-105` 那枚 `unwiredKeys` 只覆盖锁定段（文件头 `:11-19` 三条准入条件之一＝"sits in a locked section (…`[risk]`, `[fs]`, `[net]`, `[plugins]`)"），`[privacy]` 不在锁定段 ⇒ 想靠这张表把 `redact_paths` 说成"未接线"是**接不进去的**（§6.3 的落点因此不是这里） |
+| `BundleOptions.RedactPaths` | `diagnostics.go:44` 字段在，但整条 bundle 线零产码调用者（§1.2 第二行）⇒ 这枚默认值今天同样无人填、无人到 |
 
 ### 1.5 一句话结论
 
-> 待填。
+> **"仓里已有脱敏开关"这句只管日志侧，一点都管不到外发正文侧**——而且今天**日志侧那一半也是关着的**（两处生产 `InitLog` 都没填 `RedactPaths`，schema 默认 `false`，产码里没有任何一处从 `cfg.Privacy` 读它）。
+> 更贴身的补刀：**就算把它打开，也遮不住这一侧**——`redact_paths` 的开关只存在于 `observe.Redactor` 里，而 §1.3 那条链（`bridge.go:577 → loop.go:698/710/722 → :1080 → llm/*/request.go`）一枚 `Redactor` 都不碰。
+> 所以票面"不做"那一栏写的"日志侧与模型侧都无掩码"**读数成立**（我复跑确认），并且还要再加一句：**`redact_paths` 即便被接上并打开，模型侧照旧无掩码**。
+
+附一条本腿新量到的、`174-a4` 明确留白的东西（它自己列在第 8 条"没逐字读那条正则"）——`pathRe` 逐字（`internal/observe/redact.go:81`）：
+
+```go
+pathRe = regexp.MustCompile(`(?i)(?:\\{1,2}\?\\)?(?:[a-z]:\\|\\\\)[^\s"',;:)>\]]+|(?:(?:/home|/users|/root)/[^\s"',;:)>\]]+)`)
+```
+
+我的**读法**（⛔ 不是执行级判断，见 J-1）：两支都要求**反斜杠**接在盘符后（`[a-z]:\\`）或 UNC 的 `\\`，或 POSIX 侧的 `/home`｜`/users`｜`/root` 开头；
+按字面读，**斜杠正写的 Windows 绝对路径（`C:/Users/…`、`D:/work/…`）落不进这两支**，而 `rules_gateway.go:42/:73` 的 `%q` 与 `risk.Resolve` 的 `lexCanonical` 产出的正是反斜杠形（`fs.go:144` 那句吃的是 `Canonicalize` 的错，见 §2.3）。
+⇒ "打开后遮得住哪些真串"＝〔待验，需跑一遍才知道〕，本腿只把正则字面与读法摆这儿。
 
 ---
 
 ## §2 除了 `fs` 族，还有哪些族的失败句今天真把路径带出去（增量，⛔ 不重跑 174-a4）
 
+`174-a4` 件＝`.scratch/wisp/probes/174/a4/census.md`（187 行／26,592 字节，本腿 `wc -l -c` 现量），其分母（`err.Error()` 装配点 52／能进模型可见文本 48／`%w` 272／插值动词 136）**按令未复算**，属〔仅自述〕。本节只补两块。
+
 ### 2.1 `internal/tools` 里非 `fs`／`fs_write` 的族
 
-| `file:line` | 该 err 来自带路径的调用吗 | 落进 `Result.Text` 吗 |
-|---|---|---|
-| | | |
+尺：`grep -rn 'err\.Error()' internal/tools/*.go | grep -v _test` ＝ **42 枚**（本腿现量，含 `fs.go`／`fs_write.go`）；`fs.go`＋`fs_write.go` 之外的 **13 枚**逐枚判如下。⚠ 另外三族（`fs_edit`／`fs_staging`／`bridge` 的门禁句）不在这 13 枚里也要单独看，见 2.3／2.4——**票面 §现量 只点了 4 行（`fs.go:144`、`:148`、`fs_write.go:343`、`:345`），量到的远不止 4 行**。
+
+| `file:line` | 句子（逐字截） | 该 err 来自带路径的调用吗 | 落进 `Result.Text`（＝模型可见）吗 |
+|---|---|---|---|
+| `internal/tools/fs_edit.go:108` | `参数解析失败：`＋err | 否（`json.Unmarshal`，带字段名不带路径） | 是 || `internal/tools/fs_edit.go:119` | `路径无法解析（按 fail-closed 拒绝）：`＋err | **否**——见 2.3：这一支的 err 集合里没有带路径的那枚 | 是 |
+| `internal/tools/fs_edit.go:128` | `refusal("无法确认目标是否存在…："＋err)` | 需 `stat` 失败才走到（`os.Stat` 的 `*fs.PathError` 带路径） | 是（`refusal()` 见 `:92-95`，整句拼进 `Text`） |
+| **`internal/tools/fs_edit.go:132`** | `目标文件不存在，没有可定位的内容：`**＋`target`** | **是，而且根本没有 err**——这句把 canonical 后的目标路径**自己写进正文** | 是 |
+| **`internal/tools/fs_edit.go:138`** | `读取目标失败：`＋err＋`（目标未被改动）`，并带 `Origin: target` | **是**（`os.ReadFile(canon)` 的 `*fs.PathError`＝逐字绝对路径） | 是 |
+| `internal/tools/fs_edit.go:142/160/163/168/172/178/182/193/209/254/263` | 其余 `refusal(...)` 十余枚 | 否（都是字节数／编辑定位类，路径不在串里） | 是 |
+| `internal/tools/bridge.go:289` | `参数不是合法的 JSON 对象：`＋err | 否（同上） | 是（`reject()` `:1019-1024` 把 `why` 原样当 `Text`） |
+| **`internal/tools/bridge.go:431`** | `该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：`＋`dec.Reason` | **是**——`dec.Reason` ＝ `verdict.Reason`（`:301`），而 R2/R3 的理由句**逐字带路径字面**：`internal/risk/rules_gateway.go:42` `R2: 路径无法规范化，按越界处理（fail-closed）: %q`、`:73` `R3: 路径无法规范化，敏感检查 fail-closed: %q`（用例把形状钉死了：`internal/risk/assessor_test.go:172` 的 `want` 里就有 `… fail-closed）: "C:/broken"`） | 是（同 `reject()`） |
+| **`internal/tools/bridge.go:561`** | `工具内部故障：`＋err | **放大器**：任何工具 `Execute` 直接 `return Result{}, err` 都从这里出去，而 err 常是 `os.*` 的 `*fs.PathError`（例：`fs.go:132` ctx 之外还有各条 `Result{}, err` 支） | 是 |
+| `internal/tools/cancel.go:76` | `上下文已结束：`＋err | 否（`context.Canceled`／`DeadlineExceeded` 定形句） | 是 |
+| `internal/tools/task.go:509`、`:693` | `参数解析失败：`＋err | 否 | 是 |
+| **`internal/tools/task.go:837`** | `注意：这条路径现在读不到，C26 连规范化都没通过（`＋err＋`）` | 这支的 err 就是 §2.3 那枚**不带路径**的集合；路径本身由句子里的 `canonicalizeFailsHere`/pointer 段带出（见 2.5 的用例） | 是，但**今天有没有真接线是分裂的**：`task_output_canonicalize_fail_174_test.go:130-148` 自己就分 wired／unwired 两支各断一句 ⇒ 生产装配走哪一支＝运行时问题（J-10） |
+| **`internal/tools/task_backfill.go:136`** | `超长输出没能落盘，名册里不许诺任何路径：`＋err | **是**：这句的 err 来自 spill／artifacts 写盘（`internal/agent/spill.go:153-174` 的 `observe.Wrap(ClassResource, err, "agent: write spill artifact")`，链里是 `*fs.PathError`） ⇒ **一句话自己说不许诺路径、后半截却把路径接上去** | 是 |
+| `internal/tools/subagent_197.go:244` | `参数解析失败：`＋err | 否 | 是 |
+| `internal/tools/subagent_197.go:322` | `子代理环路装配失败：`＋err | 装配类（`observe.New(ClassConfig, "agent: no LlmProvider (C5 seam) wired")` 这类定形句为主）；不能排除链里混进 `os.*` | 是 |
+
+`internal/tools/fs_staging.go`：**这一族今天一枚 `err.Error()` 都没有**（`grep -n 'err.Error()\|Errorf\|Text:' internal/tools/fs_staging.go`＝空）。它对外说话走 `fs_write.go` 的句子。
+
+**路径还有第二条腿（⛔ 不是"失败句"，但同一条投递链）**：`AppliedSteps` 台账里的 `se.record` 语句带目录与临时文件名——`fs_write.go:295`（`在 %s 创建临时文件 %s`，`parent` 是绝对目录）、`:347`（`原子重命名 %s → %s`）、`:412`（`通过 %s 将 %s 放入回收站，并已核对还原记录 %s（位于 %s）`）。这些串经 `bridge.go:581 AppliedSteps: …res.AppliedSteps…` → `internal/agent/approval/report.go:98/:145`（逐条拼进 `txt`）→ `bridge.go:594-595 out.Text = orDefault(out.Text, "调用已中止") + "\n\n" + txt`。⇒ **调用被中止／否决那一条路上，台账把目录名一并发给服务商**，而且这条支的开关是"有没有 AppliedSteps"，与失败句无关。（`fs_write.go:115 stoppedResult` 也带着它。）
 
 ### 2.2 C25 那条：`internal/tools/bridge.go:646` 到底把什么喂给了谁
 
-| 待填 | |
-|---|---|
-| | |
+复认结果（三处读满）：
 
+| 谁产出 | 喂进去的是什么 | 谁消费／落到哪 |
+|---|---|---|
+| `bridge.go:638 func (b *Bridge) mark(dec Decision, res Result, hostPath string)`；`:641 origin := res.Origin`（`tool.go:50-53`：`Origin` 是"为 C25 溯源标记指明这条结果来自哪儿"的字段，`fs.go:148/158/170/212/218/238`、`fs_edit.go:138/272`、`fs_write.go:263` 都会填 canonical 后的路径）；`:642-643` 若 `origin` 为空则退到 `dec.Paths[0]`（＝`displayPaths` 的产物，见下） | **`:646 b.prov.MarkWithHostPath(dec.TaskID, dec.Tool, origin, res.Text, hostPath)`——第 4 个实参逐字是 `res.Text`**，也就是 §2.1 那些**含绝对路径的失败句整串**；第 3 个实参 `origin` 单独又是一枚路径 | `internal/risk/provenance.go:558 MarkWithHostPath`（`Mark` `:479` 是它的 `hostPath=""` 特例）→ 建 taint 片段索引（`taintmatch.go:91-144`）。**落盘＝内存态 scope 账**，不是外发正文；它的用途是**出网前 R4 粗粒度匹配**（`PLAN.md:1375` C25 契约逐字："工具结果的来源标记（`{tool, origin, sensitive}`）＋ 出网前的**粗粒度污染匹配**（规范化后 ≥8 字符连续片段命中即升 L2）"）。`bridge.go:648-649` 匹配不上时只 `b.log(...)` 一句"produced no matchable taint fragment (origin=%q)" |
+
+⇒ 这一条的**性质要说准**：`bridge.go:646` 不是"第二条外发腿"，它是**把含路径的回执喂给污染台账**（溯源／升 L2 用）。⚠ 但正因为喂的是 `res.Text`，**甲形若落在工具侧（§4 候选①）就会改这个实参**，连带改变 C25 片段的形状——这既是它的代价，也是它会顶到人的一处（见 §5.6）。
+
+### 2.3 `displayPaths`／卡片那一侧（顺带量到，具名不裁）
+
+`bridge.go:942 out = append(out, p+" (无法规范化: "+err.Error()+")")`（在 `displayPaths` `:934-949` 里）：这一枚**同时带用户的原始拼写 `p` 和 err**。它的去向不是模型正文：`:296 dec.Paths = b.displayPaths(rawPaths)` → 审批卡片与 `tool_call` 审计行（`grant.go:76` 注释、`bridge.go:1092`）。用例把这处形状钉成了**故意的**：`internal/tools/bridge_junction_windows_test.go:447`（注释逐字："<原样路径> (无法规范化: …)，批准它的人看不到自己批准的是什么"）＋`:459-460`（断言卡面**必须**带着"无法规范化"标记与那枚原样路径）。另有名册级断言：`internal/session/grants_test.go:267`、`:320`。⇒ **这一侧带路径是有明文理由的（人要看得见自己批准了哪儿），与 §1.5 那侧不是同一件事**；本腿只点名，不裁。
+
+### 2.4 ★ 对票面 §现量 第 1 条的一处更正（读码级，具名）
+
+票面说 `fs.go:144` 那句的 err"消息形在 `internal/risk/pathresolver.go:95`（`%w: %s expands to %s (%s)`）"。本腿顺着 `t.d.open` 读满：`internal/tools/fs.go:93-104 open()` 只做三件事——`d.Paths == nil` ⇒ 定形句 `fs: no C26 resolver configured (fail-closed)`；`d.Paths.Canonicalize(raw)`；结果含 `??` ⇒ `fs: unresolved path component`。而 `internal/tools/paths.go:119-148 Canonicalize` 的错误来源只有两枚：`tools: empty path`（`:121`）与 `p.resolve(raw)` 的 err；`p.resolve`（`:103-109`）透传 `risk.Resolve`（`pathresolver.go:105-139`），后者的**唯一 `return res, err`** 是 `:123 return res, ErrReparseDenied`（定形句，`:36`，不含路径）。
+⇒ **按读码：今天 `fs.go:144` 与 `fs_edit.go:119` 这两枚"路径无法解析"句里，量不到 `expands to` 那一形**；`Actable()`（`pathresolver.go:93-99`，那句带 `%s expands to %s` 的）在生产里的调用者是 `internal/panel/workspace.go:85` 与 `internal/risk/syncdirs.go:208/:226`，**`internal/tools` 零枚**（`grep -rn "Actable()"` 现量）。
+⛔ 这不是"那一侧没问题"：`fs.go:148/158/212/218`、`fs_edit.go:138`、`fs_write.go:292/325/343/408/477` 吃的是 `os.Open`／`os.ReadFile`／`os.Rename` 的 `*fs.PathError`＝**逐字绝对路径**，票面点名的 `:148` 与 `:343` 两支**复认成立**。⇒ 归口：票面 §现量 第 1 条里"`:144` 的消息形在 `pathresolver.go:95`"这一句需要更正（已推历史不改写，追加一条 `A##` 即可）。
+
+### 2.5 增量小结（一句）
+
+> 除 `fs`／`fs_write` 外，今天真把路径带进模型可见正文的还有**四族**：**`fs_edit`**（`:128`/`:132`/`:138`，其中 `:132` **不经任何 err** 直接写 `target`）、**门禁理由句**（`bridge.go:431` ← `rules_gateway.go:42/:73` 的 `%q`）、**spill／落盘失败句**（`task_backfill.go:136`，句子自己否认带路径）、**AppliedSteps 台账**（`fs_write.go:295/347/412` → `report.go:145` → `bridge.go:594-595`）。另：**票面点名的 4 行只是冰山的一角**，同形状行号在 `fs`／`fs_write` 两文件里本腿就数到 **21 枚**（`fs.go` 8＋`fs_write.go` 13，见 §1.3 产出列与 2.1）。
 ---
 
 ## §3 会不会撞已定案契约（读、未改 `docs/PLAN.md`／`docs/specs/**`）
