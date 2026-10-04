@@ -75,7 +75,7 @@
 | 15 | `slo-fresh.yml:70` `sh scripts/slo-freshness.sh` | P1 读 `.github/workflows/ci.yml` 的字节（`slo-freshness.sh:134-172`）；P2/P3 读 API | **否**（见下方"最接近之一"） |
 | 16 | `slo-fresh.yml:72-83` `sh -n scripts/slo-freshness.sh` ＋ `shellcheck -s sh scripts/slo-freshness.sh` | 只有 `slo-freshness.sh` **这一枚 .sh** 的语法与 lint；shellcheck 缺件即 rc=1（`:79-82`） | 否（且没有 PowerShell 对等件） |
 | 17 | 本机件 `scripts/portable-tests-selftest.sh:90-130`、`:258-281` | **真读别的脚本的字节**并数枚数：awk 从 `scripts/portable-tests.sh` 抽 `core_pin`（`:123-124`）、`grep -c .` 计数（`:125`）、0 枚即 exit 2（`:127-130`）；同形抽 `winsec_pin`（`:261-266`） | 读的是 `.sh`，⛔ 不读任何 `.ps1`；且**没有任何自动触发**（ci.yml／slo-fresh.yml／其它脚本零调用，尺＝`grep -rn "portable-tests-selftest" .github scripts tools docs cmd internal`） |
-| 18 | 本机件 `cmd/wisp/config_receipt_255_test.go:283` | walk 里**确实列了 `"scripts"`** 这一棵树 | ⛔ 不读：同一函数 `:296` 逐字 `if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") { return nil }` ⇒ 一枚 `.ps1` 都没打开 |
+| 18 | 本机件 `cmd/wisp/config_receipt_255_test.go:283` | walk 里**确实列了 `"scripts"`** 这一棵树 | ⛔ 不读：同一函数 `:295` 逐字 `if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") { return nil }` ⇒ 一枚 `.ps1` 都没打开 |
 | 19 | 本机件 `internal/panel/composer_dispatch_test.go:605` | 名单里把 `scripts` 当**排除项** | 否 |
 
 ⇒ **最接近的两枚，各差在哪一行**：
@@ -85,7 +85,7 @@
 ### 问② `slo-freshness.sh` 的 P3 射程到底多大？
 
 - 阈值常量：`sample_max_age_days`，定义在 `scripts/slo-freshness.sh:97`，默认 **3 天**（`${SLO_FULL_SAMPLE_MAX_AGE_DAYS:-3}`）；判定式 `:368` `[ "$sample_age_days" -gt "$sample_max_age_days" ]`；年龄＝`:362-364` `sample_age=$((now - best_epoch))` 再 `sample_age_days=$((sample_age / 86400))`（整数向下取整）。姊妹枚 P2 同形：常量 `max_age_days`（`:96`，默认 3），判定式 `:260` 也是严格大于。
-- 判的是**产物**还是**步的颜色**：产物。记录来源 `:310-315` 的 Actions artifacts 列表，过滤 `select(.name=="slo-full-report")` ＋ `select(.expired==false)`；名字是硬赋值不是旋钮（`:282`，理由逐字写在 `:275-281`）。⛔ 三处都不读 job conclusion（`:37-45` 明确"This is NOT the job conclusion"）。
+- 判的是**产物**还是**步的颜色**：产物。记录来源 `:310-315` 的 Actions artifacts 列表，过滤 `select(.name=="slo-full-report")` ＋ `select(.expired==false)`；名字是硬赋值不是旋钮（`:282`，理由逐字写在 `:275-281`）。⛔ 它**不读 job conclusion**——`slo-freshness.sh:24-25` 逐字"it reads only things obtainable from the API - never a job's conclusion"，`slo-fresh.yml:36-38` 逐字"It is deliberately NOT the job conclusion, and it does not care what colour the slo-full job is"。
 - 两形各响不响（⛔ 本腿只给"能不能"，不给"会不会"；全部〔仅读码，未跑〕）：
   - **形 A：钉被删、门还能出结论** ⇒ P3 **不响**（"能响"都谈不上：新产物照旧上传，年龄被重置，`:368` 永远不成立）。同一次红也不会有：P1（`:140-172`）只看 ci.yml 的触发块与调用行，P2（`:244-265`）只看 job 记录。⇒ **三枚探针全绿，删钉这件事在这把尺上没有任何投影。**
   - **形 B：钉被删、门出不了结论** ⇒ 只有这一形会累积年龄，最早的红＝**产物年龄 ≥ 4 个整天**那一发（`age_days` 取整后要 `>3`，即 `age ≥ 345600s`）；再叠上读数机会的窗口：`slo-fresh.yml:51` `cron: '23 */6 * * *'` ⇒ 最坏在 4 天之后再多等 6 小时。⚠ 时间维度不许写成"3 天"：3 是阈值常数，**盘面上最早变红的下界是 4 天**。
@@ -114,7 +114,7 @@
 **候选③ 把 `scripts/*.ps1` 纳入 `tools/d22scan` 的 scope 并补一条 ban**
 - 最小写面（逐枚具名，**5 枚文件起步**，全部实测自读码）：
   1. `tools/d22scan/main.go`：`// Bans` 名册加一枚 tab-indented `<N> <tag>` 行（正则 `selftest.go:117` 要求 `^//\t([1-9][0-9]*)[ \t]+([a-z][a-z0-9-]+)`）＋检查函数（内含 `s.add("<tag>"` 字面站点，`selftest.go:119`）＋一条 walk（`main.go:264-281` 区）＋`declaredScopes()` 一枚 `live:true` 条目（`main.go:405-437`）。
-  2. `tools/d22scan/selftest.go`：`selfCoverForTag`（`:519-530`）加映射，否则 `:508-514` 直接 `case "": return error`；fixture 种子（`:362-380` 那张 map，今天只有 go.mod／internal／cmd／frontend／allowlist）必须加一枚 `scripts/...` 文件——**不加就 `live:true` × 0 文件 → `main.go:1447-1452` exit 2**（每个 selftest case 都用同一份 fixture 跑）。
+  2. `tools/d22scan/selftest.go`：`selfCoverForTag`（`:519-530`）加映射，否则 `:510-511` 那格 `case "":` 直接 `return ... fmt.Errorf("case %q declares no coverage counter and no default for tag %q")`；fixture 种子（`:362-380` 那张 map，今天只有 go.mod／`internal/tools/ok.go`(`:370`)／`frontend/index.html`(`:371`)／allowlist(`:373`)）必须加一枚 `scripts/...` 文件——**不加就 `live:true` × 0 文件 → `main.go:1447-1451` exit 2**（每个 selftest case 都用同一份 fixture 跑）。
   3. `tools/d22scan/selftestsamples.go`：一枚 ring ＋ 一枚 silent 成对样本，缺任一枚 ⇒ `auditSelfCases` 报 HOLE ⇒ `runSelfTest` rc=2（`selftest.go:548-554`）。
   4. `tools/d22scan/scan_test.go`：分母／脚注钉要跟着重读——本腿命中的按名册生成的断言＝`:686`（真仓里不许有空 ban #8 scope）、`:695`（clean 那行必须逐枚点名它真扫过的 scope）、`:1090`（`scopeSummary(...)` 里 `ban #8 frontend/=%d` 的拼法）、`:2183`、`:793`、`:887`。⚠ `main.go:49` 逐字写着"the footer is **generated from the scope list**"，所以脚注文字会变，不是测试文字变不变的问题。
   5. `.github/workflows/ci.yml`：**不需要动**（`:83`/`:105`/`:134` 三步已经会执行到新的 walk 与新 ban）。⇒ 这是三形里唯一"外部件不新增执行入口"的一形。
@@ -138,13 +138,13 @@
   3. `scripts/slo-check.ps1:251` 自己那枚"从 char code 36 现拼以免自匹配"＝**没有分类器时**的最低成本自免疫写法；它的价格就是上面那句"注释也打死门"。⇒ 三枚放在一起读：**d22scan 已经付过"词法 vs 词面"这笔学费两次**，新的外牙若走词面形，应显式声明它选的是第 3 种（无分类器）并承担"注释有代价"这一条，或者复用第 1/2 种的形状。
 - ⚠ 本腿量不到的一枚：票面问的是"那两行豁免真值有几行"。本腿给不出干净的枚数——豁免横跨 `main.go` 三处（`walkEmoji` 内联 `:1154-1161`、`commentRangesFor` 起 `:1168-…`、`removeRanges`/`stripCommentLines` 另在两处），用行数当尺会把分类器本体与调用点混在一起数。已登记进 §6。
 
-### 问⑤ 还有别的门是"自锁、外面无牙"吗？⇒ 有，6 枚；逐枚登记，⛔ 本腿不顺手改
+### 问⑤ 还有别的门是"自锁、外面无牙"吗？⇒ 有，7 枚（§5 那份名册把它们连同关键词尺扩到 10 行）；逐枚登记，⛔ 本腿不顺手改
 
 | # | 门／形状（`file:line`） | 它检查的是谁 | 有没有外牙 |
 |---|---|---|---|
 | 1 | `scripts/slo-check.ps1:230`＋`:258`（两行 ok）／调用点 `:291-292` | 自己文件的字节＋自己的 instrument | ⛔ 无（本票对象；§现量 2/3 复认） |
 | 2 | `scripts/slo-check.ps1:581-591` leak fixture self-test（要求被采样程序 `exit==1`） | 门自己的"能不能变红" | ⚠ 半枚：票 263 票面 `:52` 把它记为"名册外的第三牙"，但它判的是**被采样程序的退出码**，不是钉的在场；⛔ 无任何外部件知道这段该存在。〔仅读码，未跑〕 |
-| 3 | `scripts/check-path-length-budget.sh:499-505` 正控读**自己**（`sed "/^${ROSTER_MARK_BEGIN}.../,/^...$/d" "$0" > "$BENCH/gate.sh"`，再 `grep -qE '^    R\["'` 断"删干净"） | 自己（用自抄的副本） | ⛔ 无：`ci.yml:136-166` 那一步若被删（A585 那次解冻的产物整格消失），`slo-freshness.sh` P1 只看 `on:`/`push:`/`cron:`/slo-full 的 `if:`/`continue-on-error:`/`slo-check.ps1 -Subset full`（`:140-172`），**不看这一步**；`tools/d22scan` 也不看 `.github/`。⇒ 本腿没跑那把尺（禁 go＋它是 262-v1 的读面），只登记形状 |
+| 3 | `scripts/check-path-length-budget.sh:499-505` 正控读**自己**（`sed "/^${ROSTER_MARK_BEGIN}.../,/^...$/d" "$0" > "$BENCH/gate.sh"`，再 `grep -qE '^    R\["'` 断"删干净"） | 自己（用自抄的副本） | ⛔ 无：`ci.yml:136-166` 那一步若被删（A585 那次解冻的产物整格消失），`slo-freshness.sh` P1 只看 `on:`/`push:`/`cron:`/slo-full 的 `if:`/`continue-on-error:`/`slo-check.ps1 -Subset full`（`:140-172`），**不看这一步**；`tools/d22scan` 也不看 `.github/`。⇒ 本腿**跑过这把尺本体一次**（纯壳、按票面许可，读数见 §5 名册 #4），但那一发证明的是"它会红"，⛔ 不证明"有人知道它该在场"；只登记形状，不改 |
 | 4 | `scripts/portable-tests.sh` 的 `core_pin`/GUARD A/B/C | 自己声明的枚数 vs `go list` 实解析 | ✅ 有一枚真外牙：`scripts/portable-tests-selftest.sh:123-130`（抽字节＋数枚数＋0 即 exit 2），`:261-266` 同形抽 `winsec_pin`。⚠ 但那枚载体**没有任何自动触发**（名册 #17 那把尺：ci.yml／slo-fresh.yml／其它脚本零调用）⇒ 记数对了，牙床缺一枚 |
 | 5 | `scripts/winsec-tests.sh:156-168` GUARD 3（断子进程 stdout 两句在场） | 别人（`portable-tests.sh` 的输出） | ⚠ 它是**别人的**外牙；它自己那 12 行若被删，`ci.yml:471` 那一步仍绿（谁都不看它）⇒ 同族自锁 |
 | 6 | `scripts/build.ps1:71`/`:100`/`:130`/`:169`（4 处直读自动退出码变量）＋`:115` 的 `-H=windowsgui`＋`:168` 的 `&` 不等 | 无人 | ⛔ 无：词面钉的射程由 `$PSCommandPath`（`slo-check.ps1:247`）**限定在它自己那一枚文件**，`build.ps1` 一次都不进它的视野。⇒ 票 263 的病在姊妹文件里原样活着；本腿只登记，不改，⛔ 不在本票射程 |
@@ -189,15 +189,15 @@
 
 本腿用的关键词尺（三把，逐把给出，枚数以 `| wc -l` 收尾）：
 - 自路径／自字节读取：`grep -nE 'Get-Content|\$PSCommandPath|\$PSScriptRoot|"\$0"' scripts/*.ps1 scripts/*.sh | wc -l` ⇒ **20** 行，逐枚＝`build.ps1:31`/`:70`/`:79`、`fetch-deps.ps1:32`/`:34`/`:58`/`:124`、`sign-models.ps1:34`、`slo-check.ps1:85`/`:247`/`:253`/`:544`/`:568`、`check-path-length-budget.sh:501`、`d22scan.sh:40`、`portable-tests-selftest.sh:86`、`portable-tests.sh:79`、`slo-freshness.sh:93`、`winsec-tests.sh:34`、`wisp-cli-tests.sh:49`；其中**把"自己这枚文件的字节"当判据的只有 2 枚**：`slo-check.ps1:253`（`Get-Content -LiteralPath $path -Raw`，`$path` 来自 `:247` 的 `$PSCommandPath`）与 `check-path-length-budget.sh:501`（`sed ... "$0" > "$BENCH/gate.sh"`）。其余是定位 root，或读**别的**文件（`build.ps1:79` 读 `deps.toml`、`fetch-deps.ps1:58`/`:124` 读 manifest、`slo-check.ps1:544`/`:568` 读自己刚写的 report/settle 产物）。
-- 自打印 ok 句：`grep -nE "(ok -|ok \(|/3 ok)" scripts/*.ps1 scripts/*.sh` ⇒ 逐枚 **7** 行：`build.ps1:134`、`slo-check.ps1:230`、`slo-check.ps1:258`、`slo-check.ps1:522`（precheck ok）、`check-path-length-budget.sh:515`/`:530`/`:541`（control 1-3/3 ok）。
-- 直读自动退出码变量（钉所判的那个形状本身在别处的存量）：`grep -c -E '[$][{]?([A-Za-z]+:)?LASTEXITCODE'` 逐枚＝`build.ps1` **4**（`:71`/`:100`/`:130`×2 同一行两处）、`fetch-deps.ps1` **2**、`sign-models.ps1` **3**、`dev/ball-cycle.ps1` **1**、`spike/run.ps1` **4**、`slo-check.ps1` **0** ⇒ 除 `slo-check.ps1` 外合计 **14** 行级命中。
+- 自打印 ok 句：尺 `grep -nE "(ok -|ok \(|/3 ok)" scripts/*.ps1 scripts/*.sh | wc -l` ⇒ **10** 行命中，但**真自打印 ok 句＝7 枚**：`build.ps1:134`、`slo-check.ps1:230`、`slo-check.ps1:258`、`slo-check.ps1:522`（precheck ok）、`check-path-length-budget.sh:515`/`:530`/`:541`（control 1-3/3 ok）；三枚假命中逐名＝`portable-tests.sh:647`（`case` 分支标签 `"ok (own line)"`，不是判决句）、`slo-freshness.sh:81` 与 `:206`（都是 `look (` 里的子串）。⚠ 同一件事本腿先后三把尺给出 **8 / 9 / 10** 三个数，见 §7 #2。
+- 直读自动退出码变量（钉所判的那个形状本身在别处的存量）：尺 `grep -c -E '[$][{]?([A-Za-z]+:)?LASTEXITCODE' <file>`（数的是**行**）逐枚＝`build.ps1` **4**（`:71`/`:100`/`:130`/`:169`，其中 `:130` 一行里出现两次）、`fetch-deps.ps1` **2**、`sign-models.ps1` **3**、`dev/ball-cycle.ps1` **1**、`spike/run.ps1` **4**、`slo-check.ps1` **0** ⇒ 除 `slo-check.ps1` 外合计 **14 行**（按出现次数算是 15 次）。
 
 名册（每枚：谁检查谁／有没有外牙）：
 
 | # | 形状（`file:line`） | 检查对象 | 外牙 |
 |---|---|---|---|
 | 1 | 词面钉＋能力钉（`slo-check.ps1:233-259`、`:214-231`；调用 `:291-292`） | 自己文件的字节／自己的 instrument | ⛔ 无（本票对象；§现量 2/3 复认） |
-| 2 | precheck ok 句（`slo-check.ps1:522`，机器争用拒采样那枚） | 自己的 precheck 结论 | ⚠ 半枚：它的**后果**被 `slo-freshness.sh` P3 盯（因为不写 report ⇒ 年龄累积，`slo-freshness.sh:29-37` 逐字），但"这枚 precheck 该存在"没人盯；且 `:471`/`:497`/`:515` 三处注释都指着 P3 ⇒ **删 precheck 本身不红**〔仅读码，未跑〕 |
+| 2 | precheck ok 句（`slo-check.ps1:522`，机器争用拒采样那枚） | 自己的 precheck 结论 | ⚠ 半枚：它的**后果**被 `slo-freshness.sh` P3 盯（因为不写 report ⇒ 年龄累积，`slo-freshness.sh:29-37` 逐字），但"这枚 precheck 该存在"没人盯；文件里三处**具名指向 P3**（`:471` 打在屏上的那句、`:497` 记录里的 `nail` 字段、`:515` 追加进 `GITHUB_STEP_SUMMARY` 的那句话）⇒ 说的是"沉默由 P3 兜"，⛔ 不是"precheck 本身有牙"：**删 precheck 不红**〔仅读码，未跑〕 |
 | 3 | leak fixture self-test（`slo-check.ps1:581-591`，要求被采样程序 `exit==1`） | 门自己能不能变红 | ⛔ 无外部件知道这段该在场；票 263 票面 `:52` 已具名它是"第三牙"的依赖点〔仅读码，未跑〕 |
 | 4 | path-length 门的三发正控（`check-path-length-budget.sh:499-505`、`:515`、`:530`、`:541`） | 自己（自抄副本）＋自己常量互相派生（`:256-270`） | ⛔ 无：`ci.yml:136-166` 那一步若被整格删掉，`slo-freshness.sh` P1（`:140-172`）只看 slo-full job，不看它；`tools/d22scan` 不看 `.github/`。⚠ 顺带：它的分母（本腿 14:4x 现跑唯一一发的逐字读数：`denominator read: 5594 tracked paths`、`over-budget=57 covered by roster=57 not in roster=0`、`VERDICT GREEN`、`worst full path=224 chars (hat budget 165)`）**不含"这一步在场"** 这一项；⛔ 该发的 rc 见 §7 #9（我那发量的是管道尾的 rc） |
 | 5 | `portable-tests.sh` 的 `core_pin`＋GUARD A/B/C | 自己声明的枚数 vs `go list` 实解析 | ✅ 有外部件（`portable-tests-selftest.sh:123-130`）在**读它的字节并数枚数**；⚠ 那枚载体零自动触发 ⇒ 牙床缺（§4 名册 #5） |
@@ -235,7 +235,7 @@
 全数留下不删（票面纪律：只登记，不改写历史）。
 
 1. **`grep -nE "^\s+run: |^\s+powershell " .github/workflows/ci.yml` 被我当成"37 条 run 命令"写进名册口径那句**——错。三条尺各数各的：`grep -cE "^\s+run: "`＝**33**（`run:` 命令行）、`- name:`＝**37**、`- uses:`＝**12**。我把 37 那一枚当成了 run 的枚数（因为我用了带 `|` 的合并正则，两种步一起进了输出）。§2 问① 正文已按 33／37／12 分开写，⛔ 那句合并尺的读数不许再被引用。
-2. **`Write-Host '[^']*ok` 这把"自打印 ok 句"的尺被 `doctor` 一词里的 `ok` 骗了一次**：`grep -nE "Write-Host '[^']*ok|..." scripts/*.ps1 scripts/*.sh | wc -l` ＝ **8**，其中 `build.ps1:167`（`'build.ps1: smoke test - running wisp.exe doctor'`）是子串假命中。改用 `(ok -|ok \(|/3 ok)` 之后逐枚 7 行（§5 用的是这个）。⚠ 顺带记一枚口径差：同一把严尺 `| wc -l` 我读到过 9 与 7 两个数——9 那一发把 `slo-freshness.sh:81`/`:206` 两行注释/文案算进来了（它们含 `ok (` 形状的巧合子串），列出行的一发才是 7。**两发都留在盘上，取数时刻同一轮，不删。**
+2. **"自打印 ok 句"这把尺我被子串骗了一次，并且三把相邻尺给了三个数（8／9／10）**：第一把 `grep -nE "Write-Host '[^']*ok|echo \"[^\"]*ok |..."` ＝ **8**，其中 `build.ps1:167`（`'...running wisp.exe doctor'`）是 `doctor` 里的 `ok` 假命中；第二把 `grep -nE "(ok -|ok \(|/3 ok|nail ok|self-check ok)" ... | grep -vE "^scripts/dev|^scripts/spike" | wc -l` ＝ **9**；第三把（§5 正文用的那把）`grep -nE "(ok -|ok \(|/3 ok)" scripts/*.ps1 scripts/*.sh | wc -l` ＝ **10**，逐枚读行后**真值＝7 枚**（假命中三枚：`portable-tests.sh:647` 的 `case` 标签、`slo-freshness.sh:81`/`:206` 的 `look (`）。⇒ 教训写死：**这个形状不能靠一把正则定枚数，只能"尺出候选＋逐枚读行"**；第二把与第三把为什么差 1 本腿没再追（要再发一发带 `-o` 的对照，⛔ 同一发不该被拆成两次），⚠ 三个数全部留在盘上，⛔ 只准引用 §5 那行"10 命中／7 真枚＋三枚假命中具名"。
 3. **一条 `&&` 链被 `grep -c` 的 `rc=1` 打断**：我想在同一轮里先读 `slo-check.ps1` 的带-sigil 命中数、再读裸词命中行，写成 `grep -c ... && grep -n ...`。`grep -c` 输出 `0` 同时给 `rc=1`，链子后半段没执行，那一轮只拿到 `0`。⇒ 下一轮换 `;` 分隔重跑才拿到 `:241`/`:252` 两行。**教训已写进 §1 现量 1 那条 ⚠**（`grep -c` 的"0 命中"长得像"尺坏了"）。
 4. **骨架第一版把 §1 的四条写成了 `- [ ]` 框**：⛔ 交件不许碰任何 AC 框，而带勾框的语法在票池里就是框。已在同一次 commit 之前替换成普通条目（`d3059bfb` 之前的一次 Edit），但**第一版的字节确实落过盘**，记此以免下一任以为 §1 曾经带框。
 5. **我把票 263 的 scope 名册句（"internal/cmd/frontend/design/tools"）一度当作盘上事实**：直到自己 `sed` 了 `declaredScopes()`＋`emojiScopes()` 才发现 `tools/` 那一枚不在名册里（`main.go:55-59` 逐字排除 `tools/**`）。⇒ §1 现量 1 那条 ⚠ 是本腿的更正成果，不是我抄来的。
@@ -243,7 +243,9 @@
 7. **一把尺的枚数我先写错了：`grep -nE 'Get-Content|\$PSCommandPath|\$PSScriptRoot|"\$0"' scripts/*.ps1 scripts/*.sh` 我第一版写成"命中 12 行"，现跑真值＝20 行。** 错因＝我把第一次那段被 `head -50` 截断的输出里**数得出来的条数**当成了全量枚数（那段输出其实只有 12 行进入我的视野，`portable-tests.sh:79`／`winsec-tests.sh:34`／`wisp-cli-tests.sh:49`／`build.ps1:79`／`fetch-deps.ps1:32`/`:58`/`:124`／`slo-check.ps1:544`/`:568` 等是在后面重跑时才逐枚出现的）。⇒ 这正是票面纪律"带 `| head -N` 的输出只能当样例不许当枚数"管的那一发，本腿犯了并就地改正（§5 已按 20 写，并逐枚具名）。
 8. **同一件事的两把尺给过两个数（`$0` 那把）**：`grep -nE '\\$0|"\$0"|BASH_SOURCE'` 只吐 2 枚（`d22scan.sh:40`、`portable-tests-selftest.sh:86`），而 §5 那把四选一的正则吐 20 枚。差别在 `\\$0` 那一支在 ERE 里要求"反斜杠＋$"，`portable-tests.sh:79` 那种写法根本不匹配它。⇒ 结论：**枚数依赖尺的拼法**，本件里所有枚数都随尺逐字给出，下一任要复现请照抄 §5 那把，不要自造。
 9. **我把 path-length 那把门本体的 rc 量错了对象**：那一发我写的是 `sh scripts/check-path-length-budget.sh --with-self-test 2>&1 | tail -25; echo "rc=$?"` —— `echo` 读到的是**管道尾 `tail` 的 rc（0）**，不是门的 rc。⇒ 本件里那发只引用**文字判据**（`VERDICT GREEN` ＋三行 `control n/3 ok` ＋ `positive control PASSED`，它们由 `set -e` 下的脚本自己打到最后一行，见 `check-path-length-budget.sh:541-542`），⛔ 不引用"rc=0"这一枚。要干净的 rc 得再发一发且不带管道（本腿受"只在引用分母时跑一次"的约束，没有再发）。
-10. **一次 Edit 打空**：我第一次给 §1 写正文时 `old_string` 用的是骨架的另一种写法（"条目内容见本节正文（骨架节）"），匹配 0 处、整发失败；改回逐字复制现有两行才落成功。⇒ 记此以免下一任以为 §1 有过两个版本。
+10. **一次 Edit 打空**：我第一次给 §1 写正文时 `old_string` 用的是骨架的另一种写法（"条目内容见本节正文（骨架节）"），匹配 0 处、整发失败；改回逐字复制现有两行才落成功。⇒ 记此以免下一任以为 §1 有过两个版本。（⚠ 同一枚事故在本节又发生一次：我给 11/12 两条做插入时把 `old_string` 选成了第 10 条整条，于是把它**覆盖**掉而不是追加，发现后按本节纪律原句补回，只追加、不删历史。）
+11. **我自己的 commit message 数错了本节的枚数**：`6d82eceb` 那条写的是"§7 记我六枚写错的尺"，而本节当时已有 10 枚、现在 12 枚。⇒ 已推送与否都不改写历史（`.scratch/wisp/issues/README.md` 规则：要更正就追加新 commit），所以这里只登记差异，⛔ 不 amend。下一任以盘上正文为准。
+12. **问⑤ 标题我先写"6 枚"、正文表是 7 行**：同一发里 §5 的名册又扩到 10 行。⇒ 三处枚数分属三把口径（问⑤ 表＝自检形状 7 枚、§5 名册＝含"检查别人/被别人检查"的对照组 10 枚、§2 问① 名册＝全仓读脚本内容的步 19 枚），标题已就地改成"7 枚（§5 扩到 10 行）"。记此以免被引用成"三个 7/10/19 打架"。
 
 ---
 
