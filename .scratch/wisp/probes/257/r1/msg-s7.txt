@@ -1,0 +1,1 @@
+257-r1c 证据件 §7 门禁五数：取数锚 64077e80、起手 internal/config 零脏；①d22scan 红恰为预告那枚 phantom-citation（265-r1 写面遗留，零新增，自检 33 组全 PASS）；②path-budget GREEN（5687 tracked/57 rostered）；③gofumpt 点名 settings_257_test.go 一枚（纯排版，预期"应空"实测非空，属新发现不合格点，归口 §8）；④vet rc=0；⑤go test -count=1 PASS=91 FAIL=0 SKIP=0，五枚 TestTicket257 逐枚 PASS。既有红名册逐名比对完，除 gofumpt 新发现一枚外零偏离。

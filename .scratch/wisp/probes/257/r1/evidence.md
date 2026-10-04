@@ -141,7 +141,23 @@ settings_257_test.go 工作树＝3a223edd967666ab26aa92b0fe4e1b0c ＝ blob(84ab5
 
 ## 7. 门禁读数（本节答：d22scan／path-length-budget／gofumpt／go vet／`go test -count=1 -v ./internal/config/` 五门，带时刻，红名集合逐名比对并写清哪几枚既有）
 
-未判。
+**取数锚点**：开工锚 `64077e80 2026-10-04 19:19:22 +0800`（branch `dev`）；起手 `git status --porcelain -- internal/config`＝**0 行**（前任交完已干净，闸门通过，本节全部读数取自当前树、未 checkout）。本腿未种任何突变（§6 由前任 `257-r1b` 交齐），下表全部是**当前树**的复量收尾读数。
+
+| 门 | 时刻（+08） | 读数 | 判 |
+|---|---|---|---|
+| ① `sh scripts/d22scan.sh` | 19:2x 起、末读 19:28 前完成（rc=1） | **红，且恰为派单预告的那一枚既有红，零新增**：`cmd/wisp/resident_approval_windows.go:38: [phantom-citation] comment cites repo path "internal/panel/panel_pump.go" which does not exist on disk (ticket 212 ban #9)`。红名逐名比对＝全集只有这一枚；该文件在 `cmd/wisp`＝死去接续腿 `265-r1` 的写面遗留（`internal/panel/panel_pump.go` 引了不存在的路径），**归 265 腿账户，本腿不许修、未碰 cmd/wisp 任何文件**。自检 33 组全部 PASS（含正控 `TestScanDetectsAllSeededViolations`、`TestBan8MathBandAndRemainingGaps` 正反两向、`TestBuiltBinaryGoesRedEndToEnd` 全发），唯二 FAIL 均由同一枚 phantom-citation 触发：`TestScannerSelfScanOfRealRepoIsGreen`（"repo HEAD violates" 同一枚红句）与 `TestRealRepoLedgerIsHonest`（"1 finding(s)" 同一枚红句）；runtests 汇总 `PASS=33 FAIL=2 SKIP=0`。**待 265-r1c 修复后需一次复量**（§8 具名） | **红（既有，265 腿账户）** |
+| ② `sh scripts/check-path-length-budget.sh --with-self-test` | 19:2x 首跑、19:32:47–19:32:51 复量 | **GREEN**（rc=0，两次同判）：`VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`；正控 3/3 ok；denominator `tracked paths=5687  over-budget=57  covered by roster=57  not in roster=0`；bands `over the hat=57 … past the old debt line(180)=0  in the wall interval=0  roster entries=57`；byte/char 双单位互核选出同一批 57 枚 | **绿** |
+| ③ `gofumpt -l internal/config/` | 19:28:35 | **非空（派单预期"应空"，实测点名一枚）**：`internal\config\settings_257_test.go`（gofumpt v0.12.0 / go1.27.1，经 `"$(go env GOPATH)/bin/gofumpt.exe"` 全路径跑出，`gofumpt` 裸名不在本机 PATH＝rc 127）。diff 形状＝**纯排版**：`writableRosterWalk()` 复合字面量拆行（短元素内联改逐字段行＋闭括号另起），无任何语义变化。该文件是前任收编的继承测试件，在「不碰 `internal/` 产码与测试」边界内**本腿不许修** ⇒ 归口 §8（派单既有红名册未含它，属**本腿实测新发现的不合格点**，如实登记） | **红一枚（新发现，本腿不修）** |
+| ④ `go vet ./internal/config/` | 19:28 前、19:29:37 复量 | rc=0，零输出，两次同判 | **绿** |
+| ⑤ `go test -count=1 ./internal/config/` | 19:28:28 普通档 rc=0 `ok … 1.217s`；19:29:55 -v 档全绿 `ok … 1.341s`；19:30:41 单次跑内核对 | **PASS=91 FAIL=0 SKIP=0**（`ok` 收尾；91 枚 top-level `--- PASS`，另有 50 枚子测试级 `    --- PASS` 在同一次跑内；141 枚 `=== RUN` 与 91＋50 全对账，无 FAIL 无 SKIP）。五枚票件测试逐枚现量 PASS（19:31:13 `-run 'TestTicket257'`）：`TestTicket257R1AC1CleanMachineRefusesAllSevenFields`（回执 `seven refusals by reason: map[第 2 种拒因：行不存在:7] (fields: 7)`）／`…AC1HandAddedRowsUnlockAllSevenFields`／`…AC2MissingFileIsItsOwnSentence`／`…AC2MissingRowIsItsOwnSentence`／`…AC2InvalidValueIsItsOwnSentence` | **绿（0F/0S）** |
+
+**既有红名册比对（派单预告 vs 实测，逐名）**：
+
+| 名册预告 | 实测是否在 |
+|---|---|
+| d22scan：`cmd/wisp/resident_approval_windows.go:38` phantom-citation（265 腿遗留） | **在**，且为 d22scan 红名全集（零新增） |
+| `internal/panel` `TestC21DesignTokensFourWayAgree` 族（design 资产删除所致） | 未在本节读数窗内出现——本节五门均不触 `internal/panel` 测试集；不追、不比对失败 |
+| `cmd/wisp` gofumpt 点名 `models.go`／`pending_read.go`／`queue.go`（票 212/258 账户） | 不在本门读数窗——③ 只扫 `internal/config/`，cmd/wisp 三枚未进口径；不追 |
 
 ## 8. 判不动／量不到（本节答：具名＋归口，不许"应该没问题"填空；含 AC#1 里属于 `cmd/wisp` 的那一格我为什么够不着）
 
