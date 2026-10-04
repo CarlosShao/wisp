@@ -205,6 +205,7 @@
 4. **还原证明差点少一发比对**：14:48:23 那发的 `git status --porcelain -- cmd internal` 打印出 ` M internal/ball/hotkey_borrow_refused_260r5_test.go`，我差点把它记成本腿未还原的痕迹（它属 `260-r5`，随后由它自己提交）。⇒ 记：**状态计数要现跑现抄并把每一行归到名上**；本腿最终那发才是空输出（§4）。
 5. **一次编辑竞态自伤**：V2 还原后我用 `Edit` 改产码，工具回了"file changed since your last read"（因为我用 `cp` 还原过、文件 mtime 变了）。我没有靠那次提示继续瞎改，而是先 `git diff` 确认工作树相对 HEAD 只差我要的那一行，才跑 V2（凭据＝`mut-V2-window-hardcoded.txt` 上方那 12 行 diff 输出）。⇒ 记：**突变台件的形状校验要在跑之前做，不是事后。**
 6. **一把尺的射程我说过头过一次**：§1.2 里 `grep -rn ... | head` 之后我差点把 `GREP_RC=0` 当成 grep 的退出码（那其实是管道末端的）。⇒ 本表里凡"0 命中"我只写自己直接看到空输出的那几发（ⓑ 那句、`hotRowClaims`、`thresholds.go`）。
+7. **交件发上盘时 git 给了 18 条 `LF will be replaced by CRLF` 提示**（尺＝本腿 `git add` 那一条命令的 stderr）——**包括我那两份 pristine 台件**。⇒ 后果具名：这台机器带 autocrlf，**谁按 §4 去复跑 md5 时，比的必须是本腿交件时工作树里的那份，不是未来一次 `git checkout` 之后的那份**；未来复验 pristine 的 md5，请改用 `git cat-file blob <sha>:<path> | md5sum`（本腿 §4 验它那一发用的正是这把尺，不受行尾转换影响）。本腿交件后复跑：两枚产码文件与两份 pristine 的 md5 **仍逐字等于 §4 表里那两行**，`git status --porcelain -- cmd internal` 与 `-- .scratch/wisp/probes/256/v1` 都为空 ⇒ 这一次没被改写，但这条风险得记在案。
 
 ---
 
@@ -214,8 +215,8 @@
 |---|---|
 | 占位词面扫描（形状同 §1.2 那把，字面不在本行重复） | **0 命中**（`grep -cE` 打印 0；第一次跑出 1 命中，命中的就是我自己抄尺那行，已就地改写成不重复字面的写法——记进 §9 之前它先被本腿自己抓到） |
 | 方括号待验标记枚数 | **0**（本表一律用具名散文写"未实测／量不到"，见 §6） |
-| `wc -l` | **222** |
-| `wc -c` | **37,395 字节** |
+| `wc -l` | **223** |
+| `wc -c` | **38,187 字节** |
 | 节次 | §1–§10 全填（§1 名册复认／§2 那一格三问＋用户看得见什么／§3 三格判语／§4 突变与还原／§5 门禁读数带时刻／§6 判不动十条／§7 翻勾建议／§8 甲乙不做三栏／§9 记本腿写错的尺／§10 自量） |
 | 台件名册 | `probes/256/v1/` 下 19 枚：本件 ＋ 两枚起手 pristine ＋ 两发突变 ＋ 两发探针 ＋ 一发红名比对（两枚 txt 名集）＋ 六发门禁/测试读数 ＋ 一枚基线 ＋ 本腿台件 `zz256_v1_probe_windows_test.go.bench`（从 `cmd/wisp/` 移入，只建不删） |
 | Git | 三发 commit 全带显式 pathspec（骨架发＝1 枚 md；本发＝同 1 枚 md），⛔ 无 `add -A`／`.`，⛔ 无 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`，⛔ 未 push，⛔ 未碰 `.scratch/wisp/issues/**` 任何一枚框，⛔ 未碰台账 `docs/reports/**` |
