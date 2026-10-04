@@ -178,9 +178,28 @@ func TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields(t *testing.T) {
 	if err := SaveFile(path, NewDefaults()); err != nil {
 		t.Fatalf("first-run SaveFile: %v", err)
 	}
+	body := readSettingsFile(t, path)
+	// The first default file already carries an EMPTY [llm.roles.chat] section
+	// (MarshalCanonical emits every static field, no omitempty), so the real
+	// operator move for the role pair is to FILL that section in place, not to
+	// append a second one - appending one is a toml duplicate-table error and
+	// would make this test lie about the machine.
+	if !strings.Contains(body, "[llm.roles.chat]") {
+		t.Fatalf("premise gone: the first default config no longer carries [llm.roles.chat]:\n%s", body)
+	}
 	// The operator follows the sentence: one provider section, its catalog rows
-	// with the enabled key the guidance names, and the chat role pair named.
-	hand := readSettingsFile(t, path) + `
+	// with the enabled key the guidance names, and the chat role pair named in
+	// the section that is already there. The provider key line is matched by
+	// regex so the test survives serialization-order drift.
+	hand := strings.Replace(body, "[llm.roles.chat]", "[llm.roles.chat]", 1)
+	hand = strings.Replace(hand,
+		"[llm.roles.chat]\nprovider = ''\nmodel = ''",
+		"[llm.roles.chat]\nprovider = \"deepseek\"\nmodel = \"deepseek-chat\"",
+		1)
+	if hand == body {
+		t.Fatalf("the empty chat pair the guidance teaches to fill was not found in the first default file:\n%s", body)
+	}
+	hand += `
 [llm.providers.deepseek]
 api_key_ref = "env:DEEPSEEK_KEY"
 
@@ -190,10 +209,6 @@ enabled = true
 
 [llm.providers.deepseek.models.deepseek-reasoner]
 enabled = true
-
-[llm.roles.chat]
-provider = "deepseek"
-model = "deepseek-chat"
 `
 	if err := os.WriteFile(path, []byte(hand), 0o600); err != nil {
 		t.Fatal(err)
@@ -223,23 +238,23 @@ model = "deepseek-chat"
 		t.Fatalf("unlocked fields = %d/7 after following the guidance; shape (c) promises 7/7", accepted)
 	}
 
-	body := readSettingsFile(t, path)
+	bodyAfter := readSettingsFile(t, path)
 	for _, want := range []string{
 		"https://clean-machine.example.invalid/v1",
 		"128000",
 		"llm.providers.deepseek",
 	} {
-		if !strings.Contains(body, want) {
-			t.Errorf("the accepted writes never reached the file (missing %q):\n%s", want, body)
+		if !strings.Contains(bodyAfter, want) {
+			t.Errorf("the accepted writes never reached the file (missing %q):\n%s", want, bodyAfter)
 		}
 	}
 	// AC#3's boundary, asserted rather than assumed: this path stores a reference
 	// and never a value, and the schema still has no field that could hold one.
-	if !strings.Contains(body, "api_key_ref = 'dpapi:t257r1canaryblob01'") {
-		t.Errorf("the credential leg's reference did not land as a reference:\n%s", body)
+	if !strings.Contains(bodyAfter, "api_key_ref = 'dpapi:t257r1canaryblob01'") {
+		t.Errorf("the credential leg's reference did not land as a reference:\n%s", bodyAfter)
 	}
-	if strings.Contains(body, "api_key =") {
-		t.Errorf("a plaintext api_key key appeared in config.toml:\n%s", body)
+	if strings.Contains(bodyAfter, "api_key =") {
+		t.Errorf("a plaintext api_key key appeared in config.toml:\n%s", bodyAfter)
 	}
 }
 
