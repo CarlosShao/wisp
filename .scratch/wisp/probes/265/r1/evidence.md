@@ -11,28 +11,36 @@
 
 （本节答：开工闸门两条的现跑读数＋时刻；`git status --porcelain -- cmd internal`；在飞腿名单与本腿的归因边界；sherpa PATH 这一格怎么解决。）
 
-- 闸门① `git status --porcelain -- cmd internal`：**未判**
-- 闸门② `go test ./cmd/wisp/` 需要 sherpa PATH：**未判**
-- 闸门③ `winlive` 一律不跑：**未判**
+- 闸门① `git status --porcelain -- cmd internal`＝**空**（15:48:44 +08，HEAD `c528035f`；本腿动笔后 17:4x 复跑＝只有本腿那三枚写面为 `M`，见 §8.1）。
+- 闸门② sherpa PATH：`cmd/wisp` 的测试二进制在**装载期**就要三枚 dll（`third_party/sherpa-onnx/{onnxruntime,sherpa-onnx-c-api,sherpa-onnx-cxx-api}.dll`，本腿现跑 `find` 量到），缺则 `exit status 0xc0000135` 且**没有 `--- FAIL` 行**。本腿取数一律用仓里既有那把尺的形式：`export PATH="$PWD/third_party/sherpa-onnx:$PATH"`（逐字抄 `scripts/wisp-cli-tests.sh:103-108` 的实测结论——`pwd -W` 那形在这台机上**会** 0xc0000135，MSYS 形才对）。
+- 闸门③ `winlive`：**一枚都没跑**，只跑了 `go vet -tags winlive ./cmd/wisp/`（见 §6.4）。
+- 归因边界：`internal/tools`／`internal/agent/spill.go`（`174-r4`）与 `internal/config`（`257-r1`）**本腿没碰、没跑、不归因**；非本票的红一律先 `-count=3` 安静复量再判。
+
 
 ## 1. 形状复认（ⓐ-Ⅰ 三枚写面的开工时刻现量）
 
 （本节答：三枚文件在 `git cat-file blob HEAD:` 那儿的原始行号与原文；写面边界——`internal/agent/approval/**` 与 `cmd/wisp/run.go` 零改动怎么自证；有没有越界。）
 
-- 1.1 `cmd/wisp/resident_approval_windows.go` 建门字面量与 `:185-192` 那段注释：**未判**
-- 1.2 `cmd/wisp/resident_task_source_windows.go` 的绑定位时序（`:281` 之后、`submitTask` 之前）：**未判**
-- 1.3 `cmd/wisp/resident_approval_risk_256_windows_test.go` 的 AST 钉（`:445`／`:452-455`）：**未判**
-- 1.4 写面零越界自证：**未判**
+- 1.1 `cmd/wisp/resident_approval_windows.go`：**对得上派单**。HEAD blob md5 `7a26c7a990dbd2351bdf9898b5bdc192`（盘上同值＝起手干净）；`:219-225` 那枚 `approval.New(approval.Options{…})` 字面量起手实传 **5 枚**（`UI`/`Channels`/`Window`/`ApprovalTimeout`/`Logf`，无 `Grants`），`:185-192` 逐字含 "WHAT THIS DELIBERATELY DOES NOT CLOSE" ＋ "Options.Grants stays unset here"。
+- 1.2 `cmd/wisp/resident_task_source_windows.go`：HEAD blob md5 `5fe2fc858e953aaebdfb11de0da1f5ff`；`:281`＝`src.run = run`，`:321`＝`src.submitTask(injectedText)`，两者之间只有 `src.root = …` 与 reply/console 绑定那一段 ⇒ 绑定位落在这一带是**唯一**能满足"任何卡都可能被答复之前"的位置。
+- 1.3 `cmd/wisp/resident_approval_risk_256_windows_test.go`：HEAD blob md5 `f26bfbc7a2f1a10840fb007fc728f1a8`；`:445` 的 `want` 起手 5 枚，`:452-456` 起手是 `if got["Grants"] { t.Errorf(...) }` 反向断言。派单说"连带搬家／改写成反向形状"——本腿取**改写成反向形状**那一支（见 §3.2），并**没有**动同文件 `[risk]` 那两枚字段的任何断言。
+- 1.4 **写面零越界**：交件时刻 `git diff --numstat -- cmd internal` 里本腿的名册只有 §8.1 那四枚（三枚 `M` ＋一枚 `??`），`internal/agent/approval/**` 与 `cmd/wisp/run.go` **不在其上**；尺另跑一遍 `git status --porcelain -- cmd internal` 复量＝盘上另有 `M internal/config/settings.go` 与 `?? internal/agent/spill_pointer_authority_ac3_174r4_test.go`，**那是 `257-r1`／`174-r4` 的在飞面，本腿没碰、没跑、不归因**（派单闸门条）。
 
 ## 2. 产码：holder 的形状与晚绑定接线
 
 （本节答：holder 类型逐字设计；未绑定窗口为什么必须走 error 路径（硬约束第 1 条）；`run.session == nil`（mint 失败）落在哪一支；为什么只能晚绑定（硬约束第 2 条）；账本唯一构造点没被动（硬约束第 3 条）。）
 
-- 2.1 holder 类型与 `Record` 的未绑定支：**未判**
-- 2.2 建门字面量 `Grants:` 的实传（5 枚 → 6 枚）：**未判**
-- 2.3 绑定点与它的前后邻行：**未判**
-- 2.4 `:185-192` 那段注释改写后的原文（不许留反话）：**未判**
-- 2.5 顺带同批改释两枚（`resident_approval_windows.go:32-33`／`resident_task_source_windows.go:52-53`）：**未判**
+- 2.1 **holder**（`cmd/wisp/resident_approval_windows.go:190-290` 一段）：
+  - 类型 `residentGrantHolder{ mu sync.Mutex; target approval.GrantRecorder }`，零值＝未绑定 ⇒ "从没接过的形"天然 fail-closed。
+  - `Record`（`:253`）：**未绑定即 `return 0, errors.New(...)`**，句子中文、点名"还没绑上本进程的会话账本"；⛔ 不造 id、⛔ 不 `return nil`。落点＝`internal/agent/approval/gate.go:689-690` 的 `GRANT-RECORD-FAILED`（本腿没改那一行，读来的）。
+  - `bind`（`:229`）与 `bindSessionLedger`（`:242`）各带 **typed-nil 守卫**：`nil` recorder 与 `nil *session.Ledger` 都不写进 `target`。这一条不是洁癖——`gate.go` 那边只看 `g.grants == nil`，一枚"装着 nil 指针的非 nil 接口"会让门以为有账本，然后第一发答复就在 nil 接收者上炸掉；同型陷阱在本仓有名字，`cmd/wisp/run.go:570` 那句 typed-nil 守卫是同一个东西的读侧版本。
+  - `bound()`（`:268`）**只给判据用**，产码零调用者（尺＝`git grep -n "\.bound()" -- cmd`：命中全在本腿那枚新测试件里）。
+  - `bindResidentGrantLedger`（`:283`）＝ `ra.grants.bindSessionLedger(l)` 的薄封装，是唯一的绑定向导。
+- 2.2 **实传 5 枚 → 6 枚**：`:365` `ra.grants = &residentGrantHolder{}`（在建门之前），`:374` `Grants: ra.grants,`。派单说的"实传 6 枚"到位；尺＝§3 的 AST 钉（`TestTicket265GateLiteralCarriesTheResidentHolder` 断值是 `ra.grants`，不只是键在场）。
+- 2.3 **绑定时序**：`cmd/wisp/resident_task_source_windows.go:294` `src.run = run` → `:309` `ra.bindResidentGrantLedger(run.session)` → `:351` `src.submitTask(injectedText)`。⚠ **本腿没有在绑定位新加任何打印**：mint 失败那一路 `run.go:475-476`／`:483-484` 已经在 boot 印过 `SESSION-MINT-FAILED`／`SESSION-LEDGER-FAILED`，再补一句就是同件事说两遍；而 boot 状态句 `residentStatusLine` 有票 256 名册的零漂移钉（普查件 §4 N#9 具名），本腿不去碰它。**判读了**：`run.session == nil` ⇒ holder 保持未绑定 ⇒ 那一发的答复落 `GRANT-RECORD-FAILED`，是真话不是静默。
+- 2.4 **`:185-192` 那段注释改写后的原文**：段名从 "WHAT THIS DELIBERATELY DOES NOT CLOSE" 换成三节 ——「WHAT THIS CLOSES SINCE TICKET 265, AND WITH WHAT SHAPE」＋「WHAT STAYS OPEN ON PURPOSE…」（写清未绑定窗口与为什么那是硬约束第 1 条）＋「WHY THE GATE IS NOT JUST BUILT AFTER THE LEDGER EXISTS」（无控制台即 return ⇒ 载体不存在）。⛔ 原文那句 "Options.Grants stays unset here" 已不在盘上（尺＝`git grep -n "Grants stays unset" -- cmd` 交件时刻 0 命中）。上一段 "Two of the ten fields are now passed" 也**就地限定为 "for [risk]"**，否则它会与新第六枚字段互相打脸。
+- 2.5 **顺带同批改释两枚**（编排者 `A601` §5 点到的那两枚，就在本腿写面里）：`resident_approval_windows.go:32-33` 与 `resident_task_source_windows.go:52-53`（现量行号有位移，见 §8.1）那句 "this process links no WebView2 host" 改成真话两面：**宿主确实链了**（票 33／`panel_host_windows.go`／`resident_windows.go` 真建真起），**缺的是 Go→页面的通道**（`internal/panel/panel_pump.go:12-21` 逐字），所以"卡片在屏上"仍然不是这两枚文件能声称的。⚠ 后者原先那段"printed at boot rather than smoothed over"跟着普查件 §1.4① 一起更正——**boot 从来没印过那件事**，本腿把它写成"这一段从前声称的东西不存在"。第三枚 `internal/agent/approval/approval_always.go:165` **不在写面**，见 §7.1。
+
 
 ## 3. 判据：新建的钉与解冻后的钉
 
