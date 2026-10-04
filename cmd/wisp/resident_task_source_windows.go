@@ -37,10 +37,17 @@ package main
 // with ra's gate, ra's presentation surface and ra's Replies ledger handed IN
 // through runSpec. Nothing here calls approval.New: a second gate in this process
 // would be a second "who is waiting on a decision" truth source, which is exactly
-// the shape 246-a1 §5 reason 1 and ledger A481 refused. The consequence of that
-// ordering is printed at boot rather than smoothed over - a gate built before the
-// session ledger exists has no Grants writer, so 「本会话内允许」 releases the call
-// and books GRANT-DROPPED, which is approval.Gate's own documented posture.
+// the shape 246-a1 §5 reason 1 and ledger A481 refused. What that ordering costs,
+// and what it no longer costs: the gate exists long before the ledger does, so
+// Options.Grants could never receive a value at construction time - it receives
+// the late-bound residentGrantHolder instead, which startResidentTaskSource
+// attaches to the ledger it assembles (bindResidentGrantLedger, immediately after
+// src.run = run). Before ticket 265 this paragraph claimed the resulting gap was
+// PRINTED AT BOOT; it never was - census 265-a1 §1.4 read every print in the file
+// and found none. The truth is narrower and it lives here: while the holder is
+// unbound 「本会话内允许」 releases the call and answers with GRANT-RECORD-FAILED,
+// and once it is bound the same answer writes real rows. Either way the sentence
+// is approval.Gate's own, not a line this file composes.
 //
 // THE TASK ROOT (ruling 2.3). runSpec.taskCtx is ra.root, the context D38(e) step
 // 3 cancels. Without that line "leaving cancels the running task" would still be a
@@ -49,10 +56,16 @@ package main
 // the cards while the task kept running to its own LLM timeout.
 //
 // WHAT THIS FILE DOES NOT CLAIM.
-//   - Not that a card is visible. This process links no WebView2 host
-//     (approval_always.go:165), so the reading is the orb's state, the ledger, the
-//     audit line and what the desktop does with the cancel key - the same limit
-//     ticket 246 AC#2 wrote down.
+//   - Not that a card is visible ON A PAGE. The sentence this file used to carry
+//     here - "this process links no WebView2 host (approval_always.go:165)" - was
+//     false on the shipped tree: ticket 33 landed the host
+//     (panel_host_windows.go, built and started by resident_windows.go). The
+//     limit that is real is the next one, and it is panel_pump.go:12-21's own
+//     words - there is no Go-to-page channel in this tree, and an injected gate
+//     is given no publishing UI at all - so no approval card reaches that page.
+//     What can be read is the orb's state, the ledger, the audit line and what
+//     the desktop does with the cancel key - the same limit ticket 246 AC#2 wrote
+//     down.
 //   - Not a panel, not a microphone, not the tray menu (ruling 2.5). The panel's
 //     Message slot (panel_inbound.go:238) is still nil and stays nil; AC#6 settled
 //     that of D43's four veto channels only Esc lands in this ticket.
@@ -279,6 +292,22 @@ func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval) *residentTa
 		return src
 	}
 	src.run = run
+	// Ticket 265 (form ⓐ-Ⅰ, orchestrator ruling A601 §4): the session ledger this
+	// assembly just minted is bound into the holder ra.gate was built with, HERE
+	// and not a line later - src.run is the first moment a card could be answered
+	// through this process's gate, and submitTask below is the first moment one
+	// can exist. Binding is the whole of the write side: nothing in
+	// internal/agent/approval was touched, and no second ledger was minted (that
+	// shape is ⓐ-Ⅲ, refused by name).
+	//
+	// A nil run.session - the mint or the ledger failed, and run.go already said
+	// so at boot with SESSION-MINT-FAILED / SESSION-LEDGER-FAILED - leaves the
+	// holder unbound on purpose. That is not a silent hole: 「本会话内允许」 then
+	// answers with GRANT-RECORD-FAILED rather than booking an ANSWERED row for a
+	// rule that was never written.
+	if run != nil {
+		ra.bindResidentGrantLedger(run.session)
+	}
 	src.root = observe.NewRootFrom(ra.root, "resident-task-source")
 	// The reply side, on THIS process's root: rt.close() cancels rt.replyRoot, and
 	// rebindLedger is false because ra attached its ledger to ra.gate at boot with

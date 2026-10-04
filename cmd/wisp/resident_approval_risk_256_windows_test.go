@@ -39,14 +39,16 @@ package main
 //      the other half of "did it actually land": the production call site really
 //      hands over rt.Layout.DataDir instead of the no-view signature.
 //
-// WHAT IS NOT HERE, NAMED SO THE ABSENCE IS NOT MISREAD AS A PASS:
-// Options.Grants stays unset. The session ledger is constructed only inside
-// cmd/wisp/run.go's assembleRuntime, roughly 129 lines AFTER this gate is built
-// and behind a conditional early return (256-a2 census §0/§2), and g.grants has
-// one writer and no late-binding entry. Closing that half means a second minted
-// ledger or a new holder type - new seams, not a field. It is filed as pending
-// ticket 265, and ④ deliberately asserts Grants is ABSENT so nobody can quietly
-// claim AC#1 as whole from this leg.
+// WHAT WAS NOT HERE WHEN THIS LEG WAS DELIVERED, AND WHAT REPLACED IT:
+// Options.Grants stayed unset, because the session ledger is constructed only
+// inside cmd/wisp/run.go's assembleRuntime - 128 lines AFTER this gate is built
+// (resident_windows.go:132 to :260) and behind a conditional early return
+// (256-a2 census §0/§2) - and g.grants had one writer and no late-binding entry.
+// Ticket 265 adjudicated that half as form ⓐ-Ⅰ (a holder type inside cmd/wisp,
+// so no new seam in internal/agent/approval and no second minted ledger), and
+// ruler ④ turned over with it: it now asserts Grants is PRESENT. The absence this
+// block used to insist on is the reason A602 exists as a named unfreeze; reading
+// this file as "Grants must not be passed" is the stale reading.
 
 import (
 	"go/ast"
@@ -414,14 +416,22 @@ func declaredOptionsFields256(t *testing.T) []string {
 
 // TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims is ruler ④: the
 // resident leg's real Options field set, counted off the syntax tree. Before
-// ticket 256 it was 3 (UI / Channels / Logf); it is now 5. Either direction of
-// change reddens - deleting the two new fields, or adding a third one nobody
-// adjudicated.
+// ticket 256 it was 3 (UI / Channels / Logf); ticket 256 made it 5, and ticket
+// 265's form ⓐ-Ⅰ made it 6 by adding Grants - the named unfreeze A602 covers
+// THIS expectation set and that reverse assertion only, nothing else in this
+// file. Either direction of change reddens - deleting a field, or adding one
+// nobody adjudicated.
 //
-// Grants is asserted ABSENT on purpose. AC#1's other half is not this leg's work
-// (256-a2 census §0 judged it a different proposition, and it is filed as
-// pending ticket 265), so this ruler refuses to let the shipped shape be read as
-// "Options fully fed".
+// The name still reads "Five" and is not renamed: A602's boundary says this file
+// is not to be reordered or renamed, and acceptance legs compare red-name sets
+// verbatim, so a rename would read as a new failure to whoever runs next. The
+// count the ruler actually claims is the six above.
+//
+// Grants is asserted PRESENT now. It was asserted ABSENT until ticket 265 was
+// adjudicated (the old message said so: "the half was filed as pending ticket
+// 265"), and this is that nail turning over: it is now the ⓐ-Ⅰ positive control
+// AC#3 asks for, because removing the wiring - the Grants field, or the holder
+// behind it - reddens THIS name.
 func TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims(t *testing.T) {
 	path := filepath.Join(risk256Dir(t), "resident_approval_windows.go")
 	sets, literals := optionsFieldSet256(t, path)
@@ -442,17 +452,27 @@ func TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims(t *testing.T) {
 		}
 		got[n] = true
 	}
-	want := []string{"UI", "Channels", "Window", "ApprovalTimeout", "Logf"}
+	want := []string{"UI", "Channels", "Window", "ApprovalTimeout", "Logf", "Grants"}
 	for _, w := range want {
 		if !got[w] {
 			t.Errorf("the resident leg does NOT pass Options.%s to approval.New. That is the whole of ticket 256's "+
 				"[risk] half: Window and ApprovalTimeout are the two fields this leg exists to feed.", w)
 		}
 	}
-	if got["Grants"] {
-		t.Errorf("the resident leg now passes Options.Grants. That is NOT ticket 256-r1's scope: the session " +
-			"ledger has no value to hand over at this moment (256-a2 census §0), and the half was filed as " +
-			"pending ticket 265. Either a seam was minted outside that ticket, or this leg grew.")
+	// Grants, asserted PRESENT. The block here until ticket 265 asserted the exact
+	// opposite ("the resident leg now passes Options.Grants … the half was filed
+	// as pending ticket 265"); that ticket is now adjudicated as form ⓐ-Ⅰ and this
+	// is the nail turning over, which makes it the ⓐ-Ⅰ positive control AC#3
+	// asks for: delete the Grants field from resident_approval_windows.go's
+	// literal, or hand it anything that is not this process's late-bound holder,
+	// and THIS name reddens. The holder's own posture while unbound is not this
+	// ruler's business - TestTicket265ResidentGrantHolderUnboundFailsLoudly owns
+	// that, and it is the half that would lie if it were dropped.
+	if !got["Grants"] {
+		t.Errorf("the resident leg passes no Options.Grants, so 「本会话内允许」 on this gate books " +
+			"GRANT-RECORD-FAILED forever and the two sentences at approval_reply.go:277-281 stay false. " +
+			"Ticket 265's form ⓐ-Ⅰ (orchestrator ruling A601 §4, unfreeze A602) wires the resident " +
+			"grant holder here on purpose; if this leg is being reverted, revert A602 first.")
 	}
 	for n := range got {
 		found := false

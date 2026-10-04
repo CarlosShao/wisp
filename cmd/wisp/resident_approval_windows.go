@@ -29,9 +29,17 @@ package main
 //     shape cmd/wisp/run.go's confirmModeSwitch and approval_always.go's
 //     runWidening already use: a real admission (Gate.AdmitTextTask), a real
 //     queue item or a real L1 window, a real single-use grant.
-//   - Not a panel. This process links no WebView2 host (see the sentence at
-//     approval_always.go:165), so "the card is on screen" is NOT a claim this
-//     file makes. What it can and does claim: the gate opened a real pending
+//   - Not a panel this file writes to. The claim this file used to carry - "this
+//     process links no WebView2 host" - was FALSE on the shipped tree (ticket 33
+//     landed the host: panel_host_windows.go links go-webview2 and
+//     resident_windows.go builds and starts one), and the sentence is corrected
+//     here rather than left to mislead. The limit that IS real, and is the one
+//     that matters for a card: this tree has no Go-to-page channel at all
+//     (internal/panel/panel_pump.go:12-21 says so verbatim, "the last mile is
+//     still open"), and the injected branch of the assembly root publishes
+//     nothing (run.go hands an injected gate no rt.ui), so no approval card ever
+//     reaches that page. "The card is on screen" is therefore still NOT a claim
+//     this file makes. What it can and does claim: the gate opened a real pending
 //     item, the orb's rendered state and Replies.WaitingState() moved to
 //     Confirming, the cancel hot key was really taken from the desktop for the
 //     length of the window, and the audit line says which of those happened.
@@ -53,6 +61,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/ball"
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/risk"
+	"github.com/CarlosShao/wisp/internal/session"
 	"github.com/CarlosShao/wisp/internal/statemachine"
 	"github.com/CarlosShao/wisp/internal/tools"
 )
@@ -84,6 +93,12 @@ type residentApproval struct {
 	gate  *approval.Gate
 	cards *approval.Replies
 	ui    *ballCardUI
+
+	// grants is the late-bound session-grant writer this file hands to
+	// Options.Grants (ticket 265, form ⓐ-Ⅰ). It is bound to the ledger the
+	// assembly root mints, by bindResidentGrantLedger, and until then it refuses
+	// to record - see residentGrantHolder.
+	grants *residentGrantHolder
 
 	// riskWindow / riskTimeout / riskProvenance are ticket 256's [risk] receipt:
 	// what this gate was ACTUALLY built with, and where the numbers came from.
@@ -156,6 +171,119 @@ func (ra *residentApproval) cancelKeySpelling() string {
 	return residentCancelKeySpelling(ra.ui.currentBall())
 }
 
+// ---------------------------------------------------------------- the grant holder
+//
+// residentGrantHolder is ticket 265's form ⓐ-Ⅰ (orchestrator ruling A601 §4):
+// the value this file hands to Options.Grants at gate-construction time, whose
+// target is attached later, once cmd/wisp/run.go's assembleRuntime has minted
+// the process's one session ledger.
+//
+// WHY A HOLDER AT ALL. approval.Gate takes its grant writer exactly once, inside
+// New (gate.go:160, "grants: o.Grants"), and the pair it needs - the minted
+// identity and the ledger over the store - only exists inside assembleRuntime
+// (run.go:473 Mint, :478 NewLedger, :487 assignment to rt.session). The resident
+// leg calls that 128 lines after building this gate, and only on the branch that
+// has a task entry at all. A holder is the one shape that closes the loop without
+// either moving the gate or minting a second ledger.
+//
+// WHY THE GATE MAY NOT SIMPLY BE BUILT LATER (hard constraint 2, A601 §4): the
+// early return in startResidentTaskSource (its console == nil branch) leaves the
+// whole assembly unrun whenever the process has no interactive console, which is
+// precisely the double-click / Explorer shape D2 and ticket 228 call the process
+// the user actually launches. Build the gate after that point and that launch
+// gets no gate, no card, no Confirming orb state and no borrowed cancel key -
+// ticket 256 §7-5's "载体不存在", not a weaker dimension.
+//
+// WHY NO SECOND MINT (hard constraint 3, and the reason A601 §4 refused ⓐ-Ⅲ by
+// name): the gate would then write rows under one session id while the bridge
+// reads under another (run.go:478 vs a second Mint), so tools' grant check would
+// never find them - that is AC#1's rejected 「记到了别的会话」 arm, and the audit
+// would shout GRANT-RECORDED with a real grant_id while nothing ever reads it.
+//
+// WHAT IT MUST REFUSE WHILE UNBOUND (hard constraint 1, the one way this form
+// could end up WORSE than today): a Record that arrives before the bind returns
+// an error. approval.Gate turns that into its GRANT-RECORD-FAILED line
+// (gate.go:689-690), which says out loud that the call was released but the
+// scope did not stick. Inventing an id, or returning a nil error, would replace
+// today's honest GRANT-DROPPED sentence with a lie the console repeats verbatim:
+// replySurface.session prints 「记入本会话」 and books an ANSWERED audit row on the
+// err == nil path alone (approval_reply.go:277-281), so a silent holder would
+// put a false "recorded into this session" into <dataDir>\logs\*.jsonl - a
+// persisted record that disagrees with the database, which is one tier worse than
+// an over-promised prompt. Pinned by
+// TestTicket265ResidentGrantHolderUnboundFailsLoudly.
+//
+// The zero value is the unbound state, so a holder that was never wired (an
+// assembly that returned no runtime, a mint that failed) is still a holder that
+// fails closed rather than one that pretends.
+type residentGrantHolder struct {
+	mu     sync.Mutex
+	target approval.GrantRecorder
+}
+
+// bind attaches the ledger the gate writes through. The typed-nil guard is
+// load-bearing in both directions: an untyped nil recorder, and a nil
+// *session.Ledger, would both land in h.target as a NON-nil interface value
+// whose Record then dereferences a nil receiver - the same trap
+// cmd/wisp/run.go:570 names for the read side.
+func (h *residentGrantHolder) bind(rec approval.GrantRecorder) {
+	if rec == nil {
+		return
+	}
+	h.mu.Lock()
+	h.target = rec
+	h.mu.Unlock()
+}
+
+// bindSessionLedger is the typed half of bind, the one a *session.Ledger - which
+// may be nil when this boot could not mint a session identity - goes through.
+// Staying unbound is the correct outcome for that nil: the answer still releases
+// the current call, and the audit line says the scope was not remembered.
+func (h *residentGrantHolder) bindSessionLedger(l *session.Ledger) {
+	if l == nil {
+		return
+	}
+	h.bind(l)
+}
+
+// Record implements approval.GrantRecorder (the whole interface is this one
+// method, which is why a host package can and does supply its own). Every call
+// resolves the target under the lock, so a bind racing an answer is either seen
+// in full or not at all; nothing is cached on the gate side.
+func (h *residentGrantHolder) Record(ctx context.Context, tool, pattern string) (int64, error) {
+	h.mu.Lock()
+	target := h.target
+	h.mu.Unlock()
+	if target == nil {
+		return 0, errors.New("resident grant holder: 这枚门还没绑上本进程的会话账本" +
+			"（装配根还没走到 session.NewLedger，或那一发没铸出会话身份），本次「本会话内允许」没有记下任何规则")
+	}
+	return target.Record(ctx, tool, pattern)
+}
+
+// bound answers only the test bench "has a target been attached yet". It exists
+// for the pins, never for the gate: approval.Gate reads no method back
+// (gate.go:86-88 keeps Options.Grants write-only), and nothing in production
+// branches on this value.
+func (h *residentGrantHolder) bound() bool {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.target != nil
+}
+
+// bindResidentGrantLedger is the late half, called by the task source the moment
+// the assembly root has handed back a runtime: the ledger that runtime mints (or
+// failed to mint) becomes the writer this process's gate records through.
+//
+// One holder, one bind site, and it happens before any task can be submitted -
+// so no card this process shows can be answered while the holder is unbound for
+// a reason nobody named. Re-binding is allowed by construction (last writer
+// wins) but has no production caller; a second assembly in one process belongs
+// to the ⓐ-Ⅲ shape this ruling refused.
+func (ra *residentApproval) bindResidentGrantLedger(l *session.Ledger) {
+	ra.grants.bindSessionLedger(l)
+}
+
 // newResidentApproval composes the gate the resident leg runs on WITHOUT a host
 // config view. It is the pre-ticket-256 shape and it is kept for the 246 test
 // roster (orchestrator ruling 256 §8.2, form 甲ⓐ: the signature does not gain a
@@ -179,17 +307,37 @@ func newResidentApproval() *residentApproval {
 // gate was built from three Options fields - UI / Channels / Logf - so
 // confirm_timeout_sec and l1_window_sec changed nothing in this process: it ran
 // the compiled 300s / 3s no matter what config.toml said. Two of the ten fields
-// are now passed, and the two are the only two the assembly root can obtain at
-// this moment.
+// are now passed FOR [risk], and they are the only two [risk] values the
+// assembly root can obtain at this moment. A sixth field, Options.Grants, is
+// passed too; it carries no value at this moment at all, only a holder - see the
+// next block, because reading the two sentences as one would misdescribe both.
 //
-// WHAT THIS DELIBERATELY DOES NOT CLOSE, NAMED SO IT IS NOT MISTAKEN FOR DONE:
-// Options.Grants stays unset here. The session ledger's only production
-// construction site is cmd/wisp/run.go inside assembleRuntime, which this file's
-// gate is built roughly 129 lines BEFORE (256-a2 census §0/§2), and g.grants has
-// exactly one writer in the repository (gate.go's New) with no late-binding
-// entry. Making that half move means either a second minted ledger or a new
-// holder type - both new seams, not a field to fill in. That half is filed as
-// ticket 255's sibling (pending ticket 265) and is NOT this leg's work.
+// WHAT THIS CLOSES SINCE TICKET 265, AND WITH WHAT SHAPE (orchestrator ruling
+// A601 §4, form ⓐ-Ⅰ): Options.Grants is no longer left unset. It carries
+// residentGrantHolder, a late-bound approval.GrantRecorder implemented right
+// here in cmd/wisp - the interface is one method (gate.go:66-68), so a host
+// package can supply one without any new seam inside internal/agent/approval,
+// which this ticket leaves untouched. The holder is bound to this process's ONE
+// session ledger by bindResidentGrantLedger, called by startResidentTaskSource
+// immediately after assembleRuntime returns and before any task is submitted.
+//
+// WHAT STAYS OPEN ON PURPOSE, NAMED SO IT IS NOT MISTAKEN FOR CLOSED: the
+// holder's unbound window. Between this construction and that bind - and for the
+// WHOLE life of a process whose session mint failed, or whose task entry never
+// assembled - Record returns an error, so 「本会话内允许」 releases the current
+// call and the audit prints GRANT-RECORD-FAILED. It never returns a nil error and
+// never invents a grant id: doing either would let approval_reply.go:277-281
+// print 「记入本会话」 and book an ANSWERED row for a rule that does not exist,
+// which is a false record, not a weaker one. That posture, not the field list, is
+// what TestTicket265ResidentGrantHolderUnboundFailsLoudly is for.
+//
+// WHY THE GATE IS NOT JUST BUILT AFTER THE LEDGER EXISTS: the ledger's only
+// production construction site is inside assembleRuntime, and the resident leg's
+// task source returns early without assembling anything when
+// interactiveStdin() has no console - the double-click shape, the one the user
+// actually launches. Moving the gate behind that branch removes the carrier
+// (gate, card, Confirming orb state, borrowed cancel key) rather than weakening a
+// dimension of it. Late binding is the only shape available here, not a taste.
 //
 // THE LIMITATION THAT MUST TRAVEL WITH THIS FUNCTION (census §3, pinned by
 // TestTicket256ResidentGateRiskValuesAreConstructionTimeOnly): approval.Gate
@@ -214,6 +362,7 @@ func newResidentApprovalWithConfig(dataDir string) *residentApproval {
 	root, cancel := context.WithCancel(context.Background())
 	ra := &residentApproval{root: root, cancel: cancel}
 	ra.ui = &ballCardUI{ra: ra}
+	ra.grants = &residentGrantHolder{}
 	window, timeout, provenance := residentRiskGateValues(dataDir)
 	ra.riskWindow, ra.riskTimeout, ra.riskProvenance = window, timeout, provenance
 	ra.gate = approval.New(approval.Options{
@@ -222,6 +371,7 @@ func newResidentApprovalWithConfig(dataDir string) *residentApproval {
 		Window:          window,
 		ApprovalTimeout: timeout,
 		Logf:            ra.residentAuditf,
+		Grants:          ra.grants,
 	})
 	// The receipt is read OFF THE GATE, not off the arithmetic above: what is
 	// logged is what the object actually holds after New's own clamping, so the
