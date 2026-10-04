@@ -385,13 +385,54 @@
  （b）`GRANT-RECORD-FAILED`／`GRANT-RECORDED` 有没有尺在断（尺自拉）；
  （c）票 224／256／260／266 里与票 265 现量**冲突**的句子，指到行号，⛔ 不改别的票的票面。）
 
-### 5.A （a）`Options` 里别的字段在某条生产腿上留空——未判
+### 5.A （a）`Options` 里还有哪枚字段在某条生产腿上留空＝**四条腿同形留空 4 枚，但只有 `Grants` 这一枚没有兜底**
 
-### 5.B （b）`GRANT-RECORD-FAILED`／`GRANT-RECORDED` 有没有尺在断——未判
+尺＝`git show HEAD:internal/agent/approval/gate.go` 取 `type Options struct` 全字段 ＋ `git show HEAD:cmd/wisp/run.go \| sed -n '605,625p'` ＋ 两枚产码字面量逐字段对表（读数档 `logs/13-sec5-ab.txt` §L1/L2、`logs/14-sec5a-fields.txt`、`logs/16-clock-status.txt`）。
 
-### 5.C （c）票 224／256／260／266 与票 265 现量冲突的句子——未判
+**全集 10 枚**（`gate.go` 现量）：`UI / Clock / Channels / Window / ApprovalTimeout / WarningLead / MaxPending / MaxTracked / Logf / Grants`。
+**两枚产码字面量各传几枚**：`run.go:612`（`wisp run` 腿）＝**6**（`UI/Channels/Window/ApprovalTimeout/Logf/Grants`）；`resident_approval_windows.go:219`（常驻腿，HEAD）＝**5**（少 `Grants`）。⇒ **两枚生产腿都留空的是同一批 4 枚：`Clock`、`WarningLead`、`MaxPending`、`MaxTracked`。**
 
-### 5.D （d）本腿顺带看到、不在 (a)(b)(c) 三档里的——未判
+| 字段 | 谁留空 | 后果（读码） | 有没有尺 |
+|---|---|---|---|
+| `Clock` | **两条生产腿都留空** | **无后果**——`gate.go:127-129` 有兜底：`if clock == nil { clock = SystemClock{} }`（那一行上面的注释逐字 "never a downgrade"）。⇒ 生产拿系统时钟，测试拿 fake | 只在包内有尺：`internal/agent/approval/ticket84_no_owner_test.go:59`、`:154`、`ticket87_veto_l2_test.go:49`、`ticket97_alias_direction_test.go:32`、`ticket220_l1_window_read_test.go:203/:383`、`ticket224_reply_grant_test.go:120` **全是包内自造 Options**。⛔ 没有一枚尺钉"生产腿该不该传 Clock" |
+| `WarningLead` | 两条都留空 | **无后果**——`queue.go:88-90`：`warnBefore <= 0 \|\| warnBefore >= timeout` ⇒ `DefaultApprovalWarning` | 同上：只有包内 `batch_test.go:90/:123`、`queue_test.go:192`、`ticket84:61`、`ticket87:51` 显式传值。**产码侧零枚尺** |
+| `MaxPending` | 两条都留空 | **无后果**——`queue.go:91-93` ⇒ `DefaultMaxPending` | 包内 `queue_test.go:335`（`Options{MaxPending: 1}`）。产码侧零枚 |
+| `MaxTracked` | 两条都留空 | **无后果**——`gate.go:152-154` ⇒ 常量 `64`（**兜底值是枚字面量，不是 `Default*` 常量**，⚠ 这一形比另外三枚脆：将来谁把 64 换成常量，那枚换法没有任何产码尺在盯） | 零枚（`logs/14-sec5a-fields.txt` §M1 只命中 `fakes_test.go:269`，是仪器自己的拷贝表） |
+| **`Grants`（对照面）** | **只有常驻腿留空** | **有后果，且是唯一一枚没兜底的**：`gate.go:155-165` 的 `New` 对上面 4 枚都有 `if`，**对 `Grants` 只有 `grants: o.Grants,` 一行直传**（`:160`）⇒ nil 不在构造期被换成任何东西，而是**推迟到答复那一刻**才由 `:673` 那一支兜——兜出来的是"放行但不记"＋一行日志。⇒ **本票的整条因果线就是"这一枚 Options 字段没有 default 分支"这件事**；如果 `New` 当时给 `Grants` 也写了一枚兜底（哪怕是"记不了就报错"），本票不会存在 | 见 §5.B |
+
+⇒ **给编排者的一句话（不是问题，是形状）**：ⓐ-Ⅰ 落地之后，`approval.Options` 的 10 枚字段里，"两条生产腿都不传"的还剩 **4 枚**，其中 **3 枚有 `Default*` 兜底、1 枚（`MaxTracked`）有裸字面量 64 兜底**；**"一条腿传一条腿不传"的还剩 0 枚**。⇒ 这一格以后不会再长出本票这一形，**除非**有人给 `New` 加第 11 枚字段而忘了兜底分支——那件事的唯一哨兵是 §4.C a-6（`resident_approval_risk_256_windows_test.go:476` 的 `len(declared) < 10`），而**它的哨兵是"枚数"不是"有没有兜底"**，⛔ 它拦不住"加了字段没加兜底"。〔仅读码，未跑〕
+
+### 5.B （b）`GRANT-RECORD-FAILED`／`GRANT-RECORDED` 有没有尺在断＝**RECORDED 12 命中／RECORD-FAILED 在 HEAD 只有 1 命中，且不在 `cmd/wisp`**
+
+尺（本腿自拉，读数档 `logs/13-sec5-ab.txt` §L3、`logs/18-sec5c-conflicts.txt` §Q2）：
+- `git grep -n 'GRANT-RECORDED' -- cmd internal tools` ⇒ **14 命中**，其中 `*_test.go` **12 命中**；
+- `git grep -n 'GRANT-RECORD-FAILED' -- cmd internal tools` ⇒ **7 命中**，其中测试 **2 命中**——⚠ 但那 2 命中里**有 1 是在飞的 `265-r1` 工作副本**（`cmd/wisp/resident_approval_risk_256_windows_test.go:473` 的**错误文本**，不是断言）；
+- ★ 决定性那一发＝`git grep -n 'GRANT-RECORD-FAILED' HEAD -- '*_test.go'` ⇒ **恰好 1 命中**＝`internal/agent/approval/ticket224_reply_grant_test.go:308`（`if !f.log.has("GRANT-RECORD-FAILED")`）。**枚数＝1，且它在 `internal/agent/approval` 包里、用的是包内 fixture。**
+
+⇒ **三条上报，逐条给后果：**
+
+1. **ⓐ-Ⅰ 的第一条硬约束（票面「落地三条硬约束」第 1 条："holder 在还没绑到 ledger 那段窗口里 `Record` 必须走 error 路径"）在 HEAD 上零枚产码侧尺**。包内那一枚 `:308` 断的是"recorder 的 `Record` 返回 error ⇒ 落 `GRANT-RECORD-FAILED`"，**它不知道常驻腿有没有 holder、也不知道 holder 有没有绑定**。⇒ **AC#3 的正控（"种一次 holder 未绑定 ⇒ 指名用例红"）今天无处可种**，必须随 ⓐ-Ⅰ 新建；这与 §4.F N14 那两句假话同格——**票面自己要求的那枚正控，正控对象今天没有仪器**。〔仅读码，未跑〕
+2. **`GRANT-RECORDED` 的字面格式被两枚尺钉死**（`cmd/wisp/ticket224_assembly_test.go:189-190` 与 `internal/agent/approval/ticket224_reply_grant_test.go:219`/`:318`，后者还钉到 `grant_id=11`）⇒ ⓐ-Ⅰ **不许为了让审计"看得出是哪条腿"而改 `gate.go:693` 那行的字段顺序或加后缀**。这格是**给落地腿的红线**，不是缺陷。
+3. **`GRANT-RECORD-FAILED` 与 `GRANT-RECORDED` 的极性在 `cmd/wisp` 侧只有一枚反形尺在场**（`ticket224_assembly_test.go:194` 只反钉 `GRANT-DROPPED`，**没有一枚反钉 `GRANT-RECORD-FAILED`**）⇒ 推论：**"装配正确"的那枚产码尺对"记账写失败"不敏感**。种一发"ledger 已接、但 `Record` 恒返回 error" ⇒ 本腿读码判 `cmd/wisp` 侧**零枚红**（`internal/agent/approval` 侧 `:308` 会绿，因为它要的正是这句）。⚠ 这一格是**量不到的那一种**：判它要么跑 §4.I 的 U14，要么由 ⓐ-Ⅰ 落地腿补一枚反形钉。归口：票 265 AC#3。〔仅读码，未跑〕
+
+### 5.C （c）票 224／256／260／266 与票 265 现量冲突的句子（指到行号，⛔ 一枚票面未改）
+
+| # | 别票的那一句（`file:line`） | 逐字在说什么 | 与票 265／本件的哪一句撞 | 本腿判 |
+|---|---|---|---|---|
+| **C-1** | `.scratch/wisp/issues/224-session-scoped-grant-has-zero-executors-and-no-session-identity.md:1` ＋ 同文件 `:19` | 标题句"`approval_grant` 没有生产写手" ＋ 表格行"⛔ **生产零写手／零读者**：那几枚 DAO 方法的非测试调用者＝0" | 票 265 `:4` 那句"它 09-29 那句'生产零写手'已被 224-r1/r2 部分推翻——今天 `run.go` 确实接了两枚" ＋ 本件 §2.3 现量（`run.go:618`／`:758`） | **冲突成立且是过期不是错判**：265 已具名说它"部分推翻"，但 **224 票面那两行没跟着加更正标注**（票面纪律＝append-only ⇒ 只有 224 自己或编排者能补）。⇒ 下一任读 224 票面会再得到一次"零写手"的错误先验。**归口：224**，本腿不动 |
+| **C-2** | `.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:8` | "`resident_approval_windows.go:108-113` 逐字 `ra.gate = approval.New(approval.Options{` 里只有 `UI`／`Channels`／`Logf` 三项" | 本件 §1.2（现量＝5 枚 `UI/Channels/Window/ApprovalTimeout/Logf`，HEAD 行号 `:219-224`）＋ 票 265 §现量.2 | **256 票面自身已过期**（256-r1 落地把它从 3 枚变 5 枚）；256 自己在 `:58` 只更正了"区间起点偏一行"、**没更正"三项"**。⇒ 属"票面未回填"，不属矛盾。**引用 256 §现量.1 前必须按 `git show <锚>:` 读**，这一格与本件 §4.E-3 那批行号漂同族 |
+| **C-3** | `.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer.md:53` | "AST 钉搬家需具名解冻＝**具名解冻已落 `A601`（五样齐＋撤销口令）**" | 台账：`docs/reports/pending-and-issues.md:11725`（A601 正文那句"AST 钉搬家需具名解冻＝**见 `A602`**"）＋ `:11738`（**`A602` 才是**"具名解冻·五样齐：期望集 5 枚→6 枚"，口令「265 撤 AST 钉解冻」在 `:11744`）＋ 另票旁证 `.scratch/wisp/issues/256-...md:24`（同一句写的是 `A602`） | ★ **票 265 面自己那一处是笔误（`A601`→应为 `A602`）**，三处独立凭据同向。⛔ 本腿不改票面（AC 框与票面归编排者）；**落地腿照 `A602` 的边界办，不要照票面那一行的 `A601`**——两枚的撤销口令不同，读错会撤错东西 |
+| **C-4** | `.scratch/wisp/issues/256-...md:92` | 定式：**"禁现那格 ⛔ 不许钉前缀 `approval: GRANT-DROPPED`（前缀两形同吃＝票面 §7-6 已定的洞；`ticket224_reply_grant_test.go:283` 用的正是前缀，**不可复用、也不许为让前缀零命中去改它**）"**，并指定该钉的独有词组是 `gate.go:675` 那句「本机没有接入会话授权记账」 | 票 265 §现量.3（`:10`）把 `:283` 那枚当"既有尺两枚"之一引用 ＋ 本件 §4.B N2 与 §4.C 的起手尺族 | ★ **真冲突，且冲突在 265 的引用面**：265 用一把 256 已判"不可复用"的尺当现量凭据。本件照实复认了它的读数（它确实断"这句在场"），但 ⚠ **ⓐ-Ⅰ 落地时若要写"常驻腿上不许再出现 GRANT-DROPPED"这类禁现格，必须按 256 那句定式钉独有词组、不许钉前缀**——否则一票的判据面被另一票的定式否掉。**归口：编排者**（要不要在 265 面补一句指回 256:92） |
+| **C-5** | `.scratch/wisp/issues/260-configured-cancel-hotkey-never-registers.md:63` | 撤销口令「**260 文案撤回**」的射程＝"给人看的那句话"，凭据＝`A595` 具名解冻五样齐（文件／行／理由／边界／口令） | 票 265 面 `:24` 那句"⚠ 文案射程刚被票 260 那批钉过" ＋ 本件 §4.D N7/N8（`resident_cancel_key_wording_260r3_windows_test.go:107`／`:103`）**与 N14（`approval_reply.go:278`/`:280` 那两句）** | **不冲突，是补边界**：260 那批钉的是**取消键那五句**，而 ⓐ-Ⅰ 之后可能被动的是 `approval_reply.go` 那两句**同族但不在 260 射程内**的人看句。⇒ 本腿量到：**那两句今天零枚钉（§4.F N14），所以它们既不在 260 的解冻面里、也不在任何禁改面里**——动它不需要 260 的口令，但 ⛔ **也不要有腿拿"没人钉"当"可以不改"的理由**（AC#1 ★ 条要求两句都处理） |
+| **C-6** | `.scratch/wisp/issues/266-no-external-tooth-over-the-slo-check-self-locking-nails.md:52` | 禁改清单里"三枚冻结件"**具名**＝`internal/panel/tokens_fourway_test.go`／**`internal/panel/l2_grant_boundary_test.go`**／`internal/perm/ticket90_persist_test.go` | 票 265 `:35`（AC#2）只写"三枚冻结件"**没列名** ＋ 本件 §4.F N13（那枚 `l2_grant_boundary_test.go:1241/:1244` 恰是"面板侧不许有 allow 位"的真护栏） | **不是冲突，是一枚具名缺口**：265 AC#2 让腿"不动三枚冻结件"却没说哪三枚，而其中一枚正是本票 ⓑ／I6 那条"要不要把 drop 做成界面事件"路上**唯一拦得住面板侧 allow 的尺**。⇒ 建议（⛔ 本腿不动票面）：**在 265 面补一句指回 266:52 那三枚名**，否则 ⓐ-Ⅰ 之后再来一枚 ⓑ 的腿会去动那枚冻结件 |
+| **C-7** | `.scratch/wisp/issues/256-...md:25` | "`GRANT-DROPPED 必须不再出现`那一半随 `Grants` 未接而**根本无法构造**⇒ 同归票 265" | 票 265 AC#3（`:36`）只写了三形各自的正控形状，**没接住 256 归过来的这一格**；本件 §5.B-1 量到该正控今天无处可种 | **归属撞车**：256 把一件事归给 265，265 面没有对应判据行。⇒ ⓐ-Ⅰ 落地腿若顺手把它做了，是"做了没被派的事"；若不做，那格在两张票之间悬空。**归口：编排者** |
+
+### 5.D （d）三件不在 (a)(b)(c) 档里、本腿读码撞到的
+
+1. **typed-nil 陷阱：`Options.Grants` 这一枚接法今天没有哨兵。** `gate.go:160` 是 `grants: o.Grants` **直传**，而 `:673` 判的是 `g.grants == nil`——**接口值 nil 与"装着 nil 指针的非空接口"不是一回事**：若 holder 以 `*residentGrantHolder` 形式接进 `Grants` 而**构造器里没 `new`**，那 `g.grants != nil` ⇒ 不走 drop 支 ⇒ 直接进 `:684` 对 nil receiver 调 `Record`。**本腿在飞工作副本里读到落地腿已经避开了它**（`resident_approval_windows.go` 工作副本 `:365` 先 `ra.grants = &residentGrantHolder{}`，再在 `:374` 传 `Grants: ra.grants`；⛔ 本腿不评价那枚件，只登记"这一格是靠读码撞到的、不是有尺的"）。**仓里零枚尺钉住"不许把 typed-nil 传进 Grants"**——它红不红只有 `go test` 知道。归口：票 265 AC#3。〔仅读码，未跑〕
+2. **前人 §1.2 那句"129 已漂成 128"这一格，本腿量到"两个数都还在票面上"。** 现量（HEAD `f9dc152c`）：`resident_approval_windows.go` 的 HEAD 版本 `:188` 注释仍逐字写着 "gate is built roughly 129 lines BEFORE"；而 §4.E 的漂移表说明**门字面量已从 `:219` 挪到工作副本 `:368`** ⇒ 那句注释连同"129/128"之争**在 ⓐ-Ⅰ 之后两数皆错**。⛔ 不改别的件、不改票面；归 ⓐ-Ⅰ 落地件（它本来就要改写 `:185-192` 那一段，见 §3.1）。
+3. **`.scratch/wisp/probes/265/r1/` 在盘上（未跟踪）且 `evidence.md` 已引用 `resident_approval_windows.go:<line>`**——尺＝`git grep -n 'resident_approval_windows\.go:[0-9]' -- .scratch/wisp/probes/265` ⇒ **1 命中**（`265/r1/evidence.md`）。⇒ **落地腿的凭据件自己也带行号引用，而它在 ⓐ-Ⅰ 自己那发之后必然再漂一次。**与本件 §4.E 同族，⛔ 不是缺陷，只是"下一任读它要带锚点"。
+
 
 ## 6. 判不动／量不到（具名＋归口）
 
