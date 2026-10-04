@@ -1,0 +1,6 @@
+2026-10-04 14:55:08+0800
+check-path-length-budget.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+PATHLEN_RC=0

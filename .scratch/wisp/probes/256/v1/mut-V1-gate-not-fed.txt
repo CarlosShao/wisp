@@ -1,0 +1,74 @@
+2026-10-04 14:09:22+0800
+c49759e2dc107889347996868618924e *cmd/wisp/resident_approval_windows.go
+=== RUN   TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConstants
+=== RUN   TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConstants/no_host_view_at_all
+=== RUN   TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConstants/config.toml_missing
+    resident_approval_risk_256_windows_test.go:160: positive control failed: seeded confirm_timeout_sec = 45 but Queue().Timeout() = 5m0s, so ruler ① above was measuring a face that ignores config at all
+--- FAIL: TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConstants (0.01s)
+    --- PASS: TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConstants/no_host_view_at_all (0.00s)
+    --- FAIL: TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConstants/config.toml_missing (0.01s)
+=== RUN   TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow
+=== RUN   TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/timeout_only_-_the_window_then_comes_from_the_schema_tag,_not_from_the_gate's_compiled_constant
+    resident_approval_risk_256_windows_test.go:250: Queue().Timeout() = 5m0s, want 45s for seed "confirm_timeout_sec = 45\n" - this is AC#2's positive control, a miss means the resident leg still ignores confirm_timeout_sec
+    resident_approval_risk_256_windows_test.go:254: Window() = 3s, want 2s for seed "confirm_timeout_sec = 45\n"; what this reading proves: a fact this leg had to learn by running: once a readable config.toml is consulted, an UNseeded l1_window_sec arrives as the schema tag's 2 (internal/config/schema.go's default:"2") and NOT as approval's compiled 3s, so the window moves to 2s even though nobody typed a window. Before ticket 256 this process always held 3s. Whatever the 255/265 wording for the ⓑ sentence ends up saying, it has to say 2s here and not 3s
+=== RUN   TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/window_seeded_to_2s_-_differs_from_the_pre-256_compiled_3s,_so_it_is_a_real_reading
+    resident_approval_risk_256_windows_test.go:254: Window() = 3s, want 2s for seed "l1_window_sec = 2\n"; what this reading proves: a genuine move off the compiled 3s default, AND it is inside the band, so it is the only window case here that counts as a positive control
+=== RUN   TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/both_seeded
+    resident_approval_risk_256_windows_test.go:250: Queue().Timeout() = 5m0s, want 45s for seed "confirm_timeout_sec = 45\nl1_window_sec = 2\n" - this is AC#2's positive control, a miss means the resident leg still ignores confirm_timeout_sec
+    resident_approval_risk_256_windows_test.go:254: Window() = 3s, want 2s for seed "confirm_timeout_sec = 45\nl1_window_sec = 2\n"; what this reading proves: same as above: 2s is inside [2s,3s], so the band let the file through
+=== RUN   TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/window_way_too_large_-_reverse_control,_the_clamp_must_survive
+=== RUN   TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/window_below_the_floor_-_reverse_control,_the_clamp_must_survive
+    resident_approval_risk_256_windows_test.go:254: Window() = 3s, want 2s for seed "l1_window_sec = 1\n"; what this reading proves: the CLAMP again: 1s is raised to MinL1Window
+--- FAIL: TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow (0.02s)
+    --- FAIL: TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/timeout_only_-_the_window_then_comes_from_the_schema_tag,_not_from_the_gate's_compiled_constant (0.00s)
+    --- FAIL: TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/window_seeded_to_2s_-_differs_from_the_pre-256_compiled_3s,_so_it_is_a_real_reading (0.00s)
+    --- FAIL: TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/both_seeded (0.00s)
+    --- PASS: TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/window_way_too_large_-_reverse_control,_the_clamp_must_survive (0.00s)
+    --- FAIL: TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/window_below_the_floor_-_reverse_control,_the_clamp_must_survive (0.00s)
+=== RUN   TestTicket256ResidentGateRiskValuesAreConstructionTimeOnly
+    resident_approval_risk_256_windows_test.go:287: setup: the gate was not built with the seeded 45s, got 5m0s; ruler ② owns that failure, but this case cannot measure a limitation on a value it never had
+--- FAIL: TestTicket256ResidentGateRiskValuesAreConstructionTimeOnly (0.00s)
+=== RUN   TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims
+    resident_approval_risk_256_windows_test.go:474: landing site reading: resident leg passes 5 of 10 declared approval.Options fields (was 3 of 10 before ticket 256)
+--- PASS: TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims (0.00s)
+=== RUN   TestTicket256ResidentBootPassesTheDataDirToTheGate
+--- PASS: TestTicket256ResidentBootPassesTheDataDirToTheGate (0.00s)
+=== RUN   TestV1Probe256GateFace
+=== RUN   TestV1Probe256GateFace/P1_file_readable,_no_[risk]_section_at_all
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P1 file readable, no [risk] section at all" provenance="config" receipt_window=2s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P2_dataDir_exists,_no_config.toml
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P2 dataDir exists, no config.toml" provenance="defaults (config.toml unreadable)" receipt_window=0s receipt_timeout=0s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P3_[risk]_present_but_only_the_timeout
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P3 [risk] present but only the timeout" provenance="config" receipt_window=2s receipt_timeout=45s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P4_user_writes_l1_window_sec_=_3
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P4 user writes l1_window_sec = 3" provenance="config" receipt_window=3s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P5_window_far_above_the_band
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P5 window far above the band" provenance="config" receipt_window=1m39s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P6_window_zero
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P6 window zero" provenance="config" receipt_window=0s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P7_window_negative
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P7 window negative" provenance="config" receipt_window=-1s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P8_timeout_far_above_300
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P8 timeout far above 300" provenance="config" receipt_window=2s receipt_timeout=27h46m39s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P9_timeout_zero
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P9 timeout zero" provenance="config" receipt_window=2s receipt_timeout=0s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P10_timeout_negative
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P10 timeout negative" provenance="config" receipt_window=2s receipt_timeout=-5s gate_window=3s gate_timeout=5m0s
+=== RUN   TestV1Probe256GateFace/P11_no_host_view_at_all_(bare_signature)
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P11 no host view at all (bare signature)" provenance="defaults (no host config view)" receipt_window=0s receipt_timeout=0s gate_window=3s gate_timeout=5m0s
+--- PASS: TestV1Probe256GateFace (0.03s)
+    --- PASS: TestV1Probe256GateFace/P1_file_readable,_no_[risk]_section_at_all (0.00s)
+    --- PASS: TestV1Probe256GateFace/P2_dataDir_exists,_no_config.toml (0.00s)
+    --- PASS: TestV1Probe256GateFace/P3_[risk]_present_but_only_the_timeout (0.00s)
+    --- PASS: TestV1Probe256GateFace/P4_user_writes_l1_window_sec_=_3 (0.00s)
+    --- PASS: TestV1Probe256GateFace/P5_window_far_above_the_band (0.00s)
+    --- PASS: TestV1Probe256GateFace/P6_window_zero (0.00s)
+    --- PASS: TestV1Probe256GateFace/P7_window_negative (0.00s)
+    --- PASS: TestV1Probe256GateFace/P8_timeout_far_above_300 (0.00s)
+    --- PASS: TestV1Probe256GateFace/P9_timeout_zero (0.00s)
+    --- PASS: TestV1Probe256GateFace/P10_timeout_negative (0.00s)
+    --- PASS: TestV1Probe256GateFace/P11_no_host_view_at_all_(bare_signature) (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.143s
+FAIL
+V1_RC=0

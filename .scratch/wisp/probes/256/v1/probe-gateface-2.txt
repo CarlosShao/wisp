@@ -1,0 +1,16 @@
+2026-10-04 14:47:32+0800
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P1 file readable, no [risk] section at all" provenance="config" receipt_window=2s receipt_timeout=5m0s gate_window=2s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P2 dataDir exists, no config.toml" provenance="defaults (config.toml unreadable)" receipt_window=0s receipt_timeout=0s gate_window=3s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P3 [risk] present but only the timeout" provenance="config" receipt_window=2s receipt_timeout=45s gate_window=2s gate_timeout=45s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P4 user writes l1_window_sec = 3" provenance="config" receipt_window=3s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P5 window far above the band" provenance="config" receipt_window=1m39s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P6 window zero" provenance="config" receipt_window=0s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P7 window negative" provenance="config" receipt_window=-1s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P8 timeout far above 300" provenance="config" receipt_window=2s receipt_timeout=27h46m39s gate_window=2s gate_timeout=27h46m39s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P9 timeout zero" provenance="config" receipt_window=2s receipt_timeout=0s gate_window=2s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P10 timeout negative" provenance="config" receipt_window=2s receipt_timeout=-5s gate_window=2s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P11 no host view at all (bare signature)" provenance="defaults (no host config view)" receipt_window=0s receipt_timeout=0s gate_window=3s gate_timeout=5m0s warning_lead=30s c18_warning_scheduled=true
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P12 timeout seeded below the 30s warning lead" provenance="config" receipt_window=2s receipt_timeout=10s gate_window=2s gate_timeout=10s warning_lead=30s c18_warning_scheduled=false
+    zz256_v1_probe_windows_test.go:81: V1PROBE name="P13 timeout seeded at 45" provenance="config" receipt_window=2s receipt_timeout=45s gate_window=2s gate_timeout=45s warning_lead=30s c18_warning_scheduled=true
+--- PASS: TestV1Probe256GateFace (0.03s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.091s

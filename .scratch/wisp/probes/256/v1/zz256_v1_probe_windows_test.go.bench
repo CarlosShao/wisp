@@ -1,0 +1,91 @@
+//go:build windows
+
+package main
+
+// 256-v1 acceptance-leg probe. NOT a deliverable: a measurement bench the
+// verdict reads from, then relocates to .scratch/wisp/probes/256/v1/.
+//
+// What it asks, independently of ticket 256-r1's own five rulers:
+//   P1  a readable config.toml with NO [risk] section at all - what does the
+//       resident leg's gate actually hold, read off the gate (Window /
+//       Queue().Timeout()), and what do the leg's own receipt fields say?
+//   P2  the same with no file (the fallback shape).
+//   P3  can a user get 3s back by writing l1_window_sec = 3?
+//   P4  out-of-band seeds: does the gate answer with the CLAMP or with the
+//       raw configured number, for BOTH fields (window band [2s,3s]; timeout
+//       floor-only?).
+
+import (
+	"os"
+	"path/filepath"
+	"strconv"
+	"testing"
+
+	"github.com/CarlosShao/wisp/internal/agent/approval"
+	"github.com/CarlosShao/wisp/internal/config"
+)
+
+func v1Seed(t *testing.T, dir, riskBody string) {
+	t.Helper()
+	body := "schema_version = " + strconv.Itoa(config.SchemaVersionCurrent) + "\n"
+	if riskBody != "" {
+		body += "[risk]\n" + riskBody
+	}
+	if err := os.WriteFile(filepath.Join(dir, configFileName), []byte(body), 0o600); err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+}
+
+func TestV1Probe256GateFace(t *testing.T) {
+	cases := []struct {
+		name  string
+		seed  string // "" with file=true means a file with no [risk] section
+		file  bool
+		noDir bool
+	}{
+		{"P1 file readable, no [risk] section at all", "", true, false},
+		{"P2 dataDir exists, no config.toml", "", false, false},
+		{"P3 [risk] present but only the timeout", "confirm_timeout_sec = 45\n", true, false},
+		{"P4 user writes l1_window_sec = 3", "l1_window_sec = 3\n", true, false},
+		{"P5 window far above the band", "l1_window_sec = 99\n", true, false},
+		{"P6 window zero", "l1_window_sec = 0\n", true, false},
+		{"P7 window negative", "l1_window_sec = -1\n", true, false},
+		{"P8 timeout far above 300", "confirm_timeout_sec = 99999\n", true, false},
+		{"P9 timeout zero", "confirm_timeout_sec = 0\n", true, false},
+		{"P10 timeout negative", "confirm_timeout_sec = -5\n", true, false},
+		{"P11 no host view at all (bare signature)", "", false, true},
+		{"P12 timeout seeded below the 30s warning lead", "confirm_timeout_sec = 10\n", true, false},
+		{"P13 timeout seeded at 45", "confirm_timeout_sec = 45\n", true, false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			var ra *residentApproval
+			dir := ""
+			switch {
+			case c.noDir:
+				ra = newResidentApproval()
+			default:
+				dir = t.TempDir()
+				if c.file {
+					v1Seed(t, dir, c.seed)
+				}
+				ra = newResidentApprovalWithConfig(dir)
+			}
+			// Read faces: the gate's own two getters, plus the leg's receipt.
+			gateWin := ra.gate.Window()
+			gateTimeout := ra.gate.Queue().Timeout()
+			// C18's "超时前 30s 醒目提示" is scheduled by gate.go:528 only when
+			// Timeout()-WarningLead() > 0, so that predicate IS the user-visible
+			// question "does this card ever warn".
+			lead := gateTimeout - ra.gate.Queue().WarningLead()
+			t.Logf("V1PROBE name=%q provenance=%q receipt_window=%v receipt_timeout=%v gate_window=%v gate_timeout=%v warning_lead=%v c18_warning_scheduled=%v",
+				c.name, ra.riskProvenance, ra.riskWindow, ra.riskTimeout, gateWin, gateTimeout,
+				ra.gate.Queue().WarningLead(), lead > 0)
+			if gateWin < approval.MinL1Window || gateWin > approval.MaxL1Window {
+				if gateWin != approval.DefaultL1Window {
+					t.Errorf("gate window %v is outside the band and is not the compiled default", gateWin)
+				}
+			}
+		})
+	}
+}

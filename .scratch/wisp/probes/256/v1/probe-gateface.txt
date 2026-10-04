@@ -1,0 +1,28 @@
+2026-10-04 14:08:42+0800
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P1 file readable, no [risk] section at all" provenance="config" receipt_window=2s receipt_timeout=5m0s gate_window=2s gate_timeout=5m0s
+time=2026-10-04T14:08:48.434+08:00 level=WARN msg="resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants" path=C:\Users\swq\AppData\Local\Temp\TestV1Probe256GateFaceP2_dataDir_exists,_no_config.toml4166644189\001\config.toml err="config: config.toml read: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestV1Probe256GateFaceP2_dataDir_exists,_no_config.toml4166644189\\001\\config.toml: The system cannot find the file specified." fallback="DefaultApprovalTimeout=300s / DefaultL1Window=3s"
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P2 dataDir exists, no config.toml" provenance="defaults (config.toml unreadable)" receipt_window=0s receipt_timeout=0s gate_window=3s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P3 [risk] present but only the timeout" provenance="config" receipt_window=2s receipt_timeout=45s gate_window=2s gate_timeout=45s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P4 user writes l1_window_sec = 3" provenance="config" receipt_window=3s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P5 window far above the band" provenance="config" receipt_window=1m39s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P6 window zero" provenance="config" receipt_window=0s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P7 window negative" provenance="config" receipt_window=-1s receipt_timeout=5m0s gate_window=3s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P8 timeout far above 300" provenance="config" receipt_window=2s receipt_timeout=27h46m39s gate_window=2s gate_timeout=27h46m39s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P9 timeout zero" provenance="config" receipt_window=2s receipt_timeout=0s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P10 timeout negative" provenance="config" receipt_window=2s receipt_timeout=-5s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P11 no host view at all (bare signature)" provenance="defaults (no host config view)" receipt_window=0s receipt_timeout=0s gate_window=3s gate_timeout=5m0s
+--- PASS: TestV1Probe256GateFace (0.03s)
+    --- PASS: TestV1Probe256GateFace/P1_file_readable,_no_[risk]_section_at_all (0.00s)
+    --- PASS: TestV1Probe256GateFace/P2_dataDir_exists,_no_config.toml (0.00s)
+    --- PASS: TestV1Probe256GateFace/P3_[risk]_present_but_only_the_timeout (0.00s)
+    --- PASS: TestV1Probe256GateFace/P4_user_writes_l1_window_sec_=_3 (0.00s)
+    --- PASS: TestV1Probe256GateFace/P5_window_far_above_the_band (0.00s)
+    --- PASS: TestV1Probe256GateFace/P6_window_zero (0.00s)
+    --- PASS: TestV1Probe256GateFace/P7_window_negative (0.00s)
+    --- PASS: TestV1Probe256GateFace/P8_timeout_far_above_300 (0.00s)
+    --- PASS: TestV1Probe256GateFace/P9_timeout_zero (0.00s)
+    --- PASS: TestV1Probe256GateFace/P10_timeout_negative (0.00s)
+    --- PASS: TestV1Probe256GateFace/P11_no_host_view_at_all_(bare_signature) (0.00s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.103s
+PROBE_RC=0
+2026-10-04 14:08:48+0800

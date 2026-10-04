@@ -1,0 +1,25 @@
+2026-10-04 14:10:31+0800
+687fae56a1613397f7c89c2cf6686b80 *cmd/wisp/resident_approval_windows.go
+--- PASS: TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConstants (0.00s)
+    resident_approval_risk_256_windows_test.go:254: Window() = 2s, want 3s for seed "l1_window_sec = 99\n"; what this reading proves: the CLAMP, not the config: 99s is refused down to MaxL1Window, and that is exactly why Window() must never be used as the positive control (it would read green for 99 and for 3)
+--- FAIL: TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow (0.01s)
+    --- FAIL: TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindow/window_way_too_large_-_reverse_control,_the_clamp_must_survive (0.00s)
+--- PASS: TestTicket256ResidentGateRiskValuesAreConstructionTimeOnly (0.00s)
+    resident_approval_risk_256_windows_test.go:474: landing site reading: resident leg passes 5 of 10 declared approval.Options fields (was 3 of 10 before ticket 256)
+--- PASS: TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims (0.00s)
+--- PASS: TestTicket256ResidentBootPassesTheDataDirToTheGate (0.00s)
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P1 file readable, no [risk] section at all" provenance="config" receipt_window=2s receipt_timeout=5m0s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P2 dataDir exists, no config.toml" provenance="defaults (config.toml unreadable)" receipt_window=0s receipt_timeout=0s gate_window=3s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P3 [risk] present but only the timeout" provenance="config" receipt_window=2s receipt_timeout=45s gate_window=2s gate_timeout=45s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P4 user writes l1_window_sec = 3" provenance="config" receipt_window=2s receipt_timeout=5m0s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P5 window far above the band" provenance="config" receipt_window=2s receipt_timeout=5m0s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P6 window zero" provenance="config" receipt_window=2s receipt_timeout=5m0s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P7 window negative" provenance="config" receipt_window=2s receipt_timeout=5m0s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P8 timeout far above 300" provenance="config" receipt_window=2s receipt_timeout=27h46m39s gate_window=2s gate_timeout=27h46m39s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P9 timeout zero" provenance="config" receipt_window=2s receipt_timeout=0s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P10 timeout negative" provenance="config" receipt_window=2s receipt_timeout=-5s gate_window=2s gate_timeout=5m0s
+    zz256_v1_probe_windows_test.go:75: V1PROBE name="P11 no host view at all (bare signature)" provenance="defaults (no host config view)" receipt_window=0s receipt_timeout=0s gate_window=3s gate_timeout=5m0s
+--- PASS: TestV1Probe256GateFace (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.124s
+FAIL
