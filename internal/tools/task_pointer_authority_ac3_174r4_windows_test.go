@@ -264,8 +264,11 @@ func TestPointerCheckWritesNothing174r4(t *testing.T) {
 	ghostOut := callTaskOutput(t, b, "bg-ghost")
 	t.Logf("ghost arm verbatim: IsError=%v Truncated=%v Text=%q",
 		ghostOut.IsError, ghostOut.Truncated, announceOf(ghostOut.Text))
+	// Errorf, not Fatalf: "说了没有" and "写没写" are two questions, and stopping
+	// at the first must not blind the second - a fix that keeps the wording while
+	// creating the file has to be caught by the filesystem facts below.
 	if !strings.Contains(ghostOut.Text, "并不存在") || !strings.Contains(ghostOut.Text, noticeLead) {
-		t.Fatalf("a pointer at a missing copy file must say so, got %q", announceOf(ghostOut.Text))
+		t.Errorf("a pointer at a missing copy file must say so, got %q", announceOf(ghostOut.Text))
 	}
 	if _, err := os.Lstat(ghost); !os.IsNotExist(err) {
 		t.Errorf("answering a pointer at an absent copy file must NOT create it: Lstat=%v", err)
