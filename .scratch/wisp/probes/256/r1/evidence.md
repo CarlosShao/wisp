@@ -440,7 +440,8 @@ resident_approval_risk_256_windows_test.go:247: Window() = 2s, want 3s for seed 
 |---|---|---|---|---|
 | 1 | `5ad8ec27` | 骨架：证据件九节标题 | **1 枚** | `.scratch/wisp/probes/256/r1/evidence.md` |
 | 2 | `2a10134e` | 落地：两枚 `[risk]` 字段进常驻门＋五枚判据 | **3 枚** | `cmd/wisp/resident_approval_windows.go` `cmd/wisp/resident_windows.go` `cmd/wisp/resident_approval_risk_256_windows_test.go` |
-| 3 | 本发 | 证据件写满（§0–§8 全填，占位符 0） | 1 枚 | `.scratch/wisp/probes/256/r1/evidence.md` |
+| 3 | `2708289f` | 证据件写满（§0–§9 全填，占位符 0） | **1 枚** | `.scratch/wisp/probes/256/r1/evidence.md` |
+| 4 | 本发 | §8 补第三发的 sha ＋ **已提交树上的一发复认**：`PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 -run 'TestAC246\|TestTicket224\|TestTicket255Roster\|TestTicket256Resident' ./cmd/wisp` ⇒ **`rc=0`，`ok github.com/CarlosShao/wisp/cmd/wisp 27.500s`**（件 `committed-tree-check.txt`）；同一发的 `git status --porcelain -- cmd internal tools docs frontend design` 里仍然躺着 `design/**`、`tools/d22scan/**`、`internal/agent/approval/pending_read.go`——**逐条与起手 §1.1③ 那一份对照过，全是别人的在飞面，本腿一枚没碰** | 1 枚 | `.scratch/wisp/probes/256/r1/evidence.md` |
 
 **没做的事，逐条对票面**：⛔ 没 `git add -A`／`.`；⛔ 没 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；
 ⛔ 没 push；⛔ 没碰 `.scratch/wisp/issues/**` 一枚复选框（含 256 自己那三格——**AC#1 整格不归本腿翻勾，理由见 §7-1**）；
@@ -459,6 +460,6 @@ resident_approval_risk_256_windows_test.go:247: Window() = 2s, want 3s for seed 
 | 尺 | 读数 |
 |---|---|
 | 占位符词面扫描（四枚词的字面见票面 256 §7-1 那句成稿判据，本件不重复其字面，否则这一行会把自己的扫描命中） | **0 命中** |
-| `wc -c` | **43668 bytes** |
-| `wc -l` | **464 lines** |
+| `wc -c` | **44337 bytes** |
+| `wc -l` | **465 lines** |
 | 节次 | §0–§9 十节全填（§0 结论句／§1 起手预检／§2 落地形状／§3 四枚判据／§4 突变／§5 GRANT-DROPPED／§6 门禁／§7 判不动／§8 Git 流水／§9 自量） |
