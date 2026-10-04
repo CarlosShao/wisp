@@ -123,7 +123,13 @@ func runResident() {
 	// import block), and internal/proc and internal/ball stay leaves. The ruler
 	// for that claim is `GOOS=windows go list -deps ./cmd/wisp`, run before and
 	// after, in this leg's evidence table.
-	ra := newResidentApproval()
+	// Ticket 256 AC#1 (the [risk] half, orchestrator ruling §8.2 form 甲ⓐ): this
+	// is the one production call site, and it now passes rt.Layout.DataDir so the
+	// gate is built from this host's confirm_timeout_sec / l1_window_sec instead
+	// of the compiled 300s / 3s. rt.Layout.DataDir is already resolved here (the
+	// same value installLogSink takes at :66 and newResidentPanelManager takes at
+	// :151). Construction time only - see newResidentApprovalWithConfig.
+	ra := newResidentApprovalWithConfig(rt.Layout.DataDir)
 
 	// Ticket 33 AC#1..AC#4: the panel host, on its own dedicated STA thread
 	// (orchestrator ruling P1). It is BUILT here, by the assembly root, and handed

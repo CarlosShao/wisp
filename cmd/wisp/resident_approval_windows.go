@@ -45,11 +45,13 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/agent/approval"
 	"github.com/CarlosShao/wisp/internal/ball"
+	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/statemachine"
 	"github.com/CarlosShao/wisp/internal/tools"
@@ -83,6 +85,14 @@ type residentApproval struct {
 	cards *approval.Replies
 	ui    *ballCardUI
 
+	// riskWindow / riskTimeout / riskProvenance are ticket 256's [risk] receipt:
+	// what this gate was ACTUALLY built with, and where the numbers came from.
+	// They are the construction-time answer only - see the limitation spelled
+	// out on newResidentApprovalWithConfig.
+	riskWindow     time.Duration
+	riskTimeout    time.Duration
+	riskProvenance string
+
 	mu   sync.Mutex
 	root context.Context
 	// cancel is the D38(e) step 3 action: it is what an L1 window and an L2
@@ -93,24 +103,82 @@ type residentApproval struct {
 	escLoad bool // the Esc channel was loaded (only ever with a real ball)
 }
 
-// newResidentApproval composes the gate the resident leg runs on. Every piece of
-// it is the machinery `wisp run` already uses (run.go:523's approval.New with an
-// injected UI and a bound Replies ledger); what differs is the UI implementation
-// and the fact that this one outlives a single command line.
+// newResidentApproval composes the gate the resident leg runs on WITHOUT a host
+// config view. It is the pre-ticket-256 shape and it is kept for the 246 test
+// roster (orchestrator ruling 256 §8.2, form 甲ⓐ: the signature does not gain a
+// parameter, because that would put 13 existing test call sites in compile-red).
 //
-// The channel registry starts with NOTHING loaded. ChannelEsc is marked live
-// only by bindBallHost, and only when Win32 actually gave this process a ball
-// window - the shape 246-a1's D-5 warned about is a gate advertising a cancel key
-// in a process that has no key to borrow.
+// What it now owes, and says: the gate it builds runs on the compiled approval
+// constants, and that has to be NAMEABLE rather than inferred from silence. This
+// is the same debt ticket 258 took out on the hotkey chain
+// (resident_ball_windows.go's hotkeyProvenanceNone for a nil host view), and the
+// value is that a reader of the log can tell "the file said 300" from "nobody
+// asked the file" - both land on 300s, and only one of them is a config reading.
 func newResidentApproval() *residentApproval {
+	return newResidentApprovalWithConfig("")
+}
+
+// newResidentApprovalWithConfig composes the same gate, fed with the host's
+// [risk] pair. It is what the shipped resident process calls
+// (resident_windows.go, the one production site).
+//
+// WHAT THIS CLOSES (ticket 256 AC#1, the [risk] half only). Before this leg the
+// gate was built from three Options fields - UI / Channels / Logf - so
+// confirm_timeout_sec and l1_window_sec changed nothing in this process: it ran
+// the compiled 300s / 3s no matter what config.toml said. Two of the ten fields
+// are now passed, and the two are the only two the assembly root can obtain at
+// this moment.
+//
+// WHAT THIS DELIBERATELY DOES NOT CLOSE, NAMED SO IT IS NOT MISTAKEN FOR DONE:
+// Options.Grants stays unset here. The session ledger's only production
+// construction site is cmd/wisp/run.go inside assembleRuntime, which this file's
+// gate is built roughly 129 lines BEFORE (256-a2 census §0/§2), and g.grants has
+// exactly one writer in the repository (gate.go's New) with no late-binding
+// entry. Making that half move means either a second minted ledger or a new
+// holder type - both new seams, not a field to fill in. That half is filed as
+// ticket 255's sibling (pending ticket 265) and is NOT this leg's work.
+//
+// THE LIMITATION THAT MUST TRAVEL WITH THIS FUNCTION (census §3, pinned by
+// TestTicket256ResidentGateRiskValuesAreConstructionTimeOnly): approval.Gate
+// copies the window into g.window and the queue copies the deadline into
+// q.timeout inside New/NewQueue, and nothing in the repository re-applies either
+// afterwards - the only read faces are Gate.Window() and Queue.Timeout(). So
+// what this closes is "the gate THIS launch of the resident process is built
+// with follows [risk]". It is not "edit config.toml and the running process
+// follows you", and no assertion here may be written as if it were. [risk] is a
+// locked tier (internal/config/tiers.go) with no reload or restart hook, which
+// is the same direction the facts point.
+//
+// WHY A PER-USE LoadFile AND NOT THE MANAGER: exactly the reason
+// resident_windows.go's hotkey closures give (its :168-171 comment, ticket 258) -
+// the task pipeline that owns rt.mgr is assembled later, by
+// startResidentTaskSource, so at this point in the boot nobody holds a Manager.
+// Importing internal/config here is the shape those two closures, models.go:184
+// and panel_resident_windows.go:201 already have; it is not a new package-level
+// dependency edge of the kind ticket 238's cut-1 refuses, because cmd/wisp
+// already imports internal/config in production code.
+func newResidentApprovalWithConfig(dataDir string) *residentApproval {
 	root, cancel := context.WithCancel(context.Background())
 	ra := &residentApproval{root: root, cancel: cancel}
 	ra.ui = &ballCardUI{ra: ra}
+	window, timeout, provenance := residentRiskGateValues(dataDir)
+	ra.riskWindow, ra.riskTimeout, ra.riskProvenance = window, timeout, provenance
 	ra.gate = approval.New(approval.Options{
-		UI:       ra.ui,
-		Channels: approval.NewChannels(),
-		Logf:     ra.residentAuditf,
+		UI:              ra.ui,
+		Channels:        approval.NewChannels(),
+		Window:          window,
+		ApprovalTimeout: timeout,
+		Logf:            ra.residentAuditf,
 	})
+	// The receipt is read OFF THE GATE, not off the arithmetic above: what is
+	// logged is what the object actually holds after New's own clamping, so the
+	// sentence cannot disagree with the value it names.
+	slog.Info("resident gate: [risk] tier taken at construction",
+		"provenance", provenance,
+		"config_path", residentRiskConfigPathForLog(dataDir),
+		"window_sec_read", window.Seconds(), "confirm_timeout_sec_read", timeout.Seconds(),
+		"gate_window", ra.gate.Window().String(), "gate_queue_timeout", ra.gate.Queue().Timeout().String(),
+		"scope", "construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)")
 	ra.cards = approval.NewReplies()
 	ra.cards.Attach(approval.HostBinding{
 		Gate:         ra.gate,
@@ -119,6 +187,67 @@ func newResidentApproval() *residentApproval {
 		PanelSource:  residentPanelSource,
 	})
 	return ra
+}
+
+// The three provenance words this leg's [risk] reading can answer with. Named
+// constants (not inline strings) for the same reason ticket 258 named its
+// hotkeyProvenance* trio: the tests read them off the constructed object, and a
+// prose claim that a value "came from config" is exactly the thing that must not
+// be writable twice with two different meanings.
+const (
+	// riskProvenanceRead: config.toml was read, and these two numbers are its
+	// [risk] view. Note what the word does NOT claim: a readable file with no
+	// [risk] section still answers through the schema tags (confirm_timeout_sec
+	// 300 / l1_window_sec 2), so "config" names the SOURCE OF THE READ, not a
+	// promise that a human typed a number. That boundary is stated here rather
+	// than left to the reader because ticket 258's adjudication (258-r2, "the
+	// tier word describes WHAT THE LIVE SET IS") is the nearest precedent and a
+	// value-for-value copy of it would have been wrong: the schema's 2s and the
+	// gate's compiled 3s differ, so a file that says nothing still moves this
+	// gate's window, and calling that "defaults" would be the lie in the other
+	// direction.
+	riskProvenanceRead = "config"
+	// riskProvenanceUnreadable: a dataDir was handed over but config.toml would
+	// not read (missing or broken). The gate falls back to the compiled approval
+	// constants, and the word "defaults" is what says so out loud.
+	riskProvenanceUnreadable = "defaults (config.toml unreadable)"
+	// riskProvenanceNoView: no host config view exists at all (dataDir empty -
+	// the shape newResidentApproval keeps for the 246 roster). Same compiled
+	// constants, different reason, and the reason is the part a reader needs.
+	riskProvenanceNoView = "defaults (no host config view)"
+)
+
+// residentRiskGateValues reads the two [risk] numbers the resident gate is built
+// with, and names which of the three shapes the reading is. Zero durations are
+// returned for the two fallback shapes on purpose: approval.New's documented
+// zero-value fallback (Options.Window -> DefaultL1Window, and NewQueue's
+// timeout <= 0 -> DefaultApprovalTimeout) then becomes the mechanism, so this
+// file cannot drift its own private copy of those constants.
+func residentRiskGateValues(dataDir string) (window, timeout time.Duration, provenance string) {
+	if dataDir == "" {
+		return 0, 0, riskProvenanceNoView
+	}
+	cfgPath := filepath.Join(dataDir, configFileName)
+	c, _, err := config.LoadFile(cfgPath, nil)
+	if err != nil || c == nil {
+		slog.Warn("resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants",
+			"path", cfgPath, "err", err,
+			"fallback", "DefaultApprovalTimeout=300s / DefaultL1Window=3s")
+		return 0, 0, riskProvenanceUnreadable
+	}
+	return time.Duration(c.Risk.L1WindowSec) * time.Second,
+		time.Duration(c.Risk.ConfirmTimeoutSec) * time.Second,
+		riskProvenanceRead
+}
+
+// residentRiskConfigPathForLog keeps the log honest about WHERE it looked: with
+// no host view there is no path, and printing an empty path would read like a
+// failed read rather than the absence of one.
+func residentRiskConfigPathForLog(dataDir string) string {
+	if dataDir == "" {
+		return "(no host config view)"
+	}
+	return filepath.Join(dataDir, configFileName)
 }
 
 // auditf is this gate's audit sink, in the same family the run leg writes: the
