@@ -133,6 +133,38 @@ jobs:
         # the guard below was added to that step and why the ordering rule stays.
         run: sh scripts/d22scan.sh
 
+      - name: "Tracked path-length budget (ticket 262)"
+        # ADDED STEP ONLY, and this is the only edit the file received: no existing
+        # step was moved, edited, deleted, given an `if:`, or made continue-on-error
+        # (D22 run-away mode 6). The unfreeze that permits this single addition is
+        # docs/reports/pending-and-issues.md A585, which grants "add one step to the
+        # lint job, suggested right after the tools/d22scan step" and nothing else -
+        # not the trigger table above, not the concurrency group, not any `runs-on`,
+        # not a step in slo-full / test-core / test-windows / slo-smoke.
+        #
+        # WHY IT SITS HERE AND NOT ON THE RUNNER THAT ACTUALLY BROKE: ticket 262
+        # section 1 measured the self-hosted checkout directory at 43 characters
+        # (E:\work\base\actions-runner\_work\wisp\wisp, joined as 44) against 14 on
+        # the hosted Windows side, and the job that died was `slo-full` on the
+        # self-hosted side. A step placed after `actions/checkout` in that job is a
+        # dead gate: it runs only if checkout ran, and the path shape this gate
+        # exists to catch is precisely the one that makes checkout fail. So the
+        # worst-case width is reproduced as a NAMED CONSTANT inside
+        # scripts/check-path-length-budget.sh (WORST_PREFIX=44, same source) rather
+        # than by standing on that machine. What this step therefore cannot see, and
+        # what nobody should claim it sees: the real filesystem behaviour of the
+        # self-hosted runner. It is a paper budget, checked everywhere, not a
+        # reproduction of one runner.
+        #
+        # WHAT IS NOT IN HERE: no threshold. The threshold lives in that script as
+        # one named constant derived from .scratch/wisp/issues/README.md rule 9 (a
+        # 100-character name cap), deliberately NOT from the wall at relative
+        # (206, 217]; raising it to make this step green is ticket 262's named
+        # forbidden action. The step runs the seeded-path positive control first (in
+        # a throwaway repository, so the control cannot be red because of this tree)
+        # and refuses to run the scan at all if that control cannot be made red.
+        run: sh scripts/check-path-length-budget.sh --with-self-test
+
       - name: gofmt (gofumpt)
         run: |
           go install mvdan.cc/gofumpt@latest
