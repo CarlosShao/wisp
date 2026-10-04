@@ -1,0 +1,26 @@
+260-r2 骨架：名册 12 枚（requireEscBorrowed 的过期断言其实是两格，不止 :107）
+
+本轮唯一一格＝把 internal/ball/hotkey_live_test.go 里那枚因形ⓐ 而过期的真窗判据
+同步到已裁的行为（期望值跟着种子走）。本枚只落读码与基线，⛔ 未跑真窗。
+
+现读复认编排者给的两处行号：零漂移。
+  :42 逐字 Cancel: "Ctrl+Alt+V"（liveHotkeys 的种子行）
+  :107-108 逐字 if got := rep.Live()[hkCancel]; got.VK != vkEscape { / want VK_ESCAPE 0x1B
+多读出来的一处：同一 helper 的 :110-115 那格（拿 escBorrowProbe 问桌面"裸 Esc 不许空闲"）
+也建立在"借的是裸 Esc"上 —— 只同步 :107 会留一枚改了形还在探错键的尺。
+
+名册 12 枚（逐枚读函数体，词面 grep 命中注释不算）：
+  R1 :107-108 VK 字面量格＝同步；R2 :110-115 桌面探测格＝同步（探借的那枚）；
+  R3 :96-97  standby 措辞；R4 :100-102 被拒措辞断的是错的键；R5 escBorrowProbe 本体合法保留；
+  R6 :83-89  doc 散文；R7 requireIdleRoster 断言仍真但不再看得见"还"；R8 requireEscReturned 隐性变弱＝同步；
+  R9 hotkey_status_test.go:223／hotkey_cancel_borrow_260_test.go:57 是默认档 wrapper，合法不动；
+  R10 :332 是 260-r1 的上报尺，不动；
+  R11 interaction_live_test.go:232-239 注入裸 Esc 要求取消 Confirming＝同类过期，⛔ 本枚写面外，具名交回；
+  R12 三处注释散文过期，同样具名交回。
+
+基线读数（改前，HEAD 5ad8ec27）：
+  go test -count=1 -v ./internal/ball/ ＝ PASS 62／FAIL 1／SKIP 0；
+  唯一红名 TestC21TableColourRowsMatchTokensCSS（tokens.css 被别家删，基线常红，不算本腿回归）
+  go vet ./internal/ball/ ＝ 0；go vet -tags winlive ./internal/ball/ ＝ 0（只编译，⛔ 未执行）
+
+预测口径钉死：那四枚 winlive 调用点"会红"是读码推出来的预测，今天没跑，⛔ 不写成已红。
