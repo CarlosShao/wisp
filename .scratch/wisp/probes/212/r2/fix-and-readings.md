@@ -263,3 +263,24 @@ d22scan -self-test: ban #9 phantom-citation    silent FAIL   CLASS 3 AS A PATH: 
   未 push；临时件只建不删（`/tmp/tmp.nRJNr83gw6/preimage` 留在系统临时区，不在仓内；仓内新增件全部入库）。
 - 产码注释里引用的仓内路径**全部逐字带目录**，且都真存在：终检一把＝`cd tools/d22scan && go run . -self-test` 37/37 绿
   ＋全仓 `sh scripts/d22scan.sh` rc=0（ban #9 对产码注释面的存在性判过，无幻影）。
+
+## §8 终态复量（本腿最后一发，交件读数；与 §3 不同处＝共享树又被并发腿推前）
+
+三枚 commit 之后（`7ac8965a` 骨架 → `5413f46d` 修码 → `1353ce66` 证据件），本腿把三把尺＋全仓门禁
+再跑一遍终值（档 `logs/final-vet.txt`、`logs/final-selftest.txt`、`logs/final-gotest.txt`、`logs/final-gate-full.txt`）：
+
+| 尺 | 终值逐字末行 | rc |
+|---|---|---|
+| `go vet ./...`（tools/d22scan 模块） | 无输出 | 0 |
+| `go run . -self-test` | `d22scan -self-test: clean - all 37 direction checks passed (20 expect-ring, 17 expect-silent)` | 0 |
+| `go test -count=1 ./...` | `ok  	github.com/CarlosShao/wisp/tools/d22scan	17.777s` | 0 |
+| `sh scripts/d22scan.sh` | `runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0` ＋ `d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=228, ... ban #8 cmd/=97` | 0 |
+
+- `diff logs/pre-scope-lines.txt logs/final-scope-lines.txt` → **空**：起手（未修码）与终态（三枚之后）
+  的八枚 ban scope 行＋`examined 266 production Go files` 行＋`clean` 行**逐字相等** ⇒ 票面 AC#5
+  「现有 8 枚 ban 的读数逐名不变」在 212-r2 之后仍成立（本腿只加了第五形的豁免层，未动任何既有分母）。
+- ⚠ 这一段区间里并发腿也往共享树落了 commit（`cbece45e` 258-r2 改的是 `cmd/wisp/**`），
+  所以"266 枚产码文件""PASS=34/RUN=76"这类分母是**带此刻注的读数**，不是本腿独立造成的差；
+  两处都在同一枚 `d22scan: clean` 里，本腿无需裁决，具名登记即可。
+- 本腿到交件为止：**未 push**、票面 `- [ ]` 框零碰、`cmd/**` 零字节、冻结面零触碰、
+  突变两台脚本跑完即还原（md5 全等在档）、临时件只建不删。
