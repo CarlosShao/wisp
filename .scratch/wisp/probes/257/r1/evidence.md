@@ -161,7 +161,14 @@ settings_257_test.go 工作树＝3a223edd967666ab26aa92b0fe4e1b0c ＝ blob(84ab5
 
 ## 8. 判不动／量不到（本节答：具名＋归口，不许"应该没问题"填空；含 AC#1 里属于 `cmd/wisp` 的那一格我为什么够不着）
 
-未判。
+| # | 判不动／量不到的东西 | 为什么够不着（具名） | 归口 |
+|---|---|---|---|
+| 1 | **AC#1 里属于 `cmd/wisp` 的那一格**：`cmd/wisp/firstrun.go` 首启回执文案——机主第一次跑 `wisp run`、没建过 config.toml 时控制台/回执告诉他先手加 `[llm.providers.<名>]` 三样（形 ⓒ 的 `cmd/wisp` 侧格子，§1 表已划清） | **包级互斥**：派单窗口里 `cmd/wisp/**` 写面由 `265-r1` 腿占用（该腿已死、写面遗留见下条），编排者规矩＝`cmd/wisp` 本腿不碰；且我写面授权只有 `internal/config/**`，firstrun 文案属 `cmd/wisp` 产码 | **编排者排程**：等 `265-r1c` 交完 `cmd/wisp` 写面空出后另派；本腿不代写、不预告内容 |
+| 2 | **d22scan 那枚既有红**：`cmd/wisp/resident_approval_windows.go:38` phantom-citation（引了不存在的 `internal/panel/panel_pump.go`，§7 ①） | 红点在 `cmd/wisp` 产码＝死去接续腿 `265-r1` 的写面遗留，派单写明**不归我、不许修、不许碰 cmd/wisp 任何文件**；本腿只取读数＋归因（§7 ①：红名全集仅此一枚、零新增） | **`265-r1c` 修复**；**修复后需对本门（d22scan）一次复量**——本节即该复量的登记点 |
+| 3 | **gofumpt 新发现一枚**：`internal/config/settings_257_test.go`（§7 ③，派单预期"应空"实测非空） | 文件是前任 `257-r1b` 收编的继承测试件；派单边界「不碰任何 `cmd/`、`internal/` 产码与测试」把我修它的手绑死——不修＝本腿合规，修＝违边界，两选一我只能选不修并如实登记 | **编排者排程**（一行纯排版改动，下一任有 `internal/config` 写面的腿顺手修，或编排者特批授权后修复＋复量 `gofumpt -l internal/config/` 应空） |
+| 4 | `internal/panel` 的 `TestC21DesignTokensFourWayAgree` 族、`cmd/wisp` gofumpt 三枚（`models.go`／`pending_read.go`／`queue.go`） | 派单既有红名册明写「都不归我，只比对不追」；且本节五门读数窗不触那两包（§7 比对表已注） | 各归原账户（票 212/258 与 design 资产删除账），本腿零动作 |
+
+未定义即停自查：以上四条全部是派单文本**写明**的够不着或既有红，无一条是"方案没覆盖的新情况"，不触发停手上报闸门；唯二需要编排者后续动作的（第 1 条排程、第 3 条修复授权）都已具名归口。
 
 ## 9. 交件判语（本节答：Git 纪律／AC 框未碰／冻结件未碰／凭据面未动／禁读面未读，逐条）
 
