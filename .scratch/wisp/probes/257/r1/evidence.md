@@ -172,4 +172,11 @@ settings_257_test.go 工作树＝3a223edd967666ab26aa92b0fe4e1b0c ＝ blob(84ab5
 
 ## 9. 交件判语（本节答：Git 纪律／AC 框未碰／冻结件未碰／凭据面未动／禁读面未读，逐条）
 
-未判。
+**腿 257-r1c 交件判语（2026-10-04 19:3x–19:4x +08，锚 `64077e80` 起步、三节 commit 后收笔）**：
+
+1. **Git 纪律**：全程只 commit、不 push（收笔时 `origin/dev..HEAD`＝133 枚未推——含同机在飞各腿的，**无一枚是我推的**）；每节 commit 带**显式 pathspec**（仅 `.scratch/wisp/probes/257/r1/evidence.md`＋对应 `msg-s*.txt`），未用 `git add -A`／`git add .`；未用 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；已推历史零改写、无 worktree。本腿共产三枚 commit：`7f823b7a`（§7）→ `91725826`（§8）→ 本节（§9），逐节一 commit，提交信息经 `msg-s7/s8/s9.txt` 以 `git commit -F` 落入。
+2. **触碰面自证**：本腿两枚已 commit 的 `git show --name-only` 逐枚核对＝`7f823b7a` 只含 `.scratch/wisp/probes/257/r1/{evidence.md,msg-s7.txt}`、`91725826` 只含 `{evidence.md,msg-s8.txt}`（§9 这枚同理，msg-s9.txt 同目录）——**全部落在授权写面 `.scratch/wisp/probes/257/r1/**` 内，`cmd/`／`internal/` 产码与测试一字未碰**；票面 `- [ ]` 框零触碰（AC 框归编排者）。
+3. **冻结件未碰**：`D1–D47`／`C1–C32`／`R1–R9`／D43 转移表／SLO 阈值／golden／`thresholds.go`／`docs/specs/**`／台账 `docs/reports/pending-and-issues.md`／停车点 `HANDOVER.md`——本腿 diff 涉及文件仅证据件与 msg 件，上列全部未进 pathspec，未碰。
+4. **凭据面未动**：证据件 §4 里那三句拒因文案含「API key」字样——照实写明：那只是**字段名引用**（`provider_api_key_ref`／`api_key_ref` 拒因句里的键路径与字段名），**无任何凭据值**；本腿全部读数（§3/§4/§6 前任交、§7 我量）中出现的 `api_key_ref = 'dpapi:t257r1canaryblob01'` 为测试金丝引用串、非真实凭据；本腿未读、未写、未改任何密钥面（DPAPI blob／credential store／环境变量密钥）。
+5. **搜索根遵守**：全程只读 `cmd internal tools docs .scratch scripts` 范围内的东西（实际触碰＝`scripts/` 两脚本执行、`internal/config/` 五门量测、`tools/d22scan` 经 d22scan 自检间接跑、`.scratch/wisp/probes/257/r1/` 读写、git 元数据）；**未用 `.` 作搜索根、未读 `frontend/**` 与 `design/**` 任何文件**（d22scan 对那两树的读数是仪器自身职责，非我直接读）。
+6. **边界与预算**：未种任何突变（§6 由前任 `257-r1b` 交齐，本腿不复跑不重做）；`internal/config` 起手零脏闸通过；§7/§8 于约第 30 轮工具调用前写满并 commit（§7＝`7f823b7a`，§8＝`91725826`），§9 在第 50 轮前收笔；全程无一次触禁（禁修面、禁读面、禁写面三向零触碰）。

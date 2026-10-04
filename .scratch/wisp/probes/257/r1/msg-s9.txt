@@ -1,0 +1,1 @@
+257-r1c 证据件 §9 交件判语：Git 纪律（只 commit 不 push、显式 pathspec 三节三 commit：7f823b7a/91725826/本节）；AC 框零触碰自证（两枚已 commit 的 show --name-only 逐枚核＝只含 probes/257/r1 下文件）；冻结件未碰（D 表/C 表/R 表/D43/SLO/golden/thresholds.go/台账/HANDOVER 全部未进 pathspec）；凭据面未动（§4 拒因文案的"API key"字样仅为字段名引用无值，canary 引用串非真实凭据）；搜索根遵守（未用 "."，未读 frontend/** 与 design/**）；边界与预算（零突变、起手零脏、§7/§8 于第 30 轮前、§9 于第 50 轮前收笔）。
