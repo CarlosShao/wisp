@@ -1,0 +1,9 @@
+probe263: sampling started pid=23296 state=Sleeping seconds=1
+probe263: exiting with code 1
+probe263: sampling started pid=32448 state=Warm seconds=1
+probe263: exiting with code 1
+probe263: sampling started pid=18500 state= seconds=10
+probe263: exiting with code 1
+probe263: sampling started pid=12136 state=Sleeping seconds=2
+probe263: exiting with code 1
+retry harness done, log at D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\tracked-fail-retry.txt

@@ -1,0 +1,128 @@
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: NO CONCLUSION (machine-contended) - subset=smoke refused to sample, no numbers were produced
+slo-check.ps1: machine-contended reason: machine-wide cpu utilisation 59% over a 1s window (>= 50%)
+slo-check.ps1: NO CONCLUSION (machine-contended): 1 reason(s), 0 state file(s) written, slo-report.json NOT written
+slo-check.ps1: NO CONCLUSION (machine-contended): this is a SAMPLING VALIDITY verdict, not a
+slo-check.ps1: NO CONCLUSION (machine-contended): performance result - D32 (CPU <=0.5%, private
+slo-check.ps1: NO CONCLUSION (machine-contended): RSS <=25MB) stays unverified for this run.
+slo-check.ps1: NO CONCLUSION (machine-contended): Rerun when the machine is quiet (ticket 134
+slo-check.ps1: NO CONCLUSION (machine-contended): AC#4, shape C: refuse loudly instead of
+slo-check.ps1: NO CONCLUSION (machine-contended): reporting a contaminated sample as truth).
+slo-check.ps1: NO CONCLUSION (machine-contended): AC#6 recolors the refusal, it does not lift it.
+slo-check.ps1: NO CONCLUSION (machine-contended): what keeps "no conclusion" from rotting in
+slo-check.ps1: NO CONCLUSION (machine-contended): silence is probe P3 of scripts/slo-freshness.sh,
+slo-check.ps1: NO CONCLUSION (machine-contended): which ages on the newest uploaded SLO REPORT
+slo-check.ps1: NO CONCLUSION (machine-contended): artifact - never on this job, never on this
+slo-check.ps1: NO CONCLUSION (machine-contended): exit code. Enough busy days in a row and the
+slo-check.ps1: NO CONCLUSION (machine-contended): nail goes red by itself (ticket 134 AC#6).
+slo-check.ps1: NO CONCLUSION (machine-contended): record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\out-retry-1\slo-no-conclusion.json (NOT a report; slo-report.json is not written on this path)
+slo-check.ps1: NO CONCLUSION (machine-contended): exit 0
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 44%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=31432 state=Sleeping seconds=1
+probe263: exiting with code 1
+slo-check.ps1: state Sleeping exit=1 pass=False
+slo-check.ps1: sampling state Warm for 1s
+probe263: sampling started pid=19152 state=Warm seconds=1
+probe263: exiting with code 1
+slo-check.ps1: state Warm exit=1 pass=False
+slo-check.ps1: settle check (10s window)
+probe263: sampling started pid=776 state= seconds=10
+probe263: exiting with code 1
+slo-check.ps1: settle exit=1 pass=False
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263: sampling started pid=32544 state=Sleeping seconds=2
+probe263: exiting with code 1
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\out-retry-2\slo-report.json (all_pass=False)
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: NO CONCLUSION (machine-contended) - subset=smoke refused to sample, no numbers were produced
+slo-check.ps1: machine-contended reason: foreign toolchain/wisp process present: go.exe pid=12840 started=2026-10-04 11:44:51 path=D:\work\base\go\bin\go.exe
+slo-check.ps1: machine-contended reason: machine-wide cpu utilisation 69% over a 1s window (>= 50%)
+slo-check.ps1: NO CONCLUSION (machine-contended): 2 reason(s), 0 state file(s) written, slo-report.json NOT written
+slo-check.ps1: NO CONCLUSION (machine-contended): this is a SAMPLING VALIDITY verdict, not a
+slo-check.ps1: NO CONCLUSION (machine-contended): performance result - D32 (CPU <=0.5%, private
+slo-check.ps1: NO CONCLUSION (machine-contended): RSS <=25MB) stays unverified for this run.
+slo-check.ps1: NO CONCLUSION (machine-contended): Rerun when the machine is quiet (ticket 134
+slo-check.ps1: NO CONCLUSION (machine-contended): AC#4, shape C: refuse loudly instead of
+slo-check.ps1: NO CONCLUSION (machine-contended): reporting a contaminated sample as truth).
+slo-check.ps1: NO CONCLUSION (machine-contended): AC#6 recolors the refusal, it does not lift it.
+slo-check.ps1: NO CONCLUSION (machine-contended): what keeps "no conclusion" from rotting in
+slo-check.ps1: NO CONCLUSION (machine-contended): silence is probe P3 of scripts/slo-freshness.sh,
+slo-check.ps1: NO CONCLUSION (machine-contended): which ages on the newest uploaded SLO REPORT
+slo-check.ps1: NO CONCLUSION (machine-contended): artifact - never on this job, never on this
+slo-check.ps1: NO CONCLUSION (machine-contended): exit code. Enough busy days in a row and the
+slo-check.ps1: NO CONCLUSION (machine-contended): nail goes red by itself (ticket 134 AC#6).
+slo-check.ps1: NO CONCLUSION (machine-contended): record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\out-retry-3\slo-no-conclusion.json (NOT a report; slo-report.json is not written on this path)
+slo-check.ps1: NO CONCLUSION (machine-contended): exit 0
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 40%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=27804 state=Sleeping seconds=1
+probe263: exiting with code 1
+slo-check.ps1: state Sleeping exit=1 pass=False
+slo-check.ps1: sampling state Warm for 1s
+probe263: sampling started pid=30576 state=Warm seconds=1
+probe263: exiting with code 1
+slo-check.ps1: state Warm exit=1 pass=False
+slo-check.ps1: settle check (10s window)
+probe263: sampling started pid=10464 state= seconds=10
+probe263: exiting with code 1
+slo-check.ps1: settle exit=1 pass=False
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263: sampling started pid=13856 state=Sleeping seconds=2
+probe263: exiting with code 1
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\out-retry-4\slo-report.json (all_pass=False)
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 39%
+slo-check.ps1: sampling state Sleeping for 1s
+probe263: sampling started pid=21780 state=Sleeping seconds=1
+probe263: exiting with code 1
+slo-check.ps1: state Sleeping exit=1 pass=False
+slo-check.ps1: sampling state Warm for 1s
+probe263: sampling started pid=24624 state=Warm seconds=1
+probe263: exiting with code 1
+slo-check.ps1: state Warm exit=1 pass=False
+slo-check.ps1: settle check (10s window)
+probe263: sampling started pid=22176 state= seconds=10
+probe263: exiting with code 1
+slo-check.ps1: settle exit=1 pass=False
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+probe263: sampling started pid=28180 state=Sleeping seconds=2
+probe263: exiting with code 1
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\out-retry-5\slo-report.json (all_pass=False)
+slo-check.ps1: shape nail ok - this file reads no automatic exit-code variable (ticket 263)
+slo-check.ps1: instrument self-check ok - external programs are started, waited for, and their real exit code read (ticket 263)
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: NO CONCLUSION (machine-contended) - subset=smoke refused to sample, no numbers were produced
+slo-check.ps1: machine-contended reason: machine-wide cpu utilisation 51% over a 1s window (>= 50%)
+slo-check.ps1: NO CONCLUSION (machine-contended): 1 reason(s), 0 state file(s) written, slo-report.json NOT written
+slo-check.ps1: NO CONCLUSION (machine-contended): this is a SAMPLING VALIDITY verdict, not a
+slo-check.ps1: NO CONCLUSION (machine-contended): performance result - D32 (CPU <=0.5%, private
+slo-check.ps1: NO CONCLUSION (machine-contended): RSS <=25MB) stays unverified for this run.
+slo-check.ps1: NO CONCLUSION (machine-contended): Rerun when the machine is quiet (ticket 134
+slo-check.ps1: NO CONCLUSION (machine-contended): AC#4, shape C: refuse loudly instead of
+slo-check.ps1: NO CONCLUSION (machine-contended): reporting a contaminated sample as truth).
+slo-check.ps1: NO CONCLUSION (machine-contended): AC#6 recolors the refusal, it does not lift it.
+slo-check.ps1: NO CONCLUSION (machine-contended): what keeps "no conclusion" from rotting in
+slo-check.ps1: NO CONCLUSION (machine-contended): silence is probe P3 of scripts/slo-freshness.sh,
+slo-check.ps1: NO CONCLUSION (machine-contended): which ages on the newest uploaded SLO REPORT
+slo-check.ps1: NO CONCLUSION (machine-contended): artifact - never on this job, never on this
+slo-check.ps1: NO CONCLUSION (machine-contended): exit code. Enough busy days in a row and the
+slo-check.ps1: NO CONCLUSION (machine-contended): nail goes red by itself (ticket 134 AC#6).
+slo-check.ps1: NO CONCLUSION (machine-contended): record written to D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\out-retry-6\slo-no-conclusion.json (NOT a report; slo-report.json is not written on this path)
+slo-check.ps1: NO CONCLUSION (machine-contended): exit 0
+retry harness done, log at D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\263\r1\tracked-fail-retry.txt
