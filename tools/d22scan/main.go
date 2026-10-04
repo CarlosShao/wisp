@@ -788,23 +788,39 @@ func (s *scanner) scanGoFile(path string) error {
 	// Comments come from f.Comments, which ParseComments populated from the same
 	// parse the other bans share - so the "token position after //" shape the
 	// census (212-a2/a3) calibrated is guaranteed by construction here, not by a
-	// line regex. Only fully-spelled repo-relative paths count; shorthand
-	// ("the 152 ruler", "…那一族") is the registered ③ class and is NOT a
-	// violation (AC#3: prescribe, do not convict). Existence is judged against
+	// line regex. Only fully-spelled repo-relative paths count; shorthand is the
+	// registered ③ class and is NOT a violation (AC#3: prescribe, do not convict).
+	// ③ has two measured shapes, and both are exempt here: prose with no path
+	// token at all ("the 152 ruler"), and a path spelled WITH an abbreviation
+	// mark inside it ("docs/evidence/s1/152-...-accept-r1.md", "…", "*") -
+	// shorthandPathStarts() is what keeps the second shape out of the findings,
+	// because repoPathRe's own character class swallows dots, so an abbreviated
+	// path otherwise reaches the Stat() call and gets convicted for being
+	// unspellable, which is the opposite of what AC#3 prescribes (the ticket's
+	// 终裁节 recorded this as 裁 ⓐ). Existence is judged against
 	// the scanned root so a fixture's citations are judged inside that fixture.
 	for _, cg := range f.Comments {
 		for _, c := range cg.List {
 			pos := fset.Position(c.Pos())
-			for _, tok := range repoPathRe.FindAllString(c.Text, -1) {
+			short := shorthandPathStarts(c.Text)
+			for _, ix := range repoPathRe.FindAllStringIndex(c.Text, -1) {
+				if short[ix[0]] {
+					continue // class ③: abbreviated spelling, prescribed not convicted
+				}
+				tok := c.Text[ix[0]:ix[1]]
 				if s.citationReported[tok] {
 					continue // one finding per phantom token per scan
 				}
-				// A token ending in a capital-letter segment is a qualified
-				// symbol reference (internal/tools.Result.AppliedSteps,
-				// internal/proc.WithRegistry, class internal/tool) - an API
-				// citation, not a file citation (ticket 212's census classifies
-				// these non-citations; a .go file is never excluded because
-				// files are lowercase on disk).
+				// Exclusion needs a ".大写" segment: symRefRe matches
+				// "package.Symbol" / "package.Type.Field", so a token like
+				// internal/tools.Result.AppliedSteps or internal/proc.WithRegistry
+				// is an API citation and stays out of this ban. A token with no
+				// dot before a capital is NOT excluded - measured, not assumed:
+				// the bare phrase internal/tool (212-v1 fixture probe p2) rings
+				// like any other missing path, which is why the repo's own comment
+				// at internal/agent/tools.go had to be rewritten instead of being
+				// excused by this regex. A .go file is never excluded either,
+				// because file names are lowercase on disk and end in "go".
 				if symRefRe.MatchString(tok) {
 					continue
 				}
@@ -841,11 +857,52 @@ func (s *scanner) scanGoFile(path string) error {
 var repoPathRe = regexp.MustCompile(
 	`(?:docs|\.scratch|internal|cmd|tools|scripts)/[A-Za-z0-9_./\-\x{4e00}-\x{9fff}]*[A-Za-z0-9_\-]`)
 
+// shorthandRegionRe is repoPathRe's shape with the two abbreviation marks
+// ("…" U+2026 and "*") added to its character class, so one match spans the
+// whole of a half-spelled path. The marks matter because repoPathRe's class
+// already swallows ordinary dots: "docs/evidence/s1/152-...-accept-r1.md" is
+// ONE token to repoPathRe, while "…" and "*" END a token and leave the ban
+// judging the truncated prefix as though someone had cited a complete path.
+// Either way the citation is ticket 212's class ③, which AC#3 says is
+// prescribed against and never convicted.
+var shorthandRegionRe = regexp.MustCompile(
+	`(?:docs|\.scratch|internal|cmd|tools|scripts)/[A-Za-z0-9_./\-\x{4e00}-\x{9fff}*…]*`)
+
+// shorthandPathStarts returns the byte offsets at which a repoPathRe token
+// begins inside an abbreviated path region ("...", "…", "*"). Ban #9 skips those
+// offsets: the 终裁节 of ticket 212 recorded 裁 ⓐ - exclude the缩写 shape in the
+// instrument rather than convicting it, and pin the behaviour with the
+// expect-silent sample in tools/d22scan/selftestsamples.go.
+//
+// What that costs, stated plainly: the exemption is keyed to the REGION, so a
+// mark trailing an otherwise complete path is ③ as well, and a citation written
+// that way stays out of the findings. A path followed by "…" or "*" is not a
+// fully-spelled beacon, so reading it as class ③ is the ticket's own wording -
+// but it is a widening compared to the ban as it shipped on 2026-10-03, and the
+// range is registered in .scratch/wisp/probes/212/r2/fix-and-readings.md §6
+// instead of being left for the next reader to discover.
+func shorthandPathStarts(text string) map[int]bool {
+	starts := map[int]bool{}
+	for _, ix := range shorthandRegionRe.FindAllStringIndex(text, -1) {
+		region := text[ix[0]:ix[1]]
+		if strings.Contains(region, "...") || strings.Contains(region, "…") ||
+			strings.Contains(region, "*") {
+			starts[ix[0]] = true
+		}
+	}
+	return starts
+}
+
 // symRefRe matches "package.Symbol" and "package.Type.Field" shapes so ban #9
 // does not convict qualified symbol references (internal/tools.Result.AppliedSteps
 // is an API citation, not a file citation; measured against the real repo's first
-// ten findings, 2026-10-03). A token ending in ".go" is still a file citation
-// because file names are lowercase on disk and end in "go", not an uppercase.
+// ten findings, 2026-10-03). The match REQUIRES a "." immediately followed by a
+// capital, and that is the whole of its range: a lowercase-only token such as
+// the D37-class phrase in internal/agent/tools.go before ticket 212-r2 rewrote
+// it is NOT excluded by this regex - it reaches os.Stat, finds nothing, and
+// rings (212-v1 fixture probe p2, .scratch/wisp/probes/212/v1/verdict.md §2(b)).
+// A token ending in ".go" is still a file citation because file names are
+// lowercase on disk and end in "go", not an uppercase.
 var symRefRe = regexp.MustCompile(
 	`^[a-z][a-z0-9]*(/[a-z][a-z0-9]*)*\.[A-Z]`)
 

@@ -248,9 +248,15 @@ func (b *Bridge) Tools(_ context.Context) ([]agent.ToolInfo, error) {
 
 // Execute implements agent.ToolProvider - the choke point.
 //
-// The returned error is reserved for host-internal faults (D37 class
-// internal-provider), because the loop treats non-nil as "the provider broke"
-// (loop.go:654-657) and books a class the model cannot self-correct against.
+// The returned error is reserved for host-internal faults, because the loop
+// treats non-nil as "the provider broke" (internal/agent/loop.go:692-694) and
+// books it through ErrorClassOfTurnError (internal/agent/guard.go:271): the
+// class recorded is the one the error itself carries, and an error carrying
+// no class falls back to D37 class "internal" (observe.ClassInternal). The
+// hyphenated pair internal-provider is not one of D37's 17 classes - a
+// provider fault is class provider (observe.ClassProvider) and reaches the
+// row only if the error is wrapped with that class. Either way it is a class
+// the model cannot self-correct against.
 //
 // A REJECT IS NOT A FAULT. SPEC-07 §2 states the C3 rule as "未声明即拒绝调用
 // （不是报错，是拒绝）": an undeclared capability is refused, not reported. So

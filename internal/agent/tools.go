@@ -86,8 +86,12 @@ type ToolProvider interface {
 	Tools(ctx context.Context) ([]ToolInfo, error)
 
 	// Execute runs one call and must honor ctx cancellation and the request
-	// timeout. The returned error is a host failure (error class internal-tool);
-	// a tool's own failure is reported in ToolOutcome.
+	// timeout. The returned error is a host failure, not a tool failure: the
+	// loop books it through ErrorClassOfTurnError (internal/agent/guard.go:271),
+	// which records the D37 class the error itself carries and, when it carries
+	// none, falls back to class "internal" (observe.ClassInternal). D37's 17
+	// classes have no "internal-tool" in them - see the roster in
+	// internal/observe/errors.go. A tool's own failure is reported in ToolOutcome.
 	Execute(ctx context.Context, req ToolRequest) (ToolOutcome, error)
 }
 

@@ -23,11 +23,12 @@ package main
 // emojiRe's bands; U+2192 and U+2460 are the two bands Q-46 deliberately left out
 // (main.go:161-163), and their cases below pin that gap rather than wish it away.
 var (
-	glyphMath    = string(rune(0x2264))  // U+2264 - inside the math band ticket 141 added
-	glyphCheck   = string(rune(0x2713))  // U+2713 - inside U+2600-U+27BF
-	glyphArrow   = string(rune(0x2192))  // U+2192 - deliberately NOT scanned
-	glyphCircled = string(rune(0x2460))  // U+2460 - deliberately NOT scanned
-	glyphFace    = string(rune(0x1F600)) // U+1F600 - inside U+1F000-U+1FAFF
+	glyphMath     = string(rune(0x2264))  // U+2264 - inside the math band ticket 141 added
+	glyphCheck    = string(rune(0x2713))  // U+2713 - inside U+2600-U+27BF
+	glyphArrow    = string(rune(0x2192))  // U+2192 - deliberately NOT scanned
+	glyphCircled  = string(rune(0x2460))  // U+2460 - deliberately NOT scanned
+	glyphFace     = string(rune(0x1F600)) // U+1F600 - inside U+1F000-U+1FAFF
+	glyphEllipsis = string(rune(0x2026))  // U+2026 - one of ban #9's three abbreviation marks
 )
 
 // selfCases is the table runSelfTest executes, in the order it prints.
@@ -386,6 +387,19 @@ var selfCases = []selfCase{
 			"// prescribed against, never convicted (ticket 212 AC#3).\n" +
 			"func probe2() {}\n",
 		cover:   "internalGo",
-		summary: "citations that DO exist in the fixture (seeded below) stay silent, shorthand is not convicted",
+		summary: "citations that DO exist in the fixture (seeded below) stay silent, prose shorthand has no path token to convict",
+		note:    "This case's second and third lines carry NO repo-relative path token at all, so repoPathRe never sees them - 212-v1 measured that the silent side of ban #9 therefore said nothing about the shape ticket 212 actually names in class 3, an abbreviated PATH (docs/evidence/s1/152-...-accept-r1.md). That hole is the next case's job, not this one's: keeping the two apart is what makes each flip mean one thing.",
+	},
+	{
+		tag: "phantom-citation", want: wantSilent,
+		file: "internal/probe/cites-shorthand.go",
+		src: "package probe\n\n" +
+			"// Measured against a fixture that seeds neither of these, and neither may ring:\n" +
+			"// the ruler is docs/evidence/s1/152-...-accept-r2.md and the tables are\n" +
+			"// docs/evidence/s1/212-* , while the ledger line reads docs/evidence/s1/152" + glyphEllipsis + "r2.md.\n" +
+			"func probe3() {}\n",
+		cover:   "internalGo",
+		summary: "CLASS 3 AS A PATH: \"...\", \"*\" and U+2026 inside a repo-relative token stay silent (ticket 212 裁 ⓐ)",
+		note:    "212-v1 §2(d)/§5 AC#3: before the fix, repoPathRe's own character class swallowed the dots, so an abbreviated path reached os.Stat as a full citation and RANG - contradicting the ban's roster line, its scanGoFile comment and this table's own note, all three of which say shorthand is prescribed and not convicted. The exclusion is shorthandPathStarts() in tools/d22scan/main.go. The three spellings here are the three marks the 终裁节 names; all three stand for files the fixture does not seed, so if the exclusion is removed this case rings on every one of them, which is why it is the mutation this leg ran (readings in .scratch/wisp/probes/212/r2/fix-and-readings.md §4, ticket 212-r2). Removing the exemption is a WIDENING of the ban back to the 2026-10-03 shape and needs the same owner approval that adding it did.",
 	},
 }
