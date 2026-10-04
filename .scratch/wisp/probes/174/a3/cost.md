@@ -12,7 +12,7 @@
 | 定义处 | `D:\work\workspace\projects plans\Wisp\internal\risk\pathresolver.go:36`（doc 注释在 `:34-35`） |
 | 错误串逐字 | `risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions` |
 | 模板里的变量位 | **零枚**。它是 `errors.New` 的静态串，没有 `%s`、不插路径、不插用户填的配置值；串里唯一的"用户侧词汇"是**配置项的名字本体** `reparse_point_exceptions`（这词本来就写在 `docs\specs\SPEC-06-security-gatekeeping.md:56` 与 `internal\config\schema.go:479`） |
-| 同支另一枚可达错误 | `internal\tools\paths.go:121` `tools: empty path`（同样静态、零变量位；生产不可达——`ArtifactPath` 由 `:137` 的 `case sp.Path != ""` 保证非空） |
+| 同支另一枚可达错误 | `internal\tools\paths.go:121` `tools: empty path`（同样静态、零变量位；生产不可达——名册里的 `ArtifactPath` 由 `internal\tools\task_backfill.go:137` 那句 `case sp.Path != ""` 保证非空白） |
 | 可达错误集推导式 | `grep -n 'errors.New\|fmt.Errorf' internal/tools/paths.go internal/risk/pathresolver.go` → 4 行；其中 `pathresolver.go:49`/`:95` 属 `ErrRewrittenPath`，只在 `Result.Actable()` 里造，而 `grep -c 'Actable' internal/tools/paths.go` = **0** ⇒ 它今天流不到那一跳 |
 | 拼进模型可见文本的那一跳 | `internal\tools\task.go:837`（`pointerNotice` 函数体 `:829-851`，`case err != nil` 支） |
 
@@ -90,3 +90,11 @@
 ## §6 给 owner 的一句话
 
 你的电脑没有在往外送任何关于你的东西，这一次要点的不是"漏了什么"，而是"要不要顺手把一句英文技术词从 AI 看得见的地方拿掉"：拿掉它只改一行、不碰任何你批准过的规矩，也不改屏幕上任何东西；不拿掉也不出错，只是等哪天那条"让 AI 自己去读长答案"的路真接上，这句会连同以后可能的路径原文一起，先被 AI 看到。
+
+---
+
+**交件后复量（只追加，上文一字不改）**：本程终态提交 `18b7f399` 之后 `cmd\wisp\run.go` 的行号又漂了 3 行
+（`grep -n '}).Backfill('` 由 `a73edf62` 上的 **1107** → 现在 HEAD 的 **1110**，`res := bg.Wait()` 同漂 1106）。
+⇒ §1 最后一条与 §2 条件①里引的 `run.go:1107` 请以「`Backfill` 落在 `bg.Wait()` 之后」这一**形状**为准读；
+两枚锚上形状都成立（现量：`sed -n '1105,1112p' cmd/wisp/run.go` ⇒ `MarkRoot` → `bg.Wait()` → `Backfill` 三行顺序不变），
+`ArtifactPath` 写入者枚数在两枚锚上都＝**1**（`grep -rn 'ArtifactPath *=\|ArtifactPath:' --include='*.go' internal/ cmd/ | grep -v '_test.go'`）。
