@@ -1,0 +1,44 @@
+test(ball)〔260-r2〕把"借到的必是裸 Esc"改成"借到的必是配置里那枚键"（同步到 A588 已裁行为，非放宽）
+
+本轮唯一一格：internal/ball/hotkey_live_test.go 那枚因形ⓐ 而过期的真窗判据。
+现读复认：种子行 :42 逐字 Cancel: "Ctrl+Alt+V"（＝liveHotkeys），断言行 :107-108
+逐字 if got := rep.Live()[hkCancel]; got.VK != vkEscape / want VK_ESCAPE 0x1B —— 编排者给的
+两个行号零漂移。⚠ 本枚多读出第二格：同一 helper 的 :110-115 拿 escBorrowProbe（只探
+{modNoRepeat,vkEscape}）要求"桌面裸 Esc 不许空闲"，也建立在"借的是裸 Esc"上；
+只同步 :107 会留一枚"改了形还在探错键"的尺。
+
+同步形状（签名不改，四枚调用点零改动，⛔ 不碰写面外的 interaction_live_test.go／
+live_windows_test.go／hotkey_cancel_borrow_live_260_test.go）：
+  requireEscBorrowed 的期望值改从 ball 自己的种子解出（wantCancelBorrow260r2），
+  两格分开、不许合成一句"热键接好了"：
+    格①（条件①零漂移）种子 unset／"Esc" ⇒ 期望＝写死的位对 {0x4000,0x1B}，
+      桌面探测仍是那一发裸 Esc 探测，仍要求不空闲；
+    格②（AC#1）种子是别的组合 ⇒ 期望＝那枚组合（整枚 Mods+VK 都比，旧尺只比 VK），
+      桌面探测改探那枚组合，另追一格"裸 Esc 此刻必须空闲"＝形ⓐ 的承诺。
+  两支红句都点名种子与位值；⛔ 未删任何断言、⛔ 未把 t.Fatalf 降级 t.Log、⛔ 未加 t.Skip
+  （同文件 t.Skip 计数改前改后都是 4）。helper 判红支数 5→9。
+  requireEscReturned（"还"那一格）：形ⓐ 把它原来顺带的那点牙拆了——非默认种子下
+  requireIdleRoster 探的是没被借过的那枚键，归还失败看不见。改后默认种子早退（与改前
+  逐位同判、零新增探测），非默认种子追加"借过的那枚必须空闲"，仍占用再分两种读数
+  （自己的注册集还留着＝t.Fatalf；注册集干净而桌面仍占＝t.Errorf，两种都不是通过）。
+  escBorrowProbe 签名与语义不动（body 抽给新 hotkeyFreeProbe），requireIdleRoster 与
+  260-r1 真窗件照旧。措辞同步：standby 红句与 SKIP-LOUD 那句不再断"裸 Esc"，
+  liveHotkeys 的注释不再写"要把我们的 cancel 槽和用户配的键分开"（那是旧行为）。
+
+新档 internal/ball/hotkey_cancel_borrow_expect_260r2_test.go（//go:build windows，今天就能跑）：
+  把上面那支"跟着种子走的期望"落成默认档常驻尺＋正控（本仓死规矩：负向尺必配种 X 必响），
+  三支用例：种两枚不同组合 ⇒ 期望各自等于自己的位字面量且彼此不等；默认那支逐位等于
+  {0x4000,0x1B} 并等于 takeEscWith 真的注册进假登记表的那枚；垃圾种子 ⇒ 期望退回默认
+  且必须带"被拒"那句（条件③同向）。
+  ⛔ 同义反复的防法：期望走 ParseAccelerator(种子)，实际走 resolveCancelBorrow(种子)→报告，
+  两条独立路径；突变 N1（期望退回常量）与 N2（产码退回写死 Esc）各自都能把尺打红。
+
+门禁读数（终值，改后）：go test -count=1 -v ./internal/ball/ ＝ PASS 65／FAIL 1／SKIP 0，
+唯一红名 TestC21TableColourRowsMatchTokensCSS ＝基线同名（design/assets/tokens.css 被别家删，
+先于本腿，⛔ 不算本腿回归）；go vet ./internal/ball/ ＝ 0；go vet -tags winlive ./internal/ball/
+＝ 0（只编译，真窗档一次没跑＝同步后真窗判据是〔预测已具名、实测欠一次〕，归 260-v1）；
+gofmt -l／gofumpt -l 皆空。sh scripts/d22scan.sh 停在第一步正控（别家在飞的 tools/d22scan
+三枚文件里 ban #9 self-test 4 direction failed，⛔ 不由本枚修），同跑里
+TestScannerSelfScanOfRealRepoIsGreen PASS；另用 HEAD 版扫描器（git cat-file blob 到 $TEMP 编译，
+不在仓内建检出）补量 ⇒ clean，ban #8 internal/=501（＝r1 的 500 ＋ 本枚新档）。
+产码零改动：internal/ball/hotkey_windows.go md5 前后同值、git diff --numstat 空。
