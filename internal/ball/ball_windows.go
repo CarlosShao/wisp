@@ -902,10 +902,12 @@ func (b *Ball) TakeEscForCancel() {
 	})
 }
 
-// ReleaseEscAfterSession hands Esc back to the desktop (B1: "会话结束必须归还")
-// and returns the cancel slot to standby - it is NOT re-bound to the configured
-// binding, because that binding's product default is the very bare Esc this
-// ticket is about. Idempotent.
+// ReleaseEscAfterSession hands the borrowed cancel key back to the desktop (B1:
+// "会话结束必须归还") and returns the cancel slot to standby - it is NOT re-bound
+// to the configured binding, whether that binding is the product default bare Esc
+// (ticket 245's defect) or any key the user moved it to (ticket 260 made the
+// borrow follow the config; the return still drops exactly what was borrowed).
+// Idempotent.
 func (b *Ball) ReleaseEscAfterSession() {
 	b.uiRun(func() {
 		if !b.escTakenOver {

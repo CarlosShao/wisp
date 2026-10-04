@@ -1,0 +1,124 @@
+M1 applied
+=== M1: build ===
+=== M1: go test -count=1 -v -run '260' ./internal/ball/ ===
+=== RUN   TestBorrowDefaultIsBitIdentical260
+time=2026-10-04T10:00:28.449+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T10:00:28.451+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T10:00:28.451+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBorrowDefaultIsBitIdentical260 (0.00s)
+=== RUN   TestBorrowFollowsConfiguredBinding260
+    hotkey_cancel_borrow_260_test.go:127: modifiers plus a letter: cancel = "Ctrl+Alt+K" resolves to {Mods:16384 VK:27}, want {Mods:16387 VK:75}
+    hotkey_cancel_borrow_260_test.go:127: the documented alternative summon shape: cancel = "Ctrl+Alt+Space" resolves to {Mods:16384 VK:27}, want {Mods:16387 VK:32}
+    hotkey_cancel_borrow_260_test.go:127: a bare function key: cancel = "F9" resolves to {Mods:16384 VK:27}, want {Mods:16384 VK:120}
+--- FAIL: TestBorrowFollowsConfiguredBinding260 (0.00s)
+=== RUN   TestBorrowUnparsableFallsBackLoudly260
+time=2026-10-04T10:00:28.453+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-04T10:00:28.453+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T10:00:28.453+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+--- PASS: TestBorrowUnparsableFallsBackLoudly260 (0.00s)
+=== RUN   TestBorrowReceiptSharesOneSourceWithRegistration260
+    hotkey_cancel_borrow_260_test.go:252: cancel = "Ctrl+Alt+K": receipt spells "Esc", want "Ctrl+Alt+K"
+    hotkey_cancel_borrow_260_test.go:252: cancel = "Ctrl+Alt+Space": receipt spells "Esc", want "Ctrl+Alt+Space"
+    hotkey_cancel_borrow_260_test.go:252: cancel = "F9": receipt spells "Esc", want "F9"
+--- FAIL: TestBorrowReceiptSharesOneSourceWithRegistration260 (0.00s)
+=== RUN   TestBorrowFailureNamesTheKeyItTried260
+time=2026-10-04T10:00:28.453+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="invalid argument"
+    hotkey_cancel_borrow_260_test.go:274: the failed-borrow line = {Name:cancel ID:3 Binding:Esc Status:registration failed Acc:{Mods:16384 VK:27} Err:invalid argument Note:}, want an attempted error naming "Ctrl+Alt+K"
+--- FAIL: TestBorrowFailureNamesTheKeyItTried260 (0.00s)
+=== RUN   TestConfiguredCancelStillNeverBoundWhileIdle260
+time=2026-10-04T10:00:28.454+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- PASS: TestConfiguredCancelStillNeverBoundWhileIdle260 (0.00s)
+=== RUN   TestLiveBorrowHelperPremiseIsConfigDependent260
+    hotkey_cancel_borrow_260_test.go:338: the borrow of "Ctrl+Alt+V" resolved to VK_ESCAPE again - condition ①'s default-only rule was over-applied
+--- FAIL: TestLiveBorrowHelperPremiseIsConfigDependent260 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.072s
+FAIL
+=== M1: restored, md5 must equal the baseline ===
+be79cbda486a334d74fe9d278558acba *internal/ball/hotkey_windows.go
+M2 applied
+=== M2: build ===
+=== M2: go test -count=1 -v -run '260' ./internal/ball/ ===
+=== RUN   TestBorrowDefaultIsBitIdentical260
+time=2026-10-04T10:00:33.177+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T10:00:33.180+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T10:00:33.180+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBorrowDefaultIsBitIdentical260 (0.00s)
+=== RUN   TestBorrowFollowsConfiguredBinding260
+    hotkey_cancel_borrow_260_test.go:151: modifiers plus a letter: receipt line = {Name:cancel ID:3 Binding:Ctrl+Alt+K Status:live Acc:{Mods:16384 VK:27} Err:<nil> Note:}, want live "Ctrl+Alt+K" with {Mods:16387 VK:75} and no note
+time=2026-10-04T10:00:33.181+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+    hotkey_cancel_borrow_260_test.go:151: the documented alternative summon shape: receipt line = {Name:cancel ID:3 Binding:Ctrl+Alt+Space Status:live Acc:{Mods:16384 VK:27} Err:<nil> Note:}, want live "Ctrl+Alt+Space" with {Mods:16387 VK:32} and no note
+time=2026-10-04T10:00:33.181+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Space
+    hotkey_cancel_borrow_260_test.go:151: a bare function key: receipt line = {Name:cancel ID:3 Binding:F9 Status:live Acc:{Mods:16384 VK:27} Err:<nil> Note:}, want live "F9" with {Mods:16384 VK:120} and no note
+time=2026-10-04T10:00:33.181+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=F9
+--- FAIL: TestBorrowFollowsConfiguredBinding260 (0.00s)
+=== RUN   TestBorrowUnparsableFallsBackLoudly260
+time=2026-10-04T10:00:33.182+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-04T10:00:33.182+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T10:00:33.182+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+--- PASS: TestBorrowUnparsableFallsBackLoudly260 (0.00s)
+=== RUN   TestBorrowReceiptSharesOneSourceWithRegistration260
+    hotkey_cancel_borrow_260_test.go:236: cancel = "Ctrl+Alt+K": the receipt carries {Mods:16384 VK:27} while RegisterHotKey was handed {Mods:16387 VK:75} - the two are not the same resolution
+--- FAIL: TestBorrowReceiptSharesOneSourceWithRegistration260 (0.00s)
+=== RUN   TestBorrowFailureNamesTheKeyItTried260
+time=2026-10-04T10:00:33.183+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Ctrl+Alt+K err="invalid argument"
+    hotkey_cancel_borrow_260_test.go:274: the failed-borrow line = {Name:cancel ID:3 Binding:Ctrl+Alt+K Status:registration failed Acc:{Mods:16384 VK:27} Err:invalid argument Note:}, want an attempted error naming "Ctrl+Alt+K"
+--- FAIL: TestBorrowFailureNamesTheKeyItTried260 (0.00s)
+=== RUN   TestConfiguredCancelStillNeverBoundWhileIdle260
+time=2026-10-04T10:00:33.183+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- PASS: TestConfiguredCancelStillNeverBoundWhileIdle260 (0.00s)
+=== RUN   TestLiveBorrowHelperPremiseIsConfigDependent260
+    hotkey_cancel_borrow_260_test.go:345: RegisterHotKey would get the configured key while the receipt still prints Esc
+--- FAIL: TestLiveBorrowHelperPremiseIsConfigDependent260 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.100s
+FAIL
+=== M2: restored, md5 must equal the baseline ===
+be79cbda486a334d74fe9d278558acba *internal/ball/hotkey_windows.go
+M3 applied
+=== M3: build ===
+=== M3: go test -count=1 -v -run '260' ./internal/ball/ ===
+=== RUN   TestBorrowDefaultIsBitIdentical260
+time=2026-10-04T10:00:37.627+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T10:00:37.630+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-04T10:00:37.630+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBorrowDefaultIsBitIdentical260 (0.00s)
+=== RUN   TestBorrowFollowsConfiguredBinding260
+time=2026-10-04T10:00:37.630+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-04T10:00:37.630+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Space
+time=2026-10-04T10:00:37.630+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=F9
+--- PASS: TestBorrowFollowsConfiguredBinding260 (0.00s)
+=== RUN   TestBorrowUnparsableFallsBackLoudly260
+    hotkey_cancel_borrow_260_test.go:172: P6 RED: an unparsable cancel binding resolved with no fallback notice - the parse failure was swallowed
+--- FAIL: TestBorrowUnparsableFallsBackLoudly260 (0.00s)
+=== RUN   TestBorrowReceiptSharesOneSourceWithRegistration260
+    hotkey_cancel_borrow_260_test.go:252: cancel = "Ctrl+Alt+NotAKey+": receipt spells "Esc", want "Ctrl+Alt+NotAKey+"
+--- FAIL: TestBorrowReceiptSharesOneSourceWithRegistration260 (0.00s)
+=== RUN   TestBorrowFailureNamesTheKeyItTried260
+time=2026-10-04T10:00:37.631+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Ctrl+Alt+K err="invalid argument"
+time=2026-10-04T10:00:37.631+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- PASS: TestBorrowFailureNamesTheKeyItTried260 (0.00s)
+=== RUN   TestConfiguredCancelStillNeverBoundWhileIdle260
+time=2026-10-04T10:00:37.631+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- PASS: TestConfiguredCancelStillNeverBoundWhileIdle260 (0.00s)
+=== RUN   TestLiveBorrowHelperPremiseIsConfigDependent260
+    hotkey_cancel_borrow_260_test.go:347: named conflict for the orchestrator: hotkey_live_test.go:107 reads rep.Live()[hkCancel].VK == vkEscape for a ball booted with liveHotkeys().Cancel = "Ctrl+Alt+V"; under 形ⓐ that slot holds VK 0x56, so the helper's bare-Esc premise is now config-dependent (winlive tier not run this round)
+--- PASS: TestLiveBorrowHelperPremiseIsConfigDependent260 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.127s
+FAIL
+=== M3: restored, md5 must equal the baseline ===
+be79cbda486a334d74fe9d278558acba *internal/ball/hotkey_windows.go
+=== final: all three mutations restored, gate re-read ===
+be79cbda486a334d74fe9d278558acba *internal/ball/hotkey_windows.go
+2488b2ac692c99ae4e3b4831526637d7 *internal/ball/ball_windows.go
+ M internal/ball/ball_windows.go
+ M internal/ball/hotkey_windows.go
+--- PASS: TestBorrowDefaultIsBitIdentical260 (0.00s)
+--- PASS: TestBorrowFollowsConfiguredBinding260 (0.00s)
+--- PASS: TestBorrowUnparsableFallsBackLoudly260 (0.00s)
+--- PASS: TestBorrowReceiptSharesOneSourceWithRegistration260 (0.00s)
+--- PASS: TestBorrowFailureNamesTheKeyItTried260 (0.00s)
+--- PASS: TestConfiguredCancelStillNeverBoundWhileIdle260 (0.00s)
+--- PASS: TestLiveBorrowHelperPremiseIsConfigDependent260 (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/ball	0.058s

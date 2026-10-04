@@ -1,0 +1,22 @@
+260-r1 补一句实话：借用吃配置之后，idle 那行日志不许再说 "Esc is borrowed"
+
+改的是本票条件②（说到做到）在自己包里的最后一个落点。hotkey_windows.go 的
+cancelIdleLine 每轮注册都打一行 standby 说明，旧文案逐字 "cancel hotkey left
+unbound while idle: Esc is borrowed only during Confirming ..."，而同一条日志的
+"binding" 字段带的就是用户自己那枚值（260-a2 census 把它列为形ⓑ 的头号必改落点）。
+形ⓐ 落地后借用真读配置，这句写死的 "Esc" 对改键用户由"自相矛盾"变成"直接说谎"，
+所以文案改成点名槽位不点名键："the configured key is borrowed only during Confirming"。
+
+⛔ 没动 HotkeyStandby.String()（"not bound while idle (cancel is borrowed only during
+Confirming)"）——那句本来就只说槽位，且被 internal/ball/hotkey_status_test.go:424 与
+cmd/wisp/resident_ball_live_228_windows_test.go:166 两处钉住字面，动它＝改别人的断言。
+ReleaseEscAfterSession 的注释同步补上"归还的就是借走的那枚"。
+
+门禁复跑（.scratch/wisp/probes/260/r1/gate-*.txt，全用最终码重测）：go build ./... = 0；
+go vet ./internal/ball/ = 0；go vet -tags winlive ./internal/ball/ = 0（只类型检查，未跑桌面）；
+gofumpt -l internal/ball/ = 空；go test -count=1 -v ./internal/ball/ = PASS 62 / FAIL 1 / SKIP 0，
+唯一红仍是未修码基线里就红的 TestC21TableColourRowsMatchTokensCSS（design/assets/tokens.css
+被共享工作树别家删掉，与本票无关，本腿未动）。
+三发突变（mutation-driver.sh + mutate.py，读数 mutation-M1M2M3-final.txt）对最终码重跑：
+M1 摘掉"吃配置"、M2 回执与注册各拼一次、M3 静默吞解析失败——三发各有指名用例红，
+还原后 md5 三份全等于 be79cbda486a334d74fe9d278558acba，七枚判据全绿。
