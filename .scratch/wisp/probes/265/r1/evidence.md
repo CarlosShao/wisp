@@ -96,11 +96,11 @@
 
 （本节答：`sh scripts/d22scan.sh`、`sh scripts/check-path-length-budget.sh --with-self-test`、`gofumpt -l <本腿文件>`、`go vet ./cmd/wisp/` 四门读数＋时刻；定向 `go test` 的红名集合逐名比对，哪几枚是既有红。）
 
-- 6.1 d22scan：**未判**
-- 6.2 路径长度门：**未判**
-- 6.3 gofumpt：**未判**
-- 6.4 go vet（含 `-tags winlive` 只编译不跑）：**未判**
-- 6.5 定向 go test 红名集合逐名比对：**未判**
+- 6.1 d22scan：**绿**（20:04:57）。先修已知红——`resident_approval_windows.go:38` 注释引 `internal/panel/panel_pump.go:12-21`＝盘上不存在（`ls internal/panel/` 无 panel_pump.go；A605 §2 预点名真身 `internal/panel/pump.go`，现读其 `:12-21` 逐字含 "no Go -> page channel … The last mile is NOT here"＝句子真、文件名错）⇒ 只改注释路径为 `internal/panel/pump.go:12-21`，语义零改。修后 `sh scripts/d22scan.sh` **rc=0、零 finding**（`clean - no D22 ban violations`，examin 266 production Go files；修前那枚红名＝ban #9 phantom-citation 会点 `cmd/wisp/resident_approval_windows.go`，修后名册消失）。同发复检：同文件另一处注释 `panel_pump.go:12-21`（`resident_task_source_windows.go:63`）引的相对名在 `cmd/wisp` 邻近语境有真身 `cmd/wisp/panel_pump.go`（`ls` 实存）＝非 phantom，不动。
+- 6.2 路径长度门：**绿**（20:05:14）。`sh scripts/check-path-length-budget.sh --with-self-test` rc=0，`VERDICT GREEN - every over-budget tracked path is rostered by name`（denominator 5692 tracked paths、over-budget 57 全在名册、wall interval 0）。
+- 6.3 gofumpt：**本腿写面空**（20:05:29，`"$(go env GOPATH)/bin/gofumpt.exe" -l cmd/wisp/`＝只点 `cmd\wisp\models.go` 一枚）。已知既有名册（A603 §6）＝`models.go`／`pending_read.go`／`queue.go` 三枚、票 212/258 账户；今天只点 `models.go` 一枚（另两枚本轮未点），**不归本腿、不修**（零 diff 复证：`git diff HEAD --stat -- cmd/wisp/models.go`＝空，最后触它＝`5e8748b3` 票 212/258 收尾）。本腿四枚写面＋证据件**零命中**。
+- 6.4 go vet：**双绿**（20:06:14）。`go vet ./cmd/wisp/` rc=0；`go vet -tags winlive ./cmd/wisp/` rc=0（只编译，不跑任何 winlive 测试）。
+- 6.5 定向 go test 红名集合逐名比对：**既有红名册＝空**（起手档 19:53:30–19:57:24，HEAD `a04a095f`，`go test -count=1 ./cmd/wisp/`＝`ok 201.894s` 零 FAIL）；终态复跑见 §9（收尾全量）。期间定向跑（M1–M4 四发）红名逐枚见 §4，全部为**种下即红、还原即清**的瞬时红，不在终态。`winlive` 标签测试**一枚没跑**（§0 闸门③照守）。
 
 ## 7. 我判不动／量不到的地方（具名＋归口）
 

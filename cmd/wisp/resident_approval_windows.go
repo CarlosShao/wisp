@@ -35,7 +35,7 @@ package main
 //     resident_windows.go builds and starts one), and the sentence is corrected
 //     here rather than left to mislead. The limit that IS real, and is the one
 //     that matters for a card: this tree has no Go-to-page channel at all
-//     (internal/panel/panel_pump.go:12-21 says so verbatim, "the last mile is
+//     (internal/panel/pump.go:12-21 says so verbatim, "the last mile is
 //     still open"), and the injected branch of the assembly root publishes
 //     nothing (run.go hands an injected gate no rt.ui), so no approval card ever
 //     reaches that page. "The card is on screen" is therefore still NOT a claim
