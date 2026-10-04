@@ -1,0 +1,4 @@
+=== RUN   TestBan9PrefixTablesAreTheSameList
+--- PASS: TestBan9PrefixTablesAreTheSameList (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	0.021s

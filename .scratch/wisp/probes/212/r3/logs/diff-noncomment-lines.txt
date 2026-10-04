@@ -1,0 +1,17 @@
+-// observer sees it. Decision is the verdict as it was admitted (RulesHit,
+-// Reason, Level and SessionOverrideBlocked are the fields the L2 card shows
+-// verbatim, per ticket 17's frozen-contract note, which lives in
+-// internal/tools/gate.go:13 - the note is a display contract on Decision, and
+-// tools/d22scan does not enforce it (its pathresolver-bypass ban is about
+-// filepath.Clean/Abs outside risk.PathResolver), copied per
+-//	                      scanned root; shorthand forms are a separate
+-//	                      prescription (AC#3), not a violation.
+-	// ③ has two measured shapes, and both are exempt here: prose with no path
+-	// token at all ("the 152 ruler"), and a path spelled WITH an abbreviation
+-	// mark inside it ("docs/evidence/s1/152-...-accept-r1.md", "…", "*") -
+-	// shorthandPathStarts() is what keeps the second shape out of the findings,
+-	// because repoPathRe's own character class swallows dots, so an abbreviated
+-	// path otherwise reaches the Stat() call and gets convicted for being
+-	// unspellable, which is the opposite of what AC#3 prescribes (the ticket's
+-	// 终裁节 recorded this as 裁 ⓐ). Existence is judged against
+-	// the scanned root so a fixture's citations are judged inside that fixture.

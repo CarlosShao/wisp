@@ -1,0 +1,3 @@
+A	cmd/wisp/resident_approval_risk_256_windows_test.go
+M	cmd/wisp/resident_approval_windows.go
+M	cmd/wisp/resident_windows.go

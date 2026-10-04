@@ -1,0 +1,2 @@
+442d46cadef8c641c54f7ac00984a470 *main.go
+f9e10163199a89c2614daf1ab1ad7d52 *selftestsamples.go
