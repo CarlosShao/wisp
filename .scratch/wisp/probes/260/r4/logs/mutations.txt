@@ -1,0 +1,87 @@
+=== M1 标签算一次（装了就等于没装） ===
+[approval] rc=1 FAIL=4 PASS=3
+--- FAIL: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+--- FAIL: TestTicket260R4LabelFollowsTheReaderAcrossAReload (0.00s)
+--- FAIL: TestTicket260R4UnloadLineNamesNoKey (0.00s)
+--- FAIL: TestTicket260R3LoadedCancelLabelIsTheNamedResidual (0.00s)
+--- 红句逐字 ---
+    cancel_key_label_260r4_test.go:119: 卡片通道行 没有念出装配根那枚键："按 Esc 键"（应含 "Ctrl+Alt+Q"）
+    cancel_key_label_260r4_test.go:119: 卡片通道行 还在念 Esc："按 Esc 键"
+    cancel_key_label_260r4_test.go:130: L1 否决审计句 没有念出装配根那枚键："用户在 L1 确认窗口中通过「按 Esc 键」否决了本次操作（取消窗口，非撤销已写出的内容）"（应含 "Ctrl+Alt+Q"）
+    cancel_key_label_260r4_test.go:130: L1 否决审计句 还在念 Esc："用户在 L1 确认窗口中通过「按 Esc 键」否决了本次操作（取消窗口，非撤销已写出的内容）"
+    cancel_key_label_260r4_test.go:142: r4 L2 veto: returned after 0s (start=12:24:49, end=12:24:49)
+    cancel_key_label_260r4_test.go:142: L2 否决审计句 没有念出装配根那枚键："用户在 L2 审批卡片显示期间通过「按 Esc 键」否决了本次操作，未执行"（应含 "Ctrl+Alt+Q"）
+    cancel_key_label_260r4_test.go:142: L2 否决审计句 还在念 Esc："用户在 L2 审批卡片显示期间通过「按 Esc 键」否决了本次操作，未执行"
+    cancel_key_label_260r4_test.go:150: 回执报告的否决通道行 没有念出装配根那枚键："取消不是原子的（D31）：否决到达时执行已开始，以下步骤已生效，未自动回退（否决通道：按 Esc 键）\n- 已执行：已写入 C:/data/r4.txt"（应含 "Ctrl+Alt+Q"）
+    cancel_key_label_260r4_test.go:150: 回执报告的否决通道行 还在念 Esc："取消不是原子的（D31）：否决到达时执行已开始，以下步骤已生效，未自动回退（否决通道：按 Esc 键）\n- 已执行：已写入 C:/data/r4.txt"
+--- FAIL: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+    cancel_key_label_260r4_test.go:188: 热重载后那行陈旧了：got "按 Esc 键", want "按 Ctrl+Alt+W 键"（同一台机器换了配置，标签必须跟着走）
+    cancel_key_label_260r4_test.go:192: 重载前后一行字没变，说明标签被算了一次："按 Esc 键"
+    cancel_key_label_260r4_test.go:195: 取值函数被调用 0 次，少于两枚渲染所需的次数：标签不是在读取时求值的
+--- FAIL: TestTicket260R4LabelFollowsTheReaderAcrossAReload (0.00s)
+    cancel_key_label_260r4_test.go:249: 已加载那行不再是「念当前那枚键」："按 Esc 键"
+--- FAIL: TestTicket260R4UnloadLineNamesNoKey (0.00s)
+    cancel_key_wording_260r3_test.go:102: 装配根装了取消键读口，卡片那行还在念出厂默认："按 Esc 键"（读取时求值被算成了一次）
+--- FAIL: TestTicket260R3LoadedCancelLabelIsTheNamedResidual (0.00s)
+[cmdwisp] rc=1 FAIL=1 PASS=7
+--- FAIL: TestTicket260R4ShippedConstructorInstallsTheReader (0.00s)
+--- 红句逐字 ---
+    resident_cancel_key_label_260r4_windows_test.go:104: 改了配置以后卡片那行没念那枚键："按 Esc 键"（应含 "Ctrl+Alt+Q"）
+    resident_cancel_key_label_260r4_windows_test.go:107: 改了配置以后卡片那行还在念 Esc："按 Esc 键"
+--- FAIL: TestTicket260R4ShippedConstructorInstallsTheReader (0.00s)
+还原后 git status 该文件：(空＝与 HEAD 一致)
+
+=== M2 未加载那行也指枚键名 ===
+[approval] rc=1 FAIL=1 PASS=6
+--- FAIL: TestTicket260R4UnloadLineNamesNoKey (0.00s)
+--- 红句逐字 ---
+    cancel_key_label_260r4_test.go:142: r4 L2 veto: returned after 0s (start=12:24:56, end=12:24:56)
+    cancel_key_label_260r4_test.go:227: 未加载那行的前半不再是通道名：got "按 Esc 键", want "取消键通道"（档一：这一支没有键可指）
+    cancel_key_label_260r4_test.go:231: 未加载那行的前半还在指枚键名（含 "Esc"）："按 Esc 键：快捷键取消不可用"
+    cancel_key_label_260r4_test.go:231: 未加载那行的前半还在指枚键名（含 "按"）："按 Esc 键：快捷键取消不可用"
+    cancel_key_label_260r4_test.go:241: 未加载那行还带着已加载形："按 Esc 键：快捷键取消不可用"
+    cancel_key_label_260r4_test.go:227: 未加载那行的前半不再是通道名：got "按 Ctrl+Alt+Q 键", want "取消键通道"（档一：这一支没有键可指）
+    cancel_key_label_260r4_test.go:231: 未加载那行的前半还在指枚键名（含 "Ctrl+Alt+Q"）："按 Ctrl+Alt+Q 键：快捷键取消不可用"
+    cancel_key_label_260r4_test.go:231: 未加载那行的前半还在指枚键名（含 "按"）："按 Ctrl+Alt+Q 键：快捷键取消不可用"
+--- FAIL: TestTicket260R4UnloadLineNamesNoKey (0.00s)
+[cmdwisp] rc=1 FAIL=2 PASS=6
+--- FAIL: TestTicket260R4NoBallHostNamesNoKeyOnTheCard (0.00s)
+--- FAIL: TestTicket260R4SeamIsNotAProductionShortcut (0.00s)
+--- 红句逐字 ---
+    resident_cancel_key_label_260r4_windows_test.go:145: 未加载那行的前半不再是通道名："按 Esc 键"（want "取消键通道"）
+    resident_cancel_key_label_260r4_windows_test.go:149: 未加载那行的前半还在指枚键名（含 "Esc"，档=""）："按 Esc 键：快捷键取消不可用"
+    resident_cancel_key_label_260r4_windows_test.go:149: 未加载那行的前半还在指枚键名（含 "按"，档=""）："按 Esc 键：快捷键取消不可用"
+    resident_cancel_key_label_260r4_windows_test.go:145: 未加载那行的前半不再是通道名："按 Ctrl+Alt+Q 键"（want "取消键通道"）
+    resident_cancel_key_label_260r4_windows_test.go:149: 未加载那行的前半还在指枚键名（含 "Ctrl+Alt+Q"，档="Ctrl+Alt+Q"）："按 Ctrl+Alt+Q 键：快捷键取消不可用"
+    resident_cancel_key_label_260r4_windows_test.go:149: 未加载那行的前半还在指枚键名（含 "按"，档="Ctrl+Alt+Q"）："按 Ctrl+Alt+Q 键：快捷键取消不可用"
+--- FAIL: TestTicket260R4NoBallHostNamesNoKeyOnTheCard (0.00s)
+    resident_cancel_key_label_260r4_windows_test.go:172: 未装配闸门的卡片那行 = "按 Esc 键：快捷键取消不可用", want 以通道名 "取消键通道" 开头且不指枚键名
+--- FAIL: TestTicket260R4SeamIsNotAProductionShortcut (0.00s)
+还原后 git status 该文件：(空＝与 HEAD 一致)
+
+=== M3 gate.go:314 那处读取退回旧表 ===
+[approval] rc=1 FAIL=1 PASS=6
+--- FAIL: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+--- 红句逐字 ---
+    cancel_key_label_260r4_test.go:130: L1 否决审计句 没有念出装配根那枚键："用户在 L1 确认窗口中通过「取消键通道」否决了本次操作（取消窗口，非撤销已写出的内容）"（应含 "Ctrl+Alt+Q"）
+    cancel_key_label_260r4_test.go:142: r4 L2 veto: returned after 0s (start=12:25:02, end=12:25:02)
+--- FAIL: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+还原后 git status 该文件：(空＝与 HEAD 一致)
+
+=== M4 装配根不再装读口（生产链断在这里） ===
+[cmdwisp] rc=1 FAIL=1 PASS=7
+--- FAIL: TestTicket260R4ShippedConstructorInstallsTheReader (0.00s)
+--- 红句逐字 ---
+    resident_cancel_key_label_260r4_windows_test.go:104: 改了配置以后卡片那行没念那枚键："按 Esc 键"（应含 "Ctrl+Alt+Q"）
+    resident_cancel_key_label_260r4_windows_test.go:107: 改了配置以后卡片那行还在念 Esc："按 Esc 键"
+--- FAIL: TestTicket260R4ShippedConstructorInstallsTheReader (0.00s)
+还原后 git status 该文件：(空＝与 HEAD 一致)
+
+=== M5 report.go:142 那处读取退回旧表 ===
+[approval] rc=1 FAIL=1 PASS=6
+--- FAIL: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+--- 红句逐字 ---
+    cancel_key_label_260r4_test.go:142: r4 L2 veto: returned after 0s (start=12:25:08, end=12:25:08)
+    cancel_key_label_260r4_test.go:150: 回执报告的否决通道行 没有念出装配根那枚键："取消不是原子的（D31）：否决到达时执行已开始，以下步骤已生效，未自动回退（否决通道：取消键通道）\n- 已执行：已写入 C:/data/r4.txt"（应含 "Ctrl+Alt+Q"）
+--- FAIL: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+还原后 git status 该文件：(空＝与 HEAD 一致)
