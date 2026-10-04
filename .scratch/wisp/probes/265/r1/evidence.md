@@ -46,10 +46,23 @@
 
 （本节答：普查件 §5.2 具名的"常驻腿那一格零枚用例守"补了哪几枚；每枚断什么、正控形是什么；256 那枚 AST 钉解冻后的期望集与反向断言搬到哪儿去了。）
 
-- 3.1 新建判据件与用例名册：**未判**
-- 3.2 256 AST 钉的解冻落地（A602 边界内）：**未判**
-- 3.3 硬约束第 1 条的钉（holder 未绑定 ⇒ 指名用例红）：**未判**
-- 3.4 AC#3 ⓐ 支的正控（摘掉接线 ⇒ 指名用例红）：**未判**
+- 3.1 新建判据件与用例名册：**判读成立**（20:0x，对 commit `a04a095f` 的树现读＋起手档实跑）。
+  判据件＝`cmd/wisp/resident_grant_writer_265_windows_test.go`（707 行，`//go:build windows`，`package main`），
+  **8 枚用例**，逐枚（名＋断什么＋正控形）：
+  1. `TestTicket265ResidentGrantHolderUnboundFailsLoudly`——**A601 §4 硬约束 1 的钉**。断：全新 holder `Record` 必返非 nil err 且 id==0（静默 `return 0,nil` 或造 id 两形都红）；err 句非空（`GRANT-RECORD-FAILED` 要插值它）；`bound()` 初值 false；`bindSessionLedger(nil)`／`bind(nil)` 都不得把 holder 变 bound，nil 后再 Record 仍返错。正控形＝种"未绑定返 nil err"即此名红（M1）。
+  2. `TestTicket265ResidentGrantHolderBoundDelegatesEveryField`——断：bind 后 Record 逐字段透传（ctx 标记位 sawCtx、tool、pattern），id 是账本回的（fixture 从 20 起、首呼返 21，防小造 id 混过）；两次调用计两次。
+  3. `TestTicket265LedgerErrorReachesTheOperatorThroughTheHolder`——断：账本自己报错时 holder 透传错误原句（`账本写不进去`），不吞。
+  4. `TestTicket265UnboundHolderAnswersThroughTheGateWithoutClaimingARow`——**过真门的全链 POSTURE 钉**：真 `approval.New`（fixture 带真 holder 走 `Grants:`）＋真 L2 卡（`AdmitTextTask`→`PendingApproval`→UI Prompt）＋`Native().AllowSession`。断四向：答案仍放行（`AnswerAllow`，不能收回用户已给的答复）；审计**有** `GRANT-RECORD-FAILED`；**无** `GRANT-RECORDED`／`grant_id=`；**无** `GRANT-DROPPED`（防"Grants 根本没传"的旧形混绿）。
+  5. `TestTicket265BoundHolderRecordsEveryPathTheAnsweredCardNamed`——AC#1 两句兑现的正控：bind 后同一张卡 AllowSession ⇒ recorder 收到**逐路径**调用（len==len(p.Paths)、tool/pattern 逐枚对上卡片），审计逐枚有 `GRANT-RECORDED corr=… grant_id=21+i`，且 `GRANT-RECORD-FAILED`／`GRANT-DROPPED`／`grant_id=0 ` 三禁。
+  6. `TestTicket265GateLiteralCarriesTheResidentHolder`——AST 读产码字面量：`Options.Grants` 的值表达式**逐字**必须是 `ra.grants`（per-call 字面量＝绑定位永远够不着＝进程终身 GRANT-RECORD-FAILED 的形状，专为此红）。
+  7. `TestTicket265BindSiteRunsAfterTheAssemblyAndBeforeAnyTask`——AST 读 `startResidentTaskSource`：绑定调用必须在场、实参逐字 `run.session`（ⓐ-Ⅲ 形红）、位置在 `src.run = run` 之后（早了＝账本还不存在＝装饰行）、且在每枚 `src.submitTask` 之前（晚了＝首卡可被答时仍未绑）。摘掉绑定位＝此名红（M3）。
+  8. `TestTicket265SessionLedgerStillHasOneProductionConstructionSite`——ⓐ-Ⅲ 拒绝形的钉：扫包内全部非测试 .go，`session.Mint(`/`session.NewLedger(` 的命中必须全部前缀 `run.go:`（M4 的判据）；一个没有＝判据失去对象。
+  9. `TestTicket265ResidentApprovalConstructsAnUnboundHolder`——跑**生产构造器** `newResidentApproval()`：holder 非 nil（`Grants:` 不是 nil 接口）、初值未绑定、未绑 Record 返错、`bindResidentGrantLedger(nil)` 不动它、bind 后透传。
+  （件头自述 NOT claimed 两格：真双击进程无答复入口、无 Go→页面通道——与本腿 §2.5 改释一致。）
+  **起手档实跑**：`export PATH="$PWD/third_party/sherpa-onnx:$PATH"` 后 `go test -count=1 ./cmd/wisp/`＝**ok 201.894s**（19:53:30–19:57:24，HEAD `a04a095f`）＝既有红名册**空**，本节所有用例起手全绿。
+- 3.2 256 AST 钉的解冻落地（A602 边界内）：**判读成立，diff 逐块核过**。`git diff a04a095f^ a04a095f -- cmd/wisp/resident_approval_risk_256_windows_test.go` 全部改动＝四处：① 头注释块改写（"Grants stays unset" 叙述换成 ⓐ-Ⅰ 交付叙述，纯注释）；② ruler ④ 名下注释改写（仍保留原名不改名——件内自述理由＝A602 边界禁重排/改名、验收腿逐字比红名）；③ `:455`（现量行号）`want := []string{…, "Grants"}`＝5→6 枚；④ 原 `if got["Grants"] { t.Errorf("the resident leg now passes Options.Grants …") }` 反向断言整块替换为 `if !got["Grants"]` 正向断言（红句点名 A601/A602、"revert A602 first"）。**A602 边界四条逐条对**：只动期望集＋那一条反向断言＝是；不含同包其它断言＝是；`[risk]` 两枚字段（`Window`／`ApprovalTimeout`）判据一字未动＝是（diff 里 `:445` 一带的 Window/ApprovalTimeout 断言循环零改动）；未重排/改名文件＝是。**越界枚数＝0**。
+- 3.3 硬约束第 1 条的钉（holder 未绑定 ⇒ 指名用例红）：**在册**＝3.1#1（对象级）＋3.1#4（门级全链）。红兑现见 §4 M1。
+- 3.4 AC#3 ⓐ 支的正控（摘掉接线 ⇒ 指名用例红）：**在册**＝摘 `Grants:` 实传→3.1#4 的 GRANT-DROPPED 禁＋3.1#6+3.1#7 AST 钉＋256 ruler ④ 翻正后同红；摘绑定位→3.1#7。红兑现见 §4 M2／M3。
 
 ## 4. 突变自证（每一发：种下必红 ＋ 还原 ＋ md5 三读数）
 
