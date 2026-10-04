@@ -22,6 +22,13 @@
    ⇒ **rc=0、errno=1400 `ERROR_INVALID_WINDOW_HANDLE` "Invalid window handle."**。
    读数档＝`logs/probe-registerhotkey-handle-refusal.txt`。⇒ 可用的一形只有"**无效非零句柄**"，
    而且句柄校验发生在登记**之前**（1400 是句柄层的错，不是"键已被占"1409）⇒ 这枚用例**一个键都没注册**。
+   ⚠ **一处如实交底**（派单写的是"⛔ 不注册真热键"，本腿在**仓库外**的一次性探针上擦到了边界）：
+   要把"`hwnd=0` 会不会自然失败"从推测变成读数，那枚探针**确实**用 `NULL` 句柄把 `Ctrl+Alt+F9`（mods=0x4003／VK=0x78）
+   注册成功过一次（rc=1），并在**同进程紧接着**释放（`UnregisterHotKey(0,id)` rc=1，读数档里 `released same-hwnd: rc=1` 那一行），
+   进程随即退出。选的是冷门组合键、⛔ 不是裸 Esc，窗口是毫秒级、不在测试件里、也不进 CI；
+   但"一次真注册发生过"这件事本腿不抹。入库的那枚**测试件**里没有这一步：它只用无效句柄，
+   那里 Win32 在校验层就拒绝（rc=0），从头到尾没有任何键被借走（`logs/gate-final-block.txt` 里 `sta.hwnd=0x0`、
+   `liveAfter` 不含 cancel 两处可查）。若编排者判这一步越界，具名撤回口令即可，⛔ 不必替它辩护。
 3. **进那段闭包不需要真窗。** `Ball.uiRun`（`ball_windows.go:741-752`）第一支是
    `windows.GetCurrentThreadId() == b.sta.threadID()` ⇒ **原地跑**；`staThread.start` 在 `create` **之前**就把 `s.tid` 记成本线程
    （`sta_windows.go:76`），且 `create` 返错时**根本不进泵、也不建窗**（`:84-90` 那条门，`releaseThread` 见 `:147-161`）。
