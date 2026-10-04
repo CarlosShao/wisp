@@ -54,6 +54,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/CarlosShao/wisp/internal/ball"
 	"github.com/CarlosShao/wisp/internal/llm/golden"
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/secret"
@@ -66,7 +67,24 @@ const cardRaisedClaim = "wisp: 卡片挂起："
 
 // vetoDoneClaim is the sentence the injected cancel executor returns and the ball
 // host prints (residentApproval.vetoByEsc through recordCancelHotkey).
-const vetoDoneClaim = "按 Esc 否决了卡片"
+//
+// Ticket 260-r3 (ledger A595 §2): vetoByEsc stopped hard-coding the key name and
+// prints the one this card actually borrowed, so this claim follows the same
+// source instead of repeating a literal. The default 档 is what THIS rig runs -
+// prepareResidentHarness writes a config.toml with no [hotkey] section, so
+// [hotkey] cancel resolves through ApplyHotkeyDefaults to the product default -
+// and that is exactly the value the shipped sentence renders. If this rig ever
+// writes its own cancel binding, this constant must follow THAT value, not the
+// default, or the case waits for a sentence nobody can print.
+//
+// ⚠ This file is winlive: CI never runs it (scripts/wisp-cli-tests.sh and
+// .github/workflows/ci.yml carry no -tags, so the tag never resolves) and this
+// machine cannot either (go test ./cmd/wisp/ dies at load with 0xc0000135 and no
+// --- FAIL line, ticket 98). Leaving the literal here would have been a ruler
+// that must lie the day the rig sets a key, so it is derived; the sentence pair
+// itself is pinned WITHOUT a window by
+// resident_cancel_key_wording_260r3_windows_test.go.
+var vetoDoneClaim = "按 " + ball.DefaultHotkeys().Cancel + " 否决了卡片"
 
 // residentCardFileName is the file the scripted model asks to write. Its being
 // absent after the veto is the reading that the vetoed call never executed.

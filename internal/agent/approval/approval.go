@@ -109,7 +109,14 @@ func unavailableText(ch Channel) string {
 	case ChannelBall:
 		return "悬浮球取消不可用"
 	case ChannelEsc:
-		return "Esc 取消不可用"
+		// Ticket 260 AC#1 condition 2, ledger A595 §1 boundary ④: this line is
+		// reached ONLY when the channel is not loaded, so there is no key to
+		// name. Saying 「Esc」 here was a claim about a key this host is not
+		// holding at all - and since the borrow now follows [hotkey] cancel, the
+		// named key could not even be inferred from the default. The honest form
+		// names the SLOT, never a key, matching the "无处可借／不可用" wording
+		// the resident leg uses for the same two branches.
+		return "快捷键取消不可用"
 	default:
 		return "该取消通道不可用"
 	}
