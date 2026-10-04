@@ -1,0 +1,8 @@
+# generated 2026-10-04 14:09:17 +0800 by 260-r5: build tag of every test file that names TakeEscForCancel
+internal/ball/hotkey_cancel_borrow_260_test.go :: //go:build windows
+internal/ball/hotkey_cancel_borrow_live_260_test.go :: //go:build windows && winlive
+internal/ball/hotkey_live_test.go :: //go:build windows && winlive
+internal/ball/hotkey_status_test.go :: //go:build windows
+internal/ball/interaction_live_test.go :: //go:build windows && winlive
+internal/ball/live_windows_test.go :: //go:build windows && winlive
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go :: //go:build windows

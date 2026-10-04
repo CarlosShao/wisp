@@ -1,0 +1,26 @@
+# generated 2026-10-04 14:09:18 +0800 by 260-r5: the failure-receipt write site
+$ grep -rn "cancelFailedLineFor" --include=*.go internal cmd | grep -v _test
+internal/ball/ball_windows.go:895:			b.hotkeyReport = b.hotkeyReport.withCancel(cancelFailedLineFor(borrow, err))
+internal/ball/hotkey_windows.go:691:// cancelFailedLineFor is the cancel line when the borrow was attempted and
+internal/ball/hotkey_windows.go:695:func cancelFailedLineFor(b cancelBorrow, err error) HotkeyBinding {
+internal/ball/hotkey_windows.go:704:	return cancelFailedLineFor(resolveCancelBorrow(""), err)
+cmd/wisp/resident_approval_windows.go:687:		// report's cancel line (cancelFailedLineFor carries exactly the accelerator
+
+$ sed -n "886,902p" internal/ball/ball_windows.go (the wiring under test)
+		borrow := resolveCancelBorrow(b.cancelBinding)
+		if borrow.Fallback != nil {
+			slog.Error("cancel borrow fell back to the default binding: [hotkey] cancel is not a valid key combination",
+				"hotkey", "cancel", "configured", b.cancelBinding,
+				"borrowed", borrow.Binding, "err", borrow.Fallback)
+		}
+		if err := takeEscBorrow(b.hwnd, borrow); err != nil {
+			// The borrow was refused: say it on the report (Problems() names it)
+			// rather than leaving a card with no cancel key and no explanation.
+			b.hotkeyReport = b.hotkeyReport.withCancel(cancelFailedLineFor(borrow, err))
+			b.registeredHotkeys = b.hotkeyReport.Live()
+			return
+		}
+		b.escTakenOver = true
+		b.hotkeyReport = b.hotkeyReport.withCancel(cancelBorrowedLineFor(borrow))
+		b.registeredHotkeys = b.hotkeyReport.Live()
+	})

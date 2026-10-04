@@ -1,0 +1,7 @@
+probe: does RegisterHotKey refuse on handle shape? no window is created; ids 4001+ (wisp uses 1..4)
+NULL hwnd CtrlAltF9        hwnd=0x0            IsWindow=0 rc=1 errno=0(0x546865206F7065726174696F6E20636F6D706C65746564207375636365737366756C6C792E) "The operation completed successfully."
+NULL hwnd CtrlAltF9          released same-hwnd: rc=1 errno=0 / released NULL: rc=0 errno=1419
+bogus hwnd CtrlAltF9       hwnd=0x1D0A5C       IsWindow=0 rc=0 errno=1400(0x496E76616C69642077696E646F772068616E646C652E) "Invalid window handle."
+hwnd=1 CtrlAltF9           hwnd=0x1            IsWindow=0 rc=0 errno=1400(0x496E76616C69642077696E646F772068616E646C652E) "Invalid window handle."
+destroyed-shape hwnd       hwnd=0xA0B0C        IsWindow=0 rc=0 errno=1400(0x496E76616C69642077696E646F772068616E646C652E) "Invalid window handle."
+done

@@ -1,0 +1,22 @@
+# generated 2026-10-04 14:09:17 +0800 by 260-r5
+$ grep -rn "TakeEscForCancel" --include=*_test.go internal cmd
+internal/ball/hotkey_cancel_borrow_260_test.go:48:// is the shape TakeEscForCancel leaves behind on the real ball.
+internal/ball/hotkey_cancel_borrow_live_260_test.go:37:	b.TakeEscForCancel()
+internal/ball/hotkey_cancel_borrow_live_260_test.go:70:	b.TakeEscForCancel()
+internal/ball/hotkey_live_test.go:373:	b.TakeEscForCancel()
+internal/ball/hotkey_status_test.go:257:	// holds it, and the caller must be told (TakeEscForCancel is idempotent on
+internal/ball/interaction_live_test.go:141:			b.TakeEscForCancel() // B1: Esc is the cancel key while Confirming
+internal/ball/live_windows_test.go:126:	b.TakeEscForCancel()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:21:// line TakeEscForCancel fills from the SAME cancelBorrow it hands to
+
+$ (same ruler, production callers only) grep -rn "TakeEscForCancel" --include=*.go internal cmd | grep -v _test
+internal/ball/ball_windows.go:247:	// TakeEscForCancel and ReleaseEscAfterSession hands it back.
+internal/ball/ball_windows.go:810:// TakeEscForCancel again on the next state sync - no caller does that today
+internal/ball/ball_windows.go:863:// TakeEscForCancel temporarily binds the configured cancel key as the cancel
+internal/ball/ball_windows.go:881:func (b *Ball) TakeEscForCancel() {
+internal/ball/hotkey_windows.go:260:	// slot is HotkeyStandby whenever no card is waiting; TakeEscForCancel
+cmd/balldebug/main.go:635:		b.TakeEscForCancel()
+cmd/wisp/resident_approval_windows.go:13:// (ledger A480 ②/A481 ③): TakeEscForCancel/ReleaseEscAfterSession had zero
+cmd/wisp/resident_approval_windows.go:121:// line TakeEscForCancel rewrites from the exact cancelBorrow it hands to
+cmd/wisp/resident_approval_windows.go:671:		b.TakeEscForCancel()
+cmd/wisp/resident_ball_windows.go:218:// Ball.TakeEscForCancel - so the cancel slot is held for the 2-3 seconds a
