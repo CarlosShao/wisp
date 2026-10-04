@@ -18,30 +18,158 @@
 
 ## 1. 现量复认（对编排者 13:2x 那四条逐条判：对／错＋真读数）
 
-（本节答：把票面 §现量 1/2/3/4 逐条重跑尺。尺全部是 `git grep`/`sed`/`git show`，没有一枚需要 Go。
- §1.1 判接缝本体六处行号；§1.2 判"生产建门点只有两枚"这句话**并自己拉枚数**；§1.3 判两枚既有尺的极性与行数；
- §1.4 判那两处待复认（`run.go:597` 的 boot 打印声称 ＋ `:186` 的 "Options.Grants stays unset here" 是否仍真话）。
- 每条给"对／错"与真读数，错的具名更正。）
+**判语只用三词：对／错／量不到。** 尺全部是 `git grep` / `git show HEAD:` / `sed`，一枚 Go 命令都没用。
+除注明外，**行号一律是 `git show HEAD:<path>` 的行号**（盘上 `resident_approval_windows.go` 此刻被 `260-v1` 的突变体污染，见 §0）。
+
+### 1.1 §现量 1（接缝本体）＝**对**，八处行号逐处复认命中
+
+尺＝`grep -n "grants" internal/agent/approval/gate.go`（该文件盘上＝HEAD，`git diff --stat HEAD -- ...gate.go` 空）＋ `sed -n '640,710p'`。
+
+| 编排者说 | 我读到的 | 判定 |
+|---|---|---|
+| `:160` 是 `grants:   o.Grants,` ＝全仓唯一写入点 | `gate.go:160` 逐字 `grants:   o.Grants,`；全仓 `g.grants` 写点尺＝`git grep -n "\.grants =" HEAD -- cmd internal tools` → **命中 `queue.go:563`（`fresh.grants = newGrantStore()`，那是 `Queue.grants *grantStore`，一次性 nonce 表，**与 `Gate.grants` 同名不同物**）**＋测试两枚；`Gate.grants` 的写入**只有 `gate.go:160` 那一枚构造期赋值** | **对**（⚠ 补一条：写"唯一"时必须带射程，`Queue.grants` 会被下一枚程读成第二枚写手） |
+| `:673` `if g.grants == nil` | 逐字命中 | 对 |
+| `:674-676` 落 `GRANT-DROPPED corr=%s tool=%s paths=%d (本机没有接入会话授权记账，本次按「仅本次」放行，没有落盘任何规则)` | 逐字命中（句子跨 `:674`＋`:675` 两行字面量，`)` 与参数在 `:676`） | 对 |
+| `:679` `if tool == ""` → `:680` 第二句 | 逐字命中 | 对 |
+| `:684` 才 `g.grants.Record(ctx, tool, p)` | 逐字命中 | 对 |
+| `:689-690` `GRANT-RECORD-FAILED` / `:693` `GRANT-RECORDED` | 逐字命中 | 对 |
+
+函数体边界：`allowSession` ＝ `gate.go:658-696`；`nativeAPI.AllowSession` ＝ `:653-655`（**纯转发，不是接缝**——引用接缝时别指 `:653`）。
+
+### 1.2 §现量 2（生产建门点枚数＋那句注释）＝**对，但"两枚"这句要带射程才不被读错**
+
+票面尺我原样重跑（`git grep -n "approval.New(approval.Options{" HEAD -- cmd internal | grep -v _test`）⇒ **2 枚**：
+`cmd/wisp/resident_approval_windows.go:219`、`cmd/wisp/run.go:612`。枚数复认。
+
+**本腿自拉的两把更宽的尺**（票面那句"不许照抄两枚"的兑现）：
+- 尺 A＝`git grep -n "approval\.New(" HEAD -- cmd internal tools` 去掉 `_test.go` ⇒ 产码命中 **3 行**：上述两枚 ＋ `internal/agent/approval/doc.go:28`（**注释，非建门**）。⇒ 产码建门仍 **2 枚**。
+- 尺 B＝`git ls-files cmd` 逐目录核（`cmd/balldebug`／`cmd/llmrecord` 全查）⇒ `git grep -n "approval\." HEAD -- cmd/balldebug` ＝ **0 命中** ⇒ 调试台件不建门。
+- 尺 C＝补同包构造形（`256-a2 census §4.1` 具名说票面那把尺"漏同包构造点"）：`New(Options{` 在本仓**产码零额外命中**（同包自建的只有 `approval` 与 `tools` 的**测试**）。⇒ 票面"两枚"成立。
+
+注释那句：`resident_approval_windows.go:186` 逐字 `// Options.Grants stays unset here. The session ledger's only production`——**仍是真话**（现读 `:219-225` 字面量实传 5 枚字段：`UI`/`Channels`/`Window`/`ApprovalTimeout`/`Logf`，无 `Grants`）。⚠ 同段 `:188` 那句 "this file's gate is built roughly 129 lines BEFORE" 的 **129 已漂**：真身＝`resident_windows.go:132`（建门）↔ `resident_windows.go:260`（`src := startResidentTaskSource(rt, ra)`）＝**128 行**，且两行之间还隔着 `resident_task_source_windows.go:224-230` 那枚条件 return（见 §2.2）。
+
+### 1.3 §现量 3（既有尺两枚，极性相反）＝**对**，并补第三枚
+
+票面尺 `git grep -c "GRANT-DROPPED" HEAD -- '*_test.go'` ⇒ **两枚文件**：`cmd/wisp/ticket224_assembly_test.go`＝1、`internal/agent/approval/ticket224_reply_grant_test.go`＝2（合计 3 处命中）。逐枚读断言后：
+
+| 枚 | `file:line` | 它今天**逐字**断什么 | 极性 |
+|---|---|---|---|
+| 尺① | `internal/agent/approval/ticket224_reply_grant_test.go:283` | `if !f.log.has("approval: GRANT-DROPPED") { t.Errorf(...) }` ⇒ **断这句在场** | 正向（要它出现） |
+| 尺①补 | 同文件 `:287` | `if f.log.has("GRANT-RECORDED") \|\| f.log.has("grant_id=")` ⇒ 断"没记账位就不许声称记了" | 反向 |
+| 尺② | `cmd/wisp/ticket224_assembly_test.go:194` | `if strings.Contains(h.err.String(), "GRANT-DROPPED") { t.Errorf("audit says the scope was DROPPED on a host that does have a ledger") }` ⇒ **断这句不在场** | 反向（不许出现） |
+| **尺③（票面没列）** | `cmd/wisp/resident_approval_risk_256_windows_test.go:452-456` | `if got["Grants"] { t.Errorf("the resident leg now passes Options.Grants. …") }` ⇒ **断常驻腿的 `Options` 字面量里没有 `Grants`**，读的是**语法树不是日志** | 反向，且**唯一一枚直接钉住本票那一格** |
+
+⇒ 编排者那句"这两枚极性相反"读数成立；**本腿的增量是第三枚**：它不读日志、读 AST，所以 ⓐ 一落地**它必红**，而那两枚日志尺反而都不红（见 §4）。
+
+### 1.4 §现量 4 那两处待复认：① **错（我票面那句不成立）**／② **对**
+
+**① "resident_windows.go prints the same limit at boot"＝不成立。** 尺＝把 `resident_windows.go`（HEAD，288 行）**全部 16 处打印/记录语句逐枚列出**（`git grep -nE "fmt\.(Print|Fprint)|slog\."`）＋ 在该文件里 `grep -niE "grant|会话|记账|ledger"` ⇒ 只命中 **2 行注释**（`:113`/`:137`，都是 `ledger A481` 那种台账引用，**不是会话账本、也不是打印**）。boot 那一句（`resident_windows.go:269-270`）逐字拼的是：
+`"wisp: %s; 任务来源：%s; 面板：%s; D38(e) steps with an owner in this process: %s\n"` ＋ `ra.residentStatusLine()`（`resident_approval_windows.go:589-598`，逐字只有"审批门已装配进本进程（取消通道：X 已加载；等待中的确认项：N）"两形）＋ `src.taskPosture()`（四形常量在 `resident_task_source_windows.go:107-110`）＋ `panel.statusLine()`。
+**这四形没有一枚含"会话授权／记账／Grants"字样。**
+⇒ **更正：`cmd/wisp/run.go:597` 那句话（逐字 "resident_windows.go prints the same" ＋ `:598` "limit at boot;"）在今天的盘上指不到任何产码句子**，属**注释里编造了一条不存在的可见性**，不是"改了以后不印了"。
+⚠ 归因（`git log -S"会话" -- cmd/wisp/resident_windows.go`＝**0 命中**，`git log -G"prints the same limit" -- cmd/wisp/run.go`＝**0 命中**，两句合起来读＝**这句话从来没有对应的产码打印**）：它自诞生就是假话，不是过期。
+
+**② `resident_approval_windows.go:186` "Options.Grants stays unset here"＝仍是真话。** 见 §1.2。
 
 ## 2. 四问（票面 AC#0 原文）
 
 ### 2.1 ① 常驻腿的门被谁持有、答复从哪几处进来
-（本节答：门的**归属字段与生命周期**（谁建、赋给谁、谁 bind、谁 detach、谁随退出封闭）；
- 答复入口**逐枚**列（控制台动词／取消键 veto／退出序列／面板入向／托盘／原生 `allowSession`），每枚给 `file:line`；
- 并逐枚答"它最终走的是不是 `gate.go:673` 那一支"。）
+
+**持有者**：门赋给 `residentApproval.gate`（字段声明 `resident_approval_windows.go:84`，`gate *approval.Gate`），
+赋值那一枚在 `:219`（`ra.gate = approval.New(approval.Options{…})`，字面量到 `:225` 闭合）。
+`residentApproval` 这枚对象今天**唯一**的产码构造者＝`newResidentApprovalWithConfig`（`:213`），
+它唯一的产码调用点＝`resident_windows.go:132`（`ra := newResidentApprovalWithConfig(rt.Layout.DataDir)`，票 256 §8.2 那形ⓐ留下的那枚）。
+姊妹签名 `newResidentApproval()`（`:170`）**产码调用者 0 枚**，只被本包测试领（尺＝`git grep -n "newResidentApproval()" HEAD -- cmd internal | grep -v _test`＝空）。
+
+**生命周期谁管**（逐段，全在 `resident_windows.go` 的 `runResident` 体内）：
+| 时刻 | `file:line` | 做了什么 |
+|---|---|---|
+| 建 | `resident_windows.go:132` → `resident_approval_windows.go:219` | 门在这一刻存在（早于面板 `:151`、早于球 `:217`、早于任务源 `:260`） |
+| 交给球当否决执行者 | `resident_windows.go:217`（`startResidentBall(rt.Registry, ra.vetoByEsc, …)`） | 门不进门，交的是**方法值** |
+| bind | `resident_windows.go:228`（`ra.bindBallHost(rb)`）→ `:360-361` | 挂球 UI ＋ `Channels().SetLoaded(ChannelEsc, true)` |
+| 注入装配根 | `resident_windows.go:260`（`startResidentTaskSource(rt, ra)`）→ `resident_task_source_windows.go:252-264`（`runSpec{gate: ra.gate, ui: ra.ui, cards: ra.cards, taskCtx: ra.root}`）→ `:265`（`assembleRuntime(spec)`） | 门以**指针值**递进 `cmd/wisp/run.go` |
+| 封闭 | `resident_windows.go:227`（`defer ra.detachBall()`）＋ `:240`（`RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTaskRoots)`） | 退出时卸通道 ＋ 拒待批卡 |
+
+**答复入口逐枚**（六枚候选全查；每枚给 `file:line` 并答"是不是最终走 `gate.go:673` 那一支"）：
+
+| # | 入口 | `file:line`（产码可达链） | 能不能触到 `gate.go:673` |
+|---|---|---|---|
+| **1** | **控制台动词 `session <编号>`**（唯一一枚真能触到的） | `resident_task_source_windows.go:345 runConsoleLoop` → `:376 default` → `:381 src.surface.handle(...)` → `approval_reply.go:562 handle` → `:566-567 case "session": return s.session(corr)` → `approval_reply.go:257-259 s.live.h.AllowSession(s.ctx, corr)` → `internal/agent/approval/replies.go:351-363 g.Native().AllowSession(...)` → `gate.go:653-654` → `gate.go:658 allowSession` → **`:673 if g.grants == nil` 命中** | **是**，且**全仓只有这一条路**（尺＝`git grep -n "AllowSession" HEAD -- cmd internal | grep -v _test`：产码调用者只有 `approval_reply.go:259` 一枚） |
+| **2** | 球上的取消键（Esc／配置的组合键） | `resident_windows.go:217` 交 `ra.vetoByEsc` → `resident_approval_windows.go:398-413 vetoByEsc` → `:406 ra.cards.Veto(...)` → `approval/replies.go:463 g.Veto(...)` | **否**——veto 一支不进 `allowSession`，只否决 L1 窗口 |
+| **3** | 面板入向（`approval.decide`） | `cmd/wisp/panel_inbound.go:277 Message: nil`（产码路由没有审批消息位）；`gate.go:736-746 DecideFromPanel` 对任何 allow **按路线直接拒绝** | **否**——面板侧连 `Allow` 都没有（`approval/ui.go` PanelAPI 无 Allow；`replies.go:347-350` 逐字"There is deliberately no PanelAllowSession"）。⇒ **票面上"用户在那张卡片上**点**「本会话内允许」"这个动作今天不存在**，见 §2.5 |
+| **4** | 托盘 | `internal/ball/tray_windows.go:86-91`：菜单只有 打开面板／静音／暂停唤醒／退出，`Allow`／`允许` **零命中** | **否**（入口不存在） |
+| **5** | 原生路由 `allowSession` 本身 | `gate.go:658`——它是**被到达的**，不是入口；上游只有 #1 | 它是 `:673` 的**宿主函数** |
+| **6** | 宿主自发的卡（模式切换 L2） | `run.go:826-844 confirmModeSwitch`（走 `rt.gate`，注入形状下＝同一枚 `ra.gate`）；`resident_approval_windows.go:491 AskOnTaskRoot` | **间接触到**：卡能建、能显示，但**答复仍只能从 #1 进来**。⚠ `AskOnTaskRoot`／`askConfirmation` 的产码调用者 **0 枚**（尺＝`git grep -n "AskOnTaskRoot\|askConfirmation" HEAD -- cmd internal | grep -v _test`＝只有定义处与三处注释），票 256 §7-3 记过这一格，本腿复认**仍成立** |
+
+⇒ **#1 的前提是"这一发常驻进程有交互控制台"**：`resident_task_source_windows.go:218 console := interactiveStdin()` → `:224-230` 没有控制台就 `return nil`（连 `assembleRuntime` 都不跑）。
+⇒ 另一条更硬的读码结论：**L2 卡才走得通这条路**——`replies.go:356-357` 在 `card.Grant == ""` 时返回 `ErrRouteHasNoAllow`，而 L1 窗口没有 allow（SPEC-06 §2 B1），所以 `:673` 那一支**只在常驻腿对一张 L2 卡打 `session` 时才被踩到**。〔仅读码，未跑〕
 
 ### 2.2 ② 那本 ledger 在常驻腿建门的时刻存不存在
-（本节答：**存在**与**被递进去**分开两格答，各给 `file:line`；
- 不存在则答"它在哪一行才被造出来"；
- 判"把建门挪到它之后"在时序上可行不可行——指回票 224／票 256 的既有结论，说明现读到的与那两票是否同形，⛔ 不重造结论。）
 
-### 2.3 ③ `run.go` 那两枚（`Grants: grantWrite`／`Grants: grantRead`）与常驻腿的关系
-（本节答：同一次进程还是不同入口；`grantWrite` 在常驻进程里**是否可达**、`grantRead` 在常驻进程里**是否可达**——两枚分开判，
- 并自拉"常驻腿今天有没有任何一处把 grants 补上"的尺与枚数。）
+**两件事分开答，各自给 `file:line`。**
 
-### 2.4 ④ 票面 §现量 4 那两处待复认
-（本节答：`resident_windows.go` 到底印不印那句限制、逐字句子、印到哪条流、**没有控制台的 GUI 用户看不看得到**；
- 以及 `resident_approval_windows.go:186` 那句 "Options.Grants stays unset here" 现在还是不是真话。）
+- **存不存在：建门那一刻（`resident_windows.go:132` → `resident_approval_windows.go:219`）不存在。**
+  它在全仓**唯一的产码构造点**＝`cmd/wisp/run.go:478`（`ledger, lerr := session.NewLedger(session.LedgerOptions{ID: sessID, Store: mem, Logf: rt.auditf})`），
+  前置是 `run.go:473`（`sessID, err := session.Mint()`），落到对象是 `run.go:487`（`rt.session = ledger`）。
+  三行都在 `assembleRuntime` **函数体之内**（函数起于 `run.go:382`），而 `assembleRuntime` 在常驻腿里要到 `resident_windows.go:260` 才第一次被叫。
+  尺＝`git grep -n "session\.Mint\|session\.NewLedger" HEAD -- cmd internal tools | grep -v _test` ⇒ **产码命中只有 `run.go:473`／`run.go:478` 两枚**。
+  ⛔ 别把 `internal/session/grants.go:166`、`queue.go:563` 读成第二枚构造点：前者是 `Record` 的失败包装，后者是 `Queue.grants *grantStore`（一次性 nonce 表，同名不同物）。
+- **被没被递进去：没有，而且"那一刻"根本没有值可递。**
+  递的入口只有一枚＝`gate.go:160`（`grants:   o.Grants,`，`New` 的构造期赋值）。晚绑定三词现跑＝0 命中：
+  尺 `git grep -n "SetGrants\|AttachGrants\|WithGrants" HEAD -- cmd internal tools` ⇒ **0**（本腿复跑，与票 256 §8.1 那句〔编排者复跑〕同读数）。
+  `runSpec` 也**没有**账本位：字段全集现读 `run.go:102-174`＝`argv/stdout/stderr/dataDir/notify/probeSink/now/onRuntime/modeConfirm/sink/reply/replyVeto/gate/ui/cards/taskCtx`（**16 枚**），**无 ledger／无 Grants**。
+  ⇒ 所以即使把建门挪到 `run.go:478` 之后，也还差一枚"把 ledger 交回给 `residentApproval`"的形状。
+
+- **"把建门挪到它之后"这一形在时序上可行不可行：不可行（读码级，且这不是本腿新造的结论）。**
+  现读链条与**票 256 §7-5／§8.1 说的是同形**，逐处对得上：
+  `resident_task_source_windows.go:218`（`interactiveStdin()`）→ `:224-230`（无控制台 ⇒ 打印 `taskEntryDisabledClaim` 后 `return nil`）→ `:265`（`assembleRuntime(spec)`）。
+  ⇒ 门一旦挪到 `assembleRuntime` 之内，**双击／Explorer 拉起那一支（正是 D2／票 228 那个"用户真正启动的进程"形状）永远走不到装配**＝没有门、没有 `PendingWindow`／`PendingApproval`、球不进 `Confirming`、取消键不借、Esc 通道不加载。
+  这就是票 256 §7-5 那句"**⛔ 这不是'那一维变弱'，是载体不存在**"，也是母票 248 AC#10 定 ⓑ（不移动）的理由；**本腿复认：那条提前 return 今天仍在建门之后、装配之前，形状未变。**
+  ⚠ 我与那两票的**唯一差别是枚数与行号**，不是结论：票 256 §现量.1 引的是 `resident_approval_windows.go:108-113`（256 立票时）、§7-2 更正为 `:109-113`（256-a1 复认时），**今天真身是 `:219-225`**；
+  票 256 §8.1 说"账本构造点在门构造点之后约 129 行"（`resident_windows.go:126`↔`:255`），**今天是 `:132`↔`:260`＝128 行**。两处都是注释里的自述数字，没有一枚尺钉着它（见 §4 的 N#7）。
+
+### 2.3 ③ `run.go` 那两枚（`:618 Grants: grantWrite`／`:758 Grants: grantRead`）与常驻腿的关系
+
+**具名答：同一枚函数、同一次进程，但两枚的"可达性"完全不同——一枚常驻腿永远走不到，另一枚常驻腿天天走。**
+
+- 两枚都在 `assembleRuntime`（`run.go:382` 起）里，而**常驻腿确实调用它**（`resident_task_source_windows.go:265`，把 `ra.gate`/`ra.ui`/`ra.cards`/`ra.root` 注进去）。⇒ **不是"根本不同的入口"**：`wisp run` 与常驻腿**共用同一枚装配根**，区别只在 `runSpec.gate` 有没有被注入。
+- **`grantWrite`（`run.go:618`）与常驻腿完全无关。** 它在 `if s.gate != nil {…} else {…}` 的 **else 支里**（`:600` 判、`:609` 起 else、`:612-619` 建门、`:628` 闭 else）。常驻腿 `s.gate != nil` ⇒ 走 `:600-608` 那支（`rt.gate = s.gate`），**`:612` 那枚字面量在常驻进程里一次都不执行**。
+  ⇒ 推论（本腿自己拉的尺，不照抄票面）：**"生产建门只有两枚"这句在枚数上对，在"两枚各归一条腿"这句上也对；但它会让人误读成"run.go 接了、常驻没接"＝同一条码路径上的两个兄弟。真相是常驻腿与 `grantWrite` 分属互斥的两支，同一次进程里不可能都跑到。**
+- **`grantRead`（`run.go:758`）常驻腿是跑得到的**：它在 if/else **之外**（`tools.New(tools.Options{…})` 起 `run.go:745`），两支都过。
+  ⇒ **常驻腿今天是"读侧已接、写侧孤儿"**：`run.go:573-578` 现铸的 `grantRead`/`grantWrite` 里，读侧进了桥（`internal/tools/grant.go:65-68`，nil 则 `return 0` 按未授权处理）、写侧进了那枚**常驻进程根本没建**的门。
+  净结果：常驻进程里那份 ledger **被铸出来、被挂到桥上、然后没有任何东西往里写** ⇒ `Covering` 永远查不到行 ⇒ **每次都问**。
+  ⚠ 这一形**不是**"悄悄放宽"，也**不是**"记到了别的会话"——它比票面写的更保守一档（fail-closed），但代价是 ledger 那半条链在常驻进程里是**活体死代码**。〔仅读码，未跑〕
+- **"常驻腿今天有没有任何一处把 grants 补上"＝没有。** 尺（本腿自拉，⛔ 不照抄票面）：
+  `git grep -n "Grants" HEAD -- cmd ':!*_test.go'` ⇒ 8 命中里**赋值只有 2 枚**（`run.go:618`／`run.go:758`，都在装配根内、都归 `wisp run` 那一支或两支共用的读侧），
+  其余 6 命中是**注释**（`run.go:595`、`run.go:643`、`approval_reply.go:327`、`run.go:1398`、`resident_approval_windows.go:186`、`resident_task_source_windows.go:42`）＋ 1 枚 `run.go` 的行内说明。
+  再补一枚窄尺：`git grep -in "grants" HEAD -- cmd/wisp/resident_windows.go cmd/wisp/resident_task_source_windows.go cmd/wisp/resident_approval_windows.go` ⇒ **产码赋值 0 枚，三枚命中全是注释**。
+  ⇒ **常驻腿三条腿文件（resident_windows／resident_task_source／resident_approval）里补 grants 的地方一处都没有，也没有别处（`approval_always.go`／`panel_*` 全查零命中）。**
+
+### 2.4 ④ 票面 §现量 4 那两处待复认（答复浓缩在此，全读数在 §1.4）
+
+- **"resident_windows.go prints the same limit at boot"＝不印。** 真印的那句限制不在 boot，在**答复那一刻**：
+  逐字句子（`gate.go:674-676`）＝`approval: GRANT-DROPPED corr=%s tool=%s paths=%d (本机没有接入会话授权记账，本次按「仅本次」放行，没有落盘任何规则)`。
+  印到哪儿去（常驻腿的 sink 是 `resident_approval_windows.go:329-333 residentAuditf`，两路同时走）：
+  ① `slog.Info("audit: " + line)` → 进程默认 logger ＝ `logsink.go:153-161` 那枚 `teeHandler`，**primary＝`<dataDir>\logs` 下的 redact JSONL 滚动件**（`logsink.go:144-149`＋`:76 logDirName = "logs"`），**mirror＝`os.Stderr`**；
+  ② `fmt.Printf("wisp: [audit] %s\n", line)` → **stdout**（不是票面说的 stderr）。
+  ⇒ **票面"唯一的痕迹是一行 stderr"这句在本腿读下来不准确**：落点其实是 **stdout ＋ stderr ＋ `<dataDir>\logs\*.jsonl`** 三处，其中只有 JSONL 那枚在 GUI 形状里真存在。
+- **一个没有控制台的 GUI 用户看不看得到：看不到。**
+  尺：`scripts/build.ps1:103-115` 逐字给 `wisp.exe` 传 `-H=windowsgui`（票 244），⇒ 产物是 GUI 子系统；
+  `resident_windows.go:55-60` 注释逐字"**double click the icon, no terminal attached, stderr going nowhere**"（票 117 立此段）；
+  `main.go:65 attachParentConsole()`（`console_windows.go:33-43`）只在**有父控制台可挂**时救得回来，Explorer 拉起没有父控制台 ⇒ stdout/stderr 两路**无处可去**，只剩 JSONL 文件那一路。
+  ⇒ 净答案：**界面上看不见（面板没有审批入口、球只换状态、托盘没有 allow），日志文件里有，终端里两条都有——而"终端里两条都有"那一形已经不是双击的 GUI 用户了。**〔仅读码，未跑〕
+- **`resident_approval_windows.go:186` 那句注释仍是真话**（见 §1.4②）。
+
+### 2.5 ★ 本腿量到的一枚票面之外读数（不在四问射程，但直接压 AC#1 与 ⓑ）
+
+`approval_reply.go:279-281` 是 `session` 动词的**成功回执**，逐字：
+`已按「本会话内允许」答复 <corr>（<tool>）：这一发已放行，卡片上那些路径对本会话后续的 L1 询问不再重复提问（L2 永不被会话授权覆盖，SPEC-06 §8.3 第 1 条）`。
+它的返回路径**只看 `AllowSession` 有没有报错**（`:260-276` 三个 `case errors.Is(...)` ＋ `:276 default err != nil`），
+而 `gate.allowSession` 在 `g.grants == nil` 那一支**先放行、再落 `GRANT-DROPPED`、然后 `return nil`（`gate.go:673-677`）** ⇒ 报错路径不触发 ⇒
+**常驻腿上这句话今天照样逐字印出来**，而它承诺的"不再重复提问"在常驻腿上**不发生**（写侧孤儿，见 §2.3）。
+⇒ 落点＝`resident_task_source_windows.go:319 src.runConsoleLoop(ctx, console, os.Stdout)` → `:387 fmt.Fprintf(out, "wisp: %s\n", text)`，**stdout**。
+⇒ 这一枚是"可见性缺"的**反向形**：不是"没话说"，是**说了一句做不到的话**，且它由 `err == nil` 那一路自然产出、没有一枚尺在钉它（`ticket224_assembly_test.go:198` 只断"这句里含 corr"，不断含"不再重复提问"）。
+⚠ **它归 ⓑ 的射程（票面 ⓑ＝"说到明处"），但它把 ⓑ 的语义翻了一面：ⓑ 不是"补一句真话"，是"改一句已经在说的假话"。** 本腿不裁形，只把这枚摆上台。〔仅读码，未跑〕
 
 ## 3. 三形代价表（⛔ 本腿不裁形，只摆料）
 
