@@ -68,10 +68,20 @@
 
 （本节答：每一发突变的原样命令、红句**逐字**、还原用的副本出处（必须是 `git cat-file blob HEAD:<path>`）、起手＝还原后＝HEAD blob 三枚 md5。）
 
-- M1 holder 未绑定 ⇒ 让 `Record` 静默 `return 0, nil`：**未判**
-- M2 摘掉 `Grants:` 那一枚实传：**未判**
-- M3 摘掉绑定位（`:281` 之后那一发）：**未判**
-- M4 种"第二枚 mint"形（证本腿没走 ⓐ-Ⅲ）：**未判**
+- M1 holder 未绑定 ⇒ 让 `Record` 静默 `return 0, nil`：**红兑现**（19:59:10）。种法＝`resident_approval_windows.go` 的 `Record` 未绑定支整段替换为 `return 0, nil // MUT-265-M1`（还原副本出处＝`git cat-file blob a04a095f:cmd/wisp/resident_approval_windows.go`，md5 `b3b1bc5610cbff62d69528022af6ba43`）。指名红兑现 **3 枚用例**（红句逐字）：
+  - `TestTicket265ResidentGrantHolderUnboundFailsLoudly`：`an UNBOUND grant holder returned a nil error. That is the shape A601 §4 forbids: …` ＋ `after bindSessionLedger(nil) the holder still claimed success`；
+  - `TestTicket265UnboundHolderAnswersThroughTheGateWithoutClaimingARow`：`audit is missing gate.go's GRANT-RECORD-FAILED line…`（审计实况里出现 `GRANT-RECORDED corr=265-corr-1 grant_id=0 …`，即 gate 把静默成功当真记账）＋ `audit claims a stored row while the holder was unbound`；
+  - `TestTicket265ResidentApprovalConstructsAnUnboundHolder`：`the shipped holder recorded before any bind…`。
+  还原后 md5：盘上＝副本＝blob `b3b1bc5610cbff62d69528022af6ba43` 三枚全等（19:59:16），`git status --porcelain -- cmd/wisp/`＝空。
+- M2 摘掉 `Grants:` 那一枚实传：**红兑现**（19:59:47）。种法＝`newResidentApprovalWithConfig` 字面量删 `Grants: ra.grants,` 一行（还原副本同上出处）。指名红兑现（红句逐字）：
+  - `TestTicket256ResidentGateOptionsFieldSetIsTheFiveItClaims`（256 ruler ④ 翻正后的正向臂）：`the resident leg does NOT pass Options.Grants to approval.New…` ＋ `the resident leg passes no Options.Grants, so 「本会话内允许」 on this gate books GRANT-RECORD-FAILED forever and the two sentences at approval_reply.go:277-281 stay false…revert A602 first.` ＋ `resident leg passes 5 of Options' fields, want 6`；
+  - `TestTicket265GateLiteralCarriesTheResidentHolder`：`no Options.Grants in …resident_approval_windows.go: the field this ruler reads is gone…`。
+  还原后 md5 三枚全等 `b3b1bc56…`，porcelain 空。
+- M3 摘掉绑定位（`:281` 之后那一发）：**红兑现**（20:00:14）。种法＝`resident_task_source_windows.go` 的 `ra.bindResidentGrantLedger(run.session)` 替换为空转占位（还原副本出处＝`git cat-file blob a04a095f:cmd/wisp/resident_task_source_windows.go`，md5 `b8f6ed28642f8a5e1eb1638dd860fe69`）。指名红兑现 **1 枚**：`TestTicket265BindSiteRunsAfterTheAssemblyAndBeforeAnyTask`：`…resident_task_source_windows.go never calls ra.bindResidentGrantLedger inside startResidentTaskSource: … exactly what AC#3's 「摘掉那处接线」 arm asks to see red.`（AST 钉对"整行摘除"敏感；对"移到 submitTask 之后"的敏感由用例自身断言 `bindCall >= s` 分支覆盖，本发未单测该形——具名，不冒充）。
+  还原后 md5 三枚全等 `b8f6ed28…`，porcelain 空。
+- M4 种"第二枚 mint"形（证本腿没走 ⓐ-Ⅲ）：**红兑现**（20:01:11）。种法＝在**本腿写面内**的 `resident_approval_windows.go` 落一枚 `func mut265SecondMintSite265() { _, _ = session.Mint(); _, _ = session.NewLedger(session.LedgerOptions{}) }`（第一版 `_ = session.Mint()` 编译不过——Mint/NewLedger 各返两值——当场改 `_, _ =` 形再跑；判据本身零改动）。指名红兑现 **1 枚用例两行**：`TestTicket265SessionLedgerStillHasOneProductionConstructionSite`：`a second production construction site appeared: resident_approval_windows.go:252. …refuses form ⓐ-Ⅲ by name…`（:253 同句第二行）。选写面内文件而非 run.go 的理由＝种突变是测量动作但仍在物理改产码文件，落在 `cmd/wisp/resident_approval_windows.go`（本腿四枚写面之一）不越包界；判据扫的是全包非测试 .go，写面内种照样判到。
+  还原后 md5 三枚全等 `b3b1bc56…`，porcelain 空（20:01:17）。
+- **四发共同纪律**：两发之间零其它重活（只跑 `-run 'TestTicket265…'` 定向子集；M2 加跑 256 ruler ④ 一枚）；每发还原源＝**突变前从 `git cat-file blob a04a095f:<path>` 抽的副本**（`/tmp/m1-…`／`/tmp/m2-…`／`/tmp/m3-…`，M1/M2/M4 共用同一 blob 副本），起手＝还原后＝HEAD blob 三枚 md5 全部见各发行内；无任何"红未兑现"格——四发全响。
 
 ## 5. AC#1 那两句假话 → 真话的兑现
 
