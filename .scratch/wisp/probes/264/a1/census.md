@@ -4,7 +4,7 @@
 **普查时刻**：2026-10-04 09:5x +08，落骨架时锚点 HEAD `447e0d71`（`dev`）
 **票面**：`.scratch/wisp/issues/264-error-text-carries-absolute-paths-into-model-visible-text.md`（**整读过**，AC 复选框一枚未动）
 **这一格量什么**：三选一（甲＝发出去前脱敏／乙＝行为不动只装仪器／丙＝不做了）的**代价读数**。
-**⛔ 本件不裁形**——裁形归机主（人工批准面，`AGENTS.md` §0.2）。全文不出现"建议选甲／乙／丙"。
+**⛔ 本件不裁形**——裁形归机主（人工批准面，`AGENTS.md` §0.2）。全文不对甲／乙／不做三形作任何取舍，也不写"该走哪一形"这类句子。
 **与票 174 的分工**：174 管**可达性**，264 管**外发内容的形状**；`174-a4` 已给的名册（`err.Error()` 装配点 52／能进模型可见文本 48）**本件不重跑**，只做它没覆盖的增量（见 §2）。
 
 ---
@@ -54,9 +54,9 @@
 
 | 谁产出（工具侧 → `Result.Text`） | 谁投递（进 `llm.RoleTool` → HTTP 正文） | 谁落盘 |
 |---|---|---|
-| `internal/tools/fs.go:137/144/148/158/201/208/212/218`、`fs_edit.go:108/119/128/132/138`、`fs_write.go:247/260/292/325/343/382/389/408/453/460/464/477`、`bridge.go:289/431/561`、`cancel.go:76`、`task.go:509/693/837`、`task_backfill.go:136`、`subagent_197.go:244/322` 各自 `return Result{Text: …}`（`tool.go` 的 C1 Result） | `bridge.go:576-581 out := agent.ToolOutcome{Text: res.Text（`:577`）…}` ⇒ `internal/agent/loop.go:698 log.Text = out.Text` ⇒ `:710 l.sp.Prepare(c.ID, log.Text)`（spill 可能改写这句并把 `全文见 <artifact 路径>` 拼进去，`spill.go:185-189`）⇒ `:722 l.append(toolResultMessage(c.ID, log.Text, …))` ⇒ `:1080-1083 toolResultMessage` 造 `llm.Message{Role: llm.RoleTool, Content: []llm.Content{llm.ToolResultPart{… llm.TextPart{Text: text}}}}` ⇒ 三枚适配器各自把它序列化进请求体：`internal/llm/openaichat/request.go:273 encodeToolResult`、`internal/llm/anthropic/request.go:370 encodeToolResult`、`internal/llm/openairesponses/request.go:218-226` | 两个落盘点，**都不经过 Redactor**：① `tool_call` 行（`internal/memory/dao_toolcall.go:17 InsertToolCall`／`:69 FinishToolCall(outcome, errorClass)`）落的是**结论与等级，没有正文**；② 只有超长输出被 spill 写成 artifacts 文件（`internal/agent/spill.go:153-174`）。`history` 正文不落盘——`internal/agent/compress.go:59` 逐字写着"[privacy] keep_transcript forbids putting history text on this…"，而 `keep_transcript` 是硬编码 false（`internal/config/schema.go:517`／`PLAN.md:2741`）。⇒ 这条链上的失败句**只在内存里进正文、不落盘** |
+| `internal/tools/fs.go:137/144/148/158/201/208/212/218`、`fs_edit.go:108/119/128/132/138`、`fs_write.go:247/260/292/325/343/382/389/408/453/460/464/477`、`bridge.go:289/431/561`、`cancel.go:76`、`task.go:509/693/837`、`task_backfill.go:136`、`subagent_197.go:244/322` 各自 `return Result{Text: …}`（`tool.go` 的 C1 Result） | `bridge.go:576-581 out := agent.ToolOutcome{Text: res.Text（`:577`）…}` ⇒ `internal/agent/loop.go:698 log.Text = out.Text` ⇒ `:710 l.sp.Prepare(c.ID, log.Text)`（spill 可能改写这句并把 `全文见 <artifact 路径>` 拼进去，`spill.go:185-189`）⇒ `:722 l.append(toolResultMessage(c.ID, log.Text, …))` ⇒ `:1080-1083 toolResultMessage` 造 `llm.Message{Role: llm.RoleTool, Content: []llm.Content{llm.ToolResultPart{… llm.TextPart{Text: text}}}}` ⇒ 三枚适配器各自把它序列化进请求体：`internal/llm/openaichat/request.go:273 encodeToolResult`、`internal/llm/anthropic/request.go:370 encodeToolResult`、`internal/llm/openairesponses/request.go:218-226` | 两个落盘点，**都不经过 Redactor**：① `tool_call` 行（`internal/memory/dao_toolcall.go:17 InsertToolCall`／`:69 FinishToolCall(outcome, errorClass)`）落的是**结论与等级，没有正文**；② 只有超长输出被 spill 写成 artifacts 文件（`internal/agent/spill.go:153-174`）。`history` 正文不落盘——`internal/agent/compress.go:59` 逐字写着"[privacy] keep_transcript forbids putting history text on this…"，而 `keep_transcript` 是硬编码 false（`internal/config/schema.go:515`／`PLAN.md:2741`）。⇒ 这条链上的失败句**只在内存里进正文、不落盘** |
 
-**三处读完的结论（负向句本体）**：上面 15 个产出的 `file:line`、5 跳投递、2 个落盘点里，**没有一处出现 `Redactor`、`redactHandler`、`pathRe` 或任何路径掩码**。
+**三处读完的结论（负向句本体）**：上面点名的产出侧 **8 枚文件／35 处行号**、投递链的每一跳（`bridge.go:576` → `loop.go:698` → `:710` → `:722` → `:1080` → 三枚 `request.go`）、2 个落盘点里，**没有一处出现 `Redactor`、`redactHandler`、`pathRe` 或任何路径掩码**。
 独立复跑票面现量第 3 条（⚠ 我跑的是我自己的尺，不是抄它）：`grep -rni "redact" --include=*.go internal/agent internal/tools | grep -v _test` ＝ **0 命中**；`internal/llm` 侧 7 命中全部点名过：`content.go:15/:69/:102/:106/:116`（`RedactContent`，零产码调用者）、`errors.go:168`（注释"log-safe: redaction still applies upstream"——这句注释说的"upstream"指的是 **observe 那条日志线**，不是外发线）、`anthropic/stream.go:191`（`redacted_thinking` 是 Anthropic 协议字段，与路径无关）。
 
 ### 1.4 配置键名、默认值、有没有产码填过它
@@ -199,50 +199,96 @@ pathRe = regexp.MustCompile(`(?i)(?:\\{1,2}\?\\)?(?:[a-z]:\\|\\\\)[^\s"',;:)>\]]
 
 ### 5.1 尺与命中集
 
-- 尺（原话）：`grep -rln 'ToolResult\|IsError\|Result{Text' --include=*_test.go cmd internal`
-- 命中枚数：待填
-
-### 5.2 ① 断言"失败句里含某路径／含 `expands to`"的用例（甲形一落地会红的）
-
-| # | `file:line` | 断言原文 | 甲形落地后 |
-|---|---|---|---|
-| | | | |
-
-### 5.3 ② 断言"失败句不含某物"的用例
-
-| # | `file:line` | 断言原文 |
+| 尺 | 命令（逐字） | 命中 |
 |---|---|---|
-| | | |
+| 主尺（票面给的） | `grep -rln 'ToolResult\|IsError\|Result{Text' --include=*_test.go cmd internal` | **55 枚文件**（本腿现量 `| wc -l` ＝ 55；清单太长，落在下面的分档里只点名**真的断言到文本**的那些） |
+| A | `grep -rn "打开失败\|读取失败\|路径无法解析\|原子重命名失败\|读取目标失败\|打开目录失败\|无法规范化\|工具内部故障\|参数不是合法的 JSON" --include=*_test.go internal cmd` | 12 命中／**5 枚文件**——**其中 0 枚断言 fs 族的失败句**（`无法规范化` 那几枚吃的是卡片与 Decision.Reason，见 5.2 第二档） |
+| B | `grep -rn 'Contains(…Text…)'` × 路径变量（`canon\|target\|dir\|path\|join\|artifact\|base`） | 18 命中／12 文件 |
+| C | `grep -rn "全文见" --include=*_test.go internal cmd` | 26 命中／**10 枚文件** |
+| D | `grep -rn "expands to" --include=*_test.go .`（排 `.scratch`） | **0 命中**（见 5.4） |
+| E | `internal/llm/**` 里对**外发请求体**的断言（`Contains(body/…)` × 路径变量） | **0 枚**——4 命中全是 `cache_control`／`"model":"`／`"reasoning"`（`anthropic/cache_test.go:82/:86`、`enabled_reach_261_test.go:411`、`openairesponses/protocol_test.go:54/:57/:153-156`） |
+| F | `find` 到的 6 个 testdata 目录（`cmd/wisp`、`internal/agent`、`internal/llm`、`internal/models`、`scripts`、`tools/mockllm`）里含绝对路径的文件 | **0 枚** ⇒ golden 这一侧今天**不含**任何绝对路径，甲既不会自然弄红 golden，也**不会被 golden 测到** |
+
+⚠ 诚实边界：主尺那 55 枚里，本腿**逐枚读断言**的是被 A∪B∪C 命中的 **19 枚**（现量并集；其中 2 枚是尺的假正面——`internal/config/writeguard_226_test.go:77` 吃的是 config.toml 文本、`internal/memory/dao_test.go:95` 吃的是 memory 日志文本，都与正文无关，故**真身 17 枚**）；其余 **36 枚**我只量到"A∪B∪C 三把尺都够不着它"（＝它不拿路径字面吃文本），没有逐行读完。这一句是**尺的形状**，不是"那 36 枚没问题"。
+
+### 5.2 ① 断言"失败句／回执里含某路径"的用例（甲形一落地会红的）
+
+**第一档＝正文级（`Result.Text`／`log.Text` 里必须有那枚路径）**，8 枚：
+
+| # | `file:line` | 断言原文（逐字截） | 甲落地后 |
+|---|---|---|---|
+| P-1 | `internal/agent/spill_test.go:226` | `if !strings.Contains(log.Text, "输出已落文件") \|\| !strings.Contains(log.Text, artifact)` | **红**（artifact 是绝对路径） |
+| P-2 | `internal/agent/spill_name_injectivity_test.go:142` | `if !strings.Contains(a.Text, a.Path)` | **红** |
+| P-3 | `internal/agent/spill_pointer_honesty_174_test.go:228` | `if got := strings.Count(out.Text, "全文见"); got != 1` ＋ 尺 `:48 spill174PointerRe = regexp.MustCompile(`全文见 (\S+)…`)` | **红**（掩码把 `(\S+)` 变成 `<path>` 后，177 的豁免窗键值跟着漂） |
+| P-4 | `internal/tools/task_output_pointer_notice_test.go:454` | `if !strings.Contains(out.Text, "全文见 "+filed)` | **红** |
+| P-5 | `internal/tools/task_output_pointer_notice_test.go:515` | `if !strings.Contains(out.Text, "全文见 "+mustCanonical(t, legal))` | **红** |
+| P-6 | `internal/tools/task_output_canonicalize_fail_174_test.go:93` | `if !strings.Contains(out.Text, "全文见 "+canonicalizeFailsHere)` | **红** |
+| P-7 | `internal/tools/task_output_leg_test.go:194`（尺定义 `:155`） | `m := pointerRe.FindStringSubmatch(out.Text)` → 拿抽出的路径**再去读它** | **红**（抽不到就断在中途） |
+| P-8 | `internal/tools/task_output_leg_test.go:365` | 同上第二处 | **红** |
+
+（另有一枚**尺本身**：`internal/tools/ticket175r2_stamp_live_test.go:66 host175r2PointerRe = regexp.MustCompile(`全文见 (\S+)…`)`，同理会一起改判读；`internal/tools/pointer_183_cli_seam_test.go:80`、`pointer_185_cli_seam_test.go:81` 也是同形尺。）
+
+**第二档＝卡片／门禁级（吃路径字面，但不在正文那条线上；只有落点①／翻默认才碰得到）**，5 枚：`internal/tools/bridge_junction_windows_test.go:459-460`（注释逐字："<原样路径> (无法规范化: …)，批准它的人看不到自己批准的是什么"）、`internal/tools/grant_test.go:236`（`Contains(asked[0], canon)`）、`internal/risk/assessor_test.go:172`（`Reason: ` 里带 `"C:/broken"`，这枚喂 `bridge.go:431` → 正文）、`internal/session/grants_test.go:267`、`:320`。
+
+**第三档＝C25 喂料的 stub 体（含绝对路径；只有落点①改 `res.Text` 会波及）**：`internal/risk/pointer_183_test.go:54/:61`、`pointer_185_test.go:80`、`shape_a_exemption_test.go:37/:49` —— 这三族的 `MarkWithHostPath` 测试调用点**共 31 处**（`pointer_183` 8 枚／`pointer_185` 12 枚／`shape_a` 11 枚，本腿现量）。⚠ 这 31 枚是**射程面**，不是"会红 31 枚"；会红与否〔待验，需跑一遍才知道〕（J-5）。
+
+**相邻档（具名差别，别混进上面）**：`internal/agent/instructions_test.go:104` 吃的是 `filepath.Base(dir)`（**只有 basename，不带绝对路径**）；`cmd/wisp/firstrun_198_test.go:98` 吃的是 stderr 里的 `cfgPath`（CLI 面，非正文）；`internal/tools/wiring_test.go:232/:239` 断的是 AppliedSteps **短语**（`创建临时文件`／`停止`）在 `out.Text` 与 `out.AppliedSteps` 里都在——它钉的是"台账必须被转述"这一**中继行为**，甲若重写台账句子会红。
+
+### 5.3 ② 断言"失败句不含某物"的用例（＝这仓已经在往反方向钉的几枚）
+
+| # | `file:line` | 断言原文（逐字） | 与甲的方向关系 |
+|---|---|---|---|
+| N-1 | `internal/tools/task_output_leg_test.go:425-426` | `if strings.Contains(out.Text, filepath.Base(dir)) && evil != dir { t.Fatalf("the refusal echoed a canonicalized path: %q", out.Text) }` | **同向**——已经有一枚钉在"refusal 不许回声 canonical 路径"上（射程只 `task.query`） |
+| N-2 | `internal/tools/task_output_canonicalize_fail_174_test.go:99-107` | banned 循环，含 `canonicalizeFailsHere` 一侧的毒标签与 `:106 if strings.Contains(out.Text, dir)`，报错逐字"the notice must not relay the authorized root list to the model" | **同向但更窄**：不许转述的是**授权根列表** |
+| N-3 | `internal/tools/task_output_pointer_notice_test.go:474-489` | 那**11 枚** banned：`filed`、`leakProbeSegment174r3`、`leakProbeResolved174r3`、`rootA`、`rootB`、`读得回来`、`随时可读`、`可以读回`、`不在你被授权的目录范围内`、`未接线`、`不可找回`（作用域＝`notice` 那一段，非整串） | **同向**；★ 票面 §现量 第 5 条把这份名册引成 `cmd/wisp/task_output_pointer_notice_test.go`——**该文件在 `cmd/wisp` 下不存在**（`ls` 现量），真身＝`internal/tools/task_output_pointer_notice_test.go`，行号 474-489 对得上（J-7 同类：坐标前缀漂移） |
+| N-4 | `internal/agent/spill_pointer_honesty_174_test.go:155-157` ＋ `:181-183` | `for _, banned := range []string{`C:\authorized\only`, "c26-state"} … "notice leaked judge internals %q into model-visible text"`；第二组含 `boom`、sentinel、`D:\leaked\root`、`REPARSE_DENIED_INTERNAL` | **同向**——**"model-visible text"这个词已在用例里出现，且它今天就在禁止两枚绝对路径进正文**（仅限 notice 区） |
+| N-5 | `internal/observe/logging_test.go:105-117 TestRedactPathsOptIn` | `off := Redactor{}` → `:107` 断 `C:\Users\swq\notes.txt` **必须还在**（"path masking **must be opt-in**"）；`on` → `:112` 断 `swq` 不在、`:115` 断 `<path>` 在 | **反向钉**：★ 这是全仓唯一一枚路径掩码用例，它把"**opt-in**"钉死了。⇒ 甲若把掩码做成**无条件**、或把 `redact_paths` 默认翻成 true，**这一枚必红**，而票面禁区写着⛔ 不许为了变绿放宽任何断言 ⇒ 这一枚属"必须改的既有钉"，不属"可以顺手覆盖"的那类 |
+| N-6 | `internal/agent/guard_test.go:248` | `if strings.Contains(l.Text, "context deadline exceeded")` | **形似**：钉的是"别把 Go 的原始错误句转述出去"，与路径无关；列出来是怕后人拿它当"已有先例说失败句该改写过" |
+| 旁 | `cmd/wisp/approval_always_201_test.go:181` | 断 `config.toml` 里不许多出被拒的那条 allowlist 项 | **不是本轴的钉**（吃的是配置文件内容）——具名排除，免得被算进代价里 |
+| 旁 | `internal/tools/fs_edit_ac34_test.go:141` | `if strings.Contains(out.Text, "读取目标失败")` （注释 `:118` 逐字：the read-failure wording must be absent） | **反向**：它要求 `fs_edit.go:138` 那句**不出现**（走的是另一支）——甲重写那句不会红它，但**具名**：这是唯一一枚直接吃 `fs_edit` 失败句字面的用例 |
 
 ### 5.4 ③ `internal/risk/pathresolver.go:95` 那句 `%w: %s expands to %s (%s)` 被谁引用
 
-| # | `file:line` | 性质 |
-|---|---|---|
-| | | |
+- **文本级引用：0 枚**（尺 D 全仓排 `.scratch`＝0 命中；`"expands"` 的其余命中全是别的词的注释，如 `internal/risk/paths.go` 不存在、`cmd/balldebug/diff_windows.go:67`、`winsec/resolve.go:351`）。⇒ **这一句没有任何用例断言它长什么样**。
+- **哨兵级引用：5 行／3 枚文件**（`errors.Is(err, risk.ErrRewrittenPath)` 形状，⚠ 吃的是 wrap 链不是句子）：`internal/panel/workspace_test.go:107-108`、`internal/risk/pathresolver_rewrite_account_test.go:115`、`internal/tools/paths_workspace_test.go:184-185`。⇒ **只要甲不切 `errors.Unwrap` 链，这几枚不会红**；这也解释了为什么"把正文里的句子换掉"这件事今天**基本无钉**。
+- **生产调用者：3 处**——`internal/panel/workspace.go:85`（`res.Actable()`）、`internal/risk/syncdirs.go:208`（`canon, err := res.Actable()`）、`:226`（`anceCanon, err := ares.Actable()`）；`internal/tools` **0 枚**（这就是 §2.4 那处更正的依据）。
 
-### 5.5 具名清单枚数
+### 5.5 具名清单枚数（＝"甲形会把谁顶出去"）
 
-> 待填。
+> **正文级 8 枚**（5.2 第一档 P-1…P-8，落点②／③只要吃到 `全文见` 那一串就**全红**）＋**1 枚 opt-in 钉**（N-5 `observe/logging_test.go:105`，只在"改成无条件掩码"或"翻默认值"这两形下红）＋**中继行为 1 枚**（`wiring_test.go:232/:239`，只在重写台账句子时红）＋**卡片／门禁级 5 枚**（第二档，只在落点①或改 `displayPaths` 时红）＋**C25 射程面 31 处调用点**（第三档，红否〔待验〕）。
+> ★ 反向的既有钉也在：**4 枚同向负钉**（N-1／N-2／N-3／N-4）已经把"不许把授权根列表与裁判内部转述进 model-visible text"钉在**notice 小区间**上了。⇒ "甲"与这仓已经验收的方向**不是逆风**，逆风的是那 8 枚**要求路径必须在场**的指针钉。
+> ⛔ 本腿不裁这些红该算"修 bug 不需批准"还是"改既有契约需批准"——那是 §3.2 与 J-4 的归口。
 
 ---
 
 ## §6 排程结论（不裁形）
 
-### 6.1 若答甲：最小可落地腿的写面＋必须先解冻／必须改的既有钉枚数
+### 6.1 若答甲：最小写面＋必须先解冻／必须改的既有钉枚数
 
-> 待填。
+| 形 | 最小写面（枚文件） | 必须先解冻 | 必须改的既有钉 |
+|---|---|---|---|
+| **甲-②（投递侧）** | **1 枚**：`internal/agent/loop.go`（`:710` 之后、`:722` 之前那一道；等价落点＝`:1080-1083 toolResultMessage`） | `internal/agent`（票面排程逐字："落点大概率在 `internal/agent`（跨包）⇒ 写面要具名解冻"） | **8 枚必红**（P-1…P-8，全是票 174 的指针族）——这 8 枚**不能靠放宽断言解决**（票面禁区：⛔ 不许为了变绿放宽任何断言）；⇒ 真话是：**甲-②与票 174 已验收的"可读指针"互斥，要么甲-②豁免 `全文见` 那一段（写面＋1 处，但要新造豁免形状），要么 174 那 8 枚重谈** |
+| **甲-③（接缝侧）** | **3 枚**：`internal/llm/{openaichat,anthropic,openairesponses}/request.go` 的 `encodeToolResult`（可选第 4 处 `internal/llm/provider.go:126`） | 无（`internal/llm` 不在别的腿的写面上；260-r1＝`internal/ball/**`，262-r1＝`scripts/`＋`.github/workflows/ci.yml`，本腿现量 `git status`） | **0 枚必红**（尺 E＋F：外发请求体今天没有任何路径断言，golden 里没有任何绝对路径）⇒ **代价不是钉，是"这一侧从此测不到"**：mockllm 不吃真适配器，C5 那条注入面看不见这道掩码；且三形漂移 |
+| **甲-①（工具侧）** | **5 枚**：`fs.go`／`fs_write.go`／`fs_edit.go`／`bridge.go`／`task_backfill.go`（约 16 枚行，见 §4） | `internal/tools`（票面排程：两票若同批只一枚碰它） | **0 枚正文级必红**（P-1…P-8 吃的都不是 fs 族失败句！——见 5.1 尺 A 的 0 命中）；但会改 `bridge.go:646` 喂 C25 的实参 ⇒ **射程面 31 处**（5.2 第三档，红否〔待验〕）＋撞 **K-3 `PLAN.md:1375`** 的 C 编号（人工批准面） |
+| 任何一形共用 | — | — | **N-5**（`observe/logging_test.go:105`）只在"无条件掩码／翻默认"两形下红；`cmd/wisp/config_readers_255.go:134` ＋ `cmd/wisp/config_receipt_255_test.go:166/:179` 只在"甲去读 `cfg.Privacy.RedactPaths`"那一形下必须**同步改名册行**（读了它＝给 `[privacy]` 段添了个生产读者，名册那一行立刻是假话） |
 
-### 6.2 若答乙：那枚能力尺该钉在哪一跳（复认三候选今天哪一处能被断言）
+> **一句排程读数的形状**（⛔ 不是建议）：三形的**必红枚数是反着的**——写面最小的②红 8 枚，写面最大的①红 0 枚正文级但撞 C 编号，③两头都轻却带不来任何钉。另：`AGENTS.md` §1.2 那条 `filepath.Clean|Abs` 禁令对三形一视同仁，而"绝对→相对"在仓里**没有现成能力**（`Canonicalize` 只回绝对，包内只有 `baseOf()`）；`tools/d22scan/allowlist.txt` 在 AC#3 越界面里 ⇒ 加白名单不可用。
 
-| 候选 | `file:line` | 今天能被断言吗 |
+### 6.2 若答乙：那枚能力尺该钉在哪一跳（复认 174-a4 的三处候选）
+
+| 候选 | `file:line` | 今天能被断言吗（读码级） |
 |---|---|---|
-| 甲 | `internal/risk/paths.go:122-126` | |
-| 乙 | `internal/tools/task.go:837` | |
-| 丙 | `fs.go:144+148` ＋ `fs_write.go:343` | |
+| 甲 | `internal/risk/paths.go:122-126` | **量不到——坐标不存在**：`ls internal/risk/*.go` 现量清单里没有 `paths.go`（19 枚非测试文件，无一枚名为 `paths.go`）。真身＝`internal/tools/paths.go:119`（`func (p *PathCanonicalizer) Canonicalize(raw string) (string, error)`）。⇒ 票面排程引用的这枚 file:line 需更正（追加，不改已推历史） |
+| 乙 | `internal/tools/task.go:837` | **能被断言，且已有用例在断**（`task_output_canonicalize_fail_174_test.go:85/:130/:145` 三种形状：`连规范化都没通过`／wired／unwired）。⚠ 但按 §2.1＋§2.4：这一枚括进来的 err 今天**不含绝对路径**，且票面排程逐字"候选甲 `paths.go:122-126`／乙 `task.go:837` 属票 174 的可达性轴，**不许并进本票**" ⇒ 用它当本票的尺，量的是 174 那一格 |
+| 丙 | `fs.go:144+148` ＋ `fs_write.go:343` | **`:144` 今天带不出路径**（§2.4：那支的 err 集合只有 `fs: no C26 resolver configured (fail-closed)`／`tools: empty path`／`ErrReparseDenied` 三枚定形句）；`fs.go:148`／`fs_write.go:343` 是 `*fs.PathError`＝逐字绝对路径，**且今天 0 枚用例断其文本**（尺 A：`打开失败`／`原子重命名失败` 在测试里 0 命中）。⇒ **本票 AC#1 那格（"今天已出去的那批路径有没有一枚钉"）在这两处确实是空场**，丙形可选 |
+
+**形状级结论（能力级仍〔待验〕，J-1/J-5）**：丙形钉得住 `fs` 一族的两句话，钉不住 §2.5 点名的另四族（`fs_edit.go:132` 不经 err 直接写 `target`、`bridge.go:431` 经 `dec.Reason`、`AppliedSteps` 三句、`task_backfill.go:136`）——**唯一能一次覆盖全部来源的接缝是 `loop.go:710→:722` 那一跳**（所有族共用，且与 spill 之后的最终串同形）。现成的种子形状也已存在：`internal/tools/bridge_test.go:184` 拿裸 `fsRead{}`/`fsList{}`（`FSDeps` 零值 ⇒ `Paths == nil`）去读 `Z:\definitely-not-here\x.txt`，**但它只断 `res.IsError`（`:190`），不读文本**，而且走的是 §2.4 那条**不带路径**的 `:144` 支——真要到 `:148` 那支得给 deps 挂上真 resolver（现成形状：`FSDeps{Paths: NewPathCanonicalizer(...)}`，见 `bridge_a18_kill_windows_test.go:74-75` 等 10 处）。⇒ 这句话是给写 AC#2 正控的人看的：**照抄 bridge_test:184 不会种出含路径的失败句**。
 
 ### 6.3 若答不做：缺的那句"说到明处"该写在哪
 
-> 待填。
+- **不该写在 `internal/config/unwired.go`**：那张表**接不进去**——`unwired.go:11-19` 的三条准入条件之一逐字是 "it sits in a locked section (the four marked rows of SPEC-03 sec 3: `[risk]`, `[fs]`, `[net]`, `[plugins]`)"，`[privacy]` 不在锁定段；表体 `:61-105` 现有 6 行全是 `[risk]`／`[net]`。硬塞会撞上 `unwired_test.go` 的 `TestEveryLockedSectionKeyIsAccountedFor`（文件 `:107-112` 注释具名）。
+- **现成的"说真话"机制是这两枚，且已经在说这半句**：① `cmd/wisp/config_readers_255.go:134`（产码名册行逐字"the mirror field exists and is filled by callers, **never from cfg.Privacy**"）＋它的尺 `cmd/wisp/config_receipt_255_test.go:166/:179`（每轮重量）；② `docs/reports/pending-and-issues.md` 的 `A##`／DEFERRED 台账（票面 §现量 与 `AGENTS.md` §1.1 指定的批准轴）。
+- **那句还缺的半句**（按 §1.5 读数补齐）：票面"不做"栏现在写的是"日志侧与模型侧都无掩码"——复量成立，但还差一句才说满：**`redact_paths` 即使被接上并打开，模型可见正文照旧不脱敏**（`Redactor` 的三枚产码构造点全在日志与诊断包线上，§1.2/§1.3），**且**它的正则按字面只吃反斜杠盘符／UNC／`/home|/users|/root`（§1.5 附）。⛔ 票面禁区已写明：⛔ 不许留"我们有脱敏开关"这种读起来像已防住的句子——**这一枚的实测形状正是那句话说起来像防住、读起来没防住**。
 
 ---
 
@@ -273,8 +319,8 @@ pathRe = regexp.MustCompile(`(?i)(?:\\{1,2}\?\\)?(?:[a-z]:\\|\\\\)[^\s"',;:)>\]]
 | 项 | 读数 |
 |---|---|
 | `wc -c census.md` | 自指量不入正文：以每枚 commit 的 `git show --stat` 与本腿回报里的实测值为准（写入数字会让下一次 `wc -c` 立刻过期） |
-| 占位符（`待填`）枚数 | 本枚 commit 时＝填表尚未开始，六格里仍留占位；**终态枚数必须＝0**（终稿会重测并在 G-2 里改成本读数） |
-| `（填写中）`枚数 | 0（本腿不用这一形状） |
+| 占位记号枚数（骨架期格子里用的那三字记号） | **0**（终稿 `grep -c` 复量＝0；骨架枚（commit `0b91f30d`）里六格各留有该记号，属计划内中间态，具名不抹） |
+| 半成品记号枚数（骨架期另一种三字形状） | **0**（本腿从未使用那一形状，终稿 `grep -c` 复量＝0） |
 | 写面枚数 | 1＝`.scratch/wisp/probes/264/a1/census.md`（另：`.scratch/commit-msg-264a1-*.txt` 是 commit message 临时件，按"只建不删"留在 `.scratch/`，不入 commit） |
 | 产业代码／测试件／票面／台账改动 | **0**（`git diff` 见每枚 commit 的 stat） |
 | `docs/PLAN.md`／`docs/specs/**` | **读了、未改**（§3 的读数：`docs/PLAN.md:1057-1112`、`:1375`、`:2514-2545`、`:2662`、`:2764-2812`；`docs/specs/SPEC-06-security-gatekeeping.md:60-92`、`SPEC-05:106`、`SPEC-04:77-86`、`SPEC-03:37`） |
@@ -301,7 +347,7 @@ pathRe = regexp.MustCompile(`(?i)(?:\\{1,2}\?\\)?(?:[a-z]:\\|\\\\)[^\s"',;:)>\]]
 | J-4 | 甲形算不算**改契约** | §3 只报得出"哪一条已定案文字与它相邻／相抵"（`PLAN.md:2788`、`:1375`、`:1101`），"相抵到什么程度算改"是人工批准面 | 机主＋编排者（`AGENTS.md` §0.2） |
 | J-5 | 逐枚用例"变红／不变红"的**最终判语** | 我只给得出"这一枚断言吃的是哪一句串"；变红与否要跑 | 写码腿的撞钉预检（形甲落地前必须先跑，票面排程已写"要具名解冻并先跑撞钉预检"） |
 | J-6 | `174-a4` 的分母（装配点 52／能进模型可见文本 48／`%w` 272／自带插值动词 136） | **按令不重跑**（避免与它互洗）；本腿只在自己的格子里复认它没覆盖的两块 | 若要复核：票 174 自己的腿，或另派一枚带尺的腿 |
-| J-7 | `internal/risk/paths.go:122-126` 这一枚候选 | **坐标今天不存在**：`internal/risk/` 下没有 `paths.go`（`ls internal/risk/*.go` 实测，文件清单见 §6.2）。是"坐标失效"，⛔ 不是"这一侧没问题" | 编排者：票 174 与票面排程引用的这枚 file:line 需要更正（追加，不改已推历史） |
+| J-7 | `internal/risk/paths.go:122-126` 这一枚候选 | **坐标今天不存在**：`internal/risk/` 下没有 `paths.go`（`ls internal/risk/*.go` 实测 19 枚非测试文件，无一枚名为 `paths.go`）。是"坐标失效"，⛔ 不是"这一侧没问题" | 编排者：票 174 与票面排程引用的这枚 file:line 需要更正（追加，不改已推历史） |
 | J-8 | 外发正文里**除工具失败句之外**还有哪几族带路径（如 system prompt／记忆注入段／spill 回执） | 本格射程＝工具失败句那一条链；其余族我只在 §2 增量里点名了我查到的，没有做全仓穷举（那是票 174 的射程） | 票 174 的名册轴／或另立票 |
 | J-9 | 面板／球侧今天把哪一句显示成什么 | `frontend/**`、`design/**` 我没读（G-2 具名）；我只读到产码侧 `bridge.go:374 Args: req.Args` 与 `displayPaths` 这两条喂卡片的线 | 如需"用户看得见"的像素级读数：派一枚前端腿（可只读） |
 | J-10 | `internal/tools/task.go:837` 那一枚接缝**今天到底接没接** | 它旁边的用例（`task_output_canonicalize_fail_174_test.go:130-148`）自己就分了 wired／unwired 两支断言，"生产装配走哪一支"是运行时选择 | 写码腿或乙形仪器；§6.2 只报"这一处今天有没有可断言的形状" |
