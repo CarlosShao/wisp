@@ -11353,5 +11353,16 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 **3. 定式入库**：**"把门挂在故障点之后"是一类形状级错误**，与我昨天记的"负向尺要配正控"是同族——写任何"检查 X"的判据前先问一遍**"X 真发生的那一刻，这把尺被执行到了吗"**（今天这枚如果照我原话落地，会得到一枚永远绿的门＋一句"已装牙"的假话，而盘上看起来和真装有牙一模一样）。
 **4. 待办**：`262-r1` 交件后派非实现者验收（`262-v1`）⇒ 我翻 AC#0-AC#7；另欠**票 260 AC#1 选形**（料在 `260-a2` 代价表）与票 253／167／220／198／255 那几张队列，均按写面空出顺序排。
 
+## A586（2026-10-04 09:2x，编排者自记：**推送生效——`slo-full` 的 checkout 这几天第一次过了（票 262 的改名实测有效），但它 5 秒后死在另一枚从未被执行到的缺陷上＝`scripts/slo-check.ps1` 在严格档下取未赋值的 `$LASTEXITCODE` ⇒ 立票 263（写面撞 `scripts/`，按住等 262-r1）；★同时收到两枚"CI 红／本机绿"的新红，其中两枚给出一条可检验假设＝ban #9 问的是磁盘存在性、而 CI 的检出里没有未跟踪的台件**）
+
+**0. 现跑钟点＝09:21:55+08**；起手 HEAD 已不是我落笔时的 `ada5ed79`（`174-a3` 在飞期间又落了 `3a9fe4cf`＝"交件后复量节"），按第 82 条只写"此刻取到的是别的程的枚"，不写"HEAD 未变"。
+
+**1. 改名的实测效果（这是今天最该记的一条，它把"我说的有效"和"盘上验证过"分开处理了）**：推送 191 枚触发 run `37166458550`（`sha=fd269de1`，日志已落 `.scratch/ci-logs/run-37166458550-failed.log`＝2,053,538 字节）。同一次 run 里 `slo-full` 的 `Run actions/checkout@v4`／`Run actions/setup-go@v5`／`Build wisp.exe` 三步**全 success** ⇒ **票 262 那层墙确实被拆掉了**（这条是 CI 读数，不是我推断）。⚠ 但它**只说明今天这一枚 commit 过得了**；拦不住下一枚的那把尺还没装（票 262 未落地）。
+**2. 第二层故障（此前被第一层整层掩盖）**：`slo-full / SLO full gate (six states + settle + leak)` 在开采第一档 `Sleeping for 6s` 之后约 0.2 秒抛 `The variable '$LASTEXITCODE' cannot be retrieved because it has not been set.`（`FullyQualifiedErrorId : VariableIsUndefined,slo-check.ps1`）⇒ 5 秒后 `exit code 1`，`Upload SLO report` 随之 skipped ⇒ **今天这条路上没有任何 SLO 数字**（既不是达标也不是超标，是没测）。脚本＝`scripts/slo-check.ps1`（397 行，`LASTEXITCODE` 见 `:106/:326/:345/:366`；⚠ 肇事点**不是**这三处显式取值行，因为红句落在采样档——真读取点归落地腿现读，我在票里把这句标成待验）。机制一句：`$LASTEXITCODE` 是 PowerShell 自动变量，**只有该作用域真跑过外部命令才存在**，严格档下取未赋值变量＝运行时异常。⇒ 立**票 263**（`.scratch/wisp/issues/263-slo-check-dies-on-unset-lastexitcode.md`，六格判据：正控两发齐＋不许吞异常/放宽严格档/动阈值＋"未赋值即死"要变成具名失败档＋必须真出现一次 slo-full 出结论的 run 才算销账）。⛔ **`263-r1` 现在不许派**：写面＝`scripts/**`，而 `262-r1` 正在写 `scripts/check-path-length-budget.sh`＋`ci.yml` ⇒ **同目录串行**（09-29 我自己破过这条，代价记在那条账上）。
+**3. 我不拿"编队抢 CPU"当解释（否证我自己跑过）**：脚本自己的 precheck（票 134 AC#4）逐字报 `precheck ok - no foreign toolchain/runner process, machine-wide cpu max 17%` ⇒ 这枚红**与我的写腿无关**。（按第 74 条：这类"归因于争用"的话如果我顺着说下去，会造出一条盘上不可核的假因果，而"没测"和"测了但被干扰"后续程会走完全不同的路。）
+**4. 推后逐名比红名集合（基线 `.scratch/ci-logs/red-941805d0.txt` 29 枚 ↔ 现 `.scratch/ci-logs/red-fd269de1.txt` 24 枚）**：**消失 9 枚**（昨天的活真把九格治好了）、**新增 4 枚**＝`TestAC1AlwaysBranchDoesNotRevertAHandEditedKey`／`TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card`／`TestRealRepoLedgerIsHonest`／`TestScannerSelfScanOfRealRepoIsGreen`。后两枚属 `tools/d22scan`，**本机 `go test -count=1 ./...` 在 HEAD 上是绿的**（我今天 08:5x 现跑 `ok 16.368s`、`-self-test` 36/36 过）⇒ 这是**口径差**（第 73 条：CI 与本机不同口径不可互比，先怀疑环境再怀疑码）。★**一条可检验假设登记给票 212**（⛔ 我**没有**验证它，别当结论用）：ban #9 判"引用路径存不存在"用的是**磁盘 `os.Stat`**，而 CI 的检出里**没有未跟踪的本地台件**（我今天 grep 到 Go 注释里确有引 `.scratch/wisp/probes/**` 的路径）⇒ 同一枚注释在两台机器上会给出两种颜色。若成立，修法与既有 A207 定式同族：**存在性该问 git index（ tracked ），问不到就退化成扫磁盘并响亮自陈**。前两枚新增红（`AlwaysBranch` 两枚）**未归因**，具名挂账。
+**5. 定式入库（第 3 枚同类）**：**两层故障会互相掩盖**——修掉外层之前，内层的红句在盘上根本不存在，于是"这条保护在跑"这句话既没人能证也没人能驳。今后任何"外层被修好"的交件，我要**当场再读一次内层有没有真出结论**（今天这发就是：checkout 从没绿过 → 绿了 → 才发现闸门本身一跑就死）。
+
+
 
 
