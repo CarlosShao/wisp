@@ -144,7 +144,7 @@ cancel_key_wording_260r3_test.go:60: 取消通道不可用句还在指枚 Esc：
 | approval 包全量 | `PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 -v ./internal/agent/approval/` | rc=0，`--- PASS`=72、`--- FAIL`=0；唯一 `--- SKIP: TestDefaultDeadlineWallClockMeasurement`＝`internal/agent/approval/ticket84_no_owner_test.go:222` **起手即在**的那枚（非本腿造，本腿没动它） |
 | D22 扫描 | `sh scripts/d22scan.sh` | **rc=0 clean - no D22 ban violations**；`ban #8 internal/=502`、`ban #8 cmd/=99`（编排者 10:40 终值是 501／98 ⇒ 两枚 +1 恰是本腿新增的两枚测试件文件本身，不是新增违规）；`bans #1-5 internal/=228`、`cmd/=38` 不变 |
 | 路径预算 | `sh scripts/check-path-length-budget.sh` | rc=0，逐字 `VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`；`longest=180 chars relative`；`tracked paths=5442`（编排者 10:40 是 5316 ⇒ 增量为今天别的腿进树的路径，与本腿无关）；`over-budget=57 covered=57 not in roster=0`、`in the wall interval=0` |
-| gofumpt | `"$(go env GOPATH)/bin/gofumpt" -l <碰过的五枚文件>` | **空**（输出 0 字节，`logs/gofumpt-final.txt`） |
+| gofumpt | `"$(go env GOPATH)/bin/gofumpt" -l <碰过的五枚文件>` | **空**（输出 0 字节，`logs/gofumpt-final.txt`）。⚠ 同目录那枚 `logs/gofumpt.txt` 里是 50 字节的 `command not found`＝本腿第一次直接敲 `gofumpt` 的 rc=127（它装在 `$(go env GOPATH)/bin`，不在这条 shell 的 PATH 上），**不是格式红，也不是门红** |
 | ⛔ 未跑 | `slo` 全量／`-Subset full` | 未跑（本机 self-hosted runner 的活，派单明令避开）；winlive 全部未跑 |
 
 **7.1 进树后复跑（证据件 `0de321fa` 落盘之后，`2026-10-04 11:21:34 +0800`，读数存 `logs/path-length-postcommit.txt`／`logs/d22scan-postcommit.txt`）**：
