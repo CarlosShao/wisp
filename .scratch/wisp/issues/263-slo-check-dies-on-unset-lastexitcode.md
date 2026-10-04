@@ -38,6 +38,14 @@
 - [ ] **AC#5**：一次真 run 里 `slo-full` 走到出结论（`Upload SLO report` 不再 skipped）；拿不到就**具名停在"没验证"**，不许用本机一发冒充 CI 读数（既有定式：CI 与本机不同口径不可互比）。⇒ **停在未勾**：本机 12 发全是 `-Subset smoke -SecondsPerState 1`×假件，证的是**路的形状**、不证 D32 那两个数；推送窗口在我手里（取数时刻 `2026-10-04 13:13` 现跑 `git rev-list --count origin/dev..HEAD`＝**81 枚未推**）。
 - [x] **AC#6（两门适用＋两门不适用，具名）**：`tools/d22scan`（rc=0，`ban #8 internal/=503`、`cmd/=100`，比 12:0x 各 +1 ⇒ 归因＝**260-r4 新增的两枚测试件**，与本票无关）＋票面长度的门（rc=0，`VERDICT GREEN`）＝**本腿现跑的两门**；`gofumpt`/`go vet` 因"五枚 commit 零 tracked Go 产码"（验收腿自己拉的 `git show --name-only` 名册）**不可能因本票变红**，⛔ 下一任不许以为这两门真跑过。ban #9：本机 d22scan clean ⇒ 未扩大。`tools/d22scan` 那两枚"CI 红／本机绿"本腿没碰一字、按票面具名上报。
 
+## 编排者更正（2026-10-04 16:5x）：本票 `:53` 那句 scope 名册**写宽了一枚**（⛔ 原句不抹，按这一条读）
+
+- `:53` 逐字写着 `tools/d22scan` 的 scope 名册"只列 internal/cmd/frontend/design/**tools**"——**`tools/` 那一枚不在名册里**。凭据＝只读腿 `266-a1` 指出后，**我 16:5x 自己现读源码复认**：
+  - `tools/d22scan/main.go:55-59` 逐字写着 ban #9 "Judged against … the production Go files of **internal/ and cmd/ ONLY** - **`tools/**` and `_test.go` are outside this ban's range**，…**adding either tree is a scope change for an owner to approve, not a test fix**"；
+  - 走查那几枚调用＝`main.go:264`（`internal`）／`:267`（`cmd`）／`:271`（`frontend`，ban #6）／`:274`（`internal/tools`，ban #7）／`:581-582`（`design`／`frontend`，ban #8）⇒ **仓根那枚 `tools/` 目录今天不被任何一条 ban 走查**（`:260` 只是去**读** `tools/d22scan/allowlist.txt` 这枚白名单文件，不是扫那棵树）。
+- **这一处写宽不是纯洁癖**：它正是票 266 的命门——"**仪器自己的源码不在任何外牙射程内**"。我把它列进 scope 名册＝把"仪器有外牙"这句说大了。⇒ **`266-a1` 的更正成立**，本票 `:53` 那句按上面读。
+- ⚠ **为什么我当初会写宽**（记我）：我是照 `AGENTS.md` 的"薄索引"口气与 d22scan 的**自述文案**拼的，⛔ 没有逐条走 `walkGo/walkText` 的调用点。⇒ 定式：**凡把"某道门扫哪几棵树"写进票面，必须现读那几枚 walk 调用，不读注释**。
+
 ## 排程与禁区
 
 - **按住原因（写面互斥）**：本票写面＝`scripts/**`，而 `262-r1` 正在写 `scripts/check-path-length-budget.sh`＋`.github/workflows/ci.yml`。**同目录一律串行**，不接受"改的是不同文件"这种推理（先例：09-29 我自己破过这条）。等 `262-r1` 交件并由我核过之后再派 `263-r1`。
