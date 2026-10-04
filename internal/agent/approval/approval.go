@@ -84,12 +84,128 @@ type ChannelStatus struct {
 	Text    string
 }
 
-// channelNames are the display labels the card and the ball strip show.
+// channelNames are the display labels the card and the ball strip show, and
+// EVERY entry here names a CHANNEL, never a key. The cancel channel's live
+// label - the one that names the key this host actually borrows - is resolved
+// at read time by channelLabel, NOT frozen in this map (ticket 260 AC#4,
+// ledger A598 §2). Two facts made that true:
+//
+//  1. since ticket 260 形ⓐ the borrowed key follows [hotkey] cancel, and ticket
+//     258's reload bridge rebinds it while the process runs - a label computed
+//     once into a package var is the stale half of the exact defect ticket 260
+//     was filed over ("the card says one key, the desktop holds another");
+//  2. the key's spelling is owned by internal/ball's hotkey receipt, and this
+//     package must not import internal/ball (a new package-level dependency
+//     edge = human-approval face), so the spelling arrives through the
+//     composition-root seam below instead.
+//
+// ChannelEsc's entry is therefore the SLOT name: it is what the availability
+// line prints when the channel is NOT loaded, i.e. when there is no key to
+// name. That is A595 §1 boundary ④ / 档一, and it is why this line and the
+// 「取消键无处可借」 the resident leg prints for the same branch agree.
 var channelNames = map[Channel]string{
 	ChannelBall:  "单击悬浮球",
-	ChannelEsc:   "按 Esc 键",
+	ChannelEsc:   "取消键通道",
 	ChannelPanel: "面板拒绝",
 	ChannelKWS:   "说取消词",
+}
+
+// defaultCancelKeySpelling is the fallback this package prints when its host
+// installed no reader (a host with no hotkey chain at all - cmd/wisp's console
+// leg, and every test that never wired one). It is the SHIPPED DEFAULT KEY and
+// nothing else, and it is duplicated here on purpose rather than imported:
+// internal/ball's DefaultHotkeys().Cancel is the authority, and
+// cmd/wisp's TestTicket260R4FallbackSpellingStillMatchesBallsDefault pins the
+// two against each other, so a drift between them is a red test and not a
+// sentence on the card that names a key nobody holds.
+const defaultCancelKeySpelling = "Esc"
+
+// cancelKeyLabelPattern wraps a key spelling in the words the card used before
+// ticket 260 ever moved: with the default spelling it renders 「按 Esc 键」,
+// byte-for-byte the string this package printed for years. Only the spelling
+// moves; the shape around it does not (AC#4 ① zero drift).
+const cancelKeyLabelPattern = "按 %s 键"
+
+// CancelKeySpelling answers "which key does this process call the cancel key",
+// in the host's own spelling (「Esc」, 「Ctrl+Alt+Q」, ...). It is the whole of
+// what the composition root injects: the value comes from the ball's hotkey
+// report - the same line internal/ball fills from the cancelBorrow it hands to
+// RegisterHotKey - so the printed name and the borrowed key cannot disagree.
+//
+// It is a display seam and NOTHING more: no decision in this package reads it.
+// Which veto lands is decided by ChannelRegistry (loadedness) and the grant
+// proof, so a host that installed a reader answering「F13」 still cannot cancel
+// through a channel it never loaded, and cannot make an unloaded channel look
+// available. Pinned by TestTicket260R4SpellingSeamCarriesNoAuthority.
+type CancelKeySpelling func() string
+
+var (
+	// cancelKeyMu guards the incumbent reader, not any decision. The read faces
+	// (Statuses / gate.go's two audit lines / report.go's channel attribution)
+	// are called from the gate's own goroutines AND from the UI thread, so the
+	// map this replaces could be read unlocked while the root re-wired it.
+	cancelKeyMu sync.RWMutex
+	// cancelKeySrc is nil until a composition root installs one.
+	cancelKeySrc CancelKeySpelling
+)
+
+// SetCancelKeySpelling installs (or, with nil, removes) the host's reader and
+// returns the incumbent so a caller can restore it. Callers are composition
+// roots only; the shape is the one winsec.SetPathResolver established for a
+// package-level seam the provider package must not import.
+func SetCancelKeySpelling(src CancelKeySpelling) CancelKeySpelling {
+	cancelKeyMu.Lock()
+	defer cancelKeyMu.Unlock()
+	prev := cancelKeySrc
+	cancelKeySrc = src
+	return prev
+}
+
+// cancelKeySpelling resolves the spelling at read time: no installed reader and
+// an empty answer from one both land on the shipped default, because 「按  键」
+// is a sentence that names nothing and reads like a broken card.
+func cancelKeySpelling() string {
+	cancelKeyMu.RLock()
+	src := cancelKeySrc
+	cancelKeyMu.RUnlock()
+	if src == nil {
+		return defaultCancelKeySpelling
+	}
+	if s := src(); s != "" {
+		return s
+	}
+	return defaultCancelKeySpelling
+}
+
+// cancelKeyLabel is the loaded form of the cancel channel's label: the key this
+// host really holds, in the words the card has always used.
+func cancelKeyLabel() string { return fmt.Sprintf(cancelKeyLabelPattern, cancelKeySpelling()) }
+
+// channelLabel renders a channel whose label is being printed as a thing that IS
+// live or DID happen: the availability line of a loaded channel, and the three
+// attribution faces (gate.go's L1 and L2 veto sentences, report.go's
+// 「（否决通道：…）」). A veto that reached those lines passed the registry check,
+// so naming a key there is honest - as long as the key it names is THIS host's,
+// which is the whole of what this function adds.
+func channelLabel(ch Channel) string {
+	if ch == ChannelEsc {
+		return cancelKeyLabel()
+	}
+	return channelNames[ch]
+}
+
+// channelStatusLabel renders the label half of one availability line. The
+// cancel channel splits in two, and the split is by the only fact the line
+// claims: loaded -> name the key this host holds; not loaded -> name the SLOT,
+// because there is no borrowed key to point at and the second half of the line
+// says so out loud. Before this split the pair rendered 「按 Esc 键：快捷键取消
+// 不可用」 - the first clause naming a key the machine is not holding, in the
+// one moment (card would not come up / key never got borrowed) a user reads it.
+func channelStatusLabel(ch Channel, loaded bool) string {
+	if ch == ChannelEsc && !loaded {
+		return channelNames[ch]
+	}
+	return channelLabel(ch)
 }
 
 // unavailableText is the wording B1 mandates. The KWS line is the exact string
@@ -200,9 +316,9 @@ func (r *ChannelRegistry) Statuses() []ChannelStatus {
 		loaded := r.Loaded(ch)
 		st := ChannelStatus{Channel: ch, Loaded: loaded}
 		if loaded {
-			st.Text = channelNames[ch]
+			st.Text = channelStatusLabel(ch, true)
 		} else {
-			st.Text = channelNames[ch] + "：" + unavailableText(ch)
+			st.Text = channelStatusLabel(ch, false) + "：" + unavailableText(ch)
 		}
 		out = append(out, st)
 	}

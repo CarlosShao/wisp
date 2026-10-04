@@ -9,15 +9,21 @@ package approval_test
 // the slot the way the other three lines name theirs (语音取消不可用 / 面板取消不
 // 可用 / 悬浮球取消不可用), and it holds for every value [hotkey] cancel may take.
 //
-// The loaded-channel label (channelNames[ChannelEsc], 「按 Esc 键」) is the ONE
-// string of the ten this leg did NOT change, and it is not changed here either:
-// making it follow the config needs a value this package cannot see without
-// either importing internal/ball (a new package-level dependency edge, which
-// AGENTS.md §1.2 books as a human-approval face) or a late write to the package
-// map that gate.go:314 / gate.go:477 and report.go:142 read unlocked. The
-// orchestrator's ruling is owed; wording.md §8 carries the three candidate forms
-// and their costs. The assertion below pins today's text so the follow-up leg
-// sees it move - it is a NAMED RESIDUAL RULER, not an approval of the wording.
+// The loaded-channel label (the 第十枚 of A595's ten) is the ONE string 260-r3 did
+// NOT change, and it stayed a named residual for exactly one day: making it follow
+// the config needed a value this package cannot see without importing internal/ball
+// (a new package-level dependency edge, which AGENTS.md §1.2 books as a
+// human-approval face). The orchestrator ruled it in ledger A598 §2 with a named
+// unfreeze of five things, and 260-r4 landed it: the label is now resolved at READ
+// time from a function the composition root installs (approval.SetCancelKeySpelling),
+// so 「按 <key> 键」 names the key this host borrows.
+//
+// The assertion below therefore keeps its byte-exact expectation for the DEFAULT
+// 档 (a host that installed no reader still renders the old string, AC#4 ①) and
+// gained the counterpart that makes it a moving ruler instead of a frozen one:
+// with a reader installed, the same line MUST NOT be that string. That is not a
+// relaxation of anything - it is one assertion plus the half that used to be
+// missing. See .scratch/wisp/probes/260/r4/label.md §5 for the cell-by-cell map.
 
 import (
 	"strings"
@@ -75,12 +81,29 @@ func TestTicket260R3EscUnavailableLineNamesNoKey(t *testing.T) {
 	}
 }
 
-// TestTicket260R3LoadedCancelLabelIsTheNamedResidual is the ruler that keeps the
-// one string this leg could not fix from drifting silently. See the header: this
-// is a booked debt, and the leg that lands the fix flips this expectation on
-// purpose (it must also flip the two gate.go / one report.go read faces, which is
-// why it needs the orchestrator's word first).
+// TestTicket260R3LoadedCancelLabelIsTheNamedResidual is the ruler 260-r3 left
+// behind for the one string it could not fix. The NAME stays because r3's own
+// evidence logs cite it (.scratch/wisp/probes/260/r3/logs/approval-*.txt) - the
+// residual it names is closed, and what this case pins now is the DEFAULT 档 of
+// the new read-time mechanism plus the half that was missing: install a reader,
+// and the same line must stop being that string.
 func TestTicket260R3LoadedCancelLabelIsTheNamedResidual(t *testing.T) {
+	// 260-r4's counterpart first: with a reader installed by the host, this line
+	// is NOT the old string. Without this half the case below would be satisfied
+	// by a label frozen back into a constant.
+	useCancelKeySeam(t, func() string { return "Ctrl+Alt+Q" })
+	seeded := ""
+	for _, st := range approval.NewChannels(approval.ChannelBall, approval.ChannelEsc).Statuses() {
+		if st.Channel == approval.ChannelEsc {
+			seeded = st.Text
+		}
+	}
+	if seeded == "按 Esc 键" {
+		t.Errorf("装配根装了取消键读口，卡片那行还在念出厂默认：%q（读取时求值被算成了一次）", seeded)
+	}
+
+	// Then the default 档, on the shipped fallback path (no reader).
+	useCancelKeySeam(t, nil)
 	reg := approval.NewChannels(approval.ChannelBall, approval.ChannelEsc)
 	for _, st := range reg.Statuses() {
 		if st.Channel != approval.ChannelEsc {
@@ -90,8 +113,8 @@ func TestTicket260R3LoadedCancelLabelIsTheNamedResidual(t *testing.T) {
 			t.Fatal("显式加载了取消通道却报成未加载")
 		}
 		if st.Text != "按 Esc 键" {
-			t.Errorf("已加载的取消通道标签 = %q。若这一行是新形（票 260 条件②的收尾腿改的），"+
-				"记得同时改 wording.md §8 那笔账与本件；若是无意的漂移，改回来。", st.Text)
+			t.Errorf("默认档的取消通道标签 = %q。这一格钉的是「用户没配 [hotkey] cancel 时一字不动」"+
+				"（票 260 AC#4 ①）；若这是有意的换形，改 wording.md §5 与 r4 件 §5 的账再动它。", st.Text)
 		}
 	}
 }

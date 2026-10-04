@@ -239,6 +239,24 @@ func newResidentApprovalWithConfig(dataDir string) *residentApproval {
 		NativeSource: residentNativeSource,
 		PanelSource:  residentPanelSource,
 	})
+	// Ticket 260-r4 (ledger A598 §2): the cancel channel's LABEL is resolved at
+	// read time, and the only place that knows which key this process calls the
+	// cancel key is this file. approval must not import internal/ball (a new
+	// package-level dependency edge is a human-approval face), so the spelling
+	// arrives as a function handed by the assembly root - the same shape ticket
+	// 246 used for the gate and ticket 253 for panel-as-truth-source.
+	//
+	// What is injected is ra.cancelKeySpelling itself, i.e. THE ONE READER this
+	// file already has for its own sentences (the ball's hotkey receipt, cancel
+	// line, falling back to the ball's own default constant). No second spelling
+	// path is opened here, and nothing new is composed: the card's line and the
+	// veto sentences cannot drift apart because they read the same function.
+	//
+	// It is installed at construction and never re-installed per card, because
+	// the closure holds no value - it reads the ball the UI is holding AT CALL
+	// TIME, which is what keeps ticket 258's reload bridge (rebind -> new
+	// receipt -> new label) from leaving a stale key on the card.
+	approval.SetCancelKeySpelling(ra.cancelKeySpelling)
 	return ra
 }
 
@@ -678,14 +696,22 @@ func (u *ballCardUI) Prompt(_ context.Context, p approval.Prompt) error {
 		// filed to remove, so the default 档 renders this line one word shorter than
 		// before. That single-word drift is the whole deviation from AC#4 ① and it
 		// is written up in .scratch/wisp/probes/260/r3/wording.md §5 rather than
-		// passed off as zero drift. The other shape (key name in a slog attribute,
-		// message kept constant) drifts the sentence much further; this call is the
-		// tree's first slog message built with fmt.Sprintf - 尺＝grep -rn
-		// "slog\.[A-Za-z]*(fmt.Sprintf" --include=*.go internal cmd ⇒ 0 枚先例 - and
-		// it is behaviour-neutral, which is what buys the shorter drift.
+		// passed off as zero drift.
+		//
+		// RECORDING SHAPE (orchestrator ruling, ledger A598 §2 last paragraph): the
+		// key name travels as an ATTRIBUTE, the message stays a constant. 260-r3 had
+		// built the message with fmt.Sprintf, which made this the tree's only
+		// slog.*Message(fmt.Sprintf(...)) call site (尺＝grep -rn --include=*.go
+		// "slog\.[A-Za-z]*(fmt.Sprintf" internal cmd | grep -v _test ⇒ 1 枚＝这里);
+		// the ruling was to put it back in the attr family this file already uses
+		// everywhere else. Same event, same level, same two facts, same key source
+		// (u.ra.cancelKeySpelling, i.e. the ball's receipt); what the record loses
+		// is the key name INSIDE the message string, and the line the user actually
+		// reads below keeps it verbatim.
 		key := u.ra.cancelKeySpelling()
-		slog.Warn(fmt.Sprintf("approval: L1 窗口挂起期间取消键 %s 未借到，本张卡片无法用 %s 否决", key, key),
-			"corr", p.CorrelationID, "why", "取消键位被占用或注册被拒，见热键报告")
+		slog.Warn("approval: L1 窗口挂起期间取消键未借到，本张卡片无法用该键否决",
+			"corr", p.CorrelationID, "cancel_key", key,
+			"why", "取消键位被占用或注册被拒，见热键报告")
 		fmt.Printf("wisp: 卡片 %s 的取消键未借到（桌面已有占位者），按 %s 不会否决它\n", p.CorrelationID, key)
 	}
 	return nil

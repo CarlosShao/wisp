@@ -311,7 +311,7 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 				continue
 			}
 			why := fmt.Sprintf("用户在 L1 确认窗口中通过「%s」否决了本次操作（取消窗口，非撤销已写出的内容）",
-				channelNames[v.Channel])
+				channelLabel(v.Channel))
 			// The veto tier of the answer audit (ticket 201): an L1 window is not
 			// a queue item, so nothing downstream books it - the queue's
 			// ANSWER-ALLOW / ANSWER-REJECT lines can only ever describe an L2
@@ -474,7 +474,7 @@ func (g *Gate) Veto(v Veto) error {
 	// ErrUnknownCorrelation, a live window still wins the lookup above, and a
 	// started call still reports D31. Nothing here can produce an allow.
 	return g.q.reject(v.CorrelationID,
-		sprintf("用户在 L2 审批卡片显示期间通过「%s」否决了本次操作，未执行", channelNames[v.Channel]))
+		sprintf("用户在 L2 审批卡片显示期间通过「%s」否决了本次操作，未执行", channelLabel(v.Channel)))
 }
 
 // LateVeto reports whether a started call was vetoed after it began (the

@@ -139,7 +139,12 @@ func (r CancellationReport) TextFor() string {
 	}
 	if r.Vetoed && r.Channel != "" {
 		b.WriteString("（否决通道：")
-		b.WriteString(channelNames[r.Channel])
+		// channelLabel, not channelNames: this is one of the three faces outside
+		// this file that reads the cancel channel's label, and the cancel label
+		// is resolved at read time since ticket 260-r4 (ledger A598 §2). A veto
+		// that got this far passed the registry check, so naming a key here is
+		// honest - and it must name THIS host's key, not the shipped default.
+		b.WriteString(channelLabel(r.Channel))
 		b.WriteString("）")
 	}
 	for _, s := range r.AppliedSteps {
