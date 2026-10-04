@@ -38,12 +38,18 @@ import "github.com/CarlosShao/wisp/internal/tools"
 // ninth reference-typed field cannot arrive quietly.
 
 // LiveApproval is one approval still waiting for an answer, as an in-process
-// observer sees it. Decision is the verdict as it was admitted (RulesHit,
-// Reason, Level and SessionOverrideBlocked are the fields the L2 card shows
-// verbatim, per ticket 17's frozen-contract note, which lives in
-// internal/tools/gate.go:13 - the note is a display contract on Decision, and
-// tools/d22scan does not enforce it (its pathresolver-bypass ban is about
-// filepath.Clean/Abs outside risk.PathResolver), copied per
+// observer sees it. Decision is the verdict as it was admitted, and the two
+// sentences about it are not the same sentence: the frozen-contract note in
+// internal/tools/gate.go:12-13 (ticket 17) names exactly TWO fields the card
+// renders VERBATIM - RulesHit and Reason - while the four the L2 card actually
+// carries (Level/RulesHit/Reason/SessionOverrideBlocked) come from the panel's
+// own mapping note at cmd/wisp/panel_pump.go:44-46, which calls that mapping
+// "a copy, not a judgement" and is not a frozen contract. panel.CardViewFromDecision
+// (internal/panel/approval.go:72-88) is where all four are read onto the view.
+// Neither note is enforced by tools/d22scan (its pathresolver-bypass ban is
+// about filepath.Clean/Abs outside risk.PathResolver, and its phantom-citation
+// ban checks only that a cited path exists), so both are conventions this
+// header states rather than invariants a gate checks. Decision is copied per
 // LiveApprovals so writing to it cannot reach the queue; Position is the
 // 1-based place in the FIFO, i.e. the depth badge C18 puts on the card.
 type LiveApproval struct {

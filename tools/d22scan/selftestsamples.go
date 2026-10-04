@@ -29,6 +29,8 @@ var (
 	glyphCircled  = string(rune(0x2460))  // U+2460 - deliberately NOT scanned
 	glyphFace     = string(rune(0x1F600)) // U+1F600 - inside U+1F000-U+1FAFF
 	glyphEllipsis = string(rune(0x2026))  // U+2026 - one of ban #9's three abbreviation marks
+	glyphCJKGlue  = string(rune(0x89c1))  // U+89C1 - a CJK ideograph, which sits INSIDE repoPathRe's
+	// character class: see the CJK-attached case at the end of this table.
 )
 
 // selfCases is the table runSelfTest executes, in the order it prints.
@@ -372,11 +374,11 @@ var selfCases = []selfCase{
 		tag: "phantom-citation", want: wantRing,
 		file: "internal/probe/cites.go",
 		src: "package probe\n\n" +
-			"// Reading the readings first is mandatory; see docs/evidence/s1/212-citation-ruler.md\n" +
+			"// Reading the readings first is mandatory; see docs/evidence/s1/212-comments-phantom-citation-v2.md\n" +
 			"// for the denominators this file was measured against.\n" +
 			"func probe() {}\n",
-		summary: "a comment citing docs/evidence/s1/212-citation-ruler.md, which the fixture does not seed",
-		note:    "Ticket 212's own opening section is the real-world shape: the fixture does NOT create that file, so the citation is phantom and the gate must name it. The repo-wide first firing was internal/risk/pathresolver.go:28.",
+		summary: "a comment citing docs/evidence/s1/212-comments-phantom-citation-v2.md, which the fixture does not seed",
+		note:    "Ticket 212's own opening section is the real-world shape: the fixture does NOT create that file, so the citation is phantom and the gate must name it. The repo-wide first firing was internal/risk/pathresolver.go:28. This token is deliberately a page that EXISTS in the real repo but is not seeded in the fixture: the path 212-r2 first wrote here (docs/evidence/s1/212-citation-ruler.md) existed neither in the fixture nor on disk, which is ticket 212's own shape reported inside the instrument (212-v2 §8 #4) - and tools/** is outside ban #9's range today, so nothing in the real scan could catch it. Re-pointing the string is the fix 212-r3 was told to make; widening the range to tools/** is NOT, and needs an owner.",
 	},
 	{
 		tag: "phantom-citation", want: wantSilent,
@@ -401,5 +403,51 @@ var selfCases = []selfCase{
 		cover:   "internalGo",
 		summary: "CLASS 3 AS A PATH: \"...\", \"*\" and U+2026 inside a repo-relative token stay silent (ticket 212 裁 ⓐ)",
 		note:    "212-v1 §2(d)/§5 AC#3: before the fix, repoPathRe's own character class swallowed the dots, so an abbreviated path reached os.Stat as a full citation and RANG - contradicting the ban's roster line, its scanGoFile comment and this table's own note, all three of which say shorthand is prescribed and not convicted. The exclusion is shorthandPathStarts() in tools/d22scan/main.go. The three spellings here are the three marks the 终裁节 names; all three stand for files the fixture does not seed, so if the exclusion is removed this case rings on every one of them, which is why it is the mutation this leg ran (readings in .scratch/wisp/probes/212/r2/fix-and-readings.md §4, ticket 212-r2). Removing the exemption is a WIDENING of the ban back to the 2026-10-03 shape and needs the same owner approval that adding it did.",
+	},
+
+	// The three cases below are the rest of the exemption's REAL range. 212-v2 §3
+	// measured them on a throwaway tree (its P3/P4/P5: complete name + trailing
+	// "…", complete name + trailing "*", and a CJK-glued tail segment), found the
+	// live count in the repo to be 0, and reported that nothing pinned them - the
+	// behaviour lived only in prose. The orchestrator's ruling (ticket face,
+	// 编排者翻勾节 2026-10-04) is 不收窄豁免: narrowing is a scope change and this
+	// instrument has already had three range edits. So the shapes get SAMPLES and
+	// the self-descriptions get the truth, and the behaviour does not move.
+	{
+		tag: "phantom-citation", want: wantSilent,
+		file: "internal/probe/cites-tail-ellipsis.go",
+		src: "package probe\n\n" +
+			"// 212-v2 P3 shape, verbatim: a COMPLETE phantom path with the mark behind it -\n" +
+			"// docs/evidence/s1/probe-tail-ellipsis.md" + glyphEllipsis + " is the only citation here and the\n" +
+			"// fixture seeds no page that answers it.\n" +
+			"func probeTailEllipsis() {}\n",
+		cover:   "internalGo",
+		summary: "SHAPE 1 (P3): a complete phantom path TRAILING \"…\" stays silent - the exemption is keyed to the region start, not to the mark's position",
+		note:    "Why this is silent and not a hole to hide: shorthandPathStarts() marks the byte offset where an abbreviation REGION starts, and ban #9 skips every repoPathRe token that starts there. Here repoPathRe's own token (docs/evidence/s1/probe-tail-ellipsis.md, without the mark) starts on exactly that offset, so a complete path whose page does not exist goes free because someone typed one glyph after it. 212-v2 measured the live count of this shape in the repo at 0 (its clean-tree fixed/mut token difference is empty), which is the only reason the orchestrator accepted the range instead of narrowing it. NARROWING is a scope change needing an owner (口令 「212 收窄豁免」 on the ticket face) - and the moment someone does it, THIS case rings while it is marked expect-silent, which is the loud flip the pin is for. Readings of the paired mutation: .scratch/wisp/probes/212/r3/fix-and-readings.md §2.",
+	},
+	{
+		tag: "phantom-citation", want: wantSilent,
+		file: "internal/probe/cites-tail-star.go",
+		src: "package probe\n\n" +
+			"// 212-v2 P4 shape, verbatim: the starred spelling of a page nobody seeded -\n" +
+			"// docs/evidence/s1/probe-tail-star.md* is the only citation here, and the mark\n" +
+			"// ends repoPathRe's token but not the region around it.\n" +
+			"func probeTailStar() {}\n",
+		cover:   "internalGo",
+		summary: "SHAPE 2 (P4): a complete phantom path TRAILING \"*\" stays silent - same region-start key, second mark",
+		note:    "The mirror of the case above with the other trailing mark, kept as its own sample because the two marks reach the exemption by different regex steps: repoPathRe's class already swallows \".\", so \"…\" only ever appears AFTER a token has ended, while \"*\" is absent from repoPathRe's class and present in shorthandRegionRe's - so \"*\" is the mark that can truncate a token (see the r2 case's docs/evidence/s1/212-* shape) AND the mark that can trail a whole one. Both consequences are pinned, because a range described once in prose is a range nobody has to obey.",
+	},
+	{
+		tag: "phantom-citation", want: wantSilent,
+		file: "internal/probe/cites-cjk-attached.go",
+		src: "package probe\n\n" +
+			"// 212-v2 P5 shape, verbatim: two citations glued by one CJK character, so the\n" +
+			"// abbreviated tail drags the complete phantom in front of it into its region:\n" +
+			"// docs/evidence/s1/probe-swallowed.md" + glyphCJKGlue + "docs/evidence/s1/... is ONE token to\n" +
+			"// repoPathRe, and nothing inside it exists in this fixture.\n" +
+			"func probeCJKAttached() {}\n",
+		cover:   "internalGo",
+		summary: "SHAPE 3 (P5): a CJK-glued tail segment swallows a complete phantom path on the same line",
+		note:    "The widest of the three, and the reason the exemption cannot be described as \"a mark inside a path\": CJK is inside BOTH regex classes (\\x{4e00}-\\x{9fff}), so with no space to break the run, repoPathRe reports one token spanning both citations and shorthandRegionRe's region starts on the same offset and contains \"...\" - so the first, fully-spelled, non-existent page is never Stat()'d. 212-v2 §3 P6/P8/P9 bound the damage: the same glue WITHOUT a mark still rings, the exemption is computed per comment LINE (c.Text), and a space ends the region. This case is the shape a reader must not have to discover the hard way, which is why main.go's roster entry and its ban #9 comment now name all three.",
 	},
 }

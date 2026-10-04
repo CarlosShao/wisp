@@ -2380,3 +2380,86 @@ func exeSuffix() string {
 	}
 	return ""
 }
+
+// TestBan9PrefixTablesAreTheSameList pins the remainder 212-v2 §8 #3 named:
+// repoPathRe and shorthandRegionRe each carry their own HAND-COPIED list of
+// leading directories, and ban #9's class-3 exemption only covers a tree that
+// appears in BOTH. Add a root to repoPathRe and forget the region table and the
+// abbreviations in that tree start convicting again - ticket 212 AC#3's exact
+// shape, recurring quietly on a prefix nobody was thinking about. Nothing in
+// the self-test or in the scanner can see that, because both regexes compile
+// from literals and only their STARTS have to agree.
+//
+// Why a test and not one shared slice: building both patterns from a single
+// table at init is behaviour-identical, but it moves two published shapes out of
+// the source and into a constructor, and this leg's brief forbids moving
+// behaviour at all. The equality assertion is the check the ticket asked for, it
+// names WHICH list moved, and it cannot be satisfied by deleting the sample or
+// the ban (that pair is auditSelfCases' job, not this one's).
+func TestBan9PrefixTablesAreTheSameList(t *testing.T) {
+	repo, err := regexPrefixAlternation(repoPathRe.String())
+	if err != nil {
+		t.Fatalf("repoPathRe: %v", err)
+	}
+	region, err := regexPrefixAlternation(shorthandRegionRe.String())
+	if err != nil {
+		t.Fatalf("shorthandRegionRe: %v", err)
+	}
+	if len(repo) == 0 || len(region) == 0 {
+		t.Fatalf("an empty prefix table means the helper stopped reading the shape: repo=%v region=%v", repo, region)
+	}
+
+	// Compared as SETS, not as strings: in both patterns every alternative is
+	// followed by a literal "/", so the order of the list cannot change what
+	// either regex matches, and a reordered table is not a bug worth a red.
+	inRegion := map[string]bool{}
+	for _, p := range region {
+		inRegion[p] = true
+	}
+	inRepo := map[string]bool{}
+	for _, p := range repo {
+		inRepo[p] = true
+	}
+	if len(inRepo) != len(repo) {
+		t.Errorf("repoPathRe lists one prefix twice (%v) - a duplicate in an alternation reads as coverage and is neither", repo)
+	}
+	if len(inRegion) != len(region) {
+		t.Errorf("shorthandRegionRe lists one prefix twice (%v)", region)
+	}
+	var onlyRepo, onlyRegion []string
+	for _, p := range repo {
+		if !inRegion[p] {
+			onlyRepo = append(onlyRepo, p)
+		}
+	}
+	for _, p := range region {
+		if !inRepo[p] {
+			onlyRegion = append(onlyRegion, p)
+		}
+	}
+	if len(onlyRepo) != 0 || len(onlyRegion) != 0 {
+		t.Errorf("ban #9's two hand-copied prefix tables disagree: repoPathRe=%v, shorthandRegionRe=%v; only in repoPathRe=%v means a shorthand path there is NOT exempt and class 3 convicts again (ticket 212 AC#3), only in shorthandRegionRe=%v means a COMPLETE phantom path there gets swallowed by the region, which widens the exemption without an owner's approval. Edit both lists in one commit, and read the ban #9 comment in main.go before deciding which shape is intended.", repo, region, onlyRepo, onlyRegion)
+	}
+}
+
+// regexPrefixAlternation reads the leading-directory group out of a pattern
+// written "(?:a|b|c)/rest" - the shape both ban #9 regexes have. It errors out
+// rather than returning an empty list, so rewriting either pattern out of that
+// shape fails the pin instead of silently comparing nothing.
+func regexPrefixAlternation(pattern string) ([]string, error) {
+	if !strings.HasPrefix(pattern, "(?:") {
+		return nil, fmt.Errorf("pattern does not start with a non-capturing prefix group: %q", pattern)
+	}
+	end := strings.Index(pattern, ")/")
+	if end <= 3 {
+		return nil, fmt.Errorf("pattern has no \"(?:...)/\" prefix group to read: %q", pattern)
+	}
+	body := pattern[3:end]
+	parts := strings.Split(body, "|")
+	for _, p := range parts {
+		if p == "" {
+			return nil, fmt.Errorf("empty alternative in the prefix group %q", body)
+		}
+	}
+	return parts, nil
+}

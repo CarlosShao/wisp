@@ -51,8 +51,22 @@
 //	                      path that does not exist on disk (ticket 212: the
 //	                      citation is the next leg's navigation beacon, and a
 //	                      phantom one is worse than none). Judged against the
-//	                      scanned root; shorthand forms are a separate
-//	                      prescription (AC#3), not a violation.
+//	                      scanned root, over the production Go files of
+//	                      internal/ and cmd/ ONLY - tools/** and _test.go are
+//	                      outside this ban's range, so the instrument's own
+//	                      source can hold a phantom beacon (212-v2 §8 #4, and
+//	                      adding either tree is a scope change for an owner to
+//	                      approve, not a test fix). Class 3 - shorthand - is
+//	                      prescribed against and never convicted (AC#3), and
+//	                      the exemption is keyed to the abbreviation REGION's
+//	                      START, not to where the mark sits, which is THREE
+//	                      shapes: a mark inside a half-spelled path, a mark
+//	                      TRAILING an otherwise complete phantom path ("…" or
+//	                      "*"), and a CJK-glued tail segment that pulls a
+//	                      complete phantom into the abbreviation that follows
+//	                      it on the same comment line. All three are pinned
+//	                      expect-silent in selftestsamples.go (212-r3); "a
+//	                      path with no mark in it" still rings.
 //
 // Findings are suppressed only via allowlist.txt entries of the form
 // "ban-id<TAB>repo-relative path prefix<TAB>reason" (committed, reviewable,
@@ -790,15 +804,30 @@ func (s *scanner) scanGoFile(path string) error {
 	// census (212-a2/a3) calibrated is guaranteed by construction here, not by a
 	// line regex. Only fully-spelled repo-relative paths count; shorthand is the
 	// registered ③ class and is NOT a violation (AC#3: prescribe, do not convict).
-	// ③ has two measured shapes, and both are exempt here: prose with no path
-	// token at all ("the 152 ruler"), and a path spelled WITH an abbreviation
-	// mark inside it ("docs/evidence/s1/152-...-accept-r1.md", "…", "*") -
-	// shorthandPathStarts() is what keeps the second shape out of the findings,
-	// because repoPathRe's own character class swallows dots, so an abbreviated
-	// path otherwise reaches the Stat() call and gets convicted for being
-	// unspellable, which is the opposite of what AC#3 prescribes (the ticket's
-	// 终裁节 recorded this as 裁 ⓐ). Existence is judged against
-	// the scanned root so a fixture's citations are judged inside that fixture.
+	// What that actually exempts, stated as the range the code has (212-v2 §3
+	// measured it, 212-r3 pinned it in selftestsamples.go): a comment line that
+	// carries no path token at all ("the 152 ruler" - repoPathRe never fires on
+	// it), plus EVERY token that starts inside a shorthandRegionRe region, i.e.
+	// any run containing "...", "…" or "*". The key is the region's START
+	// offset, so three shapes go free and not one: (1) a mark INSIDE a
+	// half-spelled path ("docs/evidence/s1/152-...-accept-r1.md"), because
+	// repoPathRe's own class swallows the dots and would otherwise send an
+	// unspellable path to the Stat() call and convict it for being shorthand -
+	// the opposite of AC#3, and the reason the ticket's 终裁节 recorded 裁 ⓐ;
+	// (2) a mark TRAILING an otherwise complete path - 212-v2 §3 P3/P4 wrote it as
+	// "whole-page-name…", "whole-page-name*"; (3) a CJK-glued tail segment: one
+	// complete name, one CJK letter, one abbreviation, nothing between them, and
+	// because CJK is inside BOTH classes the whole run reaches ban #9 as ONE
+	// token. Shapes 2 and 3 are the price of 裁 ⓐ: their live count in this repo
+	// is 0 (212-v2 §3, clean-tree fixed/mut token difference empty), which is why
+	// the orchestrator kept the range instead of narrowing it a fourth time
+	// (ticket face, 编排者翻勾节 2026-10-04, 口令 「212 收窄豁免」) - and that is
+	// why each of the three now has its own expect-silent case (SHAPE 1/2/3) in
+	// tools/d22scan/selftestsamples.go, so a future narrowing shows up as a red
+	// direction check and not as a rereading of this comment. A fully-spelled
+	// path with no mark in it still rings.
+	// Existence is judged against the scanned root so a fixture's citations are
+	// judged inside that fixture.
 	for _, cg := range f.Comments {
 		for _, c := range cg.List {
 			pos := fset.Position(c.Pos())
@@ -854,6 +883,10 @@ func (s *scanner) scanGoFile(path string) error {
 // at least one directory separator beyond the prefix so bare "docs" never
 // matches, and must not end mid-word (trailing punctuation like ) , . : is
 // trimmed by the regex via the character class).
+// The leading-directory list below is copied by hand into shorthandRegionRe,
+// and that copy is what makes the two have to move together: an abbreviation in
+// a tree this regex knows but the region table does not would go back to being
+// convicted. scan_test.go's TestBan9PrefixTablesAreTheSameList is the nail.
 var repoPathRe = regexp.MustCompile(
 	`(?:docs|\.scratch|internal|cmd|tools|scripts)/[A-Za-z0-9_./\-\x{4e00}-\x{9fff}]*[A-Za-z0-9_\-]`)
 
@@ -865,6 +898,9 @@ var repoPathRe = regexp.MustCompile(
 // judging the truncated prefix as though someone had cited a complete path.
 // Either way the citation is ticket 212's class ③, which AC#3 says is
 // prescribed against and never convicted.
+// The two regexes differ ONLY in what follows the prefix group: the prefix list
+// is repoPathRe's, transcribed by hand, and TestBan9PrefixTablesAreTheSameList
+// in scan_test.go refuses to let the two transcriptions drift apart.
 var shorthandRegionRe = regexp.MustCompile(
 	`(?:docs|\.scratch|internal|cmd|tools|scripts)/[A-Za-z0-9_./\-\x{4e00}-\x{9fff}*…]*`)
 
@@ -881,6 +917,18 @@ var shorthandRegionRe = regexp.MustCompile(
 // but it is a widening compared to the ban as it shipped on 2026-10-03, and the
 // range is registered in .scratch/wisp/probes/212/r2/fix-and-readings.md §6
 // instead of being left for the next reader to discover.
+//
+// The widening has a third arm that §6 described but did not sample: CJK sits
+// inside this regex's class AND repoPathRe's, so a citation and an abbreviation
+// written with nothing between them ("…md" + one CJK letter + "docs/evidence/…")
+// reach ban #9 as ONE token whose region starts before the complete phantom
+// path - and the whole run stays silent (212-v2 §3 P5). P6/P8/P9 say where that
+// arm stops: drop the mark, put the abbreviation on the next line, or put a
+// space between the two, and the token rings again. Since 212-r3 each of the
+// three arms is pinned expect-silent in tools/d22scan/selftestsamples.go, one
+// case per arm, so this function cannot be edited quietly any more - a
+// narrowing (an owner's call, not a test fix) shows up as a failed direction
+// check. The live count of arms 2 and 3 in this repo is 0 (212-v2 §3).
 func shorthandPathStarts(text string) map[int]bool {
 	starts := map[int]bool{}
 	for _, ix := range shorthandRegionRe.FindAllStringIndex(text, -1) {
