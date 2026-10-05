@@ -64,6 +64,15 @@
 #   GUARD C (AC#3)  the named scopes pin their resolved import paths, so
 #                   deleting an entry (or a glob quietly narrowing) fails the
 #                   step instead of shortening the run.
+#   GUARD D (this ticket's AC#1, added by the r1 leg) the CENSUS refuses to exit 0
+#                   while a package compiles a test file for this GOOS and no tier
+#                   claims it. A/B/C audit the packages a scope NAMES; nothing
+#                   audited the packages a scope FORGETS, which is why "20 of 33"
+#                   could sit in a printed table that exited 0. GUARD C bites when
+#                   a row is deleted from a list that still exists; GUARD D bites
+#                   when the list and its pin are deleted together, and when a new
+#                   package arrives with tests and no entry at all (internal/projctx,
+#                   ticket 200, is the specimen).
 #
 # Usage:
 #   bash scripts/portable-tests.sh                    # the core (ubuntu) CI scope
@@ -93,15 +102,30 @@ fi
 # fail loudly (GUARD C) only works if the list and its pin live together.
 #
 #   core    test-core (ubuntu). Every portable package with a test denominator on
-#           both platforms. ./internal/session/ and ./internal/watchdog/ USED to
-#           be here and are gone: they are doc.go-only boundary stubs
-#           (DEFERRED: ticket 28 / ticket 42), so they could never go red and
-#           never proved anything. ./internal/agent/... is spelled out as agent +
+#           both platforms. ./internal/watchdog/ is NOT here and cannot be: it is a
+#           doc.go-only boundary stub (DEFERRED: ticket 42), so it could never go red
+#           and never proved anything; ./internal/agent/... is spelled out as agent +
 #           agent/approval for the same reason - the glob was quietly carrying
-#           agent/scheduler, a third doc.go-only stub. When those packages get
-#           code, put them back: GUARD A rejects them until they have a test file,
-#           so re-entry cannot be lazy.
-#   windows test-windows' portable step.
+#           agent/scheduler, a second doc.go-only stub. When those packages get code,
+#           put them back: GUARD A rejects them until they have a test file, and
+#           GUARD D names them the moment they do have one and no entry.
+#           ./internal/session/ RE-ENTERED on 2026-10-05 (ticket 111 r1 leg): ticket
+#           111 took it out because it was a doc.go stub, then ticket 224 put
+#           grants.go + session.go (371 lines) and two test files behind it, and
+#           nothing noticed - the package sat at zero CI coverage for four days while
+#           the census that could see it was a command nobody ran. ./internal/projctx/
+#           arrived the same way from ticket 200 (one xtest file, 442 lines, never in
+#           any scope in any commit). Both compile tests on BOTH platforms, both carry
+#           ZERO //go:build lines, ZERO t.Skip, ZERO os.Getenv and ZERO exec.Command
+#           (measured by grep, so neither can hide a skip from runtests.sh), and every
+#           package they import is already in this scope (memory / panel / risk / perm
+#           / config). Their recorded green readings are on WINDOWS hosts
+#           (probes/197/v1/M1a-sweep/run-whole_repository.txt lines 62 and 71, and
+#           probes/200/r2/final-gate-committed.txt:27); the ubuntu reading has never
+#           been taken by anyone, so this row's first ubuntu run is the reading this
+#           leg owes - a red there is a finding to register on the ticket, not a
+#           reason to touch an assertion, a threshold or a build tag (AC#2).
+#   windows test-windows' portable step - the same denominator in its windows shape.
 #   cli     cmd/wisp, whose test binary needs the sherpa DLLs (ticket 98's load
 #           hole) - run by scripts/wisp-cli-tests.sh, which stages them first.
 #   winsec  the internal/winsec tier (ticket 251 AC#1). This tier is NEW: the pin
@@ -158,8 +182,10 @@ github.com/CarlosShao/wisp/internal/panel
 github.com/CarlosShao/wisp/internal/perm
 github.com/CarlosShao/wisp/internal/plugin
 github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/projctx
 github.com/CarlosShao/wisp/internal/risk
 github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/session
 github.com/CarlosShao/wisp/internal/statemachine
 github.com/CarlosShao/wisp/internal/tools
 github.com/CarlosShao/wisp/internal/winsec
@@ -171,8 +197,10 @@ github.com/CarlosShao/wisp/internal/config
 github.com/CarlosShao/wisp/internal/perm
 github.com/CarlosShao/wisp/internal/plugin
 github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/projctx
 github.com/CarlosShao/wisp/internal/risk
 github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/session
 '
 cli_pin='
 github.com/CarlosShao/wisp/cmd/wisp
@@ -213,6 +241,7 @@ core)
         ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
         ./internal/panel/... ./internal/ball/ ./internal/perm/
         ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
+        ./internal/session/ ./internal/projctx/
     )
     pinned=$core_pin
     ;;
@@ -220,6 +249,7 @@ windows)
     scope=(
         ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
         ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
+        ./internal/session/ ./internal/projctx/
     )
     pinned=$win_pin
     ;;
@@ -293,12 +323,42 @@ if [ "$mode" = census ]; then
         } >&2
         exit 1
     fi
-    all=$(go list ./... 2>/dev/null | sort -u)
+    # THE go list CALL, AND WHY IT USED TO DIE WITHOUT A WORD. This block ran
+    # `all=$(go list ./... 2>/dev/null | sort -u)` under `set -eu -o pipefail`, so a
+    # non-zero `go list` aborted the script with rc=1 and ZERO bytes of output -
+    # measured on this host 2026-10-05 14:07 with GOOS=linux (rc=1, stdout 34 lines,
+    # stderr 3 lines, log 0 lines). A red with no words is the "step green can equal
+    # nothing tested" disease wearing the other colour, so the streams are kept
+    # separate and a failed resolve REFUSES out loud, naming its own rc.
+    census_out=$(mktemp 2>/dev/null || echo "$root/.portable-census.$$.txt")
+    census_err=$(mktemp 2>/dev/null || echo "$root/.portable-census-err.$$.txt")
+    go_rc=0
+    go list ./... >"$census_out" 2>"$census_err" || go_rc=$?
+    if [ "$go_rc" -ne 0 ]; then
+        {
+            echo "portable-tests.sh: census - go list ./... exited $go_rc. stdout named" \
+                "$(grep -c . "$census_out" || true) package(s); its stderr said:"
+            sed 's/^/portable-tests.sh:   err| /' "$census_err"
+            echo "portable-tests.sh: refused rather than reported - a roster built on a partial package set"
+            echo "portable-tests.sh: can only UNDER-REPORT holes, which is the exact claim ticket 111 was"
+            echo "portable-tests.sh: filed against. internal/models/assembly_reachability_121_test.go:74-92"
+            echo "portable-tests.sh: records that the non--e form of this query does not succeed for"
+            echo "portable-tests.sh: GOOS=linux (sherpa-onnx-go-linux excludes all its files there), so the"
+            echo "portable-tests.sh: census is wired on the leg where the plain form DOES succeed."
+        } >&2
+        rm -f "$census_out" "$census_err"
+        exit 1
+    fi
+    rm -f "$census_err"
+    all=$(grep -v '^[[:space:]]*$' "$census_out" | sort -u || true)
+    rm -f "$census_out"
     n=$(printf '%s\n' "$all" | grep -c . || true)
     echo "portable-tests.sh: census GOOS=$goos - go list ./... = $n packages (one row each)"
     printf 'portable-tests.sh: %-46s %-11s %s\n' PACKAGE 'TESTS(t/x)' 'CLAIMED BY'
     empty=0
     noscope=0
+    guardd=0
+    unclaimed=''
     while IFS= read -r p; do
         [ -n "$p" ] || continue
         counts=$(go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' "$p" 2>/dev/null || echo '?/?')
@@ -319,13 +379,48 @@ if [ "$mode" = census ]; then
             esac
             if printf '%s\n' "$pin" | grep -qxF "$p"; then where="$where$m"; fi
         done
-        if [ -z "$where" ]; then where=' NO-SCOPE'; noscope=$((noscope + 1)); fi
+        if [ -z "$where" ]; then
+            where=' NO-SCOPE'
+            noscope=$((noscope + 1))
+            # GUARD D's split of the NO-SCOPE rows: `0/0` is a package with no
+            # denominator on THIS platform (GUARD A's business, and a scope entry
+            # for it would be the false claim ticket 111 AC#3 refuses), while
+            # anything else - a non-zero count, or `?/?`/empty because the count
+            # could not be read - is a package with tests that no step will ever
+            # run. Default-deny: an unreadable count is counted as a hole, never
+            # as covered.
+            case $counts in
+            0/0) ;;
+            *)
+                unclaimed="$unclaimed$p  tests-compiled-for-$goos=${counts:-UNKNOWN}"$'\n'
+                guardd=$((guardd + 1))
+                where="$where <-UNCLAIMED-HAS-TESTS"
+                ;;
+            esac
+        fi
         case $counts in
         0/0) empty=$((empty + 1)); where="$where <-NO-TESTS" ;;
         esac
         printf 'portable-tests.sh: %-46s %-11s %s\n' "$p" "$counts" "$where"
     done <<<"$all"
-    echo "portable-tests.sh: census totals: packages=$n with-zero-compiled-tests=$empty claimed-by-no-scope=$noscope"
+    echo "portable-tests.sh: census totals: packages=$n with-zero-compiled-tests=$empty claimed-by-no-scope=$noscope unclaimed-with-tests=$guardd"
+    if [ "$guardd" -ne 0 ]; then
+        {
+            echo "portable-tests.sh: GUARD D - $guardd package(s) compile a test file for GOOS=$goos and"
+            echo "portable-tests.sh:   NO named scope claims them, so no CI step runs them and no CI step"
+            echo "portable-tests.sh:   can ever go red over them:"
+            printf '%s' "$unclaimed" | sed 's/^/portable-tests.sh:   /'
+            echo "portable-tests.sh: this row is the ticket 111 field itself ('CI 只测 33 个包里的 20 个')."
+            echo "portable-tests.sh: The census used to PRINT these rows and exit 0, so the hole was visible"
+            echo "portable-tests.sh: only to whoever thought to run it by hand - which is how internal/session"
+            echo "portable-tests.sh: (2 files, ticket 224) and internal/projctx (1 file, ticket 200) sat at"
+            echo "portable-tests.sh: zero coverage for four days after their tests landed. Pull the package"
+            echo "portable-tests.sh: into a named scope and update that tier's pin in the SAME commit, or"
+            echo "portable-tests.sh: state on the ticket where its coverage lives. What this guard forbids"
+            echo "portable-tests.sh: is the third option: a build tag, a t.Skip or a deleted test."
+        } >&2
+        exit 1
+    fi
     exit 0
 fi
 
