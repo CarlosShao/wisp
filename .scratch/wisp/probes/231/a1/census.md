@@ -118,7 +118,48 @@
 
 ## §3 问三：`cmd/wisp/config_sentences_223r2_test.go` 今天钉着哪几形
 
-未判。
+文件尺＝`wc -l` **124 行**；枚数尺＝`grep -c "^func Test"`＝**1**（唯一用例 `TestTicket223R2FailureSentenceRouting`，`:39`），表里 **8 枚子形**（尺＝数 `{` 条目，`:50`–`:86`，逐枚现读；子用例全名＝`TestTicket223R2FailureSentenceRouting/<表里的中文名>`）。该文件自创建起**零枚后续 commit**（`git log --oneline -- <file>`＝只有 `5a755c3c`）⇒ 票面说的 `:67-69` **未漂**。
+
+### 3.1 三把尺（`:110`／`:114`／`:118`，逐字）
+
+| 尺 | 代码（现读） | 语义 |
+|---|---|---|
+| ①前缀尺 | `:110` `if !strings.HasPrefix(line, tc.wantCause) {` → 红句 `:111-112` `"shape %s is booked %q, want it to open with %q - the two sentences swapped again"` | 操作员句**必须以 `cause=xxx` 开头** ⇒ ⚠ **新增那一支的返回串也必须以 `cause=` 起头**，否则这里红 |
+| ②反向 cause 尺 | `:114` `if strings.Contains(line, tc.notCause) {` → 红句 `:115-116` `"shape %s borrows %q, which is a different pipeline's answer:\n%s"` | 不许借用另一支的 `cause=` |
+| ③反向半句尺 | `:118` `if tc.notFragment != "" && strings.Contains(line, tc.notFragment) {` → 红句 `:119-120` `"shape %s says %q, which contradicts its own cause:\n%s"` | 不许说出与自己归句矛盾的那半句中文 |
+
+读数路径＝生产分类器本体（`:104` `mgr.CheckAndReload()` → `:108` `describeReloadFailure(err)`），种子装配＝`:92` `config.SaveFile(path, config.NewDefaults())` → `:95` `config.NewManager(path, nil)` → `:99` `Sleep(30ms)` → `:100` `os.WriteFile(path, tc.body, 0o600)` → `:103` `Sleep(30ms)` → 重读。⛔ 全表**没有一行种得出"解析得开的未来版"**。
+
+### 3.2 八枚子形逐枚（needle 逐字抄回，行号现读）
+
+| 行 | 子形名（＝表里的 `name`） | 种的 body | `wantCause` | `notCause` | `notFragment` |
+|---|---|---|---|---|---|
+| `:51-53` | `声明当前版_注释以方括号开头_C1` | `"# [fs] 这不是表头\nschema_version = 2\nbroken [[[\n"` | `cause=syntax` | `cause=invalid` | `语法没问题` |
+| `:55-56` | `声明当前版_CRLF_E1` | `"schema_version = 2\r\nbroken [[[\r\n"` | `cause=syntax` | `cause=invalid` | `语法没问题` |
+| `:59-60` | `声明当前版_无空格_G1` | `"schema_version=2\nbroken [[[\n"` | `cause=syntax` | `cause=invalid` | `语法没问题` |
+| `:63-64` | `声明当前版_缩进版本行_L1` | `"   schema_version = 2\nbroken [[[\n"` | `cause=syntax` | `cause=invalid` | `语法没问题` |
+| **`:66-69`** | **`声明未来版_正文语法坏_J1`** | **`"schema_version = 99\nbroken [[[\n"`** | **`cause=syntax`** | **`cause=invalid`** | **`语法没问题`** |
+| `:71-72` | `读不出版本_A1_基线不动` | `"this is not toml [[[\n"` | `cause=syntax` | `cause=invalid` | `语法没问题` |
+| `:78-79` | `声明旧版_坏表头_A2_仍归迁移` | `"schema_version = 1\n[llm\nbroken ===\n"` | `cause=migration` | `cause=syntax` | `""` |
+| `:84-85` | `解析得开_未知键_不抢语法错` | `"schema_version = 2\n\nthis_key_does_not_exist = 1\n"` | `cause=unknown-key` | `cause=syntax` | `""` |
+
+⇒ **今天这张表里 `cause=invalid` 只作为"不许成为"出现（6 次，全是 `notCause`），一次都没作为"必须是"被钉**；`语法没问题` 这半句中文在 `cmd/wisp` 测试侧的全部 7 枚命中（尺＝`grep -rn "语法没问题" cmd/ --include=*_test.go | wc -l`＝7）**全在本文件**，且**全是否定尺**（`:14` 是注释）。
+
+### 3.3 票面 AC#3 复认：前半推翻、后半成立
+
+- **后半"保留 (a) 那形（未来版＋正文坏 ⇒ 仍归语法错）"＝真被这样断着**，物证就是 `:66-69` 这一枚（①②③三把尺双向齐全），223-v2 件 `:208` 也记了"本腿 ②2.3 那发把它打回改前形状时 J1 恰好转红 ⇒ 这颗钉有牙"。⇒ 票面这半句**复认成立**。
+- **前半"`:67-69` 那三形必须改成断新出口"＝推翻**：那三行今天只有**一枚**子形（J1＝(a)），不是三形；(b)(c)(f) 那三形（现读未来版＋解析得开）在常驻表里**根本不存在**，它们只活在 223-v2 的 overlay 台件里（`docs/evidence/s1/223-hot-reload-wiring-v2.md:177` 具名：那枚件"**只 `t.Logf` 读数、零判等**"，物理件 `.scratch/wisp/probes/223/v2/overlay/zz_v2probe_cmdwisp_test.go`）。223-v2 自己给的改法（`:215`）是"**并在 `config_sentences_223r2_test.go` 的表里加一行**"＝**加行**，不是**改那三行**。
+- ⇒ **连带后果（本条是 §4/§6 的承重）**：按票面 AC#3 的"判据形状＝改完跑该用例全绿；**把 AC#2 那分支拿掉必须红**"——今天**拿掉新分支不会红任何一枚现有子形**（8 枚里没有任何一枚种得出那一形），正控**必须先新增一行才谈得上红不红**。票面 现量表第 6 行"要修这句就得同时动那一处断言"因此也**只说对了一半**：动它≠红，**加行**才红。
+
+### 3.4 要修那句，必须同时改／必须不改哪几行（逐枚具名）
+
+| 处置 | 行 | 为什么 |
+|---|---|---|
+| ⛔ **一字不许动** | `config_sentences_223r2_test.go:66-69`（J1） | (a) 形唯一的常驻钉；改了它＝票面 AC#3 后半自己违自己 |
+| ⛔ 不许动 | `:78-79`（A2，`cause=migration` 唯一钉）／`:83-85`（未知键唯一钉） | 新分支不该抢这两形 |
+| ✅ **必须新增**（否则 AC#3 的正控无处跑） | `:50`–`:86` 那张表里加**一行**，body 要"解析得开的未来版"（如 `"schema_version = 99\n\n[ball]\nsize = 64\n"`），`wantCause`＝新出口、`notCause`＝`cause=invalid`、`notFragment`＝`语法没问题` | 只有它种得到 `loader.go:120`；子形名建议沿用表里的中文风格 |
+| ⚠ 建议同批（不改不会红，但牙会变钝） | `config_reload_223_test.go:570-573` 的 `all` 名册（现 8 枚）、`config_reload_perm_223_windows_test.go:112-115` 的名册（现 6 枚） | 这两枚是"各句互斥"的**负钉名册**：新 `cause=` 不进名册 ⇒ 新那一形将来误吞别的形状时没人响 |
+| ⛔ 产品侧唯一位置约束 | 新 `case` 必须写在 `cmd/wisp/config_reload.go:396` **之前** | 写在它后面＝死代码（前缀先命中），新增行会红在①那把前缀尺上、红句是 `the two sentences swapped again` |
 
 ## §4 问四：新增一支会撞谁（`cmd/wisp/**_test.go` 四类尺穷尽）
 
