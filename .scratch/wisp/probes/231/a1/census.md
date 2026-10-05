@@ -213,9 +213,39 @@
 
 **穷尽读数：加一支"新出口＋新表条目"在今天的 `cmd/wisp` 测试面不会红任何一枚**（①②③④四类逐枚判完，红＝0 枚）。真正会红的是**写歪的三种方式**：写晚于 `:396`（暗坑 A）、命名含既有 marker 子串（暗坑 B）、认领串抢走 perm 用例的 body（暗坑 C）。三处"不会红但会变钝／无人管"＝互斥名册没进新形、重复审计行无数得住、同族第二吞点零常驻钉。
 
-## §5 问五：既有定式对照＋票 232 撞行核查
+## §5 问五：既有定式对照 ＋ 票 232 撞行核查
 
-未判。
+### 5.1 规矩出处（逐字，⛔ 不是转述）
+
+- **票 223 AC#4 原文**＝`.scratch/wisp/issues/223-checkandreload-has-zero-production-callers-hot-reload-never-runs.md:37`：
+  `**AC#4 不生效与读不到是两句话**（同票 216 的纪律）：配置文件缺失／语法错／权限不够／热加载被禁用，**四种各一句**，不许合成一句"配置未生效"。`
+  ⇒ 本票 现量表第 3 行说"这正是票 223 AC#4 立的规矩的同族：第五种形状没有自己的那句话"——**出处复认成立**；"第五种"这一说法与 223-v2 件 `:215`（"(b)(c) 这形是**第五件**，票面没写、派单没要求"）逐字对得上。
+- 祖先规矩的件在盘（防幻影引用）：`.scratch/wisp/issues/216-menu-display-base-scrub-control-chars-and-two-sentences.md`（`ls` 现量存在）。
+- **这条规矩在产码里的落地注释**（同一枚函数头上，`cmd/wisp/config_reload.go:342-353`，逐字）：
+  - `:342-349`：`describeReloadFailure turns "the reload did not happen" into one sentence per cause. 票 223 AC#4 forbids collapsing these: a missing file, a file with a syntax error, a file this process may not read and a host that never armed a tick are four different things an operator can fix in four different ways, and one shared "配置未生效" line would be a lie by omission (the same discipline 票 216 set). Each branch is exercised by a planted artifact in config_reload_223_test.go, and each case asserts the OTHER sentences are absent, so the four stay four.`
+  - `:351-353`：`Order carries weight: the io/fs sentinels are checked first, because a failed read also arrives wrapped in a config-class error, and "the file is gone" must not be reported as "the file is invalid".`
+  ⇒ ⚠ **`config_sentences_223r2_test.go:14` 把「语法没问题」定为本形的禁用语**，而 `:349` 那句"asserts the OTHER sentences are absent"就是名册负钉的授权语——**这两条注释合起来就是 AC#2 该照的形状**，落地腿不必自造。
+
+### 5.2 今天已落地的三种形状（给落地腿照形状写，不是自造）
+
+| 范本 | `file:line` | 形状（为什么可照抄） |
+|---|---|---|
+| **甲：同一函数里两枚 sentinel 支** | `cmd/wisp/config_reload.go:356-359`／`:360-363` | 两个"读不到"各占一支，**且每支自带互斥语**：`（这一条只说缺失，不说语法、不说权限）`／`这一条不是语法错，也不是文件缺失`。⇒ AC#2 要的"①这份文件由更新版本写出②本次继续用旧配置③升级或恢复备份才会读它"正好可套这个"**说清自己不是什么**"的尾句形状；且这两支走 `errors.Is`（★机读），与内层四支走 detail 词面（☆）在同一段里并存——**先 sentinel 后 prose** 就是本函数已认的顺序定式（`:351-353`）。 |
+| **乙：三档回执的"两件事都没发生"** | `cmd/wisp/config_reload.go:311-327`（`reportRestartPending`）＋头注 `:307-310` | 注释逐字：`It says the three things the operator needs and cannot derive from silence: which sections, that this run will not use the new values, and WHY …` ＋ `It also says what did NOT happen to the file, because "不生效" and "被丢了" are different fears.` ⇒ 这就是"**一句里带①是什么②没发生什么③为什么**"的现成拼法，与本票 AC#2 要的三项**同构**（AC#2 的③"升级或恢复备份才会读它"在 `cause=migration` 那句 `:394-395` 里已是成品，可直接对齐措辞）。 |
+| **丙：票 268 今天刚落地的具名 provenance** | `cmd/wisp/resident_approval_windows.go:427-462`（常量组），落地笔 `9a941965`（2026-10-05 13:31，`--numstat`＝该文件 **64 增 8 删**＋新测试 `cmd/wisp/resident_approval_risk_268_windows_test.go` **293 行**） | 三枚值逐字：`riskProvenanceRead = "config"`（`:439`）／`riskProvenanceUnreadable = "defaults (config.toml unreadable)"`（`:446`）／`riskProvenanceRefusedAtLoad = "defaults (config.toml present but refused at load)"`（`:457`）。⚠ **与本票最紧的一段是它的注释（`:447-456`，逐字）**：`this word deliberately does NOT name which of those it was, because it cannot tell them apart without reading error prose (see the note on the branch below)`——即 268 **明知**prose 不可分而**故意不细分**；本票 AC#4 的两个候选（按 `observe` 分类码／带互不重叠标记）正是那条"故意不细分"的**上游缺位**。⇒ 落地腿若选"机读标记"路线，**这一处是同一族最近的前例与张力点**，本腿具名交回（⛔ 不裁决）。 |
+
+### 5.3 顺带答：票 232 今天有没有已落地的改动会跟它抢同一行
+
+- 尺一（工单池）＝`ls .scratch/wisp/issues/ | grep -c "^232.*-done"`＝**0** ⇒ 票 232 **未翻 `-done`**；票面 Status 行（`232-the-restart-tier-test-pins-that-the-sentence-exists-not-that-it-carries-the-why.md:3`）＝`**待派，测试面加固**（与票 231 同撞 cmd/wisp/config_reload*.go ⇒ 同批或串行）`。
+- 尺二（`git log --oneline -- cmd/wisp/config_reload.go`，近 6 笔）＝`67ab595d`／`a4906b6c`／`ae60a87c`（三笔都是**票 255 r2**）／`5a755c3c`／`248095d1`／`ec7a034d`（三笔都是**票 223 r1/r2**）⇒ **零笔属 232**。
+- 尺三（`git log --oneline -8 -- cmd/wisp/config_reload_223_test.go`）＝最新一笔 `ae60a87c`（255-r2）⇒ 232 要动的那枚用例文件也**没有 232 的落地笔**。
+- ⇒ **结论：票 232 今天零落地，不存在"抢同一行"的既成事实。** 两票射程现读**不同函数**：231＝`describeReloadFailure`（`:354-409`）；232＝`reportRestartPending`（`:311-327`）＋用例 `TestTicket223RestartTierSaysItWillNotApply`（`cmd/wisp/config_reload_223_test.go:471-511`）。
+- ⚠ **但票 232 自己那组锚已经漂了**（漂因正是 255-r2 的 `ae60a87c`，与本票 §0 表 #2 同一笔）：232 现量表说 needle 在 `config_reload_223_test.go:482-486`／`:481`／`:495-497`；`git show 5a755c3c:` 复算＝`awaitStdout` 那行在 **`:481`**（票面锚当时成立）、needle 组在 **`:482`**、`the restart tier applied mid-run` 在 **`:488`**；**现读 HEAD**＝`awaitStdout` 在 **`:490`**、needle 组在 **`:491`**、那句 `t.Fatal` 在 **`:497`** ⇒ **整体漂 ＋9**，232 落笔前也得自认一遍。
+- ⇒ 真正会撞的是**同两枚文件**（`cmd/wisp/config_reload.go` 与 `cmd/wisp/config_reload_223_test.go`）：231 若按 §3.4 把新 `cause=` 写进 `:570-573` 的名册，就会落在 232 的邻区（232 的补法要改 `:490-495` 的 needle 读取面）⇒ **票面"同批或串行"这条约束现读成立、不是空话**。
+
+### 5.4 本节判语
+
+"不生效与读不到是两句话"的**出处、祖先件、产码注释、测试负钉**四层全部现读复认；三种已落地形状（甲 sentinel＋互斥尾句／乙 三段式回执／丙 具名 provenance）给出成品拼法，其中**丙自带一条与 AC#4 直接相关的反例注释**。**票 232 零落地、无同行争夺**，但它的行号锚与本票同样漂了（＋9，同一笔 `ae60a87c`）。
 
 ## §6 必须交给落地腿的那一页名册
 
