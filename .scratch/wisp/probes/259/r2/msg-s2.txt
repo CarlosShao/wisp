@@ -1,0 +1,29 @@
+票 259 腿 259-r2 第 2 步：AC#1 ⓐ 落地＝注释口径降级（行为零改动，两枚文件）
+
+写面＝internal/agent/approval/approval.go（+79/-7）与 queue.go（+36/-4），删除列⛔ 只落在注释行上。
+七枚注释点（全部只改注释，函数签名/返回值/分支/文案一字未动）：
+1. approval.go 那枚 grant 权威块：把"authority 第三条＝绑定摘要与所花之物相符"改成盘上事实——
+   权威＝原生面到达＋该 nonce 是**这张卡自己的 store** 里的活行＋这枚 item 还没离开 pending；
+   并明写摘要那一层**对跨卡零独立拦截能力**（花侧传的就是存进去的同一个 it.bind）。
+2. approval.go bindDigest：删掉"ties a grant to ONE pending item"那句自称，改为"摘要不决定牌属于
+   哪张卡；决定它的是哪个 grantStore 持有这行"。
+3. approval.go grantStore：指名它是**真防线之一**（成员扫描落到 denialSpentNonce），并写明第二枚
+   guard＝队列的 state 拒绝，同时按票 259 §9 我复认的更正写清 state 关拦的不是跨卡。
+4. approval.go denialMisbound 常量注：指名"没有任何经路由的调用能产出这一枚"，只有包内手递两枚
+   不同摘要的直调 store 用例看得到它（点名的两枚 TestTicket242SpendRejectsForgedBinding...／
+   TestTicket259R1DenialNamesMisbound 逐枚现验在册）。
+5. approval.go spend 上方：同一份摘要两端的具名链路＋ⓐ §2 边界②那条残余风险（若成员扫描或 state
+   拒绝被重构掉，这一句比较里**再没有东西能被察觉**；A619 §2 登记它今天没有任何尺看得见，本腿
+   ⛔ 未种突变，故引用不复测）。
+6. queue.go qitem.bind：原文"so a nonce cannot be replayed onto a different request"就是那句
+   要撤的"能挡跨卡"；改成 guard 1＝store per item／guard 2＝队列 state 拒绝，两处各自拦什么分开写。
+7. queue.go grantNonce 注＋allowScoped 那行 spend 调用点上方：把"两端同源"写在花的那一行旁边。
+
+边界①也照写：降级≠没用——摘要仍是这张卡"一枚牌只花一次"那条记录的内容物，也是 ⓑ 那一刀唯一要
+比的东西；ⓑ 是待设计不是否决（答复面今天没有 tool/args/level/seq，动它＝扩 C17 入向面＝人工批准）。
+⛔ 没动 ui.go 那枚对外合并句（:127-130 零字节）；⛔ 没动票面 AC 框与台账；⛔ 没动任何测试文件。
+
+自证：改动前后 comment-stripped 逐枚 md5 相同（approval.go f8881122…／queue.go 7f2e9289…）；
+go test -count=1 ./internal/agent/approval/ 名册作差零差异（70 枚顶层名／89 行 PASS／0 FAIL／
+1 枚既有 SKIP＝TestDefaultDeadlineWallClockMeasurement，WISP_84_MEASURE 门后，不当通过）；
+go vet rc=0；gofumpt -l 两枚文件空读数（负控同把尺点得出 TEMP 里那枚故意写坏的 probe.go）。

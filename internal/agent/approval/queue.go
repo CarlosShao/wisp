@@ -41,10 +41,25 @@ type qitem struct {
 	// reply carrying one of those names is not a reply for a different request.
 	names []string
 
-	// bind is the digest a grant must match to authorize THIS item. It covers
-	// the correlation id, the task, the tool, the level, the argument bytes
-	// and the sequence number, so a nonce cannot be replayed onto a different
-	// request or onto a later re-issue of the same one.
+	// bind is the digest this item's grant rows are issued against. It covers
+	// the correlation id, the task, the tool, the level, the argument bytes and
+	// the sequence number, so no two items ever hold the same value - not even
+	// the same identity re-queued later (a replay), because seq moves.
+	//
+	// It is NOT what refuses "A's nonce spent on card B", and the wording here
+	// used to say it was. allowScoped spends with this very field, which is the
+	// string grantNonce already put into this item's own store, so the binding
+	// comparison inside grantStore.spend is a value against itself on every
+	// routed call and has zero independent power across cards. The two checks
+	// that do refuse, and where a reader finds them:
+	//   guard 1 - the store is per item: push gives every item its own
+	//   newGrantStore, so B's store holds no row for A's nonce and spend answers
+	//   denialSpentNonce; guard 2 - the queue's state refusals: the statePending
+	//   test in allowScoped before the spend, plus deliver's refusal to settle an
+	//   item twice. Guard 1 is where a cross-card attempt lands; guard 2 is where
+	//   an answer lands after its own card has left pending. Downgrade recorded as
+	//   ticket 259 AC#1 form (a), ledger A619 section 2; the residual risk of it
+	//   is written on grantStore.spend.
 	bind   string
 	grants *grantStore
 
@@ -323,6 +338,13 @@ func (q *Queue) takeAnswer(it *qitem) (answer, bool) {
 // grantNonce mints the single-use native proof for one item. An error means
 // the RNG failed: no prompt may be displayed, because a displayed prompt
 // nobody can authorize is worse than an honest refusal.
+//
+// The row issue writes here carries this item's own bind - and that same field
+// is what allowScoped passes to spend below. Both ends of the spend comparison
+// are therefore set from one item's one value, which is why the binding
+// comparison cannot disagree on a routed call. Which card a nonce is live on is
+// decided by WHICH store the row went into (this one), not by the digest
+// matching. See qitem.bind and grantStore.spend.
 func (q *Queue) grantNonce(it *qitem) (string, error) {
 	nonce, err := mintGrant()
 	if err != nil {
@@ -379,6 +401,16 @@ func (q *Queue) allowScoped(corr, nonce string, forSession bool) error {
 	// grant authorised, and a settled item is the one thing this queue must
 	// never re-describe from a stale pointer.
 	tool := it.Dec.Tool
+	// The second argument is this item's own digest, the string grantNonce
+	// issued into this item's own store, so the binding comparison inside spend
+	// is a value against itself here: this layer stops nothing across cards on
+	// its own. Two checks do, and both are in reach from here - the membership
+	// scan in grantStore.spend (a foreign nonce is not a row in it.grants, which
+	// is B's store when the answer names B), and the statePending test above plus
+	// deliver's own settled check below. Recorded as ticket 259 AC#1 form (a),
+	// ledger A619 section 2. The residual risk of that downgrade - if either
+	// check is ever refactored away, this comparison has nothing left to notice,
+	// because it compares a value to itself - is on grantStore.spend.
 	denial := it.grants.spend(nonce, it.bind)
 	q.mu.Unlock()
 	if denial != denialNone {

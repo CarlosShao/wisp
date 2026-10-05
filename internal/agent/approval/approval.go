@@ -354,9 +354,35 @@ func (r *ChannelRegistry) check(ch Channel) error {
 // from crypto/rand.
 //
 // Authority for an allow answer is therefore: (1) the answer arrived on the
-// native API surface, (2) it presented a live grant for THIS pending item, and
-// (3) the grant's binding digest matches the item it is spent on. The
-// caller-settable Request.Source string is logged and never consulted
+// native API surface, (2) the nonce it presented is a live row in the store OF
+// THE CARD it is being spent on - grantStore is one per pending item, and
+// Queue.allowScoped reaches it only through the item the queue issued that key
+// for - and (3) the item has not already left pending. (2) and (3) are the
+// load-bearing pair, and (2) is the one a cross-card attempt lands on: A's
+// nonce is not a row in B's store, so spend answers denialSpentNonce.
+//
+// The binding digest is NOT a fourth gate, and it stops nothing across cards
+// on its own. Every routed call spends with the digest this same item's store
+// was issued (Queue.allowScoped passes it.bind; grantNonce issues it.bind into
+// that store; push writes it.bind once, from bindDigest), so the two sides of
+// the comparison inside spend are one string by construction - that branch
+// cannot come out unequal on any path the gate can reach. Ticket 259 AC#1 chose
+// form (a) for this: a NAMED DOWNGRADE of what the code claims, not a fix of it
+// (ledger A619 section 2 of docs/reports/pending-and-issues.md, which also
+// carries the revocation phrase for that choice). The three sites to read for
+// yourself are Queue.allowScoped's spend call, grantNonce's issue and
+// grantStore.spend; the wording on each of them is the same reading.
+//
+// Downgraded is not the same as unused, and this is the boundary of that claim:
+// the row is what spend deletes, so single-use lives in the row, and the digest
+// is that row's content - one of the two places this layer records which card a
+// proof was minted for, the other being which store holds it. It is also the
+// half a form-(b) check would need: recomputing the binding from the request
+// the answer actually carried has to compare against something. Form (b) is on
+// hold as UNDESIGNED, not rejected: the answer surface carries no tool, args,
+// level or sequence to recompute from, so it begins by widening C17's inbound
+// face, which is human-approval territory.
+// The caller-settable Request.Source string is logged and never consulted
 // (rulings M-7 / C-3 in docs/reports/pending-and-issues.md: a security
 // decision keyed on a caller-controlled selector fails open).
 const grantBytes = 32
@@ -375,9 +401,17 @@ func mintGrant() (string, error) {
 	return grantPrefix + hex.EncodeToString(buf), nil
 }
 
-// bindDigest is the domain separator that ties a grant to ONE pending item.
-// Two items with the same correlation id at different times (a replay) still
-// differ, because the sequence number is folded in.
+// bindDigest folds one card's identity - correlation id, task, tool, level,
+// sequence number, argument bytes - into the value that card's grant rows
+// carry. Two items never share a digest, not even a replay of the same identity
+// at a later time, because the sequence number is folded in.
+//
+// "Which card a nonce belongs to" is NOT decided by comparing anything to this
+// digest; the wording here used to say that it was ("ties a grant to ONE
+// pending item"). The digest is per-item data: the check that really decides
+// the card is which grantStore holds the row (see grantStore below), and every
+// routed spend call hands the comparison this same field (see Queue.allowScoped
+// and spend). The block above grantBytes carries the whole of the downgrade.
 func bindDigest(corr, taskID, tool, level string, seq uint64, args []byte) string {
 	sum := sha256.New()
 	for _, s := range []string{corr, taskID, tool, level, strconv.FormatUint(seq, 10)} {
@@ -398,7 +432,15 @@ func equalSecret(a, b string) bool {
 	return subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
 }
 
-// grantStore holds the live nonces of one pending item. Every entry is
+// grantStore holds the live nonces of one pending item - ONE ITEM, and that
+// per-item split is the check that really does refuse "A's grant spent on card
+// B": a nonce minted for another card is not a row in this store, so spend's
+// scan falls through to denialSpentNonce and the binding comparison is never
+// even reached. Its companion guard is the queue's state refusals (the
+// statePending test in Queue.allowScoped and deliver's refusal to settle an
+// item twice), which refuse an answer that arrives after its own card left
+// pending - not a cross-card attempt, because the other card is sitting there
+// pending. qitem.bind carries both guards and what each covers. Every entry is
 // single-use: spending deletes it, and so does answering or expiring, so a
 // screenshot of a dismissed card cannot authorize anything afterwards.
 type grantStore struct {
@@ -450,6 +492,12 @@ const (
 	denialSpentNonce
 	// denialMisbound: the proof IS live on this card, but the binding digest
 	// it was issued under does not match the one it is presented against.
+	// No routed call can produce this value - Queue.allowScoped presents the
+	// item's own stored digest - so the only callers that reach it are inside
+	// this package and hand spend two different digests by hand: that is what
+	// TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce and
+	// TestTicket259R1DenialNamesMisbound do at the store. Those cases pin the
+	// store part; they cannot and do not say anything about the route.
 	denialMisbound
 	// denialNotPending: the item exists but already left the pending set, so no
 	// proof of any quality could be spent on it. Produced by the queue (the
@@ -482,6 +530,30 @@ func (d grantDenial) label() string {
 // byte-for-byte equivalent in outcome: the nonce is consumed whether or not the
 // binding matched (a rejected caller cannot retry), and an unknown value
 // deletes nothing. What changed is only that the branch taken is now reportable.
+//
+// What the bind argument is on a routed call: the only production caller of this
+// function is Queue.allowScoped, which passes the item's own it.bind - the same
+// string grantNonce wrote into this store through issue - so the comparison
+// below is a value against itself, and the membership scan is what decides the
+// answer. The binding line has ZERO independent power over a grant aimed at the
+// wrong card; the guard inside this function is that scan, and it works only
+// because the store is one per item.
+//
+// Residual risk, stated where a reader looks for the guard (ticket 259 AC#1
+// form (a) boundary 2, ledger A619 section 2): if the membership scan below or
+// the queue's state refusals are ever refactored away or reordered - a spend
+// that answers denialNone on a nonce it merely recognised, or an allow route
+// that reaches this function without the statePending test - the line below has
+// nothing to notice, because a comparison of a value to itself reports success
+// for exactly the calls both guards would have refused. The cases that reach
+// denialMisbound all call this function directly with two hand-written digests
+// (TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce and
+// TestTicket259R1DenialNamesMisbound), so none of them can tell a routed
+// identity from a routed disagreement. A619 §2 registers that refactor as
+// invisible to today's rulers; this leg seeded no mutation, so it cites that
+// reading rather than re-measuring it. Making this line bear real weight is
+// form (b) - recomputing the digest from the request the answer carried - which
+// is blocked on widening the answer surface, not on a line of code.
 func (s *grantStore) spend(nonce, bind string) grantDenial {
 	if nonce == "" {
 		return denialMissingNonce
