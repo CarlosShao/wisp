@@ -123,7 +123,7 @@ r1b §2 的 5 枚结论本腿**逐枚复认**（下 1–5 全"已在册"），�
 | 6 | `internal/session` | 2 | 0 枚带 tag | 2/0 | core+windows（1bb654e3） | 见下 |
 | 7 | `internal/projctx` | 1 | 0 枚带 tag（外部测试包 `package projctx_test`） | 0/1 | core+windows（1bb654e3） | 见下 |
 
-1. **internal/ball** — 复认 r1b。tag 现量：`//go:build windows` 6 枚（`hotkey_borrow_refused_260r5`／`hotkey_cancel_borrow_260`／`hotkey_cancel_borrow_expect_260r2` 等）、`windows && winlive` 5 枚（`hotkey_live`／`interaction_live`／`live_windows`／`live_guard_windows`／`hotkey_cancel_borrow_live_260`）、无 tag 5 枚（`dock`／`liquid`／`position`／`tokens`／`tokens_table`，本腿逐枚 `head -1` 复认）。**算术自证**：16−5(windows)−5(winelive)＝6 枚进得了 windows 分母，census 实测 **11**＝6 带 tag＋5 无 tag ⇒ **那 5 枚 winlive 今天连编译都没编译**（§2.8）。新依赖无。最坏颜色：ubuntu 若有平台 bug＝普通红即发现。**已在册。**
+1. **internal/ball** — 复认 r1b。tag 现量：`//go:build windows` 6 枚（`hotkey_borrow_refused_260r5`／`hotkey_cancel_borrow_260`／`hotkey_cancel_borrow_expect_260r2` 等）、`windows && winlive` 5 枚（`hotkey_live`／`interaction_live`／`live_windows`／`live_guard_windows`／`hotkey_cancel_borrow_live_260`）、无 tag 5 枚（`dock`／`liquid`／`position`／`tokens`／`tokens_table`，本腿逐枚 `head -1` 复认）。**算术自证**（逐枚 python 数，21:3x 复算）：16 枚− 5 枚 `windows && winlive` ＝ **11** 枚进得了 windows 分母，其构成是 6 枚 `windows` ＋ 5 枚无 tag，census 实测正是 **`t=11`** ⇒ **那 5 枚 winlive 今天连编译都没编译**（§2.8）。新依赖无。最坏颜色：ubuntu 若有平台 bug＝普通红即发现。**已在册。**
 2. **cmd/wisp** — 复认 r1b 的 tag 计数并补精确分布：22 `windows`／6 `windows && winlive`／1 `!windows`（`secret_dataroot_119b_test.go:1`）／**36 无 tag**＝65。windows 侧 census `t=58`＝22＋36 ⇒ **6 枚 winlive 同样零编译**；`t=58` 里不含那枚 `!windows`。runner 只 `cli` 档，由 `scripts/wisp-cli-tests.sh`（ci.yml `:507`）在 windows 腿跑，缺 sherpa DLL 时它 `exit 1` 点名缺哪个（`:74-99` 预检）。**已在册（cli）。** ubuntu 半边见 §2.9。
 3. **internal/perm** — 复认：3 枚 `head -1` 全是 `package …`，无一行 `//go:build`（`grep -c` 命中 0）。无新依赖。普通红。**已在册。**
 4. **internal/plugin** — 复认：`disposal_test.go` 无 tag，census `1/0`。普通红。**已在册。**★这枚同时是 §3.2 GUARD D 正控的靶件。
@@ -328,7 +328,7 @@ r1b §3 记的行号（A`:477`／B`:643`／C`:455`）在 1bb654e3 之后**一律
 | `✔` | U+2714 | 4 | **是** |
 | `✗` | U+2717 | 4 | **是** |
 
-带内合计 **101** 枚；`⇒` 另 111 枚（不在带内）。测量时刻 `2026-10-05 21:32:24 +0800`，对象＝当时工作树全文（538 行／53,285 字节；本节定稿后只改过 ASCII 数字，枚数仍成立）。
+带内合计 **101** 枚；`⇒` 另 111 枚（不在带内）。测量时刻 `2026-10-05 21:39:54 +0800`，对象＝当时工作树全文（540 行／54,181 字节；本节定稿后只改过 ASCII 数字（数字不在带内，故枚数仍成立；但数字位数会动字节数，所以这一格的字节数是**最终态**而不是该时刻的））。
 
 复量命令（验收方自复，不必信我这张表；**故意写成 ASCII 转义**，否则这条命令自己就含 10 枚带内字符，枚数会被它自己顶漂——这是我这两格里踩到的第二个自指坑）：
 
@@ -382,7 +382,7 @@ print([(hex(ord(c)),s.count(c)) for c in \
 
 **现状（三条都是现量，见 §2.8）**：ci.yml `winlive` 命中 **0**／ci.yml 无 `-tags`、无 `GOFLAGS`／
 `portable-tests.sh` 与 `runtests.sh` 的 `tags|GOFLAGS` 命中各 **0**。编译侧自证：
-`ball` 16 枚文件 − 5 枚 `windows` − 5 枚 `winlive` ＝ 6 枚可进 windows 分母，census 实测 `t=11`＝6＋5 无 tag ⇒ **那 5 枚 winlive 连编译都不参与**；
+`ball` 16 枚文件 − 5 枚 `winlive` ＝ 11 枚进 windows 分母（构成：6 枚 `windows` ＋ 5 枚无 tag），census 实测正是 `t=11` ⇒ **那 5 枚 winlive 连编译都不参与**；
 `cmd/wisp` 65 − 22 − 6 − 1(`!windows`) ＝ 36 无 tag，census `t=58`＝22＋36 ⇒ **同理 6 枚不参与**。
 
 **真接入要动哪几行（逐行，不笼统说"改 ci.yml"）**：
@@ -503,9 +503,9 @@ print([(hex(ord(c)),s.count(c)) for c in \
 
 ⛔ 本票面 `AC#1–AC#10` 的勾框**不由任何实现腿做**（`AGENTS.md §0` 第 3 句：裁决者≠实现者；D22 双角色）。
 
-### 6.4 ★本腿自查到的**三处自身失手**（逐条给"初稿写了什么／真身是什么／怎么改的"，不藏）
+### 6.4 ★本腿自查到的**四处自身失手**（逐条给"初稿写了什么／真身是什么／怎么改的"，不藏）
 
-对抗验收要攻的就是这三类，我先自己交出来：
+对抗验收要攻的就是这四类，我先自己交出来：
 
 1. **§4.5 初稿**："我没有写 `✓`(U+2713) 或 `≤`(U+2264)" ⇒ **假的**。带内字符本件共 **101** 枚，`≤`／`✓` 就在我抄 AGENTS.md 的引文里，
    而我为了说清"哪些算带内"又把 `PLAN.md:3449` 的禁令清单（含 `✓ ✔ ✗ ⚠ ★ →`）抄进文件 ⇒ **引文自己又添了几枚**。
@@ -516,7 +516,9 @@ print([(hex(ord(c)),s.count(c)) for c in \
 3. **§5.1 初稿**："11 枚里 **3 枚**文件自带 `t.Skip`" ⇒ **数错**，逐枚 `grep -c` 复算＝**5 枚文件／合计 13 处**
    （`hotkey_live` 4／`resident_hotkey_live_258` 4／`interaction_live` 2／`live_windows` 2／`live_guard_windows` 1，其余 6 枚 0）。
 
-⇒ **共同成因**：三条都是"我先在别处目测／凭上下文记忆写了一句可以直接 grep 的话"。
+4. **§2 第 1 条与 §5.1 的 ball 算式**：初稿写"16 枚− 5(windows)− 5(winelive)＝6 枚进得了 windows 分母"，把 `windows` 的枚数当成了 **5**，真身 **6** 枚（逐枚 python 数：6 枚 `windows` ＋ 5 枚 `winlive` ＋ 5 枚无 tag ＝ 16）。错处在"减对了数、贴错了名字"：凑出来的 6 其实是 windows 的枚数、不是无 tag 的枚数，而 census 的 `t=11` 正好等于 6＋5，两侧一比对就露。更正方式：换成不绕的写法——"16 枚减 5 枚 winlive ＝ 11 枚进分母，构成 6 windows ＋ 5 无 tag"，§2 第 1 条与 §5.1 现状段**两处同批改**（只改一处会自相矛盾）。
+
+⇒ **共同成因**：四条都是"我先在别处目测／凭上下文记忆写了一句可以直接 grep 的话"。
 本腿后半程的规矩改成：**枚数一律当场 grep/python 数，数完立刻贴到当条句子旁边**（§2 表、§4.6 表、§5.1 那 5 枚都是这么重做的）。
 
 ### 6.5 收尾读数（三发，全带时刻，证明"交件形状"没把门碰坏）
