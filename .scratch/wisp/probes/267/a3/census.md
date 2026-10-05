@@ -25,11 +25,11 @@
 | 6 | `cmd/wisp/resident_approval_windows.go:746` | `审批门已装配进本进程（取消通道：%s 已加载；等待中的确认项：%d）` | 无秒数（`%d`＝队列深度） | 不说谎 |
 | 7 | `internal/tools/bridge.go:467` | `审批超时未确认，已自动拒绝`（`orDefault(why, …)`＝`why` 为空的兜底句） | 无秒数 | 不说谎；形状是「不含数字的兜底」，配任何值都不会与它矛盾 |
 | 8 | `internal/agent/prompt.go:63` | `不可逆或越界操作必须先经用户确认，确认超时视为拒绝。`（进模型提示词，`prompt_test.go:268` 逐字钉 needle） | 无秒数 | 不说谎（这把尺不量秒数） |
-| 9 | `internal/config/unwired.go:121` | `consumed: cmd/wisp/run.go and cmd/wisp/resident_approval_windows.go both build the approval timeout from it (the resident leg since ticket 256); ticket 267 bands it [31, 3600] at load` | 无秒数，但**断言「consumed」** | ★**本腿判出的唯一一枚"配而不生效就会说谎"的现成文案**：它今天声称两枚消费点都从它建超时。`Q-77` 若判甲（配了不真生效），说谎的就是这一行；判乙则它为真。名册归本腿，**裁定归机主** |
+| 9 | `internal/config/unwired.go:121` | `consumed: cmd/wisp/run.go and cmd/wisp/resident_approval_windows.go both build the approval timeout from it (the resident leg since ticket 256); ticket 267 bands it [31, 3600] at load` | 无秒数，但**断言「consumed」** | ★**判甲方向（"配了但不真生效"）唯一一枚会当场变成假话的现成文案**：它今天声称两枚消费点都从它建超时。反方向（判乙＝真生效）会说谎的不是文案，而是 §3 L3（日志字面 `DefaultApprovalTimeout=300s`）、§3 L5／§2.3（事件名 `approval.timeout-300s` 与状态机表里那枚 300s）。`Q-77` 若判甲，说谎的就是这一行；判乙则它为真。名册归本腿，**裁定归机主** |
 | 10 | `cmd/wisp/config_reload.go:224`／`:229` | 放宽未确认／已确认两条款回执 | 无秒数 | 不说谎 |
 | 11 | `internal/panel/pump.go:50-53`（注释自陈） | 逐字：`the no-source list is seven: approval.remainingMs joins it, because the L1 countdown has no producer either - approval.EventTick is declared and emitted nowhere in the tree, the Remaining that is emitted carries the static window length` | 面板快照**没有**审批剩余秒数这一栏 | **不说谎＝也是沉默面**：快照里根本没有 `remainingMs`，所以配 90 也不会有一栏写 300。本腿用第二把尺独立复认：`json:"(timeout\|window\|deadline\|remaining\|expire\|warn)[^"]*"` 在 `{cmd,internal}` **零命中** ⇒ 两把尺同向。（gate.go:274/:387/:510-513 那三枚行号是**该注释引用他票的读数**，本腿未复测，见 §7 G-4） |
 
-**用户可见文案的说谎数＝0 枚（Go 侧），另 1 枚条件性说谎（#9）。** 但「不说谎」不等于「说全」：#3／#5 两片把「卡片还会等多久」这件事**完全不打印**，机主把 300 改成 90 之后，屏幕上既不会有假的 300，也不会有真的 90——这一格是**沉默**，不是谎。
+**用户可见文案的说谎数＝0 枚（Go 侧），另 1 枚**条件性**说谎（#9，方向＝判甲）。** 但「不说谎」不等于「说全」：#3／#5 两片把「卡片还会等多久」这件事**完全不打印**，机主把 300 改成 90 之后，屏幕上既不会有假的 300，也不会有真的 90——这一格是**沉默**，不是谎。
 
 ⚠ **审批卡／托盘／悬浮球／面板 HTML 上的字（「5 分钟」这类人话最可能落点）属页面侧：`frontend/**` 与 `design/**` 两棵树本编队不许读，故"页面上有没有写死的 300 秒／5 分钟"这一格本腿量不到，需机主带去他用的那枚 agent 另查。** 派单点名的四类可见面里，球与托盘的**文字渲染**同样落在那两棵树（Go 侧只 `SetState` 一个状态名，`ball_windows.go:309-311` 注释逐字「the consumer drives this after its statemachine dispatch」＝球不自带计时器）。
 
@@ -39,7 +39,7 @@
 
 - 定义：`internal/agent/approval/queue.go:107` 逐字 `DefaultApprovalTimeout = 300 * time.Second`（同段 `:106` 注释逐字 `// DefaultApprovalTimeout: 「超时 300s 一律判拒绝」. Never an infinite wait.`，注释豁免 d22scan 的 emoji 尺，但它是**人读的 300**）。
 - **生产引用者＝1 枚**：`internal/agent/approval/queue.go:86`（`NewQueue` 的 `timeout <= 0` 兜底；兜底**不看 config**，只看调用方给没给值）。
-- 生产侧"非引用者"的 300 落点（**字面串**，不是常量）：`cmd/wisp/resident_approval_windows.go:456`（日志，见 §3）、`:445`／`:296`／`:308`／`:309`、`cmd/wisp/resident_windows.go:129`、`cmd/wisp/config_reload.go:50`、`internal/config/manager.go:26`、`internal/tools/gate.go:86`、`internal/perm/store.go:86`、`internal/risk/mode.go:32`、`internal/agent/approval/{doc.go:6,21,82,59; gate.go:30,499; approval.go:21; queue.go:59,82; panel/composer_handlers.go:23}`＝**注释与包文档**，不进屏幕。
+- 生产侧"非引用者"的 300 落点（**字面串**，不是常量）：`cmd/wisp/resident_approval_windows.go:456`（日志，见 §3）、`:445`／`:296`／`:308`／`:309`、`cmd/wisp/resident_windows.go:129`、`cmd/wisp/config_reload.go:50`、`internal/config/manager.go:26`、`internal/tools/gate.go:86`、`internal/perm/store.go:86`、`internal/risk/mode.go:32`、`internal/agent/approval/{doc.go:6,21; gate.go:30,499; approval.go:21; queue.go:59,82}`、`internal/panel/composer_handlers.go:23`＝**注释与包文档**，不进屏幕。
 - 测试引用者（**与生产分开**）：`cmd/wisp/resident_approval_risk_256_windows_test.go:141,144,214,229,237`；`internal/agent/approval/ticket84_no_owner_test.go:105,108,110,113,114,232,233,253,254,256,257`；`internal/agent/approval/queue_test.go:48`。
 
 ### 2.2 schema 默认值
@@ -102,7 +102,7 @@
 | D9 | `docs/specs/SPEC-02-data-storage.md:162` | `**进程启动后延迟 5 分钟跑一次 + 每 24h 一次**` | 〔冻结〕★**假阳性登记**：这是 `RetentionJob` 的 5 分钟，与审批超时无关。本腿把它列出来是因为同名尺（`5 ?分钟`）会命中它，别让它被当成第二枚说谎面 |
 
 叙述件（非冻结，机主会读，本腿只列不改）：`docs/reports/missing-features-2026-09-29-v4.md:194`（`confirm_timeout_sec` 300 一行）；`docs/evidence/s1/246-resident-task-source-v2.md:112/:212`、`docs/evidence/s1/248-settings-write-path-r1.md:301-305`、`docs/evidence/s1/90-adversarial-acceptance.md:272`、`docs/evidence/s1/128-ac4-r1-acceptance.md:425`（引了一句红测试的原文，内含「审批超时（300 秒未确认）」）、`docs/evidence/s1/84-ac1-bounded-wait.md:25`。台账 `docs/reports/pending-and-issues.md:11761`（`Q-77` 本体）／`:11829`／`:10107`——**⛔ 本腿不碰台账**（`:11932` 那种派单记述同理只读）。
-文档面判语：**冻结件里 5 枚把 300s 写成数字（D1／D2／D3／D4／D6／D7／D8 共 7 枚，其中 D3／D6 是"默认值"形状、D1／D2／D4／D7／D8 是"契约值"形状）**。`Q-77` 判乙（配置真生效）之后，"契约值"那 5 枚并不会立刻假——300 仍是**默认**；真正会被变成假话的是把它们读成"固定值"的那类表述，其中**唯一一枚把 300s 写成用户愿望的是 D7（SPEC-00 场景 33）**。这一格判语归机主。
+文档面判语：**把 300 写成数字的冻结件共 7 枚（D1／D2／D3／D4／D6／D7／D8）——其中 2 枚是"默认值"形状（D3 `\`confirm_timeout_sec\`(300)`、D6 `\`confirm_timeout_sec(int)=300\``），5 枚是"契约值"形状（D1／D2／D4／D7／D8）**。`Q-77` 判乙（配置真生效）之后，"契约值"那 5 枚并不会立刻假——300 仍是**默认**；真正会被变成假话的是把它们读成"固定值"的那类表述，其中**唯一一枚把 300s 写成用户愿望的是 D7（SPEC-00 场景 33）**。这一格判语归机主。
 
 ## §5 会因配置生效而红的测试钉
 
@@ -120,7 +120,7 @@
 | `cmd/wisp/resident_approval_risk_256_windows_test.go:141-144` | `if got := ra.gate.Queue().Timeout(); got != approval.DefaultApprovalTimeout { … "(300s is the contract default; a fourth number here means the fallback grew a value of its own)" }` | ★**这一枚就是"§3 L3 那句字面 300"的守门钉的反面**：兜底若长出第四个数就红；但 `resident_approval_windows.go:456` 那句**字面串不在它的射程里**（它测 `Queue().Timeout()`，不测日志文案）⇒ 改了 `:456` 的字面，**没有尺会红** | 不红 |
 | `cmd/wisp/resident_approval_risk_256_windows_test.go:214,229,237` | `wantTime: approval.DefaultApprovalTimeout`（种子分别是 `l1_window_sec = 2`／`= 99`／`= 1`，都没写 `confirm_timeout_sec`） | ⇒ 它们断言的是等式「**schema 默认 300 ＝＝ 编译常量 300**」；`default:"300"` 或常量任一改动都红 | 不红（各自的 `t.TempDir()` 里没有 90；`45`／`90` 那几枚种子另见 5.3） |
 
-**A 类具名落点＝9 枚（分 6 组）。** 附带一条本腿现量的空白：**`internal/config` 里零枚钉子钉住 `default:"300"` 本身**（尺＝`ConfirmTimeoutSec` 在 `internal/config` 的 21 枚命中，无一行与 300 作相等断言；同族键 `warm_timeout_sec` 倒是有 `loader_test.go:73` 那种默认值钉）。⇒ 今天"schema 默认 300 ＝ C18 的 300"这枚等式**只在 `cmd/wisp` 那三枚 256 钉子里被守着**。
+**A 类具名＝6 组钉子，按"断言条件"数共 9 枚（`queue_test.go:48`、`batch_test.go` 那枚未读到条件体见 §7 G-5、`ticket84:108`／`:113`／`:232`／`:253`／`:256`、`256_test:141`、`256_test:251`），另有 3 枚表项 `wantTime`（`256_test:214/229/237`）挂在 `:251` 那一枚条件上。** 附带一条本腿现量的空白：**`internal/config` 里零枚钉子钉住 `default:"300"` 本身**（尺＝`ConfirmTimeoutSec` 在 `internal/config` 的 21 枚命中，无一行与 300 作相等断言；同族键 `warm_timeout_sec` 倒是有 `loader_test.go:73` 那种默认值钉）。⇒ 今天"schema 默认 300 ＝ C18 的 300"这枚等式**只在 `cmd/wisp` 那三枚 256 钉子里被守着**。
 
 ### 5.2 B 类＝文案 needle 钉（钉"话里有没有某句"）
 
@@ -140,7 +140,7 @@
 | `cmd/wisp/panel_pump_test.go:124,136` | 注释 `confirm_timeout_sec = 2, so the case can watch an L2 card open and close` ＋ 逐字 `[]byte(string(old)+"\n[risk]\nconfirm_timeout_sec = 2\npermission_mode = \"ask_high_risk\"\n")` | 同上：这一枚**只有配置真生效才有意义**；2 带外 |
 | `cmd/wisp/run_mode101_test.go:110` | `riskLines := "[risk]\nl1_window_sec = 1\nconfirm_timeout_sec = 1\n"` | 1 带外；`docs/evidence/s1/128-ac4-r1-acceptance.md:425` 记过它红句「配置里写着 confirm_timeout_sec = 1 却被默认值取代」＝**同一格的历史读数，本腿不重跑** |
 | 另 4 枚（**他腿读数，本腿未复量**） | `approval_seam_201_test.go:50/:138`、`ticket224_assembly_test.go:81/:234` 各喂 20 | 出处＝同票 `267-a2` 的 §0／§1／§2 普查（本腿只引不抄，其 commit 见 `git log`：`89976ed1`／`c9600334`） |
-| 带内、门不撞（具名以免被误登记） | `resident_approval_risk_256_windows_test.go:159/202/221/286`（45）、`:293/:325`（90）；`unwired_test.go:66`（300）、`:188`（60）；`boundary_test.go:142`（60，断言体见 §7 G-5）；`validate_test.go:236`（31）／`:240`（30，**这条就是门的钉子本身**） | 全在 `[31,3600]` 内或本就是拒带外的正向钉 ⇒ **★90 这一枚已经有测试在守**（`256_test:293/:325` 种 90 并要求 `Queue().Timeout() == 90s`）——这一条对机主最有用：**常驻腿的"配 90 真生效"今天已被钉住，唯独这一格属 `Q-77` 未定的"该不该"** |
+| 带内、门不撞（具名以免被误登记） | `resident_approval_risk_256_windows_test.go:159/202/221/286`（45）、`:293/:325`（90）；`unwired_test.go:66`（300）、`:188`（60）；`boundary_test.go:142`（60，断言体见 §7 G-5）；`validate_test.go:236`（31）／`:240`（30，**这条就是门的钉子本身**） | 全在 `[31,3600]` 内或本就是拒带外的正向钉 ⇒ ★**「配 90 真生效」这一格今天已被 `256_test:284-327` 钉住，但钉的是"重建后才生效"那一半**：`:286` 种 45 建门 → `:293` 把文件改成 90 → `:310` 逐字要求**已建好的门仍是 45s**（红句 `"the live gate moved from its construction value (%v) to %v after config.toml changed."`＝**构造期取值、不热生效**）→ `:324-325` 再要求重建的新门读到 90s。同段 `:311-314` 逐字承认：若将来给 `[risk]` 加了 re-apply 路径，这一枚就红，「ticket 256's stated limitation is obsolete and has to be re-adjudicated, and the 255/265 wording for the ⓑ sentence with it」。⇒ **生效时机（重启／重建 vs 热生效）是 `Q-77` 的第三维**，本腿在 §9 单独立一条给机主；本腿不裁 |
 
 **§5 判语：因"用户配 90 且真生效"而必红的测试钉＝0 枚（Go 面）。** 会红的是另外两类：改那个**字面 300**（A 类 9 枚落点）与 267 的**带门**把带外种子挡住（C 类 4 枚具名＋他腿 4 枚）。⇒ **"配了要不要真生效"这件事不会撞上任何现有测试**；它撞上的只有 §4 那 7 枚冻结文档文字与 §2.3 那枚状态机表/事件名。
 
@@ -166,7 +166,7 @@
 | R14 | `Queue\(\)\.Timeout\(\)\|ApprovalTimeout\|approval\.NewQueue` | `cmd/wisp` | 23 行＝产码 3（`run.go:616`、`resident_approval_windows.go:372`、`:383` 日志）＋注释/日志 3（`config_reload.go:42`、`:445`、`:456`）＋测试 17 | 10:01+08 |
 
 **未跑清单（本腿一票未跑，全数具名）**：`go build ./...`／`go test ./...`／`go vet`／`gofumpt`／`wisp slo`／`sh scripts/*`／任何 `go run`。原因＝派单硬闸①（编排者正在跑 `cmd/wisp` 整包取红名册，并发跑会洗掉它的读数）＋硬规矩①。⇒ **本文件全部判语＝静态读码**，没有任何一枚"今天红/绿"的断言出自本腿；哪枚测试今天真的红，只有编排者那一发的名册能答。
-**门禁读数（自陈）**：本腿至此工具调用约 56 次；`go` 命令 0 次；`git add` 只带过本文件一枚 pathspec（骨架 `4e877958`／§1＋§2 `f9bd0eb7`／§3＋§4 `e1491088`）；未改任何他人已跟踪文件（本文件是本腿自建自填的交付件）；未碰 `.scratch/wisp/issues/**` 的 AC 框、未碰 `docs/reports/pending-and-issues.md`。
+**门禁读数（自陈）**：写本节时本腿工具调用约 56 次、**终值约 74 次**（§8 的自我对抗与就地改读数占了尾程；`go` 命令**始终 0 次**）；`git add` 只带过本文件一枚 pathspec（骨架 `4e877958` 09:53:45＋0800／§1＋§2 `f9bd0eb7` 10:01:38／§3＋§4 `e1491088` ≈10:04／§5＋§6＋§7 `f3a8fab6` 10:08:16／本次 §8＋§9 与就地更正另落一笔，终值 `wc` 与时刻见 §9 末行与 `git log`）；未改任何他人已跟踪文件（本文件是本腿自建自填的交付件）；未碰 `.scratch/wisp/issues/**` 的 AC 框、未碰 `docs/reports/pending-and-issues.md`。
 
 ## §7 判不动／量不到
 
@@ -182,6 +182,28 @@
 | G-8 | 托盘 tooltip 的字 | Go 侧未找到承载位（R5 只 3 行） | 与 G-1 同格：若存在则在页面侧／原生文案资源里，本编队不读 |
 | G-9 | 首启落盘那一刻屏上写的值（盘上现在真是 300 吗） | `schema.go:460` 的 `default:"300"` 是反射源 | 「盘上＝300」是同票 `267-a2` 的现量（其 §0 判 `firstrun.go:82` 走 `NewDefaults()`），本腿未自跑那把尺，只引注 |
 
-## §8 我写错的读数（自我对抗）
+## §8 我写错的读数（自我对抗，逐条真改）
+
+| # | 我原本写成 | 错在哪 | 已就地改成（现量凭据） |
+|---|---|---|---|
+| E1 | §4 判语「**冻结件里 5 枚把 300s 写成数字（D1／D2／D3／D4／D6／D7／D8 共 7 枚…**」 | 同一个句子里既写 5 又列 7，把"带数字的枚数"和"契约形状的枚数"混成一锅——这是**会被机主当成数错**的那种句子 | 改成「共 **7** 枚带数字，其中 **2** 枚默认值形状（D3／D6）、**5** 枚契约值形状（D1／D2／D4／D7／D8）」，单位与集合都列名 |
+| E2 | §1 #9「本腿判出的**唯一**一枚"配而不生效就会说谎"的现成文案」 | "唯一"没带方向，读者会以为是全案唯一说谎面——而 §3 L3／L5 与 §2.3 明明是**反方向**（判乙）会说谎的落点 | 改成「**判甲方向**唯一一枚……；反方向（判乙）会说谎的是 §3 L3、§3 L5／§2.3」，并同步把 §1 表后那句小结改成「另 1 枚**条件性**说谎（#9，方向＝判甲）」 |
+| E3 | §2.1 那条注释名册里我写的 `internal/agent/approval/{doc.go:6,21,**82,59**; …; queue.go:59,82; **panel/composer_handlers.go:23**}` | 两处错置：`82`／`59` 属 `queue.go` 不属 `doc.go`；`composer_handlers.go:23` 在 `internal/panel` 不在 `internal/agent/approval`——**我把两把尺的输出串行错了包**，这种错会让人点进去找不到行 | 改成 `{doc.go:6,21; gate.go:30,499; approval.go:21; queue.go:59,82}` ＋ 具名 `internal/panel/composer_handlers.go:23`（两处落点都已在 09:55+08 那次 `internal` 尺输出里逐行复认） |
+| E4 | §5.3 我先前写「★90 这一枚已经有测试在守（`256_test:293/:325` 种 90 并要求 `Queue().Timeout() == 90s`）」 | **漏了中间那一枚，方向就反了**：`:293` 只是把文件改成 90，真正守着 90 的是 `:324-325` 那枚"**重建**后的新门"；而 `:310` 守的是"**已建好的门仍是 45s**"。我那一句会让机主读成"改了文件当场生效"，恰好把 `Q-77` 最贵的那一维（生效时机）抹平 | 已重写：四步链（`:286` 建 45 → `:293` 改 90 → `:310` 旧门仍 45＝构造期取值／不热生效 → `:324-325` 新门读 90）＋把 `:311-314` 那句逐字承认（加了 re-apply 就红、256 的自陈限制须重裁、连带 255/265 的 ⓑ 文案）抄回，并在 §9 单列第三维 |
+| E5 | §6 尺表 R14 我第一版草稿记「26 行」 | 手快把上一次 grep 的 head_limit 当行数；真数是**逐行点数 23**＝产码 3＋注释/日志 3＋测试 17 | 表中已写 23 并给出三段拆法（`cmd/wisp` 那次 `Queue\(\)\.Timeout\(\)\|ApprovalTimeout\|approval\.NewQueue` 尺输出可逐行核） |
+| E6 | §3 L3 我最初的判语是「回落日志说的是编译常量＝**实话，无风险**」 | 读完 `resident_approval_windows.go:447-462` 才发现 267 的值域门会让"用户写了带外值"也走 `:453` 的 err 分支——那句话**对结果为真、对原因为残缺**（它不告诉用户"你写的那个数被拒了"） | 已改成两枚风险（① 该字面串不在任何常量引用链上，改 `queue.go:107` 它不会红；② 带外值被洗成"编译常量"），并顺带把 L4 那枚"能把配的值与门拿到的值并排打出来"的日志单独具名给机主当核验抓手 |
+| E7 | §1 #2 我最初只写"与 timeout 无关，永远说 30" | 说得不够：`queue.go:88-90` 的兜底是 `warnBefore <= 0 \|\| warnBefore >= timeout → DefaultApprovalWarning(30s)`，所以当 timeout 落在带内最小 31s 时，提示**只剩 1s 提前量**——这正是 `validate.go:128` 定 31、`validate_267_test.go:63-80` 钉 `lead+1` 的理由 | §1 #2 那句"永远讲 30"保留（它对屏幕文案为真），但把 31／`lead+1` 这层因果补在 §5.3 的带内行与 §9 的第三条里，别让读者以为"提示提前量"也是可配数 |
 
 ## §9 交件判语
+
+**这份名册摆给机主的三堆数（都不是裁定）：**
+
+1. **会被这把配置变成假话的用户可见文案＝0 枚（Go 侧）。** 两枚会打出秒数的句子（`queue.go:479` 拒绝句、`gate.go:563` 提示句）都是 `fmt.Sprintf` 现算，数字来源就是队列自己的 `timeout`；配 90 之后它们说 90，说"5 分钟"的那种字面在 Go 生产面**根本不存在**（R2／R3／R5／R6／R7 五把尺同向）。**真正的谎面藏在非文案处**：判甲方向 1 枚（`unwired.go:121` 的 `consumed:` 断言），判乙方向 3 枚（`resident_approval_windows.go:456` 的日志字面 `DefaultApprovalTimeout=300s`、`events.go:42` 的事件名 `approval.timeout-300s`、`timeouts.go:51` 状态机表里那枚 300s 行为值）。另有**沉默面 3 枚**（`run.go:1364`／`resident_approval_windows.go:829`／面板快照零栏）——改了配置之后那里既不会写假的 300，也不会写真的 90。
+2. **会因"配置真生效"而红的测试钉＝0 枚。** 派单担心的那类（文案含 300 的 needle）经两把尺确认为**不存在**。会红的另外两族与"生效"无关：改那个**字面 300**（A 类 6 组，其中 `ticket84_no_owner_test.go:232-257` 是 300s 墙钟、最贵）；以及 267 的**带门**挡住带外种子（具名 `run_mode101_test.go:110`＝1、`panel_pump_test.go:136`＝2、`approval_reply_201_test.go:105-110`＝1 下限；另 4 枚 20 是同票 267-a2 的读数，本腿只引注不重跑）。
+3. **`Q-77` 还有第三维，本腿现量到并且它已经有钉子**：`resident_approval_risk_256_windows_test.go:310` 逐字钉住「**已建好的门保持构造期那个值，改了 config.toml 不会热生效**」。所以"配了要不要真生效"至少分成 **(甲) 要不要吃这个数**与 **(乙) 什么时候吃（重启／重建 vs 热生效）**——今天代码是「吃、但只在构造时吃」。机主只答前者会漏掉后者；而 `:311-314` 已经预告：一旦加了 re-apply 路径，这枚钉子会红，256 的自陈限制与 255／265 那句 ⓑ 文案都得重裁。
+
+**本腿量不到的那一格（具名，供机主转给他用的那枚 agent）**：**审批卡／托盘／悬浮球／面板页面上的字**——`frontend/**` 与 `design/**` 两棵树不属本编队、本腿一律未读（硬规矩②）。Go 侧 R5 只 3 行、R6 生产可见串零枚字面 300 ⇒ 页面若真写着"5 分钟"，它要么现算、要么就在那里写死；**"屏幕上会不会出现假的 300"这一问，只有页面侧能答**。其余量不到／判不动见 §7 G-2（生产里那枚机器定时器有没有被 arm）、G-3（快照有无手写键）、G-4／G-5（他票行号与两枚断言体未补读）、G-6（今天红绿——本腿零枚 go，全部判语静态读码）。
+
+**合规自陈**：⛔ 零枚 `go`／`wisp slo`／`sh scripts/*`；搜索根只 `cmd internal tools docs .scratch scripts`；冻结件（`docs/PLAN.md`、`docs/specs/**`）只读、一字未改，引用处均标〔冻结〕；未碰 issues AC 框与台账；`git add` 全程只带本文件一枚 pathspec；未用 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`restore`；`Q-77` 不裁、不选甲乙。
+
+**体量与时刻（现量尺，`wc -l -c` ＋ `date`，`10:10:53+0800`）**：本文件写到这一行为止＝**207 行／43,018 字节**，最后一笔已落 commit＝`f3a8fab6`（10:08:16+0800，§5＋§6＋§7）。下面这一行本身会让终值再长 2 行左右，故交件终值以 §8／§9 那笔 commit 之后编排者复量为准（本腿在同一批把它报回去）。起手锚 `c9600334`、骨架 `4e877958`、§1＋§2 `f9bd0eb7`、§3＋§4 `e1491088`、§5＋§6＋§7 `f3a8fab6`——**五笔，全部只带 `.scratch/wisp/probes/267/a3/census.md` 这一枚 pathspec**。
