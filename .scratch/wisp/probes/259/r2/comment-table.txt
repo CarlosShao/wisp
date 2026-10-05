@@ -1,0 +1,124 @@
+### internal/agent/approval/approval.go
+deleted=7 deleted-non-comment=0 added=80 added-non-comment=0
+new-line|kind|first-24-chars
+357|COMMENT|// native API surface, (
+358|COMMENT|// THE CARD it is being 
+359|COMMENT|// Queue.allowScoped rea
+360|COMMENT|// for - and (3) the ite
+361|COMMENT|// load-bearing pair, an
+362|COMMENT|// nonce is not a row in
+363|COMMENT|//
+364|COMMENT|// The binding digest is
+365|COMMENT|// on its own. Every rou
+366|COMMENT|// was issued (Queue.all
+367|COMMENT|// that store; push writ
+368|COMMENT|// the comparison inside
+369|COMMENT|// cannot come out unequ
+370|COMMENT|// form (a) for this: a 
+371|COMMENT|// (ledger A619 section 
+372|COMMENT|// carries the revocatio
+373|COMMENT|// yourself are Queue.al
+374|COMMENT|// grantStore.spend; the
+375|COMMENT|//
+376|COMMENT|// Downgraded is not the
+377|COMMENT|// the row is what spend
+378|COMMENT|// is that row's content
+379|COMMENT|// proof was minted for,
+380|COMMENT|// half a form-(b) check
+381|COMMENT|// the answer actually c
+382|COMMENT|// hold as UNDESIGNED, n
+383|COMMENT|// level or sequence to 
+384|COMMENT|// face, which is human-
+385|COMMENT|//
+386|COMMENT|// The caller-settable R
+405|COMMENT|// bindDigest folds one 
+406|COMMENT|// sequence number, argu
+407|COMMENT|// carry. Two items neve
+408|COMMENT|// at a later time, beca
+409|COMMENT|//
+410|COMMENT|// "Which card a nonce b
+411|COMMENT|// digest; the wording o
+412|COMMENT|// 259 AC#1 form (a) dow
+413|COMMENT|// really decides the ca
+414|COMMENT|// below), and every rou
+415|COMMENT|// (see Queue.allowScope
+436|COMMENT|// grantStore holds the 
+437|COMMENT|// per-item split is the
+438|COMMENT|// B": a nonce minted fo
+439|COMMENT|// scan falls through to
+440|COMMENT|// even reached. Its com
+441|COMMENT|// statePending test in 
+442|COMMENT|// item twice), which re
+443|COMMENT|// pending - not a cross
+444|COMMENT|// pending. qitem.bind c
+496|COMMENT|// No routed call can pr
+497|COMMENT|// item's own stored dig
+498|COMMENT|// this package and hand
+499|COMMENT|// TestTicket242SpendRej
+500|COMMENT|// TestTicket259R1Denial
+501|COMMENT|// store part; they cann
+534|COMMENT|//
+535|COMMENT|// What the bind argumen
+536|COMMENT|// function is Queue.all
+537|COMMENT|// string grantNonce wro
+538|COMMENT|// below is a value agai
+539|COMMENT|// answer. The binding l
+540|COMMENT|// wrong card; the guard
+541|COMMENT|// because the store is 
+542|COMMENT|//
+543|COMMENT|// Residual risk, stated
+544|COMMENT|// form (a) boundary 2, 
+545|COMMENT|// the queue's state ref
+546|COMMENT|// that answers denialNo
+547|COMMENT|// that reaches this fun
+548|COMMENT|// nothing to notice, be
+549|COMMENT|// for exactly the calls
+550|COMMENT|// denialMisbound all ca
+551|COMMENT|// (TestTicket242SpendRe
+552|COMMENT|// TestTicket259R1Denial
+553|COMMENT|// identity from a route
+554|COMMENT|// invisible to today's 
+555|COMMENT|// reading rather than r
+556|COMMENT|// form (b) - recomputin
+557|COMMENT|// is blocked on widenin
+
+### internal/agent/approval/queue.go
+deleted=4 deleted-non-comment=0 added=36 added-non-comment=0
+new-line|kind|first-24-chars
+44|COMMENT|// bind is the digest th
+45|COMMENT|// the correlation id, t
+46|COMMENT|// the sequence number, 
+47|COMMENT|// the same identity re-
+48|COMMENT|//
+49|COMMENT|// It is NOT what refuse
+50|COMMENT|// used to say it was. a
+51|COMMENT|// string grantNonce alr
+52|COMMENT|// comparison inside gra
+53|COMMENT|// routed call and has z
+54|COMMENT|// that do refuse, and w
+55|COMMENT|//   guard 1 - the store
+56|COMMENT|//   newGrantStore, so B
+57|COMMENT|//   denialSpentNonce; g
+58|COMMENT|//   test in allowScoped
+59|COMMENT|//   item twice. Guard 1
+60|COMMENT|//   an answer lands aft
+61|COMMENT|//   ticket 259 AC#1 for
+62|COMMENT|//   is written on grant
+341|COMMENT|//
+342|COMMENT|// The row issue writes 
+343|COMMENT|// is what allowScoped p
+344|COMMENT|// are therefore set fro
+345|COMMENT|// comparison cannot dis
+346|COMMENT|// decided by WHICH stor
+347|COMMENT|// matching. See qitem.b
+404|COMMENT|// The second argument i
+405|COMMENT|// issued into this item
+406|COMMENT|// is a value against it
+407|COMMENT|// its own. Two checks d
+408|COMMENT|// scan in grantStore.sp
+409|COMMENT|// is B's store when the
+410|COMMENT|// deliver's own settled
+411|COMMENT|// ledger A619 section 2
+412|COMMENT|// check is ever refacto
+413|COMMENT|// because it compares a
+

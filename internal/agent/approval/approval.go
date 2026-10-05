@@ -382,6 +382,7 @@ func (r *ChannelRegistry) check(ch Channel) error {
 // hold as UNDESIGNED, not rejected: the answer surface carries no tool, args,
 // level or sequence to recompute from, so it begins by widening C17's inbound
 // face, which is human-approval territory.
+//
 // The caller-settable Request.Source string is logged and never consulted
 // (rulings M-7 / C-3 in docs/reports/pending-and-issues.md: a security
 // decision keyed on a caller-controlled selector fails open).
@@ -407,11 +408,11 @@ func mintGrant() (string, error) {
 // at a later time, because the sequence number is folded in.
 //
 // "Which card a nonce belongs to" is NOT decided by comparing anything to this
-// digest; the wording here used to say that it was ("ties a grant to ONE
-// pending item"). The digest is per-item data: the check that really decides
-// the card is which grantStore holds the row (see grantStore below), and every
-// routed spend call hands the comparison this same field (see Queue.allowScoped
-// and spend). The block above grantBytes carries the whole of the downgrade.
+// digest; the wording on this function used to claim that it was, and ticket
+// 259 AC#1 form (a) downgraded it. The digest is per-item data: the check that
+// really decides the card is which grantStore holds the row (see grantStore
+// below), and every routed spend call hands the comparison this same field
+// (see Queue.allowScoped and spend; the block above grantBytes is the whole of it).
 func bindDigest(corr, taskID, tool, level string, seq uint64, args []byte) string {
 	sum := sha256.New()
 	for _, s := range []string{corr, taskID, tool, level, strconv.FormatUint(seq, 10)} {
