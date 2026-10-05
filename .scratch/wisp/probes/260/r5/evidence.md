@@ -214,6 +214,7 @@ M4 那一趟（同档末段）：`start md5=2488b2ac692c99ae4e3b4831526637d7` �
 
 - ⛔ 本程没跑 `winlive` 的任何测试（连 `go vet -tags winlive` 都没跑——那是昨天 `instrument.md` §7 跑过的，本程没新增需要它编得动的符号）。⛔ 没跑 `scripts/slo-check.ps1`。⛔ 没动阈值／golden／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt`。⛔ 没放宽任何断言、没加 `t.Skip`、没把任何 SKIP 读成通过。
 - **emoji 那一支门的射程要说清（免得下一枚腿把这行读成"证据件过了 emoji 门"）**：仪器扫的是 `internal/`＋`cmd/` 的 Go 文件（含注释与 `_test.go`，上面那行 508／102 计数就是它自己报的）＋`design/`／`frontend/` 文本件；`.scratch/**` 下的 markdown 与 `.py` 台件**不在射程内**。本件因此沿用仓内文档的既有符号（`⛔`／`★`／`⇒`，与 `instrument.md`、票面、`AGENTS.md` 同形）。⛔ 本程没写任何 Go 源码 ⇒ Go 那一侧零新增符号（写面名册见 §6），emoji 门那一句对**真产生 Go 的形态**是「不适用」，不是「过了」。
+- **笔落之后复跑长度那一门（11:26:44 → 11:26:46，`sh scripts/check-path-length-budget.sh`）**：rc=0，**VERDICT GREEN**，分母从 5733 涨到 **5759**（本笔 13 枚＋同时别腿入库的那些；⛔ 差额归谁我没算，所以只报两个数不报归因），over-budget 仍 **57＝roster 57、not in roster 0** ⇒ **本程那 13 枚一枚都没进 over-budget 名册**（逐枚长度尺见 §6.2）。上面那张表里 11:18 那一发读的是**笔落之前**的树，两发都留，⛔ 不用后一发覆盖前一发。
 - 路径长度那一门里那两行 `warning: in the working copy of '…'，LF will be replaced by CRLF` 是**该脚本正控自己在 `/tmp` bench 目录里种的台件**打的，不是本仓的脏面；bench 目录按规则 8 留在盘上不删（`/tmp/tmp.HL2CGJQD87`）。
 
 ## 5. 判不动的格／量不到的格（逐条具名归口，⛔ 不自己划掉）
@@ -251,7 +252,13 @@ M4 那一趟（同档末段）：`start md5=2488b2ac692c99ae4e3b4831526637d7` �
 
 ### 6.2 补录（第 8 枚那一笔现跑的逐字名册）
 
-上一节那条「不预填号」的承诺在这一节兑现：本件第 7 枚的号与逐枚 `git show --name-only` 名册由第 8 枚追加，⛔ 两处读数都来自现跑不是回忆。
+上一节那条「不预填号」的承诺在这一节兑现，两处读数都来自现跑不是回忆：
+
+- 第 7 枚的号＝**`b617084e`**（2026-10-05 11:26:31 +0800，`13 files changed, 3027 insertions(+)`，⛔ 无删除行）。
+- 逐枚名册尺＝`git show --name-only --format= HEAD`（11:26:44 现跑），13 行全在 `.scratch/wisp/probes/260/r5/**` 之下：`evidence.md` ＋ `mutate260r5-recheck.py` ＋ `mutate260r5-m4.py` ＋ `logs-recheck/` 那十枚档。
+- 同发现跑的作差尺：`git status --porcelain -- internal/ball`＝**空**（⇒ 本程对 `internal/ball` 零字节改动这句在笔落之后仍然为真）；`go test -count=1 ./internal/ball/` 复跑（11:26:45 → 11:26:46）＝唯一红仍是 `TestC21TableColourRowsMatchTokensCSS`（既有环境红），`ok` 之外零新增红。
+- 本程最长那一枚新路径的相对长度尺＝`git ls-files -- .scratch/wisp/probes/260/r5 | awk length | sort -rn` 现跑：最长 **90** 字符（`logs-recheck/mutation-M3-no-return-after-refusal-go-test-v.txt`），在 `A583`/规则 9 那顶帽（相对 121）之下，⛔ 没给长度门添一枚新债。
+- 本笔（第 8 枚）只碰 `evidence.md` 这一枚路径——本节这一段＋§4 那条复跑注。
 
 ## 7. 自我对抗（本程真抓出来的东西，逐条）
 
