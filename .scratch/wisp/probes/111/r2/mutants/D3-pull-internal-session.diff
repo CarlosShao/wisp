@@ -1,0 +1,54 @@
+--- /tmp/wisp-111r2-d3/scripts/portable-tests.sh	2026-10-05 20:29:33.034010700 +0800
++++ /dev/fd/63	2026-10-05 20:40:40.000000000 +0800
+@@ -50,7 +50,7 @@
+ # "DEFERRED: implemented by ticket 28 / 42, this ticket only freezes the package
+ # boundary" - and a third case (internal/agent/scheduler) was reachable only
+ # because the list said ./internal/agent/... . Measured, not argued:
+-# `runtests.sh` alone exits 1 (no top-level result at all),
++# `runtests.sh ./internal/session/` alone exits 1 (no top-level result at all),
+ # but INSIDE a 23-package invocation the strict runner's "PASS>0" test is
+ # satisfied by the other packages, so the empty one contributes nothing and stays
+ # invisible forever. That is why the scope is now resolved to import paths and
+@@ -109,7 +109,7 @@
+ #           agent/scheduler, a second doc.go-only stub. When those packages get code,
+ #           put them back: GUARD A rejects them until they have a test file, and
+ #           GUARD D names them the moment they do have one and no entry.
+-#           RE-ENTERED on 2026-10-05 (ticket 111 r1 leg): ticket
++#           ./internal/session/ RE-ENTERED on 2026-10-05 (ticket 111 r1 leg): ticket
+ #           111 took it out because it was a doc.go stub, then ticket 224 put
+ #           grants.go + session.go (371 lines) and two test files behind it, and
+ #           nothing noticed - the package sat at zero CI coverage for four days while
+@@ -185,6 +185,7 @@
+ github.com/CarlosShao/wisp/internal/projctx
+ github.com/CarlosShao/wisp/internal/risk
+ github.com/CarlosShao/wisp/internal/secret
++github.com/CarlosShao/wisp/internal/session
+ github.com/CarlosShao/wisp/internal/statemachine
+ github.com/CarlosShao/wisp/internal/tools
+ github.com/CarlosShao/wisp/internal/winsec
+@@ -199,6 +200,7 @@
+ github.com/CarlosShao/wisp/internal/projctx
+ github.com/CarlosShao/wisp/internal/risk
+ github.com/CarlosShao/wisp/internal/secret
++github.com/CarlosShao/wisp/internal/session
+ '
+ cli_pin='
+ github.com/CarlosShao/wisp/cmd/wisp
+@@ -239,7 +241,7 @@
+         ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+         ./internal/panel/... ./internal/ball/ ./internal/perm/
+         ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
+-        ./internal/projctx/
++        ./internal/session/ ./internal/projctx/
+     )
+     pinned=$core_pin
+     ;;
+@@ -247,7 +249,7 @@
+     scope=(
+         ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
+         ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
+-        ./internal/projctx/
++        ./internal/session/ ./internal/projctx/
+     )
+     pinned=$win_pin
+     ;;

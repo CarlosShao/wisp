@@ -1,0 +1,9 @@
+github.com/CarlosShao/wisp/cmd/llmrecord
+github.com/CarlosShao/wisp/internal/ball
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/perm
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/projctx
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/session

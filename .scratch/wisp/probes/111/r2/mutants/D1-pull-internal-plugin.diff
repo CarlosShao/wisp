@@ -1,0 +1,36 @@
+--- /tmp/wisp-111r2-d1/scripts/portable-tests.sh	2026-10-05 20:28:14.395197200 +0800
++++ /dev/fd/63	2026-10-05 20:40:40.000000000 +0800
+@@ -180,6 +180,7 @@
+ github.com/CarlosShao/wisp/internal/observe
+ github.com/CarlosShao/wisp/internal/panel
+ github.com/CarlosShao/wisp/internal/perm
++github.com/CarlosShao/wisp/internal/plugin
+ github.com/CarlosShao/wisp/internal/proc
+ github.com/CarlosShao/wisp/internal/projctx
+ github.com/CarlosShao/wisp/internal/risk
+@@ -194,6 +195,7 @@
+ github.com/CarlosShao/wisp/internal/ball
+ github.com/CarlosShao/wisp/internal/config
+ github.com/CarlosShao/wisp/internal/perm
++github.com/CarlosShao/wisp/internal/plugin
+ github.com/CarlosShao/wisp/internal/proc
+ github.com/CarlosShao/wisp/internal/projctx
+ github.com/CarlosShao/wisp/internal/risk
+@@ -238,7 +240,7 @@
+         ./internal/tools/... ./internal/models/...
+         ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+         ./internal/panel/... ./internal/ball/ ./internal/perm/
+-        ./cmd/llmrecord/ "$winsec_scope"
++        ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
+         ./internal/session/ ./internal/projctx/
+     )
+     pinned=$core_pin
+@@ -246,7 +248,7 @@
+ windows)
+     scope=(
+         ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
+-        ./internal/ball/ ./internal/perm/ ./cmd/llmrecord/
++        ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
+         ./internal/session/ ./internal/projctx/
+     )
+     pinned=$win_pin

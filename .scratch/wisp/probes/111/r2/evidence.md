@@ -138,9 +138,115 @@ r1b §2 的 5 枚结论本腿**逐枚复认**（下 1–5 全"已在册"），�
 剩下的两处不是"接入"问题而是**平台/tag 问题**（winlive 需 ci.yml＋一条传 tag 的缝；cmd/wisp 的 ubuntu 需先让 `go list` 在 linux 解得开）。
 ⇒ **本轮我不新增任何 scope 行、不新增任何 pin 枚**（新增了反而会被 GUARD C 判红，见 §3.4）。
 
-## §3 实际改动与 GUARD D 正控
+## §3 实际改动与 GUARD D 正控（票 111 AC#3 那格的核心）
 
-（待填：GUARD D 机制读解、正控变异两发（抽 pin 项→红→还原）、`git cat-file` 双读凭据、若有 bug 则最小修）
+### 3.0 先答编排者那把闸：**"触发 GUARD D 要不要真跑 25 包的 go test？"——不要。这条我读实现读出来的，并且证了**
+
+`1bb654e3` 的实现里，GUARD D whole 落在 **`--scope=census` 那一个 block 内**（`:286` `if [ "$mode" = census ]` 起，`:425` `fi` 止）：
+
+- `sed -n '286,430p' | grep -c 'go test\|go build\|go vet\|runtests.sh'` = **0**；
+- 同一段里出现的 go 命令只有 **`go list ./...`**（`:336`）与 **`go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}'`**（`:364`）；
+- `census)` 分支 `:271-274` 是 `scope=()`／`pinned=''`，**根本走不到** `:449` 之后的"真跑测试"那段（census 在 `:425` 前就 `exit 0`／GUARD D 在 `:422` 就 `exit 1`）。
+
+⇒ 正控**不需要真测试窗**，因此**不需要停手上报**，也不需要动用那格"归编排者"的出口。
+本腿全程零 `go test`／零 `go build`／零 `go vet`（`go list` 与 `go env GOOS` 由脚本自己调，见 §3.5 的诚实边界）。
+
+### 3.1 对照组（HEAD 原样，未变异）：census 绿
+
+```
+portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+```
+rc=**0**，38 行，窗口 `2026-10-05 20:24:55 → 20:25:11 +0800`。逐行读数：`…/r2/census-base.txt`。
+
+### 3.2 ★正控第一发（D1）：把 `internal/plugin` 从名册里抽掉 → GUARD D 响亮红，点名它
+
+**怎么抽的**：抽**四处**（`core_pin` 一枚＋`win_pin` 一枚＋`core)` scope 一处＋`windows)` scope 一处），
+不是只抽 pin。**只抽 pin** 会让 GUARD C 先红（pin≠resolved）而**测不到 D**；
+四处一起抽＝"这枚包从来没人认领过"，GUARD C 保持哑（见 §3.4），**红的只可能是 D**——这才是票面 AC#3 要的那一发。
+
+**在哪抽的**：票面 Rules（`111-ci-tests…md:54`）**"绝不在仓库内建 worktree/checkout"**，变异只在 /tmp 的
+`git archive <sha> | tar -x` 快照里做 ⇒ `git archive 164ee2c2 | tar -x -C /tmp/wisp-111r2-d1`，
+快照里 `sed` 抽，**工作树 `scripts/portable-tests.sh` 一字未动**。
+落地凭据（同一条 `&&` 链里 `grep -n` 打印被改后的整行）：
+
+```
+240:        ./internal/panel/... ./internal/ball/ ./internal/perm/
+249:        ./internal/ball/ ./internal/perm/ ./cmd/llmrecord/
+```
+（`:243`／`:252` 原本的 `./internal/plugin/ ` 前缀没了；pin 行数 core 27→26、windows 10→9）
+`bash -n scripts/portable-tests.sh`（快照内）rc=**0** ⇒ 变异是编译/语法层面成立的，不是碰巧崩在解析上。
+
+**红句逐字**（窗口 `20:28:23 → 20:28:37 +0800`，**rc=1**，50 行；全文 `…/r2/census-mutant-D1-plugin-pulled.txt`；
+变异 diff `…/r2/mutants/D1-pull-internal-plugin.diff`）：
+
+```
+portable-tests.sh: github.com/CarlosShao/wisp/internal/plugin     1/0          NO-SCOPE <-UNCLAIMED-HAS-TESTS
+portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=8 unclaimed-with-tests=1
+portable-tests.sh: GUARD D - 1 package(s) compile a test file for GOOS=windows and
+portable-tests.sh:   NO named scope claims them, so no CI step runs them and no CI step
+portable-tests.sh:   can ever go red over them:
+portable-tests.sh:   github.com/CarlosShao/wisp/internal/plugin  tests-compiled-for-windows=1/0
+portable-tests.sh: this row is the ticket 111 field itself ('CI 只测 33 个包里的 20 个').
+```
+
+**三件判据全中**：① 响亮（rc=1，不是 0，不是"少跑一个包照样绿"）；② **点名被抽的那枚包**（`internal/plugin`＋它的分母 `1/0`＋平台）；
+③ 分母自己跟着动（`claimed-by-no-scope` 7→8、`unclaimed-with-tests` 0→1）⇒ 它不是硬编码一句错误。
+
+### 3.3 正控第二发（D3）：换一枚靶件，证它不是只认 plugin
+
+同一把手术抽 `internal/session` 四处（core pin `:188`／win pin `:203`／scope `:244`／`:252`），
+靶件取自我快照底本 `164ee2c2`（含 1bb654e3 的两包）。窗口 `20:29:33 → 20:29:47 +0800`，**rc=1**：
+
+```
+portable-tests.sh: github.com/CarlosShao/wisp/internal/session    2/0          NO-SCOPE <-UNCLAIMED-HAS-TESTS
+portable-tests.sh: GUARD D - 1 package(s) compile a test file for GOOS=windows and
+portable-tests.sh:   github.com/CarlosShao/wisp/internal/session  tests-compiled-for-windows=2/0
+```
+全文 `…/r2/census-mutant-D3-session-pulled.txt`；变异 diff `…/r2/mutants/D3-pull-internal-session.diff`
+（⚠ 这份 diff 里另有 **2 行纯注释的字序差**——我的 `sed 's| \./internal/session/||'` 顺带咬到了 `:48`／`:112` 两句注释里的同名字符串，
+**不在代码路径上**，`bash -n` 与两发读数都不受影响；登记在此免得被当成"变异多改了东西"）。
+⇒ 两发不同靶件、不同分母（`1/0` 与 `2/0`）各自点名自己 ⇒ **GUARD D 是通用的，不是为 session/projctx 写死的**。
+
+### 3.4 ★GUARD D 不是 GUARD C 的重复（这条是 D 该不该存在的判据，本腿证了）
+
+对 **D1 那个变异体**（四处一起抽），把 `:248-254` 的 windows scope 原样 `go list`（窗口 `20:29:11`，一条命令）：
+
+```
+pin_rows=9  resolved_rows=9  diff_rc=0（0 行差）
+```
+⇒ **GUARD C 对这一发完全哑**（pin 与 resolved 相等，它看不出少了一枚）；
+留盘 `…/r2/guardc-blind-win-pin.txt`＋`guardc-blind-win-resolved.txt`（9 行 vs 9 行，`diff` rc=0）。
+**"有测试却不在名册"这个洞，GUARD C 结构上抓不到**——它比的是"名单 vs 名单展开"，两边同时少就是相等。
+GUARD A 也抓不到（它只管"名册里声明了却 0 分母"，方向相反）；GUARD B 更抓不到（那枚包压根没进调用）。
+⇒ **D 补的正是 A/B/C 三面都照不到的那一个方向**，与 `:64-75` 注释自己那句
+"A/B/C audit the packages a scope NAMES; nothing audited the packages a scope FORGETS" **对得上，不是我替它圆**。
+
+### 3.5 还原凭据（票面点名的那条）＋本腿对 `scripts/` 的改动＝**零字节**
+
+- `git status --porcelain -- scripts/ .github/` = **0 行**：**本腿（r2b）第一条命令**（约 20:22，未印时刻）＝0 行，
+  带时刻的两次复量 **20:30:32** 与 **20:46:48** 亦 0 行；前腿 `111-r2` 在 §0 记的 20:01:28／20:07:05 两发同 0 行（那是它的读数，我不认领）。
+- `md5sum scripts/portable-tests.sh` = **`328eb3ead0545736a33e2c131687d60d`**
+  ＝`git cat-file blob HEAD:scripts/portable-tests.sh | md5sum` **同值**（20:30:32），
+  blob 号 `git rev-parse HEAD:scripts/portable-tests.sh` = **`2ff02dd7`**（= `1bb654e3` 那枚 blob，HEAD 漂到 `15d8b60e` 后仍同一枚）。
+- `bash -n scripts/portable-tests.sh` rc=**0**（20:30:32）。
+- ⇒ **本腿没改过它，也就无从"还原"**——变异全在 /tmp 快照（`wisp-111r2-d1`／`d2`／`d3`，按"只建不删"留着不删）。
+  票面那句"最小修＋单独 commit"的触发条件（**GUARD D 验出 bug**）**没有发生**：§3.2/§3.3 两发都按设计红、按设计点名、按设计退出，**未发现实现缺陷**。
+
+**诚实边界（三条，不许被读成"我跑了 GUARD D 的每一步"）**：
+1. GUARD D 的红句里 `GOOS=windows` 那半句出自脚本自己的 `go env GOOS`（`:280`）⇒ 本腿**零 `go test/build/vet`**，
+   但 `go list`/`go env` 是编排者白名单与脚本自身行为，不是我另开的口子（`go env` 只被脚本内部调，我本人一次没手打 `go env`）。
+2. 我这腿的靶件平台是 **windows**（本机 GOOS）。**GOOS=linux 下 GUARD D 会 rc=1 但原因是"拒绝"而非"发现洞"**：
+   `go list ./...` 在 linux rc=1（§1.2 那发：stdout 34 行／stderr 264 字节）→ 命中 `:337-351` 的 refusal 分支 → `exit 1`。
+   ⇒ **这条直接决定 §5.3 的接法：census 只能接在 windows 腿，接进 ubuntu 腿是一枚永久红。**
+3. 两发红句都是**真子进程真退出码**（12 秒／14 秒各含 35 次 `go list -f`），不是我拼的字符串。
+
+### 3.6 本轮"实际改动"清单（照 AC 的口径交）
+
+- `scripts/portable-tests.sh`：**0 字节**（§3.5）。理由：票面 5 枚早在册（§2.1–5）、真洞 2 枚已由 `1bb654e3` 补完且 GUARD C 复认咬合（§1.5）、
+  GUARD D 验出可用无 bug（§3.2–4）。**再写一行就是重复行，不改变任何分母**——这与 r1b §3 那句是同一条判语，但**我这枚多了正控那一格**。
+- `.github/workflows/ci.yml`：**0 字节，只读**（引行号见 §1.3／§5.1／§5.3）。
+- 票面 `111-ci-tests-20-of-33-packages.md`：**0 字节**（AC 框一枚不碰）。台账：0 字节。
+- 本腿写面＝`.scratch/wisp/probes/111/r2/**`（证据件＋台件，只建不删）。
 
 ## §4 门禁读数（带时刻）
 
