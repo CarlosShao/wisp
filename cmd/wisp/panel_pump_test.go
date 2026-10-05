@@ -109,7 +109,7 @@ var modeRead145 = regexp.MustCompile(`perm: MODE-READ origin=startup mode=(\S+) 
 // is what makes the queue non-empty, which is the whole subject of these cases.
 func executeOn145(t *testing.T, rt *agentRuntime, taskID, corr, callID, tool, args string) (agent.ToolOutcome, error) {
 	t.Helper()
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 	defer cancel()
 	return rt.bridge.Execute(ctx, agent.ToolRequest{
 		TaskID: taskID, CorrelationID: corr, CallID: callID,
@@ -133,7 +133,7 @@ func nonDefaultConfig145(t *testing.T, dataDir string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(cfgPath, []byte(string(old)+"\n[risk]\nconfirm_timeout_sec = 2\npermission_mode = \"ask_high_risk\"\n"), 0o600); err != nil {
+	if err := os.WriteFile(cfgPath, []byte(string(old)+"\n[risk]\nconfirm_timeout_sec = 31\npermission_mode = \"ask_high_risk\"\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 }

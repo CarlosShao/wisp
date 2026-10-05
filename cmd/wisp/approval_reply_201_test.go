@@ -199,7 +199,7 @@ func (h *replyHost) openStore() *memory.Store {
 }
 
 func TestReplyListenerAllowsAnL2CardFromTheNativeSide(t *testing.T) {
-	h := newReplyHost(t, 20*time.Second)
+	h := newReplyHost(t, 40*time.Second)
 	target := filepath.Join(h.outside, "landed-after-a-native-allow.txt")
 	pr, pw := io.Pipe()
 	h.reply = pr
@@ -269,7 +269,7 @@ func TestReplyListenerAllowsAnL2CardFromTheNativeSide(t *testing.T) {
 }
 
 func TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel(t *testing.T) {
-	h := newReplyHost(t, 20*time.Second)
+	h := newReplyHost(t, 40*time.Second)
 	target := filepath.Join(h.outside, "never-written-after-a-reasoned-reject.txt")
 	pr, pw := io.Pipe()
 	h.reply = pr
@@ -347,7 +347,7 @@ func TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject(t *testing.T) {
 	// (the panel's projection, the panel-route allow attempt, the native attempt
 	// the burned nonce can no longer support, and the panel route's refusal), and
 	// pinning that on a 2s deadline would measure the clock instead of the route.
-	h := newReplyHost(t, 20*time.Second)
+	h := newReplyHost(t, 40*time.Second)
 	target := filepath.Join(h.outside, "panel-route-allow-would-have-written.txt")
 	pr, pw := io.Pipe()
 	h.reply = pr
@@ -436,7 +436,7 @@ func TestUnansweredL2CardTimesOutIntoRejectNeverExecution(t *testing.T) {
 	// h.reply stays nil, so this run has the answer side assembled but UNREACHABLE.
 	// The card's terminal state must be a refusal that booked a timeout - never
 	// execution - and the audit must say which of the two clocks ran out.
-	h := newReplyHost(t, 2*time.Second)
+	h := newReplyHost(t, 31*time.Second)
 	target := filepath.Join(h.outside, "unanswered-card-must-not-write.txt")
 	var (
 		out  agent.ToolOutcome
@@ -487,6 +487,23 @@ func TestUnansweredL2CardTimesOutIntoRejectNeverExecution(t *testing.T) {
 			t.Errorf("audit is missing the expiry line %q; got:\n%s", want, audit)
 		}
 	}
+	// Ticket 267 AC#2's positive half, read through the assembled run rather than
+	// a unit: at this seed the gate's `lead := g.q.Timeout() - g.q.WarningLead()`
+	// is 31s - 30s = 1s > 0, so gate.go:528 arms the C18 pre-timeout warning and
+	// gate.go:557-566 hands it to the approval UI as an Event of kind "warning"
+	// with the text gate.go:563 formats. This host has no panel and no injected
+	// gate, so the UI the root assembled is the console (run.go:611) and its
+	// Update prints every event to stdout verbatim (run.go:1394).
+	//
+	// This reading could not have existed before ticket 267: the seed this case
+	// carried was 2s, so lead was <= 0, `warn` stayed nil and the warning simply
+	// was not sent - the silent removal of a protection the config claims is in
+	// force, which is the shape ticket 267 was filed for.
+	if sentences := h.out.String(); !strings.Contains(sentences,
+		"[warning] 审批将在 30 秒后自动拒绝，请尽快确认") {
+		t.Errorf("the C18 pre-timeout warning never reached the console: lead = 31s - 30s "+
+			"= 1s > 0 must arm it (gate.go:528), stdout:\n%s", sentences)
+	}
 	row := toolCallByCorr187(t, h, "t201-timeout-corr")
 	if row.Decision != agent.DecisionTimeout {
 		t.Errorf("tool_call row = %+v, want decision=%s (the C18 auto-reject, not an allow)",
@@ -501,7 +518,7 @@ func TestL1VetoNeedsAChannelTheHostReallyWired(t *testing.T) {
 		// the L1 window keeps its frozen polarity: it expires into EXECUTION
 		// (SPEC-06 §2 row L1). This half is the evidence that ticket 201 did NOT
 		// quietly change that, and that the run says so instead of going silent.
-		h := newReplyHost(t, 20*time.Second)
+		h := newReplyHost(t, 40*time.Second)
 		target := filepath.Join(h.dir, "l1-window-console-veto.txt")
 		pr, pw := io.Pipe()
 		h.reply = pr
@@ -575,7 +592,7 @@ func TestL1VetoNeedsAChannelTheHostReallyWired(t *testing.T) {
 		// seam standing in for the ball/Esc-hook leg (tickets 07/77/92), stated as
 		// such in the evidence file. The reading it produces is the one the ticket
 		// wants: a veto that arrives in time STOPS the write.
-		h := newReplyHost(t, 20*time.Second)
+		h := newReplyHost(t, 40*time.Second)
 		h.replyVeto = approval.ChannelEsc
 		target := filepath.Join(h.dir, "l1-window-vetoed-by-a-loaded-channel.txt")
 		pr, pw := io.Pipe()

@@ -107,7 +107,7 @@ func (h *t101host) writeConfig(t *testing.T, mode string) {
 	if h.base == "" {
 		h.base = "http://127.0.0.1:9"
 	}
-	riskLines := "[risk]\nl1_window_sec = 1\nconfirm_timeout_sec = 1\n"
+	riskLines := "[risk]\nl1_window_sec = 1\nconfirm_timeout_sec = 40\n"
 	if mode != "" {
 		riskLines += fmt.Sprintf("permission_mode = %q\n", mode)
 	}

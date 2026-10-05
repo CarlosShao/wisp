@@ -47,7 +47,7 @@ import (
 // TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole is AC#1's criterion: an
 // allow that arrives through the exported seam, with no reply listener attached.
 func TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole(t *testing.T) {
-	h := newReplyHost(t, 20*time.Second)
+	h := newReplyHost(t, 40*time.Second)
 	target := filepath.Join(h.outside, "landed-through-the-seam.txt")
 	// h.reply stays nil: no console, no verbs, no listener goroutine.
 
@@ -135,7 +135,7 @@ func TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole(t *testing.T) {
 // for the entry point a WebView host would be handed, not only for the terminal's
 // panel-yes verb.
 func TestNativeHostSeamRefusesAPanelSourcedAllow(t *testing.T) {
-	h := newReplyHost(t, 20*time.Second)
+	h := newReplyHost(t, 40*time.Second)
 	target := filepath.Join(h.outside, "must-never-exist.txt")
 
 	var (

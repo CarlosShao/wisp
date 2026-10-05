@@ -78,7 +78,7 @@ import (
 // this case fails at "0 rows for the minted session", and the audit line it also
 // catches is the one that still claims GRANT-RECORDED.
 func TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun(t *testing.T) {
-	h := newReplyHost(t, 20*time.Second)
+	h := newReplyHost(t, 40*time.Second)
 	target := filepath.Join(h.outside, "remembered-by-a-click.txt")
 	pr, pw := io.Pipe()
 	h.reply = pr
@@ -231,7 +231,7 @@ func grantLinesOf(h *replyHost) string {
 // refused" says nothing about whether anything was asked. That is the polarity trap
 // 224-v1 §6-b row 3 names, and the control below is what keeps it honest.
 func TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking(t *testing.T) {
-	h := newReplyHost(t, 20*time.Second)
+	h := newReplyHost(t, 40*time.Second)
 	asked := filepath.Join(h.dir, "never-granted.txt")
 	granted := filepath.Join(h.dir, "granted-in-this-session.txt")
 	ctx := context.Background()
