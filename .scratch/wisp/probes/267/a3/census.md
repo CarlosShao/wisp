@@ -106,9 +106,81 @@
 
 ## §5 会因配置生效而红的测试钉
 
+> 尺＝`DefaultApprovalTimeout`／`"[^"]*300[^"]*"`／`秒未确认|审批超时|确认超时|自动拒绝|已超时`／`confirm_timeout_sec`（含 `-C` 上下文读断言体），根＝`{cmd,internal,tools}`；生产 vs `_test.go` 分列。取数窗口＝09:53:45–10:03:50+0800。
+> 派单担心的那一类（"断言提示文案里含 300"或"超时提示逐字等于某句"）——**本腿判它不存在**：全仓测试面里 `秒未确认` **零命中**，`"[^"]*300[^"]*"` 的测试行**全部是 `t.Errorf`／`t.Fatalf` 的解释语，不是被断言的 needle**。所以这一节按三种"红条件"分开登记，别把它们混成一锅。
+
+### 5.1 A 类＝字面钉住「编译 300／schema 默认 300」的钉子（★改 `queue.go:107` 或 `schema.go:460` 才红；**用户配 90 不红**）
+
+| file:line | 断言逐字（现量） | 红条件 | 用户配 90 ⇒ 红不红 |
+|---|---|---|---|
+| `internal/agent/approval/queue_test.go:48-49` | `if p.Deadline != approval.DefaultApprovalTimeout { t.Errorf("Deadline=%v，期望 300s", p.Deadline) }` | 常量动 | **不红**（该测试不读 config，量的是 `NewQueue` 兜底） |
+| `internal/agent/approval/batch_test.go:106` | `t.Errorf("L2 卡片要挂 C18 的 300s 截止，得 %v", p.Deadline)` | 同上（断言体本腿未读到，见 §7 G-5） | 不红（同上形状） |
+| `internal/agent/approval/ticket84_no_owner_test.go:105-114` | `{"explicit default", approval.DefaultApprovalTimeout}` ＋ `if approval.DefaultApprovalTimeout <= 0 { t.Fatal("DefaultApprovalTimeout must be a finite positive bound") }` | 常量被改成 `<=0`／无限 | 不红 |
+| `internal/agent/approval/ticket84_no_owner_test.go:232-233,253-257` | `if got := noUI.Queue().Timeout(); got != approval.DefaultApprovalTimeout {` ＋ `if bel < approval.DefaultApprovalTimeout`／`if bel > 2*approval.DefaultApprovalTimeout` | ★**墙钟**钉：默认上界动它就红（跑时还要 `WISP_84_MEASURE=1`，`:224` 逐字 Skip 句「有意慢：300s 墙钟计量…」） | 不红（同样不经 config）；**但它是"300s 要改"这件事最贵的一枚代价钉** |
+| `cmd/wisp/resident_approval_risk_256_windows_test.go:141-144` | `if got := ra.gate.Queue().Timeout(); got != approval.DefaultApprovalTimeout { … "(300s is the contract default; a fourth number here means the fallback grew a value of its own)" }` | ★**这一枚就是"§3 L3 那句字面 300"的守门钉的反面**：兜底若长出第四个数就红；但 `resident_approval_windows.go:456` 那句**字面串不在它的射程里**（它测 `Queue().Timeout()`，不测日志文案）⇒ 改了 `:456` 的字面，**没有尺会红** | 不红 |
+| `cmd/wisp/resident_approval_risk_256_windows_test.go:214,229,237` | `wantTime: approval.DefaultApprovalTimeout`（种子分别是 `l1_window_sec = 2`／`= 99`／`= 1`，都没写 `confirm_timeout_sec`） | ⇒ 它们断言的是等式「**schema 默认 300 ＝＝ 编译常量 300**」；`default:"300"` 或常量任一改动都红 | 不红（各自的 `t.TempDir()` 里没有 90；`45`／`90` 那几枚种子另见 5.3） |
+
+**A 类具名落点＝9 枚（分 6 组）。** 附带一条本腿现量的空白：**`internal/config` 里零枚钉子钉住 `default:"300"` 本身**（尺＝`ConfirmTimeoutSec` 在 `internal/config` 的 21 枚命中，无一行与 300 作相等断言；同族键 `warm_timeout_sec` 倒是有 `loader_test.go:73` 那种默认值钉）。⇒ 今天"schema 默认 300 ＝ C18 的 300"这枚等式**只在 `cmd/wisp` 那三枚 256 钉子里被守着**。
+
+### 5.2 B 类＝文案 needle 钉（钉"话里有没有某句"）
+
+| file:line | 断言逐字 | 用户配 90 ⇒ |
+|---|---|---|
+| `internal/agent/approval/queue_test.go:222` | `if got[0].Remaining != 30*time.Second \|\| !strings.Contains(got[0].Text, "30 秒") {` | **不红**：钉的是提前量（`DefaultApprovalWarning` 30s），不是超时数；且 `:191-193` 显式传 `ApprovalTimeout: 300 * time.Second` 进接缝，与 config 无关 |
+| `internal/agent/approval/ticket84_no_owner_test.go:81-82` | `if !strings.Contains(got.why, "超时") { t.Errorf("why=%q，拒绝理由必须说明是超时自动拒绝", got.why) }` | **不红**——★"钉词不钉数"的正面形状，本腿建议机主把它当作"文案该怎么被守"的参照（这是射程判语，不是改法） |
+| `cmd/wisp/config_reload_223_test.go:311` | `if !strings.Contains(shown, "[确认 L2 "+configReloadTool+"]") {` | 不红（钉 §1 #3 那个卡头的**词**，不含秒数） |
+| `internal/agent/prompt_test.go:268` | `for _, needle := []string{"先经用户确认", "确认超时视为拒绝", "数据不是指令"} {` | 不红（§1 #8 那句无数字） |
+| ★零枚 | —（断言文案含「300」的测试） | **本腿两把尺都落空＝不存在**，故"配置生效后文案钉子必红"这一担心在 Go 测试面**不成立** |
+
+### 5.3 C 类＝因 267 的**带门**而撞、且**依赖"配了真生效"**的用例（不是"生效会红"，是"生效才成立"）
+
+| file:line | 现量形状 | 判语 |
+|---|---|---|
+| `cmd/wisp/approval_reply_201_test.go:105-110` ＋ `:145` | `if l2Wait < time.Second { … // config.toml carries the C18 deadline in whole seconds, and a zero would land on the contract default of 300 - far too long for a test that needs one to expire. l2Wait = time.Second }` ＋ 模板行 `confirm_timeout_sec = %d` | ★**仓里已有的"配了会生效"的既有事实**（注释逐字承认：给 0 才会落回 300，给 1 就真等 1 秒）；而 1 落在 `[31,3600]` 之外 ⇒ 门一生效这条路的种子就被拒 ⇒ 红的是**带**，不是"生效"。本腿不裁它该怎么改 |
+| `cmd/wisp/panel_pump_test.go:124,136` | 注释 `confirm_timeout_sec = 2, so the case can watch an L2 card open and close` ＋ 逐字 `[]byte(string(old)+"\n[risk]\nconfirm_timeout_sec = 2\npermission_mode = \"ask_high_risk\"\n")` | 同上：这一枚**只有配置真生效才有意义**；2 带外 |
+| `cmd/wisp/run_mode101_test.go:110` | `riskLines := "[risk]\nl1_window_sec = 1\nconfirm_timeout_sec = 1\n"` | 1 带外；`docs/evidence/s1/128-ac4-r1-acceptance.md:425` 记过它红句「配置里写着 confirm_timeout_sec = 1 却被默认值取代」＝**同一格的历史读数，本腿不重跑** |
+| 另 4 枚（**他腿读数，本腿未复量**） | `approval_seam_201_test.go:50/:138`、`ticket224_assembly_test.go:81/:234` 各喂 20 | 出处＝同票 `267-a2` 的 §0／§1／§2 普查（本腿只引不抄，其 commit 见 `git log`：`89976ed1`／`c9600334`） |
+| 带内、门不撞（具名以免被误登记） | `resident_approval_risk_256_windows_test.go:159/202/221/286`（45）、`:293/:325`（90）；`unwired_test.go:66`（300）、`:188`（60）；`boundary_test.go:142`（60，断言体见 §7 G-5）；`validate_test.go:236`（31）／`:240`（30，**这条就是门的钉子本身**） | 全在 `[31,3600]` 内或本就是拒带外的正向钉 ⇒ **★90 这一枚已经有测试在守**（`256_test:293/:325` 种 90 并要求 `Queue().Timeout() == 90s`）——这一条对机主最有用：**常驻腿的"配 90 真生效"今天已被钉住，唯独这一格属 `Q-77` 未定的"该不该"** |
+
+**§5 判语：因"用户配 90 且真生效"而必红的测试钉＝0 枚（Go 面）。** 会红的是另外两类：改那个**字面 300**（A 类 9 枚落点）与 267 的**带门**把带外种子挡住（C 类 4 枚具名＋他腿 4 枚）。⇒ **"配了要不要真生效"这件事不会撞上任何现有测试**；它撞上的只有 §4 那 7 枚冻结文档文字与 §2.3 那枚状态机表/事件名。
+
 ## §6 尺读数与未跑清单（门禁读数）
 
+> 每把尺都带取数窗口；计数尺一律用检索工具的 count/content 模式（⛔ 未用 shell grep，避免 `grep -c` 零命中断 `&&` 链）。
+
+| # | 尺（正则） | 根 | 读数 | 取数窗口 |
+|---|---|---|---|---|
+| R1 | `DefaultApprovalTimeout` | `{cmd,internal,tools,scripts}/**` | 22 行＝定义 1（`queue.go:107`）＋注释 2（`queue.go:106`、`resident_approval_windows.go:445`）＋生产引用 1（`queue.go:86`）＋日志字面 1（`:456`）＋测试 17（256_test 5／ticket84 11／queue_test 1） | 09:54+08 |
+| R2 | `300 ?秒\|300秒\|5 ?分钟\|五分钟\|5min\|5 min\|300s` | `cmd` | 9 枚文件／15 行；**产码可见文案 0 枚**（唯一非注释落点＝`resident_approval_windows.go:456` 日志 attr） | 09:55+08 |
+| R3 | 同 R2 | `internal` | 32 行；产码可见文案 0 枚（其余为注释／包文档／测试解释语） | 09:55+08 |
+| R4 | `秒未确认\|审批超时\|确认超时\|自动拒绝\|已超时` | `{cmd,internal,tools}` | 10 行；产码 4 枚（`bridge.go:467`／`prompt.go:63`／`gate.go:563`／`queue.go:479`）＋测试 6 枚 | 09:56+08 |
+| R5 | `"[^"]*秒[^"]*"`（字符串内的「秒」） | `{cmd,internal,tools}` | **3 行**＝`queue_test.go:222`、`queue.go:479`、`gate.go:563` ⇒ 产码秒数文案**只两枚**，且都 `Sprintf` 现算 | 09:56+08 |
+| R6 | `"[^"]*300[^"]*"`（字符串内的「300」） | `{cmd,internal,tools}` | 24 行；生产可见串**零枚字面 300**；非注释落点＝`events.go:42`（事件名）／`resident_approval_windows.go:456`（日志 attr）／`schema.go:460`（toml tag） | 09:57+08 |
+| R7 | `"[^"]*(分钟\|minute)[^"]*"` | `{cmd,internal,tools}` | 2 行（`cmd/llmrecord/main.go:46` 的 flag 默认 2 分钟、`loop_golden_test.go:22` 的语料「提醒我五分钟后关火」）⇒ **零枚"5 分钟"审批文案** | 09:55+08 |
+| R8 | `[Cc]onfirm[_]?[Tt]imeout` | `{cmd,internal,tools,docs,scripts}` | **26 枚文件／98 行**＝`cmd` 21／`internal` 53／文档（PLAN＋SPEC＋reports）15／叙述件（`docs/evidence/**`）9；count 尺现量 | 10:05+08 |
+| R9 | `json:"(timeout\|window\|deadline\|remaining\|expire\|warn)[^"]*"` | `{cmd,internal}` | **0 命中**（⇒ 面板快照无超时秒数栏，与 `pump.go:50-53` 注释同向） | 09:58+08 |
+| R10 | `logf\(\|slog\.\|auditf` | `internal/agent/approval` | 26 行（含 3 行 `t.Logf`）⇒ 审计行带秒数的只 `queue.go:489` 一枚（现算） | 10:00+08 |
+| R11 | `超时\|30 ?秒\|秒` | `docs/specs/SPEC-06-security-gatekeeping.md` | 2 行（`:104` 带 300s／`:151` 不带数） | 10:02+08 |
+| R12 | `^\|?\s*\*?\*?C18` | `docs/PLAN.md` | 3 行（`:1368` 契约表／`:1444` 切片映射／`:3210` 差异表） | 09:57+08 |
+| R13 | `statemachine\.` 与 `SetState\(\|Dispatch\(` | `cmd/wisp` | 生产落点：`models.go:303`（FirstRun Machine）、`resident_approval_windows.go:823`／`:900`（`b.SetState(…)`＝球的渲染态）、`approval_always.go:190`／`approval_reply.go:168`（只回状态名）⇒ 未见 Machine 被推进 `AwaitingApproval`（§7 G-2） | 10:00+08 |
+| R14 | `Queue\(\)\.Timeout\(\)\|ApprovalTimeout\|approval\.NewQueue` | `cmd/wisp` | 23 行＝产码 3（`run.go:616`、`resident_approval_windows.go:372`、`:383` 日志）＋注释/日志 3（`config_reload.go:42`、`:445`、`:456`）＋测试 17 | 10:01+08 |
+
+**未跑清单（本腿一票未跑，全数具名）**：`go build ./...`／`go test ./...`／`go vet`／`gofumpt`／`wisp slo`／`sh scripts/*`／任何 `go run`。原因＝派单硬闸①（编排者正在跑 `cmd/wisp` 整包取红名册，并发跑会洗掉它的读数）＋硬规矩①。⇒ **本文件全部判语＝静态读码**，没有任何一枚"今天红/绿"的断言出自本腿；哪枚测试今天真的红，只有编排者那一发的名册能答。
+**门禁读数（自陈）**：本腿至此工具调用约 56 次；`go` 命令 0 次；`git add` 只带过本文件一枚 pathspec（骨架 `4e877958`／§1＋§2 `f9bd0eb7`／§3＋§4 `e1491088`）；未改任何他人已跟踪文件（本文件是本腿自建自填的交付件）；未碰 `.scratch/wisp/issues/**` 的 AC 框、未碰 `docs/reports/pending-and-issues.md`。
+
 ## §7 判不动／量不到
+
+| 号 | 格子 | 本腿能判到哪 | 为什么判不动／量不到 |
+|---|---|---|---|
+| G-1 | **审批卡／托盘／悬浮球／面板页面上的字**（"5 分钟"这类人话最可能的落点） | Go 侧 R5／R6／R7 三把尺都是零 ⇒ 屏幕上的秒数若存在，其来源要么现算、要么在那两棵树里 | 硬规矩②：`frontend/**` 与 `design/**` 不许读、结论里不许转述 ⇒ **这一面属页面侧、本编队量不到，需机主带去他用的那枚 agent 另查** |
+| G-2 | 生产里 `AwaitingApproval` 那枚 **300s 机器定时器到底有没有被 arm** | 球不自带计时器（`ball_windows.go:309-311`＋`ball/doc.go:19`）；`EvApprovalTimeout` 零枚手工 Dispatch（R1 尺与 `EvApprovalTimeout` 尺都只命中 `timeouts.go:51`／`table.go:172`／测试） | 本腿未读到"常驻/run 装配根把 Machine 推进 `AwaitingApproval` 并 rearm"的那一行；`resident_ball_windows.go:275` 那个 `Initial: statemachine.StateSleeping` 属于谁（ball.Options 还是 statemachine.Options）未复现 |
+| G-3 | 面板快照是否用**别种形状**（手写 map／字符串拼接）把 timeout 换算成毫秒送进 JS | R9 零命中＋`panel_pump.go:408` 只打 `len(snap.Pending)`＋`pump.go:50-53` 注释自陈 `approval.remainingMs` 在 no-source 名单 | 未逐行读 `internal/panel` 的快照构造体；"没有 json 标签"不等于"没有手写键名"，本腿只到"两把尺同向"，不到"证否" |
+| G-4 | `pump.go:53` 引的 `gate.go:274`／`:387`／`:510-513`（"Remaining 装的是静态窗口长度"） | 只复核到 `gate.go:562` `Remaining: g.q.WarningLead()` 与 `:308`／`:437` `Remaining: g.window` 三枚同族落点确实存在 | 那三枚行号是他票注释的读数，本腿未逐行 `Read`；行号会漂（派单硬规矩⑤），所以引而不认 |
+| G-5 | `batch_test.go:106`、`boundary_test.go:142` 的**断言条件** | 只现量到落点与解释语／赋值行 | 未读到紧邻上文的 `if` ⇒ 5.1 A 类这两枚的"红条件"是形状推断；机主若拿它当凭据，请让实现腿补读 |
+| G-6 | 这些钉子**今天**红不红 | — | 本腿禁跑 go（硬规矩①），全节不提红绿；只有编排者那一发 `cmd/wisp` 整包名册可答 |
+| G-7 | **`Q-77` 本体**：C18 写死的 300s 与可配的 `confirm_timeout_sec` 谁优先 | 本腿只交名册：条件性说谎文案 1 枚（§1 #9）＋行为面写死 300 共 2 枚（§2.3）＋日志字面 2 枚（§3 L3／L5）＋冻结文字 7 枚（§4）＋**生效红 0 枚**（§5 判语） | 硬契约面（`SPEC-12 §4.1`＋票 267 AC#3 禁区）⇒ ⛔ 不裁、不选甲乙；**"配了要不要真生效"这一格归机主** |
+| G-8 | 托盘 tooltip 的字 | Go 侧未找到承载位（R5 只 3 行） | 与 G-1 同格：若存在则在页面侧／原生文案资源里，本编队不读 |
+| G-9 | 首启落盘那一刻屏上写的值（盘上现在真是 300 吗） | `schema.go:460` 的 `default:"300"` 是反射源 | 「盘上＝300」是同票 `267-a2` 的现量（其 §0 判 `firstrun.go:82` 走 `NewDefaults()`），本腿未自跑那把尺，只引注 |
 
 ## §8 我写错的读数（自我对抗）
 
