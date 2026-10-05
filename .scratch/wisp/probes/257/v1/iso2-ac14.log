@@ -1,0 +1,15 @@
+ISO2 START 12:31:18 head=549cb218 load=CPU=52% MEM=56.3%
+time=2026-10-05T12:31:24.522+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+time=2026-10-05T12:31:24.531+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 791.5 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:867: AC#14 nail 2 (Eval push hop), page's own words: title="PUSHED-33R5-OK"
+time=2026-10-05T12:31:25.519+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-05T12:31:25.524+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC14GoSideEvalPushReachesThePage (0.99s)
+=== RUN   TestAC1ResidentLegInstallsItsLogListenerOnDisk
+    resident_sink_nail_127_windows_test.go:433: resident sink C:\Users\swq\AppData\Local\Temp\TestAC1ResidentLegInstallsItsLogListenerOnDisk3705111548\002\logs: 1 file(s), 12 record(s)
+--- PASS: TestAC1ResidentLegInstallsItsLogListenerOnDisk (6.86s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	7.972s
+ISO2 END rc=0 12:31:32

@@ -1,0 +1,3 @@
+wisp 0.0.0-dev (unknown, built unknown)
+WISP_ENV=dev (data dir rules: SPEC-03 §5)
+sherpa-onnx runtime version: 1.13.8

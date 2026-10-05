@@ -132,11 +132,33 @@
 
 ## 7. ★裁定三：那 61 行有没有把指引漏进生成的 `config.toml`（实弹突变）
 
-判语：未判。凭据：未判。
+判语：**没有漏**；而且**"漏了就响亮红"这一雷是真会响的**——本腿自己种下去证过一遍（不是引用并行腿的 M4 读数）。
+
+凭据（两把尺同发）：
+- **今天盘上那一形**：真进程干净机建出的 `data-dev/config.toml`＝2,571 字节、`grep -c "llm.providers"`＝**0**；`grep -n "^\["` 尾部节名＝`[cost]`／`[models]`／`[observe]`／`[observe.roll]`／`[plugins]`，没有任何 provider 节被"顺手建出来"（原件 `.scratch/wisp/probes/257/v1/probe/`）。包内那一形同向：`firstrun_257_test.go:165-171` 逐枚读 `os.ReadFile(cfgPath)` 反控 `[llm.providers`（⛔ 它读的是文件，不是 stderr，这正是"教"与"建"之间那道界）。
+- **本腿种的实弹 M3**（12:36:01→12:36:08）：在 `SaveFile` 成功后加三行，把一段 `[llm.providers.t257v1leak]` 追加进**生成的文件**（`os.ReadFile`＋`os.WriteFile`＋`append(raw, …)`）。结果 **rc=1、红 6 枚**，逐字红句（`mut-M3-guidance-leaks-into-generated-file.log`）：
+  `firstrun_198_test.go:217: the created file carries the dynamic table "[llm.providers" anyway - that would be an invented entry, not a default`
+  `firstrun_198r2_test.go:239: AC#2 RED: the config.toml first-run wrote is not the schema's `default` tags rendered: first difference at line 179 (byte 2571): want "", got ""; total bytes want 2571 got 2599`
+  `firstrun_257_test.go:170: AC#1 RED: the guidance leaked into the generated config.toml, which is invented-default territory and ticket 198's forbidden shape:`
+  `firstrun_257_test.go:249: AC#1 RED: the hand-add shape the receipt teaches does not even load: config: config.toml: llm.providers.t257v1leak.protocol must be set explicitly for a non-preset provider …`
+  另两枚同发红＝`TestTicket257R2AC1ReceiptOnlyFirstItemUnlocksThreeOfSeven`／`TestTicket257R2AC1NonPresetRowNeedsProtocolBeforeItLoads`（都因那份文件自己加载不过）。
+  ⇒ 三把尺同时响：票 198 的**名册反控**、票 198 的**逐字节尺**（2571→2599）、本票 AC#1 自己的**泄漏反控**。`A543` 记的那条最硬的雷（"ⓐ 空壳行会让首建文件自己加载不过、进程起不来"）在这一发里被复现成红句，不是推测。
+- 还原证明：五发突变各归 `md5sum cmd/wisp/firstrun.go`＝`0491339282492f2cabdbf5be576c8a57`（＝`git cat-file blob HEAD:cmd/wisp/firstrun.go` 同一值），脚本每发跑完立刻还原、末尾再双读（`FINAL md5 … equals baseline: True`）。
 
 ## 8. ★裁定二：正向断言（"提示真到达 stderr/stdout"）是不是恒真
 
-判语：未判。凭据：未判。
+判语：**不恒真——它有牙**；⚠ 另要更正一处口径：**那一格真到达的通道是 stderr，不是 stdout**，两枚测试测的是 `runTextTask` 注入的那枚 `io.Writer`，"生产把它绑到 `os.Stderr`"这一步**没有任何用例钉着**（本腿用真进程读数顶了这一格，⛔ 它不该被当成入库的钉）。
+
+凭据（攻法＝把"指引"从**到达**降级为**存在于二进制但谁也没收到**）：
+- 本腿 **M1**（12:35:39→12:35:50）：只把 `firstrun.go:151` 那枚 `fmt.Fprint(stderr, …)` 的目标改成 `io.Discard`——三样指引的**字面串一个都没动**（仍在源码与二进制里），只是不写给操作者。⇒ **rc=1、红 3 枚**：
+  `TestTicket257R2AC1CleanMachineReceiptTeachesTheWalkableChain`（逐条 `AC#1 RED: the first-run receipt never says "第一样＝一节 [llm.providers.<名>]"` 等五条）
+  `TestTicket257R2AC1ReceiptChainWalkUnlocksAllSevenFields`（`the receipt stopped teaching the in-place fill`）
+  `TestTicket257R2AC1ReceiptStatesTheNonPresetCondition`（两行 `never states "非预设名必须自己写 protocol"`／`"否则这份文件加载不过"`）
+  ⇒ 在"回执里根本没有指引"的世界里这几枚**必红**，恒真性攻不动。
+- 前提也不是恒真：`t257CleanMachine`／`t257npCleanMachine` 都在拿回执之前先 `t.Fatalf` 断言"文件此前不存在＋退码仍 2＋stderr 里有 `新建默认配置`"（`firstrun_257_test.go:76-91`／`firstrun_257_nonpreset_test.go:52-61`）——若 `ensureFirstRunConfig` 一声不响地建了文件，用例在**读到回执之前**就红，不会把"没有回执"读成"回执通过"。
+- **通道那一格的真读数（本腿现跑，⛔ 不入库的读数不作数）**：`main.go:159-163` 逐字把 `stdout: os.Stdout, stderr: os.Stderr` 交给 `runTextTask`；真进程那一发 stdout＝**119 字节**（只有版本行，无指引），stderr＝**5,674 字节**（三样指引＋三因＋三形状全在这里）。
+  ⇒ 若按票面/派单那句"真到达 stdout"逐字裁：**那一格不成立，且本来就不该成立**——文案落的是 stderr（票 198 结案的同族形状：回执走 stderr、退码 2 一字未放宽）。本腿按"到达用户可见通道"裁＝**成立**，并具名登记"stdout 是措辞不符，不是交付缺失"，翻勾时别把它写成 stdout。
+- ⚠ 残余（把它写成结论就是假话）：**没有任何用例从真子进程口径测过这枚通道**（两枚测试都在同进程里传 buffer）。本腿那发真进程读数顶了今天，⛔ 不可重放为门禁；要长期钉住需一发行文＋一枚 `exec` 级用例，归编排者决定要不要新开一格。
 
 ## 9. 那枚新增红＋那枚命名跳的复跑两形与归因
 
@@ -166,22 +188,72 @@
 - 收腿后 12:30:36：`internal/agent/approval`＝` M approval.go`＋` M queue.go`（两枚，`git diff --stat`＝109 增／13 删，读片段确为注释级）、`GOFLAGS`＝空、HEAD `549cb218`。
 - ⇒ **`259-r2` 在我整包窗口中段落了笔**（正是派单预告的那种撞法）。本腿仍收下这一发读数的理由具名：那两枚文件在 `cmd/wisp` 的编译闭包里，但变色那三枚的判据不读 `approval`；三枚变色里 lifecycle／latency 两枚另有**低载隔离复跑**（12:30:58 起腿前后各取一次 status，见 `iso1-status-approval-before.txt`）顶着，AC#14 那枚另有 12:31:18 的隔离复跑顶着。**若编排者认为整包那一发因污染不作数，需要复跑的是"包内顺序能否复现 AC#14 的红"这一格，不是票 257 的六格。**
 
-## 10. 门禁四门（本腿自跑，不引用腿的读数）
+## 10. 门禁四门（本腿自跑，⛔ 不引用实现腿的读数）
 
-判语：未判。凭据：未判。
+| 门 | 时刻（+08） | 命令（逐字） | 读数 |
+|---|---|---|---|
+| D22 静态扫描 | 12:33:14 起→12:33:44 完 | `sh scripts/d22scan.sh` | **rc=0**，末行逐字 `d22scan: clean - no D22 ban violations`；覆盖面 `bans #1-5 internal/=228、cmd/=38、ban #6 frontend/=85、ban #7 internal/tools/=23、ban #8 design/=39、frontend/=85、internal/=512、cmd/=103`（`gate-d22scan.log`） |
+| 路径长度帽 | 12:33:44 | `sh scripts/check-path-length-budget.sh --with-self-test` | **rc=0**，`VERDICT GREEN`；`tracked=5866／over-budget=57／covered by roster=57／not in roster=0`；`longest=180 chars relative`（`252-…` 那枚）；自检那一行逐字 `control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim`（`gate-pathlen.log`） |
+| `go vet` | 12:34:00 | `go vet ./cmd/wisp/` | **rc=0**，日志 **0 字节**（`gate-vet.log`）。⚠ 空读数这一发不作"跑到了"的证据，所以同发跑了 `go test` 与下面那把 gofumpt 的版本尺；本腿全程没有遇到过 11:26:51 那一形的编译红 |
+| gofumpt 点名 | 12:34:02 | `"D:/work/base/gopath/bin/gofumpt.exe" -l cmd/wisp` | **rc=0，只列一枚 `cmd\wisp\models.go`**（预存 CRLF，不归本票，⛔ 未顺手格式化）；本票三枚（`firstrun.go`／`firstrun_257_test.go`／`firstrun_257_nonpreset_test.go`）**零命中**。尺本身活着的证明＝同把 `-version` 回 `v0.12.0 (go1.27.1)` |
+
+⛔ 没用 `~/GOPATH/bin/gofumpt` 那把瞎尺；`go env GOPATH` 本腿现量＝`D:\work\base\gopath`（与派单一致）。
 
 ## 11. 突变名册（每发起止时刻到秒，编排者拿它作差）
 
-未判。
+⛔ 五发全种在 `cmd/wisp/**` 唯一一枚 `firstrun.go`；⛔ 未种 `internal/agent/approval`／`internal/config`／`internal/panel`。台件＝`.scratch/wisp/probes/257/v1/mutate257v1.py`（每枚 needle **要求恰好命中 1 次**，不符就 `ABORT` 不跑测试＝不会产"没改到东西的假牙"；每发跑完立刻还原并 `md5` 双读）。
 
-## 12. 七项对抗检查（`SPEC-10 §8`）
+| 号 | 起点→终点 | 种法（一句话） | 应红格 | 实读 |
+|---|---|---|---|---|
+| M1 | 12:35:39→12:35:50 | 指引那枚 `Fprint` 的目标改 `io.Discard`（字串不动） | §8 恒真性 | rc=1 红 3 枚（两套各红，见 §8 逐字红句） |
+| M2 | 12:35:50→12:36:01 | 抹掉 `非预设名必须自己写 protocol，否则这份文件加载不过` | §2 两套射程 | rc=1 红 **1 枚**＝`…ReceiptStatesTheNonPresetCondition`，六枚那一套全绿 |
+| M3 | 12:36:01→12:36:08 | 把 `[llm.providers.t257v1leak]` 追加进**生成的 config.toml** | §7 最硬那枚雷 | rc=1 红 **6 枚**（含票 198 名册反控＋逐字节尺 2571→2599） |
+| M4 | 12:36:08→12:36:17 | 回执第 2、3 句折成同一句「配置未生效——去这份文件里看看」 | §4 AC#2 | rc=1 红 1 枚＝`…AC2ThreeRefusalsStayThreeSentences`（四条红句） |
+| M5 | 12:36:17→12:36:26 | 凭据那句里回显 `api_key = "sk-t257v1mutantvalue"` | §5 AC#3 | rc=1 红 1 枚＝`…AC3CredentialSurfaceUntouched`（两条红句） |
 
-未判。
+- 基线读数（同缝、未突变）：12:36:48→12:36:56 rc=0，八枚 257 全 PASS＋十一枚票 198 全 PASS。
+- 还原凭据：`BASELINE md5 0491339282492f2cabdbf5be576c8a57 worktree-equals-head=True` 起手即证；每发 `restored_md5_ok=True`；收尾 `FINAL md5 … equals baseline: True`。
+- 窗口内的污染面：这五发跑在 12:35:39→12:36:26，`internal/agent/approval` 在 12:30:36 已脏（`259-r2` 注释级），本腿没碰它；五发的 `-run` 只挑 `TestTicket257R2|TestTicket198`，不含计时敏感用例。
 
-## 13. 我攻不动的地方／判不动的格子（具名归口，⛔ 一枚不写成"应该没问题"）
+## 12. 七项对抗检查（`SPEC-10 §8`，逐格本腿自跑／自读）
 
-未判。
+1. **stub 扫描**：⛔ 无 mock 顶真件。两枚测试都走**真入口** `runTextTask`（`main.go:159` 那条缝，README「seams」列的合法注入面之一）与**真加载器** `config.NewManager(path, nil)`（`nil` 正是产线三处的形状，`A560`）；`firstrun.go` 的 61 行里 `grep` 无 `TODO`／返回 nil 假成功形状，`ensureFirstRunConfig` 仍只在真建成功时打印。
+2. **DEFERRED 双向核对**：本票新增行里 `DEFERRED` 标记 **0 枚**（`git diff -U0 21bec8a1..HEAD -- cmd/wisp/firstrun.go | grep -c "^+.*DEFERRED"`＝0）⇒ 没有新增登记项，`SPEC-12 §5` 那张表不被本票牵动。⚠ 顺带复认一处**既有**在册缺陷（不属本票、不新立）：AGENTS.md 与记忆里都写着"表 13 行／代码 0 枚标记＝空转规矩"，本腿没有尺可核。
+3. **SLO 测量完整性**：`internal/observe/thresholds.go` 在范围内 **0 命中**（§6 那张表），D32 那两枚预算（冷启 1500 ms／热 200 ms）本腿**一字未动**、读数取自用例自己的 `t.Log`（§9 那四发冷启 917/980/960/757/802 ms）；⛔ 无"放宽断言换绿"，⛔ 无 `t.Skip`，⛔ 未把 SKIP 读成通过（§9 明写"跳＝什么都没测"）。
+4. **契约偏离检查**（D34 工具表／C19 R1–R9／D43 转移表）：本票没碰任何一张——`internal/panel` 三枚契约面文件（`config_handlers.go`／`bridge.go`／`panel_config_store.go`）范围内 0 改动，名册仍七枚（`config_handlers.go:58-68` 与 `firstrun_257_test.go:107-132` 那七枚**逐名相等**，本腿对过）。ⓒ 那形的"不新增 C17 面字段"兑现＝ⓑ 那形没被偷偷做。
+5. **D22 七条新增禁令静态扫描**：见 §10 第一行（rc=0 clean）＋§5 第二把尺（新增行里 `go func(|filepath.Clean|filepath.Abs|time.Since|time.Now` 命中 0）＋`firstrun.go` 内函数枚数仍 1。⛔ 明文 API 密钥：五发之外全程零值形状（§5）。
+6. **场景↔切片双向核对**：本格超出单票射程——`SPEC-00 §4` 那张矩阵要按切片核，归编排者（§13 第 4 行具名）。本腿只补一句：票 257 的**用户可见后果**（"机主第一次配模型能不能走通"）今天只有**静态可走通**这一种证明（手加三样 ⇒ 7/7），没有人替机主真在编辑器里打过那三样。
+7. **失败预演＋缺口审计**：审计者＝本腿（≠ 实现腿 `257-r1*`／`257-r2`／`257-r2b`）。缺口逐条落在 §3 边界两条、§5 nit 一条、§7/§8 各一条残余、§13 全表；⛔ 没有一格被写成"应该没问题"。
+
+## 13. 我攻不动的地方／判不动的格子（具名归口）
+
+| # | 格子 | 为什么够不着 | 归口 |
+|---|---|---|---|
+| N1 | `provider_credential` 的**值腿**（`StoreCredential`→DPAPI 真密封＋"只写不回显"在真机上的长相） | ⛔ AC#3 不许为测试去写真 blob；两枚测试都只走引用侧；本腿同样不写（没种这一发） | 编排者：`docs/evidence/s1/` 单行真机裁决（同 `A617` §1 残余第一条） |
+| N2 | 三句拒因与三样指引**在设置页上的完整长相** | ⛔ `internal/panel/**` 不是本票写面，且本腿派单禁改；本腿只读到 `config_handlers.go:381-394`／`:501` 的形状，量不到渲染终串 | 编排者（票 §8 边界③已预告"要界面建行＝单开票"） |
+| N3 | 回执通道（stderr）被真子进程口径**长期钉住** | 今天没有任何 `exec` 级用例；本腿那发真进程读数是手工的、不可当门禁 | 编排者：要不要新开一格（§8 末行） |
+| N4 | 两枚测试里三枚 tag 用**字面量**（`firstrun_257_test.go:50-54`）这件事本身好不好 | 有意为之（并行腿 §7A-N7 给了理由：换成读常量就落回 257-r1b 的 M1 盲区），本腿认同其取舍但⛔ 无权改它一根针 | 编排者知悉即可；本腿判"脆性可接受" |
+| N5 | `TestTicket257R2AC1…` 那两枚 `AC1…` 用例与票面 AC 编号的**一对一映射表**（README 规则 6 要求的裁决表按 AC 编号） | 票面 AC 框只有 4 枚（AC#0 已勾），本件已按 AC#1–AC#4 出判语；`AC#0` 的形状裁在 `A543`，⛔ 本腿不重裁契约 | 编排者翻勾时按 §3／§4／§5／§6 四格即可 |
+| N6 | **机主人因层面**："教了三样"不等于"机主会照三样打" | 只能靠 e2e／自用期读数，静态与包内尺顶不了 | 编排者（与 §12 第 6 项同一格） |
+| N7 | 我攻不动的最后一枚：五发突变之后，`A617` 那条"同一轮派两枚写腿"的**根因**不在这棵树的任何一格判据里 | 那是派单纪律，不是本票交付物 | 编排者自己已记账，本腿不代劳 |
 
 ## 14. 交件判语与 commit 链
 
-未判。
+**四条 AC 的判语（逐格一句，⛔ 框归编排者翻）**：
+- **AC#1 成立**（附 §3 那两条具名边界）：干净机两形都真跑过——包内八枚 rc=0 复现 `map[第 2 种拒因：行不存在:7]`、真进程那发 stderr 5,674 字节里三样指引各到一次、生成的文件 2,571 字节零 `[llm.providers`。
+- **AC#2 成立**：三因三句各带互不重叠的补救，本腿 M4 折两句 ⇒ 指名用例红，四条红句逐字在 §4。
+- **AC#3 成立**（附一条准确性 nit）：范围内 `StoreCredential` 侧与三枚面板契约文件零改动、`firstrun.go` 仍一枚函数，M5 回显值 ⇒ 指名用例红。
+- **AC#4 成立**：`21bec8a1..HEAD` 八枚禁区模式里，除 `internal/config/**` 那 5 枚**全部归票 267** 外其余全 0；本票各腿自己的 commit 枚枚 0 命中；一处**范围外**的 `257-r1b` 落点差具名在 §6 末段。
+- **★三格加裁**：两测试套＝**两套都留、同批算交件**（M2 决定性）；正向断言＝**不恒真、有牙**（M1），通道措辞需从 stdout 更正为 stderr；61 行漏进文件＝**没漏，且漏了必响**（M3，三把尺同响）。
+- **那枚红＋那枚跳＝本腿复跑判为机器争用**：票 257 新增红 **0 枚**；本腿整包另出一枚在册同名红（AC#14），隔离复跑绿，归票 33 那一族；⚠ 整包那一发的窗口里 `259-r2` 落了笔（前后 status 已报，§9 末段）。
+
+**本腿 commit 链（只 commit、⛔ 零 push、笔笔 `git commit -F msg -- 枚枚点名 pathspec`）**：
+| 笔 | 时刻 | 内容 |
+|---|---|---|
+| `65142d9a` | 12:21:29 | 骨架（§0 锚＋§1 容量三发现量） |
+| `0793e35e` | 12:42:07 | §2 两测试套裁定＋§3/§4/§5 三格判语＋两枚 msg 台件 |
+| 本笔 | 见 `git log -1` | §6/§7/§8/§9/§10/§11/§12/§13/§14 收满＋本腿全部台件 |
+
+**纪律自证**：⛔ 票面 AC 框（`- [ ]` 四枚）与 `docs/reports/pending-and-issues.md` 一字未改（两枚文件都不在本腿任何 pathspec 里）；⛔ 产码一字未改（五发突变全部还原、`md5` 五取相等）；⛔ 未删任何一枚测试件（两套件与 `9c0d4c9a` 原件都在原位，覆盖过的、没覆盖的都没动）；⛔ 无 `add -A`／`add .`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删（本腿台件全留在 `.scratch/wisp/probes/257/v1/`，含 `probe/` 那枚 31 MB 的 `wisp.exe`，⛔ 未 commit 进仓，清点见本节）；未在仓库内建 worktree。
+
+**本腿台件清单（README 规则 8：路径＋体积＋有没有被本件引用，⛔ 一条没删）**：整目录 `du -sh .scratch/wisp/probes/257/v1`＝**31 MB**，其中 30 MB 是一枚**未入库**的可执行件 `probe/wisp.exe`（§8 那发真进程读数的宿主，⛔ 别删，删了那格读数就不可重放）。入库的 35 枚全为文本：`pkg1-cmd-wisp.log`（最大，整包全文）／`mut-M1..M5-*.log`（五发红句原件）／`baseline-257-family.log`／`iso1-count1.log`／`iso2-ac14.log`／`iso3-count3.log`／`gate-{d22scan,pathlen,vet,gofumpt}.log`＋`gates.log`／`ac4-diff-names.txt`／`roster-{mine,theirs}.txt`＋`names-{mine,theirs}.txt`／`pkg1-status-approval-{before,after}.txt`＋`pkg1-goflags-*`＋`pkg1-head-*`／`iso1-status-approval-before.txt`／`firstrun.pristine`（突变还原用的 HEAD 快照）／`mutate257v1.py`（台件本体）／`probe/{real-run,real-run2,run}-{stdout,stderr}.txt`／`msg-skeleton.txt`＋`msg-s2.txt`。除 `probe/` 那六枚 stdout/stderr 直接顶 §3/§8 两格、五枚 `mut-*.log` 顶 §2/§4/§5/§7/§8 五格外，其余每枚都被 §6/§9/§10/§11 逐名引用；**没有一枚是"建了没人引用"的**。⛔ `probe/data-dev/**`（真进程那发的 `config.toml`＋logs＋secrets 目录形状）**刻意未入库**——那一格里有 DPAPI store 的目录形状，本票凭据只需要它的文本读数。

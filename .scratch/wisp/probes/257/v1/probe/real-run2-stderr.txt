@@ -1,0 +1,4 @@
+time=2026-10-05T12:38:13.464+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp run: 本机没有可交互控制台，本轮没有人能答复卡片：L2 卡会等到超时后按拒绝处理，L1 窗口没有人能否决（要能当场答复，请在终端里跑）
+time=2026-10-05T12:38:13.467+08:00 level=INFO msg="wisp: persistent log sink installed" dir="D:\\work\\workspace\\projects plans\\Wisp\\.scratch\\wisp\\probes\\257\\v1\\probe\\data-dev\\logs" min_level=info early_records=1 early_dropped=0
+wisp run: 文本角色未配置（Unconfigured）：config: llm: role "chat" is unset and text_chain is empty (Unconfigured)
