@@ -276,7 +276,22 @@
 | 09:51:59 | 本件 commit §2 后 | **`c9600334`**，163 行 |
 | 09:52:15 | `grep -n -i "inject\|seam\|mock" .scratch/wisp/issues/README.md`、`grep -rn -i … tools/d22scan/*.go`、`ls internal/*/testdata` | 名册原文＝`README.md:206-207`；d22scan 侧**没有**任何"测试构造 gate/queue"的禁令；`testdata/` 现存四棵：`internal/agent/testdata`(golden)、`internal/llm/testdata`(golden)、`internal/models/testdata`(tiny-model.tar.bz2/README)、`scripts/testdata` |
 
-### §6.2 未跑清单（派单规矩 1 的账，逐枚具名）
+### §6.2 收口读数（09:58:25–09:58:42+0800，本腿自取）
+
+| 尺 | 读数 |
+|---|---|
+| `git rev-parse --short HEAD` | **`8d44e7ff`**（本腿最后一枚内容 commit；起手 `873c3063` → 骨架 `8aa9ff6f` → `89976ed1` → `c9600334` → `9ca14bdf` → `7b87b991` → `8d44e7ff`，共 **6 枚 commit**，全部只含本件） |
+| 逐枚验面 `git show --name-only`（对上面 6 枚各取一次） | 每一枚的文件清单都只有 **`.scratch/wisp/probes/267/a2/census.md`** 一行 ⇒ "pathspec 只写自己那一枚文件"这条**逐枚成立**，且零 `git add -A`/`git add .` |
+| `wc -l` / `wc -c` 本件 | **09:58:25 读＝345 行 / 73,563 字节**；⚠ 这是**写该行时刻**的快照，本件之后又长了（10:00:32 复尺＝**361 行 / 77,555 字节**，当时 HEAD 已被并发腿推到 `82a9f7a3`）；终值以最后一枚 commit 后的复量为准 |
+
+| 占位符尺 `grep -n "待填\|未判\|TBD\|TODO\|占位"` 本件 | **命中 1 行＝本行自己**（尺的字面混进被扫文件里，这是本腿写的一枚假阳性，09:59:50 现读）；⛔ **除此之外 0 命中** ⇒ 硬预算闸门那句"全文不许留占位符"成立（§7 里的"判不动/量不到"是小节标题＋**具名归口**，不是占位符）。这一处已写进 §8 第 14 条 |
+| scoped 脏面尺 `git status --porcelain -- cmd internal tools scripts docs` | 起手（09:38:38）**0 行** → 收口（09:58:33）**1 行**＝` M docs/reports/pending-and-issues.md`。⚠ **那不是本腿写的**：派单规矩 2 明令不碰台账，本腿零次打开过它写面（只在 §1.3/§7.5 引用过它的行号，那是 grep 读）。这一行＝编排者自己在共享树上的写面，本腿如实登记、不动、不 `checkout` |
+| `git diff --name-only 873c3063..HEAD` 全树 | 除本件外还有 `.scratch/wisp/probes/267/r1/evidence.md`、`r1/final-verify.txt`、`probes/267/a3/census.md`、`issues/167-*.md`、`issues/267-*.md`、`docs/reports/pending-and-issues.md` ⇒ **同机此刻至少三枚别的面在飞**（r1 写腿、`a3` 普查腿、编排者） |
+| ★并发腿具名 | **`267-a3`** 已于 `4e877958` 落骨架（起手 `09:53:08+0800`／锚 `c9600334`＝本腿 §2 那枚 commit），它的射程是**用户可见文案名册／常量与默认值／日志审计／文档含冻结件标注** ⇒ **与本件（调用点与名册尺）不重叠**。本腿没有读它的正文，避免把别家腿未核的读数当自己的尺（派单"不许复用别家腿读数"） |
+| 零 go 尺 | 本腿全程只跑过 `date`/`git`/`ls`/`grep`/`sed`/`wc`/`awk`/`cut`/`sort`/`uniq`，⛔ 一条 `go`／`wisp`／`sh scripts/*` 都没有（§6.3 那 6 项都是据此未跑而量不到的） |
+
+### §6.3 未跑清单（派单规矩 1 的账，逐枚具名）
+
 
 ⛔ 本腿**一条 `go` 命令都没跑**，因此下面每一项都是"本可以实测、按令未实测"：
 
@@ -293,7 +308,7 @@
 甲在本腿的账是 +29s（`approval_reply_201_test.go:439`）+29s（`panel_pump_test.go:136`）+ 失败路径每发 30s（`run_mode101_test.go` 里 `t101call` 用的是无期限 `context.Background()`，`:195`）。这棵树今天有没有一枚尺量着 `cmd/wisp` 的包时长，本腿没找到（`scripts/wisp-cli-tests.sh` 里搜不到 `-timeout`），而 `scripts/portable-tests.sh:5` 只列了"go test <16 packages>"。**⇒ 归口＝编排者**：只有当机那枚跑 go 的腿能给出"抬完种子后这一包还在不在默认包超时内"。本腿拒绝用"应该还早"填空。
 
 ### §7.2 band 之后那 12 枚调用点的**确切红形态** —— **量不到**
-本腿能给的是链条：`os.WriteFile` 落盘 → `config.LoadFile`（`loader.go:41`）→ `readConfigFile` → `validate`（`loader.go:137`）→ `validateRisk` 的 `observe.New(observe.ClassConfig, "config.toml: risk.confirm_timeout_sec %d out of range [31, 3600]")`（`validate.go:145-148`）→ 装配根拿不到 cfg。给不了的是**这一包实际打印哪一句、第几枚用例先停**（未跑，§6.2 第 1 项）。**⇒ 归口＝编排者排的下一枚 `cmd/wisp` 写腿**（它本来就要动这批文件）。
+本腿能给的是链条：`os.WriteFile` 落盘 → `config.LoadFile`（`loader.go:41`）→ `readConfigFile` → `validate`（`loader.go:137`）→ `validateRisk` 的 `observe.New(observe.ClassConfig, "config.toml: risk.confirm_timeout_sec %d out of range [31, 3600]")`（`validate.go:145-148`）→ 装配根拿不到 cfg。给不了的是**这一包实际打印哪一句、第几枚用例先停**（未跑，§6.3 第 1 项）。**⇒ 归口＝编排者排的下一枚 `cmd/wisp` 写腿**（它本来就要动这批文件）。
 
 ### §7.3 常驻腿"越界"与"缺文件"共用同一枚 `unreadable` 判语 —— **判不动，且本腿认为这是本把尺量出的最重一枚**
 `resident_approval_windows.go:453-457` 逐字 `if err != nil || c == nil { slog.Warn(…); return 0, 0, riskProvenanceUnreadable }`：band 让**一份存在但越界**的 config 与**一份不存在**的 config 得到同一个 provenance 词与同一个 300s 回落。票 256 的 `:141-144` 那枚正控（`(300s is the contract default; a fourth number here means the fallback grew a value of its own)`）**分不开这两种**，而裁形 ⓐ 的原话是"越界＝加载时拒"。要不要给常驻腿加第三种 provenance 词、要不要让它拒启动，都不在只读普查的权里。**⇒ 归口＝编排者**（且它可能与 `Q-77` 同一枚决定面，见 §7.5）。
@@ -317,7 +332,7 @@
 本腿的尺是 `-e confirm_timeout_sec -e ConfirmTimeoutSec`（大小写不敏感）。若某处用**变量拼出键名**（`"confirm_" + "timeout_sec"`、正则、或 `toml.Marshal` 之后改写），grep 形状看不见。`internal/config/schema.go:460` 的 toml tag 是本腿能确认的唯一具名形状；**"零枚隐藏拼接者"这句本腿不敢说**，只说"未发现"。
 
 ### §7.10 `panel_pump` 那发在 31s 下**究竟改看哪枚时钟** —— **判不动（两相未实测）**
-本腿读到 `panel_pump_test.go:112` 的 30s ctx 与 `gate.go:571`（`<-deadline`）/:576（`<-ctx.Done()`）在同一枚 `select` 里，**读到的是"两枚 case 并存"，不是"哪枚先赢"**。`30 < 31` 让机制判语倾向 ctx 先响，但这一句在没跑过之前不许当结论用（§6.2 第 1 项）。**⇒ 归口＝编排者**：甲若被选，这一发要**连 ctx 一起抬**，而抬完必须有一枚实测读数才算交付（本腿给不了）。
+本腿读到 `panel_pump_test.go:112` 的 30s ctx 与 `gate.go:571`（`<-deadline`）/:576（`<-ctx.Done()`）在同一枚 `select` 里，**读到的是"两枚 case 并存"，不是"哪枚先赢"**。`30 < 31` 让机制判语倾向 ctx 先响，但这一句在没跑过之前不许当结论用（§6.3 第 1 项）。**⇒ 归口＝编排者**：甲若被选，这一发要**连 ctx 一起抬**，而抬完必须有一枚实测读数才算交付（本腿给不了）。
 
 ## §8 我写错的读数（自我对抗）
 
@@ -334,6 +349,8 @@
 11. **§2.2 的"带内 15 枚"起初数成 14**：漏了 `config_reload_perm_223_windows_test.go:61` 的 60s（尺 09:47:59：`40×10 + 90×4 + 60×1`）。
 12. **`.scratch` 那 749 枚起初打算整根不列**：数完发现 ci-logs 与大批 `probes/*/gate-*.txt` 印着 `confirm_timeout_sec = 1/40/300`，**会被下一个人误读成"仓里还有带外种子"** ⇒ 补了 §1.4 那格"假红"警告，而不是让它留在总数里当噪声。
 13. **越界自查**：本腿**未改任何已跟踪文件、未产一码、未翻任何 AC 框、未碰台账**；起手与写作期间 `git status --porcelain -- cmd internal tools scripts docs` 均回 **0 行**（09:38:38 与 09:44:46 各一把）。本件只落 `.scratch/wisp/probes/267/a2/census.md` 与 `.scratch/commit-msg-267a2-*.txt`（临时件按规矩 8 只建不删）。⚠ 唯一"看起来像越界"的是 §1.1★／§7.3 描述了常驻腿行为——**只读，未动 `resident_approval_windows.go` 一字**。
+14. **收口时又踩两枚自己的坑（同一把尺两次读数不同，都登记不抹）**：(a) 我在 §6.2 里那条"占位符尺"起初写 **0 命中**，09:59:50 复尺回 **1 命中＝那一行自己**（尺的字面混进了被扫文件）⇒ 已就地改成"命中 1 行＝本行自己，除此之外 0 命中"，没有把错数留着当结论。(b) 插入 §6.2 收口块时我用 `old_string` 换掉了原 `### §6.2 未跑清单` 那枚标题，导致同一份文件里出现 `§6.1 → §6.3 → §6.2` 的乱序（09:59:50 标题尺现读），已把两枚标题对调并同步改掉 **3 处** `§6.2 第 1 项/那 6 项` 的交叉引用（`grep -n "§6\.[0-9]"` 复尺 09:59:50 确认现在是 6.1/6.2/6.3 顺序）。⇒ 教训：**在同一文件里插小节时，`old_string` 要包住"标题 + 其后空行"以外的边界，别把下一节的标题当分隔符用。**
+15. **一处判语与自己的证据有张力，本腿不掩盖**：§9 说甲"只有 3 处必须抬"，而 §1.2 表里 `approval_reply_201_test.go:105-109` 那枚 `l2Wait < time.Second → 1s` 兜底**今天没有调用点走到**（§2 #3–#12 全部喂 ≥2s）。所以严格讲甲的改动面是 **3 处必抬 + 1 处必须拆的雷 + 9 处可删行**。我在 §3 甲表里已把那句单列为"必须连带改的一句兜底"，但 §9 的"3 处"口径**略窄于 §3 的 5 类**——两处都留着，让编排者按各自的用途读数，而不是把 §9 当唯一口径。
 
 ## §9 交件判语
 
