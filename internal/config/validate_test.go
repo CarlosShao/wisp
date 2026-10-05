@@ -177,56 +177,69 @@ func TestValidateBallSizeRange(t *testing.T) {
 //
 // The refusal must name the key AND the band, otherwise a user reading the
 // error cannot tell which line to fix (the same rule validateBall follows).
+// The seeds and the band text below are LITERALS on purpose. Mutation M2 in
+// ticket 267's self-proof caught it: a pin that writes its own seeds as
+// confirmTimeoutSecMax+1 moves them the moment the constant moves, so loosening
+// the ceiling leaves the case green - which is the "swap in a different
+// out-of-range value and it still passes" insensitivity the ticket forbids.
+// Literal seeds plus the literal sentence they must produce make any move of
+// either bound turn this red.
 func TestValidateRiskConfirmTimeoutRange(t *testing.T) {
-	c := validConfig(t)
-	band := fmt.Sprintf("out of range [%d, %d]", confirmTimeoutSecMin, confirmTimeoutSecMax)
-	for _, bad := range []int{
-		confirmTimeoutSecMin - 1, // 30: exactly approval.DefaultApprovalWarning -> C18 lead would be <= 0
-		10,                       // a timeout below the warning lead
-		confirmTimeoutSecMax + 1, // 3601
-		99999,                    // ticket 267's 27h46m seed
-		0, -1,                    // unset-shaped values must not read as "use the default"
-	} {
-		c.Risk.ConfirmTimeoutSec = bad
-		err := validate(c)
-		if err == nil {
-			t.Fatalf("risk.confirm_timeout_sec=%d must be rejected (%s)", bad, band)
-		}
-		if !strings.Contains(err.Error(), "risk.confirm_timeout_sec") {
-			t.Fatalf("error %q must name the key risk.confirm_timeout_sec", err)
-		}
-		if !strings.Contains(err.Error(), band) {
-			t.Fatalf("error %q must state the band %q", err, band)
-		}
-		if !strings.Contains(err.Error(), fmt.Sprintf("%d out of range", bad)) {
-			t.Fatalf("error %q must quote the offending value %d", err, bad)
-		}
+	const band = "out of range [31, 3600]"
+	// 30 = exactly the C18 warning lead, 10 = below it, 3601/99999 = the ceiling
+	// side (99999 is ticket 267's 27h46m card), 0/-1 = shapes that must not be
+	// read as "unset, so use the default".
+	for _, bad := range []int{30, 10, 3601, 99999, 0, -1} {
+		// One subtest per seed: a single t.Fatalf over a slice would stop at the
+		// first one and leave the other bounds unfalsified in the report.
+		t.Run(fmt.Sprintf("reject_%d", bad), func(t *testing.T) {
+			c := validConfig(t)
+			c.Risk.ConfirmTimeoutSec = bad
+			err := validate(c)
+			if err == nil {
+				t.Fatalf("risk.confirm_timeout_sec=%d must be rejected (%s)", bad, band)
+			}
+			if !strings.Contains(err.Error(), "risk.confirm_timeout_sec") {
+				t.Fatalf("error %q must name the key risk.confirm_timeout_sec", err)
+			}
+			if !strings.Contains(err.Error(), band) {
+				t.Fatalf("error %q must state the band %q", err, band)
+			}
+			if !strings.Contains(err.Error(), fmt.Sprintf("%d out of range", bad)) {
+				t.Fatalf("error %q must quote the offending value %d", err, bad)
+			}
+		})
 	}
 	// 31 is the floor precisely because the C18 warning needs Timeout() strictly
 	// greater than WarningLead(); validate_267_test.go re-derives that floor
 	// from approval.DefaultApprovalWarning instead of trusting this line.
-	for _, good := range []int{confirmTimeoutSecMin, 300, confirmTimeoutSecMax} {
-		c.Risk.ConfirmTimeoutSec = good
-		if err := validate(c); err != nil {
-			t.Fatalf("risk.confirm_timeout_sec=%d must validate: %v", good, err)
-		}
+	for _, good := range []int{31, 300, 3600} {
+		t.Run(fmt.Sprintf("accept_%d", good), func(t *testing.T) {
+			c := validConfig(t)
+			c.Risk.ConfirmTimeoutSec = good
+			if err := validate(c); err != nil {
+				t.Fatalf("risk.confirm_timeout_sec=%d must validate: %v", good, err)
+			}
+		})
 	}
 }
 
 // TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne pins the two
-// edges of the band itself rather than a sample of it: one below the floor and
-// one at it. Kept separate from the table above so that moving the floor (a
-// contract decision, ticket 267's residual 1) fails here with the lead in the
-// message rather than in a list of numbers.
+// edges by their meaning rather than by the constants: 30 is the value that
+// equals approval.DefaultApprovalWarning (so gate.go's `Timeout() -
+// WarningLead()` is <= 0 and the C18 warning never arms), 31 is the smallest
+// value that still arms it. Written as literals on purpose - see the note on
+// the table above. The symbol-derived version of the same claim is
+// TestConfirmTimeoutFloorSitsAboveApprovalWarningLead in validate_267_test.go.
 func TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne(t *testing.T) {
 	c := validConfig(t)
-	c.Risk.ConfirmTimeoutSec = confirmTimeoutSecMin
+	c.Risk.ConfirmTimeoutSec = 31
 	if err := validate(c); err != nil {
-		t.Fatalf("the floor %d must load: %v", confirmTimeoutSecMin, err)
+		t.Fatalf("the floor 31 (= warning lead + 1) must load: %v", err)
 	}
-	c.Risk.ConfirmTimeoutSec = confirmTimeoutSecMin - 1
+	c.Risk.ConfirmTimeoutSec = 30
 	if err := validate(c); err == nil {
-		t.Fatalf("a timeout equal to the C18 warning lead (%ds) must be rejected: it arms no warning at all", confirmTimeoutSecMin-1)
+		t.Fatal("a timeout equal to the C18 warning lead (30s) must be rejected: it arms no warning at all")
 	}
 }
 
