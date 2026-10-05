@@ -321,4 +321,25 @@
 
 ## §8 我写错的读数（自我对抗）
 
+1. **名册数错（已就地更正，原话留着）**：§1.5 首发把带外喂值写成"12 枚调用点、3 枚文件、14 个位置"。现量（09:47:59，`grep -rn "newReplyHost(t, " cmd/wisp`）＝**喂值调用点 10 枚**（9 枚 20s、1 枚 2s），字面种子 2 枚，合计 **12 枚带外位置 / 5 枚文件**。"14 个位置"是把 helper 形参那 2 行也算了进去——重复计数。
+2. **`internal` 那行的产码/测试拆分写错（已更正）**：首发"产码 11 + 测试 30 + 注释 1"，逐文件尺（09:45:05）实为 **产码 10（`validate.go` 7 + `schema.go` 2 + `unwired.go` 1）＋ 测试 32**（`internal/agent/approval/ticket84_no_owner_test.go:51` 那枚虽是注释，但它住在 `_test.go` 里，不能单列第三类）。
+3. **我违了自己的 commit 规矩一次（事实，不抹）**：§6/§7 那次用了 `git commit -m "<长中文>"`，⛔ 不是派单要求的 `git commit -F <临时txt>`。后果＝正文换行被压成一行，`9ca14bdf` 这条 body 的逐行结构丢了。按 AGENTS §1.4「已提交的历史不改写」本腿**不 amend、不 reset**，只登记；前后各枚 commit（`8aa9ff6f`/`89976ed1`/`c9600334`/`7b87b991`）都走 `-F`。
+4. **骨架 commit 第一次尝试失败**：`git commit -F <msg> -- <path>` 对**尚未 add** 的新文件报 `error: pathspec '.scratch/wisp/probes/267/a2/census.md' did not match any file(s) known to git`（09:39:11）⇒ 显式 pathspec ≠ 先 add，两件事都要做。
+5. **派单点名的"三枚文件"其实是五枚**：`approval_seam_201_test.go:50/:138` 与 `ticket224_assembly_test.go:81/:234` 也经同一枚 `approval_reply_201_test.go:145` 的 `%d` 喂进 20。r1 `evidence.md §7.1`（`:228`）同样只列 6 处并写"这三枚文件里 8 个调用点"。⇒ **本腿的 10 枚有 grep 全文为据，r1 的数是点例**；这句是别人票面上的数，本腿只登记差异、不改（台账归编排者）。
+6. **行号漂移我又踩到两次，都靠字符尺退回**：(a) 起初按 `docs/evidence/s1/128-ac4-r1-acceptance.md:425` 里的 `run_test.go:378` 引那句 "an unvetoed L1 window means EXECUTE"，现读在 **`cmd/wisp/run_test.go:382`**；(b) 起初按 `missing-features-2026-09-29-v4.md:194` 引 `schema.go:450`，现读字段在 **`internal/config/schema.go:460`**。另有**别人票面上的过期行号**本腿不动：`internal/agent/approval/ticket84_no_owner_test.go:51` 注释写 `cmd/wisp/run.go:259`，消费点现读 **`run.go:616`**。
+7. **派单给的坐标逐枚复核：一枚不错，两枚要补精度**：`queue.go:108-109`（`:108` 注释、`:109` 才是 `DefaultApprovalWarning = 30 * time.Second`）；`gate.go:528` 逐字 `if lead := g.q.Timeout() - g.q.WarningLead(); lead > 0 {` ✓ 未漂；派单说的 "`approval_reply_201_test.go:145` 的 `int(h.l2Wait.Seconds())`" 实为**键在 `:145`、表达式在 `:147`**。
+8. **判语上的一次自我推翻**：§2 #1 起初写"抬到 31s 会让这一族多等 30 秒"，读完 `run_mode101_test.go:544` 的 `context.WithTimeout(context.Background(), 300*time.Millisecond)` 与 `gate.go:576-580` 后改为**happy path 零增量**，只有 `t101call` 那枚无期限 `context.Background()`（`:195`）在失败路径吃 30s。差点据此把甲的代价摊到 12 枚上。
+9. **`panel_pump` 起初判"甲无损"**，读 `:112` 的 30s ctx 才改判"变形，必须连带抬"（§3 甲、§7.10）。⚠ 这条仍是**机制判语**：两枚 case 同在一个 `select`（`gate.go:571`/`:576`），本腿未跑 ⇒ 归 §7.10 而不当结论用。
+10. **§3 丁起初写错一枚事实**：起笔写"`l1_window_sec` 在 config 层有带"，读 `validate.go:141-151` 全文后更正为 **config 层零约束、钳位在接缝 `gate.go:143-151`**。差点据此给出"丁会被 band 一起拒掉"的错判语。
+11. **§2.2 的"带内 15 枚"起初数成 14**：漏了 `config_reload_perm_223_windows_test.go:61` 的 60s（尺 09:47:59：`40×10 + 90×4 + 60×1`）。
+12. **`.scratch` 那 749 枚起初打算整根不列**：数完发现 ci-logs 与大批 `probes/*/gate-*.txt` 印着 `confirm_timeout_sec = 1/40/300`，**会被下一个人误读成"仓里还有带外种子"** ⇒ 补了 §1.4 那格"假红"警告，而不是让它留在总数里当噪声。
+13. **越界自查**：本腿**未改任何已跟踪文件、未产一码、未翻任何 AC 框、未碰台账**；起手与写作期间 `git status --porcelain -- cmd internal tools scripts docs` 均回 **0 行**（09:38:38 与 09:44:46 各一把）。本件只落 `.scratch/wisp/probes/267/a2/census.md` 与 `.scratch/commit-msg-267a2-*.txt`（临时件按规矩 8 只建不删）。⚠ 唯一"看起来像越界"的是 §1.1★／§7.3 描述了常驻腿行为——**只读，未动 `resident_approval_windows.go` 一字**。
+
 ## §9 交件判语
+
+- **代价最小＝甲，且真实改动面比派单以为的窄**：只有 **3 处**必须抬——`panel_pump_test.go:136`（**连同 `:112` 那枚 30s ctx**）与 `approval_reply_201_test.go:439`；剩下 **9 枚带外位置今天没有一枚是任何断言的观察对象**（§2 #1/#3/#4/#5/#7/#8/#9/#10/#11/#12 逐枚给了为什么），删行落 schema 默认 300 即可。§5.2 的活样本 `cmd/wisp/run_test.go:373/:382` 证明"不写 `[risk]`、跑默认 300s、照样看窗口开合"在这棵树上今天就是绿的。甲墙钟总账≈ **+58s**，并附赠一枚只有甲给得出的免费正控：`lead = 31 − 30 = 1s > 0` ⇒ `gate.go:557-569` 那句 `审批将在 %d 秒后自动拒绝，请尽快确认` 第一次端到端响（正是 r1 §7.2 交回的那半格空洞）。
+- **乙不算"新造注入缝"**（§4.3）：`runSpec.gate/ui/cards` 是票 246 AC#7 已裁的注入点；`cmd/wisp` 测试直构真 `approval.Gate` 的先例在 `resident_grant_writer_265_windows_test.go:187`（且它 `:171-175` 主动把 `Window/ApprovalTimeout` 留零，说明"直构但不动超时"是先前那枚裁定的边界）；直构真 `approval.Queue` 的先例 7 枚（§5.3）。**但它一次只能划算用在 `#6`**：注入路径 `run.go:607` 把控制台面关掉（`rt.ui = nil`），而 §2.1 里 10/12 枚的断言正读控制台/审计文本 ⇒ 用它替甲＝拆掉 8 枚用例的证据面。要不要为此具名澄清 D22 名册＝人工批准面（§7.7），本腿只交判据。
+- **丙在 `cmd/wisp` 层不该做**（§5.1）：接缝早已存在且是 D22 ban 5 指定的形状，但 `NewQueue` 签名里没时钟（`queue.go:84`）、三枚读时钟点全在 Gate 上（`gate.go:291/526/529`）、`cmd/wisp` 零枚 `Clock` 引用 ⇒ 丙必须先有乙；且假时钟只喂 gate，会让 mockllm 真 HTTP、SQLite、面板泵、热加载 tick 与死线脱钩，`#2` 那发的"跑自己的 publish 也 book 一条记录"（`panel_pump_test.go:207-213`）会因此不再是现场次序。丙属于 `internal/agent/approval` 那一层。
+- **丁（L1 那枚合法小窗口）成立但救不了这两枚主题**（§5.2）：`#2` 被 `panel_pump_test.go:160-162` 逐字否决（L1 不进队列，`snapshot.pending` 无物可报）；`#6` 被极性等否决（L1 到点＝执行，`approval_reply_201_test.go:545` 就钉着这条）。**唯一能替短种子的既有旋钮是 `runSpec.reply`（"答它"而不是"等到点"），而它对 `#2` 会改掉 `:181` 那句 `an unanswered L2 card must not execute` 的语义。** #7/#8/#12 三枚本来就跑在 L1 窗口上，它们的 20s 种子是死重——这正是"丁已在仓里、只是没替到点子上"的证据。
+- **本腿量不到的那一格（具名）**：**抬完种子后 `cmd/wisp` 这包到底红不红、红成哪一句、包时长余量够不够 +58s**（§7.1/§7.2/§7.10）。根因＝派单规矩 1 禁止本腿跑任何 `go` 命令，而 `scripts/wisp-cli-tests.sh:111`（`scope=./cmd/wisp/`）里没有可抄的 `-timeout` 读数 ⇒ 只有当机那枚跑 go 的腿能给。
+- **顺带一枚不在四支里、但编排者必须知道的现量后果**：**常驻腿把"越界"读成"读不到"**（`resident_approval_windows.go:453-457` ⇒ 回落编译常量 300s 并把 provenance 写成 `"defaults (config.toml unreadable)"`）。于是裁形 ⓐ 那句"越界＝加载时拒"在两条腿上给出两种答复，而票 256 的 `:141` 那枚正控分不开这两种（§1.1★、§7.3）。这是本把尺今天量出的最重一枚意外。
