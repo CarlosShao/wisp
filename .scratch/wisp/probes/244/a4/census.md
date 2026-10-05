@@ -262,7 +262,38 @@ $ git ls-files "*.exe" | wc -l
 
 ## §7 问 7 —— 最小落地形状与代价：一发行文＋一枚用例
 
-未判。
+判语：**最小形成立、代价可接受，但它今天买到的是"把 257-v1 那发不可重放的手工读数换成默认档门禁里的一枚用例"，⛔ 它不满足票 244 AC#2 的字面、也碰不到 subsystem 那一维**。派单要的那句"对照 AC 与 `A619`"在这里要给准：**盘上没有 `A619` 那句**（§0 已量：`AC#1 不勾` 全台账 0 命中），等价判据的真身是**票面 AC#0 `:21`**"AC#1 单独做完会留下一枚『看着对、其实没人验过』的产物"＋"AC#1 与 AC#2 不许拆成两批改"，与 `A557:11063`"244 AC#2 真机两发（要构建＝等写面空窗）"。⇒ **按这两句读：这一枚用例既不是 AC#1、也不是 AC#2，它是 257 残余③自己的一格**，别把它记成 244 的任何一枚 AC 的兑现。
+
+**最小形（写腿照抄即可，全部指得到现读行号）**
+
+| 格 | 取哪一枚现成形 | 出处（现读） |
+|---|---|---|
+| 落点文件 | **新建** `cmd/wisp/firstrun_channel_exec_244_windows_test.go`（短名，⛔ 别去碰路径预算：§6 已量 `FULL_PATH_BUDGET=165`、tracked 最长 180 已在册） | `scripts/check-path-length-budget.sh:149/:156/:161/:253-254` |
+| build tag | `//go:build windows` **单标签**，⛔ 不带 `winlive` | §6：CI 里 `winlive` 零命中＝带上就永远进不了门禁；同形先例 21 枚 `//go:build windows` 文件 |
+| 编 exe | 复用 `buildWispForTest(t)`，**不要**新造 helper（`firstrun.go` 那枚"函数枚数＝1"钉不禁测试 helper，但 §5 A 组禁行 1 管包级 var） | `cmd/wisp/secret_argv_windows_test.go:161-199` |
+| 起子进程 | `exec.Command(exe, "run", "<任务文本>")` ＋ `cmd.Dir = filepath.Dir(exe)` ＋ `cmd.Env = append(os.Environ(), "WISP_ENV=test", "WISP_TEST_DATA_DIR="+dataDir)` ＋ `cmd.Stdin = nil` | 三形逐枚在：argv/env `secret_argv_windows_test.go:234-236`、`cmd.Stdin = nil`（＝"无可交互控制台"那一态）`resident_sink_nail_127_windows_test.go:229`、`early_log_nail_130_windows_test.go:125` |
+| 收两柄 | `lockedBuf` ×2（活进程可读）＋ `pollUntil127` 等句子，⛔ 不许 `time.Sleep` 猜时长 | `resident_sink_nail_127_windows_test.go:174-193`（`lockedBuf`/`has`）、`:317 pollUntil127(attempts int, done func() bool) bool` |
+| 收尾 | `t.Cleanup` 里 `cmd.Wait()`；**不许留孤儿子进程** | 定式原文 `resident_sink_nail_127_windows_test.go:235-238`、`slo_exit_os_156_windows_test.go:328` |
+| 判据（正向） | 真子进程 **stderr** 里同时有 `"新建默认配置"` 与那枚 `cfgPath`；再加一句前提：跑之前 `os.Stat(cfgPath)` 必须 `fs.ErrNotExist`、跑之后必须存在（⛔ 前提不成立就等于判了个恒真） | 要复制的判据逐字在 `cmd/wisp/firstrun_198_test.go:98-99`（同进程口径），前提形在 `:78-80`＋`257-v1:158` 那句"先 `t.Fatalf` 断文件此前不存在＋退码仍 2＋stderr 里有 `新建默认配置`" |
+| 判据（退码） | `rc == 2` 不许放宽（首建之后仍按未配置失败） | `firstrun_198_test.go:86-90` 逐字："The exit code is asserted at 2 on purpose" |
+| ⛔ 不许抄的判据 | `stdout == ""`（真进程必有版本行三发）；`assertDirEmpty128` 那枚合并输出形 | §5 B 组第一行；`dataroot_128_windows_test.go:131-133` |
+
+**"一发行文"落哪一格**（三枚候选，各带归属，⛔ 本腿一枚都不写）：
+1. **票 244 票面新格**（＝最合规那一枚：把"通道绑定"归进 244 名下并写明它与 AC#1/AC#2 的关系）⇒ **归编排者落笔**，且票面现在 7 枚框全未勾、本腿一枚没碰（尺：`grep -c "^- \[ \]"`＝7、`grep -c "^- \[x\]"`＝0）。
+2. **台账 `A##` 一行**（真相源：`docs/reports/pending-and-issues.md`，只追加不删）⇒ 归编排者。
+3. **产码注释一行**（`cmd/wisp/firstrun.go:88-95` 那段"说实话的回执"注释里加一句"这句话今天由 `cmd/wisp/firstrun_channel_exec_244_windows_test.go` 在真子进程 stderr 上钉着"）⇒ ⚠ 这一枚**有仪器后果**：`tools/d22scan` ban #9 phantom-citation 专扫 `internal/`＋`cmd/` 的**产码注释**里指向不存在路径的引用（`tools/d22scan/main.go:50-59`，且 `_test.go` 与 `tools/**` 在它射程外）⇒ **只有在新测试文件已经真落盘之后**才许写这行注释，否则写腿自己造出一枚幻影引用（本仓今天已抓到第五例幻影用例名）。
+
+**代价**（能量到的都给了尺，量不到的具名）
+- 时长：**每多一枚 `buildWispForTest` 调用＝多一发完整 cgo＋sherpa 链接**（无缓存，§1 量死：21 枚调用点＝21 发构建）。基线现成读数＝默认档整包 **148.168 s**（`docs/evidence/s1/228-resident-ball-v1.md:13`），台账 `A621` §7 的排程口径"整包预期 ~8.5 min"。⇒ **精确增额本腿量不到**（要跑构建），能说的是它落在"与 127/246 那族同一枚价"这一档，不是新增量级。
+- 毒源继承：走 `run` 腿 ⇒ **零** `proc.Boot`、不起球窗、不抢全局热键、不吃每会话互斥（§5 E 组那把尺）；⛔ 别顺手复用 `bootResidentLeg`，那会把 127 那族带载偶发一并接进来。
+- 排程冲突（写腿前必查）：`268-r1` 此刻正在 `cmd/wisp` 写（`A621` §7 逐字），同包并发＝互洗读数；票 244 自己那格"排程与串行"也写过同一条形（⛔ 与 `228-r1` 串行）。⇒ **新用例排在 `268-r1` 交回之后**。
+- CI 面：只在 `test-windows` 那一步生效（§6），ubuntu 两 job 永远不跑它 ⇒ 这一格的回归网只有一枚 runner 宽。
+
+**买到什么／买不到什么**（逐格对照票面 AC）
+- ✅ **买到**：257-v1 `:150`/`:161` 那句"生产把它绑到 `os.Stderr` 这一步没有任何用例钉着"从〔手工一发、⛔ 不可重放为门禁〕升级成〔默认档门禁里的用例〕；顺带让"`wisp run` 的 stderr 通道"在 `run` 腿上有了一枚能被打红的钉（ Mutation：把 `firstrun.go:92` 的目标换成 `io.Discard`，新用例必红——这正是 `257-v1` §8 M1 那一发的自动形）。
+- ⛔ **买不到 1**：**AC#2 的字面三发真机读数**（票面 `:23`）——①"在父控制台里跑、回复文本真出现在那个控制台"要的是**人眼看那台控制台**，用例给的是"管道里看得见"；②"`wisp doctor > out.txt` 重定向仍有效"是另一枚 argv；③"双击／explorer 拉起不再出现黑框＋常驻腿照常起"§4 判语 2 已具名：**那一支根本不产生这句话**。⇒ **⛔ 不许用这枚用例去勾 AC#2**（票面 `:23` 原文那句"⛔ 不许用『单测里 mock stdout』代替真机"针对的是 mock；真子进程用例不是 mock，但它也**不是** AC#2 那一发的替身）。
+- ⛔ **买不到 2**：**subsystem 这一维**。`buildWispForTest` 零 `-ldflags` ⇒ 台件二进制永远 CUI（§1/§3），而票 244 §5 G5 那句"包内断言天生看不见 subsystem 这一维"就是为这一格写的。要钉 subsystem 得另一枚尺（读 `debug/pe` 或 `objdump`，且**必须先有构建**，因为库里 tracked exe＝0 枚，§3 现尺）——归 AC#1/AC#5 ⓑ，不归本问。
+- ⛔ **买不到 3**：**态乙那一发**（GUI 件无父控制台时那句话的真去向：NUL 还是无效柄）——量不到，归编排者真机（票面 AC#0 与 §9 第 2 条两处都禁止继承 `docs/BUILD.md:90` 那枚过期读数）。
 
 ---
 
