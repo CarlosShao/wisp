@@ -1,0 +1,7 @@
+probes(parking-1)：把笔 3 落笔之后的真 numstat 抄进检查笔记，本程到此收工（停车点腿＝四笔：正文／§5 追加／"补"＋幻影号更正／本件这一段）
+
+笔 3＝0de1d744 落完之后现跑 git diff --numstat HEAD~1..HEAD：checked.md 8/0、msg-03.txt 13/0、docs/reports/HANDOVER.md 10/1。
+⇒ 删除列合计 1＝我自己 §4.0aa-7 第 5 条那行（幻影号 cfd96736 更正为真身 cfd97636），⛔ 没有一行删除落在别人的节或句上。
+结构尺同一发：HANDOVER.md 1,662 → 1,733 → 1,742 行；"## 4.0z 停车点"仍 1 枚；"### 4.0aa-"子块 8 枚；"### 4.0aa 补"1 枚；grep cfd96736＝1（＝认错那一段里故意引的错号，不是流通中的凭据）。
+本件这一段＝纯追加（笔落前尺：本文件 numstat 删除列 0；git diff --cached --name-only 起飞前 0 行）。
+交件面：写面只有 docs/reports/HANDOVER.md 与 .scratch/wisp/probes/parking/1/**；⛔ 一枚 go 命令没跑；⛔ 没碰台账与票面框；⛔ 没 push、没 amend／reset／rebase／stash／checkout ．／restore／clean；仓内没删任何东西。

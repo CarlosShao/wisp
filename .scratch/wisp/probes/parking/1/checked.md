@@ -98,3 +98,9 @@
 - ⚠⚠ **记我自己一枚幻影 commit 号（本仓登记过的老病，第五次同源）**：笔 1（`a39dba32`）里 §4.0aa-7 第 5 条我把那枚锚写成 **`cfd96736`——盘上没有这枚号**（尺＝`git cat-file -t cfd96736` 报错／`git log --format=%h -6 -- .scratch/wisp/probes/236/r1` 真身是 **`cfd97636`**）。真身我在同节别处写对了 6 次，错的是这一枚转抄。⇒ **处置＝就地以新 commit 改对**（AGENTS.md §1.4"要更正就追加新 commit"，⛔ 不改写已入库历史、不 `--amend`），并在 §4.0aa 补那一节具名记这一寸；⛔ 不留一枚假号给下一位去 grep。
 - 本笔 numstat（笔落之后现跑 `git diff --numstat HEAD~1..HEAD`）：`docs/reports/HANDOVER.md` **8 插入／0 删除**（删除列 **0** ＝纯追加，一枚别人的行都没吞；插入的行数＝新节末尾那块"4.0aa 补（13:15）"的 8 行）；`wc -l docs/reports/HANDOVER.md` 1,733 → **1,741**；结构尺 `grep -c "^## 4.0z 停车点"`＝1、`grep -c "^### 4.0aa 补"`＝1。
 - ⛔ 这一笔之后本程收工：`docs/reports/HANDOVER.md` 与新节之外我什么都没写；台账、票面框、`internal/**`、`tools/**`、`scripts/**`、`.github/**` 零改动（尺＝`git show --name-only` 枚枚点名）。
+
+**笔 4（＝本件这一段，最后一笔；号请现取）——把笔 3 落笔之后的真读数补进来**
+- `git diff --numstat HEAD~1..HEAD`（笔 3＝`0de1d744` 落笔之后 13:18:18 现跑）逐枚：`8  0  checked.md`／`13  0  msg-03.txt`／`10  1  docs/reports/HANDOVER.md` ⇒ **删除列合计 1**，那一枚＝我自己 §4.0aa-7 第 5 条那行（幻影号 `cfd96736`→真身 `cfd97636` 的更正），⛔ 没有任何删除落在别人的节或句上。
+- 结构尺复跑（同一发）：`wc -l docs/reports/HANDOVER.md`＝**1,742**（起手 1,662 → 笔 1 后 1,733 → 笔 3 后 1,742）；`grep -c "^## 4.0z 停车点"`＝**1**；`grep -c "^### 4.0aa-"`＝**8**；`grep -c "^### 4.0aa 补"`＝1；`grep -c "cfd96736" docs/reports/HANDOVER.md`＝1（＝"补"那一节里我**故意引用来认错**的那枚错号，⛔ 不是还在正文里流通的凭据）。
+- 提交后尺：`git status --porcelain -- docs .scratch/wisp/probes/parking`＝**空**（13:18:18，笔 3 落完之后）。
+- 本件（笔 4）落笔前的自证：`git diff --numstat -- .scratch/wisp/probes/parking/1/checked.md`＝**纯插入／删除列 0**（＝这一段只往本件末尾追加，没回头改前面任何一行）；`git diff --cached --name-only` 起飞前＝**0 行**（共享索引里没有别人已暂存的文件）。⛔ 本笔之后不再追加——再记一次就要再补一笔，那是自指循环；停车点腿到此交件。
