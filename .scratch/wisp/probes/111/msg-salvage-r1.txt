@@ -1,0 +1,7 @@
+probes(111-r1 遗产代提)：scripts/portable-tests.sh 的未提交编辑原样收编——GUARD D（"包有测试却不在名册"即红）＋ internal/session、internal/projctx 两包重新认领（core/windows scope 数组与 pin 四处）
+
+腿 111-r1 于 2026-10-05 17:3x 撞当日额度上限死亡（编排者 A623 那句"判死"是错的——它 15:48 落了骨架 f2d069d7、16:59 还在编辑本文件，是活着只是慢）。此笔＝编排者按"死腿盘上遗产代提"惯例收编，归属＝111-r1，非编排者作业。
+
+编排者验收凭据（17:43 现量）：git diff --numstat = +106/-11；bash -n rc=0（语法完好）；新增行只含 GUARD D 注释与两包名；工作树此文件与本 commit 逐字节同值。
+
+票 111 现量更正（111-r1b 证据件 §0 复算）：票面"5 枚带测试的包零覆盖"是过期断言——core_pin/win_pin/cli_pin 在 HEAD 已认领全部 5 枚（cmd/llmrecord/internal/ball/internal/perm/internal/plugin@:141-172、cmd/wisp@cli_pin:178，2026-09-21 agent-ticket111 两枚 commit 8fe5c7c/7699ec3 落的）。真正的残余洞＝session/projctx 两包有测试文件却不在名册（本笔正是补它）＋winlive 半边（ball 5+wisp 6 枚 windows&&winlive 用例 CI 零编译，纳入必须动 ci.yml＝111-r1 的另一半写面，未做）。

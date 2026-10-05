@@ -1,0 +1,6 @@
+probes(111-r1b) 证据件骨架落盘：§0 起手锚与现读已量，§1-§6 先写未判
+
+- 起点 commit 链首枚。写面硬边界：只许改 scripts/ 测试范围表 scope=(...) 数组；不碰 .github/workflows/ci.yml；零 go test/build/vet/env（仅 go list 允许）。
+- §0 现读（HEAD 9761d630，本机 GOOS=windows）：go list ./... = 35（票面 AC#0 写 33，漂）；5 枚目标包 _test.go 枚数 ball=16/wisp=65/perm=3/plugin=1/llmrecord=1（票面 11/5/2/1/1，漂）。
+- ★重大漂移：census 现读 packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 ⇒ 5 枚目标包在 HEAD 上已全部被 scope 认领（ball/perm/plugin/llmrecord→core+windows；cmd/wisp→cli），票面"5 枚带测试的包零覆盖"不成立。
+- ★纪律报回：.scratch/wisp/probes/111/r1/ 非零足迹（f2d069d7 111-r1 于 15:48 落盘骨架，晚于编排者 15:14 判死）；本枚不覆盖、不复用其读数、不写该路径。

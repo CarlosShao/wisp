@@ -1,0 +1,6 @@
+probes(111 骨架＋268-a2 普查件未提交增量代提)：死腿与交付腿的散件收编
+
+①111-r1/111-r1b 两枚 msg-001-skeleton.txt（它们自己惯用的提交伴生件，腿死前没来得及带上）；
+②268-a2 census.md 的 +14/-7 增量（该腿 11:40 最后编辑后没提交的三段：671 枚脏面"未逐名分类"的自限更正、11:33 第三次读数＝11 条脏面全在 internal/panel+internal/tools 不在 cmd/wisp、⚠⚠同目录代号撞车上报——.scratch/wisp/probes/268/a2/ 里并存两枚不同腿的交付 census.md(41dc8cff/6488d039) 与 verdict.md(3f0c4fff/cf3f1ecd)，编排者派单键冲突；顺带登记 3f0c4fff 的 --name-only 含 257-r2 产码面＝事故自曝原文）。
+
+归属：census.md 增量＝268-a2 撞钉料腿；骨架 msg＝各自腿号。编排者 2026-10-05 17:5x 代提，内容一字未改。
