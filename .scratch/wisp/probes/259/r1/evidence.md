@@ -91,10 +91,19 @@ AC#1（ⓐ具名降级／ⓑ做出牙 二选一）与 AC#4（`cmd/wisp` 载具�
 
 ### §1.4 已知正控 `197-v1` 的 D2（本腿新尺不许把它做成常红或常绿）
 
-出处＝`docs/evidence/s1/242-grant-binding-v1.md` §2 M-A2 行（该腿把票面 D2 落实的形）：
-`approval.go` 的 `grantStore.spend` 改成不比摘要。⚠ 派单点名的是 **197-v1 的 D2**，本腿在
-`docs/evidence/s1/` 里检索到的**同形实跑读数**在 242-v1 表 M-A2（`-- 不比摘要 --` 那一发）：
-`TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce` 与 `TestTicket242SpendRequiresTheExactBinding` 红。
+出处（本腿自己检索并读到原文，⛔ 不转述前人结论）：
+`docs/evidence/s1/197-ac5-selfapproval-v1.md:75` 那行逐字把 **D2** 定义成
+"`approval.go:292 grantStore.spend` 不再比对 binding 摘要，活令牌可花在本机任何一张卡上"，
+当时的读数＝**⛔ 全绿，两把尺都绿**（同文件 `:228` 那节标题逐字 "`bindDigest` 那一层今天零尺（D2，跨条发现）"）。
+第二次落实是同一种的 `docs/evidence/s1/242-grant-binding-v1.md` §2 的 **M-A2**（读数＝两枚 `TestTicket242Spend*` 红）。
+⚠ 那两行行号是他们那次的现量：今天 `spend` 在 `approval.go:420`、比对在 `:431`（本腿改形后在 `:486` 一带）
+⇒ **引"形"（花侧不比摘要），不引行号**。
+
+**本腿的处置＝§4 的 PC-D2 一发**：种下同形 ⇒ 指名"绑定不对"那一枚新用例**必须红**（不许常绿）；
+不种时本包 89 `--- PASS`／0 `--- FAIL`（不许常红）。两向都有读数。
+对照 197-v1 那次"**全绿、零尺**"：同一种今天响 **三枚**（两枚在册 242 钉＋一枚本腿新钉）——
+这一格是 259 相对 197-v1 唯一被翻过来的读数。⛔ 但它翻的仍是 **store 面**那一层：
+跨卡路由那一句（现量 1／2 的恒等式）本腿一字未改，见 §6 第 1、2 条。
 ---
 
 ## §2 AC#2 改形：逐枚 before／after（一字逐字，含等价式）
@@ -283,7 +292,7 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go（同上）
 
 | 编号 | 种什么（逐字形） | 哪枚必须红 | 实测红句逐字 | 同发读数 | 窗口（起→终） |
 |---|---|---|---|---|---|
-| **M-E**（票面点名的必抓形） | `ui.go` `PanelAPI` 加 `Allow(correlationID, grant string) error` ＋ `gate.go` `func (p panelAPI) Allow(corr, grant string) error { return p.q.allow(corr, grant) }`（真花令牌、真改卡状态） | 尺① | `ticket259_panel_capability_rulers_test.go:73: AC#3 RED: PanelAPI gained method "Allow"; the panel surface is closed at Reject/Head/View, and a fourth name is a new capability on the untrusted face (ticket 242 M-E shape: an allow verb that spends a real grant). Refusing a card is safe; settling one as allowed is not, and no spelling of a new verb makes it the same act` ／ `:82: AC#3 RED: PanelAPI has 4 methods, the closed set has 3; a count match is part of the fence, otherwise an alias for an existing verb passes silently` ／ `:101: AC#3 RED: the value Gate.Panel() returns (approval.panelAPI) carries method "Allow", which the PanelAPI list does not name; a panel host that asserts a wider interface calls it` ／ `:111: AC#3 RED: the panel carrier satisfies an Allow-shaped verb; a host holding Panel() can settle a card as allowed (ticket 242 M-E)` | **2 FAIL／87 PASS**；同发 242 那六枚逐枚 `--- PASS`（含 `TestTicket242PanelItemReadFaceIsFullyDeclared`、`...StaysGrantFree`）＝242-v1 的"本包 66 全绿"这一形被复现，只是这次新尺响了 | 起 11:52:47（ui.go 半枚）／11:52:59（gate.go 半枚打卡）→ 跑毕 11:53:23 → 终 **11:53:31** |
+| **M-E**（票面点名的必抓形） | `ui.go` `PanelAPI` 加 `Allow(correlationID, grant string) error` ＋ `gate.go` `func (p panelAPI) Allow(corr, grant string) error { return p.q.allow(corr, grant) }`（真花令牌、真改卡状态） | 尺① | `ticket259_panel_capability_rulers_test.go:73: AC#3 RED: PanelAPI gained method "Allow"; the panel surface is closed at Reject/Head/View, and a fourth name is a new capability on the untrusted face (ticket 242 M-E shape: an allow verb that spends a real grant). Refusing a card is safe; settling one as allowed is not, and no spelling of a new verb makes it the same act` ／ `:82: AC#3 RED: PanelAPI has 4 methods, the closed set has 3; a count match is part of the fence, otherwise an alias for an existing verb passes silently` ／ `:101: AC#3 RED: the value Gate.Panel() returns (approval.panelAPI) carries method "Allow", which the PanelAPI list does not name; a panel host that asserts a wider interface calls it` ／ `:111: AC#3 RED: the panel carrier satisfies an Allow-shaped verb; a host holding Panel() can settle a card as allowed (ticket 242 M-E)` | **2 FAIL／87 PASS**；同发 242 那六枚逐枚 `--- PASS`（尺①两枚＋四枚 binding 全在册；逐枚行在 `m-e.txt`，计数尺＝`grep -cE "^--- PASS: TestTicket242" m-e.txt`＝6）＝242-v1 的"本包 66 全绿"这一形被复现，只是这次新尺响了 | 起 **11:52:59**（打卡；`ui.go` 那半枚在同一次窗口的上一步落盘，**未单独打卡**＝本表唯一的时刻缺口，见 §6 第 8 条）→ 跑毕 11:53:23 → 终 **11:53:31** |
 | **M-D2**（票面点名的必抓形） | `ui.go` `PanelItem` 末尾加 `Permitted bool` **且** `ticket242_panelface_test.go` 把 `"Permitted"` 补进 `panelItemReadFace`（同一只手补名单的真实场景） | 尺②（KIND 那问） | `ticket259_panel_capability_rulers_test.go:174: AC#3 RED: PanelItem.Permitted has type bool - a bool on the card a panel reads IS a verdict bit (allowed / not allowed); the panel read face is plain display data and has no decisions to report. This is the M-D2 shape: the field name is free, the list is updatable by the same hand that adds the field, so the fence has to be about what the field CAN carry (ticket 259 AC#3)` | **1 FAIL／88 PASS**；两枚 242 词面尺逐枚 `--- PASS`＝"改名＋补名单静默过审"这一形**仍然静默过审**，被抓到的是新尺；VALUE／不变量两问不响（bool 不是串）＝三问互相独立，不是同一块石头 | 起 **11:53:39** → 跑毕 11:54:08 → 终 **11:54:15** |
 | **M-G**（尺③的必响形） | `approval.go` 加 `func (s *grantStore) peekAny() string`（回一枚活 nonce）＋ `queue.go` `viewLocked` 把 `Reason: it.Dec.Reason` 换成 `Reason: it.grants.peekAny()`——**不加字段、不改名、不改类型**，凭据从既有已声明的展示字段里漏出去 | 尺③（＋尺②的 VALUE／不变量两问） | `ticket259_panel_capability_rulers_test.go:301: AC#3 RED: a value read out of the panel face spent as a native grant and allowed the card; the outward read face and the answer face are not the same channel, and this is the case that says so` ／ `:308: AC#3 RED: the panel-observable values were refused, but so was the live native grant (approval: correlation_id 无对应待审批项) - the card stopped being answerable before the control ran, which makes the pass above meaningless` ／ `:199: AC#3 RED: Head renders a live native grant in PanelItem.Reason; the value a panel can read is the value that opens the card` ／ 同 `:199` 第二行 `View renders ...` ／ `:229: AC#3 RED: PanelItem.Reason changed when the card's grants were revoked; the panel read face must not reflect grant or decision state (name-blind: this is the capability half of M-D2)` | **4 FAIL／85 PASS**；第四枚红是**在册旧尺**：`ticket146_liveapprovals_backing_test.go:349: AC#2 RED: PanelItem 非引用字段也被牵动：tool="shell.run" reason=""`——它钉的是"投影的 Reason 必须等于 Decision 的 Reason"，⛔ 只钉那一枚字段名；我的②／③按值与按方向判，换个字段名（`CorrelationID`、或将来的新字段）它就不响、这两问照响 ⇒ 尺③不是那枚在册钉的换名版 | 起 **11:54:15** → 跑毕 11:54:46 → 终 **11:54:54** |
 | **PC-D2**（197-v1 的 D2 正控；242-v1 §2 M-A2 同形） | `approval.go` `spend` 里 `if !equalSecret(stored, bind) { return denialMisbound }` 换成 `if !equalSecret(stored, bind) || len(bind) >= 0 { return denialNone }`＝**花侧不比摘要**，用法保留、编译通过 | 本腿那枚指名"绑定不对"的新用例**必须红**（不许常绿）；242 那两枚在册钉也必须红 | `ticket259_denial_rulers_test.go:172: AC#2 RED: a spend against a mismatched binding was classified none, want the binding cause named apart` ／ `ticket242_binding_test.go:31: AC#1 RED: a grant bound to item one was spent with item two's digest - the binding layer did not reject the forged binding` ／ `ticket242_binding_test.go:48: AC#1 RED: empty binding spent a live grant` | **3 FAIL／86 PASS**。反向一半：不种任何突变时本包 89 PASS／0 FAIL（§5 逐名）＝新尺**不常红**；`TestTicket242ForgedBindingCannotSpendAnotherItemsGrant` 在 PC-D2 下仍 `--- PASS`＝242-v1 那条"名字叫跨卡那枚不敏感"的读数不变，本腿没替它加牙（那属 AC#1） | 起 **11:55:18** → 跑毕 11:55:37 → 终 **11:55:55** |
@@ -291,11 +300,14 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go（同上）
 
 | **M-I**（反折叠那枚尺的必响形） | `approval.go` 的 `label()` 里 `case denialSpentNonce:` 从 `return "spent-or-never-live-nonce"` 改成 `return "missing-nonce"`＝**两枚词元在渲染器里折成一枚**（M-H 折的是调用点、这一发折的是词元本身） | 反折叠尺＋走路由的"已用"那一枚＋维持对外合并那一枚 | `ticket259_denial_rulers_test.go:235: AC#2 RED: denials 1 and 2 share the label "missing-nonce"; four causes must not fold into fewer names` ／ `:240: AC#2 RED: 4 causes produced 3 distinct labels; the four sentences are the deliverable` ／ `:143: AC#2 RED: the audit does not name the not-live-proof cause (approval: GRANT-DENY corr=corr-259-spent tool=shell.run denial=spent-or-never-live-nonce)` ／ `:268: AC#2 RED: the audit stopped naming the two causes it merged outward` | **3 FAIL／86 PASS**；缺失那一枚按定义仍绿。⇒ §8 第 6 条那句"反折叠尺的牙由哪一发量出来"就此从"待量"变成有读数，⛔ 不再挂在 M-H 身上 | 起 **12:04:56** → 跑毕 12:05:15 → 终 **12:05:16** |
 
-**盘上无残留突变**（六枚文件逐枚 md5 回到起手值，见上表末段；另尺＝
+**盘上无残留突变**（五枚被改文件逐枚 md5 回到起手值——六发突变压在同样这五枚上，见上表末段；另尺＝
 `grep -rn "259-r1 M-E probe|259-r1 M-D2 probe|259-r1 M-G probe|259-r1 PC-D2 probe|259-r1 M-H probe|259-r1 M-I probe|peekAny" --include=*.go internal/agent/approval/`
-在 11:56:42 与 12:05:16 各量一次 **0 命中**，最后一次的输出面在 `.scratch/wisp/probes/259/r1/final-md5.txt` 旁边）。
+在 11:56:42 与 12:05:16 各量一次 **0 命中**）。
 全部突变输出留在
-`.scratch/wisp/probes/259/r1/{m-e,m-d2,m-g,pc-d2,m-h,m-i}.txt`（`-count=1 -v` 逐字）。
+`.scratch/wisp/probes/259/r1/{m-e,m-d2,m-g,pc-d2,m-h,m-i}.txt`（`-count=1 -v` 逐字），
+六发的同发对照读数逐枚复核过并写进上表（例：PC-D2 下发 `TestTicket242ForgedBindingCannotSpendAnotherItemsGrant`
+逐枚 `--- PASS`＝242-v1 那条"名字叫跨卡那枚不敏感"未被本腿改动；M-H 下发
+`TestTicket259R1FourDenialLabelsArePairwiseDistinct` 逐枚 `--- PASS`＝那枚反折叠尺的牙不由 M-H 作证、由 M-I 作证）。
 
 
 ---
@@ -354,6 +366,14 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go（同上）
    不在本腿写面（`cmd/wisp` 此刻是 `257-r2` 的整包面），本腿⛔ 未跑该包、未读那枚行的新值，
    框也⛔ 未勾 ⇒ 具名归口：**AC#4 仍挂在本票面上，等 `cmd/wisp` 空窗另派**。
    本腿的四枚拒因用例不依赖那枚载具（它们要的是"同一张队里两枚卡"，`r1CardIn` 已给）。
+8. **M-E 那发的窗口起点有一枚时刻缺口**（如实登记，不补一个像样的数进去）：那发是两枚文件、
+   两次落盘，我只在**第二枚**（`gate.go`）落盘后打了 `11:52:59` 这一发；`ui.go` 那半枚落在同一次窗口的
+   上一步工具调用里、**没单独打卡** ⇒ 真起点在 `11:52:4x` 与 `11:52:59` 之间，界上界是 11:53:31。
+   其余五发的起止都是同一把命令里打的、无缺口。事后若要精确窗口，只有重跑那一发（本腿⛔ 没为一枚
+   时刻数挂第二次突变）。
+9. **`ui.go` 起手＝交付＝`a4cee69ef76adc54ea0154527f283604`**，与 `242-v1` §0 那枚锚同值 ⇒
+   "M-D2 那形今天仍只被新尺抓到"这句可以跨两枚腿对表；⛔ 但同一把值也说明本腿对它做的只有临时突变、
+   一次都没留在盘上（六枚 `.txt` 之外无残留）。
 
 ---
 
@@ -363,7 +383,8 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go（同上）
 |---|---|
 | `ea522444` | 证据件 §0／§1 ＋ `base-v.txt`／`base-names.txt` |
 | `b6b1d6a4` | AC#2 改形（`approval.go`／`queue.go`）＋ 五枚调用点等价改判据（`ticket242_binding_test.go`）＋ 两枚新尺文件（12 枚用例）＋ `after-code-v.txt`／`after-code-names.txt` |
-| （本件后续笔） | §2—§9 与 `.txt`／`backup/*.orig`／`msg-s*.txt` 名册 |
+| `50e0299c` | 证据件 §2—§9 写满 ＋ 六枚突变输出（`m-e`／`m-d2`／`m-g`／`pc-d2`／`m-h`／`m-i`）＋ 五枚还原源 `backup/*.orig` ＋ `final-v.txt`／`final-md5.txt` ＋ gofumpt 负控样本 |
+| （本件末笔） | §1.4／§4／§6／§7 的四处准确性回头改（M-E 窗口起点缺口、六枚→五枚文件的说法、D2 出处改引 197-v1 原文、反折叠尺的牙从 M-H 改记到 M-I）＋ §9 交件判语终值 |
 
 `git add -- <点名文件> && git commit -F .scratch/wisp/probes/259/r1/msg-sN.txt -- <同一批点名文件>`，
 中间不停顿；⛔ 无 `add -A`／`.`、无裸 `git commit`、无 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；
