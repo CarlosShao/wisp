@@ -1,0 +1,6 @@
+firstrun.go baseline (worktree == HEAD 06b66e66) md5: 0491339282492f2cabdbf5be576c8a57
+M1 mutant md5: a2a7e62d27ae0152673dfbf18b6d7ea2
+M2 mutant md5: 538f93c02dfa1d954b7d5dcbcee89f4b
+M3 mutant md5: 891fc88b4e887c0f8592a6dabf7b2cc2
+M4 mutant md5: 17fdd43209d51090b4ef6043417a912d
+worktree after (unchanged): 0491339282492f2cabdbf5be576c8a57

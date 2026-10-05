@@ -1,0 +1,12 @@
+257-r2 证据件 0.9 追加：本腿实现被 3f0c4fff 无 pathspec 卷走的归因更正
+
+11:24 本腿以显式 pathspec 暂存十枚文件后 commit 未落地（git 回 no changes added to commit）；
+11:25:10 别票的 3f0c4fff（标题 probes(268-a2)）把本腿暂存区整卷带走，
+cmd/wisp/firstrun.go 与 cmd/wisp/firstrun_257_test.go 与本件 §0-§4 现在在那枚 commit 里。
+内容完好：git cat-file blob HEAD:cmd/wisp/firstrun.go 的 md5 ＝ 0491339282492f2cabdbf5be576c8a57
+＝ 工作树；测试件 23a7a56795019fabf506f6726541b049 同形。
+本节把两件事钉下来：一是这枚实现的归属（内容是本腿 11:04 进场那一发写的，
+不是另一枚自名 257-r2 的腿 11:12:54 那半段），二是尾程突变窗口有被再次卷进 HEAD 的风险，
+所以每发突变还原后立刻双读 md5（工作树与 HEAD blob）。
+本 commit 只带本件一枚路径；另一枚腿新写的 cmd/wisp/firstrun_257_nonpreset_test.go 不碰不删。
+只 commit 不 push；未用 add -A / . / -a / --amend / reset / rebase / stash / checkout . / clean。

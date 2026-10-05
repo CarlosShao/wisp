@@ -1,0 +1,44 @@
+257-r2（11:04 那一发）证据件 6A-10A：门禁四数、整包名册、判不动、污染面、自我对抗、交件判语
+
+门禁四数（逐把带时刻，原件在 .scratch/wisp/probes/257/r2/tail-*.log）：
+- GOFLAGS= go build ./... rc=0（11:08:26 基线／11:11:59 改后／11:42 尾程／11:43:15 复量）
+- gofumpt -l cmd/wisp：11:17:39 点名本腿新件一枚，-w 自己那枚后归零；
+  11:42:00 与 11:43:15 两读只剩预存的 cmd/wisp/models.go（CRLF 既有账，未顺手格式化）
+- sh scripts/d22scan.sh rc=0 clean（11:17:59 与 11:42:57 两发，自检 35/0/0）
+- sh scripts/check-path-length-budget.sh rc=0 VERDICT GREEN（11:18:43 与 11:42:59 两发；
+  分母 5733 到 5817 的涨幅是同机别腿落件，不是本腿口径变化）
+- 附 go vet ./cmd/wisp/ rc=0（11:43:36）；11:26:51 那次红是 181-r3 在飞写脏 internal/panel，
+  已从本腿门禁剔除并具名（§9A-N4）
+
+整包那一发（尾程、重定向到文件、带 -v）：go test -count=1 -v ./cmd/wisp/
+起 11:30:2x、末 11:39:54、体内 506.468s；=== RUN=331 PASS=233 FAIL=1 SKIP=1 子测试 96 枚，
+233+1+1+96=331 对账闭合。逐名比对同机基线 baseline-cmd-wisp.log（11:22:42，233/0/0）：
+丢名 0 枚、新增名 2 枚（并行腿的 nonpreset 用例，两枚 PASS）。
+新增红 1 枚＝TestPanelHostRealWindowHopAndLifecycle（基线里它是 PASS），红句逐字进 §6A：
+AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=0 (machine-wide 24)
+no msedgewebview2 process is a direct child of this test process while the window is up
+隔离复跑交回读数：count=1（11:40:40-11:41:05）两枚全 PASS；
+count=3（11:41:13-11:41:28）第 1 迭代 PASS、第 2/3 迭代双 FAIL，
+红句含 cold bring-up 2107.9 ms exceeds D32 panel cold budget 1500 ms；
+同尺 cold 读数 619.409 / 1031.424 / 2107.868 ms 八分钟内 3.4 倍漂移，
+跑窗内 runner 在跑 slo-full 与 test-windows、internal/panel 又被别腿写脏
+=> 具名标〔机器争用待复跑〕〔未归因，归编排者〕，未压断言、未混发。
+命名 SKIP 一枚＝TestPanelHostLatencyPercentilesAC2（它自己写"空聚合不是绿门"），读成未跑不读成通过。
+
+判不动七格（§7A）：哪一枚 257-r2 算交件归编排者（A617 已自曝双派）；真面板链那一格要 WebView2
+且本腿禁写 internal/panel；无控制台常驻那一形要运行期 GetConsoleMode；面板渲染整段串的一致性
+只钉到三枚 tag 字面同串；provider_credential 走引用腿（名册 7 枚、腿 6 条，口径写死在测试注释里）；
+并行腿留下的 40MB test 二进制与 mut/ 不删不提交；两处有意脆性（tag 字面耦合与占位计数）主动交出。
+
+污染面与提交名册（§8A）：本腿实现八枚内容在 3f0c4fff（message 是别票 268-a2 的，本腿自己那笔因
+git 回 no changes added 没落地，事故在 §0.9 逐时刻写全）、06b66e66 是本腿自落一枚证据件、
+7c644bb0 是并行腿交件且把我的 §0-§5 原样保留在 7-174 行。AC 框零改动自证＝票文件工作树与 HEAD 一致、
+AC#1-AC#4 四框仍未勾；AC#4 越界尺对本腿两枚 commit 全文件名跑禁区正则＝0 命中；
+internal/config、internal/panel、frontend、design、PLAN、specs、thresholds、golden、allowlist、台账
+全部不在本腿任何 pathspec 里。只 commit 不 push，未用 add -A / . / -a / --amend / reset / rebase /
+stash / checkout . / clean，还原只用 git cat-file blob HEAD:<path> > <path>。
+
+自我对抗（§9A）七条：§5 首版 M3 md5 抄错已用 mutant-md5.txt 实读值替掉；M2 首次脚本 setup fail
+造成一次空跑 rc=0 不作读数；§3 发 2 首跑 5/7 红是本腿仪器缺陷（手加值与试写值撞同值）不是产码缺陷；
+11:26:51 那次 vet 红差点被我记成本腿门禁；§0.9 首版把推测当了一句话；派单"代号 r2 干净"这一前提
+本腿只在开工时核过一次（教训＝要每轮重取）；文案形状可加载可解锁不等于机主真会照着走。

@@ -1,0 +1,18 @@
+time=2026-10-05T11:41:00.315+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: 1490.539 ms (HEAD 51ea6998 at read time, 2026-10-05T11:41:02+08:00)
+    panel_host_windows_test.go:713: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=8 (machine-wide 20)
+    panel_host_windows_test.go:749: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=8 (machine-wide 20)
+    panel_host_windows_test.go:779: AC#1 denominators (head 51ea6998): our tree webview=8 direct-children=1 tree-pids=8 | browser hosts pre=[29708] mine=[29708] post=[29708] added=[] mine-died=[] | machine-wide msedgewebview2=20 | same HWND 0xb8a0dfc across hide->re-show=true
+    panel_host_windows_test.go:787: hot re-show measured on this box: 82.401 ms
+    panel_host_windows_test.go:814: AC#3 listening-socket ruler (head 51ea6998): IPv4 rows=480 LISTEN-owned-by-tree=0 ; IPv6 rows=83 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:840: AC#1 after Destroy (head 51ea6998), ONE sample and no timing claim: our tree webview baseline 0 -> now 8, machine-wide 12 -> 20. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (2.71s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:987: AC#2 appendix (head 51ea6998, n=1, same-process consecutive runs):
+    panel_host_windows_test.go:993:   sample  1: cold=1490.539 ms hot=82.401 ms at 2026-10-05T11:41:03+08:00
+    panel_host_windows_test.go:999: AC#2 percentiles over 1 runs (nearest-rank): cold P50=1490.539 P95=1490.539 (budget 1500) | hot P50=82.401 P95=82.401 (budget 200)
+    panel_host_windows_test.go:1003: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 1490.539 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	4.771s

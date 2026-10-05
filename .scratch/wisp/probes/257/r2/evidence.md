@@ -442,4 +442,105 @@ over-budget=57、roster 覆盖 57、**not in roster=0**。
   四门与两发整包读数齐；本腿没有"量不到却写成结论"的格——够不着的三格全在 §7.1 具名归口给编排者，
   ⛔ 一枚没自己划掉。若 §5–§10 再被姊妹腿覆盖一次，原件逐字在**本笔 commit**（`git log -- <本文件>` 取最新一笔）。
 
+---
+
+# 6A–10A. 并行腿（自名 `257-r2`，11:04:54 进场那一发，锚 `c6cf66e6`）的尾程账
+
+> 编号说明：本件 §0–§5 与本块 6A–10A 是**同一枚腿**（11:04 进场、锚 `c6cf66e6`）；§5–§10（175-445 行）是**另一枚自名 `257-r2b` 的腿**（其 §0 自报 11:12:54 进场，锚 `c6cf66e6`→`69c1bb82`）。
+> 两套件在同一棵共享工作树上并存，编排者已在 `A617`（commit `51ea6998`）自曝"同一轮把票 257 派了两枚写腿"并留"两套实现并存待 257-v1 裁"。
+> **本块不自裁谁算交件**；本块只保证：本腿那两枚产码/测试件的内容、读数、突变红句、门禁与整包名册，盘上一一可核。
+> 本腿实现落点：`cmd/wisp/firstrun.go`（＋61 行，md5 `0491339282492f2cabdbf5be576c8a57`）与 `cmd/wisp/firstrun_257_test.go`（472 行，md5 `23a7a56795019fabf506f6726541b049`），两枚都在 `3f0c4fff`（该笔 message 是别票的，事故见 §0.9）。
+
+## 6A. 门禁四数＋整包名册（逐把带时刻）
+
+| 门 | 时刻（+08） | 读数 | 判 |
+|---|---|---|---|
+| ① `GOFLAGS= go build ./...` | 11:08:26（改前基线）／11:11:59（改后）／11:42:0x（尾程）／11:43:15（尾程复量） | **rc=0 四取同判** | 绿 |
+| ② `"D:\work\base\gopath\bin\gofumpt.exe" -l cmd/wisp` | 11:17:39 首读点名两枚：`cmd\wisp\firstrun_257_test.go`（本腿新件）＋`cmd\wisp\models.go` | 11:17:50 对**本腿自己那枚**跑 `-w` 后：`firstrun_257_test.go` 归零，清单只剩 `cmd\wisp\models.go`；尾程 11:42:00 与 11:43:15 两读均只剩 `models.go`（预存 CRLF，票 212/258 既有账，⛔ 未顺手格式化） | 绿（本腿零命中） |
+| ③ `sh scripts/d22scan.sh` | 11:17:59（原件 `gate-d22scan.log`）／11:42:57（尾程 `tail-d22scan.log`） | 两发 **rc=0**；末行 `d22scan: clean - no D22 ban violations`；仪器自检 `PASS=35 FAIL=0 SKIP=0`（含 `TestBan8MathBandAndRemainingGaps` 正反两向）。⛔ 无 phantom-citation（265 腿那枚既有红已结案，账 `A607`） | 绿 |
+| ④ `sh scripts/check-path-length-budget.sh` | 11:18:43／11:42:59 | 两发 **rc=0 VERDICT GREEN**；分母 `11:18`＝`5733 tracked / 57 over / 57 covered / 0 not in roster`，`11:42`＝`5817 / 57 / 57 / 0` ⇒ 分母涨 84 枚＝同机别腿在这 24 分钟里落了件，⛔ 不是本腿口径变化 | 绿 |
+| 附：`go vet ./cmd/wisp/` | 11:43:36 | rc=0。（⚠ 11:26:51 那一发曾因 `181-r3` 在飞的 `internal/panel/workspace.go` 编译不过而红，那次**不作本腿门禁读数**，见 §9A-N4） | 绿 |
+
+**整包那一发（尾程，重定向到文件取数，⛔ 不用 `tail` 截名册）**：
+`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v ./cmd/wisp/ > .scratch/wisp/probes/257/r2/full-cmd-wisp.log 2>&1`
+发射 11:30:2x，末行落 11:39:54，测试体内计时 **506.468s**：
+
+| 读数 | 值 |
+|---|---|
+| `=== RUN` | **331** |
+| top-level `--- PASS` | **233** |
+| top-level `--- FAIL` | **1** |
+| top-level `--- SKIP` | **1** |
+| 子测试 `    --- PASS` | **96** |
+| 对账 | `233＋1＋1＋96 = 331` ＝ `=== RUN` 数，逐枚闭合（无"跑了没结果"那一形） |
+| 本腿六枚 | 全在名册里逐名 `--- PASS`（`TestTicket257R2AC1…×3／AC2…×2／AC3…×1`） |
+
+**红名判据＝只减不增，基线用同机同包那一发**（`.scratch/wisp/probes/257/r2/baseline-cmd-wisp.log`，11:22:42，`233 PASS／0 FAIL／0 SKIP`，是并行腿在本腿实现已入树之后跑的）：
+`comm -23` 逐名比对＝**丢名 0 枚**；`comm -13`＝**新增名 2 枚**，均是并行腿的新用例（`TestTicket257R2AC1NonPresetRowNeedsProtocolBeforeItLoads`／`TestTicket257R2AC1ReceiptStatesTheNonPresetCondition`），两枚本发内 **PASS**。
+**新增红 1 枚〔未归因，归编排者〕＋〔机器争用待复跑〕**：`TestPanelHostRealWindowHopAndLifecycle`（基线里它是 `--- PASS (1.08s)`），红句逐字（整包 `0.81s` 那一发）：
+```
+panel_host_windows_test.go:713: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=0 (machine-wide 24)
+panel_host_windows_test.go:717: no msedgewebview2 process is a direct child of this test process while the window is up - the host-pid ruler is blind (tree webview 0, tree pids 0)
+```
+隔离复跑（派单要求的两形，⛔ 没有"重跑到一半把两发混成一发"）：
+- `-count=1`（11:40:40→11:41:05，`-run 'TestPanelHostRealWindowHopAndLifecycle|TestPanelHostLatencyPercentilesAC2'`）：rc=0，`--- PASS`（lifecycle 2.71s）＋ `--- PASS`（latency 0.00s）。原件 `isolate-realwindow-count1.log`
+- `-count=3`（11:41:13→11:41:28）：**第 1 迭代两枚 PASS，第 2／3 迭代两枚双 FAIL**，红句含 `panel_host_windows_test.go:665: cold bring-up 2107.9 ms exceeds D32 panel cold budget 1500 ms` ＋ 同一族的 `tree settle: reading held after 1 extra sample(s)`。原件 `isolate-realwindow-count3.log`
+- 同尺 cold bring-up 四次读数：**619.409 ms（11:32:52，整包内）／1031.424 ms（11:41:20）／2107.868 ms（11:41:24）**＝8 分钟内同机漂到 3.4 倍，且 `machine-wide msedgewebview2` 在 19~24 之间浮动（本树 `webview=0/7/8`）；跑窗内 self-hosted runner 正在跑 `slo-full`／`test-windows`（派单预告），`internal/panel`＋`internal/tools` 同时被 `181-r3` 写脏（`git status` 11:27 现量九枚 ` M`/`??`）。
+⇒ 本腿判语只到这里：**这枚红与本腿写面（stderr 文案＋同包测试）无因果路径**（本腿没碰窗体、没碰 `internal/panel`），但**不宣布"无关"划掉**，标〔机器争用待复跑〕〔未归因，归编排者〕，⛔ 未压任何断言换绿。
+**命名 SKIP 1 枚**：`TestPanelHostLatencyPercentilesAC2`，它自己的句子＝`no cold/hot sample recorded in this process: the lifecycle test did not run in this binary … Named skip - an empty aggregate is not a green latency gate` ⇒ 本腿读成"未跑"，⛔ 不读成通过（该 SKIP 只在 lifecycle 未落样本的那发里出现，隔离复跑两发里它是 PASS）。
+
+## 7A. 判不动／量不到（具名归口，⛔ 没有一枚写成"应该没问题"）
+
+| # | 格子 | 为什么够不着 | 归口 |
+|---|---|---|---|
+| N1 | **哪一枚 `257-r2` 的件算交件**（两套件并存：本腿 6 枚用例／并行腿 8 枚突变＋两枚 nonpreset 用例，写面同一枚 `firstrun.go`） | 派单前提"另一枚腿只读不写"被 `git log` 推翻（§0.9），且本腿无权限判姊妹件作废 | **编排者**（`A617` 已自曝并留"两套实现并存待 257-v1 裁"；本腿不自裁） |
+| N2 | AC#1 的**真面板链那一格**（设置页里逐枚点那七枚、看页面回执原话） | 需要 WebView2 真窗＋`internal/panel`，本腿写面禁止碰 `internal/panel`（另两枚腿在读它），且真窗族在本机受争用（§6A） | 本腿量到的是**名册 setter 层**（`config.NewManager` ＋ 七枚导出 setter）与**首启 stderr 回执层**；页面渲染层归 `257-v1`／`e2e` 腿 |
+| N3 | 三形状里"无控制台常驻"那一格**在机主那台机器上到底是哪一形** | 要 `GetConsoleMode` 的运行期答案（`257-a2` §5-N4 同判，`resident_task_source_windows.go:224-231` 那道闸），码里读不出 | 回执只把三形都说到、不替用户选形；真机判定归 winlive 批准后那一程（账 `A606`/`A607` 的 U9） |
+| N4 | 本腿回执与 `internal/panel` 那侧中文句（`renderSettingReceipt`／`tierSentence`）的**全串一致性** | 只钉到"三枚 tag 字面同串"（本腿测试用字面量抄那三句），面板渲染整段字符串不在本腿读数窗，且 ⛔ 不能改 `internal/panel` | 归 `257-v1` 对抗验收；本腿在 §7A-N7 把自己的耦合脆性交出去 |
+| N5 | `provider_credential` 那一枚的**完整腿**（`configStore.StoreCredential` → DPAPI store） | AC#3 禁新增回显／禁碰凭据面，且写 DPAPI blob 会让"干净机读数"混进真密钥存储形状；本腿按 `257-r1` 口径走该字段的**引用腿** `SetProviderAPIKeyRef` | 名册枚数仍 7，**腿数是 6**（口径差异在 `firstrun_257_test.go:96-104` 的注释里逐字写明）；真凭据腿的干净机形状归 248/257-v1 那一族 |
+| N6 | 并行腿在 `.scratch/wisp/probes/257/r2/` 里留下的 40 MB `cmdwisp.test.exe`、`mut/`、`snapshot-*.go`、`baseline-cmd-wisp.log` 等 | ⛔ 派单规则"临时件只建不删"，本腿不删别人的件、也不 commit 别人的件（`3f0c4fff` 那次是被第三枚腿的裸 commit 卷走的，不是本腿提交） | 编排者／CI 地界（`A617` 已记 `ci.yml:171` gofumpt 走遍 `.scratch` 那笔红归票 171；本腿新件全部 <25 KB） |
+| N7 | 脆性两条，主动交出：①本腿测试里三枚 tag 是**字面量**（`firstrun_257_test.go:53-57`），`internal/config` 将来改 tag 措辞会打红 `cmd/wisp` 这一族（有意耦合，改 tag 必须两半同批改）；②`TestTicket257R2AC3` 里 `dpapi:`／`env:` 占位计数用"总数 == 占位数"，同一占位若被引用两次则**假红**（宁可假红不静默） | — | 交给验收腿判"是否要换成尺读常量"（换成读常量＝重新掉进 257-r1b 的 M1 盲区，本腿选边是刻意的） |
+
+## 8A. 污染面与提交名册（逐笔 `git show --name-only`＋AC 框零改动自证）
+
+| 笔 | 归属 | 内容 | `git show --name-only` 实测 |
+|---|---|---|---|
+| `3f0c4fff`（11:25:10） | **message 是别票的**（`probes(268-a2)`），**内容含本腿八枚**：`cmd/wisp/firstrun.go`＋`cmd/wisp/firstrun_257_test.go`＋本件 §0–§4＋五枚 log | 本腿 11:24 用显式 pathspec `git add` 后跑 `git commit -F … --only -- <十枚路径>`，git 回 `no changes added to commit`＝**本腿那笔没落地**；随后 `268-a2` 的裸 commit 把本腿暂存区卷走 | 名单已核；内容完好（`git cat-file blob HEAD:…` 两枚 md5 与 §0.9 一致）；`A617` 就地追账同一形事故，定式升级为"commit 一律 `-F msg -- 显式 pathspec`" |
+| `06b66e66`（11:2x） | **本腿** | 证据件 §0.9 追加（撞腿登记） | 只含 `.scratch/wisp/probes/257/r2/evidence.md` 一枚 |
+| `7c644bb0`（11:31:42） | 并行腿（`257-r2b` 交件） | 含它的 `firstrun_257_nonpreset_test.go` ＋ 本件合并版（**我的 §0–§5 原样保留在 7–174 行**，它的 §5–§10 从 175 行起） | 名单已核：cmd/ 里只多它那枚 nonpreset 测试，本腿两枚文件不在其中（已在 `3f0c4fff`） |
+| 本块（6A–10A） | **本腿** | 证据件 ＋ 尾程 log／msg 件 | 枚枚显式 pathspec，只带 `.scratch/wisp/probes/257/r2/**` |
+
+**AC#4 越界尺（本腿两枚 commit 的全部文件名过禁区正则）**：
+`git show --name-only --format="" 3f0c4fff 06b66e66 | grep -E "^frontend/|^design/|PLAN\.md|^docs/specs/|thresholds\.go|golden|allowlist\.txt"` ＝ **0 行命中**。
+**写面清单（逐枚 `file:line`）**：
+- `cmd/wisp/firstrun.go:123-150`（ ⓒ 的立论注释块）／`:151-160`（三样段）／`:162-170`（三因段，`Fprintf` 带真路径）／`:172-184`（三形状段＋凭据段）
+- `cmd/wisp/firstrun_257_test.go`：`:53-67`（三枚 tag 与五枚教学串字面量）／`:72-95`（干净机起步：`t.TempDir` ＋ `fs.ErrNotExist` 断言 ＋ 真入口 `runTextTask`）／`:96-133`（名册七枚行走）／`:139-217`（AC#1 发 1）／`:224-276`（AC#1 发 2：照回执手加 → 7/7）／`:281-306`（AC#1 发 3：只加第一样 → 恰 3/7）／`:311-364`（AC#2 三因三句）／`:370-398`（AC#2 三形状）／`:403-446`（AC#3 凭据面）／`:448-472`（手加与读盘 helper）
+- ⛔ 零触碰清单（本腿任何 commit 的名单里都没有）：`internal/config/**`（包级互斥的另一枚写位）、`internal/panel/**`（两枚腿在读）、`frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、`docs/reports/pending-and-issues.md`。
+**票面 AC 框零改动自证**：`.scratch/wisp/issues/257-clean-machine-provider-registry-nil-blocks-writes.md` 不在本腿任何一枚 pathspec 里；现量该文件＝`AC#0 [x]`（编排者 10-02 翻的勾）＋`AC#1..AC#4 [ ]` 四框未勾，`git status --porcelain` 对该文件**零输出**＝工作树与 HEAD 一致，勾与不勾留给编排者。
+**Git 纪律**：全程只 commit、⛔ 不 push；未用 `add -A`／`add .`／`commit -a`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；还原只用 `git cat-file blob HEAD:<path> > <path>`（§5 四发）；临时件只建不删；未在仓库内建 worktree。
+
+## 9A. 本腿写错的读数（自我对抗，不等验收腿抓）
+
+| # | 我错在哪 | 后果与处置 |
+|---|---|---|
+| N1 | §5 首版把 M3 的突变体 md5 抄成不确定串（"891fc88b4e887c0f587…"） | 已用 `mutant-md5.txt`（11:31:31 纯计算重算）的全值 `891fc88b4e887c0f8592a6dabf7b2cc2` 替掉，并把"抄错"这件事留在原地不抹 |
+| N2 | M2 第一次脚本第 5 枚 needle 没匹配上 → 按设计写盘前退出，但**那次 `go test` 仍跑了**（对未突变文件），`rc=0` | 那一发的 `rc=0` **不作任何一发的读数**；换 needle 后的 M2 才是证（11:29:02→11:29:14，五条红句在 `mutant-M2.log`）。教训：脚本 assert 失败后不该继续跑测试，本腿后半段把两步并成一个 `&&` 链 |
+| N3 | §3 发 2 首跑 5/7 红（`provider_api_key_ref`／`role_chat_model` 两枚"接受但键路径为空"） | **是我的仪器缺陷不是产码缺陷**：手加段把后面要试写的同一个值先填上了，`writeOneKey` 老实回"文件里已经是这个值"。改法是让两段用不同占位值（未放宽任何断言，两枚 log 都留盘） |
+| N4 | 11:26:51 我把 `go vet ./cmd/wisp/` 的编译红（`internal/panel/workspace.go` 参数不匹配）差一点记成本腿门禁读数 | 现量 `git status`＝`181-r3` 正在写 `internal/panel`＋`internal/tools`（九枚脏）⇒ 那次红是别腿在飞形状，已从 §6A 门禁表剔除并具名；尾程 11:43:36 rc=0 才算数 |
+| N5 | §0.9 首版我只写了一句"另两枚只读腿在写文件"的推测 | 11:25 追认时才用 `git show --name-only` 把"是谁、哪一枚、哪一刻、卷走了哪八枚"定死；推测没当成读数用 |
+| N6 | 我最初接受派单"代号 `r2` 是干净的"（编排者已 `ls` 过）作为前提，直到 11:22 看见 `mut/` 才怀疑 | 教训＝**代号干净要每轮重取**，不只在派单时取一次；登记给编排者的派单定式（`A617` 已自定"派前 grep 台账腿号＋git log --since 看那枚包几分钟"） |
+| N7 | 我不能证明"回执教的形状就是机主真会走的形状"（人因层面），只证明了它可加载、7/7 解锁、且非预设名那一支会因缺 `protocol` 加载不过（本腿只把这句话**写进文案**，量它的是并行腿那枚 nonpreset 用例） | 具名留给 257-v1：文案诚实性 ≠ 机主真走得通；真走通要 e2e 腿 |
+
+## 10A. 本腿交件判语（四条 AC 各一句 ＋ 预算／纪律）
+
+- **AC#1（干净机真跑＋ ⓒ 终态）**：`t.TempDir()` 且断言无 `config.toml` 起步 → 真入口 `runTextTask` 建首份配置 → 名册七枚逐枚试写**全拒、且七枚都只报第 2 种并点名 `[llm.providers.`**（`map[第 2 种拒因：行不存在:7]`）→ 照回执教的三样手加后 **7/7 接受并报键路径**、只加第一样**恰好 3/7**；回执文本逐字含 `[llm.providers.<名>]`／`[llm.providers.<名>.models.<模型 id>]`／就地填 `[llm.roles.chat]`，且 `[providers.` 被反控钉为禁串。**判：兑现。**
+- **AC#2（三因三句）**：三枚 tag 各恰一枚行、各带互不重叠的补救句，`配置未生效`／`重启就好` 在整个回执只许出现在禁句那一行；M3（折因）与 M4（折形状）两发红句证明折叠必响。**判：兑现（面板渲染层那一格见 §7A-N2/N4）。**
+- **AC#3（凭据面一字未动）**：本腿零新增方法（`firstrun.go` 仍只 `ensureFirstRunConfig` 一枚函数、签名未漂，静态钉在 `:403-446`）；回执里 `dpapi:`／`env:` 各只以占位形出现；盘上文件无 `api_key =`；本件与本 commit message 内**无任何凭据值**（只有 `dpapi:<blob 名>` 这类占位与 `env:T257_R2_*` 这类永不置值的变量名）。**判：未动。**
+- **AC#4（越界）**：本腿两枚 commit 的全部文件名过禁区尺＝**0 命中**；写面只有派单授权的两枚（`cmd/wisp/firstrun.go` ＋ 同包测试件）。**判：零越界。**
+- **牙**：四发突变全响（ⓐ 两形＝改坏拼法／删指引；ⓑ 两形＝折三因／折三形状），红句逐字在 §5 与四枚 `mutant-M*.log`，还原后五取 md5 全等基线、`git cat-file blob HEAD:` 双读相同＝没有突变进历史。
+- **纪律与预算**：本腿工具轮次约 60／100 帽内交满全部节次（未触发"第 100 轮先写 §7/§10"那条硬闸门，但 §7A/§10A 已提前写满）；无 `t.Skip`、无放宽断言、无 SKIP 读成通过；只 commit 不 push；枚枚显式 pathspec。
+- **留给编排者的一句话**：两套件并存（本腿 6 枚用例＋四发突变／并行腿 8 枚突变＋2 枚 nonpreset 用例），**本腿不合并、不重跑、不替它判**；要哪一套、或两套都要合入哪一枚，`257-v1` 裁。
+
+
+
 

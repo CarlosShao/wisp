@@ -1,0 +1,39 @@
+257-r2 实现＋仪器＋证据件 §0-§4：票 257 形 ⓒ 的 cmd/wisp 那一半
+
+写面（派单授权的两枚，无第三枚）：
+- cmd/wisp/firstrun.go：ensureFirstRunConfig 末段追加三段首启回执（+61 行，零删除，
+  产码结构一字未动）。三段各答一票：AC#1 的手加三样与 3/7 与 7/7 两个数、
+  AC#2 的三因各一句（与 internal/config 那三枚 tag 逐字同串）、
+  票 8 边界1 与 A560 的三形状生效时机（有控制台 / 无控制台 / 面板写入）
+  加凭据引用只在新建端点时再解一次。全部只进 stderr，一行不落进被生成的 config.toml。
+- cmd/wisp/firstrun_257_test.go（新增，472 行）：六枚用例。
+  三枚 AC#1（干净机 t.TempDir 且断言无 config.toml 起步，真入口 runTextTask 建文件，
+  逐枚试写名册七枚 到 7/7 拒且只报第 2 因 / 照回执手加三样后 7/7 接受 / 只加第一样恰 3 枚），
+  两枚 AC#2（三句 tag 各恰一枚行 且各带自己的补救串，折叠串全回执只许出现一次；
+  三形状各一枚），一枚 AC#3（回执只许 dpapi:<blob 名> 与 env:<环境变量名> 两种占位形、
+  无明文键、firstrun.go 只此一枚函数且签名未漂）。期望值全部是字面量，
+  不 import internal/config 的未导出 tag 到同包常量（257-r1b 的 M1 盲区）。
+
+门禁四数（带时刻，读数在 .scratch/wisp/probes/257/r2/gate-*.log）：
+- 11:08:26 起手 GOFLAGS= go build ./... rc=0；11:11:59 改后同尺 rc=0
+- 11:17:39 gofumpt -l cmd/wisp 点名新测试件一枚 到 已 -w 本腿自己的文件（11:17:50 归零）；
+  预存的 cmd/wisp/models.go（CRLF）仍在清单里＝既有账，本腿不顺手格式化
+- 11:17:59 sh scripts/d22scan.sh rc=0 clean（自检 PASS=35 FAIL=0 SKIP=0）
+- 11:18:43 sh scripts/check-path-length-budget.sh rc=0 VERDICT GREEN（5733 tracked / 57 over / 57 covered）
+- 11:12:28 与 11:08:49 同一把尺：票 198 全家 11 枚改前改后全绿；
+  11:19:08 255/223 两族 24 枚绿；11:17:16 本腿六枚全绿（其中 7/7 那枚首跑 5/7 红，
+  红因与改法记在证据件 3，未放宽任何断言）
+
+★ 0.9 撞腿登记（重要，请编排者裁）：派单说 r2 代号是干净的、另两枚腿只读不写文件
+——被盘上事实推翻。11:19:29 commit 9c0d4c9a 由另一枚自名 257-r2 的腿提交了同一目录下的
+evidence.md 骨架 249 行，并把我 11:08/11:12 那两枚日志一并 commit；其 0.1 把我 11:11
+写的 61 行认成"它自己前一小时的活"。11:14-11:22 同一目录又长出非本腿产出：
+cmdwisp.test.exe（40 MB）/ mut/M1..M6 / snapshot-*.go / build-mutants.py /
+baseline-cmd-wisp.log。本腿处置：不 commit 别人任何一枚、不删（README 规则 8）、
+突变前后重取 md5；本腿的 Write 覆盖了它那份 evidence.md 的工作树副本，
+原件完整可取 git show 9c0d4c9a:.scratch/wisp/probes/257/r2/evidence.md。
+哪一枚 257-r2 算交件＝编排者裁，本腿不自裁。
+
+纪律：只 commit 不 push；显式 pathspec 逐枚列；未用 add -A / . / -a / --amend /
+reset / rebase / stash / checkout . / clean；票面 AC 框与 docs/reports/pending-and-issues.md
+零触碰；无 t.Skip、无放宽断言。
