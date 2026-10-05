@@ -176,7 +176,7 @@ $ git ls-files "*.exe" | wc -l
 
 **双击起法下"stdout 那一行"到底去了哪**——两态分开写，⛔ 不许合成一句：
 
-- **态甲＝今天盘上那枚件（CUI(3)，§3 现读）**：无参双击 ⇒ 系统为这个 CUI 进程**新建一枚控制台**（＝票 244 票面 `:5` 与 `:15` 记的那只黑框），`attachParentConsole` 在 `:34-37` 因为 `GetStdHandle(STD_OUTPUT_HANDLE)` 有效**直接 return**，于是一切 `fmt.Printf` 都写进那只黑框。⇒ **看得见，但看见的方式就是那只框**；`resident_windows.go:55-60` 那段注释（"double click the icon, no terminal attached, stderr going nowhere"）**描述的态甲不成立**，它描述的是态乙——这正是票面 AC#3 要点名改口的两行注释之一。
+- **态甲＝今天盘上那枚件（CUI(3)，§3 现读）**：无参双击 ⇒ 系统为这个 CUI 进程**新建一枚控制台**（＝票 244 票面 `:5` 与 `:15` 记的那只黑框），`attachParentConsole` 在 `:34-37` 因为 `GetStdHandle(STD_OUTPUT_HANDLE)` 有效**直接 return**，于是一切 `fmt.Printf` 都写进那只黑框。⇒ **看得见，但看见的方式就是那只框**；`resident_windows.go:55-60` 那段注释（"double click the icon, no terminal attached, stderr going nowhere"）**说的不是态甲、是态乙**——今天盘上这枚件双击起来是有框、有 stderr 去向的，这正是票面 AC#3 要点名改口的两行注释之一。
 - **态乙＝旗标落地之后（GUI(2)）**：无父控制台 ⇒ `:39` 的 `AttachConsole(ATTACH_PARENT_PROCESS)` 失败，`:40-42` 三枚 `rebindStdHandle` 在 `:48-51` 因为 `CreateFile("CONOUT$")` 失败而**逐枚静默 return**，`os.Stdout`／`os.Stderr` **保持进程启动时的柄**。那一枚"启动时的柄"到底是什么（Explorer 给 GUI 进程的是 NUL 还是无效柄）**本腿量不到**——判它要一发真机 GUI 双击（＝票面 AC#2 ③，归编排者；`docs/BUILD.md:90` 那枚"当时的临时构建"读数**不可继承**，票面 AC#0 与 §9 第 2 条两处都写了这句）。**两支共同点只有一条：写进一枚没有读者的柄**，所以态乙下"那句话消失"是**无害的哑**，不是丢数据的崩（票面 `:5` 第 ③ 行"最坏后果是什么形状"就是这么裁的）。
 - **态丙＝本腿唯一能从盘上反证的那一支（测试起法）**：21 枚台件都是**把子进程 stdout/stderr 重定向到管道**起的（`resident_sink_nail_127_windows_test.go:229`、`resident_task_source_246_windows_test.go:462`、`secret_argv_windows_test.go:238`……），重定向本身使 `GetStdHandle` 拿到**有效管道柄** ⇒ `console_windows.go:35-37` 早退 ⇒ 句子的去向＝**那根管道**。⇒ 盘上佐证：127 那四枚正向 `leg.stderr.has(...)`（`:487/:493/:529/:541`）今天在默认档名册里是绿的（`docs/evidence/s1/228-resident-ball-v1.md:13` 记的默认档整包 `rc=0／零枚 --- FAIL／148.168s` 就含这一族）。〔读码推断＋盘上第二手读数，本腿没跑任何用例〕
   ⚠ **这一态的推论要给写腿**：新用例**在测试进程里能可靠看到那枚首启回执**，恰恰是因为"重定向使 attach 早退"这一条——**它不是"双击也看得见"的证据**，两个态别混进同一句判语。
@@ -187,13 +187,76 @@ $ git ls-files "*.exe" | wc -l
 
 ## §5 问 5 —— 撞钉预检：新增一枚 exec 级用例会撞哪些既有计数尺
 
-未判。
+判语：**会打红的只有 A 组两枚 AST 门的"仪器形"红，且三枚禁行写死；B/C/D 三组共 12 枚计数形钉全部钉在"自己那枚子进程／自己那枚 temp 目录／产码文件形状"上，加一枚文件、加一枚用例都打不红它们**。另有一枚**反向陷阱**必须写进派单：`firstrun_198_test.go:91` 那句"stdout 必须为空"在**真子进程口径下天然不成立**（版本行三行走 stdout），照抄它会把新用例生下来就判红。
+
+⚠ **本节的引文口径**（免得下一位把折叠当篡改）：所有"逐字"都是**同一行里的原文**，只把连续空白（缩进、注释块的对齐空格）折成单个空格，⛔ 没有改过任何字符、没有省略中段；带 `…` 的那几处才是有省略，且省略号前后仍是原文。
+
+**A 组｜会读到你新加那枚文件的两扇门**（⚠ 行为型钉不写常量名只写产物，这两枚就是；光 grep 新符号名不算数）
+
+| 尺／行 | 断言原句（逐字） | 加一文件／加一用例会不会红 |
+|---|---|---|
+| `cmd/wisp/leg_dispatch_gate_133_test.go:179` `pkg, err := loadPackage133(".")` → `:365 entries, err := os.ReadDir(dir)` → `:372 if e.IsDir() \|\| !strings.HasSuffix(name, ".go") { continue }` → `:438 isTest := strings.HasSuffix(name, "_test.go")` | 见左：**`_test.go` 一样进 AST**，`isRunnableCase133`（定义在 `:516`）把真用例分进 `p.tests`、其余分进 `p.helpers`（`:468-472`，注释逐字："Helpers, methods, benchmarks: still walkable in loose mode … They are not cases, and they can no longer cover a leg by being named after one."） | **不因"多一枚文件"红**；红的是下面四枚仪器形 |
+| 同文件 `:213-216` `for _, b := range pkg.blind { t.Errorf("AC#1/#2 RED (the instrument, not the code): %s\n"…` | blind 只有 5 个追加点：`:758`／`:765`（"calls %s, a package-level function value this directory declares but never defines"）、`:788`（"calls through field %s of package-level var %s…"）、`:1753`（"cannot read %s to scan it for coverage rulings"）、`:1768`（"%s:%d carries %s with no leg name after it"） | ⛔ **禁行 1**：新文件里不许新增包级 `var x = someFunc`／结构体字段携带函数；⛔ **禁行 2**：不许出现 `WISP-LEG-COVERAGE-RULING` 词面却不带真腿名（`main.go:74-87` 那三枚是唯一合法形） |
+| 同文件 `:187-190`（下界常量 `minLegs133 = 11` 定义在 `:148`） | `if len(legs) < minLegs133 { t.Errorf("AC#1/#2 RED: the leg census enumerated %d legs (%d is the floor, measured when this gate landed), so a dispatch rewrite is being read as \"no legs\" rather than reported. Census: %s", …) }` | 只数 `func main` 的分支 ⇒ **加用例不红**；**加命令**才红（还要同步 `usage` 块，见 `:218 censusVsUsage133`） |
+| 同文件 `:195-206`（orphan sink callers） | `t.Errorf("AC#1 RED: %s reaches %s (or is a production entry of this package's dispatch), and no chain from func main reaches it any more.…")` | `sinkCallers133` 只走 `allDecls133()`＝`p.decls`＋`p.methods`（非测试声明）⇒ **测试用例与测试辅助函数都不进这张图**，新用例就算直接调 `installLogSink` 也不会被记成 orphan（现例：`logsink_test.go:128` 今天就在调它且门是绿的） |
+| 同文件 `:227-230`＋`:1632 runRosterReds135` | `t.Errorf("AC#1/#2 RED: leg %q (%s) is booked in the ledger below as covered by the case %q, and this round's test binary has no such case…")` | 只有**登记名册 `legCovers133`（`:169-174`）里的每一枚名**被逐字核对；枚数 `n` 只进 disclosure 句（`:1687`）不断言 ⇒ **加用例不红**；⛔ **禁行 3**：不许把新用例名塞进 `legCovers133`／`legNails131` 那两张登记册，却让它落在本编译拿不到的 tag 后面（那正是 R-133-9 的形状） |
+| 同文件 `:1543 const rosterReadTimeout135 = 2 * time.Minute`（注释 `:1540` 记实测 0.098 s） | 起子进程跑 `exe -test.list '.*'`（`:1580`） | 这枚门**每次跑都要列全包名册** ⇒ ⛔ 新用例**绝不允许在 `init()` 或包级变量初始化里跑构建**，否则 2 min 预算被吃穿 |
+| `cmd/wisp/leg_sink_gate_131_test.go:559-586 loadMainPackage131`（注释 `:548-558` 逐字："parses every .go file in dir, **whatever its build constraints say**"） | `:382 if len(legNails131) == 0 {`＋同族 blindness check | 加用例不红；⚠ 具名：`:587-592` 的 ruling 扫描**跳过 `_test.go`**（`if !isTest { …bytes.Contains(src, []byte(legSinkRulingMarker)) }`）⇒ 在测试文件里写 marker **不会被算作一条 ruling**，别指望它当豁免用 |
+
+**B 组｜stdout／stderr 形状与枚数钉**（逐枚原句＋判语）
+
+| `file:line` | 断言原句（逐字，取判据那一行） | 判"加一文件／加一用例" |
+|---|---|---|
+| `cmd/wisp/firstrun_198_test.go:91-93` | `if stdoutText != "" { t.Errorf("stage 1: stdout = %q, want empty (a refused run streams no task output)", stdoutText) }` | 打不红（同进程 buffer）。⚠ **反向陷阱**：真子进程口径下 stdout＝三行版本（`main.go:152 printVersions`→`fmt.Printf`），`257-v1:159` 现量 119 字节 ⇒ **新用例不许照抄这句判据** |
+| `cmd/wisp/firstrun_198_test.go:98-99` | `if !strings.Contains(stderrText, "新建默认配置") \|\| !strings.Contains(stderrText, cfgPath) { t.Errorf("stage 1: the run created the file but never said so with its path …") }` | 打不红。★这一枚就是**要复制到子进程口径的那句判据**，串与路径两枚都在 |
+| `cmd/wisp/firstrun_257_test.go:88`／`firstrun_257_nonpreset_test.go:59` | `if !strings.Contains(stderrText, "新建默认配置") {` | 打不红（同一枚 helper） |
+| `cmd/wisp/resident_sink_nail_127_windows_test.go:493` | `if n := strings.Count(leg.stderr.String(), residentEarlyResolverMsg); n != 1 {` | 数的是**它自己那枚子进程**的 stderr ⇒ 打不红。⚠ 唯一会连坐的形＝新用例复用 `bootResidentLeg` 又改动那台 tee |
+| `cmd/wisp/resident_sink_nail_127_windows_test.go:487/:529/:541` | `if !leg.stderr.has(residentInstallMsg) {`／`pollUntil127(200, func() bool { return leg.stderr.has(residentRefusalPrefix) })` | 同上，打不红 |
+| `cmd/wisp/early_log_nail_130_windows_test.go:257/:266` | `if n := strings.Count(stderr, early130ResolverMsg); n != 1 {`／`… early130InstallMsg); n != 1 {` | 打不红（`runSecretListLeg` 每发一枚新进程） |
+
+**C 组｜文件枚数／名册钉**
+
+| `file:line` | 原句 | 判语 |
+|---|---|---|
+| `cmd/wisp/firstrun_257_test.go:435` | `t.Errorf("AC#3 RED: firstrun.go now declares %d functions, want 1 (ensureFirstRunConfig). A new helper here is a new surface…")` ＋ `:437` 逐字签名钉 `"func ensureFirstRunConfig(dataDir string, stderr io.Writer) (bool, error) {"` | ⇒ ⛔ 新用例**不许往 `firstrun.go` 加任何 helper、不许改那枚签名**；"一发行文"只能动 `firstrun.go` 里 `:92-95`／`:111-…` 那两枚 `Fprintf` 的**文案串**，签名与枚数一动不动 |
+| `cmd/wisp/logsink_test.go:81-101` | `before, err := os.ReadDir(cwd)` … `if len(after) != len(before) { t.Errorf("the refused install changed the working directory: %d entries before, %d after", len(before), len(after)) }`（cwd＝**包源码树**，该用例注释 `:72-75` 逐字："which for a test run is the package source tree"） | ⇒ ⛔ 新用例**绝不许把编出来的 exe、拷出来的 DLL、任何日志落进 `cmd/wisp/`**；沿用 `buildWispForTest` 的 `t.TempDir()`（`secret_argv_windows_test.go:172`）就是安全形 |
+| `cmd/wisp/dataroot_128_windows_test.go:79` | `assertDirEmpty128(t, cwd, "real leg "+leg.name)` | 打不红（cwd 是它自己 `:66` 的 `t.TempDir()`）；⚠ 但它**只判合并输出**，别拿它当通道证据 |
+| 六枚跳过 `_test.go` 的 AST 尺：`cmd/wisp/config_receipt_255_test.go:295`、`leg_dispatch_gate_133_test.go:1748`、`resident_ball_228_test.go:74`、`resident_grant_writer_265_windows_test.go:547`、`panel_inbound_33_test.go:213`＋`:289`、`panel_host_gate_test.go:218` | 例：`if e.IsDir() \|\| !strings.HasSuffix(name, ".go") \|\| strings.HasSuffix(name, "_test.go") { continue }` | 加测试文件**零影响**（已逐枚读到位） |
+
+**D 组｜构建次数／耗时预算**（现尺：`grep -rn "buildWispForTest" cmd/wisp --include=*_test.go | grep -c "len("`＝**0**；`grep -c "timeout-minutes" .github/workflows/ci.yml`＝**0**）
+⇒ **没有任何一枚仪器钉构建枚数或包时长**。代价落在时长上：默认档整包现成读数 **148.168 s**（`docs/evidence/s1/228-resident-ball-v1.md:13`），台账 `A621` §7 给 `268-r1` 的排程口径是"整包预期 ~8.5 min 不许压种子"。每多一枚 `buildWispForTest` 调用＝**多一发完整 cgo＋sherpa 链接**（无缓存，§1 已量），⚠ 这就是"复用现成 exe"那一格真正的价：想要它快，就得先把 helper 改成跨用例缓存——那是**改 21 枚调用点共用的台件底座**，属另一格活，不在"一发行文＋一枚用例"的射程内。
+
+**E 组｜真窗毒源那一族＋"起了子进程却没收尾"那一形**
+- 派单点名的先例真身＝`cmd/wisp/resident_sink_nail_127_windows_test.go:415 TestAC1ResidentLegInstallsItsLogListenerOnDisk`。它的毒源形状量得出三样：**无参常驻腿**＝真球窗＋四枚全局热键＋**每会话单实例互斥**（`cmd/wisp/resident_windows.go:42 rt, err := proc.Boot(env)`，全仓只有 `resident_windows.go:42` 与 `slo_windows.go:261` 两枚 `proc.Boot` 调用者，现尺）＋`CREATE_NEW_PROCESS_GROUP`/`GenerateConsoleCtrlEvent`（`resident_sink_nail_127_windows_test.go:222/:253`）。
+- 现尺：`grep -rn "t.Parallel()" cmd/wisp --include=*_test.go | wc -l`＝**0** ⇒ 同包内串行；但**两发并发 `go test ./cmd/wisp` 一定互洗**——`resident_task_source_246_windows_test.go:432-436` 逐字把这形写成红：`"AC#7 RED (desktop state, not our code): a dev Wisp is already running in this session, so this leg handed its activation over and exited. Stop it and re-run."`。
+- ⇒ **具名结论（这格最值钱的一句）**：新用例走 **`run` 腿**就不继承这枚毒源（`cmd/wisp/run.go` 零枚 `proc.Boot`），这是它今天能被放进默认档门禁当尺用的前提；反之**复用 `bootResidentLeg` 就连带继承热键、真窗与互斥**。
+- "起了子进程却没收尾"：**名册里零枚**（§1 末逐枚列的 `t.Cleanup(leg.stop)`／`go func(){…cmd.Wait()}`／`CommandContext` 三形覆盖全部 21＋2 枚调用点）。最接近的是 `cmd/wisp/slo_exit_os_156_windows_test.go:318-328 slo156Spawn`：`Start()` 后**不由自己 Wait**、由 witness 从 PID 重开柄，但它自带 `t.Cleanup(func() { _ = cmd.Wait() }) // never leave a child behind`（逐字 `:328`），且 `cmd.Stdout, cmd.Stderr = nil, nil`（`:324`）⇒ **照抄这一形会得到一枚看不见任何输出的用例**，本问要的恰是反形。
+- ⛔ 顺带一枚 CI 侧硬约束（细节见 §6）：`scripts/portable-tests.sh` 的严格跑法里**任何 top-level `--- SKIP` 都是红的**（`tools/d22scan/runtests.sh:24`"any `--- SKIP` -> SKIP is NOT a pass"，`scripts/portable-tests.sh:18`）⇒ 新用例**不许"没有桌面就 skip"**，要么判红要么按 `ledger=(` 名册（`scripts/portable-tests.sh:494-509`）具名登记。
+
+**量格结论**：`grep -rn "objdump" scripts tools cmd internal .github 2>/dev/null | wc -l`＝**0**，`grep -rln "debug/pe" cmd internal tools --include=*.go | wc -l`＝**0** ⇒ **全仓今天没有一把读 subsystem 的仪器**（复认票 244 §9 第 3 条"会响的尺今天是真空"）。
 
 ---
 
 ## §6 问 6 —— CI 那一侧：windows job 跑哪些包、什么 tag／env
 
-未判。
+判语：**新用例会进 CI，且指得到步名与那一行**——job `test-windows`（`ci.yml:419`，`runs-on: windows-latest` `:420`，job 级 `env: WISP_ENV: test` `:421-422`）里那一步 **"cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"＝`ci.yml:487`**，执行行＝**`ci.yml:507 run: bash scripts/wisp-cli-tests.sh`**（`shell: bash` `:505`、`if: ${{ !cancelled() }}` `:506`）。⇒ 落点链逐跳现读：`scripts/wisp-cli-tests.sh:112 bash "$portable" --scope=cli` → `scripts/portable-tests.sh:226-231 cli) … scope=(./cmd/wisp/) ; pinned=$cli_pin` → `:83 strict="$root/tools/d22scan/runtests.sh"` → `:598 sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern"`。**只要新用例（i）在 `./cmd/wisp/` 包里、（ii）只带 `//go:build windows`、不带额外 tag、（iii）不 SKIP，它就在那一步里被跑到。**
+
+**"step 层的绿可以等于什么都没测"这一坑：这一族今天堵住了，堵它的三行都在**：
+- `tools/d22scan/runtests.sh:22`「zero top-level `--- PASS`/`--- FAIL` lines -> the pattern matched nothing」、`:24`「any `--- SKIP` -> SKIP is NOT a pass」、`:86-99` 现算 `passed/failed/skipped` 并在 `skipped>0` 时非零退出（`:99`）。
+- `scripts/portable-tests.sh:18-19` 同两条规则（外加 `:19` "zero top-level PASS *and* zero FAIL is fatal (the green no-op)"）。
+- ⚠ **但它不钉枚数**：`grep -rn "PASS=33" .github/workflows/ci.yml scripts/*.sh` 只命中**注释**（`ci.yml:491`"its 33 top-level cases go PASS=33 FAIL=0 SKIP=0"、`scripts/wisp-cli-tests.sh:20` 同句）⇒ **名册枚数是散文、不是仪器**；新用例进了 CI 这件事，靠的是"包在 scope 里"那一跳，不靠那枚 33。
+- ⚠ 另一枚"绿但没测"的现存形状在**同一 job 的上一步**：`ci.yml:485 run: powershell … scripts/build.ps1 -Env dev`，而 `build.ps1:166-169` 的 doctor 冒烟在 GUI 子系统旗标之后**可能读到上一发 `go build` 留下的 0**（§3 末那格，⛔ 本腿无读数，判它要跑构建）。
+
+**`winlive` 是什么门槛、默认跑不跑**：
+- **默认不跑，CI 里零命中**：尺＝`grep -c "winlive" .github/workflows/ci.yml`＝**0**；`scripts/*.sh` 里也无 `--tags`／`-tags winlive`（现读 `portable-tests.sh:598` 那一发的实参只有 `-count=1` 与 `-skip`）。⇒ **今天没有任何一枚 CI 步跑过 winlive 档**，与 `docs/evidence/s1/228-resident-ball-v1.md:315` 那句"`-tags winlive` 在 `ci.yml` 里零命中 ⇒ live 档只在这台机上跑过"现读复认一致。
+- 门槛本体＝构建标签：`grep -rl "^//go:build windows && winlive" cmd internal --include=*_test.go | wc -l`＝**11 枚文件**，其中 **`cmd/wisp/` 6 枚**（`panel_geometry_255_winlive_test.go`、`panel_host_windows_live_test.go`、`resident_approval_live_246_windows_test.go`、`resident_ball_live_228_windows_test.go`、`resident_hotkey_live_258_windows_test.go`、`resident_task_source_live_246_windows_test.go`）＋`internal/ball` 等 5 枚。跑法只有手敲：`go test -tags winlive ./cmd/wisp -run <名>`（现成读数见 `docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md:12`：每次跑 winlive 前必量 `tasklist` 的 `balldebug.exe`／`wisp.exe`／`go.exe` 三把尺＝计数 0）。
+- ⇒ **这一格对最小落地形状的直接影响**：新用例**不该**带 `winlive`——它判的是 stderr 通道，不需要桌面；带上就永远进不了 CI，等于把那格残余重新交回手工腿。
+
+**其余相关步（逐枚指到行，⛔ 说不出当它不存在）**：
+- lint job（`ci.yml:65-66`，ubuntu）：`ci.yml:108` "D22 seven-ban + emoji scan (tools/d22scan)" → `:134 run: sh scripts/d22scan.sh`；`ci.yml:136` "Tracked path-length budget (ticket 262)" → `:166 run: sh scripts/check-path-length-budget.sh --with-self-test`；`ci.yml:168` "gofmt (gofumpt)" → `:171 gofumpt -l . tools/d22scan tools/mockllm`；`ci.yml:206` "go vet (module)" → `:207 run: go vet ./...`；`ci.yml:213` "staticcheck"。⇒ **新用例会过这四把静态尺**：emoji 那一把对 `_test.go` 与注释都算射程，但**注释豁免、字符串不豁免**（`tools/d22scan/main.go:1150-1162`，Q-46(c)：`commentRangesFor` 先把注释抹掉再 `emojiRe.MatchString`，判语原文"non-comment text, string literals included; comments are exempt per Q-46(c)"）；盘上尺复认：`grep -rhoP '[\x{1F000}-…]' cmd internal --include=*.go` 有 `⚠`／`⛔`／`∩` 三枚字符、20 枚文件命中，而门是绿的 ⇒ **它们全在注释里**；⛔ **新用例不许把这类字形放进任何字符串字面量**（那正是断言用的用户文案）。
+- 路径长度那一把（票 262）：`scripts/check-path-length-budget.sh:149 HAT_NAME_LIMIT=100`、`:161 ISSUES_PREFIX_LEN=21`、`:156 WORST_PREFIX=44`、`:253-254 HAT_RELATIVE=121 / FULL_PATH_BUDGET=165`，名册外多一枚超预算 tracked path 即红（形 A）。现尺：`git ls-files | awk '{print length}' | sort -n | tail -1`＝**180**（＝已登记在名册里的最枚）。⇒ 新测试文件名建议按 `cmd/wisp/…_windows_test.go` 一族短名走，别去碰那枚 165 的预算线。
+- ubuntu 侧**不跑** `cmd/wisp`：`test-core`（`ci.yml:309-310`）与 `portable-tests.sh` 的 core（`:206-217`）／windows（`:219-224`）两 scope 的名册里都没有 `./cmd/wisp/`（windows 那 8 枚是 `internal/proc`／`secret`／`config`／`risk`／`ball`／`perm`／`plugin`／`cmd/llmrecord`），`scripts/wisp-cli-tests.sh:65` 的 GUARD 逐字"this is the windows leg of the cmd/wisp gate"。⇒ **新用例的 CI 覆盖面只有一枚 windows runner**，这是"通道绑定"这一格未来唯一的门禁处，写派单时要具名。
+- slo 两 job（`ci.yml:564-565` slo-smoke、`:622-623` slo-full self-hosted `[self-hosted, wisp-slo]`）**不跑 `cmd/wisp` 用例**，只跑 `scripts/slo-check.ps1` 消费 `wisp.exe`（`:584`/`:647`）；slo-full 那枚 runner 与票 244 §排程那格"取数期间不改构建链"直接相关。
 
 ---
 
