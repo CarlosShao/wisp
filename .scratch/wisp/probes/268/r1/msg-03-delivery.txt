@@ -1,0 +1,41 @@
+docs(probes/268-r1): 交付笔——三发突变名册＋交付态整包与四门复跑＋§4-§7 填实（占位归零），台件入库
+
+编队 268-r1（票 268 落地腿）交件。本笔**零产码字节**：代码面与 9a941965 逐字节同形，证在
+md5sum cmd/wisp/resident_approval_windows.go ＝ git cat-file blob HEAD:cmd/wisp/resident_approval_windows.go
+＝ 69a630bf350daf1032c62b921e9d7044，且 git diff --name-only 对该路径 0 行；测试文件自 9a941965 起未再被写。
+
+一、突变名册（每发起止到秒，台件留在本目录）
+  MUT-1 13:34:05→13:36:38：把 riskProvenanceRefusedAtLoad 折回旧字面 "defaults (config.toml unreadable)"
+    ⇒ 只红 TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig（三句红字逐字抄进 §5），
+      票 256 五枚钉与 ②③ 全绿。这一发就是 AC#1 要求的"两枚状态又折回同一枚字符串 ⇒ 新用例必红"。
+  MUT-2 13:52:04→14:05:08：注释掉那行 fmt.Printf ⇒ ②③ 双红（stdout 0 行 / Printf 计数 0），① 与 256 全绿。
+  MUT-3 14:10:16→14:53:26：在哨兵旁边加一次文案匹配（行为逐字不变）⇒ 只红 ③，证明"不许靠错误文案分类"那枚钉咬得住。
+    纯文案支会因 io/fs 未使用而编译不过，故取这一形以隔离 ③。
+  自曝一处流程失手：MUT-3 第一发还原只改回 if 行、把突变期注释块留在文件里，md5 尺当场抓到（8fcd72af… 不符），
+    15:03:35 以许可的 git cat-file blob HEAD:<path> > <path> 形全量还原并复量同值、grep -c "MUT-" ＝ 0。
+
+二、交付态整包与红名逐名比对
+  go test -count=1 -v ./cmd/wisp/ ＝ RUN 334／PASS 334／FAIL 0／SKIP 0、ok 401.239s、rc=0（log mtime 15:12:06），
+  台件 deliver-cmdwisp.log 1,724 行＋名册 deliver-top-names.txt（238 枚顶层名）。
+  diff baseline-top-names.txt deliver-top-names.txt ＝ 只多本腿三枚用例，一枚未少、一枚未红。
+  两发包尾耗时差 65 s 属同机他腿负载，不作读数。
+
+三、门禁四数（交付态复跑，逐门带时刻）
+  d22scan.sh rc=0 clean（15:25:29–15:25:54；正控制 PASS=35/FAIL=0/SKIP=0, RUN=77）
+  check-path-length-budget.sh --with-self-test rc=0 VERDICT GREEN（15:26:32；tracked=5953 over=57 rostered=57 not-in-roster=0）
+  go vet ./cmd/wisp/ rc=0（15:26:37）
+  gofumpt：先 -version 自证 v0.12.0 (go1.27.1)，再 -l cmd/wisp ＝ 只剩预存脏枚 cmd\wisp\models.go（15:26:39），⛔ 未顺手格式化它
+  如实登记一处分母变化：d22scan 的 ban #8 cmd/ Go 文件枚数 103→104 ＝ 本腿新增的那枚 _test.go；违规枚数仍 0、红名集合仍空。
+
+四、禁区与契约面（§4.5 三把尺）
+  两笔产码 commit 的 --name-only 并集对禁区正则命中 0 行（docs/PLAN.md、docs/specs/、internal/observe/thresholds.go、
+  internal/agent/approval/、tools/d22scan/allowlist.txt、frontend/、design/）；internal/agent/approval 与 docs/specs
+  的 find -newer 起手件 ＝ 0 枚；生产 diff 的新增 func ＝ 0 枚 ⇒ 无新入向方法名（C17 面未动）。
+  值域 [31,3600] 与 [risk].l1_window_sec 钳位：不在写面，一字未动。
+
+五、交件判语与口径差（§7）
+  AC#1–AC#4 本腿判语＝四格达标；AC 框一枚未碰，票面只追加 Progress log（现共四行，append-only）。
+  与派单/a2 不同处逐条具名三条待裁：新 provenance 取 class 级措辞（依 a2 §2② 不冒充"值域门拒的"）、
+  d22scan 文件分母 +1 算不算"读数扩大"、票面 AC#1 分档原文与派单"stdout 即达标"的档位差；
+  另量到票面 :379-382 与派单 :379-384 两处文本区间不一致（代码未漂，本腿以亲读 :379-384 为准，票面未改）。
+  本腿只 commit、未 push；每一笔都是 git commit -F msg -- <点名 pathspec> 形。
