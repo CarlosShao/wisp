@@ -76,9 +76,31 @@
 
 ## 4. 自救：谁产／谁投／谁落三处齐读
 
-（本节答：panic 记录的生产者／投递者／落盘者三处具名 file:line）
+（本节答：产＝`internal/observe/goroutine.go:286` 那枚唯一受许可的协程体；投＝`:312-315` 交给 `r.sink`，默认值在 `NewRegistry` 体内 `:236` 就装好；落＝`cmd/wisp/logsink.go:153` 那台 tee 的 primary → JSONL 文件。**"生产没装 panic sink"那句假话本程独立复核为假**）
 
-未判
+**4.1 谁产（panic → 结构化记录）**
+- `internal/observe/goroutine.go:286`（`func (r *Registry) run(...)`）——`:285` 注释逐字 `// run is the single sanctioned goroutine body of the codebase.`
+- `:294` `defer func() {` ⇒ `:296` `if rec := recover(); rec != nil {` ⇒ `:297-304` 组装 `PanicEvent`，其中 **`:302` 逐字 `Stack:     string(debug.Stack()),`**；`:301` `Recovered: fmt.Sprint(rec)`；`:303` `At: NowWallUTC()`。
+- 记录形状：`:153` `type PanicEvent struct`，文本槽 `:159` 逐字 `Stack     string     \`json:"stack"\``（同族键 `goroutine`/`owner`/`root_id`/`error_class`/`recovered`/`at`）。
+- 计数：`:308-310` `r.panicCount++`；出口 `:375` `func (r *Registry) PanicCount() uint64`。
+- 崩溃之后进程看到的错误：`:317-320` 那句 `&Error{Class: ClassInternal, Detail: fmt.Sprintf("panic in goroutine %q (owner %s): %s", …)}`——**含 recover 值、不含栈**（这枚区别就是当年票 249 误判的地方）。
+
+**4.2 谁投（记录 → sink）**
+- `internal/observe/goroutine.go:312` `sink := r.sink`（`sinkMu` 保护）⇒ `:314` `if sink != nil {` ⇒ `:315` `sink(ev)`。
+- sink 字段：`:220` `sink PanicSink`；类型：`:165` `type PanicSink func(PanicEvent)`（`:163-164` 注释逐字 `PanicSink receives panic records. The default writes a structured slog error; ticket 08 replaces it with the JSONL pipeline.`）。
+- ★ **默认装在装配点**：`:236` 逐字 `sink: defaultPanicSink,`（在 `NewRegistry` 体内）。⇒ `:314` 那句 `if sink != nil` **在生产里不可能走空**。
+- 替换口：`:240-241`（`func (r *Registry) SetPanicSink(s PanicSink)`），`:245` `s = defaultPanicSink`（传 nil 会把默认装回来）。
+- ⚠⚠ **本程不复演那枚旧错**：尺 `grep -rn "SetPanicSink" cmd internal tools --include=*.go | grep -v _test` 的结果**只命中定义自身那两行（`:240`/`:241`）＝非测试调用者零枚**——这枚读数证的是"没人替换默认"，⛔ 它证不了"没有默认"。当年票 249 正是把这两件事写成了一句（现由 `docs/reports/pending-and-issues.md` 与票 249 票面自纠、票已撤回；本程独立从 `:236` 复核出同一结论）。测试侧调用者＝`internal/observe/goroutine_test.go:117-118` 两行。
+- 默认 sink 干什么：`:167` `func defaultPanicSink(ev PanicEvent)` ⇒ `:168` `slog.Error("goroutine panic recovered", …)`，**`:174` 逐字 `"stack", ev.Stack,`**（同块还带 goroutine/owner/root/error_class/recovered/at）。⇒ 它交给**进程默认 logger**，不自己开文件。
+
+**4.3 谁落（默认 logger → 盘）**
+- 装默认 logger＝`cmd/wisp/logsink.go:144`（`func installLogSink(dataDir string) (*logSink, error)`）：`:145-147` 空 dataDir 直接拒（逐字 `"wisp: no data dir resolved, so the log sink has nowhere to write"`）⇒ `:148` `dir := logSinkDir(dataDir)`（`:87`，`:76` 逐字 `const logDirName = "logs"`）⇒ `:149` `observe.InitLog(observe.LogConfig{Dir: dir, Level: logSinkLevel})` ⇒ `:153` `slog.SetDefault(slog.New(teeHandler{`。
+- **tee 的两条腿**：`:157` 逐字 `primary: p.Handler(),`（`:154-156` 注释逐字说它是 "redactHandler on top of the JSON writer"）；`:160` 逐字 `mirror: slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}),`（`:158-159` 注释逐字 `The mirror deliberately carries no redaction of its own.`）。扇出＝`:208` `func (t teeHandler) Handle(...)` ⇒ `:209` primary 先、`:211` mirror 后（同一枚 record 交两边）。
+- 生产装配根（尺：`grep -rn "installLogSink(" cmd --include=*.go | grep -v _test`）＝**四枚**：`cmd/wisp/run.go:222`、`cmd/wisp/resident_windows.go:66`、`cmd/wisp/secret.go:226`、`cmd/wisp/models.go:284`。⇒ **常驻 GUI 那条腿装了 sink**（`resident_windows.go:66`），这枚是"盘上有没有栈"的开关，本程判它**装了**。
+- 脱敏闸在落盘之前：`internal/observe/logging.go:88` `red: Redactor{RedactPaths: cfg.RedactPaths}`；`:123` `type redactHandler struct` ⇒ `:132` `func (h *redactHandler) Handle(ctx context.Context, rec slog.Record) error` 逐 attr 过 `h.red.Attr(...)`（文件侧与 stderr 侧共用这一枚流水，mirror 那一侧不过它，见 §4.3 上面那两条腿）⇒ `internal/observe/redact.go:107` `func (r Redactor) Attr(key string, v slog.Value) slog.Attr` 的分支顺序逐枚核过：`:112` 密钥名（`secretWords` ⇒ `secret.RedactSecret`）、`:114` 音频、`:116` 正文、**:120 逐字 `return slog.String(key, r.String(v.String()))`（`slog.KindString` 那一支，`stack` 走的就是这一支）** ⇒ `:133` `func (r Redactor) String(s string) string`：`:138-139` `if r.RedactPaths { s = pathRe.ReplaceAllString(s, "<path>") }` ⇒ **`:141` 逐字 `return truncate(s, MaxLoggedString)`**。
+- ★ **栈进文件之前被截到 512 rune**：`:36-37` 逐字 `// MaxLoggedString bounds any single string that reaches the log (rule 4).` ＋ `MaxLoggedString = 512`；`truncate`（`:193`）在 `:198` 逐字 `return string(runes[:max]) + fmt.Sprintf("...(truncated, %d chars total)", len(runes))`——**所以盘上那枚 `stack` 字段＝栈头 512 rune＋一枚可数的总长**，完整栈只在不过脱敏的 stderr 那半。
+- ⚠ 顺带一枚**影响"可复制现场"含金量**的现读：`cmd/wisp/logsink.go:149` 那次 `InitLog` **没填 `RedactPaths`** ⇒ 走零值；而配置里 `internal/config/schema.go:509` 逐字 `RedactPaths bool \`toml:"redact_paths" default:"false"\``，且本仓自己的名册早已写明没有任何产码从 `cfg.Privacy` 读它（`cmd/wisp/config_readers_255.go:134` 逐字 `"privacy": hotClaimNoReader + "internal/observe/logging.go:50 [RedactPaths] - the mirror field exists and is filled by callers, never from cfg.Privacy"`）。⇒ **今天盘上那 512 rune 的栈头里的路径是原样路径**（这条对 AC#6 是双刃：可复制性↑、脱敏承诺✗，归编排者与票 264 那条轴一起摆）。
+- 产码 `recover()` 全名册（尺：`grep -rn "recover()" cmd internal tools --include=*.go | grep -v _test`＝**9 枚**）：`internal/ball/hotkey_reload.go:146`、`internal/memory/writer.go:144`、`internal/observe/goroutine.go:296`、`internal/risk/assessor.go:278`、`internal/risk/assessor.go:292`、`internal/tools/bridge.go:823`、`internal/tools/grant.go:70`、`internal/tools/mode.go:40` ＋ `cmd/balldebug/main.go:401` 那句**注释里的**"故意不加 recover"（尺命中含它，枚数按产码实体算＝**8 枚真 recover**）。⇒ **`cmd/wisp` 产码零枚 recover**（⚠ 修正前版那句"7 处"）。
 
 ## 5. 自救："可复制现场"与"自救指令"两半各自的出口有无
 
