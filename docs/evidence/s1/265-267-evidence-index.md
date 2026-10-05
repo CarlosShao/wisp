@@ -97,7 +97,58 @@
 
 ## §2 票 267（凭据在哪）
 
-未判（下一步填）。
+票面：`.scratch/wisp/issues/267-confirm-timeout-config-has-no-bounds-so-the-c18-warning-can-vanish-done.md`（本腿⛔未改一字）。
+
+### 2.1 结案那一笔＋交件两串 commit（逐枚验真）
+
+- **改名 `-done`＝`c6cf66e6`（2026-10-05 10:58）**：`git show --name-status` 现量含 `R076 ...can-vanish.md → ...can-vanish-done.md`，subject 逐字起于「ledger(A614＋A615) 票 267 五格全勾改名 -done」。⚠ 票面「结案」节（line 73）自报**锚 `c7bb02be`**（那是 `267-r2` 的第五笔、编排者落笔结案prose时的树顶）——**改名那一笔本身是 `c6cf66e6`**，两枚号都真、各指一事，本腿如实并列。
+- **band 六笔**（subject 皆以 `ticket 267 r1:` 起头，与 A611"六笔 commit"对上）：`42115f65`(09:15 骨架)→`37f8e5c6`(09:25 值域进门 shape a)→`ec6a47a8`(09:30 pins 改字面种子)→`22fc968a`(09:33 §0/6/7)→`873c3063`(09:33 外置 config_test 守卫)→`0c2445d1`(09:41 §1–§5)。
+- **种子迁移五笔**（subject 皆以 `267-r2` 起头，与 A615 §1"五笔自落 commit"对上）：`00f0ef97`(10:05 骨架)→`32e74479`(10:11 种子迁移，凭 A611 具名解冻)→`5fa0d28c`(10:29 §0–§7)→`aac52ab2`(10:33 §8–§10＋19 枚台件)→`c7bb02be`(10:36 正名笔)。
+- 产码面＝`internal/config/**` 五枚（`validate.go`／`validate_test.go`／`validate_267_test.go`／`schema.go` 注释／`unwired.go` 一行）＋`cmd/wisp/**_test.go` 五枚；生产码零改动（见 §2.4 本腿复跑的越界尺）。
+
+### 2.2 凭据件路径与 `wc -l -c`（本腿现量）
+
+| 件路径 | 行 | 字节 | 出处对账 |
+|---|---|---|---|
+| `.scratch/wisp/probes/267/a1/census.md`（普查，编排者代落盘） | 81 | 12,579 | 票面 line 46 逐字「81 行／12,579 字节」**符** |
+| `.scratch/wisp/probes/267/a2/census.md`（§7.1 甲/乙/丙/丁料） | 362 | 77,770 | A612（`:11963`）「362 行／77,770 字节」**符** |
+| `.scratch/wisp/probes/267/a3/census.md`（`Q-77` 三维料） | 209 | 43,614 | A613（`:11976`） |
+| `.scratch/wisp/probes/267/r1/evidence.md`（band 交件件） | 294 | 30,943 | 票面 line 57／A611「294 行／30,943 字节」**符** |
+| `.scratch/wisp/probes/267/r2/evidence.md`（种子迁移交件件） | 254 | 44,771 | A615 §1（`:12020`）「254 行／44,771 字节」**符** |
+| `.scratch/wisp/probes/267/gate/cmdwisp-HEAD.log`（基线 16 枚 FAIL 台件） | 1,575 | 242,438 | 票面 line 80／A615 §3「1,575 行」**行符** |
+| `.scratch/wisp/probes/267/r2/cmdwisp-after.log`（腿 `-v` 台件，四数 RUN=323/PASS=226/FAIL=1/SKIP=0 的唯一出处） | 1,673 | 258,923 | A615 §3 末段 |
+| `.scratch/wisp/probes/267/gate/orch-d22scan.log`／`orch-pathlen.log` | — | — | 编排者 10:5x 四门中的两门读数台件 |
+
+⚠ **本腿复跑的这三件字节数与台账逐字一致**（81/12579、362/77770、294/30943、254/44771），与票 265 census.md 那处 Δ6 不同——票 267 侧的登记没有字节漂移。
+
+### 2.3 票面几枚 AC 框、由谁翻
+
+- 票面共 **5 枚 AC 框**，本腿现量物理态：AC#0–AC#4（line 27–31）**全部 `- [x]`＝5 枚**，`- [ ]` **0 枚**（与台账"五格全勾"一致，无 §1.4 那种框态差）。
+- **翻勾者＝编排者本人**（⛔ 非实现者终裁未发生，见 §2.5）：AC#0＝`f761a017`（09:12 翻勾＋裁形 ⓐ）；AC#1／AC#2／AC#3＝`9e24d178`（09:51，凭据＝`267-r1` 证据件，见 A611 `:11937`）；AC#4＝结案那一笔 `c6cf66e6`（10:58，凭据全为编排者现跑，见 A615 §5 `:12032`）。
+
+### 2.4 ★AC#4 那格的凭据＝编排者本人现跑的四门＋越界尺（位置指到＋本腿复跑两把壳尺）
+
+- **原始读数位置**：`docs/reports/pending-and-issues.md:12023`（A615 §2）＝四门（`d22scan.sh` rc0 clean、`check-path-length-budget.sh` rc0 GREEN、`go vet ./cmd/wisp/ ./internal/config/` rc0、`gofumpt` 只剩预存 `cmd/wisp/models.go`）＋越界尺（`git diff --name-only 21bec8a1..HEAD` 禁区命中 0 行）。票面「结案」节 item 2（line 78）同记。⚠ 四门里 `go vet`／`gofumpt` 那两门的**原始读数是编排者现跑**（本腿未复跑，见下）。
+- **本腿现跑复认（两把允许重跑的壳尺，见 §0.2 row 11/12）**：
+  - `sh scripts/d22scan.sh`（14:49:04→14:49:32）＝**rc=0／clean**，分母 `#1-5 internal/=228、cmd/=38；#6 frontend/=85` **与 A615 §2 逐枚对得上**；⚠ `ban #8 cmd/=104` 含在飞 `268-r1` 那枚未提交文件＝**非静默树读数**。
+  - `sh scripts/check-path-length-budget.sh --with-self-test`（14:51:15→14:51:19）＝**rc=0／VERDICT GREEN**，`over-budget=57／covered by roster=57／not in roster=0／longest=180`，positive control PASSED；跑完工作树仍只 `cmd/wisp M`＝自检临时件无残留。
+  - 越界尺本腿**独立复跑**（git 只读，`git diff --name-only 21bec8a1..c6cf66e6` 存 `267-boundary-names.txt`）：禁区集（`docs/PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／`frontend/**`／`design/**`／`internal/agent/approval/**`）**命中 0**、`internal/config/**` 恰那 **5 枚** ⇒ A615 §2 越界那半**复现**。（⚠ 本腿把 range 收到本票全链终点 `c6cf66e6`，区间夹了别腿交件共 55 枚文件，与编排者当发"非 `.scratch` 只 11 枚"**不同口径**，但禁区命中同为 0。）
+- **量不到的两门，具名归编排者在安静窗口**：`go vet`／`gofumpt` 两门本腿**跑不了**——它们要么是 `go` 命令（本腿全程禁跑）、要么需 `gofumpt` 二进制，而此刻 `268-r1` 正在 `cmd/wisp` 上取整包终态（一发约 8.5 分钟、计时敏感）。并发跑会把别人的读数洗成假红，故⛔ 不跑、如实标"量不到"。
+- ⛔ **本腿这些复跑≠非实现者终裁**：AC#4 的原始四门本就是"实现者＝编排者"同体读数，本腿复跑只是**确认读数没漂**，不使 267 因此视为已验收。
+
+### 2.5 `267-v1`（非实现者终裁）仍未发生、仍在队列
+
+- `ls docs/evidence/s1/ | grep -E '26[57]'`＝0 命中（本腿现量）⇒ `docs/evidence/s1/` 里**没有** `267-v1` 表。
+- 队列依据（逐字在册）：`docs/reports/pending-and-issues.md:12033`（A615 §5 末段）「本票结案≠没有验收：`267-v1`（非实现者终裁…）此刻在队列里、按推送窗口之后派」；`:12035` 队列序「推送 → `257-r2` → **`267-v1`** → `268-r1` → `167-r2`」。
+- 若 `267-v1` 推翻任一格：按 A615 §5「追加更正、不改写已入库的 commit」处置。
+
+### 2.6 残余五格、各自归口（票面 line 87＋A615 §5 `:12032`）
+
+- ① `confirm_timeout_sec` 用"拒载"而 `l1_window_sec` 用"钳位"的**行为不一致**⇒ 归**下一枚治理票**。
+- ② 下界抬到 60 s 那支＝要改票 256 的种子钉 ⇒ **待编排者具名解冻**（本票未做）。
+- ③ `WarningLead` 生产里恒零值、全靠兜底 ⇒ 归**票 255** 的账。
+- ④ 常驻腿把"越界拒载"读成"文件读不到" ⇒ **票 268**（料已由 `268-a1` 量齐：`.scratch/wisp/probes/268/a1/census.md`，见 A614）。
+- ⑤ `Q-77`（配置值 vs C18 写死 300 s 谁优先）＝**待机主一句话**，⛔ 任何腿不许自裁。
 
 ---
 
