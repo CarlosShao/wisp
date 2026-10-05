@@ -116,7 +116,46 @@ $ grep -rln "buildWispForTest(t)" cmd/wisp | wc -l
 
 ## §3 问 3 —— subsystem 那一格：`-H=windowsgui` 在 `scripts/` 的哪一行、PE subsystem 真身
 
-未判。
+判语：**旗标在 `scripts/build.ps1:115`、无条件、今天就在出厂链里；但盘上那枚 `build/wisp.exe` 比这面旗早 2 天，`objdump` 现读仍是 `Subsystem 00000003 (Windows CUI)`**——"默认构建出来的 exe 的 subsystem"这一问有**两枚答案**，必须分开交：**"链今天会产出什么"＝GUI(2)〔由 `.scratch/probes-244-r1/out/wisp.exe` 的真读数佐证，那枚是 244-r1 用同一份 `$ldflags` 现编的〕；"仓里现在躺着什么"＝CUI(3)**。⛔ 本腿不跑构建（`build.ps1:129` 就是 `go build`），所以"今天再跑一次 build.ps1 会得到 GUI(2)"这一发**量不到，归编排者**——它正是票 244 **AC#1** 那句"改前 CUI(3) 与改后读数都要写在交件里"欠的那一发。
+
+**旗标那一行与条件**（现读，⛔ 没有 if）：
+
+```
+scripts/build.ps1:103-107   六行 why 注释（点 SPEC-11 §2.2 ＋点名 attachParentConsole 的早退条件）
+scripts/build.ps1:108-116   $ldflags = ( 六枚 "-X ..." , "-H=windowsgui" ) -join ' '
+                     :115       ← 旗标本体，数组第七枚，**无守卫、无条件分支**
+scripts/build.ps1:121-124  环境变量：CGO_ENABLED=1 / CC / GOOS=windows / GOARCH=amd64
+scripts/build.ps1:129      & $go.Source build -trimpath -ldflags $ldflags -o build\wisp.exe ./cmd/wisp
+scripts/build.ps1:130      if ($LASTEXITCODE -ne 0) { Fail ... }
+scripts/build.ps1:166-169  冒烟：& build\wisp.exe doctor ＋ if ($LASTEXITCODE -ne 0) { Fail }
+```
+
+现尺（13:1x 全部现跑）：
+
+```
+$ grep -rn "windowsgui" scripts | wc -l
+4        # build.ps1:103（注释）/ :115（旗标）/ slo-check.ps1:58（注释）/ :158（注释）
+$ git log --format="%h %cI %s" -S'-H=windowsgui' -- scripts/build.ps1
+cc6eaa65 2026-10-02T19:39:20+08:00 244-r1: build.ps1 追加 -H=windowsgui，双击不再带黑控制台
+$ git log --format="%h %cI %s" -3 -- scripts/build.ps1     # 旗标之后没有第二笔
+cc6eaa65 …   ← 此后再无人动过 build.ps1
+$ git ls-files "*.exe" | wc -l
+0        # 库里零枚 tracked exe ⇒ 任何"读 PE subsystem"的尺都必须先构建（复认 244-c2 §3 那句）
+```
+
+**PE 头真身**（⛔ 没读注释判形态；尺＝仓里既有定式 `objdump -p <exe> | grep -i subsystem`，本机 `command -v objdump`＝`/e/work/base/msys64/mingw64/bin/objdump` **有**）：
+
+| 产物 | mtime／字节（`ls -l --time-style=long-iso`） | `objdump -p` 现读 |
+|---|---|---|
+| `build/wisp.exe` | **2026-09-30 23:43**，30,299,552 | `Subsystem 00000003 (Windows CUI)`（`MajorSubsystemVersion 10`） |
+| `build/wisp228.exe` | 2026-09-30 16:14，30,184,669 | `Subsystem 00000003 (Windows CUI)` |
+| `build/balldebug.exe` | 2026-09-30 11:21，7,295,488 | `Subsystem 00000003 (Windows CUI)` |
+| `.scratch/probes-244-r1/out/wisp.exe`（244-r1 的临时出厂件，**没覆盖 `build/`**；它的构建脚本 `.scratch/probes-244-r1/build-probe.ps1` 现读 `:103/:108/:115/:129` 与出厂链逐行同形） | 2026-10-02 19:37，30,973,922 | **`Subsystem 00000002 (Windows GUI)`** |
+| `cmd/wisp` 台件（`buildWispForTest` 现编，`cmd/wisp/secret_argv_windows_test.go:174`） | 每次 `t.TempDir()`，跑完即弃 | **量不到**（不许跑 `go build`）；⇒ 只能由那一发的实参**只有 `-o`＋包名、零枚 `-ldflags`** 判它**必然是 CUI**〔读码，非读数〕 |
+
+**新旧判定**（现尺）：`ls -l --time-style=long-iso cmd/wisp/main.go cmd/wisp/run.go cmd/wisp/firstrun.go`＝`main.go 2026-09-30 23:16`／`run.go 2026-10-02 16:23`／`firstrun.go **2026-10-05 12:36**`。⇒ **`build/wisp.exe`（09-30 23:43）比 `run.go` 与 `firstrun.go` 都旧，且比那面旗（`cc6eaa65`，10-02 19:39）早 2 天**——票 244 §9 第 2 条那句"r1 的 GUI 产物落在 `.scratch/probes-244-r1/`、没覆盖 `build/`"**本腿现读复认成立**，而且它比 `A558` 当时记的"09-30 23:43"没有动过（同 mtime、同字节数）。⇒ **今天任何"双击已经没有黑框了"的句子都是假话**（票面 §9 第 2 条逐字禁止这一句）。
+
+**顺带量到一枚本问没问、但直接打在 §6/§7 上的形状**（⚠ 标〔读码推断＋盘上尺〕，本腿不许跑 `build.ps1` 所以**没有读数**）：`scripts/build.ps1:166-169` 的冒烟是 `& build\wisp.exe doctor` ＋ `if ($LASTEXITCODE -ne 0) { Fail }`，同一文件 `:28` 是 `Set-StrictMode -Version 2.0`；旗标落地后 `wisp.exe` 是 GUI 子系统件，**`&` 不等它退出**——这条因果链在本仓已有**两枚具名实证**：`scripts/slo-check.ps1:50-64`（"since ticket 244 scripts/build.ps1 passes -H=windowsgui … a bare call to one is NOT waited for"）与 `:155-161`（实测对照："the console build returned 2049ms later with exit=3, the GUI build fell through in 70ms"，探针盘上现读在 `.scratch/wisp/probes/263/r1/`，含 `bin/`）。`build.ps1` 里 `:130` 那发 `go build` 已经把 `$LASTEXITCODE` 赋成 0，`:169` 读到的**很可能是上一发的 0**，于是冒烟步在"doctor 到底跑没跑成"这一格**恒绿**＝**step 层的绿等于什么都没测**的现成形状。⇒ **具名归口**：这是票 244 **AC#6**（票面 `:31-33`"下游消费者名册"）射程内的一枚消费者，本腿只登记、⛔ 不判它今天是否真的恒绿（判它要跑构建）。
 
 ---
 
