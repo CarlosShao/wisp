@@ -182,7 +182,46 @@
 
 ## 3. 问三 — `internal/panel` 三枚冻结件的射程（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`frontend_hygiene` 一族）
 
-未判。
+> ★**先声明性质**：本节是**射程判断**（这枚尺管不管得到落地腿要动的那一格），⛔ 不是内容引用、不是摘录复用；判据＝现读该文件内部判据本体。三枚的"一字不许改"在册文本＝`.scratch/wisp/dispatches/2026-09-26-093x-thaw-panel-for-145.md` §3 逐字：`:15` `internal/panel/tokens_fourway_test.go` —— owner 的 `Q-52` 撤回令在效：界面未定稿期间那枚**恒红**是已知常红，**不许为它变绿做任何事**；`:16` `internal/panel/l2_grant_boundary_test.go` —— 票 128／门钉那一族的既有钉子；`:17` `internal/panel/frontend_hygiene_test.go` —— 它断言的是 `frontend/**` 的形状，而那半棵树**正被前端会话改写且未定稿**；**`:19` 还加了一枚范围扩张**逐字 `internal/panel/** 里其余文件若与上面三枚同名族（tokens*、l2_grant*、frontend_hygiene*），一律按禁改面处理，不确定就停手报回` ⇒ ⚠ 落地腿若**新建**同名族文件（例如 `internal/panel/tokens_167_test.go`）＝撞 `:19`，属停手报回格，不属"能写"格。
+
+### 3.1 `tokens_fourway_test.go`（550 行、**1 枚**测试，`TestC21DesignTokensFourWayAgree` 起 `:439`）
+
+| 内部判据（现读） | 射程 |
+|---|---|
+| 输入只有四枚路径，逐字（`:50-53`）：`tokensCSSPath     = "design/assets/tokens.css"`／`c21TablePath      = "docs/evidence/s1/c21-native-tokens.md"`／`nativeTokensPath  = "internal/ball/tokens.go"`／`frontendThemePath = "frontend/src/styles/tokens.generated.css"` | ⇒ **新增快照字段／新增入向方法名：零射程**（这四枚没有一枚在 `cmd/wisp` 或 `internal/panel` 的可写面上） |
+| 三枚防空读：`:212` 逐字 `		t.Fatalf("parsed only %d colour rows from %s - the table shape changed and this check would be vacuous", len(rows), c21TablePath)`；`:285` 逐字 `		t.Fatalf("native palettes not parsed (dark %d / light %d fields)", len(out["dark"]), len(out["light"]))`；`:456` 逐字 `			t.Fatalf("theme %s: %s parsed no declarations, this check would be vacuous", theme, tokensCSSPath)` | ⇒ 这族计数钉只被**颜色行／调色板字段**喂养。⚠ **对本腿唯一有价值的相邻读数**：`:52` 说明它读 **`internal/ball/tokens.go`** ⇒ 这一枚冻结件的活性射程在 **260-r1 的写面**上、不在 167-r2 的写面上；落地腿不许"顺手"拿它当自己安全的凭据，也不许为它变绿做任何事（`:15` 的 Q-52 令） |
+
+**裁**：167-r2 动不到它；它今天红不红与 167-r2 无关（`167-a3` §5.1 U-1 已具名其红因在 `design/**` 工作树，本腿不复跑、不引为读数）。
+
+### 3.2 `l2_grant_boundary_test.go`（2549 行、**7 枚**测试：`:1229`／`:1530`／`:1547`／`:1595`／`:1807`／`:1959`／`:2168`）——★**三枚里唯一真会咬落地腿的那一枚**
+
+它把整个 `internal/panel` **生产源码**按 AST 解析（`dir` 逐字 `filepath.Join(root, "internal", "panel")`，见 `:1231-1232`、`:1847-1848`）⇒ **新增文件自动进射程，无需有人改名册**。逐枚判据：
+
+| 内部判据（现读原句） | 落地腿新增快照字段／新增入向方法名会不会撞 |
+|---|---|
+| `:966` `func instrumentBlindnessProblem(dir string, pkg boundaryPackage) string {` 的防空读六支，逐字含 `:976` `	if len(pkg.answered) == 0 {`、`:979` `	if len(pkg.structs) == 0 {`、`:982` `	if len(pkg.decodes) == 0 {`；经 `:992` `func requireReadableInstrument(t *testing.T, dir string, pkg boundaryPackage) {` 的 `:994`–`:996` 升为 `t.Fatalf` | **有条件撞**：`:967` 要求 `knownComposerMethod` 仍在那棵树里、`:982` 要求 `internal/panel` 至少还剩一枚 JSON decode 站点 ⇒ 只要不删这两类东西就不响；**新增文件不会让它红**（它只防空读，不设上界） |
+| ★`:1857-1859`（在 `TestJSONKeyDerivationAgreesWithEncodingJSON` 里）逐字 `	for seed := range pkg.inboundSeeds {`／`		if _, ok := reg[seed]; !ok {`／`			t.Fatalf("decode destination %s has no reflection twin in inboundTypeRegistry: this test would compare the two instruments over different trees, and the AST half would be unchecked", seed)`；而 `inboundTypeRegistry()` 的名册**只有 4 枚**（`:1721-1726`：`ComposerRequest`／`ModeRequest`／`AttachmentPayload`／`AttachmentRef`） | ★★★**最硬的一枚，管的就是"新增入向那一跳"**：`inboundSeeds` 的来源是 `classifyDecodes`（`:678`起），`:700` 逐字 `			pkg.inboundSeeds[d.TypeName] = true` ⇒ **`internal/panel` 里任何一枚 decode 落到的同包 struct 都自动成为 seed**。⇒ **落地腿若为面板新增一枚入向承载体（例如给"停止"或"草稿"新造一个请求 struct），这枚 `t.Fatalf` 立刻红，而唯一修法是往 `inboundTypeRegistry` 加一行＝改冻结件一字＝禁**。⇒ 具名后果：**新增入向形状必须复用 `ComposerRequest`（`:1722` 已在册）**，否则这一格在治理面上是死路。⛔ 本腿不裁要不要新增，只把"新增即 FATAL、且自己修不了"量清楚 |
+| `:1878` 子测试 iii 的 24 枚判决词名册，逐字 `:1882-1887`：`"outcome", "Outcome", "allow", "Allow", "allowOnce", "AllowOnce",`／`"approved", "Approved", "grant", "Grant", "verdict", "Verdict",`／`"decision", "Decision", "decide", "Decide", "bypass", "Bypass",`／`"override", "Override", "permit", "Permit", "authorize", "Authorize",`；判据 `:1906` 逐字 `				if known {`→`:1907` 红句 `t.Errorf("%s binds the wire key %q, so a panel can address an approval decision through it (D33/F2, AGENTS.md ban #6). If %s is inbound, this is the finding; if it is not inbound any more, drop it from inboundTypeRegistry instead of dropping the check", name, key, name)` | 只过 `inboundTypeRegistry` 那四型 ⇒ **出向快照字段零射程**；**入向字段名不许取这 24 枚拼写**。落地腿候选名逐枚裁：`position`／`occupancy`／`stopRequested`／`cancellable`／`draftText` **全部无交集**（射程判断） |
+| ★`:1293-1301`（`TestAnsweredPanelRoutesCarryNoApprovalDecision`）逐字 `	declared := map[string]bool{}`／`	for name, val := range pkg.consts {`／`		if strings.HasPrefix(name, "Method") {`／`			declared[val] = true`；判据 `:1300` `		if !declared[name] {`→`:1301` 红句逐字含 `"Go answers %q but no Method* constant declares it: a route written straight into the guard's case list. Nothing else in this package would notice - TestFrontendComposerRequestsMatchTheEnvelope (bridge_test.go:131) is the test that reads the frontend for these names, and it only ever iterates the four declared constants, so a fifth route that never became a constant is invisible to it. This line is the only gate on that shape"` | ⇒ **第五枚入向方法名的形状被这枚钉死**：守卫答了就必须有一枚 `Method*` 包级常量（且红句自己承认 `bridge_test.go:131` 只循环四枚常量＝对它失明）。⛔ 出向字段零射程 |
+| `:1243` `		if carriesGrantWord(name, grantRouteWords) {`（词表 `:192-195` **11 枚**：`approve`/`approval`/`grant`/`allow`/`permit`/`ratify`/`authorize`/`authorised`/`decide`/`decision`/`verdict`）＋`:1276` `	if len(pool) < len(answered) {` | ⇒ 第五枚方法名不许含这 11 枚词；`stop`／`cancel`／`halt` **不在表内**（本腿逐枚比过）⇒ **名字本身不撞**，撞的是上面那些名册钉 |
+| `:1574` `	findings := scanGrantBoundary(t, filepath.Join(root, "internal", "panel"))`；体内 `:1181` `	inbound := inboundEnvelopes(pkg)`、`:1182` `	if len(inbound) == 0 {`→`t.Fatalf("no inbound envelope type (a JSON decode destination, or anything nested in one) under %s: …")`，判据 `:1189` `			if carriesGrantWord(f.JSONKey, grantFieldWords) {`；`grantFieldWords`（`:183-188`）**19 枚**＝路由表 11 枚之外再加 `autoapprove`/`granted`/`allowed`/`allowonce`/`permitted`/`outcome`/`bypass`/`override` 等形；归一化在 `carriesGrantWord`（转小写、去掉 `_` `-` 空格 `.` 再 `strings.Contains`） | ⇒ 只过"入向信封＋其嵌套／嵌入可达的类型"（种子就是 `inboundSeeds`，`:1006-1012`）⇒ 出向快照字段零射程；⚠ 若新字段挂进 `ComposerRequest` 一族，字段名不许含这 19 枚词根（`pendingApproval`／`allowedDraft` 都会红）。**旁证一枚（值钱）**：`TaskRowView.BlockedOnApproval` 的键 `blockedOnApproval` **本身含 `approval`**、今天不红**仅因为它是纯出向** ⇒ "出向＝豁免"是射程事实，不是运气 |
+| `:1487` 三枚计数钉＋`:1691` 见证名册（红句逐字含 `"grantRouteWords no longer carries %q while %q still stands here as its witness: the sweep stopped asking the %d names that word used to build…"`） | ⇒ 只在**判决词表被增删**时响 ⇒ 落地腿不碰词表即零射程（且它无权碰：冻结件） |
+
+**裁**：`l2_grant_boundary_test.go` 对**"新增出向快照字段"＝零射程**；对**"新增入向方法名"＝至少两枚**（`:1293-1301` 的 `Method*` 常量钉，加取名不当时的 `:1243`/`:1906` 词表钉）；对**"新增入向承载 struct"＝一枚无法自行修复的 `t.Fatalf`**（`:1859`，修法在冻结件内部）⇒ 这一格请编排者按票面 §9 第 1 条与 `Q-76` 的口径归档，本腿不裁。
+
+### 3.3 `frontend_hygiene` 那一族（`internal/panel/frontend_hygiene_test.go`，324 行、**5 枚**测试）
+
+⚠ **先更正一处前人读数**：`167-c3` §3.6 写的是"六枚测试"，本腿现量 `grep -n "^func Test" internal/panel/frontend_hygiene_test.go` ＝ **5 枚**（`:169`／`:196`／`:222`／`:246`／`:281`），另 5 枚是包级 helper（`:76 frontendSrcFiles`／`:101 reachableFrom`／`:140 resolveSpec`／`:161 relToRoot`／`:317 basenames`）。逐枚射程：
+
+| 枚 | 内部判据（现读） | 射程 |
+|---|---|---|
+| `TestPanelFrontendIsStateless` `:169` | 文件集＝`:79` 逐字 `	err := filepath.WalkDir(filepath.Join(root, "frontend", "src"), func(p string, d fs.DirEntry, err error) error {`，只收 `.ts/.tsx/.css`（`:86`）；判据是 `bannedStorageAPIs`（`:48-56`，**7 枚**：`localStorage`/`sessionStorage`/`indexedDB`/`cookie`/`caches`/`serviceWorker`/`fs-access`）；防空读 `:172` 逐字 `	if len(files) == 0 {` | **纯 `frontend/**`** ⇒ 落地腿 Go 侧改动**零射程** |
+| `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme` `:196` | 判据尺是 `colourLitRe`（定义 `:61`，匹配十六进制色值与 `rgb()/rgba()` 两形，注释 `:59-60` 明写它**故意不匹配 `var(--x)`**），走 `reachableFrom` 的 import 闭包；防空读 `:133` 逐字 `	if len(seen) < 5 {`→`:134` 逐字 `t.Fatalf("import closure of main.tsx holds only %d files - the walk broke and the checks below would be vacuous", len(seen))` | 同上，**零射程**（它今天在册红因在页面／`design` 侧，不属本编队） |
+| `TestVendoredDemoComponentsAreNotMounted` `:222` | `:225-226` 读 `frontend/src/components/ai-native` 目录；判据 `:239` 逐字 `	if len(mounted) == 0 {` | **零射程**（枚数关系全在页面树） |
+| `TestFrontendHasNoEmoji` `:246` | 走 `frontend/src`＋`frontend/scripts`（`:249-260`）再补 `frontend/index.html`（`:261`）；`emojiRangesRe` 在 `:71`，注释 `:64-70` 明写这份副本**无注释豁免、覆盖面比 CI 仪器窄**，逐字 `// So this test can be stricter than the gate, never wider.`（前一行逐字 `// that says so: this copy has no comment exemption (the scanner blanks`） | **零射程**，但★必须具名分清两件事：这一族**不扫 Go 侧**，落地腿界面文案里的 emoji 归 `tools/d22scan`（CI）管、不归这族管（`AGENTS.md §1.2` 已把"规格射程≠仪器射程"登记为未定案缺口，本腿不重开） |
+| `TestFrontendNeverNamesAnApprovalDecision` `:281` | 走**整棵 `frontend/`**（`:285`），`:289` 跳过 `/node_modules/` 与 `/dist/`；判据只有一条正则，定义在 `:73`（`panelDecisionIdentifierRe`，匹配的是 `approval.decide` 这一枚字面），注释 `:72` 逐字 `	// panelDecisionIdentifierRe is tools/d22scan's ban #6 pattern (approval.decide).` | **零射程**（唯一命中面是页面树） |
+
+**裁**：这一族对 167-r2 **整体零射程**。⚠ 唯一致命的相邻形状是"落地腿往 `frontend/` 落任何文件"——那是票面硬约束 3（有一枚要写的落在 `frontend/` 下就整段停手上报），⛔ 不是"改一行让它变绿"的选项。
 
 ## 4. 问四 — C17 入向方法名名册钉：现量枚数＋"第五枚入向方法名"的代价
 
