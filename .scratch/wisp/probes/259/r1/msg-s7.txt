@@ -1,0 +1,8 @@
+票 259 腿 259-r1 第 7 步（收尾）：交件链按序写进 §7
+
+§7 加一行"起手锚 d7236abc 之后本腿交件链按序"：ea522444 → b6b1d6a4 → 50e0299c → e8a1bec3 →
+c854a8e0 → 2efc8940 → 本笔（⛔ 不自名，自名要自指、指不上），并给收件侧一把对表尺＝
+git log --oneline d7236abc..HEAD 只取本腿两棵子树的那几笔、逐枚 git show --name-only 复看写面。
+
+代码面零改动：internal/agent/approval 自 b6b1d6a4 起逐枚 md5 未动（六发突变全部还原到那一份，
+§4 表末列 md5 起手＝终值），本包最后一次 go test -count=1 仍 89 PASS／0 FAIL。

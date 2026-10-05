@@ -387,6 +387,11 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go（同上）
 | `e8a1bec3` | §1.4／§4／§6／§7 的四处准确性回头改（M-E 窗口起点缺口登记进 §6 第 8 条、"六枚文件"改回"五枚文件六发突变"、D2 出处改引 `197-ac5-selfapproval-v1.md:75` 原文、反折叠尺的牙从 M-H 改记到 M-I） |
 | 本笔 | §7 名册补全（含本笔自身的点名，写在下一格里——一枚 commit 装不进自己的哈希，⛔ 我没有为了凑一个数去 amend）＋ §8 第 9 条（`msg-s3.txt` 正文里那枚 `11:52:47` 是未打卡的估计值，读数以下表为准）＋ 交件面尺一行 |
 
+起手锚 `d7236abc`（§0）之后的**本腿交件链，按序**：
+`ea522444` → `b6b1d6a4` → `50e0299c` → `e8a1bec3` → `c854a8e0` → `2efc8940` → （写这一行的那一笔，⛔ 不自名：
+自名要自指，指不上）。收件侧对表尺＝`git log --oneline d7236abc..HEAD` 里**只取本腿两棵子树**的那几笔，
+逐枚 `git show --name-only` 复看写面；⛔ 本腿未 push，也⛔ 没有一笔是裸 `git commit`（每笔的 pathspec 都写在命令上）。
+
 `git add -- <点名文件> && git commit -F .scratch/wisp/probes/259/r1/msg-sN.txt -- <同一批点名文件>`，
 中间不停顿；⛔ 无 `add -A`／`.`、无裸 `git commit`、无 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；
 别人的脏面（§0 那十一枚 `internal/panel`／`internal/tools`）一个字节没动。
