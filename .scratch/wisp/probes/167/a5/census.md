@@ -123,7 +123,62 @@
 
 ## 2. 问二 — 四枚输出各自的现有断言现状（占用／序号／停止／草稿＋崩溃自救）
 
-未判。
+> 本节一律按派单点名的**三处法**答："零调用者"这种负向句要问**谁产出／谁投递／谁落盘（谁出向）**三处，不能只数显式调用点。尺与时刻逐格附。
+
+### 2.1 ① 占用条 —— **零断言**（两把独立尺互相否证，16:5x）
+
+| 尺 | 读数 |
+|---|---|
+| `grep -rniE "occupanc\|contextused\|usedtokens\|windowused\|prompttokens" cmd/wisp internal/panel --include=*_test.go \| wc -l` | **3** 行，逐枚过目**全部是热键占用**那一枚 occupancy 的注释/红句，与上下文占用无关：`cmd/wisp/resident_hotkey_live_258_windows_test.go:249`／`:259`（注释）与 `:284` 逐字 `t.Fatalf("258 LIVE RULER RED: cannot build the occupancy premise for %s: RegisterHotKey answered %v. …", binding, errno)` |
+| `grep -rn "ContextWindow" cmd/wisp internal/panel --include=*_test.go \| wc -l` | **4** 行，逐枚过目**全部是配置字段写入**那一枚，不是占用显示：`cmd/wisp/firstrun_257_test.go:114-115`（`m.SetModelContextWindow(t257Provider, t257Model, 128000)`）／`internal/panel/config_route_248_test.go:272`／`:296`（`FieldModelContextWindow` 作为 `configField` 被写） |
+
+⇒ **裁**：今天**没有任何一枚用例断过"占用"**这件事——既没有断过出口存在，也没有断过它不存在。落地腿新增这一格＝**零枚现有断言要改写**，但要新增自己的断言（AC#2 那两发变异是它的凭据）。⚠ 唯一有条件咬它的是 §1.6 W-1/W-2 那两枚**逐行扫源码的词面钉**（写注释时的用词），与 §1.1 族①那四枚顶层键钉（落点选择）。
+
+### 2.2 ② 排队序号 —— **有断言"队列条数"，零断言"第几条"那一枚值**
+
+现量（尺＝`grep -rnE "\bPosition\b\|\bDepth\b" cmd/wisp internal/panel --include=*_test.go \| wc -l` ＝ **37** 行；逐枚过目后**其中 27 行是 `fset.Position(...)`＝AST 位置，与队列无关**）：
+
+| 锚 | 原句（逐字） | 它断的是什么 |
+|---|---|---|
+| `cmd/wisp/resident_grant_writer_265_windows_test.go:196` | `		if n := f.g.Queue().Depth(); n != 0 {` | 队列**深度＝条数**，且断的是"应为 0"这一形 ⇒ 序号（1-based 的第几条）**没被任何用例读过** |
+| `cmd/wisp/panel_pump_test.go:97-98` | `	if rec["depth"] != fmt.Sprint(len(snap.Pending)) {`→`t.Errorf("ledger depth %q, retained packet holds %d cards", rec["depth"], len(snap.Pending))` | **账本 k=v 里的 `depth=`＝`len(snap.Pending)`** ⇒ 这是今天唯一一枚把"队列长度"写成可断言之形的地方；它读日志、不读快照 |
+| `cmd/wisp/panel_pump_test.go:203` | `		if rec["depth"] == "1" && strings.Contains(rec["pending"], "pump-corr") {` | 同上（另一发，字面 `"1"`） |
+| `internal/panel/instructions_200_test.go:300` | 词面册含 `"depth":0`、`"tier":"project"` | **`depth` 这一枚键名在项目说明那一节里已被占用**（＝§1.6 W-4）⇒ 序号若复用 `depth` 这枚拼写，两节会在同一份字节里同名 |
+| `cmd/wisp/instructions_200r2_test.go:151`／`:239` | `			if sec.Files[i].Tier != "project" \| sec.Files[i].Depth != 0 {`／`			if f.Tier != "global" \| f.Depth != -1 {` | 数的是**说明文件的目录深度**，与排队无关（登记以免被误当序号钉） |
+| 另有 **13 枚** `len(….Pending)` 形状的运行期断言（尺＝`grep -rn "len(snap.Pending)\|Pending) != \|Pending) == " cmd/wisp internal/panel --include=*_test.go \| wc -l`），例：`cmd/wisp/subagent_blocked_197_test.go:164` 逐字 `	if len(snap.Pending) != 1 \|\| snap.Pending[0].CorrelationID != id {` | 断的是"卡在哪一张"，不是"第几条" | ⇒ **落地腿若改 `Pending` 的填充语义（不只是加键），这 13 枚都在射程里**；只加 `position` 一枚键 ⇒ 一枚都不响 |
+
+⇒ **裁**：`ApprovalCardView.Position` 今天**零断言**（`grep` 里那枚 `Position` 全是 AST 位置）；真源三枚（`LiveApproval.Position`／`Queue.Depth()`／`PanelItem.Depth`）在 `167-c2`／`167-a3` 已量齐，本腿只补一句：**`internal/agent/approval` 那两枚今天一次都不出向**（`grep -rc "json:\"" internal/agent/approval` 两口径均 0，复认 `167-a3` R-⑥）。
+
+### 2.3 ③ 停止 —— 三处法逐处量（**产出有、投递零、出向零**）
+
+| 处 | 现量（尺＋时刻 16:5x） | 结论 |
+|---|---|---|
+| **谁产出** | `grep -n 'func (r \*TaskRoster)' internal/tools/task.go` ＝ **13 枚**，其中停止那一支三枚：`:420 AttachCancel(taskID, cancel)`／`:434 DetachCancel(taskID)`／`:447 Cancel(taskID) (bool, string)`；`:418` 注释逐字 `// AttachCancel stores the child's own context.CancelFunc as the ONLY stop path` | 名册在、且**没有"能不能停"的谓词**（13 枚逐枚过目：Record/WatchRow/Look/Count/Descendants/PublishSubagent/MarkRoot/TryAcquireSubagentSlot/InFlightSubagents/RunningSubagentIDs/AttachCancel/DetachCancel/Cancel）⇒ **推翻 `docs/reports/survey-2026-09-28-dsh-ui-packages.md:191` 那句"方法 15 枚"**（那是过期或含非导出，口径不同；票面 §9 的"13 枚"复认成立） |
+| **谁投递** | `grep -rn "AttachCancel" cmd internal tools` 全命中 **4 行产码**：定义 `internal/tools/task.go:418/:420`、注释 `internal/tools/subagent_197.go:38`、**唯一产码调用者 `internal/tools/subagent_197.go:346` 逐字 `	t.d.Roster.AttachCancel(bg.ID, cancelChild)`**；`cmd/wisp/**` 命中 **0 枚** | ⇒ **主 run 那条零调用**复认成立（票面 §9 第 1 条末行、`A` 台账那句都对得上）；`requestTaskStop` 在 `cmd/wisp`＋`internal/panel` 测试里 **0 命中**（尺＝`grep -rniE "requestTaskStop\|AttachCancel" cmd/wisp internal/panel --include=*_test.go`＝**0 行**） |
+| **谁落盘／谁出向** | `grep -rniE "cancellable" cmd internal tools` ＝ **3 行、全部是注释**（`cmd/wisp/approval_reply.go:473`、`internal/agent/approval/cancel_key_label_260r4_test.go:24`／`:256`）；`TaskRowView` 现量 **12 枚 json 键**（`internal/panel/subagent_roster_197.go:106-138`：`taskId/label/kind/parentTaskId/status/statusKnown/statusReason/streamKey/blockedOnApproval/streamTruncated/streamElidedRunes/streamDropped`）⇒ **无 cancellable 位** | ⇒ 票面 §9"'看得见'缺位三处"的第 2 处（12 枚键无 cancellable 位）**逐枚复认**；第 3 处（根行 `statusKnown` 那一维被票 196／`A394` 占着）在场：`:115` 逐字 `	StatusKnown bool   \`json:"statusKnown"\`` ＋ `:111-113` 注释自述它是 D43 状态名 ⇒ ⛔ 本腿不判要不要动它 |
+
+⇒ **裁**：**停止这一枚今天零断言**（既无 `AttachCancel` 的调用者用例，也无 `cancellable` 的出向用例）。相邻的只有 `l2_grant_boundary_test.go` 那族**入向名册钉**（§4）与 `panel_resident_windows_test.go` 那族线程收尾钉（§5）。
+
+### 2.4 ④ 草稿 —— **门有三枚断言、"存住／不覆盖"零断言**（★本腿抓到一枚"必须同批改写"的钉）
+
+| 锚 | 原句（逐字） | 射程判断 |
+|---|---|---|
+| `cmd/wisp/panel_config_248_test.go:460` `TestAC1OtherDoorsStillRefuseByNameAfterTheSettingsSocket`，判据 `:467-471` | `	for _, method := range []string{panel.MethodWorkspaceRequest, panel.MethodAttachmentAdd, panel.MethodMessageSend} {` → `		if _, err := disp.Handle(context.Background(), raw); !strings.Contains(err.Error(), "处理器未接入") {` → 红句 `t.Errorf("%s with no socket: %v, want the unattached refusal", method, err)` | ★**这枚正向断言的是"message 那扇门必须仍然按名拒绝"**。本腿追到它的构造体：`cmd/wisp/panel_config_248_test.go:126-150` `newRealSettingsLeg` **自己在 `:145-148` 造了一枚只带 `Config`＋`Audit` 的 dispatch**（注释 `:124-125` 逐字 `// newRealSettingsLeg builds the leg out of the two production objects, the way`／`// newComposerDispatchChain does, and returns the dispatch in front of it.`）⇒ **它不读生产装配**，所以把 `cmd/wisp/panel_inbound.go:277` 的 `Message: nil` 换成真处理器**不会**让这发红。⚠ 但它的**注释与用例名**（"the three doors nobody owns still refuse by name"、`"Untouched by this slice, and refused by name when they arrive: … message = ticket 35"`，见 `panel_inbound.go:273-274`）在那一发之后就成了**假话**：字面尺不响、语义已过期 ⇒ 这一格属"该同批改写、但仪器不会替你响"的那一类，落地腿若动 `Message` 就**必须**在交件里具名说它动了这枚用例的语义 |
+| `cmd/wisp/panel_inbound_33_test.go:158` `TestAC9InboundLegRefusesRosterMethodWithNoHandler`，判据 `:165-172` | `	if code != 1 {`→`t.Errorf("exit=%d want 1 (the request was refused): stdout=%q", code, out)`；`:168` 逐字 `	if !strings.Contains(out, "处理器未接入") {`；`:171` 逐字 `	if !strings.Contains(errLog, "panel.workspace.request") {` | 跑的是**真腿**（`runInboundLeg33`），但送的是 `panel.workspace.request` ⇒ 落地腿只接 `Message` **不撞**；若哪天有人顺手把 workspace 也接上 ⇒ 撞这一枚 |
+| `internal/panel/composer_dispatch_test.go:291` | `	d := &ComposerDispatch{Mode: modeSpy, Workspace: other, Attachment: other, Message: other}` | 四枚插座的**桩**（既有形状，票面 §9 第 3 条说的"`ComposerDispatch` 的四枚插座"就是这里）⇒ 落地腿接 `Message` 不必新造接缝，这条有先例 |
+| 门本身（产码在场，供对照；锚点 `2a0e23b4`，17:1x 逐枚现量） | 名册 `internal/panel/bridge.go:42-45` 四枚逐字 `	MethodMessageSend      = "panel.message.send"`（`:45`）；白名单守卫 `bridge.go:146` `func knownComposerMethod(m string) bool`（调用点 `:132`）；派发表 `internal/panel/composer_dispatch.go:175` `func (d *ComposerDispatch) dispatch(…)` 的六枚 `case`（`:177`/`:182`/`:187`/`:192`/`:197`/`:202`＝**与入向名册的 6 枚同数**）；承载位 `internal/panel/bridge.go:98` 逐字 `	Text string \`json:"text,omitempty"\``；生产装配 `cmd/wisp/panel_inbound.go:275-277` 逐字 `		Workspace:  nil,`／`		Attachment: nil,`／`		Message:    nil,`（**未漂**，票面 §9 第 ④ 枚复认） | 出向零枚：草稿**没有任何承载位回去**；持久面 `internal/store` **目录不存在**（尺＝`ls -d internal/store` ⇒ 不存在）；全仓 `grep -rniE "draft\|草稿" cmd internal tools` ＝ **15 行**、逐枚过目**全部**是"这份测试的第一稿"这类注释与一处 fixture 字符串（`internal/tools/fs_edit_ac34_test.go:75`），**零枚关于输入框草稿** |
+
+⇒ **裁**：**"失败原文存住"与"不许覆盖用户后来新写的字"两格今天零断言**；有断言的是"这扇门还没接线"这一枚**负向现状钉**（上面第一、二行），其中 248 那一枚是**语义级**的（仪器不响、话变假）。
+
+### 2.5 ⑤ 崩溃自救（AC#6 三枚拆开的现有断言）
+
+| 枚 | 三处读数（16:5x 现量） | 今天有没有用例断过 |
+|---|---|---|
+| 崩溃栈落盘 | 产＝`internal/observe/goroutine.go`（`grep -rln "ev.Stack" internal/observe` 命中 `goroutine.go`／`goroutine_test.go`）；投＝`cmd/wisp/logsink.go`；落＝`internal/observe/redact.go`（同一把尺三枚文件命中） | **`cmd/wisp`＋`internal/panel` 里零枚断过它**。尺＝`grep -rnE "MaxLoggedString\|BuildDiagnosticsBundle\|Panic" cmd/wisp internal/panel --include=*_test.go`＝**0 行**；放宽到 `grep -rn "panic" … \| grep -iE "sink\|stack\|recover\|crash\|diagnos"`＝**8 行**，逐枚过目全是**别的事**（`panel_resident_windows_test.go:465/:488` 是 WM_QUIT panic 的复现钉、`resident_sink_nail_127_windows_test.go:599`／`leg_sink_nail_131_windows_test.go:212` 是"panic 会吞红名"的仪器钉、`leg_sink_gate_131_test.go:1351` 是内建名册）⇒ **512 那一枚截断今天无人断** |
+| 可复制现场 | `grep -rn "BuildDiagnosticsBundle" cmd internal tools \| grep -v _test.go \| wc -l`＝**3**，且 3 枚全在它自己那一枚文件（`internal/observe/diagnostics.go:35` 注释／`:61` 注释／`:62` 定义）⇒ **产码调用者 0 枚**复认（票面 §9 第 ⑥ 枚、`A` 台账 09:36 那次复跑同读数） | 断它的用例住在 `internal/observe/diagnostics_test.go`（`:35`／`:125`／`:140` 三处调用），**不在本腿射程**；`cmd/wisp`／`internal/panel` **零枚** |
+| 自救指令 | `grep -n 'pass("\|fail("\|info("' cmd/wisp/doctor.go \| wc -l`＝**28**（复认票面 §9 第 2 条那枚更正后的数）；`grep -n "logs\|logDir" cmd/wisp/doctor.go \| wc -l`＝**1**，且那一行是**注释** `:243` ⇒ **零枚检查项读 `logs\`** 复认；`grep -rn "logDir()" cmd/wisp \| grep -v _test.go`＝**1 行**＝定义本体 `cmd/wisp/logsink.go:99` ⇒ **产码调用者 0 枚**（该格票面原标〔仅自述〕，**本腿复跑成立**） | **零断言**（无人断 doctor 该读到日志目录，也无人断它没读到） |
+
+⇒ **裁**：AC#6 三枚在 `cmd/wisp`＋`internal/panel` 侧**全部零断言** ⇒ 落地腿新增自救出口**不打红任何现有用例**；它唯一的相邻火源是 `cmd/wisp` 那一族 **leg/sink 门**（`leg_dispatch_gate_133_test.go`／`leg_sink_gate_131_test.go` 按 AST 数 `main.go` 的腿与 sink 站点）——那两族数的是**分发腿名册**，若新增一枚 `wisp` 子命令就要一并过它们（§6 第 5 条）。
 
 ## 3. 问三 — `internal/panel` 三枚冻结件的射程（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`frontend_hygiene` 一族）
 
