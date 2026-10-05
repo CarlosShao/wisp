@@ -1,0 +1,15 @@
+167-a3 占用条取证 §2：分子 8 枚／分母 8 枚候选逐枚钉真源与可读性
+
+三枚值钱读数：
+1. 唯一在 execute 之外可读、且自带具名「未知」的分母是 rt.endpoint.ContextWindow
+   （internal/config/schema.go:353 逐字注释「0 = unknown」）；环路真正缩放用的
+   Budgets.ContextWindow 不但读不到，而且结构上不可能报未知——BudgetsFor 把
+   <=0 与 >128000 一律折成 128000，未知那一维在穿过它的那一刻永久丢失。
+2. 已跨过 execute() 边界的 token 整数对只有一枚：projctx.Bundle{BudgetTokens,UsedTokens}
+   （cmd/wisp/panel_pump.go:108 -> run.go:718 -> pump.go:177 -> pump.go:308），
+   而 internal/panel/instructions_200.go:170 的映射把两个数都丢了。
+3. agent.Event.TokensIn/TokensOut 是唯一「天然跨过 execute()」的整数载体，
+   但 cmd 全树 .TokensIn 消费 0 命中、且只有 EvStuck/EvDone 两枚终态非零。
+
+具名排除：Guard.TokensUsed / Cost.Usage 是跨轮累加的计费轴（第 k 轮把同一段前文
+算第 k 次，可以合法大于窗口）；Assembler.TotalTokens 与 refTokenBudget 等属别轴。

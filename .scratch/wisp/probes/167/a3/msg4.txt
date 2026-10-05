@@ -1,0 +1,9 @@
+167-a3 占用条取证 §4：撞钉名册（两把双向尺／三枚顶层键集字节钉／五枚 want-N 锚）＋tag 盲区今天复量
+
+读数：
+- 尺A(composer_test.go:48) 六对型、尺B(approval_test.go:105) 三对型，重叠区只有 Snapshot 顶层 ⇒ 占用加在 ComposerState 只响 A 一发。
+- 顶层四键字节钉今天 3 枚（pump_test.go:123 / :291 / subagent_roster_197_test.go:214），而 pump.go:45-47 自述只有两枚 ⇒ 包内注释已过期，登记在 §7。
+- approval 包 json: tag 现量 0 枚（含/不含测试件两口径皆 0），但两把尺的型别名册全在 internal/panel 自己声明的七型里 ⇒ 对本枚射程＝零；它是序号那一枚的战场。
+- ComposerState 今天 11 枚字段／11 枚 tag、Snapshot 6/6、ApprovalCardView 10/10 ⇒ 快照上零枚幽灵键；但无 tag 字段两把尺同时哑火，后果写死在 §4.4。
+- 新撞出的一枚：TestModeViewHasNoWriteSurface 逐行扫 composer.go 全文找 modeSetterRe ⇒ 在 composer.go 里写注释带 SetMode/PermissionMode = 就会红，落地腿必读。
+- 推翻 167-c2 一句：ComposerState 不是 14 枚 JSON 字段，是 11 枚。

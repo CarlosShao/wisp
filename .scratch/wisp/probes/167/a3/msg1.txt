@@ -1,0 +1,9 @@
+167-a3 占用条取证：§0 起手锚 + §1 第 0 跳名册（十跳逐条带 file:line 与四分类）
+
+复量 167-c2 那句「loop 是 execute 局部变量」：成立，但它引的两枚行号已移动
+（loop.go:253 -> :260、:256 -> :263），且 agentRuntime 全字段过目确认零 *agent.Loop 字段。
+新增两枚前趟未量的读数：子代理那侧的环路连 Options 拷贝都不留（subagent_197.go:319/:344
+全是局部变量）⇒ 子代理上下文用量今天从任何地方都读不到；唯一已跨过 execute() 边界的
+token 整数对是 projctx.Bundle{BudgetTokens, UsedTokens}，而它是项目说明子预算、不是对话窗口。
+
+只做占用这一枚；序号／停止／草稿／崩溃自救未动笔。零 go 命令，未读 frontend/design。

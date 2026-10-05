@@ -1,0 +1,9 @@
+167-a3 占用条取证 §3：13 枚具名「未知」形状分三族（A 布尔 …Known／B 字符串枚举／C 随附 reason）
+
+关键判语：A 族里唯一「零新键」的复用是借 TaskRowView.StatusKnown 那一维，
+而那恰是票 196／A394 明令不许顺手改的一枚 ⇒ 治理面上「不新增 JSON 键」这条便宜路是关着的。
+落地腿要么在 internal/panel/composer.go 的 ComposerState 里新增标量字段（寸内），
+要么停下要一张新类型／新文件的授权（先例＝票 181 靠派单自己那行「✅ 新建 internal/panel/git.go」拿到，不是靠 145）。
+
+具名越界判定：新建 occupancy.go＝越界；改 instructions_200.go 借 projctx 现成数＝越界且语义错（说明子预算≠对话窗口）；
+改 subagent_roster_197.go＝越界；任何新增 Loop 导出方法＝停手上报（G3 在册）。
