@@ -73,7 +73,64 @@
 
 ## §2 突变名册（自重种三发）
 
-「待验」
+> **本节由续腿 `268-v2` 填写**（21:4x 接手）。前两枚同职腿（`268-v1` 20:1x 断流、`268-v1b` 21:1x 断流）都死于服务故障，
+> §0/§3/§4/§5/§6 已实、只剩 AC#1／AC#2 两格与本节。派单明令 ⛔ **不重跑 422 秒整包**（全量日志已在盘＝`deliver-cmdwisp.log`，§3 已核）。
+>
+> **续腿起手锚（21:45:40–21:45:55 现量）**：HEAD＝`176d6277`（`git rev-parse HEAD`）；`git status --porcelain` 全仓 **727** 行、scoped `cmd/wisp` **0** 行；
+> 两枚字节面复量与 §0.1 逐字同值——`resident_approval_windows.go`＝`69a630bf350daf1032c62b921e9d7044`、
+> `resident_approval_risk_268_windows_test.go`＝`e2405a21bb278b558c1305ea95d34a9b` ⇒ 本节读的还是**交付态字节**（本腿一枚产码字节未留，见末行收口）。
+>
+> **跑形（⛔ 非整包）**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test -count=1 -run 'TestTicket268' ./cmd/wisp/`
+> —— PATH 注入两枚目录照 r1 §1 那把整包命令的形状（r1 台件逐字：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test -count=1 -v ./cmd/wisp/`），
+> 只是把 `-run` 收窄到本票三枚。⚠ **不扩到 `TestTicket256`**（那是 r1 的跑形，会在本腿多带五枚用例＝多一倍负载；派单只给 `-run 'TestTicket268'` 一形）。
+> `-v` 只加在两处（各自具名）：负控第二发与 MUT-2/MUT-3 那两发——为的是让"没红的哪几枚"在名册里**逐枚可见**，而不是靠"非 `-v` 不印＝绿"这一步推理收口；
+> MUT-1 那一发取的是派单给的裸形（无 `-v`），它的"②③ 未红"两半里，**只有"未列红"是本腿现量**（见下表该行括注）。
+>
+> **负控起跑（交付态、一枚未种，先证"真跑起来了"）**：
+> - 非 `-v` 预跑 21:47:02→21:47:06：`ok github.com/CarlosShao/wisp/cmd/wisp 0.069s`、`rc=0`（台件 `v2-targeted-baseline.log`，53 字节）。
+> - **`-v` 形同刻复跑 21:52:23→21:52:25**：三枚顶层 `--- PASS` 逐枚可见（`…NamesRefusedConfigApartFromMissingConfig (0.01s)`／`…ReachesStdoutOnce (0.00s)`／`…BySentinelNotByErrorWords (0.00s)`）、`PASS`／`ok … 0.083s`／`rc=0`；
+>   台件 `v2-targeted-baseline-v.log`＝**5,957 字节**；`grep -c '^--- FAIL'`＝**0**；`grep -c 'wisp: resident \[risk\]'`＝**1**；
+>   `grep -c 'provenance="defaults (config.toml present but refused at load)"'`＝**4**。
+>   ⇒ **不是 `exit status 0xc000135`**（那一形会在无 `--- FAIL` 的情况下直接把包打 `FAIL`，且不会有 `--- PASS` 名册与 stdout 行）——本腿三枚是**实跑绿**，不是没跑起来。
+> - 负载闸：每发起 go 命令前现量 CPU/MEM——21:45:40 CPU 34%／MEM 69.5、21:51:45 CPU 38%、21:52:11 CPU 26%／MEM 69.7、21:55:27 CPU 46%／MEM 70.2。
+>   ⛔ 无任一发在 ≥70% 时起；21:55 那一采 MEM 触 70.2 ⇒ 该采之后**先落一笔 commit（纯文书，不占 CPU）再复量**才起下一发。
+>   `@(Get-CimInstance Win32_Process -Filter "Name='go.exe'").Count`＝**0**（21:50:03 现量，同机无并发整包）。
+>
+> **三形 needle 预检（21:52:0x 现量，种之前先数，不符即 ABORT）**：
+> `grep -c 'riskProvenanceRefusedAtLoad = "defaults (config.toml present but refused at load)"'`＝**1** ／
+> `grep -c 'fmt.Printf("wisp: resident \[risk\]: config.toml is present but was refused at load'`＝**1** ／
+> `grep -c 'if errors.Is(err, fs.ErrNotExist) {'`＝**1**。三形各自唯一命中 ⇒ 允许种。
+
+| # | 种什么（只 `cmd/wisp/resident_approval_windows.go`） | 起 | 止 | 红了谁（本腿跑形） | 还原证 |
+|---|---|---|---|---|---|
+| MUT-1 | `:456` 新常量字面折回旧那枚：`riskProvenanceRefusedAtLoad = "defaults (config.toml unreadable)"`（＝AC#1 要求自证的"两枚状态又共用一张脸"） | 种 21:52:49（md5 现量 `e03e7d700f00d26f79186b3e99dc9888`，≠交付态 `69a630bf…`）／跑 21:53:14 | 21:53:17（`rc=1`） | **只用例① 红**：`--- FAIL: TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig`；②③ **未列红**（该跑形只 `-run 'TestTicket268'`，红名册整份三行 `:9-11` 全属①，`grep -c '^--- FAIL'`＝**1**）⇒ 与 r1 §5「只 ① 红」同形 | 21:53:47 `git cat-file blob HEAD:cmd/wisp/resident_approval_windows.go > cmd/wisp/resident_approval_windows.go` ⇒ `md5sum`＝`69a630bf350daf1032c62b921e9d7044` ＝ `git cat-file blob HEAD:… \| md5sum` **双读同值**；`git diff --name-only -- cmd/wisp`＝**0 行**；`grep -c "MUT-"`＝**0** |
+| MUT-2 | 摘掉被拒支那一行 stdout（注释掉 `:510-512` 那枚 `fmt.Printf`）——证 ② 不是恒绿装饰 | 「待验」 | 「待验」 | 「待验」 | 「待验」 |
+| MUT-3 | 在哨兵旁边**加**一次 prose/`err.Error()` 字符串匹配、行为逐字不变——证 ③ 咬的是"靠文案分类"这件事 | 「待验」 | 「待验」 | 「待验」 | 「待验」 |
+
+**红句逐字**（原文抄自本腿台件，行号＝台件行）：
+
+MUT-1（`v2-mut1-red.log:9-11`，三句同发）：
+
+```
+resident_approval_risk_268_windows_test.go:125: the two shapes are folded back into one word "defaults (config.toml unreadable)" - that fold IS ticket 268: the user wrote a number, the gate runs the compiled 300s, and the receipt blames a file that is sitting in that directory
+resident_approval_risk_268_windows_test.go:129: refused-file provenance "defaults (config.toml unreadable)" does not say out loud that the file is present, which is the whole difference from the missing shape
+resident_approval_risk_268_windows_test.go:147: provenance constants riskProvenanceUnreadable and riskProvenanceRefusedAtLoad share the literal "defaults (config.toml unreadable)" - the four readings have to be four names
+```
+
+MUT-2（`v2-mut2-red.log`）：「待验」
+
+MUT-3（`v2-mut3-red.log`）：「待验」
+
+**MUT-1 附带的现场名实不符（盘上日志原文，非转述）**：`v2-mut1-red.log:4` 被拒支印
+`msg="resident gate: [risk] source present but refused at construction; …" provenance="defaults (config.toml unreadable)"`——
+名字（"unreadable"）与事情（文件在场、被值域门拒）对不上，正是本票题面那句话的机器形状；`:5` 那一行 stdout 仍写 "is present but was refused at load" ⇒ **折叠态下两枚面自己先打起来**。还原后同一支印 `provenance="defaults (config.toml present but refused at load)"`（`v2-targeted-baseline-v.log` 4 处）。
+
+**与 r1 §5 名册的可比性（口径先说清，不冒充同尺）**：r1 跑形＝`-run 'TestTicket268|TestTicket256'`，本腿＝`-run 'TestTicket268'`（派单收窄）。
+⇒ 本腿**量不到**"票 256 五枚钉在这一发突变下是否仍绿"那一半（那是 r1 §5 三行都点名的隔离证），只复认三行的**红名册方向**：
+MUT-1 只红①（r1 同）／MUT-2 ②③ 双红（r1 同）／MUT-3 只红③（r1 同）。红句文本本腿与 r1 **逐字同**（三处都对得上台件行，见上）。
+
+**三形全种完后的收口（本节末行，逐格填）**：MUT-3 还原后 `md5sum` 双读同值＝`69a630bf350daf1032c62b921e9d7044`、
+`git diff --name-only -- cmd/wisp`＝**0 行**、测试文件 md5 未变＝`e2405a21bb278b558c1305ea95d34a9b` ⇒ **产码零净变化**、「除还原外未动测试文件与产码」成立。
 
 ## §3 名册差集（v1b 复跑名册 vs 268-r1 vs probes/257/v1）——**不重跑，从三枚现成文件算**
 
