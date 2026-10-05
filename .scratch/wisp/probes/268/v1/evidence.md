@@ -62,14 +62,39 @@
 
 ## §1 起手锚与四格判语
 
-「待验」（本节在整包/突变完成后填实并 commit；判语先立骨架）：
+AC#3／AC#4 由 `268-v1`/`268-v1b` 两腿在静态面判实（§5.4／§5.5）；**AC#1／AC#2 两格由续腿 `268-v2` 在 21:4x–22:0x 填实**（凭据节＝§2 三发自重突变＋§1.1/§1.2 展开）。
 
 | 格 | v1 判语 | 依据节 |
 |---|---|---|
-| AC#1 | 「待验」 | §0.2/§0.3/§2 |
-| AC#2 | 「待验」 | §0.3/§2 |
-| AC#3 | **达标**（v1 判，静态面；§5.4） | §5.1/§5.4/§4.5 |
-| AC#4 | **达标**（v1 判，静态面；§5.5） | §5.5/§4 |
+| AC#1 | **成立（达标档）**——独立具名＋两面到达眼睛＋折回同名必红由本腿自己种过（§2 MUT-1）。⚠ 两枚已知限：双击起法那一行看不得见（§6.3／r1 §6.1）、"被哪一条规则拒"分不开只到 class 级（§6.1）。展开＝§1.1 | §0.2／§0.3／§2 MUT-1／§5.4／§6.1／§6.3 |
+| AC#2 | **成立**——回落仍走编译常量 300 s（产码 diff 内 `return 0, 0` 两枚、零新增时长字面、`cmd/wisp` 产码全域 `300 * time.Second`＝**0 枚**），票 256 那枚仪器**定向复跑点名 5 枚全绿**，放宽面＝**零**。展开＝§1.2 | §1.2／§2 收口／§0.3／§5.5／§4 门 4 |
+| AC#3 | **达标**（v1 判，静态面；§5.4） | §5.1／§5.4／§4.5 |
+| AC#4 | **达标**（v1 判，静态面；§5.5） | §5.5／§4 |
+
+### 1.1 AC#1 的凭据（v2 现量，21:4x–22:0x）
+
+- **独立具名 provenance**：`riskProvenanceRefusedAtLoad = "defaults (config.toml present but refused at load)"`（`:456`）与 `riskProvenanceUnreadable`（`:446`）逐字不同名；四枚常量两两不同字面由用例① 钉（`…test.go:147` 那一枚 map 逐对检重）。§0.1/§2 收口两次双读确认本腿读的是交付态字节（`69a630bf…`）。
+- **至少一次到用户眼睛（派单分档＝日志具名＋stdout 行算达标）**：
+  1. 日志具名——被拒支 `slog.Warn`（`:496-499`，msg 含 "present but refused at construction"、多带 `"provenance"` attr）＋紧随的 `slog.Info` 同一枚 provenance；本腿还原后负控台件 `v2-targeted-after-restore.log` 里 `provenance="defaults (config.toml present but refused at load)"` 现量 **4 次**（`:5/:7/:11/:12`）。
+  2. stdout 行——`:510` 那枚 `fmt.Printf`，形抄 `resident_windows.go:187` 的 `[hotkey]` 母本；本腿行首尺 `grep -c '^wisp: resident \[risk\]: config.toml is present'` 在负控＝**1**、MUT-2 摘掉后＝**0**、MUT-1/MUT-3 未动它时＝**1**（三发同尺，见 §2 那把有坑的尺的具名）。
+- **MUT-1 必响的证据（本腿亲手种）**：`:456` 字面折回 `"defaults (config.toml unreadable)"` ⇒ 用例① 红、红句三枚逐字在 §2（`v2-mut1-red.log:9-11`）；同发日志现场印出 `msg="…present but refused…" provenance="defaults (config.toml unreadable)"`（`v2-mut1-red.log:4`）＝**名字与事情对不上**，正是本票题面那句的机器形状。⇒ 这一格的"具名"不是装饰：折掉就红，且红在**分不开两枚状态**那一句上。
+- **已知限（不冒充达标、也不据此判失败）**：① `-H=windowsgui` 双击无 console ⇒ 那一面只剩日志具名（=票面**最低档**），本腿量不到双击面（实机动作 ⛔ 不在本编队）；② `doctor` 零改动且有构建门代价、"回执"档在常驻腿无承接面——两枚事实已在 §6.3 交回，**分档裁量归编排者**；本腿按派单给的分档口径（日志具名＋stdout＝达标）判**成立**，并具名这成立的一半依赖"终端起法"。
+
+### 1.2 AC#2 的凭据（v2 现量）
+
+- **回落只能用编译常量 300 s**：
+  - 产码面：`git show 9a941965 -- cmd/wisp/resident_approval_windows.go` 的新增行里时长字面＝**0 枚**（`grep -E '^\+' | grep -c 'time.Second'`＝0），两枚回落都写成 `return 0, 0, <provenance>`（亲读 `:480`／`:513`）⇒ 机制交给 `approval.New` 的零值回落（`internal/agent/approval/queue.go:122 DefaultApprovalTimeout = 300 * time.Second`、`:131 DefaultL1Window = 3 * time.Second` 现量逐字在）。
+  - 本文件**不存私抄**：`grep -rn '300 \* time.Second' cmd/wisp/*.go | grep -v _test`＝**0 枚**（300 只在注释与 `"fallback"` 文案串里出现，见 §2 那四行 `DefaultApprovalTimeout=300s`）。
+  - 运行时面：负控台件 `v2-targeted-after-restore.log` 里四枚"回落形态"的构造回执逐枚印 `confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s`（`:4`/`:7`/`:12`/`:14`），其中归属被拒支的两枚＝`:7`（用例① 那一次）与 `:12`（用例② 那一次），各自紧跟同一枚 `provenance="…present but refused at load"`；尺＝`grep -c 'present but refused at load).*gate_queue_timeout=5m0s'`＝**2**。另有一枚 `confirm_timeout_sec_read=45 … gate_queue_timeout=45s`＝正控（45 走带内读取，不是回落）。⇒ 种进去的 20 **没有**变成活值（Q-77 仍关着；用例① `…test.go:161/:165` 那两枚断言 `== approval.DefaultApprovalTimeout`／`!= 20*time.Second` 钉住同一件事）。
+- **既有仪器保持绿（定向复跑点名，⛔ 未重跑整包）**：
+  `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test -count=1 -v -run 'TestTicket256' ./cmd/wisp/`（22:08:43→22:08:46，台件 `v2-targeted-256.log`＝8,971 字节，`rc=0`）⇒ **五枚顶层 `--- PASS` 逐枚点名**：
+  `TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConstants`／`…TakesTheSeededRiskTimeoutAndWindow`／`…RiskValuesAreConstructionTimeOnly`／`…OptionsFieldSetIsTheFiveItClaims`／`…ResidentBootPassesTheDataDirToTheGate`；`grep -c '^--- FAIL'`＝**0**。
+  这一发同时给 §2 的口径差补了半边：三发突变窗之外，268 的产码改动**没有把 256 那五枚钉碰红**。
+- **零放宽（三面）**：
+  1. 交付笔本身零放宽——`git diff --stat 9a941965^ 9a941965 -- cmd/wisp/resident_approval_risk_256_windows_test.go internal/`＝**空输出（0 行）**：256 那枚仪器（含 §0.4 亲读的 `:141-144` 300s 钉与 `:559-568` 构造名计数钉）与 `internal/` 全地界**零字节**；`internal/agent/approval/` 最后一笔＝`789a02e2`（259-r2），268 全链零触（§5.2 同读数）。
+  2. 值域零放宽——`internal/config/validate.go:128/129` 的 `[31, 3600]` 逐字在（§5.5），268 只在测试里**种**一个带外值 20 去撞门。
+  3. 本腿零放宽——三发突变只种产码、**每发跑完立刻还原**（§2 收口行：`69a630bf…` 双读同值＋scoped `git diff` 0 行＋测试文件 `e2405a21…` 双读同值）；⛔ 未压种子、未 `t.Skip`、未把 SKIP 读成通过（本腿三发**绿形**名册＝268 负控两发＋256 点名一发，逐发 `^--- FAIL`＝0、`SKIP` 字样＝0 枚）。
+- **⚠ 一格量不到（如实登记，不并入判语）**：AC#2 的"回落仍只能用编译常量"这一格，**跑任务腿**（`wisp run` 拒载即退、退码 2）与陪聊腿不在本腿射程（§5.4 只在静态面确认 268 没动它们）；跨腿一致性归 §6.3 交回的事实，本腿不代判。
 
 ## §2 突变名册（自重种三发）
 
