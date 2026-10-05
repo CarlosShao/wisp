@@ -1,0 +1,8 @@
+49c49
+< d22scan -self-test: type unparseable           ring   OK     a file the Go parser refuses | ranged on 1 finding(s): internal/probe/broken.go:1: [unparseable] C:\Users\swq\AppData\Local\Temp\d22scan-selftest-567867023\internal\probe\broken.go:5:2: expression in go must be function call
+---
+> d22scan -self-test: type unparseable           ring   OK     a file the Go parser refuses | ranged on 1 finding(s): internal/probe/broken.go:1: [unparseable] C:\Users\swq\AppData\Local\Temp\d22scan-selftest-3312682912\internal\probe\broken.go:5:2: expression in go must be function call
+51c51
+< d22scan -self-test: ban #1 bare-goroutine      silent OK     KNOWN BLIND SPOT B5: a bare goroutine inside a file that will not parse | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); other tags did fire here: internal/probe/brokenhidden.go:1: [unparseable] C:\Users\swq\AppData\Local\Temp\d22scan-selftest-483619697\internal\probe\brokenhidden.go:5:2: expression in go must be function call
+---
+> d22scan -self-test: ban #1 bare-goroutine      silent OK     KNOWN BLIND SPOT B5: a bare goroutine inside a file that will not parse | stayed silent while bans #1-5 + #8 internal/ Go walk examined 3 file(s); other tags did fire here: internal/probe/brokenhidden.go:1: [unparseable] C:\Users\swq\AppData\Local\Temp\d22scan-selftest-1992550103\internal\probe\brokenhidden.go:5:2: expression in go must be function call

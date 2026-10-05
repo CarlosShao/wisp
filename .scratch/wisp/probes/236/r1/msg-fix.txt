@@ -1,0 +1,34 @@
+style(161/236-r1): tools/d22scan/selftest.go 格式化到 gofumpt 干净（纯排版，语义零动）
+
+票 236 AC#6 的 2026-10-05 12:3x 增量那一格（236-r1）：普查腿 269-a1 在归档形状
+（git archive HEAD 整树）上量出 tracked 分母脏 19 至 20 枚，其中唯一一枚非台件真违规
+就是 tools/d22scan/selftest.go（首入库 5e8748b3，10-03，属票 161 那批编排者代提的码）。
+
+改动内容：gofumpt v0.12.0 自己 -w 重写的那枚文件，git diff --numstat = 2 增 2 删、
+1 个 hunk（@@ -373,8 +373,8 @@）。两行都在 selfSkeleton() 的 map 字面量里，改的是
+键与值之间的那串空格（注释行把对齐段截成两组，第二组最长键是
+internal/probe/roster.md）。字符串字面量、键、值、行数（640 对 640）、行尾（0 枚 CR）
+全部不变，字节数 25589 对 25583（少 6 枚空格）。
+
+第 0 步两把尺（先验前提再动笔）：
+一、真脏：归档形状单发 gofumpt -l tools/d22scan/selftest.go 吐出一行、rc=0
+（是"要格式化"不是"解析不过"）；同一枚文件的盘上字节、HEAD blob、归档三形 md5 全等
+（bbc0bd946e1117e437c58939e867112e）、CR 各 0 枚，排除本机 CRLF 污染那一族假读数。
+二、不是故意的载体：那 34 至 40 项双向 selftest 的钉全在 selftestsamples.go 与
+main.go 的名册里，readRosters 读的是 main.go 而不是本文件；grep 过 selftest.go
+在 Go 侧只有一处提及（selftestsamples.go:4 的一句散文注释），零枚 sha256／md5／字节数／
+"gofumpt 会点它"断言指向这枚路径（probes/161/r4/removed/sha256-*.txt 钉的是
+selftestsamples.go，另一枚文件）。逐行改动是否全在格式：是，对照表在证据件 §2。
+
+门禁（四读数 + 那枚模块自己那一套，改前改后各一发）：
+scripts/d22scan.sh clean rc=0；check-path-length-budget.sh --with-self-test
+VERDICT GREEN rc=0；go vet ./... rc=0；go test -count=1 ./... ok 19.087s rc=0；
+go run . -self-test rc=0 且 clean - all 40 direction checks passed（20 ring / 20 silent）。
+self-test 改前改后输出逐字对比只差 2 行的随机临时目录名，实质读数零漂移。
+
+禁区遵守：未碰 .scratch 任何台件、未改 .github/workflows/ci.yml 一个字、未加
+if: 或 continue-on-error、未删任何件、未动 main.go 的九条禁令射程与 allowlist.txt、
+未修普查名册里其余那批台件；票面 AC 框与台账一字未动。
+
+证据件 .scratch/wisp/probes/236/r1/evidence.md（含修完之后 tracked 分母名册，那正是
+Q-66 缺的那枚数，本笔 commit 之后另笔落档）。

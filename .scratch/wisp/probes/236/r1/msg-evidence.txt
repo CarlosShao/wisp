@@ -1,0 +1,38 @@
+docs(evidence/236-r1): 修完那一枚非台件真违规之后的名册与读数（Q-66 缺的那枚数＝19 枚、全在 .scratch）
+
+件＝.scratch/wisp/probes/236/r1/evidence.md（353 行／33,362 字节／占位 0 枚），
+读数码件在 logs/（17 枚，只建不删）。上一笔 b3eabab7 是那枚产码格式化，本笔只交证据。
+
+§3 那枚数（本腿存在的理由）：锚 b3eabab7（我自己的 commit）、时刻 2026-10-05 12:45:58 +0800、
+口径＝整树归档（find -type f 5869 对 git ls-tree 5869 相等）× tracked 全集 924 枚 .go ×
+gofumpt v0.12.0 × stdout 与 stderr 两路都收。读数＝**19 枚，每一枚都落在 .scratch/wisp/probes/**，
+非台件 0 枚**。修前同一把尺在同一棵归档的父锚 0793e35e 上＝20 枚（非台件 1 枚），
+两本名册 diff 恰好一行＝tools/d22scan/selftest.go。HEAD 漂到 14dc6f48（12:47:05，多的 37 枚 tracked 件
+都在别处、.go 分母仍 924）复跑一次仍 19 枚、diff 空。19 枚逐枚给了路径、归属票号与"票面在"判定。
+
+§1 第 0 步两把尺原文：真脏（归档形单发打印该文件、rc=0，另有 stdin 形复现；三形 md5 全等＋CR 各 0 枚
+排除本机 CRLF 那一族假读数）；不是故意的载体（八处候选 P1 至 P8 逐枚读原文：名册尺读的是 main.go、
+去重尺读的是 selfCases、sha256 那两枚钉的是 selftestsamples.go、161 那把 attrib.sh 的 tracked 正控用的
+是 main.go，本模块内零枚判格式的尺）。
+
+§2 改动对照：2 增 2 删、1 枚 hunk、等长替换（640 行对 640 行）=> 全仓 selftest.go:<N> 的引用一枚都不失效
+（三枚点名行逐枚复量到位）；改的是 selfSkeleton() 第二对齐组里键与值之间的空格，合计少 6 字节，
+字符串字面量逐字节未动；改法由 gofumpt -w 本体产出，不是手敲。
+
+§4 门禁带时刻：d22scan.sh clean rc=0（12:40:49 与 12:48:46、12:50:10）；check-path-length-budget.sh
+--with-self-test VERDICT GREEN rc=0（12:41:28 与 12:49:13）；go vet rc=0（12:41:34 与 12:43:13）；
+go test -count=1 ./... ok 19.087s rc=0（12:43:14，改前 23.887s 同绿）；go run . -self-test rc=0、
+40 项双向全过（20 ring／20 silent，改前改后名册行逐字相同，两发全量输出 diff 只差随机临时目录名）。
+
+两处具名的坑（归编排者，本腿不改台账）：
+一、派单按 A620 写的"34 项"是过期数——改前基线就是 40 项（票 212 那批加了 ban #9 样本；
+212 的验收件现跑写的是 37 cases）。判据"项数掉了＝本腿改坏"未触发。
+二、我这枚改动让 probes/212/v1/verdict-first-instance.md:8 记的那枚历史 md5（bbc0bd94…）不再可复现；
+新值 b56c7636473283cf453fee9178e53498 与新旧覆盖区间都写在 §5 第 3 条，给那条读数留桥。
+
+量不到（§5 逐枚具名）：attrib.sh 本体未执行（它与 :168 吃同一批字节是我在同一棵归档上复算的名册实测，
+它的退码映射是按脚本文本读的）；CI 那台的真实颜色需真发 run；gofumpt 在 ci.yml 里写 @latest，有版本漂移风险。
+
+禁区自证：台件一枚未动（形 II 未裁）、ci.yml 零字节（形 I 等 Q-66）、if: 零枚（形 III 未分离落地）、
+未删任何件、main.go 九条禁令与 allowlist.txt 零字节、票面与台账零字节、frontend 与 design 连读都没读；
+两笔 commit 都带显式 pathspec、零 git add、零 push，那 35 枚别人的 staged 料（probes/257/v1/）全程未被动过。
