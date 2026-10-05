@@ -1,0 +1,28 @@
+fix(evidence/236-r1): 自纠——我自己把两份 Go 源副本以 .go 后缀入库，顶了格式门的分母（改名不动字节）
+
+第三笔（236-r1）。前两笔：b3eabab7（把 tools/d22scan/selftest.go 格式化到 gofumpt 干净）、
+cfd97636（交证据件与 logs/）。
+
+本笔的缺陷与自纠（我自己在 cfd97636 造出来的）：
+为留"改前/改后逐字节对照"，我把两份 Go 源副本放进了 .scratch/wisp/probes/236/r1/logs/ 并以 .go 后缀入库。
+现量后果（尺＝整树归档 × git ls-tree 的 tracked *.go × gofumpt -l，stdout＋stderr 两路，13:05:38 现跑）：
+  锚 cfd97636：tracked .go 分母 924 -> 926；脏样名册 19 -> 20；
+  多出来的那一枚就是 .scratch/wisp/probes/236/r1/logs/arc236-selftest-orig.go（它正是修前那份脏字节的本体，
+  被 gofumpt 点名、rc=0）。
+=> 我一边交付"非台件 0 枚"，一边把名册顶回 20，与本票要治的那一形同病（票 185 的 fs_broken.go、259/r1 的负控）。
+   "落在 .scratch 下"不等于"无害"——这条尺我在 §3 口径里写明了却没用在自己新入库的件上。
+
+处置（走本仓既有先例＝票 267 models.go -> models.go.pristine，只改后缀、不动字节）：
+  git mv logs/arc236-selftest-orig.go  -> logs/arc236-selftest-orig.go.pristine
+  git mv logs/arc236-selftest-fixed.go -> logs/arc236-selftest-fixed.go.pristine
+  md5 逐枚全等（改前改后）：orig bbc0bd946e1117e437c58939e867112e、fixed b56c7636473283cf453fee9178e53498。
+  未删任何件（issues/README 规则 8），临时件只建不删；rename 相似度 100%（两枚 R100）。
+证据件同步更正：§6 commit 名册补第三笔与这一段自纠、§7 新增第 8 条（我漏掉的那把尺）、
+§0 的"零 git add"改写为实情（commit 1 零 add，commit 2/3 用逐枚点名的 add 与 git mv，全程无 add -A/add .、笔笔带 pathspec）、
+§2/§6 内引用的两份副本文件名跟着改后缀（逐枚存在性尺复跑，无 phantom）。
+
+那枚交付数不受影响：§3 的 19 枚是在 b3eabab7 与 14dc6f48 两锚上取的，当时我这两枚 .go 副本还没入库；
+本笔之后在新锚上复跑一次，读数与名册随第四笔落 logs/final-roster.txt。
+
+其余面：产码零改动（本笔只碰 .scratch/wisp/probes/236/r1/**）、ci.yml 零字节、if: 零枚、
+main.go 九条禁令与 allowlist.txt 零字节、票面与台账零字节。

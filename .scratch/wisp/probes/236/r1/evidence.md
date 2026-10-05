@@ -30,8 +30,9 @@
   下载的那版同版 => 本件的数与 CI 那台检出同尺）。
 - 起手时工作树脏度（【禁】不是本腿的）：`git status --porcelain | wc -l` ＝ **697**；
   `git diff --cached --name-only | wc -l` ＝ **35**（逐枚看过，全在 `.scratch/wisp/probes/257/v1/` 下＝在飞腿 `257-v1` 的暂存料）。
-  本腿全程**零 `git add`**，两笔 commit 都带显式 pathspec；commit 之后复量 `git diff --cached --name-only | wc -l` ＝ **35（原封不动）**，
-  这一把是"没卷走别人 staged 文件"的凭据。
+  commit 1（那枚产码格式化）**零 `git add`**、只带显式 pathspec，commit 之后复量 `git diff --cached --name-only | wc -l` ＝ **35（原封不动）**，
+  这一把是"没卷走别人 staged 文件"的凭据。commit 2／3 要新建与改名 `logs/` 下的件，用了**逐枚点名**的 `git add <路径>`／`git mv <旧> <新>`
+  （`add -A`、`add .` 全程零枚，三笔 commit 每一笔都带 pathspec；两笔的载荷逐枚核过＝只含 `236/r1/**`，见 §6）。
 - 在飞腿地界：`cmd/wisp`（`257-v1`）、`internal/agent/approval`（`259-r2`）＝**未读、未跑、未归因**。
   本腿跑过的 Go 仪器只有 `tools/d22scan` 那一枚模块自己那一套（§4）。
 
@@ -142,7 +143,7 @@ git grep -nE 'selftest\.go:[0-9]' HEAD
   第一组最长键是 `tools/d22scan/allowlist.txt`（`:373`，仍在原对齐位上、本腿未动），
   第二组最长键是 `internal/probe/roster.md`（25 字符）=> gofumpt v0.12.0 要求第二组按**它自己那组**的最长键补齐，
   于是 `docs/readings.md` 少 3 空格、`internal/probe/roster.md` 少 3 空格。合计少 **6 字节**（25589 对 25583，实测）。
-- **改法不是我手敲的**：`gofumpt -w` 对一份副本（`logs/arc236-selftest-orig.go` -> `logs/arc236-selftest-fixed.go`）跑完，
+- **改法不是我手敲的**：`gofumpt -w` 对一份副本（`logs/arc236-selftest-orig.go.pristine` -> `logs/arc236-selftest-fixed.go.pristine`）跑完，
   `diff -u` 只有上面那一个 hunk，才把结果落到工作树 => 判它脏的那把尺就是把它改干净的那把尺，不留"我理解格式"的余地。
 - 逐枚改动行是否全在格式＝**是**（2 对 2，成对同句；键/值/字符串字面量/注释/行数/行尾全不变，`0 枚 CR` 改后复量仍为 0）。
 - 未做的事：未顺手调整第一组对齐、未动 `:373`、未动该文件任何注释文字（注释里那句"Ticket 212's wantSilent case cites these two"逐字保留）、
@@ -290,17 +291,35 @@ diff logs/arc236-selftest-before.txt logs/arc236-selftest-after.txt -> 8 行 / 1
 | 笔 | sha（短） | 时刻 | 内容 | pathspec | numstat |
 |---|---|---|---|---|---|
 | 1 | `b3eabab7` | `2026-10-05 12:44:50 +0800` | `style(161/236-r1): tools/d22scan/selftest.go 格式化到 gofumpt 干净（纯排版，语义零动）` | `-- tools/d22scan/selftest.go` | `1 file changed, 2 insertions(+), 2 deletions(-)`；`^@@` 计数＝1 |
-| 2 | 本笔 | 落档时刻见 commit 本体（`git log -1`） | 证据件＋`logs/` 读数码＋`msg-fix.txt` | `-- .scratch/wisp/probes/236/r1` | 只增不删（本目录内） |
+| 2 | `cfd97636` | `2026-10-05 12:58:58 +0800` | `docs(evidence/236-r1): 修完那一枚非台件真违规之后的名册与读数（Q-66 缺的那枚数＝19 枚、全在 .scratch）` | `-- .scratch/wisp/probes/236/r1` | 16 枚新建（`evidence.md`＋`msg-*.txt`＋`logs/**`），0 删 0 改 |
+| 3 | 本笔 | 落档时刻见 commit 本体（`git log -1` 现读） | 收尾：把 commit 2 里我自己以 `.go` 后缀入库的两枚读副本改成 `.go.pristine`（只改后缀、不动字节）＋本件的 §6／§7／§8 更正 | `-- .scratch/wisp/probes/236/r1` | 2 枚改名（`git mv`，rename 相似度 100％）＋本件若干行更正 |
 
-- commit 父＝`0793e35e`（现读 `git rev-parse b3eabab7^`）。
-- 那 35 枚别人的 staged 料在 commit 1 之后仍在索引里（复量 `git diff --cached --name-only | wc -l` ＝ 35，逐枚名仍全在 `probes/257/v1/`）
-  => 没有"先 `git add` 再裸 commit"，也没卷走别人。
-- 未 push（`git status -sb` 本腿全程只 commit）；`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`add -A`／`add .`／`rm` 零次。
-- 临时件全部只建不删：`/tmp/arc236`、`/tmp/arc236-pre`、`/tmp/arc236-post`、`/tmp/arc236-head`（三份整树归档，各约整树体积）、
+- commit 1 的父＝`0793e35e`（现读 `git rev-parse b3eabab7^`）；commit 2 的父＝`6c96a425`（现读 `git rev-parse cfd97636^`，
+  那是 257-v1 在 12:56:34 的结案笔；12:44 到 12:58 之间 HEAD 走了 4 枚，全是别人的入库，锚漂是常态）。
+- **我这枚 commit 2 自己造过一次分母污染（自纠，具名）**：为留"改前／改后逐字节对照"，我把两枚 Go 源副本
+  以 **`.go` 后缀**放进了 `logs/` 并入库 => tracked `.go` 分母从 924 顶到 **926**，
+  且那枚改前副本（`arc236-selftest-orig.go`，＝修前的脏字节本体）在归档形上被 `gofumpt -l` **点名**（现读：打印该路径、rc=0）。
+  => 我一边交付"非台件 0 枚"，一边亲手往名册里加了一枚新的脏台件——这正是本票要治的那一形（`A620` 的 19->20 同源）。
+  修法走本仓既有先例（票 267 `pristine/models.go` -> `models.go.pristine`；普查件 §2 乙-1 尺＝在册 17 枚 `.pristine`）＝**只改后缀、不动字节**，
+  两件 md5 逐枚全等：改前改后都 `bbc0bd946e1117e437c58939e867112e`（orig）与 `b56c7636473283cf453fee9178e53498`（fixed）。
+  改后复尺：`git ls-files -z '*.go' | tr -dc '\0' | wc -c` ＝ **924**、本目录下 `.go` 在册 ＝ **0 枚**（终尺见 §8 末条）。
+  这一枚**未被删**（`issues/README` 规则 8 只建不删）、改名前后字节全等；而 §3 那枚 **19** 是在 `b3eabab7` 与 `14dc6f48` 两锚上取的，
+  当时我的 `.go` 副本还没入库 => **那枚数不受本次污染影响**；受影响的是"12:58 之后在新锚上复跑"的人，故此段把机制写全。
+- 那 35 枚别人的 staged 料在 commit 1 之后仍在索引里（**12:44 现读** `git diff --cached --name-only | wc -l` ＝ 35，逐枚名全在 `probes/257/v1/`）
+  => 没有"先 `git add` 再裸 commit"，也没卷走别人。这 35 枚此后由 **257-v1 自己在 `6c96a425`（12:56:34）结的案**，
+  索引里今天只剩 2 枚＝本腿 commit 3 那两枚改名（现读，见下条），不是别人的料被动过。
+- commit 2 用 `git add <逐枚点名的路径>` ＋ `git commit -F msg -- <同一批点名 pathspec>`
+  （新件非入库不可；两把都点名到枚，未用 `-A`／`.`；尺＝commit 2 的 `--name-only` 16 行**全部**在 `236/r1/**` 下，
+  与当时索引里那 35 枚 `257/v1/**` 交集＝**0 枚**，逐枚 `grep -c 257` 现读那两笔（1 与 2）都是 0）。
+- 未 push（`git status -sb` 本腿全程只 commit）；`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`add -A`／`add .`／`rm` 零次；
+  `git mv` 2 次（只动后缀，commit 3 内，逐枚 md5 全等）。
+- 临时件全部只建不删：`/tmp/arc236`、`/tmp/arc236-pre`、`/tmp/arc236-post`、`/tmp/arc236-head`、`/tmp/arc236-fix`（五份整树归档）、
   `/tmp/arc236-selftest-{orig,fixed,before,after,delta}.*`、`/tmp/census-{pre,post,head}.{out,err}`、`/tmp/golist-*.z`、
-  `/tmp/gate-{d22scan,pathlen}-post-full.txt`、`/tmp/ci168-post.roster`；其中关键件已复制进 `logs/`（下表），
+  `/tmp/gate-{d22scan,pathlen}-post-full.txt`、`/tmp/ci168-post.roster`；其中关键件已复制进 `logs/`，
   `logs/` 里被当"可重跑凭据"引用的东西本腿一枚不许删。
-- 仓内未落任何 `/tmp` 归档副本（尺：`git status --porcelain -- tools/d22scan` 在 commit 1 前后都只那一枚 M；工作树里除本腿那枚文件外无新增产码改动）。
+- 仓内未落**整树归档**副本（尺：`git status --porcelain -- tools/d22scan` 在 commit 1 前后都只那一枚 M；
+  工作树里除本腿那枚产码文件外无新增改动；`/tmp/arc236*` 五棵树全部留在 `/tmp`）
+  ——但 commit 2 确实把两枚**单件**副本带进过仓库目录（就是上面自纠那一格），本行的原口径"一枚未落"是错的，已按实改写。
 - **`logs/` 两枚件的带内符号具名（不是我写的）**：`logs/arc236-selftest-before.txt` 与 `logs/arc236-selftest-after.txt` 各有 1 行含一枚
   带圈小写字母 a（U+24D0，落在这件的禁带里，本件不用字形本体、只点名码位），
   那是 `-self-test` 自己打印的 `selftestsamples.go` 注行原文（票 260 那一族的形号）。这两枚是**仪器逐字节输出**，
@@ -331,6 +350,18 @@ diff logs/arc236-selftest-before.txt logs/arc236-selftest-after.txt -> 8 行 / 1
    两锚 tracked 全量与 `.go` 分母逐枚对齐（5869 对 5869、924 对 924），差集才敢写成"恰好一行"。
 7. **`ci.yml:184` 的退码我一度写成实测**：那是脚本语义推断。=> 降级为"名册同一批＝实测；退码映射＝按文本读"，
    具名进 §5 第 4 条，不冒充跑过的读数。
+8. **我自己造了一枚新的脏台件（这一条是本腿的缺陷，不是读数误差）**：commit 2 把改前/改后的两份 Go 源副本
+   以 `.go` 后缀放进 `logs/` 并入库 => tracked `.go` 分母 924 -> **926**，其中那份**改前**副本就是修前的脏字节本体，
+   在归档形上被 `gofumpt -l` 点名（现读打印该路径、rc=0）。
+   原来怎么读："我只是复制读数码件，且都在 `.scratch` 下，不碰别人写的东西＝合规"。
+   现在怎么读：**"落在 `.scratch` 下"不等于"无害"**——本票的命题就是"入库的 `.go` 台件会顶格式门的分母"，
+   我一边交"非台件 0 枚"、一边把名册从 19 顶回 20，是同一种病的第三次发作（前两次＝票 185 的 `fs_broken.go`、`259/r1` 的负控）。
+   尺是什么：`git ls-tree -r --name-only <锚> | grep -cE '\.go$'`（924/926 两发）＋`git archive <锚> | tar -x` 后
+   `gofumpt -l .scratch/wisp/probes/236/r1/logs/`（打印那一枚）。
+   处置：commit 3 按本仓既有先例（票 267 `models.go` -> `models.go.pristine`）**只改后缀、不动字节**，md5 逐枚全等；
+   未删任何件，`logs/` 里两份对照原件逐字节仍在（改名后仍可 `cmp` 回 §2 那四行）。
+   我为什么没在 commit 2 之前发现：我当时的自检只扫了"符号带／占位符／pathspec"，**没有把"新入库的 `.go` 会不会进那把我自己交付的尺的分母"**
+   列成一条尺——这条恰好是本件 §3 口径第 2 条写明的东西。=> 已把该尺补进 §8 末条，交付前对新锚复跑一次。
 
 ---
 
@@ -347,7 +378,11 @@ diff logs/arc236-selftest-before.txt logs/arc236-selftest-after.txt -> 8 行 / 1
    => 交给 `Q-66` 的那半句现在是：**"形 I 剔除台件之后，非台件剩 0 枚"**（修之前是 1 枚），
    而**"形 I 之后 `:168` 会不会绿"本腿不替它答**——因为 `185/c1/mut/fs_broken.go` 那枚走 stderr 的解析错误（单发 rc=2）不属"格式脏"那一档，
    它把 `xargs` 聚合顶到 123 这一条我在修前修后各测一次（都是 123）。档与不档的分别是：18 枚纯格式＋1 枚解析错误，共 19 枚，全在台件目录里。
-4. **禁区自证**：`.scratch/**` 台件零字节（我这枚 commit 的 pathspec 只有那一枚产码文件）、`ci.yml` 零字节、
-   新增 `if:`/`continue-on-error` 零枚、未删任何件、`main.go` 九条禁令与 `allowlist.txt` 零字节、
+4. **禁区自证**：`.scratch/**` 别人的台件零字节（我那三笔 commit 的 pathspec 只到 `-- tools/d22scan/selftest.go` 与 `-- .scratch/wisp/probes/236/r1`）、`ci.yml` 零字节、
+   新增 `if:`/`continue-on-error` 零枚、未删任何件（commit 3 是 `git mv` 改后缀，md5 逐枚全等）、`main.go` 九条禁令与 `allowlist.txt` 零字节、
    普查名册里其余 19 枚一枚未顺手修、票面与台账零字节、`frontend/**`／`design/**` 连读都没读。
 5. **本腿不判**：形 I／II／III 的取舍、`Q-66` 要不要摆与怎么措辞、`:184` 那步的真实退码、票面 AC 框翻勾、台账 `A##` 追加——全归编排者。
+6. **交付前那把我漏掉的尺，补在这里（新锚复跑）**：本腿三笔全部入库后，在**含 commit 3 的锚点**上重跑 §3 那把尺
+   （整树归档 × tracked 全集 × gofumpt `-l` × stdout＋stderr），并把"我自己那枚 commit 的 `.go` 载荷"单列一枚数。
+   本笔（commit 3）交的是改名与更正；那把尺的真实读数与名册落在**第四笔**的 `logs/final-roster.txt`（本行引用它时它在盘上还不存在，
+   这一句就是那条自陈，不是空格），那一笔只交读数、不再改产码。
