@@ -45,6 +45,18 @@ type PathCanonicalizer struct {
 	// It can only ever TIGHTEN InAllowlist - a workspace outside the roots is
 	// refused at switch time - so no workspace choice can widen authority.
 	workspace string
+	// workspaceAccount is C26's own answer about the spelling that produced the
+	// narrowing above (ticket 181 AC#7). It is written and cleared under the
+	// same lock as workspace, by the same call, and it exists because a root
+	// handed out as a bare string cannot carry ticket 102's book: the reader of
+	// the current root then reports "no expansion substituted anything" whether
+	// or not anything did, and the two consumers of that account
+	// (internal/panel's git dimension and its project-instruction request) are
+	// branches no producer can ever reach. The account is data this package
+	// already had and threw away - ResolveWorkspace returns it to the caller,
+	// and the caller's Actable() check is what keeps a rewritten one from ever
+	// arriving through the panel's own door.
+	workspaceAccount risk.Result
 }
 
 // NewPathCanonicalizer resolves the allowlist roots through C26 once and

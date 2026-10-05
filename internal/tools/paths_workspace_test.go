@@ -53,7 +53,7 @@ func TestWorkspaceSwitchNarrowsWhatTheAssessorJudges(t *testing.T) {
 		t.Fatalf("premise: an in-allowlist write with no workspace chosen assessed %q (%v), want L1",
 			before.Level, before.RulesHit)
 	}
-	if canon.WorkspaceRoot() != "" {
+	if canon.WorkspaceRoot().Canonical != "" {
 		t.Fatal("premise: a fresh canonicalizer already reports a workspace")
 	}
 
@@ -61,7 +61,7 @@ func TestWorkspaceSwitchNarrowsWhatTheAssessorJudges(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveWorkspace(%s) = %v, want success", wsA, err)
 	}
-	if err := canon.SetWorkspaceRoot(res.Canonical); err != nil {
+	if err := canon.SetWorkspaceRoot(res.Canonical, res); err != nil {
 		t.Fatalf("SetWorkspaceRoot: %v", err)
 	}
 
@@ -106,8 +106,8 @@ func TestWorkspaceSwitchRefusesOutOfScopeAndMissingPaths(t *testing.T) {
 	} else if !strings.Contains(err.Error(), "allowed_dirs") {
 		t.Errorf("out-of-scope refusal said %q, want it to name the allowlist", err)
 	}
-	if canon.WorkspaceRoot() != "" {
-		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot())
+	if canon.WorkspaceRoot().Canonical != "" {
+		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot().Canonical)
 	}
 
 	if _, err := canon.ResolveWorkspace(filepath.Join(inside, "does-not-exist")); err == nil {
@@ -121,12 +121,12 @@ func TestWorkspaceSwitchRefusesOutOfScopeAndMissingPaths(t *testing.T) {
 	if _, err := none.ResolveWorkspace(inside); err == nil {
 		t.Error("a workspace was accepted with an empty allowlist")
 	}
-	if err := none.SetWorkspaceRoot(inside); err == nil {
+	if err := none.SetWorkspaceRoot(inside, risk.Result{Canonical: inside}); err == nil {
 		t.Error("SetWorkspaceRoot accepted an unauthorized root with an empty allowlist")
 	}
 	// Handing SetWorkspaceRoot a raw path that was never resolved is the other
 	// way a caller can get it wrong.
-	if err := canon.SetWorkspaceRoot(outside); err == nil {
+	if err := canon.SetWorkspaceRoot(outside, risk.Result{Canonical: outside}); err == nil {
 		t.Error("SetWorkspaceRoot accepted a path outside the roots without resolving it")
 	}
 }
@@ -184,8 +184,8 @@ func requireRewritten(t *testing.T, res risk.Result, err error, canon *PathCanon
 	if !errors.Is(err, risk.ErrRewrittenPath) {
 		t.Errorf("refusal %q does not carry risk.ErrRewrittenPath (res.Rewritten=%v) - the account was not read", err, res.Rewritten)
 	}
-	if canon.WorkspaceRoot() != "" {
-		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot())
+	if canon.WorkspaceRoot().Canonical != "" {
+		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot().Canonical)
 	}
 	t.Logf("expanded spelling refused as required: %v", err)
 }
@@ -214,8 +214,8 @@ func TestWorkspaceSwitchRefusesAJunctionToOutside(t *testing.T) {
 	if !errors.Is(err, risk.ErrReparseDenied) {
 		t.Errorf("refusal %q is not risk.ErrReparseDenied; the reason shown to the user must be C26's own", err)
 	}
-	if canon.WorkspaceRoot() != "" {
-		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot())
+	if canon.WorkspaceRoot().Canonical != "" {
+		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot().Canonical)
 	}
 	t.Logf("junction workspace refused with C26's reason: %v", err)
 }

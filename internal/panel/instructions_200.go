@@ -104,15 +104,19 @@ type ProjectInstructionLoadRequest struct {
 // view yields no directory at all - not the workspace, not the global tier -
 // plus the sentence the host prints and the loader prints once per turn.
 //
-// MEASURED TODAY (the same honest note internal/panel/git.go:260-266 carries for
-// GitViewRewritten): no producer in this tree hands out a view with
-// Rewritten=true. RequestWorkspaceSwitch refuses a rewritten spelling at
-// workspace.go:85 through res.Actable() before it ever builds the view at
-// :104-111, so a view that reaches here has Rewritten == false. This branch is
-// defence in depth for the day upstream loosens - ticket 181 AC#7's open item is
-// exactly "fill the producer side of the account with true values" - and it is
-// not decorative: TestRewrittenWorkspaceViewYieldsNoDirectoryAtAll runs a real
-// loader over real files and requires it to read neither tree.
+// MEASURED TODAY (re-measured by ticket 181 AC#7's producer leg, 181-r3; the
+// honest note this paragraph carried at 200-r2 is now out of date): a view with
+// Rewritten=true IS reachable through the snapshot path, because
+// WorkspaceViewFromRoot now renders the C26 account internal/tools records for
+// the narrowing in force instead of dropping it. What has NOT changed is the
+// panel's own door: RequestWorkspaceSwitch still refuses a rewritten spelling
+// at workspace.go through res.Actable(), so no composer request can put this
+// branch in force - only a host that names the expanded tree can. That is
+// ticket 102's rule, not a gap, and this branch stays non-decorative for the
+// same reason it was written: TestRewrittenWorkspaceViewYieldsNoDirectoryAtAll
+// runs a real loader over real files and requires it to read neither tree, and
+// TestWorkspaceAccountReachesEveryConsumer drives the account all the way from
+// a path scope's answer to this refusal.
 func ProjectInstructionLoadRequestFor(ws WorkspaceView, globalDir string) ProjectInstructionLoadRequest {
 	if ws.Rewritten {
 		return ProjectInstructionLoadRequest{

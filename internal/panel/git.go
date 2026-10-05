@@ -257,13 +257,23 @@ func ReadGitForWorkspace(ws WorkspaceView) GitView {
 // the account — is the disease this function exists to close, and is not
 // implemented anywhere.
 //
-// MEASURED TODAY: this branch is unreachable on the current tree. The only
-// producer that ever sets WorkspaceView.Rewritten is RequestWorkspaceSwitch
-// (workspace.go:104-111), and its success path runs after res.Actable() at
-// workspace.go:85, which errors on any rewritten spelling — so a view that
-// reaches the packet has Rewritten == false. The branch is defence in depth for
-// the day the upstream loosens, which is the same reason workspace.go:83-85
-// re-reads the account "on the native side of the boundary".
+// WHAT THE ACCOUNT CARRIES TODAY (ticket 181 AC#7, rewritten after 181-r3
+// filled the producer side): the snapshot path builds its view with
+// WorkspaceViewFromRoot(scope.WorkspaceRoot()), and internal/tools now hands
+// back the C26 Result that produced the narrowing, so Rewritten here is a
+// READING of that book instead of a field no producer was ever able to fill -
+// which is the difference this branch needed to stop being decoration.
+//
+// The panel's own door still cannot produce rewritten=true, and that is a
+// safety property rather than the old gap: RequestWorkspaceSwitch reads
+// res.Actable() at workspace.go before it authorises anything,
+// internal/tools/paths_workspace.go reads it once more inside ResolveWorkspace,
+// and SetWorkspaceRoot now refuses any account that does not describe the root
+// it is handed. So a rewritten account reaches this branch only when a caller
+// took C26's expanded answer and then named THAT tree by itself, which is the
+// one use ErrRewrittenPath's own sentence allows.
+// TestWorkspaceAccountReachesEveryConsumer names the route and checks the
+// packet says it out loud.
 func GitViewRewritten(ws WorkspaceView) GitView {
 	view := ReadGit(ws.Canonical)
 	view.Reason = "注意：这条工作区路径被 C26 的展开步改写过（账户 rewritten=true），" +

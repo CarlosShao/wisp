@@ -27,6 +27,11 @@ package tools
 //   - the selected tree must already be inside the [fs] allowed_dirs roots, so
 //     a workspace switch can only ever NARROW scope (see InAllowlist below),
 //     and an empty allowlist still authorizes nothing.
+//   - the account is KEPT, not just read (ticket 181 AC#7): WorkspaceRoot
+//     answers with the C26 Result that produced the narrowing, so the panel's
+//     snapshot path is a producer of ticket 102's book instead of a place where
+//     it was thrown away. SetWorkspaceRoot binds the account to the coordinate
+//     it describes, and ClearWorkspace drops both together.
 
 import (
 	"fmt"
@@ -35,12 +40,38 @@ import (
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
-// WorkspaceRoot returns the narrowed workspace root, or "" when the session is
-// running on the configured roots alone.
-func (p *PathCanonicalizer) WorkspaceRoot() string {
+// WorkspaceRoot returns the narrowed workspace AS C26 reported it (ticket 181
+// AC#7). The zero Result - Canonical == "" - means "nothing was narrowed": the
+// session runs on the configured roots alone, which is every run that never
+// touched a composer.
+//
+// WHY THIS RETURNS AN ACCOUNT AND NOT A STRING. WorkspaceView.Rewritten is read
+// by two consumers (internal/panel's ReadGitForWorkspace and
+// ProjectInstructionLoadRequestFor), and a producer that hands out a bare
+// string cannot fill it: the only thing the caller could do was leave the field
+// at its zero value, so the account read as false on every packet, including
+// the ones where C26 had said otherwise. That is ticket 181 AC#7 measured, and
+// it is the same disease ticket 102 closed on the write side - a verdict taken
+// on a coordinate whose expansion account was dropped.
+//
+// WHAT THIS IS NOT: a loosening. The narrowing itself is unchanged (inRoots
+// still gates it, InAllowlist still compares against the same fold key), and
+// neither refusal moves: a %VAR% or ~ spelling is still refused here at
+// ResolveWorkspace and again on the panel side of the boundary at
+// workspace.go's own res.Actable(). Rewritten == true can therefore only be
+// recorded by a caller that took C26's expanded answer and then named THAT tree
+// - which is exactly what ErrRewrittenPath's own sentence permits ("act on the
+// expanded tree only if you asked for it by name"). When it does, the account
+// travels with the coordinate instead of being smoothed over, and the two
+// consumers above say so out loud.
+func (p *PathCanonicalizer) WorkspaceRoot() risk.Result {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	return p.workspace
+	acc := p.workspaceAccount
+	// Rewrites is a slice: handing out the stored backing array would let a
+	// reader append into the canonicalizer's own book.
+	acc.Rewrites = append([]string(nil), p.workspaceAccount.Rewrites...)
+	return acc
 }
 
 // ResolveWorkspace runs the three checks a workspace request must pass before
@@ -76,10 +107,17 @@ func (p *PathCanonicalizer) ResolveWorkspace(input string) (risk.Result, error) 
 }
 
 // SetWorkspaceRoot narrows subsequent judgements to root, which MUST already
-// have come from ResolveWorkspace. A root outside the allowlist is refused
-// here as well: this is the last place a caller can still get it wrong, and the
+// have come from ResolveWorkspace, and records acc as the only account that
+// belongs to it (ticket 181 AC#7). A root outside the allowlist is refused here
+// as well: this is the last place a caller can still get it wrong, and the
 // narrowing must be structurally impossible to widen.
-func (p *PathCanonicalizer) SetWorkspaceRoot(root string) error {
+//
+// The account is not decoration, and it is not a free variable either: it has
+// to describe THIS root (foldPath(acc.Canonical) == foldPath(root)) or the call
+// is refused. Before this ticket the setter took a bare string, so an account
+// could not be attached even by a caller that held one, and a packet reading the
+// current root had nothing to be truthful about.
+func (p *PathCanonicalizer) SetWorkspaceRoot(root string, acc risk.Result) error {
 	if strings.TrimSpace(root) == "" {
 		return fmt.Errorf("tools: 工作区根为空（用 ClearWorkspace 取消收窄）")
 	}
@@ -87,17 +125,25 @@ func (p *PathCanonicalizer) SetWorkspaceRoot(root string) error {
 	if !p.inRoots(f) {
 		return fmt.Errorf("tools: 拒绝把工作区设为未授权的目录 %q", root)
 	}
+	if foldPath(acc.Canonical) != f {
+		return fmt.Errorf("tools: 拒绝收窄：%q 的 C26 账户说的是另一棵树 %q，账户必须描述它所依附的那枚坐标（票 181 AC#7）",
+			root, acc.Canonical)
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.workspace = f
+	p.workspaceAccount = acc
 	return nil
 }
 
-// ClearWorkspace removes the narrowing (back to the config roots alone).
+// ClearWorkspace removes the narrowing (back to the config roots alone), and
+// with it the account: an answer about a tree that is no longer in force is a
+// phantom coordinate in the packet, not a fact about the current one.
 func (p *PathCanonicalizer) ClearWorkspace() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.workspace = ""
+	p.workspaceAccount = risk.Result{}
 }
 
 // inRoots is the allowlist question WITHOUT the workspace narrowing - the check

@@ -25,6 +25,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/CarlosShao/wisp/internal/risk"
 )
 
 // ------------------------------------------------------------- fixtures
@@ -537,8 +539,10 @@ func TestGitSectionTravelsInTheSnapshotPacket(t *testing.T) {
 		".git/refs/heads/release/9": gitRefFile,
 	})
 	pump := NewSnapshotPump(PumpSources{
-		Workspace: func() WorkspaceView { return WorkspaceViewFromRoot(root) },
-		Git:       func() GitView { return ReadGit(root) },
+		Workspace: func() WorkspaceView {
+			return WorkspaceViewFromRoot(risk.Result{Canonical: root, Spelling: root, Resolved: true})
+		},
+		Git: func() GitView { return ReadGit(root) },
 	})
 
 	snap := pump.Snapshot()

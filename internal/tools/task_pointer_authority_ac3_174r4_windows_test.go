@@ -193,7 +193,7 @@ func TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveWorkspace(%s): %v", proj, err)
 	}
-	if err := paths.SetWorkspaceRoot(res.Canonical); err != nil {
+	if err := paths.SetWorkspaceRoot(res.Canonical, res); err != nil {
 		t.Fatalf("SetWorkspaceRoot(%s): %v", res.Canonical, err)
 	}
 

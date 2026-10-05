@@ -15,25 +15,27 @@ import (
 )
 
 type scriptedScope struct {
-	root    string
+	// root is what the scope answers for "the narrowing in force" - an account,
+	// not a bare string, since ticket 181 AC#7 made that the seam's shape.
+	root    risk.Result
 	res     risk.Result
 	err     error
 	setErr  error
 	setArgs []string
 }
 
-func (s *scriptedScope) WorkspaceRoot() string { return s.root }
+func (s *scriptedScope) WorkspaceRoot() risk.Result { return s.root }
 
 func (s *scriptedScope) ResolveWorkspace(string) (risk.Result, error) {
 	return s.res, s.err
 }
 
-func (s *scriptedScope) SetWorkspaceRoot(root string) error {
+func (s *scriptedScope) SetWorkspaceRoot(root string, acc risk.Result) error {
 	s.setArgs = append(s.setArgs, root)
 	if s.setErr != nil {
 		return s.setErr
 	}
-	s.root = root
+	s.root = acc
 	return nil
 }
 
@@ -119,14 +121,14 @@ func TestWorkspaceSwitchRefusesARewrittenAccountEvenIfTheResolverSaysOK(t *testi
 }
 
 func TestWorkspaceSwitchKeepsThePreviousScopeOnFailure(t *testing.T) {
-	scope := &scriptedScope{root: `d:\work\alpha`, err: errors.New("boom")}
+	scope := &scriptedScope{root: risk.Result{Canonical: `d:\work\alpha`}, err: errors.New("boom")}
 	view, err := RequestWorkspaceSwitch(scope, `d:\work\beta`, nil)
 	if err == nil {
 		t.Fatal("expected the refusal to carry an error")
 	}
 	if view.Canonical != `d:\work\alpha` {
 		t.Errorf("after a refusal the panel was shown %q instead of the scope still in force %q",
-			view.Canonical, scope.root)
+			view.Canonical, scope.root.Canonical)
 	}
 	if !view.Set {
 		t.Errorf("the still-active workspace rendered as unset: %+v", view)
@@ -137,7 +139,7 @@ func TestWorkspaceSwitchDetectsAScopeThatMovedAnyway(t *testing.T) {
 	// A scope whose SetWorkspaceRoot failed after ResolveWorkspace said yes, or
 	// whose root changed behind the handler, must be reported as inconsistent -
 	// not rendered as the folder the user asked for.
-	scope := &scriptedScope{root: `d:\work\alpha`, setErr: errors.New("denied by acl")}
+	scope := &scriptedScope{root: risk.Result{Canonical: `d:\work\alpha`}, setErr: errors.New("denied by acl")}
 	view, err := RequestWorkspaceSwitch(scope, `d:\work\beta`, nil)
 	if err == nil {
 		t.Fatal("SetWorkspaceRoot failed but the switch reported success")
@@ -151,10 +153,13 @@ func TestWorkspaceSwitchDetectsAScopeThatMovedAnyway(t *testing.T) {
 }
 
 func TestWorkspaceViewRenderedForSnapshots(t *testing.T) {
-	if v := WorkspaceViewFromRoot(""); v.Set || v.Reason == "" {
+	if v := WorkspaceViewFromRoot(risk.Result{}); v.Set || v.Reason == "" {
 		t.Errorf("an unset workspace rendered as %+v: it must say so", v)
 	}
-	v := WorkspaceViewFromRoot(`d:\work\a`)
+	if v := WorkspaceViewFromRoot(risk.Result{Canonical: "   "}); v.Set || v.Reason == "" {
+		t.Errorf("a blank canonical rendered as %+v: unset is a fact the panel must read", v)
+	}
+	v := WorkspaceViewFromRoot(risk.Result{Canonical: `d:\work\a`, Spelling: `d:\work\a`})
 	if !v.Set || v.Canonical != `d:\work\a` {
 		t.Errorf("a set workspace rendered as %+v", v)
 	}
