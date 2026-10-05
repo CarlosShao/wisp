@@ -13,6 +13,11 @@
   `internal/config/{parse,validate,loader}.go`、`internal/observe/{redact,logging,errors,errors_test}.go`、
   `cmd/wisp/resident_approval_risk_256_windows_test.go`（全文）、`scripts/build.ps1:100-173`、票 268、census 全文。
 - 禁区自陈：`frontend/**`／`design/**` 零读零引；工单票面 AC 框与 `docs/reports/pending-and-issues.md` 零改动。
+- ★**commit 事故（如实自曝）**：本件初版落盘后的 `3f0c4fff` 一笔，`git add` 我按纪律用了显式 pathspec，但 `git commit -F` 提交的是**整个索引**——
+  共享树里 `257-r2` 此刻已 staged 的 8 枚文件（`probes/257/r2/` 五枚 log＋`evidence.md`＋`cmd/wisp/firstrun.go`＋`firstrun_257_test.go`，
+  逐枚清单见 `git show --stat 3f0c4fff`）被我这笔一并带上盘。内容零丢失、他们的活没有被改写，但**提交署名错了人**。
+  按纪律不改写历史，以本段与追加 commit 更正；本腿其后的 commit 一律改走 `git commit -F msg -- <pathspec>` 形。
+  教训具名：**显式 pathspec 只守 `add` 不守 `commit`，在共享工作树里等于没守**。
 
 ## §1 复跑的尺逐把（命令原文＋读数＋时刻；编号 A＝a2，对账 census 的 C 系）
 
@@ -26,6 +31,10 @@
 | A6 | `grep -rn "DefaultL1Window" ...` | `queue.go:116` 逐字 `DefaultL1Window = 3 * time.Second`；`MinL1Window = 2s`（`:120`）；零值回落支在 `gate.go:146` | 11:18:37 |
 | A7 | `grep -n "fmt.Printf" resident_windows.go resident_approval_windows.go` | resident 腿 stdout 面共 14 行 Printf（`resident_windows.go` 11 行含 `:187`；`resident_approval_windows.go` 3 行＝`:482/:829/:865`）；**`residentRiskGateValues`／`newResidentApprovalWithConfig` 两支零 Printf** | 11:18:39 |
 | A8 | 全文精读（非 grep）：`redact.go`、`errors.go`、`logging.go`、`parse.go`、`validate.go`、`loader.go`、`config_reload.go`、`logsink.go`、`console_windows.go`、`resident_windows.go`、`resident_approval_windows.go`、`main.go`、`doctor.go`、`256_windows_test.go`、`build.ps1:100-173` | 逐字行号见 §2／§3 各条 | 11:12–11:18 |
+| A9 | `find . -path ./.git -prune -o -iname "*doctor*" -print` | 全仓 **1 枚**＝`cmd/wisp/doctor.go`——census C7"doctor 枚数钉零枚"的尺**复跑复现** | 11:24:05 |
+| A10 | `grep -ln "os\.Stdout" cmd/wisp/*_test.go`＋`grep -ln "captureStdout128(" cmd/wisp/*_test.go` | 换 stdout 的在捕面＝`dataroot_128_test.go`（harness 本体）／`leg_sink_nail_131`／`panel_assets_143`；调用 harness 的＝`260r3`／`260r4`——共 5 枚 | 11:24:04–11:26:15 |
+| A11 | `grep -ln "bootResidentLeg(" cmd/wisp/*_test.go` | 起真常驻子进程的用例＝ **6 枚文件**：`resident_approval_246`／`resident_ball_228`／`resident_ball_live_228`／`resident_hotkey_live_258`／`resident_sink_nail_127`／`resident_task_source_246` | 11:27:12 |
+| A12 | `git show --stat 3f0c4fff` | commit 事故逐枚清单（9 files changed＝本腿 1 枚＋`257-r2` 在飞 8 枚），披露见 §0 末条 | 11:28:12 |
 
 未跑清单（本编队全数具名）：`go build`／`go test`／`go vet`／`wisp doctor` 真跑／任何实机双击。硬闸与 census §3 同因。
 
@@ -89,7 +98,11 @@
 - 名册钉口径修正：census `:56` 从 `256_windows_test.go:560/:563`（`fed != 1`／`bare != 0`，逐字复现）退出"不许在 `runResident` 里加第二枚配置读取点"——
   **射程画宽了**。那两枚是 AST 尺（`:537-558`），只数 `newResidentApprovalWithConfig`／`newResidentApproval` **这两个构造名**在 `runResident` 体内的调用次数；
   在 `runResident` 里新加一枚裸 `config.LoadFile` 不撞它。对本票真正的钉是：**别多调一枚构造函数**。
-- 枚数钉零枚：doctor 无测试文件、无 `len(results)` 型断言——census C7 的 `find` 我尚未独立重跑（列在 §4 之后补尺），暂记〔待本编队 A9 复验〕。
+- 枚数钉零枚＝**复现**（A9：`find` 全仓只命中 `cmd/wisp/doctor.go` 本身，doctor 无测试文件、无 `len(results)` 型断言）。
+  但 census §④ 没说的一个边界本件补上：**doctor 的全量 stdout 已被一枚消费者捕获**——`dataroot_128_test.go:132`
+  以 `captureStdout128(t, func(){ ok = cmdDoctor() })` 驱动 refusal-legs 表的 cmdDoctor 那一腿。该腿跑在"用户配置目录不可得"
+  的重绑机上（`failConfigDir128`），doctor 改动前本就返 1，断言为 rescueMarkers 的 contains 型 ⇒ 加 info 行不撞、加 fail 行也不打红**这一发**；
+  构建门那发的红判（§2④ 上文）不变。
 
 ## §3 那句 `err` 透传的独立证真——**证真（四支链全码读通；⛔ 未跑起来，跑即违规）**
 
@@ -116,16 +129,34 @@ census `:29-31` 判：回落前先 `slog.Warn(…, "err", err, …)`（`resident
 KindAny 原样返回后由 `json.Marshal` 全量序列化 ⇒ 长 Detail 不截断。对本题是好消息（句子完整在盘），对"日志行数有界"那条规则是既有缺口（具名登记建议，不由本件裁）。
 由此 census `:31` 对票面"且不说"的更正——**盘上有、名字错（unreadable）、用户手上没有**——三短句我全部独立复认。
 
-## §4 U4：给常驻腿加一行 stdout 会不会打红既有 stdout 形状断言——静态撞钉名册
+## §4 U4：给常驻腿加一行 stdout 会不会打红既有 stdout 形状断言——静态撞钉名册（已收口）
 
-尺＝全树 grep"改写 os.Stdout／换 stdout／StdoutPipe／断言 stdout 具体行"的用例，逐枚读它断什么（census U4 未穷尽那格归我）。
-**名册判定进行中**：候选文件 38 枚（11:18:40 的 `grep -ln "os\.Stdout\|stdout" cmd/wisp/*_test.go` 全名单），
-先按三道闸筛：①用例是否在 **config 读失败态**下构造 resident 门（只有那一支才触发新行）；②是否**捕获 stdout**；③断言是**精确行集／行数**还是 `contains`。
-初判（已读实的部分）：
+尺＝枚举一切捕获 stdout 的用例（在程换管／子进程管道），逐枚读它断什么、是否在"配置读失败态"构造常驻门（census U4 未穷尽那格归本件）。
+⛔ 零跑测：以下判定全部静态出身，颜色一枚不背书（具名在 §6）。
 
-- `256_windows_test.go` 全文零 stdout 触点（纯对象读数＋AST 尺）——**不撞**；
-- `dataroot_128_test.go:168` census 称 contains 型——正核；
-- 其余 35 枚候选逐枚判定与枚数结论在本节二版补齐（不占位：届时本节以"名册 N 枚／撞 K 枚／其中 M 枚在拒载态构造门"三数收口）。
+**名册 11 枚文件（A10＋A11），分四族：**
+
+| 族 | 文件 | 断的是什么 | 拒载/缺失态会构造门吗 | 加一行 stdout 撞吗 |
+|---|---|---|---|---|
+| 在程换 stdout | `dataroot_128_test.go` | `captureStdout128` harness 本体＋cmdDoctor 腿（contains 型 rescueMarkers） | 否（不构造门） | 不撞 |
+| 在程换 stdout | `leg_sink_nail_131_windows_test.go` :163-196 | 驱动的是**有返回码的控制台腿**（run/models/providers/panel-inbound）；`:240 if n != 1` 数的是 sink 目录 **jsonl 文件枚数**、不是行数 | 否（那些腿不建常驻门） | 不撞 |
+| 在程换 stdout | `panel_assets_143_test.go` :85-91 | `cmdPanelAssets` 写临时文件 | 否 | 不撞 |
+| 在程捕获调用方 | `resident_cancel_key_wording_260r3_windows_test.go` :98/:140/:164/:178 | bindBallHost 审计句；:103-105 的逐字 want 走的是 **`strings.Contains`**、非相等 | **否**——全部用裸 `newResidentApproval()`＝NoView 支（构造在捕获块**之外**） | 不撞 |
+| 在程捕获调用方 | `resident_cancel_key_label_260r4_windows_test.go` :86/:128 | 同上族，contains 型 | 同上 | 不撞 |
+| 常驻子进程（CI 跑） | `resident_sink_nail_127_windows_test.go`（3 发） | stdout 全 `lockedBuf.has`（contains）；stderr 枚数钉数的是 **winsec 封缝句**那一枚串（`Count(...)!=1` :493）；JSONL 的 record 0/1 位置钉——`[risk]` 两行日志本就排在 install 记录之后（门在 `resident_windows.go:132` 构造、sink 在 `:66` 先装），stdout 多一行**不动 JSONL 索引** | **会**（`t.TempDir()` 无 config.toml ⇒ fallback 支触发） | 不撞（附带条件见下） |
+| 常驻子进程（CI 跑） | `resident_approval_246`／`resident_task_source_246`／`resident_ball_228` | 卡片挂起句／任务来源姿态／球姿态 claims，均 contains 型（如 `:119 residentReachedLoop`、`:66 cardRaisedClaim`） | 会 | 不撞（同条件） |
+| 常驻子进程（winlive，默认 CI 不跑） | `resident_ball_live_228`／`resident_hotkey_live_258` | hotkey verdict 片段；census 引的 `:69` 断的是 `"provenance=defaults"`——那是 `[hotkey]` 桥接行的 console 形状，**与 `[risk]` 无关**（〔仅腿报〕那枚我亲读定性） | 会 | 不撞 |
+
+**关键负空间**：在程触发 fallback 支的用例只有 `256_windows_test.go` ruler① 的 "unreadable" case（`newResidentApprovalWithConfig(t.TempDir())`），
+而该文件**根本不在捕获名册里**——加行后它只会往 `go test` 的真 stdout 淌一行无人捕获的文本，判定无影响。
+
+**枚数与结论**：捕获名册 11 枚文件／常驻子进程 6 枚／其中在拒载-或缺失态构造门的 6 枚；断言形状逐枚读尽为 contains、或针对**其它字符串／文件枚数**的精确计数——
+**静态判定："只加一行 stdout Printf" 撞 0 枚钉**（census U4 的"落地腿开工前必做一次撞钉预检"这一格，本件以静态尺交回大半）。
+
+具名留给写腿的两条残余（本件量不到）：
+1. **词面条件**：新句措辞不得**吞任何既有 claim 子串**（`resident event loop running`／`exited through the D38(e) shutdown order`／
+   `wisp: 卡片挂起：`／`hotkeys from`／`wisp: persistent log sink installed`／winsec 封缝句）——contains 族会被误命中；这是词面约束，静态尺只能警告、不能替它钉绿。
+2. **一发真跑**：`go test ./cmd/wisp` 整包颜色（尤其 127 族的 record 位置断言在新 slog 记录加入时的表现）——本腿禁跑，交回写腿，与本件 §2③ 的"抄 hotkey 形状"最小组合正交：那只加 stdout 行、不加 slog 记录时，残余 2 亦应绿。
 
 ## §5 我不同意 census 的地方
 
@@ -157,6 +188,9 @@ KindAny 原样返回后由 `json.Marshal` 全量序列化 ⇒ 长 Detail 不截�
 5. "实印 14–16"我一度按〔仅腿报〕带过——自己枚举 `results` append 路径后判**不复现**并给出 11/13＋构成（§2④）。
 6. C4"3 命中"我以同词同目录尺复跑成 5 命中——把它降为"口径不同、不改判定"，并点名 `firstrun.go` 在飞脏对读数的污染（§2②）。
 7. census §3 表把它自己的 `:76` 写成 `:77`——我不合并两种写法，以亲读为准（§5.6）。
+8. 131 的 `:240 if n != 1` 我初读当作"行数精确钉"（若是，U4 结论要翻成"高危"）——重读 `:225-262` 确认数的是 **jsonl 文件枚数**，把判定从"高危"改回"不撞"并写进名册（§4）。
+9. `dataroot_128_test.go:132` 那枚 `cmdDoctor` 全量捕获是 census §④ 没点的洞——不推翻它的"枚数钉零枚"，但把"doctor 输出无人消费"的隐含说法收窄了（§2④）。
+10. 首笔 commit 的 `git commit -F` 整索引事故（§0 末条）是真改动而非修辞：本件因此新增"commit 也须 pathspec 形"一条纪律自陈，A12 附原命令清单不涂改。
 
 ## §8 判语：AC#0 四问能不能翻
 
@@ -164,7 +198,8 @@ KindAny 原样返回后由 `json.Marshal` 全量序列化 ⇒ 长 Detail 不截�
 
 - ①③④的机制与行号我在 `c6cf66e6` 逐枚独立复现（②半分离结论独立复现），census §6 三行判语的**重心更正成立**：
   缺的不是记录（拒载原句今天已带 `err` 落进 JSONL，§3 四支链证真），缺的是（a）一枚分得开的名字、（b）一处双击用户真会读到的面。
-- census 的 §5 未穷尽格里 **U4 归本件**（结论在 §4 收口前，AC#0 只欠这一格＋doctor 枚数钉那把 find 尺）；**U1 本编队量不到；U3 等实机；U5 不翻 AC**。
+- **U4（派给本件的那格）已由 §4 静态尺收口：撞钉 0 枚、词面残余与一发整包真跑具名交回写腿**；doctor 枚数钉那把 find（A9）也已复跑复现。
+  census §6 列的其余判不动格归口不变：**U1 本编队量不到**（不读 frontend/design）、**U3 等实机**、**U5 不翻 AC**。
 - 落地形最小组合仍是 census §6.2 的 A＋B（抄 `resident_windows.go:187` 那枚形状），C 只能 `info()` 级；
   `DefaultL1Window=3s` 那枚"瑕疵"**不得随件落地**（§5.1，它不成立）。
 - ⛔ 本件不代翻 AC#0 的框——框归编排者按 §2 逐问核勾；本件只回答"独立腿复跑，它撑不撑得住"。撑得住，附 §5 六条修正。
