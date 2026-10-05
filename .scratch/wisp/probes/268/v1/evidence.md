@@ -108,9 +108,12 @@ AC#3／AC#4 由 `268-v1`/`268-v1b` 两腿在静态面判实（§5.4／§5.5）�
 > **跑形（⛔ 非整包）**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test -count=1 -run 'TestTicket268' ./cmd/wisp/`
 > —— PATH 注入两枚目录照 r1 §1 那把整包命令的形状（r1 台件逐字：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test -count=1 -v ./cmd/wisp/`），
 > 只是把 `-run` 收窄到本票三枚。⚠ **不扩到 `TestTicket256`**（那是 r1 的跑形，会在本腿多带五枚用例＝多一倍负载；派单只给 `-run 'TestTicket268'` 一形）。
-> `-v` 加在三处（各自具名）：负控第二发、MUT-2、MUT-3——为的是让"没红的哪几枚"在名册里**逐枚可见**，而不是靠"非 `-v` 不印＝绿"这一步推理收口；
+> `-v` 加在五发（逐枚具名，⛔ 不是"随便哪发都带 v"）：起手负控第二发、MUT-2、MUT-3、还原后负控、`-run 'TestTicket256'` 点名发——
+> 为的是让"没红的哪几枚"在名册里**逐枚可见**，而不是靠"非 `-v` 不印＝绿"这一步推理收口；
 > MUT-1 那一发取的是派单给的裸形（无 `-v`）：那一形下 Go 仍逐枚印 `--- FAIL`，所以"②③ 未列红"是本腿现量（红名册计数＝1 枚）而不是推理，
 > 但"②③ 各印过一次 PASS"本腿在那一发**没量到**——由下一发 MUT-2 的 `-v` 名册补上（那一发 ① 逐枚 `--- PASS` 可见）。
+> 六枚入库台件的计数收口（一把尺过六发：`grep -c '^--- FAIL'`／`'^--- PASS'`／`'^--- SKIP'`，22:19–22:2x 现量；另有一发 21:47 的 53 字节非 `-v` 预跑不入这张表）：
+> baseline-v＝0/3/0｜mut1＝**1**/0/0｜mut2＝**2**/1/0｜mut3＝**1**/2/0｜after-restore＝0/3/0｜targeted-256＝0/5/0——⛔ 六发 SKIP 全 0（未把 SKIP 读成通过）。
 >
 > **负控起跑（交付态、一枚未种，先证"真跑起来了"）**：
 > - 非 `-v` 预跑 21:47:02→21:47:06：`ok github.com/CarlosShao/wisp/cmd/wisp 0.069s`、`rc=0`（台件 `v2-targeted-baseline.log`，53 字节）。
@@ -395,4 +398,44 @@ v1 那一枚出现处 `:1002`，`=== RUN` 归属＝`TestTicket268ResidentGateNam
 
 ## §7 commit 链与收尾读数
 
-「待验」
+**本节由续腿 `268-v2` 填实**（22:1x）。⛔ 只 commit、未 push（`git log @{u}..HEAD` 由编排者核过后再推）。
+
+### 7.1 证据件的落地笔（本件 `evidence.md` 的五笔，逐笔 pathspec 点名）
+
+| 笔 | commit | 时刻 | 填了哪格 | 名册枚数（`git show --name-only --format=""`） |
+|---|---|---|---|---|
+| v1 笔1 | `1c12712a` | 20:08 | §0 产码亲读＋§1 骨架 | （死腿 `268-v1` 的笔，本腿未重跑） |
+| v1 笔2 | `2875930b` | 20:11 | §5 攻面＋AC#3/#4 静态判语 | （同上） |
+| 代提 | `164ee2c2` | 20:21 | v1 死腿整包台件（⛔ 不是证据件笔） | （编排者代提） |
+| v1b 笔1–3 | `01b38812`／`554cb945`／`438f5050` | 20:32／20:35／20:41 | §3 名册差集／§4 门禁四数／§6 六处差异 | （死腿 `268-v1b` 的笔，本腿未重跑） |
+| **v2 笔1** | `689bc241` | 21:57:58 | §2 骨架＋**MUT-1** 行＋红句 | 5 枚（evidence＋msg-20＋v2-targeted-baseline.log＋-v 负控＋v2-mut1-red.log） |
+| **v2 笔2** | `ba2482c9` | 22:02:19 | §2 **MUT-2** 行＋红句＋stdout 尺换形具名 | 3 枚（evidence＋msg-21＋v2-mut2-red.log） |
+| **v2 笔3** | `862556b3` | 22:10:11 | §2 **MUT-3** 行＋红句＋r1 逐字对照＋**三格收口** | 5 枚（evidence＋msg-22＋v2-mut3-red.log＋after-restore 负控＋v2-targeted-256.log） |
+| **v2 笔4** | `0d207e14` | 22:15:46 | §1 **AC#1／AC#2 两格判语**（＋§1.1/§1.2 展开） | 2 枚（evidence＋msg-23） |
+| **v2 笔5** | 「本笔」＝§7 落盘这一笔（hash 只有下一枚 commit 才看得见，⛔ 不预填；`git log --oneline -- .scratch/wisp/probes/268/v1/evidence.md` 现量第五笔即本笔） | 22:2x | §7（本节）＋收尾自证 | 2 枚（evidence＋msg-24） |
+
+- 起手 HEAD `176d6277`（21:45:40 现量）→ 笔1 落在 `45d7987a` 之后（`45d7987a`＝编排者 21:46:16 的台账笔 `## A626`，非本腿；那一笔名册＝`.scratch/wisp/probes/111/msg-a626.txt`＋`docs/reports/pending-and-issues.md` 两枚，本腿未读未引前者）。
+- **本腿四笔的名册只含 `.scratch/wisp/probes/268/v1/**`**：`git diff --name-only 45d7987a..HEAD` 里落在这个前缀之外的＝**0 枚**（22:16 现量）⇒ 票面／台账／docs／产码**零字节**由名册本身保证（本腿起笔之前那枚 `## A626` 是编排者的，不算在本腿账上）。
+- `176d6277..HEAD` 之间对 `cmd/`＋`internal/` 的 `git log`＝**空输出（0 行）**（22:19 现量）⇒ 本腿突变窗全程**没有别人的产码笔插进来**，"每发还原后 md5 与 HEAD 同值"这一步不会被第三方改动污染；HEAD blob 22:19 复量仍是 `69a630bf…`。
+- **交付物名册（本腿入库 11 枚，全在本目录）**：`msg-20/21/22/23-*.txt` 四枚＋台件七枚（`v2-targeted-baseline.log`／`v2-targeted-baseline-v.log`／`v2-mut1-red.log`／`v2-mut2-red.log`／`v2-mut3-red.log`／`v2-targeted-after-restore.log`／`v2-targeted-256.log`）。尺＝`git diff --name-only --diff-filter=A 176d6277..HEAD`＝**12 枚新增**，逐枚看＝上面这 11 枚＋`45d7987a` 那枚 `probes/111/msg-a626.txt`（非本腿）。
+
+### 7.2 收尾读数（22:16–22:19 现量）
+
+- **产码零净变化（三形全种完之后的最终双读）**：`md5sum cmd/wisp/resident_approval_windows.go`＝`69a630bf350daf1032c62b921e9d7044` ＝ `git cat-file blob HEAD:… | md5sum`；
+  `cmd/wisp/resident_approval_risk_268_windows_test.go`＝`e2405a21bb278b558c1305ea95d34a9b`＝HEAD 双读同值（22:05:39 与 22:16 两采同值）；
+  ⛔ 本腿**没写过**票 256 那枚仪器，也顺手把它量了一遍以防"看起来像被我碰过"：`resident_approval_risk_256_windows_test.go`＝`47d8855a77abf75d4f1b8f8430ab269d`＝HEAD blob 双读同值（22:19 现量）。
+  `grep -c "MUT-"` 产码＝**0**；`git status --porcelain -- cmd internal docs .scratch/wisp/issues`＝**0 行**。⇒ 交付态字节面与本腿起手（21:45）与 v1 死腿（§0.1）三读同值。
+- 工作树：`git status --porcelain` 全仓 **727**（21:45 起手）→ **728**（22:16）→ **729**（22:23 复量）。⚠ **这 +2 不都属本腿**：共享树里 `111-r2b`／`167-a5c`／`evidence-close-2` 三块并行腿在写（本腿未读未引），且本腿自己的 `evidence.md` 在笔5 落盘前也占一枚 ` M`；scoped 尺才是本腿的账——`git status --porcelain -- cmd internal docs .scratch/wisp/issues`＝**0 行**（22:16 与 22:23 两采同值）。
+- tracked 名册＝`git ls-tree -r --name-only HEAD | wc -l`＝**6,069**（22:16 与 22:19 两采同值）。⚠ 下一枚读门 2 的腿会看到这枚数（§4 那笔报的是"本件 commit 之后 **5,999**"，本腿四笔＋并行腿台件把它推到 6,069；对账尺＝`git ls-tree -r --name-only 176d6277`＝**6,057**，起手→现在恰 **+12**＝本腿入库 11 枚＋`45d7987a` 那枚 111 腿的 `msg-a626.txt`，一枚不多一枚不少）。`over-budget`／`roster`／`not in roster` 三枚读数本腿**未重跑**（派单 ⛔ 只给定向用例一形），不代判。
+- **本目录唯一未跟踪件（不属本腿，未代提）**：`v1b-load-watch.log`（1,382 字节，mtime 21:52:23，65 秒跨采尺寸**未变**＝`268-v1b` 死腿遗留的负载自量件）。⛔ 临时件只建不删 ⇒ 原地留着，**要不要代提归编排者**（同 `164ee2c2` 那次处理）；本腿不 commit 一枚不是自己写的台件。
+- **五格「待验」的去向**：`:65` §1 表两格（笔4）／`:69`、`:70` 表内两行（笔4）／`:76` §2 名册（笔1–3）／`:291` §7（本笔）＝**五格全部填实**。
+  尺＝本笔落盘前 `grep -n '待验'` 只命中 **1** 处（427 行），而那一处正是下面这句话自己在引用「待验」这两个字 ⇒ **判语与读数面零遗留空格**；
+  下一枚腿若拿 `grep -c '待验'` 当尺，会读到 **1**——那 1 枚是本件在**描述**这五格，不是还欠着格。
+
+### 7.3 本腿的失手与量不到的地方（如实登记）
+
+1. **一处失手**：MUT-3 的第一版种子写成 `strings.Contains(err.Error(), …)`，而本文件 import 块没有 `strings` ⇒ **那一形编译不过**。本腿在**任何 go 命令之前**发现并换成 r1 §5 那一形（`err.Error()[:1] == "X"` 空体）。⇒ 若那一发真跑起来，红名册会多出"编译失败"这种**不是突变该红**的形状。教训具名：**种 prose 匹配之前先量 import 面**（r1 §5 MUT-3 那句"纯文案支会因 io/fs 未使用而编译不过"讲的就是同一处地形，本腿是第二次踩）。
+2. **一处口径差（不冒充同尺）**：本腿跑形 `-run 'TestTicket268'` 比 r1 的 `-run 'TestTicket268|TestTicket256'` 窄，三发红名册里"256 五枚钉仍绿"那一半**不在突变窗内量**，改在还原态用一发 `-run 'TestTicket256'` 点名补上（§2 末段＋§1.2）⇒ 本腿的隔离证形如"突变窗内只看 268 三枚的方向；窗外单独点名 256 五枚"，与 r1 的"窗内同屏看八枚"**不等价**，如实具名。
+3. **量不到的三格**（不并入判语）：① `-H=windowsgui` 双击起法下 stdout 那行可不可见（实机动作 ⛔ 不在本编队，§6.3／r1 §6.1）；② "被哪一条 loader 规则拒"分不分得开（class 级上限，§6.1）；③ 跑任务腿与陪聊腿的回落一致性（不在本腿射程，§1.2 末条）。
+4. **未做**：整包重跑（派单 ⛔ 明令，§3 的名册差集已由 v1b 从在盘日志算完并核过）；四门重跑（§4 已在 `15d8b60e` 上跑过，本腿产码字节面与那一刻同值，重跑只会得到同读数＋一枚更大的 tracked 分母）。
+5. **纪律自证**：只 commit 不 push；每笔 `git commit -F <msgfile> -- <点名 pathspec>`；⛔ 无 `add -A`/`.`、无 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`（还原一律用派单许可的 `git cat-file blob HEAD:<path> > <path>`）；票面 AC 框一枚未碰；台账／`docs/`／`PLAN.md`／`docs/specs` 一字未动；`frontend/**`、`design/**`、`.gitignore` 未碰；`.scratch/wisp/probes/111`、`167`、`evidence-close` 三块并行腿地界**未读未引**（本件全部读数出自 `268/v1`＋`268/r1`＋仓内产码/git 三处）。
