@@ -104,15 +104,47 @@
 
 ## 5. 自救："可复制现场"与"自救指令"两半各自的出口有无
 
-（本节答：现场格式的可复制边界＋自救指令出口＋断"栈真的落盘"的既有尺名册）
+（本节答：可复制＝**有但没接**（现场确实落盘，但只有栈头 512 rune；唯一"整块可复制"的成品＝`BuildDiagnosticsBundle`，产码调用者零枚、CLI 名册里也没有它）；指令＝**零枚出口**（崩溃那一半今天没有任何一句话告诉用户接下来怎么办））
 
-未判
+**5.1 "可复制的现场"今天是什么形状**
+- 落盘形状＝JSONL **一行里的一个字段**：`"stack"`（`internal/observe/goroutine.go:159` 的 tag）连同一行的 `goroutine`/`owner`/`root_id`/`error_class`/`recovered`/`at`；写手＝`cmd/wisp/logsink.go:157` 的 primary（`redactHandler`→JSON writer）。
+- **它不是一次性可复制文本**：① 栈被 `internal/observe/redact.go:141` 截到 512 rune（§4 已核），② 记录躺在滚动 JSONL 里（`internal/observe/logging.go` 的 rolling writer），要人自己去 `%APPDATA%\wisp\logs\` 里挑那一行——而**没有任何产码把这个目录名说给用户听**（见 5.3）。⇒ 判语：**"会话语境里的一句＋盘上一行截断字段"，不是票面那句"一笔可复制的现场"**。
+- 完整栈今天在**stderr**那半（`logsink.go:160` 的 mirror 不过脱敏），但常驻 GUI 那条腿（双击／Explorer 起）没有控制台 ⇒ 现场两头各缺半张：文件里短、控制台里没有。〔仅读码：控制台有无取决于启动方式，本程未跑〕
+- ★ **既有半成品一枚（前版没量）**：`internal/observe/diagnostics.go:62` `func BuildDiagnosticsBundle(o BundleOptions) (string, error)` —— 它正是"把现场打包成一件可外发的东西"：`BundleOptions.LogDir`（`:41`）读日志目录（`:99-100` `if o.LogDir != "" { entries, lerr := os.ReadDir(o.LogDir)`）⇒ 逐枚以 `logs/<name>` 写进 zip（`:122`）；配置快照**再过一遍红actor** 才写 `config.redacted.toml`（`:144`）；另带 `version.json`（`:174`）、`deferred.json`（`:192`）、`manifest.json`（`:87-95`，注释 `:25-26` 逐字 `the manifest never lies about what is inside`）。
+  - **产码调用者＝零枚**（尺：`grep -rn "BuildDiagnosticsBundle" cmd internal tools --include=*.go | grep -v _test` 只回到它自己的定义/注释 `:35`/`:61`/`:62`；测试调用者三处 `internal/observe/diagnostics_test.go:35`/`:125`/`:140`）。
+  - **CLI 面也没有它**：`cmd/wisp/main.go` 的子命令名册逐枚＝`:89 run`／`:92 providers`／`:95 doctor`／`:100 secret`／`:102 models`／`:110 slo`／`:112 panel-assets`／`:115 panel-inbound`／`:121 version|—version|-h`——**零枚 diagnostics/export**。
+  - 规格里给它挂过名：`docs/specs/SPEC-08-ui-ball-panel.md:173` 逐字 `| \`diagnostics.export\` | invoke | — |`；代码里 `grep -rn "diagnostics.export" cmd internal tools` **零命中**。⇒ 判语＝**「有但没接」，而且缺的那一寸比"接一行"大**：它是出向交付面（票 194 的 c1 已把这枚列为"要新门控"的越界候选，`docs/evidence/s1/194-method-roster-census-c1.md:105`，⛔ 那句不是我量的，是引的）。
+
+**5.2 断"栈真的落盘"的既有尺＝零枚**（`grep -rn "Stack" cmd internal --include=*_test.go` 全仓只回**一行**）
+1. `internal/observe/goroutine_test.go:114` `TestPanicInWorkerSurvivesAndCancelsRoot` —— 它 `:117-118` **自己装了枚测试 sink**，然后 `:167` 逐字 `if len(ev.Stack) == 0 { t.Error("event stack is empty") }`。⇒ 断的是**内存事件**里栈非空＋`PanicCount()` 加一＋root pending 归零＋registry 计数归零。**不经过 `defaultPanicSink`、不碰文件**（"栈非空"与"栈落盘"是两件事，这枚尺只管前者）。
+2. `internal/observe/logging_test.go:92` `TestRedactLongArgTruncated` —— `long := strings.Repeat("x", 4096) + "TAIL-MARKER-777"`，断 `TAIL-MARKER-777` 不在输出里、`(truncated, 4111 chars total)` 在（`:100-101`）。⇒ 断的是**512 那道闸对任意字符串生效**，写进内存 buffer；与 key 是不是 `stack` 无关。
+3. `internal/observe/logging_test.go:240` `TestLogPipelineEndToEnd` —— 真建 `t.TempDir()`、`InitLogWithRegistry(...)`＋`InstallAsDefault()`，`FlushNow`/`Close` 后 `os.ReadFile` 首行必须可 `json.Unmarshal`，且种子密钥不得出现在文件里。⇒ 断的是**记录能到盘且不泄密**，不带 panic。
+   ⇒ **没有任何一枚把 (1) 的栈接到 (3) 的文件上**：这就是 AC#6 那格今天"有通路、无出口"的尺面证据。
+   ⚠ 附带一枚空档：`MaxLoggedString` 在 `cmd`＋`internal`＋`tools` 的 `*_test.go` 里**零枚引用**（尺 `grep -rn "MaxLoggedString" cmd internal tools --include=*_test.go` 无输出＝没找到，别当失败）⇒ 那 512 这个数字本身没有尺钉，只有 (2) 那枚"闸会响"的间接证据。
+
+**5.3 "自救指令"那一半：零枚出口**
+- 全仓产码里唯一一句"接下来怎么办"形状的自救文案＝`cmd/wisp/doctor.go:290` `func dataDirUnresolved128(env string, cause error) error`，`:296` 逐字 `"修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。"`（尺：`grep -rn "修法" cmd internal tools --include=*.go` 在产码里**只有这一枚**）。
+  - ⚠ **它的靶不是崩溃**，是"数据根解析不了"（`cmd/wisp/doctor.go:283` `errDataDirUnresolved`）。崩溃时这句根本不会出现。
+- 崩溃那半的出口名册（逐枚判"零枚"）：
+  - panic 只进 `slog.Error`（`goroutine.go:168`）→ tee 的两条腿（文件＋stderr），**没有任何一处把它翻译成用户看得懂的一句下一步**；`goroutine.go:317-320` 那句 `Error.Detail` 是**给调用方的 Go error**，含 panic 值不含栈，也没有指令。
+  - 启动失败那句同样是 stderr：`cmd/wisp/resident_windows.go:52` 逐字 `fmt.Fprintf(os.Stderr, "wisp: boot failed: %v\n", err)`（另一枚同形＝`cmd/wisp/slo_windows.go:267`）。双击场景读不到。
+  - **"日志在哪"这句话没有出口**：`cmd/wisp/logsink.go:99` `func (s *logSink) logDir() string` 的**产码调用者＝零枚**，唯一读者是测试 `cmd/wisp/logsink_test.go:158`（`lines := sinkLines117(t, sink.logDir())`）。  ⚠ 而这枚方法存在的理由就是说要交给用户：`cmd/wisp/logsink.go:91-92` 两行注释逐字 `// logSink is the running pipeline plus the directory it resolved to, so a` ＋ `// caller can name the landing spot in whatever it prints.` ⇒ **装配那一寸写了"以便谁打印它"，却零人打印**。
+  - `wisp doctor` 也读不到日志：`cmd/wisp/doctor.go` 里 `pass|fail|info` 检查点共 **28 处**（尺 `grep -cE "^\s*(pass|fail|info)\(" cmd/wisp/doctor.go`＝28；⚠ 前版说"10 枚检查项"，枚数不符，以本尺为准），而全文 `grep -in "log" cmd/wisp/doctor.go` 只回**三行注释**（`:226`、`:243`、`:245`），**零枚检查读 `logs\`**。
+  - 密封／安全侧也没有：`internal/winsec` 与 `internal/observe` 里 `grep` "修法|请重试|然后重试|请用户" 的产码命中只有 `internal/panel/composer.go:330` 那句 `（这些附件没有进入本轮，请用户确认后重试或改用受支持的类型）`——**而它的宿主 `ForAgent`（`:308`）产码调用者＝零枚**（§1.3 已量），且靶是附件不是崩溃。
+  - 没有守护/重启能力可指：`ls internal/watchdog`＝**只有 `doc.go`**，其中 `:18` 逐字 `// DEFERRED(watchdog loop/thresholds): implemented by ticket 42. This ticket` ⇒ 今天不存在"崩了会自动/手动重启"的那条路可写进指令。
+- ⇒ 具名判语：**自救指令那一半＝零枚出口**（今天全靠人自己知道 `%APPDATA%\wisp\logs` 在哪、自己会读 JSONL）。
 
 ## 6. 既有文案有没有写歪（"禁用插件重启"那一形状）
 
-（本节答：现读确认有没有既有文案/注释已写成"能禁用插件重启"，有则逐字引）
+（本节答：**零枚写歪**——今天没有任何产码/文档把自救写成"禁用插件后重启"；不需要归口更正）
 
-未判
+- 尺：`grep -rn "禁用插件\|禁用该插件\|停掉插件\|disablePlugins\|plugin.*restart\|重启.*插件" docs .scratch/wisp/issues tools scripts internal cmd`（排探针与二进制）。命中逐枚归类，**没有一枚是产品文案**：
+  - 票 167 自身：票面 `:4`（讲外部项目 `apps/desktop/src/fatal-recovery.ts`，逐字「里面真有一枚 `disablePlugins()`，我读过接口清单」）、`:5`、`:21`（硬约束 4「…**不许把它写成已经成立**」）、`:30`（AC#6「⛔ 不许把它写成"能禁用插件重启"」）。
+  - 票 168 的文件名/关联行（`:6` 逐字「票 167（崩溃自救里"禁用插件"那一支）」）。
+  - 台账 `docs/reports/pending-and-issues.md` 四处，且**四处都把它记成"没有/未裁"**：`:7660`（列为"确为缺"的一项：崩溃自救"禁用插件后重启"）、`:7711` 逐字「崩溃自救（167 AC#6）里"禁用插件后重启"那支**明写未裁**——插件地基（50/51）没建，"禁用插件"里没有插件可禁」、`:10623`（读数句：「自救指令与"禁用插件"**盘上没有**」）、`:10629`（处置句：「草稿与"禁用插件"那两格**另立票**」）。⚠ 这四条是**台账既有记录，不是我量的**，本件只登记它们在树里、且方向与票面一致。
+- 产码面反向确认："禁用"这一族在 `cmd/wisp` 的命中全是**别的语义**，逐枚：`cmd/wisp/config_reload.go:91/:97/:137`＋`cmd/wisp/panel_inbound.go:218`＝热重载状态 `disabled`（面板入向被关），`cmd/wisp/resident_task_source_windows.go:98/:101/:242`＝`taskEntryDisabledClaim` 逐字 `任务入口未启用（本机没有可交互控制台）`，`cmd/wisp/secret.go:79/:246`＝控制台回显关闭，`cmd/wisp/logsink.go:155`＝`non-disableable`（脱敏不可关）。⇒ **零枚与插件相关。**
+- `internal/plugin` 包面：尺 `ls internal/plugin`＝**只有三枚文件**（`disposal.go`／`disposal_test.go`／`doc.go`），且 `grep -rniE "disable|enable|restart" internal/plugin` **零命中＝没找到** ⇒ **票面硬约束 4 那句"没有插件可禁"今天在码上是成立的**，也就没有人能"顺手"写出那半句真话之外的承诺。
+- ⚠ 本件给落地腿留一枚**形状提醒**（不是读数、不改一字）：今天唯一"可复制现场"的半成品是 `BuildDiagnosticsBundle`（§5.1），而 C17 规格里它的名字是 `diagnostics.export`（SPEC-08:173）。落地腿若把这格写成"导出诊断包＝自救指令"，措辞必须停在"记一笔＋给一条指令"这一寸，⛔ 不许顺手加"禁用插件后重启"那半句（票面 :21/:30 原话）。
 
 ## 7. 我判不动／量不到
 
