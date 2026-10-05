@@ -1,0 +1,20 @@
+docs(probes/268-r1): 补笔——登记本腿一处 msgfile 覆盖失手，并把 msg-04 的正文以独立台件形补回
+
+失手具名（⛔ 不改写历史，只追加）：上一笔 `2a0e23b4`（16:17:52）的 commit message 只有一行，
+因为我在 `git commit` 之前用 `printf '%s\n' '单行标题' > msg-04-correction.txt` 把 Write 工具刚落盘的**详细正文覆盖掉了**。
+教训具名：**msgfile 只由 Write/Edit 产出，绝不再用 shell 重定向二次写它**；`-F` 之前应当 `wc -l` 复量那一枚文件。
+本笔不 amend、不 reset、不 checkout，只做两件事：① 把那篇正文按原样补回成独立台件
+`msg-04-body.txt`（内容＝我本来要写进 commit message 的话，一字不增不减，见下），② 把 §7.2 表第 4 行的实测回填。
+
+——以下为 `2a0e23b4` 那笔**本应**携带的正文（补录，非提交信息本身）——
+
+- §7.2 表第 3 行从占位改成实测：交付笔＝`b93624d4`，2026-10-05 16:02:29，`git show --name-only` 11 枚路径
+  （票面一枚＋`.scratch/wisp/probes/268/r1/` 十枚），**零产码路径**；新增第 4 行登记本更正笔自身，⛔ 不预测自己的号。
+- §1 补一枚读数：`grep -c 'wisp: resident \[risk\]'` 在交付态 `deliver-cmdwisp.log`＝**1**（用例① 那次未被捕获的构造，
+  行原文逐字带 `config.toml: risk.confirm_timeout_sec 20 out of range [31, 3600]` 与 `DefaultApprovalTimeout=300s`），
+  基线 `baseline-cmdwisp.log`＝**0**。这一枚是 AC#1"到达用户眼睛"在**包级真跑**上的直接出现证据，
+  与 §0 补读 2（既有 cmd/wisp 用例里带外 confirm 种子 0 枚 ⇒ 那一行在别人的用例上根本不触发）互相咬合。
+- 交付态字节面自证：`git status --short -- cmd` 对本腿两枚产码路径**空输出**，
+  `md5sum cmd/wisp/resident_approval_windows.go` ＝ `git cat-file blob HEAD:…` ＝ `69a630bf350daf1032c62b921e9d7044`。
+- 票面 Progress log 追加第 5 行（append-only，UTC 时刻按 `date -u` 现量更正为 08:12:01Z），⛔ 原句与 AC 框一枚未动。
+- 本笔两枚 pathspec 全是文档面；只 commit、未 push；形如 `git commit -F msg -- <点名 pathspec>`。

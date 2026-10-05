@@ -1,0 +1,25 @@
+docs(probes/268-r1): 补笔——把 2a0e23b4 本应携带的正文补成独立台件，登记 msgfile 覆盖失手，回填 §7.2 第 4 行实测
+
+一、失手具名（⛔ 不改写历史：不 amend、不 reset、不 checkout、不 clean，只追加）
+  上一笔 `2a0e23b4`（16:17:52）的 commit message 只剩一行，因为我在 `git commit -F` 之前用
+  `printf '%s\n' '单行标题' > .scratch/wisp/probes/268/r1/msg-04-correction.txt`
+  把 Write 工具刚落盘的详细正文**覆盖**掉了。定式补死两条：
+    ① msgfile 只由 Write／Edit 产出，绝不再用 shell 重定向二次写它；
+    ② `-F` 之前先 `wc -l` 复量那一枚文件（本笔已复量＝正文见 msg-05 自身行数）。
+  信息未丢：那两枚读数（那一行 stdout 在交付态整包里出现 1 枚／基线 0 枚；两笔产码 commit 的禁区命中 0 行）
+  本来就登记在证据件 §1 与 §4.5，只是没进 commit message。
+
+二、本笔内容
+  - 新台件 `.scratch/wisp/probes/268/r1/msg-04-body.txt`：按原样补回 `2a0e23b4` 本应携带的正文（具名为补录）。
+  - 证据件 `.scratch/wisp/probes/268/r1/evidence.md`：
+      §6 新增第 11 格登记本处失手（第 10 格是 MUT-3 那处还原不彻底，同一类：交付件自身要收口）；
+      §7.2 commit 链表回填第 4 行实测（`2a0e23b4`／2026-10-05 16:17:52／`--name-only` 3 枚路径、零产码），
+      并加第 5 行登记本笔（⛔ 不预测自身号，核验尺＝`git log --oneline -6` 顶行）。
+  - 票面 Progress log 追加第 6 行（append-only，时刻按 `date -u` 现量 08:48:38Z；该行未入库前就地修过一次时钟，
+      修的是我自己那一行草稿里过期的钟点，不动票面任何原有句子、不碰 AC 框）。
+
+三、字节面与纪律
+  本笔三枚 pathspec 全是文档面；产码两枚 `cmd/wisp/resident_approval_windows.go`／
+  `cmd/wisp/resident_approval_risk_268_windows_test.go` 与 `9a941965` 逐字节同形
+  （`git status --short -- cmd` 对本腿两枚路径空输出；md5 ＝ `69a630bf350daf1032c62b921e9d7044` ＝ HEAD blob）。
+  只 commit、未 push；共享工作树里他腿在飞的路径一枚未带上。
