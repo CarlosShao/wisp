@@ -1,0 +1,52 @@
+time=2026-10-05T09:30:38.741+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestValidateRiskConfirmTimeoutRange
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_30
+    validate_test.go:206: error "config: config.toml: risk.confirm_timeout_sec 30 out of range [31, 360000]" must state the band "out of range [31, 3600]"
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_10
+    validate_test.go:206: error "config: config.toml: risk.confirm_timeout_sec 10 out of range [31, 360000]" must state the band "out of range [31, 3600]"
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_3601
+    validate_test.go:200: risk.confirm_timeout_sec=3601 must be rejected (out of range [31, 3600])
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_99999
+    validate_test.go:200: risk.confirm_timeout_sec=99999 must be rejected (out of range [31, 3600])
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_0
+    validate_test.go:206: error "config: config.toml: risk.confirm_timeout_sec 0 out of range [31, 360000]" must state the band "out of range [31, 3600]"
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_-1
+    validate_test.go:206: error "config: config.toml: risk.confirm_timeout_sec -1 out of range [31, 360000]" must state the band "out of range [31, 3600]"
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_31
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_300
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_3600
+--- FAIL: TestValidateRiskConfirmTimeoutRange (0.00s)
+    --- FAIL: TestValidateRiskConfirmTimeoutRange/reject_30 (0.00s)
+    --- FAIL: TestValidateRiskConfirmTimeoutRange/reject_10 (0.00s)
+    --- FAIL: TestValidateRiskConfirmTimeoutRange/reject_3601 (0.00s)
+    --- FAIL: TestValidateRiskConfirmTimeoutRange/reject_99999 (0.00s)
+    --- FAIL: TestValidateRiskConfirmTimeoutRange/reject_0 (0.00s)
+    --- FAIL: TestValidateRiskConfirmTimeoutRange/reject_-1 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_31 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_300 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_3600 (0.00s)
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601
+    validate_267_test.go:94: confirm_timeout_sec = 3601 must be refused at load
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999
+    validate_267_test.go:94: confirm_timeout_sec = 99999 must be refused at load
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600
+--- FAIL: TestConfirmTimeoutIsBandedOnTheLoadPath (0.03s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10 (0.00s)
+    --- FAIL: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601 (0.00s)
+    --- FAIL: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.060s
+FAIL

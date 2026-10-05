@@ -1,0 +1,55 @@
+=== T1 2026-10-05T09:31:18+0800 HEAD=d7a10152
+--- md5 restored validate.go (want fecfefcb1c4240801fb2f9c47bcd66f9):
+fecfefcb1c4240801fb2f9c47bcd66f9 *internal/config/validate.go
+--- git diff --name-only (tracked changes vs HEAD, whole repo):
+.gitignore
+.scratch/wisp/probes/152/my152.py
+.scratch/wisp/probes/161/r6/logs/flip-1.txt
+.scratch/wisp/probes/161/r6/logs/flip-2.txt
+.scratch/wisp/probes/161/r6/logs/flip-3.txt
+.scratch/wisp/probes/161/r6/logs/flip-4.txt
+.scratch/wisp/probes/161/r6/logs/flip-5.txt
+.scratch/wisp/probes/161/r6/logs/flip-6.txt
+.scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+.scratch/wisp/probes/161/r6/logs/flip-restored.txt
+design/assets/base.css
+design/assets/icons.js
+design/assets/theme.js
+design/assets/tokens.css
+design/doubao/README.md
+design/doubao/demo/app.js
+design/doubao/demo/index.html
+design/doubao/demo/styles.css
+design/index.html
+design/screens/approval.html
+design/screens/ball.html
+design/screens/chat.html
+design/screens/config.html
+design/screens/cost.html
+design/screens/firstrun.html
+design/screens/palette.html
+design/screens/privacy.html
+design/screens/security.html
+design/screens/states.html
+design/screens/tasks.html
+internal/config/validate_267_test.go
+--- T2 gofumpt -l internal/config/ 09:31:19:
+(empty above = clean)
+--- T3 go test -count=1 ./internal/config/ 09:31:19:
+ok  	github.com/CarlosShao/wisp/internal/config	1.057s
+--- T4 sh scripts/d22scan.sh 09:31:21:
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 508 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 101 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=228, bans #1-5 cmd/=38, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=508, ban #8 cmd/=101; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 508 Go files, comments and _test.go included; cmd/ 101 Go files, comments and _test.go included
+d22scan rc=0
+--- T5 path-length budget 09:31:44:
+check-path-length-budget.sh: denominator: tracked paths=5701  over-budget=57  covered by roster=57  not in roster=0
+check-path-length-budget.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+--- T6 2026-10-05T09:31:49+0800 done
