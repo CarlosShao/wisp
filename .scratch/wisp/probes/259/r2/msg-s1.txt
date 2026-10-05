@@ -1,0 +1,13 @@
+票 259 腿 259-r2 第 1 步：证据件骨架，起手锚与三处现读（含行号漂移具名报差）
+
+件 .scratch/wisp/probes/259/r2/evidence.md：
+§0 起手 date=2026-10-05 12:20:27 +0800、HEAD=5b638498、git status --porcelain -- cmd internal tools 空；
+   写面只两枚产码文件的注释，本腿不种突变（257-v1 正在 cmd/wisp 取终裁读数）。
+§1 现读逐字：queue.go:382 denial := it.grants.spend(nonce, it.bind)／approval.go:415 s.values[nonce] = bind
+   ／approval.go:485-502（比对行 :496）；it.bind 唯一写点 queue.go:162；spend 产码调用者全仓 1 枚、
+   issue 产码调用者全仓 1 枚（尺与逐枚命中写进件里）。
+   ★具名报差：票面/A619 §2 的 approval.go:287 / :298-305 / :303 / queue.go:376 现读为 :415 / :485-502 /
+   :496 / :382，漂移成因=b6b1d6a4（259-r1 的 AC#2 把 spend 返回换成 grantDenial）。
+   真防线两处按票 §9 更正分开写：跨卡那一下是 store 成员检查（approval.go:491-501，落点 :501），
+   state 拒绝拦的是"牌落在已离开 pending 的卡上"，不是跨卡。
+AC#1 选形=ⓐ（A619 §2，撤销口令「259 AC#1 改 ⓑ」）——本腿不裁形，只兑现。产码零笔。
