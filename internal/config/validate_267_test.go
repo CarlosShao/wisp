@@ -87,19 +87,28 @@ func TestConfirmTimeoutFloorSitsAboveApprovalWarningLead(t *testing.T) {
 // and which range.
 func TestConfirmTimeoutIsBandedOnTheLoadPath(t *testing.T) {
 	lead := warningLeadSec(t)
-	for _, bad := range []int{lead, 10, 3601, 99999, 0, -1} {
-		_, err := loadWithTimeout(t, bad)
-		if err == nil {
-			t.Fatalf("confirm_timeout_sec = %d must be refused at load", bad)
-		}
-		if !strings.Contains(err.Error(), "risk.confirm_timeout_sec") || !strings.Contains(err.Error(), "out of range") {
-			t.Fatalf("error %q must name risk.confirm_timeout_sec and state the range it broke", err)
-		}
+	// 1, 2 and 20 are not made-up numbers: they are the values cmd/wisp's own
+	// fixtures write today (run_mode101_test.go:110, panel_pump_test.go:136,
+	// approval_reply_201_test.go:145). Listing them here proves on the real load
+	// path what ticket 267's shape (a) costs those cases - the orchestrator's
+	// named-unfreeze roster, recorded in the test rather than in prose.
+	for _, bad := range []int{lead, 10, 1, 2, 20, 3601, 99999, 0, -1} {
+		t.Run(fmt.Sprintf("reject_%d", bad), func(t *testing.T) {
+			_, err := loadWithTimeout(t, bad)
+			if err == nil {
+				t.Fatalf("confirm_timeout_sec = %d must be refused at load", bad)
+			}
+			if !strings.Contains(err.Error(), "risk.confirm_timeout_sec") || !strings.Contains(err.Error(), "out of range") {
+				t.Fatalf("error %q must name risk.confirm_timeout_sec and state the range it broke", err)
+			}
+		})
 	}
 	for _, good := range []int{lead + 1, 300, 3600} {
-		if _, err := loadWithTimeout(t, good); err != nil {
-			t.Fatalf("confirm_timeout_sec = %d must load: %v", good, err)
-		}
+		t.Run(fmt.Sprintf("accept_%d", good), func(t *testing.T) {
+			if _, err := loadWithTimeout(t, good); err != nil {
+				t.Fatalf("confirm_timeout_sec = %d must load: %v", good, err)
+			}
+		})
 	}
 }
 
