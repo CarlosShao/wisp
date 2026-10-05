@@ -529,7 +529,8 @@ item**. The message never says which, so the API cannot be used to probe for val
 | 1 | `549cb218` | 证据件骨架 §0-§1＋起手快照 `before/approval.go`／`before/queue.go`＋`msg-s1.txt` | 仅本目录 4 枚 |
 | 2 | `6a021830` | ⓐ 落地第一批：两枚产码文件的注释降级＋`msg-s2.txt` | `internal/agent/approval/approval.go`、`queue.go`、本目录 msg |
 | 3 | `789a02e2` | §2-§9 填实＋读数件 8 枚＋`msg-s3.txt`；同笔带上两枚产码文件的**收尾注释**（`approval.go` 第 385 行那枚 `//` 分段线＋B 枚点撤掉逐字引用；本笔对第 2 笔＝+6/-5，两笔合计 +80/-7；`queue.go` 对 HEAD 零差故不在本笔 name-only 里，合计仍是 +36/-4） | `internal/agent/approval/approval.go`＋本目录 9 枚 |
-| 4 | 本笔（哈希随交件回报给编排者；已入库历史不改写，要更正就追新笔） | 只改本件：把第 3 笔哈希与 §9 的件尺终值写成实测值 | 本件＋`msg-s4.txt` |
+| 4 | `0359d168` | 只改本件＋`msg-s4.txt`：把第 3 笔哈希与 §9 的件尺终值写成实测值；交付态复跑 `go test` ok 0.381s（12:53:38→12:53:39） | 本件＋`msg-s4.txt` |
+| 5 | 本笔（哈希随交件回报） | 只改本件＋`msg-s5.txt`：把 4／5 两笔哈希与逐枚写面自证表补齐，件尺终值再按实测收敛一次（⛔ 产码自第 3 笔后零笔） | 本件＋`msg-s5.txt` |
 
 起手锚 `5b638498`（`git log -1 --format=%h` 自取，非抄派单）；`git status --porcelain -- cmd internal tools`
 起手为**空输出**，第 2 笔之后现跑（12:48 前后）＝只含我自己那一枚待收尾的产码文件：
@@ -552,6 +553,22 @@ $ git diff --numstat HEAD -- internal/agent/approval/approval.go internal/agent/
 **显式 pathspec**（且写在 `git commit -F` 上）的原因：index 是共享的，`A617` 那笔事故就是这么来的。
 第 3 笔之后 `git diff --numstat 5b638498..HEAD` 应读到 `80 7`（approval.go）与 `36 4`（queue.go），
 ＝§3.1 那两行交付态读数。
+
+**逐枚写面自证**（12:55 现跑，尺＝`git show --name-only --format= <四笔>`）：
+
+| 笔 | 入库面（全部逐字） |
+|---|---|
+| `549cb218` | `probes/259/r2/{before/approval.go, before/queue.go, evidence.md, msg-s1.txt}` |
+| `6a021830` | `internal/agent/approval/approval.go`、`internal/agent/approval/queue.go`、`probes/259/r2/msg-s2.txt` |
+| `789a02e2` | `internal/agent/approval/approval.go`＋`probes/259/r2/{after-names,after-v,base-names,base-v,comment-diff,comment-table,evidence,gofumpt-negctl,msg-s3}.txt` |
+| `0359d168` | `probes/259/r2/{evidence.md, msg-s4.txt}` |
+
+⇒ 本腿全部的产码写面＝那两枚文件，其余全在我自己的证据目录里。禁区尺（同一轮现跑）＝
+把四笔的 name-only 并集过一遍 `PLAN\.md|docs/specs|thresholds\.go|golden|allowlist\.txt|^frontend/|^design/|ui\.go|tokens_fourway_test|l2_grant_boundary_test|ticket90_persist_test`
+⇒ **rc=1 零命中**（`ui.go` 与三枚冻结件在我这里零笔；票面 AC 框与台账同样零笔）。
+⚠ 另一件事按实报：`git diff --name-only 5b638498..HEAD`（整条区间）会列出 257-v1／236-r1／269-a1／
+台账 `A620` 那几枚别腿的文件——因为**共享分支上别人在我的锚点之后也提交了东西**，不是我的写面。
+按笔核（上表）才是这把尺的正确用法，这条也解释了为什么 commit 必须带显式 pathspec。
 
 ---
 
@@ -660,5 +677,5 @@ $ git diff --numstat HEAD -- internal/agent/approval/approval.go internal/agent/
 | `gofumpt-negctl.txt` | 12:47:37 那一次并排跑：仓外负控被点名、我改的两枚零行（§4 的空读数凭据） |
 | `msg-s1.txt` … `msg-s4.txt` | 四笔 commit message 的原文（中文，⛔ 无英文单引号） |
 
-交付终值（把这串数字写进去之后重跑那把 `wc` 的读数）＝**664 行／44,405 字节**，行数不动、
+交付终值（把这串数字写进去之后重跑那把 `wc` 的读数）＝**681 行／46,028 字节**，行数不动、
 字节只随数字本身变，占位尺同轮再跑仍 **0 枚**。⛔ 这里不留成语也不留下划线。

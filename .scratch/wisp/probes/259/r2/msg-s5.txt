@@ -1,0 +1,18 @@
+票 259 腿 259-r2 第 5 步（末笔）：逐枚写面自证表进 §6，件尺按实测收敛到 681 行／46,028 字节
+
+只改本件＋本 msg，⛔ 产码自第 3 笔（789a02e2）之后零笔——所以 §4 那四道门禁的读数仍然覆盖交付态：
+d22scan 12:45:52→12:46:17 rc=0（ban #8 internal/ 512 枚含注释与 _test.go）、
+path-length 12:46:17→12:46:21 rc=0（tracked 5905／not in roster=0／正控三发全过）、
+go vet 12:45:20→12:45:21 rc=0、gofumpt 12:45:21 与 12:47:37 两轮零行（同把尺在仓外 TEMP 点得出故意写坏的负控）。
+本腿末次复跑＝12:55:30→12:55:31，go test -count=1 ./internal/agent/approval/ 回 ok 0.386s；
+同发 git status --porcelain -- internal cmd tools ＝ 空输出（我的两枚产码文件已全入库，别人那三档也干净）。
+
+§6 新增的是一把以前没有的尺：按笔 git show --name-only 逐枚列（四笔共 16 枚路径），
+产码写面只有 internal/agent/approval/approval.go 与 queue.go，其余全在 probes/259/r2/；
+禁区并集过一遍正则（PLAN.md／docs/specs／thresholds.go／golden／allowlist.txt／frontend／design／
+ui.go／三枚冻结件）＝rc=1 零命中，票面 AC 框与台账同样零笔。
+⚠ 同时按实记一条：整条 5b638498..HEAD 区间的 name-only 里会出现 257-v1／236-r1／269-a1／台账 A620
+那些别腿文件——共享分支上别人在我锚点之后也提交了东西，不是我的写面；只有按笔核才算得准，
+这就是 commit 必须带显式 pathspec 的又一条理由。
+
+四笔链＝549cb218 → 6a021830 → 789a02e2 → 0359d168 → 本笔；起手锚 5b638498；⛔ 未 push；⛔ 未种突变。
