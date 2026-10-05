@@ -220,6 +220,19 @@ M2 那一行还顺手把"半填"的形状量出来了：`Reason` 里有改写句
 
 ⚠ 本节里 d22scan／path-length／gofumpt 三枚**取在产码 commit `16901acb` 之后**；证据件本笔 commit 之后不再动产码，故不再复跑产码门禁；最后一笔只改本件时会在交件回报里附**同一把尺的终态复跑**读数。
 
+### 6-1 终态复跑（取在最后一枚 commit `9edb33e8` 之后，11:43:31—11:44:39 +08；全量输出落盘 `.scratch/wisp/probes/181/r3/final-gates.txt`）
+
+| 尺 | 终态读数 |
+|---|---|
+| `go test -count=1 -v ./internal/panel/ ./internal/tools/` | panel `FAIL 2.199s`，顶层 **PASS 118／FAIL 4／SKIP 0**；tools `ok 15.842s`，**PASS 198／FAIL 0／SKIP 0**；红名册逐名＝`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`（§1 那四枚，零枚新增、零枚转色） |
+| `go test -count=1 ./internal/risk/` 单包 | `ok 4.899s` |
+| `go vet ./internal/panel/ ./internal/tools/` | rc=0，空输出 |
+| `go vet ./cmd/wisp/`（**只证编译，未跑**） | rc=0，空输出 |
+| `sh scripts/d22scan.sh` | rc=0 `clean - no D22 ban violations`；`bans #1-5 internal/=228`、`ban #7 internal/tools/=23`、`ban #8 internal/=510`、`cmd/=103` |
+| `sh scripts/check-path-length-budget.sh` | rc=0；`tracked paths=5817 over-budget=57 covered by roster=57 **not in roster=0**`；`VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`（5813→5817 是别程在这三分钟内入库的四枚件，与本程无关；本程入库的三枚最长名 46 字符） |
+| `/d/work/base/gopath/bin/gofumpt.exe -l` 十一枚点名 | **空读数**（rc=0） |
+| `git status --porcelain -- internal` | 只有一枚 ` M internal/agent/approval/approval.go`——**那是别程在飞的件**（`internal/agent/approval/**` 是本程禁区，一字未读未写）；本程写面 `git status --porcelain -- internal/panel internal/tools` 复跑为**空** |
+
 ---
 
 ## §7 判不动或量不到
@@ -238,8 +251,10 @@ M2 那一行还顺手把"半填"的形状量出来了：`Reason` 里有改写句
 |---|---|---|---|
 | 1 | `b672f853` | `.scratch/wisp/probes/181/r3/evidence.md` | 本件骨架＋§0／§1／§2 填实 |
 | 2 | `16901acb` | 十一枚：`internal/panel/{workspace.go,workspace_test.go,workspace_account_181r3_test.go,git.go,git_test.go,instructions_200.go}`＋`internal/tools/{paths.go,paths_workspace.go,paths_workspace_test.go,paths_workspace_account_181r3_test.go,task_pointer_authority_ac3_174r4_windows_test.go}` | 产码六枚＋判据（4 枚既有跟签名、7 枚新增），`+653/-62` |
-| 3 | 本笔（提交时刻见 git log） | `.scratch/wisp/probes/181/r3/evidence.md` | §3-§10 填实 |
-| 4 | 终态复跑笔（如需要） | 同 3 | 只在门禁读数变化时补 |
+| 3 | `9edb33e8` | `.scratch/wisp/probes/181/r3/evidence.md` | §3-§10 填实（`+151/-10`） |
+| 4 | 本笔 | `.scratch/wisp/probes/181/r3/evidence.md`＋`.scratch/wisp/probes/181/r3/final-gates.txt` | §6-1 终态复跑读数＋门禁全量输出入库（只改证据件与 .txt 台件，⛔ 不动任何产码，故 §6 的产码门禁不必再复跑） |
+
+共享工作树的实际顺序（不是我一家在跑）：第 2 笔与第 3 笔之间落了别程的 `e940334c`／`51ea6998`／`ea522444`（票 257-r2b／ledger A617／票 259 骨架），我的三笔都在 `dev` 上原样在位，未改写任何一笔。
 
 台件（本程建、只建不删）：`/tmp/181r3-baseline.txt`、`/tmp/181r3-after.txt`、`/tmp/181r3mut/{paths_workspace_M1.go,workspace_M2.go,workspace_M3.go,m1.json,m2.json,m3.json,m1-out.txt,m2-out.txt,m3-out.txt,hashes-before.txt}`——全部落在**仓外**临时目录，仓内未新增游离 `.go`。⚠ 记一笔纪律偏差：本程把突变副本放在仓外 `/tmp` 而不是 `.scratch/wisp/probes/181/r3/`，理由是 267-r2 自首过"模块内游离 `.go` 会被 `go list` 当包、`go vet ./...` 咬人"；代价是台件不随 commit 入库，故本 §8 把名册写全，逐字红句已抄进 §5。
 
@@ -259,6 +274,7 @@ M2 那一行还顺手把"半填"的形状量出来了：`Reason` 里有改写句
 10. **架构约束我核了两把**：`grep` 证 tools 不 import panel、panel 非测试件不 import tools；`bridge.go` 的 `panel.*` 常量枚数用源码文本尺（不是我数的）复跑 PASS。
 11. **空读数先证命令真跑到**：`gofumpt`／`d22scan.sh`／`check-path-length-budget.sh` 三把都附了 rc、版本或 `examined=`／`denominator=` 这类自证行；`~/GOPATH/bin/gofumpt` 那把瞎尺没用。
 12. **我承认量不到的**：`cmd/wisp` 那枚相关用例没跑（§7-1）、真进程 packet 没取（§7-4）、账户伪造面没做仪器（§7-5）。这三条写在这儿而不是写进 §10 的"完成"里。
+13. **纪律面偏差自报一枚**：我在第 3 笔之前发过一条畸形的 commit 命令（`git commit -F /dev/null -m ""` 后面接了一段"应该什么都不发生"的自测管道）——本意是空跑，实际是**在共享工作树里发了一次可能落盘的 commit 调用**。它没成功（空 message 被拒），`git log --format=%s -20 | grep -c placeholder` 读 **0**、`git log -1` 当时是别程的 `ea522444`，所以仓里没有多出任何一笔。但"发一条我自己判断不会生效的写命令"这件事本身就是要记的形状：正确做法是只发 `git add -- <pathspec>` 再单独发带 `-F` 的 commit。零 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`、零删除命令、零 push。
 
 ---
 

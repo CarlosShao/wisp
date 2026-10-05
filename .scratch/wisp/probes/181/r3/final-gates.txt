@@ -1,0 +1,34 @@
+=== final battery, taken after commit 9edb33e8, Mon Oct  5 11:43:31 CST 2026 ===
+test rc=1
+FAIL	github.com/CarlosShao/wisp/internal/panel	2.199s
+ok  	github.com/CarlosShao/wisp/internal/tools	15.842s
+panel top-level PASS=118 FAIL=4 SKIP=0
+tools top-level PASS=198 FAIL=0 SKIP=0
+--- red names:
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.13s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+=== risk single pkg ===
+ok  	github.com/CarlosShao/wisp/internal/risk	4.899s
+risk rc=0
+=== vet ===
+vet rc=0
+=== cmd/wisp compile only ===
+vet-cmd rc=0
+=== d22scan ===
+d22scan: scope ban #8 internal/         examined 510 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 103 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=228, bans #1-5 cmd/=38, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=510, ban #8 cmd/=103; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 510 Go files, comments and _test.go included; cmd/ 103 Go files, comments and _test.go included
+d22 rc=0
+=== path-length ===
+check-path-length-budget.sh: denominator read: 5817 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=5817  over-budget=57  covered by roster=57  not in roster=0
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+pathlen rc=0
+=== gofumpt (11 named) ===
+gofumpt rc=0 (empty above = clean)
+=== porcelain ===
+ M internal/agent/approval/approval.go
+(empty = my write surface clean)
+Mon Oct  5 11:44:39 CST 2026
