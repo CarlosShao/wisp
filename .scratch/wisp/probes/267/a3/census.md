@@ -71,7 +71,38 @@
 
 ## §3 日志与审计里带秒数的形状
 
+> 尺：`logf\(|slog\.|auditf`（根＝`internal/agent/approval`，26 枚命中全读）＋`"[^"]*300[^"]*"`（§2 那把尺的日志子集）。逐枚再 `Read` 现量喂值。取数窗口＝09:53:45–10:01:38+0800（本节末行有 commit 时刻）。
+
+| # | file:line | 逐字形状 | 秒数来源 | 配 90 ⇒ 会不会说谎 |
+|---|---|---|---|---|
+| L1 | `internal/agent/approval/queue.go:489-490` | `approval: ANSWER-EXPIRED corr=%s tool=%s decision=timeout->reject after=%ds` | 尾参 `int(q.timeout.Seconds())`（`:490`） | **真话**：配 90 就打 `after=90s`。审计行与屏幕文案（§1 #1）同源同值 ⇒ 两面对得上 |
+| L2 | `internal/agent/approval/gate.go:338` | `approval: ANSWER-EXPIRED corr=%s tool=%s decision=timeout->execute after=%s` | L1 窗口 `Duration`（`%s`，非秒数整数） | 真话；且这枚是 **L1 窗口的 timeout→execute**，与 L2 的 reject 共用 `ANSWER-EXPIRED` 词头——审计里区分两者靠 `decision=` 那一对值，不靠数字（这是射程事实，不是缺陷判语） |
+| L3 | `cmd/wisp/resident_approval_windows.go:454-456` | `slog.Warn("resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants", "path", cfgPath, "err", err, "fallback", "DefaultApprovalTimeout=300s / DefaultL1Window=3s")` | ★**日志里唯一一枚字面「300s」**，硬编码在 attr 值里 | 触发条件（`:448` dataDir 空 / `:453` `LoadFile` 返错）下门**确实**回落编译 300s ⇒ 今天为真。**两枚说谎风险**：① 兜底值一旦改动（或改接 config），这行字面立刻成假话，而它不在任何常量的引用链上＝**没有尺会因为它变红**（`queue.go:107` 改了它不知道）；② 267 的值域门让「用户配带外值」也走 `:453` 的 err 分支 ⇒ 日志只说"回落到编译常量"，**不说"你写的那个数被拒了"**；对结果是实话，对原因是残缺的实话。要补哪一句＝归机主，不归本腿 |
+| L4 | `cmd/wisp/resident_approval_windows.go:382-383` | `"window_sec_read", window.Seconds(), "confirm_timeout_sec_read", timeout.Seconds()` ＋ `"gate_window", ra.gate.Window().String(), "gate_queue_timeout", ra.gate.Queue().Timeout().String()` | 现读的 config 值／现读的队列值 | 真话，而且是**唯一一枚能把"配的值"与"门实际拿到的值"并排打出来的日志**——`Q-77` 无论判甲判乙，机主要核验都得看这两行 |
+| L5 | `internal/statemachine/machine.go:139-140` | `slog.Error("state machine rejected transition", "from", string(from), "event", string(ev), "err", err.Error())` | `string(ev)`；当事件是 `EvApprovalTimeout` 时字面打出 `approval.timeout-300s`（`events.go:42`） | ★日志面的**第二枚字面 300**：它把"300s"写进了**事件的名字**里。若机主判"配置生效"，那枚定时器/事件名的 300s 就成了假话；而它同时是 D43 冻结转移表第 24 行的事件身份（`table.go:172`）＝**改名＝改契约**，本腿只登记，不动 |
+| L6 | `cmd/wisp/resident_approval_windows.go:824-828` | `slog.Info("approval: 常驻进程显示一张确认卡片", "corr", …, "level", …, "tool", …, "orb_state", …, "esc_borrowed", …, "channels", …)` | 零秒数 | 不谎；同样是沉默面（举卡时不宣告截止） |
+| L7 | `internal/agent/approval/gate.go:567` | `approval: warning delivery failed corr=%s: %v` | 零秒数 | 不谎 |
+
+审计面小结：**没有一枚审计行会把「300」写死**（L1 现算、L2 现算），字面 300 只活在 L3（回落日志的 attr 串）与 L5（事件名）两处。
+
 ## §4 文档（含冻结件标注）
+
+> 〔冻结〕＝`docs/PLAN.md` 与 `docs/specs/**`：**只读判射程，一字未改**。
+
+| # | file:line | 逐字（节选） | 标注 |
+|---|---|---|---|
+| D1 | `docs/PLAN.md:1368` | `**超时 = 300s，一律判拒绝**…；**超时前 30s 醒目提示**`（C18 契约行） | 〔冻结〕C18 本体 |
+| D2 | `docs/PLAN.md:3210` | `\| **C18** \| 「超时一律判拒绝」**无数值** \| **300s**；超时前 30s 醒目提示；…`（§16 差异表） | 〔冻结〕C18 修订记录 |
+| D3 | `docs/PLAN.md:2738` | `\| **\`[risk]\`** \| \`confirm_timeout_sec\`(300) \`l1_window_sec\`(2) …` \| 🔒 **变更即需 L2 级重新确认** \|`（D36 配置树） | 〔冻结〕——**注意它把 300 写成"默认值"而不是"固定值"**，这一枚是机主可引的原文弹药（判乙的文档依据） |
+| D4 | `docs/specs/SPEC-06-security-gatekeeping.md:104` | `- **超时 300s 一律判拒绝**；超时前 30s 醒目提示；拒绝后任务 root ctx 不取消、可一键重放。` | 〔冻结〕门控规格 |
+| D5 | `docs/specs/SPEC-06-security-gatekeeping.md:151` | `…队头单显、超时判拒绝、重放可续` | 〔冻结〕**不含秒数**⇒ 这一行永远不会因配置生效而说谎（名册里唯一一枚"无数字"的门控验收句） |
+| D6 | `docs/specs/SPEC-03-config-secrets-envs.md:34` | `\| 🔒 \`[risk]\` \| \`confirm_timeout_sec(int)=300\` \`l1_window_sec(int)=2\` …` | 〔冻结〕配置规格——写的是 `=300`（默认值形状），与 D3 同族 |
+| D7 | `docs/specs/SPEC-00-product-overview.md:74` | `33. 作为用户，我想让**审批超时一律判拒绝**（300s）且任务可一键重放…（C18）` | 〔冻结〕场景矩阵行——**这一枚最像"对用户承诺的字"**：场景文案把 300s 写成用户想要的东西 |
+| D8 | `docs/specs/SPEC-08-ui-ball-panel.md:112` | `\| 24 \| \`AwaitingApproval\` \| 队头被拒绝/**超时 300s** \| \`Acting\`（取消该调用） \| 超时前 30s 醒目提示；可一键重放 \|` | 〔冻结〕UI 状态表（D43 第 24 行的 UI 视图）＝§2.3 那枚 `timeouts.go:51` 的**文档来源**：机器表与这行同源，改配置不改这张表的话两边都会讲 300 |
+| D9 | `docs/specs/SPEC-02-data-storage.md:162` | `**进程启动后延迟 5 分钟跑一次 + 每 24h 一次**` | 〔冻结〕★**假阳性登记**：这是 `RetentionJob` 的 5 分钟，与审批超时无关。本腿把它列出来是因为同名尺（`5 ?分钟`）会命中它，别让它被当成第二枚说谎面 |
+
+叙述件（非冻结，机主会读，本腿只列不改）：`docs/reports/missing-features-2026-09-29-v4.md:194`（`confirm_timeout_sec` 300 一行）；`docs/evidence/s1/246-resident-task-source-v2.md:112/:212`、`docs/evidence/s1/248-settings-write-path-r1.md:301-305`、`docs/evidence/s1/90-adversarial-acceptance.md:272`、`docs/evidence/s1/128-ac4-r1-acceptance.md:425`（引了一句红测试的原文，内含「审批超时（300 秒未确认）」）、`docs/evidence/s1/84-ac1-bounded-wait.md:25`。台账 `docs/reports/pending-and-issues.md:11761`（`Q-77` 本体）／`:11829`／`:10107`——**⛔ 本腿不碰台账**（`:11932` 那种派单记述同理只读）。
+文档面判语：**冻结件里 5 枚把 300s 写成数字（D1／D2／D3／D4／D6／D7／D8 共 7 枚，其中 D3／D6 是"默认值"形状、D1／D2／D4／D7／D8 是"契约值"形状）**。`Q-77` 判乙（配置真生效）之后，"契约值"那 5 枚并不会立刻假——300 仍是**默认**；真正会被变成假话的是把它们读成"固定值"的那类表述，其中**唯一一枚把 300s 写成用户愿望的是 D7（SPEC-00 场景 33）**。这一格判语归机主。
 
 ## §5 会因配置生效而红的测试钉
 
