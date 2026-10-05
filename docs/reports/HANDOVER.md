@@ -170,7 +170,7 @@
 >
 > ⛔ **本节先落骨架再填数**：标题＋五块骨架单独入库，之后每填一块单独 commit 一次——那是上一枚 parking-2 的死法（75 次调用全花在"先量准再写"、一个字没落盘）的直接解药。骨架里的空位一律具名写着"读数待补＋在哪一块补"，⛔ 不冒充已量。
 
-**取数（起手发，22:40:36+0800 现量）**：分支 `dev`；`HEAD`＝`f73558c0`（`git rev-parse --abbrev-ref HEAD`＋`git log --oneline -1` 现取）；`git rev-list --count origin/dev..HEAD`＝**125 枚未推**（⚠ 共享树里这枚数会漂——简报 22:15 那发量得"120 上下"，本腿 22:40 量到 **125**；**引用前自取，别抄这里**）；`git status --porcelain -- docs/reports/HANDOVER.md`＝1 行（＝本文件，是我自己在写）；CPU／MEM＝**读数待补（§4.0ab-1 那一发补）**；`tasklist` 抽 `go.exe`／`wisp.test.exe`＝**读数待补（同上）**。
+**取数（起手发 22:40:36＋复量发 22:45:16／22:45:52+0800）**：分支 `dev`，upstream＝`cnb/dev`；`HEAD`＝`f73558c0`（22:40:36 起手发）→ 我的骨架笔 `72b78016` 后＝**128 枚未推**（22:45:16 复量，同尺）；`git rev-list --count origin/dev..HEAD` 起手那发＝**125**（⚠ 这枚数在共享树里会漂——简报 22:15 量得"120 上下"、本腿 22:40＝125、22:45＝128（那 +3 枚＝`e8df2643`(268-v2 笔6)＋`165db919`(A627)＋我自己那笔骨架 `72b78016`，`git log --oneline f73558c0..HEAD` 现量逐枚列名）；**引用前自取，别抄这里**）；`origin/dev`＝`c6cf66e6`（22:45:52 现取）；`git status --porcelain -- docs/reports/HANDOVER.md`＝1 行（＝本文件，是我自己在写）；容量＝**CPU 26 %／MEM 68.4 %**（22:43:42 现跑 `powershell -NoProfile -File .scratch/fleet-load.ps1`，两值均 <70 % ⇒ 按水位可以再加派，⛔ 但本腿不动编队）；`tasklist` 抽 `go.exe`＋`wisp.test.exe`＝**0 枚**（22:45:52 现量；尺＝`tasklist | grep -icE '^go\.exe|^wisp\.test\.exe'`，同发量到 `cargo.exe` 2 枚＝别的项目的进程，与本仓无关，具名免得下一位误读成"没有进程在跑"）。台账到 **`A627`**（22:2x–22:4x 那一笔，`165db919`）。
 
 ### 4.0ab-1 从哪儿接（下一枚会话的第一动作）
 
