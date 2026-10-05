@@ -384,12 +384,28 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go（同上）
 | `ea522444` | 证据件 §0／§1 ＋ `base-v.txt`／`base-names.txt` |
 | `b6b1d6a4` | AC#2 改形（`approval.go`／`queue.go`）＋ 五枚调用点等价改判据（`ticket242_binding_test.go`）＋ 两枚新尺文件（12 枚用例）＋ `after-code-v.txt`／`after-code-names.txt` |
 | `50e0299c` | 证据件 §2—§9 写满 ＋ 六枚突变输出（`m-e`／`m-d2`／`m-g`／`pc-d2`／`m-h`／`m-i`）＋ 五枚还原源 `backup/*.orig` ＋ `final-v.txt`／`final-md5.txt` ＋ gofumpt 负控样本 |
-| （本件末笔） | §1.4／§4／§6／§7 的四处准确性回头改（M-E 窗口起点缺口、六枚→五枚文件的说法、D2 出处改引 197-v1 原文、反折叠尺的牙从 M-H 改记到 M-I）＋ §9 交件判语终值 |
+| `e8a1bec3` | §1.4／§4／§6／§7 的四处准确性回头改（M-E 窗口起点缺口登记进 §6 第 8 条、"六枚文件"改回"五枚文件六发突变"、D2 出处改引 `197-ac5-selfapproval-v1.md:75` 原文、反折叠尺的牙从 M-H 改记到 M-I） |
+| 本笔 | §7 名册补全（含本笔自身的点名，写在下一格里——一枚 commit 装不进自己的哈希，⛔ 我没有为了凑一个数去 amend）＋ §8 第 9 条（`msg-s3.txt` 正文里那枚 `11:52:47` 是未打卡的估计值，读数以下表为准）＋ 交件面尺一行 |
 
 `git add -- <点名文件> && git commit -F .scratch/wisp/probes/259/r1/msg-sN.txt -- <同一批点名文件>`，
 中间不停顿；⛔ 无 `add -A`／`.`、无裸 `git commit`、无 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；
 别人的脏面（§0 那十一枚 `internal/panel`／`internal/tools`）一个字节没动。
-临时件（`backup/*.orig`、七枚 `.txt`、三枚 `msg-*.txt`）只建不删。
+写面自证（本腿逐枚回看，含本笔）：`git show --name-only` 对上表每一笔回出的文件清单
+**只含** `internal/agent/approval/**` 与 `.scratch/wisp/probes/259/r1/**` 两棵子树 ⇒
+票面 AC#5（越界检查）那七条路径一枚都没出现；三枚冻结件⛔ 未读未跑未改（射程判断在 §6 第 6 条）；
+票面与 `docs/reports/pending-and-issues.md` ⛔ 一个字节未改（AC 框一枚未勾，翻勾归编排者）。
+
+临时件只建不删（本腿收尾不清理）：`.scratch/wisp/probes/259/r1/` 下
+`base-v.txt`／`base-names.txt`／`after-code-v.txt`／`after-code-names.txt`／`final-v.txt`／`final-md5.txt`／
+`m-e.txt`／`m-d2.txt`／`m-g.txt`／`pc-d2.txt`／`m-h.txt`／`m-i.txt`（12 枚读数）＋
+`msg-s1.txt`—`msg-s5.txt`（5 枚 commit 正文，逐枚＝上表那一笔的 `-F` 源）＋ `backup/` 五枚还原源 ＋ `gofumpt-negctl/probe.go` 一枚负控样本。
+
+**交件面尺（编排者收件可直接对表）**：本件 **451 行／41,811 字节**（本笔之前），占位尺
+`grep -nE "待填|填写中|未判|placeholder|TBD|TODO|XXX"`＝**0 命中**；
+本包终值 `go test -count=1 -v`（12:05:42→12:05:44）＝**89 `--- PASS`／0 `--- FAIL`**，
+其中本腿新立的 12 枚逐枚 `--- PASS`（名册在 `final-v.txt`）；
+起手 58 枚顶层名／77 行 PASS → 交付 70 枚／89 行，`diff base-names.txt after-code-names.txt` **只增不减**（0 枚删除行）。
+
 
 ---
 
@@ -425,6 +441,14 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go（同上）
    并把这一格留在 §8 第 7 条而不是在 §9 判语里写"显示侧已钉住"。
 8. **窗口长度我量过自己的最差一发**：最长的一发 M-G 是 11:54:15→11:54:54＝**39 秒**（其中测试跑 31 秒），
    ⛔ 没有任何一发挂着突变去跑别的东西；每发跑完**同一条命令里**就还原＋md5 回锚。
+9. **我在 `msg-s3.txt`（commit `50e0299c` 的正文）里写了一枚 `11:52:47`——那不是读数。**
+   M-E 那发是两枚文件、我只在第二枚落盘后打了 `11:52:59` 一发，`ui.go` 那半没单独打卡；
+   commit 正文已入库（⛔ 禁 `--amend`，共享工作树里更不改写），所以这一格的处理是：
+   **在 §4 表里把该发的起点改写成"界内估计"、把缺口具名进 §6 第 8 条、在这里留一笔账**，
+   而不是回头把那条 msg 改成一个看起来量过的数。同一格另有一处同族失误：
+   `msg-s3.txt` 首行原本写"七枚突变输出"、正文写"六枚文件逐枚 md5"（突变六发、被改文件五枚），
+   首行我在提交前一次编辑里已改成"六枚"，正文那处落在 `e8a1bec3`——
+   两枚都是"把发数当文件数"的同一枚口误，读数本身没受影响（`wc -l` 与 md5 名册都是实跑）。
 
 ---
 
