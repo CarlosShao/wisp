@@ -128,7 +128,7 @@
 - 崩溃那半的出口名册（逐枚判"零枚"）：
   - panic 只进 `slog.Error`（`goroutine.go:168`）→ tee 的两条腿（文件＋stderr），**没有任何一处把它翻译成用户看得懂的一句下一步**；`goroutine.go:317-320` 那句 `Error.Detail` 是**给调用方的 Go error**，含 panic 值不含栈，也没有指令。
   - 启动失败那句同样是 stderr：`cmd/wisp/resident_windows.go:52` 逐字 `fmt.Fprintf(os.Stderr, "wisp: boot failed: %v\n", err)`（另一枚同形＝`cmd/wisp/slo_windows.go:267`）。双击场景读不到。
-  - **"日志在哪"这句话没有出口**：`cmd/wisp/logsink.go:99` `func (s *logSink) logDir() string` 的**产码调用者＝零枚**，唯一读者是测试 `cmd/wisp/logsink_test.go:158`（`lines := sinkLines117(t, sink.logDir())`）。  ⚠ 而这枚方法存在的理由就是说要交给用户：`cmd/wisp/logsink.go:91-92` 两行注释逐字 `// logSink is the running pipeline plus the directory it resolved to, so a` ＋ `// caller can name the landing spot in whatever it prints.` ⇒ **装配那一寸写了"以便谁打印它"，却零人打印**。
+  - **"日志在哪"这句话没有出口**：`cmd/wisp/logsink.go:99` `func (s *logSink) logDir() string` 的**产码调用者＝零枚**，唯一读者是测试 `cmd/wisp/logsink_test.go:158`（`lines := sinkLines117(t, sink.logDir())`）。  ⚠ 而这枚方法存在的理由就是说要交给用户：`cmd/wisp/logsink.go:90-91` 两行注释逐字 `// logSink is the running pipeline plus the directory it resolved to, so a` ＋ `// caller can name the landing spot in whatever it prints.` ⇒ **装配那一寸写了"以便谁打印它"，却零人打印**。
   - `wisp doctor` 也读不到日志：`cmd/wisp/doctor.go` 里 `pass|fail|info` 检查点共 **28 处**（尺 `grep -cE "^\s*(pass|fail|info)\(" cmd/wisp/doctor.go`＝28；⚠ 前版说"10 枚检查项"，枚数不符，以本尺为准），而全文 `grep -in "log" cmd/wisp/doctor.go` 只回**三行注释**（`:226`、`:243`、`:245`），**零枚检查读 `logs\`**。
   - 密封／安全侧也没有：`internal/winsec` 与 `internal/observe` 里 `grep` "修法|请重试|然后重试|请用户" 的产码命中只有 `internal/panel/composer.go:330` 那句 `（这些附件没有进入本轮，请用户确认后重试或改用受支持的类型）`——**而它的宿主 `ForAgent`（`:308`）产码调用者＝零枚**（§1.3 已量），且靶是附件不是崩溃。
   - 没有守护/重启能力可指：`ls internal/watchdog`＝**只有 `doc.go`**，其中 `:18` 逐字 `// DEFERRED(watchdog loop/thresholds): implemented by ticket 42. This ticket` ⇒ 今天不存在"崩了会自动/手动重启"的那条路可写进指令。
@@ -169,7 +169,7 @@
 - **`go` 系命令零枚**：没有 `go test`／`go build`／`go vet`／`go run`／`go list`／`gofmt`／`wisp slo`／任何 scripts 门禁。全部读数＝〔仅读码〕／〔尺〕两级，无"跑一遍看看"。
 
 **8.2 零改动自证**
-- 产码／测试目录：`git status --porcelain -- cmd internal tools scripts docs` 收口读数见 §8.5；起手那一次同尺＝**零行**。
+- 产码／测试目录：收口尺 `git status --porcelain -- cmd internal tools scripts docs` 的读数逐枚写在 §8.5，⚠ **那两行不是本件的写面**（具名归口见 §8.5）。⛔ 本件不粉：起手那一尺用的是全量 `git status --porcelain` ＋ `head -50`，**当时没做包级 scoped 计数**，所以"起手 scoped＝零行"这句话我没资格写；能写的只有"本件对 `cmd`／`internal`／`tools`／`scripts`／`docs` 零写入（每一枚写面都是 `git status` 里的别人）"。
 - 票面：`.scratch/wisp/issues/167-*.md` 一枚未动，AC 框（AC#1–AC#7 的 `[ ]`）一枚未碰；本件也不代它翻勾。
 - 本件名下唯一写面＝`.scratch/wisp/probes/167/a2/census.md`＋`.scratch/commit-msg-167a2-*.txt`（临时件按 `issues/README` 规则 8 **只建不删**）。
 - Git 纪律：只 commit、**未 push**；每枚 commit 都带显式 pathspec；`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`git add -A`／`git add .` **零枚使用**。
@@ -181,7 +181,14 @@
 - 前一版同路径件（commit `8fa4246d`，编排者代落）：**本版取代**，其全部 `file:line` 一律重新自跑（`bridge.go:91/:98`、`composer.go:235/:295/:296/:308`、`goroutine.go:153/:167/:174/:236/:240/:241/:286/:294/:296/:302/:312/:314/:315`、`redact.go:36/:37/:107/:120/:133/:141/:193`、`logsink.go:76/:87/:99/:144/:148/:149/:153/:157/:160/:208`、`schema.go` 九枚建表、`dao_tasklog.go:24`、`journal.go:122/:129`、`doctor.go:290/:296`、`diagnostics.go:62` 逐枚核过）；**三处比前版更准或不同**，具名：① 前版只数"入向文本载体几枚"，本件 §1.3 另量了 `OutgoingMessage` 的**产码构造者零枚**这一维；② 前版把 512 那格写成"〔待验，需跑一遍才知道〕"，本件按硬约束不跑，改判为 §7-2〔仅读码〕；③ 本件新量 **`logSink.logDir()` 产码调用者零枚、唯一读者是测试 `cmd/wisp/logsink_test.go:158`**，并新量 **`observe.BuildDiagnosticsBundle` 产码调用者零枚**（前版未提后者，它正是"可复制现场"那一格的既有半成品）。
 
 **8.4 交付形状**
-- 九节齐（§0–§8）；本节以下无一处 `未判`／`待填`／`填写中`；每节首行给"本节答"。
+- 九节齐（§0–§8）；每节首行给"本节答"；**占位语计数＝0**（尺：`grep -c` 那三个占位词 → 本件末次读数为 `0`；⚠ 这一句先前自带那三个字的字面量，会被下一位的 `grep` 抓成一枚假残留，所以本件把它们写成"那三个占位词"而不转写）。
 - 判语口径：AC#5 草稿＝**无**（三层皆空：字段／库表／入向听众）；AC#6 崩溃自救＝**有但没接**（记录通路在、话说出口那一寸没线，且"完整现场"卡在 512 那道闸＝人工批准面）。
 
-**8.5 收口读数**：本节末尾由最后一枚 Edit 落名册（起手 HEAD `f761a017`；骨架 `aa016492`；§0–§1 `9c290d55`；本节与 §2–§6 的逐节 commit 号由 `git log --oneline -- .scratch/wisp/probes/167/a2/census.md` 现量后填在 §8.5 表内）。
+**8.5 收口读数**（`2026-10-05T09:29:28+0800`，起手 `09:15:08+0800`／起手 HEAD `f761a017`）
+- 本件名下六枚 commit，逐枚（尺：`git log --oneline -- .scratch/wisp/probes/167/a2/census.md`）：**`aa016492`** 骨架 → **`9c290d55`** §0＋§1 → **`054d1d6c`** §7＋§8 → **`62dae112`** §2＋§3 → **`bbfe9739`** §4 → **`a9caf6c3`** §5＋§6 →（本枚＝§8.5 收口＋两枚自纠）。前版代落件 **`8fa4246d`** 在同一条 log 里在册，未删未改。
+- 交件体量：`wc -l -c`＝**194 行／42,736 字节**（这一枚 commit 只把本节自己的数字改成终值，不再动别处，故终值＝本行）。
+- ⚠ **具名"不是我改的"**：收口 `git status --porcelain -- cmd internal tools scripts docs` 回两行——` M internal/config/validate_267_test.go`、` M internal/config/validate_test.go`。二者＝同机在飞写腿 **`267-r1`** 的写面（其间它还落了一枚 `37f8e5c6`「ticket 267 r1: band [risk].confirm_timeout_sec at load (shape a)」）。本件对这两枚**一字未动、未 `sed`、未据其下任何结论**；这一格的存在就是把"并发窗口里别人在写"这件事留在读数里，而不是把它洗成零行。
+- 票面与 AC 框：`git status --porcelain -- .scratch/wisp/issues`＝**零行**＝没找到改动＝好消息（票 167 正文与七个 AC 框一枚未碰）。
+- 三枚冻结件：本件**未 Read、未 sed、未引行号**；包级 `grep` 顺带命中的那几枚行号一律不转写（`internal/panel/l2_grant_boundary_test.go`）。
+- `frontend/**`／`design/**`：起手 `git status --porcelain` 里出现它们的删除项（`D design/…` 若干）——那是别人的写面，**本件零读取**（未 `cat`／未 `sed`／未 `grep` 进这两枚根）。
+- 零 `go` 命令：见 §8.1 名册；起手与收口各跑一次 `date`，其余全是 `grep`／`sed`／`ls`／`wc`／`git`。
