@@ -175,6 +175,12 @@ numbers written in that file are NOT the numbers this process runs on
 八枚 scope 读数（同一发 d22scan 里逐枚抄，供与历史对账）：
 `bans #1-5 internal/=228`、`bans #1-5 cmd/=38`、`ban #6 frontend/=85`、`ban #7 internal/tools/=23`、
 `ban #8 design/=39`、`ban #8 frontend/=85`、`ban #8 internal/=512`、`ban #8 cmd/=104`。
+
+**交件前最后一采（同一枚字节面，只重跑门 3 与门 4）**：`GOFLAGS= go vet ./cmd/wisp/` rc=0（16:55:15–16:55:20，无输出）；
+`"D:/work/base/gopath/bin/gofumpt.exe" -l cmd/wisp` ＝ 只有 `cmd\wisp\models.go`（16:55:21）。
+同刻字节自证：`md5sum` 两枚产码 ＝ `git cat-file blob HEAD:…` 两枚同值
+（`69a630bf350daf1032c62b921e9d7044`／`e2405a21bb278b558c1305ea95d34a9b`），`git status --short -- cmd` 对本腿路径**空输出**
+⇒ 门 1／门 2 在 15:25:29–15:26:36 那两发的读数就是交付态读数，不必重跑（代码与那时逐字节同形）。
 ⚠ 诚实登记一处**本腿造成的分母变化**：`ban #8 cmd/` 这把尺数的是 Go 文件枚数（含 `_test.go`），
 本腿新增一枚 `_test.go` ⇒ 该读数比开工前多 1（104＝103＋本腿那枚）。这是"射程面多了一枚文件"，不是"违规多了一条"——
 违规枚数＝**0**、红名集合＝**空**。其余七枚本腿无从改变（同一枚函数内的常量与分支不新增文件）。

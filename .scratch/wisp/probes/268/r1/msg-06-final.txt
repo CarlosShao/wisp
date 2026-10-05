@@ -1,0 +1,26 @@
+docs(probes/268-r1): 末笔——交件前最后一采（门 3／门 4 复跑＋两枚产码字节面同值自证），证据件终尺 320 行／38,309 字节／占位 0
+
+一、末采读数（时刻都带）
+  - `GOFLAGS= go vet ./cmd/wisp/` rc=0，16:55:15–16:55:20，无输出。
+  - `"D:/work/base/gopath/bin/gofumpt.exe" -l cmd/wisp` ＝ 只有预存脏枚 `cmd\wisp\models.go`，16:55:21（⛔ 未顺手格式化它）。
+  - 字节面同值自证：`md5sum cmd/wisp/resident_approval_windows.go`＝`69a630bf350daf1032c62b921e9d7044`、
+    `md5sum cmd/wisp/resident_approval_risk_268_windows_test.go`＝`e2405a21bb278b558c1305ea95d34a9b`，
+    两者与各自 `git cat-file blob HEAD:<path>` 逐枚同值；`git status --short -- cmd` 对本腿两枚路径**空输出**。
+    ⇒ 门 1（d22scan rc=0，15:25:29–15:25:54）与门 2（path-length budget rc=0／VERDICT GREEN，15:26:32–15:26:36）
+    那两发的读数就是交付态读数，不必重跑——代码与那时逐字节同形。
+
+二、件尺终值
+  `.scratch/wisp/probes/268/r1/evidence.md` ＝ 320 行／38,309 字节／占位符 **0**
+  （尺＝那条三选一字符类，`| wc -l` 收尾；本件不含其字面串，故 0 是真 0）。
+
+三、又一处 Edit 失手（自曝，与 §6.11 同一类教训的第二个形）
+  本欲在 §4 追加"末采"一段，却拿整段（含八枚 scope 读数那两行）当锚点、替换串只留下段首一行 ⇒ 误删两行。
+  当场以同一段锚补回逐字原文，复量尺＝`git diff --stat` 对该件＝**6 行纯插入、删除列 0 行**，
+  并 `grep -n "八枚 scope 读数" -A 8` 逐行核对补回内容。
+  本仓定式再证一次：**拿整行／整段当锚点时，替换串必须逐字包含旧文全文；改完立刻看 numstat 的删除列。**
+
+四、纪律与射程
+  本笔两枚 pathspec（票面＋本件）全是文档面；产码两枚自 `9a941965` 起未再被写。
+  只 commit、未 push；未 amend／reset／rebase／stash／checkout .／restore／clean，未在仓内建 worktree。
+  票面 Progress log 现共 7 行（append-only，时刻按 `date -u` 现量 09:01:12Z；该行入库前修过一次自己的草稿钟点）。
+  本腿射程到此用完：AC#1–AC#4 判语＝四格达标，终裁与缺口审计请另派非实现者（D22 双角色）。
