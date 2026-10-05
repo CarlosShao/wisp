@@ -1,0 +1,5 @@
+probes(111-r2 笔2)：§2 逐枚可纳入性落盘——r1b 的 5 枚结论逐枚复认（ball 16/wisp 65/perm 3/plugin 1/llmrecord 1，tag 分布精确到枚：wisp 22+6+1+36=65、ball 6+5+5=16）+ 补 session(2, package session)/projctx(1, package projctx_test ⇒ census 记 0/1) 两枚，二者 t.Skip/os.Getenv/exec.Command 本腿现量命中 0/0/0（对得上 1bb654e3 注释的 ZERO 断言，非抄它）
+
+★winlive 半边四个"没有"复认：ci.yml 命中 0、ci.yml 全文无 -tags/GOFLAGS、portable-tests.sh 与 runtests.sh 均 0 命中（⇒ 没有现成传 tag 的缝，加 winlive 要先造这条缝）、仓内 winlive 测试文件只有这 11 枚（ball 5 + wisp 6，无第三处）。owner 未批 ⇒ 本轮不加 -tags，只登记现状（真接入要动哪几行归 §5.1）。cmd/wisp ubuntu 半边不重跑，归票 98。
+
+本轮零新增 scope 行／零新增 pin 枚（新增不配 pin 反被 GUARD C 判红）。scripts/ 与 .github/ porcelain 仍 0 行。

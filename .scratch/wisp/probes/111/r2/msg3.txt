@@ -1,0 +1,11 @@
+probes(111-r2 笔3)：★§3 GUARD D 正控两发落盘——AC#3 那格做成
+
+先答编排者那把闸：GUARD D 落在 `--scope=census` 单一个 block（:286-425），那段 `grep -c 'go test|go build|go vet|runtests.sh'` = 0，只调 go list ./... (:336) 与 go list -f (:364)，且 census 走不到 :449 之后的真跑测试段 ⇒ **正控不需要真测试窗，不必停手上报、不必归编排者**。
+
+变异两发（票面 Rules:54「绝不在仓库内建 worktree/checkout」⇒ 只在 /tmp 的 git archive 164ee2c2 快照里 sed）：
+- D1 抽 internal/plugin **四处**（core pin:183/win pin:198/scope:243/scope:252）→ rc=1、点名 `internal/plugin tests-compiled-for-windows=1/0`、分母自己跟着动（no-scope 7→8、unclaimed 0→1），12 秒；
+- D3 抽 internal/session 四处 → rc=1、点名它自己的 2/0，14 秒 ⇒ 靶件通用，不是为 session/projctx 写死。
+
+只抽 pin 会让 GUARD C 先红而测不到 D，故四处一起抽＝"从来没人认领"。**★D 不是 C 的重复这条我证了**：对 D1 变异体跑 `go list` 复算 windows scope ⇒ pin 9 行 == resolved 9 行、diff rc=0 ⇒ **GUARD C 结构上看不见"有测试却不在名册"**（两边同时少就是相等），GUARD A 方向相反、B 更抓不到 ⇒ D 补的是 A/B/C 三面都照不到的那一个方向。
+
+本腿对 scripts/ 改动＝**0 字节**：porcelain 20:30:32 与 20:46:48 两次 0 行，工作树 md5 328eb3ea… == `git cat-file blob HEAD:` 同值，blob 2ff02dd7，bash -n rc=0。票面"最小修＋单独 commit"的触发条件（验出 bug）**没发生**——两发都按设计红、按设计点名、按设计退出。诚实边界三条内含一条判死读数：GOOS=linux 下 `go list ./...` rc=1（stdout 34 行／stderr 264 字节点名 sherpa-onnx-go-linux）→ census 命中 :337-351 的 refusal 分支 exit 1 ⇒ **census 只能接 windows 腿，接 ubuntu 腿是永久红**（归 §5.3）。

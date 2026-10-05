@@ -1,0 +1,19 @@
+check-path-length-budget.sh: positive control bench=/tmp/tmp.MzQIv8CM7P (kept on disk; this project never deletes temp artifacts)
+warning: in the working copy of 'ok-short-name.md', LF will be replaced by CRLF the next time Git touches it
+check-path-length-budget.sh: control 1/3 ok - bench baseline green, so this gate is not stuck red
+warning: in the working copy of '.scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md', LF will be replaced by CRLF the next time Git touches it
+check-path-length-budget.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+RED - over budget and NOT in the roster: .scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md  (relative 125 chars, name 104 chars, full path on the self-hosted runner 169 chars, budget 165)
+check-path-length-budget.sh: control 3/3 ok - green again once the planted path is gone
+check-path-length-budget.sh: positive control PASSED
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 6019 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=6019  over-budget=57  covered by roster=57  not in roster=0
+check-path-length-budget.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units

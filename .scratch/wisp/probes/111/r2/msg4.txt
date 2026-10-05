@@ -1,0 +1,9 @@
+probes(111-r2b 笔4＝交件笔)：§4/§5/§6 填实 + 本腿自查三处失手留痕——票 111 的 AC#3 那格第一次有样本
+
+§4：四道守卫 HEAD 现行号（A:574／B:751／C:553＋形状拒绝 532／D:409→退出 422）各配一句"咬什么"与一句"咬不到什么"；两把壳尺 rc=0（d22scan 20:31:20→20:31:41 正控 PASS=35 RUN=77；path-length 20:31:50→20:31:54 正控 3/3 ok、5991/57/57/not-in-roster 0）。★本腿自己落 15 枚跟踪件 ⇒ 补跑第二发 6019 分母、over-budget 仍 57、not-in-roster 仍 0 ⇒ 交件不给门添新红；gofumpt 不适用坐实（零 .go 写面，scripts/ 的 11 枚 .go 全在 spike/，emojiScopes() 只有 design/frontend/internal/cmd 四枚）。
+
+§5：票面"5 枚零覆盖"过期的"谁证的"给三层——r1b 权威读法 + HEAD 现行号逐枚（llmrecord :165/:194、ball :169/:195、perm :182/:197、plugin :183/:198、wisp=cli_pin :206）+ ★钉到出生地：8fe5c7ce 与 7699ec3f 两枚 commit 里 5 枚已在册（cli_pin 由 git log -S 判为 8fe5c7ce 引入），成因＝票面记的是票 110 的现场、同日 21:1x 已被修掉而票面没回头改。winlive 半边只登记不接：5 处落点行号（runtests.sh:75 透传已具备／portable-tests.sh:694 唯一真跑行／★:570 与 :364 两处 go list -f 不跟 tag／ci.yml:543 或 :507／runner 只能落 :623 的 wisp-slo）＋3 条代价（5 枚文件合计 13 处 t.Skip vs runtests.sh:98 的 SKIP-fatal ⇒ 接 windows-latest 必永久红；live 硬件用例同 AC#7 那个改口径；放宽＝违 AC#2）。cmd/wisp ubuntu 19 枚红归票 98/123，不重跑。★新报两格：census 在 ci.yml 命中 0 ⇒ GUARD D 今天接不进任何 CI 步，且 GOOS=linux 必命中 :337-351 拒绝分支＝接 ubuntu 腿是永久红；GUARD D 自身零回归覆盖（载具 fake-go 支持 -f 与 ./...，但 0 枚 case 引用 D，而那把载具也不在 CI）。步级读数本地产不出，登记欠 push。
+
+§6＋★自查：本腿三处自身失手全部留痕不改口——(1) 初稿"我没写 ✓/≤"是假的（带内本件 100 枚，且引 PLAN.md:3449 禁令清单时引文自己又添字符；复量命令初稿用字面字符写会自指顶漂，改 ASCII 转义）；(2) 初稿"scope=census 除自己 0 命中"是假的，真身 2 枚在 portable-tests-selftest.sh:506/:533 ⇒ 结论没翻但成因换掉；(3) 初稿"3 枚文件自带 t.Skip"数错，逐枚 grep -c 复算＝5 枚文件/13 处。共同成因＝凭目测写了一句可以直接 grep 的话，后半程改成当场数、数完贴旁边。
+
+收尾：porcelain scripts/ .github/ 空；portable-tests.sh 工作树 md5 328eb3ea… == git cat-file blob HEAD: 同值、blob 2ff02dd7、bash -n rc=0；§0 前腿那 9 行 diff rc=0 未动；零 go test/build/vet、我本人零 go env；两把尺收尾复跑 21:17:27→21:17:54 皆 rc=0；只 commit 未 push；/tmp 三枚快照与 msg*.txt 只建不删；伪指令登记 0 次。

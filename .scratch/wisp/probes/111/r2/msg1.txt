@@ -1,0 +1,3 @@
+probes(111-r2 笔1)：§1 名册现量落盘——go list ./... = 35 复认 + ★35−33 差集逐枚坐实（多出的正是 internal/projctx@票200 与 internal/streamkey，删除列 0；4e66817 的 portable-tests.sh 里二者命中 0 次）+ ci.yml 四个调用点行号复认未漂（:373/:471/:507/:543）+ 名册真身 HEAD 现行号顶替 r1b 过期那组（core_pin :164-192=27、win_pin :193-204=10、cli_pin :206、winsec :208）+ GUARD C 咬合只用 go list 复认（core 27==27、windows 10==10，diff 皆 0 行）
+
+本腿零 go test/build/vet（cmd/wisp 整包读数归并行腿 268-v1，已在 164ee2c2 落盘 ok 422.320s）；scripts/ 与 .github/ 的 porcelain 仍 0 行，portable-tests.sh 工作树 md5 328eb3ea… == HEAD blob 2ff02dd7 同值，一字未改。
