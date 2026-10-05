@@ -447,6 +447,16 @@ type AgentSection struct {
 // RiskSection is the locked [risk] section (D36 rule 1: any loosening needs L2 re-confirm).
 type RiskSection struct {
 	// ConfirmTimeoutSec is how long an L2 confirmation card stays open.
+	// Ticket 267: the value range is gated at load, not clamped at the gate -
+	// validateRisk rejects anything outside [31, 3600] seconds. The floor is
+	// strictly above approval.DefaultApprovalWarning (30s) because the C18
+	// pre-timeout warning is armed only while Timeout()-WarningLead() > 0, so a
+	// timeout at or below the lead would silently drop that warning instead of
+	// refusing the config. The default 300 (the C18 constant) sits mid-band and
+	// is unchanged by this ticket; the ceiling is 1h.
+	// l1_window_sec deliberately keeps its consumer-side clamp (gate.go
+	// MinL1Window/MaxL1Window): making it a load error would rewrite what the
+	// existing clamp pin asserts, which is outside this ticket.
 	ConfirmTimeoutSec int `toml:"confirm_timeout_sec" default:"300"`
 	// L1WindowSec is the auto-approve window for L1 actions; raising it
 	// auto-approves more, so an increase is a loosening change.

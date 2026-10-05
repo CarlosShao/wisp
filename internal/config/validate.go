@@ -100,15 +100,52 @@ func validateModels(c *Config) error {
 	return nil
 }
 
-// validateRisk checks the [risk] enum added by ticket 90. It is the loud half
-// of the ticket-83 rule: a permission key that nothing reads must fail at load
+// confirmTimeoutSecMin/Max bound [risk].confirm_timeout_sec (ticket 267,
+// ruling = shape (a) "the value range is gated at load"). This layer, and not
+// the consumer, because clamping at the gate would recreate ticket 255's whole
+// complaint - "the config says it takes effect and nothing honours it".
+//
+// The lower bound is not a taste call, it is the C18 warning's survival
+// condition. internal/agent/approval/gate.go:528 arms the pre-timeout warning
+// only when `Timeout() - WarningLead() > 0`, and the queue falls back to
+// approval.DefaultApprovalWarning (30s) whenever no producer passed a lead
+// (queue.go:88-89; ticket 267's census: no production caller passes one at
+// all). So any timeout at or below that lead does not fail loudly - it
+// silently deletes a protection the config layer claims is in force. The band
+// therefore starts STRICTLY ABOVE that lead.
+//
+// internal/config must not import internal/agent/approval: approval ->
+// internal/agent -> internal/config, so the edge would be a cycle. The number
+// is written here and re-derived from approval.DefaultApprovalWarning by the
+// same-source guard in validate_267_test.go (external config_test package,
+// which may import approval precisely because config does not). If that guard
+// ever goes red, this constant moved away from the lead it depends on.
+//
+// The upper bound is one hour: an L2 card nobody has answered for longer is
+// not a pending confirmation, it is an abandoned one (ticket 267's 99999 seed
+// hung a card for 27h46m).
+const (
+	confirmTimeoutSecMin = 31
+	confirmTimeoutSecMax = 3600
+)
+
+// validateRisk checks the [risk] key added by ticket 90 and the
+// confirm_timeout_sec band added by ticket 267. It is the loud half of the
+// ticket-83 rule: a permission key that nothing reads must fail at load
 // (unwired.go), and a permission key that IS read must not accept a value the
 // reader cannot map. An unknown mode is therefore an error naming the whole
 // vocabulary, never a silent fall back to the default - "it fell back" and "it
-// was never written" look identical in the field.
+// was never written" look identical in the field. The same argument covers an
+// out-of-band timeout: refusing it says "this config is invalid", accepting it
+// and ignoring it would say "the program decided for you".
 func validateRisk(c *Config) error {
 	if _, err := risk.ParseMode(c.Risk.PermissionMode); err != nil {
 		return observe.New(observe.ClassConfig, "config.toml: risk.permission_mode: "+err.Error())
+	}
+	if sec := c.Risk.ConfirmTimeoutSec; sec < confirmTimeoutSecMin || sec > confirmTimeoutSecMax {
+		return observe.New(observe.ClassConfig, fmt.Sprintf(
+			"config.toml: risk.confirm_timeout_sec %d out of range [%d, %d]",
+			sec, confirmTimeoutSecMin, confirmTimeoutSecMax))
 	}
 	return nil
 }

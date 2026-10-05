@@ -118,7 +118,7 @@ func validateUnwired(c *Config) error {
 // is what keeps this list from going stale the way the four [risk] keys did.
 var lockedKeyDisposition = map[string]string{
 	// [risk]
-	"risk.confirm_timeout_sec": "consumed: cmd/wisp/run.go builds the approval timeout from it",
+	"risk.confirm_timeout_sec": "consumed: cmd/wisp/run.go and cmd/wisp/resident_approval_windows.go both build the approval timeout from it (the resident leg since ticket 256); ticket 267 bands it [31, 3600] at load",
 	"risk.l1_window_sec":       "consumed: cmd/wisp/run.go builds the L1 auto-approve window from it",
 	"risk.shell_enabled":       "unwired:risk.shell_enabled",
 	"risk.allow_shell_string":  "unwired:risk.allow_shell_string",

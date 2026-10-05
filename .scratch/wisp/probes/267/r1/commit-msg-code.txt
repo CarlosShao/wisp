@@ -1,0 +1,22 @@
+ticket 267 r1: band [risk].confirm_timeout_sec at load (shape a)
+
+validateRisk now rejects anything outside [31, 3600] seconds, naming the key
+and the range, so an out-of-range timeout is refused as an invalid config
+instead of reaching the approval gate. The floor is strictly above
+approval.DefaultApprovalWarning (30s) because gate.go arms the C18 pre-timeout
+warning only while Timeout()-WarningLead() > 0.
+
+- validate.go: confirmTimeoutSecMin/Max + the check, with the derivation.
+- validate_test.go: TestValidateRiskConfirmTimeoutRange (seeds 30/10/3601/99999
+  /0/-1 red, 31/300/3600 green) + band-edge pin.
+- validate_267_test.go: NEW external config_test package, because approval
+  depends on config (approval -> agent -> config) so an internal test could not
+  import it. Holds the same-source guard that re-derives the floor from
+  approval.DefaultApprovalWarning, the load-path band check, and the AC#2
+  reading (smallest legal timeout -> real approval.Queue -> lead 1s > 0).
+- schema.go: comment records the band and why l1_window_sec keeps its clamp.
+- unwired.go: lockedKeyDisposition for risk.confirm_timeout_sec was stale
+  (named only run.go); the resident leg consumes it since ticket 256.
+
+Untouched: DefaultApprovalTimeout / the C18 300s default / l1_window_sec
+validation / internal/agent/approval / cmd/wisp.

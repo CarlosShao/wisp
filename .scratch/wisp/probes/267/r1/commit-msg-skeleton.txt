@@ -1,0 +1,1 @@
+ticket 267 r1: evidence skeleton (§0-§8), placeholders only

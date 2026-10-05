@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -165,6 +166,67 @@ func TestValidateBallSizeRange(t *testing.T) {
 		if err := validate(c); err != nil {
 			t.Fatalf("ball.size=%d must validate: %v", good, err)
 		}
+	}
+}
+
+// TestValidateRiskConfirmTimeoutRange pins ticket 267's shape (a): [risk].
+// confirm_timeout_sec gets a load-time band, so an out-of-range value is
+// refused as "this config is invalid" instead of reaching the approval gate,
+// where 99999 would hang an L2 card for 27h46m and 10 would take the C18
+// pre-timeout warning away without a word.
+//
+// The refusal must name the key AND the band, otherwise a user reading the
+// error cannot tell which line to fix (the same rule validateBall follows).
+func TestValidateRiskConfirmTimeoutRange(t *testing.T) {
+	c := validConfig(t)
+	band := fmt.Sprintf("out of range [%d, %d]", confirmTimeoutSecMin, confirmTimeoutSecMax)
+	for _, bad := range []int{
+		confirmTimeoutSecMin - 1, // 30: exactly approval.DefaultApprovalWarning -> C18 lead would be <= 0
+		10,                       // a timeout below the warning lead
+		confirmTimeoutSecMax + 1, // 3601
+		99999,                    // ticket 267's 27h46m seed
+		0, -1,                    // unset-shaped values must not read as "use the default"
+	} {
+		c.Risk.ConfirmTimeoutSec = bad
+		err := validate(c)
+		if err == nil {
+			t.Fatalf("risk.confirm_timeout_sec=%d must be rejected (%s)", bad, band)
+		}
+		if !strings.Contains(err.Error(), "risk.confirm_timeout_sec") {
+			t.Fatalf("error %q must name the key risk.confirm_timeout_sec", err)
+		}
+		if !strings.Contains(err.Error(), band) {
+			t.Fatalf("error %q must state the band %q", err, band)
+		}
+		if !strings.Contains(err.Error(), fmt.Sprintf("%d out of range", bad)) {
+			t.Fatalf("error %q must quote the offending value %d", err, bad)
+		}
+	}
+	// 31 is the floor precisely because the C18 warning needs Timeout() strictly
+	// greater than WarningLead(); validate_267_test.go re-derives that floor
+	// from approval.DefaultApprovalWarning instead of trusting this line.
+	for _, good := range []int{confirmTimeoutSecMin, 300, confirmTimeoutSecMax} {
+		c.Risk.ConfirmTimeoutSec = good
+		if err := validate(c); err != nil {
+			t.Fatalf("risk.confirm_timeout_sec=%d must validate: %v", good, err)
+		}
+	}
+}
+
+// TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne pins the two
+// edges of the band itself rather than a sample of it: one below the floor and
+// one at it. Kept separate from the table above so that moving the floor (a
+// contract decision, ticket 267's residual 1) fails here with the lead in the
+// message rather than in a list of numbers.
+func TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne(t *testing.T) {
+	c := validConfig(t)
+	c.Risk.ConfirmTimeoutSec = confirmTimeoutSecMin
+	if err := validate(c); err != nil {
+		t.Fatalf("the floor %d must load: %v", confirmTimeoutSecMin, err)
+	}
+	c.Risk.ConfirmTimeoutSec = confirmTimeoutSecMin - 1
+	if err := validate(c); err == nil {
+		t.Fatalf("a timeout equal to the C18 warning lead (%ds) must be rejected: it arms no warning at all", confirmTimeoutSecMin-1)
 	}
 }
 
