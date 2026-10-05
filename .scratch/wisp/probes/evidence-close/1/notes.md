@@ -22,11 +22,20 @@
 
 ⛔ 未跑：`go vet`、`gofumpt`（267 AC#4 四门另两门）＝非允许尺，具名"量不到，归编排者在安静窗口"。
 
-## B. commit 台账与 numstat 删除列（每笔 commit 后回填，应为 0）
+## B. commit 台账与 numstat 删除列（每笔 commit 后回填）
 
 | 笔 | commit | 时刻 | pathspec | `git diff --numstat HEAD~1..HEAD` 删除列 |
 |---|---|---|---|---|
-| 1 骨架 | 待回填 | | index + notes | |
-| 2 §1 | 待回填 | | index | |
-| 3 §2 | 待回填 | | index | |
-| 4 §3＋§4 | 待回填 | | index + notes | |
+| 1 骨架 | `d4e489fa` | 10-05 15:47 | index + notes | index `63\t0`、notes `32\t0` ⇒ **删除列全 0**（新建两枚文件，无删除） |
+| 2 §1 | `f75ca2da` | 10-05 15:54 | index | `50\t1` ⇒ 删除那 **1 行＝本腿 §1 自己的"未判（下一步填）。"占位行**（`git show` 逐字核＝`-未判（下一步填）。`）；⛔ 非吞别人行 |
+| 3 §2 | `6ac29ddc` | 10-05 15:58 | index | `52\t1` ⇒ 同上，删的是本腿 §2 占位行 |
+| 4 §3 | `84099d58` | 10-05 16:02 | index | `11\t1` ⇒ 同上，删的是本腿 §3 占位行 |
+| 5 §4＋notes | 待回填 | | index + notes | |
+
+**关于删除列＝1 的说明（本腿逐笔核过）**：每填一节就替掉本腿骨架里那一行 `未判（下一步填）。`。本索引件从头到尾**只有 `evidence-close-1` 自己的两枚 commit 碰过**（`git log --format='%an' -- <件>` 逐笔＝CarlosShao/evidence-close-1，无别腿），所以那个删除列**结构上不可能是别人的行**——是占位行被填实，属预期，⛔ 非"吞掉别人的行"。真正的卫生判据是"没在别人的文件上落笔、没把别人 staged 的东西带进 pathspec"——本腿每笔 pathspec 只点名 index（＋notes），且 commit 前 `git diff --cached --name-only` 现量为空（共享 index 无别人 staged 内容）。
+
+## C. 交付回报要点（终值以 commit 后现量为准）
+
+- 新建索引件：`docs/evidence/s1/265-267-evidence-index.md`（本腿唯一产品件）。
+- 现量到的盘-账不符：**共 2 处**，都在票 265——① census.md 字节 89,147（HEAD blob 同值）vs 票面 line32「89,141」（Δ6，行 496 一致）；② AC#0 物理框 `- [ ]`（line29）vs 台账 A607/e0790a45「五格全勾」。票 267 侧四门/越界尺与 a1/a2/r1/r2 各件字节**全部复跑对上、零处不符**。
+- ⛔ 未跑：`go vet`／`gofumpt`／任何 `go` 命令；已跑且仅此两把＝`d22scan.sh`（rc0 clean @14:49:32）、`check-path-length-budget.sh --with-self-test`（rc0 GREEN @14:51:19）。
