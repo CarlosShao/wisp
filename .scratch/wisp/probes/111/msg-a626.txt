@@ -1,0 +1,28 @@
+
+## A626
+
+2026-10-05 21:4x +08（取数 21:16–21:43 现量；HEAD 176d6277，未推 **119**）——第四波中断（**这一波不是额度，是服务侧故障**：回执逐字 `Sorry, something went wrong`；另有一枚撞 150 轮帽），三枚已恢复＋我自己把压推送的两格账销掉。
+
+**1. 死法逐枚（两把尺：commit 链＋盘上字节，不读通知正文）**
+- `111-r2b`＝★**撞 150 轮帽**（159 次调用／30.99M token／77.8 分钟），但**件已实质交完**：`probes/111/r2/evidence.md` **540 行／54,181 字节／待验 0**，五笔（6aac9e8a→fbf9060b→70596a40→ef748ca0 交件笔→960b450c 收尾自纠笔）。★它 §3 交回了票 111 AC#3 的核心：**GUARD D 正控两发实种**（D1 抽 internal/session、D3 换一枚），且 §3.0 先答了我派单那道闸——触发 GUARD D **不需要跑 25 包 go test**（只跑 scope 解析段）；§3.4 具名"GUARD D 不是 GUARD C 的重复"；§3.5 还原凭据。它 §5 三格归口＝winlive 半边（⛔ 未批）、cmd/wisp ubuntu 19 枚红（归票 98）、★GUARD D 今天接不进任何 CI 步（要动 ci.yml）。
+- `167-a5c`＝服务断流（120 次调用／24.4M token／69.4 分钟）。遗产＝`probes/167/a5b/census.md` **335 行／69,172 字节／待验 0**（四笔 076144fd→f22e5e01→689891c7→2afdaeb6＋我代提的 +9/-2 未提交增量＝176d6277，含它 §7.6 自指尺失手的第三处自纠与"交件自述供编排者复量"一节）。**接力的三腿分工已成件**：a5 交 §0–§3、a5b 交 §4（C17 名册 6 枚＋第五枚代价表）、a5c 交 §5–§7。
+- `268-v1b`＝服务断流（110 次调用／14.28M／49.3 分钟）。件 **291 行／29,547 字节**，§3/§4/§5/§6 已实，**只剩 5 格「待验」**（§1 的 AC#1／AC#2 两行＋§2 突变名册＋§7）＝**牙没装上**，这是唯一还欠着的验收面。
+- `evidence-close-2` 第二次＝服务断流（99 次调用／13.55M／48.7 分钟）＝**扫描做完了、交付件没写**：29 枚分拣件我已代提入库（`6050e171`，含 ticket-class.txt／final-table.tsv／classify*.sh 三把尺）。
+
+**2. ★安全尺（唯一会伤机主的那一类，先答它）**：`git status --porcelain -- cmd internal tools scripts .github docs/PLAN.md docs/specs`＝**空**＝268-v1b 死在"准备种突变"的位置，**盘上没有残留针**；被验产码 `cmd/wisp/resident_approval_windows.go` 工作树 md5＝`69a630bf350daf1032c62b921e9d7044`＝HEAD 逐字同值。票 111 的 AC 框仍 5 枚未勾（腿一枚未碰）。
+
+**3. 我自己欠的两格账，本波已销（带时刻）**
+- `sh scripts/d22scan.sh` 21:30:22→21:30:48 **rc=0 clean**，末行逐字 `no D22 ban violations`；分母 bans #1-5 internal/=228 cmd/=38、ban#6 frontend/=85、ban#7 internal/tools/=23、ban#8 design/=39 frontend/=85 internal/=512 **cmd/=104**（与 268-r1 末笔读数一致，未扩大）。
+- `sh scripts/check-path-length-budget.sh --with-self-test` 21:30:48→21:30:53 **rc=0 VERDICT GREEN**；tracked=**6026**／over-budget=57／covered by roster=57／**not in roster=0**；longest=180；runner 最差全路径 224（帽 165，墙 (206,217] 内 0 枚）。
+- ★名册差集我**独立算过**（不引用腿的表）：尺＝`grep -E '^--- (PASS|FAIL)'` 顶层。v1 死腿那次 **238**／r1 基线 **235**／r1 交付 **238**，FAIL 0、SKIP 0；**多的恰 3 枚逐名**＝TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig／…RefusedRiskConfigReachesStdoutOnce／…ClassifiesBySentinelNotByErrorWords，**少的＝0 枚**。⇒ 我欠的"cmd/wisp 整包逐名作差"这一格**到此结清**。
+- ⇒ 推送的**唯一剩余阻塞**＝268 的 AC#1/AC#2 判语＋三发突变（＝第 4 条那枚续腿）。
+
+**4. 恢复编队（21:43 起飞，CPU 31%／MEM 69.9%——贴着 70% 帽，故派单一律带"起 go 命令前自量、≥70% 就等"）**
+- `268-v2`＝补那 5 格：⛔ **不重跑 422 秒整包**（日志已在盘＝164ee2c2），只跑 `-run TestTicket268` 定向形；三发自重突变（折回同一字面／摘 stdout／旁加 prose 匹配），每发跑完 `git cat-file blob HEAD:` 还原＋md5 双读，红句逐字入 §2。
+- `evidence-close-3`＝把前腿 29 枚分拣件**收口成件**（`docs/evidence/s1/closed-tickets-evidence-index.md`＋AC 框对账清单：结案票物理未勾 **14 枚**、同行注记已翻而框未翻 **3 票**＝182/242/245），⛔ 一枚都不许改框，⛔ 不重做它的扫描。
+- `parking-2`＝刷 `HANDOVER.md` §4 最新一节（上一节是 15:0x 的 parking-1，已过期 6.5 小时并跨两波死亡）。
+- ⛔ 本轮**不派**任何票的落地腿：`cmd/wisp` 写面归 268-v2 的突变窗独占。
+
+**5. 编队死亡统计（今天一天，供后续排程定"件要多小"）**：额度中断 4 枚（17:3x 同刻全断：111-r1／111-r1b／167-a5＋更早 236-r1 撞 150 帽）；服务故障 5 枚（20:1x：268-v1／111-r2／167-a5b／evidence-close-2 首发；21:1x：268-v1b／evidence-close-2 二死／167-a5c）；撞轮次帽 2 枚（236-r1、111-r2b）。⇒ **两枚腿在 99–120 次调用之间死掉、正文全没提交**＝派单的"每节立刻单独 commit"确实救人（今天 0 次因此丢活，代提 6 笔全部落盘）。**新尺自记**：占位尺我写的是 `待[填]|填写[中]|未判`，而腿写"「待验」"＝**尺漏计**（268-v1 报占位 0、实剩 5 格）⇒ 占位名册要并上"待验"，且**交件判语格必须逐节亲读**，不能只信字符类尺。
+
+**6. 待人项与推送**：推送仍**按住**（未推 119），队列＝268-v2 交件 → 我复跑定向那发＋看三发红句 → **一批推送**（推前量 CPU、推后逐名比红名集）→ 231-r1（cause=newer-build 已裁）→ 267-v1 → 259-v1 → 167-r2 → 票 244 exec 通道钉。**摆给机主的仍是七枚**（Q-66／Q-77／票 264／167 AC#6／Q-76／Q-78／winlive），本波**一枚未摆**，四枚腿交完一次摆齐、每枚带"不做"栏。
