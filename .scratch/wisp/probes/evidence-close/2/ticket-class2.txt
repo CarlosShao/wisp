@@ -1,0 +1,92 @@
+01|NOFILE
+02|NOFILE
+03|NOFILE
+04|NOFILE
+05|IMPL:|VERDICT: 05-adversarial-acceptance.md
+06|NOFILE
+07|IMPL:|VERDICT: 07-adversarial-acceptance.md
+08|IMPL:|VERDICT: 08-adversarial-acceptance.md
+09|IMPL:|VERDICT: 09-adversarial-acceptance.md
+10|IMPL:|VERDICT: 10-adversarial-acceptance.md
+11|IMPL:|VERDICT:
+13|NOFILE
+14|NOFILE
+17|IMPL:|VERDICT: 17-adversarial-acceptance.md
+18|IMPL:|VERDICT: 18-adversarial-acceptance.md
+19|NOFILE
+63|IMPL:|VERDICT:
+66|IMPL:|VERDICT: 66-adversarial-acceptance.md
+67|IMPL:|VERDICT: 67-adversarial-acceptance.md
+69|IMPL:|VERDICT: 69-adversarial-acceptance.md
+73|IMPL:|VERDICT: 73-adversarial-acceptance.md
+74|IMPL:|VERDICT: 74-adversarial-acceptance.md
+75|IMPL:|VERDICT: 75-independent-verification.md
+76|IMPL:|VERDICT: 76-adversarial-acceptance.md
+78|NOFILE
+79|IMPL:|VERDICT: 79-adversarial-acceptance.md
+80|IMPL:|VERDICT:
+81|IMPL:|VERDICT: 81-adversarial-acceptance.md
+82|IMPL:|VERDICT: 82-adversarial-acceptance.md
+83|IMPL:|VERDICT: 83-adversarial-acceptance.md
+84|IMPL: 84-ac1-bounded-wait.md|VERDICT: 84-ac1-bounded-wait.md
+87|IMPL:|VERDICT: 87-adversarial-acceptance.md
+88|IMPL:|VERDICT: 88-adversarial-acceptance.md
+89|IMPL:|VERDICT: 89-adversarial-acceptance.md
+90|IMPL:|VERDICT: 90-adversarial-acceptance.md
+92|IMPL:|VERDICT: 92-adversarial-acceptance.md
+93|IMPL:|VERDICT: 93-adversarial-acceptance.md
+94|IMPL:|VERDICT: 94-adversarial-acceptance.md
+95|IMPL:|VERDICT: 95-adversarial-acceptance.md
+96|IMPL:|VERDICT: 96-adversarial-acceptance.md
+97|IMPL:|VERDICT: 97-adversarial-acceptance.md
+99|IMPL:|VERDICT: 99-adversarial-acceptance.md
+101|IMPL:|VERDICT: 101-adversarial-acceptance.md
+102|IMPL:|VERDICT: 102-adversarial-acceptance.md
+104|IMPL:|VERDICT: 104-adversarial-acceptance.md
+105|IMPL:|VERDICT: 105-adversarial-acceptance.md
+106|IMPL:|VERDICT: 106-adversarial-acceptance.md
+110|IMPL:|VERDICT: 110-adversarial-acceptance.md
+113|IMPL:|VERDICT: 113-adversarial-acceptance.md
+115|NOFILE
+116|IMPL:|VERDICT: 116-adversarial-acceptance.md
+117|IMPL:|VERDICT: 117-adversarial-acceptance.md
+118|IMPL:|VERDICT: 118-adversarial-acceptance.md
+119|IMPL: 119-ac7-impl.md|VERDICT: 119-ac1-ac2-r2-acceptance.md 119-ac2-r2b-acceptance.md 119-ac7-impl.md 119-ac7-r1-acceptance.md 119-adversarial-acceptance.md 119-next-audit-r1.md
+121|IMPL: 121-preflight-deps-reachability.md|VERDICT: 121-adversarial-acceptance.md
+126|IMPL:|VERDICT: 126-adversarial-acceptance.md
+127|IMPL:|VERDICT: 127-adversarial-acceptance.md
+129|IMPL:|VERDICT: 129-adversarial-acceptance.md
+131|IMPL:|VERDICT: 131-adversarial-acceptance.md 131-reaccept-ac4.md
+134|IMPL:|VERDICT: 134-ac5-gate-readings.md 134-ac6-contended-no-conclusion.md 134-adversarial-acceptance.md
+137|IMPL:|VERDICT: 137-ac1-r1-acceptance.md 137-ac2-ac5-impl.md 137-ac2-ac5-r1-acceptance.md 137-ac3-r1-acceptance.md 137-ac3-r2-acceptance.md 137-ac4-impl.md 137-ac4-r1-acceptance.md
+141|IMPL:|VERDICT: 141-ac2-stock-inventory-r1.md 141-ac34-positive-controls-r1.md 141-q46c-accept-r1.md
+142|IMPL:|VERDICT: 142-non-quiescent-index-guard-accept-r1.md 142-non-quiescent-index-guard-r1.md
+143|IMPL:|VERDICT: 143-panel-assets-r4-leg-accept-r1.md 143-panel-assets-r4-leg-r1.md
+144|IMPL: 144-slo-report-partial-read-r1.md|VERDICT: 144-slo-report-partial-read-r1-accept-r1.md 144-slo-report-partial-read-r1.md
+146|IMPL:|VERDICT: 146-liveapprovals-fix-r1.md 146-liveapprovals-r1-accept-r1.md 146-liveapprovals-r1-accept-r2.md 146-liveapprovals-r1.md
+147|IMPL:|VERDICT: 147-offset-naming-r1-accept-r1.md 147-offset-naming-r1.md
+149|IMPL:|VERDICT: 149-three-unpinned-outlets-r1-accept-r1.md 149-three-unpinned-outlets-r1.md
+151|IMPL:|VERDICT: 151-task-scope-never-closed-r1-accept-r1.md 151-task-scope-never-closed-r1.md
+152|IMPL:|VERDICT: 152-subject-death-never-measured-r1-accept-r1.md
+153|IMPL:|VERDICT: 153-ac2-a-closure-r1.md 153-trace-lies-unguarded-r1-accept-r1.md 153-trace-lies-unguarded-r1.md
+154|IMPL:|VERDICT: 154-close-gate-never-rings-r1-accept-r1.md 154-host-id-never-closed-r1.md
+155|IMPL: 155-three-unjudged-cells-r1.md|VERDICT: 155-three-unjudged-cells-r1-accept-r1.md 155-three-unjudged-cells-r1.md
+156|IMPL:|VERDICT: 156-close-and-load-bearing-r1-accept-r1.md 156-exited-asks-os-r1.md 156-r4-gates-and-cleanup-r1.md
+157|IMPL:|VERDICT: 157-ac5-recheck-r1.md 157-record-level-cleanup-r1-accept-r1.md
+161|IMPL: 161-gate-order-r4.md 161-gates-selftest-accept-r1.md|VERDICT: 161-attrib-selftest-r5.md 161-gate-aggregate-r6.md 161-gate-order-r4.md 161-gates-accept-r2.md 161-gates-selftest-accept-r1.md 161-selftests-r3.md
+162|IMPL:|VERDICT: 162-fs-edit-accept-r1.md 162-fs-edit-accept-r2.md 162-risk-tier-accept-v3.md 162-risk-tier-and-contract-axis-r4.md
+183|IMPL:|VERDICT: 183-exemption-why-not-live-a1.md 183-pointer-exemption-accept-v2.md
+184|IMPL:|VERDICT:
+198|IMPL:|VERDICT: 198-firstrun-config-r2.md 198-firstrun-config-v1.md
+212|IMPL:|VERDICT: 212-comments-phantom-citation-v2.md
+221|IMPL:|VERDICT: 221-task-cancel-v1.md
+235|IMPL:|VERDICT: 235-pool-nail-and-bridge-preread-v1.md
+241|IMPL:|VERDICT: 241-audio-level-producer-v1.md
+243|NOFILE
+250|NOFILE
+251|NOFILE
+254|NOFILE
+257|IMPL:|VERDICT: 257-clean-machine-provider-registry-v1.md
+263|NOFILE
+265|IMPL:|VERDICT: 265-267-evidence-index.md
+267|NOFILE

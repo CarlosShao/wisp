@@ -1,0 +1,146 @@
+# T05 对抗验收报告（编排者执行）|05-adversarial-acceptance.md
+# T07 对抗验收报告（编排者执行）|07-adversarial-acceptance.md
+# T08 对抗验收报告（编排者执行）|08-adversarial-acceptance.md
+# T09 对抗验收报告（T09-adv 独立执行）|09-adversarial-acceptance.md
+# T10 对抗验收报告（独立复核者执行）|10-adversarial-acceptance.md
+# 票 101 —— 独立对抗验收裁决表（`internal/perm` 的生产装配线）|101-adversarial-acceptance.md
+# 102 — C26 展开改写：独立对抗验收裁决表|102-adversarial-acceptance.md
+# 104 — 对抗验收：`SealFile` 对"继承来的"带外授权出声（两桶 + `kind=`）|104-adversarial-acceptance.md
+# 105 — 独立对抗验收裁决表（acceptor-ticket105）|105-adversarial-acceptance.md
+# 106 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket106`）|106-adversarial-acceptance.md
+# Ticket 11 — adversarial acceptance (LLM REST adapters)|11-adversarial-acceptance.md
+# 票 110 对抗验收裁决表（acceptor-110-97）|110-adversarial-acceptance.md
+# 票 113 — 对抗验收裁决表（`acceptor-ticket113`）|113-adversarial-acceptance.md
+# 票 116 对抗验收 —— `acceptor-ticket116`|116-adversarial-acceptance.md
+# 票 117 — 独立对抗验收（`acceptor-ticket117`）|117-adversarial-acceptance.md
+# 票 118 独立对抗验收表（acceptor-ticket118）|118-adversarial-acceptance.md
+# 票 119 — AC#1／AC#2 第二轮回判（`acceptor-ticket119-ac1-ac2-r2`，非实现者）|119-ac1-ac2-r2-acceptance.md
+# 票 119 · AC#2 复判（第二程 r2b）· 对抗验收表|119-ac2-r2b-acceptance.md
+# 119 AC#7 —— 实现侧交件：那两枚未解析根用例接了记名断言，并同时换到已解析基根|119-ac7-impl.md
+# 119 AC#7 —— 裁决表 r1（非实现者）|119-ac7-r1-acceptance.md
+# 票 119 — 独立对抗验收（`acceptor-ticket119`）|119-adversarial-acceptance.md
+# 119-`next=` 三问审计 r1 —— 只读取证（`auditor-ticket119-next`）|119-next-audit-r1.md
+# 121 对抗验收表 —— 模型交还链是否真被接上（AC#2/AC#3 那一族"能力有没有被接上"）|121-adversarial-acceptance.md
+# 121 预做（pre-flight）—— `cmd/wisp` 依赖图可达性读数|121-preflight-deps-reachability.md
+# 票 126 独立对抗验收 —— `sameTree`/`answerInsideTree` 加卷段（生产判据）|126-adversarial-acceptance.md
+# 票 127 独立对抗验收 —— 常驻 GUI 腿那 20 行 install 的第一枚钉（`R-117-A`，票 117 结案的唯一条件）|127-adversarial-acceptance.md
+# 票 129 — AC#4（变异自证）+ AC#5（门禁）读数表|129-ac4-ac5-mutation-and-gates.md
+# 票 129 — 独立对抗验收（AC#1..AC#5）|129-adversarial-acceptance.md
+# 票 131 独立对抗验收（第二任）—— 攻的就是那枚"从 `main.go` 现算腿清单"的枚举门|131-adversarial-acceptance.md
+# 票 131 续单 — 第 0 件：钉文件的跨平台编译破口（Linux 真跑读数）|131-followup-0-crossplatform.md
+# 票 131 续单 第 1 件：三形（X4／X8／X12）打进枚举门，另加两形自证与一枚邻票新形的答复|131-followup-1-three-shapes.md
+# 票 131 续单 第 2、3 件：第 0 件的 Linux 复核、票 130 越权改动的追认取证、`R-131-4` 措辞|131-followup-2-ratification-and-linux.md
+# 票 131 AC#4 复验（第三任）—— 裁的就是上一任判退回那一格|131-reaccept-ac4.md
+# 134 AC#2 + AC#3 取证 — `schedule` 触发落地、真 run 读数、以及反静默死钉的变异三态（2026-09-23）|134-ac2-ac3-trigger-and-freshness-pin.md
+# 134 AC#4 取证 — 采样有效性前置检查真触发（shape C，2026-09-23）|134-ac4-machine-contended-readings.md
+# 134 AC#5 取证 — 门禁复跑（d22scan 纯净快照 / scope 不降 / YAML 解析器 / 脚本 lint）2026-09-23|134-ac5-gate-readings.md
+# 134 AC#6 取证 — `machine-contended` 改判「本 run 无结论」+ 新鲜度钉改按「最近一次产出有效样本」计龄|134-ac6-contended-no-conclusion.md
+# 票 134 对抗验收（AC#1..AC#6）— `acceptor-ticket134-r1`，2026-09-23|134-adversarial-acceptance.md
+# 137 AC#1 —— 验收方第二程（r1）：把测量方那句"部分成立"独立重走一遍|137-ac1-r1-acceptance.md
+# 137 AC#1 —— winsec 那批 POSIX 拒绝腿在软链形下到底有没有牙（变异取证，不改生产码）|137-ac1-teeth-or-not.md
+# 137 AC#2／AC#5 —— 实现方第二程：收紧断言（含 108 那两枚内联腿）＋门禁|137-ac2-ac5-impl.md
+# 137 AC#2／AC#5 —— 验收方第一程（r1）：两格各裁一次，读数全部我自己打|137-ac2-ac5-r1-acceptance.md
+# 137 AC#3 —— 终裁（r2 程，写入本族既定的 `137-ac3-r1-acceptance.md` 路径）：只裁 AC#3 那一格|137-ac3-r1-acceptance.md
+# 137 AC#3 —— 验收方第二程（r2）：只裁 AC#3 那一格，读数全部我自己打|137-ac3-r2-acceptance.md
+# 137 AC#4 —— 那 7 处"按地界有意未换"的 raw `t.TempDir()`：逐枚判定＋换根后的 MUT-D 读数|137-ac4-impl.md
+# 137 AC#4 —— 终裁表（非实现者）：那 7 处递根点换得对不对，凭据是不是我自己跑出来的|137-ac4-r1-acceptance.md
+# 141 AC#2 —— ban #8 缺口段存量盘点（只读程 r1）|141-ac2-stock-inventory-r1.md
+# 141 — `AC#3` / `AC#4` 补发的正向对照（编排者现量，快照在仓库外）|141-ac34-positive-controls-r1.md
+# 141 / Q-46c 对抗验收表 r1（裁决者 ≠ 实现者）|141-q46c-accept-r1.md
+# 141 / `Q-46` 已批＝按推荐 —— 实现程交件表（`worker-ticket141-q46c`）|141-q46c-impl.md
+# 142-accept-r1 — 两读不原子守卫的对抗验收（非实现者程）|142-non-quiescent-index-guard-accept-r1.md
+# 142-r1 — 两读不原子的守卫（实现方自证；裁决表须出自非实现者）|142-non-quiescent-index-guard-r1.md
+# 票 143 对抗验收 r1 — `wisp panel-assets -taint-source` 那条腿：R4 到底是不是 assessor 判出来的|143-panel-assets-r4-leg-accept-r1.md
+# 票 143 — `wisp panel-assets` 那条产字节的路现在能打出由 assessor 真判出来的 R4 卡（r1）|143-panel-assets-r4-leg-r1.md
+# 144 — 对抗验收 r1（非实现者）：`collectReport` 分"没写完 / 坏了"这一味|144-slo-report-partial-read-r1-accept-r1.md
+# 144 — `wisp slo` 收主体报告：把"还没写完"与"真的坏了"分开 —— 实现程自证 r1|144-slo-report-partial-read-r1.md
+# 146-fix-r1 — 修复程裁决表：补上验收件退回的两枚洞（值保真 + 穷尽 fail-closed 普查）|146-liveapprovals-fix-r1.md
+# 146-r1 对抗验收（r1）—— `Queue.LiveApprovals()` 的 "copies"：裁决表|146-liveapprovals-r1-accept-r1.md
+# 146-r1 对抗验收（第二轮 r2）—— 修复程补上的那两味尺子：裁决表|146-liveapprovals-r1-accept-r2.md
+# 146-r1 — `Queue.LiveApprovals()` 的 "copies"：裁决表（实现程自证件）|146-liveapprovals-r1.md
+# 147 对抗验收件 r1 — `unwritten` 支的 offset 与那三枚新用例的牙|147-offset-naming-r1-accept-r1.md
+# 147 — 实现程证据件 r1：`unwritten` 分支的 offset 判定 ＋ 一枚会响的检|147-offset-naming-r1.md
+# 149 对抗验收 r1 — 三处未钉出口的修法、那把"第一版是坏的"尺、以及坏尺期间留在树里的读数|149-three-unpinned-outlets-r1-accept-r1.md
+# 149 实现件 r1 — `corrupt` 那条腿的取值、那句注释的反例、loop 第二个调用点|149-three-unpinned-outlets-r1.md
+# 151 验收 r1（非实现者对抗验收程）— `Bridge.CloseTask` 只开不关这一案的第二枚验收表|151-task-scope-never-closed-r1-accept-r1.md
+# 151 r1 — `Bridge.CloseTask` 全仓零调用者：per-task 污点 scope 只开不关（实现程判定与修法）|151-task-scope-never-closed-r1.md
+# 152 对抗验收 r1（非实现者）— 被验版本 `97cfc6e`|152-subject-death-never-measured-r1-accept-r1.md
+# 152 r1 — 真 subject 中途死掉那一条出口，第一次被**量**到：它在生产接线上今天产不出自己那句红|152-subject-death-never-measured-r1.md
+# 153 AC#2 部件 (a) 那两笔待补的**内容级**复核 · r1（非实现者验收程）|153-ac2-a-closure-r1.md
+# 153 — 那枚压缩痕的两条谎法 · 对抗验收件 r1（非实现者，只读取证）|153-trace-lies-unguarded-r1-accept-r1.md
+# 153 — 那枚压缩痕的两条谎法 · 实现件 r1（写码程）|153-trace-lies-unguarded-r1.md
+# 154 对抗验收程（非实现者）— 「关」只长在环路那一枚 id 上：RESERVED＋触发门那一票的六格|154-close-gate-never-rings-r1-accept-r1.md
+# 154 实现程 r1 — 「关」只长在环路那一枚 id 上：宿主自带 id 那一形仍没人关、并发任务零读数|154-host-id-never-closed-r1.md
+# 155 的三块"无人裁"——**非实现者**对抗验收 r1（复判：那三块是量出来的，还是推出来的）|155-three-unjudged-cells-r1-accept-r1.md
+# 155 — 票 153 剩下的三块"无人裁"·实现件 r1（只读取证，不写生产码）|155-three-unjudged-cells-r1.md
+# 票 156 — 非实现者验收表（accept-r1）：七格逐格裁 ＋ 承重按操作定义攻 ＋ 收口纪律|156-close-and-load-bearing-r1-accept-r1.md
+# 156 r1 — Q-57 落地＝乙：`sloSubject.exited()` 从此问 OS，那一发在本程锚点上被量了两次（改前 2209ms 说不死／改后 1 枚读数就认尸）|156-exited-asks-os-r1.md
+# 票 156 — r4 程证据件（AC#4② ＋ AC#7 改后那一发 ＋ AC#6 名册 ＋ 交件报告）|156-r4-gates-and-cleanup-r1.md
+# 票 157 · **AC#5 那一格的重判**（非实现者·第三程 r1；派单＝`.scratch/wisp/dispatches/2026-09-26-142x-accept-157-ac5-recheck.md`）|157-ac5-recheck-r1.md
+# 票 157（记录级收口）——**非实现者**验收 r1：抽四笔换尺重走 ＋ 裁那件"自相矛盾" ＋ 五枚框双向对账|157-record-level-cleanup-r1-accept-r1.md
+# 票 161 · 161-r5（写码位）＝归因尺的合成自测 ＋ CI 甲形那一步 ＋ `TRACKED-DIRTY` 腿的实测|161-attrib-selftest-r5.md
+# 票 161 · AC#3「有没有人按门铃」普查（161-r2 证据件 · r1）|161-doorbell-census-r1.md
+# 票 161 AC#6 —— 161-r6 交件证据（聚合退码＋两族成对普查各成一腿）|161-gate-aggregate-r6.md
+# 161-r1 证据件：D22 门禁盲区普查（AC#1 读数 + AC#5 契约轴 + 门禁）|161-gate-blindspot-r1.md
+# 161-r4 — AC#7② 归因仪器（两形读数）＋ AC#4 真摘一次|161-gate-order-r4.md
+# 161-gates-accept-r2 —— 票 161 的 AC#4／AC#6／AC#7 三格，非实现者裁决表（代号 161-v2）|161-gates-accept-r2.md
+# 161-v1 非实现者验收表：票 161 的 AC#1／AC#2／AC#3 三格（对抗验收，逐格独立读数）|161-gates-selftest-accept-r1.md
+# 161-r3 证据件：把自检装成规矩（AC#2）＋ 止血（AC#7①）＋ 反向判据（AC#4）|161-selftests-r3.md
+# 162-v1 验收件（**非实现者**）— 票 162 的 AC#1／AC#2／AC#3／AC#4 四格独立复算|162-fs-edit-accept-r1.md
+# 票 162 · 162-v2 验收表（非实现者）＝裁 r3 四件：AC#3b 两形响亮 ／ 那半格反向尺 ／ AC#4b 真硬杀 ／ 判据顺序|162-fs-edit-accept-r2.md
+# 162-r1 证据件 — 票 162 的两格：AC#1（读数）＋ AC#2（四枚拒绝）|162-fs-edit-r1.md
+# 162-r2 证据件 — 票 162 的第①②格（AC#3 行尾/BOM 正反两向＋AC#4 原子性反面实验）＋裁给本程的一句注释|162-fs-edit-r2.md
+# 票 162 · r3（写码位）＝AC#3b 两形变响亮 ＋ AC#4b 真硬杀那一半 ＋ "改完还是 CRLF" 反向尺半格 ＋ 判据顺序一笔|162-fs-edit-r3.md
+# 票 162 · AC#5（风险档与门控）＋ AC#6（契约轴） — 非实现者对抗验收表 `162-v3`|162-risk-tier-accept-v3.md
+# 票 162 · AC#5（风险档与门控＝L2）＋ AC#6（契约轴）＋ 派单 §3 那一枚〔现读码〕 — 写码位 `162-r4` 交件件|162-risk-tier-and-contract-axis-r4.md
+# T17 对抗验收报告（编排者执行）|17-adversarial-acceptance.md
+# T18 对抗验收报告（编排者执行）|18-adversarial-acceptance.md
+# T18 性能补证（perf AC 的 DEFERRED 关闭）— 2026-09-20|18-perf-bench-addendum.md
+# 183-a1 — 只读设计核：票 177 那枚"宿主自己写下的路径精确豁免"为什么在真机 CLI 上没护住|183-exemption-why-not-live-a1.md
+# 183-v2 — 非实现者对抗验收（收窄版）：宿主指针豁免的三发变异恒真性 / 安全退让面进攻 / 三条边界 / AC#2 措辞判读|183-pointer-exemption-accept-v2.md
+# 183-r1 — 先立在 HEAD 上就红的包级裁判，再逐族现量：F1（前程推荐的挖跨度）翻不动裁判，F2（按声明串自身的窗口值扣）翻得动，落的是 F2|183-pointer-exemption-r1.md
+# 183-r2 — 测试面装牙：AC#9 的第 8 枚常驻腿 / AC#2b 的 CLI 接缝常驻判据 / AC#4 那一形 / AC#6 一句归口 / AC#8 门禁重取|183-reread-permanent-teeth-r2.md
+# 184-c1 — `tool_call.decision` 取证词汇普查（只读·零产码）|184-audit-vocabulary-census-c1.md
+# 票 198 · 落地写腿 `198-r2` · 证据件（四小格：AC#2 仪器／AC#5 失败支用例／AC#4 "去哪儿补"／落点仪器收回本票）|198-firstrun-config-r2.md
+# 票 198 · 对抗验收腿 `198-v1` · 裁决表（首建 config.toml 只挂 `wisp run`）|198-firstrun-config-v1.md
+# 212-v2 对抗验收裁决（票 212 第 2 轮修码 212-r2；非实现者腿，实现者＝212-r2）|212-comments-phantom-citation-v2.md
+# 221 — 非实现者对抗验收表（腿 `221-v1`）|221-task-cancel-v1.md
+# 票 235 裁决表 —— 235-v1（非实现者验收腿）|235-pool-nail-and-bridge-preread-v1.md
+# 241-r1 — 电平生产者半：PCM 帧 → `0..1` 电平数（internal/audio 包内）|241-audio-level-producer-r1.md
+# 241-v1 — 裁决腿验收：`internal/audio` 电平生产者半（票 241 五格 AC）|241-audio-level-producer-v1.md
+# 257-v1 终裁件 — 票 257（干净机器上设置写不进去／形 ⓒ 首启回执）的对抗验收|257-clean-machine-provider-registry-v1.md
+# 凭据索引 — 票 265 与票 267（已结案，但 `docs/evidence/s1/` 里没有对应的表）|265-267-evidence-index.md
+# Ticket 63 — adversarial acceptance (credential-entry CLI)|63-adversarial-acceptance.md
+DIR|66
+# 票 66 对抗验收报告 — SLO 判据仪器返工（A14 解析末项 + A15 树外 CPU 口径）|66-adversarial-acceptance.md
+# 66 — AC#1 变异检验：解析器顺序缺陷的回归用例咬合证明|66-mutation-parse-order.md
+# 票 67 AC#3（判据①）— `wisp providers` verdict 列改 ASCII `PASS`/`FAIL`|67-ac3-ascii-verdict.md
+# 票 67 对抗验收 —— 让扫描器可信：`mockllm` 走受管出口 + 门必须自报覆盖面|67-adversarial-acceptance.md
+# 票 67 AC#3 判据②：ban #8 覆盖面真正扩到 `internal/` + `cmd/`，并证明它咬得住|67-emoji-scope-internal-cmd.md
+# 票 69 对抗验收 —— C21 令牌表的双向机器检查（A24-D4）|69-adversarial-acceptance.md
+# 69 — C21 表↔码双向断言的变异检验原始输出（AC#2）|69-mutation-tokens.md
+# 票 73 对抗验收 —— 孤儿暂存文件清扫器（A18 判据②的可执行化）|73-adversarial-acceptance.md
+# 票 73：孤儿 `.wisp-tmp-*` 清扫器落地，A18 判据②选"自愈"并测了四件事|73-orphan-staging-sweep.md
+# 票 74 对抗验收 —— C21 令牌表必须对齐真正驱动像素的常量|74-adversarial-acceptance.md
+# 票 75 — 独立验收复现（acceptor，非实现者、非编排者）|75-independent-verification.md
+# 票 75 — Linux 变异对照（独立重跑，证明 POSIX 判据真的咬得住）|75-linux-mutation-check.md
+# 票 75 — 根因定位与修复证据：C26 在 Linux 上产出反斜杠形状的 canonical|75-rootcause-linux-path-shape.md
+# 票 75 根因定位报告（只读代理产出，10:41）—— 由编排者代它落档|75-rootcause-locator-report.md
+# 票 76 对抗验收 —— 把 artifacts 路的"隐含安全"变成跑过的不变式（并修掉一个真绕过）|76-adversarial-acceptance.md
+# 票 79 — 对抗验收裁决表（编排者亲自复跑，2026-09-21）|79-adversarial-acceptance.md
+# 票 80 — AC#1 / AC#2 裁决：`blacklist_overrides` 是死线，但**契约没有写这条能力** ⇒ 不接线、上报编排者|80-ac1-ac2-verdict.md
+# 票 81 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 15:1x）|81-adversarial-acceptance.md
+# 票 82 — 独立对抗验收裁决表（acceptor-ticket82）|82-adversarial-acceptance.md
+# 票 83 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 14:3x）|83-adversarial-acceptance.md
+# 票 84 裁决表 — AC#1 两侧读数：`PendingApproval` 的等待**有界**（(b)），不是无限期阻塞（(c)）|84-ac1-bounded-wait.md
+# 票 87 独立对抗验收 —— `acceptor-ticket87`|87-adversarial-acceptance.md
+# 票 88 独立对抗验收 —— `ban #6` 这道门现在到底有没有牙|88-adversarial-acceptance.md
+# 票 89 独立对抗验收（acceptor-ticket89）|89-adversarial-acceptance.md
+# 票 90 —— 独立对抗验收（`acceptor-ticket90`）|90-adversarial-acceptance.md
+# 票 92 对抗验收表 — 主面板输入框 v2（档位显示 + 附件 + 工作区选择）|92-adversarial-acceptance.md
+# 93 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket93`）|93-adversarial-acceptance.md
+# 票 94 独立对抗验收（acceptor-ticket94）|94-adversarial-acceptance.md
+# 95 — 对抗验收裁决表（acceptor-ticket95 · 终版）|95-adversarial-acceptance.md
+# 票 96 独立对抗验收 —— `ban #8`（零 emoji）覆盖 `frontend/`|96-adversarial-acceptance.md
+# 票 97 对抗验收裁决表（acceptor-110-97）|97-adversarial-acceptance.md
+# 票 99 对抗验收裁决表 — `scripts/d22scan.sh` 第一步（阳性对照）被 `go test` 缓存端过去|99-adversarial-acceptance.md

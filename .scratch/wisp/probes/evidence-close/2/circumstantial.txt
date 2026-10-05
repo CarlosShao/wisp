@@ -1,0 +1,18 @@
+01 || REFS=docs/evidence/s1/136-slo-output-contract-census-r1.md docs/evidence/s1/157-ac5-recheck-r1.md  || PROBES=none
+02 || REFS=docs/evidence/s1/157-ac5-recheck-r1.md docs/evidence/s1/62-ball-visual-prototype.md docs/evidence/s1/panel-l2-grant-nail-fix-r5-accept-r1.md  || PROBES=none
+03 || REFS=docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md docs/evidence/s1/138-cancel-kills-children-r1.md docs/evidence/s1/157-ac5-recheck-r1.md  || PROBES=none
+04 || REFS=docs/evidence/s1/10-adversarial-acceptance.md docs/evidence/s1/225-deferred-registry-audit.md  || PROBES=none
+06 || REFS=docs/evidence/s1/157-ac5-recheck-r1.md docs/evidence/s1/18-adversarial-acceptance.md docs/evidence/s1/63-adversarial-acceptance.md  || PROBES=none
+13 || REFS=docs/evidence/s1/119-ac7-impl.md docs/evidence/s1/119-ac7-r1-acceptance.md docs/evidence/s1/137-ac2-ac5-impl.md  || PROBES=none
+14 || REFS=docs/evidence/s1/121-preflight-deps-reachability.md docs/evidence/s1/124-ac2b-2-conversion.md docs/evidence/s1/124-ac2b-4-conversion.md  || PROBES=none
+19 || REFS=docs/evidence/s1/07-adversarial-acceptance.md docs/evidence/s1/133-adversarial-acceptance.md docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md  || PROBES=none
+78 || REFS=docs/evidence/s1/121-adversarial-acceptance.md docs/evidence/s1/131-reaccept-ac4.md docs/evidence/s1/138-cancel-kills-children-r1.md  || PROBES=none
+115 || REFS=docs/evidence/s1/104-adversarial-acceptance.md docs/evidence/s1/111-ci-step-readings.md docs/evidence/s1/116-adversarial-acceptance.md  || PROBES=none
+243 || REFS=docs/evidence/s1/136-ac14-r1-acceptance.md docs/evidence/s1/228-resident-ball-v1.md  || PROBES=1
+250 || REFS=none || PROBES=29
+251 || REFS=none || PROBES=19
+254 || REFS=docs/evidence/s1/130-ac1-inventory-and-ruling.md docs/evidence/s1/137-ac2-ac5-impl.md docs/evidence/s1/137-ac3-r1-acceptance.md  || PROBES=33
+263 || REFS=docs/evidence/s1/137-ac4-r1-acceptance.md docs/evidence/s1/140-ac1-verdict-r1.md  || PROBES=198
+267 || REFS=docs/evidence/s1/257-clean-machine-provider-registry-v1.md docs/evidence/s1/265-267-evidence-index.md  || PROBES=39
+184 || REFS=docs/evidence/s1/183-pointer-exemption-r1.md docs/evidence/s1/184-audit-vocabulary-census-c1.md docs/evidence/s1/248-settings-write-path-v1.md  || PROBES=4
+265 || REFS=docs/evidence/s1/265-267-evidence-index.md docs/evidence/s1/ci-step-readings-2026-09-22.md  || PROBES=33

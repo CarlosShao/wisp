@@ -1,0 +1,146 @@
+ID|05-adversarial-acceptance.md|# T05 对抗验收报告（编排者执行）
+ID|07-adversarial-acceptance.md|# T07 对抗验收报告（编排者执行）
+ID|08-adversarial-acceptance.md|# T08 对抗验收报告（编排者执行）
+ID|09-adversarial-acceptance.md|# T09 对抗验收报告（T09-adv 独立执行）
+ID|10-adversarial-acceptance.md|# T10 对抗验收报告（独立复核者执行）
+ID|101-adversarial-acceptance.md|# 票 101 —— 独立对抗验收裁决表（`internal/perm` 的生产装配线）
+ID|102-adversarial-acceptance.md|# 102 — C26 展开改写：独立对抗验收裁决表
+ID|104-adversarial-acceptance.md|# 104 — 对抗验收：`SealFile` 对"继承来的"带外授权出声（两桶 + `kind=`
+ID|105-adversarial-acceptance.md|# 105 — 独立对抗验收裁决表（acceptor-ticket105）
+ID|106-adversarial-acceptance.md|# 106 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket106`）
+ID|11-adversarial-acceptance.md|
+ID|110-adversarial-acceptance.md|# 票 110 对抗验收裁决表（acceptor-110-97）
+ID|113-adversarial-acceptance.md|# 票 113 — 对抗验收裁决表（`acceptor-ticket113`）
+ID|116-adversarial-acceptance.md|# 票 116 对抗验收 —— `acceptor-ticket116`
+ID|117-adversarial-acceptance.md|# 票 117 — 独立对抗验收（`acceptor-ticket117`）
+ID|118-adversarial-acceptance.md|# 票 118 独立对抗验收表（acceptor-ticket118）
+ID|119-ac1-ac2-r2-acceptance.md|# 票 119 — AC#1／AC#2 第二轮回判（`acceptor-ticket119-ac1-ac2-r2`，非实现者
+ID|119-ac2-r2b-acceptance.md|# 票 119 · AC#2 复判（第二程 r2b）· 对抗验收表
+ID|119-ac7-impl.md|# 119 AC#7 —— 实现侧交件：那两枚未解析根用例接了记名断言，并同
+ID|119-ac7-r1-acceptance.md|# 119 AC#7 —— 裁决表 r1（非实现者）
+ID|119-adversarial-acceptance.md|# 票 119 — 独立对抗验收（`acceptor-ticket119`）
+ID|119-next-audit-r1.md|
+ID|121-adversarial-acceptance.md|# 121 对抗验收表 —— 模型交还链是否真被接上（AC#2/AC#3 那一族"能�
+ID|121-preflight-deps-reachability.md|**代理:** `audit-deps-reachability`（只读预做，不改码、不改票面、不 comm
+ID|126-adversarial-acceptance.md|# 票 126 独立对抗验收 —— `sameTree`/`answerInsideTree` 加卷段（生产判据
+ID|127-adversarial-acceptance.md|# 票 127 独立对抗验收 —— 常驻 GUI 腿那 20 行 install 的第一枚钉（`R-
+ID|129-ac4-ac5-mutation-and-gates.md|# 票 129 — AC#4（变异自证）+ AC#5（门禁）读数表
+ID|129-adversarial-acceptance.md|# 票 129 — 独立对抗验收（AC#1..AC#5）
+ID|131-adversarial-acceptance.md|# 票 131 独立对抗验收（第二任）—— 攻的就是那枚"从 `main.go` 现算�
+ID|131-followup-0-crossplatform.md|
+ID|131-followup-1-three-shapes.md|
+ID|131-followup-2-ratification-and-linux.md|
+ID|131-reaccept-ac4.md|
+ID|134-ac2-ac3-trigger-and-freshness-pin.md|
+ID|134-ac4-machine-contended-readings.md|
+ID|134-ac5-gate-readings.md|
+ID|134-ac6-contended-no-conclusion.md|
+ID|134-adversarial-acceptance.md|# 票 134 对抗验收（AC#1..AC#6）— `acceptor-ticket134-r1`，2026-09-23
+ID|137-ac1-r1-acceptance.md|裁决方：`acceptor-ticket137-ac1-r1`（**非实现者、非测量方**）。本格只�
+ID|137-ac1-teeth-or-not.md|
+ID|137-ac2-ac5-impl.md|**AC#2／AC#5 两勾均未翻**（票面 AC 归非实现者落笔）。AC#4（换根）是
+ID|137-ac2-ac5-r1-acceptance.md|判据依据＝票面 AC#2／AC#5 ＋ `docs/evidence/s1/137-ac1-r1-acceptance.md` 里终�
+ID|137-ac3-r1-acceptance.md|# 137 AC#3 —— 终裁（r2 程，写入本族既定的 `137-ac3-r1-acceptance.md` 路�
+ID|137-ac3-r2-acceptance.md|> 本格裁决者＝**非实现者**（`SPEC-12 §4.3` #1/#3、D22 双角色）。
+ID|137-ac4-impl.md|**agent**＝`worker-ticket137-ac4`（实现者）。**本件不是裁决表**：AC#4 的�
+ID|137-ac4-r1-acceptance.md|# 137 AC#4 —— 终裁表（非实现者）：那 7 处递根点换得对不对，凭据
+ID|141-ac2-stock-inventory-r1.md|
+ID|141-ac34-positive-controls-r1.md|**作者身份**：编排者。**本文件不是裁决表**——票 141 的非实现者�
+ID|141-q46c-accept-r1.md|# 141 / Q-46c 对抗验收表 r1（裁决者 ≠ 实现者）
+ID|141-q46c-impl.md|
+ID|142-non-quiescent-index-guard-accept-r1.md|# 142-accept-r1 — 两读不原子守卫的对抗验收（非实现者程）
+ID|142-non-quiescent-index-guard-r1.md|# 142-r1 — 两读不原子的守卫（实现方自证；裁决表须出自非实现者�
+ID|143-panel-assets-r4-leg-accept-r1.md|# 票 143 对抗验收 r1 — `wisp panel-assets -taint-source` 那条腿：R4 到底是�
+ID|143-panel-assets-r4-leg-r1.md|裁决者：本件作者＝实现者本人（票 143 的落地程）。**对抗验收与�
+ID|144-slo-report-partial-read-r1-accept-r1.md|# 144 — 对抗验收 r1（非实现者）：`collectReport` 分"没写完 / 坏了"这�
+ID|144-slo-report-partial-read-r1.md|**身份**：实现程（写代码）。本文件是**实现者自证**，不是裁决表 
+ID|146-liveapprovals-fix-r1.md|# 146-fix-r1 — 修复程裁决表：补上验收件退回的两枚洞（值保真 + 穷�
+ID|146-liveapprovals-r1-accept-r1.md|# 146-r1 对抗验收（r1）—— `Queue.LiveApprovals()` 的 "copies"：裁决表
+ID|146-liveapprovals-r1-accept-r2.md|# 146-r1 对抗验收（第二轮 r2）—— 修复程补上的那两味尺子：裁决�
+ID|146-liveapprovals-r1.md|# 146-r1 — `Queue.LiveApprovals()` 的 "copies"：裁决表（实现程自证件）
+ID|147-offset-naming-r1-accept-r1.md|# 147 对抗验收件 r1 — `unwritten` 支的 offset 与那三枚新用例的牙
+ID|147-offset-naming-r1.md|- 本件作者：**实现程**（写码代理）。票面五框**不由本件勾选**（`S
+ID|149-three-unpinned-outlets-r1-accept-r1.md|# 149 对抗验收 r1 — 三处未钉出口的修法、那把"第一版是坏的"尺、�
+ID|149-three-unpinned-outlets-r1.md|- 来路：票 147 对抗验收件 `docs/evidence/s1/147-offset-naming-r1-accept-r1.md` §
+ID|151-task-scope-never-closed-r1-accept-r1.md|# 151 验收 r1（非实现者对抗验收程）— `Bridge.CloseTask` 只开不关这一�
+ID|151-task-scope-never-closed-r1.md|- 角色＝实现程（本件不是验收表；按 `SPEC-12 §4.3` #1 与 AGENTS §0.3，�
+ID|152-subject-death-never-measured-r1-accept-r1.md|# 152 对抗验收 r1（非实现者）— 被验版本 `97cfc6e`
+ID|152-subject-death-never-measured-r1.md|
+ID|153-ac2-a-closure-r1.md|# 153 AC#2 部件 (a) 那两笔待补的**内容级**复核 · r1（非实现者验收程�
+ID|153-trace-lies-unguarded-r1-accept-r1.md|# 153 — 那枚压缩痕的两条谎法 · 对抗验收件 r1（非实现者，只读取�
+ID|153-trace-lies-unguarded-r1.md|来路：票 139 对抗验收件 `docs/evidence/s1/139-compression-leaves-no-trace-r1-acce
+ID|154-close-gate-never-rings-r1-accept-r1.md|# 154 对抗验收程（非实现者）— 「关」只长在环路那一枚 id 上：RESE
+ID|154-host-id-never-closed-r1.md|本件是**实现程**自己那一遍；票面框由编排者按**非实现者**验收表�
+ID|155-three-unjudged-cells-r1-accept-r1.md|# 155 的三块"无人裁"——**非实现者**对抗验收 r1（复判：那三块是量
+ID|155-three-unjudged-cells-r1.md|- 本程身份：**实现方（只读取证）**。票面框**一枚不勾**、`-done` **�
+ID|156-close-and-load-bearing-r1-accept-r1.md|# 票 156 — 非实现者验收表（accept-r1）：七格逐格裁 ＋ 承重按操作�
+ID|156-exited-asks-os-r1.md|
+ID|156-r4-gates-and-cleanup-r1.md|
+ID|157-ac5-recheck-r1.md|# 票 157 · **AC#5 那一格的重判**（非实现者·第三程 r1；派单＝`.scratch
+ID|157-record-level-cleanup-r1-accept-r1.md|# 票 157（记录级收口）——**非实现者**验收 r1：抽四笔换尺重走 ＋ 
+ID|161-attrib-selftest-r5.md|
+ID|161-doorbell-census-r1.md|# 票 161 · AC#3「有没有人按门铃」普查（161-r2 证据件 · r1）
+ID|161-gate-aggregate-r6.md|# 票 161 AC#6 —— 161-r6 交件证据（聚合退码＋两族成对普查各成一腿�
+ID|161-gate-blindspot-r1.md|# 161-r1 证据件：D22 门禁盲区普查（AC#1 读数 + AC#5 契约轴 + 门禁）
+ID|161-gate-order-r4.md|
+ID|161-gates-accept-r2.md|# 161-gates-accept-r2 —— 票 161 的 AC#4／AC#6／AC#7 三格，非实现者裁决表
+ID|161-gates-selftest-accept-r1.md|# 161-v1 非实现者验收表：票 161 的 AC#1／AC#2／AC#3 三格（对抗验收，�
+ID|161-selftests-r3.md|
+ID|162-fs-edit-accept-r1.md|# 162-v1 验收件（**非实现者**）— 票 162 的 AC#1／AC#2／AC#3／AC#4 四格�
+ID|162-fs-edit-accept-r2.md|# 票 162 · 162-v2 验收表（非实现者）＝裁 r3 四件：AC#3b 两形响亮 ／ �
+ID|162-fs-edit-r1.md|
+ID|162-fs-edit-r2.md|
+ID|162-fs-edit-r3.md|
+ID|162-risk-tier-accept-v3.md|# 票 162 · AC#5（风险档与门控）＋ AC#6（契约轴） — 非实现者对抗验
+ID|162-risk-tier-and-contract-axis-r4.md|
+ID|17-adversarial-acceptance.md|# T17 对抗验收报告（编排者执行）
+ID|18-adversarial-acceptance.md|# T18 对抗验收报告（编排者执行）
+ID|18-perf-bench-addendum.md|
+ID|183-exemption-why-not-live-a1.md|
+ID|183-pointer-exemption-accept-v2.md|# 183-v2 — 非实现者对抗验收（收窄版）：宿主指针豁免的三发变异�
+ID|183-pointer-exemption-r1.md|
+ID|183-reread-permanent-teeth-r2.md|
+ID|184-audit-vocabulary-census-c1.md|# 184-c1 — `tool_call.decision` 取证词汇普查（只读·零产码）
+ID|198-firstrun-config-r2.md|> 上一枚非实现者裁决表＝`docs/evidence/s1/198-firstrun-config-v1.md`（本件�
+ID|198-firstrun-config-v1.md|# 票 198 · 对抗验收腿 `198-v1` · 裁决表（首建 config.toml 只挂 `wisp run`�
+ID|212-comments-phantom-citation-v2.md|# 212-v2 对抗验收裁决（票 212 第 2 轮修码 212-r2；非实现者腿，实现者
+ID|221-task-cancel-v1.md|# 221 — 非实现者对抗验收表（腿 `221-v1`）
+ID|235-pool-nail-and-bridge-preread-v1.md|# 票 235 裁决表 —— 235-v1（非实现者验收腿）
+ID|241-audio-level-producer-r1.md|
+ID|241-audio-level-producer-v1.md|
+ID|257-clean-machine-provider-registry-v1.md|# 257-v1 终裁件 — 票 257（干净机器上设置写不进去／形 ⓒ 首启回执�
+ID|265-267-evidence-index.md|本件不是对抗验收表，也不是缺口审计；它只是凭据索引。这两枚票
+ID|63-adversarial-acceptance.md|
+DIR|66|-
+ID|66-adversarial-acceptance.md|# 票 66 对抗验收报告 — SLO 判据仪器返工（A14 解析末项 + A15 树外 CPU
+ID|66-mutation-parse-order.md|
+ID|67-ac3-ascii-verdict.md|
+ID|67-adversarial-acceptance.md|# 票 67 对抗验收 —— 让扫描器可信：`mockllm` 走受管出口 + 门必须自
+ID|67-emoji-scope-internal-cmd.md|
+ID|69-adversarial-acceptance.md|# 票 69 对抗验收 —— C21 令牌表的双向机器检查（A24-D4）
+ID|69-mutation-tokens.md|
+ID|73-adversarial-acceptance.md|# 票 73 对抗验收 —— 孤儿暂存文件清扫器（A18 判据②的可执行化）
+ID|73-orphan-staging-sweep.md|
+ID|74-adversarial-acceptance.md|# 票 74 对抗验收 —— C21 令牌表必须对齐真正驱动像素的常量
+ID|75-independent-verification.md|# 票 75 — 独立验收复现（acceptor，非实现者、非编排者）
+ID|75-linux-mutation-check.md|
+ID|75-rootcause-linux-path-shape.md|
+ID|75-rootcause-locator-report.md|
+ID|76-adversarial-acceptance.md|# 票 76 对抗验收 —— 把 artifacts 路的"隐含安全"变成跑过的不变式（
+ID|79-adversarial-acceptance.md|# 票 79 — 对抗验收裁决表（编排者亲自复跑，2026-09-21）
+ID|80-ac1-ac2-verdict.md|
+ID|81-adversarial-acceptance.md|# 票 81 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 15:1x）
+ID|82-adversarial-acceptance.md|# 票 82 — 独立对抗验收裁决表（acceptor-ticket82）
+ID|83-adversarial-acceptance.md|# 票 83 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 14:3x）
+ID|84-ac1-bounded-wait.md|# 票 84 裁决表 — AC#1 两侧读数：`PendingApproval` 的等待**有界**（(b)）�
+ID|87-adversarial-acceptance.md|# 票 87 独立对抗验收 —— `acceptor-ticket87`
+ID|88-adversarial-acceptance.md|# 票 88 独立对抗验收 —— `ban #6` 这道门现在到底有没有牙
+ID|89-adversarial-acceptance.md|# 票 89 独立对抗验收（acceptor-ticket89）
+ID|90-adversarial-acceptance.md|# 票 90 —— 独立对抗验收（`acceptor-ticket90`）
+ID|92-adversarial-acceptance.md|# 票 92 对抗验收表 — 主面板输入框 v2（档位显示 + 附件 + 工作区选�
+ID|93-adversarial-acceptance.md|# 93 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket93`）
+ID|94-adversarial-acceptance.md|# 票 94 独立对抗验收（acceptor-ticket94）
+ID|95-adversarial-acceptance.md|# 95 — 对抗验收裁决表（acceptor-ticket95 · 终版）
+ID|96-adversarial-acceptance.md|# 票 96 独立对抗验收 —— `ban #8`（零 emoji）覆盖 `frontend/`
+ID|97-adversarial-acceptance.md|# 票 97 对抗验收裁决表（acceptor-110-97）
+ID|99-adversarial-acceptance.md|# 票 99 对抗验收裁决表 — `scripts/d22scan.sh` 第一步（阳性对照）被 `go

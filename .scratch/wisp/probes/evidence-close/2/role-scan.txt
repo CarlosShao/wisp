@@ -1,0 +1,146 @@
+[05-adversarial-acceptance.md] ROLE=>>>
+[07-adversarial-acceptance.md] ROLE=>>>
+[08-adversarial-acceptance.md] ROLE=>>>
+[09-adversarial-acceptance.md] ROLE=>>>
+[10-adversarial-acceptance.md] ROLE=>>>
+[101-adversarial-acceptance.md] ROLE=>>># 票 101 —— 独立对抗验收裁决表（`internal/perm` 的生产装配线） - 来源档位图例：〔独立复现〕= 本代理亲敲命令�
+[102-adversarial-acceptance.md] ROLE=>>># 102 — C26 展开改写：独立对抗验收裁决表 **档位图例**：〔独立复现〕= 本代理亲自敲命令、读到真实 exit code；�
+[104-adversarial-acceptance.md] ROLE=>>>| `/tmp/ac104-red-fk` | `4693feb` 纯净树 | 修前红复算 | | `/tmp/ac104-m1-fk` … `m6-fk` | `4d43447` 逐发重抽 + 单发变异 | AC#3 变异
+[105-adversarial-acceptance.md] ROLE=>>># 105 — 独立对抗验收裁决表（acceptor-ticket105） HEAD 复算时点：`f6818f24ec404063fc6dde408edbe5b56acdf2ac`（分支 `dev`），本�
+[106-adversarial-acceptance.md] ROLE=>>># 106 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket106`） 档位：**① 〔独立复现〕** / **② 〔日志＋归档，�
+[11-adversarial-acceptance.md] ROLE=>>>
+[110-adversarial-acceptance.md] ROLE=>>># 票 110 对抗验收裁决表（acceptor-110-97） 档位图例：〔独立复现〕= 验收方自己跑出同形读数 · 〔日志＋归档，我�
+[113-adversarial-acceptance.md] ROLE=>>># 票 113 — 对抗验收裁决表（`acceptor-ticket113`） 档位图例：〔独立复现〕= 我亲手跑过并贴读数 / 〔日志＋归档，�
+[116-adversarial-acceptance.md] ROLE=>>>**被验 sha**：`80e248c`（用例）＋ `63fdbd2`（票面 append）。锚定复算/变异一律 `git archive 80e248c | tar -x`。 〔日志＋归�
+[117-adversarial-acceptance.md] ROLE=>>>- 被验 commit：`ce666ea`（5 枚代码文件）/ `23403ab`（票面入库）/ `e9d70ca`（接续者复算账） 
+[118-adversarial-acceptance.md] ROLE=>>>不重写**，只在"读数五"里对它做抽验（快照 md5、归档日志逐发重点数、变异字节落地）并补 AC#3 的恒真/恒假两发
+[119-ac1-ac2-r2-acceptance.md] ROLE=>>>
+[119-ac2-r2b-acceptance.md] ROLE=>>>
+[119-ac7-impl.md] ROLE=>>># 119 AC#7 —— 实现侧交件：那两枚未解析根用例接了记名断言，并同时换到已解析基根 **本件不是裁决表**：AC#7 �
+[119-ac7-r1-acceptance.md] ROLE=>>># 119 AC#7 —— 裁决表 r1（非实现者） 
+[119-adversarial-acceptance.md] ROLE=>>>
+[119-next-audit-r1.md] ROLE=>>># 119-`next=` 三问审计 r1 —— 只读取证（`auditor-ticket119-next`） 的归属三条量清楚，只新建 `119-next-audit-r1.md`"。 
+[121-adversarial-acceptance.md] ROLE=>>>## 1. 裁决表（七格 + AC#5 那一空格） | **AC#1** 复算四件仪器 | **通过。** 四件我全部自己重跑（§2）：接后依赖图�
+[121-preflight-deps-reachability.md] ROLE=>>>**代理:** `audit-deps-reachability`（只读预做，不改码、不改票面、不 commit、不 push） **复算快照:** `git archive HEAD | tar -
+[126-adversarial-acceptance.md] ROLE=>>>## 0. 会话口径（先声明我怎么做，免得读数无法复算）   | `/tmp/ac126-sq/pre2` | `git archive 09b5285` + 交件那枚用例文件 |
+[127-adversarial-acceptance.md] ROLE=>>>### 1.1 M4 我自己复算了一遍（原文照贴） 
+[129-ac4-ac5-mutation-and-gates.md] ROLE=>>># 票 129 — AC#4（变异自证）+ AC#5（门禁）读数表 
+[129-adversarial-acceptance.md] ROLE=>>>**总判与五格 1:1 裁决表在第 6 节；`R-129-1..R-129-6` 与归单建议在第 7 节； 
+[131-adversarial-acceptance.md] ROLE=>>>
+[131-followup-0-crossplatform.md] ROLE=>>>**执行方**：`worker-ticket131-followup`（票 131 续单） 
+[131-followup-1-three-shapes.md] ROLE=>>>会话：`worker-ticket131-followup-r2`。接续撞轮次上限的前任 `worker-ticket131-followup`   "P1 ⇒ helper 仍须红"**不成立**（读数
+[131-followup-2-ratification-and-linux.md] ROLE=>>>会话：`worker-ticket131-followup-r2`。锚点：开工 `git rev-parse HEAD` = `b723978` 所以本档所有读数仍对得上 `b723978` 那一版分
+[131-reaccept-ac4.md] ROLE=>>>**被验交件**：票 131 的「续单」三件（续#1/续#2/续#3），实现方 `worker-ticket131-followup` + `worker-ticket131-followup-r2` 
+[134-ac2-ac3-trigger-and-freshness-pin.md] ROLE=>>>
+[134-ac4-machine-contended-readings.md] ROLE=>>>
+[134-ac5-gate-readings.md] ROLE=>>>## 2. 台账各 scope 不降（与票 99 裁决表那一行逐格比） 
+[134-ac6-contended-no-conclusion.md] ROLE=>>>简报给的线索是**断言**，我独立复算：`gh api repos/CarlosShao/wisp/actions/runs/35817761098/jobs` + 
+[134-adversarial-acceptance.md] ROLE=>>>下面每一格要么是**我自己重跑的原文**，要么写明"只复核了实现方的读数、复算方式是 X"。   3. 「`docs/evidence/s1/1
+[137-ac1-r1-acceptance.md] ROLE=>>>`docs/evidence/s1/137-ac1-teeth-or-not.md`；本件是**独立复现**，不是它的附录。 
+[137-ac1-teeth-or-not.md] ROLE=>>>
+[137-ac2-ac5-impl.md] ROLE=>>>  | `1d38206` | 测量方 `137-ac1-teeth-or-not.md` §0 的锚 | `commit` | 
+[137-ac2-ac5-r1-acceptance.md] ROLE=>>>
+[137-ac3-r1-acceptance.md] ROLE=>>>`docs/evidence/s1/137-ac2-ac5-impl.md` 与上一程终裁件 `137-ac2-ac5-r1-acceptance.md` 都是**被审对象或抽验对象，不是本件的依�
+[137-ac3-r2-acceptance.md] ROLE=>>>
+[137-ac4-impl.md] ROLE=>>>**agent**＝`worker-ticket137-ac4`（实现者）。**本件不是裁决表**：AC#4 的勾**没翻**，终裁归非实现者。 三档口径（本件
+[137-ac4-r1-acceptance.md] ROLE=>>>三档口径（每节自标）：〔独立复现〕＝本程自己在树上跑出来的；〔日志＋归档，抽验〕＝引别程读数但本程重
+[141-ac2-stock-inventory-r1.md] ROLE=>>>**agent**：`auditor-ticket141-inventory-r1` 
+[141-ac34-positive-controls-r1.md] ROLE=>>>**作者身份**：编排者。**本文件不是裁决表**——票 141 的非实现者裁决在 `141-q46c-accept-r1.md`（总裁＝附条件成立�
+[141-q46c-accept-r1.md] ROLE=>>>
+[141-q46c-impl.md] ROLE=>>>
+[142-non-quiescent-index-guard-accept-r1.md] ROLE=>>>## 0. 锚点、脏树隔离、以及简报前提的逐条复算 
+[142-non-quiescent-index-guard-r1.md] ROLE=>>># 142-r1 — 两读不原子的守卫（实现方自证；裁决表须出自非实现者） 
+[143-panel-assets-r4-leg-accept-r1.md] ROLE=>>>  每次漂移后都复算过 `git diff --name-only d242168 HEAD -- cmd/wisp/` = **0 行**（现量两次：`0e17914`、`3855dc6`）   每发之后复
+[143-panel-assets-r4-leg-r1.md] ROLE=>>>## §0 前提复算：七条 —— 四条成立、两条要说准、一条（票面自己的引用）不成立 | # | 简报那句前提 | 复算结�
+[144-slo-report-partial-read-r1-accept-r1.md] ROLE=>>>| **①** | `a91d7c2` 的三处自述（"改动只有空白"／"前后两版 `diff -w` 逐字相同"／commit 标题"只改对齐"）**为假**；真�
+[144-slo-report-partial-read-r1.md] ROLE=>>>**身份**：实现程（写代码）。本文件是**实现者自证**，不是裁决表 —— 按 `AGENTS.md §0.3` / 
+[146-liveapprovals-fix-r1.md] ROLE=>>># 146-fix-r1 — 修复程裁决表：补上验收件退回的两枚洞（值保真 + 穷尽 fail-closed 普查） - 修复程身份：**写代码的�
+[146-liveapprovals-r1-accept-r1.md] ROLE=>>># 146-r1 对抗验收（r1）—— `Queue.LiveApprovals()` 的 "copies"：裁决表 - 被验对象：票 146（`internal/agent/approval/pending_read.
+[146-liveapprovals-r1-accept-r2.md] ROLE=>>># 146-r1 对抗验收（第二轮 r2）—— 修复程补上的那两味尺子：裁决表   **复算结果：简报那五行变异对照表逐字成
+[146-liveapprovals-r1.md] ROLE=>>># 146-r1 — `Queue.LiveApprovals()` 的 "copies"：裁决表（实现程自证件） - 写手：`agent=ticket146`（实现程，**同一程写码又�
+[147-offset-naming-r1-accept-r1.md] ROLE=>>># 147 对抗验收件 r1 — `unwritten` 支的 offset 与那三枚新用例的牙 
+[147-offset-naming-r1.md] ROLE=>>># 147 — 实现程证据件 r1：`unwritten` 分支的 offset 判定 ＋ 一枚会响的检 3738d3b evidence(146 二轮验收 r2): 打⑤(更正段�
+[149-three-unpinned-outlets-r1-accept-r1.md] ROLE=>>>- 票面：`.scratch/wisp/issues/149-the-corrupt-leg-of-the-offset-field-has-zero-teeth-the-new-comment-claims-a-sufficient-condition-with-counterexam
+[149-three-unpinned-outlets-r1.md] ROLE=>>>- 票面：`.scratch/wisp/issues/149-the-corrupt-leg-of-the-offset-field-has-zero-teeth-the-new-comment-claims-a-sufficient-condition-with-counterexam
+[151-task-scope-never-closed-r1-accept-r1.md] ROLE=>>>- 变异与复算用三枚仓库外树： 
+[151-task-scope-never-closed-r1.md] ROLE=>>>
+[152-subject-death-never-measured-r1-accept-r1.md] ROLE=>>>| 第 4 格 | 承重两问 | **成立**（本程复算，并对它的问二给一处**更严的答**：操作员那一句零变化） | 
+[152-subject-death-never-measured-r1.md] ROLE=>>>
+[153-ac2-a-closure-r1.md] ROLE=>>>**里面写的账对不对**——157 的验收件对它自己 AC#2 那行写的是「成立（**形状**；这两笔不在本程的抽判射程）」
+[153-trace-lies-unguarded-r1-accept-r1.md] ROLE=>>># 153 — 那枚压缩痕的两条谎法 · 对抗验收件 r1（非实现者，只读取证） 被验版本＝**`6de3d1c5`**（票 153 实现件最�
+[153-trace-lies-unguarded-r1.md] ROLE=>>>来路：票 139 对抗验收件 `docs/evidence/s1/139-compression-leaves-no-trace-r1-accept-r1.md` §6.2 第 2、3 件。 
+[154-close-gate-never-rings-r1-accept-r1.md] ROLE=>>>  ⇒ 这枚证据件在锚点与 HEAD 是同一枚 blob（编排者另已 cmp 过前 520 行），本程仍一律 `git show 5766be9:<路径>` 取版�
+[154-host-id-never-closed-r1.md] ROLE=>>>
+[155-three-unjudged-cells-r1-accept-r1.md] ROLE=>>>凭据＝`probes/155-accept/00-preflight.sh` ＋ `00-preflight.txt`、`10-ruler-caliber-and-counts.txt`。 
+[155-three-unjudged-cells-r1.md] ROLE=>>>| 验收件 §12.3 用的 `86b0161` | commit | `feat(frontend 10 首启引导)`——派单那两枚的**父的父** | 成立 | | 到盘复算锚点 `
+[156-close-and-load-bearing-r1-accept-r1.md] ROLE=>>>| **〔日志＋归档，本程抽验〕** | 别的程入库的日志，**本程自己重新数过四数／名册**，不是转述 | | **〔某程读�
+[156-exited-asks-os-r1.md] ROLE=>>>
+[156-r4-gates-and-cleanup-r1.md] ROLE=>>># 票 156 — r4 程证据件（AC#4② ＋ AC#7 改后那一发 ＋ AC#6 名册 ＋ 交件报告）   交出了 `3fbb1ce`（gofumpt 修形）与那�
+[157-ac5-recheck-r1.md] ROLE=>>>- **一句话总裁决：AC#5 ＝〔成立〕（那一整张双向对账表早在 `ef1c474`（13:41:25）就已在盘上）。前一张验收件判的
+[157-record-level-cleanup-r1-accept-r1.md] ROLE=>>>- 本程时刻：进场 `2026-09-26 13:26 +0800`（`date` 现取，`probes/157-accept/00-preflight.txt` P 段），收口 13:4x 名册尺按派单要�
+[161-attrib-selftest-r5.md] ROLE=>>>35  - [ ] **AC#7（09-26 22:0x 追加，来路＝161-r1 报回＋编排者独立复算）自家取证台件不许把全仓门点红，且"跑门"必�
+[161-doorbell-census-r1.md] ROLE=>>># 票 161 · AC#3「有没有人按门铃」普查（161-r2 证据件 · r1） - 本程性质＝**只读普查**。生产字节零改动；写面只�
+[161-gate-aggregate-r6.md] ROLE=>>># 票 161 AC#6 —— 161-r6 交件证据（聚合退码＋两族成对普查各成一腿） 档位标记：**〔本程现跑〕**＝我在这一程�
+[161-gate-blindspot-r1.md] ROLE=>>># 161-r1 证据件：D22 门禁盲区普查（AC#1 读数 + AC#5 契约轴 + 门禁） 
+[161-gate-order-r4.md] ROLE=>>>- [ ] **AC#7（09-26 22:0x 追加，来路＝161-r1 报回＋编排者独立复算）自家取证台件不许把全仓门点红，且"跑门"必须排
+[161-gates-accept-r2.md] ROLE=>>># 161-gates-accept-r2 —— 票 161 的 AC#4／AC#6／AC#7 三格，非实现者裁决表（代号 161-v2） - 被验的三格：AC#4（反向判据�
+[161-gates-selftest-accept-r1.md] ROLE=>>>   〔仅自述，我未复算〕——要钉它需要一次安静窗口的真树现跑。 3. **B3 盲区（bans #1–#5 不看 `_test.go`）没独立
+[161-selftests-r3.md] ROLE=>>># 161-r3 证据件：把自检装成规矩（AC#2）＋ 止血（AC#7①）＋ 反向判据（AC#4） - 射程：**AC#7①（止血）＋ AC#2（自�
+[162-fs-edit-accept-r1.md] ROLE=>>># 162-v1 验收件（**非实现者**）— 票 162 的 AC#1／AC#2／AC#3／AC#4 四格独立复算 - ⚠ `docs/evidence/s1/162-fs-edit-r1.md` 与 `-
+[162-fs-edit-accept-r2.md] ROLE=>>>5. 面板/UI 那一层没看：AC#3b 的"外部可见"本程只复算到**回执＋审计行**两处（票面 `:38` 的口径）；这两处再往外�
+[162-fs-edit-r1.md] ROLE=>>># 162-r1 证据件 — 票 162 的两格：AC#1（读数）＋ AC#2（四枚拒绝） - 档别标注约定：**〔本轮现跑〕**＝这一程亲自�
+[162-fs-edit-r2.md] ROLE=>>># 162-r2 证据件 — 票 162 的第①②格（AC#3 行尾/BOM 正反两向＋AC#4 原子性反面实验）＋裁给本程的一句注释 - 档别�
+[162-fs-edit-r3.md] ROLE=>>>> - [ ] **AC#3b（09-27 11:0x 编排者追加，来路＝162-r2 登记的"今天静默通过的两形"）**：本票的立票原则是**"响亮失败�
+[162-risk-tier-accept-v3.md] ROLE=>>>- 被验证据件＝`docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md`（现量 236 行，与锚点 blob 一致） fd8201e7 2026-09-27 17:53:58 
+[162-risk-tier-and-contract-axis-r4.md] ROLE=>>>> **AC#6 契约轴**：本票**只许**动 `docs/PLAN.md` 的 `D34` 那一行（**需 owner 单独批准，且批准原文要落台账**）＋ `intern
+[17-adversarial-acceptance.md] ROLE=>>>
+[18-adversarial-acceptance.md] ROLE=>>>
+[18-perf-bench-addendum.md] ROLE=>>>> 只有实现者的一句自述。audit-B 把它列为 13 张 done 票里唯一带实质动作的 MAJOR。 
+[183-exemption-why-not-live-a1.md] ROLE=>>>
+[183-pointer-exemption-accept-v2.md] ROLE=>>>
+[183-pointer-exemption-r1.md] ROLE=>>>
+[183-reread-permanent-teeth-r2.md] ROLE=>>>- 派单：`.scratch/wisp/dispatches/2026-09-28-135x-impl-183-r2-grow-the-two-missing-teeth-and-re-take-the-gates-after-your-own-last-commit.md` 
+[184-audit-vocabulary-census-c1.md] ROLE=>>># 184-c1 — `tool_call.decision` 取证词汇普查（只读·零产码） - 读面：`docs/evidence/s1/184-audit-vocabulary-census-c1.md`（本件�
+[198-firstrun-config-r2.md] ROLE=>>># 票 198 · 落地写腿 `198-r2` · 证据件（四小格：AC#2 仪器／AC#5 失败支用例／AC#4 "去哪儿补"／落点仪器收回本票） >
+[198-firstrun-config-v1.md] ROLE=>>># 票 198 · 对抗验收腿 `198-v1` · 裁决表（首建 config.toml 只挂 `wisp run`） > ＋尾部修正 `9edeba1f` ＋实现者证据件 `.scra
+[212-comments-phantom-citation-v2.md] ROLE=>>>  →`1353ce66`（证据件满稿＋读数档＋两台突变脚本）→`d4b2e9b5`（§8 终态复量）。 
+[221-task-cancel-v1.md] ROLE=>>>- **本腿起跑前置**：每次 `go test` 前 `tasklist //FI "IMAGENAME eq go.exe" | grep -c go.exe` ＝ **0**；突变全部走 `-overlay`， | 额
+[235-pool-nail-and-bridge-preread-v1.md] ROLE=>>># 票 235 裁决表 —— 235-v1（非实现者验收腿）   所有突变只经 `go test -overlay` 施加，每发之后 `git status --porcelain -- 
+[241-audio-level-producer-r1.md] ROLE=>>>
+[241-audio-level-producer-v1.md] ROLE=>>>| AC#1 标度是真的 | 静默⇒严格 0；满幅方波⇒1.0 或具名上界；正弦对 `1/√2`（两头都钉）有具名容差；三发缺一�
+[257-clean-machine-provider-registry-v1.md] ROLE=>>>| 本腿写面（授权） | `docs/evidence/s1/257-clean-machine-provider-registry-v1.md`＋`.scratch/wisp/probes/257/v1/**`；突变只许种进 `cmd
+[265-267-evidence-index.md] ROLE=>>>
+[63-adversarial-acceptance.md] ROLE=>>>| 2 — no plaintext in argv / logs / errors / temp files, proven not asserted | **PASS** | (a) **My own mutation**: added `"value", value` to the aud
+[66] ROLE=DIR
+[66-adversarial-acceptance.md] ROLE=>>>> 今天我在票 62 上盖过一个**假 `-done`**（八个 AC 框一个都没勾、且 AC#8 要的裁决表根本不存在）， > 归档物齐全�
+[66-mutation-parse-order.md] ROLE=>>>
+[67-ac3-ascii-verdict.md] ROLE=>>>
+[67-adversarial-acceptance.md] ROLE=>>>**证据档位**：〔独立复现〕／〔日志＋归档，我抽验〕／〔仅自述，不背书〕 ## 裁决表（与票面 4 个 AC 框 1:1） |
+[67-emoji-scope-internal-cmd.md] ROLE=>>>
+[69-adversarial-acceptance.md] ROLE=>>>**证据档位标记**：〔独立复现〕= 我亲自敲命令并读真实输出；〔日志＋归档，我抽验〕= 数字来自代理但我核对�
+[69-mutation-tokens.md] ROLE=>>>
+[73-adversarial-acceptance.md] ROLE=>>>## 裁决表（与票面 5 个 AC 框 1:1） | **AC#2** 归属是真的，不是"前缀匹配就删" | **PASS** | 我的独立变异：`stagingAttribu
+[73-orphan-staging-sweep.md] ROLE=>>>
+[74-adversarial-acceptance.md] ROLE=>>>**档位**：〔独立复现〕／〔日志＋归档，我抽验〕／〔仅自述，不背书〕 | **AC#5** 门禁 | **PASS** | 我的读数：`-coun
+[75-independent-verification.md] ROLE=>>>
+[75-linux-mutation-check.md] ROLE=>>>
+[75-rootcause-linux-path-shape.md] ROLE=>>>
+[75-rootcause-locator-report.md] ROLE=>>>
+[76-adversarial-acceptance.md] ROLE=>>>**档位**：〔独立复现〕／〔日志＋归档，我抽验〕／〔仅自述，不背书〕 | **AC#2** containment 用真目录差分而非字�
+[79-adversarial-acceptance.md] ROLE=>>># 票 79 — 对抗验收裁决表（编排者亲自复跑，2026-09-21） **〔日志＋归档，我抽验〕**＝数字来自代理，但我核对�
+[80-ac1-ac2-verdict.md] ROLE=>>>
+[81-adversarial-acceptance.md] ROLE=>>># 票 81 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 15:1x） 
+[82-adversarial-acceptance.md] ROLE=>>># 票 82 — 独立对抗验收裁决表（acceptor-ticket82） | H | 1:1 裁决表 + 票 70 结论 + 改名建议 | **已做完** | 
+[83-adversarial-acceptance.md] ROLE=>>># 票 83 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 14:3x） | **AC#1** 键表（六键定罪 + `ConfirmLocked` 判为"不说谎" 
+[84-ac1-bounded-wait.md] ROLE=>>># 票 84 裁决表 — AC#1 两侧读数：`PendingApproval` 的等待**有界**（(b)），不是无限期阻塞（(c)） 
+[87-adversarial-acceptance.md] ROLE=>>>
+[88-adversarial-acceptance.md] ROLE=>>>
+[89-adversarial-acceptance.md] ROLE=>>>## 进度总览（**全部 8 项 + AC#6 的 POSIX 腿已做完；结论在文末裁决表**） 
+[90-adversarial-acceptance.md] ROLE=>>>
+[92-adversarial-acceptance.md] ROLE=>>>**证据档位图例**：〔独立复现〕= 本代理自己在机器上跑出来/写探针复算出来的；〔日志＋归档，我抽验〕= 代理
+[93-adversarial-acceptance.md] ROLE=>>># 93 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket93`） 档位图例：**① 〔独立复现〕**＝我自己跑出来的；*
+[94-adversarial-acceptance.md] ROLE=>>>## 进度总览（七项攻击 + 一项对票面论证的反向变异，全部做完；结论在文末 1:1 裁决表） 
+[95-adversarial-acceptance.md] ROLE=>>># 95 — 对抗验收裁决表（acceptor-ticket95 · 终版） - 档位标注：〔独立复现〕= 本代理亲敲；〔日志＋归档，我抽验�
+[96-adversarial-acceptance.md] ROLE=>>>
+[97-adversarial-acceptance.md] ROLE=>>># 票 97 对抗验收裁决表（acceptor-110-97） 档位图例：〔独立复现〕= 验收方自己跑出同形读数 · 〔日志＋归档，我�
+[99-adversarial-acceptance.md] ROLE=>>># 票 99 对抗验收裁决表 — `scripts/d22scan.sh` 第一步（阳性对照）被 `go test` 缓存端过去 来源档位：**A=独立复现**（�

@@ -1,0 +1,92 @@
+C 01 | NONE
+C 02 | NONE
+C 03 | NONE
+C 04 | NONE
+A 05 | VERDICT: 05-adversarial-acceptance.md  | OTHER: 
+C 06 | NONE
+A 07 | VERDICT: 07-adversarial-acceptance.md  | OTHER: 
+A 08 | VERDICT: 08-adversarial-acceptance.md  | OTHER: 
+A 09 | VERDICT: 09-adversarial-acceptance.md  | OTHER: 
+A 10 | VERDICT: 10-adversarial-acceptance.md  | OTHER: 
+B 11 | OTHERONLY: 11-adversarial-acceptance.md 
+C 13 | NONE
+C 14 | NONE
+A 17 | VERDICT: 17-adversarial-acceptance.md  | OTHER: 
+A 18 | VERDICT: 18-adversarial-acceptance.md  | OTHER: 18-perf-bench-addendum.md 
+C 19 | NONE
+B 63 | OTHERONLY: 63-adversarial-acceptance.md 
+A 66 | VERDICT: 66-adversarial-acceptance.md  | OTHER: 66 66-mutation-parse-order.md 
+A 67 | VERDICT: 67-adversarial-acceptance.md  | OTHER: 67-ac3-ascii-verdict.md 67-emoji-scope-internal-cmd.md 
+A 69 | VERDICT: 69-adversarial-acceptance.md  | OTHER: 69-mutation-tokens.md 
+A 73 | VERDICT: 73-adversarial-acceptance.md  | OTHER: 73-orphan-staging-sweep.md 
+A 74 | VERDICT: 74-adversarial-acceptance.md  | OTHER: 
+A 75 | VERDICT: 75-independent-verification.md  | OTHER: 75-linux-mutation-check.md 75-rootcause-linux-path-shape.md 75-rootcause-locator-report.md 
+A 76 | VERDICT: 76-adversarial-acceptance.md  | OTHER: 
+C 78 | NONE
+A 79 | VERDICT: 79-adversarial-acceptance.md  | OTHER: 
+B 80 | OTHERONLY: 80-ac1-ac2-verdict.md 
+A 81 | VERDICT: 81-adversarial-acceptance.md  | OTHER: 
+A 82 | VERDICT: 82-adversarial-acceptance.md  | OTHER: 
+A 83 | VERDICT: 83-adversarial-acceptance.md  | OTHER: 
+B 84 | OTHERONLY: 84-ac1-bounded-wait.md 
+A 87 | VERDICT: 87-adversarial-acceptance.md  | OTHER: 
+A 88 | VERDICT: 88-adversarial-acceptance.md  | OTHER: 
+A 89 | VERDICT: 89-adversarial-acceptance.md  | OTHER: 
+A 90 | VERDICT: 90-adversarial-acceptance.md  | OTHER: 
+A 92 | VERDICT: 92-adversarial-acceptance.md  | OTHER: 
+A 93 | VERDICT: 93-adversarial-acceptance.md  | OTHER: 
+A 94 | VERDICT: 94-adversarial-acceptance.md  | OTHER: 
+A 95 | VERDICT: 95-adversarial-acceptance.md  | OTHER: 
+A 96 | VERDICT: 96-adversarial-acceptance.md  | OTHER: 
+A 97 | VERDICT: 97-adversarial-acceptance.md  | OTHER: 
+A 99 | VERDICT: 99-adversarial-acceptance.md  | OTHER: 
+A 101 | VERDICT: 101-adversarial-acceptance.md  | OTHER: 
+A 102 | VERDICT: 102-adversarial-acceptance.md  | OTHER: 
+A 104 | VERDICT: 104-adversarial-acceptance.md  | OTHER: 
+A 105 | VERDICT: 105-adversarial-acceptance.md  | OTHER: 
+A 106 | VERDICT: 106-adversarial-acceptance.md  | OTHER: 
+A 110 | VERDICT: 110-adversarial-acceptance.md  | OTHER: 
+A 113 | VERDICT: 113-adversarial-acceptance.md  | OTHER: 
+C 115 | NONE
+A 116 | VERDICT: 116-adversarial-acceptance.md  | OTHER: 
+A 117 | VERDICT: 117-adversarial-acceptance.md  | OTHER: 
+A 118 | VERDICT: 118-adversarial-acceptance.md  | OTHER: 
+A 119 | VERDICT: 119-ac1-ac2-r2-acceptance.md 119-ac2-r2b-acceptance.md 119-ac7-r1-acceptance.md 119-adversarial-acceptance.md  | OTHER: 119-ac7-impl.md 119-next-audit-r1.md 
+A 121 | VERDICT: 121-adversarial-acceptance.md  | OTHER: 121-preflight-deps-reachability.md 
+A 126 | VERDICT: 126-adversarial-acceptance.md  | OTHER: 
+A 127 | VERDICT: 127-adversarial-acceptance.md  | OTHER: 
+A 129 | VERDICT: 129-adversarial-acceptance.md  | OTHER: 129-ac4-ac5-mutation-and-gates.md 
+A 131 | VERDICT: 131-adversarial-acceptance.md 131-followup-1-three-shapes.md 131-reaccept-ac4.md  | OTHER: 131-followup-0-crossplatform.md 131-followup-2-ratification-and-linux.md 
+A 134 | VERDICT: 134-ac6-contended-no-conclusion.md 134-adversarial-acceptance.md  | OTHER: 134-ac2-ac3-trigger-and-freshness-pin.md 134-ac4-machine-contended-readings.md 134-ac5-gate-readings.md 
+A 137 | VERDICT: 137-ac1-r1-acceptance.md 137-ac2-ac5-r1-acceptance.md 137-ac3-r1-acceptance.md 137-ac3-r2-acceptance.md 137-ac4-impl.md 137-ac4-r1-acceptance.md  | OTHER: 137-ac1-teeth-or-not.md 137-ac2-ac5-impl.md 
+A 141 | VERDICT: 141-ac2-stock-inventory-r1.md 141-q46c-accept-r1.md  | OTHER: 141-ac34-positive-controls-r1.md 141-q46c-impl.md 
+A 142 | VERDICT: 142-non-quiescent-index-guard-accept-r1.md 142-non-quiescent-index-guard-r1.md  | OTHER: 
+A 143 | VERDICT: 143-panel-assets-r4-leg-accept-r1.md 143-panel-assets-r4-leg-r1.md  | OTHER: 
+A 144 | VERDICT: 144-slo-report-partial-read-r1-accept-r1.md  | OTHER: 144-slo-report-partial-read-r1.md 
+B 146 | OTHERONLY: 146-liveapprovals-fix-r1.md 146-liveapprovals-r1-accept-r1.md 146-liveapprovals-r1-accept-r2.md 146-liveapprovals-r1.md 
+A 147 | VERDICT: 147-offset-naming-r1-accept-r1.md  | OTHER: 147-offset-naming-r1.md 
+A 149 | VERDICT: 149-three-unpinned-outlets-r1-accept-r1.md  | OTHER: 149-three-unpinned-outlets-r1.md 
+A 151 | VERDICT: 151-task-scope-never-closed-r1-accept-r1.md 151-task-scope-never-closed-r1.md  | OTHER: 
+A 152 | VERDICT: 152-subject-death-never-measured-r1.md  | OTHER: 152-subject-death-never-measured-r1-accept-r1.md 
+B 153 | OTHERONLY: 153-ac2-a-closure-r1.md 153-trace-lies-unguarded-r1-accept-r1.md 153-trace-lies-unguarded-r1.md 
+A 154 | VERDICT: 154-host-id-never-closed-r1.md  | OTHER: 154-close-gate-never-rings-r1-accept-r1.md 
+A 155 | VERDICT: 155-three-unjudged-cells-r1-accept-r1.md  | OTHER: 155-three-unjudged-cells-r1.md 
+A 156 | VERDICT: 156-close-and-load-bearing-r1-accept-r1.md  | OTHER: 156-exited-asks-os-r1.md 156-r4-gates-and-cleanup-r1.md 
+A 157 | VERDICT: 157-ac5-recheck-r1.md 157-record-level-cleanup-r1-accept-r1.md  | OTHER: 
+A 161 | VERDICT: 161-gates-selftest-accept-r1.md  | OTHER: 161-attrib-selftest-r5.md 161-doorbell-census-r1.md 161-gate-aggregate-r6.md 161-gate-blindspot-r1.md 161-gate-order-r4.md 161-gates-accept-r2.md 161-selftests-r3.md 
+A 162 | VERDICT: 162-fs-edit-accept-r2.md  | OTHER: 162-fs-edit-accept-r1.md 162-fs-edit-r1.md 162-fs-edit-r2.md 162-fs-edit-r3.md 162-risk-tier-accept-v3.md 162-risk-tier-and-contract-axis-r4.md 
+A 183 | VERDICT: 183-pointer-exemption-accept-v2.md  | OTHER: 183-exemption-why-not-live-a1.md 183-pointer-exemption-r1.md 183-reread-permanent-teeth-r2.md 
+B 184 | OTHERONLY: 184-audit-vocabulary-census-c1.md 
+B 198 | OTHERONLY: 198-firstrun-config-r2.md 198-firstrun-config-v1.md 
+B 212 | OTHERONLY: 212-comments-phantom-citation-v2.md 
+A 221 | VERDICT: 221-task-cancel-v1.md  | OTHER: 
+A 235 | VERDICT: 235-pool-nail-and-bridge-preread-v1.md  | OTHER: 
+A 241 | VERDICT: 241-audio-level-producer-v1.md  | OTHER: 241-audio-level-producer-r1.md 
+C 243 | NONE
+C 250 | NONE
+C 251 | NONE
+C 254 | NONE
+A 257 | VERDICT: 257-clean-machine-provider-registry-v1.md  | OTHER: 
+C 263 | NONE
+B 265 | OTHERONLY: 265-267-evidence-index.md 
+C 267 | NONE
