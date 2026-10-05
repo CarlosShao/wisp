@@ -16,17 +16,24 @@ import (
 //   - the mint end: every queued item's grant is bound to a digest covering
 //     the item's own identity fields, and a replayed correlation id lands on
 //     a different digest because the sequence number is folded in.
+//
+// 259-r1 mechanical note: spend used to return a bool and now returns a
+// grantDenial (ticket 259 AC#2). Every judgement below is the SAME failure
+// condition written against the new shape - denialNone is exactly the old true,
+// anything else exactly the old false - and no message text moved. The old/new
+// equivalence pair is transcribed in
+// .scratch/wisp/probes/259/r1/evidence.md §2.
 func TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce(t *testing.T) {
 	s := newGrantStore()
 	s.issue("nonce-live", "digest-of-item-one")
 
-	if s.spend("nonce-live", "digest-of-item-two") {
+	if d := s.spend("nonce-live", "digest-of-item-two"); d == denialNone {
 		t.Fatal("AC#1 RED: a grant bound to item one was spent with item two's digest - the binding layer did not reject the forged binding")
 	}
 	if s.live() != 0 {
 		t.Fatalf("AC#1 RED: after a rejected spend the nonce survived (%d live); a rejected answer must still consume the grant or the forged caller can retry it", s.live())
 	}
-	if s.spend("nonce-live", "digest-of-item-one") {
+	if d := s.spend("nonce-live", "digest-of-item-one"); d == denialNone {
 		t.Fatal("AC#1 RED: the rejected nonce was still spendable afterwards - single-use was broken by the forged attempt")
 	}
 }
@@ -37,7 +44,7 @@ func TestTicket242SpendRequiresTheExactBinding(t *testing.T) {
 	// path would burn the grant before the exact-digest assertion ran.
 	s := newGrantStore()
 	s.issue("nonce-e", bindDigest("corr", "task", "tool", "L2", 1, []byte("args")))
-	if s.spend("nonce-e", "") {
+	if d := s.spend("nonce-e", ""); d == denialNone {
 		t.Fatal("AC#1 RED: empty binding spent a live grant")
 	}
 	if s.live() != 0 {
@@ -47,7 +54,7 @@ func TestTicket242SpendRequiresTheExactBinding(t *testing.T) {
 	happy := newGrantStore()
 	want := bindDigest("corr", "task", "tool", "L2", 1, []byte("args"))
 	happy.issue("nonce-a", want)
-	if !happy.spend("nonce-a", want) {
+	if d := happy.spend("nonce-a", want); d != denialNone {
 		t.Fatal("AC#1 RED: the exact minted digest failed to spend its own grant - the mint/spend round trip is broken")
 	}
 	if happy.live() != 0 {
@@ -101,7 +108,7 @@ func TestTicket242ForgedBindingCannotSpendAnotherItemsGrant(t *testing.T) {
 		t.Fatalf("enqueue B: %v", err)
 	}
 	// Item B's binding must not open item A's grant even if a nonce leaked.
-	if itA.grants.spend("leaked-or-guessed-nonce", itB.bind) {
+	if d := itA.grants.spend("leaked-or-guessed-nonce", itB.bind); d == denialNone {
 		t.Fatal("AC#1 RED: item B's binding spent item A's grant - cross-item binding is broken")
 	}
 }

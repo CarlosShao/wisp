@@ -415,11 +415,76 @@ func (s *grantStore) issue(nonce, bind string) {
 	s.values[nonce] = bind
 }
 
-// spend validates and consumes. It reports why a rejection happened in
-// user-safe terms: never "close, you got 3 bytes right".
-func (s *grantStore) spend(nonce, bind string) bool {
+// grantDenial is the INTERNAL answer to one question: why did this allow not
+// spend a grant (ticket 259 AC#2). Before this type existed the answer was a
+// bool, so "no proof presented", "proof not live on this card", "proof live but
+// bound to something else" and "the card already left pending" folded into one
+// reply, and the audit line could only list them ("missing/spent/misbound")
+// instead of naming which one happened.
+//
+// Scope, stated because the two halves are NOT the same decision:
+//
+//   - audit side (this type, and Queue.allowScoped's GRANT-DENY line): the four
+//     causes are named apart, so an auditor attributes a refusal by reading a
+//     line instead of inferring it from the absence of three other lines;
+//   - API and UI side: unchanged on purpose. Every grant denial still leaves
+//     this package as the one error value ErrBadGrant with the one merged
+//     sentence (ui.go), and no caller - native, panel, host router or a page -
+//     can read a grantDenial from out here. That merge is the anti-probe
+//     property the ErrBadGrant comment states, and ticket 259 does not move it.
+//
+// It is unexported for that reason: exporting it would hand the distinction to
+// exactly the faces the merge exists to keep it from.
+type grantDenial uint8
+
+// The denials. denialNone is the zero value and means "no denial": the spend
+// succeeded. The others are the four causes of ticket 259 AC#2, one apiece.
+const (
+	denialNone grantDenial = iota
+	// denialMissingNonce: no proof was presented at all (the empty value).
+	denialMissingNonce
+	// denialSpentNonce: the presented value is not live in THIS card's own
+	// store. One label covers "already spent" and "never issued" deliberately:
+	// spending deletes the row, so telling them apart needs a kept roster of
+	// dead nonces, which is a new state face and not what AC#2 asked for.
+	denialSpentNonce
+	// denialMisbound: the proof IS live on this card, but the binding digest
+	// it was issued under does not match the one it is presented against.
+	denialMisbound
+	// denialNotPending: the item exists but already left the pending set, so no
+	// proof of any quality could be spent on it. Produced by the queue (the
+	// store has no view of item state), not by spend.
+	denialNotPending
+)
+
+// label is the token the audit line prints. It is a machine-readable name, not
+// user-facing prose, and it never appears in any error value or card text.
+func (d grantDenial) label() string {
+	switch d {
+	case denialNone:
+		return "none"
+	case denialMissingNonce:
+		return "missing-nonce"
+	case denialSpentNonce:
+		return "spent-or-never-live-nonce"
+	case denialMisbound:
+		return "misbound"
+	case denialNotPending:
+		return "card-not-pending"
+	default:
+		return "unclassified-denial"
+	}
+}
+
+// spend validates and consumes, and returns WHICH denial it reached (ticket
+// 259 AC#2): denialNone means the grant opened the card, anything else means it
+// did not and says why in audit terms. The control flow is the pre-259 one,
+// byte-for-byte equivalent in outcome: the nonce is consumed whether or not the
+// binding matched (a rejected caller cannot retry), and an unknown value
+// deletes nothing. What changed is only that the branch taken is now reportable.
+func (s *grantStore) spend(nonce, bind string) grantDenial {
 	if nonce == "" {
-		return false
+		return denialMissingNonce
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -428,9 +493,12 @@ func (s *grantStore) spend(nonce, bind string) bool {
 			continue
 		}
 		delete(s.values, v) // consumed whether or not the binding matched
-		return equalSecret(stored, bind)
+		if !equalSecret(stored, bind) {
+			return denialMisbound
+		}
+		return denialNone
 	}
-	return false
+	return denialSpentNonce
 }
 
 // revoke drops every live nonce for the item (answered, expired, host gone).

@@ -366,20 +366,34 @@ func (q *Queue) allowScoped(corr, nonce string, forSession bool) error {
 		return ErrUnknownCorrelation
 	}
 	if it.state != statePending {
+		// Ticket 259 AC#2: the denial is named in the audit even on the cause
+		// the store never sees. Read the tool under the lock - this item is
+		// settled, and a settled item is the one thing this queue must never
+		// re-describe from a stale pointer after the lock is gone.
+		settled := it.Dec.Tool
 		q.mu.Unlock()
+		q.logf("approval: GRANT-DENY corr=%s tool=%s denial=%s", corr, settled, denialNotPending.label())
 		return ErrNotPending
 	}
 	// Read while the lock is held: the answer line has to name the call the
 	// grant authorised, and a settled item is the one thing this queue must
 	// never re-describe from a stale pointer.
 	tool := it.Dec.Tool
-	spent := it.grants.spend(nonce, it.bind)
+	denial := it.grants.spend(nonce, it.bind)
 	q.mu.Unlock()
-	if !spent {
+	if denial != denialNone {
+		// Two lines, and the order is the point (ticket 259 AC#2): the first
+		// names WHICH denial happened for the auditor, the second is the merged
+		// sentence this funnel has always written - kept verbatim, because the
+		// audit face is where the distinction belongs and the outward face is
+		// where the merge belongs. Nothing between these two lines and
+		// ErrBadGrant below may read the denial: it stops here.
+		q.logf("approval: GRANT-DENY corr=%s tool=%s denial=%s", corr, tool, denial.label())
 		q.logf("approval: FORGED-OR-STALE allow rejected corr=%s (native grant missing/spent/misbound)", corr)
 		return ErrBadGrant
 	}
 	if !q.deliver(it, answer{a: tools.AnswerAllow, why: "用户在原生侧批准了本次操作"}) {
+		q.logf("approval: GRANT-DENY corr=%s tool=%s denial=%s", corr, tool, denialNotPending.label())
 		return ErrNotPending
 	}
 	// Ticket 201 AC (答复要进审计): the successful allow used to be the silent

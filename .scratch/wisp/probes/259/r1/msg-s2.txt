@@ -1,0 +1,22 @@
+票 259 腿 259-r1 第 2 步：AC#2 拒因可指名＋AC#3 三枚能力尺的码与新尺
+
+AC#2（internal/agent/approval）：
+- approval.go 新增未导出的 grantDenial 形状（denialNone／missing-nonce／
+  spent-or-never-live-nonce／misbound／card-not-pending），grantStore.spend 由
+  返 bool 改成返它；控制流逐支等价于改形前（照花仍烧牌、陌生值不删任何行）。
+- queue.go allowScoped 两处答复侧收口各写一行 GRANT-DENY 指名拒因，
+  FORGED-OR-STALE 那枚合并句一字未动、仍在原位；对外仍是 ErrBadGrant 一枚错误值
+  与 ui.go 那句合并文案（ui.go 一行未改，编排者裁定：内部与审计现场区分、对外维持合并）。
+- ticket242_binding_test.go 五枚 spend 调用点按逐字等价改判据形状（denialNone 即旧 true），
+  红句文本一字未改、无一枚删去或降级。
+- 新尺两枚文件共 12 枚用例：四枚拒因各自指名（缺失／已用走路由、绑定不对走 store、
+  状态不是 pending 走那道防御关＋deliver 那处路由可达的同胞点），一枚反折叠尺
+  （四名必须两两不同），一枚对外维持合并尺（合并句一字未动＋拒因词不得借用别的层的句子），
+  加 AC#3 三枚能力尺：PanelAPI 方法名封闭集与载体上的动词语义探针、
+  PanelItem 按 KIND 与按 VALUE 的封名单（bool／func／chan／ptr／iface／map／nested／非[]string 一律红，
+  加上等于活令牌或绑定摘要的值、以及撤销授权后投影必须不变）、
+  出向读面拿到的每个字符串回填两条答复路由都不许放行（末发正向对照用真令牌放行一次，
+  证明上一发的红不是卡死了）。
+
+本包读数：起手 58 枚顶层名／77 行 PASS，本次 70 枚／89 行，diff 名册只增不减、0 枚 FAIL。
+AC#1 选形与 AC#4 载具本轮未动，归口写在证据件 §6。
