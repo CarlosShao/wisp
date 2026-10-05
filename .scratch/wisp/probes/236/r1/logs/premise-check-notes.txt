@@ -1,0 +1,17 @@
+时刻：2026-10-05 13:15:33 / 13:15:56 / 13:17:14 +0800
+锚（13:15:56 那次）：6e1c0d544f5066416ec81a131c138902e04e83d1
+锚（13:17:14 那次）：273cb2d56826ffe2c9a8141e5c7a6412e6e37b93
+
+尺1 两枚被点名件的盘上 vs HEAD：internal/agent/loop.go md5 全等 5b7499eeb1340b8cd187d53f7fa99c48（工作树对该件干净）
+        internal/plugin/loader.go：No such file or directory；git cat-file 报 path does not exist in HEAD
+尺2 internal/plugin/ 在册全集（3 枚）：disposal.go / disposal_test.go / doc.go
+        git log --diff-filter=ADR -- internal/plugin/loader.go ＝ 空（该路径从未存在过，不是被删也不是被改名）
+        git log -1 -- internal/plugin/loader.go ＝ 空
+尺3 归档形（整树）单枚点名：gofumpt -l internal/agent/loop.go ＝ 空、rc=0（干净）
+        本机工作树形同枚：gofumpt -l internal/agent/loop.go ＝ 空；internal/plugin/ 三枚逐个＝空
+尺4 归档形目录级：gofumpt -l internal/agent internal/plugin ＝ 空（该两目录全族无一枚脏）
+尺5 tracked .go 全集名册（grep -zE '\.go$' × gofumpt -l，stdout＋stderr 去重）
+        锚 6e1c0d54：分母 924、名册 19 枚、不在 .scratch/wisp/probes/ 的＝0 枚
+        锚 273cb2d5（混合口径，把 .pristine 一起递尺）：分母 941、名册 35 枚＝17 枚 .pristine ＋ 18 枚 .go；不在 probes 的＝0 枚
+        => 两种口径都复现不出 79 枚；两枚被点名的产码件一枚都不在名册里
+尺6 我这三笔 commit 的载荷累计面（除 tools/d22scan/selftest.go 与 .scratch/wisp/probes/236/r1/ 之外）＝0 枚
