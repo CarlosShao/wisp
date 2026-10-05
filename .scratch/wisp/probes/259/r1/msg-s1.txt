@@ -1,0 +1,10 @@
+票 259 腿 259-r1 第 1 步：证据件骨架，起手锚与起手名册
+
+落点 .scratch/wisp/probes/259/r1/evidence.md，§0 起手锚（date、HEAD d7236abc、
+porcelain 里 181-r3 的脏面逐字登记不归因）＋ §1 起手逐名读数（本包 58 枚顶层名、
+77 行 PASS、0 行 FAIL，base-v.txt 与 base-names.txt 落盘）＋ §1.2 到 §1.4 把本腿
+要撞的既有断言原文一枚枚抄出来：spend 的 6 枚调用者、FORGED-OR-STALE 两枚
+Contains 钉（cmd/wisp，本腿不碰）、原生令牌无效那三份对外文案副本（裁定维持合并，
+ui.go:127-130 一字不改）、newGate 的队列深度收尾钉、242 那枚被 M-D2 绕过的词面名单。
+
+本格只两格：AC#2 拒因可指名、AC#3 三枚能力尺。AC#1 选形与 AC#4 载具本轮不落。
