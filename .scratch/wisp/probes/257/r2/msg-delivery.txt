@@ -1,0 +1,37 @@
+票 257-r2b 交件（写面＝回执文案＋两枚同包测试）：形 ⓒ 的四发干净机真跑、八枚突变全响、四门读数齐、证据件 §5-§10 写满
+
+一、写面（枚枚点名，越界零命中）
+- cmd/wisp/firstrun.go：只在 ensureFirstRunConfig 末尾的 stderr 回执里加三段（+61 行纯新增、删除 0 行、
+  函数签名与判定／建文件三段一字未动）。指引只走"给人看的回执"这一条通道，⛔ 一行都不落进生成的 config.toml。
+- cmd/wisp/firstrun_257_test.go（同包六枚）＋ cmd/wisp/firstrun_257_nonpreset_test.go（本腿新增两枚）。
+- ⛔ 未碰 internal/config/**、internal/panel/**、internal/ball/**、internal/tools/**、frontend/**、design/**、
+  docs/**、thresholds.go、golden、tools/d22scan/allowlist.txt；写侧那道"行不存在则拒写"保持原样＝票 §8 边界②的"诚实"。
+
+二、AC#1 是真跑不是排演：起步态逐条断言（临时数据根＋config.toml 必须 fs.ErrNotExist），
+经 wisp run 那条 CLI 缝跑一次（退码仍为 2，未放宽），首建后名册七枚逐枚拒（全是第 2 种拒因、文件字节不变）；
+按回执手加三样后 7/7 接受；只加第一样恰好 3/7；非预设名（自建网关）必须自己写 protocol 才加载得过、
+写了之后那一行的两枚服务商字段写得进。⛔ 全程没有一发是手工先塞一份完整 config.toml。
+
+三、牙：八枚突变 M1-M8 全响，红句逐字抄进证据件 §5.1，判据↔突变对号表在 §5.2。
+M4 是最硬那枚雷的实弹：把指引漏进生成的文件，票 198 那两枚钉（[llm.providers 禁串＋逐字节尺 2571 vs 2624）当场红。
+突变一律 go test -overlay 构建期替换，⛔ 不改盘：§5.3 逐枚 md5 相等（firstrun.go 0491339...／
+firstrun_257_test.go 23a7a56...／新件 4cf81b6...）；未放宽断言、无 t.Skip、无把 SKIP 读成通过。
+
+四、门禁四读数（带时刻，全文日志入 .scratch/wisp/probes/257/r2/）
+d22scan rc=0 clean（11:25:14-11:25:36，覆盖面 live scope 全列）／check-path-length-budget rc=0 VERDICT GREEN
+（over-budget 57 全在名册、not-in-roster=0，11:25:36）／go vet ./cmd/wisp/ rc=0（11:25:37 与 11:28:33 两发）／
+gofumpt 本腿三枚零命中（整包只报预存的 cmd/wisp/models.go CRLF，⛔ 未顺手格式化）。
+gofumpt 要用 $(go env GOPATH)/bin 那一枚，裸命令名报 command not found（rc=127，那次读数不作数）。
+整包基线（起手真跑）：11:17:21 起 48b85705，401.8s，RUN 329／PASS 233＋子 96／FAIL 0／SKIP 0＝红名册空；
+cmd/wisp 必须注入 third_party/sherpa-onnx 到 PATH，否则加载期 exit status 0xc0000135、=== RUN 0 条（票 98 在册坑，§0.3 记根因与出处）。
+
+五、撞腿事实（⛔ 不归本腿裁决，具名给编排者）
+同一票同一写面有两枚活着的腿：姊妹腿 11:17:50 落 firstrun_257_test.go、11:26:20 整枚覆盖本腿的 evidence.md
+（原件逐字在 commit 9c0d4c9a）。本腿据此不再原地改她那两枚文件（只读＋md5 盯），突变改走 overlay，
+自己的新增只落一枚新文件且标识符全带 t257np 前缀（同包重名＝整包编译失败）。
+另登记两枚不属于本腿的红：internal/panel/workspace.go 半写导致 cmd/wisp 整包构建失败（11:26:42 四行、11:27:50 自行清）、
+firstrun.go 半写瞬间的 vet 红（11:28:05 md5 43548dec，11:28:33 回 0491339）。
+本腿自曝的两处洞在 §9（非预设名只证到 2/7；M7 那发暴露一枚 needle 可被票 198 旧句满足）。
+
+六、纪律：只 commit 不 push；AC 勾选框一枚未碰；工单文件与台账 docs/reports/pending-and-issues.md 一字未改；
+Go 源码零 emoji；临时件只建不删。

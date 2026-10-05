@@ -1,0 +1,8 @@
+time=2026-10-05T11:28:49.403+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket257R2AC1NonPresetRowNeedsProtocolBeforeItLoads
+time=2026-10-05T11:28:49.423+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1NonPresetRowNeedsProtocolBeforeItLoads3075042840\001\logs min_level=info early_records=1 early_dropped=0
+    firstrun_257_nonpreset_test.go:110: AC#1 RED: a non-preset provider row with no protocol loaded, so the receipt's warning is describing a gate that is not there
+--- FAIL: TestTicket257R2AC1NonPresetRowNeedsProtocolBeforeItLoads (0.05s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.256s
+FAIL

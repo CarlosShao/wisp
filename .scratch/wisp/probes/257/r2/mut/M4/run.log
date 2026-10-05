@@ -1,0 +1,217 @@
+time=2026-10-05T11:22:44.492+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables
+time=2026-10-05T11:22:44.498+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedT4188854336\001\logs min_level=info early_records=1 early_dropped=0
+    firstrun_198_test.go:217: the created file carries the dynamic table "[llm.providers" anyway - that would be an invented entry, not a default
+--- FAIL: TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables (0.02s)
+=== RUN   TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags
+time=2026-10-05T11:22:44.515+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTa279362022\001\logs min_level=info early_records=0 early_dropped=0
+    firstrun_198r2_test.go:237: tag-derived default leaves: 70; file: 2624 bytes
+    firstrun_198r2_test.go:239: AC#2 RED: the config.toml first-run wrote is not the schema's `default` tags rendered: first difference at line 179 (byte 2571): want "", got ""; total bytes want 2571 got 2624
+        every value in that file must be traceable to a default tag (D36 rule 3) - a value the writer typed, or a default table edited away from its tags, is exactly what this case exists to catch
+--- FAIL: TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags (0.02s)
+=== RUN   TestTicket257R2AC1CleanMachineReceiptTeachesTheWalkableChain
+time=2026-10-05T11:22:44.531+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1CleanMachineReceiptTeachesTheWalkableChain3613422359\001\logs min_level=info early_records=0 early_dropped=0
+    firstrun_257_test.go:170: AC#1 RED: the guidance leaked into the generated config.toml, which is invented-default territory and ticket 198's forbidden shape:
+        schema_version = 2
+        
+        [app]
+        language = 'zh-CN'
+        theme = 'dark'
+        autostart = false
+        single_instance = true
+        
+        [ball]
+        size = 56
+        opacity_idle = 0.35
+        click_through = true
+        hide_on_fullscreen = true
+        
+        [ball.position]
+        x = 0
+        y = 0
+        monitor = ''
+        
+        [hotkey]
+        summon = ''
+        mute = ''
+        cancel = 'Esc'
+        panel = ''
+        
+        [session]
+        warm_timeout_sec = 90
+        settling_sec = 3
+        conversation_idle_sec = 30
+        
+        [voice]
+        enabled = true
+        punctuation = true
+        conversation_mode = false
+        cloud_asr_chain = []
+        cloud_tts_chain = []
+        
+        [voice.wake_word]
+        enabled = false
+        keywords = []
+        thresholds = []
+        veto_words = ['取消', '停下', '别']
+        
+        [voice.asr]
+        provider = 'local-sherpa'
+        model = ''
+        
+        [voice.tts]
+        provider = 'local-sherpa'
+        voice = ''
+        speed = 1.0
+        
+        [voice.aec]
+        enabled = true
+        echo_ref = 'self-render'
+        
+        [voice.realtime]
+        enabled = false
+        provider = ''
+        model = ''
+        api_key_ref = ''
+        base_url = ''
+        
+        [audio]
+        input_device = 'default'
+        sample_rate = 16000
+        half_duplex = true
+        mic_muted_default = true
+        
+        [llm]
+        text_chain = []
+        timeout_ms = 60000
+        
+        [llm.roles]
+        [llm.roles.chat]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.memory_extract]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.handoff]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.summarize]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.retry]
+        max = 3
+        backoff_ms = 1000
+        
+        [agent]
+        max_rounds = 50
+        token_budget = 200000
+        per_tool_timeout_ms = 0
+        steering_enabled = true
+        project_instructions_enabled = true
+        
+        [agent.loop_guard]
+        repeat_thresholds = [3, 5, 8]
+        
+        [risk]
+        confirm_timeout_sec = 300
+        l1_window_sec = 2
+        shell_enabled = false
+        allow_shell_string = false
+        shell_allowlist = []
+        blacklist_overrides = []
+        permission_mode = 'ask_every_step'
+        
+        [fs]
+        allowed_dirs = []
+        reparse_point_exceptions = []
+        delete_enabled = false
+        
+        [net]
+        allowlist = []
+        block_private_ranges = true
+        
+        [net.proxy]
+        mode = 'system'
+        url = ''
+        
+        [privacy]
+        redact_paths = false
+        diagnostics_opt_in = false
+        retention_days = 30
+        keep_transcript = false
+        keep_audio = false
+        
+        [memory]
+        l1_enabled = true
+        l1_max = 20
+        l3_retention_days = 30
+        extract_model = ''
+        
+        [panel]
+        enabled = true
+        width = 640
+        height = 0
+        keep_alive_in_session = true
+        scale = 0.0
+        
+        [cost]
+        daily_budget = 0
+        monthly_budget = 0
+        alert_threshold = 0.8
+        over_budget = 'pause'
+        
+        [models]
+        dir = ''
+        mirror = []
+        verify_signature = true
+        
+        [observe]
+        level = 'info'
+        slo_sample_interval_sec = 5
+        
+        [observe.roll]
+        size_mb = 10
+        days = 7
+        [plugins]
+        tier2_enabled = false
+        
+        [llm.providers.deepseek]
+        api_key_ref = 'env:M4LEAK'
+    firstrun_257_test.go:178: the ticket's premise is gone: the fresh registry is map[string]config.Provider{"deepseek":config.Provider{Protocol:"openai-chat", BaseURL:"https://api.deepseek.com/v1", APIKeyRef:"env:M4LEAK", Billing:"", PlanCreditTotalMicro:0, Compat:config.Compat{Loose:false, AllowMissingUsage:false, ExtraHeaders:map[string]string(nil)}, RPM:0, TPM:0, Models:map[string]config.ModelSpec(nil)}}, not nil
+--- FAIL: TestTicket257R2AC1CleanMachineReceiptTeachesTheWalkableChain (0.01s)
+=== RUN   TestTicket257R2AC1ReceiptChainWalkUnlocksAllSevenFields
+time=2026-10-05T11:22:44.545+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1ReceiptChainWalkUnlocksAllSevenFields3643420072\001\logs min_level=info early_records=0 early_dropped=0
+    firstrun_257_test.go:249: AC#1 RED: the hand-add shape the receipt teaches does not even load: config: config.toml parse: toml: table deepseek already exists
+--- FAIL: TestTicket257R2AC1ReceiptChainWalkUnlocksAllSevenFields (0.01s)
+=== RUN   TestTicket257R2AC1ReceiptOnlyFirstItemUnlocksThreeOfSeven
+time=2026-10-05T11:22:44.558+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1ReceiptOnlyFirstItemUnlocksThreeOfSeven423705045\001\logs min_level=info early_records=0 early_dropped=0
+    firstrun_257_test.go:289: a provider row alone must still load (preset name, protocol filled by applyPresets): config: config.toml parse: toml: table deepseek already exists
+--- FAIL: TestTicket257R2AC1ReceiptOnlyFirstItemUnlocksThreeOfSeven (0.01s)
+=== RUN   TestTicket257R2AC2ThreeRefusalsStayThreeSentences
+time=2026-10-05T11:22:44.569+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC2ThreeRefusalsStayThreeSentences4258527702\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket257R2AC2ThreeRefusalsStayThreeSentences (0.01s)
+=== RUN   TestTicket257R2AC2EffectTimingSaysThreeProcessShapes
+time=2026-10-05T11:22:44.581+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC2EffectTimingSaysThreeProcessShapes3013371294\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket257R2AC2EffectTimingSaysThreeProcessShapes (0.01s)
+=== RUN   TestTicket257R2AC3CredentialSurfaceUntouched
+time=2026-10-05T11:22:44.594+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC3CredentialSurfaceUntouched3221105341\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket257R2AC3CredentialSurfaceUntouched (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.186s
+FAIL

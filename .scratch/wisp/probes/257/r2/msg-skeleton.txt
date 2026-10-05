@@ -1,0 +1,23 @@
+票 257-r2 证据件骨架（§0 锚与写面／§1 撞钉预检逐枚原文／§2 文案 before-after／§3 干净机真跑怎么搭／§4 三句拒因逐字／§5 突变名册／§7 判不动归口）
+
+起手锚 c6cf66e6、时刻 2026-10-05 11:12 +0800；进场复认（README 规则 3）：工作树里那枚 M cmd/wisp/firstrun.go
+是本腿前半段留下的未提交文案件（+61 行纯新增，preflight 11:08 与 after-text 11:12 两发票 198 全家全绿为证），
+证据件当时未建，本节即第一份书面件。
+
+§0.3 登记一发真撞上的仪器坑并给出根因与出处：cmd/wisp 测试 exe 不注入 third_party/sherpa-onnx 的三枚 dll
+就在加载期死（exit status 0xc0000135、=== RUN 0 条），属票 98 在册老坑（101-adversarial:129/168 的 R-101-6、
+102-adversarial:148 同形读数），本腿此后每发都带注入。§0.2 登记共享树里 HEAD 中途被别人推走（11:15:57 已至 69c1bb82）。
+
+§1 逐枚抄了动手前必读的钉：firstrun_198_test.go:215-219（禁首建文件出现 [llm.providers 的那一枚，本腿最硬的雷）、
+:243-248（回执不复用热加载四句归因）、defaults.go:77-78（map 留 nil＝票面根因，不改）、
+settings_248_test.go:130-132（未声明 provider 必拒＝写侧那道闸保持原样）、settings_257_test.go:125、
+parse.go:72/123 的 DisallowUnknownFields（顶格 [providers.x] 会把整条链打死，指引里绝不出现那拼法）、
+catalog.go:86-110 validateRoles（两枚一起点名才是唯一走得通的形状）。
+§1.5 是本腿自己 dump 的现量（2571 字节、33 枚节头、有空的 [llm.roles.chat]、没有任何 [llm.providers 节），
+"就地填已有那一节"这句就是这枚读数量出来的。
+
+§2 写面只有 firstrun.go 的文案与同包新测试；产码结构零改动的三条可核证据（签名未变／判定与建文件三段未变／
+零新增 import 函数类型）。§4 的三句拒因不硬编码 tag 串，测试用形状正则从生产拒句里反推，避免自造第二名册。
+
+AC 勾选框一枚未碰（翻勾归编排者，票 257 票面与台账一字未改）；internal/config 与 internal/panel 零触碰；
+frontend 与 design 连读都没读；只 commit 不 push，显式 pathspec 枚枚点名。
