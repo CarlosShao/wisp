@@ -150,9 +150,107 @@
 
 ## §3 四支出口的代价（甲 抬带内 / 乙 测试窄缝 / 丙 fake clock / 丁 第四形）
 
+尺：本节全部依据 §1/§2 的现读位置，取数时刻 09:44:46–09:53:56+0800，HEAD 从 `2c83c076` 漂到 `9ca14bdf`（本腿自己的两枚 commit 之外还有别人的）。
+
+### 甲 · 把 12 枚带外位置抬进带内（≥31s），并给每一发找回观察对象
+
+| 代价项 | 现量 |
+|---|---|
+| 要改的位置 | **12 枚**（§2.1 全表）：2 枚字面 + 10 枚喂值调用点，分布在 **5 枚文件** |
+| 墙钟增量 | **只有两笔**：`approval_reply_201_test.go:439`（2→31，这一发真的要等 C18 时钟走完，`:467` 注释逐字 `This is the timeout path, so the wait is the C18 clock`）与 `panel_pump_test.go:136`（2→31，`:177` 的 `<-done` 在等卡合上）⇒ **+29s +29s**。其余 8 枚答完卡就走 ⇒ **零增量** |
+| 必须连带抬的一件 | `panel_pump_test.go:112` `context.WithTimeout(context.Background(), 30*time.Second)`：30 < 31 ⇒ 不抬它就是**换时钟**（`gate.go:576-580` 的 ctx 分支抢在 `:571` 的 deadline 前）。这一枚是本腿能给出的唯一"改了种子却没找回观察对象"的位置 |
+| 必须连带改的一句兜底 | `approval_reply_201_test.go:105-109` `if l2Wait < time.Second { … l2Wait = time.Second }`：band 后这枚兜底自己写出的就是**一个会被拒载的值**（1）。今天 10 枚调用点没有一枚走到它，所以它不红，但它是留在那儿的一枚雷；甲必须把它抬到带内（或改成具名报错） |
+| 可以顺手删的一枚 | `run_mode101_test.go:110` 的 `confirm_timeout_sec = 1`：§2 #1 已证这一族的观察走 300ms ctx（`:544`），**1s 从不轮到**。删掉它＝落 schema 默认 300（带内，不红），代价是"卡被忘答时堵 300s 而不是 1s"；写 31 是更稳的形状 |
+| ★甲独有的收益 | 抬到 31 之后 `lead = 31 − 30 = 1s > 0` ⇒ `gate.go:528` 那句第一次为真，`gate.go:557-569` 那段（逐字 `审批将在 %d 秒后自动拒绝，请尽快确认`）在 `#6` 那一发里会**顺路端到端响一次**。r1 `evidence.md §7.2` 说"这半格没人读得到"，甲是四支里唯一一枚不新造任何门就能把它读到的 |
+| 甲的风险 | §7.1 包时长余量未量；§7.10 那发究竟哪枚时钟先赢未实测 |
+
+### 乙 · 给测试留一条"直接构造 `approval.NewQueue`／`approval.New`"的窄缝
+
+- **它需要新造门吗？不需要。** 两枚现成的门都在 HEAD 里、都有具名裁定（逐枚见 §4）：`approval.Options.ApprovalTimeout` 是**公开字段**，`cmd/wisp/resident_grant_writer_265_windows_test.go:187` 今天就在 `cmd/wisp` 的测试里直接 `approval.New(approval.Options{…})`；而 `runSpec.gate/ui/cards`（`cmd/wisp/run.go:148-166`）是票 246 AC#7 裁过的注入点。
+- **但它的真实代价在"必须三件套一起递"这一条上**：`run.go:600-605` 逐字 `if s.gate != nil { if s.cards == nil \|\| s.ui == nil { … 已拒绝装配 … return rt, 2 } }`，且 `:607` 逐字 `rt.ui = nil // no console surface in a process whose cards go to another host`。⇒ 一旦走注入，**控制台面就没了**，而 §2.1 里 #2/#3/#4/#5/#9/#10/#11/#12 的断言正读控制台与审计文本（`h.out`/`h.err`、`rt.ui.shown()`、`waitForSentence187`）。要保住这些句子，测试得自带一枚能冒充 `consoleApprovalUI` 的 UI —— **那就从"复用既有门"滑向"用 mock 顶掉真面"**，正是名册原文禁的那一类（§4.1）。
+- 乙对**唯一真正需要它的用例**是干净的：`approval_reply_201_test.go:439` 那一发不需要控制台文本以外的东西吗？它需要 `:484` 那句审计（`ANSWER-EXPIRED …`），而审计是 `run.go:617` 的 `Logf: rt.auditf` 写进 `h.err` 的 ⇒ 注入 gate 就得连 `Logf` 一起重接。**判语：乙能替甲，但它是"为 1 枚用例重开整条装配面"，成本集中且不可复用；甲的成本摊在 12 枚位置上的其中 2 枚。**
+- 乙还带一笔**裁定成本**：它到底算不算"新造一枚注入缝"＝人工批准面（§7.7），本腿只交判据不交结论。
+
+### 丙 · 改用 fake clock
+
+- **接缝在不在？在，而且早就在**：`internal/agent/approval/approval.go:20` 逐字 `Clock is the injected monotonic time source (D42#9 / D22 ban 5). Every`，接口 `:26-32`（`Now()` + `After(d time.Duration) <-chan time.Time`），`SystemClock` 在 `:34-41`，`Options.Clock` 在 `gate.go:21-22`，`New` 的兜底在 `gate.go:127-130`（逐字 `clock := o.Clock; if clock == nil { clock = SystemClock{} }`）。三枚读时钟的点全走它：`gate.go:291`（L1 窗口）、`gate.go:526`（C18 deadline）、`gate.go:529`（warning lead）。
+- **cmd/wisp 吃不吃得到？吃不到。** 两枚生产构造点都没传 `Clock`：`run.go:612-619`、`resident_approval_windows.go:368-375`（09:53:56 现读两枚 Options 字段的完整清单＝UI/Channels/Window/ApprovalTimeout/Logf/Grants）；`grep -rn "Clock\b" cmd/wisp/*.go` ＝ **0 命中**（09:49:39）。⇒ **丙必须以乙为前提**：想让 `#6` 用假时钟，先要在测试里自己 `approval.New(approval.Options{ApprovalTimeout: 31 * time.Second, Clock: fake})`，也就是先付乙的全部成本。
+- **现成的假时钟导不过来**：`fakeClock` 在 `internal/agent/approval/fakes_test.go`，而该文件首行是 `package approval_test`（`:1`）⇒ **外部测试包，不可 import**；`newFakeClock()`（`:39`）、`Advance()`（`:62`）、`newGate(t, ui, opts...)`（`:250-260`，逐字 `o := approval.Options{UI: ui, Clock: clk, Channels: ch}`）都只在 approval 那包内可用。cmd/wisp 要用就得**再写一枚**（同形的 `neverClock` 先例在 `ticket220_l1_window_read_test.go:84-88`）。
+- **丙对整条 run 的副作用是本腿最担心的一格**：这些用例跑的是**完整的 `runTextTask`**（mockllm 走真 HTTP、SQLite 真写、面板泵与热加载 tick 真计时）。假时钟只喂 gate，一 `Advance(31s)` 就让审批死线与进程里其余计时器**脱钩**；`#2`（panel_pump）正是"跑自己的 publish 也 booked 一条记录"的用例（`panel_pump_test.go:207-213`），假时钟下先后次序不再是现场次序。**⇒ 丙适合 `internal/agent/approval` 那一层，不适合 `cmd/wisp` 这一层的整进程用例。**
+
+### 丁 · 本腿在盘上找到的第四形
+
+派单给的线索成立，而且**比线索本身更宽**，本腿现量到两枚合法小时钟：
+
+1. **L1 窗口那枚（线索说的那枚）——合法、带外无约束、但替不了这次的主题。** `gate.go:143-151` 的钳位（`win <= 0 → DefaultL1Window`／`< MinL1Window → 2s`／`> MaxL1Window → 3s`，常量在 `queue.go:116/120/122`）；而 `validateRisk`（`validate.go:141-151`）**只校 `permission_mode` 与 `confirm_timeout_sec` 两样，`l1_window_sec` 连 config 级的带都没有**。⇒ "仓里已经存在一条合法的小窗口"这句**为真**。
+   **但它救不了 §2.1 的任何一枚**：`#2` 被文件自己否掉（`panel_pump_test.go:160-162` 逐字 `the verdict is L2, so the item goes into the approval QUEUE (an L1 window does not), which is what snapshot.pending is made of`）；`#6` 被极性否掉（L1 到点**执行**，`#7` 的 `:545` 逐字 `the L1 timeout polarity changed (this is the D4 contract, not this leg)` 就是钉着这条极性的句子，而 `#6` 的主题正是"L2 到点必须拒绝"）；`#1` 的观察对象是 L2 卡放行档，也不在 L1 上。**唯一能被 L1 救的是 `#7`/`#8` 两枚，而它们今天本来就跑在 L1 上（那 20s 种子对它们是死重）。**
+2. **`runSpec.gate` 那枚（本腿新找到的，可以完全不动 band）**：见 §4.3，票 246 AC#7 已裁、`resident_*_265` 已在用。**它实际上是乙的"合法化版本"**：不是"新造一条窄缝"，而是**复用一枚仓里已存在的窄缝**＋公开字段 `Options.ApprovalTimeout`。
+3. **本腿找到的第三形（写在这里因为它比甲便宜，且不属任何一支）：把带外种子里"其实没人观察它"的那几枚直接删掉，让它落 schema 默认 300。** 现量证据：`#1` 走 300ms ctx、`#7`/`#8` 走 L1 窗口、`#3/#4/#5/#9/#10/#11/#12` 答完卡就走 ⇒ **这 9 枚位置上的种子值今天没有一枚是观察对象**，写 20 或写 300 对断言等价。真正需要"短"的只有 `#2` 与 `#6` 两枚。**⇒ 最小改动面＝2 枚抬进带内（+ ctx 连带 1 枚）+ 7 枚删行/抬平 + 1 枚兜底句**，而不是 12 枚逐一重排。
+
 ## §4 已有的窄缝先例（乙那格：D22 注入缝名册现量）
 
+### §4.1 名册原文（逐字，⛔ 本腿不扩它）
+
+`.scratch/wisp/issues/README.md:206-207`：
+
+> `Tests inject at seams only: C8 AudioSource (wav), C5 LlmProvider (golden SSE), C17 PanelBridge,`
+> `CLI `wisp run`. No mock-instead-of-real to fake completion; never weaken SLO thresholds.`
+
+同形中文摘要在 `AGENTS.md` §1.3（派单已抄给本腿）。⇒ **名册里没有"approval 队列/门"这一枚。**
+另有一把仪器尺：`grep -rn -i "inject\|mock\|seam" tools/d22scan/*.go`（09:52:15）里没有**任何**一条 ban 针对"测试构造 `approval.New`/`NewQueue`"；d22scan 侧的 `inject` 只指它自己的测试内缝（`main.go:1396` `fixtureScope is injected by the tests ONLY (ticket 88 AC#3)`、`:1410` `fixtureVerdict exists so a test that injects scopes says so in the function`）。⇒ **乙不会被 CI 扫红，但也不被 CI 认可**；认不认是裁定面，不是仪器面（归口 §7.7）。
+
+### §4.2 现成的同类先例（逐枚带 file:line，判语在每枚后面）
+
+| 先例 file:line | 逐字形状 | 它是不是"不经 config 的真对象构造"？ |
+|---|---|---|
+| `cmd/wisp/resident_grant_writer_265_windows_test.go:187` | `f.g = approval.New(approval.Options{ UI: f.ui, Channels: approval.NewChannels(), Logf: f.log.write, Grants: f.holder, })` | **是，而且就在 `cmd/wisp` 包里、就在真 `approval.Gate` 上**。`#171-175` 的注释逐字把这件事说在前头：`Options carries four of the fields the resident literal carries (UI / Channels / Logf / Grants); Window and ApprovalTimeout are left at zero, which approval.New clamps to its own defaults` ⇒ **"测试自己造门、并把超时留给默认"已经是这棵树的既成事实，且写明了它为什么不算假** |
+| `internal/config/validate_267_test.go:130` | `q := approval.NewQueue(time.Duration(c.Risk.ConfirmTimeoutSec)*time.Second, 0, 0, nil)` | **是本票自己刚造的先例**：不经装配根、直接构造**真 `approval.Queue`**（⛔ 不是 mock），r1 `evidence.md §3` 逐字为它写了两条理由（"喂法逐字照装配根 `run.go:616` 与 `resident_approval_windows.go:460`"）。⇒ 乙要的那条形（`NewQueue`/`New` 直构）**已经在 HEAD 里落了一枚，且带同源守卫的身份** |
+| `internal/agent/approval/fakes_test.go:250-260` | `func newGate(t *testing.T, ui approval.UI, opts ...approval.Options) (*approval.Gate, *fakeClock, *approval.ChannelRegistry) { … o := approval.Options{UI: ui, Clock: clk, Channels: ch} … o.Clock = opts[0].Clock }` | 门＋假时钟的现成配方，但**首行 `package approval_test`（`:1`）⇒ 不可 import**，只是形状先例不是可复用件（§5.1） |
+| `cmd/wisp/approval_reply_stdin_other.go:13` | `// answer cards pass their own reader through runSpec.reply (the `wisp run` seam` | `runSpec.reply` **自己就被注释指认为 AGENTS §1.3 名册里那枚 `CLI wisp run` 缝**（另见 `run.go:132-140` 的逐字辩护：`the CLI tests fill it with a scripted reader, which is the injection seam AGENTS.md §1.3 names for `wisp run` - it is not a mock standing in for a missing subsystem, because the subsystem here IS a human typing at this terminal`） |
+| `cmd/wisp/run.go:115-119` | `// onRuntime hands the assembled stack to the caller before the task runs. Production leaves it nil; the composition tests use it …` | 又一枚"生产留 nil、测试用真装配根内部对象"的**已裁先例**：§2 的 12 枚调用点全都靠它拿 `rt.gate`/`rt.bridge`/`rt.ui` |
+| `cmd/wisp/run.go:120-126` | `modeConfirm is the L2 strong confirmation … The end-to-end tests fill it to stand for "the operator clicked allow"` | **测试用非空 `modeConfirm` 顶掉真 L2 卡**已被成文允许（`run_mode101_test.go:219-225` 就是它的用法）⇒ 与乙同族：测试改的是"谁来答"，不是"造不造真对象" |
+| `cmd/wisp/secret_argv_windows_test.go:161`＋`:174`＋`:234` | `func buildWispForTest(t *testing.T) string {` … `cmd := exec.Command(goExe, "build", "-o", exe, "./cmd/wisp")` … `cmd := exec.Command(exe, args...)` | **进程级缝**：真二进制、真 config、真加载链 ⇒ **band 在这一族用例里绕不过去，也不该绕**（乙与它无关，登记为"窄缝不该被推广到端到端腿"的界标）。同形另有 `resident_approval_live_246_windows_test.go:417`（`exec.Command(goExe, "build", "-o", exe, "./cmd/wisp/testdata/esclistener")`）与 `:446` |
+| `cmd/wisp/instructions_200r2_test.go:92-104` | `// disableProjectInstructions writes AC#8's switch into the fixture's config. It appends a section the fixture does not carry, the same way nonDefaultConfig145 does for [risk]` | **"往夹具 config 追加一节"这形状本身是被点名继承的先例**（`panel_pump_test.go:136` 是它的祖师）。⇒ 甲改的正是这枚先例里的**数值**，不是这枚先例的形状 |
+
+### §4.3 那枚最值钱的先例：`runSpec.gate / ui / cards` 已经是"合法窄缝"
+
+`cmd/wisp/run.go:148-166` 逐字：`gate, ui and cards are ticket 246 AC#7's injection points, and they exist for exactly one reason: a process may hold ONE approval gate.`，用法现读在 `cmd/wisp/resident_task_source_246_windows_test.go:153`：`{"gate without ledger", runSpec{stdout: f.out, stderr: f.err, dataDir: f.dir, gate: ra.gate, ui: ra.ui}}`。
+⇒ **判语（本腿只给判据）：乙不是"新造一枚注入缝"，而是"把一枚已裁过的注入缝从常驻腿延伸到跑任务腿"。** 它需要新裁的不是"缝存不存在"，而是两件事：① 允许在 `cmd/wisp` 测试里传**非默认** `ApprovalTimeout`（今天唯一那枚直构先例 `:187` 刻意**没**传，见其 `:171-175` 的自限句）；② 接受注入路径会关掉控制台面（`run.go:607`）。这两件都够得上"具名 A##/人工批准"，不是写腿自选。
+
 ## §5 clock 与 L1 窗口现量（丙 / 丁）
+
+取数时刻 **`09:54:58–09:55:34+0800`**（尺见每小节末），HEAD＝`9ca14bdf` 之后、§3/§4 那次编辑之前。
+
+### §5.1 clock 是不是已可注入？——**是，早就可注入；但生产与 `cmd/wisp` 都没用它**
+
+- 接口与实现：`internal/agent/approval/approval.go:20` 逐字 `Clock is the injected monotonic time source (D42#9 / D22 ban 5). Every`、`:26-32` `type Clock interface { Now() time.Time; After(d time.Duration) <-chan time.Time }`、`:34-41` `SystemClock`。
+- 注入点：`gate.go:21-22` `// Clock is the monotonic time source (D42#9). nil uses SystemClock.` + `Clock Clock`；兜底 `gate.go:127-130`。
+- **全部三枚读时钟的点都经它**（这是"可注入"的硬证）：`gate.go:291` `deadline := g.clock.After(g.window)`（L1）、`gate.go:526` `deadline := g.clock.After(g.q.Timeout())`（C18）、`gate.go:529` `warn = g.clock.After(lead)`（**本票那枚提示**）。
+- ⚠ **`Queue` 自己没有时钟**：`NewQueue(timeout, warnBefore time.Duration, maxPending int, logf func(string, ...any)) *Queue`（`queue.go:84`）签名里没有 `Clock`，唯一调用者是 `gate.go:158` `q: NewQueue(o.ApprovalTimeout, o.WarningLead, o.MaxPending, logf)` ⇒ **想让假时钟驱动 C18 死线，必须整个 `Gate` 一起换**，不能只换队列（这条决定了丙不能"小到只动测试里那一行"）。
+- 现成的假时钟有两枚，都**在 approval 包内**：`fakes_test.go:21-77`（`type fakeClock struct`、`newFakeClock()` `:39`、`After` `:47`、`Advance(d)` `:62`；配方在 `newGate` `:250-260`）与 `ticket220_l1_window_read_test.go:84-88` 的 `neverClock`。前者所在文件首行是 `package approval_test`（`fakes_test.go:1`）⇒ **不可被 `cmd/wisp` import**。
+- 谁在传 `Clock`（尺＝`grep -rn "Clock:" internal --include='*.go'`，09:55:34，共 10 行）：**全部 10 行都在 `internal/agent/approval/*_test.go`**（`fakes_test.go:254`、`ticket220…:203/:383`、`ticket224_reply_grant_test.go:120`、`ticket84_no_owner_test.go:59/:154/:182`、`ticket87_veto_l2_test.go:49`、`ticket97_alias_direction_test.go:32`）。⛔ **零枚产码传**。
+- `cmd/wisp` 侧（尺＝`grep -rn "Clock\b" cmd/wisp/*.go`，09:49:39）＝**0 命中**；两枚生产构造点 `run.go:612-619`、`resident_approval_windows.go:368-375` 的 Options 字段全集现读为 `UI/Channels/Window/ApprovalTimeout/Logf/Grants`（**没有 `Clock`、也没有 `WarningLead`** ⇒ 后者落 `queue.go:88-89` 的兜底 `DefaultApprovalWarning`，正是票 267 的成因，本腿在此复钉一次）。
+- **判语**：丙的接缝**已存在且形状正确**（它就是 D22 ban 5 指定的做法），但在 `cmd/wisp` 这一层它今天**吃不到**，要吃到必须先走乙；而"测试自带一枚 fakeClock"这一支会撞上 §3 丙末段那条脱钩风险。⇒ **丙在 approval 层值得做、在 cmd/wisp 层不该做**。
+
+### §5.2 L1 窗口那枚合法小时钟现量（丁）
+
+- 钳位：`gate.go:143-151` 逐字 `win := o.Window; switch { case win <= 0: win = DefaultL1Window; case win < MinL1Window: win = MinL1Window; case win > MaxL1Window: win = MaxL1Window }`；常量 `queue.go:116` `DefaultL1Window = 3 * time.Second`、`:120` `MinL1Window = 2 * time.Second`、`:122` `MaxL1Window = 3 * time.Second`。
+- **config 层对这枚键零约束**（尺＝读 `validate.go:141-151` 全文，只两枚判语：`risk.ParseMode(c.Risk.PermissionMode)` 与本票新增的 band）⇒ `l1_window_sec` 可以写 1、99、任何数，钳位发生在接缝里。票 256 已经把这枚事实钉成断言：`resident_approval_risk_256_windows_test.go:228-232` 逐字 `"window way too large - reverse control, the clamp must survive"` + `seed: "l1_window_sec = 99\n"` + `wantWin: approval.MaxL1Window`，以及 `:235-239` 的 `l1_window_sec = 1` → `MinL1Window`；`:263-265` 还有一枚"带不许被喂开"的反向钉 `if w := ra.gate.Window(); w < approval.MinL1Window || w > approval.MaxL1Window {`。
+- **`cmd/wisp` 里今天确实有"用合法小窗口看卡开合、且不靠 `confirm_timeout_sec`"的活样本**（这是丁最硬的一枚证据）：`cmd/wisp/run_test.go:373` `cards = rt.windowCount()` ＋ `:382` `t.Fatalf("an unvetoed L1 window means EXECUTE, got: %s", text)`，而它用的夹具 `newRunFixture`（`run_test.go:76-115`）**整个 `[risk]` 一节都没写** ⇒ 这一族用例今天跑在 schema 默认 **300s**（带内、band 落地后仍绿），观察对象是 2s 的 L1 窗口开合。⇒ **"看一张卡开合"在跑任务那条腿上本来就有不带 `confirm_timeout_sec` 的走法。**
+- **但它替不了 §2.1 的两枚真短种子，理由各不同且都在盘上**：
+  - `#2`（`panel_pump_test.go:136`）：要的是**队列里的那一枚 pending L2**，`snapshot.pending` 由它构成（同文件 `:160-162` 逐字否决 L1）。
+  - `#6`（`approval_reply_201_test.go:439`）：要的是**"到点＝拒绝"这枚极性**；L1 到点＝执行（`:544-546` 就是钉住这条极性的句子）。这一发的主题与 L1 相反，换过去＝观察对象归零。
+- 除 L1 之外，本腿另外量到两枚**已有的、能替代"短超时"的旋钮**：
+  1. `runSpec.reply`（`run.go:132-140`，名册点名的 `wisp run` 缝）——把"等到点"换成"答它"，#3/#4/#5/#9/#10/#11/#12 今天就是这么做的（例：`approval_reply_201_test.go:303` 写 `"no …"`、`:229` 写 `"yes …"`）。**对 `#2` 它只能让卡"被答而关"，而 `:181` 那句断言逐字要求 `an unanswered L2 card must not execute` ⇒ 用它会改掉断言语义，不是无损。**
+  2. `runSpec.modeConfirm`（`run.go:120-126`）——`run_mode101_test.go:219-225` 用它顶掉整张真卡。⇒ `#1` 那枚 `confirm_timeout_sec = 1` 在这一族里**没有任何一枚断言经它**（`#1` 的 L2 走 300ms ctx 或走 stub），与 §3 丁的第 3 形一致：删行即可。
+
+### §5.3 本小节的三把尺（逐把带时刻）
+
+| 时刻 | 尺 | 读数 |
+|---|---|---|
+| 09:55:34 | `grep -rn "Clock:" internal --include='*.go'` | 10 行，**全部**在 `internal/agent/approval/*_test.go`；产码零枚 |
+| 09:55:34 | `grep -rn "NewQueue(" internal cmd --include='*.go'` | 9 行：产码 2（`queue.go:84` 定义、`gate.go:158` 唯一调用）＋ 测试 7（`pending_read_test.go:112/:191`、`ticket146_liveapprovals_backing_test.go:209/:265`、`ticket242_binding_test.go:59/:88` 六枚 `NewQueue(0, 0, 0, nil)`，加本票的 `validate_267_test.go:130`）⇒ **"测试直接构造真 Queue"已是 7 枚先例**，乙在"这算不算 mock"这一问上并不孤立 |
+| 09:49:39 | `grep -rn "Clock\b" cmd/wisp/*.go` | **0**（§5.1 的"吃不到"由此得） |
 
 ## §6 尺读数与未跑清单
 
