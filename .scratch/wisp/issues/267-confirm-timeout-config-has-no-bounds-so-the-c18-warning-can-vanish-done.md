@@ -28,7 +28,7 @@
 - [x] **AC#1**：种一发**越界值**（上界与下界各一发）⇒ 指名用例必须红，且红句要**逐字念出是哪枚键、超出哪个范围**；⛔ 判据换成反形（随便换个越界值就不响）还全绿＝不敏感，不许当凭据。
 - [x] **AC#2**：**C18 那枚提示的存活**要有一发正向钉：`confirm_timeout_sec` 取一个**小于 `WarningLead`** 的合法值时，要么响、要么按所选形把提示保住——⛔ 不许"静默把保护撤了"继续是合法终态。
 - [x] **AC#3**：⛔ **不许顺手把 C18 的 300s 常量改掉**（`docs/PLAN.md` 的 C18 属冻结契约面）；本票只处理"可配之后值域没人管"。**"配置值 vs C18 写死 300s 谁优先"这一格归 `Q-77`（待机主一句话）**，任何腿不许自行裁定。
-- [ ] **AC#4**：越界检查——`git diff` 出现 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` 任一路径 ⇒ 直接退回。卫生四门读数不扩大，红名集合逐名比对并**带取数时刻**。
+- [x] **AC#4**：越界检查——`git diff` 出现 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` 任一路径 ⇒ 直接退回。卫生四门读数不扩大，红名集合逐名比对并**带取数时刻**。
 
 ## 排程与禁区
 
@@ -69,3 +69,19 @@
 **5. ★新抓到一枚本票射程外的形状，具名立成票 268**（`267-a2` §1.1★／§7.3，我自己复读了代码）：常驻腿 `residentRiskGateValues` 也走 `config.LoadFile`，但它对"加载失败"的处理是**回落编译常量 300 s 并写 provenance `"defaults (config.toml unreadable)"`**——不是 run 腿那样退码 2 响亮拒绝。⇒ band 之后，**"文件存在但越界"与"文件不存在"在常驻腿里折成同一枚 provenance**，而票 256 那一族五枚字面（45/90，全带内）里没有一枚把这两种"读不到"分得开。安全结论不受影响（300 s 仍 > 30 s ⇒ 提示仍武装），坏的是**说实话**：用户写了个数、系统按另一个数跑，且不说。⛔ 本票不动那一支（写面属常驻腿），归票 268。
 
 **6. 落地腿排程**：种子迁移那一腿**必须在 `cmd/wisp` 上跑完整包**（它要的就是这一发颜色），⛔ 不许与 `257-r2`（同为 `cmd/wisp`）并发，⛔ 也不许在我自己那发 `cmd/wisp` 复跑期间起飞。迁移名册＝上面那 10 枚带外喂值点（5 枚文件）＋`panel_pump_test.go:112` 那枚 ctx；解冻走 `A611` 具名（只到 `_test.go` 里的种子字面量与那一枚 ctx，⛔ 不许动断言、不许动阈值、不许 `t.Skip`）。撤销口令「**267 撤**」。
+
+## 结案（编排者，2026-10-05 10:5x，锚 `c7bb02be`；凭据全部编排者现跑，账 `A615`）
+
+**五格全勾 ⇒ 本票改 `-done`。** AC#4 的凭据（⛔ 不是腿的自述，是我这两小时自己跑的）：
+
+1. **越界尺**：`git diff --name-only 21bec8a1..HEAD`（＝本票全链，含 `267-r1` 的 band 与 `267-r2` 的种子迁移）里，`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**`／`internal/agent/approval/**` **命中 0 行**〔10:39 现量〕；该范围内非 `.scratch` 改动只有 **11 枚文件**＝`internal/config/**` 五枚（`validate.go`／`validate_test.go`／`validate_267_test.go`／`schema.go` 注释／`unwired.go` 一行）＋`cmd/wisp/**_test.go` 五枚＋本台账。C18 那枚 300 s **未动一字**（`queue.go:107` 仍 `300 * time.Second`、`schema.go:460` 仍 `default:"300"`）。
+2. **卫生四门**（10:50–10:53 我自己重跑，⛔ 没引用腿的读数）：`sh scripts/d22scan.sh`＝**rc 0、clean**（live 分母 `bans #1-5 internal/=228`／`cmd/=38`／`ban #6 frontend/=85`，与旧基线不同口径、按当发引）；`sh scripts/check-path-length-budget.sh`＝**rc 0、VERDICT GREEN**；`go vet ./cmd/wisp/ ./internal/config/`＝**rc 0**；`gofumpt -l internal/config cmd/wisp`＝只剩预存的 `cmd/wisp/models.go`（CRLF，**不在本票写面**⇒ 不算扩大）。
+   ⚠ **记我一枚仪器坑（第 70 条同源）**：我第一次跑 gofumpt 用了 `~/GOPATH/bin/gofumpt`，而本机 `GOPATH` 实际是 `D:\work\base\gopath` ⇒ 那次"**空输出**"**不是干净，是尺没跑到**（两个分支的 stderr 都被我 `2>/dev/null` 吞了）。换真路径才读到 `models.go` 那一行。**"空输出先怀疑仪器"这条我今天又需要一次才算长进。**
+3. **红名逐名比对（判据＝只减不增）**：基线＝**16 枚**（09:46:00→09:50:2x，`cmdwisp-HEAD.log` 1,575 行，逐枚都带 band 的拒载句）；我这发＝**10:37:0x→10:49:15、508.882 s、`--- FAIL` 共 1 枚**＝`TestAC1ResidentLegInstallsItsLogListenerOnDisk`（`resident_sink_nail_127_windows_test.go:433`／`:498`"the child never reached the event loop"），**与那 16 枚名册不相交** ⇒ **16 枚全消、新增 0 枚**。
+   - ★**两发各红一枚、且不是同一枚**（腿那发＝`TestAC14GoSideEvalPushReachesThePage`；我这发＝上面那枚）。两枚**都早已具名在册**：AC14 那枚在 `docs/evidence/s1/33-panel-host-c27-v2.md:183` 的"本机真建窗 11 枚"名册里、且台账 `:10727` 与 `:11899` 记过它在 CI 侧翻色；AC1 那枚＝`A607` §7 我亲自核过归口的"**票 127 钉 `:497` 不 poll 竞态（隔离 ×4 绿、带载偶发）**"。⇒ **判语＝本票没造成任何新增红；这两枚属带载偶发的既有账，⛔ 不许我为了变绿去放宽任何断言，也不许把它们划成本票的伤。**
+   - ⚠ **我这发的 RUN／PASS 数拿不到**：我跑的是不带 `-v` 的整包，Go 只打失败行 ⇒ 我这条尺天生读不到 `--- PASS`（`^=== RUN`＝0 命中）。四数（RUN=323／PASS=226／FAIL=1／SKIP=0）**归 `267-r2` 那一发台件**（`cmdwisp-after.log`，腿用 `-v` 跑的），我这边成立的只有"红名一枚、与 16 枚不相交"。**引用四数时不许挂在我的时刻上。**
+4. **墙钟账（⛔ 这条是我派单的错，不是腿的错）**：腿实测 `cmd/wisp` **246 s → 508.9 s（我这一发）＝+262.9 s**，我派单里预估的是 **"+58 s 属预期"**——**低估了 4.5 倍**。逐枚归因（**时刻与秒数出自腿的 `-v` 台件 `cmdwisp-after.log`；我这发没带 `-v`，只有包级 508.882 s 这一枚是我的**）：`TestTicket101SessionGrantDoesNotCrossRestart` 81.70 s（重启两发各等满）、`TestTicket101ManualSwitchSurvivesRestart` 42.24 s、`TestRunBooksWithASnapshotOfItsLiveQueue` 32.60 s、`TestUnansweredL2CardTimesOutIntoRejectNeverExecution` 32.44 s——**这四枚的等待就是被测对象本身**，票 267 的判据明写不许压种子、不许 `t.Skip`，所以这 262.9 s 是**本票的诚实代价，我认下并写进账**。
+   - ⚠ 顺带一枚可省的账（⛔ 不在本票做，归后续）：`run_mode101` 那族抬的是 **40 s**，而它的最小合法档是 **31 s**（那一族的观察对象是 L2 卡、ctx 先响），三枚重启类改 31 可省约 **54 s／发**。要动就是新的一枚 `cmd/wisp` 写腿，⛔ 不许顺手夹在任何票里。
+5. **`267-r2` 的 §4 那一格我认**：种 31 时 `[warning] 审批将在 30 秒后自动拒绝，请尽快确认` **真到达装配根 stdout**（链＝`gate.go:528`→`:557-568`→`run.go:611`→`:1394`），并带两发突变（M1 把 needle 改错⇒红并倒出真实 stdout；M2 把种子压到 30⇒加载层响亮拒载）；"掐发送路"那一形**写面在 `internal/agent/approval` 之外、本票禁区不许进**，腿具名归口给编排者 ⇒ **这一格按 AC#2 已翻的口径成立，残余那半格记在 `A615`，不抹进"已证"**。
+
+**残余（具名，⛔ 任何腿不许"顺手"补）**：① `l1_window_sec` 用钳位而 `confirm_timeout_sec` 用拒载的**行为不一致** ⇒ 归下一枚治理票；② 下界抬到 60 s 那支要动票 256 的种子钉 ⇒ 待具名解冻；③ `WarningLead` 生产里恒零值、全靠兜底 ⇒ 归票 255 的账；④ **常驻腿把"越界拒载"读成"文件读不到"** ⇒ **票 268**（料已由 `268-a1` 量齐，见 `.scratch/wisp/probes/268/a1/census.md`）；⑤ `Q-77`（配置值 vs C18 的 300 s 谁优先）＝**待机主一句话**，⛔ 本票任何腿不许自裁。
