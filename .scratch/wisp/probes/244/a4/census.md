@@ -299,4 +299,29 @@ $ git ls-files "*.exe" | wc -l
 
 ## §8 落盘尺与「⛔ 这轮没动的东西」自证
 
-未判。
+**七问判语一句话版**（正文在各自那节，每节都带现尺读数）：
+
+| 问 | 判语 | 主要那把尺（读数） |
+|---|---|---|
+| 1 现成先例 | 这一族 10 枚文件／21 枚调用点，⛔ 没有一枚是"编译一次"（`buildWispForTest` 零缓存、零 `-ldflags`）；判过"某句话到真子进程 stderr"的只有 4 枚、且全在 slog-mirror 那一支 | `grep -rn "buildWispForTest(t)" cmd/wisp \| wc -l`＝21；`grep -rn "exec.Command(" cmd/wisp \| wc -l`＝23（**漏计 5 枚真起子进程的文件**，含 `dataroot_128` 那枚 `CommandContext`） |
+| 2 通道绑定 | 绑定在 `main.go:159-164`；`cmdRun` 零枚测试调用者；`runTextTask` 的 8 枚测试调用点**八枚同进程传 buffer**；`run198` 那枚共享 helper 15 处命中、零枚走子进程 ⇒ **派单那格残余成立** | `grep -rn "cmdRun(" cmd/wisp --include=*.go`＝2（定义＋dispatch）；`grep -rn "run198(" cmd/wisp \| wc -l`＝15 |
+| 3 subsystem | 旗标无条件在 `build.ps1:115`；盘上出厂件仍 **CUI(3)**（比旗标早 2 天、比 `run.go`/`firstrun.go` 旧）；244-r1 那枚临时出厂件真读 **GUI(2)**；"今天重跑 build.ps1"那一发**量不到，归编排者**＝AC#1 欠的那一发 | `objdump -p build/wisp.exe \| grep -i subsystem`＝`00000003 (Windows CUI)`；`git ls-files "*.exe" \| wc -l`＝0 |
+| 4 无父控制台 | attach 永远早于绑定（无错位）；★**双击那一支根本不产生这句话**（无参＝resident 分支，从不进 `cmdRun`）；`console_windows.go` 里"没有父控制台就 return"这句**不存在**（早退条件是"已有可用 stdout"`:34-37`） | 现读 `cmd/wisp/console_windows.go:33-43`、`cmd/wisp/logsink.go:160`、`cmd/wisp/run.go:222/:245` |
+| 5 撞钉预检 | 会红的只有两枚 AST 门的**仪器形**（三枚禁行写死）；12 枚计数形钉都打不红；★反向陷阱＝`firstrun_198_test.go:91` 的"stdout 必须为空"在真进程口径天然不成立；★新用例走 `run` 腿**不继承真窗毒源**；"起了子进程却没收尾"名册里**零枚** | `grep -rn "t.Parallel()" cmd/wisp --include=*_test.go \| wc -l`＝0；`grep -rn "objdump" scripts tools cmd internal .github \| wc -l`＝0；`grep -rln "debug/pe" cmd internal tools --include=*.go \| wc -l`＝0 |
+| 6 CI | 会进 CI，指到步名＋那一行：`ci.yml:487`＋`:507` → `wisp-cli-tests.sh:112` → `portable-tests.sh:226-231` → `runtests.sh`（零 PASS 即 fatal、任何 SKIP 即 fatal）；⚠"33 枚"只在注释里；**`winlive` 在 ci.yml 现量 0 命中＝默认不跑**，新用例不许带这枚标签 | `grep -c "winlive" .github/workflows/ci.yml`＝0；`grep -c "timeout-minutes" .github/workflows/ci.yml`＝0；`grep -rn "PASS=33" .github scripts/*.sh`＝3 处、**全 `#` 注释** |
+| 7 最小形 | 形状齐（tag／helper／argv／两柄／收尾／判据逐格都指得到现读行）；买到＝把 257-v1 那发手工读数升级成默认档门禁；⛔ 买不到 AC#2 三发真机字面、买不到 subsystem、买不到态乙 | 基线两把现成读数：整包 148.168 s（`228-v1:13`）／排程口径 ~8.5 min（`A621` §7）；精确构建增额**量不到** |
+
+**推翻／更正派单的五处**（逐枚具名，⛔ 没照抄进表）：① "编译一次 wisp.exe 再用 exec.Command 起真子进程"——**不存在缓存形**；② `console_windows.go:38-51` 那句"没有父控制台就 return"——**方向相反**；③ `A619` 那句"AC#1 不勾＝缺 AC#2 真机两发"——**归错账**（真身＝票面 AC#0 `:21`＋`A557:11063`，`AC#1 不勾` 全台账 0 命中）；④ 起手尺 `grep -rn "exec.Command(" cmd/wisp`——**漏计 5 枚**（`exec.CommandContext` 与复用 127 helper 的四枚）；⑤ 隐含前提"exec 级用例能把 AC#2 双击那一发钉住"——**买不到**（§4 判语 2）。
+
+**落盘尺**（收尾现跑）
+- `wc -l .scratch/wisp/probes/244/a4/census.md`＝**302**／`wc -c`＝**56,266**（本节前）；占位尺 `grep -cE '待[填]|填写[中]|未判'`＝**1**（就是本节这一格自己）。
+- commit 链（逐枚 `git log --format="%h %cI %s" -- .scratch/wisp/probes/244/a4/census.md` 复跑）：`05ac9fc0` 13:01:41 骨架 → `625717d9` 13:08:43 §0＋§1 → `7b5a6d13` 13:11:12 §2 → `273cb2d5` 13:17:01 §3 → `8734a4ba` 13:18:24 §4 → `e00cbd6d` 14:08:41 §5＋§6 → `b70cf069` 14:30:17 §7 →（本笔＝§8 收尾）。
+- ⚠ 本节写完后再量一次占位尺应为 **0**；若读者看到非 0，那一枚就是本腿没答完的格，⛔ 别当已交付。
+
+**⛔ 这轮没动的东西**（自证，全部现跑）
+- 逐笔 `git show --name-only` 复跑：上面 **8 枚 commit 每一枚的文件清单只有 `.scratch/wisp/probes/244/a4/census.md` 一行**，没有第二枚文件。
+- `git status --porcelain -- cmd internal tools scripts docs`＝**1 行**：` M cmd/wisp/resident_approval_windows.go`——**那是 `268-r1` 的活，不是我的**（本腿对它零写入、只读定位过它的存在，⛔ 未改、未 stash、未 add）。⇒ 我这轮在该四界里贡献 **0 行**。
+- **一枚 `go` 命令都没跑**：无 `go test`／`go build`／`go vet`／`go env`／`go list`（唯一执行过的二进制是 `objdump`、`git`、`grep`、`ls`、`wc`、`find`、`command -v`）。`268-r1` 在 `cmd/wisp` 取整包读数的名册因此没有被本腿洗过。
+- 票面／台账／证据件／`docs/**` **一字未改**；票 244 的 7 枚 `- [ ]` 框一枚没碰（收尾复尺 `grep -c "^- \[ \]" .scratch/wisp/issues/244-spec-11-wants-the-gui-subsystem-build.md`＝7、`grep -c "^- \[x\]"`＝0）。
+- `frontend/**`／`design/**` **零读零写零转述**（本腿所有 grep／find 的根都显式限定为 `cmd internal tools scripts docs .github .scratch`；尺：`find` 只从 `.scratch` 起、`grep -r` 全部带显式目录参数）。
+- temp 件只建不删，全在 `.scratch/wisp/probes/244/a4/`（本文件的 8 枚 commit message txt 都落在同目录，⛔ 没进任何一次 pathspec）。
