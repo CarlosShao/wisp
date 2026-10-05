@@ -1,0 +1,51 @@
+time=2026-10-05T11:08:53.868+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone
+time=2026-10-05T11:08:53.876+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone4281664047\001\logs min_level=info early_records=1 early_dropped=0
+    firstrun_198_test.go:101: stage 1 receipt (verbatim stderr):
+        wisp run: 已在 C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone4281664047\001\config.toml 新建默认配置：全部取值来自内置默认表（schema 的 default 标签），未替你选任何模型；[llm] 的模型与 api_key_ref 仍缺，本轮仍按未配置失败退码
+        wisp run: 缺的两样各有各的入口。key：先跑 wisp secret set <blob 名>（隐藏输入，不进 argv 也不进日志，也可以 --from-stdin 从管道喂），它把明文交给 DPAPI 存储，并回显一行 api_key_ref = "dpapi:<blob 名>"；这份文件里没有写明文 key 的字段，要补的是那个名字。不想用 DPAPI 就把 api_key_ref 写成 env:<环境变量名>，值由系统环境提供。
+        wisp run: 模型：在同一份文件的 [llm.providers.<名>] 里补 api_key_ref、base_url 与 models.<id>（名字对上内置预设的，protocol 与 base_url 可以留空），再在 [llm] 的 text_chain 或 roles.chat 里点名 provider/model；wisp providers discover 与 probe 读这份文件去问真实端点，不替你写。注意：models.<id> 条目里要写 enabled = true——缺这枚键的条目视为关闭，点名它会在起动时被拒。
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: role "chat" is unset and text_chain is empty (Unconfigured)
+    firstrun_198_test.go:102: stage 1 config.toml: 2571 bytes, first line "schema_version = 2"
+time=2026-10-05T11:08:53.905+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone4281664047\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-05T11:08:53.913+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone4281664047\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone (0.06s)
+=== RUN   TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten
+time=2026-10-05T11:08:53.938+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten1933733586\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten (0.02s)
+=== RUN   TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables
+time=2026-10-05T11:08:53.956+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedT588417370\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables (0.03s)
+=== RUN   TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences
+time=2026-10-05T11:08:53.981+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences77900964\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences (0.02s)
+=== RUN   TestTicket198FirstRunCallerIsTheRunEntryOnly
+--- PASS: TestTicket198FirstRunCallerIsTheRunEntryOnly (0.12s)
+=== RUN   TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags
+time=2026-10-05T11:08:54.129+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTa962245062\001\logs min_level=info early_records=0 early_dropped=0
+    firstrun_198r2_test.go:237: tag-derived default leaves: 70; file: 2571 bytes
+--- PASS: TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags (0.02s)
+=== RUN   TestTicket198R2AC2ExportedDefaultTableStillRendersAsItsTags
+--- PASS: TestTicket198R2AC2ExportedDefaultTableStillRendersAsItsTags (0.00s)
+=== RUN   TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile
+time=2026-10-05T11:08:54.153+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile1813988621\001\data\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile (0.01s)
+=== RUN   TestTicket198R2AC4ReceiptNamesTheRealEntryPoints
+time=2026-10-05T11:08:54.164+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints8197023\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-05T11:08:54.285+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints8197023\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2AC4ReceiptNamesTheRealEntryPoints (0.13s)
+=== RUN   TestTicket198R2J1TheAssemblyRootStillCreatesNothing
+time=2026-10-05T11:08:54.297+08:00 level=INFO msg="audit: perm: MODE-READ-FAILED path=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing411430042\\\\001\\\\config.toml\" err=config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing411430042\\001\\config.toml: The system cannot find the file specified. mode=ask_every_step origin=startup result=fail-closed detail=\"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）\""
+time=2026-10-05T11:08:54.299+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2J1TheAssemblyRootStillCreatesNothing411430042\002\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2J1TheAssemblyRootStillCreatesNothing (0.02s)
+=== RUN   TestTicket198AC3CreatedFileLandsPrivate
+time=2026-10-05T11:08:54.317+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC3CreatedFileLandsPrivate1975640958\001\logs min_level=info early_records=0 early_dropped=0
+    firstrun_acl_198_windows_test.go:35: AC#3 icacls(cfgPath) verbatim:
+        C:\Users\swq\AppData\Local\Temp\TestTicket198AC3CreatedFileLandsPrivate1975640958\001\config.toml NT AUTHORITY\SYSTEM:(F)
+                                                                                                          BUILTIN\Administrators:(F)
+                                                                                                          DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestTicket198AC3CreatedFileLandsPrivate (0.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.578s

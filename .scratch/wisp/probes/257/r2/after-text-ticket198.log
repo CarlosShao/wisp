@@ -1,0 +1,62 @@
+time=2026-10-05T11:12:44.471+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone
+time=2026-10-05T11:12:44.480+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone747349260\001\logs min_level=info early_records=1 early_dropped=0
+    firstrun_198_test.go:101: stage 1 receipt (verbatim stderr):
+        wisp run: 已在 C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone747349260\001\config.toml 新建默认配置：全部取值来自内置默认表（schema 的 default 标签），未替你选任何模型；[llm] 的模型与 api_key_ref 仍缺，本轮仍按未配置失败退码
+        wisp run: 缺的两样各有各的入口。key：先跑 wisp secret set <blob 名>（隐藏输入，不进 argv 也不进日志，也可以 --from-stdin 从管道喂），它把明文交给 DPAPI 存储，并回显一行 api_key_ref = "dpapi:<blob 名>"；这份文件里没有写明文 key 的字段，要补的是那个名字。不想用 DPAPI 就把 api_key_ref 写成 env:<环境变量名>，值由系统环境提供。
+        wisp run: 模型：在同一份文件的 [llm.providers.<名>] 里补 api_key_ref、base_url 与 models.<id>（名字对上内置预设的，protocol 与 base_url 可以留空），再在 [llm] 的 text_chain 或 roles.chat 里点名 provider/model；wisp providers discover 与 probe 读这份文件去问真实端点，不替你写。注意：models.<id> 条目里要写 enabled = true——缺这枚键的条目视为关闭，点名它会在起动时被拒。
+        wisp run: 上面那句模型只是第一样。设置页那七枚字段（服务商的 base_url、api_key_ref、凭据，模型的 context_window、price.in、price.out，还有聊天模型）今天都不建行，只改已有的行；要在这一页配上模型，得在这份文件里手加三样，缺一不可：
+        wisp run: 第一样＝一节 [llm.providers.<名>]，就是服务商那一行（名字对上内置预设的，protocol 与 base_url 可以留空；非预设名必须自己写 protocol，否则这份文件加载不过）。第二样＝它的模型行 [llm.providers.<名>.models.<模型 id>]，里面写 enabled = true。第三样＝就地填已有的 [llm.roles.chat] 那一节，把 provider 与 model 两枚一起点上名（别再追加一节同名的，那在 TOML 里是 duplicate table，文件直接加载不过）。界面不会替你建这一行，它只会告诉你去哪一节建；三样齐了这七枚才全部写得进，只加第一样只解锁服务商那三枚。
+        wisp run: 写不进去的时候有三种原因，各是一句不同的话，不会合成一句「配置未生效」：
+          第 1 种拒因：文件没建——这一种刚才那一发已经替你办完，C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone747349260\001\config.toml 现在是真的文件；首启之前没有任何旧配置可言。
+          第 2 种拒因：行不存在——那一页改不了服务商与模型的存在性，去这份文件里手加上面那三样，加完才写得进；这一条说的不是你的值不对。
+          第 3 种拒因：校验不过——行在，但那个值过不了这份 schema 的校验（引用形没写对前缀、点名的模型不在目录里，都算这一种）；要改的是值，文件一个字节都没动。
+        wisp run: 改完什么时候才算用上，按进程形状分三种说法，不是一句「重启就好」：
+          在控制台里跑 wisp run——这个进程带着每 1s 重读一次 config.toml 的看门狗，[llm] 属可热加载档，手改的值一秒内就换进这台进程的内存；但模型通路是启动时建一次的，热加载不会替它换脑，真正发请求还是按启动时那一份。
+          没有可答卡入口的常驻形状——任务腿过不去控制台那道闸时，这个进程里可能根本没有会重读盘的东西，手改与面板写在两个方向上都只能等下一次启动。
+          设置页那一页——它那条腿自己明说不带轮询，写入回执固定说要重启进程；页面上的读数在重启之前也不会跟着你手改的文件走。
+        凭据这一格只有引用会进这份文件：改 api_key_ref 换的是名字不是密钥本身，把那份引用再解一次是新建端点时才做的事，所以换过 key 的引用同样要重启才算用上；这一页任何时候都不回显密钥的值，只说已录入还是没录入。
+        wisp run: 文本角色未配置（Unconfigured）：config: llm: role "chat" is unset and text_chain is empty (Unconfigured)
+    firstrun_198_test.go:102: stage 1 config.toml: 2571 bytes, first line "schema_version = 2"
+time=2026-10-05T11:12:44.510+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone747349260\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-05T11:12:44.520+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone747349260\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone (0.06s)
+=== RUN   TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten
+time=2026-10-05T11:12:44.542+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten1398986726\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten (0.01s)
+=== RUN   TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables
+time=2026-10-05T11:12:44.556+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedT1586711450\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables (0.02s)
+=== RUN   TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences
+time=2026-10-05T11:12:44.579+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences3407207829\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences (0.03s)
+=== RUN   TestTicket198FirstRunCallerIsTheRunEntryOnly
+--- PASS: TestTicket198FirstRunCallerIsTheRunEntryOnly (0.14s)
+=== RUN   TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags
+time=2026-10-05T11:12:44.752+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTa3666336063\001\logs min_level=info early_records=0 early_dropped=0
+    firstrun_198r2_test.go:237: tag-derived default leaves: 70; file: 2571 bytes
+--- PASS: TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags (0.02s)
+=== RUN   TestTicket198R2AC2ExportedDefaultTableStillRendersAsItsTags
+--- PASS: TestTicket198R2AC2ExportedDefaultTableStillRendersAsItsTags (0.00s)
+=== RUN   TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile
+time=2026-10-05T11:12:44.776+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile2763315389\001\data\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile (0.01s)
+=== RUN   TestTicket198R2AC4ReceiptNamesTheRealEntryPoints
+time=2026-10-05T11:12:44.788+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints449304269\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-05T11:12:44.920+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints449304269\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2AC4ReceiptNamesTheRealEntryPoints (0.14s)
+=== RUN   TestTicket198R2J1TheAssemblyRootStillCreatesNothing
+time=2026-10-05T11:12:44.932+08:00 level=INFO msg="audit: perm: MODE-READ-FAILED path=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing2189408543\\\\001\\\\config.toml\" err=config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing2189408543\\001\\config.toml: The system cannot find the file specified. mode=ask_every_step origin=startup result=fail-closed detail=\"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）\""
+time=2026-10-05T11:12:44.936+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2J1TheAssemblyRootStillCreatesNothing2189408543\002\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket198R2J1TheAssemblyRootStillCreatesNothing (0.02s)
+=== RUN   TestTicket198AC3CreatedFileLandsPrivate
+time=2026-10-05T11:12:44.955+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC3CreatedFileLandsPrivate3095277870\001\logs min_level=info early_records=0 early_dropped=0
+    firstrun_acl_198_windows_test.go:35: AC#3 icacls(cfgPath) verbatim:
+        C:\Users\swq\AppData\Local\Temp\TestTicket198AC3CreatedFileLandsPrivate3095277870\001\config.toml NT AUTHORITY\SYSTEM:(F)
+                                                                                                          BUILTIN\Administrators:(F)
+                                                                                                          DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestTicket198AC3CreatedFileLandsPrivate (0.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.642s
