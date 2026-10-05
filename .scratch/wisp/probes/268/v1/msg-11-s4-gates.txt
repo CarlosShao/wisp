@@ -1,0 +1,23 @@
+probes(268-v1b 笔2)：填 §4 门禁四数——四门现跑带时刻，唯一不一致那枚已归因到窗口
+
+四门都在本腿自己窗口现跑（20:30:05–20:30:55），台件四枚入库：
+v1b-gate1-d22scan.log / v1b-gate2-pathlen.log / v1b-gate3-vet.log / v1b-gate4-gofumpt.log。
+
+- 门 1 `GOFLAGS= sh scripts/d22scan.sh`：rc=0、clean；八枚 scope 与 r1 逐枚同读数
+  （#1-5 internal/=228／#1-5 cmd/=38／#6 frontend/=85／#7 internal/tools/=23／#8 design/=39／
+  #8 frontend/=85／#8 internal/=512／#8 cmd/=104）；红名集合＝空——`violation` 那 8 处命中
+  全在 `TestBuiltBinaryGoesRedEndToEnd` 自造 fixture 的缩进块里（:141-219），真实一面 :251 逐字 clean。
+- 门 2 `check-path-length-budget.sh --with-self-test`：rc=0、三发控制逐枚 ok、VERDICT GREEN、
+  57／57／0 一字未变；**唯一与 r1 不一致处＝分母 tracked paths 5953→5991（+38）**。
+  归因（现量不猜）：`git ls-tree -r --name-only` 逐枚＝9a941965 5953／b93624d4 5970／2925b643 5975／
+  2a633eb8 5981／164ee2c2 5990／15d8b60e 5991；`git diff --name-status 9a941965 15d8b60e`＝
+  38 枚 A ＋ 9 枚 M ＝ 47 枚路径，落 cmd/＝0、落 internal/＝0，全在 .scratch(44)/docs(2)/scripts(1)
+  ⇒ 漂移属 r1 交件之后那批文书腿，不属 268 产码射程。本腿 §3 那 8 枚台件取数时未跟踪，
+  commit 后 tracked＝5999（如实写给下一枚读门 2 的腿）。
+- 门 3 `GOFLAGS= go vet ./cmd/wisp/`：rc=0、输出 0 字节（wc -c 亲量，未用 2>/dev/null）＝与 r1 三采同。
+- 门 4 gofumpt `-version`＝v0.12.0 (go1.27.1) 自证尺活着，`-l cmd/wisp`＝只有预存脏枚 `cmd\wisp\models.go`
+  （不是本腿的红，具名即可）＝与 r1 四采同枚。
+
+字节面同值自证随本节再取一遍：两枚产码 md5＝HEAD blob＝69a630bf…／e2405a21… ⇒ 四门读的是交付态字节。
+
+写面＝`.scratch/wisp/probes/268/v1/**`；⛔ 零产码、⛔ 零票面、⛔ 零台账。只 commit 不 push。

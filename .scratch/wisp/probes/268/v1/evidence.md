@@ -120,7 +120,30 @@ v1 那一枚出现处 `:1002`，`=== RUN` 归属＝`TestTicket268ResidentGateNam
 
 ## §4 门禁四数
 
-「待验」
+四门都在**本腿自己的窗口**现跑（20:30:05–20:30:55，`date` 现量逐枚带时刻），台件四枚全在本目录。
+起手 HEAD＝`164ee2c2`，本节跑完后又落了一笔 `01b38812`（§3）——**四门跑在 `15d8b60e` 这一枚 HEAD 上**（20:26 的台账笔，`git rev-parse --short HEAD` 现量），
+两枚产码字节面本节现量仍与 r1 交付同值（见 §0.1 与下条末行）。
+
+| 门 | 命令原文 | 本腿读数 | 时刻 | 与 r1 末笔（`2925b643`／17:19 那两采＋15:25–15:26 那四采）比 |
+|---|---|---|---|---|
+| 1 | `GOFLAGS= sh scripts/d22scan.sh` | **rc=0**、`d22scan: clean - no D22 ban violations`；正控真跑：`runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0`；`examined 266 production Go files under internal/ and cmd/`；八枚 scope＝`#1-5 internal/=228`／`#1-5 cmd/=38`／`#6 frontend/=85`／`#7 internal/tools/=23`／`#8 design/=39`／`#8 frontend/=85`／`#8 internal/=512`／`#8 cmd/=104` | 20:30:05–20:30:31 | **八枚逐枚同读数**；红名集合＝**空**（`grep -E 'VIOLATION\|violation'` 8 处命中全在 `TestBuiltBinaryGoesRedEndToEnd` 的**自造 fixture** 里，`:141-219` 缩进块，非本仓真实文件；真实一面 `:251` 逐字 `clean`） |
+| 2 | `sh scripts/check-path-length-budget.sh --with-self-test` | **rc=0**、`positive control PASSED`（三发控制 1/3–3/3 逐枚 ok）、`VERDICT GREEN`；`over-budget=57 covered by roster=57 not in roster=0`；`longest=180 chars relative`＝票 252 那枚工单名（⛔ 不是本腿造的）；`worst full path …=224 chars` | 20:30:38–20:30:41 | 分子分母**不一致**：r1＝`tracked paths=5953`，本腿＝`tracked paths=5991`（**+38**）。⇒ **先怀疑在谁的窗口**：见下段归因，**57／57／0 那三枚一枚未变**，本腿两枚文件不在 over-budget 名册里（`grep resident_approval_risk_268`＝0 命中） |
+| 3 | `GOFLAGS= go vet ./cmd/wisp/` | **rc=0**，输出 **0 字节**（`wc -c` 亲量；⛔ 未用 `2>/dev/null`，空读数与非空分得开） | 20:30:54 | **同读数**（r1 13:33:01／15:26:37／16:55:15 三采都 rc=0 无输出） |
+| 4 | `"D:/work/base/gopath/bin/gofumpt.exe" -version` 先自证尺活着，再 `-l cmd/wisp` | 尺＝**v0.12.0 (go1.27.1)**；`-l` 输出＝**只有 `cmd\wisp\models.go`** 一枚（`cat` 亲量，1 行）＝派单点名的**预存脏枚，不是本腿的红**，具名即可。本腿两枚与 r1 两枚产码**都不在名册里** | 20:30:55 | **同读数**（r1 13:33:03／14:09:34／15:26:39／16:55:21 四采同枚） |
+
+**门 2 分母漂移的归因（现量，不猜）**：`git ls-tree -r --name-only` 逐枚数——
+`9a941965`（r1 落地笔，13:31）＝**5953**（＝r1 报的数）／`b93624d4`＝5970／`2925b643`＝5975／`2a633eb8`＝5981／`164ee2c2`＝5990／`15d8b60e`＝**5991**＝本腿 `git ls-files | wc -l` 现量。
+`git diff --name-status 9a941965 15d8b60e`（门 2 取数那一刻的 HEAD）＝**38 枚新增（`A`）＋9 枚修改（`M`）＝47 枚路径**，
+按顶层目录分（对全部 47 枚）＝`.scratch/` **44**、`docs/` **2**（`docs/evidence/s1/265-267-evidence-index.md` 新增、`docs/reports/pending-and-issues.md` 修改）、`scripts/` **1**；
+落 `cmd/`＝**0 枚**、落 `internal/`＝**0 枚**（尺＝`git diff --name-only 9a941965 15d8b60e | grep -cE '^(cmd|internal)/'`＝**0**，20:3x 现量）。
+⇒ **漂移全在文书／台件地界，属 r1 交件之后那批腿与台账笔（`evidence-close-1`／`111-*`／`167-*`／`231-a1`／`268-v1` 自己那三笔）加的台件，不属 268 产码射程**；
+`over-budget`／`roster`／`not in roster` 三枚读数一字未变＝门本身没有因为任何一腿扩大射程。⚠ 本腿 §3 那 8 枚名册台件在门 2 取数时**未跟踪**（`:1` 尺只数 `git ls-files`），所以 5991 不含它们；
+本节这批 commit 之后 tracked 数＝`git ls-tree -r --name-only HEAD | wc -l`＝**5999**（20:3x 现量）——下一枚读门 2 的腿会看到它，如实先写在这里。
+
+**字节面同值自证（本节读数归属交付态）**：`md5sum` ＝ `git cat-file blob HEAD:… | md5sum` 双读——
+`resident_approval_windows.go`＝`69a630bf350daf1032c62b921e9d7044`、`resident_approval_risk_268_windows_test.go`＝`e2405a21bb278b558c1305ea95d34a9b`（20:3x 现量，两枚都与 r1 §4/§5 末采报的同值）。
+⇒ 四门读的是**交付态字节**，与 r1 那四采可比。
+
 
 ## §5 攻它没攻的格
 
