@@ -506,6 +506,95 @@ jobs:
         if: ${{ !cancelled() }}
         run: bash scripts/wisp-cli-tests.sh
 
+      - name: "Package coverage census (ticket 111 AC#1 + GUARD D)"
+        # WHY THIS STEP EXISTS. `--scope=census` is the ONLY call site GUARD D has:
+        # the audit that walks every package of `go list ./...` and refuses to exit
+        # 0 when a package compiles a test file on this platform while NO named tier
+        # claims it (scripts/portable-tests.sh:392-399, message :407-423). Before
+        # this step the census had ZERO CI call sites - `grep -c census ci.yml` was
+        # measured at 0 twice (ticket 111 r2 section 5.3, and by this leg at the
+        # HEAD below) - and the only things that ever ran it were cases inside the
+        # ticket 250 carrier script under scripts/, a carrier that is itself not
+        # wired into this workflow. Its filename is deliberately not spelled out in
+        # this file so the ruler "the carrier is not in CI" stays a clean grep
+        # reading for whoever takes it next; wiring the carrier into CI is a
+        # different decision from this one and is NOT made here. That is the
+        # mechanism this ticket was filed against: internal/session (2 test files,
+        # ticket 224) and internal/projctx (1, ticket 200) sat at zero coverage for
+        # four days after their tests landed because the ruler that could see them
+        # was a command nobody ran. A gate that only runs when someone remembers it
+        # is not a gate.
+        #
+        # WHY THE WINDOWS LEG AND NOT THE UBUNTU ONE (this is measured, not
+        # preference): on GOOS=linux `go list ./...` does not resolve the module -
+        # it exits 1 naming `build constraints exclude all Go files in
+        # .../sherpa-onnx-go-linux@v1.13.8` (reproduced three times independently:
+        # ticket 111 AC#4's reading, the script's own comment at
+        # scripts/portable-tests.sh:326-332, and probes/111/r2 section 1.2 at
+        # 2026-10-05 20:36:55, stdout 34 lines / stderr 264 bytes). Census then
+        # takes its refusal branch (portable-tests.sh:337-351) and exits 1 rather
+        # than build a roster on a partial package set - a refusal that can only
+        # UNDER-report holes. So ubuntu would not gain a verdict from this step, it
+        # would gain a permanent red whose cause is a package ubuntu can never run
+        # (ticket 98's wall), which is noise, not a gate. The leg where the plain
+        # form succeeds is the leg that carries it: GOOS=windows resolves all 35
+        # packages and the census exits 0 (r2 section 3.1).
+        #
+        # WHY IT SITS HERE IN THE JOB (between `cmd/wisp CLI tests` and `Portable
+        # windows tests`) - and the part of AC#5 this answers. This repo has been
+        # bitten three times by a gate that never produced a verdict because a red
+        # step stood above it (A54, A61, and this ticket's AC#6 with run
+        # 35599458439: step4 failure, steps 5-8 all `skipped`). The fix already in
+        # this job is ticket 111 AC#6's shape: EVERY non-setup step carries
+        # `if: ${{ !cancelled() }}`, so a step below a red one still answers. This
+        # step carries the same guard, which is why its position is about ORDER and
+        # not about dodging a red. Order chosen: census needs nothing staged - it
+        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+        # third_party, no DLLs on PATH - so it is placed below the two steps whose
+        # products it does not need and ABOVE the portable windows step whose
+        # denominator it audits: when `Portable windows tests` is red, the roster
+        # has already answered, and a package that lost its scope entry is named by
+        # this step instead of quietly shortening the one below. It is deliberately
+        # NOT above `Windows ACL sealing gate`: ticket 110 AC#5 fixed that step as
+        # first-in-job for its own reason, and a census red must not be able to
+        # delay the ACL evidence. No step was moved, edited, or deleted, and NO
+        # step here carries `continue-on-error` (D22 run-away mode 6) - a red
+        # census fails the job exactly like any other red.
+        #
+        # WHAT THIS STEP DOES NOT ADD, STATED SO IT IS NOT READ AS A SLIDE:
+        #   - no build tag of any kind is passed here, no environment-level tag
+        #     override, no skip flag by name. The live window cases stay
+        #     unwired, un-approved and un-measured by this step: ticket 111 r2
+        #     section 5.1 counted 11 such test files under internal/ball and
+        #     cmd/wisp, 5 of those files carrying 13 `t.Skip` calls whose literal
+        #     reason is `SKIP-LOUD: this host reports no ball window` (e.g.
+        #     cmd/wisp/resident_hotkey_live_258_windows_test.go:55), while
+        #     tools/d22scan/runtests.sh:98-102 treats ANY `--- SKIP` as fatal and
+        #     ends with "do not relax this script". Wiring them to a hosted runner
+        #     would be a permanent red that is not a product bug, and relaxing
+        #     anything to make them green is forbidden by AC#2 and AGENTS.md 1.1.
+        #     This step inherits that ruling untouched - the census branch it calls
+        #     executes no test binary at all, which is also why it cannot disturb a
+        #     milliseconds-sensitive package while another leg is reading it.
+        #   - it does not re-run GUARD A/B/C. It adds exactly one claim: every
+        #     package that compiles a test file here is claimed by a named tier.
+        #
+        # TODAY'S COLOR IS MEASURED, NOT ASSUMED, AND A RED IS A FINDING: census on
+        # a windows host at this HEAD prints
+        # `census totals: packages=35 ... unclaimed-with-tests=0` and exits 0
+        # (probes/111/r2/census-base.txt at HEAD 15d8b60e, re-taken by this leg at
+        # its own start HEAD - see probes/111/r3/evidence.md section 0). If the
+        # runner ever says otherwise, that is the hole this step exists to name;
+        # nothing here is tuned to make it green. Its teeth are pinned twice: r2's
+        # two real-tree mutants (sections 3.2/3.3, pulling internal/session and
+        # internal/plugin out of pin + scope gave rc=1 with the package named), and
+        # the two carrier cases added by this same leg - `census-unclaimed-package-goes-red`
+        # and `guard-d-slice-is-what-bites` - so the guard cannot be broken silently
+        # and cannot be wired as decoration.
+        shell: bash
+        if: ${{ !cancelled() }}
+        run: bash scripts/portable-tests.sh --scope=census
+
       - name: Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
         # Same disease as the ubuntu step above (ticket 93): bare `go test` books
         # a SKIP as `ok`, and this scope contains one - internal/proc's

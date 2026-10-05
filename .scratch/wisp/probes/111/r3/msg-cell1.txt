@@ -1,0 +1,36 @@
+ci(111-r3 格1): GUARD D 那把尺子第一次有自己的 CI 调用点——test-windows 新增 census 一步（+89/0）
+
+落点（工作树现量行号）：新步名 `.github/workflows/ci.yml:509`、`run:` 行 `:596`，
+夹在 `cmd/wisp CLI tests`（`run:` `:507`）与 `Portable windows tests`（名 `:598`／`run:` `:632`）之间，
+命令一字 `bash scripts/portable-tests.sh --scope=census`，带 `if: ${{ !cancelled() }}`。
+
+为什么是 windows 腿而不是 ubuntu：GOOS=linux 下 `go list ./...` 自身 rc=1
+（sherpa-onnx 的 linux module 排除全部文件）⇒ census 命中 `scripts/portable-tests.sh:337-351`
+的拒绝分支 exit 1 ⇒ 接 ubuntu 是一枚原因不在产品的永久红；windows 腿是 plain form 成功那一侧
+（r2 §1.2 现量＋脚本自己 `:326-332` 的注释复认，本腿零 go test/build/vet、零手打 go env）。
+
+为什么是这个位置：census 不消费任何上游产物（只 `go env GOOS` + `go list`，不跑测试不建东西），
+所以放两条它不需要其产物的步之后、放它审计的那份 windows 名册之前；⛔ 没插到
+`Windows ACL sealing gate` 前面（票 110 AC#5 把它钉为 job 内第一步，出处 `:432-435`）。
+"红步骤之后的步骤不执行"那条病对本步不成立也不需要靠挪位躲：本 job 7 枚非 setup 步
+全部带 `!cancelled()`（yaml 逐步核过，形状＝票 111 AC#6），本步的 if 只是与它们同形。
+
+禁面自证（现量）：`git diff --numstat` 删除列 **0**（零步骤被移动／编辑／删除）；
+逐步 `continue-on-error` 键 6 job 全遍历 = **0**；`grep -cE 'winlive|-tags|GOFLAGS'` = **0**；
+`grep -c portable-tests-selftest` = **0**（载具文件名一字不写，免得把"载具不在 CI"那把尺洗软）。
+⛔ 本腿没给 ci.yml 加任何 build tag／skip 面：winlive 11 枚文件里 5 枚自带 13 处
+`t.Skip`（`SKIP-LOUD: this host reports no ball window`），而 `tools/d22scan/runtests.sh:98-102`
+判任何 `--- SKIP` fatal ⇒ 接上去是永久红，放宽则是 AC#2／AGENTS.md §1.1 双禁；只在注释里登记现状。
+
+一处自曝并就地更正：第一版注释为了让"没加什么"可核写了 `-tags winlive`／`GOFLAGS`／`-skip`
+三个字面 token ⇒ `grep -cE 'winlive|-tags|GOFLAGS'` 从 0 变 3，那把尺是本票 AC#1 与 r2 §5.1
+用来判"winlive 零接入"的仪器，注释不许把它洗软；已改为不含 token 的等价句，复量回 0/0/0，
+事实与出处一字未减。
+
+证据件＝`.scratch/wisp/probes/111/r3/evidence.md`（起手锚 §0：HEAD 862556b3／scoped porcelain 0 行／
+全仓 730 行／改前 `grep -c census ci.yml` = 0／`grep -cE 'GUARD D|unclaimed|UNCLAIMED' selftest` = 0／
+`portable-tests.sh` 工作树 md5 = HEAD blob 同值 328eb3ea…／载具改前基线 27 枚全绿 rc=0）。
+格 2（GUARD D 的回归覆盖：`scripts/portable-tests-selftest.sh` +3 枚 census 发射 ＋ `scripts/testdata/portable-tests/go`
+的 census `-f` 逐包应答）此刻在工作树，随下一笔入库；两格合起来的"改坏必红"窗与四把门禁尺在 §3／§4。
+
+未 push（推送归编排者）。票面 111 的 AC 框一枚未翻。
