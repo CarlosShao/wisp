@@ -205,14 +205,15 @@
 
 ## §8 污染面与提交名册 ＋ 票面 AC 框零改动自证
 
-**commit 名册（逐笔 `git show --name-only`，本腿共四笔，只 commit、⛔ 从未 push）**
+**commit 名册（逐笔 `git show --name-only`，本腿共五笔，只 commit、⛔ 从未 push）**
 
 | 笔 | 名册（该笔唯一改动面） |
 |---|---|
 | `00f0ef97` | `.scratch/wisp/probes/267/r2/evidence.md`（骨架，1 file changed, 46 insertions） |
 | `32e74479` | `cmd/wisp/approval_reply_201_test.go`／`cmd/wisp/approval_seam_201_test.go`／`cmd/wisp/panel_pump_test.go`／`cmd/wisp/run_mode101_test.go`／`cmd/wisp/ticket224_assembly_test.go`＝**5 files changed, 30 insertions(+), 13 deletions(-)** |
 | `5fa0d28c` | `.scratch/wisp/probes/267/r2/evidence.md`（§0–§7 填实，191 insertions／23 deletions） |
-| 收尾笔（本件之后一笔，名册只有 `.scratch/wisp/probes/267/r2/**`） | 证据件 §8–§10 ＋全部台件（`cmdwisp-after.log`／`cmdwisp-after.stamp`／`mutation-m1.log`／`mutation-m2.log`／`timeout-case-after.log`／`ac14-rerun1.log`／`d22scan.log`／`path-length.log`／`dur-*.txt`／`run-*.txt`／`pristine/models.go.pristine`／三枚 `commit-msg-*.txt`） |
+| 收尾笔 `aac52ab2` | `.scratch/wisp/probes/267/r2/**` 共 **19 枚**（evidence.md §8–§10 ＋全部台件：`cmdwisp-after.log`／`cmdwisp-after.stamp`／`mutation-m1.log`／`mutation-m2.log`／`timeout-case-after.log`／`ac14-rerun1.log`／`d22scan.log`／`path-length.log`／`dur-before.txt`／`dur-after.txt`／`run-before.txt`／`run-after.txt`／`pristine/models.go.pristine`／四枚 `commit-msg-*.txt`），⛔ 无一枚在闭集之外 |
+| 第 5 笔（本行所在，交件后补的正名笔） | 只有 `.scratch/wisp/probes/267/r2/evidence.md` 一枚：把"共四笔"改成"共五笔"、把这张表补全、并给 §9 加第 12 条（数错自己的 commit 枚数）——⛔ 不再改任何产码或种子 |
 
 - **写面并集（尺＝三笔 `git show --name-only` 去重，10:2x 现跑）**＝6 枚路径：五枚 `cmd/wisp/*_test.go` ＋本证据件 ⇒ 与派单给的闭集**逐枚相同，零越界**。
 - **禁区尺**（同一把尺对 12 个禁区形态取反）：`internal/config`／`internal/agent/approval`／`internal/risk`／`thresholds.go`／`golden`／`allowlist.txt`／`docs/PLAN.md`／`docs/specs`／`.github`／`scripts/`／`frontend/`／`design/`／`.scratch/wisp/issues` 命中＝**0 行**。
@@ -239,6 +240,7 @@
     - #3/#4/#5/#7/#8/#9/#10/#11/#12 抬到 **40**：实测各 1.2–4.0 s（远小于 40 s）⇒ 40 s 那枚钟从未轮到，答完卡就走的原话在这些枚**为真**；同发放宽性读数：`TestL1Veto...` 4.54 s（含两枚子测）、`TestTicket224LiveGrant...` 3.96 s。
     - ⇒ 结论：**零枚发生观察对象搬家**；错的那格不是"抬错值"，是"没人量过 40 s 让哪一发真等满"（第 3 条）。
 11. **§0 起手读数我只截了 30 行**：`head -30` 的 `.scratch` 名册不完整（同一文件里 `??` 项远多于 30 行）⇒ 那一节的话说成"cmd/internal 零条"是完整的（两棵子树各自单独取过），但"全树脏面"这句我不能声称数全过。已按此限定措辞。
+12. **我把自己写成交件时还数错过一次枚数**：§8 初稿写"本腿共四笔"，而这张表写完时第 5 笔已经在计划里（就是补这一条的那一笔）。尺＝`git log --oneline f9bd0eb7..HEAD` 里本腿的 hash 逐枚点数＝00f0ef97／32e74479／5fa0d28c／aac52ab2／（本笔）＝**5 笔**；已把 §8 的名册与枚数改成"共五笔"，原话留在本条。**为什么这算缺陷级而不是笔误**：交件判语里"名册完整"是我自己下的判据，枚数错了那张表就不闭合，下一枚腿照它核面会以为少了一笔没交。
 
 ## §10 交件判语
 
@@ -249,3 +251,4 @@
 - **交件判定**：**本腿这一腿可收**（出口甲的射程全部落地，AC#4 的凭据里"红名逐名比对＋时刻"这一半已齐）；**留给编排者的三格**＝① 那枚新增红的裁决（同 HEAD 复跑一次即可归因），② `run_mode101` 族是否改取 31 以省 9 秒×2（要重跑整包才配得上同发读数），③ `panel_pump_test.go:124` 那句注释里的过期数字 2（写面闭集外，需具名解冻或另派）。
 - **占位符自尺（同发读数）**：10:31:07 第一把尺命中 **2 枚**，两处都是尺自身写下的词形（假阳性，已在 §8 那一条就地更正并把词形从正文摘掉）；复尺逐词计数读数与时刻写在下一行，⛔ 本件交件时全文不含任何一节处于未完成状态。
   - 复尺读数：**10:33:01** 同发两把——逐词 `grep -c`＝**0／0／0／0**，合尺（转义竖线四词一并）＝**0** ⇒ 交件时全文零枚占位。（中间态 10:31:07＝2、10:32:07＝逐词 0，都是尺自身的词形造成的，已就地更正；⚠ 10:32:07 那次只跑了逐词那一把，合尺补跑在 10:33:01。）
+  - ★那一行之后又复尺四次，全都是 0：10:33:50（对已入库的 `aac52ab2` 版本）／10:34:13／10:34:38／**10:35:33＝交件时刻那一把**（合尺 `grep -c`，零命中返回 rc=1 属这台机的正常形状）⇒ 写完 §8 名册与 §9 第 12 条之后没有重新引入任何占位词形；交件时全文 11 节（§0–§10）标题齐、254 行（字节数不在本件里自指——每改一行它就漂，终值以交件回报那把尺为准）。
