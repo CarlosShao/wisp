@@ -82,7 +82,35 @@ $ grep -rln "buildWispForTest(t)" cmd/wisp | wc -l
 
 ## §2 问 2 —— 通道绑定的真身：`os.Stdout`／`os.Stderr` 交给了谁
 
-未判。
+判语：**绑定发生在 `cmd/wisp/main.go:159-164`，那三行今天既没有被任何用例驱动、也没有被任何真子进程判过**——`cmdRun`（唯一持有那枚 `runSpec` 的函数）全仓**只有 2 处命中**（尺：`grep -rn "cmdRun(" cmd/wisp --include=*.go` → `main.go:91 os.Exit(cmdRun(args[1:]))`、`main.go:151 func cmdRun(args []string) int`），**零枚测试调它**。`runTextTask` 另有 8 枚测试调用点，**8 枚全部在同一进程里传 `bytes.Buffer`／`io.Discard`**。⇒ 257-v1 `:161` 那句残余**成立**，且本腿把它量窄了一格：**连"同进程但走真文件描述符"那一形都没用在 `runTextTask` 上**（`captureLeg131` 那台管道机只喂给了 `cmdModels`／`cmdSecret`，见下）。
+
+**绑定逐字**（现读 `cmd/wisp/main.go`）：
+
+- `:89-91` `case "run": attachParentConsole(); os.Exit(cmdRun(args[1:]))`——**attach 早于绑定**（与票 244 §9 第 5 条同一条读数，本腿复认：`attachParentConsole` 在 `:90`，`os.Stdout` 捕获在 `:161`）。
+- `:151-165 cmdRun`：`:152 printVersions("")`（两行版本走 `fmt.Printf`＝**stdout**）→ `:153 reply := interactiveStdin()` → `:154-158` 无控制台时向 `os.Stderr` 打那一句"L2 卡会等到超时后按拒绝处理…" → `:159-164 return runTextTask(runSpec{argv: args, stdout: os.Stdout, stderr: os.Stderr, reply: reply})`。
+- 下游：`cmd/wisp/run.go:104-105` 是 `runSpec` 的 `stdout io.Writer`／`stderr io.Writer` 两枚字段；`:182-187` 的 nil 兜底把默认再绑一次 `os.Stdout`／`os.Stderr`（**运行时读全局**，不是构造时绑定）；`:245 ensureFirstRunConfig(s.dataDir, s.stderr)` 把 `s.stderr` 交给回执生产者（`cmd/wisp/firstrun.go:72`，句面 `:92-95` 与 `:111-…` 那两枚 `fmt.Fprintf(stderr, …)`）。
+- ⚠ **`stderr` 那一枚 writer 同时还是错误与归因句的出口**（`run.go:196` 用法句、`:208` 起的数据根拒绝句……），所以"首启回执真到达"这句话在产码侧本来就与退码 2 那一族共用同一条通道。
+
+**`runTextTask` 的 8 枚测试调用点（尺＝`grep -rn "runTextTask(" cmd/wisp | wc -l`＝9，扣 `main.go:159` 与 `run.go:181` 定义）**：
+
+| 调用点 | 传的 writer | 口径 |
+|---|---|---|
+| `cmd/wisp/firstrun_198_test.go:32`（经 `run198` `:29-40`） | `stdout: out, stderr: errb`（`:31` 两枚 `bytes.Buffer`） | 同进程内存。★ 那枚"新建默认配置＋路径"的正向断言就在 **`:98`**，`t.Logf` 逐字回显 stderr 在 `:101` |
+| `cmd/wisp/firstrun_257_test.go:79` | 复用 `run198` | 同进程内存（尺＝`grep -rn "run198(" cmd/wisp | wc -l`＝**15 处命中**：定义 1 ＋调用 14，分布在 `firstrun_198_test.go`(7)、`firstrun_198r2_test.go`(5)、`firstrun_257_test.go`(1)、`firstrun_257_nonpreset_test.go`(1)、`firstrun_acl_198_windows_test.go:24`(1) ⇒ **这一族的 5 枚文件共用同一枚同进程 helper，没有一枚走子进程**） |
+| `cmd/wisp/firstrun_257_nonpreset_test.go:55` | 复用 `run198` | 同上 |
+| `cmd/wisp/run_test.go:122` | `runFixture` 的 buffer | 同进程内存 |
+| `cmd/wisp/run_mode101_test.go:148` | 同上族 | 同进程内存 |
+| `cmd/wisp/approval_reply_201_test.go:172` | 同上族 | 同进程内存 |
+| `cmd/wisp/dataroot_128_test.go:117` | `stdout: io.Discard, stderr: &out` | 同进程内存 |
+| `cmd/wisp/logsink_windows_test.go:152`、`:319` | `out, errb := &bytes.Buffer{}, &bytes.Buffer{}` | 同进程内存 |
+
+**"真到达"这一格的三枚最接近先例，各自差在哪一格**（全部现读复认，⛔ 都不算通道钉）：
+
+1. `cmd/wisp/dataroot_128_windows_test.go:131-133`＋`:74-78`——**真子进程**、**真 argv**（含 `run` 腿 `:60`），但 stdout 与 stderr **合进同一枚 `bytes.Buffer`** ⇒ 它能说"那句话到了某处"，**说不出"那句话到了 stderr"**。这一枚是"差半枚口径"的先例。
+2. `cmd/wisp/leg_sink_nail_131_windows_test.go:161-207 captureLeg131`——把 `os.Stdout`/`os.Stderr` 换成**真 `os.Pipe()`**（`:164-172`，收尾 `:190-197` 还原），再在 `:351-357` 用 `cmdModels(…, modelsIO{stdout: os.Stdout, stderr: os.Stderr, …})` 判 `:393 !strings.Contains(stderr, "wisp models ensure: 交还被拒绝")`。**这是仓里最硬的一枚"句子真写进 stderr 文件描述符"的钉**，但它（i）是**同进程**（`go test` 的进程自己换柄，不是 `wisp.exe` 起来自己绑），（ii）钉的是 `cmdModels` 那枚 `modelsIO`，**不是 `runTextTask` 的 `runSpec`**。同族还有一枚更软的：`cmd/wisp/panel_assets_143_test.go:85-86` 把 `os.Stdout/os.Stderr` 换成**临时文件**再直接调 `cmdPanelAssets`。
+3. `cmd/wisp/resident_sink_nail_127_windows_test.go:487/:493/:529/:541`——**真子进程＋真 stderr**，四枚正向 `has(...)` 都在，但**那条通道是 slog 的 mirror（`logsink.go:160`），不是 `runSpec.stderr`**：无参常驻腿根本不进 `runTextTask` 的 CLI 分支（它走 `resident_windows.go:33`），而首启回执只在 `run` 腿产生（`run.go:245`）。⇒ **两枚先例各占一半：一半有真进程没有真 stderr，另一半有真 stderr 没有那枚 writer。**
+
+**量不到的那一格具名**：`run198` 那族用例"stderr 里有没有回执"与真进程"stderr 句柄到底是不是那根管道"之间的这一步，**今天整个包没有一枚用例跨过去**（尺：本包 22 处 `os.Stdout`/`os.Stderr` 命中全在测试自己的换柄或子进程 argv 里，`grep -rn "os\.Stdout\|os\.Stderr" cmd/wisp --include=*_test.go | wc -l`＝22；**零枚**用例从 `exec.Command(exe, "run", …)` 之后读 `cmd.Stderr` 里的首启回执串）。
 
 ---
 
