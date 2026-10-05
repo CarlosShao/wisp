@@ -1,0 +1,9 @@
+probes(268-v1 笔2)：AC#3/AC#4 静态面判语＋攻面三节落盘（整包仍在跑）
+
+- §5.1：cmd/wisp 产码 LoadFile 调用点全枚 7 处——268-r1 没加第七枚读取点；runResident 调用面零字节；256 :559-568 构造名计数钉在册。
+- §5.2：l1_window_sec 用钳位 vs confirm 拒载＝schema.go:450-463 注释写明的 deliberate（267 定的），268 未顺手统一；approval/ 最后一笔 789a02e2（259-r2）。
+- §5.3：三回落形态负控＋两枚正控枚齐，无缺控形态。
+- §5.4：run.go 只含注释零调用；一响一静未被抹平；缺失支零新面（268 用例②反控）。
+- §5.5：禁区正则 9a941965/b93624d4 两笔各 0 行命中；新增导出方法 0（测试仅 3 枚 func Test）；internal/ 全目录 diff 空；
+  validate.go :128/:129/:145 逐字在（最后一笔 37f8e5c6＝267-r1）；riskProvenanceUnreadable 字面未动。
+- AC#3/AC#4 v1 判语＝达标（静态面）。

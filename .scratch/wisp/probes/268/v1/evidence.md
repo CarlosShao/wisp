@@ -68,8 +68,8 @@
 |---|---|---|
 | AC#1 | 「待验」 | §0.2/§0.3/§2 |
 | AC#2 | 「待验」 | §0.3/§2 |
-| AC#3 | 「待验」 | §5 |
-| AC#4 | 「待验」 | §4.5/§4 |
+| AC#3 | **达标**（v1 判，静态面；§5.4） | §5.1/§5.4/§4.5 |
+| AC#4 | **达标**（v1 判，静态面；§5.5） | §5.5/§4 |
 
 ## §2 突变名册（自重种三发）
 
@@ -85,7 +85,57 @@
 
 ## §5 攻它没攻的格
 
-「待验」
+### 5.1 「runResident 不得加第二枚 [risk] 读取点」的硬钉审计（r1 只报了"没有"，本腿枚了全部读取点）
+
+现量 `grep -n "config.LoadFile" cmd/wisp/*.go | grep -v _test`（20:2x）＝**7 枚产码调用点**：
+
+| 站点 | 归属票 | 268 后状态 |
+|---|---|---|
+| `cmd/wisp/models.go:184` | 255 族（任务侧 geometry/providers 前身） | 未动 |
+| `cmd/wisp/panel_resident_windows.go:201` | 255 AC#4（panel geometry per-use 读） | 未动 |
+| `cmd/wisp/providers.go:98` | 任务腿 | 未动 |
+| `cmd/wisp/resident_approval_windows.go:474` | 256 建的那枚（268 在**其内部**分叉） | 268 改的是函数体、没加新调用点 |
+| `cmd/wisp/resident_windows.go:183` | 258 AC#1（[hotkey] hotCfg258 构造读） | 未动 |
+| `cmd/wisp/resident_windows.go:206` | 258（[hotkey] hotReload258 per-tick 读） | 未动 |
+| `cmd/wisp/run.go:17` | 注释行（非调用） | 未动 |
+
+⇒ **268-r1 没有加第七枚读取点**；它把被拒分支写进 256 已建的那枚函数里，`runResident` 调用面
+（`newResidentApprovalWithConfig(rt.Layout.DataDir)`，`resident_windows.go:122` 附近）零字节。
+256 的 `:559-568` 构造名计数钉（`fed != 1`／`bare != 0`／`argOK`）亲读在册、未被触碰。
+派单的「硬钉 1」（不在 runResident 里加第二枚 [risk] 读取点）**满足**；与 a2 §2④ 收窄口径的冲突不存在——两条尺在这份 diff 上同读数。
+
+### 5.2 `l1_window_sec` 钳位 vs `confirm_timeout_sec` 拒载（票 267 残余①）——亲读
+
+- `internal/config/schema.go:450-463`（票 267 注释）逐字：confirm **"gated at load, not clamped at the gate"**；
+  `l1_window_sec` **"deliberately keeps its consumer-side clamp (gate.go MinL1Window/MaxL1Window)"**——
+  即"行为不一致"是**注释里写明的 deliberate**，不是 268 造的，也不是 268 该顺手统一的（AC#3 同理）。268-r1 未动 schema.go（§4.5）。
+- `internal/agent/approval/` 最后一笔＝`789a02e2`（票 259-r2，12:52:43），268 全链零触；gate.go 的 MinL1Window/MaxL1Window 未动。
+
+### 5.3 「常驻腿任何时候按用户写的数跑」须同时满足两枚正控——枚齐
+
+本腿枚到的正控全在：256 的 `:151-159`（45s 正控）与 `:240-260`（45/90/31/40 种子表，provenance 必须 `riskProvenanceRead`）；
+268 用例①的 45s 正控。负控（缺失/被拒/NoView 三回落形态 ⇒ 300s/3s）在 256 ruler①＋268 用例①。**没有一枚形态缺正负控。**
+
+### 5.4 AC#3「两腿不许顺手统一」的逐文件形审（r1 只报了"run.go 零字节"）
+
+- `run.go` 只含 `config.LoadFile` 的**注释**（`:17`），产码调用零枚；268 diff 名册里 `run.go` 零字节。
+- 跑任务腿的响亮拒绝（退码 2＋"配置未就绪（Unconfigured）"句）不在本腿写面，`git show --name-only 9a941965` 全 5 枚路径无它。
+- 常驻腿缺失支**没有**因为本票而获得任何新可见面（268 用例②的反控钉着：缺失支 stdout 零行）；
+  被拒支的新面只属于被拒支。⇒ 「一响一静」的差别没有被抹平：跑任务腿=拒载即退；常驻腿=拒载回落＋具名＋stdout；缺失=回落＋具名（无 stdout）。
+
+### 5.5 AC#4 逐条（静态面）
+
+- **禁区命中**：`git show --name-only` 对 `9a941965`（5 枚路径）与 `b93624d4`（11 枚路径）分别过禁区正则
+  （docs/PLAN.md、docs/specs/、internal/observe/thresholds.go、internal/agent/approval/、tools/d22scan/allowlist.txt、frontend/、design/）
+  ＝ **两笔各 0 行命中**（20:2x 现量）。r1 §4.5 同尺同读数（0 行）。
+- **新增导出方法名**：全 diff `^\+` 过 `func \(…\) [A-Z]`＝**0 枚**；产码文件 `^\+(func |	func )`＝**0 枚**；
+  测试文件新增 `func` 仅三枚 `func Test…`（测试面，非入向 API）⇒ **零新增入向方法名（C17 面未动）**，r1 读数复现。
+- **值域 [31,3600]／l1_window_sec 钳位一字未动**：`git diff 9a941965^ 9a941965 --stat -- internal/`＝**空**（internal/ 零字节）；
+  `internal/config/validate.go` 现量 `:128` `confirmTimeoutSecMin = 31`、`:129` `confirmTimeoutSecMax = 3600`、`:145` band 判断逐字在；
+  该文件最后一笔＝`37f8e5c6`（票 267-r1）——268 全链零触。
+- **`riskProvenanceUnreadable` 字面逐字未动**：现量 `:446`＝`"defaults (config.toml unreadable)"`，与票面引文逐字同。
+- **测试种子只种带外值（20），不改 band**：`grep` 全 diff 中带 `31/3600` 的新增行全部是**测试断言文案／证据件引文**，
+  零枚落在 `internal/config`。
 
 ## §6 六处差异的独立复核
 
