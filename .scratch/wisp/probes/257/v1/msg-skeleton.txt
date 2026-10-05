@@ -1,0 +1,6 @@
+票 257 验收腿 257-v1 第 1 步：证据件骨架（起手锚＋容量三发已现量，其余格逐枚写"未判"）
+
+- 件＝docs/evidence/s1/257-clean-machine-provider-registry-v1.md（新建）
+- 锚：12:20:31 进场、HEAD 5b638498、dev；cmd+internal 脏面 0 行、GOFLAGS 空、internal/agent/approval 脏面 0 行
+- 容量三发 58/67/60 %（均 <70 %，放行计时敏感腿；整包前逐发再取）
+- 本腿只出判语：⛔ 不翻票面 AC 框、⛔ 不改台账、⛔ 不删任何一套测试的件
