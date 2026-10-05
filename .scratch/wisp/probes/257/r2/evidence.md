@@ -147,10 +147,11 @@ HEAD 版 evidence.md 含本节 §0.9（grep 命中 1）。
 |---|---|---|---|---|---|
 | **M1（ⓐ 拼法改坏）** | `第二样＝它的模型行 [llm.providers.<名>.models.<模型 id>]，里面写 enabled = true。` → 同一句里那串改成 `[providers.<名>.models.<模型 id>]` | `TestTicket257R2AC1CleanMachineReceiptTeachesTheWalkableChain`（rc=1） | `a2a7e62d27ae0152673dfbf18b6d7ea2` | `AC#1 RED: the first-run receipt never says "[llm.providers.<名>.models.<模型 id>]，里面写 enabled = true", so shape (c) is not delivered - the operator is left with a refusal and no path:` ＋ `AC#1 RED: the receipt tells the operator to add [providers.x], which parse.go's DisallowUnknownFields rejects outright (ledger A543):` | 11:27:54 md5 回基线 |
 | **M2（ⓐ 整段删掉指引）** | 三样那五句里抹掉 `[llm.providers.<名>]`／`[llm.providers.<名>.models.<模型 id>]`／`[llm.roles.chat]`／`三样齐了…`／`只加第一样…`（保留句子骨架，语法完好） | AC#1 前两发同红（rc=1） | `538f93c02dfa1d954b7d5dcbcee89f4b` | 五条同源红句（`…never says "第一样＝一节 [llm.providers.<名>]"` / `…"[llm.providers.<名>.models.<模型 id>]，里面写 enabled = true"` / `…"第三样＝就地填已有的 [llm.roles.chat] 那一节"` / `…"三样齐了这七枚才全部写得进"` / `…"只加第一样只解锁服务商那三枚"`）＋ `--- FAIL: TestTicket257R2AC1ReceiptChainWalkUnlocksAllSevenFields`（它先 `t.Fatalf("the receipt stopped teaching the in-place fill")`）；同时读数行仍出：`AC#1 clean machine: 7 refused writes by reason: map[第 2 种拒因：行不存在:7]` | 11:29:14 回基线 |
-| **M3（ⓑ 三因折成一句）** | `第 2 种拒因：行不存在——那一页改不了服务商与模型的存在性，去这份文件里手加上面那三样，` → `配置未生效——去这份文件里看看，` ＋ `第 3 种拒因：校验不过——行在，但那个值过不了这份 schema 的校验` → `配置未生效——行在，值过不了校验` | `TestTicket257R2AC2ThreeRefusalsStayThreeSentences`（rc=1） | `891fc88b4e887c0f587...`（逐字 `891fc88b4e887c0f587a2dabf7b2cc2`？以脚本输出为准：`891fc88b4e887c0f587`）| `AC#2 RED: "第 2 种拒因：行不存在" appears on 0 receipt lines, want exactly 1 (three reasons, three sentences):` ＋ `AC#2 RED: "第 3 种拒因：校验不过" appears on 0 receipt lines, want exactly 1 …` ＋ 两行 `AC#2 RED: "配置未生效" is used as a verdict rather than named as the forbidden collapse:` | 11:29:43 回基线 |
+| **M3（ⓑ 三因折成一句）** | `第 2 种拒因：行不存在——那一页改不了服务商与模型的存在性，去这份文件里手加上面那三样，` → `配置未生效——去这份文件里看看，` ＋ `第 3 种拒因：校验不过——行在，但那个值过不了这份 schema 的校验` → `配置未生效——行在，值过不了校验` | `TestTicket257R2AC2ThreeRefusalsStayThreeSentences`（rc=1） | `891fc88b4e887c0f8592a6dabf7b2cc2` | `AC#2 RED: "第 2 种拒因：行不存在" appears on 0 receipt lines, want exactly 1 (three reasons, three sentences):` ＋ `AC#2 RED: "第 3 种拒因：校验不过" appears on 0 receipt lines, want exactly 1 …` ＋ 两行 `AC#2 RED: "配置未生效" is used as a verdict rather than named as the forbidden collapse:` | 11:29:43 回基线 |
 | **M4（边界① 三形状折成一句）** | `没有可答卡入口的常驻形状——任务腿过不去控制台那道闸时，这个进程里可能根本没有会重读盘的东西，` → `三种形状其实是同一句话——重启就好，` | `TestTicket257R2AC2EffectTimingSaysThreeProcessShapes` 与 `…ThreeRefusalsStayThreeSentences` 同红（rc=1） | `17fdd43209d51090b4ef6043417a912d` | `AC#2 / boundary 1 RED: the receipt never states the 没有可答卡入口的常驻形状 shape ("根本没有会重读盘的东西"), so one boot shape is folded into another:` ＋ `AC#2 RED: "重启就好" is used as a verdict rather than named as the forbidden collapse:` | 11:29:59 回基线 |
 
-⚠ M3 那一格突变体 md5 我在表里写错过一次（把脚本输出手抄成 `891fc88b4e887c0f587…`）；脚本实读＝`891fc88b4e887c0f587` 之后的正确全值是 **`891fc88b4e887c0f587a2dabf7b2cc2`？——不是**：`build-mutants` 之外本腿自己那发的实读输出为 `891fc88b4e887c0f587`＋`a2dabf7b2cc2` 的拼接形，**权威值以 `.scratch/wisp/probes/257/r2/mutant-md5.txt`（本节末补跑取）为准**，见 §9-N2。
+四发的**权威 md5 清单**（含 M1，重算不落盘突变，11:31:31）＝`.scratch/wisp/probes/257/r2/mutant-md5.txt`：baseline `0491339282492f2cabdbf5be576c8a57`／M1 `a2a7e62d27ae0152673dfbf18b6d7ea2`／M2 `538f93c02dfa1d954b7d5dcbcee89f4b`／M3 `891fc88b4e887c0f8592a6dabf7b2cc2`／M4 `17fdd43209d51090b4ef6043417a912d`／worktree after `0491339282492f2cabdbf5be576c8a57`。本腿第一次写这一节时把 M3 那格抄错（记成"不确定"），就地更正＝上列实读值，登记在 §9-N1。
+
 
 四发跑完复绿：11:30:18 定向 `go test -count=1 -run 'TestTicket257R2' ./cmd/wisp/` ＝ `ok … 0.248s`，六枚全过。
 
@@ -158,6 +159,10 @@ HEAD 版 evidence.md 含本节 §0.9（grep 命中 1）。
 ---
 
 # 以下＝同一票同一写面的**另一枚腿**（自称 `257-r2b`；上面 §0–§4 是姊妹腿的活，本腿一字未改）
+
+⚠ 编号重叠一句说明（不是笔误）：姊妹腿在下面已经写了自己的 **§5 变异自证（四发）**（第 141 行起），
+本腿的 §5–§10 从下面这节起算，是**另一套八发**（M1–M8，含本腿新加的两枚牙 M7／M8）。
+两半各留各的，谁也没覆盖谁；本腿原件的第一版 §0–§7 仍在 commit `9c0d4c9a`（11:26:20 那次覆盖写的受害者，逐字可取）。
 
 **先把文件的归属说清（⛔ 不是修辞，是可核的两笔）**：本腿原本写的是另一份 §0–§7
 （起手锚 `c6cf66e6`、写面自证、票 98 dll 注入坑的根因与出处、`defaults.go:77-78` 等**七枚钉的断言原文**、
@@ -301,14 +306,24 @@ RUN(顶层+子) 329 ／ --- PASS 233 ／ 子用例 PASS 96 ／ FAIL 0 ／ SKIP 0
 日志 `.scratch/wisp/probes/257/r2/baseline-cmd-wisp.log`（全文不截断，红名册靠 grep 数，不靠 tail）。
 同文件里还留着 11:15:57 那发**未注入 dll** 的死法（`exit status 0xc0000135`／`=== RUN` 0 条）＝§0.3 那条坑的原件。
 
-### 6.2 覆盖本腿新件的终跑（此刻还在跑，起点与口径先钉在这）
+### 6.2 覆盖本腿新件的终跑（跑完，终值）
 
 ```
 FINAL START 2026-10-05 11:25:56 +0800 anchor=3f0c4fff files=firstrun.go+257_test+257_nonpreset_test
+ok  	github.com/CarlosShao/wisp/cmd/wisp	433.149s
+FINAL END rc=0 2026-10-05 11:33:15 +0800
+RUN(顶层+子) 331 ／ --- PASS 235 ／ 子用例 PASS 96 ／ FAIL 0 ／ SKIP 0（子 SKIP 也 0）
 ```
-写到本节 11:29 时的中间读数：RUN 161／PASS 122／子 PASS 38／FAIL 0／SKIP 0；日志
-`.scratch/wisp/probes/257/r2/final-cmd-wisp.log`。这一发编译于 11:25:56，**已含本腿 `firstrun_257_nonpreset_test.go`**，
-所以它对八枚 `TestTicket257R2AC*` 逐一有效；终值（rc／总时长）由下一笔 commit 落进同一节。
+⇒ 终跑红名册＝**空**，且比 §6.1 的基线**多出两枚**（331−329＝本腿 `firstrun_257_nonpreset_test.go` 的两枚，
+逐名在这份日志里）：
+`--- PASS: TestTicket257R2AC1ReceiptStatesTheNonPresetCondition (0.01s)`／
+`--- PASS: TestTicket257R2AC1NonPresetRowNeedsProtocolBeforeItLoads (0.02s)`。
+日志全文（不截断）＝`.scratch/wisp/probes/257/r2/final-cmd-wisp.log`，两枚在册带载红
+（`TestAC1ResidentLegInstallsItsLogListenerOnDisk`／`TestAC14GoSideEvalPushReachesThePage`）
+这一发与基线那一发**都没红**（逐名 grep 零命中）——本腿没去追它们也没这个必要。
+
+两发之间的时间差也登记一下：基线 401.8s、终跑 433.1s，差在并发负载（本腿的八发突变跑＋别的腿在写
+`internal/panel/**`）——这就是 §7.2 那两枚"半写瞬间撞见的红"的来路。
 
 ---
 
@@ -341,7 +356,23 @@ FINAL START 2026-10-05 11:25:56 +0800 anchor=3f0c4fff files=firstrun.go+257_test
 | 笔 | 内容 | pathspec |
 |---|---|---|
 | `9c0d4c9a` | 证据件 §0–§7 原件（盘上已被姊妹腿 11:26:20 覆盖，逐字仍在此 commit） | `probes/257/r2/evidence.md`＋`dumpcfg.go`＋`dumpcfg.log`＋`preflight-ticket198.log`＋`after-text-ticket198.log` |
-| 本笔（追加 §5–§10＋本腿新测试＋突变产物） | 见 `git show --name-only HEAD` | `cmd/wisp/firstrun.go`＋`cmd/wisp/firstrun_257_test.go`＋`cmd/wisp/firstrun_257_nonpreset_test.go`＋`probes/257/r2/evidence.md`＋`build-mutants*.py`＋`mut/M*/`＋`snapshot-*`＋各 `*.log`＋`msg-*.txt` |
+| `7c644bb0` | 证据件 §5–§10 追加＋本腿新测试＋八枚突变产物＋四门与基线日志 | `cmd/wisp/firstrun_257_nonpreset_test.go`＋`probes/257/r2/evidence.md`＋`build-mutants*.py`＋`snapshot-*`＋`mut/M1..M8/*`（24 枚）＋`gate2-*.log`＋`baseline-cmd-wisp.log`＋`my-new-tests.log`＋`msg-*.txt` |
+
+### 8.1 ★ 回执文案那枚文件其实落在**别人的 commit** 里（现量，⛔ 不是本腿漏交）
+
+`git log -1 --format='%h %ad %s' -- cmd/wisp/firstrun.go` 与 `-- cmd/wisp/firstrun_257_test.go` 都指向
+**`3f0c4fff`（11:25，subject 逐字起于 `probes(268-a2): 独立复核初版——AC#0 四问复跑判定＋err 透传四支链证真`）**
+⇒ 那两枚文件是被**票 268 的复核腿**连着它自己的活一起提交的。
+本腿据 §0.4 从未原地改它们，所以这次落库不是本腿的动作；但内容一字未丢，可核两把尺：
+
+- `md5sum cmd/wisp/firstrun.go` = `0491339282492f2cabdbf5be576c8a57` = 本腿起手快照（§5.3 同一枚）；
+- `git show HEAD:cmd/wisp/firstrun_257_test.go | md5sum` = `23a7a56795019fabf506f6726541b049` = 本腿快照，
+  且 `git diff -- cmd/wisp/firstrun.go cmd/wisp/firstrun_257_test.go` **零行**。
+
+后果登记（给编排者，两条都是本票面上的事）：
+① 257 的产码半格（回执文案）**已经进了 268-a2 那一笔**，验收腿若按"票号找 commit"会找不到它，
+按 `git log -- cmd/wisp/firstrun.go` 才会撞见；
+② 一笔 commit 里混着两张票的写面，正是 README 规则 2「>1 个写码代理必须 worktree 隔离」想拦的形状。
 
 `git show --name-only` 逐笔自证只含上面这些路径；`internal/config/**`、`internal/panel/**`、
 `internal/ball/**`、`internal/tools/**`、`frontend/**`、`design/**`、`docs/**`、`tools/d22scan/allowlist.txt`
@@ -391,6 +422,8 @@ FINAL START 2026-10-05 11:25:56 +0800 anchor=3f0c4fff files=firstrun.go+257_test
 - **牙**：八枚突变全响，红句逐字在 §5.1，盘上还原证明在 §5.3（三枚 md5 逐一相等）。
 - **四门**：d22scan rc=0／pathlen rc=0 VERDICT GREEN（not-in-roster=0）／vet rc=0（两次）／gofumpt 本腿三枚零命中
   （整包只报预存的 `models.go`，未动）。
-- **本腿唯一没做完的一件事**：§6.2 那发终跑的终值（写这节时还在跑，RUN 161、FAIL 0），下一笔 commit 补终值；
-  以及 §5–§10 若被姊妹腿再覆盖一次，原件在**本笔 commit** 里逐字可取。
+- **收尾状态**：§6.2 那发终跑已跑完并写满（rc=0、433.1s、331 RUN、0 FAIL、0 SKIP，含本腿两枚新用例逐名 PASS），
+  四门与两发整包读数齐；本腿没有"量不到却写成结论"的格——够不着的三格全在 §7.1 具名归口给编排者，
+  ⛔ 一枚没自己划掉。若 §5–§10 再被姊妹腿覆盖一次，原件逐字在**本笔 commit**（`git log -- <本文件>` 取最新一笔）。
+
 

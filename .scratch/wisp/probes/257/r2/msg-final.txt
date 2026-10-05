@@ -1,0 +1,25 @@
+票 257-r2b 收尾（§6.2 终跑终值落档＋§8.1 回执文案的真实落库处＋§0.4 编号重叠说明）
+
+一、终跑跑完（覆盖本腿新件的整包一发，真跑、 dll 注入）
+FINAL START 2026-10-05 11:25:56 +0800 anchor=3f0c4fff → FINAL END rc=0 11:33:15 +0800、433.149s；
+RUN 331／--- PASS 235／子 PASS 96／FAIL 0／SKIP 0（子 SKIP 亦 0）＝终跑红名册为空。
+331 比基线 329 多的正是本腿 firstrun_257_nonpreset_test.go 的两枚，逐名 PASS 已抄进 §6.2。
+起手基线（11:17:21→11:24:08、401.8s、329／233＋96／FAIL 0／SKIP 0）与两枚在册带载红名
+（TestAC1ResidentLegInstallsItsLogListenerOnDisk／TestAC14GoSideEvalPushReachesThePage）
+在两发里都逐名 grep 零命中——本腿未追未修，只登记读数差来自并发负载。
+
+二、★§8.1 现量：回执文案那半格其实落在别人的 commit 里
+git log -1 -- cmd/wisp/firstrun.go 与 -- cmd/wisp/firstrun_257_test.go 都指向 3f0c4fff（11:25，
+subject 逐字起于 probes(268-a2): 独立复核初版……）＝票 268 的复核腿把它俩连着自家活一起提交了。
+内容一字未丢，两把尺可核：md5sum cmd/wisp/firstrun.go = 0491339282492f2cabdbf5be576c8a57（＝起手快照）、
+git show HEAD:cmd/wisp/firstrun_257_test.go 的 md5 = 23a7a56795019fabf506f6726541b049（＝本腿快照）、
+git diff 零行。后果两条给编排者：验收腿按票号找 commit 会找不到这半格，得按文件路径找；
+一笔 commit 混两张票的写面正是 README 规则 2 要拦的形状。
+
+三、编号重叠说明（§0.4 之后那句）：姊妹腿在下面自写了 §5 变异自证（四发），本腿 §5-§10 是另一套八发
+（M1-M8，红句逐字在 §5.1、判据对号表在 §5.2、盘上还原的三枚 md5 相等在 §5.3）；两半各留各的，谁也没再覆盖谁。
+
+四、纪律与边界复述：只 commit 不 push；显式 pathspec 枚枚点名（本笔只有证据件＋终跑日志＋msg 三枚）；
+AC 勾选框零触碰；工单文件与台账一字未改；internal/config、internal/panel、internal/ball、internal/tools、
+frontend、design、docs、thresholds.go、golden、allowlist.txt 零命中（frontend 与 design 连读都没读）；
+Go 源码零 emoji；临时件只建不删；gofumpt 预存的 cmd/wisp/models.go 未顺手格式化。
