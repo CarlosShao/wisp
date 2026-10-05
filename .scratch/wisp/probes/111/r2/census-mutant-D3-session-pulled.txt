@@ -1,0 +1,50 @@
+portable-tests.sh: census GOOS=windows - go list ./... = 35 packages (one row each)
+portable-tests.sh: PACKAGE                                        TESTS(t/x)  CLAIMED BY
+portable-tests.sh: github.com/CarlosShao/wisp/cmd/balldebug       0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/cmd/llmrecord       1/0         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/cmd/wisp            58/0        cli
+portable-tests.sh: github.com/CarlosShao/wisp/frontend            0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/agent      19/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/agent/approval 8/11        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/agent/scheduler 0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/audio      5/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/ball       11/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/buildinfo  1/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/config     16/1        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm        2/8         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/adaptertest 1/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/anthropic 3/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/golden 1/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/openaichat 4/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/llm/openairesponses 2/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/memory     11/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/models     16/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/observe    15/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/panel      20/0        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/perm       3/0         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/plugin     1/0         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/proc       11/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/projctx    0/1         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/risk       20/0        corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/secret     4/0         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/session    2/0          NO-SCOPE <-UNCLAIMED-HAS-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/speech     0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/statemachine 2/0         core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/streamkey  0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/tools      46/3        core
+portable-tests.sh: github.com/CarlosShao/wisp/internal/watchdog   0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: github.com/CarlosShao/wisp/internal/winsec     12/8        corewinsec
+portable-tests.sh: github.com/CarlosShao/wisp/tools/signmodels    0/0          NO-SCOPE <-NO-TESTS
+portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=8 unclaimed-with-tests=1
+portable-tests.sh: GUARD D - 1 package(s) compile a test file for GOOS=windows and
+portable-tests.sh:   NO named scope claims them, so no CI step runs them and no CI step
+portable-tests.sh:   can ever go red over them:
+portable-tests.sh:   github.com/CarlosShao/wisp/internal/session  tests-compiled-for-windows=2/0
+portable-tests.sh: this row is the ticket 111 field itself ('CI 只测 33 个包里的 20 个').
+portable-tests.sh: The census used to PRINT these rows and exit 0, so the hole was visible
+portable-tests.sh: only to whoever thought to run it by hand - which is how internal/session
+portable-tests.sh: (2 files, ticket 224) and internal/projctx (1 file, ticket 200) sat at
+portable-tests.sh: zero coverage for four days after their tests landed. Pull the package
+portable-tests.sh: into a named scope and update that tier's pin in the SAME commit, or
+portable-tests.sh: state on the ticket where its coverage lives. What this guard forbids
+portable-tests.sh: is the third option: a build tag, a t.Skip or a deleted test.
