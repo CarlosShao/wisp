@@ -12,7 +12,7 @@
 
 ## §1 Q1 名册：断常驻腿 stdout／console 的既有钉，逐枚带断言条件逐字
 
-★ 先给**可达性**这把尺（它决定后面所有判断）：那句新增 `fmt.Printf` 只在 `residentRiskGateValues`（`cmd/wisp/resident_approval_windows.go:447-462`）的**被拒那一支**打，而该函数唯一的产码调用点是 `resident_windows.go:132`（`newResidentApprovalWithConfig(rt.Layout.DataDir)`，`runResident` 内）。现量：**今天套件里没有任何一例把带 `config.toml` 的数据根交给常驻腿**——所有子进程常驻用例的数据根都是 `t.TempDir()` 空目录（`resident_ball_228_windows_test.go:55`、`resident_approval_246_windows_test.go:186`、`resident_task_source_246_windows_test.go:298`、`resident_sink_nail_127_windows_test.go:418/:527/:569` 逐枚 Read），且 `resident_task_source_246_windows_test.go:389-391` 反过来**钉"常驻腿不许造出 config.toml"**。⇒〔预测〕被拒句在既有套件的**任何一发里都不会被打出来**，也就无从打红。
+★ 先给**可达性**这把尺（它决定后面所有判断）：那句新增 `fmt.Printf` 只在 `residentRiskGateValues`（`cmd/wisp/resident_approval_windows.go:447-462`）的**被拒那一支**打，而该函数唯一的产码调用点是 `resident_windows.go:132`（`newResidentApprovalWithConfig(rt.Layout.DataDir)`，`runResident` 内）。现量：**今天套件里没有任何一例把带 `config.toml` 的数据根交给常驻腿**——所有子进程常驻用例的数据根都是 `t.TempDir()` 空目录（`resident_ball_228_windows_test.go:55`、`resident_approval_246_windows_test.go:186`、`resident_task_source_246_windows_test.go:298`、`resident_sink_nail_127_windows_test.go:418/:527/:569` 逐枚 Read），且 `resident_task_source_246_windows_test.go:389-391` 反过来**钉"常驻腿不许造出 config.toml"**。⇒〔预测〕被拒句在既有套件的**任何一发里都不会被打出来**，也就无从打红。**同一条顺序还有一层含义**（尺 R-18，11:27 现量）：全仓产码里唯一造 `config.toml` 的入口是 `ensureFirstRunConfig`（`cmd/wisp/firstrun.go:72`），它唯一的产码调用者是 `cmd/wisp/run.go:245`——在常驻进程里那要走 `resident_windows.go:260` 的 `startResidentTaskSource`，**晚于 `:132` 的风险读**。⇒ 空数据根上常驻腿永远先看到"缺失"形；"被拒"形只有一枚来源＝**用户手改过 `config.toml`**（恰是本票要服务的那一枚形状）。
 
 ### 1.1 contains 型（加一行不红；逐枚）
 
@@ -35,6 +35,7 @@
 | N4 | `cmd/wisp/early_log_nail_130_windows_test.go:257`、`:266` | `if n := strings.Count(stderr, early130ResolverMsg); n != 1`；`if n := strings.Count(stderr, early130InstallMsg); n != 1` | stderr 两枚指定 msg | 同上 ⇒ **不红**（落地腿若**新增一枚 `slog.Warn`** 才会进 stderr 的视野，但那两枚 Count 仍只数各自的串） |
 | N5 | `cmd/wisp/firstrun_198_test.go:91-93` | `if stdoutText != "" { t.Errorf("stage 1: stdout = %q, want empty …")` | **注入 buffer**（`run198` 在 `:34` 交 `stdout:  out` 给 `runSpec`，打的是 `wisp run` 那条腿） | 数的是 run 腿注入流；`fmt.Printf` 走 `os.Stdout` **进不去注入 buffer**，且 run 腿不调 `residentRiskGateValues`〔尺见 §5 R-9〕 ⇒ **不红** |
 | N6 | 全仓 `cmd/wisp` 的**逐枚相等／整缓冲相等型 stdout 钉** | 尺 R-5b（宽正则，见 §5）读数＝**除 N5 外零枚** | — | **零枚"console 只有这几行"型整等钉**。⚠ 我先用窄尺 `(out\|stdout\|said) != ""` 得出"2 枚"，那两枚（`resident_task_source_246_windows_test.go:253`、`:275`）Read 后是 `residentTestTaskText` 的**返回值**，不是 stdout ⇒ 已改判（§7(1)） |
+| N8 | **进程内 capture 型 stdout 钉（`captureStdout128` 的全部调用者）** | 尺 R-19 读数＝**7 处**：`cmd/wisp/dataroot_128_test.go:132`（包的是 `cmdDoctor()`）、`cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:98`、`:140`、`:164`、`:178`、`cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:88`、`:130` | **窗口体只包 `bindBallHost(...)`**，构造调用全在窗口**之外**（`ra2 := newResidentApproval()` 逐枚在 `:96`／`:138`／`:161`／`:176`／`:86`／`:128`／`:164`） | 本票新增句打在 `residentRiskGateValues`（经构造调用）⇒ **落在窗口外**，〔预测〕不红。⚠ 但这些窗口里有**缺席断言**（`260r3:132/147/170/184/189` 断 `Esc` 与种子键名不出现在捕获文本里）⇒ 落地腿若把新句挪进 `bindBallHost`／`residentStatusLine` 那条面，就会进这些窗口并被"不含 Esc"这类断言咬到。**判语：新句只在构造期那一次打，不许搬到装配回执里。** |
 | N7 | `len(lines)` 型行数钉 | 尺 R-6 读数 **8 处**，逐枚 Read 后无一处数 wisp 的 console 行数（`config_receipt_255_test.go:203-204` 数被引用的**源码文件**行数、`:617`／`config_reload_223_test.go:220`／`resident_approval_246_windows_test.go:290`／`resident_task_source_live_246_windows_test.go:436` 是"从尾找含 needle 的行"的 helper（只 `t.Fatalf` "no line for %q"＝在场型）、`panel_pump_test.go:80` 数账本行、`panel_host_gate_test.go:360-361` 数的是 **git 的 stdout**） | — | **打在常驻腿 stdout 上的行数钉＝零枚** |
 
 ### 1.3 名册型（盯"常驻腿到底装配了哪几句／几处"的钉，⚠ 这几枚落地腿真会撞）
@@ -65,7 +66,7 @@
 ### 1.6 ★ Q1 结论（三支齐给）
 
 1. **A 支（换具名 provenance）**：只动 `resident_approval_windows.go:430-438` 的常量与 `:447-462` 的分支 ⇒ 命中的名册只有 M1/M2/M3；〔预测〕只要"文件缺失"仍归 `riskProvenanceUnreadable`、被拒归**新名**，`256_test` 全绿。
-2. **B 支（多一行 stdout `fmt.Printf`）**：既有 console 钉**全是 contains/指定字面 Count 型**（C1–C6、N1–N5），整等型与行数型**零枚**（N6/N7）⇒〔预测〕**零枚红**。更硬的理由是可达性（§1 表头）：既有套件无一例让被拒支成立。
+2. **B 支（多一行 stdout `fmt.Printf`）**：既有 console 钉**全是 contains/指定字面 Count 型**（C1–C6、N1–N5），整等型与行数型**零枚**（N6/N7）；进程内那 7 处 `captureStdout128` 窗口**都不包构造调用**（N8，尺 R-19）⇒〔预测〕**零枚红**。更硬的两条理由是可达性：既有套件无一例让被拒支成立（§1 表头），且造 `config.toml` 的入口在常驻腿里排在风险读**之后**（R-18）。
 3. **代价形状**（不是红，是"说了两次"）：若落地腿**也**给"缺失"那支加一句 stdout，则同一枚启动会连打两枚近义句——`resident_windows.go:187` 的 `[hotkey]` 那句（`fmt.Printf("wisp: ball [hotkey]: config.toml unreadable (%v); …", err)`）本来就在缺失形下打。⛔ 但**不许**为此把两支折成一支（票 268 AC#3：一响一静是有名字的差别；`resident_hotkey_258_windows_test.go:244-250 Test258ProvenanceWordsAreThePrintedOnes` 把 `[hotkey]` 那三枚词当数据钉着）。按已裁形（只被拒支打）这条不落。
 
 ## §2 Q2 复用面：`describeReloadFailure` 逐支＋措辞名册
@@ -144,6 +145,8 @@
 | R-15 | `grep -rn '"fallback"' --include="*_test.go" cmd internal tools` | 同上 | 2 枚，均与本句无关（已 Read 两处上下文） | 11:14 |
 | R-16 | `grep -rn "compiled approval constants" --include="*.go" .`（剔 `.scratch`） | 同上 | **1**＝产码 `:454`，测试 0 | 11:14 |
 | R-11 | `grep -rn "winlive" .github/workflows/ci.yml scripts/*.sh` | 仓根 | **0 命中** | 11:15:20 |
+| R-18 | `grep -rn "ensureFirstRunConfig" --include="*.go" cmd`（剔 `_test.go`） | 仓根 | 声明 `cmd/wisp/firstrun.go:72`；产码调用者 **1 枚**＝`cmd/wisp/run.go:245`（常驻腿侧要过 `resident_windows.go:260` 才走到，晚于 `:132`） | 11:27:12 |
+| R-19 | `grep -rn 'captureStdout128(' --include='*_test.go' cmd/wisp \| grep -v 'func captureStdout128'` | 同上 | **7** 处（`dataroot_128_test.go:132`／`resident_cancel_key_wording_260r3_windows_test.go:98/140/164/178`／`resident_cancel_key_label_260r4_windows_test.go:88/130`）；逐枚 Read 到窗口体＝**只包 `bindBallHost(...)` 或 `cmdDoctor()`**，构造调用都在窗口外（`260r3:96/138/161/176`、`260r4:86/128/164`） | 11:29:03 |
 | R-17 | `git status --porcelain -- cmd internal tools scripts docs`；`git rev-parse --short HEAD` | 仓根 | 起手 0 行／HEAD `c6cf66e6`（11:00:46）→ 收口 2 行（` M cmd/wisp/firstrun.go`、`?? cmd/wisp/firstrun_257_test.go`）／HEAD `69c1bb82`（11:16:13） | 两处 |
 
 **未跑的 go 命令（逐枚具名＋原因）**：`go build`／`go test`（含 `go test ./cmd/wisp/`、`-list`、`-count=2 -v`）／`go vet`／`gofumpt -l`／`gofmt -l`／`go list -deps`／`staticcheck`／`tools/d22scan` 真跑（含 `sh scripts/d22scan.sh`）／`wisp slo`／`scripts/build.ps1`／`scripts/wisp-cli-tests.sh`／`scripts/portable-tests.sh`／任何 `buildWispForTest` 派生的子进程编译。原因＝硬闸①：GitHub Actions 正在这台机器的 self-hosted runner 上跑 `slo-full`（D32 两个数的测量），叠任何 `go` 负载会污染读数。⇒ **本件全部颜色判断都是〔预测〕，归口编排者**；本件给的是"会不会红"的形状与可达性论证，不是读数。
@@ -168,6 +171,7 @@
 4. **Q4 题面我照抄会写歪**：派单/a1 把这枚字面称"与实现不一致"。现量后判**不成立**——回落支的窗口真值是 `DefaultL1Window`=3 s（`gate.go:143-146` 的 `win <= 0` 支），瑕疵是"手抄进散文、无派生、无钉"，不是"数错"。⇒ §4 按更正后的形状写。
 5. **一次可达性想当然**：我先入为主以为 127/228/246 的子进程常驻用例里被拒句会出现（那样 §1 结论要重做）。逐枚读它们的 `dataDir` 来源后改判：全是空 `t.TempDir()`，且 `resident_task_source_246_windows_test.go:389-391` 反向钉死"常驻腿不许造 `config.toml`" ⇒ 被拒支在既有套件里**不可达**，这才是"零枚红"的主证，contains 型只是第二证。
 6. 起手 scoped 读数 0 行我差点只记一次；11:16 复跑变 2 行（`257-r2` 进场）。⇒ §0 已改写成"两次读数＋漂移"，不再写成单点。
+7. **两处读数在我自己第一版里是错的，复跑后已改**：① M5／R-7 我原写"名册引的 **17** 枚 cite"，复跑尺（同一正则、`sort -u`）读数＝**18**，且这枚 18 里含**注释里的路径引用**（`config_readers_255.go:114-116`、`:145-152`、`:187-192` 都是注释），我没有逐枚分"被断言的 cite／注释引用"——两种口径都写出来，引这枚数时不许写成"17 vs 18 是新旧版本"；② R-6 我第一版写"命中 6 处"，把尺逐字重跑（11:25:47）是 **8 处**，逐枚 Read 后结论不变（零枚行数钉），但**枚数是我的错**，已按 8 改写并把每一处的身份列出。
 
 ## §8 交件判语（三行）
 
