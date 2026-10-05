@@ -80,3 +80,13 @@
 ## 5. 提交后的复量（逐笔，笔落之后现跑）
 
 （这一节在下面每次 commit 之后追加，⛔ 不回头改上面已经落笔的段落。）
+
+**笔 1＝`a39dba32`（13:14:28+0800，`docs(HANDOVER 4.0aa)`）**
+- `git diff --numstat HEAD~1..HEAD` 现跑逐枚读数：
+  - `82  0  .scratch/wisp/probes/parking/1/checked.md`（新件，删除列 **0**）
+  - `23  0  .scratch/wisp/probes/parking/1/msg-01.txt`（新件，删除列 **0**）
+  - `72  1  docs/reports/HANDOVER.md` ← **删除列＝1**＝预期的那一枚：第 85 行那枚 §4 索引行（"最新是下面的 4.0z"→"最新是下面的 4.0aa"）。⛔ 没有任何一行的删除落在别人的节上。
+- 提交后尺：`git status --porcelain -- docs`＝**空**（13:14:28）；`git rev-parse --short HEAD`＝`a39dba32`；结构尺复跑＝`grep -c "^## 4.0aa 停车点"` 1／`grep -c "^## 4.0z 停车点"` 1／`grep -c "^### 4.0aa-"` **8**（八块齐），`wc -l docs/reports/HANDOVER.md`＝**1,733**（起手 1,662 ⇒ 净 +71＝+72/−1）。
+- 起飞前那把 index 归属尺：`git diff --cached --name-only`＝**0 行**（13:13 现跑＝共享索引里此刻没有别人已暂存的文件）⇒ 我这笔的 `git add -- <三枚点名>` 之后 `git commit -F msg -- <同三枚>`，⛔ 没带 `-A`／`.`／`-a`，⛔ 没有裸 commit。
+- ⚠ 本笔之后 `HEAD` 又漂了：13:11:02 那一发我量到 `c216fe4b`／未推 **56**（不是我写进新节的那枚 `4c456d0a`／53）⇒ 新节里那句"53 枚"仍是**它自己时刻的合法读数**，节内已把 50／52／53／56 四发并排列出，下一位照旧自取。⛔ 我没有回头去"更正"那一行。
+- ⛔ 本程只有这一笔提交（第二笔＝本件的追加，见下）。没有 push、没有 `--amend`、没有 `reset`／`rebase`／`stash`／`checkout .`／`restore`／`clean`，仓内**没删任何东西**。

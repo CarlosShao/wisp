@@ -1,0 +1,8 @@
+probes(parking-1)：把笔 1 的删除列读数抄进检查笔记（本仓的规矩：每笔 commit 之后现跑 git diff --numstat HEAD~1..HEAD，多出来的删除就是吞了别的行）
+
+笔 1＝a39dba32：checked.md 82/0、msg-01.txt 23/0、docs/reports/HANDOVER.md **72/1**——
+那唯一一枚删除＝第 85 行那枚 §4 索引行（"最新是下面的 4.0z"→"最新是下面的 4.0aa"），⛔ 没有任何一行的删除落在别人的节上。
+提交后尺：git status --porcelain -- docs＝空；结构尺＝4.0aa 节 1 枚、4.0z 节 1 枚、"### 4.0aa-" 子块 8 枚，行数 1,662→1,733。
+起飞前共享索引归属尺：git diff --cached --name-only＝0 行；本笔仍是 add 与 commit 两侧都带枚枚点名的 pathspec，⛔ 无 -A／.／-a、无裸 commit。
+⚠ 另记一笔漂移：13:11:02 我量到 HEAD c216fe4b／未推 56，而新节里写的是 4c456d0a／53——那是它自己时刻的合法读数，节内已并排列出 50／52／53／56 四发，⛔ 我没有回头"更正"那一行。
+停车点腿 parking-1 到此交件：写面只有 docs/reports/HANDOVER.md 与本检查笔记，⛔ 一枚 go 命令没跑、⛔ 没碰台账与 AC 框。
