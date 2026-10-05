@@ -83,8 +83,9 @@
 > **跑形（⛔ 非整包）**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test -count=1 -run 'TestTicket268' ./cmd/wisp/`
 > —— PATH 注入两枚目录照 r1 §1 那把整包命令的形状（r1 台件逐字：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test -count=1 -v ./cmd/wisp/`），
 > 只是把 `-run` 收窄到本票三枚。⚠ **不扩到 `TestTicket256`**（那是 r1 的跑形，会在本腿多带五枚用例＝多一倍负载；派单只给 `-run 'TestTicket268'` 一形）。
-> `-v` 只加在两处（各自具名）：负控第二发与 MUT-2/MUT-3 那两发——为的是让"没红的哪几枚"在名册里**逐枚可见**，而不是靠"非 `-v` 不印＝绿"这一步推理收口；
-> MUT-1 那一发取的是派单给的裸形（无 `-v`），它的"②③ 未红"两半里，**只有"未列红"是本腿现量**（见下表该行括注）。
+> `-v` 加在三处（各自具名）：负控第二发、MUT-2、MUT-3——为的是让"没红的哪几枚"在名册里**逐枚可见**，而不是靠"非 `-v` 不印＝绿"这一步推理收口；
+> MUT-1 那一发取的是派单给的裸形（无 `-v`）：那一形下 Go 仍逐枚印 `--- FAIL`，所以"②③ 未列红"是本腿现量（红名册计数＝1 枚）而不是推理，
+> 但"②③ 各印过一次 PASS"本腿在那一发**没量到**——由下一发 MUT-2 的 `-v` 名册补上（那一发 ① 逐枚 `--- PASS` 可见）。
 >
 > **负控起跑（交付态、一枚未种，先证"真跑起来了"）**：
 > - 非 `-v` 预跑 21:47:02→21:47:06：`ok github.com/CarlosShao/wisp/cmd/wisp 0.069s`、`rc=0`（台件 `v2-targeted-baseline.log`，53 字节）。
@@ -104,7 +105,7 @@
 | # | 种什么（只 `cmd/wisp/resident_approval_windows.go`） | 起 | 止 | 红了谁（本腿跑形） | 还原证 |
 |---|---|---|---|---|---|
 | MUT-1 | `:456` 新常量字面折回旧那枚：`riskProvenanceRefusedAtLoad = "defaults (config.toml unreadable)"`（＝AC#1 要求自证的"两枚状态又共用一张脸"） | 种 21:52:49（md5 现量 `e03e7d700f00d26f79186b3e99dc9888`，≠交付态 `69a630bf…`）／跑 21:53:14 | 21:53:17（`rc=1`） | **只用例① 红**：`--- FAIL: TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig`；②③ **未列红**（该跑形只 `-run 'TestTicket268'`，红名册整份三行 `:9-11` 全属①，`grep -c '^--- FAIL'`＝**1**）⇒ 与 r1 §5「只 ① 红」同形 | 21:53:47 `git cat-file blob HEAD:cmd/wisp/resident_approval_windows.go > cmd/wisp/resident_approval_windows.go` ⇒ `md5sum`＝`69a630bf350daf1032c62b921e9d7044` ＝ `git cat-file blob HEAD:… \| md5sum` **双读同值**；`git diff --name-only -- cmd/wisp`＝**0 行**；`grep -c "MUT-"`＝**0** |
-| MUT-2 | 摘掉被拒支那一行 stdout（注释掉 `:510-512` 那枚 `fmt.Printf`）——证 ② 不是恒绿装饰 | 「待验」 | 「待验」 | 「待验」 | 「待验」 |
+| MUT-2 | 摘掉被拒支那一行 stdout——形＝把 `:510-512` 那枚 `fmt.Printf` 三行整段注释掉（⛔ 不留 `_ = err` 之类的补钉：那样会多一枚与本票无关的形状；注释后 `err` 仍被上一行 `slog.Warn` 的 `"err", err` 使用 ⇒ 编译干净，`go test` 能起跑即为证） | 种 21:58:58（md5 现量 `90c4ad0a04fe5d500185188f3f562ec6`）／跑 21:59:08 | 21:59:13（`rc=1`） | **②③ 双红、① 绿**（`-v` 形逐枚可见：`:--- PASS` 只有 ①，红名册 `grep -c '^--- FAIL'`＝**2**）——② 那三句量的正是"stdout 恰 1 行"＋两枚必带文案，③ 的 `fmt.Printf` 计数尺从 1 掉到 0 ⇒ **② 不是恒绿装饰**；与 r1 §5 MUT-2「②③ 双红」同形 | 21:59:28 `git cat-file blob HEAD:… > …` ⇒ `md5sum`＝`69a630bf350daf1032c62b921e9d7044`＝HEAD blob 双读同值；`git diff --name-only -- cmd/wisp`＝**0 行** |
 | MUT-3 | 在哨兵旁边**加**一次 prose/`err.Error()` 字符串匹配、行为逐字不变——证 ③ 咬的是"靠文案分类"这件事 | 「待验」 | 「待验」 | 「待验」 | 「待验」 |
 
 **红句逐字**（原文抄自本腿台件，行号＝台件行）：
@@ -117,13 +118,23 @@ resident_approval_risk_268_windows_test.go:129: refused-file provenance "default
 resident_approval_risk_268_windows_test.go:147: provenance constants riskProvenanceUnreadable and riskProvenanceRefusedAtLoad share the literal "defaults (config.toml unreadable)" - the four readings have to be four names
 ```
 
-MUT-2（`v2-mut2-red.log`）：「待验」
+MUT-2（`v2-mut2-red.log:12/13/14/19`，四条同发）：
+
+```
+resident_approval_risk_268_windows_test.go:201: the refused branch wrote 0 stdout lines carrying "wisp: resident [risk]:", want exactly 1. AC#1 asks that this shape reach a user's eye at least once from a terminal; one line is the shape resident_windows.go's [hotkey] fallback has carried since ticket 258
+resident_approval_risk_268_windows_test.go:205: the stdout line has to carry the loader's own answer, not just this file's class name; captured stdout was:
+resident_approval_risk_268_windows_test.go:208: the stdout line has to say what the gate runs on instead; captured stdout was:
+resident_approval_risk_268_windows_test.go:285: residentRiskGateValues holds 0 fmt.Printf calls, want exactly 1: AC#1's user-visible face is the other half of this branch, and a branch that only logs to disk does not reach the eye of anyone who launched the process from a terminal
+```
 
 MUT-3（`v2-mut3-red.log`）：「待验」
 
 **MUT-1 附带的现场名实不符（盘上日志原文，非转述）**：`v2-mut1-red.log:4` 被拒支印
 `msg="resident gate: [risk] source present but refused at construction; …" provenance="defaults (config.toml unreadable)"`——
 名字（"unreadable"）与事情（文件在场、被值域门拒）对不上，正是本票题面那句话的机器形状；`:5` 那一行 stdout 仍写 "is present but was refused at load" ⇒ **折叠态下两枚面自己先打起来**。还原后同一支印 `provenance="defaults (config.toml present but refused at load)"`（`v2-targeted-baseline-v.log` 4 处）。
+
+**stdout 那行的跨发计数——一把有坑的尺，本腿换形并具名**：§3/r1 用的 `grep -c 'wisp: resident \[risk\]'` 在**红日志**里会把**测试自己的红句**数进来（`②:201` 那句逐字引用了同一枚字面串），所以它只在全绿态才等于"产码印了几行"。收紧尺＝只认行首的产码句 `grep -c '^wisp: resident \[risk\]: config.toml is present'`：
+基线 `-v`＝**1**（`:6`）／MUT-1＝**1**（`:5`——这一发只折名字、stdout 面照旧，正好印证 ②③ 量的不是字面）／MUT-2＝**0**（那一行被真摘掉）。⚠ 本腿不据此说 §3 那两枚读数（基线 0／交付 1）错了：那两把尺跑的是**全绿整包**，没有红句混进来。
 
 **与 r1 §5 名册的可比性（口径先说清，不冒充同尺）**：r1 跑形＝`-run 'TestTicket268|TestTicket256'`，本腿＝`-run 'TestTicket268'`（派单收窄）。
 ⇒ 本腿**量不到**"票 256 五枚钉在这一发突变下是否仍绿"那一半（那是 r1 §5 三行都点名的隔离证），只复认三行的**红名册方向**：
