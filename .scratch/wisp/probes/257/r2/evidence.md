@@ -32,6 +32,23 @@
 
 **本腿据此采取的动作（不扩权、不改别人的件）**：① 立刻把本腿的实现＋测试＋本件以**显式 pathspec** 落 commit（先让 HEAD 有一份带 md5 链的可归因产物）；② ⛔ 不 commit 别人的 `mut/`／`cmdwisp.test.exe`／`snapshot-*.go`／`dumpcfg.*`／`build-mutants.py`／`baseline-cmd-wisp.log`，也 ⛔ 不删（README 规则 8）；③ 尾程每一次突变前后**重取 md5**，若发现工作树两枚文件被外部改动，立即停手并把差异贴进本节；④ "哪一枚 `257-r2` 的件算交件"＝编排者裁，本腿不自裁。
 
+**11:25:3x 追加：① 已经失败，本腿的 commit 被第三枚腿卷走了**。本腿 11:24 用显式 pathspec `git add` 好这十枚文件后跑
+`git commit -F … --only -- <十枚显式路径>`，git 回 "no changes added to commit"（未落任何 commit）；
+11:25:10 落地的 `3f0c4fff` **标题是别票的**（"probes(268-a2): 独立复核初版…"），
+`git show --name-only 3f0c4fff` 却列着本腿那十枚：`cmd/wisp/firstrun.go`、`cmd/wisp/firstrun_257_test.go`、
+`.scratch/wisp/probes/257/r2/{evidence,gate-d22scan,gate-pathlen,new-tests-first,new-tests-second,preflight-255-223}.log/md`
+——即 `268-a2` 那一发**没带 pathspec 的 commit 把本腿暂存区整卷带走**（同机另一枚腿 `b672f853` 11:24:12 是带显式路径的，形状正常）。
+本腿内容完好可核：`git cat-file blob HEAD:cmd/wisp/firstrun.go | md5sum` ＝ `0491339282492f2cabdbf5be576c8a57`
+＝ 工作树 ＝ §0.9 表里那一枚；`cmd/wisp/firstrun_257_test.go` 同形（`23a7a56795019fabf506f6726541b049`）；
+HEAD 版 evidence.md 含本节 §0.9（grep 命中 1）。
+⇒ 后果两条，都记在本腿账上但不归本腿裁：**(a) 归因错**：本腿实现的名册里必须把 `3f0c4fff` 算作
+"内容是我的、message 不是我的"那一枚；**(b) 危险**：只要还有一枚腿不带 pathspec 提交，
+**本腿尾程突变的中间态就有被卷进 HEAD 的风险** ⇒ 本腿把突变窗口压到"一次 Edit＋一次定向 `-run`＋一次还原"，
+每发还原后立刻重取 `md5sum` 与 `git cat-file blob HEAD:<path> | md5sum` 双读，任一漂即停手。
+
+**同时刻另一枚 `257-r2` 的件在长**：`cmd/wisp/firstrun_257_nonpreset_test.go`（8,241 字节，11:24:12，未 commit、⛔ 不是本腿写的）。
+本腿不碰、不删；它进不了本腿任何 commit（枚枚显式 pathspec）。
+
 
 ## 1. 撞钉预检名册（今天绿着的相邻用例，逐枚）
 
