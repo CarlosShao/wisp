@@ -1,0 +1,39 @@
+票 268 落地（268-r1 第 2 步）：常驻腿把"配置缺失"与"配置被拒"分成两枚具名 provenance，被拒那一支另给一行 stdout
+
+形由编排者裁死（账 A614 §5）＝ A＋B；本笔不重裁形、⛔ 不取 C（wisp doctor 零改动，连 info 级也未加）。
+
+一、基线先行（规矩 64：光 grep 新符号不算撞钉预检）
+  动笔前整包真跑 go test -count=1 -v ./cmd/wisp/：RUN 331／PASS 331／FAIL 0／SKIP 0、ok 466.320s、rc=0，
+  起 2026-10-05 13:05:56／止 13:13:47，台件 .scratch/wisp/probes/268/r1/baseline-cmdwisp.log（1,708 行）。
+  起跑前 go.exe 进程数现量 0。未压种子、未 t.Skip、无 SKIP 可读成通过。
+  静态补三把尺：captureStdout128 是进程级换 os.Stdout（cmd/wisp/dataroot_128_test.go:410-438）、
+  cmd/wisp 无一行 AST 尺数 fmt.Printf、包目录扫描型用例一律剔掉 _test.go ⇒ 新面不撞既有分母。
+  另现量：既有 cmd/wisp 用例里带外 confirm_timeout_sec 种子 0 枚 ⇒ 新 stdout 行在今天的整包里根本不触发。
+
+二、A 支（cmd/wisp/resident_approval_windows.go）
+  residentRiskGateValues 的回落支按 errors.Is(err, fs.ErrNotExist) 一分为二：
+    缺失支＝原 slog.Warn 与 riskProvenanceUnreadable 逐字未动（票 256 ruler① 的 :124-125/:141-144 射程不碰）；
+    被拒支＝新常量 riskProvenanceRefusedAtLoad = "defaults (config.toml present but refused at load)"，
+    另带一枚自己的 slog.Warn（多一个 provenance attr）。
+  ⛔ 不靠 strings.HasPrefix／错误文案子串分类（cmd/wisp/config_reload.go:396 那形被点名不取）；
+  命名只承担"确定知道的事"（文件在、没加载成），不冒充"是值域门拒的"——具体哪条规则由紧跟的 err 原话承担。
+  注释同步：常量块 three→four，riskProvenanceUnreadable 的 "(missing or broken)" 收窄为只指缺失。
+  import 只加 io/fs；无新增包级依赖边、无新增函数（生产 diff 里 ^+func 计数 0）。
+
+三、B 支（同一枚函数内）
+  照抄 cmd/wisp/resident_windows.go:187 那枚 [hotkey] 行的形状，给被拒支一行 fmt.Printf（wisp: resident [risk]: …）。
+  复用本函数已在手的 err：不重读文件、不取 Manager、不在 runResident 里加调用 ⇒ 256 的 :560/:563 构造名计数钉射程未碰。
+  -H=windowsgui 双击起法下这行无处可去，是既有事实（scripts/build.ps1:115、cmd/wisp/console_windows.go:38/:49-51），已知不藏。
+
+四、用例（新文件 cmd/wisp/resident_approval_risk_268_windows_test.go，三枚顶层）
+  ① 两枚状态各自具名且互不相等＋四枚常量两两不同字面＋被拒支仍 300 s（且不等于种进去的 20 s＝Q-77 未动）＋前提钉＋同目录正控；
+  ② stdout 上那枚前缀恰 1 行、带 out of range [31, 3600] 与 DefaultApprovalTimeout=300s，反控＝缺失支在这一张面上零行；
+  ③ 语法树尺：errors.Is(…, fs.ErrNotExist) 恰 1 次、函数体内 strings.*／err.Error() 零次、fmt.Printf 恰 1 次、四枚常量各有 return。
+  复用同包 risk256Dir／writeRiskConfig256 与 captureStdout128，不重造辅助件。
+
+五、判据现跑（终判交非实现者）
+  go test -count=1 -v -run 'TestTicket268|TestTicket256' ./cmd/wisp/ 于 13:17:08 全绿：新三枚 PASS，
+  票 256 五枚钉（含 :141-144 的 300 s 钉与 :310-314 的 construction-time 钉）保持绿。
+  禁区零字节：docs/PLAN.md、docs/specs/**、internal/observe/thresholds.go、golden、tools/d22scan/allowlist.txt、
+  internal/agent/approval/**、frontend/**、design/** 本笔一枚未碰；[risk].l1_window_sec 与钳位、值域 [31,3600] 一字未动。
+  突变自证与门禁四数在下一笔（MUT-1 把两枚状态折回同一字面，①③ 必须红）。

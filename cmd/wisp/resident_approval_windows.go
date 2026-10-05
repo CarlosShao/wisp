@@ -52,6 +52,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"path/filepath"
 	"sync"
@@ -410,11 +411,19 @@ func newResidentApprovalWithConfig(dataDir string) *residentApproval {
 	return ra
 }
 
-// The three provenance words this leg's [risk] reading can answer with. Named
+// The four provenance words this leg's [risk] reading can answer with. Named
 // constants (not inline strings) for the same reason ticket 258 named its
 // hotkeyProvenance* trio: the tests read them off the constructed object, and a
 // prose claim that a value "came from config" is exactly the thing that must not
 // be writable twice with two different meanings.
+//
+// Ticket 268 opened the fourth slot. Until then this leg answered "unreadable"
+// for BOTH "there is no config.toml" and "config.toml is there and the loader
+// rejected what it says" - and since ticket 267 put a band on
+// confirm_timeout_sec, the second shape is the one a user can actually reach by
+// typing a number. Folding them was not a safety hole (the fallback is still the
+// compiled 300s) but it was a honesty hole: the value written down and the value
+// in force came apart and nothing named the split.
 const (
 	// riskProvenanceRead: config.toml was read, and these two numbers are its
 	// [risk] view. Note what the word does NOT claim: a readable file with no
@@ -428,10 +437,23 @@ const (
 	// gate's window, and calling that "defaults" would be the lie in the other
 	// direction.
 	riskProvenanceRead = "config"
-	// riskProvenanceUnreadable: a dataDir was handed over but config.toml would
-	// not read (missing or broken). The gate falls back to the compiled approval
-	// constants, and the word "defaults" is what says so out loud.
+	// riskProvenanceUnreadable: a dataDir was handed over but there is no
+	// config.toml to read at it. Since ticket 268 this word names the MISSING
+	// shape only - it used to carry "missing or broken", and "broken" was the
+	// half that got folded onto the wrong sentence. The gate falls back to the
+	// compiled approval constants, and the word "defaults" is what says so out
+	// loud.
 	riskProvenanceUnreadable = "defaults (config.toml unreadable)"
+	// riskProvenanceRefusedAtLoad: the file IS there and it did not load, so the
+	// failure is in what the file says, not in whether it exists. What "refused"
+	// covers is everything the loader can say no to on a present file - ticket
+	// 267's [risk] band being the shape ticket 268 was filed for, plus syntax,
+	// unknown keys, schema migration and any later rule; this word deliberately
+	// does NOT name which of those it was, because it cannot tell them apart
+	// without reading error prose (see the note on the branch below). The gate
+	// falls back to the same compiled constants as the missing shape, and it is
+	// the fall-back-with-a-name, not a different number, that this slot carries.
+	riskProvenanceRefusedAtLoad = "defaults (config.toml present but refused at load)"
 	// riskProvenanceNoView: no host config view exists at all (dataDir empty -
 	// the shape newResidentApproval keeps for the 246 roster). Same compiled
 	// constants, different reason, and the reason is the part a reader needs.
@@ -439,7 +461,7 @@ const (
 )
 
 // residentRiskGateValues reads the two [risk] numbers the resident gate is built
-// with, and names which of the three shapes the reading is. Zero durations are
+// with, and names which of the four shapes the reading is. Zero durations are
 // returned for the two fallback shapes on purpose: approval.New's documented
 // zero-value fallback (Options.Window -> DefaultL1Window, and NewQueue's
 // timeout <= 0 -> DefaultApprovalTimeout) then becomes the mechanism, so this
@@ -451,10 +473,44 @@ func residentRiskGateValues(dataDir string) (window, timeout time.Duration, prov
 	cfgPath := filepath.Join(dataDir, configFileName)
 	c, _, err := config.LoadFile(cfgPath, nil)
 	if err != nil || c == nil {
-		slog.Warn("resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants",
-			"path", cfgPath, "err", err,
+		if errors.Is(err, fs.ErrNotExist) {
+			slog.Warn("resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants",
+				"path", cfgPath, "err", err,
+				"fallback", "DefaultApprovalTimeout=300s / DefaultL1Window=3s")
+			return 0, 0, riskProvenanceUnreadable
+		}
+		// Ticket 268 AC#1: this is the branch that used to be the branch above.
+		// The classification is the SENTINEL, not the prose - errors.Is against
+		// fs.ErrNotExist is the same type-level test internal/config's own
+		// fileMissing (parse.go) and cmd/wisp's describeReloadFailure
+		// (config_reload.go) already rest on, and it is the shape ticket 267's
+		// census calls machine-readable. What this branch does NOT do is sort the
+		// non-missing failures from each other by matching their message text:
+		// the refused value carries no marker type (observe.New leaves Error.Err
+		// nil, so there is no cause to inspect) and config_reload.go's
+		// strings.HasPrefix on the detail string is exactly the fragile shape
+		// this ticket was told not to copy. So the provenance names the CLASS
+		// ("present but refused"), and the verbatim loader answer travels with it
+		// in the log attribute and in the line below, which is where the specific
+		// field and band actually get said.
+		slog.Warn("resident gate: [risk] source present but refused at construction; the gate falls back to the compiled approval constants",
+			"path", cfgPath, "err", err, "provenance", riskProvenanceRefusedAtLoad,
 			"fallback", "DefaultApprovalTimeout=300s / DefaultL1Window=3s")
-		return 0, 0, riskProvenanceUnreadable
+		// Ticket 268 AC#1's "at least once to the user's eyes" (form B, shape
+		// copied from resident_windows.go's [hotkey] fallback line, which has had
+		// this second face since ticket 258). The log sink above already carries
+		// the sentence on disk for both launch shapes; a process started from a
+		// terminal also has this one. A -H=windowsgui double-click has no console
+		// to print into, and that known limit is recorded in ticket 268's
+		// evidence file rather than papered over here.
+		//
+		// It reuses the err this function already holds: no second config read,
+		// no Manager, no extra constructor call anywhere near runResident - the
+		// 256 file's AST ruler counts those and would redden.
+		fmt.Printf("wisp: resident [risk]: config.toml is present but was refused at load (%v); "+
+			"the approval gate falls back to the compiled constants (DefaultApprovalTimeout=300s / DefaultL1Window=3s), "+
+			"so the [risk] numbers written in that file are NOT the numbers this process runs on\n", err)
+		return 0, 0, riskProvenanceRefusedAtLoad
 	}
 	return time.Duration(c.Risk.L1WindowSec) * time.Second,
 		time.Duration(c.Risk.ConfirmTimeoutSec) * time.Second,
