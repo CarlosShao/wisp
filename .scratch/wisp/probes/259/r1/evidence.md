@@ -400,8 +400,11 @@ dc99738456f72cdb0fabad1cb81e99bf  ticket242_panelface_test.go（同上）
 `m-e.txt`／`m-d2.txt`／`m-g.txt`／`pc-d2.txt`／`m-h.txt`／`m-i.txt`（12 枚读数）＋
 `msg-s1.txt`—`msg-s5.txt`（5 枚 commit 正文，逐枚＝上表那一笔的 `-F` 源）＋ `backup/` 五枚还原源 ＋ `gofumpt-negctl/probe.go` 一枚负控样本。
 
-**交件面尺（编排者收件可直接对表）**：本件 **451 行／41,811 字节**（本笔之前），占位尺
-`grep -nE "待填|填写中|未判|placeholder|TBD|TODO|XXX"`＝**0 命中**；
+**交件面尺（编排者收件可直接对表）**：本件在 12:14:14（`c854a8e0`）之后由本腿最后一次 `wc` 量得
+**475 行／44,447 字节**；⛔ 本腿⛔ 不再为凑一个整数改本件，验收腿若要往这里追加段落，
+那枚数会随之一动——所以真正当凭据的是下面三条不变量，不是那两枚数。
+占位尺 `grep -nE "待填|填写中|未判|placeholder|TBD|TODO|XXX" .scratch/wisp/probes/259/r1/evidence.md`＝**0 命中**
+（12:14 之后复量同一条尺）；
 本包终值 `go test -count=1 -v`（12:05:42→12:05:44）＝**89 `--- PASS`／0 `--- FAIL`**，
 其中本腿新立的 12 枚逐枚 `--- PASS`（名册在 `final-v.txt`）；
 起手 58 枚顶层名／77 行 PASS → 交付 70 枚／89 行，`diff base-names.txt after-code-names.txt` **只增不减**（0 枚删除行）。
