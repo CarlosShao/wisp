@@ -1,0 +1,25 @@
+docs(evidence/236-r1): 第四笔——含全部三笔的新锚复尺落档（交付数 19 枚、非台件 0 枚）
+
+锚 00629ea9（本腿 commit 3）上重跑 §3 那把尺，现读时刻 2026-10-05 13:07:09 +0800：
+  归档完整性 find -type f 5936 对 git ls-tree 5936（相等，含每枚 go.mod）
+  tracked .go 分母 924（回到 commit 1 那一发的数）
+  xargs 聚合退码 123（fs_broken.go 那枚 rc=2 顶的，修前修后同形）
+  名册枚数 19（stdout 18 ＋ stderr 1，去重），其中不在 .scratch/wisp/probes/ 的 0 枚
+  与 b3eabab7 那发名册 diff 空
+  本腿带进 tracked 集的 .go 载荷 0 枚
+  单枚点名 gofumpt -l tools/d22scan/selftest.go（该锚归档内）＝空、rc=0
+
+对照那一发（自纠的凭据）：同一把尺在污染锚 cfd97636（我的 commit 2，把两份 Go 源副本以 .go 后缀入了库）上
+＝分母 926、名册 20 枚，多出来的一枚逐字是 .scratch/wisp/probes/236/r1/logs/arc236-selftest-orig.go。
+commit 3 按票 267 的先例只改后缀（models.go -> models.go.pristine 那一形），md5 逐枚全等、未删任何件。
+
+交付的那枚数（Q-66 缺的那一枚）因此定为：**修完之后 tracked 分母脏 19 枚，19 枚全部落在 .scratch/wisp/probes/**，
+非台件 0 枚**；19 枚逐枚路径、归属票号、票面在否与脏因在 §3，落档件 logs/final-roster.txt。
+另两档：logs/final-gofumpt-stdout.txt（18 行）、logs/final-gofumpt-stderr.txt（1 行）、
+logs/polluted-roster-at-cfd97636.txt（20 行，那一次污染的现场名册）。
+
+件内同步补：§3 锚点段声明"交付数以 §8 第 6 条那一发为准"（两锚同答 19，差别只在 cfd97636 短暂 20）、
+§6 commit 名册补第四笔。
+
+本笔零产码、零 rename、零 rm；只动 .scratch/wisp/probes/236/r1/**；ci.yml、台件、main.go 禁令射程、
+allowlist.txt、票面与台账照旧零字节。

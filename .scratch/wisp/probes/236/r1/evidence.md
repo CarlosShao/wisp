@@ -161,6 +161,9 @@ git grep -nE 'selftest\.go:[0-9]' HEAD
    逐枚前缀归档路径后 `xargs -0 gofumpt -l`；**stdout 与 stderr 两路都要收**（解析错误走 stderr，漏收就少数一枚，普查件 §8 第 2 条栽的就是这个）。
 3. **锚点**＝**本腿那笔 commit 之后**：`b3eabab7aefe637918b1f53dc4adaf0d88d231a2`（`12:44:50` 入库），取数时刻 **`2026-10-05 12:45:58 +0800`**。
    取数时 HEAD 已漂到 `3862e0e2`（`12:45:43` 现读），所以我在漂移后的 `14dc6f48`（`12:47:05`）又复跑一发对差（下条 4）。
+   本腿后面两笔（commit 2／3）里有过一次我自己造的分母污染与自纠（详见 §6 与 §7 第 8 条），故
+   **交付数以 §8 第 6 条那一发为准**（锚 `00629ea9`，含全部三笔，13:07:09 现读：**19 枚、非台件 0 枚、与本名册 `diff` 空**）。
+   两枚锚给出的答案相同（19），差别只在中间那枚 `cfd97636` 上短暂是 20（我自己顶上去的，已改名纠正）。
 
 **答案：19 枚。每一枚都落在 `.scratch/wisp/probes/**` 里。非台件＝0 枚（没有"哪几枚不在、归谁"这一格，那一格今天为空）。**
 
@@ -292,7 +295,8 @@ diff logs/arc236-selftest-before.txt logs/arc236-selftest-after.txt -> 8 行 / 1
 |---|---|---|---|---|---|
 | 1 | `b3eabab7` | `2026-10-05 12:44:50 +0800` | `style(161/236-r1): tools/d22scan/selftest.go 格式化到 gofumpt 干净（纯排版，语义零动）` | `-- tools/d22scan/selftest.go` | `1 file changed, 2 insertions(+), 2 deletions(-)`；`^@@` 计数＝1 |
 | 2 | `cfd97636` | `2026-10-05 12:58:58 +0800` | `docs(evidence/236-r1): 修完那一枚非台件真违规之后的名册与读数（Q-66 缺的那枚数＝19 枚、全在 .scratch）` | `-- .scratch/wisp/probes/236/r1` | 16 枚新建（`evidence.md`＋`msg-*.txt`＋`logs/**`），0 删 0 改 |
-| 3 | 本笔 | 落档时刻见 commit 本体（`git log -1` 现读） | 收尾：把 commit 2 里我自己以 `.go` 后缀入库的两枚读副本改成 `.go.pristine`（只改后缀、不动字节）＋本件的 §6／§7／§8 更正 | `-- .scratch/wisp/probes/236/r1` | 2 枚改名（`git mv`，rename 相似度 100％）＋本件若干行更正 |
+| 3 | `00629ea9` | `2026-10-05 13:06:54 +0800` | 自纠：两枚 `.go` 副本改成 `.go.pristine`（只改后缀、不动字节）＋本件 §0／§2／§3／§6／§7／§8 更正 | `-- .scratch/wisp/probes/236/r1` | 4 枚变动＝2 枚 rename（相似度 100％）＋`evidence.md`＋`msg-selffix.txt`；77 增 14 删 |
+| 4 | 本笔 | 落档时刻见 commit 本体（`git log -1` 现读） | §8 第 6 条的真实读数落档（`logs/final-roster.txt` 等 4 枚）＋§3 锚点段补一句"交付数取哪一发" | `-- .scratch/wisp/probes/236/r1` | 4 枚新建 `.txt`＋本件更正（零产码、零 rename） |
 
 - commit 1 的父＝`0793e35e`（现读 `git rev-parse b3eabab7^`）；commit 2 的父＝`6c96a425`（现读 `git rev-parse cfd97636^`，
   那是 257-v1 在 12:56:34 的结案笔；12:44 到 12:58 之间 HEAD 走了 4 枚，全是别人的入库，锚漂是常态）。
@@ -382,7 +386,22 @@ diff logs/arc236-selftest-before.txt logs/arc236-selftest-after.txt -> 8 行 / 1
    新增 `if:`/`continue-on-error` 零枚、未删任何件（commit 3 是 `git mv` 改后缀，md5 逐枚全等）、`main.go` 九条禁令与 `allowlist.txt` 零字节、
    普查名册里其余 19 枚一枚未顺手修、票面与台账零字节、`frontend/**`／`design/**` 连读都没读。
 5. **本腿不判**：形 I／II／III 的取舍、`Q-66` 要不要摆与怎么措辞、`:184` 那步的真实退码、票面 AC 框翻勾、台账 `A##` 追加——全归编排者。
-6. **交付前那把我漏掉的尺，补在这里（新锚复跑）**：本腿三笔全部入库后，在**含 commit 3 的锚点**上重跑 §3 那把尺
-   （整树归档 × tracked 全集 × gofumpt `-l` × stdout＋stderr），并把"我自己那枚 commit 的 `.go` 载荷"单列一枚数。
-   本笔（commit 3）交的是改名与更正；那把尺的真实读数与名册落在**第四笔**的 `logs/final-roster.txt`（本行引用它时它在盘上还不存在，
-   这一句就是那条自陈，不是空格），那一笔只交读数、不再改产码。
+6. **交付前那把我漏掉的尺，补在这里（新锚复跑，已跑出数）**：在**含 commit 3 的锚** `00629ea9ac0d7366d20525837aed8cff778a96cf`
+   （13:06:54 入库）上重跑 §3 那把尺（整树归档 × tracked 全集 × gofumpt `-l` × stdout＋stderr），现读时刻 **`13:07:09 +0800`**：
+
+   | 尺 | 读数 |
+   |---|---|
+   | 归档完整性（`find -type f` 对 `git ls-tree -r --name-only \| wc -l`） | 5936 对 5936（相等＝整树取全，含每一枚 `go.mod`） |
+   | tracked `.go` 分母 | **924**（回到 commit 1 那一发的数） |
+   | `xargs` 聚合退码 | 123（＝`fs_broken.go` 那一枚 rc=2 顶的，与修前修后同形） |
+   | 名册枚数（stdout 18 ＋ stderr 1，去重） | **19** |
+   | 其中不在 `.scratch/wisp/probes/**` | **0** |
+   | 与 `b3eabab7` 那发名册的 `diff` | **空**（同一批 19 枚） |
+   | 我这枚 commit 带进 tracked 集的 `.go` 载荷 | **0 枚**（`git ls-tree -r --name-only <锚> \| grep 236/r1 \| grep -cE '\.go$'`） |
+   | 单枚点名（`gofumpt -l tools/d22scan/selftest.go`，该锚归档内） | **空**、rc=0（干净） |
+
+   对照读数（那把我漏掉的尺为什么必须补）：同一把尺在**污染锚** `cfd97636`（我的 commit 2）上＝
+   分母 **926**、名册 **20 枚**，多出来的一枚逐字是 `.scratch/wisp/probes/236/r1/logs/arc236-selftest-orig.go`
+   （尺与名册＝`logs/polluted-roster-at-cfd97636.txt`，20 行）。交付数以 `00629ea9` 这一发为准：**19 枚、非台件 0 枚**。
+   落档件＝`logs/final-roster.txt`（19 行）、`logs/final-gofumpt-stdout.txt`（18 行）、`logs/final-gofumpt-stderr.txt`（1 行）、
+   `logs/polluted-roster-at-cfd97636.txt`（20 行，那一次污染的现场名册）。
