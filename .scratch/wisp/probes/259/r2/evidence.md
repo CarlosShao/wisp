@@ -528,8 +528,8 @@ item**. The message never says which, so the API cannot be used to probe for val
 |---|---|---|---|
 | 1 | `549cb218` | 证据件骨架 §0-§1＋起手快照 `before/approval.go`／`before/queue.go`＋`msg-s1.txt` | 仅本目录 4 枚 |
 | 2 | `6a021830` | ⓐ 落地第一批：两枚产码文件的注释降级＋`msg-s2.txt` | `internal/agent/approval/approval.go`、`queue.go`、本目录 msg |
-| 3 | 本笔（哈希见 §8 末与交件回报） | §2-§8 填实＋读数件（`base-v/base-names/after-v/after-names/comment-table/comment-diff/gofumpt-negctl`）＋`msg-s3.txt`；同笔带上两枚产码文件的**收尾注释**（`approval.go` 第 385 行那枚 `//` 分段线＋B 枚点撤掉逐字引用，两笔合计 +80/-7 与 +36/-4） | 两枚产码文件＋本目录 |
-| 4 | 末笔（随交付回报给哈希） | 只改本件：把 3／4 两笔的哈希按序写回 §6（⛔ 不动产码） | 本件＋`msg-s4.txt` |
+| 3 | `789a02e2` | §2-§9 填实＋读数件 8 枚＋`msg-s3.txt`；同笔带上两枚产码文件的**收尾注释**（`approval.go` 第 385 行那枚 `//` 分段线＋B 枚点撤掉逐字引用；本笔对第 2 笔＝+6/-5，两笔合计 +80/-7；`queue.go` 对 HEAD 零差故不在本笔 name-only 里，合计仍是 +36/-4） | `internal/agent/approval/approval.go`＋本目录 9 枚 |
+| 4 | 本笔（哈希随交件回报给编排者；已入库历史不改写，要更正就追新笔） | 只改本件：把第 3 笔哈希与 §9 的件尺终值写成实测值 | 本件＋`msg-s4.txt` |
 
 起手锚 `5b638498`（`git log -1 --format=%h` 自取，非抄派单）；`git status --porcelain -- cmd internal tools`
 起手为**空输出**，第 2 笔之后现跑（12:48 前后）＝只含我自己那一枚待收尾的产码文件：
@@ -660,5 +660,5 @@ $ git diff --numstat HEAD -- internal/agent/approval/approval.go internal/agent/
 | `gofumpt-negctl.txt` | 12:47:37 那一次并排跑：仓外负控被点名、我改的两枚零行（§4 的空读数凭据） |
 | `msg-s1.txt` … `msg-s4.txt` | 四笔 commit message 的原文（中文，⛔ 无英文单引号） |
 
-交付终值（把这串数字写进去之后重跑那把 `wc` 的读数）＝**657 行／43,526 字节**，行数不动、
+交付终值（把这串数字写进去之后重跑那把 `wc` 的读数）＝**664 行／44,405 字节**，行数不动、
 字节只随数字本身变，占位尺同轮再跑仍 **0 枚**。⛔ 这里不留成语也不留下划线。
