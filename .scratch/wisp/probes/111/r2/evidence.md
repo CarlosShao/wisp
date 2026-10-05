@@ -104,7 +104,39 @@ ci.yml 总 766 行；`runs-on` 分布：`:66`／`:310`／`:697` ubuntu-latest，
 
 ## §2 逐枚可纳入性（票面 5 枚 + 真残余洞）
 
-（待填：ball/wisp/perm/plugin/llmrecord 在 HEAD 的认领格；winlive 半边；cmd/wisp ubuntu 半边；session/projctx 已由 1bb654e3 认领）
+判据四列：`_test.go` 枚数（`git ls-files`）／tag 形状（`head -1` 逐文件）／**本平台编译得出的分母**（§3.1 base census 的 `t/x` 列，GOOS=windows 现量）／最坏颜色。
+r1b §2 的 5 枚结论本腿**逐枚复认**（下 1–5 全"已在册"），并把 1bb654e3 补的两枚（下 6–7）补齐；8 是横切的 winlive 半边，9 是 cmd/wisp 的 ubuntu 半边。
+
+| # | 包 | `_test.go` | tag 形状 | census t/x | 认领 | 最坏颜色 |
+|---|---|---|---|---|---|---|
+| 1 | `internal/ball` | 16 | 6×`windows`＋5×`windows && winlive`＋5 无 tag | 11/0 | core+windows | 见下 |
+| 2 | `cmd/wisp` | 65 | 22×`windows`＋6×`windows && winlive`＋1×`!windows`＋36 无 tag | 58/0 | cli | 见下 |
+| 3 | `internal/perm` | 3 | 0 枚带 tag | 3/0 | core+windows | 普通红 |
+| 4 | `internal/plugin` | 1 | 0 枚带 tag | 1/0 | core+windows | 普通红 |
+| 5 | `cmd/llmrecord` | 1 | 0 枚带 tag | 1/0 | core+windows | 普通红 |
+| 6 | `internal/session` | 2 | 0 枚带 tag | 2/0 | core+windows（1bb654e3） | 见下 |
+| 7 | `internal/projctx` | 1 | 0 枚带 tag（外部测试包 `package projctx_test`） | 0/1 | core+windows（1bb654e3） | 见下 |
+
+1. **internal/ball** — 复认 r1b。tag 现量：`//go:build windows` 6 枚（`hotkey_borrow_refused_260r5`／`hotkey_cancel_borrow_260`／`hotkey_cancel_borrow_expect_260r2` 等）、`windows && winlive` 5 枚（`hotkey_live`／`interaction_live`／`live_windows`／`live_guard_windows`／`hotkey_cancel_borrow_live_260`）、无 tag 5 枚（`dock`／`liquid`／`position`／`tokens`／`tokens_table`，本腿逐枚 `head -1` 复认）。**算术自证**：16−5(windows)−5(winelive)＝6 枚进得了 windows 分母，census 实测 **11**＝6 带 tag＋5 无 tag ⇒ **那 5 枚 winlive 今天连编译都没编译**（§2.8）。新依赖无。最坏颜色：ubuntu 若有平台 bug＝普通红即发现。**已在册。**
+2. **cmd/wisp** — 复认 r1b 的 tag 计数并补精确分布：22 `windows`／6 `windows && winlive`／1 `!windows`（`secret_dataroot_119b_test.go:1`）／**36 无 tag**＝65。windows 侧 census `t=58`＝22＋36 ⇒ **6 枚 winlive 同样零编译**；`t=58` 里不含那枚 `!windows`。runner 只 `cli` 档，由 `scripts/wisp-cli-tests.sh`（ci.yml `:507`）在 windows 腿跑，缺 sherpa DLL 时它 `exit 1` 点名缺哪个（`:74-99` 预检）。**已在册（cli）。** ubuntu 半边见 §2.9。
+3. **internal/perm** — 复认：3 枚 `head -1` 全是 `package …`，无一行 `//go:build`（`grep -c` 命中 0）。无新依赖。普通红。**已在册。**
+4. **internal/plugin** — 复认：`disposal_test.go` 无 tag，census `1/0`。普通红。**已在册。**★这枚同时是 §3.2 GUARD D 正控的靶件。
+5. **cmd/llmrecord** — 复认：`main_test.go` 无 tag，census `1/0`。普通红。**已在册。**
+6. **internal/session** — 补 r1b 未覆盖的两枚之一。`grants_test.go`＋`ticket224_pattern_dialect_test.go`（`package session` 内部测试×2，census `2/0`）。★本腿现量：这 2 枚里 `t.Skip`／`os.Getenv`／`exec.Command` 命中 **0／0／0**（`grep -c` 逐文件）⇒ 与 `1bb654e3` 注释里那句"ZERO t.Skip、ZERO os.Getenv、ZERO exec.Command"**逐字对得上**，不是抄它的断言。无 tag ⇒ 两平台都进分母。**已在册（1bb654e3），本腿不重复合入。**
+7. **internal/projctx** — 另一枚。1 枚 `projctx_test.go`，`package projctx_test` ⇒ census 记作 `0/1`（**x** 而不是 t）。★票面 `现场` 那句"零覆盖且有 `_test.go`"的写法在这种形状上会**被误读成 0**（t 列为 0），所以名册必须报 `t/x` 两列——这正是 `:288-292` 注释立这条的理由。同样 `t.Skip`/`os.Getenv`/`exec.Command` 命中 0。无 tag。**已在册（1bb654e3）。**
+8. **★winlive 半边（横切 ball＋wisp，共 11 枚文件）** — 本腿复认 r1b §2.6 的四个"没有"：
+   - `grep -c winlive .github/workflows/ci.yml` = **0**（`grep -n` 零行）；
+   - ci.yml 全文 `grep -n 'winlive\|-tags\|GOFLAGS'` = **零行**；
+   - `scripts/portable-tests.sh` 里 `tags\|GOFLAGS` 命中 **0**；`tools/d22scan/runtests.sh` 同样 **0**
+     ⇒ **没有任何一条现成的"传 tag"的缝**，加 winlive 必须先造这条缝，不是给 scope 数组加一行就完事；
+   - 仓内 `winlive` 测试文件**只有这 11 枚**（`grep -rl //go:build.*winlive` 逐目录计数＝cmd/wisp 6＋internal/ball 5，无第三处）。
+   ⇒ 结论复认：**这 11 枚默认零编译、CI 永不跑**。owner **未批**，本腿**不给 ci.yml 加 `-tags winlive`**。
+   真接入要动哪几行＋代价 → **§5.1**（不是"不做"，是"这轮不能由我这枚做"）。
+9. **cmd/wisp 的 ubuntu 半边** — 票面 `AC#4` 已量过（CGO=1 时 19/29 FAIL，rc=1，127.4s），本腿**不重跑**（零 go test）。ubuntu 腿根本没有 `cmd/wisp` 的调用点：`:373` 的 core scope 不含它，且 `GOOS=linux go list ./...` 连解析都 rc=1（§1.2 那发 264 字节 stderr）。⇒ **归票 98／新票，登记不修**（§5.2）。
+
+**§2 的总结局**：票面点名的 5 枚**全部早已在册**；1bb654e3 补的 2 枚在册且本腿复核其"零藏 skip"断言成立；
+剩下的两处不是"接入"问题而是**平台/tag 问题**（winlive 需 ci.yml＋一条传 tag 的缝；cmd/wisp 的 ubuntu 需先让 `go list` 在 linux 解得开）。
+⇒ **本轮我不新增任何 scope 行、不新增任何 pin 枚**（新增了反而会被 GUARD C 判红，见 §3.4）。
 
 ## §3 实际改动与 GUARD D 正控
 
