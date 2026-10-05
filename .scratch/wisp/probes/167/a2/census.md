@@ -36,15 +36,43 @@
 
 ## 2. 草稿：存不存盘、谁清、谁覆盖
 
-（本节答：存盘与否＋失败路径上谁写谁清＋"新写的字不许被覆盖"今天由谁负责）
+（本节答：**盘上零处、会话内零处**；"清"没有责任人；"新写的字不许被覆盖"今天**没有任何一格负责**）
 
-未判
+**2.1 唯一带用户文本的持久列，只给"已受理"的任务**
+- 建表名册（尺：`grep -n "CREATE TABLE" internal/memory/schema.go`）＝**九枚**：`:23 schema_meta`／`:30 profile`／`:40 memory`／`:53 task_log`／`:69 tool_call`／`:89 approval_grant`／`:102 cost_daily`／`:111 plugin_state`／`:136 provider_health`。
+- 其中唯一装用户原话的列＝`internal/memory/schema.go:58` 逐字 `query_text     TEXT NOT NULL,          -- 已脱敏；模式匹配掩码是尽力而为，须标注（§14.4）`。
+- 写手链：`internal/agent/journal.go:122`（`func (t *taskJournal) startTask(ctx context.Context, query string)`）⇒ `:129` `j.StartTaskLog(ctx, memory.TaskLog{ID:…, State: "running", QueryText: query})` ⇒ DAO `internal/memory/dao_tasklog.go:24`（`StartTaskLog`，`:33` 那句 INSERT）。`startTask` 的调用点在 loop 内（任务已受理之后）。⇒ **判据：这条列今天只收"已经进入 loop 的那一发"；一次没被受理的发送（`panel.message.send` 走 `unattached` 那条）根本不经过它。**
+- 接口面也印证同一件事：`internal/agent/journal.go:18-20` 的 `Journal` 只暴露 `StartTaskLog`/`FinishTaskLog`，**零枚"存一条未发出的草稿"的形状**。
+- **第二条持久面不存在**：`ls internal` 的名册＝`agent audio ball buildinfo config llm memory models observe panel perm plugin proc projctx risk secret session speech statemachine streamkey tools watchdog winsec`——**没有 `store` 这个包**（尺 `ls internal/store` 回 `No such file or directory`）⇒ 想落草稿也没有现成的落盘面。
+- 数据根下的文件面（具名，〔仅读码〕）：`config.toml`／`logs\`（`cmd/wisp/logsink.go:76` 逐字 `const logDirName = "logs"`、`:87 logSinkDir`）／`models\`／`artifacts\`（附件字节；`internal/panel/attachments.go:61` 逐字 `ArtifactsDir() string`，注释 `:56` 写明"`*memory.Store` satisfies it in production"）／`memory.db`。⇒ **附件字节今天存盘、原文不存盘**，这两件事的方向正好相反。
+
+**2.2 会话内存里也不存**
+- `ls internal/session`＝`doc.go grants.go grants_test.go session.go ticket224_pattern_dialect_test.go`；尺 `grep -rn "Role.*user\|\"user\"" internal/session/*.go`（排测试）**零命中＝这个包只管会话与授权，不管话**。
+- `ComposerState`（`internal/panel/composer.go:235`）是**出向**快照的一节，11 键里零自由文本位（§1.3 已逐枚列），它**不回写页面输入框**，也不承担草稿。
+- 附件族里"清空"这件事在 Go 侧也**没有产码函数**：尺 `grep -rn "func.*Reset\|func.*Clear\|attachments = nil" internal/panel/*.go | grep -v _test` **零命中** ⇒ **谁清它＝零枚**（因为没有需要清的那一格；不是"我没找到"）。
+
+**2.3 "用户后来新写的字不许被它覆盖"今天由谁负责＝没有人**
+- Go 侧既没存原文、也不回写文本 ⇒ **这一条今天整个在页面那一寸**（⛔ 本程不读 `frontend/**`，判不了，见 §7-1）。
+- 全仓唯一同族"新的不许顶旧的"的**已接产**在配置那一轴：`internal/config/writeguard.go` 的守护写＋两枚尺族（§3 逐枚列名）。它们断的是 `config.toml` 的键，**射程里没有 composer 文本**——⛔ 不许有人把"已有 no-clobber 机制"当成草稿这一格已有人管。
 
 ## 3. 草稿：既有尺名册
 
-（本节答：断"草稿不吞"的既有测试＝逐枚用例名＋到底断什么；零枚就写零枚）
+（本节答：**零枚**。断"草稿不吞／失败原文单独存住／新字不被覆盖"的既有测试＝**0 枚**；下面给邻近者的逐枚名册）
 
-未判
+- 直接靶（草稿）：**零枚**。`grep -rn "draft" cmd internal tools --include=*.go` 的 14 枚命中里没有一枚是测试用例名或断言（§1.3 已逐枚具名，其中只有 `internal/tools/fs_edit_ac34_test.go:75,86` 在测试里，而那是 `status: draft` 的**文件内容 fixture**，与 composer 无关）。
+- 沾到 `panel.message.send` 的用例**共 15 处**，逐枚看**没有一枚读 `req.Text` 的内容**，全部是"名册／派发表一致性"用途：
+  `cmd/wisp/panel_config_248_test.go:467`；`internal/panel/bridge_test.go:62`（封套里塞了 `"看看这个"` 只为验证能解析）、`:140`；`internal/panel/composer_dispatch_test.go:261`、`:292`；`internal/panel/composer_handlers_test.go:303`；`internal/panel/composer_test.go:414`；`internal/panel/git_test.go:382`、`:450`、`:508`；`internal/panel/inbound_roster_253_test.go:73`、`:659`、`:703`。
+- 唯一沾"发送文本"的用例＝`internal/panel/attachments_test.go:284` 造 `OutgoingMessage{Text: "看看这个", …}`、`:285` 调 `ForAgent` 后断附件形状（拒收的附件要在文本里逐字重复）。**它断的是"附件别被吃掉"，不是"草稿别被吞"**——同一票面 §「do not eat the user's intent」的**另一维**，具名免得下一位误认。
+- no-clobber 那一家（**同族不同靶**，逐枚名＋断什么）：
+  - `cmd/wisp/always_write_no_clobber_226_test.go:39` `TestAC1AlwaysBranchDoesNotRevertAHandEditedKey` —— 断"always 那条分支不许把人手改过的键回落"。
+  - `internal/config/writeguard_226_test.go` 13 枚：`:63 TestAC1AllowedDirsWriteKeepsAHandEditedKey`、`:102 TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit`、`:117 TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept`、`:146 TestAC2CleanWriteReportsOneKeyAtInfoLevel`、`:164 TestAC2UnreadableFileIsRefusedAndNothingIsWritten`、`:187 TestAC3AdoptionClaimsOnlyWhatThisWriteProduced`、`:234 TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory`、`:269 TestAC4PermissionModeWriteKeepsAHandEditedKey`、`:308 TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber`、`:330 TestAddAllowedDirStillRefusesARelativeHop`、`:360 TestGuardedWriteFailureRollsBackMemory`、`:393 TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt`、`:416 TestDiffKeyPathsNamesRealKeyPaths`。⇒ **全是 `config.toml` 的键级 no-clobber**，与 AC#5 那发"失败时整块回填"的变异毫无重叠。
+- ⛔ 三枚冻结件按令未读：`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`。本程在包级 `grep` 里**顺带见到**第二枚的文件名与行号，一律不转写、不据此下结论；若编排者要判"草稿出向字段会不会撞那枚白名单尺"，得由**非本程**的腿去读。
+
+**3.1 C17（`PanelBridge`）里有没有草稿相关方法名——零枚，且本程不新造**
+- 代码侧入向名册（逐字，`internal/panel/bridge.go:41-45` 那块常量；枚位尺＝`grep -nE '=\s*"panel\.' internal/panel/bridge.go` 回 42/43/44/45 四行）：`panel.mode.request`／`panel.workspace.request`／`panel.attachment.add`／`panel.message.send`，另有票 248 的两枚 `config.get`/`config.set` 形状（同块注释自述它们**刻意不带 `panel.` 前缀**）。⇒ **无草稿格。**
+- 契约文本侧（`docs/PLAN.md`，逐字引 C17 那几枚）：`:1367`「**C17** | **`PanelBridge`** | 前端↔Go 双向通道：`invoke(method, args) → result` + Go→前端事件推送（流式结果、审批请求、任务状态）。**回复必须按 correlationId 路由**；前端**必须无状态**（WebView 销毁后一切从 Go 侧重读）」；`:2434`「**配套**：C17 `PanelBridge` 必须给出**方法白名单**（只有列出的方法可被前端调用）」；`:2968` 起「**C17 `PanelBridge` — 补四项**：① **方法白名单**…② 每个方法标注所需 capability…③ correlationId 路由 + 事件推送的背压与合并（D38(d)）④ **前端无状态的强制手段**：面板每次 `show` 必须发 `panel.resync`…」。⇒ **PLAN.md 的 C17 条文里零枚草稿方法名**，只有 `panel.resync` 这一枚推送名（`docs/specs/SPEC-08-ui-ball-panel.md:150`、`:163` 表首行）。
+- `docs/specs/SPEC-08-ui-ball-panel.md:161-174` 那张提案白名单表逐枚（本程全文读完）：`panel.resync`／`tasks.list`／`task.detail`／`history.query`／`transcript.get`／`approval.current`／`approval.queue`／`approval.decide`／`config.get`／`config.set`／`grants.list`／`grants.revoke`／`privacy.purge`／`privacy.export`／`cost.summary`／`models.list`／`models.delete`／`diagnostics.export` ＋ 事件推送 `task.delta` `tool.chip` `approval.request` `ball.state` `cost.tick`。⇒ **零枚草稿/draft 方法**；最接近"草稿出口"的是 `diagnostics.export`，但它是**诊断包**不是输入框（§5 归到崩溃那一格去量）。
+- ⛔ 本件不新造任何方法名（派单硬约束）。若 AC#5 要一枚出向草稿字段，那是**§7-5 的裁定面**，不是本件的产出。
 
 ## 4. 自救：谁产／谁投／谁落三处齐读
 
