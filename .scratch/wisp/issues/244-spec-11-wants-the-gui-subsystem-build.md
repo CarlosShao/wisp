@@ -93,3 +93,17 @@
 3. **"会响的尺"今天是真空**（不是被谁放宽过）：全仓零枚测试/脚本读 PE subsystem——build.ps1 step6 冒烟只跑 `doctor`（`:166-169`）、`tools/d22scan` 的 ban 不含 `-H`/subsystem、`internal/tools` 无 `debug/pe` 解析。要装一把，**不能不构建就测**（库里 tracked exe＝0 枚，subsystem 仅链接后存在）。⛔ 本票不采纳"做不到"这句作否证——它一枚候选形的作用面都没跑过（第 74 条那条规矩）；落点候选两形（甲＝build.ps1 冒烟区、乙＝独立后台件）留给我在 AC#2 落地时选。
 4. `docs/BUILD.md:52-53` 正文只列 `-X` 不提 `-H`、`:87` 仍写"推迟到票 07"＝**过期文本**；照它手敲 `go build` 会漏 `-H`。⚠ 本票 §禁区 第 71 行已把这件事写死在前：**该冻结件一字不改，由票面具名更正**——本节就是那次具名更正，⛔ 不动 `BUILD.md` 一个字。
 5. stdout 可见性那条只算〔读码推断，未跑〕：`attachParentConsole()` 在 `cmd/wisp/main.go:90` **早于** `cmdRun` 捕获 `os.Stdout`（`main.go:161`→`run.go:390`），attach 成功时把 `os.Stdout` 重绑成新 `CONOUT$`（`cmd/wisp/console_windows.go:55`）⇒ 有父控制台或有重定向两态句子应仍可见，仅"attach 失败且无重定向"那一态写进死柄（无输出但无害）。**定它的那一发＝票面 AC#2 ①②，归编排者本机跑，⛔ 不许在本票里当已证。**
+
+## 8. 收只读普查腿 `244-a4` ⇒ 本票新增一格"exec 级通道钉"（编排者落点，2026-10-05 15:1x +08，账 `A623`；⛔ 本票 7 枚 AC 框一枚未动，现尺 `^- [ ]`＝7／`^- [x]`＝0）
+
+**来路**：票 257 结案时归口过来的残余③——"首启回执那句实话到底走哪条通道，今天没有任何用例从真子进程口径钉过"（凭据＝`docs/evidence/s1/257-clean-machine-provider-registry-v1.md` §8 末行；那里唯一的读数出自 `257-v1` 手工搭的一发真进程，⛔ 不可重放为门禁）。普查件＝`.scratch/wisp/probes/244/a4/census.md`（**338 行／64,023 字节／真实占位 0**；九笔自落 commit `05ac9fc0`→`5f3ca514`，逐笔 `--name-only` 只含该件）。
+
+**它交回的落地形状（§7，我照它写，⛔ 不自己另造）**：新建一枚 `//go:build windows` 单标签测试件，复用现成的 `buildWispForTest`（`cmd/wisp/secret_argv_windows_test.go:161`）＋`lockedBuf`＋`pollUntil127`，argv 走 `run <文本>`，env 带 `WISP_ENV=test` 与 `WISP_TEST_DATA_DIR`，`Stdin=nil`，判据抄 `cmd/wisp/firstrun_198_test.go:98-99` 那两行＋退码 2。**买到的**＝把 `257-v1` 那发手工读数升成门禁；**买不到的三样具名**＝本票 AC#2 那三发真机字面、subsystem 本身、以及"双击起法"那一态。
+
+**四条必须先读再动的事（全是它现量出来的，⛔ 落地腿不许当装饰）**：
+1. ★**"起子进程不收尾"这一族今天零枚**、且**全仓 `proc.Boot` 只有 2 枚调用者、`t.Parallel()` 0 枚** ⇒ 这一枚新用例**不继承真窗那一族的毒源**（与台账里"某枚真窗钉自己就是毒源"那条教训分开，别预防性地把那套收尾全抄过来）。
+2. ★**反向陷阱**：`cmd/wisp/firstrun_198_test.go:91` 那句"stdout 必须为空"在**真子进程口径下天然不成立**——新用例若照抄那把尺会造出一枚常红。判"通道"要判的是 `runSpec.stderr`，⛔ 不是复用那枚 stdout 反控。
+3. **只有两枚 AST 门会被"仪器形"打红**：`cmd/wisp/leg_dispatch_gate_133_test.go`／`cmd/wisp/leg_sink_gate_131_test.go`（都吃 `_test.go`）。三枚禁行写死：**不许新增包级 `var = 函数`**、**不许挂 `WISP-LEG-COVERAGE-RULING` 而不带腿名**、**不许在 `init()` 里跑构建**。B／C／D 那 12 枚计数钉全打不红（它逐枚读过）。
+4. **它把本票"今天到底谁在管可见性"这句钉正了**：`attachParentConsole()` 在 `cmd/wisp/main.go:90` **早于** `cmdRun` 捕获 `os.Stdout`（`main.go:161`→`run.go:390`），成功时把 `os.Stdout` 重绑成新 `CONOUT$`（`cmd/wisp/console_windows.go:55`）⇒ **不存在"无父控制台就 return"那一支**（我派单与 `A614` §3 那句"无父控制台即 return"**方向反了**，`console_windows.go` 里的早退条件逐字是"已有可用 stdout"，在 `:34-37`）；★更硬的一条：**双击那一起法根本不产生首启回执那句话**——无参即进常驻分支，从不进 `cmdRun`（它现读）。⇒ `A614` §3 那句按这一条读，原话不抹。
+
+**它推翻我派单的其余两处（一并记，免得下一位再踩）**：① "编译一次 exe"那族**不存在缓存形**——helper 每次都是 `t.TempDir()`＋`go build`＋拷 DLL，零缓存、零 `-ldflags`（所以这一枚新用例的墙钟按"再编译一次"估，⛔ 不许按复用估）；② 我给的起手尺 `grep "exec.Command("` **漏计 5 枚真起子进程的文件**（它换了一把才数全：10 枚文件／21 枚调用点）；③ 它还查出一枚**我引用错地方**：我那句"AC#1 不勾＝缺 AC#2 真机两发"并不在 `A619`（全台账 `AC#1 不勾` 命中 0），真身＝本票票面 AC#0 那行＋`A557`。
