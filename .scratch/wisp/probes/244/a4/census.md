@@ -161,7 +161,27 @@ $ git ls-files "*.exe" | wc -l
 
 ## §4 问 4 —— 无父控制台那一支：`console_windows.go` 的 return 与 `logsink.go` 的 mirror 谁先谁后
 
-未判。
+判语（三句，每句都指得到行）：
+1. **顺序上没有错位**：`attachParentConsole` 永远**早于**"writer 绑定"与"mirror 绑定"这两件事，所以 `logsink.go:160` 的 mirror 与 `runSpec.stderr` 取的是**同一批柄**——不存在"mirror 抓到重绑之前的旧柄"这种形状（今天没有那条路径）。
+2. **但"双击起法"那一支压根不产生那句话**：首启回执只在 `runTextTask` 里印（`cmd/wisp/run.go:245` → `cmd/wisp/firstrun.go:92-95`），而双击＝**无参**＝`main.go:60-67` 的 resident 分支，**从不进 `cmdRun`**。⇒ ⚠ 具名推翻派单的一处隐含前提：**票 257 那格"stderr 真到达"与票 244 的"双击那一支"不是同一条通道**，一枚 exec 级用例能钉的是"从终端起／被重定向"那一支，**买不到 AC#2 ③ 那一发双击**。
+3. **`console_windows.go` 里那句"没有父控制台就 return"在本文件不存在**（见 §0 第 2 行）：早退的条件是**"已经有可用 stdout"**（`:34-37`），"没有父控制台"落在 `:39` 的 `AttachConsole` 失败＋`:47-51` 的 `CreateFile("CONOUT$")` 失败**静默不重绑**上。这一处方向之差直接决定 stdout 那一行的去向，所以下面逐态写。
+
+**谁先谁后（现读逐条，全带行号）**：
+
+| 腿 | 顺序 | 绑定发生在 |
+|---|---|---|
+| `wisp run`（终端起／重定向起） | `main.go:90 attachParentConsole()` → `:91 os.Exit(cmdRun(…))` → `main.go:152 printVersions`（`fmt.Printf`＝stdout）→ `:154-157` 无控制台时向 `os.Stderr` 喊那一句 → **`main.go:161-162` 把 `os.Stdout`／`os.Stderr` 交进 `runSpec`** → `run.go:181 runTextTask` → `run.go:222 installLogSink`（mirror 在 `logsink.go:160` 读**那一刻的** `os.Stderr`）→ `run.go:245 ensureFirstRunConfig(s.dataDir, s.stderr)` | attach **早于**绑定（票 244 §9 第 5 条同读数，复认） |
+| `wisp`（无参＝双击那一支） | `main.go:65 attachParentConsole()` → `:66 runResident()` → `resident_windows.go:34 printVersions`（stdout）→ `:66 installLogSink` → `:71` 装不上时向 `os.Stderr` 喊"持久日志未启用" → `:88` 启动汇报 `fmt.Printf`（stdout） | 同上：attach 早于 mirror |
+| 常驻腿的内部任务源（**今天唯一能印首启回执的非 CLI 入口**） | `resident_task_source_windows.go:266-267 stdout: os.Stdout, stderr: os.Stderr`（`runSpec` 字面量），且这条腿**只在 `console != nil` 时才受理任务**（`:346-348` 那个 `if console != nil` 才起 `runConsoleLoop`） | 无 attach 之外的额外绑定 |
+
+**双击起法下"stdout 那一行"到底去了哪**——两态分开写，⛔ 不许合成一句：
+
+- **态甲＝今天盘上那枚件（CUI(3)，§3 现读）**：无参双击 ⇒ 系统为这个 CUI 进程**新建一枚控制台**（＝票 244 票面 `:5` 与 `:15` 记的那只黑框），`attachParentConsole` 在 `:34-37` 因为 `GetStdHandle(STD_OUTPUT_HANDLE)` 有效**直接 return**，于是一切 `fmt.Printf` 都写进那只黑框。⇒ **看得见，但看见的方式就是那只框**；`resident_windows.go:55-60` 那段注释（"double click the icon, no terminal attached, stderr going nowhere"）**描述的态甲不成立**，它描述的是态乙——这正是票面 AC#3 要点名改口的两行注释之一。
+- **态乙＝旗标落地之后（GUI(2)）**：无父控制台 ⇒ `:39` 的 `AttachConsole(ATTACH_PARENT_PROCESS)` 失败，`:40-42` 三枚 `rebindStdHandle` 在 `:48-51` 因为 `CreateFile("CONOUT$")` 失败而**逐枚静默 return**，`os.Stdout`／`os.Stderr` **保持进程启动时的柄**。那一枚"启动时的柄"到底是什么（Explorer 给 GUI 进程的是 NUL 还是无效柄）**本腿量不到**——判它要一发真机 GUI 双击（＝票面 AC#2 ③，归编排者；`docs/BUILD.md:90` 那枚"当时的临时构建"读数**不可继承**，票面 AC#0 与 §9 第 2 条两处都写了这句）。**两支共同点只有一条：写进一枚没有读者的柄**，所以态乙下"那句话消失"是**无害的哑**，不是丢数据的崩（票面 `:5` 第 ③ 行"最坏后果是什么形状"就是这么裁的）。
+- **态丙＝本腿唯一能从盘上反证的那一支（测试起法）**：21 枚台件都是**把子进程 stdout/stderr 重定向到管道**起的（`resident_sink_nail_127_windows_test.go:229`、`resident_task_source_246_windows_test.go:462`、`secret_argv_windows_test.go:238`……），重定向本身使 `GetStdHandle` 拿到**有效管道柄** ⇒ `console_windows.go:35-37` 早退 ⇒ 句子的去向＝**那根管道**。⇒ 盘上佐证：127 那四枚正向 `leg.stderr.has(...)`（`:487/:493/:529/:541`）今天在默认档名册里是绿的（`docs/evidence/s1/228-resident-ball-v1.md:13` 记的默认档整包 `rc=0／零枚 --- FAIL／148.168s` 就含这一族）。〔读码推断＋盘上第二手读数，本腿没跑任何用例〕
+  ⚠ **这一态的推论要给写腿**：新用例**在测试进程里能可靠看到那枚首启回执**，恰恰是因为"重定向使 attach 早退"这一条——**它不是"双击也看得见"的证据**，两个态别混进同一句判语。
+
+**顺手量到的一格（本问没问，归票 244 AC#6 的名册）**：`cmd/wisp/main.go` 的 switch 里**两枚分支不调 `attachParentConsole`**——`case "secret"`（`:100-101`）与 `case "slo"`（`:110-111`），而 `secret.go:200-202` 照样绑 `os.Stdout`／`os.Stderr`、`:226` 照样 `installLogSink`。⇒ 旗标落地后这两条腿在 GUI 子系统下的可见输出**只靠继承柄**：从终端起＝继承的是控制台柄（有效，attach 那段本来也不需要跑）；管道起＝有效；**双击／无终端起＝与态乙同形**。`docs/BUILD.md` 不在本腿射程，且这两枚是不是"该 attach"属设计判断——⛔ 本腿只登记，判它归编排者。
 
 ---
 
