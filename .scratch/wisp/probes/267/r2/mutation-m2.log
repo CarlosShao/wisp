@@ -1,0 +1,12 @@
+time=2026-10-05T10:13:00.316+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-05T10:13:01.682+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/05 10:13:01 mockllm: serving on http://127.0.0.1:53028 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-05T10:13:01.718+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution1037735007\002\logs min_level=info early_records=2 early_dropped=0
+--- FAIL: TestUnansweredL2CardTimesOutIntoRejectNeverExecution (1.41s)
+    approval_reply_201_test.go:470: exit 2
+        
+        [audit] perm: MODE-READ-FAILED path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestUnansweredL2CardTimesOutIntoRejectNeverExecution1037735007\\002\\config.toml" err=config: config.toml: risk.confirm_timeout_sec 30 out of range [31, 3600] mode=ask_every_step origin=startup result=fail-closed detail="档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）"
+        wisp run: 配置未就绪（Unconfigured）：config: config.toml: risk.confirm_timeout_sec 30 out of range [31, 3600]
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.492s
+FAIL

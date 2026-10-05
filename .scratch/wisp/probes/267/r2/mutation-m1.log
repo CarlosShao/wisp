@@ -1,0 +1,34 @@
+time=2026-10-05T10:11:49.679+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-05T10:11:51.062+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/05 10:11:51 mockllm: serving on http://127.0.0.1:52554 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-05T10:11:51.090+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2339884928\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-05T10:11:51.122+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2339884928\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-05T10:11:51.132+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-05T02:11:51Z duration_ms=10
+time=2026-10-05T10:11:51.140+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2339884928\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-05T10:11:51.146+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-05T02:11:51Z duration_ms=5
+time=2026-10-05T10:11:51.151+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-05T10:11:51.154+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-05T10:12:22.206+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestUnansweredL2CardTimesOutIntoRejectNeverExecution (32.54s)
+    approval_reply_201_test.go:504: the C18 pre-timeout warning never reached the console: lead = 31s - 30s = 1s > 0 must arm it (gate.go:528), stdout:
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        
+        [确认 L2 fs.write] R1: 工具声明为下界（L1）; R2: 目标路径在授权目录之外: C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2339884928\003\unanswered-card-must-not-write.txt
+          规则 R1
+          规则 R2
+          取消方式：单击悬浮球：悬浮球取消不可用（未加载）
+          取消方式：取消键通道：快捷键取消不可用（未加载）
+          取消方式：面板拒绝：面板取消不可用（票 37 未接入）（未加载）
+          取消方式：说取消词：语音取消不可用（未加载）
+          影响路径：C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2339884928\003\unanswered-card-must-not-write.txt
+          窗口 0.0s
+          卡片编号：t201-timeout-corr
+        [warning] 审批将在 30 秒后自动拒绝，请尽快确认
+        [dismissed] 审批超时（31 秒未确认），C18 一律判拒绝，已自动拒绝
+        echo: ## scene
+        当前时间：2026-10-05 02:12 +00:00
+        wisp run: 任务 a41da9df-3fad-4d63-bd85-0db6b1c7b4b4 结束（completed，1 轮，0 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	32.607s
+FAIL

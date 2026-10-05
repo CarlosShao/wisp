@@ -203,12 +203,49 @@
 6. **`Q-77`（配置值 vs C18 写死 300 s 谁优先）**：⛔ 本腿一枚字都没碰，§4 那句提示里的"30 秒"是 `DefaultApprovalWarning` 现算的，不是 300 s 那一枚；主一句话之前，本腿不裁。
 7. **量不到的那一格**：常驻腿（GUI）`ballCardUI` 收到 `EventWarning` 之后**页面上到底显出什么**——尺子够不着（`cmd/wisp/resident_approval_windows.go:878` 只读到 `case approval.EventWarning:` 那一层，再往下是 `frontend/**`／`design/**`，⛔ 本腿不许读，也不在此转述）。**归口＝票 268／界面会话**（票 268 的 provenance 那一支本来就在常驻腿）。
 
-## §8 污染面与提交名册
+## §8 污染面与提交名册 ＋ 票面 AC 框零改动自证
 
-逐笔 `git show --name-only`＋票面 AC 框零改动自证＋写面越界尺。
+**commit 名册（逐笔 `git show --name-only`，本腿共四笔，只 commit、⛔ 从未 push）**
 
-## §9 我写错的读数
+| 笔 | 名册（该笔唯一改动面） |
+|---|---|
+| `00f0ef97` | `.scratch/wisp/probes/267/r2/evidence.md`（骨架，1 file changed, 46 insertions） |
+| `32e74479` | `cmd/wisp/approval_reply_201_test.go`／`cmd/wisp/approval_seam_201_test.go`／`cmd/wisp/panel_pump_test.go`／`cmd/wisp/run_mode101_test.go`／`cmd/wisp/ticket224_assembly_test.go`＝**5 files changed, 30 insertions(+), 13 deletions(-)** |
+| `5fa0d28c` | `.scratch/wisp/probes/267/r2/evidence.md`（§0–§7 填实，191 insertions／23 deletions） |
+| 收尾笔（本件之后一笔，名册只有 `.scratch/wisp/probes/267/r2/**`） | 证据件 §8–§10 ＋全部台件（`cmdwisp-after.log`／`cmdwisp-after.stamp`／`mutation-m1.log`／`mutation-m2.log`／`timeout-case-after.log`／`ac14-rerun1.log`／`d22scan.log`／`path-length.log`／`dur-*.txt`／`run-*.txt`／`pristine/models.go.pristine`／三枚 `commit-msg-*.txt`） |
 
-自我对抗：名册尺／观察对象搬家／行号漂移／注释与字面量不一致／突变是否真有牙。
+- **写面并集（尺＝三笔 `git show --name-only` 去重，10:2x 现跑）**＝6 枚路径：五枚 `cmd/wisp/*_test.go` ＋本证据件 ⇒ 与派单给的闭集**逐枚相同，零越界**。
+- **禁区尺**（同一把尺对 12 个禁区形态取反）：`internal/config`／`internal/agent/approval`／`internal/risk`／`thresholds.go`／`golden`／`allowlist.txt`／`docs/PLAN.md`／`docs/specs`／`.github`／`scripts/`／`frontend/`／`design/`／`.scratch/wisp/issues` 命中＝**0 行**。
+- **票面 AC 框零改动自证**：`git status --porcelain -- .scratch/wisp/issues`＝**零行**；票 267 现态＝`AC#0`/`AC#1`/`AC#2`/`AC#3` 已是 `[x]`（编排者 09:5x 翻的，见票面「编排者收件」节），**`AC#4` 仍是 `[ ]`**（票面 `:31`）⇒ 本腿一枚未翻、未改字形。
+- **`context.WithTimeout` 全株比对**（兑现 §3 那句"⛔ 没动别枚"）：尺＝`grep -n "context.WithTimeout"` 对 `32e74479^` 与现树的 `cmd/wisp/*.go` 逐行 diff ⇒ **唯一差异＝`panel_pump_test.go:112` 的 30 到 45**；`approval_reply_201_test.go` 那枚 5 s（`:684`，现 `:701`）计数前后都＝1、句子未变。
+- **断言/阈值零改动自证**：`git show --stat 32e74479` 的 13 枚删除＝12 枚种子行＋1 枚 ctx 行，30 枚插入＝同 13 行的新版 ＋ 17 行新增块（§4.2 那段，含 9 行注释）⇒ **没有任何既有断言被改写**（本腿没动过一句 `t.Fatal`/`t.Errorf`，新增的是**另一枚** `t.Errorf`）。
+- **污染面（本腿自己造过一枚，已消解并具名）**：为判 `gofumpt -l` 那枚 `models.go` 是不是本腿造的，本腿用 `git cat-file blob HEAD:cmd/wisp/models.go > .scratch/wisp/probes/267/r2/pristine/models.go` 落了一枚副本 ⇒ **它落在模块内**：`go list -e ./.scratch/wisp/probes/267/r2/pristine/` 返回 `github.com/CarlosShao/wisp/.scratch/...pristine`，`go vet` 该目录报 `vet.exe: ...models.go:110:18: undefined: resolveDataDir` ⇒ 这会让 CI 的 `go vet ./...`（`.github/workflows/ci.yml:207`）多咬一口。**处置＝改名**为 `pristine/models.go.pristine`（⛔ 未删，字节原样留着＝临时件只建不删），复尺 `go vet` 该目录＝`no Go files in ...\pristine` ⇒ 不再成包。⚠ 顺带量到一枚**与本腿无关的系统性暴露**具名给编排者：`git ls-files -- .scratch | grep -c "\.go$"`＝**264 枚 tracked 的 `.go`**（分布在 127 枚目录）今天就在 `go vet ./...` 的射程里，本腿那一枚只是其中刚被摘掉的一枚；这条归治理票，不归本腿。
+- **占位符尺**（本件收尾时同发跑，读数在 §10 末条）：尺＝对那四个占位词形（以「待／未」起头那一族）**逐词** `grep -c`，⛔ 词形不在正文复写，否则尺咬到自己（本腿第一把尺就命中 2 枚、两处都是尺自己的词形＝假阳性，已就地更正）。反例记名＝`267-r1` 那把把竖线写进**基本正则**的尺（ERE 的 `|` 在基本正则里是字面竖线 ⇒ 四个词被当一条字面串、恒返 0＝瞎尺），本腿改用转义竖线 `\|` 复跑过。
+
+## §9 我写错的读数（自我对抗，本腿自己写的）
+
+1. **"40 s 有 15 枚先例"数错了**：15 是**带内喂值点总数**（40×10＋90×4＋60×1），单算 40 的先例是 **10 枚**。§2 已就地改成"10 枚现成先例（另 90×4、60×1，共 15 枚带内喂值点）"；原话留着不抹。
+2. **★我吞过一枚标题**：填 §0＋§1 那次 Edit 的 `old_string` 覆盖到了骨架的 `## §2` 标题与其正文 ⇒ 现树的 §2 是后来重写回去的。发现尺＝`git show 00f0ef97:<本件> | grep -n "^## "`（骨架 11 枚）与现树标题名册对撞（那一度只有 10 枚）。⇒ 教训具名：**同一枚文件里连做多次区间替换，必须拿"骨架标题名册"当尺复点**，否则少一节我看不见。
+3. **派单那句"其余 9 枚答完卡就走＝零增量"我照抄了没先验** ⇒ 实测 `TestTicket101SessionGrantDoesNotCrossRestart` 81.70 s、`...ManualSwitchSurvivesRestart` 42.24 s：那族**真的在等这枚钟**（重启若干次、每次等一张没人答的卡到点）。总墙钟实测 ＋242.7 s vs 预估 ＋58 s。⇒ 写进 §5／§7 并给出可选更形，⛔ 没有替派单圆成"大致符合"。
+4. **`docs` 那 24 行我一开始读成"零命中"**：第一把尺 `grep -rln ... | head -20` 被 `.scratch` 的文件挤满了前 20 行 ⇒ 假阴性。复尺（`for r in ...; do ... | wc -l; done`）才量到 `docs=24 tools=0 scripts=0`。⇒ 教训：**计数尺不许挂 `head`**。
+5. **行号抄过一次的险**：§2 初稿直接写派单给的 `:504/:578`，`grep` 复尺发现本腿新断言插了 17 行、它们已在 `:521/:595`。已在 §2 具名标"迁移前／迁移后"两号。⇒ 与仓里今天的定式一致：**引用行号前先用那串字符当尺**。
+6. **`gofumpt -l cmd/wisp/` 不是零命中**：`cmd\wisp\models.go` 那枚是预存 CRLF（`file`＋`gofmt -l`＋`git diff --name-only` 三把尺）。我差点把它写成"本腿全绿"，改为如实写"非零项，但非本腿所造"。⛔ 本腿没有去"顺手格式化它"（越界）。
+7. **M1 的牙齿有边界，我不夸大**：M1 证明的是"句子或前缀变了就红"；**它没有**证明"提示不发时这一发红"——因为带内任意种子的 `lead ≥ 1 s`，"不发"那一支在 `_test.go` 写面内不可表达（M2 只证明了拒载那支）。这一格的正写已在 §4.3 末条，归口＝编排者是否另派 approval 层的腿。⛔ 没把"两发突变"写成"三发已齐"。
+8. **我差点污染 CI**：§8 那枚 `pristine/models.go` 副本是本腿造的、本腿量到它进模块并改名消解。⇒ 教训：**诊断用的原件改名加后缀，别留 `.go`**。
+9. **`--author` 不能当"我的 commit"尺**：共享配置下所有腿同一个 `user.name`，`git log --author=...` 把 `267-a3` 的件也捞进来 ⇒ 本件名册一律按 hash 具名。
+10. **★观察对象搬家逐枚复检（派单硬要求）**：
+    - #2（`panel_pump`）／#6（timeout 那发）抬到 **31**：观察对象仍是"卡开合／超时本身"，凭据＝§3 那两行 stdout（`[warning] ...` ＋ `[dismissed] 审批超时（31 秒未确认）...`）与 `TestRunBooksWithASnapshotOfItsLiveQueue` 32.60 s 走的是超时支；ctx 那枚配套件就是为守这一格。
+    - #1（`run_mode101`）抬到 **40**：该族观察对象＝档位读写／重启存活，仍然成立（迁移后五枚 101 用例全绿，含三枚子测首次登记）⇒ 没搬家；**但它顺带暴露"这族其实在等这枚钟"**（见第 3 条），这条代价先前没人量过。
+    - #3/#4/#5/#7/#8/#9/#10/#11/#12 抬到 **40**：实测各 1.2–4.0 s（远小于 40 s）⇒ 40 s 那枚钟从未轮到，答完卡就走的原话在这些枚**为真**；同发放宽性读数：`TestL1Veto...` 4.54 s（含两枚子测）、`TestTicket224LiveGrant...` 3.96 s。
+    - ⇒ 结论：**零枚发生观察对象搬家**；错的那格不是"抬错值"，是"没人量过 40 s 让哪一发真等满"（第 3 条）。
+11. **§0 起手读数我只截了 30 行**：`head -30` 的 `.scratch` 名册不完整（同一文件里 `??` 项远多于 30 行）⇒ 那一节的话说成"cmd/internal 零条"是完整的（两棵子树各自单独取过），但"全树脏面"这句我不能声称数全过。已按此限定措辞。
 
 ## §10 交件判语
+
+- **做完的**：12 枚带外种子全部抬进带内（10 枚 `%d` 喂值点→40 s、#2 与 #6→31 s、#1→40 s 且同行 `l1_window_sec = 1` 一字未动）；★配套件 `panel_pump_test.go:112` 的 ctx 30 s→45 s 已连带抬；★票 267 AC#2 那半格的**正向读数已拿到并写死**（种 31 ⇒ 那句 `[warning] 审批将在 30 秒后自动拒绝，请尽快确认` 真到达装配根控制台 stdout，M1/M2 两发突变各自红、红句逐字在 §4.3）。
+- **门禁**：`cmd/wisp` 整包 `=== RUN=323／PASS=226／--- FAIL=1／--- SKIP=0`（10:13:30→10:21:08，PATH 带 `third_party/sherpa-onnx`，rc=1）；`internal/config` `ok 1.212s`；`d22scan` clean rc=0；`check-path-length-budget --with-self-test` VERDICT GREEN rc=0；`go vet ./cmd/wisp/` rc=0；`gofumpt -l cmd/wisp/` 只剩预存的 `models.go`（CRLF，非本腿）。
+- **红名作差**：基线 16 枚**逐名全转绿**，账算得平（211＋16−1＝226）；新增红 **1 枚**＝`TestAC14GoSideEvalPushReachesThePage`，红句逐字在 §6，四条排除性读数齐备，⛔ 本腿没有自行判它"无关"，**标〔未归因，归编排者〕**。
+- **墙钟**：实测 ＋242.7 s（不是 ＋58 s），逐枚具名；本腿⛔未做任何"为快而压种子／压超时／加 Skip"的动作。
+- **交件判定**：**本腿这一腿可收**（出口甲的射程全部落地，AC#4 的凭据里"红名逐名比对＋时刻"这一半已齐）；**留给编排者的三格**＝① 那枚新增红的裁决（同 HEAD 复跑一次即可归因），② `run_mode101` 族是否改取 31 以省 9 秒×2（要重跑整包才配得上同发读数），③ `panel_pump_test.go:124` 那句注释里的过期数字 2（写面闭集外，需具名解冻或另派）。
+- **占位符自尺（同发读数）**：10:31:07 第一把尺命中 **2 枚**，两处都是尺自身写下的词形（假阳性，已在 §8 那一条就地更正并把词形从正文摘掉）；复尺逐词计数读数与时刻写在下一行，⛔ 本件交件时全文不含任何一节处于未完成状态。
+  - 复尺读数：**10:33:01** 同发两把——逐词 `grep -c`＝**0／0／0／0**，合尺（转义竖线四词一并）＝**0** ⇒ 交件时全文零枚占位。（中间态 10:31:07＝2、10:32:07＝逐词 0，都是尺自身的词形造成的，已就地更正；⚠ 10:32:07 那次只跑了逐词那一把，合尺补跑在 10:33:01。）
