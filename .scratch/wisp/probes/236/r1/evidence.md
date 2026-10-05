@@ -260,6 +260,19 @@ diff logs/arc236-selftest-before.txt logs/arc236-selftest-after.txt -> 8 行 / 1
 （后两枚连读都没读）、`go build`（除该模块 self-test 里那条既有 `go build -o <TempDir>` 由 `go test` 自己带出的）、
 `attrib.sh`、`gh`／任何 push。
 
+**终尺（本腿四笔全部入库之后复跑一遍整套，锚 `c216fe4b`，13:10:53 至 13:11:58 +0800）**：
+
+| 门 | 时刻 | 读数 |
+|---|---|---|
+| `sh scripts/d22scan.sh` | `13:10:53` | **clean**、rc=0（`no D22 ban violations`，逐行自报的 live scope 与 §4 改后那一发同数） |
+| `bash scripts/check-path-length-budget.sh --with-self-test` | `13:11:25` | **VERDICT GREEN**、rc=0 |
+| `go vet ./...`（`tools/d22scan`） | `13:11:31` | rc=0、零输出 |
+| `go test -count=1 ./...`（`tools/d22scan`） | `13:11:32` | **ok** 25.904s、rc=0 |
+| `go run . -self-test` | `13:11:58` | rc=0、判据行 **40** 枚（含 ` OK `）、`clean - all 40 direction checks passed (20 expect-ring, 20 expect-silent)` |
+
+=> 四笔入库后没有把任何一门改红；`-self-test` 那 40 项与本腿起手基线（`12:40:30`，改前）逐字同形。
+终尺输出落档＝`logs/final-gate-d22scan.txt`、`logs/final-gate-pathlen.txt`、`logs/final-selftest.txt`（第五笔）。
+
 ---
 
 ## §5 判不动／量不到／与我无关但影响读数的（逐枚具名）
@@ -302,7 +315,8 @@ diff logs/arc236-selftest-before.txt logs/arc236-selftest-after.txt -> 8 行 / 1
   那是 257-v1 在 12:56:34 的结案笔；12:44 到 12:58 之间 HEAD 走了 4 枚，全是别人的入库，锚漂是常态）。
 - **我这枚 commit 2 自己造过一次分母污染（自纠，具名）**：为留"改前／改后逐字节对照"，我把两枚 Go 源副本
   以 **`.go` 后缀**放进了 `logs/` 并入库 => tracked `.go` 分母从 924 顶到 **926**，
-  且那枚改前副本（`arc236-selftest-orig.go`，＝修前的脏字节本体）在归档形上被 `gofumpt -l` **点名**（现读：打印该路径、rc=0）。
+  且那枚改前副本（路径以污染锚 `cfd97636` 为准＝`arc236-selftest-orig.go`，commit 3 起改名 `arc236-selftest-orig.go.pristine`，
+  下面两处的历史路径同理）在归档形上被 `gofumpt -l` **点名**（现读：打印该路径、rc=0）。
   => 我一边交付"非台件 0 枚"，一边亲手往名册里加了一枚新的脏台件——这正是本票要治的那一形（`A620` 的 19->20 同源）。
   修法走本仓既有先例（票 267 `pristine/models.go` -> `models.go.pristine`；普查件 §2 乙-1 尺＝在册 17 枚 `.pristine`）＝**只改后缀、不动字节**，
   两件 md5 逐枚全等：改前改后都 `bbc0bd946e1117e437c58939e867112e`（orig）与 `b56c7636473283cf453fee9178e53498`（fixed）。
@@ -402,6 +416,7 @@ diff logs/arc236-selftest-before.txt logs/arc236-selftest-after.txt -> 8 行 / 1
 
    对照读数（那把我漏掉的尺为什么必须补）：同一把尺在**污染锚** `cfd97636`（我的 commit 2）上＝
    分母 **926**、名册 **20 枚**，多出来的一枚逐字是 `.scratch/wisp/probes/236/r1/logs/arc236-selftest-orig.go`
+   （该路径只存在于污染锚 `cfd97636`；commit 3 起它叫 `arc236-selftest-orig.go.pristine`，两枚名都以各自锚为准，别拿今日盘上尺去复核它）
    （尺与名册＝`logs/polluted-roster-at-cfd97636.txt`，20 行）。交付数以 `00629ea9` 这一发为准：**19 枚、非台件 0 枚**。
    落档件＝`logs/final-roster.txt`（19 行）、`logs/final-gofumpt-stdout.txt`（18 行）、`logs/final-gofumpt-stderr.txt`（1 行）、
    `logs/polluted-roster-at-cfd97636.txt`（20 行，那一次污染的现场名册）。

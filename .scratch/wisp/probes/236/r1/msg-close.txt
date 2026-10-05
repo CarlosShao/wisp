@@ -1,0 +1,23 @@
+docs(evidence/236-r1): 第五笔（收尾）——四笔全部入库后的门禁终尺落档，两处历史路径加锚限定
+
+门禁终尺（本腿四笔全部入库之后整套复跑，锚 c216fe4b，13:10:53 至 13:11:58 +0800）：
+  sh scripts/d22scan.sh rc=0（clean - no D22 ban violations）
+  bash scripts/check-path-length-budget.sh --with-self-test rc=0（VERDICT GREEN）
+  cd tools/d22scan && go vet ./... rc=0（零输出）
+  go test -count=1 ./... rc=0（ok 25.904s）
+  go run . -self-test rc=0（40 枚判据行全 OK；clean - all 40 direction checks passed，20 expect-ring／20 expect-silent）
+=> 四笔入库没有把任何一门改红；-self-test 与本腿起手基线（12:40:30，改前那一发）逐字同形。
+落档＝logs/final-gate-d22scan.txt、logs/final-gate-pathlen.txt、logs/final-selftest.txt、logs/final-gate-rc.txt。
+
+件内两处历史路径加了锚限定：arc236-selftest-orig.go 这个文件名只存在于污染锚 cfd97636（我的 commit 2），
+commit 3 起它叫 arc236-selftest-orig.go.pristine；两处引用都按各自锚为准，免得下一位拿今日盘上尺去复核一条历史名。
+存在性终尺复跑＝件里引用的每一枚"今日应当存在"的 logs 路径都在盘上（MISSING 零枚）。
+
+本笔零产码、零 rename、零 rm；只动 .scratch/wisp/probes/236/r1/**；
+ci.yml、别人的台件、main.go 的九条禁令射程、allowlist.txt、票面 AC 框与台账照旧零字节；未 push。
+
+交付回顾（详情在 evidence.md）：
+  格一＝tools/d22scan/selftest.go 格式化到 gofumpt 干净（2 增 2 删、1 枚 hunk、640 行未漂、逐枚全在格式）。
+  格二＝修完之后 tracked 分母（整树归档 × tracked 全集 924 枚 .go × gofumpt v0.12.0 × stdout＋stderr）
+        脏 **19 枚**，**19 枚全部落在 .scratch/wisp/probes/**，非台件 0 枚**；
+        锚 b3eabab7（12:45:58）与含全部笔的 00629ea9／c216fe4b 同答 19，名册 diff 空。
