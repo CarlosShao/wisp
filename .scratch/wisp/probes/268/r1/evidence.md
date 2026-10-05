@@ -67,6 +67,7 @@
 | 红名册 | **空**（`grep '^--- FAIL\|^    --- FAIL'` → 0 行） | 13:13:5x |
 | 交付态复跑同一把尺（三发突变全部还原之后、代码与 §4 那四门同形） | **RUN 334／PASS 334／FAIL 0／SKIP 0**，包尾 `ok github.com/CarlosShao/wisp/cmd/wisp 401.239s`，`rc=0`，台件 `deliver-cmdwisp.log`（1,724 行） | 止 15:12:06（log mtime 现量） |
 | 红名集合逐名比对（`diff baseline-top-names.txt deliver-top-names.txt`） | 差集＝**只多我三枚**：`TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig`／`TestTicket268RefusedRiskConfigReachesStdoutOnce`／`TestTicket268RefusedBranchClassifiesBySentinelNotByErrorWords`；**一枚未少、一枚未红**（235 枚 → 238 枚顶层名，`--- ` 级） | 15:12:5x |
+| 那一行 stdout 在整包里的出现枚数（`grep -c 'wisp: resident \[risk\]'`） | 交付态 `deliver-cmdwisp.log`＝**1 枚**（用例① 那次未被捕获的构造，行原文含 `out of range [31, 3600]` 与 `DefaultApprovalTimeout=300s`）、基线 `baseline-cmdwisp.log`＝**0 枚**（代码尚不存在）。⇒ 与 §0 补读 2 同因：既有用例里带外 confirm 种子 0 枚，所以整包只在我自己那枚用例上出现一次 | 16:0x |
 | 两发包尾耗时并记（不作读数，只作负载登记） | 基线 `466.320s`（起跑前 `go.exe`＝0，但同机另有 244-a4／parking-1 在读与在写文档）／交付 `401.239s` ⇒ 差 65 s 属他腿负载，**不判为"我变快了"** | 13:13:47／15:12:06 |
 
 **⛔ 未压种子、未 `t.Skip`、未把 SKIP 读成通过**（SKIP＝0 枚，本就无此面）。
@@ -271,7 +272,8 @@ MUT-1 附带的一枚现场证据（**盘上日志原文**，`mut1-red.log` 里�
 |---|---|---|---|---|
 | 1 | `4c456d0a` | 2026-10-05 13:05:34 | 起手：§0 锚逐枚亲读＋证据件骨架八节＋票面 Progress log 首行 | 3（全在 `.scratch/wisp/`，零产码） |
 | 2 | `9a941965` | 2026-10-05 13:31:53 | 落地：A 支分叉＋新常量＋B 支一行 stdout＋三枚新用例＋基线后 §0-§3 填实＋msg-02 | 5（2 枚产码＋3 枚文档面） |
-| 3 | 本笔（HEAD 顶行，hash 见 `git log --oneline -1`） | 2026-10-05 15:4x（本笔动作自身时刻，非抄本表） | 交付态：§1 交付整包＋§4 四门复跑（15:25:29–15:26:39）＋§5 三发突变名册＋§6 判不动十格＋§7＋msg-03＋票面 Progress log 第 3、4 行 | 见 `git show --name-only HEAD` |
+| 3 | `b93624d4` | 2026-10-05 16:02:29 | 交付态：§1 交付整包＋§4 四门复跑（15:25:29–15:26:39）＋§5 三发突变名册＋§6 判不动十格＋§7＋msg-03＋票面 Progress log 第 3、4 行＋11 枚台件入库 | 11（`git show --name-only HEAD` 现量：票面＋`probes/268/r1/` 十枚；**零产码路径**） |
+| 4 | 更正笔（本表第 3 行的实测回填；⛔ 不预测自己的号） | 16:0x | 把第 3 行的 hash 与时刻从占位改成实测，并补 §1 那行"stdout 行在整包里的出现枚数"读数 | 2（票面＋本件） |
 
 ⚠ 纪律自陈：本腿**只 commit、未 push**；三笔全部带显式 pathspec（`git add` 也只 add 点名路径），
 中途没有过任何裸 `git commit`（派单点名的 `3f0c4fff` 事故形状本腿避开了——a2 §0 末条的教训"显式 pathspec 只守 add 不守 commit"在本腿这里是 add＋commit 双守）。
