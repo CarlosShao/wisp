@@ -106,7 +106,7 @@
 |---|---|---|---|---|---|
 | MUT-1 | `:456` 新常量字面折回旧那枚：`riskProvenanceRefusedAtLoad = "defaults (config.toml unreadable)"`（＝AC#1 要求自证的"两枚状态又共用一张脸"） | 种 21:52:49（md5 现量 `e03e7d700f00d26f79186b3e99dc9888`，≠交付态 `69a630bf…`）／跑 21:53:14 | 21:53:17（`rc=1`） | **只用例① 红**：`--- FAIL: TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig`；②③ **未列红**（该跑形只 `-run 'TestTicket268'`，红名册整份三行 `:9-11` 全属①，`grep -c '^--- FAIL'`＝**1**）⇒ 与 r1 §5「只 ① 红」同形 | 21:53:47 `git cat-file blob HEAD:cmd/wisp/resident_approval_windows.go > cmd/wisp/resident_approval_windows.go` ⇒ `md5sum`＝`69a630bf350daf1032c62b921e9d7044` ＝ `git cat-file blob HEAD:… \| md5sum` **双读同值**；`git diff --name-only -- cmd/wisp`＝**0 行**；`grep -c "MUT-"`＝**0** |
 | MUT-2 | 摘掉被拒支那一行 stdout——形＝把 `:510-512` 那枚 `fmt.Printf` 三行整段注释掉（⛔ 不留 `_ = err` 之类的补钉：那样会多一枚与本票无关的形状；注释后 `err` 仍被上一行 `slog.Warn` 的 `"err", err` 使用 ⇒ 编译干净，`go test` 能起跑即为证） | 种 21:58:58（md5 现量 `90c4ad0a04fe5d500185188f3f562ec6`）／跑 21:59:08 | 21:59:13（`rc=1`） | **②③ 双红、① 绿**（`-v` 形逐枚可见：`:--- PASS` 只有 ①，红名册 `grep -c '^--- FAIL'`＝**2**）——② 那三句量的正是"stdout 恰 1 行"＋两枚必带文案，③ 的 `fmt.Printf` 计数尺从 1 掉到 0 ⇒ **② 不是恒绿装饰**；与 r1 §5 MUT-2「②③ 双红」同形 | 21:59:28 `git cat-file blob HEAD:… > …` ⇒ `md5sum`＝`69a630bf350daf1032c62b921e9d7044`＝HEAD blob 双读同值；`git diff --name-only -- cmd/wisp`＝**0 行** |
-| MUT-3 | 在哨兵旁边**加**一次 prose/`err.Error()` 字符串匹配、行为逐字不变——证 ③ 咬的是"靠文案分类"这件事 | 「待验」 | 「待验」 | 「待验」 | 「待验」 |
+| MUT-3 | 在哨兵旁边**加**一次 prose/`err.Error()` 字符串匹配、行为逐字不变——形＝`if err != nil && err.Error()[:1] == "X" { }`（**空体**，插在 `:481` 那枚哨兵支闭合之后、被拒支之前），照 r1 §5 同形。⚠ **本腿的一处过程留痕（如实登记，未影响任何读数）**：第一版种子写的是 `_ = strings.Contains(err.Error(), "out of range")`——那一形**根本编译不过**（本文件 import 块亲读＝`context/errors/fmt/io/fs/log/slog/path/filepath/sync/time`＋internal，**没有 `strings`**，§0.2 早量过这点），本腿在**任何 go 命令之前**（22:03 种子 → 22:04 改形 → 22:05:16 才首发）换成 r1 那一形。⇒ 与 r1 那句"纯文案支会因 `io/fs` 变成未使用而编译不过，故取这一形"是同一处地形的第二次踩到，**这枚突变必须"只多一处 prose 调用、不动 import"** | 种 22:04:59（md5 现量 `25f2ca072d74c3776f48ff246ebe05a4`；needle `err.Error()[:1] == "X"` 现量 **1** 处）／跑 22:05:16 | 22:05:21（`rc=1`） | **只 ③ 红**（`-v` 名册逐枚：① ② 各 `--- PASS` 可见、红名册 `grep -c '^--- FAIL'`＝**1**；同发产码 stdout 行仍印 **1** 次＝行为面一字未变的旁证）。红句＝③ 的 prose 尺 `[err.Error()]` ⇒ **③ 咬的是"靠文案分类"这件事**，不是咬某个具体断言的巧合；与 r1 §5 MUT-3「只 ③ 红」同形 | 22:05:39 `git cat-file blob HEAD:… > …` ⇒ `md5sum`＝`69a630bf350daf1032c62b921e9d7044`＝HEAD blob 双读同值；`grep -c "MUT-"`＝**0**；`git diff --name-only -- cmd/wisp internal`＝**0 行** |
 
 **红句逐字**（原文抄自本腿台件，行号＝台件行）：
 
@@ -127,7 +127,15 @@ resident_approval_risk_268_windows_test.go:208: the stdout line has to say what 
 resident_approval_risk_268_windows_test.go:285: residentRiskGateValues holds 0 fmt.Printf calls, want exactly 1: AC#1's user-visible face is the other half of this branch, and a branch that only logs to disk does not reach the eye of anyone who launched the process from a terminal
 ```
 
-MUT-3（`v2-mut3-red.log`）：「待验」
+MUT-3（`v2-mut3-red.log:17`，一发）：
+
+```
+resident_approval_risk_268_windows_test.go:281: residentRiskGateValues classifies by prose through [err.Error()]: matching an error message is the shape config_reload.go:396 already carries and ticket 268 was told not to copy - a reworded loader sentence would silently re-fold the two shapes
+```
+
+**三发红句与 r1 §5 的逐字对照**（尺＝同一枚 `sed -n` 取台件行后直接比文本）：
+MUT-1 三句＝r1 `mut1-red.log:46-48` 同三句（行号 125/129/147 一致）；MUT-2 四句＝r1 `mut2-red.log:50/51/52/57` 同四句（201/205/208/285）；
+MUT-3 一句＝r1 `mut3-red.log:55` 同句（281）。⇒ **两枚腿各自种的突变各自跑红，红句与断言行号逐字复现**，测试文件字节面本腿零触（`e2405a21…` 双读同值）。
 
 **MUT-1 附带的现场名实不符（盘上日志原文，非转述）**：`v2-mut1-red.log:4` 被拒支印
 `msg="resident gate: [risk] source present but refused at construction; …" provenance="defaults (config.toml unreadable)"`——
@@ -140,8 +148,14 @@ MUT-3（`v2-mut3-red.log`）：「待验」
 ⇒ 本腿**量不到**"票 256 五枚钉在这一发突变下是否仍绿"那一半（那是 r1 §5 三行都点名的隔离证），只复认三行的**红名册方向**：
 MUT-1 只红①（r1 同）／MUT-2 ②③ 双红（r1 同）／MUT-3 只红③（r1 同）。红句文本本腿与 r1 **逐字同**（三处都对得上台件行，见上）。
 
-**三形全种完后的收口（本节末行，逐格填）**：MUT-3 还原后 `md5sum` 双读同值＝`69a630bf350daf1032c62b921e9d7044`、
-`git diff --name-only -- cmd/wisp`＝**0 行**、测试文件 md5 未变＝`e2405a21bb278b558c1305ea95d34a9b` ⇒ **产码零净变化**、「除还原外未动测试文件与产码」成立。
+**三形全种完后的收口（逐格实测）**：MUT-3 还原后 `md5sum` 双读同值＝`69a630bf350daf1032c62b921e9d7044`（22:05:39）；
+`grep -c "MUT-"`＝**0**；`git diff --name-only -- cmd/wisp internal`＝**0 行**；测试文件 `md5sum`＝`e2405a21bb278b558c1305ea95d34a9b`＝HEAD blob 双读同值（22:05:39）
+⇒ **产码零净变化**、「除还原外未动测试文件与产码」成立。
+**还原后负控一发**（22:08:13→22:08:16，台件 `v2-targeted-after-restore.log`＝5,957 字节，与起手负控**同字节数**）：
+三枚 `--- PASS` 逐枚可见、`ok … 0.092s`、`rc=0`；行首产码 stdout 句 **1**、`provenance="defaults (config.toml present but refused at load)"` **4**——
+两个计数与起手负控（`v2-targeted-baseline-v.log`）逐枚同值 ⇒ 突变窗已闭合，本件后续读数读的是交付态字节。
+**负载闸全程读数（每发 go 之前现量，⛔ 无任一发 ≥70% 起）**：21:45:40 CPU 34/MEM 69.5 → 21:52:11 26/69.7 → 21:55:27 46/70.2 → 22:01:58 19/70.2 → 22:04:59 49/— → 22:07:52 24/69.7 → 22:08:32 20/—；
+21:55 与 22:01 两采 MEM 触 70.x ⇒ 依派单**先落一笔文书 commit（不占 CPU）再复量**才起下一发，未硬闯。
 
 ## §3 名册差集（v1b 复跑名册 vs 268-r1 vs probes/257/v1）——**不重跑，从三枚现成文件算**
 
