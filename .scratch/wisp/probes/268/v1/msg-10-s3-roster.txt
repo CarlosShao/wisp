@@ -1,0 +1,26 @@
+probes(268-v1b 笔1)：填 §3 名册差集——⛔ 零重跑，全部从三枚已在盘的日志算
+
+派单明令不要重跑整包，本节每一枚读数都出自现成件，尺逐枚同一条
+（`grep -E '^--- (PASS|FAIL|SKIP)' | sed -E 's/^--- ([A-Z]+): ([^ ]+).*/\1: \2/'`＝顶层名册，缩进子枚不计）：
+
+1. v1b(238) vs 268-r1 交付态(238)：`diff` 空，逐名同集同序（顶层 `=== RUN`/`--- PASS` 序列 `diff` 亦空）。
+2. v1b vs 268-r1 基线(235)：净增恰 3 枚＝268 家族三枚用例名；少 0、红 0。
+3. v1b vs `257/v1/names-mine.txt`(235) 与 `names-theirs.txt`(235)：都＝净增同 3 枚、少 0 枚。
+4. `257/v1/names-mine` vs `268/r1/baseline-top-names`：`diff` 空＝今天那 235 枚绿底有同日他票的第三方独立复认。
+
+枚数账（三发同尺同形）：`=== RUN` 顶层 331/334/334、`^--- PASS` 顶层 235/238/238、
+`    --- PASS` 子枚三发都 96、全量 `--- PASS` 331/334/334、FAIL 0、SKIP 0。
+⇒ r1 那句「RUN 334／PASS 334」不是漂字：334＝全量 PASS（238 顶层＋96 子枚），本腿无退回。
+
+1,723 vs 1,724 那一行差＝`diff` 定位在尾部 `1723,1724c1723`，r1 那发多的是腿自己 echo 的 `rc=0` 注脚，
+不是测试输出；`wc -l` 与 `grep -c ''` 在每枚件上同读数（末字节 `\n`，`od -c` 亲读）。
+
+stdout 那行跨发计数（r1 §7.2 同尺）＝基线 0／r1 交付 1／v1 交付 1，r1 报数复现；
+v1 那枚出现处 `:1002`，`=== RUN` 归属＝268 用例①，紧邻上下两行分别是 `slog.Warn` 与 `slog.Info`
+的同值 `provenance="defaults (config.toml present but refused at load)"` ⇒ 被拒支三面对齐。
+
+⚠ 具名一处不作证据：`257/v1/roster-mine.txt` 首行 `FAIL: TestAC14GoSideEvalPushReachesThePage` 属 257 腿自己窗口的读数，
+本尺只取名集；该用例在 r1 基线／r1 交付／v1 交付三发里逐枚 `--- PASS`。
+
+写面＝`.scratch/wisp/probes/268/v1/**` 一枚（evidence.md）＋本节台件。⛔ 零产码、⛔ 零票面、⛔ 零台账、零 go 整包。
+只 commit 不 push。

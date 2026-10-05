@@ -75,9 +75,48 @@
 
 「待验」
 
-## §3 名册差集（v1 复跑名册 vs 268-r1 vs probes/257/v1）
+## §3 名册差集（v1b 复跑名册 vs 268-r1 vs probes/257/v1）——**不重跑，从三枚现成文件算**
 
-「待验」
+派单明令 ⛔ 不重跑整包。本节全部读数出自这三枚已在盘的日志，尺逐枚同一条：
+`grep -E '^--- (PASS|FAIL|SKIP)' <log> | sed -E 's/^--- ([A-Z]+): ([^ ]+).*/\1: \2/'`（顶层名册，缩进子枚不计）。
+
+| 件 | 路径 | 行尺读数 |
+|---|---|---|
+| v1 死腿的整包（编排者代提 `164ee2c2`） | `.scratch/wisp/probes/268/v1/deliver-cmdwisp.log` | `wc -l`＝**1,723**；`grep -c ''`＝**1,723**（末字节 `\n`，`od -c` 亲读 `…422.320s\n`）；末三行＝`PASS` / `ok … 422.320s` |
+| 268-r1 交付态整包 | `.scratch/wisp/probes/268/r1/deliver-cmdwisp.log` | `wc -l`＝**1,724**；`grep -c ''`＝**1,724**；末两行＝`ok … 401.239s` / `rc=0`（**多出的那一行＝腿自己 echo 的 `rc=0` 注脚，不是测试输出**——`diff` 定位在 `1723,1724c1723`，唯一一处尾部差） |
+| 268-r1 基线整包（动笔前） | `.scratch/wisp/probes/268/r1/baseline-cmdwisp.log` | 1,708 行 |
+
+**名册枚数（同一把尺，三发一致到底）**：
+
+| 件 | `=== RUN` 顶层 | `^--- PASS` 顶层 | `    --- PASS` 子枚 | 全量 `--- PASS` | FAIL | SKIP | `ok` |
+|---|---|---|---|---|---|---|---|
+| r1 基线（13:0x） | 331 | 235 | 96 | **331** | 0 | 0 | 466.320s |
+| r1 交付（15:12） | 334 | 238 | 96 | **334** | 0 | 0 | 401.239s |
+| v1 死腿（20:15） | 334 | 238 | 96 | **334** | 0 | 0 | 422.320s |
+
+⇒ 派单引文「`ok … 422.320s`、末枚 PASS 可见」复现：末枚顶层 PASS＝`TestTicket224ProductionSessionDoesNotSurviveRestart (3.87s)`（20:15:38，`tail -6` 亲读）。
+⚠ **r1 那句「RUN 334／PASS 334」不是漂字**：334＝全量 `--- PASS`（顶层 238 ＋ 缩进子枚 96）；`=== RUN` 顶层也恰 334。三发同尺同形，本腿无退回。
+
+**差集（三枚名册去前缀、排序、`comm`）**：
+
+| 对 | 读数 |
+|---|---|
+| v1b(238) vs r1 交付(238) | `diff`＝**空**（逐名同集同序，`diff` 顶层 RUN/PASS 序列亦**空**） |
+| v1b(238) vs r1 基线(235) | 多 **3 枚**、少 **0 枚**：`TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig` / `TestTicket268RefusedRiskConfigReachesStdoutOnce` / `TestTicket268RefusedBranchClassifiesBySentinelNotByErrorWords`（与 §0.3 亲读的三枚用例名逐枚同） |
+| v1b(238) vs `257/v1/names-mine.txt`(235) | 多同 **3 枚**、少 **0 枚** |
+| v1b vs `257/v1/names-theirs.txt`(235) | 多同 **3 枚**、少 **0 枚** |
+| `257/v1/names-mine` vs `r1/baseline-top-names` | `diff`＝**空**（235 枚逐名同集＝今天绿名册的第三方独立复认） |
+| `257/v1/roster-mine.txt` 名集 vs v1b | 少 **0 枚** |
+
+⇒ **名册差集判语＝成立**：v1 死腿那次全绿整包与 r1 交付态名册**逐名同集**，268 家族净增恰 3 枚、一枚未少、一枚未红；
+257/v1 那枚**同日、他票、独立跑**的名册与 r1 基线名册同集，等于给"这 235 枚是今日绿底"补了第三方读数。
+⚠ `257/v1/roster-mine.txt` 首行是 `FAIL: TestAC14GoSideEvalPushReachesThePage`——那是 **257 腿自己的窗口里**的读数，
+本尺只取名集；该用例在 r1 基线／r1 交付／v1 交付三发里逐枚 `--- PASS`（v1 日志 `:838`，0.48s），不构成任何未少证据。
+
+**stdout 那行的跨发计数**（尺＝r1 §7.2 用的 `grep -c 'wisp: resident \[risk\]'`）：
+基线 **0** ／ r1 交付 **1** ／ v1 死腿交付 **1**——r1 报的同值复现。
+v1 那一枚出现处 `:1002`，`=== RUN` 归属＝`TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig`（20:11:50.962，`:998` 起）；
+该行紧邻上一行是 `slog.Warn` 的 `provenance="defaults (config.toml present but refused at load)"`，紧邻下一行是 `slog.Info` 同一枚 provenance ⇒ 被拒支三面对齐（日志／stdout／构造回执）。
 
 ## §4 门禁四数
 
