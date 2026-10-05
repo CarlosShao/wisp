@@ -1,0 +1,21 @@
+票 257-r2b 收尾复量（§6.3 四门复量＋§8.1 补一条姊妹腿的独立同因读数）
+
+一、§6.3 交件那一刻的四门（11:34:39 起，gate3-*.log 全文入库）
+d22scan rc=0，末行逐字 clean - no D22 ban violations（覆盖面 live scope：bans #1-5 internal/=228、cmd/=38、
+ban #6 frontend/=85、ban #7 internal/tools/=23、ban #8 四域全列）／go vet ./cmd/wisp/ rc=0、日志 0 字节／
+gofumpt 对本腿三枚零命中（整包预存的 cmd/wisp/models.go 依旧未动）／
+check-path-length-budget rc=0 VERDICT GREEN，tracked=5806（比 11:25 那发多 60 枚＝别的腿在落件）、
+over-budget=57、roster 覆盖 57、not in roster=0。
+
+二、盘上三枚写面文件的 md5 与起手快照逐枚相等（firstrun.go 0491339282492f2cabdbf5be576c8a57／
+firstrun_257_test.go 23a7a56795019fabf506f6726541b049／firstrun_257_nonpreset_test.go 4cf81b638013728575f026dab6fabf2a），
+八发 overlay 突变跑完＋两发整包跑完之后仍然一字未变＝§5.3 那条还原证明在交件这一刻复量成立。
+
+三、§8.1 补的那条：回执文案被 3f0c4fff 卷走这件事，姊妹腿在 06b66e66（11:27，subject 逐字含
+"本腿实现被 3f0c4fff 无 pathspec 卷走"）里独立量到并指向同一笔 commit ⇒ 双份读数，不是本腿一家之言。
+本腿只补一句判断：无 pathspec 的 commit 在共享工作树里卷走的是别人的未提交活，
+所以本腿从第 0 步起每笔都枚枚点名（§8 两张表可核）。
+
+四、纪律复述：只 commit 不 push；AC 勾选框一枚未碰；工单与台账一字未改；禁区路径零命中
+（internal/config、internal/panel、internal/ball、internal/tools、frontend、design、docs、thresholds.go、
+golden、allowlist.txt；frontend 与 design 连读都没读）；Go 源码零 emoji；临时件只建不删。

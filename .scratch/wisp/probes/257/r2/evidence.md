@@ -325,6 +325,16 @@ RUN(顶层+子) 331 ／ --- PASS 235 ／ 子用例 PASS 96 ／ FAIL 0 ／ SKIP 0
 两发之间的时间差也登记一下：基线 401.8s、终跑 433.1s，差在并发负载（本腿的八发突变跑＋别的腿在写
 `internal/panel/**`）——这就是 §7.2 那两枚"半写瞬间撞见的红"的来路。
 
+### 6.3 收尾复量（交件那一刻的四门，逐枚带时刻，`gate3-*.log`）
+
+11:34:39 起：`sh scripts/d22scan.sh` **rc=0**（末行逐字 `d22scan: clean - no D22 ban violations`）／
+`go vet ./cmd/wisp/` **rc=0**（日志 0 字节）／
+`$(go env GOPATH)/bin/gofumpt -l` 对本腿三枚 **零命中**／
+`sh scripts/check-path-length-budget.sh` **rc=0**，`VERDICT GREEN`，tracked=5806（比 11:25 多 60 枚＝别的腿在落件）、
+over-budget=57、roster 覆盖 57、**not in roster=0**。
+同刻三枚 md5 仍与起手快照逐字相等（`049133…`／`23a7a5…`／`4cf81b…`）＝本腿全程没在交件后又动过写面。
+
+
 ---
 
 ## 7. 判不动／量不到／不属于本腿的红（具名归口，一枚没自己划掉）
@@ -373,6 +383,12 @@ RUN(顶层+子) 331 ／ --- PASS 235 ／ 子用例 PASS 96 ／ FAIL 0 ／ SKIP 0
 ① 257 的产码半格（回执文案）**已经进了 268-a2 那一笔**，验收腿若按"票号找 commit"会找不到它，
 按 `git log -- cmd/wisp/firstrun.go` 才会撞见；
 ② 一笔 commit 里混着两张票的写面，正是 README 规则 2「>1 个写码代理必须 worktree 隔离」想拦的形状。
+
+**这条不是本腿一家之言**：姊妹腿在 `06b66e66`（11:27，subject 逐字起于 `257-r2 证据件 0.9 追加：本腿实现被 3f0c4fff 无 pathspec 卷走`）
+里独立量到了同一件事，并把它归因到那一笔**没带 pathspec** 的 commit。两枚腿各写一份、指向同一笔 `3f0c4fff`，
+⇒ 这条对编排者是**双份读数**而不是噪声；本腿在上面那两条后果之外只补一句：
+无 pathspec 的 commit 在共享工作树里卷走的是别人的未提交活，本腿从第 0 步起每笔都枚枚点名（§8 两张表可核）。
+
 
 `git show --name-only` 逐笔自证只含上面这些路径；`internal/config/**`、`internal/panel/**`、
 `internal/ball/**`、`internal/tools/**`、`frontend/**`、`design/**`、`docs/**`、`tools/d22scan/allowlist.txt`
