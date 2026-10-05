@@ -3,21 +3,21 @@
 - 腿＝`231-a1`（只读普查）；写点＝本文件一处，⛔ 未动任何代码／测试／工单／台账／票面 `- [ ]` 框。
 - ⛔ **本腿一枚 `go` 命令都没跑**（无 `go test`／`go build`／`go vet`／`go env`），尺＝`grep`／`git show`／`git log` 的现读。
 - 起手锚：HEAD `b70cf069`；现量时刻 `2026-10-05 15:0x +08`。
-- 起手树态（⚠ 不是本腿改的）：`git status --porcelain -- cmd internal tools scripts docs` ＝ **1 行** ` M cmd/wisp/resident_approval_windows.go` ＝在飞写腿 `268-r1` 的地界；本腿交件时这一行必须仍是唯一一行。
-- 票面：`.scratch/wisp/issues/231-a-config-written-by-a-newer-build-is-reported-to-the-operator-as-a-validation-failure.md`（34 行／待[填] 字节，5 格 AC 全未勾）。
+- 起手树态（⚠ 不是本腿改的）：`git status --porcelain -- cmd internal tools scripts docs` 起手＝**1 行** ` M cmd/wisp/resident_approval_windows.go`（在飞写腿 `268-r1` 的地界）；交件时＝**1 行** ` M scripts/portable-tests.sh`（⛔ 不是本腿的；起手那行已被票 268 的落地笔 `9a941965` 收走）。⇒ **本腿对这些路径贡献 0 行**（尺＝`git status --porcelain -- cmd/wisp/config_reload.go cmd/wisp/config_sentences_223r2_test.go cmd/wisp/config_reload_223_test.go internal/config | wc -l`＝**0**）。
+- 票面：`.scratch/wisp/issues/231-a-config-written-by-a-newer-build-is-reported-to-the-operator-as-a-validation-failure.md`＝**33 行／5,856 字节**（`wc -l -c` 现量；末行无换行故 Read 报 34 行），5 格 AC **全部 `- [ ]` 未勾**＝本腿一枚未翻。
 - 我这轮**不答**的：票 231 AC#1（种一份新 `config.toml` 抄回操作员原句）＝要跑程序 ⇒ 归编排者安静窗口；本件里凡标"生产分类器今天会说哪句"的，都是**读码得到的形状**，⛔ 不是实跑读数。
 
 ## 节状态
 
 | 节 | 内容 | 状态 |
 |---|---|---|
-| §0 | 起手复认：票面锚 vs 现读 | 待[填] |
-| §1 | 问一：分类器今天有哪几条出口 | 待[填] |
-| §2 | 问二："版本更高"那支的真身（＋对照支） | 待[填] |
-| §3 | 问三：钉住今天这三形的用例 | 待[填] |
-| §4 | 问四：新增一支会撞谁（四类尺穷尽） | 待[填] |
-| §5 | 问五：既有定式对照＋票 232 撞行核查 | 待[填] |
-| §6 | 必须交给落地腿的那一页名册 | 待[填] |
+| §0 | 起手复认：票面锚 vs 现读 | 已判（8 条锚：2 枚漂、1 枚指错文件、2 处推翻） |
+| §1 | 问一：分类器今天有哪几条出口 | 已判（7 条 `cause=`＋1 枚常量；吞点现读 `:396`） |
+| §2 | 问二："版本更高"那支的真身（＋对照支） | 已判（现读 `:120-124`；`observe.New` ⇒ cause 链空；机读位只剩 `ProviderCode`） |
+| §3 | 问三：钉住今天这三形的用例 | 已判（8 枚子形逐枚；**票面 AC#3 前半推翻**） |
+| §4 | 问四：新增一支会撞谁（四类尺穷尽） | 已判（**红＝0 枚**；三处会写歪＋三处变钝） |
+| §5 | 问五：既有定式对照＋票 232 撞行核查 | 已判（三种形状；**232 零落地、无同行争夺**，其锚亦漂 ＋9） |
+| §6 | 必须交给落地腿的那一页名册 | 已判（含"本腿给不出绿名册"的口径自纠） |
 
 ---
 
@@ -249,4 +249,39 @@
 
 ## §6 必须交给落地腿的那一页名册
 
-未判。
+⚠ **先给一条口径更正（本腿不能替谁背）**：派单要"今天哪几枚用例绿"的名册，而本腿被明令**一枚 `go` 命令都不许跑** ⇒ **我给不出"绿"的实跑凭据**，这一格只能交**名册＋原句＋"会不会红"的形状判定**（§4 逐枚判过：红＝0 枚）。**"哪几枚今天绿"必须等编排者安静窗口那一发整包**（票 231 AC#5；历史在册的别人的红名：`internal/ball` 1＋`internal/panel` 4、`internal/risk TestResolvePerCallBudget` 争用型假红——⛔ 不是本腿读数，抄自票面 AC#5，落地腿落笔前自认）。
+
+### 6.1 一字不许动的句子（它们各自已被钉着）
+
+| 句子 | 产码 `file:line` | 谁钉着它（测试 `file:line`） |
+|---|---|---|
+| `cause=missing` 那句全串 | `cmd/wisp/config_reload.go:357-359` | ⛔ **无任何测试钉它的中文全文**；`cmd/wisp/firstrun_198_test.go:245` 反向钉（首启回执⛔不得出现 `config.toml 读不到：文件不存在`），`:581`/`:112-115` 钉的是 `cause=missing` 这 7 个字符 |
+| `cause=permission` 那句 | `:361-363` | `cmd/wisp/config_reload_perm_223_windows_test.go:122` needle＝`没有读它的权限`；`:139` 整串 needle＝`config: HOT-RELOAD state=not-applied cause=permission` |
+| `cause=syntax` 那句 | `:370-372` | 只被**反向**钉：`config_sentences_223r2_test.go:52/56/60/64/68/72` 的 `notFragment="语法没问题"` 要求 syntax 形**不得**说出这句的前半 |
+| `cause=unknown-key` 那句 | `:374-376` | ⛔ 测试侧零枚中文钉；只有 `cause=unknown-key` marker 钉（`config_sentences_223r2_test.go:85`、`config_reload_223_test.go:565`） |
+| `cause=migration` 那句 | `:393-395` | ⛔ 测试侧零枚中文钉；marker 钉＝`config_sentences_223r2_test.go:78-79`、`config_reload_223_test.go:558`；配置层那句英文由 `internal/config/migrate_test.go:123`（needle `"migrat"`，`:131`）钉，**票 223/231 都写死一字不许动**，本腿复算该文件最后一次被改＝`a95ee3a8` |
+| `cause=invalid` 那句（**本票要"让开"的那句**） | `:397-399` | ⛔ 中文全文测试侧**零枚**钉（尺＝`grep -rn "内容被校验拒绝" cmd internal tools --include=*.go`＝1，命中即产码自己）⇒ **"一字不改"靠的是票面，不是靠门**；marker 被 6 枚子形当 `notCause` 用、被 `config_reload_perm_223_windows_test.go:143` 当**控制流**用（§4.4-C） |
+| `state=disabled` 那句 | 常量 `:97-99` | `config_reload_223_test.go:614`（panel-inbound） |
+| loader 那句英文（AC#2 明令不改） | `internal/config/loader.go:122` | `internal/config/loader_test.go:273`（needle `"99"`）＋`internal/config/migrate_test.go:160`（needle `"newer build"`）⇒ **改了 loader 那句＝这两枚红** |
+| D36 三档 stdout 那七行 | `:187`／`:190-193`／`:201-203`／`:223-225`／`:228-230`／`:234-236`／`:321-326` | `config_reload_223_test.go:253/280/284/357/362/387/490-494/499/504`＋`config_receipt_255_test.go` 若干（§4.1） |
+
+### 6.2 必须同批改的行（改完不红≠改完了）
+
+1. **产品**：`cmd/wisp/config_reload.go`——新 `case` 落在 `:377-378`（migration）与 `:396`（invalid）之间最稳；⛔ 落在 `:396` 之后＝死代码（§3.4/§4.4-A）。返回串**必须以 `cause=` 起头**（`config_sentences_223r2_test.go:110` 那把前缀尺）。
+2. **测试（票面 AC#3 的正控只能靠加行）**：`cmd/wisp/config_sentences_223r2_test.go` 表内 `:50`–`:86` **加一行**，body＝解析得开的未来版（`"schema_version = 99\n\n[ball]\nsize = 64\n"` 即 223-v2 的 (f) 形，`:202`）；⛔ **不许动 `:66-69`（J1＝(a) 形唯一的钉）**——票面 AC#3 前半句"那三形必须改成断新出口"经 §3.3 推翻，按字面执行就是自毁 (a)。
+3. **同批建议（不改不红，但牙会变钝）**：把新 `cause=` 加进 `cmd/wisp/config_reload_223_test.go:570-573` 的 `all`（现 8 枚）与 `cmd/wisp/config_reload_perm_223_windows_test.go:112-119`（现 6 枚）。
+4. **命名禁忌**：新串不得包含 `cause=missing`／`cause=syntax`／`cause=unknown-key`／`cause=invalid`／`cause=permission`／`cause=migration`／`cause=unclassified`／`state=disabled` 任一枚作子串（§4.4-B）；⚠ **`cause=newer-build`（票面）vs `cause=newer-version`（223-v2 建议 `:215`）两名不一致，择一归编排者**，本腿不裁。新句子⛔不得出现 `配置未生效`／`重启就好`（那两枚是本仓被禁的折叠语，`firstrun_257_test.go:342-352`）。
+
+### 6.3 AC#4 该登记的材料（本腿查出来的，不替它裁决）
+
+- **同一前缀今天身兼 6 类事实**（§1 末表），其中第二类同族吞点 `internal/config/migrate.go:71-73`／`:78-80`（"迁移产物不合法"）**同样零常驻钉**、同样被 `:396` 吞——票 231 字面没要求处理它 ⇒ 登记。
+- **缺尺**：没有一枚尺数得住"同一个失败被印两条审计行"（§4.2 末段）；`cause=invalid` 的中文全文没有任何测试钉（§6.1）。
+- **可选机读路**：`observe.Error.ProviderCode` 全仓产码零枚赋值 ⇒ 不新增导出名即可用（§2.1 表），但它会改 `Error()` 句首渲染（`internal/observe/errors.go:194-196`）；另一路 `ClassConfig` 不可用（85 枚共用）。
+- **最近的前例与张力**：票 268 今天在 `cmd/wisp/resident_approval_windows.go:447-456` 写下"因为不能读 error prose 所以故意不细分"（§5.2 丙），并立了一枚**禁止 `strings.*` 分类**的 AST 尺（`cmd/wisp/resident_approval_risk_268_windows_test.go:224-293`，射程只到那一枚文件）——AC#4 若要"按机读形状分"，这一族话已经说过一次，落笔时引它比新造说法稳。
+
+### 6.4 本腿没答的（具名，⛔ 不是遗漏）
+
+1. **票 231 AC#1 那一格**＝操作员实际看到的原句：要种文件＋跑 `wisp run` ⇒ 归编排者安静窗口。本腿给的是**种子形状**：`schema_version` > 2 **且整份文档解析得开**（正文坏 ⇒ 被 `loader.go:104` 抢先归 `cause=syntax`）。
+2. **AC#5 整包终态与逐名红名册**＝⛔ 一枚 `go` 命令都不许跑 ⇒ 本腿零读数。
+3. **实跑级"会不会红"＝形状级判定**：尤其 §4.4-C（perm 用例 `:142-143` 借 `cause=invalid` 当探测器）那一条，本腿**推不出实跑**，只具名为风险形状。
+4. 本腿**未读**也**未引用** `frontend/**` 与 `design/**`（两层禁令）；未动 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／工单／台账／票面框；**未 push**；仓内零删除。
