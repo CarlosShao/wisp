@@ -1,249 +1,122 @@
-# 票 257 落地腿 `257-r2` 证据件 — 形 ⓒ 的首启回执（写面＝`cmd/wisp/firstrun.go` 文案＋同包测试）
+# 257-r2 落地件 — 票 257 形 ⓒ 的 `cmd/wisp` 那一半（首启回执文案）
 
-## 0. 锚与写面
+> 腿：`257-r2`；票：`.scratch/wisp/issues/257-clean-machine-provider-registry-nil-blocks-writes.md`（AC 框零触碰）。
+> 前件：`257-a1/census.md`（92 行／`ed3fd270`）＋`257-a2/census.md`（257 行／`cbf4f1b2`）＋`257-r1/evidence.md`（182 行，`internal/config` 那一半，九节全满）＋票面 §8（选形 ⓒ，账 `A543`）＋`A560`。
+> 本节次安排：§0–§4 随首枚实现 commit 落盘，§5 随突变 commit，§6 随尾程整包 commit，§7–§10 交件时收满。**未写满的节次此刻不在文件里**（不放过半句占位）。
 
-起手三读数（同一次发取，逐字）：
+## 0. 起手锚
 
-```
-$ date
-Mon Oct  5 11:12:54 CST 2026                      # = 2026-10-05 11:12 +0800
+| 项 | 读数（本腿现量） |
+|---|---|
+| 进场时刻 | `2026-10-05 11:04:54 +0800` |
+| 进场自取 HEAD | `c6cf66e64849955bf92a4b3356c096ea81c35563`（branch `dev`）＝"ledger(A614＋A615) 票 267 五格全勾" 那枚 |
+| 起手 `git status --porcelain -- cmd internal` | **0 行**＝`cmd/**`＋`internal/**` 此刻没有别人的活在树上（写面互斥闸通过）；开工后到我首次 commit 前仍是只有我这枚的形状（见 §8） |
+| 起手 `git status --porcelain` 总行数 | 632＋（同机多枚在飞的正常量级；`design/**` 删除族与 `.scratch/**` 过程件占大头，与 `257-r1` 进场同形） |
+| 并发腿（派单告知） | 另两枚**只读**腿在跑，不写文件；两者都在读 `internal/panel` ⇒ 本腿 ⛔ 不碰 `internal/panel/**` |
+| CI 背景 | GitHub Actions 正在这台机器的 self-hosted runner 上跑 `slo-full`（D32）与 `test-windows` ⇒ 整包 `go test` 按派单留到尾程，本件尾程读数若被争用洗到，具名标〔机器争用待复跑〕 |
+| 本腿写面（授权） | `cmd/wisp/firstrun.go`（回执文案）＋同包新增 `_test.go`＋`.scratch/wisp/probes/257/r2/**`；⛔ 不碰 `internal/config`、⛔ 不碰 `internal/panel` |
+| 起手 `GOFLAGS= go build ./...` | rc=0（`11:08:26`，改动前基线） |
 
-$ git log -1 --format=%h
-c6cf66e6
+### 0.9 ★ 撞腿登记（11:23 现量，本腿停手上报前的完整事实；⛔ 不归本腿裁决）
 
-$ git status --porcelain -- cmd internal
- M cmd/wisp/firstrun.go
-```
+派单给本腿的前提之一："代号 `r2` 是干净的（`257/` 里只有 `a1`／`a2`／`r1`）"＋"另有两枚只读腿在跑，它们不写文件"。**这条在 11:19–11:23 之间被盘上事实推翻**：
 
-分支 `dev`。写面只有这两枚（枚枚点名，无第三枚）：
-
-- `cmd/wisp/firstrun.go` — 首启回执文案（产码结构一字未动，见 §2）
-- `cmd/wisp/firstrun_257_test.go` — 本腿新测试（§3）
-
-### 0.1 进场时的既有脏件＝我自己前一小时那半段（按 README 规则 3 复认过才继续）
-
-`git status` 报的 ` M cmd/wisp/firstrun.go` 不是别人的活，是本票 `257-r2` 前半段留下的未提交件，
-同目录里两枚日志为证（时刻与文件内容都对得上）：
-
-- `.scratch/wisp/probes/257/r2/preflight-ticket198.log`（11:08，改文案**前**跑票 198 全家 11 枚，全 PASS）
-- `.scratch/wisp/probes/257/r2/after-text-ticket198.log`（11:12，改文案**后**同一把尺，全 PASS）
-
-`git diff --stat` 逐字 = `cmd/wisp/firstrun.go | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++`，
-纯新增（零删除行），落在 `ensureFirstRunConfig` 末段 `return true, nil` 之前。
-证据件本身当时还没建 ⇒ 本节是这一腿的第一份书面件。前段已 commit 的 `internal/config` 半边
-（`settings_257_test.go`、`settings.go` 的三枚 tag 与三句 guidance）属 `257-r1c`，账 `A606`/`A607`，
-**本腿一个字没碰那两个文件**（§4 逐字抄的是它们的现成句，不是本腿新写的）。
-
-### 0.2 中途 HEAD 被别人推走（共享工作树，登记不归我）
-
-11:15:57 后台重跑基线时 `git log -1 --format=%h` 已变成 `69c1bb82`（起手是 `c6cf66e6`）——
-同一工作树里其它腿在我之后提交。**本腿的 commit 一律以"显式 pathspec 只含我这两枚文件"自证边界**（§8）。
-
-### 0.3 一次真撞上的仪器坑（不是我的红，具名登记）
-
-第一次全包基线（11:15:57，后台，未注入 dll）逐字读数：
-
-```
-BASELINE START 2026-10-05 11:15:57 +0800 anchor=69c1bb82 dirty=firstrun.go
-exit status 0xc0000135
-FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.033s
-```
-
-`=== RUN` 计数 = **0 条**（进程在加载期就死了，一条用例都没跑到）。根因＝票 98 那一格在册老坑：
-`cmd/wisp` 的测试 exe 链接 `third_party/sherpa-onnx` 的三枚 dll
-（`onnxruntime.dll` / `sherpa-onnx-c-api.dll` / `sherpa-onnx-cxx-api.dll`，现量都在仓里），
-不注入 PATH 就 `STATUS_DLL_NOT_FOUND`。出处逐字：
-`docs/evidence/s1/101-adversarial-acceptance.md:129` 与 `:168`（`R-101-6`）、
-`docs/evidence/s1/102-adversarial-acceptance.md:148`（同形读数 `=== RUN 0 条`）。
-⇒ 本腿**所有** `cmd/wisp` 读数都带这条前提：`export PATH="$PWD/third_party/sherpa-onnx:$PATH"`。
-第一发死掉的日志留在 `.scratch/wisp/probes/257/r2/baseline-cmd-wisp.log` 的 `11:15:57` 那一节，
-注入后的重跑（`11:1x` 起）覆盖进同一文件（只建不删，故这里点名两发先后同物）。
-
----
-
-## 1. 撞钉预检：动手前逐枚读到的断言原文
-
-⚠ 最硬的一枚雷是 1.1：它禁的是**被生成的文件**里出现 `[llm.providers`，而我的指引句里必然带这四个字——
-所以那句只许走 stderr 这条"给人看的回执"通道。1.1～1.4 逐枚读过才动 1.5。
-
-### 1.1 `cmd/wisp/firstrun_198_test.go:215-219`（票 198 AC#1 第十八节的钉，逐字）
-
-```go
-	for _, forbidden := range []string{"[llm.providers", "[models.local_override", "[plugins."} {
-		if strings.Contains(text, "\n"+forbidden) {
-			t.Errorf("the created file carries the dynamic table %q anyway - that would be an invented entry, not a default", forbidden)
-		}
-	}
-```
-
-同一枚用例（`TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables`）还钉着
-18 枚静态节各出现**恰好 1 次**（`:203-206`）与 `[plugins]` 恰好 1 次（`:211-213`）
-⇒ 我若把指引写进生成的文件，红的不止一枚。
-
-### 1.2 `cmd/wisp/firstrun_198_test.go:243-248`（回执不复用热加载四句归因，逐字）
-
-```go
-	for _, borrowed := range []string{
-		"cause=missing",
-		"config.toml 读不到：文件不存在",
-		"本次运行继续用内存里的旧配置",
-	} {
-		if strings.Contains(stderrText, borrowed) {
-```
-
-⇒ 我的三段新句一个字都没用这三枚串（现量：`grep` 三枚 needle 在 `firstrun.go` 新增段里零命中）。
-
-### 1.3 `internal/config/defaults.go:77-78`（票面"现量 1"的那两行，逐字）
-
-```go
-		case reflect.Map:
-			// leave nil (see NewDefaults)
-```
-
-⇒ 首份默认配置里服务商注册表是 nil，这是本票根因；本腿**不改它**（ⓐ 那形已被毙）。
-
-### 1.4 另两枚钉与那条坑（逐字）
-
-- `internal/config/settings_248_test.go:130-132`（AC#7 表里"未声明的服务商"那一支）：
-
-```go
-		{"a provider the config does not declare", func(m *Manager) ([]string, error) {
-			return m.SetProviderBaseURL("inventco", "https://x.example.invalid")
-		}},
-```
-
-  ⇒ 写侧"行不存在则拒"是**被钉着的行为**，本腿保持原样（票 §8 边界②）。
-- `internal/config/settings_257_test.go:125`（`257-r1c` 已交的干净机前提钉）：
-  `if strings.Contains(body, "[llm.providers") { t.Fatalf("the first default config invented a provider row, which contradicts the ticket 198 pin:...") }`
-  ⇒ 与本腿 1.1 同一条线的另一侧。
-- `internal/config/parse.go:72` 与 `:123` 逐字都是 `dec.DisallowUnknownFields()` / `fdec.DisallowUnknownFields()`
-  ⇒ 顶格写 `[providers.x]` 会让整份文件加载不过（票 §8 记的那处坑），指引里**绝不出现**那个拼法。
-- `internal/config/catalog.go:86-110`（`validateRoles`）：provider/model 只设一枚 ⇒ `set both or neither` 拒；
-  点名了不存在的 provider ⇒ `references unknown provider` 拒。这条决定了指引第三样的形状（两枚一起点名）。
-
-### 1.5 `defaults.go`／首份文件的现量（本腿自己 dump，不是抄来的）
-
-`.scratch/wisp/probes/257/r2/dumpcfg.go`（`//go:build ignore` 探针，不入构建）＋
-`dumpcfg.log`：`config.SaveFile(path, config.NewDefaults())` 产出 **2571 字节**、33 枚节头，
-其中**有** `[llm.roles.chat]` 且其内是 `provider = ''` / `model = ''`（空值），
-**没有任何** `[llm.providers...]` 节。⇒ 票 §8 那句"就地填已有的那一节，别再追加一节同名的"是真读数量出来的。
-
----
-
-## 2. 改了什么（逐枚 before-after）
-
-写面产码只有一枚文件、只有**文案**，零结构改动：
-
-| 枚 | before（锚 `c6cf66e6` 已提交态） | after（工作树） |
+| 时刻 | 现量 | 出处 |
 |---|---|---|
-| `cmd/wisp/firstrun.go` | `ensureFirstRunConfig` 末段是票 198 的三句回执（新建确认／key 入口／模型入口＋票 261 的 `enabled` 一句），然后 `return true, nil` | 同三句一字未动；在 `return true, nil` **之前**追加三段 `fmt.Fprint(stderr, ...)`（AC#1 三样指引／AC#2 三因各一句／AC#0 边界①＋A560 的三形状生效时机），+38 行文案、+23 行解释注释，`git diff --stat` = `61 ++++`、删除行数 0 |
+| 11:04:54 | 本腿进场，`ls .scratch/wisp/probes/257/`＝`a1 a2 r1`，**无 `r2` 目录** | 本腿命令实录 |
+| 11:08:49–11:17:26 | 本腿做完：预检名册 → 改 `firstrun.go`（＋61 行）→ 新增 `firstrun_257_test.go` → 三发读数（`preflight-ticket198.log`／`after-text-ticket198.log`／`new-tests-first.log`／`new-tests-second.log`），md5 链：`firstrun.go`＝`0491339282492f2cabdbf5be576c8a57`、`firstrun_257_test.go`＝`23a7a56795019fabf506f6726541b049`（11:17:50 与 11:23:03 两取相同） | 本件 §1/§6 |
+| 11:19:29 | commit `9c0d4c9a` 落盘：**另一枚自名 `257-r2` 的腿**提交了 `.scratch/wisp/probes/257/r2/evidence.md` 骨架（249 行），**并把我上面那两枚日志一并 commit** | `git show --name-only 9c0d4c9a` |
+| 11:12:54 | 那枚件的 §0 自报进场时刻（晚于本腿 8 分钟），其 §0.1 把 ` M cmd/wisp/firstrun.go` 与两枚日志判为"我自己前一小时那半段留下的活"——**这是误认**：那 61 行＋两枚日志是本腿 11:11–11:12 产出的（本件 §2 逐字 before/after 为证） | `git show 9c0d4c9a:...evidence.md` |
+| 11:14:58–11:22:42 | 同一目录继续长出**非本腿产出**：`dumpcfg.go`／`dumpcfg.log`（11:15）／`cmdwisp.test.exe` **40 MB**（11:16:54）／`msg-skeleton.txt`（11:19:02）／`snapshot-firstrun.go`＋`snapshot-firstrun_257_test.go`（11:20:12，内容＝本腿那两枚文件的快照）／`build-mutants.py`（11:21:40，读的正是 `cmd/wisp/firstrun.go`）／`mut/M1..M6`（11:22:08–11:22:42）／`baseline-cmd-wisp.log`（11:22:42＝有人在本腿写面上跑了整包） | `ls -l --time-style=+%H:%M:%S` |
+| 11:21:5x | **本腿的 Write 覆盖了那枚腿在 `9c0d4c9a` 里那份 evidence.md 的工作树副本**（同一文件路径，两腿共用一枚 `257-r2` 目录）。⛔ 本腿没有删任何东西：那份骨架完整可读，取法＝`git show 9c0d4c9a:.scratch/wisp/probes/257/r2/evidence.md > <外部路径>`；本件 §0.9 就是这次覆盖的具名登记 | 本节 |
 
-结构面的"零改动"是可核的三条，不是口头承诺：
+**本腿据此采取的动作（不扩权、不改别人的件）**：① 立刻把本腿的实现＋测试＋本件以**显式 pathspec** 落 commit（先让 HEAD 有一份带 md5 链的可归因产物）；② ⛔ 不 commit 别人的 `mut/`／`cmdwisp.test.exe`／`snapshot-*.go`／`dumpcfg.*`／`build-mutants.py`／`baseline-cmd-wisp.log`，也 ⛔ 不删（README 规则 8）；③ 尾程每一次突变前后**重取 md5**，若发现工作树两枚文件被外部改动，立即停手并把差异贴进本节；④ "哪一枚 `257-r2` 的件算交件"＝编排者裁，本腿不自裁。
 
-1. 函数签名 `func ensureFirstRunConfig(dataDir string, stderr io.Writer) (bool, error)` 未变（`:72`）。
-2. 判定/建文件的三段（`os.Stat` 支、`secret.NewStore`、`config.SaveFile`）逐字未变（`:73-87`）⇒
-   票 198 的 AST 钉 `TestTicket198FirstRunCallerIsTheRunEntryOnly`（`:256-281`，要求调用集恰为 `[runTextTask]`）照旧绿。
-3. 写面**没有任何**新增 import／新增函数／新增类型（`grep` 新段里只有 `fmt.Fprint*`）。
 
-三段文案的逐字内容见 §4（拒因那三段）与 §3（指引那一段），本腿不在此重复。
+## 1. 撞钉预检名册（今天绿着的相邻用例，逐枚）
 
----
+★ 派单点名的那枚钉**找到且逐枚读了断言体**：`cmd/wisp/firstrun_198_test.go:215` 在 `TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables` 里逐字禁 `[llm.providers`／`[models.local_override`／`[plugins.` 出现在**首建文件的内容**里（读的是 `os.ReadFile(cfgPath)`，⛔ 不是读 stderr）。⇒ ⓒ 的新文案只要落在 stderr 这条"给人看的回执"通道就不碰它；本腿新增的 AC#1 用例反过来**自己钉了一遍**"生成的文件里没有 `[llm.providers`"（`firstrun_257_test.go`，防的就是"文案漏进产物"这一形）。
+同类钉逐枚读到的另三枚：`firstrun_198_test.go:237`（回执 ⛔ 不得借 cause=missing 那三串标记，逐字 `"cause=missing"`／`"config.toml 读不到：文件不存在"`／`"本次运行继续用内存里的旧配置"`）、`firstrun_198r2_test.go:363`（回执必名 7 串＋`wisp <词>` 必须真有 `cmd<词>`：`\bwisp ([a-z][a-z0-9-]*)` 拿 AST 数过）、`firstrun_198r2_test.go:414`（二跑不重复回执，含 `"新建默认配置"` 与 `"wisp secret set"`）。
+⚠ 由 `:363` 那把尺得出的**硬约束，本腿照办**：新文案里出现过的 `wisp <拉丁词>` 只有 `wisp run`（`cmdRun` 存在）；`panel-inbound`／`resident` 一类**写不得**（`cmdPanel-inbound` 不存在，会当场红），所以三形状那一段用中文形状名指代，不造命令词。
 
-## 3. 干净机那一发怎么真跑的（AC#1）
+**起手绿着的名册（`-v` 实跑，非静态推断）**：
 
-新件 `cmd/wisp/firstrun_257_test.go`，四枚用例，全部**从生产入口起步**，⛔ 没有一处手工塞 config.toml：
+| 发 | 时刻 | 命令 | 读数 |
+|---|---|---|---|
+| 1 | 11:08:49 | `go test -count=1 -run 'TestTicket198' -v ./cmd/wisp/` | rc=0；**11 枚 `--- PASS`、0 FAIL、0 SKIP**，逐名：`TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone`／`…AC1DirectoryShapedConfigIsNeverOverwritten`／`…AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables`／`TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences`／`TestTicket198FirstRunCallerIsTheRunEntryOnly`／`TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags`／`TestTicket198R2AC2ExportedDefaultTableStillRendersAsItsTags`／`TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile`／`TestTicket198R2AC4ReceiptNamesTheRealEntryPoints`／`TestTicket198R2J1TheAssemblyRootStillCreatesNothing`／`TestTicket198AC3CreatedFileLandsPrivate`。原件 `.scratch/wisp/probes/257/r2/preflight-ticket198.log` |
+| 2 | 11:09:05 | `go test -count=1 -run 'TestTicket255\|TestTicket223' ./cmd/wisp/` | rc=0（不带 `-v`＝读不到名册，这发只算"整族绿"的粗筛；名册在发 3 补） |
+| 3 | 11:19:08–11:19:5x | 同发 2 加 `-v`，重定向 `preflight-255-223.log` | rc=0；**24 枚 `--- PASS`、0 FAIL、0 SKIP**：255 族 13 枚（`SplitOnlyClaimsSectionsWithALiveReader`／`HotRowRosterCoversTheRegistry`／`RosterEvidenceLinesStillSayWhatTheyClaim`／`RosterStillMatchesTheActualReadSites`／`ReceiptOmitsPanelFromTheImmediateSentence`／`ReceiptOmitsASectionWithNoReaderAnywhere`／`ReceiptStillNamesTheLiveReadSection`／`ReceiptSentenceAssemblyIsFiltered`／`WindowOptionsFollowTheConfigSource`／`AssemblyRootGeometrySourceReachesTheWindowOptions`／`PanelHostBuildsItsWindowOptions`／`HostStillDoesNotParseConfigItself`／`PanelRosterVerdictIsTheHonestShape`／`RestartTierKeysAreBackedByATest`）＋223 族 10 枚（`RunArmsTheReloadTick`／`HandEditedFsLooseningCostsAnL2Card`／`RefusedLooseningKeepsOldValues`／`TighteningRaisesNoCard`／`ModeLooseningChangesTheRunningModeAfterAllow`／`RestartTierSaysItWillNotApply`／`FailureSentencesAreDistinct`／`PanelInboundSaysHotReloadIsDisabled`／`PermissionDeniedSitsInItsOwnSentence`／`R2FailureSentenceRouting`） |
 
-起步态（逐条断言，不是注释）：`t.TempDir()` 做数据根 → `os.Stat(config.toml)` 必须
-`fs.ErrNotExist` → 用 `run198(t, dir)`（票 198 现成仪器，真调 `runTextTask`，即 `wisp run` 那条 CLI 缝，
-README「Hard global constraints」列的合法注入缝之一）跑**一次**，退码必须仍是 `2`（⛔ 不放宽），
-文件由生产自己写出。
+**相邻但本腿不动的钉（读过断言体，判"会不会被我打红"）**：
 
-- `TestTicket257R2AC1ReceiptNamesTheThreeHandAddedThings`
-  回执里必须逐字出现三样的**具体小节名**：`[llm.providers.<名>]`／`[llm.providers.<名>.models.<模型 id>]`／
-  `[llm.roles.chat]`，加上 `enabled = true`；⛔ 顶格 `[providers.` 那一形一次都不许出现（1.4 那条坑）；
-  ⛔ 不许把没接线的引用解析通道列成入口（账 A560）：`resolveRefs`／`Resolved()` 两个标识符零命中；
-  第三样必须是"就地填已有那一节"的措辞（含 `duplicate table` 那句反例）。
-- `TestTicket257R2AC1CleanMachineRefusesAllSevenFields`
-  拿生产建出的那份文件建 `config.NewManager(path, nil)`（`res=nil`＝产线三处的形状，A560），
-  逐枚试写名册那七枚（`provider_base_url`／`provider_api_key_ref`／`model_context_window`／`model_price_in`／
-  `model_price_out`／`role_chat_model`／`provider_credential` 的配置侧半枚，走 `panel_config_store.go` 那道
-  switch 实际路由的 `Manager.Set*` 腿）⇒ **七枚全拒**，每枚的拒句必须命中"三因"里恰好一枚且不能是"文件没建"，
-  七枚之后文件字节不变。
-- `TestTicket257R2AC1FollowingTheReceiptUnlocksAllSevenFields` ★本腿真正兑现 ⓒ 的那一发：
-  **指引串从回执里正则抠出来**（不是测试里另抄一份），把 `<名>`／`<模型 id>` 两枚占位换成实名后
-  拼成手加补丁；`[llm.roles.chat]` 那一半是**在已有节内就地替换** `provider = ''` / `model = ''`；
-  写回后必须 `NewManager` 加载得过（这条就是"拼法真走得通"的证明，撞 1.4 的 `DisallowUnknownFields` 会当场红），
-  再逐枚试写那七枚 ⇒ **7/7 接受**，且接受后的键真的落在盘上。
-- `TestTicket257R2AC1SecondRunSaysTheGuidanceOnlyOnce`
-  同一目录再跑一次 `run198` ⇒ 文件字节不变、退码仍 2、那三样指引**不再重复出现**（首启专属）。
-
-AC#2／AC#3／两通道三形状各自的用例见 §4 与 §5 的突变名册（同一件文件里，`TestTicket257R2AC2...`、
-`TestTicket257R2AC3...`、`TestTicket257R2AC0...`）。
-
-仪器前提：每条 `cmd/wisp` 命令都带 §0.3 那条 dll 注入，否则 0 条 RUN。
-
----
-
-## 4. 三句拒写原因逐字（AC#2）
-
-### 4.1 盘上现场那三枚 tag（`internal/config/settings.go:78-80`，`257-r1c` 已提交，本腿未碰）
-
-```go
-	refusalFileMissing = "第 1 种拒因：文件没建"
-	refusalRowMissing  = "第 2 种拒因：行不存在"
-	refusalInvalid     = "第 3 种拒因：校验不过"
-```
-
-它们在拒句里的长相（同文件逐字，本腿只读）：`:293` 是校验不过
-（`refusalInvalid+"：值本身过不了这份 schema 的校验，这一行要改的是值；文件一个字节都没动。"`）、
-`:367`／`:379` 是行不存在配 `guidanceModelRow`／`guidanceProviderRow`（`:87-92` 那三句 handAddGuidance 就是 ⓒ 的界面对话），
-`internal/config/loader.go:77` 是文件没建。三枚 tag 互斥这一点由 `257-r1c` 在包内测过（账 `A606`）。
-
-### 4.2 本腿写进回执的那三句（`cmd/wisp/firstrun.go:162-171`，逐字）
-
-```
-wisp run: 写不进去的时候有三种原因，各是一句不同的话，不会合成一句「配置未生效」：
-  第 1 种拒因：文件没建——这一种刚才那一发已经替你办完，<cfgPath 绝对路径> 现在是真的文件；首启之前没有任何旧配置可言。
-  第 2 种拒因：行不存在——那一页改不了服务商与模型的存在性，去这份文件里手加上面那三样，加完才写得进；这一条说的不是你的值不对。
-  第 3 种拒因：校验不过——行在，但那个值过不了这份 schema 的校验（引用形没写对前缀、点名的模型不在目录里，都算这一种）；要改的是值，文件一个字节都没动。
-```
-
-三句的区别不是修辞而是**动作不同**，且各自主语指向唯一：第 1 种＝已由这一发办完（首启场景里它不可能再发生）；
-第 2 种＝缺行 ⇒ 去手加那三样；第 3 种＝值不对 ⇒ 改值、盘没动。
-"不会合成一句"这半句是**引用**那枚被禁的折迭句（票 223 AC#4 定式），⛔ 它自己不是那句折迭话——
-牙怎么咬这一点在 §5 的 M2 里被证明：把三句真折成一句时，从生产拒句反推 tag 的那枚用例当场红。
-
-### 4.3 测试怎么把"三句不同"钉住而不自造第二名册
-
-⛔ 本腿测试**不硬编码**那三枚 tag 串（那会变成 schema 之外的第二真相源）。做法是：
-在干净机上真取一发生产拒句（`SetProviderBaseURL` 打未声明的 provider），用
-`第 [123] 种拒因：` 这个**形状**正则从拒句里把 tag 抠出来，再断言回执里同一枚 tag 出现且只出现一次、
-三枚 tag 两两不同、每枚 tag 后面跟着的解释子句也两两不同。
-⇒ `internal/config` 若哪天改名，这枚测试跟着生产改；⇒ 若有人把三句折成一句，回执里就凑不齐三枚不同 tag，必红。
-
----
-
-## 5. 突变名册（每枚判据一发会响的牙）
-
-名册先落这里，红句逐枚抄进 §5.1 之后的每一小节；改回后逐枚 `md5`／`git diff` 归零的证明同处登记。
-
-| 号 | 把被钉的那一支改成什么 | 应红的用例 |
+| 钉 | 位置 | 我为什么不会打红它 |
 |---|---|---|
-| M1 | 指引第一样的小节名换成顶格 `[providers.<名>]`（票面那个错拼法） | AC#1 名串枚＋"手加真走得通"枚（后者还额外撞 `DisallowUnknownFields`） |
-| M2 | 三因三句折成一句「写不进去就是配置未生效」 | AC#2 两枚（三句各一句／从生产拒句反推 tag 那枚） |
-| M3 | 生效时机折成一句「改完重启就好」 | AC#0 两通道三形状枚 |
-| M4 | 把指引从 stderr 改写进生成的 `config.toml` | 票 198 的 `:215` 那枚钉（证明最硬的雷真会响） |
-| M5 | 第三样改成"再追加一节 `[llm.roles.chat]`"（duplicate table 那个谎） | AC#1 名串枚＋手加走得通枚 |
-| M6 | 凭据那句里加一条明文样例（`sk-` 开头那种值） | AC#3 凭据枚 |
+| 首建文件逐字节＝tag 渲染 | `firstrun_198r2_test.go:221` | 我的改动一行都没进 `SaveFile`／`NewDefaults`；文案只进 stderr。发 1 与发 3 复跑仍绿（11:12:28 那发见 §6） |
+| 回执 ⛔ 借 cause=missing 措辞 | `firstrun_198_test.go:237` | 新文案三处自查：`AC#2` 用例直接把这两串当反控告出（`firstrun_257_test.go` 的 `borrowed` 循环） |
+| 二跑不重复回执 | `firstrun_198r2_test.go:414` | 三段新印品全在 `ensureFirstRunConfig` 的创建分支内（`os.Stat` 判缺才走到），第二跑根本不进这一支；复跑绿 |
+| 名册七枚枚数＝7（`reflect.DeepEqual`） | `internal/panel/config_route_248_test.go` 族 | 形 ⓑ 已毙 ⇒ 我一枚字段都没加，`internal/panel` 未碰 |
+| 七枚的写门读盘不读内存／拒因三 tag | `internal/config/settings_257_test.go`（257-r1 交） | 产码未动；我只**字面**引用那三句 tag（不 import 常量，理由见 §2 末），r1 那五枚仍绿＝尾程整包名册里对账 |
 
----
+**"测试里先手工塞一份完整 config.toml"这一族（＝本票立案的那个洞）在本腿的处理**：⛔ 不照抄。`cmd/wisp` 里预塞文件的相邻件（`run_test.go:90`、`providers_test.go:46`、`panel_config_248_test.go:76`、`secret_test.go:774`、`run_mode101_test.go:123`、`approval_reply_201_test.go:128`、`resident_task_source_live_246_windows_test.go:336`、`leg_sink_nail_131_windows_test.go:420`）全部**手写** `[llm.providers.acme]` 起步——它们在量别的格子，不是本票的洞。我的三枚 AC#1 用例一律从 `t.TempDir()`＋**没有** `config.toml` 起步、由真入口 `runTextTask` 建文件（`§3` 逐字写了这一发怎么造），手加段是**机主动作**、发生在建完之后。
 
-## 7. 判不动／量不到（具名归口，本腿一律没自己划掉）
+## 2. 改动逐处（before／after 逐字＋为什么落这一支）
 
-| 格 | 判语 | 归口 |
+**唯一产码改动＝`cmd/wisp/firstrun.go` 的 `ensureFirstRunConfig` 尾部追加三段印品＋一段说明注释；`git diff --numstat`＝`61  0  cmd/wisp/firstrun.go`（加 61 删 0）。新增测试件＝`cmd/wisp/firstrun_257_test.go`（472 行，本腿唯一新增文件）。**
+
+| # | 落点（新行号） | before（逐字） | after（逐字，只列印品体） | 为什么落这一支 |
+|---|---|---|---|---|
+| 1 | `firstrun.go:123-150`（注释块） | 模型句之后直接 `return true, nil` | 28 行注释：三形代价的账（`A543`）、拼法更正的出处（`parse.go` 的 `DisallowUnknownFields`，现量 `:72`＋`:123`）、ⓐ 的 `roles.chat` 就地填形状（257-r1b 的 M3 红句）、`A560` 的"引用解引用没接线"、以及"只走 stderr、不落进文件"的两枚 198 钉 | 落这一支的理由＝票 §8-3 ⓒ 的**边界①②**都写在回执上；这段注释是本腿唯一允许的"新立论"位置，产码形状零变化 |
+| 2 | `firstrun.go:151-160` | —— | `fmt.Fprint(stderr, "wisp run: 上面那句模型只是第一样。设置页那七枚字段（服务商的 base_url、api_key_ref、凭据，模型的 context_window、price.in、price.out，还有聊天模型）今天都不建行，只改已有的行；要在这一页配上模型，得在这份文件里手加三样，缺一不可：" + "wisp run: 第一样＝一节 [llm.providers.<名>]，就是服务商那一行（名字对上内置预设的，protocol 与 base_url 可以留空；非预设名必须自己写 protocol，否则这份文件加载不过）。第二样＝它的模型行 [llm.providers.<名>.models.<模型 id>]，里面写 enabled = true。第三样＝就地填已有的 [llm.roles.chat] 那一节，把 provider 与 model 两枚一起点上名（别再追加一节同名的，那在 TOML 里是 duplicate table，文件直接加载不过）。界面不会替你建这一行，它只会告诉你去哪一节建；三样齐了这七枚才全部写得进，只加第一样只解锁服务商那三枚。` | **AC#1 的终态格**： ⓒ 兑现＝把"静态链 7/7"教到能照着走通（257-a1 §ⓒ-2 量的三样；`3/7` 与 `7/7` 两个数都进文案，并被两枚用例各钉一边，见 §3 发 2／发 3）。第二样用 `guidanceModelRow` 的同一串拼法、第三样用"就地填"而非"追加"，是与 `internal/config` 那半句逐字对齐的结果 |
+| 3 | `firstrun.go:162-170` | —— | `fmt.Fprintf(stderr, "wisp run: 写不进去的时候有三种原因，各是一句不同的话，不会合成一句「配置未生效」：\n" + "  第 1 种拒因：文件没建——这一种刚才那一发已经替你办完，%s 现在是真的文件；首启之前没有任何旧配置可言。\n" + "  第 2 种拒因：行不存在——那一页改不了服务商与模型的存在性，去这份文件里手加上面那三样，加完才写得进；这一条说的不是你的值不对。\n" + "  第 3 种拒因：校验不过——行在，但那个值过不了这份 schema 的校验（引用形没写对前缀、点名的模型不在目录里，都算这一种）；要改的是值，文件一个字节都没动。\n", cfgPath)` | **AC#2**：三句各配各的补救，且 `Fprintf` 的第二参数把"第 1 种已办完"落到**这台机的真路径**上（不是模板话）。三句的 tag 与 `internal/config/settings.go:78-80` 那三枚常量**逐字同串**（`refusalFileMissing`／`refusalRowMissing`／`refusalInvalid`），拒写现场与首启回执说的是同三种事 |
+| 4 | `firstrun.go:172-184` | —— | `fmt.Fprint(stderr, "wisp run: 改完什么时候才算用上，按进程形状分三种说法，不是一句「重启就好」：\n" + "  在控制台里跑 wisp run——这个进程带着每 1s 重读一次 config.toml 的看门狗，[llm] 属可热加载档，手改的值一秒内就换进这台进程的内存；但模型通路是启动时建一次的，热加载不会替它换脑，真正发请求还是按启动时那一份。\n" + "  没有可答卡入口的常驻形状——任务腿过不去控制台那道闸时，这个进程里可能根本没有会重读盘的东西，手改与面板写在两个方向上都只能等下一次启动。\n" + "  设置页那一页——它那条腿自己明说不带轮询，写入回执固定说要重启进程；页面上的读数在重启之前也不会跟着你手改的文件走。\n" + "wisp run: 凭据这一格只有引用会进这份文件：改 api_key_ref 换的是名字不是密钥本身，把那份引用再解一次是新建端点时才做的事，所以换过 key 的引用同样要重启才算用上；这一页任何时候都不回显密钥的值，只说已录入还是没录入。`) | **票 §8 边界①＋`A560` 的反噬**：三形状各一句（有控制台／无控制台／面板写入），⛔ 不再用"手改＝热加载认／面板写＝要重启"那两格冒充全部；凭据那段只写真接了的那条路（`run.go:435-436` → `internal/llm/resolver.go:141` 每建一次端点解一次），⛔ 不把 `config.NewManager` 的 `resolveRefs` 列成入口（`A560`：生产三处第二参数全 nil） |
+
+**为什么测试里的期望全是字面量**：`257-r1b` 的 M1 量过同包常量的盲区（改常量值＝断言跟着改，永不红）。`internal/config` 那三枚 tag 是**未导出**的，`cmd/wisp` 想引用也引用不到；本腿把三句当字面抄进 `firstrun_257_test.go:53-57`，于是"两半文案漂移"与"折叠成一句"这类真缺陷才咬得动（§5 的 M2/M3 就是它咬的）。这条同时是本件的一处**已知脆性**，具名进 §7-N1。
+
+## 3. AC#1 干净机真跑读数
+
+**这一发怎么造出来的（⛔ 没有"测试先塞一份 config.toml"这一步）**：
+`t257CleanMachine(t)`（`cmd/wisp/firstrun_257_test.go:74-95`）＝
+1. `dir := t.TempDir()`；
+2. `os.Stat(filepath.Join(dir, "config.toml"))` 必须是 `fs.ErrNotExist`，否则 `t.Fatalf("AC#1 premise broke: the clean machine already holds ...")` —— **"没有 config.toml"这一步是断言出来的，不是假设出来的**；
+3. 调 `run198(t, dir)`＝`runTextTask(runSpec{argv, stdout, stderr, dataDir: dir, notify: 空})`，也就是**真入口**（`main.go cmdRun -> runTextTask -> ensureFirstRunConfig`，`run.go:245`）；
+4. 断言退码仍＝2（票 198 的"建完仍按未配置失败"不许被我放宽）＋文件现在真在＋stderr 里有 `"新建默认配置"`，否则 `t.Fatalf` 说"没有回执可读"。
+
+**发 1＝`TestTicket257R2AC1CleanMachineReceiptTeachesTheWalkableChain`（11:17:16 PASS）**
+- 回执含 `[llm.providers.<名>`／`第一样＝一节 [llm.providers.<名>]`／`[llm.providers.<名>.models.<模型 id>]，里面写 enabled = true`／`第三样＝就地填已有的 [llm.roles.chat] 那一节`／`三样齐了这七枚才全部写得进`／`只加第一样只解锁服务商那三枚`（逐串断言，缺一串即红）；
+- 反控：回执 ⛔ 不含 `[providers.`（`A543`：那串会撞 `DisallowUnknownFields`，面板整条链起不来）；
+- 通道分离：新建的 `config.toml` 里 ⛔ 不含 `[llm.providers` ⇒ 指引只在"给人看的回执"里；
+- `config.NewManager(cfgPath, nil)`（生产形状，`A560`）加载过，且 `m.Config().LLM.Providers == nil`（票面前提在**我这枚树上、我这个入口建出来的文件**上重认一次）；
+- 逐枚试写七枚（名册七枚＝`provider_base_url`／`provider_api_key_ref`／`model_context_window`／`model_price_in`／`model_price_out`／`role_chat_model`／`provider_credential`，第 7 枚按 257-r1 的口径走**引用腿** `SetProviderAPIKeyRef`，⛔ 不碰 `StoreCredential`，AC#3）：
+  **读数（逐字，`-v` 里的 `t.Logf`）**：`AC#1 clean machine: 7 refused writes by reason: map[第 2 种拒因：行不存在:7]` —— 七枚全拒、七枚**各带且只带一枚** tag（`seen != 1` 即红），且七句都点名 `[llm.providers.`（ⓒ 的"告诉你去哪一节建"），折叠串 `"配置未生效："`／`"写入失败，配置未生效"` 逐枚断言不在场。
+
+**发 2＝`TestTicket257R2AC1ReceiptChainWalkUnlocksAllSevenFields`（11:17:16 PASS）**：把回执教的三样**照教的样子**动文件——`strings.Replace` 就地填已有的 `[llm.roles.chat]`（前置断言：文件里必须找得到 `"[llm.roles.chat]\nprovider = ''\nmodel = ''"`，找不到即红＝"教错了形状"）＋追加 `[llm.providers.deepseek]`／两条 `models.<id>` 且各带 `enabled = true` ⇒ `NewManager` 加载过 ⇒ **七枚 7/7 全部接受且各报键路径**（`len(written)==0` 判红，所以"接受了却没说落了哪"也拦得住）；文件终态 ⛔ 无 `\napi_key =` 明文键（AC#3）。
+⚠ 本腿在这发上**先红后绿过一次**，两次跑都留了盘（`new-tests-first.log`／`new-tests-second.log`）：首跑读数 `AC#1 RED: the taught chain unlocked 5 of 7 fields, want 7`，红因是**我的测试自己**把 `api_key_ref` 与 role 的 `model` 先填成了后面要写的同一个值 ⇒ `writeOneKey` 老实回"文件里已经是这个值"、键路径为空。这不是产码缺陷，是"接受了却没键路径"与"没变化"两种形状在我仪器里没分开；改法是让手加段与试写段用**不同**的占位值（`env:T257_R2_HANDADD_ENV_NAME` vs `env:T257_R2_ENV_NAME_NEVER_SET`；`model = deepseek-chat` vs 写 `deepseek-reasoner`），11:17:16 复跑 7/7。
+
+**发 3＝`TestTicket257R2AC1ReceiptOnlyFirstItemUnlocksThreeOfSeven`（11:17:16 PASS）**：只加第一样 ⇒ 恰好 3 枚接受，且逐名核对这 3 枚就是服务商那三枚（多一枚也算红）——这是把回执里"只加第一样只解锁服务商那三枚"这句数量话**变成可失败断言**的那一发（`257-a1` §1-7／`257-a2` §2.3 末两条独立复认过的 3/7，本腿在真跑里量到同一数）。
+
+**终态判语**：形 ⓒ 在 `cmd/wisp` 这一面**真兑现**＝干净机起步 → 首份配置由真入口建 → 七枚逐枚拒、拒句只讲"行不存在"并点名 `[llm.providers.<名>]` → 照回执教的三样手加 → 7/7 写得进；两个数量断言（3/7 与 7/7）都在盘上跑过，不靠静态推。
+
+## 4. AC#2 三句不同的话：逐字＋各自触发条件
+
+**先在产码里找到那三支今天各走哪条路（本腿自己 grep＋逐枚读，不抄派单行号）**：
+
+| 因 | 今天的真身（现量） | 现场原话挂在谁身上 |
 |---|---|---|
-| AC#1 的"设置页那七枚"里 `provider_credential` 的**真凭据腿**（`StoreCredential`→DPAPI） | 本腿够不着：AC#3 明令凭据面一字不动，且该腿在 `cmd/wisp/panel_config_store.go`（不在本腿写面）。本腿只对它的**配置侧半枚**（那条引用落盘）负责 | 编排者：需要一次真机 DPAPI 腿的裁决表行，`docs/evidence/s1/` |
-| 面板侧那三句拒因**在界面上的长相**（信封键、回执串） | ⛔ 写面禁 `internal/panel/**`（本票 §8 边界＋票 257 票面），且新增 C17 面字段属契约面（ⓑ 那形已被毙） | 编排者：若 owner 要"界面上也这三句"，需单开票（票 §8 边界③已预告 ⓑ 的两件契约面另立） |
-| 全包红名册里 `TestAC1ResidentLegInstallsItsLogListenerOnDisk`（票 127 `:497` 不 poll 竞态）／`TestAC14GoSideEvalPushReachesThePage`（票 33 真建窗） | 带载偶发、早已在册，不是本腿造成的红，本腿零动作 | 编排者（原有归属：票 127／票 33） |
-| `gofumpt -l cmd/wisp` 预存报 `cmd/wisp/models.go`（CRLF，不在本腿写面） | 明令不许顺手格式化 ⇒ 本腿不动，逐字读数留在 §6 | 编排者（属全仓 gofumpt 那一 sweep，票 70 家族） |
-| `frontend/**` 与 `design/**` | 连读都没读（README 规则 7 ＋本票 AC#4）；`git status` 起手就报着别人的一批 `D design/**`，本腿零动作、零引用 | 编排者：那批 `design/` 删除不属本票，请确认是谁的活 |
+| 文件没建 | `internal/config/loader.go:77`（`readConfigFile` 的缺文件分支，句尾接 `refusalFileMissing`＋"运行一次 wisp run 写出首份配置"）；`cmd/wisp` 侧的旧形状是 `run.go:417` 的 `wisp run: 配置未就绪（Unconfigured）：%v`（票 198 已把"干净机建文件"接在 `run.go:245`，所以首启后这一因在 `wisp run` 上不再发生） | 257-r1 那半；本腿的**回执**替它说话（第 1 句把真路径 `%s` 印出来，宣布"这一种已办完"） |
+| 行不存在 | `internal/config/settings.go:367`／`:379`（`requireCatalogEntry`／`unknownProviderErr`，接 `refusalRowMissing`＋`guidanceModelRow`／`guidanceProviderRow`）＋`:235-243` 的 `requireChatProvider`（role 那枚在"config 没点名 provider"时改判第 2 种） | 拒写现场；本腿的**回执第 2 句**预先说清"这一条说的不是你的值不对" |
+| 校验不过 | `internal/config/settings.go:293`（`writeOneKey` 预写 `validate()` 门，接 `refusalInvalid`＋"要改的是值；文件一个字节都没动"） | 拒写现场；本腿的**回执第 3 句**给同一形状 |
+
+**三句逐字（首启回执里的版本，11:12:28 那发的真 stderr，见 `after-text-ticket198.log`）**：
+1. `  第 1 种拒因：文件没建——这一种刚才那一发已经替你办完，<绝对路径>\config.toml 现在是真的文件；首启之前没有任何旧配置可言。`
+2. `  第 2 种拒因：行不存在——那一页改不了服务商与模型的存在性，去这份文件里手加上面那三样，加完才写得进；这一条说的不是你的值不对。`
+3. `  第 3 种拒因：校验不过——行在，但那个值过不了这份 schema 的校验（引用形没写对前缀、点名的模型不在目录里，都算这一种）；要改的是值，文件一个字节都没动。`
+
+**触发条件各不相同**：① 只在该数据根从没建过配置时出现（并宣布自己刚被解决）；② 文件在、要写的行不在（provider 行／model 行／roles.chat 的 provider 三形）；③ 行在、值过不了同一份 `validate()`（引用形缺前缀、点名的模型不在目录）。
+
+**仪器（`TestTicket257R2AC2ThreeRefusalsStayThreeSentences`，11:17:16 PASS）**的牙齿，不是"含不含"而是：
+- 三枚 tag 各**恰好出现在一枚行上**（`len(hits) != 1` 即红＝既拦折叠、也拦一句里塞两因）；
+- 每枚 tag 那一行还必须带**它自己的补救**：第 1 种＝`替你办完`＋`没有任何旧配置可言`；第 2 种＝`改不了服务商与模型的存在性`＋`手加上面那三样`；第 3 种＝`过不了这份 schema 的校验`＋`文件一个字节都没动`（三组补救串互不重叠 ⇒ "两行话其实是一行话"会红，见 §5-M3）；
+- 折叠判据正向化：`配置未生效`／`重启就好` 在整个回执里**只能出现一次**，且只能出现在禁句那行（"不会合成一句…"／"不是一句…"），出现在别的任何行都判红；
+- 借句判据：`cause=missing`／`本次运行继续用内存里的旧配置` 不得出现在回执（票 223/198 的归因隔离，本腿自己复钉一遍）。
+
+**第二发（`TestTicket257R2AC2EffectTimingSaysThreeProcessShapes`，11:17:16 PASS）**＝票 §8 边界①在 AC#2 上的延伸：**"什么时候算用上"也不许折成一句**——三形状各一枚（`每 1s 重读一次 config.toml 的看门狗`／`根本没有会重读盘的东西`／`自己明说不带轮询`），另钉两枚限定句（`热加载不会替它换脑`＝内存与装配期一次建好的模型通路不是一回事；`把那份引用再解一次是新建端点时才做的事`＝`A560` 那条没接线的通道不许被说成"改了就生效"）。
