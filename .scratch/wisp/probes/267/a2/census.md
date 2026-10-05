@@ -156,7 +156,70 @@
 
 ## §6 尺读数与未跑清单
 
-## §7 判不动 / 量不到（具名归口）
+### §6.1 每把尺的取数时刻（本腿自取，⛔ 零枚抄别家腿或票面）
+
+| 时刻 (+0800) | 尺 | 读数 |
+|---|---|---|
+| 09:38:38 | `date "+%H:%M:%S%z"` / `git rev-parse --short HEAD` | 起手 HEAD **`873c3063`** |
+| 09:39:11 | `git commit -- pathspec`（未 add 的裸文件） | `error: pathspec … did not match any file(s) known to git`（未跟踪文件必须先 `git add`） |
+| 09:39:16 | `git add <本件> && git commit -F <临时txt> -- <本件>` | 骨架 commit **`8aa9ff6f`**，24 行 |
+| 09:44:46 | 六根合并尺，带 `--include='*.go\|*.toml\|*.md\|*.ps1'` 过滤 | **213** 行 |
+| 09:44:46 / 09:44:56 | `git rev-parse --short HEAD` | **`2c83c076`**（期间 `0c2445d1`、`492571d8` 落到同一棵树 ⇒ 并发确认） |
+| 09:44:56 | 逐根 `grep -rIni`（无 include 过滤）：`cmd / internal / tools / docs / scripts / .scratch` | **21 / 42 / 0 / 27 / 0 / 749** |
+| 09:45:05 | `… internal cmd \| cut -d: -f1 \| sort \| uniq -c` | cmd 侧逐文件：`resident_approval_risk_256_windows_test.go` 11、`resident_approval_windows.go` 4、`panel_pump_test.go` 2、`run.go` 1、`run_mode101_test.go` 1、`resident_windows.go` 1、`approval_reply_201_test.go` 1 |
+| 09:45:05 | `.scratch` 分桶 | probes **717**（本票 `probes/267` 83，其中 `267/r1/evidence.md` 42）· issues **21** · ci-logs **4** · `ledger-restore.tmp` 4 · `probes-255-r1c` 2 |
+| 09:46:20 | `docs` 分文件 | 14 枚文件共 27：`pending-and-issues.md` 8、`evidence/s1` 15（分 11 枚文件）、`PLAN.md` 1、`SPEC-03` 1、`missing-features-…v4.md` 1 |
+| 09:47:59 | `grep -rn "newReplyHost(t, " cmd/wisp` | 直接喂值调用点 **10 枚**（20s ×9、2s ×1）＋ 2 枚 helper 形参转手 |
+| 09:47:59 | `grep -rn "newWidenRun(t, \|newReloadRun223(t, " cmd/wisp` | 间接调用点 **15 枚**（40s ×10、90s ×4、60s ×1）＝全部带内 |
+| 09:49:18 | `sed` 逐段读 `approval_seam_201_test.go`／`ticket224_assembly_test.go` | 两枚 20s 调用点的断言原文已取得（§2 #9–#12） |
+| 09:49:39 | `grep -rn "Clock\b" cmd/wisp/*.go` | **0 命中** ⇒ 丙在 `cmd/wisp` 今天没有任何入口 |
+| 09:49:45 / 09:49:50 | `grep -rn "go test" scripts`、`grep -n "timeout\|go test\|cmd/wisp" scripts/wisp-cli-tests.sh` | 跑 `cmd/wisp` 的是 `scripts/wisp-cli-tests.sh`（`:111` scope=`./cmd/wisp/`）；**两把尺都找不到 `-timeout` 字样** ⇒ 包级超时是 `go test` 的默认值，本腿不去猜它是多少（见 §7.1） |
+| 09:50:27 | `grep -n "t\.Errorf\|t\.Fatal" cmd/wisp/approval_seam_201_test.go` 等 | 断言行号全部就地核字符确认（§2 引用逐枚） |
+| 09:51:59 | 本件 commit §2 后 | **`c9600334`**，163 行 |
+| 09:52:15 | `grep -n -i "inject\|seam\|mock" .scratch/wisp/issues/README.md`、`grep -rn -i … tools/d22scan/*.go`、`ls internal/*/testdata` | 名册原文＝`README.md:206-207`；d22scan 侧**没有**任何"测试构造 gate/queue"的禁令；`testdata/` 现存四棵：`internal/agent/testdata`(golden)、`internal/llm/testdata`(golden)、`internal/models/testdata`(tiny-model.tar.bz2/README)、`scripts/testdata` |
+
+### §6.2 未跑清单（派单规矩 1 的账，逐枚具名）
+
+⛔ 本腿**一条 `go` 命令都没跑**，因此下面每一项都是"本可以实测、按令未实测"：
+
+1. `go test ./cmd/wisp/` ＝ 明令禁跑 ⇒ **§2 那 12 枚带外位置的红，形态是机制判语不是读数**：本腿说不出"先炸的是 `run_mode101_test.go:551` 的 `t.Fatalf("exit %d\n%s", code, log)` 还是 `:245` 的同形句"，也说不出退码到底是 2 还是 1。
+2. `go test ./internal/config/`、`./internal/agent/approval/` 未跑 ⇒ §1.2 里那些"绿"的判语（票 267 自己的钉子、unwired 夹具 300/60、boundary 60）是**读断言 + 读带**得来的。
+3. `go build ./...`、`go vet`、`gofumpt` 未跑 ⇒ 本件不对任何"编译面/格式面"下结论。
+4. `wisp slo`、`sh scripts/*`、`tools/d22scan` 未跑 ⇒ 未验证 band 会不会把 D22 静态门或 SLO 门顶红（本腿只确认 `tools/` 与 `scripts/` 里**零枚**这枚键的出现，见 §1 总量表）。
+5. `cmd/wisp` 包级总时长未量 ⇒ 甲的 +58s 落不落得下，见 §7.1。
+6. 面板/球侧那张 C18 卡的实际文案到达与否未量 ⇒ 一因未跑，二因 `frontend/**` 是本腿禁读面（§7.8）。
+
+## §7 判不动 / 量不到（具名归口；⛔ 本节不许出现"应该没问题"）
+
+### §7.1 `cmd/wisp` 包的总时长余量 —— **判不动**
+甲在本腿的账是 +29s（`approval_reply_201_test.go:439`）+29s（`panel_pump_test.go:136`）+ 失败路径每发 30s（`run_mode101_test.go` 里 `t101call` 用的是无期限 `context.Background()`，`:195`）。这棵树今天有没有一枚尺量着 `cmd/wisp` 的包时长，本腿没找到（`scripts/wisp-cli-tests.sh` 里搜不到 `-timeout`），而 `scripts/portable-tests.sh:5` 只列了"go test <16 packages>"。**⇒ 归口＝编排者**：只有当机那枚跑 go 的腿能给出"抬完种子后这一包还在不在默认包超时内"。本腿拒绝用"应该还早"填空。
+
+### §7.2 band 之后那 12 枚调用点的**确切红形态** —— **量不到**
+本腿能给的是链条：`os.WriteFile` 落盘 → `config.LoadFile`（`loader.go:41`）→ `readConfigFile` → `validate`（`loader.go:137`）→ `validateRisk` 的 `observe.New(observe.ClassConfig, "config.toml: risk.confirm_timeout_sec %d out of range [31, 3600]")`（`validate.go:145-148`）→ 装配根拿不到 cfg。给不了的是**这一包实际打印哪一句、第几枚用例先停**（未跑，§6.2 第 1 项）。**⇒ 归口＝编排者排的下一枚 `cmd/wisp` 写腿**（它本来就要动这批文件）。
+
+### §7.3 常驻腿"越界"与"缺文件"共用同一枚 `unreadable` 判语 —— **判不动，且本腿认为这是本把尺量出的最重一枚**
+`resident_approval_windows.go:453-457` 逐字 `if err != nil || c == nil { slog.Warn(…); return 0, 0, riskProvenanceUnreadable }`：band 让**一份存在但越界**的 config 与**一份不存在**的 config 得到同一个 provenance 词与同一个 300s 回落。票 256 的 `:141-144` 那枚正控（`(300s is the contract default; a fourth number here means the fallback grew a value of its own)`）**分不开这两种**，而裁形 ⓐ 的原话是"越界＝加载时拒"。要不要给常驻腿加第三种 provenance 词、要不要让它拒启动，都不在只读普查的权里。**⇒ 归口＝编排者**（且它可能与 `Q-77` 同一枚决定面，见 §7.5）。
+
+### §7.4 C18 那张卡的"即将超时"提示端到到不到面板 —— **量不到**
+`gate.go:557-569` 那段（逐字 `审批将在 %d 秒后自动拒绝，请尽快确认`）需要真时钟跑到 `lead`；本腿⛔禁跑 go、⛔禁改 `internal/agent/approval/**` 与 `cmd/wisp/**`，而且 `frontend/**` 是禁读面。**⇒ 归口＝下一枚 `cmd/wisp` 写腿顺手一发**（本腿在 §2 #6 给了它一枚免费正控的形状：种子 31 ⇒ `lead = 1s`）。这与 r1 `evidence.md §7.2` 自己交回的那半格是同一枚洞，不重复记账。
+
+### §7.5 `Q-77`（C18 硬编码 300s vs 可配 `confirm_timeout_sec` 谁优先）—— **待人拍板，本腿不动**
+台账逐字在 `docs/reports/pending-and-issues.md:11761`，`docs/specs`/票面都写着⛔任何腿不许自行裁。本件的 §2.3 与 §7.3 都在它射程里（回落值 300 恰是 C18 那个数），但**本腿一律按"不答也能成立的机制描述"写，没有替它裁任何一支**。
+
+### §7.6 值域要不要进 `SPEC-03`／`PLAN.md` 的 D36 文本 —— **判不了（属人工批准面）**
+`docs/specs/SPEC-03-config-secrets-envs.md:34` 现在只写 `confirm_timeout_sec(int)=300`、`docs/PLAN.md:2738` 只写 `(300)`，两处**都没有值域一格**。band 落地＝给 SPEC-03 加一条它今天没有的规矩。改规格文字＝改契约面（AGENTS §0 第 2 句、`SPEC-12 §4.1`）。**⇒ 归口＝编排者**（本腿只登记"文字与规矩已经不同步"这一事实，不动一字）。
+
+### §7.7 乙那格算不算"新造一枚注入缝"—— **本腿给判据，不给裁定**
+名册原文逐字＝`.scratch/wisp/issues/README.md:206-207`：`Tests inject at seams only: C8 AudioSource (wav), C5 LlmProvider (golden SSE), C17 PanelBridge, CLI `wisp run`. No mock-instead-of-real to fake completion`。**扩这枚名册（或裁定"测试直接构造真 `approval.New` 不属于新缝"）＝人工批准**，只读腿无权裁。本腿在 §4 只交两样东西：现成的同类先例逐枚 file:line，以及"先例里那些门是谁裁的"。
+
+### §7.8 面板/球侧的第二枚消费点 —— **量不到（禁读面）**
+派单规矩 3 禁读 `frontend/**` 与 `design/**`。`confirm_timeout_sec` 若在渲染层还有第二枚读者（例如把 `Prompt.Deadline`（`gate.go:610`）画成倒计时），本腿看不见也不转述。**⇒ 归口＝那一编队**；本件全部结论只覆盖 Go 侧与文档侧。
+
+### §7.9 键名的拼接形状 —— **量不到的形状**
+本腿的尺是 `-e confirm_timeout_sec -e ConfirmTimeoutSec`（大小写不敏感）。若某处用**变量拼出键名**（`"confirm_" + "timeout_sec"`、正则、或 `toml.Marshal` 之后改写），grep 形状看不见。`internal/config/schema.go:460` 的 toml tag 是本腿能确认的唯一具名形状；**"零枚隐藏拼接者"这句本腿不敢说**，只说"未发现"。
+
+### §7.10 `panel_pump` 那发在 31s 下**究竟改看哪枚时钟** —— **判不动（两相未实测）**
+本腿读到 `panel_pump_test.go:112` 的 30s ctx 与 `gate.go:571`（`<-deadline`）/:576（`<-ctx.Done()`）在同一枚 `select` 里，**读到的是"两枚 case 并存"，不是"哪枚先赢"**。`30 < 31` 让机制判语倾向 ctx 先响，但这一句在没跑过之前不许当结论用（§6.2 第 1 项）。**⇒ 归口＝编排者**：甲若被选，这一发要**连 ctx 一起抬**，而抬完必须有一枚实测读数才算交付（本腿给不了）。
 
 ## §8 我写错的读数（自我对抗）
 
