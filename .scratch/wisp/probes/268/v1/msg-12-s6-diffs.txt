@@ -1,0 +1,24 @@
+probes(268-v1b 笔3)：填 §6——对 268-r1 交回的六处差异逐处独立复核（只交事实，裁决归编排者）
+
+6.1 class 级措辞：internal/config 全包只一枚 sentinel 用法（parse.go:234），loader.go:74 那枚是注释；
+    validate.go:141-148 的 band 拒载用 observe.New(ClassConfig, …) 造，无 marker 类型、无 cause
+    ⇒ class 级是今天诚实上限，要 string 出现 band 字样得先动 internal/config＝跨包契约面。不裁。
+6.2 d22scan 分母：独立尺改用 git 名册（⛔ find 会数进 testdata）——87bc8b0f=103／9a941965=104／HEAD=104；
+    find 数到 105 的差 1＝cmd/wisp/testdata/esclistener/main.go，仪器 main.go:1117 明确跳 testdata。
+    违规 0、红名空。+1 确为 268 那枚新 _test.go。"算不算读数扩大"不裁。
+6.3 AC#1 分档：票面原句"日志具名＝最低档／doctor、回执＝达标"。三枚事实——doctor 五笔命中逐笔 0 且
+    检查项尺＝28（与 AC#0④ 同读数）、build.ps1:167-169 拿 doctor 退码当构建门；"回执"在 cmd/wisp 非测试码
+    只 5 处且全属 run 腿 firstrun stderr 与 panel-inbound 行回执，常驻审批卡今天无回执承接面
+    （panel/ball/approval 三包 grep 回执＝0）；stdout 那行终端可见、windowsgui 双击不可见。分档不裁。
+6.4 硬钉射程：256 仪器 AST 窗 :537、锚 :530，三枚断言 :560/:563/:568 逐中行号现量中——它数构造名，不数
+    config.LoadFile ⇒ a2 收窄口径形成立；本腿 §5.1 的 7 枚读取点复现"268 一枚未加"。两句在这份 diff 同读数。不裁。
+6.5 行号区间：对 87bc8b0f 逐行 cat -n 复量——:382 是 window/confirm 那行不是句尾，句尾在 :384 ⇒ 票面 :379-382
+    截短两行、派单/r1 的 :379-384 与旧文件实况一致、代码无漂；现文件同句下移 1 行（:380-386 逐字同形）。
+6.6 触发面：r1 尺原文复跑本腿现量＝16 ≠ r1 的 14；归因＝同一把尺过 git 名册：87bc8b0f 取 14、9a941965 取 16，
+    差的 2 枚正是 r1 自己那枚新文件（:82 种 20、:176 修 45）⇒ 两数皆真，差别是取数时刻。
+    "带外 confirm 0 枚"独立复量：approval_reply_201 的 %d 六处喂值 40s/40s/40s/31s/40s/40s 全带内
+    ⇒ 除 268 三枚用例外整包不走被拒支，与 §3 的"stdout 行只出现 1 枚且归属用例①"互证。
+    ★顺手量到一枚他票过期注释并具名归口（本腿一字未改）：panel_pump_test.go:124 注释仍写 confirm=2、
+    :136 代码已 31，改动笔＝32e74479（票 267-r2 种子迁移）。
+
+写面＝.scratch/wisp/probes/268/v1/** 一枚 evidence.md；⛔ 零产码、⛔ 零票面、⛔ 零台账。只 commit 不 push。

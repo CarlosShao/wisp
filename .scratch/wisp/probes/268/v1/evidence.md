@@ -201,7 +201,90 @@ v1 那一枚出现处 `:1002`，`=== RUN` 归属＝`TestTicket268ResidentGateNam
 
 ## §6 六处差异的独立复核
 
-「待验」
+派单口径：**只交事实与复跑读数，裁决归编排者**。六处都出自 `268-r1` §7.3 自己列的待裁清单（`r1/evidence.md:294-312`），
+本腿每一处独立取数、不复用 r1 的转述。
+
+### 6.1 新 provenance 取 **class 级**措辞（r1 §7.3 第 1 条）
+
+- 本腿独立量的"机读分不分得开"：`grep -rn 'errors.Is\|^var Err\|type .*Error' internal/config/*.go | grep -v _test`＝
+  该包**只有一枚** sentinel 用法：`internal/config/parse.go:234` `return errors.Is(err, fs.ErrNotExist)`；
+  `internal/config/loader.go:74` 那行是**注释**（"reads fs.ErrNotExist off it for cause=missing"）。
+- 值域拒载那支的造物现场＝`internal/config/validate.go:141-148`（亲读逐字）：
+  `return observe.New(observe.ClassConfig, fmt.Sprintf("config.toml: risk.confirm_timeout_sec %d out of range [%d, %d]", …))`
+  ⇒ **没有 marker 类型、没有包装 cause**，分不出"语法／未知键／迁移／band"任何两支而**不读 prose**。
+- ⇒ **事实**：`present but refused at load` 是**今天诚实的上限**（class 级），"被值域门拒"那半只能由紧跟其后的 `%v` 原话承载
+  （日志 attr `"err"` ＋ stdout 行 `:510` 两处都在，§5.1/§0.2 已亲读）；要 string 里出现 band 字样 ⇒ 得先给 `internal/config` 造 marker ＝ 跨包契约面。
+  本腿**不裁**这算不算"具名程度够"。⚠ 一处支持 r1 的旁证：票面对 AC#1 的原句是"一枚与'文件不存在'**不同**的具名状态"，未要求具名到规则级。
+
+### 6.2 d22scan `ban #8 cmd/` 分母 **103→104**（r1 §7.3 第 2 条）
+
+- 独立尺＝git 名册（⛔ 不用 `find`，它会数进 `testdata`）：
+  `git ls-tree -r --name-only <tree> | grep -E '^cmd/.*\.go$' | grep -vc testdata`
+  → `87bc8b0f`（268 之前）＝**103**；`9a941965`＝**104**；`HEAD`＝**104**。
+- `find cmd -name '*.go' -type f`＝**105** 与仪器读数差 1 的归因（现量，不是矛盾）：
+  `cmd/wisp/testdata/esclistener/main.go` 被仪器跳过——`tools/d22scan/main.go:1117`
+  `if (sc.goOnly || sc.everyFile) && d.Name() == "testdata"`（`:682`/`:1031` 同族跳过）。
+- 违规枚数＝**0**、红名集合＝**空**（门 1 §4 现量，`:251` 逐字 `clean`）。
+- ⇒ **事实**：+1 那枚**确为** `cmd/wisp/resident_approval_risk_268_windows_test.go`（唯一一枚随 268 落地的新 Go 文件，`git show --name-only 9a941965` 亲读 5 枚路径）。
+  这是"仪器射程面多一枚文件"，不是"违规多一条"。**"算不算读数扩大"本腿不裁**（派单原文是"卫生四门读数不扩大"，红名集合逐名比对＝空集差）。
+
+### 6.3 AC#1 的 stdout 那行算不算**达标档**（r1 §7.3 第 3 条）
+
+- 票面 AC#1 原文逐字（`.scratch/wisp/issues/268-…md:31`）：
+  「日志具名 provenance 算**最低档**；`doctor`／**回执**算**达标**」。派单与 r1 把 stdout 那行记为达标凭据。
+- 本腿量的可达面事实（三枚，逐枚 file:line）：
+  1. `slog.Warn`（被拒支在 `:496`，进 logsink 落盘，两枚起法都在；缺失支那枚在 `:477`）＝票面写明的**最低档**。
+  2. `fmt.Printf` 那行（`:510`）＝**终端起法可见、`-H=windowsgui` 双击无 console 可打**（r1 §6.1 已具名，本腿不推翻）。
+  3. `doctor` **零改动**：`grep -c 'pass("\|fail("\|info("' cmd/wisp/doctor.go`＝**28**（与票面 AC#0④ 的"调用点 28"同读数），
+     且 `9a941965`／`4c456d0a`／`b93624d4`／`2a0e23b4`／`c072d5b7` 五笔对 `doctor` 命中逐笔＝**0**（`git show --name-only | grep -c doctor`）。
+     成本面本腿复认 a2：`scripts/build.ps1:167-169` 逐字 `& (Join-Path $outDir 'wisp.exe') doctor` ＋ `if ($LASTEXITCODE -ne 0) { Fail 'wisp doctor reported FAIL.' }`
+     ⇒ 加 `fail` 级检查项＝把带内越界那台机器的构建门打红。
+- **"回执"这枚档到底指哪一面**——本腿量的现量：`grep -rn '回执' cmd/wisp/*.go | grep -v _test`＝5 处，
+  全属 **run 腿 firstrun 的 stderr 回执**（`firstrun.go:88/126/147/179`，且 `:147` 逐字"三段都只走 stderr 这一条'给人看的回执'通道"）
+  与 **panel-inbound 的行回执**（`panel_inbound.go:181`），**没有一枚是常驻审批卡的回执**。
+  ⇒ 事实＝票面那枚"回执"**在常驻腿今天没有承接面**（要造＝动 `frontend/**` 或面板回执，票面「排程与禁区」末条＋AC#0③已划为停手项）。
+  本腿另量到常驻腿**本来就有**第二枚 stdout 面这一事实（不属 268，仅供裁档参考）：
+  `resident_approval_windows.go:538` `fmt.Printf("wisp: [audit] %s\n", line)`（`residentAuditf`），与 `[hotkey]`（`resident_windows.go:187`）同形。
+- ⇒ **本腿不裁分档**；只把"最低档已满足／达标两档里 doctor 零改动且有构建门代价、回执面无承接位"三枚事实交回。
+
+### 6.4 硬钉 1 的**射程**（r1 §7.3 第 4 条）
+
+- 仪器本体亲读（`cmd/wisp/resident_approval_risk_256_windows_test.go`）：AST 窗从 `:537` `ast.Inspect(fn, …)` 起，
+  `fn` 是 `:530` 那句 `no runResident in %s` 锚定的**唯一一个 FuncDecl**；三枚断言＝`:560 if fed != 1`／`:563 if bare != 0`／`:568 if !argOK`（行号现量逐中）。
+  它数的是**构造名**（`newResidentApprovalWithConfig`／`newResidentApproval`）与那枚实参是否 `*.DataDir`——
+  ⇒ **仪器射程＝a2 §2④ 说的"构造名计数钉"，不数 `config.LoadFile`**。复认 a2 的尺**形**成立。
+- 同时本腿 §5.1 已枚过全部读取点：现量 7 枚（其中 1 枚是 `run.go:17` 注释），落 `residentRiskGateValues` 内部的只有 `:474` 一枚 ⇒
+  **268 一个读取点都没加**（复现 §5.1，非引用 r1）。
+- ⇒ 事实＝**派单那句更严的纪律（不得加第二枚 `[risk]` 读取点）与 a2 收窄口径在这份 diff 上同读数**，冲突只存在于文字层。
+  本腿**不裁**该以哪句为准。
+
+### 6.5 `:379-382`（票面）vs `:379-384`（派单／r1）文本区间（r1 §7.3 第 5 条）
+
+- 独立复跑（`git cat-file blob 87bc8b0f:… | sed -n '379,385p' | cat -n`，票面锚定的就是这枚旧文件）：
+  `:379`＝`slog.Info("resident gate: [risk] tier taken at construction",`、`:380` provenance、`:381` config_path、
+  `:382`＝`"window_sec_read", …, "confirm_timeout_sec_read", …`（**不是句尾**）、`:383` gate_window／gate_queue_timeout、
+  `:384`＝`"scope", …`（句尾 `)` 在此行）、`:385`＝`ra.cards = approval.NewReplies()`（**已出句**）。
+- ⇒ 事实＝**旧文件该句实跨 `:379-384`**；票面 `:379-382` 截短两行；派单与 r1 的 `:379-384` 与实况一致；
+  **代码无漂**（`9a941965^` 的 `:379-384` 逐字未动）。现文件（含 268）同一句整体下移 1 行＝`sed -n '380,386p'` 逐字同形（本腿现量）。
+- ⇒ 这一处 r1 的"以亲读为准"本腿**复现且无新增疑点**；是否据此改票面文字归编排者（AC 框本腿一枚未碰）。
+
+### 6.6 触发面窄于 a2（r1 §7.3 第 6 条）
+
+- r1 的尺原文逐字复跑（`grep -rn 'confirm_timeout_sec = \|l1_window_sec = ' cmd/wisp/*_test.go`）：
+  本腿 20:2x 现量＝**16**，⚠ **不等于 r1 报的 14**。归因（同一枚尺过 git 名册，非猜）：
+  `git grep -h -E '…' 87bc8b0f -- 'cmd/wisp/*_test.go' | wc -l`＝**14**；同尺对 `9a941965`＝**16**。
+  ⇒ **r1 那 14 是对"它落地之前"的树取的，落地后＋2 枚＝它自己那枚新文件（`_268_windows_test.go:82` 种 20、`:176` 修成 45）**；
+  两读数都真，差别＝取数时刻，**不是漂字**。本腿按派单口径具名"读数不一致先怀疑在谁的窗口"：这里在 r1 自己的落地笔。
+- "带外 confirm **0 枚**"那半独立复量：现役种子里 confirm 取值＝`45/90/31/40/%d` 与 `20`（`20` 只属 268 自己的用例）。
+  `%d` 那枚（`approval_reply_201_test.go:145`）的喂值现场＝`newReplyHost(t, …)` 六处调用：`:202/:272/:350/:521/:595`＝`40s`、`:439`＝`31s` ⇒ 全带内。
+  ⇒ **除 268 自己那三枚用例，今天整包里没有任何一枚用例把被拒支走绿**＝与 §3 那枚"stdout 行在整包里只出现 **1** 枚、
+  且归属 `TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfig`"（`:1002`，20:11:50.962）**互相印证**。
+- ⚠ 本腿顺手量到一枚**他票留下的过期注释**（不属 268 射程，只具名归口）：
+  `cmd/wisp/panel_pump_test.go:124` 注释逐字仍写 `confirm_timeout_sec = 2`，而 `:136` 代码已是 `confirm_timeout_sec = 31`
+  （改动笔＝`32e74479` 票 267-r2 种子迁移，12 枚带外喂值点抬进带内那一笔）⇒ 注释过期、代码带内；
+  本腿一字未改（⛔ 零产码），交回编排者决定归哪枚票。
+- a2 §4 那句"**即使触发也不撞**"本腿不复跑它的钉名册（属 a2 射程，且并行腿地界），只复认它的**结论方向**与 268-r1 的"根本不触发"在同一枚事实（除 268 用例无带外种子）上不打架。
+
 
 ## §7 commit 链与收尾读数
 
