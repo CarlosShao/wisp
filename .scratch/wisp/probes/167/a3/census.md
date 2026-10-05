@@ -109,3 +109,58 @@ git status --porcelain cmd internal tools docs scripts
 - N4／N5／N6 是**计费 token（provider 报的真值）轴**，且是跨轮累加 ⇒ 与 D 轴相除在算术上就不成立。⛔ 同一格里不许混。
 - 字节数在盘上另有两枚（`internal/projctx/projctx.go:94` 逐字 `	Bytes int \`json:"bytes"\`` 与 `internal/panel/instructions_200.go:54` 逐字 `	Bytes int \`json:"bytes"\``）—— 具名排除，它们不是 token 轴。
 
+## 3. Q3 — "未知"这一枚状态在这棵树上今天怎么长：可复用名册
+
+> 票面 AC#2 要的是"分子或分母任一未知 ⇒ 出口里必须是**一枚具名状态**"。本节只量仓里**已有**的具名"未知/不可知"形状，逐枚给 `file:line` ＋类型＋今天被谁读，⛔ 不选形（选形归落地腿与编排者）。
+
+### 3.1 名册（三族，共 13 枚）
+
+**A 族：布尔尾缀 `…Known`（"没读过"≠"读出来是空"）**
+
+| 枚 | `file:line` ＋ 被指字符逐字 | 类型 | 谁产 | 今天被谁读 |
+|---|---|---|---|---|
+| A1 | `internal/panel/approval.go:52` 逐字 `	ReasonKnown bool \`json:"reasonKnown"\`` | bool＋**有 tag** | `internal/panel/approval.go:84` 逐字 `		ReasonKnown:            strings.TrimSpace(decision.Reason) != "",` | `internal/panel/approval_test.go:68`、`cmd/wisp/panel_pump_test.go:245`、`cmd/wisp/panel_assets_143_test.go:58`（自带一份 wire 镜像 `bool \`json:"reasonKnown"\``）与 `:147` |
+| A2 | `internal/panel/composer.go:256` 逐字 `	ModelKnown   bool   \`json:"modelKnown"\`` | bool＋有 tag | `internal/panel/pump.go:285` 逐字 `		composer.ModelKnown = composer.CurrentModel != ""` | `internal/panel/composer_test.go:749/:757/:762/:764`（四发，含"裸构造必须为 false"与"空串必须为 false"两枚反向） |
+| A3 | `internal/panel/composer.go:269` 逐字 `	CredentialKnown bool            \`json:"credentialKnown"\`` | bool＋有 tag | `internal/panel/pump.go:296` 逐字 `		composer.CredentialKnown = true`（只在 reader 存在那支里） | `cmd/wisp/panel_config_248_test.go:539` 逐字 `	if composer["credentialKnown"] != true {`（**按 wire 键名读**，不是按 Go 字段） |
+| A4 | `internal/panel/subagent_roster_197.go:115` 逐字 `	StatusKnown bool   \`json:"statusKnown"\`` | bool＋有 tag | 产在装配根 `cmd/wisp/panel_pump.go:179` 逐字 `			StatusKnown:       status != "",` | `cmd/wisp/subagent_blocked_197_test.go:176`、`cmd/wisp/subagent_carrier_197_test.go:300/:323/:354`；⚠ 载体的**宿主侧同名镜像 `internal/panel/subagent_roster_197.go:72` 逐字 `	StatusKnown  bool`（无 tag）** ⇒ 见 §4.4 那把盲区尺 |
+
+**B 族：字符串枚举里的一枚具名"不可知"（状态枚）**
+
+| 枚 | `file:line` ＋ 被指字符逐字 | 类型 | 谁产 | 今天被谁读 |
+|---|---|---|---|---|
+| B1 | `internal/panel/config_handlers.go:175` 逐字 `type CredentialState string` ＋ `:180` 逐字 `	CredentialUnknown CredentialState = "unknown"`（五值名册 `:178-190`） | **字符串枚举**（五枚） | `cmd/wisp/panel_config_store.go:90` 逐字 `		return panel.SettingsView{Credential: panel.CredentialUnknown}, fmt.Errorf(...)`；回落 `internal/panel/pump.go:292-293` | `internal/panel/composer.go:288`（`NewComposerState` 的默认值＝`CredentialUnknown`）、`cmd/wisp/panel_config_248_test.go:536` |
+| B2 | `internal/panel/instructions_200.go:73` 逐字 `	Status string \`json:"status"\`` ＋ 五值名册 `:27/:30/:32/:35/:40`（`loaded`/`none_found`/`off`/`refused`/**`not_run`**） | 字符串枚举（五枚），**每非-loaded 态必带 `Reason`**（`:77` 逐字 `	Reason string \`json:"reason,omitempty"\``） | `internal/panel/instructions_200.go:158-194` `InstructionsSectionFromBundle`（`:161` 就是 `not_run` 那一支，`:162` 逐字带一句"这里是没有读数，不是没有说明文件"） | `cmd/wisp/instructions_200r2_test.go:58-69`（**按 wire 读**：键不存在即 Fatal，`Status` 为空即 Error）、`internal/panel/instructions_200_test.go:269` |
+| B3 | `internal/panel/git.go:66-69` 四枚（`repo`/`not_a_repo`/`permission_denied`/**`unreadable`**），载体 `internal/panel/git.go:119` 逐字 `	Kind string \`json:"kind"\`` ＋ `:122` 逐字 `	Reason string \`json:"reason"\`` | 字符串枚举（四枚）＋**必填 reason** | 构造函数 `internal/panel/git.go:150` 逐字 `func GitViewNotProbed() GitView {`（`:151` 逐字 `	return newGitView(GitKindUnreadable, gitNoWorkspaceReason)`） | 默认值写在两枚构造点：`internal/panel/composer.go:125` 与 `:285`（都逐字 `Git: GitViewNotProbed(),`）；读侧 `cmd/wisp/panel_pump.go:228 func (rt *agentRuntime) gitView() panel.GitView` |
+| B4 | `internal/panel/composer.go:144` 逐字 `	Current string \`json:"current"\``（注释 `:142-143` 点名 `"unknown"`）＋ 出口 `internal/panel/composer.go:168` 逐字 `func ModeUnknownView() ModeView {` | 字符串**哨兵值**（不是枚举类型；合法档位名与 `"unknown"` 共用一枚 string） | `internal/panel/pump.go:273` 逐字 `		composer.Mode = ModeUnknownView()`（只在 `!modeReadable` 那支）；另有 `internal/panel/composer.go:117` 在构造函数里兜底 | `internal/panel/pump_test.go:131`（零 reader ⇒ `mode.current == "unknown"`）与 `:152-159`（**活 reader 给了非法档也必须 `"unknown"`**）、`internal/panel/composer_test.go:246 TestUnknownModeNeverRendersAsASafeOne` |
+| B5 | `internal/panel/config_handlers.go:196` 逐字 `type EffectiveTier string` ＋ `:202` 逐字 `	EffectiveNotApplied EffectiveTier = "not_applied"` | 字符串枚举（四枚） | `cmd/wisp/panel_config_store.go:175/:177/:191/…`（写面回执） | `internal/panel/config_route_248_test.go:323` 逐字 `	for _, tier := range []EffectiveTier{EffectiveRestart, EffectiveNextTask, EffectiveNotApplied, EffectiveTier("")} {`（含"空串单独一枚"那一支） | ⚠ 这一枚的射程是"写入回执"，不是出向读数 ⇒ 具名说明它**不是**同一族的模板 |
+
+**C 族：随附的"为什么不知道"字符串（provenance/reason 那一族）**
+
+| 枚 | `file:line` ＋ 被指字符逐字 | 类型 | 今天被谁读 |
+|---|---|---|---|
+| C1 | `internal/panel/subagent_roster_197.go:120` 逐字 `	StatusReason string \`json:"statusReason,omitempty"\`` | string＋omitempty | 产点两枚：装配根 `cmd/wisp/panel_pump.go:180` 逐字 `			StatusReason:      statusReason,`（值来自 `internal/tools/task.go:160` 逐字 `		return "", "宿主没有登记这一维（fail-closed：不替任务编一个状态）"`），以及 carrier 自己在 `internal/panel/subagent_roster_197.go:247-249` 补的一句兜底话；读点 `cmd/wisp/subagent_carrier_197_test.go:323` |
+| C2 | `internal/panel/composer.go:224` 逐字 `	Reason string \`json:"reason"\``（注释 `:222-223`：`// Reason explains an unset or narrowed workspace; never empty when Set is`／`// false, because "no workspace" is a fact the user must be able to read.`） | string，**无 omitempty** | `internal/panel/pump_test.go:137` 逐字 `	if snap.Composer.Workspace.Set || snap.Composer.Workspace.Reason == "" {` |
+| C3 | `internal/panel/git.go:144` 逐字 `	SwitchBlocked string \`json:"switchBlocked"\``（值是一枚常量句 `git.go:82` 逐字 `const GitSwitchBlockedReason = ...`） | string 常量句（"这一维今天不可用"的具名陈述） | 由 `newGitView` 一路带出；⚠ 它示范的是**"能力不存在"也要有一句话**这个形状 |
+| C4 | `internal/panel/subagent_roster_197.go:167-168` 逐字 `	// Empty array means none, never "unread".`／`	DroppedStreamKeys []string \`json:"droppedStreamKeys"\``（配合 `:207-211` 把 nil 折成空数组） | 数组的"空 vs 未读"分流 | `cmd/wisp/subagent_carrier_197_test.go` 一族 |
+
+### 3.2 复用判语（派单点名："哪一枚复用不需要新增 JSON 键"）
+
+**结论先行：占用这一枚的"未知"**无法**复用任何一枚既有键——既有 13 枚形状里没有一枚的语义槽位是"上下文用量"。所以：复用**形状**（A/B/C 三种写法）不新增键，复用**键本身**必须新增键。**逐条判：****
+
+| 复用哪一枚形状 | 要不要新增 JSON 键 | 加在哪个文件 | 落不落在票 145 已批那一寸内 |
+|---|---|---|---|
+| **甲＝A2/A3 形（值＋`…Known` 两枚 bool）**：例如 `contextUsed`＋`contextUsedKnown` | **要**（每枚各一键） | 若加在 `ComposerState`＝`internal/panel/composer.go:235-270` → **在寸内**（该文件是 145 特批点名的三枚之一，且"只到新增字段"逐字覆盖"加字段"） | ✅ 不越界；⚠ 但键一加就撞 `internal/panel/composer_test.go:61` 那一行名册（`{"ComposerState", ComposerState{}, "ComposerState"}`），见 §4.1 |
+| **乙＝B2 形（一节对象，`status` 恒非空＋`reason`＋数值）**：`*OccupancySection json:"occupancy,omitempty"` | **要**，且**至少两键**（一节的外壳键＋节内 `status`/数值） | 外壳字段可加在 `internal/panel/composer.go:57-92`（寸内）；**但那个 section 类型本身今天不存在** —— 三种落点：① 追加进 `composer.go`（寸内）；② 新建 `internal/panel/occupancy.go`（**不在 145 名册的三枚文件里 ⇒ 越界**，先例是票 181 靠**自己那份派单**的「✅ 新建：`internal/panel/git.go`」拿到授权，不是靠 145）；③ 改 `internal/panel/instructions_200.go` 借道（**越界**，那枚文件不在名册里） | ⚠ 分形判：① 允许；②③ **越界，必须停手上报由编排者补授权行** |
+| **丙＝B3 形（四值字符串枚举行）** | 要（新键） | 同乙（新类型落点决定越界与否） | 同乙 |
+| **丁＝直接复用 `internal/panel/composer.go:269 CredentialKnown` 那一寸旁边的空位**（不新增类型，只加两枚标量字段） | 要 | `composer.go` | ✅ 寸内，且**是名册里唯一"三个文件全用得上、一枚新类型都不必声明"的形** |
+| **戊＝借 `Snapshot.Tasks` 那一节**（`internal/panel/subagent_roster_197.go:150-169`，它已是 pointer＋omitempty） | 要（节内新键） | `subagent_roster_197.go` | ❌ **越界**：不在三枚名册文件里，且那一节的 `StatusKnown` 那一维是票 196／`A394` 的（票面 §9 第 1 条末行逐字「⛔ 不许顺手把那一维改了」） |
+| **己＝复用 N7（`projctx.Bundle.BudgetTokens/UsedTokens` 已在泵手里）填进 `InstructionsSection`** | 要（节内两枚新键） | 映射在 `internal/panel/instructions_200.go:158-194` | ❌ **越界**（同一理由：文件不在名册里）。⚠ 这一支**语义上也是错的**（§2.1 N7 已具名：说明子预算 ≠ 对话窗口），列出来是为了让落地腿别把它当便宜路 |
+| **庚＝复用 `TaskRowView.StatusKnown` 那一维表达"有没有一发在跑"** | 不要（键已有！） | 但要改的是 `internal/tools/task.go:355` `MarkRoot` 那一支（把 State 填上） | ❌ **越界且禁手**：那是票 196／`A394` 占着的写者重接线，票面 §9 第 1 条逐字点名不许顺手改 |
+
+⇒ **A 族里唯一"零新键"的复用是庚，而它恰是唯一被明令禁手的那一枚。** 这条对偶是本件对 AC#2 最值钱的读数：**"不新增 JSON 键"这条便宜路在治理面上是关着的**，所以落地腿要么在 `composer.go` 里新增标量字段（寸内），要么停下来要一张新类型／新文件的授权。
+
+### 3.3 顺带量到的一枚形状陷阱（与票 200/248 的既有判语同源，落地腿必读）
+
+A 族的三枚现有 `…Known` 全部是 **`bool` ＋ 无 `omitempty`**（A1/A2/A3 逐字如此）。`encoding/json` 对这种写法**恒发 `false`** ⇒ 复用到占用时，"未知"（false）与"读过、确实为未知"在 wire 上同形；今天的既有解法是把判据放在**reader 是否存在**那一层（`internal/panel/pump.go:280-297` 三支 `if p.src.X != nil` 就是这台机器）。B2 的 `not_run` 那一支（`internal/panel/instructions_200.go:159-165`）则是把"接了线但还没跑过"单独具名。**两形都在册、都不必新造第三种**——选哪一形属编排者，本腿不裁。
+
+
