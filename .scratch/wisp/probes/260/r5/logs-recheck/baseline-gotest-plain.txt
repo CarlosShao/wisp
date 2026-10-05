@@ -1,0 +1,48 @@
+Mon Oct  5 11:13:35 CST 2026
+time=2026-10-05T11:13:37.878+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-05T11:13:37.898+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-05T11:13:37.901+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-05T11:13:37.904+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.904+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.904+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.904+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-05T11:13:37.904+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Space
+time=2026-10-05T11:13:37.904+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=F9
+time=2026-10-05T11:13:37.904+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-05T11:13:37.904+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.904+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-05T11:13:37.905+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Ctrl+Alt+K err="invalid argument"
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.905+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="Hot key is already registered."
+time=2026-10-05T11:13:37.905+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="invalid argument"
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-05T11:13:37.905+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-05T11:13:37.905+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.905+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-05T11:13:37.905+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-05T11:13:37.906+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.906+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-05T11:13:37.906+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.906+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-05T11:13:37.906+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:13:37.906+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=3
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.312s
+FAIL
+Mon Oct  5 11:13:38 CST 2026

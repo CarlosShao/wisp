@@ -1,0 +1,36 @@
+#### 260-r5 recheck ruler, taken 2026-10-05 11:25:11 +0800, HEAD=3f0c4fff
+#### grep -rn TakeEscForCancel --include=*_test.go internal cmd
+internal/ball/hotkey_borrow_refused_260r5_test.go:14:// every case that calls Ball.TakeEscForCancel sits behind //go:build windows &&
+internal/ball/hotkey_borrow_refused_260r5_test.go:44:// names a handle this process does not own. Then the shipped TakeEscForCancel runs
+internal/ball/hotkey_borrow_refused_260r5_test.go:145:// shipped Ball.TakeEscForCancel on it. cfg.Cancel is the planted binding.
+internal/ball/hotkey_borrow_refused_260r5_test.go:202:		b.TakeEscForCancel()
+internal/ball/hotkey_borrow_refused_260r5_test.go:233:// ball_windows.go:892-899 through the shipped TakeEscForCancel, with no window, no
+internal/ball/hotkey_borrow_refused_260r5_test.go:391:// TakeEscForCancel's idempotency branch (ball_windows.go:883-885) returns before any
+internal/ball/hotkey_cancel_borrow_260_test.go:48:// is the shape TakeEscForCancel leaves behind on the real ball.
+internal/ball/hotkey_cancel_borrow_live_260_test.go:37:	b.TakeEscForCancel()
+internal/ball/hotkey_cancel_borrow_live_260_test.go:70:	b.TakeEscForCancel()
+internal/ball/hotkey_live_test.go:373:	b.TakeEscForCancel()
+internal/ball/hotkey_status_test.go:257:	// holds it, and the caller must be told (TakeEscForCancel is idempotent on
+internal/ball/interaction_live_test.go:141:			b.TakeEscForCancel() // B1: Esc is the cancel key while Confirming
+internal/ball/live_windows_test.go:126:	b.TakeEscForCancel()
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:21:// line TakeEscForCancel fills from the SAME cancelBorrow it hands to
+
+#### build tag (head -1) of every hit file
+internal/ball/hotkey_borrow_refused_260r5_test.go :: //go:build windows
+internal/ball/hotkey_cancel_borrow_260_test.go :: //go:build windows
+internal/ball/hotkey_cancel_borrow_live_260_test.go :: //go:build windows && winlive
+internal/ball/hotkey_live_test.go :: //go:build windows && winlive
+internal/ball/hotkey_status_test.go :: //go:build windows
+internal/ball/interaction_live_test.go :: //go:build windows && winlive
+internal/ball/live_windows_test.go :: //go:build windows && winlive
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go :: //go:build windows
+
+#### real call sites (b.TakeEscForCancel or .TakeEscForCancel() ) in non-winelive files
+internal/ball/hotkey_borrow_refused_260r5_test.go:202:		b.TakeEscForCancel()
+internal/ball/hotkey_cancel_borrow_live_260_test.go:37:	b.TakeEscForCancel()
+internal/ball/hotkey_cancel_borrow_live_260_test.go:70:	b.TakeEscForCancel()
+internal/ball/hotkey_live_test.go:373:	b.TakeEscForCancel()
+internal/ball/interaction_live_test.go:141:			b.TakeEscForCancel() // B1: Esc is the cancel key while Confirming
+internal/ball/live_windows_test.go:126:	b.TakeEscForCancel()
+#### t.Skip count in this leg's ruler
+0

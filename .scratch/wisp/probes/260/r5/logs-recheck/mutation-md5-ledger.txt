@@ -1,0 +1,33 @@
+# 260-r5 recheck rig, started 2026-10-05 11:16:46 +0800
+start: md5(working ball_windows.go)=2488b2ac692c99ae4e3b4831526637d7
+start: md5(HEAD blob copy)          =2488b2ac692c99ae4e3b4831526637d7  head_blob=D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\260\r5\logs-recheck\ball_windows.go.head-blob
+start: matches_start=True (working tree must equal HEAD before any mutation)
+
+== M1-drop-receipt-write applied at 2026-10-05 11:16:46 +0800
+   md5(mutated)=51d4024f927c55a84565dee91039cac1 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  window=2026-10-05 11:16:46 +0800 -> 2026-10-05 11:16:49 +0800  reading=.scratch\wisp\probes\260\r5\logs-recheck\mutation-M1-drop-receipt-write-go-test-v.txt
+   restored from HEAD blob copy at 2026-10-05 11:16:49 +0800: md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M1b-drop-both-writes applied at 2026-10-05 11:16:49 +0800
+   md5(mutated)=94811a15a6641db2b82ac31e6696216b matches_start=False (must be False: the file really is mutated)
+   go test rc=1  window=2026-10-05 11:16:49 +0800 -> 2026-10-05 11:16:53 +0800  reading=.scratch\wisp\probes\260\r5\logs-recheck\mutation-M1b-drop-both-writes-go-test-v.txt
+   restored from HEAD blob copy at 2026-10-05 11:16:53 +0800: md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== M3-no-return-after-refusal applied at 2026-10-05 11:16:53 +0800
+   md5(mutated)=41ccbf322f6792307aa8e2858a6bf104 matches_start=False (must be False: the file really is mutated)
+   go test rc=1  window=2026-10-05 11:16:53 +0800 -> 2026-10-05 11:16:56 +0800  reading=.scratch\wisp\probes\260\r5\logs-recheck\mutation-M3-no-return-after-refusal-go-test-v.txt
+   restored from HEAD blob copy at 2026-10-05 11:16:56 +0800: md5(after restore)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+
+== restored control run (no mutation in the file) at 2026-10-05 11:16:56 +0800
+   go test rc=1 (rc=1 is the known environment red TestC21TableColourRowsMatchTokensCSS)  window=2026-10-05 11:16:56 +0800 -> 2026-10-05 11:16:58 +0800  reading=.scratch\wisp\probes\260\r5\logs-recheck\mutation-restored-go-test-v.txt
+
+FINAL md5(working ball_windows.go)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+   M1-drop-receipt-write: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M1b-drop-both-writes: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+   M3-no-return-after-refusal: md5-after-restore=2488b2ac692c99ae4e3b4831526637d7 test-rc=1
+# 260-r5 M4 sensitivity-boundary probe, started 2026-10-05 11:19:33 +0800
+start: md5(working)=2488b2ac692c99ae4e3b4831526637d7 md5(HEAD blob)=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+== M4-drop-mirror-only applied at 2026-10-05 11:19:33 +0800 md5(mutated)=3cfc5ee9d780e796aa20abae9f4b2791 matches_start=False
+   go test rc=0  window=2026-10-05 11:19:33 +0800 -> 2026-10-05 11:19:35 +0800  reading=.scratch\wisp\probes\260\r5\logs-recheck\mutation-M4-drop-mirror-only-go-test-v.txt
+   restored at 2026-10-05 11:19:35 +0800: md5=2488b2ac692c99ae4e3b4831526637d7 matches_start=True
+FINAL md5=2488b2ac692c99ae4e3b4831526637d7 matches_start=True

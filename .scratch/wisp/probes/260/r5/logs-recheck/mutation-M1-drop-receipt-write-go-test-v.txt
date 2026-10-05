@@ -1,0 +1,247 @@
+#### mutation=M1-drop-receipt-write  go test started 2026-10-05 11:16:46 +0800  ended 2026-10-05 11:16:49 +0800
+=== RUN   TestDockGeometryShape
+--- PASS: TestDockGeometryShape (0.00s)
+=== RUN   TestDockTangentMeansGapZero
+--- PASS: TestDockTangentMeansGapZero (0.00s)
+=== RUN   TestDockPosKeepsTheOrbTangentAtEveryRampLevel
+--- PASS: TestDockPosKeepsTheOrbTangentAtEveryRampLevel (0.00s)
+=== RUN   TestDockSquashIsMonotonicAndClamped
+--- PASS: TestDockSquashIsMonotonicAndClamped (0.00s)
+=== RUN   TestDockProgressReadsThePush
+--- PASS: TestDockProgressReadsThePush (0.00s)
+=== RUN   TestNearestDockEdgePicksTheEdgeYouPushed
+--- PASS: TestNearestDockEdgePicksTheEdgeYouPushed (0.00s)
+=== RUN   TestDockedLeavesAHittableStrip
+--- PASS: TestDockedLeavesAHittableStrip (0.00s)
+=== RUN   TestDockFreePosKeepsTheBallReachable
+--- PASS: TestDockFreePosKeepsTheBallReachable (0.00s)
+=== RUN   TestDockOnSecondaryMonitorWithNegativeOrigin
+--- PASS: TestDockOnSecondaryMonitorWithNegativeOrigin (0.00s)
+=== RUN   TestDockHoverPopBackWalksTheRampHome
+--- PASS: TestDockHoverPopBackWalksTheRampHome (0.00s)
+=== RUN   TestDockRampWalksItsBudget
+--- PASS: TestDockRampWalksItsBudget (0.00s)
+=== RUN   TestWindowlessSTAReachesTheBorrowWiring260r5
+time=2026-10-05T11:16:49.229+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+    hotkey_borrow_refused_260r5_test.go:283: the cancel line carries no error ({Name:cancel ID:3 Binding:Ctrl+Alt+F9 Status:not bound while idle (cancel is borrowed only during Confirming) Acc:{Mods:0 VK:0} Err:<nil> Note:}): the rig never met a refusal
+--- FAIL: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.02s)
+=== RUN   TestRefusedBorrowIsNamedOnTheReport260r5
+time=2026-10-05T11:16:49.248+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+    hotkey_borrow_refused_260r5_test.go:325: problem lines after a borrow Win32 refused = 0 ([]), want the 1 that says so: the seed said [], and the write at ball_windows.go:895 is the only thing between the two
+--- FAIL: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+=== RUN   TestRefusedBorrowIsNotAStandingAnnouncement260r5
+time=2026-10-05T11:16:49.250+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+--- PASS: TestRefusedBorrowIsNotAStandingAnnouncement260r5 (0.00s)
+=== RUN   TestBorrowDefaultIsBitIdentical260
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBorrowDefaultIsBitIdentical260 (0.00s)
+=== RUN   TestBorrowFollowsConfiguredBinding260
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Space
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=F9
+--- PASS: TestBorrowFollowsConfiguredBinding260 (0.00s)
+=== RUN   TestBorrowUnparsableFallsBackLoudly260
+time=2026-10-05T11:16:49.252+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.252+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+--- PASS: TestBorrowUnparsableFallsBackLoudly260 (0.00s)
+=== RUN   TestBorrowReceiptSharesOneSourceWithRegistration260
+--- PASS: TestBorrowReceiptSharesOneSourceWithRegistration260 (0.00s)
+=== RUN   TestBorrowFailureNamesTheKeyItTried260
+time=2026-10-05T11:16:49.252+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Ctrl+Alt+K err="invalid argument"
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- PASS: TestBorrowFailureNamesTheKeyItTried260 (0.00s)
+=== RUN   TestConfiguredCancelStillNeverBoundWhileIdle260
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- PASS: TestConfiguredCancelStillNeverBoundWhileIdle260 (0.00s)
+=== RUN   TestLiveBorrowHelperPremiseIsConfigDependent260
+    hotkey_cancel_borrow_260_test.go:347: named conflict for the orchestrator: hotkey_live_test.go:107 reads rep.Live()[hkCancel].VK == vkEscape for a ball booted with liveHotkeys().Cancel = "Ctrl+Alt+V"; under 形ⓐ that slot holds VK 0x56, so the helper's bare-Esc premise is now config-dependent (winlive tier not run this round)
+--- PASS: TestLiveBorrowHelperPremiseIsConfigDependent260 (0.00s)
+=== RUN   TestBorrowWishFollowsSeed260r2
+--- PASS: TestBorrowWishFollowsSeed260r2 (0.00s)
+=== RUN   TestBorrowWishDefaultCellIsBitIdentical260r2
+--- PASS: TestBorrowWishDefaultCellIsBitIdentical260r2 (0.00s)
+=== RUN   TestBorrowWishRefusedSeedIsNotSilent260r2
+--- PASS: TestBorrowWishRefusedSeedIsNotSilent260r2 (0.00s)
+=== RUN   TestRegisterAllLiveSet
+time=2026-10-05T11:16:49.252+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestRegisterAllLiveSet (0.00s)
+=== RUN   TestDefaultHotkeysIdlePassHoldsNoEsc
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestDefaultHotkeysIdlePassHoldsNoEsc (0.00s)
+=== RUN   TestCancelBorrowRoundTrip
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.253+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="Hot key is already registered."
+--- PASS: TestCancelBorrowRoundTrip (0.00s)
+=== RUN   TestCancelBorrowFailureIsAProblemLine
+time=2026-10-05T11:16:49.253+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="invalid argument"
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestCancelBorrowFailureIsAProblemLine (0.00s)
+=== RUN   TestStandbyIsNotDisabledAndNotAProblem
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-05T11:16:49.253+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+--- PASS: TestStandbyIsNotDisabledAndNotAProblem (0.00s)
+=== RUN   TestRegisterAllSplitsFailureFamilies
+time=2026-10-05T11:16:49.253+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.253+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+--- PASS: TestRegisterAllSplitsFailureFamilies (0.00s)
+=== RUN   TestUnregisterAllDropsKnownSlots
+--- PASS: TestUnregisterAllDropsKnownSlots (0.00s)
+=== RUN   TestHotkeyStatusString
+--- PASS: TestHotkeyStatusString (0.00s)
+=== RUN   TestHotkeyReloaderRebindsOnConfigChange
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+--- PASS: TestHotkeyReloaderRebindsOnConfigChange (0.00s)
+=== RUN   TestHotkeyReloaderSectionsHookIgnoresOtherSections
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-05T11:16:49.253+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=3
+--- PASS: TestHotkeyReloaderSectionsHookIgnoresOtherSections (0.00s)
+=== RUN   TestApplyHotkeyDefaults
+--- PASS: TestApplyHotkeyDefaults (0.00s)
+=== RUN   TestParseAccelerator
+--- PASS: TestParseAccelerator (0.00s)
+=== RUN   TestDefaultHotkeys
+--- PASS: TestDefaultHotkeys (0.00s)
+=== RUN   TestLiquidRotationIsMonotonicInLevel
+--- PASS: TestLiquidRotationIsMonotonicInLevel (0.00s)
+=== RUN   TestLiquidConvergesAndBorderFadesInOnSilence
+--- PASS: TestLiquidConvergesAndBorderFadesInOnSilence (0.00s)
+=== RUN   TestSummonBurstIsBoundedAndRetires
+--- PASS: TestSummonBurstIsBoundedAndRetires (0.00s)
+=== RUN   TestMotionOnlyAppliesInPrototypeMode
+--- PASS: TestMotionOnlyAppliesInPrototypeMode (0.00s)
+=== RUN   TestBorderIsNeverAppliedInOneFrame
+--- PASS: TestBorderIsNeverAppliedInOneFrame (0.00s)
+=== RUN   TestBorderGlidesInAfterTheSessionEnds
+--- PASS: TestBorderGlidesInAfterTheSessionEnds (0.00s)
+=== RUN   TestSpeakingGlidesTheBorderBackOut
+--- PASS: TestSpeakingGlidesTheBorderBackOut (0.00s)
+=== RUN   TestTransitionTimerSetIsTheFrozenTimerSet
+--- PASS: TestTransitionTimerSetIsTheFrozenTimerSet (0.00s)
+=== RUN   TestSleepingFrameLosesTheBorderAuthority
+--- PASS: TestSleepingFrameLosesTheBorderAuthority (0.00s)
+=== RUN   TestLiquidDrivenStateSet
+--- PASS: TestLiquidDrivenStateSet (0.00s)
+=== RUN   TestPushLevelIsInputHardened
+--- PASS: TestPushLevelIsInputHardened (0.00s)
+=== RUN   TestRepaintIsSkippedWhenNothingChanged
+--- PASS: TestRepaintIsSkippedWhenNothingChanged (0.00s)
+=== RUN   TestPositionStoreRoundTrip
+--- PASS: TestPositionStoreRoundTrip (0.01s)
+=== RUN   TestResolvePosition
+=== RUN   TestResolvePosition/saved_visible_on_its_monitor:_kept
+=== RUN   TestResolvePosition/saved_partially_off_right_edge:_clamped
+=== RUN   TestResolvePosition/saved_monitor_detached:_primary_default
+=== RUN   TestResolvePosition/nothing_saved:_primary_default
+=== RUN   TestResolvePosition/saved_point_on_no_monitor:_that-monitor_default_impossible_->_primary
+=== RUN   TestResolvePosition/primary_detection_when_listed_second
+--- PASS: TestResolvePosition (0.00s)
+    --- PASS: TestResolvePosition/saved_visible_on_its_monitor:_kept (0.00s)
+    --- PASS: TestResolvePosition/saved_partially_off_right_edge:_clamped (0.00s)
+    --- PASS: TestResolvePosition/saved_monitor_detached:_primary_default (0.00s)
+    --- PASS: TestResolvePosition/nothing_saved:_primary_default (0.00s)
+    --- PASS: TestResolvePosition/saved_point_on_no_monitor:_that-monitor_default_impossible_->_primary (0.00s)
+    --- PASS: TestResolvePosition/primary_detection_when_listed_second (0.00s)
+=== RUN   TestDefaultPositionInsideWorkArea
+--- PASS: TestDefaultPositionInsideWorkArea (0.00s)
+=== RUN   TestSTAReleaseAfterFailedCreateHandsBackNoWindow
+    sta_release_windows_test.go:268: 33-r8 create-error door: tid=27188 planted hwnd=0x9F80A40 | after plant: ball windows=1 all windows=2 classes=[WispBallWindow IME] queue head=empty
+    sta_release_windows_test.go:270: 33-r8 create-error door: after the plants (window-addressed PostMessageW rc=1, thread-addressed PostThreadMessageW rc=1): ball windows=1 all=2 classes=[WispBallWindow IME] queue head=msg 0x82F8 on hwnd 0x9F80A40
+    sta_release_windows_test.go:272: 33-r8 create-error door: the instant start() returned: ball windows=0 all windows=0 classes=[] queue head=empty (start err=plant: renderer init failed plant err=<nil>)
+--- PASS: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.01s)
+=== RUN   TestSTAReleaseAfterPumpExitDispatchesItsQueue
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=quit-only: tid=27188 hwnd=0x9F90A40 createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=1 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=real-Close: tid=27188 hwnd=0x9FA0A40 createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=0 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+--- PASS: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.01s)
+=== RUN   TestReleasePumpCapIsALoudReadingNotAGreen
+    sta_release_windows_test.go:602: 33-r8b cap leg (planted 4160, want pump to stop at the cap): tid=27188 posted=4160 postErr=<nil> pumped=4096 head-after="msg 0x82F9 on hwnd 0x0" windows(ball/all)=0/0 classes=[] | own drain moved 64, head-final="empty" | logged="time=2026-10-05T11:16:49.317+08:00 level=WARN msg=\"ball: the ui-sta release pump hit its cap before the thread's queue was empty; the thread goes back to the Go pool non-empty\" cap=4096 pumped=4096\n"
+    sta_release_windows_test.go:605: 33-r8b control leg (planted 8, under the cap): tid=27188 posted=8 postErr=<nil> pumped=8 head-after="empty" windows(ball/all)=0/0 classes=[] | own drain moved 0, head-final="empty" | logged=""
+--- PASS: TestReleasePumpCapIsALoudReadingNotAGreen (0.03s)
+=== RUN   TestC21TableColourRowsMatchCode
+    tokens_table_test.go:780: light table reuses the :root value by cascade for 2 field(s): BallHalo, OnSolid (the table states this in prose above its light rows)
+    tokens_table_test.go:805: verified 114/114 colour rows against tokens.go (40 palette fields checked in code -> table, 36 look colours, 4 looks)
+--- PASS: TestC21TableColourRowsMatchCode (0.00s)
+=== RUN   TestC21GeometryRowsMatchCodeConstants
+    tokens_table_test.go:955: docs/evidence/s1/c21-native-tokens.md:169: this row states a rule (缓动) without naming a Go constant, so there is no value to compare
+    tokens_table_test.go:1059: MATCHED WITHOUT THE PROMISED UNIT (4): BallSizeMaxPx=72 @ docs/evidence/s1/c21-native-tokens.md:141, BallSizeMinPx=44 @ docs/evidence/s1/c21-native-tokens.md:141, FontSizeMicroPx=11 @ docs/evidence/s1/c21-native-tokens.md:159, FontSizeMonoPx=12.5 @ docs/evidence/s1/c21-native-tokens.md:159
+    tokens_table_test.go:1063: NUMBERS NO NAMED CONSTANT CLAIMS (52): 0.35 @ docs/evidence/s1/c21-native-tokens.md:155, 0.55 @ docs/evidence/s1/c21-native-tokens.md:162, 0.8s @ docs/evidence/s1/c21-native-tokens.md:151, 1 @ docs/evidence/s1/c21-native-tokens.md:154, 1 @ docs/evidence/s1/c21-native-tokens.md:155, 1 @ docs/evidence/s1/c21-native-tokens.md:162, 1 @ docs/evidence/s1/c21-native-tokens.md:163, 1000 @ docs/evidence/s1/c21-native-tokens.md:165, 10fps @ docs/evidence/s1/c21-native-tokens.md:149, 160ms @ docs/evidence/s1/c21-native-tokens.md:157, 16px @ docs/evidence/s1/c21-native-tokens.md:166, 180ms @ docs/evidence/s1/c21-native-tokens.md:167, 2 @ docs/evidence/s1/c21-native-tokens.md:167, 2.1 @ docs/evidence/s1/c21-native-tokens.md:157, 21.75 @ docs/evidence/s1/c21-native-tokens.md:166, 22 @ docs/evidence/s1/c21-native-tokens.md:166, 22 @ docs/evidence/s1/c21-native-tokens.md:166, 220ms @ docs/evidence/s1/c21-native-tokens.md:167, 22px @ docs/evidence/s1/c21-native-tokens.md:168, 24 @ docs/evidence/s1/c21-native-tokens.md:168, 260ms @ docs/evidence/s1/c21-native-tokens.md:148, 2px @ docs/evidence/s1/c21-native-tokens.md:152, 3 @ docs/evidence/s1/c21-native-tokens.md:151, 30 @ docs/evidence/s1/c21-native-tokens.md:166, 30 @ docs/evidence/s1/c21-native-tokens.md:168, 300ms @ docs/evidence/s1/c21-native-tokens.md:167, 32 @ docs/evidence/s1/c21-native-tokens.md:168, 33 @ docs/evidence/s1/c21-native-tokens.md:163, 33ms @ docs/evidence/s1/c21-native-tokens.md:165, 34.72px @ docs/evidence/s1/c21-native-tokens.md:145, 4.2 @ docs/evidence/s1/c21-native-tokens.md:163, 44 @ docs/evidence/s1/c21-native-tokens.md:166, 56 @ docs/evidence/s1/c21-native-tokens.md:145, 5px @ docs/evidence/s1/c21-native-tokens.md:166, 62 @ docs/evidence/s1/c21-native-tokens.md:145, 62 @ docs/evidence/s1/c21-native-tokens.md:166, 72 @ docs/evidence/s1/c21-native-tokens.md:166, 74 @ docs/evidence/s1/c21-native-tokens.md:157, 74 @ docs/evidence/s1/c21-native-tokens.md:162, 74 @ docs/evidence/s1/c21-native-tokens.md:163, 8 @ docs/evidence/s1/c21-native-tokens.md:145, 8 @ docs/evidence/s1/c21-native-tokens.md:157, 8 @ docs/evidence/s1/c21-native-tokens.md:166, 8 @ docs/evidence/s1/c21-native-tokens.md:167, 838 @ docs/evidence/s1/c21-native-tokens.md:145, 8px @ docs/evidence/s1/c21-native-tokens.md:166, 9 @ docs/evidence/s1/c21-native-tokens.md:166, 9 @ docs/evidence/s1/c21-native-tokens.md:168, 900ms @ docs/evidence/s1/c21-native-tokens.md:167, 96dpi @ docs/evidence/s1/c21-native-tokens.md:161, 96dpi @ docs/evidence/s1/c21-native-tokens.md:166, 96dpi @ docs/evidence/s1/c21-native-tokens.md:168
+    tokens_table_test.go:1065: checked 67 constant declarations across 29 geometry rows against 56 exported tokens.go constants + 11 tabled from hit.go/liquid.go
+--- PASS: TestC21GeometryRowsMatchCodeConstants (0.01s)
+=== RUN   TestC21TokenConsumerReport
+    tokens_table_test.go:1149: ZERO-CONSUMER TOKENS (27 of 116 checked; 89 are referenced by 18 non-test files):
+    tokens_table_test.go:1156:   UNCONSUMED BallSizeLargePx (declared at docs/evidence/s1/c21-native-tokens.md:143)
+    tokens_table_test.go:1156:   UNCONSUMED BallSizeSmallPx (declared at docs/evidence/s1/c21-native-tokens.md:142)
+    tokens_table_test.go:1156:   UNCONSUMED CountdownFontPx (declared at docs/evidence/s1/c21-native-tokens.md:159)
+    tokens_table_test.go:1156:   UNCONSUMED DurBaseMs (declared at docs/evidence/s1/c21-native-tokens.md:147)
+    tokens_table_test.go:1156:   UNCONSUMED DurFastMs (declared at docs/evidence/s1/c21-native-tokens.md:146)
+    tokens_table_test.go:1156:   UNCONSUMED DurSlowMs (declared at docs/evidence/s1/c21-native-tokens.md:148)
+    tokens_table_test.go:1156:   UNCONSUMED FirstRunGuidePulseMs (declared at docs/evidence/s1/c21-native-tokens.md:154)
+    tokens_table_test.go:1156:   UNCONSUMED FontSizeMonoPx (declared at docs/evidence/s1/c21-native-tokens.md:159)
+    tokens_table_test.go:1156:   UNCONSUMED Palette.FgPrimary
+    tokens_table_test.go:1156:   UNCONSUMED Palette.FgTertiary
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassHiSoft
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassRing
+    tokens_table_test.go:1156:   UNCONSUMED Palette.InfoLine
+    tokens_table_test.go:1156:   UNCONSUMED Palette.OrbShadow
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintAccentHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintDangerHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintDangerLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintNeutralHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintNeutralLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintSuccessHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintSuccessLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarmHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarmLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarnHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarnLo
+    tokens_table_test.go:1156:   UNCONSUMED looks[*].Deep
+    tokens_table_test.go:1198: 未接线豁免: 24 row(s) attribute all 27 zero-consumer token(s); 89/116 checked tokens are live
+--- PASS: TestC21TokenConsumerReport (0.01s)
+=== RUN   TestC21CodeTokensAreTabledOrExempt
+    tokens_table_test.go:1304: EXEMPT HTClient (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT HTTransparent (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT HTNowhere (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT AltSummonSpace (hotkey_windows.go) is outside the table on purpose: Default hotkey text (SPEC-04 surface), not a C21 token
+--- PASS: TestC21CodeTokensAreTabledOrExempt (0.06s)
+=== RUN   TestC21TableColourRowsMatchTokensCSS
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+=== RUN   TestTokenGoldenValues
+--- PASS: TestTokenGoldenValues (0.00s)
+=== RUN   TestPremultipliedDerivation
+--- PASS: TestPremultipliedDerivation (0.00s)
+=== RUN   TestNoHardcodedColorsInBallPackage
+--- PASS: TestNoHardcodedColorsInBallPackage (0.02s)
+=== RUN   TestVisualForCoversAllTwentyStates
+--- PASS: TestVisualForCoversAllTwentyStates (0.00s)
+=== RUN   TestSleepingSizeTruthTable
+--- PASS: TestSleepingSizeTruthTable (0.00s)
+=== RUN   TestRecordedSleepingDiffBoxIsNotA44pxBody
+--- PASS: TestRecordedSleepingDiffBoxIsNotA44pxBody (0.00s)
+=== RUN   TestAnimatedWhitelist
+--- PASS: TestAnimatedWhitelist (0.00s)
+=== RUN   TestAnimationPolicyZeroTimerInSleeping
+--- PASS: TestAnimationPolicyZeroTimerInSleeping (0.00s)
+=== RUN   TestHitTestAndDPIInjection
+--- PASS: TestHitTestAndDPIInjection (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.255s
+FAIL
+
+===== stderr =====

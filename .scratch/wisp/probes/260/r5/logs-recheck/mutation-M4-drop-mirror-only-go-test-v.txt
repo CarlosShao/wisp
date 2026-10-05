@@ -1,0 +1,16 @@
+#### mutation=M4-drop-mirror-only  window 2026-10-05 11:19:33 +0800 -> 2026-10-05 11:19:35 +0800  (targeted -run 260r5)
+=== RUN   TestWindowlessSTAReachesTheBorrowWiring260r5
+time=2026-10-05T11:19:35.312+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+    hotkey_borrow_refused_260r5_test.go:293: 260-r5 rig: IsWindow(0x1D0A5C)=0 uiRun-inline=true closure-entered=true sta.hwnd=0x0 door="260-r5 rig: this door creates no window and runs no pump" refusal="Invalid window handle."
+--- PASS: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)
+=== RUN   TestRefusedBorrowIsNamedOnTheReport260r5
+time=2026-10-05T11:19:35.324+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+    hotkey_borrow_refused_260r5_test.go:386: 260-r5 refused borrow: line={Name:cancel ID:3 Binding:Ctrl+Alt+F9 Status:registration failed Acc:{Mods:16387 VK:120} Err:Invalid window handle. Note:} problems=["hotkey cancel = \"Ctrl+Alt+F9\" was not registered: Invalid window handle."] logged="time=2026-10-05T11:19:35.325+08:00 level=ERROR msg=\"cancel takeover refused by Win32; Confirming will have no cancel key\" hotkey=cancel binding=Ctrl+Alt+F9 err=\"Invalid window handle.\"\n"
+--- PASS: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+=== RUN   TestRefusedBorrowIsNotAStandingAnnouncement260r5
+time=2026-10-05T11:19:35.326+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+--- PASS: TestRefusedBorrowIsNotAStandingAnnouncement260r5 (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/ball	0.047s
+
+===== stderr =====
