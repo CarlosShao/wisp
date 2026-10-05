@@ -373,8 +373,8 @@ func selfSkeleton() map[string]string {
 		"tools/d22scan/allowlist.txt": "# empty allowlist: this fixture tests the bans, not the exemptions\n",
 		// Ticket 212's wantSilent case cites these two; the fixture must seed
 		// them so those citations EXIST and the gate stays silent on them.
-		"docs/readings.md":            "readings\n",
-		"internal/probe/roster.md":    "roster\n",
+		"docs/readings.md":         "readings\n",
+		"internal/probe/roster.md": "roster\n",
 	}
 }
 
