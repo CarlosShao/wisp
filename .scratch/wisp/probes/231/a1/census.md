@@ -69,7 +69,52 @@
 
 ## §2 问二：`internal/config/loader.go` 的"版本更高"那支的真身
 
-未判。
+### 2.1 那支本体（现读 `:120-124`，票面说 `:106-110` ⇒ 漂 ＋14，漂因见 §0 表 #1）
+
+```go
+	if ver > SchemaVersionCurrent {                                     // :120
+		return nil, observe.New(observe.ClassConfig, fmt.Sprintf(       // :121
+			"config.toml: schema_version %d was written by a newer build (this build understands %d); upgrade Wisp or restore a backup",   // :122
+			ver, SchemaVersionCurrent))                                 // :123
+	}                                                                   // :124
+```
+
+- **产给日志的原句（逐字，含格式动词）**：`config.toml: schema_version %d was written by a newer build (this build understands %d); upgrade Wisp or restore a backup`。`SchemaVersionCurrent`＝**2**（`internal/config/schema.go:28`）⇒ 种 `schema_version = 99` 时渲染出的 detail＝`config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup`，`err.Error()` 再过一层 `internal/observe/errors.go:188-204` 变成 `config: config.toml: schema_version 99 was written by a newer build …`。⚠ 这两串我**不是实跑读的**，是从 `:122`＋`errors.go:192-203` 的拼装规则推的；`docs/evidence/s1/223-hot-reload-wiring-v2.md:188` 的原始件读数与此**逐字相同**（那是非实现者腿实跑的，可当对照）。
+- **类型／分类码／cause 链**（这决定落地腿能不能不靠字符串分它）：
+
+| 维度 | 现读 | 后果 |
+|---|---|---|
+| Go 类型 | `*observe.Error`（`internal/observe/errors.go:170-176`） | 分类器 `errors.As(err, &oe)` 取得到（`config_reload.go:365-366`） |
+| 构造子 | `observe.New(class, detail)`（`errors.go:179-181`） | ⛔ **`Err` 字段没赋值 ⇒ cause 链为空**（与 `observe.Wrap` 的区别就在这一条；`Unwrap` 返回 nil，`errors.go:207-212`） |
+| 分类码 | `observe.ClassConfig` ＝ `"config"`（`errors.go:19`） | ⛔ **不可用于归句**：`internal/config` 非测源码里 85 枚错误点全用这一枚（尺见 §1 表内） |
+| `ProviderCode` | `""`（未赋值） | **全仓产码从未给 `ProviderCode:` 赋过值**（尺＝`grep -rn "ProviderCode:" cmd/ internal/ --include=*.go \| grep -v _test.go \| wc -l`＝**0**；`internal/config` 内亦 0）⇒ 它是**现成空闲的机读位，且是已导出字段**（`errors.go:172`），填它**不新增导出名**（票面禁区＝"不新增导出名／要新增先落 `A##`"） |
+| `RetryAfter` | `0`；`RetryPolicy(ClassConfig)`＝`RetryNever`（`errors.go:114-117`） | 与本票无关，仅记下别再打它的主意 |
+
+⇒ **今天唯一的判别材料就是 detail 字符串本身**（这正是 bug 的形状：前缀既当身份又当归类）。落地腿若想"用机读形状而不靠字符串"，`ProviderCode` 是本腿找到的**唯一一枚不新增导出名的现成位**；⚠ **本腿具名一处冲突交回**：`ProviderCode` 一旦非空，`Error()` 会把句首渲染成 `config (<code>): …`（`errors.go:194-196`）⇒ 分类器读的 `oe.Detail` 不受影响（AC#2 那句"不许改 loader 原文"仍守得住），但**任何按 `err.Error()` 全文比对的既有断言**形状会变（本腿在 `internal/config` 侧只找到 `Contains` 型尺，见 2.4，未见全等尺）。本腿**不裁决**用不用它——AC#4 明写"这一步允许只登记不实现"。
+
+- **今天怎么被吞的（复现链，逐行现读）**：`schema_version = 99` ＋ 正文解析得开 ⇒ `peekSchemaVersion` 返回 `(99, nil)` ⇒ `:84`（`ver == 0 && peekErr != nil`）不进、`:104`（`peekErr != nil && ver >= SchemaVersionCurrent`）不进 ⇒ **`:120` 命中** ⇒ detail 以 `config.toml: ` 开头 ⇒ `config_reload.go:369/373/377` 三支全不命中 ⇒ **`:396` 命中** ⇒ 操作员得到 `cause=invalid`「语法没问题，但内容被校验拒绝（值不合法或引用解不开）」。
+- ⚠ **种子形状必须"解析得开"**：若正文坏（如 `schema_version = 99\nbroken [[[\n`），`:104` 抢在 `:120` 之前返回 `config.toml parse` ⇒ 归 `cause=syntax`＝票面 AC#3 要保留的 (a) 形。**这条短路是 loader 的书写顺序给的，不是分类器给的**——编排者跑 AC#1 时按这个形状种。
+
+### 2.2 对照支："版本更低＋不会迁移"——它有出口，且出口里带行动指引
+
+- 路由：`loader.go:125-130`（`if ver != SchemaVersionCurrent { raw, err = applyMigrations(path, raw, ver) … }`）→ 错误产在 `internal/config/migrate.go`：
+  - `:53-56`：`config.toml: no migration registered from schema version %d (this build understands up to %d); the file was left untouched - fix or restore it manually, it will never be silently reset`
+  - `:60-63`：`config.toml: cannot migrate from schema version %d: %v; the file was left untouched - fix or restore it manually, it will never be silently reset`
+- 分类器侧的专属出口＝**`config_reload.go:377-378` 认领 → `:393-395` 原句**（逐字见 §1 表 #5）：`config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它`。
+- ⚠ **派单 Q2 说的"`internal/config/loader.go:355` 附近"这枚锚指错了文件**（loader.go 只有 263/264 行）：那句中文真身在 `cmd/wisp/config_reload.go:394-395`（223-v2 当时记 `:354-356`）。⇒ "有出口／没出口"的对照**两边都在分类器里**，配置层只是给它喂串。
+- 钉住这条对照的既有断言＝`internal/config/migrate_test.go:123 TestMigrateCorruptFileUntouched`（尺＝`strings.Contains(err.Error(), "migrat")`，`:131`），票 223 与本票都写死它一字不许动。**本腿独立复认**：`git log --oneline -3 -- internal/config/migrate_test.go` 最新＝`a95ee3a8`（票 83 那批）⇒ 与票 223 件里那句"`migrate_test.go` 最后一次被改是 `a95ee3a8`"对上，`:123` 那枚断言今天确实没被动过。
+
+### 2.3 "版本更高"在操作员面上的出口枚数＝**零**；配置层原句的常驻钉＝两枚
+
+- 分类器里：**0 条** `cause=` 与它对应（§1 那 7 条逐条排除）。
+- 配置层两枚钉住那句英文的常驻用例（⛔ 都不许被本票改动，AC#2 已写明不改 loader 原文）：
+  - `internal/config/loader_test.go:267-276 TestLoadFileNewerSchemaVersionRejected`——种 `"schema_version = 99\n"`，needle＝`strings.Contains(err.Error(), "99")`（`:273`）。
+  - `internal/config/migrate_test.go:155-163 TestMigrateHigherIntermediateVersionRejected`——同种子，needle＝`strings.Contains(err.Error(), "newer build")`（`:160`）。
+  ⇒ 这两枚**只钉 `err.Error()`，钉不到操作员那一句**；这正是票面说的"那句真话在代码里活着"的物证。
+
+### 2.4 本节判语
+
+现象、匹配顺序、"零出口"、"同一句中文只在 migration 支里齐全"——**四条全部现读复认成立**。票面/派单的两枚行号锚（`loader.go:106-110`、`loader.go:355`）一枚漂 14 行、一枚**指错文件**；`ProviderCode` 那条机读路存在但带一处渲染副作用，**具名交回不裁决**。
 
 ## §3 问三：`cmd/wisp/config_sentences_223r2_test.go` 今天钉着哪几形
 
