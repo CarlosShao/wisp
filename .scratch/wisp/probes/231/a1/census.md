@@ -163,7 +163,55 @@
 
 ## §4 问四：新增一支会撞谁（`cmd/wisp/**_test.go` 四类尺穷尽）
 
-未判。
+**尺法**：目录＝`cmd/wisp`，测试文件枚数＝`ls cmd/wisp/*_test.go | wc -l`＝**65**；四类各一把 `grep -rn … cmd/wisp/ --include=*_test.go | wc -l`（⛔ 不拿 `head` 的样例当枚数）。判定口径＝"新增一支 `case` ＋ 新增一行表条目"之后，**这一枚会不会红**。
+
+### 4.1 ①类：对 stdout／stderr 文案的 contains 断言（命中 9 枚文件，逐枚具名）
+
+| `file:line` | 断的原句／needle（逐字） | 加一支会不会红它 |
+|---|---|---|
+| `cmd/wisp/config_sentences_223r2_test.go:110`／`:114`／`:118` × 8 子形 | 三把尺见 §3.1；红句原文 `the two sentences swapped again`／`which is a different pipeline's answer`／`which contradicts its own cause` | ⛔ **不红**（8 枚子形没有一枚种得出"解析得开的未来版"，`loader.go:104` 的短路把 (a) 挡在 syntax 支）；✅ 新增那一行**受这三把尺管**（必须以 `cause=` 开头、不得含 `cause=invalid`） |
+| `cmd/wisp/config_reload_223_test.go:581` | `"config: HOT-RELOAD state=not-applied " + tc.wantCause`（四子形：missing／syntax／migration／unknown-key，种的 body 逐枚见 `:528-566`） | ⛔ 不红（四枚 body 全 `ver <= 2` ⇒ 新支不命中） |
+| `cmd/wisp/config_reload_223_test.go:570-573` ＋ `:582-589` | `all := []string{"cause=missing", "cause=syntax", "cause=unknown-key", "cause=invalid", "cause=permission", "cause=unclassified", "cause=migration", "state=disabled"}` ＝**8 枚互斥名册**，负钉跑在 **整条 trail** 上（`awaitAudit` 返回 `r.h.err.String()` 全文，`:116`） | ⛔ 不红（新 `cause=` 不在名册里，缺席无人管）；⚠ **变钝**：新那一形不受互斥保护 ⇒ §3.4 建议同批进名册；⚠ **命名禁忌见 4.4-B** |
+| `cmd/wisp/config_reload_223_test.go:249/253/263-264/280/284/311/314/346-347/350-351/357/362/379-380/383-384/387/416-417/421/430/433/453/460/478-479/482/490-494/499/504` | D36 三档与卡面文案（`配置热加载已接管`／`值已换进本进程内存`／负钉 `这些段已立即生效`／`[确认 L2 config.reload]`／`fs.allowed_dirs`／`result=allow`／`effect=applied-after-L2`／`放宽已经过 L2 重新确认`／`仍按启动时建好的 C26 名单`／`result=deny`／`effect=kept-old-values`／`放宽本次没有生效`／`direction=tighten`＋负钉 `config: D36-CONFIRM`／`state=denied`／`risk.permission_mode`／`state=restart-pending sections=[app]`／`effect=next-process-start`／`config: RESTART-PENDING detail=`／`本次运行不会生效`／needle 组 `app.autostart`·`开机自启`·`重启进程后生效`／负钉 `这些段已立即生效：[app]`） | ⛔ 不红——这些支的入口是 `rep`（读成功之后的分档），本票那一支的入口是 `err != nil`（`reloadOnce:153-157`），两条路互斥 |
+| `cmd/wisp/config_reload_223_test.go:614` ＋ `:617-620` | `"config: HOT-RELOAD state=disabled host=panel-inbound"` ＋ 4 枚负钉（`cause=missing`／`cause=syntax`／`cause=permission`／`state=armed`） | ⛔ 不红（panel-inbound 不 arm tick，`describeReloadFailure` 在那条腿上根本不被调） |
+| `cmd/wisp/config_reload_perm_223_windows_test.go:122`／`:112-119` | 正钉 `没有读它的权限`；6 枚互斥名册（`cause=missing`／`syntax`／`unknown-key`／`invalid`／`unclassified`／`migration`） | ⛔ 不红（种的是 ver=2 合法体＋真 ACL）；⚠ **暗坑 C**：`:142-143` 把 `state=not-applied cause=invalid` 当**控制流**信号用（见 4.4-C） |
+| `cmd/wisp/config_receipt_255_test.go:402/408/435/470/473/487/509/515/545/566/600/608` | `state=armed`／`state=applied`／`config: HOT-RELOAD-READER section=panel|session|llm|voice` | ⛔ 不红（种的改动全读得开） |
+| `cmd/wisp/firstrun_198_test.go:240`＋`:243-251` | 正钉 `新建默认配置`；负钉 `cause=missing`／`config.toml 读不到：文件不存在`／`本次运行继续用内存里的旧配置`（红句 `the first-run receipt reuses hot-reload wording %q (票 223 keeps the four causes four sentences)`） | ⛔ 不红；⚠ 这枚负钉**只禁首启回执借词**，不禁分类器继续用 `本次运行继续用内存里的旧配置` ⇒ 新句子沿用同一尾巴是安全的、也是一致的 |
+| `cmd/wisp/firstrun_257_test.go:199-200`／`:316-338`／`:342-352`／`:356-359` | 三枚 reason×remedy（`替你办完`·`没有任何旧配置可言`／`改不了服务商与模型的存在性`·`手加上面那三样`／`过不了这份 schema 的校验`·`文件一个字节都没动`）；折叠钉 `配置未生效`·`重启就好` 各 `!= 1` 即红；借词负钉 `cause=missing`·`本次运行继续用内存里的旧配置` | ⛔ 不红（这是 settings 写入回执那条链，不经 `describeReloadFailure`）；⚠ **命名提醒**：`配置未生效` 这半句在本仓是**被禁的折叠语** ⇒ 新句子不许出现它 |
+| `cmd/wisp/resident_approval_risk_268_windows_test.go:200/205/207/216` | `strings.Count(out, "wisp: resident [risk]:") != 1` 即红；`contains` loader 的答复与 `DefaultApprovalTimeout=300s`；missing 形⛔不得带该 marker | ⛔ 不红（走 `newResidentApprovalWithConfig`，不经分类器）；但见 4.4-E（它把 `config_reload.go:396` 写成了"反面教材"） |
+
+### 4.2 ②类：对句子**枚数**的计数尺
+
+| `file:line` | 尺 | 加一支会不会红 |
+|---|---|---|
+| `cmd/wisp/firstrun_257_test.go:199-200` | `if seen != 1 { t.Errorf("%s: refusal names %d of the three reasons, want exactly 1 …") }` | ⛔ 不红（settings 拒绝路） |
+| `cmd/wisp/firstrun_257_test.go:327-329` | `if len(hits) != 1 { "AC#2 RED: %q appears on %d receipt lines, want exactly 1 (three reasons, three sentences)" }` | ⛔ 不红（同上，且分母是 receipt 不是 trail） |
+| `cmd/wisp/firstrun_257_test.go:342-346` | `strings.Count(receipt, "配置未生效"／"重启就好") != 1` | ⛔ 不红；⚠ 新句子若写进 receipt 才会撞上（本票不碰 receipt） |
+| `cmd/wisp/firstrun_198_test.go:204/212/220` | `strings.Count(text, "\n["+head+"]\n") != 1` 等三枚（文件正文尺） | ⛔ 不红 |
+| `cmd/wisp/config_reload_223_test.go:288-290/341-343/427-429/507-509` | `r.rt.windowCount()` 卡枚数（0／1） | ⛔ 不红——**但**：读失败那一支今天**不发卡**，若落地腿手滑让新形走 `ConfirmLocked`，会红在 `:341`／`:427` |
+| `cmd/wisp/resident_ball_228_windows_test.go:66-67`／`cmd/wisp/resident_sink_nail_127_windows_test.go:493`／`cmd/wisp/early_log_nail_130_windows_test.go:257/266`／`cmd/wisp/resident_approval_risk_268_windows_test.go:200` | 各枚 `strings.Count(…, needle) != 1` | ⛔ 不红（全是 resident/child 进程面，与分类器不同一条链） |
+
+**②类的空档（具名交回）**：全仓**没有任何一枚尺数得住"同一个失败被印了两条审计行"**——`describeReloadFailure` 的返回只被 `:155` 一枚 `auditf` 消费，`all` 名册只查"缺席的 marker"，不查"重复的行"。⇒ 若新支与 `:396` 同时命中（顺序写错之外还有一种：新支认领串与旧支重叠且写在旧支**之后**），操作员会得到**两条**或**零条**，**门不响**。这条是 AC#4 该登记的"缺尺"，本腿只具名。
+
+### 4.3 ③类：对 `config.toml:` 前缀的词面尺
+
+尺＝`grep -rn '"config\.toml:' cmd/wisp/ --include=*_test.go | wc -l`＝**0**；`grep -rn "HasPrefix" cmd/wisp/ --include=*_test.go | wc -l`＝**43**（其中与归句有关的只有一枚：`config_sentences_223r2_test.go:110`，它前缀钉的是 `cause=` 不是 `config.toml:`）。
+⇒ **测试面没有一枚把 `config.toml:` 当词面 needle**：这个前缀**只活在产码 `:396` 和两处注释**（`resident_approval_risk_268_windows_test.go:37`、`:281`）。⇒ 落地腿收窄/改名 `:396` 的认领形状 ⇒ **不会因"词面尺"红**；会红的只有 4.4-C 那枚控制流。
+
+### 4.4 ④类：日志行数／位置钉 ＋ 四处暗坑
+
+| 暗坑 | `file:line` | 内容与判 |
+|---|---|---|
+| ④ 位置钉 | `cmd/wisp/resident_sink_nail_127_windows_test.go:608`（record 0 必须是 early resolver 句）／`:619`（`installIdx != 1` 即红）／`:629`（shutdown trail 非空）／`:633-635`（**sink 最后一条**必须是 shutdown 步） | ⛔ 不红——但**前提本腿查出来了**：`startConfigReload()` 的调用点在 `cmd/wisp/run.go:813`，而那行位于 `assembleRuntime`（`run.go:382` 起），**resident 腿共用这枚装配根**（`cmd/wisp/resident_task_source_windows.go:278`）⇒ 常驻腿**今天也 armed 了 tick**。这些用例种的都是 canonical config（不失败）⇒ 新支不发句 ⇒ 不红。⚠ 一旦落地腿给新支**另加一行 stdout**（票面没要求），resident 面的 stdout 捕获会变宽——`268:200`/`228:66-67` 只数各自 marker 故仍不红，但这是"票外动作"，本腿具名不背书 |
+| 暗坑 A（位置） | 产码 `cmd/wisp/config_reload.go:396` | 新 `case` 必须早于 `:396`，否则**死代码**；红法＝新增表条目红在 `:110` 那把前缀尺，红句 `the two sentences swapped again` |
+| 暗坑 B（命名） | `config_reload_223_test.go:570-573`＋`config_reload_perm_223_windows_test.go:112-119` | 新 `cause=` 串**不得包含**任一枚既有 marker 作子串（`cause=invalid`／`cause=missing`／`cause=syntax`／`cause=unknown-key`／`cause=permission`／`cause=migration`／`cause=unclassified`／`state=disabled`）。反例：`cause=invalid-version` 会让新那一形自己撞 ②反向尺；`cause=newer-build`／`cause=newer-version` 两枚候选都安全。⚠ **两名不一致具名**：票面 AC#2 写 `cause=newer-build`，223-v2 件 `:215` 建议 `cause=newer-version` ⇒ 择一归编排者/落地腿，本腿不裁 |
+| 暗坑 C（控制流借词） | `config_reload_perm_223_windows_test.go:142-143` | `if strings.Contains(got, "config: HOT-RELOAD state=applied") \|\| strings.Contains(got, "state=not-applied cause=invalid") { return "", true }`——`cause=invalid` 在这里**不是断言，是"tick 读到了文件"的探测器**。它种的 body 是 ver=2 且解析得开（`:81-82`），靠 `validate`/catalog 那批 `config.toml: ` 串落到 invalid ⇒ ⚠ **只要新支的认领串宽到把那种 body 抢走**（例如误用 `strings.Contains(d, "config.toml: ")` 之类），这枚用例会以 `three plants all landed in the tick's read window; this case cannot be decided on this machine` 或 `neither the permission sentence nor an adoption arrived; stderr:…` 红。**本腿未实跑，这是形状级风险，具名交回落地腿自查** |
+| 暗坑 D（同族第二吞点无人钉） | 产码 `internal/config/migrate.go:71-73`／`:78-80` | 尺＝`grep -rn "produced an invalid config" cmd/ internal/ --include=*.go`——命中**全在产码**（`internal/config/migrate.go`），测试侧另有一枚 `internal/config/unwired_test.go` 只钉 "unknown key" 那条（`:254`）。⇒ "迁移产物不合法"今天也被 `:396` 吞成 `cause=invalid`，与"版本更高"同一根前缀、**同样零常驻钉**；票 231 字面没要求处理它 ⇒ 归 AC#4 的登记材料 |
+| 暗坑 E（治理口径已被人立过） | `cmd/wisp/resident_approval_risk_268_windows_test.go:32-38`＋AST 尺 `:224-293` | 268 件头逐字：`the rejected alternative (config_reload.go's strings.HasPrefix on the detail string) would redden it`；红句 `:281`：`matching an error message is the shape config_reload.go:396 already carries and ticket 268 was told not to copy`。⚠ **射程本腿查清了**：那枚 AST 尺只 `parser.ParseFile` 一个文件（`:225`＝`resident_approval_windows.go`）且只量 `residentRiskGateValues`（`:233`）⇒ **在 `describeReloadFailure` 里加 `strings.*` 不会红它**；但它是本仓**已记录在案的"不要靠 prose 分类"取向**，AC#4 登记时应引它 |
+
+### 4.5 本节判语
+
+**穷尽读数：加一支"新出口＋新表条目"在今天的 `cmd/wisp` 测试面不会红任何一枚**（①②③④四类逐枚判完，红＝0 枚）。真正会红的是**写歪的三种方式**：写晚于 `:396`（暗坑 A）、命名含既有 marker 子串（暗坑 B）、认领串抢走 perm 用例的 body（暗坑 C）。三处"不会红但会变钝／无人管"＝互斥名册没进新形、重复审计行无数得住、同族第二吞点零常驻钉。
 
 ## §5 问五：既有定式对照＋票 232 撞行核查
 
