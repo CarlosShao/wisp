@@ -1,0 +1,13 @@
+docs(probes/268-r1): 起手——票面与 a2 复核件读完、§0 起手锚逐枚亲读（行号未漂），证据件骨架八节落盘
+
+编队 268-r1（票 268 落地腿，形由编排者裁死＝A＋B，不取 C/doctor）。
+
+- 读面：票 268 全文（41 行）＋ .scratch/wisp/probes/268/a2/verdict.md（205 行，独立复核，推翻 census 六条，本腿以 a2 为准）
+  ＋ cmd/wisp/resident_approval_windows.go 的 [risk] 读取段 ＋ resident_windows.go:180-196（[hotkey] 形状母本）
+  ＋ config_reload.go:345-409（被诟病的 strings.HasPrefix 分类形状，本腿不取）
+  ＋ resident_approval_risk_256_windows_test.go 的硬钉原文（:124-125/:141-144/:310-314/:560/:563）
+  ＋ internal/config/{loader,validate}.go 的缺失支与 band（[31,3600] 逐字在 :128-129）。
+- 派单给的每一枚 file:line 都按待验断言亲读一遍：现量全部未漂，无需报漂因。
+- 新落：.scratch/wisp/probes/268/r1/evidence.md（§0-§7 八节，未填处逐节"未判"占位）。
+- 票面：只在末尾追加 Progress log 一节一行（append-only），⛔ 原句一字未改、AC 框一枚未碰。
+- 起跑前现量：go.exe 进程数 0（同机并发整包会互相洗读数）。本笔两枚 pathspec 全是文档面（骨架＋票面追加行），零产码字节；整包基线在**这一笔之后**才起跑。
