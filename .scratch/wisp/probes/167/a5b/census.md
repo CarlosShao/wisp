@@ -100,7 +100,7 @@
 | **P1 聚合门** | `cmd/wisp/panel_host_windows_test.go:1004`／`:1007` | `:1004` `	if coldP95 > 1500 {`→红句 `:1005` 逐字 `"cold P95 %.3f ms over %d runs exceeds the D32 panel cold budget 1500 ms (the single-run assertion is not the only gate: the tail is what AC#2 asks for)"`；`:1007` `	if hotP95 > 200 {`→红句 `:1008` | **两枚 P95**（cold 1500／hot 200）。⚠ **P50 算了但从不判**（`:995`/`:997` 只进 `t.Logf` `:999-1000`） |
 | **P1b P11 线** | `:1003` | `	t.Logf("AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: %.3f ms", maxOf(cold))` | **纯 Logf**，注释 `:1001-1002` 明写它"reported, never a threshold of its own here" |
 | **P2 单发门** | `:664`／`:790` | `:661` `	if coldMs <= 0 {`→`t.Fatalf`；`:664` `	if coldMs > 1500 {`→红句 `:665` 逐字 `"cold bring-up %.1f ms exceeds D32 panel cold budget 1500 ms"`；hot 同形 `:788`/`:790` | 真窗**单发** cold/hot。`hotMs <= 0` 那支是 `t.Errorf` 不是 Fatalf（`:788-789`）⇒ 无读数仍会继续往下 record |
-| **P3 唯一喂样点** | `:793` 逐字 `	panelHostLatency.record(head, coldMs, hotMs)` | — | **全仓这一发调用只有 1 处**（尺＝`grep -rn 'panelHostLatency.record' cmd/wisp`＝命中定义 `:577`＋这一枚）⇒ **P1 的分母 100% 来自 `TestPanelHostRealWindowHopAndLifecycle` 一枚用例**，且只在它跑到 `:793` 那一行时才进料 |
+| **P3 唯一喂样点** | `:793` 逐字 `	panelHostLatency.record(head, coldMs, hotMs)` | — | **全仓这一发调用只有 1 处**（尺＝`grep -rn 'panelHostLatency.record' cmd/wisp`＝命中 **3 行**：注释 `:561`／定义 `:577`／调用 `:793`，**调用面唯一**）⇒ **P1 的分母 100% 来自 `TestPanelHostRealWindowHopAndLifecycle` 一枚用例**，且只在它跑到 `:793` 那一行时才进料 |
 
 **"该钉哪两行"这一问在本腿量不到判据**（骨架写了它，派单未授）；本节只报射程事实：**今天这条族里没有任何一枚用例断过 `len(cold) >= 10`**——样本枚数只出现在 `t.Logf`（`:987`/`:999`），P1 的门对 n=1 与 n=10 一视同仁。⇒ 具名后果：**"10-run P50/P95" 那枚 AC#2 字面，仪器只管住 P95 那半、管不住 10-run 那半**（本腿只登记这一事实，不裁该不该补；⛔ 补法形状是产码，非本编队）。
 
@@ -111,11 +111,11 @@
 | V1 | `cmd/wisp/panel_host_windows_test.go:1` 逐字 `//go:build windows`；文件头注释 `:5-11` 逐字 `"they are gated by the //go:build windows tag (a real platform fork, not a fake skip); they never use testing.Short() or an environment escape hatch to pretend green, and a window that cannot be created here is a red, not a skip"` | **平台叉，非 SKIP 叉** | 非 windows 编译时这 4 枚用例**根本不进二进制**：`go test` 报 `ok`／`no test files` 而**无红名册**。文件自己声明这是"real platform fork"——它不是伪装，但**读数面上与"没跑"同形**（⇒ §5.3 形状 A） |
 | V2 | `cmd/wisp/panel_host_windows_live_test.go:1` 逐字 `//go:build windows && winlive` | **双标签叉＋无 CI** | `:5-20` 注释具名：这一枚（`:36` `TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`，2s 退出条款，`:62` `	deadline := time.Now().Add(2 * time.Second)`＋`:70` `	if final.TreeWebview > baseline.TreeWebview {`）由编排者裁定（10-01 12:22，form B）**移出默认层**，代价逐字 `:18-20` `"winlive has NO CI job, so this clause is now measurable only on a desktop box and is never seen by the pipeline"` ⇒ 默认层全绿时这一寸**一次都没被测过** |
 | V3 | `cmd/wisp/panel_geometry_255_winlive_test.go:1` 同 `windows && winlive`；真窗宽度那一族，结算在 `:143`／`:198` `if n := settleThreadWindows255(t, hh, tid, 3*time.Second); n != 0 {`，等待体 `:229` 起、`:231` `	deadline := time.Now().Add(limit)`＋`:239` `		time.Sleep(50 * time.Millisecond)` | 同一枚双层叉的第二户 | 真窗几何（票 255 那条）今天也在**无 CI 的层**里；`:221` 注释自述它"reports the number it measured rather than a guess about the settle time" ⇒ 结算不到 0 时报数不报绿 |
-| V4 | `cmd/wisp/panel_host_windows_test.go:620` 逐字 `	dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")`，前置注释 `:615-619` 具名 `t.TempDir` 的 auto-RemoveAll **会**与浏览器 profile-DB 拆除抢锁 ⇒ 故意不删 | **跨 run 残留 profile** | 固定路径＋永不删 ⇒ 第二次跑的起点取决于上一次留下了什么。同文件 `:630-638` 的 `baselineHosts` 与 `:703-710` 的注释正是为这一枚而存在（`255-r5 measured exactly that shape: post-fix-count3-v2 run 2 read TWO hosts pre-hide and went red on the leftover's exit`）⇒ **判据靠"减基线"成立，基线本身是时序量** |
-| V5 | `cmd/wisp/panel_host_windows_test.go:353-356` 逐字 `	treeSettleWait = 3 * time.Second`／`	treeSettleStep = 100 * time.Millisecond`／`	treeSettleMax  = int(treeSettleWait / treeSettleStep)`；循环体 `:371-383`，`:376` `		if second.TreeWebview == first.TreeWebview {`→返回 | **两枚样本一致即算"settled"** | 注释 `:346-352` 自认"detect the tree webview count drifting ... keeps sampling"，`:360-369` 自认 255-r5 实测"helpers spawned around bring-up exit within roughly a second"。⇒ 浏览器换编号的节奏与 100ms 采样**同量级**：两枚一致可能是"真稳"，也可能是"两次都落在同一段漂移里"；且**耗尽 30 枚样本后 `:382` 仍返回 `(first, treeSettleMax+1)` 而非 `t.Fatalf`** ⇒ 未结算读数被当结算读数用（`afterExtra`/`beforeExtra` 只进 `t.Logf` `:749`/`:715`） |
+| **V4** | `cmd/wisp/panel_host_windows_test.go:620` 逐字 `	dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")`，前置注释 `:615-619` 具名 `t.TempDir` 的 auto-RemoveAll **会**与浏览器 profile-DB 拆除抢锁 ⇒ 故意不删 | **跨 run 残留 profile** | 固定路径＋永不删 ⇒ 第二次跑的起点取决于上一次留下了什么。同文件两枚为此而生的注释块本腿逐枚现取：`:630-637`（`// baselineHosts is the direct-child browser set BEFORE this run brings its`…，字段本体 `:638` `	baselineHosts := browserHostPids(t, self)`）与 `:700-706`（`//   3. With -count>1 the browser process is REUSED across iterations of the`＋实测 `cold bring-up fell 1689 -> 328 ms` 在 `:701-702`）⇒ 具名逐字 `:634-637` `"255-r5 measured exactly that shape: post-fix-count3-v2 run 2 read TWO hosts pre-hide and went red on the leftover's exit when no baseline was subtracted"` ⇒ **判据靠"减基线"成立，基线本身是时序量** |
+| **V5** | `cmd/wisp/panel_host_windows_test.go:353-355` 逐字 `	treeSettleWait = 3 * time.Second`／`	treeSettleStep = 100 * time.Millisecond`／`	treeSettleMax  = int(treeSettleWait / treeSettleStep)`（`const (` 在 `:352`）；循环体 `:371-383`，`:376` `		if second.TreeWebview == first.TreeWebview {`→返回 | **两枚样本一致即算"settled"** | 注释 `:346-351` 自认"The wait is NOT an assertion bound being widened … The loop counts samples, it does not read the wall clock"，`:360-369` 自认 255-r5 实测"helpers spawned around bring-up exit within roughly a second of their own accord"。⇒ 浏览器换编号的节奏与 100ms 采样**同量级**：两枚一致可能是"真稳"，也可能是"两次都落在同一段漂移里"；且**耗尽 30 枚样本后 `:382` 仍返回 `(first, treeSettleMax+1)` 而非 `t.Fatalf`** ⇒ 未结算读数被当结算读数用（`beforeExtra`/`afterExtra` 只进 `t.Logf` `:713`/`:749`） |
 | V6 | `cmd/wisp/panel_host_windows_test.go:394-398`（`browserHostPids`）逐字 `		if row.ppid == root && strings.EqualFold(row.name, webviewExeName) {` | **只认直接子进程** | 注释 `:385-390` 自述理由（helper 挂在 host 下，不挂测试进程下）。⇒ 这一族对"浏览器自己重排父子关系"是**结构性失明**，与 V5 的漂移同源 |
 | V7 | `cmd/wisp/panel_host_windows_test.go:611-613` 注释逐字 `// Do not parallelize this test or any sibling in this file: the AC#3 socket ruler`／`// and the AC#4 foreground ruler both read machine-global state, and`／`// TestAC3ListeningSocketRulerSeesItsOwnListener deliberately opens a listener.`；实量 `t.Parallel()` 在本族四枚文件里＝**0 命中** | **靠约定防并发，不靠仪器** | 没有 `if t.Parallel() …` 之类的钉，**这是一句注释不是一枚断言**：任何人给这个包加并行，AC#3（`:552` `			if state == mibTcpStateListen && pids[own] {`，读机器全局 TCP 表）与 AC#4（`:876` `	foregroundBefore := uintptr(windows.GetForegroundWindow())`，读机器前台窗）立刻互相污染 ⇒ 真窗族的"红"可以是**别人开窗**造成的 |
-| V8 | `cmd/wisp/panel_host_windows_test.go:1021` 注释逐字 `// It is declared AFTER the lifecycle test on purpose: go test runs the tests of a`／`// file in source order, and the aggregate is read from the samples that file's`／`// earlier tests recorded.` | **跨用例·同进程·源序耦合** | P1 的输入是**包级可变全局** `:575` `var panelHostLatency latencyRecord`，进料点在另一枚用例体内（`:793`）。⇒ `-run` 单挑 P1／重排源序／P2 那枚用例在 `:793` 之前任一 `t.Fatalf`（`:641`/`:648`/`:651`/`:661`/`:728`/`:734`/`:753`）都会让聚合**空**——此时不是红，见 §5.3 形状 B |
+| V8 | `cmd/wisp/panel_host_windows_test.go:967-969` 注释逐字 `// It is declared AFTER the lifecycle test on purpose: go test runs the tests of a`／`// file in source order, and the aggregate is read from the samples that file's`／`// earlier tests recorded.` | **跨用例·同进程·源序耦合** | P1 的输入是**包级可变全局** `:575` `var panelHostLatency latencyRecord`，进料点在另一枚用例体内（`:793`）。⇒ `-run` 单挑 P1／重排源序／P2 那一枚用例在 `:793` 之前任一 `t.Fatalf`（本腿逐枚现量：`:642`/`:648`/`:651`/`:662`/`:672`/`:675`/`:717`/`:728`/`:731`/`:734`/`:753`/`:782`，**共 12 枚，全部在进料点之前**）都会让聚合**空**——此时不是红，见 §5.3 形状 B |
 | V9 | `cmd/wisp/panel_host_gate_test.go:338` `func gitHeadShortForTest`，`:341` `	out, err := exec.Command("git", "rev-parse", "--short", "HEAD").Output()`，`:343` `		return "HEAD-unknown"` | 读数自述的锚是**跑出来的** | 注释 `:333-337` 具名它就是为了终结 33-v1 §A#21（旧件把 `"HEAD 7a41db9b"` 写死在测量行里）。⇒ 值：**没有 git 元数据时读数仍绿，锚写成 `HEAD-unknown`**；任何引用这族读数的表若不带这一枚区分就是过期 |
 | V10 | `cmd/wisp/panel_resident_windows_test.go:50-53` 逐字 `// panelThreadWait bounds every "did the panel thread get there" wait in this file.`／`const panelThreadWait = 15 * time.Second`；结算体 `:87` `	deadline := time.Now().Add(panelThreadWait)`→`:94` `	t.Fatalf("timed out after %v waiting for %s - this is a failed measurement, not a pass", panelThreadWait, what)` | **墙钟等待，但红向做对了** | 超时是 `t.Fatalf`（不是 skip、不是绿）——这枚形状是**本族的正面样本**；`time.Now()` 差值实现超时这一点与 `AGENTS.md §1.2` 的"不许用墙钟时间差实现超时"在**字面**相冲（测试件是否在射程归 `tools/d22scan`，⛔ 本腿不裁，登记为 Q-1） |
 | V11 | `cmd/wisp/panel_resident_windows_test.go:611` 逐字 `const refusalSettleBudget = 5 * time.Second`；四发判据 `:703` `	for time.Now().Before(settled.Add(refusalSettleBudget)) {`＋`:731` `	secondElapsed := time.Since(secondStart)`→`:735` `	if secondElapsed > refusalSettleBudget {`＋`:750`/`:755` `case <-time.After(refusalSettleBudget + time.Second):` | **同一枚 5s 既当等待上限又当断言阈值** | `:703` 的轮询与 `:735` 的门是**同一个常量**：轮询若被拖慢，`secondElapsed` 的判据与它自己的等待上限同涨同落 ⇒ 机器负载升高时这一发**两侧一起让**（`settleElapsed` `:709` 只进 `:757` 的 Logf，不参与判）。这是真窗族里"阈值＝自身超时"形状的一枚 |
@@ -241,4 +241,88 @@
 
 ## 7. 量不到／判不动／我写错的读数（自我对抗）／⛔ 未动产码自证
 
-本节打算答：(1) 本腿对 a5 读数复核中发现的写错处（逐条具名）；(2) 本腿自己量不动、归编排者的条目；(3) `git status --porcelain` scoped 读数收尾自证（起手在 §0）。
+> 本节是派单点名的那一枚最容易出错的形状：**行号漂移**（三腿接力期间 `cmd/wisp`／`internal/panel` 都在动）。
+> 规矩（照派单）：本腿要引用的**每一枚 file:line 都由本腿重新取一遍**；凡与 a5／a5b 笔 2 件内行号不一致，逐枚列对照表。
+> ⛔ **不写成"上一版 vs 新版"**——只写"哪一腿在哪一笔 commit 读到的"。
+
+### 7.1 三腿接力的锚时刻（先立时间轴，后面所有对照按它归口）
+
+| 腿 | 起手 HEAD | 该腿件内行号的取值时刻 | 盘上件 |
+|---|---|---|---|
+| `167-a5`（死腿，§0–§3 已填） | `94380ab3`（§0 逐字） | 14:0x–17:1x 之间逐枚现跑（§1 尺注；§2.4 的门锚自称取自 `2a0e23b4` 17:1x） | `.scratch/wisp/probes/167/a5/census.md`（240 行／46,567 字节，四笔 `1711ad06`→`2759d08a`） |
+| `167-a5b` 笔 2（＝本腿的前一笔，§4 填实） | `2a633eb8`（本件 §0 逐字） | 15:4x（本件 §4 尺注） | 本件 `:19-81` |
+| **本腿（笔 3＋笔 4，§5/§6/§7）** | 接续时 HEAD＝`2a633eb8`（写面起手复量）；笔 3 落地后 HEAD＝`689891c7`；本笔写作时 HEAD＝`438f5050`（其间进来的是 `268-v1b`／`111-r2`／`evidence-close-*` 等**非产码笔**） | 16:0x–16:3x 逐枚 `sed -n '<l>p'` 现取 | 本件 §5/§6/§7 |
+
+★**本节最重要的一枚读数（它把"行号漂移"这一担忧在本编队里关掉了）**：
+`git diff --name-only 2a633eb8..HEAD -- cmd internal` ＝ **0 行**；`git diff --stat 94380ab3..HEAD -- cmd internal` ＝ **0 行输出**。
+⇒ **从 a5 起手那笔（`94380ab3`）到本笔写作时（`438f5050`），`cmd/**` 与 `internal/**` 两个产码根一字未动**（期间进来的全是 `.scratch`／`docs` 笔）。
+⇒ 所以：**a5 与本腿读的是同一棵树**，下面的对照表里"未漂"不是运气，是这枚 diff 读数保证的；⛔ 本腿不写"新版行号已更正旧版"这种话——两腿读的是同一枚字节面。
+⚠ **这枚保证对下一腿不成立**：`167-r2` 落地必写 `internal/panel/**`＋`cmd/wisp/**` ⇒ **本节全部行号在 r2 交件后即刻过期**；引用本件时须带"锚 `94380ab3..438f5050` 产码零动"这枚前提。
+
+### 7.2 本腿重取 a5 全部引用锚的对照表（逐枚；不一致的只列在 7.3）
+
+| a5 件内锚（§1–§3） | 本腿现量 | 判 |
+|---|---|---|
+| `internal/panel/git_test.go:387`／`:519`／`:516` | 同号（`:387` 真树 want-4、`:516` 正控 `!= 5`、`:519` 真树 `!= 4`） | 未漂 |
+| `internal/panel/git_test.go:396`（`panelMethodRe`） | 同号 | 未漂；⚠ **`inbound_roster_253_test.go:437` 的红句自己写着 `panelMethodRe at git_test.go:394`** ⇒ 件内注释锚与尺体锚**差 2 行**，本腿两枚都取到并逐字对上（正则真身在 `:396`）；见 §7.3 第 5 条 |
+| `internal/panel/inbound_roster_253_test.go:445`／`:455`／`:435`／`:474`／`:498`／`:510-517` | 全部同号（`:435` `missing, extra := sameNameSet(declared, …)`、`:470`/`:474` 守卫 AST 分母、`:494`/`:498` 路由分母、`:514-515` ANSWERED 字面分母） | 未漂 |
+| `internal/panel/inbound_roster_253_test.go:59`／`:64`／名册 var `:69-76`／注释 `:37-40` | 同号（`:59` ＝6、`:64` ＝2、`:69-76` 六枚字面串、`:37-40` 自述"not as references to the Go constants"） | 未漂 |
+| `internal/panel/bridge_test.go:138-145`／`:161` | 循环 `:138` 起、`contains` 判据 `:142`；`postMessage` 计数钉 `:161`（红句 `:162`）；函数体 `TestFrontendComposerRequestsMatchTheEnvelope` 在 `:131` | 未漂（a5b 笔 2 本件 §4.4 已裁"四枚常量循环在 `:138-141`"，本腿复认 `:138`/`:142` 同面） |
+| `internal/panel/composer_test.go:409-419` | `composerRouteLiterals()` `:409` 起、闭集 `:419`；消费点 `:502`、unknown 门 `:521` | 未漂 |
+| `internal/panel/composer_test.go:48`／`:50`／`:60`／`:65`／`:73-74`／`:76-77` | 全部同号（`:50` 读 `panel.ts`、六对 `:60-65`、两方向红句 `:74`/`:77`） | 未漂 |
+| `internal/panel/composer_test.go:173`/`:174`／`:180`/`:181`／`:268`／`:276`／`:317-319`／`:321`／`:332`／`:334` | 全部同号 | 未漂 |
+| `internal/panel/approval_test.go:105`／`:118-120`／`:128-132`／`:174-191`（`:177`/`:182`） | 函数 `:105`、三对 `:118-120`、正向 `:128`→红句 `:129`、反向 `:131`→红句 `:132`、helper `:174`（`NumField` `:177`、tag 盲区 `:182`） | 未漂；⚠ a5 §1.2 写"判据 `:128-132` 同一条断言体"——**本腿复认为两方向各一枚**（`:128`/`:129` 与 `:131`/`:132`），不是同一条；见 §7.3 第 3 条 |
+| `internal/panel/pump_test.go:123`（注释 `:109-110`）／`:291` | 全部同号；`:291` 的红句在 `:292`、同段 `var wire` 在 `:283` | 未漂 |
+| `internal/panel/subagent_roster_197_test.go:214`（红句 `:215`、反向钉 `:207-208`）／`:275-276` | 同号 | 未漂 |
+| `internal/panel/subagent_stream_197_test.go:129-130`／`:136`／`:140-141` | `:129` `	if len(generic) != 4 {`、`:136` `	if len(results) != len(agents) {`、`:140` `		if len(r) != 3 {` | 未漂 |
+| `internal/panel/l2_grant_boundary_test.go:1293-1301`（红句 `:1301`）／`:1243`／`:1276`／`:1181`／`:1189`／`:183`／`:192-195`／`:1487`／`:1691`／`:1721-1726`／`:1857-1861`／`:1878`／`:1882-1887`／`:1906`／`:966`/`:976`/`:979`/`:982`／`:992`–`:996`／`:1006-1012`／`:1231-1232`／`:1847-1848`／`:279`／`:1753`/`:1755`／`:678`/`:700` | **全部同号**（本腿逐枚打印原文对上：`:1189` 现量 `				continue`、判决词真身在 `:1193`；`:994`–`:996` 为 `t.Fatalf("%s", problem)` 那一支；`:1722` `"ComposerRequest": reflect.TypeOf(ComposerRequest{}),`；`:1859` 那枚 `t.Fatalf`） | 未漂；仅 `:1189` 一枚**红句本体在 `:1193`** ⇒ 见 §7.3 第 1 条 |
+| `internal/panel/l2_grant_boundary_test.go` 七枚测试起点 `:1229`/`:1530`/`:1547`/`:1595`/`:1807`/`:1959`/`:2168`＋总长 2549 行 | 全部同号；`wc -l`＝**2549** | 未漂 |
+| `internal/panel/tokens_fourway_test.go:50-53`／`:212`／`:285`／`:439`／`:456`＋550 行 | 全部同号（`:51` c21 md、`:53` generated css）；`wc -l`＝**550** | 未漂 |
+| `internal/panel/frontend_hygiene_test.go` 5 枚测试 `:169`/`:196`/`:222`/`:246`/`:281`＋`:133`/`:134`＋324 行 | `wc -l`＝**324**；`:133` 现量 `	if len(seen) < 5 {` | 未漂（本腿未逐枚复跑五枚函数起点，见 §7.4 第 2 条） |
+| `internal/panel/composer_dispatch_test.go:592`／`:605`／`:628`／`:637` | 全部同号 | 未漂 |
+| `internal/panel/bridge.go:42-45`／`:66-67`／`:98`／`:146`（守卫 case `:148`） | 全部同号；`knownComposerMethod` 的 case 表本腿现量在 **`:148`**（六枚一行） | 未漂（与 a5b 笔 2 §4.1 同读数） |
+| `internal/panel/composer_dispatch.go:175`＋六枚 case `:177`/`:182`/`:187`/`:192`/`:197`/`:202` | 全部同号 | 未漂 |
+| `cmd/wisp/panel_inbound.go:273-274`／`:275`／`:277` | 同号（`:274` 逐字 `	// workspace = ticket 186, attachment = ticket 92, message = ticket 35.`） | 未漂 |
+| `cmd/wisp/panel_config_248_test.go:126-150`（`:145` 造 dispatch）／`:330`/`:373`／`:389`／`:460`/`:467` | 同号（`:145` `	disp := &panel.ComposerDispatch{`、`:330` `	shared := jsonKeys248(reflect.TypeOf(panel.ComposerRequest{}))`、`:389` `	for i := 0; i < ty.NumField(); i++ {`） | 未漂 |
+| `cmd/wisp/config_receipt_255_test.go:233`／`firstrun_257_test.go:213-214`／`providers_test.go:112`／`panel_pump_test.go:97`/`:203`/`:302`／`resident_approval_risk_256_windows_test.go:489`／`resident_grant_writer_265_windows_test.go:196`／`subagent_blocked_197_test.go:164`／`instructions_200r2_test.go:151`/`:239`／`panel_assets_143_test.go:52-61`/`:112`／`instructions_200_test.go:300`／`subagent_roster_197.go:106-138`/`:115` | **全部同号**（本腿逐枚打印对上；`cardView143` 本腿复数＝**8 枚键**，与 a5 §1.6 W-3 的"8 枚"一致） | 未漂 |
+| `internal/panel/config_route_248_test.go:73`/`:75`（a5b 笔 2 §4.4 补册那枚）／`:272`/`:296`（a5 §2.1） | 同号（`:75` `			if !knownComposerMethod(method) {`） | 未漂 |
+
+**结论**：a5 件内 §1–§3 引用的**每一枚** file:line 本腿重取后**没有一枚漂**（由 §7.1 那枚 `git diff … = 0 行` 保证）。本件 §4（笔 2）已对 §1.3 做过同向的核对，本节把它扩到 §1–§3 全量。
+
+### 7.3 我写错／前人写歪的读数（逐条具名，含本腿自己）
+
+1. **`l2_grant_boundary_test.go:1189` 那一枚不是判据行**——a5 §3.2 写作"`:1189` `			if carriesGrantWord(f.JSONKey, grantFieldWords) {`"，本腿现量 `:1189` ＝逐字 `				continue`，`carriesGrantWord(f.JSONKey, …)` 的真身在 **`:1193`**。⚠ **a5b 笔 2（本件 §4.2 L2 行）把这枚锚照抄成 `:1189`** ⇒ 同一处错在两腿各写一遍。本腿 §6.1 格 A/B/C 三处已按 **`:1189`→`:1193` 双写**登记（不改写笔 2 已成文格，遵守"已写成的格子一字不改"）。
+2. **`panelMethodRe` 的件内自述与真身差 2 行**：`inbound_roster_253_test.go:437` 的红句写着 `panelMethodRe at git_test.go:394`，本腿现量 `git_test.go:394` ＝ `var (`、正则本体在 **`:396`**。⇒ **这是产码注释里的过期行号，不是 a5 写错**；本腿具名交回以免下一腿拿 `:437` 那句当锚。
+3. **a5 §1.2 把尺 B 的两方向红句合成"同一条断言体"**：本腿现量是 `:128`/`:129`（正向）与 `:131`/`:132`（反向）**两条**，且尺 A 同形（`:73`/`:74` 与 `:76`/`:77`）。⇒ 后果值钱：§6.1 的 B-1/B-2 必须**分开判**（页面欠声明＝正向红；Go 欠发＝反向红），a5 那句"同一条"会让人以为一发只撞一枚。
+4. **★本腿自己写错过两处，已在落盘前自纠（痕迹在此具名，不抹）**：
+   (a) §6.2 第 1 条初稿用尺 `grep -rn 'panel\.\|knownComposerMethod' …` 得出"真窗族无 `panel.` 字面"的暗示——**错**：本腿复跑 `grep -rn '"panel\.'` 抓到 4 枚引号字面（`panel_host_windows_test.go:669`、`panel_resident_windows_test.go:251`/`:790`/`:794`）。现改写为"零射程 ≠ 没有字面"。
+   (b) §6.1 D-1 初稿具名"a5 把 `config_route_248_test.go` 的包路径写错"——**错**：回读 a5 `:133` 逐字就是 `internal/panel/config_route_248_test.go:272`／`:296`，是**本腿**复跑时把 `internal/panel/` 误记成 `cmd/wisp/`。已改写为"a5 的包路径本来对，本腿钉行号"。
+   ⛔ 这两处都是**我自己的取数／回读失手**，不是前腿的缺陷；按纪律留痕具名。
+5. **`git_test.go:403-406` 的引用**：a5b 笔 2 §4.3 第 2 条写"名册注释 `:37-40` 自述…"并转引 `git_test.go:403-406` 的理由；本腿现量 `git_test.go:403` ＝ `)`、注释本体从 **`:405`** 起（`// whitelistMethodsFromSource reads the method names off the file that declares`）。⇒ 差 2 行，属**笔 2 已成文格**，本腿只登记不改写。
+6. **§5 初稿的三枚行号失手（本腿自查后在落盘前后改写，此处具名）**：V8 初稿把"源序耦合"注释记成 `:1021`（真身 `:967-969`，`:1021` 是空行）；V4/V5 初稿的 `:703-710`／`:715` 本腿复量为 `:700-706`／`:713`；`:353-356` 复量为 `:352`（`const (`）＋`:353-355`（三枚常量）。V8 已改写；余两枚属"区间少一行"级，本腿在正文给的即现量值。
+7. **"该钉哪两行"不在派单射程**：本件骨架 §5 那句"落地腿新增那一跳时最该补钉的两行断言"是**死腿留题**，本腿派单只授权"哪些带计时断言／哪些带 SKIP 通道／什么形状没跑起来却像绿"三问 ⇒ 本腿 §5 只登记相关射程事实（**今天没有任何一枚用例断过 `len(cold) >= 10`**、P50 算了从不判），⛔ 不自授"该钉哪两行"的裁法（那是产码形状，归 r2 与编排者）。**判定：这一格量不到判据，归编排者**（见 §7.5 第 1 条）。
+
+### 7.4 量不到／判不动（归编排者）
+
+1. **实跑颜色**：本腿零 `go` 命令 ⇒ §5 全部为射程判断。P1 那两枚 P95 门今天**跑不跑得出红**、winlive 层今天有没有人跑过、`-short` 那发实际吃掉多少枚 `cmd/wisp` 用例，都只能由编排者跑。
+2. **本节未逐枚复跑的两处**：`frontend_hygiene_test.go` 五枚函数起点（`:169`/`:196`/`:222`/`:246`/`:281`）本腿只复量了总长与 `:133`；`subagent_roster_197.go:106-138` 的 12 枚键名册本腿复量了 `:106`/`:115` 两枚端点。⇒ 若要拿这两处当 r2 凭据，请复跑逐枚。
+3. **`AGENTS.md §1.2` 那条"不许用墙钟时间差实现超时"打在测试件上的射程**：§5 的 V10/V11/V13 三枚都是墙钟实现（`panel_resident_windows_test.go:87`/`:611`/`cmd/wisp/run_test.go:368`），而 `tools/d22scan` 实际扫不扫 `_test.go` 本腿无权裁、也未读该仪器源码（⛔ 未读 `tools/d22scan` 不是本腿禁面，但本腿未读 ⇒ 登记为量不到）。**已按 §5 V10 标为"登记，不裁"。**
+4. **`internal/observe/thresholds.go` 里有没有 panel 冷/热那两枚 1500/200**：本腿 `grep -rn '1500|PanelCold|panel' internal/observe/thresholds.go` ＝ **0 命中** ⇒ 那两枚数在 `cmd/wisp` 测试里是**硬编码字面**（`:1004`/`:1007`），真源按 `cmd/wisp/panel_host_windows_test.go:1001-1002` 的注释口径指向 `PLAN.md` 的 D32（本腿**未读** `docs/PLAN.md` 该节以外内容，⛔ 一字不动）。⇒ "改 D32 会不会让 §5 那两枚门变钝"这一问**本腿判不动**（要同时读 PLAN 与 thresholds.go 再对账），归编排者；⚠ 本腿能给的唯一事实：仓里 `docs/PLAN.md:508` 那行（D32 的②项）写着「冷 ≤1500ms / 热 ≤200ms」，与 `:1004`/`:1007` 的两枚字面**同数不同源**。
+5. **票 167 票面的 AC 框状态**：本腿读了票面（只读）但**一枚框未碰**；现尺供编排者核：AC#1 已勾（`- [x]`），AC#2–AC#7 未勾（`- [ ]` × 6）。
+
+### 7.5 ⛔ 未动产码自证（收尾复量，与起手同一把尺）
+
+| 尺 | 起手（本腿） | 收尾（本笔） |
+|---|---|---|
+| `git status --porcelain -- .scratch/wisp/probes/167 cmd/ internal/` | `??` 4 行（全是 a5 死腿留下的 `msg*.txt`），`cmd/`＋`internal/` **0 行** | 同一把尺只多出本腿自己写的 `.scratch/wisp/probes/167/a5b/census.md`（＋本目录 msg 件）；**`cmd/` 与 `internal/` 仍 0 行** |
+| `git diff --name-only 2a633eb8..HEAD -- cmd internal` | — | **0 行**（本腿期间未提交任何产码，也未见他人产码笔） |
+| `go` 命令 | **零枚**（无 `go test`／`go build`／`go vet`／`go env`） | 同 |
+| 写面 | 仅 `.scratch/wisp/probes/167/a5b/census.md`＋同目录 `msg*.txt`（只建不删） | 同；⛔ 未动 a5 件一字、⛔ 未动票面／台账／`docs/**`／`frontend/**`／`design/**`／`probes/268`／`probes/111` |
+| Git 纪律 | 每节单独 commit、显式 pathspec、`-F` 取 msg 件、⛔ 无 `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`、只 commit 不 push | 同 |
+
+★**本件 §0 那格"产码枚数复跑｜待 §4 起手量"的代量（⛔ 不改 §0 已成文格，读数登记在这里）**：本腿收尾现量 `ls cmd/wisp/*.go`＝**99**（其中 `*_test.go` **65**）、`ls internal/panel/*.go`＝**34**（其中 `*_test.go` **20**）——与 a5 §0 那行"cmd/wisp 99／65；internal/panel 34／20"**逐枚同数**（同树，§7.1 那枚零动 diff 保证），复认成立。
+
+### 7.6 交件判据（盘上文件自尺）
+
+见本笔 commit 后编排者复量：`wc -l -c .scratch/wisp/probes/167/a5b/census.md` ＋ 占位尺 `grep -n '本节打算答\|未判\|TODO' .scratch/wisp/probes/167/a5b/census.md`。
+★**占位尺归零说明（本腿具名）**：§5/§6/§7 三节骨架那三行"本节打算答…"里，§5 与 §6 的两行**已被正文替换**；本节（§7）那一行**本笔同样替换**。件头 `:4` 与 `:22` 两处仍含"占位／未判"字样——**那是本件叙述 a5 死腿状态的正文，不是待填空位** ⇒ 若尺子按字面命中它们，**真实占位＝0**；本腿⛔ 不改写这两行（它们已是有正文的格子）。
