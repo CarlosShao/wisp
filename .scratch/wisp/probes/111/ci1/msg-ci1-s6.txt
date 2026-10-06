@@ -1,0 +1,21 @@
+probes(111-ci1): §6 写满（八枚判不动＋三枚故意不判，缺的读数具名到 run+job+step）
+
+自我对抗节 B 交齐，⛔ 无一处顶替：
+- 6.1/6.2 go vet ×2 与 161 AC#7 form A：三发推送后 run 全 skipped ⇒ 零字节日志，
+  "没日志"不当"没红"读；
+- 6.3 GUARD D 的正向自证（票 AC#3"人为抽掉一个包证明它会红"）在 CI 上从未跑过：
+  portable-tests-selftest.sh 在两个 workflow 里引用 0 次，全仓只有三处注释提它；
+- 6.4 census 唯一调用点在 test-windows ⇒ linux 侧 census 形状今天无读数，
+  只给出"带 !windows 测试文件的五枚包全在 scope 内"的 HEAD 尺（git grep，不读工作树）；
+- 6.5 session 的 ubuntu 首读数在、但所在步整体 failure（run1 一枚 own-line FAIL、run2 两枚），
+  两半摆开不并档；顺带具名交回 portable-tests.sh:124-126 那句"ubuntu reading never taken"已过期；
+- 6.6 memory 那枚只在第二发红：三发 Go 源码逐字节相同（git diff --name-only | grep -c '\.go$' = 0），
+  写"同码不同果"，根因判不了，⛔ 不借机放宽断言；
+- 6.7 本腿尺子缺陷自陈：run 37405698188 的 lint/test-core 全量日志第二列是 UNKNOWN STEP，
+  那两枚的读数只能按内容归步；
+- 6.8 分母 33 vs census 今天打的 35：四枚 go.mod 现量，另两 module 不在主 go list 里，
+  "20/33"那句今天过期，但重算属口径变更 ⇒ 交编排者。
+
+另三枚故意不判：AC#6 翻不翻（§4.3 两读法摆平）、Post Cache 副作用是否真丢、
+以及今天三枚未登记 skip（TestCanonicalizeErrorNotice...174r3 / TestSyncRedTeamRealOneDrive /
+TestAC13ColdStart...Probe，ledger-hits 全 0）归不归 AC#10。票面一枚框未动。

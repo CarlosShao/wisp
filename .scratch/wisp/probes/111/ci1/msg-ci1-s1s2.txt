@@ -1,0 +1,26 @@
+probes(111-ci1): §1 票面逐字 + §2 AC#1 第④列三十五行全名册
+
+§1（问 1）：sed -n '20,35p;70,90p' 的十枚框逐字抄齐，行号复核=没漂
+（grep -n 现量十枚框在 :22/:24/:27/:29/:31/:71/:75/:77/:81/:86，票面 306 行、零枚 - [x]）。
+具名一处口径差：任务前文把 AC#6 那句"只要还有一步是 skipped 就判 FAIL"说成在 :71-74，
+票面 :71-74 逐字里没有这句——真身在 :255（限定 test-windows 五枚非 post 步）与 :291（未限定），
+两处射程不同即 §4.3 两读法的依据。本腿票面一字未改。
+
+§2（问 2）：35 行全在（尺 = census 步 grep -c 'portable-tests.sh: +github' = 35，
+三发名册 diff 无输出），每行四列：
+①git ls-files 跟踪 _test.go 枚数 ②census 在 windows 打的 TESTS(t/x)
+③在不在 CI 某一步（core/windows/cli/winsec→具体作业第几步）
+④那一步真给过结论的 run+job+步+该枚包自己的 own-line 判语。
+第④列只从 gh run view --job --log 的步级全量日志取（⛔ 不用 --log-failed）。
+
+两处必须纠的口径：
+- census 步打印的四数不是"1518/1028/4/1 一形"，那是 runtests.sh 的 RUN/PASS/FAIL/SKIP；
+  census 自己的四数 = packages=35 / with-zero-compiled-tests=7 / claimed-by-no-scope=7 /
+  unclaimed-with-tests=0，三发逐字相同（run1 112082660385 step8、run2 112085927937 step8、
+  run3 112084901765 step8）；推前 37396530365 无 census 步。
+- 票面 33 的分母今天打 35（差 2 枚是谁挤进来＝§6.8 判不了，属口径变更）。
+
+28 枚有真步级结论 / 7 枚 NO-SCOPE 且全 0/0（无测试文件，不是"有测试没在册"）；
+session 与 projctx 两格第④列今天第一次有值（推前 own-line 名册 core 25 枚、windows 10 枚都没它们）；
+tools/d22scan 与 tools/mockllm 在 35 行之外但有 CI 读数（lint step4 success、step13 只 vet 不测），单列 §2.3 防漏计。
+零 go 命令：t/x 差集只由 git grep HEAD 那把尺定性，本腿没跑过 go list。

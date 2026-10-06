@@ -23,6 +23,18 @@
 - 计数／名单：`git ls-files` 系列、`wc -l`、`sed -n`、`grep -n`
 - ⛔ 无 `go`／无 `go test`／无 `go vet`
 
+**"零 go 命令"的可核证据（不是自我声明，是枚举＋两条落盘尺）**
+1. 本腿全程用过的命令族只有：`gh`（`run view`／`run list`／`api repos/actions/…`）、`git`
+   （`rev-parse`／`ls-files`／`ls-tree`／`show`／`log`／`diff`／`status`／`add`／`commit`／`reset -q -- <我自己的新文件>`／`merge-base`／`grep -l … HEAD`）、
+   `grep`／`awk`／`sed`／`sort`／`uniq`／`comm`／`diff`／`wc`／`ls`／`gzip -dc`／`base64 -d`／`mkdir`。
+2. `go test`／`go build`／`go vet`／`go run`／`go list`／`go env` **一次都没出现**——
+   所以本件的②列（`TESTS(t/x)`）**只转述 census 步自己打印的数**（§2.2），
+   ①列与②列的差集靠 `git ls-tree`／`git show HEAD:<file>` 那把 tag 尺闭合（§2.2 末表），⛔ 不靠本腿自己跑 `go list`。
+3. 落盘尺：本腿唯一的写入路径是 `.scratch/wisp/probes/111/ci1/**`（`readings.md` ＋ 4 枚 `msg-*.txt` ＋ 9 枚 `logs/*.gz`），
+   仓里没有由本腿产生的 `go build` 临时件／`.portable-census.*`／`.portable-resolved.*`
+   （`git status --short` 里那些 `design/**`、`.gitignore`、`probes/152`、`probes/161`、`probes/268` 的改动**全部是别的腿的**，本腿一枚都没碰、也没转述其内容）。
+4. 边界自报一处偏差见 **§6.9**（起手阶段一枚 `grep -rl` 扫的是工作树而非 HEAD），这一条正是"零 go"之外的另一道边界，本腿如实登记。
+
 **run 号存活确认**（`gh run list --branch dev -L 8` 原文摘录，10-06 11:4x）
 ```
 completed  failure  ## A634                                              ci  dev  push  37406757402  9m36s  2026-10-06T02:58:39Z
@@ -494,6 +506,7 @@ step7 `cmd/wisp`：推前 6 枚、`37405698188` 6 枚（**逐名相同**）、`3
 | 6.6 | `TestConcurrentWritersReaders`（`internal/memory`）为什么只在 `37406757402` 红 | `37406757402`/job `112085927688`/step7 `--- FAIL`（10.05s）对照 `37405698188`/`112082660423`/step7 `--- PASS`（10.03s）与第三发 `37406422380`/`112084901657`/step7 `--- PASS` | **三发的 Go 源码逐字节相同**：`git diff --name-only ec84cff1..cc315261 \| grep -c '\.go$'` = **0**，`b948bcb8..cc315261` 也只差 1 枚纯台账提交（`cc315261` 改 `msg-a634.txt`＋`pending-and-issues.md`，`git show --stat` 现量）。⇒ 只能写成"同码不同果"，**根因判不了**（时序／负载／runner 差异三种都没尺区分）。⛔ 不许据此放宽任何断言——那是 AC#2 明令禁止的方向。 |
 | 6.7 | `37405698188` 的 `lint`／`test-core` 两枚 job 的全量日志**没有步名列** | 尺原文：`gh run view --job 112082660317 --log` 与 `--job 112082660423 --log`，第二列逐行都是 `UNKNOWN STEP`（对照 `112085927883`／`112085927688`／两发 `test-windows` 都带真步名） | ⇒ 那一发的这两枚只能**按内容归步**（如 `##[error]...fs_broken.go` 落在 gofmt 的 `Run` 块里），归到步号的映射靠 `ci.yml` 的步序推。凡本件里由 run1 这两枚给出的"第 N 步"，都要按这个折扣读；run2 的读数不受影响（步名列齐全）。这是本腿尺子的缺陷，不隐瞒。 |
 | 6.8 | AC#1 的分母：票标题写 **33**，census 今天打 **35** | 三发 census 步（`test-windows` step8）逐字 `go list ./... = 35 packages` | 差 2 枚是谁挤进来的，**本腿判不了**：`tools/d22scan`／`tools/mockllm`／`scripts/spike` 是**独立 module**（`git ls-files` 现量 4 枚 `go.mod`：`go.mod`、`tools/d22scan/go.mod`、`tools/mockllm/go.mod`、`scripts/spike/go.mod`），主 module 的 `go list` 里**没有**它们；`internal/session`／`internal/projctx` 又明明早已在 35 行里。⇒ "20 个 / 33 个"那句今天**过期**，但"20"该重算成几、33 该改成 35 还是把另两个 module 的包并入分母，属**口径变更**（碰 D／C 契约级），交编排者，本腿不自裁。 |
+| 6.9 | **本腿自己的边界遵守情况（自报一处偏差，不隐瞒）** | 不属于任何 run／job／step，是**尺子本身的污点** | 起手阶段我跑过一枚 `grep -rl "go:build !windows" --include='*_test.go' internal cmd`，它**扫的是工作树**，而写腿 `232-r2` 正在改的 `cmd/wisp/config_reload_223_test.go` 就落在 `cmd/` 的射程内 ⇒ 那枚命令**可能读过**一枚本腿只该用 `git show HEAD:<path>` 取的文件。发现后同一结论立刻按 HEAD 重取（`git grep -l "go:build !windows" HEAD -- '*_test.go'`，见 §6.4 与 §2.2 那张 tag 账表），并复核 `git show HEAD:cmd/wisp/config_reload_223_test.go \| grep -c "go:build !windows"` = **0** ⇒ **该文件不是那枚结论的来源，本件里没有任何一字取自它**。但"没造成内容污染"不等于"没越界"，故按硬边界自报：受影响的全部读数＝§6.4 那一句与 §2.2 的 tag 差集表，**如需绝对干净，请让后续腿只对这两处重跑 HEAD 尺**。 |
 
 **另外三处"看似能判、本腿故意不判"**
 1. **AC#6 翻不翻**——§4.3 两读法已摆平，判语留白。

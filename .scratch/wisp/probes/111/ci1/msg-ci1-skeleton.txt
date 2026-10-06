@@ -1,0 +1,16 @@
+probes(111-ci1): 落六节骨架 + §0 起手锚（推送后两发 run 步级取证，只取数不裁框）
+
+腿：111-ci1（只读取证）。工作树 HEAD c98fc5db / dev / 10-06 11:46。
+
+这一发只做一件事：把票 111 里逐字要求「CI 侧真读数」的那几格
+（AC#1 第④列 / AC#3 前提今判 / AC#6 skipped 全名册 / 常红归因）喂到步级，
+件面不裁任何 AC 的生死、不翻任何 - [ ] 框、不改票面一字。
+
+已量：gh run list --branch dev 确认三发推送后 run 与推前对照发都还活着
+（37405698188 / 37406422380 / 37406757402，推前 37396530365），
+并拿到两发主口径 run 的六作业步级 conclusion
+（含 test-windows step8 census 的历史第一次 success）。
+
+纪律：本腿全程零 go 命令（go 使用权整轮留给写腿 232-r2）；
+计数一律 git ls-files / wc / sed；CI 读数一律 gh；
+只 commit 不 push；只新建 .scratch/wisp/probes/111/ci1/** 一枚文件。

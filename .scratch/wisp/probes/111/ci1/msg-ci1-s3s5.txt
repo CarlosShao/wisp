@@ -1,0 +1,36 @@
+probes(111-ci1): §3 GUARD D 与空分母 + §5 红名作差（六节填齐，无空节）
+
+§3（问 3，AC#3 前提今判）：
+- session 今天 2 枚跟踪 _test.go（git ls-files），watchdog 0 枚只剩 doc.go；
+  但推前那个 head c6cf66e6 上 session 也已 2 枚 ⇒ 推送补的不是测试文件而是"在册"
+  （git show c6cf66e6:scripts/portable-tests.sh 里 wisp/internal/session 与 projctx 两枚 pin 全查无）。
+- 在册位：core_pin:188 / win_pin:203 / scope(core):244 / scope(windows):252；
+  watchdog 一枚都不在 ⇒ census 打 NO-SCOPE 且 0/0，GUARD A 碰不到、GUARD D 也不算洞。
+- "有测试却没在册"这一形三发全没响（UNCLAIMED-HAS-TESTS=0、GUARD D -=0、NO-TESTS=7、行数=35）。
+  success 成因判为"真没漏"而非"这一支不产红"，三条步级证据：
+  ①七枚 NO-SCOPE 逐枚 0/0 走 :392-393 那一支；②退出码路径 :360→:396→:406→:407→:422/exit1 或 :424/exit0；
+  ③35 行里没有一枚 ?/?，default-deny 不是靠"读不出"糊过去的。
+  GUARD A/C 在八枚作业日志里逐枚 =0。⛔ 反向自证（抽掉一个包证明它会红）的载体
+  portable-tests-selftest.sh 在 workflow 里引用 0 次 ⇒ 记在 §6.3，不当"CI 上验过"。
+
+§5（问 5，推前推后同口径，一律全量日志 ⛔ 不用 --log-failed）：
+- test-core step7：panel 那 4 枚推前就红且逐名相同；今天唯一新增红名 = TestConcurrentWritersReaders，
+  且第三发又 PASS ⇒ 同码不同果（三发 Go 源码 diff 为 0），归 §6.6 不写因。
+- lint step8：三发＋推前红句逐字节同一枚 .scratch/wisp/probes/185/c1/mut/fs_broken.go，推前就红。
+- lint step12 staticcheck：先把行号列号归一再 diff ⇒ 今天只消失 1 枚（queue.go pendingCount），
+  ticket242_binding_test.go:111→118 与 git_test.go:448→450 是位移不是新账；其余 51 枚推前就红。
+- windows step9 risk 12 枚逐名 ALL PRESENT PRE-PUSH；step7 CLI 6 枚推前就红，
+  今天多出的 2 枚（TestTicket223HandEdited.../TestAC14GoSideEval...）在另外三发都 PASS。
+- §5.4 推送第一次带进 CI 的读数是硬的：core own-line 名册 25 枚→27 枚，多出的正是 session 与 projctx，
+  两枚都打 ok (own line) + 顶层 ok；推前两条腿都没有它们。
+- §5.6 顺手两枚：AC#7 的 TestSyncRegistryProbeLive 三发 -run 计数仍为 0（只在 -skip 串里）⇒"至今 0 次"今天仍成立；
+  AC#9 的 winsec ubuntu 半边四发都有顶层 ok 行（0.025/0.011/0.017/0.012s）⇒ 票面 :82 那句"全日志出现 0 次"
+  在今天这四发字面不成立，只摆读数不翻框。
+- 另补一枚与 AC#10 同族的硬事实并当场自我纠偏：unaccounted SKIP lines 那句守卫推前推后一样在响
+  （六枚日志 grep -c 逐枚 =1/1/1/1/2/2），⛔ 写成"今天第一次响"就是假报。
+
+§2 顺手修一处自己写错的账：①/②列差集只有六枚（65→58、16→11、18→17、16、22→20、27→20），
+先前把 approval 8/11 与 llm 2/8 误列进差集——那是内部拆 xtest、总数不变，已改为逐枚 tag 账
+（!windows ＋ winlive 两类，git show HEAD 尺，⛔ 不碰工作树）。
+
+零 go 命令；票面十枚框与 Status 一字未动；只 commit 不 push。

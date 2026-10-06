@@ -1,0 +1,18 @@
+probes(111-ci1): §4 写满（skipped 全名册 + 两分 + AC#6 两读法，本腿不自翻）
+
+问 4 交齐：两发主口径 run（37405698188 / 37406757402）各 7 枚 skipped 逐枚列出
+（作业名＋步号＋步名原文＋被跳过的原因），并拿推前 37396530365 与第三发推送后
+37406422380 同尺复量作差，证明 skipped 的形状推前推后同构、非推送引入。
+
+跳过原因一律现量到 action 自己的 post-if，不靠注释判：
+setup-go@v5.0.0 = post-if: success()；cache@v4.0.2 = post-if: success() || save-always
+（ci.yml 里 save-always 出现 0 次）；checkout@v4 无 post-if ⇒ 同作业红仍 success，
+这条反证把"不是整个 post 阶段被跳过"钉住。
+
+两分：①lint step9/10/11 是被前一步红吃掉的实质测试步，承载 go vet ×2 与 161 AC#7 form A，
+四发全无日志 ⇒ 读数永久采不到，⛔ 不许把"没日志"读成"没红"；
+②post 三枚（Post Cache third_party / Post setup-go / Post checkout）不承载任何四数或 own-line 名册。
+
+AC#6 两读法都摆平：票面 :250-255 点名的五枚 test-windows 非 post 步今天首次无一 skipped
+（含 census step8 success 的历史第一次），:291 那句"只要还有一步是 skipped 就 FAIL"若裁全集
+则 lint 三枚足以单独翻——归 ci.yml 面。本腿一枚框未动，只给建议位。
