@@ -1,0 +1,30 @@
+probes(pool-validity-4a): 判完前 3 枚 —— 200 差翻勾 / 220 仍成立 / 225 仍成立
+
+HEAD 锚点仍 `1a93cc7b`（起手 10-06 11:53:51，本腿未换 HEAD；期间他人有 commit 落树，
+但本腿所有读数一律 `git … HEAD` 现跑，⛔ 未照抄票面／派单／前腿任何一个数）。
+
+- **200＝差翻勾**（不是已失效）：票面头名"我们一枚代码都没有"今树反证——
+  `internal/projctx/projctx.go:56` 那串优先级名册逐字与票面 §1 要求一致，
+  生产接线 `cmd/wisp/run.go:1071 loop.AttachProjectInstructions(instrLoader)`，
+  载体生产者 `run.go:718 Instructions: rt.instructionBundle`。
+  硬门过得去（`84feec44`／`a90677e9` ＋ `--name-only`），但两枚 commit 标题逐字都写 `ticket 200`
+  ⇒ **是 200 自己做的，不是别人替它做的** ⇒ 按 §0 只能落〔差翻勾〕。
+  8 格一格没翻：AC#1 正控／AC#3／AC#5／AC#6 四格运行期读数＋那一跳到 `frontend/**`（本腿禁读）。
+- **220＝仍成立**（半死半活，两半写死）：死的一半＝"同任务第二张卡静默掉格"，
+  `indexWaitingKey`＋`splitClashSuffix` 已在（落地 `480b970d 10-03`，标题逐字带 220-r1）；
+  活的一半＝"那一格今天只看得见 L2"——`gate.go` 仍只有 `:355/358/364/427` 四行自用、**零枚举口**，
+  泵侧 `L1Windows` 读槽开了（`pump.go:200`）但**生产装配没供水**
+  （`grep "L1Windows:"` 全仓 1 命中、在 `_test.go`），于是 `pump.go:196-199` 自陈的
+  "roster 继续只从卡里读＝票 197 的行为"就是今天的真值。AC#5 要整包终态＝零 go，量不到。
+- **225＝仍成立**：两件事都在——**账对不上**（本腿现量 代码侧 30 处 vs §5 DEFERRED 13 行；
+  票面 09-29 那版 26/22 已被取代，与票面 :42 编排者 10-04 那把 30 独立对上）、
+  **没有仪器在查**（`grep -rln "DEFERRED(" tools/ scripts/ .github/` → 只 `portable-tests.sh` 两行注释）；
+  两枚确凿失配 `config/doc.go:14`／`watchdog/doc.go:18` 逐字原样在；
+  补充①的载体仍缺（`git ls-files docs | grep DEFERRED` 空、0 枚标记带 `docs/`、`DEFERRED(D-` 0 处）；
+  补充② `internal/tools/registry.go:55` REJECTED vs §5 `:81` RESERVED 仍相反。
+  ⚠ 09-29 审计 `225-a1` 把账**量清楚了**没把账**对平**（AC#1 自己就禁改 `docs/specs/**`）
+  ⇒ 那三格是差翻勾形状，但整票仍〔仍成立〕，⛔ 不许读成"审计做完＝可结案"。
+  票面"热加载在生产里根本不转"那半句今天**过期**（`CheckAndReload` 已有 `cmd/wisp` 生产调用者，票 223 接的）。
+
+写面纪律：本笔删除列 **11 行全部是本腿自己上一笔骨架里的"尚未判"占位行**（逐行 diff 已验），
+⛔ 未动任何人的一行；零 go／票面零改动／docs/** 零碰／`cmd/wisp` 只 `git show HEAD:` 读。
