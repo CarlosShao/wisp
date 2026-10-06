@@ -1,0 +1,18 @@
+01|xrefcount=0|probesfiles=0|list=
+02|xrefcount=2|probesfiles=0|list=119-adversarial-acceptance.md 62-ball-visual-prototype.md
+03|xrefcount=3|probesfiles=0|list=138-cancel-kills-children-r1-accept-r1.md 138-cancel-kills-children-r1.md 182-rail-stacks-census-a1.md
+04|xrefcount=5|probesfiles=0|list=10-adversarial-acceptance.md 109-adversarial-acceptance.md 126-adversarial-acceptance.md 129-ac4-ac5-mutation-and-gates.md 225-def
+06|xrefcount=6|probesfiles=0|list=113-adversarial-acceptance.md 171-contract-axis-rerecount-a1.md 18-adversarial-acceptance.md 221-task-cancel-v1.md 63-adversarial-
+13|xrefcount=3|probesfiles=0|list=180-182-panel-fields-census-c1.md 62-adversarial-acceptance.md 62-visual-spec-draft.md
+14|xrefcount=5|probesfiles=0|list=121-preflight-deps-reachability.md 144-slo-report-partial-read-r1.md 18-adversarial-acceptance.md 225-deferred-registry-audit.md A
+19|xrefcount=9|probesfiles=0|list=133-adversarial-acceptance.md 138-cancel-kills-children-r1-accept-r1.md 143-panel-assets-r4-leg-r1.md 154-close-gate-never-rings-r
+78|xrefcount=6|probesfiles=0|list=138-cancel-kills-children-r1.md 225-deferred-registry-audit.md 245-esc-not-a-standby-global-hotkey-r1.md 245-esc-not-a-standby-glo
+115|xrefcount=8|probesfiles=0|list=104-adversarial-acceptance.md 111-ci-step-readings.md 119-adversarial-acceptance.md 119-next-audit-r1.md 121-preflight-deps-reacha
+184|xrefcount=1|probesfiles=4|list=183-pointer-exemption-r1.md
+243|xrefcount=1|probesfiles=1|list=228-resident-ball-v1.md
+250|xrefcount=0|probesfiles=29|list=
+251|xrefcount=0|probesfiles=19|list=
+254|xrefcount=0|probesfiles=33|list=
+263|xrefcount=0|probesfiles=198|list=
+265|xrefcount=0|probesfiles=33|list=
+267|xrefcount=2|probesfiles=39|list=257-clean-machine-provider-registry-v1.md 265-267-evidence-index.md

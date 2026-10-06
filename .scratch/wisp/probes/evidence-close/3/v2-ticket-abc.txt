@@ -1,0 +1,92 @@
+C	01		
+C	02		
+C	03		
+C	04		
+A	05	05-adversarial-acceptance.md 	
+C	06		
+A	07	07-adversarial-acceptance.md 	
+A	08	08-adversarial-acceptance.md 	
+A	09	09-adversarial-acceptance.md 	
+A	10	10-adversarial-acceptance.md 	
+B	11		11-adversarial-acceptance.md 
+C	13		
+C	14		
+A	17	17-adversarial-acceptance.md 	
+A	18	18-adversarial-acceptance.md 	18-perf-bench-addendum.md 
+C	19		
+B	63		63-adversarial-acceptance.md 
+A	66	66-adversarial-acceptance.md 	66 66-mutation-parse-order.md 
+A	67	67-adversarial-acceptance.md 	67-ac3-ascii-verdict.md 67-emoji-scope-internal-cmd.md 
+A	69	69-adversarial-acceptance.md 	69-mutation-tokens.md 
+A	73	73-adversarial-acceptance.md 	73-orphan-staging-sweep.md 
+A	74	74-adversarial-acceptance.md 	
+A	75	75-independent-verification.md 	75-linux-mutation-check.md 75-rootcause-linux-path-shape.md 75-rootcause-locator-report.md 
+A	76	76-adversarial-acceptance.md 	
+C	78		
+A	79	79-adversarial-acceptance.md 	
+B	80		80-ac1-ac2-verdict.md 
+A	81	81-adversarial-acceptance.md 	
+A	82	82-adversarial-acceptance.md 	
+A	83	83-adversarial-acceptance.md 	
+B	84		84-ac1-bounded-wait.md 
+A	87	87-adversarial-acceptance.md 	
+A	88	88-adversarial-acceptance.md 	
+A	89	89-adversarial-acceptance.md 	
+A	90	90-adversarial-acceptance.md 	
+A	92	92-adversarial-acceptance.md 	
+A	93	93-adversarial-acceptance.md 	
+A	94	94-adversarial-acceptance.md 	
+A	95	95-adversarial-acceptance.md 	
+A	96	96-adversarial-acceptance.md 	
+A	97	97-adversarial-acceptance.md 	
+A	99	99-adversarial-acceptance.md 	
+A	101	101-adversarial-acceptance.md 	
+A	102	102-adversarial-acceptance.md 	
+A	104	104-adversarial-acceptance.md 	
+A	105	105-adversarial-acceptance.md 	
+A	106	106-adversarial-acceptance.md 	
+A	110	110-adversarial-acceptance.md 	
+A	113	113-adversarial-acceptance.md 	
+C	115		
+A	116	116-adversarial-acceptance.md 	
+A	117	117-adversarial-acceptance.md 	
+A	118	118-adversarial-acceptance.md 	
+A	119	119-ac1-ac2-r2-acceptance.md 119-ac2-r2b-acceptance.md 119-ac7-r1-acceptance.md 119-adversarial-acceptance.md 	119-ac7-impl.md 119-next-audit-r1.md 
+A	121	121-adversarial-acceptance.md 	121-preflight-deps-reachability.md 
+A	126	126-adversarial-acceptance.md 	
+A	127	127-adversarial-acceptance.md 	
+A	129	129-adversarial-acceptance.md 	129-ac4-ac5-mutation-and-gates.md 
+A	131	131-adversarial-acceptance.md 131-followup-1-three-shapes.md 131-reaccept-ac4.md 	131-followup-0-crossplatform.md 131-followup-2-ratification-and-linux.md 
+A	134	134-ac6-contended-no-conclusion.md 134-adversarial-acceptance.md 	134-ac2-ac3-trigger-and-freshness-pin.md 134-ac4-machine-contended-readings.md 134-ac5-gate-readings.md 
+A	137	137-ac1-r1-acceptance.md 137-ac2-ac5-r1-acceptance.md 137-ac3-r1-acceptance.md 137-ac3-r2-acceptance.md 137-ac4-impl.md 137-ac4-r1-acceptance.md 	137-ac1-teeth-or-not.md 137-ac2-ac5-impl.md 
+A	141	141-ac2-stock-inventory-r1.md 141-q46c-accept-r1.md 	141-ac34-positive-controls-r1.md 141-q46c-impl.md 
+A	142	142-non-quiescent-index-guard-accept-r1.md 142-non-quiescent-index-guard-r1.md 	
+A	143	143-panel-assets-r4-leg-accept-r1.md 143-panel-assets-r4-leg-r1.md 	
+A	144	144-slo-report-partial-read-r1-accept-r1.md 	144-slo-report-partial-read-r1.md 
+B	146		146-liveapprovals-fix-r1.md 146-liveapprovals-r1-accept-r1.md 146-liveapprovals-r1-accept-r2.md 146-liveapprovals-r1.md 
+A	147	147-offset-naming-r1-accept-r1.md 	147-offset-naming-r1.md 
+A	149	149-three-unpinned-outlets-r1-accept-r1.md 	149-three-unpinned-outlets-r1.md 
+A	151	151-task-scope-never-closed-r1-accept-r1.md 151-task-scope-never-closed-r1.md 	
+A	152	152-subject-death-never-measured-r1.md 	152-subject-death-never-measured-r1-accept-r1.md 
+B	153		153-ac2-a-closure-r1.md 153-trace-lies-unguarded-r1-accept-r1.md 153-trace-lies-unguarded-r1.md 
+A	154	154-host-id-never-closed-r1.md 	154-close-gate-never-rings-r1-accept-r1.md 
+A	155	155-three-unjudged-cells-r1-accept-r1.md 	155-three-unjudged-cells-r1.md 
+A	156	156-close-and-load-bearing-r1-accept-r1.md 	156-exited-asks-os-r1.md 156-r4-gates-and-cleanup-r1.md 
+A	157	157-ac5-recheck-r1.md 157-record-level-cleanup-r1-accept-r1.md 	
+A	161	161-gates-selftest-accept-r1.md 	161-attrib-selftest-r5.md 161-doorbell-census-r1.md 161-gate-aggregate-r6.md 161-gate-blindspot-r1.md 161-gate-order-r4.md 161-gates-accept-r2.md 161-selftests-r3.md 
+A	162	162-fs-edit-accept-r2.md 	162-fs-edit-accept-r1.md 162-fs-edit-r1.md 162-fs-edit-r2.md 162-fs-edit-r3.md 162-risk-tier-accept-v3.md 162-risk-tier-and-contract-axis-r4.md 
+A	183	183-pointer-exemption-accept-v2.md 	183-exemption-why-not-live-a1.md 183-pointer-exemption-r1.md 183-reread-permanent-teeth-r2.md 
+B	184		184-audit-vocabulary-census-c1.md 
+B	198		198-firstrun-config-r2.md 198-firstrun-config-v1.md 
+B	212		212-comments-phantom-citation-v2.md 
+A	221	221-task-cancel-v1.md 	
+A	235	235-pool-nail-and-bridge-preread-v1.md 	
+A	241	241-audio-level-producer-v1.md 	241-audio-level-producer-r1.md 
+C	243		
+C	250		
+C	251		
+C	254		
+A	257	257-clean-machine-provider-registry-v1.md 	
+C	263		
+B	265		265-267-evidence-index.md 
+C	267		

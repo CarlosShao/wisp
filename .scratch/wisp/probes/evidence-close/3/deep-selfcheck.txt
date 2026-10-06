@@ -1,0 +1,4 @@
+84|84-ac1-bounded-wait.md|写码代理，2026-09-21。用例：`internal/agent/approval/ticket84_no_owner_
+221|221-task-cancel-v1.md|- **被验对象**：`a7993a9b`（实现腿起手锚点）..`29215a93`，三发�
+235|235-pool-nail-and-bridge-preread-v1.md|  被验实现腿的五枚 commit＝`795ed767`／`1d2ad737`／`a71f0be9`／`feb8
+241|241-audio-level-producer-v1.md|实现腿：`241-r1`（**本腿不信它的自述**） · 裁决腿：`241-v1`�

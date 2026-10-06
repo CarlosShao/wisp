@@ -1,0 +1,18 @@
+01|name=build-chain|evrefs=0|list=|probes=0
+02|name=s0-spike|evrefs=1|list=62-ball-visual-prototype.md|probes=0
+03|name=skeleton-runtime-rules|evrefs=2|list=138-cancel-kills-children-r1-accept-r1.md 138-cancel-kills-children-r1.md|probes=0
+04|name=sqlite-core|evrefs=2|list=10-adversarial-acceptance.md 225-deferred-registry-audit.md|probes=0
+06|name=secretstore-envs|evrefs=3|list=18-adversarial-acceptance.md 63-adversarial-acceptance.md A30-citation-repair.md|probes=0
+13|name=audio-capture|evrefs=3|list=180-182-panel-fields-census-c1.md 62-adversarial-acceptance.md 62-visual-spec-draft.md|probes=0
+14|name=model-distribution|evrefs=5|list=121-preflight-deps-reachability.md 144-slo-report-partial-read-r1.md 18-adversarial-acceptance.md 225-deferred-registry-audit.md A30-citation-repair.m|probes=0
+19|name=provenance-c25|evrefs=9|list=133-adversarial-acceptance.md 138-cancel-kills-children-r1-accept-r1.md 143-panel-assets-r4-leg-r1.md 154-close-gate-never-rings-r1-accept-r1.md 154-h|probes=0
+78|name=linux-vet-buildtags-unblocks-d22-gate|evrefs=6|list=138-cancel-kills-children-r1.md 225-deferred-registry-audit.md 245-esc-not-a-standby-global-hotkey-r1.md 245-esc-not-a-standby-global-hotkey-v1.md ci-|probes=0
+115|name=seal-notices-carry-the-resolvers-answer-|evrefs=8|list=104-adversarial-acceptance.md 111-ci-step-readings.md 119-adversarial-acceptance.md 119-next-audit-r1.md 121-preflight-deps-reachability.md 126-advers|probes=0
+184|name=a-decision-column-of-five-frozen-values-|evrefs=2|list=183-pointer-exemption-r1.md 184-audit-vocabulary-census-c1.md|probes=1
+243|name=a-closed-ticket-number-still-owns-work-i|evrefs=1|list=228-resident-ball-v1.md|probes=1
+250|name=portable-tests-guard-c-merges-go-list-st|evrefs=0|list=|probes=1
+251|name=winsec-pin-is-a-pin-nobody-compares-the-|evrefs=0|list=|probes=1
+254|name=fifth-tier-winsec-no-ci-caller|evrefs=0|list=|probes=1
+263|name=slo-check-dies-on-unset-lastexitcode|evrefs=0|list=|probes=1
+265|name=resident-gate-has-no-session-grant-write|evrefs=1|list=265-267-evidence-index.md|probes=1
+267|name=confirm-timeout-config-has-no-bounds-so-|evrefs=2|list=257-clean-machine-provider-registry-v1.md 265-267-evidence-index.md|probes=1
