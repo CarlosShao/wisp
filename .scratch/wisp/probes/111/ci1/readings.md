@@ -58,7 +58,81 @@ completed  success  slo-fresh                                 slo-fresh dev  sch
 
 ## §4 skipped 全名册与两分（问 4，自我对抗节 A）
 
-<!-- 先写满：两发 run 全部 skipped 步逐枚；①被前一步失败吃掉的实质测试步 ②setup post 清理步；谁承载读数谁不承载 -->
+尺原文：`gh run view <run> --json jobs -q '.jobs[] | .name as $n | .steps[] | select(.conclusion=="skipped") | "\($n) :: step\(.number) [\(.name)]"'`
+（四发各跑一遍，输出逐字贴在下面；⛔ 不是 `--log-failed`，那把尺会少算。）
+
+### 4.1 全名册（逐枚，含推前与第三发做参照）
+
+| run | 作业 | 步号 | 步名（原文） | 为什么被跳过（能不能从日志判） |
+|---|---|---|---|---|
+| `37405698188` | `lint` | 9 | `gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)` | step8 `gofmt (gofumpt)` failure 吃掉；该步在 `ci.yml:184`，**无 `if:`** ⇒ 默认 `success()` |
+| `37405698188` | `lint` | 10 | `go vet (module)` | 同上（`ci.yml:206`，无 `if:`） |
+| `37405698188` | `lint` | 11 | `go vet (tools/d22scan module)` | 同上（`ci.yml:209`，无 `if:`） |
+| `37405698188` | `lint` | 25 | `Post Run actions/setup-go@v5` | action 自带的 post；`setup-go@v5.0.0/action.yml:30-31` = `post: dist/cache-save/index.js` / **`post-if: success()`**，作业已红 ⇒ skipped |
+| `37405698188` | `test-windows` | 18 | `Post Cache third_party (deps.toml key)` | `actions/cache@v4.0.2/action.yml:39-40` = **`post-if: "success() \|\| github.event.inputs.save-always"`**；`ci.yml` 里 `save-always` 出现 **0 次**（`grep -c save-always .github/workflows/ci.yml` = 0），作业红 ⇒ skipped。⚠ 该步自身的 `if: ${{ !cancelled() }}`（`ci.yml:474`）只管**恢复半（step5）**，管不到 post 半 |
+| `37405698188` | `test-windows` | 19 | `Post Run actions/setup-go@v5` | 同 `setup-go` `post-if: success()` |
+| `37405698188` | `test-core` | 15 | `Post Run actions/setup-go@v5` | 同上 |
+| `37406757402` | `test-core` | 15 | `Post Run actions/setup-go@v5` | 同上（枚枚同因，只是作业顺序变了） |
+| `37406757402` | `lint` | 9 | `gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)` | step8 failure 吃掉（同一枚红句，见 §5.2） |
+| `37406757402` | `lint` | 10 | `go vet (module)` | 同上 |
+| `37406757402` | `lint` | 11 | `go vet (tools/d22scan module)` | 同上 |
+| `37406757402` | `lint` | 25 | `Post Run actions/setup-go@v5` | `post-if: success()` |
+| `37406757402` | `test-windows` | 18 | `Post Cache third_party (deps.toml key)` | `post-if: success() \|\| save-always` |
+| `37406757402` | `test-windows` | 19 | `Post Run actions/setup-go@v5` | `post-if: success()` |
+
+**两发主口径 run 的 skipped 枚数＝7 : 7，且名册逐枚同构**（只是 `test-core` 那枚在两发里都排第 15）。
+作差用的参照两发（同尺现量，⛔ 二手）：
+- 第三发推送后 `37406422380`：skipped 名册与 `37406757402` **逐枚相同**（7 枚：test-core 15 / lint 9,10,11,25 / test-windows 18,19）。
+- 推前 `37396530365`：也是 7 枚，但 test-windows 那两枚编号是 **16、17**（不是 18、19）——
+  因为那一发**没有 census 步**（见 §3.4），插一步就把 post 编号往后推一格。
+  ⇒ 结论性事实：**skipped 的形状不是推送引入的，推前推后同构**；差别只在步号。
+
+**反证尺（证明"不是整个 post 阶段被跳过"）**：每一发的每一个作业里
+`Post Run actions/checkout@v4` **都是 success**（`checkout@v4/action.yml:104` 只声明 `post:`、**不声明 `post-if`** ⇒ 走 runner 默认，红作业也跑）。
+所以 skipped 是**逐 action 的 `post-if` 属性**，不是"作业红 ⇒ post 全灭"。这条差别只能由 `Post Run actions/checkout@v4` 承载，本腿已把它从全名册里单列出来。
+
+### 4.2 两分：谁承载读数，谁不承载
+
+**① 被前一步失败吃掉的实质测试步（这一类承载读数，且读数永久采不到）**
+- `lint` step9 / step10 / step11 三枚。
+- 它们各自承载什么：step9 承载 `sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only`（161 AC#7 form A 的"受跟踪集当分母"那道判据）；
+  step10 承载 `go vet ./...`（主模块，`ci.yml:207`）；step11 承载 `go vet ./...`（`tools/d22scan` 模块，`ci.yml:210`）。
+- **一步红会吃掉后续步 ⇒ 被 skip 的步没有日志**：这三枚在 `37405698188`／`37406757402`／`37406422380`／`37396530365`
+  四发里**全部**没有日志行（`gh run view --log` 拿不到它们的任何输出）。
+  ⇒ **⛔ 不许把"没日志"读成"没红"**：`go vet` 这两枚今天是红是绿**未知**，不是"应该绿"。
+  这三枚的形状正是票 111 AC#6 想治的那枚病（`ci.yml` 的注释 `:180` 附近也这么写），
+  同作业里带 `if: ${{ !cancelled() }}` 的 step12 `staticcheck`（`ci.yml:263`）与 step13 `mockllm module vet`（`:300`）
+  **照样给了结论**（step12 failure／step13 success），这道对照就是"加了 `!cancelled()` 的步能穿透前一步的红"的现成读数。
+
+**② setup 的 post 清理步（这一类不承载任何读数）**
+- `Post Cache third_party (deps.toml key)`、`Post Run actions/setup-go@v5`、`Post Run actions/checkout@v4`。
+- 它们是谁写的：**不是 `ci.yml` 写的**，是 `uses:` 动作自带的 post 钩子由 runner 注入的（所以名册里它们的步名一律是 `Post …` 前缀、
+  编号和主步之间有空洞：test-windows 主步到 step10，post 从 step18 起）。
+- 它们承载什么：`setup-go` 的 post 写 Go 模块缓存（`dist/cache-save/index.js`）；`cache` 的 post 保存/落盘 `third_party` 缓存；
+  `checkout` 的 post 删临时 git config。**四数（RUN/PASS/FAIL/SKIP）、own-line 名册、census 表——一枚都不在这些步的输出里。**
+- 现量证据：`37406757402`/`test-windows` 全日志里 `Post Cache`/`Post Run` 相关内容只有 `Post Run actions/checkout@v4` 打了
+  git 版本与 config 那几行（`:5596-5609`），另两枚 skipped ⇒ **零字节输出**，没有任何测试结论可丢。
+
+### 4.3 AC#6 的两读法（本腿不裁，只把两面摆平）
+
+票面那把生死尺的**原文有两个射程**（逐字抄自票面，行号现量）：
+- **窄读法（`:250-255`，next= 1 的判据本体）**：点名五枚**非 post 的 test-windows 实质步**——
+  `Cache third_party` / `cgo build smoke` / `cmd/wisp CLI tests` / `Portable windows tests` / `PathResolver junction placeholder`
+  "各自必须有 conclusion（success 或 failure，不能是 skipped）；只要还有一步是 skipped ⇒ 没修好，AC#6 当场判 FAIL"。
+  两发主口径 run 的读数：`step5 success／step6 success／step7 failure／step9 failure／step10 success` ⇒ **这五枚无一 skipped**（第三发同形）。
+  ⚠ 同一枚 run 里 census（step8）也 success ⇒ `step4 与 step5–8 同时有结论` 这半句（`:74`）今天**第一次**成立。
+- **宽读法（`:291`）**：「**只要还有一步是 skipped，就判 AC#6 FAIL**，不接受"通过附条件"」——没限定步集合。
+  按这半句逐字执行 ⇒ 两发各有 **7 枚 skipped**（上表），**包含 lint 的三枚实质步**，无论 post 类算不算，
+  `lint` step9/10/11 都是被吃掉的**测试步** ⇒ 宽读法下**光凭 lint 那一作业就翻不了**。
+
+〔建议位——留给编排者裁，本腿不自翻〕
+- 事实层面可以给死的三点：①`lint` 那道病**推前推后一模一样**（四发同形），本票 AC#6 若要的是"新门不再吃掉后面的步"，
+  那 `lint` 作业里的 step9/10/11 至今仍是"被吃掉且无日志"，**没有任何一处出现它们今天的结论**；
+  ②`test-windows` 的五枚点名步**今天首次全数给结论**（且 census success 是历史第一次）；
+  ③post 类三枚**不承载读数**，把它们算进 AC#6 的"还有一步是 skipped"里，等于把 runner 的 `post-if` 属性记在本票头上。
+- ⇒ 建议：AC#6 的"翻/不翻"取决于裁的是 `:250-255` 的五枚点名集还是 `:291` 的全集；
+  若裁全集，**必须同时说明 `lint` step9/10/11 的处置**（这三枚归 `ci.yml` 面，票面 `:306` 已具名"归 ci.yml 面，与票 85 地界同处"）。
+  本腿一枚框都不动。
 
 ---
 
