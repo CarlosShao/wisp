@@ -86,10 +86,10 @@ func TestTicket223R2FailureSentenceRouting(t *testing.T) {
 		},
 		// Ticket 231 AC#3: a file that DECLARES A NEWER VERSION *and parses* is its
 		// own shape - it never reaches decodeStrict or validate (loader.go:120
-		// returns first), so booking it cause=invalid told the operator "内容被校验
-		// 拒绝（值不合法或引用解不开）" about a file whose only property is that
-		// another build wrote it. J1 above is the OTHER half of the same line and
-		// stays untouched: declared-newer with a body that does NOT parse is
+		// returns first), so booking it cause=invalid told the operator that its own
+		// values had been rejected, which is false for a file whose only property is
+		// that another build wrote it. J1 above is the OTHER half of the same line
+		// and stays untouched: declared-newer with a body that does NOT parse is
 		// 语法错 (loader.go:104 short-circuits first). This row is the one that
 		// makes the newer-build branch reachable from the permanent table - before
 		// it no case in this file planted that shape at all, so deleting the branch
