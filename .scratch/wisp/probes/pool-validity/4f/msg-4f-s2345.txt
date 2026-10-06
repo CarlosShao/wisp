@@ -1,0 +1,5 @@
+pool-validity 4f: sections 2, 3, 4, 5 land (15 tickets graded, seven unframed tickets judged AC by AC)
+
+Grading of the fifteen tickets this leg kept: twelve still hold (178 186 187 189 194 195 196 213 214 215 216 219), one awaits only a tick (182), two are already done by someone else with a commit number named (185 and 211). No ticket was graded unreachable as a whole; the panel and front-end half of six tickets is recorded as unreachable cell by cell because frontend and design were never read.
+
+Also recorded here: one false negative reading this leg wrote and corrected on the spot (ticket 213 AC number 3, the slash substring ruler reads 67 not zero), the five deleted lines of the second commit named one by one as placeholders replaced by real content, and the two anchors b7251d17 and 7329f07f proved to give the same reading for every ruler in section 2.
