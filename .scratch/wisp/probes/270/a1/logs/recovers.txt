@@ -1,0 +1,21 @@
+internal/agent/approval/fakes_test.go:183:			if r := recover(); r != nil {
+internal/agent/approval/ticket220_l1_window_read_test.go:214:			if r := recover(); r != nil {
+internal/ball/hotkey_reload.go:146:		if rec := recover(); rec != nil {
+internal/ball/sta_release_windows_test.go:223:			o.panicked = recover()
+internal/ball/sta_release_windows_test.go:360:			o.panicked = recover()
+internal/ball/sta_release_windows_test.go:551:			o.panicked = recover()
+internal/memory/writer.go:144:		if rec := recover(); rec != nil {
+internal/observe/goroutine.go:296:		if rec := recover(); rec != nil {
+internal/observe/sampler_faketree_guard_136_test.go:45:		if r := recover(); r != nil {
+internal/panel/subagent_stream_197_test.go:158:			defer func() { recover() }() // the owner/recover shape D22/D38b asks for
+internal/risk/assessor.go:278:		if rec := recover(); rec != nil {
+internal/risk/assessor.go:292:		if rec := recover(); rec != nil {
+internal/tools/bridge.go:823:		if rec := recover(); rec != nil {
+internal/tools/failclosed_236_teeth_test.go:233:		if rec := recover(); rec != nil {
+internal/tools/failclosed_236_teeth_test.go:283:		if rec := recover(); rec != nil {
+internal/tools/grant.go:70:		if rec := recover(); rec != nil {
+internal/tools/mode.go:40:		if rec := recover(); rec != nil {
+cmd/balldebug/main.go:401:// boundary - there is deliberately no recover() in here, because one would
+cmd/wisp/panel_host_windows_test.go:75:			if r := recover(); r != nil {
+cmd/wisp/panel_resident_windows_test.go:465:			o.panicked = recover()
+cmd/wisp/panel_resident_windows_test.go:546:			o.panicked = recover()

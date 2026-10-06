@@ -1,0 +1,82 @@
+// SubagentDeps is what task.spawn needs from the host. Every field is a seam the
+// composition root wires; nil on any of them is a fail-closed refusal, never a
+// degraded success.
+type SubagentDeps struct {
+	// Roster is the shared process-local table: the pool counter, the identity
+	// rows and the cancel handles all live there, so host and tool see one table.
+	Roster *TaskRoster
+	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+	// a copy with three fields changed (Tools / Registry / Sink) and nothing else,
+	// which is what "同一套宿主装配" means concretely. ok=false refuses the spawn.
+	BaseOptions func() (agent.Options, bool)
+	// ParentTools is the host's C4 surface (the bridge). The child receives it
+	// wrapped so task.spawn is not merely refused but absent from its directory.
+	ParentTools agent.ToolProvider
+	// Provenance is the C25 engine used to stamp the child's conclusion into the
+	// PARENT task's taint scope as risk.SrcTaskOutput. nil means the stamp cannot
+	// happen, and the reply then says so out loud instead of handing the parent an
+	// untraced outside text.
+	Provenance *risk.Provenance
+	// Stream is the subagent's text channel, and it is the panel's stream log
+	// handed over as the two methods this package needs - nothing more, so the
+		return Result{}, err
+	}
+	var a subagentSpawnArgs
+	if err := json.Unmarshal(params, &a); err != nil {
+		return Result{Text: "参数解析失败：" + err.Error(), IsError: true}, nil
+	}
+	label := strings.TrimSpace(a.Description)
+	prompt := strings.TrimSpace(a.Prompt)
+	if label == "" || prompt == "" {
+		return Result{Text: "description（短标题）与 prompt（自包含任务书）都得给，两枚字段不能互相替代", IsError: true}, nil
+	}
+	label = capRunes(label, 120)
+
+	if t.d.Roster == nil {
+		return Result{Text: "任务名册未接线（fail-closed：拒绝派生子代理，派生了也没有地方登记它）", IsError: true}, nil
+	}
+	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+	}
+	parentID := CorrelationID(ctx)
+	if parentID == "" {
+		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，" +
+			"就没法登记父子关系，也没法把结论盖戳进父任务的 C25 作用域）", IsError: true}, nil
+	}
+	if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {
+		return Result{Text: fmt.Sprintf(
+			"拒绝派生：深度上限是 %d，而派生者 %s 自己就是一枚子代理（父 kind=%s）。"+
+				"子代理不许再派子代理。", MaxSubagentDepth, parentID, rec.Kind), IsError: true}, nil
+	}
+
+	release, ok := t.d.Roster.TryAcquireSubagentSlot(MaxConcurrentSubagents)
+	if !ok {
+		return Result{Text: fmt.Sprintf(
+			"拒绝派生：同时在跑的子代理已达上限 %d 枚（在跑的：%s）。"+
+				"这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。",
+			MaxConcurrentSubagents, strings.Join(t.d.Roster.RunningSubagentIDs(), ", ")), IsError: true}, nil
+	}
+
+	base, wired := t.d.BaseOptions()
+	if !wired {
+		release()
+		return Result{Text: "宿主现在给不出装配快照（fail-closed：不在没有父装配的情况下起子环路）", IsError: true}, nil
+	}
+	if base.AdmitTask == nil {
+		// A child with no admission hook has no route to the host's approval
+		// layer at all. Deriving one would be handing it a private decision
+		// surface, which is the "子代理自批" shape this ticket must not ship.
+		release()
+		return Result{Text: "拒绝派生：宿主装配里没有审批准入钩子（AdmitTask 未接线），" +
+			"子代理的请求就没有任何队列可去（fail-closed：子代理永不自批）", IsError: true}, nil
+	}
+
+	opt := base
+	opt.Tools = newSubagentToolProvider(t.d.ParentTools)
+	opt.Registry = observe.NewRegistry()
+	// The child's text must NOT ride the parent's console sink: that is how two
+	// tasks' output gets merged into one visible stream. It gets its own sink,
+	// built from the one text channel the host injected, and that channel keys the
+	// child by its own task id (see SubagentDeps.Stream for why r3 had to widen it
+	// - before this leg the child had NO sink at all, so its streaming work was
+	// thrown away and the page was two lifecycle lines).

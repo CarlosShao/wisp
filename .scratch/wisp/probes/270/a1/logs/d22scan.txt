@@ -1,0 +1,161 @@
+1:// Command d22scan is the D22 seven-ban + zero-emoji static scanner
+10://	                      `go func(` and "clean" therefore meant "no bare
+15://	2 pathresolver-bypass filepath.Clean / filepath.Abs outside the allowlist
+41://	                      (EVERY file, ticket 96 - same walk shape as ban #6, no
+44://	                      _test.go INCLUDED (D23). This is the one ban whose
+56://	                      outside this ban's range, so the instrument's own
+72:// "ban-id<TAB>repo-relative path prefix<TAB>reason" (committed, reviewable,
+78:// hold it. Before that, "ban #6 frontend/ examined N" meant whatever the machine
+106:// every ban walks zero files and the tool would print "clean" while having
+132:	Ban  string `json:"ban"`
+145:	allow            map[string]map[string]bool // ban-id -> path prefix set
+148:	citationReported map[string]bool // ban #9: phantom tokens already reported in this scan
+149:	citationExists   map[string]bool // ban #9: token -> existence, judged once per scan
+150:	emojiSeen        map[string]int  // ban #8: scope label -> files actually line-scanned
+151:	examined         map[string]int  // bans #1-7: scope key -> files actually walked
+176:// emojiRe is ban #8's character class.
+179:// ranges does NOT contain that band either, so the spec is narrower than what
+180:// the ban exists to prevent - of the non-comment occurrences of U+2265,
+182:// 1 is the approval card's own reason string. Do not "tidy" the bands into one
+184:// deliberately still absent, because the approval added ONLY the math band, and
+185:// any further band belongs in scan_test.go's pin, not here.
+186:var emojiRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`)
+241:// property for the Go scope with checkRoot; main.go enforces it for ban #8).
+260:	if err := s.loadAllowlist(filepath.Join(root, "tools", "d22scan", "allowlist.txt")); err != nil {
+264:	if err := s.walkGo(filepath.Join(root, "internal")); err != nil {
+267:	if err := s.walkGo(filepath.Join(root, "cmd")); err != nil {
+270:	// Directory-scoped bans.
+271:	if err := s.walkText(filepath.Join(root, "frontend"), "panel-approval", s.panelCheck, false); err != nil {
+274:	if err := s.walkText(filepath.Join(root, "internal", "tools"), "internal-artifact-tool", s.artifactCheck, true); err != nil {
+285:// emojiScope is one tree ban #8 walks.
+291:	// the walk shape ban #6 uses on the same tree (walkText). Ticket 96 added
+296:	// would have made ban #8's view of frontend/ a strict SUBSET of ban #6's,
+298:	// re-narrowing a ban into. Mutually exclusive with goOnly.
+302:// scanScope is ONE DECLARED WALK of the whole scan, whichever ban it serves.
+304:// Before ticket 71 AC#4 the tool only kept a ledger for ban #8 (emojiSeen), so
+307:// healthy, and the two directory-scoped bans (#6 frontend/, #7 internal/tools/)
+309:// going empty - which is precisely how ban #6's frontend/ survived as a
+314:// the walk writes into (emojiSeen for ban #8, examined for the rest) rather
+322:	seenKey     string // ban #8's emojiSeen key; empty when examinedKey is used
+323:	examinedKey string // bans #1-7's examined key; empty when seenKey is used
+349:func goScopeKey(dir string) string { return filepath.ToSlash(dir) + "/" }
+381:// WHY ban #6 IS REGISTERED AS absentOK INSTEAD OF LIVE (and why its text is
+401:// snapshot exits 2 naming ban #6). The entry is now live:true, the ban TEXT is
+406:	internalGo, cmdGo := goScopeKey(filepath.Join(root, "internal")), goScopeKey(filepath.Join(root, "cmd"))
+409:			label: "bans #1-5 internal/", dir: filepath.Join(root, "internal"),
+413:			label: "bans #1-5 cmd/", dir: filepath.Join(root, "cmd"),
+417:			label: "ban #6 frontend/", dir: filepath.Join(root, "frontend"),
+422:				"exactly one thing here: 0 examined files is fatal. The ban TEXT is unchanged " +
+427:				"the ban into (35 files as measured 2026-09-21; 40 as measured 2026-09-25 at " +
+433:			label: "ban #7 internal/tools/", dir: filepath.Join(root, "internal", "tools"),
+436:	}, ban8Scopes(root)...)
+439:// ban8Scopes adapts emojiScopes() (ban #8's own truth source, unchanged) into
+441:// there is still exactly one list naming ban #8's trees.
+442:func ban8Scopes(root string) []scanScope {
+450:			label: "ban #8 " + sc.label, dir: sc.dir, kind: kind,
+460:// be something only ban #8 is subject to.
+474:// NO SCOPE IN declaredScopes() SETS absentOK ANY MORE (ticket 88 armed ban #6,
+520:// emojiScopes is ban #8's ENTIRE coverage, kept in one place so the tool cannot
+524:// ban was blind to every .go file of the product while printing "no emoji in
+535://     of truth for ban #8's coverage, so "the panel tree is not covered" reads
+537://   - NOT touched here: ban #6 (panel-approval) still walks frontend/ via
+539://     ban I do not own, which R16#4 forbids an agent to do; ticket 71 AC#4 owns
+545:// ban #6 IS disposed of now, but NOT by deleting it - the walk stays, the ban
+548:// ban #6 frontend/" on every invocation. What ticket 71 closed is the silence:
+549:// before it no number at all was printed for bans #1-5 per directory, ban #6 or
+550:// ban #7, so "the walk ran empty" was indistinguishable from "the walk found
+557:// not exist") is exactly what ticket 77 changed at 63ef895: ticket 88 armed ban
+559:// had three entries, so ban #8 read ZERO bytes of the panel while the run printed
+567:// frontend/dist/.gitkeep) and would make ban #8's view of this tree a strict
+568:// subset of ban #6's over the same files. Widening a ban is allowed; handing it a
+573:// "40 text files" it quotes for ban #6 was true ONLY of a tree with no build
+575:// ticket 96's ban #8 frontend/ entry was being argued and 40 on a
+581:		{dir: filepath.Join(root, "design"), label: "design/"},
+582:		{dir: filepath.Join(root, "frontend"), label: "frontend/", everyFile: true},
+583:		{dir: filepath.Join(root, "internal"), label: "internal/", goOnly: true},
+584:		{dir: filepath.Join(root, "cmd"), label: "cmd/", goOnly: true},
+603:// emptyEmojiScope returns the label of the first declared ban #8 scope that
+631:			return fmt.Errorf("allowlist line %d malformed (want ban-id\\tpath\\treason): %q", i+1, line)
+636:		s.allow[parts[0]][filepath.ToSlash(parts[1])] = true
+641:func (s *scanner) allowed(ban, path string) bool {
+642:	rel := filepath.ToSlash(path)
+646:		rel = strings.TrimPrefix(strings.TrimPrefix(rel, filepath.ToSlash(s.root)), "/")
+649:	for prefix := range s.allow[ban] {
+657:func (s *scanner) add(ban, path string, line int, what string) {
+658:	if s.allowed(ban, path) {
+661:	rel, err := filepath.Rel(s.root, path)
+665:	s.findings = append(s.findings, Finding{Ban: ban, Path: filepath.ToSlash(rel), Line: line, What: what})
+668:// walkGo runs the Go-level bans over production files of dir. Every file it
+670:// which is what makes bans #1-5 report per-directory work instead of one
+677:	return filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+683:				return filepath.SkipDir
+713:	// Line maps for the regex bans (skip pure comment lines).
+720:			// R16#1: the ban covers EVERY `go <anything>`, not just the closure
+722:			// `go func(){}`, so matching only FuncLit left the gate blind to
+729:					"bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)")
+733:				"bare `"+goStmtText(v)+"` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)")
+741:							"filepath."+sel.Sel.Name+" outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions")
+803:	// parse the other bans share - so the "token position after //" shape the
+820:	// because CJK is inside BOTH classes the whole run reaches ban #9 as ONE
+846:				// is an API citation and stays out of this ban. A token with no
+858:					_, statErr := os.Stat(filepath.Join(s.root, filepath.FromSlash(tok)))
+873:					"comment cites repo path \""+tok+"\" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation")
+897:// ONE token to repoPathRe, while "…" and "*" END a token and leave the ban
+917:// but it is a widening compared to the ban as it shipped on 2026-10-03, and the
+924:// reach ban #9 as ONE token whose region starts before the complete phantom
+944:// symRefRe matches "package.Symbol" and "package.Type.Field" shapes so ban #9
+1005:		return "`approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)", true
+1018:// The per-ban counter is what ticket 71 AC#4's ledger reads: ban #6 and ban #7
+1019:// each walk exactly one directory, so "files examined for this ban" is a
+1022:func (s *scanner) walkText(dir, ban string, check func(string) (string, bool), goOnly bool) error {
+1026:	return filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+1032:				return filepath.SkipDir
+1039:		// The same exclusion ban #8 applies to this very tree (walkEmoji's
+1050:		s.examined[ban]++
+1053:				s.add(ban, path, i+1, what)
+1060:// walkEmoji line-scans one ban #8 scope.
+1068://     emojiRe against the RAW line and nothing stripped comments first. Ticket
+1070://     "注释豁免、字符串从严", in the same breath as adding the math band
+1072://     neither stands alone: (c) without the band leaves the gate blind to
+1073://     exactly the symbols users see, and the band without (c) is a 78-line
+1074://     comment rewrite. R16#4 forbids an agent narrowing a ban; what happened
+1076://     ticket and in AGENTS.md's ban list rather than only in this comment, and
+1082://     history came from a gate blind to a whole class of file (ban #1 saw only
+1083://     `go func(`; ban #8 saw only design/). Cost as counted 2026-09-21: 1 line,
+1093:// below exactly as walkGo/walkText skip it for every other ban, so ban #8 gains
+1094:// no file class the other bans lack and drops none either. design/ stays
+1104:	return filepath.WalkDir(sc.dir, func(path string, d os.DirEntry, err error) error {
+1110:				return filepath.SkipDir
+1112:			// testdata is skipped for the scopes whose sibling bans skip it
+1114:			// match ban #6's rule for=for). design/ keeps walking its testdata if
+1116:			// drop a file class from a ban this ticket may not shrink.
+1118:				return filepath.SkipDir
+1128:			// No filter at all: this is ban #6's walkText shape, chosen so the
+1137:		// Git-ignored paths are out of ban #8's denominator too, and this is the
+1160:			if emojiRe.MatchString(probe) {
+1161:				s.add("emoji", path, i+1, fmt.Sprintf("ban #8 glyph in scope %s is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)", sc.label))
+1204:	file, err := parser.ParseFile(fset, "ban8.go", src, parser.ParseComments)
+1313:	switch strings.ToLower(filepath.Ext(path)) {
+1327:// checkRoot proves root is a wisp repository the bans can actually be
+1334:		filepath.Join("tools", "d22scan", "allowlist.txt"),
+1335:		filepath.Join("internal"),
+1336:		filepath.Join("cmd"),
+1338:		if _, err := os.Stat(filepath.Join(root, required)); err != nil {
+1339:			return 0, fmt.Errorf("%q is not a wisp repository root: missing %s", root, filepath.ToSlash(required))
+1352:	for _, dir := range []string{filepath.Join(root, "internal"), filepath.Join(root, "cmd")} {
+1353:		err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+1359:					return filepath.SkipDir
+1373:		return files, fmt.Errorf("%q has only %d production .go files under internal/ and cmd/, want >= %d: the ban scan would be a no-op",
+1399:// WHY A SEAM EXISTS: ticket 67 registered ban #6 exempt, so the drift guard was
+1401:// Ticket 88 armed ban #6 (correctly: the tree is real now), which means
+1419:	fmt.Fprintf(out, "d22scan: examined %d production Go files under internal/ and cmd/ of %s\n", goFiles, filepath.ToSlash(root))
+1438:	// Guard 1 (ticket 67's, most specific message first): a declared ban #8
+1441:		fmt.Fprintf(errOut, "d22scan: ban #8 scope %s examined 0 files - it is declared in emojiScopes() but walks nothing."+
+1446:	// live scope, so bans #1-5/#6/#7 cannot walk 0 files and read as green.
+1462:		fmt.Fprintf(errOut, "d22scan: %d finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)\n", len(s.findings))
+1469:	fmt.Fprintf(out, "d22scan: clean - no D22 ban violations; live scope work: %s; ban #8 emoji coverage: %s",
+1493:func main() {
+1496:		"0 every ban ranged on its bad sample and stayed silent on its clean one, 1 a direction failed, "+
+1497:		"2 the self-test's own roster is hollow (a ban with no sample, a sample with no ban, a walk that read nothing)")
+1499:		"source file -self-test reads the ban roster from (the `// Bans` block and every finding-emission site)")
+1508:	abs, err := filepath.Abs(*root)

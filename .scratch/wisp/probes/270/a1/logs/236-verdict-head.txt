@@ -1,0 +1,80 @@
+# 236-v1 — 票 236 AC#1／AC#1b／AC#2 三格的独立终裁件
+
+腿＝`236-v1`（非实现者终裁腿）。射程＝票 236 的 **AC#1**（两格）、**AC#1b**（三格）、**AC#2**（一格）。
+⛔ 本件**不翻任何一枚框**、不改 `Status:`、不写裁决表到 `docs/evidence/s1/`（本票裁决表由编排者凭本件归档）。
+⛔ 零产码改动、零测试断言改动；全部突变只在 `go test -overlay` 上做，合成副本落 `D:/tmp/wisp236v1/`。
+AC#3／AC#4／AC#5／AC#6 一枚不做、不读、不顺带裁（派单 §0、§4 地界）。
+
+> 状态：**五节全实**（§0 起手｜§1 现状与边界｜§2 逐格判语｜§3 突变名册 29 发｜§4 门禁｜§5 判不动十条）。三格总结判语在 §2.1；⛔ 本腿不翻框，翻勾由编排者凭本件做。
+
+---
+
+## §0 起手五把尺（2026-10-06 17:2x 现跑，逐字可重打）
+
+| # | 尺 | 命令（逐字） | 原始读数 | 停手判定 |
+|---|---|---|---|---|
+| 1 | 撤票口令 | `sed -n '3,5p' .scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md` | 三行逐字＝①`- **Status**：**待派**（编排者 09-29 20:2x 立，起手锚点 \`c5d88a7f\`＝本票现读 \`git rev-parse --short HEAD\`）。`②`  来源＝\`docs/evidence/s1/221-task-cancel-v1.md\`（**37,097 字节**…）与 \`.scratch/wisp/probes/ci-red/ci-red-1.md\`（**35,452 字节**…）。台账 \`A451\`。`③`- **本票的射程不是"功能没做"，是"没人能证明它没坏"**。⛔ **零枚 AC 允许放宽任何现有断言**；凡"改门／改分母"那一支一律标〔契约邻接，要另批〕。` ⇒ **零 `WITHDRAWN`、第 3–5 行窗内零"撤"、零"作废"** | **不停手**（口径照 `236-r2` §0 那把尺写明：`撤`／`作废` 这些字在本票**别处**有——`:54` 作废的是"哪一步红"那一句、`:130` 撤的是**另一枚票 269**——不在派单指定的第 3–5 行窗内） |
+| 2 | HEAD／时间／工作树 | `git log -1 --format='%h %ad %s' --date=format:'%H:%M'` ＋ `date '+%m-%d %H:%M'` ＋ `git status --porcelain -- internal cmd scripts .github docs` | `f87a696c 17:17 236 AC#2 更正提交（腿 236-r3c）…` ＋ `10-06 17:22` ＋ **0 行**（`wc -l`＝`0`） | **不停手**（五前缀全干净，没有人在飞改产码／CI） |
+| 3 | 写腿交付是否真在盘上 | `git log -1 --format='%h %ad %s' --date=format:'%H:%M' <号>` 逐枚 | 七枚**全部存在**：`c06d569a 13:31`（r2 骨架）→`c7497566 14:20`（r2 装尺）→`603469df 14:21`（r2 交件）→`b1b7a770 14:23`（r2 补两笔）；`d9aff5fd 15:25`（r3 死腿代提）；`a3a7d535 17:00`（r3c 交件）；`f87a696c 17:17`（r3c 自报更正） | 交付真在盘上 |
+| 3b | 证件体量 | `wc -l`／`wc -c` | `probes/236/r2/evidence.md`＝**237 行**；`probes/236/r3/evidence.md`＝**448 行／47,553 字节**（与派单给的号**逐字一致**） | 一致 ⇒ 复认开始，不是照抄 |
+| 4 | 框数 | `grep -n '^- \[ \]' .scratch/wisp/issues/236-*.md` ＋ `grep -cn '^- \[x\]'` | 未勾 **7 枚**＝`:26` AC#1／`:27` AC#2／`:28` AC#3／`:29` AC#4／`:30` AC#5／`:31` AC#6／`:85` AC#1b；已勾 **0 枚**（`grep -c` 无匹配、rc=1） | 与派单现量一致；⛔ 本腿一枚不翻 |
+| 5 | 产码未被动过 | `md5sum internal/tools/task.go` ＋ `git show HEAD:internal/tools/task.go \| md5sum` | 两者**都＝`4138177e29ffff427776a73eb0d61a9b`** | **不停手**（裁之前无人动过产码） |
+
+### §0-补 五枚被审文件的盘上＝HEAD 对拉（本腿自跑，⛔ 不引写腿的号）
+
+```
+internal/tools/task.go                                 disk=4138177e29ffff427776a73eb0d61a9b head=同一串 SAME
+internal/tools/subagent_197.go                         disk=06caf8f5465ff1c47c310da27fe3ffab   head=同一串 SAME
+internal/tools/task_cancel_221_legs_test.go            disk=13a0ba39e30fb95ad4f2be88beed4fc7   head=同一串 SAME
+internal/tools/tasklist_deferred_236r3_teeth_test.go   disk=21b53d52ac87b893b74fdd9828f2f3aa   head=同一串 SAME
+internal/tools/failclosed_236_teeth_test.go            disk=c793966c2730c64896d9512de597ddf4   head=同一串 SAME
+```
+
+⚠ `tasklist_deferred_236r3_teeth_test.go` 的 `21b53d52…` 与 `236-r3c` 件开头自报的"本腿改后字节"**逐字对上**（`8f536366…`→`21b53d52…`）⇒ r3c 的注释版＝HEAD 版，没有第三条腿在中间动过它。
+
+### §0-补2 基线（此刻绿的用例，判据只许钉在这些真名上）
+
+`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./internal/tools/ -count=1 -v`
+＝**rc=0／顶层 `PASS=206`／`FAIL=0`／`SKIP=0`／`ok github.com/CarlosShao/wisp/internal/tools 14.086s`**（日志＝`logs/baseline-verbose.txt`，1,1xx 行原文）。
+★口径声明（票面 §六 逐字警告过）：`206` 是 `grep -c '^--- PASS'` 的**顶层枚数**，行首锚定看不见缩进子测试；本件所有判语钉在**具名用例原文行**上，不钉名级计数。
+
+与本票三格直接相关的 16 枚绿名（`--- PASS` 原文行，逐字抄自本腿这一发）：
+
+```
+Test236R2TaskCancelRefusesWhenHostGaveNoCallerID          Test221TaskCancelIsRegisteredAtItsFrozenLevel
+Test236R2TaskCancelRefusesWhenRosterIsUnwired             Test221DeferredMarkerForCancelLiftedButListStillMarked
+Test236R2TaskSpawnRefusesWhenRosterIsUnwired              Test221SpawnDescriptionPromisesOnlyWhatIsTrue
+Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired         Test221ParentStopsItsOwnChildRowAndStreamSettle
+Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired         Test221SubagentCannotStopSiblingOrItself
+Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID             Test221ParentCancellationStillDoesNotCascade
+                                                        Test221TaskCancelUnderNoGateStopsAtTheWindow
+                                                        Test221EveryPromisedTaskNameIsRegistered
+                                                        Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+                                                        Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+```
+
+⇒ 本包起手**全绿、零枚历史在册红**，所以 §3 名册里任何一枚红都只能是本腿那一发行造成的（`236-r2` §1 第 8 行同结论，但那是**它的**一发；上面这一发是本腿自己跑的）。
+
+---
+
+## §1 现状与边界
+
+### 1.1 三格里盘上到底有什么（行号＝本腿 `grep -n`／`awk NR` 现读，⛔ 不抄票面也不抄写腿的号）
+
+| 格 | 被审的那一行 | 常驻尺（写腿交付） | 尺的形状 |
+|---|---|---|---|
+| **AC#1** | `internal/tools/task.go:699`＝`if t.d.Roster == nil {`（返回体 `:700`）；`:706`＝`caller := CorrelationID(ctx)`、`:707`＝`if caller == "" {`（返回体 `:708`） | `.scratch` 之外唯一新文件＝`internal/tools/failclosed_236_teeth_test.go`：`:136` `Test236R2TaskCancelRefusesWhenRosterIsUnwired`、`:107` `Test236R2TaskCancelRefusesWhenHostGaveNoCallerID` | 行为尺（真桥真发一次调用）＋**完整字面量相等**（`!=`，不是 `Contains`） |
+| **AC#1b** | `internal/tools/subagent_197.go:253`（roster，体 `:254`）；`:256`＝`if t.d.BaseOptions == nil || t.d.ParentTools == nil {`（体 `:257`）；`:259`＝`parentID := CorrelationID(ctx)`、`:260`＝`if parentID == "" {`（体 `:261-262`） | 同文件 `:166`／`:184`／`:208`／`:244`（`:256` 那枚语句占两枚用例）；panic 那一形经 `:230` `spawnGuarded` | 同上；`spawnGuarded` 用 `defer recover()` 把 panic 收成该用例自己的 1 枚红 |
+| **AC#2** | 被审的尺＝`internal/tools/task_cancel_221_legs_test.go:223` `Test221DeferredMarkerForCancelLiftedButListStillMarked`：`:224` `src, err := os.ReadFile("task.go")`、`:230` 先丢不含 `DEFERRED` 的行、`:236` 共现 `task.list` 计数、`:244` `if listMarked == 0` | 交付＝`internal/tools/tasklist_deferred_236r3_teeth_test.go:150`（编译期名册钉）＋`:202`（仪器事实尺：`//go:embed task.go` 在 `:109`，对拉 `os.ReadFile`） | 名册钉读**编译期** `BuiltinTaskEntries` 的注册名（`task.go:600-605`，两名＝`task.output`／`task.cancel`）；同包生产调用者＝`cmd/wisp/run.go:544` |
+
+### 1.2 ★词面尺今天无牙的**算术**（本腿自己数，⛔ 不引 `236-r3c` 的数）
+
+```
+grep -c DEFERRED internal/tools/task.go                 -> 3   （:23 :32 :279）
+grep DEFERRED internal/tools/task.go | grep -c 'task\.list'   -> 2
+grep DEFERRED internal/tools/task.go | grep -c 'task\.cancel' -> 0
+```
+
+三行逐字（本腿现读行号）：
+- `:23` `//	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531` ← **尺声称要守的那一枚标记行**
+- `:32` `// and the DEFERRED line above is the only one left standing.` ← 含 `DEFERRED`、不含 `task.list`

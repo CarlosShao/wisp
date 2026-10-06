@@ -1,0 +1,194 @@
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:247:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:248:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:269:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md:85:- [x] **AC#1b `task.spawn` 侧同族三支同样零尺**：`internal/tools/subagent_197.go:253-255`（`Roster == nil`）、`:256-258`（`BaseOptions/ParentTools == nil`）、`:259-263`（`parentID == ""`）——三条字面量在 `_test.go` 零命中。判据形状与 AC#1 逐字相同（**钉完整字面量**＋摘一支必有具名用例红）。裁定理由＝同包（`internal/tools`）、同 harness、同"拒绝来自哪一道门"的坑，拆开会造成两腿抢同一枚文件＋两套载具。
+./.scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md:139:- ★★★ **一条本票没预料到的仪器读数（请编排者裁，本腿不修也不判）**：`subagent_197.go:256-258` 那道 guard 今天**同时充当 `:278` 的 nil 防护**——摘整支且 `BaseOptions == nil` 时是一次**空函数值调用 panic**，第一版读数＝`rc=1, PASS=25, FAIL=2`，**其后约 179 枚用例零读数**（票面 §九 说"并发＝互相洗读数"，这次一枚未受管的 panic 自己就洗掉了整包）。修法落在测试面（panic 收成该用例自己的 1 枚红，只可能把"崩"变红、不可能把红变绿）；⛔ 产码那个洞一字未动，性质与归属见件 §5 第 2 条。
+./.scratch/wisp/issues/270-task-spawn-assembly-guard-is-also-the-only-nil-protection-for-line-278.md:14:1. `internal/tools/subagent_197.go:256-258` ＝ `if t.d.BaseOptions == nil || t.d.ParentTools == nil { return Result{Text: "宿主没有给出派生用的装配…", IsError: true}, nil }` ——**一枚语句管两枚字段**。
+./.scratch/wisp/issues/270-task-spawn-assembly-guard-is-also-the-only-nil-protection-for-line-278.md:15:2. `internal/tools/subagent_197.go:278` ＝ `base, wired := t.d.BaseOptions()`，**无条件调用**，就在 guard 之后两行。
+./.scratch/wisp/issues/270-task-spawn-assembly-guard-is-also-the-only-nil-protection-for-line-278.md:16:3. `internal/tools/subagent_197.go:135` ＝ `BaseOptions func() (agent.Options, bool)`（函数值字段，nil 时调用＝panic）。
+./.scratch/wisp/issues/270-task-spawn-assembly-guard-is-also-the-only-nil-protection-for-line-278.md:31:- [ ] **AC#1 `:278` 不再无条件调用**：`BaseOptions == nil` 时走到**具名拒绝**，⛔ 不许是 panic、不许是静默退化成"没装配也起一套运行时"。完成判据＝删除 `:256` 整支后的台件读数：`internal/tools` 整包**仍出全量名册**（PASS+FAIL ≈ 206，⛔ 不许出现 25／0 那种失明形）。
+./.scratch/wisp/probes/167/a3/census.md:39:- 唯一"握着装配但**不**握着环路"的字段：`cmd/wisp/run.go:292-293` 逐字 `loopOpt    agent.Options` / `loopOptSet bool`，写在 `cmd/wisp/run.go:1022` 逐字 `rt.loopOpt, rt.loopOptSet = opts, true`，读在 `cmd/wisp/run.go:789` 逐字 `BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },`。**这是值拷贝的 `Options`，不含 `*Loop`、不含 `Budgets`、不含 `history`。**
+./.scratch/wisp/probes/197/r1c/pre/subagent_197.go:25://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/197/r1c/pre/subagent_197.go:102:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/197/r1c/pre/subagent_197.go:105:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/197/r1c/pre/subagent_197.go:191:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/197/r1c/pre/subagent_197.go:192:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/197/r1c/pre/subagent_197.go:213:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/197/r1c/pre/subagent_197_test.go:182:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/197/r3b/pre/run.go:222:	// execute(), read through SubagentDeps.BaseOptions per spawn.
+./.scratch/wisp/probes/197/r3b/pre/run.go:542:		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:125:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:128:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:240:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:241:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:262:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/198/v2/backup/run.go:291:	// execute(), read through SubagentDeps.BaseOptions per spawn.
+./.scratch/wisp/probes/198/v2/backup/run.go:789:		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
+./.scratch/wisp/probes/221/c1/census.md:46:- **TaskDeps 不需要新字段**：`internal/tools/task.go:30-52` 已有 `Roster *TaskRoster`（:36），取消句柄就住在 roster 内（`:177` cancel map；`AttachCancel` :413-425、`DetachCancel` :429-436；attach 调用点＝`internal/tools/subagent_197.go:337`）。⚠ **更不许往 `SubagentDeps` 加字段**：它今天恰 5 枚（Roster/BaseOptions/ParentTools/Provenance/Stream，`internal/tools/subagent_197.go:128-161`），字段枚举手守卫在 `internal/tools/subagent_197_test.go:826-833`（reflect 枚举）＋`:871-873`（`Test197SubagentHasNoSelfApprovalOutlet`，函数起 :838）钉「!= 5 即红」——加第 6 枚必打红这枚「子代理永不自批」守卫。甲形不需要碰它。
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:255:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:256:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:277:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:91:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:91:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:91:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:247:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:248:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:269:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:247:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:248:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:269:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:279:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:283:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:279:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:279:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:247:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:248:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:269:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:247:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:248:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:269:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/235/r1/mut-ac3-commentback/subagent_197_test.go:185:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:279:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/235/v1/mut/base-1d2ad737-222.go:279:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/base-head-197.go:185:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/base-head-222.go:303:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/235/v1/mut/commentback_197_test.go:185:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:279:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:135:	BaseOptions func() (agent.Options, bool)
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:278:	base, wired := t.d.BaseOptions()
+./.scratch/wisp/probes/235/v1/mut/pre235-197_test.go:185:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:279:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+./.scratch/wisp/probes/236/a1/census.md:45:同族还有 **3 枚同样零尺**的 fail-closed 支，在 `task.spawn` 侧：`internal/tools/subagent_197.go:253-255`（`Roster == nil`）、`:256-258`（`BaseOptions/ParentTools == nil`）、`:259-263`（`parentID == ""`）。尺与读数同上（两条字面量 `_test.go` 0 命中）。要不要与 AC#1 同批收，是**射程决定**，不是本腿能定的事；只把"它们存在且同样无尺"摊平。
+./.scratch/wisp/probes/236/r2/evidence.md:32:| 5 | AC#1b `:256-258`（`BaseOptions/ParentTools == nil`） | `宿主没有给出派生用的装配`／`BaseOptions/ParentTools 未接线` | **两把都 rc=1 零命中** | 成立 ⇒ **需要补钉** |
+./.scratch/wisp/probes/236/r2/evidence.md:47:| AC#1b `BaseOptions/ParentTools == nil` | `subagent_197.go:256-258` | 同一 `buildWith` mutate 钩子，各 nil 一枚字段（`\|\|` 的两半都钉） | §3 m-1d＋m-1d1＋m-1d2 | m-1d（整支摘）＝FAIL=**2**（两半一起没）；m-1d1（只摘 ParentTools 半边）＝FAIL=**1**；m-1d2（只摘 BaseOptions 半边）＝FAIL=**1**，且 got 逐字带 `panic（guard 摘掉后不是拒绝而是崩）` 形状 | **两半各自有牙**（半边突变各恰 1 枚红）。⚠ 整支摘＝2 枚红，这一读法算不算破"各恰 1 枚"的形状**归验收腿裁**，见 §5 第 3 条 |
+./.scratch/wisp/probes/236/r2/evidence.md:110:  --- FAIL: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+./.scratch/wisp/probes/236/r2/evidence.md:116:  failclosed_236_teeth_test.go:196: subagent_197.go:256 那一支的完整字面量没被原样说出（got "子代理 d9eb3681-…（父工具面没接线）已结束，状态 Settling。\n结论：\n甲号子代理的结论甲甲甲 197-a", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）——这一支是 || 的 ParentTools 半边
+./.scratch/wisp/probes/236/r2/evidence.md:117:  failclosed_236_teeth_test.go:219: subagent_197.go:256 那一支的完整字面量没被原样说出（got "panic（guard 摘掉后不是拒绝而是崩）: runtime error: invalid memory address or nil pointer dereference", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）——这一支是 || 的 BaseOptions 半边；got 以「panic」开头就是那道 guard 已经不在了
+./.scratch/wisp/probes/236/r2/evidence.md:125:  ⛔ **产码那个洞本腿一个字都不修**（`subagent_197.go:278` 无条件调用 `t.d.BaseOptions()` 的调用形状＝产码改动，超出本票"给已有拒绝分支装牙"的射程）；性质与"该记给谁"见 §5 第 2 条。
+./.scratch/wisp/probes/236/r2/evidence.md:127:### m-1d1 — 只摘 `:256` 的 **ParentTools 半边**（条件改写成 `if t.d.BaseOptions == nil {`）
+./.scratch/wisp/probes/236/r2/evidence.md:135:### m-1d2 — 只摘 `:256` 的 **BaseOptions 半边**（条件改写成 `if t.d.ParentTools == nil {`）
+./.scratch/wisp/probes/236/r2/evidence.md:138:- 红名册＝**恰 1 枚**：`--- FAIL: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)`；**rc=1，PASS=203，FAIL=1**
+./.scratch/wisp/probes/236/r2/evidence.md:166:| m-1d | `subagent_197.go:256-258` 整支 | 1 | 202／**2** | `…WhenParentToolsIsUnwired` ＋ `…WhenBaseOptionsIsUnwired` |
+./.scratch/wisp/probes/236/r2/evidence.md:168:| m-1d2 | 同上，只摘 BaseOptions 半边 | 1 | 203／**1** | `Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired` |
+./.scratch/wisp/probes/236/r2/evidence.md:191:| 10 | **锚点漂移核查（共享工作树的常态，票面 §九 点名的那一件）** | `git log -1 --format='%h %ad %s'` ＋ `sed -n '699p;707p' task.go` ＋ `sed -n '253p;256p;259p;260p' subagent_197.go` ＋ `git hash-object` 两枚 | 起手锚 `3d9b8374 10-06 13:12` → 跑完突变时 HEAD＝**`8a9b2f49 10-06 14:05`**（其间 10 枚 commit，逐名属于 `pool-validity/4b`、`pool-validity/4c`、`111/r5` 与本腿自己的 `c06d569a`，**零枚动过 `internal/tools`**）。五枚分支行**逐字未变**（`if t.d.Roster == nil {`／`if caller == "" {`／`if t.d.Roster == nil {`／`if t.d.BaseOptions == nil || t.d.ParentTools == nil {`／`parentID := CorrelationID(ctx)`＋`if parentID == "" {`）；blob hash＝`task.go`＝`8b22cc02405958ba…`、`subagent_197.go`＝`d636a02d1fb64ccf…` | ⇒ 八发突变读数**都落在这五枚分支未变的那份字节上**，别人的十枚 commit 没有洗掉本腿任何一读 |
+./.scratch/wisp/probes/236/r2/evidence.md:206:   读数（§3 m-1d 前一遍）：摘掉 `:256-258` 那道 guard、且 `BaseOptions == nil` 时，`t.d.BaseOptions()` 是一次**空函数值调用**，panic 直接**打死测试二进制**（`rc=1, PASS=25, FAIL=2, 1.346s`，其后约 179 枚用例零读数）。
+./.scratch/wisp/probes/236/r2/evidence.md:215:   - 摘 BaseOptions 半边（m-1d2）＝恰 1 枚红。
+./.scratch/wisp/probes/236/v1/verdict.md:48:Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired         Test221SubagentCannotStopSiblingOrItself
+./.scratch/wisp/probes/236/v1/verdict.md:67:| **AC#1b** | `internal/tools/subagent_197.go:253`（roster，体 `:254`）；`:256`＝`if t.d.BaseOptions == nil || t.d.ParentTools == nil {`（体 `:257`）；`:259`＝`parentID := CorrelationID(ctx)`、`:260`＝`if parentID == "" {`（体 `:261-262`） | 同文件 `:166`／`:184`／`:208`／`:244`（`:256` 那枚语句占两枚用例）；panic 那一形经 `:230` `spawnGuarded` | 同上；`spawnGuarded` 用 `defer recover()` 把 panic 收成该用例自己的 1 枚红 |
+./.scratch/wisp/probes/236/v1/verdict.md:117:| **AC#1b `\|\|` 两半**（`subagent_197.go:256`） | `v-m1d1` 只留 BaseOptions 半边（`if t.d.BaseOptions == nil {`）；`v-m1d2` 只留 ParentTools 半边；`A-4` 整支改 `if false` | `v-m1d1` rc=1／PASS=205／**FAIL=1**＝`…WhenParentToolsIsUnwired`（红句 `:192`＋`:196`，got＝子代理**真派生了**的成功回执 `子代理 83c0c55a-…（父工具面没接线）已结束，状态 Settling。`）；`v-m1d2` rc=1／PASS=205／**FAIL=1**＝`…WhenBaseOptionsIsUnwired`（红句 `:219`，got 逐字以 `panic（guard 摘掉后不是拒绝而是崩）: runtime error: invalid memory address or nil pointer dereference` 开头）；`A-4` rc=1／FAIL=**2**（两半一起没） | **成立：两半各自有牙，不是共用一副。** ★本腿对 `236-r2` §5 第 3 条留给验收腿的那一裁给出**明确判语**：票面"各恰 1 枚红才算有牙"落在**一枚语句管两枚字段**上时，唯一自洽的读法是"**半边摘 ⇒ 恰 1 枚红**"（`v-m1d1`／`v-m1d2` 各拿到）；"整支摘 ⇒ 2 枚红"**不是破形状**，而是那一枚语句本来就守两扇门的正确反应。判"2 枚＝形状破"会反向激励把复合 guard 拆成两支语句，而**拆语句是产码改动、且今天会露出 `:278` 那个洞**（§5 第 2 条）。⇒ 本格按票面原意成立，不因 `A-4` 的 2 枚红降级 |
+./.scratch/wisp/probes/236/v1/verdict.md:119:| **★一票两形：panic 那一形算不算真红**（`subagent_197.go:256` ↔ `:278`） | 三发配对：`A-4-spawn-assembly-false`＝guard 永假＋**有** recover；`A-4-without-recover`＝同一产码突变＋overlay 换掉 `failclosed_236_teeth_test.go:232-236` 那五行 `defer func(){ recover() }()`；`ctrl-no-recover-only`＝★**只**换测试文件、产码一字不动（本腿多加的那枚正控，`236-r2` 没有） | `ctrl-no-recover-only` **rc=0／PASS=206／FAIL=0**；`A-4` 有 recover rc=1／PASS=204／**FAIL=2 枚具名红**；`A-4-without-recover` rc=1／**PASS=25／FAIL=2**／日志 `^panic`＝**2 行**／`FAIL github.com/CarlosShao/wisp/internal/tools 1.444s` ⇒ 其后约 **181 枚用例零读数**（206−25） | **成立：那枚 recover 是"把崩变成红"，不是掩盖。** 三条，条条带读数：①**它造不出绿**——产码未突变时摘掉它仍 206／0（正控），说明这层兜底在未突变态完全惰性；②它对 panic **必判红**——`Result{Text:"panic…", IsError:true}` 通得过 `!res.IsError`，但**永远不等于任何一枚完整字面量**，且 helper 只包 dispatch、不包断言（`:230-238`）；③没有它则**整包失明**，本票"摘一支必须有**具名**用例红"的判据形状在那一发上**根本无法裁**。⚠ 同时这一格是**产码洞的读数**：`:135` 声明 `BaseOptions func() (agent.Options, bool)`、`:278` `base, wired := t.d.BaseOptions()` 无条件调用 ⇒ 那道 guard 今天**同时充当 `:278` 的 nil 防护**。本腿**不判**该不该修（超本票射程），只交回编排者并附一条后程硬约束：**拆 `:256` 之前必须先处理 `:278`**，否则拆完就是崩溃面（§5 第 2 条） |
+./.scratch/wisp/probes/236/v1/verdict.md:153:| `A-4-spawn-assembly-false` | `subagent_197.go:256` →`if false {`（两半一起没） | 1 | 204／2 | `…WhenParentToolsIsUnwired` ＋ `…WhenBaseOptionsIsUnwired` |
+./.scratch/wisp/probes/236/v1/verdict.md:160:| `v-m1d1-keep-baseonly` | `:256` 条件改写成**只剩 BaseOptions 半边** | 1 | 205／1 | `Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired` |
+./.scratch/wisp/probes/236/v1/verdict.md:161:| `v-m1d2-keep-parentonly` | `:256` 条件改写成**只剩 ParentTools 半边** | 1 | 205／1 | `Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired` |
+./.scratch/wisp/probes/236/v1/verdict.md:184:  · - if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./.scratch/wisp/probes/236/v1/verdict.md:185:    · + if t.d.BaseOptions == nil {
+./.scratch/wisp/probes/236/v1/verdict.md:203:- `A-4`（有 recover，枚 3 行）：`failclosed_236_teeth_test.go:219: … got "panic（guard 摘掉后不是拒绝而是崩）: runtime error: invalid memory address or nil pointer dereference", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）——这一支是 || 的 BaseOptions 半边`
+./.scratch/wisp/probes/236/v1/verdict.md:258:   形状复认：`SubagentDeps.BaseOptions` 的声明（`subagent_197.go:135`）＝`func() (agent.Options, bool)`；`:278` `base, wired := t.d.BaseOptions()` **无条件调用** ⇒ 摘掉 `:256` 那枚 guard 且 `BaseOptions == nil` 时是**空函数值调用 panic**，不是一次拒绝。⇒ 那道 guard 今天**同时充当 `:278` 的 nil 防护**＝**一票两形**。
+./.scratch/wisp/probes/246/r2/mut/base-run.go:271:	// execute(), read through SubagentDeps.BaseOptions per spawn.
+./.scratch/wisp/probes/246/r2/mut/base-run.go:757:		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
+./cmd/wisp/run.go:291:	// execute(), read through SubagentDeps.BaseOptions per spawn.
+./cmd/wisp/run.go:789:		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
+./cmd/wisp/subagent_selfapproval_197_test.go:544:// together from. A child's loop is a copy of agent.Options (SubagentDeps.BaseOptions),
+./docs/evidence/s1/197-subagent-entity-r1.md:40:- `:98` `SubagentDeps`（Roster／BaseOptions／ParentTools／Provenance／Stream 五枚接缝，nil 一律 fail-closed）
+./docs/evidence/s1/197-subagent-entity-r1.md:64:  `BaseOptions`＝读 `rt.loopOpt`
+./docs/evidence/s1/200-project-instructions-r2.md:275:   `SubagentDeps.BaseOptions`（`cmd/wisp/run.go` 的 `rt.loopOpt`），而 `agent.Options` 里没有 instruction 源
+./docs/evidence/s1/222-spawn-holds-bridge-permit-v1.md:124:`git show bfc55b5b -- internal/tools/bridge.go internal/tools/subagent_197.go` 新增的顶层声明**逐枚现读＝六枚，全小写开头**：`inFlightSlot`／`take`／`giveBack`／`inFlightSlotKey`／`withInFlightSlot`／`giveBackWhileWaiting` ⇒ **零枚新导出名**；源名复用现成 `risk.SrcTaskOutput`（`subagent_197.go:463` 往父任务作用域盖戳），**没有** `subagent.output` 之类的新名字；`SubagentDeps` 仍是 5 枚字段（`:128-148`：Roster／BaseOptions／ParentTools／Provenance／Stream），197 那枚字段枚举守卫不必重谈。**所以 AC#3 不是因为越权判不成立的。**
+./docs/reports/pending-and-issues.md:12534:- 它报的洞形状＝"`subagent_197.go:256-258` 那道 guard 同时充当 `:278` `t.d.BaseOptions()` 的 nil 防护；整支摘掉且 `BaseOptions==nil` 时是空函数值调用 panic ⇒ 第一发 `FAIL=2`、其后约 179 枚用例**零读数**"。我先复认了产码形状（`git show HEAD:` 尺：`:256` guard 在、`:278` 无条件调用、中间无别的 nil 检查；全仓 `BaseOptions` 的生产者只有 `cmd/wisp/run.go:789` 与三枚测试 harness）⇒ **形状为真**。
+./docs/reports/pending-and-issues.md:12535:- ★但我接着去读了那枚新钉本体（`internal/tools/failclosed_236_teeth_test.go:201-234`）⇒ **这一形已经被它兜住**：`Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired` 经 `spawnGuarded`（`:230-234`，`defer recover()` 把 panic 转成以"panic"起头的 `IsError` 结果）跑这一支，所以"guard 被删"读到的是**该用例自己 1 枚红**，不是整包中止；注释逐字写着"turns a panic into an IsError result … reads as ONE named red rather than as an aborted run"。⇒ **裁定＝不立新票**。
+./docs/reports/pending-and-issues.md:12672:- **票 270**＝`subagent_197.go:256` 那道 guard **同时是 `:278` 空函数值调用的唯一 nil 防护**（一票两形）。★我落票面前自己跑了五把锚点尺：`:256` 逐字 `if t.d.BaseOptions == nil || t.d.ParentTools == nil {`、`:278` 逐字 `base, wired := t.d.BaseOptions()`（无条件调用）、`:135` 声明是函数值字段、生产产出者只有 `cmd/wisp/run.go:789`。崩溃读数在案（摘 guard＋摘 recover ⇒ PASS=25／FAIL=2／其后约 **181 枚零读数**；正控"只换测试文件"⇒ rc=0／206／0，所以失明只能归产码那一次调用）。三形未预选，⛔ 硬约束写死：**拆 `:256` 之前必须先处理 `:278`**。
+./internal/tools/failclosed_236_teeth_test.go:12://	subagent_197.go:256-258    task.spawn, t.d.BaseOptions == nil || t.d.ParentTools == nil
+./internal/tools/failclosed_236_teeth_test.go:30://	task spawn, BaseOptions half gone -> :278 CALLS t.d.BaseOptions two lines
+./internal/tools/failclosed_236_teeth_test.go:95:	lit236SpawnNoAssembly = "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，" +
+./internal/tools/failclosed_236_teeth_test.go:201:// AC#1b, subagent_197.go:256-258, the BaseOptions half of the ||. Same sentence,
+./internal/tools/failclosed_236_teeth_test.go:203:// because :278 calls t.d.BaseOptions() unconditionally two lines later. Measured
+./internal/tools/failclosed_236_teeth_test.go:204:// (see 交件 §3 m-1d): deleting the whole guard with BaseOptions nil panics inside
+./internal/tools/failclosed_236_teeth_test.go:208:func Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired(t *testing.T) {
+./internal/tools/failclosed_236_teeth_test.go:212:	}, true, func(d *SubagentDeps) { d.BaseOptions = nil })
+./internal/tools/failclosed_236_teeth_test.go:216:		t.Errorf("BaseOptions 没接线时 task.spawn 回了非拒绝：%q", res.Text)
+./internal/tools/failclosed_236_teeth_test.go:220:			"这一支是 || 的 BaseOptions 半边；got 以「panic」开头就是那道 guard 已经不在了",
+./internal/tools/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+./internal/tools/subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+./internal/tools/subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+./internal/tools/subagent_197.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+./internal/tools/subagent_197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+./internal/tools/subagent_197.go:278:	base, wired := t.d.BaseOptions()
+./internal/tools/subagent_197_test.go:185:		BaseOptions: func() (agent.Options, bool) {
+./internal/tools/subagent_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+./internal/tools/task_cancel_221_legs_test.go:91:		BaseOptions: func() (agent.Options, bool) {

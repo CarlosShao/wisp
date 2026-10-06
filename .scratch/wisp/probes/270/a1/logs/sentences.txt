@@ -1,0 +1,55 @@
+cmd/wisp/approval_always.go:81:		s.record("REFUSED", corr, card.Tool, "native/always", "配置写面未装配")
+cmd/wisp/approval_always.go:82:		return "", errors.New("配置写面没有装配：这一发能允许，但无处可存长期规则，所以什么都不写")
+cmd/wisp/config_reload.go:236:					"新放宽的目录要重启进程才参与判定（原因：canonicalizer 只在装配时构造一次）。\n")
+cmd/wisp/panel_inbound.go:148:		fmt.Fprintf(s.stderr, "wisp panel-inbound: 入向装配未完成（Unconfigured）：%v\n", err)
+cmd/wisp/panel_inbound.go:288:  退码：2=装配未完成，1=有请求被拒，0=全部受理。`
+cmd/wisp/resident_approval_246_windows_test.go:213:	// injection has to say 审批门未装配 while still owning step 3 - and a leg that
+cmd/wisp/resident_approval_246_windows_test.go:271:	gateAssembledClaim = "审批门已装配进本进程"
+cmd/wisp/resident_approval_246_windows_test.go:272:	gateAbsentClaim    = "审批门未装配"
+cmd/wisp/resident_approval_246_windows_test.go:324:	if line := ra.residentStatusLine(); !strings.Contains(line, "审批门未装配") {
+cmd/wisp/resident_approval_246_windows_test.go:361:	if !strings.Contains(line, "审批门未装配") {
+cmd/wisp/resident_approval_246_windows_test.go:367:	if line := ra.residentStatusLine(); !strings.Contains(line, "审批门未装配") {
+cmd/wisp/resident_approval_windows.go:5:// The approval gate held by the resident process (ticket 246, 乙形：装配根注入).
+cmd/wisp/resident_approval_windows.go:23:// 197's "装配根 cmd/wisp 是唯一的接缝". This is an application of those rulings
+cmd/wisp/resident_approval_windows.go:260:			"（装配根还没走到 session.NewLedger，或那一发没铸出会话身份），本次「本会话内允许」没有记下任何规则")
+cmd/wisp/resident_approval_windows.go:550:		ra.residentAuditf("resident-approval: 审批门已装配，但本进程没有悬浮球窗口，" +
+cmd/wisp/resident_approval_windows.go:559:		ra.residentAuditf("resident-approval: 本进程有悬浮球窗口，但装配根没有注入取消执行者，" +
+cmd/wisp/resident_approval_windows.go:574:	ra.residentAuditf("resident-approval: 审批门已装配进常驻进程，取消通道 %s 已加载（本票只落 %s 一条通道；"+
+cmd/wisp/resident_approval_windows.go:800:		return "审批门未装配（本进程没有可承载卡片的悬浮球窗口，或装配根没有注入取消执行者）"
+cmd/wisp/resident_approval_windows.go:802:	return fmt.Sprintf("审批门已装配进本进程（取消通道：%s 已加载；等待中的确认项：%d）",
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:90:			t.Error("bindBallHost 在没有执行者的情况下声称装配好了")
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:115:		t.Errorf("装配根那句和卡片那行分家了：%q（键名应与卡片一致为 %q）", status, r4SeededCardKey)
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:172:		t.Errorf("未装配闸门的卡片那行 = %q, want 以通道名 %q 开头且不指枚键名", got.Text, r4CardSlotLine)
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:50:	old260r3LoadedAudit = "resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；" +
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:54:	old260r3StatusLine   = "审批门已装配进本进程（取消通道：Esc 已加载；等待中的确认项：0）"
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:100:			t.Error("bindBallHost 在没有执行者的情况下声称装配好了")
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:105:		t.Errorf("默认档装配回执漂移：got %q, want it to contain %q", said, want)
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:145:			t.Errorf("改过键以后的装配句没有念那枚键：%q", line)
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:148:			t.Errorf("改过键以后的装配句仍在念 Esc：%q", line)
+cmd/wisp/resident_task_source_windows.go:113:	pipelineAbsentClaim = "任务管线未装配"
+cmd/wisp/resident_task_source_windows.go:123:	taskPostureRefused  = "无（任务管线未装配，理由见上面那行）"
+cmd/wisp/resident_task_source_windows.go:283:		slog.Error("task source: 任务管线未装配", "exit_code", code,
+cmd/wisp/resident_task_source_windows.go:284:			"why", "装配根在这一发返回了非零分类；审批门仍在，但没有会举卡的任务环路")
+cmd/wisp/resident_task_source_windows.go:285:		fmt.Printf("wisp: %s（退出码 %d，原因见上面这几行）：审批门已装配而任务管线没有，本进程仍然带球常驻\n",
+cmd/wisp/resident_task_source_windows.go:406:				fmt.Fprintf(out, "wisp: 这一路没有答复通道（装配时读不到可交互控制台）：%s\n", line)
+cmd/wisp/run.go:603:				"（gate=%v ui=%v cards=%v），已拒绝装配\n", s.gate, s.ui, s.cards)
+cmd/wisp/run.go:839:		return fmt.Errorf("审批 gate 未装配，无法为切到 %s 签发 L2 卡片", sw.To)
+cmd/wisp/run.go:868:		"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）")
+cmd/wisp/run.go:1025:		fmt.Fprintf(rt.stderr, "wisp run: agent 环路装配失败：%v\n", err)
+cmd/wisp/subagent_selfapproval_197_test.go:34://	(5) 允许出口连"可达"这件事都不成立：从子代理装配能静态走到的每一个类型
+cmd/wisp/subagent_selfapproval_197_test.go:563:		t.Errorf("从子代理的装配里能静态走到声明了允许出口的类型：%v。"+
+cmd/wisp/task_scope_close_151_test.go:11://	   同一条装配好的桥上：一枚宿主侧任务先读走一份敏感内容（污点挂在它身上），
+internal/agent/approval/cancel_key_label_260r4_test.go:316:		t.Errorf("%s 没有念出装配根那枚键：%q（应含 %q）", face, got, r4SeededKey)
+internal/agent/approval/cancel_key_wording_260r3_test.go:102:		t.Errorf("装配根装了取消键读口，卡片那行还在念出厂默认：%q（读取时求值被算成了一次）", seeded)
+internal/tools/failclosed_236_teeth_test.go:95:	lit236SpawnNoAssembly = "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，" +
+internal/tools/failclosed_236_teeth_test.go:214:	res := spawnGuarded(t, h, "装配快照没接线", "读一段")
+internal/tools/grant.go:16:// ModeSource 那形由装配根注入") because the alternative - handing
+internal/tools/grant.go:115:var errNoCanonicalizer = errors.New("tools: 未装配 C26 路径规范化器，会话授权无从比对")
+internal/tools/subagent_197.go:134:	// which is what "同一套宿主装配" means concretely. ok=false refuses the spawn.
+internal/tools/subagent_197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+internal/tools/subagent_197.go:281:		return Result{Text: "宿主现在给不出装配快照（fail-closed：不在没有父装配的情况下起子环路）", IsError: true}, nil
+internal/tools/subagent_197.go:288:		return Result{Text: "拒绝派生：宿主装配里没有审批准入钩子（AdmitTask 未接线），" +
+internal/tools/subagent_197.go:322:		return Result{Text: "子代理环路装配失败：" + err.Error(), IsError: true}, nil
+internal/tools/subagent_197_test.go:877:	// 派生路径上没有第二枚队列/第二份 gate 可接：SubagentDeps 的字段只有装配、
+internal/tools/task_cancel_221_test.go:7://	分母 = 「这次装配真正注册出去的所有工具名的并集」＝包内测试枚举几家
+internal/tools/task_cancel_221_test.go:140:				"而 %q 没有注册进这次装配的并集（并集 %d 枚：%s）",

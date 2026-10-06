@@ -1,0 +1,22 @@
+cmd/wisp/run.go:291:	// execute(), read through SubagentDeps.BaseOptions per spawn.
+cmd/wisp/run.go:789:		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
+cmd/wisp/subagent_selfapproval_197_test.go:544:// together from. A child's loop is a copy of agent.Options (SubagentDeps.BaseOptions),
+internal/tools/failclosed_236_teeth_test.go:12://	subagent_197.go:256-258    task.spawn, t.d.BaseOptions == nil || t.d.ParentTools == nil
+internal/tools/failclosed_236_teeth_test.go:30://	task spawn, BaseOptions half gone -> :278 CALLS t.d.BaseOptions two lines
+internal/tools/failclosed_236_teeth_test.go:95:	lit236SpawnNoAssembly = "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，" +
+internal/tools/failclosed_236_teeth_test.go:201:// AC#1b, subagent_197.go:256-258, the BaseOptions half of the ||. Same sentence,
+internal/tools/failclosed_236_teeth_test.go:203:// because :278 calls t.d.BaseOptions() unconditionally two lines later. Measured
+internal/tools/failclosed_236_teeth_test.go:204:// (see 交件 §3 m-1d): deleting the whole guard with BaseOptions nil panics inside
+internal/tools/failclosed_236_teeth_test.go:208:func Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired(t *testing.T) {
+internal/tools/failclosed_236_teeth_test.go:212:	}, true, func(d *SubagentDeps) { d.BaseOptions = nil })
+internal/tools/failclosed_236_teeth_test.go:216:		t.Errorf("BaseOptions 没接线时 task.spawn 回了非拒绝：%q", res.Text)
+internal/tools/failclosed_236_teeth_test.go:220:			"这一支是 || 的 BaseOptions 半边；got 以「panic」开头就是那道 guard 已经不在了",
+internal/tools/subagent_197.go:26://   - not a second runtime. The child loop comes from SubagentDeps.BaseOptions,
+internal/tools/subagent_197.go:132:	// BaseOptions answers the agent.Options the ROOT loop runs on. The child gets
+internal/tools/subagent_197.go:135:	BaseOptions func() (agent.Options, bool)
+internal/tools/subagent_197.go:256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+internal/tools/subagent_197.go:257:		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+internal/tools/subagent_197.go:278:	base, wired := t.d.BaseOptions()
+internal/tools/subagent_197_test.go:185:		BaseOptions: func() (agent.Options, bool) {
+internal/tools/subagent_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+internal/tools/task_cancel_221_legs_test.go:91:		BaseOptions: func() (agent.Options, bool) {

@@ -1,0 +1,28 @@
+internal/tools/failclosed_236_teeth_test.go:111:	res := x.h.spawn(t, t.Context(), label197, "读完就好")
+internal/tools/failclosed_236_teeth_test.go:237:	return h.spawn(t, t.Context(), label, prompt)
+internal/tools/failclosed_236_teeth_test.go:289:		Name: "task.spawn",
+internal/tools/subagent_197_test.go:81:		_ = emit(llm.StreamEvent{Type: llm.EvToolCallStart, ToolCallID: "call-197-spawn", ToolName: "task.spawn"})
+internal/tools/subagent_197_test.go:86:		_ = emit(llm.StreamEvent{Type: llm.EvToolCallEnd, ToolCallID: "call-197-spawn", ToolName: "task.spawn"})
+internal/tools/subagent_197_test.go:120:		{Name: "task.spawn", RiskLevel: "L0"},
+internal/tools/subagent_197_test.go:215:func (h *sub197Harness) spawnResult(ctx context.Context, label, prompt string) (Result, error) {
+internal/tools/subagent_197_test.go:218:		Name: "task.spawn",
+internal/tools/subagent_197_test.go:229:	res, err := h.spawnResult(ctx, label, prompt)
+internal/tools/subagent_197_test.go:300:	res := h.spawn(t, t.Context(), label197, "把日志读完并总结")
+internal/tools/subagent_197_test.go:368:		res, err := h.spawnResult(context.Background(), label197, "跑一段慢任务")
+internal/tools/subagent_197_test.go:473:			res, err := h.spawnResult(t.Context(), string(rune('A'+i)), "并发任务")
+internal/tools/subagent_197_test.go:556:			res, err := h.spawnResult(ctx, string(rune('A'+i)), "占住池位")
+internal/tools/subagent_197_test.go:590:	next, err := h.spawnResult(t.Context(), "多出来的那枚", "再来一枚")
+internal/tools/subagent_197_test.go:646:		if info.Name == "task.spawn" {
+internal/tools/subagent_197_test.go:655:		TaskID: "child-197", Name: "task.spawn",
+internal/tools/subagent_197_test.go:665:		if name == "task.spawn" {
+internal/tools/subagent_197_test.go:672:	if res := h.spawn(t, t.Context(), label197, "让孩子试着再派一枚"); res.IsError {
+internal/tools/subagent_197_test.go:696:	res := h.spawn(t, t.Context(), label197, "读一份外来的东西")
+internal/tools/subagent_197_test.go:723:	if r := h2.spawn(t, t.Context(), "没有溯源", "读一段"); !strings.Contains(r.Text, "没接线") {
+internal/tools/subagent_197_test.go:745:		res, err := h.spawnResult(parentCtx, label197, "长任务")
+internal/tools/subagent_197_test.go:852:	res := h.spawn(t, t.Context(), label197, "没有审批层就想派一枚")
+internal/tools/subagent_197_test.go:867:	if res := h2.spawn(t, t.Context(), label197, "走父队列"); res.IsError {
+internal/tools/subagent_222_test.go:333:				Name: "task.spawn",
+internal/tools/task_cancel_221_legs_test.go:136:		res, err := x.h.spawnResult(t.Context(), label, "长任务")
+internal/tools/task_cancel_221_legs_test.go:203:	res := x.h.spawn(t, t.Context(), label197, "读完就好")
+internal/tools/task_cancel_221_legs_test.go:462:		res, err := x.h.spawnResult(parentCtx, label197, "长任务")
+cmd/wisp/subagent_carrier_197_test.go:174:			Name: "task.spawn", Args: args,

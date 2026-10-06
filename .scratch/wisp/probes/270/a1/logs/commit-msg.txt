@@ -1,0 +1,27 @@
+270-a1 交件：票 270 三形代价普查表（AC#0 的料，⛔ 不选形）
+
+只读代价普查腿 270-a1。射程＝票 270 AC#0 的料，供编排者选形。本腿零 go 命令（另有一枚腿在
+cmd/wisp 跑突变，并发 go 进程会洗它的读数），零产码改动，未翻任何 AC 框。
+
+件＝.scratch/wisp/probes/270/a1/census.md（五节全实：§0 起手锚／§1 形状与逐字原文／
+§2 三形代价表／§3 要编排者裁的清单（判语留空）／§4 判不动的地方十条）。
+
+读数要点：
+- 派单五枚锚点（subagent_197.go :135／:256／:257／:278／:279）现量逐字对上，一枚未漂。
+- 尺子全程锚在带括号的调用形状（\.BaseOptions( 、BaseOptions == nil），双向追到 main：
+  生产唯一产出者＝cmd/wisp/run.go:789（main→cmdRun→runTextTask→assembleRuntime 闭合）；
+  产码判空只有 :256 一处，:278 之前无任何 BaseOptions 判空。
+- 顶红枚数：甲 0 枚具名红／乙 3 枚具名红（failclosed_236_teeth_test.go:95-96 共用常量
+  ＋:195 ＋:218 两枚等值钉）另 3 枚次序敏感钉（:176／:257／:269）／丙 0 枚
+  （越界加类型或字段则 +2＝subagent_197_test.go:879、subagent_selfapproval_197_test.go:563）。
+- 新发现：:293 opt.Tools = newSubagentToolProvider(t.d.ParentTools) 同样只靠 :256 拦着
+  ⇒ :256 今天是一票三形；internal/tools/task_cancel_221_test.go:51 是派单未列的
+  第 4 处 nil-BaseOptions 形状（只枚名、不派发）。
+- 残余零读数面（静态）：internal/tools 25 处＋cmd 1 处无 recover 的 spawn 派发点，三形都不动。
+- d22scan：唯一真会拦三形的是 ban 8（字符串不豁免）与 ban 9（丙那条注释若引路径必须盘上存在；
+  实测 docs/DECISIONS.md／DEFERRED.md／TOOLS.md／STATE_MACHINE.md／contracts/ 全 MISSING，
+  SPEC-05 真名＝docs/specs/SPEC-05-agent-core.md）。
+- 未交：AC#0 里"拆完之后剩几枚零读数"的实测（禁跑 go），已摆进 §3 第 3 条待编排者处置。
+
+票面只追加一行 Progress log（git diff --numstat 自证删除列＝0）。
+git status --porcelain -- cmd internal 起手＝终态＝0 行。
