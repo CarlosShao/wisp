@@ -1,0 +1,7 @@
+probes(evidence-close-4 §1.2b 台件)：免责句层复算尺＋其 6 行输出入库〔未验证·只读扫描产物〕
+
+- reruler-disclaim-layer.sh：逐枚把 v3 的 DISCLAIM 词族过前 8 行，再把命中件回灌标题层（VERD3/IMPL3），
+  打印"免责句层是否还有活可接"。只读，输出只写本目录。
+- disclaim-layer-audit.txt：现跑输出＝6 枚命中，逐行标「免责句层无活可接」⇒ 独立决定数＝0（交付件 §1.2b/§0.2 row18 引这两枚）。
+
+⛔ 未动 evidence-close/2、/3 任何原件；未动票面/台账/产码。

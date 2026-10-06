@@ -1,0 +1,8 @@
+119-ac7-impl.md :: dis=[本件不是裁决表] :: 标题层已因 IMPL3[实现侧交件] 落 OTHER ⇒ 免责句层无活可接
+137-ac4-impl.md :: dis=[本件不是裁决表] :: 标题层因'无终裁词'(VERD3 不中) 落 OTHER ⇒ 免责句层无活可接
+141-ac34-positive-controls-r1.md :: dis=[本文件不是裁决表] :: 标题层已因 IMPL3[正向对照] 落 OTHER ⇒ 免责句层无活可接
+146-liveapprovals-fix-r1.md :: dis=[本件不是验收件] :: 标题层已因 IMPL3[修复程] 落 OTHER ⇒ 免责句层无活可接
+146-liveapprovals-r1.md :: dis=[同一程写码又自证
+本件不是验收件] :: 标题层已因 IMPL3[实现程自证] 落 OTHER ⇒ 免责句层无活可接
+265-267-evidence-index.md :: dis=[不是对抗验收表] :: 标题层已因 IMPL3[凭据索引] 落 OTHER ⇒ 免责句层无活可接
+66 :: DIR-skip
