@@ -1,0 +1,6 @@
+probe(pool-validity/4c): 判完 22／23／24 —— 三枚都落「仍成立」，各带零落点的直接读数与发阴性对照
+
+- 22 仍成立：SSRF 编码形断言尺（2130706433/octal/0x7f000001/rebind）0 命中；`return "web.` 类工具名册尺 0；SearchProvider 0；anysearch 码内 0；mock-web 名册 0（字面只落票面＋三份 SPEC 文字）——R5 那套判定件确实在场但属票 17 的落码（67ffbd82 09-20），不算本票做掉
+- 23 仍成立：十一枚机器控制工具名在 internal/tools 非测试码全零；SendInput/OpenClipboard/SetClipboardData/EnumWindows/IsUserAnAdmin 全仓非测试 0；C7 图像线在场（content.go:43、anthropic/request.go:412-414）但唯一生产者只 llm/probe.go:112 那枚 1×1 探针
+- 23 补一发反向对照防"尺坏了读成零"：同一形状换成 fs.read → 6 枚文件命中 ⇒ 尺能响，那十一枚的零是真零
+- 24 仍成立：DEFERRED(D-34) 码内 0 枚，SPEC-12 §5 登记表 13 行里 :75 那行逐字在场（表侧在、标记侧零）；doc.read/search.* 注册尺 0；go.mod pdf/docx/xlsx 0；码内 DEFERRED( 记法 16 处／11 个名字，与表 13 行不是一套命名 ⇒ 本票 AC#5 的 cross-check 今天落不了
