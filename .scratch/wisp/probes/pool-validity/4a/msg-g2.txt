@@ -1,0 +1,47 @@
+probes(pool-validity-4a): 判完 227/229/230 + 补回上一笔被我误删的 8 行占位行
+
+HEAD 锚点仍 `1a93cc7b`（本腿所有读数一律 `git … HEAD` 现跑）。
+
+⚠ **先认一枚自己的事故**：上一笔 `3f437556` 的 Edit 把 §2 表里 **227/229/230/233/234/236/237/238
+八行"尚未判"占位行一起删掉了**（我原来的 old_string 覆盖 11 行、new_string 只给 3 行）。
+numstat 当时报 11 删，我只核了"删的是不是我自己的行"（是），**没核"删完还剩几行"**，
+所以那张表一度只剩 3 行＝**名册 11 枚、表 3 枚**，读的人会以为我漏判了 8 枚。
+本笔把八行**全部补回**（五枚仍写"尚未判"，三枚是本轮判语），
+现尺＝`awk` 段内 `grep -cE '^\| 2[0-9][0-9] \|'` → **11 行**，与 §1 名册对上。
+
+- **227＝仍成立**：票面两枚"没人钉"逐字仍在——`writeguard_226_test.go` 今天 **13 枚 `^func Test`**
+  （与票面枚数相同、半年没加用例）、窄尺 `delet|remov.*line|missing key` 在该文件 **0 命中**；
+  `TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt` 仍在 **`:393`（票面行号零漂移）**、
+  其 fixture `matrixBase` 在 `manager_test.go:37-38` 逐字 `schema_version = 2` ＝ `schema.go:28` 的当前版。
+  ⚠ 我比票面多扫一层：全包 18 枚 `_test.go` 都跑了同一把尺，**仓里确实有一枚删行 fixture**
+  （`migrate_test.go:113` 删 `schema_version = 1` 那行），但它钉的是迁移管线不是受守卫写
+  ⇒ "零用例"精确说＝"零枚用例钉住'手删一行 ⇒ 受守卫写之后文件与日志说什么'"。
+  迁移-on-读仍真写盘＝`loader.go:126 applyMigrations` → `migrate.go:96 atomicWrite`。
+  AC#6 那格两半都在：`always_write_no_clobber_226_test.go:43-44` 那句 `nothing … polls` 逐字仍在、
+  而 `config_reload.go:119` 的 1s tick（`:88 configReloadPollInterval = time.Second`）早已在生产 ⇒ 注释仍是假的。
+  `writeguard.go` 行号一处漂（`statOwnWrite` `:177→:175`），票面另两处没漂。
+- **229＝仍成立**：`subagent_197.go:380/381` 同名仍 `subagent-finish-`（票面 `:371/:372` 漂 9 行）、
+  `grep -n subagent HEAD -- internal/observe/goroutine.go` → **rc=1／0 命中**（名册四张表我逐枚现读，未引票面）。
+  ⚠ **AC#4 那格今天没人交，且答案比票面假设更糟**：全仓 20 处真 spawn 里**名册外 5 枚**
+  ＝`subagent-finish-`／`panel-sta`／`balldebug-hotkey-bridge`／`balldebug-level-feeder`／`mockllm-stdout-reader`
+  （逐枚 `grep -c` 验在册＝全 0）。其中 `panel-sta` 是**知情的**——
+  `panel_resident_windows.go:80-81` 注释自陈 "An unlisted name is classified CategoryUnknown, which logs and
+  does not fail"，等于把本票的报警面当可接受噪声写进产码，却没有 D38b 批准记录。
+  ⛔ 三枚算不算该进册是射程裁量，本腿不裁，只交名册。
+  另记一把险些读错的尺：`grep … | cat` 之后 `$?` 是 `cat` 的 rc 不是 grep 的，
+  我改用 `; echo rc=$?` 与 `$(…)` 两种取法各复跑才坐实"0 命中"。
+- **230＝仍成立**（四枚残缺逐枚还在）：票 115 裁决表仍 **0 枚**（`/115-` rc=1，跨 7 天读数不变）／
+  `queue.go:262` 那句 "only reader of q.alias" 逐字在（票面 `:247` 漂到 `:262`，读者仍在 `:212/:225/:231`）／
+  票 80→票 21 交接：票 21 里 `blacklist_overrides` **0 命中（rc=1）**、票 80 仍带 `-done`／
+  两枚 dangling：`docs/reports/pending-human-review.md` 仍不在树（`grep -c` → 0）、
+  `SPEC-08:42` 仍指着 `docs/evidence/s1/68-*` 而该名册 **0 枚**。
+  ⚠ **票面 §现量 三行今天过期**：①"115 七格全未勾"→ 今天 **2 未勾／3 已勾**；
+  ②"54 枚／14 张"→ 今天 **14 枚／8 张**（与票面 `:39` 的 `done-debt-1` 14／8 独立复算对上、逐票拆法逐字相同）；
+  ③"7 张一格都没勾"→ 今天 **0 张**（这半枚缺陷已不在）。
+  ⚠ 注释那枚别读成整句重写：`queue.go:262-263` 两半**一句假一句真**（"唯一读者"假／"allow 侧不可达"真，
+  `lookupForAllowLocked` 只读 `q.byID`），改注释得保住已变真的那一半。
+  ⚠ 票面内部自相矛盾一处（§现量 `:10` 与 AC#1 注记 `:20`）本腿只登记、⛔ 不裁权威。
+
+边界遵守：零 go／未开 `.scratch/wisp/probes/{232,111/ci1}/**`／未开四枚 `226/v1/b*-probe` 台件／
+`frontend|design|.gitignore` 零读／`docs/evidence/s1/**` 只取文件名不读内容／票面零改动／台账零碰／
+`cmd/wisp/**` 一律 `git show HEAD:`。
