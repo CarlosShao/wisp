@@ -1,0 +1,24 @@
+probes(A642 落账)：机主桌面连弹 3 次"选择一个应用打开 projects"＝我造的不是外人，根因逐字取到
+
+归因：powershell PID 27232（08:55）存档命令行逐字为 `e={D:\work\workspace\projects plans\Wisp.CPU}`
+——我在 bash 的内联 `-Command "..."` 里写了 `$_`，被 bash 先展开成当前工作目录，
+PowerShell 收到裸词 `projects`（路径空格切出的第二段）⇒ Windows 外壳去派应用打开它 ⇒ 弹选择器。
+第二枚 PID 38932（09:01，`...Wisp.WorkingSet64/1MB`）同形；第 3 枚（17:49/18:20）是我
+**为了诊断这个弹窗又用了内联 -Command** 当场再造的——同一个坑今天第 3 次。
+
+三行定性（按机主口径）：现象只在他桌面（`OpenWith.exe` 由 svchost PID 1640 拉起）；
+本机被入侵的证据＝无，发起方是我的取数命令；最坏后果形状＝会反复弹、点取消即消失的窗口，
+动的是"请系统找个应用打开一个词"，不改权限／防火墙／配置。
+`D:\work\workspace\projects`（不带 plans）本来就存在＝一个真目录，非我新建。
+
+仓没被改坏：`git status --porcelain -- cmd internal`＝0 行，HEAD 55324446。
+
+清理：关掉 3 枚弹窗宿主（28552／36412／27416）＋2 枚坏 powershell（27232／38932），复尺剩余 0；
+⛔ 故意没动 mockllm.exe PID 38844（10-05 23:25 起，`Temp\TestTicket223...1318611284\001`，7 MB）
+＝一枚测试助手残留，非弹窗原因，杀别人起的进程要先问 ⇒ 登记等复核来历。
+诊断脚本两枚落 .scratch/wisp/probes/diag/（临时件只建不删）。
+
+规矩升级（记忆第 107 条）：凡 PowerShell 语句含任何 `$` 一律 Write 成 .ps1 再 `-File` 跑；
+取证尺＝Get-CimInstance Win32_Process 的 CommandLine。
+
+只 commit 不 push；台账 append-only（numstat 删除列 0）。
