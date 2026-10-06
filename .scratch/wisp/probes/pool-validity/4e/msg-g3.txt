@@ -1,0 +1,50 @@
+pool-validity 4e: sections 3, 4, 5, 6 land (six-batch overlap census plus my own caveats)
+
+Section 3 is the most valuable cell of this leg. Extraction ruler is a small awk
+file in this probe directory: every numeric table row counts toward the roster; a
+row counts toward judged only when one of its fields begins with a tier word.
+
+Roster occurrences across the nine batch files total 163, dedup 105. Judged
+occurrences total 90, dedup 82.
+
+Question one, tickets judged by two or more batches: exactly 8, all of them the
+pair batch1 under directory 2 versus batch4c (tickets 15, 16, 21, 22, 23, 24, 25,
+26). No ninth ticket surfaced. Recorded without judging which tier is right, but
+the two files do not even agree on the tier for 16, 21, 25, which is what makes a
+duplicate dispatch more than wasted rounds.
+
+Wider finding: batch4 under directory 2 already listed the rosters of 3b, 4a and
+4b, and batch1 listed the roster of 4c, so the later batches added zero new ticket
+numbers. The union of all six batches equals the union of the four files under
+directory 2: 105 tickets, both set differences empty.
+
+Question two, tickets still zero-checked today and never judged by any batch: 22,
+of which this leg just judged 233, 234, 237, leaving 19. Seven of those nineteen
+have no checkbox line at all (196, 211, 213, 214, 215, 216, 219) so the denominator
+ruler every batch used runs empty on them. Measured both ways this leg: zero
+checked gives 103 open tickets, unchecked greater than zero gives 96, the gap is
+exactly those seven.
+
+Question three, each file self-reported total versus my extraction: nine cases,
+seven agree. Two conflicts left as two readings side by side, no pick: batch 3b
+section 2 claims four tiers all unjudged while its own section 1 has nine rows
+with tier words. And batch 4a says tickets 249 and 269 are not in its ruler output,
+while re-running that ruler verbatim today prints both of them with unchecked 7 and
+5.
+
+Section 4 names the two of my three verdicts that feel unsafe: 234 leans entirely
+on another leg artifacts and ledger A449 with zero go commands from me, and the
+second cell of 237 cannot distinguish three histories around commit 1d2ad737.
+
+Section 5 records: my own bad first reading of the artifact count (58 at HEAD, 49
+in the delivery commit, not 63), the first version of my extractor missing all of
+4c because its verdict rows start with bold ticket numbers, one drifted line
+reference in ticket 234 face, two in 233, and the clause conflict where the
+zero-deletion rule is unreachable for replacing my own skeleton placeholders. The
+four deleted lines are the four honest not-computed-yet sentences from my own
+sections 2 to 5, nothing else.
+
+Section 6 is the boundary attestation: zero go commands, HEAD-only rulers for
+internal and cmd, do-not-read prefixes untouched, no frontend or design reads,
+evidence directory used by file name only, zero ticket face edits, writes confined
+to this probe directory, commit only and no push.
