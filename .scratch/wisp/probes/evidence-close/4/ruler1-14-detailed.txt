@@ -1,0 +1,14 @@
+07-ball-state-machine-core-done.md|51|(无AC号)|- [ ] Visual: 20 states rendered in a debug cycle page/window; human screenshot review vs
+104-sealfile-silently-drops-inherited-grants-done.md|52|AC#3|- [ ] **AC#3** 双向变异：① 把检测退回"只看显式 ACE" ⇒ AC#1 红；
+104-sealfile-silently-drops-inherited-grants-done.md|57|AC#4|- [ ] **AC#4** 回归：`go test -count=2 ./internal/winsec/ ./internal/memory/ ./internal/secret/ ./internal/agent/` rc=0，
+105-c26-rewrite-account-has-no-production-reader-done.md|56|AC#5|- [ ] **AC#5** 门禁（按包 scope）：`go test -count=2 -v` 各包 rc=0 并逐条点名 SKIP/FAIL（**报 `=== RUN` 行数 == 不同测试名 × 2**；
+110-no-ci-step-runs-internal-winsec-done.md|39|AC#3|- [ ] **AC#3** 这道新步要**自己会红**：在 `/tmp` 快照里把 winsec 某条安全断言人为弄坏（例如私有集改成按名字比）⇒ 新步必须 rc≠0；
+110-no-ci-step-runs-internal-winsec-done.md|47|AC#5|- [ ] **AC#5** 门禁：`bash -n` 改动脚本 rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且台账各 scope 不降；
+113-posix-platformverifypplacement-has-no-link-leg-done.md|54|AC#4|- [ ] **AC#4** 变异：把新腿关掉 ⇒ AC#1 那条必须红；再把"祖先链只查一层"这种**半修**形状试一发 ⇒ 也要红（证明它咬的是全集不是某一行）。
+113-posix-platformverifypplacement-has-no-link-leg-done.md|56|AC#5|- [ ] **AC#5** 门禁：容器内 `-count=2 -v ./internal/winsec/ ./internal/memory/ ./internal/risk/` rc=0 且四数逐条点名（报 SKIP 要说是不是 `-v`；
+115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md|58|AC#4|- [ ] **AC#4** 变异：把你选的修法退回原状 ⇒ AC#3 新用例必须红；再试一发"只比大小写不敏感"（`EqualFold`）这种**半修** ⇒ 也要红
+115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md|64|AC#6|- [ ] **AC#6** 门禁：按包 `-count=2 -v` 四数逐条点名（报 SKIP 要说是不是 `-v` 量的；`-count=2` 不缓存）；
+92-panel-composer-mode-attachments-workspace-done.md|68|AC#5|- [ ] **AC#5** 变异三向：(i) 把"面板只能显示"改成"面板能写 mode" ⇒ 必须有用例红；
+92-panel-composer-mode-attachments-workspace-done.md|73|AC#6|- [ ] **AC#6** 台账与门禁（只跑自己碰的范围）：`sh scripts/d22scan.sh` 纯净树 rc=0 且贴出**逐作用域文件数**
+92-panel-composer-mode-attachments-workspace-done.md|79|AC#7|- [ ] **AC#7** **负判据**：把"不做 git 切换"变成可检查的东西——在 `frontend/` 与 `internal/panel/` 里
+97-dead-strict-param-and-the-comment-that-invents-a-caller-done.md|55|AC#5|- [ ] **AC#5** 门禁（按包）：`gofmt -l`/`gofumpt -l` 空、`go vet ./internal/agent/approval/` rc=0、

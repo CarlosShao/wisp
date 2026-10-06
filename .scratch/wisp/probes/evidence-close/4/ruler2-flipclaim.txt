@@ -1,0 +1,1 @@
+255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md|17| ] **AC#1 那句"已立即生效"只许说真话**：判据＝stdout 里"这些段已立即生效"那一段**只列真有生

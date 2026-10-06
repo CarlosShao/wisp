@@ -1,0 +1,9 @@
+docs(evidence-close-4 骨架)：closed-tickets-evidence-index.md 立骨架＋分母现量 93 枚入库〔未验证·只落位不判〕
+
+本腿是收口腿（前三枚同职腿 evidence-close-1/2/3 两死一成品）。本笔只落骨架：
+五节占位（§0 起手锚／§1 尺的选定／§2 分母／§3 三段计数／§4 对账清单／§5 不解决什么）＋首段性质声明逐字写死。
+
+本腿现量分母：`ls .scratch/wisp/issues/*-done.md | wc -l` = 93（⛔ 不含 README.md）。
+台件落 .scratch/wisp/probes/evidence-close/4/（nums4.txt 93 枚 / done-files-4.txt / pairs-own.txt 146 / file-identity-4.txt / ticket-abc-4.tsv / reruler-v3.sh）。
+
+⛔ 本笔不判任何一票该不该结、不翻任何一枚框、不改票面一字。

@@ -1,0 +1,8 @@
+05-adversarial-acceptance.md :: 编排者执行
+07-adversarial-acceptance.md :: 编排者执行
+08-adversarial-acceptance.md :: 编排者执行
+11-adversarial-acceptance.md :: Acceptor:** orchestrator
+161-gates-selftest-accept-r1.md :: 编排者代提
+17-adversarial-acceptance.md :: 编排者执行
+18-adversarial-acceptance.md :: 编排者执行
+63-adversarial-acceptance.md :: Acceptor:** orchestrator

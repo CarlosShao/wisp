@@ -1,0 +1,14 @@
+probes(evidence-close-4 台件)：23 枚收口尺台件入库〔未验证·只读扫描产物，非裁决〕
+
+本腿全部读数名册（§0.2 那 17 条各指回这里一枚）：
+- 分母层：denominator.txt(93) / nums4.txt / done-files-4.txt / mine-nums.txt / unchecked-per-ticket.txt
+- 名册与分类：pairs-own.txt(146 对) / file-identity-4.txt(VERDICT85/OTHER60/DIR1) / ticket-abc-4.tsv(A74/B2/C17)
+- 可复跑尺：reruler-v3.sh（本腿自写，含口径注释；输入只读、输出只写本目录）
+- 表体：table-body.md / table-body2.md / table-full.md / tbody.txt / abc-flat.tsv / tbody-marker
+- 尺一台件：ruler1-14-strict.txt / ruler1-14-detailed.txt（14 枚未勾框逐枚）
+- 尺二台件：ruler2-flipclaim.txt（翻勾主张扫描）/ ruler3-x-but-dontflip.txt（反向形状 1 枚＝票 110 AC#4）
+- 署名层：orch-or-selfdecl.txt（前 30 行那发 8 枚命中；§3.3-1 据此收敛到 7 枚）
+- 三笔 commit 的 msg 原件：msg-1.txt / msg-2.txt / msg-3.txt
+
+⛔ 本腿未改 evidence-close/2 与 /3 的任何一枚原件（git status 现量两处皆空）；未读未引 frontend/design；
+未引 probes/231、111/r4、pool-validity；全程零 go 命令。
