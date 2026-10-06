@@ -31,12 +31,12 @@
 | 动作 1-③ | 票 254 `.scratch/wisp/issues/254-fifth-tier-winsec-no-ci-caller-done.md` | **已追加**（47→72 行，＋25 行／＋2,174 字节），读回已过 |
 | 动作 1-④ | 票 267 `.scratch/wisp/issues/267-…-done.md` | **已追加**（87→107 行，＋20 行／＋1,744 字节），读回已过 |
 | 动作 2 | `docs/evidence/s1/closed-tickets-evidence-index.md` §3.1 表下方插更正引用块 | **已插入**（354→361 行，＋7 行／＋1,041 字节），删除列＝0，表里 17／74／2／93 一字未动 |
-| 提交 | 6 枚文件逐枚点名 commit（⛔ 不 push） | 本件＝**第 1 笔（状态件闸门）**；5 枚交付件的第二笔待落；落完再追加第 3 笔登记 commit 号 |
+| 提交 | 6 枚文件逐枚点名 commit（⛔ 不 push） | **已落两笔**：闸门笔＝`e841792f`（本件）、交付件笔＝`b82a29ef`（5 枚）；本笔＝第 3 笔（本件收尾追加） |
 
-**剩余工作清单（若本腿此刻死掉，接手腿照这个做）**：
-1. `git commit -F <msg.txt> -- <5 枚点名路径>`（⛔ 不含本 status 件亦可，或同笔带上；禁 `add -A`／`.`／`--amend`）。
-2. 把两笔 commit 号回填进本件 §5，并 `git log --oneline -3` 复认。
-3. 回报编排者：两处对不上的地方（票 254 的计数差、票 267 的行号差）——已各自写进票面，不需另立件。
+**剩余工作清单（若本腿此刻死掉，接手腿照这个做）**：⛔ **此刻三条已全部做完，本腿无遗留工作**（细节见 §5）：
+1. ~~`git commit -F <msg.txt> -- <5 枚点名路径>`~~ → 已落 `b82a29ef`。
+2. ~~把 commit 号回填进本件 §5 并 `git log` 复认~~ → 已回填并复认（第三笔＝本件这次追加）。
+3. ~~回报编排者两处对不上的地方~~ → 已各自写进票面（票 254 的计数差、票 267 的行号差），未另立件。
 
 ## 3 闸门自查
 
@@ -44,6 +44,24 @@
 - ⛔ 不碰任何 `- [ ]`／`- [x]`；不改 `-done` 文件名；不动台账／`AGENTS.md`／`PLAN.md`／`docs/specs/**`。
 - ⛔ 禁读面：`.scratch/wisp/probes/232/**`／`111/ci-read-1/**`／`pool-validity/**`／`frontend/**`／`design/**`（本腿未读、未引）。
 - 本件＝硬预算闸门的落点：任何时刻被打断，本节即"做到哪一枚／还剩哪几枚"的答案，⛔ 不留「（待填）」。
+
+## 5 提交登记（本腿交件已落，2026-10-06 19:0x 现量）
+
+- **闸门笔**＝`e841792f`（只含本状态件一枚，1 file changed, 55 insertions(+)）
+- **交付件笔**＝`b82a29ef`（5 files changed, **90 insertions(+), 0 deletions**）
+  逐枚 `git show --numstat`（增／删两列，⛔ 删除列全 0）：
+  - `.scratch/wisp/issues/78-linux-vet-buildtags-unblocks-d22-gate-done.md`＝20／0
+  - `.scratch/wisp/issues/115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md`＝18／0
+  - `.scratch/wisp/issues/254-fifth-tier-winsec-no-ci-caller-done.md`＝25／0
+  - `.scratch/wisp/issues/267-confirm-timeout-config-has-no-bounds-so-the-c18-warning-can-vanish-done.md`＝20／0
+  - `docs/evidence/s1/closed-tickets-evidence-index.md`＝7／0
+- 追加字节数（`git show HEAD:<路径> | wc -c` vs 落笔后 `wc -c`，⛔ 与行数增量同向、无吞字）：
+  78＝17,295→18,486（**＋1,191**）／115＝82,966→84,692（**＋1,726**）／254＝7,779→9,953（**＋2,174**）／
+  267＝24,037→25,781（**＋1,744**）／索引件＝55,207→56,248（**＋1,041**）
+- 勾自查（HEAD vs NOW 逐枚 `- [x]`＋`- [ ]` 计数）：78＝4→4／115＝5→5／254＝3→3／267＝5→5 ⇒ **一枚都没动**。
+- 状态自查：`git status --porcelain -- .scratch/wisp/issues docs/evidence/s1`＝**空**（本腿写面已全部入库）；⛔ **未 push**。
+- ⚠ 并发观察（⛔ 不属本腿、只是登记）：本腿两笔之间 HEAD 由 `257275be` → `1eb93d96`（编排者另落 `A644` 与两枚只读腿的收／派），与本腿 5 枚写面**无同名文件冲突**，本腿未引它的任何读数。
+- 本腿**没做**的（照编排者清单，越线一条即虚报）：没跑任何 Go／`sh scripts/*.sh`／门禁；没翻任何一枚勾；没改台账／`AGENTS.md`／`PLAN.md`／`docs/specs/**`；没给票 250 落任何节（那枚编排者裁"无可搬"）；没改 `-done` 文件名；没删任何临时件；没 push；没引用禁读面。
 
 ## 4 起手现量（逐字，2026-10-06）
 
