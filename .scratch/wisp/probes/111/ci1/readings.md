@@ -40,13 +40,160 @@ completed  success  slo-fresh                                 slo-fresh dev  sch
 
 ## §1 票面逐字（问 1）
 
-<!-- 待填：AC#1/2/3/4/6/7/8/9/10 十枚框原文，sed 行号已核对与否要具名 -->
+尺原文：`sed -n '20,35p;70,90p' .scratch/wisp/issues/111-ci-tests-20-of-33-packages.md`
+**行号复核结论：没漂**。本腿另用 `grep -n '^- \[ \]\|^- \[x\]\|^Status:' .scratch/wisp/issues/111-ci-tests-20-of-33-packages.md`
+现量 ⇒ 十枚框分别在 `:22 / :24 / :27 / :29 / :31 / :71 / :75 / :77 / :81 / :86`，
+与编排者给的 `20,35p`＋`70,90p` 两段**完全覆盖**；票面总行数 `wc -l` = **306**，**零枚 `- [x]`**（全 10 枚仍是 `- [ ]`）。
+
+```
+22| - [ ] **AC#1** 复算并出一张**全仓对账表**：每个包 ×（有无测试文件 / 在不在 CI 某一步 / 那一步真给过结论的 run id + step 号）。
+23|       表格必须能自证完整（`go list ./...` 的 33 行都在，不许只列零覆盖那几个）。
+24| - [ ] **AC#2** 逐包接入，**先易后难**，每包一次可核对的步级读数。
+25|       ⚠ **加严可以直接做**；**不许**为了让某包变绿而放宽它的断言、调它的阈值、或给它加 `//go:build`/`t.Skip` 挡掉。
+26|       接入第一天就红 ⇒ **那是发现**：红名逐条登记进本票面并**开票**，不许撤步骤。
+27| - [ ] **AC#3** `session`/`watchdog` 这种"空分母"要**响亮**：scope 校验加上
+28|       "**声明在范围内但该平台没有任何测试文件 ⇒ 直接失败**"的守卫（与票 93 的"条目腐坏即红"同族），并人为抽掉一个包证明它会红。
+29| - [ ] **AC#4** `cmd/wisp` 那一格：给出它在 CI 上**能不能跑**的实测结论（能 ⇒ 接入；不能 ⇒ 写清缺什么、归票 98 还是新票），
+30|       **不许默默留在零覆盖列**。
+31| - [ ] **AC#5** 门禁：`bash -n` 改动脚本 rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且各 scope 不降；
+32|       ⚠ 新步若排在"会失败的步骤"之后 ⇒ 必须放前面或 `if: always()`（本仓实测过这道门因此从未执行）。
+```
+
+```
+71| - [ ] **AC#6** 让**新增的门不再吃掉后面的步骤**：把 step4 之后的每一步都还能跑
+72|       （`if: always()` 或把新步挪到该 job 最后，二选一并说明为什么）。
+73|       ⚠ 加 `always()` 属**加严**可以直接做；**不许**反过来把新步删掉或挪到 `continue-on-error`（那等于把门拆了）。
+74|       判据：**同一枚 run 里 step4 与 step5–8 同时有结论**（允许 step4 红），并给一次这样的**步级**读数（run id + 各步 conclusion）。
+75| - [ ] **AC#7** `R-110-4`：票 110 承诺过"`-run TestSyncRegistryProbeLive` 经 `runtests.sh` 接进 windows 腿（step7）"，
+76|       验收复算发现**至今 0 次** ⇒ 要么落地并给 step7 读数，要么在票 110/111 面把它**当众改口径**（不许留在原地当已做）。
+77| - [ ] **AC#8** `R-110-3`：包匹配式缺前缀锚定（`"winsec"` 宽松串曾让我把 0 命中说成 18 次）
+78|       ⇒ 匹配式要能区分"**被测包**"与"日志里出现过这个词"，并用一次阳性自证（种一个只在字符串里出现的包名 ⇒ 不许计入分母）。
+81| - [ ] **AC#9（编排者 21:0x 追加，来源=run `35599458439` 的真实读数）** **`internal/winsec` 的 POSIX 半边今天零覆盖**：
+82|       `test-core`（ubuntu 腿）step7 的逐字 scope 是那 16 个包、**不含** `./internal/winsec/`，全日志里 `internal/winsec` 出现 **0 次**
+83|       ⇒ 票 113 刚交的链接腿（`winsec_other.go`）**没有任何 CI 回归保护**，只有编排者本机 Docker 跑过。
+84|       判据：ubuntu 腿里出现一步真跑 winsec 的 `!windows` 半边，并给出**该步的 run id + job id + step 号 + 结论**。
+85|       ⚠ 不许用"本机 Docker 跑过"替代；也不许把它接成"只编译不执行"（`GOOS=linux go vet` 那一类）就算数。
+86| - [ ] **AC#10（编排者 21:0x 追加）** `test-core` step7 现在报 **PASS=578 FAIL=0 SKIP=1**，而那枚 skip
+87|       （`TestWorkspaceSwitchRefusesAJunctionToOutside`，`paths_workspace_test.go:198`，理由是"C26 reparse 检测是 Windows-only"）
+88|       **不在任何台账里** ⇒ 与票 93 同族（**步不再把 SKIP 记成 ok**），但这一枚要的是：**未记账的 skip 必须响亮**——
+89|       要么进"已知双平台跳过"清单并写明归谁，要么在 POSIX 上给出等价判据。**不许**为消掉数字而 `Skip` 掉它。
+```
+
+**一处要具名的口径差（⛔ 不是本腿改票面）**：任务前文把 AC#6 的生死判据引成
+「只要还有一步是 `skipped` 就判 FAIL，不接受'通过附条件'」并说它在"约 `:71-74`"。
+**票面 `:71-74` 那四行逐字如上，里面没有这句话。**
+这句话真身有两处、都在 Progress log 里而非 AC 段里：
+- `:255`（next= 1 的判据本体，点名 test-windows 的五枚非 post 步）：「只要还有一步是 skipped ⇒ **没修好，AC#6 当场判 FAIL**（不许写"通过附条件"）」
+- `:291`：「是本票唯一的生死判据：**只要还有一步是 skipped，就判 AC#6 FAIL**，不接受"通过附条件"」
+
+⇒ 两处的**射程不一样**（一处限定五枚、一处未限定），这正是 §4.3 把两读法摆开的依据。本腿按硬边界**一枚框、一字票面都没动**，只把行号与原文差异登记在这里。
+
+**AC 段之外、与问 1 同一段落里的一条过期陈述**（同号具名，不改）：票头 `:1` 与 `:23` 的 **33** 这个分母，
+今天三发 census 步逐字打的是 `go list ./... = 35 packages`（见 §2.1、§6.8）。
 
 ---
 
 ## §2 AC#1 第④列名册（问 2）
 
-<!-- 待填：包 × (有无测试文件 / 在不在 CI 某一步 / 那一步真给过结论的 run+job+step)，含 census 步打印的四数逐作业 -->
+### 2.0 尺与分母（先自证完整）
+
+- 包全集（第①～③列的前两块）：`git ls-files '*.go' | grep -v '^\.scratch/'` 按目录聚合现量（枚数＝跟踪的 `_test.go` / 非测试 `.go` 各几枚），
+  core 名单来自 `scripts/portable-tests.sh`（`core_pin` `:164-192`、`scope(core)` `:234-247`），
+  windows 腿名单同文件（`win_pin` `:193-204`、`scope(windows)` `:248-255`），`cli` `:256-262`、`winsec` `:263-270`，`tiers='core windows cli winsec census'` `:220`。
+- 第④列**只从这两发 run 的步级 log 里取**：`gh run view --job <id> --log`（全量，⛔ 不用 `--log-failed`），落盘 9 枚 gz 后逐枚 grep。
+- **分母今值＝35，不是票面那 33**（三发 census 步逐字 `go list ./... = 35 packages`；差集口径见 §6.8）。
+  下表**35 行全在**，满足票面 `:23` 那句"不许只列零覆盖那几个"。
+- ⚠ `tools/d22scan`／`tools/mockllm`／`scripts/spike` 是**另三枚 `go.mod`**（`git ls-files` 现量 4 枚：`go.mod`、`tools/d22scan/go.mod`、`tools/mockllm/go.mod`、`scripts/spike/go.mod`），
+  不在主 module 的 `go list` 里 ⇒ 不在 35 行内；它们**有** CI 读数（`lint` step4 / step13），单列在 §2.3。
+
+### 2.1 census 步打印的四数（逐作业，第④列的"表头"）
+
+| run | job | 步 | census totals 原文（四个数） | 结论 |
+|---|---|---|---|---|
+| `37405698188` | `112082660385`（test-windows） | **step8** | `census GOOS=windows - go list ./... = 35 packages` ／ `census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0` | success |
+| `37406757402` | `112085927937`（test-windows） | **step8** | 同上，**四数逐字相同** | success |
+| `37406422380`（第三发，参照） | `112084901765` | **step8** | 同上，四数亦相同 | success |
+| 推前 `37396530365` | `112053739011`（test-windows） | — | **无 census 步**：该发 step8 是 `Portable windows tests`，step9 是 `PathResolver junction`；`gh run view 37396530365 … test("census")` 返回**空** | 不存在 |
+
+（⛔ 这三行不是"core 那发 1518/1028/4/1 一形"。那四枚是 `runtests.sh` 的 **RUN/PASS/FAIL/SKIP 四数**，
+不是 census 的 totals；两套四数分别在 §2.4 与本节。census 的四个数是 `packages/with-zero-compiled-tests/claimed-by-no-scope/unclaimed-with-tests`。）
+
+### 2.2 三十五行全名册
+
+列义：①`git ls-files` 跟踪的 `_test.go` 枚数 ②census 在 windows 上打印的 `TESTS(t/x)`（＝真编进该平台 test 二进制的那几枚，`!windows` 的会少）
+③在不在 CI 某一步（哪个 tier→哪个作业第几步）④那一步**真给过结论**的 run＋job＋步＋该枚包自己的 own-line 判语。
+
+| # | 包（`github.com/CarlosShao/wisp/` 之后） | ①`_test.go` | ②t/x | ③在册（tier→步） | ④步级真读数 |
+|---|---|---|---|---|---|
+| 1 | `cmd/balldebug` | 0 | `0/0` | **NO-SCOPE**（`<-NO-TESTS`） | 无任何步 ⇒ 无读数 |
+| 2 | `cmd/llmrecord` | 1 | `1/0` | core＋windows | core：`37406757402`/`112085927688`/step7 `ok (own line)`；windows：`112085927937`/step9 `ok` （run1 `112082660423`/step7、`112082660385`/step9 同形） |
+| 3 | `cmd/wisp` | 65 | `58/0` | cli→`test-windows` step7 | 三发都**给了结论**：run1 `112082660385`/step7 `FAIL (own line)`（`RUN=335 PASS=231 FAIL=6 SKIP=1`）；run2 `112085927937`/step7 `FAIL`（`335/229/8/1`）；run3 `112084901765`/step7 `FAIL`（`335/231/6/1`）。推前 `112053739011`/step7 亦 FAIL（`323/220/6/1`） |
+| 4 | `frontend` | 0 | `0/0` | NO-SCOPE | 无读数 |
+| 5 | `internal/agent` | 19 | `19/0` | core | run1 `112082660423`/step7 `ok`；run2 `112085927688`/step7 `ok`（该步整体 failure，但本枚 own-line 是 ok） |
+| 6 | `internal/agent/approval` | 19 | `8/11` | core | 同上两发 step7 `ok (own line)` |
+| 7 | `internal/agent/scheduler` | 0 | `0/0` | NO-SCOPE | 无读数（`doc.go` 型空壳，`portable-tests.sh:107-111` 具名它为何不能进 core） |
+| 8 | `internal/audio` | 5 | `5/0` | core | 两发 step7 `ok` |
+| 9 | `internal/ball` | 16 | `11/0` | core＋windows | core 两发 step7 `ok`；windows 两发 step9 `ok` |
+| 10 | `internal/buildinfo` | 1 | `1/0` | core | 两发 step7 `ok` |
+| 11 | `internal/config` | 18 | `16/1` | core＋windows | core 两发 step7 `ok`；windows 两发 step9 `ok` |
+| 12 | `internal/llm` | 10 | `2/8` | core | 两发 step7 `ok` |
+| 13 | `internal/llm/adaptertest` | 1 | `1/0` | core | 两发 step7 `ok` |
+| 14 | `internal/llm/anthropic` | 3 | `3/0` | core | 两发 step7 `ok` |
+| 15 | `internal/llm/golden` | 1 | `1/0` | core | 两发 step7 `ok` |
+| 16 | `internal/llm/openaichat` | 4 | `4/0` | core | 两发 step7 `ok` |
+| 17 | `internal/llm/openairesponses` | 2 | `2/0` | core | 两发 step7 `ok` |
+| 18 | `internal/memory` | 11 | `11/0` | core | run1 `112082660423`/step7 **`ok`**；run2 `112085927688`/step7 **`FAIL (own line)`**（`--- FAIL: TestConcurrentWritersReaders`，见 §6.6） |
+| 19 | `internal/models` | 17 | `16/0` | core | 两发 step7 `ok` |
+| 20 | `internal/observe` | 15 | `15/0` | core | 两发 step7 `ok` |
+| 21 | `internal/panel` | 20 | `20/0` | core | 两发 step7 **`FAIL (own line)`**（4 枚 C21/theme 契约用例，见 §5.3） |
+| 22 | `internal/perm` | 3 | `3/0` | core＋windows | core 两发 step7 `ok`；windows 两发 step9 `ok` |
+| 23 | `internal/plugin` | 1 | `1/0` | core＋windows | core 两发 step7 `ok`；windows 两发 step9 `ok` |
+| 24 | `internal/proc` | 11 | `11/0` | core＋windows | core 两发 step7 `ok`；windows 两发 step9 `ok` |
+| 25 | `internal/projctx` | 1 | `0/1` | core＋windows（**推送才在册**） | core 两发 step7 `ok (own line)`＋`ok …projctx 0.006s`；windows 两发 step9 `ok`。推前 `37396530365` **无此枚读数**（pre 的 own-line 名册 10 枚里没有 projctx/session，见 §5.4） |
+| 26 | `internal/risk` | 22 | `20/0` | core＋windows | core 两发 step7 `ok`；windows 两发 step9 **`FAIL (own line)`**（12 枚用例，推前也红，见 §5.5） |
+| 27 | `internal/secret` | 4 | `4/0` | core＋windows | core 两发 step7 `ok`；windows 两发 step9 `ok` |
+| 28 | `internal/session` | **2** | `2/0` | core＋windows（**推送才在册**） | core：run1 `112082660423`/step7 `ok (own line)`＋`ok …session 0.127s`；run2 `112085927688`/step7 `ok`＋`0.098s`。windows：`112082660385`/`112085927937` step9 均 `ok (own line)`。推前**零枚**（§5.4）⇒ 这是 AC#1 第④列今天第一次有值的那格（口径分歧见 §6.5） |
+| 29 | `internal/speech` | 0 | `0/0` | NO-SCOPE | 无读数 |
+| 30 | `internal/statemachine` | 2 | `2/0` | core | 两发 step7 `ok` |
+| 31 | `internal/streamkey` | 0 | `0/0` | NO-SCOPE | 无读数 |
+| 32 | `internal/tools` | 49 | `46/3` | core | 两发 step7 `ok` |
+| 33 | `internal/watchdog` | **0** | `0/0` | **NO-SCOPE**（`<-NO-TESTS`） | 无读数；跟踪件只有 `internal/watchdog/doc.go`（`git ls-files internal/watchdog` = 1 枚）。§3 的主角 |
+| 34 | `internal/winsec` | 27 | `12/8` | core＋winsec tier | winsec 独立步：三发 `test-windows` **step4 success**（`RUN=101 PASS=58 FAIL=0 SKIP=0`，own-line `ok`）；ubuntu 半边 core step7 `ok (own line)`＋`ok …winsec 0.025s` 级读数（run1/run2 都有） |
+| 35 | `tools/signmodels` | 0 | `0/0` | NO-SCOPE | 无读数 |
+
+**自证完整**：35 行＝census 步打印的 35 枚（尺：`gzip -dc job-112085927937.log.gz | grep -cE 'portable-tests.sh: +github'` = **35**；run1 与 run3 各测一遍亦 35，三发名册逐字节相同——
+尺原文 `diff /tmp/job-112082660385.census /tmp/job-112085927937.census` → 无输出）。
+②列的 `t/x` 与①列的差集（`cmd/wisp` 65→58、`internal/winsec` 27→12+8、`internal/risk` 22→20、`internal/config` 18→17、`internal/models` 17→16、`internal/agent/approval` 19→8+11、`internal/llm` 10→2+8、`internal/ball` 16→11 等）
+就是 build-tag 的账，本腿**没跑 `go list`**（零 go 命令），差集只由 §6.4 那把 `git grep HEAD` 尺定性。
+
+### 2.3 35 行之外、但有 CI 读数的两个 module（防"20/33"式漏计）
+
+| 包 | 在不在 35 行 | CI 步 | 今天读数 |
+|---|---|---|---|
+| `tools/d22scan`（`*_test.go` 2 枚） | **不在**（独立 `go.mod`） | `lint` step4 `D22 scanner positive control` | run1 `112082660317`／run2 `112085927883` 均 **success**，`runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77` |
+| `tools/mockllm`（`*_test.go` 3 枚） | 不在 | `lint` step13 `mockllm module vet`（`go vet ./...`） | 三发 **success**（但那是 vet，不是 test；**没有任何一步跑 mockllm 的测试**） |
+| `scripts/spike`（11 枚 `.go`） | 不在 | 无 | 无读数 |
+
+### 2.4 各步的四数（第④列的"这一步有没有真给结论"的分母）
+
+| run | job | 步 | 四数原文（`portable-tests.sh: four numbers …`） | 步结论 |
+|---|---|---|---|---|
+| `37405698188` | `112082660423` | test-core step7 | `=== RUN=1587 --- PASS=1071 --- FAIL=4 --- SKIP=1` | failure |
+| `37406757402` | `112085927688` | test-core step7 | `=== RUN=1587 --- PASS=1070 --- FAIL=5 --- SKIP=1` | failure |
+| `37406422380` | `112084901657` | test-core step7 | `=== RUN=1587 --- PASS=1071 --- FAIL=4 --- SKIP=1` | failure |
+| 推前 `37396530365` | `112053739109` | test-core step7 | `=== RUN=1518 --- PASS=1028 --- FAIL=4 --- SKIP=1` | failure |
+| `37405698188` | `112082660385` | test-windows step4 | `RUN=101 PASS=58 FAIL=0 SKIP=0` | success |
+| `37405698188` | `112082660385` | test-windows step7 | `RUN=335 PASS=231 FAIL=6 SKIP=1` | failure |
+| `37405698188` | `112082660385` | test-windows step8 | **census**（四数见 §2.1） | success |
+| `37405698188` | `112082660385` | test-windows step9 | `RUN=577 PASS=386 FAIL=12 SKIP=1` | failure |
+| `37406757402` | `112085927937` | test-windows step4/7/8/9/10 | `101/58/0/0` ／ `335/229/8/1` ／ census ／ `577/386/12/1` ／ junction `PASS=1 FAIL=0 SKIP=0` | success／failure／**success**／failure／success |
+| `37406422380` | `112084901765` | test-windows step4/7/8/9/10 | `101/58/0/0` ／ `335/231/6/1` ／ census ／ `577/386/12/1` | 同上形 |
+| 推前 `37396530365` | `112053739011` | test-windows step4/7/8/9 | `101/58/0/0` ／ `323/220/6/1` ／ `536/362/12/1` ／ junction success | **无 step8 census**（步号整体前移一格） |
+
+〔建议位——仍归编排者裁〕第④列今天**第一次能整列填上 CI 侧读数**：35 枚里 28 枚有真步级结论、
+7 枚 NO-SCOPE（`cmd/balldebug`／`frontend`／`internal/agent/scheduler`／`internal/speech`／`internal/streamkey`／`internal/watchdog`／`tools/signmodels`，全部 `0/0` ⇒ 零测试文件，不是"有测试没在册"）。
+⇒ "CI 只测 33 个包里的 20 个"这句**今天数字已翻**（28/35 有结论，且 census 的 `unclaimed-with-tests=0` 说明**再没有"带测试却零覆盖"那一形**）；
+但分母 33→35 属口径变更（§6.8），本腿不据此翻框。
 
 ---
 
