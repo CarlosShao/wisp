@@ -1,0 +1,7 @@
+probe(pool-validity/4c): 判完 25／26 ＋ §3 §4 §5 写满 —— 8 枚全部落档，无空节
+
+- 25 仍成立（切片级验收票，只答产物在不在）：testdata/evidence 计数 0、scripts/ 28 枚里场景/红队入口 0、docs/evidence/s3/ 3 枚按名全属票 19；红队清单七项产物按名在场（blacklist ClassA 13、junction 测试 10+6、tamper 两枚、TestFourChannelExfilSuite:169、伪造面板:89、batch 五枚、registry:141），但执行体那半（11 枚工具）零落点；AC#2 量不到（CI 读数）、AC#5 判不动（要 decision log 与 D34 表 diff）
+- 26 仍成立：IAudioRenderClient 全仓 0 行，采集侧对照 IAudioCaptureClient 7 命中；internal/audio 名册里 render/play/output/sink 计数 0；internal/speech 1 枚 doc.go；HalfDuplexGate 零外部消费者；ChTTS 断言在场但票面点名的"26-side gate test"0 命中；docs/ 下 p7 名册 0
+- §3 判得心虚 5 枚并具名：21（panelArgs 那条送参数的通路逼向差翻勾，本腿仍按 AC#2 字面取仍成立）／24（DEFERRED 码内 16 处 11 名 vs 表 13 行，是"没落"还是"两套名字"）／25（产物归属只按名不按内容）／26（R5 已改判云 TTS，票面按 sherpa 量出双落空）／16（演示记录未规定落点）
+- §4 六处：--count-matches 这把 git 不认（曾误读成 0，两把读数都留下）／中文词面零命中一律只作旁证／AC#5 判不动的缺读数是 log／对抗验收类判据普查腿不判／D34 枚数三套口径 3601-39-36，注册面实尺 10 枚／sherpa 词面 36 枚文件 vs 真 import 2 枚且只调 GetVersion
+- §5 自证＋票面零改动复量：8 枚已勾复量仍全 0；A19 的 SetLoaded 半边今天已有 3 处非测试调用者，读数照录不改档
