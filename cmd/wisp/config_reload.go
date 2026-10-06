@@ -397,7 +397,7 @@ func describeReloadFailure(err error) string {
 			// Ticket 231 AC#2: a file declaring a version ABOVE this build's is
 			// its own shape, and until this branch it had no sentence. It cannot
 			// fall through to the two branches below: the prefix branch books it as
-			// "内容被校验拒绝（值不合法或引用解不开）", which is false for it -
+			// "值不合法或引用解不开", which is false for it -
 			// loader.go:120 returns before decodeStrict and before validate, so the
 			// file was never validated at all - and the migration branch's wording
 			// ("不会迁移的 schema_version") describes a version BELOW this build,
