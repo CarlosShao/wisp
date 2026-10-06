@@ -163,8 +163,22 @@ completed  success  slo-fresh                                 slo-fresh dev  sch
 
 **自证完整**：35 行＝census 步打印的 35 枚（尺：`gzip -dc job-112085927937.log.gz | grep -cE 'portable-tests.sh: +github'` = **35**；run1 与 run3 各测一遍亦 35，三发名册逐字节相同——
 尺原文 `diff /tmp/job-112082660385.census /tmp/job-112085927937.census` → 无输出）。
-②列的 `t/x` 与①列的差集（`cmd/wisp` 65→58、`internal/winsec` 27→12+8、`internal/risk` 22→20、`internal/config` 18→17、`internal/models` 17→16、`internal/agent/approval` 19→8+11、`internal/llm` 10→2+8、`internal/ball` 16→11 等）
-就是 build-tag 的账，本腿**没跑 `go list`**（零 go 命令），差集只由 §6.4 那把 `git grep HEAD` 尺定性。
+**②列与①列的差集只有六枚**（尺原文＝`awk` 对 `/tmp/gocounts.txt` 与 census 的 `t+x` 求差，逐枚可对上账）：
+
+| 包 | ①跟踪 `_test.go` | ②windows 上编译进去 `t/x` | 差的账（HEAD 尺逐枚数出来的 tag） |
+|---|---|---|---|
+| `cmd/wisp` | 65 | `58/0` | 1 枚 `!windows` ＋ 6 枚 `windows && winlive`（CI 不设 `winlive`）⇒ 65−7=58 |
+| `internal/ball` | 16 | `11/0` | 5 枚 `windows && winlive` ⇒ 16−5=11 |
+| `internal/config` | 18 | `16/1` | 1 枚 `!windows` ⇒ 18−1=17（=16+1） |
+| `internal/models` | 17 | `16/0` | 1 枚 `!windows` ⇒ 16 |
+| `internal/risk` | 22 | `20/0` | 2 枚 `!windows` ⇒ 20 |
+| `internal/winsec` | 27 | `12/8` | 7 枚 `!windows` ⇒ 20（=12+8）；tag 串里"含 windows"的 24 枚有 7 枚其实是 `!windows`（子串陷阱，正是 AC#8 那枚病，本腿按首行整条 tag 数的） |
+
+其余 29 枚包 ①＝②（`internal/agent/approval 19↔8/11`、`internal/llm 10↔2/8` 是**内部拆 xtest**、总数不变，⛔ 不是 build-tag 缺口）。
+⇒ 票面 AC#9 关心的"`internal/winsec` 的 POSIX 半边"**在 windows census 上必然显示为 20/27**，
+那 7 枚 `!windows` 只能由 ubuntu 腿证明——本件 §5.6 给的就是那一步的读数。
+尺原文：`git ls-tree -r --name-only HEAD -- <pkg> | grep '_test.go$'` ＋逐枚 `git show HEAD:<file> | grep -m1 '^//go:build'`（**一律按 HEAD，不碰工作树**）。
+本腿**没跑 `go list`**（零 go 命令），所以②列只转述 census 自己打印的数，①列与②列的账靠上面这把 tag 尺闭合。
 
 ### 2.3 35 行之外、但有 CI 读数的两个 module（防"20/33"式漏计）
 
@@ -197,9 +211,71 @@ completed  success  slo-fresh                                 slo-fresh dev  sch
 
 ---
 
-## §3 GUARD D 与空分母（问 3）
+## §3 GUARD D 与空分母（问 3，AC#3 前提今判）
 
-<!-- 待填：session/watchdog 今日跟踪的 _test.go 枚数、在册与否、census success 的成因（步级证据 + portable-tests.sh 退出码路径） -->
+### 3.1 两枚主角今天的跟踪测试枚数（尺原文，全部按 HEAD／不碰工作树）
+
+```
+git ls-files 'internal/session/*_test.go'
+  internal/session/grants_test.go
+  internal/session/ticket224_pattern_dialect_test.go            ⇒ 2 枚
+git ls-files 'internal/watchdog/*_test.go'   ⇒ 空（0 枚）
+git ls-files 'internal/watchdog/'            ⇒ internal/watchdog/doc.go，仅此 1 枚
+```
+票面 `:27-28`（AC#3）的前提今天**两半不同**：
+- `session` 的"在清单里却一个测试文件都没有"这一支**已翻**（2 枚）；
+  且**推前那一发也已翻**——`git ls-tree -r --name-only c6cf66e6 -- internal/session | grep -c '_test.go'` = **2**
+  ⇒ 测试文件不是推送才出现的，推送带来的是**在册**（见 3.2）。
+- `watchdog` 那一支**今天仍成立**：0 枚、只有 `doc.go`；且它**不在任何名册里**（下条），
+  所以它现在属"零测试＋不在册"＝GUARD A 管不到、GUARD D 也不算洞（`0/0` 走 `case 0/0) ;;` 那一支）。
+
+### 3.2 在不在 scope 名册／GUARD D 的名册里（HEAD 尺，行号现量）
+
+| 包 | `core_pin` | `win_pin` | `scope(core)` | `scope(windows)` | GUARD D 眼里的形状 |
+|---|---|---|---|---|---|
+| `internal/session` | **在**，`:188` | **在**，`:203` | **在**，`:244` | **在**，`:252` | 已在册 ⇒ 不进 `unclaimed` 计数 |
+| `internal/watchdog` | 不在 | 不在 | 不在 | 不在 | **NO-SCOPE ＋ `0/0`** ⇒ census 打 ` NO-SCOPE <-NO-TESTS`，计入 `claimed-by-no-scope=7` 但**不计** `unclaimed-with-tests` |
+
+推前同尺对照（`git show c6cf66e6:scripts/portable-tests.sh`）：`grep -c "GUARD D"` = **0**、
+`grep -c "guardd\|UNCLAIMED"` = **0**、`git show c6cf66e6:.github/workflows/ci.yml | grep -c "scope=census"` = **0**
+⇒ **GUARD D 这支守卫与它的调用步在推前那个 head 上根本不存在**（`tiers=`/`census)` 分支当时已有，但没有 GUARD D 的判红）。
+`internal/session` 在 `c6cf66e6` 的 `core_pin`/`win_pin` 里也**查无**（`git show c6cf66e6:scripts/portable-tests.sh | grep -n "wisp/internal/session\|wisp/internal/projctx"` = 无输出）
+⇒ "测试文件早就有、名册里一直没有"这件事，是**这次推送才补上的**，且和日志读数对得上（§5.4）。
+
+### 3.3 "有测试却没在册"这一形，census 步在 CI 上**响没响**
+
+尺原文（三发 census 步各测一遍）：
+```
+for j in job-112082660385 job-112085927937 run3-job-112084901765; do
+  gzip -dc $j.log.gz | grep -c 'UNCLAIMED-HAS-TESTS'   # 三发都 = 0
+  gzip -dc $j.log.gz | grep -c 'GUARD D -'             # 三发都 = 0
+  gzip -dc $j.log.gz | grep -c '<-NO-TESTS'            # 三发都 = 7
+  gzip -dc $j.log.gz | grep -cE 'portable-tests.sh: +github'   # 三发都 = 35
+done
+```
+⇒ **三发都没响**（`unclaimed-with-tests=0`，GUARD D 的判红句一次都没打印）。
+
+**success 的成因判定：是"真没漏"，不是"这一支不产红"。** 三条步级证据（⛔ 全部靠日志与行号，不靠注释）：
+1. **七个 NO-SCOPE 行逐枚都带 `0/0`**：`cmd/balldebug 0/0`／`frontend 0/0`／`internal/agent/scheduler 0/0`／
+   `internal/speech 0/0`／`internal/streamkey 0/0`／`internal/watchdog 0/0`／`tools/signmodels 0/0`，
+   且行尾统一挂 `<-NO-TESTS`。这正对应 `portable-tests.sh:392-393` 的 `case $counts in` / `0/0) ;;` ⇒
+   这七枚**根本不该**进 `guardd` 计数。35 枚里其余 28 枚的 `t/x` 至少一边非零，而它们**全部**有 tier 认领（`where` 非空 ⇒ 走不到 `:382` 那个 `[ -z "$where" ]`）。
+2. **退出码路径逐行号可追**：`:360 guardd=0` → `:396 guardd=$((guardd + 1))`（唯一的自增处，在无认领＋非 `0/0` 那一支里）
+   → `:406` 打印 totals（今天打出的是 `unclaimed-with-tests=0`）→ `:407 if [ "$guardd" -ne 0 ]` → `:422 exit 1`／`:424 exit 0`。
+   今天的 totals 就是 `0` ⇒ 走 `:424`。**这条 `exit 1` 是真在的**，同一步里还有另外三处 `exit 1`（`:305` 读不到自身字节、`:324` tiers 与分支不等集、`:350` `go list` 非零），今天也都没走。
+3. **default-deny 的反面没有漏**：`:392-399` 那支把"计数读不出来"（`?/?` 或空）也算洞。三发 35 行里**没有一行是 `?/?`**（逐枚都是 `数字/数字`）
+   ⇒ 今天不是"读不出所以没计"，是"读得出且确实为 `0/0`"。
+
+**但必须摆的另一半（这才是"响亮"与"能红"的差别）**：CI 上**至今没有任何一发**给过 GUARD D 真的红一次的读数，
+而票面 AC#3 逐字要的第二半"并人为抽掉一个包证明它会红"的载体 `scripts/portable-tests-selftest.sh`
+在 `.github/workflows/ci.yml` 里被引用 **0 次**（`grep -c portable-tests-selftest .github/workflows/ci.yml` = 0；`slo-fresh.yml` 亦 0）。
+⇒ **本腿给的结论是**："success＝真没漏"这一条有步级证据（上面 1/2/3）；
+"这一支能不能产红"这一条**今天仍无 CI 证据**，属 §6.3，⛔ 不许拿"逻辑上行号在那儿"当"CI 上验过"。
+`watchdog` 的"响亮"今天也只是**打印**（` NO-SCOPE <-NO-TESTS` 那一行，与有覆盖行同音量），
+不是 AC#3 那句"直接失败"——因为它压根不在 scope 里，GUARD A（`:570-583`，`exit 1`）碰不到它。
+GUARD A 今天同样没响，且不是只测一发：**八枚作业全量日志**（四发 × core/windows 两条腿：
+`pre-112053739109`／`pre-112053739011`／`job-112082660423`／`job-112085927688`／`job-112082660385`／`job-112085927937`／
+`run3-job-112084901657`／`run3-job-112084901765`）里 `grep -c 'GUARD A -'` **逐枚 = 0**，`grep -c 'GUARD C -'` 亦逐枚 = 0。
 
 ---
 
@@ -283,9 +359,123 @@ completed  success  slo-fresh                                 slo-fresh dev  sch
 
 ---
 
-## §5 红名作差（问 5）
+## §5 红名作差（问 5，推前推后同口径）
 
-<!-- 待填：test-core step7 / lint step8+step12 staticcheck / test-windows step7+step9 红句逐名，与 37396530365 同口径作差 -->
+同口径做法：四发都用 `gh run view --job <id> --log`（**全量日志，⛔ 不用 `--log-failed`**）＋同一把尺
+`grep -oE "\-\-\- FAIL: [A-Za-z0-9_]+" | sort -u`；
+推前那发 `37396530365`（head `c6cf66e6`）与推送后三发（`ec84cff1`／`b948bcb8`／`cc315261`）。
+⚠ 推前那发的四枚 job 日志第二列同样全是 `UNKNOWN STEP`（§6.7 同病）⇒ 推前的**步号归属**由 `ci.yml` 当时的步序＋包名归属推，
+步级 conclusion 则来自 `gh run view --json jobs`（API，与日志无关，可靠）。
+
+### 5.1 `test-core` step7（Portable package tests，ubuntu 腿）
+
+| run | job | 步 | 四数 | 红名（逐字） |
+|---|---|---|---|---|
+| 推前 `37396530365` | `112053739109` | step7 failure | `RUN=1518 PASS=1028 FAIL=4 SKIP=1` | `TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`（own-line FAIL 只有 1 枚＝`internal/panel`） |
+| `37405698188` | `112082660423` | step7 failure | `RUN=1587 PASS=1071 FAIL=4 SKIP=1` | **同上 4 枚，逐名相同**（own-line FAIL＝`internal/panel` 1 枚） |
+| `37406757402` | `112085927688` | step7 failure | `RUN=1587 PASS=1070 FAIL=5 SKIP=1` | 上面 4 枚 **＋** `TestConcurrentWritersReaders`（own-line FAIL＝`internal/memory`＋`internal/panel` 2 枚） |
+| `37406422380`（参照） | `112084901657` | step7 failure | `RUN=1587 PASS=1071 FAIL=4 SKIP=1` | 回到 4 枚（`TestConcurrentWritersReaders` 这发 **PASS**） |
+
+**作差结论**：那 4 枚 `internal/panel` 的 C21/theme 契约用例**推前就红**，一字未变；
+今天**唯一新增的红名＝`TestConcurrentWritersReaders`**，且只在 `37406757402` 出现（三发 Go 源码逐字节相同，见 §6.6 ⇒ 写"同码不同果"，不写归因）。
+`RUN=1518 → 1587`（＋69）与 `PASS=1028 → 1071`（＋43）＝推送把 `internal/session`＋`internal/projctx` 两枚包的测试**第一次带进 ubuntu 腿**的账（5.4）。
+今天那**一枚 SKIP** 的名字：`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`
+（尺：`grep -oE "\-\-\- SKIP: [A-Za-z0-9_]+" | sort | uniq -c` ⇒ **推前与三发推送后的 core 日志都恰好是 2 行同名**，逐发相同；
+原因句逐字 `task_output_pointer_notice_test.go:428: 前置条件缺失：造不出真 NTFS junction（mklink /J /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3…/001/…）`，
+文件在 `internal/tools/task_output_pointer_notice_test.go`，`git ls-files` 尺确认）。
+⇒ 票面 `:86-89`（AC#10）当年点名的 `TestWorkspaceSwitchRefusesAJunctionToOutside` **今天不在 SKIP 里、在 `-skip` 正则里**（读数见 §6 末条），
+但今天这枚 SKIP **在 `runtests.sh` 打印的 `[fixture]/[reexec]/[opt-in]` 名册里查无**（ledger-hits=0，阳性对照=4/1/1，尺原文见 §6）。
+
+**一条必须补进来的硬发现（与 AC#10 的"响亮"同族；⛔ 但它不是今天才有的，见末段）：**
+```
+$ gzip -dc job-112085927688.log.gz | grep "unaccounted SKIP"
+test-core  Portable package tests (core scope; …)  portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:
+test-core  Portable package tests (core scope; …)      task_output_pointer_notice_test.go:428: 前置条件缺失：造不出真 NTFS junction（mklink /J …）
+test-core  Portable package tests (core scope; …)  --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.00s)
+test-core  Portable package tests (core scope; …)  portable-tests.sh: strict runner exited 1 for the core scope
+```
+同一枚 core 步里 `=== RUN TestCanonicalize…` 只 **1 次**、`--- SKIP:` 却 **2 行**（`grep -c` 现量），
+第 2 行紧跟在 `unaccounted SKIP lines` 那句之后 ⇒ 那第 2 行是**守卫自己的复述**，不是重复执行；
+顶层四数里的 `SKIP=1` 因此**没有**被记成 ok（AC#10 括号里那句"步不再把 SKIP 记成 ok"这一形，日志里看得见）。
+
+**但这道守卫不是推送带来的新行为，本腿不许把它写成"今天第一次响"**（尺原文＝逐枚日志 `grep -c 'unaccounted SKIP'`）：
+```
+pre-112053739109（推前 core） = 1     job-112082660423（run1 core） = 1
+job-112085927688（run2 core） = 1     run3-job-112084901657（run3 core） = 1
+pre-112053739011（推前 windows） = 2  job-112085927937（run2 windows） = 2
+```
+⇒ **推前推后一样在响**（每枚"有未记账 skip 的步"打印一次，windows 腿两枚步各一次）。
+所以 AC#10 那句"**不在任何台账里**"指的应是名册（`[fixture]/[reexec]/[opt-in]` 名册里查无，ledger-hits=0 已量），
+⛔ 不是"日志里静悄悄"。这一格今天到底是"守卫已在做它该做的（⇒ 与票 93 同族那半已成立）"
+还是"仍缺一枚把未记账 skip 写进名册的落地（⇒ 票面第二半没做）"——**归编排者裁，本腿不翻框**，
+只登记：三枚未记账 skip 的名字与所在步已在 §5.5／§6 末条列全。
+
+### 5.2 `lint` step8 `gofmt (gofumpt)`
+
+三发推送后 ＋ 推前那一发，**红句逐字节同一枚**（尺：`awk -F'\t' '$2 ~ /^gofmt \(gofumpt\)$/'` ＋ `grep -o '##\[error\]…'`）：
+```
+##[error].scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1: imports must appear before other declarations
+##[error]Process completed with exit code 2.
+```
+⇒ **推前就红**（推前 `112053738745` 同一枚红句，`grep -oE "##\[error\]\.scratch[^ ]*"` 命中）。
+红的是**一枚台账探针用的坏文件**（`.scratch/wisp/probes/185/c1/mut/`），不是产码；
+它的直接后果就是 §4 那三枚 skipped（step9/10/11）。⚠ 本腿**没有**判"该不该把这枚 mut 文件排出口径"的权限——那是口径变更，交编排者。
+
+### 5.3 `lint` step12 `staticcheck`（带 `if: ${{ !cancelled() }}`，`ci.yml:263`）
+
+| run | job | findings / 名数（按 `file:line:col` 去重） | 步结论 |
+|---|---|---|---|
+| 推前 `37396530365` | `112053738745` | `modules=3 packages=36 findings=53`；unique 名行 **54**（含 §5.2 那枚 fs_broken，同日志混排） | failure |
+| `37405698188` | `112082660317` | `modules=3 packages=36 findings=52`；unique 名行 **53** | failure |
+| `37406757402` | `112085927883` | 同上 `findings=52`；`--- module .: exit=1 packages=34 findings=48`／`tools/d22scan: exit=1 packages=1 findings=3`／`tools/mockllm: exit=1 packages=1 findings=1` | failure |
+
+**作差**（尺：先 `sed -E 's/:[0-9]+:[0-9]+:/:POS:/'` 把行号列号归一，再 `diff`，最后再按原名 `comm` 双向）：
+- **今天消失的只有 1 枚**：`internal/agent/approval/queue.go:546:17: func (*Queue).pendingCount is unused (U1000)`（推前有、三发推送后全无）。
+- **纯位移、不是新账的 2 枚**：`internal/agent/approval/ticket242_binding_test.go` 的 `sameDigest`（`:111`→`:118`）
+  与 `internal/panel/git_test.go` 的 `composerMethodWhitelist`（`:448`→`:450`）——归一化 diff 里**不出现**，
+  ⇒ ⛔ 别把行号漂移当新增红。
+- 其余 **51 枚逐名逐位相同**（`cmd/wisp` 11 枚、`internal/audio` 4 枚、`internal/llm/*` 若干、`frontend/embed.go:4:1 SA9009`、
+  `tools/mockllm/chat.go:219:6`、`tools/d22scan/gitignore.go:13:1` 等）⇒ **推前就红，今天照红**。
+- 两发推送后之间：**名册逐字节相同**（`diff /tmp/job-112082660317.names /tmp/job-112085927883.names` → `IDENTICAL`）。
+
+### 5.4 推送第一次带进 CI 的两枚包（"推前没有读数"的那一格）
+
+推前 `37396530365` 的 own-line 名册尺原文（`awk '/own line/ {print $NF}' | sort -u`）：
+- core 腿 **25 枚**，里面**没有** `internal/session`、**没有** `internal/projctx`（当时 `core_pin` 里也查无，§3.2）。
+- windows 腿 **10 枚**，同样没有这两枚。
+今天：core 腿 **27 枚**（多出这两枚），windows 腿 step9 **10 枚**里含 `internal/session`＋`internal/projctx`，
+ubuntu 上各打 `ok (own line)` ＋ 顶层 `ok …session 0.127s/0.098s`、`ok …projctx 0.006s`（`37405698188`／`37406757402` 两发都有）。
+⇒ 这两枚的第④列**今天第一次有 CI 侧读数**；同一步整体 failure 的折扣见 §6.5。
+
+### 5.5 `test-windows` step7（CLI）与 step9（Portable windows tests）
+
+step9 `internal/risk` 的 **12 枚红名推前就红、今天逐名相同**
+（尺：`grep -oE "\-\-\- FAIL: [A-Za-z0-9_]+" | sort -u`，把推前 18 枚红名与今天 step9 的 12 枚逐一 `grep -qx` ⇒ **ALL 12 PRESENT PRE-PUSH**；
+四发的该步四数 `RUN=536/577 PASS=362/386 FAIL=12 SKIP=1`，`FAIL=12` 推前推后一样）。
+step7 `cmd/wisp`：推前 6 枚、`37405698188` 6 枚（**逐名相同**）、`37406757402` **8 枚**、`37406422380` 回到 6 枚。
+今天**只在 `37406757402` 冒出来的 2 枚**＝`TestTicket223HandEditedFsLooseningCostsAnL2Card`、`TestAC14GoSideEvalPushReachesThePage`；
+两枚在推前 `37396530365`、`37405698188`、`37406422380` **都是 `--- PASS`**（八枚日志逐名跟踪表见本节末）⇒ 与 `TestConcurrentWritersReaders` 同形，**同码不同果**（§6.6），不是"接入第一天就红"那种发现（AC#2 `:26`）。
+`SKIP=1` 那枚今天叫 `TestSyncRedTeamRealOneDrive`（step9）与 `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`（step7），两枚在 `[fixture]` 名册里同样查无（§6 末条）。
+
+### 5.6 顺手量到、与 AC#7 / AC#9 直接相关的两枚读数（⛔ 不翻框）
+
+- **AC#7（`:75-76`）**：`TestSyncRegistryProbeLive` 在两发 windows 腿上**一次都没被 `-run` 跑过**
+  （尺：`grep -c -- "-run TestSyncRegistryProbeLive"` ⇒ `37405698188`/`112082660385` = **0**、`37406757402`/`112085927937` = **0**；
+  它出现的 9 行全部落在 `…Pipeline|TestSyncRegistryProbeLive)$` 那串 **`-skip` 正则**里＋`[fixture]` 名册行，
+  ⇒ 正是 AC#8（`:77-78`）点的那枚"词出现在日志里 ≠ 被测包跑过"）。
+  推前 `37396530365`/`112053739011` 亦 0；ubuntu 腿三发全 0（该用例在 ubuntu 由平台出 scope）。
+  ⇒ **"至今 0 次"这一条今天仍成立**，本腿只登记，不裁。
+- **AC#9（`:81-85`）**：ubuntu 腿今天**真跑了** `internal/winsec` 的 `!windows` 半边，四发都有顶层 own 结果行：
+  推前 `112053739109`/step7 `ok github.com/CarlosShao/wisp/internal/winsec 0.025s`；
+  `112082660423`/step7 `0.011s`；`112085927688`/step7 `0.017s`；`112084901657`/step7 `0.012s`；
+  再各自带 `ok (own line) github.com/CarlosShao/wisp/internal/winsec`（GUARD B 的锚定行）。
+  ⚠ 票面 `:82` 说"全日志里 `internal/winsec` 出现 **0 次**"——那句的来源是旧 run `35599458439`；
+  **在今天这四发里该句字面不成立**（尺：`grep -c "internal/winsec"` 全 >0），本腿只把新读数摆出来，AC#9 翻不翻归编排者。
+
+〔建议位〕§5 的净结论只有一条是硬的：**四枚常红里 `test-core step7`（panel 那 4 枚）、`lint step8`、`lint step12 staticcheck`（51 枚原样＋1 枚消失）、
+`test-windows step9`（risk 12 枚）全部推前就红；今天新增的红名一共只有 3 枚，
+且三枚都在另外两发 PASS（同码不同果）**。⇒ 没有一枚是"接入新包把门撑红"的形状；
+`session`／`projctx` 带进来的是 **＋69 RUN／＋43 PASS 的绿读数**，不是红。AC#2 `:26` 那句"接入第一天就红 ⇒ 那是发现"今天**没有对应实例**。
 
 ---
 
