@@ -1,0 +1,43 @@
+probe(111/r5b): 续件收口 —— ★那一步已在 1309757b 里落地（本腿对 ci.yml 净改动 0 行），改核为实＋门禁四把补齐
+
+腿号 111-r5b，续接服务故障死掉的 111-r5（同一 r5/ 目录，未新建 r5b/；r5 已写的 §0 一行未改）。
+
+★起手先量到的一件比"怎么改"更要紧的事：派单那句"ci.yml 此刻干净 ⇒ 前一枚腿没来得及改 CI"不成立。
+1309757b 标题写"骨架"，但它的 numstat 是 `55  0  .github/workflows/ci.yml` —— 那枚腿把 CI 那一步
+连同骨架一起提交了，删除列 0。本腿三个方向核过：工作树与 HEAD 逐字节同 / 1309757b..HEAD 无人再动
+ci.yml / `grep -c portable-tests-selftest` 改前 0（1309757b^）、改后 5。那一步在 lint 作业
+（:65 作业、:66 ubuntu-latest）：- name: :304、if: ${{ !cancelled() }} :356（抄 :263 staticcheck
+那枚写法，不是 always()、没有 continue-on-error）、run: bash scripts/portable-tests-selftest.sh :357。
+⇒ 本腿不加第二枚（同作业跑同一载体的两枚步会把步数尺 11 推到 12），射程收在"独立复核实＋补门禁读数"。
+
+核过的形状（全部现量，判据一字未动）：
+- 步数尺：awk 数 lint 作业 `- name:` —— 改前 10 枚 / 改后 11 枚，差 1 枚正是那一步；同名步 grep -c=1。
+  yaml safe_load 通过；新步键集合恰 ['if','name','run']；continue-on-error 不存在；无作业级 if: 挡住它。
+- ★"不跑 go"换了能问对问题的尺：派单给的词面 grep 实读 9 行命中（:371/:381 是断言字符串不是注释，
+  ⛔ 没把它修成 0）；于是把一枚自报家门的假 go 塞 PATH 最前、跑与 CI 逐字同的命令 ⇒
+  rc=0／32 case／0 失败／hits.txt 从未被创建 ＝ 真 go 一次都没被 exec。机制：载体 9 处
+  PATH="$work/bin:$PATH" 无漏网、假 go 兜底 exit 99 且无 exec／无回落、--scope=census 在
+  portable-tests.sh:424 就 exit，走不到 :694 那枚真 go test。耗时本地 ≈2 分 38 秒（非 CI 读数）。
+- bash 而不用 sh 复量属实：dash -n 载体 rc=2 报在 :246（portable-tests.sh／winsec-tests.sh 同 rc=2，
+  唯 runtests.sh rc=0）；本机 /bin/sh 恰是 bash 5.2.37 所以本地 sh 也绿，ubuntu 上写 sh 会死在语法。
+- 门禁：sh scripts/portable-tests-selftest.sh 四发（含 r5 基线）全 rc=0、:224 逐字
+  `32 case(s) ran, 0 assertion(s) failed`；sh scripts/d22scan.sh 工作树与 git archive HEAD 纯净快照
+  双发 rc=0、各 scope 两发逐字不降（唯一差集 ban #8 design/ 39 树／30 快照＝未跟踪件方向，与本腿无关，
+  ⛔ 未读 design/** 内容面只记计数）；bash -n 三枚脚本 rc=0。
+
+⛔ 不宣称 AC#3 完成：交付物＝载体在 CI 上可跑＋本地两向读数；票面那句"CI 里一步真跑该 selftest 并让
+它为这枚正控红/绿各一次"仍未收，AC#5／AC#8 同判（变的是"不在 CI"那半）。取数归编排者，日志编号应为
+step 14（YAML 13 ＋ Set up job；换算律由票面 AC#2 翻 那条 step8 gofmt／step12 staticcheck 钉住）。
+
+具名交回而不修三件：① 1309757b 名实不符（标题"骨架"／内容含落地步，⛔ 不改写已入库历史）；
+② portable-tests.sh:694 用 sh 起 runtests.sh 那处形状耦合（今天唯一 dash-clean 恰是它，一旦有人把
+它写成 bash-only，这一步会以语法错红而不是以它想报的 finding 红，修它要动 scripts/**＝越界）；
+③"注释写在门的正文里"那条地界的真出处是票 236 :96，不是本票 :306（本票 :305-306 是另一枚内容，
+恰与本腿改前步数 10 对上，已当佐证用）。
+另自报一处本腿造成的漂移：在票面 :307 追加 Progress log 一行 ⇒ 其下编排者那节行号各 +1
+（AC#2 翻 那条 :313→:314），件内引用已改成"文字为准、行号作辅读"并两边行号都留下。
+
+地界：写面只有本件＋票面追加那一行（追加前后 - [ ]＝4／- [x]＝6 不变，:306 之后无任何框被挪动，
+框一枚未勾）；ci.yml／scripts／docs／cmd／internal（含 236-r2 在飞的 internal/tools/**，全程未读
+其工作树内容面）一字不碰；frontend/**／design/** 零读零转述；未读 probes/236/**；零 go 命令；
+未加 -tags winlive；只 commit 不 push。
