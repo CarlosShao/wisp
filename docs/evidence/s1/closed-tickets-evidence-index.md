@@ -44,6 +44,7 @@
 | 15 | `wc -l -c` 本腿台件关键三枚 | `ticket-abc-4.tsv`＝93 行；`file-identity-4.txt`＝146 行；`pairs-own.txt`＝146 行 | — |
 | 16 | **独立收敛复认**：把死腿 `2/final-table.tsv`（92 行，`evidence-close-2` 自己那套尺的成品表）与本腿 `ticket-abc-4.tsv` 按票号 join 比档 | **92 枚公共票逐票零差**（`join`＋`$2!=$3` 过滤后无输出）；`2/final-table.tsv` 自带档数＝**A 74／B 2／C 16**（少的那一枚仍是 268，它当时不在分母）。⇒ 两枚腿各写各的脚本、各取各的名册，**同一份账**＝本件最强的复认 | 本件 §1.2／§3.3-3 |
 | 17 | 旁证层复认：`2/circumstantial.txt`（18 行，死腿 2 自己那一层"跨名引用"账） | 本腿 §3.3-3 那 5 个形状的**逐票 REFS 清单在死腿 2 原件里独立在册**（`115 REFS=…111-ci-step-readings.md…`、`267 REFS=…265-267-evidence-index.md`＋`PROBES=39`、`250/251/254/263 PROBES=29/19/33/198`、`265 REFS=…ci-step-readings-2026-09-22.md`＋`PROBES=33`）⇒ 本腿不是新下判断，是把死腿已量到、但没进交付件的旁证层**接上来** | 同上 |
+| 18 | 免责句层独立决定数复算（可复跑尺 `reruler-disclaim-layer.sh`）：对 146 枚名册逐枚 `head -8 \| grep -E "$DISCLAIM"`，再逐枚把命中件回灌标题层（VERD3／IMPL3） | 前 8 行含免责句＝**6 枚**（`119-ac7-impl`〔`实现侧交件`〕／`137-ac4-impl`〔VERD3 不中〕／`141-ac34-positive-controls-r1`〔`正向对照`〕／`146-liveapprovals-fix-r1`〔`修复程`〕／`146-liveapprovals-r1`〔`实现程自证`〕／`265-267-evidence-index`〔`凭据索引`〕）；逐枚回灌后**全部已在标题层落 OTHER** ⇒「VERD3 中 ∧ IMPL3 不中 ∧ 免责句中」的**独立决定枚数＝0** ⇒ 具名写进 §1.2b，作为对本腿自己选尺理由的一条**诚实修正** | `disclaim-layer-audit.txt`（6 行，逐行标"免责句层无活可接"）＋`reruler-disclaim-layer.sh` |
 
 ---
 
@@ -64,14 +65,27 @@
 **件级改类数**（同一枚文件在两把尺下类别不同）＝**v1↔v3＝12 枚／v2↔v3＝23 枚／v1↔v2＝29 枚**；名册层 VERDICT 总数 **v1=83／v2=82／v3=85**（同一份 146 对名册，⛔ 分母相同、只差判词）。
 
 - **`v1` ↔ `v3`＝12 枚**（逐枚具名＋方向）：
-  - v1 漏、v3 收（7 枚）＝`119-ac1-ac2-r2-acceptance.md`、`137-ac1-r1-acceptance.md`、`137-ac2-ac5-r1-acceptance.md`、`137-ac3-r2-acceptance.md`、`153-ac2-a-closure-r1.md`、`157-record-level-cleanup-r1-accept-r1.md`、`162-fs-edit-accept-r2.md` ⇒ 根因＝**v1 的 VERD1 词表不含 `acceptor`／`验收方`／`裁决`**，这几枚标题写的是「119 — AC#1／AC#2 第二轮回判（`acceptor-ticket119-ac1-ac2-r2`，非实现者）」「137 AC#1 —— **验收方**第二程」这类形状。
-  - v1 收、v3 踢（5 枚）＝`131-reaccept-ac4.md`、`142-non-quiescent-index-guard-r1.md`、`146-liveapprovals-r1-accept-r2.md`、`153-trace-lies-unguarded-r1-accept-r1.md`、`67-ac3-ascii-verdict.md` ⇒ 根因两条：**v1 无免责句层**（`131-reaccept`／`146-…-r2` 前 8 行有免责句）＋**v1 的 VERD1 含裸词 `verdict`／`reaccept`**，于是 `67-ac3-ascii-verdict.md`（`:1`「…`wisp providers` **verdict** 列改 ASCII `PASS`/`FAIL`」＝一枚讲工具输出的实现侧件）与 `142-non-quiescent-index-guard-r1.md`（`:1` 逐字「# 142-r1 — 两读不原子的守卫（**实现方自证**；裁决表须出自非实现者）」）都被 v1 误收。
+  - v1 漏、v3 收（7 枚）＝`119-ac1-ac2-r2-acceptance.md`、`137-ac1-r1-acceptance.md`、`137-ac2-ac5-r1-acceptance.md`、`137-ac3-r2-acceptance.md`、`153-ac2-a-closure-r1.md`、`157-record-level-cleanup-r1-accept-r1.md`、`162-fs-edit-accept-r2.md` ⇒ 本腿把 VERD1 逐词套到标题行现算，根因＝**v1 的 VERD1 词表缺 `回判`／`验收方`／`非实现者` 三个词**（v3 齐）：`119-…` 命中的是 `回判`、137 那三枚命中的是 `验收方`（`:1`「# 137 AC#1 —— **验收方**第二程…」，标题里没有英文 `acceptance`，那只在文件名里）、153／157／162 那三枚命中的是 `非实现者` ⇒ v1 一律落"标题无终裁词"默认出口。
+  - v1 收、v3 踢（5 枚）＝`131-reaccept-ac4.md`、`142-non-quiescent-index-guard-r1.md`、`146-liveapprovals-r1-accept-r2.md`、`153-trace-lies-unguarded-r1-accept-r1.md`、`67-ac3-ascii-verdict.md` ⇒ 本腿逐枚把两把尺的词表套到标题行上现算，根因**两条都在标题层**：**① v1 的 IMPL1 词表窄**——`142`（`:1` 逐字「…（**实现方自证**；裁决表须出自非实现者）」，IMPL1 只有 `实现者自证`、**抓不到 `实现方`**）、`146-…-r2`（`:1`「…**修复程**补上的那两味尺子：裁决表」，IMPL1 无 `修复程`）、`153-…-r1-accept-r1`（`:1` 尾含 `只读取证`，IMPL1 无此词）三枚因此被 v1 放行；v3 的 IMPL3 三词齐备 ⇒ 踢掉。**② v1 的 VERD1 含两个 v3 已删掉的裸词**——`复验`（→ `131-reaccept-ac4.md` 命中）与 `verdict`（→ `67-ac3-ascii-verdict.md` 命中，而它 `:1` 其实是"把 `wisp providers` 的 verdict 列改成 ASCII `PASS`/`FAIL`"＝一枚讲工具输出的实现侧件）⇒ v1 因词表多收、v3 因词表精而不收。
+    ⚠ **本腿更正死腿 `3/rerun-rulers93.sh` 注释里的一处口径宣称**：这 12 枚的改类**没有一枚是"前 8 行免责句"层造成的**（见下 §1.2b）。
 - **`v2` ↔ `v3`＝23 枚**（逐枚具名＋方向；**13 枚被 v2 踢掉／10 枚被 v2 误收**）：
   - **v2 踢、v3 收（13 枚）**＝`11-adversarial-acceptance.md`、`63-adversarial-acceptance.md`、`80-ac1-ac2-verdict.md`、`84-ac1-bounded-wait.md`、`146-liveapprovals-r1-accept-r1.md`、`152-subject-death-never-measured-r1-accept-r1.md`、`153-ac2-a-closure-r1.md`、`154-close-gate-never-rings-r1-accept-r1.md`、`161-gates-accept-r2.md`、`162-fs-edit-accept-r1.md`、`162-risk-tier-accept-v3.md`、`198-firstrun-config-v1.md`、`212-comments-phantom-citation-v2.md`。
   - **v2 收、v3 踢（10 枚）**＝`131-followup-1-three-shapes.md`、`131-reaccept-ac4.md`、`134-ac6-contended-no-conclusion.md`、`137-ac4-impl.md`、`141-ac2-stock-inventory-r1.md`、`142-non-quiescent-index-guard-r1.md`、`143-panel-assets-r4-leg-r1.md`、`151-task-scope-never-closed-r1.md`、`152-subject-death-never-measured-r1.md`、`154-host-id-never-closed-r1.md`。
   - **根因两族，本腿逐枚复跑两套词表坐实**：**①族＝v2 的 VERD2 词表不含裸词 `acceptance`／`verdict`**（3 枚：`11-…md`＝`:1` 全英文「# Ticket 11 — adversarial acceptance」、`63-…md` 同形、`80-ac1-ac2-verdict.md`＝标题有"裁决"二字但前 20 行两族命中**都是空**，本腿现量 `IMPL2hit=[]`＋`VERD2hit=[]`）⇒ 直接落 OTHER（"两个都不中"＝OTHER 的默认出口）。
     **②族＝v2 把前 20 行里"描述被验对象"的实现侧词当成件自己的自称**（10 枚：`84`〔命中 `写码代理`〕、`146-…-r1`〔`普查`+`证据件`〕、`152-…-accept-r1`〔`只读取证`〕、`153-ac2-a-closure-r1`／`154-…-accept-r1`／`162-risk-tier-accept-v3`／`198-v1`／`212-v2`〔各命中 `证据件` 1 词〕、`161-gates-accept-r2`〔`普查`〕、`162-fs-edit-accept-r1`〔`写码位`+`证据件`〕）——这几枚的标题逐字都写着「**对抗验收**…**裁决表**」／「**非实现者**验收程」／「**非实现者**腿」，VERD2 其实**全中**（本腿现量逐枚列出，见台件），却被"前 20 行否决"这道**先判**吃掉 ⇒ **一票否决踢掉 10 枚真表**。v3 的否决面只有第 1 行标题，正好避开这两族误伤（这也是 v3 名册 VERDICT 85 ＞ v2 的 82 的全部来源）。
 - **`v1` ↔ `v2`＝29 枚**＝两把尺各朝相反方向漂（v1 的漏收＋v2 的过否决叠加），互校时漂得最多 ⇒ 说明"v1 与 v2 不是同一把尺的两个版本，是两把不同的尺"。
+
+### 1.2b 免责句层在本名册上**独立决定数＝0**（对本腿选尺理由的一条诚实修正，具名）
+
+派单提示"尺本身有歧义"，本腿逐枚验到一件比那更具体的事：**v3 比 v1 多出来的那道"前 8 行免责句"否决，在这 146 枚名册上一枚都没有独立判掉过。**现量三步：
+
+1. 全名册 146 枚里，前 8 行含免责句的只有 **6 枚**：`119-ac7-impl.md`（`本件不是裁决表`）、`137-ac4-impl.md`（同）、`141-ac34-positive-controls-r1.md`（`本文件不是裁决表`）、`146-liveapprovals-fix-r1.md`（`本件不是验收件`）、`146-liveapprovals-r1.md`（`同一程写码又自证`＋`本件不是验收件`）、`265-267-evidence-index.md`（`不是对抗验收表`）。
+2. 把这 6 枚逐枚再过一遍标题层：`119-ac7-impl`／`141-ac34-positive-controls-r1`／`265-267-evidence-index` 三枚标题即命中 IMPL3（`实现侧交件`／`正向对照`／`凭据索引`）；`146-liveapprovals-fix-r1`／`146-liveapprovals-r1` 两枚标题命中 IMPL3（`修复程`／`实现程自证`）；`137-ac4-impl.md` 两族都不中 ⇒ 走"标题无终裁词"的默认出口落 OTHER。**⇒ 6 枚全部在标题层就已经被判掉，免责句层接手时手上已经是空的。**
+3. 反向也量：全名册里满足「VERD3 中 ∧ IMPL3 不中 ∧ 免责句中」的**独立决定枚数＝0**。
+
+这条不是挑 v3 的毛病，是**把 v3 的真实承重结构说清**，防下一位误引：v3 相对 v1 的优势＝**IMPL3 词表宽 12 词＋VERD3 删掉了 `verdict`／`复验`／`重判` 三个裸词**（＝上面那 12 枚的全部来源）；v3 相对 v2 的优势＝**否决面从"前 20 行"收到"仅第 1 行"**（＝避开 ②族那 10 枚误伤）。免责句层是一道**今天没有出过力的保险**——留着（它防的是"标题合规、开头就自陈不是裁决表"这种尚未出现的形状），但⛔ 不许把它当成"v3 比 v1 严"的理由来引，那是错的。
+
+⚠ 同一件事也解释了 §3.3-2 那个盲点为什么**必然**存在：**整把尺的效力全压在"第 1 行"这一行字上**，所以票 84 那枚「`:1` 合规、`:3` 自称写码代理」的件一定漏。要补这一层＝改尺＝按 `AGENTS.md` §0.2「改契约＝人工批准」，⛔ 本腿不改，只具名并把口径写死在原处供裁。
 
 **票级换档数**（A/B/C 三档里跳到别的档）：
 
@@ -93,9 +107,10 @@ OTHER   := 其余同名件（实现侧交件／普查／读数台件／取证件
 三档    := A 名下有 VERDICT ／ B 名下只有 OTHER ／ C 名下零枚同名件（NOFILE）。
 ```
 
-选它的理由（三条，都是可核的）：
+选它的理由（三条，都是可核的；⚠ 第 1 条经 §1.2b 修正过口径）：
 
-1. **只有 v3 同时满足"读标题定类＋读免责句降级"**。v1 没有免责句层 ⇒ 会把正文开头写着"本件不是裁决表"的件收进终裁名册；v2 把否决面铺到前 20 行 ⇒ 反过来把真裁决表（正文里合规地引用了"凭据索引"这个词的 `11`/`63` 等）误踢出去，**8 枚票因此掉档**。
+1. **v3 的两处口径都恰好在"这一名册真正会咬人的地方"**：① 它的**否决面只在第 1 行标题**，而 v2 把否决面铺到前 20 行 ⇒ 把标题逐字写着"对抗验收／裁决表／非实现者"、只是正文顺带提到"证据件／普查"的 **10 枚真表误踢**，连带 **8 枚票掉档**（§1.2 ②族）；② 它的 **IMPL3 词表比 v1 宽 12 词、且 VERD3 删掉了 `verdict`／`复验`／`重判` 三个裸词** ⇒ 避开 v1 那 5 枚多收（§1.2 v1↔v3 ①②两条）。
+   ⛔ **但本腿不能把"v3 多一道免责句否决"当理由引**：§1.2b 现量＝那道保险在这 146 枚上**独立决定数＝0**（6 枚含免责句的件全部已在标题层被判掉）。v3 比 v1 严的说法**不成立**，两把尺的差**全在词表**。
 2. **v3 是死腿自己的最终版**，且 `rerun-v3.sh` 的头部注释逐字把口径写成散文（三套里唯一把口径写清楚的），本腿能逐字复跑。
 3. **复现性**：本腿不引用死腿任何一枚输出，只拿它的脚本口径自己重抽名册（`pairs-own.txt` 146 对）、自己分类（`file-identity-4.txt`）、自己汇总（`ticket-abc-4.tsv`），结果与 `3/v3-a93.txt` **逐票零差**（§0.2 row 6）。
 
