@@ -1,0 +1,37 @@
+=== call id literals in testdata / golden SSE ===
+     20 "id":"resp_mock1"
+     12 "id":"msg_out1"
+     11 "id":"msg_mock1"
+      3 "id":"fc_1"
+      3 "id":"call_b2"
+      2 "id":"rs_1"
+      2 "id":"r"
+      2 "id":"fc_2"
+      2 "id":"call_x1"
+      2 "id":"call_a1"
+      1 "id":"m2"
+      1 "id":"m1"
+      1 "id":"m"
+      1 "id":"chatcmpl-fake"
+      1 "id":"call_w1"
+      1 "id":"call_t1"
+      1 "id":"call_sp1"
+      1 "id":"call_r7"
+      1 "id":"call_r6"
+      1 "id":"call_r5"
+      1 "id":"call_r4"
+      1 "id":"call_r3"
+      1 "id":"call_r2"
+      1 "id":"call_r1"
+      1 "id":"call_r0"
+=== CallID shape in agent: where call id comes from ===
+internal/agent/loop.go:70:	CallID     string
+internal/agent/loop.go:654:			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
+internal/agent/loop.go:682:		log := ToolResultLog{CallID: c.ID, Name: c.Name, Rejected: p.rejected}
+internal/agent/loop.go:724:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+internal/agent/loop.go:858:			CallID: c.ID, Name: c.Name, Outcome: OutcomeTruncated,
+internal/agent/loop.go:863:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+internal/agent/loop.go:893:			CallID: c.ID, Name: c.Name,
+internal/agent/loop.go:898:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+internal/agent/sink.go:49:	CallID    string
+internal/agent/tools.go:57:	CallID        string

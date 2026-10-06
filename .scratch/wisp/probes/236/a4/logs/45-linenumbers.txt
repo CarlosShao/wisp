@@ -1,0 +1,23 @@
+### exact line numbers (mint + calls + fallback)
+329:	id := newTaskID()
+333:		t.result = l.run(c, id, input)
+340:	return l.run(ctx, newTaskID(), input)
+1130:func newTaskID() string {
+1132:	if _, err := rand.Read(b[:]); err != nil {
+1134:		n := time.Now().UnixNano()
+### compress_trace_test exact assertion lines
+513:	if task != res.TaskID {
+526:	if len(task) != 36 || strings.Count(task, "-") != 4 {
+557:	idA, idB := newTaskID(), newTaskID()
+558:	if idA == idB {
+### is internal/agent in core scope?
+51:# boundary" - and a third case (internal/agent/scheduler) was reachable only
+52:# because the list said ./internal/agent/... . Measured, not argued:
+107:#           and never proved anything; ./internal/agent/... is spelled out as agent +
+166:github.com/CarlosShao/wisp/internal/agent
+167:github.com/CarlosShao/wisp/internal/agent/approval
+### 174r3 skip in latest CI logs: which runs
+-- .scratch/ci-logs/run-37166458550-failed.log
+2
+-- .scratch/ci-logs/run-37158259050.log
+0

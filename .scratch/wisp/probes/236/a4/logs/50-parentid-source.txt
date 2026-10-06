@@ -1,0 +1,98 @@
+### subagent_197.go 240-285 (parentID derivation)
+		return Result{}, err
+	}
+	var a subagentSpawnArgs
+	if err := json.Unmarshal(params, &a); err != nil {
+		return Result{Text: "参数解析失败：" + err.Error(), IsError: true}, nil
+	}
+	label := strings.TrimSpace(a.Description)
+	prompt := strings.TrimSpace(a.Prompt)
+	if label == "" || prompt == "" {
+		return Result{Text: "description（短标题）与 prompt（自包含任务书）都得给，两枚字段不能互相替代", IsError: true}, nil
+	}
+	label = capRunes(label, 120)
+
+	if t.d.Roster == nil {
+		return Result{Text: "任务名册未接线（fail-closed：拒绝派生子代理，派生了也没有地方登记它）", IsError: true}, nil
+	}
+	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+	}
+	parentID := CorrelationID(ctx)
+	if parentID == "" {
+		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，" +
+			"就没法登记父子关系，也没法把结论盖戳进父任务的 C25 作用域）", IsError: true}, nil
+	}
+	if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {
+		return Result{Text: fmt.Sprintf(
+			"拒绝派生：深度上限是 %d，而派生者 %s 自己就是一枚子代理（父 kind=%s）。"+
+				"子代理不许再派子代理。", MaxSubagentDepth, parentID, rec.Kind), IsError: true}, nil
+	}
+
+	release, ok := t.d.Roster.TryAcquireSubagentSlot(MaxConcurrentSubagents)
+	if !ok {
+		return Result{Text: fmt.Sprintf(
+			"拒绝派生：同时在跑的子代理已达上限 %d 枚（在跑的：%s）。"+
+				"这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。",
+			MaxConcurrentSubagents, strings.Join(t.d.Roster.RunningSubagentIDs(), ", ")), IsError: true}, nil
+	}
+
+	base, wired := t.d.BaseOptions()
+	if !wired {
+		release()
+		return Result{Text: "宿主现在给不出装配快照（fail-closed：不在没有父装配的情况下起子环路）", IsError: true}, nil
+	}
+	if base.AdmitTask == nil {
+		// A child with no admission hook has no route to the host's approval
+		// layer at all. Deriving one would be handing it a private decision
+### task.go 690-735 (caller + target ids)
+	}
+	var a taskCancelArgs
+	if err := json.Unmarshal(params, &a); err != nil {
+		return Result{Text: "参数解析失败：" + err.Error(), IsError: true}, nil
+	}
+	target := strings.TrimSpace(a.TaskID)
+	if target == "" {
+		return Result{Text: "缺少 task_id 参数", IsError: true}, nil
+	}
+	if t.d.Roster == nil {
+		return Result{Text: "任务名册未接线（fail-closed：拒绝停掉任何任务——名册才是唯一的停法）", IsError: true}, nil
+	}
+	// The caller's identity is the host's, not an argument: CorrelationID is what
+	// the bridge stamps from the call it dispatched, so a model cannot name whose
+	// child it is by editing parameters. Same source task.spawn uses to fill in
+	// ParentTaskID, which is what makes the two sides agree by construction.
+	caller := CorrelationID(ctx)
+	if caller == "" {
+		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）", IsError: true}, nil
+	}
+	rec, known := t.d.Roster.Look(target)
+	if !known {
+		return Result{Text: fmt.Sprintf(
+			"查不到这个任务 %s：v1 的任务名册只在本进程内，重启后不保留（票 164 定案②）。"+
+				"这是「没有这条记录」，不是「它已经停了」。", target), IsError: true}, nil
+	}
+	if target == caller {
+		return Result{
+			Text: fmt.Sprintf(
+				"拒绝停止：%s 就是这次调用所属的任务自己。子代理不许停自己（票 221 AC#3 的正控，"+
+					"票 197 AC#5「子级永不自批」同族）；要收摊就把手上的活做完，或者把这一行留给父任务。", target),
+			IsError: true,
+		}, nil
+	}
+	if rec.ParentTaskID == "" {
+		return Result{Text: fmt.Sprintf(
+			"拒绝停止：%s 那一行没有父任务（kind=%s），它不是这次调用派生的孩子，本工具动不了它。"+
+				"由用户停一棵正在跑的树是另一条入向通道（票 181／票 220），今天没有落点。",
+			target, orDefaultKind(rec.Kind)), IsError: true}, nil
+	}
+	if rec.ParentTaskID != caller {
+		return Result{Text: fmt.Sprintf(
+			"拒绝停止：%s 是任务 %s 派生的孩子，不是调用者 %s 的孩子——只有父任务能停自己的孩子，"+
+				"兄弟之间、旁支之间都停不了（票 221 AC#3 的正控）。",
+			target, rec.ParentTaskID, caller), IsError: true}, nil
+	}
+### grep parentID source
+internal/tools/subagent_197.go:259:	parentID := CorrelationID(ctx)
+internal/tools/subagent_197.go:260:	if parentID == "" {
+internal/tools/subagent_197.go:471:	case parentID == "":

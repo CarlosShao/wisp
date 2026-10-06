@@ -1,0 +1,41 @@
+### session MintedShape precedent
+### grant_test shape leg names
+108:func TestTicket224MintIsRandomAndValid(t *testing.T) {
+152:func TestTicket224TestLiteralsAreOutsideTheMintedShape(t *testing.T) {
+186:func TestTicket224RecordWritesOneRowPerAnswer(t *testing.T) {
+256:func TestTicket224RecordRefusesUnusableSubjects(t *testing.T) {
+297:func TestTicket224CoveringMatchesItsOwnSession(t *testing.T) {
+350:func TestTicket224CoveringDoesNotCrossToANewSession(t *testing.T) {
+407:func TestTicket224ExpiredOrRevokedRowIsNotLive(t *testing.T) {
+467:func TestTicket224LedgerFailsClosedOnStoreErrors(t *testing.T) {
+498:func TestTicket224NewLedgerRefusesHandWrittenIDs(t *testing.T) {
+### stream_key_197_test 35-70
+	}
+	// The literal itself is pinned too, so this leg cannot silently turn into
+	// "both sides changed together": ticket 197 §0 froze this exact spelling.
+	if tools.SubagentStreamKeyPrefix != "subagent:" {
+		t.Errorf("前缀 = %q, want %q（§0 冻的键形状：全小写、冒号分隔）",
+			tools.SubagentStreamKeyPrefix, "subagent:")
+	}
+}
+
+// The two builders agree for the ids production actually mints. Compared against
+// each other, not against a literal this file typed.
+//
+// Empty/whitespace ids are deliberately NOT compared: panel's SubagentStreamKey
+// answers "" for them (Append("") would open a row nobody can attribute, its own
+// comment at pump.go:382-389 says why) while the tools leg has no such branch.
+// That divergence is documented, and closing it is 载体层 r3's call, not a
+// composition-root test's.
+func TestSubagentStreamKeyBuildersAgreeAcrossBothPackages(t *testing.T) {
+	for _, id := range []string{
+		"task-197-a",
+		"00000000-0000-4000-8000-000000000000",
+		"带中文的id",
+	} {
+		got, want := tools.SubagentStreamKey(id), panel.SubagentStreamKey(id)
+		if got != want {
+			t.Errorf("同一个 id %q 两侧拼出不同的键：tools = %q, panel = %q", id, got, want)
+		}
+	}
+}

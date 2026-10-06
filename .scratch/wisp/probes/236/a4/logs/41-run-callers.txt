@@ -1,0 +1,51 @@
+### callers of l.run / .run( with explicit id (non-test)
+internal/agent/loop.go:333:		t.result = l.run(c, id, input)
+internal/agent/loop.go:340:	return l.run(ctx, newTaskID(), input)
+internal/tools/bridge.go:362:	return b.run(ctx, req, entry, dec, grantID)
+### loop_golden_test.go 55-85
+func TestGoldenSingleToolCall(t *testing.T) {
+	h := newHarness(t, "tool-then-text")
+	res := h.run("现在天气怎么样")
+
+	if res.Status != StatusCompleted {
+		t.Fatalf("status = %s (%s), want completed", res.Status, res.Message)
+	}
+	if n := h.echo().CallCount(); n != 1 {
+		t.Fatalf("tool executions = %d, want 1", n)
+	}
+	call := h.echo().Calls()[0]
+	if call.Req.Name != "echo" || call.Req.CallID != "call_e1" {
+		t.Errorf("call = %+v", call.Req)
+	}
+	if call.Req.TaskID != res.TaskID || call.Req.CorrelationID != res.TaskID {
+		t.Errorf("call identity = %+v, want task %s", call.Req, res.TaskID)
+	}
+	if res.Text != "现在是 22 摄氏度，晴。" {
+		t.Errorf("final text = %q", res.Text)
+	}
+	// The assistant turn and its tool result both stay in the history, keyed by
+	// the same call id (C25/D21 depend on the chain being intact).
+	if !historyHasCallID(h.loop.History(), "call_e1") {
+		t.Errorf("history lost call id: %s", dumpHistory(h.loop.History()))
+	}
+}
+
+func TestGoldenParallelToolCalls(t *testing.T) {
+	h := newHarness(t, "parallel-tools")
+	res := h.run("两件事一起办")
+
+### tests asserting id uniqueness / not-a-lookalike
+internal/agent/approval/pending_read_test.go:67:	if d.CorrelationID != want.CorrelationID || d.TaskID != want.TaskID {
+internal/agent/approval/ticket220_l1_window_read_test.go:255:	if w.CorrelationID != "corr-220" || w.TaskID != "task-220" || w.Tool != "fs.write" {
+internal/agent/compress_trace_test.go:475:// lookalike), and a pass nobody attributed stays unattributed instead of being
+internal/agent/compress_trace_test.go:513:	if task != res.TaskID {
+internal/agent/loop_golden_test.go:69:	if call.Req.TaskID != res.TaskID || call.Req.CorrelationID != res.TaskID {
+internal/agent/loop_golden_test.go:341:	if row.Tool != "echo" || row.CorrelationID != res.TaskID {
+internal/panel/subagent_roster_197_test.go:146:	if child.ParentTaskID != "root-1" {
+internal/risk/provenance_test.go:786:	// The evasion must be symmetric: an unmarked lookalike still does not hit.
+internal/tools/loop_approval_test.go:213:	if r.CorrelationID == "" || r.CorrelationID != res.TaskID {
+internal/tools/subagent_197_test.go:308:	if row.Out.ParentTaskID != parent197 {
+internal/tools/task_cancel_221_legs_test.go:333:	if rec.Out.ParentTaskID != parent197 || rec.Out.Kind != TaskKindSubagent || rec.Out.Label != label197 {
+internal/tools/task_cancel_221_legs_test.go:380:			if r.TaskID != parent197 {
+cmd/wisp/subagent_carrier_197_test.go:203:			if row.Kind == tools.TaskKindRoot && row.TaskID != "" {
+cmd/wisp/subagent_carrier_197_test.go:294:	if child.ParentTaskID != rootID {

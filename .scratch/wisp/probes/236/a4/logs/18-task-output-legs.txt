@@ -1,0 +1,112 @@
+### task_output_ac2_before_test.go 40-80
+
+	req := agent.ToolRequest{
+		TaskID: "164-ac2-before",
+		CallID: "call-164-ac2-before",
+		Name:   "task.output",
+		Args:   json.RawMessage(`{"task_id":"bg-1"}`),
+	}
+	out, err := b.Execute(t.Context(), req)
+	if err != nil {
+		t.Fatalf("Execute must answer a rejection as data, not as a Go error (D37): %v", err)
+	}
+
+	t.Logf("AC#2 BEFORE verbatim: IsError=%v ErrorClass=%q Truncated=%v Text=%q",
+		out.IsError, out.ErrorClass, out.Truncated, out.Text)
+
+	if !out.IsError {
+		t.Fatalf("expected the pre-implementation call to be refused, got a success: %+v", out)
+	}
+	if !strings.Contains(out.Text, "未知工具") || !strings.Contains(out.Text, "task.output") {
+		t.Fatalf("expected the unknown-tool branch (bridge.go:247), got: %q", out.Text)
+	}
+	if out.ErrorClass != "tool" {
+		t.Errorf("error_class = %q, want tool (an unknown tool is self-correctable, D37)", out.ErrorClass)
+	}
+	if out.Text != "" && strings.Contains(out.Text, "bg-1") {
+		t.Errorf("the refusal leaked the task id it never looked up: %q", out.Text)
+	}
+	// And the mirror of AC#1's claim, at call level: the directory the model is
+	// shown today holds no task.* entry, so the model cannot even learn to ask.
+	dir1 := tempCanonical(t)
+	b2, _ := fsBridgeWith(t, nil, NoGate{}, dir1)
+	tools, err := b2.Tools(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, ti := range tools {
+		if strings.HasPrefix(ti.Name, "task.") {
+			t.Fatalf("a task.* tool is registered: %s", ti.Name)
+		}
+	}
+}
+### task_output_leg_test.go 85-130 + 160-180
+// names the id - never as an empty success, which is the shape that reads to
+// the model as "the task printed nothing".
+func TestUnknownTaskIDIsLoudNotEmpty(t *testing.T) {
+	dir := tempCanonical(t)
+	b := taskBridge(t, NewTaskRoster(), dir)
+
+	out, err := b.Execute(t.Context(), agent.ToolRequest{
+		TaskID: "164-r2", CallID: "c1", Name: "task.output",
+		Args: json.RawMessage(`{"task_id":"ghost-9"}`),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !out.IsError {
+		t.Fatalf("an unknown task id must be an error outcome, got: %+v", out)
+	}
+	if out.Text == "" || !strings.Contains(out.Text, "ghost-9") {
+		t.Fatalf("the refusal must name the id it could not find, got %q", out.Text)
+	}
+	if !strings.Contains(out.Text, "没有这条记录") {
+		t.Errorf("the refusal must distinguish 无记录 from 无输出, got %q", out.Text)
+	}
+	if out.ErrorClass != "tool" {
+		t.Errorf("error_class = %q, want tool (self-correctable, D37)", out.ErrorClass)
+	}
+}
+
+// TestMissingArgsAndUnwiredRoster both fail closed.
+func TestMissingArgsAndUnwiredRoster(t *testing.T) {
+	dir := tempCanonical(t)
+	b := taskBridge(t, NewTaskRoster(), dir)
+	out, err := b.Execute(t.Context(), agent.ToolRequest{
+		TaskID: "a", CallID: "c", Name: "task.output", Args: json.RawMessage(`{}`),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !out.IsError || !strings.Contains(out.Text, "task_id") {
+		t.Fatalf("missing task_id must be refused, got %+v", out)
+	}
+
+	bare := New(Options{
+		Registry: mustRegisterTaskEntries(t, TaskDeps{Roster: nil}),
+		Gate:     NoGate{}, Logf: func(string, ...any) {},
+	})
+	out2, err := bare.Execute(t.Context(), agent.ToolRequest{
+// criterion for 只截不指: drop the pointer from taskOutput.Execute and this test
+// goes red, because everything it asserts is downstream of that path.
+//
+// It asserts READ-BACK, not "a path was mentioned": the file the stub names is
+// re-read twice - once raw, and once through a real fs.read call - and the
+// bytes must equal the original output the roster holds. The announced total
+// length must equal the real artifact length, not the stub's length.
+func TestLongOutputPointerRecoversEveryByte(t *testing.T) {
+	dir := tempCanonical(t)
+	full := asciiRun(20000) // 5000 tokens under the 4-bytes-per-token heuristic
+
+	// The artifact is landed by the host, exactly as D15(3) does it, and the
+	// roster is then filed with the bytes plus where they went.
+	artName := "tool-output-164-bg7.txt"
+	artPath := filepath.Join(dir, artName)
+	if err := os.WriteFile(artPath, []byte(full), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	roster := NewTaskRoster()
+	roster.Record("bg-7", TaskOutput{Text: full, ArtifactPath: mustCanonical(t, artPath)})
+
+	b := taskBridge(t, roster, dir)
+	out, err := b.Execute(t.Context(), agent.ToolRequest{

@@ -1,0 +1,30 @@
+### literal task id fixtures in the two scored dirs
+internal/tools/bridge_test.go:671:		rq.TaskID, rq.CorrelationID = "task-1", fmt.Sprintf("corr-%d", i)
+internal/tools/bridge_test.go:686:	rq.TaskID, rq.CorrelationID = "task-1", "corr-l1"
+internal/tools/failclosed_236_teeth_test.go:147:		Args: json.RawMessage(`{"task_id":"target-236r2"}`),
+internal/tools/pointer_183_cli_seam_test.go:165:	const task = "183r2-cli"
+internal/tools/pointer_183_cli_seam_test.go:230:	const task = "183r2-sibling"
+internal/tools/pointer_183_cli_seam_test.go:64:	r183SiblingTaskID = "c66c0635183r2b2c"
+internal/tools/pointer_185_cli_seam_test.go:195:	const task = "185r1-second"
+internal/tools/pointer_185_cli_seam_test.go:225:	const task = "185r1-paged"
+internal/tools/pointer_185_cli_seam_test.go:256:	const task = "185r1-foreign"
+internal/tools/pointer_185_cli_seam_test.go:294:	const task = "185r1-nominate"
+internal/tools/pointer_185_cli_seam_test.go:374:	const task = "185r1-sibling"
+internal/tools/task_output_ac2_before_test.go:45:		Args:   json.RawMessage(`{"task_id":"bg-1"}`),
+internal/tools/task_output_leg_test.go:182:		Args: json.RawMessage(`{"task_id":"bg-7"}`),
+internal/tools/task_output_leg_test.go:253:		Args: json.RawMessage(`{"task_id":"bg-8"}`),
+internal/tools/task_output_leg_test.go:299:		Args: json.RawMessage(`{"task_id":"bg-9"}`),
+internal/tools/task_output_leg_test.go:323:		Args: json.RawMessage(`{"task_id":"bg-10"}`),
+internal/tools/task_output_leg_test.go:360:		Args: json.RawMessage(`{"task_id":"bg-11"}`),
+internal/tools/task_output_leg_test.go:64:		Args:   json.RawMessage(`{"task_id":"bg-1"}`),
+internal/tools/task_output_leg_test.go:93:		Args: json.RawMessage(`{"task_id":"ghost-9"}`),
+internal/tools/ticket175r2_stamp_live_test.go:148:	const task = "175r2-j1"
+internal/tools/ticket175r2_stamp_live_test.go:149:	out := call175r2(t, b, task, "task.output", `{"task_id":"bg-175r2"}`)
+internal/tools/ticket175r2_stamp_live_test.go:187:	const task = "175r2-plain"
+internal/tools/ticket175r2_stamp_live_test.go:222:	const task = "175r2-j2"
+internal/tools/ticket175r2_stamp_live_test.go:224:	stub := call175r2(t, b, task, "task.output", `{"task_id":"bg-175r2-j2"}`)
+internal/tools/ticket175r2_stamp_live_test.go:290:	const task = "175r2-j3"
+internal/tools/ticket175r2_stamp_live_test.go:292:	stub := call175r2(t, b, task, "task.output", `{"task_id":"bg-175r2-j3"}`)
+internal/tools/ticket176r1_start_port_test.go:131:	const taskID = "e3f1c0a97b2d4865"
+### count
+27

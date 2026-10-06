@@ -1,0 +1,69 @@
+### taskOutput.Execute 490-560 (caller check?)
+//
+//	unknown task id  -> IsError naming the id (never an empty success)
+//	short output     -> the whole text, Truncated=false, no pointer needed
+//	long output      -> head + tail + total + pointer, Truncated=true, and the
+//	                    pointer is required by the contract: 只截不指＝不合格
+//	                    (PLAN.md:2564), so a long output with no copy file
+//	                    announces that the rest is unrecoverable instead of
+//	                    dropping it quietly.
+func (t taskOutput) Execute(ctx context.Context, params json.RawMessage, onUpdate func(string)) (Result, error) {
+	if err := ctx.Err(); err != nil {
+		return Result{}, err
+	}
+	var a taskOutputArgs
+	if err := json.Unmarshal(params, &a); err != nil {
+		return Result{Text: "参数解析失败：" + err.Error(), IsError: true}, nil
+	}
+	if strings.TrimSpace(a.TaskID) == "" {
+		return Result{Text: "缺少 task_id 参数", IsError: true}, nil
+	}
+	if t.d.Roster == nil {
+		return Result{Text: "任务名册未接线（fail-closed：拒绝猜测任何任务的输出）", IsError: true}, nil
+	}
+	rec, ok := t.d.Roster.Look(a.TaskID)
+	if !ok {
+		return Result{Text: fmt.Sprintf(
+			"查不到这个任务 %s：v1 的任务名册只在本进程内，重启后不保留（票 164 定案②）。"+
+				"这是「没有这条记录」，不是「任务没有输出」。", a.TaskID), IsError: true}, nil
+	}
+
+	full := rec.Text
+	if agent.ApproxTokens(full) <= t.d.spillTokens() {
+		if onUpdate != nil {
+			onUpdate(fmt.Sprintf("task.output 返回 %d 字节（未截断）", len(full)))
+		}
+		return Result{Text: full, Truncated: false}, nil
+	}
+
+	head := takeHeadTokens(full, t.d.headTokens())
+	tail := takeTailTokens(full, t.d.tailTokens())
+	totalBytes := len(full)
+	totalTokens := agent.ApproxTokens(full)
+
+	// The pointer branch. A copy file is the D15(3) norm; its absence is a
+	// defect the model has to be told about, because the alternative - a stub
+	// with no path - is precisely "只截不指".
+	//
+	// Ticket 174 AC#2: when the pointer IS given, it still must not promise a
+	// road back that does not exist. The path stays in the reply (that is
+	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+	// pointerNotice adds what is actually true about it, in the same text the
+	// model reads - not in a log line, not in a Go error.
+	var stub string
+	if rec.ArtifactPath != "" {
+		notice := t.d.pointerNotice(rec.ArtifactPath)
+		// Ticket 177 shape A (Q-61甲, precise exemption): the path printed at
+		// the end of the stub below is text the HOST just wrote itself - it
+		// comes from the roster record, never from content this tool read.
+		// Declaring it on the per-call box lets C25 keep this whole stub
+		// indexed EXCEPT the window this path occupies, so a model that
+		// re-reads its own pointer is not blocked by R4 while every other
+		// byte of it still taints like normal. The stub's wording and shape
+		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+		// here changes a character the model reads.
+		if box := hostPathBoxFromCtx(ctx); box != nil {
+			box.set(rec.ArtifactPath)
+		}
+### any test asserting cross-task output read must be refused
+internal/tools/pointer_185_cli_seam_test.go:327:// T5 — AC#2 on the seam: another task cannot borrow this task's roster.

@@ -1,0 +1,100 @@
+=== ticket176r1_start_port_test.go doc 1-40 ===
+package tools
+
+// Ticket 176-r1 - the standing criteria for the WRITE side of ticket 164's
+// task roster: the host now starts a background task through the loop's
+// existing async entry point and files its answer afterwards, so task.output
+// has an object to read on a real run.
+//
+// The four legs, and the mutation each one turns red on (readings recorded in
+// docs/evidence/s1/176-background-start-port-r1.md):
+//
+//	L-1 TestBackfillFilesTheRealSpilledArtifact176r1
+//	    -> drop the ArtifactPath assignment (record only the text): a long
+//	       answer then gets no pointer, which is PLAN.md:2564's 「只截不指」.
+//	L-2 TestTaskArtifactKeyStaysOutOfTheCallIDNamespace176r1
+//	    -> hand Prepare the BARE task id as the artifact key (the line
+//	       taskArtifactPrefix + taskID -> taskID): a model-supplied call id
+//	       that repeats the id now lands on the same file name, and
+//	       spill.go:117-131 resolves that as last-writer-wins - a silent byte
+//	       swap under a pointer the host itself printed.
+//	L-3 TestNoRosterWriteAfterCancel176r1
+//	    -> remove the Stopped(ctx) guard in Backfill, or lift Record above the
+//	       join: the cancelled task's output then lands in the table.
+//	       This leg carries its own control half (no cancel -> the same port
+//	       DOES write), so it cannot be bought by "never write at all".
+//	L-4 TestTerminalWriteCarrierStaysOutOfScope176r1
+//	    -> widen the guard to "refuse whenever the PARENT is done": the loop's
+//	       own terminal write carrier (context.WithoutCancel,
+//	       internal/agent/loop.go:956-958 - the one legitimate still-writing
+//	       shape after a cancel) would then be read as a violation, and a
+//	       green here would be the host flagging its own teardown.
+//
+// What these legs do NOT pin: that the composition root actually calls
+// RunAsync. That claim is a grep, not a test in this package (cmd/wisp's own
+// tests are not this ticket's write surface), and its reading is in the
+// evidence file next to the start-port line in cmd/wisp/run.go.
+
+import (
+	"context"
+	"os"
+	"path/filepath"
+=== :118-175 ===
+	if n := roster.Count(); n != 2 {
+		t.Errorf("Count() = %d, want 2", n)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// L-2 namespace discipline: a background record's artifact key must not be
+// reachable by a model-supplied tool-call id.
+// ---------------------------------------------------------------------------
+
+func TestTaskArtifactKeyStaysOutOfTheCallIDNamespace176r1(t *testing.T) {
+	roster, spills, _ := backfill176r1(t)
+
+	const taskID = "e3f1c0a97b2d4865"
+	mine := asciiRun(20000)
+	if _, why := (TaskBackfill{Roster: roster, Spills: spills}).
+		Backfill(context.Background(), taskID, mine); why != "" {
+		t.Fatalf("回填没有成功：%s", why)
+	}
+	pointer, _ := roster.Look(taskID)
+	if pointer.ArtifactPath == "" {
+		t.Fatal("precondition: 这条记录没有产物路径，命名空间的对照就散了")
+	}
+	// The precedent name (loop.go:324 registers the same task as
+	// "agent-task-<id>" in the D38 roster) must be readable off the file name,
+	// because that prefix is the only thing separating the two key spaces.
+	if name := filepath.Base(pointer.ArtifactPath); !strings.Contains(name, "agent-task-"+taskID) {
+		t.Errorf("产物名 %q 不带 agent-task- 前缀：后台记录与模型 supplied 的 call id 又回到同一命名空间", name)
+	}
+
+	// The collision attempt, played the way the model can actually play it: a
+	// tool-call id that repeats a task id it has seen. The loop's own spill
+	// layer addresses artifacts by call id, so this is the same writer, the same
+	// directory, the same key space.
+	foreign := asciiRun(19000)
+	sp, err := spills.Prepare(taskID, foreign)
+	if err != nil {
+		t.Fatalf("Prepare(模型 call id): %v", err)
+	}
+	if sp.Path == pointer.ArtifactPath {
+		t.Fatalf("模型 supplied 的 call id 与任务 id 落在同一个产物名上：%q", sp.Path)
+	}
+	body, err := os.ReadFile(pointer.ArtifactPath)
+	if err != nil {
+		t.Fatalf("任务那份产物读不回来了：%v", err)
+	}
+	if string(body) != mine {
+		t.Errorf("任务产物被静默换成了别的内容：%d 字节 vs 原 %d 字节（spill.go:117-131 的 last-writer-wins 不会报错）",
+			len(body), len(mine))
+	}
+}
+
+// ---------------------------------------------------------------------------
+// L-3 AC#3: once a task is cancelled, nobody may still be writing its output.
+// ---------------------------------------------------------------------------
+
+// runLikeThePort176r1 reproduces the composition root's shape with the real
+// registry and the real root: spawn the body under the D38 name the loop uses,

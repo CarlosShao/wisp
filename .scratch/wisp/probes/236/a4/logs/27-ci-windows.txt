@@ -1,0 +1,24 @@
+### ci.yml windows job: name + packages + skip policy
+16:      - name: "Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"
+42:        # nothing and no step was moved into skippability or given
+59:      - name: Cache third_party (deps.toml key)
+### second windows job
+15:      - name: Cache third_party (deps.toml key)
+21:      - name: Build wisp.exe
+24:      - name: SLO smoke gate
+27:      - name: Upload SLO report
+30:          name: slo-smoke-report
+47:  # deliberately not a skip (no `if:`, no continue-on-error, no -Skip switch) -
+### runtests.sh package list refs
+scripts/portable-tests.sh:190:github.com/CarlosShao/wisp/internal/tools
+scripts/portable-tests.sh:240:        ./internal/tools/... ./internal/models/...
+scripts/portable-tests.sh:598:    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The case is
+scripts/portable-tests.sh:599:    "TestD34WriteMatrix|./internal/tools/|linux|fixture|the table needs a second volume from otherVolumeDir (f
+scripts/portable-tests.sh:600:    "TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop|./internal/tools/|linux|fixture|same otherVolumeDir requi
+tools/d22scan/main.go:39://	                      gated tool names (D34 note 2) - scope: internal/tools/
+tools/d22scan/main.go:307:// healthy, and the two directory-scoped bans (#6 frontend/, #7 internal/tools/)
+tools/d22scan/main.go:433:			label: "ban #7 internal/tools/", dir: filepath.Join(root, "internal", "tools"),
+tools/d22scan/main.go:845:				// internal/tools.Result.AppliedSteps or internal/proc.WithRegistry
+tools/d22scan/main.go:945:// does not convict qualified symbol references (internal/tools.Result.AppliedSteps
+tools/d22scan/main.go:1084://     a comment in internal/tools/bridge_junction_windows_test.go, owned by
+tools/d22scan/main.go:1092:// as internal/tools/tmp/, i.e. not source - and testdata is skipped

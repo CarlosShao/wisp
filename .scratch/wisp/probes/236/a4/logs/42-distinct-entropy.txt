@@ -1,0 +1,55 @@
+### tests comparing two task ids for equality/inequality
+internal/agent/approval/pending_read_test.go:67:	if d.CorrelationID != want.CorrelationID || d.TaskID != want.TaskID {
+internal/agent/compress_trace_test.go:558:	if idA == idB {
+internal/agent/loop_golden_test.go:69:	if call.Req.TaskID != res.TaskID || call.Req.CorrelationID != res.TaskID {
+### entropy injection seam? (rand.Read hooks)
+internal/agent/approval/approval.go:399:	if _, err := rand.Read(buf); err != nil {
+internal/agent/loop.go:1132:	if _, err := rand.Read(b[:]); err != nil {
+### spill_path_invariant_test 55-75 + 420-445
+// what the ids USED to collapse onto ("p/q" and "pq" both became
+// tool-output-pq.txt), and that collapse was the clobbering defect this repo is
+// fixing. The four shapes are still asserted to come out BARE, with no / \ : ..
+// anywhere and with the full payload inside - containment is exactly as pinned as
+// it was; what changed is that nothing is silently dropped on the way.
+type inv76aShape struct {
+	sub      string // AC#1 subtest name
+	callID   string // model-supplied tool-call id
+	wantName string // the ONLY file name it may become
+}
+
+func inv76aShapes() []inv76aShape {
+	return []inv76aShape{
+		{
+			sub: "separator",
+			// Both spellings, because the encoder escapes them alike: the
+			// forward-slash form first (a nested path), then a backslash form
+			// that must not become a second directory level either.
+			callID:   "p/q",
+			wantName: "tool-output-p%2Fq.txt",
+		},
+			t.Errorf("user dir file %s did not survive the artifacts API: %v", n, err)
+		}
+	}
+}
+
+// TestSpillAPITakesNoCallerControlledDestinationPath audits spill.go the same way
+// the memory side audits artifacts.go: the destination is only ever the
+// constructor's dir, the model-supplied id is the single caller component, and
+// no write call is fed a path built from anything else.
+func TestSpillAPITakesNoCallerControlledDestinationPath(t *testing.T) {
+	fset := token.NewFileSet()
+	src, err := parser.ParseFile(fset, "spill.go", nil, parser.ParseComments)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pathLike := []string{
+		"path", "dir", "dirname", "dest", "dst", "target", "root",
+		"basedir", "folder", "filename", "file", "prefix", "where", "output",
+	}
+	const constructor = "NewSpiller" // the one host-side place a dir is supplied
+
+	render := func(n any) string {
+		var buf bytes.Buffer
+		_ = printer.Fprint(&buf, fset, n)
+		return buf.String()
+	}

@@ -1,0 +1,114 @@
+### TaskID: assignments in prod (non-test) ===
+internal/agent/approval/gate.go:600:		TaskID:        d.TaskID,
+internal/agent/approval/replies.go:176:		TaskID:        p.TaskID,
+internal/agent/approval/report.go:97:		Tool: d.Tool, CorrelationID: corr, TaskID: d.TaskID, Level: d.LevelString(),
+internal/agent/approval/window_read.go:73:		out = append(out, L1Window{CorrelationID: w.corr, TaskID: w.taskID, Tool: w.tool})
+internal/agent/journal.go:76:		TaskID:        t.taskID,
+internal/agent/loop.go:376:	res := Result{TaskID: taskID, Status: StatusCompleted}
+internal/agent/loop.go:462:			l.publish(Event{Kind: EvError, TaskID: taskID, Text: msg, Stop: turn.Stop})
+internal/agent/loop.go:481:				Kind: EvReminder, TaskID: taskID, Text: rem.Text,
+internal/agent/loop.go:486:					Kind: EvStuck, TaskID: taskID,
+internal/agent/loop.go:512:	l.publish(Event{Kind: EvControl, TaskID: taskID, Verb: verb, Text: utterance})
+internal/agent/loop.go:518:	res := Result{TaskID: taskID, Status: StatusControl}
+internal/agent/loop.go:552:			l.publish(Event{Kind: EvTextDelta, TaskID: taskID, Text: ev.Text})
+internal/agent/loop.go:554:			l.publish(Event{Kind: EvReasoningDelta, TaskID: taskID, Text: ev.Text})
+internal/agent/loop.go:654:			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
+internal/agent/loop.go:724:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+internal/agent/loop.go:863:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+internal/agent/loop.go:898:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+internal/agent/loop.go:910:		Kind: EvStuck, TaskID: res.TaskID, Text: msg,
+internal/agent/loop.go:921:	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err})
+internal/agent/loop.go:962:		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+internal/panel/subagent_roster_197.go:228:			TaskID:            row.TaskID,
+internal/panel/subagent_roster_197.go:231:			ParentTaskID:      row.ParentTaskID,
+internal/tools/bridge.go:376:		TaskID: req.TaskID, CallID: req.CallID,
+internal/tools/bridge.go:1112:		TaskID:        req.TaskID,
+internal/tools/subagent_197.go:426:		ParentTaskID: parentID, Label: label, Kind: TaskKindSubagent,
+internal/tools/task.go:322:				out = append(out, TaskRecord{TaskID: id, Out: o})
+internal/tools/task.go:344:		ParentTaskID: parentTaskID, Label: label, Kind: TaskKindSubagent,
+cmd/wisp/approval_always.go:116:		TaskID: allowWidenTaskID,
+cmd/wisp/config_reload.go:280:		TaskID: configReloadTaskID,
+cmd/wisp/panel_pump.go:174:			TaskID:            rec.TaskID,
+cmd/wisp/panel_pump.go:175:			ParentTaskID:      rec.Out.ParentTaskID,
+cmd/wisp/panel_pump.go:189:			add(tools.TaskRecord{TaskID: id, Out: out})
+cmd/wisp/resident_approval_windows.go:670:		TaskID: c.TaskID,
+cmd/wisp/run.go:845:		TaskID: taskID,
+### does anything compare taskID to callID?
+internal/agent/approval/pending_read_test.go:67:	if d.CorrelationID != want.CorrelationID || d.TaskID != want.TaskID {
+internal/agent/approval/ticket220_l1_window_read_test.go:255:	if w.CorrelationID != "corr-220" || w.TaskID != "task-220" || w.Tool != "fs.write" {
+internal/agent/loop_golden_test.go:69:	if call.Req.TaskID != res.TaskID || call.Req.CorrelationID != res.TaskID {
+internal/memory/models.go:161:	if tc.TaskID == "" {
+internal/panel/subagent_roster_197.go:236:			BlockedOnApproval: row.TaskID != "" && waiting[row.TaskID],
+internal/panel/subagent_roster_197_test.go:86:		if r.TaskID == taskID {
+internal/panel/subagent_roster_197_test.go:146:	if child.ParentTaskID != "root-1" {
+internal/tools/bridge.go:638:	if b.prov == nil || dec.TaskID == "" || !risk.IsSensitiveSource(dec.Tool) {
+internal/tools/bridge.go:1099:	if b.j == nil || req.TaskID == "" {
+internal/tools/subagent_197_test.go:308:	if row.Out.ParentTaskID != parent197 {
+internal/tools/task.go:225:		if o.ParentTaskID == "" {
+internal/tools/task.go:318:				if o.ParentTaskID != parent || seen[id] {
+internal/tools/task.go:329:		if out[i].TaskID == out[j].TaskID {
+internal/tools/task.go:724:	if rec.ParentTaskID == "" {
+internal/tools/task.go:730:	if rec.ParentTaskID != caller {
+internal/tools/task_cancel_221_legs_test.go:333:	if rec.Out.ParentTaskID != parent197 || rec.Out.Kind != TaskKindSubagent || rec.Out.Label != label197 {
+internal/tools/task_cancel_221_legs_test.go:380:			if r.TaskID != parent197 {
+cmd/wisp/resident_approval_windows.go:642:	if c.TaskID == "" || c.Reason == "" {
+cmd/wisp/subagent_carrier_197_test.go:20:// bridge with the ids the agent loop itself uses (TaskID == CorrelationID,
+cmd/wisp/subagent_carrier_197_test.go:127:		if r.TaskID == taskID {
+cmd/wisp/subagent_carrier_197_test.go:203:			if row.Kind == tools.TaskKindRoot && row.TaskID != "" {
+cmd/wisp/subagent_carrier_197_test.go:218:		if row.Kind == tools.TaskKindSubagent && row.ParentTaskID == rootID {
+cmd/wisp/subagent_carrier_197_test.go:294:	if child.ParentTaskID != rootID {
+cmd/wisp/subagent_carrier_197_test.go:409:		if row.TaskID == taskID {
+cmd/wisp/subagent_selfapproval_197_test.go:41://     bridge in the child's own identity (TaskID == the roster's subagent row) -
+cmd/wisp/subagent_selfapproval_197_test.go:131:			if c.TaskID == taskID && c.Level == "L2" {
+### run_test.go 190-240 (taskID use)
+	}
+	if !posted {
+		t.Errorf("the reply was never presented as a notification: %v", notices)
+	}
+
+	// AC#4 (first half): a task_log row for this task, closed with its state.
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	id := f.taskID()
+	tl, err := f.openStore().TaskLogByID(ctx, id)
+	if err != nil {
+		t.Fatalf("task_log for %s: %v", id, err)
+	}
+	if tl.State != "done" || tl.QueryText == "" || tl.EndedAt == nil {
+		t.Errorf("task_log = %+v, want a closed done row carrying the query text", tl)
+	}
+}
+
+func TestRunTextTaskFailNextIsClassified(t *testing.T) {
+	f := newRunFixture(t, "openai-chat")
+	// fail_next(3): every attempt fails, so the retry ladder has to give up and
+	// the task has to end classified.
+	f.srv.QueueFault(t, adaptertest.Fault{Status: 500, Times: 3})
+	code := f.run("总结一下 这份笔记")
+	out, errb := f.out.String(), f.err.String()
+	if code == 0 {
+		t.Fatalf("a run whose provider failed must not exit 0:\n%s\n%s", out, errb)
+	}
+	// A provider failure is neither Unconfigured (2) nor a loop brake (3): the
+	// classified-failure code is 1.
+	if code != 1 {
+		t.Errorf("exit = %d, want 1 for a classified provider failure\n%s", code, errb)
+	}
+	if !strings.Contains(errb, "error_class=provider") {
+		t.Errorf("the error class is not on stderr:\n%s", errb)
+	}
+	if !strings.Contains(out, "wisp run:") || !strings.Contains(out, "failed") {
+		t.Errorf("the user must get a status line, not only an exit code:\n%s", out)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	tl, err := f.openStore().TaskLogByID(ctx, f.taskID())
+	if err != nil {
+		t.Fatalf("a failed task must still close its task_log row: %v", err)
+	}
+	if tl.State != "error" || tl.ErrorClass != "provider" {
+		t.Errorf("task_log = state %q class %q, want error/provider", tl.State, tl.ErrorClass)
+	}
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if len(f.notices) == 0 {

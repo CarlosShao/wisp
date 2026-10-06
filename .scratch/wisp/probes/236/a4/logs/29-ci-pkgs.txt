@@ -1,0 +1,32 @@
+### ci.yml: ubuntu test step package list
+12:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+25:        run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+28:        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+32:        # every verdict to tools/d22scan/runtests.sh (the strict runner from
+42:        # and a ./internal/agent/... glob was quietly carrying a third (scheduler).
+46:        # them to print its own anchored top-level result line. Four packages with
+### ci.yml: windows test step package lists (raw command lines)
+75:        # runtests.sh asserts that the tests ACTUALLY RAN (ticket 71 AC#3):
+81:        run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+310:        # that judges the DENOMINATOR of scripts/portable-tests.sh, and its case
+316:        # is already in force (scripts/portable-tests.sh, census arm, `exit 1`);
+325:        # (scripts/portable-tests.sh fails `dash -n` at :231, scripts/winsec-tests.sh
+339:        # judged (portable-tests.sh, winsec-tests.sh, runtests.sh) that runs for
+391:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+404:        run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+406:      - name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
+410:        # printed the same bytes as a pass. scripts/portable-tests.sh delegates
+411:        # every verdict to tools/d22scan/runtests.sh (the strict runner from
+428:        run: bash scripts/portable-tests.sh --scope=core
+568:        # claims it (scripts/portable-tests.sh:392-399, message :407-423). Before
+588:        # scripts/portable-tests.sh:326-332, and probes/111/r2 section 1.2 at
+590:        # takes its refusal branch (portable-tests.sh:337-351) and exits 1 rather
+627:        #     tools/d22scan/runtests.sh:98-102 treats ANY `--- SKIP` as fatal and
+651:        run: bash scripts/portable-tests.sh --scope=census
+668:        # would be either a permanent red (runtests.sh treats SKIP as fatal, by
+672:        # on THIS platform: because risk is in the scope, portable-tests.sh
+679:        # The package list moved INTO scripts/portable-tests.sh as the named
+687:        run: bash scripts/portable-tests.sh --scope=windows
+690:        # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
+698:        # classify B, want ClassA), and runtests.sh propagates a non-zero `go
+703:        run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows

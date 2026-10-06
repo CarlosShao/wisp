@@ -1,0 +1,22 @@
+### windows job lines 530-700 (test steps)
+6:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+13:      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+35:      - name: "Package coverage census (ticket 111 AC#1 + GUARD D)"
+55:        # preference): on GOOS=linux `go list ./...` does not resolve the module -
+66:        # form succeeds is the leg that carries it: GOOS=windows resolves all 35
+78:        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+97:        #     cmd/wisp/resident_hotkey_live_258_windows_test.go:55), while
+98:        #     tools/d22scan/runtests.sh:98-102 treats ANY `--- SKIP` as fatal and
+124:      - name: Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+125:        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+133:        # ./internal/risk/ ADDED (ticket 110 AC#4, tightening - closes R-93-4):
+138:        # syncdirs_windows_test.go:133), so putting it in the RUN denominator
+139:        # would be either a permanent red (runtests.sh treats SKIP as fatal, by
+140:        # design) or a false green (bare `go test` prints `ok`) - which is the
+145:        # `go test -list` and prints the row with its class and reason in this
+160:      - name: "PathResolver junction placeholder (real cases tickets 18/20)"
+161:        # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
+162:        # pathresolver_junction_windows_test.go, so on any runner where the name or
+163:        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+169:        # classify B, want ClassA), and runtests.sh propagates a non-zero `go
+174:        run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows

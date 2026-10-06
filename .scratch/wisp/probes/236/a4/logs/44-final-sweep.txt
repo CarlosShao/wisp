@@ -1,0 +1,16 @@
+### prefix/regex assertions on a TASK id (not artifact name)
+internal/tools/pointer_183_cli_seam_test.go:176:	if name := filepath.Base(rec.ArtifactPath); !strings.HasPrefix(name, "tool-output-agent-task-") {
+internal/tools/subagent_222_test.go:275:			if strings.HasPrefix(delta, "task.spawn 已派生子代理") {
+internal/tools/task_output_ac2_before_test.go:76:		if strings.HasPrefix(ti.Name, "task.") {
+cmd/wisp/run_test.go:54:// taskIDRe pulls the loop's task id out of the run's own status line, so the
+cmd/wisp/run_test.go:56:var taskIDRe = regexp.MustCompile(`任务 (\S+) 结束`)
+cmd/wisp/run_test.go:140:	m := taskIDRe.FindStringSubmatch(f.out.String())
+### assertions that task id != a model-supplied id / distinct from call id
+internal/agent/compress_trace_test.go:513:	if task != res.TaskID {
+internal/agent/loop_golden_test.go:69:	if call.Req.TaskID != res.TaskID || call.Req.CorrelationID != res.TaskID {
+internal/agent/loop_golden_test.go:341:	if row.Tool != "echo" || row.CorrelationID != res.TaskID {
+internal/tools/loop_approval_test.go:213:	if r.CorrelationID == "" || r.CorrelationID != res.TaskID {
+### any test that pins task id against provider fixture ids
+internal/agent/loop_golden_test.go:66:	if call.Req.Name != "echo" || call.Req.CallID != "call_e1" {
+internal/agent/loop_golden_test.go:77:	if !historyHasCallID(h.loop.History(), "call_e1") {
+internal/agent/loop_golden_test.go:128:	mustContain(t, "round 2 body", second, `"tool_call_id":"call_e1"`)

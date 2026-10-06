@@ -1,0 +1,82 @@
+### loop_golden_test.go 165-215 (six parallel tasks: id assertions?)
+func TestToolExecutionRunsFourAcross(t *testing.T) {
+	tools := newBlockingProvider()
+	t.Cleanup(tools.release)
+	h := newHarness(t, "six-tools", withTools(tools), withConfig(func(c *Config) {
+		c.PerToolTimeout = 30 * time.Second // the release ends the hold, not the brake
+	}))
+
+	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+	if !h.waitForFirstRequest(5 * time.Second) {
+		task.Cancel()
+		task.Wait()
+		t.Fatal("provider never received a request")
+	}
+	if !tools.waitForInflight(MaxToolConcurrency, 5*time.Second) {
+		tools.release()
+		task.Wait()
+		t.Fatalf("only %d calls ran at once, want %d: the pool is serial, so the "+
+			"ceiling assertion in TestGoldenConcurrencyCeiling is vacuous",
+			tools.MaxConcurrent(), MaxToolConcurrency)
+	}
+	// Four of six are parked right now: the ceiling is a gate, not a hint, so
+	// not even a fifth call may have entered the provider.
+	if got := tools.MaxConcurrent(); got > MaxToolConcurrency {
+		t.Errorf("max concurrent = %d, want <= %d (D38d ceiling)", got, MaxToolConcurrency)
+	}
+	if got := tools.Started(); got > MaxToolConcurrency {
+		t.Errorf("calls entered while four were held = %d, want <= %d", got, MaxToolConcurrency)
+	}
+
+	tools.release()
+	res := task.Wait()
+	if res.Status != StatusCompleted {
+		t.Fatalf("status = %s (%s), want completed", res.Status, res.Message)
+	}
+	if got := tools.CallCount(); got != 6 {
+		t.Errorf("executions = %d, want 6", got)
+	}
+	if got := tools.MaxConcurrent(); got != MaxToolConcurrency {
+		t.Errorf("observed concurrency = %d, want exactly %d: the ceiling must be "+
+			"reached, not merely respected", got, MaxToolConcurrency)
+	}
+}
+
+// Budget exhaustion is the C22 token brake: Stuck state plus an explicit,
+// user-visible message that names the consumption. No silent stop.
+func TestGoldenBudgetExhaustionStuck(t *testing.T) {
+	var cfgTokenBudget int = 300 // two rounds of 170 tokens
+	h := newHarness(t, "budget-loop", withConfig(func(c *Config) {
+		c.TokenBudget = cfgTokenBudget
+	}))
+	res := h.run("分三步把这件事做完")
+### forensics_test.go 92-120
+	h := newHarness(t, "six-tools", withJournal(store), withTools(tools),
+		withConfig(func(c *Config) {
+			// Cancellation, never the C22 timeout, must be what ends this task.
+			c.PerToolTimeout = 10 * time.Second
+			c.ArtifactsDir = filepath.Join(dir, "artifacts")
+		}))
+
+	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+	if !h.waitForFirstRequest(3 * time.Second) {
+		tools.release()
+		t.Fatal("provider never received a request")
+	}
+	// Wait until four calls are genuinely in flight: their rows are open, and
+	// the cancellation now lands mid-execution.
+	if !tools.waitForInflight(MaxToolConcurrency, 3*time.Second) {
+		tools.release()
+		task.Wait()
+		t.Fatalf("only %d/%d tool calls started; the cancelled path is untested",
+			tools.MaxConcurrent(), MaxToolConcurrency)
+	}
+	task.Cancel()
+	tools.release()
+
+	res := task.Wait()
+	if res.Status != StatusCancelled {
+		t.Fatalf("status = %s (%s), want cancelled", res.Status, res.Message)
+	}
+
+	// Read back on a fresh, LIVE ctx: the point of the defect is that the rows

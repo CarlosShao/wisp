@@ -1,0 +1,17 @@
+=== newest log job list ===
+    866 lint
+    288 lint-frontend
+   5244 test-core
+   4578 test-windows
+=== does 37158259050 contain the notice test at all ===
+6
+=== SKIP lines in 37158259050 ===
+12
+=== red-*.txt heads ===
+TestAC1AlwaysBranchDoesNotRevertAHandEditedKey
+TestAListWinsWhereBothTablesHit
+TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card
+TestApprovalCardViewJSONKeysMatchFrontendTypes
+TestBListDefaultDenyAndOverride
+TestC21DesignTokensFourWayAgree
+=== ledger grep 174 anywhere in scripts ===

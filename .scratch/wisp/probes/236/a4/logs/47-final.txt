@@ -1,0 +1,29 @@
+### A. any assertion TaskID vs CallID differ (repo, tests)
+### B. rand stub / fallback branch coverage attempts
+internal/agent/approval/cancel_key_label_260r4_test.go:81:// TestTicket260R4DefaultLabelIsTheOldSentence is cell ① on the SHIPPED fallback
+internal/agent/approval/cancel_key_wording_260r3_test.go:105:	// Then the default 档, on the shipped fallback path (no reader).
+internal/agent/approval/queue_test.go:164:	// A guessed grant for item A - the value is 256 bits from crypto/rand, so
+internal/agent/approval/ticket87_veto_l2_test.go:200:// side of the same rule: the fallback may reach exactly the item the name
+internal/agent/compress_trace_test.go:418:// (~41 706 tokens over 3 072) left 0 records, the degenerate multi-ladder shape
+internal/agent/forensics_test.go:78:// the rows were stranded: state="running", ended_at NULL, and zero tool_call
+internal/agent/spill_name_injectivity_test.go:152:// fallback, or a long id carrying a digest tail).
+internal/agent/spill_name_injectivity_test.go:216:			// The one documented exception: the sequence fallback, whose token is
+internal/agent/spill_name_injectivity_test.go:219:				t.Errorf("empty id produced %q, want the sequence fallback name", name)
+internal/agent/spill_path_invariant_test.go:152:	// The degenerate case the fallback exists for. TICKET 79 narrowed it and the
+internal/agent/spill_path_invariant_test.go:154:	// characters now ENCODES to something non-empty, so the sequence fallback is
+internal/agent/spill_path_invariant_test.go:159:	// while the test congratulated them on "the fallback name". Bare and
+internal/agent/spill_path_invariant_test.go:160:	// non-degenerate is still what is pinned - plus that five ids get five names.
+internal/agent/spill_path_invariant_test.go:164:			sp, err := NewSpiller(filepath.Join(root, "fallback"), inv76aBudget).Prepare(id, strings.
+internal/agent/spill_path_invariant_test.go:169:				t.Errorf("empty id produced %q, want the sequence fallback name", sp.Name)
+### C. task_output_pointer_notice_test legs + skips
+106:func TestPointerOutsideAuthorizedRootSpeaks(t *testing.T) {
+147:func TestPointerToMissingCopyFileSpeaks(t *testing.T) {
+179:func TestPointerToNonRegularPathSpeaks(t *testing.T) {
+204:func TestHealthyPointerStaysSilent(t *testing.T) {
+235:func TestUnwiredJudgeFailsClosedInReply(t *testing.T) {
+268:func TestBothPointerDefectsAreReportedSeparately(t *testing.T) {
+300:func TestPointerNoticeKeepsTheD153StubShape(t *testing.T) {
+350:func TestHealthyReplyStillMatchesThePreFixTemplate(t *testing.T) {
+408:		t.Skipf("前置条件缺失：造不出真 NTFS junction（mklink /J %s %s: %v: %s）", link, target, err, out)
+420:func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3(t *testing.T) {
+497:func TestLeakProbeTokenOnALegalPathStaysSilent174r3(t *testing.T) {

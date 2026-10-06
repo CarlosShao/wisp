@@ -1,0 +1,118 @@
+### portable-tests.sh 175-260
+github.com/CarlosShao/wisp/internal/llm/golden
+github.com/CarlosShao/wisp/internal/llm/openaichat
+github.com/CarlosShao/wisp/internal/llm/openairesponses
+github.com/CarlosShao/wisp/internal/memory
+github.com/CarlosShao/wisp/internal/models
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/panel
+github.com/CarlosShao/wisp/internal/perm
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/projctx
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/session
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/tools
+github.com/CarlosShao/wisp/internal/winsec
+'
+win_pin='
+github.com/CarlosShao/wisp/cmd/llmrecord
+github.com/CarlosShao/wisp/internal/ball
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/perm
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/projctx
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/session
+'
+cli_pin='
+github.com/CarlosShao/wisp/cmd/wisp
+'
+winsec_pin='
+github.com/CarlosShao/wisp/internal/winsec
+'
+
+# TICKET 251 AC#4 - ONE ROSTER, READ BY EVERYONE. The tier names used to be written
+# TWICE in this file: as the `case $mode in` branches, and again as
+# `for m in core windows cli winsec` inside the census loop. Two lists that can
+# disagree, and at the ticket's own HEAD they DID (census printed `CLAIMED BY ...
+# winsec` for a tier no branch implemented) while census exited 0. tiers= is now the
+# only place the names are written; the census step re-reads THIS FILE's own
+# `case $mode in` block and refuses to report anything unless the two sets are equal
+# in both directions, so the roster cannot be maintained apart from the branches.
+tiers='core windows cli winsec census'
+# The winsec tier's scope, named once: the tier branch below, the explicit-path audit
+# further down and the core tier's winsec row ALL read it, so "what the tier covers"
+# cannot drift from "what the tier's pin claims" the way the tier NAME used to, and
+# the two tiers that claim internal/winsec cannot resolve it two different ways
+# (ticket 254 AC#2: core used to name the DIRECTORY here while the tier names the
+# GLOB, which is exactly the shape that lets one tier go green on a package split
+# while the other goes red on it).
+winsec_dir=./internal/winsec/
+winsec_scope=./internal/winsec/...
+
+scope=()
+pinned=''
+case $mode in
+core)
+    scope=(
+        ./internal/agent/ ./internal/agent/approval/
+        ./internal/llm/... ./internal/config/...
+        ./internal/memory/... ./internal/observe/... ./internal/secret/...
+        ./internal/risk/... ./internal/statemachine/...
+        ./internal/tools/... ./internal/models/...
+        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+        ./internal/panel/... ./internal/ball/ ./internal/perm/
+        ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
+        ./internal/session/ ./internal/projctx/
+    )
+    pinned=$core_pin
+    ;;
+windows)
+    scope=(
+        ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
+        ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
+        ./internal/session/ ./internal/projctx/
+    )
+    pinned=$win_pin
+    ;;
+cli)
+    # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
+    # the test binary dies at LOAD time without the sherpa DLLs on PATH (ticket
+    # 98), and that script stages them and refuses to run if they are not there.
+    scope=(./cmd/wisp/)
+### scope switches
+22:# cases declared NOT IN SCOPE for a stated reason, plus the check that stops
+44:# TICKET 111 - THE THREE GUARDS BELOW THE SCOPE, AND WHY THIS SCRIPT OWES THEM.
+56:# invisible forever. That is why the scope is now resolved to import paths and
+64:#   GUARD C (AC#3)  the named scopes pin their resolved import paths, so
+69:#                   claims it. A/B/C audit the packages a scope NAMES; nothing
+70:#                   audited the packages a scope FORGETS, which is why "20 of 33"
+78:#   bash scripts/portable-tests.sh                    # the core (ubuntu) CI scope
+79:#   bash scripts/portable-tests.sh --scope=windows    # the test-windows scope
+80:#   bash scripts/portable-tests.sh --scope=cli        # cmd/wisp, after third_party
+81:#   bash scripts/portable-tests.sh --scope=winsec     # the internal/winsec tier (ticket 251)
+82:#   bash scripts/portable-tests.sh ./internal/proc/   # explicit scope (A and B still
+85:#                                                     # scope, see the ticket 251 AC#1 block)
+99:# The scopes CI runs, stated once, here - ci.yml names a scope, it does not carry
+118:#           any scope in any commit). Both compile tests on BOTH platforms, both carry
+121:#           package they import is already in this scope (memory / panel / risk / perm
+137:#           kept passing while testing one package less. The tier's scope is written
+141:#           census is not a scope - it is the audit of the four above, and it is in
+143:#           census reads and the branches that give a tier its scope to be ONE list.
+157:    --scope=*) mode=${1#--scope=}; shift ;;
+160:# Each named scope carries the set its globs resolve to, on one line per import
+161:# path. GUARD C compares against this, and --scope=census reads it, so the list a
+163:#   bash scripts/portable-tests.sh --scope=census
+221:# The winsec tier's scope, named once: the tier branch below, the explicit-path audit
+229:winsec_scope=./internal/winsec/...
+231:scope=()
+234:core)
+235:    scope=(
+243:        ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
+248:windows)
+249:    scope=(

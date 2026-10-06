@@ -1,0 +1,9 @@
+### all --- SKIP lines in newest logs (names only)
+-- .scratch/ci-logs/run-37166458550-failed.log
+      2 --- SKIP: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+      2 --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+      2 --- SKIP: TestSyncRedTeamRealOneDrive
+-- .scratch/ci-logs/run-37158259050.log
+      2 --- SKIP: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+      2 --- SKIP: TestSyncRedTeamRealOneDrive
+### test-core final verdict in 37158259050

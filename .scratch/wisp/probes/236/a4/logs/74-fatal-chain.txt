@@ -1,0 +1,44 @@
+### core runtests summary full line (37166458550)
+top-level: PASS=1010 FAIL=4 SKIP=1, === RUN=1479, '[no tests to run]'=0
+### FAIL names in core step
+### portable-tests exit chain lines 700-770 grep exit
+9:# and the step exited 0. A case that could never evaluate anything was booked as
+16:# ticket 71 AC#3 and stricter than anything this script could add:
+17:#   1. a non-zero `go test` exit code propagates unchanged;
+53:# `runtests.sh ./internal/session/` alone exits 1 (no top-level result at all),
+54:# but INSIDE a 23-package invocation the strict runner's "PASS>0" test is
+67:#   GUARD D (this ticket's AC#1, added by the r1 leg) the CENSUS refuses to exit 0
+71:#                   could sit in a printed table that exited 0. GUARD C bites when
+92:strict="$root/tools/d22scan/runtests.sh"
+93:if [ ! -f "$strict" ]; then
+94:    echo "portable-tests.sh: $strict is missing - this script is a shell around it and" \
+96:    exit 2
+216:# winsec` for a tier no branch implemented) while census exited 0. tiers= is now the
+277:    exit 2
+283:    exit 2
+298:    # `CLAIMED BY ... winsec` for a tier NO branch implemented, and exited 0 doing it.
+305:        exit 1
+309:        f && /^esac$/ { exit }
+324:        exit 1
+339:            echo "portable-tests.sh: census - go list ./... exited $go_rc. stdout named" \
+350:        exit 1
+377:                exit 1
+414:            echo "portable-tests.sh: The census used to PRINT these rows and exit 0, so the hole was visible"
+422:        exit 1
+424:    exit 0
+451:    exit 2
+469:# - eleven `go: downloading` lines, exit 1, twelve seconds in, BEFORE `go test`
+476:# one still exits 1 with BOTH streams printed - the pre-fix failure branch (it used
+487:        echo "portable-tests.sh: go list [${scope[*]}] exited non-zero. Its stdout was:"
+495:    exit 1
+539:    exit 1
+561:        exit 1
+582:    exit 1
+621:    exit 1
+631:        exit 2
+637:        exit 2
+646:    # exits on the first match, which SIGPIPEs `go test` and - with pipefail -
+673:    exit 1
+691:rc=0
+692:# tee costs nothing and keeps the strict runner's verdict intact while giving
+694:sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern" 2>&1 | tee "$capture" || rc=$?

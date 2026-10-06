@@ -1,0 +1,19 @@
+### TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 location
+internal/tools/task_output_pointer_notice_test.go:415:// TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 is the
+internal/tools/task_output_pointer_notice_test.go:420:func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3(t *t
+### skip gates in 174/notice tests (windows/junction)
+internal/tools/bridge_a18_kill_windows_test.go:43:// contains no t.Skip.
+internal/tools/fs_edit_ac4b_kill_windows_test.go:36:// 通过. There is no t.Skip in this file: a missing taskkill.exe fails LOUDLY.
+internal/tools/fs_staging_windows_test.go:30:// No t.Skip anywhere: a fixture this machine cannot build must read as a
+internal/tools/paths_twocontainments_252_r2_windows_test.go:32:// usable alias the case FAILS LOUDLY. Zero t.Skip calls in this file.
+internal/tools/paths_workspace_test.go:198:		t.Skipf("C26's reparse detection is a Windows implementation (risk.pathresolver_other.go reparseComponents returns 
+internal/tools/recycle_windows_test.go:39:		t.Skip("shell32 recycle-bin entry point not resolvable on this machine")
+internal/tools/task_output_pointer_notice_test.go:408:		t.Skipf("前置条件缺失：造不出真 NTFS junction（mklink /J %s %s: %v: %s）", link, target, er
+internal/risk/pathresolver_junction_windows_test.go:128:		t.Skip("volume has 8.3 short-name generation disabled (GetShortPathName returned the long name); legal
+internal/risk/syncdirs_redteam_windows_test.go:54:		t.Skipf("no 8.3 alias generated for %s on this volume", p)
+internal/risk/syncdirs_redteam_windows_test.go:208:		t.Skip("no profile home")
+internal/risk/syncdirs_redteam_windows_test.go:220:		t.Skipf("no live sync root on this machine (detected roots: %+v)", p.SyncRoots())
+internal/risk/syncdirs_windows_test.go:133:		t.Skip("no registry-grade sync record on this machine (HKCU Accounts without UserFolder is the documented reality h
+### tasklist_deferred_236r3 name+skips
+150:func Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment(t *testing.T) {
+202:func Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt(t *testing.T) {

@@ -1,0 +1,33 @@
+### unaccounted SKIP arm in logs
+.scratch/ci-logs/run-37158259050.log:test-windows	UNKNOWN STEP	2026-10-03T22:34:47.3108019Z portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:
+.scratch/ci-logs/run-37158259050.log:test-windows	UNKNOWN STEP	2026-10-03T22:35:14.7596113Z portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:
+.scratch/ci-logs/run-37166458550-failed.log:test-windows	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)	2026-10-04T01:02:18.5163979Z portable-tests.sh: unaccounted SKIP lines, each with the file
+.scratch/ci-logs/run-37166458550-failed.log:test-windows	Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)	2026-10-04T01:02:50.5472041Z portable-tests.sh: unaccounted SKIP lines, each with the f
+.scratch/ci-logs/run-37166458550-failed.log:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7327350Z portable-tests.sh: unaccounted SKIP lines,
+3
+### probes/236 a1 a2 contents (my siblings, allowed to read)
+.scratch/wisp/probes/236/a1:
+census.md
+end-status-porcelain.txt
+gofumpt-tracked-stderr.txt
+gofumpt-tracked-stdout.txt
+start-anchor.txt
+start-status-porcelain.txt
+tracked-go-zlist.bin
+
+.scratch/wisp/probes/236/a2:
+census.md
+diff-1-163-main.txt
+diff-2-174-wiring.txt
+diff-3-183-task-boxset-off.txt
+diff-4-185-hostpath.txt
+diff-5-197-subagent.txt
+diff-6-197-subagent-test.txt
+diff-7-222-m11.txt
+diff-8-185-fs-broken.txt
+gitstatus-end.txt
+### session shape lock prod function
+### any other 36-char uuid assertions in agent tests
+internal/agent/compress_trace_test.go:524:	// The shape check is not decoration: newTaskID mints a 36-char uuid-shaped
+internal/agent/compress_trace_test.go:526:	if len(task) != 36 || strings.Count(task, "-") != 4 {
+internal/agent/compress_trace_test.go:527:		t.Errorf("trace task = %q, want the uuid-shaped id newTaskID mints (36 chars, 4 dashes)", task)

@@ -1,0 +1,76 @@
+### newTaskID body with absolute line numbers
+  1128	// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+  1129	// documented as a UUID), built from crypto/rand so no new dependency appears.
+  1130	func newTaskID() string {
+  1131		var b [16]byte
+  1132		if _, err := rand.Read(b[:]); err != nil {
+  1133			// Entropy source unavailable: fall back to a clock-derived unique id.
+  1134			n := time.Now().UnixNano()
+  1135			for i := range b {
+  1136				b[i] = byte(n >> (8 * uint(i%8)))
+  1137			}
+  1138		}
+  1139		b[6] = (b[6] & 0x0f) | 0x40
+  1140		b[8] = (b[8] & 0x3f) | 0x80
+  1141		h := hex.EncodeToString(b[:])
+  1142		return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:]
+  1143	}
+### cmd/wisp/run_test.go 135-160
+   135	}
+   136	
+   137	// taskID reads the id this run reported.
+   138	func (f *runFixture) taskID() string {
+   139		f.t.Helper()
+   140		m := taskIDRe.FindStringSubmatch(f.out.String())
+   141		if m == nil {
+   142			f.t.Fatalf("the run printed no status line:\n%s", f.out.String())
+   143		}
+   144		return m[1]
+   145	}
+   146	
+   147	// openStore reopens the run's store after the runtime closed it.
+   148	func (f *runFixture) openStore() *memory.Store {
+   149		f.t.Helper()
+   150		st, err := memory.Open(f.dir)
+   151		if err != nil {
+   152			f.t.Fatal(err)
+   153		}
+   154		f.t.Cleanup(func() { _ = st.Close() })
+   155		return st
+   156	}
+   157	
+   158	func TestRunTextTaskTextPathEndToEnd(t *testing.T) {
+   159		f := newRunFixture(t, "openai-chat")
+   160		code := f.run("总结一下 这份笔记讲了什么")
+### loop_golden 335-345
+   335			t.Fatalf("tool_call lookup: %v", err)
+   336		}
+   337		if len(rows) != 1 {
+   338			t.Fatalf("tool_call rows = %d, want 1", len(rows))
+   339		}
+   340		row := rows[0]
+   341		if row.Tool != "echo" || row.CorrelationID != res.TaskID {
+   342			t.Errorf("row = %+v", row)
+   343		}
+   344		if row.Decision != DecisionAllow {
+   345			t.Errorf("decision = %q, want %q (pre-gate pass-through)", row.Decision, DecisionAllow)
+### do windows CI runs reach internal/tools?
+-- .scratch/ci-logs/run-37166458550-failed.log
+1
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-
+-- .scratch/ci-logs/run-37158259050.log
+1
+test-core	UNKNOWN STEP	2026-10-03T22:24:59.2235720Z     task_output_pointer_notice_test.go:117: shape (a) verb
+test-core	UNKNOWN STEP	2026-10-03T22:24:59.2237423Z     task_output_pointer_notice_test.go:161: shape (b) miss
+test-core	UNKNOWN STEP	2026-10-03T22:24:59.2239101Z     task_output_pointer_notice_test.go:186: shape (b) dire
+test-core	UNKNOWN STEP	2026-10-03T22:24:59.2240523Z     task_output_pointer_notice_test.go:213: silent control
+test-core	UNKNOWN STEP	2026-10-03T22:24:59.2242303Z     task_output_pointer_notice_test.go:252: fail-closed ve
+test-core	UNKNOWN STEP	2026-10-03T22:24:59.2244218Z     task_output_pointer_notice_test.go:282: both shapes ve

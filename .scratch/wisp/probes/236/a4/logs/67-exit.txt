@@ -1,0 +1,51 @@
+### after unaccounted SKIP: does it exit?
+14:# strict runner forces is what makes `[no test files]` and `(cached)` impossible
+52:[ "$rc" -eq 0 ] || echo "portable-tests.sh: strict runner exited $rc for scope=[${scope[*]}]" >&2
+53:exit "$rc"
+### lines 640-700 (ledger accounting + skip pattern build)
+done
+
+echo "portable-tests.sh: platform=$goos scope=[${scope[*]}]"
+echo "portable-tests.sh: ${#ledger[@]} ledger entries, ${#active[@]} accounted on this platform:"
+for entry in "${ledger[@]}"; do
+    IFS='|' read -r name _pkg platform class reason <<<"$entry"
+    case $platform in
+    any | "$goos") printf 'portable-tests.sh:   %-52s %s\n' "$name" "[$class] $reason" ;;
+    esac
+done
+
+if [ "${#stale[@]}" -ne 0 ]; then
+    echo "portable-tests.sh: these ledger entries name NO TEST in the compiled test binary for $goos:" >&2
+    printf '    %s\n' "${stale[@]}" >&2
+    echo "portable-tests.sh: a -skip pattern that matches nothing is the green no-op ticket 71 was" \
+        "written about. Either the test was renamed or deleted (fix or delete the entry), or it" \
+        "moved behind a build tag that excludes this platform (then say so in the entry)." >&2
+    rm -f "$universe_file"
+    exit 1
+fi
+rm -f "$universe_file"
+
+if [ "${#active[@]}" -eq 0 ]; then
+    # Nothing applies on this platform. Use a pattern that cannot match any test
+    # name, so the flag is always present and its effect is always exercised.
+    skip_pattern='^portable_tests_ledger_is_empty_on_this_platform$'
+else
+    alt=""
+    for name in "${active[@]}"; do
+        if [ -z "$alt" ]; then alt=$name; else alt="$alt|$name"; fi
+    done
+    skip_pattern="^($alt)\$"
+fi
+echo "portable-tests.sh: -skip pattern built from the ledger: $skip_pattern"
+
+capture=$(mktemp 2>/dev/null || echo "$root/.portable-tests.$$.log")
+rc=0
+# tee costs nothing and keeps the strict runner's verdict intact while giving
+# this script the bytes for the four numbers and for naming an offender.
+sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern" 2>&1 | tee "$capture" || rc=$?
+
+count() { grep -c "$1" "$capture" || true; }
+ran=$(count '^=== RUN')
+passed=$(count '^--- PASS')
+failed=$(count '^--- FAIL')
+skipped=$(count '^--- SKIP')

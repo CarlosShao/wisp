@@ -1,0 +1,5 @@
+=== uuid-literal-shaped strings in tests (8-4-4-4-12) ===
+internal/tools/subagent_197_test.go:886:	for _, id := range []string{"aB-1", "00000000-0000-4000-8000-000000000000", "带中文的id"} {
+cmd/wisp/subagent_stream_key_197_test.go:55:		"00000000-0000-4000-8000-000000000000",
+=== count ===
+2

@@ -1,0 +1,53 @@
+=== literal task id fixture assignments (id := some-string) ===
+internal/tools/failclosed_236_teeth_test.go:91:	lit236CancelNoHostTaskID = "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只�
+internal/tools/failclosed_236_teeth_test.go:98:	lit236SpawnNoHostTaskID = "这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，" 
+internal/tools/pointer_183_cli_seam_test.go:64:	r183SiblingTaskID = "c66c0635183r2b2c"
+internal/tools/subagent_197_test.go:29:	parent197 = "parent-task-197"
+internal/tools/ticket176r1_start_port_test.go:131:	const taskID = "e3f1c0a97b2d4865"
+
+=== bare task id literals appearing in assertions (quoted strings containing task) ===
+internal/tools/bridge_a18_kill_windows_test.go:121:			_, _ = exec.Command("taskkill", "/F", "/PID", fmt.Sprint(pid)).CombinedOutput()
+internal/tools/bridge_a18_kill_windows_test.go:141:	out, err := exec.Command("taskkill", "/F", "/PID", fmt.Sprint(pid)).CombinedOutput()
+internal/tools/bridge_a18_kill_windows_test.go:143:		t.Fatalf("前置条件缺失：真 taskkill 跑不动（taskkill /F /PID %d: %v: %s）。\n"+
+internal/tools/bridge_a18_kill_windows_test.go:144:			"需要 Windows 自带的 System32\\taskkill.exe 可用，且当前用户能终止自己的进程。\n"+
+internal/tools/bridge_junction_windows_test.go:594:	mustStartTask(t, store, "task-1")
+internal/tools/bridge_junction_windows_test.go:613:	rows, err := store.ListToolCallsByTask(t.Context(), "task-1")
+internal/tools/bridge_scope_open_ticket158_test.go:14://     它证明这本账真的连到了"谁把这枚 task 的污点从表上摘下去"那一句上，而�
+internal/tools/bridge_scope_open_ticket158_test.go:36:// req() helper hardcodes "task-1", and this test needs to tell two tasks apart.
+internal/tools/bridge_scope_open_ticket158_test.go:92:	const plainTask = "task-158-plain"
+internal/tools/bridge_scope_open_ticket158_test.go:98:		t.Errorf("非敏感源 fs.list 也开了 scope，task=%q："+
+internal/tools/bridge_scope_open_ticket158_test.go:104:	const taintedTask = "task-158-taint"
+internal/tools/bridge_scope_open_ticket158_test.go:122:	want := "task=" + taintedTask + " was_open=true"
+internal/tools/bridge_test.go:149:		TaskID: "task-1", CorrelationID: "corr-1", CallID: "call-1",
+internal/tools/bridge_test.go:655:	mustStartTask(t, store, "task-1")
+internal/tools/bridge_test.go:671:		rq.TaskID, rq.CorrelationID = "task-1", fmt.Sprintf("corr-%d", i)
+internal/tools/bridge_test.go:686:	rq.TaskID, rq.CorrelationID = "task-1", "corr-l1"
+internal/tools/bridge_test.go:694:	rows, err := store.ListToolCallsByTask(t.Context(), "task-1")
+internal/tools/failclosed_236_teeth_test.go:120:		t.Fatalf("caller 为空时 task.cancel 回了非拒绝：%q", callerUnknown.Text)
+internal/tools/failclosed_236_teeth_test.go:146:		Name: "task.cancel",
+internal/tools/failclosed_236_teeth_test.go:147:		Args: json.RawMessage(`{"task_id":"target-236r2"}`),
+internal/tools/failclosed_236_teeth_test.go:150:		t.Fatalf("task.cancel dispatch failed: %v", err)
+internal/tools/failclosed_236_teeth_test.go:153:		t.Fatalf("名册没接线时 task.cancel 回了非拒绝：%q", out.Text)
+internal/tools/failclosed_236_teeth_test.go:174:		t.Fatalf("名册没接线时 task.spawn 回了非拒绝：%q", res.Text)
+internal/tools/failclosed_236_teeth_test.go:216:		t.Errorf("BaseOptions 没接线时 task.spawn 回了非拒绝：%q", res.Text)
+internal/tools/failclosed_236_teeth_test.go:255:		t.Errorf("宿主没给任务 id 时 task.spawn 回了非拒绝：%q", res.Text)
+internal/tools/failclosed_236_teeth_test.go:289:		Name: "task.spawn",
+internal/tools/failclosed_236_teeth_test.go:293:		t.Fatalf("task.spawn dispatch failed: %v", err)
+internal/tools/fswrite_silentloss_ac1_test.go:98:	mustStartTask(t, store, "task-1")
+internal/tools/fswrite_silentloss_ac1_test.go:166:	rows, err := store.ListToolCallsByTask(context.Background(), "task-1")
+internal/tools/fs_edit_ac4b_kill_windows_test.go:138:			_, _ = exec.Command("taskkill", "/F", "/PID", fmt.Sprint(pid)).CombinedOutput()
+internal/tools/fs_edit_ac4b_kill_windows_test.go:157:	out, err := exec.Command("taskkill", "/F", "/PID", fmt.Sprint(pid)).CombinedOutput()
+internal/tools/fs_edit_ac4b_kill_windows_test.go:159:		t.Fatalf("前置条件缺失：真 taskkill 跑不动（taskkill /F /PID %d: %v: %s）。\n"+
+internal/tools/fs_edit_ac4b_kill_windows_test.go:160:			"需要 Windows 自带的 System32\\taskkill.exe，且当前用户能终止自己的进程。\n"+
+internal/tools/fs_edit_ac4b_kill_windows_test.go:200:	t.Logf("AC#4b 子进程输出（应只有 taskkill 的强制终止，没有任何 Go 清理）：%q", chil
+internal/tools/fs_staging_windows_test.go:331:		_, _ = exec.Command("taskkill", "/F", "/PID", fmt.Sprint(proc.Process.Pid)).CombinedOutput()
+internal/tools/fs_staging_windows_test.go:349:	out, err := exec.Command("taskkill", "/F", "/PID", fmt.Sprint(proc.Process.Pid)).CombinedOutput()
+internal/tools/fs_staging_windows_test.go:398:			_, _ = exec.Command("taskkill", "/F", "/PID", fmt.Sprint(cmd.Process.Pid)).CombinedOutput()
+internal/tools/fs_test.go:35:	if got := prov.ScopeTaints("task-1"); len(got) != 1 {
+internal/tools/fs_test.go:110:	if got := b.prov.ScopeTaints("task-1"); len(got) != 0 {
+internal/tools/loop_approval_test.go:214:		t.Errorf("correlation_id = %q, want the task id %q (C18)", r.CorrelationID, res.TaskID)
+internal/tools/loop_approval_test.go:232:		t.Fatalf("a loop with no admitted task must not reach a window: %+v", f.ui.cards())
+internal/tools/pointer_183_cli_seam_test.go:21://	       "task.output" taken off the C25 marking roster (ticket 175's gate in
+internal/tools/pointer_183_cli_seam_test.go:60:	// it), and the artifact key is "agent-task-"+id, so the spilled file is
+internal/tools/pointer_183_cli_seam_test.go:127:		TaskID: taskID, CorrelationID: taskID, CallID: "call-" + taskID + "-" + tool,
+internal/tools/pointer_183_cli_seam_test.go:176:	if name := filepath.Base(rec.ArtifactPath); !strings.HasPrefix(name, "tool-output-agent-task-") {

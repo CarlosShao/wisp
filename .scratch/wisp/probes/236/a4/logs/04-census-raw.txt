@@ -1,0 +1,43 @@
+=== A. file count (tools+cmd tests) ===
+116
+=== B. files containing taskid-ish ===
+36
+=== C. total matching lines ===
+203
+=== D. per-file counts ===
+28 cmd/wisp/subagent_carrier_197_test.go
+18 internal/tools/failclosed_236_teeth_test.go
+16 internal/tools/task_output_leg_test.go
+16 internal/tools/subagent_197_test.go
+12 internal/tools/ticket176r1_start_port_test.go
+11 cmd/wisp/run_test.go
+10 internal/tools/task_cancel_221_legs_test.go
+9 cmd/wisp/subagent_selfapproval_197_test.go
+7 internal/tools/loop_approval_test.go
+7 internal/tools/bridge_scope_open_ticket158_test.go
+7 cmd/wisp/approval_reply_201_test.go
+6 internal/tools/ticket175r2_stamp_live_test.go
+6 internal/tools/pointer_183_cli_seam_test.go
+6 cmd/wisp/panel_pump_test.go
+4 cmd/wisp/task_scope_close_151_test.go
+4 cmd/wisp/subagent_blocked_197_test.go
+3 internal/tools/pointer_185_cli_seam_test.go
+3 internal/tools/bridge_test.go
+3 cmd/wisp/ticket224_assembly_test.go
+3 cmd/wisp/resident_approval_live_246_windows_test.go
+3 cmd/wisp/approval_always_201_test.go
+2 internal/tools/task_output_pointer_notice_test.go
+2 internal/tools/task_output_ac2_before_test.go
+2 internal/tools/subagent_222_test.go
+2 internal/tools/grant_test.go
+2 cmd/wisp/resident_approval_246_windows_test.go
+2 cmd/wisp/approval_seam_201_test.go
+1 internal/tools/wiring_test.go
+1 internal/tools/ticket90_test.go
+1 internal/tools/ticket224_grantid_column_test.go
+1 internal/tools/fs_write_test.go
+1 cmd/wisp/subagent_stream_key_197_test.go
+1 cmd/wisp/run_mode101_test.go
+1 cmd/wisp/resident_task_source_246_windows_test.go
+1 cmd/wisp/resident_grant_writer_265_windows_test.go
+1 cmd/wisp/logsink_windows_test.go

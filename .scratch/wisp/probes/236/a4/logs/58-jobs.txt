@@ -1,0 +1,17 @@
+### ci.yml job names + runs-on + internal/tools mentions
+12:  push:
+36:  schedule:
+50:  group: ci-${{ github.workflow }}-${{ github.ref }}${{ github.event_name == 'push' && format('-{0}', githu
+51:  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+65:  lint:
+66:    runs-on: ubuntu-latest
+364:  test-core:
+365:    runs-on: ubuntu-latest
+474:  test-windows:
+475:    runs-on: windows-latest
+708:  slo-smoke:
+709:    runs-on: windows-latest
+766:  slo-full:
+767:    runs-on: [self-hosted, wisp-slo]
+840:  lint-frontend:
+841:    runs-on: ubuntu-latest

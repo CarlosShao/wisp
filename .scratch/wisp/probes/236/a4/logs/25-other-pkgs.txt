@@ -1,0 +1,8 @@
+### other packages: task id shape assertions
+internal/panel/subagent_blocked_220_test.go:92:func assertBlocked(t *testing.T, data []byte, taskID string, want bool) {
+internal/panel/subagent_blocked_220_test.go:98:			taskID, row.BlockedOnApproval, want, data)
+internal/panel/subagent_roster_197_test.go:146:	if child.ParentTaskID != "root-1" {
+internal/panel/subagent_roster_197_test.go:147:		t.Errorf("parentTaskId = %q, want the task that derived it", child.ParentTaskID)
+internal/panel/subagent_stream_197_test.go:37:		t.Errorf("SubagentStreamKey(\"t-42\") = %q, want the literal shape subagent:<taskID>", got)
+### full-repo: any test asserting id shape/length for task
+internal/agent/compress_trace_test.go:526:	if len(task) != 36 || strings.Count(task, "-") != 4 {

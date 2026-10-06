@@ -1,0 +1,50 @@
+### dao_test.go 230-275
+   230		}
+   231		for _, r := range rows {
+   232			if r.Kind != MemoryKindExplicit {
+   233				t.Errorf("kind = %q, want explicit", r.Kind)
+   234			}
+   235		}
+   236	
+   237		if err := s.DeleteMemory(ctx, id1); err != nil {
+   238			t.Fatal(err)
+   239		}
+   240		if err := s.DeleteMemory(ctx, id1); !errors.Is(err, ErrNotFound) {
+   241			t.Errorf("delete missing memory: %v", err)
+   242		}
+   243		n, err := s.PurgeMemories(ctx)
+   244		if err != nil || n != 1 {
+   245			t.Fatalf("purge = %d, %v; want 1", n, err)
+   246		}
+   247	}
+   248	
+   249	func TestTaskLogLifecycleAndErrorClassValidation(t *testing.T) {
+   250		s := openTestStore(t)
+   251		ctx := context.Background()
+   252	
+   253		tl := TaskLog{ID: "task-1", State: "running", QueryText: "帮我查天气 [已脱敏]"}
+   254		if err := s.StartTaskLog(ctx, tl); err != nil {
+   255			t.Fatal(err)
+   256		}
+   257		// Duplicate id rejected by PK.
+   258		if err := s.StartTaskLog(ctx, tl); err == nil {
+   259			t.Error("duplicate task id accepted")
+   260		}
+   261		// D37 enum enforced via observe.ValidateErrorClass (ticket 03 hook).
+   262		if err := s.FinishTaskLog(ctx, "task-1", "succeeded", "done", 120, 45, 3100, "not_a_class"); err == nil {
+   263			t.Error("invalid error_class accepted")
+   264		}
+   265		if err := s.FinishTaskLog(ctx, "task-1", "succeeded", "done", 120, 45, 3100, string(observe.ClassNetwork)); err != nil {
+   266			t.Fatal(err)
+   267		}
+   268		got, err := s.TaskLogByID(ctx, "task-1")
+   269		if err != nil {
+   270			t.Fatal(err)
+   271		}
+   272		if got.State != "succeeded" || got.EndedAt == nil || got.ErrorClass != string(observe.ClassNetwork) {
+   273			t.Errorf("finished row wrong: %+v", got)
+   274		}
+   275		if got.Currency != "CNY" {
+### enclosing func name
+163:func TestMemoryAddSearchDeletePurge(t *testing.T) {
+249:func TestTaskLogLifecycleAndErrorClassValidation(t *testing.T) {

@@ -1,0 +1,52 @@
+### RunAsync call shape (non-.scratch, tracked)
+internal/agent/control_test.go:81:	task := h.loop.RunAsync(context.Background(), "慢一点也行")
+internal/agent/control_test.go:131:	task := h.loop.RunAsync(context.Background(), "现在天气怎么样")
+internal/agent/forensics_test.go:99:	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+internal/agent/loop.go:328:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+internal/agent/loop_golden_test.go:172:	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+internal/agent/loop_golden_test.go:251:	task := h.loop.RunAsync(context.Background(), "慢一点也行")
+internal/agent/loop_golden_test.go:275:	task := h.loop.RunAsync(context.Background(), "两件事一起办")
+internal/tools/subagent_197.go:344:	bg := child.RunAsync(childCtx, prompt)
+cmd/wisp/run.go:1099:	bg := loop.RunAsync(ctx, task)
+### tests that read Result.TaskID from a real loop run
+internal/tools/bridge_scope_open_ticket158_test.go:6:// b.OpenTask(dec.TaskID)，本包 115/79/0/0 零枚红；同一发变异换到 cmd/wisp 才红
+internal/tools/bridge_test.go:671:		rq.TaskID, rq.CorrelationID = "task-1", fmt.Sprintf("corr-%d", i)
+internal/tools/bridge_test.go:686:	rq.TaskID, rq.CorrelationID = "task-1", "corr-l1"
+internal/tools/failclosed_236_teeth_test.go:115:	target := x.h.childRow(t).TaskID
+internal/tools/fs_write_test.go:752:	return stubReport{d: d, res: res, vetoed: f.Vetoed(orDefault(d.CorrelationID, d.TaskID))}
+internal/tools/loop_approval_test.go:202:	rows := f.rows(t, res.TaskID)
+internal/tools/loop_approval_test.go:213:	if r.CorrelationID == "" || r.CorrelationID != res.TaskID {
+internal/tools/loop_approval_test.go:214:		t.Errorf("correlation_id = %q, want the task id %q (C18)", r.CorrelationID, res.TaskID)
+internal/tools/loop_approval_test.go:246:	if rows := f.rows(t, res.TaskID); len(rows) != 1 ||
+internal/tools/subagent_197_test.go:327:	key := SubagentStreamKey(row.TaskID)
+internal/tools/subagent_197_test.go:328:	if key != "subagent:"+row.TaskID {
+internal/tools/subagent_197_test.go:329:		t.Errorf("流键 = %q, want subagent:%s", key, row.TaskID)
+internal/tools/subagent_197_test.go:679:	if grand := h.roster.Descendants(rows[0].TaskID); len(grand) != 0 {
+internal/tools/subagent_197_test.go:761:			childID = r.TaskID
+internal/tools/subagent_197_test.go:870:	childID := h2.childRow(t).TaskID
+internal/tools/task_cancel_221_legs_test.go:153:			return r.TaskID, done
+internal/tools/task_cancel_221_legs_test.go:211:	late := x.cancel(t, parent197, row.TaskID)
+internal/tools/task_cancel_221_legs_test.go:380:			if r.TaskID != parent197 {
+internal/tools/task_cancel_221_legs_test.go:381:				t.Errorf("tool_call 行的调用者是 %q, want %q", r.TaskID, parent197)
+internal/tools/task_cancel_221_legs_test.go:476:			childID = r.TaskID
+cmd/wisp/subagent_blocked_197_test.go:236:		row.TaskID, row.Status, row.StreamKey, snap.Pending[0].Tool, len(snap.Pending),
+cmd/wisp/subagent_carrier_197_test.go:127:		if r.TaskID == taskID {
+cmd/wisp/subagent_carrier_197_test.go:203:			if row.Kind == tools.TaskKindRoot && row.TaskID != "" {
+cmd/wisp/subagent_carrier_197_test.go:204:				return row.TaskID, nil
+cmd/wisp/subagent_carrier_197_test.go:219:			kids = append(kids, row.TaskID)
+cmd/wisp/subagent_carrier_197_test.go:283:		if sect.Rows[i-1].TaskID > sect.Rows[i].TaskID {
+cmd/wisp/subagent_carrier_197_test.go:286:				sect.Rows[i-1].TaskID, sect.Rows[i].TaskID)
+cmd/wisp/subagent_carrier_197_test.go:381:			child.TaskID, child.Status, sect.InFlightSlots)
+cmd/wisp/subagent_carrier_197_test.go:409:		if row.TaskID == taskID {
+cmd/wisp/subagent_carrier_197_test.go:579:			t.Errorf("row %s's page carries the root's prompt", row.TaskID)
+cmd/wisp/subagent_carrier_197_test.go:584:				row.TaskID, row.StreamTruncated, row.StreamElidedRunes, row.StreamDropped, live)
+cmd/wisp/subagent_selfapproval_197_test.go:131:			if c.TaskID == taskID && c.Level == "L2" {
+### assertRulerLive def+uses
+internal/agent/compress_trace_test.go:100:// assertRulerLive drives the capture with a record this package's production
+internal/agent/compress_trace_test.go:103:func (tc *traceCapture) assertRulerLive(t *testing.T) {
+internal/agent/compress_trace_test.go:179:	recs.assertRulerLive(t)
+internal/agent/compress_trace_test.go:271:	recs.assertRulerLive(t)
+internal/agent/compress_trace_test.go:304:	recs.assertRulerLive(t)
+internal/agent/compress_trace_test.go:428:	recs.assertRulerLive(t)
+internal/agent/compress_trace_test.go:480:	recs.assertRulerLive(t)
+internal/agent/compress_trace_test.go:536:	recs.assertRulerLive(t)

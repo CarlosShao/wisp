@@ -1,0 +1,30 @@
+### UnixNano across all tests (must not be clock-derived pins)
+internal/proc/boot_windows_test.go:23:		MutexName:         fmt.Sprintf(`Local\wisp-test-boot-%d-%d`, os.Getpid(), time.N
+internal/proc/boot_windows_test.go:24:		ActivateEventName: fmt.Sprintf(`Local\wisp-test-boot-%d-%d.activate`, os.Getpid(
+internal/proc/envfork_mutex_windows_test.go:28:	suffix := fmt.Sprintf("-itest-%d-%d", os.Getpid(), time.Now().UnixNano()
+internal/proc/singleinstance_windows_test.go:52:	mutex := fmt.Sprintf(`Local\wisp-test-single-instance-%d-%d`, os.Getpid
+### ledger entry count + accounted line in portable-tests.sh
+32:# the failure mode a plain -skip list would have smuggled in. An unaccounted SKIP
+589:ledger=(
+658:echo "portable-tests.sh: ${#ledger[@]} ledger entries, ${#active[@]} accounted on this platform:"
+704:    echo "portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:" >&2
+### newTaskID callers outside internal/agent (tracked only)
+internal/agent/compress_trace_test.go:557:	idA, idB := newTaskID(), newTaskID()
+internal/agent/loop.go:329:	id := newTaskID()
+internal/agent/loop.go:340:	return l.run(ctx, newTaskID(), input)
+internal/agent/loop.go:1130:func newTaskID() string {
+internal/tools/pointer_183_cli_seam_test.go:59:	// agent.newTaskID() gives in production (task_backfill.go's doc block names
+internal/tools/task_backfill.go:38:// model-supplied. agent.newTaskID() is a plain lowercase hex uuid, so a bare
+### task.spawn schema (no id field?)
+type subagentSpawnArgs struct {
+	Description string `json:"description"`
+	Prompt      string `json:"prompt"`
+}
+
+// subagentSpawnSchema keeps description and prompt as TWO fields: a short title
+// for the roster label and a self-contained task book for the child. Merging
+// them would make the roster row unreadable and the child under-specified.
+var subagentSpawnSchema = JSONSchema(`{"type":"object","properties":{` +
+	`"description":{"type":"string","description":"短标题，只放任务名，进名册当 label，不作为子代理的输入"},` +
+	`"prompt":{"type":"string","description":"交给子代理的自包含任务书：子代理看不到父任务的对话，需要的背景都得写进来"}` +
+	`},"required":["description","prompt"],"additionalProperties":false}`)

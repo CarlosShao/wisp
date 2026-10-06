@@ -1,0 +1,28 @@
+### runtests.sh skip handling (excerpt)
+24:#   2. any `--- SKIP`                             -> SKIP is NOT a pass. A test
+88:skipped=$(count '^--- SKIP')
+93:summary="packages=[$*] top-level: PASS=$passed FAIL=$failed SKIP=$skipped, === RUN=$ran, '[no tests to run]'=$noresult"
+99:    echo "runtests.sh: $skipped test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3) - $summary" >&2
+### portable-tests.sh: allowlist mechanism around line 590-610
+# name|package|platform|class|reason
+#   class: fixture = the machine or OS cannot supply the subject at all
+#          opt-in  = deliberately slow or real-network, gated by an env var
+#          reexec  = not a test, the child-process entry point of another test
+ledger=(
+    "TestDefaultDeadlineWallClockMeasurement|./internal/agent/approval/|any|opt-in|300s wall-clock measurement gated by WISP_84_MEASURE=1 (ticket84_no_owner_test.go:224, docs/evidence/s1/84-ac1-bounde
+    "TestSubprocessCrashWriter|./internal/memory/|any|reexec|child-process entry point of TestCrashRecoveryKillMidWrite (concurrent_test.go:186); not a test of its own, it skips whenever it is not the
+    "TestHelperProcess|./internal/proc/|windows|reexec|child-process entry point of the job-object cases (jobscope_windows_test.go:87, //go:build windows); skips unless re-exec'd with the helper env v
+    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio e
+    "TestRealDownloadVadThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:120); CI has no business pulling model archives from
+    "TestRealDownloadPuncArchiveThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:147); same reason as the VAD row"
+    "TestSyncRegistryProbeLive|./internal/risk/|windows|fixture|P12 live registry evidence; on ubuntu it is now out of scope by platform instead of by skip (ticket 93 AC#2 moved it verbatim into syncd
+    "TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|./internal/risk/|linux|fixture|needs a handle-resolved form of an existing directory, which POSIX has no object for (pathresolver_rewrite_account_t
+    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The case is AC#3(ii) with a REAL junction: on windows it builds one with cmd /c mklink /J and asserts
+    "TestD34WriteMatrix|./internal/tools/|linux|fixture|the table needs a second volume from otherVolumeDir (fs_write_test.go:140/151), and the volume-identity call it uses is a Windows API - on POSIX
+    "TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop|./internal/tools/|linux|fixture|same otherVolumeDir requirement as the write matrix row above (fs_write_test.go:677); on POSIX there is no volume i
+)
+
+# Names and packages, and the -list universe for this platform: built once, from
+# the scope PLUS every ledger package, so an entry whose package is outside a
+# narrowed scope is still checked rather than silently spared.
+### does allowlist include 174r3?

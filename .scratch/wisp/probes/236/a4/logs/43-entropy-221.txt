@@ -1,0 +1,14 @@
+### entropy/guessability/clock fallback in tests
+### task_cancel_221_test.go exists? leg names
+task_cancel_221_legs_test.go
+task_cancel_221_test.go
+89:func Test221EveryPromisedTaskNameIsRegistered(t *testing.T) {
+### spill_pointer_honesty_174 leg names + what it pins
+111:func TestSpillPointerUnwiredJudgeFailsClosed174(t *testing.T) {
+132:func TestSpillPointerOutsideAllowlistNamesBothRoadsBack174(t *testing.T) {
+164:func TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText174(t *testing.T) {
+196:func TestSpillHealthyPointerStillMatchesThePreFixSentence174(t *testing.T) {
+219:func TestSpillPointerNoticeAddsNoSecondPath174(t *testing.T) {
+248:func TestSpillPointerNoticeKeepsHeadTailAndBudget174(t *testing.T) {
+282:func TestLoopSpillNoticeReachesHistoryUnwired174(t *testing.T) {
+316:func TestLoopHonorsConfigPointerJudgeQuietly174(t *testing.T) {

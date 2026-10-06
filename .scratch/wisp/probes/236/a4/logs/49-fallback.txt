@@ -1,0 +1,46 @@
+### bridge.go 260-285 (id fallback)
+// row only if the error is wrapped with that class. Either way it is a class
+// the model cannot self-correct against.
+//
+// A REJECT IS NOT A FAULT. SPEC-07 §2 states the C3 rule as "未声明即拒绝调用
+// （不是报错，是拒绝）": an undeclared capability is refused, not reported. So
+// every rejection - capability, Deny, gate veto, timeout - comes back as an
+// IsError outcome carrying the right D37 class with err == nil: the task
+// continues, the model learns the call was refused, and the row records the
+// refusal. Returning a Go error instead would surface a policy decision as
+// "Wisp crashed", which is the failure mode the constraint exists to prevent.
+func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.ToolOutcome, error) {
+	if req.CorrelationID == "" {
+		req.CorrelationID = req.TaskID
+	}
+	entry, ok := b.reg.Lookup(req.Name)
+	if !ok {
+		// Unknown tool: class tool (self-correctable, D37), never internal.
+		return b.reject(ctx, req, Decision{Tool: req.Name},
+			"未知工具 "+req.Name+"，可用工具见 list_tools",
+			string(observe.ClassTool), OutcomeKindNotFound)
+	}
+
+	// --- C3: capability enforcement, ahead of any risk work or execution ----
+	dec, why := b.checkCaps(req, entry)
+	if why != "" {
+		return b.reject(ctx, req, dec, why, string(observe.ClassPermissionDenied), OutcomeKindCapability)
+	}
+
+### TaskID fallback to CorrelationID anywhere
+269:	if req.CorrelationID == "" {
+596:		if kind == OutcomeKindError && b.cancel.Vetoed(orDefault(dec.CorrelationID, dec.TaskID)) {
+### cmd/wisp/run.go:840-850 TaskID source
+	if rt.gate == nil {
+		return fmt.Errorf("审批 gate 未装配，无法为切到 %s 签发 L2 卡片", sw.To)
+	}
+	const taskID = "host:mode-switch"
+	revoke := rt.gate.AdmitTextTask(taskID)
+	defer revoke()
+	ans, why := rt.gate.PendingApproval(ctx, tools.Decision{
+		TaskID: taskID,
+		Tool:   modeSwitchToolName,
+		Level:  risk.L2,
+		Reason: fmt.Sprintf("切换到 %s 会移除本应询问的确认，需要一次 L2 强确认（R20/M4，当前档 %s）",
+			sw.To, sw.From),
+		Mode: sw.From,

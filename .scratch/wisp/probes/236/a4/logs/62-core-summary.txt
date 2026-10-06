@@ -1,0 +1,21 @@
+### core step summary lines (both logs)
+.scratch/ci-logs/run-37158259050.log:runtests.sh: go test exited 1 - packages=[./internal/agent/ ./internal/agent/approval/ ./internal/llm/... ./internal/config/... ./internal/memory/... ./internal/observe/... ./internal/secret/... ./internal/risk/... ./internal/statemachine/... ./internal/tools/... ./internal/models/... ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... ./internal/
+.scratch/ci-logs/run-37166458550-failed.log:runtests.sh: go test exited 1 - packages=[./internal/agent/ ./internal/agent/approval/ ./internal/llm/... ./internal/config/... ./internal/memory/... ./internal/observe/... ./internal/secret/... ./internal/risk/... ./internal/statemachine/... ./internal/tools/... ./internal/models/... ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... ./in
+### also any 'SKIP is not a pass'
+### ticket 111 findings about 174r3 unaccounted skip
+  `TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. …` 且**归谁写明了**
+  （原文 `OWNER of the POSIX half: whoever lands reparseComponents in risk.pathresolver_other.go`，并具名"那一支不在这儿假造"）。
+  ★响亮那一半今天**第一次有 CI 侧真读数**：run `37406757402`／job `112085927688`／step7 在 `03:00:02.4742096Z` 打
+  `portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:`，紧跟着点名
+  `--- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`，再 `03:00:02.4744054Z` 打
+  `portable-tests.sh: strict runner exited 1 …` ⇒ **未记账的 skip 会让这一步当场红**，不是外推是日志。同发还打
+  `11 ledger entries, 8 accounted on this platform`（推前 `37396530365` 同值 ⇒ 名册不是今天新加的，今天加的是**可见性**）。
+  ⛔⛔ **我这一格第一遍判成了"两支都没落"，错因是我的尺写坏了**：我跑的是 `grep -rn '双平台跳过|known-skip|KNOWN_SKIP' scripts/portable-tests.sh`
+  ＝0 命中，而那枚名册在库里的真名是 `ledger=(`、正文是英文——**中文词面当尺、零命中就当结论**，正是记忆里那条"多分支 grep 混中文的零命中先怀疑尺"今天又咬了我一次，
+  这次咬在**翻勾**这一环上（比咬在派单上更贵，因为翻错的框没人会去复算）。⇒ 判据已改成两条可核尺：名册行号＋CI 日志时间戳。
+  ★顺带抓到一枚**新的未记账 skip**（`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3` 在 ubuntu 腿红掉 step7）——
+  这一格翻勾**不覆盖它**：它要么进同一张 ledger 并写明归谁，要么那枚用例自己改判，归下一枚落地腿（我在台账具名登记，不当已解决）。
+
+**待我裁（记在这儿，防"写在件里"被读成"编排者已裁"）**
+① §6.8 那枚"20 个／33 个"分母要不要按今天实测的 35 重算——属口径，我倾向**另立一枚小票**而不在本票改题面；
+② §6.9 该腿自报的一处边界偏差（起手一枚 `grep -rl` 扫了工作树，射程盖到写腿 `232-r2` 正在改的 `cmd/wisp/config_reload_223_test.go`；它当场用 HEAD 尺重取同一结论并核那枚文件 `go:build !windows` 命中＝**0** ⇒ 非来源）——我不替它抹平，本票 AC#1 第④列与 §2.2 tag 差集表按这一条折扣读。

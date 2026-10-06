@@ -1,0 +1,39 @@
+### runtests fatal strings in archived logs
+-- .scratch/ci-logs/run-37166458550-failed.log
+test-windows	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)	2026-10-04T01:02:18.4345907Z runtests.sh: go test exited 1 - packages=[./cmd/wisp/ -count=1 -skip ^(TestDefaultDea
+test-windows	Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)	2026-10-04T01:02:50.4662493Z runtests.sh: go test exited 1 - packages=[./internal/proc/ ./internal/secret/ ./in
+lint	D22 scanner positive control (tools/d22scan tests, seeded red)	2026-10-04T00:56:32.1816737Z runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=32 FAIL=2 SKIP=0, === RUN=76, '[no tes
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7334320Z runtests.sh: go test exited 1 - packages=[./internal/agent/ ./inte
+0
+-- .scratch/ci-logs/run-37158259050.log
+test-windows	UNKNOWN STEP	2026-10-03T22:24:57.9767560Z runtests.sh: OK - packages=[./internal/winsec/... -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperPr
+test-windows	UNKNOWN STEP	2026-10-03T22:34:47.1962185Z runtests.sh: go test exited 1 - packages=[./cmd/wisp/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelp
+test-windows	UNKNOWN STEP	2026-10-03T22:35:14.6407707Z runtests.sh: go test exited 1 - packages=[./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/ ./internal/ball/ ./internal/per
+test-windows	UNKNOWN STEP	2026-10-03T22:35:16.5509906Z runtests.sh: OK - packages=[./internal/risk/ -run TestPathResolverJunctionWindows] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]
+lint	UNKNOWN STEP	2026-10-03T22:23:35.3376369Z runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+lint	UNKNOWN STEP	2026-10-03T22:23:39.3454789Z runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+0
+### runtests.sh lines 84-106 verbatim
+}
+ran=$(count '^=== RUN')
+passed=$(count '^--- PASS')
+failed=$(count '^--- FAIL')
+skipped=$(count '^--- SKIP')
+noresult=$(count '\[no tests to run\]')
+
+rm -f "$out"
+
+summary="packages=[$*] top-level: PASS=$passed FAIL=$failed SKIP=$skipped, === RUN=$ran, '[no tests to run]'=$noresult"
+if [ "$rc" -ne 0 ]; then
+    echo "runtests.sh: go test exited $rc - $summary" >&2
+    exit "$rc"
+fi
+if [ "$skipped" -ne 0 ]; then
+    echo "runtests.sh: $skipped test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3) - $summary" >&2
+    echo "runtests.sh: either make the step's scope exclude it or run it where it can execute;" >&2
+    echo "             do not relax this script." >&2
+    exit 1
+fi
+if [ "$passed" -eq 0 ] && [ "$failed" -eq 0 ]; then
+    echo "runtests.sh: go test exited 0 but reported NO top-level result at all (ticket 71 AC#3) - $summary" >&2
+    echo "runtests.sh: this is what a -run pattern that matches nothing looks like. Name the tests you" >&2

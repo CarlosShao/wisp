@@ -1,0 +1,81 @@
+	v, ok := rec.attr["task"]
+	if !ok {
+		t.Fatalf("trace carries no \"task\" attribute; present: %v - an unattributable fold cannot be joined to the task that paid for it (D37 attribution)", rec.attr)
+	}
+	task, isString := v.(string)
+	if !isString {
+		t.Fatalf("\"task\" attribute is %T (%v), want the loop's task id as a string", v, v)
+	}
+	if task != res.TaskID {
+		t.Errorf("trace task = %q, want the Result's own %q", task, res.TaskID)
+	}
+	// The record still answers to the fold it came from: same threshold the
+	// loop froze for this window, same report the Result outwire carries.
+	if got := attrInt(t, rec, "threshold"); got != int64(b.HistoryCompressTokens) {
+		t.Errorf("trace threshold = %d, want the window-derived %d", got, b.HistoryCompressTokens)
+	}
+	if got, want := attrInt(t, rec, "tokens_before"), int64(res.Compression.TokensBefore); got != want {
+		t.Errorf("trace tokens_before = %d, want the Result's %d", got, want)
+	}
+	// The shape check is not decoration: newTaskID mints a 36-char uuid-shaped
+	// id, and this is what tells the reading apart from a hand-typed constant.
+	if len(task) != 36 || strings.Count(task, "-") != 4 {
+		t.Errorf("trace task = %q, want the uuid-shaped id newTaskID mints (36 chars, 4 dashes)", task)
+	}
+}
+
+// The other half: attribution is per call, and nothing is ever invented to fill
+// the gap. A shared Compressor that stored the id as a field would pass the test
+// above and fail the ordering asserted here.
+func TestCompressionTraceNeverInventsATaskID(t *testing.T) {
+	recs := newTraceCapture()
+	recs.assertRulerLive(t)
+
+	b := BudgetsFor(4096)
+	c := NewCompressor(b, nil, WithLogger(recs.logger()))
+	hist := buildRoundHistory(6, 400)
+	if _, rep, err := c.Compress(context.Background(), hist); err != nil || !rep.Ran {
+		t.Fatalf("setup: the fixture does not fold (err=%v ran=%v)", err, rep.Ran)
+	}
+
+	// An untagged call still leaves the trace - just with nothing to say about
+	// who owned it.
+	untagged := recs.with(traceMsg)
+	if len(untagged) != 1 {
+		t.Fatalf("%q records = %d, want 1 for a pass that folded", traceMsg, len(untagged))
+	}
+	if v, present := untagged[0].attr["task"]; present {
+		t.Fatalf("untagged call produced a \"task\" attribute %q (%T): absence is honest, an invented owner is not", v, v)
+	}
+
+	// Two ids from the real mint, three calls, one shared compressor: each
+	// record must answer to the call that produced it.
+	idA, idB := newTaskID(), newTaskID()
+	if idA == idB {
+		t.Fatalf("setup: newTaskID returned the same id twice (%q)", idA)
+	}
+	ctxA := withTraceTask(context.Background(), idA)
+	ctxB := withTraceTask(context.Background(), idB)
+	for _, ctx := range []context.Context{ctxA, ctxB, ctxA} {
+		if _, _, err := c.Compress(ctx, hist); err != nil {
+			t.Fatalf("Compress: %v", err)
+		}
+	}
+	tagged := recs.with(traceMsg)[1:]
+	want := []string{idA, idB, idA}
+	if len(tagged) != len(want) {
+		t.Fatalf("tagged calls left %d records, want %d", len(tagged), len(want))
+	}
+	for i, r := range tagged {
+		got, present := r.attr["task"]
+		if !present {
+			t.Fatalf("tagged call %d left no \"task\" attribute: %v", i, r.attr)
+		}
+		if got != want[i] {
+			t.Errorf("record %d carries task %v, want %q - the id rides on the call, not on the shared compressor", i, got, want[i])
+		}
+	}
+
+	// And no placeholder value ever reaches a record, on any attribute: that is
+	// how "cannot attribute" gets laundered into "attributed to nobody".
+	for _, r := range recs.with(traceMsg) {

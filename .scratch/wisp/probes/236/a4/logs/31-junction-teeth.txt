@@ -1,0 +1,42 @@
+### is the 174r3 junction leg in the named-skip registry?
+### skip registry lines mentioning junction in portable-tests.sh
+598:    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The case is AC#3(ii) with a REAL junction: on windows it builds one
+### notice test 395-430
+// channel: a future fix that "helpfully" resolves the junction to tell the
+// model where the pointer leads would leak this one instead.
+const leakProbeResolved174r3 = "RESOLVED-LEAK-PROBE-174r3"
+
+// mkJunctionForLeakProbe174r3 creates one REAL NTFS junction. Local copy of
+// bridge_junction_windows_test.go's mkRealJunction (which lives in a
+// _windows file; per ticket 238 the copies are not merged), downgraded to a
+// skip because this criterion is platform-tagless and a junction needs
+// NTFS + cmd.
+func mkJunctionForLeakProbe174r3(t *testing.T, link, target string) {
+	t.Helper()
+	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput()
+	if err != nil {
+		t.Skipf("前置条件缺失：造不出真 NTFS junction（mklink /J %s %s: %v: %s）", link, target, err, out)
+	}
+	if _, err := os.Lstat(link); err != nil {
+		t.Fatalf("mklink 报告成功但 %s 不存在: %v", link, err)
+	}
+}
+
+// TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 is the leak
+// criterion. The branch may say that C26 refused the path and that the copy
+// cannot be fetched; it may NOT relay the path it was handed, the authorized
+// root list, or a promise of a road back - those are the dispatch's three
+// forbidden classes, asked here on the branch's own output.
+func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3(t *testing.T) {
+	rootA, rootB := tempCanonical(t), tempCanonical(t)
+	outside := tempCanonical(t)
+	target := filepath.Join(outside, leakProbeResolved174r3)
+	if err := os.MkdirAll(target, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	link := filepath.Join(rootA, leakProbeSegment174r3)
+	mkJunctionForLeakProbe174r3(t, link, target)
+	// The roster holds the link spelling itself: canonicalizing it is exactly
+	// the call that must fail, so there is no canonical form to file.
+	filed := link
+

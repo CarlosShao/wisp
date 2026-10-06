@@ -1,0 +1,10 @@
+### task_log schema (id column definition + CHECK)
+internal/memory/dao_tasklog.go:97:		 FROM task_log ORDER BY started_at DESC, id DESC`)
+internal/memory/models.go:187:		return fmt.Errorf("memory: task_log.id is required")
+internal/memory/privacy.go:134:// or task UUID (task_log) or artifact file name.
+internal/memory/privacy_test.go:67:		t.Errorf("task_log item id = %q, want task-p2 (newest first)", lists[PrivacyTaskLog][0].ID)
+internal/memory/schema.go:53:CREATE TABLE task_log (
+internal/memory/schema.go:71:  task_id        TEXT NOT NULL REFERENCES task_log(id),
+### any CHECK on id
+internal/memory/doc.go:8://     ValidateErrorClass — exactly the 17 D37 values, no SQL CHECK (the DDL
+internal/memory/schema_test.go:601:	// strict digit check (a stray newline from manual editing is tolerated;

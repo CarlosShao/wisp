@@ -1,0 +1,85 @@
+### compress_trace_test.go 455-530
+
+	hits := recs.with(traceMsg)
+	for _, h := range hits {
+		t.Errorf("over-threshold pass that folded nothing left a trace: %s", h.flat())
+	}
+	if len(hits) != 0 {
+		t.Fatalf("%q records = %d, want none: a record reading \"compressed\" while nothing folded is a false positive, and %d raw round(s) against the KeepRawRounds floor of %d is exactly the case where no fold can happen (all records: %v)",
+			traceMsg, len(hits), len(rawRoundIndexes(groupRounds(hist))), b.KeepRawRounds, flattenRecordMsgs(recs.all()))
+	}
+}
+
+// ---------------------------------------------------------------------------
+// ticket 153 AC#2: the trace has to say which task it belongs to
+//
+// 139's own delivery named this gap (impl r1 s2.2: "痕里没有 taskID") and the
+// acceptance confirmed it was still open. The compressor cannot see a task id:
+// agent.New builds one Compressor per Loop (loop.go) before any task exists,
+// and the id is minted inside Loop.run. So the two readings below pin the two
+// halves of the fix: a real Run attributes its fold to the id that Run mints
+// (the same string Result.TaskID and every Event of that task carry - not a
+// lookalike), and a pass nobody attributed stays unattributed instead of being
+// handed a placeholder that would read as a real owner.
+
+func TestCompressionTraceCarriesTheOwningTaskID(t *testing.T) {
+	recs := newTraceCapture()
+	recs.assertRulerLive(t)
+
+	b := BudgetsFor(4096)
+	h := newHarness(t, "text-reply",
+		withConfig(func(c *Config) { c.ContextWindow = 4096 }),
+		withLogger(recs.logger()))
+	// Four raw rounds over the derived threshold: the fold has oldest rounds to
+	// take, so this really is a pass that ran (see AC#1's case for the shape
+	// where it cannot).
+	for _, m := range buildRoundHistory(4, 400) {
+		h.loop.append(m)
+	}
+
+	res := h.run("收个尾")
+	if res.Status != StatusCompleted {
+		t.Fatalf("run status = %s (%s), want completed: attribution needs a pass that ran",
+			res.Status, res.Message)
+	}
+	hits := recs.with(traceMsg)
+	if len(hits) != 1 {
+		t.Fatalf("%q records = %d, want exactly 1 from one real Run (all: %v)",
+			traceMsg, len(hits), flattenRecordMsgs(recs.all()))
+	}
+	rec := hits[0]
+
+	v, ok := rec.attr["task"]
+	if !ok {
+		t.Fatalf("trace carries no \"task\" attribute; present: %v - an unattributable fold cannot be joined to the task that paid for it (D37 attribution)", rec.attr)
+	}
+	task, isString := v.(string)
+	if !isString {
+		t.Fatalf("\"task\" attribute is %T (%v), want the loop's task id as a string", v, v)
+	}
+	if task != res.TaskID {
+		t.Errorf("trace task = %q, want the Result's own %q", task, res.TaskID)
+	}
+	// The record still answers to the fold it came from: same threshold the
+	// loop froze for this window, same report the Result outwire carries.
+	if got := attrInt(t, rec, "threshold"); got != int64(b.HistoryCompressTokens) {
+		t.Errorf("trace threshold = %d, want the window-derived %d", got, b.HistoryCompressTokens)
+	}
+	if got, want := attrInt(t, rec, "tokens_before"), int64(res.Compression.TokensBefore); got != want {
+		t.Errorf("trace tokens_before = %d, want the Result's %d", got, want)
+	}
+	// The shape check is not decoration: newTaskID mints a 36-char uuid-shaped
+	// id, and this is what tells the reading apart from a hand-typed constant.
+	if len(task) != 36 || strings.Count(task, "-") != 4 {
+		t.Errorf("trace task = %q, want the uuid-shaped id newTaskID mints (36 chars, 4 dashes)", task)
+	}
+}
+
+### func names + skip gates in that file
+177:func TestCompressionTraceBooksCountsOnSuccess(t *testing.T) {
+269:func TestCompressionTraceSilentWhenNothingFolded(t *testing.T) {
+302:func TestCompressionTraceSurvivesTheLoopWiring(t *testing.T) {
+366:func TestCompressionTraceDoesNotAlterTheFold(t *testing.T) {
+426:func TestCompressionTraceSilentWhenNothingFoldableOverThreshold(t *testing.T) {
+478:func TestCompressionTraceCarriesTheOwningTaskID(t *testing.T) {
+534:func TestCompressionTraceNeverInventsATaskID(t *testing.T) {

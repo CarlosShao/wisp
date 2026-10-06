@@ -1,0 +1,27 @@
+### how the ledger is applied (skip allowance)
+21:# vacuous. This script adds exactly one thing on top: a per-platform ledger of
+38:# platform-layer move AC#2 prescribes rather than a ledger row. They are recorded
+589:ledger=(
+604:# the scope PLUS every ledger package, so an entry whose package is outside a
+606:ledger_pkgs=()
+607:for entry in "${ledger[@]}"; do
+609:    case " ${ledger_pkgs[*]-} " in
+611:    *) ledger_pkgs+=("$pkg") ;;
+616:if ! go test -list '.*' "${scope[@]}" "${ledger_pkgs[@]}" >"$universe_file" 2>&1; then
+618:    echo "portable-tests.sh: go test -list failed for [${scope[*]} ${ledger_pkgs[*]}] - the ledger" \
+626:for entry in "${ledger[@]}"; do
+629:        echo "portable-tests.sh: malformed ledger entry, need name|pkg|platform|class|reason: $entry" >&2
+634:        echo "portable-tests.sh: ledger name $name is not a bare top-level Test identifier," \
+658:echo "portable-tests.sh: ${#ledger[@]} ledger entries, ${#active[@]} accounted on this platform:"
+659:for entry in "${ledger[@]}"; do
+667:    echo "portable-tests.sh: these ledger entries name NO TEST in the compiled test binary for $goos:" >&2
+680:    skip_pattern='^portable_tests_ledger_is_empty_on_this_platform$'
+688:echo "portable-tests.sh: -skip pattern built from the ledger: $skip_pattern"
+### latest ci log grep for that SKIP / core result
+red-fd269de1.txt
+run-37166458550-failed.log
+run-37166458550-failed.err
+red-941805d0.txt
+run-37158259050.log
+file=.scratch/ci-logs/run-37166458550-failed.log size=2053538
+2

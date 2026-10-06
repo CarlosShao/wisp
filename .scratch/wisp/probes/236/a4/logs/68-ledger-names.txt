@@ -1,0 +1,50 @@
+### ledger entries: is 174r3 in there now (re-read verbatim all 11 names)
+590:    "TestDefaultDeadlineWallClockMeasurement|./internal/agent/approval/|any|opt-in|300s wall-clock measure
+591:    "TestSubprocessCrashWriter|./internal/memory/|any|reexec|child-process entry point of TestCrashRecover
+592:    "TestHelperProcess|./internal/proc/|windows|reexec|child-process entry point of the job-object cases (
+593:    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a
+594:    "TestRealDownloadVadThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WIS
+595:    "TestRealDownloadPuncArchiveThroughPipeline|./internal/models/|any|opt-in|real-network spot check gate
+596:    "TestSyncRegistryProbeLive|./internal/risk/|windows|fixture|P12 live registry evidence; on ubuntu it i
+597:    "TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|./internal/risk/|linux|fixture|needs a handle-resolve
+598:    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The cas
+599:    "TestD34WriteMatrix|./internal/tools/|linux|fixture|the table needs a second volume from otherVolumeDi
+600:    "TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop|./internal/tools/|linux|fixture|same otherVolumeDir r
+### ledger name list only
+"TestC26RewrittenSyncRootDoesNotDisarmSuspectNet
+"TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop
+"TestD34WriteMatrix
+"TestDefaultDeadlineWallClockMeasurement
+"TestHelperProcess
+"TestLiveWasapiSmoke
+"TestRealDownloadPuncArchiveThroughPipeline
+"TestRealDownloadVadThroughPipeline
+"TestSubprocessCrashWriter
+"TestSyncRegistryProbeLive
+"TestWorkspaceSwitchRefusesAJunctionToOutside
+### what runtests.sh counts: package-level skips excluded? show lines 60-84
+        "that is not a module root (a wrong -C is how a green no-op is born)" >&2
+    exit 2
+fi
+if [ $# -eq 0 ]; then
+    echo "runtests.sh: no packages given; pass e.g. ./internal/proc/ -run TestX" >&2
+    exit 2
+fi
+
+out=$(mktemp 2>/dev/null || echo "$cwd/.runtests.$$.log")
+cd "$cwd"
+
+# -v is forced: without it Go prints no per-test lines at all and the counts
+# below would be vacuous. -count=1 is forced for the same reason a cached result
+# must never satisfy a gate.
+set +e
+go test -v -count=1 "$@" >"$out" 2>&1
+rc=$?
+set -e
+cat "$out"
+
+count() {
+    # grep exits 1 on no match; that is a real zero here, not an error.
+    n=$(grep -c "$1" "$out" || true)
+    echo "${n:-0}"
+}

@@ -1,0 +1,233 @@
+### repo-wide mentions of 174r3 notice leg
+./.scratch/ci-logs/run-37166458550-failed.log:7160:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026
+./.scratch/ci-logs/run-37166458550-failed.log:7161:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026
+./.scratch/ci-logs/run-37166458550-failed.log:7162:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026
+./.scratch/ci-logs/run-37166458550-failed.log:8688:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026
+./.scratch/ci-logs/run-37166458550-failed.log:8689:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026
+./.scratch/commit-msg-174r3.txt:11:- TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3（:420）：正向半
+./.scratch/wisp/issues/111-ci-tests-20-of-33-packages.md:329:  `--- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`，再 `03:00:02.4744054Z` �
+./.scratch/wisp/issues/111-ci-tests-20-of-33-packages.md:335:  ★顺带抓到一枚**新的未记账 skip**（`TestCanonicalizeErrorNoticeMustNotRelayTheFiledP
+./.scratch/wisp/issues/174-task-output-points-at-a-file-the-model-cannot-read-by-default-spill-artifacts-are-outside-fs-allowed-dirs.md:90:- [ ] **AC#6（编排
+./.scratch/wisp/probes/111/a5b/ac-map.md:36:| AC#10 | 票面 `:86-89` 逐字：`- [ ] **AC#10（编排者 21:0x 追加）** \`test-core\` step7 现在报 **PASS
+./.scratch/wisp/probes/111/a5b/ac-map.md:74:- 临时件只建不删：本腿的 /tmp 台件＝`/tmp/a5b-logs/core-37396530365.log`（750,298 字节）＋`/tmp/a
+./.scratch/wisp/probes/111/a5b/readings-37396530365.txt:60:2026-10-06T00:57:30.3486335Z     task_output_pointer_notice_test.go:428: 前置条件缺失：造不�
+./.scratch/wisp/probes/111/a5b/readings-37396530365.txt:61:2026-10-06T00:57:30.3486616Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.00
+./.scratch/wisp/probes/111/ci-read-1/logs/job-112085927688-test-core-log.txt:3910:test-core	Portable package tests (core scope; the list and its guards live in 
+./.scratch/wisp/probes/111/ci-read-1/logs/job-112085927688-test-core-log.txt:3911:test-core	Portable package tests (core scope; the list and its guards live in 
+./.scratch/wisp/probes/111/ci-read-1/logs/job-112085927688-test-core-log.txt:3912:test-core	Portable package tests (core scope; the list and its guards live in 
+./.scratch/wisp/probes/111/ci-read-1/logs/job-112085927688-test-core-log.txt:4983:test-core	Portable package tests (core scope; the list and its guards live in 
+./.scratch/wisp/probes/111/ci-read-1/logs/job-112085927688-test-core-log.txt:4984:test-core	Portable package tests (core scope; the list and its guards live in 
+./.scratch/wisp/probes/111/ci1/readings.md:394:今天那**一枚 SKIP** 的名字：`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`
+./.scratch/wisp/probes/111/ci1/readings.md:396:原因句逐字 `task_output_pointer_notice_test.go:428: 前置条件缺失：造不出真 NTFS junction（mklink
+./.scratch/wisp/probes/111/ci1/readings.md:406:test-core  Portable package tests (core scope; …)  --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPat
+./.scratch/wisp/probes/111/ci1/readings.md:514:3. **今天 3 枚未登记的 skip 该按 AC#10 翻哪一格**——现量事实：三发里被 `runtests.sh` 打
+./.scratch/wisp/probes/111/msg-a111-flip.txt:22:★顺带抓到一枚**新的未记账 skip**：`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3` 在 u
+./.scratch/wisp/probes/111/msg-a635.txt:12:⇒ 三条更正动作：①那一格的票面正文里我把**错因原样留着**并写明判据已换成两条可�
+./.scratch/wisp/probes/111/msg-a638b.txt:5:【更正的是什么】A635 第 3 节我把 run 37406757402 的 test-core step7 红因只报了 panel 那四枚，�
+./.scratch/wisp/probes/111/r4/evidence.md:261:   - core step7（ubuntu）：`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`（`internal/tools/task_ou
+./.scratch/wisp/probes/174/a3/cost.md:60:- `internal\tools\task_output_pointer_notice_test.go:450`（`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3` 
+./.scratch/wisp/probes/174/r3/impl.md:26:**判据一 `TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`（`:420`，泄漏钉）**，fixture：`rootA` �
+./.scratch/wisp/probes/174/r3/impl.md:37: Junction 臂实跑（未变异产码，`-run 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3|TestLeakProbeTo
+./.scratch/wisp/probes/174/r3/impl.md:50:- **MUT-A（摘掉那支的整句文案；`mut/task-MUTA.go`，sed 把 `notes = append(notes, "注意：这条路径现
+./.scratch/wisp/probes/174/r3/impl.md:73:- **名册 comm**（`git grep -h '^func Test' HEAD -- internal/tools/` vs 工作树，双向）：added＝`TestCanonica
+./.scratch/wisp/probes/174/r3/logs/flipped-criterion-run.txt:2:--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/174/r3/logs/flipped-criterion-run.txt:3:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true
+./.scratch/wisp/probes/174/r3/logs/flipped-criterion-run.txt:5:    task_output_pointer_notice_test.go:486: the canonicalize-error notice must not relay "C:\\Use
+./.scratch/wisp/probes/174/r3/logs/flipped-criterion-run.txt:8:    task_output_pointer_notice_test.go:486: the canonicalize-error notice must not relay "C:\\Use
+./.scratch/wisp/probes/174/r3/logs/flipped-criterion-run.txt:9:    task_output_pointer_notice_test.go:486: the canonicalize-error notice must not relay "C:\\Use
+./.scratch/wisp/probes/174/r3/logs/gotest-final-verbose.txt:975:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/174/r3/logs/gotest-final-verbose.txt:976:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=tru
+./.scratch/wisp/probes/174/r3/logs/gotest-final-verbose.txt:978:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.05s)
+./.scratch/wisp/probes/174/r3/logs/mutA-leak-criterion-run.txt:2:--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/174/r3/logs/mutA-leak-criterion-run.txt:3:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=tr
+./.scratch/wisp/probes/174/r3/logs/mutA-leak-criterion-run.txt:4:    task_output_pointer_notice_test.go:451: the reply must name normalization as the step that 
+./.scratch/wisp/probes/174/r3/logs/mutB2-poison-token-run.txt:2:--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.10s)
+./.scratch/wisp/probes/174/r3/logs/mutB2-poison-token-run.txt:3:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=tru
+./.scratch/wisp/probes/174/r3/logs/roster-worktree.txt:38:func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/174/r3/mut/test-flipped.go:415:// TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 is the leak
+./.scratch/wisp/probes/174/r3/mut/test-flipped.go:420:func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3(t *testing.T) {
+./.scratch/wisp/probes/174/r4/logs/final-targeted.txt:975:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/174/r4/logs/final-targeted.txt:976:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true anno
+./.scratch/wisp/probes/174/r4/logs/final-targeted.txt:978:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/174/r4/logs/gate-targeted.txt:975:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/174/r4/logs/gate-targeted.txt:976:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true annou
+./.scratch/wisp/probes/174/r4/logs/gate-targeted.txt:978:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/174/r4/logs/mutA1.txt:975:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/174/r4/logs/mutA1.txt:976:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true announce="[�
+./.scratch/wisp/probes/174/r4/logs/mutA1.txt:978:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/174/r4/logs/mutA2.txt:975:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/174/r4/logs/mutA2.txt:976:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true announce="[�
+./.scratch/wisp/probes/174/r4/logs/mutA2.txt:978:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/174/r4/logs/mutB.txt:976:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/174/r4/logs/mutB.txt:977:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true announce="[…
+./.scratch/wisp/probes/174/r4/logs/mutB.txt:979:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r2/logs/baseline-verbose.txt:987:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/baseline-verbose.txt:988:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true an
+./.scratch/wisp/probes/236/r2/logs/baseline-verbose.txt:990:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.08s)
+./.scratch/wisp/probes/236/r2/logs/mut/m-1a-cancel-caller.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/mut/m-1a-cancel-caller.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=
+./.scratch/wisp/probes/236/r2/logs/mut/m-1a-cancel-caller.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r2/logs/mut/m-1b-cancel-roster.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/mut/m-1b-cancel-roster.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=
+./.scratch/wisp/probes/236/r2/logs/mut/m-1b-cancel-roster.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r2/logs/mut/m-1c-spawn-roster.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/mut/m-1c-spawn-roster.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=t
+./.scratch/wisp/probes/236/r2/logs/mut/m-1c-spawn-roster.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d-spawn-assembly.txt:1004:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d-spawn-assembly.txt:1005:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d-spawn-assembly.txt:1007:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d1-keep-baseonly.txt:1003:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d1-keep-baseonly.txt:1004:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d1-keep-baseonly.txt:1006:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d2-keep-parentonly.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d2-keep-parentonly.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncat
+./.scratch/wisp/probes/236/r2/logs/mut/m-1d2-keep-parentonly.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r2/logs/mut/m-1e-spawn-parentid.txt:1004:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/mut/m-1e-spawn-parentid.txt:1005:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated
+./.scratch/wisp/probes/236/r2/logs/mut/m-1e-spawn-parentid.txt:1007:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/r2/logs/mut/pos-control-nodel.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/mut/pos-control-nodel.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=t
+./.scratch/wisp/probes/236/r2/logs/mut/pos-control-nodel.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r2/logs/restore-clean-final.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r2/logs/restore-clean-final.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=tru
+./.scratch/wisp/probes/236/r2/logs/restore-clean-final.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-final-with-nail.log:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-final-with-nail.log:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false T
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-final-with-nail.log:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.05s)
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-green.log:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-green.log:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=t
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-green.log:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.11s)
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-with-nail.log:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-with-nail.log:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncat
+./.scratch/wisp/probes/236/r3/logs/baseline/test-v-with-nail.log:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.08s)
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2a.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2a.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=t
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2a.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2b.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2b.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=t
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2b.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2c.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2c.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=t
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2c.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2e.txt:1013:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2e.txt:1014:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=t
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2e.txt:1016:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2z.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2z.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=t
+./.scratch/wisp/probes/236/r3/logs/mut/full-package-m-2z.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/baseline-full-package-v.log:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/baseline-full-package-v.log:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false T
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/baseline-full-package-v.log:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/full-readpath-no-markers.log:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/full-readpath-no-markers.log:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false 
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/full-readpath-no-markers.log:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/full-readpath-teeth-m13.log:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/full-readpath-teeth-m13.log:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false T
+./.scratch/wisp/probes/236/r3/logs/r3c/mut/full-readpath-teeth-m13.log:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/v1/logs/baseline-verbose.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/baseline-verbose.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true a
+./.scratch/wisp/probes/236/v1/logs/baseline-verbose.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/A-1-cancel-caller-false.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/A-1-cancel-caller-false.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunc
+./.scratch/wisp/probes/236/v1/logs/mut/A-1-cancel-caller-false.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/A-2-cancel-roster-false.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/A-2-cancel-roster-false.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunc
+./.scratch/wisp/probes/236/v1/logs/mut/A-2-cancel-roster-false.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/A-3-spawn-roster-false.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/A-3-spawn-roster-false.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunca
+./.scratch/wisp/probes/236/v1/logs/mut/A-3-spawn-roster-false.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.05s)
+./.scratch/wisp/probes/236/v1/logs/mut/A-4-spawn-assembly-false.txt:1004:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/A-4-spawn-assembly-false.txt:1005:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trun
+./.scratch/wisp/probes/236/v1/logs/mut/A-4-spawn-assembly-false.txt:1007:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/A-5-spawn-parentid-false.txt:1004:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/A-5-spawn-parentid-false.txt:1005:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trun
+./.scratch/wisp/probes/236/v1/logs/mut/A-5-spawn-parentid-false.txt:1007:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.05s)
+./.scratch/wisp/probes/236/v1/logs/mut/A-6-cancel-caller-noterror.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/A-6-cancel-caller-noterror.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Tr
+./.scratch/wisp/probes/236/v1/logs/mut/A-6-cancel-caller-noterror.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/A-7-swap-cancel-literals.txt:1002:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/A-7-swap-cancel-literals.txt:1003:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trun
+./.scratch/wisp/probes/236/v1/logs/mut/A-7-swap-cancel-literals.txt:1005:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.05s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-1-teeth-m13.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-1-teeth-m13.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true 
+./.scratch/wisp/probes/236/v1/logs/mut/B-1-teeth-m13.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.10s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-2a-a-branch-readpath.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-2a-a-branch-readpath.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunca
+./.scratch/wisp/probes/236/v1/logs/mut/B-2a-a-branch-readpath.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-2b-readpath-ctrl.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-2b-readpath-ctrl.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=
+./.scratch/wisp/probes/236/v1/logs/mut/B-2b-readpath-ctrl.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.05s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-2c-a-branch-blind.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-2c-a-branch-blind.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated
+./.scratch/wisp/probes/236/v1/logs/mut/B-2c-a-branch-blind.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-3-m2c-register-note.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-3-m2c-register-note.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncat
+./.scratch/wisp/probes/236/v1/logs/mut/B-3-m2c-register-note.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-4-m2b-register-list.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-4-m2b-register-list.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncat
+./.scratch/wisp/probes/236/v1/logs/mut/B-4-m2b-register-list.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-5-m2e-unregister-cancel.txt:1013:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-5-m2e-unregister-cancel.txt:1014:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Tru
+./.scratch/wisp/probes/236/v1/logs/mut/B-5-m2e-unregister-cancel.txt:1016:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-6-readpath-teeth-m13.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-6-readpath-teeth-m13.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunca
+./.scratch/wisp/probes/236/v1/logs/mut/B-6-readpath-teeth-m13.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/B-7-readpath-all-markers-gone.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/B-7-readpath-all-markers-gone.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false
+./.scratch/wisp/probes/236/v1/logs/mut/B-7-readpath-all-markers-gone.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.05s)
+./.scratch/wisp/probes/236/v1/logs/mut/ctrl-no-recover-only.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/ctrl-no-recover-only.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncate
+./.scratch/wisp/probes/236/v1/logs/mut/ctrl-no-recover-only.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/pos-ctrl.txt:1000:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/pos-ctrl.txt:1001:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncated=true annou
+./.scratch/wisp/probes/236/v1/logs/mut/pos-ctrl.txt:1003:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1a-del-cancel-caller.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1a-del-cancel-caller.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunc
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1a-del-cancel-caller.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1b-del-cancel-roster.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1b-del-cancel-roster.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunc
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1b-del-cancel-roster.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1c-del-spawn-roster.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1c-del-spawn-roster.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunca
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1c-del-spawn-roster.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1d1-keep-baseonly.txt:1003:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1d1-keep-baseonly.txt:1004:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Truncate
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1d1-keep-baseonly.txt:1006:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.06s)
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1d2-keep-parentonly.txt:1001:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1d2-keep-parentonly.txt:1002:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trunca
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1d2-keep-parentonly.txt:1004:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1e-del-spawn-parentid.txt:1004:=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1e-del-spawn-parentid.txt:1005:    task_output_pointer_notice_test.go:439: leak-criterion verbatim: IsError=false Trun
+./.scratch/wisp/probes/236/v1/logs/mut/v-m1e-del-spawn-parentid.txt:1007:--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+./.scratch/wisp/probes/ci/1005-a/logs/prior-test-core-full.log:3812:test-core	Portable package tests (core scope; the list and its guards live in scripts/portab
+./.scratch/wisp/probes/ci/1005-a/logs/prior-test-core-full.log:3813:test-core	Portable package tests (core scope; the list and its guards live in scripts/portab
+./.scratch/wisp/probes/ci/1005-a/logs/prior-test-core-full.log:3814:test-core	Portable package tests (core scope; the list and its guards live in scripts/portab
+./.scratch/wisp/probes/ci/1005-a/logs/prior-test-core-full.log:5340:test-core	Portable package tests (core scope; the list and its guards live in scripts/portab
+./.scratch/wisp/probes/ci/1005-a/logs/prior-test-core-full.log:5341:test-core	Portable package tests (core scope; the list and its guards live in scripts/portab
+./.scratch/wisp/probes/ci/1005-a/logs/run-failed.log:4652:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.s
+./.scratch/wisp/probes/ci/1005-a/logs/run-failed.log:4653:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.s
+./.scratch/wisp/probes/ci/1005-a/logs/run-failed.log:7246:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.s
+./.scratch/wisp/probes/ci/1005-a/logs/run-failed.log:7247:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.s
+./.scratch/wisp/probes/ci/1005-a/logs/run-failed.log:7248:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.s
+./.scratch/wisp/probes/ci/1005-a/logs/test-core-full.log:1279:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tes
+./.scratch/wisp/probes/ci/1005-a/logs/test-core-full.log:1280:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tes
+./.scratch/wisp/probes/ci/1005-a/logs/test-core-full.log:3873:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tes
+./.scratch/wisp/probes/ci/1005-a/logs/test-core-full.log:3874:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tes
+./.scratch/wisp/probes/ci/1005-a/logs/test-core-full.log:3875:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tes
+./.scratch/wisp/probes/ci/37240161874/111547117881.log:990:test-core	UNKNOWN STEP	2026-10-04T22:30:42.9452824Z     task_output_pointer_notice_test.go:428: 前�
+./.scratch/wisp/probes/ci/37240161874/111547117881.log:991:test-core	UNKNOWN STEP	2026-10-04T22:30:42.9455871Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelay
+./.scratch/wisp/probes/ci/37240161874/111547117881.log:3785:test-core	UNKNOWN STEP	2026-10-04T22:30:43.0911420Z === RUN   TestCanonicalizeErrorNoticeMustNotRela
+./.scratch/wisp/probes/ci/37240161874/111547117881.log:3786:test-core	UNKNOWN STEP	2026-10-04T22:30:43.0913335Z     task_output_pointer_notice_test.go:428: 前�
+./.scratch/wisp/probes/ci/37240161874/111547117881.log:3787:test-core	UNKNOWN STEP	2026-10-04T22:30:43.0913599Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRela
+./docs/reports/pending-and-issues.md:12477:⇒ 三条更正动作：①那一格的票面正文里我把**错因原样留着**并写明判据已换成两条可�
+./docs/reports/pending-and-issues.md:12587:- 事实（我自己现跑三把尺）：①`grep -c 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3' scrip
+./internal/tools/task_output_pointer_notice_test.go:415:// TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 is the leak
+./internal/tools/task_output_pointer_notice_test.go:420:func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3(t *testing.T) {
+### runtests.sh skip policy lines
+14:# exits 0, and a skipped test prints `ok` too. Two of CI's steps are exactly
+24:#   2. any `--- SKIP`                             -> SKIP is NOT a pass. A test
+38:# No `|| true`, no skippable step, output is echoed verbatim before the asserts.
+88:skipped=$(count '^--- SKIP')
+93:summary="packages=[$*] top-level: PASS=$passed FAIL=$failed SKIP=$skipped, === RUN=$ran, '[no tests to run]'=$noresult"
+98:if [ "$skipped" -ne 0 ]; then
+99:    echo "runtests.sh: $skipped test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3) - $summary" >&2

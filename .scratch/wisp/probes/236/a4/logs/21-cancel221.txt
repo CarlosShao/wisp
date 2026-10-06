@@ -1,0 +1,113 @@
+### task_cancel_221_legs_test.go 1-60
+package tools
+
+// Ticket 221 甲形, the behavioural legs (批准＝台账 A434; AC#1's resident ruler
+// lives in task_cancel_221_test.go).
+//
+// What these legs refuse to repeat is what the ticket was filed for: take a
+// promise in a description and call it a capability. So every leg below
+// dispatches through the REAL bridge (real C19 routing, real roster, real
+// agent.Loop, real memory.Store journal) with a REAL host-minted task id as the
+// caller identity. The only fake is the C5 provider, a frozen injection seam
+// (AGENTS §1.3); nothing here stands in for a real component.
+//
+// ⚠ Why these legs do NOT reuse subagent_197_test.go's harness bridge: that one
+// runs with tools.NoGate, whose PendingWindow answers AnswerReject - so a
+// task.cancel call (D34 freezes it at L1, PLAN.md:2564) would be refused by the
+// GATE before Execute. A refusal from the gate is not a refusal from the
+// authority check, and a "refused" leg that never reached Execute would be a
+// false green for AC#3. So build221 takes its gate per leg, and
+// Test221TaskCancelUnderNoGateStopsAtTheWindow pins that consequence on purpose.
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"sync"
+	"testing"
+
+	"github.com/CarlosShao/wisp/internal/agent"
+	"github.com/CarlosShao/wisp/internal/llm"
+	"github.com/CarlosShao/wisp/internal/memory"
+	"github.com/CarlosShao/wisp/internal/risk"
+	"github.com/CarlosShao/wisp/internal/statemachine"
+)
+
+// harness221 drives the 197 harness's roster / stream feed / taint engine
+// through a bridge this file owns, so gate and sinks are chosen per leg.
+type harness221 struct {
+	h *sub197Harness
+
+	mu    sync.Mutex
+	audit []string
+
+	mem *memory.Store // nil when the leg books no tool_call rows
+}
+
+func (x *harness221) logLine(format string, args ...any) {
+	x.mu.Lock()
+	defer x.mu.Unlock()
+	x.audit = append(x.audit, fmt.Sprintf(format, args...))
+}
+
+func (x *harness221) auditText() string {
+	x.mu.Lock()
+	defer x.mu.Unlock()
+	return strings.Join(x.audit, "\n")
+}
+
+// windowGate221 answers an L1 window the way SPEC-06 §2 says an unopposed window
+### :340-390
+
+	// The parked task.spawn call answers with that terminal state too - the
+	// parent's model reads it, it is not left holding a spawn that never ends.
+	select {
+	case spawnRes := <-parked:
+		if spawnRes.IsError {
+			t.Errorf("父任务的 task.spawn 回了错误：%s", spawnRes.Text)
+		}
+		if !strings.Contains(spawnRes.Text, string(statemachine.StateMuted)) {
+			t.Errorf("task.spawn 的结论里没有那句终态名（%s）：%q", statemachine.StateMuted, spawnRes.Text)
+		}
+	case <-t.Context().Done():
+		t.Error("父任务那次 task.spawn 在孩子被停之后没有收口")
+	}
+
+	// Nothing else moved.
+	select {
+	case moved := <-sibWatch:
+		t.Errorf("停这一枚把隔壁也写了：%+v", moved)
+	default:
+	}
+	if sib := x.h.mustLook(t, "sibling-221"); sib.Out.State != statemachine.StateThinking {
+		t.Errorf("隔壁那枚被动了：state = %q", string(sib.Out.State))
+	}
+
+	// 被谁停的 = 现成审计 sink 里查得到（A434 item 4：这一维只进审计，不加上屏字段）。
+	// Two records, both already produced by the bridge for every call:
+	//   - the audit line, naming the CALLER's task id and the tool;
+	//   - the persisted tool_call row, whose ArgsJSON names the TARGET.
+	audit := x.auditText()
+	if !strings.Contains(audit, "tool=task.cancel") || !strings.Contains(audit, "task="+parent197) {
+		t.Errorf("审计日志里没有这一停（缺 tool=task.cancel 或 task=%s）：\n%s", parent197, audit)
+	}
+	rows, err := x.mem.ListToolCallsByTask(t.Context(), parent197)
+	if err != nil {
+		t.Fatalf("ListToolCallsByTask: %v", err)
+	}
+	var booked bool
+	for _, r := range rows {
+		if r.Tool == "task.cancel" && strings.Contains(r.ArgsJSON, childID) {
+			if r.TaskID != parent197 {
+				t.Errorf("tool_call 行的调用者是 %q, want %q", r.TaskID, parent197)
+			}
+			booked = true
+		}
+	}
+	if !booked {
+		t.Errorf("tool_call 账上没有一条「谁停了谁」的记录（task.cancel＋%s）：%+v", childID, rows)
+	}
+}
+

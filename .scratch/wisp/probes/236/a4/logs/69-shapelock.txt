@@ -1,0 +1,39 @@
+### session minted-id shape lock function
+internal/session/grants_test.go:108:func TestTicket224MintIsRandomAndValid(t *testing.T) {
+internal/session/grants_test.go:152:func TestTicket224TestLiteralsAreOutsideTheMintedShape(t *testing.T) {
+internal/session/grants_test.go:511:func mustMint(t *testing.T) ID {
+internal/session/session.go:67:func (id ID) Valid() bool {
+internal/session/session.go:94:func Mint() (ID, error) {
+### grants_test.go 139-170 verbatim
+// TestTicket224TestLiteralsAreOutsideTheMintedShape is the structural half of the
+// lock ticket 224's nail precheck asks for. The pre-224 guards in cmd/wisp and
+// internal/perm key their fixture rows with hand-written strings
+// ("session-before-restart", "session-after-restart"); if any production mint
+// could ever equal one, AC#4's control would go green while granting nothing.
+//
+// This is the cheap direction. The expensive direction - "a session the REAL
+// assembly minted is never one of those literals" - is asserted by the production
+// minting point in cmd/wisp's TestTicket224ProductionSessionDoesNotSurviveRestart
+// (cmd/wisp/ticket224_assembly_test.go, written by ticket 224-r2; until then this
+// comment pointed at a name no file defined). That case compares BOTH of its
+// boots' minted ids against both literals, so the lock now has both directions,
+// with the same ceiling as everywhere else here: two assemblies, one test process.
+func TestTicket224TestLiteralsAreOutsideTheMintedShape(t *testing.T) {
+	for _, lit := range []string{
+		"session-before-restart",
+		"session-after-restart",
+		"sess_",
+		"sess_deadbeef",
+		strings.TrimSuffix(idPrefix, "_"),
+	} {
+		if ID(lit).Valid() {
+			t.Errorf("the hand-written literal %q validates as a minted session: the shape "+
+				"lock is no longer excluding fixtures", lit)
+		}
+	}
+	// And a minted id is never equal to any of them, on this run or any future one.
+	for i := 0; i < 50; i++ {
+		id, err := Mint()
+		if err != nil {
+			t.Fatal(err)
+		}

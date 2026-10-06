@@ -1,0 +1,16 @@
+### unaccounted SKIP offender lines, core step, 37166458550
+test-windows	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)	2026-10-04T01:02:18.5163979Z portable-tests.sh: unaccounted SKIP lines, each with the file:line and reas
+test-windows	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)	2026-10-04T01:02:18.5166037Z portable-tests.sh: four numbers (all from -v output): === RUN=292  --- PASS
+test-windows	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)	2026-10-04T01:02:18.5292423Z --- SKIP: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.00s)
+test-windows	Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)	2026-10-04T01:02:50.5472041Z portable-tests.sh: unaccounted SKIP lines, each with the file:line and r
+test-windows	Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)	2026-10-04T01:02:50.5591733Z --- SKIP: TestSyncRedTeamRealOneDrive (0.00s)
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7327350Z portable-tests.sh: unaccounted SKIP lines, each with the
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7329244Z     task_output_pointer_notice_test.go:428: 前置条件
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7329513Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFile
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7331068Z portable-tests.sh: strict runner exited 1 for scope=[./i
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7334320Z runtests.sh: go test exited 1 - packages=[./internal/age
+### which logs archived at all
+7609 1889808 Oct  4 08:50 .scratch/ci-logs/run-37158259050.log
+7609 2053538 Oct  4 09:20 .scratch/ci-logs/run-37166458550-failed.log
+### any log for run 37406757402
+0

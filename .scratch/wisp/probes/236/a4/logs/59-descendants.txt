@@ -1,0 +1,55 @@
+### task.go Descendants dedup body 305-335
+func (r *TaskRoster) Descendants(taskID string) []TaskRecord {
+	if r == nil || taskID == "" {
+		return nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var out []TaskRecord
+	frontier := []string{taskID}
+	seen := map[string]bool{taskID: true}
+	for len(frontier) > 0 {
+		next := make([]string, 0, len(frontier))
+		for _, parent := range frontier {
+			for id, o := range r.byTask {
+				if o.ParentTaskID != parent || seen[id] {
+					continue
+				}
+				seen[id] = true
+				out = append(out, TaskRecord{TaskID: id, Out: o})
+				next = append(next, id)
+			}
+		}
+		frontier = next
+	}
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].TaskID == out[j].TaskID {
+			return out[i].TaskID < out[j].TaskID
+		}
+		return out[i].TaskID < out[j].TaskID
+	})
+	return out
+}
+### tests pinning distinct task ids across two runs / duplicates
+internal/agent/spill_name_injectivity_test.go:48:// AC#1 — distinct ids, distinct names.
+internal/agent/spill_name_injectivity_test.go:51:// TestArtifactNameDoesNotFoldDistinctIDs is AC#1: the exact collision triples
+internal/agent/spill_name_injectivity_test.go:53:func TestArtifactNameDoesNotFoldDistinctIDs(t *testing.T) {
+internal/agent/spill_name_injectivity_test.go:74:					t.Errorf("ids %q and %q both name %q: the encoder folds distinct ids "+
+internal/agent/spill_name_injectivity_test.go:88:				t.Errorf("%d distinct names for %d ids: %v", len(seen), len(tc.ids), seen)
+internal/agent/spill_name_injectivity_test.go:233:		t.Errorf("only %d distinct names for %d ids", len(seen), len(ids))
+internal/agent/spill_name_injectivity_test.go:254:			"alone would fold distinct long ids onto one name again", name)
+internal/agent/spill_name_injectivity_test.go:266:	// Distinct over-long ids must not fold either.
+internal/agent/spill_path_invariant_test.go:188:			t.Errorf("%d distinct names for 5 distinct ids, want 5 (name -> id: %v)", len(seen), seen)
+internal/audio/hotplug_test.go:515:		t.Fatalf("capture thread migrated: distinct OS thread ids = %v", ids)
+internal/memory/dao_test.go:259:		t.Error("duplicate task id accepted")
+internal/winsec/private_set_sid_windows_test.go:229:// ("BG"), so it exercises the same spelling-vs-SID distinction "LA" did.
+cmd/wisp/firstrun_257_test.go:96:// distinct legs: provider_credential's value leg is StoreCredential, which
+cmd/wisp/leg_dispatch_gate_133_test.go:1687:	out := fmt.Sprintf("run-roster disclosure: GOOS=%s, %d startable cases read from this binary itself (`-test.list '.*'`);
+### task.go:481 schema description verbatim
+// mechanism ("模型可用 fs.read 按需再读"), and ticket 164's ruling 1 forbids
+// inventing a second pagination scheme in this ticket.
+var taskOutputSchema = JSONSchema(`{"type":"object","properties":{` +
+	`"task_id":{"type":"string","description":"后台任务的 id（由宿主记录，不是路径）"}` +
+	`},"required":["task_id"],"additionalProperties":false}`)
+
+func (taskOutput) Name() string { return "task.output" }

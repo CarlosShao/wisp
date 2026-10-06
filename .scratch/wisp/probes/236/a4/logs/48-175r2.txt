@@ -1,0 +1,39 @@
+### ticket175r2 124 / 240-290
+	defer b.mu.Unlock()
+	return b.scopes[taskID] != nil
+}
+
+// writeArtifact175r2 lands a copy file the way D15(3) does it - under an
+// artifacts directory inside the authorized root - and returns its canonical
+// path. The host mints the name; no leg below lets the model invent it.
+func writeArtifact175r2(t *testing.T, root, name, body string) string {
+	t.Helper()
+	dir := filepath.Join(root, "artifacts")
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+// J-3 the exemption really landed on the bridge: re-reading the pointer the
+// host itself wrote must not re-trip R4 - and must not be green by accident.
+// ---------------------------------------------------------------------------
+
+func TestHostMintedPointerRereadStaysCleanOnRealBridge175r2(t *testing.T) {
+	dir := tempCanonical(t)
+	full := asciiRun(20000)
+	pointer := writeArtifact175r2(t, dir, "tool-output-175r2-ac3.txt", full)
+
+	roster := NewTaskRoster()
+	roster.Record("bg-175r2-j3", TaskOutput{Text: full, ArtifactPath: pointer})
+
+	g := &gateSpy{approveAns: AnswerAllow, windowAns: AnswerAllow}
+	b, prov := stamp175r2Bridge(t, roster, g, dir)
+	const task = "175r2-j3"
+
+	stub := call175r2(t, b, task, "task.output", `{"task_id":"bg-175r2-j3"}`)
+	if stub.IsError || !stub.Truncated {
+		t.Fatalf("precondition: 需要一个带指针的截断桩，got %+v", stub)
+	}
+	m := host175r2PointerRe.FindStringSubmatch(stub.Text)
+	if m == nil {
+		t.Fatalf("precondition: 桩里没有指针：%q", stub.Text)
+	}
+	if p := m[1]; p != filepath.ToSlash(pointer) && p != pointer {

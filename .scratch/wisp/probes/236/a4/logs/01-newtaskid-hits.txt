@@ -1,0 +1,68 @@
+=== newTaskID all hits (any form) ===
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:799:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:320:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/153/accept-r1/zzaccept153_blank_test.go:24:	id := newTaskID()
+./.scratch/wisp/probes/153/accept-r1/zzaccept153_concurrency_test.go:24:		ids[i] = newTaskID()
+./.scratch/wisp/probes/153/accept-r1/zzaccept153_inherit_test.go:17:	id := newTaskID()
+./.scratch/wisp/probes/153/accept-r1/zzaccept153_ondisk_test.go:34:	id := newTaskID()
+./.scratch/wisp/probes/153/probe153_line_test.go:24:	tagged := withTraceTask(context.Background(), newTaskID())
+./.scratch/wisp/probes/153/probe153_line_test.go:28:	t.Log("PROBE-B above: tagged call (id from newTaskID)")
+./.scratch/wisp/probes/155-accept/30-zzaccept155-parsed-ondisk_test.go:49:	leg2ID := newTaskID()
+./.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/mut/bridge.canary.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/mut/bridge.noopentask.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:694:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:663:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/175/r2/bak1-bridge.go:721:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/176/r1/mut/M1-drop-artifactpath.go:37:// model-supplied. agent.newTaskID() is a plain lowercase hex uuid, so a bare
+./.scratch/wisp/probes/176/r1/mut/M2-bare-task-key.go:37:// model-supplied. agent.newTaskID() is a plain lowercase hex uuid, so a bare
+./.scratch/wisp/probes/176/r1/mut/M3-drop-cancel-guard.go:37:// model-supplied. agent.newTaskID() is a plain lowercase hex uuid, so a bare
+./.scratch/wisp/probes/176/r1/mut/M4-guard-covers-every-carrier.go:37:// model-supplied. agent.newTaskID() is a plain lowercase hex uuid, so a bare
+./.scratch/wisp/probes/183/a1/mut/loop.go:322:	id := newTaskID()
+./.scratch/wisp/probes/183/a1/mut/loop.go:333:	return l.run(ctx, newTaskID(), input)
+./.scratch/wisp/probes/183/a1/mut/loop.go:1121:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+./.scratch/wisp/probes/183/a1/mut/loop.go:1123:func newTaskID() string {
+./.scratch/wisp/probes/197/r1c/pre/subagent_197.go:258:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:313:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:48:	// (agent.newTaskID), not by this carrier.
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:328:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:799:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:320:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:320:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:797:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:799:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:320:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:320:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:792:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:798:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./internal/agent/compress_trace_test.go:524:	// The shape check is not decoration: newTaskID mints a 36-char uuid-shaped
+./internal/agent/compress_trace_test.go:527:		t.Errorf("trace task = %q, want the uuid-shaped id newTaskID mints (36 chars, 4 dashes)", task)
+./internal/agent/compress_trace_test.go:557:	idA, idB := newTaskID(), newTaskID()
+./internal/agent/compress_trace_test.go:559:		t.Fatalf("setup: newTaskID returned the same id twice (%q)", idA)
+./internal/agent/loop.go:329:	id := newTaskID()
+./internal/agent/loop.go:340:	return l.run(ctx, newTaskID(), input)
+./internal/agent/loop.go:1128:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+./internal/agent/loop.go:1130:func newTaskID() string {
+./internal/panel/subagent_roster_197.go:53:	// (agent.newTaskID), not by this carrier.
+./internal/tools/bridge.go:867:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./internal/tools/pointer_183_cli_seam_test.go:59:	// agent.newTaskID() gives in production (task_backfill.go's doc block names
+./internal/tools/subagent_197.go:329:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+./internal/tools/task_backfill.go:38:// model-supplied. agent.newTaskID() is a plain lowercase hex uuid, so a bare
+=== NewTaskID variant ===

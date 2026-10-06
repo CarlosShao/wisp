@@ -1,0 +1,18 @@
+=== assertion-bearing lines among the 203 (Errorf/Fatalf/Assert/equal//!=/want) ===
+30
+=== same, but trimmed to file:line + first 150 chars ===
+internal/tools/loop_approval_test.go:214:		t.Errorf("correlation_id = %q, want the task id %q (C18)", r.CorrelationID, res.TaskID)
+internal/tools/subagent_197_test.go:213:// parent task id reaches the tool the way production delivers it. No t.Fatalf
+internal/tools/subagent_197_test.go:309:		t.Errorf("ParentTaskID = %q, want %q", row.Out.ParentTaskID, parent197)
+internal/tools/subagent_197_test.go:329:		t.Errorf("流键 = %q, want subagent:%s", key, row.TaskID)
+internal/tools/task_cancel_221_legs_test.go:381:				t.Errorf("tool_call 行的调用者是 %q, want %q", r.TaskID, parent197)
+internal/tools/task_output_ac2_before_test.go:65:		t.Errorf("the refusal leaked the task id it never looked up: %q", out.Text)
+internal/tools/task_output_leg_test.go:99:		t.Fatalf("an unknown task id must be an error outcome, got: %+v", out)
+cmd/wisp/panel_pump_test.go:324:		t.Errorf("results correlationId = %q, want the task id the run printed %q",
+cmd/wisp/subagent_blocked_197_test.go:8:// needs a card whose correlation id equals a CHILD task id, and nothing in this
+cmd/wisp/subagent_carrier_197_test.go:131:	t.Fatalf("the packet carries no roster row for %q: %+v", taskID, sect.Rows)
+cmd/wisp/subagent_carrier_197_test.go:284:			t.Errorf("rows are not ordered by taskId (%s before %s): the ledger books a sha256 of "+
+cmd/wisp/subagent_carrier_197_test.go:295:		t.Errorf("parentTaskId = %q, want the root this run ran (%q)", child.ParentTaskID, rootID)
+cmd/wisp/subagent_carrier_197_test.go:413:	t.Fatalf("the reader lost row %q: %+v", taskID, sect.Rows)
+cmd/wisp/subagent_carrier_197_test.go:579:			t.Errorf("row %s's page carries the root's prompt", row.TaskID)
+cmd/wisp/subagent_carrier_197_test.go:599://     whose correlation id equals a CHILD task id, and nothing in this tree can make

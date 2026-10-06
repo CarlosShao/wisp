@@ -1,0 +1,32 @@
+### prod callers of loop.Run( (call shape)
+cmd/balldebug/main.go:252:			bridge.Run(ctx, time.Second)
+cmd/balldebug/main.go:662:// left. What remains of it is the one-line `bridge.Run(ctx, every)` inside the
+cmd/wisp/models.go:311:	state, err := bridge.Run(ctx, id)
+cmd/wisp/panel_resident_windows.go:299:	w.Run()
+cmd/wisp/resident_ball_windows.go:316:			bridge.Run(ctx, time.Second)
+internal/ball/hotkey_reload.go:22://	go r.Run(ctx, time.Second) // panic-isolated inside; the host owns the goroutine
+internal/ball/hotkey_reload.go:125:// `go r.Run(ctx, time.Second)`.
+### roster.Count assertions with >1 distinct id
+internal/tools/ticket176r1_start_port_test.go:209:	if port.Roster.Count() != 0 {
+### unaccounted SKIP arm lines 695-715 portable-tests.sh
+
+count() { grep -c "$1" "$capture" || true; }
+ran=$(count '^=== RUN')
+passed=$(count '^--- PASS')
+failed=$(count '^--- FAIL')
+skipped=$(count '^--- SKIP')
+
+echo "portable-tests.sh: four numbers (all from -v output): === RUN=$ran  --- PASS=$passed  --- FAIL=$failed  --- SKIP=$skipped"
+if [ "$skipped" -ne 0 ]; then
+    echo "portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:" >&2
+    grep -B1 -- '^--- SKIP' "$capture" >&2 || true
+fi
+
+# GUARD B (ticket 111 AC#2 + AC#8): a package counts as tested only if THIS run
+# printed a top-level result line for its exact import path.
+#
+# The anchor is the whole point. R-110-3 is a matching expression that let a bare
+# substring "winsec" be read as 18 hits when the package was tested 0 times; the
+# general form of that mistake is "the word appears in the log" == "the package
+# ran". So: line-anchored to ^ok/FAIL (a result line Go prints once per package),
+# the import path regex-ESCAPED (an unescaped `.` in github.com/... matches any

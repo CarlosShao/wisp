@@ -1,0 +1,8 @@
+### when was the 174r3 leg added
+fatal: unknown date format short-iso-strict
+1e47769a 2026-10-03T18:01:32+08:00 test(tools): 174-r3 票 174 AC#2d 第二半——Canonicalize 返错那支的注意句不许转述毒值（泄漏断言两枚判据，零产码）
+### does ledger contain it at HEAD
+0
+### ci.yml: is scripts/wisp-cli-tests.sh scope tools too?
+545:        # scripts/wisp-cli-tests.sh's header for the four readings. Short version:
+562:        run: bash scripts/wisp-cli-tests.sh

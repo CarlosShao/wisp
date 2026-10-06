@@ -1,0 +1,34 @@
+### agent-task- prefix in tests (roster name assertions)
+internal/observe/goroutine_test.go:21:// approval-waiter in 9, agent-task-noop in 0). The missing edge is now waited
+internal/observe/goroutine_test.go:45:	reg.Spawn("agent-task-noop", "test", root, func(ctx context.Context) {
+internal/observe/goroutine_test.go:46:		entered <- "agent-task-noop"
+internal/observe/goroutine_test.go:250:		"agent-task-7f3a":  CategoryPerTask,
+internal/risk/pointer_183_test.go:35:	// produced (backslash windows path, artifacts dir, tool-output-agent-task-
+internal/risk/pointer_183_test.go:37:	ptr183Path = `C:\Users\swq\AppData\Roaming\wisp\artifacts\tool-output-agent-task-c66c0634.txt`
+internal/risk/pointer_183_test.go:43:	// artifact name "tool-output-agent-task-...".
+internal/risk/pointer_183_test.go:68:	ptr183Almost = `C:\Users\swq\AppData\Roaming\wisp\artifacts\tool-output-agent-task-c66c0635.txt`
+internal/risk/pointer_185_test.go:39:	// produced on tickets 179/183 (artifacts dir, tool-output-agent-task-<id>.txt).
+internal/risk/pointer_185_test.go:40:	ptr185Path = `C:\Users\swq\AppData\Roaming\wisp\artifacts\tool-output-agent-task-c66c0634.txt`
+internal/risk/pointer_185_test.go:45:	ptr185Sibling = `C:\Users\swq\AppData\Roaming\wisp\artifacts\tool-output-agent-task-c66c0699.txt`
+internal/risk/pointer_185_test.go:50:	ptr185Almost = `C:\Users\swq\AppData\Roaming\wisp\artifacts\tool-output-agent-task-c66c0635.txt`
+internal/risk/pointer_185_test.go:56:	ptr185SameBasename = `D:\wisp\other\artifacts\tool-output-agent-task-c66c0634.txt`
+internal/tools/pointer_183_cli_seam_test.go:60:	// it), and the artifact key is "agent-task-"+id, so the spilled file is
+internal/tools/pointer_183_cli_seam_test.go:61:	// named tool-output-agent-task-<id>.txt - the same name family the real CLI
+internal/tools/pointer_183_cli_seam_test.go:176:	if name := filepath.Base(rec.ArtifactPath); !strings.HasPrefix(name, "tool-output-agent-task-") {
+internal/tools/ticket176r1_start_port_test.go:142:	// "agent-task-<id>" in the D38 roster) must be readable off the file name,
+internal/tools/ticket176r1_start_port_test.go:144:	if name := filepath.Base(pointer.ArtifactPath); !strings.Contains(name, "agent-task-"+taskID) {
+internal/tools/ticket176r1_start_port_test.go:145:		t.Errorf("产物名 %q 不带 agent-task- 前缀：后台记录与模型 supplied 的 call id 又回到同�
+internal/tools/ticket176r1_start_port_test.go:188:	h := reg.Spawn("agent-task-"+taskID, "test", root, func(c context.Context) {
+### task_log schema / id CHECK in memory
+internal/memory/dao_tasklog.go:33:			`INSERT INTO task_log(id, started_at, ended_at, state, query_text, summary_text,
+internal/memory/dao_tasklog.go:41:		return fmt.Errorf("memory: start task_log %s: %w", tl.ID, err)
+internal/memory/dao_tasklog.go:58:			`UPDATE task_log SET ended_at=?, state=?, summary_text=COALESCE(?, summary_text),
+internal/memory/dao_tasklog.go:66:			return fmt.Errorf("task_log %s: %w", id, ErrNotFound)
+internal/memory/dao_tasklog.go:71:		return fmt.Errorf("memory: finish task_log %s: %w", id, err)
+internal/memory/dao_tasklog.go:82:		 FROM task_log WHERE id=?`, id)
+internal/memory/dao_tasklog.go:85:			return TaskLog{}, fmt.Errorf("task_log %s: %w", id, ErrNotFound)
+internal/memory/dao_tasklog.go:87:		return TaskLog{}, fmt.Errorf("memory: task_log by id: %w", err)
+internal/memory/dao_tasklog.go:97:		 FROM task_log ORDER BY started_at DESC, id DESC`)
+internal/memory/dao_tasklog.go:99:		return nil, fmt.Errorf("memory: list task_log: %w", err)
+internal/memory/dao_tasklog.go:116:		res, err := tx.ExecContext(ctx, `DELETE FROM task_log WHERE id=?`, id)
+internal/memory/dao_tasklog.go:121:			return fmt.Errorf("task_log %s: %w", id, ErrNotFound)

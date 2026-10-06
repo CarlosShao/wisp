@@ -1,0 +1,86 @@
+=== shape-check vocabulary across ALL tests (uuid/len 36/dash/regex) ===
+internal/agent/compress_trace_test.go:524:	// The shape check is not decoration: newTaskID mints a 36-char uuid-shaped
+internal/agent/compress_trace_test.go:526:	if len(task) != 36 || strings.Count(task, "-") != 4 {
+internal/agent/compress_trace_test.go:527:		t.Errorf("trace task = %q, want the uuid-shaped id newTaskID mints (36 chars, 4 dashes)", task)
+internal/agent/spill_name_injectivity_test.go:243:	escapes := regexp.MustCompile(`%[0-9A-F]{2}`)
+internal/agent/spill_name_injectivity_test.go:252:	if !regexp.MustCompile(`-[0-9a-f]{16}\.txt$`).MatchString(name) {
+internal/agent/spill_pointer_honesty_174_test.go:48:var spill174PointerRe = regexp.MustCompile(`全文见 (\S+)…`)
+internal/ball/tokens_table_test.go:88:	c21IdentRe  = regexp.MustCompile("`([A-Za-z_][A-Za-z0-9_]*)`")
+internal/ball/tokens_table_test.go:89:	c21ExportRe = regexp.MustCompile(`^[A-Z][A-Za-z0-9]*$`)
+internal/ball/tokens_table_test.go:90:	c21NumRe    = regexp.MustCompile(`([0-9]+(?:\.[0-9]+)?)\s*(ms|fps|dpi|px|s|%)?`)
+internal/ball/tokens_table_test.go:91:	c21HexLitRe = regexp.MustCompile(`0[xX][0-9A-Fa-f]+`)
+internal/ball/tokens_table_test.go:92:	c21RGBARe   = regexp.MustCompile(`^rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9.]+)\s*\)$`)
+internal/ball/tokens_table_test.go:93:	c21HexRe    = regexp.MustCompile(`^hex\(\s*(0[xX][0-9A-Fa-f]{6})\s*,\s*([0-9.]+)\s*\)$`)
+internal/ball/tokens_table_test.go:94:	c21LookRef  = regexp.MustCompile(`^looks\[([^\]]+)\]\.([A-Za-z0-9]+)$`)
+internal/ball/tokens_table_test.go:135:var c21ExemptRefRe = regexp.MustCompile("`(looks\\[\\*\\]\\.[A-Za-z0-9]+|[A-Z][A-Za-z0-9]*(\\.[A-Za-z0-9]+)?)`")
+internal/ball/tokens_table_test.go:1376:var c21CSSDeclRe = regexp.MustCompile(`^--([a-z0-9-]+)\s*:\s*(.+)$`)
+internal/ball/tokens_table_test.go:1454:var c21CSSCommentRe = regexp.MustCompile(`/\*.*?\*/`)
+internal/ball/tokens_table_test.go:1562:	m := regexp.MustCompile(`^#([0-9A-Fa-f]{6})$`).FindStringSubmatch(v)
+internal/ball/tokens_test.go:95:	badColor := regexp.MustCompile(`#[0-9A-Fa-f]{6}\b`)
+internal/ball/tokens_test.go:96:	badRGBA := regexp.MustCompile(`\brgba\(`)
+internal/memory/privacy_test.go:70:	// --- delete-one: by row id, task UUID, and artifact file name.
+internal/observe/diagnostics_test.go:118:	snapshotDetectRe = regexp.MustCompile(`ZZZZTRIGGERMARKER`)
+internal/observe/nobarego_test.go:26:	bare := regexp.MustCompile(`\bgo func\(`)
+internal/panel/approval_test.go:172:var jsonTagRe = regexp.MustCompile(`json:"([^",]+)`)
+internal/panel/approval_test.go:193:var tsBlockRe = regexp.MustCompile(`(?s)export interface (\w+) \{(.*?)\n\}`)
+internal/panel/approval_test.go:197:	keyRe := regexp.MustCompile(`(?m)^\s*(\w+)(\??):`)
+internal/panel/composer_dispatch_test.go:380:	routeLiteral := regexp.MustCompile(`"panel\.[^"]*"`)
+internal/panel/composer_test.go:88:var composerModeWriteRe = regexp.MustCompile(
+internal/panel/composer_test.go:268:var gitSwitchCapabilityRe = regexp.MustCompile(
+internal/panel/composer_test.go:332:var modeSetterRe = regexp.MustCompile(`func\s+(Set|Write|Apply|Change)Mode\b|\bPermissionMode\s*=|perm\.Store\.Set\(`)
+internal/panel/composer_test.go:381:var hostBridgeCallRe = regexp.MustCompile(`\.\s*postMessage\s*\(`)
+internal/panel/composer_test.go:386:var dottedJoinRe = regexp.MustCompile(`\.join\(\s*["']\.["']\s*\)`)
+internal/panel/composer_test.go:391:var computedSendRequestRe = regexp.MustCompile("sendRequest\\(\\s*(?:[A-Za-z_$][\\w$]*|`|\\[)")
+internal/panel/composer_test.go:394:var routeLiteralRe = regexp.MustCompile(`"panel\.[A-Za-z.]+"`)
+internal/panel/frontend_hygiene_test.go:49:	"localStorage":   regexp.MustCompile(`\blocalStorage\b`),
+internal/panel/frontend_hygiene_test.go:50:	"sessionStorage": regexp.MustCompile(`\bsessionStorage\b`),
+internal/panel/frontend_hygiene_test.go:51:	"indexedDB":      regexp.MustCompile(`\bindexedDB\b| indexedDB\.open|\bIDBDatabase\b`),
+internal/panel/frontend_hygiene_test.go:52:	"cookie":         regexp.MustCompile(`\bdocument\.cookie\b`),
+internal/panel/frontend_hygiene_test.go:53:	"caches":         regexp.MustCompile(`\bcaches\.(open|match|keys)\b`),
+internal/panel/frontend_hygiene_test.go:54:	"serviceWorker":  regexp.MustCompile(`\bnavigator\.serviceWorker\b`),
+internal/panel/frontend_hygiene_test.go:55:	"fs-access":      regexp.MustCompile(`\brequire\(["']fs["']\)|from ["']node:fs["']`),
+internal/panel/frontend_hygiene_test.go:61:	colourLitRe  = regexp.MustCompile(`#[0-9A-Fa-f]{3,8}\b|\brgba?\(`)
+internal/panel/frontend_hygiene_test.go:62:	importFromRe = regexp.MustCompile(`(?:from|import)\s*\(?\s*["']([^"']+)["']`)
+internal/panel/frontend_hygiene_test.go:63:	cssImportRe  = regexp.MustCompile(`@import\s+["']([^"']+)["']`)
+internal/panel/frontend_hygiene_test.go:71:	emojiRangesRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1
+internal/panel/frontend_hygiene_test.go:73:	panelDecisionIdentifierRe = regexp.MustCompile(`approval\.decide`)
+internal/panel/git_test.go:395:	gitToolNameRe = regexp.MustCompile(`"(git\.[a-z0-9_.-]+)"`)
+internal/panel/git_test.go:396:	panelMethodRe = regexp.MustCompile(`"(panel\.[a-z0-9_.-]+)"`)
+internal/panel/git_test.go:402:	d34ToolNameRe = regexp.MustCompile("`(git\\.[a-z0-9_.-]+)`")
+internal/panel/tokens_fourway_test.go:92:	blockRe    = regexp.MustCompile(`(?s)(:root|\[data-theme="light"\])\s*\{([^}]*)\}`)
+internal/panel/tokens_fourway_test.go:93:	commentRe  = regexp.MustCompile(`(?s)/\*.*?\*/`)
+internal/panel/tokens_fourway_test.go:94:	declRe     = regexp.MustCompile(`^--([A-Za-z0-9-]+)\s*:\s*(.*)$`)
+internal/panel/tokens_fourway_test.go:95:	plainColRe = regexp.MustCompile(`^(#[0-9A-Fa-f]{3,8}|rgba?\([^)]*\))$`)
+internal/panel/tokens_fourway_test.go:96:	colourInRe = regexp.MustCompile(`rgba?\([^)]*\)|#[0-9A-Fa-f]{3,8}`)
+internal/panel/tokens_fourway_test.go:171:	tableSectionRe = regexp.MustCompile(`^## (明色系|亮色系)`)
+internal/panel/tokens_fourway_test.go:172:	tableRowHeadRe = regexp.MustCompile("^`--")
+internal/panel/tokens_fourway_test.go:229:	nativePaletteRe = regexp.MustCompile(`^func (DarkPalette|LightPalette)\(\) Palette \{`)
+internal/panel/tokens_fourway_test.go:230:	nativeAssignRe  = regexp.MustCompile(`^\s*p\.([A-Z][A-Za-z0-9]*)\s*=\s*(.+)$`)
+internal/panel/tokens_fourway_test.go:231:	nativeFieldRe   = regexp.MustCompile(`^[A-Z][A-Za-z0-9]*$`)
+internal/panel/tokens_fourway_test.go:232:	goHexClaimRe    = regexp.MustCompile(`^hex\(\s*0[xX][0-9A-Fa-f]{6}\s*,\s*[0-9.]+\s*\)`)
+internal/panel/tokens_fourway_test.go:233:	goRGBAClaimRe   = regexp.MustCompile(`^rgba\(\s*[0-9]{1,3}\s*,\s*[0-9]{1,3}\s*,\s*[0-9]{1,3}\s*,\s*[0-9.]+\s*\)`)
+internal/risk/pointer_183_test.go:36:	// <uuid>.txt) - ticket 183's live reading, shortened only in the uuid tail.
+internal/risk/pointer_183_test.go:64:	// ptr183Almost is the declared path with ONE character changed (the uuid
+internal/risk/pointer_185_test.go:48:	// uuid tail, same length): ticket 183 AC#4's third shape, re-asserted on
+internal/tools/pointer_183_cli_seam_test.go:80:var r183PointerRe = regexp.MustCompile(`全文见 (\S+)…`)
+internal/tools/pointer_185_cli_seam_test.go:81:var p185PointerRe = regexp.MustCompile(`全文见 (\S+)…`)
+internal/tools/task_cancel_221_test.go:30:var taskRootRe = regexp.MustCompile(`task\.[a-z][a-z0-9_]*`)
+internal/tools/task_output_leg_test.go:155:var pointerRe = regexp.MustCompile(`全文见 (\S+)…`)
+internal/tools/task_output_leg_test.go:480:var omittedRe = regexp.MustCompile(`省略 (\d+) 字符`)
+internal/tools/ticket175r2_stamp_live_test.go:66:var host175r2PointerRe = regexp.MustCompile(`全文见 (\S+)…`)
+cmd/wisp/firstrun_198r2_test.go:351:var wispCommand198r2 = regexp.MustCompile(`\bwisp ([a-z][a-z0-9-]*)`)
+cmd/wisp/leg_dispatch_gate_133_test.go:152:var usageCommand133 = regexp.MustCompile(`(?m)^  wisp ([a-z][a-z0-9-]*)`)
+cmd/wisp/leg_dispatch_gate_133_test.go:156:var usageBare133 = regexp.MustCompile(`(?m)^  wisp {2,}\S`)
+cmd/wisp/leg_dispatch_gate_133_test.go:1548:var rosterName135 = regexp.MustCompile(`^Test[A-Za-z0-9_]*$`)
+cmd/wisp/panel_config_248_test.go:44:	regexp.MustCompile(`sk-[A-Za-z0-9]{12,}`),
+cmd/wisp/panel_config_248_test.go:45:	regexp.MustCompile(canary248),
+cmd/wisp/panel_pump_test.go:105:var modeRead145 = regexp.MustCompile(`perm: MODE-READ origin=startup mode=(\S+) source=`)
+cmd/wisp/panel_pump_test.go:443:var consoleCard145 = regexp.MustCompile(
+cmd/wisp/panel_resident_windows_test.go:259:var entryIDRe = regexp.MustCompile(`id=["']([A-Za-z0-9_:\-.]{1,64})["']`)
+cmd/wisp/run_test.go:56:var taskIDRe = regexp.MustCompile(`任务 (\S+) 结束`)
+cmd/wisp/slo_report_144_windows_test.go:380:var slo147UnwrittenRe = regexp.MustCompile(`([0-9]+) bytes read, document still open at offset ([0-9]+): the tail had not arrived`)
+cmd/wisp/slo_report_144_windows_test.go:558:var slo149ContradictionRe = regexp.MustCompile(
+cmd/wisp/slo_report_144_windows_test.go:786:	if re := regexp.MustCompile(`^([0-9]+) bytes contradict a subject report at an offset the decoder did not name: `); !re.MatchStrin
+cmd/wisp/slo_report_144_windows_test.go:789:	if m := regexp.MustCompile(`offset [0-9]`).FindString(unknown.Error()); m != "" {
+=== count ===
+82

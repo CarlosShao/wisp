@@ -1,0 +1,60 @@
+### models.go 175-205
+	}
+	if tc.Outcome != "" && !toolCallOutcomes[tc.Outcome] {
+		return fmt.Errorf("memory: invalid tool_call.outcome %q", tc.Outcome)
+	}
+	if tc.ErrorClass != "" {
+		return observe.ValidateErrorClass(tc.ErrorClass)
+	}
+	return nil
+}
+
+func validateTaskLog(tl TaskLog) error {
+	if tl.ID == "" {
+		return fmt.Errorf("memory: task_log.id is required")
+	}
+	if tl.State == "" {
+		return fmt.Errorf("memory: task_log.state is required")
+	}
+	if tl.ErrorClass != "" {
+		// D37: task_log.error_class accepts exactly the 17 observe classes.
+		return observe.ValidateErrorClass(tl.ErrorClass)
+	}
+	return nil
+}
+
+// normalizeKeywords lowercases, splits on whitespace, dedupes and re-joins
+// with single spaces (SPEC-02 §3 memory.keywords: space-separated,
+// lowercase-normalized).
+func normalizeKeywords(s string) string {
+	fields := strings.Fields(strings.ToLower(s))
+	seen := make(map[string]bool, len(fields))
+	out := make([]string, 0, len(fields))
+### schema.go 50-75
+CREATE INDEX idx_memory_last_hit ON memory(last_hit_at);
+
+-- L3 任务日志（D20；query_text 按 §14.4 脱敏）
+CREATE TABLE task_log (
+  id             TEXT PRIMARY KEY,       -- 任务 UUID
+  started_at     INTEGER NOT NULL,
+  ended_at       INTEGER,
+  state          TEXT NOT NULL,          -- 结束态（含 'interrupted'）
+  query_text     TEXT NOT NULL,          -- 已脱敏；模式匹配掩码是尽力而为，须标注（§14.4）
+  summary_text   TEXT,
+  cost_tokens_in  INTEGER NOT NULL DEFAULT 0,
+  cost_tokens_out INTEGER NOT NULL DEFAULT 0,
+  cost_amount_micro INTEGER NOT NULL DEFAULT 0,  -- 【SPEC】1e-6 货币单位整数，避免浮点
+  currency       TEXT NOT NULL DEFAULT 'CNY',    -- 【SPEC】
+  error_class    TEXT                             -- D37 枚举，可空
+);
+CREATE INDEX idx_task_log_started ON task_log(started_at);
+
+-- 工具调用与审批取证（owner 隐私敏感：「它到底对我的机器做了什么」必须可查）
+CREATE TABLE tool_call (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  task_id        TEXT NOT NULL REFERENCES task_log(id),
+  seq            INTEGER NOT NULL,
+  tool           TEXT NOT NULL,
+  args_json      TEXT NOT NULL,          -- 长字符串截断（§5.1 脱敏规则）
+  risk_level     TEXT NOT NULL,          -- 'L0'|'L1'|'L2'
+### who validates task id shape (Validate*)

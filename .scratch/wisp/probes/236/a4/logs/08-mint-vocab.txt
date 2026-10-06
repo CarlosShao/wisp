@@ -1,0 +1,123 @@
+=== mint / model-supplied vocabulary in all tracked go tests+prod ===
+internal/agent/approval/cancel_key_wording_260r3_test.go:91:	// 260-r4's counterpart first: with a reader installed by the host, this line
+internal/agent/approval/queue_test.go:97:		t.Fatal("no grant minted")
+internal/agent/approval/replies_201_test.go:7:// reachable from outside: the rule text is derived from a card the gate mints, and
+internal/agent/approval/ticket242_binding_test.go:10:// ONE pending item it was minted for had zero test assertions. These cases
+internal/agent/approval/ticket242_binding_test.go:58:		t.Fatal("AC#1 RED: the exact minted digest failed to spend its own grant - the mint/spend round trip is broken")
+internal/agent/approval/ticket259_denial_rulers_test.go:167:	minted := bindDigest("corr-259", "task-259", "shell.run", "L2", 7, []byte(`{"cmd":"259"}`))
+internal/agent/approval/ticket259_denial_rulers_test.go:168:	s.issue("nonce-259-misbound", minted)
+internal/agent/approval/ticket259_denial_rulers_test.go:170:	d := s.spend("nonce-259-misbound", minted+"-tampered")
+internal/agent/approval/ticket259_denial_rulers_test.go:179:	if d2 := s.spend("nonce-259-misbound", minted); d2 == denialNone {
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:306:	// and the minted grant still opens it.
+internal/agent/approval/ticket87_veto_l2_test.go:127:// when it has re-stamped one. A card addressed by the host's own key must be
+internal/agent/approval/ticket87_veto_l2_test.go:145:		t.Fatalf("Veto by the host's own key: %v", err)
+internal/agent/compress_trace_test.go:472:// and the id is minted inside Loop.run. So the two readings below pin the two
+internal/agent/compress_trace_test.go:473:// halves of the fix: a real Run attributes its fold to the id that Run mints
+internal/agent/compress_trace_test.go:524:	// The shape check is not decoration: newTaskID mints a 36-char uuid-shaped
+internal/agent/compress_trace_test.go:527:		t.Errorf("trace task = %q, want the uuid-shaped id newTaskID mints (36 chars, 4 dashes)", task)
+internal/agent/spill_name_injectivity_test.go:7:// model-supplied ids `p/q`, `p\q` and `pq` all became tool-output-pq.txt, and
+internal/agent/spill_path_invariant_test.go:6:// the only caller-controlled piece is the model-supplied tool-call id, and the
+internal/agent/spill_path_invariant_test.go:62:	callID   string // model-supplied tool-call id
+internal/agent/spill_path_invariant_test.go:432:// constructor's dir, the model-supplied id is the single caller component, and
+internal/config/settings_257_test.go:337:		t.Error("SetModelContextWindow minted a catalog row")
+internal/llm/ratelimit_pace_test.go:274:			"(tokens must not be minted out of a wall-clock rewind)", slept)
+internal/panel/workspace_account_181r3_test.go:123:			t.Errorf("unset view = %+v, want the same view UnsetWorkspaceView mints", v)
+internal/risk/pointer_183_test.go:10:// Ticket 177 shape A exempts the host-minted re-read pointer by POSITION: the
+internal/risk/pointer_183_test.go:34:	// ptr183Path is the host-minted pointer in the shape the real CLI actually
+internal/risk/pointer_183_test.go:65:	// tail): AC#4's third shape - the host never minted it, so reading it is
+internal/risk/pointer_183_test.go:265:// miss was never minted by the host, so re-reading it still has to hit. Any
+internal/risk/pointer_183_test.go:278:		t.Fatal("AC#4: a path the host never minted must still hit R4 (prefix/directory-level exemption = widening)")
+internal/risk/pointer_185_test.go:5:// HOST itself minted and declared in THIS scope", not of "which path did the
+internal/risk/pointer_185_test.go:38:	// ptr185Path is the host-minted artifact path, in the shape the real CLI
+internal/risk/pointer_185_test.go:43:	// host minted it too, but never declared it in this scope. Directory-level
+internal/risk/pointer_185_test.go:58:	// ptr185ModelFile is a path the MODEL nominated and the host never minted:
+internal/risk/pointer_185_test.go:166:// whatever path the model handed it"). A file the host never minted, whose body
+internal/risk/pointer_185_test.go:184:		t.Fatal("AC#2 (a): a path the host never minted may not launder its own body (参数侧按值放行 was excluded by A381)")
+internal/risk/pointer_185_test.go:238:		t.Fatal("AC#2: task-2 never minted or declared that path — borrowing task-1's roster would launder every artifact in the process")
+internal/risk/pointer_185_test.go:315:		t.Fatal("AC#4: a prefix-level roster would exempt the near miss too; the host minted the declared path, not this one")
+internal/risk/pointer_185_test.go:342:		t.Fatal("AC#7: the host minted one file name under one directory; a different directory is a different file and stays evidence")
+internal/risk/shape_a_exemption_test.go:9:// one host-minted mark, only the normalized window the declared path occupies
+internal/risk/shape_a_exemption_test.go:23:	// shapeAPath is the host-minted re-read pointer, as embedded by
+internal/risk/shape_a_exemption_test.go:26:	// shapeAGhost shares shapeAPath's directory but was NEVER minted by the
+internal/risk/shape_a_exemption_test.go:41:	// shapeAForeignGhost is an external text carrying the NEVER-MINTED sibling
+internal/risk/shape_a_exemption_test.go:117:// the host never minted must still hit. Its fixture (shapeAGhost) is sized so
+internal/risk/shape_a_exemption_test.go:122:func TestShapeAW3NeverMintedSiblingUnderSameDirStillHits(t *testing.T) {
+internal/risk/shape_a_exemption_test.go:125:		t.Fatal("fixture broken: ghost must share the minted directory")
+internal/risk/shape_a_exemption_test.go:139:		t.Fatal("W-3: a never-minted path in the exempted directory must still hit R4 (prefix-level exemption = widening)")
+internal/session/grants_test.go:3:// Ticket 224 tests: the minted identity and the per-session grants ledger.
+internal/session/grants_test.go:17://	      TestTicket224CoveringDoesNotCrossToANewSession (⑩'s control ②: second minted
+internal/session/grants_test.go:27:// inside the same test process, so it proves the minted key changes per assembly -
+internal/session/grants_test.go:97:// else recomputable. Two mints INSIDE one process share all of those inputs, so
+internal/session/grants_test.go:106:// which is why this function asserts 200 distinct mints rather than trusting
+internal/session/grants_test.go:131:		t.Error("the empty identity validates: a host that never minted would still have " +
+internal/session/grants_test.go:135:		t.Error("NewLedger accepted an unminted identity")
+internal/session/grants_test.go:139:// TestTicket224TestLiteralsAreOutsideTheMintedShape is the structural half of the
+internal/session/grants_test.go:146:// assembly minted is never one of those literals" - is asserted by the production
+internal/session/grants_test.go:150:// boots' minted ids against both literals, so the lock now has both directions,
+internal/session/grants_test.go:152:func TestTicket224TestLiteralsAreOutsideTheMintedShape(t *testing.T) {
+internal/session/grants_test.go:161:			t.Errorf("the hand-written literal %q validates as a minted session: the shape "+
+internal/session/grants_test.go:165:	// And a minted id is never equal to any of them, on this run or any future one.
+internal/session/grants_test.go:226:		t.Errorf("session_id = %q, want the minted %q", g.SessionID, l.SessionID())
+internal/session/grants_test.go:339:// production-minted id, then look up with a SECOND production-minted id and
+internal/session/grants_test.go:366:	// "A new process": a second minted identity over the same bytes on disk.
+internal/session/grants_test.go:372:		t.Fatal("two mints produced one identity: session end cannot be process exit if " +
+internal/tools/grant_test.go:7:// row and measures invalidation against a second minted identity; cmd/wisp's
+internal/tools/grant_test.go:515:				"a grant: the identity has exactly one owner (the host minted it, "+
+internal/tools/loop_approval_test.go:133:		// id is minted inside run().
+internal/tools/pointer_183_cli_seam_test.go:34://	       shape; the host minted path1, never path2.
+internal/tools/pointer_183_cli_seam_test.go:57:	// r183BackgroundID is the task id the host mints for the background task
+internal/tools/pointer_183_cli_seam_test.go:223:// very same directory, spelled verbatim by the host's own stub, that the host
+internal/tools/pointer_185_cli_seam_test.go:69:	// host really spills, so both artifact paths are host-minted and only ONE of
+internal/tools/pointer_185_cli_seam_test.go:248:// host never minted, whose text spells the host artifact path verbatim, must
+internal/tools/pointer_185_cli_seam_test.go:287:// minted may not launder its own body just because the bridge knew which path
+internal/tools/pointer_185_cli_seam_test.go:288:// it opened. A381 approved the host-minted shape and excluded 参数侧按值放行.
+internal/tools/pointer_185_cli_seam_test.go:296:	// The host mints one artifact, so a roster is live in this scope at all, and
+internal/tools/pointer_185_cli_seam_test.go:306:	// A DIFFERENT file, nominated by the model and never minted by the host,
+internal/tools/pointer_185_cli_seam_test.go:369:// host-minted artifact in the very same artifacts directory, never declared in
+internal/tools/pointer_185_cli_seam_test.go:393:	// ...and the sibling, spelled verbatim by the host's own stub but declared by
+internal/tools/task_cancel_221_legs_test.go:9:// agent.Loop, real memory.Store journal) with a REAL host-minted task id as the
+internal/tools/task_output_leg_test.go:169:	// The artifact is landed by the host, exactly as D15(3) does it, and the
+internal/tools/ticket175r2_stamp_live_test.go:31://	J-3 TestHostMintedPointerRereadStaysCleanOnRealBridge175r2
+internal/tools/ticket175r2_stamp_live_test.go:124:// path. The host mints the name; no leg below lets the model invent it.
+internal/tools/ticket175r2_stamp_live_test.go:243:	// same host-minted path must still be judged R4 / L2.
+internal/tools/ticket175r2_stamp_live_test.go:280:func TestHostMintedPointerRereadStaysCleanOnRealBridge175r2(t *testing.T) {
+internal/tools/ticket176r1_start_port_test.go:16://	       taskArtifactPrefix + taskID -> taskID): a model-supplied call id
+internal/tools/ticket176r1_start_port_test.go:125:// reachable by a model-supplied tool-call id.
+internal/tools/ticket224_setter_scope_test.go:27:// injected source, which the composition root minted, so "a caller that wanted a
+cmd/wisp/panel_config_248_test.go:310:		t.Errorf("config.toml does not carry the reference this write minted:\n%s", body)
+cmd/wisp/resident_approval_risk_256_windows_test.go:48:// so no new seam in internal/agent/approval and no second minted ledger), and
+cmd/wisp/resident_ball_228_windows_test.go:150:	// Teardown, and where it sits: D38(e) step 2's work is done by the host that
+cmd/wisp/resident_grant_writer_265_windows_test.go:510:		t.Errorf("the bind passes %q, want \"run.session\": that is this process's ONE minted ledger "+
+cmd/wisp/resident_grant_writer_265_windows_test.go:561:		t.Errorf("no production file in %s mints a session any more: the ledger this leg binds is the "+
+cmd/wisp/resident_grant_writer_265_windows_test.go:562:			"one cmd/wisp/run.go's assembleRuntime mints, so a ruler that cannot find it has lost the "+
+cmd/wisp/run_mode101_test.go:431:		// session this boot minted.
+cmd/wisp/run_mode101_test.go:437:		// (run.go:529), both from the ledger minted at run.go:414. So the conditional
+cmd/wisp/run_mode101_test.go:442:		// MintedShape plus cmd/wisp/ticket224_assembly_test.go's
+cmd/wisp/run_test.go:14://	TestHostDispatchThroughTheAssembledBridge a call dispatched by the HOST on
+cmd/wisp/subagent_blocked_197_test.go:17:// assembled bridge carrier197 uses (its roster row is minted by the spawner and
+cmd/wisp/subagent_carrier_197_test.go:417:// TestSubagentStreamKeyHasOneMintSite is the tooth the 载体层 grew when it collapsed
+cmd/wisp/subagent_carrier_197_test.go:430:func TestSubagentStreamKeyHasOneMintSite(t *testing.T) {
+cmd/wisp/subagent_carrier_197_test.go:436:		t.Fatalf("the stream key literal %q is minted in %d non-test sources %v, want exactly one: %s",
+cmd/wisp/subagent_carrier_197_test.go:450:			t.Errorf("id %q: tools minted %q, panel reads %q", id, got, wantKey)
+cmd/wisp/subagent_stream_key_197_test.go:44:// The two builders agree for the ids production actually mints. Compared against
+cmd/wisp/ticket224_assembly_test.go:38:// and the minted identity are all freshly built; the OS process is not.
+cmd/wisp/ticket224_assembly_test.go:40:// So the third case below proves "a second assembly mints a different key and
+cmd/wisp/ticket224_assembly_test.go:73:// answer stream. The row is then read back with the identity this boot minted, and
+cmd/wisp/ticket224_assembly_test.go:78:// this case fails at "0 rows for the minted session", and the audit line it also
+cmd/wisp/ticket224_assembly_test.go:89:		minted    string
+cmd/wisp/ticket224_assembly_test.go:101:		minted = rt.session.SessionID().String()
+cmd/wisp/ticket224_assembly_test.go:138:	rows, err := st.ListGrantsBySession(ctx, minted)
+cmd/wisp/ticket224_assembly_test.go:140:		t.Fatalf("ListGrantsBySession(%s): %v", minted, err)
+cmd/wisp/ticket224_assembly_test.go:146:		t.Fatalf("%d approval_grant rows for the session this run minted (%s), want %d - the card "+
+cmd/wisp/ticket224_assembly_test.go:148:			len(rows), minted, len(printed), printed, grantLinesOf(h))
+cmd/wisp/ticket224_assembly_test.go:162:	if got.SessionID != minted {
+cmd/wisp/ticket224_assembly_test.go:163:		t.Errorf("row session_id = %q, want the id this boot minted %q", got.SessionID, minted)
+cmd/wisp/ticket224_assembly_test.go:181:		r2, err := lt.ListGrantsBySession(ctx, minted)
+cmd/wisp/ticket224_assembly_test.go:185:		t.Errorf("a second handle on the same db cannot read the row back by the minted id")
+cmd/wisp/ticket224_assembly_test.go:225:// through the ledger cmd/wisp minted, out to the store cmd/wisp opened. 224-v1 §1
+cmd/wisp/ticket224_assembly_test.go:393://	② rows written by boot 1's id read 0    (asserted with boot 2's minted id)
+cmd/wisp/ticket224_assembly_test.go:433:			t.Fatalf("boot 1 minted %q, which the shape lock rejects: the minting point and the "+
+cmd/wisp/ticket224_assembly_test.go:474:		t.Errorf("boot 1's audit does not announce the id it minted (%s):\n%s",
+cmd/wisp/ticket224_assembly_test.go:485:			t.Fatalf("the second assembly minted boot 1's identity %q: 「本次会话内」 would then be "+
+cmd/wisp/ticket224_assembly_test.go:489:			t.Fatalf("boot 2 minted %q, which the shape lock rejects", id2)
+cmd/wisp/ticket224_assembly_test.go:557:		t.Errorf("boot 2's audit does not announce the id it minted (%s):\n%s", id2, grantLinesIn(log2))

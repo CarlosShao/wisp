@@ -1,0 +1,21 @@
+### CI workflow files
+ci.yml
+slo-fresh.yml
+### windows runner / go test invocation
+.github/workflows/ci.yml:66:    runs-on: ubuntu-latest
+.github/workflows/ci.yml:76:        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+.github/workflows/ci.yml:142:        # not the trigger table above, not the concurrency group, not any `runs-on`,
+.github/workflows/ci.yml:365:    runs-on: ubuntu-latest
+.github/workflows/ci.yml:391:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+.github/workflows/ci.yml:398:        # and no threshold changed): it sat below a step that bare `go test` lets
+.github/workflows/ci.yml:407:        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+.github/workflows/ci.yml:475:    runs-on: windows-latest
+.github/workflows/ci.yml:607:        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+.github/workflows/ci.yml:654:        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+.github/workflows/ci.yml:669:        # design) or a false green (bare `go test` prints `ok`) - which is the
+.github/workflows/ci.yml:674:        # `go test -list` and prints the row with its class and reason in this
+.github/workflows/ci.yml:692:        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+.github/workflows/ci.yml:709:    runs-on: windows-latest
+.github/workflows/ci.yml:767:    runs-on: [self-hosted, wisp-slo]
+.github/workflows/ci.yml:841:    runs-on: ubuntu-latest
+.github/workflows/slo-fresh.yml:62:    runs-on: ubuntu-latest

@@ -1,0 +1,24 @@
+=== who reads a task_id from model args (prod code) ===
+internal/tools/task.go:473:	TaskID string `json:"task_id"`
+internal/tools/task.go:481:	`"task_id":{"type":"string","description":"后台任务的 id（由宿主记录，不是路径）"}` +
+internal/tools/task.go:482:	`},"required":["task_id"],"additionalProperties":false}`)
+internal/tools/task.go:512:		return Result{Text: "缺少 task_id 参数", IsError: true}, nil
+internal/tools/task.go:614:	TaskID string `json:"task_id"`
+internal/tools/task.go:622:	`"task_id":{"type":"string","description":"要停掉的那枚子代理的任务 id（名册那一行的 id，不是路径）"}` +
+internal/tools/task.go:623:	`},"required":["task_id"],"additionalProperties":false}`)
+internal/tools/task.go:697:		return Result{Text: "缺少 task_id 参数", IsError: true}, nil
+internal/panel/subagent_roster_197.go:107:	TaskID       string `json:"taskId"`
+=== TaskRoster lookup by id ===
+internal/tools/task.go:215:func (r *TaskRoster) Record(taskID string, o TaskOutput) {
+internal/tools/task.go:248:func (r *TaskRoster) WatchRow(taskID string) <-chan TaskOutput {
+internal/tools/task.go:268:func (r *TaskRoster) Look(taskID string) (TaskOutput, bool) {
+internal/tools/task.go:281:func (r *TaskRoster) Count() int {
+internal/tools/task.go:305:func (r *TaskRoster) Descendants(taskID string) []TaskRecord {
+internal/tools/task.go:342:func (r *TaskRoster) PublishSubagent(taskID, parentTaskID, label string) {
+internal/tools/task.go:355:func (r *TaskRoster) MarkRoot(taskID, label string) {
+internal/tools/task.go:363:func (r *TaskRoster) TryAcquireSubagentSlot(limit int) (release func(), ok bool) {
+internal/tools/task.go:390:func (r *TaskRoster) InFlightSubagents() int {
+internal/tools/task.go:402:func (r *TaskRoster) RunningSubagentIDs() []string {
+internal/tools/task.go:420:func (r *TaskRoster) AttachCancel(taskID string, cancel func()) {
+internal/tools/task.go:434:func (r *TaskRoster) DetachCancel(taskID string) {
+internal/tools/task.go:447:func (r *TaskRoster) Cancel(taskID string) (bool, string) {

@@ -1,0 +1,70 @@
+=== internal/agent/loop.go:1120-1160 (newTaskID definition) ===
+     1	func orClass(s string, def observe.ErrorClass) string {
+     2		if s == "" {
+     3			return string(def)
+     4		}
+     5		if err := observe.ValidateErrorClass(s); err != nil {
+     6			return string(def)
+     7		}
+     8		return s
+     9	}
+    10	
+    11	// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+    12	// documented as a UUID), built from crypto/rand so no new dependency appears.
+    13	func newTaskID() string {
+    14		var b [16]byte
+    15		if _, err := rand.Read(b[:]); err != nil {
+    16			// Entropy source unavailable: fall back to a clock-derived unique id.
+    17			n := time.Now().UnixNano()
+    18			for i := range b {
+    19				b[i] = byte(n >> (8 * uint(i%8)))
+    20			}
+    21		}
+    22		b[6] = (b[6] & 0x0f) | 0x40
+    23		b[8] = (b[8] & 0x3f) | 0x80
+    24		h := hex.EncodeToString(b[:])
+    25		return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:]
+    26	}
+
+=== internal/agent/loop.go:310-350 (call sites) ===
+     1	// joins BOTH the result signal (t.done, closed inside the task goroutine) and
+     2	// the registry handle (t.h.done, which the registry closes only AFTER it has
+     3	// decremented the root's pending counter). Joining only t.done could let a
+     4	// caller read Pending()==1 immediately after Wait() returned - a task whose
+     5	// completion (D38e: the join counter drained) is therefore not yet observable.
+     6	func (t *RunningTask) Wait() Result {
+     7		<-t.done
+     8		if t.h != nil {
+     9			<-t.h.Done()
+    10		}
+    11		return t.result
+    12	}
+    13	
+    14	// Pending reports the root's undrained goroutines: 0 means the task's work is
+    15	// fully joined (D38e: completion means the WaitGroup drained).
+    16	func (t *RunningTask) Pending() int { return t.root.Pending() }
+    17	
+    18	// RunAsync spawns the task on a roster-named goroutine and returns immediately.
+    19	func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+    20		id := newTaskID()
+    21		t := &RunningTask{ID: id, root: observe.NewRootFrom(ctx, id), done: make(chan struct{})}
+    22		t.h = l.reg.Spawn("agent-task-"+id, "agent", t.root, func(c context.Context) {
+    23			defer close(t.done)
+    24			t.result = l.run(c, id, input)
+    25		})
+    26		return t
+    27	}
+    28	
+    29	// Run executes one task synchronously on the calling goroutine.
+    30	func (l *Loop) Run(ctx context.Context, input string) Result {
+    31		return l.run(ctx, newTaskID(), input)
+    32	}
+    33	
+    34	// ---------------------------------------------------------------------------
+    35	// core
+    36	
+    37	func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+    38		// (1) D11(1): control words never reach the provider.
+    39		if verb, ok := MatchControl(input); ok {
+    40			return l.runControl(taskID, verb, input)
+    41		}

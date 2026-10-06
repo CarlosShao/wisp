@@ -1,0 +1,7 @@
+### context of the SKIP lines in latest failed log
+7160:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.6583285Z === RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath
+7161:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.6585203Z     task_output_pointer_notice_test.go:428: 前置条件缺�
+7162:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.6585474Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath
+8688:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7329244Z     task_output_pointer_notice_test.go:428: 前置条件缺�
+8689:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7329513Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath
+### which job/step lines mention SKIPPED fatal

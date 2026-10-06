@@ -1,0 +1,84 @@
+### cmd/wisp/subagent_carrier_197_test.go task-id hits
+10:// packet this run published carries it with its task id, its D43 state and its
+20:// bridge with the ids the agent loop itself uses (TaskID == CorrelationID,
+22:// as a task id). The spawn therefore waits for the ROOT's own roster row - proof the
+74:	TaskID            string `json:"taskId"`
+77:	ParentTaskID      string `json:"parentTaskId"`
+122:// carrierRow returns the row for one task id, or fails naming every row present: an
+124:func carrierRow(t *testing.T, sect carrier197Wire, taskID string) carrier197Row {
+127:		if r.TaskID == taskID {
+131:	t.Fatalf("the packet carries no roster row for %q: %+v", taskID, sect.Rows)
+139:	rootID   string
+153:	rootID, err := waitRootRow197(rt)
+173:			TaskID: rootID, CorrelationID: rootID, CallID: fmt.Sprintf("spawn-197-%02d", i),
+185:		s.rootID = rootID
+186:		s.childIDs = append(s.childIDs, childRowAfterJoin197(rt, rootID, i+1))
+203:			if row.Kind == tools.TaskKindRoot && row.TaskID != "" {
+204:				return row.TaskID, nil
+212:// childRowAfterJoin197 picks the n-th subagent row hanging under rootID. Ordering is
+213:// by task id (what panel.TaskRosterSectionFrom sorts on too), so "the first child"
+215:func childRowAfterJoin197(rt *agentRuntime, rootID string, n int) string {
+218:		if row.Kind == tools.TaskKindSubagent && row.ParentTaskID == rootID {
+219:			kids = append(kids, row.TaskID)
+229:// cell (b): 派一枚子代理 ⇒ 这枚 run 自己发布的快照里有它，带 taskID、D43 状态、父任务和
+268:	err, rootID, childIDs := sp.err, sp.rootID, append([]string(nil), sp.childIDs...)
+273:	if rootID == "" || len(childIDs) != 1 || childIDs[0] == "" {
+274:		t.Fatalf("the roster this run filled gave no root/child pair (root %q, children %v)", rootID, childIDs)
+283:		if sect.Rows[i-1].TaskID > sect.Rows[i].TaskID {
+286:				sect.Rows[i-1].TaskID, sect.Rows[i].TaskID)
+294:	if child.ParentTaskID != rootID {
+295:		t.Errorf("parentTaskId = %q, want the root this run ran (%q)", child.ParentTaskID, rootID)
+319:	root := carrierRow(t, sect, rootID)
+381:			child.TaskID, child.Status, sect.InFlightSlots)
+406:func findRow197(t *testing.T, sect panel.TaskRosterState, taskID string) panel.TaskRow {
+409:		if row.TaskID == taskID {
+413:	t.Fatalf("the reader lost row %q: %+v", taskID, sect.Rows)
+579:			t.Errorf("row %s's page carries the root's prompt", row.TaskID)
+584:				row.TaskID, row.StreamTruncated, row.StreamElidedRunes, row.StreamDropped, live)
+599://     whose correlation id equals a CHILD task id, and nothing in this tree can make
+
+### :417-460 mint-site ruler
+// TestSubagentStreamKeyHasOneMintSite is the tooth the 载体层 grew when it collapsed
+// the duplicated key spelling. internal/tools and internal/panel each used to write
+// the literal themselves, and the composition root could only compare the two
+// constants afterwards - nothing could stop a third copy, or a fourth. Now the literal
+// lives in internal/streamkey alone, and this scan is what keeps it that way: mint it
+// anywhere else and this leg goes red on its own.
+//
+// The scan reads STRING LITERALS through the go/ast, not bytes: a comment may name the
+// shape (several do) and must not be mistaken for a mint site, while a real literal in
+// a non-test file is one. Test files are out of scope on purpose - a test naming the
+// expected spelling is how the shape stays pinned at its source (internal/tools'
+// Test197StreamKeyShapeIsLiteral and internal/panel's key-shape leg both do), and
+// forbidding that would only push the literal into a computed string nobody can read.
+func TestSubagentStreamKeyHasOneMintSite(t *testing.T) {
+	root := repoRoot197(t)
+	want := filepath.ToSlash(filepath.Join("internal", "streamkey", "streamkey.go"))
+	found := stringLitSites197(t, root, "internal")
+	found = append(found, stringLitSites197(t, root, "cmd")...)
+	if len(found) != 1 {
+		t.Fatalf("the stream key literal %q is minted in %d non-test sources %v, want exactly one: %s",
+			panel.SubagentStreamKeyPrefix, len(found), found, want)
+	}
+	if found[0] != want {
+		t.Fatalf("the one mint site is %s, want %s", found[0], want)
+	}
+	// The two legs still alias it, so the writer's key is the reader's key - compared
+	// against each other, not against a spelling this file typed.
+	if tools.SubagentStreamKeyPrefix != panel.SubagentStreamKeyPrefix {
+		t.Errorf("tools = %q, panel = %q: the aliases drifted", tools.SubagentStreamKeyPrefix,
+			panel.SubagentStreamKeyPrefix)
+	}
+	for _, id := range []string{"task-197-a", "带中文的id"} {
+		if got, wantKey := tools.SubagentStreamKey(id), panel.SubagentStreamKey(id); got != wantKey {
+			t.Errorf("id %q: tools minted %q, panel reads %q", id, got, wantKey)
+		}
+	}
+}
+
+// stringLitSites197 returns the files under root/sub holding a top-level directory
+// whose Go string literals include exactly `value` - the literal itself, not a
+// sentence about it.
+func stringLitSites197(t *testing.T, root, sub string) []string {
+	t.Helper()
+	var hits []string

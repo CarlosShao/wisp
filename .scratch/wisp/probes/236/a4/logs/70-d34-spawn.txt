@@ -1,0 +1,11 @@
+### task.spawn / task.* rows in D34 table
+1531:| **DEFERRED** | **`task.list` / `task.cancel` 的实现**（D34 名册在册、生产注册表零枚） | 票 164 
+2564:| `task.list` / `task.cancel` | 查看/取消任务 | L0 / L1 | — | **S7** | **D31「被阻塞的东西必须可�
+2565:| **`task.output`** | **读一个后台任务吐了什么**（含"太长怎么续读"） | **L0** | — | **S7** | 
+3115:| **S7** | 增：**D45-2 作用域会话授权** · **C24 `GojaHostAPI` 契约测试** · **端到端"真插件跑�
+### D34 table extent
+### 16.5.2 权威表
+
+| 工具 | 动作 | RiskLevel | capability | 落切片 | 备注 |
+|---|---|---|---|---|---|
+### is there a '宿主铸造/mints' D34 note about ids?
