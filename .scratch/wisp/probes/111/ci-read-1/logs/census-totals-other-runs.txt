@@ -1,0 +1,4 @@
+=== job 112084901765 ===
+test-windows	Package coverage census (ticket 111 AC#1 + GUARD D)	2026-10-06T03:03:05.7767317Z portable-tests.sh: census GOOS=windows - go list ./... = 35 packages (one row each)
+test-windows	Package coverage census (ticket 111 AC#1 + GUARD D)	2026-10-06T03:03:17.0076147Z portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+=== job 112083873122 ===

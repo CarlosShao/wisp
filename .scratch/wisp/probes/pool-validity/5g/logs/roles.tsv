@@ -1,0 +1,149 @@
+==== TICKET 101
+docs/evidence/s1/101-adversarial-acceptance.md | lines=270 | # 票 101 —— 独立对抗验收裁决表（`internal/perm` 的生产装配线） | 验收方：`acceptor-ticket101`（独立对抗验收代理，未参与实现，未看先前 | hits=2
+==== TICKET 104
+docs/evidence/s1/104-adversarial-acceptance.md | lines=306 | # 104 — 对抗验收：`SealFile` 对"继承来的"带外授权出声（两桶 + `kind=`） |  | hits=1
+==== TICKET 106
+docs/evidence/s1/106-adversarial-acceptance.md | lines=97 | # 106 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket106`） |  | hits=0
+==== TICKET 11
+docs/evidence/s1/11-adversarial-acceptance.md | lines=83 | # Ticket 11 — adversarial acceptance (LLM REST adapters) |  | hits=1
+==== TICKET 110
+docs/evidence/s1/110-adversarial-acceptance.md | lines=43 | # 票 110 对抗验收裁决表（acceptor-110-97） |  | hits=0
+==== TICKET 116
+docs/evidence/s1/116-adversarial-acceptance.md | lines=125 | # 票 116 对抗验收 —— `acceptor-ticket116` |  | hits=0
+==== TICKET 117
+docs/evidence/s1/117-adversarial-acceptance.md | lines=588 | # 票 117 — 独立对抗验收（`acceptor-ticket117`） |  | hits=2
+==== TICKET 118
+docs/evidence/s1/118-adversarial-acceptance.md | lines=412 | # 票 118 独立对抗验收表（acceptor-ticket118） |  | hits=2
+==== TICKET 119
+docs/evidence/s1/119-ac1-ac2-r2-acceptance.md | lines=527 | # 票 119 — AC#1／AC#2 第二轮回判（`acceptor-ticket119-ac1-ac2-r2`，非实现者） |  | hits=2
+docs/evidence/s1/119-ac2-r2b-acceptance.md | lines=529 | # 票 119 · AC#2 复判（第二程 r2b）· 对抗验收表 |  | hits=2
+docs/evidence/s1/119-ac7-impl.md | lines=469 | # 119 AC#7 —— 实现侧交件：那两枚未解析根用例接了记名断言，并同时换到已解析基根 |  | hits=0
+docs/evidence/s1/119-ac7-r1-acceptance.md | lines=748 | # 119 AC#7 —— 裁决表 r1（非实现者） |  | hits=1
+docs/evidence/s1/119-adversarial-acceptance.md | lines=555 | # 票 119 — 独立对抗验收（`acceptor-ticket119`） |  | hits=1
+docs/evidence/s1/119-next-audit-r1.md | lines=281 | # 119-`next=` 三问审计 r1 —— 只读取证（`auditor-ticket119-next`） |  | hits=2
+==== TICKET 126
+docs/evidence/s1/126-adversarial-acceptance.md | lines=578 | # 票 126 独立对抗验收 —— `sameTree`/`answerInsideTree` 加卷段（生产判据） |  | hits=2
+==== TICKET 127
+docs/evidence/s1/127-adversarial-acceptance.md | lines=538 | # 票 127 独立对抗验收 —— 常驻 GUI 腿那 20 行 install 的第一枚钉（`R-117-A`，票 117 结案的唯一条件） |  | hits=2
+==== TICKET 129
+docs/evidence/s1/129-ac4-ac5-mutation-and-gates.md | lines=212 | # 票 129 — AC#4（变异自证）+ AC#5（门禁）读数表 |  | hits=0
+docs/evidence/s1/129-adversarial-acceptance.md | lines=721 | # 票 129 — 独立对抗验收（AC#1..AC#5） | 裁决方：`acceptor-ticket129-r1`。我不是实现者，下面每一个数都是我 | hits=2
+==== TICKET 131
+docs/evidence/s1/131-adversarial-acceptance.md | lines=627 | # 票 131 独立对抗验收（第二任）—— 攻的就是那枚"从 `main.go` 现算腿清单"的枚举门 |  | hits=3
+docs/evidence/s1/131-followup-0-crossplatform.md | lines=154 | # 票 131 续单 — 第 0 件：钉文件的跨平台编译破口（Linux 真跑读数） |  | hits=0
+docs/evidence/s1/131-followup-1-three-shapes.md | lines=297 | # 票 131 续单 第 1 件：三形（X4／X8／X12）打进枚举门，另加两形自证与一枚邻票新形的答复 |  | hits=2
+docs/evidence/s1/131-followup-2-ratification-and-linux.md | lines=155 | # 票 131 续单 第 2、3 件：第 0 件的 Linux 复核、票 130 越权改动的追认取证、`R-131-4` 措辞 |  | hits=0
+docs/evidence/s1/131-reaccept-ac4.md | lines=539 | # 票 131 AC#4 复验（第三任）—— 裁的就是上一任判退回那一格 |  | hits=1
+==== TICKET 134
+docs/evidence/s1/134-ac2-ac3-trigger-and-freshness-pin.md | lines=171 | # 134 AC#2 + AC#3 取证 — `schedule` 触发落地、真 run 读数、以及反静默死钉的变异三态（2026-09-23） |  | hits=0
+docs/evidence/s1/134-ac4-machine-contended-readings.md | lines=85 | # 134 AC#4 取证 — 采样有效性前置检查真触发（shape C，2026-09-23） |  | hits=0
+docs/evidence/s1/134-ac5-gate-readings.md | lines=77 | # 134 AC#5 取证 — 门禁复跑（d22scan 纯净快照 / scope 不降 / YAML 解析器 / 脚本 lint）2026-09-23 |  | hits=1
+docs/evidence/s1/134-ac6-contended-no-conclusion.md | lines=959 | # 134 AC#6 取证 — `machine-contended` 改判「本 run 无结论」+ 新鲜度钉改按「最近一次产出有效样本」计龄 |  | hits=0
+docs/evidence/s1/134-adversarial-acceptance.md | lines=764 | # 票 134 对抗验收（AC#1..AC#6）— `acceptor-ticket134-r1`，2026-09-23 | 验收方：`acceptor-ticket134-r1`（独立对抗验收方，非实现方）。票面 | hits=2
+==== TICKET 141
+docs/evidence/s1/141-ac2-stock-inventory-r1.md | lines=638 | # 141 AC#2 —— ban #8 缺口段存量盘点（只读程 r1） |  | hits=0
+docs/evidence/s1/141-ac34-positive-controls-r1.md | lines=100 | # 141 — `AC#3` / `AC#4` 补发的正向对照（编排者现量，快照在仓库外） |  | hits=0
+docs/evidence/s1/141-q46c-accept-r1.md | lines=587 | # 141 / Q-46c 对抗验收表 r1（裁决者 ≠ 实现者） |  | hits=0
+docs/evidence/s1/141-q46c-impl.md | lines=245 | # 141 / `Q-46` 已批＝按推荐 —— 实现程交件表（`worker-ticket141-q46c`） |  | hits=0
+==== TICKET 142
+docs/evidence/s1/142-non-quiescent-index-guard-accept-r1.md | lines=701 | # 142-accept-r1 — 两读不原子守卫的对抗验收（非实现者程） |  | hits=0
+docs/evidence/s1/142-non-quiescent-index-guard-r1.md | lines=388 | # 142-r1 — 两读不原子的守卫（实现方自证；裁决表须出自非实现者） |  | hits=0
+==== TICKET 143
+docs/evidence/s1/143-panel-assets-r4-leg-accept-r1.md | lines=568 | # 票 143 对抗验收 r1 — `wisp panel-assets -taint-source` 那条腿：R4 到底是不是 assessor 判出来的 |  | hits=0
+docs/evidence/s1/143-panel-assets-r4-leg-r1.md | lines=399 | # 票 143 — `wisp panel-assets` 那条产字节的路现在能打出由 assessor 真判出来的 R4 卡（r1） |  | hits=0
+==== TICKET 144
+docs/evidence/s1/144-slo-report-partial-read-r1-accept-r1.md | lines=678 | # 144 — 对抗验收 r1（非实现者）：`collectReport` 分"没写完 / 坏了"这一味 |  | hits=0
+docs/evidence/s1/144-slo-report-partial-read-r1.md | lines=620 | # 144 — `wisp slo` 收主体报告：把"还没写完"与"真的坏了"分开 —— 实现程自证 r1 |  | hits=0
+==== TICKET 147
+docs/evidence/s1/147-offset-naming-r1-accept-r1.md | lines=795 | # 147 对抗验收件 r1 — `unwritten` 支的 offset 与那三枚新用例的牙 |  | hits=0
+docs/evidence/s1/147-offset-naming-r1.md | lines=570 | # 147 — 实现程证据件 r1：`unwritten` 分支的 offset 判定 ＋ 一枚会响的检 | 作者：**实现程**（写码代理）。票面五框**不由本件勾选**（`SPEC-12 §4 | hits=0
+==== TICKET 149
+docs/evidence/s1/149-three-unpinned-outlets-r1-accept-r1.md | lines=1031 | # 149 对抗验收 r1 — 三处未钉出口的修法、那把"第一版是坏的"尺、以及坏尺期间留在树里的读数 |  | hits=0
+docs/evidence/s1/149-three-unpinned-outlets-r1.md | lines=742 | # 149 实现件 r1 — `corrupt` 那条腿的取值、那句注释的反例、loop 第二个调用点 |  | hits=0
+==== TICKET 151
+docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md | lines=622 | # 151 验收 r1（非实现者对抗验收程）— `Bridge.CloseTask` 只开不关这一案的第二枚验收表 |  | hits=0
+docs/evidence/s1/151-task-scope-never-closed-r1.md | lines=380 | # 151 r1 — `Bridge.CloseTask` 全仓零调用者：per-task 污点 scope 只开不关（实现程判定与修法） |  | hits=0
+==== TICKET 152
+docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md | lines=709 | # 152 对抗验收 r1（非实现者）— 被验版本 `97cfc6e` |  | hits=0
+docs/evidence/s1/152-subject-death-never-measured-r1.md | lines=516 | # 152 r1 — 真 subject 中途死掉那一条出口，第一次被**量**到：它在生产接线上今天产不出自己那句红 |  | hits=0
+==== TICKET 153
+docs/evidence/s1/153-ac2-a-closure-r1.md | lines=191 | # 153 AC#2 部件 (a) 那两笔待补的**内容级**复核 · r1（非实现者验收程） |  | hits=0
+docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md | lines=939 | # 153 — 那枚压缩痕的两条谎法 · 对抗验收件 r1（非实现者，只读取证） |  | hits=0
+docs/evidence/s1/153-trace-lies-unguarded-r1.md | lines=648 | # 153 — 那枚压缩痕的两条谎法 · 实现件 r1（写码程） |  | hits=0
+==== TICKET 154
+docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md | lines=592 | # 154 对抗验收程（非实现者）— 「关」只长在环路那一枚 id 上：RESERVED＋触发门那一票的六格 |  | hits=0
+docs/evidence/s1/154-host-id-never-closed-r1.md | lines=802 | # 154 实现程 r1 — 「关」只长在环路那一枚 id 上：宿主自带 id 那一形仍没人关、并发任务零读数 |  | hits=0
+==== TICKET 155
+docs/evidence/s1/155-three-unjudged-cells-r1-accept-r1.md | lines=359 | # 155 的三块"无人裁"——**非实现者**对抗验收 r1（复判：那三块是量出来的，还是推出来的） |  | hits=0
+docs/evidence/s1/155-three-unjudged-cells-r1.md | lines=841 | # 155 — 票 153 剩下的三块"无人裁"·实现件 r1（只读取证，不写生产码） |  | hits=0
+==== TICKET 157
+docs/evidence/s1/157-ac5-recheck-r1.md | lines=272 | # 票 157 · **AC#5 那一格的重判**（非实现者·第三程 r1；派单＝`.scratch/wisp/dispatches/2026-09-26-142x-accept-157-ac5-recheck.md`） |  | hits=0
+docs/evidence/s1/157-record-level-cleanup-r1-accept-r1.md | lines=220 | # 票 157（记录级收口）——**非实现者**验收 r1：抽四笔换尺重走 ＋ 裁那件"自相矛盾" ＋ 五枚框双向对账 |  | hits=0
+==== TICKET 162
+docs/evidence/s1/162-fs-edit-accept-r1.md | lines=431 | # 162-v1 验收件（**非实现者**）— 票 162 的 AC#1／AC#2／AC#3／AC#4 四格独立复算 |  | hits=0
+docs/evidence/s1/162-fs-edit-accept-r2.md | lines=223 | # 票 162 · 162-v2 验收表（非实现者）＝裁 r3 四件：AC#3b 两形响亮 ／ 那半格反向尺 ／ AC#4b 真硬杀 ／ 判据顺序 |  | hits=0
+docs/evidence/s1/162-fs-edit-r1.md | lines=247 | # 162-r1 证据件 — 票 162 的两格：AC#1（读数）＋ AC#2（四枚拒绝） |  | hits=0
+docs/evidence/s1/162-fs-edit-r2.md | lines=273 | # 162-r2 证据件 — 票 162 的第①②格（AC#3 行尾/BOM 正反两向＋AC#4 原子性反面实验）＋裁给本程的一句注释 |  | hits=0
+docs/evidence/s1/162-fs-edit-r3.md | lines=379 | # 票 162 · r3（写码位）＝AC#3b 两形变响亮 ＋ AC#4b 真硬杀那一半 ＋ "改完还是 CRLF" 反向尺半格 ＋ 判据顺序一笔 |  | hits=0
+docs/evidence/s1/162-risk-tier-accept-v3.md | lines=169 | # 票 162 · AC#5（风险档与门控）＋ AC#6（契约轴） — 非实现者对抗验收表 `162-v3` |  | hits=0
+docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md | lines=236 | # 票 162 · AC#5（风险档与门控＝L2）＋ AC#6（契约轴）＋ 派单 §3 那一枚〔现读码〕 — 写码位 `162-r4` 交件件 |  | hits=0
+==== TICKET 183
+docs/evidence/s1/183-exemption-why-not-live-a1.md | lines=181 | # 183-a1 — 只读设计核：票 177 那枚"宿主自己写下的路径精确豁免"为什么在真机 CLI 上没护住 |  | hits=0
+docs/evidence/s1/183-pointer-exemption-accept-v2.md | lines=177 | # 183-v2 — 非实现者对抗验收（收窄版）：宿主指针豁免的三发变异恒真性 / 安全退让面进攻 / 三条边界 / AC#2 措辞判读 |  | hits=0
+docs/evidence/s1/183-pointer-exemption-r1.md | lines=178 | # 183-r1 — 先立在 HEAD 上就红的包级裁判，再逐族现量：F1（前程推荐的挖跨度）翻不动裁判，F2（按声明串自身的窗口值扣）翻得动，落的是 F2 |  | hits=0
+docs/evidence/s1/183-reread-permanent-teeth-r2.md | lines=227 | # 183-r2 — 测试面装牙：AC#9 的第 8 枚常驻腿 / AC#2b 的 CLI 接缝常驻判据 / AC#4 那一形 / AC#6 一句归口 / AC#8 门禁重取 |  | hits=0
+==== TICKET 184
+docs/evidence/s1/184-audit-vocabulary-census-c1.md | lines=133 | # 184-c1 — `tool_call.decision` 取证词汇普查（只读·零产码） |  | hits=0
+==== TICKET 198
+docs/evidence/s1/198-firstrun-config-r2.md | lines=97 | # 票 198 · 落地写腿 `198-r2` · 证据件（四小格：AC#2 仪器／AC#5 失败支用例／AC#4 "去哪儿补"／落点仪器收回本票） |  | hits=0
+docs/evidence/s1/198-firstrun-config-v1.md | lines=114 | # 票 198 · 对抗验收腿 `198-v1` · 裁决表（首建 config.toml 只挂 `wisp run`） |  | hits=0
+==== TICKET 212
+docs/evidence/s1/212-comments-phantom-citation-v2.md | lines=221 | # 212-v2 对抗验收裁决（票 212 第 2 轮修码 212-r2；非实现者腿，实现者＝212-r2） |  | hits=0
+==== TICKET 221
+docs/evidence/s1/221-task-cancel-v1.md | lines=287 | # 221 — 非实现者对抗验收表（腿 `221-v1`） |  | hits=0
+==== TICKET 241
+docs/evidence/s1/241-audio-level-producer-r1.md | lines=202 | # 241-r1 — 电平生产者半：PCM 帧 → `0..1` 电平数（internal/audio 包内） |  | hits=0
+docs/evidence/s1/241-audio-level-producer-v1.md | lines=603 | # 241-v1 — 裁决腿验收：`internal/audio` 电平生产者半（票 241 五格 AC） |  | hits=0
+==== TICKET 257
+docs/evidence/s1/257-clean-machine-provider-registry-v1.md | lines=262 | # 257-v1 终裁件 — 票 257（干净机器上设置写不进去／形 ⓒ 首启回执）的对抗验收 |  | hits=0
+==== TICKET 63
+docs/evidence/s1/63-adversarial-acceptance.md | lines=84 | # Ticket 63 — adversarial acceptance (credential-entry CLI) |  | hits=2
+==== TICKET 66
+docs/evidence/s1/66-adversarial-acceptance.md | lines=53 | # 票 66 对抗验收报告 — SLO 判据仪器返工（A14 解析末项 + A15 树外 CPU 口径） |  | hits=0
+docs/evidence/s1/66-mutation-parse-order.md | lines=210 | # 66 — AC#1 变异检验：解析器顺序缺陷的回归用例咬合证明 |  | hits=0
+==== TICKET 67
+docs/evidence/s1/67-ac3-ascii-verdict.md | lines=88 | # 票 67 AC#3（判据①）— `wisp providers` verdict 列改 ASCII `PASS`/`FAIL` |  | hits=0
+docs/evidence/s1/67-adversarial-acceptance.md | lines=38 | # 票 67 对抗验收 —— 让扫描器可信：`mockllm` 走受管出口 + 门必须自报覆盖面 |  | hits=0
+docs/evidence/s1/67-emoji-scope-internal-cmd.md | lines=249 | # 票 67 AC#3 判据②：ban #8 覆盖面真正扩到 `internal/` + `cmd/`，并证明它咬得住 |  | hits=0
+==== TICKET 69
+docs/evidence/s1/69-adversarial-acceptance.md | lines=45 | # 票 69 对抗验收 —— C21 令牌表的双向机器检查（A24-D4） |  | hits=0
+docs/evidence/s1/69-mutation-tokens.md | lines=186 | # 69 — C21 表↔码双向断言的变异检验原始输出（AC#2） |  | hits=0
+==== TICKET 73
+docs/evidence/s1/73-adversarial-acceptance.md | lines=61 | # 票 73 对抗验收 —— 孤儿暂存文件清扫器（A18 判据②的可执行化） |  | hits=0
+docs/evidence/s1/73-orphan-staging-sweep.md | lines=102 | # 票 73：孤儿 `.wisp-tmp-*` 清扫器落地，A18 判据②选"自愈"并测了四件事 |  | hits=0
+==== TICKET 74
+docs/evidence/s1/74-adversarial-acceptance.md | lines=32 | # 票 74 对抗验收 —— C21 令牌表必须对齐真正驱动像素的常量 |  | hits=0
+==== TICKET 76
+docs/evidence/s1/76-adversarial-acceptance.md | lines=39 | # 票 76 对抗验收 —— 把 artifacts 路的"隐含安全"变成跑过的不变式（并修掉一个真绕过） |  | hits=0
+==== TICKET 79
+docs/evidence/s1/79-adversarial-acceptance.md | lines=108 | # 票 79 — 对抗验收裁决表（编排者亲自复跑，2026-09-21） |  | hits=0
+==== TICKET 83
+docs/evidence/s1/83-adversarial-acceptance.md | lines=59 | # 票 83 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 14:3x） |  | hits=0
+==== TICKET 84
+docs/evidence/s1/84-ac1-bounded-wait.md | lines=123 | # 票 84 裁决表 — AC#1 两侧读数：`PendingApproval` 的等待**有界**（(b)），不是无限期阻塞（(c)） |  | hits=0
+==== TICKET 87
+docs/evidence/s1/87-adversarial-acceptance.md | lines=394 | # 票 87 独立对抗验收 —— `acceptor-ticket87` |  | hits=3
+==== TICKET 88
+docs/evidence/s1/88-adversarial-acceptance.md | lines=363 | # 票 88 独立对抗验收 —— `ban #6` 这道门现在到底有没有牙 |  | hits=3
+==== TICKET 89
+docs/evidence/s1/89-adversarial-acceptance.md | lines=495 | # 票 89 独立对抗验收（acceptor-ticket89） |  | hits=3
+==== TICKET 93
+docs/evidence/s1/93-adversarial-acceptance.md | lines=74 | # 93 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket93`） |  | hits=0
+==== TICKET 94
+docs/evidence/s1/94-adversarial-acceptance.md | lines=569 | # 票 94 独立对抗验收（acceptor-ticket94） |  | hits=2
+==== TICKET 95
+docs/evidence/s1/95-adversarial-acceptance.md | lines=158 | # 95 — 对抗验收裁决表（acceptor-ticket95 · 终版） |  | hits=0
+==== TICKET 96
+docs/evidence/s1/96-adversarial-acceptance.md | lines=329 | # 票 96 独立对抗验收 —— `ban #8`（零 emoji）覆盖 `frontend/` |  | hits=3
+==== TICKET 99
+docs/evidence/s1/99-adversarial-acceptance.md | lines=229 | # 票 99 对抗验收裁决表 — `scripts/d22scan.sh` 第一步（阳性对照）被 `go test` 缓存端过去 | 验收方：`acceptor-ticket99`（独立对抗验收代理，未参与实现，未看先前对 | hits=1

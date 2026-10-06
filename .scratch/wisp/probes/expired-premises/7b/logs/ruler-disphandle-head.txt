@@ -1,0 +1,9 @@
+HEAD:cmd/wisp/panel_config_248_test.go:162:	reply, err := disp.Handle(context.Background(), raw)
+HEAD:cmd/wisp/panel_config_248_test.go:270:	reply, err := disp.Handle(context.Background(), raw)
+HEAD:cmd/wisp/panel_config_248_test.go:469:		if _, err := disp.Handle(context.Background(), raw); !strings.Contains(err.Error(), "处理器未接入") {
+HEAD:cmd/wisp/panel_config_248_test.go:489:	reply, err := disp.Handle(context.Background(), raw)
+HEAD:cmd/wisp/panel_config_248_test.go:517:	if _, err := disp.Handle(context.Background(), raw); err != nil {
+HEAD:cmd/wisp/panel_host_windows.go:637:	return m.disp.Handle(ctx, raw)
+HEAD:cmd/wisp/panel_inbound.go:163:		reply, err := disp.Handle(ctx, raw)
+HEAD:cmd/wisp/panel_inbound_33_test.go:187:			"Expected at least one call site in the style of cmd/wisp/panel_inbound.go's `disp.Handle(ctx, raw)`.")
+HEAD:internal/panel/composer_dispatch_test.go:496:	_, _ = disp.Handle(nil, "{}")

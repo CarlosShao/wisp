@@ -1,0 +1,131 @@
+==== 101 :: 101-perm-store-has-no-production-importer-done.md
+8:⚠ 结案限定语，对 owner 的口径**不许省**：**读侧已通、写侧未通**——
+99:  Status 建议 `ready-for-review`（裁决表按票面留给验收方，`docs/evidence/s1/101-*.md` 我没写）。
+149:  已出，与 AC#1–AC#5 五框 1:1。**总判 `PASS WITH CONDITIONS`**（不改票头 Status，-done 后缀归编排者）。
+177:  next= 编排者定 Status；`R-101-1` 转票 90 的验收判；票 92 落 `Set` 调用者时**必须**一并回答"第二个 `perm.New` 调用者的审计首行谁写"。
+  TAIL:   本代理只写 `docs/evidence/s1/101-adversarial-acceptance.md` + 本段追加，未动 PLAN/specs/risk/d22scan/allowlist，未 push。   next= 编排者定 Status；`R-101-1` 转票 90 的验收判；票 92 落 `Set` 调用者时**必须**一并回答"第�
+==== 110 :: 110-no-ci-step-runs-internal-winsec-done.md
+45:      `done-check-1` 勾＝本格判据是一个「**或**」句，本腿按第二支（明写为什么不该被纳入）现读四把尺：尺一 `grep -n "AC#4 \`R-93-4\` 的答复" .scratch/wisp/issues/110-no-ci-step-runs-internal-winsec-done.md`＝`:90` 逐字「**AC#4 `R-93-4` 的答复 = 它不该进 RUN 分母，但它该拿的步级证据我给了**」，并给出"纳入只有两种读数（常红 / 假 `ok`）"的理由；尺二 `grep -n "TestSyncRegistryProbeLive" scripts/portable-tests.sh`＝`:326` 那行 ledger reason 今天仍在树里；尺三（**这一支非实现者早已认过，不是本腿新裁**）表 `docs/evidence/s1/110-adversarial-acceptance.md:17`「| AC#4 | `R-93-4` 一并收：windows 腿把 `TestSyncRegistryProbeLive` 纳入分母的步级证据，或论证不该纳入 | **通过（附条件：步级证据至今不存在）** | …**"不该进 RUN 分母"的论证我认可**…」＋同表 `:33`「**通过（附条件）**…AC#4 成立但**附条件**」；尺四（那枚"附条件"没被本勾吃掉、今天仍是一枚开放格）`grep -n "AC#7" .scratch/wisp/issues/111-ci-tests-20-of-33-packages.md`＝`:75` `- [ ] **AC#7** `R-110-4`：票 110 承诺过…` 未勾，且票 111 不带 `-done`。⇒ **可翻勾**：判据两支取其一已成立且由 `acceptor-110-97` 裁过；缺的那发 step7 `go test -list` 读数**不挂在本格名下**、挂在 `R-110-4`／票 111 AC#7。⚠ 与 `done-fix-1` 的分歧：它把"那发步级读数"当本格的缺项，本腿认为那是 `R-110-4` 的账（本格是"或"句，第二支不需要读数）；分歧交编排者裁，本勾若被撤请连带撤这行的结论。三行定性（本格涉"纳入/不纳入分母"字样）：现象＝一枚 windows 专属用例记在 ledger 而不进 RUN 分母；本机被入侵证据＝无（本腿只读文件与只读 git，未跑任何仪器）；最坏后果形状＝若"不该纳入"那条论证错了，真实注册表行为在 CI 永不被执行（覆盖缺口），不是对任何已交付码的放宽或授权。
+49:      `done-fix-1` 追加（己类·判不了，本腿不翻勾）：尺一过了——表 `110-…md:18`「AC#5 | `bash -n` rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且各 scope 不降；新步不得排在会失败的步之后 | **通过（附一条后果登记）** | 〔独立复现〕 | `bash -n scripts/winsec-tests.sh` rc=0、`bash -n scripts/portable-…」」；尺二只能靠跑（`bash -n`/`d22scan.sh` 都是执行，本腿禁），而那批 rc 只对当时的树负责 ⇒ 缺的读数＝这两发在当前 HEAD 上的一次非实现者读数。⚠ **本格第三句的后果今天仍挂在开放池里**：票 110 那步加进去后"把后面的步骤全吃掉"（改名 commit `f161c690` 正文自陈），本腿现量 **票 111 `un=10`／票 112 `un=5`／票 140 `un=4`，三张都不带 `-done`** ⇒ 这格即便翻勾也不是"零后果"。
+92:- （agent-ticket110）**AC#4 `R-93-4` 的答复 = 它不该进 RUN 分母，但它该拿的步级证据我给了**。本机（windows 主机）`go test ./internal/risk/ -run 'TestSyncRegistryProbeLive$' -count=1 -v` = **`--- SKIP`，syncdirs_windows_test.go:133 `no registry-grade sync record on this machine`** ⇒ 纳入 run 分母只有两种读数：`runtests.sh` 下 SKIP=1 的常红，或裸 `go test` 下的假 `ok`（正是票 93 要消灭的字节形状），所以维持 ledger 的 fixture 记账。**做了的加严**：windows 腿的 portable 步现在把 `./internal/risk/` 纳入 scope（步名同步改成 `Portable windows tests (proc/secret/config/risk)`），于是那行 ledger 第一次**在 windows 腿**被 `go test -list` 对着 windows 编出的 test binary 复验、并在该步日志里带 class+reason 打印；改名/删测试/埋进 build tag 都会让这一步红。顺带把 windows 腿的 risk 分母从"一条 `-run`"扩到整包：本机 **rc=0，PASS=201 / FAIL=0 / SKIP=0 / === RUN=325**。
+102:裁决表 = `docs/evidence/s1/110-adversarial-acceptance.md`（与票面 AC#1-AC#5 逐格 1:1，每格标证据档位）。**总判：通过（附条件）**——条件即下面 R-110-1/2/4 的补救，不是"再验一轮"的意思。Status 与本文件名验收方一律未动。
+  TAIL:  验收方改动文件：`docs/evidence/s1/110-adversarial-acceptance.md`（新）、本票面（仅此追加段）。**无 push、无 amend/reset/rebase/stash、无仓内 worktree、未跑整仓门禁**（共树：`internal/tools/bridge.go` 与 `internal/ris
+==== 116 :: 116-ancestor-actable-leg-still-has-no-behavior-case-done.md
+3:**Status:** open（2026-09-21 20:5x 编排者建；来源=`acceptor-ticket105b` 的
+6:**Blocks:** 票 105 结案 · **Blocked by:** nothing
+149:  （形状完全从导入口 `IsSyncPath` 进、从 `SyncStatus` 出，唯一的包内依赖 `deepestExistingAncestor` 与 `Resolve`
+209:  ④ 票 105 结案的门现在只等验收复算——本票没有给生产码留任何待办。
+  TAIL:   ③ 两次 Read 对 `/tmp/...` 报 `File does not exist`：是 Read 工具不认 MSYS 路径（换      `C:\Users\swq\AppData\Local\Temp\...` 即可），属仪器形状不是结论。 
+==== 117 :: 117-security-warnings-have-no-listener-in-production-done.md
+3:**Status:** open（2026-09-21 21:0x 编排者建；来源=`acceptor-ticket104` 的 **`R-104-5`**（它自己的"下一张首推"）
+8:             （票 89/92/94/104/105 都已结案或已交件，本票不推翻它们，只补它们共同的出口）
+358:  先说清楚：**我这一条不是"验收"**。验收方是另一个位，我没写 `docs/evidence/s1/117-*.md`，票面 Status 我也没动。
+367:    标题写明"checkpoint（前任撞轮数上限死亡后落盘）"，**没写结案也没写通过**。
+  TAIL: 其中**逐帧/逐调用可重复**的是 `ball_windows.go:393`、`:417`、`plugin/disposal.go:332`、`observe/goroutine.go:271` 这四处形状； `Level: "info"` 与轮转/上限一字未动（本票与票 127 都没动阈值）。 
+==== 118 :: 118-winsec-test-hardening-from-ticket104-acceptance-done.md
+4:              （它把这一组叫"并行小包"，并写明**不阻塞票 104 结案**））
+66:      `done-fix-1` 追加（甲类·**账在票 126**，⛔ 不翻勾）：接管票核实**通过**——`126-…-done.md:1` 标题逐字点名「`sameTree` 比对前**剥掉 volume 段**…（`R-115-3`／**票 118 AC#8 停手那一格**）」、`:5` 逐字「**Blocks:** 票 118 的 AC#8（那格按票面规则留在 `[ ]`，等本票）」；本票面 `:161` 记的正是那次停手（逐字「**AC#8 停手回报：这证明的是生产判据会归错，本格留 `[ ]`**」）——按本格 `:63` 自己写的规则（"证明的是生产判据 ⇒ 停手回报，不要自己改 `winsec_windows.go`，我会另开立票"），这一步做对了。本腿现量 **票 126＝0 未勾／6 已勾**（已结案）⇒ 等的那一票结完了；今天的树里那一发也确实落了：`grep -rn 'func sameTree' internal/winsec/*.go` ＝ `internal/winsec/resolve.go:455`，函数体第一行逐字 `if !sameVolume(a, b) || !sameAbsoluteness(a, b) { return false }`（卷比较已在）。⇒ 本格按派单不翻（118 名下没有裁过这一格的表；`docs/evidence/s1/118-adversarial-acceptance.md` 出在 AC#8 立格之前，本腿不引它背书）。⚠ 顺手交回一条**不在本腿射程**的账：**票 126 的 Status 行至今写 `open`（`:3`）而文件名已带 `-done`**——与 `A440` 第②条点名的那四枚同形状，留给编排者。
+67:      `done-fix-1` 更正上一行的一句（本腿自己写错的，只追加不划掉）：**118 名下是有表的，而且这张表裁过 AC#8**——`docs/evidence/s1/118-adversarial-acceptance.md:34`（收表 `:397`）逐字「| AC#8 | 跨卷归属：先量再判（票面留 `[ ]`） | **通过（停手移交票 126）**；缝守腿不背书 | 链＋判据＋跨卷读数〔独立复现〕／缝守腿〔仅自述，不背书〕 |」，`:308` 一节裁决「**通过（按票面规则停手）**」，`:405` 更写「建议结案写法：`AC#8 = 移交票 126（本票不勾，结案不以此格为缺）`——**票面那一格我不翻，实现方的框我一个也不动**」。⇒ 本格"不翻勾"这条结论不变，但**理由要说准**：不是"没表"，而是**出表的人自己明写这一格归票 126、他不动框**；本腿现量票 126 已 0 未勾／6 已勾结案、`resolve.go:455 sameTree` 今天也带 `sameVolume` ⇒ 账在 126、指针已具名，翻不翻由裁决者按这张表的 `:405` 那句决定。
+89:- 2026-09-21 21:0x（编排者）：建票。票 104 的验收方把它标为"不阻塞结案"，所以本票**不挂**在任何结案链上；
+  TAIL:   (3) 邻居提醒——`internal/models/assembly_reachability_121_test.go` 在工作树里处于语法未闭合状态（票 121 在飞），   任何人在树里跑 `./...` 的门禁都会先撞上它，与本票无关。 
+==== 119 :: 119-posix-link-leg-refuses-legitimate-symlinked-data-roots-done.md
+420:  复算它们的来历：`git ls-tree HEAD` 里**同时**有原名的两枚与 `-done.md` 的两枚 ⇒ `e475ce0` 那次改名只加了新名字、没删旧名字，
+448:     改名权在验收方，我不自翻 `-done`。
+470:     > 形状：09-22 我用 `git mv` 把 105／116 两枚票面改成 `-done`，`git mv` 把改名记成"一加一删"两枚索引条目，而我 commit 时**只列了新名**
+483:- 2026-09-24 17:2x（`worker-ticket119-ac7`，**AC#7 实现侧交件**；本格**未翻勾**、本票**未改 `-done`**）：
+  TAIL:   
+==== 126 :: 126-winsec-tree-attribution-strips-the-volume-so-a-seal-on-one-drive-is-reported-against-another-done.md
+3:**Status:** open（2026-09-22 16:41 编排者建；来源 `agent-ticket115c` 登记 + `agent-ticket118b` **用真第二卷量成生产洞**）
+265:     建议结案写法仍按验收方那一句：`AC#8 = 已由票 126 交付`，票面那一格由票 118 的作者或编排者翻，我不动别人的账。
+272:       先把 `\?\` 拒在 seal 之前 ⇒ 这一形拿不到真 seal，写进 `sameVolume` 的注释里。（建议归属：本票结案备注）
+  TAIL:   日期变更提醒 1 次；Edit 工具因我自己用 perl/gofmt 落笔改过同一枚文件而报   "The file changed since your last read" 3 次（都是本票自己的票面或用例文件，改前改后我都 `git diff` 逐行核过）。 
+==== 127 :: 127-the-resident-gui-leg-installs-its-log-listener-with-zero-nails-deleting-20-lines-keeps-146-tests-green-done.md
+5:**Blocks:** **票 117 结案**（验收方原话：只有这一发钉上就能翻 `-done`）· **Blocked by:** 无
+19:- [x] **AC#1** **结案判据只有一条**：删掉那 20 行 ⇒ 至少红一条、**且红名点到常驻腿**（不许是「顺带把别的用例拖红」）。
+211:1. **票 117 可以结案**：R-117-A（常驻腿零钉）已由 `8663a39` 的三枚用例闭合，且 M4 重量给了逐字红名；
+235:- **本票 Status 不改**（open → 交验收）：四格全 `[x]`，`next=` 五条留给验收方与票 07/34、`internal/observe` 的地界。
+  TAIL:   `git diff --stat 6a39820..HEAD -- cmd/wisp/` = **562 insertions / 0 deletions**。 - **本票 Status 不改**（open → 交验收）：四格全 `[x]`，`next=` 五条留给验收方与票 07/34、`internal/observe` 的地界。 
+==== 129 :: 129-sametree-also-drops-the-absoluteness-segment-so-a-drive-relative-spelling-passes-the-seam-guard-done.md
+131:  Status 与勾框本条不动（AC#4/AC#5 未量完）。
+148:  **改前−改后＝0 枚**（无删除、无改名），新增 8 枚全在 `absoluteness_*_129` 两枚文件里；票 126 的腿表 `wantRefused:` true 3→3 / false 4→4 一分未动。
+199:## 结案（09-23 14:0x 编排者落，依据 `acceptor-ticket129-r1` 的 `docs/evidence/s1/129-adversarial-acceptance.md`）
+217:### 为什么 AC#4 记 PARTIAL 仍给本票结案（原话不改）
+  TAIL: 且把 Y2/Y3 与摘腿**叠起来仍是同样 4 枚红名 ⇒ **生产改动没失去证人**，静默丢掉的是"缝守面那一条腿的靶"。 ⇒ 洞按规则归口到**票 133/124**，本票 AC#4 的勾**保持实现者打的形状不动**，本节就是
+==== 131 :: 131-the-models-leg-has-no-nail-deleting-9-lines-keeps-76-cmd-wisp-tests-green-done.md
+380:X2/X9 各多两枚红（票 130 的 early-record 用例）、X10 多一枚（本轮新增的入口红）——**方向都是查得更多，没有一枚旧红被改名或摘掉**。
+405:形状与两拍读数已原样写进 **票 133 AC#1 第 5 发（X14）**，连同"第二拍也必须红"这条结案判据；**不为它开第三张同族票**（票面已写死）。
+407:在此之前 131 保持-open、不改名 `-done`。三小句结案判据（六发红名逐字不变／三形转红／四数不降）**已由复验方逐条判 PASS**，
+453:   这两条**不因本格翻勾而作废**。
+  TAIL: ② 本票门头自陈的残窗三支里，**"跨包那一支"至今无证人**（验收方未造，出 `cmd/wisp/**` 地界）、**"方法值那一支"仍未测**——    这两条**不因本格翻勾而作废**。 
+==== 141 :: 141-ban8-emoji-scan-range-is-narrower-than-plan-md-states-41-go-files-carry-u2190-u25ff-today-done.md
+3:**Status:** open（2026-09-24 19:3x 编排者建；来源＝`auditor-ticket140-static-ac2` 交件时"按规矩上报"的第 8 条 finding，**但那条只说"文档与正则不一致"，下面这层是我自己往下追出来的**：不一致的那一侧是**仪器**，而 PLAN.md 是**同一句话写了两次**的权威。严重度＝**中偏高**——它不是"报错没报"，是**一条被写成"用户硬要求"的门，有一部分射程从来没生效过**）
+58:> **仍未结案的一格＝本票不改成 `-done`**：07:23 前端会话 `67192a5` 往 `frontend/VENDORED.md:149` 写进一枚 `⚠`（`U+26A0`，**属一直就扫的 `2600–27BF`，与本票扩的段无关**）⇒ `sh scripts/d22scan.sh` 在当前 HEAD 上 **rc=1**。已具名发回它改（那是 owner 交出去的地界，我不进去动码）。
+113:> **[2026-09-25 07:3x +08] 上一段那句"本票不改成 `-done`"的原因已被前端会话修掉 ⇒ 本格结案（原句不删，只追加工夫）**
+118:> 结案依据清单（逐枚具名，不给"看起来齐了"）：非实现者裁决 `141-q46c-accept-r1.md`（总裁＝附条件成立，三条件 U1/U7/Q-48 **逐枚已闭**）
+  TAIL: > (ii) `U+2200–U+22FF` 段 256 枚码点里只有 4 枚有会响的种子，其余靠类算术（记在补发读数表 §6，属已知残留）。 > 口令不变：**「撤 141 定勾」**＝四枚勾逐枚退回 `[ ]` 并撤销本文件的 `-done` 后缀，
+==== 142 :: 142-the-two-git-spawns-are-not-atomic-so-a-tracked-directory-can-be-skipped-during-the-window-done.md
+  TAIL:  `next=`＝①AC#1 先跑（可能它自己就把本票作废，那是好事）；②裁决表交非实现者；③与 `task #79`（`PanelSnapshot` 补"当前屏"）不同目录，可并行。 
+==== 143 :: 143-wisp-panel-assets-l2-cannot-produce-an-r4-card-the-taint-detector-is-not-wired-on-that-path-done.md
+3:- Status: ready-for-agent
+  TAIL: >> ⇒ 本票正文真正错的只有两处、且都不是行号：**把那张表叫成"差距表"**（规格里没这个称呼）、**占位符拼成 `<source>`**（纸上无此拼法）。 >> ⚠ 这条要留在仓里的理由：这是一枚**"更正比原�
+==== 144 :: 144-wisp-slo-collectreport-reads-a-still-being-written-file-as-a-corrupt-one-one-empty-read-kills-the-run-done.md
+3:- Status: ready-for-agent
+146:  Status 行没动（`ready-for-agent` → 该由编排者裁成什么，以及 `-done` 改名的地界不在我）。
+233:是**另开票**还是记台账，请裁（本程没顺手改，理由在那条里）；④ `Status` 行（`ready-for-agent`）与
+234:`-done` 改名的地界不在本程；`internal/agent/approval/**`、`internal/panel/**`、`design/**`、`frontend/**` 本程一字未碰。
+  TAIL:   也没有为任何一格新增或放宽断言；唯一一次代码面改动是 `a91d7c2` 那枚 `gofumpt -w`，只有空白。  
+==== 147 :: 147-collectreports-named-red-says-document-stopped-at-offset-n-but-the-unwritten-branch-always-carries-0-and-no-assertion-pins-it-done.md
+3:- Status: ready-for-agent
+  TAIL:   它在票面 AC#1 ⓐ 的射程之外；② 真竞态、预算常量、`slo-check.ps1` 一律未碰；③ 票面五框**未勾**（本程是自证，裁决表归非实现者）。   证据件：`docs/evidence/s1/147-offset-naming-r1.md`。 
+==== 151 :: 151-bridge-opentask-sits-on-the-dispatch-hot-path-while-closetask-has-zero-callers-repo-wide-so-the-per-task-taint-scope-is-only-ever-opened-done.md
+3:- Status: ready-for-agent
+62:- Status 追加（**上面那行原样保留不删**）：**done（附条件成立，四枚条件全在记录文本层、已由我逐条落到实现件附录 A）**。
+  TAIL: **我这一侧要收回的一句话**：我在 09-26 上午给 owner 报"这条腿今天会硬拒后面的任务"，那是**照实现件 §2.1 的括注念的**；验收件把它判窄了—— **那一形今天不走 `wisp run` 控制台腿**。⇒ 已在 `A2
+==== 183 :: 183-host-pointer-exemption-fails-real-cli-done.md
+63:> **⇒ 票 183 十格全勾、结线改名 `-done`。** 残余两笔都归了口：**第二次续读＝票 185**（并新加 AC#7"同名不同目录"那一形）、**要不要给续读摆一张 L2 卡＝票 177 AC#0**（至今零读数、另议）。票 177 AC#3／票 175 AC#5／票 176 AC#3-5 **本轮一律不翻**，理由各不相同且来自非实现者 `183-v2` 的判读（177＝端到端条件只满足首读那一半；175 AC#5 是分账格、本票不构成为它翻勾；176 那三枚等的是起跑口、与本票无依赖）——⚠ **176 那三枚到底能不能翻，我下一轮单独裁，不趁本程顺手翻**。
+78:- 09-28 13:2x-13:5x 非实现者对抗验收 `183-v2`（**只裁不改**，表 `docs/evidence/s1/183-pointer-exemption-accept-v2.md`，读数 `.scratch/wisp/probes/183/v2/**`，**AC 框一枚没勾**，工具调用 38/40）。四格结论：① **恒真性矩阵**＝七枚常驻判据（现量 7 枚，不是派单写的 6）× 六发自取变异 M0/M1/M2/M3/M4/M5——**没有一枚是装饰**（每枚至少被一发打红；M1≡M2 红名册逐字相同＝值规则是一枚行为）；**但 M3（不要求 `runeIndexOf` 命中就挂 `declaredNorm`）零枚红** ⇒ `provenance.go:568-572` 那支 fail-closed 今天只靠注释活着，**判据集这一格不通过**，要补的腿形状＝正文不含声明路径时那一发必须仍命中。② **进攻**＝自造四发：与声明串共享 >8 rune 前缀的**另一条资源**路径仍命中（L1）、可逃集合精确＝"整条候选参数都是声明串的逐字子串"（L2 `hit=false`）、跨 scope 借不到（L3 归因 `web.fetch`）、同一路径第二发仍命中且判中它的是没声明的读回 mark（L4）⇒ **影响面只在同一枚 mark 内**，我这发没结出可用外带。频率口径复跑（同一 overlay、我自己 rc=0 那份 `freq-recount.txt`）：`3 of 10` 逐字复现，但分母＝**8 枚真仓内文件＋2 枚作者自造夹具**、另 2 枚 SPEC 语料因文件名取错未计入 ⇒ 该拆成"真文件 2/8＋自造 1/2"说，且那 8 枚是**仓内文件不是用户文档**，"自用第一天就会撞上"是〔推断〕不是读数（⚠ 段已披露组成，结论行与它口径不一致）。③ **三条边界**＝(a) 不是 AC#5① 禁的那一支（键不在参数名／通道上），但它**通道无关**地按值扣证据，可逃值只等于宿主自己公开过的那段字；(b) `declaredPath` **不是名册**——存储侧 `grep -rn "declaredPath\|attachDeclaredPath" internal/risk/*.go | grep -v _test.go` 现量 11 处全在 mark 侧、`Scope.Close` 删 mark 即删豁免、桥上 `hostPathBox` 每调用新建，跨 mark／跨 scope 不可见由 L3/L4 **实测**；(c) 逐 token 那一票＝**坐实**编排者"不算复活"（无 token 级污点状态、不传播、只逐字比一条常量串），并给了下次判分界线。④ **AC 判读（不勾）**＝票 183 **AC#2 判部分达成**：措辞上第一发满足，两处缺口＝(硬) AC#2 自己要求的"常驻、落 `internal/tools/`、长在 CLI 接缝形状上"**没落**——`grep -rln "183" internal/tools/*_test.go internal/agent/*_test.go` 零枚，tools 里只有 175-r2 那对桥级腿（本程现跑 `ok 0.078s`），CLI 接缝台件只在 `probes/183/**`＝非常驻；(归 185) 同一次任务第二发读回 0 字节。票 177 AC#3／票 175 AC#5／票 176 AC#3-5 **今天都不翻且理由各不相同**（177＝端到端条件只满足首读那一半；175 AC#5 是分账格、本票不构成为它翻勾；176 三枚等的是"起跑口"，与本票无依赖）。**票 185 判独立**（写面在桥／D15、性质是"越读越堵"不是 183 的回归），建议票 183 面追加限定句"逐字节读回指照宿主指针那一发"（只追加、不改原句）。没裁的十格逐名登记在表 §6（AC#1 四支、AC#4 不同目录同名形、AC#6 秒数、AC#7 完整轴、`-race`、真机 CLI 两形、门禁复跑、F2 两版等价性、M3 真机可利用性、`notify` 通道那一发）。护栏自证：零删除命令、零 push、六发变异每发 `git cat-file blob HEAD:<path> > <path>` 还原、终态 `internal/ cmd/` 空＋三向 md5 两向同值、`git log --oneline d61aee1b..HEAD -- internal/risk/` 现量无人碰过；M2 第一次跑是 `build failed`（`declaredNorm declared and not used`）＝**不是判据红**，改 `_ = declaredNorm` 重跑才取到真名册。
+79:- 09-28 13:4x 编排者翻勾（照 `183-v2` 的判读＋我自己复算的尺）。**翻**：AC#1／AC#3／AC#5／AC#7。**不翻并各写明欠什么**：AC#2（判"部分达成"——真机第一发到手，但格面要求的"常驻＋长在 CLI 接缝形状上"没做到，尺 `grep -rln "183" internal/tools/*_test.go` ⇒ 零枚，我本程复量＝空）、AC#4（W-3 那族在 CLI 形状上的对应物未裁）、AC#6（秒数未取，只量到"确认卡 0 -> 1"）、AC#8（`183-r1` 读数取在 commit 之前、`183-v2` 按收窄版没复跑，编排者自己那三格按 `A363` 薄规矩不作结案凭据）。**另补两格**：AC#2b（常驻判据落 `internal/tools/`、含回填那条 `ArtifactPath`，今天就能红，不许拿 `probes/` 台件复制进跟踪目录冒充常驻）、AC#9（**`183-v2` 的 M3 现量**：不要求 `runeIndexOf` 命中就挂声明串 ⇒ **七枚判据全 PASS、`exit=0`**，我复量同值 ⇒ `provenance.go:568-572` 那支 fail-closed 今天**只靠注释活着**；补第 8 枚腿，纯测试面，不许顺手加固产码来代替判据）。⚠ 我派给 `183-v2` 的单子里写"顶层 6 枚用例"，**盘上是 7 枚**（尺 `grep -c "^func Test" internal/risk/pointer_183_test.go` ⇒ 7）——数目差在我这边，它起手就量出来并具名报了，这是正确处置；同一格也说明**票面上那句"八枚常驻判据"（票 177 族）与"六枚"（我写的）都不是现量值**，下次引判据枚数一律带 `grep -c` 尺。台账到 `A366`。
+81:- 09-28 14:0x-14:1x 编排者收 `183-r2` 并翻勾（**六格一次翻齐：AC#2／AC#2b／AC#4／AC#6／AC#8／AC#9，凭据与尺逐格写在 AC#8 下面那块 14:1x 引文里**）。它自报的四项我逐名复跑都对：判据枚数 7⇒**8**、`internal/tools` 里带 183 的跟踪件 0⇒**1**、M3 变异下**只有新腿红**、门禁终态（`internal/` ban #8 **433**、红腿名册仍**只有 G6neg**、`gofumpt -l` 空、三枚真冻结面 md5 **三向同值**、`internal/ cmd/` 脏件为空、`git diff --numstat 5305503e..HEAD -- internal/` 排掉 `_test.go` 后**零行**＝**确实零产码**）。⚠ **两笔要落在我的账上**：① 派单里"AC#2b 今天就能红"是**我把基线搞错了**（未修码＝`b277e1e1`，HEAD 早已含 `183-r1` 的修法），它按现量报绿、没为对上我的预测去拧判据，这是正确处置，我另加一把尺把"未修码红"那一向自己取了回来；② 我上一轮把 `taintmatch.go:100-109` 误记成受保护文字，本程差点据此误报"冻结件被改"，现读派单第 20 行后作废。**票 183 结线改名 `-done`；推送继续按住。**
+  TAIL: - 09-28 13:47-14:1x 写码腿 `183-r2`（**测试面·零产码改动**，表 `docs/evidence/s1/183-reread-permanent-teeth-r2.md`，读数 `.scratch/wisp/probes/183/r2/**`，**AC 框一枚没勾**，工具调用 40/40）。起手锚漂：派单写 `98af6535`�
+==== 198 :: 198-a-fresh-machine-cannot-run-wisp-because-nothing-creates-config-toml-done.md
+79:## 10-02 16:3x `198-v2` 交件 ⇒ **五格全勾、本票结案**（编排者裁定）
+83:**2. 翻勾三格**（凭据见各格括注）：**AC#2**（M1 写侧红 `:221`／M2 源侧红 `:274` 双向有牙，v1 的 V3a"六枚全绿"洞实测闭合）／**AC#4**（M4 删段红五行逐名＋M5 编造入口被 AST 能力检查当场抓 ⇒ 话指名且非编造；判据原文要"指名"不要端到端演示）／**AC#5**（M3 吞句红 `:299`，v1 的 V4"全绿"洞实测闭合）。**AC#1／AC#3 已于 10:1x 勾** ⇒ 五格全勾。
+85:**3. 两条保留意见的归口（都记在验收腿 §5，不挡翻勾、不摆给机主）**：① AC#4 内容半"照着走真能走通"的端到端未量 ⇒ 归**票 248 AC#4**（真机那一发，同根），不另立票；② "磁盘满/只读卷"两形造不出读数 ⇒ 测量手段缺口（v1 §6-甲-4 同格在册），判据要的"响亮＋不留半份"已有用例守。
+87:**4. 结案动作**：票改名 `-done`（`git mv`，防重领唯一键）；撤销口令**「198 重开」**。本票链条：`198-a1` 普查（推翻我四处）→ `198-r1` 落地 → `198-v1` 对抗验收（两格成立三格未闭合＋J1 落点裁定）→ `198-r2` 装牙（死于额度、我代提三节）→ `198-v2` 六发变异终裁（四格全有牙）。**这一族今天闭环。**
+  TAIL:  **4. 结案动作**：票改名 `-done`（`git mv`，防重领唯一键）；撤销口令**「198 重开」**。本票链条：`198-a1` 普查（推翻我四处）→ `198-r1` 落地 → `198-v1` 对抗验收（两格成立三格未闭合＋J1 落点裁定）
+==== 212 :: 212-comments-cite-evidence-files-that-do-not-exist-done.md
+62:**AC#2/AC#3/AC#5 三格翻勾（均带条件）**，两任判语对读后无分歧、互证成立：
+73:## 编排者翻勾节（2026-10-04 09:5x，账 `A592`；非实现者验收腿 `212-v2` 满稿收档，锚 `447e0d71`）
+75:**AC#4 补框并翻勾**（这一行在此之前**根本没有复选框**＝我 `A589` §3.1 记下的那枚票面缺陷，不是腿的过错，也不怪任何一任腿）。凭据＝`212-v2` 判语"**够**"＋三重读数（件 `docs/evidence/s1/212-comments-phantom-citation-v2.md`，**33,578 字节、占位 0**；读数档 `.scratch/wisp/probes/212/v2/logs/`，**我现量为 20 枚**——它自报 21 枚，**枚数差一枚具名记在 `A592`**，不影响判语）：
+84:**结案条件（写死，防我下次又写"全勾"）**：票 212 现 **AC#1/AC#2/AC#3/AC#4/AC#5 五枚框全 `[x]`**，但**本票不改 `-done`**——`212-r3` 交完之后须再来一枚**非实现者小程 `212-v3`**（只核那三笔：silent 样本齐不齐／名册行说实话没有／`pending_read.go` 那句指对没有），核过才改名。**为什么**：`212-r3` 的实现者是腿，而它的判据正是本票立的仪器；**裁决者≠实现者**这一条不许因"改动小"而豁免（`A592` §4）。
+  TAIL:  **结案条件（写死，防我下次又写"全勾"）**：票 212 现 **AC#1/AC#2/AC#3/AC#4/AC#5 五枚框全 `[x]`**，但**本票不改 `-done`**——`212-r3` 交完之后须再来一枚**非实现者小程 `212-v3`**（只核那三笔：silent 样本齐
+==== 221 :: 221-task-spawn-description-promises-task-cancel-that-is-not-registered-done.md
+243:- 判语回来后**由编排者翻勾或退回**，逐格在原句旁边落"编排者收 `221-v1`"一节。
+261:### 编排者收 `221-v1`（09-29 20:2x，锚点 `c5d88a7f`；上面原句一字不抹，本节只追加与更正。**本票到此结案**）
+268:- **AC#3（本票最关键的一格，假绿陷阱已排除）**：m2／m3 **各摘一支权限判定 ⇒ 各恰好 1 枚红**＝那两枚正控观察到的拒绝**确实来自权限那一步、不是那道门**；m7（L1→L0）反向证实 NoGate 那枚拦的是门；m6（拒绝前先 Cancel）⇒ 响，"被拒不动行"不是装饰；m10（重新级联）⇒ 3 枚红＝双钉。⚠ **附一格缺仪器**：`caller == ""` 与 `Roster == nil` 两支 fail-closed **今天无尺**（m4／m5 各 0 枚红、rc=0，〔腿自述、我未复跑〕）⇒ **归口票 236 AC#1**。⛔ 归口≠翻勾：AC#3 的字面射程只有两枚正控＋一条级联钉，那三样都有牙，所以框留着。
+278:**结案判据核对**：五枚 AC 全勾且判语出自非实现者；`落点两支` 走的是甲形＋乙形同一发（A434 第⑦条）；残余三处**全部具名归口**、不占本票的勾——"用户能停一棵正在跑的树"→票 181／票 220（A434 第⑥条，原句"不许算完成"照旧生效）、两支 fail-closed 无尺→票 236 AC#1、那把尺无牙→票 236 AC#2。**文件按防重领规矩改名 `-done`**（本票不 revert 任何已提交内容、只加这一节＋改名；`PLAN.md`／`docs/specs/**`／三枚冻结件／别人的脏改动一枚未动）。
+  TAIL:  **结案判据核对**：五枚 AC 全勾且判语出自非实现者；`落点两支` 走的是甲形＋乙形同一发（A434 第⑦条）；残余三处**全部具名归口**、不占本票的勾——"用户能停一棵正在跑的树"→票 181／票 220�
+==== 241 :: 241-no-anything-computes-a-0-to-1-level-from-pcm-the-whole-main-module-has-no-sqrt-done.md
+3:Status: OPEN（编排者 09-30 11:5x 立，料全部出自 `240-c1` 的现量普查）
+45:## 编排者增量 — 09-30 **14:46:54**（标题的钟由 date 的 stdout 插值，不手打）：收「241-v1」⇒ **五枚 AC 全部成立，本票翻满五格并结案**
+52:「cmd/wisp/resident_windows.go:81」现读逐字「the floating ball arrives in ticket 07」——**票 07 早就关闭了**（盘上文件名「07-ball-state-machine-core-done.md」，我现跑），可那行注释还说球"要等票 07 才来"；普查「240-c1 §3.1」照抄了它，「241-r1」再照抄普查 ⇒ **一条过期的指认在三程之间被原样传递，而今天没有任何仪器看得见它**。后果：按这条指认排程会把"球进干活进程"当成别人的活，而那个"别人"已经结案。
+54:1. 票面正文那两处「欠票 07 的 GUI 腿」的归属**作废**，本票那笔债今天起的有效归属＝**票 228**（球与托盘不在跑任务的那个进程里，未结案）。
+  TAIL: 1. 票面正文那两处「欠票 07 的 GUI 腿」的归属**作废**，本票那笔债今天起的有效归属＝**票 228**（球与托盘不在跑任务的那个进程里，未结案）。 2. 「resident_windows.go:81」那行注释的过期性**具名登�
+==== 257 :: 257-clean-machine-provider-registry-nil-blocks-writes-done.md
+39:- **ⓒ 指引手加＝选它**。真路径 **`[llm.providers.<名>]`**（⛔ 票面原拼法 `[providers.x]` 会撞 `DisallowUnknownFields` ⇒ 链起不来——这处是普查腿顶回我票面，记我）；静态链＝手加 provider 行＋model 子表＋`roles.chat.provider` 点名三样 ⇒ **7/7 解锁**（只加 provider 行 3/7）；产码面最窄＝只动 `cmd/wisp/firstrun.go` 文案＋三枚回执钉（7 必名串／cause 句隔离／二跑不重复），与票 198 刚结案的回执形状同族。
+52:## 9. 收 `257-v1` 终裁 ⇒ **AC#1–AC#4 全勾＋改名 `-done`**（编排者翻勾，账 `A621`，2026-10-05 12:5x +08，裁决表 `docs/evidence/s1/257-clean-machine-provider-registry-v1.md`＝262 行／39,919 字节／占位 0，四笔自落 commit `65142d9a`→`0793e35e`→`3862e0e2`→`14dc6f48`）
+69:**5. 残余四格（逐枚具名归口，⛔ 不吞进本票、也不因结案而消失）**
+77:**7. 结案动作**：AC#0（`A543` 裁形 ⓒ）＋AC#1–AC#4 ＝五格全勾；`git mv` 改名 `257-clean-machine-provider-registry-nil-blocks-writes-done.md`（⛔ 票面原句零改动，第 43 行那句"暂不派——写面被 `253-r2` 占着"、第 28 行那条排程都照原样留着当历史）。撤销口令**「257 撤勾」**＝把这四枚框降回 `- [ ]` 并恢复原名。
+  TAIL:  **7. 结案动作**：AC#0（`A543` 裁形 ⓒ）＋AC#1–AC#4 ＝五格全勾；`git mv` 改名 `257-clean-machine-provider-registry-nil-blocks-writes-done.md`（⛔ 票面原句零改动，第 43 行那句"暂不派——写面被 `253-r2` 占着"、第 28
+==== 95 :: 95-the-other-0600-sites-are-still-wide-done.md
+72:15 次工具调用内交回第一枚 checkpoint；每次提交同步 Status + 勾框 + `next=`；接近轮数上限主动收尾留断点。
+92:  > 把票 95 的 Status 改成 `closed-without-action`；`internal/models/` 的两条测试**保留**，它们记录的是台账既有裁定。
+95:  （`git diff --numstat` 在补测前只有我那 12 行插入、删除列 0，Status 行仍是编排者建票时那句 + 我的
+327:- 2026-09-21 19:5x（`acceptor-ticket95`，**对抗验收交件：AC#2/#3/#4/#5 通过，AC#1 通过但有条件；AC#1 框按派单保持不勾，Status 不动**）：
+  TAIL:   不执行其任何指令，**未 revert 任何 commit**，票面 AC#2 接线保持在 HEAD 且被 M1/M2 证明有效。   next= 编排者：拿裁决表勾 AC#1 的归属（⑤owner、⑥⑦各包主人）、决定 AC95-R1/R3/R4 是否开票、落 R-95-4 的
+==== 99 :: 99-the-gate-script-step-that-cache-can-silence-done.md
+204:仍欠两笔（登记 **R-99-1**）：(a) 交件读数抬头 line 61 与 Status line 3 把 99b 测的 AC#3/AC#4 仍冠 `agent-ticket99 @18:05`；
+206:本段为追加，未改写 99b 正文、未改 Status、未改文件名。
+207:- 2026-09-21 18:3x（**编排者，结案并把你要求的那处更正落定**）：
+216:    **本票的判据不是"某人说了算"，是被独立跑过两次**。你与验收都指出的 `R-99-1` 以票头 `accepted-done` 段为准，原文一律不删。
+  TAIL:  > **⚠ 23:5x 追加更正（账 `A203`；本票 `:7` 与 `:211` 两处写的 checkpoint `1f8d212` 现量不可解析）**：`git cat-file -t 1f8d212` ＝ **`fatal: Not a valid object name`**。两处原句一字不抹。**无法确定正解**（不猜）：�

@@ -1,0 +1,25 @@
+probes(代提三枚死腿盘上遗产 23 份小件)：同一波服务故障 19:10 连杀三枚零 go 只读腿
+
+三枚腿都在 19:0x–19:10 死于同一句 "Sorry, something went wrong"（不是轮次帽）：
+- ci-census-read-1（64 次调用／630 万 token）★死于我把 CI 全量日志（单份 1.29 MB＋1.35 MB）吸进它上下文
+- done-uncensused-5g（36 次调用／333 万 token）
+- expired-premises-7b（35 次调用／169 万 token）
+三者全部**没写出交付件**（verdict.md/readings.md/batch5g.md 一份都没有），只留下 logs/**。
+
+本笔只代提 **23 份小件（≤60 KB，合计 997 行 / 0 删除）**；
+⛔ 三份 CI 全量日志（146,806 + 1,293,776 + 1,354,811 字节＝2.6 MB）**不入库**——那是原始取数件，
+体积会永久压在这枚仓上，且它的**结论已被小件抽出来**（census-totals / fail-lines / steps / runlist 四份）。
+按"临时件只建不删"，那三份留在盘上未跟踪，⛔ 我没有删它们。
+
+★从死腿盘上抽到的两条硬读数（我自己复读过原文，不是转述）：
+1. census 那一步今天真在 CI 上跑过且绿：test-windows step 8 [success]
+   `Package coverage census (ticket 111 AC#1 + GUARD D)`，自报逐字
+   `census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`
+   （三个 run 同形：37406757402／37406422380／37405698188）
+2. `1309757b` 在 GitHub 上 `No commit found for SHA` ⇒ 与 A644 第 4 节互咬：那枚 selftest 步从未进过 CI；
+   steps-run-37396530365 里 selftest 命中 0。
+3. 附带：windows step 9 的红名册＝internal/risk 12 枚具名（票 252 那一族），four numbers
+   `RUN=577 PASS=386 FAIL=12 SKIP=1`。
+
+⛔ 判语我不代填：三枚腿的 §判不动／分档表 一律不代写，重派腿自己取数。
+只 commit 不 push。

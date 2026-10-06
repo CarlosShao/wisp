@@ -1,0 +1,18 @@
+=== run 37406757402 ===
+headSha=cc315261 created=2026-10-06T02:58:39Z concl=failure
+  test-windows job id=112085927937 concl=failure
+    step 7 [failure] cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)
+    step 8 [success] Package coverage census (ticket 111 AC#1 + GUARD D)
+    step 9 [failure] Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+=== run 37406422380 ===
+headSha=b948bcb8 created=2026-10-06T02:54:30Z concl=failure
+  test-windows job id=112084901765 concl=failure
+    step 7 [failure] cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)
+    step 8 [success] Package coverage census (ticket 111 AC#1 + GUARD D)
+    step 9 [failure] Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+=== run 37405698188 ===
+headSha=ec84cff1 created=2026-10-06T02:45:36Z concl=failure
+  test-windows job id=112082660385 concl=failure
+    step 7 [failure] cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)
+    step 8 [success] Package coverage census (ticket 111 AC#1 + GUARD D)
+    step 9 [failure] Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)

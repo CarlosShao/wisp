@@ -1,0 +1,71 @@
+.scratch/wisp/issues/105-c26-rewrite-account-has-no-production-reader-done.md:7:              AC#2 的接线本体维持通过：装配
+.scratch/wisp/issues/131-the-models-leg-has-no-nail-deleting-9-lines-keeps-76-cmd-wisp-tests-green-done.md:12:⇒ **本仓第八次**�
+.scratch/wisp/issues/132-log-files-are-never-sealed-sealdirdir-has-zero-production-callers.md:85:- **六条引用的复核结果**：�
+.scratch/wisp/issues/133-no-instrument-sees-the-dispatch-hop-deleting-one-caller-keeps-76-tests-green.md:15:**只摘掉"分发那一跳
+.scratch/wisp/issues/139-context-compression-leaves-no-trace-zero-log-calls-in-compress-go-zero-readers-of-res-compression.md:120:- **"
+.scratch/wisp/issues/145-panel-snapshot-has-four-fields-so-eleven-of-the-fourteen-ui-states-have-no-input-to-render-grow-the-go-side-ca
+.scratch/wisp/issues/151-bridge-opentask-sits-on-the-dispatch-hot-path-while-closetask-has-zero-callers-repo-wide-so-the-per-task-taint
+.scratch/wisp/issues/164-background-jobs-cannot-be-read-fix-the-roster-then-add-the-output-leg.md:57:- [2026-09-27 20:2x] **非实现�
+.scratch/wisp/issues/167-four-small-outputs-the-panel-needs-occupancy-queue-stop-draft-plus-crash-self-rescue.md:68:**5. 排程**：`16
+.scratch/wisp/issues/167-four-small-outputs-the-panel-needs-occupancy-queue-stop-draft-plus-crash-self-rescue.md:84:| ⑦ 自救指令�
+.scratch/wisp/issues/186-the-composer-area-should-detect-git-and-let-the-user-switch-between-local-worktree-and-branch.md:54:- 09-28 �
+.scratch/wisp/issues/194-the-panel-has-two-method-rosters-that-do-not-know-each-other-owner-ruled-align-the-code-to-the-spec.md:25:- [ 
+.scratch/wisp/issues/194-the-panel-has-two-method-rosters-that-do-not-know-each-other-owner-ruled-align-the-code-to-the-spec.md:42:  - 
+.scratch/wisp/issues/194-the-panel-has-two-method-rosters-that-do-not-know-each-other-owner-ruled-align-the-code-to-the-spec.md:48:- **
+.scratch/wisp/issues/197-the-panel-must-show-each-subagents-state-and-click-through-to-its-own-streaming-work-page-but-go-side-has-zero
+.scratch/wisp/issues/214-composer-plus-menu-attachments-and-context-wired.md:37:- **AC#1**：受理器有**«生产调用者»**（现�
+.scratch/wisp/issues/219-approval-card-three-reply-buttons-and-a-reason-box.md:97:> - **第 27 行"没有 `SetAllowedDirs`"这句今天
+.scratch/wisp/issues/221-task-spawn-description-promises-task-cancel-that-is-not-registered-done.md:30:- [x] **AC#2（仅甲形）**：
+.scratch/wisp/issues/221-task-spawn-description-promises-task-cancel-that-is-not-registered-done.md:78:  `task.go:23` 的 DEFERRED 标�
+.scratch/wisp/issues/221-task-spawn-description-promises-task-cancel-that-is-not-registered-done.md:246:**我现跑复核为真的四�
+.scratch/wisp/issues/226-always-answer-rewrites-the-whole-config-snapshot-and-hides-hand-edits.md:40:  - **09-29 终裁＝⛔ 不勾（
+.scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md:19:| 待答卡的数据**原生面直接读得到**，
+.scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md:139:  本轮新增的最要紧五句读数：① **`Se
+.scratch/wisp/issues/244-spec-11-wants-the-gui-subsystem-build.md:104:1. ★**"起子进程不收尾"这一族今天«零枚»**、且*
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md:63:**3. AC#0 翻勾**：凭据＝上四把尺＋普查件 §1 那
+.scratch/wisp/issues/257-clean-machine-provider-registry-nil-blocks-writes-done.md:46:- ★`config.NewManager(path, res)` 的**第二�
+.scratch/wisp/issues/261-the-model-enabled-key-promises-removal-from-discovery-and-selection-but-no-production-code-reads-it-while-the-
+.scratch/wisp/issues/33-panel-host-c27.md:42:- [ ] **AC#14（10-01 11:4x 编排者追加，来路＝只读普查 `33-a2` §⑦-H＋我 
+.scratch/wisp/issues/33-panel-host-c27.md:182:  - ⚠ **它答"«生产调用者»＝«零枚»"并停手**：我派单里"要一枚具
+.scratch/wisp/issues/33-panel-host-c27.md:188:  ③ **AC#D 的诚实答案：«生产调用者»＝«0 枚»，本程没有那枚具名
+.scratch/wisp/issues/33-panel-host-c27.md:291:- **裁定 2｜`33-r2` 的题面就此定死四件**（原三件＋这一件，缺一不�
+.scratch/wisp/issues/33-panel-host-c27.md:342:- `agent=33-r8b did=接管腿（写面只有 internal/ball/** ＋自己的证据件；⛔
+docs/evidence/s1/105-adversarial-acceptance.md:54:- **«生产调用者»计数非零**：`book()` 的两个调用点都在 `Execute` �
+docs/evidence/s1/121-adversarial-acceptance.md:286:| **R-121-1** | **枚举门的天花板被放大了一格：断"分发"那一跳，A
+docs/evidence/s1/131-adversarial-acceptance.md:156:  `models.go:98`（注释）与 `models.go:104`（声明）⇒ **«生产调用者»
+docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md:473:### 2.3　支撑③ —— `NewDisposalScope` 生产码调用者 «0 枚
+docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md:486:⇒ **七枚命中＝1 声明＋2 注释＋4 测试**，与它逐字同�
+docs/evidence/s1/138-cancel-kills-children-r1.md:511:⇒ 生产码里 `NewDisposalScope` 的调用者 **«0 枚»**（七枚命中：1 
+docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md:65:| 未修码上的同一问 | `git grep -n 'CloseTask' 5d46f24^ -- '*.go
+docs/evidence/s1/153-trace-lies-unguarded-r1.md:618:                                                  ⇒ 定义 1 枚＋注释 5 枚�
+docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md:166:| A `OpenTask` 指路句 | "The open side is per CALL (mark above), the
+docs/evidence/s1/154-host-id-never-closed-r1.md:344:| 12 | `memory.Store.InsertGrant` ↔ `RevokeGrant` / `DeleteGrant` | **0**：只�
+docs/evidence/s1/181-186-git-detection-census-c1.md:167:1. **票 33（WebView2 宿主／C27 单例）是"切换"那一支的硬前置**
+docs/evidence/s1/194-method-roster-census-c1.md:134:⚠ **贯穿三堆的一条前提（本程现量，逐枚都适用）**：`Composer
+docs/evidence/s1/194-method-roster-census-c1.md:216:9. **生产听众那一环**：`ComposerDispatch.Handle` `composer_dispatch.go:120`
+docs/evidence/s1/197-subagent-stream-r2.md:196:   Go 侧 `Truncated/ElidedRunes/DroppedKeys` 三枚出口**今天没有任何«生产�
+docs/evidence/s1/219-approval-reply-surface-c1.md:119:**两枚 getter 的«生产调用者»：零**（`grep -rn "\.Native()\|\.Panel()
+docs/evidence/s1/221-task-cancel-v1.md:19:| AC#2 | «生产调用者» ≥1 且名册那行不消失（`A434` ③④⑤） | **成立**
+docs/evidence/s1/221-task-cancel-v1.md:74:> `TaskRoster.Cancel` 有**«生产调用者»**（现跑点数：改前 «0 枚» ⇒ 改后
+docs/evidence/s1/223-hot-reload-wiring-v2.md:225:| **AC#1 生产里真有人在轮询** | **成立**（注不变：这圈 tick 没被 j
+docs/evidence/s1/228-resident-ball-v1.md:13:| **AC#1** 宿主存在性有生产点数 | **成立**（附四枚具名条件 F-2／F-5／
+docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md:84:1. **常驻腿没有借的路径**：`cmd/wisp` 今天无状态机、无�
+docs/evidence/s1/246-resident-task-source-v2.md:70:## §3 六攻读数（A «生产调用者»／B 一进程一枚门／C 四步真机�
+docs/evidence/s1/33-35-preflight.md:35:⇒ `ParseComposerRequest` / `HandleModeRequest` / `RequestWorkspaceSwitch` / `NewAttachmentBrok
+docs/evidence/s1/33-inbound-hop-design-a1.md:255:| **切工作树／分支** | 票 186（`.scratch/wisp/issues/186-...md`，AC#1–#9 �
+docs/evidence/s1/33-panel-host-c27-r4.md:252:4. **`PanelManager` «生产调用者»枚数**（dispose 半、也是 owner 那句"我要
+docs/evidence/s1/33-panel-host-c27-r5.md:34:| 改前（尺＝`git grep -n "NewPanelManager" 7a02b121 -- cmd/wisp \| grep -v _test.go`�
+docs/evidence/s1/33-panel-host-c27-v1.md:52:   - **残余缺口（不用突变就能量）**：钉绿不等于有人开窗。#14 现量
+docs/evidence/s1/33-panel-host-c27-v1.md:216:2. **"宿主真装起来了"与"用户能开出一个窗口"之间差的不是细节，是
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:131:| `(*SnapshotPump).Snapshot`／`Marshal` | `Snapshot`：`pump.go:191`、`:2
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:140:**并且：`Native().Allow`／`DecideFromNative`／`DecideFromPanel` 在全
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:152:| 页面进来的那侧 | `ParseComposerRequest` 的**非测试调用者 «
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:153:| 宿主答题的那侧 | `DecideFromPanel` / `Native().Allow` 非测试调
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:331:**它不会多签一次批准**（§1 那一格已裁：整条结算链非�
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:346:| "`Marshal()` 非测试调用者 0"（＝"全量字节仍无人接"那一�
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:347:| "`lastPanelSnapshot()`／`snapshotCount()` 非测试调用者 0" | 两枚
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:410:今天**零«生产调用者»**，全仓能把一次答案送进队列的�
+docs/evidence/s1/62-visual-spec-draft.md:82:| 13 | `Downloading` | `56×1` ⇒ **56.00px** | `1` ⇒ `1` | `CoreColor BGOverlay rgba(30
+docs/evidence/s1/panel-l2-grant-nail-accept-r1.md:87:| 3 | `HandleModeRequest` 只有测试调用者 | `grep -rn HandleModeRequest --in
+docs/evidence/s1/panel-l2-grant-nail-fix-r5-accept-r1.md:451:- **没复算**"今天这条入站路由没有«生产调用者»"（`Pars
+docs/evidence/s1/panel-l2-grant-nail-fix-r5.md:317:- **没复算**"今天这条入站路由根本没有«生产调用者»"那枚自陈

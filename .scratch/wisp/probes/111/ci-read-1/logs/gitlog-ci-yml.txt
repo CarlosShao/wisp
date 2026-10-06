@@ -1,0 +1,20 @@
+1309757b 10-06 14:03 probe(111/r5): 骨架 —— 起手三把尺全落（HEAD 15fbf18f／scripts+.github 0 行／票面 4 枚零勾框不归本腿），自检基线 rc=0、32 枚 case、0 条断言失败
+6c0e3e31 10-05 23:16 ci(111-r3 格1): GUARD D 那把尺子第一次有自己的 CI 调用点——test-windows 新增 census 一步（+89/0）
+519e1ade 10-04 09:42 262-r1 落地：跟踪路径长度门禁（丙＋丁同批，阈值钉在帽＝相对 >121）
+e67a5773 09-27 08:49 161-r5 cell 2: CI gains the tracked-set leg of the formatting gate
+3e56e680 09-26 23:37 票 161 r3 撞顶代提（AC#2 自检入口落地＋AC#7 判据改两形读）＋ledger(A318)
+20f8033a 09-25 12:53 ci(F4): 把三枚"存在却没人跑"的渲染判据挂进 lint-frontend——它们今天红不了，所以等于没门
+6291dc73 09-25 11:58 ci(步名改实): lint-frontend 第 6 步现名含"其形状与不许有允许按钮"，因前端会话把判据加进 render:l2(+126/0 只加不删)而旧名读起来像只查字段 改名是编排者的活(前端在 430ad57 里点名而不悄悄扩)。step 的 run 行一字未动、步序未挪、未加 if:/continue-on-error(D22 mode-6)。 frontend-handoff.md 同步留一枚 > 注记：之前的 run 报旧拼写、之后的报新拼写，两串都能一字不差引出来——"上次真跑过的 run id+step"这句话靠它撑着。
+decb7b96 09-23 13:51 feat(134 AC#6 前半): machine-contended 改判"本 run 无结论"——exit 0 + 响亮 NO CONCLUSION + 落一枚非报告记录，D32 两阈值一字未动
+b9b20723 09-23 10:41 feat(134 AC#2,AC#3): daily schedule for slo-full plus a pin that goes red when it stops being triggered
+7ad6eb44 09-23 09:52 docs(A104,A105,Q-25落地,建票132/133): owner 批的 8 条逐条落地；票 128 把 CWD 回落量成两份树；票 121 验收通过零退回并补出 R-121-1..4
+e563a61a 09-21 21:45 feat(85a): staticcheck 钉到 2026.2.1、纳入 d22scan/mockllm 两 module、自报分母——门先存在
+8fe5c7ce 09-21 21:05 ci(111,AC#6/AC#2/AC#3/AC#8): 让 step4 的红不再吃掉 step5-8，并把 scope 表变成有分母的表
+9e9a2f53 09-21 19:42 ci+gate(110,AC#1-AC#5): test-windows 第一次有一步真跑 internal/winsec 自己的测试
+c8c828e3 09-21 18:34 fix(93,AC#1,AC#2): portable 步不再把 SKIP 记成 ok —— 复用 ticket 71 的严仪器 + 可自证的 per-platform 台账
+14720af3 09-21 15:13 feat(77,AC#1,AC#3,AC#4,AC#6): L2 卡拿到 React 渲染级证据，embed 半缺拿到真红，lint-frontend job 落盘
+3d46bdd9 09-21 10:16 feat(71 AC#3,ci): runtests.sh 让"go test 没匹配到测试"不能再读成 ok；把 D22 门提到 vet 之前
+75ef726a 09-21 09:47 ci(71,AC#4): ci.yml:23 的注释不再复制作用域清单，改成指向真相源 emojiScopes()
+98fa8aee 09-21 09:01 fix(70): R16#4/#3 之后补 slo-full 的编译器路径——它不是构建坏了，是 runner 环境里没有 gcc
+23ebb59f 09-20 22:57 fix(67): make the D22 gate refuse to report a verdict it did not compute
+f088ce3f 09-20 07:44 feat(ci): GitHub Actions pipeline - lint (gofumpt/vet/staticcheck + D22 seven-ban + emoji scan), test-core (compose mock-llm + portable tests), test-windows (cgo smoke + junction placeholder), slo-smoke (windows-latest), slo-full (self-hosted wisp-slo); no job skippable (D22); compose.test.yml gains mock-llm service, model-mirror preserved

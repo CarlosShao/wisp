@@ -1,0 +1,19 @@
+--- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.08s)
+--- FAIL: TestCanonicalInputGainsNoSecondForm (0.04s)
+--- FAIL: TestAListWinsWhereBothTablesHit (0.07s)
+--- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+--- FAIL: TestPathResolverUNCAListDenied (0.01s)
+--- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+--- FAIL: TestBListDefaultDenyAndOverride (0.03s)
+--- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+--- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)
+--- FAIL: TestSyncUnverifiedRootKeepsFallback (0.01s)
+--- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.00s)
+--- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	7.283s
+FAIL
+portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:
+portable-tests.sh: four numbers (all from -v output): === RUN=577  --- PASS=386  --- FAIL=12  --- SKIP=1
+portable-tests.sh:   FAIL (own line) github.com/CarlosShao/wisp/internal/risk
+portable-tests.sh: strict runner exited 1 for scope=[./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/ ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/session/ ./internal/projctx/]
