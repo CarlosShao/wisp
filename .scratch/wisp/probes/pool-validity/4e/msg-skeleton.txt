@@ -1,0 +1,25 @@
+pool-validity 4e: skeleton for the dead-leg 4a roster cleanup
+
+Why: batch 4a died at the 150-round cap with 5 of its 11-ticket roster
+still marked "not yet judged". Two of those cannot be judged by this leg
+(236 has an active write leg on AC#2, 238 was already judged by 4b and
+is only read as a same-idiom reference sample), so this leg judges
+233, 234, 237 and then does the six-batch ticket-number overlap audit.
+
+What lands now (skeleton only, no verdicts yet):
+- section 0 starting anchor: HEAD 95cb3d7a, branch dev, 10-06 15:13,
+  git status --porcelain -- internal cmd reading verbatim, plus the
+  directory listing proving 4e was unused (so the fallback name 4e2
+  is not needed). Also names that pool-validity/ contains 1/ and 4d/
+  beyond the six batches; 4d is a do-not-read prefix for this leg and
+  1/ is treated as an extra reconciliation face, not a rejudge.
+- section 1 roster and self-measured denominator: all five files
+  233/234/236/237/238 measured at 0 checked boxes, unchecked counts
+  6/6/7/3/4, with the exact command reproduced.
+- section 2 and 3 placeholders written as honest "not computed yet,
+  this leg computes it next", no filler wording.
+- section 4 and 5 reserved for the round-100 checkpoint.
+
+Scope discipline: read-only census leg. No ticket edits, no ledger or
+docs writes, zero go commands, no writes to cmd/ or internal/ working
+tree content face (HEAD-only measuring sticks), commit only, no push.
