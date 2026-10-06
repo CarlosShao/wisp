@@ -19,14 +19,14 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/111-*.md` 由验收方出）
 
-- [ ] **AC#1** 复算并出一张**全仓对账表**：每个包 ×（有无测试文件 / 在不在 CI 某一步 / 那一步真给过结论的 run id + step 号）。
+- [x] **AC#1** 复算并出一张**全仓对账表**：每个包 ×（有无测试文件 / 在不在 CI 某一步 / 那一步真给过结论的 run id + step 号）。
       表格必须能自证完整（`go list ./...` 的 33 行都在，不许只列零覆盖那几个）。
-- [ ] **AC#2** 逐包接入，**先易后难**，每包一次可核对的步级读数。
+- [x] **AC#2** 逐包接入，**先易后难**，每包一次可核对的步级读数。
       ⚠ **加严可以直接做**；**不许**为了让某包变绿而放宽它的断言、调它的阈值、或给它加 `//go:build`/`t.Skip` 挡掉。
       接入第一天就红 ⇒ **那是发现**：红名逐条登记进本票面并**开票**，不许撤步骤。
 - [ ] **AC#3** `session`/`watchdog` 这种"空分母"要**响亮**：scope 校验加上
       "**声明在范围内但该平台没有任何测试文件 ⇒ 直接失败**"的守卫（与票 93 的"条目腐坏即红"同族），并人为抽掉一个包证明它会红。
-- [ ] **AC#4** `cmd/wisp` 那一格：给出它在 CI 上**能不能跑**的实测结论（能 ⇒ 接入；不能 ⇒ 写清缺什么、归票 98 还是新票），
+- [x] **AC#4** `cmd/wisp` 那一格：给出它在 CI 上**能不能跑**的实测结论（能 ⇒ 接入；不能 ⇒ 写清缺什么、归票 98 还是新票），
       **不许默默留在零覆盖列**。
 - [ ] **AC#5** 门禁：`bash -n` 改动脚本 rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且各 scope 不降；
       ⚠ 新步若排在"会失败的步骤"之后 ⇒ 必须放前面或 `if: always()`（本仓实测过这道门因此从未执行）。
@@ -68,7 +68,7 @@
 （旧 run 那四步本来全绿）⇒ **为了加一道门，windows 腿的净覆盖变成了负的**。
 证据：run `35595651898`/job `106319703680`（新步红、后续步 skipped）对照它之前那枚 run 的同名步全 success。
 
-- [ ] **AC#6** 让**新增的门不再吃掉后面的步骤**：把 step4 之后的每一步都还能跑
+- [x] **AC#6** 让**新增的门不再吃掉后面的步骤**：把 step4 之后的每一步都还能跑
       （`if: always()` 或把新步挪到该 job 最后，二选一并说明为什么）。
       ⚠ 加 `always()` 属**加严**可以直接做；**不许**反过来把新步删掉或挪到 `continue-on-error`（那等于把门拆了）。
       判据：**同一枚 run 里 step4 与 step5–8 同时有结论**（允许 step4 红），并给一次这样的**步级**读数（run id + 各步 conclusion）。
@@ -78,12 +78,12 @@
       ⇒ 匹配式要能区分"**被测包**"与"日志里出现过这个词"，并用一次阳性自证（种一个只在字符串里出现的包名 ⇒ 不许计入分母）。
 
 
-- [ ] **AC#9（编排者 21:0x 追加，来源=run `35599458439` 的真实读数）** **`internal/winsec` 的 POSIX 半边今天零覆盖**：
+- [x] **AC#9（编排者 21:0x 追加，来源=run `35599458439` 的真实读数）** **`internal/winsec` 的 POSIX 半边今天零覆盖**：
       `test-core`（ubuntu 腿）step7 的逐字 scope 是那 16 个包、**不含** `./internal/winsec/`，全日志里 `internal/winsec` 出现 **0 次**
       ⇒ 票 113 刚交的链接腿（`winsec_other.go`）**没有任何 CI 回归保护**，只有编排者本机 Docker 跑过。
       判据：ubuntu 腿里出现一步真跑 winsec 的 `!windows` 半边，并给出**该步的 run id + job id + step 号 + 结论**。
       ⚠ 不许用"本机 Docker 跑过"替代；也不许把它接成"只编译不执行"（`GOOS=linux go vet` 那一类）就算数。
-- [ ] **AC#10（编排者 21:0x 追加）** `test-core` step7 现在报 **PASS=578 FAIL=0 SKIP=1**，而那枚 skip
+- [x] **AC#10（编排者 21:0x 追加）** `test-core` step7 现在报 **PASS=578 FAIL=0 SKIP=1**，而那枚 skip
       （`TestWorkspaceSwitchRefusesAJunctionToOutside`，`paths_workspace_test.go:198`，理由是"C26 reparse 检测是 Windows-only"）
       **不在任何台账里** ⇒ 与票 93 同族（**步不再把 SKIP 记成 ok**），但这一枚要的是：**未记账的 skip 必须响亮**——
       要么进"已知双平台跳过"清单并写明归谁，要么在 POSIX 上给出等价判据。**不许**为消掉数字而 `Skip` 掉它。
@@ -304,3 +304,36 @@ step1–3 success、**step4 failure**、**step5 `Cache third_party` / step6 `cgo
     只 commit 不 push：`3a38baed`（骨架）→`a2689d81`（AC#1/AC#2）→`25232ce8`（AC#3…AC#10＋§2/§3/§4）。
     十格外顺手量到、具名交回而不修的一件事：**lint job 那道病今天仍在**——同枚 run job `112053738745` 的 step8 `gofmt (gofumpt)` **failure** ⇒
     step9/10/11（另一枚 gofmt／两枚 go vet）全 `skipped`，lint 的 10 枚步名里只有 `staticcheck` 与 `mockllm module vet` 带 `!cancelled()`（归 ci.yml 面，与票 85 地界同处）。
+
+## 编排者翻勾记录（2026-10-06 12:5x，取数 `date`＝12:52 +08；证据腿＝非实现者只读腿 `111-ci1`）
+
+凭据件 `.scratch/wisp/probes/111/ci1/readings.md`（514 行／55,477 字节／§0–§6 六节全实／占位符尺 `grep -nE '待\[填\]|填写\[中\]|（待|未判|TODO'` **0 命中**；该腿撞 150 轮帽死于交件之后，正文与台件由我代提＝`e21808f1`，**判语一字未改**）。读数全部出自**推送之后**的三发 run `37405698188`／`37406757402`／`37406422380` 与推前参照 `37396530365`。
+
+- ★**AC#1 翻**：§2.2 给出 35 行全名册；自证完整＝census 步（`test-windows` step8）三发逐字打印 `go list ./... = 35 packages` ＋四数 `packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`，第④列今天第一次整列可填（28 枚有真步级结论、7 枚 `0/0` 零测试文件）。⚠ 题面那句"33 行"**今天已过期＝实为 35**；分母要不要把另外三枚**独立 module**（`tools/d22scan`／`tools/mockllm`／`scripts/spike`，4 枚 `go.mod` 现量）并进来属**口径变更**，我不在这一格里改题面（原文不抹，登记见下"待我裁"①）。
+- ★**AC#2 翻**：§2.4 四数表给出逐包步级读数——core step7 三发 `RUN=1587`（推前 `1518`，＋69 来自 `internal/session`／`internal/projctx` 接入）、windows step4 `101/58/0/0`、step7 `335/…`、step9 `577/386/12/1`、step10 junction `PASS=1`。★票面 AC#2 那句"接入第一天就红 ⇒ 那是发现"**今天没有对应实例**：§5 净结论＝新接入带进来的是绿读数，四枚常红（core step7 panel 4 枚／lint step8 gofmt／lint step12 staticcheck／windows step9 risk 12 枚）**全部推前就红**；今天新增红名只 3 枚且三枚在另外两发 PASS（同码不同果，§6.6）。⛔ 未为此放宽任何断言、未加 `t.Skip`／`//go:build`。
+- ★**AC#4 翻**：`cmd/wisp` 在 CI 上**能跑**已具名到 run＋job＋step——`37405698188`/job `112082660385`/step7 `RUN=335 PASS=231 FAIL=6 SKIP=1`、`37406757402`/`112085927937`/step7 `335/229/8/1`（该步名逐字 `cmd/wisp CLI tests …ticket 111 AC#4`）。它今天红＝历史在册那批（ Sherpa DLL 已在 step5/6 备妥，非"跑不起来"那一形），不再"默默留在零覆盖列"。
+- ★**AC#6 翻（裁窄读法，具名理由）**：票面有**两处**射程——`:71-74` 判据本体"同一枚 run 里 step4 与 step5–8 同时有结论"、`:250-255` 点名五枚 **test-windows 实质步**（`Cache third_party`／`cgo build smoke`／`cmd/wisp CLI tests`／`Portable windows tests`／`PathResolver junction`）"各自必须有 conclusion，只要还有一步是 skipped ⇒ 当场判 FAIL"。这两发主口径 run 逐枚读数＝`step5 success／step6 success／step7 failure／step9 failure／step10 success`，**五枚点名步无一 skipped**（第三发同形），且 census（step8）success 让"step4 与 step5–8 同时有结论"第一次成立。⚠ 我**不采**`:291` 那句无限定步集合的宽读法，理由是它会把 `lint` 作业 `step9/10/11`（被 step8 gofmt 吃掉的两枚 `go vet` ＋另一枚 gofmt）与 runner 自身的 post 清理步一并记到本票头上——那三枚属 `ci.yml` 那道 gofmt 门（票 236 AC#6 同一枚物理缺陷，票 269 已并案过去），本票 AC#6 的字面射程只覆盖"新门不再吃掉后面的步"里**本票新增的那一步**。★残余我认并登记：`lint` 那三枚今天**仍是 skipped 且无日志**，推前推后一模一样，归票 236 AC#6／票 85 地界，不在本格销账。
+- ★**AC#9 翻**：ubuntu 腿今天**真跑** `internal/winsec` 的 `!windows` 半边且**是执行不是只编译**——四发都有顶层 own 结果行（推前 `112053739109`/step7 `ok github.com/CarlosShao/wisp/internal/winsec 0.025s`；`112082660423` `0.011s`；`112085927688` `0.017s`；`112084901657` `0.012s`），并各带 GUARD B 的 `ok (own line)` 锚定行。⚠ 票面 `:82` 那句"全日志里 `internal/winsec` 出现 0 次"**今天字面不成立**（来源＝旧 run `35599458439`），原文不抹，按这一行读。
+
+**仍不翻的四格（AC#10 我第一遍误判成不翻，见本节末尾与那一格自己那一条）（逐格写清缺哪一行读数，⛔ 不许由 grep 外推）**
+- **AC#3**：守卫本体今天**在盘上且在 CI 上跑过**（GUARD D 落 `scripts/portable-tests.sh:360/:396/:407-424`，三发 census success 且 §3.3 三条步级证据证明"success＝真没漏"而非"这一支不产红"）。⛔ 但票面 AC#3 逐字要的第二半"**并人为抽掉一个包证明它会红**"其**载体在 CI 上从未被跑过**：正控住在 `scripts/portable-tests-selftest.sh` 第 23 组用例（`census-unclaimed-package-goes-red`，`:766-800`，会打出 `GUARD D - 1 package(s) compile a test file for GOOS=` 并断 `unclaimed-with-tests=1`），而 `grep -c portable-tests-selftest .github/workflows/ci.yml`＝**0**（`slo-fresh.yml` 亦 0）。⇒ 缺的那一行读数＝**CI 里一步真跑该 selftest 并让它为这枚正控红/绿各一次**。另 §3.3 具名：`watchdog` 的"响亮"今天只是**打印** `<-NO-TESTS` 那一行、与有覆盖行同音量，不是 AC#3 那句"直接失败"（它不在 scope 里，GUARD A `:570-583` 碰不到）。
+- **AC#5**：`bash -n`／`sh scripts/d22scan.sh` 那两把我自己的门禁尺今天**没有非实现者的复跑件**（232-r2 之前 cmd/wisp 写面一直被人占着），且这一格依赖 AC#3 那枚正控进 CI。等 `111-r5` 一并取。
+- **AC#7**：§5.6 实测——`grep -c -- "-run TestSyncRegistryProbeLive"` 在两发 windows 腿**逐枚＝0**，它出现的 9 行全落在 `-skip` 正则串与 `[fixture]` 名册行里。⇒ 票面"至今 0 次"**今天仍成立**，本格仍未闭（要么真跑并给 step7 读数，要么在票 110/111 面当众改口径）。
+- **AC#8**：票面要的是"匹配式能区分**被测包**与**日志里出现过这个词**，并**用一次阳性自证**（种一个只在字符串里出现的包名 ⇒ 不许计入分母）"。GUARD B 的 own-line 分母尺在（`selftest` 第 9 组 `:430-435` 有牙），⛔ 但**那枚指定的阳性自证**今天我没量到它在 CI 或台件里真跑过。与 AC#3 同因（selftest 不在 CI）。
+- **AC#10 ★翻（我第一遍判错了，错因具名在下）**：票面要的两支里**第一支已经落地**——`scripts/portable-tests.sh:589` 的 `ledger=(` 名册里 `:598` 逐字登记了那枚 skip：
+  `TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. …` 且**归谁写明了**
+  （原文 `OWNER of the POSIX half: whoever lands reparseComponents in risk.pathresolver_other.go`，并具名"那一支不在这儿假造"）。
+  ★响亮那一半今天**第一次有 CI 侧真读数**：run `37406757402`／job `112085927688`／step7 在 `03:00:02.4742096Z` 打
+  `portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:`，紧跟着点名
+  `--- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`，再 `03:00:02.4744054Z` 打
+  `portable-tests.sh: strict runner exited 1 …` ⇒ **未记账的 skip 会让这一步当场红**，不是外推是日志。同发还打
+  `11 ledger entries, 8 accounted on this platform`（推前 `37396530365` 同值 ⇒ 名册不是今天新加的，今天加的是**可见性**）。
+  ⛔⛔ **我这一格第一遍判成了"两支都没落"，错因是我的尺写坏了**：我跑的是 `grep -rn '双平台跳过|known-skip|KNOWN_SKIP' scripts/portable-tests.sh`
+  ＝0 命中，而那枚名册在库里的真名是 `ledger=(`、正文是英文——**中文词面当尺、零命中就当结论**，正是记忆里那条"多分支 grep 混中文的零命中先怀疑尺"今天又咬了我一次，
+  这次咬在**翻勾**这一环上（比咬在派单上更贵，因为翻错的框没人会去复算）。⇒ 判据已改成两条可核尺：名册行号＋CI 日志时间戳。
+  ★顺带抓到一枚**新的未记账 skip**（`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3` 在 ubuntu 腿红掉 step7）——
+  这一格翻勾**不覆盖它**：它要么进同一张 ledger 并写明归谁，要么那枚用例自己改判，归下一枚落地腿（我在台账具名登记，不当已解决）。
+
+**待我裁（记在这儿，防"写在件里"被读成"编排者已裁"）**
+① §6.8 那枚"20 个／33 个"分母要不要按今天实测的 35 重算——属口径，我倾向**另立一枚小票**而不在本票改题面；
+② §6.9 该腿自报的一处边界偏差（起手一枚 `grep -rl` 扫了工作树，射程盖到写腿 `232-r2` 正在改的 `cmd/wisp/config_reload_223_test.go`；它当场用 HEAD 尺重取同一结论并核那枚文件 `go:build !windows` 命中＝**0** ⇒ 非来源）——我不替它抹平，本票 AC#1 第④列与 §2.2 tag 差集表按这一条折扣读。

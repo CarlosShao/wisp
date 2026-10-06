@@ -1,0 +1,38 @@
+issues(111): 编排者翻勾六格（AC#1/AC#2/AC#4/AC#6/AC#9/AC#10，凭据＝非实现者腿 111-ci1）＋登记不翻四格各缺哪一行读数＋★记我：AC#10 第一遍被我自己的坏尺判成了不翻
+
+证据＝非实现者只读腿 `111-ci1`（`.scratch/wisp/probes/111/ci1/readings.md`，514 行／55,477 字节／§0–§6 六节全实／
+占位符尺 0 命中；该腿撞 150 轮帽死于交件之后，正文＋11 枚全量 CI 日志台件由我代提＝`e21808f1`，判语一字未改）。
+取数全部出自推送之后的三发 run `37405698188`／`37406757402`／`37406422380`，参照推前 `37396530365`。
+
+★翻的六格：AC#1（35 行全名册＋census 步四数三发逐字相同，第④列第一次整列可填）／AC#2（逐包步级四数表；
+"接入第一天就红"今天无实例——新包带来的是 ＋69 RUN 的绿读数，未为此放宽任何断言）／AC#4（`cmd/wisp` 在 CI
+能跑已具名到 run+job+step7 `335/231/6/1`）／AC#6（裁票面 `:71-74`＋`:250-255` 的窄读法：五枚点名实质步今天首次
+全数给结论、无一 skipped，census step8 success；不采 `:291` 的无限定全集读法，理由与残余归口写在票面）／
+AC#9（ubuntu 腿四发真跑 winsec 的 `!windows` 半边，是执行不是只编译，顶层 own 行＋GUARD B own-line 锚定行俱在）／
+AC#10（`scripts/portable-tests.sh:589` 的 `ledger=(` 里 `:598` 逐字登记了那枚 skip 并写明 POSIX 半边归谁；
+响亮那一半今天第一次有 CI 读数：job `112085927688` step7 `03:00:02.4742096Z` 打 `unaccounted SKIP lines…`、
+`03:00:02.4744054Z` 打 `strict runner exited 1` ⇒ 未记账的 skip 会让该步当场红）。
+
+⛔⛔ **记我：AC#10 我第一遍判成"两支都没落"，错因是我的尺写坏了**——我跑
+`grep -rn '双平台跳过|known-skip|KNOWN_SKIP' scripts/portable-tests.sh` 得 0 命中就当结论，而那枚名册在库里的
+真名是 `ledger=(`、正文全英文。这是记忆里"多分支 grep 混中文的零命中先怀疑尺"那一条**今天又咬我一次**，
+而且这次咬在**翻勾**这一环上（比咬在派单上更贵：翻错的框没人会去复算）。⇒ 票面那一格里我把错因原样留着，
+判据换成两条可核尺（名册行号＋CI 日志时间戳）。
+
+★顺带抓到一枚**新的未记账 skip**：`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3` 在 ubuntu 腿把
+step7 打红（同一发 run 的 `--- SKIP` 原文就在那份台件里）。AC#10 这枚勾**不覆盖它**——它要么进同一张 ledger
+并写明归谁，要么那枚用例自己改判，归下一枚落地腿。
+
+不翻的四格在票面逐格写了缺哪一行读数：AC#3（GUARD D 本体在盘也在 CI 跑过，但票面要的"人为抽掉一个包证明它会红"
+那枚正控住在 `scripts/portable-tests-selftest.sh` 第 23 组，而 `grep -c portable-tests-selftest .github/workflows/ci.yml`＝0）／
+AC#5（我自己的门禁尺没有非实现者复跑件）／AC#7（`-run TestSyncRegistryProbeLive` 两发 windows 腿逐枚＝0，"至今 0 次"仍成立）／
+AC#8（指定的那枚阳性自证今天没量到真跑过，与 AC#3 同因）。
+
+★两处过期句就地标"原文不抹、按新行读"：题面"33 行"今天实为 35；`:82` 那句"`internal/winsec` 出现 0 次"来源是
+旧 run `35599458439`，今天四发全部 >0。★分母 33→35 要不要重算属口径变更，我不改题面，登记在"待我裁"①。
+★腿自报的一处边界偏差（§6.9）我原样保留并登记在"待我裁"②。
+
+尺：`git diff --numstat`＝39 增／6 删，删除列逐枚核过＝正好那 6 行 `- [ ]`→`- [x]`（第一遍我拿 `cut -c120` 的
+截断输出当 Edit 锚点，把 Progress log 最后一行劈成两半，已按 `git show HEAD:` 原文逐字补回并复验碎片 0 命中）；
+框数现量＝未勾 4／已勾 6，总 10 枚与 `111-a5b` 自取的 `grep -c '^- \[ \] \*\*AC#'`＝10 对得上。
+`cmd`／`internal`／`scripts`／`.github`／`docs` 一字未动；只 commit 不 push。
