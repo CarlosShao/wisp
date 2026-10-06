@@ -1,0 +1,19 @@
+=== branch/head ===
+dev
+2822ee04
+2822ee04 probes(代提三枚死腿盘上遗产 23 份小件)：同一波服务故障 19:10 连杀三枚零 go 只读腿
+=== status cmd internal: 0 lines
+=== status 5g logs: 0 lines
+=== 5g logs on disk ===
+total 102
+drwxr-xr-x 1 swq 197609     0 Oct  6 19:07 .
+drwxr-xr-x 1 swq 197609     0 Oct  6 18:38 ..
+-rw-r--r-- 1 swq 197609  2065 Oct  6 19:03 cites.tsv
+-rw-r--r-- 1 swq 197609 14216 Oct  6 18:51 closemark.txt
+-rw-r--r-- 1 swq 197609  1073 Oct  6 19:08 header.tsv
+-rw-r--r-- 1 swq 197609   437 Oct  6 18:51 ledger.txt
+-rw-r--r-- 1 swq 197609  1957 Oct  6 19:01 rolecount.tsv
+-rw-r--r-- 1 swq 197609 17706 Oct  6 18:43 roles.tsv
+-rw-r--r-- 1 swq 197609 11670 Oct  6 18:41 scan.tsv
+-rw-r--r-- 1 swq 197609 35522 Oct  6 18:49 tail.txt
+-rw-r--r-- 1 swq 197609   189 Oct  6 18:40 tix.txt

@@ -1,0 +1,10 @@
+awk: cmd. line:2: (FILENAME=.scratch/wisp/probes/pool-validity/5g2/logs/m4.tsv FNR=2) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+M11V=52
+ZEROVERDICT=
+ACCFILES0=184 
+BOXES0_all94=
+BRACKET0_all94=
+UNIND_NEQ_ANYIND=
+ledger_exists=yes lines=12753
+LEDGER0=
+LEDGER_NOCLOSEWORDS=76 

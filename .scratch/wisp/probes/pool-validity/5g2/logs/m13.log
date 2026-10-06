@@ -1,0 +1,18 @@
+M13=52
+ACC_ONLY_IN_PROBES=
+ACC_NOWHERE=184 
+== 184: every file in repo whose name carries 184 ==
+./.scratch/wisp/dispatches/2026-09-28-123x-readonly-184-c1-what-can-the-decision-column-not-say
+./.scratch/wisp/dispatches/2026-09-28-184x-impl-197r1-entity-and-197r2-stream.md
+./.scratch/wisp/issues/184-a-decision-column-of-five-frozen-values-cannot-tell-an-auto-allowed-
+./.scratch/wisp/probes/184
+./docs/evidence/s1/184-audit-vocabulary-census-c1.md
+== 184: mentions inside docs/evidence/s1 filenames of other numbers (body) ==
+6
+== 184 ticket: header + progress log verdict lines ==
+FILE=.scratch/wisp/issues/184-a-decision-column-of-five-frozen-values-cannot-tell-an-auto-allowed-l0-from-a-human-approval-and-grant-id-has-zero-production-writers-done.md lines=82
+3:- Status: **结案（09-28 13:2x，AC 9/9 翻勾，改名 `-done`）**——零产码普查票，交付＝一张事实表＋一张代价表；**残�
+79:- 09-28 13:2x 编排者收表、**翻勾 9/9 并结案改名 `-done`**。**为什么是我翻而不是再派一枚验收**：本票零产码、没�
+== ledger parse (numeric-safe) ==
+<<LEDGER_ZERO_MENTION
+76(8) <<LEDGER_MENTION_BUT_NO_CLOSEWORDS

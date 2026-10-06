@@ -1,0 +1,21 @@
+STRICTCB0: 
+STRICTCB0_COUNT_ROSTER52: 0
+LOWPASS: 157 184 
+HASBACK: 104 110 116 117 118 119 126 127 129 131 134 141 142 143 144 147 149 151 152 153 154 162 183 198 212 221 241 257 66 79 84 87 88 89 94 95 96 99 
+== prior-leg disagreement: nonimpl_marked=0 / header_nonimpl=0 / self_named low ==
+
+header0:184 header0:84 
+== 104 / 110 unchecked box lines ==
+52:- [ ] **AC#3** 双向变异：① 把检测退回"只看显式 ACE" ⇒ AC#1 红；
+57:- [ ] **AC#4** 回归：`go test -count=2 ./internal/winsec/ ./internal/memory/ ./internal/secret/ ./internal/agent/`
+39:- [ ] **AC#3** 这道新步要**自己会红**：在 `/tmp` 快照里把 winsec 某条安全断言人为弄坏（例�
+47:- [ ] **AC#5** 门禁：`bash -n` 改动脚本 rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且台账各 scope �
+== ledger lines for 76 ==
+1253:  **不要**——winsec 的守卫是"**拼写/祖先链/树归属**"这一级，"这棵树归谁"是**调用方数
+2562:  并且**观察到我这侧看不见的东西**——中途票 76 的两份测试曾短暂在 Linux 红 2 条，
+2802:  ——被点名的是**票 76 已提交的两份测试文件**；⇒ **读结论要读那一步，不要读 job �
+2864:## 编排者登记 A45（2026-09-21 10:31，票 76 落地：**今天第三例"拼写改变安全语义"**，以及�
+2877:- **A45③ 票 76 交回、故意没修的两条我开了票 79**：
+2883:  **500MB 配额全部隐形**（票 76 的 `nested\` canary 真的活过了 purge）——
+2885:- **A45④ 一条记账姿势，值得单独表扬并抄进简报模板**：票 76 的报告里主动写出
+2917:  （`d9224af`，票 76）会被 gofumpt 重排。票 71 故意不碰别人的文件（对）。⇒ 票 76 自己�

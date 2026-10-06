@@ -1,0 +1,97 @@
+docs/evidence/s1/101-adversarial-acceptance.md|ACCHEAD|hacc=5|himp=1|# 票 101 —— 独立对抗验收裁�
+docs/evidence/s1/104-adversarial-acceptance.md|ACCHEAD|hacc=3|himp=0|# 104 — 对抗验收：`SealFile` 对"
+docs/evidence/s1/106-adversarial-acceptance.md|ACCHEAD|hacc=4|himp=3|# 106 — 对抗验收裁决表（accept
+docs/evidence/s1/11-adversarial-acceptance.md|ACCHEAD|hacc=4|himp=0|# Ticket 11 — adversarial acceptance (
+docs/evidence/s1/110-adversarial-acceptance.md|ACCHEAD|hacc=11|himp=0|# 票 110 对抗验收裁决表（accept
+docs/evidence/s1/116-adversarial-acceptance.md|ACCHEAD|hacc=3|himp=1|# 票 116 对抗验收 —— `acceptor-
+docs/evidence/s1/117-adversarial-acceptance.md|ACCHEAD|hacc=2|himp=2|# 票 117 — 独立对抗验收（`acce
+docs/evidence/s1/118-adversarial-acceptance.md|ACCHEAD|hacc=7|himp=3|# 票 118 独立对抗验收表（accept
+docs/evidence/s1/119-ac1-ac2-r2-acceptance.md|ACCHEAD|hacc=2|himp=2|# 票 119 — AC#1／AC#2 第二轮回�
+docs/evidence/s1/119-ac2-r2b-acceptance.md|ACCHEAD|hacc=3|himp=1|# 票 119 · AC#2 复判（第二程 r2b
+docs/evidence/s1/119-ac7-impl.md|ACCHEAD|hacc=1|himp=2|# 119 AC#7 —— 实现侧交件：那�
+docs/evidence/s1/119-ac7-r1-acceptance.md|ACCHEAD|hacc=2|himp=2|# 119 AC#7 —— 裁决表 r1（非实�
+docs/evidence/s1/119-adversarial-acceptance.md|ACCHEAD|hacc=2|himp=3|# 票 119 — 独立对抗验收（`acce
+docs/evidence/s1/119-next-audit-r1.md|RLEG|hacc=0|himp=0|# 119-`next=` 三问审计 r1 —— 只
+docs/evidence/s1/126-adversarial-acceptance.md|ACCHEAD|hacc=3|himp=1|# 票 126 独立对抗验收 —— `sam
+docs/evidence/s1/127-adversarial-acceptance.md|ACCHEAD|hacc=3|himp=2|# 票 127 独立对抗验收 —— 常�
+docs/evidence/s1/129-ac4-ac5-mutation-and-gates.md|UNK|hacc=0|himp=0|# 票 129 — AC#4（变异自证）+ AC
+docs/evidence/s1/129-adversarial-acceptance.md|ACCHEAD|hacc=4|himp=1|# 票 129 — 独立对抗验收（AC#1.
+docs/evidence/s1/131-adversarial-acceptance.md|ACCHEAD|hacc=2|himp=3|# 票 131 独立对抗验收（第二任
+docs/evidence/s1/131-followup-0-crossplatform.md|ACCHEAD|hacc=1|himp=0|# 票 131 续单 — 第 0 件：钉文�
+docs/evidence/s1/131-followup-1-three-shapes.md|ACCHEAD|hacc=1|himp=0|# 票 131 续单 第 1 件：三形（X4
+docs/evidence/s1/131-followup-2-ratification-and-linux.md|ACCHEAD|hacc=2|himp=0|# 票 131 续单 第 2、3 件：第 0 �
+docs/evidence/s1/131-reaccept-ac4.md|ACCHEAD|hacc=2|himp=1|# 票 131 AC#4 复验（第三任）—�
+docs/evidence/s1/134-ac2-ac3-trigger-and-freshness-pin.md|UNK|hacc=0|himp=0|# 134 AC#2 + AC#3 取证 — `schedule` 
+docs/evidence/s1/134-ac4-machine-contended-readings.md|ACCHEAD|hacc=1|himp=0|# 134 AC#4 取证 — 采样有效性前
+docs/evidence/s1/134-ac5-gate-readings.md|ACCHEAD|hacc=2|himp=0|# 134 AC#5 取证 — 门禁复跑（d22
+docs/evidence/s1/134-ac6-contended-no-conclusion.md|ACCHEAD|hacc=2|himp=0|# 134 AC#6 取证 — `machine-contended
+docs/evidence/s1/134-adversarial-acceptance.md|ACCHEAD|hacc=4|himp=3|# 票 134 对抗验收（AC#1..AC#6）�
+docs/evidence/s1/141-ac2-stock-inventory-r1.md|ACCHEAD|hacc=3|himp=0|# 141 AC#2 —— ban #8 缺口段存量
+docs/evidence/s1/141-ac34-positive-controls-r1.md|ACCHEAD|hacc=1|himp=1|# 141 — `AC#3` / `AC#4` 补发的正�
+docs/evidence/s1/141-q46c-accept-r1.md|ACCHEAD|hacc=1|himp=1|# 141 / Q-46c 对抗验收表 r1（裁�
+docs/evidence/s1/141-q46c-impl.md|IMPHEAD|hacc=0|himp=1|# 141 / `Q-46` 已批＝按推荐 ——
+docs/evidence/s1/142-non-quiescent-index-guard-accept-r1.md|ACCHEAD|hacc=2|himp=3|# 142-accept-r1 — 两读不原子守�
+docs/evidence/s1/142-non-quiescent-index-guard-r1.md|ACCHEAD|hacc=4|himp=2|# 142-r1 — 两读不原子的守卫（
+docs/evidence/s1/143-panel-assets-r4-leg-accept-r1.md|ACCHEAD|hacc=2|himp=3|# 票 143 对抗验收 r1 — `wisp pane
+docs/evidence/s1/143-panel-assets-r4-leg-r1.md|ACCHEAD|hacc=1|himp=1|# 票 143 — `wisp panel-assets` 那条
+docs/evidence/s1/144-slo-report-partial-read-r1-accept-r1.md|ACCHEAD|hacc=2|himp=1|# 144 — 对抗验收 r1（非实现者
+docs/evidence/s1/144-slo-report-partial-read-r1.md|ACCHEAD|hacc=2|himp=3|# 144 — `wisp slo` 收主体报告：�
+docs/evidence/s1/147-offset-naming-r1-accept-r1.md|ACCHEAD|hacc=3|himp=3|# 147 对抗验收件 r1 — `unwritten`
+docs/evidence/s1/147-offset-naming-r1.md|ACCHEAD|hacc=3|himp=4|# 147 — 实现程证据件 r1：`unwri
+docs/evidence/s1/149-three-unpinned-outlets-r1-accept-r1.md|ACCHEAD|hacc=2|himp=3|# 149 对抗验收 r1 — 三处未钉�
+docs/evidence/s1/149-three-unpinned-outlets-r1.md|ACCHEAD|hacc=4|himp=3|# 149 实现件 r1 — `corrupt` 那条�
+docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md|ACCHEAD|hacc=1|himp=3|# 151 验收 r1（非实现者对抗验�
+docs/evidence/s1/151-task-scope-never-closed-r1.md|ACCHEAD|hacc=2|himp=3|# 151 r1 — `Bridge.CloseTask` 全仓�
+docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md|ACCHEAD|hacc=3|himp=3|# 152 对抗验收 r1（非实现者）�
+docs/evidence/s1/152-subject-death-never-measured-r1.md|IMPHEAD|hacc=0|himp=1|# 152 r1 — 真 subject 中途死掉那
+docs/evidence/s1/153-ac2-a-closure-r1.md|ACCHEAD|hacc=2|himp=1|# 153 AC#2 部件 (a) 那两笔待补的
+docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md|ACCHEAD|hacc=2|himp=5|# 153 — 那枚压缩痕的两条谎法
+docs/evidence/s1/153-trace-lies-unguarded-r1.md|ACCHEAD|hacc=1|himp=1|# 153 — 那枚压缩痕的两条谎法
+docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md|ACCHEAD|hacc=2|himp=2|# 154 对抗验收程（非实现者）�
+docs/evidence/s1/154-host-id-never-closed-r1.md|ACCHEAD|hacc=4|himp=4|# 154 实现程 r1 — 「关」只长�
+docs/evidence/s1/155-three-unjudged-cells-r1-accept-r1.md|ACCHEAD|hacc=3|himp=3|# 155 的三块"无人裁"——**非实
+docs/evidence/s1/155-three-unjudged-cells-r1.md|ACCHEAD|hacc=1|himp=3|# 155 — 票 153 剩下的三块"无人
+docs/evidence/s1/157-ac5-recheck-r1.md|ACCHEAD|hacc=2|himp=2|# 票 157 · **AC#5 那一格的重判**
+docs/evidence/s1/157-record-level-cleanup-r1-accept-r1.md|ACCHEAD|hacc=2|himp=2|# 票 157（记录级收口）——**�
+docs/evidence/s1/162-fs-edit-accept-r1.md|ACCHEAD|hacc=1|himp=3|# 162-v1 验收件（**非实现者**）
+docs/evidence/s1/162-fs-edit-accept-r2.md|ACCHEAD|hacc=3|himp=1|# 票 162 · 162-v2 验收表（非实�
+docs/evidence/s1/162-fs-edit-r1.md|IMPHEAD|hacc=0|himp=1|# 162-r1 证据件 — 票 162 的两格
+docs/evidence/s1/162-fs-edit-r2.md|IMPHEAD|hacc=0|himp=1|# 162-r2 证据件 — 票 162 的第①
+docs/evidence/s1/162-fs-edit-r3.md|IMPHEAD|hacc=0|himp=2|# 票 162 · r3（写码位）＝AC#3b �
+docs/evidence/s1/162-risk-tier-accept-v3.md|ACCHEAD|hacc=2|himp=4|# 票 162 · AC#5（风险档与门控�
+docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md|IMPHEAD|hacc=0|himp=3|# 票 162 · AC#5（风险档与门控�
+docs/evidence/s1/183-exemption-why-not-live-a1.md|VLEG|hacc=0|himp=0|# 183-a1 — 只读设计核：票 177 �
+docs/evidence/s1/183-pointer-exemption-accept-v2.md|ACCHEAD|hacc=2|himp=2|# 183-v2 — 非实现者对抗验收（
+docs/evidence/s1/183-pointer-exemption-r1.md|IMPHEAD|hacc=0|himp=1|# 183-r1 — 先立在 HEAD 上就红的
+docs/evidence/s1/183-reread-permanent-teeth-r2.md|IMPHEAD|hacc=0|himp=1|# 183-r2 — 测试面装牙：AC#9 的�
+docs/evidence/s1/184-audit-vocabulary-census-c1.md|UNK|hacc=0|himp=0|# 184-c1 — `tool_call.decision` 取证
+docs/evidence/s1/198-firstrun-config-r2.md|ACCHEAD|hacc=1|himp=3|# 票 198 · 落地写腿 `198-r2` · �
+docs/evidence/s1/198-firstrun-config-v1.md|ACCHEAD|hacc=3|himp=3|# 票 198 · 对抗验收腿 `198-v1` ·
+docs/evidence/s1/212-comments-phantom-citation-v2.md|ACCHEAD|hacc=3|himp=4|# 212-v2 对抗验收裁决（票 212 �
+docs/evidence/s1/221-task-cancel-v1.md|ACCHEAD|hacc=2|himp=4|# 221 — 非实现者对抗验收表（
+docs/evidence/s1/241-audio-level-producer-r1.md|ACCHEAD|hacc=1|himp=1|# 241-r1 — 电平生产者半：PCM �
+docs/evidence/s1/241-audio-level-producer-v1.md|ACCHEAD|hacc=3|himp=1|# 241-v1 — 裁决腿验收：`internal
+docs/evidence/s1/257-clean-machine-provider-registry-v1.md|ACCHEAD|hacc=2|himp=1|# 257-v1 终裁件 — 票 257（干净�
+docs/evidence/s1/63-adversarial-acceptance.md|ACCHEAD|hacc=7|himp=0|# Ticket 63 — adversarial acceptance (
+docs/evidence/s1/66-adversarial-acceptance.md|ACCHEAD|hacc=7|himp=0|# 票 66 对抗验收报告 — SLO 判�
+docs/evidence/s1/66-mutation-parse-order.md|UNK|hacc=0|himp=0|# 66 — AC#1 变异检验：解析器�
+docs/evidence/s1/67-ac3-ascii-verdict.md|ACCHEAD|hacc=3|himp=0|# 票 67 AC#3（判据①）— `wisp pr
+docs/evidence/s1/67-adversarial-acceptance.md|ACCHEAD|hacc=8|himp=1|# 票 67 对抗验收 —— 让扫描�
+docs/evidence/s1/67-emoji-scope-internal-cmd.md|ACCHEAD|hacc=1|himp=0|# 票 67 AC#3 判据②：ban #8 覆盖�
+docs/evidence/s1/69-adversarial-acceptance.md|ACCHEAD|hacc=8|himp=1|# 票 69 对抗验收 —— C21 令牌�
+docs/evidence/s1/69-mutation-tokens.md|UNK|hacc=0|himp=0|# 69 — C21 表↔码双向断言的变
+docs/evidence/s1/73-adversarial-acceptance.md|ACCHEAD|hacc=8|himp=1|# 票 73 对抗验收 —— 孤儿暂�
+docs/evidence/s1/73-orphan-staging-sweep.md|UNK|hacc=0|himp=0|# 票 73：孤儿 `.wisp-tmp-*` 清扫�
+docs/evidence/s1/74-adversarial-acceptance.md|ACCHEAD|hacc=8|himp=1|# 票 74 对抗验收 —— C21 令牌�
+docs/evidence/s1/76-adversarial-acceptance.md|ACCHEAD|hacc=6|himp=1|# 票 76 对抗验收 —— 把 artifac
+docs/evidence/s1/79-adversarial-acceptance.md|ACCHEAD|hacc=7|himp=0|# 票 79 — 对抗验收裁决表（编
+docs/evidence/s1/83-adversarial-acceptance.md|ACCHEAD|hacc=4|himp=0|# 票 83 — 对抗验收裁决表（编
+docs/evidence/s1/84-ac1-bounded-wait.md|ACCHEAD|hacc=1|himp=0|# 票 84 裁决表 — AC#1 两侧读数
+docs/evidence/s1/87-adversarial-acceptance.md|ACCHEAD|hacc=2|himp=1|# 票 87 独立对抗验收 —— `acce
+docs/evidence/s1/88-adversarial-acceptance.md|ACCHEAD|hacc=3|himp=0|# 票 88 独立对抗验收 —— `ban 
+docs/evidence/s1/89-adversarial-acceptance.md|ACCHEAD|hacc=4|himp=1|# 票 89 独立对抗验收（acceptor-t
+docs/evidence/s1/93-adversarial-acceptance.md|ACCHEAD|hacc=3|himp=4|# 93 — 对抗验收裁决表（accepto
+docs/evidence/s1/94-adversarial-acceptance.md|ACCHEAD|hacc=3|himp=1|# 票 94 独立对抗验收（acceptor-t
+docs/evidence/s1/95-adversarial-acceptance.md|ACCHEAD|hacc=11|himp=3|# 95 — 对抗验收裁决表（accepto
+docs/evidence/s1/96-adversarial-acceptance.md|ACCHEAD|hacc=4|himp=0|# 票 96 独立对抗验收 —— `ban 
+docs/evidence/s1/99-adversarial-acceptance.md|ACCHEAD|hacc=3|himp=0|# 票 99 对抗验收裁决表 — `scri

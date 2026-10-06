@@ -1,0 +1,52 @@
+101|docs/evidence/s1/101-adversarial-acceptance.md 
+104|docs/evidence/s1/104-adversarial-acceptance.md 
+106|docs/evidence/s1/106-adversarial-acceptance.md 
+11|docs/evidence/s1/11-adversarial-acceptance.md 
+110|docs/evidence/s1/110-adversarial-acceptance.md 
+116|docs/evidence/s1/116-adversarial-acceptance.md 
+117|docs/evidence/s1/117-adversarial-acceptance.md 
+118|docs/evidence/s1/118-adversarial-acceptance.md 
+119|docs/evidence/s1/119-ac1-ac2-r2-acceptance.md docs/evidence/s1/119-ac2-r2b-acceptance.md docs/evidence/s1/119-ac7-impl.md docs/evidence/s1/119-ac7-r1-acceptance.md docs/evidence/s1/119-adversarial-acceptance.md 
+126|docs/evidence/s1/126-adversarial-acceptance.md 
+127|docs/evidence/s1/127-adversarial-acceptance.md 
+129|docs/evidence/s1/129-adversarial-acceptance.md 
+131|docs/evidence/s1/131-adversarial-acceptance.md docs/evidence/s1/131-followup-0-crossplatform.md docs/evidence/s1/131-followup-1-three-shapes.md docs/evidence/s1/131-followup-2-ratification-and-linux.md docs/evidence/s1/131-reaccept-ac4.md 
+134|docs/evidence/s1/134-ac4-machine-contended-readings.md docs/evidence/s1/134-ac5-gate-readings.md docs/evidence/s1/134-ac6-contended-no-conclusion.md docs/evidence/s1/134-adversarial-acceptance.md 
+141|docs/evidence/s1/141-ac2-stock-inventory-r1.md docs/evidence/s1/141-ac34-positive-controls-r1.md docs/evidence/s1/141-q46c-accept-r1.md 
+142|docs/evidence/s1/142-non-quiescent-index-guard-accept-r1.md docs/evidence/s1/142-non-quiescent-index-guard-r1.md 
+143|docs/evidence/s1/143-panel-assets-r4-leg-accept-r1.md docs/evidence/s1/143-panel-assets-r4-leg-r1.md 
+144|docs/evidence/s1/144-slo-report-partial-read-r1-accept-r1.md docs/evidence/s1/144-slo-report-partial-read-r1.md 
+147|docs/evidence/s1/147-offset-naming-r1-accept-r1.md docs/evidence/s1/147-offset-naming-r1.md 
+149|docs/evidence/s1/149-three-unpinned-outlets-r1-accept-r1.md docs/evidence/s1/149-three-unpinned-outlets-r1.md 
+151|docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md docs/evidence/s1/151-task-scope-never-closed-r1.md 
+152|docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md 
+153|docs/evidence/s1/153-ac2-a-closure-r1.md docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md docs/evidence/s1/153-trace-lies-unguarded-r1.md 
+154|docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md docs/evidence/s1/154-host-id-never-closed-r1.md 
+155|docs/evidence/s1/155-three-unjudged-cells-r1-accept-r1.md docs/evidence/s1/155-three-unjudged-cells-r1.md 
+157|docs/evidence/s1/157-ac5-recheck-r1.md docs/evidence/s1/157-record-level-cleanup-r1-accept-r1.md 
+162|docs/evidence/s1/162-fs-edit-accept-r1.md docs/evidence/s1/162-fs-edit-accept-r2.md docs/evidence/s1/162-risk-tier-accept-v3.md 
+183|docs/evidence/s1/183-exemption-why-not-live-a1.md docs/evidence/s1/183-pointer-exemption-accept-v2.md 
+184|
+198|docs/evidence/s1/198-firstrun-config-r2.md docs/evidence/s1/198-firstrun-config-v1.md 
+212|docs/evidence/s1/212-comments-phantom-citation-v2.md 
+221|docs/evidence/s1/221-task-cancel-v1.md 
+241|docs/evidence/s1/241-audio-level-producer-r1.md docs/evidence/s1/241-audio-level-producer-v1.md 
+257|docs/evidence/s1/257-clean-machine-provider-registry-v1.md 
+63|docs/evidence/s1/63-adversarial-acceptance.md 
+66|docs/evidence/s1/66-adversarial-acceptance.md 
+67|docs/evidence/s1/67-ac3-ascii-verdict.md docs/evidence/s1/67-adversarial-acceptance.md docs/evidence/s1/67-emoji-scope-internal-cmd.md 
+69|docs/evidence/s1/69-adversarial-acceptance.md 
+73|docs/evidence/s1/73-adversarial-acceptance.md 
+74|docs/evidence/s1/74-adversarial-acceptance.md 
+76|docs/evidence/s1/76-adversarial-acceptance.md 
+79|docs/evidence/s1/79-adversarial-acceptance.md 
+83|docs/evidence/s1/83-adversarial-acceptance.md 
+84|docs/evidence/s1/84-ac1-bounded-wait.md 
+87|docs/evidence/s1/87-adversarial-acceptance.md 
+88|docs/evidence/s1/88-adversarial-acceptance.md 
+89|docs/evidence/s1/89-adversarial-acceptance.md 
+93|docs/evidence/s1/93-adversarial-acceptance.md 
+94|docs/evidence/s1/94-adversarial-acceptance.md 
+95|docs/evidence/s1/95-adversarial-acceptance.md 
+96|docs/evidence/s1/96-adversarial-acceptance.md 
+99|docs/evidence/s1/99-adversarial-acceptance.md 

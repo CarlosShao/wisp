@@ -1,0 +1,97 @@
+docs/evidence/s1/101-adversarial-acceptance.md|ln=270|hacc=4|himp=1|wacc=8|wimp=0|     10 FAIL      9 PASS      1 PASS WITH CON|# 票 101 —— 独立对抗验收裁决表（`internal/per
+docs/evidence/s1/104-adversarial-acceptance.md|ln=306|hacc=2|himp=0|wacc=3|wimp=0|     14 FAIL     11 PASS      8 不通过    |# 104 — 对抗验收：`SealFile` 对"继承来的"带外�
+docs/evidence/s1/106-adversarial-acceptance.md|ln=97|hacc=1|himp=3|wacc=1|wimp=0|     11 FAIL     14 PASS      1 PASS WITH CON|# 106 — 对抗验收裁决表（acceptor-93-106，独立�
+docs/evidence/s1/11-adversarial-acceptance.md|ln=83|hacc=1|himp=0|wacc=0|wimp=0|      8 PASS|# Ticket 11 — adversarial acceptance (LLM REST adapters)
+docs/evidence/s1/110-adversarial-acceptance.md|ln=43|hacc=5|himp=0|wacc=1|wimp=0|      9 FAIL      8 PASS      1 退回|# 票 110 对抗验收裁决表（acceptor-110-97）
+docs/evidence/s1/116-adversarial-acceptance.md|ln=125|hacc=1|himp=1|wacc=3|wimp=0|      9 FAIL     17 PASS      1 退回|# 票 116 对抗验收 —— `acceptor-ticket116`
+docs/evidence/s1/117-adversarial-acceptance.md|ln=588|hacc=2|himp=2|wacc=2|wimp=0|      8 FAIL      4 PASS      5 拒绝      2|# 票 117 — 独立对抗验收（`acceptor-ticket117`）
+docs/evidence/s1/118-adversarial-acceptance.md|ln=412|hacc=4|himp=2|wacc=5|wimp=0|     13 FAIL     10 PASS      1 拒绝      6|# 票 118 独立对抗验收表（acceptor-ticket118）
+docs/evidence/s1/119-ac1-ac2-r2-acceptance.md|ln=527|hacc=1|himp=2|wacc=2|wimp=1|      6 FAIL      3 PASS     11 退回|# 票 119 — AC#1／AC#2 第二轮回判（`acceptor-ticket
+docs/evidence/s1/119-ac2-r2b-acceptance.md|ln=529|hacc=2|himp=1|wacc=10|wimp=0|     14 FAIL     21 PASS      9 退回|# 票 119 · AC#2 复判（第二程 r2b）· 对抗验收�
+docs/evidence/s1/119-ac7-impl.md|ln=469|hacc=1|himp=2|wacc=2|wimp=0|     22 FAIL     48 PASS      1 拒绝|# 119 AC#7 —— 实现侧交件：那两枚未解析根用
+docs/evidence/s1/119-ac7-r1-acceptance.md|ln=748|hacc=2|himp=2|wacc=2|wimp=2|     26 FAIL     30 PASS      2 拒绝|# 119 AC#7 —— 裁决表 r1（非实现者）
+docs/evidence/s1/119-adversarial-acceptance.md|ln=555|hacc=2|himp=3|wacc=2|wimp=3|     29 FAIL     21 PASS      5 拒绝     21|# 票 119 — 独立对抗验收（`acceptor-ticket119`）
+docs/evidence/s1/119-next-audit-r1.md|ln=281|hacc=0|himp=0|wacc=12|wimp=2|      1 FAIL      1 PASS      3 拒绝      1|# 119-`next=` 三问审计 r1 —— 只读取证（`auditor
+docs/evidence/s1/126-adversarial-acceptance.md|ln=578|hacc=2|himp=1|wacc=3|wimp=0|     15 FAIL     27 PASS     14 拒绝      5|# 票 126 独立对抗验收 —— `sameTree`/`answerInside
+docs/evidence/s1/127-adversarial-acceptance.md|ln=538|hacc=2|himp=2|wacc=6|wimp=0|     12 FAIL     13 PASS      1 拒绝      3|# 票 127 独立对抗验收 —— 常驻 GUI 腿那 20 行
+docs/evidence/s1/129-ac4-ac5-mutation-and-gates.md|ln=212|hacc=0|himp=0|wacc=0|wimp=0|     14 FAIL     19 PASS     12 拒绝|# 票 129 — AC#4（变异自证）+ AC#5（门禁）读数
+docs/evidence/s1/129-adversarial-acceptance.md|ln=721|hacc=3|himp=1|wacc=3|wimp=0|     20 FAIL     44 PASS     10 拒绝      8|# 票 129 — 独立对抗验收（AC#1..AC#5）
+docs/evidence/s1/131-adversarial-acceptance.md|ln=627|hacc=2|himp=3|wacc=2|wimp=0|     28 FAIL     33 PASS      7 退回|# 票 131 独立对抗验收（第二任）—— 攻的就�
+docs/evidence/s1/131-followup-0-crossplatform.md|ln=154|hacc=0|himp=0|wacc=0|wimp=0|      3 FAIL      3 PASS|# 票 131 续单 — 第 0 件：钉文件的跨平台编译
+docs/evidence/s1/131-followup-1-three-shapes.md|ln=297|hacc=0|himp=0|wacc=0|wimp=0|      3 FAIL     12 PASS|# 票 131 续单 第 1 件：三形（X4／X8／X12）打进
+docs/evidence/s1/131-followup-2-ratification-and-linux.md|ln=155|hacc=0|himp=0|wacc=0|wimp=0|     11 FAIL      5 PASS|# 票 131 续单 第 2、3 件：第 0 件的 Linux 复核�
+docs/evidence/s1/131-reaccept-ac4.md|ln=539|hacc=1|himp=1|wacc=3|wimp=0|     13 FAIL     41 PASS      2 拒绝      6|# 票 131 AC#4 复验（第三任）—— 裁的就是上�
+docs/evidence/s1/134-ac2-ac3-trigger-and-freshness-pin.md|ln=171|hacc=0|himp=0|wacc=0|wimp=0|      6 FAIL|# 134 AC#2 + AC#3 取证 — `schedule` 触发落地、真 r
+docs/evidence/s1/134-ac4-machine-contended-readings.md|ln=85|hacc=0|himp=0|wacc=0|wimp=0|      4 FAIL      5 拒绝|# 134 AC#4 取证 — 采样有效性前置检查真触发�
+docs/evidence/s1/134-ac5-gate-readings.md|ln=77|hacc=1|himp=0|wacc=0|wimp=0|      1 FAIL      3 PASS|# 134 AC#5 取证 — 门禁复跑（d22scan 纯净快照 / 
+docs/evidence/s1/134-ac6-contended-no-conclusion.md|ln=959|hacc=1|himp=0|wacc=0|wimp=0|     10 FAIL      6 PASS      2 拒绝|# 134 AC#6 取证 — `machine-contended` 改判「本 run �
+docs/evidence/s1/134-adversarial-acceptance.md|ln=764|hacc=2|himp=3|wacc=5|wimp=0|      6 FAIL     26 PASS     14 拒绝      2|# 票 134 对抗验收（AC#1..AC#6）— `acceptor-ticket13
+docs/evidence/s1/141-ac2-stock-inventory-r1.md|ln=638|hacc=1|himp=0|wacc=8|wimp=3|      5 拒绝|# 141 AC#2 —— ban #8 缺口段存量盘点（只读程 r
+docs/evidence/s1/141-ac34-positive-controls-r1.md|ln=100|hacc=1|himp=1|wacc=1|wimp=0|      1 FAIL      1 PASS|# 141 — `AC#3` / `AC#4` 补发的正向对照（编排者�
+docs/evidence/s1/141-q46c-accept-r1.md|ln=587|hacc=1|himp=1|wacc=1|wimp=0|     24 FAIL      9 PASS      7 退回|# 141 / Q-46c 对抗验收表 r1（裁决者 ≠ 实现者�
+docs/evidence/s1/141-q46c-impl.md|ln=245|hacc=0|himp=1|wacc=0|wimp=4|      6 FAIL      4 PASS|# 141 / `Q-46` 已批＝按推荐 —— 实现程交件表�
+docs/evidence/s1/142-non-quiescent-index-guard-accept-r1.md|ln=701|hacc=2|himp=3|wacc=5|wimp=0|     19 FAIL     23 PASS      3 拒绝      5|# 142-accept-r1 — 两读不原子守卫的对抗验收（�
+docs/evidence/s1/142-non-quiescent-index-guard-r1.md|ln=388|hacc=2|himp=2|wacc=10|wimp=0|      9 FAIL      8 PASS      3 拒绝|# 142-r1 — 两读不原子的守卫（实现方自证；�
+docs/evidence/s1/143-panel-assets-r4-leg-accept-r1.md|ln=568|hacc=2|himp=3|wacc=5|wimp=0|     12 FAIL     12 PASS      1 拒绝     12|# 票 143 对抗验收 r1 — `wisp panel-assets -taint-sour
+docs/evidence/s1/143-panel-assets-r4-leg-r1.md|ln=399|hacc=1|himp=1|wacc=3|wimp=0|      6 FAIL      3 PASS      2 退回|# 票 143 — `wisp panel-assets` 那条产字节的路现�
+docs/evidence/s1/144-slo-report-partial-read-r1-accept-r1.md|ln=678|hacc=2|himp=1|wacc=3|wimp=2|     24 FAIL     27 PASS      4 拒绝      9|# 144 — 对抗验收 r1（非实现者）：`collectReport
+docs/evidence/s1/144-slo-report-partial-read-r1.md|ln=620|hacc=2|himp=3|wacc=2|wimp=3|     24 FAIL     21 PASS      8 拒绝      1|# 144 — `wisp slo` 收主体报告：把"还没写完"与"
+docs/evidence/s1/147-offset-naming-r1-accept-r1.md|ln=795|hacc=2|himp=2|wacc=6|wimp=24|     28 FAIL     18 PASS      1 拒绝      5|# 147 对抗验收件 r1 — `unwritten` 支的 offset 与�
+docs/evidence/s1/147-offset-naming-r1.md|ln=570|hacc=3|himp=4|wacc=4|wimp=2|     22 FAIL     25 PASS      4 退回|# 147 — 实现程证据件 r1：`unwritten` 分支的 offs
+docs/evidence/s1/149-three-unpinned-outlets-r1-accept-r1.md|ln=1031|hacc=2|himp=3|wacc=2|wimp=81|     50 FAIL     24 PASS      7 退回|# 149 对抗验收 r1 — 三处未钉出口的修法、那�
+docs/evidence/s1/149-three-unpinned-outlets-r1.md|ln=742|hacc=2|himp=2|wacc=12|wimp=3|     25 FAIL     27 PASS      1 拒绝      3|# 149 实现件 r1 — `corrupt` 那条腿的取值、那句
+docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md|ln=622|hacc=1|himp=3|wacc=4|wimp=38|     14 FAIL      8 PASS      2 拒绝      2|# 151 验收 r1（非实现者对抗验收程）— `Bridge.
+docs/evidence/s1/151-task-scope-never-closed-r1.md|ln=380|hacc=1|himp=3|wacc=4|wimp=3|      8 FAIL      5 PASS      5 拒绝      1|# 151 r1 — `Bridge.CloseTask` 全仓零调用者：per-tas
+docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md|ln=709|hacc=2|himp=2|wacc=4|wimp=31|     17 FAIL     16 PASS      6 退回|# 152 对抗验收 r1（非实现者）— 被验版本 `97c
+docs/evidence/s1/152-subject-death-never-measured-r1.md|ln=516|hacc=0|himp=1|wacc=0|wimp=1|      5 FAIL      8 PASS|# 152 r1 — 真 subject 中途死掉那一条出口，第�
+docs/evidence/s1/153-ac2-a-closure-r1.md|ln=191|hacc=1|himp=1|wacc=4|wimp=0||# 153 AC#2 部件 (a) 那两笔待补的**内容级**复核 
+docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md|ln=939|hacc=2|himp=5|wacc=4|wimp=40|      9 FAIL      8 PASS      1 不通过    |# 153 — 那枚压缩痕的两条谎法 · 对抗验收件 
+docs/evidence/s1/153-trace-lies-unguarded-r1.md|ln=648|hacc=1|himp=1|wacc=5|wimp=4|     10 FAIL      8 PASS|# 153 — 那枚压缩痕的两条谎法 · 实现件 r1（�
+docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md|ln=592|hacc=2|himp=2|wacc=4|wimp=4|     10 FAIL      8 PASS|# 154 对抗验收程（非实现者）— 「关」只长�
+docs/evidence/s1/154-host-id-never-closed-r1.md|ln=802|hacc=4|himp=4|wacc=13|wimp=6|     10 FAIL      5 PASS      1 拒绝      1|# 154 实现程 r1 — 「关」只长在环路那一枚 id 
+docs/evidence/s1/155-three-unjudged-cells-r1-accept-r1.md|ln=359|hacc=2|himp=3|wacc=4|wimp=3|      6 FAIL      2 PASS|# 155 的三块"无人裁"——**非实现者**对抗验收
+docs/evidence/s1/155-three-unjudged-cells-r1.md|ln=841|hacc=1|himp=3|wacc=36|wimp=29|      7 FAIL      3 PASS|# 155 — 票 153 剩下的三块"无人裁"·实现件 r1�
+docs/evidence/s1/157-ac5-recheck-r1.md|ln=272|hacc=2|himp=2|wacc=8|wimp=4||# 票 157 · **AC#5 那一格的重判**（非实现者·第
+docs/evidence/s1/157-record-level-cleanup-r1-accept-r1.md|ln=220|hacc=2|himp=2|wacc=7|wimp=5||# 票 157（记录级收口）——**非实现者**验收 r
+docs/evidence/s1/162-fs-edit-accept-r1.md|ln=431|hacc=1|himp=3|wacc=1|wimp=2|     16 FAIL      3 PASS     13 拒绝      2|# 162-v1 验收件（**非实现者**）— 票 162 的 AC#1
+docs/evidence/s1/162-fs-edit-accept-r2.md|ln=223|hacc=2|himp=1|wacc=2|wimp=0|      5 FAIL     14 PASS      2 拒绝      4|# 票 162 · 162-v2 验收表（非实现者）＝裁 r3 四
+docs/evidence/s1/162-fs-edit-r1.md|ln=247|hacc=0|himp=1|wacc=0|wimp=1|      2 FAIL      2 PASS      9 拒绝|# 162-r1 证据件 — 票 162 的两格：AC#1（读数）�
+docs/evidence/s1/162-fs-edit-r2.md|ln=273|hacc=0|himp=1|wacc=0|wimp=2|      2 FAIL      2 PASS      6 拒绝|# 162-r2 证据件 — 票 162 的第①②格（AC#3 行尾
+docs/evidence/s1/162-fs-edit-r3.md|ln=379|hacc=0|himp=2|wacc=0|wimp=4|      7 FAIL     22 PASS     13 拒绝|# 票 162 · r3（写码位）＝AC#3b 两形变响亮 ＋ A
+docs/evidence/s1/162-risk-tier-accept-v3.md|ln=169|hacc=2|himp=2|wacc=2|wimp=8|      6 FAIL      9 PASS      3 拒绝      2|# 票 162 · AC#5（风险档与门控）＋ AC#6（契约�
+docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md|ln=236|hacc=0|himp=3|wacc=1|wimp=4|      7 FAIL      6 PASS      6 拒绝|# 票 162 · AC#5（风险档与门控＝L2）＋ AC#6（契
+docs/evidence/s1/183-exemption-why-not-live-a1.md|ln=181|hacc=0|himp=0|wacc=1|wimp=1|     10 FAIL      1 PASS      1 拒绝|# 183-a1 — 只读设计核：票 177 那枚"宿主自己�
+docs/evidence/s1/183-pointer-exemption-accept-v2.md|ln=177|hacc=2|himp=2|wacc=3|wimp=1|      1 PASS      1 不通过      1 拒绝|# 183-v2 — 非实现者对抗验收（收窄版）：宿�
+docs/evidence/s1/183-pointer-exemption-r1.md|ln=178|hacc=0|himp=1|wacc=0|wimp=1|     10 FAIL      3 PASS|# 183-r1 — 先立在 HEAD 上就红的包级裁判，再�
+docs/evidence/s1/183-reread-permanent-teeth-r2.md|ln=227|hacc=0|himp=1|wacc=0|wimp=1|      8 FAIL      4 PASS      3 拒绝|# 183-r2 — 测试面装牙：AC#9 的第 8 枚常驻腿 / 
+docs/evidence/s1/184-audit-vocabulary-census-c1.md|ln=133|hacc=0|himp=0|wacc=0|wimp=0|      1 拒绝|# 184-c1 — `tool_call.decision` 取证词汇普查（只�
+docs/evidence/s1/198-firstrun-config-r2.md|ln=97|hacc=1|himp=3|wacc=5|wimp=1|     10 FAIL      3 PASS|# 票 198 · 落地写腿 `198-r2` · 证据件（四小格�
+docs/evidence/s1/198-firstrun-config-v1.md|ln=114|hacc=2|himp=3|wacc=2|wimp=0|      9 FAIL     14 PASS      3 退回|# 票 198 · 对抗验收腿 `198-v1` · 裁决表（首建 
+docs/evidence/s1/212-comments-phantom-citation-v2.md|ln=221|hacc=2|himp=4|wacc=2|wimp=21|      4 FAIL      4 PASS      4 拒绝|# 212-v2 对抗验收裁决（票 212 第 2 轮修码 212-r2
+docs/evidence/s1/221-task-cancel-v1.md|ln=287|hacc=1|himp=4|wacc=1|wimp=14|      7 FAIL      5 PASS     10 拒绝      2|# 221 — 非实现者对抗验收表（腿 `221-v1`）
+docs/evidence/s1/241-audio-level-producer-r1.md|ln=202|hacc=1|himp=1|wacc=1|wimp=1|      1 FAIL      1 PASS|# 241-r1 — 电平生产者半：PCM 帧 → `0..1` 电平�
+docs/evidence/s1/241-audio-level-producer-v1.md|ln=603|hacc=3|himp=1|wacc=2|wimp=3|      5 FAIL      4 PASS      3 退回|# 241-v1 — 裁决腿验收：`internal/audio` 电平生产
+docs/evidence/s1/257-clean-machine-provider-registry-v1.md|ln=262|hacc=2|himp=1|wacc=2|wimp=2|      4 FAIL     16 PASS      1 拒绝|# 257-v1 终裁件 — 票 257（干净机器上设置写不
+docs/evidence/s1/63-adversarial-acceptance.md|ln=84|hacc=0|himp=0|wacc=0|wimp=0|      6 PASS|# Ticket 63 — adversarial acceptance (credential-entry CLI
+docs/evidence/s1/66-adversarial-acceptance.md|ln=53|hacc=3|himp=0|wacc=1|wimp=0|      9 PASS      2 退回|# 票 66 对抗验收报告 — SLO 判据仪器返工（A14
+docs/evidence/s1/66-mutation-parse-order.md|ln=210|hacc=0|himp=0|wacc=0|wimp=0|     19 FAIL     59 PASS      1 退回|# 66 — AC#1 变异检验：解析器顺序缺陷的回归�
+docs/evidence/s1/67-ac3-ascii-verdict.md|ln=88|hacc=0|himp=0|wacc=0|wimp=0|     12 FAIL     16 PASS|# 票 67 AC#3（判据①）— `wisp providers` verdict 列
+docs/evidence/s1/67-adversarial-acceptance.md|ln=38|hacc=3|himp=1|wacc=2|wimp=0|      1 FAIL      8 PASS|# 票 67 对抗验收 —— 让扫描器可信：`mockllm` 
+docs/evidence/s1/67-emoji-scope-internal-cmd.md|ln=249|hacc=0|himp=0|wacc=0|wimp=0|      5 FAIL     11 PASS|# 票 67 AC#3 判据②：ban #8 覆盖面真正扩到 `inte
+docs/evidence/s1/69-adversarial-acceptance.md|ln=45|hacc=3|himp=1|wacc=2|wimp=0|      1 FAIL      7 PASS|# 票 69 对抗验收 —— C21 令牌表的双向机器检
+docs/evidence/s1/69-mutation-tokens.md|ln=186|hacc=0|himp=0|wacc=0|wimp=0|     13 FAIL      9 PASS|# 69 — C21 表↔码双向断言的变异检验原始输�
+docs/evidence/s1/73-adversarial-acceptance.md|ln=61|hacc=3|himp=1|wacc=2|wimp=0|      4 FAIL      7 PASS|# 票 73 对抗验收 —— 孤儿暂存文件清扫器（A
+docs/evidence/s1/73-orphan-staging-sweep.md|ln=102|hacc=0|himp=0|wacc=0|wimp=0|      1 FAIL      5 PASS      1 拒绝      1|# 票 73：孤儿 `.wisp-tmp-*` 清扫器落地，A18 判据
+docs/evidence/s1/74-adversarial-acceptance.md|ln=32|hacc=2|himp=1|wacc=2|wimp=0|      3 FAIL      9 PASS|# 票 74 对抗验收 —— C21 令牌表必须对齐真正
+docs/evidence/s1/76-adversarial-acceptance.md|ln=39|hacc=2|himp=1|wacc=2|wimp=0|      1 FAIL      7 PASS|# 票 76 对抗验收 —— 把 artifacts 路的"隐含安�
+docs/evidence/s1/79-adversarial-acceptance.md|ln=108|hacc=1|himp=0|wacc=1|wimp=0|     12 FAIL      5 PASS      2 退回|# 票 79 — 对抗验收裁决表（编排者亲自复跑�
+docs/evidence/s1/83-adversarial-acceptance.md|ln=59|hacc=1|himp=0|wacc=1|wimp=0|      7 FAIL      7 PASS|# 票 83 — 对抗验收裁决表（编排者亲自复跑�
+docs/evidence/s1/84-ac1-bounded-wait.md|ln=123|hacc=1|himp=0|wacc=0|wimp=0|      8 FAIL     15 PASS     18 拒绝      1|# 票 84 裁决表 — AC#1 两侧读数：`PendingApproval`
+docs/evidence/s1/87-adversarial-acceptance.md|ln=394|hacc=2|himp=1|wacc=3|wimp=0|     21 FAIL     31 PASS     18 拒绝      1|# 票 87 独立对抗验收 —— `acceptor-ticket87`
+docs/evidence/s1/88-adversarial-acceptance.md|ln=363|hacc=2|himp=0|wacc=5|wimp=0|     17 FAIL     28 PASS      7 退回|# 票 88 独立对抗验收 —— `ban #6` 这道门现在�
+docs/evidence/s1/89-adversarial-acceptance.md|ln=495|hacc=3|himp=1|wacc=6|wimp=0|     31 FAIL     40 PASS      3 拒绝      3|# 票 89 独立对抗验收（acceptor-ticket89）
+docs/evidence/s1/93-adversarial-acceptance.md|ln=74|hacc=1|himp=3|wacc=1|wimp=0|      9 FAIL     12 PASS      1 PASS WITH CON|# 93 — 对抗验收裁决表（acceptor-93-106，独立于
+docs/evidence/s1/94-adversarial-acceptance.md|ln=569|hacc=2|himp=1|wacc=3|wimp=0|     21 FAIL     22 PASS     11 拒绝      4|# 票 94 独立对抗验收（acceptor-ticket94）
+docs/evidence/s1/95-adversarial-acceptance.md|ln=158|hacc=1|himp=2|wacc=1|wimp=0|      7 FAIL      6 PASS      7 退回|# 95 — 对抗验收裁决表（acceptor-ticket95 · 终版
+docs/evidence/s1/96-adversarial-acceptance.md|ln=329|hacc=2|himp=0|wacc=2|wimp=0|     19 FAIL     20 PASS      1 退回|# 票 96 独立对抗验收 —— `ban #8`（零 emoji）�
+docs/evidence/s1/99-adversarial-acceptance.md|ln=229|hacc=2|himp=0|wacc=2|wimp=0|      6 FAIL      7 PASS      2 退回|# 票 99 对抗验收裁决表 — `scripts/d22scan.sh` 第�

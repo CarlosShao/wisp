@@ -1,0 +1,9 @@
+HEAD=12201b2c
+12201b2c probes(票 236 AC#3 第一半 普查腿 236-a4)：task id 换成模型给的值时变红的尺＝1 枚（编排者那句『0 枚』不成立），来源钉今天 0 枚
+cmd/internal_dirty=0
+5g_logs_dirty=0
+wc_cmd_wisp=0
+toolcalls_note=prior leg died at 36 calls / 3.33M tokens
+done_files=94
+/usr/bin/bash: line 1: /m7-scope.txt: No such file or directory
+scope_files=632
