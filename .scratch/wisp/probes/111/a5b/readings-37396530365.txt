@@ -1,0 +1,115 @@
+# 111-a5b 台件：run 37396530365（head c6cf66e6＝远程 tip，2026-10-06T00:55:36Z created，run conclusion failure）的推送侧读数
+# 取数时刻 2026-10-06 10:53:53 +0800；来源=gh api（只读网络）＋本地 /tmp 日志副本；本腿零 go 命令
+
+## 本腿的取数尺（逐条可重跑）
+gh api repos/CarlosShao/wisp/actions/runs?per_page=8 --jq ...           # 名册：最新 ci run = 37396530365 head c6cf66e6
+gh api repos/CarlosShao/wisp/actions/jobs/<jobid> --jq .steps[]        # 步级 conclusion
+gh api repos/CarlosShao/wisp/actions/jobs/<jobid>/logs                 # 包级 own-line / 四数 / SKIP
+
+## jobs（run 37396530365）
+112053738745 | lint | completed | failure | steps=16
+112053738964 | slo-smoke | completed | success | steps=11
+112053739011 | test-windows | completed | failure | steps=13
+112053739043 | lint-frontend | completed | success | steps=15
+112053739064 | slo-full | completed | success | steps=9
+112053739109 | test-core | completed | failure | steps=11
+
+## test-windows job 112053739011 步级逐字
+1 | Set up job | success
+2 | Run actions/checkout@v4 | success
+3 | Run actions/setup-go@v5 | success
+4 | Windows ACL sealing gate (internal/winsec's own tests, ticket 110) | success
+5 | Cache third_party (deps.toml key) | success
+6 | cgo build smoke (build.ps1 fetch-deps + mingw link + doctor) | success
+7 | cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4) | failure
+8 | Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord) | failure
+9 | PathResolver junction placeholder (real cases tickets 18/20) | success
+16 | Post Cache third_party (deps.toml key) | skipped
+17 | Post Run actions/setup-go@v5 | skipped
+18 | Post Run actions/checkout@v4 | success
+19 | Complete job | success
+
+## test-core job 112053739109 步级逐字
+1 | Set up job | success
+2 | Run actions/checkout@v4 | success
+3 | Run actions/setup-go@v5 | success
+4 | Start compose test services (mock-llm on 18080) | success
+5 | Probe mock-llm | success
+6 | Environment fork assertion (WISP_ENV=test data dir) | success
+7 | Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh) | failure
+8 | Stop compose services | success
+15 | Post Run actions/setup-go@v5 | skipped
+16 | Post Run actions/checkout@v4 | success
+17 | Complete job | success
+
+## core 日志（/tmp/a5b-logs/core-37396530365.log, 750298 字节）
+own-line 行数 = 25
+winsec 命中 = 5
+scope 行（:331 逐字）:
+2026-10-06T00:57:01.3674663Z portable-tests.sh: platform=linux scope=[./internal/agent/ ./internal/agent/approval/ ./internal/llm/... ./internal/config/... ./internal/memory/... ./internal/observe/... ./internal/secret/... ./internal/risk/... ./internal/statemachine/... ./internal/tools/... ./internal/models/... ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... ./internal/panel/... ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/winsec/...]
+winsec 包结果行＋own-line 行＋POSIX 断言逐字:
+2026-10-06T00:57:30.3483528Z PASS
+2026-10-06T00:57:30.3483681Z ok  	github.com/CarlosShao/wisp/internal/winsec	0.025s
+2026-10-06T00:57:30.3497664Z portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/winsec
+5383:2026-10-06T00:57:30.3479422Z === RUN   TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator
+5384:2026-10-06T00:57:30.3480808Z     placement_symlink_113_other_test.go:402: AC#1 foreign tree before: dir /tmp/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator1795359843/001/foreign = mode=777 u
+四数行:
+portable-tests.sh: four numbers (all from -v output): === RUN=1518  --- PASS=1028  --- FAIL=4  --- SKIP=1
+unaccounted SKIP 段逐字:
+2026-10-06T00:57:30.3484126Z portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:
+2026-10-06T00:57:30.3486335Z     task_output_pointer_notice_test.go:428: 前置条件缺失：造不出真 NTFS junction（mklink /J /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r31814219928/001/ALLOWLIST-LEAK-PROBE-174r3 /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3181
+2026-10-06T00:57:30.3486616Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.00s)
+skip-pattern 行（AC#10 那枚在册）:
+2026-10-06T00:57:01.3727435Z portable-tests.sh: -skip pattern built from the ledger: ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$
+FAIL 顶层逐名:
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.01s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.05s)
+
+## windows 日志（/tmp/a5b-logs/win-37396530365.log, 784023 字节）
+own-line 行数 = 10（按步分组：step4 winsec 门 1 行 / step7 CLI 1 行 / step8 windows scope 8 行）
+step8 own-line 逐行:
+portable-tests.sh:   FAIL (own line) github.com/CarlosShao/wisp/internal/risk
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/cmd/llmrecord
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/ball
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/config
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/perm
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/plugin
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/proc
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/secret
+四数行（四发）:
+portable-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+portable-tests.sh: four numbers (all from -v output): === RUN=323  --- PASS=220  --- FAIL=6  --- SKIP=1
+portable-tests.sh: four numbers (all from -v output): === RUN=536  --- PASS=362  --- FAIL=12  --- SKIP=1
+TestSyncRegistryProbeLive 命中 = 9（ledger 打印 + -skip 串）
+GUARD D / scope=census 命中 = 0
+unaccounted SKIP 段逐字:
+    panel_resident_windows_test.go:317: AC#13 has no subject in this tree: the embed resolves no entry, so there is no page content that could be covered. Named skip; the working-tree reading is the one that ran, recorded in docs/evidence/s1/33-panel-host-c27-
+    syncdirs_redteam_windows_test.go:220: no live sync root on this machine (detected roots: [])
+--
+--- SKIP: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.00s)
+--- SKIP: TestSyncRedTeamRealOneDrive (0.00s)
+portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:
+step8 顶层 FAIL 逐名:
+--- FAIL: TestAC1AlwaysBranchDoesNotRevertAHandEditedKey (1.17s)
+--- FAIL: TestAListWinsWhereBothTablesHit (0.05s)
+--- FAIL: TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card (1.06s)
+--- FAIL: TestBListDefaultDenyAndOverride (0.01s)
+--- FAIL: TestCanonicalInputGainsNoSecondForm (0.03s)
+--- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.04s)
+--- FAIL: TestPanelHostLatencyPercentilesAC2 (0.00s)
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (3.95s)
+--- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.38s)
+--- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+--- FAIL: TestPathResolverUNCAListDenied (0.02s)
+--- FAIL: TestRunPacketCarriesTheLoadedInstructionFiles (1.01s)
+--- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.01s)
+--- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+--- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.00s)
+--- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.00s)
+--- FAIL: TestSyncUnverifiedRootKeepsFallback (0.00s)
+--- FAIL: TestTicket223PermissionDeniedSitsInItsOwnSentence (1.04s)
+run/head 信息:
+head ec84cff1 2026-10-06 10:44:14 +0800 ## 5. 编排者翻勾记录（2026-10-06 10:3x +08，锚 HEAD `fdb437c3`）

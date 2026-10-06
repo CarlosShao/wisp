@@ -1,0 +1,1 @@
+probes(111-a5b 笔2)：映射表 AC#1/AC#2 两行填实——②栏 sed 自票面 :22-26 逐字、③栏 HEAD 现量 pin 行号（core 27/win 10/cli 1/winsec 1）、④栏本腿今早自取的推送读数（run 37396530365／head c6cf66e6，core step7 25 行四数 1518/1028/4/1、win step8 own-line 8 行 536/362/12/1、cli step7 323/220/6/1，台件 /tmp/a5b-logs 两枚字节数坐实）＋零 go 名册尺 35=35 双向 comm 空〔未验证·建议位不裁，一枚框不翻〕
