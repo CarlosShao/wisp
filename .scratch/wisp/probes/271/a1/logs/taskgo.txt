@@ -1,0 +1,29 @@
+=== task.go: DEFERRED/task.list/BuiltinTaskEntries lines ===
+21://	task.output  L0  read what a background task printed   (this file)
+22://	task.cancel  L1  stop one subagent the CALLER itself derived (this file, 221)
+23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+25:// task.output is AC#3's leg, task.cancel is ticket 221's. task.list stays
+29:// promising task.cancel to the model while nothing registered it and
+32:// and the DEFERRED line above is the only one left standing.
+64:// checked, which is why task.output does the shaping itself for the text it is
+279:// diagnostics, not as a tool surface: task.list is DEFERRED (§7 :1531), and
+280:// giving task.output a "list everything" mode would smuggle that row back in.
+467:// task.output (C1 Tool, D34 row: PLAN.md:2564)
+484:func (taskOutput) Name() string { return "task.output" }
+527:			onUpdate(fmt.Sprintf("task.output 返回 %d 字节（未截断）", len(full)))
+571:		onUpdate(fmt.Sprintf("task.output 截断 %d 字节为头尾摘要", totalBytes))
+576:// TaskOutputDecl is the host-side declaration for task.output.
+581:// task.list/task.cancel on :2563): reading an in-process table touches no C3
+597:// BuiltinTaskEntries returns the task family this configuration registers:
+598:// task.output and (since ticket 221 甲形, ruling A434) task.cancel. See the
+599:// header comment for why task.list is not here.
+600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+608:// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+617:// taskCancelSchema carries the same single roster key task.output reads, and for
+625:func (taskCancel) Name() string { return "task.cancel" }
+646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+647:// pair splitting into task.list L0 and task.cancel L1, and SPEC-07 §3's mirror
+649:// L1 window (tools.NoGate, i.e. 票 21 未接入), a task.cancel call is REFUSED
+654:// Capabilities and Needs are empty the way task.output's are (the frozen row's
+748:		onUpdate(fmt.Sprintf("task.cancel 已对子代理 %s 发出停止", target))
+758:				onUpdate(fmt.Sprintf("task.cancel 收尾：子代理 %s 落到 %s", target, string(st)))

@@ -1,0 +1,114 @@
+=== task_cancel_221_test.go 25-75 ===
+)
+
+// taskRootRe pulls a task.* tool root out of text the model reads. It needs a
+// letter after the dot, so a parameter named task_id cannot be mistaken for a
+// tool root.
+var taskRootRe = regexp.MustCompile(`task\.[a-z][a-z0-9_]*`)
+
+// clauseMarks are the separators a reader of these Chinese descriptions actually
+// uses. ASCII '.' is deliberately NOT one of them: every tool root contains a
+// dot, so cutting on it would report 「可以用 task」 as the offending sentence
+// and hide the fact being asserted.
+var clauseMarks = []string{"；", "。", "\n"}
+
+// allBuiltinEntriesHere is AC#1's denominator: the union of every builtin entry
+// this configuration can register. It is built from the constructors themselves,
+// so a re-fork between "what we promise" and "what we register" is what this leg
+// measures, and no hand-kept list of names can drift out of sync with it.
+func allBuiltinEntriesHere(t *testing.T) []Entry {
+	t.Helper()
+	paths := NewPathCanonicalizer(nil, nil)
+	roster := NewTaskRoster()
+	var out []Entry
+	for _, batch := range [][]Entry{
+		BuiltinFSEntries(FSDeps{Paths: paths, DeleteEnabled: true}),
+		BuiltinFSWriteEntries(FSDeps{Paths: paths, DeleteEnabled: true}),
+		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths}),
+		BuiltinSubagentEntries(SubagentDeps{Roster: roster}),
+	} {
+		for _, e := range batch {
+			if e.Tool == nil {
+				t.Fatalf("%s 构造器交出一枚 nil Tool", batchKind(batch))
+			}
+			// fs.* families overlap by design (BuiltinFSEntries already carries
+			// the write half), and a registry would refuse the duplicate - so
+			// the union is keyed by name here, first writer wins.
+			if !containsName(out, e.Tool.Name()) {
+				out = append(out, e)
+			}
+		}
+	}
+	if len(out) == 0 {
+		t.Fatal("一枚内置工具都没注册到，这把尺就是空转")
+	}
+	return out
+}
+
+func batchKind([]Entry) string { return "Builtin*Entries" }
+
+func containsName(entries []Entry, name string) bool {
+	for _, e := range entries {
+		if e.Tool.Name() == name {
+=== :100-160 ===
+		sentence string // the clause the model actually reads
+	}
+	promised := map[string][]promise{}
+
+	for _, e := range entries {
+		for _, text := range []struct {
+			slot string
+			body string
+		}{
+			{"Description()", e.Tool.Description()},
+			{"Parameters()", string(e.Tool.Parameters())},
+		} {
+			for _, hit := range taskRootRe.FindAllStringIndex(text.body, -1) {
+				root := text.body[hit[0]:hit[1]]
+				promised[root] = append(promised[root], promise{
+					tool: e.Tool.Name(), slot: text.slot,
+					sentence: sentenceAround(text.body, hit[0]),
+				})
+			}
+		}
+	}
+
+	roots := make([]string, 0, len(promised))
+	for root := range promised {
+		roots = append(roots, root)
+	}
+	sort.Strings(roots)
+
+	// The ruler checks its own射程 first: an empty numerator over a non-empty
+	// denominator means it is scanning nothing at all, which must not read green.
+	if len(roots) == 0 {
+		t.Fatal("说明书里一枚 task.* 都没提：这把尺没在扫任何东西（分母非空、分子为空＝判据失效）")
+	}
+
+	for _, root := range roots {
+		if registered[root] {
+			continue
+		}
+		for _, p := range promised[root] {
+			t.Errorf("说明书对模型许诺了一枚不存在的工具：%s 的 %s 写着「%s」，"+
+				"而 %q 没有注册进这次装配的并集（并集 %d 枚：%s）",
+				p.tool, p.slot, p.sentence, root, len(registered),
+				strings.Join(sortedNames(registered), " / "))
+		}
+	}
+}
+
+func sortedNames(set map[string]bool) []string {
+	out := make([]string, 0, len(set))
+	for n := range set {
+		out = append(out, n)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// sentenceAround returns the clause containing byte offset i, cut on clauseMarks.
+// It clamps the result so a red line stays readable instead of dumping a whole
+// parameter schema.
+func sentenceAround(body string, i int) string {
+	start := 0

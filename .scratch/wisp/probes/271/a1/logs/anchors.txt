@@ -1,0 +1,42 @@
+=== exact roster line numbers ===
+602:		{Tool: taskOutput{d: d}, Decl: TaskOutputDecl()},
+603:		{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
+=== DEFERRED marker line + :279 comment ===
+23: //	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+279: // diagnostics, not as a tool surface: task.list is DEFERRED (§7 :1531), and
+=== legs ruler exact lines ===
+181: 		t.Fatalf("BuiltinTaskEntries 没注册 task.cancel（现名册：%v）—— 说明书又在许诺一枚不存在的工具", names)
+182: 	}
+183: 	if len(names) != 2 {
+184: 		t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它）", len(names), names)
+185: 	}
+=== task_output_leg_test 138-152 ===
+	}
+}
+
+func mustRegisterTaskEntries(t *testing.T, d TaskDeps) *Registry {
+	t.Helper()
+	reg := NewRegistry()
+	for _, e := range BuiltinTaskEntries(d) {
+		if err := reg.Register(e); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return reg
+}
+
+// pointerRe pulls the 全文见 <path> out of the stub. The wording is the D15(3)
+=== task_output_leg_test 36-46 ===
+	t.Helper()
+	paths := NewPathCanonicalizer(allowed, nil)
+	reg := NewRegistry()
+	for _, e := range append(BuiltinFSEntries(FSDeps{Paths: paths}),
+		BuiltinTaskEntries(TaskDeps{Roster: roster})...) {
+		if err := reg.Register(e); err != nil {
+			t.Fatalf("Register(%s): %v", e.Tool.Name(), err)
+		}
+	}
+	return New(Options{
+		Registry: reg, Paths: paths,
+=== any test indexing BuiltinTaskEntries by position ===
+rc=1

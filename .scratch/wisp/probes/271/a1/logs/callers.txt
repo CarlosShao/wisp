@@ -1,0 +1,67 @@
+=== BuiltinTaskEntries callers (all repo, non-test + test) ===
+./.scratch/wisp/probes/163/a1/main.go:50:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: tools.NewTaskRoster()}) {
+./.scratch/wisp/probes/174/c1/zz174c1_windows_test.go:80:		for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: roster}) {
+./.scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go:47:		BuiltinTaskEntries(td)...) {
+./.scratch/wisp/probes/174/r1/zz174r1_before_windows_test.go:88:		tools.BuiltinTaskEntries(tools.TaskDeps{Roster: roster})...) {
+./.scratch/wisp/probes/174/r1/zz174r1_windows_test.go:74:		tools.BuiltinTaskEntries(tools.TaskDeps{Roster: roster, Paths: judge})...) {
+./.scratch/wisp/probes/174/r2/mut/task-M1.go:295:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/174/r2/mut/task-M2.go:295:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/174/r3/mut/task-MUTA.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/174/r3/mut/task-MUTB.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/174/r3/mut/task-MUTB2.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/174/r3/mut/test-flipped.go:54:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...) {
+./.scratch/wisp/probes/174/r4/pristine-task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/175/r1/main.go:90:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: roster}) {
+./.scratch/wisp/probes/175/r1/main.go:182:	e := tools.BuiltinTaskEntries(tools.TaskDeps{Roster: roster})[0]
+./.scratch/wisp/probes/175/r2/bak1-task.go:295:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/183/a1/mut/task.go:295:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/183/r2/mut/task-boxset-off.go:293:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/197/r1c/pre/subagent_197_test.go:199:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: h.roster}), BuiltinSubagentEntries(deps)...) {
+./.scratch/wisp/probes/197/r3b/pre/run.go:395:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+./.scratch/wisp/probes/198/v2/backup/run.go:544:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+./.scratch/wisp/probes/221/r1/mutations/m1-task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/r1/mutations/m2-task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/r1/mutations/m3-task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/control-task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m11-census-answer-deleted.go:79:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...)
+./.scratch/wisp/probes/221/v1/mutations/m11-census-answer-deleted.go:352:		BuiltinTaskEntries(TaskDeps{})...) {
+./.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:599:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:601:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:101:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: x.h.roster}), BuiltinSubagentEntries(deps)...) {
+./.scratch/wisp/probes/221/v1/mutations/teeth-control-test.go:171:	entries := BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()})
+./.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:101:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: x.h.roster}), BuiltinSubagentEntries(deps)...) {
+./.scratch/wisp/probes/221/v1/mutations/teeth-m13-list-marker-lifted-test.go:171:	entries := BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()})
+./.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:101:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: x.h.roster}), BuiltinSubagentEntries(deps)...) {
+./.scratch/wisp/probes/221/v1/mutations/teeth-m14-cancel-marked-again-test.go:171:	entries := BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()})
+./.scratch/wisp/probes/235/r1/mut-ac3-commentback/subagent_197_test.go:201:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: h.roster}), BuiltinSubagentEntries(deps)...) {
+./.scratch/wisp/probes/235/v1/mut/base-head-197.go:201:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: h.roster}), BuiltinSubagentEntries(deps)...) {
+./.scratch/wisp/probes/235/v1/mut/commentback_197_test.go:201:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: h.roster}), BuiltinSubagentEntries(deps)...) {
+./.scratch/wisp/probes/235/v1/mut/pre235-197_test.go:201:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: h.roster}), BuiltinSubagentEntries(deps)...) {
+./.scratch/wisp/probes/246/r2/mut/base-run.go:518:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+./cmd/wisp/run.go:544:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+./internal/tools/pointer_183_cli_seam_test.go:111:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...)
+./internal/tools/pointer_185_cli_seam_test.go:103:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...)
+./internal/tools/subagent_197_test.go:201:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: h.roster}), BuiltinSubagentEntries(deps)...) {
+./internal/tools/task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+./internal/tools/tasklist_deferred_236r3_teeth_test.go:130:	for _, e := range BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()}) {
+./internal/tools/task_cancel_221_legs_test.go:101:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: x.h.roster}), BuiltinSubagentEntries(deps)...) {
+./internal/tools/task_cancel_221_legs_test.go:171:	entries := BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()})
+./internal/tools/task_cancel_221_test.go:50:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths}),
+./internal/tools/task_output_leg_test.go:40:		BuiltinTaskEntries(TaskDeps{Roster: roster})...) {
+./internal/tools/task_output_leg_test.go:144:	for _, e := range BuiltinTaskEntries(d) {
+./internal/tools/task_output_pointer_notice_test.go:54:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...) {
+./internal/tools/ticket175r2_stamp_live_test.go:79:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...)
+./internal/tools/ticket175r2_stamp_live_test.go:353:		BuiltinTaskEntries(TaskDeps{})...) {
+
+=== bare symbol mentions (decl/construct/comment included) ===
+114
+
+=== TaskDeps construction sites ===
+51

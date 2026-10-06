@@ -1,0 +1,34 @@
+=== run.go:249 enclosing function ===
+181: func runTextTask(s runSpec) int {
+=== main.go 85-95 + 151-165 ===
+	// would exit the test binary, and the real-process form is ticket 128's
+	// TestAC2RealProcessRefusesOnEveryLegWithoutAppData128, which covers the other
+	// legs' refusals rather than this one.
+	switch args[0] {
+	case "run":
+		attachParentConsole()
+		os.Exit(cmdRun(args[1:]))
+	case "providers":
+		attachParentConsole()
+		os.Exit(cmdProviders(args[1:], providersIO{}))
+	case "doctor":
+func cmdRun(args []string) int {
+	printVersions("")
+	reply := interactiveStdin()
+	if reply == nil {
+		fmt.Fprintln(os.Stderr,
+			"wisp run: 本机没有可交互控制台，本轮没有人能答复卡片："+
+				"L2 卡会等到超时后按拒绝处理，L1 窗口没有人能否决（要能当场答复，请在终端里跑）")
+	}
+	return runTextTask(runSpec{
+		argv:   args,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
+		reply:  reply,
+	})
+}
+=== resident_task_source_windows.go:278 enclosing ===
+228: func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval) *residentTaskSource {
+=== who calls runTextTask ===
+cmd/wisp/main.go:159:	return runTextTask(runSpec{
+cmd/wisp/run.go:181:func runTextTask(s runSpec) int {

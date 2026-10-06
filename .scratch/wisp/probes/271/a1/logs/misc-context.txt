@@ -1,0 +1,45 @@
+=== cmd/wisp/firstrun_257_test.go:297 ===
+		if _, err := f.run(m); err == nil {
+			accepted[f.field] = true
+		}
+	}
+	if len(accepted) != 3 {
+		t.Errorf("AC#1 RED: a provider row alone unlocked %v (%d of 7), want 3 - the receipt promises %q",
+			accepted, len(accepted), t257TeachThreeOfSeven)
+	}
+=== cmd/wisp/resident_approval_246_windows_test.go:146 ===
+		t.Fatalf("RegisterShutdownHook(step 3): %v", err)
+	}
+
+	records := rt.Shutdown(false)
+	if len(records) != 10 {
+		t.Fatalf("audit trail = %d records, want the frozen 10", len(records))
+	}
+	step3 := records[proc.StepCancelTasks-1]
+=== cmd/wisp/secret_test.go:985 ===
+			t.Errorf("blob under %s holds the plaintext", env)
+		}
+		seen[string(raw)] = true
+	}
+	if len(seen) != 3 {
+		t.Fatalf("the three envs produced %d distinct blobs, want 3", len(seen))
+	}
+
+=== cmd/wisp/providers_test.go:112 ===
+		if !strings.HasPrefix(line, "  ") || strings.HasPrefix(line, "    ") {
+			continue // verdict rows carry exactly two leading spaces
+		}
+		fields := strings.Fields(line)
+		if len(fields) != 4 || fields[2] != "实测" {
+			t.Errorf("unrecognised two-space row in probe report: %q", line)
+			continue
+		}
+=== cmd/wisp/subagent_selfapproval_197_test.go:569 ===
+	}
+
+	// The one approval surface a tool can hold at all, and its whole method set.
+	gateNames := methodNames197(reflect.TypeOf((*tools.Gate)(nil)).Elem())
+	if len(gateNames) != 2 || !hasMethod197(gateNames, "PendingWindow") || !hasMethod197(gateNames, "PendingApproval") {
+		t.Errorf("tools.Gate 的方法集是 %v，想要 {PendingWindow, PendingApproval}。"+
+			"这是每个工具都摸得到的一枚接口：往上添任何一枚「答」的动作，就是给孩子开出口", gateNames)
+	}

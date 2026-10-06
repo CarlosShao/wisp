@@ -1,0 +1,67 @@
+=== 252r2 :290-320 ===
+			"(params=%d). The 'derived from the parameter alone' half of assertion d needs the ruler, not the "+
+			"production code, to be re-read.", len(params))
+	}
+	param := params[0].Names[0].Name
+
+	book, tainted, guards := survey252r2(fset, judge, recv)
+
+	// a. exactly two containments over the authorization book.
+	if len(book) != 2 {
+		lines := make([]string, 0, len(book))
+		for _, b := range book {
+			lines = append(lines, b.file+":"+strconv.Itoa(b.line)+" key="+b.keyText)
+		}
+		t.Errorf("TICKET 252 BAN RED (assertion a: two containments, not one): InAllowlist's body asks the "+
+			"authorization book %d times, want 2 (found: %v). AC#2's \"绝不许把两次包含改成一次\" is a hard ban, "+
+			"and the shape this fires on is exactly the one no value test can see: after 2b1a3071 every string "+
+			"production hands this function is already one form, so the two legs agree on all of them and a "+
+			"missing leg is invisible from outside. If this deletion was NOT intended, restore both legs at "+
+			"paths.go:196 and paths.go:209. If the code is right and the ruler is stale, the ruler is the thing "+
+			"that needs a human approval, not a green test run.", len(book), lines)
+	}
+	// b. each can refuse on its own.
+	for _, b := range book {
+		if !b.refuses {
+			t.Errorf("TICKET 252 BAN RED (assertion b: each containment must be able to refuse): the "+
+				"containment at %s:%d (key=%s) has no path to `return false` from its own result, so it computes "+
+				"an answer nobody acts on. One live leg is the ticket 107 hole.", b.file, b.line, b.keyText)
+		}
+	}
+	// c and d need both legs present to say anything.
+	if len(book) == 2 {
+		x, y := book[0], book[1]
+		if sameCallSet252r2(x.calls, y.calls) {
+=== subagent_197 :870-885 ===
+	childID := h2.childRow(t).TaskID
+	h2.muAdmit.Lock()
+	joined := strings.Join(h2.admits, ",")
+	h2.muAdmit.Unlock()
+	if !strings.Contains(joined, childID) {
+		t.Errorf("孩子的请求没有走宿主那一枚准入钩子（＝父队列）：%q", joined)
+	}
+	// 派生路径上没有第二枚队列/第二份 gate 可接：SubagentDeps 的字段只有装配、
+	// 目录、溯源、流四枚，没有一处能塞进"允许出口"。
+	if got := subagentDepsFieldNames(); len(got) != 5 {
+		t.Errorf("SubagentDeps 字段集合变了：%v（多出来的每一枚都要问一句是不是新的允许出口）", got)
+	}
+}
+
+// The stream key shape ticket 197 §0 froze, pinned at the source that writes it.
+func Test197StreamKeyShapeIsLiteral(t *testing.T) {
+=== cmd/wisp count hits (all files) ===
+cmd/wisp/ticket224_assembly_test.go:132:	if len(printed) == 0 {
+cmd/wisp/ticket224_assembly_test.go:334:	if len(rows) != 1 || rows[0].ID != rowID {
+cmd/wisp/ticket224_assembly_test.go:504:		} else if len(old) != 1 || old[0].ID != rowID1 {
+cmd/wisp/ticket224_assembly_test.go:550:	if len(all) != 1 || all[0].SessionID != id1 || all[0].ID != rowID1 {
+cmd/wisp/run_test.go:182:	if len(notices) == 0 {
+cmd/wisp/run_test.go:240:	if len(f.notices) == 0 {
+cmd/wisp/run_test.go:303:	if len(rows) != 1 {
+cmd/wisp/run_mode101_test.go:250:	if len(gotAsked) != 1 || gotAsked[0] != risk.ModeAutoApprove {
+cmd/wisp/run_mode101_test.go:525:	if len(all) != 1 || all[0].SessionID != session || all[0].ID != id {
+cmd/wisp/providers_test.go:112:		if len(fields) != 4 || fields[2] != "实测" {
+cmd/wisp/providers_test.go:126:	if len(verdicts) == 0 {
+cmd/wisp/instructions_200r2_test.go:208:	if len(secOff.Files) != 0 {
+=== any 'want N 枚' / 'tools, want' assertions in the two dirs ===
+internal/tools/bridge_a18_kill_windows_test.go:219:			t.Fatalf("真 kill 之后的 .wisp-tmp-* 残留 = %v, want 1 个。"+
+internal/tools/fs_edit_ac4b_kill_windows_test.go:230:		t.Fatalf("AC#4b(b) violated：真硬杀之后 %s 目录里的 .wisp-tmp-* 残件 = %d 枚（%v），want 1 枚。\n"+

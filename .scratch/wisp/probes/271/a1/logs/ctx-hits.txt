@@ -1,0 +1,355 @@
+internal/tools/bridge_a18_kill_windows_test.go-217-		before := stagingFiles(t, auth)
+internal/tools/bridge_a18_kill_windows_test.go:218:		if len(before) != 1 {
+internal/tools/bridge_a18_kill_windows_test.go-219-			t.Fatalf("真 kill 之后的 .wisp-tmp-* 残留 = %v, want 1 个。"+
+internal/tools/bridge_a18_kill_windows_test.go-220-				"这条是 ③ 的阳性对照：kill 本身没留下残口的话，\"扫干净了\"就什么都不是。"+
+internal/tools/bridge_a18_kill_windows_test.go-244-		}
+internal/tools/bridge_a18_kill_windows_test.go:245:		if after := stagingFiles(t, auth); len(after) != 0 {
+internal/tools/bridge_a18_kill_windows_test.go-246-			t.Fatalf("下一次写盘没有清扫历史残留 (%v -> %v)：A18 的残口仍然开着——"+
+internal/tools/bridge_a18_kill_windows_test.go-247-				"清扫器（internal/tools/fs_staging.go）被摘掉了或者归因失败", before, after)
+internal/tools/bridge_junction_windows_test.go-458-	}
+internal/tools/bridge_junction_windows_test.go:459:	if len(d.Paths) != 1 || !strings.Contains(d.Paths[0], "无法规范化") {
+internal/tools/bridge_junction_windows_test.go-460-		t.Errorf("卡面上的目标 = %v, want 带'无法规范化'标记（今天的形状）", d.Paths)
+internal/tools/bridge_junction_windows_test.go-461-	}
+internal/tools/bridge_junction_windows_test.go-516-	// shortened spelling cannot be allowed to hide the real target.
+internal/tools/bridge_junction_windows_test.go:517:	if len(d.Paths) != 1 || !strings.EqualFold(d.Paths[0], mustCanonical(t, long)) {
+internal/tools/bridge_junction_windows_test.go-518-		t.Errorf("决策里显示的路径 = %v, want 解析后的长路径 %s", d.Paths, mustCanonical(t, long))
+internal/tools/bridge_junction_windows_test.go-519-	}
+internal/tools/bridge_junction_windows_test.go-554-		}
+internal/tools/bridge_junction_windows_test.go:555:		if len(d.Paths) != 1 || !strings.EqualFold(d.Paths[0], wantCanon) {
+internal/tools/bridge_junction_windows_test.go-556-			t.Errorf("卡面上的路径 = %v, want 长路径 %s（短名不许替真目标打掩护）", d.Paths, wantCanon)
+internal/tools/bridge_junction_windows_test.go-557-		}
+internal/tools/bridge_junction_windows_test.go-575-		d := g.approvalDecision()
+internal/tools/bridge_junction_windows_test.go:576:		if d.Level != risk.L2 || len(d.Paths) != 1 ||
+internal/tools/bridge_junction_windows_test.go-577-			!strings.EqualFold(d.Paths[0], wantCanon) {
+internal/tools/bridge_junction_windows_test.go-578-			t.Fatalf("人批准的卡必须说清它批准了哪个文件: %+v", d)
+internal/tools/bridge_junction_windows_test.go-616-	}
+internal/tools/bridge_junction_windows_test.go:617:	if len(rows) != 1 {
+internal/tools/bridge_junction_windows_test.go-618-		t.Fatalf("booked %d rows, want 1: %+v", len(rows), rows)
+internal/tools/bridge_junction_windows_test.go-619-	}
+internal/tools/bridge_scope_open_ticket158_test.go-129-	}
+internal/tools/bridge_scope_open_ticket158_test.go:130:	if len(hit) == 0 {
+internal/tools/bridge_scope_open_ticket158_test.go-131-		t.Fatalf("收尾审计行没有承认这枚 scope 是开过的：找不到含 %q 的行；"+
+internal/tools/bridge_scope_open_ticket158_test.go-132-			"C25 scope closed 全部读数=%q\n"+
+internal/tools/bridge_test.go-103-	defer g.mu.Unlock()
+internal/tools/bridge_test.go:104:	if len(g.windows) == 0 {
+internal/tools/bridge_test.go-105-		return Decision{}
+internal/tools/bridge_test.go-106-	}
+internal/tools/bridge_test.go-112-	defer g.mu.Unlock()
+internal/tools/bridge_test.go:113:	if len(g.approvals) == 0 {
+internal/tools/bridge_test.go-114-		return Decision{}
+internal/tools/bridge_test.go-115-	}
+internal/tools/bridge_test.go-291-func TestCapabilitySetIsFrozen(t *testing.T) {
+internal/tools/bridge_test.go:292:	if len(AllCapabilities) != 11 {
+internal/tools/bridge_test.go-293-		t.Fatalf("C3 has %d tokens, want 11", len(AllCapabilities))
+internal/tools/bridge_test.go-294-	}
+internal/tools/bridge_test.go-732-	}
+internal/tools/bridge_test.go:733:	if len(dir) != 0 {
+internal/tools/bridge_test.go-734-		t.Fatalf("empty bridge reports %d tools", len(dir))
+internal/tools/bridge_test.go-735-	}
+internal/tools/fswrite_silentloss_ac1_test.go-169-	}
+internal/tools/fswrite_silentloss_ac1_test.go:170:	if len(rows) != 1 {
+internal/tools/fswrite_silentloss_ac1_test.go-171-		t.Fatalf("want exactly the one booked fs.write row, got %d", len(rows))
+internal/tools/fswrite_silentloss_ac1_test.go-172-	}
+internal/tools/fs_edit_ac34_test.go-459-	// (0) the seam actually fired at the byte boundary we named, and only there.
+internal/tools/fs_edit_ac34_test.go:460:	if len(killed) == 0 || killed[0] != "create-temp" {
+internal/tools/fs_edit_ac34_test.go-461-		t.Fatalf("expected the write to reach the staging boundaries, got %q", killed)
+internal/tools/fs_edit_ac34_test.go-462-	}
+internal/tools/fs_edit_ac34_test.go-478-	}
+internal/tools/fs_edit_ac34_test.go:479:	if len(out.AppliedSteps) == 0 {
+internal/tools/fs_edit_ac34_test.go-480-		t.Fatalf("the D31 ledger must say what landed before the stop: %+v", out)
+internal/tools/fs_edit_ac34_test.go-481-	}
+internal/tools/fs_edit_ac3b_test.go-117-	}
+internal/tools/fs_edit_ac3b_test.go:118:	if len(original) != 14 || !strings.HasPrefix(readString(t, target), utf8BOM) {
+internal/tools/fs_edit_ac3b_test.go-119-		t.Fatalf("the fixture is not a 14-byte BOM file: %d bytes, % x", len(original), []byte(original))
+internal/tools/fs_edit_ac3b_test.go-120-	}
+internal/tools/fs_edit_ac4b_kill_windows_test.go-228-	residue := stagingFiles(t, dir)
+internal/tools/fs_edit_ac4b_kill_windows_test.go:229:	if len(residue) != 1 {
+internal/tools/fs_edit_ac4b_kill_windows_test.go-230-		t.Fatalf("AC#4b(b) violated：真硬杀之后 %s 目录里的 .wisp-tmp-* 残件 = %d 枚（%v），want 1 枚。\n"+
+internal/tools/fs_edit_ac4b_kill_windows_test.go-231-			"0 枚＝taskkill 没打断任何事，或者有别的东西跑了清理；多枚＝计数尺坏了。\n"+
+internal/tools/fs_edit_ac5_gate_r4_test.go-78-	}
+internal/tools/fs_edit_ac5_gate_r4_test.go:79:	if len(hits) == 0 {
+internal/tools/fs_edit_ac5_gate_r4_test.go-80-		t.Fatalf("wanted an audit line for %s carrying %v, got none in %q", tool, wantSubs, audit)
+internal/tools/fs_edit_ac5_gate_r4_test.go-81-	}
+internal/tools/fs_edit_ac5_gate_r4_test.go-394-	}
+internal/tools/fs_edit_ac5_gate_r4_test.go:395:	if len(entries) != 0 {
+internal/tools/fs_edit_ac5_gate_r4_test.go-396-		t.Errorf("a refused call left %d entries under the root: %v", len(entries), entries)
+internal/tools/fs_edit_ac5_gate_r4_test.go-397-	}
+internal/tools/fs_edit_ac5_sweep_r4_windows_test.go-62-	// (b) nothing of THIS write is left behind either: the rename consumed it.
+internal/tools/fs_edit_ac5_sweep_r4_windows_test.go:63:	if left := stagingFiles(t, root); len(left) != 0 {
+internal/tools/fs_edit_ac5_sweep_r4_windows_test.go-64-		t.Errorf("写盘后目录里仍留 %d 枚 .wisp-tmp-*：%v", len(left), left)
+internal/tools/fs_edit_ac5_sweep_r4_windows_test.go-65-	}
+internal/tools/fs_edit_test.go-93-	}
+internal/tools/fs_edit_test.go:94:	if len(out.AppliedSteps) != 0 {
+internal/tools/fs_edit_test.go-95-		t.Errorf("a refusal must have an empty ledger, got %q", out.AppliedSteps)
+internal/tools/fs_edit_test.go-96-	}
+internal/tools/fs_test.go-34-	// context, so a later exfil call carrying the same fragment must hit R4.
+internal/tools/fs_test.go:35:	if got := prov.ScopeTaints("task-1"); len(got) != 1 {
+internal/tools/fs_test.go-36-		t.Fatalf("task scope carries %d tainted sources, want 1 (fs.read result)", len(got))
+internal/tools/fs_test.go-37-	} else {
+internal/tools/fs_test.go-109-	// and marking it would flood the taint index.
+internal/tools/fs_test.go:110:	if got := b.prov.ScopeTaints("task-1"); len(got) != 0 {
+internal/tools/fs_test.go-111-		t.Errorf("fs.list marked %d tainted sources, want 0", len(got))
+internal/tools/fs_test.go-112-	}
+internal/tools/fs_test.go-189-	entries := BuiltinFSEntries(FSDeps{Paths: paths})
+internal/tools/fs_test.go:190:	if len(entries) != 6 {
+internal/tools/fs_test.go-191-		t.Fatalf("the default fs roster has %d tools, want 6 (read/list/write/edit/trash/move)", len(entries))
+internal/tools/fs_test.go-192-	}
+internal/tools/fs_test.go-234-	entries := BuiltinFSEntries(FSDeps{Paths: paths, DeleteEnabled: true})
+internal/tools/fs_test.go:235:	if len(entries) != 7 {
+internal/tools/fs_test.go-236-		t.Fatalf("with delete_enabled the roster has %d tools, want 7", len(entries))
+internal/tools/fs_test.go-237-	}
+internal/tools/fs_test.go-249-	}
+internal/tools/fs_test.go:250:	if len(del.Needs) != 1 || del.Needs[0] != CapFSWrite {
+internal/tools/fs_test.go-251-		t.Errorf("fs.delete needs %v, want [fs.write]", del.Needs)
+internal/tools/fs_test.go-252-	}
+internal/tools/fs_test.go-262-	}
+internal/tools/fs_test.go:263:	if len(dir) != 6 {
+internal/tools/fs_test.go-264-		t.Fatalf("directory has %d entries: %+v", len(dir), dir)
+internal/tools/fs_test.go-265-	}
+internal/tools/fs_test.go-280-		}
+internal/tools/fs_test.go:281:		if len(ti.Parameters) == 0 || ti.Description == "" {
+internal/tools/fs_test.go-282-			t.Errorf("%s: empty schema or description", ti.Name)
+internal/tools/fs_test.go-283-		}
+internal/tools/fs_write_test.go-43-	defer d.mu.Unlock()
+internal/tools/fs_write_test.go:44:	if len(d.all) == 0 {
+internal/tools/fs_write_test.go-45-		return Decision{}
+internal/tools/fs_write_test.go-46-	}
+internal/tools/fs_write_test.go-392-		noStagingFilesLeft(t, root)
+internal/tools/fs_write_test.go:393:		if len(out.AppliedSteps) == 0 {
+internal/tools/fs_write_test.go-394-			t.Errorf("the ledger must say what landed: %q", out.Text)
+internal/tools/fs_write_test.go-395-		}
+internal/tools/fs_write_test.go-832-	bus.mu.Unlock()
+internal/tools/fs_write_test.go:833:	if len(reported) == 0 {
+internal/tools/fs_write_test.go-834-		t.Fatal("Report() was called with an empty ledger while the tool had applied steps")
+internal/tools/fs_write_test.go-835-	}
+internal/tools/fs_write_test.go-843-	}
+internal/tools/fs_write_test.go:844:	if got := bus.completed(); len(got) != 1 || got[0] != "corr-1" {
+internal/tools/fs_write_test.go-845-		t.Errorf("the bridge must release the call's tracking, got %v", got)
+internal/tools/fs_write_test.go-846-	}
+internal/tools/grant_test.go-89-	}
+internal/tools/grant_test.go:90:	if g.errOn || len(paths) == 0 {
+internal/tools/grant_test.go-91-		return 0, false
+internal/tools/grant_test.go-92-	}
+internal/tools/grant_test.go-138-	defer j.mu.Unlock()
+internal/tools/grant_test.go:139:	if len(j.calls) == 0 {
+internal/tools/grant_test.go-140-		return memory.ToolCall{}, false
+internal/tools/grant_test.go-141-	}
+internal/tools/grant_test.go-230-	asked := grants.asked()
+internal/tools/grant_test.go:231:	if len(asked) == 0 {
+internal/tools/grant_test.go-232-		t.Fatal("the bridge never consulted the grant source, so the zero above is an accident")
+internal/tools/grant_test.go-233-	}
+internal/tools/grant_test.go-324-	}
+internal/tools/grant_test.go:325:	if got := grD.asked(); len(got) != 0 {
+internal/tools/grant_test.go-326-		t.Errorf("the bridge queried the grant source %d times for an L2 verdict (%v); the L2 "+
+internal/tools/grant_test.go-327-			"branch must not reach the check at all, so a future edit cannot make it answer "+
+internal/tools/grant_test.go-339-	}
+internal/tools/grant_test.go:340:	if got := grJ.asked(); len(got) != 0 {
+internal/tools/grant_test.go-341-		t.Errorf("the bridge queried the grant source for an R2 call (%v), want no query", got)
+internal/tools/grant_test.go-342-	}
+internal/tools/grant_test.go-373-	}
+internal/tools/grant_test.go:374:	if got := grants.asked(); len(got) != 0 {
+internal/tools/grant_test.go-375-		t.Errorf("the grant source was consulted on a Deny (%v); Deny must return before the "+
+internal/tools/grant_test.go-376-			"check, otherwise the refusal is one flipped comparison from silence", got)
+internal/tools/grant_test.go-429-	}
+internal/tools/grant_test.go:430:	if got := grants.asked(); len(got) != 0 {
+internal/tools/grant_test.go-431-		t.Errorf("a pathless call consulted the grant source (%v), want no query at all", got)
+internal/tools/grant_test.go-432-	}
+internal/tools/helpers_test.go-37-	var paths *PathCanonicalizer
+internal/tools/helpers_test.go:38:	if len(allowed) == 0 {
+internal/tools/helpers_test.go-39-		paths = NewPathCanonicalizer(nil, nil)
+internal/tools/helpers_test.go-40-	} else {
+internal/tools/loop_approval_test.go-184-	cards := f.ui.cards()
+internal/tools/loop_approval_test.go:185:	if len(cards) != 1 {
+internal/tools/loop_approval_test.go-186-		t.Fatalf("the gate displayed %d cards, want exactly the one L1 window", len(cards))
+internal/tools/loop_approval_test.go-187-	}
+internal/tools/loop_approval_test.go-202-	rows := f.rows(t, res.TaskID)
+internal/tools/loop_approval_test.go:203:	if len(rows) != 1 {
+internal/tools/loop_approval_test.go-204-		t.Fatalf("tool_call rows = %d, want exactly one per call: %+v", len(rows), rows)
+internal/tools/loop_approval_test.go-205-	}
+internal/tools/loop_approval_test.go-233-	}
+internal/tools/loop_approval_test.go:234:	if len(res.ToolLog) != 1 || !res.ToolLog[0].Rejected {
+internal/tools/loop_approval_test.go-235-		t.Fatalf("the call must be refused before execution:\n%s", dumpToolLog(res))
+internal/tools/loop_approval_test.go-236-	}
+internal/tools/loop_approval_test.go-245-	}
+internal/tools/loop_approval_test.go:246:	if rows := f.rows(t, res.TaskID); len(rows) != 1 ||
+internal/tools/loop_approval_test.go-247-		rows[0].Decision != agent.DecisionReject || rows[0].RiskLevel != memory.RiskL1 {
+internal/tools/loop_approval_test.go-248-		t.Errorf("the refusal must still be booked, as L1/reject: %+v", rows)
+internal/tools/pathshape_portable_test.go-35-	pc := NewPathCanonicalizer([]string{dir}, nil)
+internal/tools/pathshape_portable_test.go:36:	if bad := pc.UnusableRoots(); len(bad) != 0 {
+internal/tools/pathshape_portable_test.go-37-		t.Fatalf("the allowlist root was rejected: %v", bad)
+internal/tools/pathshape_portable_test.go-38-	}
+internal/tools/paths_rewrite_ticket102_test.go-29-	rewrote := pc.RewrittenRoots()
+internal/tools/paths_rewrite_ticket102_test.go:30:	if len(rewrote) != 1 {
+internal/tools/paths_rewrite_ticket102_test.go-31-		t.Fatalf("RewrittenRoots() = %v, want the one %q root recorded", rewrote, spelled)
+internal/tools/paths_rewrite_ticket102_test.go-32-	}
+internal/tools/paths_rewrite_ticket102_test.go-38-	plain := NewPathCanonicalizer([]string{sub}, nil)
+internal/tools/paths_rewrite_ticket102_test.go:39:	if got := plain.RewrittenRoots(); len(got) != 0 {
+internal/tools/paths_rewrite_ticket102_test.go-40-		t.Errorf("RewrittenRoots() = %v for a root spelled as an absolute path, want empty", got)
+internal/tools/paths_rewrite_ticket102_test.go-41-	}
+internal/tools/paths_shortname_252_probe_test.go-167-	pc := NewPathCanonicalizer(c.rootsCfg, nil)
+internal/tools/paths_shortname_252_probe_test.go:168:	if u := pc.UnusableRoots(); len(u) != 0 {
+internal/tools/paths_shortname_252_probe_test.go-169-		t.Fatalf("carrier broken: NewPathCanonicalizer dropped a configured root: %q", u)
+internal/tools/paths_shortname_252_probe_test.go-170-	}
+internal/tools/paths_shortname_252_r1_test.go-46-	pc := NewPathCanonicalizer(rootsCfg, nil)
+internal/tools/paths_shortname_252_r1_test.go:47:	if bad := pc.UnusableRoots(); len(bad) != 0 {
+internal/tools/paths_shortname_252_r1_test.go-48-		t.Fatalf("carrier broken: NewPathCanonicalizer dropped a configured root: %q", bad)
+internal/tools/paths_shortname_252_r1_test.go-49-	}
+internal/tools/paths_ticket107b_probes_test.go-125-	// and the deny leg's reason name a tree that exists rather than a link.
+internal/tools/paths_ticket107b_probes_test.go:126:	if r := pc.Roots(); len(r) != 0 {
+internal/tools/paths_ticket107b_probes_test.go-127-		t.Errorf("AC#3 RED: Roots() = %v: the named root %q is a link onto %q, so it authorizes nothing and must not be in the book",
+internal/tools/paths_ticket107b_probes_test.go-128-			r, spelled, outside)
+internal/tools/paths_ticket107b_probes_test.go-129-	}
+internal/tools/paths_ticket107b_probes_test.go:130:	if u := pc.UnusableRoots(); len(u) == 0 {
+internal/tools/paths_ticket107b_probes_test.go-131-		t.Errorf("UnusableRoots() is empty: a dropped root must leave the operator a reason, got roots=%v", pc.Roots())
+internal/tools/paths_ticket107b_probes_test.go-132-	}
+internal/tools/paths_twocontainments_252_r2_test.go-108-	pc := NewPathCanonicalizer([]string{proj}, nil)
+internal/tools/paths_twocontainments_252_r2_test.go:109:	if u := pc.UnusableRoots(); len(u) != 0 {
+internal/tools/paths_twocontainments_252_r2_test.go-110-		t.Fatalf("carrier broken: the configured root was dropped: %q", u)
+internal/tools/paths_twocontainments_252_r2_test.go-111-	}
+internal/tools/paths_twocontainments_252_r2_test.go:112:	if r := pc.Roots(); len(r) != 1 {
+internal/tools/paths_twocontainments_252_r2_test.go-113-		t.Fatalf("carrier broken: roots = %q, want the one named tree", r)
+internal/tools/paths_twocontainments_252_r2_test.go-114-	}
+internal/tools/paths_twocontainments_252_r2_test.go-212-			fd, ok := d.(*ast.FuncDecl)
+internal/tools/paths_twocontainments_252_r2_test.go:213:			if !ok || fd.Name.Name != "InAllowlist" || fd.Recv == nil || len(fd.Recv.List) != 1 {
+internal/tools/paths_twocontainments_252_r2_test.go-214-				continue
+internal/tools/paths_twocontainments_252_r2_test.go-215-			}
+internal/tools/paths_twocontainments_252_r2_test.go-220-	}
+internal/tools/paths_twocontainments_252_r2_test.go:221:	if len(found) == 0 {
+internal/tools/paths_twocontainments_252_r2_test.go-222-		t.Fatalf("S1 has nothing to measure: no method named InAllowlist on a PathCanonicalizer receiver "+
+internal/tools/paths_twocontainments_252_r2_test.go-223-			"in any of the %d non-test .go files of this package. If the seam moved packages, this ruler must "+
+internal/tools/paths_twocontainments_252_r2_test.go-285-	params := judge.Type.Params.List
+internal/tools/paths_twocontainments_252_r2_test.go:286:	if len(params) != 1 || len(params[0].Names) != 1 {
+internal/tools/paths_twocontainments_252_r2_test.go-287-		t.Fatalf("S1's shape assumption broke: InAllowlist no longer takes exactly one named parameter "+
+internal/tools/paths_twocontainments_252_r2_test.go-288-			"(params=%d). The 'derived from the parameter alone' half of assertion d needs the ruler, not the "+
+internal/tools/paths_twocontainments_252_r2_test.go-295-	// a. exactly two containments over the authorization book.
+internal/tools/paths_twocontainments_252_r2_test.go:296:	if len(book) != 2 {
+internal/tools/paths_twocontainments_252_r2_test.go-297-		lines := make([]string, 0, len(book))
+internal/tools/paths_twocontainments_252_r2_test.go-298-		for _, b := range book {
+internal/tools/paths_twocontainments_252_r2_test.go-317-	// c and d need both legs present to say anything.
+internal/tools/paths_twocontainments_252_r2_test.go:318:	if len(book) == 2 {
+internal/tools/paths_twocontainments_252_r2_test.go-319-		x, y := book[0], book[1]
+internal/tools/paths_twocontainments_252_r2_test.go-320-		if sameCallSet252r2(x.calls, y.calls) {
+internal/tools/paths_twocontainments_252_r2_test.go-371-		}
+internal/tools/paths_twocontainments_252_r2_test.go:372:		if len(as.Rhs) != 1 {
+internal/tools/paths_twocontainments_252_r2_test.go-373-			return true
+internal/tools/paths_twocontainments_252_r2_test.go-374-		}
+internal/tools/paths_twocontainments_252_r2_test.go-412-		call, ok := n.(*ast.CallExpr)
+internal/tools/paths_twocontainments_252_r2_test.go:413:		if !ok || len(call.Args) != 2 {
+internal/tools/paths_twocontainments_252_r2_test.go-414-			return true
+internal/tools/paths_twocontainments_252_r2_test.go-415-		}
+internal/tools/paths_twocontainments_252_r2_test.go-580-		}
+internal/tools/paths_twocontainments_252_r2_test.go:581:		if len(r.Results) == 1 {
+internal/tools/paths_twocontainments_252_r2_test.go-582-			if id, ok := r.Results[0].(*ast.Ident); ok && id.Name == "false" {
+internal/tools/paths_twocontainments_252_r2_test.go-583-				found = true
+internal/tools/paths_twocontainments_252_r2_windows_test.go-71-			pc := NewPathCanonicalizer([]string{long}, nil)
+internal/tools/paths_twocontainments_252_r2_windows_test.go:72:			if u := pc.UnusableRoots(); len(u) != 0 {
+internal/tools/paths_twocontainments_252_r2_windows_test.go-73-				t.Fatalf("carrier broken: the configured root was dropped: %q", u)
+internal/tools/paths_twocontainments_252_r2_windows_test.go-74-			}
+internal/tools/paths_workspace_account_181r3_test.go-68-	}
+internal/tools/paths_workspace_account_181r3_test.go:69:	if got.Rewritten || len(got.Rewrites) != 0 {
+internal/tools/paths_workspace_account_181r3_test.go-70-		t.Errorf("rewritten=%v rewrites=%v for a spelling C26 substituted nothing in", got.Rewritten, got.Rewrites)
+internal/tools/paths_workspace_account_181r3_test.go-71-	}
+internal/tools/pointer_183_cli_seam_test.go-200-	}
+internal/tools/pointer_183_cli_seam_test.go:201:	if mark := prov.ScopeTaints(task); len(mark) == 0 {
+internal/tools/pointer_183_cli_seam_test.go-202-		t.Fatal("precondition: task.output 没盖戳，绿色就不是豁免给的（票 175 的破口本身）")
+internal/tools/pointer_183_cli_seam_test.go-203-	}
+internal/tools/subagent_197_test.go-240-	rows := h.childRows()
+internal/tools/subagent_197_test.go:241:	if len(rows) != 1 {
+internal/tools/subagent_197_test.go-242-		t.Fatalf("名册里子代理行数 = %d, want 1（%+v）", len(rows), rows)
+internal/tools/subagent_197_test.go-243-	}
+internal/tools/subagent_197_test.go-375-	rows := h.childRows()
+internal/tools/subagent_197_test.go:376:	if len(rows) != 1 {
+internal/tools/subagent_197_test.go-377-		t.Fatalf("孩子正在跑，名册里却有 %d 行（跑起来才登记＝界面在说谎）", len(rows))
+internal/tools/subagent_197_test.go-378-	}
+internal/tools/subagent_197_test.go-649-	}
+internal/tools/subagent_197_test.go:650:	if len(list) != 1 {
+internal/tools/subagent_197_test.go-651-		t.Errorf("孩子的目录少了不该少的工具：%+v", list)
+internal/tools/subagent_197_test.go-652-	}
+internal/tools/subagent_197_test.go-675-	rows := h.childRows()
+internal/tools/subagent_197_test.go:676:	if len(rows) != 1 {
+internal/tools/subagent_197_test.go-677-		t.Fatalf("名册里出现第二代（深度上限 1 被破）：%+v", rows)
+internal/tools/subagent_197_test.go-678-	}
+internal/tools/subagent_197_test.go:679:	if grand := h.roster.Descendants(rows[0].TaskID); len(grand) != 0 {
+internal/tools/subagent_197_test.go-680-		t.Errorf("孙代理行数 = %d, want 0：%+v", len(grand), grand)
+internal/tools/subagent_197_test.go-681-	}
+internal/tools/subagent_197_test.go-878-	// 目录、溯源、流四枚，没有一处能塞进"允许出口"。
+internal/tools/subagent_197_test.go:879:	if got := subagentDepsFieldNames(); len(got) != 5 {
+internal/tools/subagent_197_test.go-880-		t.Errorf("SubagentDeps 字段集合变了：%v（多出来的每一枚都要问一句是不是新的允许出口）", got)
+internal/tools/subagent_197_test.go-881-	}
+internal/tools/tasklist_deferred_236r3_teeth_test.go-138-	}
+internal/tools/tasklist_deferred_236r3_teeth_test.go:139:	if len(names) == 0 {
+internal/tools/tasklist_deferred_236r3_teeth_test.go-140-		t.Fatal("一枚 task 家族工具都没注册到：这把尺没在扫任何东西（分母为空＝判据失效）")
+internal/tools/tasklist_deferred_236r3_teeth_test.go-141-	}
+internal/tools/task_cancel_221_legs_test.go-182-	}
+internal/tools/task_cancel_221_legs_test.go:183:	if len(names) != 2 {
+internal/tools/task_cancel_221_legs_test.go-184-		t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它）", len(names), names)
+internal/tools/task_cancel_221_legs_test.go-185-	}
+internal/tools/task_cancel_221_legs_test.go-189-	}
+internal/tools/task_cancel_221_legs_test.go:190:	if len(decl.Capabilities) != 0 || len(decl.Needs) != 0 {
+internal/tools/task_cancel_221_legs_test.go-191-		t.Errorf("task.cancel 的能力声明 = %v / %v, want 两枚都空（那行的第四列是「—」）", decl.Capabilities, decl.Needs)
+internal/tools/task_cancel_221_legs_test.go-192-	}
+internal/tools/task_cancel_221_legs_test.go:193:	if len(decl.PathParams) != 0 {
+internal/tools/task_cancel_221_legs_test.go-194-		t.Errorf("task.cancel 的 PathParams = %v, want 空：唯一的模型输入是名册 id，不是路径", decl.PathParams)
+internal/tools/task_cancel_221_legs_test.go-195-	}
+internal/tools/task_cancel_221_test.go-64-	}
+internal/tools/task_cancel_221_test.go:65:	if len(out) == 0 {
+internal/tools/task_cancel_221_test.go-66-		t.Fatal("一枚内置工具都没注册到，这把尺就是空转")
+internal/tools/task_cancel_221_test.go-67-	}
+internal/tools/task_cancel_221_test.go-129-	// denominator means it is scanning nothing at all, which must not read green.
+internal/tools/task_cancel_221_test.go:130:	if len(roots) == 0 {
+internal/tools/task_cancel_221_test.go-131-		t.Fatal("说明书里一枚 task.* 都没提：这把尺没在扫任何东西（分母非空、分子为空＝判据失效）")
+internal/tools/task_cancel_221_test.go-132-	}
+internal/tools/task_output_leg_test.go-262-	// 4 bytes-per-token heuristic is what PLAN.md:431 freezes.
+internal/tools/task_output_leg_test.go:263:	if len(head) != 500*4 {
+internal/tools/task_output_leg_test.go-264-		t.Errorf("head = %d bytes, want %d (D15 head 500 tokens x 4)", len(head), 500*4)
+internal/tools/task_output_leg_test.go-265-	}
+internal/tools/task_output_leg_test.go:266:	if len(tail) != 200*4 {
+internal/tools/task_output_leg_test.go-267-		t.Errorf("tail = %d bytes, want %d (D15 tail 200 tokens x 4)", len(tail), 200*4)
+internal/tools/task_output_leg_test.go-268-	}
+internal/tools/task_state_188_test.go-358-	}
+internal/tools/task_state_188_test.go:359:	if len(found) != 0 {
+internal/tools/task_state_188_test.go-360-		for _, f := range found {
+internal/tools/task_state_188_test.go-361-			t.Errorf("panel-side write leg for the task status dimension: %s:%d %s", f.file, f.line, f.why)
+internal/tools/task_state_188_test.go-422-		}
+internal/tools/task_state_188_test.go:423:		if len(got) == 0 {
+internal/tools/task_state_188_test.go-424-			t.Errorf("positive control %s went GREEN: the AC#3 gate does not catch a panel-side write leg", name)
+internal/tools/task_state_188_test.go-425-			continue
+internal/tools/task_state_188_test.go-458-	}
+internal/tools/task_state_188_test.go:459:	if len(got) != 0 {
+internal/tools/task_state_188_test.go-460-		for _, f := range got {
+internal/tools/task_state_188_test.go-461-			t.Errorf("the AC#3 gate caught a panel-side READER at %s:%d (%s): it is aimed too wide and would put ticket 145's pump leg in its own red",
+internal/tools/ticket175r2_stamp_live_test.go-355-	}
+internal/tools/ticket175r2_stamp_live_test.go:356:	if len(names) == 0 {
+internal/tools/ticket175r2_stamp_live_test.go-357-		t.Fatal("一枚内置工具都没注册到，这条普查就是空转")
+internal/tools/ticket175r2_stamp_live_test.go-358-	}
+internal/tools/ticket224_setter_scope_test.go-52-	}
+internal/tools/ticket224_setter_scope_test.go:53:	if len(grantFields) != 1 {
+internal/tools/ticket224_setter_scope_test.go-54-		t.Fatalf("Bridge carries %d grant-shaped fields, want exactly 1: %v. The pre-224 bridge "+
+internal/tools/ticket224_setter_scope_test.go-55-			"carried none and ticket 224 added one read seam; a second channel is a second place "+
+internal/tools/ticket90_test.go-143-	defer g.mu.Unlock()
+internal/tools/ticket90_test.go:144:	if len(g.seen) == 0 {
+internal/tools/ticket90_test.go-145-		return Decision{}
+internal/tools/ticket90_test.go-146-	}
+internal/tools/ticket90_test.go-208-		defer emMu.Unlock()
+internal/tools/ticket90_test.go:209:		if len(emitted) == 0 {
+internal/tools/ticket90_test.go-210-			return Decision{}
+internal/tools/ticket90_test.go-211-		}
+internal/tools/ticket90_test.go-536-	}
+internal/tools/ticket90_test.go:537:	if len(note.Unlockable) != 1 {
+internal/tools/ticket90_test.go-538-		t.Errorf("Unlockable = %v, want the one B-tier path", note.Unlockable)
+internal/tools/ticket90_test.go-539-	}
+internal/tools/ticket90_test.go:540:	if len(note.AlreadyUnlocked) != 0 {
+internal/tools/ticket90_test.go-541-		t.Errorf("AlreadyUnlocked = %v with no confirmations on file, want empty", note.AlreadyUnlocked)
+internal/tools/ticket90_test.go-542-	}
+internal/tools/wiring_test.go-126-	cards := ui.cards()
+internal/tools/wiring_test.go:127:	if len(cards) != 1 {
+internal/tools/wiring_test.go-128-		t.Fatalf("the gate displayed %d cards, want exactly the one L1 window", len(cards))
+internal/tools/wiring_test.go-129-	}
+internal/tools/wiring_test.go-227-	}
+internal/tools/wiring_test.go:228:	if len(out.AppliedSteps) == 0 {
+internal/tools/wiring_test.go-229-		t.Error("the outcome carries no ledger even though the tool applied steps")
+internal/tools/wiring_test.go-230-	}
+cmd/wisp/subagent_carrier_197_test.go-274-		t.Fatalf("the roster this run filled gave no root/child pair (root %q, children %v)", rootID, childIDs)
+cmd/wisp/subagent_selfapproval_197_test.go-568-	gateNames := methodNames197(reflect.TypeOf((*tools.Gate)(nil)).Elem())
+cmd/wisp/subagent_selfapproval_197_test.go-570-		t.Errorf("tools.Gate 的方法集是 %v，想要 {PendingWindow, PendingApproval}。"+
+cmd/wisp/subagent_selfapproval_197_test.go-571-			"这是每个工具都摸得到的一枚接口：往上添任何一枚「答」的动作，就是给孩子开出口", gateNames)

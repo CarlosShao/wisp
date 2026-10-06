@@ -1,0 +1,104 @@
+1:internal/tools/bridge_a18_kill_windows_test.go:218:		if len(before) != 1 {
+2:internal/tools/bridge_a18_kill_windows_test.go:245:		if after := stagingFiles(t, auth); len(after) != 0 {
+3:internal/tools/bridge_junction_windows_test.go:459:	if len(d.Paths) != 1 || !strings.Contains(d.Paths[0], "无法规范化") {
+4:internal/tools/bridge_junction_windows_test.go:517:	if len(d.Paths) != 1 || !strings.EqualFold(d.Paths[0], mustCanonical(t, long)) {
+5:internal/tools/bridge_junction_windows_test.go:555:		if len(d.Paths) != 1 || !strings.EqualFold(d.Paths[0], wantCanon) {
+6:internal/tools/bridge_junction_windows_test.go:576:		if d.Level != risk.L2 || len(d.Paths) != 1 ||
+7:internal/tools/bridge_junction_windows_test.go:617:	if len(rows) != 1 {
+8:internal/tools/bridge_scope_open_ticket158_test.go:130:	if len(hit) == 0 {
+9:internal/tools/bridge_test.go:104:	if len(g.windows) == 0 {
+10:internal/tools/bridge_test.go:113:	if len(g.approvals) == 0 {
+11:internal/tools/bridge_test.go:292:	if len(AllCapabilities) != 11 {
+12:internal/tools/bridge_test.go:733:	if len(dir) != 0 {
+13:internal/tools/fswrite_silentloss_ac1_test.go:170:	if len(rows) != 1 {
+15:internal/tools/fs_edit_ac34_test.go:460:	if len(killed) == 0 || killed[0] != "create-temp" {
+16:internal/tools/fs_edit_ac34_test.go:479:	if len(out.AppliedSteps) == 0 {
+18:internal/tools/fs_edit_ac3b_test.go:118:	if len(original) != 14 || !strings.HasPrefix(readString(t, target), utf8BOM) {
+19:internal/tools/fs_edit_ac4b_kill_windows_test.go:229:	if len(residue) != 1 {
+21:internal/tools/fs_edit_ac5_gate_r4_test.go:79:	if len(hits) == 0 {
+22:internal/tools/fs_edit_ac5_gate_r4_test.go:395:	if len(entries) != 0 {
+23:internal/tools/fs_edit_ac5_sweep_r4_windows_test.go:63:	if left := stagingFiles(t, root); len(left) != 0 {
+24:internal/tools/fs_edit_test.go:94:	if len(out.AppliedSteps) != 0 {
+25:internal/tools/fs_test.go:35:	if got := prov.ScopeTaints("task-1"); len(got) != 1 {
+26:internal/tools/fs_test.go:110:	if got := b.prov.ScopeTaints("task-1"); len(got) != 0 {
+27:internal/tools/fs_test.go:190:	if len(entries) != 6 {
+28:internal/tools/fs_test.go:235:	if len(entries) != 7 {
+29:internal/tools/fs_test.go:250:	if len(del.Needs) != 1 || del.Needs[0] != CapFSWrite {
+30:internal/tools/fs_test.go:263:	if len(dir) != 6 {
+31:internal/tools/fs_test.go:281:		if len(ti.Parameters) == 0 || ti.Description == "" {
+32:internal/tools/fs_write_test.go:44:	if len(d.all) == 0 {
+33:internal/tools/fs_write_test.go:393:		if len(out.AppliedSteps) == 0 {
+35:internal/tools/fs_write_test.go:833:	if len(reported) == 0 {
+36:internal/tools/fs_write_test.go:844:	if got := bus.completed(); len(got) != 1 || got[0] != "corr-1" {
+37:internal/tools/grant_test.go:90:	if g.errOn || len(paths) == 0 {
+38:internal/tools/grant_test.go:139:	if len(j.calls) == 0 {
+39:internal/tools/grant_test.go:231:	if len(asked) == 0 {
+40:internal/tools/grant_test.go:325:	if got := grD.asked(); len(got) != 0 {
+41:internal/tools/grant_test.go:340:	if got := grJ.asked(); len(got) != 0 {
+42:internal/tools/grant_test.go:374:	if got := grants.asked(); len(got) != 0 {
+43:internal/tools/grant_test.go:430:	if got := grants.asked(); len(got) != 0 {
+44:internal/tools/helpers_test.go:38:	if len(allowed) == 0 {
+45:internal/tools/loop_approval_test.go:185:	if len(cards) != 1 {
+46:internal/tools/loop_approval_test.go:203:	if len(rows) != 1 {
+47:internal/tools/loop_approval_test.go:231:	if len(f.ui.cards()) != 0 {
+48:internal/tools/loop_approval_test.go:234:	if len(res.ToolLog) != 1 || !res.ToolLog[0].Rejected {
+49:internal/tools/loop_approval_test.go:246:	if rows := f.rows(t, res.TaskID); len(rows) != 1 ||
+50:internal/tools/pathshape_portable_test.go:36:	if bad := pc.UnusableRoots(); len(bad) != 0 {
+51:internal/tools/paths_rewrite_ticket102_test.go:30:	if len(rewrote) != 1 {
+52:internal/tools/paths_rewrite_ticket102_test.go:39:	if got := plain.RewrittenRoots(); len(got) != 0 {
+53:internal/tools/paths_rewrite_ticket102_test.go:47:	if len(gp.Roots()) != 0 {
+54:internal/tools/paths_rewrite_ticket102_test.go:50:	if len(gp.UnusableRoots()) != 1 || !strings.Contains(gp.UnusableRoots()[0], "not confirmed on disk") {
+56:internal/tools/paths_shortname_252_probe_test.go:168:	if u := pc.UnusableRoots(); len(u) != 0 {
+57:internal/tools/paths_shortname_252_r1_test.go:47:	if bad := pc.UnusableRoots(); len(bad) != 0 {
+58:internal/tools/paths_ticket107b_probes_test.go:126:	if r := pc.Roots(); len(r) != 0 {
+59:internal/tools/paths_ticket107b_probes_test.go:130:	if u := pc.UnusableRoots(); len(u) == 0 {
+60:internal/tools/paths_ticket107_portable_test.go:90:	if len(pc.Roots()) != 1 {
+61:internal/tools/paths_twocontainments_252_r2_test.go:109:	if u := pc.UnusableRoots(); len(u) != 0 {
+62:internal/tools/paths_twocontainments_252_r2_test.go:112:	if r := pc.Roots(); len(r) != 1 {
+63:internal/tools/paths_twocontainments_252_r2_test.go:213:			if !ok || fd.Name.Name != "InAllowlist" || fd.Recv == nil || len(fd.Recv.List) != 1 {
+64:internal/tools/paths_twocontainments_252_r2_test.go:221:	if len(found) == 0 {
+66:internal/tools/paths_twocontainments_252_r2_test.go:286:	if len(params) != 1 || len(params[0].Names) != 1 {
+67:internal/tools/paths_twocontainments_252_r2_test.go:296:	if len(book) != 2 {
+68:internal/tools/paths_twocontainments_252_r2_test.go:318:	if len(book) == 2 {
+69:internal/tools/paths_twocontainments_252_r2_test.go:372:		if len(as.Rhs) != 1 {
+71:internal/tools/paths_twocontainments_252_r2_test.go:413:		if !ok || len(call.Args) != 2 {
+72:internal/tools/paths_twocontainments_252_r2_test.go:581:		if len(r.Results) == 1 {
+73:internal/tools/paths_twocontainments_252_r2_windows_test.go:72:			if u := pc.UnusableRoots(); len(u) != 0 {
+75:internal/tools/paths_workspace_account_181r3_test.go:69:	if got.Rewritten || len(got.Rewrites) != 0 {
+81:internal/tools/pointer_183_cli_seam_test.go:201:	if mark := prov.ScopeTaints(task); len(mark) == 0 {
+87:internal/tools/subagent_197_test.go:241:	if len(rows) != 1 {
+88:internal/tools/subagent_197_test.go:376:	if len(rows) != 1 {
+89:internal/tools/subagent_197_test.go:650:	if len(list) != 1 {
+90:internal/tools/subagent_197_test.go:676:	if len(rows) != 1 {
+91:internal/tools/subagent_197_test.go:679:	if grand := h.roster.Descendants(rows[0].TaskID); len(grand) != 0 {
+92:internal/tools/subagent_197_test.go:879:	if got := subagentDepsFieldNames(); len(got) != 5 {
+93:internal/tools/tasklist_deferred_236r3_teeth_test.go:139:	if len(names) == 0 {
+94:internal/tools/task_cancel_221_legs_test.go:183:	if len(names) != 2 {
+95:internal/tools/task_cancel_221_legs_test.go:190:	if len(decl.Capabilities) != 0 || len(decl.Needs) != 0 {
+96:internal/tools/task_cancel_221_legs_test.go:193:	if len(decl.PathParams) != 0 {
+97:internal/tools/task_cancel_221_test.go:65:	if len(out) == 0 {
+98:internal/tools/task_cancel_221_test.go:130:	if len(roots) == 0 {
+100:internal/tools/task_output_leg_test.go:263:	if len(head) != 500*4 {
+101:internal/tools/task_output_leg_test.go:266:	if len(tail) != 200*4 {
+104:internal/tools/task_state_188_test.go:359:	if len(found) != 0 {
+105:internal/tools/task_state_188_test.go:423:		if len(got) == 0 {
+106:internal/tools/task_state_188_test.go:459:	if len(got) != 0 {
+107:internal/tools/ticket175r2_stamp_live_test.go:356:	if len(names) == 0 {
+108:internal/tools/ticket224_setter_scope_test.go:53:	if len(grantFields) != 1 {
+109:internal/tools/ticket90_test.go:144:	if len(g.seen) == 0 {
+110:internal/tools/ticket90_test.go:209:		if len(emitted) == 0 {
+111:internal/tools/ticket90_test.go:537:	if len(note.Unlockable) != 1 {
+112:internal/tools/ticket90_test.go:540:	if len(note.AlreadyUnlocked) != 0 {
+114:internal/tools/wiring_test.go:127:	if len(cards) != 1 {
+115:internal/tools/wiring_test.go:228:	if len(out.AppliedSteps) == 0 {
+116:internal/tools/wiring_test.go:302:	if len(ui.cards()) != 0 {
+140:cmd/wisp/firstrun_198_test.go:180:	if entries, _ := os.ReadDir(cfgPath); len(entries) != 0 {
+147:cmd/wisp/leg_dispatch_gate_133_test.go:139:	// noArgsLeg133 names func main's `if len(args) == 0` branch, the one leg with
+152:cmd/wisp/leg_dispatch_gate_133_test.go:598:	if len(vs.Names) != 1 || len(vs.Values) != 1 {
+176:cmd/wisp/leg_dispatch_gate_133_test.go:1593:	if len(names) == 0 {
+180:cmd/wisp/leg_dispatch_gate_133_test.go:1855:	if len(l.entries) == 0 {
+190:cmd/wisp/leg_sink_gate_131_test.go:663:				if len(vs.Values) == 0 || len(vs.Names) != len(vs.Values) {
+213:cmd/wisp/logsink_test.go:188:	if len(names) == 0 {
+227:cmd/wisp/panel_host_gate_test.go:117:		if len(entry) == 0 {
+264:cmd/wisp/resident_approval_246_windows_test.go:138:	if got := rt.RegisteredShutdownSteps(); len(got) != 0 {
+326:cmd/wisp/subagent_selfapproval_197_test.go:569:	if len(gateNames) != 2 || !hasMethod197(gateNames, "PendingWindow") || !hasMethod197(gateNames, "PendingApproval") {

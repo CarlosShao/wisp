@@ -1,0 +1,46 @@
+=== non-.scratch call-shaped uses of BuiltinTaskEntries( ===
+cmd/wisp/run.go:544:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+internal/tools/pointer_183_cli_seam_test.go:111:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...)
+internal/tools/pointer_185_cli_seam_test.go:103:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...)
+internal/tools/subagent_197_test.go:201:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: h.roster}), BuiltinSubagentEntries(deps)...) {
+internal/tools/task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+internal/tools/tasklist_deferred_236r3_teeth_test.go:130:	for _, e := range BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()}) {
+internal/tools/task_cancel_221_legs_test.go:101:	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: x.h.roster}), BuiltinSubagentEntries(deps)...) {
+internal/tools/task_cancel_221_legs_test.go:171:	entries := BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()})
+internal/tools/task_cancel_221_test.go:50:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths}),
+internal/tools/task_output_leg_test.go:40:		BuiltinTaskEntries(TaskDeps{Roster: roster})...) {
+internal/tools/task_output_leg_test.go:144:	for _, e := range BuiltinTaskEntries(d) {
+internal/tools/task_output_pointer_notice_test.go:54:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...) {
+internal/tools/ticket175r2_stamp_live_test.go:79:		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...)
+internal/tools/ticket175r2_stamp_live_test.go:353:		BuiltinTaskEntries(TaskDeps{})...) {
+
+=== enclosing func of run.go:544 ===
+line544 enclosing: 382: func assembleRuntime(s runSpec) (*agentRuntime, int) {
+
+=== run.go around 535-560 ===
+	// description of the measure is spelled out here without the call syntax on
+	// purpose, so this comment can never be miscounted as a caller).
+	// Who FILLS the roster is ticket 197's spawner, which now
+	// does (PublishSubagent on both the spawn goroutine and the child's admission
+	// hook), and the row a cancelled child lands on is finalised by that spawner's
+	// finish watcher, not by this tool. A call for an id nobody filed still answers
+	// "查不到这个任务" - loud, per 票 164 定案②, and never an empty success that
+	// would read as "the task printed nothing".
+	rt.tasks = tools.NewTaskRoster()
+	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+
+	// The approval layer (A13). Channels loaded here are the honest set for a
+	// console run: no floating ball, no global Esc hook, so an L1 window can
+	// only expire unvetoed and an L2 card can only time out into a reject.
+	//
+	// Ticket 201 changed one half of that sentence and left the other half
+	// standing: the console can now ANSWER a card (a reply source, attached at
+	// the end of this function), so an L2 card no longer has to be a question
+	// nobody hears. What it still cannot do is veto an L1 window, because none
+	// of SPEC-06 §2's four veto channels (ball / Esc / KWS / panel) exists in a
+	// terminal - so NewChannels() stays empty and runSpec.replyVeto stays unset,

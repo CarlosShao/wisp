@@ -1,0 +1,41 @@
+=== git log adding the 221 legs test file ===
+c44b30c4 221 甲形＋乙形同一发：注册 task.cancel 并把说明书那句裸许诺换成当下为真的话
+=== git log touching it (all) ===
+c44b30c4 221 甲形＋乙形同一发：注册 task.cancel 并把说明书那句裸许诺换成当下为真的话
+=== tickets 221 done? ===
+220-roster-blockedOnApproval-only-sees-L2-and-second-card-silently-drops.md
+221-task-spawn-description-promises-task-cancel-that-is-not-registered-done.md
+222-spawn-holds-a-bridge-permit-while-waiting-for-its-child.md
+223-checkandreload-has-zero-production-callers-hot-reload-never-runs.md
+224-session-scoped-grant-has-zero-executors-and-no-session-identity.md
+225-deferred-markers-do-not-match-the-spec12-registry-and-nothing-checks-it.md
+226-always-answer-rewrites-the-whole-config-snapshot-and-hides-hand-edits.md
+227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md
+228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md
+229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md
+=== ledger 解冻 occurrences ===
+11351:**1. 具名解冻（`改契约＝人工批准` 的邻域，按既有定式落 A## 而不动冻结文字一字）**：**文件**＝`.github/workflows/ci.yml`；**允许的动作**＝在 `lint` job（定义在 `:65`、`runs-on: ubuntu-latest` 在 `:66`、`steps:` 在 `:67`）的 steps 里**新增一枚 step**，建议紧接 `:108` 那枚 `D22 seven-ban + emoji scan (tools/d22scan)` 之后；**理由**＝票 262 的门禁需要一处每次 push 都执行的地方，而 `slo-full`（self-hosted）在 checkout 失败时整 job 归零、把尺挂它后面恰好在唯一需要它响的那种情况下不执行；**边界**＝⛔ 不许动 `:12`/`:36` 的触发表与 `:50-51` 的并发组（那是票 134 定过的 C+B 形状）、⛔ 不许动 `slo-full`/`test-core`/`test-windows`/`slo-smoke` 任何现有 step、⛔ 阈值与 golden 一字节不碰；**撤销口令**＝「撤 262 解冻」。⚠ 这一条只批"加一步"，不批"重排现有步骤"，也不批改任何 job 的 `runs-on`。
+11457:**4. AC#5 草稿这一格**（腿的判语，我认形状不代取证）：Go 侧**出向可装原文的字段 0 枚**、**持久面 0 枚**（`internal/memory/schema.go` 建表 9 枚里 `task_log.query_text` 只给**已受理**任务；`internal/store` 这个包**不存在**），"发送失败"这条分支今天根本不产生留痕 ⇒ **这一格整个落在页面那一侧**，而页面不归本编队（票 Status 逐字 `skipped=frontend(owner-delegated)`）。⇒ **⛔ 不许任何 Go 侧腿"顺手做掉 AC#5"**；要做先裁一枚**具名局部解冻**给快照开出向字段（撞票 145 已批那一寸），或把这格搬给机主带去他用的那枚前端 agent。**此刻不裁**（等 AC#2/AC#3/AC#4 那三枚落地腿交完与 AC#6 一起摆）。
+11509:- **ci.yml 只加一步**：`git show --stat 519e1ade` ＝ ci.yml **32 增／0 删**；**前 135 行 `md5sum` 与改前逐字节相同**（`250a9c5f15247458ad87dc5e401b623c` 两发全等）；新 step 逐字 `- name: "Tracked path-length budget (ticket 262)"`，其注释里把**具名解冻出处指回 A585**、并写明"不加 `if:`、不设 `continue-on-error`"（＝D22 跑歪模式 6 那条）。
+11532:**3. 条件②"说到做到"还剩两处文案，在 260 授权写面之外（⛔ 腿没越界，是对的）**：`internal/agent/approval/approval.go:90`（逐字"按 Esc 键"）／`:112`，以及 `cmd/wisp/resident_approval_windows.go:180/182/457` 仍念 Esc。⇒ **功能不受影响**（答复按 `hkCancel` 这个 **id** 派发），**但改过键的用户会看见"页面写着按 Esc、实际借的是别的键"**＝正是条件②禁的那一形。⇒ **处置**：给票 260 **追加一格**并**具名解冻**那两枚文件（`A##` 里写清文件/行/理由/边界/撤销口令），**排程按包级互斥**：`internal/agent/approval` 等 `212-r3` 交完、`cmd/wisp` 等 `256-r1` 交完。**⛔ 不塞进 `260-r2`**（它此刻正与那两条腿并行，塞进去就是让一枚腿抢三枚写面）。
+11538:## A595（2026-10-04 10:19:36，编排者自记：**票 260 条件②剩下的那批 Esc 文案——十枚现量＋撞钉预检已做完 ⇒ 落一枚具名解冻（五样齐）；⛔ 票面那一格我先不写，因为被点名的两枚文件里有一枚此刻正被 `256-r1` 写脏**）
+11542:**1. ★ 具名解冻（`A594` §3 那笔欠账的兑现；五样齐）**
+11557:**3. ⛔ 我这一轮刻意没做的事，具名入账**：票 260 面上那一格**我先不追加**。原因＝`cmd/wisp/resident_approval_windows.go` 此刻是 `M`（`256-r1` 正在写它，`git status` 可见），而"裁定与票面不同发"正是 `A582` 记过的分裂事故形状。⇒ 解冻裁定先落这一节账（**盘上可核**），票面那一格等 `256-r1` 交完再补，补的时候**逐样抄本节第 1 条的五样**，⛔ 不许重述成另一套口径。
+11614:## A598（2026-10-04 12:06:56，编排者自记：**收 `260-r3`（10 枚 Esc 文案落地 9 枚＋第 10 枚按票面停手上报）与 `263-r1`（SLO 那枚门"未赋值即死"修好＋肇因追到票 244 那发 `-H=windowsgui`）⇒ 我裁两件事：① 卡片标签那一枚**不许挂到明天**，追加修复腿 `260-r4` 并具名解冻 `internal/agent/approval` 同包另两枚文件；② 我那把尺自己错了（差点用它推翻腿的一句真话，记我）；另 ★票 263 那条因果链值得单独立档——它解释了一直没人答的问题"D32 那两个数字为什么从来没出现过"**）
+11620:- ★ **它的全部被触文件我逐名拉出来对过**（probes 之外）＝**5 枚**：`cmd/wisp/resident_approval_windows.go`（＋106／−12，再＋17／−8）、`cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go`（新 247）、`cmd/wisp/resident_task_source_live_246_windows_test.go`（＋19／−1＝A595 §2 那枚词面钉的同步）、`internal/agent/approval/approval.go`（＋8／−1）、`internal/agent/approval/cancel_key_wording_260r3_test.go`（新 97）。⇒ **`gate.go` 零命中、`internal/ball/**` 零命中、三枚冻结件零命中、`PLAN.md`/specs/thresholds/golden/allowlist/frontend/design 零命中**＝**A595 那枚解冻的边界它一字没越**（这条我要自己拉尺，⛔ 不接受腿的"我没越界"）。
+11626:**2. ★ 我的裁定一：卡片标签那一枚**不挂到明天**＝追加 `260-r4`，并具名解冻同包另两枚文件**
+11629:- **具名解冻（五样齐）**：**文件**＝`internal/agent/approval/approval.go`（把 `channelNames` 那张 `var` 表改成**读取时求值**的形态）＋`gate.go:314`／`gate.go:477`／`report.go:142` 三处调用点（⚠ 行号取数时刻 `12:06:56`，派单前重跑）；**理由**＝条件②"说到做到"覆盖卡片上每一行人能读到的字，且今天这一枚会自相矛盾；**边界**＝⛔ 只动"这枚标签从哪儿取值"，⛔ 不动门/审计/回执任何判定逻辑，⛔ 不许新增 `internal/agent/approval → internal/ball` 的依赖边（拼法只能由**装配根注入**，先例＝票 246 的门由装配根注入；`cmd/wisp` 侧已有 `residentCancelKeySpelling` 那枚读回执的函数可作唯一来源），⛔ 不许在 `gate.go` 里再拼一遍组合键；**撤销口令**＝**「260 标签撤回」**；**排程**＝`internal/agent/approval`＋`cmd/wisp` 此刻都空（`260-r3`/`256-r1` 已交），⛔ 与 `263-v1` 不同包可并行。
+11662:- 名册对授权集：落地枚 probes 之外 **7 枚**，逐名都落在 `A595`＋`A598` §2 的授权面内（`gate.go`／`report.go` 那两处调用点＝A598 §2 具名解冻过的）。⛔ **这不是追认**——`260-v1` 的头一格就是自己重拉名册。
+11705:- 残面对账：§0 运行约束／§1 现量复认（⚠ 它判**我的现量 2 只到读码级**）／§2 四问逐条答满／§3 三形代价表（ⓐ-Ⅰ/Ⅱ/Ⅲ＋ⓑ-Ⅰ/Ⅱ＋ⓒ，各带最小写面与必须先解冻）／§6.1 十二枚没跑的尺逐名（U1–U12）＋§6.2 七格判不动（I1–I7）＋§6.3 污染面自证——**这五节正文写满、照收**。
+11725:- ★ **落地三条硬约束**（已逐字写进票面，第 1 条是这形唯一能"反而更坏"的形状）：holder 在"还没绑到 ledger"那段窗口里 `Record` **必须走 error 路径**（让 `GRANT-RECORD-FAILED` 响），⛔ 绝不许造 id、绝不许静默 `return nil`——否则把今天那句**诚实的** `GRANT-DROPPED` 换成假话；只能晚绑定，⛔ 不许把建门挪进 `assembleRuntime`（`resident_task_source_windows.go:224-230` 无控制台即 `return nil` ⇒ 双击那一形永远走不到装配＝**载体不存在**，票 256 §7-5 那句）；AST 钉搬家需具名解冻＝**见 `A602`**。
+11738:## A602（2026-10-04 15:18:03，**具名解冻**·五样齐：票 256 那枚 AST 钉的 `Options` 字段集期望集 5 枚 → 6 枚）**
+11743:- **边界**：**只解冻那一处期望集与那一条反向断言**。⛔ 不含同包其它任何断言；⛔ 不含该文件里 `[risk]` 那两枚字段（`Window`／`ApprovalTimeout`）的判据——那仍是票 256 的地界、且 `256-r1` 已交付、`256-v1` 正在验收；⛔ 不许顺手把该文件重排或改名；⛔ 票 256 的 AC 框一枚不许因这枚解冻而被翻动（框归编排者，且只按 `256-v1` 的判语翻）。
+11744:- **撤销口令**：**「265 撤 AST 钉解冻」**——撤销后的形状＝`A601` §4 那条"ⓐ-Ⅰ 落地会把票 256 判据打红"重新变成阻断，ⓐ-Ⅰ 就地停摆、票 265 退回只读普查态（AC#0/AC#1 两格已交的凭据不动，⛔ 不因撤销而抹）。
+11861:**2. `265-r1c` 已派**（派单要点）：第一动作＝**先收编**四枚未提交产码（我 19:5x 现量：`resident_approval_windows.go` +176／`resident_task_source_windows.go` +45／`resident_approval_risk_256_windows_test.go` ≈60 行 A602 解冻／`?? resident_grant_writer_265_windows_test.go` 27,293 B）——收编前先 Read diff 与前任 §0–§2 自述逐条对，矛盾即停手上报；然后 §3–§9 七节＋修 phantom-citation（真身待它现读 `internal/panel/pump.go`）＋四发突变自证。**串行依据**：257-r1c 已交、其 d22scan 读数已封盘，265-r1c 的突变与全仓扫描不再互洗。
+11869:- **它判不动的四格**（§7 具名，我全部核过归口）：① `approval_always.go:165` 第三枚过期注释（写面 `internal/agent/approval`，本票解冻只到 AST 钉 ⇒ 归我，处理窗＝票 256 收档时一并或另开小票）；② 票 127 钉 `:497` 带载偶发（隔离 ×4 绿）；③ 223/AC1-shutdown 两枚 count=3 复绿；④ **U9 真进程尺与 `-race` 未跑**＝具名"没做"——U9 挂在 winlive 那个词之下（票 265 AC#1 判语里那枚"唯一能证伪的尺"仍未跑，ⓐ-Ⅰ 落地后它更该跑，**升格为 winlive 批准后的第一件**）。
+11911:- **裁 ⓐ（值域进门）**：落 `internal/config/validate.go` 的 `validateRisk`（今天只断 `permission_mode`），带＝**下界 31s／上界 3600s**，不变式＝**下界必须严格大于 `approval.DefaultApprovalWarning`**。⚠ **为什么不取 60s**：那会让票 256 既有钉 `cmd/wisp/resident_approval_risk_256_windows_test.go:251-254`（种子 45s，`wantTime` 在 `:202-203`）在加载层就被拒＝**把本来绿的用例打红**；抬界须先落一枚具名解冻（A##＋撤销口令），**本票不做**，列为残余①。⛔ `l1_window_sec` 一字不动（它已有双向钳 `gate.go:143-151`，且 `:263-266` 断的就是钳后落带内）。
+11912:- 残余四格具名（⛔ 任何腿不许"顺手补"）：① 60s 那支＝待具名解冻；② 同一次落地里"一枚拒载、一枚钳位"的行为不一致＝归下一枚治理票；③ `WarningLead` "配了但装配根从不传"＝归票 255 的账；④ 附录 6 枚无上界键＝不在本票。
+11937:## A611 — 10-05 09:4x–09:5x：**具名解冻**（五样齐）· ★收 `267-r1`（band 产码面只有 `internal/config/**` 五枚）⇒ 我翻 AC#1／AC#2／AC#3、**AC#4 按住**· ★`cmd/wisp` 实测红名册到手＝**16 枚 FAIL 逐枚都带着我这把 band 的拒载句，零枚未归因**· 收 `267-a2`（它顶回我派单名册：不是 3 枚文件 8 处，是 **5 枚文件 12 处**）⇒ **§7.1 裁＝甲**，乙／丙／丁逐支具名否掉· ★新抓到一枚形状立成**票 268**（常驻腿把"越界文件"与"没有文件"折成同一枚 provenance）
+11939:**1. ★具名解冻·五样齐（撤销口令「267 撤」）**
+11952:**4. 收 `267-a2`**（只读普查件 `.scratch/wisp/probes/267/a2/census.md`，交件时点 163 行／34,243 字节，§3–§9 仍在补）：**它顶回了我派单里的名册**——带外种子不是"3 枚文件 8 处"，现量＝**5 枚文件 12 枚喂值调用点**（我漏了 `cmd/wisp/approval_seam_201_test.go:50/:138` 与 `cmd/wisp/ticket224_assembly_test.go:81/:234`，各喂 20）。⛔ 我派单那句"三枚文件"是抄 `267-r1` §7.1 的，而**两枚腿在数全名册之前都没发现**——数过的是它。**生产路径零枚带外种子**：`cmd/wisp/firstrun.go:82` 落盘的是 `NewDefaults()` 反射来的 `default:"300"`＝带内（它现量，未抄我）。⇒ **第 1 节那份解冻名册按它的数写，不按我派单那个 8 处写。**
+12032:**5. 结案动作**：票 267 五格（AC#0／#1／#2／#3／#4）**全勾**＋改名 `267-...-can-vanish-done.md`（`git mv`，⛔ 未动票面任何原句；09:13 与 10-05 09:1x 那两条更正段照旧在原处）。残余五格具名写在票面"结案"节末尾：① `l1_window_sec` 钳 vs `confirm_timeout_sec` 拒的行为不一致→下一枚治理票；② 下界 60 s→待具名解冻（要改票 256 的种子钉）；③ `WarningLead` 生产恒零值→票 255 的账；④ 常驻腿把拒载读成"文件读不到"→**票 268**（料齐：`.scratch/wisp/probes/268/a1/census.md`，见 `A614`）；⑤ **`Q-77`→机主**（⛔ 任何腿不许自裁）。

@@ -1,0 +1,109 @@
+=== fs_test.go 180-270 ===
+// TestFSRegistrationIsTheD34Roster pins the whole family's registration shape:
+// the L0 pair plus the write half (fs.write L1, fs.edit L2 per ticket 162,
+// fs.trash/fs.move L1), and NO fs.delete unless
+// [fs] delete_enabled was set. Segment 1 pinned this at two entries; the third
+// and later entries are what segment 2 was, so the pin moved with the work
+// rather than being deleted (an absent fs.write here would still mean the
+// write half got faked).
+func TestFSRegistrationIsTheD34Roster(t *testing.T) {
+	paths := NewPathCanonicalizer(nil, nil)
+	entries := BuiltinFSEntries(FSDeps{Paths: paths})
+	if len(entries) != 6 {
+		t.Fatalf("the default fs roster has %d tools, want 6 (read/list/write/edit/trash/move)", len(entries))
+	}
+	want := map[string]risk.Level{
+		"fs.read": risk.L0, "fs.list": risk.L0,
+		"fs.write": risk.L1, "fs.edit": risk.L2, "fs.trash": risk.L1, "fs.move": risk.L1,
+	}
+	// Needs is not decoration: Bridge.checkCaps derives the C3 requirement set
+	// from it, so an under-declared Needs makes the authz check pass for a
+	// capability the tool actually exercises.
+	wantNeeds := map[string][]Capability{
+		"fs.read": {CapFSRead}, "fs.list": {CapFSRead},
+		"fs.write": {CapFSWrite}, "fs.edit": {CapFSWrite},
+		"fs.trash": {CapFSWrite}, "fs.move": {CapFSWrite},
+	}
+	for _, e := range entries {
+		n := e.Tool.Name()
+		lvl, ok := want[n]
+		if !ok {
+			t.Errorf("unexpected fs tool %q", n)
+			continue
+		}
+		if e.Decl.Declared != lvl {
+			t.Errorf("%s declared %v, want %v (D34)", n, e.Decl.Declared, lvl)
+		}
+		if e.Decl.Provider != KindBuiltin {
+			t.Errorf("%s provider = %q, want builtin", n, e.Decl.Provider)
+		}
+		wantN := wantNeeds[n]
+		if len(e.Decl.Needs) != len(wantN) || e.Decl.Needs[0] != wantN[0] {
+			t.Errorf("%s needs %v, want exactly %v (C3 requirement set)", n, e.Decl.Needs, wantN)
+		}
+	}
+	for _, e := range entries {
+		if e.Tool.Name() == "fs.delete" {
+			t.Fatal("fs.delete must not be registered without [fs] delete_enabled=true")
+		}
+	}
+}
+
+// TestDeleteEnabledAddsFSDelete is the other half of the same switch: the flag
+// is what puts the tool on the roster, and it arrives as L2 (D34).
+func TestDeleteEnabledAddsFSDelete(t *testing.T) {
+	paths := NewPathCanonicalizer(nil, nil)
+	entries := BuiltinFSEntries(FSDeps{Paths: paths, DeleteEnabled: true})
+	if len(entries) != 7 {
+		t.Fatalf("with delete_enabled the roster has %d tools, want 7", len(entries))
+	}
+	var del *Decl
+	for i, e := range entries {
+		if e.Tool.Name() == "fs.delete" {
+			del = &entries[i].Decl
+		}
+	}
+	if del == nil {
+		t.Fatal("fs.delete missing with delete_enabled=true")
+	}
+	if del.Declared != risk.L2 {
+		t.Errorf("fs.delete declared %v, want L2 (D34)", del.Declared)
+	}
+	if len(del.Needs) != 1 || del.Needs[0] != CapFSWrite {
+		t.Errorf("fs.delete needs %v, want [fs.write]", del.Needs)
+	}
+}
+
+// TestToolsDirectoryShape checks what the model sees: the pair is resident
+// (D15(1)) and carries the declared level, not a verdict.
+func TestToolsDirectoryShape(t *testing.T) {
+	b, _ := fsBridgeWith(t, nil, nil, tempCanonical(t))
+	dir, err := b.Tools(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(dir) != 6 {
+		t.Fatalf("directory has %d entries: %+v", len(dir), dir)
+	}
+	// The directory carries the DECLARED level (the R1 floor), never a verdict:
+	// the write trio shows L1 while an overwrite of the same path will be
+	// judged L2 by R8 inside Execute. fs.edit shows L2 because overwriting an
+	// existing file is the only thing it can do (ticket 162, D34).
+	declared := map[string]string{
+=== bridge_test.go 285-300 ===
+
+// ---------------------------------------------------------------------------
+// C3: capability enforcement
+// ---------------------------------------------------------------------------
+
+// TestCapabilitySetIsFrozen pins SPEC-07 §2's eleven tokens.
+func TestCapabilitySetIsFrozen(t *testing.T) {
+	if len(AllCapabilities) != 11 {
+		t.Fatalf("C3 has %d tokens, want 11", len(AllCapabilities))
+	}
+	want := "clipboard,fs.read,fs.write,input,memory,net,notify,screen,shell,sysinfo,window"
+	got := make([]string, 0, 11)
+	for _, c := range AllCapabilities {
+		if !c.Valid() {
+			t.Fatalf("%s claims to be in its own set", c)
+		}

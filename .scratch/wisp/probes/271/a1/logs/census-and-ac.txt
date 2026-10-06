@@ -1,0 +1,73 @@
+=== 175r2 census 349-380 verbatim ===
+func TestEveryRegisteredToolIsClassifiedForMarking175r2(t *testing.T) {
+	paths := NewPathCanonicalizer(nil, nil)
+	names := map[string]bool{}
+	for _, e := range append(BuiltinFSEntries(FSDeps{Paths: paths, DeleteEnabled: true}),
+		BuiltinTaskEntries(TaskDeps{})...) {
+		names[e.Tool.Name()] = true
+	}
+	if len(names) == 0 {
+		t.Fatal("一枚内置工具都没注册到，这条普查就是空转")
+	}
+
+	for name := range names {
+		marked := risk.IsSensitiveSource(name)
+		why, decided := classified175r2[name]
+		switch {
+		case marked && !decided:
+			t.Errorf("%s 现在会被盖戳，却不在本用例的分类表里：盖戳集合变了要在这里留下一句为什么", name)
+		case !marked && !decided:
+			t.Errorf("%s 既不在盖戳名册里、也没有被分类：它返回的内容是不是外部内容？"+
+				"票 175 的破口正是「一枚读回外部内容的工具没人登记过」，新工具请就地回答", name)
+		case marked && !strings.HasPrefix(why, "marked:"):
+			t.Errorf("%s 在名册里，分类表却写着 %q：这一句得和名册同向", name, why)
+		case !marked && !strings.HasPrefix(why, "unstamped:"):
+			t.Errorf("%s 不在名册里，分类表却写着 %q：这一句得和名册同向", name, why)
+		default:
+			t.Logf("%s: %s", name, why)
+		}
+	}
+}
+=== 333-341 classified map head ===
+// lands red until someone says out loud whether its answer is outside content.
+// ---------------------------------------------------------------------------
+
+var classified175r2 = map[string]string{
+	"fs.read":   "marked: C25 source roster (SPEC-06 §5)",
+	"fs.list":   "unstamped: a listing this process composed, no foreign body",
+	"fs.write":  "unstamped: a confirmation of a local write",
+	"fs.edit":   "unstamped: a confirmation of a local edit",
+	"fs.trash":  "unstamped: a confirmation of a local delete",
+	"fs.move":   "unstamped: a confirmation of a local move",
+	"fs.delete": "unstamped: a confirmation of a local delete (opt-in family)",
+	// Ticket 221 甲形 registers task.cancel, so this census demands an answer
+
+=== evidence 221-v1: which AC the count nail is under ===
+4:- **被验对象**：`a7993a9b`（实现腿起手锚点）..`29215a93`，三发＝`453eebab`（草案＋预检，现核＝**零产码**，只有票面 31 行＋probe plan 82 行）／`c44b30c4`（甲形＋乙形同一发）／`29215a93`（AC#5 读数记录）。
+18:| AC#1 | 说明书与现实一致（常驻能力尺） | **成立**（m1 摘注册那行 ⇒ 这把尺响；分母＝四家构造器的并集，不是单枚 `BuiltinTaskEntries`；扫能力不扫词面 ⇒ 注释污染不成立） |
+19:| AC#2 | 生产调用者 ≥1 且名册那行不消失（`A434` ③④⑤） | **成立**（非测试调用者现量 **1** 枚＝`task.go:740`，12 枚命中里零注释命中；③借名 `Muted` 未新造、m12 有牙；④名册**根本没有删行 API**；⑤只进现成审计 sink、上屏字段零新增） |
+20:| AC#3 | 两枚正控＋父取消不级联 | **成立**（m2/m3 各**恰 1 枚红**＝拒绝来自权限那一步不是门；m6 证实"被拒不动行"不是装饰；m10 三枚红＝非级联双钉；m7 反向证实 NoGate 拦的是门）⚠ **附一条缺格**：两支 fail-closed（`caller==""`／`Roster==nil`）m4/m5 **各 0 枚红**＝今天无尺 |
+21:| AC#4 | DEFERRED 登记（只裁本票那枚标记） | **成立**（摘标记与接线同在 `c44b30c4` 一发，`git show` 两条计数各＝1；`task.list` 那行是 diff 的**上下文行**＝逐字未动）。尺本腿用"overlay 换读路径＋正控"测出：**(a) 支有牙**（m14 放回标记 ⇒ FAIL），**(b) 支无牙**（m13 摘掉 `task.list` 标记 ⇒ PASS，叙述行 `:279` 把计数撑住）＝下一格要修的形状缺陷，不是本票的账 |
+22:| AC#5 | 整包终态读数 | **成立**（本腿自发 rc=1：23 ok／3 FAIL／5 无测试；名级红 6 枚＝在册 panel 4＋ball 1＋`cmd/wisp` 一枚计时红（隔离复量 3/3 绿）⇒ **本票新造红 0 枚**）⚠ 更正：在册名册不是稳定集合，`risk/R-116-1` 与 `cmd/wisp/TestTicket223*` 会换位 |
+35:| `m1-cancel-unregistered` | `BuiltinTaskEntries` 里 `task.cancel` 那行注册 | **6 枚红**，含 `Test221EveryPromisedTaskNameIsRegistered`（AC#1 的尺有牙）＋ `…TaskCancelIsRegisteredAtItsFrozenLevel` ＋ `…ParentStopsItsOwnChildRowAndStreamSettle` ＋ `…SubagentCannotStopSiblingOrItself` ＋ `…ParentCancellationStillDoesNotCascade` ＋ `…UnderNoGateStopsAtTheWindow` |
+37:| `m3-no-selfstop-check` | `target == caller` 自停那一支 | **恰好 1 枚红**＝同一枚 AC#3 用例 |
+38:| `m4-no-empty-caller-guard` | `caller == ""` 那枚 fail-closed | **0 枚红（rc=0）** ⇒ 那一支没牙（见 AC#3 判语的缺格） |
+50:## AC#1 说明书与现实一致（常驻能力尺）
+62:- 词面 vs 能力：分子取 `e.Tool.Description()`／`e.Tool.Parameters()` 的**运行时返回值**，分母取**构造器结果**⇒ 注释、日志、票面文字都进不了这把尺（与 AC#2 那把 grep 的 self-pollutable 问题是两回事）。`taskRootRe`＝`task\.[a-z][a-z0-9_]*`，`task_id` 这类参数名不会被当词根。
+71:## AC#2 生产调用者 ≥1 且名册那一行不消失（对 `A434` ③④⑤）
+92:  按 `A434` ⑤ 把票面 AC#2 那句"要留下'被谁停的'"**降级成〔审计可查〕**的原文口径，这个形状是**合规的**；实现腿还把自己先前写在回执里那句"这一停记在宿主审计里"**收回**了（票面 log 续 3 末段），收窄成当下为真的两句话——这一步是**减谎**，不是缺账。
+98:## AC#3 两枚正控＋父取消不级联
+118:⇒ AC#3 的**两枚正控＋非级联**这三件票面明写的事成立；两支 fail-closed 无钉是本票之后该补的一格（建议见最后一节）。
+122:## AC#4 DEFERRED 登记（按改写后口径，只裁本票那一枚标记）
+143:  | `teeth-m14-cancel-marked-again` | 把 `task.cancel` 的 DEFERRED 行**放回**而注册仍在 | **FAIL**，红句逐字＝「task.go 里还有 1 行把 task.cancel 标成 DEFERRED：它已经注册并有实现，『在册＋无实现＋无人认领』正是票 164 AC#1 要杀的那一形」（`:241`）⇒ **AC#4(a) 那支有牙** |
+156:## AC#5 整包终态读数
+169:  ⇒ 落在**别人在工作树里删掉的那棵 `design/**`** 上；三枚冻结件本腿零改动（`git status --porcelain -- internal/panel internal/perm` 空）。按派单口径**不报成新缺陷、一字不许动**。
+195:  与代码里的判定支一一对得上（AC#3 那几支）；并明写"由用户停某一枚子代理…今天没有落点"⇒ 与 `A434` ⑤ 的"不许算完成"同向，没有藏缺格。
+209:- 顺带核了 AC#2 那把 grep 尺的污染问题：新注释写的是 `TaskRoster's Cancel had zero production callers` 与"count it with a grep for calls of that method outside _test"，
+223:- 存在理由（本腿读 `:327-374` 的注释与断言原文）：票 175 AC#3 那把普查尺要求"本包注册的每一枚内置工具都必须在分类表里就地答一句"，
+263:  ⚠ 本腿只转述这枚**计数与结论**，没读 `frontend/**`／`design/**` 的任何内容（那两棵树在工作树里正被别人改动，见 AC#5 那 5 枚在册红的成因）。
+270:1. **AC#5 与门禁已补完（本腿自发）**，剩余没做的只有下面几条。
+274:2. **AC#4 那把尺测出一支真的没牙，修法要另批**：`Test221DeferredMarkerForCancelLiftedButListStillMarked` 的 (a) 支（`task.cancel` 不许再被标 DEFERRED）**有牙**（`teeth-m14` FAIL），
+279:3. **两支 fail-closed 无尺（`caller == ""`、`t.d.Roster == nil`）**：`m4`/`m5` 读数都是 **0 枚红（rc=0）**。票面 AC#3 明写的那三件（两枚正控＋非级联）成立，
+280:   但这两支"名字写在那儿、没有任何用例能响"的形状正是本票要杀的同一形（票 164 AC#1 族）。⇒ 建议下一格：一枚定向尺"未接线名册／无宿主 id 的调用必须在 `Execute` 那一步被拒且不动任何行"，
+287:   另有一处派单口径与实际形状不符，本腿就地更正而不是照抄：AC#2 那格派单给的攻法"摘 `Roster.Cancel` 里改那一行的分支"在代码里**没有对应物**（`Cancel` 不写那一行），本腿改攻 `finalize` 的落账支（m12）。

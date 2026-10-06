@@ -1,0 +1,6 @@
+=== ticket 236 file ===
+236-six-cells-that-only-surface-at-the-reading-layer.md
+=== git log adding 236r3 teeth test ===
+d9aff5fd probes(236-r3 死腿半成品代提)：一枚能编译、自己会红，但证件只有骨架——编排者只代提、不代判，标〔未验证半成品〕
+=== git log -1 HEAD ===
+bd39f17f Tue Oct 6 19:21:34 2026 +0800 probes(票 111 追加编排者记 19:2x)：ci-census-read-1 死腿的 logs 我自己复跑后读回三问

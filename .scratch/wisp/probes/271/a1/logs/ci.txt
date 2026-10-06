@@ -1,0 +1,45 @@
+=== ci.yml go test invocations ===
+18:  # be a verdict, and C's cost is that a busy machine has to be re-run. B pays
+76:        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+129:        # rc=0 with cgo on, rc=1 only for cmd/wisp with cgo off). The ball/mulA
+147:        # (E:\work\base\actions-runner\_work\wisp\wisp, joined as 44) against 14 on
+391:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+398:        # and no threshold changed): it sat below a step that bare `go test` lets
+404:        run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+407:        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+495:        # proc/secret/config and one -run on ./internal/risk/. So the package
+516:        # PASS=28 / FAIL=4 / SKIP=0 at HEAD 84e43af (all four failures were
+519:        # === RUN=71 / PASS=35 / FAIL=0 / SKIP=0 at HEAD b878b30. Both readings
+542:      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+546:        # on windows its 33 top-level cases go PASS=33 FAIL=0 SKIP=0 rc=0 once the
+598:        # WHY IT SITS HERE IN THE JOB (between `cmd/wisp CLI tests` and `Portable
+607:        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+624:        #     cmd/wisp, 5 of those files carrying 13 `t.Skip` calls whose literal
+626:        #     cmd/wisp/resident_hotkey_live_258_windows_test.go:55), while
+634:        #   - it does not re-run GUARD A/B/C. It adds exactly one claim: every
+654:        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+669:        # design) or a false green (bare `go test` prints `ok`) - which is the
+674:        # `go test -list` and prints the row with its class and reason in this
+678:        # denominator (measured on that host: PASS=201 FAIL=0 SKIP=0, rc=0).
+692:        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+695:        # DO NOT READ THIS WIRING AS A FIX OR A MASK: the step FAILS on
+703:        run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
+749:  # run is a VALIDITY refusal, not a performance regression: re-run it when the
+
+=== scripts/dev listing ===
+scripts/dev:
+ball-cycle.ps1
+gen_fixtures11.py
+
+scripts/spike:
+bin
+common
+go.mod
+go.sum
+goja-caps
+model-residency
+run.ps1
+shell-baseline
+speech-baseline
+webview2-latency
+xy-verdict

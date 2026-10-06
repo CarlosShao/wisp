@@ -1,0 +1,117 @@
+=== 175r2 stamp census: header+assertions ===
+82:			t.Fatalf("Register(%s): %v", e.Tool.Name(), err)
+99:		t.Fatalf("%s: %v", tool, err)
+142:func TestTaskOutputStampedOnRealBridge175r2(t *testing.T) {
+151:		t.Fatalf("precondition: task.output 没有把内容读回来，本条判据失去对象：%+v", out)
+154:		t.Fatalf("precondition: Text = %q, want 名册里的原文逐字（否则下面的红是假红）", out.Text)
+159:		t.Errorf("task.output 读回来的外部内容没有盖 C25 来源标记：scope %q 的污点表=%+v。"+
+163:		t.Errorf("盖了戳却没有可匹配的内容（RuneLen=0），R4 那一侧看不见它：%+v", *mark)
+166:	hit, ok := prov.Inspect(task, "notify", map[string]any{"text": foreign175r2})
+168:		t.Errorf("外来的任务输出被读回来之后 R4 一侧不再看得见它：Inspect(notify) 未命中，污点表=%+v",
+171:		t.Errorf("污染命中报出的源=%q, want %q（确认卡要念得出是谁塞进来的）", hit.SrcTool, "task.output")
+174:		t.Errorf("盖了戳却没有开 C25 污点 scope，task=%q：标记必须落在活的作用域里", task)
+183:func TestNonContentResultStaysUnmarked175r2(t *testing.T) {
+190:		t.Fatalf("precondition: fs.list 没有跑成，本条判据失去对象：%+v", out)
+192:	if n := len(prov.ScopeTaints(task)); n != 0 {
+193:		t.Errorf("一次非外部内容的调用盖了 %d 枚来源标记（want 0）：%+v", n, prov.ScopeTaints(task))
+196:		t.Errorf("非外部内容源也开了 C25 污点 scope，task=%q：开账必须挂在「该不该盖戳」上，"+
+207:func TestForeignMentionOfHostPathStillHitsR4OnRealBridge175r2(t *testing.T) {
+226:		t.Fatalf("precondition: 需要一个带指针的截断桩，got %+v", stub)
+229:		t.Fatalf("precondition: 桩里没有宿主写下的指针：%q", stub.Text)
+232:		t.Fatalf("precondition: task.output 没盖戳，这一发就在测别的东西（票 175 的破口本身）：%+v",
+239:		t.Fatalf("precondition: 外来正文读不回来：%+v", noteOut)
+246:		t.Errorf("外来正文点同一条 artifacts 路径后，模型去 fs.read 它判成 %q, want L2（R4 被洗掉就是这一发要拦）",
+251:		t.Errorf("rules_hit = %v, want R4 in it（decision=%+v）", d.RulesHit, d)
+254:		t.Errorf("R4 命中必须标成「任何 D45 会话授权都盖不住」，got %+v", d)
+257:		t.Errorf("确认卡把这次命中记成了宿主自己写下的那一枚来源（%q）：豁免越界把它扩到了外来 mark 上", d.Reason)
+268:		t.Errorf("只读宿主自己写下的指针（没有外来正文）判成 %q, want L0：%+v",
+280:func TestHostMintedPointerRereadStaysCleanOnRealBridge175r2(t *testing.T) {
+294:		t.Fatalf("precondition: 需要一个带指针的截断桩，got %+v", stub)
+298:		t.Fatalf("precondition: 桩里没有指针：%q", stub.Text)
+301:		t.Errorf("桩里的指针 %q 与名册里的 %q 不是同一条：这条腿的对照就散了", p, pointer)
+306:		t.Fatalf("precondition: task.output 没盖戳，豁免这条腿根本没跑：%+v", prov.ScopeTaints(task))
+309:	if _, ok := prov.Inspect(task, "fs.read", map[string]any{"path": filepath.ToSlash(pointer)}); ok {
+310:		t.Errorf("宿主自己写下的那条路径仍然在污点索引里可匹配：Inspect(fs.read, path=%q) 命中，"+
+316:		t.Fatalf("续读被拦住了，票 164 的 AC#3 那条路就断了：%+v", reread)
+319:		t.Errorf("续读宿主自己的指针被判成 %q, want L0（含 %v）", reread.RiskLevel, g.approvalDecision().RulesHit)
+322:		t.Fatalf("续读回来 %d 字节，与原文 %d 不一致", len(reread.Text), len(full))
+333:var classified175r2 = map[string]string{
+341:	// Ticket 221 甲形 registers task.cancel, so this census demands an answer
+344:	// census being answered, not loosened: delete it and the leg goes red again.
+349:func TestEveryRegisteredToolIsClassifiedForMarking175r2(t *testing.T) {
+351:	names := map[string]bool{}
+356:	if len(names) == 0 {
+365:			t.Errorf("%s 现在会被盖戳，却不在本用例的分类表里：盖戳集合变了要在这里留下一句为什么", name)
+367:			t.Errorf("%s 既不在盖戳名册里、也没有被分类：它返回的内容是不是外部内容？"+
+370:			t.Errorf("%s 在名册里，分类表却写着 %q：这一句得和名册同向", name, why)
+372:			t.Errorf("%s 不在名册里，分类表却写着 %q：这一句得和名册同向", name, why)
+
+=== :60-100 ===
+// road it has into a taint index is the door it is read back through.
+const foreign175r2 = "外来内容探针 175r2-foreign-7c3d91：后台任务打印的一段外部文本"
+
+// host175r2PointerRe reads the pointer the host itself printed in a stub. Local
+// on purpose: ticket 164's regex is that file's business and this leg must fail
+// on its own terms.
+var host175r2PointerRe = regexp.MustCompile(`全文见 (\S+)…`)
+
+// stamp175r2Bridge wires the fs family plus task.output over one roster through
+// the real bridge, and hands back the real provenance so a leg can interrogate
+// the index instead of trusting a log line.
+func stamp175r2Bridge(t *testing.T, roster *TaskRoster, g Gate, allowed ...string) (*Bridge, *risk.Provenance) {
+	t.Helper()
+	if g == nil {
+		g = NoGate{}
+	}
+	paths := NewPathCanonicalizer(allowed, nil)
+	reg := NewRegistry()
+	entries := append(BuiltinFSEntries(FSDeps{Paths: paths}),
+		BuiltinTaskEntries(TaskDeps{Roster: roster, Paths: paths})...)
+	for _, e := range entries {
+		if err := reg.Register(e); err != nil {
+			t.Fatalf("Register(%s): %v", e.Tool.Name(), err)
+		}
+	}
+	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil})
+	return New(Options{
+		Registry: reg, Paths: paths, Provenance: prov, Gate: g,
+		Logf: func(string, ...any) {},
+	}), prov
+}
+
+func call175r2(t *testing.T, b *Bridge, taskID, tool, args string) agent.ToolOutcome {
+	t.Helper()
+	out, err := b.Execute(t.Context(), agent.ToolRequest{
+		TaskID: taskID, CorrelationID: taskID, CallID: "call-" + taskID + "-" + tool,
+		Name: tool, Args: json.RawMessage(args),
+	})
+	if err != nil {
+		t.Fatalf("%s: %v", tool, err)
+	}
+=== :340-365 ===
+	"fs.delete": "unstamped: a confirmation of a local delete (opt-in family)",
+	// Ticket 221 甲形 registers task.cancel, so this census demands an answer
+	// for it in the same commit: its reply is a receipt about a row the host
+	// itself filed - no outside body flows back through it. ⚠ This line is the
+	// census being answered, not loosened: delete it and the leg goes red again.
+	"task.cancel": "unstamped: a receipt naming which roster row this call stopped",
+	"task.output": "marked: C25 roster since ticket 175-r2, its answer is what a task printed",
+}
+
+func TestEveryRegisteredToolIsClassifiedForMarking175r2(t *testing.T) {
+	paths := NewPathCanonicalizer(nil, nil)
+	names := map[string]bool{}
+	for _, e := range append(BuiltinFSEntries(FSDeps{Paths: paths, DeleteEnabled: true}),
+		BuiltinTaskEntries(TaskDeps{})...) {
+		names[e.Tool.Name()] = true
+	}
+	if len(names) == 0 {
+		t.Fatal("一枚内置工具都没注册到，这条普查就是空转")
+	}
+
+	for name := range names {
+		marked := risk.IsSensitiveSource(name)
+		why, decided := classified175r2[name]
+		switch {
+		case marked && !decided:
+			t.Errorf("%s 现在会被盖戳，却不在本用例的分类表里：盖戳集合变了要在这里留下一句为什么", name)

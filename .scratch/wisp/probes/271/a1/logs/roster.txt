@@ -1,0 +1,43 @@
+}
+
+// BuiltinTaskEntries returns the task family this configuration registers:
+// task.output and (since ticket 221 甲形, ruling A434) task.cancel. See the
+// header comment for why task.list is not here.
+func BuiltinTaskEntries(d TaskDeps) []Entry {
+	return []Entry{
+		{Tool: taskOutput{d: d}, Decl: TaskOutputDecl()},
+		{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
+	}
+}
+
+// ---------------------------------------------------------------------------
+// task.cancel (C1 Tool, D34 row: PLAN.md:2564, declared L1, ticket 221 甲形)
+// ---------------------------------------------------------------------------
+
+type taskCancel struct{ d TaskDeps }
+
+// The D34 task family (ticket 164, plus ticket 221 甲形 per ruling A434). Two of
+// the three names the roster line carries now have an implementation here:
+//
+//	task.output  L0  read what a background task printed   (this file)
+//	task.cancel  L1  stop one subagent the CALLER itself derived (this file, 221)
+//	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+//
+// task.output is AC#3's leg, task.cancel is ticket 221's. task.list stays
+// unregistered because the §7 registry says so, and a half-claim is exactly the
+// "在册 + 无实现 + 无人认领" shape ticket 164 AC#1 was written to end - the same
+// shape ticket 221 was filed for, one row over: task.spawn's description had been
+// promising task.cancel to the model while nothing registered it and
+// TaskRoster.Cancel had zero production callers. Registration and implementation
+// therefore land in the SAME commit (A434 批准范围 item 7: 摘标记与接线同一次核销),
+// and the DEFERRED line above is the only one left standing.
+
+// TaskDeps is what a task.* tool needs from the host.
+	return o, ok
+}
+
+// Count reports how many tasks are filed. It exists for the host's own
+// diagnostics, not as a tool surface: task.list is DEFERRED (§7 :1531), and
+// giving task.output a "list everything" mode would smuggle that row back in.
+func (r *TaskRoster) Count() int {
+	if r == nil {

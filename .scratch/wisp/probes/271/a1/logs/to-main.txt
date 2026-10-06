@@ -1,0 +1,19 @@
+=== assembleRuntime callers ===
+cmd/wisp/firstrun_198r2_test.go:436:	rt, code := assembleRuntime(runSpec{
+cmd/wisp/resident_task_source_246_windows_test.go:74:	ar, code := assembleRuntime(runSpec{
+cmd/wisp/resident_task_source_246_windows_test.go:158:			ar, code := assembleRuntime(c.spec)
+cmd/wisp/resident_task_source_246_windows_test.go:186:	ar, code := assembleRuntime(runSpec{
+cmd/wisp/resident_task_source_windows.go:278:	run, code := assembleRuntime(spec)
+cmd/wisp/run.go:249:	rt, code := assembleRuntime(s)
+cmd/wisp/run.go:382:func assembleRuntime(s runSpec) (*agentRuntime, int) {
+
+=== main / run invocation chain in cmd/wisp ===
+cmd/wisp/main.go:58:func main() {
+cmd/wisp/main.go:91:		os.Exit(cmdRun(args[1:]))
+cmd/wisp/main.go:139:// cmdRun is the S1 text path (ticket 12): runTextTask assembles the whole
+cmd/wisp/main.go:151:func cmdRun(args []string) int {
+cmd/wisp/main.go:159:	return runTextTask(runSpec{
+cmd/wisp/run.go:135:	// auto-rejects, an L1 window cannot be opposed. cmdRun fills it with the
+
+=== files in cmd/wisp (non-test) ===
+cmd/wisp/approval_always.go cmd/wisp/approval_reply.go cmd/wisp/approval_reply_stdin_other.go cmd/wisp/approval_reply_stdin_windows.go cmd/wisp/config_readers_255.go cmd/wisp/config_reload.go cmd/wisp/console_other.go cmd/wisp/console_windows.go cmd/wisp/doctor.go cmd/wisp/firstrun.go cmd/wisp/logsink.go cmd/wisp/main.go cmd/wisp/models.go cmd/wisp/notify_other.go cmd/wisp/notify_windows.go cmd/wisp/panel_assets.go cmd/wisp/panel_config_store.go cmd/wisp/panel_host_windows.go cmd/wisp/panel_inbound.go cmd/wisp/panel_pump.go cmd/wisp/panel_resident_windows.go cmd/wisp/providers.go cmd/wisp/resident_approval_windows.go cmd/wisp/resident_ball_windows.go cmd/wisp/resident_hotkey_258_seam_windows.go cmd/wisp/resident_other.go cmd/wisp/resident_task_source_windows.go cmd/wisp/resident_windows.go cmd/wisp/run.go cmd/wisp/secret.go cmd/wisp/slo_other.go cmd/wisp/slo_windows.go cmd/wisp/versioninfo_other.go cmd/wisp/versioninfo_windows.go 

@@ -1,0 +1,17 @@
+=== exact-count assertions with N>=3 in the two dirs (any subject) ===
+internal/tools/bridge_test.go:292:	if len(AllCapabilities) != 11 {
+internal/tools/fs_edit_ac3b_test.go:118:	if len(original) != 14 || !strings.HasPrefix(readString(t, target), utf8BOM) {
+internal/tools/fs_test.go:190:	if len(entries) != 6 {
+internal/tools/fs_test.go:235:	if len(entries) != 7 {
+internal/tools/fs_test.go:263:	if len(dir) != 6 {
+internal/tools/subagent_197_test.go:879:	if got := subagentDepsFieldNames(); len(got) != 5 {
+internal/tools/task_output_leg_test.go:263:	if len(head) != 500*4 {
+internal/tools/task_output_leg_test.go:266:	if len(tail) != 200*4 {
+cmd/wisp/firstrun_257_test.go:297:	if len(accepted) != 3 {
+cmd/wisp/providers_test.go:112:		if len(fields) != 4 || fields[2] != "实测" {
+cmd/wisp/resident_approval_246_windows_test.go:146:	if len(records) != 10 {
+cmd/wisp/resident_approval_live_246_windows_test.go:245:	if len(records) != 10 {
+cmd/wisp/secret_test.go:985:	if len(seen) != 3 {
+
+=== registry union / model-visible tool directory counts ===
+47

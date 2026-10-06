@@ -1,0 +1,33 @@
+=== references to the 221 legs test name / file outside .scratch ===
+./docs/evidence/s1/221-task-cancel-v1.md:81:  `git diff a7993a9b..HEAD -- internal/tools/subagent_197.go` 里那一族常量**一行未动**⇒ 本票没造新名。用例侧断言：`task_cancel_221_legs_test.go:325-331` 既比 `final.State == subagentStateStopped` 又跑 `statemachine.Valid(final.State)`。
+./docs/evidence/s1/221-task-cancel-v1.md:137:- ⚠ **本腿一把尺的牙测到了意外结果，具名记在这里**：`Test221DeferredMarkerForCancelLiftedButListStillMarked` 的实现是 `os.ReadFile("task.go")`（`task_cancel_221_legs_test.go:224`）
+./docs/reports/pending-and-issues.md:9954:尺：`git diff --numstat` ＝ **1 增 / 0 删**（那一枚锚行一字未动，只在其下插一行）；该文件**其余零改动**，`PLAN.md` 零改动。⛔ **我没有加 `DEFERRED(D-xx)` 代码标记**——现况是**表里 13 行、代码里 0 枚标记**（我 17:5x 现跑 `grep -rn "DEFERRED(D-" --include=*.go internal cmd tools scripts`＝0），"反向对齐"本来就不齐、也**没有任何仪器在查**（`go test` 名册里无一枚核这件事的用例，唯一提到 `DEFERRED(D-` 的是 `internal/tools/task_cancel_221_legs_test.go`，它不核这张表）；加一枚标记只会造出"13 行里只有这一行有代码标记"的**第二形状**，比不加更糟。**这一层现状也具名登记**：表与代码标记的双向核对是 `AGENTS.md §1.1` 写着的硬规矩，今天实际靠"代码里根本没标记"来维持＝**空转的规矩**，要不要真立一套 `D-xx` 编号＋一枚常驻核对尺，属另一枚待裁项（⛔ 不摆给 owner，这是账目形状，我自己排队列）。
+./docs/reports/pending-and-issues.md:12619:- ★我抽验了它引用的那把尺**本体**：`internal/tools/task_cancel_221_legs_test.go:236-246` 确实在数"同时带 `DEFERRED` 与 `task.list` 的行数"（`listMarked`），且 `grep -c DEFERRED internal/tools/task.go`＝**3 行**、其中含 `task.list` 的＝**2 行** ⇒ 与它报的"3 枚 DEFERRED、2 枚 co-carry（`:23` 标记行＋`:279` 的 `Count()` 文档注释）"**逐字一致**。★这第 2 枚很关键：**它不是标记行，是一句注释碰巧同时含两个词**——这正是"数词面"这把尺被叙述句撑住、看不见能力的形状。
+./docs/reports/pending-and-issues.md:12673:- **票 271**＝票 221 那把"task 家族几枚"的尺（`task_cancel_221_legs_test.go:183-185`，逐字 `if len(names) != 2`）在**合法新增第三枚工具时会假红**。⇒ 这一条正好踩我记忆里那条老规矩：**"故意留空的一格"与"结案须 0 未勾"冲突时＝勾交付物＋把洞归口另一张票＋原话不改**——票 221 已 `-done`，我不去改它的判据，只把风险立成一张待裁票，并且**"丙＝不做"作为真选项写在票面上**（按第 13 款：摆甲／乙之前先问有没有"不做了"那一支）。
+./internal/tools/failclosed_236_teeth_test.go:53:// check - a false green, warned about verbatim at task_cancel_221_legs_test.go:13-19.
+./internal/tools/failclosed_236_teeth_test.go:72:// COMPILER sees, while os.ReadFile (e.g. task_cancel_221_legs_test.go:224)
+./internal/tools/tasklist_deferred_236r3_teeth_test.go:17:// Carrier being measured: task_cancel_221_legs_test.go:223-247,
+./internal/tools/tasklist_deferred_236r3_teeth_test.go:74:// task_cancel_221_legs_test.go:183 keeps counting).
+./internal/tools/tasklist_deferred_236r3_teeth_test.go:90://	      task_cancel_221_legs_test.go:183 goes red. NOT measured by r3c: the
+./internal/tools/task_cancel_221_legs_test.go:170:func Test221TaskCancelIsRegisteredAtItsFrozenLevel(t *testing.T) {
+
+=== allowlist / always-red files in scripts+github ===
+.github/workflows:
+ci.yml
+slo-fresh.yml
+
+scripts:
+build.ps1
+check-path-length-budget.sh
+d22scan.sh
+dev
+fetch-deps.ps1
+portable-tests-selftest.sh
+portable-tests.sh
+sign-models.ps1
+slo-check.ps1
+slo-freshness.sh
+spike
+testdata
+winsec-tests.sh
+wisp-cli-tests.sh

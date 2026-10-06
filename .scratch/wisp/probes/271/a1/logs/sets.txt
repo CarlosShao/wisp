@@ -1,0 +1,43 @@
+=== tests that count a WHOLE registered tool set (all families) ===
+internal/tools/fs_test.go-108-	// fs.list is NOT a D34 sensitive source: a directory listing is metadata,
+internal/tools/fs_test.go-264-		t.Fatalf("directory has %d entries: %+v", len(dir), dir)
+internal/tools/fs_test.go-266-	// The directory carries the DECLARED level (the R1 floor), never a verdict:
+internal/tools/fs_test.go-279-			t.Errorf("%s directory level = %q, want the declared %q", ti.Name, ti.RiskLevel, want)
+cmd/wisp/config_receipt_255_test.go-97-	// A name plan() booked that the registry cannot explain is neither claimed nor
+cmd/wisp/firstrun_198_test.go-178-		t.Fatalf("the directory under the config name is gone - creation overwrote what it was told to leave alone")
+cmd/wisp/firstrun_198_test.go-181-		t.Errorf("the untouched directory grew entries: %v", entries)
+cmd/wisp/leg_dispatch_gate_133_test.go-934-		return "not declared in this directory"
+cmd/wisp/leg_dispatch_gate_133_test.go-1046-					reds = append(reds, fmt.Sprintf("leg %q (%s): %s calls %s, which this directory does not declare as a function. A dispatch this gate resolves to nothing is a leg it cannot read, and \"cannot read\" is not \"nothing to check\".",
+cmd/wisp/leg_sink_gate_131_test.go-14-// reference, over every NON-TEST .go file in this directory. Build tags are
+cmd/wisp/panel_inbound_33_test.go-209-		t.Fatalf("AC#9 RED (the instrument, not the code): cannot enumerate this directory's sources: %v", err)
+
+=== '未知工具' reject nails file:line ===
+internal/tools/bridge.go:276:			"未知工具 "+req.Name+"，可用工具见 list_tools",
+internal/tools/fs_write_test.go:586:	if !out.IsError || !strings.Contains(out.Text, "未知工具") {
+internal/tools/task_output_ac2_before_test.go:58:	if !strings.Contains(out.Text, "未知工具") || !strings.Contains(out.Text, "task.output") {
+internal/tools/task_output_leg_test.go:19:// "未知工具" now reaches a real tool).
+internal/tools/task_output_leg_test.go:72:	if out.IsError || strings.Contains(out.Text, "未知工具") {
+internal/tools/task_output_leg_test.go:73:		t.Fatalf("the same call that read 未知工具 before must now reach the tool: %+v", out)
+
+=== 221 ticket AC mentioning 枚数 / len(names) / AC#1 ===
+4:  ✅ **09-29 13:08 更新（见文末"收 `221-c1`"那一节）**：普查腿 `221-c1`（28,379 字节、`dc4f3870`、锚点 `beaeaeba`）已交并被我逐条复验，**顶回我九处**（其中 AC#1 的分母与 AC#4 的仪器是两张真红，判据已就地改写）；**甲形的批准记录已落＝台账 `A434`**（按 `A399`/`A401`/`A424` 先例：`PLAN.md` 与 `docs/specs/**` 一字不动、改判只落台账；撤销口令「撤 221 甲」）。⇒ **本票现在是"可派写腿"状态**，但排程在后面：**`226-v1` 交完 → 票 223 → `222-v1` → 本票（甲形＋乙形三处同一发）**，理由＝不并发跑门的腿（`A432` 那条争用假红的教训）。
+12:| 而 `task.cancel` 没注册 | `internal/tools/task.go:595` `BuiltinTaskEntries` **只返回 `task.output` 一枚**；头部 `:20-27` 逐字把 `task.list`／`task.cancel` 标为「DEFERRED with five fields, PLAN.md §7 :1531」，并写明"在册＋无实现＋无人认领"正是票 164 AC#1 要终结的形状 | 现读 |
+18:模型会照说明书办事：它以为能停掉自己派出去的孩子，于是**不会去找别的退路**（自己收、等、或告诉用户）。按票 197 AC#6 那句"父取消不级联**且要写给模型看**"的精神，**写给模型看的每一句都必须是当下为真的**——"在册＋无实现＋无人认领"正是票 164 AC#1 立起来要杀的那个形状。
+29:- [x] **AC#1 说明书与现实一致**：种一枚"说明文字里出现的 `task.*` 词根必须在 `BuiltinTaskEntries` 的注册名册里"的**常驻能力尺**（扫能力，不扫词面；红句要能指出是哪一句、缺哪一枚）。⚠ 派单必附**未修码读数**：改前这把尺**必须响**（今天它就该响，因为 `task.cancel` 就在说明书里而注册表里没有）。
+50:| ④ | **AC#1 那把尺的分母我写错了** | **认，且这是本票今天要红的第一号错**：我写的是"`task.*` 词根必须在 `BuiltinTaskEntries` 的注册名册里"，而我现跑 `sed -n '592,600p' internal/tools/task.go` ＝ **`BuiltinTaskEntries` 只返回 `task.output` 一枚**，而 `task.spawn` 走的是 `BuiltinSubagentEntries`（`subagent_197.go`）⇒ **按我那张分母，`task.spawn` 自己也会被这把尺报成"许诺了没注册"＝假红**。⇒ **AC#1 改写（下方"判据改写"第一节）** |
+57:**判据改写（AC#1／AC#4／上面④⑤两格，改写不删原句——原文留在本节上方）**：
+59:- **AC#1（新写法）**：尺的分母＝**"这次装配真正注册出去的所有工具名的并集"**（现跑＝`BuiltinTaskEntries`＋`BuiltinSubagentEntries`＋其余 `Builtin*Entries` 的构造结果，落点＝包内测试枚举这几家构造器），**分子＝各 `Description()`／`Parameters()` 文本里出现的 `task.` 词根**。⇒ **今天这一发应恰好红一枚＝`task.cancel`**（其余 `task.spawn`／`task.output` 都在并集里）。⚠ 不许把分母写成单枚 `BuiltinTaskEntries`（那会把 `task.spawn` 也报红＝假红，见④）。
+60:- **AC#4（新写法）**：本票**不承诺**"与 `SPEC-12 §5` 双向 1:1 对得上"（§5 里没有 `task.*` 行，见⑤）。改成本票**自己这枚标记**的两条：**(a)** 若走甲形，`internal/tools/task.go:20-27` 头部把 `task.cancel` 标为 DEFERRED 的那段**要摘掉**（它是"在册无实现"那一形，票 164 AC#1 要杀的形状）；**(b)** 摘标记与接线**同一次核销**，不许先摘标记再补实现（否则中间那一发会把"这件事没了"读进账里）。1:1 那枚**仪器**本身归**票 225**（已量：12 行只有 2 行有标记、`docs/DEFERRED.md` 不存在），不由本票造。
+75:- **状态**：**进行中／骨架已落**。AC#1–AC#5 **五格全部 `[ ]`＝UNJUDGED**，判据落点与尺写在
+91:  **新** `internal/tools/task_cancel_221_test.go`（AC#1 常驻尺＋AC#2＋AC#3）、`cmd/wisp/run.go`（**只改注释**：
+100:### 221-r1（续，同一腿）：甲形＋乙形同一发已落，AC#1／AC#2／AC#3／AC#4 交付，AC#5 整包读数在下面一条
+102:- **状态**：**AC#1 做完／AC#2 做完／AC#3 做完／AC#4 做完／AC#5 带注**（下面逐格给尺与读数）。
+106:  **新** `internal/tools/task_cancel_221_test.go`（AC#1 常驻尺）＋**新** `internal/tools/task_cancel_221_legs_test.go`（行为腿）。
+107:- **AC#1 做完**：尺＝`go test ./internal/tools/ -run Test221EveryPromisedTaskNameIsRegistered -count=1`。
+153:  | **M1** | `BuiltinTaskEntries` 里注册 `task.cancel` 那一行 | **6 枚红**：`Test221EveryPromisedTaskNameIsRegistered`（AC#1 的尺有牙）＋ `…TaskCancelIsRegisteredAtItsFrozenLevel` ＋ `…ParentStopsItsOwnChildRowAndStreamSettle` ＋ `…SubagentCannotStopSiblingOrItself` ＋ `…ParentCancellationStillDoesNotCascade` ＋ `…UnderNoGateStopsAtTheWindow` |
+238:**⛔⛔ 先记一笔纪律，记在两个人身上**：本票五枚 AC 框（AC#1…AC#5）是**产码腿自己勾成 `[x]` 的**（`c44b30c4`／`29215a93` 里 `- [ ]` → `- [x]`，我逐条 `git diff a7993a9b..HEAD` 看过）。这违反 `AGENTS.md` §0.3 与 `SPEC-12 §4.3` #1「缺口审计与对抗验收必须由**另一个** agent 做」——**实现者自审不构成为核**。根因在我：我给 `221-r1` 的派单写了落点／判据／禁区／读数，**唯独没写"框归编排者勾"**；今天之前每一枚框都是编排者翻的（票 223／票 222 均为我翻），这是这一漏第一次落地。
+246:**我现跑复核为真的四条**（不是照抄它的自述）：① `internal/tools/task.go` 那一发**零新增导出标识符**（`^+func [A-Z]`／`^+type [A-Z]`／`^+var [A-Z]` 三种形状零命中）；② `cmd/wisp/run.go` 的删除行**逐行看全是注释**；③ `TaskRoster.Cancel` 在 `_test` 之外的调用者＝**1 枚**（`internal/tools/task.go:740`），AC#2 那句"改前 0 枚 ⇒ 改后 ≥1 枚"这条数得成立；④ AC#1 那把尺的**分母口径**用的是「收 `221-c1`」一节里我改写过的那个（装配注册出去的工具名并集），不是原句那句 `BuiltinTaskEntries`——按原句那把尺会把 `task.spawn` 报成假红。
+251:3. AC#1 那把能力尺今天只有**一枚**目录可比；拆成按调用者的多枚目录，它就得乘上目录数，假红面跟着放大。
+266:- **AC#1**：m1 摘掉注册那行 ⇒ 这把尺**响**，红句逐字指到"哪句／哪个槽／缺哪一枚／并集几枚"；分母＝四家构造器的并集（现量 `^func Builtin.*Entries` 恰 4 枚），分子取运行时 `Description()`／`Parameters()` ⇒ 我担心的"注释污染"那条路结构上走不通。
+268:- **AC#3（本票最关键的一格，假绿陷阱已排除）**：m2／m3 **各摘一支权限判定 ⇒ 各恰好 1 枚红**＝那两枚正控观察到的拒绝**确实来自权限那一步、不是那道门**；m7（L1→L0）反向证实 NoGate 那枚拦的是门；m6（拒绝前先 Cancel）⇒ 响，"被拒不动行"不是装饰；m10（重新级联）⇒ 3 枚红＝双钉。⚠ **附一格缺仪器**：`caller == ""` 与 `Roster == nil` 两支 fail-closed **今天无尺**（m4／m5 各 0 枚红、rc=0，〔腿自述、我未复跑〕）⇒ **归口票 236 AC#1**。⛔ 归口≠翻勾：AC#3 的字面射程只有两枚正控＋一条级联钉，那三样都有牙，所以框留着。
+278:**结案判据核对**：五枚 AC 全勾且判语出自非实现者；`落点两支` 走的是甲形＋乙形同一发（A434 第⑦条）；残余三处**全部具名归口**、不占本票的勾——"用户能停一棵正在跑的树"→票 181／票 220（A434 第⑥条，原句"不许算完成"照旧生效）、两支 fail-closed 无尺→票 236 AC#1、那把尺无牙→票 236 AC#2。**文件按防重领规矩改名 `-done`**（本票不 revert 任何已提交内容、只加这一节＋改名；`PLAN.md`／`docs/specs/**`／三枚冻结件／别人的脏改动一枚未动）。

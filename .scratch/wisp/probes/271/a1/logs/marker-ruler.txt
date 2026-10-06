@@ -1,0 +1,41 @@
+=== legs test 217-250 verbatim (co-occurrence marker ruler) ===
+// Test221DeferredMarkerForCancelLiftedButListStillMarked is AC#4 in the rewritten
+// form (票面 ⑤: this ticket does NOT claim a two-way 1:1 with SPEC-12 §5, whose
+// instrument is ticket 225's and which carries no task.* row at all). What it
+// claims is its own marker: (a) task.cancel's DEFERRED line is lifted, (b) lifted
+// in the same landing as the wiring - which this file proves by asserting the
+// wiring and the marker in one leg - and task.list's line is untouched.
+func Test221DeferredMarkerForCancelLiftedButListStillMarked(t *testing.T) {
+	src, err := os.ReadFile("task.go")
+	if err != nil {
+		t.Fatalf("读不到 task.go（这把尺的落点是包内源文件）：%v", err)
+	}
+	var cancelMarked, listMarked int
+	for _, line := range strings.Split(string(src), "\n") {
+		if !strings.Contains(line, "DEFERRED") {
+			continue
+		}
+		if strings.Contains(line, "task.cancel") {
+			cancelMarked++
+		}
+		if strings.Contains(line, "task.list") {
+			listMarked++
+		}
+	}
+	if cancelMarked != 0 {
+		t.Errorf("task.go 里还有 %d 行把 task.cancel 标成 DEFERRED：它已经注册并有实现，"+
+			"「在册＋无实现＋无人认领」正是票 164 AC#1 要杀的那一形", cancelMarked)
+	}
+	if listMarked == 0 {
+		t.Errorf("task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）")
+	}
+}
+
+// Test221SpawnDescriptionPromisesOnlyWhatIsTrue is 乙形: the three promise shapes
+// the ticket names (task.spawn 的说明文字那句无条件许诺、它后面那个括号、父任务不等了的
+
+=== BuiltinSubagentEntries counted anywhere? ===
+rc_of_that_grep=1
+
+=== out-of-scope dirs: count-shape assertions per dir ===
+139
