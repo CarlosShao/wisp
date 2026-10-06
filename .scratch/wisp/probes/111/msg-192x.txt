@@ -1,0 +1,9 @@
+
+## 编排者记（2026-06-10 19:2x +08 补，⛔ 不翻任何框，只把两格的"缺什么"改成具名）
+
+腿 `ci-census-read-1` 19:10 死于服务故障（64 次调用／630 万 token，⛔ 没写出交付件，只留下 `.scratch/wisp/probes/111/ci-read-1/logs/` 14 份取数件，我已代提入库 `2822ee04`）。⇒ 我从它留下的**抽件**里读了三问，并**自己复跑**了最关键那把尺，逐枚记在这里，⛔ 没有翻任何框：
+
+- **AC#1 的 CI 侧现量（已有，属"算过"而非"被吞"）**：`test-windows` job 的 **step 8 [success]** `Package coverage census (ticket 111 AC#1 + GUARD D)`，自报逐字＝`census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`；三发 run 同形（`37406757402`／`37406422380`／`37405698188`）。⇒ 这一格此前我裁的是"脚本臂在树、名册现量 35、census 名册零枚未认领"，今天多了一条 **CI 侧同数**（`unclaimed-with-tests=0`）。★但**"GUARD D 真响过"这一发今天仍未取到**——它要的是 `unclaimed-with-tests>0` 那一形，而载体自测步从未进过 CI（下一条）。
+- **AC#3 我改判为"不在只读腿射程内"**（⛔ 不是欠读数）：票面 `:27` 原文要求"scope 校验加上『声明在范围内但该平台没有任何测试文件 ⇒ 直接失败』的守卫，**并人为抽掉一个包证明它会红**"。⇒ 那＝**改脚本＋跑抽包变异**＝落地腿地界。⛔ 我不因为"腿死了"就把这一格记成"欠一次 CI 读数"。
+- **AC#5 那条"新步排在会失败的步骤之后 ⇒ 必须 `if: always()`"的规矩，今天有了一条 CI 侧正证**：run `37406757402` 里 step 7 [failure] 之后，step 8 [success] **确实跑了**（那一步带 `if: ${{ !cancelled() }}`，本地 `ci.yml:356` 同源形状）⇒ 这道"从未执行"的坑**在这枚形状上是堵住的**。⛔ 本格**不翻**：票面还逐字要求 `bash -n` 改动脚本 rc=0 与 `sh scripts/d22scan.sh` 纯净快照 rc=0 且各 scope 不降，那是**落地腿的四数**，本编队没有。
+- **★`selftest` 那一步至今从未进过 CI（本票"门在 CI 真响过"那一读的结构性原因）**：`1309757b`（10-06 14:03 落地）`git merge-base --is-ancestor` 判**未推**，`git show origin/dev:.github/workflows/ci.yml | grep -c 'Portable tests carrier self-test'`＝**0**；★GitHub 侧独立一尺＝`GET repos/.../commits/1309757b` 返回逐字 `{"message":"No commit found for SHA: 1309757b","status":"422"}`；另一尺＝我 19:1x 自己 `gh run view 37396530365 --json jobs` 现量该发（00:55Z＝08:55 +08，推送之前那发 schedule）`test-windows` 的 13 步名册里**没有 census 也没有 selftest**，而 10:45 推送后的三发都有 census ⇒ **census 步首发＝我 10:45 那笔推送**，selftest 步晚于它、要等下一笔推送才会第一次跑。⛔ 取数期间不推送（本编队规矩），所以这一读的**唯一路径是推送之后**，不是"我没去看日志"。
