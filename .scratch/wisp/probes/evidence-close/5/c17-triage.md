@@ -158,3 +158,145 @@ ci-step-readings-2026-09-22.md
 ⇒ **只有票 115 一枚还剩物理未勾框**，其余 16 枚全勾。票 115 那两格与索引件 §4.1 第 13/14 行
 （原件 `docs/evidence/s1/closed-tickets-evidence-index.md` 自 `:304` 起那一节）**独立复现一致**
 ⇒ 本腿不新增该线索，也不翻框。
+
+---
+
+## §2 十七枚逐枚三分表
+
+形状＝①在等哪种凭据 ②现量尺 + 读数原文 ③归口结论。
+
+### 2.1 票 01 — `.scratch/wisp/issues/01-build-chain-done.md`
+
+① 在等：**终裁表**（判 AC 框那一类；票面 5 框全勾）。
+② 现量：
+- `ls docs/evidence/s1/ | grep -c "^01-"` = `0`；`grep -c "^0*01-"` = `0`。
+- 本腿新加的跨目录同名尺 `find docs/evidence -type f | grep -E '/(0*01)-'` → **命中 `docs/evidence/s0/01-adversarial-acceptance.md`**。
+- `wc -l -c` 该件 = **167 行 / 14,227 字节**；`git log -1 -- …` = `98b5a9ed 09-19 14:53 docs(evidence): T01 adversarial accepta…`；`git ls-files … | wc -l` = `1`（已跟踪）。
+- 票面引用它的行：`:49`（"T01-adv VERDICT PASS … report docs/evidence/s0/01-adversarial-acceptance.md"）、`:50`（"AC boxes reconciled against docs/evidence/s0/01-adversarial-acceptance.md"）。
+- `Status:`（`:3`）逐字 `**Status:** done`；未勾 0；最后一次动这笔票 = `c992da08 09-20 10:49 chore(tickets): reconcile AC checkboxes against docs/e`。
+③ 归口：**凭据在别处（指路径）＝错档**。`docs/evidence/s0/01-adversarial-acceptance.md` 以票号开头、命名与 A 档件同族、
+且被票面逐字当成翻勾凭据引了两处 ⇒ 真凭据存在，只是落在 **`s0/` 那一层**，被"只扫 `docs/evidence/s1/` 一层"的索引尺看不见。
+要做的不是补凭据，是**把尺的落点扩到 `docs/evidence/{s0,s2,s3}/**`**（改不改档＝编排者判断，本腿不改）。
+那张表是谁签的本腿不查（查＝读内容面，被禁）。
+
+### 2.2 票 02 — `.scratch/wisp/issues/02-s0-spike-done.md`
+
+① 终裁表。
+② s1 名下两把尺均 `0`；`find` 命中 **`docs/evidence/s0/02-adversarial-acceptance.md`（136 行 / 10,116 字节）＋ `docs/evidence/s0/02-spike-report.md`**；
+提交 `f11f7063 09-19 17:29 docs(evidence): T02 adversarial accepta…`；票面引用行 `:58`、`:59`；`Status: done`；未勾 0；最后提交 `3cbde3a6 09-20 10:56 docs(reports): audit-B MINOR cleanups…`。
+③ **凭据在别处＝错档**（同 2.1，落 `s0/`）。
+
+### 2.3 票 03 — `.scratch/wisp/issues/03-skeleton-runtime-rules-done.md`
+
+① 终裁表。
+② s1 名下 `0`/`0`；命中 **`docs/evidence/s0/03-adversarial-acceptance.md`（166 行 / 13,033 字节）**，提交 `6b83e93e 09-19 15:58 docs(evidence): T03 adversarial accepta…`；票面引用 `:64`、`:65`；`Status: done`；未勾 0；最后提交 `c992da08 09-20 10:49`。
+③ **凭据在别处＝错档**。
+
+### 2.4 票 04 — `.scratch/wisp/issues/04-sqlite-core-done.md`
+
+① 终裁表。
+② s1 名下 `0`/`0`；命中 **`docs/evidence/s0/04-adversarial-acceptance.md`（223 行 / 16,572 字节）**，提交 `642eee8a 09-19 17:29 docs(evidence): T04 adversarial accepta…`；票面引用 `:56`；`Status: done`；未勾 0；最后提交 `3cbde3a6 09-20 10:56`。
+③ **凭据在别处＝错档**。
+
+### 2.5 票 06 — `.scratch/wisp/issues/06-secretstore-envs-done.md`
+
+① 终裁表。
+② 现量：
+- s1 名下两把尺均 `0`；跨目录尺命中 **`docs/evidence/s0/06-adversarial-acceptance.md`** = `wc -l -c` → **52 行 / 3,928 字节**（17 枚候选里最短的一件）。
+- 该件最后一笔提交 = `8dbd9a2a 09-20 11:25 chore(tickets): addendum AC ruling for ticket 06 (AC#6…`＝**补裁那一笔**（不是首裁那一笔）。
+- 票面引用行：`:47`（逐字 "note: AC#6 **PASS** — 见 docs/evidence/s0/06-adversarial-acceptance.md §"Addendum 裁决（2026-09-20，AC#6 补裁）""）、`:62`、`:63`；`:64` 另记 `agent=ac-addendum-auditor did=补裁 AC#6（该框原为空白裁决）`。
+- `Status:`（`:3`）= `**Status:** done`；未勾 0；最后一次动这笔票＝`8dbd9a2a 09-20 11:25`（＝与那笔补裁同一枚提交）。
+③ 归口：**凭据在别处＝错档**（落 `s0/`）。★附一条尺寸告警（只有尺、没有判语）：件体 52 行／3,928 字节而票面 6 框全勾；
+票面 `:47` 与 `:64` 两处都写明 AC#6 那一格**原本"空白裁决"、由补裁笔事后补上**
+⇒ 若有人拿这一件当"06 的整票终裁表"，它对六格的覆盖度要由**非实现者另量**。本腿不读内容面、不判覆盖度。
+
+### 2.6 票 13 — `.scratch/wisp/issues/13-audio-capture-done.md`
+
+① 终裁表。
+② s1 名下 `0`/`0`；跨目录尺命中 **`docs/evidence/s2/13-adversarial-acceptance.md`（102 行 / 9,820 字节）**，提交 `e45b9672 09-19 23:09 docs(evidence): T13 adversarial accepta…`；
+票面引用 `:61`（"T13-adv VERDICT PASS … report docs/evidence/s2/13-adversarial-acceptance.md"）、`:62`（"AC boxes reconciled against …"）；`Status: done`；未勾 0；最后提交 `8bf0d341 09-20 10:49`。
+③ **凭据在别处＝错档**（落 `s2/`）。
+
+### 2.7 票 14 — `.scratch/wisp/issues/14-model-distribution-done.md`
+
+① 终裁表。
+② s1 名下 `0`/`0`；命中 **`docs/evidence/s2/14-adversarial-acceptance.md`（85 行 / 8,976 字节）**，最后一笔提交 `f5362d5d 09-20 11:26 chore(tickets): addendum AC rulings for ticket 14 (AC#…`＝补裁那一笔；
+票面引用 `:50`（AC#2 补裁行，逐字"见 docs/evidence/s2/14-adversarial-acceptance.md §"Addendum 裁决（2026-09-20，AC#2 补裁）""）、`:69`、`:70`；`:71` 记 `agent=ac-addendum-auditor did=补裁 AC#2/AC#3/AC#4/AC#5（四框原为空白裁决）`；`Status: done`；未勾 0。
+③ **凭据在别处＝错档**（落 `s2/`）。2.5 那条覆盖度告警在这里**更硬**：票面 `:71` 自陈**四格**原为空白裁决、由补裁笔改勾，
+而整件只有 85 行／8,976 字节 ⇒ 覆盖度需非实现者另量，本腿不代量。
+
+### 2.8 票 19 — `.scratch/wisp/issues/19-provenance-c25-done.md`
+
+① 终裁表。
+② 现量：
+- s1 名下 `0`/`0`；跨目录尺命中三件：**`docs/evidence/s3/19-adversarial-acceptance.md`（353 行 / 51,596 字节，提交 `a1ac6213 09-20 23:12 ci(A26,A27,A29): CI 5/5 job 全红实…`）**、
+  `docs/evidence/s3/19-adversarial-fix-round.txt`、`docs/evidence/s3/19-provenance-c25-tests.txt`（提交 `c33d10b4 09-20 10:53 docs(risk): C25 P12 conclusion + self-h…`）。
+- 票面 `:52` 逐字把第三件当证据引（"evidence: docs/evidence/s3/19-provenance-c25-tests.txt"）；`:63` 记 "accepted FAIL verdict, starting must-fix set B-1/B-2/M-1/M-3/M-6"。
+- `Status: done`；未勾 0；最后一次动这笔票 = `b3f6ea74 09-20 14:31 chore(tickets): ticket 19 DONE (orchestrator acceptanc…`。
+③ **凭据在别处＝错档**（落 `s3/`）。★但这枚有一个**必须由另腿看**的时序形状（本腿只登记、不判）：
+票 19 改名结案那笔提交在 **09-20 14:31**，而 `docs/evidence/s3/19-adversarial-acceptance.md` 的落地提交在 **09-20 23:12**
+⇒ **那张表比这笔票的结案晚约 8 小时 41 分**（两笔提交号与时刻本腿已贴原文）。判它要读表的内容面，本腿被禁。
+
+### 2.9 票 78 — `.scratch/wisp/issues/78-linux-vet-buildtags-unblocks-d22-gate-done.md`
+
+① 在等：**终裁表**。票面 AC 段标题逐字 "## AC（1:1 裁决表）" ⇒ 等的就是名下一张 1:1 表。
+② 现量（这枚的负向结论做了三重自证）：
+- `ls docs/evidence/s1/ | grep -c "^78-"` = `0`；`find docs/evidence -type f -name "78-*"` = **零命中**；`find .scratch/wisp/probes/78 -type f` = **无目录（0 枚）**。
+- 票面自报的凭据是 CI 原文而不是表：`:3` 逐字 `**Status:** **done**（编排者验收 2026-09-21 13:2x）—— AC#1..AC#4 四框全绿`；
+  `:4` run `35558750456` 里两步 success；`:17` 逐字 `**Evidence:** registry **A44②**；run 35551819606 / job 106188167868；票 71 报告`。
+- 那枚 run 的日志**不在盘上**：`ls .scratch/ci-logs/ | grep -E "35558750456|37166458550"` 只命中 `run-37166458550-failed.log` / `.err`（票 263 那枚的），
+  78 引的那一枚**没有**（`.scratch/ci-logs` 整层共 6 枚）⇒ 连"当时贴的读数"现在也不可复跑。
+- 同族命名的正向对照见 §0 尺二末段（`readings` 那一族 9 枚命中正常）⇒ 尺认得这类件名，78 名下确实零枚。
+- 反向引用尺（只用 `-l`、不读内容）：`grep -l -F "35558750456" docs/evidence/s1/*.md` → 唯一命中 **`docs/evidence/s1/75-independent-verification.md`**。
+- 票面还留着一格它自己承认无样本（`:55` 附近逐字）："**真正未见的判据**是 CI 上 ubuntu 原生的那一步 `go vet (module)`：run `35558750456` 里它 **skipped**…所以**AC#1 的"CI 侧绿"仍无样本**"。
+③ 归口：**缺凭据（要补）**，且要补的形状本腿能给准——不是重新发明证据，而是**把已存在的那枚 run 读数正式落成 78 名下的一件**
+（`docs/evidence/s1/78-*.md`）。这与票 115 那族"证据在别处、就是没有名下的 1:1 表"同形。
+★两条必须点名的残余：(a) AC#1 的"CI 侧 ubuntu 原生绿"那一半**票面自己写"仍无样本"**，那不是归口问题、是缺读数；
+(b) `75-independent-verification.md` 反向提到同一 run，要不要据此把 78 改记成"凭据在他名下"，属编排者／裁决腿的判断，见 §3-5。
+
+### 2.10 票 115 — `.scratch/wisp/issues/115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md`
+
+① 在等：**终裁表**——而且是"两半都要"：既缺 115 名下的 1:1 表，**AC#4（变异两向）与 AC#6（门禁按包四数）这两格连读数都没有**。
+② 现量：
+- `ls docs/evidence/s1/ | grep -c "^115-"` = `0`（严格尺同 0）；`find .scratch/wisp/probes/115 -type f` = **无目录**。
+- 未勾框原文（顶格尺命中 2 枚，缩进尺同数）：
+  - `:58:- [ ] **AC#4** 变异：把你选的修法退回原状 ⇒ AC#3 新用例必须红；再试一发"只比大小写不敏感"（`EqualFold`）这种**半修** ⇒ 也要红`
+  - `:64:- [ ] **AC#6** 门禁：按包 `-count=2 -v` 四数逐条点名（报 SKIP 要说是不是 `-v` 量的；`-count=2` 不缓存）；`
+- `Status:`（`:3`）逐字开头 = `**Status:** BLOCKED 部分（2026-09-21 21:2x agent-ticket115：AC#2 已裁=**方向 B（比对按树不按拼写）**…）`；
+  全票 `grep -nE 'WITHDRAWN|作废|撤'` 只命中 `:347`（"票面点名的 run 已作废"——说的是那枚 run，**不是这张票**）。
+- 票面自己指的凭据文件名：`grep -oE 'docs/evidence/[A-Za-z0-9._/-]+' … | sort -u` → `docs/evidence/s1/ci-step-readings-2026-09-22.md`（在盘）＋ `docs/evidence/s1/115-`（＝它自己承认名下没有）。
+- 最后一次动这笔票 = `6d22dd6c 09-29 19:01 gate-rerun-1 交件：12 枚全部升成〔有读数…〕`。
+- 关联票仍开放：`ls .scratch/wisp/issues/ | grep "^230"` → **`230-four-cells-left-unfinished-inside-closed-tickets.md`（无 `-done` 后缀＝还开着）**；票面 `:44`、`:46`、`:71` 三处把账指向票 230。
+③ 归口：**缺凭据（要补）**，两件事分属两类腿：
+(a) 115 名下的 1:1 终裁表——**必须非实现者写**，本腿不写、更不替编排者签；
+(b) AC#4 的变异两向与 AC#6 的门禁四数是**缺读数**（不是缺归口），需要一枚能跑 go 的腿（本腿零 go，做不到）。
+★另登记：`-done` 后缀与票面 `Status: BLOCKED 部分` 自相矛盾 ⇒ 见 §3-4。
+
+### 2.11 票 243 — `.scratch/wisp/issues/243-a-closed-ticket-number-still-owns-work-in-25-comments-which-is-the-shape-that-fooled-three-legs-done.md`
+
+① 等的凭据形状特殊：票面 `:10` 标题逐字 "## 要交的东西（一张表，不是代码）" ⇒ 本票要的**不是再一张表**，
+而是**对那张已交的逐处判定表的非实现者验收／签收**。
+② 现量：
+- s1 名下 `0`；`find .scratch/wisp/probes/243 -type f` = **1 枚** = `.scratch/wisp/probes/243/c1/census.md`（**177 行 / 35,375 字节**；
+  `:1` 逐字 "# 票 243 ／ 腿 `243-c1` — 「ticket 07」25 处注释逐处判定表（只读普查，零产码）"；`:4` 自陈纪律"零 `.go` 改动、零注释改动、零 `go test`、零 `go build`、零新仪器"）。
+- 未勾 0；`Status:`（`:3`）逐字 `**已立，未派**（09-30 15:3x，编排者立；由「票 228 AC#7」拆出…）`。
+- 最后提交 `08cec5a6 09-30 16:10 ledger(A473 收 243-c1：票 243 三格全成立、翻…`；
+  票面 `:17` 标题逐字 "## 编排者收表 — 09-30 16:2x（普查腿 `243-c1` 交件；账 `A473`；三格全成立、翻满、改名结案）"，同节自陈"**我按三把尺自认，没采信通知正文**"。
+- 反向引用尺：`grep -l -F "243-c1" docs/evidence/s1/*.md` → **`docs/evidence/s1/228-resident-ball-v1.md`**（别票名下的件引用它）。
+③ 归口：**票本身不该算结案（凭据矛盾处＝判定表在盘、被别票名下的件引用，但"三格全成立、翻满、改名结案"这一判语出自编排者本人之手）**。
+⇒ 缺的是**名下一张非实现者表**那一半，不是缺普查材料。归口动作＝需非实现者补签（本腿不签），不需要重做那 25 处判定。
+★同一枚票面还有第二处矛盾：`:3` 的 `Status:` 停在"已立，未派"、与 `-done` 与"翻满、改名结案"三处互相打脸 ⇒ §3-1。
+
+### 2.12 票 250 — `.scratch/wisp/issues/250-portable-tests-guard-c-merges-go-list-stderr-into-its-own-denominator-so-a-cold-module-cache-kills-the-whole-core-scope-reading-done.md`
+
+① 终裁表（四格都是"尺／门禁"形状，不涉界面）。
+② 现量：
+- s1 名下 `0`；`find .scratch/wisp/probes/250 -type f | wc -l` = **29 枚**，其中 `.scratch/wisp/probes/250/r1/verdict.md` = **273 行 / 25,344 字节**；
+- 那份件的 `:1` 逐字 "# 票 250 · **落地腿 `250-r1`** 裁决件 —— `portable-tests.sh` GUARD C 的分母被 `go list` 的 stderr 污染"，`:3` 起即 "## ① 起手锚与写面"
+  ⇒ ★**文件名叫 verdict、署名是落地腿自己**（本腿只读前 4 行取署名，不读判语）。
+- 反向引用尺：`grep -l -F "250-r1" docs/evidence/s1/*.md` = **零命中**；`grep -l -F "250-v1" docs/evidence/s1/*.md` = **零命中**。
+- `find .scratch/wisp/probes/250 -type f | grep -iE 'verdict|accept|裁决|验收'` 只回上面那一枚
+  ⇒ **250 名下连"落错地方"的非实现者件都没有**（与票 263/268 形状不同，那两枚至少各有一枚署名非实现者的表在 `.scratch` 里）。
+- 未勾 0；`Status:`（`:3`）逐字 `**已立，待派**（10-02 08:5x，编排者立；来源＝只读取证腿 ci-delta-1…）`；最后提交 `e39386b7 10-02 09:27 ledger(A516)：33-r8 死腿收尾＋250-r1／195-a1 …`。
+③ 归口：**缺凭据（要补）**。尺证据＝三把（s1 名下 0／两枚腿号 `grep -l` 零命中／probes 内 verdict 形状只有落地腿自署那一枚）。
+不许读成"没做过工作"：29 枚台件确在盘，缺的是**另一个体的读数**。另登记 §3-1（状态行"已立，待派"与 `-done` 矛盾）。
