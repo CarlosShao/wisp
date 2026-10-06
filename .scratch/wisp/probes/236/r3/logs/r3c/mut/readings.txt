@@ -1,0 +1,90 @@
+### ctrl : overlay D:/tmp/wisp236r3c/overlay/ctrl.json  (copy md5 4138177e29ffff427776a73eb0d61a9b)
+### rc=0
+--- FAIL lines (top-level) ---
+(none)
+--- last 2 lines ---
+ok  	github.com/CarlosShao/wisp/internal/tools	15.116s
+--- AC#2 four legs, raw lines ---
+(no line for these legs: non-verbose mode prints only failures)
+--- physical task.go md5 right after this run (must equal HEAD blob md5 4138177e29ffff427776a73eb0d61a9b) ---
+4138177e29ffff427776a73eb0d61a9b
+### teeth-m13 : overlay D:/tmp/wisp236r3c/overlay/teeth-m13.json  (copy md5 bb011a71b1949f23283191420825fb5a)
+### rc=1
+--- FAIL lines (top-level) ---
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- last 2 lines ---
+FAIL	github.com/CarlosShao/wisp/internal/tools	14.092s
+FAIL
+--- AC#2 four legs, raw lines ---
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- physical task.go md5 right after this run (must equal HEAD blob md5 4138177e29ffff427776a73eb0d61a9b) ---
+4138177e29ffff427776a73eb0d61a9b
+### m2b : overlay D:/tmp/wisp236r3c/overlay/m2b.json  (copy md5 e51a9a9a59f1e97f8421f8fa368a08c5)
+### rc=1
+--- FAIL lines (top-level) ---
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- FAIL: TestEveryRegisteredToolIsClassifiedForMarking175r2 (0.00s)
+--- last 2 lines ---
+FAIL	github.com/CarlosShao/wisp/internal/tools	13.745s
+FAIL
+--- AC#2 four legs, raw lines ---
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- physical task.go md5 right after this run (must equal HEAD blob md5 4138177e29ffff427776a73eb0d61a9b) ---
+4138177e29ffff427776a73eb0d61a9b
+### m2e : overlay D:/tmp/wisp236r3c/overlay/m2e.json  (copy md5 f2152339178d911b1d7944748aa9773c)
+### rc=1
+--- FAIL lines (top-level) ---
+--- FAIL: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+--- FAIL: Test221ParentStopsItsOwnChildRowAndStreamSettle (0.06s)
+--- FAIL: Test221SubagentCannotStopSiblingOrItself (30.00s)
+--- FAIL: Test221ParentCancellationStillDoesNotCascade (0.00s)
+--- FAIL: Test221TaskCancelUnderNoGateStopsAtTheWindow (0.00s)
+--- FAIL: Test221EveryPromisedTaskNameIsRegistered (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- last 2 lines ---
+FAIL	github.com/CarlosShao/wisp/internal/tools	44.091s
+FAIL
+--- AC#2 four legs, raw lines ---
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- physical task.go md5 right after this run (must equal HEAD blob md5 4138177e29ffff427776a73eb0d61a9b) ---
+4138177e29ffff427776a73eb0d61a9b
+### extra pair readpath-teeth-m13 (positive control for the read-disk blindness): overlay D:/tmp/wisp236r3c/overlay/readpath-teeth-m13.json
+### rc=1
+--- the archived read-disk leg, raw lines ---
+=== RUN   Test221DeferredMarkerForCancelLiftedButListStillMarked
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+--- my instrument-fact witness leg, raw lines ---
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- physical files md5 after run (test file must be 8f536366..., task.go 4138177e...) ---
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+13a0ba39e30fb95ad4f2be88beed4fc7 *internal/tools/task_cancel_221_legs_test.go
+### extra pair readpath-no-markers (positive control for the read-disk blindness): overlay D:/tmp/wisp236r3c/overlay/readpath-no-markers.json
+### rc=1
+--- the archived read-disk leg, raw lines ---
+=== RUN   Test221DeferredMarkerForCancelLiftedButListStillMarked
+--- FAIL: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+--- my instrument-fact witness leg, raw lines ---
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- physical files md5 after run (test file must be 8f536366..., task.go 4138177e...) ---
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+13a0ba39e30fb95ad4f2be88beed4fc7 *internal/tools/task_cancel_221_legs_test.go
+### readpath-nomarkers-testonly (OVERLAY THE TEST FILE ONLY; task.go never overlaid): rc=1
+--- FAIL: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+    task_cancel_221_legs_test.go:245: task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）
+    tasklist_deferred_236r3_teeth_test.go:178: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+    tasklist_deferred_236r3_teeth_test.go:222: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+FAIL
+### md5 after: task.go=4138177e29ffff427776a73eb0d61a9b test-file=13a0ba39e30fb95ad4f2be88beed4fc7

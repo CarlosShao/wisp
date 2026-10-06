@@ -1,0 +1,11 @@
+### 236-r3c gates, run at 2026-10-06 16:19 +0800, HEAD f84b4554 10-06 16:12
+
+$ go vet ./internal/tools/
+rc=0
+
+$ gofmt -l internal/tools/tasklist_deferred_236r3_teeth_test.go
+rc=0
+
+$ gofumpt -l (v0.12.0) on my one writable test file
+v0.12.0 (go1.27.1)
+rc=0

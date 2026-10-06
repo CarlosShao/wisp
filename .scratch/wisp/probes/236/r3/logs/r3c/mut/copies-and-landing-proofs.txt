@@ -1,0 +1,31 @@
+### 236-r3c mutation copies: how each was synthesised + landing proof
+### physical task.go md5 = 4138177e29ffff427776a73eb0d61a9b   (git show HEAD:internal/tools/task.go | md5sum = 4138177e29ffff427776a73eb0d61a9b)
+
+--- ctrl: diff physical -> /d/tmp/wisp236r3c/ctrl/task.go ---
+    md5 of copy: 4138177e29ffff427776a73eb0d61a9b
+--- teeth-m13: diff physical -> /d/tmp/wisp236r3c/teeth-m13/task.go ---
+23d22
+< //	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+    md5 of copy: bb011a71b1949f23283191420825fb5a
+--- m2b: diff physical -> /d/tmp/wisp236r3c/m2b/task.go ---
+603a604
+> 		{Tool: taskListRow236r3c{taskCancel{d: d}}, Decl: taskCancelDecl()},
+889a891,896
+> 
+> // taskListRow236r3c is a MUTANT-ONLY roster row (ticket 236 AC#2, leg 236-r3c).
+> // It exists only inside this overlay copy; it is never in the physical file.
+> type taskListRow236r3c struct{ taskCancel }
+> 
+> func (taskListRow236r3c) Name() string { return "task.list" }
+    md5 of copy: e51a9a9a59f1e97f8421f8fa368a08c5
+--- m2e: diff physical -> /d/tmp/wisp236r3c/m2e/task.go ---
+603d602
+< 		{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
+    md5 of copy: f2152339178d911b1d7944748aa9773c
+
+### marker arithmetic (this is what the archived lexical (b) branch counts)
+physical lines carrying DEFERRED: 3
+physical lines carrying DEFERRED and task.list: 2
+teeth-m13 copy lines carrying DEFERRED and task.list: 1
+m2b copy lines carrying DEFERRED and task.list: 2
+m2e copy lines carrying DEFERRED and task.list: 2

@@ -1,0 +1,78 @@
+### 1. the ruler on trial, located by grep (not by recalled line numbers)
+223:func Test221DeferredMarkerForCancelLiftedButListStillMarked(t *testing.T) {
+224:	src, err := os.ReadFile("task.go")
+--- the (b) branch, verbatim with line numbers ---
+228		var cancelMarked, listMarked int
+229		for _, line := range strings.Split(string(src), "\n") {
+230			if !strings.Contains(line, "DEFERRED") {
+231				continue
+232			}
+233			if strings.Contains(line, "task.cancel") {
+234				cancelMarked++
+235			}
+236			if strings.Contains(line, "task.list") {
+237				listMarked++
+238			}
+239		}
+240		if cancelMarked != 0 {
+241			t.Errorf("task.go 里还有 %d 行把 task.cancel 标成 DEFERRED：它已经注册并有实现，"+
+242				"「在册＋无实现＋无人认领」正是票 164 AC#1 要杀的那一形", cancelMarked)
+243		}
+244		if listMarked == 0 {
+245			t.Errorf("task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）")
+246		}
+247	}
+
+### 2. the other lexical/count-shaped ruler in the same file (the count at :183)
+170	func Test221TaskCancelIsRegisteredAtItsFrozenLevel(t *testing.T) {
+171		entries := BuiltinTaskEntries(TaskDeps{Roster: NewTaskRoster()})
+172		names := make([]string, 0, len(entries))
+173		var cancelEntry *Entry
+174		for i, e := range entries {
+175			names = append(names, e.Tool.Name())
+176			if e.Tool.Name() == "task.cancel" {
+177				cancelEntry = &entries[i]
+178			}
+179		}
+180		if cancelEntry == nil {
+181			t.Fatalf("BuiltinTaskEntries 没注册 task.cancel（现名册：%v）—— 说明书又在许诺一枚不存在的工具", names)
+182		}
+183		if len(names) != 2 {
+184			t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它）", len(names), names)
+185		}
+186		decl := cancelEntry.Decl
+
+### 3. BuiltinTaskEntries registration, verbatim
+596	
+597	// BuiltinTaskEntries returns the task family this configuration registers:
+598	// task.output and (since ticket 221 甲形, ruling A434) task.cancel. See the
+599	// header comment for why task.list is not here.
+600	func BuiltinTaskEntries(d TaskDeps) []Entry {
+601		return []Entry{
+602			{Tool: taskOutput{d: d}, Decl: TaskOutputDecl()},
+603			{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
+604		}
+605	}
+606	
+
+### 4. can my negative grep reach the TRUE NAME? (prove the ruler hits before claiming zero)
+--- grep -rn 'task\.list' internal/tools --include=*.go | wc -l  and the test-file subset ---
+23
+internal/tools/tasklist_deferred_236r3_teeth_test.go:7:// tell a true claim from a false one. The claim itself (task.list is DEFERRED,
+internal/tools/tasklist_deferred_236r3_teeth_test.go:20:// branching on whether the same line also names task.cancel (a) or task.list (b).
+internal/tools/tasklist_deferred_236r3_teeth_test.go:26://     Count() doc comment); 2 of them also carry "task.list" (:23 and :279).
+internal/tools/tasklist_deferred_236r3_teeth_test.go:34://     DEFERRED+task.list line is invisible to the leg guarding it: with this
+internal/tools/tasklist_deferred_236r3_teeth_test.go:51:// "task.list is DEFERRED" is a claim about capability: the family this host
+internal/tools/tasklist_deferred_236r3_teeth_test.go:63://	M-2b  register a task.list row -> the nail goes red BY NAME, while the
+internal/tools/tasklist_deferred_236r3_teeth_test.go:95:		if strings.Contains(line, "DEFERRED") && strings.Contains(line, "task.list") {
+internal/tools/tasklist_deferred_236r3_teeth_test.go:124:// task.list must NOT be in the roster, and the two rows that have
+internal/tools/tasklist_deferred_236r3_teeth_test.go:131:		if n == "task.list" {
+internal/tools/tasklist_deferred_236r3_teeth_test.go:132:			t.Errorf("DEFERRED 那一支和名册分叉了：BuiltinTaskEntries 的注册名册里出现了 task.list 这一行"+
+internal/tools/tasklist_deferred_236r3_teeth_test.go:160:// nail about task.list: it owns one invariant that is true at HEAD - the bytes
+internal/tools/tasklist_deferred_236r3_teeth_test.go:195:		t.Errorf("同一枚 DEFERRED＋task.list 标记行数，编译器看到 %d 行、os.ReadFile 看到 %d 行："+
+internal/tools/task_cancel_221_legs_test.go:184:		t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它）", len(names), names)
+internal/tools/task_cancel_221_legs_test.go:222:// wiring and the marker in one leg - and task.list's line is untouched.
+internal/tools/task_cancel_221_legs_test.go:236:		if strings.Contains(line, "task.list") {
+internal/tools/task_cancel_221_legs_test.go:245:		t.Errorf("task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）")
+--- who asks the roster for the name task.list: grep registered\["task.list"\] ---
+rc=0 (1 = zero hits, and the next line proves the pattern shape itself can hit)

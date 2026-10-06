@@ -1,0 +1,5 @@
+$ git status --porcelain -- internal cmd
+(end)
+
+$ git status --porcelain -- scripts .github
+(end)

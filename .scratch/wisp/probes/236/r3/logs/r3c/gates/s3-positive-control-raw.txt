@@ -1,0 +1,17 @@
+### raw text of the archived read-disk leg under the two positive-control variants
+--- readpath-teeth-m13 ---
+927:--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+928-=== RUN   Test221SpawnDescriptionPromisesOnlyWhatIsTrue
+929---- PASS: Test221SpawnDescriptionPromisesOnlyWhatIsTrue (0.00s)
+--- readpath-no-markers ---
+928:--- FAIL: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+929-=== RUN   Test221SpawnDescriptionPromisesOnlyWhatIsTrue
+930---- PASS: Test221SpawnDescriptionPromisesOnlyWhatIsTrue (0.00s)
+
+### source-level arithmetic of the (b) branch for each copy (what listMarked would be IF the leg read this copy)
+/d/tmp/wisp236r3c/teeth-m13/task.go : DEFERRED lines=2  lines with DEFERRED and task.list=1  lines with DEFERRED and task.cancel=0
+
+/d/tmp/wisp236r3c/no-markers/task.go : DEFERRED lines=1  lines with DEFERRED and task.list=0  lines with DEFERRED and task.cancel=0
+
+internal/tools/task.go : DEFERRED lines=3  lines with DEFERRED and task.list=2  lines with DEFERRED and task.cancel=0
+

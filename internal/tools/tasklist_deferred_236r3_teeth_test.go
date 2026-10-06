@@ -25,8 +25,11 @@ package tools
 //     lines (:23 the roster header, :32 a sentence about that header, :279 the
 //     Count() doc comment); 2 of them also carry "task.list" (:23 and :279).
 //     Delete :23 - the very line the branch is supposed to guard - and
-//     listMarked is still 1: the leg reports "标记还在" over a file whose marker
-//     line is gone. 交件 §3 M-2a-measured-on-disk shows it without any overlay.
+//     listMarked is still 1: the leg would report "标记还在" over a file whose
+//     marker line is gone. 交件 §3 measures this shape twice: M-2a (the teeth-m13
+//     copy, arithmetic in logs/r3c/mut/copies-and-landing-proofs.txt) and the
+//     read-path positive control, where the archived leg is shown green over the
+//     deleted-marker text and red only over the all-markers-gone copy.
 //  2. A read-disk ruler is structurally blind to `go test -overlay`, which is
 //     the instrument this ticket must mutate with. The overlay replaces the
 //     bytes the COMPILER sees; os.ReadFile opens the PHYSICAL file at run time,
@@ -45,6 +48,19 @@ package tools
 // os.ReadFile carrier. This file does not adjudicate (a) (see 交件 §5 item 1).
 //
 // ---------------------------------------------------------------------------
+// Where the readings in this file come from (attribution, AC#2's 交件 rule)
+// ---------------------------------------------------------------------------
+//
+// No judgement below is copied from the earlier legs. 236-r3 and 236-r3b both
+// died of a service fault before writing any adjudication (their evidence file
+// was 36 lines of "打算答" intent, commit d9aff5fd; the orchestrator re-submitted
+// it as 未验证半成品). This file's own bytes are leg 236-r3c: every rc, every
+// FAIL line and every roster quoted in 交件 §2/§3 was produced by r3c on
+// 10-06 16:2x-16:4x from the copies under D:/tmp/wisp236r3c/, and the archived
+// probe files under .scratch/wisp/probes/236/r3/logs/** were used as a SHAPE
+// reference only - never as a credential.
+//
+// ---------------------------------------------------------------------------
 // The AC#2 nail: ask the roster, not the comment
 // ---------------------------------------------------------------------------
 //
@@ -58,15 +74,22 @@ package tools
 // task_cancel_221_legs_test.go:183 keeps counting).
 //
 // A capability nail is reachable by the mutation instrument because the roster is
-// COMPILED. Both directions are shown in 交件 §3:
+// COMPILED. 交件 §3 records which shapes leg 236-r3c measured:
 //
+//	M-2a (teeth-m13)  delete the marker row at :23 only -> this file's roster nail
+//	      stays GREEN, which is correct: the capability did not change. The leg
+//	      that cannot tell this apart from a real code change is the archived
+//	      lexical one, and it stays green for the wrong reason (see 1 above).
 //	M-2b  register a task.list row -> the nail goes red BY NAME, while the
 //	      archived lexical leg stays green (:23 is still on disk): the exact
-//	      divergence the old shape cannot see.
-//	M-2c  register an unrelated new task.* row -> the nail stays green (it is a
-//	      name set, not a count) while the count-shaped leg at :183 goes red.
-//	      That is 票面 §四's 假红 prediction, measured; the count is left in
-//	      place, and the name set is what AC#2 adds next to it.
+//	      divergence the old shape cannot see. Measured, 交件 §3.
+//	M-2e  unregister task.cancel -> the nail goes red on the second half (the
+//	      roster must contain the two rows that have implementations). Measured.
+//	M-2c  register an unrelated new task.* row -> this nail is designed to stay
+//	      green (it is a name set, not a count) while the count-shaped leg at
+//	      task_cancel_221_legs_test.go:183 goes red. NOT measured by r3c: the
+//	      dispatch capped this leg at four mutations, so the 假红 prediction of
+//	      票面 §四 stays an argument from source, not a reading. 交件 §5 says so.
 
 import (
 	_ "embed"

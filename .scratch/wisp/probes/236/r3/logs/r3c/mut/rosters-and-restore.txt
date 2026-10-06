@@ -1,0 +1,63 @@
+### full-package red name rosters per mutant (non-verbose: only failures printed)
+--- ctrl ---
+(none: package green)
+--- teeth-m13 ---
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- m2b ---
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- FAIL: TestEveryRegisteredToolIsClassifiedForMarking175r2 (0.00s)
+--- m2e ---
+--- FAIL: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+--- FAIL: Test221ParentStopsItsOwnChildRowAndStreamSettle (0.06s)
+--- FAIL: Test221SubagentCannotStopSiblingOrItself (30.00s)
+--- FAIL: Test221ParentCancellationStillDoesNotCascade (0.00s)
+--- FAIL: Test221TaskCancelUnderNoGateStopsAtTheWindow (0.00s)
+--- FAIL: Test221EveryPromisedTaskNameIsRegistered (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+
+### the other capability rulers that also saw M-2b (who else has teeth; ⛔ not mine to adjudicate)
+--- FAIL: TestEveryRegisteredToolIsClassifiedForMarking175r2 (0.00s)
+    ticket175r2_stamp_live_test.go:374: fs.delete: unstamped: a confirmation of a local delete (opt-in family)
+    ticket175r2_stamp_live_test.go:374: task.cancel: unstamped: a receipt naming which roster row this call stopped
+    ticket175r2_stamp_live_test.go:374: fs.read: marked: C25 source roster (SPEC-06 §5)
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+    task_cancel_221_legs_test.go:184: task 家族注册了 3 枚：[task.output task.cancel task.list]（task.list 仍须是 DEFERRED，本票不许顺手注册它）
+time=2026-10-06T16:23:40.024+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle899430237\001\backup\wisp.db.bak-0-1 from=0 to=1
+
+### restore proof: physical files never changed (no in-place mutation was ever done)
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+13a0ba39e30fb95ad4f2be88beed4fc7 *internal/tools/task_cancel_221_legs_test.go
+8f536366cfe481e446f640d08e460673 *internal/tools/tasklist_deferred_236r3_teeth_test.go
+4138177e29ffff427776a73eb0d61a9b *-
+13a0ba39e30fb95ad4f2be88beed4fc7 *-
+8f536366cfe481e446f640d08e460673 *-
+### git status --porcelain -- internal cmd
+(end)
+### overlay 替换表逐字（r3c 四发＋三发配对），并把每发的 diff/md5 落地证明并档
+--- .scratch/wisp/probes/236/r3/logs/r3c/overlay/ctrl.json
+{"Replace": {"D:/work/workspace/projects plans/Wisp/internal/tools/task.go": "D:/tmp/wisp236r3c/ctrl/task.go"}}
+--- .scratch/wisp/probes/236/r3/logs/r3c/overlay/m2b.json
+{"Replace": {"D:/work/workspace/projects plans/Wisp/internal/tools/task.go": "D:/tmp/wisp236r3c/m2b/task.go"}}
+--- .scratch/wisp/probes/236/r3/logs/r3c/overlay/m2e.json
+{"Replace": {"D:/work/workspace/projects plans/Wisp/internal/tools/task.go": "D:/tmp/wisp236r3c/m2e/task.go"}}
+--- .scratch/wisp/probes/236/r3/logs/r3c/overlay/readpath-no-markers.json
+{"Replace": {"D:/work/workspace/projects plans/Wisp/internal/tools/task_cancel_221_legs_test.go": "D:/tmp/wisp236r3c/readpath-no-markers/task_cancel_221_legs_test.go", "D:/work/workspace/projects plans/Wisp/internal/tools/task.go": "D:/tmp/wisp236r3c/no-markers/task.go"}}
+--- .scratch/wisp/probes/236/r3/logs/r3c/overlay/readpath-nomarkers-testonly.json
+{"Replace": {"D:/work/workspace/projects plans/Wisp/internal/tools/task_cancel_221_legs_test.go": "D:/tmp/wisp236r3c/readpath-no-markers/task_cancel_221_legs_test.go"}}
+--- .scratch/wisp/probes/236/r3/logs/r3c/overlay/readpath-teeth-m13.json
+{"Replace": {"D:/work/workspace/projects plans/Wisp/internal/tools/task_cancel_221_legs_test.go": "D:/tmp/wisp236r3c/readpath-teeth-m13/task_cancel_221_legs_test.go", "D:/work/workspace/projects plans/Wisp/internal/tools/task.go": "D:/tmp/wisp236r3c/teeth-m13/task.go"}}
+--- .scratch/wisp/probes/236/r3/logs/r3c/overlay/teeth-m13.json
+{"Replace": {"D:/work/workspace/projects plans/Wisp/internal/tools/task.go": "D:/tmp/wisp236r3c/teeth-m13/task.go"}}
+
+### 盘上物理文件在全部 7 发之后仍未被改过一个字（overlay 不写盘）
+internal/tools/task.go  盘上=4138177e29ffff427776a73eb0d61a9b  HEAD=4138177e29ffff427776a73eb0d61a9b
+internal/tools/task_cancel_221_legs_test.go  盘上=13a0ba39e30fb95ad4f2be88beed4fc7  HEAD=13a0ba39e30fb95ad4f2be88beed4fc7
+internal/tools/tasklist_deferred_236r3_teeth_test.go  盘上=21b53d52ac87b893b74fdd9828f2f3aa  HEAD=8f536366cfe481e446f640d08e460673
+
+### git status --porcelain -- internal cmd
+ M internal/tools/tasklist_deferred_236r3_teeth_test.go

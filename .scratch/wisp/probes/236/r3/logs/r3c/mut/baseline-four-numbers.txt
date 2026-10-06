@@ -1,0 +1,8 @@
+rc=0
+top-level PASS= 206
+top-level FAIL= 0
+top-level SKIP= 0
+RUN lines= 281
+indented FAIL lines= 0
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	13.924s

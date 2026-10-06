@@ -1,0 +1,5 @@
+### existing capability rulers that already cover part of the shape (measured, not asserted)
+grep -rn 'task\.list' internal/tools --include=*_test.go | wc -l = 16
+--- the name-set rulers hitting task.cancel / task.list ---
+internal/tools/task_cancel_221_test.go:82:// Test221EveryPromisedTaskNameIsRegistered is AC#1's resident ruler.
+internal/tools/task_cancel_221_test.go:89:func Test221EveryPromisedTaskNameIsRegistered(t *testing.T) {

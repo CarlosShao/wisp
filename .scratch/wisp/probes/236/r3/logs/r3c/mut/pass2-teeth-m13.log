@@ -1,0 +1,83 @@
+time=2026-10-06T16:43:14.960+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-06T16:43:16.060+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing4120842224\003\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T16:43:16.068+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T08:43:16Z duration_ms=8
+time=2026-10-06T16:43:16.075+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing4120842224\003\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T16:43:16.081+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T08:43:16Z duration_ms=5
+time=2026-10-06T16:43:16.085+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T16:43:16.087+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T16:43:16.269+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete2659710253\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T16:43:16.278+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T08:43:16Z duration_ms=8
+time=2026-10-06T16:43:16.288+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete2659710253\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T16:43:16.295+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T08:43:16Z duration_ms=6
+time=2026-10-06T16:43:16.300+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T16:43:16.303+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T16:43:16.336+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4bfb95e4-4759-4af6-95ab-462fb9da149a owner=tools
+time=2026-10-06T16:43:18.385+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1339731645\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T16:43:18.392+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T08:43:18Z duration_ms=6
+time=2026-10-06T16:43:18.401+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1339731645\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T16:43:18.407+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T08:43:18Z duration_ms=5
+time=2026-10-06T16:43:18.412+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T16:43:18.415+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T16:43:19.254+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a0c921d2-7c5a-456c-8ec0-00c85edab939 owner=tools
+time=2026-10-06T16:43:19.255+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4790fdbb-8ff0-4e0b-a935-052979df5dd6 owner=tools
+time=2026-10-06T16:43:19.255+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-69ef6af5-f6ad-4b36-b92b-06222be7671f owner=tools
+time=2026-10-06T16:43:19.255+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-cc1ddf54-8c85-4fea-a1a8-ad77e7c7fa25 owner=tools
+time=2026-10-06T16:43:19.255+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8e349c03-b7a6-42c9-8705-699417da6885 owner=tools
+time=2026-10-06T16:43:19.255+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a0992f67-d56f-4964-9688-fba00dd65fc3 owner=tools
+time=2026-10-06T16:43:19.255+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fc86dbde-bc0b-4d65-982a-18d5e5904838 owner=tools
+time=2026-10-06T16:43:19.255+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d39738e5-6023-4c6c-8ab4-a38a3db63832 owner=tools
+time=2026-10-06T16:43:19.256+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-76df1134-9fc8-465d-b60c-d05a9097e6cb owner=tools
+time=2026-10-06T16:43:19.256+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8a3a96e6-9253-46ca-983d-fb1d6fb42d18 owner=tools
+time=2026-10-06T16:43:19.256+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6dc55f4d-021c-483d-ad14-554b01324add owner=tools
+time=2026-10-06T16:43:19.256+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c215cd8a-ae75-45e2-9304-f5459fff78f0 owner=tools
+time=2026-10-06T16:43:19.257+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-03d7f4a6-5dfc-4dff-9b7d-a01c76f6f292 owner=tools
+time=2026-10-06T16:43:19.257+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-29426a76-8c70-4d1a-bc6b-a315289ad667 owner=tools
+time=2026-10-06T16:43:19.257+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-dc42401f-f71b-4770-8d89-b224d2b2a5a0 owner=tools
+time=2026-10-06T16:43:19.257+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-357c24a5-3835-476e-aaec-9cfb1f999a7d owner=tools
+time=2026-10-06T16:43:19.257+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8d2d2872-edc7-4bc4-9710-27058953767e owner=tools
+time=2026-10-06T16:43:19.257+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8003692d-51fa-4ce7-aa76-9fd165428076 owner=tools
+time=2026-10-06T16:43:19.257+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-cc4a1c8d-329f-4dcc-88c4-04268e23aa2c owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f31d5a86-a02e-4094-a2b4-0c4fa5cadb69 owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-224d5e45-ab7a-4d08-99da-deba4a2bd623 owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-7e82558b-cdce-49fb-a2e0-6a155a1dd73f owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-740a8628-6b9c-4dda-8737-d8f2b4d961e4 owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-db713585-b3f3-4143-bba0-eb42a42adad4 owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f91d50e0-fc39-428a-91c5-416bc7fac76b owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-017921b8-9e79-4225-a492-c91cfa2f77fb owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-13d17c21-fdf1-4863-a1b4-1de85387be48 owner=tools
+time=2026-10-06T16:43:19.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e435a25e-4cf5-4e59-a45d-7b9e7df90a03 owner=tools
+time=2026-10-06T16:43:19.278+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle513782048\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T16:43:19.288+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T08:43:19Z duration_ms=9
+time=2026-10-06T16:43:19.296+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle513782048\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T16:43:19.303+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T08:43:19Z duration_ms=6
+time=2026-10-06T16:43:19.308+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T16:43:19.311+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T16:43:19.315+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-223a0f0a-485b-4a62-a440-3556af7b2e70 owner=tools
+time=2026-10-06T16:43:19.326+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5a920903-0500-42c8-bf05-750b7a1e746b owner=tools
+time=2026-10-06T16:43:19.326+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4fd0d07a-c5f7-4d34-ae18-c7846952add7 owner=tools
+time=2026-10-06T16:43:19.327+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c01bc7c9-dc81-46c1-a160-4f0b9ba4be27 owner=tools
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+    tasklist_deferred_236r3_teeth_test.go:212: 编译期与运行期读到的 task.go 字节不一致（编译 37326 字节 / 盘上 37391 字节，标记行数 1 对 2）：只有 -overlay 能让它们分开。这一发就是那条仪器事实的落地证明：盘上那把尺看不见突变，所以它绿的时候不能当作「标记还在」的证据。标记账号＝票 236 AC#2，未修码读数见交件 §3 M-2a
+    tasklist_deferred_236r3_teeth_test.go:218: 同一枚 DEFERRED＋task.list 标记行数，编译器看到 1 行、os.ReadFile 看到 2 行：两个数只有在 -overlay 下才会分开（交件 §3 M-2a 的配对读数）
+    tasklist_deferred_236r3_teeth_test.go:222: 成对读数：盘上 2 行 / 编译期 1 行（HEAD 上两数相等＝这把尺没在空转）
+time=2026-10-06T16:43:19.775+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore41146040\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T16:43:19.783+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T08:43:19Z duration_ms=7
+time=2026-10-06T16:43:19.790+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore41146040\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T16:43:19.795+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T08:43:19Z duration_ms=4
+time=2026-10-06T16:43:19.800+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T16:43:19.802+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T16:43:19.913+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate1818976434\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T16:43:19.919+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T08:43:19Z duration_ms=6
+time=2026-10-06T16:43:19.926+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate1818976434\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T16:43:19.932+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T08:43:19Z duration_ms=5
+time=2026-10-06T16:43:19.936+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T16:43:19.938+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T16:43:22.993+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered3653028695\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T16:43:23.002+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T08:43:22Z duration_ms=6
+time=2026-10-06T16:43:23.010+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered3653028695\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T16:43:23.014+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T08:43:23Z duration_ms=4
+time=2026-10-06T16:43:23.019+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T16:43:23.021+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	14.237s
+FAIL

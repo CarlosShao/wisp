@@ -1,0 +1,27 @@
+### negative-ruler hit-proof battery (all run by 236-r3c; each line = the ruler, then its reading)
+
+[N1] string literal "task.list" in internal/tools test files (code + comments):
+internal/tools/tasklist_deferred_236r3_teeth_test.go:26://     Count() doc comment); 2 of them also carry "task.list" (:23 and :279).
+internal/tools/tasklist_deferred_236r3_teeth_test.go:108:		if strings.Contains(line, "DEFERRED") && strings.Contains(line, "task.list") {
+internal/tools/tasklist_deferred_236r3_teeth_test.go:144:		if n == "task.list" {
+internal/tools/task_cancel_221_legs_test.go:236:		if strings.Contains(line, "task.list") {
+
+[N2] does any test file compare a tool name against the literal task.list (membership shape)?
+internal/tools/tasklist_deferred_236r3_teeth_test.go:144:		if n == "task.list" {
+
+[N2-hitproof] same pattern family applied to the name that IS registered (must be non-zero):
+internal/tools/task_cancel_221_legs_test.go:176:		if e.Tool.Name() == "task.cancel" {
+
+[N3] roster membership map lookups by literal name anywhere in repo:
+[N3-hitproof] the map exists and is written by e.Tool.Name(), not by literals:
+94:		registered[e.Tool.Name()] = true
+135:		if registered[root] {
+
+[N4] rosters counted, not named - the count-shaped assertion:
+internal/tools/task_cancel_221_legs_test.go:183:	if len(names) != 2 {
+
+[N5] marker-word census in production code (what the old ruler counts):
+internal/tools/task.go lines with DEFERRED = 3
+   of those, also carrying task.list = 2
+   of those, also carrying task.cancel = 0
+whole-package code marks DEFERRED( in internal/tools/*.go (production, non-test): 2

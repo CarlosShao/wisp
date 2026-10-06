@@ -1,0 +1,38 @@
+### ctrl  (-v, -run filtered to the three AC#2 legs)  rc=0
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+    tasklist_deferred_236r3_teeth_test.go:155: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+    tasklist_deferred_236r3_teeth_test.go:199: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+ok  	github.com/CarlosShao/wisp/internal/tools	0.038s
+
+### teeth-m13  (-v, -run filtered to the three AC#2 legs)  rc=1
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+    tasklist_deferred_236r3_teeth_test.go:155: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+    tasklist_deferred_236r3_teeth_test.go:189: 编译期与运行期读到的 task.go 字节不一致（编译 37326 字节 / 盘上 37391 字节，标记行数 1 对 2）：只有 -overlay 能让它们分开。这一发就是那条仪器事实的落地证明：盘上那把尺看不见突变，所以它绿的时候不能当作「标记还在」的证据。标记账号＝票 236 AC#2，未修码读数见交件 §3 M-2a
+    tasklist_deferred_236r3_teeth_test.go:195: 同一枚 DEFERRED＋task.list 标记行数，编译器看到 1 行、os.ReadFile 看到 2 行：两个数只有在 -overlay 下才会分开（交件 §3 M-2a 的配对读数）
+    tasklist_deferred_236r3_teeth_test.go:199: 成对读数：盘上 2 行 / 编译期 1 行（HEAD 上两数相等＝这把尺没在空转）
+FAIL
+
+### m2b  (-v, -run filtered to the three AC#2 legs)  rc=1
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+    tasklist_deferred_236r3_teeth_test.go:132: DEFERRED 那一支和名册分叉了：BuiltinTaskEntries 的注册名册里出现了 task.list 这一行（现名册：task.output / task.cancel / task.list）。§7 :1531 与 D34 都还把它记成 DEFERRED，「在册＋无实现＋无人认领」正是票 164 AC#1 要杀的那一形；真要解冻得由人工批准、标记与接线同批核销（A434 批准范围 item 7），而不是留下一行注释替一枚已注册的工具说它还不可用。这一枚就是 AC#2 要的牙：读注释那把尺在同一发突变下照旧全绿（交件 §3 M-2b）。
+    tasklist_deferred_236r3_teeth_test.go:155: 现名册：task.output / task.cancel / task.list（DEFERRED 的判据读的是这一行，不是注释里的词面）
+    tasklist_deferred_236r3_teeth_test.go:189: 编译期与运行期读到的 task.go 字节不一致（编译 37729 字节 / 盘上 37391 字节，标记行数 2 对 2）：只有 -overlay 能让它们分开。这一发就是那条仪器事实的落地证明：盘上那把尺看不见突变，所以它绿的时候不能当作「标记还在」的证据。标记账号＝票 236 AC#2，未修码读数见交件 §3 M-2a
+    tasklist_deferred_236r3_teeth_test.go:199: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+FAIL
+
+### m2e  (-v, -run filtered to the three AC#2 legs)  rc=1
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+    tasklist_deferred_236r3_teeth_test.go:151: task 家族名册 = task.output, want 含 task.output 与 task.cancel（task.output 是票 164 的，task.cancel 是票 221 甲形接的线）——名册少一枚就是「说明书与能力分叉」的另一形
+    tasklist_deferred_236r3_teeth_test.go:155: 现名册：task.output（DEFERRED 的判据读的是这一行，不是注释里的词面）
+    tasklist_deferred_236r3_teeth_test.go:189: 编译期与运行期读到的 task.go 字节不一致（编译 37339 字节 / 盘上 37391 字节，标记行数 2 对 2）：只有 -overlay 能让它们分开。这一发就是那条仪器事实的落地证明：盘上那把尺看不见突变，所以它绿的时候不能当作「标记还在」的证据。标记账号＝票 236 AC#2，未修码读数见交件 §3 M-2a
+    tasklist_deferred_236r3_teeth_test.go:199: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+FAIL
+

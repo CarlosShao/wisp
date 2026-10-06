@@ -1,0 +1,27 @@
+### PASS 2 of every shot, run 10-06 16:42 AFTER my comment-only edits (file md5 21b53d52...). Purpose: prove the pass-1 name sets are not an artifact of the earlier file bytes; ⛔ no断言 changed.
+### physical task.go before: 4138177e29ffff427776a73eb0d61a9b
+--- ctrl rc=0 isolated-red-count=0
+    (package green)
+    tail: ok  	github.com/CarlosShao/wisp/internal/tools	14.378s
+--- teeth-m13 rc=1 isolated-red-count=1
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+    tail: FAIL
+--- m2b rc=1 isolated-red-count=2
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+--- FAIL: TestEveryRegisteredToolIsClassifiedForMarking175r2 (0.00s)
+    tail: FAIL
+--- m2e rc=1 isolated-red-count=2
+--- FAIL: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+--- FAIL: Test221ParentStopsItsOwnChildRowAndStreamSettle (0.06s)
+--- FAIL: Test221SubagentCannotStopSiblingOrItself (30.00s)
+--- FAIL: Test221ParentCancellationStillDoesNotCascade (0.00s)
+--- FAIL: Test221TaskCancelUnderNoGateStopsAtTheWindow (0.00s)
+--- FAIL: Test221EveryPromisedTaskNameIsRegistered (0.00s)
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+    tail: FAIL
+### physical task.go after pass 2: 4138177e29ffff427776a73eb0d61a9b
