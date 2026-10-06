@@ -1,0 +1,11 @@
+probes(A646 落账)：19:10 一波服务故障连杀三枚只读腿；用它们自己留下的 logs 把四问里的三问答掉
+
+- 三枚死于 35/36/64 次调用（token 169 万/333 万/630 万）＝不是轮次帽，是我派单漏了"大输出先落文件"
+- 三枚的遗产是第三形：logs 完整、零交付件 ⇒ 代提 23 份小件（997 行/0 删，2822ee04），三份 MB 级 CI 全量日志（2.6 MB）不入库、也没删
+- 答完三问：census 步今天真在 CI 跑过且算出东西（test-windows step 8 [success]，自报 packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0，三发同形；脚本 :406 那行自报＋:409 GUARD D 具名行，不是硬印）
+- selftest 步从未进过 CI：GitHub 侧 No commit found for SHA 1309757b ＋ 08:55 那发 schedule run 13 步名册里没有 census（★这 13 行是我 gh run view 自己复跑的，逐字同于死腿件——它的 logs 只是"它取过"的证据，不是"这事为真"的证据）
+- ★票 111 AC#3 不是"欠读数"，是落地腿地界：票面 :27 原文要求"加守卫＋人为抽掉一个包证明它会红"＝改脚本＋跑变异，⛔ 不是读 CI 能交回的读数 ⇒ 不因为"腿死了"就把它记成欠读数
+- 附带（归票 252 那一族）：windows step 9 红名册＝internal/risk 12 枚具名，four numbers RUN=577 PASS=386 FAIL=12 SKIP=1
+- 三枚重派已飞（续各自 logs、只补缺尺、第 70 次调用强制 commit、并把上一枚死因写进派单）＋ 270-a1 出票 270 三形代价表
+
+在飞 4 枚（232-v1 唯一跑突变，go.exe 1 枚＝它活着）；写腿仍按住。只 commit 不 push；台账 append-only（18 增/0 删）。
