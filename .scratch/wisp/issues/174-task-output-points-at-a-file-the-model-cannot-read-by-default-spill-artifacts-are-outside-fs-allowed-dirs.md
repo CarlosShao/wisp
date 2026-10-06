@@ -84,3 +84,13 @@
 - **★它量到今天的真实泄漏（升级为一格待人裁）**：junction 臂实测 `risk.ErrReparseDenied` 全文（**含配置键名 `reparse_point_exceptions`**）原样进模型可见文本＝今天真的在漏——但那两句受 `task.go:299`/`:349` 模板冻结钉系着＝**契约轴，须 owner 裁**（进下一批大白话清单）。按 A375 先例不把红断言 commit 进名册，牙证留在 probes。
 - **它推翻我票面四处**（照单入账）：行号 `:313-314`→现锚 `task.go:836-837`；r2"必须动产码"对一半（路径/根列表两半经 junction 可绿钉）；票面 grep 尺从 r2 落地起失效（主文件=1、r2 文件=6）；MUT-V5 今天再跑不会绿。
 - **AC#2b/AC#2c**：2c 已由 `174-r2` 落地待非实现者翻勾（spill.go 那半，174-r2 的三 commit＋我的补记在案）；**2b 仍按在 `cmd/wisp`**（261-r2 交件后重估队列）。
+
+## 编排者追加格（2026-10-06 16:4x，取数 16:33–16:40，锚 95cb3d7a 之后；来路＝台账 A635 的 CI 读数＋本轮更正 A638）
+
+- [ ] **AC#6（编排者 10-06 追加；★原写 AC#4，落笔后核名册发现本票已有 AC#4（未勾），同号会撞两枚 ⇒ 就地改号，⛔ 不改别人那枚）**：本票那枚用例 `TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`（`internal/tools/task_output_pointer_notice_test.go:420`）在 ubuntu 腿上**跳过**，而它**不在** `scripts/portable-tests.sh` 那张 `ledger=(` 已知跳过名册里（尺原文：`grep -c 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3' scripts/portable-tests.sh` ＝ **0 枚**；名册共 11 枚、该平台记 8 枚已账）。后果不是"少一行日志"，是**整整一步被它判红**：同一次 run 的 step7 逐字打了 `portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:` → `--- SKIP: TestCanonicalizeErrorNotice...` → `portable-tests.sh: strict runner exited 1`。⇒ 只要这一格不落，推送之后 `test-core` 那一步就会一直红，而这条红**会被后续每一程误读成"又是 panel 那四枚"**（我自己就在 A635 里这样误读过一次，已在台账就地更正）。
+- 完成判据（二选一，⛔ 不许用第三种"把它删掉/改成不跳过"来消数字）：
+  - **甲**：在同一张 `ledger=(` 里补一行，五字段齐全（用例名｜包｜平台｜类别｜理由），理由要写"它测的是真 junction（`cmd /c mklink /J`）上的规范化拒绝，POSIX 上没有可拒的对象"，并**写明 POSIX 半边归谁**（照票 111 AC#10 那一行的既有写法：`OWNER of the POSIX half: whoever lands ...`）；
+  - **乙**：在 POSIX 侧给出**等价判据**（不依赖 junction 也能测到"错误提示里不得转述被登记的路径"这一条），此时该用例在 ubuntu 上应**真跑并 PASS**，名册那行不需要。
+- ⚠ 边界（本格为什么归 174 不归票 111）：票 111 AC#10 管的是**名册机制本身**（"未记账的 skip 要响亮"这条今天已被 CI 证明有牙——它就是把这一步打红的）；本格管的是**本票用例该不该进那本名册**。⛔ 两格不许合并、也不许由本腿去改机制。
+- ⚠ 写面：甲形要动 `scripts/portable-tests.sh`（今天有写腿在 `internal/tools` 跑 overlay 突变，串行由编排者排）；乙形要动 `internal/tools/task_output_pointer_notice_test.go`（同包同地界，⛔ 两腿不许并发）。
+- ⚠ 与既有五格的关系：本格排在 **AC#2b 之前**做（AC#2b 撞 `cmd/wisp` 写面已按住，本格只在 `internal/tools`／`scripts` 里动，可先行）。
