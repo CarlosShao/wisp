@@ -279,6 +279,29 @@ core_split="$work/core-pin-split.txt"
 { cat "$pin"; printf '%s\n' "$winsec_path/acl"; } >"$core_split"
 echo "portable-tests-selftest.sh: 254 split universe = core_pin ($pinc) + ${winsec_path}/acl ($((pinc + 1)) lines)"
 
+# seed 111: a package that exists in the module, compiles a test file on this
+# platform, and is claimed by NO tier pin. Ticket 111's GUARD D is the guard for
+# exactly this shape (internal/session and internal/projctx lived it for four days,
+# invisible, because the census that sees it had no reader). The path is invented
+# rather than borrowed from a real package on purpose: the fake go resolves the
+# universe from FAKEGO_PIN_FILE, so the only thing this seed claims is "one more
+# line in `go list ./...` than any pin accounts for" - and if a real package is ever
+# named here, GUARD C would go red for the tier runs and this case would be judging
+# something else. See cases 23-24 at the end of this file.
+unclaimed_path='github.com/CarlosShao/wisp/internal/carrier111unclaimed'
+# The universe, the count table and the unreadable-count table are written HERE,
+# not inside a case, because cases 23 and 24 share them and the carrier must run
+# either one alone (`bash scripts/portable-tests-selftest.sh guard-d-slice-is-what-bites`)
+# without `set -u` killing it on an unset name.
+universe111="$work/census-universe-111.txt"
+{ cat "$pin"; printf '%s\n' "$unclaimed_path"; } >"$universe111"
+counts111="$work/census-counts-111.txt"
+printf '%s %s\n' "$unclaimed_path" 1/0 >"$counts111"
+counts111q="$work/census-counts-111-q.txt"
+printf '%s %s\n' "$unclaimed_path" '?/?' >"$counts111q"
+uccount=$(grep -c . "$universe111" || true)
+echo "portable-tests-selftest.sh: 111 GUARD D universe = core_pin ($pinc) + $unclaimed_path ($uccount lines, claimed by no tier)"
+
 # TICKET 254: the chain runner. Cases 11-18 judge scripts/portable-tests.sh on its
 # own; the claim this ticket files is about the route CI REALLY takes -
 # .github/workflows/ci.yml:439 runs scripts/winsec-tests.sh, which hands the child an
@@ -737,6 +760,108 @@ if selected core-dir-form-hides-the-split; then
         has 'GUARD C - scope mode=winsec resolved to a DIFFERENT package'
         has '> github\.com/CarlosShao/wisp/internal/winsec/acl'
         printf '   (logs: %s / %s)\n' "$work/core-dir-form-hides-the-split.log" "$last_log"
+    fi
+fi
+
+# 23. TICKET 111 (this leg) - GUARD D's regression coverage, which did not exist
+#     before: `grep -Ec 'GUARD D|unclaimed|UNCLAIMED'` over THIS carrier read 0 at
+#     the HEAD this leg started from (the hole probes/111/r2 section 5.3 measured and
+#     named for the next leg, re-taken here rather than copied). GUARD D is the census
+#     arm that refuses exit 0 when a package COMPILES A TEST FILE on this platform
+#     while no named tier claims it (scripts/portable-tests.sh:392-399 counts,
+#     :407-423 refuses, message starts `portable-tests.sh: GUARD D -`). None of the
+#     22 scenarios above could see it: cases 15-16 drive the census but judge only the
+#     tier roster, and the fake go had no way to answer the census's per-package
+#     `go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' <pkg>` probe at all -
+#     it exited 0 printing nothing for every `-f` - so a seeded unclaimed package was
+#     unfakeable by construction. The shim now answers that format per package
+#     (FAKEGO_CENSUS_COUNTS, defaulting to FAKEGO_CENSUS_DEFAULT = 0/0).
+#
+#     ONE UNIVERSE, THREE SHAPES, and the third is what stops the first two from
+#     passing for the wrong reason:
+#       (a) package in no tier pin, count 1/0        -> RED, GUARD D names it
+#       (b) same universe, count unreadable (`?/?`) -> RED (default-deny)
+#       (c) same universe, count 0/0 (the default)  -> GREEN
+#     (c) proves the reds are caused by the seeded COUNT, not by the package merely
+#     being unclaimed: an unclaimed package with no denominator is GUARD A's subject
+#     and is marked `<-NO-TESTS`, never `<-UNCLAIMED-HAS-TESTS` (the script's own
+#     comment at :385-391 says a scope entry for it would be the false claim ticket
+#     111 AC#3 refuses). Without (c), (a) could go red on bytes where GUARD D is dead
+#     and this leg's wiring claim would be unfalsifiable.
+if selected census-unclaimed-package-goes-red; then
+    run_with census-unclaimed-package-goes-red "$universe111" \
+        "FAKEGO_CENSUS_COUNTS=$counts111" -- --scope=census
+    printf '   (a) the guard'"'"'s own words: it names the package AND what it counted.\n'
+    want_rc 1
+    has 'GUARD D - 1 package\(s\) compile a test file for GOOS='
+    has 'NO named scope claims them, so no CI step runs them'
+    has '<-UNCLAIMED-HAS-TESTS'
+    has "$unclaimed_path  tests-compiled-for-[a-z]*=1/0"
+    has 'census totals: packages='"$uccount"' .*unclaimed-with-tests=1'
+
+    run_with census-unreadable-count-goes-red "$universe111" \
+        "FAKEGO_CENSUS_COUNTS=$counts111q" -- --scope=census
+    printf '   (b) default-deny: a count that could not be read is a hole, not coverage.\n'
+    want_rc 1
+    has 'GUARD D - 1 package\(s\) compile a test file for GOOS='
+    has "$unclaimed_path  tests-compiled-for-[a-z]*=\?/\?"
+    has '<-UNCLAIMED-HAS-TESTS'
+
+    run_with census-unclaimed-zero-count-stays-green "$universe111" -- --scope=census
+    printf '   (c) control on the identical universe: unclaimed + 0/0 stays GREEN.\n'
+    want_rc 0
+    hasnt 'GUARD D -'
+    hasnt '<-UNCLAIMED-HAS-TESTS'
+    has "<-NO-TESTS"
+    has 'census totals: packages='"$uccount"' .*unclaimed-with-tests=0'
+fi
+
+# 24. The teeth of case 23, and the reading that turns it from a demo into a
+#     regression pin: same seed, MUTATED COPY of the script under test, GUARD D's
+#     `0/0)` arm widened to `*)` so it swallows every count. That is the shape of a
+#     "harmless" edit - someone folding the two marks into one arm, or reordering the
+#     case - and it must leave the carrier GREEN where the real bytes are RED over the
+#     same universe. If this case ever goes green-when-it-should-be-red or the slice
+#     moves out from under the awk, the case says so instead of reporting a vacuous
+#     pass (the same rule as cases 16, 18 and 22). This is the 改坏必红 half of this
+#     leg: the census step this leg wires into ci.yml (ticket 111 AC#1) is only worth
+#     wiring if breaking the guard it runs makes something red somewhere, and until
+#     this pair of cases nothing did.
+if selected guard-d-slice-is-what-bites; then
+    deadguard="$work/portable-tests-deadguard.sh"
+    awk -v old='            0/0) ;;' -v new='            *) ;;' \
+        '$0 == old { print new; next } { print }' "$script" >"$deadguard"
+    touched=$(diff "$script" "$deadguard" | grep -c '^<' || true)
+    printf '\n== case guard-d-slice-is-what-bites: mutant replaced %s line (GUARD D'"'"'s' "$touched"
+    printf ' 0/0 arm at\n        scripts/portable-tests.sh:393; 0 = nothing to mutate, and a seed that'
+    printf ' cannot take is\n        not evidence)\n'
+    ran=$((ran + 1))
+    if [ "$touched" -ne 1 ]; then
+        printf '   FAIL the mutant seed took %s line(s), expected exactly 1 - GUARD D'"'"'s case arm moved' "$touched"
+        printf ' out from\n        under this case; re-read the script instead of trusting the carrier\n'
+        failed=$((failed + 1))
+    else
+        gshadow=$(make_shadow_root "$deadguard")
+        last_log="$work/guard-d-slice-is-what-bites-mutant.log"
+        ( cd "$gshadow" && PATH="$work/bin:$PATH" FAKEGO_PIN_FILE="$universe111" \
+            FAKEGO_CENSUS_COUNTS="$counts111" bash scripts/portable-tests.sh --scope=census ) >"$last_log" 2>&1
+        last_rc=$?
+        printf '   mutant (the 0/0 arm swallows every count): same seed, GUARD D neutered.\n'
+        printf '   (log: %s)\n' "$last_log"
+        want_rc 0
+        hasnt 'GUARD D -'
+        hasnt '<-UNCLAIMED-HAS-TESTS'
+        has 'census totals: packages='"$uccount"' .*unclaimed-with-tests=0'
+        # and the seed is live in the REAL bytes: mutant green + real red over ONE
+        # universe is the whole claim. A mutant that had simply never been handed the
+        # package would look identical, so the real copy is run in the same case.
+        run_with guard-d-slice-is-what-bites-real "$universe111" \
+            "FAKEGO_CENSUS_COUNTS=$counts111" -- --scope=census
+        printf '   real bytes, same universe, same counts file:\n'
+        want_rc 1
+        has 'GUARD D - 1 package\(s\) compile a test file for GOOS='
+        has "$unclaimed_path  tests-compiled-for-[a-z]*=1/0"
+        printf '   (logs: %s / %s)\n' "$work/guard-d-slice-is-what-bites-mutant.log" "$last_log"
     fi
 fi
 

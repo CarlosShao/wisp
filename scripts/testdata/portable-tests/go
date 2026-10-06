@@ -26,6 +26,13 @@
 #   FAKEGO_LIST_DROP        one import path to withhold from `go list` stdout
 #   FAKEGO_LIST_RC          exit code of `go list`                  (default 0)
 #   FAKEGO_GUARD_A_SEED     makes `go list -f ...` print "EMPTY <this>"
+#   FAKEGO_CENSUS_COUNTS    file of "<importpath> <t/x>" lines - what
+#                           `go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}'
+#                           <pkg>` answers for THAT package (ticket 111 GUARD D's
+#                           per-package probe; see the census branch of the carrier)
+#   FAKEGO_CENSUS_DEFAULT   the count for a package absent from that file
+#                           (default 0/0 = no denominator on this platform, which is
+#                           GUARD A's business and explicitly NOT GUARD D's)
 #   FAKEGO_DROP_PKG         no package result line for this import path
 # Anything else is a mis-wired carrier and exits 99 loudly rather than printing
 # an empty success.
@@ -48,6 +55,36 @@ env)
     ;;
 list)
     if [ "${1-}" = "-f" ]; then
+        fmt=${2-}
+        # TICKET 111 (GUARD D regression): the census's per-package denominator
+        # probe is `go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' <pkg>`,
+        # asked once per package, so a carrier that wants a package to "compile a
+        # test file while no tier claims it" has to answer PER PACKAGE. The counts
+        # file holds "<importpath> <t/x>"; a package not listed in it answers
+        # FAKEGO_CENSUS_DEFAULT (0/0 = no denominator on this platform, which is
+        # GUARD A's subject and deliberately not a GUARD D hit). Answering the
+        # census fmt with a fixed string, or with nothing, would make the whole
+        # guard unseed-able - which is exactly how GUARD D sat at zero regression
+        # coverage until this leg.
+        case $fmt in
+        '{{len .TestGoFiles}}/{{len .XTestGoFiles}}')
+            # the census probe always names its package last; refuse a probe with
+            # no package rather than inventing an answer.
+            [ $# -ge 3 ] || { echo "fake-go: census -f probe with no package argument" >&2; exit 99; }
+            pkg=${@: -1}
+            answer=${FAKEGO_CENSUS_DEFAULT-0/0}
+            if [ -n "${FAKEGO_CENSUS_COUNTS-}" ]; then
+                if [ ! -r "$FAKEGO_CENSUS_COUNTS" ]; then
+                    echo "fake-go: FAKEGO_CENSUS_COUNTS names an unreadable file: $FAKEGO_CENSUS_COUNTS" >&2
+                    exit 99
+                fi
+                got=$(awk -v p="$pkg" '$1 == p { print $2; exit }' "$FAKEGO_CENSUS_COUNTS")
+                [ -n "$got" ] && answer=$got
+            fi
+            printf '%s\n' "$answer"
+            exit 0
+            ;;
+        esac
         # GUARD A's denominator probe: go list -f '<fmt>' <scope...>
         if [ -n "${FAKEGO_GUARD_A_SEED-}" ]; then
             printf 'EMPTY %s\n' "$FAKEGO_GUARD_A_SEED"

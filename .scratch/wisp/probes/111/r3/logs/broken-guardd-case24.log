@@ -1,0 +1,15 @@
+portable-tests-selftest.sh: core_pin extracted from /d/work/workspace/projects plans/Wisp/scripts/portable-tests.sh = 27 import paths
+portable-tests-selftest.sh: winsec_pin extracted from /d/work/workspace/projects plans/Wisp/scripts/portable-tests.sh = 1 import path(s)
+portable-tests-selftest.sh: split seed = github.com/CarlosShao/wisp/internal/winsec + github.com/CarlosShao/wisp/internal/winsec/acl (2 lines)
+portable-tests-selftest.sh: 254 split universe = core_pin (27) + github.com/CarlosShao/wisp/internal/winsec/acl (28 lines)
+portable-tests-selftest.sh: 111 GUARD D universe = core_pin (27) + github.com/CarlosShao/wisp/internal/carrier111unclaimed (28 lines, claimed by no tier)
+
+== case guard-d-slice-is-what-bites: mutant replaced 0 line (GUARD D's 0/0 arm at
+        scripts/portable-tests.sh:393; 0 = nothing to mutate, and a seed that cannot take is
+        not evidence)
+   FAIL the mutant seed took 0 line(s), expected exactly 1 - GUARD D's case arm moved out from
+        under this case; re-read the script instead of trusting the carrier
+
+portable-tests-selftest.sh: 1 case(s) ran, 1 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.KItWM0fCeC (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.

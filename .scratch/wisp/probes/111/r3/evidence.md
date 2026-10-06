@@ -123,33 +123,101 @@
 
 ## §3 ★工作树"改坏必红"那一窗（派单格 2 的第二半，边界具名）
 
-窗口＝**同一条 bash 调用内**完成：md5 起手 → 改坏 → `grep -n` 打印被改后整行 → 载具单发 ×2 →
+窗口＝**四条连续 bash 调用**构成的一个时间窗（23:17:55 → 23:20:56），窗内工作树的
+`scripts/portable-tests.sh` 是被改坏的那一份，窗外（含起手 22:22 与收尾 23:21 之后）它都等于 HEAD。
+每发都在**同一条命令内**做 md5 起手 → 改坏 → `grep -n` 打印被改后整行 → 载具发射 →
 `git cat-file blob HEAD:scripts/portable-tests.sh > scripts/portable-tests.sh` 还原 → md5 双读。
-窗口外任何时刻工作树的 `portable-tests.sh` 都等于 HEAD。读数与红句逐字见 §3.1／§3.2。
 
-- 窗口边界（起止时刻）：`______`（§3 填）
-- 净变化：`md5sum` 与 `git cat-file blob HEAD:... | md5sum` 双读同值 = `______`
-- `git status --porcelain -- scripts` 还原后：只应剩本腿的两枚文件（selftest + testdata go），`portable-tests.sh` **不出现**。
+### 3.1 窗口边界与凭据（逐时刻）
+
+| 时刻（+0800） | 动作 | 读数 |
+|---|---|---|
+| 23:17:55 | **WINDOW-OPEN**：`md5sum scripts/portable-tests.sh` ＋ `git cat-file blob HEAD:... \| md5sum` | 两者同值 `328eb3ead0545736a33e2c131687d60d`；改前先 `cp` 一份到 `/tmp/111r3-orig-portable-backup.sh`（临时件只建不删） |
+| 23:17:55 | 同一条链里 `awk` 把 `:393` 的 `            0/0) ;;` 换成 `            *) ;;` ⇒ `diff` 打印 | 逐字 `393c393` / `<             0/0) ;;` / `>             *) ;;` ⇒ **只 1 行落地**，随后 `cp` 进工作树 |
+| 23:17:55 | 落地自证：`grep -n '            \*) ;;' scripts/portable-tests.sh` ＋ `sed -n '392,399p'` | `393:            *) ;;`；那 8 行读作 `case $counts in` / `*) ;;` / `*)` / …⇒ **重复 `*)` 分支被 bash 接受且 `bash -n` rc=0**（第一支吞掉全部，GUARD D 计数与点名双双失效），所以这一发是"改坏"而不是"改坏到编译不过" |
+| 23:17:55 | 改坏态 md5 | `1a6e82eab24c9b33d5fd715360a15213`（≠ HEAD） |
+| 23:18:14→23:18:45 | 载具 case 23（正控）跑在**改坏的工作树**上 | **rc=1**，`3 case(s) ran, 10 assertion(s) failed` ⇒ 红句逐字见 §3.2，台件 `.scratch/wisp/probes/111/r3/logs/broken-guardd-case23.log` |
+| 23:19:37→23:19:38 | 载具 case 24（牙）跑在**改坏的工作树**上 | **rc=1**，`1 case(s) ran, 1 assertion(s) failed`，台件 `logs/broken-guardd-case24.log`，红句见 §3.3 |
+| 23:19:47 | **还原** `git cat-file blob HEAD:scripts/portable-tests.sh > scripts/portable-tests.sh` | md5 双读同值 `328eb3ead0545736a33e2c131687d60d`（工作树 ＋ HEAD blob 各一次）；`grep -c '^            0/0) ;;$'` = **1**（needle 回到可再种基线形）；`grep -c "MUT-"` = **0**；`bash -n` rc=**0**；`git status --porcelain -- scripts` 只剩本腿两枚文件（selftest ＋ testdata go），**`portable-tests.sh` 不出现** |
+| 23:20:03→23:20:56 | 还原后负控：case 23 与 case 24 各再跑一发 | 均 rc=**0**（`3 case(s) ran, 0 assertion(s) failed` / `2 case(s) ran, 0 assertion(s) failed`），台件 `logs/restored-case23.log`／`restored-case24.log` ⇒ **突变窗闭合** |
+| 23:21:08→23:23:40 | 还原态全跑（照派单用 `sh` 起） | rc=**0**，`32 case(s) ran, 0 assertion(s) failed`，`logs/full-carrier-sh-restored.log` |
+
+**净变化＝0**：`scripts/portable-tests.sh` 工作树 md5 与 HEAD blob 同值双读（23:19:47 与 23:20:56 之后
+`git status --porcelain -- scripts` 都不列它）；`git diff --numstat` 里它**根本不出现**（§6 逐笔）。
+
+### 3.2 红句逐字（case 23 打在改坏的工作树上，台件 `logs/broken-guardd-case23.log`）
+
+```
+== case census-unclaimed-package-goes-red: rc=0 log=/tmp/tmp.CR9G3YWFYw/census-unclaimed-package-goes-red.log
+   (a) the guard's own words: it names the package AND what it counted.
+   FAIL exit 0, expected 1
+   FAIL /GUARD D - 1 package\(s\) compile a test file for GOOS=/ appeared 0 time(s), wanted at least 1
+   FAIL /NO named scope claims them, so no CI step runs them/ appeared 0 time(s), wanted at least 1
+   FAIL /<-UNCLAIMED-HAS-TESTS/ appeared 0 time(s), wanted at least 1
+   FAIL /github.com/CarlosShao/wisp/internal/carrier111unclaimed  tests-compiled-for-[a-z]*=1/0/ appeared 0 time(s), wanted at least 1
+   FAIL /census totals: packages=28 .*unclaimed-with-tests=1/ appeared 0 time(s), wanted at least 1
+
+== case census-unreadable-count-goes-red: rc=0 log=/tmp/tmp.CR9G3YWFYw/census-unreadable-count-goes-red.log
+   (b) default-deny: a count that could not be read is a hole, not coverage.
+   FAIL exit 0, expected 1
+   FAIL /GUARD D - 1 package\(s\) compile a test file for GOOS=/ appeared 0 time(s), wanted at least 1
+   FAIL /github.com/CarlosShao/wisp/internal/carrier111unclaimed  tests-compiled-for-[a-z]*=\?/\?/ appeared 0 time(s), wanted at least 1
+   FAIL /<-UNCLAIMED-HAS-TESTS/ appeared 0 time(s), wanted at least 1
+```
+
+末三行（同一发）：`portable-tests-selftest.sh: 3 case(s) ran, 10 assertion(s) failed` /
+`portable-tests-selftest.sh: RED - a guard stopped biting, or the carrier went stale.`（rc=1）。
+
+⚠ **这一发的形状要读准**：(c) 那枚"0/0 应保持绿"在改坏态**照样 ok** —— 这是设计，不是漏：
+改坏后的 GUARD D 对什么计数都不再红，所以"该绿的绿"这条抓不到它，抓到它的是"该红的红了"。
+⇒ **10 枚 FAIL 全落在 (a)(b) 两支"必须红"的断言上，一枚不落在 (c)**，
+这正是派单要的"谁把那个 case 写坏，载具必须红"。
+
+### 3.3 红句逐字（case 24 打在改坏的工作树上，台件 `logs/broken-guardd-case24.log`）
+
+```
+== case guard-d-slice-is-what-bites: mutant replaced 0 line (GUARD D's 0/0 arm at
+        scripts/portable-tests.sh:393; 0 = nothing to mutate, and a seed that cannot take is
+        not evidence)
+   FAIL the mutant seed took 0 line(s), expected exactly 1 - GUARD D's case arm moved out from
+        under this case; re-read the script instead of trusting the carrier
+```
+
+第二枚红是**独立的一把**：case 24 的 awk 锚在"被审计的那份脚本"里找 `            0/0) ;;`，
+工作树被改坏后那一行**已经不存在** ⇒ `touched=0` ⇒ 用例自己不交 vacuous green 而是点名
+"the mutant seed took 0 line(s) ... re-read the script instead of trusting the carrier"。
+⇒ 同一处腐坏被两把尺各自抓到（case 23 抓行为面、case 24 抓种子面），不是同一条断言数两遍。
 
 ## §4 门禁四把尺（带时刻＋HEAD）
 
-| 尺 | 读数 | 时刻 |
+| 尺 | 读数 | 时刻（+0800）／HEAD |
 |---|---|---|
-| `bash -n scripts/portable-tests-selftest.sh` | rc=**0** | 23:04:1x |
-| `bash -n scripts/testdata/portable-tests/go` | rc=**0** | 22:5x（shim 单测） |
-| `bash -n scripts/portable-tests.sh` | rc=**0**（本腿净变化 0） | 22:27:03 |
-| `sh scripts/portable-tests-selftest.sh`（全跑） | 见 §5 | |
-| `sh scripts/d22scan.sh` | 待填 | |
-| `sh scripts/check-path-length-budget.sh --with-self-test` | 待填 | |
-| ci.yml 禁面 `grep -cE 'winlive\|-tags\|GOFLAGS'` | **0** | 23:0x |
+| `bash -n scripts/portable-tests-selftest.sh` | rc=**0** | 23:04:17（改后）；改前基线 22:27:03 亦 0 |
+| `bash -n scripts/testdata/portable-tests/go` | rc=**0** | 22:5x（shim 单测那发） |
+| `bash -n scripts/portable-tests.sh` | rc=**0**（本腿净变化 0） | 22:27:03 / 改坏态 23:17:55 / 还原后 23:19:47 三发全 0 |
+| `sh scripts/portable-tests-selftest.sh`（**全跑**） | rc=**0**，`32 case(s) ran, 0 assertion(s) failed`，`GREEN - every seeded anomaly was refused, and the clean scope passed.` | 23:21:08→23:23:40，HEAD 当时 `0cebee4c`（本腿第 1 笔 `6c0e3e31` 已入库） |
+| `sh scripts/d22scan.sh` | rc=**0**，末行逐字 `d22scan: clean - no D22 ban violations` | 23:23:52→23:24:16，HEAD `0cebee4c`，台件 `logs/d22scan-r3.log` |
+| `sh scripts/check-path-length-budget.sh --with-self-test` | rc=**0**，逐字 `VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree` | 23:24:30→23:24:34，HEAD `0cebee4c`，台件 `logs/path-length-r3.log` |
 
-⚠ **本腿自查并就地更正一处**：第一版 ci.yml 注释为了让"我这步没加什么"可核，
-把 `-tags winlive`／`GOFLAGS`／`-skip` 三个词写成了字面量 ⇒ `grep -cE 'winlive|-tags|GOFLAGS' .github/workflows/ci.yml`
-当场从 0 变 3 枚命中（各 1）。那把尺是本票 AC#1／票 111 r2 §5.1 用来判"winlive 零接入"的仪器，
-写注释的人不许把它洗软。已改写为不含这些 token 的等价句子（`no build tag of any kind is passed here,
-no environment-level tag override, no skip flag by name`），复量回到 **0 / 0 / 0**；
-事实与出处（11 枚 winlive 文件／5 枚自带 13 处 `t.Skip`／`SKIP-LOUD: this host reports no ball window`
-@ `cmd/wisp/resident_hotkey_live_258_windows_test.go:55`／`tools/d22scan/runtests.sh:98-102` 判 SKIP fatal）一字未减。
+**d22scan 分母不降（与编排者 A626 记的上一发读数逐枚对照，本腿只加文件不减）**：
+bans #1-5 `internal/`=**228**、`cmd/`=**38**、ban#6 `frontend/`=**85**、ban#7 `internal/tools/`=**23**、
+ban#8 `design/`=**39**、`frontend/`=**85**、`internal/`=**512**、`cmd/`=**104** ⇒ 八枚读数与 A626 那发**全部持平**，
+`=== RUN=77 PASS=35 FAIL=0 SKIP=0`（正控段 `runtests.sh: OK`）。
+⚠ ban#8 的 `internal/` 512 枚含注释与 `_test.go`：本腿没写任何 `.go` 产码／测试文件，只动了 `scripts/` 下三份，
+所以这把尺对本腿是"不增不减"，读到的 512 是别人这两小时的活痕（与本腿无关，具名不冒充）。
+
+**path-length 分母**：tracked=**6081**（本腿第 1 笔落了 3 枚新跟踪件 ⇒ 相对 268-v2 笔6 的 6070 ＝ **+11 枚**，
+其中本腿 3 枚、其余是同时段他人的在飞件，本腿不认领也不猜是谁）／over-budget=**57**／
+covered by roster=**57**／**not in roster=0** ⇒ 交件不给门添新红；positive control 三发全 ok。
+本腿新建的最长相对路径＝`.scratch/wisp/probes/111/r3/logs/broken-guardd-case23.log`（58 枚字符），
+远低于 hat 121／帽 100，且不在 `.scratch/wisp/issues/`（README 规则 9 的射程目录）里。
+
+**零 emoji 自证（ban#8 的仪器射程）**：本腿三份文件新增行里 `U+1F000–1FAFF`／`U+2200–22FF`／
+`U+2600–27BF`／`U+2B00–2BFF`／`U+FE0F`／`U+1F1E6–1F1FF` 命中 **0 枚**（python 逐码位扫 `git diff -U0` 的 `+` 行）；
+新增行里的非 ASCII 仅 **4** 枚字符＝`改坏必红` 的汉字 4 枚（`U+6539`／`U+574F`／`U+5FC5`／`U+7EA2`，带外）。
+⛔ 仪器**不扫**的 `→`（`U+2192`）与 `①②③`（`U+2460` 段）本腿一律**不往界面文案里写**——
+这三份文件都是 CI 读的注释／证据件，不是界面文案（`AGENTS.md §1.2` 那段"规格比仪器宽"的缺口不归本腿定案）。
+
 
 ## §5 判不动的地方（具名归口）
 

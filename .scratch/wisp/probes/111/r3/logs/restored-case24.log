@@ -1,0 +1,26 @@
+portable-tests-selftest.sh: core_pin extracted from /d/work/workspace/projects plans/Wisp/scripts/portable-tests.sh = 27 import paths
+portable-tests-selftest.sh: winsec_pin extracted from /d/work/workspace/projects plans/Wisp/scripts/portable-tests.sh = 1 import path(s)
+portable-tests-selftest.sh: split seed = github.com/CarlosShao/wisp/internal/winsec + github.com/CarlosShao/wisp/internal/winsec/acl (2 lines)
+portable-tests-selftest.sh: 254 split universe = core_pin (27) + github.com/CarlosShao/wisp/internal/winsec/acl (28 lines)
+portable-tests-selftest.sh: 111 GUARD D universe = core_pin (27) + github.com/CarlosShao/wisp/internal/carrier111unclaimed (28 lines, claimed by no tier)
+
+== case guard-d-slice-is-what-bites: mutant replaced 1 line (GUARD D's 0/0 arm at
+        scripts/portable-tests.sh:393; 0 = nothing to mutate, and a seed that cannot take is
+        not evidence)
+   mutant (the 0/0 arm swallows every count): same seed, GUARD D neutered.
+   (log: /tmp/tmp.5uo20pqhCc/guard-d-slice-is-what-bites-mutant.log)
+   ok   exit 0, as expected
+   ok   /GUARD D -/ absent
+   ok   /<-UNCLAIMED-HAS-TESTS/ absent
+   ok   /census totals: packages=28 .*unclaimed-with-tests=0/ appears 1 time(s)
+
+== case guard-d-slice-is-what-bites-real: rc=1 log=/tmp/tmp.5uo20pqhCc/guard-d-slice-is-what-bites-real.log
+   real bytes, same universe, same counts file:
+   ok   exit 1, as expected
+   ok   /GUARD D - 1 package\(s\) compile a test file for GOOS=/ appears 1 time(s)
+   ok   /github.com/CarlosShao/wisp/internal/carrier111unclaimed  tests-compiled-for-[a-z]*=1/0/ appears 1 time(s)
+   (logs: /tmp/tmp.5uo20pqhCc/guard-d-slice-is-what-bites-mutant.log / /tmp/tmp.5uo20pqhCc/guard-d-slice-is-what-bites-real.log)
+
+portable-tests-selftest.sh: 2 case(s) ran, 0 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.5uo20pqhCc (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: GREEN - every seeded anomaly was refused, and the clean scope passed.
