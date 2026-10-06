@@ -1,0 +1,11 @@
+chore(probe/pool-validity-3a): 判完 100/103/107（1+1+1）
+
+- 100 仍成立：AC#0 门仍关（生产面 exec.Command 非测试 0 命中；AppContainer 载体 0 枚）。
+  顺带登记票面那句"全仓非测试 exec.Command 只有 mockllm/SLO/doctor"已过期（今树 2 枚：mockllm、tools/d22scan/gitignore.go）。
+- 103 差翻勾：缝守卫 + firstLinkAncestor 今树都在（resolve.go 6 命中 / winsec.go 3 命中），
+  commit 0717bf29 标题逐字 fix(103,AC#1#2) ⇒ 缺陷不在但不是"被别人做掉"，AC#3/AC#4 运行期量不到。
+- 107 已失效（硬门：commit 号 + --name-only + 今树复算三把它都过了）：
+  8e100950 装进 treeResolvedAsNamed/resolvedForm（paths.go:99/:191/:220），treeOnDisk 在授权腿零调用，
+  两枚 107b 探针用例已进仓。写死一处措辞：装进的是票 92 的 commit、代码是 agent-ticket107b 写的（票面 19:5x 少署注记）。
+
+HEAD 4b15869d。零 go 命令。票面零改动。
