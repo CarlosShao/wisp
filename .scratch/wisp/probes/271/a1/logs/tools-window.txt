@@ -1,0 +1,26 @@
+=== widen the window: -A8 then filter len( ===
+internal/tools/bridge_test.go-733-	if len(dir) != 0 {
+internal/tools/bridge_test.go-734-		t.Fatalf("empty bridge reports %d tools", len(dir))
+internal/tools/fs_test.go-263-	if len(dir) != 6 {
+internal/tools/fs_test.go-264-		t.Fatalf("directory has %d entries: %+v", len(dir), dir)
+rc=0
+=== bridge_test.go 725-740 ===
+722| }
+723| 
+724| // TestBridgeIsTheLoopToolProvider is the "fits the existing seam, not a
+725| // parallel one" proof: a *Bridge satisfies agent.ToolProvider, so the loop's
+726| // Tools()/Execute() calls are the bridge's, with no second dispatch path.
+727| func TestBridgeIsTheLoopToolProvider(t *testing.T) {
+728| 	var p agent.ToolProvider = New(Options{})
+729| 	dir, err := p.Tools(t.Context())
+730| 	if err != nil {
+731| 		t.Fatal(err)
+732| 	}
+733| 	if len(dir) != 0 {
+734| 		t.Fatalf("empty bridge reports %d tools", len(dir))
+735| 	}
+736| 	if _, err := p.Execute(t.Context(), req("fs.read", `{}`)); err != nil {
+737| 		t.Fatalf("unknown tool must not be a provider fault: %v", err)
+738| 	}
+739| }
+740| 

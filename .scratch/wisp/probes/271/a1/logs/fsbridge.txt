@@ -1,0 +1,4 @@
+=== fsBridgeWith definition ===
+
+=== does that bridge register task entries? (grep BuiltinTaskEntries in fs_test.go) ===
+0

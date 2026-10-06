@@ -1,0 +1,44 @@
+=== run.go:505-525 ===
+	// shortcut). SPEC-07 §3's frozen S1 roster names the first two builtins
+	// `notify` and `list_tools`, and internal/tools' C1 registration validates
+	// the 'namespace.action' name shape - which both of those names violate
+	// (`Registry.Register` refuses "notify": "name must be 'namespace.action'").
+	// Renaming it to `system.notify`/`wisp.notify.send` departs from the frozen
+	// table just as badly, and internal/tools is consume-only for this ticket,
+	// so neither side gets edited here. The notification therefore stays on the
+	// CLI's own D10 result path (which is where the S1 demo needs it anyway)
+	// and list_tools keeps its D15(2) in-loop answer. Registering notify as a
+	// C4 tool needs a ruling on which frozen name wins.
+	for _, e := range tools.BuiltinFSEntries(tools.FSDeps{
+		Paths:         rt.paths,
+		DeleteEnabled: cfg.FS.DeleteEnabled,
+	}) {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+	// The task family (ticket 164 AC#3, plus ticket 221 甲形 per ruling A434) is
+	// what reads and stops the process-local task table above:
+=== run.go:780-800 ===
+	for _, e := range tools.BuiltinSubagentEntries(tools.SubagentDeps{
+		Roster:      rt.tasks,
+		ParentTools: rt.bridge,
+		Provenance:  rt.c25,
+		// The panel's stream log itself, handed over as the two methods the
+		// spawner needs (tools.SubagentStreamSink). It is the log rather than a
+		// closure around it because Close is half of the job: a finished
+		// subagent whose row never says done streams forever on the page.
+		Stream:      rt.stream,
+		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
+	}) {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+
+	// The answer side, last - so a reply can never arrive at a half-built
+	// runtime (ticket 201). With no reply source this is a no-op and the run
+	// keeps the posture it had before the field existed: cards get shown, nobody
+	// answers them, and each route resolves on its own clock.

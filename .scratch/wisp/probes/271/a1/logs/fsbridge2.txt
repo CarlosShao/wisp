@@ -1,0 +1,42 @@
+=== helpers_test.go 30-55 ===
+// fsBridgeWith is fsBridge with an optional journal and gate. The C25 engine is
+// always wired, because "results are taint-marked" is a hard rule, not a flag.
+func fsBridgeWith(t *testing.T, j agent.Journal, g Gate, allowed ...string) (*Bridge, *risk.Provenance) {
+	t.Helper()
+	if g == nil {
+		g = NoGate{}
+	}
+	var paths *PathCanonicalizer
+	if len(allowed) == 0 {
+		paths = NewPathCanonicalizer(nil, nil)
+	} else {
+		paths = NewPathCanonicalizer(allowed, nil)
+	}
+	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil})
+	reg := NewRegistry()
+	for _, e := range BuiltinFSEntries(FSDeps{Paths: paths}) {
+		if err := reg.Register(e); err != nil {
+			t.Fatalf("Register(%s): %v", e.Tool.Name(), err)
+		}
+	}
+	return New(Options{
+		Registry: reg, Paths: paths, Provenance: prov, Journal: j, Gate: g,
+		Logf: func(string, ...any) {},
+	}), prov
+}
+
+=== where is fsBridgeWith ===
+internal/tools/helpers_test.go:32:func fsBridgeWith(t *testing.T, j agent.Journal, g Gate, allowed ...string) (*Bridge, *risk.Provenance) {
+=== grep BuiltinTaskEntries per file in internal/tools ===
+internal/tools/failclosed_236_teeth_test.go:1
+internal/tools/pointer_183_cli_seam_test.go:1
+internal/tools/pointer_185_cli_seam_test.go:1
+internal/tools/subagent_197.go:1
+internal/tools/subagent_197_test.go:1
+internal/tools/task.go:2
+internal/tools/task_cancel_221_legs_test.go:3
+internal/tools/task_cancel_221_test.go:2
+internal/tools/task_output_leg_test.go:2
+internal/tools/task_output_pointer_notice_test.go:1
+internal/tools/tasklist_deferred_236r3_teeth_test.go:5
+internal/tools/ticket175r2_stamp_live_test.go:2

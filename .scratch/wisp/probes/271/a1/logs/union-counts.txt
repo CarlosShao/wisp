@@ -1,0 +1,46 @@
+=== tests that count the model-visible tool directory (Tools()) anywhere in repo ===
+rc=1
+
+=== registry size assertions (len(reg…/registry)) ===
+internal/agent/spill_name_injectivity_test.go:339:	if len(entries) != 1 {
+internal/agent/spill_path_invariant_test.go:146:			if len(entries) != 1 || entries[0].Name() != sh.wantName {
+internal/agent/spill_test.go:65:	if entries, _ := os.ReadDir(dirBig); len(entries) != 0 {
+internal/ball/hotkey_cancel_borrow_260_test.go:41:	if len(reg.attemptedAcc) == 0 {
+internal/ball/hotkey_status_test.go:398:	if len(reg.unattempt) != 4 {
+internal/memory/artifacts_path_invariant_test.go:541:	if entries, err := os.ReadDir(artifactsDir); err != nil || len(entries) != 0 {
+internal/memory/dao_test.go:367:	if err != nil || len(all) != 1 {
+internal/models/acl_sid_121_test.go:237:	if all := parseACELines(dump, path); len(all) != 2 {
+internal/perm/ticket90_persist_test.go:269:	if len(all) != 1 {
+internal/risk/pointer_185_test.go:367:		if reg == nil || len(reg.marks) == 0 {
+internal/secret/delete_test.go:96:	if len(entries) != 0 {
+internal/secret/store_test.go:75:	if len(entries) != 1 {
+internal/secret/store_test.go:137:	if len(entries) != 0 {
+internal/session/grants_test.go:398:	if len(all) != 1 || all[0].SessionID != writer.SessionID().String() {
+internal/tools/fs_edit_ac5_gate_r4_test.go:395:	if len(entries) != 0 {
+internal/tools/fs_test.go:190:	if len(entries) != 6 {
+internal/tools/fs_test.go:235:	if len(entries) != 7 {
+internal/tools/helpers_test.go:38:	if len(allowed) == 0 {
+cmd/wisp/firstrun_198_test.go:180:	if entries, _ := os.ReadDir(cfgPath); len(entries) != 0 {
+cmd/wisp/run_mode101_test.go:525:	if len(all) != 1 || all[0].SessionID != session || all[0].ID != id {
+
+=== reflect-based method/field set counts anywhere ===
+internal/agent/approval/ticket146_liveapprovals_backing_test.go:119:		for i := 0; i < ty.NumField(); i++ {
+internal/agent/approval/ticket220_l1_window_read_test.go:343:	if typ.NumMethod() != 0 {
+internal/agent/approval/ticket220_l1_window_read_test.go:345:			"at all - it is one dimension of a read, not a door", typ.NumMethod())
+internal/agent/approval/ticket220_l1_window_read_test.go:348:	for i := 0; i < typ.NumField(); i++ {
+internal/agent/approval/ticket220_l1_window_read_test.go:362:	for i := 0; i < gateType.NumMethod(); i++ {
+internal/agent/approval/ticket242_panelface_test.go:36:	for i := 0; i < typ.NumField(); i++ {
+internal/agent/approval/ticket242_panelface_test.go:55:	for i := 0; i < typ.NumField(); i++ {
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:47:	out := make([]string, 0, typ.NumMethod())
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:48:	for i := 0; i < typ.NumMethod(); i++ {
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:81:	if typ.NumMethod() != len(panelAPIAllowedMethods) {
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:83:			typ.NumMethod(), len(panelAPIAllowedMethods))
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:171:	for i := 0; i < typ.NumField(); i++ {
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:191:		for i := 0; i < typ.NumField(); i++ {
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:227:	for i := 0; i < bt.NumField(); i++ {
+internal/agent/approval/ticket259_panel_capability_rulers_test.go:336:		for i := 0; i < typ.NumField(); i++ {
+internal/ball/tokens_table_test.go:626:func c21ColourFieldNames(t *testing.T, typ reflect.Type) []string {
+internal/ball/tokens_table_test.go:629:	for i := 0; i < typ.NumField(); i++ {
+internal/ball/tokens_table_test.go:754:	for i := 0; i < paletteType.NumField(); i++ {
+internal/ball/tokens_table_test.go:793:		for i := 0; i < lookType.NumField(); i++ {
+internal/ball/tokens_table_test.go:806:		verified, len(colour), paletteType.NumField(), lookChecked, len(looks))

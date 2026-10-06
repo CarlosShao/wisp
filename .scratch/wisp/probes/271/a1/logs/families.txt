@@ -1,0 +1,26 @@
+=== top-level dirs ===
+build/
+cmd/
+design/
+docker/
+docs/
+frontend/
+internal/
+models/
+plans/
+scripts/
+third_party/
+tmp-none/
+tools/
+
+=== all Builtin*Entries constructors in prod code ===
+internal/tools/fs.go:325:func BuiltinFSEntries(d FSDeps) []Entry {
+internal/tools/fs_write.go:772:func BuiltinFSWriteEntries(d FSDeps) []Entry {
+internal/tools/subagent_197.go:233:func BuiltinSubagentEntries(d SubagentDeps) []Entry {
+internal/tools/task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+
+=== who else registers entries into a Registry in prod (non-test) ===
+internal/proc/boot_windows.go:192:	return rt.shutdownHooks.Register(step, hook)
+cmd/wisp/run.go:519:		if err := reg.Register(e); err != nil {
+cmd/wisp/run.go:545:		if err := reg.Register(e); err != nil {
+cmd/wisp/run.go:791:		if err := reg.Register(e); err != nil {

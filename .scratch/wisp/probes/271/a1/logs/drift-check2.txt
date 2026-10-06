@@ -1,0 +1,12 @@
+=== commits since my snapshot bd39f17f touching internal or cmd ===
+rc=0
+=== disk vs head md5 for the five reviewed files ===
+internal/tools/task.go disk=4138177e29ffff427776a73eb0d61a9b head=4138177e29ffff427776a73eb0d61a9b same=YES
+internal/tools/task_cancel_221_legs_test.go disk=13a0ba39e30fb95ad4f2be88beed4fc7 head=13a0ba39e30fb95ad4f2be88beed4fc7 same=YES
+internal/tools/tasklist_deferred_236r3_teeth_test.go disk=21b53d52ac87b893b74fdd9828f2f3aa head=21b53d52ac87b893b74fdd9828f2f3aa same=YES
+cmd/wisp/run.go disk=1d95cfaf116d9092514ee0a905a82b23 head=1d95cfaf116d9092514ee0a905a82b23 same=YES
+internal/tools/ticket175r2_stamp_live_test.go disk=2a5fde81b78e56c8644c8463ce8738e3 head=2a5fde81b78e56c8644c8463ce8738e3 same=YES
+=== current short HEAD ===
+6895b994
+=== porcelain cmd internal ===
+0

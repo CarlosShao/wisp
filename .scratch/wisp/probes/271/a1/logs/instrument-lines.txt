@@ -1,0 +1,22 @@
+=== 236r3 instrument fact test exact lines ===
+155:			t.Errorf("DEFERRED 那一支和名册分叉了：BuiltinTaskEntries 的注册名册里出现了 task.list 这一行"+
+174:		t.Errorf("task 家族名册 = %s, want 含 task.output 与 task.cancel（task.output 是票 164 的，"+
+187://	diskCount     = deferredListMarkerLines236r3(os.ReadFile(taskSrcPath236r3))
+188://	compiledCount = deferredListMarkerLines236r3(compiled236r3TaskSrc)
+202:func Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt(t *testing.T) {
+205:		t.Fatalf("读不到 %s（读盘型尺的落点就是包内源文件）：%v", taskSrcPath236r3, err)
+208:	diskCount := deferredListMarkerLines236r3(diskText)
+209:	compiledCount := deferredListMarkerLines236r3(compiled236r3TaskSrc)
+212:		t.Errorf("编译期与运行期读到的 task.go 字节不一致（编译 %d 字节 / 盘上 %d 字节，标记行数 %d 对 %d）："+
+215:			len(compiled236r3TaskSrc), len(diskText), compiledCount, diskCount)
+217:	if diskCount != compiledCount {
+218:		t.Errorf("同一枚 DEFERRED＋task.list 标记行数，编译器看到 %d 行、os.ReadFile 看到 %d 行："+
+220:			compiledCount, diskCount)
+222:	t.Logf("成对读数：盘上 %d 行 / 编译期 %d 行（HEAD 上两数相等＝这把尺没在空转）", diskCount, compiledCount)
+=== :109 embed ===
+//go:embed task.go
+var compiled236r3TaskSrc string
+
+// deferredListMarkerLines236r3 counts the marker shape the archived ruler
+// guards: a line carrying both tokens. Same two tokens, same predicate, kept as
+// a pure function so 交件 §3's readings are auditable line by line.

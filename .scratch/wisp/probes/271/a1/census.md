@@ -31,7 +31,8 @@
 
 `git rev-parse` · `git branch --show-current` · `git status --porcelain` · `git log --oneline --diff-filter=A -- <path>` ·
 `git log --oneline -- <path>` · `git log -1 --format` · `grep -rn / -rl / -rnE / -c`（含 `-A`／`-B`） · `sed -n` · `awk` · `cut` ·
-`sort` · `uniq` · `wc -l / -c` · `ls` · `mkdir -p` · `head`／`tail`（管道末端） · `cat`（只读本腿自己的 logs） ＋ 工具侧 `Read`／`Write`。
+`sort` · `uniq` · `wc -l / -c` · `ls` · `mkdir -p` · `head`／`tail`（管道末端） · `cat`（只读本腿自己的 logs） ·
+`md5sum` ＋ `git show HEAD:<file> | md5sum`（§1.5(b) 那把对拉，⛔ 只读不改盘） ＋ 工具侧 `Read`／`Write`。
 
 ⇒ **清单里没有任何一枚 `go`**：无 `go test`／`go build`／`go vet`／`go list`／`go env`／`go run`，
 也没有任何间接起 `go` 的包装件（`scripts/*.sh`、`tools/d22scan/runtests.sh` 一枚未跑）。
@@ -152,7 +153,26 @@ ticket175r2_stamp_live_test.go:79 与 :353
 | 入口 | `cmd/wisp/main.go:58 func main()` → `:91` `case "run":` → `os.Exit(cmdRun(args[1:]))` |
 
 ⇒ **现量结论（不是判语）**：名册在**两条**产码路径上都被装配（文本 CLI `wisp run` ＋ 常驻任务来源那一支），
-所以这把尺量的**不是测试专用件**。`run.go:536-541` 那段注释逐字写明谁填名册（`Who FILLS the roster is ticket 197's spawner`）。
+所以这把尺量的**不是测试专用件**。`run.go:537` 那段注释逐字写明谁填名册（`Who FILLS the roster is ticket 197's spawner`，在 `:537-541` 那一段里）。
+
+**装配根一共往同一枚 registry 里放三家**（本腿现读 `grep -n "\.Register(" cmd/wisp/run.go` 去掉 `_test` ⇒ 三处循环）：
+
+```
+cmd/wisp/run.go:517-519	for _, e := range tools.BuiltinFSEntries(tools.FSDeps{Paths: rt.paths, DeleteEnabled: cfg.FS.DeleteEnabled}) { reg.Register(e) }
+cmd/wisp/run.go:544-545	tools.BuiltinTaskEntries(...)  → reg.Register(e)
+cmd/wisp/run.go:780-791	tools.BuiltinSubagentEntries(...) → reg.Register(e)
+```
+
+内置构造器全集（`grep -rnE "^func Builtin[A-Za-z]*Entries" --include="*.go" internal cmd`）＝**4 枚**：
+`fs.go:325`／`fs_write.go:772`／`subagent_197.go:233`／`task.go:600`（`fs_write` 那一枚装配根没用，`task_cancel_221_test.go:41-43` 的并集里用了）。
+⇒ ★**没有任何一把尺数"装配根最终注册出去的全集枚数"**：`grep -rn -A3 "\.Tools(" --include="*_test.go" internal cmd | grep -E "len\("` ＝ **rc=1 零命中**（`logs/union-counts.txt`）。
+★**这把零命中本腿按"过滤后空 ≠ 没跑"自证过两段**（`logs/zero-hit-proof.txt`）：第一段 `grep -rn -A3 "\.Tools(" --include="*_test.go" internal cmd` ＝ **24 行**（真命中 5 枚调用点：
+`bridge_test.go:729`／`fs_test.go:259`／`fs_write_test.go:569`／`subagent_197_test.go:641`／`task_output_ac2_before_test.go:71`），第二段那道 `len(` 过滤才是 rc=1
+⇒ **"零命中"是"这些调用点上没有计数断言"，不是"我 grep 错了"**（同一把尺的第二个用法：`grep -rn "BuiltinTaskEntries(" --include="*_test.go" internal cmd`＝**12 行**，
+再 `grep "\["`＝**0 行** ⇒ 真的没有一把尺按下标读名册）。
+⇒ 这条现量对选形要紧：**乙形把 `:183` 换成名集判之后，"整个装配的枚数"这一维仍然零尺**（本来也是零尺），
+不存在"改完乙就没人管枚数了"这一说——今天管枚数的只有**分家族**那 5 枚。
+
 
 ### 1.4 ⚠ 派单／票面锚点漂移核查表（逐枚具名，未漂的也列）
 
@@ -166,6 +186,58 @@ ticket175r2_stamp_live_test.go:79 与 :353
 | `cmd/wisp/run.go:544` 生产调用者 | 同 | **未漂** |
 | `tasklist_deferred_236r3_teeth_test.go:174` 红句 | 同（逐字 `task 家族名册 = %s, want 含 task.output 与 task.cancel`） | **未漂** |
 | 票 221 老票面 `internal/tools/task.go:595` | 现 `:600` | **修码前的历史读数**，不算漂移（但引用它的人会漂） |
+
+### 1.5 凭据件的引用口径**逐枚验过**＋二次锚点核查（本腿自己拉尺，⛔ 不照抄派单）
+
+**（a）凭据件 §2 那张表的**行序号**本腿自己数过（口径＝`:112` 表头／`:113` 分隔行之后的**数据行**，第 1 枚＝`:114`）：**
+
+| 数据行序号 | verdict.md 位置 | 那一格的内容 |
+|---|---|---|
+| 1–4 | `:114`–`:117` | AC#1 两支／AC#1b 两支 |
+| 5 | `:118` | AC#1b `parentID == ""` ⇒ ★**禁区别处引用的那句就在这一格**，逐字 `⛔ 本腿不据此判"断言太弱"，也不许任何人为了看孤行去**新增名册读口**（＝产码改动＋可能新导出名）` ⇒ **票面 §禁区那句"§2 第 5 行"引用成立** ✔ |
+| 6 | `:119` | 一票两形：panic 那一形 |
+| 7 | `:120` | AC#2 (b) 支"今天无牙"（`B-1`／`B-6`） |
+| 8 | `:121` | AC#2 (b) 支改扫能力＝**`B-4`（注册 `task.list`，FAIL=4）／`B-5`（注销 `task.cancel`，rc=1／PASS=196／FAIL=10 枚具名红）** |
+| 9 | `:122` | AC#2 欠量①（(a) 支，`B-2a`） |
+| **10** | **`:123`** | **AC#2 欠量② `m-2c`＝`B-3`（注册无关的 `task.note`）⇒ rc=1／PASS=203／**FAIL=3**；★名册钉 **PASS**＝假红预测坐实；判语栏逐字把"枚数形旧尺会假红"作为**附带读数交回编排者** |
+| 11 | `:124` | AC#2 的仪器事实 |
+
+⇒ ★**一处序号引用要更正给编排者**：票面 Status 行与派单说的"§2 **第 8 行**的附带读数"，按本腿这把数法，
+"枚数形尺今天会假红"那条附带读数的真身＝**第 10 枚数据行（`:123`）**；第 8 枚（`:121`）是 `B-4`／`B-5` 那一格。
+⇒ **内容全都对得上、序号差两枚**（本腿不猜是哪一种数法造成的，只具名报）。
+★更要紧的一处**数字归属冲突**（已进 §3 第 5 条）：票面 §现量 3 写的是
+`B-3`＝注册无关的 `task.note` ⇒ **rc=1／PASS=196／FAIL=10 枚具名红**＋"其中含两枚 AC#1 拒绝钉走真注册路径"，
+而凭据 `:123`（`B-3` 那一格）逐字＝**PASS=203／FAIL=3**、`:121`（`B-5` 那一格）才是 **PASS=196／FAIL=10 且含两枚拒绝钉**。
+⇒ **票面 §现量 3 把 `B-5` 的三个数（196／10／两枚拒绝钉）挂到了 `B-3` 名下**；本腿 ⛔ 未重跑、原样报回，不裁谁对。
+（`236-v1` §5 第 3 条＝`:261` 同口径：`B-5`＝10 枚／`B-4`＝4 枚／`B-3`＝3 枚，且逐字
+`⛔ 本腿没有因红得多而判"钉太宽"，也没有建议收窄任何断言（禁区）`。）
+
+**（b）二次锚点核查（本腿写完全件后重拉一把，防共享工作树漂移）**：
+
+```
+git rev-parse --short HEAD                                 → 6895b994（本腿第一发交件；起手快照＝bd39f17f）
+git log --oneline bd39f17f..HEAD --name-only -- internal cmd → 零枚命中（rc=0，无任何 commit 动过 internal/** 或 cmd/**）
+git status --porcelain -- cmd internal | wc -l              → 0
+md5 对拉（disk vs `git show HEAD:<f>`）                     → 五枚全部 same=YES：
+  internal/tools/task.go                        4138177e29ffff427776a73eb0d61a9b
+  internal/tools/task_cancel_221_legs_test.go   13a0ba39e30fb95ad4f2be88beed4fc7
+  internal/tools/tasklist_deferred_236r3_teeth_test.go 21b53d52ac87b893b74fdd9828f2f3aa
+  cmd/wisp/run.go                               1d95cfaf116d9092514ee0a905a82b23
+  internal/tools/ticket175r2_stamp_live_test.go 2a5fde81b78e56c8644c8463ce8738e3
+```
+
+⇒ 本件所有静态读数**落在同一份产码字节上**，且那五枚 md5 与 `236-v1` §4 第 8 行自报的前四串**逐字相同**
+（`4138177e…`／`13a0ba39…`／`21b53d52…` ＋ `run.go` 那一枚它未列）⇒ **两枚腿取的是同一份字节**，本件的静态归因可以直接接在它那些读数后面。
+★注意：`cmd/wisp/run.go` 的 md5 本腿量到 `1d95cfaf…`，而 `236-v1` §4 第 8 行那五枚文件名册里那串第五位是 `21b53d52…`＝**它排的是 `236r3` 那枚文件**，
+两枚腿的被审文件集**只有 4 枚重叠**（本腿多一枚 `ticket175r2_stamp_live_test.go`）⇒ 不构成矛盾，只记口径差。
+
+**（c）射程外那一枚"数工具枚数"的雷（不在本票两张表里，但派单第 4 条问的是"全仓还有几把"，具名给）**：
+
+- `grep -rlE "len\(…\) (!=|==) [0-9]+" --include="*_test.go" internal cmd tools pkg` 去掉 `internal/tools/`＋`cmd/wisp/` ⇒ **139 枚文件**（口径＝**文件枚数不是断言枚数**，命令与读数在 `logs/marker-ruler.txt` 末段）。
+- 其中**数工具名册**的：零枚（逐枚看过 `logs/union-counts.txt` 里的候选：`internal/agent/spill_*` 数的是目录项、`internal/ball/hotkey_status_test.go:398` 数的是注册尝试、`internal/risk/pointer_185_test.go:367` 数的是污点标记）。
+- 一枚**同族形状但射程是面板 API**的：`internal/agent/approval/ticket259_panel_capability_rulers_test.go:81` `if typ.NumMethod() != len(panelAPIAllowedMethods) {`
+  ⇒ 它是"枚数对名集长度"的**双形**写法（乙形若想照同一形状办，这一枚是仓里现成的**写法先例**，⛔ 不是放行理由）。
+- ⇒ **结论性现量**：**枚数形工具尺在整个 `internal/**`＋`cmd/**` 全集里只有 §2.0(a) 那 5 枚**，task 名册那一枚只有 1 枚。
 
 ---
 
@@ -184,12 +256,15 @@ ticket175r2_stamp_live_test.go:79 与 :353
 | 1 | `internal/tools/task_cancel_221_legs_test.go:183` | `if len(names) != 2 {` ＋ `:184` 红句（见 §1.1） | **task 家族名册枚数**（分母＝`BuiltinTaskEntries`） | **会**——本票射程内唯一一把 |
 | 2 | `internal/tools/fs_test.go:190` | `if len(entries) != 6 {` ＋ `t.Fatalf("the default fs roster has %d tools, want 6 (read/list/write/edit/trash/move)", len(entries))` | **fs 默认名册枚数** | 不会（不同名册） |
 | 3 | `internal/tools/fs_test.go:235` | `if len(entries) != 7 {` ＋ `t.Fatalf("with delete_enabled the roster has %d tools, want 7", len(entries))` | **fs 名册（带 `delete_enabled`）枚数** | 不会 |
-| 4 | `internal/tools/fs_test.go:263` | `if len(dir) != 6 {` ＋ `t.Fatalf("directory has %d entries: %+v", len(dir), dir)` | **模型可见工具目录枚数**（`b.Tools()`，构造面只有 fs 六枚） | 不会（该尺桥里只装 fs；⛔ 未跑，见 §4 U1） |
+| 4 | `internal/tools/fs_test.go:263` | `if len(dir) != 6 {` ＋ `t.Fatalf("directory has %d entries: %+v", len(dir), dir)` | **模型可见工具目录枚数**（`b.Tools()`，`:259`；桥＝`:258` 的 `fsBridgeWith`，其构造面＝`internal/tools/helpers_test.go:45` `for _, e := range BuiltinFSEntries(FSDeps{Paths: paths})` ＝**只装 fs、不装 task**（本腿现读，`fs_test.go` 里 `grep -c BuiltinTaskEntries`＝**0**）） | 不会（静态可判：task 那两枚根本不进这把尺的桥；⛔ 仍未跑，见 §4 U1） |
 | 5 | `internal/tools/bridge_test.go:292` | `if len(AllCapabilities) != 11 {` ＋ `t.Fatalf("C3 has %d tokens, want 11", len(AllCapabilities))` | **C3 能力 token 枚数**（不是工具枚数） | 不会；若新工具**顺带**加能力则红＝**那是该红的** |
 
 **同族但形状不同**（`== 0` 的"非空分母自证"，合法新增**不会**红、摘掉注册才会）：
 `internal/tools/ticket175r2_stamp_live_test.go:356` `if len(names) == 0 {`＋`t.Fatal("一枚内置工具都没注册到，这条普查就是空转")`、
 `internal/tools/task_cancel_221_test.go:65`＋`:130` 同形、`internal/tools/tasklist_deferred_236r3_teeth_test.go:139`＋`:140` 同形。
+★**这把尺本腿放宽过窗口重扫一次以防漏**（`-A3` 可能盖不住隔两行的断言）：`grep -rn -A8 "\.Tools(" --include="*_test.go" internal cmd | grep -E "len\((dir|list|tools)"`
+⇒ 只多出一枚 `internal/tools/bridge_test.go:733` `if len(dir) != 0 {`＋`t.Fatalf("empty bridge reports %d tools", len(dir))`，
+它钉的是 `New(Options{})` 那枚**空桥**（`:728`），分母里没有任何家族 ⇒ 合法新增同样不红，**上表那 5 枚是全集**（读数 `logs/tools-window.txt`）。
 
 **枚数形＋名字形并存**（乙形最容易被误读成"也要动它们"，具名列出）：
 `internal/tools/fs_test.go:190` 之后**另有一张 `want map[string]risk.Level` 名集表**（红句 `:211` `unexpected fs tool %q`）
@@ -231,7 +306,7 @@ task 家族的名集那一半在**另一枚文件**里（`236r3`，见 2.0(b)）
 | 栏 | 现量 |
 |---|---|
 | 动哪几行 | `internal/tools/task_cancel_221_legs_test.go`：`:183` 上下**加注释**＋（可选）改 `:184` 的**文案**（票面 §甲 要求"在文案里写清响了之后要走哪道工序"）；**新增一枚 overlay 台件**（AC#1 要求）＋"删掉台件行后名册尺回到起手读数"的还原对拉。`internal/tools/task.go`／`cmd/wisp/**` 一字不动。 |
-| 顶红谁现有的钉 | **HEAD 态：0 枚**（注释与文案都不改任何断言的形状；2.0(b) 那 7 枚名集／普查钉照旧绿，`fs_test.go`／`bridge_test.go` 那四枚分母不含 task）。<br>★**跑正控时那 1 枚非零**：甲形正控要 `-overlay` 换进 `task.go`，而同包仪器尺 `internal/tools/tasklist_deferred_236r3_teeth_test.go`（`:109` `//go:embed task.go` 与 `os.ReadFile(taskSrcPath236r3)` 对拉，断言在 `:~200-218`）在**任何**换入 `task.go` 的 overlay 上都红——该文件头注释 `:33-45` 与 `:197-199` 逐字自认这是它**存在的读数**（`this leg goes red under ANY -overlay of that file, benign ones included … not a defect and not a new always-red`）；`236-v1` §4 第 8 行同口径。⇒ **甲形每跑一次正控必带 1 枚"红得有道理"的仪器红**，名册口径要提前写清，否则下一位会读成"新增了常红"。 |
+| 顶红谁现有的钉 | **HEAD 态：0 枚**（注释与文案都不改任何断言的形状；2.0(b) 那几枚名集／普查钉照旧绿，`fs_test.go`／`bridge_test.go` 那四枚分母不含 task）。<br>★**跑正控时那 1 枚非零**：甲形正控要 `-overlay` 换进 `task.go`，而同包仪器尺 `internal/tools/tasklist_deferred_236r3_teeth_test.go:202` `func Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt`（`:109` `//go:embed task.go` 与 `:204` `os.ReadFile(taskSrcPath236r3)` 两读对拉，红句在 **`:212`**`编译期与运行期读到的 task.go 字节不一致（编译 %d 字节 / 盘上 %d 字节，标记行数 %d 对 %d）`与 **`:217-218`**`同一枚 DEFERRED＋task.list 标记行数，编译器看到 %d 行、os.ReadFile 看到 %d 行`）在**任何**换入 `task.go` 的**不同字节**的 overlay 上都红——该文件头注释 `:33-45` 与 `:197-199` 逐字自认这是它**存在的读数**（`this leg goes red under ANY -overlay of that file, benign ones included … not a defect and not a new always-red`）；`236-v1` §4 第 8 行同口径。⇒ **甲形每跑一次正控必带 1 枚"红得有道理"的仪器红**，名册口径要提前写清，否则下一位会读成"新增了常红"。 |
 | 要不要解冻别人 `-done` 票 | **只加注释＝不动判据**；★但若甲选择**改 `:184` 那句红句文案**，那一行属已 `-done` 票 221 的判据文件 ⇒ 严格讲仍需一枚**只到文案**的具名解冻。**这一支算不算"改判据"＝要编排者裁**（§3 第 4 条）。票 221 的 `-done` 现量见 §2.2 同名栏（同一枚文件、同一发 commit）。 |
 | "那一天接手的人会看到几枚红" | **不减**：甲买到的是"红得**有说明书**"，枚数尺照旧红。已测单侧读数（`236-v1` 造，本腿**未重跑**）：多注册无关的 `task.note`＝**3 枚**（§5 第 3 条：枚数尺＋`175r2` 普查＋仪器尺）；多注册 `task.list`＝**4 枚**（`B-4`）；注销 `task.cancel`＝**10 枚**（`B-5`）。★"合法新增那一发共几枚"本件**给不出确数**（§4 U1／U2）。 |
 
@@ -277,10 +352,14 @@ task 家族的名集那一半在**另一枚文件**里（`236r3`，见 2.0(b)）
 3. **甲形的写面边界**：加注释＝零解冻；改 `:184` 那句**文案**算不算动判据 ⇒ 同一枚问题在甲形这里的影子，请一并裁。
 4. **甲形正控带来的那 1 枚必带仪器红**：`236r3` 仪器尺在任何换入 `task.go` 的 overlay 上都红（它自己注释逐字承认）。
    ⇒ 请裁"这一枚要不要写进本票的 AC#3 门禁名册口径"，否则下一位会把它当新常红。
-5. **票面 §现量 4 那句对照读数的引用面**：`B-4`＝4 枚、`B-1`＝"206／0 只有仪器尺红"、`B-3`＝10 枚红（票面写的）
-   vs `236-v1` §5 第 3 条的**同白发**记的是 `B-3`＝**3 枚**、`B-5`＝**10 枚**。★**票面 §现量 3/4 里"FAIL=10 枚"那个数挂在 `B-3` 名下，
-   而凭据件把 10 枚挂在 `B-5`（注销 `task.cancel`）名下、`B-3` 是 3 枚**（逐字见凭据 §2 表最后一行与 §5 第 3 条）⇒
-   **这是票面与凭据的一处数字归属冲突，本腿不裁、也不重跑，只具名报**（它会影响甲／乙两形"看到几枚红"那一栏怎么写）。
+5. **★票面 §现量 3／§现量 4 与凭据的**数字归属**冲突（本腿逐格对拉，未重跑，见 §1.5(a)）**：
+   票面 §现量 3 写 `B-3`＝注册无关的 `task.note` ⇒ **rc=1／PASS=196／FAIL=10 枚具名红、其中含两枚 AC#1 拒绝钉走真注册路径**；
+   凭据 `verdict.md:123`（`B-3` 那一格）逐字＝**rc=1／PASS=203／FAIL=3**，而 **196／10 枚／两枚拒绝钉**在 `:121`＝**`B-5`（注销 `task.cancel`）**那一格
+   （`236-v1` §5 第 3 条 `:261` 同口径：`B-5`＝10／`B-4`＝4／`B-3`＝3）。
+   ⇒ 请裁：票面 §现量 3 那三个数是**换错发**还是**另有名册**（本腿 ⛔ 不重跑、不裁）。
+   另一处同源的序号漂：票面 Status 行与派单说"§2 **第 8 行**的附带读数"，本腿按数据行逐枚数下来，"枚数形尺今天会假红"那条附带读数的真身＝**第 10 枚数据行（`:123`）**，
+   第 8 枚是 `B-4`／`B-5` 那格 ⇒ **内容都对得上、序号差两枚**，请一并裁引用口径（`第 N 格`／`第 N 枚数据行`／`第 N 行文件`）。
+   ★这一处影响的是"那一发接手的人会看到几枚红"那一栏怎么写（3 还是 10），**不影响三形各自的写面与顶红名册**。
 6. **射程要不要扩到 fs 那三枚同族雷**：现量＝`fs_test.go:190`／`:235`／`:263` 是同一形状的枚数尺，
    "合法新增一枚 **fs** 工具"会同时假红 3 枚；票 271 只写了 221 那一把。⇒ 请裁是本票扩射程、还是另立一票、还是就地登记残余。
 7. **丙形若要选**：台账那行"今后任何腿接第三枚 task 工具前须先读本票"归编排者写（本腿 ⛔ 未动 `docs/**` 一字）。
@@ -326,6 +405,14 @@ task 家族的名集那一半在**另一枚文件**里（`236r3`，见 2.0(b)）
 仓里没有一枚尺数过这件事（本腿 grep 过 `解冻`／`常红`／`爆炸半径` 的落账形状，见 `logs/discipline.txt`，全是人写的 A## 台账、不是仪器）。
 ⇒ **人工碰一次的代价无法量化**，选甲／丙那一栏这里是空的，只能按定性摆。
 
-**U10. `236-v1` 判语与本件读数的**同一性**没验。** 本腿按派单只当背景引用它，⛔ 未重跑那些 overlay 突变。
-若那枚件的某一行号已经漂（本件 §1.4 已抓到 `task.go:600-605` 那处轻漂是**派单**的、不是它的），
-则 §2 里"已测单侧枚数"那一栏的锚点也可能漂。⇒ **只有下一次真跑能校准，本腿不能。**
+**U10. `236-v1` 判语与本件读数的**同一性**只验到了"字节级"，没验到"读数级"。** 本腿按派单只当背景引用它，⛔ 未重跑那些 overlay 突变。
+§1.5(b) 那把 md5 对拉**证到了**两枚腿取的是同一份产码字节（四枚重叠串逐字相同）⇒ 静态归因可以接在它那些读数后面；
+但**它那些 rc／PASS／FAIL 的数本身**要跑才能校准。⇒ **本腿能做的是"确认我们对的是同一份文件"，不是"确认它数得对"。**
+
+**U11. 三形各自"要不要解冻"这件事，本腿给的是**现量**不是**定性**。** §2.2 摆明：枚数尺不在票 221 任何一格 AC 原文里、
+裁决表也没把它列进任一 AC 判语 ⇒ 本腿**无法判断**它是"已勾判据的组成部分"还是"实现腿自拉的线"（§3 第 2 条）。
+这条一旦定错，乙形的解冻要么写成"改契约"（过重）、要么写成"没改任何 AC"（漏账），⛔ 两种都由编排者担、不由本腿选。
+
+**U12. "有没有第三枚 task 工具在路上"这件事本腿没查、也不该查。** 那是路线图地界（票面禁区段：`⛔ 不许把"注册 task.list"顺手做进本票`，
+`PLAN.md §7`／D34 那一格、票 164 与票 225 各管一半）。⇒ 三张表里"那一天"全是**假设态**，没有一枚真实排队工单支撑它；
+若其实**根本没有**那种工单在路上，丙形的代价就比表里写的更轻（轻到多少＝要读路线图才知道，本腿 ⛔ 未读）。

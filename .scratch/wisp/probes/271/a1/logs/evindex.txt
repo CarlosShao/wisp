@@ -1,0 +1,13 @@
+=== closed-tickets-evidence-index refs to 221 / count ruler (read only) ===
+47:| 18 | 免责句层独立决定数复算（可复跑尺 `reruler-disclaim-layer.sh`）：对 146 枚名册逐枚 `head -8 \| grep -E "$DISCLAIM"`，再逐枚把命中件回灌标题层（VERD3／IMPL3） | 前 8 行含免责句＝**6 枚**（`119-ac7-impl`〔`实现侧交件`〕／`137-ac4-impl`〔VERD3 不中〕／`141-ac34-positive-controls-r1`〔`正向对照`〕／`146-liveapprovals-fix-r1`〔`修复程`〕／`146-liveapprovals-r1`〔`实现程自证`〕／`265-267-evidence-index`〔`凭据索引`〕）；逐枚回灌后**全部已在标题层落 OTHER** ⇒「VERD3 中 ∧ IMPL3 不中 ∧ 免责句中」的**独立决定枚数＝0** ⇒ 具名写进 §1.2b，作为对本腿自己选尺理由的一条**诚实修正** | `disclaim-layer-audit.txt`（6 行，逐行标"免责句层无活可接"）＋`reruler-disclaim-layer.sh` |
+84:3. 反向也量：全名册里满足「VERD3 中 ∧ IMPL3 不中 ∧ 免责句中」的**独立决定枚数＝0**。
+144:| 档 | 含义 | 枚数 | 占比 |
+245:| 221 | A | 221-task-cancel-v1.md |
+270:   ⚠ 同族另三枚（`221`／`235`／`241`，死腿 `deep-selfcheck.txt` 一并标了"实现腿"）**本腿判为过度怀疑**：三枚 `:1` 逐字分别是「# 221 — **非实现者**对抗验收表（腿 `221-v1`）」「# 票 235 裁决表 —— 235-v1（**非实现者**验收腿）」「# 241-v1 — **裁决腿**验收…」，正文里的"实现腿"都在**指被验对象**（`241-…md` 甚至逐字写「实现腿：`241-r1`（**本腿不信它的自述**）」）⇒ 与 84 那枚"署名为写码代理"形状不同，本腿保留它们且不标存疑。
+
+=== does any evidence file reference the 271 ticket ===
+docs/evidence/s1/136-ac10-ac14-preflight-r1.md
+docs/evidence/s1/223-hot-reload-wiring-v1.md
+docs/reports/missing-features-2026-09-29-v4.md
+docs/reports/pending-and-issues.md
+docs/reports/survey-2026-09-28-minimax-agent-modules.md

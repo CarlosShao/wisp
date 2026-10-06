@@ -1,0 +1,3 @@
+240:	if cancelMarked != 0 {
+244:	if listMarked == 0 {
+245:		t.Errorf("task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）")

@@ -1,0 +1,14 @@
+=== first stage non-empty check (memory 第108条: 过滤后空 ≠ 没跑) ===
+24
+first-stage-rc=0
+--- second stage (the len() filter) ---
+second-stage-rc=1
+=== .Tools( call sites in tests (sample 8) ===
+internal/tools/bridge_test.go:729:	dir, err := p.Tools(t.Context())
+internal/tools/fs_test.go:259:	dir, err := b.Tools(t.Context())
+internal/tools/fs_write_test.go:569:	dir, err := b.Tools(t.Context())
+internal/tools/subagent_197_test.go:641:	list, err := childDir.Tools(t.Context())
+internal/tools/task_output_ac2_before_test.go:71:	tools, err := b2.Tools(t.Context())
+=== BuiltinTaskEntries(...) indexed: first stage ===
+12
+0

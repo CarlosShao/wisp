@@ -1,0 +1,42 @@
+=== verdict.md §2 table row labels with index (1-based rows after header) ===
+107: ## §2 逐格判语表
+108: 
+109: > 判语口径：**成立**＝本腿自己造的突变证明该钉有牙、且牙咬在该支上；**半格**＝有牙但缺具名的一行读数；**不成立**＝摘了不红。
+110: > ★**通读前提（否则每一发的枚数会被算错）**：`Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt` 这枚**仪器尺**在**任何** overlay 把**不同字节**换
+111: 
+112: | 格 | 本腿自己跑了什么（⛔ 未把写腿日志当凭据） | 原始读数 | 判语 |
+113: |---|---|---|---|
+114: | **AC#1 `caller == ""`**（`task.go:707`） | 独立重做删除发 `v-m1a`；另造三形进攻：`A-1` 条件改 `if false {`（**落到相邻分支**＝票面 §72 预言"照样绿"那一形）、`
+115: | **AC#1 `Roster == nil`**（`task.go:699`） | `v-m1b` 删除；`A-2` 改 `if false`；`A-7` 对调（同一发覆盖两支） | `v-m1b` rc=1／PASS=204／FAIL
+116: | **AC#1b `Roster == nil`**（`subagent_197.go:253`） | `v-m1c` 删除；`A-3` 改 `if false` | 两发都 rc=1／PASS=205／**FAIL=1**＝`Test2
+117: | **AC#1b `\|\|` 两半**（`subagent_197.go:256`） | `v-m1d1` 只留 BaseOptions 半边（`if t.d.BaseOptions == nil {`）；`v-m1d2` 只留 Par
+118: | **AC#1b `parentID == ""`**（`subagent_197.go:260`） | `v-m1e` 删除（**保留** `:259` 的 `parentID :=`，否则退化成编译不过）；`A-5` 改 `if fa
+119: | **★一票两形：panic 那一形算不算真红**（`subagent_197.go:256` ↔ `:278`） | 三发配对：`A-4-spawn-assembly-false`＝guard 永假＋**有** recover；`A-4
+120: | **AC#2 (b) 支"今天无牙"** | `B-1`＝只删 `task.go:23` 那行标记（overlay 打进编译器）；`B-6`＝把归档尺的**读路径**（`task_cancel_221_legs_test.go:224`
+121: | **AC#2 (b) 支改扫能力＝新钉有没有牙** | `B-4`＝往 `BuiltinTaskEntries` 注册一枚 `task.list`（`task.go:603` 后插一行＋文件尾加两枚**未导出**类型，只覆盖 `Name
+122: | **AC#2 欠量①：(a) 支**（派单点名要本腿补） | `B-2a`＝往文件里**注入**一行同时含 `DEFERRED` 与 `task.cancel` 的注释（副本 `co-carry-task.cancel` 由 0→1）＋
+123: | **AC#2 欠量②：`m-2c`（注册一枚无关的 `task.*`）**（派单点名要本腿补） | `B-3`＝注册 `task.note`（同样只覆盖 `Name()`），看**枚数形**与**名集形**各自动不动 | rc=1／PA
+124: | **AC#2 的仪器事实**（票面点名要写进判据注释） | 复认注释在位＋复跑配对 | 注释逐字在 `tasklist_deferred_236r3_teeth_test.go:33-45`（★票面 §四 那句要的是"写进判据注释"，本
+125: 
+
+=== verdict §5 item 5 (导出读口 prohibition) ===
+243: ## §5 判不动的地方
+244: 
+245: 1. ★★★ **`ErrorClass` 那一维：本腿把它量出来了，结论与 `236-r2` §5 第 4 条的措辞不同——那一维"拿得到、但没有牙"。**
+246:    `236-r2` 写的是"现成载具 `x.cancel` 把 `ErrorClass` 丢了 ⇒ 那一枚用例**无法**断 `error_class`"。本腿用四发一次性 overlay 探针（⛔ 未落任何共享文件，盘上 disk＝head 见 §4 第 8 行）实测：
+247:    - `P-1`（在 `task.go:699` 那一枚钉的现有 `agent.ToolOutcome` 上加一行 `t.Logf`）＝**rc=0／该用例 PASS**，读数逐字＝`failclosed_236_teeth_test.go:155: V1READ-ErrorClass="tool" RiskLev
+248:    - `P-2`（`caller == ""` 那一枚经 `x.cancel` 确实拿不到，于是同一枚用例里直发一次 `bridge.Execute`）＝`failclosed_236_teeth_test.go:122: V1READ2-ErrorClass="tool" IsError=true RiskLev
+249:    - `P-3`／`P-4`（★**决定性两发**：把 `task.go:707`／`:699` 改成 `if false {`＝**分支已经不在了**，同一发里读三元组）＝逐字 `failclosed_236_teeth_test.go:122: V1READ3(branch-gone fall-through)
+250:    ⇒ **判语**：`ErrorClass` 与 `RiskLevel` 在"分支在"与"分支被摘"两态下**逐字相同**（`tool`／`L1`）。原因写在产码里：`internal/tools/bridge.go:583-587` 对任何 `res.IsError` 一律 `out.ErrorClass = s
+251:    ⇒ 所以 AC#1 缺的那一行读数**不是"少断了一维"**，而是"**那一维上没有可钉的牙**"：就算补上 `ErrorClass == "tool"` 的断言，`A-1`／`A-2` 那种摘支突变**照样不会因它红**。本格按票面原判据（"摘掉那一支必然有具名用例变红"＋"各恰 1 枚红"）判**成立**；而
+252: 
+253: 2. **★`subagent_197.go:278` 那个洞（一票两形）：本腿复现了，归属与处置不归本腿判。**
+254:    本腿的配对读数（比 `236-r2` 多一枚**正控**）：
+255:    - `A-4-without-recover`（guard 永假＋摘掉 `failclosed_236_teeth_test.go:232-236` 那五行 recover）＝**rc=1／PASS=25／FAIL=2／日志 `^panic`＝2 行／`FAIL github.com/CarlosShao/wis
+256:    - `ctrl-no-recover-only`（★**只**换测试文件、产码一字不动）＝**rc=0／PASS=206／FAIL=0** ⇒ 摘 recover 这个动作本身**不产红、不产崩**，所以上面那份"整包失明"只能归因于产码那一次空函数值调用。
+257:    - `A-4-spawn-assembly-false`（同一产码突变＋保留 recover）＝**rc=1／PASS=204／FAIL=2**（两枚具名红，其中 `:219` 那枚 got 逐字以 `panic（guard 摘掉后不是拒绝而是崩）: runtime error: invalid memory a
+258:    形状复认：`SubagentDeps.BaseOptions` 的声明（`subagent_197.go:135`）＝`func() (agent.Options, bool)`；`:278` `base, wired := t.d.BaseOptions()` **无条件调用** ⇒ 摘掉 `:256` 那枚 
+259:    ⇒ **本腿判语（派单点名要的那一句）**：那枚 `defer recover()` **算把"崩"变成了真红，不算掩盖，也不算正确掩盖**。三条，条条带读数：①**它造不出绿**——产码未突变时摘掉它仍 206／0；②它对 panic **必判红**——`Result{Text:"panic…", IsErro
+260: 
+261: 3. **"爆炸半径该定在几枚"不归本格。** 本腿三个读数：注销一行＝**10 枚具名红**（`B-5`，红句含 `task_cancel_221_legs_test.go:181`「BuiltinTaskEntries 没注册 task.cancel（现名册：[task.output]）」与两枚 `:97`／`:1
+262: 
