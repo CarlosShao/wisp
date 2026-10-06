@@ -1,0 +1,12 @@
+--- "D:/work/workspace/projects plans/Wisp/internal/tools/task.go"	2026-10-04 17:21:20.833673100 +0800
++++ D:/tmp/wisp236r2/mut/m-1b-cancel-roster/task.go	2026-10-06 13:43:08.373654100 +0800
+@@ -696,9 +696,6 @@
+ 	if target == "" {
+ 		return Result{Text: "缺少 task_id 参数", IsError: true}, nil
+ 	}
+-	if t.d.Roster == nil {
+-		return Result{Text: "任务名册未接线（fail-closed：拒绝停掉任何任务——名册才是唯一的停法）", IsError: true}, nil
+-	}
+ 	// The caller's identity is the host's, not an argument: CorrelationID is what
+ 	// the bridge stamps from the call it dispatched, so a model cannot name whose
+ 	// child it is by editing parameters. Same source task.spawn uses to fill in

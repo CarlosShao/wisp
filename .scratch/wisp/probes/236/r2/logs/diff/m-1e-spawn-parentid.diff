@@ -1,0 +1,13 @@
+--- "D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go"	2026-09-30 15:03:51.713211900 +0800
++++ D:/tmp/wisp236r2/mut/m-1e-spawn-parentid/subagent_197.go	2026-10-06 13:43:08.382225700 +0800
+@@ -257,10 +257,6 @@
+ 		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+ 	}
+ 	parentID := CorrelationID(ctx)
+-	if parentID == "" {
+-		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，" +
+-			"就没法登记父子关系，也没法把结论盖戳进父任务的 C25 作用域）", IsError: true}, nil
+-	}
+ 	if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {
+ 		return Result{Text: fmt.Sprintf(
+ 			"拒绝派生：深度上限是 %d，而派生者 %s 自己就是一枚子代理（父 kind=%s）。"+

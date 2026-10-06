@@ -1,0 +1,12 @@
+--- "D:/work/workspace/projects plans/Wisp/internal/tools/task.go"	2026-10-04 17:21:20.833673100 +0800
++++ D:/tmp/wisp236r2/mut/m-1a-cancel-caller/task.go	2026-10-06 13:43:08.335258400 +0800
+@@ -704,9 +704,6 @@
+ 	// child it is by editing parameters. Same source task.spawn uses to fill in
+ 	// ParentTaskID, which is what makes the two sides agree by construction.
+ 	caller := CorrelationID(ctx)
+-	if caller == "" {
+-		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）", IsError: true}, nil
+-	}
+ 	rec, known := t.d.Roster.Look(target)
+ 	if !known {
+ 		return Result{Text: fmt.Sprintf(
