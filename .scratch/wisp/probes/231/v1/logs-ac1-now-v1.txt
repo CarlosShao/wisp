@@ -1,0 +1,21 @@
+time=2026-10-06T10:00:54.211+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe231V1NewerBuildOperatorLine
+time=2026-10-06T10:00:55.738+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 10:00:55 mockllm: serving on http://127.0.0.1:50062 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T10:00:55.768+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestProbe231V1NewerBuildOperatorLine1616592592\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-06T10:00:55.798+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbe231V1NewerBuildOperatorLine1616592592\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T10:00:55.806+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T02:00:55Z duration_ms=7
+time=2026-10-06T10:00:55.813+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbe231V1NewerBuildOperatorLine1616592592\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T10:00:55.819+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T02:00:55Z duration_ms=4
+time=2026-10-06T10:00:55.839+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T10:00:55.845+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    zz_231v1_ac1_probe_test.go:34: AC#1 OPERATOR LINE (verbatim) =
+        [audit] config: HOT-RELOAD state=not-applied cause=newer-build detail="config.toml 是由一个更新的 Wisp 写出来的（它声明的 schema_version 比这份程序懂得的高；这一条不说语法错，也不说值不合法，因为它还没走到校验）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+    zz_231v1_ac1_probe_test.go:37: AC#1 FULL TRAIL (stderr) =
+        [audit] wisp run: SESSION-MINT id=sess_7d940a8aebdd67bb550cf717d9ab5795 (结束点＝本进程退出，A435 第 2 条)
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe231V1NewerBuildOperatorLine1616592592\\002\\config.toml"
+        [audit] config: HOT-RELOAD state=armed tick=1s path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe231V1NewerBuildOperatorLine1616592592\\002\\config.toml" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail="本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效"
+        [audit] config: HOT-RELOAD state=not-applied cause=newer-build detail="config.toml 是由一个更新的 Wisp 写出来的（它声明的 schema_version 比这份程序懂得的高；这一条不说语法错，也不说值不合法，因为它还没走到校验）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+--- PASS: TestProbe231V1NewerBuildOperatorLine (2.70s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.786s

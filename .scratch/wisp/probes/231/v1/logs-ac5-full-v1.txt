@@ -1,0 +1,110 @@
+FULL START 2026-10-06 10:07:09 +0800
+HEAD=78072249780203d57ff641f58f5796d2946c4a8d
+CMD=PATH=$PWD/third_party/sherpa-onnx:$PWD/build:$PATH GOFLAGS= go test -count=1 ./cmd/wisp ./internal/...
+ok  	github.com/CarlosShao/wisp/cmd/wisp	464.811s
+ok  	github.com/CarlosShao/wisp/internal/agent	6.008s
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	1.484s
+?   	github.com/CarlosShao/wisp/internal/agent/scheduler	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/audio	17.050s
+time=2026-10-06T10:07:18.247+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-06T10:07:18.281+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-06T10:07:18.288+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-06T10:07:18.292+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.292+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.293+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.303+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-06T10:07:18.303+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Space
+time=2026-10-06T10:07:18.303+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=F9
+time=2026-10-06T10:07:18.304+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.304+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-06T10:07:18.304+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Ctrl+Alt+K err="invalid argument"
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.304+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="Hot key is already registered."
+time=2026-10-06T10:07:18.304+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="invalid argument"
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-06T10:07:18.304+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-06T10:07:18.304+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-06T10:07:18.304+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.315+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-06T10:07:18.315+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T10:07:18.317+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=3
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	1.331s
+ok  	github.com/CarlosShao/wisp/internal/buildinfo	0.094s
+ok  	github.com/CarlosShao/wisp/internal/config	4.933s
+ok  	github.com/CarlosShao/wisp/internal/llm	83.585s
+ok  	github.com/CarlosShao/wisp/internal/llm/adaptertest	8.497s
+ok  	github.com/CarlosShao/wisp/internal/llm/anthropic	40.074s
+ok  	github.com/CarlosShao/wisp/internal/llm/golden	0.129s
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	51.280s
+ok  	github.com/CarlosShao/wisp/internal/llm/openairesponses	51.078s
+ok  	github.com/CarlosShao/wisp/internal/memory	19.291s
+ok  	github.com/CarlosShao/wisp/internal/models	22.331s
+ok  	github.com/CarlosShao/wisp/internal/observe	4.208s
+time=2026-10-06T10:07:23.195+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+    composer_test.go:74: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:79: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:74: Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare
+    composer_test.go:79: ComposerState <-> ComposerState: 11 JSON keys reconciled
+    composer_test.go:79: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:79: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:79: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:79: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.23s)
+    frontend_hygiene_test.go:216: a second style source appeared in code the bundle actually ships:
+          frontend/src/components/harness/right-rail.tsx:89: diff: [{ sign: "+", text: "  --page: #fafafb;  /* beautiful-ui 主题收编 */" }],
+        Add or reference a C21 token in design/assets/tokens.css instead.
+    frontend_hygiene_test.go:219: 57 files reachable from main.tsx carry colour literals only in the generated theme
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	9.452s
+ok  	github.com/CarlosShao/wisp/internal/perm	1.058s
+ok  	github.com/CarlosShao/wisp/internal/plugin	0.653s
+ok  	github.com/CarlosShao/wisp/internal/proc	10.296s
+ok  	github.com/CarlosShao/wisp/internal/projctx	1.782s
+time=2026-10-06T10:07:26.747+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestResolvePerCallBudget (2.41s)
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 5521666 ns/op = 5.522 ms/op (budget 1.000 ms, 279 samples)
+    pathresolver_budget_norace_test.go:37: C26 budget breach: Resolve averages 5.521666ms per call, budget 1ms
+time=2026-10-06T10:07:36.470+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	14.726s
+ok  	github.com/CarlosShao/wisp/internal/secret	1.041s
+ok  	github.com/CarlosShao/wisp/internal/session	3.703s
+?   	github.com/CarlosShao/wisp/internal/speech	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/statemachine	0.398s
+?   	github.com/CarlosShao/wisp/internal/streamkey	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/tools	30.144s
+?   	github.com/CarlosShao/wisp/internal/watchdog	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/winsec	33.624s
+FAIL
+FULL_RC=1
+FULL END 2026-10-06 10:15:03 +0800

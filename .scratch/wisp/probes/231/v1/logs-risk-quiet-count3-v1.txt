@@ -1,0 +1,17 @@
+START 2026-10-06 10:17:22 +0800
+HEAD=4b15869db7edf3dd64b590e42a7a227093f9a3c4
+CMD=PATH=... GOFLAGS= go test -run TestResolvePerCallBudget -count=3 -v ./internal/risk
+time=2026-10-06T10:17:23.531+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 370972 ns/op = 0.371 ms/op (budget 1.000 ms, 4222 samples)
+--- PASS: TestResolvePerCallBudget (1.62s)
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 391163 ns/op = 0.391 ms/op (budget 1.000 ms, 4174 samples)
+--- PASS: TestResolvePerCallBudget (1.69s)
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 375408 ns/op = 0.375 ms/op (budget 1.000 ms, 3404 samples)
+--- PASS: TestResolvePerCallBudget (3.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	6.357s
+RC=0
+END 2026-10-06 10:17:30 +0800

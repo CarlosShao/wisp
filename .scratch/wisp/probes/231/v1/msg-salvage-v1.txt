@@ -1,0 +1,9 @@
+probes(231-v1 遗产代提)：验收腿撞 150 轮帽、29 枚台件与 441 行证据件全部未提交 ⇒ 编排者代提
+
+死法＝撞轮次上限（160 次调用／24.37M token／45 分钟），回执停在"整包在跑、我先把已量到的节写完"。★但**九节全实在**：§0 起手锚／§1 新分支位置（是不是死代码）／§2 正控重放（拿掉新分支必红）／§3 四枚既有句的字节尺／§4 AC#1 操作员实际看到的那句／§5 AC#4 前缀身兼两职／§6 整包终态逐名红名册／§7 门禁四门／§8 量不到的地方。grep 命中的两行"待验"（`:29`／`:386`）都是**它正文在描述自己那把尺**（"并集尺…0 命中"），不是空白格＝占位尺第三次同形误报（前两次：268-v2 的「待验」写法、evidence-close-4 的叙述句），故我按节结构逐节读过才下"已交完"的判。
+
+★整包终态已跑完并落台件：logs-ac5-full-v1.txt 尾行 FULL_RC=1／FULL END 10:15:03。红＝**3 包 6 枚**，逐名：internal/ball 1（TestC21TableColourRowsMatchTokensCSS）＋internal/panel 4（TestApprovalCardViewJSONKeysMatchFrontendTypes／TestComposerContractTypesMatchFrontend／TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme／TestC21DesignTokensFourWayAgree）＝**票面历史在册那五枚，属别人地界**；另有 internal/risk 1（TestResolvePerCallBudget 2.41s）＝票面点名的争用型假红那一枚（它跑那发时同机确有 2 枚 go 进程在飞），其 §6 已按"安静 -count=3 为准"处理。★cmd/wisp 那一包逐字 **ok 464.811s**（本票写面所在包全绿）。
+
+安全尺（编排者 10:32 自己跑）：`git status --porcelain -- cmd internal` 空＝工作树净；`md5sum cmd/wisp/config_reload.go` 与 `git cat-file blob HEAD:` 同值（5ce441ca5e72…）⇒ 它的 overlay 形正控没在盘上留针。票面 AC 框本笔未触碰（翻框归编排者，另笔处理）。
+
+归属＝验收腿 231-v1；代提人＝编排者；内容一字未改。

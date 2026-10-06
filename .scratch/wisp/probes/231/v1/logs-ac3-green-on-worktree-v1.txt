@@ -1,0 +1,50 @@
+time=2026-10-06T10:06:07.553+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223R2FailureSentenceRouting
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_注释以方括号开头_C1
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_注释以方括号开头_C1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_CRLF_E1
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_CRLF_E1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_无空格_G1
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_无空格_G1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_缩进版本行_L1
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_缩进版本行_L1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明未来版_正文语法坏_J1
+    config_sentences_223r2_test.go:123: ROUTING "声明未来版_正文语法坏_J1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/读不出版本_A1_基线不动
+    config_sentences_223r2_test.go:123: ROUTING "读不出版本_A1_基线不动"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明旧版_坏表头_A2_仍归迁移
+    config_sentences_223r2_test.go:123: ROUTING "声明旧版_坏表头_A2_仍归迁移"
+          raw err = config: config.toml: cannot migrate from schema version 1: not valid TOML: toml: expected character ]; the file was left untouched - fix or restore it manually, it will never be silently reset
+          PRODUCTION LINE = cause=migration detail="config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+=== RUN   TestTicket223R2FailureSentenceRouting/解析得开_未知键_不抢语法错
+    config_sentences_223r2_test.go:123: ROUTING "解析得开_未知键_不抢语法错"
+          raw err = config: config.toml: unknown key "this_key_does_not_exist" at line 3
+          PRODUCTION LINE = cause=unknown-key detail="config.toml 语法没问题，但里面有这份 schema 不认的键（拼错的键会被这样拒绝，而不是被忽略）。本次运行继续用内存里的旧配置"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明未来版_正文解析得开_归更高版本自己那句
+    config_sentences_223r2_test.go:123: ROUTING "声明未来版_正文解析得开_归更高版本自己那句"
+          raw err = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=newer-build detail="config.toml 是由一个更新的 Wisp 写出来的（它声明的 schema_version 比这份程序懂得的高；这一条不说语法错，也不说值不合法，因为它还没走到校验）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+--- PASS: TestTicket223R2FailureSentenceRouting (0.65s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_注释以方括号开头_C1 (0.08s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_CRLF_E1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_无空格_G1 (0.08s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_缩进版本行_L1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明未来版_正文语法坏_J1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/读不出版本_A1_基线不动 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明旧版_坏表头_A2_仍归迁移 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/解析得开_未知键_不抢语法错 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明未来版_正文解析得开_归更高版本自己那句 (0.07s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.719s

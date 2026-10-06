@@ -1,0 +1,8 @@
+### perm run 1 @ 2026-10-06 10:20:13 +0800
+--- PASS: TestTicket223PermissionDeniedSitsInItsOwnSentence (2.74s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.819s
+RC=0
+### perm run 2 @ 2026-10-06 10:20:20 +0800
+--- PASS: TestTicket223PermissionDeniedSitsInItsOwnSentence (2.80s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.896s
+RC=0

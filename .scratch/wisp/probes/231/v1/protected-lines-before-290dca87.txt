@@ -1,0 +1,28 @@
+== disabled (97-99)
+const hotReloadDisabledPanelInbound = "config: HOT-RELOAD state=disabled host=panel-inbound " +
+	"detail=\"本宿主没有接 config.toml 轮询，这次运行期间手改配置不会生效；" +
+	"它也没有可弹卡的面，所以放宽本来就无法被确认（fail-closed）。要生效请重启进程并用 wisp run。\""
+== missing (357-359)
+		return "cause=missing detail=\"" +
+			"config.toml 读不到：文件不存在（这一条只说缺失，不说语法、不说权限）。本次运行继续用内存里的旧配置；" +
+			"文件回来之后要它的 mtime 或大小变过才会被下一 tick 重读\""
+== permission (361-363)
+		return "cause=permission detail=\"" +
+			"config.toml 读不到：这个进程没有读它的权限（文件在，也读得开名字，只是不让读）。" +
+			"本次运行继续用内存里的旧配置；这一条不是语法错，也不是文件缺失\""
+== syntax (370-372)
+			return "cause=syntax detail=\"" +
+				"config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。" +
+				"本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读\""
+== unknownkey (374-376)
+			return "cause=unknown-key detail=\"" +
+				"config.toml 语法没问题，但里面有这份 schema 不认的键（拼错的键会被这样拒绝，而不是被忽略）。" +
+				"本次运行继续用内存里的旧配置\""
+== migration (393-395)
+			return "cause=migration detail=\"" +
+				"config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。" +
+				"本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它\""
+== invalid (397-399)
+			return "cause=invalid detail=\"" +
+				"config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。" +
+				"本次运行继续用内存里的旧配置\""
