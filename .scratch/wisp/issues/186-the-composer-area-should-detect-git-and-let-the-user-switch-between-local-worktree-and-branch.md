@@ -52,3 +52,22 @@
 
 - 09-28 14:3x 编排者立票：owner 改判 `Q-64`＝**做**（原话入 `A368`），我上一轮把它读成"让面板去切宿主正在跑的树"并推荐默认不做——**那句读法作废**；风险改成 AC#3 的实现约束。上面 7 把尺本程现跑（锚 `72c76d42`）。⚠ 本票与票 181 的普查**并成一程派**（同一枚接缝、同一枚前端需求表）。未派。
 - 09-28 普查程 `181-c1` 交件（只读·**未勾任何 AC 框**·`internal/ cmd/` 零字节改动）：证据件 `docs/evidence/s1/181-186-git-detection-census-c1.md`。⚠ **本票最值钱的一条现量＝AC#2 的前提被推翻了方向**：那枚"躺在仓里的半成品"今天**接不上**——入向那一跳**整条不存在**（具名**坐实票 114**：`ParseComposerRequest` 与 `HandleModeRequest` 非 test **零调用方**；`internal/panel/pump.go:16` 自述 "no WebView2 host (ticket 33 is unclaimed), no postMessage writer"；全仓非 test 没有一枚 WebView2 消息接收器，`grep WebMessage|ReceiveMessage|OnMessage` 只命中 `internal/ball` 的 Win32 `PostMessageW`）。⇒ "切本地／切工作树"是**从零建一层**（票 33 宿主 → 接收器 → router → 照 `ModeWriteHandler` 那形包一枚 `WorkspaceWriteHandler` 壳 → 快照字段），**不是接线**；出向快照管子今天确实在跑（`cmd/wisp/panel_pump.go:82-86/159/241`）。`panel.workspace.request` 已在册 ⇒ **有一条"不新增 C17 白名单枚"的路线**（把目标当 `input` 走同一枚 `RequestWorkspaceSwitch`＋C26），要新名则＝契约变更、先落 `A##`。⚠ **一条结构性前置**（`internal/tools/paths_workspace.go:72-73,87-89`）：换树**只许收窄、不许放宽**，候选必须已在 `[fs] allowed_dirs` 内，取消收窄只有内部的 `ClearWorkspace()` ⇒ 面板"挑一棵没授权过的目录"今天做不到，要做要人批。AC#6 那五样连带面逐样答案在证据件 §⑥：**产物目录（装配期定死、不在工作区根之下）／C25 名册（键是 `taskID`、根本不认识"哪棵树"）／会话历史（进程内，切换不清；`internal/session/` 只有 `doc.go`）／预算 `BudgetsFor`（键是模型窗口）——四样今天全都"保留、不随树走"** ⇒ 照切会把上一棵树的证据带进下一棵树；审计这一维已经如实（`workspace.go:93-103` 两形都写）。面板需求表＝证据件 §⑧（9＋1 枚字段＋来源，`frontend/**` 一字未读）。门禁见 §⑩：d22scan rc0／`ban #8 internal/`＝433（基线相等）、红腿名册只有 `G6neg`（与票 178 在册一致）、`internal/config` ok、`internal/panel` 红一枚＝`TestC21DesignTokensFourWayAgree`（共享工作树里 `design/assets/*` 被别家会话删了未 staged，**与本票无关**）。
+
+## 编排者记：`:54` 那句"入向那一跳整条不存在"今天按字面已过期（10-06 20:3x，腿 `expired-premises-7b2` 报、编排者自己复跑后落）
+
+⛔ **本节不改 `:54` 一个字、不改任何 `- [ ]` 框**，只把"哪几个子断言今天塌了"记在票末，供下一位读这张票的人不再按"从零建一层"去估工。
+
+**先记我一处错**：我 19:2x 派单里写「票 186 面上我只命中 `:54` 一行普查记录、**那行里没有"零枚"这句话**」⇒ **这句是我错的**，腿顶回得对。错因＝我拿 `ComposerDispatch` 与"零枚"两个**关键词**去 grep 就下"票面无此句"的负向结论，而 `:54` 用的是**同族的另两个符号名＋"零调用方"这个说法**。⇒ 形状教训：**判"票面有没有这句话"要按"这句话在说什么"扫，不能按某个符号名扫**（＝我记忆里"零命中先怀疑尺"与"穷举不彻底时负向结论听起来和正确结论一模一样"那一族，今天多一枚实例：换词不等于换事实）。
+
+**我自己复跑的尺（锚在带括号的调用形状上，⛔ 不锚裸符号名）**：
+
+| `:54` 里的子断言（09-28 写下） | 我 20:3x 自己现跑 | 判定 |
+|---|---|---|
+| `ParseComposerRequest` 非 test **零调用方** | `grep -rn "ParseComposerRequest(" --include='*.go' cmd internal \| grep -v _test.go` ⇒ 两枚命中：`internal/panel/bridge.go:126`（定义）＋★`internal/panel/composer_dispatch.go:155` `req, err := ParseComposerRequest(raw)` | **过期**（有 1 枚非 test 调用者） |
+| `HandleModeRequest` 非 test **零调用方** | `grep -rn "HandleModeRequest(ctx" …` ⇒ `composer_dispatch.go:70`（接口声明）＋★`:181` `return "", d.Mode.HandleModeRequest(ctx, req)`＋`composer_handlers.go:111`（实现） | **过期**（有 1 枚非 test 调用者） |
+| 全仓非 test 没有一枚 WebView2 消息接收器 | 腿重跑 `WebMessage\|ReceiveMessage\|OnMessage` 于 `internal cmd tools` 非 test＝**空**；⇒ 这一支**没塌**，接收器今天仍住在外部包（`go-webview2` 那一族），不在本仓 Go 文件里 | **仍成立**（但措辞要精确到"本仓 Go 文件内"） |
+| `internal/panel/pump.go:16` 自述 "ticket 33 is unclaimed" | 腿逐字复量：注释**今天还在**，而票 33 已有落地件（`33-r*`／`33-v2`）⇒ **注释的前提已过期** | **注释过期**，属产码，⛔ 本批一字未动 |
+
+⇒ **对本票工程量的影响，写清边界**：`:54` 由此得出的结论「"切本地／切工作树"是**从零建一层**，不是接线」**仍然成立**——塌掉的只是它引的两条**枚数**证据，而那一步真正缺的东西（票 33 的宿主接到常驻腿、`panel_resident_windows.go` 与 `panel_host_windows.go` 的装配连线、以及下面那条 C26"只许收窄"的授权边界）**一条没变**。⇒ ⛔ 任何人不许把本节读成"186 的活变小了"；本节只把"为什么变小/变大"的证据换成今天真的数。
+
+**两处残余，具名登记、⛔ 不在本票处理**：①`pump.go:15-16` 那句过期注释＝产码改动，归下一次真动 `internal/panel` 的票顺手清（本仓已有"注释里的引用必须可核"的门：`tools/d22scan` ban #9，但它只判**路径存在性**、判不出"claim 状态过期"这一形）；②腿另报的票 219 `:39`／`:15`「答复侧零调用者」＋`gate.go` 行号漂 114/114/50 ⇒ **属第二枚过期票面、在本批射程外**，等票 226／201 那一族开工时一并定（那里才是答复侧的地界）。
