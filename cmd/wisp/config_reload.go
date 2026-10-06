@@ -393,6 +393,34 @@ func describeReloadFailure(err error) string {
 			return "cause=migration detail=\"" +
 				"config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。" +
 				"本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它\""
+		case strings.Contains(d, "was written by a newer build"):
+			// Ticket 231 AC#2: a file declaring a version ABOVE this build's is
+			// its own shape, and until this branch it had no sentence. It cannot
+			// fall through to the two branches below: the prefix branch books it as
+			// "内容被校验拒绝（值不合法或引用解不开）", which is false for it -
+			// loader.go:120 returns before decodeStrict and before validate, so the
+			// file was never validated at all - and the migration branch's wording
+			// ("不会迁移的 schema_version") describes a version BELOW this build,
+			// which is the one shape that does have a migration to run.
+			//
+			// Position is load-bearing: this case must stay written BEFORE the
+			// strings.HasPrefix(d, "config.toml:") branch, because loader.go:122
+			// opens its detail with exactly that prefix. A copy placed after it is
+			// dead code and the new row in config_sentences_223r2_test.go reddens
+			// on its prefix ruler with "the two sentences swapped again".
+			//
+			// It claims a phrase, not a prefix: "was written by a newer build" is
+			// loader.go:122's own wording (the cause token comes from the same
+			// source), so the branch is narrower than the prefix it is racing and
+			// cannot reach any of the other 47 details in internal/config that
+			// also open with "config.toml: ".
+			//
+			// AC#4's registration (this branch still classifies prose; why today
+			// nothing else moves) is in .scratch/wisp/probes/231/r1/evidence.md §4.
+			return "cause=newer-build detail=\"" +
+				"config.toml 是由一个更新的 Wisp 写出来的（它声明的 schema_version 比这份程序懂得的高；" +
+				"这一条不说语法错，也不说值不合法，因为它还没走到校验）。本次运行继续用内存里的旧配置；" +
+				"升级 Wisp 或恢复备份才会读它\""
 		case strings.HasPrefix(d, "config.toml:"):
 			return "cause=invalid detail=\"" +
 				"config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。" +
