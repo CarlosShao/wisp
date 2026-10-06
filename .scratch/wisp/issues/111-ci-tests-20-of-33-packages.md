@@ -289,3 +289,18 @@ step1–3 success、**step4 failure**、**step5 `Cache third_party` / step6 `cgo
     `--scope=census` 自证完整：windows 33 行 / linux 32 行。
   - **待 push 才能结的格子仍是 next= 1/2/3/4 四条**，其中 next= 1（AC#6 同枚 run 里 step4 与 step5–8 同时有结论）
     是本票唯一的生死判据：**只要还有一步是 skipped，就判 AC#6 FAIL**，不接受"通过附条件"。
+- [2026-10-06 11:20 +08] agent=111-a5b did=只读普查腿（接零足迹死掉的 111-a5-acmap，前腿 probes/111/a5/ 从未建立，本腿另起 a5b/）交**一张十行的映射表**：
+    `.scratch/wisp/probes/111/a5b/ac-map.md`＝AC#1…AC#10（本腿自己 `grep -c '^- \[ \] \*\*AC#'`＝**10** 枚框，
+    ★不是前四枚腿一直说的"五格"）×七栏（票面那一格逐字／现有凭据／读数带时刻／还缺什么／被什么挡／该不该翻的建议位）。
+    本腿现量的两处硬事实：①**推送那道闸复认**——`git show c6cf66e6:.github/workflows/ci.yml | grep -c 'scope=census'`＝**0**、
+    `git show c6cf66e6:scripts/portable-tests.sh | grep -c 'GUARD D'`＝**0**，且 `1bb654e3`／`6c0e3e31`／`98f62fde` 逐枚 `merge-base --is-ancestor` 判 **NOT on origin/dev**（tip 之后 **167** 枚）⇒ census 那一步今天没有任何 CI 读数；
+    ②**推送侧读数本腿自己取**（不引二手）——run `37396530365`／head `c6cf66e6`：test-core job `112053739109` step7 **failure**（own-line **25 行**、`=== RUN=1518 PASS=1028 FAIL=4 SKIP=1`、`ok github.com/CarlosShao/wisp/internal/winsec 0.025s` 在 `:5389`＋own-line `:5421`＋POSIX 真执行断言 `--- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator` `:5387`）；
+    test-windows job `112053739011` 非 Post 步 4–9 **无一 skipped**（step4 success／step7 failure／step8 failure／step9 success），台件 `.scratch/wisp/probes/111/a5b/readings-37396530365.txt`。
+    ★票面 AC#3 那句"`internal/session` 在 scope 里却 0 个测试文件"**今天已不成立**（本腿 `git ls-files` 尺＝**2** 枚跟踪测试，且已在 pin `:188`/`:203`＋scope `:244`/`:252`）；
+    `internal/watchdog` 今天读到的仍是 **0** 枚（`git ls-files internal/watchdog` 只有 `doc.go`，其 `:18` 逐字 `DEFERRED(watchdog loop/thresholds): implemented by ticket 42`），且它**不在**任何 scope 里。
+    ⑥栏四类计数＝**推送 4／别的票 3／前提已翻 2／没人做 4**（13 枚标签，AC#1/AC#2/AC#3 各挂两类）；
+    按今天的盘最接近可翻的是 **AC#9**，其余本腿一律给"不翻"建议（含 AC#6 的两种读法都摆出来，⛔ 不自裁）。
+    ⛔ 一枚框未翻、票面正文一字未改（只追加本行）、台账/`docs/**`/产码/`scripts`/`.github` 一字不碰、**零 go 命令**；
+    只 commit 不 push：`3a38baed`（骨架）→`a2689d81`（AC#1/AC#2）→`25232ce8`（AC#3…AC#10＋§2/§3/§4）。
+    十格外顺手量到、具名交回而不修的一件事：**lint job 那道病今天仍在**——同枚 run job `112053738745` 的 step8 `gofmt (gofumpt)` **failure** ⇒
+    step9/10/11（另一枚 gofmt／两枚 go vet）全 `skipped`，lint 的 10 枚步名里只有 `staticcheck` 与 `mockllm module vet` 带 `!cancelled()`（归 ci.yml 面，与票 85 地界同处）。
