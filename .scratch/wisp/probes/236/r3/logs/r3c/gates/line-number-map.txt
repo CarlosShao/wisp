@@ -1,0 +1,32 @@
+### line-number map for internal/tools/tasklist_deferred_236r3_teeth_test.go (measured, not recalled)
+### WHY this file exists: this leg edited the file's COMMENTS mid-run, so the SAME sentence sits at different line
+### numbers in the logs before vs after the edit. Two readings of the same ruler differ => both go in the record
+### (dispatch rule), and no log line below was retyped from memory: each was grep'd out of the bytes named.
+
+-- version A = HEAD as submitted by d9aff5f, md5 8f536366cfe481e446f640d08e460673, 200 lines --
+86://go:embed task.go
+95:		if strings.Contains(line, "DEFERRED") && string
+131:		if n == "task.list" {
+132:			t.Errorf("DEFERRED 那一支和名册分叉�
+151:		t.Errorf("task 家族名册 = %s, want 含 tas
+155:	t.Logf("现名册：%s（DEFERRED 的判据读�
+189:		t.Errorf("编译期与运行期读到的 task.
+195:		t.Errorf("同一枚 DEFERRED＋task.list 标�
+199:	t.Logf("成对读数：盘上 %d 行 / 编译�
+
+-- version B = committed by this leg a3a7d535, md5 21b53d52ac87b893b74fdd9828f2f3aa, 223 lines --
+109://go:embed task.go
+118:		if strings.Contains(line, "DEFERRED") && strin
+154:		if n == "task.list" {
+155:			t.Errorf("DEFERRED 那一支和名册分叉�
+174:		t.Errorf("task 家族名册 = %s, want 含 tas
+178:	t.Logf("现名册：%s（DEFERRED 的判据读�
+212:		t.Errorf("编译期与运行期读到的 task.
+218:		t.Errorf("同一枚 DEFERRED＋task.list 标�
+222:	t.Logf("成对读数：盘上 %d 行 / 编译�
+
+-- which version produced which log (signature = the line numbers quoted INSIDE the log) --
+A (131/132/151/155/189/195/199): baseline-full-package-v.log full-{ctrl,teeth-m13,m2b,m2e}.log iso-*.log full-readpath-{teeth-m13,no-markers}.log
+B (155/174/178/212/218/222):      pass2-*.log full-readpath-nomarkers-testonly.log final-gates*.txt pass3-final-committed-bytes.txt
+neither A nor B: n1-n5-negative-rulers.txt quoted 108/144 for this file => taken on an INTERMEDIATE edit state.
+   => that reading is superseded by gates/n-rulers-rerun-on-committed-bytes.txt; the original file is kept, not deleted.

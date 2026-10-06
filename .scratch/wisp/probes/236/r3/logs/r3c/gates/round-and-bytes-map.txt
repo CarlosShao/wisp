@@ -1,0 +1,46 @@
+### round-and-bytes map for 236-r3c logs (measured by grep -o of quoted line numbers inside each log)
+### nail / Logf / instrument-Errorf positions per file version (git show | grep -n):
+-- ORIGINAL bytes d9aff5f (8f536366cfe481e446f640d08e460673, 200 lines)
+30://  2. A read-disk ruler is structurally bl
+86://go:embed task.go
+131:		if n == "task.list" {
+132:			t.Errorf("DEFERRED 那一支和名册�
+151:		t.Errorf("task 家族名册 = %s, want �
+155:	t.Logf("现名册：%s（DEFERRED 的判�
+189:		t.Errorf("编译期与运行期读到的
+195:		t.Errorf("同一枚 DEFERRED＋task.list
+199:	t.Logf("成对读数：盘上 %d 行 / �
+-- FINAL committed a3a7d535 (21b53d52ac87b893b74fdd9828f2f3aa, 223 lines)
+33://  2. A read-disk ruler is structurally bl
+109://go:embed task.go
+154:		if n == "task.list" {
+155:			t.Errorf("DEFERRED 那一支和名册�
+174:		t.Errorf("task 家族名册 = %s, want �
+178:	t.Logf("现名册：%s（DEFERRED 的判�
+212:		t.Errorf("编译期与运行期读到的
+218:		t.Errorf("同一枚 DEFERRED＋task.list
+222:	t.Logf("成对读数：盘上 %d 行 / �
+
+### which version produced which log (signature = quoted line numbers of MY file)
+baseline-full-package-v.log  mtime=16:22  quoted=[155 199 ]
+full-ctrl.log  mtime=16:23  quoted=[(no failure/log lines from my file)]
+full-m2b.log  mtime=16:23  quoted=[132 155 189 199 ]
+full-m2e.log  mtime=16:24  quoted=[151 155 189 199 ]
+full-readpath-no-markers.log  mtime=16:26  quoted=[155 189 195 199 ]
+full-readpath-nomarkers-testonly.log  mtime=16:32  quoted=[178 222 ]
+full-readpath-teeth-m13.log  mtime=16:26  quoted=[155 189 195 199 ]
+full-teeth-m13.log  mtime=16:23  quoted=[189 195 199 ]
+iso-ctrl.log  mtime=16:26  quoted=[155 199 ]
+iso-m2b.log  mtime=16:27  quoted=[132 155 189 199 ]
+iso-m2e.log  mtime=16:27  quoted=[151 155 189 199 ]
+iso-teeth-m13.log  mtime=16:27  quoted=[155 189 195 199 ]
+pass2-ctrl.log  mtime=16:43  quoted=[(no failure/log lines from my file)]
+pass2-m2b.log  mtime=16:43  quoted=[155 178 212 222 ]
+pass2-m2e.log  mtime=16:44  quoted=[174 178 212 222 ]
+pass2-teeth-m13.log  mtime=16:43  quoted=[212 218 222 ]
+
+### stale-by-mid-edit artifacts (name them, do not silently reuse their numbers):
+- gates/n1-n5-negative-rulers.txt quoted ':144' for the nail = an INTERMEDIATE version (only the first comment edit applied).
+  Re-run on the committed bytes is gates/n-rulers-rerun-on-committed-bytes.txt (nail = :154).
+- gates/s1-ruler-location.txt was taken on ORIGINAL bytes; the archived-ruler numbers in it (:223/:224/:183/:244/:176) are UNCHANGED
+  because that file (task_cancel_221_legs_test.go) was never edited: md5 13a0ba39e30fb95ad4f2be88beed4fc7 = HEAD blob, both then and now.

@@ -13,15 +13,27 @@ AC#1／AC#1b／AC#3／AC#4／AC#5／AC#6 一枚不做、不评、不顺手；票
    **逐字保留**在本件文末附录（临时件只建不删），其"本节以下目前是骨架"那句以本件为准。
    `logs/mut/**`（29 枚）、`logs/overlay/**`（11 枚）、`logs/gates/**`（11 枚）、`logs/baseline/**`（3 枚）＝**`236-r3` 跑的**，
    本腿只当**形状参考**（overlay json 的写法、合成副本放 `D:/tmp/` 的做法），⛔ 未引用其中任何 rc／红名册／判语当自己的凭据。
-   **本腿自己跑的读数全部在新目录 `.scratch/wisp/probes/236/r3/logs/r3c/**`**（现量枚数：`mut/` 23、`overlay/` 7、`gates/` 10）。
+   **本腿自己跑的读数全部在新目录 `.scratch/wisp/probes/236/r3/logs/r3c/**`**（现量枚数：`mut/` 23、`overlay/` 7、`gates/` 14）。
 
 用例载体（`internal/tools/tasklist_deferred_236r3_teeth_test.go`，HEAD 版 200 行）＝`236-r3` 落库（提交 `d9aff5f`，
 编排者标〔未验证半成品〕代提）。**本腿对它的改动＝注释三处**（新增"读数归属"一节；把 `M-2a`／`M-2c` 两行按本腿实测改准，
 如实写明 `M-2c` 未实测）。零断言改动、零用例增删、零导出名、零产码改动。
 文件字节：`8f536366cfe481e446f640d08e460673`（HEAD 原版）→ `21b53d52ac87b893b74fdd9828f2f3aa`（本腿改后）。
-★因此本件引用**测试文件行号**按轮次分开看：pass1 四发跑在 `8f536366`（红句里是 `:132`／`:151`／`:189`／`:195`），
-三发配对与 pass2 跑在 `21b53d52`（同一句落在 `:144`／`:163`／`:201`／`:207`）。
-**两遍红名册逐字相同**（`logs/r3c/mut/pass2-readings.txt`）⇒ 名册不是某次文件字节或缓存的产物（全程带 `-count=1`）。
+★因此**同一句红句在两版字节里落在不同行号**，本件按轮次分开标注（实测，⛔ 不是推的；逐条名册＝
+`logs/r3c/gates/line-number-map.txt`；早期那份 `round-and-bytes-map.txt` 也留着）：
+
+| 轮次 | 跑的钟点 | 文件字节 | 红句里出现的本腿文件行号 |
+|---|---|---|---|
+| pass1 四发（`full-ctrl`／`full-teeth-m13`／`full-m2b`／`full-m2e`＋`iso-*`）＋配对①② | 16:23–16:27 | `8f536366`（**r3 原字节**，本腿尚未落笔） | `:132`（名册钉）／`:151`（家族名册）／`:155`（`现名册` Logf）／`:189`＋`:195`（仪器尺两把读数）／`:199`（成对读数） |
+| 配对③ `readpath-nomarkers-testonly` | 16:32 | `21b53d52`（本腿注释已改） | `:178`／`:222` |
+| pass2 四发（`pass2-*.log`） | 16:43–16:44 | `21b53d52` | `:155`／`:174`／`:178`／`:212`／`:218`／`:222` |
+| PASS3 门禁（`gates/pass3-final-committed-bytes.txt`） | 17:01 | `21b53d52`（＝提交 `a3a7d535` 的字节，盘上＝HEAD 同一串） | 未突变态：九枚 **PASS**（含 `236-r2` 那六枚） |
+
+⇒ **两遍红名册（用例名集合）逐字相同**（用 `sort` 对比过，过程记在 `mut/pass2-readings.txt`）
+⇒ 名册不是某次文件字节或测试缓存的产物（全程带 `-count=1`）；只有**行号**随字节版本移动。
+★**本腿自记一条写错的读数**（原句不抹，写在 §5 第 8 条）：本件第一版把新字节下的行号**猜**成
+`:144`／`:163`／`:201`／`:207`，实测是 `:155`／`:174`／`:212`／`:218`／`:222`——猜的那四个不对，已按实测顶正。
+
 
 ---
 
@@ -127,9 +139,11 @@ func BuiltinTaskEntries(d TaskDeps) []Entry {
   **`os.ReadFile("task.go")`**——**读盘型尺对 `go test -overlay` 结构性不可见**（overlay 只替换编译器看到的字节，
   测试二进制运行时打的是物理盘）。⇒ 今天**连"测这把尺的牙"都做不到**，不是没测、是测不出。这条必须写进判据注释。」
   同一句在票面 AC#2 那一格里也写着（`:27` 末）：「测它的牙必须 overlay 替换测试文件里的读路径并配正控」。
-- 注释里在位（`236-r3` 落的字，本腿复认逐字在位）：`internal/tools/tasklist_deferred_236r3_teeth_test.go:33-45`。
+- 注释里在位（`236-r3` 落的字，本腿复认逐字在位）：`internal/tools/tasklist_deferred_236r3_teeth_test.go:33-45`
+  （**提交后字节**的行号；r3 原字节里同一段落在 `:30-42`——本腿在它前面插了归属那一节，见开头那张表）。
 - **本腿把这条事实变成可量的两半**：
-  1. **编译期那一半**＝同文件 `:86` `//go:embed task.go`（`//go:embed` 走**构建期**，overlay **够得到**）。
+  1. **编译期那一半**＝同文件 `:109` `//go:embed task.go`（提交后字节；r3 原字节是 `:86`）。
+     `//go:embed` 走**构建期**，overlay **够得到**它。
      用例 `Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt` 把两把读数并排比（盘 vs 编译）：
      HEAD 上两数相等、只有 `-overlay` 能让它们分开 ⇒ 这一枚红＝"这一发的字节真进了编译器"的**落地证明**。
   2. **正控那一半**＝overlay 替换**测试文件里的读路径**：只改 `:224` 那一行 `os.ReadFile` 的字符串参数，
@@ -143,9 +157,13 @@ func BuiltinTaskEntries(d TaskDeps) []Entry {
 
 | 尺（本腿现跑） | 读数 | 命中真名的证明（同形换真名必须非零） |
 |---|---|---|
-| `grep -rn '"task\.list"' internal/tools --include=*_test.go` | **4 行**；逐行读：4 行全落在注释或"数词面"的谓词里（`task_cancel_221_legs_test.go:236`、本腿文件 `:108`／`:144`），**零枚比的是注册名** | —（这一把是"命中了，但没有一枚是能力尺"，不是零命中） |
-| `grep -rn '== "task\.list"' internal --include=*_test.go` | **1 行**＝本腿自己那枚钉子（`tasklist_deferred_236r3_teeth_test.go:144`，`21b53d52` 版行号） | 同族形状换真名：`grep -rn 'Name() == "task\.cancel"' internal --include=*_test.go` ⇒ **命中 `task_cancel_221_legs_test.go:176`（非零）** ⇒ 这把尺抓得到英文注册名，**不是中文词面尺** |
+| `grep -rn '"task\.list"' internal/tools --include=*_test.go` | **4 行**，逐行读（提交后字节）＝本腿文件 `:26`（注释）＋`:118`（词面谓词）＋**:154（本腿这枚名册钉自己）**，加归档尺 `task_cancel_221_legs_test.go:236`（词面谓词）。⇒ **除本腿那枚钉之外，三行都不是比注册名**；**本腿落笔之前＝零枚** | —（这一把是"命中了，但没有一枚既存的是能力尺"，不是零命中） |
+| `grep -rn '== "task\.list"' internal --include=*_test.go` | **1 行**＝本腿自己那枚钉子（`tasklist_deferred_236r3_teeth_test.go:154`，提交后字节；r3 原字节里是 `:131`） | 同族形状换真名：`grep -rn 'Name() == "task\.cancel"' internal --include=*_test.go` ⇒ **命中 `task_cancel_221_legs_test.go:176`（非零）** ⇒ 这把尺抓得到英文注册名，**不是中文词面尺** |
 | `grep -rn 'registered\["task\.' . --include=*.go` | **0 命中** | ★**这一把的零命中本身是伪尺**：名集在 `internal/tools/task_cancel_221_test.go:94` 以**计算键**写入（`registered[e.Tool.Name()] = true`），任何"字面量键"的 grep 结构上都打不到它。⇒ 本腿**不拿这一把下结论**，只拿前两把（各有命中证明） |
+
+> 行号口径：第一把尺在**注释改到一半**的中间态字节上曾报 `:108`／`:144`
+（`gates/n1-n5-negative-rulers.txt` 那份就是中途态）⇒ 那两份号**作废**，以上表两列为准；
+复跑件＝`gates/n-rulers-rerun-on-committed-bytes.txt`（钉＝`:154`），⛔ 旧那份不删。
 
 ⇒ 结论的精确形状：**不是"仓里没有能力尺"**——票面 §四 指名的两枚本腿复认其形状
 （`internal/tools/task_cancel_221_test.go:42 allBuiltinEntriesHere` ＋ `:89 Test221EveryPromisedTaskNameIsRegistered`；
@@ -313,7 +331,7 @@ func BuiltinTaskEntries(d TaskDeps) []Entry {
 3. **爆炸半径该定在几枚，不归本格裁。** 发③（注销一行）＝10 枚具名红，发②（多注册一行）＝4 枚。
    "动名册一行＝十个具名用例响"是好事（行为尺密），但 AC#2 只管**这把尺自己有没有牙**。
    本腿因此**没有**因"红得多"收窄任何断言，也**没有**把它写成"钉太宽"的缺陷；若要裁"该红几枚"，请另立一格。
-4. **本格拦不住"注释与代码分叉"，只拦得住"名册与能力分叉"——而且这是**故意**的。**
+4. **本格拦不住"注释与代码分叉"，只拦得住"名册与能力分叉"——而且这是故意的。**
    发④ 的真实后果：产码注释可以说谎而**零枚行为尺报警**（能力钉正确地绿，仪器尺红的是"overlay 在跑"这件事）。
    要在**未突变态**也拦住这一形，唯一形状是再加一枚词面尺（"文件里必须留着 `DEFERRED`＋`task.list` 那一行"）。
    ⛔ 本腿**不造**它，两条理由：①它要求"注释必须含某一行文字"，而这条承诺**没有任何契约凭据**
@@ -323,13 +341,27 @@ func BuiltinTaskEntries(d TaskDeps) []Entry {
    本腿四发在**两种文件字节**上各跑一遍，红名册逐字相同（`mut/pass2-readings.txt`），基线两次也一致。
    ★要说清的口径＝§0 那个 `PASS=206` 是**顶层枚数**（`grep -c '^--- PASS'`），票面 §六 逐字警告过行首锚定尺**看不见缩进子测试**；
    本腿判据全靠"具名红名册"与逐行原文，不依赖名级计数，所以不与此冲突；但**引用 206 必须带"顶层"两字**。
-6. **仪器尺那枚红对"良性 overlay"也红**（注释里也写了）：任何一次对 `task.go` 的 `-overlay`（哪怕字节完全相同以外的任何改动）
-   都会让 `Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt` 红。⛔ 这不是新常红（HEAD 与 CI 上两把读数相等＝绿，
+6. **仪器尺对"良性 overlay"也红**（注释里也写了）：只要某发 `-overlay` 换进 `task.go` 的字节与盘上不同，
+   `Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt` 就红（实测：发④／配对①／配对②都红，
+   而字节完全相同的正控 E **PASS**、红句里两数相等）。⛔ 这不是新常红（HEAD 与 CI 上两把读数相等＝绿，
    且全仓 `scripts/**`／`.github/**` 现查 **0 处**使用 `-overlay`），⛔ 也不许"修"成少比几样——少比正是旧尺量不到的原因。
    谁下一格要用 overlay 改 `task.go`，**会先撞上这一枚红**，这是设计行为，已就地写明。
 7. **本格不答的清单**：AC#1／AC#1b（五枚拒绝分支，`236-r2` 已交、另有终裁腿）、AC#3（task id 由谁铸造）、AC#4（`ci.yml` 注释）、
    AC#5（红名册口径）、AC#6（格式门分母）、票 225（标记与 `SPEC-12 §5` 双向对账）、`task.list` 到底该不该注册（D34／`PLAN.md §7 :1531`）。
    ⛔ "AC#2 算不算修好"由编排者凭本件＋终裁腿判，本件不勾任何框、不写"完成"。
+8. **★本腿自己写错过一处读数，原句不抹、就地具名更正**（派单：写错了就追加一条具名更正，永不回滚）。
+   本件第一版（提交 `a3a7d535`）开头那两行把**新字节**下的行号**猜**成 `:144`／`:163`／`:201`／`:207`，
+   并且 §1.5／§1.6 直接把 `:86`（`//go:embed`）与 `:108`／`:144`（两处 `task.list` 谓词）当成"当前字节"的行号引用。
+   ⇒ **实测**（`git show <号>… | grep -n`，逐字在 `logs/r3c/gates/line-number-map.txt`，早期那份 `round-and-bytes-map.txt` 同并存档）：
+   r3 原字节（`d9aff5f`，200 行）里 `//go:embed` 在 `:86`、钉在 `:131`、家族名册红句在 `:151`、`现名册` Logf 在 `:155`、
+   仪器尺两句在 `:189`／`:195`、成对读数在 `:199`；提交后字节（`a3a7d535`，223 行）里同位置的行号是
+   `:109`／`:154`／`:174`／`:178`／`:212`／`:218`／`:222`。⇒ 猜的那四个（`:144`／`:163`／`:201`／`:207`）**全部作废**，
+   已按实测顶正；`gates/n1-n5-negative-rulers.txt` 那次 grep 跑在**注释改到一半**的文件上（`:108`／`:144`），
+   也已在 §1.6 那行就地标"作废"，并补跑一份 `gates/n-rulers-rerun-on-committed-bytes.txt`（钉＝`:154`）。
+   ★性质说清楚：这是**编辑锚点／引用口径的错**，⛔ 不影响任何一条 rc、任何一枚红名册、任何一句红句正文
+   （那些全部来自日志原文，且 §3 引用的红句行号一律是**产生它的那版字节**的行号，见开头那张表）。
+   犯因＝把"我以为改了多少行"当成了实测；这正是派单点名的"⛔ 截断／记忆输出当编辑锚点"那一坑，本腿认。
+   ★**同一轮复量里抓到自己的第二处措辞过头**（也是原句不抹、就地改准）：§1.6 那把 N1 尺第一版写「4 行**全**落在注释或词面谓词里、**零枚**比的是注册名」——复跑发现四行里**有一行就是本腿自己那枚钉**（提交后字节 `:154`）。已改准成「除本腿那枚之外三行都不是比注册名；本腿落笔之前＝零枚」，判语方向不变、口径变严。
 
 ---
 
@@ -346,11 +378,11 @@ for m in ctrl teeth-m13 m2b m2e; do
   go test ./internal/tools/ -count=1 -v -run 'Test221DeferredMarkerForCancelLiftedButListStillMarked|Test236R3' \
       -overlay "D:/tmp/wisp236r3c/overlay/$m.json"
 done
-# 三发配对（读路径替换）
-for m in readpath-teeth-m13 readpath-no-markers readpath-nomarkers-testonly; do
-  go test ./internal/tools/ -count=1 -v -run 'Test221DeferredMarkerForCancelLiftedButListStillMarked|Test236R3' \
-      -overlay "D:/tmp/wisp236r3c/overlay/$m.json"
-done
+# 三发配对（读路径替换）。★配对①②当时跑的是**全包 -v**（未加 -run），配对③跑的是 -run 过滤那三枚：
+go test ./internal/tools/ -count=1 -v -overlay "D:/tmp/wisp236r3c/overlay/readpath-teeth-m13.json"
+go test ./internal/tools/ -count=1 -v -overlay "D:/tmp/wisp236r3c/overlay/readpath-no-markers.json"
+go test ./internal/tools/ -count=1 -v -run 'Test221DeferredMarkerForCancelLiftedButListStillMarked|Test236R3' \
+    -overlay "D:/tmp/wisp236r3c/overlay/readpath-nomarkers-testonly.json"
 # 门禁
 sh scripts/d22scan.sh; gofmt -l internal/tools/tasklist_deferred_236r3_teeth_test.go
 "$(go env GOPATH)/bin/gofumpt.exe" -l internal/tools/tasklist_deferred_236r3_teeth_test.go

@@ -1,0 +1,26 @@
+### N-rulers re-run on the FINAL COMMITTED bytes (a3a7d535, md5 21b53d52ac87b893b74fdd9828f2f3aa), 10-06 17:06
+### why re-run: the pass-1 grep output (n1-n5-negative-rulers.txt) was taken mid-edit, so its line numbers for MY file are stale.
+[N1] grep -rn '"task\.list"' internal/tools --include=*_test.go
+internal/tools/tasklist_deferred_236r3_teeth_test.go:26://     Count() doc comment); 2 of them also carry "task.list" (:23 and :279).
+internal/tools/tasklist_deferred_236r3_teeth_test.go:118:		if strings.Contains(line, "DEFERRED") && strings.Contains(line, "task.list") {
+internal/tools/tasklist_deferred_236r3_teeth_test.go:154:		if n == "task.list" {
+internal/tools/task_cancel_221_legs_test.go:236:		if strings.Contains(line, "task.list") {
+
+[N2] grep -rn '== "task\.list"' internal --include=*_test.go
+internal/tools/tasklist_deferred_236r3_teeth_test.go:154:		if n == "task.list" {
+[N2-hitproof] grep -rn 'Name() == "task\.cancel"' internal --include=*_test.go
+internal/tools/task_cancel_221_legs_test.go:176:		if e.Tool.Name() == "task.cancel" {
+
+[N6] where the nail and the lexical predicate live IN MY FILE at the committed bytes:
+109://go:embed task.go
+118:		if strings.Contains(line, "DEFERRED") && strings.Contains(line, "task.list") {
+154:		if n == "task.list" {
+174:		t.Errorf("task 家族名册 = %s, want 含 task.output 与 task.cancel（task.output 是票 164 的，"+
+212:		t.Errorf("编译期与运行期读到的 task.go 字节不一致（编译 %d 字节 / 盘上 %d 字节，标记行数 %d 对 %d）："+
+218:		t.Errorf("同一枚 DEFERRED＋task.list 标记行数，编译器看到 %d 行、os.ReadFile 看到 %d 行："+
+222:	t.Logf("成对读数：盘上 %d 行 / 编译期 %d 行（HEAD 上两数相等＝这把尺没在空转）", diskCount, compiledCount)
+
+[N7] the archived ruler's line numbers are UNCHANGED by this leg (file never edited): md5 13a0ba39e30fb95ad4f2be88beed4fc7 = HEAD
+183:	if len(names) != 2 {
+224:	src, err := os.ReadFile("task.go")
+244:	if listMarked == 0 {

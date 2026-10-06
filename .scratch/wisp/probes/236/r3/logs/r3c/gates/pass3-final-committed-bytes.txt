@@ -1,0 +1,26 @@
+### PASS 3 - the FINAL committed bytes, run after commit a3a7d535, 10-06 17:01
+committed file md5 (git show HEAD:...) = 21b53d52ac87b893b74fdd9828f2f3aa / disk = 21b53d52ac87b893b74fdd9828f2f3aa
+$ go vet ./internal/tools/
+rc=0
+$ gofmt -l <my file>
+rc=0
+$ gofumpt -l <my file>
+rc=0
+$ go test ./internal/tools/ -count=1 -run 'Test221DeferredMarkerForCancelLiftedButListStillMarked|Test236R3|Test236R2' -v
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+--- PASS: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+--- PASS: Test236R2TaskSpawnRefusesWhenRosterIsUnwired (0.00s)
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.048s
+$ sh scripts/d22scan.sh
+d22scan: scope ban #8 cmd/              examined 104 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=228, bans #1-5 cmd/=38, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=514, ban #8 cmd/=104; ban #8 emoji coverage: design/ 3
+rc=0
+$ git status --porcelain -- internal cmd
+(end)
