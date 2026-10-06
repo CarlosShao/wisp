@@ -1,0 +1,49 @@
+pool-validity 4e: verdicts for 233, 234, 237 (the three live cells of dead leg 4a)
+
+All rulers are HEAD-face (git --no-pager grep on HEAD, git show HEAD:path,
+git ls-tree). Zero go commands in this leg. No ticket boxes touched.
+
+233 - split verdict, four faces:
+- current-measurement 2 (the three Tier constants have zero assignment sites)
+  is still literally true today (2 hits each, both in schema.go), but the
+  ticket headline "not one key is tagged" is now obsolete: commit dd92bb92
+  (10-02, ticket 255 AC2-b) added internal/config/tiers.go with TierRegistry
+  (17 hot rows, 20 reload rows, 3 restart rows, 4 locked rows) plus an export
+  accessor TierOf and a same-source panic guard in manager.go. Hard gate met
+  by commit number plus name-only listing.
+- the reload tier "has no producer key" half never held: manager.go already
+  appended rep.Reload at the filing anchor a8f3c020 (lines 378 and 412, trace
+  able back to ab638dd5 09-19), so the manager.go:198 condition was never
+  constant-false for the producer side.
+- the reload tier "has no consumer" half still holds: OnReload is assigned
+  only in cmd/balldebug and two tests; cmd/wisp reads rep.Reload exactly once,
+  inside an auditf field, and there is no honest sentence for it (compare the
+  restart tier, which got OnRestartPending wired at config_reload.go:115).
+- the drift risk of the hardcoded restartTierKeys list is now pinned by
+  cmd/wisp/restart_tier_keys_255r2_test.go (added 67ab595d 10-03).
+- AC4/AC5/AC6 are runtime readings, so out of reach for this leg.
+
+234 - mostly a flip-the-box shape, with one cell genuinely obsolete:
+AC5 (relocate 10 duplicate denominators) was delivered by leg gate-rerun-1,
+commit 6d22dd6c, and my own re-measurement of the sender and receiver box
+counts reproduces that leg's numbers cell for cell, including the warning
+that ticket 114 really has un=9. The other six ACs have readings on disk
+(63 artifact files at HEAD, table.md 289 lines, zero UNJUDGED left) but the
+credential class is a ticket note plus ledger A449 plus a non-implementer
+leg, so this is 差翻勾, not case-closable by me. AC1-AC4 and AC6 reruns on
+today's HEAD are out of reach (zero go). One citation in the ticket face has
+drifted: ticket 105 AC5 is now at line 56, not 54; the other eleven still
+point at their own AC.
+
+237 - still holds, all three faces:
+- subagent_197.go still spawns the child at line 344 before the parent emits
+  its derivation receipt at 366 and 368.
+- the parked counter is fed from the onUpdate delta, so parkParents waiting on
+  n parked then demanding zero returns keeps the same unsound inference, and
+  it is now reached from three tests (437, 514, 555), wider than the ticket
+  assumed. New finding of this leg: await222Tokens waits on the child model
+  call signal, not on parked, so the exposure is not the one cell named.
+- the sentence AC2 asks to add next to the code has zero hits at HEAD.
+- awaitChildOnBridge222 consumes a single struct{} token, so all three call
+  sites still only require at least one arrival, never per-child.
+Runtime pre-reads and the mutation shapes are out of reach.
