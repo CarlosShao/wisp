@@ -1,0 +1,11 @@
+probes(232-r2): 骨架落盘 —— §0 起手锚 + §1 现量六行复跑 + 六格表头先立
+
+- 三把尺原文：票 232 第 3/4 行零 WITHDRAWN/撤/作废；HEAD 590fb855；
+  `git status --porcelain -- cmd internal` 起手 0 行；票面 `- [ ]` = 6 枚（全部不归本腿）。
+- 产码 md5 对拉起手一致：`5ce441ca5e72b64d18a6c26f1c066882`（工作树 == HEAD），
+  三段操作员文案的 HEAD 原文已按 `git show | sed -n '311,330p'` 复量抄回 §0.1 存档。
+- §1 现量新增未修态两枚点名用例读数：
+  `--- PASS: TestTicket223RestartTierSaysItWillNotApply (2.48s)` /
+  `--- PASS: TestTicket223R2FailureSentenceRouting (0.60s)`，全文 logs/AC0-baseline-unmutated.txt。
+- 六格表 + 突变名册 + 两把安全尺 + 门禁 + 判不动栏的**表头**先落盘，读数逐格追加；
+  本轮零产码改动、零测试面改动（写面只有本目录）。
