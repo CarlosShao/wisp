@@ -53,3 +53,48 @@
 - **另两处口径**：① `runtests.sh: PASS=34 FAIL=0` 与 `internal/panel/` 那 3 枚红**不打脸**——那句是 `scripts/d22scan.sh:51` 用 `-C tools/d22scan` 起的正控，`./...` 只覆盖 scanner 自己那一包（本票登记为"矛盾"那条按此更正）；② `ban #8 internal/` 的 **438 是"扫到的文件枚数"、不是违规枚数**，`16:4x` 我复跑＝**441**（多 3 枚＝在飞 `185-r1` 新建的文件）、门仍 **clean** ⇒ 本票与台账今后只报"门 clean/红＋红点逐名"。
 - **事件推送五枚的一条硬约束收下并入本票**：不许把它们塞进 `bridge.go` 的入向白名单常量（入向方法名与出向事件名混成一张表＝本票那枚病的镜像形状）。
 - **本票状态**：`194-c1` 只是**代价表**，AC 七格**一格不勾**（勾要等非实现者裁"补齐之后代码与规格是否真同源"）。下一步＝`33-r2` 交件后派**堆1 写腿**。
+
+## 编排者派：过期读数更正（腿 7b2，10-06）
+
+> 来路＝只读＋追加式更正腿 `expired-premises-7b2`（锚 HEAD＝`bd39f17f`，10-06 19:2x 自取）。⛔ **本节不改动上面任何一行**，尤其不碰 `:42` 那句（它在 `- [ ] **AC#5 …**` 的框文射程内，改它＝改判据，判据归编排者翻）；AC 七格**一格没勾、一格没改**（本节追加前后 `grep -c '^- \[ \]'` 都＝**7**，我量过）。
+> 取料与尺的全文在 `.scratch/wisp/probes/expired-premises/7b2/verdict.md`；本节只落"哪两条链推翻了哪一句"。
+
+**① 被推翻的句子（逐字，`:42`，本腿未改它一字）**：
+`⚠ **别拿名册补齐冒充按钮能点**：` + 「`ComposerDispatch.Handle`（`composer_dispatch.go:120`）生产调用者**现量仍零枚** ⇒ 18 枚**无一例外**要等票 33 的 H2/H3。」
+⇒ 其中"**生产调用者现量仍零枚**"这一层，在今天这棵树上**不成立**；票 186 普查注 `:54` 里那句"入向那一跳**整条不存在**"同属这一层（见 verdict §3，那一枚票面本腿一字未动）。
+
+**② 尺（锚在带括号的调用形状上，⛔ 不锚符号名）**——命令原文照抄，可复跑：
+```
+git --no-pager grep -n 'disp\.Handle(' HEAD -- cmd internal | grep -v '_test.go'
+```
+我现量＝**2 处**：`cmd/wisp/panel_host_windows.go:637`＋`cmd/wisp/panel_inbound.go:163`。
+⚠ 这把尺的两处陷阱（本腿都现量过）：不剥 `_test.go` ⇒ 变成 9 行、全测试；改扫 `Handle(ctx` 宽形状 ⇒ 变成 9 处，其中 `cmd/wisp/logsink.go:209`、`:211` 与 `internal/observe/logging.go:138`、`:505`、`:519`、`:574`、`:576` 共 **7 处是 slog handler 的同名 `Handle` 方法，与 `ComposerDispatch` 无关**。⇒ **"有人构造了这个对象" ≠ "有人调用了它的方法"**，判"零调用者"与推翻"零调用者"必须用同一把锚在调用形状上、双向都追到 `main` 的尺。
+
+**③ 推翻它的链 A（常驻 GUI 腿，逐跳本腿现量）**：
+`cmd/wisp/main.go:66` `runResident()`（注释 `:135` 自证它住在 `resident_windows.go`）
+→ `cmd/wisp/resident_windows.go:33` `func runResident()` → `:151` `rp, rpErr := newResidentPanelManager(rt.Layout.DataDir)`
+→ `cmd/wisp/panel_resident_windows.go:228` `func newResidentPanelManager(...)` → `:234` `disp, err := newResidentComposerDispatch(dataDir, auditf)` → `:211` 该函数 → `:215` `return newComposerDispatchChain(dataDir, auditf, residentPanelActor)`（`cmd/wisp/panel_inbound.go:228`/`:271` 装配，`:248` `modeWrites := &panel.ModeWriteHandler{` ⇒ 路由器**真接了处理器**，不是空壳）
+→ `cmd/wisp/panel_resident_windows.go:253` `return NewPanelManager(disp, assets, dataPath, …)`
+→ `cmd/wisp/panel_host_windows.go:213` `func NewPanelManager(disp *panel.ComposerDispatch, …)` ＋ `:152` 字段 `disp *panel.ComposerDispatch`（**归属证明**：`:637` 调的确实是这一枚类型的方法）
+→ 到页那一支：`cmd/wisp/resident_windows.go:218` `return panel.RequestToggle(via)`（在 `startResidentBall(... withPanelHost(...))` 里）→ `cmd/wisp/panel_resident_windows.go:427` `RequestToggle` → `:436` `rp.RequestShow(via)` → `:383` `rp.post(func() { rp.showOnThread(via) })` → `:409` `err := rp.mgr.Show(context.Background())` → `cmd/wisp/panel_host_windows.go:488` `if err := m.bringUp(ctx); err != nil`（`:318` 定义）→ **`:405` `bindErr := w.Bind(panelDispatchBinding, func(raw string) string {`** → `:406` `reply, _ := m.dispatchRaw(ctx, raw)` → `:630` `dispatchRaw` → **`:637` `return m.disp.Handle(ctx, raw)`**。
+
+**④ 推翻它的链 B（CLI 诊断腿，逐跳本腿现量）**：
+`cmd/wisp/main.go:115` `case "panel-inbound":` → `:120` `os.Exit(cmdPanelInbound(args[1:], panelInboundIO{}))`
+→ `cmd/wisp/panel_inbound.go:103` `func cmdPanelInbound(args []string, s panelInboundIO) int` → `:146` `disp, err := newPanelInboundDispatch(dir, auditf)` → `:209` 该函数返回 `*panel.ComposerDispatch` → `:163` `reply, err := disp.Handle(ctx, raw)`。
+
+**⑤ 推翻"整条不存在"的字面尺（票 186 `:54` 给的那把 `grep WebMessage|ReceiveMessage|OnMessage`）**：本腿把同一族形状打到**依赖库源码**上（只读，`D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/`）：
+- `pkg/edge/chromium.go:112` `e.Init("window.external={invoke:s=>window.chrome.webview.postMessage(s)}")`（页面侧 `window.<名字>(...)` 被改写成 `postMessage`）
+- `pkg/edge/chromium.go:201` `e.webview.vtbl.AddWebMessageReceived.Call(...)` ＋ `:233` `func (e *Chromium) MessageReceived(...)` → `:240` `e.MessageCallback(...)`
+- `webview.go:103` `chromium.MessageCallback = w.msgcb` → `:139` `msgcb` → `:147` `w.callbinding(d)` → `:164` `f, ok := w.bindings[d.Method]` → 命中 `panel_host_windows.go:405` 绑进去的那枚闭包。
+⇒ 票 186 `:54` 那把尺**扫的是本仓 Go 文件**，而这条跳的接收器住在依赖库里；"全仓非 test 没有一枚 WebView2 消息接收器"在**这一枚符号上今天不成立**。
+
+**⑥ ★ 最关键的那句边界（本节不许被读成什么）**：
+**过期的是"枚数"这一层，不是那句警告的实质**——"页面点下去到不到 Go"是**运行期**问题，本机 `winlive` 未批、真窗那一发今天量不了 ⇒ ⛔ **本节不得被读成"按钮已能点"**。静态可达（链 A／B 每跳都在）与"owner 真按下去收到回执"是两件事；票 33 `:42` AC#14 登记的"Go→页面那一跳今天没有人投递"（模块 `webview.go:443-448` 的 `Dispatch` 只入队＋`PostThreadMessageW`）本腿**未推翻、也不归本腿推翻**。⇒ `:42` 里"18 枚无一例外要等票 33 的 H2/H3"这半句**照旧成立**，本腿只把"生产调用者现量仍零枚"标成过期读数。
+
+**⑦ 处置与两处具名分歧**：
+- 票 194 只**追加**本节（本节以上任何一行一字未改，`:25` AC#5 框文里那句"生产调用者今天仍是零枚"也**没动**——翻不翻由编排者定，见 verdict §4-①）；`docs/evidence/s1/**` 一字未动；票 33 `:182`／`:188` 不在本批射程（答的是"具名诊断入口"那一枚），未动。
+- **票 186**：普查腿 `pool-validity-4f` §5 第 3 条指认的"零枚"那句，在 186 票面上**不是这个字面**——`:54` 有同族句子（「入向那一跳**整条不存在**」＋「`ParseComposerRequest` 与 `HandleModeRequest` 非 test **零调用方**」），但**没有**"生产调用者零枚"六字逐字。⇒ 4f 的**内容**指认成立、**字面**落点不成立；本腿按派单纪律⛔ **未动票 186 一个字**（缺的是授权范围那一行，见 verdict §4-②）。
+- **票 219**：`grep -n 'ComposerDispatch'` 于票 219＝**零命中**（rc=1）⇒ **4f 报的"票 219 表第 4 行"那一处落点在票面上不存在**（`:39` 表第 4 行答的是 `DecideFromPanel`／`DecideFromNative`／`Gate.Veto`，与 `Handle` 不是同一件事）。⛔ 未动票 219 一个字。
+- ⚠ 顺带报单（本批射程外，本腿未动）：票 219 `:39`／`:15` 那两枚"答复侧生产零调用者"**今天也过期**（`internal/agent/approval/replies.go:328`、`:408`、`:413`、`:437`、`:463` 五处非 test 调用者，驱动者＝生产文件 `cmd/wisp/approval_reply.go:215`、`:259`、`:302`、`:304`、`:331` 与 `cmd/wisp/resident_approval_windows.go:612`、`:728`；票面引的 `gate.go:622/:610/:371` 今天＝`:736/:724/:421`）。⇒ 是否另派一枚腿由编排者定。
+- ⚠ 锚点：本节起手锚＝`bd39f17f`（19:2x），交件前线上已被推进到 `76370fb5`（19:5x）⇒ 本腿把 §② 那把尺与链 A／B 的 20 枚锚**在新 HEAD 上逐枚复跑**，读数不变（详见 verdict §7）。
+零删除自证：`git --no-pager diff --numstat -- .scratch/wisp/issues/194-the-panel-has-two-method-rosters-that-do-not-know-each-other-owner-ruled-align-the-code-to-the-spec.md` 我现量终值＝**`45  0 <全名>`**（删除列 **0**；行数 `55 → 100`；`grep -c '^- \[ \]'` 追加前后都＝**7**），读数与两次中间值（`40 0`）都抄在 verdict §6 与 §7。
