@@ -1,0 +1,33 @@
+chore(probes/pool-validity/4b): 交件——八枚全判完（4 仍成立／2 差翻勾／2 量不到）＋§3 心虚 6 枚＋§4 歧义 6 处
+
+起手 HEAD 3d9b8374（10-06 13:12），交件时 HEAD 已漂到 6f0a2d83（本腿自己 41d12ca7＋同职腿 4c 与写腿 236-r2 的 commit），
+这一条已具名写进 §4 第 1 处（两把读数 6357／6358 原文都在）。零 go 命令、票面零改动、唯一写入面＝本目录。
+
+判档（§2 八行 × 4 列，命令原文＋读数逐枚在表内）：
+- 238 仍成立：`git --no-pager grep -l 'wisp/internal/winsec' HEAD -- internal/ cmd/` 复跑＝非本包 importer 11 枚，
+  `internal/proc`／`observe`／`buildinfo` 各 0 枚 ⇒ 现量 1 今仍在树；状态半边＝owner 已否决目的（票面 :36-43／台账 A476），
+  不计入"真活"。§4 第 2 处记了我自己那把坏尺（短词面 `internal/winsec` 把注释算成 import）第一遍／第二遍两发读数。
+- 242 差翻勾：出向读面 8 枚能力尺已进门（2048d6b6 10-02＋b6b1d6a4 10-05，--name-only 命中）⇒ 现量 3"仪器＝0 枚"不再成立；
+  载具前置 cmd/wisp/subagent_selfapproval_197_test.go:109 逐字仍在；凭据种类＝票内注记＋台账 A559＋裁决表件名（未读内容）。
+- 244 量不到（欠读数）：构建链半边已落（build.ps1:115 逐字 "-H=windowsgui"＝cc6eaa65），但 AC#1 改后 objdump 读数、
+  AC#2 三发真机（含真双击）、AC#5 两截、AC#6 下游消费者名册全无凭据；盘上 build/wisp.exe 现读仍 CUI(3) 且 mtime 早于该 commit；
+  全仓 debug/pe 与 objdump 两把尺各 0 命中；§4 第 6 处配正控复认托盘"允许一次"与 stop-request 钩子今天仍未落。
+- 247 仍成立：`wisp/internal/audio` 非测试 importer 零命中（rc=1）、`SetAudioLevel` 产码命中只有 cmd/balldebug、
+  `internal/speech` 今树只有 doc.go、`SpawnCapture` 调用者 0 枚。
+- 253 仍成立（AC#2 那格已被 87bc6aca 做掉，编排者明令待 253-v1、docs/evidence/s1/ 里 253-*＝0 件 ⇒ 不翻）：
+  词面钉 composer_test.go:381/:394 形状未改、`panelDispatchBinding` 在 cmd/wisp/*_test.go 零尺；
+  AC#3 的落点 webview.go 属依赖库（`git ls-files | grep -i webview` 只得三枚 json/spike 件）⇒ 结构上读不到，具名归"契约邻接＋欠读数"。
+- 262 差翻勾：硬门满足（commit 519e1ade＋--name-only 命中 ci.yml／脚本＋今尺在场）；本腿自跑 `sh scripts/check-path-length-budget.sh`
+  ＝VERDICT GREEN rc=0（6357 tracked／over-budget 57／roster 57／longest 180／worst full 224），
+  `--with-self-test` 那发首行 positive control PASSED；不升"已失效"的两条具名理由＝AC#5 CI 侧读数与 AC#6 卫生四门无凭据，
+  且 docs/evidence/s1/ 里 262-*＝0 件、台账 :11537 逐字「262-v1 待派」。
+- 264 量不到（等人拍）：票面 :26/:40 自定"AC#0 未取回之前任何格不许开工"；台账推到最新一节 A635（:12489）逐字
+  "原八枚在册未摆…票 264…机主两次回继续／恢复＝未选" ⇒ 10-06 仍未取回；已收 264-a1（353 行／58,686 字节，A597 §4 改口句在案）。
+- 266 仍成立：`git show HEAD:tools/d22scan/main.go | grep -c '"scripts'`＝0、walk 只四起点；`Test-ScriptShapeNail` 的
+  名字只活在 .scratch/wisp/probes/** 的台件里；`slo-freshness.sh` 对两枚钉的名字 0 命中（判的是 ci.yml 触发器在场）＋
+  aging 常量 :97 默认 3 天、判定 :368 ⇒ "外牙按天钝且看产物不看钉"今成立；唯一闭合形③落在人工批准面（Q-78／台账 A604 逐字"登记为未闭合"）。
+
+§3 六枚心虚具名：238 别被读成真活；242 按盘面该读"已失效"（我停在差翻勾是因为凭据种类与 242 票面那句"不加 -done"）；
+244 是混合票、按 AC 档位不一致；264 外发那半边有静态凭据；262 的正控用的是实现者自带 self-test；253 三格方向不同。
+§4 六处歧义：HEAD 漂移两读数、坏尺两遍（假红）、264 零命中的两把分母证伪＋"全仓 Redact 非零命中"的口径差、
+253 AC#3 落在依赖库（git grep 结构不可读）、244 两把方向相反的尺（链已落／台未落）、244 前置的中文 grep 零命中配双正控。
