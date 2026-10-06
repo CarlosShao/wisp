@@ -1,0 +1,1 @@
+probe(111/r5): 骨架 —— 起手三把尺全落（HEAD 15fbf18f／scripts+.github 0 行／票面 4 枚零勾框不归本腿），自检基线 rc=0、32 枚 case、0 条断言失败

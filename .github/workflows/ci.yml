@@ -301,6 +301,61 @@ jobs:
         run: go vet ./...
         working-directory: tools/mockllm
 
+      - name: "Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)"
+        # ADDED STEP ONLY (ticket 111 leg 111-r5): no existing step was moved,
+        # edited, deleted, reordered, given continue-on-error, or has its own
+        # command changed - the file received additions and nothing else.
+        #
+        # WHAT IT RUNS. scripts/portable-tests-selftest.sh is the standing carrier
+        # that judges the DENOMINATOR of scripts/portable-tests.sh, and its case
+        # `census-unclaimed-package-goes-red` (group 23) is the only existing thing
+        # that makes GUARD D ring for real: it seeds a package that compiles a test
+        # file while no named scope claims it, and asserts the step prints
+        # `GUARD D - 1 package(s) compile a test file for GOOS=` plus
+        # `census totals: ... unclaimed-with-tests=1` and exits 1. The guard itself
+        # is already in force (scripts/portable-tests.sh, census arm, `exit 1`);
+        # what had never existed is a CI-side reading that it CAN go red. Until this
+        # step, `grep -c portable-tests-selftest .github/workflows/ci.yml` was 0, so
+        # the carrier's verdict lived only on laptops and AC#3's second half
+        # ("prove it goes red") had no carrier in CI at all.
+        #
+        # WHY `bash` AND NOT `sh`. The carrier is bash-only, measured, not assumed:
+        # `dash -n scripts/portable-tests-selftest.sh` exits 2 at its line 246
+        # (`local envs=()`, expecting `}`), and its child scripts are bash-only too
+        # (scripts/portable-tests.sh fails `dash -n` at :231, scripts/winsec-tests.sh
+        # at :48), so a POSIX launcher would have this step die on syntax before it
+        # judged one case. The carrier's own Usage block says `bash scripts/portable-tests-selftest.sh`,
+        # and every process it spawns already names bash explicitly, so this launcher
+        # choice is the script's documented shape rather than a workaround. On this
+        # laptop /bin/sh IS bash (measured: sh --version = GNU bash 5.2.37), which is
+        # why `sh <carrier>` also reads green locally and why the shape had to be
+        # checked with dash directly.
+        #
+        # WHY IT COSTS NO GO AND NO TEST TIME. The carrier replaces the `go` PROCESS
+        # with scripts/testdata/portable-tests/go on a private PATH prefix
+        # ($work/bin) at every one of its invocation sites, so no real toolchain is
+        # exec'd, no test binary is built, and the milliseconds-sensitive packages
+        # other legs are reading stay untouched. It is the committed code being
+        # judged (portable-tests.sh, winsec-tests.sh, runtests.sh) that runs for
+        # real - only `go` is faked.
+        #
+        # WHY `if: ${{ !cancelled() }}` AND WHY IT SITS AT THE BOTTOM OF THE JOB.
+        # Copied from the two guards this job already carries (staticcheck above,
+        # mockllm module vet above): ticket 85 ruled `!cancelled()` the one shape
+        # that makes a step answer without changing its own red/green, and
+        # continue-on-error is not used (D22 run-away mode 6). It matters here
+        # because this job has known-red steps above it (`gofmt (gofumpt)` and
+        # `staticcheck`), so an unguarded addition would be born with no CI verdict
+        # - the exact hole ticket 111 AC#5 names. Position: the next free slot after
+        # `mockllm module vet` rather than an insertion that overtakes the two D22
+        # steps and ticket 262's gate, which is the rule this file wrote for itself
+        # when ticket 161 added a step ("the new leg takes the next free slot
+        # instead of overtaking anybody"). With the guard in place the position does
+        # not buy or cost reach; it does keep further line-number drift of the
+        # file's existing `ci.yml:<n>` citations to the tail only.
+        if: ${{ !cancelled() }}
+        run: bash scripts/portable-tests-selftest.sh
+
   # ----------------------------------------------------------- test-core ----
   # Pure-Go logic tests on ubuntu (SPEC-11 §6 scope) + golden replay +
   # the compose mock-llm wiring (started, probed, used by the probe test).
