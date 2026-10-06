@@ -1,0 +1,13 @@
+chore(probes/pool-validity/4b): 判完前三枚 238／242／244（仍成立／差翻勾／量不到）
+
+HEAD 3d9b8374，零 go 命令，票面零改动。
+
+- 238 仍成立：`git --no-pager grep -l 'wisp/internal/winsec' HEAD -- internal/ cmd/` 复跑＝非本包 importer
+  11 枚文件、`internal/proc` 与 `internal/observe` 各 0 枚 ⇒ 票面现量 1 那句今仍在树。
+  状态半边（owner 09-30 否决目的，票面 :36-43／台账 A476）另记，不当档位凭据。
+- 242 差翻勾：出向读面能力尺已进门（ticket242_panelface_test.go 两枚＝2048d6b6 10-02；
+  ticket259_panel_capability_rulers_test.go 六枚＝b6b1d6a4 10-05）⇒ 票面现量 3"仪器＝0 枚"不再成立；
+  载具前置 :109 逐字仍在；凭据种类＝票内注记＋台账 A559＋裁决表件名 242-grant-binding-v1.md。不裁可结案。
+- 244 量不到（欠读数）：构建链半边已由 cc6eaa65 落 `-H=windowsgui`（build.ps1:115），但 AC#1 改后产物读数／
+  AC#2 三发真机（含真双击）／AC#5 两截／AC#6 下游消费者名册都还没有读数；
+  盘上 build/wisp.exe 现读仍 CUI(3) 且 mtime 早于 cc6eaa65；全仓 debug/pe 与 objdump 两把尺各 0 命中。
