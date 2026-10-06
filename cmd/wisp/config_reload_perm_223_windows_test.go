@@ -112,6 +112,10 @@ func TestTicket223PermissionDeniedSitsInItsOwnSentence(t *testing.T) {
 		for _, other := range []string{
 			"cause=missing", "cause=syntax", "cause=unknown-key",
 			"cause=invalid", "cause=unclassified", "cause=migration",
+			// 票 231 AC#2's sentence joins the roster so the permission reading
+			// cannot borrow it either (and a future shape that swallows this one
+			// has a negative nail waiting for it).
+			"cause=newer-build",
 		} {
 			if strings.Contains(trail, other) {
 				t.Errorf("the permission sentence carries %q:\n%s", other, trail)

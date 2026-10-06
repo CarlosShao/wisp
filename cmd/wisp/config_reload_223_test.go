@@ -567,9 +567,12 @@ func TestTicket223FailureSentencesAreDistinct(t *testing.T) {
 	}
 	// The whole family, so each case can assert that the OTHER sentences are
 	// absent instead of trusting that one shared line means one shared cause.
+	// 票 231 AC#2's cause joins the roster: a fifth "read refused" shape that is
+	// not in here is a shape nothing protects from swallowing a neighbour.
 	all := []string{
 		"cause=missing", "cause=syntax", "cause=unknown-key", "cause=invalid",
-		"cause=permission", "cause=unclassified", "cause=migration", "state=disabled",
+		"cause=permission", "cause=unclassified", "cause=migration",
+		"cause=newer-build", "state=disabled",
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
