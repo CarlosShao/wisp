@@ -157,6 +157,89 @@ func (r *reloadRun223) awaitStdout(t *testing.T, needle string) string {
 	}
 }
 
+// windowSince232 is the windowed read ticket 232 AC#2 asks for: one of this
+// host's streams FROM a mark taken earlier, never the whole stream. It exists
+// because a needle searched over the full stream is satisfied by bytes the run
+// printed BEFORE the edit was planted - a start-up banner that happens to carry
+// the same words would make the restart-tier assertions true without the
+// restart notice ever saying anything (232's "前向风险" row, and AC#4's mutation
+// H, which is measured in .scratch/wisp/probes/232/r2/logs/).
+//
+// The mark is a snapshot string, not an index: both of this host's streams are
+// syncWriters whose bytes only ever get appended (reply listener, tick notices
+// and the reload path all Write, nothing Rewinds), so the current stream must
+// contain the snapshot. If it somehow does not, the case fails loudly instead of
+// silently searching the wrong window. Test-only helper on the test's own host:
+// it adds no exported name and touches no production file.
+func windowSince232(t *testing.T, w *syncWriter, mark, stream string) string {
+	t.Helper()
+	now := w.String()
+	if !strings.HasPrefix(now, mark) {
+		t.Fatalf("232 window: the %s stream no longer starts with the mark taken before the plant;\nmark:\n%s\ncurrent:\n%s",
+			stream, mark, now)
+	}
+	return strings.TrimPrefix(now, mark)
+}
+
+// stdoutSince232 is windowSince232 for the operator's stream.
+func (r *reloadRun223) stdoutSince232(t *testing.T, mark string) string {
+	t.Helper()
+	return windowSince232(t, r.h.out, mark, "stdout")
+}
+
+// awaitStdoutSince232 waits for a sentence to arrive in the WINDOWED part of the
+// operator's stdout (the bytes written after `mark`) and returns that window
+// grown to include it. It is awaitStdout with a start marker instead of a
+// whole-stream search: a copy of the sentence that existed BEFORE the edit was
+// planted cannot satisfy it, which is exactly the shape 232 AC#4 pins.
+//
+// The await is the same monotonic shape the helpers above use - time.NewTimer
+// plus a 20ms time.NewTicker, no wall-clock subtraction (d22scan ban #4), no
+// bare goroutine (ban #1), no Skip: a sentence that never arrives reddens at
+// reloadCaseBudget with both streams and the window dumped.
+func (r *reloadRun223) awaitStdoutSince232(t *testing.T, mark, needle string) string {
+	t.Helper()
+	deadline := time.NewTimer(reloadCaseBudget)
+	defer deadline.Stop()
+	tick := time.NewTicker(20 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		win := r.stdoutSince232(t, mark)
+		if strings.Contains(win, needle) {
+			return win
+		}
+		select {
+		case <-deadline.C:
+			t.Fatalf("stdout never carried %q AFTER the plant within %v; window since the mark:\n%s\nfull stdout:\n%s\nstderr:\n%s",
+				needle, reloadCaseBudget, win, r.h.out.String(), r.h.err.String())
+		case <-tick.C:
+		}
+	}
+}
+
+// awaitAuditSince232 is awaitStdoutSince232's twin for the audit trail: it waits
+// for a line to reach stderr AFTER the mark was taken, so a pre-plant audit line
+// that happens to carry the same words cannot open the window.
+func (r *reloadRun223) awaitAuditSince232(t *testing.T, mark, needle string) string {
+	t.Helper()
+	deadline := time.NewTimer(reloadCaseBudget)
+	defer deadline.Stop()
+	tick := time.NewTicker(20 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		win := windowSince232(t, r.h.err, mark, "audit")
+		if strings.Contains(win, needle) {
+			return win
+		}
+		select {
+		case <-deadline.C:
+			t.Fatalf("the audit trail never carried %q AFTER the plant within %v; window since the mark:\n%s\nfull stderr:\n%s",
+				needle, reloadCaseBudget, win, r.h.err.String())
+		case <-tick.C:
+		}
+	}
+}
+
 // awaitCard waits for the reload path to display a card and returns it.
 func (r *reloadRun223) awaitCard(t *testing.T, tool string) liveCard {
 	t.Helper()
@@ -474,12 +557,20 @@ func TestTicket223RestartTierSaysItWillNotApply(t *testing.T) {
 		if r.rt.cfg.App.Autostart {
 			t.Fatal("this case's premise moved: the boot snapshot already autostarts")
 		}
+		// 票 232 AC#2: the two marks are the operator stream and the audit trail
+		// as they stand BEFORE the edit is planted. Everything asserted from a
+		// window below is therefore bytes this run printed AFTER the plant, and
+		// a start-up banner that happens to carry the same words (232's
+		// forward-risk row, AC#4's mutation H) cannot stand in for the restart
+		// notice.
+		mark := r.h.out.String()
+		errMark := r.h.err.String()
 		r.plant(t, "[fs]", "[app]\nautostart = true\n\n[fs]")
-		pending := r.awaitAudit(t, "config: HOT-RELOAD state=restart-pending sections=[app]")
+		pending := r.awaitAuditSince232(t, errMark, "config: HOT-RELOAD state=restart-pending sections=[app]")
 		if !strings.Contains(pending, "effect=next-process-start") {
 			t.Errorf("the restart notice does not say when it takes effect: %q", pending)
 		}
-		why := r.awaitAudit(t, "config: RESTART-PENDING detail=")
+		why := r.awaitAuditSince232(t, errMark, "config: RESTART-PENDING detail=")
 		// Ticket 223 r2 AC#5: the operator sentence lands on stdout AFTER the
 		// two audit lines just awaited (config_reload.go:282/:284 -> :288),
 		// so the single read that stood here caught the stream mid-write and
@@ -487,11 +578,38 @@ func TestTicket223RestartTierSaysItWillNotApply(t *testing.T) {
 		// awaitStdout instead; every assertion below is unchanged verbatim,
 		// and the positive control (deleting the product sentence) still
 		// reddens - awaitStdout itself fails at its deadline.
-		out := r.awaitStdout(t, "本次运行不会生效")
-		for _, needle := range []string{"app.autostart", "开机自启", "重启进程后生效"} {
-			if !strings.Contains(why+out, needle) {
-				t.Errorf("the restart sentence omits %q; audit:\n%s\nstdout:\n%s", needle, why, out)
+		//
+		// Ticket 232 AC#2 changed WHERE the sentence is awaited and WHAT the
+		// content needles may read: awaitStdoutSince232 finds it in the window
+		// that starts at `mark`, so bytes printed before the plant cannot
+		// satisfy it, and every content needle below is pinned to ONE NAMED
+		// stream instead of to a `why+out` concatenation - which is what let
+		// 232-v2's mutation B delete all three explanation clauses from the
+		// operator's sentence and stay green off the audit trail alone. The
+		// awaits are unchanged in shape and deadline (reloadCaseBudget,
+		// time.NewTimer + 20ms time.NewTicker), nothing was removed and nothing
+		// became an either/or (AC#5); the window reads are all STRICTER.
+		out := r.awaitStdoutSince232(t, mark, "本次运行不会生效")
+		// Which stream actually carries each needle was MEASURED, not assumed:
+		// .scratch/wisp/probes/232/r2/logs/P0-needle-stream-probe.txt (HEAD
+		// product, read-only probe injected by overlay) says "app.autostart" and
+		// "开机自启" are on the operator's stdout and so are the three clause
+		// markers below, while "重启进程后生效" lives ONLY on the audit line -
+		// reportRestartPending's Fprintf (config_reload.go:321-326) never says
+		// it. Pinning that one to stdout would mean writing it into the product
+		// sentence, which 票 232's 禁区 forbids, so it is pinned to the named
+		// audit stream instead - read from the post-plant window, so a banner
+		// cannot satisfy it either. "需要重启进程" is the stdout-side equivalent
+		// of the same promise and is pinned here so the operator's half carries
+		// it too.
+		for _, needle := range []string{"app.autostart", "开机自启", "需要重启进程", "原因：", "交给平台层", "没有被丢掉"} {
+			if !strings.Contains(out, needle) {
+				t.Errorf("the operator's restart sentence omits %q; stdout since the plant:\n%s", needle, out)
 			}
+		}
+		if !strings.Contains(why, "重启进程后生效") {
+			t.Errorf("the restart notice never says %q on the audit trail either; audit since the plant:\n%s\nstdout since the plant:\n%s",
+				"重启进程后生效", why, out)
 		}
 		if got := r.rt.mgr.Config().App.Autostart; got {
 			t.Fatal("the restart tier applied mid-run, which is exactly what D36 forbids")
@@ -500,9 +618,11 @@ func TestTicket223RestartTierSaysItWillNotApply(t *testing.T) {
 			t.Errorf("the operator is not told the edit will not land this run; stdout:\n%s", out)
 		}
 		// Two tiers, two sentences: the restart notice must not be dressed up as
-		// an immediate one.
-		if strings.Contains(out, "这些段已立即生效：[app]") {
-			t.Errorf("the restart tier was reported as immediately effective; stdout:\n%s", out)
+		// an immediate one. Read over the WHOLE stream on purpose - a windowed
+		// read here would be narrower than the one this assertion has always
+		// had, and 票 232 AC#5 forbids loosening.
+		if whole := r.h.out.String(); strings.Contains(whole, "这些段已立即生效：[app]") {
+			t.Errorf("the restart tier was reported as immediately effective; stdout:\n%s", whole)
 		}
 		if n := r.rt.windowCount(); n != 0 {
 			t.Errorf("a restart-tier edit displayed %d cards, want 0 (nothing loosened)", n)

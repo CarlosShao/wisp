@@ -1,0 +1,19 @@
+time=2026-10-06T12:14:42.883+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe232R2WhichStreamCarriesEachNeedle
+time=2026-10-06T12:14:44.221+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 12:14:44 mockllm: serving on http://127.0.0.1:55733 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T12:14:44.247+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestProbe232R2WhichStreamCarriesEachNeedle2871830385\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-06T12:14:44.272+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbe232R2WhichStreamCarriesEachNeedle2871830385\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T12:14:44.279+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T04:14:44Z duration_ms=6
+time=2026-10-06T12:14:44.285+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbe232R2WhichStreamCarriesEachNeedle2871830385\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T12:14:44.291+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T04:14:44Z duration_ms=5
+time=2026-10-06T12:14:44.301+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T12:14:44.304+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    zz_232r2_needle_probe_test.go:26: PROBE needle="app.autostart" stdout-full=true stdout-window=true audit=true why+out=true
+    zz_232r2_needle_probe_test.go:26: PROBE needle="开机自启" stdout-full=true stdout-window=true audit=true why+out=true
+    zz_232r2_needle_probe_test.go:26: PROBE needle="重启进程后生效" stdout-full=false stdout-window=false audit=true why+out=true
+    zz_232r2_needle_probe_test.go:33: PROBE stdout-window-since-mark follows:
+        wisp run: 这些段的改动本次运行不会生效（D36 重启档，需要重启进程）：[app]。原因：这几枚键在进程启动时被读一次就交给平台层（开机自启注册、单实例锁、界面语言），本次运行没有重新注册它们的路径。涉及：app.language / app.autostart / app.single_instance。注意两件事都没发生：文件里的新值没有被丢掉，内存里的旧值也没有被偷偷替换。
+--- PASS: TestProbe232R2WhichStreamCarriesEachNeedle (2.45s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.509s

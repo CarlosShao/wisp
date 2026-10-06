@@ -1,0 +1,16 @@
+time=2026-10-06T13:02:56.923+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-06T13:02:56.937+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 1040.0 ms, hot path 0.0 ms)
+time=2026-10-06T13:02:58.289+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-06T13:02:58.289+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.35s)
+    panel_resident_windows_test.go:315: AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]
+    panel_resident_windows_test.go:327: AC#13 page answer (head e21808f1): "0" - 0 of 1 probe id(s) present in the live document
+    panel_resident_windows_test.go:330: after a real cold start the live document contains NONE of the 1 element ids the embedded entry declares (the page itself answered "0"). That is ticket 33 AC#13: the round-trip probe page is the last document shown, so the user sees a stub instead of the panel. Product side: bringUp must hand the entry over AFTER the probe - the probe stays, because it is where cold usable is decided
+time=2026-10-06T13:02:58.291+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 529.5 ms, hot path 0.0 ms)
+time=2026-10-06T13:02:59.015+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-06T13:02:59.015+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.476s
+FAIL

@@ -1,0 +1,28 @@
+time=2026-10-06T12:32:32.203+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe232R2BannerAvailableBeforePlant
+time=2026-10-06T12:32:33.405+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 12:32:33 mockllm: serving on http://127.0.0.1:64964 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T12:32:33.429+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestProbe232R2BannerAvailableBeforePlant3117138754\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-06T12:32:33.457+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbe232R2BannerAvailableBeforePlant3117138754\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T12:32:33.466+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T04:32:33Z duration_ms=8
+time=2026-10-06T12:32:33.473+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProbe232R2BannerAvailableBeforePlant3117138754\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T12:32:33.480+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T04:32:33Z duration_ms=5
+time=2026-10-06T12:32:33.484+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T12:32:33.486+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    zz_232r2_banner_probe_test.go:22: PROBE2 BEFORE plant: stdout contains "本次运行不会生效"
+    zz_232r2_banner_probe_test.go:24: PROBE2 needle="本次运行不会生效" present-in-mark(pre-plant)=true
+    zz_232r2_banner_probe_test.go:24: PROBE2 needle="app.autostart" present-in-mark(pre-plant)=true
+    zz_232r2_banner_probe_test.go:24: PROBE2 needle="开机自启" present-in-mark(pre-plant)=true
+    zz_232r2_banner_probe_test.go:24: PROBE2 needle="原因：" present-in-mark(pre-plant)=true
+    zz_232r2_banner_probe_test.go:24: PROBE2 needle="交给平台层" present-in-mark(pre-plant)=true
+    zz_232r2_banner_probe_test.go:24: PROBE2 needle="没有被丢掉" present-in-mark(pre-plant)=true
+    zz_232r2_banner_probe_test.go:24: PROBE2 needle="重启进程后生效" present-in-mark(pre-plant)=true
+    zz_232r2_banner_probe_test.go:30: PROBE2 needle="本次运行不会生效" present-in-window(post-plant)=true
+    zz_232r2_banner_probe_test.go:30: PROBE2 needle="app.autostart" present-in-window(post-plant)=false
+    zz_232r2_banner_probe_test.go:30: PROBE2 needle="开机自启" present-in-window(post-plant)=false
+    zz_232r2_banner_probe_test.go:30: PROBE2 needle="原因：" present-in-window(post-plant)=false
+    zz_232r2_banner_probe_test.go:30: PROBE2 needle="交给平台层" present-in-window(post-plant)=false
+    zz_232r2_banner_probe_test.go:30: PROBE2 needle="没有被丢掉" present-in-window(post-plant)=false
+--- PASS: TestProbe232R2BannerAvailableBeforePlant (2.31s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.367s

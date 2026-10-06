@@ -1,0 +1,32 @@
+probes(232-r2 收尾代提): 写腿撞 150 轮帽但产码与证件全在盘上，编排者只代提未代判
+
+腿 `232-r2`（票 232 测试面加固）169 次调用／22,806,279 token 后撞帽，退出前那句"整包还在跑、现在写 §2/§3"
+不是终态——盘上事实是**六格读数全采完、门禁跑完、只欠提交**。这一笔把它未提交的遗产代提，判语一字未改。
+
+★我自己复跑过的两把（不采信腿的自述）：
+- `md5sum cmd/wisp/config_reload.go` ＝ `5ce441ca5e72b64d18a6c26f1c066882` ＝ `git show HEAD:` 同值 ⇒ **产品文案零字节改动**（本票最硬的禁区）。
+- `PATH=… go test -run 'TestTicket223RestartTierSaysItWillNotApply|TestTicket223R2FailureSentenceRouting' -count=1 ./cmd/wisp`
+  ＝ `ok github.com/CarlosShao/wisp/cmd/wisp 3.315s` ⇒ 改完的用例在我这一跑里全绿。
+
+遗产内容：`cmd/wisp/config_reload_223_test.go` ＋129/−9（9 枚删除逐枚核过＝全部落在它自己替换掉的 `why+out`
+那一块与三枚 await 调用行，别人文件删除列 0）；四枚**文件内小写**测试辅助（`windowSince232`／`stdoutSince232`／
+`awaitStdoutSince232`／`awaitAuditSince232`，零新增导出名）；`evidence.md` 147 行／23,206 字节／§0–§5 六节全实
+（占位符尺 0 命中）；台件 39 枚 `logs/*.txt` ＋ 20 枚 `overlay/*.json` ＋ 两枚 overlay 用探针（`gofmt -l` 干净，
+⛔ 不在 `go list ./...` 射程内——`.scratch` 以点开头条目被 Go 工具忽略，故不会进票 236 AC#6 那枚 tracked 分母）；
+票面被它按派单允许的形追加 Progress log 一行（numstat 3/0）。
+
+★它交回三格**只有我能裁**的口子，我登记在此、⛔ 一枚 AC 框都不翻（它是实现者，翻勾要非实现者证据）：
+① AC#2 字面做不到那一半——实测（`logs/P0-needle-stream-probe.txt`）`重启进程后生效` 这四个字**只在审计句里**
+   （`config_reload.go:319`），操作员那句 `Fprintf`（`:321-326`）根本没说；硬钉 stdout 就只能改产品文案＝本票禁区。
+   它的处置＝那枚钉到"具名审计流＋种下改动之后的窗口"，并在 stdout 窗口补钉 `需要重启进程`／`原因：`／`交给平台层`／
+   `没有被丢掉`。问：AC#2 算不算半格。
+② AC#4 票面写"断用例不许 0ms 通过"，它量到未修态在 M 形上是 `PASS (4.19s)`（不是 0ms）、修好后 `FAIL (43.80s)`，
+   起作用的机制是起点窗口不是期限变慢。问：票面那句"0ms"要不要按派单给的读法（"写清是红还是变慢"）判它满足。
+③ AC#6 红名册里两枚派单未具名的新面孔 `Test258Occupied*`／`Test258V1ProbeSummon*`，红因逐字
+   `Hot key is already registered.`（这台机器此刻有程序占着 `Ctrl+Alt+P`/`Ctrl+Alt+V`），安静 `-count=3` 稳定红；
+   它另用"把写面退回 HEAD 的整包对照发"证与本腿写面无关。⇒ 这两枚是**本机环境红**、不是本票引入，
+   要不要进在册名册归我记（`TestAC13ColdStart*` 那一枚 WebView2 页面自答 `"0"` 同族）。
+
+安全尺：`git status --porcelain -- cmd internal` 提交后只剩本笔已含的那一枚测试文件（即归零）；
+`sh scripts/d22scan.sh` ＝ rc=0（`d22scan: clean`，ban #8 覆盖 `cmd/ 104 Go files` 含 `_test.go`，未撞）。
+台账／`docs/**`／`scripts/**`／`.github/**` 一字未动；⛔ 票 232 那 6 枚 `- [ ]` 框一枚未翻；只 commit 不 push。
