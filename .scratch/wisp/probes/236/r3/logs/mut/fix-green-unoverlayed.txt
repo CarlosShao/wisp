@@ -1,0 +1,9 @@
+time=2026-10-06T14:57:35.395+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+    tasklist_deferred_236r3_teeth_test.go:155: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+    tasklist_deferred_236r3_teeth_test.go:193: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.033s

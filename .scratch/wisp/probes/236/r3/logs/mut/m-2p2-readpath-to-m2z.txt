@@ -1,0 +1,7 @@
+time=2026-10-06T15:02:42.407+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test221DeferredMarkerForCancelLiftedButListStillMarked
+    task_cancel_221_legs_test.go:245: task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）
+--- FAIL: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.032s
+FAIL

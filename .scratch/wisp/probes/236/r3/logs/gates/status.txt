@@ -1,0 +1,6 @@
+vet rc=0
+--- git status --porcelain -- internal cmd (after nail added) ---
+?? internal/tools/tasklist_deferred_236r3_teeth_test.go
+--- git status --porcelain -- scripts .github ---
+--- lines of my nail file ---
+194 internal/tools/tasklist_deferred_236r3_teeth_test.go

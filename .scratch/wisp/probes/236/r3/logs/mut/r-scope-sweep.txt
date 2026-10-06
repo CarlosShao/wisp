@@ -1,0 +1,31 @@
+### read-disk rulers inside internal/tools tests
+internal/tools/bridge_a18_kill_windows_test.go:195:		got, err := os.ReadFile(existing)
+internal/tools/bridge_a18_kill_windows_test.go:255:		got, err := os.ReadFile(existing)
+internal/tools/bridge_path_account_ticket105_test.go:48:		data, err := os.ReadFile(path)
+internal/tools/failclosed_236_teeth_test.go:72:// COMPILER sees, while os.ReadFile (e.g. task_cancel_221_legs_test.go:224)
+internal/tools/fs_edit_ac34_test.go:553:	f, oerr := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+internal/tools/fs_edit_ac4b_kill_windows_test.go:205:	got, err := os.ReadFile(target)
+internal/tools/fs_edit_ac4b_kill_windows_test.go:237:		b, rerr := os.ReadFile(p)
+internal/tools/fs_edit_ac5_gate_r4_test.go:214:	if data, err := os.ReadFile(target); err != nil {
+internal/tools/fs_staging_windows_test.go:165:		got, err := os.ReadFile(p)
+internal/tools/fs_staging_windows_test.go:248:	after, err := os.ReadFile(victim)
+internal/tools/fs_staging_windows_test.go:359:		f, err := os.OpenFile(held, os.O_RDONLY, 0o600)
+internal/tools/fs_write_test.go:100:	b, err := os.ReadFile(p)
+internal/tools/loop_approval_test.go:194:	body, err := os.ReadFile(f.target)
+internal/tools/pathshape_portable_test.go:69:	body, err := os.ReadFile(canon)
+internal/tools/paths_ticket107b_probes_test.go:112:	if body, err := os.ReadFile(via); err != nil || string(body) != "TOPSECRET" {
+internal/tools/paths_ticket107b_probes_test.go:175:	if body, err := os.ReadFile(via); err != nil || string(body) != "TOPSECRET" {
+internal/tools/paths_ticket107b_probes_test.go:206:	if body, err := os.ReadFile(via); err != nil || string(body) != "TOPSECRET" {
+internal/tools/pointer_183_cli_seam_test.go:179:	want, err := os.ReadFile(rec.ArtifactPath)
+internal/tools/pointer_185_cli_seam_test.go:150:	want, err := os.ReadFile(rec.ArtifactPath)
+internal/tools/tasklist_deferred_236r3_teeth_test.go:19:// os.ReadFile("task.go") (:224) and counts lines containing "DEFERRED",
+### scripts mentioning DEFERRED (225's instrument?)
+scripts/portable-tests.sh
+scripts/spike/bin/model-residency.exe
+scripts/spike/bin/speech-baseline.exe
+scripts/spike/bin/xy-verdict.exe
+### any other test reading task.go source
+internal/tools/tasklist_deferred_236r3_teeth_test.go:19:// os.ReadFile("task.go") (:224) and counts lines containing "DEFERRED",
+internal/tools/task_cancel_221_legs_test.go:224:	src, err := os.ReadFile("task.go")
+### SPEC-12 §5 mentioned in my nail?
+2

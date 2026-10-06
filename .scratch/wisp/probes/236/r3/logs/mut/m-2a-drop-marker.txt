@@ -1,0 +1,11 @@
+time=2026-10-06T14:57:45.456+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test221DeferredMarkerForCancelLiftedButListStillMarked
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+    tasklist_deferred_236r3_teeth_test.go:183: 编译期与运行期读到的 task.go 字节不一致（编译 37326 字节 / 盘上 37391 字节，标记行数 1 对 2）：只有 -overlay 能让它们分开。这一发就是那条仪器事实的落地证明：盘上那把尺看不见突变，所以它绿的时候不能当作「标记还在」的证据。标记账号＝票 236 AC#2，未修码读数见交件 §3 M-2a
+    tasklist_deferred_236r3_teeth_test.go:189: 同一枚 DEFERRED＋task.list 标记行数，编译器看到 1 行、os.ReadFile 看到 2 行：两个数只有在 -overlay 下才会分开（交件 §3 M-2a 的配对读数）
+    tasklist_deferred_236r3_teeth_test.go:193: 成对读数：盘上 2 行 / 编译期 1 行（HEAD 上两数相等＝这把尺没在空转）
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.038s
+FAIL

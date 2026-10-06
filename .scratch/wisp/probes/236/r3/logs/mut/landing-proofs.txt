@@ -1,0 +1,78 @@
+### landing proofs per mutant (grep inside the MUTANT COPY, then the overlay json that points at it)
+--- m-2a: md5 of mutant + physical task.go
+bb011a71b1949f23283191420825fb5a */d/tmp/wisp236r3/mut/m-2a/task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+--- m-2b: md5 of mutant + physical task.go
+b0d5bdca2b64567b0b008291a1c11977 */d/tmp/wisp236r3/mut/m-2b/task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+--- m-2c: md5 of mutant + physical task.go
+0dd81770b670f17d74197530f3318bd9 */d/tmp/wisp236r3/mut/m-2c/task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+--- m-2e: md5 of mutant + physical task.go
+f2152339178d911b1d7944748aa9773c */d/tmp/wisp236r3/mut/m-2e/task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+--- m-2q: md5 of mutant + physical task.go
+8f6cfbff2f77dd4383008118c98920d3 */d/tmp/wisp236r3/mut/m-2q/task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+--- m-2z: md5 of mutant + physical task.go
+f3068d610b213805c2b314d3d645194c */d/tmp/wisp236r3/mut/m-2z/task.go
+4138177e29ffff427776a73eb0d61a9b *internal/tools/task.go
+
+### m-2a: deleted line 23 (diff vs work tree)
+23d22
+< //	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+### m-2e: deleted the taskCancel registration line
+603d602
+< 		{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
+### m-2z: neutralized line 279 (all DEFERRED+task.list lines gone)
+23d22
+< //	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+279c278
+< // diagnostics, not as a tool surface: task.list is DEFERRED (§7 :1531), and
+---
+> // diagnostics, not as a tool surface: that row stays out of the roster (§7 :1531), and
+### m-2b/m-2c: registered row added (only the roster line differs before the stub)
+603a604
+> 		{Tool: taskListStub236r3{d: d}, Decl: taskCancelDecl()},
+888a890,911
+> }
+> 
+> // taskListStub236r3 is a MUTANT-ONLY roster row (ticket 236 AC#2 teeth M-2b):
+> // it exists only inside the overlay copy of this file, never in the physical
+> // file. It is the "capability" side of the claim the lexical ruler cannot see.
+> type taskListStub236r3 struct {
+> 	d    TaskDeps
+> 	name string
+> }
+### m-2c diff head
+603a604
+> 		{Tool: taskListStub236r3{d: d, name: "task.ping"}, Decl: taskCancelDecl()},
+888a890,911
+> }
+> 
+> // taskListStub236r3 is a MUTANT-ONLY roster row (ticket 236 AC#2 teeth M-2b):
+> // it exists only inside the overlay copy of this file, never in the physical
+> // file. It is the "capability" side of the claim the lexical ruler cannot see.
+> type taskListStub236r3 struct {
+> 	d    TaskDeps
+> 	name string
+> }
+### m-2q diff (added a DEFERRED task.cancel line)
+23a24
+> //	task.cancel  -   DEFERRED again, mutant-only line for AC#2 teeth M-2q
+### test-file read-path mutants
+--- m-2p1
+224c224
+< 	src, err := os.ReadFile("task.go")
+---
+> 	src, err := os.ReadFile("D:/tmp/wisp236r3/mut/m-2a/task.go")
+--- m-2p2
+224c224
+< 	src, err := os.ReadFile("task.go")
+---
+> 	src, err := os.ReadFile("D:/tmp/wisp236r3/mut/m-2z/task.go")
+--- m-2q
+224c224
+< 	src, err := os.ReadFile("task.go")
+---
+> 	src, err := os.ReadFile("D:/tmp/wisp236r3/mut/m-2q/task.go")

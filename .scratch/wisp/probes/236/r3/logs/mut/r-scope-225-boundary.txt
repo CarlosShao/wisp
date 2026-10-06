@@ -1,0 +1,12 @@
+### S1: does any script/CI ruler count DEFERRED markers (would be ticket 225's instrument)?
+### proof-of-hit for my grep尺 (it must be able to hit the true token):
+2
+scripts/portable-tests.sh:50:# "DEFERRED: implemented by ticket 28 / 42, this ticket only freezes the package
+scripts/portable-tests.sh:106:#           doc.go-only boundary stub (DEFERRED: ticket 42), so it could never go red
+### BUILTIN_TASK_ENTRIES / task.list in scripts or ci:
+0
+### proof-of-hit for the BuiltinTaskEntries尺 elsewhere:
+10
+### roster legs today that assert a name set for the task family (grep registered\[)
+internal/tools/task_cancel_221_test.go:94:		registered[e.Tool.Name()] = true
+internal/tools/task_cancel_221_test.go:135:		if registered[root] {

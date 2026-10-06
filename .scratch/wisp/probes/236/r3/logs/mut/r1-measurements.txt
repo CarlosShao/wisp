@@ -1,0 +1,49 @@
+### R1 ruler location
+224:	src, err := os.ReadFile("task.go")
+### R2 DEFERRED lines in task.go
+23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+32:// and the DEFERRED line above is the only one left standing.
+279:// diagnostics, not as a tool surface: task.list is DEFERRED (§7 :1531), and
+### R3 lines with both DEFERRED and task.list
+2
+23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+279:// diagnostics, not as a tool surface: task.list is DEFERRED (§7 :1531), and
+### R4 BuiltinTaskEntries body
+		Declared:     risk.L0,
+		PathParams:   nil,
+		Resident:     true,
+		Provider:     KindBuiltin,
+	}
+}
+
+// BuiltinTaskEntries returns the task family this configuration registers:
+// task.output and (since ticket 221 甲形, ruling A434) task.cancel. See the
+// header comment for why task.list is not here.
+func BuiltinTaskEntries(d TaskDeps) []Entry {
+	return []Entry{
+		{Tool: taskOutput{d: d}, Decl: TaskOutputDecl()},
+		{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
+	}
+}
+
+### R5 registered names via grep of Name() in task.go
+484:func (taskOutput) Name() string { return "task.output" }
+625:func (taskCancel) Name() string { return "task.cancel" }
+### R6 task.list anywhere in internal/cmd (non-scratch)
+HEAD:cmd/wisp/panel_pump.go:125:// deliberately has no list-everything port (its own Count comment says task.list
+HEAD:internal/tools/task.go:23://	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+HEAD:internal/tools/task.go:25:// task.output is AC#3's leg, task.cancel is ticket 221's. task.list stays
+HEAD:internal/tools/task.go:279:// diagnostics, not as a tool surface: task.list is DEFERRED (§7 :1531), and
+HEAD:internal/tools/task.go:581:// task.list/task.cancel on :2563): reading an in-process table touches no C3
+HEAD:internal/tools/task.go:599:// header comment for why task.list is not here.
+HEAD:internal/tools/task.go:646:// PLAN.md:2564 reads "task.list / task.cancel | 查看/取消任务 | L0 / L1", the
+HEAD:internal/tools/task.go:647:// pair splitting into task.list L0 and task.cancel L1, and SPEC-07 §3's mirror
+HEAD:internal/tools/task_cancel_221_legs_test.go:184:		t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它）", len(names), names)
+HEAD:internal/tools/task_cancel_221_legs_test.go:222:// wiring and the marker in one leg - and task.list's line is untouched.
+HEAD:internal/tools/task_cancel_221_legs_test.go:236:		if strings.Contains(line, "task.list") {
+HEAD:internal/tools/task_cancel_221_legs_test.go:245:		t.Errorf("task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）")
+### R7 task.list in test files
+HEAD:internal/tools/task_cancel_221_legs_test.go:184:		t.Errorf("task 家族注册了 %d 枚：%v（task.list 仍须是 DEFERRED，本票不许顺手注册它）", len(names), names)
+HEAD:internal/tools/task_cancel_221_legs_test.go:222:// wiring and the marker in one leg - and task.list's line is untouched.
+HEAD:internal/tools/task_cancel_221_legs_test.go:236:		if strings.Contains(line, "task.list") {
+HEAD:internal/tools/task_cancel_221_legs_test.go:245:		t.Errorf("task.list 的 DEFERRED 标记不见了：本票不许摘它（那半支仍然没有实现）")

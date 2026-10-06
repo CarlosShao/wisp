@@ -1,0 +1,8 @@
+### 每发跑完后的还原对拉（产码/测试文件从头到尾没被本机写过，overlay 只换编译期字节）
+internal/tools/task.go work=4138177e29ffff427776a73eb0d61a9b head=4138177e29ffff427776a73eb0d61a9b MATCH
+internal/tools/task_cancel_221_legs_test.go work=13a0ba39e30fb95ad4f2be88beed4fc7 head=13a0ba39e30fb95ad4f2be88beed4fc7 MATCH
+internal/tools/subagent_197.go work=06caf8f5465ff1c47c310da27fe3ffab head=06caf8f5465ff1c47c310da27fe3ffab MATCH
+internal/tools/ticket175r2_stamp_live_test.go work=2a5fde81b78e56c8644c8463ce8738e3 head=2a5fde81b78e56c8644c8463ce8738e3 MATCH
+### 起手 md5（第一次量到的 task.go）= 4138177e29ffff427776a73eb0d61a9b
+### git status --porcelain -- internal cmd
+?? internal/tools/tasklist_deferred_236r3_teeth_test.go
