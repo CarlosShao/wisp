@@ -1,0 +1,932 @@
+time=2026-10-06T19:02:51.434+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-06T19:03:05.802+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:03:05 mockllm: serving on http://127.0.0.1:49254 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:03:06.372+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC1AlwaysBranchDoesNotRevertAHandEditedKey3703881927\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-06T19:03:06.888+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC1AlwaysBranchDoesNotRevertAHandEditedKey3703881927\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:03:06.906+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:03:06Z duration_ms=18
+time=2026-10-06T19:03:07.136+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC1AlwaysBranchDoesNotRevertAHandEditedKey3703881927\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:03:07.215+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:03:07Z duration_ms=79
+time=2026-10-06T19:03:07.276+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:03:07.288+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:08.535+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+--- FAIL: TestAC1AlwaysBranchDoesNotRevertAHandEditedKey (17.71s)
+    always_write_no_clobber_226_test.go:103: the guarded write applied the hand-edited theme to the running process (got "light", want the dark this run loaded): reading a hand edit back is ticket 223
+time=2026-10-06T19:03:18.223+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:03:18 mockllm: serving on http://127.0.0.1:59395 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:03:18.407+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2584569783\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:03:18.660+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2584569783\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:03:18.682+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:03:18Z duration_ms=22
+time=2026-10-06T19:03:18.741+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2584569783\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:03:18.767+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:03:18Z duration_ms=25
+time=2026-10-06T19:03:18.783+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:03:18.873+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:19.807+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-10-06T19:03:25.209+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:03:25 mockllm: serving on http://127.0.0.1:59440 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:03:25.286+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused1600141418\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:03:25.390+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused1600141418\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:03:25.420+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:03:25Z duration_ms=29
+time=2026-10-06T19:03:25.451+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused1600141418\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:03:25.474+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:03:25Z duration_ms=23
+time=2026-10-06T19:03:25.527+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:03:25.532+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:30.589+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:03:30 mockllm: serving on http://127.0.0.1:60489 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:03:30.711+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestReplyListenerAllowsAnL2CardFromTheNativeSide483514658\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:03:30.840+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestReplyListenerAllowsAnL2CardFromTheNativeSide483514658\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:03:30.856+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:03:30Z duration_ms=14
+time=2026-10-06T19:03:30.874+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestReplyListenerAllowsAnL2CardFromTheNativeSide483514658\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:03:30.892+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:03:30Z duration_ms=18
+time=2026-10-06T19:03:30.923+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:03:30.929+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:31.175+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:33.963+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:03:33 mockllm: serving on http://127.0.0.1:60519 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:03:34.008+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel891187798\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:03:34.050+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel891187798\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:03:34.062+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:03:34Z duration_ms=11
+time=2026-10-06T19:03:34.083+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel891187798\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:03:34.092+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:03:34Z duration_ms=9
+time=2026-10-06T19:03:34.098+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:03:34.102+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:34.184+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:37.023+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:03:37 mockllm: serving on http://127.0.0.1:53957 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:03:37.080+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject1258451578\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:03:37.136+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject1258451578\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:03:37.150+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:03:37Z duration_ms=13
+time=2026-10-06T19:03:37.162+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject1258451578\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:03:37.172+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:03:37Z duration_ms=9
+time=2026-10-06T19:03:37.190+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:03:37.200+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:37.297+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:03:39.807+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:03:39 mockllm: serving on http://127.0.0.1:56912 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:03:39.855+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution236759404\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:03:39.904+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution236759404\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:03:39.920+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:03:39Z duration_ms=15
+time=2026-10-06T19:03:39.948+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution236759404\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:03:39.966+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:03:39Z duration_ms=18
+time=2026-10-06T19:03:39.976+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:03:39.983+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:11.048+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:12.413+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:12 mockllm: serving on http://127.0.0.1:52161 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:12.435+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestL1VetoNeedsAChannelTheHostReallyWiredconsole_posture_veto_2062463819\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:12.467+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestL1VetoNeedsAChannelTheHostReallyWiredconsole_posture_veto_2062463819\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:12.475+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:12Z duration_ms=8
+time=2026-10-06T19:04:12.484+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestL1VetoNeedsAChannelTheHostReallyWiredconsole_posture_veto_2062463819\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:12.489+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:12Z duration_ms=5
+time=2026-10-06T19:04:12.495+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:12.497+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:16.179+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:16 mockllm: serving on http://127.0.0.1:58672 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:16.202+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestL1VetoNeedsAChannelTheHostReallyWiredhost_declares_and_load3745478731\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:16.227+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestL1VetoNeedsAChannelTheHostReallyWiredhost_declares_and_load3745478731\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:16.236+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:16Z duration_ms=8
+time=2026-10-06T19:04:16.249+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestL1VetoNeedsAChannelTheHostReallyWiredhost_declares_and_load3745478731\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:16.255+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:16Z duration_ms=6
+time=2026-10-06T19:04:16.260+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:16.264+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:16.316+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:17.553+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:17 mockllm: serving on http://127.0.0.1:50452 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:17.581+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole1074480440\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:17.610+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole1074480440\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:17.618+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:17Z duration_ms=7
+time=2026-10-06T19:04:17.627+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole1074480440\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:17.633+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:17Z duration_ms=6
+time=2026-10-06T19:04:17.639+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:17.642+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:18.868+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:18 mockllm: serving on http://127.0.0.1:50455 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:18.892+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamRefusesAPanelSourcedAllow1301348516\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:18.921+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamRefusesAPanelSourcedAllow1301348516\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:18.927+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:18Z duration_ms=6
+time=2026-10-06T19:04:18.936+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamRefusesAPanelSourcedAllow1301348516\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:18.941+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:18Z duration_ms=5
+time=2026-10-06T19:04:18.946+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:18.948+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:21.173+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:21 mockllm: serving on http://127.0.0.1:52553 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:21.195+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence2819567737\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:21.230+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence2819567737\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:21.238+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:21Z duration_ms=8
+time=2026-10-06T19:04:21.247+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence2819567737\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:21.252+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:21Z duration_ms=5
+time=2026-10-06T19:04:21.256+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:21.259+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:24.267+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:24 mockllm: serving on http://127.0.0.1:49333 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:24.291+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3027773271\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:24.322+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3027773271\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:24.328+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:24Z duration_ms=6
+time=2026-10-06T19:04:24.339+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3027773271\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:24.348+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:24Z duration_ms=8
+time=2026-10-06T19:04:24.359+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:24.362+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:26.959+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:26 mockllm: serving on http://127.0.0.1:49336 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:26.993+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection2461494967\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:27.030+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection2461494967\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:27.039+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:27Z duration_ms=8
+time=2026-10-06T19:04:27.059+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection2461494967\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:27.065+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:27Z duration_ms=6
+time=2026-10-06T19:04:27.070+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:27.073+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:29.638+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:29 mockllm: serving on http://127.0.0.1:49341 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:29.664+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered2763225083\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:29.689+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered2763225083\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:29.698+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:29Z duration_ms=7
+time=2026-10-06T19:04:29.710+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered2763225083\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:29.715+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:29Z duration_ms=5
+time=2026-10-06T19:04:29.726+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:29.728+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:31.449+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:31 mockllm: serving on http://127.0.0.1:61202 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:31.485+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RunArmsTheReloadTick4284321592\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:31.521+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RunArmsTheReloadTick4284321592\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:31.530+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:31Z duration_ms=9
+time=2026-10-06T19:04:31.540+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RunArmsTheReloadTick4284321592\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:31.549+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:31Z duration_ms=7
+time=2026-10-06T19:04:31.554+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:31.558+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:34.103+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:34 mockllm: serving on http://127.0.0.1:61205 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:34.123+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card2313390828\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:34.150+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card2313390828\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:34.157+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:34Z duration_ms=7
+time=2026-10-06T19:04:34.164+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card2313390828\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:34.170+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:34Z duration_ms=5
+time=2026-10-06T19:04:34.176+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:34.179+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:35.182+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+time=2026-10-06T19:04:36.696+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:36 mockllm: serving on http://127.0.0.1:61208 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:36.720+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RefusedLooseningKeepsOldValues262073352\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:36.754+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RefusedLooseningKeepsOldValues262073352\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:36.764+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:36Z duration_ms=10
+time=2026-10-06T19:04:36.775+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RefusedLooseningKeepsOldValues262073352\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:36.781+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:36Z duration_ms=6
+time=2026-10-06T19:04:36.786+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:36.788+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:37.793+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+time=2026-10-06T19:04:42.939+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:42 mockllm: serving on http://127.0.0.1:53261 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:42.969+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223TighteningRaisesNoCard2735263238\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:43.005+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223TighteningRaisesNoCard2735263238\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:43.014+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:43Z duration_ms=8
+time=2026-10-06T19:04:43.024+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223TighteningRaisesNoCard2735263238\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:43.033+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:43Z duration_ms=7
+time=2026-10-06T19:04:43.037+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:43.041+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:44.044+08:00 level=INFO msg="config: locked section tightened, hot-applied" section=fs keys=[fs.allowed_dirs]
+time=2026-10-06T19:04:47.799+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:47 mockllm: serving on http://127.0.0.1:59317 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:47.830+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3281115440\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:47.867+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3281115440\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:47.878+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:47Z duration_ms=10
+time=2026-10-06T19:04:47.906+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3281115440\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:47.918+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:47Z duration_ms=12
+time=2026-10-06T19:04:47.925+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:47.929+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:48.936+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+time=2026-10-06T19:04:51.003+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:51 mockllm: serving on http://127.0.0.1:61886 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:51.042+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3838904166\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:51.079+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3838904166\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:51.088+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:51Z duration_ms=9
+time=2026-10-06T19:04:51.099+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3838904166\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:51.105+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:51Z duration_ms=6
+time=2026-10-06T19:04:51.112+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:51.115+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:53.624+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:53 mockllm: serving on http://127.0.0.1:56455 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:53.663+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct缺失1418495241\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:53.702+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct缺失1418495241\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:53.713+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:53Z duration_ms=11
+time=2026-10-06T19:04:53.728+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct缺失1418495241\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:53.735+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:53Z duration_ms=6
+time=2026-10-06T19:04:53.778+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:53.781+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:56.257+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:56 mockllm: serving on http://127.0.0.1:59658 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:56.284+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct语法错510788081\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:56.321+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct语法错510788081\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:56.332+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:56Z duration_ms=10
+time=2026-10-06T19:04:56.343+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct语法错510788081\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:56.355+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:56Z duration_ms=11
+time=2026-10-06T19:04:56.361+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:56.363+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:04:58.832+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:04:58 mockllm: serving on http://127.0.0.1:53933 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:04:58.857+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct声明了版本但坏265371560\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:04:58.885+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct声明了版本但坏265371560\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:04:58.893+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:04:58Z duration_ms=8
+time=2026-10-06T19:04:58.903+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinct声明了版本但坏265371560\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:04:58.911+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:04:58Z duration_ms=7
+time=2026-10-06T19:04:58.916+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:04:58.920+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:05:01.711+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:05:01 mockllm: serving on http://127.0.0.1:50192 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:05:01.739+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinctschema未知键4200852683\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:01.774+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinctschema未知键4200852683\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:05:01.786+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:05:01Z duration_ms=11
+time=2026-10-06T19:05:01.795+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223FailureSentencesAreDistinctschema未知键4200852683\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:05:01.801+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:05:01Z duration_ms=6
+time=2026-10-06T19:05:01.806+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:05:01.812+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:05:04.466+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:05:04 mockllm: serving on http://127.0.0.1:49950 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:05:04.496+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223PermissionDeniedSitsInItsOwnSentence481706532\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:04.526+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223PermissionDeniedSitsInItsOwnSentence481706532\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:05:04.536+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:05:04Z duration_ms=9
+time=2026-10-06T19:05:04.545+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223PermissionDeniedSitsInItsOwnSentence481706532\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:05:04.552+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:05:04Z duration_ms=6
+time=2026-10-06T19:05:04.557+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:05:04.562+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:05:25.632+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone2273141847\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.645+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone2273141847\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.651+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone2273141847\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.663+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten310976798\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.670+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedT888683552\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.685+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences3317290418\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.784+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTa1055787891\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.803+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC5CreationFailureIsLoudAndLeavesNoHalfFile3014147566\001\data\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.811+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints82597074\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.925+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2AC4ReceiptNamesTheRealEntryPoints82597074\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.937+08:00 level=INFO msg="audit: perm: MODE-READ-FAILED path=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing2097721416\\\\001\\\\config.toml\" err=config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing2097721416\\001\\config.toml: The system cannot find the file specified. mode=ask_every_step origin=startup result=fail-closed detail=\"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）\""
+time=2026-10-06T19:05:25.939+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198R2J1TheAssemblyRootStillCreatesNothing2097721416\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.956+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1ReceiptStatesTheNonPresetCondition202666673\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.971+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1NonPresetRowNeedsProtocolBeforeItLoads1590785259\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:25.989+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.t257-r2-ghost-gateway.base_url wrote=[llm.providers.t257-r2-ghost-gateway.base_url]
+time=2026-10-06T19:05:25.994+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.t257-r2-ghost-gateway.api_key_ref wrote=[llm.providers.t257-r2-ghost-gateway.api_key_ref]
+time=2026-10-06T19:05:25.999+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1CleanMachineReceiptTeachesTheWalkableChain3859943915\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:26.020+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1ReceiptChainWalkUnlocksAllSevenFields32091331\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:26.038+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-06T19:05:26.043+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-06T19:05:26.048+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+time=2026-10-06T19:05:26.053+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.price.in wrote=[llm.providers.deepseek.models.deepseek-chat.price.in]
+time=2026-10-06T19:05:26.057+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.price.out wrote=[llm.providers.deepseek.models.deepseek-chat.price.out]
+time=2026-10-06T19:05:26.062+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.roles.chat.model wrote=[llm.roles.chat.model]
+time=2026-10-06T19:05:26.067+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-06T19:05:26.071+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC1ReceiptOnlyFirstItemUnlocksThreeOfSeven2247024375\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:26.087+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-06T19:05:26.092+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-06T19:05:26.099+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-06T19:05:26.103+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC2ThreeRefusalsStayThreeSentences249556564\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:26.118+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC2EffectTimingSaysThreeProcessShapes252256581\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:26.132+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket257R2AC3CredentialSurfaceUntouched2643076873\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:26.146+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket198AC3CreatedFileLandsPrivate2478305909\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:27.312+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:05:27 mockllm: serving on http://127.0.0.1:50130 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:05:27.337+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheLoadedInstructionFiles803711966\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:27.373+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheLoadedInstructionFiles803711966\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:05:27.389+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:05:27Z duration_ms=14
+time=2026-10-06T19:05:27.423+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheLoadedInstructionFiles803711966\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:05:27.438+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:05:27Z duration_ms=14
+time=2026-10-06T19:05:27.444+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:05:27.448+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:05:28.931+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:05:28 mockllm: serving on http://127.0.0.1:50133 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:05:28.955+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketSaysOffAndSaysItDifferentlyThanNothingFound2902819008\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:28.979+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketSaysOffAndSaysItDifferentlyThanNothingFound2902819008\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:05:28.986+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:05:28Z duration_ms=6
+time=2026-10-06T19:05:28.993+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketSaysOffAndSaysItDifferentlyThanNothingFound2902819008\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:05:29.000+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:05:28Z duration_ms=6
+time=2026-10-06T19:05:29.005+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:05:29.008+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:05:30.192+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:05:30 mockllm: serving on http://127.0.0.1:54097 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:05:30.216+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketSaysOffAndSaysItDifferentlyThanNothingFound2902819008\004\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:30.247+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketSaysOffAndSaysItDifferentlyThanNothingFound2902819008\004\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:05:30.255+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:05:30Z duration_ms=7
+time=2026-10-06T19:05:30.269+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketSaysOffAndSaysItDifferentlyThanNothingFound2902819008\004\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:05:30.276+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:05:30Z duration_ms=7
+time=2026-10-06T19:05:30.281+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:05:30.284+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:05:30.792+08:00 level=INFO msg="wisp secret: stored dpapi blob" ref=dpapi:nail131-degraded env=test portable=false overwrote=false
+time=2026-10-06T19:05:30.887+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC2SealNoticeLandsInTheRunLegLogFile1591692352\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:30.889+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2SealNoticeLandsInTheRunLegLogFile1591692352\001\secrets kind=explicit cleared=S-1-1-0(A;OICI;0x1200a9;;;WD) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-06T19:05:32.270+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:05:32 mockllm: serving on http://127.0.0.1:54100 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:05:32.296+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC2AuditTrailLandsInTheRunLegLogFile3489768158\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:32.325+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC2AuditTrailLandsInTheRunLegLogFile3489768158\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:05:32.335+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:05:32Z duration_ms=9
+time=2026-10-06T19:05:32.346+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC2AuditTrailLandsInTheRunLegLogFile3489768158\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:05:32.356+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:05:32Z duration_ms=10
+time=2026-10-06T19:05:32.361+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:05:32.365+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:05:32.435+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite2871234437\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:05:32.437+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite2871234437\001\secrets kind=explicit cleared=S-1-1-0(A;OICI;0x1200a9;;;WD) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-06T19:05:32.552+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-06T19:05:32.571+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+time=2026-10-06T19:05:32.615+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-06T19:05:32.621+08:00 level=WARN msg="panel host: [panel] geometry source unreadable, sizing at the host's own default" path=C:\Users\swq\AppData\Local\Temp\TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions1239556713\001\no-such-dir\config.toml err="config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions1239556713\\001\\no-such-dir\\config.toml: The system cannot find the path specified." default=420x260
+time=2026-10-06T19:06:10.430+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+time=2026-10-06T19:06:13.347+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:06:13 mockllm: serving on http://127.0.0.1:65419 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:06:13.390+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunBooksWithASnapshotOfItsLiveQueue3558384975\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:06:13.451+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunBooksWithASnapshotOfItsLiveQueue3558384975\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:06:13.466+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:06:13Z duration_ms=15
+time=2026-10-06T19:06:13.479+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunBooksWithASnapshotOfItsLiveQueue3558384975\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:06:13.488+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:06:13Z duration_ms=8
+time=2026-10-06T19:06:13.494+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:06:13.499+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:06:45.892+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:06:45 mockllm: serving on http://127.0.0.1:50649 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:06:45.917+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestSnapshotWorkspaceSectionReportsTheNarrowing2387175187\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:06:45.952+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestSnapshotWorkspaceSectionReportsTheNarrowing2387175187\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:06:45.962+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:06:45Z duration_ms=10
+time=2026-10-06T19:06:45.973+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestSnapshotWorkspaceSectionReportsTheNarrowing2387175187\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:06:45.983+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:06:45Z duration_ms=10
+time=2026-10-06T19:06:45.988+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:06:45.991+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:06:47.429+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:06:47 mockllm: serving on http://127.0.0.1:50652 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:06:47.456+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestThePumpIsDrivenNotJustAssembled3502327853\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:06:47.483+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestThePumpIsDrivenNotJustAssembled3502327853\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:06:47.490+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:06:47Z duration_ms=7
+time=2026-10-06T19:06:47.499+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestThePumpIsDrivenNotJustAssembled3502327853\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:06:47.505+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:06:47Z duration_ms=6
+time=2026-10-06T19:06:47.510+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:06:47.513+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:06:47.544+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 885.8 ms, hot path 0.0 ms)
+time=2026-10-06T19:06:48.916+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-06T19:06:48.917+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+time=2026-10-06T19:06:51.290+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-06T19:06:51.365+08:00 level=ERROR msg="panel host: show failed on the panel thread" via=33r9-nail err="panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x118406A6. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message"
+wisp: panel could not open (panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x118406A6. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message): 33r9-nail
+time=2026-10-06T19:06:51.365+08:00 level=ERROR msg="panel thread: retiring without a panel window after a named refusal" via=33r9-nail err="panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x118406A6. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message" shows=1
+wisp: panel thread will take no further requests: panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x118406A6. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message
+time=2026-10-06T19:06:51.365+08:00 level=INFO msg="panel thread ending" why="no window to pump" window_opened=false
+time=2026-10-06T19:06:51.373+08:00 level=INFO msg="panel thread exited cleanly" shows=2 toggles=0 disposals=0
+time=2026-10-06T19:06:51.400+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 492.4 ms, hot path 0.0 ms)
+time=2026-10-06T19:06:52.184+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-06T19:06:52.184+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+time=2026-10-06T19:06:52.187+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 596.6 ms, hot path 0.0 ms)
+time=2026-10-06T19:06:53.051+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-06T19:06:53.051+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+time=2026-10-06T19:06:53.051+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 554.0 ms, hot path 0.0 ms)
+time=2026-10-06T19:06:53.611+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-06T19:06:53.612+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+time=2026-10-06T19:06:53.613+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+time=2026-10-06T19:06:53.613+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (panel-hotkey, cold 482.8 ms, hot path 0.0 ms)
+time=2026-10-06T19:06:54.125+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-06T19:06:54.127+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=2 disposals=0
+time=2026-10-06T19:06:54.132+08:00 level=WARN msg="ball gesture arrived with no executor" gesture=panel-hotkey why="this process has no task pipeline and no microphone, so the gesture has no executor here; the gestures that DO have one are the cancel key the assembly root wired (ticket 246) and the two panel gestures that reach the resident panel thread (ticket 33)"
+wisp: ball panel-hotkey: this process has no task pipeline and no microphone, so the gesture has no executor here; the gestures that DO have one are the cancel key the assembly root wired (ticket 246) and the two panel gestures that reach the resident panel thread (ticket 33)
+time=2026-10-06T19:06:54.146+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 420.4 ms, hot path 0.0 ms)
+time=2026-10-06T19:06:54.826+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-06T19:06:54.826+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+time=2026-10-06T19:06:57.377+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:06:57 mockllm: serving on http://127.0.0.1:60011 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:06:57.456+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeRecordsMeasuredThinkingFalse324724747\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:06:57.477+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:06:57Z duration_ms=21
+time=2026-10-06T19:06:57.498+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeRecordsMeasuredThinkingFalse324724747\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:06:57.510+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:06:57Z duration_ms=11
+time=2026-10-06T19:06:57.516+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:06:57.522+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:06:57.589+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:06:59.801+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:06:59 mockllm: serving on http://127.0.0.1:60021 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:06:59.855+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeRecordsMeasuredThinkingTrue1329038316\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:06:59.864+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:06:59Z duration_ms=9
+time=2026-10-06T19:06:59.874+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeRecordsMeasuredThinkingTrue1329038316\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:06:59.881+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:06:59Z duration_ms=6
+time=2026-10-06T19:06:59.885+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:06:59.888+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:06:59.909+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:07:01.612+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:07:01 mockllm: serving on http://127.0.0.1:60029 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:07:01.674+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersDiscoverListsWhatTheServerServes931066030\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:07:01.686+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:07:01Z duration_ms=11
+time=2026-10-06T19:07:01.699+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersDiscoverListsWhatTheServerServes931066030\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:07:01.707+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:07:01Z duration_ms=7
+time=2026-10-06T19:07:01.716+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:07:01.730+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:07:03.264+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:07:03 mockllm: serving on http://127.0.0.1:60034 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:07:03.303+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless3764927927\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:07:03.312+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:07:03Z duration_ms=8
+time=2026-10-06T19:07:03.320+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless3764927927\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:07:03.326+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:07:03Z duration_ms=5
+time=2026-10-06T19:07:03.331+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:07:03.333+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:07:03.352+08:00 level=INFO msg="ball: the cancel key was handled by the injected approval gate" outcome="injected executor ran"
+wisp: injected executor ran
+time=2026-10-06T19:07:03.352+08:00 level=WARN msg="cancel hotkey fired with no executor" why="the assembly root injected no approval gate into this leg, so the borrow cannot be spent"
+wisp: ball cancel-hotkey: no approval gate was injected into this process, so the press decided nothing
+time=2026-10-06T19:07:03.352+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:03.352+08:00 level=INFO msg="audit: resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）"
+wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）
+time=2026-10-06T19:07:03.353+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:03.353+08:00 level=INFO msg="audit: resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）"
+wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）
+time=2026-10-06T19:07:03.353+08:00 level=ERROR msg="approval: 卡片无处呈现（本进程没有悬浮球窗口），已 fail-closed 拒绝" corr=host:246-no-window tool=resident.confirmation level=L1
+time=2026-10-06T19:07:03.353+08:00 level=INFO msg="audit: approval: L1 prompt failed corr=host:246-no-window tool=resident.confirmation: 常驻进程没有悬浮球窗口，卡片无处呈现"
+wisp: [audit] approval: L1 prompt failed corr=host:246-no-window tool=resident.confirmation: 常驻进程没有悬浮球窗口，卡片无处呈现
+time=2026-10-06T19:07:03.355+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:03.355+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-06T19:07:03.355+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-06T19:07:03.355+08:00 level=INFO msg="audit: resident-approval: 退出第 3 步完成：拒绝待批卡片 0 张、作废 L1 窗口 0 张、路由失败 0 张；任务根已取消，无等待残留"
+wisp: [audit] resident-approval: 退出第 3 步完成：拒绝待批卡片 0 张、作废 L1 窗口 0 张、路由失败 0 张；任务根已取消，无等待残留
+time=2026-10-06T19:07:03.355+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-06T19:07:03.355+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-06T19:07:03.355+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-06T19:07:03.355+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+time=2026-10-06T19:07:10.035+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.400+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:07:10.416+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance="no host config view" hotkeys_live=3 hotkeys="summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live" gestures="recorded only except the cancel key: this leg has no task pipeline and no microphone, and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)"
+time=2026-10-06T19:07:10.416+08:00 level=INFO msg="audit: resident-approval: 本进程有悬浮球窗口，但装配根没有注入取消执行者，取消键通道保持未加载（advertise 一枚按不动的键＝B1 禁止的形状）"
+wisp: [audit] resident-approval: 本进程有悬浮球窗口，但装配根没有注入取消执行者，取消键通道保持未加载（advertise 一枚按不动的键＝B1 禁止的形状）
+time=2026-10-06T19:07:10.421+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+time=2026-10-06T19:07:10.421+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.421+08:00 level=INFO msg="audit: resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）"
+wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）
+time=2026-10-06T19:07:10.421+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.422+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.422+08:00 level=INFO msg="audit: resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）"
+wisp: [audit] resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）
+time=2026-10-06T19:07:10.422+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.424+08:00 level=WARN msg="resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants" path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConsta1054036566\001\config.toml err="config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConsta1054036566\\001\\config.toml: The system cannot find the file specified." fallback="DefaultApprovalTimeout=300s / DefaultL1Window=3s"
+time=2026-10-06T19:07:10.424+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (config.toml unreadable)" config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConsta1054036566\001\config.toml window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.426+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateWithoutAHostViewRunsOnTheCompiledConsta1054036566\001\config.toml window_sec_read=2 confirm_timeout_sec_read=45 gate_window=2s gate_queue_timeout=45s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.427+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.428+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.431+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindowtime2653319541\001\config.toml window_sec_read=2 confirm_timeout_sec_read=45 gate_window=2s gate_queue_timeout=45s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.435+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindowwind1380009450\001\config.toml window_sec_read=2 confirm_timeout_sec_read=300 gate_window=2s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.440+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindowboth3682483911\001\config.toml window_sec_read=2 confirm_timeout_sec_read=45 gate_window=2s gate_queue_timeout=45s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.444+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindowwind2869169924\001\config.toml window_sec_read=99 confirm_timeout_sec_read=300 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.449+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateTakesTheSeededRiskTimeoutAndWindowwind1233765046\001\config.toml window_sec_read=1 confirm_timeout_sec_read=300 gate_window=2s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.454+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateRiskValuesAreConstructionTimeOnly2941006549\001\config.toml window_sec_read=2 confirm_timeout_sec_read=45 gate_window=2s gate_queue_timeout=45s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.456+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket256ResidentGateRiskValuesAreConstructionTimeOnly2941006549\001\config.toml window_sec_read=2 confirm_timeout_sec_read=90 gate_window=2s gate_queue_timeout=1m30s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.462+08:00 level=WARN msg="resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants" path=C:\Users\swq\AppData\Local\Temp\TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfi39391764\001\config.toml err="config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfi39391764\\001\\config.toml: The system cannot find the file specified." fallback="DefaultApprovalTimeout=300s / DefaultL1Window=3s"
+time=2026-10-06T19:07:10.462+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (config.toml unreadable)" config_path=C:\Users\swq\AppData\Local\Temp\TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfi39391764\001\config.toml window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.465+08:00 level=WARN msg="resident gate: [risk] source present but refused at construction; the gate falls back to the compiled approval constants" path=C:\Users\swq\AppData\Local\Temp\TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfi39391764\002\config.toml err="config: config.toml: risk.confirm_timeout_sec 20 out of range [31, 3600]" provenance="defaults (config.toml present but refused at load)" fallback="DefaultApprovalTimeout=300s / DefaultL1Window=3s"
+wisp: resident [risk]: config.toml is present but was refused at load (config: config.toml: risk.confirm_timeout_sec 20 out of range [31, 3600]); the approval gate falls back to the compiled constants (DefaultApprovalTimeout=300s / DefaultL1Window=3s), so the [risk] numbers written in that file are NOT the numbers this process runs on
+time=2026-10-06T19:07:10.465+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (config.toml present but refused at load)" config_path=C:\Users\swq\AppData\Local\Temp\TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfi39391764\002\config.toml window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.466+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Local\Temp\TestTicket268ResidentGateNamesRefusedConfigApartFromMissingConfi39391764\002\config.toml window_sec_read=2 confirm_timeout_sec_read=45 gate_window=2s gate_queue_timeout=45s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.471+08:00 level=WARN msg="resident gate: [risk] source present but refused at construction; the gate falls back to the compiled approval constants" path=C:\Users\swq\AppData\Local\Temp\TestTicket268RefusedRiskConfigReachesStdoutOnce1313342451\001\config.toml err="config: config.toml: risk.confirm_timeout_sec 20 out of range [31, 3600]" provenance="defaults (config.toml present but refused at load)" fallback="DefaultApprovalTimeout=300s / DefaultL1Window=3s"
+time=2026-10-06T19:07:10.471+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (config.toml present but refused at load)" config_path=C:\Users\swq\AppData\Local\Temp\TestTicket268RefusedRiskConfigReachesStdoutOnce1313342451\001\config.toml window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:10.473+08:00 level=WARN msg="resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants" path=C:\Users\swq\AppData\Local\Temp\TestTicket268RefusedRiskConfigReachesStdoutOnce1313342451\002\config.toml err="config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket268RefusedRiskConfigReachesStdoutOnce1313342451\\002\\config.toml: The system cannot find the file specified." fallback="DefaultApprovalTimeout=300s / DefaultL1Window=3s"
+time=2026-10-06T19:07:10.473+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (config.toml unreadable)" config_path=C:\Users\swq\AppData\Local\Temp\TestTicket268RefusedRiskConfigReachesStdoutOnce1313342451\002\config.toml window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.482+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.482+08:00 level=INFO msg="audit: resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）"
+time=2026-10-06T19:07:21.482+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.483+08:00 level=INFO msg="audit: resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）"
+time=2026-10-06T19:07:21.483+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.483+08:00 level=INFO msg="audit: resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）"
+time=2026-10-06T19:07:21.484+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.484+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.484+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.484+08:00 level=INFO msg="audit: resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）"
+time=2026-10-06T19:07:21.484+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.484+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.484+08:00 level=INFO msg="audit: resident-approval: 审批门已装配进常驻进程，取消通道 Ctrl+Alt+Q 已加载（本票只落 Ctrl+Alt+Q 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）"
+time=2026-10-06T19:07:21.485+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.485+08:00 level=INFO msg="audit: resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）"
+time=2026-10-06T19:07:21.485+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.485+08:00 level=INFO msg="audit: resident-approval: 本进程有悬浮球窗口，但装配根没有注入取消执行者，取消键通道保持未加载（advertise 一枚按不动的键＝B1 禁止的形状）"
+time=2026-10-06T19:07:21.485+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.485+08:00 level=INFO msg="audit: resident-approval: 审批门已装配，但本进程没有悬浮球窗口，四条否决通道全部保持未加载（取消键无处可借，卡片无处可呈）"
+time=2026-10-06T19:07:21.485+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.486+08:00 level=INFO msg="audit: resident-approval: 本进程有悬浮球窗口，但装配根没有注入取消执行者，取消键通道保持未加载（advertise 一枚按不动的键＝B1 禁止的形状）"
+time=2026-10-06T19:07:21.486+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.486+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.486+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.486+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.498+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:21.555+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:07:21.561+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-06T19:07:21.561+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=3 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live" gestures="recorded only except the cancel key: this leg has no task pipeline and no microphone, and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)"
+time=2026-10-06T19:07:21.568+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:07:21.568+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-06T19:07:21.573+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+time=2026-10-06T19:07:21.618+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:07:21.622+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=defaults hotkeys_live=3 hotkeys="summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live" gestures="recorded only except the cancel key: this leg has no task pipeline and no microphone, and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)"
+time=2026-10-06T19:07:22.034+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+time=2026-10-06T19:07:22.067+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:07:22.071+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-06T19:07:22.071+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=3 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live" gestures="recorded only except the cancel key: this leg has no task pipeline and no microphone, and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)"
+time=2026-10-06T19:07:22.077+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:07:22.078+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+V err="Hot key is already registered."
+time=2026-10-06T19:07:22.078+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey panel = \"Ctrl+Alt+V\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-06T19:07:22.078+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Z mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+V live=2
+time=2026-10-06T19:07:22.083+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+time=2026-10-06T19:07:22.116+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:07:22.121+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-06T19:07:22.121+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=3 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live" gestures="recorded only except the cancel key: this leg has no task pipeline and no microphone, and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)"
+time=2026-10-06T19:07:22.128+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:07:22.128+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+7 mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-06T19:07:22.133+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+time=2026-10-06T19:07:38.987+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:07:39 mockllm: serving on http://127.0.0.1:64856 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:07:39.006+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:39.031+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC246ResidentPipelineAsksThroughTheOneGate923257019\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:07:39.039+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:07:39Z duration_ms=7
+time=2026-10-06T19:07:39.047+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC246ResidentPipelineAsksThroughTheOneGate923257019\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:07:39.053+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:07:39Z duration_ms=5
+time=2026-10-06T19:07:39.058+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:07:39.061+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:07:39.061+08:00 level=INFO msg="audit: wisp run: SESSION-MINT id=sess_642b95a62809c8afc9fbbec0efb2a6e2 (结束点＝本进程退出，A435 第 2 条)"
+time=2026-10-06T19:07:39.061+08:00 level=INFO msg="audit: perm: MODE-READ origin=startup mode=ask_every_step source=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestAC246ResidentPipelineAsksThroughTheOneGate923257019\\\\002\\\\config.toml\""
+time=2026-10-06T19:07:39.061+08:00 level=INFO msg="audit: config: HOT-RELOAD state=armed tick=1s path=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestAC246ResidentPipelineAsksThroughTheOneGate923257019\\\\002\\\\config.toml\" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail=\"本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效\""
+time=2026-10-06T19:07:39.074+08:00 level=INFO msg="audit: wisp run: 风险判定 tool=fs.write level=L1 rules=[R1] reason=\"R1: 工具声明为下界（L1）\""
+time=2026-10-06T19:07:39.074+08:00 level=ERROR msg="approval: 卡片无处呈现（本进程没有悬浮球窗口），已 fail-closed 拒绝" corr=host-corr-1 tool=fs.write level=L1
+time=2026-10-06T19:07:39.074+08:00 level=INFO msg="audit: approval: L1 prompt failed corr=host-corr-1 tool=fs.write: 常驻进程没有悬浮球窗口，卡片无处呈现"
+wisp: [audit] approval: L1 prompt failed corr=host-corr-1 tool=fs.write: 常驻进程没有悬浮球窗口，卡片无处呈现
+time=2026-10-06T19:07:39.076+08:00 level=INFO msg="audit: tools: call kind=refused task=host:246-one-gate corr=host-corr-1 tool=fs.write risk=L1 decision=reject outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason=\"R1: 工具声明为下界（L1）\""
+time=2026-10-06T19:07:39.076+08:00 level=INFO msg="audit: tools: PATH-ACCOUNT task=host:246-one-gate tool=fs.write roots=1 rewritten=[] unusable=[]"
+time=2026-10-06T19:07:39.080+08:00 level=INFO msg="audit: wisp run: 风险判定 tool=fs.write level=L1 rules=[R1] reason=\"R1: 工具声明为下界（L1）\""
+time=2026-10-06T19:07:39.080+08:00 level=INFO msg="audit: config: HOT-RELOAD state=stopped reason=run-root-cancelled detail=\"轮询协程已退出（本次进程正在收口）；此后对 config.toml 的改动要下一次启动才会被读到\""
+time=2026-10-06T19:07:40.296+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:07:40 mockllm: serving on http://127.0.0.1:64859 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:07:40.317+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:40.340+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC246ResidentGateInjectionIsRefusedHalfAssembled716693758\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:07:40.350+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:07:40Z duration_ms=9
+time=2026-10-06T19:07:40.360+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC246ResidentGateInjectionIsRefusedHalfAssembled716693758\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:07:40.365+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:07:40Z duration_ms=4
+time=2026-10-06T19:07:40.370+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:07:40.373+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:07:40.373+08:00 level=INFO msg="audit: wisp run: SESSION-MINT id=sess_b773fe6ff4e4d850ae52637e19378d45 (结束点＝本进程退出，A435 第 2 条)"
+time=2026-10-06T19:07:40.392+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:07:40.392+08:00 level=INFO msg="audit: wisp run: SESSION-MINT id=sess_608f6c0421297683ee1c289bb451c250 (结束点＝本进程退出，A435 第 2 条)"
+time=2026-10-06T19:07:41.632+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:07:41 mockllm: serving on http://127.0.0.1:64861 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:07:41.653+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance="defaults (no host config view)" config_path="(no host config view)" window_sec_read=0 confirm_timeout_sec_read=0 gate_window=3s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-06T19:07:41.675+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC246ResidentTaskRootCancelStopsTheModelCall1836848664\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:07:41.684+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:07:41Z duration_ms=8
+time=2026-10-06T19:07:41.691+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC246ResidentTaskRootCancelStopsTheModelCall1836848664\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:07:41.697+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:07:41Z duration_ms=5
+time=2026-10-06T19:07:41.704+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:07:41.706+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:07:41.706+08:00 level=INFO msg="audit: wisp run: SESSION-MINT id=sess_47d4526afcd13f3808cd84d999acd356 (结束点＝本进程退出，A435 第 2 条)"
+time=2026-10-06T19:07:41.707+08:00 level=INFO msg="audit: perm: MODE-READ origin=startup mode=ask_every_step source=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestAC246ResidentTaskRootCancelStopsTheModelCall1836848664\\\\002\\\\config.toml\""
+time=2026-10-06T19:07:41.707+08:00 level=INFO msg="audit: config: HOT-RELOAD state=armed tick=1s path=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestAC246ResidentTaskRootCancelStopsTheModelCall1836848664\\\\002\\\\config.toml\" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail=\"本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效\""
+time=2026-10-06T19:07:41.707+08:00 level=INFO msg="audit: wisp run: 项目说明加载器 workspace=\"\" globalDir=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestAC246ResidentTaskRootCancelStopsTheModelCall1836848664\\\\002\" enabled=true budget=2300"
+time=2026-10-06T19:07:41.707+08:00 level=INFO msg="audit: projctx: projctx: 没有找到任何项目说明文件（工作区逐级向上与数据目录都查过）"
+time=2026-10-06T19:07:41.713+08:00 level=INFO msg="panel: SNAPSHOT at=2026-10-06T11:07:41Z depth=0 pending= mode=ask_every_step ws=unset results=1/1 done bytes=1910 sha256=fff79523bd661cd6"
+time=2026-10-06T19:07:41.713+08:00 level=INFO msg="audit: tools: C25 scope closed task=f85d708b-6b32-41d2-b60d-3db265316691 was_open=false dropped=0 open_scopes=0 close_err=<nil>"
+time=2026-10-06T19:07:41.718+08:00 level=INFO msg="audit: resident-approval: 退出第 3 步完成：拒绝待批卡片 0 张、作废 L1 窗口 0 张、路由失败 0 张；任务根已取消，无等待残留"
+wisp: [audit] resident-approval: 退出第 3 步完成：拒绝待批卡片 0 张、作废 L1 窗口 0 张、路由失败 0 张；任务根已取消，无等待残留
+time=2026-10-06T19:07:41.718+08:00 level=INFO msg="audit: wisp run: 项目说明加载器 workspace=\"\" globalDir=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\TestAC246ResidentTaskRootCancelStopsTheModelCall1836848664\\\\002\" enabled=true budget=2300"
+time=2026-10-06T19:07:41.718+08:00 level=INFO msg="panel: SNAPSHOT at=2026-10-06T11:07:41Z depth=0 pending= mode=ask_every_step ws=unset results=2/2 done bytes=2358 sha256=bcd198474956d9b8"
+time=2026-10-06T19:07:41.719+08:00 level=INFO msg="audit: tools: C25 scope closed task=c9e772f3-4b4e-441b-b629-681e7e2794cc was_open=false dropped=0 open_scopes=0 close_err=<nil>"
+time=2026-10-06T19:07:41.719+08:00 level=INFO msg="audit: wisp run: 后台任务的输出没有进名册：这个任务没有留下正文（空正文不进名册，免得「查不到」和「没打印」被读成同一件事）"
+time=2026-10-06T19:07:41.720+08:00 level=INFO msg="audit: config: HOT-RELOAD state=stopped reason=run-root-cancelled detail=\"轮询协程已退出（本次进程正在收口）；此后对 config.toml 的改动要下一次启动才会被读到\""
+time=2026-10-06T19:08:03.780+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:08:03 mockllm: serving on http://127.0.0.1:59095 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:08:03.812+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101ManualSwitchSurvivesRestart2164158222\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:08:03.855+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ManualSwitchSurvivesRestart2164158222\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:08:03.867+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:08:03Z duration_ms=11
+time=2026-10-06T19:08:03.876+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ManualSwitchSurvivesRestart2164158222\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:08:03.884+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:08:03Z duration_ms=7
+time=2026-10-06T19:08:03.897+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:08:03.901+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:08:03.907+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+time=2026-10-06T19:08:03.913+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+time=2026-10-06T19:08:03.937+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101ManualSwitchSurvivesRestart2164158222\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:08:03.975+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:08:45.421+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:08:45 mockllm: serving on http://127.0.0.1:57122 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:08:45.464+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault93040372\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:08:45.507+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault93040372\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:08:45.516+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:08:45Z duration_ms=9
+time=2026-10-06T19:08:45.525+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault93040372\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:08:45.532+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:08:45Z duration_ms=5
+time=2026-10-06T19:08:45.537+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:08:45.540+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:08:47.589+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault93040372\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:08:47.616+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:08:49.658+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault93040372\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:08:49.679+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:08:53.005+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:08:53 mockllm: serving on http://127.0.0.1:61537 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:08:53.029+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart967340878\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:08:53.058+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart967340878\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:08:53.066+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:08:53Z duration_ms=8
+time=2026-10-06T19:08:53.076+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart967340878\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:08:53.081+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:08:53Z duration_ms=5
+time=2026-10-06T19:08:53.087+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:08:53.089+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:09:33.186+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart967340878\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:09:33.204+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:13.296+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:15.108+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:15 mockllm: serving on http://127.0.0.1:50224 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:15.134+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate1813858345\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:15.164+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate1813858345\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:15.173+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:15Z duration_ms=8
+time=2026-10-06T19:10:15.183+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate1813858345\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:15.192+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:15Z duration_ms=8
+time=2026-10-06T19:10:15.196+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:15.200+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:16.957+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:16 mockllm: serving on http://127.0.0.1:51202 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:16.983+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2676086200\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:17.011+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2676086200\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:17.019+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:17Z duration_ms=7
+time=2026-10-06T19:10:17.028+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2676086200\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:17.040+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:17Z duration_ms=12
+time=2026-10-06T19:10:17.047+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:17.050+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:17.076+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict存储损坏3540390861\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:17.090+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict版本不认识274629895\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:17.104+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict权限读不到3202896182\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:18.520+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:18 mockllm: serving on http://127.0.0.1:51205 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:18.546+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd4230359427\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:18.581+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd4230359427\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:18.588+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:18Z duration_ms=6
+time=2026-10-06T19:10:18.603+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd4230359427\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:18.609+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:18Z duration_ms=6
+time=2026-10-06T19:10:18.614+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:18.616+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:18.657+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:20.073+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:20 mockllm: serving on http://127.0.0.1:51208 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:20.103+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified2051615144\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:20.133+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified2051615144\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:20.142+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:20Z duration_ms=7
+time=2026-10-06T19:10:20.150+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified2051615144\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:20.157+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:20Z duration_ms=5
+time=2026-10-06T19:10:20.162+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:20.165+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:20.207+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:21.851+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:21 mockllm: serving on http://127.0.0.1:51214 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:21.884+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge1685899432\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:21.917+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge1685899432\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:21.925+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:21Z duration_ms=8
+time=2026-10-06T19:10:21.935+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge1685899432\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:21.941+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:21Z duration_ms=5
+time=2026-10-06T19:10:21.950+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:21.953+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:22.005+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:23.369+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:23 mockllm: serving on http://127.0.0.1:51222 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:23.390+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds886333128\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:23.416+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds886333128\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:23.429+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:23Z duration_ms=12
+time=2026-10-06T19:10:23.438+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds886333128\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:23.444+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:23Z duration_ms=6
+time=2026-10-06T19:10:23.453+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:23.456+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:25.540+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:26.898+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:26 mockllm: serving on http://127.0.0.1:51225 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:26.920+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore1422489898\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:26.945+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore1422489898\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:26.955+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:26Z duration_ms=9
+time=2026-10-06T19:10:26.963+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore1422489898\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:26.968+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:26Z duration_ms=4
+time=2026-10-06T19:10:26.973+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:26.975+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:28.993+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:29 mockllm: serving on http://127.0.0.1:51235 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:29.018+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestMissingBlobFailsUnconfiguredNeverSilently3226257565\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:41.142+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:41 mockllm: serving on http://127.0.0.1:53044 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:41.182+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding2192471274\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:41.217+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding2192471274\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:41.225+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:41Z duration_ms=8
+time=2026-10-06T19:10:41.237+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding2192471274\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:41.247+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:41Z duration_ms=8
+time=2026-10-06T19:10:41.252+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:41.256+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:41.264+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-05d11658-c1d7-440d-9ce2-d1f0ebf16318 owner=tools
+time=2026-10-06T19:10:43.327+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:43 mockllm: serving on http://127.0.0.1:53055 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:43.360+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed3710285290\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:43.405+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed3710285290\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:43.417+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:43Z duration_ms=11
+time=2026-10-06T19:10:43.436+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed3710285290\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:43.444+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:43Z duration_ms=7
+time=2026-10-06T19:10:43.449+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:43.452+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:43.459+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-326b5fba-7837-48dc-9336-ee57cac713b7 owner=tools
+time=2026-10-06T19:10:45.515+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:45 mockllm: serving on http://127.0.0.1:55067 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:45.551+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound1051009375\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:45.581+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound1051009375\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:45.589+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:45Z duration_ms=7
+time=2026-10-06T19:10:45.606+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound1051009375\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:45.612+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:45Z duration_ms=5
+time=2026-10-06T19:10:45.620+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:45.623+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:45.630+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1f59cd79-f4c3-4b19-8640-8e6fca8aea13 owner=tools
+time=2026-10-06T19:10:45.710+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-cbe80098-f2d4-497c-af52-2553d2ee31ad owner=tools
+time=2026-10-06T19:10:45.719+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f8f7d703-c692-4532-bc83-cbc8cbc9b0fa owner=tools
+time=2026-10-06T19:10:45.724+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-60fb5890-cc30-4dae-a620-aaffd383bb1e owner=tools
+time=2026-10-06T19:10:45.730+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-421dd92a-0dd7-4703-a7c8-e2fecc878f19 owner=tools
+time=2026-10-06T19:10:45.735+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-24304201-5c48-4f41-adb0-d28d4e6715e3 owner=tools
+time=2026-10-06T19:10:45.742+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6de79b7c-a8a8-4171-a52b-5ac64d7f45cf owner=tools
+time=2026-10-06T19:10:45.746+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5d28791c-c312-49b7-a53f-31c23a33788d owner=tools
+time=2026-10-06T19:10:45.753+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0440d24e-4547-4d8d-b8b7-ad39e3acd90e owner=tools
+time=2026-10-06T19:10:45.760+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-91a30678-f021-475d-b52a-69be82d34046 owner=tools
+time=2026-10-06T19:10:45.766+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2a4f8452-6153-4669-a6ef-f6ebb0be5762 owner=tools
+time=2026-10-06T19:10:45.773+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-05cc4421-fee4-44f7-b70f-d00bc0248d30 owner=tools
+time=2026-10-06T19:10:45.779+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ff007047-cdb2-4def-be66-3f071f537646 owner=tools
+time=2026-10-06T19:10:45.785+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3ecf2284-a26c-4903-8f4d-49c225fe8866 owner=tools
+time=2026-10-06T19:10:45.791+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f062e477-ae14-4c0f-a8c6-a846e911bffb owner=tools
+time=2026-10-06T19:10:45.798+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d8241b40-6a85-43fb-98ea-a70700608fe4 owner=tools
+time=2026-10-06T19:10:45.804+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3a12a6d6-9f75-4498-b024-0e0c92b6e693 owner=tools
+time=2026-10-06T19:10:45.810+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1e6e10df-a751-478d-abf4-2d2a3488f70d owner=tools
+time=2026-10-06T19:10:45.817+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-31421dcb-6fc9-4123-a8eb-00c4e8b7a80d owner=tools
+time=2026-10-06T19:10:45.823+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8728e878-21d1-4eea-9835-5f8036ca1aa0 owner=tools
+time=2026-10-06T19:10:45.829+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-beda9881-8177-437f-80c8-38e9d4251532 owner=tools
+time=2026-10-06T19:10:45.837+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b21758bf-c2ec-4c4d-a818-b44dab33c562 owner=tools
+time=2026-10-06T19:10:45.845+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f2477042-6b7c-46fd-93ec-8aff7b56041a owner=tools
+time=2026-10-06T19:10:45.852+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-17de70c4-d32f-4056-a85c-d6c003590fb8 owner=tools
+time=2026-10-06T19:10:45.858+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-39c16cbd-b77b-4e4d-937a-cd56efb7644f owner=tools
+time=2026-10-06T19:10:45.864+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-617b13fd-5762-4d64-adf8-8f907ee6b702 owner=tools
+time=2026-10-06T19:10:45.873+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-84826118-3039-4335-830e-7627c482d8c0 owner=tools
+time=2026-10-06T19:10:45.880+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8f583ca3-2a40-43c9-9d70-470e63b5586e owner=tools
+time=2026-10-06T19:10:45.886+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-cf25d41d-afdf-4aec-b192-17696470fa11 owner=tools
+time=2026-10-06T19:10:45.894+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-71f92b21-7bfb-471b-a631-fc509bd95a63 owner=tools
+time=2026-10-06T19:10:45.902+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fcd2bbbe-28df-4efe-8af6-90f8f5919745 owner=tools
+time=2026-10-06T19:10:45.908+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-12bd6444-b365-4210-8ffc-2da8ebbab8d0 owner=tools
+time=2026-10-06T19:10:45.918+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-98ec6a1d-4cea-41a6-8bb7-97d2de738e14 owner=tools
+time=2026-10-06T19:10:47.515+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:47 mockllm: serving on http://127.0.0.1:55137 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:47.545+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands1728198873\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:47.580+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands1728198873\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:47.589+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:47Z duration_ms=8
+time=2026-10-06T19:10:47.601+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands1728198873\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:47.608+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:47Z duration_ms=7
+time=2026-10-06T19:10:47.619+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:47.621+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:10:47.629+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f54c90e0-a5ad-4573-968c-0f65a30cc291 owner=tools
+time=2026-10-06T19:10:58.919+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:10:58 mockllm: serving on http://127.0.0.1:59639 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:10:58.944+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope3442133909\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:10:58.971+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope3442133909\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:10:58.980+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:10:58Z duration_ms=7
+time=2026-10-06T19:10:58.988+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope3442133909\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:10:58.994+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:10:58Z duration_ms=6
+time=2026-10-06T19:10:58.999+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:10:59.002+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:00.344+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:11:00 mockllm: serving on http://127.0.0.1:59646 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:11:00.374+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2440133377\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:11:00.405+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2440133377\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:11:00.415+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:11:00Z duration_ms=9
+time=2026-10-06T19:11:00.426+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2440133377\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:11:00.435+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:11:00Z duration_ms=8
+time=2026-10-06T19:11:00.440+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:11:00.442+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:01.748+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:11:01 mockllm: serving on http://127.0.0.1:59652 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:11:01.775+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun3300045265\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:11:01.800+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun3300045265\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:11:01.808+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:11:01Z duration_ms=7
+time=2026-10-06T19:11:01.817+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun3300045265\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:11:01.822+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:11:01Z duration_ms=4
+time=2026-10-06T19:11:01.827+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:11:01.829+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:01.879+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:01.896+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:03.167+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:11:03 mockllm: serving on http://127.0.0.1:59655 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:11:03.192+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking1381431061\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:11:03.219+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking1381431061\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:11:03.227+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:11:03Z duration_ms=7
+time=2026-10-06T19:11:03.236+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking1381431061\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:11:03.243+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:11:03Z duration_ms=7
+time=2026-10-06T19:11:03.249+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:11:03.252+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:05.342+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:08.018+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/06 19:11:08 mockllm: serving on http://127.0.0.1:57735 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-06T19:11:08.070+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket224ProductionSessionDoesNotSurviveRestart3182506721\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:11:08.116+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224ProductionSessionDoesNotSurviveRestart3182506721\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-06T19:11:08.132+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-06T11:11:08Z duration_ms=14
+time=2026-10-06T19:11:08.145+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224ProductionSessionDoesNotSurviveRestart3182506721\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-06T19:11:08.158+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-06T11:11:08Z duration_ms=13
+time=2026-10-06T19:11:08.164+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-06T19:11:08.167+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:08.200+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket224ProductionSessionDoesNotSurviveRestart3182506721\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-06T19:11:08.223+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-06T19:11:10.284+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	499.677s
+ok  	github.com/CarlosShao/wisp/internal/agent	29.743s
+time=2026-10-06T19:02:51.173+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTenOpsInOneToolCallGetOneConfirm (5.24s)
+    batch_test.go:164: 确认界面从未收到提示（等待 2s 后放弃）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	10.234s
+?   	github.com/CarlosShao/wisp/internal/agent/scheduler	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/audio	21.700s
+time=2026-10-06T19:02:51.180+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-06T19:02:51.270+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-06T19:02:51.489+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+time=2026-10-06T19:02:51.594+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.594+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.594+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.594+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-06T19:02:51.594+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Space
+time=2026-10-06T19:02:51.594+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=F9
+time=2026-10-06T19:02:51.594+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-06T19:02:51.595+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.595+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-06T19:02:51.595+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Ctrl+Alt+K err="invalid argument"
+time=2026-10-06T19:02:51.595+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-06T19:02:51.595+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-06T19:02:51.595+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.597+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.597+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.597+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.597+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="Hot key is already registered."
+time=2026-10-06T19:02:51.597+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="invalid argument"
+time=2026-10-06T19:02:51.597+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.598+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.598+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-06T19:02:51.598+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-06T19:02:51.633+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-06T19:02:51.633+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-06T19:02:51.633+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-06T19:02:51.633+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-06T19:02:51.633+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-06T19:02:51.633+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.633+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+time=2026-10-06T19:02:51.633+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-06T19:02:51.633+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-06T19:02:51.633+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-06T19:02:51.633+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.634+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-06T19:02:51.634+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.634+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-06T19:02:51.634+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-06T19:02:51.634+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=3
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	3.607s
+ok  	github.com/CarlosShao/wisp/internal/buildinfo	0.407s
+ok  	github.com/CarlosShao/wisp/internal/config	17.582s
+ok  	github.com/CarlosShao/wisp/internal/llm	80.424s
+ok  	github.com/CarlosShao/wisp/internal/llm/adaptertest	16.211s
+ok  	github.com/CarlosShao/wisp/internal/llm/anthropic	44.004s
+ok  	github.com/CarlosShao/wisp/internal/llm/golden	0.816s
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	52.954s
+ok  	github.com/CarlosShao/wisp/internal/llm/openairesponses	54.101s
+ok  	github.com/CarlosShao/wisp/internal/memory	33.672s
+ok  	github.com/CarlosShao/wisp/internal/models	32.988s
+ok  	github.com/CarlosShao/wisp/internal/observe	4.473s
+time=2026-10-06T19:03:06.667+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.02s)
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+    composer_test.go:74: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:79: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:74: Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare
+    composer_test.go:79: ComposerState <-> ComposerState: 11 JSON keys reconciled
+    composer_test.go:79: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:79: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:79: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:79: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.22s)
+    frontend_hygiene_test.go:216: a second style source appeared in code the bundle actually ships:
+          frontend/src/components/harness/right-rail.tsx:89: diff: [{ sign: "+", text: "  --page: #fafafb;  /* beautiful-ui 主题收编 */" }],
+        Add or reference a C21 token in design/assets/tokens.css instead.
+    frontend_hygiene_test.go:219: 57 files reachable from main.tsx carry colour literals only in the generated theme
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	17.305s
+ok  	github.com/CarlosShao/wisp/internal/perm	6.149s
+ok  	github.com/CarlosShao/wisp/internal/plugin	0.561s
+ok  	github.com/CarlosShao/wisp/internal/proc	11.919s
+ok  	github.com/CarlosShao/wisp/internal/projctx	3.000s
+time=2026-10-06T19:03:13.225+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestResolvePerCallBudget (3.52s)
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 9486584 ns/op = 9.487 ms/op (budget 1.000 ms, 313 samples)
+    pathresolver_budget_norace_test.go:37: C26 budget breach: Resolve averages 9.486584ms per call, budget 1ms
+time=2026-10-06T19:03:23.068+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	15.246s
+ok  	github.com/CarlosShao/wisp/internal/secret	4.544s
+ok  	github.com/CarlosShao/wisp/internal/session	3.233s
+?   	github.com/CarlosShao/wisp/internal/speech	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/statemachine	0.650s
+?   	github.com/CarlosShao/wisp/internal/streamkey	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/tools	23.854s
+?   	github.com/CarlosShao/wisp/internal/watchdog	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/winsec	25.638s
+FAIL
