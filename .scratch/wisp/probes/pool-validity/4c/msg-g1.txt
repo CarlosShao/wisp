@@ -1,0 +1,6 @@
+probe(pool-validity/4c): 判完前 3 枚（15／16／21）—— 三枚都落「仍成立」，各带今树直接读数
+
+- 15 仍成立：internal/speech 今树只 1 枚 doc.go（同尺 internal/audio 16 枚）；CER 词面全仓只 1 命中且那行是 DEFERRED(engines) 自陈；asr-baseline 名册尺 0；paraformer/silero 有词但逐行落 config/models，intra_op_num_threads 只在 scripts/spike
+- 16 仍成立（切片级验收票，只答它点名的产物在不在）：docs/SLO.md:121 逐字自陈「其余行（唤醒→监听、VAD→ASR、标点、首 token、冷/热会话整链）…未测…待票 12/15/26/28」；docs/ 下 premortem 名册尺 0；docs/evidence/s2/ 只 2 枚且按名属票 13/14
+- 21 仍成立：AC#2 那句 FULL params (not summary) 今树零读者 —— replies.go grep Params 0 命中、approval_reply/resident_approval_windows/panel_pump/internal/ball grep Params 0 命中，全仓非测试 .Params 只 3 处且全是"往里填"；pending_read.go:44-47 自陈卡片实际只带那四枚字段，Params 不在其中
+- 21 同时登记：判定层／队列／聚合／nonce／D43 表／球视觉均在树且有 35200c75 落码，run.go:612/748/1008 已真装配（票内 09-20 自陈的"零可达"今天已翻）⇒ 凭据三样齐全但本腿不裁结案；界面半截落量不到
