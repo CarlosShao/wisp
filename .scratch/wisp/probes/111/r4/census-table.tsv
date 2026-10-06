@@ -1,0 +1,36 @@
+PKG	TRACKED_TESTGO	COMPILED_T/X_WIN	CLAIMED_BY	PIN_LINE_CORE	PIN_LINE_WIN	PIN_LINE_CLI	PIN_LINE_WINSEC
+cmd/balldebug	0	0/0	NO-SCOPE	-	-	-	-
+cmd/llmrecord	1	1/0	core windows 	165	194	-	-
+cmd/wisp	65	58/0	cli 	-	-	206	-
+frontend	0	0/0	NO-SCOPE	-	-	-	-
+internal/agent	19	19/0	core 	166	-	-	-
+internal/agent/approval	19	8/11	core 	167	-	-	-
+internal/agent/scheduler	0	0/0	NO-SCOPE	-	-	-	-
+internal/audio	5	5/0	core 	168	-	-	-
+internal/ball	16	11/0	core windows 	169	195	-	-
+internal/buildinfo	1	1/0	core 	170	-	-	-
+internal/config	18	16/1	core windows 	171	196	-	-
+internal/llm	10	2/8	core 	172	-	-	-
+internal/llm/adaptertest	1	1/0	core 	173	-	-	-
+internal/llm/anthropic	3	3/0	core 	174	-	-	-
+internal/llm/golden	1	1/0	core 	175	-	-	-
+internal/llm/openaichat	4	4/0	core 	176	-	-	-
+internal/llm/openairesponses	2	2/0	core 	177	-	-	-
+internal/memory	11	11/0	core 	178	-	-	-
+internal/models	17	16/0	core 	179	-	-	-
+internal/observe	15	15/0	core 	180	-	-	-
+internal/panel	20	20/0	core 	181	-	-	-
+internal/perm	3	3/0	core windows 	182	197	-	-
+internal/plugin	1	1/0	core windows 	183	198	-	-
+internal/proc	11	11/0	core windows 	184	199	-	-
+internal/projctx	1	0/1	core windows 	185	200	-	-
+internal/risk	22	20/0	core windows 	186	201	-	-
+internal/secret	4	4/0	core windows 	187	202	-	-
+internal/session	2	2/0	core windows 	188	203	-	-
+internal/speech	0	0/0	NO-SCOPE	-	-	-	-
+internal/statemachine	2	2/0	core 	189	-	-	-
+internal/streamkey	0	0/0	NO-SCOPE	-	-	-	-
+internal/tools	49	46/3	core 	190	-	-	-
+internal/watchdog	0	0/0	NO-SCOPE	-	-	-	-
+internal/winsec	27	12/8	core winsec 	191	-	-	209
+tools/signmodels	0	0/0	NO-SCOPE	-	-	-	-

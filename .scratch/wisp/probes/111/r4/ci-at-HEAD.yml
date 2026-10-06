@@ -1,0 +1,855 @@
+name: ci
+
+# CI pipeline (ticket 08; SPEC-11 §6). PR gate = lint + test-core +
+# test-windows + slo-smoke; slo-full runs on the self-hosted wisp-slo runner
+# (full six-state SLO + settle + leak). Per D22 mode-6 NO job is configured
+# skippable: no `if: false`, no continue-on-error, no skip flags. Runner
+# platform limits (no interactive desktop / audio on hosted runners) are
+# handled by SUBSET choice, never by skipping a job (SPEC-10 §3).
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev]
+  # Ticket 134 AC#2 (shape B, owner-approved "C 为主 + B 为辅" 2026-09-23):
+  # a daily trigger nobody has to press. This does NOT replace the push
+  # trigger above - shape C (the sampling-validity precheck in
+  # scripts/slo-check.ps1) is what keeps a contended sample from pretending to
+  # be a verdict, and C's cost is that a busy machine has to be re-run. B pays
+  # for that: at 19:37 UTC (03:37 local on the wisp-slo laptop, when the review
+  # fleet is asleep) the same six-state gate gets one interference-free shot at
+  # D32 every day.
+  #
+  # Three limits stated plainly, none of them is "already in effect":
+  #   1. GitHub evaluates cron ONLY against the config on the DEFAULT BRANCH
+  #      (main). Until this file reaches main this schedule fires zero times -
+  #      on dev it is inert by design, not a bug to be fixed with a push.
+  #   2. Scheduled runs are best-effort and can be delayed at peak times
+  #      (GitHub documents minutes-long latencies), so the pin in
+  #      .github/workflows/slo-fresh.yml is what actually detects a gap.
+  #   3. A scheduled run executes ALL SIX jobs of this workflow, not just
+  #      slo-full: narrowing it would need an `if:`, and D22 mode-6 bans that.
+  #      Accepted cost: hosted minutes for lint/test-core/test-windows/
+  #      slo-smoke/lint-frontend each night.
+  # No `if:`, no continue-on-error, no skip flag anywhere in this block
+  # (D22 mode-6: "A skippable job is a job that will one day be skipped").
+  schedule:
+    - cron: '37 19 * * *'
+  workflow_dispatch:
+
+concurrency:
+  # Q-25 (owner 2026-09-23, approved "加"): push events get a per-sha group.
+  # With a per-ref group and cancel-in-progress=false, GitHub keeps only the
+  # OLDEST queued run once the in-progress one finishes and cancels the rest,
+  # so a burst of pushes permanently destroys the step-level logs of the
+  # dropped commits - and those logs are our only evidence for several gates.
+  # Measured cost of the old shape (Q-25 evidence, 09-21 evening): 4 of the 6
+  # most recent dev runs were superseded this way.
+  # PR events deliberately keep the old per-ref group + cancel-in-progress so
+  # a force-pushed branch still supersedes its own previous run.
+  group: ci-${{ github.workflow }}-${{ github.ref }}${{ github.event_name == 'push' && format('-{0}', github.sha) || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # ---------------------------------------------------------------- lint ----
+  # gofumpt/vet/staticcheck + D22 seven-ban static scan (tools/d22scan) +
+  # ban #8 zero-emoji scan. The scope names come from the tool, never from this
+  # comment: as of ticket 67 AC#3 / ticket 71 AC#4 the truth source is
+  # emojiScopes() in tools/d22scan/main.go = design/ + internal/ + cmd/ (all
+  # .go, comments and _test.go included). The previous wording here said
+  # "design/ and frontend/", a tree that does not exist at this HEAD - a stale
+  # copy of the very lie ticket 71 exists to make impossible, so it is now
+  # written as a pointer to the function instead of a duplicated list.
+  # The scan's own red-path is pinned by its seeded-violation test, which the
+  # wrapper below runs BEFORE the scan (positive control).
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: D22 scanner positive control (tools/d22scan tests, seeded red)
+        # runtests.sh asserts that the tests ACTUALLY RAN (ticket 71 AC#3):
+        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+        # never again mean "the pattern matched nothing". This is the step that
+        # proves the gate below CAN go red - see TestBuiltBinaryGoesRedEndToEnd
+        # in tools/d22scan/scan_test.go, which compiles the binary and asserts
+        # process exit codes 1 and 2 on seeded violations.
+        run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+
+      - name: "D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)"
+        # The step above proves the scanner's tests run; this one proves the SCANNER
+        # still sees what it claims to see. tools/d22scan -self-test builds a
+        # throwaway fixture repository per sample and runs the production walks over
+        # it, requiring for every ban id this tool can report (the list is read out
+        # of main.go itself, never copied here) one sample that MUST ring and one
+        # that MUST stay silent - and refusing to print a verdict at all if a ban has
+        # no pair, because a deleted sample would otherwise look like a passing test.
+        #
+        # WHY A SEPARATE STEP AT ALL, when the step above already executes the same
+        # table through TestSelfTestEntryPassesEveryCase: two independent ways to be
+        # run means deleting one is a reading, not a silence (ticket 161 AC#4). The
+        # process exit code is also what CI consumes, and a CI step whose command is
+        # `go run` cannot pass by importing a helper main() no longer calls.
+        #
+        # It sits directly under the positive control and above the scan, which is
+        # the highest position in this job that is not already taken: the two steps
+        # below it can be skipped by an earlier red (that disease is ticket 71/85/111
+        # territory and ticket 161 AC#6 owns the aggregate-rc half of it), so the
+        # nearer this sits to the top, the less often its verdict is the one that
+        # goes missing. Added step only: no existing step was moved, edited, given
+        # an `if:`, or made continue-on-error (D22 run-away mode 6).
+        run: go run . -self-test
+        working-directory: tools/d22scan
+
+      - name: D22 seven-ban + emoji scan (tools/d22scan)
+        # Wrapper is the supported entry point (ticket 67 AC#2): it derives the
+        # repo root from its own location, runs the seeded-violation positive
+        # control and then the scan, so "the scanner never ran" cannot read as
+        # green. tools/d22scan is its own Go module - invoking it from the repo
+        # root by path silently no-ops, which is what this step guards against.
+        #
+        # WHY THIS STEP IS AT THE TOP OF THE JOB (ticket 71 finding, 2026-09-21):
+        # it used to sit BELOW gofmt/vet/staticcheck, and GitHub skips every step
+        # after the first failure. At the time `go vet (module)` was red on ubuntu
+        # - fd8f838 had portable internal/ball/statevisual.go calling mulA, which
+        # is defined only in renderer_windows.go - so this gate's CI verdict had
+        # literally never been produced, on any run, while the job printed a red we
+        # attributed to "the code" rather than to "the step that never got here".
+        # Running the scan FIRST means a platform-build complaint can never again
+        # hide the D22 result. No step was removed, reordered into
+        # skippability, or given continue-on-error (D22 run-away mode 6).
+        #
+        # CORRECTION, recomputed by ticket 111 so the example above is not read as
+        # a current fact: `go vet (module)` is GREEN on ubuntu today (run
+        # 35600043583 step 7 = success; and in a real container `go vet ./...` is
+        # rc=0 with cgo on, rc=1 only for cmd/wisp with cgo off). The ball/mulA
+        # case is fixed. The same disease in this job is now elsewhere and still
+        # live: `staticcheck` fails and its dependent `mockllm module vet` reports
+        # `skipped` in that same run - ticket 85's instrument hole, which is why
+        # the guard below was added to that step and why the ordering rule stays.
+        run: sh scripts/d22scan.sh
+
+      - name: "Tracked path-length budget (ticket 262)"
+        # ADDED STEP ONLY, and this is the only edit the file received: no existing
+        # step was moved, edited, deleted, given an `if:`, or made continue-on-error
+        # (D22 run-away mode 6). The unfreeze that permits this single addition is
+        # docs/reports/pending-and-issues.md A585, which grants "add one step to the
+        # lint job, suggested right after the tools/d22scan step" and nothing else -
+        # not the trigger table above, not the concurrency group, not any `runs-on`,
+        # not a step in slo-full / test-core / test-windows / slo-smoke.
+        #
+        # WHY IT SITS HERE AND NOT ON THE RUNNER THAT ACTUALLY BROKE: ticket 262
+        # section 1 measured the self-hosted checkout directory at 43 characters
+        # (E:\work\base\actions-runner\_work\wisp\wisp, joined as 44) against 14 on
+        # the hosted Windows side, and the job that died was `slo-full` on the
+        # self-hosted side. A step placed after `actions/checkout` in that job is a
+        # dead gate: it runs only if checkout ran, and the path shape this gate
+        # exists to catch is precisely the one that makes checkout fail. So the
+        # worst-case width is reproduced as a NAMED CONSTANT inside
+        # scripts/check-path-length-budget.sh (WORST_PREFIX=44, same source) rather
+        # than by standing on that machine. What this step therefore cannot see, and
+        # what nobody should claim it sees: the real filesystem behaviour of the
+        # self-hosted runner. It is a paper budget, checked everywhere, not a
+        # reproduction of one runner.
+        #
+        # WHAT IS NOT IN HERE: no threshold. The threshold lives in that script as
+        # one named constant derived from .scratch/wisp/issues/README.md rule 9 (a
+        # 100-character name cap), deliberately NOT from the wall at relative
+        # (206, 217]; raising it to make this step green is ticket 262's named
+        # forbidden action. The step runs the seeded-path positive control first (in
+        # a throwaway repository, so the control cannot be red because of this tree)
+        # and refuses to run the scan at all if that control cannot be made red.
+        run: sh scripts/check-path-length-budget.sh --with-self-test
+
+      - name: gofmt (gofumpt)
+        run: |
+          go install mvdan.cc/gofumpt@latest
+          OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"
+          if [ -n "$OUT" ]; then
+            echo "gofumpt would reformat:"
+            echo "$OUT"
+            exit 1
+          fi
+
+      # ADDED STEP ONLY (ticket 161 AC#7 form (A), decided by the orchestrator's
+      # 00:0x ruling "裁二"): no existing step was moved, edited, deleted, given an
+      # `if:`, or made continue-on-error. It sits directly BELOW the gofmt step
+      # rather than above it on purpose - "who goes red first" is a causal claim this
+      # file already makes twice (see the ordering notes on the two D22 steps), so
+      # the new leg takes the next free slot instead of overtaking anybody.
+      - name: "gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)"
+        # STATED PLAINLY, because the honest version of this step's value is small:
+        # it adds NO REACH TODAY. On a checkout every file is tracked, so the step
+        # above and this one read the same bytes and must agree - if that ever stops
+        # being true, the disagreement is the finding. What this step buys is that
+        # the sentence "the denominator of the formatting gate is the TRACKED set,
+        # not the working tree" stops living in human memory. That sentence is what
+        # ticket 161 AC#7 was decided on after `gofumpt -l . tools/... must be EMPTY`
+        # was found to be structurally unsatisfiable on a bench tree (gofumpt walks
+        # .scratch/**, which by definition holds deliberately-broken samples), and a
+        # criterion that only people remember is a criterion that silently changes
+        # when the next program formats "the whole tree".
+        #
+        # It is not a second copy of the check - it calls the same instrument that
+        # measures the working tree on the bench, so the two readings cannot drift
+        # apart, and it reuses that instrument's hollow guard instead of writing a
+        # new one: handed ZERO tracked .go files the script exits 2, which CI reads
+        # as red, never as green (the vacuous-empty mistake this file's own ancestor
+        # made once with `git ls-files -Z`). A step that could pass by matching
+        # nothing is the shape ticket 161 exists to refuse.
+        run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
+
+      - name: go vet (module)
+        run: go vet ./...
+
+      - name: go vet (tools/d22scan module)
+        run: go vet ./...
+        working-directory: tools/d22scan
+
+      - name: staticcheck
+        # TICKET 85a (2026-09-21). Three changes, all of them the gate's own
+        # shape; not one finding was fixed here (that backlog is ticket 122).
+        #
+        # 1. VERSION PIN 2025.1.1 -> 2026.2.1. The cause was the CONSUMER, not
+        #    the Go toolchain: 2025.1.1 (module v0.6.1) vendors
+        #    golang.org/x/tools v0.30.0, whose internal/pkgbits decoder caps at
+        #    export data version 2 (decoder.go:86 is the error string), while
+        #    go1.27.1 WRITES version 4 (V4: generic methods as standalone
+        #    function objects). So the step died at import time on the standard
+        #    library ("cannot decode ..., export data version 4 is greater than
+        #    maximum supported version 2") and across all 121 runs that ever
+        #    built this job it produced ZERO findings (step conclusions:
+        #    skipped 93 / failure 28 / success 0 - the gate had literally never
+        #    executed to completion once). 2026.2.1 (v0.8.1, x/tools
+        #    v0.44.1-0.20260420230617-19499e7caabc) reads V4. Measured on a
+        #    pristine `git archive HEAD` snapshot at d3cc9ed: the old binary
+        #    exits 1 with 5 crash lines and 0 findings, the new one exits 1
+        #    with 34 (GOOS=linux, the CI platform shape) / 78 (GOOS=windows)
+        #    parseable findings and 0 crash lines. Go itself was NOT downgraded.
+        # 2. MODULE TRAVERSAL. The root module's `./...` structurally cannot
+        #    see tools/d22scan and tools/mockllm - they are separate go.mod
+        #    files (root `go list ./...` returns zero packages for both) - so
+        #    2 d22scan findings and 1 mockllm finding had never been looked at
+        #    by any gate. The loop checks all three modules and, per this
+        #    repo's rule that a gate must name its own denominator, the step
+        #    prints modules / packages / findings / toolchain-crash-lines: a
+        #    future export-format mismatch then reads as a non-zero crash-line
+        #    count, not as a wall of text that masks the verdict. The step
+        #    exits 1 if ANY module's staticcheck exits non-zero, and prints
+        #    every finding line itself (rc alone is never the reading).
+        # 3. UPSTREAM MASKING, the R-4 family. 93 of those 121 runs never
+        #    EXECUTED this step because a step above it was red (run 160:
+        #    `gofmt (gofumpt)`). `if: ${{ !cancelled() }}` is the one shape
+        #    ticket 85's ruling allows for an observation period: it does not
+        #    change this step's own red/green, it only makes sure the step
+        #    answers. continue-on-error is NOT used (D22 run-away mode 6,
+        #    ci.yml header). The `mockllm module vet` step below already
+        #    carries the same guard from ticket 111 and is left untouched;
+        #    R-4 (that step `skipped` as collateral damage of the staticcheck
+        #    crash, run 35600043583) closes on the first pushed run where both
+        #    steps carry their own conclusions.
+        # NO finding is suppressed by this change: no //nolint, no
+        # lint:ignore, no excluded package. The `frontend/embed.go:4` SA9009
+        # is a known false positive (prose comment that happens to start
+        # "// go:embed"; the real directive is embed.go:19) and KEEPS being
+        # reported - ticket 122 rules on it, ticket 77 AC#1 owns that comment.
+        # This step is EXPECTED RED after this pin, red on real parseable
+        # findings (37 lines across the 3 modules at d3cc9ed, linux shape);
+        # lint turning green is NOT a criterion of this ticket.
+        if: ${{ !cancelled() }}
+        run: |
+          go install honnef.co/go/tools/cmd/staticcheck@2026.2.1
+          rc=0
+          modcount=0
+          pkgs=0
+          findings=0
+          crashes=0
+          for mod in . tools/d22scan tools/mockllm; do
+            modcount=$((modcount+1))
+            echo "=== staticcheck module: $mod ==="
+            m_pkgs=$(cd "$mod" && go list ./... 2>/dev/null | wc -l)
+            step_rc=0
+            m_out=$(cd "${mod}" && staticcheck ./... 2>&1) || step_rc=$?
+            m_find=$(printf '%s\n' "$m_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true
+            m_crash=$(printf '%s\n' "$m_out" | grep -c 'export data version') || true
+            printf '%s\n' "$m_out"
+            echo "--- module $mod: exit=$step_rc packages=$m_pkgs findings=$m_find toolchain-crash-lines=$m_crash"
+            pkgs=$((pkgs+m_pkgs))
+            findings=$((findings+m_find))
+            crashes=$((crashes+m_crash))
+            if [ "$step_rc" -ne 0 ]; then rc=1; fi
+          done
+          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount packages=$pkgs findings=$findings toolchain-crash-lines=$crashes (step exit is $rc)"
+          exit $rc
+
+      - name: mockllm module vet
+        # Ticket 111 AC#5/AC#6, same shape as test-windows: this is a gate for a
+        # SEPARATE module (tools/mockllm, which nothing else in this job vets) and
+        # in run 35600043583 job 106334066361 it reported `skipped` because
+        # `staticcheck` two steps above it was red. A step that only gets to
+        # answer when a different tool succeeds has no CI verdict, which is the
+        # sentence this repo has now written four times. The guard is the only
+        # change; `staticcheck` itself is untouched - its own hole
+        # ("export data version 4 is greater than maximum supported version 2", so
+        # it has never produced a finding) is ticket 85's and is deliberately not
+        # fixed here.
+        if: ${{ !cancelled() }}
+        run: go vet ./...
+        working-directory: tools/mockllm
+
+  # ----------------------------------------------------------- test-core ----
+  # Pure-Go logic tests on ubuntu (SPEC-11 §6 scope) + golden replay +
+  # the compose mock-llm wiring (started, probed, used by the probe test).
+  # Windows-only packages (ball GUI, cgo speech) are out of this job's scope
+  # by platform, not skipped: they run in test-windows / slo jobs.
+  test-core:
+    runs-on: ubuntu-latest
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Start compose test services (mock-llm on 18080)
+        run: docker compose -f docker/compose.test.yml --profile test up -d --build mock-llm
+
+      - name: Probe mock-llm
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/v1/models > /dev/null; then
+              echo "mock-llm reachable"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "mock-llm never became reachable"
+          exit 1
+
+      - name: Environment fork assertion (WISP_ENV=test data dir)
+        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+        # that matches nothing prints PASS + `ok` + exit 0, so renaming
+        # TestLayoutForTestEnv would turn this step into a permanent green no-op.
+        # Measured on HEAD: the drifted-name form exits 0 with 0 `=== RUN` lines;
+        # through this script it exits 1 and prints the counts.
+        #
+        # MOVED ABOVE the portable step (ticket 93, tightening, no step removed
+        # and no threshold changed): it sat below a step that bare `go test` lets
+        # go red, and GitHub stops at the first failed step - so on any run where
+        # the portable step was red, this gate had literally never produced a
+        # verdict, which is the A44-1 shape ticket 71 already fixed once in the
+        # lint job. It needs neither compose nor mock-llm, so nothing it depends
+        # on moved.
+        run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+
+      - name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
+        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+        # Go books a SKIP as `ok` - so a case that could not evaluate anything
+        # (internal/risk's TestSyncRegistryProbeLive, skipping on both platforms)
+        # printed the same bytes as a pass. scripts/portable-tests.sh delegates
+        # every verdict to tools/d22scan/runtests.sh (the strict runner from
+        # ticket 71 AC#3: zero SKIP, non-zero go exit, and "no top-level result
+        # at all" are all fatal) and adds a per-platform, reason-carrying,
+        # re-verified ledger for the cases that are declared out of scope. The
+        # package list lives in that script, not here.
+        #
+        # TICKET 111 moved the list behind a NAME (`--scope=core`) and added three
+        # guards to it, because "the scope has a row for X" was never the same
+        # claim as "X was tested": internal/session and internal/watchdog were rows
+        # of that kind, with zero test files behind them (doc.go boundary stubs),
+        # and a ./internal/agent/... glob was quietly carrying a third (scheduler).
+        # An entry with no denominator cannot go red, so it cannot be evidence. The
+        # scope now pins its own resolved package set, rejects any declared package
+        # that compiles no test file on this platform, and requires every one of
+        # them to print its own anchored top-level result line. Four packages with
+        # tests and no CI step were pulled in on the way: internal/ball,
+        # internal/perm, internal/plugin, cmd/llmrecord.
+        run: bash scripts/portable-tests.sh --scope=core
+
+      - name: Stop compose services
+        if: always()
+        run: docker compose -f docker/compose.test.yml --profile test down
+
+  # -------------------------------------------------------- test-windows ----
+  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+  # PathResolver junction placeholder (real cases land with tickets 18/20).
+  #
+  # EVERY STEP BELOW THE SETUP ONES CARRIES `if: ${{ !cancelled() }}` (ticket 111
+  # AC#6). Read this before touching it, because the shape looks like a relaxation
+  # and is the opposite:
+  #
+  # GitHub applies a default status check of `success()` to every step, so the
+  # first red step skips all the rest. Ticket 110 added the winsec gate as this
+  # job's FIRST test step so it could not be masked (its AC#5 reasoning is in that
+  # step's comment) - and in doing so turned the job into: winsec red => the cgo
+  # build smoke, the portable windows tests and the PathResolver case all report
+  # `skipped`. Measured twice, on two runs:
+  #   run 35595651898 job 106319703680: step 4 "Windows ACL sealing gate"
+  #     =failure, the next four steps =skipped (those four were all `success` on
+  #     the run immediately before it).
+  #   run 35600043583 job 106334066496 (dev @ d13e597, 2026-09-21 12:31Z): same
+  #     shape, STILL LIVE - gate=failure, 5..8=skipped.
+  # So adding one gate made the windows leg's NET COVERAGE NEGATIVE: one red test
+  # file in internal/winsec now hides a build regression and two other gates. The
+  # gate is not the problem; the skipping is.
+  #
+  # WHY `!cancelled()` AND NOT `always()`: the runner applies the default
+  # `success()` check unless the step names a status function, so both do get the
+  # step to run. But `always()` "returns true even when canceled", and the
+  # workflow-syntax docs warn against using it for anything that could hit a
+  # critical failure (a cancelled job can leave such a step running until the
+  # 360-minute timeout); their recommended form for exactly this case is
+  # `if: ${{ !cancelled() }}`. It runs on green, runs on red, and stands down on
+  # cancel. The `${{ }}` cannot be omitted here: an expression that starts with
+  # `!` must be braced or quoted, because `!` is reserved notation.
+  #
+  # WHY THIS IS NOT A DOOR REMOVED (the two forbidden shapes, both absent): no
+  # step was deleted, and NO step here carries `continue-on-error`, whose entire
+  # documented meaning is "prevents a job from failing when a step fails". A step
+  # run under `!cancelled()` that exits non-zero still fails the job exactly as
+  # before - the only change is that the steps after it also get to answer. AC#6's
+  # criterion is therefore per-step, not per-job: in ONE run the winsec gate may be
+  # red AND every step after it must carry its own conclusion.
+  test-windows:
+    runs-on: windows-latest
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: "Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"
+        shell: bash
+        # AC#6 (ticket 111): this gate is the step whose red used to eat the four
+        # steps below it. It stays FIRST inside the job (ticket 110 AC#5 - it must
+        # not sit behind `cgo build smoke`, which has been red before) and it is
+        # itself guarded so a red checkout/setup cannot make it inconclusive.
+        if: ${{ !cancelled() }}
+        # WHY THIS STEP EXISTS (ticket 110 AC#1, read off run 35591482293): the
+        # string `ok github.com/CarlosShao/wisp/internal/winsec` appeared ZERO
+        # times in that run's logs. The windows job's two test steps covered
+        # proc/secret/config and one -run on ./internal/risk/. So the package
+        # that decides whether a path really gets an ACL - the subject of tickets
+        # 94/103/106 - has never been tested on CI in its own right; 106 read as
+        # "CI-confirmed" only because internal/secret calls into it downstream.
+        # That indirection is exactly what fails here: the bug class is the
+        # machine's own temp-dir DACL, which a developer laptop does not share
+        # (ticket 106's hole does not reproduce on the box that wrote it).
+        #
+        # WHY IT IS FIRST IN THE JOB (AC#5): Actions stops running steps after
+        # the first failed one, and this job already owns a step that has been
+        # red before (`cgo build smoke`, run 35551819606) plus a red `PathResolver
+        # junction` step documented above. A gate placed below those is a gate
+        # that never produces a verdict - the shape this repo has now been bitten
+        # by three times (A54 static scan behind `go vet`, A61 env assertion
+        # without `if: always()`, and this ticket's zero-coverage package). It
+        # needs neither third_party nor wisp.exe, so putting it above them costs
+        # nothing and no step was moved into skippability or given
+        # continue-on-error (D22 run-away mode 6).
+        #
+        # EXPECTED RED-OR-GREEN IS NOT KNOWN FROM HERE, AND NOTHING IS TUNED TO
+        # MAKE IT GREEN: on a windows dev host the package read === RUN=64 /
+        # PASS=28 / FAIL=4 / SKIP=0 at HEAD 84e43af (all four failures were
+        # ticket 108's deliberate red-before-fix probes in
+        # seam_bypass_108_windows_test.go, cured by 108 in c02c609), and
+        # === RUN=71 / PASS=35 / FAIL=0 / SKIP=0 at HEAD b878b30. Both readings
+        # are local; the runner's own temp DACL is the thing this gate exists to
+        # measure (ticket 106's hole does not reproduce on a dev laptop), so the
+        # verdict owed to this step is a CI step-level one. If it is red on its
+        # first run that is a finding to register, not something to relax: no
+        # assertion is weakened, no test is excluded by name, no
+        # continue-on-error, and the package stays in the list.
+        run: bash scripts/winsec-tests.sh
+
+      - name: Cache third_party (deps.toml key)
+        if: ${{ !cancelled() }}
+        uses: actions/cache@v4
+        with:
+          path: third_party
+          key: wisp-third_party-${{ hashFiles('deps.toml') }}
+
+      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+        # AC#6: red on run 35551819606 before, and skipped behind the winsec gate
+        # since ticket 110 - a build gate that only gets to answer when the ACL
+        # tests pass. Now it always answers.
+        if: ${{ !cancelled() }}
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+        # AC#4 asked whether this package can be tested on CI at all, and forbade
+        # answering from the laptop. It was measured on both legs - see
+        # scripts/wisp-cli-tests.sh's header for the four readings. Short version:
+        # on windows its 33 top-level cases go PASS=33 FAIL=0 SKIP=0 rc=0 once the
+        # pinned third_party/sherpa-onnx DLLs are on PATH, which is exactly what
+        # the cache step and build.ps1 above produce; the same command without them
+        # is ticket 98's `0xc0000135` before a single test runs. On ubuntu the
+        # binary builds and runs but 19 of its cases are red, which is a finding
+        # for the package owner and is written up on the ticket rather than being
+        # wired into this job.
+        #
+        # WHY IT SITS HERE AND NOT HIGHER: it is the only step in the job that
+        # consumes another step's product, so it must follow the third_party
+        # staging. That is a dependency, not a masking risk - with `!cancelled()`
+        # on all five steps, being unable to run because the DLLs are absent is
+        # reported by the script as a named setup failure (a red) instead of an
+        # inconclusive skip.
+        shell: bash
+        if: ${{ !cancelled() }}
+        run: bash scripts/wisp-cli-tests.sh
+
+      - name: "Package coverage census (ticket 111 AC#1 + GUARD D)"
+        # WHY THIS STEP EXISTS. `--scope=census` is the ONLY call site GUARD D has:
+        # the audit that walks every package of `go list ./...` and refuses to exit
+        # 0 when a package compiles a test file on this platform while NO named tier
+        # claims it (scripts/portable-tests.sh:392-399, message :407-423). Before
+        # this step the census had ZERO CI call sites - `grep -c census ci.yml` was
+        # measured at 0 twice (ticket 111 r2 section 5.3, and by this leg at the
+        # HEAD below) - and the only things that ever ran it were cases inside the
+        # ticket 250 carrier script under scripts/, a carrier that is itself not
+        # wired into this workflow. Its filename is deliberately not spelled out in
+        # this file so the ruler "the carrier is not in CI" stays a clean grep
+        # reading for whoever takes it next; wiring the carrier into CI is a
+        # different decision from this one and is NOT made here. That is the
+        # mechanism this ticket was filed against: internal/session (2 test files,
+        # ticket 224) and internal/projctx (1, ticket 200) sat at zero coverage for
+        # four days after their tests landed because the ruler that could see them
+        # was a command nobody ran. A gate that only runs when someone remembers it
+        # is not a gate.
+        #
+        # WHY THE WINDOWS LEG AND NOT THE UBUNTU ONE (this is measured, not
+        # preference): on GOOS=linux `go list ./...` does not resolve the module -
+        # it exits 1 naming `build constraints exclude all Go files in
+        # .../sherpa-onnx-go-linux@v1.13.8` (reproduced three times independently:
+        # ticket 111 AC#4's reading, the script's own comment at
+        # scripts/portable-tests.sh:326-332, and probes/111/r2 section 1.2 at
+        # 2026-10-05 20:36:55, stdout 34 lines / stderr 264 bytes). Census then
+        # takes its refusal branch (portable-tests.sh:337-351) and exits 1 rather
+        # than build a roster on a partial package set - a refusal that can only
+        # UNDER-report holes. So ubuntu would not gain a verdict from this step, it
+        # would gain a permanent red whose cause is a package ubuntu can never run
+        # (ticket 98's wall), which is noise, not a gate. The leg where the plain
+        # form succeeds is the leg that carries it: GOOS=windows resolves all 35
+        # packages and the census exits 0 (r2 section 3.1).
+        #
+        # WHY IT SITS HERE IN THE JOB (between `cmd/wisp CLI tests` and `Portable
+        # windows tests`) - and the part of AC#5 this answers. This repo has been
+        # bitten three times by a gate that never produced a verdict because a red
+        # step stood above it (A54, A61, and this ticket's AC#6 with run
+        # 35599458439: step4 failure, steps 5-8 all `skipped`). The fix already in
+        # this job is ticket 111 AC#6's shape: EVERY non-setup step carries
+        # `if: ${{ !cancelled() }}`, so a step below a red one still answers. This
+        # step carries the same guard, which is why its position is about ORDER and
+        # not about dodging a red. Order chosen: census needs nothing staged - it
+        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+        # third_party, no DLLs on PATH - so it is placed below the two steps whose
+        # products it does not need and ABOVE the portable windows step whose
+        # denominator it audits: when `Portable windows tests` is red, the roster
+        # has already answered, and a package that lost its scope entry is named by
+        # this step instead of quietly shortening the one below. It is deliberately
+        # NOT above `Windows ACL sealing gate`: ticket 110 AC#5 fixed that step as
+        # first-in-job for its own reason, and a census red must not be able to
+        # delay the ACL evidence. No step was moved, edited, or deleted, and NO
+        # step here carries `continue-on-error` (D22 run-away mode 6) - a red
+        # census fails the job exactly like any other red.
+        #
+        # WHAT THIS STEP DOES NOT ADD, STATED SO IT IS NOT READ AS A SLIDE:
+        #   - no build tag of any kind is passed here, no environment-level tag
+        #     override, no skip flag by name. The live window cases stay
+        #     unwired, un-approved and un-measured by this step: ticket 111 r2
+        #     section 5.1 counted 11 such test files under internal/ball and
+        #     cmd/wisp, 5 of those files carrying 13 `t.Skip` calls whose literal
+        #     reason is `SKIP-LOUD: this host reports no ball window` (e.g.
+        #     cmd/wisp/resident_hotkey_live_258_windows_test.go:55), while
+        #     tools/d22scan/runtests.sh:98-102 treats ANY `--- SKIP` as fatal and
+        #     ends with "do not relax this script". Wiring them to a hosted runner
+        #     would be a permanent red that is not a product bug, and relaxing
+        #     anything to make them green is forbidden by AC#2 and AGENTS.md 1.1.
+        #     This step inherits that ruling untouched - the census branch it calls
+        #     executes no test binary at all, which is also why it cannot disturb a
+        #     milliseconds-sensitive package while another leg is reading it.
+        #   - it does not re-run GUARD A/B/C. It adds exactly one claim: every
+        #     package that compiles a test file here is claimed by a named tier.
+        #
+        # TODAY'S COLOR IS MEASURED, NOT ASSUMED, AND A RED IS A FINDING: census on
+        # a windows host at this HEAD prints
+        # `census totals: packages=35 ... unclaimed-with-tests=0` and exits 0
+        # (probes/111/r2/census-base.txt at HEAD 15d8b60e, re-taken by this leg at
+        # its own start HEAD - see probes/111/r3/evidence.md section 0). If the
+        # runner ever says otherwise, that is the hole this step exists to name;
+        # nothing here is tuned to make it green. Its teeth are pinned twice: r2's
+        # two real-tree mutants (sections 3.2/3.3, pulling internal/session and
+        # internal/plugin out of pin + scope gave rc=1 with the package named), and
+        # the two carrier cases added by this same leg - `census-unclaimed-package-goes-red`
+        # and `guard-d-slice-is-what-bites` - so the guard cannot be broken silently
+        # and cannot be wired as decoration.
+        shell: bash
+        if: ${{ !cancelled() }}
+        run: bash scripts/portable-tests.sh --scope=census
+
+      - name: Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+        # a SKIP as `ok`, and this scope contains one - internal/proc's
+        # TestHelperProcess, the re-exec child entry point, which skips every
+        # time it is not the child. Through the same runner, with shell: bash
+        # because windows defaults to pwsh: an unaccounted SKIP here is now a
+        # red step, and the one accounted case is named with its reason in the
+        # log and re-verified against the compiled test binary on every run.
+        #
+        # ./internal/risk/ ADDED (ticket 110 AC#4, tightening - closes R-93-4):
+        # R-93-4 was "the windows leg has no step that really runs
+        # TestSyncRegistryProbeLive", and there is now step-level evidence for
+        # the answer. Measured on a windows host at HEAD 84e43af: the case
+        # SKIPS (`no registry-grade sync record on this machine`,
+        # syncdirs_windows_test.go:133), so putting it in the RUN denominator
+        # would be either a permanent red (runtests.sh treats SKIP as fatal, by
+        # design) or a false green (bare `go test` prints `ok`) - which is the
+        # exact byte pattern ticket 93 was created to make impossible. What the
+        # windows leg does now, and did not before, is re-verify the accounting
+        # on THIS platform: because risk is in the scope, portable-tests.sh
+        # resolves the ledger row against the compiled WINDOWS test binary via
+        # `go test -list` and prints the row with its class and reason in this
+        # step's log. Rename the test, delete it, or bury it under a build tag,
+        # and this step goes red. Widening the scope to all of internal/risk
+        # also moved 201 previously windows-untested assertions into the
+        # denominator (measured on that host: PASS=201 FAIL=0 SKIP=0, rc=0).
+        # The package list moved INTO scripts/portable-tests.sh as the named
+        # `windows` scope (ticket 111 AC#2/AC#3): ci.yml carrying it inline is the
+        # "配置里有一行 = 它跑过了" claim this repo keeps getting bitten by. The
+        # script now pins the resolved import paths, so dropping an entry from the
+        # list fails the step instead of shortening the run, and every package it
+        # claims to test must print its own top-level result line.
+        shell: bash
+        if: ${{ !cancelled() }}
+        run: bash scripts/portable-tests.sh --scope=windows
+
+      - name: "PathResolver junction placeholder (real cases tickets 18/20)"
+        # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
+        # pathresolver_junction_windows_test.go, so on any runner where the name or
+        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+        # reports `ok` and matches nothing. Verified locally on Windows: PASS=1,
+        # SKIP=0, === RUN=1 through the script; the drifted pattern exits 1.
+        # DO NOT READ THIS WIRING AS A FIX OR A MASK: the step FAILS on
+        # windows-latest today for its own real reason (run 35551819606 job
+        # 106188167785: USERPROFILE's 8.3 form RUNNER~1 makes the A-tier anchor
+        # classify B, want ClassA), and runtests.sh propagates a non-zero `go
+        # test` exit code unchanged (registry A43② documents the same discipline
+        # for the vet failure that hid this gate).
+        shell: bash
+        if: ${{ !cancelled() }}
+        run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
+
+  # ------------------------------------------------------------- slo-smoke --
+  # Memory/handle subset on a hosted Windows runner (no audio hardware):
+  # Sleeping + Warm sampling + settle + the leak self-test (SPEC-11 §6).
+  slo-smoke:
+    runs-on: windows-latest
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Cache third_party (deps.toml key)
+        uses: actions/cache@v4
+        with:
+          path: third_party
+          key: wisp-third_party-${{ hashFiles('deps.toml') }}
+
+      - name: Build wisp.exe
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: SLO smoke gate
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+
+      - name: Upload SLO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-smoke-report
+          path: build/slo/slo-report.json
+          if-no-files-found: error
+
+  # -------------------------------------------------------------- slo-full --
+  # Full six-state SLO gate + settle + leak on the self-hosted Windows runner
+  # (interactive desktop-capable machine, label wisp-slo). Same script as
+  # slo-smoke - only the subset differs (SPEC-10 §3: script identical,
+  # scope unchanged). Merges require this green locally/self-hosted.
+  #
+  # Ticket 134 (shape C + B): the triggers stay - push keeps the merge gate
+  # live per commit and the daily schedule adds one interference-free sample.
+  # What changed is what a red MEANS: scripts/slo-check.ps1 now refuses to
+  # produce numbers when the machine is busy (its log says "machine-contended",
+  # D32's thresholds are not evaluated at all on that path). A machine-contended
+  # run is a VALIDITY refusal, not a performance regression: re-run it when the
+  # laptop is quiet, and never read a D32 number out of it. That refusal is
+  # deliberately not a skip (no `if:`, no continue-on-error, no -Skip switch) -
+  # D22 mode-6. If this job ever stops being triggered altogether, the pin in
+  # .github/workflows/slo-fresh.yml goes red (ticket 134 AC#3).
+  #
+  # Ticket 134 AC#6 (Q-36, owner 2026-09-23 "都按推荐") finishes the sentence
+  # above: a VALIDITY refusal no longer colours this job red either - the gate
+  # step exits 0 and prints "NO CONCLUSION (machine-contended)", because A115
+  # measured that a badge kept red by a busy laptop hides real breakage (ticket
+  # 131's Linux compile error, sick for 4h17m). The trade is two halves and the
+  # second one is the pay-off: "no valid sample" may never stay unnoticed, so
+  # probe P3 of scripts/slo-freshness.sh now ages on the newest uploaded
+  # slo-full-report artifact (a report exists only if numbers were produced)
+  # instead of on this job's record, and this laptop refusing to sample for
+  # days reddens that nail by itself. Cancel phrase: "slo-full 恢复判红".
+  # A run that DID sample and did not pass still exits 1 and still goes red.
+  slo-full:
+    runs-on: [self-hosted, wisp-slo]
+    env:
+      WISP_ENV: test
+      # The runner's job environment carries no msys64 on PATH: measured on the
+      # wisp-slo machine, `msys64` appears 0 times in _diag/Worker_*.log for the
+      # runs that failed here, while gcc lives at E:\work\base\msys64\mingw64\bin
+      # (on the interactive user PATH only). build.ps1's own fallback path is
+      # C:\msys64\..., which is the wrong drive here, so its discovery found no
+      # compiler and the step died before compiling anything. MINGW64_ROOT is
+      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+      # weakening the step. Verified locally with msys removed from PATH:
+      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+      MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Build wisp.exe (deps cached on the runner)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: SLO full gate (six states + settle + leak)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+
+      - name: Upload SLO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-full-report
+          path: build/slo/slo-report.json
+          # Ticket 134 AC#6 (was: error). On the machine-contended path the
+          # gate exits 0 WITHOUT a report - that is the whole trade the owner
+          # approved under Q-36 - and the step above this one stays
+          # unconditional (no `if:`, no continue-on-error, D22 mode-6), so the
+          # only way to keep "no conclusion" from being red is to stop
+          # demanding the file here. error would redden the job one step later
+          # and make AC#6 decoration.
+          #
+          # What replaces the missing-file error is NOT silence:
+          #   1. warn keeps an annotation on the run page ("No files were found
+          #      with the provided path ... No artifacts will be uploaded"),
+          #      verified against the very build the runner downloads today:
+          #      actions/upload-artifact@v4 -> ea165f8d65b6e75b540449e92b4886f43607fa02,
+          #      src/upload/upload-artifact.ts lines 31-52 - warn and ignore
+          #      both sit inside `if (filesToUpload.length === 0)`, so they
+          #      neither fail NOR create an empty artifact. That last part is
+          #      load-bearing: this artifact's existence is the input of probe
+          #      P3 in scripts/slo-freshness.sh (the record of "a valid sample
+          #      was produced"), so an empty placeholder would blind the nail.
+          #   2. slo-check.ps1 prints NO CONCLUSION (machine-contended) with
+          #      one line per reason and writes build/slo/slo-no-conclusion.json
+          #      (deliberately NOT the report path, so it is never uploaded).
+          #   3. slo-smoke below keeps `error`: the owner's ruling is about the
+          #      D32 merge gate on the contended laptop, and widening it to the
+          #      hosted PR gate was never on the table. Consequence stated
+          #      plainly: if a hosted runner ever refuses to sample, slo-smoke
+          #      still goes red - at this step instead of the gate step.
+          if-no-files-found: warn
+
+  # ------------------------------------------------------- lint-frontend ----
+  # Ticket 77 AC#6: frontend/ is real code now, so it gets a real gate.
+  #
+  # It is its OWN job on purpose. The disease this ticket keeps hitting (A44-1,
+  # written up in the lint job above) is "a step exists but never produced a
+  # verdict", because it sat below a step that has been red on ubuntu since
+  # fd8f838. Jobs are independent, so no other job's red can mask this one, and
+  # every step here is node-only: ticket 78's Go-on-Linux problem cannot reach
+  # it, and none of these steps may be moved behind another gate.
+  #
+  # D22 mode-6: no `if:`, no `continue-on-error`, no skip flag, no path filter.
+  # A skippable job is a job that will one day be skipped.
+  lint-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Matches the local toolchain the numbers on ticket 77 were taken
+          # with (node v24.9.0); Vite 8 / TS 6 need >= 20.19.
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: npm ci (lockfile is the only source of deps)
+        run: npm ci
+
+      - name: typecheck (tsc -b, noEmit per tsconfig.*.json)
+        run: npm run typecheck
+
+      - name: lint (oxlint)
+        run: npm run lint
+
+      - name: token drift guard (generated theme must equal the C21 table)
+        # AC#2's independent second channel: gen-tokens --check regenerates
+        # frontend/src/styles/tokens.generated.css from docs/evidence/s1 and
+        # fails on any byte of difference, so nobody can hand-edit the theme.
+        run: npm run tokens:check
+
+      - name: build (vite build -> frontend/dist, the bytes go:embed carries)
+        run: npm run build
+
+      - name: L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)
+        # Renamed 2026-09-25: the step's content grew at 430ad57 (frontend session,
+        # render-l2.tsx +126/-0, additions only) to assert the PLAN.md:3481 shapes
+        # and the absence of a panel-side allow button. The old name read as if it
+        # only checked fields. Runs before this commit report the previous
+        # spelling, "L2 card renders the real risk fields (AC#3 render evidence)".
+        # react-dom/server paints src/App.tsx over fixtures/l2-card-fs-delete.json,
+        # which is verbatim `wisp.exe panel-assets -l2 fs.delete -irreversible delete`
+        # output. Every assertion is derived from that JSON, and the vendored
+        # Beautiful UI demo questionnaire appearing anywhere is a failure - so
+        # this step goes red if the card ever renders library props.
+        run: npm run render:l2 -- fixtures/l2-card-fs-delete.json
+
+      # Three more render harnesses existed as package.json scripts with no step
+      # calling them (orchestrator, 2026-09-25): the gate could not go red for a
+      # regression in any of them. Each one derives its expectations from frozen
+      # text and throws when that text moves, so an unrun step here would be a
+      # silent denominator. Local colors before wiring: all three exit 0 on
+      # Windows at cd87354; the run itself is the cross-platform proof.
+      - name: Composer states paint the real envelope (render evidence)
+        # react-dom/server paints the composer over fixtures/composer-states.html:
+        # no-host attached, workspace chosen with a stored video, and an
+        # unsupported attachment told to the user. Red if a state stops painting.
+        run: npm run render:composer
+
+      - name: Streaming output honours PLAN.md's SSE row (render evidence)
+        # Reads PLAN.md's "SSE 流式输出" row and throws if that row or the tokens
+        # it names are gone, so this cannot pass by quietly checking nothing.
+        run: npm run render:stream
+
+      - name: Nav rail names only icons PLAN.md's frozen list carries (render evidence)
+        # Q1 = 甲: 9 rail rows are checked against the frozen PLAN.md §17.4 list,
+        # the two interim substitutions (chat, cost) must be exactly two, and the
+        # nav layer must hold no view state of its own. Throws when the parser
+        # loses a name the list does carry - a broken ruler refuses to conclude.
+        run: npm run render:nav
+
