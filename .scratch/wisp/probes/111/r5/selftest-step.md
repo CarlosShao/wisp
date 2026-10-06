@@ -57,7 +57,7 @@ portable-tests-selftest.sh: 111 GUARD D universe = core_pin (27) + github.com/Ca
 | `date '+%Y-%m-%d %H:%M %z'` | `2026-10-06 14:19 +0800` | r5 记 `10-06 13:25`，本腿晚 54 分钟 |
 | `git rev-parse --short HEAD` | `3b8873c9`（起手瞬间）；写件期间 HEAD 又推进两枚：`b1b7a770`（14:23）、`ee22fafc`（14:34） | r5 的锚 `15fbf18f` **是** `1309757b` 的父提交；`git merge-base --is-ancestor 1309757b HEAD` ⇒ 真，骨架已入库 |
 | `git status --porcelain -- .github` | **0 行**（复量，与编排者 14:2x 现量一致） | ⚠ 这把尺的真含义由本腿澄清，见 §1.0：0 行＝"ci.yml 没有**未提交**改动"，**不等于**"CI 里还没有那一步" |
-| `sh scripts/portable-tests-selftest.sh` | **rc=0 ／ `:224` ＝ `32 case(s) ran, 0 assertion(s) failed`** | **与 r5 逐字一致** ⇒ 判据未动、无差异需具名（"末尾两行"那一处 drift 另说，见 §4 d） |
+| `sh scripts/portable-tests-selftest.sh` | **rc=0 ／ `:224` ＝ `32 case(s) ran, 0 assertion(s) failed`** | **与 r5 逐字一致** ⇒ 判据未动、无差异需具名（那处"末尾两行"的表述 drift 已结案，见 §4 d） |
 
 票面框尺复量：`grep -c '^- \[ \]'` ＝ **4**、`grep -c '^- \[x\]'` ＝ **6**，与 r5 同值。⛔ 这 4 枚框一枚不归本腿，本腿一枚不勾。
 
@@ -203,7 +203,7 @@ NO HITS FILE = the tripwire go was never executed
 
 ### 第一把：改前／改后各一发 `sh scripts/portable-tests-selftest.sh`
 
-⚠ 先讲清这把尺在"本腿净改动 0 行"前提下**怎么读**：派单要的形状是"同一把尺在两向各量一次且对得上"。本腿把**四发**一次摆全（含 r5 那枚腿的基线），**判据一字未动、未改任何尺的措辞**。
+⚠ 先讲清这把尺在"本腿净改动 0 行"前提下**怎么读**：派单要的形状是"同一把尺在两向各量一次且对得上"。本腿把**五发**一次摆全（含 r5 那枚腿的基线，与交件后的同尺第二遍），**判据一字未动、未改任何尺的措辞**。
 
 | # | 起跑锚 | 启动器（命令原文） | rc | `:224` 计数行 | 末行 |
 |---|---|---|---|---|---|
@@ -211,6 +211,9 @@ NO HITS FILE = the tripwire go was never executed
 | 2 | `3b8873c9`（本腿起手） | `sh scripts/portable-tests-selftest.sh` | **0** | `portable-tests-selftest.sh: 32 case(s) ran, 0 assertion(s) failed` | GREEN |
 | 3 | `b1b7a770`（ci.yml 内容与 `1309757b` 逐字节同） | `bash scripts/portable-tests-selftest.sh`（＝CI 那一步逐字命令） | **0** | 与 #2 逐字一致 | GREEN |
 | 4 | 同上 | 同上＋绊线假 `go` 置于 PATH 最前 | **0** | 与 #2 逐字一致 | GREEN |
+| 5 | `3d113f3c`（**本腿交件之后**复跑，第二遍同尺） | `sh scripts/portable-tests-selftest.sh` | **0** | 与 #2 逐字一致 | GREEN |
+
+★**同尺第二遍一律相同**（§4 那条"第二遍读数不同就停手"的规矩，本腿跑过没被触发）：`grep -c portable-tests-selftest ci.yml`＝5、`grep -c 'Portable tests carrier self-test'`＝1、`lint` 作业 `- name:`＝11、票面框＝4/6、ci.yml 与 HEAD＝IDENTICAL、改前尺仍＝0 —— 六把全与第一遍逐字同值。
 
 第 2／3／4 发末尾三行原文（三次输出**逐字节相同**；本腿实测 `diff` #2 与 #3 只在 `== case <name>: rc=N log=/tmp/tmp.<X>/….log` 那几行的**临时目录名**上报行，计数行与 verdict 行不进 diff）：
 
@@ -221,7 +224,7 @@ portable-tests-selftest.sh: GREEN - every seeded anomaly was refused, and the cl
 ```
 
 ⇒ **两向一致：rc=0、32 枚 case、0 条断言失败**，与 r5 骨架记的数**逐字相同 ⇒ 无差异需具名，未改判据凑数**。
-⚠ "末尾那两行"要打折读：现量末尾两行是 `scratch kept` ＋ `GREEN`，**case 计数行在 `:224`**；r5 骨架写的"`:224-226`"里 224 正是那枚计数行，它把三行说成了两行。drift 成因本腿只核到一半 ⇒ **§4 d**，不替它编解释。
+⚠ "末尾那两行"要打折读：现量末尾两行是 `scratch kept` ＋ `GREEN`，**case 计数行在 `:224`**；r5 骨架写的"`:224-226`"里 224 正是那枚计数行，它把三行说成了两行。⇒ **这一处已在 §4 d 结案**（r5 那发的原始日志仍在盘上，形状与本腿逐字同形，drift 在措辞而不在脚本／锚／runner）。
 
 ### 第二把：`sh scripts/d22scan.sh`（纯净快照 rc=0、各 scope 不降）
 
@@ -288,16 +291,33 @@ ban #8 design/ = 39 工作树 / 30 快照          ban #8 frontend/=85   ban #8 
 ⇒ 两把尺**指向同一个结论**（这一步不 exec 真 go），但**不是同一把尺**。本腿不把第一把"修正"成 0 命中，也不因第一把的字面不成立就否认第二把。
 **建议（不是本腿能定的）**：今后引用这一步的安全性时以**绊线那次**为准，词面 grep 只作辅读。⛔ 判据本身一字未动，这一条只涉及"该用哪把尺说话"，请编排者按**尺子写法**登记，不要读成判据变更。
 
-**d) "末尾两行"在两枚腿之间不一致，本腿只追到一半，⛔ 不替它编因。**
+**d) ★"末尾两行"在两枚腿之间的文字不一致——本腿**已结案**，结案凭据是 r5 那发的原始日志还在盘上。**
 
-| 腿 | 时刻／锚 | 它记的 `tail` | 本腿现量同一发应读到什么 |
-|---|---|---|---|
-| r5 | 13:4x／`15fbf18f` | `32 case(s) ran…` ＋ `GREEN…` 两行 | — |
-| r5b | 14:2x 起／`3b8873c9`、`b1b7a770` | — | `carrier scratch kept…` ＋ `GREEN…`，**计数行在 `:224`** |
+⚠ 先自报一条本腿自己的尺子缺陷：`3d113f3c` 那一笔里这一条写的是"本腿**没有** r5 那发的原始日志（`/tmp/selftest-111r5-first.txt` 是否仍在盘上，本腿**未查**）"——**那句是未查就下的判断**。本腿随后查了，文件在，于是这条从"追不到因"改判为"有因且已核"。⛔ 不改写已入库那一笔（AGENTS.md §1.4：要更正只能追加），本节这版是追加更正。
 
-已核的一半：那行 `carrier scratch kept` 由 **`6307e369`（10-02 09:19，`ticket 250 AC#1/AC#2: keep go list's stderr out of portable-tests.sh's denominator`）**引入，`git log -S 'carrier scratch kept'` 只回这一枚，且 `6307e369` **早于**两枚腿的起手时刻 ⇒ **不是 r5 或本腿动脚本造成的**。
-⛔ 未核的一半：按这个日期，r5 那发**本该**也把 `scratch kept` 读在倒数第二位——它没有。本腿**没有** r5 那发的原始日志（`/tmp/selftest-111r5-first.txt` 是否仍在盘上，本腿未查，且它不是本腿该写的面），无法区分三种可能：① 它引的是 `sed -n '224,226p'` 而非 `tail -2`（它自己写的行号 `:224-226` 更像这一种）；② 它跑在另一枚内容不同的锚上；③ 别的。
-⇒ **两把原文都留在上表**。不受影响的结论：**case 数与断言数（32 枚／0 条）两枚腿逐字一致**，第一把尺的两向对齐不靠这三行成立。⛔ 本腿不改写 r5 那节的任何字。
+现量（`/tmp/selftest-111r5-first.txt`，mtime `10-06 13:28`，12990 字节／**226 行**）：
+
+```
+:224  portable-tests-selftest.sh: 32 case(s) ran, 0 assertion(s) failed
+:225  portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.MZdK7fZnXZ (rules: …)
+:226  portable-tests-selftest.sh: GREEN - every seeded anomaly was refused, and the clean scope passed.
+
+$ tail -2 /tmp/selftest-111r5-first.txt
+carrier scratch kept …
+GREEN …
+```
+
+⇒ **r5 那一发的真实形状与本腿各发逐字同形**（计数行在 224、`scratch kept` 在 225、GREEN 在 226）；载体里那行 `scratch kept` 由 **`6307e369`（10-02 09:19）**引入，早于 r5 起手，所以它**本来就该在那儿**。
+⇒ 所谓 drift **不在脚本、不在锚、不在 runner，而在 r5 骨架节的措辞**：它把这一段标成"输出**末尾两行**原文（`first.txt:224-226`）"，却只引了 224 与 226、**把中间那行 225 漏掉了**——**它自己给的行号范围（`:224-226`）是三行、是对的**，错在"两行"这个标签与那一行被省。
+⇒ 加一把更硬的尺（本腿两发对 r5 那一发，剥掉临时路径后比字节）：
+
+```
+$ diff <(grep -vE 'tmp\.|/tmp/' /tmp/selftest-111r5-first.txt) <(grep -vE 'tmp\.|/tmp/' /tmp/selftest-111r5b-A.txt)
+IDENTICAL_MODULO_TEMP_PATHS     （diff 0 行输出）
+```
+
+⇒ **两枚腿的基线不只是"数一样"（32／0），是剥掉临时目录名后逐字节相同。** 这反而**加强**第一把尺：`sh`／`bash` 两种启动器产出的字节也一致（§3 第一把 #2 vs #3）。
+⛔ **本腿不改写 r5 骨架节的任何一字**（含那句"输出末尾两行"）——它是一枚已入库腿的原文，本件只在此处给出复核与更正；要把票面/件面那类"行号范围与文字标签不符"的写法立规矩，属编排者裁定，不归本腿。
 
 **e) ★AC#5 要求的"非实现者复跑件"不在本腿射程，本腿不冒充它。**
 票面 `AC#5` 原文：`bash -n／sh scripts/d22scan.sh 那两把我自己的门禁尺今天**没有非实现者的复跑件**……等 111-r5 一并取`。
@@ -309,7 +329,7 @@ ban #8 design/ = 39 工作树 / 30 快照          ban #8 frontend/=85   ban #8 
 ⛔ 本腿**不**把这条写成"CI 上不会红"。三处只在未来才响的残余，具名留这儿：
   1. **`/bin/sh` 的分布**：本步写 `bash …` 已经避开主风险，但 `portable-tests.sh:694` 用 `sh "$strict"` 起 `runtests.sh`——今天 `runtests.sh` 是唯一 dash-clean 的一枚（§2 第 3 条实测），一旦有人把它写成 bash-only，这一步会在 ubuntu 上以**语法错**红，而**这枚红不是它想报的那个 finding**。本腿不修（要动 `scripts/**`，越界）。
   2. **≈2 分 38 秒**（本地）落进 `lint` 作业：本腿**没有** ubuntu 侧耗时读数，不能断言它在 CI 上也在这个量级；若编排者取数发现它显著更慢，那是新问题，不归本腿现在改判据。
-  3. **`mktemp` 落点**：**三处**同形回退——`:116`（`work=$(mktemp -d 2>/dev/null || echo "$root/.portable-selftest.$$")`）、`:106` 与 `:223`（`shadow=$(mktemp -d 2>/dev/null || echo "$root/.portable-shadow.$$")`）。若 runner 上 `mktemp` 失败，回退路径落在**仓库根**里（`.portable-selftest.$$` / `.portable-shadow.$$`），会在工作树留残留件（载体自己那条"temp files are created, not deleted"的规矩更是如此）。⛔ 本腿**没有**判它会不会发生（本机 `mktemp` 显然可用，四发都写在 `/tmp/tmp.*`），只记这条形状存在，以及"若在 CI 上真发生，它会以**未跟踪残留件**出现而不是以红出现"——这一枚是取数时才响的。
+  3. **`mktemp` 落点**：**三处**同形回退——`:116`（`work=$(mktemp -d 2>/dev/null || echo "$root/.portable-selftest.$$")`）、`:106` 与 `:223`（`shadow=$(mktemp -d 2>/dev/null || echo "$root/.portable-shadow.$$")`）。若 runner 上 `mktemp` 失败，回退路径落在**仓库根**里（`.portable-selftest.$$` / `.portable-shadow.$$`），会在工作树留残留件（载体自己那条"temp files are created, not deleted"的规矩更是如此）。⛔ 本腿**没有**判它会不会发生（本机 `mktemp` 显然可用，各发都写在 `/tmp/tmp.*`），只记这条形状存在，以及"若在 CI 上真发生，它会以**未跟踪残留件**出现而不是以红出现"——这一枚是取数时才响的。
 
 **g) ★一处本腿读不出来的东西：`design/` 的 9 枚差集。**
 §3 第二把里 `ban #8 design/` 两发不同（39／30）。本腿**只读计数、不读内容面**（`design/**` 零读零写零转述是派单地界），因此**无法**自证这 9 枚全是未跟踪件、也不怀疑这个数——它由"工作树比 `git archive HEAD` 多出未跟踪内容"这一条机制解释，且方向（39 > 30）与"覆盖更宽"同向。⇒ 若编排者要把它当"纯净快照的 scope 降了"来处理，**先复量**，不要以本件为凭。
@@ -345,6 +365,6 @@ ban #8 design/ = 39 工作树 / 30 快照          ban #8 frontend/=85   ban #8 
 
 1. 取数：推送后的 run 里 `lint` 作业那一步的**颜色与日志**——CI 日志编号应为 **step 14**（YAML 第 13 枚 ＋ `Set up job`；换算律由票面 `AC#2 翻` 那一条的 `step8 gofmt`／`step12 staticcheck` 两枚读数钉住，该行 **HEAD＝`:313`／本腿追加后＝`:314`**，见 §1.2 末行的漂移注记），步名逐字
    `Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)`。**只有这个能收 AC#3 的第二半。**
-2. 裁定 §4 b（`1309757b` 名实不符）与 §4 c（该用哪把尺说话）；§4 d 那处 tail drift 若要追因，需要 r5 那发的原始日志文件。
+2. 裁定 §4 b（`1309757b` 名实不符）与 §4 c（该用哪把尺说话）。§4 d 那处"末尾两行"**本腿已自行结案**（原始日志在盘上、drift 在 r5 骨架节措辞），但**本腿在 `3d113f3c` 那一笔里先写了"没有原始日志／未查"、随后才查**——这条自报的尺子缺陷要不要记账，归编排者裁（本腿不改写已入库那一笔，只在此追加更正）。
 3. AC#5 的"非实现者复跑件"仍未闭（§4 e）：请派一枚只读腿复跑 §3 第二把／第三把 f 行。
 4. ⛔ 框仍归编排者：本腿未勾任何一枚，票面 4 枚零勾框（AC#3／AC#5／AC#7／AC#8）数量与状态未变。

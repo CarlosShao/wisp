@@ -1,0 +1,31 @@
+probe(111/r5b): 交件后补两笔 —— §4 d 自行结案（r5 那发的原始日志在盘上，drift 在措辞不在脚本／锚／runner）＋同尺第二遍六把全同值
+
+只动本件一个文件（`.github/workflows/ci.yml` 依旧 0 行改动，票面一字未动 —— 票面 Progress log 只许追加一行，
+那一行已在 3d113f3c 落完，本笔不再碰票面；框仍 4 枚零勾／6 枚已勾）。
+
+一、★§4 d 改判并自报一条本腿自己的尺子缺陷
+上一笔那一节写的是"本腿没有 r5 那发的原始日志（/tmp/selftest-111r5-first.txt 是否仍在盘上，本腿未查）"——
+**那句是未查就下的判断**。本腿随后查了：文件在（mtime 10-06 13:28、12990 字节、226 行），现量
+  :224 = `32 case(s) ran, 0 assertion(s) failed`
+  :225 = `carrier scratch kept at /tmp/tmp.MZdK7fZnXZ (rules: …)`
+  :226 = `GREEN - every seeded anomaly was refused, and the clean scope passed.`
+⇒ r5 那一发的真实形状与本腿各发**逐字同形**；`carrier scratch kept` 由 6307e369（10-02 09:19）引入、早于 r5 起手，
+它本来就该在那儿。⇒ 所谓"末尾两行"drift **不在脚本、不在锚、不在 runner，而在 r5 骨架节的措辞**：它把这段标成
+"末尾两行"却给了三行的行号范围 `:224-226`，并漏引中间那行 225。
+加一把硬尺：`diff <(grep -vE 'tmp\.|/tmp/' r5 那发) <(grep -vE 'tmp\.|/tmp/' 本腿 #2 那发)` ⇒ **0 行输出**，
+即两枚腿的基线不只是数一样（32／0），是剥掉临时目录名后**逐字节相同**。
+⛔ 不改写 3d113f3c 那一笔（AGENTS.md §1.4：要更正只能追加），原文与更正在同一节里都在；
+也不改 r5 骨架节任何一字（含那句"输出末尾两行"）——那是已入库腿的原文。"行号范围与文字标签不符"要不要立规矩，归编排者裁。
+
+二、★同尺第二遍（交件后复跑，§4 那条"第二遍不同就停手"的规矩没被触发）
+`grep -c portable-tests-selftest ci.yml`＝5 ／ `grep -c 'Portable tests carrier self-test'`＝1 ／
+`lint` 作业 `- name:` 枚数＝11 ／ 票面框＝4 零勾·6 已勾 ／ `git diff --quiet HEAD -- .github/workflows/ci.yml`＝IDENTICAL ／
+改前尺 `git show 1309757b^:… | grep -c`＝0 —— **六把全与第一遍逐字同值**；
+`sh scripts/portable-tests-selftest.sh` 第五发 **rc=0、`:224`＝`32 case(s) ran, 0 assertion(s) failed`**，
+已作为第 5 行进 §3 第一把那张表（原"四发"措辞随之改成"五发／各发"，本件内 0 处残留）。
+
+三、⛔ 本腿仍不宣称 AC#3 完成：交付物＝载体在 CI 上可跑＋本地两向读数；票面那句"CI 里一步真跑该 selftest 并让它为
+这枚正控红/绿各一次"仍未收（AC#5／AC#8 同判），取数归编排者（CI 日志编号应为 step 14＝YAML 第 13 枚＋Set up job）。
+
+零 go 命令；`docs/**`／`scripts/**`／`cmd/**`／`internal/**`（含 236-r2 在飞的 internal/tools/**，全程未读其工作树
+内容面）／`.github` 一字不碰；frontend/**、design/** 零读零写零转述；未读 probes/236/**；未加 -tags winlive；只 commit 不 push。
