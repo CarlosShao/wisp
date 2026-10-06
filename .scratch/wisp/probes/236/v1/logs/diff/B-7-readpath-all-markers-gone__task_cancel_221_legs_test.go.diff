@@ -1,0 +1,11 @@
+--- HEAD/internal/tools/task_cancel_221_legs_test.go
++++ overlay/D:/tmp/wisp236v1/mut/B-7-readpath-all-markers-gone/task_cancel_221_legs_test.go
+@@ -221,7 +221,7 @@
+ // in the same landing as the wiring - which this file proves by asserting the
+ // wiring and the marker in one leg - and task.list's line is untouched.
+ func Test221DeferredMarkerForCancelLiftedButListStillMarked(t *testing.T) {
+-	src, err := os.ReadFile("task.go")
++	src, err := os.ReadFile("D:/tmp/wisp236v1/mut/B-7-all-markers-gone/task.go")
+ 	if err != nil {
+ 		t.Fatalf("读不到 task.go（这把尺的落点是包内源文件）：%v", err)
+ 	}

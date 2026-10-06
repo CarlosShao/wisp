@@ -1,0 +1,11 @@
+--- HEAD/internal/tools/subagent_197.go
++++ overlay/D:/tmp/wisp236v1/mut/v-m1d2-keep-parentonly/subagent_197.go
+@@ -253,7 +253,7 @@
+ 	if t.d.Roster == nil {
+ 		return Result{Text: "任务名册未接线（fail-closed：拒绝派生子代理，派生了也没有地方登记它）", IsError: true}, nil
+ 	}
+-	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
++	if t.d.ParentTools == nil {
+ 		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+ 	}
+ 	parentID := CorrelationID(ctx)

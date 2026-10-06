@@ -1,0 +1,9 @@
+time=2026-10-06T18:09:09.209+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+time=2026-10-06T18:09:09.213+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8a73fee3-eae2-453d-8116-7893973ca64e owner=tools
+    failclosed_236_teeth_test.go:122: V1READ3(branch-gone fall-through)-IsError=true ErrorClass="tool" RiskLevel="L1"
+    failclosed_236_teeth_test.go:127: task.go:707 那一支的完整字面量没被原样说出（got "拒绝停止：8a73fee3-eae2-453d-8116-7893973ca64e 是任务 parent-task-197 派生的孩子，不是调用者  的孩子——只有父任务能停自己的孩子，兄弟之间、旁支之间都停不了（票 221 AC#3 的正控）。", want "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）"）——若 got 是「不是调用者的孩子」那一支，说明 caller == "" 的拒绝分支已经不在了
+--- FAIL: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.041s
+FAIL

@@ -1,0 +1,11 @@
+--- HEAD/internal/tools/task.go
++++ overlay/D:/tmp/wisp236v1/mut/A-2-cancel-roster-false/task.go
+@@ -696,7 +696,7 @@
+ 	if target == "" {
+ 		return Result{Text: "缺少 task_id 参数", IsError: true}, nil
+ 	}
+-	if t.d.Roster == nil {
++	if false {
+ 		return Result{Text: "任务名册未接线（fail-closed：拒绝停掉任何任务——名册才是唯一的停法）", IsError: true}, nil
+ 	}
+ 	// The caller's identity is the host's, not an argument: CorrelationID is what

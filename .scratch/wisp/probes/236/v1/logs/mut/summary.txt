@@ -1,0 +1,26 @@
+=== B-3-m2c-register-note rc=1 PASS=203 FAIL=3 SKIP=0 panic-lines=0
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+--- FAIL: TestEveryRegisteredToolIsClassifiedForMarking175r2
+FAIL	github.com/CarlosShao/wisp/internal/tools	13.801s
+FAIL	github.com/CarlosShao/wisp/internal/tools	13.801s
+=== B-4-m2b-register-list rc=1 PASS=202 FAIL=4 SKIP=0 panic-lines=0
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+--- FAIL: TestEveryRegisteredToolIsClassifiedForMarking175r2
+FAIL	github.com/CarlosShao/wisp/internal/tools	14.210s
+FAIL	github.com/CarlosShao/wisp/internal/tools	14.210s
+=== B-5-m2e-unregister-cancel rc=1 PASS=196 FAIL=10 SKIP=0 panic-lines=0
+--- FAIL: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired
+--- FAIL: Test221TaskCancelIsRegisteredAtItsFrozenLevel
+--- FAIL: Test221ParentStopsItsOwnChildRowAndStreamSettle
+--- FAIL: Test221SubagentCannotStopSiblingOrItself
+--- FAIL: Test221ParentCancellationStillDoesNotCascade
+--- FAIL: Test221TaskCancelUnderNoGateStopsAtTheWindow
+--- FAIL: Test221EveryPromisedTaskNameIsRegistered
+--- FAIL: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+--- FAIL: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+FAIL	github.com/CarlosShao/wisp/internal/tools	43.960s
+FAIL	github.com/CarlosShao/wisp/internal/tools	43.960s

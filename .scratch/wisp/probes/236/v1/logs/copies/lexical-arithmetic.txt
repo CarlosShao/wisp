@@ -1,0 +1,7 @@
+pos-ctrl: DEFERRED-lines=3 co-carry-task.list=2 co-carry-task.cancel=0
+B-1-teeth-m13: DEFERRED-lines=2 co-carry-task.list=1 co-carry-task.cancel=0
+B-2-inject-cancel-marker: DEFERRED-lines=4 co-carry-task.list=2 co-carry-task.cancel=1
+B-7-all-markers-gone: DEFERRED-lines=1 co-carry-task.list=0 co-carry-task.cancel=0
+B-3-m2c-register-note: DEFERRED-lines=3 co-carry-task.list=2 co-carry-task.cancel=0
+B-4-m2b-register-list: DEFERRED-lines=3 co-carry-task.list=2 co-carry-task.cancel=0
+B-5-m2e-unregister-cancel: DEFERRED-lines=3 co-carry-task.list=2 co-carry-task.cancel=0

@@ -1,0 +1,26 @@
+### final restore proof (after 25 overlay runs + full suite)
+internal/tools/task.go disk=4138177e29ffff427776a73eb0d61a9b
+internal/tools/task.go head=4138177e29ffff427776a73eb0d61a9b
+internal/tools/subagent_197.go disk=06caf8f5465ff1c47c310da27fe3ffab
+internal/tools/subagent_197.go head=06caf8f5465ff1c47c310da27fe3ffab
+internal/tools/task_cancel_221_legs_test.go disk=13a0ba39e30fb95ad4f2be88beed4fc7
+internal/tools/task_cancel_221_legs_test.go head=13a0ba39e30fb95ad4f2be88beed4fc7
+internal/tools/failclosed_236_teeth_test.go disk=c793966c2730c64896d9512de597ddf4
+internal/tools/failclosed_236_teeth_test.go head=c793966c2730c64896d9512de597ddf4
+internal/tools/tasklist_deferred_236r3_teeth_test.go disk=21b53d52ac87b893b74fdd9828f2f3aa
+internal/tools/tasklist_deferred_236r3_teeth_test.go head=21b53d52ac87b893b74fdd9828f2f3aa
+### porcelain five prefixes
+(0 lines above = clean)
+### drift since my anchor ea5b2dc9
+7329f07f 17:54 probes(evidence-close-6 追加更正三处＋票 267 补一条"别重派已在队列的腿")
+5d60cf73 17:51 probes(evidence-close-6 §2 治理账三把尺＋§3 心虚五处＋§4 判不动/要 owner/要搬运三张清单)
+0a0d908a 17:47 probes(evidence-close-6 §1.5 票 267)：六栏填实＋两把存在尺分歧（名册 0 枚 vs 子串 1 枚）
+e9d41598 17:43 probes(evidence-close-6 §1.4 票 254)：六栏填实＋残余①那把尺已过期（现量读数）
+8ed35f41 17:39 probes(evidence-close-6 §1.3 票 250 六栏＋票 78 段两处追加更正)
+08f3543a 17:33 probes(evidence-close-6 §1.2 票 115)：六栏填实＋三处名实矛盾的尺证据
+c4522b6d 17:30 probes(evidence-close-6 §1.1 票 78)：六栏填实
+### did drift touch internal/ or cmd/ ?
+0
+### boxes now
+7
+0

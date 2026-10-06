@@ -1,0 +1,8 @@
+time=2026-10-06T18:09:46.518+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R2TaskCancelRefusesWhenRosterIsUnwired
+    failclosed_236_teeth_test.go:152: V1READ4(branch-gone fall-through)-IsError=true ErrorClass="tool" RiskLevel="L1"
+    failclosed_236_teeth_test.go:157: task.go:699 那一支的完整字面量没被原样说出（got "查不到这个任务 target-236r2：v1 的任务名册只在本进程内，重启后不保留（票 164 定案②）。这是「没有这条记录」，不是「它已经停了」。", want "任务名册未接线（fail-closed：拒绝停掉任何任务——名册才是唯一的停法）"）——若 got 是「查不到这个任务」那一支，说明 Roster == nil 的拒绝分支已经不在了
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.074s
+FAIL

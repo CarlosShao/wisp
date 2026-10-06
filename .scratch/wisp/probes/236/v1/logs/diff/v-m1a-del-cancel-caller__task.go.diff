@@ -1,0 +1,12 @@
+--- HEAD/internal/tools/task.go
++++ overlay/D:/tmp/wisp236v1/mut/v-m1a-del-cancel-caller/task.go
+@@ -704,9 +704,6 @@
+ 	// child it is by editing parameters. Same source task.spawn uses to fill in
+ 	// ParentTaskID, which is what makes the two sides agree by construction.
+ 	caller := CorrelationID(ctx)
+-	if caller == "" {
+-		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）", IsError: true}, nil
+-	}
+ 	rec, known := t.d.Roster.Look(target)
+ 	if !known {
+ 		return Result{Text: fmt.Sprintf(

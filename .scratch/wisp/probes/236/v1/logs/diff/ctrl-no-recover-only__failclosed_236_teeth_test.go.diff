@@ -1,0 +1,14 @@
+--- HEAD/internal/tools/failclosed_236_teeth_test.go
++++ overlay/D:/tmp/wisp236v1/mut/ctrl-no-recover-only/failclosed_236_teeth_test.go
+@@ -229,11 +229,6 @@
+ // returns is treated as a pass.
+ func spawnGuarded(t *testing.T, h *sub197Harness, label, prompt string) (out Result) {
+ 	t.Helper()
+-	defer func() {
+-		if rec := recover(); rec != nil {
+-			out = Result{Text: fmt.Sprintf("panic（guard 摘掉后不是拒绝而是崩）: %v", rec), IsError: true}
+-		}
+-	}()
+ 	return h.spawn(t, t.Context(), label, prompt)
+ }
+ 

@@ -1,0 +1,12 @@
+--- HEAD/internal/tools/task.go
++++ overlay/D:/tmp/wisp236v1/mut/v-m1b-del-cancel-roster/task.go
+@@ -696,9 +696,6 @@
+ 	if target == "" {
+ 		return Result{Text: "缺少 task_id 参数", IsError: true}, nil
+ 	}
+-	if t.d.Roster == nil {
+-		return Result{Text: "任务名册未接线（fail-closed：拒绝停掉任何任务——名册才是唯一的停法）", IsError: true}, nil
+-	}
+ 	// The caller's identity is the host's, not an argument: CorrelationID is what
+ 	// the bridge stamps from the call it dispatched, so a model cannot name whose
+ 	// child it is by editing parameters. Same source task.spawn uses to fill in

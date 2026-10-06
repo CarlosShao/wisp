@@ -1,0 +1,10 @@
+--- HEAD/internal/tools/task.go
++++ overlay/D:/tmp/wisp236v1/mut/B-5-m2e-unregister-cancel/task.go
+@@ -600,7 +600,6 @@
+ func BuiltinTaskEntries(d TaskDeps) []Entry {
+ 	return []Entry{
+ 		{Tool: taskOutput{d: d}, Decl: TaskOutputDecl()},
+-		{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
+ 	}
+ }
+ 

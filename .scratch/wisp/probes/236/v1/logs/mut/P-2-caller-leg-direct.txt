@@ -1,0 +1,7 @@
+time=2026-10-06T18:08:26.646+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+time=2026-10-06T18:08:26.650+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-daa875cb-b9b9-4b51-91de-cafa1628b5c2 owner=tools
+    failclosed_236_teeth_test.go:122: V1READ2-ErrorClass="tool" IsError=true RiskLevel="L1" text-equal-literal=true
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.043s

@@ -1,0 +1,11 @@
+--- HEAD/internal/tools/task.go
++++ overlay/D:/tmp/wisp236v1/mut/A-6-cancel-caller-noterror/task.go
+@@ -705,7 +705,7 @@
+ 	// ParentTaskID, which is what makes the two sides agree by construction.
+ 	caller := CorrelationID(ctx)
+ 	if caller == "" {
+-		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）", IsError: true}, nil
++		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）", IsError: false}, nil
+ 	}
+ 	rec, known := t.d.Roster.Look(target)
+ 	if !known {

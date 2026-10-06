@@ -1,0 +1,10 @@
+--- HEAD/internal/tools/task.go
++++ overlay/D:/tmp/wisp236v1/mut/B-1-teeth-m13/task.go
+@@ -20,7 +20,6 @@
+ //
+ //	task.output  L0  read what a background task printed   (this file)
+ //	task.cancel  L1  stop one subagent the CALLER itself derived (this file, 221)
+-//	task.list    -   DEFERRED with five fields, PLAN.md §7 :1531
+ //
+ // task.output is AC#3's leg, task.cancel is ticket 221's. task.list stays
+ // unregistered because the §7 registry says so, and a half-claim is exactly the

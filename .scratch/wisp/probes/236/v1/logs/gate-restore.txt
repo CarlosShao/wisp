@@ -1,0 +1,19 @@
+### restore proof after all 25 overlay runs
+internal/tools/task.go disk=4138177e29ffff427776a73eb0d61a9b
+internal/tools/task.go head=4138177e29ffff427776a73eb0d61a9b
+internal/tools/subagent_197.go disk=06caf8f5465ff1c47c310da27fe3ffab
+internal/tools/subagent_197.go head=06caf8f5465ff1c47c310da27fe3ffab
+internal/tools/task_cancel_221_legs_test.go disk=13a0ba39e30fb95ad4f2be88beed4fc7
+internal/tools/task_cancel_221_legs_test.go head=13a0ba39e30fb95ad4f2be88beed4fc7
+internal/tools/failclosed_236_teeth_test.go disk=c793966c2730c64896d9512de597ddf4
+internal/tools/failclosed_236_teeth_test.go head=c793966c2730c64896d9512de597ddf4
+### porcelain
+(0 lines above = clean)
+### lexical arithmetic
+pos-ctrl: DEFERRED-lines=3 co-carry-task.list=2 co-carry-task.cancel=0
+B-1-teeth-m13: DEFERRED-lines=2 co-carry-task.list=1 co-carry-task.cancel=0
+B-2-inject-cancel-marker: DEFERRED-lines=4 co-carry-task.list=2 co-carry-task.cancel=1
+B-7-all-markers-gone: DEFERRED-lines=1 co-carry-task.list=0 co-carry-task.cancel=0
+B-3-m2c-register-note: DEFERRED-lines=3 co-carry-task.list=2 co-carry-task.cancel=0
+B-4-m2b-register-list: DEFERRED-lines=3 co-carry-task.list=2 co-carry-task.cancel=0
+B-5-m2e-unregister-cancel: DEFERRED-lines=3 co-carry-task.list=2 co-carry-task.cancel=0

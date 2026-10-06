@@ -1,0 +1,7 @@
+### gofmt -l (five reviewed Go files, read not written)
+gofmt-rc=0
+### gofumpt
+v0.12.0 (go1.27.1)
+gofumpt-rc=0
+### go vet
+vet-rc=0
