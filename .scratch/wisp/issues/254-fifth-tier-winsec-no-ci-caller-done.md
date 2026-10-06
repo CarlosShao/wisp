@@ -45,3 +45,28 @@
 **两处残余（本票不勾死，具名归口）**：
 1. **载具不在 CI 里跑**：`grep -c selftest .github/workflows/ci.yml` 现量 **0** ⇒ 上面 19–22 号那四枚场景今天是**笔记本尺**；要接进 CI＝动 workflow 触发档＝契约级（`A523` 那句"`ci.yml` 一个字不许动"仍生效）⇒ **默认不接**，接不接要 owner 一句话。
 2. **GUARD 3 红句里 `scope=[${target}…]` 是拼出来的**，父脚本 `target` 丢尾斜杠时那句会跟着漂（腿的突变 D 实测：链仍 `rc=2`，**不会静默变绿**）。⇒ 我裁**本票不动 `winsec-tests.sh`**——失败方向是"红句不好看"而不是"该响的不响"，属可容忍残余；改它另立一手。
+
+---
+
+## 凭据归口（搬运笔，非新验收）
+
+1. 本节＝**搬运**：凭据早已在盘，只是没归口到本票名下；⛔ 本节不新增任何验收读数、不改变本票任何一枚勾的状态。
+2. 出处＝只读普查腿 `evidence-close-6`（件 `.scratch/wisp/probes/evidence-close/6/backfill-worklist.md`，§4.3 名册）＋编排者裁定。
+3. ⛔ 本票**不该被本节视为已验收**。
+
+归口的凭据路径（⛔ 本节不替它们写任何判语，判语在原件里）：
+
+- `docs/evidence/s1/248-settings-write-path-v1.md`（`:68`／`:278` 两处出现 `254-r1b` 名号）
+- `.scratch/wisp/probes/254/r1b/logs/` 那 14 份读数件，逐枚名册（本腿 `ls -1` 现量＝**14 份**，与编排者口径一致）：
+  `carrier-all-at-HEAD.txt`／`mutA-chain-split-teeth.txt`／`mutC-guard3-scope-clause.txt`／`mutD-target-spelling-drift.txt`／
+  `portable-tests-at-d253703a-parent.sh`／`portable-tests-at-f5f9cc34.sh`／`prefix-chain-explicit-split-audit-bites.txt`／
+  `prefix-chain-widened-scope-loses-audit.txt`／`prefix-core-and-winsec-see-the-same-split.txt`／
+  `prefix-core-dir-form-hides-the-split.txt`／`prefix-full-at-d253703a-parent.txt`／`prefix-full-at-f5f9cc34.txt`／
+  `winsec-tests-at-d253703a-parent.sh`／`winsec-tests-at-f5f9cc34.sh`
+
+存在性复量（搬运腿 `backfill-7a`，2026-10-06 现跑 `test -f`／`ls -1`／`wc -l`／`grep -n`，⛔ 未引任何一枚的判语）：
+`docs/evidence/s1/248-settings-write-path-v1.md` **在盘、279 行**（与编排者给的 279 一致），`:68`／`:278` 两行**都在盘上逐字含 `254-r1b`**；
+`.scratch/wisp/probes/254/r1b/logs/` **在盘、14 份**——以上两处存在性**全部对得上**。
+⚠ **一处计数差具名登记（⛔ 不照抄、不替换、不自己补凭据）**：编排者那句写作"`:68`／`:278` **两处**出现 `254-r1b` 名号"，
+本腿 `grep -n '254-r1b' docs/evidence/s1/248-settings-write-path-v1.md` 复量命中 **3 行**＝`:68`／`:179`／`:278`。
+⇒ 给定的两行**逐字成立**，多出的 `:179`（同件里另一句并发声明）**不列进本票凭据**，只把这一枚计数差报给编排者裁。

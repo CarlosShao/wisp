@@ -176,3 +176,23 @@ vet 一失败，**扫描步骤被 `skipped`，D22 门从未在 CI 上给出过�
   `gofmt (gofumpt)` = **success**、D22 两步 = **success** ⇒ **AC#1 的 CI 侧绿证到手**，票 78 那颗"哑弹"彻底闭环。
   `lint` 现在只红在**一步**：`staticcheck`（跑不动的那把工具，A56① ⇒ 票 85）。
   也就是说 lint 从"不知道在红什么"变成"**红的是一件事，且有票**"。
+
+---
+
+## 凭据归口（搬运笔，非新验收）
+
+1. 本节＝**搬运**：凭据早已在盘，只是没归口到本票名下；⛔ 本节不新增任何验收读数、不改变本票任何一枚勾的状态。
+2. 出处＝只读普查腿 `evidence-close-6`（件 `.scratch/wisp/probes/evidence-close/6/backfill-worklist.md`，§4.3 名册）＋编排者裁定。
+3. ⛔ 本票**不该被本节视为已验收**。
+
+归口的凭据路径（⛔ 本节不替它们写任何判语，判语在原件里）：
+
+- `docs/evidence/s1/75-independent-verification.md`
+- `docs/evidence/s1/81-adversarial-acceptance.md`
+- `docs/evidence/s1/82-adversarial-acceptance.md`
+- `docs/evidence/s1/85-preflight-staticcheck.md`
+- `docs/reports/HANDOVER.md`
+
+存在性复量（搬运腿 `backfill-7a`，2026-10-06 现跑 `test -f` ＋ `wc -l`，⛔ 未读正文判语）：
+上列 5 枚**全部在盘**——`75→1052 行`／`81→56 行`／`82→511 行`／`85→505 行`／`HANDOVER.md→1836 行`（编排者给了前四枚的行数，逐枚对得上；`HANDOVER.md` 编排者未给数，本腿现量 1836 行）。
+⇒ **本条路径无一处存在性对不上，故本节零"复量不一致"登记。**
