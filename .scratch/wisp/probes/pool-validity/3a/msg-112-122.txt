@@ -1,0 +1,16 @@
+chore(probe/pool-validity-3a): 判完 112/120/122（差翻勾1＋仍成立2）
+
+- 112 差翻勾：结案凭据是非实现者读数表 docs/evidence/s1/ci-step-readings-2026-09-22.md
+  （:245 逐字 run 35616790753 / job 106389418059 / step4 / RUN=82 PASS=42 FAIL=0 SKIP=0）
+  ＋修它的 commit a5056079（标题逐字 "(ticket 112)"）。★两处心虚写死：
+  "集合内主体"那条腿的闭合是从聚合四数倒推逐行执行，不是它自己的具名 --- PASS 行；
+  票面 AC#5 要"步级 success 三元组"，我读到的只是步内四数 FAIL=0（同表 :57 那枚 run job 级仍 failure）。
+- 120 仍成立：检查端 winsec_other.go:155-163（pathPieces 走查、不持句柄）＋动手端 :29 os.Chmod(path)
+  ⇒ 两步之间按名字重解析的形状原样；AC#2 那条正解 openat/O_NOFOLLOW/Fchmodat 全仓 0 命中；
+  "竞态/check-then-act/ticket 120/R-113-D" 在 internal/winsec 0 命中、120 用例 0 枚、裁决表 0 枚。
+  154/4000 那个率量不到（要容器压测）。★票 113/119 那两笔邻居修没顺手做掉它（注释自陈只覆盖拼写/祖先链）。
+- 122 仍成立（凭字面不凭"函数还在"）：SA4000 那枚真缺陷逐字还在 internal/observe/goroutine_test.go:151
+  （票面 :106 已漂 +45）；AC#7 的 gofumpt@latest 还在 ci.yml:170；门自陈 EXPECTED RED（:260-261）；
+  台账 :12088 最新 staticcheck 53 findings（票面 42 又过期一档）；放宽尺 lint:ignore 0 命中（没有拿放宽换绿）。
+
+HEAD 4b15869d。零 go 命令。票面零改动。计数：仍成立5／已失效2／差翻勾2／量不到0／未判4。
