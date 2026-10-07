@@ -1,0 +1,39 @@
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 934)
+   TRACKED-DIRTY	.scratch/wisp/probes/163/a1/main.go	(last commit touching it: e13196bd 09-27 21:27 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go	(last commit touching it: 6479d540 09-28 14:55 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/183/r2/mut/task-boxset-off.go	(last commit touching it: 78ea1d19 09-28 14:07 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/185/r1/mut-m1/hostpath_185.go	(last commit touching it: ee1e2118 09-28 16:43 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/197/r1c/pre/subagent_197.go	(last commit touching it: c7abc84b 09-28 22:09 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/197/r1c/pre/subagent_197_test.go	(last commit touching it: c7abc84b 09-28 22:09 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/212/v1/mut/main-noq9.go	(last commit touching it: 54742783 10-03 22:09 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/220/r1/prechange/prechange220_probe_test.go	(last commit touching it: 480b970d 10-03 10:27 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go	(last commit touching it: f23586fa 09-29 18:26 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/224/v2/dialect_probe_test.go	(last commit touching it: 961e23b0 09-30 13:56 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/231/v1/mutation/config_reload_branch_after_prefix.go	(last commit touching it: fdb437c3 10-06 10:38 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go	(last commit touching it: 48e09742 09-29 23:27 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/241/v1/posctl/badly_formatted.go	(last commit touching it: c1e1a92e 09-30 14:32 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/241/v1/probe_v1_readings_test.go	(last commit touching it: c1e1a92e 09-30 14:32 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/257/r2/mut/M1/firstrun.go	(last commit touching it: 7c644bb0 10-05 11:31 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/257/r2/mut/M2/firstrun.go	(last commit touching it: 7c644bb0 10-05 11:31 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/257/r2/mut/M3/firstrun.go	(last commit touching it: 7c644bb0 10-05 11:31 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/257/r2/mut/M4/firstrun.go	(last commit touching it: 7c644bb0 10-05 11:31 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/257/r2/mut/M5/firstrun.go	(last commit touching it: 7c644bb0 10-05 11:31 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/257/r2/mut/M6/firstrun.go	(last commit touching it: 7c644bb0 10-05 11:31 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/257/r2/mut/M7/firstrun.go	(last commit touching it: 7c644bb0 10-05 11:31 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go	(last commit touching it: 7c644bb0 10-05 11:31 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/259/r1/gofumpt-negctl/probe.go	(last commit touching it: 50e0299c 10-05 12:09 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/263/v1/src/main.go	(last commit touching it: 8c25bfab 10-04 13:09 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/33/p1/q1/main.go	(last commit touching it: 7a956604 10-02 19:58 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/33/p1/q2/main.go	(last commit touching it: 7a956604 10-02 19:58 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/33/p1/q3/main.go	(last commit touching it: 7a956604 10-02 19:58 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	cmd/wisp/models.go	(last commit touching it: 5e8748b3 10-03 21:07 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	internal/agent/approval/pending_read.go	(last commit touching it: d03d166f 10-04 10:37 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	internal/agent/tools.go	(last commit touching it: 5413f46d 10-04 09:19 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	internal/risk/provenance.go	(last commit touching it: 5e8748b3 10-03 21:07 CarlosShao)	<== CI IS RED ON THIS
+   TRACKED-DIRTY	internal/tools/bridge.go	(last commit touching it: 5413f46d 10-04 09:19 CarlosShao)	<== CI IS RED ON THIS
+
+attrib.sh: gofumpt v0.12.0 (go1.27.1)
+attrib.sh: (A) tracked-tree  lines=32 files=32  rule: MUST be empty
+attrib.sh: (B) not run in --tracked-only mode - a checkout has no bench working tree to attribute
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: RED (tracked-only) - tracked-dirty=32 files_dirty=32. The CI gofmt step and this step read the same denominator; this one additionally refuses to answer when handed 0 files.
