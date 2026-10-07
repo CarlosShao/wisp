@@ -1,0 +1,47 @@
+=== date
+Wed Oct  7 17:03:28 CST 2026
+=== dist BEFORE second real run (holds THIS-source fresh names from run #1)
+frontend/dist:
+.gitkeep
+assets
+index.html
+
+frontend/dist/assets:
+index-vdBrT8rM.js
+index-yy8KMgdf.css
+2024c5305096a81c8a469bfdfef9feb8 *frontend/dist/index.html
+611d4ad266892214f9771cf1bedaebf8 *frontend/dist/assets/index-vdBrT8rM.js
+7bd2c565b2e4d06018fccaae1f5dcee7 *frontend/dist/assets/index-yy8KMgdf.css
+=== RUN build.ps1 a SECOND time, unchanged sources, real npm run build
+build.ps1: repo root D:\tmp\wisp274v2\real (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\work\server\node14\npm.cmd (11.6.0)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-vdBrT8rM.js assets\index-yy8KMgdf.css index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v8.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 2439 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.06 kB │ gzip:   0.64 kB
+dist/assets/index-yy8KMgdf.css   49.54 kB │ gzip:   9.84 kB
+dist/assets/index-vdBrT8rM.js   552.02 kB │ gzip: 170.74 kB
+
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 498ms[39m
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274v2\real; snapshot was 4 file(s) [.gitkeep assets\index-vdBrT8rM.js assets\index-yy8KMgdf.css index.html], dist now holds [.gitkeep assets\index-vdBrT8rM.js assets\index-yy8KMgdf.css index.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+SECOND_REAL_BUILD_PROCESS_EXITCODE=1
+=== dist AFTER
+2024c5305096a81c8a469bfdfef9feb8 *frontend/dist/index.html
+611d4ad266892214f9771cf1bedaebf8 *frontend/dist/assets/index-vdBrT8rM.js
+7bd2c565b2e4d06018fccaae1f5dcee7 *frontend/dist/assets/index-yy8KMgdf.css

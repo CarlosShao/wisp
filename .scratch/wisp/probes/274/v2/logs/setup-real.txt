@@ -1,0 +1,125 @@
+=== date
+Wed Oct  7 16:46:44 CST 2026
+=== repo top-level (read-only mirror candidates)
+****（）。
+**落位：PersonalAudioAssistant`
+-
+.git
+.gitattributes
+.github
+.gitignore
+.scratch
+.zcodeignore
+1
+2026-09-24
+2379
+397
+4
+AGENTS.md
+README.md
+agent
+balldebug.exe
+build
+cmd
+deps.toml
+design
+docker
+docs
+frontend
+go.mod
+go.sum
+internal
+logs
+models
+part1-state1-fixed.txt
+part1-state1-pristine.txt
+part1-state2-fixed.txt
+part1-state2-pristine.txt
+part2-nog6-fixed.txt
+part2-nog6-pristine.txt
+part3-stale-fixed.txt
+part3-stale-pristine.txt
+plans
+scripts
+signmodels.exe
+third_party
+tmp-none
+tools
+wisp.exe
+§15
+⚠
+⚠⚠
+「干净
+与
+且按
+交付形态：**两版**
+任何结论与
+作者：编排会话（owner
+全部**只读**、全部取
+取证方：6
+开票动作按
+性质：**这不是契约文件，也不是冻结面**。它是**补票的输入**，不是判据本身。
+性质：**这是审核裁决，不是判据本身，也不是开票授权。**
+本文经
+本方案定位：业务
+状态：**FROZEN（S0
+状态：**四轮打磨收敛完毕，D1–D47
+空
+追溯：PLAN.md
+逐项对照见
+项目名：**Wisp
+（要动
+📐
+=== step 1: shallow local clone (no hardlinks into repo objects)
+Cloning into 'D:/tmp/wisp274v2/real'...
+warning: --depth is ignored in local clones; use file:// instead.
+done.
+Updating files:  34% (2591/7472)Updating files:  35% (2616/7472)Updating files:  36% (2690/7472)Updating files:  37% (2765/7472)Updating files:  38% (2840/7472)Updating files:  39% (2915/7472)Updating files:  40% (2989/7472)Updating files:  41% (3064/7472)Updating files:  42% (3139/7472)Updating files:  43% (3213/7472)Updating files:  44% (3288/7472)Updating files:  45% (3363/7472)Updating files:  46% (3438/7472)Updating files:  47% (3512/7472)Updating files:  48% (3587/7472)Updating files:  49% (3662/7472)Updating files:  50% (3736/7472)Updating files:  51% (3811/7472)Updating files:  52% (3886/7472)Updating files:  53% (3961/7472)Updating files:  53% (3986/7472)Updating files:  54% (4035/7472)Updating files:  55% (4110/7472)Updating files:  56% (4185/7472)Updating files:  57% (4260/7472)Updating files:  58% (4334/7472)Updating files:  59% (4409/7472)Updating files:  60% (4484/7472)Updating files:  61% (4558/7472)Updating files:  62% (4633/7472)Updating files:  63% (4708/7472)Updating files:  64% (4783/7472)Updating files:  65% (4857/7472)Updating files:  66% (4932/7472)Updating files:  67% (5007/7472)Updating files:  68% (5081/7472)Updating files:  69% (5156/7472)Updating files:  70% (5231/7472)Updating files:  71% (5306/7472)Updating files:  72% (5380/7472)Updating files:  73% (5455/7472)Updating files:  74% (5530/7472)Updating files:  75% (5604/7472)Updating files:  76% (5679/7472)Updating files:  77% (5754/7472)Updating files:  78% (5829/7472)Updating files:  79% (5903/7472)Updating files:  80% (5978/7472)Updating files:  81% (6053/7472)Updating files:  82% (6128/7472)Updating files:  83% (6202/7472)Updating files:  84% (6277/7472)Updating files:  85% (6352/7472)Updating files:  86% (6426/7472)Updating files:  87% (6501/7472)Updating files:  88% (6576/7472)Updating files:  89% (6651/7472)Updating files:  90% (6725/7472)Updating files:  91% (6800/7472)Updating files:  92% (6875/7472)Updating files:  93% (6949/7472)Updating files:  94% (7024/7472)Updating files:  95% (7099/7472)Updating files:  96% (7174/7472)Updating files:  97% (7248/7472)Updating files:  98% (7323/7472)Updating files:  99% (7398/7472)Updating files: 100% (7472/7472)Updating files: 100% (7472/7472), done.
+CLONE_RC=0
+=== clone HEAD / build.ps1 identity
+f1fa87fb 274-v2 起手锚：date/HEAD/porcelain/dist+exe md5 落盘（骨架，裁决表后补）
+38ab47b7d5fdcb36a7a172440ae28a3b */d/tmp/wisp274v2/real/scripts/build.ps1
+0b5fbbb5f43850f4e3a3545c4f4eaae2 */d/work/workspace/projects plans/Wisp/scripts/build.ps1
+=== step 2: hardlink the READ-ONLY third_party cache (fetch-deps fast path)
+THIRDPARTY_CP_RC=0
+model-fetch
+sherpa-onnx
+spike-models
+onnxruntime.dll
+sherpa-onnx-c-api.dll
+sherpa-onnx-cxx-api.dll
+=== step 3: REAL copy of frontend/node_modules (167M, no hardlinks)
+BEFORE_REPO_NM_MD5
+f8b8f88d8550294c47ee5cc6e8ec141c *./graceful-fs/clone.js
+63d49916c84e2bbda13d6563d9dc18b5 *./graceful-fs/graceful-fs.js
+620fc152dc9bfa087f9901703b1e2616 *./graceful-fs/legacy-streams.js
+14cbbf8e8d0632089994286844259752 *./graceful-fs/polyfills.js
+046ecdd7b540cca510d5e0bb17ccb1b5 *./lucide-react/dynamic.js
+a81eaaa3f705f4d5b3b2603d2f58ed3f *./nanoid/index.browser.js
+65b6020f1ceb89acab38777fb651f7ed *./nanoid/index.js
+438797624030c8b45ee874d60f3b7815 *./nanoid/nanoid.js
+8ccbc925db109f469560b1c28c55201d *./picocolors/picocolors.browser.js
+2a4c947fa3480c3054649d1ec86fd466 *./picocolors/picocolors.js
+e9aae4aa1097187fbdb2cf0f0dcde955 *./picomatch/index.js
+0ad45c9bd2ff257a55522ab06e3b2428 *./picomatch/posix.js
+
+real	0m6.905s
+user	0m0.875s
+sys	0m4.874s
+NM_CP_RC=0
+167M	/d/tmp/wisp274v2/real/frontend/node_modules
+=== step 4: clone's dist shape (must be clean-checkout = .gitkeep only)
+.gitkeep
+=== step 5: is frontend/dist tracked? (gitignore check in repo)
+frontend/.gitignore:12:dist/*	frontend/dist/assets/index-BVKlegVD.js
+IGNORE_RC=0
+frontend/dist/.gitkeep
+=== step 6: repo dist + node_modules sample md5 ARCHIVE (recheck at end)
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+82bd6f012b1acfe2c48e47154848b9e0 *frontend/node_modules/.package-lock.json
+acd7a89b2d60b7733c1742ec57d868b7 *frontend/node_modules/vite/package.json
+390d9c6edfa868ff41d2e6686d621908 *frontend/node_modules/typescript/package.json
+SETUP_DONE

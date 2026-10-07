@@ -1,0 +1,20 @@
+### POST-RUN FINAL INTEGRITY
+Wed Oct  7 17:07:38 CST 2026
+--- porcelain six families
+0
+--- dist md5
+4
+FINAL_DIST_MD5_DIFF_EMPTY
+--- exe md5
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+--- build.ps1 vs 91c90aa1
+0b5fbbb5f43850f4e3a3545c4f4eaae2 *-
+0b5fbbb5f43850f4e3a3545c4f4eaae2 *-
+--- node_modules sample
+frontend/node_modules/.package-lock.json: OK
+frontend/node_modules/vite/package.json: OK
+frontend/node_modules/typescript/package.json: OK
+--- second real build rc
+1
+--- out-named files (must be 0)
+0

@@ -1,0 +1,29 @@
+=== job boundaries (2-space keys) + build.ps1 + checkout refs
+11:  pull_request:
+12:  push:
+36:  schedule:
+38:  workflow_dispatch:
+50:  group: ci-${{ github.workflow }}-${{ github.ref }}${{ github.event_name == 'push' && format('-{0}', github.sha) || '' }}
+51:  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+65:  lint:
+68:      - uses: actions/checkout@v4
+149:        # self-hosted side. A step placed after `actions/checkout` in that job is a
+395:  test-core:
+400:      - uses: actions/checkout@v4
+466:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+505:  test-windows:
+510:      - uses: actions/checkout@v4
+566:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+571:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+579:        # the cache step and build.ps1 above produce; the same command without them
+739:  slo-smoke:
+744:      - uses: actions/checkout@v4
+757:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+797:  slo-full:
+804:      # (on the interactive user PATH only). build.ps1's own fallback path is
+807:      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+809:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+812:      - uses: actions/checkout@v4
+820:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+871:  lint-frontend:
+877:      - uses: actions/checkout@v4

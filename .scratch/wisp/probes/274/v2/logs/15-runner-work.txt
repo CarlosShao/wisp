@@ -1,0 +1,26 @@
+### runner root (read-only)
+_diag
+_work
+bin
+config.cmd
+externals
+run-helper.cmd
+run-helper.cmd.template
+run-helper.sh.template
+run.cmd
+### _work
+/e/work/base/actions-runner/_work/_PipelineMapping
+/e/work/base/actions-runner/_work/_actions
+/e/work/base/actions-runner/_work/_temp
+/e/work/base/actions-runner/_work/_tool
+/e/work/base/actions-runner/_work/wisp
+### workspace contents
+-- /e/work/base/actions-runner/_work/_PipelineMapping/
+CarlosShao
+-- /e/work/base/actions-runner/_work/_actions/
+actions
+-- /e/work/base/actions-runner/_work/_temp/
+-- /e/work/base/actions-runner/_work/_tool/
+go
+-- /e/work/base/actions-runner/_work/wisp/
+wisp

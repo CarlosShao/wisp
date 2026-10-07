@@ -1,0 +1,13 @@
+.scratch/wisp/probes/257/r2/mut/M1/firstrun.go
+.scratch/wisp/probes/257/r2/mut/M2/firstrun.go
+.scratch/wisp/probes/257/r2/mut/M3/firstrun.go
+.scratch/wisp/probes/257/r2/mut/M4/firstrun.go
+.scratch/wisp/probes/257/r2/mut/M5/firstrun.go
+.scratch/wisp/probes/257/r2/mut/M6/firstrun.go
+.scratch/wisp/probes/257/r2/mut/M7/firstrun.go
+.scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go
+cmd/wisp/models.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+internal/tools/bridge.go

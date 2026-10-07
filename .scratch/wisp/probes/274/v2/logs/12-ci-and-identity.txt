@@ -1,0 +1,58 @@
+### strategy/matrix anywhere in the 3 jobs
+### slo-full checkout+build verbatim (806-835)
+      # compiler and the step died before compiling anything. MINGW64_ROOT is
+      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+      # weakening the step. Verified locally with msys removed from PATH:
+      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+      MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Build wisp.exe (deps cached on the runner)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: SLO full gate (six states + settle + leak)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+
+      - name: Upload SLO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-full-report
+          path: build/slo/slo-report.json
+          # Ticket 134 AC#6 (was: error). On the machine-contended path the
+          # gate exits 0 WITHOUT a report - that is the whole trade the owner
+          # approved under Q-36 - and the step above this one stays
+          # unconditional (no `if:`, no continue-on-error, D22 mode-6), so the
+          # only way to keep "no conclusion" from being red is to stop
+          # demanding the file here. error would redden the job one step later
+### other scripts invoking build.ps1
+scripts/slo-check.ps1:58:    scripts/build.ps1 passes -H=windowsgui, so wisp.exe is a Windows
+scripts/slo-check.ps1:157:        Why not `& $exe` plus the automatic exit-code variable: scripts/build.ps1
+scripts/slo-check.ps1:204:    # starts scripts/build.ps1 the same waited-for way as everything else.
+scripts/slo-check.ps1:296:    Write-Host "slo-check.ps1: wisp.exe missing; building (scripts/build.ps1 -Env dev)"
+scripts/slo-check.ps1:297:    # build.ps1 is a script, not a program, so it is started in a host of the
+scripts/slo-check.ps1:305:        Fail-InstrumentBroken "build path: cannot resolve the PowerShell host running this script, so scripts/build.ps1 cannot be started as a waited-for program (ticket 263)"
+scripts/slo-check.ps1:309:        (Join-Path $RepoRoot 'scripts\build.ps1'), '-Env', 'dev'
+scripts/slo-check.ps1:314:    if ($build.code -ne 0) { Fail ("build.ps1 failed with exit code {0}" -f $build.code) }
+scripts/spike/run.ps1:23:# ---- resolve toolchain (same rules as build.ps1)
+scripts/wisp-cli-tests.sh:76:        "(actions/cache on the deps.toml key, then scripts/build.ps1 -> fetch-deps.ps1)." \
+### any step re-running npm/vite in those jobs
+887:      - name: npm ci (lockfile is the only source of deps)
+888:        run: npm ci
+902:      - name: build (vite build -> frontend/dist, the bytes go:embed carries)
+903:        run: npm run build
+### 91c90aa1 vs disk
+0b5fbbb5f43850f4e3a3545c4f4eaae2 *-
+0b5fbbb5f43850f4e3a3545c4f4eaae2 *-
+### eol config
+true
+i/lf    w/lf    attr/text eol=crlf    	scripts/build.ps1
+### numstat of 91c90aa1
+91c90aa1
+
+41	1	scripts/build.ps1

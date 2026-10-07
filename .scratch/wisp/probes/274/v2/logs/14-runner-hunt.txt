@@ -1,0 +1,29 @@
+### bounded runner hunt (no full-disk scan)
+--- /e exists?
+$RECYCLE.BIN
+$WINDOWS.~BT
+11
+AI
+BaiduNetdiskDownload
+DumpStack.log
+DumpStack.log.tmp
+FFOutput
+Kugou
+Program Files (x86)
+--- _work at maxdepth 3 on E:
+--- actions* dirs, depth<=2 on C/D/E:
+--- runner processes:
+
+Image Name                     PID Session Name        Session#    Mem Usage
+========================= ======== ================ =========== ============
+Runner.Listener.exe          17844 Console                    1     96,660 K
+INFO: No tasks are running which match the specified criteria.
+--- services matching runner:
+--- env:
+PATH=/c/Users/swq/.qoder-cn/bin:/d/work/soft/Qoder CN/resources/extensions/qoder.computer-control/dist/cli/computerUseWindows/bin:/c/Users/swq/.qoder-cn/plugins/cache/qoderapp-bundler/qoder-context/1.0.72.34cf9e2f/bin:/c/Users/swq/bin:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/mingw64/bin:/usr/bin:/c/Users/swq/bin:/c/Users/swq/.qoder-cn/bin:/c/Users/swq/AppData/Roaming/npm:/c/Users/swq/AppData/Local/pnpm:/c/Users/swq/.bun/bin:/c/Users/swq/.cargo/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Windows/System32/OpenSSH:/d/work/server/flutter/flutter/bin:/d/work/base/openjdk17U/bin:/d/work/base/Android/Sdk/cmdline-tools/latest/bin:/d/work/base/Android/Sdk/platform-tools:/d/work/soft/Microsoft VS Code/bin:/d/work/soft/Git/cmd:/d/work/tools/fd-v10.4.2:/c/Program Files/GitHub CLI:/c/Program Files/PowerShell/7:/c/Program Files/Docker/Docker/resources/bin:/d/work/soft/Yan Agent:/e/work/data/AI/user data/minimax code/.minimax/bin:/c/Users/swq/.minimax/bin:/c/Users/swq/.meituan-catpaw/bin:/c/Users/swq/.kimi-code/bin:/c/Users/swq/AppData/Local/hermes/hermes-agent/venv/Scripts:/c/Users/swq/AppData/Local/hermes/bin:/d/work/soft/Trae CN/bin:/c/Users/swq/AppData/Local/Programs/Python/Python312/Scripts:/c/Users/swq/AppData/Local/Programs/Python/Python312:/c/Users/swq/AppData/Local/Programs/Python/Launcher:/c/Users/swq/.local/bin:/d/work/server/node14/node_global:/c/Users/swq/.trae-cn/tools/trae-gopls/current:/c/Users/swq/.trae-cn/sdks/workspaces/f4e3de91/versions/node/current:/c/Users/swq/.trae-cn/sdks/versions/node/current:/d/work/soft/Git/bin:/c/Users/swq/AppData/Local/Microsoft/WindowsApps:/c/Users/swq/AppData/Local/Programs/Microsoft VS Code/bin:/d/soft_home/cpolar:/d/work/soft/TRAE SOLO CN/resources/app/bin/lib:/d/work/soft/TRAE SOLO CN/resources/app/node_modules/@vscode/ripgrep/bin:/d/work/server/node14:/d/work/soft/Lingma/bin:/d/work/soft/Qoder/bin:/c/users/swq/appdata/roaming/python/python312/scripts:/c/Users/swq/AppData/Local/Microsoft/WinGet/Links:/c/Users/swq/AppData/Local/Programs/Cua/cua-driver/bin:/d/work/soft/CodeBuddy CN/bin:/d/work/soft/Hermes/hermes-agent/venv/Scripts:/c/Users/swq/AppData/Local/Programs/orca/resources/bin:/c/Users/swq/.trae-cn/plugins/trae-remote-official/lark/1.0.3/bin:/d/work/AI/tools:/d/work/workspace/tools/bin:/d/work/soft/Qoder CN IDE/bin:/d/work/base/go/bin:/e/work/base/msys64/mingw64/bin:/d/work/AI/tools/step code:/c/Users/swq/.stepcode/agent/bin:/usr/bin/vendor_perl:/usr/bin/core_perl
+--- slo label hints in repo:
+docs/evidence/s1/111-ci-step-readings-attempt2.md:198:  2. `slo-full` 跑在 self-hosted `wisp-slo` runner 上，`billable` 里 windows/ubuntu 的 `total_ms` 都报 0（私有仓配额显示口径），本轮没有用它做 runner 分钟真伪判据，用的是 `jobs.total_count=6` + `run_duration_ms=645000` + 每份日志的字节数。
+docs/evidence/s1/134-ac2-ac3-trigger-and-freshness-pin.md:12:| job id | **107021435150**（job name `slo-full`，`runs-on: [self-hosted, wisp-slo]`） |
+docs/evidence/s1/134-ac2-ac3-trigger-and-freshness-pin.md:65:`slo-full`：`runs-on: ['self-hosted', 'wisp-slo']`、`env` 键 `['MINGW64_ROOT','WISP_ENV']`、
+docs/evidence/s1/134-ac2-ac3-trigger-and-freshness-pin.md:74:runs-on 'ubuntu-latest' = 3 ; runs-on 'windows-latest' = 2 ; runs-on '- self-hosted\n- wisp-slo' = 1
+docs/evidence/s1/134-ac5-gate-readings.md:44:runs-on: ubuntu-latest = 3 / windows-latest = 2 / [self-hosted, wisp-slo] = 1

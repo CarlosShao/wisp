@@ -1,0 +1,244 @@
+=== 274-v2 battery2 date: Wed Oct  7 16:56:29 CST 2026
+=== repo dist md5 BEFORE
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+=== rebuild stub tree (hardlinks; build/ and node_modules/ and dist/ excluded)
+BATTERY2_STUBTREE_DONE
+_writes_node_modules_only
+--- dist+nm md5 BEFORE:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *dist/index.html
+node_modules_marker=ABSENT
+--- npm.cmd body:
+@echo off
+echo STUBNPM argv=%*
+if "%1"=="run" if "%2"=="build" echo marker-from-this-run> node_modules\stub-marker.txt
+exit /b 0
+build.ps1: repo root D:\tmp\wisp274v2\stub (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd (STUBNPM argv=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+STUBNPM argv=run build
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274v2\stub; snapshot was 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+CASE_I_b_npm_writes_node_modules_only_PROCESS_EXITCODE=1
+--- dist+nm md5 AFTER:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *dist/index.html
+node_modules_marker=marker-from-this-run
+########## CASE I_c_samename_rewrite_diff_bytes
+--- dist+nm md5 BEFORE:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *dist/index.html
+node_modules_marker=marker-from-this-run
+--- npm.cmd body:
+@echo off
+echo STUBNPM argv=%*
+if "%1"=="run" if "%2"=="build" echo REWRITTEN-DIFFERENT-BYTES-BY-THIS-RUN> dist\index.html
+exit /b 0
+build.ps1: repo root D:\tmp\wisp274v2\stub (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd (STUBNPM argv=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+STUBNPM argv=run build
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274v2\stub; snapshot was 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+CASE_I_c_samename_rewrite_diff_bytes_PROCESS_EXITCODE=1
+--- dist+nm md5 AFTER:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *dist/assets/index-BVKlegVD.js
+d8c28a0befec90aa00f0c71ab6e29fc2 *dist/index.html
+node_modules_marker=marker-from-this-run
+########## CASE IV_183_missing_entry
+--- dist+nm md5 BEFORE:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+node_modules_marker=marker-from-this-run
+--- npm.cmd body:
+@echo off
+echo STUBNPM argv=%*
+if not exist dist\assets mkdir dist\assets
+if "%1"=="run" if "%2"=="build" echo js-by-this-run> dist\assets\index-ZZZZ0000.js
+exit /b 0
+build.ps1: repo root D:\tmp\wisp274v2\stub (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd (STUBNPM argv=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 1 file(s) [.gitkeep] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+STUBNPM argv=run build
+build.ps1: FATAL: frontend step: frontend/dist has 1 artifact file(s) but no index.html - the entry file internal/panel resolves (panel.EntryFile) is absent, so the bundle can never be served. Named cause: missing entry file.
+CASE_IV_183_missing_entry_PROCESS_EXITCODE=1
+--- dist+nm md5 AFTER:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+290960a890775db152002dd0d6a4143e *dist/assets/index-ZZZZ0000.js
+node_modules_marker=marker-from-this-run
+########## CASE IV_187_empty_entry
+--- dist+nm md5 BEFORE:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+node_modules_marker=marker-from-this-run
+--- npm.cmd body:
+@echo off
+echo STUBNPM argv=%*
+if "%1"=="run" if "%2"=="build" type nul> dist\index.html
+if "%1"=="run" if "%2"=="build" echo js-by-this-run> dist\assets\index-ZZZZ0000.js
+exit /b 0
+build.ps1: repo root D:\tmp\wisp274v2\stub (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd (STUBNPM argv=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 1 file(s) [.gitkeep] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+STUBNPM argv=run build
+The system cannot find the path specified.
+build.ps1: FATAL: frontend step: D:\tmp\wisp274v2\stub\frontend\dist\index.html is 0 bytes - a present-but-empty entry file is not a page. Named cause: empty entry file.
+CASE_IV_187_empty_entry_PROCESS_EXITCODE=1
+--- dist+nm md5 AFTER:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+d41d8cd98f00b204e9800998ecf8427e *dist/index.html
+node_modules_marker=marker-from-this-run
+########## CASE IV_160_build_nonzero
+--- dist+nm md5 BEFORE:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+node_modules_marker=marker-from-this-run
+--- npm.cmd body:
+@echo off
+echo STUBNPM argv=%*
+if "%1"=="run" if "%2"=="build" echo STUBNPM-BUILD-FAIL
+if "%1"=="run" if "%2"=="build" exit /b 3
+exit /b 0
+build.ps1: repo root D:\tmp\wisp274v2\stub (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd (STUBNPM argv=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 1 file(s) [.gitkeep] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+STUBNPM argv=run build
+STUBNPM-BUILD-FAIL
+build.ps1: FATAL: frontend step: 'npm run build' failed with exit code 3 in D:\tmp\wisp274v2\stub\frontend (npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd). See the npm output above.
+CASE_IV_160_build_nonzero_PROCESS_EXITCODE=1
+--- dist+nm md5 AFTER:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+node_modules_marker=marker-from-this-run
+########## CASE IV_136_npm_ci_nonzero
+--- dist+nm md5 BEFORE:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+node_modules_marker=ABSENT
+--- npm.cmd body:
+@echo off
+echo STUBNPM argv=%*
+if "%1"=="ci" echo STUBNPM-CI-FAIL
+if "%1"=="ci" exit /b 7
+exit /b 0
+build.ps1: repo root D:\tmp\wisp274v2\stub (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd (STUBNPM argv=--version)
+build.ps1: frontend: node_modules ABSENT -> running npm ci (clean install pinned by package-lock.json).
+STUBNPM argv=ci
+STUBNPM-CI-FAIL
+build.ps1: FATAL: frontend step: 'npm ci' failed with exit code 7 in D:\tmp\wisp274v2\stub\frontend (npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd). See the npm output above; the page bundle cannot be built without its dependencies.
+CASE_IV_136_npm_ci_nonzero_PROCESS_EXITCODE=1
+--- dist+nm md5 AFTER:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+node_modules_marker=ABSENT
+########## CASE IV_123_no_npm_on_PATH
+go=/d/work/base/go/bin gcc=/e/work/base/msys64/mingw64/bin real_node_dir_excluded=/d/work/server/node14
+build.ps1: repo root D:\tmp\wisp274v2\stub (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: FATAL: frontend step: npm could not be resolved on PATH (tried npm.cmd, then npm). Without npm there is no frontend/dist, and an exe built from that tree carries no page at all - which is exactly what this step exists to prevent, so it fails instead of skipping.
+CASE_IV_123_no_npm_on_PATH_PROCESS_EXITCODE=1
+########## CASE D1_samename_rewrite_red_then_remedy_then_green
+--- dist BEFORE red run:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *dist/index.html
+node_modules_marker=ABSENT
+build.ps1: repo root D:\tmp\wisp274v2\green (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd (STUBNPM argv=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+STUBNPM argv=run build
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274v2\green; snapshot was 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+CASE_D1_remedy_prelude_samename_rewrite_PROCESS_EXITCODE=1
+--- dist AFTER red run (names identical, index.html bytes changed?):
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *dist/assets/index-BVKlegVD.js
+d8c28a0befec90aa00f0c71ab6e29fc2 *dist/index.html
+node_modules_marker=ABSENT
+--- APPLY THE REMEDY WRITTEN AT :204 (mirror only): delete frontend/dist, let git regenerate the tracked anchor
+GIT_CHECKOUT_RC=0
+--- dist roster after remedy:
+dist/.gitkeep
+--- GREEN RUN (same reviewed build.ps1, stub npm now produces NEW names):
+build.ps1: repo root D:\tmp\wisp274v2\green (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd (STUBNPM argv=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 1 file(s) [.gitkeep] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+STUBNPM argv=run build
+build.ps1: frontend ok: 4 file(s) in frontend/dist (entry index.html is 18 bytes): .gitkeep=0 assets\index-AAAA1111.js=16 assets\index-BBBB2222.css=17 index.html=18 || provenance: this run's npm added new artifact name(s) [assets\index-AAAA1111.js assets\index-BBBB2222.css index.html] over the pre-build snapshot 1 file(s) [.gitkeep]; gone since snapshot: []
+build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+build.ps1: DLLs colocated into D:\tmp\wisp274v2\green\build
+build.ps1: signed model manifest colocated into D:\tmp\wisp274v2\green\build\models
+build.ps1: wrote D:\tmp\wisp274v2\green\build\SHA256SUMS
+build.ps1: smoke test - running wisp.exe doctor
+build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+CASE_D2_rerun_after_remedy_PROCESS_EXITCODE=0
+--- dist AFTER green run:
+time=2026-10-07T16:57:15.942+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+290960a890775db152002dd0d6a4143e *dist/assets/index-AAAA1111.js
+6d98762670f1ab9c9075629a11b8c0e5 *dist/assets/index-BBBB2222.css
+cd9ef85eff2d7cfa2b536be1e12d91c4 *dist/index.html
+node_modules_marker=ABSENT
+wisp doctor - build chain self-check
+------------------------------------------------------------------------
+[INFO] wisp build                         version=0.0.0-dev commit=f1fa87fb built=2026-10-07T08:57:12Z WISP_ENV=dev
+[INFO] Go runtime                         go1.27.1 (toolchain pinned by go.mod)
+[INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)
+[PASS] gcc (build-time)                   gcc.exe (Rev3, Built by MSYS2 project) 16.2.0
+[PASS] sherpa-onnx C API                  runtime 1.13.8 matches build pin (exe dir D:\tmp\wisp274v2\green\build)
+[PASS] onnxruntime.dll colocated          file version 1.28.2.0 matches build pin 1.28.2
+[INFO] sherpa-onnx built against onnxruntime 1.28.2
+[PASS] DLL colocated: sherpa-onnx-c-api.dll D:\tmp\wisp274v2\green\build\sherpa-onnx-c-api.dll
+[PASS] DLL colocated: sherpa-onnx-cxx-api.dll D:\tmp\wisp274v2\green\build\sherpa-onnx-cxx-api.dll
+[PASS] deps.toml sherpa-onnx pin          1.13.8
+[PASS] deps.toml onnxruntime pin          1.28.2
+[PASS] deps.toml sherpa-onnx-go pin       v1.13.8
+[PASS] data dir writable (dev)            C:\Users\swq\AppData\Roaming\wisp-dev
+------------------------------------------------------------------------
+wisp doctor: PASS
+[dist/.gitkeep dist/assets/index-AAAA1111.js dist/assets/index-BBBB2222.css dist/index.html]
+=== repo dist md5 AFTER
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+=== repo build.ps1 md5 AFTER
+0b5fbbb5f43850f4e3a3545c4f4eaae2 */d/work/workspace/projects plans/Wisp/scripts/build.ps1
+BATTERY2_DONE

@@ -1,0 +1,7 @@
+### job/workspace markers in newest Runner log
+### same in previous Runner log (055606)
+### newest Worker log: checkout/clean step lines
+/e/work/base/actions-runner/_diag/Worker_20261007-003708-utc.log
+/e/work/base/actions-runner/_diag/Worker_20261006-025846-utc.log
+/e/work/base/actions-runner/_diag/Worker_20261006-025437-utc.log
+5057:[2026-10-07 00:42:27Z INFO TempDirectoryManager] Cleaning runner temp folder: E:\work\base\actions-runner\_work\_temp

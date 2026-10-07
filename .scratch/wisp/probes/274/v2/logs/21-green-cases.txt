@@ -1,0 +1,108 @@
+=== 274-v2 green cases date: Wed Oct  7 16:53:06 CST 2026
+=== repo dist md5 BEFORE (must equal start anchor)
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+=== mirror .git identity (own copy, HEAD)
+f1fa87fb 274-v2 起手锚：date/HEAD/porcelain/dist+exe md5 落盘（骨架，裁决表后补）
+f1fa87fb
+=== build/wisp.exe must NOT exist in mirror before run
+ls: cannot access '/d/tmp/wisp274v2/green/build': No such file or directory
+########## CASE D_1_samename_rewrite_red (same shape as ①(c))
+green_cases.sh: line 48: printf: ` ': invalid format character
+--- dist md5 before:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *dist/index.html
+build.ps1: repo root D:\tmp\wisp274v2\green (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin\npm\npm.cmd ()
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+build.ps1: FATAL: frontend step: 'npm run build' failed with exit code 255 in D:\tmp\wisp274v2\green\frontend (npm = D:\tmp\wisp274v2\bin\npm\npm.cmd). See the npm output above.
+CASE_D_1_samename_rewrite_red_PROCESS_EXITCODE=1
+--- dist md5 after (content must differ, names identical):
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *dist/index.html
+########## CASE D_2_apply_the_written_remedy
+--- remedy text taken from :204: 'delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.'
+GIT_CHECKOUT_REMEDY_RC=0
+--- dist roster after remedy:
+dist/.gitkeep
+green_cases.sh: line 34: printf: ` ': invalid format character
+########## CASE D_3_rerun_after_remedy_expect_green
+--- dist md5 before:
+d41d8cd98f00b204e9800998ecf8427e *dist/.gitkeep
+build.ps1: repo root D:\tmp\wisp274v2\green (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin\npm\npm.cmd ()
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 1 file(s) [.gitkeep] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+build.ps1: FATAL: frontend step: 'npm run build' failed with exit code 255 in D:\tmp\wisp274v2\green\frontend (npm = D:\tmp\wisp274v2\bin\npm\npm.cmd). See the npm output above.
+CASE_D_3_rerun_after_remedy_expect_green_PROCESS_EXITCODE=1
+--- exe produced in mirror:
+ls: cannot access '/d/tmp/wisp274v2/green/build/wisp.exe': No such file or directory
+[dist/.gitkeep]
+########## CASE L_tautology_neutralise_203 (shape = ①(a): stale page + noop npm)
+--- the ONLY diff between the reviewed script and the mutated copy:
+203c203
+< if ($freshNames.Count -le 0) {
+---
+> if ($false) {  # 274-v2 NEUTRALISATION of the provenance gate
+green_cases.sh: line 72: printf: `\': invalid format character
+--- dist roster before:
+dist/.gitkeep
+dist/assets/index-BRKj5OIJ.css
+dist/assets/index-BVKlegVD.js
+dist/index.html
+build.ps1: repo root D:\tmp\wisp274v2\green (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v2\bin\npm\npm.cmd (STUBNPM argv=)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+STUBNPM argv=
+build.ps1: frontend ok: 4 file(s) in frontend/dist (entry index.html is 1044 bytes): .gitkeep=0 assets\index-BRKj5OIJ.css=49943 assets\index-BVKlegVD.js=553469 index.html=1044 || provenance: this run's npm added new artifact name(s) [] over the pre-build snapshot 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html]; gone since snapshot: []
+build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+build.ps1: DLLs colocated into D:\tmp\wisp274v2\green\build
+build.ps1: signed model manifest colocated into D:\tmp\wisp274v2\green\build\models
+build.ps1: wrote D:\tmp\wisp274v2\green\build\SHA256SUMS
+build.ps1: smoke test - running wisp.exe doctor
+build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+CASE_L_tautology_neutralise_203_PROCESS_EXITCODE=0
+=== repo dist md5 AFTER (must equal start anchor)
+time=2026-10-07T16:53:26.188+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+=== repo scripts/build.ps1 md5 (must equal start anchor)
+0b5fbbb5f43850f4e3a3545c4f4eaae2 */d/work/workspace/projects plans/Wisp/scripts/build.ps1
+GREEN_DONE
+wisp doctor - build chain self-check
+------------------------------------------------------------------------
+[INFO] wisp build                         version=0.0.0-dev commit=f1fa87fb built=2026-10-07T08:53:22Z WISP_ENV=dev
+[INFO] Go runtime                         go1.27.1 (toolchain pinned by go.mod)
+[INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)
+[PASS] gcc (build-time)                   gcc.exe (Rev3, Built by MSYS2 project) 16.2.0
+[PASS] sherpa-onnx C API                  runtime 1.13.8 matches build pin (exe dir D:\tmp\wisp274v2\green\build)
+[PASS] onnxruntime.dll colocated          file version 1.28.2.0 matches build pin 1.28.2
+[INFO] sherpa-onnx built against onnxruntime 1.28.2
+[PASS] DLL colocated: sherpa-onnx-c-api.dll D:\tmp\wisp274v2\green\build\sherpa-onnx-c-api.dll
+[PASS] DLL colocated: sherpa-onnx-cxx-api.dll D:\tmp\wisp274v2\green\build\sherpa-onnx-cxx-api.dll
+[PASS] deps.toml sherpa-onnx pin          1.13.8
+[PASS] deps.toml onnxruntime pin          1.28.2
+[PASS] deps.toml sherpa-onnx-go pin       v1.13.8
+[PASS] data dir writable (dev)            C:\Users\swq\AppData\Roaming\wisp-dev
+------------------------------------------------------------------------
+wisp doctor: PASS

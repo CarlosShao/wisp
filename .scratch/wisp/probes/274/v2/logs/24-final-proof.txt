@@ -1,0 +1,41 @@
+### all FAIL: lines (unanchored) in cold gotest
+48:--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.01s)
+64:--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+69:--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+78:--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.10s)
+83:--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+### ball package block head
+51: FAIL	github.com/CarlosShao/wisp/internal/ball	0.303s
+51:FAIL	github.com/CarlosShao/wisp/internal/ball	0.303s
+### budget-ish red text
+### D1 prelude FATAL verbatim (battery2)
+133:build.ps1: FATAL: frontend step: 'npm run build' failed with exit code 3 in D:\tmp\wisp274v2\stub\frontend (npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd). See the npm output above.
+155:build.ps1: FATAL: frontend step: 'npm ci' failed with exit code 7 in D:\tmp\wisp274v2\stub\frontend (npm = D:\tmp\wisp274v2\bin2\npm\npm.cmd). See the npm output above; the page bundle cannot be built without its dependencies.
+165:build.ps1: FATAL: frontend step: npm could not be resolved on PATH (tried npm.cmd, then npm). Without npm there is no frontend/dist, and an exe built from that tree carries no page at all - which is exactly what this step exists to prevent, so it fails instead of skipping.
+182:build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274v2\green; snapshot was 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+### FINAL SELF-PROOF
+Wed Oct  7 17:02:50 CST 2026
+f1fa87fb 274-v2 起手锚：date/HEAD/porcelain/dist+exe md5 落盘（骨架，裁决表后补）
+--- porcelain six families
+PORCELAIN_LINES=0
+--- dist md5 final
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+--- diff vs start archive
+DIST_MD5_DIFF_EMPTY
+--- exe md5
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+--- build.ps1 identity: 91c90aa1 blob vs disk
+0b5fbbb5f43850f4e3a3545c4f4eaae2 *-
+0b5fbbb5f43850f4e3a3545c4f4eaae2 *-
+--- node_modules sample md5 recheck
+frontend/node_modules/.package-lock.json: OK
+frontend/node_modules/vite/package.json: OK
+frontend/node_modules/typescript/package.json: OK
+--- third_party sample hardlink safety recheck
+total 22140
+-rwxr-xr-x 15 swq 197609 17799168 Sep 11 02:34 onnxruntime.dll
+-rwxr-xr-x 15 swq 197609  4605952 Sep 11 02:43 sherpa-onnx-c-api.dll
+-rwxr-xr-x 15 swq 197609   259584 Sep 11 02:43 sherpa-onnx-cxx-api.dll

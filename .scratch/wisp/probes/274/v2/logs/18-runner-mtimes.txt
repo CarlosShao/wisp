@@ -1,0 +1,23 @@
+### timestamps in runner workspace
+/e/work/base/actions-runner/_work/wisp/wisp/frontend:
+total 200
+drwxr-xr-x 1 swq 197609      0 2026-10-04 08:56:28.773911900 +0800 .
+drwxr-xr-x 1 swq 197609      0 2026-10-07 08:39:29.531838800 +0800 ..
+-rw-r--r-- 1 swq 197609    437 2026-10-04 08:56:28.737874400 +0800 .gitignore
+-rw-r--r-- 1 swq 197609    253 2026-10-04 08:56:28.738845400 +0800 .oxlintrc.json
+-rw-r--r-- 1 swq 197609  23603 2026-10-04 08:56:28.738845400 +0800 VENDORED.md
+drwxr-xr-x 1 swq 197609      0 2026-10-04 08:56:28.739833300 +0800 dist
+-rw-r--r-- 1 swq 197609   1238 2026-10-04 08:56:28.739833300 +0800 embed.go
+drwxr-xr-x 1 swq 197609      0 2026-10-04 08:56:28.740835600 +0800 fixtures
+-rw-r--r-- 1 swq 197609    968 2026-10-04 08:56:28.740835600 +0800 index.html
+-rw-r--r-- 1 swq 197609 137343 2026-10-04 08:56:28.741836400 +0800 package-lock.json
+-rw-r--r-- 1 swq 197609   1742 2026-10-04 08:56:28.742874100 +0800 package.json
+drwxr-xr-x 1 swq 197609      0 2026-10-04 08:56:28.745845700 +0800 scripts
+2026-10-04 08:56:28.739833300 +0800 /e/work/base/actions-runner/_work/wisp/wisp/frontend/dist/.gitkeep
+2026-10-07 08:40:00.327098900 +0800 /e/work/base/actions-runner/_work/wisp/wisp/build/wisp.exe
+2026-10-07 08:39:12.731853600 +0800 /e/work/base/actions-runner/_work/wisp/wisp/.git/FETCH_HEAD
+2026-10-07 08:37:20.779512600 +0800 /e/work/base/actions-runner/_work/wisp/wisp/.git/ORIG_HEAD
+### newest worker log: last job timestamps
+[2026-10-07 00:42:27Z
+/e/work/base/actions-runner/_diag/Worker_20261007-003708-utc.log: [2026-10-07 00:42:27Z
+/e/work/base/actions-runner/_diag/Worker_20261006-025846-utc.log: [2026-10-06 03:06:22Z

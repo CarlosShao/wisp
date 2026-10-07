@@ -1,0 +1,44 @@
+### workspace top
+.git
+.gitattributes
+.github
+.gitignore
+.scratch
+AGENTS.md
+README.md
+build
+cmd
+deps.toml
+design
+docker
+docs
+frontend
+go.mod
+go.sum
+internal
+models
+scripts
+third_party
+### frontend/dist as it lies on disk right now
+/e/work/base/actions-runner/_work/wisp/wisp/frontend/dist:
+.gitkeep
+### md5 of workspace dist files
+d41d8cd98f00b204e9800998ecf8427e */e/work/base/actions-runner/_work/wisp/wisp/frontend/dist/.gitkeep
+### build dir
+total 51905
+-rw-r--r-- 1 swq 197609      335 Oct  7 08:40 SHA256SUMS
+drwxr-xr-x 1 swq 197609        0 Oct  7 08:40 models
+-rwxr-xr-x 1 swq 197609 17799168 Sep 11 02:34 onnxruntime.dll
+-rwxr-xr-x 1 swq 197609  4605952 Sep 11 02:43 sherpa-onnx-c-api.dll
+-rwxr-xr-x 1 swq 197609   259584 Sep 11 02:43 sherpa-onnx-cxx-api.dll
+drwxr-xr-x 1 swq 197609        0 Oct  7 08:42 slo
+-rwxr-xr-x 1 swq 197609 30471221 Oct  7 08:40 wisp.exe
+### _diag listing
+Runner_20261007-073605-utc.log
+Runner_20261007-055606-utc.log
+Runner_20261007-003645-utc.log
+Worker_20261007-003708-utc.log
+blocks
+pages
+Runner_20261002-151227-utc.log
+Worker_20261006-025846-utc.log
