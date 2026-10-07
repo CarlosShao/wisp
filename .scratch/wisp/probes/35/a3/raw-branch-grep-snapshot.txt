@@ -1,0 +1,107 @@
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:5:   snapshot the Go side pushes; the only local state is view preference (which
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:51:import { currentView, type PanelViewId } from "@/lib/panel-views";
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:52:import type { ComposerState, PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:70:const EMPTY: PanelSnapshot = {
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:91:export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) {
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:92:  const composer = snapshot.composer ?? EMPTY_COMPOSER;
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:123:  const hostView = (snapshot as { view?: string }).view;
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:124:  const view = hostView !== undefined ? currentView(snapshot) : (local.view ?? currentView(snapshot));
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:126:  // categories. A snapshot that names one lands on the settings page AT that
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:179:  // The permission tiers come from the snapshot's own vocabulary. The panel
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:206:          {snapshot.pending.length > 0 ? (
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:208:              待审批 {snapshot.pending.length}
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:214:          {/* git branch. Reads its strings from the snapshot; a workspace that
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:321:              {snapshot.pending.map((v) => (
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:336:                    snapshot={snapshot}
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:407:  snapshot,
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:418:  snapshot: PanelSnapshot;
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:431:  const turns = snapshot.results.map((chunk) => ({
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:457:            {snapshot.results.length === 0 ? (
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:461:                {snapshot.results.map((chunk) => (
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:493:   one honest sentence each so that a snapshot still naming one lands somewhere
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:15:   Panel status   : NOT yet: the cost and context meters are the place it would go, and those are waiting on the snapshot fields (ticket 167).
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:31:/* anchor the snapshot to *call* time (inside each card's mount-time memo) —
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:203:            Trend snapshot
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:206:            Snapshot
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:282:          Snapshot
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:436:          Contribution snapshot across current inventory value. Segment selection changes the inspected group without moving the card.
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/streaming-text.tsx:25:/** One inline source chip, as the snapshot reports it (label only, no URL). */
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:4:   The 审批中心 view, cut to what PanelSnapshot.pending carries, on the
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:8:   What the old demo had that the snapshot does not, and what happens to each:
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:26:import type { ApprovalCardView, PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:29:    accent, L0 the neutral field. The snapshot carries the level, not the risk
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:67:export function ApprovalScreen({ snapshot }: { snapshot: PanelSnapshot }) {
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:68:  const pending = snapshot.pending;
+dsh/feat/frontend-p0-v2:frontend/src/components/ball-screen.tsx:12:   so the future Go-fed 球状态 screen mounts the same shape with snapshot
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:4:   The conversation view, cut to what PanelSnapshot actually carries: the
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:8:   chips, follow-ups and inline sources all ride on fields the snapshot does not
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:15:   exactly one prop, the snapshot.
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:22:import type { PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:24:export function ChatScreen({ snapshot }: { snapshot: PanelSnapshot }) {
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:25:  const results = snapshot.results;
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:8:   exactly as owner ruled in R20/M5: everything shown is read from the snapshot
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:9:   Go pushes, and every interaction is a REQUEST through lib/panel's one
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:10:   envelope - requestModeSwitch / requestWorkspaceChange / submitAttachment /
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:42:  requestModeSwitch,
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:43:  requestWorkspaceChange,
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:45:  submitAttachment,
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:48:} from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:88:  // rows both come back through the snapshot, and each renders as itself.
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:101:    // next snapshot.
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:103:    requestModeSwitch(to);
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:111:        await submitAttachment(f);
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:126:    sendMessage(text, accepted);
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:145:          goes out verbatim and the verdict comes back in the next snapshot. */}
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:172:            requestWorkspaceChange(workspaceDraft.trim());
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:254:      {/* 底部行: the permission档 read out of the snapshot, then the input
+dsh/feat/frontend-p0-v2:frontend/src/components/config-screen.tsx:29:   The gap that closes the dormant rows is one field on the snapshot and one
+dsh/feat/frontend-p0-v2:frontend/src/components/context-meter.tsx:10:   PanelSnapshot has no field for any of the three yet, and the owner's P9 red
+dsh/feat/frontend-p0-v2:frontend/src/components/error-boundary.tsx:7:   has no component for, and any component reading a snapshot shape other than
+dsh/feat/frontend-p0-v2:frontend/src/components/error-boundary.tsx:14:   and the L2 card's 拒绝 both call lib/panel.ts, which throws on purpose when
+dsh/feat/frontend-p0-v2:frontend/src/components/error-boundary.tsx:27:       half-initialised snapshot), and remounting re-runs the same read.
+dsh/feat/frontend-p0-v2:frontend/src/components/git-branch.tsx:15:   2. The branch is READ, never guessed. `current` arrives from the snapshot.
+dsh/feat/frontend-p0-v2:frontend/src/components/git-branch.tsx:193:/** The chip's own honest-absence form, for callers that have no snapshot yet. */
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:10:   snapshot; nothing here reaches the bridge):
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:17:   Two demo ornaments are deliberately NOT drawn, because the snapshot has no
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:60:  requestApprovalResolution,
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:63:} from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:265:    requestApprovalResolution(view.correlationId, outcome);
+dsh/feat/frontend-p0-v2:frontend/src/components/nav-rail.tsx:26:import { PANEL_VIEWS, type PanelViewId } from "@/lib/panel-views";
+dsh/feat/frontend-p0-v2:frontend/src/components/panel-sidebar.tsx:68:  /** The workspace line. Path comes from the snapshot's C26-resolved field. */
+dsh/feat/frontend-p0-v2:frontend/src/components/panel-skeleton.tsx:20:import type { PanelViewId } from "@/lib/panel-views";
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:113:  const fromSnapshot = animationFrom ?? defaultFrom;
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:114:  const toSnapshots = animationTo ?? defaultTo;
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:116:  const stepCount = toSnapshots.length + 1;
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:123:        const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:136:            initial={fromSnapshot}
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:137:            animate={inView ? animateKeyframes : fromSnapshot}
+dsh/feat/frontend-p0-v2:frontend/src/components/result-stream.tsx:23:import type { ResultChunkView } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/components/showcase.tsx:10:   path reads the snapshot Go pushes.
+dsh/feat/frontend-p0-v2:frontend/src/components/showcase.tsx:272:              <ApprovalScreen snapshot={SHOWCASE_APPROVAL_SNAPSHOT} />
+dsh/feat/frontend-p0-v2:frontend/src/components/tasks-screen.tsx:13:   are pure props; when Go grows a tasks feed, the snapshot becomes the
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:5:   (App's EMPTY snapshot), which reads as a broken screen. A harness is the shape
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:25:import type { ApprovalCardView, PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:33:export const HARNESS_SNAPSHOT: PanelSnapshot = {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:175:/** The snapshot shape ApprovalScreen consumes, with only the showcase's
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:177:export const SHOWCASE_APPROVAL_SNAPSHOT: PanelSnapshot = {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:24:import type { PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:77:/** The screen the panel opens on when the snapshot names none. Chosen because
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:90: * PanelSnapshot yet - ticket 35's pump owns it, and `panel.resync` (the push
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:98:export function currentView(snapshot: PanelSnapshot & { view?: string }): PanelViewId {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:99:  const named = snapshot.view;
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:102:  // A snapshot naming a screen the frontend has no row for is a contract drift,
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:104:  console.error(`panel-views: snapshot names unknown view ${JSON.stringify(named)}`);
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:111:/** The composer section of a snapshot: what the input row may show. */
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:129:export interface PanelSnapshot {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:134:  /** ISO-8601 stamp of when Go built the snapshot; display only, never used
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:158:export function hostedByNative(): boolean {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:164: * PanelSnapshot push, never as a return value, because a panel that keeps a
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:169:export function requestApprovalResolution(
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:245:export function requestModeSwitch(to: string): void {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:254:export function requestWorkspaceChange(path: string): void {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:266:export function sendAttachmentBytes(
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:281:export function submitAttachment(file: File): Promise<void> {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:291:      sendAttachmentBytes(file.name, file.type, buf.byteLength, toBase64(buf));
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:299:export function sendMessage(text: string, attachments: ComposerAttachment[]): void {
+dsh/feat/frontend-p0-v2:frontend/src/main.tsx:12: *   - inside Wisp, WebView2 serves the embedded dist and Go pushes snapshots
+dsh/feat/frontend-p0-v2:frontend/src/main.tsx:90: * lib/panel.ts and throw when no native host is attached). Those need their

@@ -1,0 +1,27 @@
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:243:                    { label: "工作区", value: composer.workspace.set ? composer.workspace.canonical : "尚未收到" },
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:303:              workspacePath={composer.workspace.set ? composer.workspace.canonical : "尚未收到工作区"}
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:322:                <L2ApprovalCard key={v.correlationId} view={v} />
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:432:    id: chunk.correlationId,
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:462:                  <p className="text-[13px] leading-relaxed text-ink" key={chunk.correlationId}>
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:58:        {view.correlationId}
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:61:        {view.rulesHit.length} 条规则
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:104:            <QueueRow key={view.correlationId} view={view} />
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:139:      {state.attachmentError ? (
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:140:        <p className="text-[11px] text-red">{state.attachmentError}</p>
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:150:          title={state.workspace.set ? state.workspace.canonical : state.workspace.reason}
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:152:          {state.workspace.set ? state.workspace.canonical : state.workspace.reason}
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:154:        {state.workspace.reparse ? (
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:163:          placeholder={state.workspace.spelling || "D:\\work\\project"}
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:199:            title={`支持 ${state.acceptedAttachmentMimes.join(" / ")}，单个 <= ${bytes(state.maxAttachmentBytes)}`}
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:205:            accept={state.acceptedAttachmentMimes.join(",")}
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:276:              {state.mode.l2ConfirmNames.includes(m) ? (
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx:318:        {a.deduplicated ? "已存在相同内容的附件" : "已存入附件目录"}
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:207:  if (!view.reasonKnown || view.reason.trim() === "") {
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:265:    requestApprovalResolution(view.correlationId, outcome);
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:266:    onIntent?.(view.correlationId, outcome);
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:312:            <RuleList rulesHit={view.rulesHit} />
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:316:        {view.callChain.length > 0 && (
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:318:            {`调用链：${view.callChain.join(" > ")}`}
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:321:        {view.sessionOverrideBlocked && (
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx:338:            {`判定来自 ${view.decidedBy === "native" ? "原生风险评估" : view.decidedBy}`}
+dsh/feat/frontend-p0-v2:frontend/src/components/result-stream.tsx:34:          key={chunk.correlationId}

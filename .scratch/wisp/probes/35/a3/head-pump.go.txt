@@ -1,0 +1,712 @@
+package panel
+
+// The snapshot pump: the first place production BUILDS the packet the panel is
+// rendered from (ticket 35's data half).
+//
+// WHAT WAS TRUE BEFORE THIS FILE. Snapshot (composer.go:44) has four fields and
+// NewSnapshot (composer.go:63) had zero non-test callers, so "the panel displays
+// authority and requests it" (composer.go:6-12) described a packet nobody sent.
+// ticket 145's census measured the same thing from the other side and named the
+// disease in composer.go:41-43: "a view model that only a test can build is a
+// view model production never sends". Moving Snapshot into production code did
+// not move its callers, so this file's job is exactly that move: constructors
+// called from a running process, over values read out of live objects.
+//
+// WHAT THIS FILE IS NOT: the transport. There is no Go -> page channel in this
+// tree today - no WebView2 host (ticket 33 is unclaimed), no postMessage writer,
+// no local HTTP/SSE/websocket server, and assets.go:8 quotes D29 saying there
+// must not be one. docs/evidence/s1/35-panel-snapshot-pump-r1.md §1.2 measures
+// all four. So this pump stops at the byte boundary: Marshal hands out the JSON,
+// Publish hands it to src.Out, and src.Out is the one line a later ticket
+// re-points at the host. The last mile is NOT here, and it was not invented
+// here either - a file the renderer polls would be a second channel, which
+// composer.go:14 ("no second channel") and D29 both refuse.
+//
+// NO NEW TOP-LEVEL KEYS. Snapshot keeps its four JSON keys and
+// frontend/src/lib/panel.ts is untouched, so TestComposerContractTypesMatchFrontend
+// (composer_test.go:48) stays the two-way ruler it is. Adding the fifth key - the
+// "which screen" one - is Q-51 territory and ticket 145 AC#3 already answered it:
+// not in this slice.
+//
+// Ticket 248 did move keys - two of them, inside the composer SECTION and not at
+// the top level, which is the placement its ruling named (the credential dimension
+// goes where currentModel/modelKnown already live). That is the change the same
+// two-way reconciliation exists to catch: Go now emits credentialState and
+// credentialKnown, the page-side interface does not declare them, and the ruler says
+// so out loud. The reading is not "the ruler is broken" and not "write the page from
+// here" (this leg may not touch frontend/): it is that this half cannot go
+// self-green, which is recorded in docs/evidence/s1/248-settings-write-path-r1.md.
+// Nor does this file reach for the six fields ticket 145 marks as having no
+// vocabulary in the repository (thinkingMs / reasoningMs / durationMs / humanText
+// / fragment / IconClass): a pump that fills a field with a constant to look
+// complete is the same failure this file exists to end.
+//
+// TICKET 145's landing pass re-measured both numbers in that paragraph and
+// neither one was wrong, only small. The pins are four: adding a key also
+// reddens approval_test.go:105 and the two byte-level key-set nails in
+// pump_test.go (:111-124, :270-276), which is the sharper of the two guards -
+// the reconciliations read json tags, so an untagged exported field passes
+// them while encoding/json still emits it (registered, not used). And the
+// no-source list is seven: approval.remainingMs joins it, because the L1
+// countdown has no producer either - approval.EventTick is declared and
+// emitted nowhere in the tree, the Remaining that is emitted carries the
+// static window length (gate.go:274, :387, :510-513), and the live countdown
+// is gate.go:257's clock.After, which exposes no "how much is left". What the
+// pump CAN fill from live objects is named in the evidence file with a
+// removal check behind each one: docs/evidence/s1/145-snapshot-fields-landed-r1.md.
+
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/CarlosShao/wisp/internal/projctx"
+	"github.com/CarlosShao/wisp/internal/risk"
+	"github.com/CarlosShao/wisp/internal/streamkey"
+)
+
+// NativeVerdict is one live approval as the host reads it off its own queue.
+// Every field is a copy of a verdict internal/risk already reached and
+// internal/agent/approval already admitted; nothing here re-assesses, because a
+// second assessment is a second judge and the second one would be this file.
+//
+// Args is the argv-shaped view of the call's arguments (ApprovalCardView.args),
+// and CallChain has no producer in this repository yet - see the field comment.
+type NativeVerdict struct {
+	CorrelationID string
+	Tool          string
+	Args          []string
+	// CallChain is what the host actually recorded about how this call was
+	// reached. The run path records none (tools.Decision has no chain field), so
+	// production hands in nil and the card renders an empty list. That is an
+	// honest empty, not a filler: inventing ["session","agent-loop",tool] here
+	// would put a string no code produced onto a security card.
+	CallChain              []string
+	Level                  risk.Level
+	RulesHit               []risk.RuleID
+	Reason                 string
+	SessionOverrideBlocked bool
+}
+
+// CardView renders one live verdict as the card the panel shows, through the
+// same pure half NewApprovalCardView uses (approval.go:72) - which is the point:
+// the card in a pushed snapshot and the card the CLI diagnostic prints are the
+// same function over the same verdict, so they cannot disagree about what L2
+// meant.
+func (v NativeVerdict) CardView() ApprovalCardView {
+	return CardViewFromDecision(
+		ApprovalSubject{
+			CorrelationID: v.CorrelationID,
+			Tool:          v.Tool,
+			Args:          v.Args,
+			CallChain:     v.CallChain,
+		},
+		risk.Decision{
+			Level:                  v.Level,
+			RulesHit:               v.RulesHit,
+			Reason:                 v.Reason,
+			SessionOverrideBlocked: v.SessionOverrideBlocked,
+		},
+	)
+}
+
+// L1WindowWait is one confirmation window the host's gate reports as open right
+// now (ticket 220 AC#2's read-only enumeration, internal/agent/approval's
+// LiveL1Windows), reduced to the two ids a roster row can be joined by.
+//
+// It is a separate shape from NativeVerdict on purpose, and the reason is the one
+// thing this file must not blur: an L1 window is NOT a card. Cards travel in the
+// snapshot's pending section, which is the section a page answers through ticket
+// 219's buttons; a window is a 2-3s block that answers itself by expiry. Listing a
+// window as a card would put an unanswerable row into the answerable section and
+// move ticket 146's readings on LiveApprovals. So the window contributes id
+// strings to one join - nothing else - and carries no level, no rules, no reason
+// and no route to an answer.
+type L1WindowWait struct {
+	CorrelationID string
+	TaskID        string
+}
+
+// PumpSources is the live native state a snapshot is assembled from. Each field
+// is a READER, not a value, because the only version of this that is worth
+// anything reads what the running process is actually doing. A nil reader is a
+// statement about the assembly, and each section answers it in its own documented
+// direction (see Snapshot): the mode and the workspace refuse to invent, the
+// queue and the stream report what they hold.
+type PumpSources struct {
+	// Verdicts reads the approvals pending right now, head first.
+	Verdicts func() []NativeVerdict
+	// Mode reads the permission mode in force (perm.Store.PermissionMode).
+	Mode func() risk.Mode
+	// Workspace reads the narrowed root as native resolved it.
+	Workspace func() WorkspaceView
+	// Git reads the host-side git dimension for that same root (ticket 181). It
+	// is a reader, not a value, so a pump assembled without one reports
+	// "unreadable" instead of a section full of zero values - and it is the ONLY
+	// route this dimension takes: there is no git tool for the model to call, and
+	// no inbound method for a switch to arrive on.
+	Git func() GitView
+	// Model reads the model id this boot resolved (llm.Endpoint.Model), ticket
+	// 145 AC#2b's "which model is answering". It is one live string read off the
+	// endpoint the runtime already built - not the selectable catalog and not
+	// the per-adapter effort vocabulary, neither of which is exported here. nil
+	// means nobody read it, and the packet then reports modelKnown=false
+	// instead of naming a model or blanking one.
+	Model func() string
+	// Credential reads whether this machine has a credential recorded (ticket 248
+	// AC#2). It is a reader like every field above, and the answer it returns is a
+	// STATE: the pump never asks for, holds or renders a credential value, and a
+	// host assembled without this reader says credentialKnown=false rather than
+	// advertising "not recorded".
+	Credential func() CredentialState
+	// Results reads the streamed assistant text so far.
+	Results func() []ResultChunk
+	// Instructions reads what this process's project-instruction loader actually
+	// did on its last turn (ticket 200 AC#7, wired by 200-r2). It is a reader of
+	// the loader's live bundle, not a value the caller shapes, so the packet
+	// cannot claim a state the loader never reached.
+	//
+	// A nil reader is the ONE case in which the wire carries no "instructions"
+	// key at all, and that is the shape pump_test's byte nails pin. A reader that
+	// exists always sends the key - including when there is nothing to show,
+	// because the section then names which of the five states it is. The old
+	// r1 behaviour (empty list, omitempty, no key) made "you turned it off" and
+	// "this project has no AGENTS.md" indistinguishable on the wire.
+	Instructions func() *projctx.Bundle
+	// Tasks reads the roster this process is running (ticket 197 载体层): every
+	// task row the host can name, which of them are subagents of whom, the D43
+	// state each was filed under, and what the shared stream log lost to its
+	// bound. It is a reader for the same reason every field above is one - a
+	// value the caller shapes is a value the pump cannot be trusted about - and a
+	// nil reader is the ONLY way the packet carries no "tasks" key at all.
+	//
+	// The status dimension arrives already judged: the host answers it with
+	// tools.TaskOutput.StateAnswer and this pump carries the three halves through
+	// untouched, because TestTaskState188AC3PanelHasNoWriteLeg
+	// (internal/tools/task_state_188_test.go) walks this package for a panel-side
+	// write leg on that dimension and this carrier is not going to be one.
+	Tasks func() TaskRosterState
+	// L1Windows reads the confirmation windows this process is holding open right
+	// now (ticket 220 AC#2). It is a reader like every field above: the values are
+	// copies of ids the gate already filed, and the pump does not get to decide
+	// which task a window belongs to.
+	//
+	// A nil reader is the honest "this host has no enumeration for that dimension",
+	// and it changes one thing only: the roster's blockedOnApproval keeps reading
+	// from cards alone, i.e. exactly ticket 197's behaviour. It never reports "no
+	// window is waiting", because nothing read the windows to find out.
+	L1Windows func() []L1WindowWait
+	// AttachmentMax is the composer's per-attachment ceiling. Zero means
+	// MaxAttachmentBytes, the constant the broker itself defaults to
+	// (attachments.go:186), so the packet never advertises a ceiling that the
+	// store would not apply.
+	AttachmentMax int64
+	// Now is the clock for the generatedAt stamp. nil is time.Now. This is a
+	// display stamp and nothing else (panel.ts:132-134: "display only, never
+	// used to derive state"), so it is not a deadline and not a timeout.
+	Now func() time.Time
+	// Out is the far end of the exit. Today the only production assembly attaches
+	// the run's persistent ledger; a later ticket re-points it at the host. nil
+	// means "assembled but nowhere to send", which Publish reports as an error
+	// instead of pretending the bytes went somewhere.
+	Out func(snapshot Snapshot, data []byte) error
+}
+
+// SnapshotPump assembles and emits the panel's packet.
+type SnapshotPump struct {
+	src PumpSources
+
+	mu        sync.Mutex
+	publishes int
+}
+
+// NewSnapshotPump wires a pump to its sources. The result is never nil; a zero
+// PumpSources is legal and produces a snapshot whose composer section says
+// "unknown" and whose lists are empty - a packet that states what it does not
+// know, which is the AC#4 rule this file inherits.
+func NewSnapshotPump(src PumpSources) *SnapshotPump {
+	return &SnapshotPump{src: src}
+}
+
+// Snapshot builds the whole truth as of this instant.
+func (p *SnapshotPump) Snapshot() Snapshot {
+	if p == nil {
+		return NewSnapshot(nil, nil, ComposerState{}, time.Time{})
+	}
+	var pending []NativeVerdict
+	if p.src.Verdicts != nil {
+		pending = p.src.Verdicts()
+	}
+	cards := make([]ApprovalCardView, 0, len(pending))
+	for _, v := range pending {
+		cards = append(cards, v.CardView())
+	}
+
+	var results []ResultChunk
+	if p.src.Results != nil {
+		results = p.src.Results()
+	}
+
+	// The composer section is built by NewComposerState, which is the constructor
+	// ticket 92 made mandatory and nobody ever called: the accepted MIME list and
+	// the attachment ceiling the renderer reads come from there, so the packet
+	// cannot advertise one ceiling while the broker applies another.
+	mode, modeReadable := risk.Mode(0), false
+	if p.src.Mode != nil {
+		mode = p.src.Mode()
+		modeReadable = mode.Valid()
+	}
+	workspace := UnsetWorkspaceView()
+	if p.src.Workspace != nil {
+		workspace = p.src.Workspace()
+	}
+	maxAttachment := p.src.AttachmentMax
+	if maxAttachment == 0 {
+		maxAttachment = MaxAttachmentBytes
+	}
+	composer := NewComposerState(mode, workspace, nil, maxAttachment)
+	if !modeReadable {
+		// AC#4 through the pump: a mode nobody read is reported as unknown, and
+		// never as the strictest-sounding or the safest-sounding default.
+		composer.Mode = ModeUnknownView()
+	}
+	if p.src.Git != nil {
+		// NewComposerState left this section saying "not probed"; a reader that
+		// exists overwrites it with what the files actually say.
+		composer.Git = p.src.Git()
+	}
+	if p.src.Model != nil {
+		// Same shape one line up: NewComposerState built this section with no
+		// model named and modelKnown unset, because nothing had been read yet.
+		// Only a reader that exists can fill either half.
+		composer.CurrentModel = p.src.Model()
+		composer.ModelKnown = composer.CurrentModel != ""
+	}
+	if p.src.Credential != nil {
+		// Ticket 248 AC#2's dimension, same two-line rule: nobody read it is not the
+		// same fact as nothing is recorded, and the reader is the only thing that can
+		// tell them apart.
+		state := p.src.Credential()
+		if strings.TrimSpace(string(state)) == "" {
+			state = CredentialUnknown
+		}
+		composer.Credential = state
+		composer.CredentialKnown = true
+	}
+
+	now := time.Now
+	if p.src.Now != nil {
+		now = p.src.Now
+	}
+	snap := NewSnapshot(cards, results, composer, now())
+	if p.src.Instructions != nil {
+		// The reader exists, so the section always goes on the wire - with a
+		// status even when the file list is empty. Whatever the loader last did
+		// is what this says, including "nothing yet".
+		snap.Instructions = InstructionsSectionFromBundle(p.src.Instructions())
+	}
+	if p.src.Tasks != nil {
+		// Same rule one line down: a pump with a roster reader always sends the
+		// key, because "this run has spawned nothing" and "this host cannot see
+		// subagents" are two different things a page must not render the same.
+		// The pending cards are passed in because a row whose task has a card on
+		// the queue right now is the one state a subagent list must never hide
+		// (PLAN.md:1127 records that as somebody else's real incident).
+		//
+		// Ticket 220's second source joins the same render: a row whose task is
+		// parked in an L1 confirmation window is hiding the same fact, and today
+		// no card names it. Neither source REPLACES the other, and neither one
+		// touches the row's filed D43 state - blockedOnApproval stays the added
+		// dimension the ticket's 外部对照 constraint bounds it to be.
+		var waits []L1WindowWait
+		if p.src.L1Windows != nil {
+			waits = p.src.L1Windows()
+		}
+		snap.Tasks = taskRosterSectionFrom(p.src.Tasks(), cards, waits)
+	}
+	return snap
+}
+
+// Marshal is the exit function: the bytes the panel would be rendered from.
+// It is a separate step from Snapshot so the last mile has something to hand to
+// a transport without re-reading the queue (and racing whatever answered in
+// between). It owns no state, so two pumps - or two goroutines on one pump -
+// cannot see each other's packet.
+func (p *SnapshotPump) Marshal() ([]byte, error) {
+	data, err := json.Marshal(p.Snapshot())
+	if err != nil {
+		return nil, fmt.Errorf("panel: snapshot not encodable, nothing was sent: %w", err)
+	}
+	return data, nil
+}
+
+// Publish assembles, encodes, and hands the bytes to src.Out. The returned
+// snapshot is the one those bytes describe, so a caller can audit the depth it
+// just booked without asking the queue a second time.
+func (p *SnapshotPump) Publish() (Snapshot, []byte, error) {
+	if p == nil {
+		return Snapshot{}, nil, fmt.Errorf("panel: no pump attached, the snapshot was not built")
+	}
+	snap := p.Snapshot()
+	data, err := json.Marshal(snap)
+	if err != nil {
+		p.count()
+		return snap, nil, fmt.Errorf("panel: snapshot not encodable, nothing was sent: %w", err)
+	}
+	if p.src.Out == nil {
+		p.count()
+		return snap, data, fmt.Errorf("panel: 快照已构造但没有出口（最后一公里在票 33/35 名下），本次未送达")
+	}
+	if err := p.src.Out(snap, data); err != nil {
+		p.count()
+		return snap, data, fmt.Errorf("panel: 快照出口拒收：%w", err)
+	}
+	p.count()
+	return snap, data, nil
+}
+
+// Publishes reports how many snapshots this pump has put through its exit,
+// including the ones the exit refused. A count that never moves is how a caller
+// notices the pump is assembled but never driven.
+func (p *SnapshotPump) Publishes() int {
+	if p == nil {
+		return 0
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.publishes
+}
+
+func (p *SnapshotPump) count() {
+	p.mu.Lock()
+	p.publishes++
+	p.mu.Unlock()
+}
+
+// StreamLog produces the snapshot's results section from the deltas a run
+// streams, and it is the reason "results" has a source at all.
+//
+// One chunk per correlation key, deltas appended to it, Close marking that key
+// done. The key the loop actually has is the task id (agent.Event carries
+// TaskID, and Event has no per-chunk id of its own) - naming that here is the
+// honest version of a field the pump must fill; a made-up id would be the packet
+// lying about its own provenance.
+//
+// Overflow TRUNCATES and never merges (ticket 197 leg B re-cut this rule, which
+// previously folded the two oldest chunks into one row). The fold was tolerable
+// while the only producer was a single `wisp run` task, because the two rows it
+// joined were two sentences of one answer. A subagent's stream is not interchangeable
+// text: the owner clicks one subagent to read THAT agent's work, and a row carrying
+// two agents' sentences would show them something false about provenance - the same
+// disease D30 names for tool output, arriving through the display side instead of the
+// model side. So past the key bound every key keeps its own chunk, each chunk keeps
+// its own head and tail, and the elided middle is said out loud in that chunk's text.
+// The bound is still a bound: it moved from "how many rows exist" to "how many runes
+// each row holds", and past a hard ceiling whole keys stop being tracked and are
+// NAMED in DroppedKeys() - "nobody is showing this one" is a different sentence from
+// "somebody merged this one".
+//
+// What this file does NOT do is put either fact on the wire: ResultChunk keeps its
+// three JSON keys (composer.go:65-69, mirrored by frontend/src/lib/panel.ts's
+// ResultChunkView, which this leg may not touch - see
+// TestComposerContractTypesMatchFrontend). The accessors below are the host-facing
+// half; carrying the marker into the packet is ticket 197's carrier leg (197-r3).
+type StreamLog struct {
+	mu        sync.Mutex
+	order     []string
+	chunks    map[string]ResultChunk
+	kept      map[string]*streamKept
+	maxKeys   int
+	truncated bool
+	elided    int
+	dropped   []string
+}
+
+// streamKept is what one row retains of ITS OWN stream once the log is
+// truncating: the first streamTruncateKeepRunes runes, a sliding window of the
+// last streamTruncateKeepRunes, and how many runes that stream has produced in
+// total. It exists so that clamping is idempotent - a fold re-run over an already
+// folded row would otherwise eat the head it promised to keep and stack a second
+// marker inside the first. The text the panel sees is always this state rendered,
+// never a string edited in place, which is also why a stream's own text can
+// mention a marker without being parsed by anything.
+type streamKept struct {
+	head []rune
+	tail []rune
+	seen int
+}
+
+// absorb feeds one delta into the retained tail window and reports how many runes
+// it pushed out of it - the log's own count of what the bound cost.
+func (st *streamKept) absorb(delta []rune) int {
+	st.seen += len(delta)
+	st.tail = append(st.tail, delta...)
+	over := len(st.tail) - streamTruncateKeepRunes
+	if over <= 0 {
+		return 0
+	}
+	st.tail = st.tail[over:]
+	return over
+}
+
+// render is the row the panel reads: its own head, its own tail, and between them
+// a marker that counts the middle this ONE stream lost. Nothing from another key
+// can appear here - the state is per key.
+func (st *streamKept) render() string {
+	elided := st.seen - 2*streamTruncateKeepRunes
+	if elided <= 0 {
+		return string(append(append([]rune{}, st.head...), st.tail...))
+	}
+	return fmt.Sprintf("%s...[truncated: %d runes elided]...%s", string(st.head), elided, string(st.tail))
+}
+
+const (
+	// DefaultStreamKeys is how many concurrent result streams a pump tracks at
+	// full fidelity. 32 stays generous against the pre-197 producer (one task per
+	// `wisp run`) and, now that overflow truncates instead of merging, it bounds
+	// runes-per-row rather than the number of rows a subagent fan-out may open.
+	DefaultStreamKeys = 32
+
+	// StreamKeyHardCeilingMultiple is how far past maxKeys the key set may grow
+	// before whole keys start being dropped (and named). Two bound × the per-chunk
+	// floor below is the point where the bookkeeping, not the text, is the cost.
+	StreamKeyHardCeilingMultiple = 2
+
+	// streamTruncateKeepRunes is the head AND the tail every chunk keeps once the
+	// log is in truncated mode. Runes, not bytes: a byte cut would split the
+	// Chinese this project streams and hand the panel mojibake.
+	streamTruncateKeepRunes = 256
+
+	// SubagentStreamKeyPrefix is the key shape ticket 197 §0 writes down: one
+	// subagent = one stream, "subagent:<taskID>", literal lowercase, the task id
+	// passed through verbatim. It is an ALIAS now, not a copy: internal/streamkey
+	// owns the literal, because the writing leg (internal/tools) and this reading
+	// leg may not import each other, and two copies of one spelling is how a page
+	// starts lying about which agent wrote which line - change it on the writer
+	// and every roster row keeps its state while the page under its key goes
+	// empty, with nothing in either package able to see that. Ruling A406 named
+	// this package the reader's source and cmd/wisp the injector; 197-r3 collapsed
+	// the duplicated copy into that one mint site and
+	// TestSubagentStreamKeyHasOneMintSite (cmd/wisp) is the resident nail against a
+	// re-fork.
+	SubagentStreamKeyPrefix = streamkey.SubagentPrefix
+)
+
+// SubagentStreamKey is the one spelling of a subagent's stream key. An empty or
+// whitespace-only task id yields "": a stream belonging to no task is not a
+// stream, and Append("") would otherwise open a row the panel cannot attribute
+// to anybody (see Chunks - the key IS the row's identity here). The guard lives
+// in streamkey now, so the writing side gets the same answer for a blank id -
+// that divergence (panel returned "", tools returned "subagent") is the one
+// 197-r1b left documented at §⑤2 and 载体层 r3 closes.
+func SubagentStreamKey(taskID string) string {
+	return streamkey.Subagent(taskID)
+}
+
+// NewStreamLog builds an empty results log. maxKeys <= 0 means DefaultStreamKeys.
+func NewStreamLog(maxKeys int) *StreamLog {
+	if maxKeys <= 0 {
+		maxKeys = DefaultStreamKeys
+	}
+	return &StreamLog{chunks: map[string]ResultChunk{}, kept: map[string]*streamKept{}, maxKeys: maxKeys}
+}
+
+// Append adds one delta to its key's chunk. A key the log already tracks is
+// only ever appended to - never re-keyed, never folded into a neighbour.
+func (s *StreamLog) Append(key, text string) {
+	if s == nil || text == "" {
+		return
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	cur, ok := s.chunks[key]
+	if !ok {
+		s.chunks[key] = ResultChunk{CorrelationID: key, Text: text}
+		s.order = append(s.order, key)
+		s.enforceBoundLocked()
+		return
+	}
+	cur.Text += text
+	s.chunks[key] = cur
+	if s.truncated {
+		s.clampLocked(key)
+	}
+}
+
+// Close marks one key's chunk as the end of its stream. An unknown key still
+// records a done chunk, because "the stream ended and nobody had noticed it
+// start" is a fact the panel should see rather than lose.
+func (s *StreamLog) Close(key string) {
+	if s == nil || key == "" {
+		return
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	cur, ok := s.chunks[key]
+	if !ok {
+		s.chunks[key] = ResultChunk{CorrelationID: key, Done: true}
+		s.order = append(s.order, key)
+		s.enforceBoundLocked()
+		return
+	}
+	cur.Done = true
+	s.chunks[key] = cur
+}
+
+// Chunks returns the accumulated result chunks in arrival order.
+func (s *StreamLog) Chunks() []ResultChunk {
+	if s == nil {
+		return nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := make([]ResultChunk, 0, len(s.order))
+	for _, k := range s.order {
+		out = append(out, s.chunks[k])
+	}
+	return out
+}
+
+// enforceBoundLocked is ticket 197's overflow rule, and its one invariant is that
+// no key is ever folded into another: past maxKeys the log declares itself
+// truncating and clamps every chunk to its OWN head and tail; only past the hard
+// ceiling does a key stop being tracked, and then it is named in s.dropped. Caller
+// holds s.mu.
+func (s *StreamLog) enforceBoundLocked() {
+	if len(s.order) <= s.maxKeys {
+		return
+	}
+	s.truncated = true
+	for _, k := range s.order {
+		s.clampLocked(k)
+	}
+	ceiling := s.maxKeys * StreamKeyHardCeilingMultiple
+	for len(s.order) > ceiling {
+		oldest := s.order[0]
+		s.order = s.order[1:]
+		delete(s.chunks, oldest)
+		delete(s.kept, oldest)
+		s.dropped = append(s.dropped, oldest)
+	}
+}
+
+// clampLocked puts one key's row under the retained window, creating that window
+// the first time the row is over it and folding in whatever the row grew by since.
+// It never runs over another key's text, and re-running it on a row already under
+// the fold changes nothing - which is the difference between "this stream lost its
+// middle" and the old fold's "these two streams became one row". Caller holds s.mu.
+func (s *StreamLog) clampLocked(key string) {
+	c := s.chunks[key]
+	if st, ok := s.kept[key]; ok {
+		// The row is already under the fold: the only text that may have been added
+		// is the delta Append put on top of the rendered window, so re-render from
+		// state and drop the raw tail difference into the counted elision.
+		delta := []rune(strings.TrimPrefix(c.Text, st.render()))
+		if len(delta) > 0 {
+			s.elided += st.absorb(delta)
+		}
+		c.Text = st.render()
+		s.chunks[key] = c
+		return
+	}
+	r := []rune(c.Text)
+	if len(r) <= streamTruncateKeepRunes*2 {
+		return
+	}
+	st := &streamKept{
+		head: r[:streamTruncateKeepRunes],
+		tail: r[len(r)-streamTruncateKeepRunes:],
+		seen: len(r),
+	}
+	s.kept[key] = st
+	s.elided += len(r) - 2*streamTruncateKeepRunes
+	c.Text = st.render()
+	s.chunks[key] = c
+}
+
+// Truncated reports the log went past its key bound, so at least one row is no
+// longer the full stream it started as. Full fidelity below the bound is the
+// promise; this is the accessors' way of saying when it stopped holding.
+func (s *StreamLog) Truncated() bool {
+	if s == nil {
+		return false
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.truncated
+}
+
+// ElidedRunes is how many runes the truncations removed in total. A number, not
+// a shrug: "truncated" that cannot say how much it lost is the same lie with a
+// label on it.
+func (s *StreamLog) ElidedRunes() int {
+	if s == nil {
+		return 0
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.elided
+}
+
+// DroppedKeys names every key the log stopped tracking at the hard ceiling, oldest
+// first. It is the honest remainder of a bound: the panel shows no row for these,
+// and the host can say WHICH ones and say they were never merged into a row that is
+// still on screen.
+func (s *StreamLog) DroppedKeys() []string {
+	if s == nil {
+		return nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := make([]string, len(s.dropped))
+	copy(out, s.dropped)
+	return out
+}
+
+// StreamTruncation is what ONE key of the log cost the bound. It is the
+// per-stream half of the same three facts Truncated / ElidedRunes / DroppedKeys
+// give the whole log, and it exists because a host cannot put "this page is
+// missing its middle" on a row without knowing which row paid for it.
+type StreamTruncation struct {
+	// Truncated is true when this key's own row no longer holds its own full
+	// stream, i.e. when its text carries the inline "[truncated: N runes elided]"
+	// marker. A log that is truncating while this row stayed under the retained
+	// window reports false, and that is the truth, not a missing read.
+	Truncated bool
+	// ElidedRunes is how many runes THIS stream lost. Runes, not bytes: the
+	// bound is counted in runes on purpose (pump.go's streamTruncateKeepRunes),
+	// so a Chinese row and an ASCII row pay the same measure.
+	ElidedRunes int
+	// Dropped is true when the log stopped tracking this key at the hard ceiling,
+	// which means the page for it has no row at all - the loudest of the three,
+	// and never folded into a neighbour's row instead (197-r2 §1 乙).
+	Dropped bool
+}
+
+// TruncationFor reads one key's own truncation. An unknown key answers the
+// zero value with Dropped set only if it really was dropped: "nothing was lost
+// from this stream" and "nobody has written to this stream" are the same reading
+// here, and both mean the row that exists is the row in full.
+func (s *StreamLog) TruncationFor(key string) StreamTruncation {
+	if s == nil || key == "" {
+		return StreamTruncation{}
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, d := range s.dropped {
+		if d == key {
+			return StreamTruncation{Dropped: true}
+		}
+	}
+	st, ok := s.kept[key]
+	if !ok {
+		return StreamTruncation{}
+	}
+	elided := st.seen - 2*streamTruncateKeepRunes
+	if elided <= 0 {
+		return StreamTruncation{}
+	}
+	return StreamTruncation{Truncated: true, ElidedRunes: elided}
+}

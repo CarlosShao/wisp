@@ -1,0 +1,31 @@
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:387:    () => typeof window !== "undefined" && window.innerWidth < SIDEBAR_COLLAPSE_BELOW,
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:393:    window.addEventListener("resize", onResize);
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:397:    return () => window.removeEventListener("resize", onResize);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/approval-card.tsx:67:      window.setTimeout(() => {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:536:    setProp({ col: AI_LABEL, x: Math.min(rect.left, window.innerWidth - 336), y: rect.bottom + 6 });
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:568:      return { col, x: Math.min(rect.left, window.innerWidth - 336), y: rect.bottom + 6 };
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:601:      window.removeEventListener("pointermove", move);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:602:      window.removeEventListener("pointerup", finish);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:603:      window.removeEventListener("pointercancel", finish);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:609:    window.addEventListener("pointermove", move);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:610:    window.addEventListener("pointerup", finish);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:611:    window.addEventListener("pointercancel", finish);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:692:                      setAddOpen((current) => (current ? null : { x: Math.min(rect.left, window.innerWidth - 276), y: rect.bottom + 6 }));
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:708:                        x: Math.max(8, Math.min(rect.right - 220, window.innerWidth - 228)),
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:1017:              setAddOpen({ x: Math.min(position.x, window.innerWidth - 276), y: position.y });
+dsh/feat/frontend-p0-v2:frontend/src/components/error-boundary.tsx:36:   an async rejection nobody awaited - that still reaches window.onerror and
+dsh/feat/frontend-p0-v2:frontend/src/components/panel-skeleton.tsx:41:    const t = window.setTimeout(() => setEntering(false), 300);
+dsh/feat/frontend-p0-v2:frontend/src/components/panel-skeleton.tsx:42:    return () => window.clearTimeout(t);
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/animated-list.tsx:150:    window.addEventListener('keydown', handleKeyDown);
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/animated-list.tsx:151:    return () => window.removeEventListener('keydown', handleKeyDown);
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/magnet.tsx:85:    window.addEventListener('mousemove', handleMouseMove);
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/magnet.tsx:87:      window.removeEventListener('mousemove', handleMouseMove);
+dsh/feat/frontend-p0-v2:frontend/src/components/turn-rail.tsx:63:      if (hideTimer.current !== undefined) window.clearTimeout(hideTimer.current);
+dsh/feat/frontend-p0-v2:frontend/src/components/turn-rail.tsx:68:    if (hideTimer.current !== undefined) window.clearTimeout(hideTimer.current);
+dsh/feat/frontend-p0-v2:frontend/src/components/turn-rail.tsx:73:    hideTimer.current = window.setTimeout(() => {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:141:  postMessage(message: string): void;
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:146:    /** Installed by WebView2's AddHostObjectToScript / postMessage pipe. */
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:154:  return window.wispBridge ?? window.chrome?.webview ?? null;
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:179:  bridge.postMessage(
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:189: * One request on the panel's only envelope: the same postMessage pipe the
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:218:  bridge.postMessage(

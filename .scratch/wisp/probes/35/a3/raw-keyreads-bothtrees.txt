@@ -1,0 +1,6 @@
+=== dsh/feat/frontend-p0-v2
+     38 names;     24 correlationId;     13 rulesHit;      9 stored;      9 spelling;      9 artifact;      8 decidedBy;      8 canonical;      8 callChain;      7 sessionOverrideBlocked;      7 reparse;      7 reasonKnown;      6 rewritten;      5 attachmentError;      5 acceptedAttachmentMimes;      4 sizeBytes;      4 maxAttachmentBytes;      4 l2ConfirmNames;      4 generatedAt;      3 dataBase64;      2 mime;      2 deduplicated;      2 declaredMime;
+
+=== HEAD
+     33 names;     21 correlationId;     13 rulesHit;      9 stored;      9 spelling;      9 artifact;      8 decidedBy;      8 callChain;      7 sessionOverrideBlocked;      7 reparse;      7 reasonKnown;      6 rewritten;      6 canonical;      5 attachmentError;      5 acceptedAttachmentMimes;      4 sizeBytes;      4 maxAttachmentBytes;      4 l2ConfirmNames;      4 generatedAt;      3 dataBase64;      2 mime;      2 deduplicated;      2 declaredMime;
+

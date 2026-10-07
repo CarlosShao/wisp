@@ -1,0 +1,4 @@
+      4 snapshot.results
+      4 snapshot.pending
+      1 snapshot.view
+      1 snapshot.composer
