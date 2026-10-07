@@ -1,0 +1,26 @@
+$ grep -rn 'statemachine\.Machine{' cmd internal (non-test) => 0 hits
+$ files importing internal/ball under cmd/wisp (all are //go:build windows)
+cmd/wisp/resident_approval_windows.go
+cmd/wisp/resident_ball_228_test.go
+cmd/wisp/resident_ball_windows.go
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go
+cmd/wisp/resident_hotkey_258_windows_test.go
+cmd/wisp/resident_hotkey_live_258_windows_test.go
+cmd/wisp/resident_hotkey_v1probe_test.go
+cmd/wisp/resident_task_source_live_246_windows_test.go
+cmd/wisp/resident_windows.go
+$ head -1 of models.go/run.go/main.go (no build tag => portable)
+==> cmd/wisp/models.go <==
+package main
+
+==> cmd/wisp/run.go <==
+package main
+
+==> cmd/wisp/main.go <==
+// Command wisp is the single Wisp binary (SPEC-01 §3): no-args starts the GUI
+$ stateForCardLevel production callers
+cmd/wisp/resident_approval_windows.go:879:	b.SetState(stateForCardLevel(p.Level))
+cmd/wisp/resident_approval_windows.go:882:		"orb_state", string(stateForCardLevel(p.Level)),
+cmd/wisp/resident_approval_windows.go:959:// stateForCardLevel is the D43 name for "a human is being waited on at this
+cmd/wisp/resident_approval_windows.go:965:func stateForCardLevel(level string) statemachine.State {

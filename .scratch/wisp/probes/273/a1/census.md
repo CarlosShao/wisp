@@ -14,7 +14,9 @@ leg id `273-a1`｜落点普查，⛔ 本腿不落地、不选形｜票面
 - **`.github/workflows/ci.yml` 一律经 `git show HEAD:.github/workflows/ci.yml` 读**，没碰工作副本（`111-r5` 在编辑它）。CI 摘要取到 `logs/ci-from-gitshow.txt`（55 行，只留 `go build|go install|go test|gofmt|d22scan|go vet` 命中的行）。
   - 现量读数：`git show HEAD:.github/workflows/ci.yml | grep -c balldebug` = **0** ⇒ CI 不构建 `cmd/balldebug`。
 - ⛔ 不读不写 `frontend/**`、`design/**`；没开窗、没加 `-tags winlive`；无密钥入文。
-- 原始尺输出全部落在 `.scratch/wisp/probes/273/a1/logs/`（21 枚文件），本件只带摘要与逐名表。
+- 原始尺输出全部落在 `.scratch/wisp/probes/273/a1/logs/`（**29 枚文件**，整目录 226K→238K），本件只带摘要与逐名表。
+- 第 2 笔（`ae6c010e` 之后）追加三把防漏尺：`bypass-and-tag-checks.txt`（复合字面量绕过＝0、`cmd/wisp` 里 `internal/ball` 的构建标记）、
+  `state-for-card-level.txt`（`stateForCardLevel` 全部命中）；据此修正了 §2 甲栏"可移植面够不到界面收件人"与 §2 丙栏的逐名钉。
 
 ---
 
@@ -44,6 +46,7 @@ leg id `273-a1`｜落点普查，⛔ 本腿不落地、不选形｜票面
 |---|---|---|
 | C（产码构造点） | `grep -rn 'statemachine\.New(' --include=*.go .` 去掉 `_test.go` 与 `.scratch/` | **2 枚**：`cmd/wisp/models.go:303`、`cmd/balldebug/main.go:188`；两枚都是**单行字面量、只有 `Initial`**（`logs/new-callsites.txt`，总 8 枚命中＝2 产码＋6 测试） |
 | C′（防漏：多行字面量） | `grep -rn 'statemachine\.Options{' …` 去测试 | 同样 **2 枚** ⇒ 没有"多行 Options 把 Sink 藏在下一行"的漏网 |
+| C″（防绕过构造） | `grep -rn 'statemachine\.Machine{' --include=*.go cmd internal` 去测试 | **0 枚** ⇒ 没有"不走 `New`、用复合字面量绕过缺省支"的第三条造机器路子 |
 | D（有没有人给过真收件人） | `grep -rn 'Sink:\|Sink =' --include=*.go` 去测试与 `.scratch` | 58 枚命中里**没有一枚**是 `statemachine.Options` 的 `Sink`；`cmd/wisp/run.go:998 consoleSink`＝**`agent.Sink`**（`func (c consoleSink) Publish(e agent.Event)`，`run.go:1260`）、`cmd/wisp/providers.go:194 storeHealthSink`＝**`llm.HealthSink`**（`run.go:1170`）、`internal/agent/loop.go:209 NopSink{}`＝**`agent.Sink`** ⇒ **三枚同名 `Sink` 都不是状态机那枚**（本轮实测的第二处"同名罐子"陷阱，与记忆里 `.Handle(` 那例同族） |
 | E（类型面） | `grep -rn 'statemachine\.Effect\|statemachine\.Sink'` 去测试去 `.scratch` | **0 枚** ⇒ 产码里**没有任何一段代码能点出这个类型名**，收件人在类型面上不存在 |
 | F（字符串面，逐枚） | 对 50 枚名逐枚 `grep -rnF '"<name>"'` 去 `table.go`／去 `_test.go`／去 `.scratch` | 48 枚 **0 命中**；2 枚命中但**都不是消费者**（下条） |
@@ -163,6 +166,7 @@ leg id `273-a1`｜落点普查，⛔ 本腿不落地、不选形｜票面
 | 撞哪几枚既有钉 | **枚数＝1 枚用例（红名册只 1 名）＋2 枚用例（视写法）**：<br>① `cmd/wisp/config_receipt_255_test.go:179 TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` —— 该钉把 `cmd/wisp/config_readers_255.go` 里所有 `file.go:LINE [token]` 引用**逐条开文件验行号**：`cmd/wisp/models.go:163`（2 处引用）、`:183`。⚠ 只要**在 163 行以上插行**就红；插在 `handOffModel`（`:302` 以下）不红。同钉还引 `cmd/wisp/run.go:991`（3 处）、`:423/:424/:435/:1014`、`cmd/wisp/resident_ball_windows.go:276`（2 处）、`panel_resident_windows.go:207/:253` ⇒ **改 run.go／resident_ball 就撞上它**。<br>② `:230 TestTicket255RosterStillMatchesTheActualReadSites`（同文件另一枚）—— 若新 Sink 里**读任何配置字段**（`scanReadFiles` 扫的是 `os.ReadFile`／配置读点），名册必须增行，否则红。<br>③ 不受损（现量核对）：`cmd/wisp/leg_sink_gate_131_test.go`(1 名)／`leg_sink_nail_131_windows_test.go`(3 名)／`leg_dispatch_gate_133_test.go`(1 名) 盯的是 **`installLogSink` 日志收件人**与 `main.go` 派发可达性，与状态机 `Sink` **同名不同物**（`leg_sink_nail_131` 头部自陈是票 131 AC#2/#3 的日志腿）；甲只要**不删 `cmdModels` 那一跳、不动 `installLogSink` 那九行**就不碰它们。`internal/models/bridge_test.go`(3 名) 只要 `WireDownloading` 签名不动就不红 |
 | 这条边以后谁看得见 | **装配根**＝`cmd/wisp` 是唯一一处"谁收 Effect"被写下来的地方，与 246 的裁定同形（票面 `246-…md`：**「我裁走乙（装配根注入）」、`A481`、09-30 18:40**，且"⛔ 不开任何新包级依赖边"）；grep `Sink:` 在 `cmd/wisp` 里会同时命中 `consoleSink`／`storeHealthSink` 两枚同名罐子（§1.2 尺 D），**可读性差一截**，建议落新文件并用不与 `Sink` 撞的名 |
 | 额外代价 | ⛔ 不许写成"加一条日志就算收件人"（票面 §3 第二条）；若收件人要异步（`machine.go:31-33` 明令 Sink **不得阻塞、不得同步重入 Dispatch**），一枚真收件人大概率要**自己排队／起 goroutine** ⇒ 撞上禁止清单两条硬形状：裸 `go func(` 无 owner/recover、用墙钟差实现超时（`tools/d22scan`） |
+| ⚠ **本腿补的一格硬约束（现量）** | `head -1 cmd/wisp/models.go`／`run.go`／`main.go` ＝ `package main`／文档注释，**无构建标记＝可移植文件**；而 `grep -rln 'internal/ball' cmd/wisp` 出来的**每一枚非测试文件都带 `//go:build windows`**（`resident_ball_windows.go`、`resident_approval_windows.go`、`resident_windows.go`）。<br>⇒ 甲**接在链①（`models` 腿）上够不到任何界面收件人**：球的 `SetState`／面板都在 windows 一侧，可移植文件里调它们会把 ubuntu 的 `go vet ./cmd/wisp` 编译面打断。甲在链①上唯一可移植的收件人是 **stdout／store／observe** 那一类 ⇒ **实质就是把票面 §3 明令禁止的"改成加一条日志"落地**。<br>⇒ 要真治"界面没反应"，甲**必须延伸进常驻腿**（那正是丙的活），或在 windows 一侧另装配；**"甲只修链①"这枚形状修不了票面 §1 说的那件产品现象**，本腿按原文把这话说清，不替编排者选 |
 
 ### 乙＝包内自带一枚默认 Sink
 
@@ -180,7 +184,7 @@ leg id `273-a1`｜落点普查，⛔ 本腿不落地、不选形｜票面
 |---|---|
 | 动哪几枚文件 | 常驻腿今天**没有机器**（§1.3 链③）⇒ 丙至少四件事：① 在 `cmd/wisp/resident_ball_windows.go`（或同腿新文件）**建**一枚 `statemachine.New`；② 找到事件源把 `Event` 喂进去——今天球的输入是 `ball.Events{OnClickBall／OnSummonHotkey／OnMuteHotkey／…}`（`resident_ball_windows.go:278-289`）直连 `recordBallGesture`，**没有任何一处调 `Dispatch`**（现量：`.Dispatch(` 去测试只有 `cmd/balldebug:618`、`internal/models/bridge.go`×4、`machine.go:202` 自调，另两枚是**面板 ComposerDispatch 同名物** `cmd/wisp/panel_resident_windows.go:360 w.Dispatch(fn)`）；③ 收件人（`ball.SetState`/`SetBadge`/`SetBadgeText`/`SetTrayTip` 都有真形，`internal/ball/ball_windows.go:311/:316/:332/:961`）；④ 与 `resident_approval_windows.go:879/:956` 那两处**直接点名 `SetState`** 的现有控制权正面对撞（谁说了算要定案） |
 | 新依赖边 | **0**（仍在 `cmd/wisp` 内装配），但把 `ball` 的控制权从"卡片级别直接 `SetState`"改成"Effect 驱动"＝**改常驻腿的状态所有权**，这条不是依赖边而是**语义边** |
-| 撞哪几枚钉 | **枚数＝1 枚必红（行号漂移）＋1 枚范围待量**：① `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` —— 名册钉了 `cmd/wisp/resident_ball_windows.go:276 [Hotkeys:  cfg,]`（**2 处引用**），**在 276 行以上插行即红**（现量：`:276` 内容确为 `Hotkeys:  cfg,`）；② `cmd/wisp/resident_approval_246_windows_test.go`／`subagent_*_197_test.go`／`approval_seam_201_test.go` 这些**引用 `statemachine` 的常驻腿用例**（现量：`grep -rln statemachine cmd/wisp/*_test.go` = 5 枚文件），改动 `SetState` 控制权会牵动其中几枚**需落地那天现跑红名册才知道**〔判不动，见 §5〕；③ 常驻腿的 `*_windows_test.go` 里有 `winlive` 分档用例（本腿⛔没跑、也没读其内容），丙的"图标真变了"那一档**只有真机可量** |
+| 撞哪几枚钉 | **枚数＝1 枚必红（行号漂移）＋2 枚按名可指＋2 枚 winlive 不可跑**：<br>① `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` —— 名册钉了 `cmd/wisp/resident_ball_windows.go:276 [Hotkeys:  cfg,]`（**2 处引用**），**在 276 行以上插行即红**（现量：`:276` 内容确为 `Hotkeys:  cfg,`）。<br>② `cmd/wisp/resident_approval_246_windows_test.go:93 TestAC246CardWithNoWindowFailsClosedThroughTheRealGate` —— 该用例 `:119`/`:122` 直接断 `stateForCardLevel("L1"/"L2") == StateConfirming/StateAwaitingApproval`，而 `stateForCardLevel` 正是丙要**从"直接点名"改成"Effect 驱动"**的那枚函数（定义 `cmd/wisp/resident_approval_windows.go:965`；现量生产调用点**只有 2 处**、同一文件 `:879 b.SetState(stateForCardLevel(p.Level))` 与 `:882 "orb_state", string(stateForCardLevel(p.Level))`（日志字段），另加 `logs/state-for-card-level.txt` 记全 6 枚命中）。<br>③ `cmd/wisp/approval_seam_201_test.go:78`（＋`:94`/`:206`）断 `rt.waitingStateName()`（生产定义在 `cmd/wisp/approval_always.go:190`）返回 `AwaitingApproval` —— 状态的**来源**被丙改走机器以后，这枚读法要不要跟着换边，是丙的第二次撞钉。<br>④ `cmd/wisp/resident_approval_live_246_windows_test.go:133`/`:235` 两枚 winlive 档（`//go:build windows && winlive`）本腿⛔没跑、没读内容，**只能登记成"仅本机可量，未批"**。<br>⑤ 不受损（现量核对）：`subagent_blocked_197_test.go`／`subagent_carrier_197_test.go` 只把 `statemachine` 当**状态词表＋`statemachine.Valid` 判据**用（不建机器、不传 Sink），丙动不到它们 |
 | 这条边以后谁看得见 | 只在常驻腿文件里；`wisp models`（唯一今天真投递那条链）**继续投空罐** ⇒ 丙**不修**票面 §2 那两条现量读数里的任何一条，只把"看不见"从一条腿扩成两条腿各自成立；甲的链①在丙下**永不修** |
 | 额外代价 | 票面 §4 AC#2 让丙"逐形给"，本腿补一句代价：丙与甲**不是互斥**，丙实质是"甲＋给常驻腿补一台机器"，**比甲贵**；票面说"只在常驻腿接、`cmd/wisp` 那条不动"——若"那条"指 `cmd/wisp/models.go`，那丙保住的只是调试／观感，放弃唯一今天真会投递的名（`model.verify-sha256-signature`） |
 
@@ -230,14 +234,18 @@ leg id `273-a1`｜落点普查，⛔ 本腿不落地、不选形｜票面
 
 ## 5. 判不动（本腿停在这里，等编排者）
 
-1. **丙形到底撞红几枚常驻腿用例**——`cmd/wisp/resident_approval_246_windows_test.go`／`approval_seam_201_test.go`／`subagent_carrier_197_test.go` 等 5 枚引用 `statemachine` 的测试文件，
-   要把 `SetState` 控制权改交给 Effect 之后跑红名册才知道；本腿⛔不能跑 `go test`（`272-r2` 在飞）。
+1. **丙形最终红几枚**——本腿已把**该指名的钉逐名指到用例**（§2 丙栏①–⑤：1 枚行号漂移必红＋2 枚按语义待裁＋2 枚 winlive 不可跑），
+   但"改完 `stateForCardLevel`／`waitingStateName` 的来源以后到底哪几名进红名册"要跑那天现量；本腿⛔不能跑 `go test`（`272-r2` 在飞）。
+   ⚠ 同一条尺也量到"不受损"的：`subagent_*_197_test.go` 两枚只拿 `statemachine` 当词表用，别让别的腿把它们误报成风险。
 2. **"收件人的可观测状态"该断在哪一层**——`ball.SetState`/`SetBadge` 的真形在 `internal/ball/ball_windows.go`，带 `windows` 构建约束；
    ⛔ 本腿没开窗、没加 `-tags winlive`，无法判"不靠真窗口能不能断到"，AC#4 的用例形状定稿要这一条。
 3. **`error.ack` 到底今天投不投得出去**——`defer machine.Close()`（`cmd/wisp/models.go:304`）与 `time.AfterFunc`（`machine.go:187`）的竞态本腿只能〔读码推〕；
    要量就得跑带计时的用例，越界。
 4. **表枚数与权威表分叉（`#41`/`#42`）算不算已批准**——需要台账凭据；`docs/reports/pending-and-issues.md` 本腿只 grep 了"谁在等批准"与"第二枚"两组关键词（`logs/ledger-who-waits.txt` 1 行、`logs/ledger-truth-source.txt` 85 行），⛔ 没通读约 12,900 行母本，不敢据以判。
 5. **甲形是否要求 `run.go`／常驻腿同时补机器**才算"票完成"——这是范围裁量，票面 AC#2 明令"⛔ 本票不选形"，本腿只把三形代价摆平，不替你选。
+6. **"哪几枚名该由谁收"这张对应表本腿不裁**：名册 1.4 的 `→谁` 列是按名前缀的**读码推**归档（⛔ 不是任何仪器／文档里既有的映射）；
+   仓里**不存在**一份"D43 副作用名 → 收件人"的分档表（现量＝尺 F：50 枚名逐枚 `grep -rF '"<name>"'`，去表／去测试／去 `.scratch` 后 48 枚 0 命中、2 枚假阳性）。
+   这张表要人工或编排者定：它一旦沉进包里就成了 §4 第 2 条那处契约文字，一旦有名字被实现成 Tool 就撞上 §4 第 3 条 ⇒ **不在本票射程，本腿只把空位摆出来**。
 
 ---
 

@@ -1,0 +1,6 @@
+cmd/wisp/resident_approval_246_windows_test.go:119:	if s := stateForCardLevel("L1"); s != statemachine.StateConfirming {
+cmd/wisp/resident_approval_246_windows_test.go:122:	if s := stateForCardLevel("L2"); s != statemachine.StateAwaitingApproval {
+cmd/wisp/resident_approval_windows.go:879:	b.SetState(stateForCardLevel(p.Level))
+cmd/wisp/resident_approval_windows.go:882:		"orb_state", string(stateForCardLevel(p.Level)),
+cmd/wisp/resident_approval_windows.go:959:// stateForCardLevel is the D43 name for "a human is being waited on at this
+cmd/wisp/resident_approval_windows.go:965:func stateForCardLevel(level string) statemachine.State {
