@@ -351,6 +351,12 @@ rc=1  RED - roster entry carries an EMPTY reason; the reason is data, not a comm
 **一切以 §15 为准**（v2-a 那发还顺带暴露本腿自己 sed 的射程错误，见本节第 2 条）。
 写这段只为让下一位读者知道那三段在哪、为什么不该引它——⛔ 不是新读数、⛔ 不改任何格的判语。
 
+⚠ **证据件同名双份的说明（防误引）**：`logs/a.txt`（189 字节）＝`logs/v2-a-rosterless-selftest.txt` 同一发的第二次 cp、
+`logs/c.txt`（990 字节）＝`logs/v2-c-shipped-selftest-overhat-baseline.txt` 同一发的第二次 cp ⇒ **判语只引带 `v2-` 前缀的那三枚名字**。
+而 `logs/b.txt`（**18,398 字节**）**没有孪生**，它是 14:28:33 那一发的唯一原件：把名册块摘掉后跑扫描 ⇒
+门对**全部 58 枚**越帽路径逐枚打出 `RED - over budget and NOT in the roster: <全名> (relative …, name …, full path …)`＋一枚计数守卫。
+⇒ **这一发顺手补强 AC#4**：名册不是通配、也不是摆设——**每一枚豁免都在被逐枚点名地用着**，摘掉名册＝当场红 58 行。
+
 
 
 
