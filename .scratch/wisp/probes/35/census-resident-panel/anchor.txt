@@ -1,0 +1,10 @@
+# census-resident-panel 起手锚（只读普查腿）
+
+- HEAD 锚点：`af68866cffad1117365db57156c318379ae0f5a8`（2026-10-07 22:01 +08）
+- 本腿射程：只读；⛔ 任何 go 命令（cmd/wisp 整包读数窗口归写腿 `35-r4`）；⛔ 不开窗。
+- 起手即报的第一处冲突（盘上原文 vs 派单转述）：派单说"面板在常驻进程里还没被装配起来"，
+  但 `cmd/wisp/resident_windows.go:151` 现读＝`rp, rpErr := newResidentPanelManager(rt.Layout.DataDir)`，
+  `:157` 现读＝`panel = startResidentPanel(rt.Registry, rp)`，
+  `cmd/wisp/panel_resident_windows.go:253` 现读＝`return NewPanelManager(disp, assets, dataPath, withGeometrySource(...)), nil`。
+  ⇒ "NewPanelManager 生产调用者 0 枚"这一读数自票 33 落地起已过期（本腿逐行复量，非转述）。
+- 本件之后：六问逐节写在同目录 summary.md。
