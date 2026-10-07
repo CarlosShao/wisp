@@ -1,0 +1,7 @@
+103:	chromium.MessageCallback = w.msgcb
+139:func (w *webview) msgcb(msg string) {
+149:			w.Eval("window._rpc[" + id + "].reject(" + jsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+153:			w.Eval("window._rpc[" + id + "].reject(" + jsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+157:			w.Eval("window._rpc[" + id + "].resolve(" + string(b) + "); window._rpc[" + id + "] = undefined")
+463:		var RPC = window._rpc = (window._rpc || {nextSeq: 1});
+472:		  window.external.invoke(JSON.stringify({

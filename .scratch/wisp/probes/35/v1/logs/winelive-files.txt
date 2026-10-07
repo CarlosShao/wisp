@@ -1,0 +1,6 @@
+cmd/wisp/resident_approval_246_windows_test.go
+cmd/wisp/resident_approval_live_246_windows_test.go
+cmd/wisp/resident_ball_live_228_windows_test.go
+cmd/wisp/resident_hotkey_live_258_windows_test.go
+cmd/wisp/resident_task_source_246_windows_test.go
+cmd/wisp/resident_task_source_live_246_windows_test.go

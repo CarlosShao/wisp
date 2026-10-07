@@ -1,0 +1,31 @@
+}
+
+func jsString(v interface{}) string { b, _ := json.Marshal(v); return string(b) }
+
+func (w *webview) msgcb(msg string) {
+	d := rpcMessage{}
+	if err := json.Unmarshal([]byte(msg), &d); err != nil {
+		log.Printf("invalid RPC message: %v", err)
+		return
+	}
+
+	id := strconv.Itoa(d.ID)
+	if res, err := w.callbinding(d); err != nil {
+		w.Dispatch(func() {
+			w.Eval("window._rpc[" + id + "].reject(" + jsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+		})
+	} else if b, err := json.Marshal(res); err != nil {
+		w.Dispatch(func() {
+			w.Eval("window._rpc[" + id + "].reject(" + jsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+		})
+	} else {
+		w.Dispatch(func() {
+			w.Eval("window._rpc[" + id + "].resolve(" + string(b) + "); window._rpc[" + id + "] = undefined")
+		})
+	}
+}
+
+func (w *webview) callbinding(d rpcMessage) (interface{}, error) {
+	w.m.Lock()
+	f, ok := w.bindings[d.Method]
+	w.m.Unlock()

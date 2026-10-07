@@ -1,0 +1,53 @@
+			w32.SWPNoZOrder|w32.SWPNoActivate|w32.SWPNoMove|w32.SWPFrameChanged)
+		w.browser.Resize()
+	}
+}
+
+func (w *webview) Init(js string) {
+	w.browser.Init(js)
+}
+
+func (w *webview) Eval(js string) {
+	w.browser.Eval(js)
+}
+
+func (w *webview) Dispatch(f func()) {
+	w.m.Lock()
+	w.dispatchq = append(w.dispatchq, f)
+	w.m.Unlock()
+	_, _, _ = w32.User32PostThreadMessageW.Call(w.mainthread, w32.WMApp, 0, 0)
+}
+
+func (w *webview) Bind(name string, f interface{}) error {
+	v := reflect.ValueOf(f)
+	if v.Kind() != reflect.Func {
+		return errors.New("only functions can be bound")
+	}
+	if n := v.Type().NumOut(); n > 2 {
+		return errors.New("function may only return a value or a value+error")
+	}
+	w.m.Lock()
+	w.bindings[name] = f
+	w.m.Unlock()
+
+	w.Init("(function() { var name = " + jsString(name) + ";" + `
+		var RPC = window._rpc = (window._rpc || {nextSeq: 1});
+		window[name] = function() {
+		  var seq = RPC.nextSeq++;
+		  var promise = new Promise(function(resolve, reject) {
+			RPC[seq] = {
+			  resolve: resolve,
+			  reject: reject,
+			};
+		  });
+		  window.external.invoke(JSON.stringify({
+			id: seq,
+			method: name,
+			params: Array.prototype.slice.call(arguments),
+		  }));
+		  return promise;
+		}
+	})()`)
+
+	return nil
+}

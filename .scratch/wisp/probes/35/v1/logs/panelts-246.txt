@@ -1,0 +1,6 @@
+ * behalf - which is why nothing below can record an outcome.
+ */
+export function requestModeSwitch(to: string): void {
+  sendRequest("panel.mode.request", { to });
+}
+

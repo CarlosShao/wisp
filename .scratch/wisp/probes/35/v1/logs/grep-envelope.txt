@@ -1,0 +1,23 @@
+cmd/wisp/panel_host_windows.go:80:	panelDispatchBinding = "wispDispatch"
+cmd/wisp/panel_host_windows.go:645:// window.wispDispatch(raw) - the library's own RPC pipe that dispatchRaw actually
+cmd/wisp/panel_host_windows.go:653:    if (typeof window.wispDispatch === "function") { window.wispDispatch(message); }
+cmd/wisp/panel_host_windows.go:658:// wired. It binds the wispDispatch door (whose Go callback feeds dispatchRaw) and
+cmd/wisp/panel_resident_windows.go:44:// behind window.wispDispatch), whose widening branches are fail-closed, and it adds
+cmd/wisp/panel_resident_windows_test.go:199:// was covering the mutation. So the reports ride window.wispDispatch, the product's own
+cmd/wisp/panel_resident_windows_test.go:301:	parts = append(parts, "window.wispDispatch("+reportJSEnv("ac13-probe", "b")+");")
+cmd/wisp/panel_resident_windows_test.go:801:		"window.wispDispatch(" + env("'ac14r-beacon'", "'SCRIPT-RAN'") + ");" +
+cmd/wisp/panel_resident_windows_test.go:805:		"Promise.resolve(window.wispDispatch(ENVS[i])).then(function(v){ return 'REPLIED'; })," +
+cmd/wisp/panel_resident_windows_test.go:808:		"window.wispDispatch(" + env("REP[i]", "got.replace(/[^A-Za-z0-9-]/g, '')") + ");" +
+cmd/wisp/panel_resident_windows_test.go:864:	evalOnPanelThread(t, rp, "window.wispDispatch("+reportJSEnv("ac14-push", "document.title")+");")
+cmd/wisp/panel_transport_35r1_test.go:14:// postMessage into the already-bound window.wispDispatch(raw) so the envelope
+cmd/wisp/panel_transport_35r1_test.go:18:// edge) and does NOT run w.Eval("window.wispDispatch(...)") (that is N6, the test
+cmd/wisp/panel_transport_35r1_test.go:85:	door        func(raw string) string // the wispDispatch binding callback production installed
+cmd/wisp/panel_transport_35r1_test.go:108:	// window.wispDispatch or chrome.webview.postMessage, so it never trips the
+cmd/wisp/panel_transport_35r1_test.go:124:// page's window.chrome.webview.postMessage into window.wispDispatch. It reads the
+cmd/wisp/panel_transport_35r1_test.go:131:			strings.Contains(js, "window.wispDispatch") {
+cmd/wisp/panel_transport_35r1_test.go:139:// WITH the forwarding hook installed, that raw string is what window.wispDispatch is fed,
+cmd/wisp/panel_transport_35r1_test.go:140:// and the library stub wraps it as an RPC frame {id, method:"wispDispatch", params:[raw]}
+cmd/wisp/panel_transport_35r1_test.go:163:// {id, method, params}; route ONLY to a bound method; otherwise reply to a window._rpc
+cmd/wisp/panel_transport_35r1_test.go:178:		// window._rpc[id] slot the page has no listener for. The request dies here.
+cmd/wisp/panel_transport_35r1_test.go:209:		t.Fatal("AC#6 RED: installPanelTransport registered no page->wispDispatch forwarding hook " +
+cmd/wisp/panel_transport_35r1_test.go:210:			"(no Init string reroutes window.chrome.webview.postMessage into window.wispDispatch). " +

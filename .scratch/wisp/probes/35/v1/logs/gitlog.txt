@@ -1,0 +1,3 @@
+ce6a4080 A681 收 35-r1（票35 AC#6 甲子形①落 Go 侧＋新用例覆盖 AC#7 的 (a)(b)(c)）＋★我自己重读票面纠正两格口径（AC#6≠那枚用例）＋⛔ AC#6/AC#7 都不翻（已派 35-v1）＋★现量 cmd/wisp 本机 go test＝0xc0000135 缺原生 DLL
+1e42fc61 35-r1 交件（票35 AC#6:52 页面↔宿主传输）：impl.md + 证据 logs。牙＝定向突变（删 installPanelTransport 的 w.Init 转发⇒新用例 panel_transport_35r1_test.go:209 红 rc=1，恢复⇒绿 rc=0），两发 -v 落盘。门禁：d22scan rc=0(PASS=35/FAIL=0/SKIP=0)、vet rc=0、整包逐名红名册起手==终态(差∅，TestResolvePerCallBudget 间歇门不计)，cmd/wisp 本机 0xc0000135 DLL 载入=既有环境条件(起终同现)。三支守卫文案 :133/:136/:140 具名未覆盖(AC#7 归下腿)。frontend/ 零改动、越界写面=0、未 push。
+fb2fb802 35-r1 票35 AC#6(:52) 页面↔宿主传输接上（Go 侧，甲子形①）：installPanelTransport 绑定 wispDispatch 门并安装 postMessage 转发 Init；新增 cmd/wisp 判据经页面真用的那条边喂 panel.ts:246 在册信封原文，断 dispatchRaw 下游带 requestId 到达。不动 frontend/、不改 C17 名册、不新造 C##。
