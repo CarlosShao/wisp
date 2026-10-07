@@ -26,6 +26,10 @@ git ls-tree -r --name-only dsh/feat/frontend-p0-v2 -- frontend/src | wc -l   # 8
   `frontend/src/lib/panel-views.ts`（106 行，全文 `logs/145f1-panel-views.ts.txt`）＝九枚屏表 + `currentView()`。
 - 穷举其余声明（200 命中，落 `logs/145f1-type-hunt.txt`）：
   `git grep -n -E 'interface |type [A-Za-z]+ = \{|Snapshot|Props' dsh/feat/frontend-p0-v2 -- 'frontend/src/**/*.ts' 'frontend/src/**/*.tsx'`
+  ⚠ **这把尺有一个缺陷，本腿自己量出来了**：`frontend/src/**/*.tsx` 这一支**根本不覆盖 `frontend/src/App.tsx`**
+  （尺：`git grep -c -E 'snapshot' dsh/feat/frontend-p0-v2 -- 'frontend/src/**/*.tsx' | grep -c App.tsx` → **0**，而 `App.tsx` 里 `snapshot` 出现十几行）。
+  ⇒ 所有**负向读数**本腿一律改用目录形式 `-- 'frontend/src'` 重跑（重跑尺与读数见 §1.2 行 3a 与 §5 第 11 条）；
+  `logs/145f1-type-hunt.txt` 那一枚 glob 尺**只用于发现组件层声明，不用于任何"页面没读 X"的判决**。
 - 引 `@/lib/panel` 的只有 8 枚文件（`logs/145f1-panel-importers.txt`）：
   `App.tsx` · `components/approval-screen.tsx` · `components/chat-screen.tsx` · `components/composer.tsx` ·
   `components/l2-approval-card.tsx` · `components/result-stream.tsx` · `fixtures/harness.ts` · `lib/panel-views.ts`。
@@ -55,7 +59,7 @@ git ls-tree -r --name-only dsh/feat/frontend-p0-v2 -- frontend/src | wc -l   # 8
 | 〃 | `text` | `string` | `App.tsx:433` `label: chunk.text.slice(0, 18) \|\| "（空）"`；`App.tsx:464`；`result-stream.tsx:37` | Go（**空串时页面自造"（空）"**，见 §1.5） |
 | 〃 | `done` | `boolean` | `result-stream.tsx:37` `{chunk.done ? chunk.text : <RevealText …/>}` | Go |
 | `ComposerState:112` | `mode` | `ComposerMode` | `composer.tsx:94` | Go |
-| 〃 | `workspace` | `ComposerWorkspace` | `composer.tsx:150` `:152` `:154` `:163`；`App.tsx:242`（监控栏"工作区"行） | Go |
+| 〃 | `workspace` | `ComposerWorkspace` | `composer.tsx:150` `:152` `:154` `:163`；`App.tsx:243`（监控栏"工作区"行） | Go |
 | 〃 | `attachments` | `ComposerAttachment[]` | `composer.tsx:89` `:132` `:134` | Go |
 | 〃 | `acceptedAttachmentMimes` | `string[]` | `composer.tsx:199` | Go |
 | 〃 | `maxAttachmentBytes` | `number` | `composer.tsx:199` | Go |
@@ -63,7 +67,7 @@ git ls-tree -r --name-only dsh/feat/frontend-p0-v2 -- frontend/src | wc -l   # 8
 | `ComposerMode:70` | `current` | `string` | `composer.tsx:94` `state.mode.current` | Go |
 | 〃 | `names` | `string[]` | `composer.tsx:94` | Go |
 | 〃 | `l2ConfirmNames` | `string[]` | `composer.tsx:276` | Go |
-| `ComposerWorkspace:80` | `set` | `boolean` | `composer.tsx:150` `:152`；`App.tsx:242` | Go |
+| `ComposerWorkspace:80` | `set` | `boolean` | `composer.tsx:150` `:152`；`App.tsx:243` | Go |
 | 〃 | `spelling` | `string` | `composer.tsx:163` | Go |
 | 〃 | `canonical` | `string` | `composer.tsx:150` | Go |
 | 〃 | `reparse` | `boolean` | `composer.tsx:154` | Go |
@@ -91,6 +95,7 @@ git ls-tree -r --name-only dsh/feat/frontend-p0-v2 -- frontend/src | wc -l   # 8
 | 1 | `git grep -n -o -E 'snapshot\??\.[a-zA-Z_]+' dsh/feat/frontend-p0-v2 -- 'frontend/src'`（`logs/145f1-snapshot-accesses.txt`） | `snapshot.pending` **4** ／`snapshot.results` **4** ／`snapshot.composer` **1** | `snapshot.generatedAt` **0** ／`snapshot.tasks` **0** ／`snapshot.instructions` **0** |
 | 2 | `grep -n -E 'snapshot[?]?\.|\(snapshot as' logs/145f1-App.tsx.txt`（整文件已落盘，逐行读） | `App.tsx:92` `:206` `:321` `:431` `:457` `:461` | 同文件 `generatedAt` 读取 **0**（只在 `:77` 的字面量里出现） |
 | 3 | `git grep -n -E '\btasks\b\|\binstructions\b' dsh/feat/frontend-p0-v2 -- 'frontend/src/**/*.tsx' 'frontend/src/**/*.ts'`（21 命中，`logs/145f1-tasks-instr-hits.txt`，**逐条读完**） | `panel-views.ts:30` `:69` 的 `"tasks"`（＝屏名字符串，非快照字段）；`tasks-screen.tsx:95` 的 `tasks`（＝本地 prop） | 21 命中里**无一枚**是 `snapshot.tasks` / `snapshot.instructions` 的读取 |
+| 3a | **同一把尺改用目录形式重跑**（补 glob 漏掉 `App.tsx` 那一格）：`git grep -n -E '\btasks\b\|\binstructions\b' dsh/feat/frontend-p0-v2 -- 'frontend/src'`（23 命中，`logs/145f1-tasks-instr-hits-dir.txt`） | 多出的 2 枚命中全在 `App.tsx`：`:326` `{view === "approval" \|\| view === "tasks" \|\| view === "ball" ? (`、`:498` `tasks: "任务不是一个地方，是一个浮层…"` | 两枚都是**屏名／人话文案**，仍**无一是快照字段读取** ⇒ 行 3 的负读数在补射程后**不变** |
 | 4 | `git grep -c -E '\.<字段>\b' dsh/feat/frontend-p0-v2 -- 'frontend/src'`（逐字段跑） | `.reparse` **1**（composer.tsx）／`.stored` **2**／`.deduplicated` **1** | `.rewritten` **空**／`.artifact` **空** |
 | 5 | 同上尺打在新段上 | `.workspace` **4 枚文件**（`App.tsx` `composer.tsx` `harness/main.tsx` `lib/panel.ts`） | `.git` **空**／`.currentModel` **空**／`.modelKnown` **空**／`.credentialState` **空**／`.credentialKnown` **空** |
 
@@ -108,21 +113,60 @@ git ls-tree -r --name-only dsh/feat/frontend-p0-v2 -- frontend/src | wc -l   # 8
 | `ContextUsage`（`context-meter.tsx:25`） | `tokens?` `cacheHitRate?` `occupancy?` | **真实面板 `App.tsx:473` `<ContextMeter usage={{}} className="mb-1.5" />`** | **空对象占位**。`context-meter.tsx:10` 原文："PanelSnapshot has no field for any of the three yet" |
 | `TurnMark`（`turn-rail.tsx:38`） | `id` `label` | `App.tsx:431` 由 `snapshot.results.map` **现场推导**（`:443`-`:450` 交给 `LineSidebar`） | **不是新字段**：从 `results` 的 `correlationId`/`text.slice(0,18)` 客户端算出来的（⇒ 见 §1.5 那句"（空）"） |
 | `GitBranchView`（`git-branch.tsx:32`） | `current` `local` `worktrees: {branch,path}[]` `isRepo` | **真实面板 `App.tsx:214-216`**：`<GitBranchChip view={{ current: "", isRepo: false, local: [], worktrees: [] }} onCheckout={() => undefined} onNewWorktree={() => undefined} />` | **页面写死的空假值**＋**注释与代码相反**：`:214` 注释逐字"git branch. **Reads its strings from the snapshot**; a workspace that is not a repo renders nothing at all rather than a chip." ⇒ 实参是四个字面量，**没有一个字节来自快照**。⇒ "宁缺毋造"要防的那一形，且 Go 侧**已经有** `composer.git`（§2.2） |
-| `TreeSession`／`PanelSidebarProps`（`panel-sidebar.tsx:51`/`:59`） | `id` `title` `state: "done"\|"failed"\|"streaming"` `meta?`；`activeSessionId` `workspaceName` `workspacePath` `workspaceSessions` `historyGroups: {label, rows}[]` `theme` `settingsOpen` ＋5 枚回调 | **真实面板 `App.tsx:293-301`**：`historyGroups={[]}`、`activeSessionId={local.sessionId}`、其余＝本地 state/回调 | `historyGroups`＝**空数组占位**；`workspaceName`/`workspacePath` 本可来自 `composer.workspace`（页面注释 `:68` 就写着"Path comes from the snapshot's C26-resolved field"）但 `App.tsx:293` 那一段没传 ⇒ 未证是否真传（`--` 见 §5）；`session` 维 Go 侧无具名导出（尺见 §3.2） |
-| `MonitorEnvRow`／`MonitorAgentRow`（`harness/monitor-popover.tsx:15`/`:20`） | `label` `value`／`id` `name` `state: "running"\|"done"\|"failed"` | **真实面板 `App.tsx:240-244`** | `env` 第一枚**读快照**（`composer.workspace.set ? composer.workspace.canonical : "尚未收到"`），第二枚**写死** `{ label: "分支", value: "尚未读到" }` ⇒ 而 Go 早就在交 `composer.git.branch`（§2.2/§3④）。`agents`＝待补（本腿未读完该块，未证） |
+| `TreeSession`／`PanelSidebarProps`（`panel-sidebar.tsx:51`/`:59`） | `id` `title` `state: "done"\|"failed"\|"streaming"` `meta?`；`activeSessionId` `workspaceName` `workspacePath` `workspaceSessions` `historyGroups: {label, rows}[]` `theme` `settingsOpen` ＋5 枚回调 | **真实面板 `App.tsx:293-306`（逐行读完）** | `workspacePath={composer.workspace.set ? composer.workspace.canonical : "尚未收到工作区"}`＝**读快照**（`composer.workspace`）；`workspaceName="一缕"`＝**写死品牌名**（不是快照字段，也不可能是）；`workspaceSessions={[]}`＋`historyGroups={[]}`＝**空数组占位**（注释 `:71` 逐字"Empty today (ticket 166 owns the feed)"）⇒ 会话维 Go 侧无具名导出（尺见 §3.2） |
+| `MonitorEnvRow`／`MonitorAgentRow`（`harness/monitor-popover.tsx:15`/`:20`） | `label` `value`／`id` `name` `state: "running"\|"done"\|"failed"` | **真实面板 `App.tsx:240-248`（逐行读完）** | `env` 第一枚**读快照**（`:242` `{ label: "工作区", value: composer.workspace.set ? composer.workspace.canonical : "尚未收到" }`）；第二枚 `:243` **整枚写死** `{ label: "分支", value: "尚未读到" }` ⇒ 而 Go 早就在交 `composer.git.branch`（§2.2/§3④）；`agents={[]}`（`:246`）＋`onPin={() => undefined}`（`:247`）＝**空占位＋假回调**，而 Go 的 `tasks` 段 18 叶正是这一栏要的（§3.3） |
 | `Row`（`config-screen.tsx:70`，内部 interface） | `group` `name` `desc` `blocked` `control?: "alpha"\|"motion"` | `config-screen.tsx:86-` 的 `APPEARANCE_ROWS: readonly Row[]` | **整表写死在组件里**；`blocked` 逐枚是人话（如 `font_size` 那行逐字"快照里没有这个字段"）⇒ 这一族是"页面自己抄了一份 Go 有没有源的账"，Go 变了它不知道 |
 | `PanelView`（`lib/panel-views.ts:37`） | `id` `label` `icon` `demoIcon` `note?` `interim?` `fed` `selfFed?` | `panel-views.ts:65-75` 常量表；`App.tsx` 导航经 `viewOf()`/`currentView()` | **页面常量**。⚠ `fed: boolean`（`:54-56`）是页面手抄的"Go 有没有源"账：今天 `fed:true` 只有 `chat`/`approval` 两枚、7 枚 `false`（`config` 一枚另标 `selfFed:true`）⇒ **Go 加了字段这枚 `fed` 不会自己变绿**，是 §3③ 那批新段落地时最容易漏的一格 |
 
 > 注：`harness/*`（`main.tsx` 的 `HarnessMainProps`、`fixtures/harness-app.ts` 的 17 枚 `Harness*` interface、`right-rail.tsx` 的 `TreeRow`/`ReviewFile`）是**另一条线**（owner 委托的 harness 骨架，`?harness=1` 才挂，`fixtures/harness.ts:101 HARNESS_BANNER` 自己标"HARNESS 假数据"）。本腿按"面板页面"口径未逐枚展开，列 §5；`App.tsx:311` 真挂了 `SettingsPage`、`:349` 挂 `RightRail reviewFiles={[]} fileTree={[]} terminalLines={[]} browserUrl=""`（**空占位**）。
 
-### §1.4 页面里"写死的假内容"点名（宁缺毋造要防的东西）
+### §1.4 ★挂载普查（本腿最硬的一条：页面侧**也有"写了没接"**）
+
+尺（目录形式，glob 会漏 `App.tsx`，见 §1.0 那条缺陷自陈）：
+```
+git grep -n -E 'from "@/(components/)?(composer|chat-screen|approval-screen|result-stream|l2-approval-card)"' dsh/feat/frontend-p0-v2 -- 'frontend/src'
+git grep -n -E '\b(ChatScreen|ApprovalScreen|ResultStream|Composer)\b' dsh/feat/frontend-p0-v2 -- 'frontend/src'
+```
+
+| 组件 | 导出 | 谁 import 它（读数） | 判定 |
+|---|---|---|---|
+| `l2-approval-card.tsx` | `L2ApprovalCard` | **`App.tsx:40`** ＋ `showcase.tsx:47` | **真面板路径上**（`App.tsx:321` 逐枚挂载） |
+| `approval-screen.tsx` | `ApprovalScreen` | **只有 `showcase.tsx:41`**（`:272` 喂 `SHOWCASE_APPROVAL_SNAPSHOT`＝假快照） | **真面板不挂**（真面板的 pending 走 `App.tsx:206` 计数＋`:321` 卡片） |
+| `chat-screen.tsx` | `ChatScreen` | **无人 import**（全树只出现在它自己的 `:24` 导出行） | **挂死** |
+| `result-stream.tsx` | `ResultStream` | **只有 `chat-screen.tsx:21`** ⇒ 跟着 `ChatScreen` 一起挂死 | **挂死** |
+| `composer.tsx` | `Composer`（**快照里 composer 段的全部读取都在这枚**） | **无人 import**（全树只出现在 `:74` 导出行＋`fixtures/harness.ts:176` 的一句注释） | **挂死** |
+
+⇒ **真面板路径（`App.tsx` ＋ `l2-approval-card.tsx`）实际读的叶子只有 21 枚**：
+顶层 3（`pending` `results` `composer`）＋ 卡 10 ＋ `ResultChunkView` 2（`correlationId` `text`；**`done` 只在挂死的 `result-stream.tsx:37` 被读**）＋
+`ComposerState` 2（`mode` `workspace`；**`attachments`/`acceptedAttachmentMimes`/`maxAttachmentBytes`/`attachmentError` 只在挂死的 `composer.tsx`**）＋
+`ComposerMode` 2（`current` `App.tsx:335`／`names` `:181`；`l2ConfirmNames` 只在 `composer.tsx:276`）＋
+`ComposerWorkspace` 2（`set` `:243`／`canonical` `:243`；`spelling`/`reparse`/`reason` 只在 `composer.tsx:150-163`）。
+⇒ §1.1 表里那 38 枚要读成两半：**21 枚在真路径上、17 枚在"组件已写好但没人挂"的路径上**（票 145 说的"组件已在盘上、缺的是输入"——本腿量到同一族的**界面侧版本**：输入也在盘上、缺的是挂载）。
+⇒ `App.tsx` 里 `composer.` 的全部读取（尺：`grep -n -o -E 'composer\??\.[a-zA-Z.]+' logs/145f1-App.tsx.txt`）＝**5 行 / 4 枚不同叶子**：`:181` `composer.mode.names`、`:335` `composer.mode.current`、`:243` `composer.workspace.set` ＋ `.canonical`。
+
+
+
+### §1.5 页面里"写死的假内容"点名（宁缺毋造要防的东西）
 
 1. `App.tsx:54-71 EMPTY_COMPOSER` ＋ `:73-78 EMPTY`：一整套假的 `ComposerState`/`PanelSnapshot`，作为 `snapshot` 缺席时的默认值（`:91` `App({ snapshot = EMPTY })`）。其中 `workspace.reason: "尚未收到原生侧的状态快照"` 是人话兜底，但 `mode.current: "unknown"`、`maxAttachmentBytes: 0` 会被 `composer.tsx:199` 当真值渲染。
 2. `App.tsx:214-216`：`GitBranchChip` 的 `view` 四个写死字面量＋两条 `() => undefined` 回调，**注释却声称读自快照**（§1.3 已逐字引）。
-3. `App.tsx:243`：监控栏第二行 `value: "尚未读到"`（Go 已有 `git.branch`）。
+3. `App.tsx:244`：监控栏第二行 `{ label: "分支", value: "尚未读到" }` **整枚写死**（Go 已在交 `composer.git.branch`；同一块的第一行 `:243` 却真读快照 ⇒ 这不是"整屏假"，是**同一块里一行真一行假**，最难被看出来的一形）。
+3a. `App.tsx:246-247`：`agents={[]}` ＋ `onPin={() => undefined}`——监控栏的"子代理/后台任务"两堆今天**结构上没有入口**，而 Go 的 `tasks` 段 18 叶已在（§3.3）。
+3b. `App.tsx:302`：`workspaceName="一缕"`＝写死的品牌名占住了"工作区名"那一格（快照里没有、也不该有这一维；但页面把它读成工作区标题）。
 4. `App.tsx:433`：`chunk.text.slice(0, 18) || "（空）"`——页面替空文本造标签。
-5. `fixtures/harness.ts` 的 `SHOWCASE_*`（尺：`git grep -n -E 'export const (SHOWCASE|RB_|HARNESS)[A-Z_]*' … -- 'frontend/src/fixtures'` → 22 枚常量，`fixtures/harness.ts:33/110/177/185/195/225/274/280/287/294/300/307/308/311/331/339/354/362/367/373/386`）＝**全部写死**，且 `SHOWCASE_APPROVAL_SNAPSHOT:177`、`HARNESS_SNAPSHOT:33` 是两枚**冒充 `PanelSnapshot` 的假快照**（`generatedAt: "showcase"`）。它们只进 `showcase.tsx`/`?harness=1`，不进取自真宿主的路径——但**类型上没有任何东西拦住别人把它当真件用**。
+5. `App.tsx:118` `model: ""` ＋ `:338` `model={local.model}` ＋ `:474-479` `<PromptBar model={model} models={[]} effort={effort} efforts={[]} …>`：
+   **模型那一格走的是页面本地 state（初值空串）＋空数组**，而 Go 早就在交 `composer.currentModel` / `modelKnown`（§2.2，页面 0 读，尺＝§1.2 行 5）。
+   `:333-335` 另有三条**假回调** `onPermissionChange={() => undefined}` / `onSend={() => undefined}` / （`MonitorPopover :247`）`onPin={() => undefined}`——
+   这一族不是"假内容"而是**假可点**：控件画出来了，动作什么也不发生。`tiers` 是**真读快照**的（`:181` `composer.mode.names.length > 0 ? composer.mode.names : ["unknown"]`），
+   ⇒ 同一枚 `Conversation` 里**三行真、三行假**并存，`prompt-bar.tsx` 的 `PromptModel`/`PromptEffort`/`PromptPermission`（`:43`/`:52`/`:61`）声明的字段页面自己也没喂。
+6. `fixtures/harness.ts` 的 `SHOWCASE_*`（尺：`git grep -n -E 'export const (SHOWCASE|RB_|HARNESS)[A-Z_]*' … -- 'frontend/src/fixtures'` → 22 枚常量，`fixtures/harness.ts:33/110/177/185/195/225/274/280/287/294/300/307/308/311/331/339/354/362/367/373/386`）＝**全部写死**，且 `SHOWCASE_APPROVAL_SNAPSHOT:177`、`HARNESS_SNAPSHOT:33` 是两枚**冒充 `PanelSnapshot` 的假快照**（`generatedAt: "showcase"`）。它们只进 `showcase.tsx`/`?harness=1`，不进取自真宿主的路径——但**类型上没有任何东西拦住别人把它当真件用**。
 6. `config-screen.tsx:86-` `APPEARANCE_ROWS` ＋ `panel-views.ts:65-75` `fed` 表＝页面**手抄的 Go 现状账**。
+7. **"渲染一句人话"那一族的真身位置**（票 145 票面引的名字已过期，见 §4）：`App.tsx:326-328`
+   `{view === "approval" || view === "tasks" || view === "ball" ? (`（挂载行 **`:327`** `<RetiredView id={view} />`）`: (<Conversation … />)`，
+   文案表在 `App.tsx:495-512` 的 `RetiredView`（三枚逐字：`approval:` `tasks:` `ball:`，兜底 `"这一屏已经不存在了。"`）。
+   尺＋正控：`git grep -n 'UnfedScreen' dsh/feat/frontend-p0-v2 -- 'frontend/src'` → **0 命中**，同尺打 `RetiredView` → **2 命中**（`:327` `:495`）。
+   ⇒ 今天面板**不是"每屏一句人话"**，而是**approval／tasks／ball 三枚屏已被判为"不是屏"**，其余屏全落到 `Conversation` 一条路径上；
+   `ChatScreen`/`ApprovalScreen`/`TasksScreen`/`BallScreen`/`PaletteScreen`/`ConfigScreen` 六枚里，**只有 `PaletteScreen`(:368)、`ConfigScreen`(经 `SettingsPage` :311)、`ApprovalScreen`(不挂，卡由 `:321` 的 `snapshot.pending.map` 直挂 `L2ApprovalCard`) 出现在真面板路径上**（尺＝§1.2 行 3a 那条目录形式；读数逐条列在 §1.3）。
 
 ---
 
@@ -192,10 +236,13 @@ grep -rn --include=*.go -A8 'func (rt \*agentRuntime) bookPanelSnapshot' cmd/wis
 
 ## §3 对拉表（四档）
 
-### §3.1 ①两边都有、已对上＝**38 枚**
+### §3.1 ①两边都有、已对上＝**38 枚**（其中**真面板路径上只有 21 枚**，见 §1.4）
 
 顶层 3（`pending` `results` `composer`）＋ `ApprovalCardView` 10 ＋ `ResultChunkView` 3 ＋ `ComposerState` 段 6 ＋ `ComposerMode` 3 ＋ `ComposerWorkspace` 5 ＋ `ComposerAttachment` 8。
 尺＝§1.1 全表（每一行都给了 `git show … | grep -n` 可复算的消费点）↔ §2.2 的 `json:` tag。
+⚠ **这一档必须带 §1.4 那把挂载尺一起读**：38 枚里有 17 枚的读取点住在**没有任何文件 import 的组件**里
+（`chat-screen.tsx`／`result-stream.tsx`／`composer.tsx`／`approval-screen.tsx` 四枚），
+⇒ 对 Go 侧来说它们是"对上但接不上"；真面板今天只读 21 枚。
 
 ### §3.2 ②页面要、Go 没交＝**快照契约上 1 枚** ＋ **props-only 族 26 枚叶子**
 
@@ -204,15 +251,15 @@ grep -rn --include=*.go -A8 'func (rt \*agentRuntime) bookPanelSnapshot' cmd/wis
 | `view`（当前屏） | `panel-views.ts:99`、`App.tsx:123` | **无**（TS 里也不存在，靠 `& {view?}` 强转） | 无源风险低但**形状已有名**：九枚屏名在 `panel-views.ts:26-35`；Go 侧不知道这九枚名字（票 145 AC#3 已裁"ⓐ 不落"）⇒ 归 **票 145／`Q-51`／票 35（ⓑ）**，**本腿不新开账** |
 | `TaskRow.id/title/sub/status/elapsed` | `tasks-screen.tsx:95-`（只挂 showcase） | **Go 已交同族**（`tasks` 段 18 叶） | **有源且已算出**：`subagent_roster_197.go:106`/`:150`；缺的是"页面改读 `snapshot.tasks`"＋改名（→④）。`sub`/`elapsed` 两枚 **Go 无对应**＝**无源**（尺：`grep -rn --include=*.go -iE 'elapsed' internal | grep -v _test`，本腿未跑＝未证，见 §5） |
 | `ContextUsage.tokens/cacheHitRate/occupancy` | `App.tsx:473`（`usage={{}}`） | **无** | **候选有源**：分子 `internal/agent/cost.go:41`（`Usage.InputTokens` 累加）、分母 `internal/config/settings.go:143 SetModelContextWindow`、窗口/预算 `internal/agent/budgets.go`。⇒ **票 167 AC#2 已排这一枚**（本腿不重开） |
-| `MonitorEnvRow{label:"分支"}` 的真值 | `App.tsx:243` 写死"尚未读到" | **Go 已交**（`composer.git.branch`） | **有源**，缺页面读 ⇒ 不是"Go 加字段"，见 ③ |
-| `MonitorAgentRow.id/name/state` | `App.tsx:240`-块（未读完） | **Go 已交同族**（`TaskRowView.taskId/label/status`） | **有源**（`subagent_roster_197.go:106`）＋**票 188 在册**（它的"没有状态维"读数已被票 197 部分超越，见 §4） |
+| `MonitorEnvRow{label:"分支"}` 的真值 | `App.tsx:244` 写死"尚未读到" | **Go 已交**（`composer.git.branch`） | **有源**，缺页面读 ⇒ 不是"Go 加字段"，见 ③ |
+| `MonitorAgentRow.id/name/state` | `App.tsx:246` `agents={[]}`（空占位，已逐行读完） | **Go 已交同族**（`TaskRowView.taskId/label/status`） | **有源**（`subagent_roster_197.go:106`）＋**票 188 在册**（它的"没有状态维"读数已被票 197 部分超越，见 §4） |
 | `TreeSession.id/title/state/meta` ＋ `historyGroups{label,rows}` | `App.tsx:293`（`historyGroups={[]}`） | **无** | **未证**：尺 `grep -rn --include=*.go -E 'func .*(List|Recent|Sessions)\(' internal/session` → **0 命中**（同族尺在 §3.2 的 `queue.go:148 Depth()` 上出过正读数）⇒ 写"尺取不到具名导出"，**不写成"无源"**；会话维归**票 166**（`panel-sidebar.tsx:71` 注释逐字"Empty today (ticket 166 owns the feed)"） |
 | `BallStateRow.state/visual/enter/exit` | `showcase.tsx:304` | **无** | **未证**：`grep -rn --include=*.go -E 'func .*(Transitions|States)\(\)' internal/statemachine` → **0 命中**；D43 转移表在文档侧（`PLAN.md`），非导出尺 ⇒ 归 **票 145 的"ⓐ 当前屏"同族**或另登，**本腿不裁** |
 | `PaletteGroup.name/items`＋`PaletteItem.label/icon/hint` | `App.tsx:368`（`groups={[]}`）、`showcase.tsx:279` | **无** | **无源（尺命中不相关）**：`grep -rn --include=*.go -iE 'palette|commandregistry' internal cmd` → 只出 `internal/ball/renderer_windows.go:74-82` 的**配色板 palette**，与命令面板无关 ⇒ 真"无源" |
 | `GitBranchView.current/local/worktrees{branch,path}/isRepo` | `App.tsx:214` | **Go 已交**（`composer.git`，同段 10 叶） | **有源**，缺读＋改名（→④） |
 | `TurnMark.id/label` | `App.tsx:431` | 页面自己从 `results` 推导 | **不需 Go 加字段**（若要真标签则撞 `results.text` 截断，非契约缺口） |
 
-### §3.3 ③Go 交了、页面不读＝**8 枚具名 key ＋ 2 枚整段（29 叶）**
+### §3.3 ③Go 交了、页面不读＝**8 枚具名 key ＋ 2 枚整段（29 叶）**；按"真面板路径"再算则**＋17 枚**（§1.4／本节末）
 
 | Go 交的 | 行 | 页面读数 |
 |---|---|---|
@@ -226,6 +273,9 @@ grep -rn --include=*.go -A8 'func (rt \*agentRuntime) bookPanelSnapshot' cmd/wis
 | `tasks` 整段（18 叶） | `composer.go:71-93` | **0 读**（尺 3） |
 
 ⇒ 这一档里 **`git`/`currentModel`/`credentialState`/`tasks`/`instructions` 五枚是"Go 真算了、页面没接"**（不是装饰品：有真生产者），而 `generatedAt`/`rewritten`/`artifact` 三枚是**连页面声明了都不读的形状**。区分这两族很重要——前者只差一次读，后者是契约噪声。
+⇒ **再分第三族**（§1.4 量出来的）：`ResultChunkView.done` 与 `ComposerState` 的 `attachments`/`acceptedAttachmentMimes`/`maxAttachmentBytes`/`attachmentError`
+四枚、`ComposerMode.l2ConfirmNames`、`ComposerWorkspace.spelling`/`reparse`/`reason`、`ComposerAttachment` 的 8 枚——
+**读取点全在没被 import 的组件里**，所以"Go 交了、真面板不读"这一档按 §3.1 同一把尺要再加 **17 枚**（合计 26 枚叶子＋2 段的口径见 §3.1 那条警示）。
 
 ### §3.4 ④名字对不上但形状像同一件事＝**3 族**（逐枚给两边原文）
 
@@ -247,6 +297,12 @@ grep -rn --include=*.go -A8 'func (rt \*agentRuntime) bookPanelSnapshot' cmd/wis
   ① 票 145 自己 `[ ]` **维持未勾**，且收表写明"未勾不是欠账，是这一格的结论本身"（AC#2 落地集＝空）；
   ② 台账 `docs/reports/pending-and-issues.md` 的 `A383`（`:8442`，09-28"禁止任何跨会话联系前端会话"）与 `:12938`（10-07 逐字"⛔ 跨会话转达那条……继续生效"；"写页面文件……我不替他扩大解释"）⇒ **"由前端会话自己落"的收件人今天不存在**，而 `Q-51`（`:1086`，"谁有权同一枚 commit 同时写 `internal/panel/**` 与 `frontend/src/lib/panel.ts`"）**仍挂未答**、`:6339` 已把它降级为"素材没定，答了也白答"。⇒ 归属问题**原样交回机主**，本腿不选形。
 - **本腿现量到的票 145 过期点**（票面"更正"节之外的第二层）：①"恰四字段"→ 现量**六枚**；②更正⑤"`NewSnapshot` 0 枚调用者"→ 现量 `pump.go:236`/`:303` 两枚生产调用者；③行号再漂（`:44-49`→`composer.go:57`，`:79`→`:106`）；④`internal/panel/pump.go:5-6` 的注释也过期（"has four fields"）。
+- ⑤ **票面那句"前端今天的处理是 `App.tsx:52` 的 `UnfedScreen`：`:82` 除 chat/approval 外每屏渲染一句人话"在页面分支上已不可复算**：
+  `UnfedScreen` 全树 **0 命中**（正控 `RetiredView` 2 命中，`App.tsx:327`/`:495`）；今天的形状**不是"每屏一句人话"**，
+  而是 **approval／tasks／ball 三枚被判为"不是屏"**（`RetiredView` 各一句人话），其余屏一律落到 `Conversation`（`App.tsx:328-340`）。
+- ⑥ **票面"'缺'的主因不是组件没写……它们的输入在这份快照里根本不存在"这一句，本腿量到一枚反方向**：
+  快照里**已存在**并被页面读取的字段中，有 **17 枚叶子的读取点住在没人 import 的组件里**（`composer.tsx`／`chat-screen.tsx`／`result-stream.tsx`／`approval-screen.tsx`，尺与逐枚读数＝§1.4），
+  ⇒ 这一族的病因是**挂载**，不是"快照太瘦"。⇒ **它不该被算进"Go 要加的字段"里**；把它当"该加字段"派给 Go 侧会加出真数据＋假通路。
 
 ### 票 167 / 188 / 242 与本表的重叠
 
@@ -276,6 +332,14 @@ palette 命令表／ball 四字段／`TaskRow.sub`/`elapsed`→**本腿取不到
 5. **`internal/session` / `internal/statemachine` 的导出形状取不到**（§3.2 两条尺 0 命中，正控是 `approval/queue.go:148 Depth()` 那条同族尺出了读数）⇒ 只写"尺取不到具名导出"，**不许被下游读成"无源"**。
 6. **`TaskRow.sub` / `elapsed`、`PaletteItem.icon` 的 Go 侧有无源**：尺未跑（`elapsed` 那条我在 §3.2 标了"未跑＝未证"）。
 7. **与转述冲突的原文两处**：①派单说票 145 写"恰四字段"——现量**六枚**（§2.1）；②派单说"页面十四态里十一态没有输入可画"——`panel-views.ts` 今天只有**九枚屏**（`:26-35`），票 145 自己的更正①也已把"11"改成 **8**（"要凑到 11 必须把行 14 也算成无输入，而行 14 恰恰是 fed 的"）。⇒ "十四"是 `PLAN.md:3473-3488` 那张状态表的行数，**不是屏数**，本腿没有量那张表（不在射程）。
-8. **`App.tsx:293-301` 是否真的把 `workspaceName`/`workspacePath` 传给了 `PanelSidebar`**：本腿读到的那段里只有 8 行（`:293-301`），`workspaceName`/`workspacePath`/`workspaceSessions` 三枚**在截到的实参里没出现**（TS 必填 ⇒ 要么在截外、要么编译不过）。⇒ 未证，需逐行读 `App.tsx:285-312` 全文。
-9. **`MonitorPopover` 的 `agents` 实参**（`App.tsx:240`-起那块）没读完 ⇒ §1.3 那一行标了未证。
+8. ~~`App.tsx:293-312` 是否真的把 `workspaceName`/`workspacePath` 传给了 `PanelSidebar`~~ **已在第三笔补量**（`sed -n '285,312p' logs/145f1-App.tsx.txt` 整行读）：传了，且 `workspacePath` 读快照、`workspaceName="一缕"` 是写死的品牌名、另两枚是空数组占位。⇒ 该格**不再算未决**，读数进 §1.3。
+9. ~~`MonitorPopover` 的 `agents` 实参没读完~~ **已在第三笔补量**（`sed -n '236,252p'`）：`agents={[]}`、`onPin={() => undefined}`。⇒ 读数进 §1.3。
 10. 本腿**没有**跑任何 `go test`/`go build`/`go vet`（同仓 `272-r2` 在取整包读数，包级互斥）⇒ §2.3 全部是 grep 级读数，**没有一枚"颜色"可以引**。
+11. **本腿自己抓到的一把坏尺（已就地补正，登记在此防下一位再踩）**：
+    `git grep … -- 'frontend/src/**/*.tsx'` **不覆盖 `frontend/src/App.tsx`**（尺：`git grep -c -E 'snapshot' dsh/feat/frontend-p0-v2 -- 'frontend/src/**/*.tsx' | grep -c App.tsx` → **0**）。
+    本腿的 `logs/145f1-type-hunt.txt` 与最初那次"组件挂载"普查都用了 glob 形式 ⇒ 前者已在 §1.0 标"只用于发现声明、不用于负判决"，
+    后者已用目录形式重跑（读数进 §1.4／§1.5 第 7 条）。**残留风险**：`logs/145f1-type-hunt.txt` 的 200 行名册里可能漏掉直接落在 `frontend/src/` 一层的其它声明。
+12. **"页面侧 21 枚 vs 38 枚"这把挂载尺只打了 5 枚组件**（`l2-approval-card`／`approval-screen`／`chat-screen`／`result-stream`／`composer`）。
+    其它 import 关系（例：`App.tsx` 是否间接经 `Conversation` 之外的路径喂过 `Composer`）本腿按"全树 identifier 普查"判的是 0（尺＝§1.4 第二条命令），
+    但**没有跑 `tsc`/lint 证伪**（禁跑构建类命令之外的射程也有限）⇒ 若要拿这 17 枚去派"改挂载"的活，验收方建议再补一枚**挂载级**尺。
+
