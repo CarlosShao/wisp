@@ -1,0 +1,55 @@
+55:  # gofumpt/vet/staticcheck + D22 seven-ban static scan (tools/d22scan) +
+58:  # emojiScopes() in tools/d22scan/main.go = design/ + internal/ + cmd/ (all
+74:      - name: D22 scanner positive control (tools/d22scan tests, seeded red)
+76:        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+79:        # in tools/d22scan/scan_test.go, which compiles the binary and asserts
+81:        run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+85:        # still sees what it claims to see. tools/d22scan -self-test builds a
+106:        working-directory: tools/d22scan
+108:      - name: D22 seven-ban + emoji scan (tools/d22scan)
+112:        # green. tools/d22scan is its own Go module - invoking it from the repo
+116:        # it used to sit BELOW gofmt/vet/staticcheck, and GitHub skips every step
+117:        # after the first failure. At the time `go vet (module)` was red on ubuntu
+127:        # a current fact: `go vet (module)` is GREEN on ubuntu today (run
+128:        # 35600043583 step 7 = success; and in a real container `go vet ./...` is
+134:        run: sh scripts/d22scan.sh
+141:        # lint job, suggested right after the tools/d22scan step" and nothing else -
+168:      - name: gofmt (gofumpt)
+170:          go install mvdan.cc/gofumpt@latest
+171:          OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"
+180:      # `if:`, or made continue-on-error. It sits directly BELOW the gofmt step
+184:      - name: "gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)"
+208:        # moment the gofmt step above goes red this step is reported `skipped` and
+210:        # 37406757402 reads step 8 `[failure]` (gofmt) then step 9 `[skipped]` (this
+211:        # one), and this ticket's own record says the same twice (:305 gofmt red =>
+226:        # still reddens the job). gofmt / go vet / staticcheck are production gates
+237:      - name: go vet (module)
+238:        run: go vet ./...
+240:      - name: go vet (tools/d22scan module)
+241:        run: go vet ./...
+242:        working-directory: tools/d22scan
+265:        #    see tools/d22scan and tools/mockllm - they are separate go.mod
+267:        #    2 d22scan findings and 1 mockllm finding had never been looked at
+277:        #    `gofmt (gofumpt)`). `if: ${{ !cancelled() }}` is the one shape
+296:          go install honnef.co/go/tools/cmd/staticcheck@2026.2.1
+302:          for mod in . tools/d22scan tools/mockllm; do
+332:        run: go vet ./...
+378:        # because this job has known-red steps above it (`gofmt (gofumpt)` and
+422:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+429:        # and no threshold changed): it sat below a step that bare `go test` lets
+435:        run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+438:        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+442:        # every verdict to tools/d22scan/runtests.sh (the strict runner from
+466:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+520:        # not sit behind `cgo build smoke`, which has been red before) and it is
+536:        # red before (`cgo build smoke`, run 35551819606) plus a red `PathResolver
+539:        # by three times (A54 static scan behind `go vet`, A61 env assertion
+566:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+638:        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+658:        #     tools/d22scan/runtests.sh:98-102 treats ANY `--- SKIP` as fatal and
+685:        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+700:        # design) or a false green (bare `go test` prints `ok`) - which is the
+705:        # `go test -list` and prints the row with its class and reason in this
+723:        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+734:        run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
+809:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.

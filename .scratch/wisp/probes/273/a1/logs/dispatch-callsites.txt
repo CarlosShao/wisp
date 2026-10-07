@@ -1,0 +1,7 @@
+cmd/balldebug/main.go:618:	to, err := m.Dispatch(ev, f)
+cmd/wisp/panel_resident_windows.go:360:		w.Dispatch(fn)
+internal/models/bridge.go:40:	if _, err := b.machine.Dispatch(statemachine.EvModelMissing, nil); err != nil {
+internal/models/bridge.go:46:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:59:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:64:	if _, derr := b.machine.Dispatch(statemachine.EvDownloadCompleted, nil); derr != nil {
+internal/statemachine/machine.go:202:	_, _ = m.Dispatch(ev, nil)

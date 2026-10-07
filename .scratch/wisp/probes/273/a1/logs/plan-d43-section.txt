@@ -1,0 +1,66 @@
+### D43 — 状态机权威转移表（**C12 冻结的就是这张表；`docs/STATE_MACHINE.md`**）
+
+20 态（§2）· 40 条转移。**未列出的转移一律非法**（未定义即停，D22 闸门③）。
+
+| # | From | Event | To | Guard / 副作用 |
+|---|---|---|---|---|
+| 1 | `FirstRun` | 引导完成（模型 + 目录授权 + Key） | `Sleeping` | 写 config.toml；建 DB schema |
+| 2 | `FirstRun` | 缺模型 | `Downloading` | — |
+| 3 | `FirstRun` | 缺 Key | `Unconfigured` | — |
+| 4 | `Sleeping` | 快捷键 / 单击球 | `Listening` | **建 `SessionScope`(C31)**；加载 VAD+ASR（冷会话 1–3s） |
+| 5 | `Sleeping` | KWS 开启 | `Armed` | 加载 KWS 模型 |
+| 6 | `Sleeping` | 无 Key / 配置非法 | `Unconfigured` | — |
+| 7 | `Armed` | 唤醒词命中 | `Listening` | 同 #4；**KWS 暂停** |
+| 8 | `Armed` | 静音键 | `Muted` | 停 KWS 推理（模型可保留） |
+| 9 | `Armed` | 看门狗超限 | `Armed` + 告警 | **不得卸载 KWS**（D32 修订③）；提示用户关 KWS |
+| 10 | `Muted` | 静音键 | `Armed`（KWS 开）/ `Sleeping` | — |
+| 11 | `Listening` | VAD 判停且语音时长 ≥300ms | `Thinking` | 停采集；标点恢复；输入打 taint 源标记 |
+| 12 | `Listening` | 超时（**首轮 15s / 会话内 90s / Conversation 30s**） | `Sleeping`（首轮）/ **`Warm`**（会话内） | — |
+| 13 | `Listening` | 否决（否决词 / `Esc` / 单击球） | `Warm` | **丢弃音频缓冲，不落盘**（D16） |
+| 14 | `Listening` | 麦克风被占用 / 拔出 | `Error(audio_device)` | 明示设备名 |
+| 15 | `Thinking` | 首 token | `Acting`（有 tool call）/ `Speaking`（纯文本） | 面板若开则流式推送 |
+| 16 | `Thinking` | 超时 / 网络失败 | `Error` | 按 D37 分类与重试 |
+| 17 | `Acting` | 需确认 | **`Confirming`(L1)** / **`AwaitingApproval`(L2)** | L1 走倒计时；L2 入 C18 队列 |
+| 18 | `Acting` | 全部工具完成 | `Speaking`（有播报）/ `Settling`（静默完成） | — |
+| 19 | `Acting` | 重复调用阈值 [3,5,8] | `Acting` + 注入提醒 | 达 8 → `Stuck` |
+| 20 | `Acting` | 路径冲突（C20） | `Queued` | 面板可见"在等谁" |
+| 21 | `Confirming`(L1) | 倒计时结束未否决 | `Acting` | 执行；**`fs.write` 必须 temp+rename** |
+| 22 | `Confirming`(L1) | 否决（**单击球 / `Esc` / KWS 否决词 / 面板拒绝**，B1） | `Acting`（取消该调用并回给 LLM） | **KWS 未加载时 UI 必须明示"语音取消不可用"** |
+| 23 | `AwaitingApproval` | 队头被**原生侧**允许（F2） | `Acting` | 出队；角标减一；队列非空则留态 |
+| 24 | `AwaitingApproval` | 队头被拒绝 / **超时 300s** | `Acting`（取消该调用） | **超时前 30s 醒目提示**；可一键重放 |
+| 25 | `AwaitingApproval` | 队列空且任务完成 | `Speaking` / `Settling` | — |
+| 26 | `Speaking` | 播报完 | **`Warm`** | **麦克风保持关闭**（默认档）；面板保活 |
+| 27 | `Speaking` | 打断（快捷键 / 单击 / 否决词） | `Listening` | 停 TTS；释放音频输出 |
+| 28 | `Speaking` | 播报完（**`Conversation` 模式**） | `Listening` | **麦克风开启 + 红色常亮环** |
+| 29 | **`Warm`** | 单击球 / 快捷键 | `Listening` | **零模型加载**（B4 的解） |
+| 30 | **`Warm`** | 开启 Conversation | `Conversation` → `Listening` | **首次开启需 L2 级隐私确认** |
+| 31 | **`Warm`** | 90s 无交互 | `Settling` | **Dispose SessionScope(C31)**；卸载 ASR/TTS；`FreeOSMemory`；销毁或隐藏面板 |
+| 32 | `Settling` | 3s 计时到 | `Sleeping`（KWS 关）/ `Armed`（KWS 开） | **RSS 10s 内达标**（D32） |
+| 33 | `Settling` | 新唤起 | `Listening` | **取消回落**（用户意图优先） |
+| 34 | 任意 | 网络探测失败 | `NoNetwork` | **保留当前任务 ctx**，可重试 |
+| 35 | 任意 | 看门狗连续 3 次回落失败 | `WatchdogAlert` | 一键重启 |
+| 36 | 任意 | panic 被 recover | `Error(internal)` | 记 stack；给诊断包入口 |
+| 37 | `Downloading` | 完成 / 失败 | `FirstRun` / `Error(model)` | **校验 sha256 + manifest 签名（C29）** |
+| 38 | `Error` | 用户确认 / 10s | 回错误前的会话态或 `Warm` | — |
+| 39 | `Queued` | 前序任务释放路径锁 | `Acting` | — |
+| 40 | `Stuck` | 用户介入（继续 / 放弃） | `Acting` / `Settling` | — |
+
+### D44 — 切片路线图修订 + 场景↔切片追踪矩阵
+
+**（a）切片修订**（原表保留，以下为**增补与修正**）
+
+| 切片 | 修订内容 |
+|---|---|
+| **S0** | spike 输出从 3 项 → **5 项**：① **五个** RSS 基线（空 Go / +onnxruntime DLL 映射 / +一个 sherpa session / **+分层窗口+Direct2D+DirectWrite** / **+托盘+全局热键+Job Object**）—— ⚠ 原 spike **只测了前三项，而 ④⑤ 才是 S1 那 25MB 的真实构成**，不测等于 S1 的判据没有依据 ② D25 的 X/Y 判定，**输入须含 cgo 崩溃概率**（§14.10）**与「10s 内能否回落」**（D32）③ goja async/ES module 结论 ④ go-webview2 **冷/热两档**拉起延迟实测（原 done④ 的 ≤500ms 作废）⑤ **模型常驻内存实测表**（填 D32 的 16.3.3）+ **ASR↔TTS 串行加载的切换延迟** |
+| **S1** | 增：网络/代理/TLS 错误分类（D42#4）· **单调时钟硬约束**（D42#9）· **per-session 单实例互斥**（D42#7）· **Job Object(C30)** · **SLO 度量改为进程树口径**（D32）· `notify` 与 `list_tools` 两个工具（D34） |
+| **S2** | 增：**D26 模型分发落地（P5 升级为阻塞 S2）** · **CER 双集门禁 6%/15%，两个 wav 集入库** · 音频热插拔（D42#2）· 麦克风权限（D42#12）· `Downloading` 态 · **`intra_op_num_threads=1`** |
+| **S3** | ⚠ **原标题「安全层 + 称职助手能力面」但 done 判据只有安全项** —— 一个 agent 可以只实现门控、一个工具都不加，然后判 S3 通过。修订：done 判据**必须同时含能力项与安全项**：<br>**能力项**：D34 表中标 S3 的工具**逐个跑通并留证据**（`fs.*` `file.open` `app.launch` `search.*` `web.*` `doc.read`(PDF+docx) `screen.capture` `input.type` `system.*` `window.*` `clipboard.*` `media.control`）+ **四场景脚本化验收（见 §16.8 末的矩阵，§10 新增第 10–13 条）**<br>**安全项**：原判据保留 + **C26 路径规范化红队用例**（junction / 8.3 短名 / UNC / `\\?\` 四种绕过各一条）+ **C25 污染命中用例** + **C29 签名校验用例**（篡改一个字节必须失败）<br>另：**C7 的 Image 部件必须在本片可用**（否则 `screen.capture` 是死的）；**批量聚合确认（D45-1）落本片** |
+| **S4** | 增：**TTS 音质门禁（P7 落本片，原文把 TTS 音质列为 Top 风险却没给任何切片一个门禁）** · **标点模型（P4 原文未指派切片，落本片）** · **`Warm`/`Conversation` 会话保活（C31 + D43 的 #26/#28/#29/#31）** · `reminder.*`（D34）· `memory.*` · **⚠ 删除原 done 判据里的「回落 5–8s」**（B4(c)）· 改为「**`Warm` 内二次唤起 → 首字 P50 ≤1.5s（不含模型加载）**」 |
+| **S5** | 增：**C27 `PanelManager` 单例 + 单窗口复用（隐藏而非销毁）** · **面板 CSP + 输出净化 + `approval.decide` 服务端二次授权（F2 三层）** · **无面板模式的原生 L2 降级卡**（L2 能力不得消失） · `PanelBridge` 方法白名单 |
+| **S6** | 增：电源/省电/热节流（D42#1,#6）· 磁盘满与 WAL（D42#5）· **GDI/User/句柄/goroutine 泄漏采样（D42#10）** · Focus Assist 退化（D42#8）· **看门狗阈值按态查表 + `Armed` 态不得卸 KWS** |
+| **S7** | 增：**D45-2 作用域会话授权** · **C24 `GojaHostAPI` 契约测试** · **端到端"真插件跑起来"判据**（原文只判"goja 按需加载/卸载 + 沙箱加固"，没有一个真插件跑通就算过 —— 这是典型的"看着完成实则空壳"）。**验收用例已定：`lark-cli` 包装插件（D46），不另造玩具插件** —— 须验：查日程（L0 直通）· 发消息（**C19/R8 自动判 L2**，插件声明 L0 无效）· **篡改 exe 一个字节 → `exe_hash` 校验失败拒绝执行** · argv 模板注入元字符 → 被拒 · 环境变量白名单生效（子进程看不到 API Key）· `task.list`/`task.cancel` · 显示器拓扑/DPI（D42#3）· **C19 的 R7 批量规模规则** |
+| **S8** | 增：更新流程（D41(b)）+ **N-1 回滚** · 卸载残留与模型体积提示（D41(c)） |
+
+**（b）场景 ↔ 切片追踪矩阵**（新增；**这是回答"用户要的四类场景到底哪一片交付"的唯一凭证**）
+
+审查发现：**没有任何一个切片对 `web.open`/`search`/`fetch` 有 done 判据**，

@@ -1,0 +1,1 @@
+10001:- **一个进程只许一枚 `approval.Gate`**：常驻腿已有 `ra.gate`（`resident_approval_windows.go:109`），做法是给 `run.go` 的 `runSpec` 加注入位（gate／UI／Replies 账本，nil＝按今天自建控制台那一套），`assembleRuntime` 仍是全仓唯一一处装配。⛔ 不许在常驻那条腿里再 `approval.New(...)` 造第二枚＝第二个"谁在等批准"的真相源（246-a1 §5 与 `A481` 裁乙形要躲开的就是这个）。

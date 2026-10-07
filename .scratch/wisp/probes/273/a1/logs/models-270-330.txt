@@ -1,0 +1,61 @@
+1:		fmt.Fprintf(io_.err(), "wisp models ensure: 配置未就绪（Unconfigured）：%v\n", err)
+2:		return 2
+3:	}
+4:	store, err := openModelStore(io_.dataDir, cfg)
+5:	if err != nil {
+6:		fmt.Fprintf(io_.err(), "wisp models ensure: %v\n", err)
+7:		return 2
+8:	}
+9:	// The persistent sink is installed here for the same reason run.go installs
+10:	// it before assembling (ticket 117): the resident path has no terminal, and
+11:	// a refused hand-off nobody records is a security verdict that leaves no
+12:	// trace. A store that cannot open a log dir degrades loudly, it does not
+13:	// stop the verification.
+14:	var logf func(string, ...any)
+15:	if sink, sinkErr := installLogSink(io_.dataDir); sinkErr != nil {
+16:		fmt.Fprintf(io_.err(), "wisp models: 持久日志未启用（%v）：本轮告警只会到 stderr\n", sinkErr)
+17:	} else {
+18:		defer sink.close()
+19:		sinkLogger := sink.logger()
+20:		logf = func(format string, args ...any) {
+21:			sinkLogger.Info("models: " + fmt.Sprintf(format, args...))
+22:		}
+23:	}
+24:	return store.handOffModel(io_, id, logf)
+25:}
+26:
+27:// handOffModel runs one Downloading walk (D43 row #2 in, row #37 out) for id.
+28://
+29:// This function is the grep target of ticket 121 AC#2: it is the non-test
+30:// caller of models.WireDownloading and therefore of DownloadingBridge.Run,
+31:// whose body holds the only non-test call of Manager.VerifyInstalled
+32:// (internal/models/bridge.go:58). logf receives progress ticks and may be nil.
+33:func (ms *modelStore) handOffModel(io_ modelsIO, id string, logf func(string, ...any)) int {
+34:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+35:	defer machine.Close()
+36:	bridge := models.WireDownloading(ms.mgr, machine)
+37:
+38:	ctx, cancel := context.WithTimeout(context.Background(), modelHandoffTimeout)
+39:	defer cancel()
+40:
+41:	started := time.Now()
+42:	state, err := bridge.Run(ctx, id)
+43:	if err != nil {
+44:		// Loud and classified: a refused hand-off is reported as the verdict it
+45:		// is, with the state the walk ended in, because "Error" and "still
+46:		// Downloading" are two different failures (the second means the walk
+47:		// could not even be exited, which is a table problem, not a model one).
+48:		fmt.Fprintf(io_.err(), "wisp models ensure: 交还被拒绝（state=%s）：%v\n", state, err)
+49:		if logf != nil {
+50:			logf("hand-off REFUSED id=%s state=%s err=%v", id, state, err)
+51:		}
+52:		return 1
+53:	}
+54:	fmt.Fprintf(io_.out(), "wisp models ensure: %s 已交还（state=%s，ticks=%d，末次进度 %d%%，%.2fs，store=%s）\n",
+55:		id, state, bridge.Ticks(), int(bridge.LastPercent()), time.Since(started).Seconds(), ms.root)
+56:	if logf != nil {
+57:		logf("hand-off OK id=%s state=%s root=%s", id, state, ms.root)
+58:	}
+59:	return 0
+60:}
+61:

@@ -1,0 +1,16 @@
+./cmd/balldebug/main.go
+./cmd/wisp/approval_always.go
+./cmd/wisp/approval_reply.go
+./cmd/wisp/models.go
+./cmd/wisp/resident_approval_windows.go
+./cmd/wisp/resident_ball_windows.go
+./internal/agent/approval/replies.go
+./internal/ball/anim.go
+./internal/ball/ball_windows.go
+./internal/ball/liquid.go
+./internal/ball/liquid_windows.go
+./internal/ball/statevisual.go
+./internal/models/bridge.go
+./internal/tools/subagent_197.go
+./internal/tools/task.go
+./internal/tools/task_backfill.go

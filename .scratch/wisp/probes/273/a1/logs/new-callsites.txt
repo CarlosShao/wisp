@@ -1,0 +1,8 @@
+./cmd/balldebug/main.go:188:	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./cmd/wisp/models.go:303:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+./internal/ball/hotkey_live_test.go:382:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/ball/interaction_live_test.go:54:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/ball/interaction_live_test.go:134:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/models/bridge_test.go:16:	machine := statemachine.New(statemachine.Options{
+./internal/models/bridge_test.go:86:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/models/handoff_window_109_test.go:62:	return statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})

@@ -1,0 +1,61 @@
+internal/ball/anim.go:40:func AnimationPolicy(s statemachine.State) AnimPolicy {
+internal/ball/anim.go:42:	case statemachine.StateListening:
+internal/ball/anim.go:44:	case statemachine.StateThinking:
+internal/ball/anim.go:46:	case statemachine.StateConfirming:
+internal/ball/anim.go:48:	case statemachine.StateSpeaking:
+internal/ball/anim.go:50:	case statemachine.StateActing:
+internal/ball/anim.go:54:	case statemachine.StateWarm:
+internal/ball/anim.go:57:	case statemachine.StateSettling:
+internal/ball/ball_windows.go:66:	Initial  statemachine.State
+internal/ball/ball_windows.go:91:	curState        statemachine.State
+internal/ball/ball_windows.go:157:		opts.Initial = statemachine.StateSleeping
+internal/ball/ball_windows.go:311:func (b *Ball) SetState(s statemachine.State) {
+internal/ball/ball_windows.go:342:func (b *Ball) applyStateLocked(s statemachine.State) {
+internal/ball/ball_windows.go:490:func animCycleMs(s statemachine.State) int {
+internal/ball/ball_windows.go:492:	case statemachine.StateListening:
+internal/ball/ball_windows.go:494:	case statemachine.StateThinking:
+internal/ball/ball_windows.go:496:	case statemachine.StateConfirming:
+internal/ball/ball_windows.go:498:	case statemachine.StateSpeaking:
+internal/ball/liquid.go:62:func liquidDriven(s statemachine.State) bool {
+internal/ball/liquid.go:64:	case statemachine.StateListening, statemachine.StateThinking,
+internal/ball/liquid.go:65:		statemachine.StateSpeaking, statemachine.StateConversation,
+internal/ball/liquid.go:66:		statemachine.StateWarm, statemachine.StateActing:
+internal/ball/liquid.go:78:func transitionDriven(s statemachine.State) bool {
+internal/ball/liquid.go:117:func (m *liquidMotion) enterState(s statemachine.State) {
+internal/ball/liquid.go:299:func (m *liquidMotion) busy(s statemachine.State) bool {
+internal/ball/liquid_windows.go:153:func (b *Ball) motionStateChanged(from, to statemachine.State) {
+internal/ball/statevisual.go:121:func stateSize(configuredPx int, s statemachine.State) float32 {
+internal/ball/statevisual.go:128:	if s == statemachine.StateSleeping {
+internal/ball/statevisual.go:144:func VisualFor(p Palette, configuredPx int, s statemachine.State, fadeProgress float32) Visual {
+internal/ball/statevisual.go:155:	case statemachine.StateSleeping:
+internal/ball/statevisual.go:158:	case statemachine.StateArmed:
+internal/ball/statevisual.go:160:	case statemachine.StateMuted:
+internal/ball/statevisual.go:163:	case statemachine.StateListening:
+internal/ball/statevisual.go:167:	case statemachine.StateThinking:
+internal/ball/statevisual.go:173:	case statemachine.StateActing:
+internal/ball/statevisual.go:177:	case statemachine.StateConfirming:
+internal/ball/statevisual.go:181:	case statemachine.StateAwaitingApproval:
+internal/ball/statevisual.go:185:	case statemachine.StateSpeaking:
+internal/ball/statevisual.go:190:	case statemachine.StateSettling:
+internal/ball/statevisual.go:193:	case statemachine.StateWarm:
+internal/ball/statevisual.go:197:	case statemachine.StateConversation:
+internal/ball/statevisual.go:205:	case statemachine.StateDownloading:
+internal/ball/statevisual.go:209:	case statemachine.StateError:
+internal/ball/statevisual.go:214:	case statemachine.StateNoNetwork:
+internal/ball/statevisual.go:218:	case statemachine.StateUnconfigured:
+internal/ball/statevisual.go:223:	case statemachine.StateFirstRun:
+internal/ball/statevisual.go:228:	case statemachine.StateWatchdogAlert:
+internal/ball/statevisual.go:233:	case statemachine.StateQueued:
+internal/ball/statevisual.go:241:	case statemachine.StateStuck:
+internal/ball/statevisual.go:260:func borderAtRest(s statemachine.State) float32 {
+internal/ball/statevisual.go:262:	case statemachine.StateSleeping, statemachine.StateSpeaking:
+internal/ball/statevisual.go:272:func applyGlassForm(v *Visual, p Palette, s statemachine.State, fadeProgress float32) {
+internal/ball/statevisual.go:283:	case statemachine.StateSleeping:
+internal/ball/statevisual.go:288:	case statemachine.StateArmed:
+internal/ball/statevisual.go:290:	case statemachine.StateMuted:
+internal/ball/statevisual.go:292:	case statemachine.StateSettling:
+internal/ball/statevisual.go:296:	case statemachine.StateListening, statemachine.StateSpeaking:
+internal/ball/statevisual.go:321:func Animated(s statemachine.State) bool {
+internal/ball/statevisual.go:323:	case statemachine.StateListening, statemachine.StateThinking,
+internal/ball/statevisual.go:324:		statemachine.StateActing, statemachine.StateSpeaking,
+internal/ball/statevisual.go:325:		statemachine.StateConfirming:

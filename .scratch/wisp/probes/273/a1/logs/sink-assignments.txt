@@ -1,0 +1,58 @@
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:292:	opt.Sink = nil
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:294:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/151/run.head.go:550:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+./.scratch/wisp/probes/151/run.mut-noclose.go:575:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+./.scratch/wisp/probes/151-accept/run.shipped.go:576:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+./.scratch/wisp/probes/183/a1/mut/loop.go:201:	if opt.Sink == nil {
+./.scratch/wisp/probes/183/a1/mut/loop.go:202:		opt.Sink = NopSink{}
+./.scratch/wisp/probes/197/r1c/pre/subagent_197.go:233:	opt.Sink = nil
+./.scratch/wisp/probes/197/r3b/pre/run.go:695:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:285:	opt.Sink = nil
+./.scratch/wisp/probes/197/r3b/pre/subagent_197.go:287:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/198/v2/backup/run.go:998:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/221/r1/mutations/m4-subagent_197.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/221/r1/mutations/m5-subagent_197.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/221/r1/mutations/m6-subagent_197.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/221/v1/mutations/m10-cascade-returns.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/221/v1/mutations/m12-finalize-wrong-state.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:300:	opt.Sink = nil
+./.scratch/wisp/probes/221/v1/mutations/m8-old-promise-returned.go:302:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/221/v1/mutations/m9-old-receipt-returned.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:292:	opt.Sink = nil
+./.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go:294:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:292:	opt.Sink = nil
+./.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/subagent_197.go:294:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:292:	opt.Sink = nil
+./.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/subagent_197.go:294:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:292:	opt.Sink = nil
+./.scratch/wisp/probes/222/v1/mutations/m7-giveback-after-delta/subagent_197.go:294:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/235/r1/mut-m6-pool8/subagent_197.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/235/v1/mut/base-head-prod197.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:301:	opt.Sink = nil
+./.scratch/wisp/probes/235/v1/mut/pool8_197.go:303:		opt.Sink = subagentTextSink{d: t.d}
+./.scratch/wisp/probes/246/r2/mut/base-run.go:966:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+./cmd/wisp/providers.go:194:		Sink:     storeHealthSink{store: store},
+./cmd/wisp/run.go:998:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+./internal/agent/harness_test.go:121:	o.Sink = h.sink
+./internal/agent/loop.go:208:	if opt.Sink == nil {
+./internal/agent/loop.go:209:		opt.Sink = NopSink{}
+./internal/agent/sink.go:11:// task goes through Sink: the ball/panel/CLI (tickets 12, 28, 33+) forward
+./internal/llm/probe_health.go:224:	if o.Sink == nil {
+./internal/llm/probe_health_test.go:125:	o.Sink = pf.sink
+./internal/llm/probe_health_test.go:405:		Sink: pf.sink,
+./internal/llm/probe_health_test.go:428:			Sink:         failingSink{err: boom},
+./internal/models/bridge_test.go:18:		Sink:    func(e statemachine.Effect) { effects = append(effects, e) },
+./internal/statemachine/machine.go:64:	if opts.Sink == nil {
+./internal/statemachine/machine.go:67:		opts.Sink = func(Effect) {}
+./internal/statemachine/table_test.go:298:			m := New(Options{Initial: tc.from, Sink: func(e Effect) { fired = append(fired, e) }})
+./internal/tools/loop_approval_test.go:115:		Sink:     &agent.RecordSink{},
+./internal/tools/subagent_197.go:301:	opt.Sink = nil
+./internal/tools/subagent_197.go:303:		opt.Sink = subagentTextSink{d: t.d}

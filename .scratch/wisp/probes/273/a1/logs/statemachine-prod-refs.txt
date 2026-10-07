@@ -1,0 +1,197 @@
+cmd/balldebug/main.go:30:	"github.com/CarlosShao/wisp/internal/statemachine"
+cmd/balldebug/main.go:51:var allStates = []statemachine.State{
+cmd/balldebug/main.go:52:	statemachine.StateFirstRun,
+cmd/balldebug/main.go:53:	statemachine.StateSleeping,
+cmd/balldebug/main.go:54:	statemachine.StateArmed,
+cmd/balldebug/main.go:55:	statemachine.StateMuted,
+cmd/balldebug/main.go:56:	statemachine.StateListening,
+cmd/balldebug/main.go:57:	statemachine.StateThinking,
+cmd/balldebug/main.go:58:	statemachine.StateActing,
+cmd/balldebug/main.go:59:	statemachine.StateConfirming,
+cmd/balldebug/main.go:60:	statemachine.StateAwaitingApproval,
+cmd/balldebug/main.go:61:	statemachine.StateSpeaking,
+cmd/balldebug/main.go:62:	statemachine.StateSettling,
+cmd/balldebug/main.go:63:	statemachine.StateWarm,
+cmd/balldebug/main.go:64:	statemachine.StateConversation,
+cmd/balldebug/main.go:65:	statemachine.StateDownloading,
+cmd/balldebug/main.go:66:	statemachine.StateError,
+cmd/balldebug/main.go:67:	statemachine.StateNoNetwork,
+cmd/balldebug/main.go:68:	statemachine.StateUnconfigured,
+cmd/balldebug/main.go:69:	statemachine.StateWatchdogAlert,
+cmd/balldebug/main.go:70:	statemachine.StateQueued,
+cmd/balldebug/main.go:71:	statemachine.StateStuck,
+cmd/balldebug/main.go:178:		m    *statemachine.Machine
+cmd/balldebug/main.go:188:	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+cmd/balldebug/main.go:191:		Initial:     statemachine.StateSleeping,
+cmd/balldebug/main.go:286:		s := statemachine.State(*state)
+cmd/balldebug/main.go:318:			if s == statemachine.StateAwaitingApproval {
+cmd/balldebug/main.go:321:			if s == statemachine.StateDownloading {
+cmd/balldebug/main.go:325:			if s == statemachine.StateConfirming {
+cmd/balldebug/main.go:352:	b.SetState(statemachine.StateSleeping)
+cmd/balldebug/main.go:386:func writeStatus(path string, s statemachine.State, timers bool) {
+cmd/balldebug/main.go:484:		for _, s := range []statemachine.State{
+cmd/balldebug/main.go:485:			statemachine.StateSleeping, statemachine.StateArmed, statemachine.StateListening,
+cmd/balldebug/main.go:486:			statemachine.StateSpeaking, statemachine.StateWarm, statemachine.StateError,
+cmd/balldebug/main.go:498:	b.SetState(statemachine.StateSleeping)
+cmd/balldebug/main.go:505:	b.SetState(statemachine.StateListening)
+cmd/balldebug/main.go:511:	b.SetState(statemachine.StateSpeaking)
+cmd/balldebug/main.go:517:	b.SetState(statemachine.StateListening)
+cmd/balldebug/main.go:523:	b.SetState(statemachine.StateSleeping)
+cmd/balldebug/main.go:591:func gesture(b *ball.Ball, m *statemachine.Machine, k ball.EventKind) {
+cmd/balldebug/main.go:595:		case statemachine.StateListening, statemachine.StateConfirming:
+cmd/balldebug/main.go:596:			dispatch(b, m, statemachine.EvVeto, nil)
+cmd/balldebug/main.go:597:		case statemachine.StateSpeaking:
+cmd/balldebug/main.go:598:			dispatch(b, m, statemachine.EvInterrupt, nil)
+cmd/balldebug/main.go:600:			dispatch(b, m, statemachine.EvSummon, nil)
+cmd/balldebug/main.go:603:		dispatch(b, m, statemachine.EvMuteKey, nil)
+cmd/balldebug/main.go:605:		if m.State() == statemachine.StateConfirming {
+cmd/balldebug/main.go:606:			dispatch(b, m, statemachine.EvVeto, nil)
+cmd/balldebug/main.go:608:			dispatch(b, m, statemachine.EvVeto, nil) // Listening veto
+cmd/balldebug/main.go:617:func dispatch(b *ball.Ball, m *statemachine.Machine, ev statemachine.Event, f *statemachine.Facts) {
+cmd/balldebug/main.go:624:	if to != statemachine.StateConfirming {
+cmd/balldebug/main.go:630:func syncMachineToBall(b *ball.Ball, m *statemachine.Machine) {
+cmd/balldebug/main.go:634:	if s == statemachine.StateConfirming {
+cmd/wisp/approval_always.go:54:	"github.com/CarlosShao/wisp/internal/statemachine"
+cmd/wisp/approval_always.go:167:// draws it. The name comes out of the frozen D43 table via statemachine, never a
+cmd/wisp/approval_always.go:190:func (rt *agentRuntime) waitingStateName() (statemachine.State, bool) {
+cmd/wisp/approval_reply.go:69:	"github.com/CarlosShao/wisp/internal/statemachine"
+cmd/wisp/approval_reply.go:168:func (n *nativeCards) waitingState() (statemachine.State, bool) {
+cmd/wisp/models.go:44:// statemachine import nothing back up into here.
+cmd/wisp/models.go:57:	"github.com/CarlosShao/wisp/internal/statemachine"
+cmd/wisp/models.go:303:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+cmd/wisp/resident_approval_windows.go:66:	"github.com/CarlosShao/wisp/internal/statemachine"
+cmd/wisp/resident_approval_windows.go:956:	b.SetState(statemachine.StateSleeping)
+cmd/wisp/resident_approval_windows.go:965:func stateForCardLevel(level string) statemachine.State {
+cmd/wisp/resident_approval_windows.go:967:		return statemachine.StateConfirming
+cmd/wisp/resident_approval_windows.go:969:	return statemachine.StateAwaitingApproval
+cmd/wisp/resident_ball_windows.go:55:	"github.com/CarlosShao/wisp/internal/statemachine"
+cmd/wisp/resident_ball_windows.go:275:		Initial:  statemachine.StateSleeping,
+internal/agent/approval/doc.go:11://     (panel), no L1 countdown confirm (statemachine Confirming state)
+internal/agent/approval/replies.go:40:	"github.com/CarlosShao/wisp/internal/statemachine"
+internal/agent/approval/replies.go:282:// statemachine.Valid is the judge on both branches. A host surface calls this to
+internal/agent/approval/replies.go:286:func (r *Replies) WaitingState() (statemachine.State, bool) {
+internal/agent/approval/replies.go:294:		return statemachine.StateAwaitingApproval, true
+internal/agent/approval/replies.go:298:			return statemachine.StateConfirming, true
+internal/ball/anim.go:3:import "github.com/CarlosShao/wisp/internal/statemachine"
+internal/ball/anim.go:40:func AnimationPolicy(s statemachine.State) AnimPolicy {
+internal/ball/anim.go:42:	case statemachine.StateListening:
+internal/ball/anim.go:44:	case statemachine.StateThinking:
+internal/ball/anim.go:46:	case statemachine.StateConfirming:
+internal/ball/anim.go:48:	case statemachine.StateSpeaking:
+internal/ball/anim.go:50:	case statemachine.StateActing:
+internal/ball/anim.go:54:	case statemachine.StateWarm:
+internal/ball/anim.go:57:	case statemachine.StateSettling:
+internal/ball/ball_windows.go:27:	"github.com/CarlosShao/wisp/internal/statemachine"
+internal/ball/ball_windows.go:66:	Initial  statemachine.State
+internal/ball/ball_windows.go:91:	curState        statemachine.State
+internal/ball/ball_windows.go:157:		opts.Initial = statemachine.StateSleeping
+internal/ball/ball_windows.go:310:// statemachine dispatch). Safe from any goroutine.
+internal/ball/ball_windows.go:311:func (b *Ball) SetState(s statemachine.State) {
+internal/ball/ball_windows.go:342:func (b *Ball) applyStateLocked(s statemachine.State) {
+internal/ball/ball_windows.go:490:func animCycleMs(s statemachine.State) int {
+internal/ball/ball_windows.go:492:	case statemachine.StateListening:
+internal/ball/ball_windows.go:494:	case statemachine.StateThinking:
+internal/ball/ball_windows.go:496:	case statemachine.StateConfirming:
+internal/ball/ball_windows.go:498:	case statemachine.StateSpeaking:
+internal/ball/ball_windows.go:725:// be quick and non-blocking (statemachine dispatch + PostTask); a blocking
+internal/ball/doc.go:19://   - no business logic: state transitions live in statemachine; the ball
+internal/ball/liquid.go:20:	"github.com/CarlosShao/wisp/internal/statemachine"
+internal/ball/liquid.go:62:func liquidDriven(s statemachine.State) bool {
+internal/ball/liquid.go:64:	case statemachine.StateListening, statemachine.StateThinking,
+internal/ball/liquid.go:65:		statemachine.StateSpeaking, statemachine.StateConversation,
+internal/ball/liquid.go:66:		statemachine.StateWarm, statemachine.StateActing:
+internal/ball/liquid.go:78:func transitionDriven(s statemachine.State) bool {
+internal/ball/liquid.go:117:func (m *liquidMotion) enterState(s statemachine.State) {
+internal/ball/liquid.go:299:func (m *liquidMotion) busy(s statemachine.State) bool {
+internal/ball/liquid_windows.go:32:	"github.com/CarlosShao/wisp/internal/statemachine"
+internal/ball/liquid_windows.go:153:func (b *Ball) motionStateChanged(from, to statemachine.State) {
+internal/ball/statevisual.go:3:import "github.com/CarlosShao/wisp/internal/statemachine"
+internal/ball/statevisual.go:121:func stateSize(configuredPx int, s statemachine.State) float32 {
+internal/ball/statevisual.go:128:	if s == statemachine.StateSleeping {
+internal/ball/statevisual.go:144:func VisualFor(p Palette, configuredPx int, s statemachine.State, fadeProgress float32) Visual {
+internal/ball/statevisual.go:155:	case statemachine.StateSleeping:
+internal/ball/statevisual.go:158:	case statemachine.StateArmed:
+internal/ball/statevisual.go:160:	case statemachine.StateMuted:
+internal/ball/statevisual.go:163:	case statemachine.StateListening:
+internal/ball/statevisual.go:167:	case statemachine.StateThinking:
+internal/ball/statevisual.go:173:	case statemachine.StateActing:
+internal/ball/statevisual.go:177:	case statemachine.StateConfirming:
+internal/ball/statevisual.go:181:	case statemachine.StateAwaitingApproval:
+internal/ball/statevisual.go:185:	case statemachine.StateSpeaking:
+internal/ball/statevisual.go:190:	case statemachine.StateSettling:
+internal/ball/statevisual.go:193:	case statemachine.StateWarm:
+internal/ball/statevisual.go:197:	case statemachine.StateConversation:
+internal/ball/statevisual.go:205:	case statemachine.StateDownloading:
+internal/ball/statevisual.go:209:	case statemachine.StateError:
+internal/ball/statevisual.go:214:	case statemachine.StateNoNetwork:
+internal/ball/statevisual.go:218:	case statemachine.StateUnconfigured:
+internal/ball/statevisual.go:223:	case statemachine.StateFirstRun:
+internal/ball/statevisual.go:228:	case statemachine.StateWatchdogAlert:
+internal/ball/statevisual.go:233:	case statemachine.StateQueued:
+internal/ball/statevisual.go:241:	case statemachine.StateStuck:
+internal/ball/statevisual.go:260:func borderAtRest(s statemachine.State) float32 {
+internal/ball/statevisual.go:262:	case statemachine.StateSleeping, statemachine.StateSpeaking:
+internal/ball/statevisual.go:272:func applyGlassForm(v *Visual, p Palette, s statemachine.State, fadeProgress float32) {
+internal/ball/statevisual.go:283:	case statemachine.StateSleeping:
+internal/ball/statevisual.go:288:	case statemachine.StateArmed:
+internal/ball/statevisual.go:290:	case statemachine.StateMuted:
+internal/ball/statevisual.go:292:	case statemachine.StateSettling:
+internal/ball/statevisual.go:296:	case statemachine.StateListening, statemachine.StateSpeaking:
+internal/ball/statevisual.go:321:func Animated(s statemachine.State) bool {
+internal/ball/statevisual.go:323:	case statemachine.StateListening, statemachine.StateThinking,
+internal/ball/statevisual.go:324:		statemachine.StateActing, statemachine.StateSpeaking,
+internal/ball/statevisual.go:325:		statemachine.StateConfirming:
+internal/models/bridge.go:8:	"github.com/CarlosShao/wisp/internal/statemachine"
+internal/models/bridge.go:24:	machine *statemachine.Machine
+internal/models/bridge.go:29:	log     []statemachine.State
+internal/models/bridge.go:33:func WireDownloading(mgr *Manager, machine *statemachine.Machine) *DownloadingBridge {
+internal/models/bridge.go:39:func (b *DownloadingBridge) Run(ctx context.Context, id string) (statemachine.State, error) {
+internal/models/bridge.go:40:	if _, err := b.machine.Dispatch(statemachine.EvModelMissing, nil); err != nil {
+internal/models/bridge.go:46:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:59:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:64:	if _, derr := b.machine.Dispatch(statemachine.EvDownloadCompleted, nil); derr != nil {
+internal/models/bridge.go:80:func (b *DownloadingBridge) record() statemachine.State {
+internal/models/bridge.go:103:func (b *DownloadingBridge) StateLog() []statemachine.State {
+internal/models/bridge.go:106:	return append([]statemachine.State(nil), b.log...)
+internal/observe/errors.go:127:// statemachine.State constants; a test pins that correspondence so the two
+internal/observe/sampler.go:37:// internal/statemachine); PanelOpen and WorkPeak are SLO postures over the
+internal/panel/subagent_roster_197.go:18://     not import internal/statemachine and it does not assign to a State field,
+internal/panel/subagent_roster_197.go:23://     asks for one state vocabulary with statemachine.Valid as the judge; that is
+internal/session/doc.go:13://   - no state transitions (statemachine), no model loading (speech/models),
+internal/speech/doc.go:17://     (models), no wake-word arming policy (statemachine/watchdog)
+internal/statemachine/doc.go:1:// Package statemachine owns the BallState state vocabulary and the D43
+internal/statemachine/doc.go:20:package statemachine
+internal/statemachine/events.go:1:package statemachine
+internal/statemachine/machine.go:1:package statemachine
+internal/statemachine/machine.go:19:	return fmt.Sprintf("statemachine: illegal transition %s + %s (no D43 row; undefined = stop)",
+internal/statemachine/machine.go:117:		return m.state, fmt.Errorf("statemachine: dispatch %s on closed machine", ev)
+internal/statemachine/states.go:1:package statemachine
+internal/statemachine/table.go:1:package statemachine
+internal/statemachine/timeouts.go:1:package statemachine
+internal/tools/subagent_197.go:14:	"github.com/CarlosShao/wisp/internal/statemachine"
+internal/tools/subagent_197.go:29://   - not a new state vocabulary. The status dimension is statemachine.State and
+internal/tools/subagent_197.go:30://     only ever carries one of D43's 20 names (internal/statemachine/states.go:11-31),
+internal/tools/subagent_197.go:31://     checked by statemachine.Valid; memory.TaskLog.State's four legacy words
+internal/tools/subagent_197.go:94:// subagent states, all of them D43 names (statemachine.Valid is the judge).
+internal/tools/subagent_197.go:107:	subagentStateRunning = statemachine.StateThinking
+internal/tools/subagent_197.go:108:	subagentStateSettled = statemachine.StateSettling
+internal/tools/subagent_197.go:109:	subagentStateStopped = statemachine.StateMuted
+internal/tools/subagent_197.go:110:	subagentStateFailed  = statemachine.StateError
+internal/tools/subagent_197.go:409:// statemachine.Valid through TaskOutput.StateAnswer's own judge) and stamps it
+internal/tools/task.go:15:	"github.com/CarlosShao/wisp/internal/statemachine"
+internal/tools/task.go:112:	// Its type is statemachine.State, whose value set is the verbatim in-repo
+internal/tools/task.go:113:	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+internal/tools/task.go:117:	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+internal/tools/task.go:130:	State statemachine.State
+internal/tools/task.go:158:func (o TaskOutput) StateAnswer() (statemachine.State, string) {
+internal/tools/task.go:162:	if !statemachine.Valid(o.State) {
+internal/tools/task.go:345:		State: statemachine.State(subagentStateRunning),
+internal/tools/task.go:410:		if o.Kind == TaskKindSubagent && o.State == statemachine.State(subagentInFlightState) {
+internal/tools/task.go:794:			if o.State != "" && o.State != statemachine.State(subagentStateRunning) {
+internal/tools/task_backfill.go:7:	"github.com/CarlosShao/wisp/internal/statemachine"
+internal/tools/task_backfill.go:69:	// It is typed statemachine.State so the vocabulary can only come from D43's
+internal/tools/task_backfill.go:70:	// copy in internal/statemachine/states.go:11-31, and Backfill still checks
+internal/tools/task_backfill.go:71:	// statemachine.Valid before it writes: a host that hands this door a legacy
+internal/tools/task_backfill.go:75:	State statemachine.State
+internal/tools/task_backfill.go:113:	case b.State != "" && !statemachine.Valid(b.State):
+internal/watchdog/doc.go:16://     Object ownership (proc), no state transitions (statemachine)

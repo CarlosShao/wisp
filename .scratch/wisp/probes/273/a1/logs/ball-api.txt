@@ -1,0 +1,56 @@
+internal/ball/ball_windows.go:182:func (b *Ball) createOnSTA(s *staThread) error {
+internal/ball/ball_windows.go:283:func (b *Ball) resolveInitial(edge int32) (int32, int32) {
+internal/ball/ball_windows.go:311:func (b *Ball) SetState(s statemachine.State) {
+internal/ball/ball_windows.go:316:func (b *Ball) SetBadge(n int) {
+internal/ball/ball_windows.go:324:func (b *Ball) SetProgress(p float32) {
+internal/ball/ball_windows.go:332:func (b *Ball) SetBadgeText(s string) {
+internal/ball/ball_windows.go:342:func (b *Ball) applyStateLocked(s statemachine.State) {
+internal/ball/ball_windows.go:376:func (b *Ball) repaintCurrent() {
+internal/ball/ball_windows.go:391:func (b *Ball) renderFrame() {
+internal/ball/ball_windows.go:431:func (b *Ball) stopAnimTimer() {
+internal/ball/ball_windows.go:441:func (b *Ball) TimersAlive() bool {
+internal/ball/ball_windows.go:450:func (b *Ball) DebugTimersAlive() bool {
+internal/ball/ball_windows.go:457:func (b *Ball) onAnimTick() {
+internal/ball/ball_windows.go:506:func (b *Ball) repaintAnimated() {
+internal/ball/ball_windows.go:520:func (b *Ball) present() {
+internal/ball/ball_windows.go:549:func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
+internal/ball/ball_windows.go:728:func (b *Ball) fire(fn func()) {
+internal/ball/ball_windows.go:741:func (b *Ball) uiRun(fn func()) {
+internal/ball/ball_windows.go:757:func (b *Ball) persistPosition() {
+internal/ball/ball_windows.go:774:func (b *Ball) reclampPosition() {
+internal/ball/ball_windows.go:813:func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
+internal/ball/ball_windows.go:830:func (b *Ball) HotkeyReport() HotkeyReport {
+internal/ball/ball_windows.go:840:func (b *Ball) ConfiguredHotkeys() HotkeyConfig {
+internal/ball/ball_windows.go:849:func (b *Ball) RegisteredHotkeys() map[uint32]Accelerator {
+internal/ball/ball_windows.go:881:func (b *Ball) TakeEscForCancel() {
+internal/ball/ball_windows.go:911:func (b *Ball) ReleaseEscAfterSession() {
+internal/ball/ball_windows.go:926:func (b *Ball) EscTakenOver() bool {
+internal/ball/ball_windows.go:938:func (b *Ball) DebugRegisterHotkeySquat(id uint32, acc Accelerator) error {
+internal/ball/ball_windows.go:946:func (b *Ball) DebugUnregisterHotkeySquat(id uint32) {
+internal/ball/ball_windows.go:953:func (b *Ball) SetTrayChecks(muted, pausedWake bool) {
+internal/ball/ball_windows.go:961:func (b *Ball) SetTrayTip(tip string) {
+internal/ball/ball_windows.go:969:func (b *Ball) Close() {
+internal/ball/ball_windows.go:1011:func (b *Ball) recenterAt(dpi uint32, edge int32) {
+internal/ball/ball_windows.go:1042:func (b *Ball) DebugHWND() windows.HWND { return b.hwnd }
+internal/ball/dock_windows.go:44:func (b *Ball) dockGeometry() (work Rect, edgePx, marginPx, orbR, triggerPx int32, x, y int, ok b
+internal/ball/dock_windows.go:75:func (b *Ball) dockFrameDt() time.Duration {
+internal/ball/dock_windows.go:89:func (b *Ball) dockProximity() {
+internal/ball/dock_windows.go:113:func (b *Ball) dockCommit() {
+internal/ball/dock_windows.go:136:func (b *Ball) dockMoveTo(pos PosEntry) {
+internal/ball/dock_windows.go:154:func (b *Ball) dockStep(dt time.Duration) {
+internal/ball/dock_windows.go:175:func (b *Ball) dockHoverMove() {
+internal/ball/dock_windows.go:189:func (b *Ball) dockAskLeave() {
+internal/ball/dock_windows.go:205:func (b *Ball) dockLeave() {
+internal/ball/dock_windows.go:228:func (b *Ball) dockClickOut() bool {
+internal/ball/dock_windows.go:244:func (b *Ball) stampDock(v *Visual) {
+internal/ball/dock_windows.go:255:func (b *Ball) DebugDock(e Edge) bool {
+internal/ball/dock_windows.go:291:func (b *Ball) DebugPop() float32 {
+internal/ball/dock_windows.go:313:func (b *Ball) Docked() (Edge, float32, bool) {
+internal/ball/liquid_windows.go:42:func (b *Ball) SetAudioLevel(level float32) {
+internal/ball/liquid_windows.go:51:func (b *Ball) applyLevel(level float32) {
+internal/ball/liquid_windows.go:77:func (b *Ball) motionDt() time.Duration {
+internal/ball/liquid_windows.go:92:func (b *Ball) onLiquidTick() {
+internal/ball/liquid_windows.go:115:func (b *Ball) syncLiquidTimer() {
+internal/ball/liquid_windows.go:126:func (b *Ball) stopLiquidTimer() {
+internal/ball/liquid_windows.go:139:func (b *Ball) frameVisual() Visual {
+internal/ball/liquid_windows.go:153:func (b *Ball) motionStateChanged(from, to statemachine.State) {
