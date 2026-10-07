@@ -42,3 +42,4 @@
 ## Progress log (append-only, newest last)
 
 - [10-06 19:4x] 编排者立票。⛔ 零产码改动、零框翻动。来源读数全部在 `232-v1` 的件与 logs 里（195 行／22,571 字节／零占位）。
+- [10-07 09:2x] 写腿 `272-r2` 起手锚落盘（第 1 笔在任何长跑命令之后立刻交，不留零提交）：`go test -count=1 -v ./cmd/wisp ./internal/...` 四数 RUN/PASS/FAIL/SKIP = **2175/1471/7/7**（rc=1，7 枚红全部起手就在，逐名见 `.scratch/wisp/probes/272/r2/logs/G0-start-rednames.txt`；1.1 MB 原始 `-v` 输出留仓外 `/d/tmp/wisp272r2/mut/G0-raw.txt` 不入库）。⚠ 起手即现量报回一处与票面 `:10` 的机制冲突：`startConfigReload()` 的启动横幅（`config_reload.go:124-127`）由 `run.go:813` 在 `assembleRuntime` 内**同步**写进 `syncWriter`，而尺的 `mark`（`config_reload_223_test.go:566`）跑在其后的 `onRuntime`/`rtHook` ⇒ 横幅在程序顺序上先于 mark、按 `strings.TrimPrefix` 应当落在窗外；本腿正在按 AC#1 复跑 `cur`／`M`／`MDEL` 三发定机制，读数之前不下结论。⛔ 零产码改动、零框翻动。
