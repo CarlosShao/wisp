@@ -1,0 +1,62 @@
+=== ci.yml wc ===
+  941 57948 .github/workflows/ci.yml
+
+=== job names (2-space indent keys) with line numbers ===
+11:  pull_request:
+12:  push:
+36:  schedule:
+38:  workflow_dispatch:
+65:  lint:
+395:  test-core:
+505:  test-windows:
+739:  slo-smoke:
+797:  slo-full:
+871:  lint-frontend:
+
+=== all runs-on lines ===
+66:    runs-on: ubuntu-latest
+142:        # not the trigger table above, not the concurrency group, not any `runs-on`,
+396:    runs-on: ubuntu-latest
+506:    runs-on: windows-latest
+740:    runs-on: windows-latest
+798:    runs-on: [self-hosted, wisp-slo]
+872:    runs-on: ubuntu-latest
+
+=== all setup-node lines ===
+879:      - uses: actions/setup-node@v4
+
+=== all npm lines ===
+884:          cache: npm
+887:      - name: npm ci (lockfile is the only source of deps)
+888:        run: npm ci
+891:        run: npm run typecheck
+894:        run: npm run lint
+900:        run: npm run tokens:check
+903:        run: npm run build
+916:        run: npm run render:l2 -- fixtures/l2-card-fs-delete.json
+928:        run: npm run render:composer
+933:        run: npm run render:stream
+940:        run: npm run render:nav
+
+=== all frontend/dist mentions (repo-wide .github) ===
+.github/workflows/ci.yml:902:      - name: build (vite build -> frontend/dist, the bytes go:embed carries)
+
+=== build.ps1 mentions in .github ===
+.github/workflows/ci.yml:466:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+.github/workflows/ci.yml:566:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+.github/workflows/ci.yml:571:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+.github/workflows/ci.yml:579:        # the cache step and build.ps1 above produce; the same command without them
+.github/workflows/ci.yml:757:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+.github/workflows/ci.yml:804:      # (on the interactive user PATH only). build.ps1's own fallback path is
+.github/workflows/ci.yml:807:      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+.github/workflows/ci.yml:809:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+.github/workflows/ci.yml:820:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+=== go build / go install in .github ===
+.github/workflows/ci.yml:170:          go install mvdan.cc/gofumpt@latest
+.github/workflows/ci.yml:296:          go install honnef.co/go/tools/cmd/staticcheck@2026.2.1
+.github/workflows/ci.yml:466:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+.github/workflows/ci.yml:520:        # not sit behind `cgo build smoke`, which has been red before) and it is
+.github/workflows/ci.yml:536:        # red before (`cgo build smoke`, run 35551819606) plus a red `PathResolver
+.github/workflows/ci.yml:566:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+.github/workflows/ci.yml:809:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.

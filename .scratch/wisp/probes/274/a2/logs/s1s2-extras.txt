@@ -1,0 +1,81 @@
+=== step conclusions, 3 exe jobs (run 37545246395) ===
+### test-windows failure
+   1 Set up job -> success
+   2 Run actions/checkout@v4 -> success
+   3 Run actions/setup-go@v5 -> success
+   4 Windows ACL sealing gate (internal/winsec's own tests, ticket 110) -> success
+   5 Cache third_party (deps.toml key) -> success
+   6 cgo build smoke (build.ps1 fetch-deps + mingw link + doctor) -> success
+   7 cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4) -> failure
+   8 Package coverage census (ticket 111 AC#1 + GUARD D) -> success
+   9 Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord) -> failure
+   10 PathResolver junction placeholder (real cases tickets 18/20) -> success
+   18 Post Cache third_party (deps.toml key) -> skipped
+   19 Post Run actions/setup-go@v5 -> skipped
+   20 Post Run actions/checkout@v4 -> success
+   21 Complete job -> success
+### slo-smoke success
+   1 Set up job -> success
+   2 Run actions/checkout@v4 -> success
+   3 Run actions/setup-go@v5 -> success
+   4 Cache third_party (deps.toml key) -> success
+   5 Build wisp.exe -> success
+   6 SLO smoke gate -> success
+   7 Upload SLO report -> success
+   12 Post Cache third_party (deps.toml key) -> success
+   13 Post Run actions/setup-go@v5 -> success
+   14 Post Run actions/checkout@v4 -> success
+   15 Complete job -> success
+### slo-full success
+   1 Set up job -> success
+   2 Run actions/checkout@v4 -> success
+   3 Run actions/setup-go@v5 -> success
+   4 Build wisp.exe (deps cached on the runner) -> success
+   5 SLO full gate (six states + settle + leak) -> success
+   6 Upload SLO report -> success
+   11 Post Run actions/setup-go@v5 -> success
+   12 Post Run actions/checkout@v4 -> success
+   13 Complete job -> success
+
+=== scripts/dev + spike: how they build ===
+scripts/dev/ball-cycle.ps1:30:& $go build -o $exe (Join-Path $repo "cmd\balldebug")
+scripts/dev/ball-cycle.ps1:31:if ($LASTEXITCODE -ne 0) { throw "go build failed" }
+scripts/spike/run.ps1:35:if (-not $cc) { throw "gcc not found (needed for cgo builds)" }
+
+=== slo-fresh.yml runs-on / jobs ===
+47:  schedule:
+52:  workflow_dispatch:
+60:  slo-fresh:
+62:    runs-on: ubuntu-latest
+
+=== frontend/dist references repo-wide (tracked files only) ===
+.github/workflows/ci.yml:902:      - name: build (vite build -> frontend/dist, the bytes go:embed carries)
+.gitignore:22:frontend/dist/*
+.gitignore:23:!frontend/dist/.gitkeep
+.scratch/wisp/dispatches/2026-09-28-175x-wave-data-carriers-182a-180a-189a-190a-188r.md:15:- ⚠ **变异／载体两条坑**：**别用 `go test -overlay`**（扫真实磁盘的尺看不见，`A382`）；仓外副本跑 `internal/panel` 要**带上 `frontend/dist`**（那包经 `all:dist` 嵌入，否则 `[setup failed]`，`A387`）。
+.scratch/wisp/dispatches/2026-09-28-181x-wave2-impl-145r3-and-188r2.md:16:- **门禁**：`go test -count=1 ./internal/panel/ ./cmd/wisp/ ./internal/tools/`（`internal/panel/` 那**三枚在册红**逐名照实记、不修不当绿；⚠ **仓外副本跑 panel 要带 `frontend/dist`**）；其余照共同规矩那四条尺；预算 **≤35**（上一程 62 枚是教训：先落骨架再取数）。
+.scratch/wisp/issues/115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md:369:  - `sh scripts/d22scan.sh`（纯净快照 `/tmp/wisp-115b-gate-s115b`）=> **rc=0**、`d22scan: clean - no D22 ban violations`；正向对照 `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0`。台账：`bans #1-5 internal/=202, bans #1-5 cmd/=20, ban #6 frontend/=40, ban #7 internal/tools/=18, ban #8 design/=16, ban #8 frontend/=40, ban #8 internal/=372, ban #8 cmd/=26` => 八个 scope 逐一等于基线，**没有一个降**（本格只改 6 行既有字节、未新增文件，故 internal/=372 与交件同数）。工作树的 frontend 计数比快照多是未跟踪的 `frontend/dist/` 产物，不是覆盖面下降。
+.scratch/wisp/issues/136-the-zero-sample-fail-closed-guard-underneath-the-freshness-nail-has-no-nail-54-tests-stay-green-without-it.md:448:  并核清 `frontend/` 的 40→43 是工作树里未跟踪的 `frontend/dist/` 三枚构建产物、**不是**兄弟在飞的树（`git diff --name-only 1d38206..HEAD -- frontend/` 无输出）。
+.scratch/wisp/issues/145-panel-snapshot-has-four-fields-so-eleven-of-the-fourteen-ui-states-have-no-input-to-render-grow-the-go-side-carrier.md:166:- **`pump_test.go:124`／`:276`：未动，且仍绿**——本程顶层键集仍是 `composer,generatedAt,pending,results` 四枚（新键嵌在 `composer` 段里），派单"只有真落第五枚键解冻才算生效"这一条件**未触发** ⇒ 解冻不追用、正控无从属必要项。复算尺：`go test -count=1 -run 'TestSnapshotJSON|TestThePumpExitCarries|TestAPumpWithNoReaders' ./internal/panel/` ⇒ `ok 0.054s`。⚠ 本程**未跑**新维的变异正控（`-overlay` 禁用、仓外副本要带 `frontend/dist`、预算到顶），牙齿自证写在证据件 §4 N3 并标〔仅自述〕。
+.scratch/wisp/issues/156-q-57-landed-as-option-b-exited-asks-the-os-instead-of-our-own-record-and-the-152-leftover-comment-actions-done.md:104:  ⇒ "本票不必重跑门禁"这个**结论留得住，但依据换掉了**：正确依据是"`a2a3b3c` 只碰 `frontend/src/**`（3 枚）、`frontend/dist` 命中 0 枚＝**嵌入源目录没被动**"。**其二**我 `A301⑤` 那句"3 行印出来的 `[FAIL]`"已由 `A302④` 更正成精确普查（含汇总行共 4 行）。
+.scratch/wisp/issues/159-record-level-cleanup-c1-c5-left-by-ticket-156-acceptance.md:44:        交付＝把这两条写成一段可执行判据（命令逐字贴，含正控：**故意拿一枚动过 `frontend/dist` 的历史提交打一发，必须响**——
+.scratch/wisp/issues/159-record-level-cleanup-c1-c5-left-by-ticket-156-acceptance.md:48:      ⚠ 若你量到 `frontend/dist` 与 `frontend/src` 之间还有一道构建产物关系（dist 是否入库、由谁生成）⇒ **如实写进来**，
+.scratch/wisp/issues/242-the-grant-binding-layer-and-the-panel-facing-read-surface-both-have-zero-rulers.md:61:**门禁一条具名**：腿报 `d22scan.exe` rc=0 clean 但同发 1 枚 **SKIP**（`frontend/dist/assets/`，由 `frontend/.gitignore` 决定，前人 138/142/143/145 表逐字在册）＝按"SKIP 算红"登记、**不归本票**（那是既有的产物覆盖问题）。
+.scratch/wisp/issues/248-the-panel-has-no-settings-route-the-inbound-whitelist-has-zero-config-or-credential-methods.md:49:**另有一条它没问、我 10-01 00:0x 自己量到并要写死的**：`frontend/dist` 在库里**只跟踪着一枚 `.gitkeep`**（尺：`git ls-files frontend` ⇒ `frontend/dist/.gitkeep`），而 `frontend/embed.go:19` 的活模式是 `//go:embed all:dist`。`all:` 前缀连点文件也算进去 ⇒ **今天"能构建"很可能是因为目录里躺着一枚占位文件**：构建过得了，**却没有任何页面产物可发**。这条同时把票 33 的 AC#11 逼成两问（能建／有内容），并归口在下面 AC#9。
+.scratch/wisp/issues/248-the-panel-has-no-settings-route-the-inbound-whitelist-has-zero-config-or-credential-methods.md:149:**5. 一处过期指认（票面自己的话，不改原句、就地记）**：`§6-2` 报——票面 §5.4 那句"宿主还没接进常驻那条腿（`grep PanelManager`＝0 命中）"**今天不成立**：`cmd/wisp/resident_windows.go` 命中 2 行、`cmd/wisp/panel_resident_windows.go` 命中 6 行，且 `newResidentComposerDispatch`（`:166-170`）复用的正是本票动过的 `newComposerDispatchChain`。⇒ **票 33 那半边比票面写的更靠前**；但"窗口建得出"≠"机主点得出设置"，缺的是**页面产物**那一格（`frontend/dist` 只有 `.gitkeep`），仍归 AC#4／AC#9。
+.scratch/wisp/issues/248-the-panel-has-no-settings-route-the-inbound-whitelist-has-zero-config-or-credential-methods.md:156:- ★**推翻我自己票面里"AC#4＝窗没接"那一读**（我复量：`cmd/wisp/resident_windows.go:148` `panel = startResidentPanel(rt.Registry, rp)`＝1 枚生产调用、`:164`（⚠ 腿报 `:163`，差一行）把 `panel.RequestToggle(via)` 交给球宿主 ⇒ 开窗那一跳**今天已接线**，`bringUp` 由热键／托盘**传递可达**、"nothing is created until the user asks"＝设计上延迟到手势，不是没接）。AC#4 真缺的是三样叠一格：①真机才知"窗真开时会不会撞嵌套消息泵重入"，②前端 dist 产物（`git ls-files frontend/dist` 我复量＝**1 行**、逐名 `frontend/dist/.gitkeep`＝AC#9 同一块石头），③一次真机点击＋下次重启真用上。
+.scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md:21:- `frontend/dist` 在版本库里跟踪的只有 **1 枚**＝`.gitignore` 规则下刻意留的锚文件（尺＝`git ls-files frontend/dist`）。
+.scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md:41:- 34 的前提路径**在树里不存在**：`docker/frontend.Dockerfile` 跟踪枚数 **0**（尺＝`git ls-files docker | grep -ci front`）、`assets/web` 跟踪枚数 **0**（尺＝`git ls-files | grep -c '^assets/web'`）；仓库实际用的是 `frontend/` + vite + `frontend/dist`。
+.scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md:47:- [ ] **AC#1 未修码读数（先证今天拦不住）**：把 bundle 换成"只剩锚文件"那一形喂给 AC#12 那把尺——**期望今天整包全绿**，这就是"出货带不带页面零判据"的凭据。⚠ 必须走 `go test -overlay` 或仓外合成 bundle，⛔ 绝不许真删/真盖本机 `frontend/dist` 里那 4 枚文件（那是别的会话与签收现场的料）。另给一发正向对照：同一把尺喂"带 `index.html` 的合成 bundle"必须走 `true` 支，证明尺没瞎。
+.scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md:53:- [ ] **AC#7 还原自证**：所有突变只走 `go test -overlay`（拷贝放仓外）；终态 `git status --porcelain -- cmd internal scripts` ＝起手，被审文件与 `git show HEAD:` 逐串对回；⛔ 本机 `frontend/dist` 那 4 枚文件枚数与哈希起手/终态必须相同（尺＝`go list -f '{{.EmbedFiles}}' ./frontend` 两头发）。
+.scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md:54:- [ ] **AC#8 `SPEC-11 §2.2` 那两步的归属裁决（⛔ 本票不选形，由 `274-a1` §3 现量升格而来）**：§2.2 第 2 步逐字要求「存在则跳过；**`--with-frontend` 时走 `docker/frontend.Dockerfile`（§3.2）**」，而今天 ①`build.ps1` **没有这枚开关**（无条件跳过）②`docker/frontend.Dockerfile` 跟踪枚数 **0** ③该节第 3 步还写着「embed **`assets/web`** 已就位」，而 `assets/web` 跟踪枚数 **0**（真实通道是 `frontend/dist`）。⇒ 要裁的是：**这枚开关该由 `build.ps1` 兑现，还是承认 §2.2 那两步已被"CI 里 `lint-frontend` 跑 vite ＋ `frontend/dist`"这一形取代**（取代＝要动 spec 文字＝人工批准，另案；⛔ 任何腿不许"顺手补个开关"来让代码与 spec 对上）。凭据＝`.scratch/wisp/probes/274/a1/census.md` §3（我现读复认，见本票末节）。
+
+=== go:embed in cmd/wisp ===
+cmd/wisp/panel_assets.go:19:// carries (internal/panel's //go:embed bundle), so deleting this branch costs an
+cmd/wisp/panel_host_gate_test.go:147:				t.Errorf("%d bundle file(s) including the entry are committed under frontend/dist, yet the embed reports built=false - the go:embed pattern is not matching committed content", trackedBeyondAnchor)
+cmd/wisp/panel_host_windows.go:11://   - Resources come from panel.Assets (the //go:embed all:dist bundle) and are
+internal/panel/assets.go:63:// to just the anchor file that keeps the go:embed pattern valid in a clean
+internal/panel/assets.go:129:// failure mode "go:embed shipped less than npm run build produced" actually
+internal/panel/assets_test.go:7:// is loud. It is the half-embedded case - the go:embed pattern carries
+internal/tools/tasklist_deferred_236r3_teeth_test.go:105:// compiled236r3TaskSrc is task.go as the COMPILER saw it. //go:embed is resolved
+internal/tools/tasklist_deferred_236r3_teeth_test.go:109://go:embed task.go

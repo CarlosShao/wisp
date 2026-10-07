@@ -1,0 +1,75 @@
+############ JOB 112547577399 ############
+--- first 6 lines (runner/workspace header) ---
+test-windows	UNKNOWN STEP	﻿2026-10-06T23:12:30.3067517Z Current runner version: '2.337.0'
+test-windows	UNKNOWN STEP	2026-10-06T23:12:30.3098480Z ##[group]Runner Image Provisioner
+test-windows	UNKNOWN STEP	2026-10-06T23:12:30.3099834Z Hosted Compute Agent
+test-windows	UNKNOWN STEP	2026-10-06T23:12:30.3100766Z Version: 20260901.588
+test-windows	UNKNOWN STEP	2026-10-06T23:12:30.3101740Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+test-windows	UNKNOWN STEP	2026-10-06T23:12:30.3102935Z Build Date: 2026-09-01T19:56:44Z
+--- lines mentioning node/npm (grep -n, raw) ---
+158:test-windows	UNKNOWN STEP	2026-10-06T23:12:44.2567211Z (node:2512) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+159:test-windows	UNKNOWN STEP	2026-10-06T23:12:44.2568914Z (Use `node --trace-deprecation ...` to show where the warning was created)
+176:test-windows	UNKNOWN STEP	2026-10-06T23:13:05.5222086Z (node:2512) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+1678:test-windows	UNKNOWN STEP	2026-10-06T23:14:24.9548354Z (node:7324) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+1679:test-windows	UNKNOWN STEP	2026-10-06T23:14:24.9549086Z (Use `node --trace-deprecation ...` to show where the warning was created)
+1681:test-windows	UNKNOWN STEP	2026-10-06T23:14:25.2547889Z (node:7324) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2908:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0772087Z     panel_host_gate_test.go:109: AC#12 reading (head cc31526): shape=anchor-only built=false entry-bytes=0 entry-ctype="" entry-err=panel: embedded assets are not built (run npm run build in frontend/) refs=0 check-err=panel: embedded assets are not built (run npm run build in frontend/) manifest-entries=0 manifest-err=panel: embedded assets are not built (run npm run build in frontend/) | git-metadata=true tracked=1 tracked-beyond-anchor=0 tracked-has-entry=false ignored-or-untracked=0
+2990:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0849452Z     panel_resident_windows_test.go:315: Resolve(entry): panel: embedded assets are not built (run npm run build in frontend/)
+5610:test-windows	UNKNOWN STEP	2026-10-06T23:22:18.2293154Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-go@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+--- runner identity hints ---
+5610:test-windows	UNKNOWN STEP	2026-10-06T23:22:18.2293154Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-go@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+############ JOB 112547577433 ############
+--- first 6 lines (runner/workspace header) ---
+slo-smoke	UNKNOWN STEP	﻿2026-10-06T23:12:30.8927081Z Current runner version: '2.337.0'
+slo-smoke	UNKNOWN STEP	2026-10-06T23:12:30.8958578Z ##[group]Runner Image Provisioner
+slo-smoke	UNKNOWN STEP	2026-10-06T23:12:30.8960101Z Hosted Compute Agent
+slo-smoke	UNKNOWN STEP	2026-10-06T23:12:30.8960952Z Version: 20260901.588
+slo-smoke	UNKNOWN STEP	2026-10-06T23:12:30.8961879Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+slo-smoke	UNKNOWN STEP	2026-10-06T23:12:30.8963023Z Build Date: 2026-09-01T19:56:44Z
+--- lines mentioning node/npm (grep -n, raw) ---
+164:slo-smoke	UNKNOWN STEP	2026-10-06T23:12:42.4152274Z (node:5792) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+165:slo-smoke	UNKNOWN STEP	2026-10-06T23:12:42.4153065Z (Use `node --trace-deprecation ...` to show where the warning was created)
+182:slo-smoke	UNKNOWN STEP	2026-10-06T23:13:00.8594903Z (node:5792) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+253:slo-smoke	UNKNOWN STEP	2026-10-06T23:13:19.6700911Z (node:9748) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+254:slo-smoke	UNKNOWN STEP	2026-10-06T23:13:19.6701715Z (Use `node --trace-deprecation ...` to show where the warning was created)
+256:slo-smoke	UNKNOWN STEP	2026-10-06T23:13:20.0256624Z (node:9748) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+331:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:28.5321698Z (node:9660) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+332:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:28.5322948Z (Use `node --trace-deprecation ...` to show where the warning was created)
+337:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:28.9495683Z (node:9660) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+347:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:29.8028724Z (node:5560) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+348:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:29.8029658Z (Use `node --trace-deprecation ...` to show where the warning was created)
+350:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:29.9844512Z (node:8724) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+351:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:29.9845247Z (Use `node --trace-deprecation ...` to show where the warning was created)
+372:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:32.2005914Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-go@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+--- runner identity hints ---
+372:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:32.2005914Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-go@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+############ JOB 112547577499 ############
+--- first 6 lines (runner/workspace header) ---
+slo-full	UNKNOWN STEP	﻿2026-10-07T00:37:08.7505208Z Current runner version: '2.337.0'
+slo-full	UNKNOWN STEP	2026-10-07T00:37:08.7513760Z Runner name: 'wisp-selfhosted-01'
+slo-full	UNKNOWN STEP	2026-10-07T00:37:08.7514462Z Runner group name: 'Default'
+slo-full	UNKNOWN STEP	2026-10-07T00:37:08.7515296Z Machine name: 'DESKTOP-LVS7839'
+slo-full	UNKNOWN STEP	2026-10-07T00:37:08.7518291Z ##[group]GITHUB_TOKEN Permissions
+slo-full	UNKNOWN STEP	2026-10-07T00:37:08.7520918Z Contents: read
+--- lines mentioning node/npm (grep -n, raw) ---
+112:slo-full	UNKNOWN STEP	2026-10-07T00:39:15.8499778Z (node:12240) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+113:slo-full	UNKNOWN STEP	2026-10-07T00:39:15.8501647Z (Use `node --trace-deprecation ...` to show where the warning was created)
+257:slo-full	UNKNOWN STEP	2026-10-07T00:42:15.2206258Z (node:11060) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+258:slo-full	UNKNOWN STEP	2026-10-07T00:42:15.2208755Z (Use `node --trace-deprecation ...` to show where the warning was created)
+263:slo-full	UNKNOWN STEP	2026-10-07T00:42:16.1053293Z (node:11060) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+272:slo-full	UNKNOWN STEP	2026-10-07T00:42:18.6416195Z (node:13316) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+273:slo-full	UNKNOWN STEP	2026-10-07T00:42:18.6419416Z (Use `node --trace-deprecation ...` to show where the warning was created)
+290:slo-full	UNKNOWN STEP	2026-10-07T00:42:23.8711326Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+--- runner identity hints ---
+2:slo-full	UNKNOWN STEP	2026-10-07T00:37:08.7513760Z Runner name: 'wisp-selfhosted-01'
+41:slo-full	UNKNOWN STEP	2026-10-07T00:37:17.6331419Z Working directory is 'E:\work\base\actions-runner\_work\wisp\wisp'
+45:slo-full	UNKNOWN STEP	2026-10-07T00:37:17.9481503Z Copying 'C:\Users\swq\.gitconfig' to 'E:\work\base\actions-runner\_work\_temp\89762870-d7a3-4498-92be-72ab276f9662\.gitconfig'
+46:slo-full	UNKNOWN STEP	2026-10-07T00:37:17.9510032Z Temporarily overriding HOME='E:\work\base\actions-runner\_work\_temp\89762870-d7a3-4498-92be-72ab276f9662' before making global git config changes
+48:slo-full	UNKNOWN STEP	2026-10-07T00:37:17.9527135Z [command]D:\work\soft\Git\cmd\git.exe config --global --add safe.directory E:\work\base\actions-runner\_work\wisp\wisp
+111:slo-full	UNKNOWN STEP	2026-10-07T00:39:15.8493445Z Found in cache @ E:\work\base\actions-runner\_work\_tool\go\1.27.1\x64
+146:slo-full	UNKNOWN STEP	2026-10-07T00:39:16.9676174Z set GOMOD=E:\work\base\actions-runner\_work\wisp\wisp\go.mod
+155:slo-full	UNKNOWN STEP	2026-10-07T00:39:16.9682427Z set GOROOT=E:\work\base\actions-runner\_work\_tool\go\1.27.1\x64
+161:slo-full	UNKNOWN STEP	2026-10-07T00:39:16.9686659Z set GOTOOLDIR=E:\work\base\actions-runner\_work\_tool\go\1.27.1\x64\pkg\tool\windows_amd64
+175:slo-full	UNKNOWN STEP	2026-10-07T00:39:18.5379563Z build.ps1: repo root E:\work\base\actions-runner\_work\wisp\wisp (Env=dev)
+185:slo-full	UNKNOWN STEP	2026-10-07T00:40:00.4066499Z build.ps1: DLLs colocated into E:\work\base\actions-runner\_work\wisp\wisp\build
+186:slo-full	UNKNOWN STEP	2026-10-07T00:40:00.4177941Z build.ps1: signed model manifest colocated into E:\work\base\actions-runner\_work\wisp\wisp\build\models

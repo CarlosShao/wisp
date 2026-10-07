@@ -1,0 +1,32 @@
+=== sed -n '59,89p' build.ps1 raw (frontend step +-15) ===
+    Fail 'mingw-w64 gcc not found. Add mingw64\bin to PATH or set MINGW64_ROOT. See docs/BUILD.md.'
+}
+# Pitfall (see docs/BUILD.md): mingw gcc fails silently when its bin directory
+# is not on PATH, even when invoked by full path. Prepend it so both the gcc
+# driver and cgo's compiler invocations resolve its helper DLLs and tools.
+$ccDir = Split-Path -Parent $cc
+if (-not ($env:PATH -like "*$ccDir*")) { $env:PATH = "$ccDir;$env:PATH" }
+$ccVersionLine = (& $cc --version | Select-Object -First 1)
+Write-Host "build.ps1: toolchain: $($goVersionLine); CC=$cc ($ccVersionLine)"
+
+# --- 1. fetch-deps ----------------------------------------------------------
+& (Join-Path $PSScriptRoot 'fetch-deps.ps1') -RepoRoot $RepoRoot
+if ($LASTEXITCODE -ne 0) { Fail 'fetch-deps.ps1 failed (see output above).' }
+
+# --- 2. frontend ------------------------------------------------------------
+Write-Host 'build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)'
+
+# --- 3. go build ------------------------------------------------------------
+function Get-DepsValue([string]$Section, [string]$Key) {
+    $inSection = $false
+    foreach ($raw in (Get-Content -LiteralPath (Join-Path $RepoRoot 'deps.toml'))) {
+        $line = $raw.Trim()
+        if ($line.StartsWith('[')) {
+            $inSection = ($line.Trim('[', ']').Trim() -eq $Section)
+            continue
+        }
+        if (-not $inSection) { continue }
+        if ($line -match ('^\s*' + [regex]::Escape($Key) + '\s*=\s*"([^"]*)"')) { return $Matches[1] }
+    }
+    return $null
+}

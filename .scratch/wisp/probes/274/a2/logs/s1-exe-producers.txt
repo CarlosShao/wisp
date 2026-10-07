@@ -1,0 +1,199 @@
+=== grep -n 'param(' scripts/build.ps1 ===
+22:param(
+
+=== grep -rn 'go build' scripts tools .github ===
+scripts/build.ps1:11:    3. go build with CGO_ENABLED=1 + mingw-w64 gcc, real link of the
+scripts/build.ps1:76:# --- 3. go build ------------------------------------------------------------
+scripts/build.ps1:130:    if ($LASTEXITCODE -ne 0) { Fail "go build failed with exit code $LASTEXITCODE" }
+scripts/build.ps1:134:Write-Host 'build.ps1: go build ok (cgo linked against sherpa-onnx C API)'
+scripts/dev/ball-cycle.ps1:30:& $go build -o $exe (Join-Path $repo "cmd\balldebug")
+scripts/dev/ball-cycle.ps1:31:if ($LASTEXITCODE -ne 0) { throw "go build failed" }
+scripts/spike/run.ps1:35:if (-not $cc) { throw "gcc not found (needed for cgo builds)" }
+scripts/spike/xy-verdict/main.go:160:	session, err := openSession(which, modelsDir) // nil-safe on pure-go builds
+scripts/spike/xy-verdict/session_cgo.go:5:// Speech session lifecycle for the unload-test role (cgo build only).
+tools/d22scan/scan_test.go:2259:		t.Fatalf("go build failed: %v\n%s", err, out)
+tools/d22scan/selftest_test.go:184:		t.Fatalf("go build failed: %v\n%s", err, out)
+.github/workflows/ci.yml:466:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+.github/workflows/ci.yml:520:        # not sit behind `cgo build smoke`, which has been red before) and it is
+.github/workflows/ci.yml:536:        # red before (`cgo build smoke`, run 35551819606) plus a red `PathResolver
+.github/workflows/ci.yml:566:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+.github/workflows/ci.yml:809:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+
+=== grep -rn 'build.ps1' scripts tools .github docs ===
+scripts/build.ps1:19:    scripts/build.ps1 [-Env dev|prod]
+scripts/build.ps1:35:    Write-Host "build.ps1: FATAL: $Message"
+scripts/build.ps1:39:Write-Host "build.ps1: repo root $RepoRoot (Env=$Env)"
+scripts/build.ps1:67:Write-Host "build.ps1: toolchain: $($goVersionLine); CC=$cc ($ccVersionLine)"
+scripts/build.ps1:74:Write-Host 'build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)'
+scripts/build.ps1:134:Write-Host 'build.ps1: go build ok (cgo linked against sherpa-onnx C API)'
+scripts/build.ps1:139:Write-Host "build.ps1: DLLs colocated into $outDir"
+scripts/build.ps1:149:Write-Host "build.ps1: signed model manifest colocated into $manifestDir"
+scripts/build.ps1:164:Write-Host "build.ps1: wrote $sumsPath"
+scripts/build.ps1:167:Write-Host 'build.ps1: smoke test - running wisp.exe doctor'
+scripts/build.ps1:171:Write-Host 'build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS'
+scripts/slo-check.ps1:58:    scripts/build.ps1 passes -H=windowsgui, so wisp.exe is a Windows
+scripts/slo-check.ps1:157:        Why not `& $exe` plus the automatic exit-code variable: scripts/build.ps1
+scripts/slo-check.ps1:204:    # starts scripts/build.ps1 the same waited-for way as everything else.
+scripts/slo-check.ps1:296:    Write-Host "slo-check.ps1: wisp.exe missing; building (scripts/build.ps1 -Env dev)"
+scripts/slo-check.ps1:297:    # build.ps1 is a script, not a program, so it is started in a host of the
+scripts/slo-check.ps1:305:        Fail-InstrumentBroken "build path: cannot resolve the PowerShell host running this script, so scripts/build.ps1 cannot be started as a waited-for program (ticket 263)"
+scripts/slo-check.ps1:309:        (Join-Path $RepoRoot 'scripts\build.ps1'), '-Env', 'dev'
+scripts/slo-check.ps1:314:    if ($build.code -ne 0) { Fail ("build.ps1 failed with exit code {0}" -f $build.code) }
+scripts/spike/run.ps1:23:# ---- resolve toolchain (same rules as build.ps1)
+scripts/wisp-cli-tests.sh:76:        "(actions/cache on the deps.toml key, then scripts/build.ps1 -> fetch-deps.ps1)." \
+.github/workflows/ci.yml:466:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+.github/workflows/ci.yml:566:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+.github/workflows/ci.yml:571:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+.github/workflows/ci.yml:579:        # the cache step and build.ps1 above produce; the same command without them
+.github/workflows/ci.yml:757:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+.github/workflows/ci.yml:804:      # (on the interactive user PATH only). build.ps1's own fallback path is
+.github/workflows/ci.yml:807:      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+.github/workflows/ci.yml:809:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+.github/workflows/ci.yml:820:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+docs/BUILD.md:3:> 状态：**FROZEN（S0 ticket 01 定稿）**。本文件与 `deps.toml`、`scripts/build.ps1`、
+docs/BUILD.md:16:| git | 任意近期版本 | build.ps1 用它取 commit hash；缺失时 commit=nogit，不阻塞构建 |
+docs/BUILD.md:33:  `third_party/sherpa-onnx/`、build.ps1 复制到 exe 同目录。两套同为 sherpa-onnx v1.13.8
+docs/BUILD.md:45:powershell -ExecutionPolicy Bypass -File scripts\build.ps1 -Env dev     # 或 -Env prod
+docs/BUILD.md:48:build.ps1 流程（SPEC-11 §2.2）：
+docs/BUILD.md:99:   （或设 `MINGW64_ROOT`）；build.ps1 解析出 CC 后会自动把它的目录前插到 PATH。
+docs/BUILD.md:122:   `scripts/build.ps1`，并设 `$env:CC = "cl"`（脚本工具解析顺序第一位就是 `$env:CC`）
+docs/BUILD.md:133:Windows 原生构建始终是主路径）→ 跑同一份 `scripts/build.ps1` → `wisp doctor` 判绿。
+docs/evidence/s0/01-adversarial-acceptance.md:32:- `powershell -ExecutionPolicy Bypass -File scripts/build.ps1 -Env prod` 一次跑通，**13.9s**。
+docs/evidence/s0/01-adversarial-acceptance.md:96:| §3 CC 解析顺序 `$env:CC`→PATH→`MINGW64_ROOT`→`C:\msys64` | ✓ build.ps1 L48-57 逐行一致 |
+docs/evidence/s0/01-adversarial-acceptance.md:97:| §3 GOPROXY 未设则默认 goproxy.cn | ✓ build.ps1 L119 |
+docs/evidence/s0/01-adversarial-acceptance.md:101:| §5 坑 1 gcc 静默失败 → 自动前插 PATH | ✓ build.ps1 L61-65 存在 |
+docs/evidence/s0/01-adversarial-acceptance.md:103:| §5 坑 3 `$PSScriptRoot` 在 param 默认值可能为空 | ✓ fetch-deps 在函数体解析默认值（build.ps1 在体内用 `$PSScriptRoot`，无此问题） |
+docs/evidence/s0/01-adversarial-acceptance.md:104:| §5 坑 4 SHA256SUMS CRLF → WriteAllText+UTF8 no BOM+LF | ✓ build.ps1 L145-147；GNU sha256sum -c 实测通过 |
+docs/evidence/s0/01-adversarial-acceptance.md:128:| Fresh clone → build.ps1 → 可运行 exe | PASS | 第 2 项（13.9s / 全冷 56.5s，doctor PASS） |
+docs/evidence/s1/111-ci-step-readings-attempt2.md:72:| 6 | cgo build smoke (build.ps1 fetch-deps + mingw link + doctor) | **success（有 conclusion，非 skipped）** |
+docs/evidence/s1/111-ci-step-readings.md:61:  `Cache third_party (deps.toml key)`、`cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)`、
+docs/evidence/s1/134-ac6-contended-no-conclusion.md:882:  `scripts/build.ps1`、`tools/d22scan/allowlist.txt`、`internal/observe/thresholds.go` —— **全部真实存在**。
+docs/evidence/s1/134-adversarial-acceptance.md:523:| F0 | `-WispExe` 指到不存在的路径 + 一枚种好的假报告 | **rc=1**，假报告**还在盘上** | 它先去 `build.ps1` 补建二进制（`:102-106`），在 `git archive` 的快照里 build 死在"不是 git 仓库"⇒ 这发打在"仪器坏了"那条 `Fail` 上，不是"无结论"；也说明**清除（`:118-121`）排在补建之后**，一条坏路径不会让种下的文件被误当成样 |
+docs/evidence/s1/134-adversarial-acceptance.md:652:8. **拿 `git archive` 的快照直接跑 ps1 的取样路径**：F0 那发打在"补建二进制"上（快照里没有 `.git`，`build.ps1` 死），
+docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md:239:295:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md:242:395:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md:243:549:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md:276:395:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+docs/evidence/s1/138-cancel-kills-children-r1.md:837:395:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+docs/evidence/s1/140-ac1-verdict-r1.md:170:| 63 | `scripts/build.ps1:107` | §5.3 S6：`(a)` 的下家被 ldflags 钉死成 `dev` | `:107 "-X $BuildInfoPkg.DefaultEnv=$Env",` / `:23 [ValidateSet('dev', 'prod')]` / `:24 [string]$Env = 'dev'`（合法值里**没有** `test` 这一句成立） | **对** |
+docs/evidence/s1/140-ac1-verdict-r1.md:186:  `run.go:155-156`、`models.go:109-110`、`secret.go:129-132`、`build.ps1:115-119/162/163` 全 **对**；
+docs/evidence/s1/140-ac1-verdict-r1.md:190:  compiling anything`"的出处，那句原文其实在 **`:545`**（`:546-549` 讲的是 "build.ps1's documented knob / Verified locally…"）。
+docs/evidence/s1/140-ac1-verdict-r1.md:280:三步都跑 `powershell … scripts/build.ps1 -Env dev`，而 `-Env dev` 那枚字面量**只**喂给构建期 ldflags
+docs/evidence/s1/140-ac1-verdict-r1.md:281:（`build.ps1:107 "-X $BuildInfoPkg.DefaultEnv=$Env"`，且 `:23 [ValidateSet('dev','prod')]` **合法值里没有 `test`**），
+docs/evidence/s1/140-ac1-verdict-r1.md:282:真正吃 job env 的是紧随其后的 `build.ps1:162 & build\wisp.exe doctor`（`:163` 只看 `$LASTEXITCODE`）。
+docs/evidence/s1/140-ac1-verdict-r1.md:310:`wisp doctor` 在 CI 上只从 `build.ps1:162` 被跑（三步 `:400/:497/:560`），
+docs/evidence/s1/140-ac1-verdict-r1.md:324:⇒ 那两枚 job 上的 `WISP_ENV: test` 只服务一件事：`build.ps1:162` 那次 `doctor`。
+docs/evidence/s1/140-ac1-verdict-r1.md:332:（`:400/:497/:560`，全部经 `build.ps1:162` 那次 `wisp.exe doctor`）；
+docs/evidence/s1/140-ac1-verdict-r1.md:357:| **(a′)** 真问 OS 支：4 枚全删、不补 | 同上 **1 枚**，净 **4 行删** | 不碰冻结件；同样**碰共享件门**（而且比 (a) 更该先登记） | **0 枚 Go 用例**，但**必须**先给 `ci.yml:250` 那一步换一枚真读 env 的用例（否则连"看起来有断言"都没了） | **三枚不确定全在这支**（被裁文件 §3.4 U1/U2/U3，本程复算其机制成立）：`build.ps1:162` 的 `wisp.exe doctor` 从"答 `%TEMP%\wisp-test-<pid>`"换成"问 `%APPDATA%`、答 `%APPDATA%\wisp-dev`"，而 `doctor.go:104-105` 是链上**唯一无守卫**的消费者，紧接 `probeWritable`（现量 `doctor.go:300-309`：`MkdirAll` ＋ 写 `doctor-write-probe.tmp` ＋ `:308 os.Remove`）⇒ **真往配置树写**。<br>**红会吃谁**（现量 `ci.yml:257-261`/`:327-328` 两段的自陈：GitHub 停在第一枚红步骤、且全仓无 `continue-on-error`）：`:400` 红 ⇒ 吃 `:422`（`cmd/wisp` 那格读数＝票 123/128/135 共同落点）＋ `:458` ＋ `:474`；`:497` 红 ⇒ 吃 `:500`（SLO smoke）；`:560` 红 ⇒ 吃 `:563`（SLO full，本机最贵的一发，且跑在 `[self-hosted, wisp-slo]`、跨 run 复用同一份工作树，凭据 `slo-check.ps1:114-117` 原文）。<br>**回退清不掉那半**：追加 commit 能把 yaml 装回去，**装不回已经落进 `%APPDATA%\wisp-dev` 的字节**（U3），且 owner 真配置树清理按被裁文件 §4.1 建议应由 owner 做 |
+docs/evidence/s1/140-ac1-verdict-r1.md:410:| ④ CI 侧真凭据 | **成立并加固** | job 级设值现量正是 4 处（`ci.yml:226-227/:336-337/:481-482/:539-540`，票面 `:9` 行号逐字对）；真依赖它的只有 3 枚 build 步骤（`:400/:497/:560`，全经 `build.ps1:162`）；6 枚步骤靠字面量、2 枚自设 env ⇒ **A1–A4 四笔 AC#1 加法**，其中最要紧的是**语义包 `internal/buildinfo` 不在任何 Windows 名册里**（⇒"从不被咨询"在那里是"连编译都没有"） |
+docs/evidence/s1/140-ac1-verdict-r1.md:419:| **M3** | **U2**：`build\portable.txt` 在 wisp-slo 那台上存不存在（它比 `:256` 更早 return，见 `doctor.go:248-255`） | 那台机上 `ls build\portable.txt` 一发即定；`grep -n portable scripts/build.ps1` 本程现量 **0 命中** ⇒ doctor 前没有任何东西检查它 | 编排者／owner（登机要授权）；或在 `ci.yml` 加一枚只印不写的诊断步＝**动共享件** |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:150:| `cmd/wisp/doctor.go:42-43` | `4e5d240 09-23 10:18` | `info("wisp build", fmt.Sprintf("version=%s commit=%s built=%s WISP_ENV=%s",` / 续行 `buildinfo.Version, buildinfo.Commit, buildinfo.BuildDate, buildinfo.EnvString()))` | **不判，只印**（INFO 行）。⇒ (a) 会改这行**字节**，但 `build.ps1:163` 只看 `$LASTEXITCODE`，见 §3.2 |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:207:同挂在 `:539 env:` 块下，块内注释占 `:541-549`）—— 它被 `scripts/build.ps1:51`
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:252:    |                   ^  scripts/build.ps1:107  "-X $BuildInfoPkg.DefaultEnv=$Env" （构建期覆盖）
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:253:    |                      scripts/build.ps1:23-24  [ValidateSet('dev', 'prod')] / [string]$Env = 'dev'
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:300:⇒ `scripts/build.ps1:163 if ($LASTEXITCODE -ne 0) { Fail 'wisp doctor reported FAIL.' }`。
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:350:但 **`build.ps1:162` 那次 `wisp.exe doctor` 前没有任何东西检查 `build\` 里有没有 `portable.txt`**（现量：`grep -n 'portable' scripts/build.ps1` → 0 命中）。
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:401:| `test-windows`（`:334`，windows-latest） | `:337` | `:400`（`build.ps1 -Env dev` -> `build.ps1:162 wisp.exe doctor`） | **会换**（#1） |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:402:| `slo-smoke`（`:479`，windows-latest） | `:482` | `:497`（同 `build.ps1`） | **会换**（#1） |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:403:| `slo-full`（`:537`，**`[self-hosted, wisp-slo]`**） | `:540` | `:560`（同 `build.ps1`） | **会换**（#1，**最重**：真机、跨 run 复用工作树） |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:469:| U2 | **`portable.txt` 会不会已经躺在那台机器的 `build\` 旁边**（`doctor.go:248-255` 的更早早退） | 那是**机器状态**不是仓库状态。`grep -n 'portable' scripts/build.ps1` 现量 **0 命中** ⇒ 没有任何东西在 `doctor` 前检查/清除它；测试侧的兜底（`dataroot_128_test.go:76-83`）只保**测试二进制旁边**，不保 `build\wisp.exe` 旁边 | 实现程/编排者：在 wisp-slo 那台 `ls build\portable.txt` 一发即定。本程**未查**（那是仓外真机） |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:529:| **会不会把已经绿的改红** | **有这一支独一份的风险面**。静态能定的：`ci.yml:400`/`:497`/`:560` 三步的 `wisp.exe doctor`（`build.ps1:162`）从"答 `%TEMP%\wisp-test-<pid>`"换成"问 `%APPDATA%`、答 `%APPDATA%\wisp-dev`、`probeWritable` 真 `MkdirAll`+写+删（`doctor.go:300-309`）"。<br>**红不红＝§3.4 的 U1（本程未定）**。<br>**一旦红**：`:400` 红吃 `:422`/`:458`/`:474`（见 §4.0）；`:497` 红吃 `:500`（SLO smoke 门禁）；`:560` 红吃 `:563`（**SLO full，六态 + settle + leak，是这台机上最贵的一发读数**）。<br>**副作用不是红而是写面**：落点搬进真实配置树；`slo-full` 跑在 `[self-hosted, wisp-slo]`（`ci.yml:538`）且跨 run 复用工作树（`slo-check.ps1:115` 自陈，原文见 §5.4）。 |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:530:| **还有两枚静态排不掉的余量** | **U2**：`doctor.go:248-255` 的 `portable.txt` 分支比 `:256` 更早 return，而 `grep -n 'portable' scripts/build.ps1` **0 命中** ⇒ (a) 之后到底走 `dev` 还是走 `<exeDir>\data-dev`，取决于那台机器 `build\` 旁的**文件状态**。<br>**U3**：残留树会不会被后面的读数当既有状态。 |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:623:| **S2** | `scripts/build.ps1:116`（`bfcb230 09-20 07:00`） | `$env:CC = $cc` | `cmd/wisp/doctor.go:312 cc := os.Getenv("CC")`（`gccVersion()`，`:316` 拿它起 `exec.Command(cc, "--version")`）⇒ **判 `doctor` 的一枚 `critical` 检查**（`doctor.go:49-53`：`fail("gcc (build-time)", …)`） | **新账，且正落在 (a) 的风险步骤里**。⇒ `ci.yml:400/:497/:560` 那枚 `wisp doctor` **本来就有一枚靠脚本级 env 才成立的 critical 检查**。`grep -rn 't.Setenv("CC"' .` → **0 命中** ⇒ 没有任何测试兜它。这一条不改变 (a) 的分支判定，但**改变"这一步为什么可能红"的归因面** |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:624:| **S3** | `.github/workflows/ci.yml:550`（`decb7b9`） | `      MINGW64_ROOT: E:\work\base\msys64\mingw64\bin`（行首 6 空格，挂在 `slo-full` 的 `:539 env:` 块里） | `scripts/build.ps1:51` PowerShell 分支 ⇒ 判 **gcc 发现路径**（`:59` 找不到就 `Fail`） | **形状完全同族**（job 级 env、选走一条分支、只在 self-hosted 那枚 job 上需要）。`:546-549` 的注释自陈不设它「the step died before compiling anything」⇒ **它是"job 级 env 是必需件而非装饰"的现成反例**，裁定 (a) 时别把它一起摘 |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:626:| **S5** | `scripts/build.ps1:115/117/118/119` | `$env:CGO_ENABLED = '1'` / `$env:GOOS = 'windows'` / `$env:GOARCH = 'amd64'` / `if (-not $env:GOPROXY) { $env:GOPROXY = 'https://goproxy.cn,direct' }` | 构建期工具链，不选 Go **运行**分支 | 边缘同族（"脚本报 env 决定产物形状"）。注意 `:119` 是**条件设值**，与 `slo_windows.go:238` 同形 |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:627:| **S6** | `scripts/build.ps1:107`（配 `:23-24`） | `"-X $BuildInfoPkg.DefaultEnv=$Env",` | `internal/buildinfo/buildinfo.go:20` 的 `DefaultEnv` ⇒ 判**env 未设时落到哪** | **不是 env 变量，是"构建期把默认分支选走"**。`:23-24 [ValidateSet('dev', 'prod')]` / `[string]$Env = 'dev'` ⇒ **`test` 不是合法构建默认**。⇒ (a) 的下家永远是 `dev`，这一条把 §3/§4 全部结论钉死 |
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md:766:  全部经由 `build.ps1:162` 那次 `wisp.exe doctor`）；测试侧 **0 枚**；
+docs/evidence/s1/140-static-inventory-r1.md:67:2. **三枚非测试门禁其实靠这枚 job 级 env 才不落进 `%APPDATA%`**（`ci.yml:400` / `:497` / `:560`，全部经由 `scripts/build.ps1:161-163` 的 `wisp.exe doctor`）。⇒ 这直接决定 `AC#2` 的 (a) 支**不是一句"去掉就行"**，见 §4.2。
+docs/evidence/s1/140-static-inventory-r1.md:138:⇒ **腿型：无**（它不问操作系统要路径）。但它是 (a) 的**方向来源**：env 未设 ⇒ 落回 `DefaultEnv`，而 CI 的构建是 `build.ps1:107 -X …DefaultEnv=$Env`，三处都传 `-Env dev`（`ci.yml:400`、`:497`、`:560`）⇒ **未设 ＝ dev，不是 prod**。
+docs/evidence/s1/140-static-inventory-r1.md:252:| `test-windows` | windows-latest | `:337` | `:386` `scripts/winsec-tests.sh` → `portable-tests.sh ./internal/winsec/`；`:400` `build.ps1 -Env dev`（**含 `wisp.exe doctor`**）；`:422` `scripts/wisp-cli-tests.sh` → `portable-tests.sh --scope=cli` → `./cmd/wisp/`；`:458` `--scope=windows`；`:474` `runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows` |
+docs/evidence/s1/140-static-inventory-r1.md:253:| `slo-smoke` | windows-latest | `:482` | `:497` `build.ps1 -Env dev`（**含 doctor**）；`:500` `slo-check.ps1 -Subset smoke`。**零枚 `go test`** |
+docs/evidence/s1/140-static-inventory-r1.md:254:| `slo-full` | **`[self-hosted, wisp-slo]`** | `:540` | `:560` `build.ps1 -Env dev`（**含 doctor**）；`:563` `slo-check.ps1 -Subset full`。**零枚 `go test`** |
+docs/evidence/s1/140-static-inventory-r1.md:313:| (a) 的替身：给 build.ps1 那一步显式设 env（若选 (a) 才需要） | **1–3** | **1–3** | 见 §4.2 |
+docs/evidence/s1/140-static-inventory-r1.md:326:| "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)" | `ci.yml:395`/`:400` | `scripts/build.ps1:161-163`：`& build\wisp.exe doctor`；`if ($LASTEXITCODE -ne 0) { Fail }`。`doctor` → `doctor.go:104 EnvString()` → `resolveDataDir` | 未设 ⇒ `buildinfo.go:20`/`build.ps1:107` 的 `DefaultEnv=dev`（三处都是 `-Env dev`）⇒ `resolveDataDir("dev")` 走 `doctor.go:259` 去问 `%APPDATA%` ⇒ `probeWritable`（`doctor.go:300-309`）**`MkdirAll` 并写 `doctor-write-probe.tmp` 到 `%APPDATA%\wisp-dev`**；今天写的是 `%TEMP%\wisp-test-<pid>\…`。**不是"变红"，是"新增一棵仓外真实配置树的写面"** |
+docs/evidence/s1/140-static-inventory-r1.md:339:以及**一枚非测试消费者**——`build.ps1:162` 的 `wisp.exe doctor`。**说 (a) 零风险是错的**，风险不是红，是 `:400/:497/:560` 三枚步骤会开始往真实 `%APPDATA%` 里建目录、写探针文件，
+docs/evidence/s1/224-session-grant-v2.md:186:按 `scripts/build.ps1` 同法摆 DLL），并被 `resident_sink_nail_127_windows_test.go:197`、
+docs/evidence/s1/244-black-console-r1.md:1:# 244-r1 证据件 —— 双击启动黑控制台：`scripts/build.ps1` 的 `$ldflags` 追加 `-H=windowsgui`（甲形）
+docs/evidence/s1/244-black-console-r1.md:8:- 修法凭据：普查件 `.scratch/wisp/probes/244/c1/census.md` §3.1 形状甲；台账 **`A546` 裁甲**（build.ps1 唯一权威出口，CI 三处 step 与 slo-check 自建分支自动跟随；乙＝第二真相源被毙、丙＝FreeConsole 被 G4 裁撞 `SPEC-11:50` 字面 flag 要求）。撤销口令：「244 改丙」。
+docs/evidence/s1/244-black-console-r1.md:10:- 纪律自证：写面只动了 `scripts/build.ps1` 一枚（＋证据件＋台件区 `.scratch/probes-244-r1/`）；`docs/BUILD.md`、`.github/workflows/ci.yml`、`docs/PLAN.md`、`docs/specs/**`、SLO/golden、三枚冻结件、`frontend/**`／`design/**` 零读零写；⛔ 没跑 `go test` 整包（同机他腿共用）；未跑 `go build ./cmd/wisp` 单独验编译——全链真跑 build.ps1（其内即 go build ./cmd/wisp）已覆盖且更强。
+docs/evidence/s1/244-black-console-r1.md:14:**改法（甲）**：`scripts/build.ps1:103-110` 的 `$ldflags` 数组在六枚 `-X` 之后追加一枚 `"-H=windowsgui"`，六枚 `-X` 逐字原样未动；数组仍整体 `-join ' '` 喂给 `:123` 的 `go build -trimpath -ldflags $ldflags -o (Join-Path $outDir 'wisp.exe') ./cmd/wisp`。另按派单「读该文件周边注释补一行 why」在数组上方补 5 行注释（why 见 diff）。
+docs/evidence/s1/244-black-console-r1.md:16:**diff 摘要**（`git diff -- scripts/build.ps1` 逐字，7 insertions / 1 deletion）：
+docs/evidence/s1/244-black-console-r1.md:19:diff --git a/scripts/build.ps1 b/scripts/build.ps1
+docs/evidence/s1/244-black-console-r1.md:21:--- a/scripts/build.ps1
+docs/evidence/s1/244-black-console-r1.md:22:+++ b/scripts/build.ps1
+docs/evidence/s1/244-black-console-r1.md:62:**继承面确认**：`.github/workflows/ci.yml` 三处 step 与 `scripts/slo-check.ps1:104` 自建分支全部转手 `scripts/build.ps1`（census §1 #2/#4），本改自动跟随，CI 一字未动——这正是选甲的理由。
+docs/evidence/s1/244-black-console-r1.md:67:派单给的 `-OutDir` 参数在 build.ps1 里**不存在**（`.USAGE` 只收 `[-Env dev|prod]`，`$outDir` 在 `:112` 硬编码 `Join-Path $RepoRoot 'build'`）⇒ 为不把产物写进 `build/`（现有台上产物地盘），本腿在台件区放了**补丁副本** `.scratch/probes-244-r1/build-probe.ps1`（对 `61c526e0` 时刻的 build.ps1 全文逐字，仅改**三处纯位置行**：`$RepoRoot` 绝对路径、`fetch-deps.ps1` 锚回真 `scripts/`、`$outDir` 指向 `$PSScriptRoot\out`；**旗标零差异**）。真跑：
+docs/evidence/s1/244-black-console-r1.md:104:2. **补丁副本的"仅三处位置行"声明**：我逐字核对过 diff 基线，但台件副本是手工三处 Edit 产生，若 build.ps1 在我 copy 与 commit 之间被他人推进，副本可能落后于 HEAD 版本——读数对 `61c526e0` 时刻的数组负责。
+docs/evidence/s1/244-black-console-r1.md:106:4. **`build/wisp.exe` 的归属标签**：沿用 census §2.5 的保留（按 mtime 判它出自 build.ps1 链，未读版本资源段核对）——对"改前 CUI(3)"对照读数无影响。
+docs/evidence/s1/244-black-console-r1.md:111:2. **AC#3 两行注释改口**（`console_windows.go:26`／`console_other.go:7`）——写面在 `cmd/wisp`，且与 `228-r1` 串行禁区（票面排程节），本腿只动 build.ps1 一枚。
+docs/evidence/s1/255-tier-registry-v1.md:6:**取数环境**：win32 + Git Bash，go1.27.1 windows/amd64；与在飞 `244-r1`（写 scripts/build.ps1）＋`242-precheck-1`（只读禁 Go）同机，写面互不撞。
+docs/evidence/s1/33-35-preflight.md:197:| U1 | `internal/panel` 里带 `//go:build windows` 的新文件在 CI 上有没有**任何**用例分母 | 静态判"没有"（`win_pin` `scripts/portable-tests.sh:151-160` 无 panel；windows 步 `ci.yml:458` 不测该包），但**未跑 CI**、也没查 `build.ps1` 是否顺带 `go test` |
+docs/evidence/s1/33-panel-host-c27-v1.md:100:35. **冻结件与禁区自证（我的，不是引它的）**：`git diff --numstat 7a41db9b..HEAD -- internal/panel/tokens_fourway_test.go internal/panel/l2_grant_boundary_test.go internal/perm/ticket90_persist_test.go internal/observe/thresholds.go docs/SLO.md docs/BUILD.md docs/PLAN.md docs/specs`＝**全空**；`bridge.go` 入向常量枚数我重跑 `grep -cE '=\s*"panel\.' internal/panel/bridge.go`＝**4**；`internal/panel` 零平台分叉我重跑（无 `*_windows.go` 之类文件名、非 test 文件里无 `//go:build`）＝**成立**；本腿写面⛔ 未碰构建链（`git diff --name-only 7a41db9b..HEAD -- scripts/build.ps1 .github/workflows docs/BUILD.md`＝**0 行**，只有 `go.mod`）。
+docs/evidence/s1/33-panel-host-c27-v1.md:185:| **J8** 33 先、与 248／244 不合批 | **成立。** 三枚产码/测试提交各自带显式 pathspec（`697b4fae`／`b1e3d94a` 只碰 `cmd/wisp/*`＋`go.mod`/`go.sum`；`fafe0445` 只碰那枚钉）；构建链零改动（`scripts/build.ps1`／`.github/workflows`／`docs/BUILD.md` 全 0 行）；`bridge.go` 四枚入向常量未动（枚数＝4，我重跑）；票 248/228 的活一枚未做（我没发现越界写面）。 | #A#2/#35/#A#4 |
+docs/evidence/s1/35-panel-snapshot-pump-r1.md:403:| 那 6 枚是什么 | `scripts/build.ps1`、`scripts/dev/ball-cycle.ps1`、`scripts/fetch-deps.ps1`、`scripts/sign-models.ps1`、`scripts/slo-check.ps1`、`scripts/spike/run.ps1` —— **全部 `*.ps1`** |
+docs/evidence/s1/35-panel-snapshot-pump-r1.md:404:| 差的确实只有行尾吗 | 抽两枚核：`git show aeba6ff:<f> \| tr -d '\r' \| md5sum` 与 `tr -d '\r' <副本/<f> \| md5sum` **相同**（`build.ps1 → 136c48e2…`、`slo-check.ps1 → 2635bcc3…`） |
+docs/evidence/s1/ci-read-a1fd5bf-r1.md:85:| 6 | cgo build smoke (build.ps1 fetch-deps + mingw link + doctor) | completed | success | 是 |
+docs/evidence/s1/ci-runner-readings-2026-09-21.md:96:   step  6 [skipped  ] cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)
+docs/evidence/s1/ci-step-readings-2026-09-22.md:220:| 6 | cgo build smoke | L1488 `##[group]Run powershell … scripts/build.ps1 -Env dev` | 在 |
+docs/evidence/s1/panel-l2-grant-nail-fix-r4-accept-r1.md:38:   那 6 枚全部是 *.ps1：scripts/build.ps1 · scripts/dev/ball-cycle.ps1 · scripts/fetch-deps.ps1
+docs/evidence/s1/panel-l2-grant-nail-fix-r5-accept-r1.md:58:   那 6 枚逐字：scripts/build.ps1 · scripts/dev/ball-cycle.ps1 · scripts/fetch-deps.ps1
+docs/reports/2026-09-24-gap-analysis-audit-verdict.md:74:| 23 更新自检 | **半真**（§7.2 判据确实只有崩溃计数） | ⚠说 doctor 含「minisign 公钥可用」检查——`cmd/wisp/doctor.go:45` **只是 info 打印 placeholder**，且不查工具面；「成本极低」不成立＝**更新机制整体未实现**（HEAD 无 `internal/update`、无 updater 源）；漏了 `scripts/build.ps1:161-163` 已把 doctor 当构建后 smoke | 直接可开 | **错**：扩 §7.2 回滚判据＝改 SPEC-11／D41(b)／N-1 契约，SPEC-12 §4.1 须人工批准 | **并入票 54 那格**；判据变更先上报 owner |
+docs/reports/frontend-handover-to-zcode.md:34:- 产物进二进制只有一条路：`frontend/embed.go` 的 `//go:embed all:dist`；`dist/` 被 gitignore，且 `scripts/build.ps1:74` **不会**帮你构建前端（09-25 就是这么发现 dist 过期的）。
+docs/reports/frontend-session-log.md:1252:⚠ **但他指的那枚机制是真的、而且下一次就会咬人**：`scripts/build.ps1:74` 那句无条件
+docs/reports/frontend-session-log.md:1262:正是 `build.ps1:132` 拷进去的）。放好后两条命令的原文：
+docs/reports/frontend-session-log.md:1285:- **没为"让构建通过"改过 `frontend/src` 一字**（构建本来就是 rc=0），**没碰 `scripts/build.ps1`**。
+docs/reports/frontend-session-log.md:1286:- ⚠ 给 15:00 的一句提醒：`build/wisp.exe` 是**上一次 Go 构建**的产物（`build.ps1:123` 用 `-trimpath`
+docs/reports/frontend-session-log.md:1287:  编到 `build/`），它 embed 的是**它被编那一刻**的 dist ⇒ 真机签收要么先重跑 `build.ps1`，
+docs/reports/frontend-session-log.md:1509:另两枚事实：`scripts/build.ps1:74` 从不跑 `npm run build`（dist 靠人手动刷，我 14:16 刷过）；
+docs/reports/frontend-watchdog.md:80:  - **它在干的这件不在 §10 队列里**＝编排者 14:16 直接派的一枚单件活：**15:00 真机签收之前把 `frontend/dist/` 构建刷新到当前 `frontend/src`**。起因（编排者现量）＝`scripts/build.ps1:74` 是无条件 skip、`//go:embed all:dist`（`frontend/embed.go:19`）带进 exe 的字节取决于"这台机器上谁最后跑了构建"，而 `dist/` 还是今天 12:55 那版 ⇒ 现在直接构建会让 owner 签掉**他自己 Q-50=甲 那个决定生效之前**的界面。边界编排者已写死（不 commit `dist/**`、不为过构建改 `frontend/src`、不动 `build.ps1`、构建红了就原样报回来）。⇒ 这既不是偷懒也不缺活，我一句都没插嘴；**上一行那条"15:00 窗口只有 owner 能答"由此前进一格**（那个窗口看起来是真要用的）。
+docs/reports/frontend-watchdog.md:166:  - **等人／等 owner（不催、不代答）＝本轮 5 件，其中两件是新的、且只有 owner 能答**：①**owner 要在"路 A／路 B"里回一个字**——它 16:12 给了两条（回「起」＝它起本机预览、owner 开浏览器看 `localhost:4173` 对三眼；回「B」＝它贴两条可粘命令走 `scripts/build.ps1` 重编＋`wisp.exe panel-assets -check`），并明写"这一轮别开窗所以我不动手"；这件**从 15:31 起挂着的那句"15:00 签收他看到的是哪一版"由此收敛成这一问**，我不代答也不催。②它顶回后新报的一条事实要编排者接：今天真机验收**验不了球＋面板**（`go.mod` 无 `webview`、九枚子命令里没有"开面板"，那是票 33/35 的活）⇒ 我那几行"签收窗口"的口径要按这条更正。③`F3` 那枚"永不停止的循环动画"（`shimmer.tsx:38`，撞 D32 CPU 预算）走三条里哪条。④caret 终态那格（抽 `segments × count → markup` 纯函数）做不做＝等编排者排。⑤`F1`/`F3`/`F4`/`F4b`/`F5`/`F6`/`F7` 等编排者复判。⚠ §53.3 那句只有 owner 能答的非技术问**本轮已答**（原话「动画不会拿去卖的，放心」，它按"产品形态根据而非法务意见"记账）⇒ 从我那张六件清单里划掉一件。我一件没代答、一件没催。
+docs/reports/HANDOVER.md:48:| 构建 | `scripts/build.ps1 [-Env dev|prod]`（一键：fetch-deps→build→DLL 同目录→SHA256SUMS）；`docs/BUILD.md` 已冻结 |
+docs/reports/HANDOVER.md:140:- **票 268 的形＝A＋B**（〔`A614` §5〕，撤销口令「268 改形 C」）：A＝用 `errors.Is(err, fs.ErrNotExist)` 分两支，给"被拒"一枚与 `unreadable` **不同的具名来源标记**；B＝照 `cmd/wisp/resident_windows.go:187` 那一行的形状，把被拒那句**同时打到 stdout**。⛔ 不取 doctor 那一支（`scripts/build.ps1:167-169` 拿 `doctor` 退码当构建冒烟 ⇒ 加 `fail` 级检查＝把某些机器的构建门打红）；开工前先读票 128 AC#5，⛔ 两票不许各造一句"配置没读到"（〔`A614` §6〕）。
+docs/reports/pending-and-issues.md:5555:  ② 我暗示 `ci.yml:250` 那一步依赖 job 级 env——**不依赖**：那一步跑 `TestLayoutForTestEnv`（`internal/proc/envfork_test.go:75`），`:79` 传的是**字面量** `buildinfo.EnvTest`、`:78` 自己 `t.Setenv(TestDataDirEnv,…)`；`grep -rn WISP_ENV internal/proc/*.go` **只命中一枚注释** ⇒ `internal/proc` 不读环境。真正依赖的是三枚**非测试**步骤 `:400/:497/:560`（`build.ps1:161-163` 真跑 `wisp.exe doctor`）。
+docs/reports/pending-and-issues.md:5634:  **③ 它给的另外三条**（对我下次派单有用）：真读者只有 **3 处／2 枚文件**（`buildinfo/env.go:36`、`buildinfo/buildinfo.go:38`、`slo_windows.go:238`），其余 66 处是印文案／注释／测试自设；判定点 **1 枚 × CI 触发面 3 枚步骤**（`ci.yml:400`/`:497`/`:560` 全走 `build.ps1:162` 的 `wisp.exe doctor`）；**票 123 那 4 枚与 job env 不共因、静态链完整不必再推读数**（`run_test.go:118`/`run_mode101:146` 注入 `dataDir` ⇒ `run.go:155` 的守卫先挡住；旁证：`run_test.go:81-100` 那份 config **没有 `[risk]` 段**而 `run_mode101:110` 有 ⇒ 两族超时来源本非同一枚）。另补两枚我未记的键：`CC`（`build.ps1:116`→`doctor.go:312`→**critical** `fail`）与 job 级 `MINGW64_ROOT`（`ci.yml:550`）——**后者是"job env 是必需件不是装饰"的反例**，别一起删。还有一条：`build.ps1:23-24` 的 `-Env` 是 `ValidateSet('dev','prod')`⇒ **`test` 从来不是合法构建默认**，(a) 的下家永远是 `dev`。
+docs/reports/pending-and-issues.md:6203:  **① 我说了什么**：14:0x 我现量 `frontend/dist` 构建于 12:55，而 `git log --oneline --since="12:55" -- frontend/src | wc -l` ＝ **2**（`f1cdafa` 12:57 Q-50=甲、`8b35f52` 13:57 F5），又 `scripts/build.ps1:74` 是一枚**无条件** `Write-Host '… frontend step skipped …'`（它从不跑 `npm run build`，所以 `//go:embed all:dist` 带进 exe 的字节＝"这台机器上最后一次谁构建了"的结果）。⇒ 我据此对 owner 下了一句**后果**判断："你 15:00 直接构建会签掉不含你自己那条决定的界面"。
+docs/reports/pending-and-issues.md:6206:  **④ 机制那半条仍然真**：`build.ps1:74` 那一行一字未改（它属 Go 侧构建脚本，SPEC-11 §2.2 把 embed 那步推到 S5，票 92 账里也早登记过"真机要看新界面必须先构建"）。⇒ **下一次 `frontend/src` 提交后照样要手动刷 dist**。归口：票 35／task #79 那根泵落地时一并处理，本程不改 `build.ps1`。
+docs/reports/pending-and-issues.md:9878:**它顺手挖出的那件比整张表都重的事 ⇒ 新立「票 244」SPEC-11 要求的 GUI 子系统构建今天没人做、也没人认领**（三把我自己的尺）：①「objdump -p build/wisp.exe」（今天 11:21 的产物，29,771,385 字节）读 **Subsystem 00000003 (Windows CUI)**＝**控制台子系统**；②「scripts/build.ps1:103-110」的 ldflags **六枚全是 -X、零枚 -H**，且全仓「grep -rn '-H[= ]' scripts/ .github/ tools/」唯一命中是一枚二进制 blob；③「docs/specs/SPEC-11:50」逐字「CLI 与 GUI 同一二进制：无参 = GUI（-H=windowsgui）」，而「docs/BUILD.md:87」逐字把这一切换**「推迟到票 07」**、票 07 盘上已带「-done」＝**结案时没把它带走**，全票池**没有任何在开的票拥有这一格**。⇒ **人话后果**：今天双击「wisp.exe」会连一个黑控制台窗口一起起（球旁边挂一个黑框），而「cmd/wisp/console_other.go:7」／「console_windows.go:26」两行注释反过来声称"已经链接成 GUI 子系统"（⚠ 那两行还是「attachParentConsole」那条通路的存在理由——今天这条通路**永远走不到**，它的注释还以为正在用）。**这不是安全事件**：现象只在出厂产物的外观与一条死通路，没有本机被入侵的证据。⛔ **不改「PLAN.md」／「docs/specs/**」／「docs/BUILD.md」一字**（本票是照 SPEC-11 补做漏做的，不是改规格），过期那句"推迟到票 07"由票 244 在票面具名更正。
+docs/reports/pending-and-issues.md:10559:**4. `wisp-selfhosted-01` ＝ owner 这台开发机本身**（schedule 那发日志尾部逐字 `C:\Users\swq` / `E:\work\base\actions-runner`），且 `slo-full` **根本不跑 `go test`**（只有 `build.ps1`＋`slo-check.ps1`，`=== RUN` **0 枚**）。⇒ ⛔ **拿它当"CI 那一侧"的对照是类别错**（它是我自己机器的另一条腿，也正是"推送会抢本机 CPU"那条旧账的根，见 [[wisp-ci-selfhosted-topology]]）。附带：schedule 这发**六枚作业日志全在、`log not found` 零枚**（对照 push 那发缺 `slo-full` 整作业）⇒ `ci-delta-1` §1.4 那句"采集红"仍是事实，但**同码另一发采得到**＝"缺口不稳定"这一格凭据到手。
+docs/reports/pending-and-issues.md:10958:**1. 交件核过（19:22:08 盘上现量）**：`0a88d7a8`＝105 行／16,344 字节、占位 0、票面 AC 框一枚未碰、`docs/BUILD.md` 冻结件一字未动。抽验两把尺属实：`scripts/build.ps1:103` `$ldflags` 数组、`-H=windowsgui` 在 `scripts/`＋`.github/` **零命中**。
+docs/reports/pending-and-issues.md:10960:**2. 现量要点**：11 枚构建入口（build.ps1 唯一权威出口＋CI 三 step＋slo-check 缺件自建＋4 处测试台件）**全零 `-H`**；台上 19 枚 exe objdump 逐字全部 `Subsystem 00000003 (Windows CUI)`、零枚 GUI(2)——双击启动带黑控制台＝票 244 结论成立。★ 新发现：`build/wisp.exe` 已被重建（09-30 23:43／30,299,552 B，票面立票记 11:21／29,771,385 B）——**我 09-30 第⑥节那条"引用台上产物先问产物在不在库里、几何参数同不同"的尺又兑现一次**：subsystem 读数两版相同（结论不翻），但产物不可自证多一层实据。
+docs/reports/pending-and-issues.md:10962:**3. ★ 修法选形＝甲（五样齐）**：**文件**＝`scripts/build.ps1:103-110` 的 `$ldflags` 数组追加一枚 `-H=windowsgui`（全线 11 入口自动跟随，零第二真相源）；**理由**＝乙（改次要入口）造第二真相源、丙（FreeConsole）已被票面 G4 裁与 `SPEC-11:50` 冲突；`wisp run` 的 stdout 硬依赖不受影响——重定向路径由 `console_windows.go:33-43` 的"已有 stdout 即 return"判据链保住，常驻腿对控制台只是软依赖（nil 即打印降级、照常带球）。**边界**＝⛔ 不许拆两批改（票面 AC#0 原文）；真机三形态读数（双击／终端／重定向）归落地腿的 AC#2〔只有本机可量〕。**撤销口令「244 改丙」**。落地按住（写面 `scripts/build.ps1` 不撞 cmd/wisp，但它是全构建链的喉咙——排在我 cmd/wisp 代笔序列之后一次做完）。
+docs/reports/pending-and-issues.md:10974:**1. 交件核过（19:39:59 盘上现量）**：`cc6eaa65`＝`scripts/build.ps1` **7/1**（六枚 `-X` 逐字未动、追加 `"-H=windowsgui"`＋5 行 why 注释逐字引 `console_windows.go:33-43`）＋证据件 113 行占位 0。三发读数逐字：新 exe（probe 台件补丁副本构建）`Subsystem 00000002 (Windows GUI)` ✓／旧 `build/wisp.exe`（一字未动）`00000003 (Windows CUI)` 对照 ✓／重定向 `wisp version`/`-h` 两发 exit=0 非空 ✓（`run --help` 那发旗标选得不干净，腿已自陈、凭据以 version/-h 为准）。全仓 `GOFLAGS= go build ./...` rc=0 复跑 ✓。⚠ 派单偏差一处它自己兜了（build.ps1 无 `-OutDir`，用台件补丁副本真跑全链、产物未落 `build/`）——补丁三处纯位置行、旗标零差异，我接受。
+docs/reports/pending-and-issues.md:11073:**5. 收 `244-c2`（只读复量，交件为真）**：`.scratch/wisp/probes/244/c2/census.md` **125 行／23,866 字节**，commit `67fcc145`→`a21611ce`→`c02f59d0` 逐枚存在；同样只 1 枚 grep 命中在它的判语 `:124`（提了那五个字面，非残留）。它抽验我三处：① `-H=windowsgui` 真在 `scripts/build.ps1:115`（上面 5 行 why 注释从 `:103` 起，六枚 `-X` 逐字未动）；② **c1 那句"11 枚入口全零"是落地前读数**——现量出厂链 3 枚已带/继承（含 CI 三步 `ci.yml:453/:550/:613` 全走 build.ps1）、仍零 `-H` 的 3 枚全是非出厂入口（`scripts/dev/ball-cycle.ps1:30`、`scripts/spike/run.ps1:46`、测试台件），并**较 c1 补上一枚 `internal/llm/openaichat/mockllm_integ_test.go:65`**；③ ★**"旗标已落 ≠ 台上那枚 exe 已变"**：`build/wisp.exe` mtime＝**09-30 23:43**（我 `ls` 复量），r1 的 GUI 产物落在 `.scratch/probes-244-r1/` 临时目录、没覆盖 `build/` ⇒ **票 244 AC#1 改后那一发只有真跑一次 build.ps1 才兑现**，别把"代码里有旗标"读成"双击没黑窗"。
+docs/reports/pending-and-issues.md:11074:**6. 两处新现量（都属"该响"）**：① **全仓零枚尺读 PE subsystem**（没有 `debug/pe` 解析、build.ps1 step6 冒烟只跑 `doctor` `:166-169`、d22scan 的 ban 不含 `-H`）⇒ 票 244 那条"会响的尺"是**真空**，不是被谁放宽过；② `docs/BUILD.md:52-53` 正文只列 `-X` 不提 `-H`、`:87` 仍写"windowsgui 子系统切换**推迟到票 07**"＝**过期文本**，照它手敲 `go build` 会漏 `-H`——⚠ 该文件属冻结交付物，**改一字要具名解冻**，我只登记不擅改（撤销/解冻都由 owner 一句话）。
+docs/reports/pending-and-issues.md:11636:- ★ **肇因追到了别家票（这条要单独立档）**：它具名说**票 244 在 `scripts/build.ps1:115` 加的 `-H=windowsgui`** ⇒ `wisp.exe` 成 GUI 子系统二进制 ⇒ PowerShell 的 `&` **不等它退出** ⇒ 自动变量 `$LASTEXITCODE` **从未被赋值** ⇒ 严格模式在**每状态采样那一发**（改前 `:326`）抛 `VariableIsUndefined`。⇒ 这解释了本仓一直没答的问题：**"D32 那两个数字为什么从来没出现过"**——不是不达标，是**求值器在第一次真跑到它的时候当场死**，而且它此前被票 262 那层"文件名太长导致 checkout 先失败"整层掩盖（**两层故障互相掩盖**，`A596` 刚结清那堵墙的单位，这一枚是同一条链的下半场）。
+docs/reports/pending-and-issues.md:12004:- **④★真会撞的不是枚数钉，是退码钉**：`scripts/build.ps1:167-169` 把 `wisp.exe doctor` 当 smoke、非零即 `Fail` 整个构建，而 `doctor.go` 的 `fail()` 置 `critical:true` ⇒ **给 doctor 加一条 `fail` 级检查项＝把任何"配置里有带内越界值"的机器的构建门打红**。doctor 的枚数钉＝**零枚**（`find -iname "*doctor*"` 全仓只命中 `doctor.go` 自己，无测试文件）。⇒ 落地腿加那一条只能走 `info()` 档。
+docs/reports/pending-and-issues.md:12077:- ★U4 那格（"加一行 stdout 会不会撞钉"）它按静态尺收口＝**撞 0 枚钉**（捕获名册 11 枚文件，断言形状全是 contains 或对别的字符串／文件枚数计数）⇒ **`A614` §5 裁的形 A＋B 成立**；doctor 那一支只能 info 级（`build.ps1:167-169` 拿 `doctor` 退码当 smoke ⇒ 加 `fail` 级＝把带内越界那台机器的构建门打红）。
+docs/reports/pending-and-issues.md:12175:**7. 派单三枚（12:55–12:58，全后台）**：**`268-r1`**（写 `cmd/wisp`，形＝A＋B 按 `A614` §5；派单里写死⛔ 不许在 `runResident` 加第二枚 `[risk]` 读取点（`resident_approval_risk_256_windows_test.go:560/:563` 两枚钉我逐字复跑过）、⛔ 不动 `:310-314` 构造期钉、⛔ 不加 `doctor` 检查项（`scripts/build.ps1:167-169` 拿退码当 smoke）、⛔ 突变只种自己那几枚 `cmd/wisp/**`、开工前先读票 128 AC#5 防两句各造，并要它**动笔前自己跑一发整包取今日绿名册**（第 64 条）、整包预期 ~8.5 min 不许压种子）；**`parking-1`**（只写 `docs/reports/HANDOVER.md` §4 那枚最新时间戳节——停车点已落后台账多轮，⛔ 禁跑任何 `go` 命令、⛔ 不碰台账与 AC 框、发现矛盾只具名不抹平）；**`244-a4`**（只读普查七问＝票 257 残余③那一枚 exec 级通道钉的落地料：现成 `exec.Command` 先例、subsystem 读 PE 头不读注释、撞钉预检穷尽 stdout／行数／枚数计数尺、CI windows job 那一侧、最小形与代价；⛔ 全禁 `go`）。
+docs/reports/pending-and-issues.md:12227:**4. 它交回的落地形状我已写进票 244 新节 §8（`378e9ca6`，14 增／0 删）**：新建 `//go:build windows` 单标签测试件，复用 `buildWispForTest`（真身 `cmd/wisp/secret_argv_windows_test.go:161`，我上一稿这里误写成"secret argv"带空格的路径，改掉）＋`lockedBuf`＋`pollUntil127`，argv 走 `run <文本>`、判据抄 `firstrun_198_test.go:98-99`＋退码 2。**买到**＝把 `257-v1` 那发手工读数升成门禁；**买不到**＝票 244 AC#2 那三发真机字面、subsystem 本身、以及"双击那一态"。四条前置里最值钱的三条：⚠ `firstrun_198_test.go:91` 那句"stdout 必须为空"在**真子进程口径下天然不成立**，照抄＝造一枚常红；★**"起子进程不收尾"这一族全仓零枚**、`proc.Boot` 只 2 枚调用者、`t.Parallel()` 0 枚 ⇒ 这一枚新用例**不继承真窗毒源**（⛔ 不许预防性把那套收尾抄过来）；只有两枚 AST 门（`leg_dispatch_gate_133_test.go`／`leg_sink_gate_131_test.go`）会被"仪器形"打红，三枚禁行写死（不新增包级 `var = 函数`／`WISP-LEG-COVERAGE-RULING` 必须带腿名／不许 `init()` 里跑构建）。**这一格归谁做**：票 244 的写面是 `scripts/build.ps1`＋测试件 ⇒ 排进 `cmd/wisp` 那串队列（`268-r1` 之后），⛔ 不夹进票 268 顺手做。
+docs/reports/pending-and-issues.md:12498:- ★4b 里三枚要单独记住的定性：**238＝状态半边已被机主当场关死**（票面 `:36-43`＋台账 `A476`）⇒ 判"仍成立"但**不计入真活**；**264＝卡在人拍**（票面自定"AC#0 未取回前任何格不许开工"，普查件 `264-a1` 早已交 353 行／58,686 字节 ⇒ **过期的是"摆给他"那一步，不是"没人查"**）；**244＝混合票**（构建链半边已落＝`build.ps1:115` 的 `-H=windowsgui`，但 AC#1 改后 objdump／AC#2 三发真机／AC#5／AC#6 下游名册全欠凭据，且盘上 `build/wisp.exe` 现读仍 **CUI(3)**）⇒ ⛔ 不许在"0 或 1"里给它选边。
+docs/reports/pending-and-issues.md:12902:**6. `bundle-1` 交件（`99489cd`，32 文件／+1454/−0；件 `census.md` 163 行／28,420 字节／占位 0）**：出货链两条都产不出"带包体的 exe"——ⓐ本机 `scripts/build.ps1:73-74` 整步只一句 `frontend step skipped`，SPEC-11 `:44` 的 `--with-frontend` 与 `docker/frontend.Dockerfile` **盘上不存在**；ⓑCI 里 `npm run build` 只出现在 `lint-frontend`(`:871-872`)，产 exe 的三枚 job(`:540/:726/:789`) 全走 build.ps1 且零 setup-node，`upload-artifact` 只有 SLO 报表、**无 dist artifact**。取用侧＝`frontend/embed.go:19 //go:embed all:dist` → `internal/panel/assets.go:44 fs.Sub(…,"dist")`，非测试调用点 2 枚，⛔ 无运行时读盘／无 CDN。⚠ 它报 **HEAD 中途被同波腿推进到 `f6b79ab0`、`ci.yml` 纯插入 31 行** ⇒ 它所有 CI 行号锚在 `c3183379`，现 tip 需逐枚 +31（件内给了映射）。**无票那一格＝"CI／本机产出的 wisp.exe 真带页面字节"这条出货判据零票**（`with-frontend`／`frontend.Dockerfile` 全票池 0 命中）。
+docs/reports/pending-and-issues.md:12920:- `grep -n 'npm run build' .github/workflows/ci.yml` → **全文件只有 1 处**＝`:903`（在 `lint-frontend`，`:871`，`ubuntu-latest`）；跑 `scripts/build.ps1` 造 exe 的是 `:571/:757/:820` 三处，**没有一处先跑 npm**；job 之间不共享工作目录 ⇒ **CI 造的每一枚 exe 都是未构建那一形**。★ 这组行号与 `bundle-1`（A653 §6，锚 `c3183379`）报的 `:540/:726/:789` **逐枚 +31 精确对齐**＝两把独立尺同一读数，不是我把它的数抄了一遍。
+docs/reports/pending-and-issues.md:12924:**5. 立票 274**＝`.scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md`（**7 枚 AC 框，一枚未勾**）。射程：`scripts/build.ps1:73-74` 那句注释**两半都过期**（"embed lands in S5"←`//go:embed all:dist` 早已在树；"no frontend yet"←CI 每晚构建它，只是在另一枚 job）＋ 出货判据零票那一格。三形代价表（甲＝build.ps1 真跑 npm／乙＝CI 跨 job 传 dist artifact／丙＝发布前闸门强制 `built=true`）写成 **AC#2 本票不选形**。禁区三条具名：⛔ 不许动 `assets.go` 的 fail-closed 语义（那是安全形状）、⛔ 不许为了"让产物入库"改 `frontend/.gitignore` 的 `dist/*`（票 77 AC#1）、⛔ 不许把"实做第 2 步"混进改注释那一格（AC#3 单独可勾单独可撤）。AC#4 直接拿 `AC#12` 当**恒真反例**写进判据要求（"把 dist 换成只剩锚文件那一形 ⇒ 出货判据必须红"）。
+docs/reports/pending-and-issues.md:12953:- 我现量复认的三把（⛔ 没照抄）：`grep -rn 'statemachine\.Sink' --include=*.go .`＝**0**（⇒ 判"有没有人接"绝不能裸 grep `Sink`）；非测试机器 `Dispatch(` 生产点＝`internal/models/bridge.go:40/46/59/64`＋`cmd/balldebug/main.go:618`，**它排除的另外两枚我逐行确认是同名噪声**（`cmd/wisp/panel_resident_windows.go:360` 是 `w := rp.wRef` 后的 `w.Dispatch(fn)`＝webview 的 STA 投球；`internal/statemachine/machine.go:202` 是**机器自己的超时定时器自投** `onTimeout` `:193-203`，注释逐字"the timeout event is dispatched like any other event"）；`scripts/build.ps1:129` 只 `build … ./cmd/wisp` ⇒ **`cmd/balldebug` 不进出货包**、B 档判"仅 dev 件"站得住。
+docs/reports/pending-and-issues.md:12959:- ★**我票面 §2① 那句"注释两半都过期"说轻了**：`docs/specs/SPEC-11…:39` 的 **§2.2「构建顺序（一键流程）」通篇没有"S5"这个字**（`S5` 出现在 §3.2 标题与 §6），⇒ `build.ps1:74` 那句 `per SPEC-11 §2.2` 是**引用指错了节**；且 §2.2 第 2 步逐字要求「前端产物：存在则跳过；**`--with-frontend` 时走 `docker/frontend.Dockerfile`（§3.2）**」，而今天**`build.ps1` 没有这枚开关**（无条件跳过）、`docker/frontend.Dockerfile` 跟踪枚数 **0**、§2.2 第 3 步还写着「embed **`assets/web`** 已就位」而 `assets/web` 枚数 **0**。⇒ 形状升格为：**SPEC-11 §2.2 的第 2、3 步今天都没实现，而那句注释把责任推给了一节没说过这话的 spec**。⇒ 票 274 新增 **AC#8**（开关该不该由 `build.ps1` 兑现 vs 承认那两步已被 `frontend/dist`＋CI `lint-frontend` 取代；改 spec 文字＝人工批准、另案；⛔ 不许"顺手补个开关"让代码与 spec 对上）。**框数由 8 升 9（AC#0–AC#8），一枚未翻。**
+docs/reports/pending-and-issues.md:12961:- CI 侧由它坐实（这一步我从前没做过）：三发 `dev` run `37545246395`／`37406757402`／`37406422380` 的**步级 conclusion** 证明 `npm run build` **真跑过且全 success**（`lint-frontend` ≈24-25s），且**没有一发在 `build.ps1` 之前有 node 步** ⇒ 我 §2② 那把尺从此不再是"yaml 里写着"而是"run 里出现过"。另 `needs:` 全 `ci.yml` **0 枚** ⇒ 乙形要新加依赖边；`release` job 无落点 ⇒ 丙形的"发布前"**今天没有栖息地**（两条都进 AC#2 代价表）。
+docs/SLO.md:183:- **二进制**：`go build`（未 strip，非 `scripts/build.ps1`）自 `dc09909` 工作树——
+docs/specs/SPEC-11-build-deploy-containerization.md:42:scripts/build.ps1 [-Env dev|prod] :
+docs/specs/SPEC-11-build-deploy-containerization.md:178:- **构建可复现测试**：干净 clone + `build.ps1` 在 CI（windows runner）全绿 = S0 done①；
+
+=== ls scripts ===
+build.ps1
+check-path-length-budget.sh
+d22scan.sh
+dev
+fetch-deps.ps1
+portable-tests-selftest.sh
+portable-tests.sh
+sign-models.ps1
+slo-check.ps1
+slo-freshness.sh
+spike
+testdata
+winsec-tests.sh
+wisp-cli-tests.sh
+
+=== ls cmd ===
+balldebug
+llmrecord
+wisp

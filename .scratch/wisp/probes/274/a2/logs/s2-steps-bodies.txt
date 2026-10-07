@@ -1,0 +1,82 @@
+=== grep -rn 'release' .github/workflows ===
+
+=== ci.yml upload-artifact step bodies (760-775 / 823-845) ===
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+
+      - name: Upload SLO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-smoke-report
+          path: build/slo/slo-report.json
+          if-no-files-found: error
+
+  # -------------------------------------------------------------- slo-full --
+  # Full six-state SLO gate + settle + leak on the self-hosted Windows runner
+  # (interactive desktop-capable machine, label wisp-slo). Same script as
+  # slo-smoke - only the subset differs (SPEC-10 §3: script identical,
+  # scope unchanged). Merges require this green locally/self-hosted.
+  #
+  # Ticket 134 (shape C + B): the triggers stay - push keeps the merge gate
+-----
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+
+      - name: Upload SLO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-full-report
+          path: build/slo/slo-report.json
+          # Ticket 134 AC#6 (was: error). On the machine-contended path the
+          # gate exits 0 WITHOUT a report - that is the whole trade the owner
+          # approved under Q-36 - and the step above this one stays
+          # unconditional (no `if:`, no continue-on-error, D22 mode-6), so the
+          # only way to keep "no conclusion" from being red is to stop
+          # demanding the file here. error would redden the job one step later
+
+=== any 'go build' in tracked shell/ps elsewhere ===
+.github/workflows/ci.yml:466:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+.github/workflows/ci.yml:520:        # not sit behind `cgo build smoke`, which has been red before) and it is
+.github/workflows/ci.yml:536:        # red before (`cgo build smoke`, run 35551819606) plus a red `PathResolver
+.github/workflows/ci.yml:566:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+.github/workflows/ci.yml:809:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+.scratch/wisp/probes/111/r4/ci-at-HEAD.yml:380:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+.scratch/wisp/probes/111/r4/ci-at-HEAD.yml:434:        # not sit behind `cgo build smoke`, which has been red before) and it is
+.scratch/wisp/probes/111/r4/ci-at-HEAD.yml:450:        # red before (`cgo build smoke`, run 35551819606) plus a red `PathResolver
+.scratch/wisp/probes/111/r4/ci-at-HEAD.yml:480:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+.scratch/wisp/probes/111/r4/ci-at-HEAD.yml:723:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+.scratch/wisp/probes/139/run-mutations.sh:23:  echo '$ go build ./internal/agent/ ; echo rc=$?' | tee -a "$OUT"
+.scratch/wisp/probes/139/run-mutations.sh:24:  go build ./internal/agent/ 2>&1 | tail -3 | tee -a "$OUT"
+.scratch/wisp/probes/152/e2e-subject-kill.sh:23:say "\$ go build -o $exe ./cmd/wisp"
+.scratch/wisp/probes/152/e2e-subject-kill.sh:24:go build -o "$exe" ./cmd/wisp >>"$log" 2>&1
+.scratch/wisp/probes/152/e2e-subject-kill3.sh:31:say "\$ (cd $snap && go build -o $exe ./cmd/wisp)"
+.scratch/wisp/probes/152/e2e-subject-kill3.sh:32:(cd "$snap" && go build -o "$exe" ./cmd/wisp) >>"$log" 2>&1
+.scratch/wisp/probes/153/run-ac1-readings-final.sh:44:( cd "$SNAP" && go build ./internal/agent/ && echo "go build rc=0" )
+.scratch/wisp/probes/153/run-ac1-readings.sh:44:( cd "$SNAP" && go build ./internal/agent/ && echo "go build rc=0" )
+.scratch/wisp/probes/153/run-ac3-matrix.sh:30:  ( cd "$SNAP" && go build ./internal/agent/ >/dev/null 2>&1 ) || { echo "!! $label: build FAILED"; return 2; }
+.scratch/wisp/probes/161/r1/bench.sh:577:    ( cd "$root/tools/d22scan" && go build -o "$bin" . )
+
+=== ci.yml 560-580 (test-windows cgo build smoke step) ===
+        # continue-on-error, and the package stays in the list.
+        run: bash scripts/winsec-tests.sh
+
+      - name: Cache third_party (deps.toml key)
+        if: ${{ !cancelled() }}
+        uses: actions/cache@v4
+        with:
+          path: third_party
+          key: wisp-third_party-${{ hashFiles('deps.toml') }}
+
+      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+        # AC#6: red on run 35551819606 before, and skipped behind the winsec gate
+        # since ticket 110 - a build gate that only gets to answer when the ACL
+        # tests pass. Now it always answers.
+        if: ${{ !cancelled() }}
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+        # AC#4 asked whether this package can be tested on CI at all, and forbade
+        # answering from the laptop. It was measured on both legs - see
+        # scripts/wisp-cli-tests.sh's header for the four readings. Short version:
+        # on windows its 33 top-level cases go PASS=33 FAIL=0 SKIP=0 rc=0 once the
+        # pinned third_party/sherpa-onnx DLLs are on PATH, which is exactly what
+        # the cache step and build.ps1 above produce; the same command without them
+        # is ticket 98's `0xc0000135` before a single test runs. On ubuntu the

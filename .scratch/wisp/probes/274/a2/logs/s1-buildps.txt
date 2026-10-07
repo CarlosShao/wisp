@@ -1,0 +1,174 @@
+=== cmd tree (main packages) ===
+cmd/balldebug/diff_windows.go:3
+cmd/balldebug/main.go:11
+cmd/balldebug/shot_windows.go:3
+cmd/llmrecord/main.go:19
+cmd/llmrecord/main_test.go:1
+cmd/wisp/always_write_no_clobber_226_test.go:1
+cmd/wisp/approval_always.go:1
+cmd/wisp/approval_always_201_test.go:1
+cmd/wisp/approval_reply.go:1
+cmd/wisp/approval_reply_201_test.go:1
+cmd/wisp/approval_reply_stdin_other.go:3
+cmd/wisp/approval_reply_stdin_windows.go:3
+cmd/wisp/approval_seam_201_test.go:1
+cmd/wisp/config_readers_255.go:1
+cmd/wisp/config_receipt_255_test.go:1
+cmd/wisp/config_reload.go:1
+cmd/wisp/config_reload_223_test.go:1
+cmd/wisp/config_reload_perm_223_windows_test.go:3
+cmd/wisp/config_sentences_223r2_test.go:1
+cmd/wisp/console_other.go:3
+cmd/wisp/console_windows.go:3
+cmd/wisp/dataroot_128_test.go:1
+cmd/wisp/dataroot_128_windows_test.go:3
+cmd/wisp/doctor.go:1
+cmd/wisp/early_log_nail_130_windows_test.go:3
+cmd/wisp/firstrun.go:1
+cmd/wisp/firstrun_198r2_test.go:1
+cmd/wisp/firstrun_198_test.go:1
+cmd/wisp/firstrun_257_nonpreset_test.go:1
+cmd/wisp/firstrun_257_test.go:1
+cmd/wisp/firstrun_acl_198_windows_test.go:3
+cmd/wisp/instructions_200r2_test.go:1
+cmd/wisp/leg_dispatch_gate_133_test.go:1
+cmd/wisp/leg_sink_gate_131_test.go:1
+cmd/wisp/leg_sink_nail_131_windows_test.go:1
+cmd/wisp/logsink.go:1
+cmd/wisp/logsink_test.go:1
+cmd/wisp/logsink_windows_test.go:3
+cmd/wisp/main.go:11
+cmd/wisp/models.go:1
+cmd/wisp/notify_other.go:3
+cmd/wisp/notify_windows.go:3
+cmd/wisp/panel_assets.go:1
+cmd/wisp/panel_assets_143_test.go:1
+cmd/wisp/panel_config_248_test.go:1
+cmd/wisp/panel_config_store.go:1
+cmd/wisp/panel_geometry_255_test.go:3
+cmd/wisp/panel_geometry_255_winlive_test.go:3
+cmd/wisp/panel_host_gate_test.go:1
+cmd/wisp/panel_host_windows.go:3
+cmd/wisp/panel_host_windows_live_test.go:3
+cmd/wisp/panel_host_windows_test.go:3
+cmd/wisp/panel_inbound.go:1
+cmd/wisp/panel_inbound_33_test.go:1
+cmd/wisp/panel_pump.go:1
+cmd/wisp/panel_pump_test.go:1
+cmd/wisp/panel_resident_windows.go:3
+cmd/wisp/panel_resident_windows_test.go:3
+cmd/wisp/providers.go:1
+cmd/wisp/providers_test.go:1
+cmd/wisp/resident_approval_246_windows_test.go:3
+cmd/wisp/resident_approval_live_246_windows_test.go:3
+cmd/wisp/resident_approval_risk_256_windows_test.go:3
+cmd/wisp/resident_approval_risk_268_windows_test.go:3
+cmd/wisp/resident_approval_windows.go:3
+cmd/wisp/resident_ball_228_test.go:1
+cmd/wisp/resident_ball_228_windows_test.go:3
+cmd/wisp/resident_ball_live_228_windows_test.go:3
+cmd/wisp/resident_ball_windows.go:3
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:3
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:3
+cmd/wisp/resident_grant_writer_265_windows_test.go:3
+cmd/wisp/resident_hotkey_258_seam_windows.go:1
+cmd/wisp/resident_hotkey_258_test.go:1
+cmd/wisp/resident_hotkey_258_windows_test.go:3
+cmd/wisp/resident_hotkey_live_258_windows_test.go:3
+cmd/wisp/resident_hotkey_v1probe_test.go:3
+cmd/wisp/resident_other.go:3
+cmd/wisp/resident_sink_nail_127_windows_test.go:3
+cmd/wisp/resident_task_source_246_windows_test.go:3
+cmd/wisp/resident_task_source_live_246_windows_test.go:3
+cmd/wisp/resident_task_source_windows.go:3
+cmd/wisp/resident_windows.go:3
+cmd/wisp/restart_tier_keys_255r2_test.go:1
+cmd/wisp/run.go:1
+cmd/wisp/run_mode101_test.go:1
+cmd/wisp/run_test.go:1
+cmd/wisp/secret.go:1
+cmd/wisp/secret_argv_windows_test.go:3
+cmd/wisp/secret_dataroot_119b_test.go:38
+cmd/wisp/secret_test.go:1
+cmd/wisp/slo_exit_os_156_windows_test.go:3
+cmd/wisp/slo_other.go:3
+cmd/wisp/slo_report_144_windows_test.go:3
+cmd/wisp/slo_windows.go:3
+cmd/wisp/subagent_blocked_197_test.go:1
+cmd/wisp/subagent_carrier_197_test.go:1
+cmd/wisp/subagent_selfapproval_197_test.go:1
+cmd/wisp/subagent_stream_key_197_test.go:1
+cmd/wisp/task_scope_close_151_test.go:1
+cmd/wisp/tempdir_resolved_124_test.go:1
+cmd/wisp/testdata/esclistener/main.go:42
+cmd/wisp/ticket224_assembly_test.go:1
+cmd/wisp/versioninfo_other.go:3
+cmd/wisp/versioninfo_windows.go:3
+
+=== ls -R cmd (top) ===
+balldebug
+llmrecord
+wisp
+
+=== build.ps1 param block lines 18-30 ===
+.USAGE
+    scripts/build.ps1 [-Env dev|prod]
+#>
+[CmdletBinding()]
+param(
+    [ValidateSet('dev', 'prod')]
+    [string]$Env = 'dev'
+)
+
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 2.0
+$ProgressPreference = 'SilentlyContinue'
+
+
+=== build.ps1 lines 59-89 (frontend step +-15) ===
+    59	    Fail 'mingw-w64 gcc not found. Add mingw64\bin to PATH or set MINGW64_ROOT. See docs/BUILD.md.'
+    60	}
+    61	# Pitfall (see docs/BUILD.md): mingw gcc fails silently when its bin directory
+    62	# is not on PATH, even when invoked by full path. Prepend it so both the gcc
+    63	# driver and cgo's compiler invocations resolve its helper DLLs and tools.
+    64	$ccDir = Split-Path -Parent $cc
+    65	if (-not ($env:PATH -like "*$ccDir*")) { $env:PATH = "$ccDir;$env:PATH" }
+    66	$ccVersionLine = (& $cc --version | Select-Object -First 1)
+    67	Write-Host "build.ps1: toolchain: $($goVersionLine); CC=$cc ($ccVersionLine)"
+    68	
+    69	# --- 1. fetch-deps ----------------------------------------------------------
+    70	& (Join-Path $PSScriptRoot 'fetch-deps.ps1') -RepoRoot $RepoRoot
+    71	if ($LASTEXITCODE -ne 0) { Fail 'fetch-deps.ps1 failed (see output above).' }
+    72	
+    73	# --- 2. frontend ------------------------------------------------------------
+    74	Write-Host 'build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)'
+    75	
+    76	# --- 3. go build ------------------------------------------------------------
+    77	function Get-DepsValue([string]$Section, [string]$Key) {
+    78	    $inSection = $false
+    79	    foreach ($raw in (Get-Content -LiteralPath (Join-Path $RepoRoot 'deps.toml'))) {
+    80	        $line = $raw.Trim()
+    81	        if ($line.StartsWith('[')) {
+    82	            $inSection = ($line.Trim('[', ']').Trim() -eq $Section)
+    83	            continue
+    84	        }
+    85	        if (-not $inSection) { continue }
+    86	        if ($line -match ('^\s*' + [regex]::Escape($Key) + '\s*=\s*"([^"]*)"')) { return $Matches[1] }
+    87	    }
+    88	    return $null
+    89	}
+
+=== step markers ===
+41:# --- 0. toolchain discovery -------------------------------------------------
+69:# --- 1. fetch-deps ----------------------------------------------------------
+73:# --- 2. frontend ------------------------------------------------------------
+76:# --- 3. go build ------------------------------------------------------------
+136:# --- 4. colocate DLLs with the exe (SPEC-11 §7.1) ---------------------------
+141:# --- 4b. colocate the signed C29 model manifest (ticket 14) -----------------
+151:# --- 5. SHA256SUMS ----------------------------------------------------------
+166:# --- 6. smoke test ----------------------------------------------------------
+
+=== Write-Host step lines count ===
+10
+=== wc build.ps1 ===
+ 172 7346 scripts/build.ps1

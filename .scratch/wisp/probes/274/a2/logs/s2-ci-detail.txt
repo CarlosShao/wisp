@@ -1,0 +1,101 @@
+=== needs: count ===
+0
+
+=== upload-artifact / download-artifact ===
+763:        uses: actions/upload-artifact@v4
+826:        uses: actions/upload-artifact@v4
+842:          #      actions/upload-artifact@v4 -> ea165f8d65b6e75b540449e92b4886f43607fa02,
+843:          #      src/upload/upload-artifact.ts lines 31-52 - warn and ignore
+count upload:
+4
+count download:
+0
+
+=== actions/* usages ===
+68:      - uses: actions/checkout@v4
+70:      - uses: actions/setup-go@v5
+400:      - uses: actions/checkout@v4
+402:      - uses: actions/setup-go@v5
+510:      - uses: actions/checkout@v4
+512:      - uses: actions/setup-go@v5
+561:        uses: actions/cache@v4
+744:      - uses: actions/checkout@v4
+746:      - uses: actions/setup-go@v5
+751:        uses: actions/cache@v4
+763:        uses: actions/upload-artifact@v4
+812:      - uses: actions/checkout@v4
+814:      - uses: actions/setup-go@v5
+826:        uses: actions/upload-artifact@v4
+877:      - uses: actions/checkout@v4
+879:      - uses: actions/setup-node@v4
+
+=== job 505-520 header ===
+  test-windows:
+    runs-on: windows-latest
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: "Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"
+        shell: bash
+        # AC#6 (ticket 111): this gate is the step whose red used to eat the four
+        # steps below it. It stays FIRST inside the job (ticket 110 AC#5 - it must
+        # not sit behind `cgo build smoke`, which has been red before) and it is
+=== job 739-760 header ===
+  slo-smoke:
+    runs-on: windows-latest
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Cache third_party (deps.toml key)
+        uses: actions/cache@v4
+        with:
+          path: third_party
+          key: wisp-third_party-${{ hashFiles('deps.toml') }}
+
+      - name: Build wisp.exe
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: SLO smoke gate
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+=== job 797-825 header ===
+  slo-full:
+    runs-on: [self-hosted, wisp-slo]
+    env:
+      WISP_ENV: test
+      # The runner's job environment carries no msys64 on PATH: measured on the
+      # wisp-slo machine, `msys64` appears 0 times in _diag/Worker_*.log for the
+      # runs that failed here, while gcc lives at E:\work\base\msys64\mingw64\bin
+      # (on the interactive user PATH only). build.ps1's own fallback path is
+      # C:\msys64\..., which is the wrong drive here, so its discovery found no
+      # compiler and the step died before compiling anything. MINGW64_ROOT is
+      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+      # weakening the step. Verified locally with msys removed from PATH:
+      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+      MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Build wisp.exe (deps cached on the runner)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: SLO full gate (six states + settle + leak)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+
+      - name: Upload SLO report

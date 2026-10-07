@@ -1,0 +1,16 @@
+=== ls .github/workflows ===
+total 68
+drwxr-xr-x 1 swq 197609     0 Oct  7 09:11 .
+drwxr-xr-x 1 swq 197609     0 Sep 20 07:41 ..
+-rw-r--r-- 1 swq 197609 57948 Oct  7 09:11 ci.yml
+-rw-r--r-- 1 swq 197609  4038 Sep 23 14:01 slo-fresh.yml
+
+=== grep -rn build.ps1 across all workflows (whole-file scan) ===
+11
+=== which workflow files mention build.ps1 ===
+.github/workflows/ci.yml
+=== wisp.exe mentions in workflows ===
+.github/workflows/ci.yml:541:        # needs neither third_party nor wisp.exe, so putting it above them costs
+.github/workflows/ci.yml:756:      - name: Build wisp.exe
+.github/workflows/ci.yml:819:      - name: Build wisp.exe (deps cached on the runner)
+.github/workflows/ci.yml:912:        # which is verbatim `wisp.exe panel-assets -l2 fs.delete -irreversible delete`
