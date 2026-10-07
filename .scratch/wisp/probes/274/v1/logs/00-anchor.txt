@@ -1,0 +1,65 @@
+=== 274-v1 anchor, run Wed Oct  7 12:29:39 CST 2026 ===
+
+$ git rev-parse --short HEAD
+663a176d
+
+$ git status --porcelain -- cmd internal scripts tools .github docs frontend design build
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+?? design/doubao/01-ball-states.jpg
+?? design/doubao/demo/lib/
+?? design/doubao/demo/rb-files.js
+?? design/doubao/demo/rb-plugins.js
+?? design/doubao/demo/rb-review.js
+?? design/doubao/demo/rb-terminal.js
+?? design/doubao/demo/rightbar.js
+?? design/doubao/demo/screens/home.js
+?? design/doubao/demo/screenshots/
+?? design/doubao/demo/sidebar.js
+?? design/old/
+
+$ git status --porcelain -- cmd internal scripts tools .github docs frontend build   (six families, design excluded)
+[rows above this line inside the six families: 0]
+
+$ git log --oneline -3 -- scripts/build.ps1
+35633445 274-r1: build.ps1 step 2 now builds the page and fails if it cannot (form B-1)
+cc6eaa65 244-r1: build.ps1 追加 -H=windowsgui，双击不再带黑控制台
+bfcb230e feat(models): C29 signed manifest (6 entries, P3 verdicts, matcha blocked-p3) + dev minisign keypair ceremony + signer tool/script + compose model-mirror (18081-18083 fixtures) + PRECHECK P3/P5
+
+$ wc -c scripts/build.ps1; md5sum scripts/build.ps1; wc -l scripts/build.ps1
+13638 scripts/build.ps1
+644c2f6af1fa3fc7f8b3ab38c20753f5 *scripts/build.ps1
+265 scripts/build.ps1
+
+$ git show 35633445^:scripts/build.ps1 | wc -l  => 172
+172
+$ git show 35633445:scripts/build.ps1  | wc -l  => 265
+265
+
+$ git merge-base --is-ancestor 35633445 HEAD
+rc=0 (35633445 IS an ancestor of HEAD 663a176d)
+
+$ git status --porcelain -- design | awk count by status
+     16  D
+      4  M
+     11 ??
+
+design/** is DIRTY from another session (12 D + 4 M + 11 ??) -- NOT touched, NOT counted by this leg.
