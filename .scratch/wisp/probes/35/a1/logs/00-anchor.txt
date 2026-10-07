@@ -1,0 +1,5 @@
+Wed Oct  7 11:32:32 CST 2026
+HEAD=367e41b3
+BRANCH=dev
+--- git status --porcelain -- cmd internal scripts tools .github docs frontend ---
+--- (above: empty = clean) ---
