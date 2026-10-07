@@ -1,0 +1,8 @@
+shipped.sh: positive control bench=/tmp/tmp.pYJOJat5jY (kept on disk; this project never deletes temp artifacts)
+warning: in the working copy of 'ok-short-name.md', LF will be replaced by CRLF the next time Git touches it
+shipped.sh: control 1/3 ok - bench baseline green, so this gate is not stuck red
+warning: in the working copy of '.scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md', LF will be replaced by CRLF the next time Git touches it
+shipped.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+RED - over budget and NOT in the roster: .scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md  (relative 125 chars, name 104 chars, full path on the self-hosted runner 169 chars, budget 165)
+shipped.sh: control 3/3 ok - green again once the planted path is gone
+shipped.sh: positive control PASSED

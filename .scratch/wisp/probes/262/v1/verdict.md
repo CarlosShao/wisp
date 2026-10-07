@@ -301,8 +301,8 @@ rc=1  RED - roster entry carries an EMPTY reason; the reason is data, not a comm
   `tracked paths=7425  over-budget=57  covered by roster=57  not in roster=0`**，`longest=180`、`bands` 中间带 57、越墙 0 枚。
 - **分母三次现量**：`7405`（14:09，本腿第 1 笔之前）→ `7407`（14:11，**差 2 枚＝本腿第 1 笔自己提的 verdict＋log**）→
   `7425`（14:25，本腿第 2 笔的 19 枚件）。⇒ **本票今天第三次证成"引用必带时刻"**，编排者 13:5x 那发的 7405 在它自己的时刻上是对的。
-- **本腿写面纪律尺**（逐笔核，不是自述）：两笔 commit 的 `git show --name-only --format=` 里
-  **非 `.scratch/wisp/probes/262/v1/` 的文件枚数＝0／0**；
+- **本腿写面纪律尺**（逐笔核，不是自述；尺＝`git show --name-only --format= <commit> | grep -vc '^\.scratch/wisp/probes/262/v1/'`）：
+  本腿三笔 commit 的**非本腿写面文件枚数＝0／0／0**（文件总数 2／19／3，全在 `probes/262/v1/**`）；
   五枚禁改路径的 `git hash-object` 与 `HEAD` blob **逐枚全等**、`git status --porcelain` 对它们**逐枚 0 条**（14:26 现跑）：
   仪器 `scripts/check-path-length-budget.sh`＝`aa4cd3aa6295`、`ci.yml`＝`fc015a3cea32`、
   票面 262＝`2bceaa5107aa`、`docs/reports/pending-and-issues.md`＝`6ef8062e0dba`、`docs/reports/HANDOVER.md`＝`1add26c03a77`（左右两边同值＝本腿一字未动）；
@@ -315,5 +315,42 @@ rc=1  RED - roster entry carries an EMPTY reason; the reason is data, not a comm
      规矩 9 那条词面线（名 ≤100）**仍然只有词面**（没有独立仪器去读 `README.md` 那一行），⛔ 别把这两件事读成一件。
 - **本件的性质**：这是**裁决表**，不是结案文件。⛔ 本件不翻任何 AC 框、不替编排者裁 §7 那枚"AC#5 原文与裁定形状不同形"的歧义、
   也不替编排者裁 §9 那枚"257 现名过期"要不要改脚本。三处待编排者动作已在 §11／§12 逐枚点名。
+
+## 15. 追加三发（自检的牙到底挂在哪）＋本腿两处自纠（14:28:33／14:28:38／14:29:47 +08，全在 `/d/tmp/262v1/v2/` 的拷贝里）
+
+这三发是**恒真检查②的第二轮**，问的是"§6.2 那套读数有没有一枚其实是我自己造的假象"。原始件＝
+`logs/v2-a-rosterless-selftest.txt`／`logs/v2-c-shipped-selftest-overhat-baseline.txt`／`logs/v2-d-marker-removed-refuse.txt`。
+
+1. **★更正 §6.2 的一处机制描述**：入库副本在**真实树上满是 58 枚越帽路径**（本腿的种子仍在跟踪集）时跑 `--self-test` ⇒ **rc=0／`control 1/3 ok`**。
+   ⇒ **`--self-test` 的牙不依赖真实树的任何读数**（bench＝`/tmp` 里一枚独立小仓，尺＝`BENCH=$(mktemp -d)` 在 `:473`、`run_selftest()` 起于 `:472`），
+   所以名册块如果被删，**不会**像脚本注释 **`:492-498`**（那句预测逐字在 `:497-498`"the bench baseline would then be red on 57 stale entries and control 1/3 would fail out loud"）
+   预测的那样"靠 57 枚 stale 让 control 1/3 响"。
+   **实际响法是另一支**：只删两行 `#ROSTER-AWK-BEGIN/END` marker（`:314`/`:372`，defs 留在 `:499-500` 不动）⇒
+   **整体 rc=1**，逐字 `REFUSE - the roster-less copy of itself is missing or still carries roster lines`——
+   该守卫本身在 **`:501-504`**（`sed` 造副本在 `:501`、判据 `:502`、`return 2` 在 `:504`），外层 `run_selftest` 的 `return 2` 被 `:546-549` 那段转成 **`exit 1`**（⇒ 我读到的 rc 是 1，守卫自己的口径是 2，两者都对，⛔ 别混读）。
+   ⇒ 判语不变（自检**确实**不恒真、且**对自己赖以工作的突变面也带守卫**），
+   但**"响在哪一行"这件事本腿以现量为准、不采信脚本注释里的那句预测**——那是**注释与实际行为的一处不一致**，
+   ⛔ 不是产码缺陷（两支都会非 0 退出），记在这里供编排者裁是否要改那几行注释。
+2. **本腿自纠一枚突变具的缺陷**：`logs/v2-a-rosterless-selftest.txt` 那发（`rc=1`／`line 440: ROSTER_MARK_BEGIN: unbound variable`）
+   **是本腿自己的 sed 写错了射程**（我用的是**未锚定**的 `/#ROSTER-AWK-BEGIN/,/#ROSTER-AWK-END/d`，它连带删掉了 `:499-500` 两行 defs），
+   ⛔ **不是仪器的缺陷**——入库那枚用的正是**锚定**形式 `/^${ROSTER_MARK_BEGIN}$/,/^${ROSTER_MARK_END}$/`（`:501`），删得干净。
+   本腿一度把它读成"名册块被删时自检会崩"，v2-d 那发把它否掉了。**结论以 v2-d 为准。**
+3. **拆干净没**（收尾现量，14:30:1x 同一把尺）：
+   **本仓**＝`tracked 7427`／`over-budget 57 枚`／**本腿名下 0 枚**／票面未勾框 **8 枚**；
+   **clone**＝`tracked 7407`（与 14:14 那发起的基线**逐枚同数**）、`257-…-done.md` **仍在跟踪集**（本腿一度怀疑它被 M8–M10 摘掉，
+   ⛔ **那是一句没验的猜测，现量否掉了**）、本腿两枚种子跟踪集里 **0 枚**、未跟踪残留 **2 枚**（按规矩 8 只建不删、⛔ 不入库）；
+   入库五枚禁改路径的 hash 与 HEAD **逐枚全等**（`logs/final-selfproof.txt` [2]/[7]）。
+
+⇒ **AC#4 那格的两发恒真检查到此才算完整**：恒真①＝§6.1（阈值／第二枚帽各自有牙），
+恒真②＝§6.2（帽被抬时自检自拒 rc=1）＋**本节的 v2-d（marker 被动时自检 REFUSE rc=1）与 v2-c（自检与真实树无关 ⇒ 排除了"我的绿来自别人脏"这一读法）**。
+
+⚠ **一条关于自家证据件的如实声明（不掩盖）**：本腿**入库的** `logs/mutants-log.txt`（264 行／33,215 字节，`grep -c 'RUN M8'`＝**0**）只含 §6 那批 M0–M7。
+同一台机器上另有一枚**同名 bench 日志** `D:/tmp/262v1/gate-mutants/mutants-log.txt`，里面还写着 M8／M9／M10 三段（时刻 14:23:58→14:24:02，
+另一份 mutant 树 `gate-mutants/`、另一处 bench `/tmp/tmp.9Y355F…`），**本腿不声称那三段的驱动语句是本腿写的**，
+因此**不入库、不列为凭据**；它们与 §15 那三发（v2-a／v2-c／v2-d，**本腿亲手跑、命令逐字在 `logs/` 里**）覆盖同一组问题，
+**一切以 §15 为准**（v2-a 那发还顺带暴露本腿自己 sed 的射程错误，见本节第 2 条）。
+写这段只为让下一位读者知道那三段在哪、为什么不该引它——⛔ 不是新读数、⛔ 不改任何格的判语。
+
+
 
 

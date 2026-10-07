@@ -1,0 +1,3 @@
+shipped.sh: positive control bench=/tmp/tmp.3WGU4EbVCg (kept on disk; this project never deletes temp artifacts)
+shipped.sh: REFUSE - the roster-less copy of itself is missing or still carries roster lines
+shipped.sh: positive control RED - the scan below is not run, because a gate that cannot go red does not get to print green

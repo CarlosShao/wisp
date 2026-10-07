@@ -1,0 +1,2 @@
+noroster.sh: positive control bench=/tmp/tmp.V59MMcURJW (kept on disk; this project never deletes temp artifacts)
+/d/tmp/262v1/v2/noroster.sh: line 440: ROSTER_MARK_BEGIN: unbound variable
