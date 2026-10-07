@@ -1,9 +1,9 @@
 # 票 276 — 把票 275 那枚"故意坏掉的样本"剔掉之后，那道 tracked gofumpt 普查**照样红**：`exit 1` 的名册里躺着 **17 枚来自 14 张别家工单的探针件** ⇒ 唯一"既绿又不瞎"的一支是逐枚处置（⛔ 整体豁免＝把尺闭上，不是修复）
 
-**立票时刻**：2026-10-07 13:5x +08，锚点 HEAD `3d443cb9`（`dev`）
+**立票时刻**：2026-10-07 13:1x +08，锚点 HEAD `3d443cb9`（`dev`）；⚠ 本票第一笔落盘＝`381f18be`（13:12）
 **来路**：票 **275** 的第二桩病。同一把尺（`attrib.sh --tracked-only`）有两个失败出口：`exit 2`＝"读不下去"（票 275 的裁形**丁**已落，只动那一支），`exit 1`＝"真有一批 tracked `.go` 没格式化"。非实现者腿 `275-v1` 一手量到**丁对第二桩零作用**（rc=1 那一支 `A-ROSTER=0`），并给了四支账 ⇒ 编排者 10-07 裁「**现在不做**＋另立本票」，账见 `docs/reports/pending-and-issues.md` 的 **`A668` 第 4 段**。⚠ **本票立票是为了让"不做"有对象、有完成判据，不是为了排腿。**
 
-## 现量（编排者 2026-10-07 13:5x 现跑；⚠ 引用前先重跑，别把这几行当常量）
+## 现量（编排者 2026-10-07 13:0x–13:1x 现跑；⚠ 引用前先重跑，别把这几行当常量）
 
 1. **名册真身**＝`.scratch/wisp/probes/275/v1/logs/n-rc1.txt`（CI 等价 LF 形，含 `275-v1` 自己那枚样本）＝**20 枚跨 16 个 `probes/<NN>`**；去掉它的样本＝**19 枚跨 15 个目录**；★**再去掉两枚已具名的台件也还是不绿**——剩 **17 枚跨 14 个目录**（票 259 整族消失，票 241 还剩一枚 `probe_v1_readings_test.go`）。逐名（剥掉 `.scratch/wisp/probes/` 前缀）：
    `163/a1/main.go`｜`174/c2/zz174c2_wiring_pair_windows_test.go`｜`183/r2/mut/task-boxset-off.go`｜`185/r1/mut-m1/hostpath_185.go`｜`197/r1c/pre/subagent_197.go`｜`197/r1c/pre/subagent_197_test.go`｜`212/v1/mut/main-noq9.go`｜`220/r1/prechange/prechange220_probe_test.go`｜`222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go`｜`224/v2/dialect_probe_test.go`｜`231/v1/mutation/config_reload_branch_after_prefix.go`｜`235/v1/mut/prereadoff-m3_222_test.go`｜`241/v1/probe_v1_readings_test.go`｜`263/v1/src/main.go`｜`33/p1/q1/main.go`｜`33/p1/q2/main.go`｜`33/p1/q3/main.go`
