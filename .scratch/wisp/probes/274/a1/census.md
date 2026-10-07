@@ -95,15 +95,59 @@
 - 正控：上面三条 + `frontend\dist\.gitkeep` 跟踪件（git ls-files 尺）。
 
 ### 补测格（本节尚未钉死的读数，后续 commit 补）
-- [ ] `download-artifact` 精确计数（预期 0，正控同尺 upload 4 枚）
-- [ ] ci.yml 那 1 枚 `panel-assets` 命中的整行原文与其是否被看退出码
-- [ ] `cmd/wisp/panel_assets.go` 的 `built=` 输出行原文（§4 批读）
+- [x] `download-artifact` 精确计数：`rg -c 'download-artifact'` → **7 枚 / 3 文件，全部在 `.scratch`**（本 census.md 自指 5、`probes/bundle/1/census.md` 1、`probes/orchestrator/preflight-1/colors.md` 1）⇒ **跟踪件与 CI/scripts/docs 语料中 0 枚**。正控＝同尺 `upload-artifact` 4 枚（ci.yml :763/:826/:842 等）。
+- [x] ci.yml 唯一 `panel-assets` 命中＝**注释**，`:912` 逐字：
+  `        # which is verbatim ` + '`wisp.exe panel-assets -l2 fs.delete -irreversible delete`' + `（反引号原文如此）`
+  ——它是 lint-frontend job 里解释 fixture 来历的说明行，**没有任何 CI 步执行 `wisp panel-assets`、更没有任何步检查其退出码**。
+- [x] `built=` 输出行原文（`cmd/wisp/panel_assets.go`，本腿已整读该件）：
+  - `:123`（-check 支）：`fmt.Printf("panel assets check: entry=%s built=%t %d asset refs resolve [%s]\n", panel.EntryFile, assets.Built(), len(served), strings.Join(served, " "))`
+  - `:135`（默认支）：`fmt.Printf("panel assets embedded: %d files, entry=%s built=%t\n", len(lines), panel.EntryFile, assets.Built())`——票⑤那句 `built=true` 读数即此格式。
+  - 关键形状：`:126-129` 默认支在 `!assets.Built()` 时 `fmt.Fprintln(os.Stderr, "wisp panel-assets: assets NOT BUILT")` 并 **`return 1`** ⇒ 命令本身有牙，**但全仓没有任何脚本/CI 步咬这根牙**（族6 ci.yml 仅注释 1 枚）。
 
-## §2 CI 侧真名册（gh 只读）
-状态：**未开始**（本文件按纪律分段提交，本节将在下一笔 commit 填充）。
+## §2 CI 侧真名册（gh 只读；`gh run list/view --json`，RC=0，无大日志落盘，logs/ 本腿未用）
 
-## §3 SPEC-11 §2.2 原文与「还成立吗」
-状态：**未开始**。
+最近 3 发 `dev` 的 ci run（`gh run list --branch dev --limit 6`：另有两发 `slo-fresh` workflow success，与本题无关不展开）：
+
+| run | 触发/时刻(UTC) | headSha | 整发 | lint-frontend | test-windows | slo-smoke | slo-full |
+|---|---|---|---|---|---|---|---|
+| 37545246395 | schedule 10-06 23:12 | cc315261 | failure | **success**(23:12:29→23:12:54, ≈25s) | failure(cgo build smoke 步 success) | success(≈2m06s) | success(次日 00:37→00:42, ≈5m22s) |
+| 37406757402 | push 10-06 02:58 | cc315261 | failure | **success**(≈24s) | failure(同) | success | success |
+| 37406422380 | push 10-06 02:54 | b948bcb8 | failure | **success**(≈24s) | failure(同) | success | success |
+
+具名回答（判据＝step 的 conclusion 字段，非「yaml 里有」）：
+1. **`npm run build` 真跑过且成功过吗——跑过，三发全部 success**。三发的 lint-frontend job 步名册里都有这四枚步且 conclusion=success：`Run actions/setup-node@v4` / `npm ci (lockfile is the only source of deps)` / **`build (vite build -> frontend/dist, the bytes go:embed carries)`** / `Post Run actions/setup-node@v4`。
+2. **有没有任何一发 run 里 `build.ps1` 之前存在 node 步骤——这三发里没有**。test-windows 按 `npm|node|artifact|build` 正则过滤后只剩 `cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)`（success）一枚匹配；slo-smoke/slo-full 只剩 `Build wisp.exe`。且三发的 slo 线与 test-windows 都没有任何 `Download *` / setup-node 步。
+3. AC#0 (a) 格「lint-frontend 的 npm run build 产出几枚、落在哪」：**CI 侧取不到读数**——步名册证明它成功，但 vite 产物随 job 工作区丢弃（该 job 无 upload-artifact 步，见族4），要读数须 `gh run view --log` 全文（本腿未拉，属写腿/裁决腿的活）。
+4. AC#0 (b) 格「build.ps1 造的 exe 跑 panel-assets 回什么」：**没有任何 run 执行过 `wisp panel-assets`**（§1 补测格钉死：ci.yml 仅注释 1 枚）⇒ 该格今天无 CI 读数；由形状可推 `built=false`（windows job 干净检出 dist 只有 .gitkeep），但本腿如实登记为「推断，非读数」。
+5. 附注：本腿 grep 窗口（head 6）亲见 `run: ... scripts/build.ps1` 于 `ci.yml:571` 与 `:757` 两处；票面说第三处在 `:820`，第三枚的完整名册列入 §4 批的穷举尺复量（不算与本腿读数冲突，只是窗口截断）。
+
+## §3 `SPEC-11 §2.2` 到底说了什么（逐字），那句话今天还成立吗
+
+件：`docs/specs/SPEC-11-build-deploy-containerization.md`。§2.2 全文（:39-52）逐字：
+
+> ### 2.2 构建顺序（一键流程）
+>
+> ```
+> scripts/build.ps1 [-Env dev|prod] :
+>   1. fetch-deps.ps1        # 校验/补齐 third_party/（有缓存则秒过）
+>   2. 前端产物：存在则跳过；--with-frontend 时走 docker/frontend.Dockerfile（§3.2）
+>   3. go build（cgo: CGO_ENABLED=1, CC=mingw32-gcc; embed assets/web 已就位）
+>   4. 产物：wisp.exe + onnxruntime.dll + sherpa-onnx c dll 同目录（§7.1）
+>   5. 输出 SHA256SUMS
+> ```
+>
+> - CLI 与 GUI 同一二进制：无参 = GUI（`-H=windowsgui`）；`wisp run` 子命令
+>   `AttachConsole(ATTACH_PARENT_PROCESS)` 输出。【SPEC】
+> - 构建期注入：版本号、commit、`buildinfo` 里的 C29 minisign 公钥。
+
+**「S5」不在 §2.2 里**——spec 的 S5 字样在相邻两处：§3.2 标题 `### 3.2 frontend.Dockerfile（前端构建，S5 起需要）`（:69）与其末条 `S5 之前 frontend directory 可空，构建脚本跳过该步`（:84，原文为「S5 之前 frontend 目录可空，构建脚本跳过该步」）；§6 job 表 `frontend` 行门禁级别 `阻塞（S5 起）`（:125）。
+
+回答「今天还成立吗」：
+- **不成立，且是三个方向的过期**：
+  ① `build.ps1:74` 引「SPEC-11 §2.2」说“embed lands in S5”——**§2.2 本身没有一个字提 S5**，引用指错了节；§2.2 第 2 步的语义也不是“到 S5 才做”，而是“前端产物**存在则跳过**；要产就走 `docker/frontend.Dockerfile`（--with-frontend）”。
+  ② §2.2/§3.2 承诺的 embed 通道是 **docker → `assets/web/`**（:45 「embed assets/web 已就位」、:83 「产物落 assets/web/ 供 //go:embed」）——**该通道在树里 0 枚**（票 §4 尺：`docker/frontend.Dockerfile` 与 `assets/web` 均未跟踪；本腿另验 `docker/` 下仅 `builder.Dockerfile` 在族1读数里出现）。今天真正的 embed 通道是 `frontend/embed.go` 的 `//go:embed all:dist` → `frontend/dist`，spec 文字从未更新到这个形状。
+  ③ “embed 到 S5 才落”半句：embed 指令**早已在树里**（embed.go，ci.yml:289 注释自指 embed.go:19），所以「还没落」为过期；而“到 S5 才把页面喂进 exe”那半句对应的机制（frontend.Dockerfile 路径）根本没建——**票②的实证（exe 产线从未与 node 产物同 job）与 spec 的 S5 承诺是两条都没合拢的边**。
+- ⛔ 本腿不改 spec 一字（AC#5：`SPEC-11 §2.2` 那句要不要改＝人工批准）；此处只回答“那句话指什么、今天对不对得上”。
 
 ## §4 喂页面给 exe 的合法落点普查（甲/乙/丙，只描形不选形）
 状态：**未开始**。
