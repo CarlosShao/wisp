@@ -1,0 +1,72 @@
+=== subagent_197.go 的 opt.Sink 是哪枚类型（同名罐子第四枚？）===
+	opt := base
+	opt.Tools = newSubagentToolProvider(t.d.ParentTools)
+	opt.Registry = observe.NewRegistry()
+	// The child's text must NOT ride the parent's console sink: that is how two
+	// tasks' output gets merged into one visible stream. It gets its own sink,
+	// built from the one text channel the host injected, and that channel keys the
+	// child by its own task id (see SubagentDeps.Stream for why r3 had to widen it
+	// - before this leg the child had NO sink at all, so its streaming work was
+	// thrown away and the page was two lifecycle lines).
+	opt.Sink = nil
+	if t.d.Stream != nil {
+		opt.Sink = subagentTextSink{d: t.d}
+	}
+	// The child is admitted through the PARENT's admission hook, i.e. the host's
+	// one approval queue - which is also the second publisher of its roster row
+
+=== agent/harness、llm 那两枚的 opt 类型 ===
+11:// task goes through Sink: the ball/panel/CLI (tickets 12, 28, 33+) forward
+61:// Sink receives loop events. Implementations must not block: the loop calls
+63:type Sink interface {
+67:// NopSink discards events (used when no UI is wired).
+68:type NopSink struct{}
+70:// Publish implements Sink.
+71:func (NopSink) Publish(Event) {}
+73:// RecordSink is an in-memory Sink that records events in order.
+79:type RecordSink struct {
+84:// Publish implements Sink.
+85:func (s *RecordSink) Publish(e Event) {
+92:func (s *RecordSink) Events() []Event {
+
+=== machine_test.go 的 TestSinkNoopDefault 全文（乙的钉①）===
+			t.Fatalf("timeout event %s landed in %s, want %s", ev, m.State(), wantState)
+		}
+		m.Close()
+	}
+}
+
+// TestSinkNoopDefault is the explicit no-op side-effect contract: dispatching
+// a row with side effects against the default sink neither blocks nor panics.
+func TestSinkNoopDefault(t *testing.T) {
+	m := New(Options{Initial: StateSleeping})
+	if _, err := m.Dispatch(EvSummon, nil); err != nil {
+		t.Fatalf("dispatch with default no-op sink: %v", err)
+	}
+	if m.State() != StateListening {
+		t.Fatalf("state = %s, want Listening", m.State())
+	}
+	m.Close()
+}
+
+=== doc.go 全文 ===
+     1	// Package statemachine owns the BallState state vocabulary and the D43
+     2	// transition table (SPEC-01 §3; C12 freezes the table in D43).
+     3	//
+     4	// Responsibilities:
+     5	//   - the 20 BallState values (see states.go)
+     6	//   - the authoritative D43 transition table (table.go: the 40 frozen rows
+     7	//     plus SPEC-08 §3's appended #41/#42) and the per-state timeout table
+     8	//     (timeouts.go)
+     9	//   - "transitions not listed are illegal" enforcement (D22 gate 3):
+    10	//     Machine.Dispatch rejects unknown (state, event) pairs loudly
+    11	//   - side effects fire as Effect events on an injectable Sink; the default
+    12	//     sink is an explicit no-op - execution belongs to later tickets
+    13	//
+    14	// Non-responsibilities:
+    15	//   - no capabilities of its own: it never touches audio, LLM, tools or UI
+    16	//   - no error-class knowledge beyond what observe defines (mapping lives in
+    17	//     observe per D37)
+    18	//
+    19	// Implemented by ticket 07; ticket 03 pinned only the State vocabulary.
+    20	package statemachine

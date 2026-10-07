@@ -1,0 +1,54 @@
+=== 尺A2：包内不带包名限定的构造形（正控第二枚的射程证明）===
+$ grep -rnE '(^|[^.[:alnum:]_])New[(]Options[{]' --include=*.go internal/statemachine
+internal/statemachine/machine_test.go:76:			m := New(Options{Initial: p.start})
+internal/statemachine/machine_test.go:110:	m := New(Options{Initial: StateWarm, Timeouts: timeouts})
+internal/statemachine/machine_test.go:127:	m2 := New(Options{Initial: StateWarm, Timeouts: timeouts})
+internal/statemachine/machine_test.go:152:		m := New(Options{Initial: StateSleeping, Timeouts: timeouts})
+internal/statemachine/machine_test.go:160:			m = New(Options{Initial: StateWarm, Timeouts: timeouts})
+internal/statemachine/machine_test.go:187:	m := New(Options{Initial: StateSleeping})
+internal/statemachine/table_test.go:298:			m := New(Options{Initial: tc.from, Sink: func(e Effect) { fired = append(fired, e) }})
+internal/statemachine/table_test.go:361:			m := New(Options{Initial: s})
+internal/statemachine/table_test.go:404:	m := New(Options{Initial: StateError})
+internal/statemachine/table_test.go:410:	m = New(Options{Initial: StateSleeping})
+RC=0
+
+同一把括号平衡尺（把 pat 换成非限定形）逐枚判 Sink:
+$ sh logs/sink-block-scan.sh '非限定形' internal/statemachine/table_test.go internal/statemachine/machine_test.go
+SINK=YES  internal/statemachine/table_test.go:298  block_lines=1
+SINK=no   internal/statemachine/table_test.go:361  block_lines=1
+SINK=no   internal/statemachine/table_test.go:404  block_lines=1
+SINK=no   internal/statemachine/table_test.go:410  block_lines=1
+SINK=no   internal/statemachine/machine_test.go:76  block_lines=1
+SINK=no   internal/statemachine/machine_test.go:110  block_lines=1
+SINK=no   internal/statemachine/machine_test.go:127  block_lines=1
+SINK=no   internal/statemachine/machine_test.go:152  block_lines=1
+SINK=no   internal/statemachine/machine_test.go:160  block_lines=1
+SINK=no   internal/statemachine/machine_test.go:187  block_lines=1
+RC=0
+
+=== 包内非 test 面有没有自己 New 一台机器 ===
+RC=1 (1＝零命中)
+
+=== statemachine.Sink 类型名在全仓被写出过几次（v1 ⓐ 同尺复跑）===
+$ grep -rn 'statemachine\.Sink' --include=*.go . | grep -v '^\./\.scratch'
+RC=1 (1＝零命中)
+
+=== Sink 作为字段被构造后赋值的形状（opts.Sink = ...）在包外出现几枚 ===
+internal/agent/harness_test.go:121:	o.Sink = h.sink
+internal/agent/loop.go:209:		opt.Sink = NopSink{}
+internal/llm/probe_health_test.go:125:	o.Sink = pf.sink
+internal/tools/subagent_197.go:301:	opt.Sink = nil
+internal/tools/subagent_197.go:303:		opt.Sink = subagentTextSink{d: t.d}
+RC=0
+
+=== 包内 Sink 的声明/缺省支逐字（承重锚，行号现量）===
+25:// a Sink. The zero sink is an explicit no-op.
+31:// Sink receives fired side effects. Must not block and must not re-enter
+34:type Sink func(Effect)
+39:	Sink     Sink                       // nil = explicit no-op
+52:	sink     Sink
+64:	if opts.Sink == nil {
+67:		opts.Sink = func(Effect) {}
+72:	m := &Machine{state: opts.Initial, timeouts: opts.Timeouts, sink: opts.Sink}
+
+11://   - side effects fire as Effect events on an injectable Sink; the default

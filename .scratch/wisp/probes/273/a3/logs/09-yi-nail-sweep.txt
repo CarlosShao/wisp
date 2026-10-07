@@ -1,0 +1,157 @@
+=== 尺B1：全仓测试里断言「没有 Sink ⇒ 副作用不落盘／包不得自己决定收件人」的形状 ===
+internal/agent/approval/cancel_key_wording_260r3_test.go:36:// unavailable half of the cancel line says the slot cannot fire, and does not
+internal/agent/approval/ticket220_l1_window_read_test.go:80:// neverClock fires nothing: the L1 window's own deadline is a real 2-3s budget,
+internal/agent/compress_test.go:223:// Under threshold, compression is a no-op (Ran=false) and never runs.
+internal/agent/compress_test.go:224:func TestCompressNoopUnderThreshold(t *testing.T) {
+internal/agent/compress_test.go:235:		t.Error("Ran=true, want a no-op")
+internal/agent/compress_test.go:238:		t.Error("no-op pass altered the history")
+internal/agent/compress_trace_test.go:277:		t.Fatalf("setup: %d tokens clears threshold %d, want a no-op pass",
+internal/agent/compress_trace_test.go:286:		t.Fatal("setup: a no-op pass reported Ran=true")
+internal/agent/compress_trace_test.go:289:		t.Fatal("setup: no-op pass changed the history")
+internal/agent/compress_trace_test.go:292:		t.Errorf("no-op pass left %d trace record(s), want none: %v",
+internal/agent/control_test.go:164:// MINOR-9: RecordSink documented itself as single-goroutine-only, but the loop
+internal/agent/guard_test.go:18:// (never a silent stop), and the per-tool timeout fires.
+internal/agent/guard_test.go:124:		t.Fatalf("first repeat of the new call must not fire, got %+v", rem)
+internal/agent/prompt_test.go:447:			"every pass re-computed the same no-op clip - see enforceTotal's guarantees 2 and 3")
+internal/agent/spill_path_invariant_test.go:523:					t.Errorf("%s(%s): path local has no initializer in this function", sinkName, id.Name)
+internal/agent/spill_path_invariant_test.go:533:				t.Errorf("%s(%s): destination is not derived from the constructor's s.dir", sinkName, arg)
+internal/agent/spill_path_invariant_test.go:537:				t.Errorf("%s(%s): the name half is not produced by the sanitizer artifactName()", sinkName, arg)
+internal/audio/resample_test.go:166:		t.Fatalf("chans==1 must be a no-op")
+internal/ball/hotkey_live_test.go:256:		t.Fatalf("WM_HOTKEY(summon) did not reach OnSummonHotkey: %v", fired)
+internal/ball/hotkey_live_test.go:268:		t.Fatalf("the newly registered Ctrl+Alt+R never summoned the ball (fired=%v)", fired)
+internal/ball/hotkey_live_test.go:439:		t.Fatalf("the registered Ctrl+Alt+M never reached OnMuteHotkey (fired=%v)", hits)
+internal/config/manager_test.go:71:	// Idempotent: an unchanged file must be a no-op.
+internal/config/manager_test.go:74:		t.Fatalf("unchanged file must be a no-op, got rep=%v err=%v", rep, err)
+internal/config/settings_257_test.go:287:		t.Errorf("the missing-file error no longer carries fs.ErrNotExist, so cause=missing cannot fire: %v", err)
+internal/llm/llm_test.go:552:		// that Acquire is not a no-op by draining a fresh tight bucket.
+internal/llm/matrix_14_2_test.go:107:	// Under the 5s threshold no notice may fire: the first retry decision is
+internal/llm/matrix_14_2_test.go:112:			t.Errorf("notice fired before the 5s threshold: %+v", n)
+internal/llm/probe_health_test.go:114:// the notice saw. The sink and notice are injected here so no case can forget
+internal/llm/probe_health_test.go:388:// without a sink or without a notice the suite refuses to run at all, and it
+internal/memory/retention_test.go:264:	// Quota >= size: no-op.
+internal/memory/retention_test.go:267:		t.Errorf("no-op LRU removed (%d, %d, %v), want zeros", files, freed, err)
+internal/memory/schema_test.go:326:	// Contract test above covers content; here: reopen is a no-op (no second
+internal/models/bridge_test.go:55:		t.Fatalf("row #37 side effect not fired; effects %v", *effects)
+internal/observe/earlylog_130_test.go:221:		withGroup("") // an empty group name is a no-op, per slog's own rule
+internal/observe/goroutine_test.go:12:// TestNoopTaskReturnsToBaseline is the SPEC-01 §7 registry assertion: after
+internal/observe/goroutine_test.go:13:// boot plus one no-op task, the goroutine count returns to the resident
+internal/observe/goroutine_test.go:20:// saw fewer than 3 per-task legs (tool-exec-noop missing in 31 of the 33,
+internal/observe/goroutine_test.go:21:// approval-waiter in 9, agent-task-noop in 0). The missing edge is now waited
+internal/observe/goroutine_test.go:25:func TestNoopTaskReturnsToBaseline(t *testing.T) {
+internal/observe/goroutine_test.go:29:	root := NewRoot("task-noop")
+internal/observe/goroutine_test.go:45:	reg.Spawn("agent-task-noop", "test", root, func(ctx context.Context) {
+internal/observe/goroutine_test.go:46:		entered <- "agent-task-noop"
+internal/observe/goroutine_test.go:51:	reg.Spawn("tool-exec-noop", "test", root, hold("tool-exec-noop"))
+internal/observe/goroutine_test.go:81:		t.Fatal("no-op task fn never ran")
+internal/observe/goroutine_test.go:171:		t.Fatal("no panic event reached the sink")
+internal/panel/config_route_248_test.go:11:// refusal that cannot be made to fire the other way proves nothing about the door.
+internal/panel/git_test.go:459:// does for the mode door: a negative criterion that has never been seen to fire
+internal/panel/git_test.go:493:	// A _test.go file is outside the door's file set on purpose and must not fire.
+internal/proc/envfork_test.go:219:	t.Run("no marker is a no-op", func(t *testing.T) {
+internal/proc/shutdown_hooks_windows_test.go:100:// is an error the assembly root can print, not a quiet no-op.
+internal/risk/pathshape_portable_test.go:197:		// being a silent no-op on one of them.
+internal/risk/provenance_syncdirs_windows_test.go:79:				t.Errorf("IsSyncPath(%q) = not sync, although the channel fired: the two verdicts must "+
+internal/risk/provenance_test.go:580:	// A body that merely QUOTES a link is not a remote sink: a plain local
+internal/risk/provenance_test.go:681:// non-sync and which has no remote sink is still a plain local write, so the
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:134:// through and not merely that the net failed to fire" - is carried instead by
+internal/secret/migrate_test.go:179:// is a no-op - no fields, no backup rewrite, no file change, no notice.
+internal/secret/migrate_test.go:227:// TestMigratePlaintextNoConfigIsNoOp: no config yet -> clean no-op.
+internal/secret/migrate_test.go:228:func TestMigratePlaintextNoConfigIsNoOp(t *testing.T) {
+internal/secret/migrate_test.go:235:		t.Errorf("missing config must be a no-op, got %+v", report)
+internal/secret/migrate_test.go:274:			t.Error("no-op run modified the file")
+
+=== 尺B2：钉住「装配根是唯一接缝／门由装配根注入」的测试与文件（246/201/224/197 那族）===
+cmd/wisp/approval_always_201_test.go
+cmd/wisp/approval_reply.go
+cmd/wisp/approval_reply_201_test.go
+cmd/wisp/config_readers_255.go
+cmd/wisp/config_receipt_255_test.go
+cmd/wisp/config_reload.go
+cmd/wisp/config_reload_223_test.go
+cmd/wisp/dataroot_128_windows_test.go
+cmd/wisp/firstrun.go
+cmd/wisp/firstrun_198_test.go
+cmd/wisp/firstrun_198r2_test.go
+cmd/wisp/leg_sink_gate_131_test.go
+cmd/wisp/leg_sink_nail_131_windows_test.go
+cmd/wisp/logsink_windows_test.go
+cmd/wisp/models.go
+cmd/wisp/panel_config_store.go
+cmd/wisp/panel_geometry_255_test.go
+cmd/wisp/panel_host_windows.go
+cmd/wisp/panel_inbound_33_test.go
+cmd/wisp/panel_pump.go
+cmd/wisp/panel_resident_windows.go
+cmd/wisp/resident_approval_246_windows_test.go
+cmd/wisp/resident_approval_live_246_windows_test.go
+cmd/wisp/resident_approval_windows.go
+cmd/wisp/resident_ball_windows.go
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go
+cmd/wisp/resident_hotkey_258_test.go
+cmd/wisp/resident_hotkey_258_windows_test.go
+cmd/wisp/resident_hotkey_live_258_windows_test.go
+cmd/wisp/resident_hotkey_v1probe_test.go
+cmd/wisp/resident_task_source_246_windows_test.go
+cmd/wisp/resident_task_source_live_246_windows_test.go
+cmd/wisp/resident_task_source_windows.go
+cmd/wisp/resident_windows.go
+cmd/wisp/run.go
+cmd/wisp/run_mode101_test.go
+cmd/wisp/secret.go
+cmd/wisp/secret_dataroot_119b_test.go
+cmd/wisp/secret_test.go
+
+=== 尺B3：有没有测试在扫 import 图／依赖边（乙新开边会被谁看见）===
+./.github/workflows/ci.yml:266:        #    files (root `go list ./...` returns zero packages for both) - so
+./.github/workflows/ci.yml:305:            m_pkgs=$(cd "$mod" && go list ./... 2>/dev/null | wc -l)
+./.github/workflows/ci.yml:597:        # the audit that walks every package of `go list ./...` and refuses to exit
+./.github/workflows/ci.yml:615:        # preference): on GOOS=linux `go list ./...` does not resolve the module -
+./.github/workflows/ci.yml:638:        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+./cmd/wisp/logsink_test.go:32:// dependency closure (`GOOS=linux go list -deps ./internal/observe/ | grep -c
+./internal/config/c26_seam_posix_125_test.go:22:// (measured: go list -deps -test ./internal/winsec/ names no internal/risk), and
+./internal/models/assembly_reachability_121_test.go:37:// identical: go list ./... = 33, in-graph = 20, out-of-graph = 13). Of those 13
+./internal/models/assembly_reachability_121_test.go:72:// GOOS=linux go list -deps ./cmd/wisp exits 1 on this repository, and it exits
+./internal/models/assembly_reachability_121_test.go:80:// What -e can hide: go list -e keeps going past a broken edge, so a package
+./internal/models/assembly_reachability_121_test.go:141:				t.Fatalf("GOOS=%s: go list -e -deps ./cmd/wisp returned no %s/* packages at all - "+
+./internal/models/assembly_reachability_121_test.go:159:					t.Errorf("%s is NOT in GOOS=%s's go list -deps ./cmd/wisp. That is the R-109-4 "+
+./internal/models/assembly_reachability_121_test.go:243:		t.Fatalf("go list -deps ./cmd/wisp (GOOS=%s, -e=%v) failed: %v\noutput: %s",
+./internal/models/assembly_reachability_121_test.go:256:		return "", fmt.Errorf("no go toolchain on PATH (%w) - this case shells out to `go list` on "+
+./internal/models/assembly_reachability_121_test.go:279:// modulePackageSet filters a `go list` dump down to this module's own packages.
+./scripts/portable-tests-selftest.sh:6:# WHY IT EXISTS. The defect was: `go list` progress text on stderr was merged into
+./scripts/portable-tests-selftest.sh:25:# because a real `go list ./internal/winsec/` names the one package in that directory
+./scripts/portable-tests-selftest.sh:288:# line in `go list ./...` than any pin accounts for" - and if a real package is ever
+./scripts/portable-tests-selftest.sh:371:    has "GUARD C - go list's stdout carried 1 line\(s\) that are not"
+./scripts/portable-tests-selftest.sh:381:    has "GUARD C - go list's stdout carried 10 line\(s\) that are not"
+./scripts/portable-tests-selftest.sh:396:# 6. AC#1's reverse face: `go list` really fails. The step must still exit 1 and
+./scripts/portable-tests-selftest.sh:583:#     because `go list ./internal/winsec/` names the one package in that directory and
+./scripts/portable-tests-selftest.sh:775:#     `go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' <pkg>` probe at all -
+./scripts/portable-tests.sh:46:# here. AC#1's census over CI history found 20 tested packages out of `go list
+./scripts/portable-tests.sh:326:    # THE go list CALL, AND WHY IT USED TO DIE WITHOUT A WORD. This block ran
+./scripts/portable-tests.sh:327:    # `all=$(go list ./... 2>/dev/null | sort -u)` under `set -eu -o pipefail`, so a
+./scripts/portable-tests.sh:328:    # non-zero `go list` aborted the script with rc=1 and ZERO bytes of output -
+./scripts/portable-tests.sh:336:    go list ./... >"$census_out" 2>"$census_err" || go_rc=$?
+./scripts/portable-tests.sh:339:            echo "portable-tests.sh: census - go list ./... exited $go_rc. stdout named" \
+./scripts/portable-tests.sh:356:    echo "portable-tests.sh: census GOOS=$goos - go list ./... = $n packages (one row each)"
+
+=== 尺B4：doc.go 那两句自述有没有被测试钉住 ===
+./cmd/wisp/config_reload.go:27:// its loop", internal/watchdog/doc.go:3) and which nothing spawned before this
+./cmd/wisp/config_reload.go:31:// thresholds, the D32 table, the DEFERRED marker internal/watchdog/doc.go:18
+./cmd/wisp/models.go:18:// does not exist in this tree: internal/speech is a doc.go-only boundary stub
+./cmd/wisp/models.go:19:// (DEFERRED: ticket 15/26/41 per its own doc.go) and there is no
+./internal/agent/approval/doc.go:9:// Non-responsibilities:
+./internal/agent/doc.go:10:// Non-responsibilities:
+./internal/agent/scheduler/doc.go:10:// Non-responsibilities:
+./internal/audio/doc.go:21:// Non-responsibilities:
+./internal/ball/doc.go:18:// Non-responsibilities:
+./internal/config/doc.go:10:// Non-responsibilities:
+./internal/llm/doc.go:22:// Non-responsibilities: agent policy (internal/agent), secrets storage
+./internal/memory/doc.go:13:// Non-responsibilities:
+./internal/models/assembly_reachability_121_test.go:40:// 4 packages that hold nothing but a doc.go (internal/agent/scheduler,
+./internal/models/assembly_reachability_121_test.go:50:// consumer, internal/speech, is still a doc.go.
+./internal/models/doc.go:27:// Non-responsibilities:
+./internal/models/no_seal_ruling_test.go:18://     (doc.go: C29 verifies the manifest offline against a build-time key
+./internal/observe/doc.go:18:// Non-responsibilities:
+./internal/panel/doc.go:12:// Non-responsibilities:
+./internal/plugin/doc.go:13:// Non-responsibilities:
+./internal/proc/doc.go:18:// Non-responsibilities:

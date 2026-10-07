@@ -1,0 +1,41 @@
+=== 尺A4b：包名册实存性（上一条 for 循环里的 approval/session/speech 必须先证明存在才谈得上读数）===
+$ go list ./... | grep -v '^github.com/CarlosShao/wisp/tools/spike'
+github.com/CarlosShao/wisp/cmd/balldebug
+github.com/CarlosShao/wisp/cmd/llmrecord
+github.com/CarlosShao/wisp/cmd/wisp
+github.com/CarlosShao/wisp/frontend
+github.com/CarlosShao/wisp/internal/agent
+github.com/CarlosShao/wisp/internal/agent/approval
+github.com/CarlosShao/wisp/internal/agent/scheduler
+github.com/CarlosShao/wisp/internal/audio
+github.com/CarlosShao/wisp/internal/ball
+github.com/CarlosShao/wisp/internal/buildinfo
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/llm
+github.com/CarlosShao/wisp/internal/llm/adaptertest
+github.com/CarlosShao/wisp/internal/llm/anthropic
+github.com/CarlosShao/wisp/internal/llm/golden
+github.com/CarlosShao/wisp/internal/llm/openaichat
+github.com/CarlosShao/wisp/internal/llm/openairesponses
+github.com/CarlosShao/wisp/internal/memory
+github.com/CarlosShao/wisp/internal/models
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/panel
+github.com/CarlosShao/wisp/internal/perm
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/projctx
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/session
+github.com/CarlosShao/wisp/internal/speech
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/streamkey
+github.com/CarlosShao/wisp/internal/tools
+github.com/CarlosShao/wisp/internal/watchdog
+github.com/CarlosShao/wisp/internal/winsec
+github.com/CarlosShao/wisp/tools/signmodels
+
+=== 尺A4c：逐包判「今天谁传递依赖 statemachine」＝乙能不能指向它的硬筛 ===
+
+=== 反证（正控）：上面这把尺必须命中 internal/ball 与 internal/models ===

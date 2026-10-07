@@ -1,0 +1,52 @@
+$ grep -rn 'statemachine\.New(' --include=*.go . | grep -v '^\./\.scratch/'
+./cmd/balldebug/main.go:188:	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./cmd/wisp/models.go:303:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+./internal/ball/hotkey_live_test.go:382:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/ball/interaction_live_test.go:54:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/ball/interaction_live_test.go:134:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/models/bridge_test.go:16:	machine := statemachine.New(statemachine.Options{
+./internal/models/bridge_test.go:86:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/models/handoff_window_109_test.go:62:	return statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+RC=0
+
+$ ... | grep -c '_test.go'  (枚数)
+6
+$ ... | grep -vc '_test.go'
+2
+
+--- 同名噪声防漏：包 import 有没有别名 ---
+$ grep -rhn 'wisp/internal/statemachine"' --include=*.go . | grep -v '^\./\.scratch/' | sort | uniq -c
+      1 10:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 12:	"github.com/CarlosShao/wisp/internal/statemachine"
+     19 14:	"github.com/CarlosShao/wisp/internal/statemachine"
+     23 15:	"github.com/CarlosShao/wisp/internal/statemachine"
+      4 20:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 23:	"github.com/CarlosShao/wisp/internal/statemachine"
+      2 24:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 26:	"github.com/CarlosShao/wisp/internal/statemachine"
+      4 27:	"github.com/CarlosShao/wisp/internal/statemachine"
+      2 30:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 31:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 32:	"github.com/CarlosShao/wisp/internal/statemachine"
+      5 34:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 37:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 388:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 399:	"github.com/CarlosShao/wisp/internal/statemachine"
+      2 3:import "github.com/CarlosShao/wisp/internal/statemachine"
+      1 40:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 42:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 44:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 49:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 54:	"github.com/CarlosShao/wisp/internal/statemachine"
+      2 55:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 56:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 57:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 58:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 66:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 69:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 7:	"github.com/CarlosShao/wisp/internal/statemachine"
+      3 8:	"github.com/CarlosShao/wisp/internal/statemachine"
+      1 9:	"github.com/CarlosShao/wisp/internal/statemachine"
+
+--- .scratch 里的变异拷贝贡献几枚 New（应单列，不进名册）---
+0

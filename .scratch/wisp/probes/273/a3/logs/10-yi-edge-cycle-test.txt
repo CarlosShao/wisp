@@ -1,0 +1,24 @@
+=== 尺A4d：候选收件人包在 -test 图上是否已含 statemachine（决定乙的边会不会在 go test 阶段成环）===
+./internal/panel prod_sm_refs=0 test_sm_refs=1
+./internal/speech prod_sm_refs=0 test_sm_refs=0
+./internal/session prod_sm_refs=0 test_sm_refs=0
+./internal/audio prod_sm_refs=0 test_sm_refs=0
+./internal/agent prod_sm_refs=0 test_sm_refs=0
+./internal/llm prod_sm_refs=0 test_sm_refs=0
+./internal/observe prod_sm_refs=0 test_sm_refs=1
+./internal/config prod_sm_refs=0 test_sm_refs=1
+./internal/ball prod_sm_refs=1 test_sm_refs=1
+./internal/models prod_sm_refs=1 test_sm_refs=1
+./internal/tools prod_sm_refs=1 test_sm_refs=1
+./internal/agent/approval prod_sm_refs=1 test_sm_refs=1
+./cmd/wisp prod_sm_refs=1 test_sm_refs=1
+
+=== 逐枚点名：import statemachine 的那 5 枚测试文件属于哪个包名（in-package 还是 _test 外包）===
+internal/panel/subagent_roster_197_test.go: package panel
+internal/observe/errors_test.go: package observe
+internal/observe/sampler_test.go: package observe
+internal/tools/subagent_197_test.go: package tools
+internal/tools/task_cancel_221_legs_test.go: package tools
+internal/tools/task_state_188_test.go: package tools
+internal/ball/liquid_test.go: package ball
+internal/ball/tokens_test.go: package ball

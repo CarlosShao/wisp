@@ -1,0 +1,46 @@
+=== 尺A4c-v2（逐包 go list -deps 现量；⛔ 不信 in .Deps 那把空读数）===
+$ for p in $(go list ./internal/... ./cmd/...); do printf '%s ' "$p"; go list -deps "$p" | grep -qx 'github.com/CarlosShao/wisp/internal/statemachine' && echo DEPENDS_ON_SM || echo none; done
+github.com/CarlosShao/wisp/cmd/balldebug DEPENDS_ON_SM
+github.com/CarlosShao/wisp/cmd/llmrecord none
+github.com/CarlosShao/wisp/cmd/wisp DEPENDS_ON_SM
+github.com/CarlosShao/wisp/internal/agent none
+github.com/CarlosShao/wisp/internal/agent/approval DEPENDS_ON_SM
+github.com/CarlosShao/wisp/internal/agent/scheduler none
+github.com/CarlosShao/wisp/internal/audio none
+github.com/CarlosShao/wisp/internal/ball DEPENDS_ON_SM
+github.com/CarlosShao/wisp/internal/buildinfo none
+github.com/CarlosShao/wisp/internal/config none
+github.com/CarlosShao/wisp/internal/llm none
+github.com/CarlosShao/wisp/internal/llm/adaptertest none
+github.com/CarlosShao/wisp/internal/llm/anthropic none
+github.com/CarlosShao/wisp/internal/llm/golden none
+github.com/CarlosShao/wisp/internal/llm/openaichat none
+github.com/CarlosShao/wisp/internal/llm/openairesponses none
+github.com/CarlosShao/wisp/internal/memory none
+github.com/CarlosShao/wisp/internal/models DEPENDS_ON_SM
+github.com/CarlosShao/wisp/internal/observe none
+github.com/CarlosShao/wisp/internal/panel none
+github.com/CarlosShao/wisp/internal/perm none
+github.com/CarlosShao/wisp/internal/plugin none
+github.com/CarlosShao/wisp/internal/proc none
+github.com/CarlosShao/wisp/internal/projctx none
+github.com/CarlosShao/wisp/internal/risk none
+github.com/CarlosShao/wisp/internal/secret none
+github.com/CarlosShao/wisp/internal/session none
+github.com/CarlosShao/wisp/internal/speech none
+github.com/CarlosShao/wisp/internal/statemachine DEPENDS_ON_SM
+github.com/CarlosShao/wisp/internal/streamkey none
+github.com/CarlosShao/wisp/internal/tools DEPENDS_ON_SM
+github.com/CarlosShao/wisp/internal/watchdog none
+github.com/CarlosShao/wisp/internal/winsec none
+RC=0
+
+=== 同尺的正控：它必须命中 internal/ball 与 internal/models（这两枚今天确实 import statemachine）===
+github.com/CarlosShao/wisp/internal/statemachine
+ball: 命中
+github.com/CarlosShao/wisp/internal/statemachine
+models: 命中
+
+=== internal/speech 与 internal/approval 实存性（前一条 for 里那两枚 'no' 是否有效读数）===
+github.com/CarlosShao/wisp/internal/speech
+stat D:\work\workspace\projects plans\Wisp\internal\approval: directory not found

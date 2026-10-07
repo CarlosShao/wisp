@@ -1,0 +1,91 @@
+=== 尺B14：246 那枚「半装好就拒绝」的钉，断言原文 ===
+}
+
+// TestAC246ResidentGateInjectionIsRefusedHalfAssembled pins the guard inside
+// assembleRuntime: a gate handed in without the surface and the ledger it was
+// built with is a second truth source waiting to happen, and the assembly says so
+// instead of quietly composing a console surface next to it.
+func TestAC246ResidentGateInjectionIsRefusedHalfAssembled(t *testing.T) {
+	f := newRunFixture(t, "openai-chat")
+	ra := newResidentApproval()
+	cases := []struct {
+		name string
+		spec runSpec
+	}{
+		{"gate without ledger", runSpec{stdout: f.out, stderr: f.err, dataDir: f.dir, gate: ra.gate, ui: ra.ui}},
+		{"gate without surface", runSpec{stdout: f.out, stderr: f.err, dataDir: f.dir, gate: ra.gate, cards: ra.cards}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			ar, code := assembleRuntime(c.spec)
+			if code == 0 {
+				defer ar.close()
+				t.Fatalf("assembleRuntime accepted %s: a half-injected gate is how a process ends up with two "+
+					"approval truths", c.name)
+			}
+			if ar != nil {
+				ar.close()
+			}
+			if !strings.Contains(f.err.String(), "注入的审批门必须连同它自己的界面与会话账本一起递进来") {
+				t.Errorf("%s: exit %d but the refusal was never said: stderr=%q", c.name, code, f.err.String())
+			}
+			if ra.gate.Channels().Loaded(approval.ChannelEsc) {
+				t.Errorf("%s: a refused assembly still loaded a channel", c.name)
+			}
+		})
+	}
+}
+
+
+=== 尺B15：ticket224 装配钉（recorder-less host refuses）===
+ticket224_assembly_test.go
+---
+3:// Ticket 224-r2, cells N#1 (assembly half) and N#2 (the case three comments named
+40:// So the third case below proves "a second assembly mints a different key and
+231:// refused" says nothing about whether anything was asked. That is the polarity trap
+403:// run below as "restart-proofed": boot 2 is a second assembly inside this same test
+452:				"so boot 2's refusal below would be vacuous (row %d, pattern %q)", id, c)
+485:			t.Fatalf("the second assembly minted boot 1's identity %q: 「本次会话内」 would then be "+
+508:		// Card counts, not refusals - an L1 window running out answers allow, so a
+509:		// refusal would say nothing about whether anything was asked.
+524:		t.Errorf("the second assembly's session can read %d grant rows left by the first, want 0 "+
+529:			"a session grant that survives into the next assembly silences the question without "+
+533:		t.Errorf("the post-restart call booked decision=allow_session_grant: the second assembly "+
+
+=== 尺B16：resident_sink_nail_127 的收件人到底是谁（同名陷阱第几枚）===
+const (
+	// residentInstallMsg is installLogSink's own booking record (logsink.go),
+	// the one line that says "this process has a persistent listener from this
+	// moment, into this directory".
+	residentInstallMsg = "wisp: persistent log sink installed"
+	// residentReachedLoop is printed by runResident only after the install
+	// attempt and the shutdown defer are both behind it.
+	//
+	// RE-ANCHORED by ticket 246 AC#7 (leg 246-r2), and the reason is this file's
+	// own rule rather than a convenience: the sentence it pointed at said "empty
+	// event loop running (no task is taken by this loop yet)", and AC#7 is the
+	// increment that makes that clause false - the resident leg now has a task
+	// entry, so the landmark had to move onto the part of the sentence that is
+	// still doing the same job. What the claim protects did not move and is not
+	// weaker:
+	//
+	//   - duty 1 (the sink landmark): this line still only arrives from the branch
+	//     that ran AFTER installLogSink and the shutdown defer, so a child whose
+	//     console never reaches it is still read as "the disk record proves
+	//     little";
+	//   - duty 2 (no earlier start record): unchanged, and it is the record index
+	//     assertions above that carry it, not this string;
+	//   - delete the replay in cmd/wisp/logsink.go and these cases still go red on
+	//     record 0, exactly as before.
+	//
+	// The new token is true in BOTH branches of the print (console entry wired or
+	// not) and false in the during-boot-exit branch, which is the same shape the
+	// old one had. The task-source posture now rides on the same line, and a case
+	// in resident_task_source_246_windows_test.go reads that half.
+	residentReachedLoop = "resident event loop running"
+	// residentRefusalPrefix is the loud fallback that must appear on the
+	// console when the sink cannot be installed, and residentRefusalPromise is
+	// the half of that sentence telling the operator what is lost.
+	residentRefusalPrefix  = "wisp: 持久日志未启用"
+	residentRefusalPromise = "不会落盘"
+	// residentShutdownLine is runResident's own exit report, printed by the

@@ -1,0 +1,140 @@
+=== 尺A4：依赖边现量（go list，⛔ 不读 import 猜）===
+$ go list -deps ./internal/statemachine
+internal/goarch
+unsafe
+internal/abi
+internal/unsafeheader
+internal/cpu
+internal/bytealg
+internal/byteorder
+internal/chacha8rand
+internal/coverage/rtcov
+internal/godebugs
+internal/goexperiment
+internal/goos
+internal/profilerecord
+internal/runtime/atomic
+internal/runtime/exithook
+internal/runtime/gc
+internal/runtime/sys
+internal/runtime/gc/scan
+internal/asan
+internal/msan
+internal/race
+internal/runtime/math
+math/bits
+internal/runtime/maps
+internal/runtime/pprof/label
+internal/runtime/syscall/windows
+internal/strconv
+internal/stringslite
+internal/trace/tracev2
+runtime
+internal/reflectlite
+errors
+cmp
+iter
+math
+unicode/utf8
+strconv
+sync/atomic
+internal/sync
+internal/synctest
+sync
+unicode
+reflect
+slices
+internal/fmtsort
+io
+internal/oserror
+internal/syscall/windows/sysdll
+structs
+unicode/utf16
+syscall
+internal/syscall/windows
+path
+internal/syscall/windows/registry
+time
+io/fs
+internal/filepathlite
+internal/bisect
+internal/godebug
+internal/poll
+internal/syscall/execenv
+internal/testlog
+os
+fmt
+bytes
+context
+encoding
+encoding/json/internal
+encoding/json/internal/jsonflags
+encoding/json/internal/jsonopts
+strings
+encoding/json/internal/jsonwire
+encoding/json/jsontext
+encoding/base32
+encoding/base64
+encoding/binary
+encoding/hex
+encoding/json/v2
+encoding/json
+log/internal
+log
+log/slog/internal
+log/slog/internal/buffer
+log/slog
+github.com/CarlosShao/wisp/internal/statemachine
+RC=0
+
+$ go list -f '{{.ImportPath}}: {{.Imports}}' ./internal/statemachine
+github.com/CarlosShao/wisp/internal/statemachine: [fmt log/slog sync time]
+
+=== 候选收件人包今天有没有反向依赖 statemachine（决定乙会不会成环）===
+./internal/panel -> statemachine in deps? no
+./internal/approval -> statemachine in deps? no
+./internal/ball -> statemachine in deps? YES(成环风险)
+./internal/models -> statemachine in deps? YES(成环风险)
+./internal/agent -> statemachine in deps? no
+./internal/session -> statemachine in deps? no
+./internal/speech -> statemachine in deps? no
+
+=== statemachine 被谁 import（反向边名册）===
+  ./cmd/balldebug/main.go
+  ./cmd/wisp/approval_always.go
+  ./cmd/wisp/approval_reply.go
+  ./cmd/wisp/approval_seam_201_test.go
+  ./cmd/wisp/models.go
+  ./cmd/wisp/resident_approval_246_windows_test.go
+  ./cmd/wisp/resident_approval_live_246_windows_test.go
+  ./cmd/wisp/resident_approval_windows.go
+  ./cmd/wisp/resident_ball_windows.go
+  ./cmd/wisp/subagent_blocked_197_test.go
+  ./cmd/wisp/subagent_carrier_197_test.go
+  ./internal/agent/approval/replies.go
+  ./internal/ball/anim.go
+  ./internal/ball/ball_windows.go
+  ./internal/ball/hotkey_cancel_borrow_live_260_test.go
+  ./internal/ball/hotkey_live_test.go
+  ./internal/ball/interaction_live_test.go
+  ./internal/ball/liquid.go
+  ./internal/ball/liquid_test.go
+  ./internal/ball/liquid_windows.go
+  ./internal/ball/live_guard_windows_test.go
+  ./internal/ball/live_windows_test.go
+  ./internal/ball/statevisual.go
+  ./internal/ball/tokens_test.go
+  ./internal/models/bridge.go
+  ./internal/models/bridge_test.go
+  ./internal/models/handoff_window_109_test.go
+  ./internal/observe/errors_test.go
+  ./internal/observe/sampler_test.go
+  ./internal/panel/subagent_roster_197_test.go
+  ./internal/tools/subagent_197.go
+  ./internal/tools/subagent_197_test.go
+  ./internal/tools/task.go
+  ./internal/tools/task_backfill.go
+  ./internal/tools/task_cancel_221_legs_test.go
+  ./internal/tools/task_state_188_test.go
+count:
+16

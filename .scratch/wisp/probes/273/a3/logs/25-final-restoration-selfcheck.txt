@@ -1,0 +1,35 @@
+=== 终态还原自证（与起手同一把尺）===
+$ git status --porcelain -- cmd internal scripts tools .github docs frontend
+(以上零行＝与起手 §0 同)
+
+$ git diff --stat HEAD -- cmd internal scripts tools .github docs frontend
+(零行)
+
+=== 票面 273 有没有被本腿碰过（AC 框枚数现量，应与票面 §4 的 1 勾 6 未勾一致）===
+$ git status --porcelain -- .scratch/wisp/issues
+ M .scratch/wisp/issues/275-tracked-gofumpt-denominator-carries-a-deliberately-broken-sample-so-the-guarded-census-step-exits-2.md
+票面 [x] 枚数＝1
+票面 [ ] 枚数＝6
+
+=== 本腿写面（只应命中 a3 自己那枚目录）===
+ .../probes/35/a2/logs/q2-shape-c-page-cost.txt     |  31 ++
+ .scratch/wisp/probes/35/a2/logs/q3-nails-2.txt     |  78 +++++
+ .scratch/wisp/probes/35/a2/logs/q3-nails-3.txt     | 172 +++++++++
+ .scratch/wisp/probes/35/a2/logs/q3-nails-scan.txt  | 143 ++++++++
+ .scratch/wisp/probes/35/a2/transport-cost.md       | 390 +++++++++++++++++++++
+ 10 files changed, 1695 insertions(+)
+
+=== 被引用的产码文件与 HEAD 逐串对回（⛔ 本腿没改过，尺＝git diff --quiet）===
+same-as-HEAD cmd/wisp/models.go
+same-as-HEAD cmd/balldebug/main.go
+same-as-HEAD internal/models/bridge_test.go
+same-as-HEAD internal/statemachine/machine.go
+same-as-HEAD internal/statemachine/machine_test.go
+same-as-HEAD internal/statemachine/table_test.go
+same-as-HEAD internal/statemachine/doc.go
+same-as-HEAD internal/statemachine/table.go
+same-as-HEAD internal/tools/subagent_197.go
+same-as-HEAD cmd/wisp/config_readers_255.go
+same-as-HEAD cmd/wisp/config_receipt_255_test.go
+same-as-HEAD cmd/wisp/resident_task_source_246_windows_test.go
+same-as-HEAD internal/models/assembly_reachability_121_test.go

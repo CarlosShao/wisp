@@ -1,0 +1,55 @@
+=== scripts/d22scan.sh 原文（它到底扫什么）===
+     1	#!/bin/sh
+     2	# scripts/d22scan.sh - the only supported way to run the D22 gate (ticket 67 AC#2).
+     3	#
+     4	# Why a wrapper exists: tools/d22scan is its OWN Go module, so from the repo
+     5	# root `go run ./tools/d22scan -root .` fails inside the ROOT module and the
+     6	# scanner never starts - and `cd tools/d22scan && go run .` (default -root .)
+     7	# walks a tree with no internal/ or cmd/, so every ban examines zero files.
+     8	# Both forms used to look like success. The scanner now refuses to print a
+     9	# verdict it did not compute (see checkRoot in tools/d22scan/main.go), and this
+    10	# script removes the path choices that made the mistake possible: it derives
+    11	# the repository root from its own location, so it works from any directory.
+    12	#
+    13	# Both commands are load-bearing and run in this order on purpose:
+    14	#   1. runtests.sh -C tools/d22scan ./... - the seeded-violation positive
+    15	#      control. It proves the gate CAN go red, so a later "clean" cannot mean
+    16	#      "the gate is blind".
+    17	#   2. go run . -root - the real scan of the working tree.
+    18	#
+    19	# Why step 1 goes through tools/d22scan/runtests.sh and not bare `go test`
+    20	# (ticket 99 AC#2, measured in a /tmp snapshot of HEAD, not theorized):
+    21	# several tests here - TestScannerSelfScanOfRealRepoIsGreen above all - read the
+    22	# repository tree at RUNTIME, and the go test cache only records build inputs,
+    23	# so a violation added to internal/ or frontend/ cannot invalidate them. Run 1
+    24	# of the script passed, a `frontend/src/app.js:1 approval.decide` was then
+    25	# planted, run 2 of step 1 printed:
+    26	#
+    27	#	ok  	github.com/CarlosShao/wisp/tools/d22scan	(cached)
+    28	#
+    29	# with exit code 0 - the positive control endorsed a tree it had never looked
+    30	# at again. Step 2 still caught it, so the script as a whole stayed red, but a
+    31	# control that has to be trusted cannot be the one served from a cache.
+    32	# runtests.sh forces -count=1 (and -v, and "SKIP is not a pass"), which is the
+    33	# SAME instrument CI's "D22 scanner positive control" step already calls, so the
+    34	# two call sites no longer hold two different rules for one job (ticket 71
+    35	# AC#3's lesson: bare `go test` is not a gate).
+    36	#
+    37	# No skippable step, no `|| true`, no continue-on-error (D22 run-away mode 6).
+    38	set -eu
+    39	
+    40	here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+    41	root=$(CDPATH= cd -- "$here/.." && pwd)
+    42	
+    43	if [ ! -f "$root/go.mod" ]; then
+    44	    echo "d22scan.sh: no go.mod at derived repo root $root - refusing to scan" >&2
+    45	    exit 2
+    46	fi
+    47	
+    48	cd "$root/tools/d22scan"
+    49	
+    50	echo "d22scan.sh: positive control - runtests.sh -C tools/d22scan ./..."
+    51	sh "$root/tools/d22scan/runtests.sh" -C tools/d22scan ./...
+    52	
+    53	echo "d22scan.sh: scan of $root"
+    54	go run . -root "$root"

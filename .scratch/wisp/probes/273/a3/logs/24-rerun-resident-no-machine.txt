@@ -1,0 +1,20 @@
+=== 复跑④（常驻腿/wisp run 今天有没有机器实例——甲 在交互腿是不是先造发件人）===
+cmd/wisp/run.go 里 statemachine 命中行数＝0
+cmd/wisp 非 test 面 statemachine.New( 枚数＝1
+internal/ball 非 test 面 statemachine.New( 或 *statemachine.Machine 枚数＝0
+--- cmd/wisp/resident_ball_windows.go:270-280 现读（那枚 Initial 属于谁）---
+   268		rb.hotkeyProvenance = provenance
+   269	
+   270		b, err := ball.New(ball.Options{
+   271			// Sleeping is the only state this leg may claim on its own: nothing here
+   272			// is listening, thinking, acting or waiting on anyone. A card that IS
+   273			// waiting moves the orb through the injected gate's UI, which returns it
+   274			// here the moment nobody is being waited on.
+   275			Initial:  statemachine.StateSleeping,
+   276			Hotkeys:  cfg,
+   277			Registry: reg,
+   278			Events: ball.Events{
+   279				OnClickBall:     func() { recordBallGesture("click") },
+   280				OnSummonHotkey:  func() { recordBallGesture("summon-hotkey") },
+   281				OnMuteHotkey:    func() { recordBallGesture("mute-hotkey") },
+   282				OnCancelHotkey:  func() { recordCancelHotkey(onCancelEsc) },

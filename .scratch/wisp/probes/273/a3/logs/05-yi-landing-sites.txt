@@ -1,0 +1,32 @@
+=== 尺A3：乙的落点——包内哪一枚行拿得到「发给谁」的答案（Sink 的构造/缺省支全列，含行号）===
+internal/statemachine/doc.go:11://   - side effects fire as Effect events on an injectable Sink; the default
+internal/statemachine/doc.go:12://     sink is an explicit no-op - execution belongs to later tickets
+internal/statemachine/machine.go:25:// a Sink. The zero sink is an explicit no-op.
+internal/statemachine/machine.go:31:// Sink receives fired side effects. Must not block and must not re-enter
+internal/statemachine/machine.go:34:type Sink func(Effect)
+internal/statemachine/machine.go:39:	Sink     Sink                       // nil = explicit no-op
+internal/statemachine/machine.go:52:	sink     Sink
+internal/statemachine/machine.go:64:	if opts.Sink == nil {
+internal/statemachine/machine.go:65:		// Explicit no-op side-effect sink (ticket 07: hooks fire as events,
+internal/statemachine/machine.go:67:		opts.Sink = func(Effect) {}
+internal/statemachine/machine.go:72:	m := &Machine{state: opts.Initial, timeouts: opts.Timeouts, sink: opts.Sink}
+internal/statemachine/machine.go:163:		m.sink(Effect{D43: d43, Name: name})
+internal/statemachine/table.go:15:// SideEffects are event names only: the machine fires them on the EffectSink
+internal/statemachine/table.go:17:// belongs to later tickets. The default sink is an explicit no-op.
+
+=== 乙的落点候选：包内非 test 文件里所有函数定义（谁能在包里发消息）===
+internal/statemachine/machine.go:18:func (e *IllegalTransitionError) Error() string {
+internal/statemachine/machine.go:60:func New(opts Options) *Machine {
+internal/statemachine/machine.go:78:func (m *Machine) State() State {
+internal/statemachine/machine.go:86:func (m *Machine) Phase() Phase {
+internal/statemachine/machine.go:94:func (m *Machine) TimersAlive() int {
+internal/statemachine/machine.go:108:func (m *Machine) Dispatch(ev Event, facts *Facts) (State, error) {
+internal/statemachine/machine.go:169:func (m *Machine) Close() {
+internal/statemachine/machine.go:178:func (m *Machine) rearmLocked() {
+internal/statemachine/machine.go:193:func (m *Machine) onTimeout(gen uint64, ev Event) {
+internal/statemachine/machine.go:205:func (m *Machine) stopTimerLocked() {
+internal/statemachine/states.go:39:func Valid(s State) bool {
+internal/statemachine/timeouts.go:43:func DefaultTimeouts() map[timeoutKey]TimeoutSpec {
+
+=== 包内非 test 面有没有 log/slog 这类能'发出去'的东西 ===
+internal/statemachine/machine.go:139:		slog.Error("state machine rejected transition", "from", string(from), "event", string(ev),

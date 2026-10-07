@@ -1,0 +1,27 @@
+=== 尺B9：全仓逐包（go list ./... 的 35 枚）statemachine 可达性：prod / test 两把尺并报 ===
+cmd/balldebug                                              prod=1 test=1
+cmd/wisp                                                   prod=1 test=1
+internal/agent/approval                                    prod=1 test=1
+internal/ball                                              prod=1 test=1
+internal/config                                            prod=0 test=1
+internal/models                                            prod=1 test=1
+internal/observe                                           prod=0 test=1
+internal/panel                                             prod=0 test=1
+internal/perm                                              prod=0 test=1
+internal/statemachine                                      prod=1 test=1
+internal/tools                                             prod=1 test=1
+tools/signmodels                                           prod=1 test=1
+
+=== 尺B7 重取退码（⛔ 上一把拿的是 head 的 rc，读数作废重跑）===
+把 statemachine 的依赖面/doc 自述当断言的测试行数＝1
+尺子实跑计数（非管道退码）＝0
+
+=== 尺B10：doc.go/machine.go/table.go 里「包不自己决定收件人」的三处自述逐行原文（乙要改的契约文字）===
+internal/statemachine/doc.go:12://     sink is an explicit no-op - execution belongs to later tickets
+internal/statemachine/doc.go:15://   - no capabilities of its own: it never touches audio, LLM, tools or UI
+internal/statemachine/machine.go:24:// executes them itself - consumers (session, speech, panel, tickets 08+) wire
+internal/statemachine/machine.go:25:// a Sink. The zero sink is an explicit no-op.
+internal/statemachine/machine.go:39:	Sink     Sink                       // nil = explicit no-op
+internal/statemachine/machine.go:54:	gen      uint64      // timer generation; stale callbacks no-op
+internal/statemachine/machine.go:65:		// Explicit no-op side-effect sink (ticket 07: hooks fire as events,
+internal/statemachine/table.go:17:// belongs to later tickets. The default sink is an explicit no-op.

@@ -1,0 +1,91 @@
+=== 121 尺的断言本体（哪几行、断什么）===
+	"sort"
+	"strings"
+	"testing"
+)
+
+// modulePrefix is this module's import-path prefix, and the filter that turns
+// "every package in the transitive closure, stdlib and third party included"
+// into "this repository's packages". The 266-line unfiltered count is not the
+// denominator (the pre-flight's §1.1 坑登记): filtered is 20 before AC#2, 22
+// after.
+const modulePrefix = "github.com/CarlosShao/wisp"
+
+// capabilityPackages is AC#3's list. See the block comment above: it is
+// hand-maintained, it is intentionally two entries long, and expanding it is a
+// decision that belongs to whoever closes a ticket, not to this file.
+var capabilityPackages = []string{
+	modulePrefix + "/internal/models",
+	modulePrefix + "/internal/statemachine",
+}
+
+// graphGOOS lists the platforms the assertion runs on. All three are metadata
+// queries: listing dependencies for another GOOS needs no cross toolchain and
+// no target machine, so this is not a "we ran Go on macOS" claim in disguise.
+var graphGOOS = []string{"windows", "linux", "darwin"}
+
+// TestAC3CapabilityPackagesReachTheCompositionRoot is the gate.
+func TestAC3CapabilityPackagesReachTheCompositionRoot(t *testing.T) {
+	root := moduleRootForTest(t)
+
+	for _, goos := range graphGOOS {
+		goos := goos
+		t.Run("GOOS="+goos, func(t *testing.T) {
+			graph := depsGraphForGOOS(t, root, goos, true)
+
+			// Instrument sanity BEFORE policy: an empty set is the soundest way
+			// for a filter to pass nothing and look like a real answer, and it
+			// is what a missing toolchain, a read-only build cache or a
+			// GOFLAGS surprise all produce. Reported as an instrument failure,
+			// never as "every entry of the list is missing", because those two
+			// read the same in a log and mean different things to a human.
+			if len(graph) == 0 {
+				t.Fatalf("GOOS=%s: go list -e -deps ./cmd/wisp returned no %s/* packages at all - "+
+					"this is an instrument failure, NOT a statement about the list below. "+
+					"Check the go toolchain on PATH, the build cache, and that this test runs "+
+					"inside the module (%s).", goos, modulePrefix, root)
+			}
+			// The matcher must be able to answer "no". Nothing here is a
+			// package of this module, so a set that contains it means the
+			// filter matched too much and every green below is fake. This is
+			// the leg that cannot drift with policy: no future ticket wiring
+			// something real can make it red.
+			if graph["github.com/CarlosShao/wisp/internal/notARealPackage"] {
+				t.Fatalf("GOOS=%s: the graph contains a path that is not a package in this module, "+
+					"so the membership test below proves nothing. Parsed set had %d entries.",
+					goos, len(graph))
+			}
+
+			for _, pkg := range capabilityPackages {
+				if !graph[pkg] {
+					t.Errorf("%s is NOT in GOOS=%s's go list -deps ./cmd/wisp. That is the R-109-4 "+
+						"shape: capability code that exists in the tree and not in the binary. If a "+
+						"build tag is the cause, note that this case runs the same query per GOOS on "+
+						"purpose (windows-only edges are what it exists to catch). Parsed set: %d of "+
+						"this module's packages.", pkg, goos, len(graph))
+				}
+			}
+		})
+	}
+
+	plainRunMustMatchTheESet(t, root)
+}
+
+// plainRunMustMatchTheESet is the -e control leg, and the only place this case
+// can answer the pre-flight's limitation that "-e keeps going past a broken
+// edge": where the query succeeds WITHOUT -e, the two sets must be identical. A
+// difference means something in cmd/wisp's closure stopped resolving, which is
+
+=== capabilityPackages 定义处 ===
+32://	capabilityPackages = { internal/models, internal/statemachine }
+64:// THE PER-GOOS LEG IS NOT DECORATION. capabilityPackages is asserted once per
+112:// capabilityPackages is AC#3's list. See the block comment above: it is
+115:var capabilityPackages = []string{
+157:			for _, pkg := range capabilityPackages {
+//	capabilityPackages = { internal/models, internal/statemachine }
+//
+// That is two entries out of the thirteen root-module packages that are not in
+// cmd/wisp's dependency graph today (measured in
+// docs/evidence/s1/121-preflight-deps-reachability.md on 7699ec3, three GOOS
+// identical: go list ./... = 33, in-graph = 20, out-of-graph = 13). Of those 13
+// only 4 were "real signals a ticket could fix": models, statemachine, audio,

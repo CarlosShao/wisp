@@ -1,0 +1,38 @@
+=== 尺B11：包内那枚 slog 错误（machine.go:139）有没有被测试捕获（乙若用日志罐会撞的钉）===
+./internal/statemachine/machine.go:139:		slog.Error("state machine rejected transition", "from", string(from), "event", string(ev),
+RC(仅看命中)=0
+
+=== 尺B12：246/201/224/197 那族「门/听众由装配根交进来」的断言逐枚点名（文件:行:原文）===
+cmd/wisp/approval_reply_201_test.go:3:// Ticket 201 - the reply listener's production criteria, run against the stack
+cmd/wisp/approval_reply_201_test.go:36:// docs/evidence/s1/201-reply-listener-r1.md §⑥ instead of being done quietly.
+cmd/wisp/approval_reply_201_test.go:92:	// is the pre-201 posture and this suite's own detached-listener control.
+cmd/wisp/config_reload_223_test.go:11:// reply listener the ticket 201 host attaches - the same route a human typing at
+cmd/wisp/firstrun_198r2_test.go:449:		t.Errorf("J1 RED: the assembly root created a config.toml nobody asked it for (stat err %v) - the resident leg reaches this function directly, and ticket 246's pin is the only other thing standing between that and a written root",
+cmd/wisp/resident_approval_246_windows_test.go:34:// TestAC246CancelGestureUsesTheInjectedExecutor is AC#1's plumbing, measured on
+cmd/wisp/resident_approval_246_windows_test.go:40:func TestAC246CancelGestureUsesTheInjectedExecutor(t *testing.T) {
+cmd/wisp/resident_approval_246_windows_test.go:279:func indexOfMsgContaining246(recs []sinkInstallRecord, needle string) int {
+cmd/wisp/resident_approval_246_windows_test.go:339:// TestAC246VetoSentenceWithNoCard pins that the injected cancel path cannot
+cmd/wisp/resident_approval_live_246_windows_test.go:73:	rig := buildEscListener246(t)
+cmd/wisp/resident_approval_live_246_windows_test.go:85:		t.Fatalf("ticket 246 RED (desktop state, not our code): an injected bare Esc reached no "+
+cmd/wisp/resident_approval_live_246_windows_test.go:402:// buildEscListener246 compiles the in-repo rig. It lives under testdata/ on
+cmd/wisp/resident_approval_live_246_windows_test.go:405:func buildEscListener246(t *testing.T) string {
+cmd/wisp/resident_grant_writer_265_windows_test.go:15:// on a recorder-less host, cmd/wisp/ticket224_assembly_test.go refuses it on the
+cmd/wisp/resident_sink_nail_127_windows_test.go:98:	// RE-ANCHORED by ticket 246 AC#7 (leg 246-r2), and the reason is this file's
+cmd/wisp/resident_sink_nail_127_windows_test.go:118:	// in resident_task_source_246_windows_test.go reads that half.
+cmd/wisp/resident_task_source_246_windows_test.go:142:// TestAC246ResidentGateInjectionIsRefusedHalfAssembled pins the guard inside
+cmd/wisp/resident_task_source_246_windows_test.go:146:func TestAC246ResidentGateInjectionIsRefusedHalfAssembled(t *testing.T) {
+cmd/wisp/resident_task_source_246_windows_test.go:177:// TestAC246ResidentTaskRootCancelStopsTheModelCallIs ruling 2.3 measured as a
+cmd/wisp/resident_task_source_246_windows_test.go:183:func TestAC246ResidentTaskRootCancelStopsTheModelCall(t *testing.T) {
+cmd/wisp/resident_task_source_246_windows_test.go:229:// TestAC246TestTaskInjectionPredicate walks the escape hatch's own predicate.
+cmd/wisp/resident_task_source_246_windows_test.go:233:func TestAC246TestTaskInjectionPredicate(t *testing.T) {
+cmd/wisp/resident_task_source_246_windows_test.go:351:// TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline is the
+cmd/wisp/resident_task_source_246_windows_test.go:358:func TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline(t *testing.T) {
+cmd/wisp/resident_task_source_246_windows_test.go:409:// TestAC246DevLegIgnoresTheTestTaskInjection is the escape hatch's other edge, on
+
+=== 尺B13：全仓无 Sink 的机器构造点枚数（乙默认收件人会静默改写谁的观测面）===
+-- 限定名（包外）--
+7
+-- 非限定名（包内）--
+9
+-- 合计枚数 --
+16

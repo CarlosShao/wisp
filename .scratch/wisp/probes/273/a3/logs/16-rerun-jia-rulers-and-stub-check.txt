@@ -1,0 +1,37 @@
+=== 复跑①（甲的落点枚数，对应 a1 尺C/C′、v1 §2.1）===
+非 test 的 statemachine.Options{ 构造点枚数＝2
+cmd/balldebug/main.go:188:	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+cmd/wisp/models.go:303:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+
+=== 复跑②（甲的可移植面：cmd/wisp 里 import internal/ball 的非测试文件有没有带 windows 构建标记）===
+cmd/wisp/resident_approval_windows.go :: //go:build windows
+cmd/wisp/resident_ball_windows.go :: //go:build windows
+cmd/wisp/resident_windows.go :: //go:build windows
+-- 对照：models.go（甲必动的那枚）的构建标记 --
+package main
+(models.go 无任何 //go:build 行＝可移植文件)
+
+=== 复跑③（甲会不会撞票 255 那枚名册钉：它把 cmd/wisp/models.go 的哪几行钉住了）===
+-- 该用例的函数名与行号（现量，不引 a1 的 :179/:230）--
+71:func TestTicket255SplitOnlyClaimsSectionsWithALiveReader(t *testing.T) {
+119:func TestTicket255HotRowRosterCoversTheRegistry(t *testing.T) {
+179:func TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim(t *testing.T) {
+230:func TestTicket255RosterStillMatchesTheActualReadSites(t *testing.T) {
+398:func TestTicket255ReceiptOmitsPanelFromTheImmediateSentence(t *testing.T) {
+467:func TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere(t *testing.T) {
+504:func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
+563:func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
+
+=== 名册钉引用的那两行现在到底是什么（逐字）===
+cmd/wisp/models.go:163: 		mirrors = cfg.Models.Mirror
+cmd/wisp/models.go:183: func loadModelConfig(dataDir string) (*config.Config, error) {
+
+=== 乙的落点前置事实：候选收件人包是不是 doc.go-only 空壳 ===
+internal/session           非test .go 枚数=3  清单: internal/session/doc.go internal/session/grants.go internal/session/session.go 
+internal/speech            非test .go 枚数=1  清单: internal/speech/doc.go 
+internal/audio             非test .go 枚数=11  清单: internal/audio/audio.go internal/audio/device.go internal/audio/doc.go internal/audio/gate.go internal/audio/level.go internal/audio/mmdevice_windows.go internal/audio/resample.go internal/audio/wasapi_other.go internal/audio/wasapi_windows.go internal/audio/wasapimic_windows.go internal/audio/wavinjector.go 
+internal/watchdog          非test .go 枚数=1  清单: internal/watchdog/doc.go 
+internal/agent/scheduler   非test .go 枚数=1  清单: internal/agent/scheduler/doc.go 
+internal/panel             非test .go 枚数=14  清单: internal/panel/approval.go internal/panel/assets.go internal/panel/attachments.go internal/panel/bridge.go internal/panel/composer.go internal/panel/composer_dispatch.go internal/panel/composer_handlers.go internal/panel/config_handlers.go internal/panel/doc.go internal/panel/git.go internal/panel/instructions_200.go internal/panel/pump.go internal/panel/subagent_roster_197.go internal/panel/workspace.go 
+internal/perm              非test .go 枚数=1  清单: internal/perm/store.go 
+internal/observe           非test .go 枚数=10  清单: internal/observe/clock.go internal/observe/diagnostics.go internal/observe/doc.go internal/observe/errors.go internal/observe/goroutine.go internal/observe/logging.go internal/observe/redact.go internal/observe/sampler.go internal/observe/thresholds.go internal/observe/treemetrics_other.go 

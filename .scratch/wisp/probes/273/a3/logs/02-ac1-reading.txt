@@ -1,0 +1,29 @@
+=== 尺A1（括号平衡）：全仓 statemachine.New( 构造点，逐枚判闭合块里有没有 Sink: ===
+$ sh logs/sink-block-scan.sh 'statemachine[.]New[(]' <8 枚命中所在文件>
+SINK=no   cmd/balldebug/main.go:188  block_lines=1
+SINK=no   cmd/wisp/models.go:303  block_lines=1
+SINK=no   internal/ball/hotkey_live_test.go:382  block_lines=1
+SINK=no   internal/ball/interaction_live_test.go:54  block_lines=1
+SINK=no   internal/ball/interaction_live_test.go:134  block_lines=1
+SINK=YES  internal/models/bridge_test.go:16  block_lines=4
+SINK=no   internal/models/bridge_test.go:86  block_lines=1
+SINK=no   internal/models/handoff_window_109_test.go:62  block_lines=1
+RC=0
+
+=== 读数拆分 ===
+产码（非 _test）枚数＝2
+产码里 SINK=YES 枚数＝0
+测试枚数＝6
+测试里 SINK=YES 枚数＝★正控＝1
+
+=== 防漏一：不经 New 直接构造 Options（票 AC#1 的另一半形状）===
+cmd/balldebug/main.go:188:	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+cmd/wisp/models.go:303:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+（以上为非 test 面 Options{ 全部命中；RC 见下）
+2
+
+=== 防漏二：绕过 New 的复合字面量（a1 尺C″ 同形复跑）===
+RC=1 (1＝零命中)
+
+=== 防漏三：把 Options 先存进变量再交 New 的形状 ===
+RC=1 (1＝零命中)

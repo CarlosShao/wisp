@@ -1,0 +1,108 @@
+=== 尺B21：config/perm 的 test-graph 里 statemachine 的来路（环的传递路径要具名）===
+--- internal/perm ---
+github.com/CarlosShao/wisp/internal/winsec
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/perm
+github.com/CarlosShao/wisp/internal/llm
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/memory
+github.com/CarlosShao/wisp/internal/agent
+github.com/CarlosShao/wisp/internal/buildinfo
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/streamkey
+github.com/CarlosShao/wisp/internal/tools
+github.com/CarlosShao/wisp/internal/perm [github.com/CarlosShao/wisp/internal/perm.test]
+github.com/CarlosShao/wisp/internal/perm.test
+--- internal/config（只看 wisp 内部）---
+github.com/CarlosShao/wisp/internal/winsec
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/buildinfo
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/config [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/llm [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/memory
+github.com/CarlosShao/wisp/internal/agent [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/streamkey
+github.com/CarlosShao/wisp/internal/tools [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/agent/approval [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/config_test [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/config.test
+--- internal/observe ---
+github.com/CarlosShao/wisp/internal/winsec
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/observe [github.com/CarlosShao/wisp/internal/observe.test]
+github.com/CarlosShao/wisp/internal/observe.test
+--- internal/panel ---
+github.com/CarlosShao/wisp/frontend
+github.com/CarlosShao/wisp/internal/winsec
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/projctx
+github.com/CarlosShao/wisp/internal/streamkey
+github.com/CarlosShao/wisp/internal/panel
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/memory
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/panel [github.com/CarlosShao/wisp/internal/panel.test]
+github.com/CarlosShao/wisp/internal/panel.test
+
+=== 尺B22：table_test 那枚逐名投递用例的函数名与断言（正控第二枚）===
+	},
+}
+
+// TestEveryLegalRowFires drives every legal edge and asserts destination,
+// listening phase and fired side-effect names (state+side-effect spy per the
+// ticket acceptance).
+func TestEveryLegalRowFires(t *testing.T) {
+	for _, tc := range legalRows {
+		t.Run(tc.name, func(t *testing.T) {
+			var fired []Effect
+			m := New(Options{Initial: tc.from, Sink: func(e Effect) { fired = append(fired, e) }})
+			got, err := m.Dispatch(tc.event, tc.facts)
+			if err != nil {
+				t.Fatalf("Dispatch(%s) from %s: unexpected rejection: %v", tc.event, tc.from, err)
+			}
+			if got != tc.want {
+				t.Fatalf("Dispatch(%s) from %s: got %s, want %s", tc.event, tc.from, got, tc.want)
+			}
+			if !tc.skipPh && m.Phase() != tc.phase {
+				t.Errorf("phase after dispatch: got %d, want %d", m.Phase(), tc.phase)
+			}
+			gotNames := make([]string, len(fired))
+			for i, e := range fired {
+				gotNames[i] = e.Name
+			}
+			if !slices.Equal(gotNames, tc.effects) {
+				t.Errorf("fired effects = %v, want %v", gotNames, tc.effects)
+			}
+		})
+	}
+}
+
+=== 尺B23：装配根口径的原文锚（票 246 乙形自述＋两枚既有 Sink 注入先例）===
+//go:build windows
+
+package main
+
+// The approval gate held by the resident process (ticket 246, 乙形：装配根注入).
+//
+// WHY THIS FILE EXISTS. Ticket 245 made "borrow Esc while a card is waiting,
+// hand it back when the card is gone" the right shape, and ticket 228 moved the
+110:	// probeSink, when non-nil, also receives the capability probe's verdicts.
+112:	probeSink llm.HealthSink
+131:	sink *logSink
+222:	sink, sinkErr := installLogSink(s.dataDir)
+240:	// after installLogSink (a creation seal notice is exactly the record 117's
+194:		Sink:     storeHealthSink{store: store},

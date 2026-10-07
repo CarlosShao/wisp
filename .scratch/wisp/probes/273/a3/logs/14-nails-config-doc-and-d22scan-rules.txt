@@ -1,0 +1,65 @@
+=== 尺B6：internal/config 的 test-graph 里 statemachine 从哪条边进来（prod=0/test=1 的那枚）===
+github.com/CarlosShao/wisp/internal/winsec
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/buildinfo
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/config [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/llm [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/memory
+github.com/CarlosShao/wisp/internal/agent [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/streamkey
+github.com/CarlosShao/wisp/internal/tools [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/agent/approval [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/config_test [github.com/CarlosShao/wisp/internal/config.test]
+github.com/CarlosShao/wisp/internal/config.test
+---
+
+=== 尺B7：有没有任何测试把 statemachine 的依赖面/doc 自述当断言（乙会不会红）===
+RC=0
+
+=== 尺B8：d22scan 的规则清单（乙的异步 Sink 会不会撞禁止形状）===
+1:// Command d22scan is the D22 seven-ban + zero-emoji static scanner
+10://	                      `go func(` and "clean" therefore meant "no bare
+15://	2 pathresolver-bypass filepath.Clean / filepath.Abs outside the allowlist
+40://	8 emoji               zero emoji in design/ (every text file), in frontend/
+46://	                      above, and it is deliberately so: see emojiScopes
+77:// path is skipped only when a rule matches it AND git confirms the index does not
+87://     force-added `internal/build/*.go` under the root `build/` rule, is read and
+94://     does not parse) NO ignore rule is applied: every path is scanned and the
+150:	emojiSeen        map[string]int  // ban #8: scope label -> files actually line-scanned
+158:	// never hidden behind a pattern (A214/F1). See gitignore.go for why the rule is
+159:	// read, not copied, and for the no-index fallback that applies no rule at all.
+176:// emojiRe is ban #8's character class.
+186:var emojiRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`)
+252:// the same rule fixtureVerdict follows (ticket 88 AC#3: a test-only door is
+257:		emojiSeen: map[string]int{}, examined: map[string]int{},
+277:	for _, sc := range emojiScopes(root) {
+285:// emojiScope is one tree ban #8 walks.
+286:type emojiScope struct {
+304:// Before ticket 71 AC#4 the tool only kept a ledger for ban #8 (emojiSeen), so
+314:// the walk writes into (emojiSeen for ban #8, examined for the rest) rather
+322:	seenKey     string // ban #8's emojiSeen key; empty when examinedKey is used
+325:	absentOK    bool   // true only for a scope whose tree is KNOWN ABSENT (no such scope in the ledger today - see driftedAbsentScope)
+334:	return s.emojiSeen[sc.seenKey]
+343:	return "emojiSeen:" + sc.seenKey
+367:	for k := range s.emojiSeen {
+368:		if !declared["emojiSeen:"+k] {
+369:			out = append(out, "emojiSeen:"+k)
+384:// the panel" rule stays exactly as written. What ticket 71 AC#4 governs is the
+399:// exemption became the lie it was invented to prevent - driftedAbsentScope fired
+402:// still untouched (D22: not an agent's to shorten), and the empty-scope rule that
+403:// made the flip cost 5 restated ledger tests is still the rule nobody may soften:
+439:// ban8Scopes adapts emojiScopes() (ban #8's own truth source, unchanged) into
+440:// the ledger. Kept separate so ticket 67's emojiScopes tests keep passing and
+444:	for _, sc := range emojiScopes(root) {
+470:// driftedAbsentScope returns the label of a scope registered as "tree absent"
+479:// scan_test.go against a SYNTHETIC exempt scope (TestExemptScopeCannotOutliveItsAbsentTree),
+481:func driftedAbsentScope(scopes []scanScope) string {
+520:// emojiScopes is ban #8's ENTIRE coverage, kept in one place so the tool cannot
+524:// ban was blind to every .go file of the product while printing "no emoji in
+534://     that lands ticket 34's scaffold - emojiScopes() is now the single source

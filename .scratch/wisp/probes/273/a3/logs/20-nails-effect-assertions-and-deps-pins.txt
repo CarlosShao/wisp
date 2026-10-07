@@ -1,0 +1,49 @@
+=== 尺B17：machine_test.go 里所有 Effect 相关引用（有没有断言「默认不收件」）===
+184:// TestSinkNoopDefault is the explicit no-op side-effect contract: dispatching
+185:// a row with side effects against the default sink neither blocks nor panics.
+枚数＝
+0
+
+=== 尺B18：有没有测试把 statemachine 的依赖集当断言（乙新开边会不会被谁抓到）===
+命中枚数＝
+0
+0
+
+=== 尺B19：table_test.go 的 row-presence 钉原文（乙改表体以外东西会不会撞）===
+// all encoded, plus the two rows SPEC-08 §3 appends to them (#41 barge-in,
+// #42 task intent) - 42 distinct numbers total, none invented.
+func TestAllFortyD43RowsPresent(t *testing.T) {
+	seen := map[int]bool{}
+	for _, r := range Table {
+		if r.D43 < 1 || r.D43 > 42 {
+			t.Errorf("row %d outside numbering 1..42 (%s + %s)", r.D43, r.From, r.Event)
+		}
+		seen[r.D43] = true
+	}
+	for n := 1; n <= 42; n++ {
+		if !seen[n] {
+			t.Errorf("row %d missing from the table", n)
+		}
+	}
+	if len(seen) != 42 {
+		t.Errorf("got %d distinct rows, want 42 (40 D43 + #41/#42)", len(seen))
+	}
+}
+
+// TestEveryStateVocabularyCovered asserts the table's From/To columns only
+
+=== 尺B20：Effect 投递点与缺省支的行号锚（乙①的落点逐名）===
+	d43 := hit.D43
+	effects := hit.SideEffects
+
+	m.rearmLocked()
+
+	m.mu.Unlock()
+
+	for _, name := range effects {
+		m.sink(Effect{D43: d43, Name: name})
+	}
+	return to, nil
+}
+
+// Close disarms any timer. The machine is unusable afterwards.

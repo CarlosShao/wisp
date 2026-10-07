@@ -1,0 +1,100 @@
+=== 复跑③ 修正：票 255 的名册引用住在 config_readers_255.go（用例去逐条开文件验行号），尺打错文件了，重取 ===
+107:	// (cmd/wisp/models.go:163 [cfg.Models.Mirror]) but its callers are the
+109:	// (cmd/wisp/models.go:183 [func loadModelConfig]). The running `wisp run`
+112:	"models": hotClaimOtherProcess + "cmd/wisp/models.go:163 [cfg.Models.Mirror] - only the wisp models subcommands read it, in their own process, off a fresh LoadFile",
+196:	"Models": {"cmd/wisp/models.go"},
+-- 枚数＝
+4
+
+=== 那枚用例的判语原文（它怎么用这些引用）===
+func TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim(t *testing.T) {
+	root := repoRootForRoster(t)
+	citesChecked := 0
+	for row, verdict := range hotRowClaims {
+		found := evidenceCite.FindAllStringSubmatch(verdict, -1)
+		if len(found) == 0 {
+			if !strings.Contains(verdict, zeroScanMarker) {
+				t.Errorf("row %q carries neither a cite nor the 扫描零命中 marker: %q", row, verdict)
+			}
+			continue
+		}
+		for _, c := range found {
+			rel, lineNo, token := c[1], c[2], c[3]
+			n, err := strconv.Atoi(lineNo)
+			if err != nil {
+				t.Errorf("row %q has an unparseable line number %q", row, lineNo)
+				continue
+			}
+			raw, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
+			if err != nil {
+				t.Errorf("row %q cites %s which cannot be read: %v", row, rel, err)
+				continue
+			}
+			lines := strings.Split(string(raw), "\n")
+			if n < 1 || n > len(lines) {
+				t.Errorf("row %q cites %s:%s but the file has %d lines", row, rel, lineNo, len(lines))
+				continue
+			}
+			got := strings.TrimSpace(lines[n-1])
+			if !strings.Contains(got, token) {
+				t.Errorf("row %q cites %s:%s for %q, that line now reads %q - the evidence drifted, so re-adjudicate this row (and if the reader really moved, the receipt's claim may have moved with it)",
+					row, rel, lineNo, token, got)
+			}
+			citesChecked++
+		}
+	}
+	// Today eight of the seventeen rows back their verdict with a real line (the
+	// consumed [llm] row, the three near-miss readers [agent]/[models]/[hotkey], and
+	// the three "the value is decided elsewhere" rows [ball]/[privacy]/[observe] plus
+	// [panel], whose row cites the hard-coded geometry). The floor keeps a refactor
+	// from quietly turning all the cites into markers.
+	const citedRowsFloor = 8
+	if citesChecked < citedRowsFloor {
+		t.Errorf("the roster carries %d checked cites, want at least %d: verdicts are drifting from readings to prose", citesChecked, citedRowsFloor)
+	}
+}
+
+// TestTicket255RosterStillMatchesTheActualReadSites is the scan half: for every
+// Config section the roster adjudicates, the production files that read it must be
+// exactly the files sectionReadSites names. A reader appearing where the receipt
+// said "no reader" is the AC#1 lie coming back, so it reddens instead of shipping.
+func TestTicket255RosterStillMatchesTheActualReadSites(t *testing.T) {
+	root := repoRootForRoster(t)
+	fields := configSectionsForScan()
+
+=== 乙的全菜单：逐包 prod/test 可达性全列（含 0 的）===
+cmd/balldebug                                            prod=1 test=1
+cmd/llmrecord                                            prod=0 test=0
+cmd/wisp                                                 prod=1 test=1
+frontend                                                 prod=0 test=0
+internal/agent                                           prod=0 test=0
+internal/agent/approval                                  prod=1 test=1
+internal/agent/scheduler                                 prod=0 test=0
+internal/audio                                           prod=0 test=0
+internal/ball                                            prod=1 test=1
+internal/buildinfo                                       prod=0 test=0
+internal/config                                          prod=0 test=1
+internal/llm                                             prod=0 test=0
+internal/llm/adaptertest                                 prod=0 test=0
+internal/llm/anthropic                                   prod=0 test=0
+internal/llm/golden                                      prod=0 test=0
+internal/llm/openaichat                                  prod=0 test=0
+internal/llm/openairesponses                             prod=0 test=0
+internal/memory                                          prod=0 test=0
+internal/models                                          prod=1 test=1
+internal/observe                                         prod=0 test=1
+internal/panel                                           prod=0 test=1
+internal/perm                                            prod=0 test=1
+internal/plugin                                          prod=0 test=0
+internal/proc                                            prod=0 test=0
+internal/projctx                                         prod=0 test=0
+internal/risk                                            prod=0 test=0
+internal/secret                                          prod=0 test=0
+internal/session                                         prod=0 test=0
+internal/speech                                          prod=0 test=0
+internal/statemachine                                    prod=1 test=1
+internal/streamkey                                       prod=0 test=0
+internal/tools                                           prod=1 test=1
+internal/watchdog                                        prod=0 test=0
+internal/winsec                                          prod=0 test=0
+tools/signmodels                                         prod=1 test=1

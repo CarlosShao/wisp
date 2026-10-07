@@ -99,104 +99,6 @@ internal/statemachine/timeouts.go
 
 ---
 
-## §1 AC#1 未修码读数（先证今天拦不住）——负向句与正向句**同一把尺**
-
-
-
-### 1.1 尺 A1 的构造（为什么不能只看匹配行）
-
-起手锚 §0.2 已现量：全仓唯一真传 Sink 的那枚构造点是**跨 3 行字面量**（`:16` 起 `New(statemachine.Options{`，`:18` 才出现 `Sink:`）。
-⇒ 任何"只 grep 匹配行"的尺对正控失明。本腿的尺＝**括号平衡扫描**（脚本落 `logs/sink-block-scan.sh`，从匹配行累行到圆括号闭合，再在闭合块里判 `Sink:`），
-锚在**构造调用形状**（`statemachine.New(`／包内非限定 `New(Options{`），⛔ 不数裸符号名 `Sink`（票面「新增禁区」那节与本腿 §1.5 的同名罐子清单就是这条坑）。
-
-### 1.2 名册尺（先证明射程本身）
-
-```
-$ grep -rn 'statemachine\.New(' --include=*.go . | grep -v '^\./\.scratch/'
-./cmd/balldebug/main.go:188:	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
-./cmd/wisp/models.go:303:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
-./internal/ball/hotkey_live_test.go:382:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
-./internal/ball/interaction_live_test.go:54:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
-./internal/ball/interaction_live_test.go:134:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
-./internal/models/bridge_test.go:16:	machine := statemachine.New(statemachine.Options{
-./internal/models/bridge_test.go:86:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
-./internal/models/handoff_window_109_test.go:62:	return statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
-RC=0
-
-$ ... | grep -c '_test.go'   -> 6
-$ ... | grep -vc '_test.go'  -> 2
-$ grep -rn 'statemachine\.New(' --include=*.go .scratch | wc -l -> 0   (.scratch 的变异拷贝贡献 0 枚 New，不进名册)
-$ grep -rhn 'wisp/internal/statemachine"' --include=*.go . | grep -v '^\./\.scratch/' | sort | uniq -c
-（31 种行号分布，每一枚都是 "github.com/CarlosShao/wisp/internal/statemachine" 或 import "…/statemachine"，⛔ 零别名）
-```
-
-⇒ 命中总 **8** 枚＝产码 **2** ＋测试 **6**；import 无限定别名 ⇒ `statemachine.New(` 是包外的唯一构造形状。
-（这三枚数与 `273-a1` §1.2 尺 C、`273-a2` 尺 A、票面更正一「6 枚」**同数**，本腿自己复跑，不是照抄。）
-
-### 1.3 ★AC#1 主读数（负向）＋★正控：同一把尺的两半
-
-```
-$ sh .scratch/wisp/probes/273/a3/logs/sink-block-scan.sh 'statemachine[.]New[(]' <上述 6 枚文件>
-SINK=no   cmd/balldebug/main.go:188  block_lines=1
-SINK=no   cmd/wisp/models.go:303  block_lines=1
-SINK=no   internal/ball/hotkey_live_test.go:382  block_lines=1
-SINK=no   internal/ball/interaction_live_test.go:54  block_lines=1
-SINK=no   internal/ball/interaction_live_test.go:134  block_lines=1
-SINK=YES  internal/models/bridge_test.go:16  block_lines=4      ← ★正控命中（唯一真传 Sink 那枚）
-SINK=no   internal/models/bridge_test.go:86  block_lines=1
-SINK=no   internal/models/handoff_window_109_test.go:62  block_lines=1
-RC=0
-```
-
-| 读数 | 枚数 |
-|---|---|
-| 产码（非 `_test.go`）构造点 | **2** |
-| 其中 `Sink:` 出现在闭合块里 | **0** ⇒ **AC#1 期望值命中** |
-| 测试构造点 | **6** |
-| 其中真传 Sink（★同一把尺的正控） | **1**＝`internal/models/bridge_test.go:16`（块跨 4 行） |
-
-⇒ **AC#1 判语**：产码里**没有任何一枚** `statemachine.New`／`statemachine.Options` 传 `Sink`＝**0 枚**；正控被同一把尺打中 ⇒ 这枚 0 **不是尺瞎**。
-
-### 1.4 三条防漏（"还有没有别的造机器路子"）
-
-```
-$ grep -rn 'statemachine\.Options{' --include=*.go cmd internal tools scripts frontend | grep -v '_test\.go'
-cmd/balldebug/main.go:188 / cmd/wisp/models.go:303                     -> 枚数 2（与尺 A1 同两枚，无"多行 Options 藏 Sink"漏网）
-$ grep -rn 'statemachine\.Machine{' --include=*.go . | grep -v '^\.scratch'   -> RC=1（零命中＝不经 New 手搓 Machine 的形状不存在）
-$ grep -rnE '(var [a-zA-Z_]+ +statemachine\.Options|[a-zA-Z_]+ := +statemachine\.Options\{)' --include=*.go cmd internal tools  -> RC=1（零命中＝"先存变量再交 New"这条 indirect 形状不存在）
-```
-
-### 1.5 尺的第二半射程＋同名罐子清单（⛔ 裸 grep `Sink` 会给出的假读数，本腿逐名复跑）
-
-包内构造不带包名限，所以同一把尺换 pat 再跑一遍（**证明正控不止一枚、且尺认得两种写法**）：
-
-```
-$ grep -rnE '(^|[^.[:alnum:]_])New[(]Options[{]' --include=*.go internal/statemachine
-machine_test.go:76 / :110 / :127 / :152 / :160 / :187   ＋ table_test.go:298 / :361 / :404 / :410      （共 10 枚）
-$ 同一把括号平衡尺逐枚判 Sink:
-SINK=YES  internal/statemachine/table_test.go:298   ← ★第二枚正控（Sink: func(e Effect){fired=append(...)}）
-其余 9 枚 SINK=no
-$ 包内非 test 面自己 New 一台机器 -> RC=1（零命中）
-$ grep -rn 'statemachine\.Sink' --include=*.go . | grep -v '^\./\.scratch' -> RC=1（★全仓连测试都没写出过这个类型名一次）
-$ grep -rn '\.Sink[[:space:]]*=[^=]' --include=*.go cmd internal tools scripts frontend | grep -v '^internal/statemachine/'
-internal/agent/harness_test.go:121:	o.Sink = h.sink                       (agent.Options)
-internal/agent/loop.go:209:		opt.Sink = NopSink{}                     (agent.Options，agent/sink.go:67 NopSink "used when no UI is wired")
-internal/llm/probe_health_test.go:125:	o.Sink = pf.sink                    (llm.HealthSink)
-internal/tools/subagent_197.go:301:	opt.Sink = nil                        ★本腿新认出的第四枚同名罐子＝agent.Options.Sink（不是状态机那枚）
-internal/tools/subagent_197.go:303:	opt.Sink = subagentTextSink{d: t.d}   ★同上
-```
-
-⇒ **名册（含本腿补的两枚）**：`consoleSink`＝`agent.Sink`（`cmd/wisp/run.go:998`）、`storeHealthSink`＝`llm.HealthSink`（`cmd/wisp/providers.go:194`）、`leg_sink_nail_131`/`installLogSink`＝日志收件人、**`subagentTextSink`／`agent.Options.Sink`＝票面「新增禁区」那节没列的第四族**（`internal/tools/subagent_197.go:301/:303`）。
-⇒ ⛔ 任何"有没有人接"的读数必须锚在**构造点闭合块里的 `Sink:` 字段**＋包名限定的类型面；裸 `grep Sink` 在 `cmd internal` 里的 5 枚赋值命中**没有一枚**是状态机那枚。
-
-### 1.6 全仓机器枚数（本腿这把尺的副产品，⛔ 三序件都没给过这个数）
-
-限定名 8 枚＋非限定名 10 枚＝**18 枚构造点**，其中带 Sink **2 枚**（`bridge_test.go:16`、`table_test.go:298`，都在测试里）、**不带 Sink 16 枚**（产码 2 ＋包外测试 5 ＋包内测试 9）。
-⇒ 这 16 枚是 §2② 里「乙一旦让默认罐子有副作用，被悄悄改写观测面」的定义域。
-
----
-
-
 ## §2 AC#2 的「乙」那一行——包内自带默认 Sink 的代价（⛔ 本腿只报代价，不选形）
 
 > 乙的定义（票面 AC#2 原话）＝"包内自带一个默认 Sink（会把『没人订阅』变成『包自己决定发给谁』）"。
@@ -390,75 +292,97 @@ $ go vet   ./...   VET_RC=1（同一句话）
 
 ---
 
-## §4 门禁与还原自证（静态，⛔ 没抢写腿的读数）
 
-### 4.1 `sh scripts/d22scan.sh`：rc 与它到底扫了哪些 scope
+### 1.1 尺 A1 的构造（为什么不能只看匹配行）
 
-脚本原文（`logs/21-d22scan-script.txt`，54 行）关键两行：`:51` `sh "$root/tools/d22scan/runtests.sh" -C tools/d22scan ./...`（**先跑种子违规正控**），`:54` `go run . -root "$root"`（再扫工作树）。
-⚠ 交底：step 1 是 `tools/d22scan` **自己那枚 Go module** 的测试（`tools/d22scan/runtests.sh` 强制 `-count=1`），⛔ 不是本仓根模块的整包 `go test`——本腿一枚根包测试都没跑（写腿 `274-r1` 在飞构建与门禁）。
+起手锚 §0.2 已现量：全仓唯一真传 Sink 的那枚构造点是**跨 3 行字面量**（`:16` 起 `New(statemachine.Options{`，`:18` 才出现 `Sink:`）。
+⇒ 任何"只 grep 匹配行"的尺对正控失明。本腿的尺＝**括号平衡扫描**（脚本落 `logs/sink-block-scan.sh`，从匹配行累行到圆括号闭合，再在闭合块里判 `Sink:`），
+锚在**构造调用形状**（`statemachine.New(`／包内非限定 `New(Options{`），⛔ 不数裸符号名 `Sink`（票面「新增禁区」那节与本腿 §1.5 的同名罐子清单就是这条坑）。
 
-```
-$ sh scripts/d22scan.sh        -> D22SCAN_RC=0（原始全文 logs/23-d22scan-run.txt）
-runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
-d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
-d22scan: examined 266 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
-d22scan: scope bans #1-5 internal/      examined 228 production Go files
-d22scan: scope bans #1-5 cmd/           examined  38 production Go files
-d22scan: scope ban #6 frontend/         examined  85 text files
-d22scan: scope ban #7 internal/tools/   examined  23 production Go files
-d22scan: scope ban #8 design/           examined  39 text files
-d22scan: scope ban #8 frontend/         examined  85 text files
-d22scan: scope ban #8 internal/         examined 514 Go files, comments and _test.go included
-d22scan: scope ban #8 cmd/              examined 104 Go files, comments and _test.go included
-d22scan: clean - no D22 ban violations; live scope work: …（八枚 scope 全列）
-```
-
-⇒ **rc=0 且正控先绿**（PASS=35/FAIL=0/SKIP=0，`[no tests to run]`=0）。
-⇒ scope 名册：七条禁止形状扫 `internal/`(228)＋`cmd/`(38)；ban #6 扫 `frontend/`(85 文本)；ban #7 扫 `internal/tools/`(23)；ban #8（零 emoji）扫四棵树全集合 `design/`39／`frontend/`85／`internal/`514（**含注释与 `_test.go`**）／`cmd/`104。
-⇒ ⛔ **不许拿这一枚 rc=0 抵"接没接线"的账**（本腿指令 §2 与票 270 教训同一条：Go 不为未使用/未接线报错，d22scan 也不判接线）——"接没接线"只在本腿 §1 用**构造点枚数**报（产码 0/2）。
-
-### 4.2 还原自证（与起手同一把尺，`logs/25-final-restoration-selfcheck.txt`）
+### 1.2 名册尺（先证明射程本身）
 
 ```
-$ git status --porcelain -- cmd internal scripts tools .github docs frontend
-（零行＝与 §0 起手同）
-$ git diff --stat HEAD -- cmd internal scripts tools .github docs frontend
-（零行）
+$ grep -rn 'statemachine\.New(' --include=*.go . | grep -v '^\./\.scratch/'
+./cmd/balldebug/main.go:188:	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./cmd/wisp/models.go:303:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+./internal/ball/hotkey_live_test.go:382:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/ball/interaction_live_test.go:54:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/ball/interaction_live_test.go:134:	m := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/models/bridge_test.go:16:	machine := statemachine.New(statemachine.Options{
+./internal/models/bridge_test.go:86:	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+./internal/models/handoff_window_109_test.go:62:	return statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+RC=0
+
+$ ... | grep -c '_test.go'   -> 6
+$ ... | grep -vc '_test.go'  -> 2
+$ grep -rn 'statemachine\.New(' --include=*.go .scratch | wc -l -> 0   (.scratch 的变异拷贝贡献 0 枚 New，不进名册)
+$ grep -rhn 'wisp/internal/statemachine"' --include=*.go . | grep -v '^\./\.scratch/' | sort | uniq -c
+（31 种行号分布，每一枚都是 "github.com/CarlosShao/wisp/internal/statemachine" 或 import "…/statemachine"，⛔ 零别名）
 ```
 
-被本腿引用过的 13 枚文件逐串对回 `git diff --quiet HEAD -- <file>` ＝ **全部 `same-as-HEAD`**，零枚 `DIRTY`：
-`cmd/wisp/models.go`、`cmd/balldebug/main.go`、`internal/models/bridge_test.go`、`internal/statemachine/{machine,machine_test,table,table_test,doc}.go`、`internal/tools/subagent_197.go`、`cmd/wisp/config_readers_255.go`、`cmd/wisp/config_receipt_255_test.go`、`cmd/wisp/resident_task_source_246_windows_test.go`、`internal/models/assembly_reachability_121_test.go`。
+⇒ 命中总 **8** 枚＝产码 **2** ＋测试 **6**；import 无限定别名 ⇒ `statemachine.New(` 是包外的唯一构造形状。
+（这三枚数与 `273-a1` §1.2 尺 C、`273-a2` 尺 A、票面更正一「6 枚」**同数**，本腿自己复跑，不是照抄。）
 
-票面 273 现量：`[x]` 枚数＝**1**（AC#0，编排者 10-07 12:5x 自己翻的）、`[ ]` 枚数＝**6**（AC#1–AC#6）⇒ **本腿一枚框没碰、票面一字没改**。
+### 1.3 ★AC#1 主读数（负向）＋★正控：同一把尺的两半
 
-工作区里别人的件（⛔ 不是本腿动的，本腿不提交、不还原，只登记）：
-- `.scratch/wisp/issues/275-…md` 起手起就是 ` M`（别腿在写）。
-- 本腿锚 `89114888` 之后 HEAD 已推进到 `f88144b3`（`274-r1` 两笔＋`35-a2` 一笔＋`275-a1` 两笔……），本腿起手锚 `28872c9a` 仍在历史里，未被动过。
-- `design/**`、`.gitignore` 与 `.scratch/**` 其余未提交件同属别处，本腿一律不碰。
-- 本腿**没 push**（机主 10-07 原话「暂时不推远程」）；两笔 commit 的 pathspec 一律只有 `.scratch/wisp/probes/273/a3/census.md` 与 `.scratch/wisp/probes/273/a3/logs`。
+```
+$ sh .scratch/wisp/probes/273/a3/logs/sink-block-scan.sh 'statemachine[.]New[(]' <上述 6 枚文件>
+SINK=no   cmd/balldebug/main.go:188  block_lines=1
+SINK=no   cmd/wisp/models.go:303  block_lines=1
+SINK=no   internal/ball/hotkey_live_test.go:382  block_lines=1
+SINK=no   internal/ball/interaction_live_test.go:54  block_lines=1
+SINK=no   internal/ball/interaction_live_test.go:134  block_lines=1
+SINK=YES  internal/models/bridge_test.go:16  block_lines=4      ← ★正控命中（唯一真传 Sink 那枚）
+SINK=no   internal/models/bridge_test.go:86  block_lines=1
+SINK=no   internal/models/handoff_window_109_test.go:62  block_lines=1
+RC=0
+```
+
+| 读数 | 枚数 |
+|---|---|
+| 产码（非 `_test.go`）构造点 | **2** |
+| 其中 `Sink:` 出现在闭合块里 | **0** ⇒ **AC#1 期望值命中** |
+| 测试构造点 | **6** |
+| 其中真传 Sink（★同一把尺的正控） | **1**＝`internal/models/bridge_test.go:16`（块跨 4 行） |
+
+⇒ **AC#1 判语**：产码里**没有任何一枚** `statemachine.New`／`statemachine.Options` 传 `Sink`＝**0 枚**；正控被同一把尺打中 ⇒ 这枚 0 **不是尺瞎**。
+
+### 1.4 三条防漏（"还有没有别的造机器路子"）
+
+```
+$ grep -rn 'statemachine\.Options{' --include=*.go cmd internal tools scripts frontend | grep -v '_test\.go'
+cmd/balldebug/main.go:188 / cmd/wisp/models.go:303                     -> 枚数 2（与尺 A1 同两枚，无"多行 Options 藏 Sink"漏网）
+$ grep -rn 'statemachine\.Machine{' --include=*.go . | grep -v '^\.scratch'   -> RC=1（零命中＝不经 New 手搓 Machine 的形状不存在）
+$ grep -rnE '(var [a-zA-Z_]+ +statemachine\.Options|[a-zA-Z_]+ := +statemachine\.Options\{)' --include=*.go cmd internal tools  -> RC=1（零命中＝"先存变量再交 New"这条 indirect 形状不存在）
+```
+
+### 1.5 尺的第二半射程＋同名罐子清单（⛔ 裸 grep `Sink` 会给出的假读数，本腿逐名复跑）
+
+包内构造不带包名限，所以同一把尺换 pat 再跑一遍（**证明正控不止一枚、且尺认得两种写法**）：
+
+```
+$ grep -rnE '(^|[^.[:alnum:]_])New[(]Options[{]' --include=*.go internal/statemachine
+machine_test.go:76 / :110 / :127 / :152 / :160 / :187   ＋ table_test.go:298 / :361 / :404 / :410      （共 10 枚）
+$ 同一把括号平衡尺逐枚判 Sink:
+SINK=YES  internal/statemachine/table_test.go:298   ← ★第二枚正控（Sink: func(e Effect){fired=append(...)}）
+其余 9 枚 SINK=no
+$ 包内非 test 面自己 New 一台机器 -> RC=1（零命中）
+$ grep -rn 'statemachine\.Sink' --include=*.go . | grep -v '^\./\.scratch' -> RC=1（★全仓连测试都没写出过这个类型名一次）
+$ grep -rn '\.Sink[[:space:]]*=[^=]' --include=*.go cmd internal tools scripts frontend | grep -v '^internal/statemachine/'
+internal/agent/harness_test.go:121:	o.Sink = h.sink                       (agent.Options)
+internal/agent/loop.go:209:		opt.Sink = NopSink{}                     (agent.Options，agent/sink.go:67 NopSink "used when no UI is wired")
+internal/llm/probe_health_test.go:125:	o.Sink = pf.sink                    (llm.HealthSink)
+internal/tools/subagent_197.go:301:	opt.Sink = nil                        ★本腿新认出的第四枚同名罐子＝agent.Options.Sink（不是状态机那枚）
+internal/tools/subagent_197.go:303:	opt.Sink = subagentTextSink{d: t.d}   ★同上
+```
+
+⇒ **名册（含本腿补的两枚）**：`consoleSink`＝`agent.Sink`（`cmd/wisp/run.go:998`）、`storeHealthSink`＝`llm.HealthSink`（`cmd/wisp/providers.go:194`）、`leg_sink_nail_131`/`installLogSink`＝日志收件人、**`subagentTextSink`／`agent.Options.Sink`＝票面「新增禁区」那节没列的第四族**（`internal/tools/subagent_197.go:301/:303`）。
+⇒ ⛔ 任何"有没有人接"的读数必须锚在**构造点闭合块里的 `Sink:` 字段**＋包名限定的类型面；裸 `grep Sink` 在 `cmd internal` 里的 5 枚赋值命中**没有一枚**是状态机那枚。
+
+### 1.6 全仓机器枚数（本腿这把尺的副产品，⛔ 三序件都没给过这个数）
+
+限定名 8 枚＋非限定名 10 枚＝**18 枚构造点**，其中带 Sink **2 枚**（`bridge_test.go:16`、`table_test.go:298`，都在测试里）、**不带 Sink 16 枚**（产码 2 ＋包外测试 5 ＋包内测试 9）。
+⇒ 这 16 枚是 §2② 里「乙一旦让默认罐子有副作用，被悄悄改写观测面」的定义域。
 
 ---
 
-## §5 没做完的格（逐枚具名，⛔ 不写成做完了）
-
-1. **2② Ⓓ 的 3 枚 `winlive` 构造点没量**：`internal/ball/hotkey_live_test.go:382`、`internal/ball/interaction_live_test.go:54`、`:134` 在乙 之下会不会真执行副作用／会不会变红——票面 §3 明令 `winlive` 未批，本腿没跑也没读它们的内容 ⇒ 登记为〔**仅本机可量，未批**〕。
-2. **2④ 的恒真预判没有运行时凭据**：全部是"读用例全文＋核对断言原文"级别的读数（Ⓐ 那枚 `TestSinkNoopDefault` 本腿通读了 `:184-195`），⛔ 本腿**一枚突变都没跑**（`go test -overlay` 也没跑）⇒ "把 `machine.go:64-68` 改回空罐会红几名"必须由跑突变的腿现量。
-3. **乙 的"包内落盘"那一形没量**：本腿的尺 A3 只扫了 `slog.`/`log.`/`^func `（结论＝包内唯一对外通道是 `log/slog`）；⛔ 没扫 `os.`／文件写入面。若乙 被选成"包内自己写文件/落盘"，它撞不撞 `cmd/wisp/config_readers_255.go` 的读点扫描名册（`TestTicket255RosterStillMatchesTheActualReadSites`，`config_receipt_255_test.go:230`），本腿**给不了数**。
-4. **票 255 那两枚用例的实际红名册没跑**：本腿只复跑了它们的**引用清单与断言原文**（`logs/17-…txt`），没跑测试 ⇒ 甲/乙 各形下"进红名册几枚"未量（这条正是 a1 §5-1 自己声明过的同一格，本腿没能力替它补）。
-5. **AC#0 的三把尺（行 56／唯一号 42／权威文字 40 条）与名册 50/62/33 本腿没复跑**：指令 §1 说 10-07 已量完并落账、不需重做；本腿只自己复跑到承重的"真收件人＝0"（§1.3）与"投递锚"那几把。⇒ 若编排者要"名册枚数"的**第三枚独立腿**读数，这格仍空。
-6. **`table.go:29` 的 `(1..40)` 与表体 41/42 的账面矛盾、`#41/#42` 的台账凭据（`A655`/`A656`）本腿未复对**：票面 `:61` 已由编排者 11:0x 裁并销账，且本腿指令 §3 禁动 `docs/PLAN.md`/D43 表 ⇒ 不在射程，只登记为"未复对"。
-7. **"50 枚副作用名 → 收件人"这张对应表仓里不存在**（本腿复认：`logs/06-…txt`／`logs/14-…txt` 两把尺都读 0——没有任何产码或测试把某枚名映射到某个收件人）。这张表要人工/编排者定，⛔ 本腿不填；它一旦沉进包里就变成 §2① 那 4 处契约文字的一部分。
-8. **票 AC#5 的四数本腿只跑了一数**：`sh scripts/d22scan.sh` rc=0 已交；`gofmt -l`／`gofumpt v0.12.0 -l`／`go vet ./cmd/wisp ./internal/statemachine/`／终态整包 `go test` 红名册**一枚都没跑**（指令 §3 禁抢 `274-r1` 的读数，且 §4 只授权 d22scan）。
-9. **`go list` 的读数没做 GOOS 交叉复跑**：`internal/models/assembly_reachability_121_test.go` 那把尺按 windows/linux/darwin 三个 GOOS 各跑一遍；本腿只在本机 GOOS（windows）上量了 `go list -deps`／`-deps -test` ⇒ §2③ 那张逐包表在另外两个 GOOS 下是否同表，未量（⚠ 特别是 `internal/ball`／`resident_*_windows.go` 这些带构建标记的件，在 linux 下可能整枚退出图）。
-
----
-
-## §6 与前序腿/背景不一致之处（具名报回，⛔ 本腿不改票面）
-
-| # | 出处原话 | 本腿现量 | 判定 |
-|---|---|---|---|
-| 1 | `273-a1` §2 乙栏：`statemachine → ball／panel／speech 任何一枚都成环` | `go list -deps`：`ball` prod=1（成环，**对**）；`panel` **prod=0**（生产图不成环，代价改形为"`go test`/`go vet ./internal/panel` setup failed"，仓外最小复现件钉住）；`speech` prod=0 且**包内只有 `doc.go` 一枚文件** | **形状不对**：panel 不是包级环而是 test 图环；speech 那一枚指过去是空壳 |
-| 2 | `273-a1` §2 乙栏：乙 要改的自述＝`doc.go` 两句＋`machine.go:25` 一句 | 尺 B10 逐名＝**4 处**：`doc.go:11-12`、`doc.go:15`、`machine.go:24-25`、`table.go:15-17`，另加字段注释 `machine.go:39 // nil = explicit no-op` | **枚数往少里数了**（本腿 4＋1 处） |
-| 3 | `273-a1` §2 甲栏：名册钉住 `cmd/wisp/models.go:163`（2 处引用）、`:183` | `logs/17-…txt`：`models.go` 在 `config_readers_255.go` 里出现 **4 行**（`:107`/`:109` 注释、`:112` 带行号的 cite、`:196` 文件名集合项）；被 `evidenceCite` 扫到并断言的只有 `models.go:163` **一枚行号**；`:183 [func loadModelConfig]` 只在**注释**里 ⇒ 不被断言 | **部分不对**（行号钉枚数＝1，不是 2＋1）；方向（"163 以上插行即红"）**复认为真** |
-| 4 | 背景转述：全仓机器构造点＝产码 2＋测试 6（票面 §2② 与更正一） | 限定名 8 枚**同数**；但把包内非限定写法 `New(Options{` 也算进来＝**18 枚构造点**（带 Sink 2、不带 16） | **同数但射程更宽**：`internal/statemachine` 自己那 10 枚构造点在任何"数构造点"的尺上都不能漏（`statemachine.New(` 这把尺对包内失明） |
-| 5 | 票面「新增禁区」列了三枚同名 `Sink` 罐子 | 本腿扫 `\.Sink[[:space:]]*=[^=]` 另见 `internal/tools/subagent_197.go:301/:303`（`opt.Sink = nil` / `= subagentTextSink{…}`，装的都是 `agent.Options.Sink`） | **第四枚同名罐子，新报**（裸 grep `Sink` 的假读数面比票面写的还宽一处） |
