@@ -162,16 +162,21 @@ the count is 32 not 19. (CRLF judged with `tr -cd '\r' | wc -c`, not `grep -c $'
   `TestScannerSelfScanOfRealRepoIsGreen`, `TestEmojiBanCoversGoSourcesNotJustDesign`, `TestBan8MathBandAndRemainingGaps` all PASS;
   then `d22scan: clean - no D22 ban violations`. (d22scan is its OWN module
   `tools/d22scan`, not the root module — no root `go build`/`go test` was run.)
-  raw: `logs/d22scan.out` / `logs/d22scan.err`.
+  raw: `logs/d22scan.txt` / `logs/d22scan.err`.
 - Ticket 161 self-check carrier for THIS script = `attrib.sh --self-test` (no separate
   wrapper exists under scripts/ or .scratch/wisp/probes/161/). On my **edited** file ->
-  **rc=0 SELF-TEST GREEN**, `cases=8 failures=0` (5 RING + 3 SILENT). raw: `logs/selftest-green.out`.
+  **rc=0 SELF-TEST GREEN**, `cases=8 failures=0` (5 RING + 3 SILENT). raw: `logs/selftest-green.txt`.
 - Carrier's positive control still reddens: copied my edited attrib.sh to 仓外
   (`D:/tmp/wisp275r1/attrib-mut.sh`), blinded the classifier's UNATTRIBUTABLE branch
   (`CL_RC=1` -> `0`, the 4-space line; the shared file was NOT edited), ran with
   `ATTRIB_ROOT=<repo>` -> **rc=1 SELF-TEST RED, failures=4** (the 4 unattributable
-  RING cases, while tracked + silent cases stay correct). raw: `logs/selftest-RED-proof.out`.
+  RING cases, while tracked + silent cases stay correct). raw: `logs/selftest-RED-proof.txt`.
   Shared attrib.sh md5 re-checked after this = 77ee11a8 (untouched by the 仓外 proof).
+
+NOTE on filenames: the committed `.gitignore:8` has a repo-wide `*.out` rule, so my
+first evidence commit silently skipped the three `.out` gate logs. They were renamed
+to `.txt` (not ignored) and re-committed; the raw gate output is now under
+`logs/d22scan.txt`, `logs/selftest-green.txt`, `logs/selftest-RED-proof.txt`.
 
 ## §7 最终自证 — final self-proof
 
