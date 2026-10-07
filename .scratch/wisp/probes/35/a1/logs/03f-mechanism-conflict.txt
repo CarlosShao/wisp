@@ -1,0 +1,51 @@
+### library Bind-generated JS (webview.go 464-500)
+464: 		window[name] = function() {
+465: 		  var seq = RPC.nextSeq++;
+466: 		  var promise = new Promise(function(resolve, reject) {
+467: 			RPC[seq] = {
+468: 			  resolve: resolve,
+469: 			  reject: reject,
+470: 			};
+471: 		  });
+472: 		  window.external.invoke(JSON.stringify({
+473: 			id: seq,
+474: 			method: name,
+475: 			params: Array.prototype.slice.call(arguments),
+476: 		  }));
+477: 		  return promise;
+478: 		}
+479: 	})()`)
+480: 
+481: 	return nil
+482: }
+
+### rpcMessage struct shape
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go:131:type rpcMessage struct {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-132-	ID     int               `json:"id"`
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-133-	Method string            `json:"method"`
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-134-	Params []json.RawMessage `json:"params"`
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-135-}
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-136-
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-137-func jsString(v interface{}) string { b, _ := json.Marshal(v); return string(b) }
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-138-
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-139-func (w *webview) msgcb(msg string) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go:140:	d := rpcMessage{}
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-141-	if err := json.Unmarshal([]byte(msg), &d); err != nil {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-142-		log.Printf("invalid RPC message: %v", err)
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-143-		return
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-144-	}
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-145-
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-146-	id := strconv.Itoa(d.ID)
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-147-	if res, err := w.callbinding(d); err != nil {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go-148-		w.Dispatch(func() {
+--
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/webview.go:162:func (w *webview) callbinding(d rpcMessage) (interface{}, error) {
+
+### does the page EVER call wispDispatch / window.wispProbeRT?
+   hits=0
+### POSITIVE CONTROL: same尺 on Go tree
+cmd/wisp/panel_host_windows.go:80:	panelDispatchBinding = "wispDispatch"
+cmd/wisp/panel_resident_windows.go:44:// behind window.wispDispatch), whose widening branches are fail-closed, and it adds
+cmd/wisp/panel_resident_windows_test.go:199:// was covering the mutation. So the reports ride window.wispDispatch, the product's own
+cmd/wisp/panel_resident_windows_test.go:301:	parts = append(parts, "window.wispDispatch("+reportJSEnv("ac13-probe", "b")+");")
+cmd/wisp/panel_resident_windows_test.go:801:		"window.wispDispatch(" + env("'ac14r-beacon'", "'SCRIPT-RAN'") + ");" +

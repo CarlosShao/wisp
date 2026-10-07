@@ -1,0 +1,47 @@
+### Go: the binding name actually installed
+cmd/wisp/panel_host_windows.go:80:	panelDispatchBinding = "wispDispatch"
+internal/panel/composer_test.go:101:  const bridge = window.wispBridge
+
+### C17 whitelist roster (internal/panel/bridge.go:36-56)
+34: // composerRouteLiterals() is built from these four constants and refuses any
+35: // "panel.*" literal the Go side does not answer; that nail's own positive
+36: // control is TestPlantedRendererDoorShapesGoRed (composer_test.go:533), which
+37: // points the same scan at a knowingly wrong tree. (This pointer used to name a
+38: // test that does not exist in this repository; ticket 35's snapshot pump was the
+39: // step that checked it, and the behaviour was already covered - only the name
+40: // was wrong.)
+41: const (
+42: 	MethodModeRequest      = "panel.mode.request"
+43: 	MethodWorkspaceRequest = "panel.workspace.request"
+44: 	MethodAttachmentAdd    = "panel.attachment.add"
+45: 	MethodMessageSend      = "panel.message.send"
+46: 	// MethodConfigGet and MethodConfigSet are ticket 248 AC#1's two settings
+47: 	// routes. Three facts about the naming, because each one is a decision
+48: 	// somebody could later "fix" by accident:
+49: 	//
+50: 	//   - The names are NOT invented here. They are the two spellings the
+51: 	//     product spec already carries (docs/specs/SPEC-08-ui-ball-panel.md:168,
+52: 	//     read-only for this leg), so this file follows a document rather than
+53: 	//     minting a fourth vocabulary.
+54: 	//   - They carry no `panel.` prefix on purpose, and that is load-bearing
+55: 	//     twice over: ticket 181's anti-drift nail in this package counts the
+56: 	//     `panel.*` literals of this file (git_test.go's whitelistMethodsFromSource
+
+### page: does any file name wispBridge besides panel.ts?
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:147:    wispBridge?: WispHostBridge;
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:154:  return window.wispBridge ?? window.chrome?.webview ?? null;
+
+### App.tsx:210-222 (the four-literal comment claim)
+210:           ) : null}
+211:         </div>
+212: 
+213:         <div className="flex min-w-0 flex-1 items-center gap-1.5">
+214:           {/* git branch. Reads its strings from the snapshot; a workspace that
+215:               is not a repo renders nothing at all rather than a chip. */}
+216:           <GitBranchChip
+217:             view={{ current: "", isRepo: false, local: [], worktrees: [] }}
+218:             onCheckout={() => undefined}
+219:             onNewWorktree={() => undefined}
+220:           />
+221:         </div>
+222: 

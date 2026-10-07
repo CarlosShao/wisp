@@ -1,0 +1,63 @@
+### receiver census (dir form, NOT the *.tsx glob that skips App.tsx)
+--- pattern: addEventListener
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:169:    document.addEventListener("keydown", onKey);
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:393:    window.addEventListener("resize", onResize);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/agent-screen.tsx:226:    document.addEventListener("keydown", onKey);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/flowchart.tsx:275:    document.addEventListener("pointerdown", close);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:553:    document.addEventListener("pointerdown", close);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:609:    window.addEventListener("pointermove", move);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:610:    window.addEventListener("pointerup", finish);
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:611:    window.addEventListener("pointercancel", finish);
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/app-harness.tsx:108:    document.addEventListener("keydown", onKey);
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/animated-list.tsx:150:    window.addEventListener('keydown', handleKeyDown);
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/magnet.tsx:85:    window.addEventListener('mousemove', handleMouseMove);
+dsh/feat/frontend-p0-v2:frontend/src/lib/use-dismiss.ts:46:    document.addEventListener("pointerdown", onPointerDown, true);
+dsh/feat/frontend-p0-v2:frontend/src/lib/use-dismiss.ts:47:    document.addEventListener("keydown", onKeyDown);
+dsh/feat/frontend-p0-v2:frontend/src/main.tsx:73:  close.addEventListener("click", () => note.remove());
+   hits=9 files
+--- pattern: webview
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:148:    chrome?: { webview?: WispHostBridge };
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:154:  return window.wispBridge ?? window.chrome?.webview ?? null;
+   hits=1 files
+--- pattern: onmessage
+   hits=0 files
+--- pattern: postMessage
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:141:  postMessage(message: string): void;
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:146:    /** Installed by WebView2's AddHostObjectToScript / postMessage pipe. */
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:179:  bridge.postMessage(
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:189: * One request on the panel's only envelope: the same postMessage pipe the
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:218:  bridge.postMessage(
+   hits=1 files
+--- pattern: MessageEvent
+   hits=0 files
+
+### App.tsx: props/snapshot wiring
+5:   snapshot the Go side pushes; the only local state is view preference (which
+38:import { useCallback, useEffect, useRef, useState } from "react";
+54:const EMPTY_COMPOSER: ComposerState = {
+70:const EMPTY: PanelSnapshot = {
+73:  composer: EMPTY_COMPOSER,
+91:export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) {
+92:  const composer = snapshot.composer ?? EMPTY_COMPOSER;
+97:  const [local, setLocal] = useState<{
+123:  const hostView = (snapshot as { view?: string }).view;
+124:  const view = hostView !== undefined ? currentView(snapshot) : (local.view ?? currentView(snapshot));
+126:  // categories. A snapshot that names one lands on the settings page AT that
+142:  const [sidebarOpen, setSidebarOpen] = useState(false);
+143:  useEffect(() => {
+157:  useEffect(() => {
+179:  // The permission tiers come from the snapshot's own vocabulary. The panel
+206:          {snapshot.pending.length > 0 ? (
+208:              待审批 {snapshot.pending.length}
+214:          {/* git branch. Reads its strings from the snapshot; a workspace that
+321:              {snapshot.pending.map((v) => (
+336:                    snapshot={snapshot}
+390:  const [narrow, setNarrow] = useState(read);
+391:  useEffect(() => {
+395:    // useState initialiser and this effect running.
+407:  snapshot,
+418:  snapshot: PanelSnapshot;
+431:  const turns = snapshot.results.map((chunk) => ({
+457:            {snapshot.results.length === 0 ? (
+461:                {snapshot.results.map((chunk) => (
+493:   one honest sentence each so that a snapshot still naming one lands somewhere

@@ -1,0 +1,38 @@
+### ref check
+16c2f038
+
+### panel.ts line count
+311
+
+### panel.ts: window surfaces / exported roster (with line numbers)
+24:export interface ApprovalCardView {
+50:export type ApprovalOutcome = "grant" | "refuse";
+70:export interface ComposerMode {
+80:export interface ComposerWorkspace {
+95:export interface ComposerAttachment {
+112:export interface ComposerState {
+122:export interface ResultChunkView {
+129:export interface PanelSnapshot {
+140:interface WispHostBridge {
+145:  interface Window {
+147:    wispBridge?: WispHostBridge;
+148:    chrome?: { webview?: WispHostBridge };
+152:function hostBridge(): WispHostBridge | null {
+154:  return window.wispBridge ?? window.chrome?.webview ?? null;
+158:export function hostedByNative(): boolean {
+169:export function requestApprovalResolution(
+173:  const bridge = hostBridge();
+205:function nextRequestId(): string {
+207:  const uuid = globalThis.crypto?.randomUUID?.();
+211:function sendRequest(method: string, payload: Record<string, unknown>): void {
+212:  const bridge = hostBridge();
+245:export function requestModeSwitch(to: string): void {
+254:export function requestWorkspaceChange(path: string): void {
+266:export function sendAttachmentBytes(
+281:export function submitAttachment(file: File): Promise<void> {
+283:    const reader = new FileReader();
+286:      const buf = reader.result;
+299:export function sendMessage(text: string, attachments: ComposerAttachment[]): void {
+303:function toBase64(buf: ArrayBuffer): string {
+304:  const bytes = new Uint8Array(buf);
+306:  const step = 0x8000;

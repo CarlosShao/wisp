@@ -1,0 +1,19 @@
+### dev-tree frontend/src: wispDispatch / wispBridge / receiver
+frontend/src/lib/panel.ts:147:    wispBridge?: WispHostBridge;
+frontend/src/lib/panel.ts:154:  return window.wispBridge ?? window.chrome?.webview ?? null;
+  ls frontend:
+VENDORED.md
+dist
+embed.go
+fixtures
+index.html
+node_modules
+package-lock.json
+package.json
+public
+scripts
+
+### does any Go file install a name containing 'Bridge' via Bind?
+cmd/wisp/panel_host_windows.go:668:	if err := w.Bind("wispProbeRT", func() string {
+  -> plus the constant:
+80:	panelDispatchBinding = "wispDispatch"

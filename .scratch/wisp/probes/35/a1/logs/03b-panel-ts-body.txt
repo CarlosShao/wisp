@@ -1,0 +1,121 @@
+### panel.ts 126-245 (WispHostBridge + hostBridge + sendRequest)
+126: }
+127: 
+128: /** What the host pushes on every state change (ticket 35 owns the pump). */
+129: export interface PanelSnapshot {
+130:   pending: ApprovalCardView[];
+131:   results: ResultChunkView[];
+132:   /** The input row's state, always read from here - never remembered (AC#4). */
+133:   composer: ComposerState;
+134:   /** ISO-8601 stamp of when Go built the snapshot; display only, never used
+135:       to derive state - the panel keeps none. */
+136:   generatedAt: string;
+137: }
+138: 
+139: /** Shape of the object WebView2 installs on the host page (C17). */
+140: interface WispHostBridge {
+141:   postMessage(message: string): void;
+142: }
+143: 
+144: declare global {
+145:   interface Window {
+146:     /** Installed by WebView2's AddHostObjectToScript / postMessage pipe. */
+147:     wispBridge?: WispHostBridge;
+148:     chrome?: { webview?: WispHostBridge };
+149:   }
+150: }
+151: 
+152: function hostBridge(): WispHostBridge | null {
+153:   if (typeof window === "undefined") return null;
+154:   return window.wispBridge ?? window.chrome?.webview ?? null;
+155: }
+156: 
+157: /** True inside WebView2, false in a plain browser (dev / typecheck harness). */
+158: export function hostedByNative(): boolean {
+159:   return hostBridge() !== null;
+160: }
+161: 
+162: /**
+163:  * Send one bridge request and return nothing: responses arrive as a fresh
+164:  * PanelSnapshot push, never as a return value, because a panel that keeps a
+165:  * copy of the answer would be a second state holder (PLAN.md:1044).
+166:  * Throws when there is no host: a silent no-op would look like a UI that
+167:  * worked while nothing was ever asked.
+168:  */
+169: export function requestApprovalResolution(
+170:   correlationId: string,
+171:   outcome: ApprovalOutcome,
+172: ): void {
+173:   const bridge = hostBridge();
+174:   if (!bridge) {
+175:     throw new Error(
+176:       "panel: no native host attached - the request was not sent (ticket 33 owns the WebView2 host)",
+177:     );
+178:   }
+179:   bridge.postMessage(
+180:     JSON.stringify({
+181:       method: "panel.approval.request",
+182:       correlationId,
+183:       outcome,
+184:     }),
+185:   );
+186: }
+187: 
+188: /**
+189:  * One request on the panel's only envelope: the same postMessage pipe the
+190:  * approval card uses (C17). There is no second channel, and a composer that
+191:  * needed one would be a composer with authority the native side never gave it.
+192:  *
+193:  * Every composer request carries requestId + source: the id is what lets an
+194:  * audit line and a card point back at the user's own click, and the source is
+195:  * the native side's routing claim (panel.ParseComposerRequest refuses anything
+196:  * that does not name "panel-composer"). It is NOT authority - the payload still
+197:  * passes the same guards on the Go side.
+198:  *
+199:  * Throws when no host is attached: a silent no-op here would look like a UI
+200:  * that accepted the user's intent while nothing was ever asked (ticket 83's
+201:  * family again).
+202:  */
+203: let requestSeq = 0;
+204: 
+205: function nextRequestId(): string {
+206:   requestSeq += 1;
+207:   const uuid = globalThis.crypto?.randomUUID?.();
+208:   return `pc-${requestSeq.toString()}-${uuid ?? "no-randomuuid"}`;
+209: }
+210: 
+211: function sendRequest(method: string, payload: Record<string, unknown>): void {
+212:   const bridge = hostBridge();
+213:   if (!bridge) {
+214:     throw new Error(
+215:       "panel: no native host attached - the request was not sent (ticket 33 owns the WebView2 host)",
+216:     );
+217:   }
+218:   bridge.postMessage(
+219:     JSON.stringify({
+220:       method,
+221:       requestId: nextRequestId(),
+222:       source: "panel-composer",
+223:       ...payload,
+224:     }),
+225:   );
+226: }
+227: 
+228: // There is deliberately NO fifth outbound route here. A `panel.view.request`
+229: // existed for about an hour on 2026-09-25; owner ruled Q-50 = 甲 ("先删掉这个请求"),
+230: // because Go's whitelist (internal/panel/bridge.go) answers four names, and a
+231: // fifth means the renderer names a route the native side does not answer - which
+232: // is exactly what internal/panel/composer_test.go:522 exists to catch (it was
+233: // red on two tests before this comment was written, green after). Re-adding one
+234: // is not a frontend change: it reopens C17's method whitelist, a contract-level
+235: // human-approval surface. Undo phrase: 「撤 Q-50 甲」.
+236: 
+237: /**
+238:  * Ask the native side to switch the permission mode. This is intent only: the
+239:  * call that actually changes the mode is perm.Store.Set on the Go side, which
+240:  * still costs the R20/M4 L2 strong confirmation and writes the audit line.
+241:  * Switching INTO the档 that stops asking questions is the one that needs it,
+242:  * and a renderer that could do it silently would be approving on nobody's
+243:  * behalf - which is why nothing below can record an outcome.
+244:  */
+245: export function requestModeSwitch(to: string): void {

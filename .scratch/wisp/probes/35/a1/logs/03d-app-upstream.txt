@@ -1,0 +1,125 @@
+### who renders <App> and what snapshot it passes
+dsh/feat/frontend-p0-v2:frontend/src/components/error-boundary.tsx:76:  render(): ReactNode {
+dsh/feat/frontend-p0-v2:frontend/src/components/showcase.tsx:272:              <ApprovalScreen snapshot={SHOWCASE_APPROVAL_SNAPSHOT} />
+dsh/feat/frontend-p0-v2:frontend/src/main.tsx:2:import { createRoot } from "react-dom/client";
+dsh/feat/frontend-p0-v2:frontend/src/main.tsx:13: *     through the C17 bridge - no query string, so this file renders <App />
+dsh/feat/frontend-p0-v2:frontend/src/main.tsx:97:  product: { area: "面板", node: <App /> },
+dsh/feat/frontend-p0-v2:frontend/src/main.tsx:98:  app: { area: "演示应用", node: <AppHarness /> },
+dsh/feat/frontend-p0-v2:frontend/src/main.tsx:110:createRoot(document.getElementById("root")!).render(
+
+### main.tsx full (numbered)
+1: import { StrictMode, type ReactNode } from "react";
+2: import { createRoot } from "react-dom/client";
+3: import App from "@/App";
+4: import { AppHarness } from "@/components/harness/app-harness";
+5: import { ErrorBoundary } from "@/components/error-boundary";
+6: import { Showcase } from "@/components/showcase";
+7: import { HARNESS_BANNER } from "@/fixtures/harness";
+8: import "./styles/theme.css";
+9: 
+10: /**
+11:  * The host page is loaded three ways and only one of them carries data:
+12:  *   - inside Wisp, WebView2 serves the embedded dist and Go pushes snapshots
+13:  *     through the C17 bridge - no query string, so this file renders <App />
+14:  *     with its empty frame and every unfed screen says so out loud;
+15:  *   - ?harness=1 renders the whole-application walkthrough (owner 2026-09-26:
+16:  *     "用户刚进来的时候，不是都进入一个新任务的窗口吗" - sidebar, new-task
+17:  *     entry, sessions, right rail, overlays), fed by fixtures;
+18:  *   - ?harness=2 keeps the component showcase this replaced.
+19:  * All harness modes are demo data behind a banner; the product panel has no
+20:  * fixture mode, because a fixture behind the real UI would be exactly the
+21:  * "假数据当真实字段" the P9 red line forbids.
+22:  */
+23: const harness = new URLSearchParams(location.search).get("harness");
+24: 
+25: /**
+26:  * The demo banner is a LAYOUT ROW, not an overlay.
+27:  *
+28:  * It used to be position:fixed on a 100vh app, so it sat on top of the first
+29:  * ~26px of the tree: the harness top bar vanished under it and the sidebar's
+30:  * workspace row was sliced in half. The owner asked for the banner to be
+31:  * always there and closable (2026-09-26) - "always there" is not "covering the
+32:  * header" - so for the app-shaped harness it now takes its own row: the
+33:  * attribute below makes <body> a flex column and lets #root take the rest,
+34:  * which is what lets the app root be h-full instead of h-screen.
+35:  *
+36:  * harness=2 (the component showcase) is a long scrolling page, so its banner
+37:  * keeps the overlay form - there is no top bar down there to hide.
+38:  *
+39:  * The product path never sets the attribute, so none of this applies to it.
+40:  */
+41: if (harness === "1" || harness === "2") {
+42:   const isApp = harness === "1";
+43:   if (isApp) {
+44:     document.documentElement.dataset.harnessBanner = "row";
+45:   }
+46:   const note = document.createElement("div");
+47:   note.setAttribute("role", "note");
+48:   note.style.cssText = [
+49:     isApp ? "flex:0 0 auto" : "position:fixed;left:0;right:0;top:0;z-index:9999",
+50:     "display:flex", "align-items:center", "gap:8px",
+51:     "padding:4px 10px", "font:500 11px/1.4 ui-monospace,monospace",
+52:     "background:var(--warn-soft)", "color:var(--warn)", "border-bottom:1px solid var(--warn-line)",
+53:   ].join(";");
+54: 
+55:   const text = document.createElement("span");
+56:   text.textContent = HARNESS_BANNER;
+57:   text.style.cssText = "flex:1;";
+58:   note.append(text);
+59: 
+60:   // owner 2026-09-26: 横幅一直压着顶栏，「首次加载一下，我点击关闭起码能关闭」。
+61:   // 关闭是纯 DOM 移除，不进 React 树、不落盘——刷新会重新出现（它仍然得在）。
+62:   const close = document.createElement("button");
+63:   close.type = "button";
+64:   close.textContent = "关闭";
+65:   close.setAttribute("aria-label", "关闭演示横幅");
+66:   close.style.cssText = [
+67:     "flex-shrink:0", "border:none", "cursor:pointer", "padding:0 6px",
+68:     "font:inherit", "border-radius:999px",
+69:     "background:transparent", "color:inherit",
+70:   ].join(";");
+71:   // Closing is a pure DOM removal (out of the React tree, never persisted) and
+72:   // the row it leaves behind closes with it, because #root is the flex sibling.
+73:   close.addEventListener("click", () => note.remove());
+74:   note.append(close);
+75: 
+76:   // prepend, not append: once <body> is a flex column the banner has to be the
+77:   // FIRST child, or it lands after #root and pins itself to the bottom edge -
+78:   // which hid the top bar and covered the sidebar's bottom block instead.
+79:   document.body.prepend(note);
+80: }
+81: 
+82: /**
+83:  * The three roots, each behind its own boundary. A throw in the product panel
+84:  * must not be able to take the showcase down with it, and vice versa - and the
+85:  * product panel is the one that matters.
+86:  *
+87:  * Scope, because it is easy to over-claim: this catches RENDER-time throws.
+88:  * It does not catch throws from event handlers, and the two most likely ones
+89:  * live there (Composer.send and the L2 card's 拒绝, both of which reach
+90:  * lib/panel.ts and throw when no native host is attached). Those need their
+91:  * own handling; see error-boundary.tsx for the same note on the other side.
+92:  *
+93:  * The area label is what the fallback says, so the three read differently
+94:  * instead of all three saying "出错了".
+95:  */
+96: const ROOTS = {
+97:   product: { area: "面板", node: <App /> },
+98:   app: { area: "演示应用", node: <AppHarness /> },
+99:   showcase: { area: "组件总览", node: <Showcase /> },
+100: } as const;
+101: 
+102: function root(): ReactNode {
+103:   if (harness === "1") return ROOTS.app.node;
+104:   if (harness === "2") return ROOTS.showcase.node;
+105:   return ROOTS.product.node;
+106: }
+107: 
+108: const area = harness === "1" ? ROOTS.app.area : harness === "2" ? ROOTS.showcase.area : ROOTS.product.area;
+109: 
+110: createRoot(document.getElementById("root")!).render(
+111:   <StrictMode>
+112:     <ErrorBoundary area={area}>{root()}</ErrorBoundary>
+113:   </StrictMode>,
+114: );
+115: 

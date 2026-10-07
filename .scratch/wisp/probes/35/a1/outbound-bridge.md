@@ -227,3 +227,129 @@ select { case rp.tasks <- fn: rp.mu.Unlock(); return true
 - 生产调用方：`RequestShow:378` / `RequestToggle:427` / `RequestDispose:442`（都是「把 Show/Hide/Destroy 搬上线程」那一族，见 `:408 showOnThread`）
   ⇒ **形状可抄，载荷还没人用过**（没有一枚调用者送过数据）。
 - teardown 侧：`:495` 「the published handle so nothing can Dispatch into a dead pump」——推送路径要与这条退出口对拍，否则会有「往死泵 Dispatch」的窗口。
+
+## S4 页面接收器有哪几种合法形状
+
+⛔ 全程走 git 对象层（`git show dsh/feat/frontend-p0-v2:<path>`／`git grep … -- 'frontend/src'`，ref 解析＝`16c2f038`）；
+**一步都没进 `D:/wt/fe`，仓内 `frontend/**` 一个字节都没落**（终态自查见 S6）。
+⛔ 负判决一律用目录形式 `-- 'frontend/src'`，没用那支会跳过 `App.tsx` 的 `*.tsx` glob。
+
+### 4.1 `frontend/src/lib/panel.ts` 今天暴露的桥面（311 行）
+
+**桥面只有一个方法，且方向是页→Go**：
+```ts
+140: interface WispHostBridge {
+141:   postMessage(message: string): void;
+142: }
+144: declare global {
+145:   interface Window {
+146:     /** Installed by WebView2's AddHostObjectToScript / postMessage pipe. */
+147:     wispBridge?: WispHostBridge;
+148:     chrome?: { webview?: WispHostBridge };
+152: function hostBridge(): WispHostBridge | null {
+154:   return window.wispBridge ?? window.chrome?.webview ?? null;
+```
+- `window.wispBridge` 与 `window.chrome?.webview` **两枚都只声明了同一枚方法 `postMessage(message: string)`**（`:141`）；
+  取值顺序 `wispBridge ?? chrome?.webview ?? null`（`:154`）。
+- 页侧出口函数共 6 枚，全部走 `bridge.postMessage(`（`:179`、`:218`）：
+  `requestApprovalResolution:169`、`requestModeSwitch:245`、`requestWorkspaceChange:254`、`sendAttachmentBytes:266`、
+  `submitAttachment:281`、`sendMessage:299`；外加 `hostedByNative:158`（＝`hostBridge() !== null`）、`sendRequest:211`、`nextRequestId:205`。
+- 类型侧的快照形状：`PanelSnapshot:129-137`（`pending / results / composer / generatedAt`），
+  注释 `:128` 逐字：**「What the host pushes on every state change (ticket 35 owns the pump).」**
+  ⇒ 页面的类型模型**从一开始就假定有一枚 host→页的 push**，缺的从来不是类型。
+
+### 4.2 WebView2 页侧接收 Go 推送的合法写法——以仓里真出现过的写法为据
+
+⛔ 不凭记忆编 API。仓里/探针里**真出现过**的只有下面三形，第四形（`chrome.webview.addEventListener('message')`）**在本仓零证据**：
+
+| 形 | 本仓的证据 | 状态 |
+|---|---|---|
+| 甲 `Eval` 写页面全局状态/DOM，页面**轮询**自己读到 | 探针 `-mode eval`／`eval-disp`：Go `Dispatch(Eval("document.title='…'"))`（`probes/33/p1/q2/main.go:283`、`:302`），页侧 `setInterval` 读 `document.title` 命中即 `wispReport("EVAL_SEEN")`（`:378-393`） | **实测收到过**（票头 `:21-25` 明确以页面的话为判据） |
+| 乙 `Eval` 调页面上的**全局函数**（`window.__x = …`／`fn(json)`） | 库自己的绑定回执就是这一形：`webview.go:156 Eval("window._rpc["+id+"].resolve("+string(b)+"); …")` | **生产在跑**（每次绑定调用都走），但载荷是绑定回执 |
+| 丙 `Init(js)` 在每次文档创建前注入一段脚本 | 库导出（`godoc :64`；实现 `chromium.go:130-136 AddScriptToExecuteOnDocumentCreated`），且 `Bind` 本身就靠 `Init` 装 `window[name]`（`webview.go:461` 起） | 通道存在，**本仓无生产 push 用过它** |
+| 丁 `chrome.webview.addEventListener('message')` ＋ Go 侧 `PostWebMessageAsJSON` | **零证据**：`PostWebMessage*` 在库里只是 vtbl 表项（`corewebview2.go:106-107`），无导出方法（票头 `:16-19` 已具名）；页侧 `addEventListener('message')`／`onmessage`／`MessageEvent` 于该 ref 的 `frontend/src` **共 0 命中** | **取不到仓内写法** ⇒ 不是「不行」，是**本仓没有先例、也没有可抄的正控**，选它＝从零验证 |
+
+⇒ 甲/乙/丙三形**在 Go 侧都是同一扇门**（`Eval`，区别只在页那头怎么读）；它们都要求 §3.2 那条：`Run()` 在抽队。
+
+### 4.3 页面要把收到的 JSON 灌进 `App({snapshot})`，缺的是哪一环
+
+**缺的那一环点名到文件:行：`frontend/src/main.tsx:97`**
+```
+ 97:   product: { area: "面板", node: <App /> },
+110:   createRoot(document.getElementById("root")!).render(
+```
+- `<App />` **不带任何 prop** 被挂载 ⇒ `App.tsx:91 export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot })`
+  的默认值 **`EMPTY`（`App.tsx:70-73` 定义）就是页面永远看到的唯一值**。
+  ⇒ **`snapshot` 的上游不是任何人**：`main.tsx:97` 是挂载点，`App.tsx:70/91` 是兜底，中间**没有 React state、没有 receiver、没有 store**。
+- 而 `main.tsx:12-13` 的注释逐字写着「inside Wisp, WebView2 serves the embedded dist and **Go pushes snapshots through the C17 bridge** -
+  no query string, so this file renders `<App />`」⇒ 页面作者**以为**这条 push 存在，实际挂载点没有 prop。
+- ⇒ 补齐「那一环」的最小清单（**不是选形，是缺件名册**）：①一枚 receiver（4.2 甲/乙/丙 任一的页侧读法），
+  ②一枚把 receiver 的值交给 React 的 state/订阅（`main.tsx` 或 `App.tsx` 内 `useState`＋`useEffect`），
+  ③`<App snapshot={…}/>` 的实参。今天 **①②③ 三件全无**。
+
+### 4.4 ⚠ 本节最该上报的一条：入向（页→Go）也不是「真在」，它只在对 Go 半截成立
+
+- Go 半截（与转述一致）：`panel_host_windows.go:80 panelDispatchBinding = "wispDispatch"`、`:405 w.Bind(panelDispatchBinding, …)` → `:630 dispatchRaw` → `internal/panel/composer_dispatch.go:181 HandleModeRequest(`。✅
+- **页半截不成立**：页面发的唯一形状是 `bridge.postMessage(JSON.stringify({method:"panel.mode.request", …}))`（`panel.ts:179-185`、`:218`），
+  走的是 **WebView2 原生 `chrome.webview.postMessage`**；而库把所有收到的消息一律按 **RPC 信封**解析
+  （`webview.go:131-135 type rpcMessage{ID;"id"; Method;"method"; Params;"params"}` → `:139 msgcb` → `:162 callbinding` 查 `w.bindings[d.Method]`）。
+  绑定名册（Go 生产只有两枚）＝ `wispDispatch`、`wispProbeRT` ⇒ `bindings["panel.mode.request"]` 查不到 ⇒ `callbinding` 回 `(nil, nil)`，
+  随后 `:156` 会对不存在的 `window._rpc[0]` 做 `.resolve`（TypeError 被 Eval 吞掉）。
+- **尺与正控**：`git grep -E "wispDispatch|wispProbeRT" dsh/feat/frontend-p0-v2 -- 'frontend/src'` ＝ **0 命中**；
+  同一把尺在 Go 树命中 5＋ 处（`panel_host_windows.go:80`、`panel_resident_windows.go:44`、`panel_resident_windows_test.go:199/301/801`，
+  其中 `:301` 与 `:801` 是产品自己的 AC#13/AC#14 探针**真调过** `window.wispDispatch(`）⇒ 尺能命中真东西，0 不是尺坏。
+- 另：dev 工作树那份 `frontend/src` 拷贝同尺同结果（`frontend/src/lib/panel.ts:147` 只有 `wispBridge`，全树 0 处 `wispDispatch`）。
+- `window.wispBridge` 这个名字在 Go 树里**没有任何一处安装它**（唯一出现是测试夹具 `internal/panel/composer_test.go:101`）。
+- ⇒ **精确表述**：Go→页缺；页→Go 是**两半各缺一块**——Go 那半的门开在 `window.wispDispatch(…)` 上，
+  页那半从来不叫这个名字，而是把信封直接 `postMessage` 给库的 RPC 解析器。**这座桥两头都没接上，只是 Go 这头有半根线。**
+
+## S5 禁区与代价表（可派单形状）
+
+### 5.1 四条硬禁区（逐条给出处）
+
+1. **⛔ 不新造 `C##`、不往 C17 方法白名单加名字**。白名单现量（`internal/panel/bridge.go:41-45` 的 const 块）＝ 6 枚：
+   `MethodModeRequest "panel.mode.request"`(:42)、`MethodWorkspaceRequest "panel.workspace.request"`(:43)、
+   `MethodAttachmentAdd "panel.attachment.add"`(:44)、`MethodMessageSend "panel.message.send"`(:45)、
+   外加 `bridge.go:46-49` 具名的票 248 两枚 `MethodConfigGet/MethodConfigSet`（**故意不带 `panel.` 前缀**，`:54-56` 写着这「load-bearing twice over」，
+   且 `git_test.go` 的 `whitelistMethodsFromSource` 在数 `panel.*` 字面量 ⇒ 加名＝同时踩白名单与反漂移钉）。
+   加名＝人工批准。**注**：本节 4.4 那条「页该改叫 `wispDispatch`」的形状**不加白名单名**，但会新增一枚 JS 全局名，派单要分清这两件事。
+2. **⛔ 面板只是「显示＋发起请求」的口，不许经它给权限/批准**。出处：`panel_resident_windows.go:41-47`
+   「it grants nothing: the only door it exposes to the page is the one … whose widening branches are fail-closed, and it adds no approval channel of its own」。
+3. **⛔ 宁缺毋造**：`App.tsx:214-215` 的注释声称「Reads its strings from the snapshot」，紧接 `:216-219` 的实参是四个字面量
+   （`view={{ current: "", isRepo: false, local: [], worktrees: [] }}`、`onCheckout={() => undefined}`、`onNewFrame` 同形）——**转述这条读数在盘上逐字成立，本腿复核通过**。
+   这座桥落地时同族那一形不许再被引入一次：拿不到真值的栏位只许画「没有」。
+4. **⛔ 页侧「记住一份答案」被明令禁止**（这一条是我在 4.1 读到的，不是转述）：`panel.ts:162-168` 逐字
+   「responses arrive as a fresh PanelSnapshot push, **never as a return value**, because a panel that keeps a copy of the answer would be a second state holder (PLAN.md:1044)」
+   ⇒ **S2.3 表里「页侧轮询绑定函数、从 Promise resolve 里读 JSON」那一形（我标为 A/D 的候选）被这行票面直接否掉**；
+   它技术上今天唯一跑得通，但要动 `panel.ts` 的既有契约文字 ⇒ 属**契约面**，不是实现细节。
+
+### 5.2 逐枚落点的代价表（选形归编排者）
+
+| 形 | 动的文件 | 新增依赖边 | 碰 STA 约束？ | 要解冻的既有钉／裁定 |
+|---|---|---|---|---|
+| **push 走 `Dispatch→Eval`**（复用 `post()`） | `cmd/wisp/panel_resident_windows.go`（新增方法）、`cmd/wisp/panel_pump.go:319`（记账后调它）、`cmd/wisp/run.go:734` 或 `:607/:725` 附近（把句柄递进 `agentRuntime`） | 包内注入，**无跨包边** | **是**：必须落 `post()` 的两态路由＋`wRef`（`S3.3`），且 `Eval` 闭包内不许阻塞 | `run.go:730-733` 那段「不给常驻腿第二条 publish 路」的裁定 |
+| **push 走 `Init` 预置回调**（Go 只 `Eval("window.__wispPush(json)")`） | 同上，外加页侧一处 receiver | 无 | 是（同上） | 无契约钉；但页侧新增全局名 |
+| **页→Go 改叫 `window.wispDispatch(env)`**（修 4.4） | 只动 `frontend/src/lib/panel.ts`（`hostBridge`/`sendRequest`） | 无 | **否**（入向不经新线程） | 动的是页面契约文字；`panel.ts:146` 那句「AddHostObjectToScript」是过期描述 |
+| **页侧轮询取包（绑定返回快照）** | Go 加第 9 枚绑定 ＋ 页侧 `useEffect` 轮询 | 无 | 否（走已有绑定回执） | ⛔ **撞 5.1-④**（`panel.ts:162-168` 明令「never as a return value」）＋ 可能需新绑定名 ⇒ 撞 5.1-① |
+| **`internal/panel` 直接握 webview** | — | ⛔ `internal/panel → 库` | — | ⛔ 点名禁过（票 255 AC#4 / 票 246 form 乙 / 票 238 cut-1），见 S2.3-E |
+| **新增 `PostWebMessageAsJSON` 通道** | 需在 Wisp 侧直调 COM vtbl，或换/patch 依赖 | 无 Go 包边，但**新增仓内 COM unsafe 代码** | 是 | ⛔ 会改 `go.mod` 依赖面（`go list -deps` 前后对拉那把尺会被触发）；且页侧**零先例**（4.2-丁） |
+
+**共同代价（不分形）**：载荷含 NUL ⇒ `log.Fatal` 退进程（`chromium.go:140-142`）；`Eval` 无回执 ⇒ 判据必须来自页面（探针 R25 教训）；
+`dispatchRaw` 的返回字符串今天**已经**经 `:156` 那条形回页 ⇒ 任何「页侧自己再造一条回执通道」都要与这条对拍，不要造出两份状态。
+
+## S6 终态自证
+
+见本件末尾「S6 输出原文」小节（与 `git status`／`git show --stat HEAD` 实测同批写入）。
+
+## 附：本腿推翻／收窄了派单里的哪几句
+
+| # | 派单原话 | 盘上实测 | 严重度 |
+|---|---|---|---|
+| 1 | 「`PostWebMessage\|EvaluateScript\|CreateWebMessageAsJson` 于 `cmd/wisp`＋`internal/panel` ＝ 0」 | 读数对，**尺为负**：这三个名字里 `EvaluateScript`/`CreateWebMessageAsJson` **根本不是这套 API 的拼写**，`PostWebMessage*` 只在库里作 COM vtbl 表项存在、无导出方法。库的真出向名册是 `Eval`/`Init`/`SetHtml` ＋跨线程门 `Dispatch` | 高——按原尺永远得不出「有/没有」的判决 |
+| 2 | 「出向（Go→页）**整条不存在**」 | **不准确**：库在每次绑定调用后都用 `Dispatch(Eval("window._rpc[i].resolve(…)"))` 把 Go 的返回值送回页面（`webview.go:148/152/156`），本仓生产每次面板交互都走它；`SetHtml` 更有 3 处生产调用。**缺的是 unsolicited push（Go 不经页问就先说）那一支，不是「Go→页这根线」** | 高——决定了落地腿是「新建通道」还是「给已有通道加发起端」 |
+| 3 | 「入向（页→Go）真在」 | **只对 Go 半截成立**：门在 `window.wispDispatch(…)`（`panel_host_windows.go:80`），页面从来不叫这个名字，它发 `chrome.webview.postMessage({method:"panel.mode.request",…})`（`panel.ts:179-185`），而库把一切收到的消息按 RPC 信封解析并查绑定表 ⇒ 查不到 ⇒ 空转。`git grep wispDispatch -- 'frontend/src'`＝0（正控：Go 测试里 2 处真调过） | **本腿最值钱**——两头都没接上 |
+| 4 | 「`func (m *PanelManager)` 导出方法共 8 枚」 | 复核**通过**：`IsCreated/IsShown/LastColdMs/LastHotMs/Show/HotShow/Hide/Destroy` 逐枚对上（`:268/276/285/286/481/547/574/615`）；非导出另有 11 枚声明行 | 低（确认） |
+| 5 | 「`lastPanelSnapshot()` 带括号数＝10 处调用全在 `_test.go`、非 test 0 处」 | 复核**通过**并加一条：非 test 唯一命中是 `panel_pump.go:383` 的**定义行本身**，不是调用 | 低（确认） |
+| 6 | 「泵在跑、只差 transport」 | 更硬的一层：`run.go:607 rt.ui = nil`（常驻腿递了 gate）＋ `run.go:734 if rt.ui != nil` ⇒ **持有 `PanelManager` 的那个进程今天一次都不调 `publishPanelSnapshot`**；而调得到它的控制台腿里 `PanelManager` 没被构造。`run.go:730-733` 还具名拒绝过补这条触发器 | 高——这是「隔着什么」的真答案 |
+| 7 | 「`App.tsx:216` 注释声称读快照、实参是四个字面量」 | 复核**通过**，逐字（`:214-215` 注释 vs `:216-219` `view={{ current:"", isRepo:false, local:[], worktrees:[] }}`） | — |
+| 8 | （派单未问，但会挡住选形） | `panel.ts:162-168` 已把「响应只能作为新快照 push 到达、**绝不用返回值**」写成契约（引 `PLAN.md:1044`）⇒ 「页侧轮询绑定函数读 Promise resolve」这一形**技术上今天唯一通、契约上被明令否掉** | 高 |
