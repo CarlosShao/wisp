@@ -13350,4 +13350,39 @@ dev 真身我现量重钉：挂载＝`main.tsx:58`（`<App />` **确实无 prop*
 
 **9. ★同一族我把分母自己扩了（补 §3；14:58 现量）**：起因＝`274-v1` 交件里那句"`gofmt -l`／`gofumpt -l` 都列 `cmd\wisp\models.go`，CR=334，属既有、不是 274 造成的"——我把它当**待验断言**自己复跑：`tr -cd '\r' < cmd/wisp/models.go`＝**334**、`git show HEAD:cmd/wisp/models.go`＝**0**、`gofumpt -l cmd/wisp/models.go` ⇒ **列出它**、`cmd/wisp` 的 **100 枚 Go 文件里恰好 1 枚带 CR＝就是它**。⇒ 本机 `gofumpt` 幻影全名册＝**5 枚**（`internal/` 那 4 枚＋`cmd/wisp/models.go`），⛔ 没有一枚是"源码没格式化"，以后派单口径那句按 5 枚写。⚠ 顺带一枚对本编队更通用的推论：**这 5 枚同时是"`git status` 里那些看着像别人在飞的改动"的一个候选来源**（`core.autocrlf=true` 的归一化会让内容相同的文件在 LF／CRLF 两种形状间跳）⇒ 以后凡是"某文件脏了"的归因，要先跑 `tr -cd '\r' | wc -c` 那一把再说话（第 118 条的操作性补句）。
 
+---
+
+## A675｜2026-10-07 15:1x｜收验收腿 `274-v1`（票 274「构建带页面」，非实现者，五笔 `ec1ccddd`／`3f7bd77d`／`15ff0846`／`955857e9`／`9b98cbe0`）＋★我自纠两枚枚数（CRLF 全名册 **13 枚**非 5 枚、`design` 起手脏 **31 行**非"4 枚 ` D`"）＋新立 **AC#10**（闸门只校存在、不校出处那一形＝腿的 M-iii 落绿）＋AC#9 降〔已成立・不可复核〕＋★面板↔Go 键名册那把尺今天为红（对 `35-r1`／票 145 是硬约束）（我翻 4 格：票面现 **7 勾／4 未勾**，⛔ 不加 `-done`）
+
+**1. 收档（盘上尺，⛔ 不采信通知正文）**：裁决表＝`.scratch/wisp/probes/274/v1/verdict.md`（**29,240 字节**）＋`logs/`＝**17 枚**；五笔 commit 全命中。写面纪律尺我现跑（尺＝`git show --name-only --format= <c> | grep -vc '^\.scratch/wisp/probes/274/v1/'`）＝总枚数 **1/1/1/12/5**、越界写面 **0/0/0/0/0**。六族 `cmd internal scripts tools .github docs frontend build` 现量 **0 行**；`git status --porcelain -- design`＝**16 ` D`／4 ` M`／11 `??`＝31 行**（＝起手形状，见 §2b）。被审件字节尺我也对回：`scripts/build.ps1` 盘上 md5 **`644c2f6af1fa3fc7f8b3ab38c20753f5`** ＝ `git show 35633445:scripts/build.ps1 | md5sum` 同一串 ⇒ 它审的就是那一笔的落地件。
+
+**2. ★我自纠两处（都是我把枚数／分母写小，原句不抹，A674 §9 那句照此更正）**：
+(a) **`gofumpt` 幻影"全名册＝5 枚"是 scope 越界**——我只量了 `internal/`＋`cmd/wisp` 两枚 scope 就写了"全名册"（第 119 条的行尾符变体，记我）。15:1x 现量尺＝`git ls-files '*.go'` 逐枚 `tr -cd '\r' | wc -c` >0 ⇒ 全仓跟踪 `.go` 带 CR＝**13 枚**＝产码 **5** 枚（`internal/tools/bridge.go` 1280／`internal/risk/provenance.go` 1115／`cmd/wisp/models.go` 334／`internal/agent/tools.go` 225／`internal/agent/approval/pending_read.go` 131）＋`.scratch/wisp/probes/257/r2/mut/M1–M8/firstrun*.go` **8** 枚（那是**已入库的别人台件**，名册＝`/d/tmp/a675-crlf-go.txt`）。⇒ 以后派单口径按 **13** 写；⛔ **任何腿不许去"格式化"这 13 枚**（动了＝改别人的证据件、对产码零收益）。
+(b) **简报与票面那句 `design` 起手脏＝"4 枚 ` D`"少计了 12 枚**：腿用 `git status --porcelain -- design | cut -c1-2 | sort | uniq -c` 现量 **16 ` D`**，我 15:1x 同一把尺复跑**逐字相同**。⇒ 处置不变（不碰、不算进任何作差），但"起手即脏的规模"被我写成实际的四分之一；这直接解释了 §5 那两枚 `design/assets/tokens.css` 相关的红。
+
+**3. 我翻四格：AC#1／AC#4／AC#6／AC#7（凭据主体＝腿自跑＋我这轮独立复认；⛔ 腿一枚都没翻）**：
+- **AC#1**（未修码读数：今天拦不住）成立——仓外硬链接镜像树 `D:/tmp/wisp274v1/tree` 里只 `unlink` 掉 3 枚陈旧件 ⇒ `go list -f '{{.EmbedFiles}}' ./frontend`＝**`[dist/.gitkeep]`**，正控（本仓工作树，未改一字节）＝4 枚；未修码那份 `35633445^:scripts/build.ps1`（172 行）整条走完 **`OLD_BUILD_PS1_PROCESS_EXITCODE=0`**（写了 SHA256SUMS、`wisp doctor: PASS`），而同一发里 `wisp panel-assets` 回 `assets NOT BUILT` rc=1 ⇒ 票面 §1 那句现象由非实现者独立复现，不是转述。
+- **AC#4**（反形敏感性／恒真句攻击）字面成立＋**一枚射程外缺口**——`Fail` 定义只有一枚出口 `exit 1`（`:38-41`，`grep -c 'exit 1' scripts/build.ps1`＝**1**），全脚本 **16** 枚 `Fail` 调用点里前端那一步占 **9** 枚（`:92/:110/:114/:127/:137/:149/:157/:160/:164`），各支报**不同**具名原因；CI 三处调用点 `ci.yml:571`／`:757`／`:820` 且 `grep -c '^[[:space:]]*continue-on-error:' .github/workflows/ci.yml`＝**0** ⇒ `exit 1` 真会把那一步染红。⛔ 但腿自造的 **M-iii** 落绿（见 §4）⇒ 按派单纪律"落绿那一格要具名说出并拒绝接受本格"，本格只按**字面命题**翻勾，缺口**不并进来**、单立 AC#10。
+- **AC#6**（门禁四数）成立，但两条读数必须并存：`sh scripts/d22scan.sh` rc=0 且**正控先绿**（`PASS=35 FAIL=0 SKIP=0`、`=== RUN=77`）；`go vet ./cmd/wisp/ ./internal/panel/` rc=0；整包 `go test ./cmd/wisp ./internal/... -count=1` 起手＝终态同一串四数 **`RUN=1839 PASS=1234 FAIL=6 SKIP=7`**、逐名红名册 6 枚作差＝0（那 6 枚的因都属别人在飞的 `design/**`／`frontend/**`／`%TEMP%` 路径形状，⛔ 不算 274 的账）；⚠ `gofmt -l cmd/wisp internal/panel` 与 gofumpt **v0.12.0 (go1.27.1)** 同列 `cmd\wisp\models.go`＝**CRLF 幻影**（§2a），⛔ 不许写成"不适用"。
+- **AC#7**：**实质成立／字面不成立**。盘上我复认＝仓内 `frontend/dist` 四枚 md5 起手/终态逐枚全等（腿在 unlink 前后各回查一次）、六族 porcelain 起手＝终态＝**0 行**；但票面 `:53` 字面"所有突变只走 `go test -overlay`"与 `:47` 自己给的第二条合法路线（"走 `-overlay` **或仓外合成 bundle**"）**不自洽**，而本票的突变对象是 PowerShell 看到的 PATH 与真实目录形状，overlay 在语义上够不着那一层。⇒ 我判：**腿的方法不追认、也不否定**；`:53` 那句起草错记我（§7），本轮不改文字。
+
+**4. ★新立 AC#10（出处＝腿的 M-iii 落绿；15:1x 编排者立框，票面已加框、⛔ 未勾）**：今天这道闸门校的是**"dist 里有没有页面字节"**，不是**"这些字节是不是这一趟构建出来的"**。腿那发 M-iii-2 的形状＝桩 `npm` 一个字节都不写，而 dist 里躺着 09-27 的陈旧页面 ⇒ `frontend ok: 4 file(s) …` 照打、整条 **`M_III_RERUN_PROCESS_EXITCODE=0`**、exe 报 `panel assets embedded: 4 files, entry=index.html built=true`、`-manifest` 逐枚有字节。⇒ 要的牙＝**本趟 `npm run build` 之前先拍 dist 名册快照，跑完名册必须换名**（或校 `index.html` 的 mtime 晚于 `frontend/src` 最新 mtime），判据写成**定向突变**（桩 npm 一字不写 ⇒ 必红），⛔ 不许写成"有没有 built 标志"那种两形都绿的恒真句。落点＝`scripts/build.ps1:148-165`（那段现量已在 `:166` 拼好 `$distRoster`，只是没跟"本趟 npm 之前"的快照对拉）。⚠ **与 AC#9 同族但不合并**：AC#9 管"读数必须同时给 fresh 名册＋内嵌物逐枚相同"（验收纪律），AC#10 管"闸门自己有没有牙"（产码）。
+**侧发现一枚（不属 274，登记即可）**：`build.ps1:192` 在没有 `.git` 的目录里跑 `git rev-parse --short HEAD` 会被 `$ErrorActionPreference='Stop'`（`:31`）升成 `NativeCommandError` 而整条 rc=1；该行 `35633445^:scripts/build.ps1:99` 就有 ⇒ ⛔ 不是 274 引入，CI 检出带 `.git` 不阻塞本票。
+
+**5. ★面板↔Go 键名册那把尺今天是红的（15:07:50 现量 `go test -count=1 ./internal/panel` rc=1，四枚；对 `35-r1`／票 145 是硬约束）**：
+`approval_test.go:129` `TestApprovalCardViewJSONKeysMatchFrontendTypes` ⇒ 逐字「Go Snapshot emits **[instructions tasks]** that interface PanelSnapshot does not declare」；
+`composer_test.go:74` `TestComposerContractTypesMatchFrontend` ⇒ 同一句「Go Snapshot emits **[instructions tasks]**…」＋「Go ComposerState emits **[git currentModel modelKnown credentialState credentialKnown]** that interface ComposerState does not declare」；
+`tokens_fourway_test.go:441` `TestC21DesignTokensFourWayAgree` ⇒ 「read design/assets/tokens.css: … The system cannot find the path specified.」＋`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme` 同因 ⇒ 后两枚归 §2b 那 **16 枚 ` D`**（别人在飞），⛔ 不算 274/35 的账。
+⇒ **约束（写进 `35-r1` 派单，也写给票 145 那一程）**：Go 侧每加一枚出向键，**必须同批改页面的声明面**（`frontend/src/types/**` 那两枚 interface），而 `frontend/**` 在本编队是**只读**（A655 只放开"读"）；⛔ 不许用"删 Go 字段"换绿（那是把功能删了，第 120 条同形）。⇒ 真要加键，只有两条合法路：**跨会话把字段对账结果交给前端那边**，或**具名解冻 `frontend/**` 写面**后再派。这一格先问的是解冻，⛔ 不是让腿自己猜。
+
+**6. 外部取数（我用 `gh` 自己现跑，腿取不到的那一半）＋AC#9 降级**：
+- `lint-frontend` 那一发的 vite 名册＝**3 枚**：`index-CZ-rxcIB.js 551.96 kB`／`index-yy8KMgdf.css 49.54 kB`／`index.html 1.04 kB`。⇒ ★**CSS 与本机那份 fresh 同名、JS 不同名**（本机**仓外 fresh** 那对＝`index-vdBrT8rM.js`／`index-yy8KMgdf.css`；⛔ 盘上 `frontend/dist` 里的 `index-BVKlegVD.js`／`index-BRKj5OIJ.css` 是 09-27 **陈旧件**，不是 fresh）⇒ **跨机器哈希名册不许互证**：同名≠同内容、异名≠异内容，只有"同一次运行内 A==B"作数（第 115 条的第三种变体，进记忆）。
+- `test-windows` step 6 `success`，但整发日志里 `node --version`／`node.exe` **零命中** ⇒ "Windows runner 有没有 Node"仍〔无凭据〕。甲那一形（`build.ps1` 真跑 `npm ci && npm run build`）会把这条边变成每台编译机的硬依赖 ⇒ ⛔ 取到读数前不选形（AC#2 仍不勾）。
+- **AC#9 由〔已成立〕降为〔已成立・不可复核〕**：`build/wisp.exe` 内嵌那 4 枚（`index-B8yINMF1.js`／`index-yy8KMgdf.css`）与盘上 dist（`index-BVKlegVD.js`／`index-BRKj5OIJ.css`）是**另外两枚名字** ⇒ "同一次运行"那一对已从盘上消失，凭据只剩日志。凡后续再拿 `build/wisp.exe` 报"带页面"，读数主体是它自己内嵌那份，⛔ 不是工作树的 dist。
+- exe 备份的可执行性我核过：`/d/tmp/wisp274r1/wisp.exe.pre-274r1-backup` 在盘，**31,076,405 字节**／md5 `7032d94d36b2e060ec4a24a6a04c1f47`，仓内现 exe md5 `e6c8e52bb14f15a7983bbc6b093e6058`＝另一枚 ⇒ 那句撤销口令「还原 274 前 exe」是真可执行的（仍未还原，等本票结案）。
+
+**7. 判据文字的一处自认错（本轮不改，具名挂账）**：票面 `:53`（AC#7）"所有突变只走 `go test -overlay`"与 `:47`（AC#1）"必须走 `go test -overlay` **或仓外合成 bundle**"两句不自洽，起因＝**我起草时把 Go 侧尺的规矩套到了构建脚本侧**。票面文字＝契约面，改它要人工批准 ⇒ 本轮只在台账记错，⛔ 不改一字，也⛔ 不因此否定腿的台件。今后立判据时问一句："这条**手段**限制，它服务的**目的**在原句哪一处？有没有第二种手段同样满足目的？"
+
+**8. 排程（据此更新）**：`274-r2`＝只做 **AC#10** 那一枚出处校验（落点 `scripts/build.ps1:148-165`，⛔ 不许顺带动别的 `Fail` 支；突变走仓外台件＋附还原自证）；`35-r1` 解除"等 `cmd/wisp` 整包窗口"那一半（`274-v1` 已交、六族现量 0 行），但派单**必须**按 §5 改写（带 `A671` 那族 `internal/panel/l2_grant_boundary_test.go` 行号＋本轮两组未声明键逐字红因）；票 274（剩 AC#0/AC#2/AC#8/AC#10）与票 262（剩 AC#5 父格＋ⓑ）都**不加 `-done`**；`build/wisp.exe` 仍不还原；⛔ 全程零 push（机主 10-07"暂时不推远程"仍生效）。
+
 
