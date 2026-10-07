@@ -1,0 +1,36 @@
+TestC21TableColourRowsMatchTokensCSS
+TestApprovalCardViewJSONKeysMatchFrontendTypes
+TestComposerContractTypesMatchFrontend
+TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+TestC21DesignTokensFourWayAgree
+pkg-fail-lines:
+ok  	github.com/CarlosShao/wisp/internal/agent	2.969s
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	0.559s
+ok  	github.com/CarlosShao/wisp/internal/audio	15.708s
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.359s
+ok  	github.com/CarlosShao/wisp/internal/buildinfo	0.055s
+ok  	github.com/CarlosShao/wisp/internal/config	1.891s
+ok  	github.com/CarlosShao/wisp/internal/llm	33.218s
+ok  	github.com/CarlosShao/wisp/internal/llm/adaptertest	2.512s
+ok  	github.com/CarlosShao/wisp/internal/llm/anthropic	14.774s
+ok  	github.com/CarlosShao/wisp/internal/llm/golden	0.090s
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	20.627s
+ok  	github.com/CarlosShao/wisp/internal/llm/openairesponses	18.974s
+ok  	github.com/CarlosShao/wisp/internal/memory	13.501s
+ok  	github.com/CarlosShao/wisp/internal/models	6.868s
+ok  	github.com/CarlosShao/wisp/internal/observe	3.719s
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	2.778s
+ok  	github.com/CarlosShao/wisp/internal/perm	0.399s
+ok  	github.com/CarlosShao/wisp/internal/plugin	0.129s
+ok  	github.com/CarlosShao/wisp/internal/proc	1.622s
+ok  	github.com/CarlosShao/wisp/internal/projctx	0.248s
+ok  	github.com/CarlosShao/wisp/internal/risk	5.257s
+ok  	github.com/CarlosShao/wisp/internal/secret	0.409s
+ok  	github.com/CarlosShao/wisp/internal/session	1.536s
+ok  	github.com/CarlosShao/wisp/internal/statemachine	0.291s
+ok  	github.com/CarlosShao/wisp/internal/tools	16.172s
+ok  	github.com/CarlosShao/wisp/internal/winsec	11.955s
+FAIL
+rc=0

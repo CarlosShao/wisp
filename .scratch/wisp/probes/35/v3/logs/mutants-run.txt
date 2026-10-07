@@ -1,0 +1,65 @@
+===== m-roster =====
+build rc=0
+run rc=1
+PASS count: 2
+FAIL count: 1
+--- FAIL: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+===== m-source =====
+build rc=0
+run rc=1
+PASS count: 2
+FAIL count: 1
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- FAIL: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+===== m-reqid =====
+build rc=0
+run rc=1
+PASS count: 2
+FAIL count: 1
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- FAIL: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+===== m-merge-generic =====
+build rc=0
+run rc=1
+PASS count: 0
+FAIL count: 3
+--- FAIL: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- FAIL: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- FAIL: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+===== m-merge-all3 =====
+build rc=0
+run rc=1
+PASS count: 0
+FAIL count: 3
+--- FAIL: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- FAIL: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- FAIL: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+===== m-hook =====
+build rc=0
+run rc=1
+PASS count: 0
+FAIL count: 3
+--- FAIL: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- FAIL: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- FAIL: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+===== m-legal =====
+build rc=0
+run rc=1
+PASS count: 2
+FAIL count: 1
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- FAIL: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+ALLDONE
+mutant=m-roster named-tests=3 FAIL=1 PASS=2
+mutant=m-source named-tests=3 FAIL=1 PASS=2
+mutant=m-reqid named-tests=3 FAIL=1 PASS=2
+mutant=m-merge-generic named-tests=3 FAIL=3 PASS=0
+mutant=m-merge-all3 named-tests=3 FAIL=3 PASS=0
+mutant=m-hook named-tests=3 FAIL=3 PASS=0
+mutant=m-legal named-tests=3 FAIL=1 PASS=2
+mutant=m-this named-tests=3 FAIL=0 PASS=3

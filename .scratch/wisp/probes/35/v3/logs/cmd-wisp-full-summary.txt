@@ -1,0 +1,21 @@
+=== cmd/wisp whole-package reading (35-v3 owns it this wave per A685 5) — FINAL ===
+exe: /d/tmp/wisp35v3/panel.test.exe (unmutated, //go:build windows, NO winlive tag), CWD=cmd/wisp, args '-test.run .* -test.v'
+named-PASS: 338
+named-FAIL: 5
+named-SKIP: 1
+package tail:
+--- PASS: TestTicket224ProductionSessionDoesNotSurviveRestart (3.05s)
+FAIL
+rc=1
+the trio:
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+FAIL roster:
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (5.05s)
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.11s)
+--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (20.01s)
+--- FAIL: TestAC14AwaitedBindingReplyReachesThePage (20.01s)
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (20.01s)
+winlive-tagged tests skipped? (want >0 SKIP lines mentioning live):
+--- SKIP: TestPanelHostLatencyPercentilesAC2 (0.00s)

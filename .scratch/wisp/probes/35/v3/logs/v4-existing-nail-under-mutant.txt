@@ -1,0 +1,20 @@
+=== existing l2 nail under M-R (roster guard neutralised) ===
+rc=1
+=== RUN   TestGrantWireShapesAreRefusedAtTheDoor
+=== RUN   TestGrantWireShapesAreRefusedAtTheDoor/the_historical_wire_shape_is_refused_because_Go_does_not_answer_its_route
+    l2_grant_boundary_test.go:1972: ParseComposerRequest accepted "{\"method\":\"panel.approval.request\",\"requestId\":\"r-1\",\"source\":\"panel-composer\",\"correlationId\":\"c-1\",\"outcome\":\"grant\"}" (parsed as {Method:panel.approval.request RequestID:r-1 Source:panel-composer To: Path: Text: AttachmentPayload:{Name: DeclaredMIME: SizeBytes:0 DataBase64:} Attachments:[] ConfigField: ConfigProvider: ConfigModel: ConfigValue:}) - a grant request walked through the door D33/F2 keeps shut
+    l2_grant_boundary_test.go:1972: ParseComposerRequest accepted "{\"method\":\"approval.decide\",\"requestId\":\"r-1\",\"source\":\"panel-composer\",\"outcome\":\"grant\"}" (parsed as {Method:approval.decide RequestID:r-1 Source:panel-composer To: Path: Text: AttachmentPayload:{Name: DeclaredMIME: SizeBytes:0 DataBase64:} Attachments:[] ConfigField: ConfigProvider: ConfigModel: ConfigValue:}) - a grant request walked through the door D33/F2 keeps shut
+    l2_grant_boundary_test.go:1972: ParseComposerRequest accepted "{\"method\":\"panel.l2.allow\",\"requestId\":\"r-1\",\"source\":\"panel-composer\",\"allow\":true}" (parsed as {Method:panel.l2.allow RequestID:r-1 Source:panel-composer To: Path: Text: AttachmentPayload:{Name: DeclaredMIME: SizeBytes:0 DataBase64:} Attachments:[] ConfigField: ConfigProvider: ConfigModel: ConfigValue:}) - a grant request walked through the door D33/F2 keeps shut
+    l2_grant_boundary_test.go:1972: ParseComposerRequest accepted "{\"method\":\"panel.grant\",\"requestId\":\"r-1\",\"source\":\"panel-composer\",\"approved\":true}" (parsed as {Method:panel.grant RequestID:r-1 Source:panel-composer To: Path: Text: AttachmentPayload:{Name: DeclaredMIME: SizeBytes:0 DataBase64:} Attachments:[] ConfigField: ConfigProvider: ConfigModel: ConfigValue:}) - a grant request walked through the door D33/F2 keeps shut
+=== RUN   TestGrantWireShapesAreRefusedAtTheDoor/every_answered_route_drops_a_smuggled_verdict
+--- FAIL: TestGrantWireShapesAreRefusedAtTheDoor (0.00s)
+=== control: same nail, unmutated ===
+rc=0
+0
+3
+=== which shapes fire under M-R (want the two that carry requestId+source) ===
+accepted "{\"method\":\"panel.approval.request\",\"requestId\":\"r-1\",\"source\":\"panel-composer\",\"correlationId\":\"c-1\",\"outcome\":\"grant\"}"
+accepted "{\"method\":\"approval.decide\",\"requestId\":\"r-1\",\"source\":\"panel-composer\",\"outcome\":\"grant\"}"
+accepted "{\"method\":\"panel.l2.allow\",\"requestId\":\"r-1\",\"source\":\"panel-composer\",\"allow\":true}"
+accepted "{\"method\":\"panel.grant\",\"requestId\":\"r-1\",\"source\":\"panel-composer\",\"approved\":true}"
+rc=0 (this line: artefact self-stamp; the two go-test rc lines above are the readings)

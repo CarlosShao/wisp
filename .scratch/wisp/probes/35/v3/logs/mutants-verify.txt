@@ -1,0 +1,105 @@
+=== m-roster ===
+changed-line-count: 2
+@@ -129,7 +129,7 @@
+ 		return r, fmt.Errorf("%w: 不是可解析的封套：%v", ErrComposerRequest, err)
+ 	}
+ 	r.Method = strings.TrimSpace(r.Method)
+-	if !knownComposerMethod(r.Method) {
++	if false && !knownComposerMethod(r.Method) {
+ 		return r, fmt.Errorf("%w: 方法 %q 不是面板 composer 通路的能力入口", ErrComposerRequest, r.Method)
+ 	}
+ 	if strings.TrimSpace(r.Source) != ComposerRequestSource {
+overlay json: {"Replace": {"D:/work/workspace/projects plans/Wisp/internal/panel/bridge.go": "/d/tmp/wisp35v3/m-roster/bridge.go"}}
+=== m-source ===
+changed-line-count: 2
+@@ -132,7 +132,7 @@
+ 	if !knownComposerMethod(r.Method) {
+ 		return r, fmt.Errorf("%w: 方法 %q 不是面板 composer 通路的能力入口", ErrComposerRequest, r.Method)
+ 	}
+-	if strings.TrimSpace(r.Source) != ComposerRequestSource {
++	if false && strings.TrimSpace(r.Source) != ComposerRequestSource {
+ 		return r, fmt.Errorf("%w: 来源 %q 不是 %q，按伪造/串台拒绝（requestId=%q）",
+ 			ErrComposerRequest, r.Source, ComposerRequestSource, r.RequestID)
+ 	}
+overlay json: {"Replace": {"D:/work/workspace/projects plans/Wisp/internal/panel/bridge.go": "/d/tmp/wisp35v3/m-source/bridge.go"}}
+=== m-reqid ===
+changed-line-count: 2
+@@ -136,7 +136,7 @@
+ 		return r, fmt.Errorf("%w: 来源 %q 不是 %q，按伪造/串台拒绝（requestId=%q）",
+ 			ErrComposerRequest, r.Source, ComposerRequestSource, r.RequestID)
+ 	}
+-	if strings.TrimSpace(r.RequestID) == "" {
++	if false && strings.TrimSpace(r.RequestID) == "" {
+ 		return r, fmt.Errorf("%w: 缺少 requestId，无法与审计/卡片对齐（method=%q）",
+ 			ErrComposerRequest, r.Method)
+ 	}
+overlay json: {"Replace": {"D:/work/workspace/projects plans/Wisp/internal/panel/bridge.go": "/d/tmp/wisp35v3/m-reqid/bridge.go"}}
+=== m-merge-generic ===
+changed-line-count: 8
+@@ -130,15 +130,13 @@
+ 	}
+ 	r.Method = strings.TrimSpace(r.Method)
+ 	if !knownComposerMethod(r.Method) {
+-		return r, fmt.Errorf("%w: 方法 %q 不是面板 composer 通路的能力入口", ErrComposerRequest, r.Method)
++		return r, fmt.Errorf("%w: 面板请求被拒绝", ErrComposerRequest)
+ 	}
+ 	if strings.TrimSpace(r.Source) != ComposerRequestSource {
+-		return r, fmt.Errorf("%w: 来源 %q 不是 %q，按伪造/串台拒绝（requestId=%q）",
+-			ErrComposerRequest, r.Source, ComposerRequestSource, r.RequestID)
++		return r, fmt.Errorf("%w: 面板请求被拒绝", ErrComposerRequest)
+ 	}
+ 	if strings.TrimSpace(r.RequestID) == "" {
+-		return r, fmt.Errorf("%w: 缺少 requestId，无法与审计/卡片对齐（method=%q）",
+-			ErrComposerRequest, r.Method)
++		return r, fmt.Errorf("%w: 面板请求被拒绝", ErrComposerRequest)
+ 	}
+ 	return r, nil
+ }
+overlay json: {"Replace": {"D:/work/workspace/projects plans/Wisp/internal/panel/bridge.go": "/d/tmp/wisp35v3/m-merge-generic/bridge.go"}}
+=== m-merge-all3 ===
+changed-line-count: 8
+@@ -130,15 +130,13 @@
+ 	}
+ 	r.Method = strings.TrimSpace(r.Method)
+ 	if !knownComposerMethod(r.Method) {
+-		return r, fmt.Errorf("%w: 方法 %q 不是面板 composer 通路的能力入口", ErrComposerRequest, r.Method)
++return r, fmt.Errorf("%w: 入向请求不合（不是面板 composer 通路的能力入口／按伪造/串台拒绝／缺少 requestId）method=%q", ErrComposerRequest, r.Method)
+ 	}
+ 	if strings.TrimSpace(r.Source) != ComposerRequestSource {
+-		return r, fmt.Errorf("%w: 来源 %q 不是 %q，按伪造/串台拒绝（requestId=%q）",
+-			ErrComposerRequest, r.Source, ComposerRequestSource, r.RequestID)
++return r, fmt.Errorf("%w: 入向请求不合（不是面板 composer 通路的能力入口／按伪造/串台拒绝／缺少 requestId）method=%q", ErrComposerRequest, r.Method)
+ 	}
+ 	if strings.TrimSpace(r.RequestID) == "" {
+-		return r, fmt.Errorf("%w: 缺少 requestId，无法与审计/卡片对齐（method=%q）",
+-			ErrComposerRequest, r.Method)
++return r, fmt.Errorf("%w: 入向请求不合（不是面板 composer 通路的能力入口／按伪造/串台拒绝／缺少 requestId）method=%q", ErrComposerRequest, r.Method)
+ 	}
+ 	return r, nil
+ }
+overlay json: {"Replace": {"D:/work/workspace/projects plans/Wisp/internal/panel/bridge.go": "/d/tmp/wisp35v3/m-merge-all3/bridge.go"}}
+=== m-hook ===
+changed-line-count: 2
+@@ -697,7 +697,7 @@
+ 	}); err != nil {
+ 		return err
+ 	}
+-	w.Init(panelPostMessageForwardInit)
++	_ = panelPostMessageForwardInit
+ 	return nil
+ }
+ 
+overlay json: {"Replace": {"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "/d/tmp/wisp35v3/m-hook/panel_host_windows.go"}}
+=== m-legal ===
+changed-line-count: 2
+@@ -79,7 +79,7 @@
+ const (
+ 	envelope35r3UnregisteredName = `{"method":"panel.approval.request","correlationId":"pc-35r3-approval-1","outcome":"allow"}`
+ 	envelope35r3WrongSource      = `{"method":"panel.mode.request","requestId":"pc-35r3-2-9e7a-4c1b","source":"panel-composer-x","to":"ask_every_step"}`
+-	envelope35r3MissingID        = `{"method":"panel.mode.request","source":"panel-composer","to":"ask_every_step"}`
++	envelope35r3MissingID        = `{"method":"panel.mode.request","requestId":"pc-35v3-legal","source":"panel-composer","to":"ask_every_step"}`
+ )
+ 
+ // deliverViaPageEdge35r3 wires the shipping transport onto a fresh document and posts
+overlay json: {"Replace": {"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_inbound_guards_35r3_test.go": "/d/tmp/wisp35v3/m-legal/panel_inbound_guards_35r3_test.go"}}
+rc=0 (verification artefact; repo files untouched, copies live in D:/tmp/wisp35v3)

@@ -1,0 +1,12 @@
+=== repo files untouched after all overlay runs (blob vs working tree hash) ===
+bebe8e702a85c640641551e93dd09936530950f4
+bebe8e702a85c640641551e93dd09936530950f4
+26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+7185ab56d75952247226feb404add6642fc0e336
+7185ab56d75952247226feb404add6642fc0e336
+a917e0dc1e2ef0801c189da66a6b726de3c45301
+a917e0dc1e2ef0801c189da66a6b726de3c45301
+=== git status of those four (want no M) ===
+(no output above = clean)
+rc=0

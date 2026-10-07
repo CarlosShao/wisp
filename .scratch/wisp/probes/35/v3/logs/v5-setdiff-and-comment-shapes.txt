@@ -1,0 +1,13 @@
+=== r3 file: the dispatchRaw / Eval hits in context (are they comments?) ===
+24:// w.Eval("window.wispDispatch(...)") (that is N6, the test playing the page, zero
+43:// (panel_host_windows.go:694-696, `reply, _ := m.dispatchRaw(...)`), so the yard's
+=== l2 nail: the 2 transport-word hits in context ===
+20://	   ->      bridge.postMessage(JSON.stringify({method:"panel.approval.request", correlationId, outcome}))
+72:// postMessage today. A green run here therefore does NOT mean "the panel cannot
+=== internal reds set-diff vs known 5 ===
+known-only:
+new-only:
+counts: known=5 got=5
+=== intermittent gates present? ===
+0
+rc=0

@@ -1,0 +1,53 @@
+		}
+	}
+
+	// Nothing approval-shaped may be answered. These are the spellings a wiring
+	// commit would plausibly use, starting with the one the removed button
+	// already emitted.
+	for _, cand := range []string{
+		"panel.approval.request", // verbatim from frontend/src/lib/panel.ts:181
+		"panel.approval.grant",
+		"panel.approval.resolve",
+		"panel.approval.decide",
+		"panel.l2.allow",
+		"panel.l2.grant",
+		"panel.grant",
+		"panel.allow",
+		"panel.mode.approve",
+		"approval.decide",
+		"approval.grant",
+	} {
+		if knownComposerMethod(cand) {
+			t.Errorf("knownComposerMethod answers %q - an approval decision addressed from the panel", cand)
+		}
+	}
+
+	// The oracle, pointed the other way: every name this package spells out gets
+	// asked of the RUNNING guard, not of the AST. The loop above can only ever
+	// report what its own enumeration found, so a second chain that
+	// knownComposerMethod hands its decision to (acceptance r1's M4, and the M13
+	// that combines it with a renamed route key) used to leave this test green
+	// while ParseComposerRequest accepted the route.
+	pool := routeNamePool(pkg)
+}
+
+// TestGrantWireShapesAreRefusedAtTheDoor is facet 3, behavioural: what actually
+// happens on the wire today when a request carries a verdict.
+func TestGrantWireShapesAreRefusedAtTheDoor(t *testing.T) {
+	t.Run("the historical wire shape is refused because Go does not answer its route", func(t *testing.T) {
+		// The body l2-approval-card.tsx:163 emitted via panel.ts:181, verbatim,
+		// plus the identity fields the current envelope demands.
+		for _, raw := range []string{
+			`{"method":"panel.approval.request","correlationId":"c-1","outcome":"grant"}`,
+			`{"method":"panel.approval.request","requestId":"r-1","source":"panel-composer","correlationId":"c-1","outcome":"grant"}`,
+			`{"method":"approval.decide","requestId":"r-1","source":"panel-composer","outcome":"grant"}`,
+			`{"method":"panel.l2.allow","requestId":"r-1","source":"panel-composer","allow":true}`,
+			`{"method":"panel.grant","requestId":"r-1","source":"panel-composer","approved":true}`,
+		} {
+			parsed, err := ParseComposerRequest(raw)
+			if err == nil {
+				t.Errorf("ParseComposerRequest accepted %q (parsed as %+v) - a grant request walked through the door D33/F2 keeps shut", raw, parsed)
+				continue
+			}
+			if !errors.Is(err, ErrComposerRequest) {
+rc=0 (excerpt of HEAD internal/panel/l2_grant_boundary_test.go lines 1245-1275 and 1955-1975)
