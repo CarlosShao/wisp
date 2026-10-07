@@ -1,0 +1,39 @@
+=== d22scan positive control present? ===
+3:--- PASS: TestScanDetectsAllSeededViolations (0.04s)
+5:--- PASS: TestScanCleanRepoIsGreen (0.03s)
+7:--- PASS: TestAllowlistSuppressesOnlyListedPaths (0.02s)
+13:--- PASS: TestCheckRootRejectsBlindRoots (0.03s)
+19:--- PASS: TestScanAloneIsNotAFalsifier (0.00s)
+=== restoration self-proof ===
+HEAD now: 355f05e2
+log: 355f05e2 275-r2 落 AC#6 两件事：:355 banner 改实话 ＋ --self-test 补一枚行为级"报名字"正控
+log: 7b3a7b8a 自纠（时刻戳）＋台账 A669 第 5 段：我在 A668/A669 与票 275/276 抬头写的 13:4x／13:5x 是**当时还没到的未来时刻**
+log: dd71a487 275-r2 起手锚：attrib.sh 未改动（md5 77ee11a8／459 行）＋改前两发原始读数
+log: 381f18be 立票 276（第二桩归口票）＋台账 A669：票 275 那句"另立一票"落成盘上对象；★不做〔已裁，非结案〕＝状态，⛔ 今天不排腿
+md5 attrib.sh start=77ee11a8d0cc8dd8248c6a9b8e164a78 end=3475f583fc237ec1b6aada3dc6c9ca82 (changed by design)
+two other legs' samples vs HEAD (must be empty): 0
+git ls-files '*.go' = 935 (start 935)
+porcelain total = 765
+porcelain cmd:      0
+porcelain internal: 0
+porcelain scripts:  0
+porcelain .github:  0
+porcelain frontend: 0
+porcelain design:   31
+porcelain docs:     0
+--- files touched by my two commits ---
+dd71a487 275-r2 起手锚：attrib.sh 未改动（md5 77ee11a8／459 行）＋改前两发原始读数
+ .scratch/wisp/probes/275/r2/anchor.txt             | 31 +++++++++++++++++++
+ .../wisp/probes/275/r2/logs/selftest-before.err    |  0
+ .../wisp/probes/275/r2/logs/selftest-before.txt    | 11 +++++++
+ .scratch/wisp/probes/275/r2/logs/shn-before.err    |  0
+ .../probes/275/r2/logs/tracked-only-before.err     |  1 +
+ .../probes/275/r2/logs/tracked-only-before.txt     | 35 ++++++++++++++++++++++
+ 6 files changed, 78 insertions(+)
+355f05e2 275-r2 落 AC#6 两件事：:355 banner 改实话 ＋ --self-test 补一枚行为级"报名字"正控
+ .scratch/wisp/probes/161/r5/attrib.sh | 92 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 91 insertions(+), 1 deletion(-)
+--- working-tree diff of attrib.sh vs its committed state (must be empty) ---
+0
+--- .github untouched by me ---
+0

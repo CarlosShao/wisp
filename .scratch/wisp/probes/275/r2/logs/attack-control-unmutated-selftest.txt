@@ -1,0 +1,12 @@
+== attrib.sh --self-test: the classifier, fed as text (v0.12.0 (go1.27.1))
+   PASS  want rc=1 verdict=UNATTRIBUTABLE    got rc=1  .scratch/wisp/probes/999/bad-sample.go (path claims ticket 999 but .scratch/wisp/issues/999-*.md does not exist, class=untracked, parse_err=0) <== REAL INJURY
+   PASS  want rc=1 verdict=UNATTRIBUTABLE    got rc=1  .scratch/wisp/probes/999/bad-sample.go (path claims ticket 999 but .scratch/wisp/issues/999-*.md does not exist, class=untracked, parse_err=1) <== REAL INJURY
+   PASS  want rc=1 verdict=UNATTRIBUTABLE    got rc=1  .scratch/wisp/probes/777/second-fake-ticket.go (path claims ticket 777 but .scratch/wisp/issues/777-*.md does not exist, class=untracked, parse_err=0) <== REAL INJURY
+   PASS  want rc=1 verdict=UNATTRIBUTABLE    got rc=1  internal/tools/not_a_bench_path.go (no probes/<NN>/ path segment, class=untracked, parse_err=0) <== REAL INJURY
+   PASS  want rc=1 verdict=TRACKED<CI-RED>   got rc=1  tools/d22scan/main.go (parse_err=0) <== TRACKED BYTES ARE DIRTY
+   PASS  want rc=0 verdict=ticket-161        got rc=0  .scratch/wisp/probes/161/r5/negative-control/bad-sample.go (untracked, parse_err=0)
+   PASS  want rc=0 verdict=ticket-161        got rc=0  .scratch/wisp/probes/161/r5/negative-control/bad-sample.go (untracked, parse_err=1)
+   PASS  want rc=0 verdict=ticket-169        got rc=0  .scratch/wisp/probes/169/a-bench-sample.go (untracked, parse_err=0)
+   PASS  want rc=2+roster-names-the-sample  got rc=2 rows=1  throwaway tracked tree left at: /tmp/wisp-275-r2-rosterctl.Wl5qKY
+attrib.sh: --self-test cases=9 failures=0
+attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns

@@ -1,0 +1,38 @@
+=== who owns the porcelain drift (must be nobody of mine except my own new dir) ===
+porcelain under probes/275: 15
+  ?? .scratch/wisp/probes/275/a1/census-2.md
+  ?? .scratch/wisp/probes/275/r2/logs/attack-control-unmutated-selftest.err
+  ?? .scratch/wisp/probes/275/r2/logs/attack-control-unmutated-selftest.txt
+  ?? .scratch/wisp/probes/275/r2/logs/attack-mutated-selftest.err
+  ?? .scratch/wisp/probes/275/r2/logs/attack-mutated-selftest.txt
+  ?? .scratch/wisp/probes/275/r2/logs/attack-summary.txt
+  ?? .scratch/wisp/probes/275/r2/logs/attack2-stderr-redirect-selftest.txt
+  ?? .scratch/wisp/probes/275/r2/logs/d22scan-after.txt
+  ?? .scratch/wisp/probes/275/r2/logs/gates-post-change.txt
+  ?? .scratch/wisp/probes/275/r2/logs/rc1-crosscheck-summary.txt
+  ?? .scratch/wisp/probes/275/r2/logs/restoration-proof.txt
+  ?? .scratch/wisp/probes/275/r2/logs/selftest-after.err
+  ?? .scratch/wisp/probes/275/r2/logs/selftest-after.txt
+  ?? .scratch/wisp/probes/275/r2/logs/tracked-only-after.err
+  ?? .scratch/wisp/probes/275/r2/logs/tracked-only-after.txt
+porcelain under probes/161: 12
+   M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+   M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+   M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+   M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+   M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+   M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+   M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+   M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+  ?? .scratch/wisp/probes/161/r2/__pycache__/
+  ?? .scratch/wisp/probes/161/r2/ctl/
+  ?? .scratch/wisp/probes/161/r5/negative-control/
+  ?? .scratch/wisp/probes/161/r6/logs/flip-7.txt
+=== cross-check: the rc=1 branch still works, and A-ROSTER stays 0 there (same throwaway tree minus its broken sample: /tmp/wisp-275-r2-rosterctl.iz6Tjt) ===
+1
+rc=1
+A-ROSTER rows on rc=1 path: 0
+TRACKED-DIRTY rows: 1
+     TRACKED-DIRTY	rosterctl/zz_roster_ctl_unformatted.go	(last commit touching it: -)	<== CI IS RED ON THIS
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: RED (tracked-only) - tracked-dirty=1 files_dirty=1. The CI gofmt step and this step read the same denominator; this one additionally refuses to answer when handed 0 files.

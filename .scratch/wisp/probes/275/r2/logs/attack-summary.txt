@@ -1,0 +1,24 @@
+=== 275-r2 AC#6 positive-control attack: print block neutralized (copy at /d/tmp/wisp275r2/mut/attrib-mut.sh, block 444-452 prefixed '#MUT ', exit 2 at :453 untouched) ===
+--- control: UNMUTATED copy, same dir, same invocation ---
+CTL_SELFTEST_RC=0
+CTL cases=9 failures=0
+attrib.sh: --self-test cases=9 failures=0
+attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns
+--- attack: MUTATED copy (print block neutralized) ---
+MUT_SELFTEST_RC=1
+MUT cases=9 failures=1
+10:   FAIL  want rc=2+roster-names-the-sample  got rc=2 rows=0
+11:         why : rc was 2 but stdout carries no A-ROSTER row naming rosterctl/zz_roster_ctl_unformatted.go - the print block did not print, which is exactly the red-with-zero-names shape 275 was filed for
+12:         tree: /tmp/wisp-275-r2-rosterctl.KOUcvC (its stdout, then its stderr:)
+13:         out: == (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 2)
+14:         err: attrib.sh: (A) gofumpt exited 123 on the tracked set (>=2 means a file would not parse) - the tracked tree is not readable by this ruler
+16:attrib.sh: SELF-TEST RED - the classifier no longer reads the way AC#7 was decided; do not 'fix' the expectations, fix the classifier
+--- stderr of the mutated run (must be 0 lines: the case fails as a case, not as a crash) ---
+0
+=== attack 2: rows redirected to stderr (line 448 mutated) - proves the assertion reads STDOUT, not 'any output' ===
+                printf '   A-ROSTER	%s\n' "$roster_line" >&2
+sh -n rc=0
+MUT2_SELFTEST_RC=1
+MUT2 cases=9 failures=1
+10:   FAIL  want rc=2+roster-names-the-sample  got rc=2 rows=0
+11:         why : rc was 2 but stdout carries no A-ROSTER row naming rosterctl/zz_roster_ctl_unformatted.go - the print block did not print, which is exactly the red-with-zero-names shape 275 was filed for

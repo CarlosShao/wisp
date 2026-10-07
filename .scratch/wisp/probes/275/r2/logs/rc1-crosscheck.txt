@@ -1,0 +1,8 @@
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 1)
+   TRACKED-DIRTY	rosterctl/zz_roster_ctl_unformatted.go	(last commit touching it: -)	<== CI IS RED ON THIS
+
+attrib.sh: gofumpt v0.12.0 (go1.27.1)
+attrib.sh: (A) tracked-tree  lines=1 files=1  rule: MUST be empty
+attrib.sh: (B) not run in --tracked-only mode - a checkout has no bench working tree to attribute
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: RED (tracked-only) - tracked-dirty=1 files_dirty=1. The CI gofmt step and this step read the same denominator; this one additionally refuses to answer when handed 0 files.

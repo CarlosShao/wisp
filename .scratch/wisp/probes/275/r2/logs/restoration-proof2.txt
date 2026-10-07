@@ -1,0 +1,70 @@
+=== every tracked file differing from HEAD at the end (nothing here is mine but attrib.sh, which is committed) ===
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/152/my152.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-5.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-6.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-baseline.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-restored.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design/doubao/demo/index.html', LF will be replaced by CRLF the next time Git touches it
+  MOD .gitignore
+  MOD .scratch/wisp/probes/152/my152.py
+  MOD .scratch/wisp/probes/161/r6/logs/flip-1.txt
+  MOD .scratch/wisp/probes/161/r6/logs/flip-2.txt
+  MOD .scratch/wisp/probes/161/r6/logs/flip-3.txt
+  MOD .scratch/wisp/probes/161/r6/logs/flip-4.txt
+  MOD .scratch/wisp/probes/161/r6/logs/flip-5.txt
+  MOD .scratch/wisp/probes/161/r6/logs/flip-6.txt
+  MOD .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+  MOD .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+  MOD .scratch/wisp/probes/268/v1/evidence.md
+  MOD design/assets/base.css
+  MOD design/assets/icons.js
+  MOD design/assets/theme.js
+  MOD design/assets/tokens.css
+  MOD design/doubao/README.md
+  MOD design/doubao/demo/app.js
+  MOD design/doubao/demo/index.html
+  MOD design/doubao/demo/styles.css
+  MOD design/index.html
+  MOD design/screens/approval.html
+  MOD design/screens/ball.html
+  MOD design/screens/chat.html
+  MOD design/screens/config.html
+  MOD design/screens/cost.html
+  MOD design/screens/firstrun.html
+  MOD design/screens/palette.html
+  MOD design/screens/privacy.html
+  MOD design/screens/security.html
+  MOD design/screens/states.html
+  MOD design/screens/tasks.html
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/152/my152.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-5.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-6.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-baseline.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-restored.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design/doubao/demo/index.html', LF will be replaced by CRLF the next time Git touches it
+count=31
+=== deleted/renamed tracked entries ===
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/152/my152.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-5.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-6.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-baseline.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/161/r6/logs/flip-restored.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design/doubao/demo/index.html', LF will be replaced by CRLF the next time Git touches it
+31
+=== untracked outside my own dir (other legs, all pre-13:13) ===
+721

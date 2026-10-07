@@ -1,0 +1,15 @@
+=== post-change --tracked-only on the real repo (935 tracked .go) ===
+rc=2
+stdout lines=35 stderr lines=1
+A-ROSTER rows=33
+first two stdout lines:
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 935)
+== (A) roster: every row of A_OUT printed raw, and A_OUT was captured with 2>&1, so these rows are gofumpt's stdout list AND its stderr parse-error diagnostics folded into one stream (count them as rows, not as files); the whole capture is here, it is not a prefix cut off at the unparseable file. exit code unchanged, denominator unchanged:
+stderr:
+attrib.sh: (A) gofumpt exited 123 on the tracked set (>=2 means a file would not parse) - the tracked tree is not readable by this ruler
+=== d22scan ===
+d22scan rc=0
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 514 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 104 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=228, bans #1-5 cmd/=38, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=514, ban #8 cmd/=104; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 514 Go files, comments and _test.go included; cmd/ 104 Go files, comments and _test.go included
