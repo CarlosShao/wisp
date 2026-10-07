@@ -51,7 +51,21 @@
 - [ ] **AC#5 零新契约面**：⛔ 不新造 `C##`，⛔ 不往 `C17` 方法白名单加名字，⛔ 不动 D29/D41/SPEC-11 的文字（`SPEC-11 §2.2` 那句"embed lands in S5"要不要改＝人工批准，本票只上报不修）。
 - [ ] **AC#6 门禁四数**：`sh scripts/d22scan.sh` rc=0 且正控先绿；`gofmt -l`／gofumpt v0.12.0 `-l` 只喂 `.go`；`go vet ./cmd/wisp/ ./internal/panel/` rc=0；终态 `go test ./cmd/wisp ./internal/... -count=1` 的**逐名红名册与起手作差＝0**。⚠ `cmd/wisp` 写面**同一时刻只能一枚写手**（包级互斥，不接受"改的是不同文件"）。
 - [ ] **AC#7 还原自证**：所有突变只走 `go test -overlay`（拷贝放仓外）；终态 `git status --porcelain -- cmd internal scripts` ＝起手，被审文件与 `git show HEAD:` 逐串对回；⛔ 本机 `frontend/dist` 那 4 枚文件枚数与哈希起手/终态必须相同（尺＝`go list -f '{{.EmbedFiles}}' ./frontend` 两头发）。
+- [ ] **AC#8 `SPEC-11 §2.2` 那两步的归属裁决（⛔ 本票不选形，由 `274-a1` §3 现量升格而来）**：§2.2 第 2 步逐字要求「存在则跳过；**`--with-frontend` 时走 `docker/frontend.Dockerfile`（§3.2）**」，而今天 ①`build.ps1` **没有这枚开关**（无条件跳过）②`docker/frontend.Dockerfile` 跟踪枚数 **0** ③该节第 3 步还写着「embed **`assets/web`** 已就位」，而 `assets/web` 跟踪枚数 **0**（真实通道是 `frontend/dist`）。⇒ 要裁的是：**这枚开关该由 `build.ps1` 兑现，还是承认 §2.2 那两步已被"CI 里 `lint-frontend` 跑 vite ＋ `frontend/dist`"这一形取代**（取代＝要动 spec 文字＝人工批准，另案；⛔ 任何腿不许"顺手补个开关"来让代码与 spec 对上）。凭据＝`.scratch/wisp/probes/274/a1/census.md` §3（我现读复认，见本票末节）。
 
 ## 6. 排程（编排者自己记，不许腿替我改）
 本票**按住**，排在 `cmd/wisp` 写面空出之后：此刻 `272-r2` 是本波唯一跑 Go 突变的腿，它的终态门禁要跑整包红名册，任何写腿落脏文件都会洗它的读数。
 AC#0/AC#1 可以**先派只读普查腿**（不写产码、不跑整包）——它与票 273 的落点普查 `273-a1` 同族，但**不许在同一枚包里同时跑整包测试**。
+
+## 收 `274-a1`（只读普查；件 `.scratch/wisp/probes/274/a1/census.md`，215 行／29,577 字节／占位 0；三枚 commit，起手锚 `15699a2f`；10-07 11:1x，落账 `A656`）
+
+★**两枚对我不利的更正，我都现量对回了，且都让本票的射程更准（⛔ 票面 §2① 原句不抹）：**
+
+1. **§2① 那句"注释两半都过期"说轻了。** `docs/specs/SPEC-11…:39 §2.2「构建顺序（一键流程）」` 我现读逐字，它第 2 步写的是「**前端产物：存在则跳过；`--with-frontend` 时走 `docker/frontend.Dockerfile`（§3.2）**」——
+   - 该节**通篇没有"S5"这个字**（`S5` 在 §3.2 标题与 §6 里），⇒ `build.ps1:74` 那句 `per SPEC-11 §2.2` 是**引用指错了节**，不只是内容过期。
+   - 更要紧的：**`build.ps1` 今天没有 `--with-frontend` 这个开关**，它是**无条件**跳过；而 §2.2 第 3 步还写着「embed `assets/web` 已就位」，`assets/web` 跟踪枚数＝**0**（我早前量过）。⇒ 形状应从"一句过期注释"升格为 **「SPEC-11 §2.2 的第 2、3 步今天都没实现，且注释把责任推给了一节没说过这话的 spec」**。⛔ spec 文字我不改（改它＝契约面，另案）。
+   - ⇒ 新增 **AC#8（本票不选形）**：把"`--with-frontend` 这枚开关该不该由 `build.ps1` 兑现、还是承认 spec 那一步已被 `frontend/dist` ＋ CI `lint-frontend` 取代"摆成一支待裁项；⛔ 不许任何腿"顺手补个开关"来让 §2.2 变得对上。
+2. **"没有任何判据要求它带页面"这句要配一枚例外——牙其实存在，只是没人咬。** `cmd/wisp/panel_assets.go:125-129`（`default` 支）现读：`if !assets.Built() { fmt.Fprintln(os.Stderr, "wisp panel-assets: assets NOT BUILT"); return 1 }` ⇒ **`wisp panel-assets` 不带子命令时，未构建就直接 rc=1**。腿的尺＋我的复跑一致：`ci.yml` 里 `panel-assets` **唯一命中在 `:912` 的一句注释**，`scripts/**` 与 `tools/**` 里 `setup-node|npm ci|npm run build` **0 命中**（正控＝同尺在 `.github/**` 命中 4 枚）、`download-artifact` 跟踪语料 **0 枚**（正控＝同尺 `upload` 4 枚）。⇒ **本票真正的缺口收窄成一句：现成的牙（rc=1）没有任何脚本或 CI 步骤去咬。** 这把丙形（发布前闸门）从"要新造判据"降成"要接一根线"，代价量级也因此有了现成数（腿给的：`lint-frontend` ≈24-25s、`slo-smoke` ≈2m、`test-windows` ≈10m）。
+3. **腿替我把 CI 侧坐实了**：三发 `dev` run（`37545246395`／`37406757402`／`37406422380`）的步级 conclusion 证明 **`npm run build` 真跑过且全 success**，且**没有一发在 `build.ps1` 之前有 node 步** ⇒ §2②那把尺不再是"yaml 里写着"而是"run 里出现过"。另：`needs:` 全 `ci.yml` **0 枚** ⇒ 乙形要新加依赖边；`release` job 无落点 ⇒ 丙形的"发布前"**今天没有栖息地**（这两条直接进 AC#2 的代价表）。
+4. **⛔ 我不采纳它的一条**：它报"工单盘上真名比派单少个『1』"。尺＝`grep -rl 'build-ps1-step-2' .scratch docs` ＝ **0 命中**，仓内所有引用与本文件名一致 ⇒ 那处拼写差异**盘上查无实据**，记为"腿的自报未经我复认"，不影响它其余读数。
+5. **它自报未做完的三格我不代填**：AC#0(a) `npm run build` 在 CI 侧产出枚数（要全量 run 日志）、更早 run 扩样、`placeholder` 独立尺。⇒ 归后续验收腿逐枚处置。**本票九枚框（AC#0–AC#8，其中 AC#8 由本次收表新增）一枚未翻。**
