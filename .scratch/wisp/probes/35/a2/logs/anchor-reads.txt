@@ -1,0 +1,318 @@
+# 35-a2 anchor re-reads at Wed Oct  7 11:57:35 CST 2026 HEAD=3c8ac14e
+
+## go.mod:15-21
+
+require (
+	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808 // indirect
+	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
+	github.com/k2-fsa/sherpa-onnx-go-linux v1.13.8 // indirect
+
+## panel_host_windows.go:78-82
+
+const (
+	panelDispatchBinding = "wispDispatch"
+	// panelWidthPx / panelHeightPx are what the host asks WebView2 for when NOBODY
+	// handed it a geometry source (票 255 AC#4: these two are now "the value when
+## :400-412
+	// The one inbound door. JS -> Go via a bound function over the WebView2
+	// message channel; the returned string is the receipt that reaches the page.
+	// No new inbound method name is invented here: the raw envelope is parsed by
+	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+	// four existing methods (bridge.go:42-45, ticket 248 owns config methods).
+	bindErr := w.Bind(panelDispatchBinding, func(raw string) string {
+		reply, _ := m.dispatchRaw(ctx, raw)
+		return reply
+	})
+	if bindErr != nil {
+		w.Destroy()
+		return fmt.Errorf("panel host: bind dispatch door: %w", bindErr)
+	}
+## :440-470
+// the user is never left looking at the round-trip probe page, and it still opens
+// no socket and loads nothing over the network.
+func (m *PanelManager) serveNotBuiltNoticeLocked() {
+	m.mu.Lock()
+	w := m.w
+	m.mu.Unlock()
+	if w == nil {
+		return
+	}
+	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
+		`</head><body><p>panel assets unavailable: the embedded bundle is not built.</p></body></html>`)
+}
+
+// serveEntry resolves the embedded index.html and pushes it into the control.
+func (m *PanelManager) serveEntry() error {
+	if m.assets == nil || !m.assets.Built() {
+		return fmt.Errorf("panel host: embedded bundle not built (only the tracked placeholder is present)")
+	}
+	data, _, err := m.assets.Resolve(panel.EntryFile)
+	if err != nil {
+		return err
+	}
+	m.mu.Lock()
+	w := m.w
+	m.mu.Unlock()
+	if w == nil {
+		return fmt.Errorf("panel host: no window to serve into")
+	}
+	w.SetHtml(string(data))
+	return nil
+}
+## :625-635
+	}
+}
+
+// dispatchRaw runs one page envelope through the router. Kept separate from the
+// bind closure so a test can call the same code path the page reaches.
+func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, error) {
+	if m.disp == nil {
+		return "panel host: no inbound router attached", fmt.Errorf("panel host: nil router")
+	}
+	if ctx == nil {
+		ctx = context.Background()
+## :665-672
+	// A second, one-shot binding the probe page calls; its Go side just signals
+	// the round trip completed. Using a binding keeps the probe on the same
+	// WebView2 channel the real door uses.
+	if err := w.Bind("wispProbeRT", func() string {
+		select {
+		case <-done:
+		default:
+			close(done)
+## bridge.go:38-52
+// test that does not exist in this repository; ticket 35's snapshot pump was the
+// step that checked it, and the behaviour was already covered - only the name
+// was wrong.)
+const (
+	MethodModeRequest      = "panel.mode.request"
+	MethodWorkspaceRequest = "panel.workspace.request"
+	MethodAttachmentAdd    = "panel.attachment.add"
+	MethodMessageSend      = "panel.message.send"
+	// MethodConfigGet and MethodConfigSet are ticket 248 AC#1's two settings
+	// routes. Three facts about the naming, because each one is a decision
+	// somebody could later "fix" by accident:
+	//
+	//   - The names are NOT invented here. They are the two spellings the
+	//     product spec already carries (docs/specs/SPEC-08-ui-ball-panel.md:168,
+	//     read-only for this leg), so this file follows a document rather than
+## composer_dispatch_test.go:455-465
+		writeHostCarrier(t, a, filepath.Join("internal", "panel"), "host_windows.go", `package panel
+
+type CoreWebView2 struct{}
+
+func (w *CoreWebView2) WebMessageReceived(sender, args any) error { return nil }
+
+func (w *CoreWebView2) PostWebMessageAsJson(json string) error { return nil }
+`)
+		if got := hostChannelCapabilityHits(t, a); len(got) == 0 {
+			t.Errorf("POSITIVE CONTROL RED (the ruler, not the product): a tree whose production source hosts a "+
+				"CoreWebView2 and takes WebMessageReceived answered 0 capability hits, so the check above is a "+
+## library webview.go 99-110 / 139-160 / 435-482
+	w.bindings = map[string]interface{}{}
+	w.autofocus = options.AutoFocus
+
+	chromium := edge.NewChromium()
+	chromium.MessageCallback = w.msgcb
+	chromium.DataPath = options.DataPath
+	chromium.SetPermission(edge.CoreWebView2PermissionKindClipboardRead, edge.CoreWebView2PermissionStateAllow)
+
+	w.browser = chromium
+	w.mainthread, _, _ = w32.Kernel32GetCurrentThreadID.Call()
+	if !w.CreateWithOptions(options.WindowOptions) {
+		return nil
+func (w *webview) msgcb(msg string) {
+	d := rpcMessage{}
+	if err := json.Unmarshal([]byte(msg), &d); err != nil {
+		log.Printf("invalid RPC message: %v", err)
+		return
+	}
+
+	id := strconv.Itoa(d.ID)
+	if res, err := w.callbinding(d); err != nil {
+		w.Dispatch(func() {
+			w.Eval("window._rpc[" + id + "].reject(" + jsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+		})
+	} else if b, err := json.Marshal(res); err != nil {
+		w.Dispatch(func() {
+			w.Eval("window._rpc[" + id + "].reject(" + jsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+		})
+	} else {
+		w.Dispatch(func() {
+			w.Eval("window._rpc[" + id + "].resolve(" + string(b) + "); window._rpc[" + id + "] = undefined")
+		})
+	}
+}
+func (w *webview) Init(js string) {
+	w.browser.Init(js)
+}
+
+func (w *webview) Eval(js string) {
+	w.browser.Eval(js)
+}
+
+func (w *webview) Dispatch(f func()) {
+	w.m.Lock()
+	w.dispatchq = append(w.dispatchq, f)
+	w.m.Unlock()
+	_, _, _ = w32.User32PostThreadMessageW.Call(w.mainthread, w32.WMApp, 0, 0)
+}
+
+func (w *webview) Bind(name string, f interface{}) error {
+	v := reflect.ValueOf(f)
+	if v.Kind() != reflect.Func {
+		return errors.New("only functions can be bound")
+	}
+	if n := v.Type().NumOut(); n > 2 {
+		return errors.New("function may only return a value or a value+error")
+	}
+	w.m.Lock()
+	w.bindings[name] = f
+	w.m.Unlock()
+
+	w.Init("(function() { var name = " + jsString(name) + ";" + `
+		var RPC = window._rpc = (window._rpc || {nextSeq: 1});
+		window[name] = function() {
+		  var seq = RPC.nextSeq++;
+		  var promise = new Promise(function(resolve, reject) {
+			RPC[seq] = {
+			  resolve: resolve,
+			  reject: reject,
+			};
+		  });
+		  window.external.invoke(JSON.stringify({
+			id: seq,
+			method: name,
+			params: Array.prototype.slice.call(arguments),
+		  }));
+		  return promise;
+		}
+	})()`)
+
+	return nil
+}
+## library pkg/edge/chromium.go:233-248 + corewebview2.go:104-112
+func (e *Chromium) MessageReceived(sender *ICoreWebView2, args *iCoreWebView2WebMessageReceivedEventArgs) uintptr {
+	var message *uint16
+	_, _, _ = args.vtbl.TryGetWebMessageAsString.Call(
+		uintptr(unsafe.Pointer(args)),
+		uintptr(unsafe.Pointer(&message)),
+	)
+	if e.MessageCallback != nil {
+		e.MessageCallback(w32.Utf16PtrToString(message))
+	}
+	_, _, _ = sender.vtbl.PostWebMessageAsString.Call(
+		uintptr(unsafe.Pointer(sender)),
+		uintptr(unsafe.Pointer(message)),
+	)
+	windows.CoTaskMemFree(unsafe.Pointer(message))
+	return 0
+}
+	CapturePreview                         ComProc
+	Reload                                 ComProc
+	PostWebMessageAsJSON                   ComProc
+	PostWebMessageAsString                 ComProc
+	AddWebMessageReceived                  ComProc
+	RemoveWebMessageReceived               ComProc
+	CallDevToolsProtocolMethod             ComProc
+	GetBrowserProcessID                    ComProc
+	GetCanGoBack                           ComProc
+## frontend dev reads
+/** Shape of the object WebView2 installs on the host page (C17). */
+interface WispHostBridge {
+  postMessage(message: string): void;
+}
+
+declare global {
+  interface Window {
+    /** Installed by WebView2's AddHostObjectToScript / postMessage pipe. */
+    wispBridge?: WispHostBridge;
+    chrome?: { webview?: WispHostBridge };
+  }
+}
+
+function hostBridge(): WispHostBridge | null {
+  if (typeof window === "undefined") return null;
+  return window.wispBridge ?? window.chrome?.webview ?? null;
+}
+
+/** True inside WebView2, false in a plain browser (dev / typecheck harness). */
+export function hostedByNative(): boolean {
+  return hostBridge() !== null;
+}
+
+/**
+ * Send one bridge request and return nothing: responses arrive as a fresh
+ * PanelSnapshot push, never as a return value, because a panel that keeps a
+ * copy of the answer would be a second state holder (PLAN.md:1044).
+ * Throws when there is no host: a silent no-op would look like a UI that
+): void {
+  const bridge = hostBridge();
+  if (!bridge) {
+    throw new Error(
+      "panel: no native host attached - the request was not sent (ticket 33 owns the WebView2 host)",
+    );
+  }
+  bridge.postMessage(
+    JSON.stringify({
+      method: "panel.approval.request",
+      correlationId,
+      outcome,
+    }),
+  );
+}
+
+/**
+ * One request on the panel's only envelope: the same postMessage pipe the
+ * approval card uses (C17). There is no second channel, and a composer that
+
+function sendRequest(method: string, payload: Record<string, unknown>): void {
+  const bridge = hostBridge();
+  if (!bridge) {
+    throw new Error(
+      "panel: no native host attached - the request was not sent (ticket 33 owns the WebView2 host)",
+    );
+  }
+  bridge.postMessage(
+    JSON.stringify({
+      method,
+      requestId: nextRequestId(),
+      source: "panel-composer",
+      ...payload,
+    }),
+  );
+}
+
+  document.body.append(note);
+}
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    {harness === "1" ? <AppHarness /> : harness === "2" ? <Showcase /> : <App />}
+  </StrictMode>,
+);
+
+};
+
+const EMPTY: PanelSnapshot = {
+  pending: [],
+  results: [],
+  composer: EMPTY_COMPOSER,
+  generatedAt: "",
+};
+
+  );
+}
+
+export default function App({
+  snapshot = EMPTY,
+}: {
+  snapshot?: PanelSnapshot;
+}) {
+  // A snapshot from a host that has not filled the composer section yet falls
+  311 frontend/src/lib/panel.ts
+   61 frontend/src/main.tsx
+  117 frontend/src/App.tsx
+  489 total
