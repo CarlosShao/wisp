@@ -7,7 +7,11 @@
 
 .DESCRIPTION
     1. scripts/fetch-deps.ps1        (verify/complete third_party/, cached runs finish fast)
-    2. frontend: skipped (none yet, lands in S5)
+    2. frontend: built here - npm ci (when node_modules is absent) + npm run
+       build in frontend/, then frontend/dist is verified to hold a real page.
+       No node/npm on this machine means this script FAILS; the step never skips
+       (ticket 274: '//go:embed all:dist' in frontend/embed.go is what carries
+       the page bytes into wisp.exe, so a skipped step ships a pageless exe).
     3. go build with CGO_ENABLED=1 + mingw-w64 gcc, real link of the
        sherpa-onnx C API via the official Go bindings
     4. output: build\wisp.exe + onnxruntime.dll + sherpa-onnx DLLs colocated
@@ -71,7 +75,96 @@ Write-Host "build.ps1: toolchain: $($goVersionLine); CC=$cc ($ccVersionLine)"
 if ($LASTEXITCODE -ne 0) { Fail 'fetch-deps.ps1 failed (see output above).' }
 
 # --- 2. frontend ------------------------------------------------------------
-Write-Host 'build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)'
+# This step BUILDS the page bundle the exe is supposed to carry. frontend/dist
+# is produced here ('npm ci' when node_modules is absent, then 'npm run build'
+# = tsc -b && vite build), and frontend/embed.go's '//go:embed all:dist' is the
+# only channel that moves those bytes into build\wisp.exe. Without this step the
+# build still succeeds - go:embed happily embeds the single tracked anchor file
+# frontend/dist/.gitkeep - and the shipped exe carries zero page bytes. That is
+# the defect ticket 274 was filed about.
+# So node and npm are HARD requirements of this build line, and there is
+# deliberately no skip path: unresolvable node or npm, a non-zero 'npm ci' or
+# 'npm run build', or a dist that still looks like a clean checkout all make
+# this script stop with a named cause and exit code 1.
+$FrontendDir = Join-Path $RepoRoot 'frontend'
+$DistDir = Join-Path $FrontendDir 'dist'
+if (-not (Test-Path -LiteralPath (Join-Path $FrontendDir 'package.json'))) {
+    Fail "frontend step: no package.json under $FrontendDir - the page source tree is missing, so nothing can produce the frontend/dist bytes go:embed puts into wisp.exe."
+}
+
+# Tool resolution. PowerShell maps a bare 'npm' lookup to its own npm.ps1 shim,
+# so npm.cmd - the plain batch wrapper - is preferred: under the
+# $ErrorActionPreference = 'Stop' at the top of this file the only failure this
+# step should ever surface is npm's own exit code, not a wrapper's exception
+# behaviour. Each lookup falls back to the extension-less name so a Node install
+# that ships only 'node'/'npm' still resolves, and a miss is a hard failure
+# rather than a skip.
+function Resolve-BuildTool([string]$Preferred, [string]$Fallback) {
+    $found = Get-Command $Preferred -ErrorAction SilentlyContinue
+    if ($null -eq $found) { $found = Get-Command $Fallback -ErrorAction SilentlyContinue }
+    return $found
+}
+
+$node = Resolve-BuildTool 'node.exe' 'node'
+if ($null -eq $node) {
+    Fail 'frontend step: node could not be resolved on PATH (tried node.exe, then node). The page bundle is a build input of wisp.exe, so this script fails instead of skipping it. Install the toolchain pinned in docs/BUILD.md, or run the build on a machine that has node and npm on PATH.'
+}
+$npm = Resolve-BuildTool 'npm.cmd' 'npm'
+if ($null -eq $npm) {
+    Fail 'frontend step: npm could not be resolved on PATH (tried npm.cmd, then npm). Without npm there is no frontend/dist, and an exe built from that tree carries no page at all - which is exactly what this step exists to prevent, so it fails instead of skipping.'
+}
+$nodeVersionLine = (& $node.Source --version)
+$npmVersionLine = (& $npm.Source --version)
+Write-Host "build.ps1: frontend: node = $($node.Source) ($nodeVersionLine); npm = $($npm.Source) ($npmVersionLine)"
+
+if (Test-Path -LiteralPath (Join-Path $FrontendDir 'node_modules')) {
+    Write-Host 'build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.'
+} else {
+    Write-Host 'build.ps1: frontend: node_modules ABSENT -> running npm ci (clean install pinned by package-lock.json).'
+    Push-Location $FrontendDir
+    try {
+        & $npm.Source ci
+        if ($LASTEXITCODE -ne 0) { Fail "frontend step: 'npm ci' failed with exit code $LASTEXITCODE in $FrontendDir (npm = $($npm.Source)). See the npm output above; the page bundle cannot be built without its dependencies." }
+    } finally {
+        Pop-Location
+    }
+}
+
+Write-Host 'build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).'
+Push-Location $FrontendDir
+try {
+    & $npm.Source run build
+    if ($LASTEXITCODE -ne 0) { Fail "frontend step: 'npm run build' failed with exit code $LASTEXITCODE in $FrontendDir (npm = $($npm.Source)). See the npm output above." }
+} finally {
+    Pop-Location
+}
+
+# Post-build verification - the nail this ticket was really asking for.
+# 'npm run build' exiting 0 is NOT evidence that page bytes exist: a stubbed or
+# no-op npm leaves frontend/dist looking exactly like a clean checkout, one
+# tracked anchor file (frontend/dist/.gitkeep) and no index.html, and go:embed
+# embeds that anchor without complaint. Every branch below names its own cause.
+$DistEntry = Join-Path $DistDir 'index.html'
+if (-not (Test-Path -LiteralPath $DistDir)) {
+    Fail "frontend step: npm run build reported success but $DistDir does not exist. Named cause: dist directory missing, so wisp.exe would embed no page."
+}
+$distAll = @(Get-ChildItem -LiteralPath $DistDir -Recurse -File -Force)
+# The anchor-only shape is .gitkeep alone; anything real has to add at least one
+# file beside it. Counting non-anchor files rather than all files keeps a build
+# that wiped .gitkeep but did produce a page from failing for the wrong reason.
+$distReal = @($distAll | Where-Object { $_.Name -ne '.gitkeep' })
+if ($distReal.Count -le 0) {
+    Fail "frontend step: npm run build reported success but frontend/dist holds only the anchor file(s) [$($distAll.Count) file(s), none beside frontend/dist/.gitkeep]. That is the clean-checkout shape, so the exe would ship with zero page bytes. Named cause: build produced no page artifacts."
+}
+if (-not (Test-Path -LiteralPath $DistEntry)) {
+    Fail "frontend step: frontend/dist has $($distReal.Count) artifact file(s) but no index.html - the entry file internal/panel resolves (panel.EntryFile) is absent, so the bundle can never be served. Named cause: missing entry file."
+}
+$distEntryBytes = (Get-Item -LiteralPath $DistEntry).Length
+if ($distEntryBytes -le 0) {
+    Fail "frontend step: $DistEntry is 0 bytes - a present-but-empty entry file is not a page. Named cause: empty entry file."
+}
+$distRoster = ($distAll | Sort-Object FullName | ForEach-Object { "$($_.FullName.Substring($DistDir.Length + 1))=$($_.Length)" }) -join ' '
+Write-Host "build.ps1: frontend ok: $($distAll.Count) file(s) in frontend/dist (entry index.html is $distEntryBytes bytes): $distRoster"
 
 # --- 3. go build ------------------------------------------------------------
 function Get-DepsValue([string]$Section, [string]$Key) {
