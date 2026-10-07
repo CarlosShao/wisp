@@ -1,0 +1,16 @@
+# 272-v1 起手整包红名册 (go test -v ./cmd/wisp ./internal/... -count=1, raw 留 /d/tmp/wisp272v1/start-raw.txt)
+# 四数 RUN/PASS/FAIL/SKIP = 2174/1472/6/7
+# START-RC=START-RC=1
+## named --- FAIL:
+  --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+  --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.01s)
+  --- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+  --- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.17s)
+  --- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+  --- FAIL: TestResolvePerCallBudget (1.42s)
+## package-level FAIL:
+  FAIL	github.com/CarlosShao/wisp/internal/ball	0.468s
+  FAIL	github.com/CarlosShao/wisp/internal/panel	5.474s
+  FAIL	github.com/CarlosShao/wisp/internal/risk	9.304s
+## cmd/wisp 结果行:
+  ok  	github.com/CarlosShao/wisp/cmd/wisp	388.173s

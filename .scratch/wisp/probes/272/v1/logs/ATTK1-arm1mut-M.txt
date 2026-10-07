@@ -1,0 +1,14 @@
+time=2026-10-07T11:15:40.463+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-10-07T11:15:41.473+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/07 11:15:41 mockllm: serving on http://127.0.0.1:60588 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-07T11:15:41.502+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply2578442948\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-07T11:15:41.529+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply2578442948\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-07T11:15:41.536+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-07T03:15:41Z duration_ms=6
+time=2026-10-07T11:15:41.544+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply2578442948\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-07T11:15:41.550+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-07T03:15:41Z duration_ms=6
+time=2026-10-07T11:15:41.554+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-07T11:15:41.556+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket223RestartTierSaysItWillNotApply (2.13s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.190s

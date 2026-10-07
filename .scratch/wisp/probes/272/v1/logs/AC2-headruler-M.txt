@@ -1,0 +1,19 @@
+time=2026-10-07T11:14:01.308+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-10-07T11:14:02.328+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/07 11:14:02 mockllm: serving on http://127.0.0.1:51115 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-07T11:14:02.351+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3207649278\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-07T11:14:02.381+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3207649278\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-07T11:14:02.389+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-07T03:14:02Z duration_ms=7
+time=2026-10-07T11:14:02.395+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3207649278\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-07T11:14:02.401+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-07T03:14:02Z duration_ms=6
+time=2026-10-07T11:14:02.406+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-07T11:14:02.407+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    config_reload_223_test.go:596: the operator stream carried "本次运行不会生效" 1 time(s) BEFORE this run planted the edit; a copy nobody planted cannot be evidence that this run will not use the new values. stdout before the plant:
+        wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、head / view <编号> 看卡片；quit 退出监听。
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        wisp run: 上一版横幅（种改动之前打的）：这些段的改动本次运行不会生效（D36 重启档，需要重启进程）。原因：这几枚键在进程启动时被读一次就交给平台层（开机自启注册、单实例锁、界面语言），本次运行没有重新注册它们的路径。涉及：app.language / app.autostart / app.single_instance。注意两件事都没发生：文件里的新值没有被丢掉，内存里的旧值也没有被偷偷替换。
+--- FAIL: TestTicket223RestartTierSaysItWillNotApply (2.15s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.207s
+FAIL
