@@ -1,0 +1,6 @@
+42:- [ ] Whitelist fuzz: 50 random/forbidden method names → all rejected + logged; each listed
+44:- [ ] Concurrency routing: 10 parallel invokes with shuffled replies → correct pairing.
+45:- [ ] Forged panel allow: direct bridge call `approval.decide{allow:true}` from the webview
+47:- [ ] Resync: hide → tool state changes → show → UI reflects fresh state; SDK forbids cross-show
+49:- [ ] Backpressure: flood events under blocked consumer → merges, no unbounded memory (heap cap
+51:- [ ] No secret leakage scan across bridge payloads.

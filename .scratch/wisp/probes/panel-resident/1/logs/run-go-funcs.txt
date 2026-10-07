@@ -1,0 +1,154 @@
+3:// wisp run - the S1 text vertical slice (ticket 12 AC#1) and, more importantly,
+4:// the ASSEMBLY ROOT rulings A8/A11/A13/R12 say was missing.
+6:// Before this file the three capabilities that landed this week were each green
+7:// inside their own package and unreachable from production:
+15:// What is composed here, in one place, is therefore:
+24:// Ticket 101 added one line to that chain, and it is the whole point of this
+25:// file's current shape: the permission mode is READ from config.toml here and
+26:// INJECTED into the decision chain (config.NewManager -> perm.Store ->
+27:// tools.Options.Modes). Ticket 90 built the storage and proved it works in its
+28:// own tests; an unwired capability is a capability nobody has (R20/M3 did not
+29:// take effect until this line existed).
+31:// The dependency direction matters: cmd/wisp is the only package allowed to
+32:// know about all of these at once (internal/llm must not import storage,
+33:// internal/agent/approval imports internal/tools, never the reverse).
+68:// runExit* are the process exit codes of `wisp run`, which the AC pins: "exit
+69:// code reflects error_class" (ticket 12 Key constraints). They are stable
+70:// numbers, not per-run accidents:
+76:func runExitCode(status agent.Status, errClass string) int {
+93:// notifyPoster posts one user-visible notification (D10 result presentation).
+94:// It is a seam so the end-to-end tests can observe the post; production fills
+95:// it with the real Windows implementation in notify_windows.go.
+98:// runSpec is one `wisp run` invocation with its process surface injected. The
+99:// zero-value fields are filled by runDefaults, so main() passes only argv and
+100:// the two streams: the data dir, the config file, the credential store, the
+101:// SQLite store and the notification poster are all the REAL ones.
+176:// runTextTask executes one CLI text task and returns the process exit code.
+178:// Every failure here is a CLASSIFIED failure with a user-visible line: SPEC-05
+179:// §3.4 forbids the silent downgrade, so nothing returns 0 unless the task
+180:// really completed.
+181:func runTextTask(s runSpec) int {
+265:// runtime is the assembled S1 stack.
+379:// assembleRuntime builds the whole stack from the data dir. A failure here is
+380:// the Unconfigured state (SPEC-03 §4.1: never fall back to a half-configured
+381:// runtime silently), which exits 2 with a named reason.
+382:func assembleRuntime(s runSpec) (*agentRuntime, int) {
+818:// modeSwitchToolName is the card's tool name for a mode switch. It is not a
+819:// registered C4 tool: no call route uses it, it exists so the card and the
+820:// audit line name what is being confirmed.
+823:// confirmModeSwitch is the production R20/M4 confirmation: exactly ONE L2 card,
+824:// raised through the same C18 approval gate a tool call goes through, and it can
+825:// only be answered from the native side (SPEC-06:1588, machine-gated by ban #6).
+827:// A console run has no native channel, so this refuses - the card times out into
+828:// a reject, or the caller's context ends first and the gate abandons it. That is
+829:// fail-closed by construction and it is the point: the档 that removes questions
+830:// cannot be reached from a surface that cannot ask them. The floating ball /
+831:// panel hosts (tickets 77/92) hand the same card a real click.
+833:// D47 applies to a host-initiated card as much as to a loop-initiated one: the
+834:// gate refuses any request whose task was never admitted, so this registers its
+835:// own synthetic task id for the duration of the confirmation and revokes it on
+836:// the way out.
+837:func (rt *agentRuntime) confirmModeSwitch(ctx context.Context, sw perm.Switch) error {
+861:// auditModeUnreadable is AC#3's loud half. It writes the same "[audit] perm:"
+862:// family the Store itself writes, so every mode event in the log has one shape
+863:// and one grep, and it names the档 a failed read answers with instead of
+864:// leaving that to the reader's imagination.
+865:func (rt *agentRuntime) auditModeUnreadable(path string, err error) {
+871:// displayedCounter is the one question a host-side presentation surface answers
+872:// about its own output: how many cards did it actually put in front of somebody.
+873:// It is an interface rather than the concrete resident type because run.go is
+874:// not build-tagged and the ball surface is (resident_approval_windows.go), and
+875:// because the count is the surface's own fact, never this file's inference.
+880:// windowCount reports how many confirmation cards the composed gate displayed.
+881:func (rt *agentRuntime) windowCount() int {
+894:// close releases the store and stands the reply listener down.
+896:// The cancel is not a join: a listener parked in a blocking Read on the
+897:// operator's stream does not observe a context, so the root's Cancel is what
+898:// stops it from taking any further reply (runReplyLoop checks ctx.Err() per line
+899:// and refuses to act on one after that). For a CLI process that is the whole
+900:// requirement - the goroutine dies with the process, and a pipe an end-to-end
+901:// test closed returns EOF on its own.
+902:func (rt *agentRuntime) close() {
+917:// logf is the audit sink: the bridge's and the gate's lines.
+919:// Both halves are load-bearing and they answer two different complaints:
+921://   - stderr is the operator standing at a terminal, reading this run.
+922://   - slog is the record that outlives the process. Ticket 105 wired the D31
+923://     path-rewrite account ("tools: d31 report ...") and the mode reads
+924://     ("perm: MODE-READ ...") into this function, and R-105-1 was right that
+925://     calling that "persisted" was false: an fmt.Fprintf to a stream is not a
+926://     ledger. Now the same line also goes through the sink this run installed,
+927://     the rolling JSONL file under <data>\logs (see logsink.go) - so the
+928://     rewrite ledger is on disk on the production path, not only in a test that
+929://     built its own sink. It rides the sink's own logger rather than the
+930://     process default precisely so the console keeps ONE copy of each line.
+931:func (rt *agentRuntime) auditf(format string, args ...any) {
+937:// admitTask is this composition root's per-task boundary: it registers the
+938:// TEXT-loop task with the D47 gate and hands back the revocation the loop
+939:// defers (internal/agent/loop.go:366). The revocation now also closes the
+940:// task's C25 taint scope on the bridge (ticket 151).
+942:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+943:// root defers it "on the task's ..." boundary, and this is the only boundary
+944:// this root has that (a) is handed the loop's task id - the loop generates it
+945:// inside Run, so nothing above this point knows it - and (b) already runs on a
+946:// defer, so it covers the brake/cancel/error exits too. The alternative
+947:// readings were rejected: closing after loop.Run returns would skip every
+948:// panic exit, and a task-lifecycle event does not exist in this tree yet.
+950:// What this does NOT close: a task id a host-internal caller invents when it
+951:// dispatches on the bridge directly (no admission, no boundary). That shape is
+952:// recorded as an open end, not silently folded into this line.
+953:func (rt *agentRuntime) admitTask(taskID string) func() {
+964:// noteTask records that a task of this process was admitted, which is what makes
+965:// it nameable by the panel's roster reader (ticket 197 载体层). It adds no state
+966:// of its own: the row behind an id is the roster's, and a task that was admitted
+967:// but never filed a row is simply not in the packet.
+968:func (rt *agentRuntime) noteTask(taskID string) {
+982:// execute runs one task through the loop and presents the result.
+984:// parent is the context the task derives from, and the three-way default is the
+985:// whole of ticket 246 AC#7's ruling 2.3: a caller that names none gets
+986:// context.Background() (what `wisp run` has always meant - the process IS the
+987:// task's lifetime), a run assembled with runSpec.taskCtx gets that host's task
+988:// root, and a host that submits one task at a time passes a root derived from it
+989:// so a single task can be cancelled without touching the entry that produced it.
+990:func (rt *agentRuntime) execute(parent context.Context, task string) int {
+1168:// storeHealthSink is the composition-side adapter llm.HealthSink ->
+1169:// memory.Store (the exact mapping internal/llm documents but must not own).
+1172:func (m storeHealthSink) RecordProbe(ctx context.Context, provider, model string,
+1181:// notifyBody is the notification text: the reply when there is one, the
+1182:// failure line when there is not (SPEC-05 §3.4: a failure the user cannot see
+1183:// is a failure that did not happen).
+1184:func notifyBody(res agent.Result) string {
+1194:// costLine renders the C23 cost line without floats.
+1195:func costLine(res agent.Result) string {
+1204:// taskLogState maps the loop's terminal state onto the memory.task_log.state
+1205:// vocabulary.
+1206:func taskLogState(s agent.Status) string {
+1219:// chainOptions carries the [net] and [llm.retry] settings into the provider
+1220:// stack; tests reach the same function through the config file, so there is
+1221:// no second construction path to keep honest.
+1222:func chainOptions(cfg *config.Config) llm.ChainBuildOptions {
+1231:// orDefaultS renders v, or def when v is empty.
+1232:func orDefaultS(v, def string) string {
+1239:func firstArg(argv []string) string {
+1246:// buildEnvString is the environment badge used to pick the data dir.
+1247:func buildEnvString() string { return buildinfo.EnvString() }
+1249:// consoleSink streams the reply. It must never block (the loop publishes
+1250:// synchronously on the task goroutine).
+1260:func (c consoleSink) Publish(e agent.Event) {
+1302:// consoleApprovalUI is the injected presentation surface for a console run: it
+1303:// prints the card and the countdown events.
+1305:// It still never answers on the user's behalf - it decides nothing, and the
+1306:// gate's own comment on that rule is unchanged. What ticket 201 added is the
+1307:// other half of a native surface: it HOLDS what an answer needs. The card's
+1308:// single-use grant arrives in Prompt and is booked into live, the ledger the
+1309:// reply surface spends from, and the card's id is printed because an operator
+1310:// cannot answer a question they cannot address. An L2 card on a run with no
+1311:// reply source attached still ends in an auto-reject, and that is the route's
+1312:// own behaviour rather than this surface answering for anyone.
+1335:// shown reports how many prompts have been displayed.
+1336:func (u *consoleApprovalUI) shown() int {
+1342:// Prompt prints one confirmation. Returning nil means "the card was shown",
+1343:// not "the user agreed": the gate decides that, and only the gate.
+1344:func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
+1392:// Update prints the transient states (countdown, warning, dismissal, handoff).
+1393:func (u *consoleApprovalUI) Update(_ context.Context, e approval.Event) error {
+1422:func channelState(c approval.ChannelStatus) string {

@@ -1,0 +1,1 @@
+61:- [ ] **AC#8（新补）那枚 boot 时序 flake 要有归属**：修法在常驻启动路径（候选＝把 `signal.Notify(bootExit)` 提到 `installLogSink` 之前，消掉 `[sink→Notify]` 那段窗口），**地界属票 228**（用例名就是它的 `TestAC228…`）⇒ 本格只做"归口＋判据"，⛔ 不在本票改；判据＝整包序 `-count=10` 该用例**零枚** `0xc000013a`＋红，且不得靠放宽断言或加 `sleep` 达成。

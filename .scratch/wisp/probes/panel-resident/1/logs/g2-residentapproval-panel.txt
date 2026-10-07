@@ -1,0 +1,8 @@
+32://   - Not a panel this file writes to. The claim this file used to carry - "this
+34://     landed the host: panel_host_windows.go links go-webview2 and
+38://     (internal/panel/pump.go:12-21 says so verbatim, "the last mile is
+47://     ChannelPanel stay unloaded in this process (ticket 246 AC#6); the gate's
+76:	residentPanelSource  = "cmd-wisp-resident-panel-route"
+359:// and panel_resident_windows.go:201 already have; it is not a new package-level
+391:		PanelSource:  residentPanelSource,
+398:	// 246 used for the gate and ticket 253 for panel-as-truth-source.

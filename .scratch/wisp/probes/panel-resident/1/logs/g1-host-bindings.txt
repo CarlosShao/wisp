@@ -1,0 +1,4 @@
+cmd/wisp/panel_host_windows.go:80:	panelDispatchBinding = "wispDispatch"
+cmd/wisp/panel_host_windows.go:213:func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPath string, opts ...panelHostOption) *PanelManager {
+cmd/wisp/panel_resident_windows.go:44:// behind window.wispDispatch), whose widening branches are fail-closed, and it adds
+cmd/wisp/panel_resident_windows.go:253:	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), nil
