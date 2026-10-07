@@ -205,6 +205,10 @@ plant is inside the window and is caught by arm 2's count"）在**单份**情形
   实现件正文写 `:595`/`:622`/`:647` 系行号口径，本腿现量红点为 `:596`、两枚既有字面为 `:623`/`:648`，见 §3-4）。
 - 本腿只写 `.scratch/wisp/probes/272/v1/**`；两笔 commit 均带显式 pathspec（`1ec9fa19` §0、本笔 §1–§6）。
 - ⛔ 未 push、未 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`、未改 SLO/golden/thresholds/PLAN/specs、未给 CI 加 `-tags winlive`、未放宽任何断言。
+- **更正（追加，10-07 终笔后现量）**：§5-2/§6 上文记的那枚 `?? internal/winsec/wisp129-dr-15652/` 系整包 `go test` 期间的**临时测试产物目录**，
+  进程收口后已被用例自身清掉——本腿最后一次现量 `git status --porcelain -- cmd internal` **＝空**，与 §0 起手逐字相同。
+  ⇒ AC#6 的"porcelain 等起手"这条**实为成立**（此前记的"非逐字等"是中途快照、非终态）；§5-2 的登记按"追加不抹"保留原话。
+  ⛔ 历史三笔 commit `1ec9fa19`/`ce58aa46`/`edc3c42e` 不改写；本更正另起一笔。
 
 ---
 
