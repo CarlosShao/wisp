@@ -12903,3 +12903,26 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - ⚠ 待我裁两处：它说票 33 **AC#13 那发探测盖页已落地**（`:420-426` 注释自认 "the whole fix"）⇒ 若我一直按未修排程，要更正；它自陈**读了 `frontend/embed.go`**（在我给的"Go 侧内嵌资源"允许清单内），⛔ 未打开任何 `frontend/src/**`、未读 `design/**`——我按清单追认，并把"允许清单"这句写清到下一轮派单。
 
 **7. 排程与待人项**：⛔ 未推送（取数期间不推、只 commit 不 push、cnb 未经机主同意不动）；`winlive` 在 CI 那档**继续禁**（机主今早那句"开，我看看"只覆盖本机看一次）。按住不动的：`cmd/wisp` 与 `internal/*` 写腿等 `272-r2` 交完；**页面那 21 枚提交要不要并进来＝等机主点名哪枚分支与什么口径，我不自作主张**。
+
+## A654｜2026-10-07 10:4x｜机主纠射程＋合并预演（乙）跑完＋**我预演里那句"没人看得见空 bundle"被我自己推翻**＋立票 274
+
+**1. 机主纠射程（原话照录，⛔ 不改写）**：「我需要跟你提一嘴，其实面板UI是在另一个worktree的分支上，所以，你会发现主dev分支好像没面板，所以这需要你去检查那个分支，是否合适合并进来，**不要重复劳动哈**」。⇒ 这一句同时撤掉我今早两件事的前提：①"面板接没接进常驻"在 dev 上追是追不到的（页面字节不在这棵树）；②他那句"开，我看看"我**没有**拿去当 CI `-tags winlive` 的批准，也没在 dev 上硬开一扇空白窗给他看。现行边界已写进记忆 `wisp-frontend-branch-worktree`（⛔ 不往 `D:/wt/fe` 派腿、连只读参考都不许）。
+
+**2. 他拍的口径＝乙：先预演（不落真实合并）**。方法＝`git merge-tree --write-tree`（纯对象层，不 checkout、不写 index、不碰任何分支），所有读数打在那枚结果树上。件＝`.scratch/wisp/probes/merge-dryrun/1/dryrun.md`（随本笔入库）。四枚数：
+- **真冲突＝0**（`rc=0` 且 `--name-only` 输出只有树号），并且我用一把**不依赖 merge 算法**的尺对拉过：两边相对分岔点 `c1b10089` 各自动过的文件清单取交集＝**0 枚**（fe 动过 43 枚、⛔ 全部在 `frontend/` 底下（`grep -vc '^frontend/'`＝0）；dev 动过 4771 枚；只在 fe 存在的＝22 枚）。
+- **门分母不会被顶歪**：`frontend/` 跟踪枚数 85 → 107；而把枚数写死成常数的那些断言全在**合成台架**里（自造 `frontend/dist/*.tsx` 那类假件），对真实仓的断言形状是"两把尺互相一致"。
+- **表情符号那道门（ban #8）在这 22 枚上不会响**：上界尺（不分注释/字符串，注释也算进去）打合并树＝**0 行**；⚠ 我给它配了正控，同一把尺打 `HEAD:docs/reports/pending-and-issues.md`＝**2719 行**、`HEAD:AGENTS.md`＝**6 行** ⇒ 那个 0 是真读数、不是尺坏了。
+- **并进来不解决他真正关心的那件事**：合并树里 `frontend/dist/` 仍只有 `.gitkeep`（fe 那侧也没把产物入库，那是票 77 AC#1 定的 `.gitignore` 规则、不是疏漏）。
+
+**3. ★我在同一小时内推翻了自己预演里的一句（原句不抹，写进 dryrun.md 的"§3 自纠"）**：我写的是**"没有门看得见空 bundle"**——**这句是重的**。立票 274 前按名字去核，现读到 `cmd/wisp/panel_host_gate_test.go:77 TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` **每次 CI 的 `cmd/wisp` 那一发都在跑**（`ci.yml:573` 那步），且 `internal/panel/assets.go` 是诚实形状：`:29 EntryFile="index.html"`、`:34 errNotBuilt`、`:54 newAssets`／`:57` 只有入口在场才置 `built=true`、`:75 Resolve` 在 `:76` 未构建时 `:77`**报错而不是给假页面**。⇒ **真缺口不是"没人管"，是"那把尺两种形状都放行"**（它 `:115-:127` 管带页面支、`:131-:137` 管只有锚文件支）＝CI 恒走 `false` 支而整包照绿。**"降级必须 fail-closed" ≠ "出货不许降级"**，这条形状级区分我此前没有过。
+
+**4. 新增两把尺（都是现跑，⛔ 不引件里的数）**：
+- `grep -n 'npm run build' .github/workflows/ci.yml` → **全文件只有 1 处**＝`:903`（在 `lint-frontend`，`:871`，`ubuntu-latest`）；跑 `scripts/build.ps1` 造 exe 的是 `:571/:757/:820` 三处，**没有一处先跑 npm**；job 之间不共享工作目录 ⇒ **CI 造的每一枚 exe 都是未构建那一形**。★ 这组行号与 `bundle-1`（A653 §6，锚 `c3183379`）报的 `:540/:726/:789` **逐枚 +31 精确对齐**＝两把独立尺同一读数，不是我把它的数抄了一遍。
+- 一枚**仓外隔离台件**把 embed 语义钉死（⛔ 没动本机那 4 枚产物）：`$HOME/tmp/embedprobe-274/`＝只放 `dist/.gitkeep` ＋ 同样写 `//go:embed all:dist` 的 `embed.go` ⇒ `go list -f '{{.EmbedFiles}}'` 回 `[dist/.gitkeep]`、`go build ./...` **rc=0**。对照本机现值 `go list -f '{{.EmbedFiles}}' ./frontend` ＝ **4 枚**（`.gitkeep`＋2 枚 assets＋`index.html`）。⇒ **"能不能编译"与"里面有没有页面"今天毫无关系**；带不带取决于编译机上碰巧有什么。台件留在盘上（只建不删）。
+- 与票 34 的分工（他"不要重复劳动"那句按这节落的）：34（未结案，`Last update 2026-09-19`）确实声称 "embed pipeline"，但它的前提路径**在树里跟踪枚数都是 0**（`git ls-files docker | grep -ci front`＝0、`git ls-files | grep -c '^assets/web'`＝0），且它的 AC#1 要**真开一扇窗**才能判＝今天 `winlive` 未批。⇒ **34 不动、不并、不改写**；票 274 只补"不需要开窗就能自动判"的那半句。
+
+**5. 立票 274**＝`.scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md`（**7 枚 AC 框，一枚未勾**）。射程：`scripts/build.ps1:73-74` 那句注释**两半都过期**（"embed lands in S5"←`//go:embed all:dist` 早已在树；"no frontend yet"←CI 每晚构建它，只是在另一枚 job）＋ 出货判据零票那一格。三形代价表（甲＝build.ps1 真跑 npm／乙＝CI 跨 job 传 dist artifact／丙＝发布前闸门强制 `built=true`）写成 **AC#2 本票不选形**。禁区三条具名：⛔ 不许动 `assets.go` 的 fail-closed 语义（那是安全形状）、⛔ 不许为了"让产物入库"改 `frontend/.gitignore` 的 `dist/*`（票 77 AC#1）、⛔ 不许把"实做第 2 步"混进改注释那一格（AC#3 单独可勾单独可撤）。AC#4 直接拿 `AC#12` 当**恒真反例**写进判据要求（"把 dist 换成只剩锚文件那一形 ⇒ 出货判据必须红"）。
+
+**6. 边界自陈（记在我身上，不等谁来挑）**：为确认那条 embed 指令，我读了 `frontend/embed.go` 第 **15–24 行**（10 行 Go 构建胶水）。依据＝A653 §6 我已按"Go 侧内嵌资源"允许清单追认过 `bundle-1` 读同一枚文件；⛔ 本轮**未打开任何 `frontend/src/**`、未读 `design/**`、未进 `D:/wt/fe` 那棵树一个字节**。⇒ 下一轮派单要把这条允许清单逐字抄给腿（`A653 §6` 已欠过一次，⛔ 不许欠第二次）。
+
+**7. 排程**：⛔ 未推送（取数期间不推、只 commit 不 push、cnb 未经机主同意不动）。`winlive` 在 CI 那档**继续禁**。本票写腿**按住**等 `cmd/wisp` 写面空出（`272-r2` 在飞，包级互斥）；AC#0/AC#1 可先派只读普查腿。仍在手的：`272-r2`／`111-r5` 收档、票 273 的 `#41`/`#42` 编号凭据去台账查（A653 §5 那格）、`236-m1`／`228 AC#2/AC#11`／`253 AC#1`（待我代笔）／`197-r3` 队列。产码面起手与此刻都是 `git status --porcelain -- cmd internal` ＝ **0 行**。
