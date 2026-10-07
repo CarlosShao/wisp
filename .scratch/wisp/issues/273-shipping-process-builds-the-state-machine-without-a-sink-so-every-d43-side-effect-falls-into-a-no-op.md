@@ -1,0 +1,38 @@
+# 273 — 出货进程里那台状态机没带 Sink：D43 那张表的副作用今天全投进一只空罐子
+
+立票时刻 `2026-10-07 09:2x +08`，锚点 HEAD `4dab3fbc`。来源＝只读普查腿 `voice-wire-1`（`.scratch/wisp/probes/voice-wire/1/wiring.md`，交件 `aee498d8`＋`756fb856`）具名报回的一枚**没有票**的缺口；**编排者已自己复量到下面①②两条**，③那枚数**我没量，故写进 AC#0 而不是写进结论**。
+
+## 1. 现象（大白话）
+产品里那张"十四态／状态机转移表"（D43）承诺：状态每变一次，会**发一枚副作用**出去（球换形状、托盘换图标、面板换文案那一类）。今天的形状是——**发是发了，收件人是一只什么都不做的空函数**。⇒ 读代码的人会以为"界面没反应是 bug"，而真正缺的是**那根线从来没接上**。
+
+## 2. 根因（两条我已现量，逐条给尺）
+① **`Sink` 是可选字段，缺省＝明示的 no-op**：
+- `internal/statemachine/machine.go:34` `type Sink func(Effect)`
+- `internal/statemachine/machine.go:39` `Sink Sink // nil = explicit no-op`
+- `internal/statemachine/machine.go:64` `if opts.Sink == nil {` → `:67` `opts.Sink = func(Effect) {}`
+- 尺＝`grep -n 'Sink' internal/statemachine/*.go | grep -v _test`
+② **出货那条腿建机器时没带 Sink**（`statemachine.New(` 在产码里只有 2 枚，两枚都只填 `Initial`）：
+- `cmd/wisp/models.go:303` `machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})`
+- `cmd/balldebug/main.go:188` `m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})`
+- 其余 5 枚命中都在 `_test.go`（`internal/ball/hotkey_live_test.go:382`、`internal/ball/interaction_live_test.go:54`/`:134`、`internal/models/bridge_test.go:16`/`:86`、`internal/models/handoff_window_109_test.go:62`）——**测试里有传 Sink 的形状，产码里没有**，这正是"用例绿而产品看不见"那一族。
+- 尺＝`grep -rn 'statemachine\.New(' --include=*.go .`
+③ **"一共有几枚副作用名、其中几枚是界面真要看的"＝我没量**（普查腿报"表上 50 枚副作用名全投进 no-op"，⛔ 我没有复跑那把尺，故不写进结论，只写成本票 AC#0 的靶子）。
+
+## 3. 关键约束（⛔ 触碰即退回）
+- **D43 转移表与 `C12` 是冻结件**（`AGENTS.md` §1.1、`PLAN.md` D43）：本票**不许改表里任何一行**，也不许新增/删除副作用名。要动表＝人工批准，不是本票射程。
+- **不许顺手把"界面无反应"改成"加一条日志就行"**：本票射程是"有没有一个真收件人"，不是日志。
+- ⛔ **不许为凑绿放宽任何既有断言**；⛔ 不许动 SLO 阈值／golden／`thresholds.go`。
+- ⛔ **`winlive` 未批**：任何"真开窗口看图标变没变"的读数都不许在本票里跑（那条只能登记成〔仅本机可量，未批〕）。
+- ⛔ 不碰 `frontend/**`、`design/**`（页面侧由别的会话负责）；本票只到"Go 侧有没有把 Effect 交出去"为止。
+
+## 4. 完成判据（AC 框只有编排者能翻，腿一枚都不许碰）
+- [ ] **AC#0 先把枚数量清**：D43 表里副作用名共几枚（逐枚点名）；其中**今天已有真收件人**的几枚、**只有空罐子**的几枚。⛔ 不许引用本票面或任何 logs 里的数当作凭据，要现跑。
+- [ ] **AC#1 未修码读数（先证今天拦不住）**：在未改动的那把尺上跑一发"产码里有没有任何一枚 `statemachine.New` 传了 `Sink`"⇒ 期望 **0 枚**；并给一发正向对照（测试里有传 Sink 的形状，证明尺命中得了真名）。
+- [ ] **AC#2 三形代价表，⛔ 本票不选形**：甲＝装配根注入一枚真 Sink（`cmd/wisp`，与票 246"门由装配根注入"同一条路）；乙＝包内自带一个默认 Sink（会把"没人订阅"变成"包自己决定发给谁"）；丙＝只在常驻腿接、`cmd/wisp` 那条不动。逐形给：动哪几枚文件、撞哪几枚既有钉、要不要新依赖边、以及**"这条边以后谁能看见"**。
+- [ ] **AC#3 零新契约面**：⛔ 不许新造 `C##`、不许往 `C17` 方法白名单加名字（那要人工批准）；如果只有加白名单才能落，本票**停下上报**，不许自作主张。
+- [ ] **AC#4 反形敏感性**：判据必须写成**定向突变**——"把 Sink 摘掉那一形必须红"，⛔ 不许写"有没有 Sink"这种换形也全绿的恒真句（票 270 的 AC#1 今天刚被判出恒真，教训在同一天）。
+- [ ] **AC#5 门禁四数**：`sh scripts/d22scan.sh` rc=0 且正控先绿；`gofmt -l`／gofumpt v0.12.0 `-l` 只喂 `.go`；`go vet ./cmd/wisp/ ./internal/statemachine/` rc=0；终态 `go test ./cmd/wisp ./internal/... -count=1` 的**逐名红名册与起手作差＝0**。
+- [ ] **AC#6 还原自证**：所有突变只走 `go test -overlay`（拷贝放仓外），⛔ 绝不原地编辑共享工作树；终态 `git status --porcelain -- cmd internal`＝起手，被审文件与 `git show HEAD:` 逐串对回。
+
+## 5. 排程（编排者自己记，不许腿替我改）
+本票**排在 `cmd/wisp` 写面空出之后**：此刻 `272-r2` 是本波唯一跑 Go 突变的腿，它的终态门禁要跑整包红名册，任何写腿落脏文件都会洗它的读数（⛔ "它们改的是不同文件"这种推理不接受，包级互斥那条）。落点普查腿 `273-a1`（只读）与本票可并行。

@@ -42,3 +42,24 @@
 
 - 10-06 18:3x 编排者立票。产码未动一字（`internal/tools/subagent_197.go` md5＝HEAD 同串）。
 - 10-06 19:1x 腿 `270-a1`（只读代价普查）交件＝`.scratch/wisp/probes/270/a1/census.md`（五节全实，⛔ 不选形、不翻框、零 `go` 命令）。读数摘要：①派单五枚锚点（`:135`／`:256`／`:257`／`:278`／`:279`）现量**逐字对上，一枚未漂**；②顶红枚数＝甲 **0** 枚具名红／乙 **3** 枚具名红（`failclosed_236_teeth_test.go:95-96` 共用常量＋`:195`＋`:218` 两枚等值钉）另 **3** 枚次序敏感钉（`:176`／`:257`／`:269`）／丙 **0** 枚（越界加类型或字段则＋2＝`subagent_197_test.go:879`、`cmd/wisp/subagent_selfapproval_197_test.go:563`）；③★新发现＝`:293 opt.Tools = newSubagentToolProvider(t.d.ParentTools)` 同样只靠 `:256` 拦着 ⇒ `:256` 今天是**一票三形**，且 `internal/tools/task_cancel_221_test.go:51` 是派单未列的第 4 处 nil-`BaseOptions` 形状；④残余零读数面（静态）＝`internal/tools` 里 **25 处＋cmd 1 处无 recover 的 spawn 派发点**，三形都不动；⑤`d22scan` 侧唯一真会拦三形的是 ban 8（字符串不豁免）与 ban 9（丙那条注释若引路径必须盘上存在——本腿实测 `docs/DECISIONS.md`／`docs/DEFERRED.md`／`docs/TOOLS.md`／`docs/STATE_MACHINE.md`／`docs/contracts/` **全 MISSING**，`SPEC-05` 真名＝`docs/specs/SPEC-05-agent-core.md`）。⚠ **AC#0 里"拆完之后剩几枚零读数"那一格本腿未交实测**（禁跑 `go`），已作为 §3 第 3 条摆给编排者；本腿未动产码一字、未动任何 `- [ ]`（`git status --porcelain -- cmd internal` 起手＝终态＝0 行）。
+
+---
+
+### [10-07 09:3x] 编排者追加更正（来源＝只读腿 `270-a2` 交件 `aa6e8870`，其件 `.scratch/wisp/probes/270/a2/pairing.md` 103 行／23,759 字节／占位 0；下列三处**我逐条自己复量过**，原话不抹）
+
+**更正一：本票 AC#1 那条完成判据今天恒真 ⇒ 不许当凭据（框未翻，仍待重写）。**
+腿给的尺：`236-v1/verdict.md:153`（A-4 那发**带 recover＝名册全 ≈204/2**）与 `:164`（摘掉 recover 才 25/2）。⇒ 我原来那句"摘掉 `:256` 整支后仍出全量名册"正是**反形自己要读的那一发**——零改动也绿。按 [[记忆：判据换成反形仍全绿＝它对这事不敏感]]，这条判据对"有没有装配守卫"不敏感。
+⇒ 处置：AC#1 框**保持未勾**；下一枚落地腿的判据改成腿建议的那枚定向形状——"同发突变里 `Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired`（等值钉在 `failclosed…_test.go:218`）**红→绿**"，前提＝`:278` 复用 `:257` 那句串（该前提由腿给，落地腿必须自己再验一次）。
+
+**更正二：我票面那句"就在 guard 之后两行"已过期。**
+现量：`:258`→`:278`＝**20 行**（`:256`→`:278`＝22 行），不是两行。同一句英文仍在 `failclosed…_test.go:201-203`。⛔ 我只登记，不改写原句。
+
+**更正三：★记我——"没有任何读盘／embed 的尺去读 `subagent_197.go`"这句是我凭空加的，不是 `270-a1` 的结论，且今天为假。**
+- `270-a1` 的件里**没有这句话**（腿具名报回，我复按其件亦无）。
+- 今天盘上有两把读源码形状的尺，且都在本包：`internal/tools/paths_twocontainments_252_r2_test.go:194` `os.ReadDir(".")` → `:203` 排除 `_test.go` → `:206` `parser.ParseFile(fset, name, nil, parser.ParseComments)`（＝逐枚解析本包全部非测试源，`subagent_197.go` 在其内）；`internal/tools/task_cancel_221_legs_test.go:224` `os.ReadFile("task.go")`。两把我都 `sed` 逐行看到原文。
+- ⇒ 影响：**丙形（"只登记不装牙"）并非零具成本**；但腿同时给出关键限定——这类**源形状尺对 `-overlay` 突变失明**（`failclosed…_test.go:68-75`），所以它**不能顶替 AC#1**。两句要一起读，⛔ 不许只剩其中一句。
+
+**裁定（本票不拆，拆票归下一轮）：**
+腿建议"拆 2 枚＋1 枚待议"，理由是 `:293` 那一半**按静态读不是当场崩形**——我复量对上了：`internal/tools/subagent_197.go` 的 `Tools()`（`:552`）**有 `if p.inner == nil { return nil, nil }` 守卫**，nil `ParentTools` 不会在构造时炸，而是**延迟到 `Execute` 走 `p.inner.Execute(...)` 那一支**。⇒ 我票面"拆任一半不许零读数"只对 `BaseOptions` 半边成立，**对 `ParentTools` 半边说过头了**。
+- 本票射程**收窄为 `BaseOptions` 那一半**（三形同落 `subagent_197.go`、互不打红：甲/丙 0 枚红、乙 3 枚红是它自己那批钉 ⇒ 文件层面装得住，这条腿已证）；
+- `ParentTools` 那一半"延迟崩"要不要单立一票，**我按下不立**，等本票 AC#1 判据重写并落地之后再裁（⛔ 不在同一枚票上同时改判据与加射程）。
