@@ -1,0 +1,14 @@
+probes(111 r5 起手闸门件)：ci.yml 39 枚具名步 / 51 枚含 uses 步的名册＋守卫计数＋四格原文
+
+写腿 111-r5 的第 1 笔（在任何长跑命令之前落盘，按 A651 定式）。
+
+- 靶子现量：lint 作业 `gofmt (gofumpt) - the tracked set is the denominator`
+  （`- name:` :184 / `run:` :204）**没有** `if:`，它紧挨着的上一步 `gofmt (gofumpt)`（:168）
+  按票面 §305/§316 记录今天在红 ⇒ 这把 tracked 名册普查尺在 CI 里到今天一次都没执行。
+  同族对照组＝test-windows 的 census 步（守卫 :650 / run :651），那枚有守卫。
+- 名册两份产出：`logs/step-roster-before.txt`（awk 抽，39 行具名步）＋
+  `logs/yaml-census-before.txt`（真 YAML 解析器 PyYAML 6.0.3 读，51 枚步 / 11 枚带 `if:` /
+  `continue-on-error` 出现 0 次）。
+- `logs/ac-verbatim.txt`＝票面 `:27` AC#3、`:31` AC#5、`:75` AC#7、`:77` AC#8 四格逐字（8 行 1,161 字节）。
+- 台件 `ci-guards.md` §0/§1/§2 起手件写满；⛔ 一枚 AC 框未动（`- [ ]`＝4 / `- [x]`＝6 与起手一致）。
+- 本笔只写 `.scratch/wisp/probes/111/r5/**`，`ci.yml` 尚未改动；零 `.go` 读写；只 commit 不 push。
