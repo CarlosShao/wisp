@@ -273,3 +273,75 @@ $ find . -name '*.go' -not -path './.scratch/*' | grep -v '^\./cmd/' | grep -v '
 
 ⓓ **顺手量到、与条数同层但形状不同的一枚（只报形，不裁决）**：尺
 `grep -n 'To: *StateConversation' internal/statemachine/table.go` → **RC=1（零命中）**，而 `D43: 42`（`table.go:246`）的 `From` 正是 `StateConversation`。⇒ 实现表里 #42 那一行的 `From` 没有任何一枚行的 `To` 能到达。SPEC-08:118 的 `#30` 把 `To` 列写成 ``Conversation`→`Listening`，而 `table.go:219` 的 `To` 只有 `StateListening`（`table.go:220-223` 的注释对这一点是明说的）。三层原文到此摆齐，**是否算缺陷由编排者裁**。
+
+---
+
+## §4 落点形状的三个事实（本腿不选形）
+
+### ⓐ 装配根在哪
+
+| 腿 | 入口 | 装配函数（具名行） | 机器造点 | 该装配函数今天被调几处 |
+|---|---|---|---|---|
+| `wisp models ensure`（出货 CLI 子腿） | `cmd/wisp/main.go:109`（`case "models"`） | `cmdModels` `cmd/wisp/models.go:104` → `modelsEnsure` `:262` → `(*modelStore).handOffModel` `:302` | `:303`（唯一造点，逐跳 1 枚调用点） | `cmdModels` 1 枚产码调用；`modelsEnsure` 1 枚；`handOffModel` 1 枚 |
+| `wisp run`（干活 CLI 腿） | `cmd/wisp/main.go:91` → `cmdRun` | `cmd/wisp/run.go:990 (*agentRuntime).execute`（`:998` 装 `agent.Options.Sink`） | **0 枚**（尺 A 全仓无） | — |
+| 常驻腿（无参数 GUI，`wisp.exe` 双击） | `cmd/wisp/main.go:66 runResident()` | `cmd/wisp/resident_windows.go:33 func runResident()`；同文件装配行＝`:66 installLogSink`、`:132 newResidentApprovalWithConfig`、`:217 startResidentBall(...)`；非 Windows 是同名的 stub `cmd/wisp/resident_other.go:22` | **0 枚** | `runResident` 产码调用点 1 枚（`main.go:66`） |
+| dev 件（⛔ 非出货件） | `cmd/balldebug/main.go:87 main()` | 同函数内装配（`:188` New、`:189 ball.New`、`:194-208 Events`） | `:188` | 仅 `scripts/dev/ball-cycle.ps1:30` 构建；`scripts/build.ps1:129` 只 `go build ... ./cmd/wisp` |
+
+⇒ 事实：**出货进程里"有机器可装"的位点只有 `cmd/wisp/models.go:302-305` 一处**；常驻腿与 `wisp run` 里连机器都没有，"往哪儿注 Sink"这两条腿目前是空集（要先有机器）。
+
+### ⓑ 既成的"由装配根注入"先例（票 246 的真身在哪几行）
+
+- 票面自述：`cmd/wisp/resident_approval_windows.go:5`——`// The approval gate held by the resident process (ticket 246, 乙形：装配根注入).`
+- 被注入方的形状（参数就是"函数值＋nil 合法"）：
+  - `cmd/wisp/resident_ball_windows.go:63` `type escVetoFunc func() string`
+  - `cmd/wisp/resident_ball_windows.go:256` `func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg ..., hotReload ..., hooks ...ballHostHook) *residentBall`
+  - `:257` `rb := &residentBall{cancelHosted: onCancelEsc != nil}`；消费点 `:430-437 recordCancelHotkey(onCancelEsc)`（nil ⇒ 只登记不可用）
+  - 注释钉：`:34` "It is handed in as a function value by startResidentBall's parameter, so…"、`:237` "onCancelEsc is the injected cancel executor … nil is legal"、`:351` "D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)"
+- 装配根递进去的那一行：`cmd/wisp/resident_windows.go:217 rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, …)`（`:132` 先 `ra := newResidentApprovalWithConfig(rt.Layout.DataDir)`）。
+- 同族第二先例（**同一字段名 `Sink`，装的都是别的包的 Sink**，即"由装配根往 Options 里塞一枚 Sink"这条形状在本仓已有两枚产码真身）：
+  - `cmd/wisp/run.go:998 Sink: consoleSink{out:…, stream:…, publish: rt.publishPanelSnapshot}`（`internal/agent/sink.go:63 type Sink interface`；缺省不塞＝`internal/agent/sink.go:67-68 NopSink … used when no UI is wired`）
+  - `cmd/wisp/providers.go:194 Sink: storeHealthSink{store: store}`（`internal/llm/probe_health.go:117 HealthSink`、`:208 Sink HealthSink`）
+- ⚠ 反面事实：状态机这枚 `statemachine.Sink`（`machine.go:34`）**没有任何一枚先例被写出过类型名**（尺 D 全仓 `grep -rn 'statemachine\.Sink'` → RC=1，含测试），唯一的真收件人是函数字面量 `internal/models/bridge_test.go:18`。
+
+### ⓒ 新增注入会不会新开一条依赖边（`go list` 现量，⛔ 不凭印象）
+
+```
+$ go list -f '{{.ImportPath}}: {{.Imports}}' ./internal/statemachine
+github.com/CarlosShao/wisp/internal/statemachine: [fmt log/slog sync time]
+```
+⇒ 状态机包**零 wisp 内部依赖**。"包内自带默认 Sink"（票 AC#2 的乙形）若要在包里真发出去，`ball`/`panel`/`agent` 全都要新开边，且 `internal/ball` 与 `internal/models` 已经各自 import `statemachine`（下量），包内自带真收件人会**成环**。
+```
+$ for p in ./internal/models ./internal/ball ./internal/panel ./internal/agent; do go list -f '{{.ImportPath}} {{range .Imports}}{{.}} {{end}}' $p | grep CarlosShao; done
+```
+原始末 3 行（逐包 wisp 内部依赖，已剥前缀）：
+```
+./internal/models -> internal/observe internal/statemachine
+./internal/ball   -> internal/observe internal/statemachine
+./internal/panel  -> internal/projctx internal/risk internal/streamkey
+./internal/agent  -> internal/config internal/llm internal/memory internal/observe internal/winsec
+```
+⇒ `internal/models`（`WireDownloading` 造桥侧）**不 import** `ball`/`panel`/`agent`；在这里注一枚真 Sink 就要新开 `models -> ball`/`models -> panel` 之类的边。
+```
+$ go list -f '{{range .Imports}}{{.}}{{"\n"}}{{end}}' ./cmd/wisp | grep wisp
+（21 枚，含 internal/agent、internal/ball、internal/models、internal/panel、internal/session、internal/statemachine、internal/observe …）
+```
+原始末 3 行：
+```
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/session
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/tools
+```
+⇒ 在 `cmd/wisp` 装配根里注一枚真 Sink（票 AC#2 的甲形落点），被调的 `ball`/`panel`/`agent` **已经在 `package main` 的直接 import 集里**，这条注入**不需要新增 import 边**（尺已跑）。另有一条必须记的事实：`cmd/wisp` 装机器的那条腿（`models.go`）今天**没有** `ball`/`panel` 的任何窗口或事件循环在场，而常驻腿（`resident_windows.go`）有窗口却**没有机器**——"零新边"只说明 import 图上不加箭头，不说明那两条腿能直接对接。
+
+---
+
+## §5 未做完／没量的格子（照实报，⛔ 不写成做完了）
+
+1. **§2 的 B 档 10 枚＝静态可达推演，没有任何一发运行时读数**：`winlive` 未批、本腿一枚 `go test` 都没跑。若编排者要"balldebug 真响过这 10 枚"的凭据，本腿给不了。
+2. **§2 没有把"面板/托盘/键盘/语音"入口逐枚追到 OS 事件源**：我只量了"事件常量的生产者枚数＋具名行"。托盘 `OnTray*` 我读到的是 `cmd/balldebug/main.go:199-208` 的 `fmt.Println` stub（不投事件），出货常驻腿的托盘回调链**没逐枚追**。
+3. **§1 的 8 枚里没有查"机器被别处经接口值持有"的形状**：`internal/models/bridge.go` 用的是具体类型 `*statemachine.Machine`，尺"全仓 `statemachine.Machine` 出现处（非测试）"＝ balldebug 4 枚 + bridge 2 枚；但我**没有**扫"把机器塞进某个 `any`/结构体字段再传"的形状。
+4. **§3 只做三层原文摆齐**：`#41/#42` 有没有获人工批准（票面末段那格）＝不在本腿射程，我**没去台账查 `A##`**。
+5. **`error.ack` 归 C 档的依据**是"`Close()` 拆定时器"这一读码推理（`machine.go:169-174`＋`models.go:304/:321`），**没有**时间测量；如果哪天 `handOffModel` 在 return 前做够 10s 的事，这一格会变。
+6. **§2 的 12 枚重名去重后＝50**，但"每枚名字分布在几枚行上"我只在表里逐名标了行号，**没有**单独给"每枚名字出现的次数分布尺输出"（`uniq -c` 我跑了 `uniq -d`，见 2.1 那句）。
+
