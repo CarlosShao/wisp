@@ -1,0 +1,33 @@
+=== A) fresh build output on disk (frontend/dist), produced by this run ===
+.gitkeep bytes=0 sha256_8=e3b0c44298fc1c14 md5=d41d8cd98f00b204e9800998ecf8427e
+assets/index-B8yINMF1.js bytes=551989 sha256_8=8f06145dac449fb6 md5=e28c737644151464e239192fa27850d1
+assets/index-yy8KMgdf.css bytes=49540 sha256_8=d0b198664b250973 md5=7bd2c565b2e4d06018fccaae1f5dcee7
+index.html bytes=1044 sha256_8=9b7856b949d63989 md5=d83b83991cfc8fcb0e3d821240e27aed
+
+=== B) what go:embed now takes in ===
+[dist/.gitkeep dist/assets/index-B8yINMF1.js dist/assets/index-yy8KMgdf.css dist/index.html]
+rc=0
+
+=== C) the exe's own report ===
+panel assets embedded: 4 files, entry=index.html built=true
+EXITCODE=0
+
+=== D) exe manifest (path size sha256[0:8] straight off the embedded FS) ===
+.gitkeep 0 e3b0c44298fc1c14
+assets/index-B8yINMF1.js 551989 8f06145dac449fb6
+assets/index-yy8KMgdf.css 49540 d0b198664b250973
+index.html 1044 9b7856b949d63989
+EXITCODE=0
+
+=== E) exe -check (entry refs resolve inside the binary) ===
+panel assets check: entry=index.html built=true 2 asset refs resolve [./assets/index-B8yINMF1.js ./assets/index-yy8KMgdf.css]
+EXITCODE=0
+
+=== F) exe identity ===
+md5=e6c8e52bb14f15a7983bbc6b093e6058 bytes=31074357
+
+=== G) did frontend/** move between 274-a2's fresh build and this run? ===
+611ae8b9 fix(票 169 甲案): right-rail.tsx:108 假终端文案里的 U+2713 换成 OK——一枚装饰字符曾同时摘掉 CI 四道静态门（lint 自检红→后续步全跳过且无声）；d22scan 复跑 rc=0、全仓 0 finding
+5e23d995 feat(frontend 右栏三标签定案): owner 指认「审查（代码的审查）/终端/浏览器」——画布误解纠正，三面板大胆画
+a2a3b3cc feat(frontend 右栏 ZCode 交互补全 + 会话流行): 标签可关×/＋重开/下拉（打开+最近关闭+搜索）/全关出空状态卡；会话流补 后台任务行/子智能体行/审阅钮
+HEAD=66df27ba

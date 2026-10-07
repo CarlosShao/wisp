@@ -1,0 +1,21 @@
+=== build/wisp.exe panel-assets (default branch, the existing rc=1 tooth) ===
+time=2026-10-07T11:51:45.058+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp panel-assets: assets NOT BUILT
+EXITCODE=1
+
+=== build/wisp.exe panel-assets -manifest ===
+time=2026-10-07T11:51:45.117+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)
+EXITCODE=1
+
+=== build/wisp.exe panel-assets -check ===
+time=2026-10-07T11:51:45.175+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)
+EXITCODE=1
+
+=== exe identity ===
+md5=50846822b62fd3426ced8365408891cb bytes=30471221
+
+=== post-build go list EmbedFiles ===
+[dist/.gitkeep]
+rc=0

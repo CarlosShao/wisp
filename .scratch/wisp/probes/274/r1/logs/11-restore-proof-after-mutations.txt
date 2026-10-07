@@ -1,0 +1,9 @@
+=== restore self-proof after mutation (ii): stale dist moved back ===
+diff -r rc=0 IDENTICAL to the untouched backup
+.gitkeep MATCH d41d8cd98f00b204e9800998ecf8427e
+index.html MATCH f98bfc4ba5dd39d74c9b2f85438de70a
+assets/index-BRKj5OIJ.css MATCH db4db7a27fb34e3de7acf045561d753a
+assets/index-BVKlegVD.js MATCH 70128a3dfdbc73e9f603bb421cdf324c
+
+--- git status --porcelain -- cmd internal scripts tools .github docs frontend (expect only scripts/build.ps1) ---
+ M scripts/build.ps1

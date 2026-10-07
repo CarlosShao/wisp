@@ -1,0 +1,13 @@
+MUTATION=i node dir removed from process PATH (system PATH untouched)
+node.exe resolves to: 
+node resolves to: 
+npm.cmd resolves to: 
+npm resolves to: 
+remaining PATH entries matching node14: 0
+go.exe still resolves to: D:\work\base\go\bin\go.exe
+--- running build.ps1 ---
+build.ps1: repo root D:\work\workspace\projects plans\Wisp (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: FATAL: frontend step: node could not be resolved on PATH (tried node.exe, then node). The page bundle is a build input of wisp.exe, so this script fails instead of skipping it. Install the toolchain pinned in docs/BUILD.md, or run the build on a machine that has node and npm on PATH.
+BUILD_PS1_PROCESS_EXITCODE=1

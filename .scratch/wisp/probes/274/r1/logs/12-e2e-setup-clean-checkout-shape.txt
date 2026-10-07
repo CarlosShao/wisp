@@ -1,0 +1,10 @@
+=== end-to-end run setup: tree put into the CLEAN-CHECKOUT shape ===
+--- frontend/dist now ---
+frontend/dist/.gitkeep
+--- frontend/node_modules present? ---
+NO
+  (moved intact to /d/tmp/wisp274r1/node-modules-pre-274r1/node_modules, nothing deleted; npm ci will rebuild it)
+--- go list EmbedFiles at this shape ---
+[dist/.gitkeep]
+--- build/wisp.exe pre-run ---
+md5=50846822b62fd3426ced8365408891cb bytes=30471221

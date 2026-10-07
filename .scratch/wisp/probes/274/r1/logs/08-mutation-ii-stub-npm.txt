@@ -1,0 +1,35 @@
+MUTATION=ii stub npm prepended; it exits 0 and produces no files
+npm.cmd resolves to: D:\tmp\wisp274r1\fake-npm-shim\npm.cmd
+node.exe resolves to: D:\work\server\node14\node.exe
+--- dist before run ---
+D:\work\workspace\projects plans\Wisp\frontend\dist\.gitkeep
+--- running build.ps1 ---
+build.ps1: repo root D:\work\workspace\projects plans\Wisp (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module 'D:\work\workspace\projects plans\Wisp\version'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v24.9.0
+build.ps1: frontend: node = D:\work\server\node14\node.exe (); npm = D:\tmp\wisp274r1\fake-npm-shim\npm.cmd (fake-npm 0.0.0 (ticket 274 mutation rig - exits 0 without doing any work))
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+fake-npm 0.0.0 (ticket 274 mutation rig - exits 0 without doing any work)
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds only the anchor file(s) [1 file(s), none beside frontend/dist/.gitkeep]. That is the clean-checkout shape, so the exe would ship with zero page bytes. Named cause: build produced no page artifacts.
+BUILD_PS1_PROCESS_EXITCODE=1
+--- dist after run ---
+D:\work\workspace\projects plans\Wisp\frontend\dist\.gitkeep

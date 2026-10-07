@@ -1,0 +1,18 @@
+=== restore self-proof after the unfixed run (moved files back) ===
+--- dist now ---
+frontend/dist/.gitkeep md5=d41d8cd98f00b204e9800998ecf8427e sha256_8=e3b0c44298fc1c14 bytes=0
+frontend/dist/assets/index-BRKj5OIJ.css md5=db4db7a27fb34e3de7acf045561d753a sha256_8=f8ff337b2ce80f3b bytes=49943
+frontend/dist/assets/index-BVKlegVD.js md5=70128a3dfdbc73e9f603bb421cdf324c sha256_8=793e606366463f0e bytes=553469
+frontend/dist/index.html md5=f98bfc4ba5dd39d74c9b2f85438de70a sha256_8=2078af7f2343af94 bytes=1044
+
+--- diff against the untouched backup /d/tmp/wisp274r1/dist-stale-backup ---
+diff -r rc=0 IDENTICAL
+
+--- per-file md5 compare table (start baseline vs now) ---
+.gitkeep MATCH d41d8cd98f00b204e9800998ecf8427e
+index.html MATCH f98bfc4ba5dd39d74c9b2f85438de70a
+assets/index-BRKj5OIJ.css MATCH db4db7a27fb34e3de7acf045561d753a
+assets/index-BVKlegVD.js MATCH 70128a3dfdbc73e9f603bb421cdf324c
+
+--- git status --porcelain -- cmd internal scripts tools .github docs frontend ---
+(empty = same as start)
