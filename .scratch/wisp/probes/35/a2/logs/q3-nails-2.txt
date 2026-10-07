@@ -1,0 +1,78 @@
+=== panel_host_gate_test.go:20,55 (import ban list) ===
+20: 	"strings"
+21: 	"testing"
+22: 
+23: 	"github.com/CarlosShao/wisp/internal/panel"
+24: )
+25: 
+26: // TestPanelHostOpensNoListeningSocketL1 is AC#3's L1 half: the host production
+27: // file must not import net or net/http (no listener can be built without them).
+28: // The L2 half - reading GetExtendedTcpTable and filtering dwState==LISTEN - runs
+29: // only on the desktop box (winlive has no CI job) in panel_host_windows_test.go.
+30: func TestPanelHostOpensNoListeningSocketL1(t *testing.T) {
+31: 	src := filepath.Join("panel_host_windows.go")
+32: 	fset := token.NewFileSet()
+33: 	f, err := parser.ParseFile(fset, src, nil, parser.ImportsOnly)
+34: 	if err != nil {
+35: 		t.Fatalf("parse host source %s: %v", src, err)
+36: 	}
+37: 	forbidden := []string{"net", "net/http", "net/netip", "net/mail", "net/tcp"}
+38: 	for _, imp := range f.Imports {
+39: 		path := strings.Trim(imp.Path.Value, `"`)
+40: 		for _, bad := range forbidden {
+41: 			if path == bad || strings.HasPrefix(path, bad+"/") {
+42: 				t.Errorf("panel host imports %q, which can open a listening socket; D29/AC#3 forbid a localhost server", path)
+43: 			}
+44: 		}
+45: 	}
+46: }
+47: 
+48: // TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12 is AC#12's ruler, re-tooled
+49: // by 33-r4. The version it replaces
+50: // (TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12) contained ZERO t.Errorf:
+51: // every finding - the non-anchor entries and the count - went to t.Logf, so it
+52: // could not go red under any bundle at all (33-v1 §A#31: "the fails-closed claim
+53: // in its comment has no counterpart in the code").
+54: //
+55: // AC#12's question is "can this instrument tell 'the embed only matched the
+=== who asserts Eval/Init/SetHtml/Bind call counts or inbound-shape across cmd+internal tests ===
+cmd/wisp/panel_host_windows_test.go:226:// records that the router reached a handler for a real postMessage, and accepts.
+cmd/wisp/panel_resident_windows_test.go:175:		w.Eval(js)
+cmd/wisp/panel_resident_windows_test.go:199:// was covering the mutation. So the reports ride window.wispDispatch, the product's own
+cmd/wisp/panel_resident_windows_test.go:301:	parts = append(parts, "window.wispDispatch("+reportJSEnv("ac13-probe", "b")+");")
+cmd/wisp/panel_resident_windows_test.go:801:		"window.wispDispatch(" + env("'ac14r-beacon'", "'SCRIPT-RAN'") + ");" +
+cmd/wisp/panel_resident_windows_test.go:805:		"Promise.resolve(window.wispDispatch(ENVS[i])).then(function(v){ return 'REPLIED'; })," +
+cmd/wisp/panel_resident_windows_test.go:808:		"window.wispDispatch(" + env("REP[i]", "got.replace(/[^A-Za-z0-9-]/g, '')") + ");" +
+cmd/wisp/panel_resident_windows_test.go:864:	evalOnPanelThread(t, rp, "window.wispDispatch("+reportJSEnv("ac14-push", "document.title")+");")
+internal/panel/l2_grant_boundary_test.go:20://	   ->      bridge.postMessage(JSON.stringify({method:"panel.approval.request", correlationId, outcome}))
+internal/panel/l2_grant_boundary_test.go:72:// postMessage today. A green run here therefore does NOT mean "the panel cannot
+=== hostChannelCapabilityHits: definition + callers ===
+internal/panel/composer_dispatch_test.go:424://     they exercise hostChannelCapabilityHits, which is the same function as before.
+internal/panel/composer_dispatch_test.go:436:	hits := hostChannelCapabilityHits(t, root)
+internal/panel/composer_dispatch_test.go:455:		writeHostCarrier(t, a, filepath.Join("internal", "panel"), "host_windows.go", `package panel
+internal/panel/composer_dispatch_test.go:463:		if got := hostChannelCapabilityHits(t, a); len(got) == 0 {
+internal/panel/composer_dispatch_test.go:474:		writeHostCarrier(t, b, "", "go.mod", "module github.com/CarlosShao/wisp\n\nrequire github.com/jchv/go-webview2 v0.0.0-20220111092826-5ea30c1aaa37\n")
+internal/panel/composer_dispatch_test.go:475:		writeHostCarrier(t, b, "", "go.sum", "github.com/jchv/go-webview2 v0.0.0-20220111092826-5ea30c1aaa37 h1:8vXupf01+8Q7j94hb8jLZ4J0K+zxuu6W1JxG2rHpNzA=\n")
+internal/panel/composer_dispatch_test.go:476:		if got := hostChannelCapabilityHits(t, b); len(got) == 0 {
+internal/panel/composer_dispatch_test.go:490:		writeHostCarrier(t, c, filepath.Join("cmd", "wisp"), "panel_inbound.go", `package main
+internal/panel/composer_dispatch_test.go:499:		if got := hostChannelCapabilityHits(t, c); len(got) != 0 {
+internal/panel/composer_dispatch_test.go:518:		writeHostCarrier(t, d, filepath.Join("cmd", "wisp"), "panel_host_neutralised.go", `package main
+internal/panel/composer_dispatch_test.go:531:		dhits := hostChannelCapabilityHits(t, d)
+internal/panel/composer_dispatch_test.go:545:// from hostChannelCapabilityHits is tagged ":identifier", ":imports" or
+internal/panel/composer_dispatch_test.go:580:// hostChannelCapabilityHits reads root's PRODUCTION sources for the host family
+internal/panel/composer_dispatch_test.go:588:func hostChannelCapabilityHits(t *testing.T, root string) []string {
+internal/panel/composer_dispatch_test.go:690:// writeHostCarrier puts one throwaway file into a repository-external temp tree.
+internal/panel/composer_dispatch_test.go:694:func writeHostCarrier(t *testing.T, root, dir, name, content string) {
+=== func Test list in composer_dispatch_test.go ===
+126:func TestRawEnvelopeReachesTheAttachedModeHandlerExactlyOnce(t *testing.T) {
+157:func TestAcceptedRequestInventsNoReplyLine(t *testing.T) {
+175:func TestRoutingDoesNotBypassTheNativeModeGate(t *testing.T) {
+201:func TestUnlistedMethodNameIsRefusedAndAudited(t *testing.T) {
+231:func TestRosterMismatchBackstopRefusesInsteadOfAccepting(t *testing.T) {
+249:func TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped(t *testing.T) {
+288:func TestAttachedHandlerIsWhatRunsForItsOwnMethod(t *testing.T) {
+313:func TestTamperedSourceIsRefusedByTheSameDoor(t *testing.T) {
+347:func TestAttributionFieldsReachTheHandlerUnchanged(t *testing.T) {
+374:func TestDispatcherSpellsNoRouteLiteralOfItsOwn(t *testing.T) {
+434:func TestPanelHostIsAttachedAndNamesTheWindowHops(t *testing.T) {
+708:func TestTheInboundHopAddsNoSwitchingCapability(t *testing.T) {

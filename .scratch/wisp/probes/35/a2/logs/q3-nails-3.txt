@@ -1,0 +1,172 @@
+=== hostChannelCapabilityHits body :580-660 ===
+580: // hostChannelCapabilityHits reads root's PRODUCTION sources for the host family
+581: // and returns "relpath:line:what" per hit. Out of scope, and named so nobody has
+582: // to guess: test files (a host is a shipping thing, and this very file spells the
+583: // symbols in its own carrier strings), the directory set below, comments, and
+584: // string literals. A host reached through a hand-rolled COM vtable that spells
+585: // none of these names in an identifier is outside this ruler's sight - the
+586: // dependency half is what would catch it, and 票 33's window leg is where that
+587: // shape would actually arrive.
+588: func hostChannelCapabilityHits(t *testing.T, root string) []string {
+589: 	t.Helper()
+590: 	var hits []string
+591: 	fset := token.NewFileSet()
+592: 	walk := filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
+593: 		if err != nil {
+594: 			return err
+595: 		}
+596: 		if d.IsDir() {
+597: 			switch d.Name() {
+598: 			// .git and the build trees carry no product source; scripts/ holds this
+599: 			// repository's own WebView2 latency spike, which is deliberately not the
+600: 			// shipped host, and the set below is the one the predecessor skipped -
+601: 			// frontend/ and design/ are another session's ground and this slice reads
+602: 			// neither. .scratch/ is the ticket pool: other slices keep probe copies
+603: 			// there (several of them renamed copies of run.go), and a red from one of
+604: 			// those would accuse the product of something a scratch tree did.
+605: 			case ".git", ".scratch", "node_modules", "dist", "third_party", "scripts", "docs", "frontend", "design", "build":
+606: 				return filepath.SkipDir
+607: 			}
+608: 			return nil
+609: 		}
+610: 		name := d.Name()
+611: 		rel, _ := filepath.Rel(root, p)
+612: 		rel = filepath.ToSlash(rel)
+613: 		if strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
+614: 			src, err := os.ReadFile(p)
+615: 			if err != nil {
+616: 				return err
+617: 			}
+618: 			f, err := parser.ParseFile(fset, p, src, 0)
+619: 			if err != nil {
+620: 				// Unparseable production source is itself a finding: the alternative
+621: 				// is a ruler that quietly skips the file it cannot read.
+622: 				hits = append(hits, rel+":0:unparseable: "+err.Error())
+623: 				return nil
+624: 			}
+625: 			for _, imp := range f.Imports {
+626: 				path := strings.Trim(imp.Path.Value, `"`)
+627: 				if hostModulePathHit(path) {
+628: 					hits = append(hits, fmt.Sprintf("%s:%d:imports %s", rel, fset.Position(imp.Pos()).Line, path))
+629: 				}
+630: 			}
+631: 			ast.Inspect(f, func(n ast.Node) bool {
+632: 				id, ok := n.(*ast.Ident)
+633: 				if !ok {
+634: 					return true
+635: 				}
+636: 				if sym := hostChannelSymbolHit(id.Name); sym != "" {
+637: 					hits = append(hits, fmt.Sprintf("%s:%d:identifier %s", rel, fset.Position(id.Pos()).Line, sym))
+638: 				}
+639: 				return true
+640: 			})
+641: 			return nil
+642: 		}
+643: 		if name == "go.mod" || name == "go.sum" {
+644: 			src, err := os.ReadFile(p)
+645: 			if err != nil {
+646: 				return err
+647: 			}
+648: 			for i, line := range strings.Split(string(src), "\n") {
+649: 				if strings.HasPrefix(strings.TrimSpace(line), "//") {
+650: 					continue
+651: 				}
+652: 				for _, tok := range hostModuleTokens {
+653: 					if strings.Contains(strings.ToLower(line), tok) {
+654: 						hits = append(hits, fmt.Sprintf("%s:%d:dependency %q", rel, i+1, tok))
+655: 						break
+656: 					}
+657: 				}
+658: 			}
+659: 		}
+660: 		return nil
+=== TestPanelHostIsAttachedAndNamesTheWindowHops :405,435 ===
+405: // one sentence that made the flip legitimate - "when one of those lands, the first
+406: // leg below goes red and the window's own ticket has to say so". 33-r1 is that leg,
+407: // and this file is the "say so". The function is RENAMED because a nail whose name
+408: // contradicts what it now asserts is a stale指认 this repository does not tolerate:
+409: // it asks, and only this, that a native host / WebView2 message channel IS attached
+410: // - a production identifier from the family (CoreWebView2 / WebView2 / WebMessage in
+411: // non-test Go sources, or an import path carrying webview/msedge) AND a webview
+412: // module in the main module's go.mod. Either signal missing => red.
+413: //
+414: // What green here means, stated exactly: a host is attached. It STILL does not mean
+415: // "the panel can click" the way a user wants it - the real multi-file page served
+416: // through AddWebResourceRequestedFilter and the settings route (ticket 248) are open
+417: // work; the evidence for 33-r1's window ACs and the go-webview2 hosting gaps ride in
+418: // docs/evidence/s1/33-panel-host-c27-r1.md. This nail guards one fact: nobody can
+419: // now ship a tree that quietly links no host while the panel ticket reads done.
+420: //
+421: // Teeth, unchanged and doubled:
+422: //   - the two POSITIVE controls (a fake host source, a fake webview dependency) must
+423: //     still make the predicate fire, and the CLI-seam shape must still stay silent -
+424: //     they exercise hostChannelCapabilityHits, which is the same function as before.
+425: //   - a new REVERSE control proves the inverted latch has teeth: a throwaway tree
+426: //     whose host identifiers are neutralised (no WebView2/CoreWebView2/WebMessage, no
+427: //     webview go.mod) must be one the assertion rejects - i.e. the "host attached"
+428: //     condition is genuinely decidable, not a nail that is always green because the
+429: //     tree happens to carry a host.
+430: //
+431: // All carriers are written OUTSIDE this repository (t.TempDir); a scan of the real
+432: // disk cannot see a -overlay file, and a carrier the ruler cannot see would make
+433: // this a nail with no door. The old name now lives only in archived gate logs.
+434: func TestPanelHostIsAttachedAndNamesTheWindowHops(t *testing.T) {
+435: 	root := panelRepoRoot(t)
+436: 	hits := hostChannelCapabilityHits(t, root)
+437: 	prodSignal, depSignal := hostSignals(hits)
+438: 	t.Logf("native-host capability hits in %s: %d -> %v (production=%v dependency=%v)", root, len(hits), hits, prodSignal, depSignal)
+439: 	if !prodSignal {
+440: 		t.Errorf("no native host / WebView2 message channel is attached in this tree: no production source carries a " +
+441: 			"CoreWebView2/WebView2/WebMessage identifier or a webview import. Ticket 33 landed H2/H3/H10 - a tree that " +
+442: 			"links no host while the panel window ACs read done is exactly the false-green this nail now forbids")
+443: 	}
+444: 	if !depSignal {
+445: 		t.Errorf("the main module does not require a webview module (go.mod/go.sum carry no webview/msedge path): " +
+=== l2_grant_boundary_test.go:14,30 + :65,80 ===
+14: // from frontend/src/components/l2-approval-card.tsx. In the parent commit
+15: // (git show 53a1359^) those lines were a live button:
+16: //
+17: //	:161-167  a bg-accent Button, onClick={() => send("grant")}
+18: //	:96-100   const send = (outcome: ApprovalOutcome) => requestApprovalResolution(...)
+19: //	   ->      frontend/src/lib/panel.ts:169-186
+20: //	   ->      bridge.postMessage(JSON.stringify({method:"panel.approval.request", correlationId, outcome}))
+21: //
+22: // The only thing that made it inert was Go-side: panel.approval.request is not an
+23: // answered inbound method (facet 1), and no answered method can carry an outcome
+24: // (facet 2). Deleting the button removed one DRAWING of the shape and nothing
+25: // that would catch the next one - and frontend/src/lib/panel.ts:50 still exports
+26: // ApprovalOutcome with "grant" in it, so the wire vocabulary is still alive on the
+27: // other side of the boundary.
+28: //
+29: // WHY THE STRONGEST EXISTING INSTRUMENT MISSED IT:
+30: // TestTheRendererHoldsExactlyOneDoorToTheHost (composer_test.go:502) pins which
+65: // NOTHING IS WIRED TODAY - THIS PIN PROTECTS NOTHING YET. No production code
+66: // calls ParseComposerRequest, so no request from the page reaches these routes at
+67: // all: at this anchor `grep -rn ParseComposerRequest --include=*.go .` yields the
+68: // definition (bridge.go:77) plus test call sites, and every other hit is a
+69: // comment - including cmd/wisp/run.go:225, which says so itself ("Nothing calls it
+70: // yet - the WebView2 \"event -> ParseComposerRequest\" hop does not exist in this
+71: // tree"), and `grep -c webview go.mod` is 0, so the module cannot even receive a
+72: // postMessage today. A green run here therefore does NOT mean "the panel cannot
+73: // grant"; it means "this boundary cannot be WIRED to grant without a red test".
+74: // Read the two rounds in docs/evidence/s1/ before treating any of it as covered.
+75: //
+76: // WHAT THIS FILE DOES *NOT* COVER - read this before citing it as coverage:
+77: // the ban's wording is wider than this instrument. A violation drawn entirely in
+78: // JSX (a button whose onClick passes "grant" into a legitimate
+79: // requestApprovalResolution call) is invisible here, because this reads Go only.
+80: // facet 4 measures that blindness rather than pretending it away: the verbatim
+### roster/guard lines re-verified (for 2.1 / 3 N1)
+42:	MethodModeRequest      = "panel.mode.request"
+43:	MethodWorkspaceRequest = "panel.workspace.request"
+44:	MethodAttachmentAdd    = "panel.attachment.add"
+45:	MethodMessageSend      = "panel.message.send"
+66:	MethodConfigGet = "config.get"
+67:	MethodConfigSet = "config.set"
+148:	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet:
+146:func knownComposerMethod(m string) bool {
+func knownComposerMethod(m string) bool {
+	switch m {
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet:
+		return true
+	}

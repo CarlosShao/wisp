@@ -1,0 +1,143 @@
+=== inbound_roster_253_test.go: structure ===
+3:// Ticket 253 AC#2, shape (a) as ruled in the ticket's section 8: a SECOND roster
+10:// bridge.go - "config.get" and "config.set" - fall outside both rosters, and a new
+14:// roster read off the production source by STRUCTURE, never by a namespace prefix,
+33://     name it handles belongs on the roster.
+38:// down here as string literals, not as references to the Go constants: a roster
+57:	// from being satisfied by a silently narrowed roster - and, together with the
+67:// wantFullInboundRoster253 is the closed roster: every name a page can put in the
+115:// inboundName returns the roster name this declaration contributes, or "" when it
+248:// rosterMismatch backstop stays required instead of being read as a hole. An
+293:					problems = append(problems, site+": the backstop that refuses an unrostered route (it must call "+
+315:		problems = append(problems, "func "+funcName+" has no default branch at all: a route off this roster would reach a case that does not exist and be handled by nothing")
+351:// why the roster below audits the shipped surface rather than test scaffolding.
+369:		t.Fatalf("walk %s: %v", dir, err)
+373:		t.Fatalf("no production Go files under %s - this roster would be judging an empty universe", dir)
+418:// roster, five denominators over the real tree, both directions on each one.
+419:func TestFullInboundMethodRosterIsClosed(t *testing.T) {
+427:		t.Fatalf("bridge.go: %s", bridge.parseError)
+431:		t.Fatalf("bridge.go declares no inbound method name at all - an extractor that finds nothing must never read as a pass")
+434:	// Denominator 1 (DECLARED): bridge.go's inbound names are exactly the roster.
+437:		t.Errorf("ticket 253 AC#2: bridge.go declares the inbound method name %s at %s and the closed roster does not carry it - a new inbound route entered the tree without being registered anywhere. The two prefix rulers cannot see a name that carries no \"panel.\" prefix (panelMethodRe at git_test.go:394, routeLiteralRe at composer_test.go:394), which is the hole this roster exists to close. If the name is meant to stay, register it in wantFullInboundRoster253 and move the count constants beside it",
+441:		t.Errorf("ticket 253 AC#2: the closed roster carries %s but bridge.go no longer declares it - the roster and the inbound surface are two different universes, so every check below is auditing a name that may not exist", name)
+446:		t.Errorf("wantFullInboundRoster253 holds %d names, want %d - the roster grew or shrank without its count constant being moved with it",
+456:		t.Errorf("the closed roster holds %d names with no \"panel.\" prefix, want %d: that batch is exactly what AC#2 exists to cover (%s). If the count moved, either the prefix-blind rulers got blinder relative to this one or this roster grew, and the diff has to say which",
+460:	// Denominator 2 (RUNNING GUARD): every roster name is answered by Go itself,
+465:			t.Errorf("ticket 253 AC#2: the roster carries %s but the running guard knownComposerMethod refuses it - a rostered inbound name Go does not answer is a page-visible dead door", name)
+469:	// Denominator 3 (GUARD AST): the guard's own case labels are the roster.
+472:		t.Errorf("ticket 253 AC#2: %s", p)
+476:		t.Errorf("ticket 253 AC#2: knownComposerMethod's case list answers %s and the closed roster does not carry it - an answered route that was never registered", name)
+479:		t.Errorf("ticket 253 AC#2: the roster carries %s but knownComposerMethod's case list no longer names it - the guard stopped answering a door this file still claims is open", name)
+488:			t.Fatalf("%s", fi.parseError)
+493:	// Denominator 4 (ROUTER): what the router routes is on the roster too.
+494:	routerLabels, routerProblems := switchCaseValues(t, dispatchPath, "dispatch", "rosterMismatch", bridge.consts, pkgConsts)
+496:		t.Errorf("ticket 253 AC#2: %s", p)
+500:		t.Errorf("ticket 253 AC#2: composer_dispatch.go's dispatch routes %s and the closed roster does not carry it - the router is where an inbound name becomes an action, so a name it handles belongs on this roster (register it, or take the case out)", name)
+503:		t.Errorf("ticket 253 AC#2: the roster carries %s but composer_dispatch.go's dispatch has no case for it - the guard would answer it and the router would fall through to the roster-mismatch backstop", name)
+507:	// production sources that the RUNNING guard answers must be a roster name. This
+515:		t.Errorf("ticket 253 AC#2: the running guard answers the dotted literal %q found at %s, and it is on no roster - a route that exists only inside an expression has no registerable spelling, which is how an inbound door gets shipped unnumbered",
+519:	t.Logf("full inbound roster held: %d names declared in bridge.go, %d guard case labels, %d router case labels, %d of them carrying no \"panel.\" prefix (%s)",
+525:// must not be silently settled by a roster check.
+540:// running guard answers while the closed roster does not carry them.
+
+=== bridge_test.go ===
+41:		t.Fatalf("marshal: %v", err)
+51:func TestComposerEnvelopeAcceptsItsFourRequests(t *testing.T) {
+68:			t.Errorf("%s refused: %v", tc.method, err)
+72:			t.Errorf("%s parsed without its identity fields: %+v", tc.method, r)
+77:func TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests(t *testing.T) {
+86:			t.Fatalf("ParseComposerRequest(%s) = %v, want a refusal naming the route", raw, err)
+94:			t.Fatalf("a request with no requestId parsed as %v", err)
+103:				t.Errorf("source %q was accepted - only %q may use this route", src, ComposerRequestSource)
+105:				t.Errorf("source %q refused for the wrong reason: %v", src, err)
+113:				t.Errorf("payload %q parsed without error", raw)
+122:			t.Errorf("refusal %q does not name what was refused", line)
+131:func TestFrontendComposerRequestsMatchTheEnvelope(t *testing.T) {
+135:		t.Fatalf("read frontend/src/lib/panel.ts: %v", err)
+143:			t.Errorf("frontend never emits %q - the Go side parses a method nobody sends", m)
+149:				t.Errorf("frontend does not claim the source %q on its envelope", ComposerRequestSource)
+154:			t.Errorf("frontend envelope is missing %s", key)
+162:		t.Errorf("postMessage call sites = %d, want 2 (the approval request and sendRequest) - "+
+
+=== panel_host_gate_test.go ===
+30:func TestPanelHostOpensNoListeningSocketL1(t *testing.T) {
+35:		t.Fatalf("parse host source %s: %v", src, err)
+42:				t.Errorf("panel host imports %q, which can open a listening socket; D29/AC#3 forbid a localhost server", path)
+50:// (TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12) contained ZERO t.Errorf:
+77:func TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12(t *testing.T) {
+80:		t.Fatalf("panel.BuiltinAssets() cannot answer what this binary carries: %v", err)
+115:			t.Fatalf("the embed reports built=true yet Resolve(%q) failed: %v", panel.EntryFile, entryErr)
+118:			t.Errorf("built=true but the embedded entry file is 0 bytes - that is a bundle that renders nothing while still claiming to be built")
+121:			t.Errorf("the embedded entry resolves as content type %q, want an html document", entryCT)
+124:			t.Errorf("half-bundle: built=true and the entry resolves, but the entry's own asset references do not all resolve from the same embed tree: %v (resolved %d of them before failing)", checkErr, len(refs))
+127:			t.Errorf("built=true yet Manifest() carried nothing (err=%v)", manifestErr)
+131:			t.Errorf("the embed reports built=false (placeholder only), yet Resolve(%q) handed back %d bytes - a placeholder-only bundle is being served as a page", panel.EntryFile, len(entry))
+134:			t.Errorf("the embed reports built=false, yet Check() passed and resolved %d asset reference(s) - the not-built fail-closed door is open", len(refs))
+137:			t.Errorf("the embed reports built=false, yet Manifest() listed %d entr(y/ies) - a placeholder-only tree must not hand out a bundle manifest", len(manifest))
+143:			t.Errorf("AC#12's two shapes have just been conflated: the binary carries a page (built=true) while this tree tracks nothing under frontend/dist beyond the anchor and reports no untracked/ignored entry there either - there is nothing this embed could have been built from, so 'built' is not being decided by the bundle")
+147:				t.Errorf("%d bundle file(s) including the entry are committed under frontend/dist, yet the embed reports built=false - the go:embed pattern is not matching committed content", trackedBeyondAnchor)
+149:				t.Errorf("committed half-bundle: %d file(s) are tracked under frontend/dist but the entry %s is not - the binary would ship a bundle that can never render, which is the exact shape the pre-33-r4 file only promised to fail closed on", trackedBeyondAnchor, panel.EntryFile)
+177:func TestAC1SessionDisposeHasAProductionTrigger_AC1(t *testing.T) {
+185:		t.Errorf("a production site now constructs the panel host (%s) but no non-test file calls Destroy ON THE MANAGER. The %d .Destroy() call(s) this package does have [%s] release the WebView2 control inside the host's own file, which is not a session tearing its window down: AC#1's second clause would still be unmet and the panel would outlive the session",
+212:		t.Fatalf("read package dir for the dispose scan: %v", err)
+223:			t.Fatalf("parse production file %s for the dispose scan: %v", name, err)
+277:		t.Fatalf("the dispose scan parsed 0 production files - the instrument is not looking at the package it claims to cover")
+304:// 33-v1 §A#31 - the body had no t.Errorf at all, so it could not go red whatever
+312:		t.Fatalf("git rev-parse --show-toplevel: %v", err)
+385:func TestCleanCheckoutBuilds_AC11(t *testing.T) {
+387:		t.Fatalf("go toolchain not on PATH for the clean-checkout build: %v", err)
+398:		t.Fatalf("git archive HEAD: %v", err)
+401:		t.Fatalf("extract HEAD zip into %s: %v", tmp, err)
+404:		t.Fatalf("clean-checkout: go.mod not at %s after extract (%v)", tmp, err)
+412:		t.Fatalf("clean-checkout go build ./... failed: %v\n%s", err, tail(string(out), 4000))
+
+=== panel_resident_windows_test.go:165,185 ===
+165: // anything is answered by the page, below.
+166: func evalOnPanelThread(t *testing.T, rp *residentPanel, js string) {
+167: 	t.Helper()
+168: 	done := make(chan error, 1)
+169: 	posted := rp.post(func() {
+170: 		w := rp.mgr.currentWindow()
+171: 		if w == nil {
+172: 			done <- fmt.Errorf("no window on the panel thread")
+173: 			return
+174: 		}
+175: 		w.Eval(js)
+176: 		done <- nil
+177: 	})
+178: 	if !posted {
+179: 		t.Fatalf("the panel thread refused the Eval request (startUp error: %v)", rp.startUpErr())
+180: 	}
+181: 	select {
+182: 	case err := <-done:
+183: 		if err != nil {
+184: 			t.Fatalf("Eval on the panel thread: %v", err)
+185: 		}
+
+=== composer_test.go:510,535 ===
+510: 		t.Errorf("host call sites in frontend/src = %d, want 2 (the approval request and sendRequest):%s",
+511: 			len(rep.callSites), "\n  "+strings.Join(rep.callSites, "\n  "))
+512: 	}
+513: 	if len(rep.assembly) != 0 {
+514: 		t.Errorf("a dotted route name is assembled at runtime, which is a method name the source never states and no"+
+515: 			" literal gate can judge:%s", "\n  "+strings.Join(rep.assembly, "\n  "))
+516: 	}
+517: 	if len(rep.computed) != 0 {
+518: 		t.Errorf("sendRequest is called with a computed route; the envelope's method must be a literal so the"+
+519: 			" vocabulary stays closed:%s", "\n  "+strings.Join(rep.computed, "\n  "))
+520: 	}
+521: 	if len(rep.unknown) != 0 {
+522: 		t.Errorf("the renderer names a route the Go side does not answer:%s", "\n  "+strings.Join(rep.unknown, "\n  "))
+523: 	}
+524: 	t.Logf("renderer door held: %d files scanned, %d host call sites (all in src/lib/panel.ts), %d panel.* route literals",
+525: 		rep.files, len(rep.callSites), len(composerRouteLiterals()))
+526: }
+527: 
+528: // TestPlantedRendererDoorShapesGoRed is AC#1's positive nail for the two shapes
+529: // the acceptance round measured as GREEN under the old instruments: a
+530: // panel.mode.set sent from a plain .js file, and the same route assembled at
+531: // runtime from an array. Both are planted into a copy of the real tree, so the
+532: // run also shows the clean half still passes.
+533: func TestPlantedRendererDoorShapesGoRed(t *testing.T) {
+534: 	root := panelRepoRoot(t)
+535: 	real := filepath.Join(root, "frontend", "src")

@@ -1,0 +1,31 @@
+### dev tree: which frontend/src files mention postMessage / wispBridge / hostBridge (non-test page source)
+     13 frontend/src/lib/panel.ts
+
+### dev: exact call-site lines
+frontend/src/lib/panel.ts:179:  bridge.postMessage(
+frontend/src/lib/panel.ts:218:  bridge.postMessage(
+
+### dev frontend/src file count
+64
+
+### BRANCH dsh/feat/frontend-p0-v2: same ruler
+     13 dsh/feat/frontend-p0-v2
+
+### branch: exact call sites
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:179:  bridge.postMessage(
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:218:  bridge.postMessage(
+
+### branch file count + line counts of panel.ts
+85
+311
+
+### dev HEAD vs branch: does dev panel.ts == branch panel.ts?
+ frontend/src/lib/use-dismiss.ts                    |   53 +
+ frontend/src/main.tsx                              |   62 +-
+ frontend/src/styles/theme.css                      |  139 ++-
+ frontend/src/styles/tokens.generated.css           |    4 +-
+ 37 files changed, 7229 insertions(+), 377 deletions(-)
+### panel.ts dev-HEAD vs branch blob identity check (load-bearing for 2.3)
+5ea999d5444aa13cadbd3d94a895b44c2bfdf697
+5ea999d5444aa13cadbd3d94a895b44c2bfdf697
+5ea999d5444aa13cadbd3d94a895b44c2bfdf697

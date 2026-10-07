@@ -1,0 +1,300 @@
+### RULER A (exact transport-API spellings) across docs/ + .scratch/wisp/issues/README.md:
+--- pattern: postMessage
+  docs/evidence/s1/114-ac1-status-table.md:119 len=473
+  docs/evidence/s1/180-182-panel-fields-census-c1.md:45 len=169
+  docs/evidence/s1/180-panel-width-ownership-a1.md:114 len=322
+  docs/evidence/s1/181-186-git-detection-census-c1.md:59 len=237
+  docs/evidence/s1/181-186-git-detection-census-c1.md:65 len=137
+  docs/evidence/s1/193-frontend-gates-census-a1.md:61 len=346
+  docs/evidence/s1/193-frontend-gates-census-a1.md:169 len=305
+  docs/evidence/s1/193-frontend-gates-census-a1.md:233 len=170
+  docs/evidence/s1/194-method-roster-census-c1.md:116 len=390
+  docs/evidence/s1/201-reply-listener-r2.md:17 len=239
+  docs/evidence/s1/33-35-preflight.md:79 len=282
+  docs/evidence/s1/33-inbound-hop-design-a1.md:133 len=168
+  docs/evidence/s1/33-inbound-hop-design-a1.md:192 len=110
+  docs/evidence/s1/33-panel-host-c27-r1.md:26 len=265
+  docs/evidence/s1/33-panel-host-c27-r1.md:35 len=265
+  docs/evidence/s1/33-panel-host-c27-r1.md:61 len=290
+  docs/evidence/s1/33-panel-host-c27-v2.md:204 len=315
+  docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:158 len=123
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:231 len=140
+  docs/evidence/s1/92-adversarial-acceptance.md:39 len=186
+  docs/evidence/s1/92-adversarial-acceptance.md:40 len=281
+  docs/evidence/s1/92-adversarial-acceptance.md:42 len=165
+  docs/evidence/s1/92-adversarial-acceptance.md:43 len=143
+  docs/evidence/s1/92-adversarial-acceptance.md:51 len=219
+  docs/evidence/s1/92-adversarial-acceptance.md:196 len=396
+  docs/evidence/s1/92-adversarial-acceptance.md:197 len=374
+  docs/evidence/s1/92b-adversarial-acceptance.md:15 len=171
+  docs/evidence/s1/92b-adversarial-acceptance.md:132 len=175
+  docs/evidence/s1/92b-adversarial-acceptance.md:161 len=138
+  docs/evidence/s1/92b-adversarial-acceptance.md:206 len=335
+  docs/evidence/s1/92b-adversarial-acceptance.md:208 len=371
+  docs/evidence/s1/92b-adversarial-acceptance.md:312 len=334
+  docs/evidence/s1/92b-adversarial-acceptance.md:329 len=137
+  docs/evidence/s1/92b-adversarial-acceptance.md:330 len=144
+  docs/evidence/s1/panel-l2-grant-nail-accept-r1.md:100 len=158
+  docs/evidence/s1/panel-l2-grant-nail-accept-r1.md:376 len=109
+  docs/evidence/s1/panel-l2-grant-nail-accept-r2.md:420 len=196
+  docs/evidence/s1/panel-l2-grant-nail-accept-r2.md:450 len=123
+  docs/evidence/s1/panel-l2-grant-nail-r1.md:16 len=206
+  docs/reports/missing-features-2026-09-29-v4.md:244 len=469
+  docs/reports/pending-and-issues.md:1268 len=109
+  docs/reports/pending-and-issues.md:1356 len=138
+  docs/reports/pending-and-issues.md:5966 len=710
+  docs/reports/pending-and-issues.md:8351 len=257
+  docs/reports/pending-and-issues.md:8391 len=360
+  docs/reports/pending-and-issues.md:10583 len=451
+  docs/reports/pending-and-issues.md:10614 len=569
+  docs/reports/pending-and-issues.md:10922 len=280
+  docs/reports/pending-and-issues.md:11041 len=245
+  docs/reports/pending-and-issues.md:11043 len=716
+  docs/reports/pending-and-issues.md:11072 len=883
+  docs/reports/pending-and-issues.md:12978 len=197
+  docs/reports/pending-and-issues.md:13104 len=236
+--- pattern: external\.invoke
+--- pattern: AddHostObjectToScript
+  docs/evidence/s1/114-ac1-status-table.md:119 len=473
+  docs/evidence/s1/114-ac2-native-gate.md:121 len=126
+  docs/evidence/s1/33-35-preflight.md:60 len=432
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:81 len=212
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:172 len=290
+  docs/evidence/s1/92b-adversarial-acceptance.md:166 len=123
+  docs/evidence/s1/92b-adversarial-acceptance.md:329 len=137
+  docs/reports/pending-and-issues.md:1356 len=138
+  docs/reports/pending-and-issues.md:13116 len=301
+  docs/reports/pending-and-issues.md:13130 len=179
+--- pattern: HostObject
+  docs/evidence/s1/114-ac1-status-table.md:119 len=473
+  docs/evidence/s1/114-ac2-native-gate.md:121 len=126
+  docs/evidence/s1/33-35-preflight.md:60 len=432
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:81 len=212
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:172 len=290
+  docs/evidence/s1/92b-adversarial-acceptance.md:166 len=123
+  docs/evidence/s1/92b-adversarial-acceptance.md:329 len=137
+  docs/reports/pending-and-issues.md:1356 len=138
+  docs/reports/pending-and-issues.md:13116 len=301
+  docs/reports/pending-and-issues.md:13130 len=179
+--- pattern: JSON-?RPC
+--- pattern: jsonrpc
+--- pattern: CoreWebView2
+  docs/evidence/s1/33-35-preflight.md:60 len=432
+  docs/evidence/s1/33-35-preflight.md:165 len=153
+  docs/evidence/s1/33-inbound-hop-design-a1.md:155 len=199
+  docs/evidence/s1/33-inbound-hop-design-a1.md:200 len=283
+  docs/evidence/s1/33-inbound-hop-design-a1.md:275 len=211
+  docs/evidence/s1/33-inbound-listener-r3.md:72 len=128
+  docs/evidence/s1/33-inbound-listener-r3.md:73 len=211
+  docs/evidence/s1/33-inbound-listener-r3.md:96 len=196
+  docs/evidence/s1/33-inbound-listener-r3.md:107 len=149
+  docs/evidence/s1/33-inbound-listener-r3.md:110 len=137
+  docs/evidence/s1/33-inbound-listener-r3.md:123 len=625
+  docs/evidence/s1/33-minimal-inbound-hop-r1.md:64 len=305
+  docs/evidence/s1/33-panel-host-c27-r1.md:25 len=526
+  docs/evidence/s1/33-panel-host-c27-r1.md:72 len=433
+  docs/evidence/s1/33-panel-host-c27-v1.md:104 len=828
+  docs/evidence/s1/33-panel-host-c27-v1.md:138 len=314
+  docs/reports/pending-and-issues.md:8488 len=397
+  docs/reports/pending-and-issues.md:10124 len=417
+--- pattern: wispDispatch
+  docs/evidence/s1/33-panel-host-c27-r1.md:61 len=290
+  docs/evidence/s1/33-panel-host-c27-r5.md:58 len=435
+  docs/evidence/s1/33-panel-host-c27-r5.md:127 len=344
+  docs/evidence/s1/33-panel-host-c27-v1.md:83 len=429
+  docs/reports/pending-and-issues.md:10439 len=729
+  docs/reports/pending-and-issues.md:10583 len=451
+  docs/reports/pending-and-issues.md:10614 len=569
+  docs/reports/pending-and-issues.md:11043 len=716
+  docs/reports/pending-and-issues.md:11072 len=883
+  docs/reports/pending-and-issues.md:13128 len=198
+  docs/reports/pending-and-issues.md:13129 len=173
+--- pattern: window\.wisp
+  docs/evidence/s1/33-panel-host-c27-r5.md:58 len=435
+  docs/evidence/s1/33-panel-host-c27-r5.md:127 len=344
+  docs/reports/pending-and-issues.md:10439 len=729
+  docs/reports/pending-and-issues.md:13129 len=173
+--- pattern: CallDevToolsProtocol
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:81 len=212
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:172 len=290
+--- pattern: ExecuteScript
+  docs/reports/frontend-session-log.md:24 len=499
+  docs/reports/pending-and-issues.md:11000 len=326
+--- pattern: EvaluateScript
+  docs/reports/pending-and-issues.md:12975 len=229
+  docs/reports/pending-and-issues.md:13113 len=209
+--- pattern: WebMessageReceived
+  docs/evidence/s1/114-ac1-status-table.md:33 len=143
+  docs/evidence/s1/114-ac2-native-gate.md:87 len=134
+  docs/evidence/s1/33-35-preflight.md:60 len=432
+  docs/evidence/s1/33-35-preflight.md:82 len=190
+  docs/evidence/s1/33-inbound-hop-design-a1.md:155 len=199
+  docs/evidence/s1/33-inbound-hop-design-a1.md:201 len=351
+  docs/evidence/s1/33-inbound-hop-design-a1.md:275 len=211
+  docs/evidence/s1/33-inbound-listener-r2.md:159 len=146
+  docs/evidence/s1/33-inbound-listener-r3.md:73 len=211
+  docs/evidence/s1/33-inbound-listener-r3.md:96 len=196
+  docs/evidence/s1/33-inbound-listener-r3.md:107 len=149
+  docs/evidence/s1/33-inbound-listener-r3.md:123 len=625
+  docs/evidence/s1/33-inbound-listener-r3.md:161 len=169
+  docs/evidence/s1/33-minimal-inbound-hop-r1.md:64 len=305
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:81 len=212
+  docs/evidence/s1/35-panel-snapshot-pump-r1.md:172 len=290
+  docs/reports/pending-and-issues.md:3705 len=136
+  docs/reports/pending-and-issues.md:13129 len=173
+
+### RULER B (meaning-level: 传输/通道/桥/信封/序列化/协议) counts per doc:
+docs/PLAN.md
+docs/PRECHECK.md
+docs/SLO.md
+docs/evidence/s0/01-adversarial-acceptance.md
+docs/evidence/s0/02-spike-report.md
+docs/evidence/s0/04-adversarial-acceptance.md
+docs/evidence/s1/09-adversarial-acceptance.md
+docs/evidence/s1/10-adversarial-acceptance.md
+docs/evidence/s1/101-adversarial-acceptance.md
+docs/evidence/s1/103-adversarial-acceptance.md
+docs/evidence/s1/104-adversarial-acceptance.md
+docs/evidence/s1/114-ac1-status-table.md
+docs/evidence/s1/114-ac2-native-gate.md
+docs/evidence/s1/117-adversarial-acceptance.md
+docs/evidence/s1/119-ac1-ac2-r2-acceptance.md
+docs/evidence/s1/124-ac2a-leg-classification.md
+docs/evidence/s1/124-ac2b-2-conversion.md
+docs/evidence/s1/127-adversarial-acceptance.md
+docs/evidence/s1/136-ac11-r1-acceptance.md
+docs/evidence/s1/136-ac12-ac13-impl.md
+docs/evidence/s1/136-ac12-ac13-r1-acceptance.md
+docs/evidence/s1/136-ac14b-impl.md
+docs/evidence/s1/136-slo-output-contract-census-r1.md
+docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md
+docs/evidence/s1/139-compression-leaves-no-trace-r1-accept-r1.md
+docs/evidence/s1/139-compression-leaves-no-trace-r1.md
+docs/evidence/s1/141-q46c-accept-r1.md
+docs/evidence/s1/143-panel-assets-r4-leg-r1.md
+docs/evidence/s1/144-slo-report-partial-read-r1-accept-r1.md
+docs/evidence/s1/144-slo-report-partial-read-r1.md
+docs/evidence/s1/145-snapshot-field-census-r1.md
+docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+docs/evidence/s1/145-snapshot-fields-landed-r1.md
+docs/evidence/s1/145-snapshot-growth-r3.md
+docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md
+docs/evidence/s1/151-task-scope-never-closed-r1.md
+docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md
+docs/evidence/s1/153-trace-lies-unguarded-r1.md
+docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md
+docs/evidence/s1/154-host-id-never-closed-r1.md
+docs/evidence/s1/155-three-unjudged-cells-r1-accept-r1.md
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+docs/evidence/s1/158-gate-scope-blind-spot-r1.md
+docs/evidence/s1/161-doorbell-census-r1.md
+docs/evidence/s1/161-gate-blindspot-r1.md
+docs/evidence/s1/162-fs-edit-accept-r2.md
+docs/evidence/s1/162-fs-edit-r1.md
+docs/evidence/s1/162-fs-edit-r3.md
+docs/evidence/s1/162-risk-tier-accept-v3.md
+docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md
+docs/evidence/s1/163-persistent-shell-session-design-core-a1.md
+docs/evidence/s1/164-task-output-design-core-c1.md
+docs/evidence/s1/171-pair-legs-accept-r1.md
+docs/evidence/s1/174-artifacts-allowlist-readback-c1.md
+docs/evidence/s1/174-pointer-honesty-accept-v1.md
+docs/evidence/s1/174-pointer-honesty-r1.md
+docs/evidence/s1/175-c25-marking-roster-scope-c1.md
+docs/evidence/s1/175-mark-gate-r1.md
+docs/evidence/s1/175-task-output-stamped-r2.md
+docs/evidence/s1/177-c25-r4-path-exemption-c1.md
+docs/evidence/s1/177-mutation-shape-a-redlist-m1.md
+docs/evidence/s1/177-shape-a-impl-r1.md
+docs/evidence/s1/179-cli-reread-r2.md
+docs/evidence/s1/179-declared-l0-refused-accept-v1.md
+docs/evidence/s1/179-declared-l0-refused-r1.md
+docs/evidence/s1/180-182-panel-fields-census-c1.md
+docs/evidence/s1/181-186-git-detection-census-c1.md
+docs/evidence/s1/182-rail-stacks-census-a1.md
+docs/evidence/s1/183-pointer-exemption-accept-v2.md
+docs/evidence/s1/183-pointer-exemption-r1.md
+docs/evidence/s1/183-reread-permanent-teeth-r2.md
+docs/evidence/s1/185-reread-owner-census-c1.md
+docs/evidence/s1/188-task-state-r1.md
+docs/evidence/s1/189-uncommitted-count-design-a1.md
+docs/evidence/s1/197-ac5-selfapproval-v1.md
+docs/evidence/s1/197-blocked-carrier-r4.md
+docs/evidence/s1/197-subagent-carrier-r3.md
+docs/evidence/s1/198-firstrun-config-v1.md
+docs/evidence/s1/200-project-instructions-r2.md
+docs/evidence/s1/201-reply-listener-r2-verdict.md
+docs/evidence/s1/201-reply-listener-r2.md
+docs/evidence/s1/21-segment1-adversarial-acceptance.md
+docs/evidence/s1/219-approval-reply-surface-c1.md
+docs/evidence/s1/222-spawn-holds-bridge-permit-v1.md
+docs/evidence/s1/222-spawn-permit-release-r1.md
+docs/evidence/s1/223-hot-reload-wiring-r1.md
+docs/evidence/s1/223-hot-reload-wiring-v1.md
+docs/evidence/s1/223-hot-reload-wiring-v2.md
+docs/evidence/s1/226-config-write-no-clobber-r1.md
+docs/evidence/s1/226-config-write-no-clobber-v2.md
+docs/evidence/s1/228-resident-ball-v1.md
+docs/evidence/s1/241-audio-level-producer-r1.md
+docs/evidence/s1/246-resident-task-source-r2.md
+docs/evidence/s1/246-resident-task-source-v2.md
+docs/evidence/s1/246-veto-channel-in-the-resident-process-r1.md
+docs/evidence/s1/246-veto-channel-in-the-resident-process-v1.md
+docs/evidence/s1/248-settings-write-path-r1.md
+docs/evidence/s1/248-settings-write-path-v1.md
+docs/evidence/s1/255-tier-registry-v1.md
+docs/evidence/s1/257-clean-machine-provider-registry-v1.md
+docs/evidence/s1/33-35-preflight.md
+docs/evidence/s1/33-inbound-hop-design-a1.md
+docs/evidence/s1/33-inbound-listener-r3.md
+docs/evidence/s1/33-panel-host-c27-r1.md
+docs/evidence/s1/33-panel-host-c27-r5.md
+docs/evidence/s1/33-panel-host-c27-r9.md
+docs/evidence/s1/33-panel-host-c27-v2.md
+docs/evidence/s1/35-panel-snapshot-pump-fix-r1.md
+docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md
+docs/evidence/s1/35-panel-snapshot-pump-r1.md
+docs/evidence/s1/62-visual-spec-draft.md
+docs/evidence/s1/69-mutation-tokens.md
+docs/evidence/s1/80-ac1-ac2-verdict.md
+docs/evidence/s1/84-ac1-bounded-wait.md
+docs/evidence/s1/87-adversarial-acceptance.md
+docs/evidence/s1/89-adversarial-acceptance.md
+docs/evidence/s1/90-adversarial-acceptance.md
+docs/evidence/s1/91-os-isolation-memo.md
+docs/evidence/s1/92-adversarial-acceptance.md
+docs/evidence/s1/92b-adversarial-acceptance.md
+docs/evidence/s1/97-adversarial-acceptance.md
+docs/evidence/s1/A30-citation-repair.md
+docs/evidence/s1/c21-native-tokens.md
+docs/evidence/s1/ci-step-readings-2026-09-22.md
+docs/evidence/s1/observe-datebomb-r1.md
+docs/evidence/s1/panel-l2-grant-nail-accept-r2.md
+docs/evidence/s2/13-adversarial-acceptance.md
+docs/evidence/s2/14-adversarial-acceptance.md
+docs/evidence/s3/19-adversarial-acceptance.md
+docs/reports/2026-09-19-t14-dev-minisign-key.md
+docs/reports/HANDOVER.md
+docs/reports/frontend-session-brief.md
+docs/reports/frontend-session-log.md
+docs/reports/injection-timeline.md
+docs/reports/missing-features-2026-09-28-v2.md
+docs/reports/missing-features-2026-09-28-v3.md
+docs/reports/missing-features-2026-09-29-v4.md
+docs/reports/pending-and-issues.md
+docs/reports/survey-2026-09-28-composer-plus-menu.md
+docs/reports/survey-2026-09-28-dsh-ui-packages.md
+docs/reports/survey-2026-09-28-minimax-agent-modules.md
+docs/reports/survey-2026-09-28-oc-mobile-vscode-extensions.md
+docs/specs/README.md
+docs/specs/SPEC-00-product-overview.md
+docs/specs/SPEC-01-architecture.md
+docs/specs/SPEC-03-config-secrets-envs.md
+docs/specs/SPEC-04-voice-pipeline.md
+docs/specs/SPEC-05-agent-core.md
+docs/specs/SPEC-06-security-gatekeeping.md
+docs/specs/SPEC-07-tools-and-plugins.md
+docs/specs/SPEC-10-testing-acceptance.md
+docs/specs/SPEC-11-build-deploy-containerization.md
+docs/specs/SPEC-12-roadmap-governance.md

@@ -1,0 +1,78 @@
+=== lib: how Init is implemented (edge/chromium.go) ===
+130:func (e *Chromium) Init(script string) {
+131-	_, _, _ = e.webview.vtbl.AddScriptToExecuteOnDocumentCreated.Call(
+132-		uintptr(unsafe.Pointer(e.webview)),
+133-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(script))),
+134-		0,
+135-	)
+136-}
+137-
+138-func (e *Chromium) Eval(script string) {
+139-	_script, err := windows.UTF16PtrFromString(script)
+140-	if err != nil {
+141-		log.Fatal(err)
+142-	}
+=== lib: WebView interface method set (common.go) ===
+30:	Run()
+34:	Terminate()
+39:	Dispatch(f func())
+42:	Destroy()
+47:	Window() unsafe.Pointer
+51:	SetTitle(title string)
+54:	SetSize(w int, h int, hint Hint)
+59:	Navigate(url string)
+63:	SetHtml(html string)
+68:	Init(js string)
+73:	Eval(js string)
+83:	Bind(name string, f interface{}) error
+=== webview2 root package: which file re-exports? ===
+=== our file header comment 20-60 ===
+//     page gets back. That is H2 (control created) + H3 (page bytes reach Go) +
+//     H10 (reply reaches the page) landing together on a real host.
+//   - The window's messages belong to the thread that pumps them, so bringUp runs
+//     on the resident panel's OWN dedicated STA thread
+//     (cmd/wisp/panel_resident_windows.go, orchestrator ruling P1 at 10-01 13:12),
+//     never on the ball's ui-sta. Why not ui-sta, now measured rather than asserted:
+//     calling bring-up re-entrantly from a window callback of a thread that is
+//     already pumping returns fine, but the outer pump's iteration freezes for the
+//     whole nested pump and up to five tasks already queued on that thread get run
+//     EARLY by the nested one (about 0.55s per open) - docs/evidence/s1/... the 33-p1
+//     probe, R34/R35 with positive control R36. 33-p1 also corrected this file's
+//     earlier claim that re-entry "panics on this box": the natural shape does not
+//     panic; the nil dereference needs a FORCED WM_QUIT during create (R37) or an
+//     MTA-initialised thread (R32/R39). A test harness still owns its own locked
+//     thread for the local measurements; that harness is not the shipping topology.
+//   - Because the resident thread hands the pump over to the library's own Run(),
+//     a Go->page reply is actually delivered: webview.Dispatch only appends to the
+//     library's private queue and posts a thread message, and the queue's only
+//     reader is Run(). A host that pumps by hand instead never drains it, so the
+//     page's awaited binding reply does not arrive (33-p1 §A, R25 vs R26).
+
+// What is NOT a library gap (this paragraph was wrong before and is corrected
+// here, ticket 33 AC#13's stop-and-report): AddWebResourceRequestedFilter is
+// exported by pkg/edge, and the claim that a caller cannot size a controller
+// because ICoreWebView2Controller.PutBounds takes go-webview2's INTERNAL w32.Rect
+// does not block anything - (*edge.Chromium).Resize() (pkg/edge/
+// chromium_amd64.go:12) is exported, sizes the controller from its own
+// GetClientRect, and is what the high-level wrapper already calls after a
+// successful Embed (webview.go:343). So "many files served through a resource
+// request filter" is a product-shape decision, not a dependency boundary.
+// What is still NOT proven, and is not claimed here: whether that path gives the
+// panel the 420x260 size this host asks WindowOptions for. Today serving goes
+// through SetHtml over embedded bytes (still offline, still no listener).
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log/slog"
+	"sync"
+	"time"
+=== Dispatch call sites (cmd+internal, non-test) ===
+cmd/balldebug/main.go:618:	to, err := m.Dispatch(ev, f)
+cmd/wisp/panel_resident_windows.go:360:		w.Dispatch(fn)
+internal/models/bridge.go:40:	if _, err := b.machine.Dispatch(statemachine.EvModelMissing, nil); err != nil {
+internal/models/bridge.go:46:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:59:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:64:	if _, derr := b.machine.Dispatch(statemachine.EvDownloadCompleted, nil); derr != nil {
+internal/statemachine/machine.go:202:	_, _ = m.Dispatch(ev, nil)

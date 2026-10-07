@@ -1,0 +1,141 @@
+=== PLAN.md:1374,1382 full ===
+1374: | **C24** | **`GojaHostAPI`** | Tier-2 插件在 JS 侧可见的**唯一**宿主入口全集（方法名 + 对应 capability + RiskLevel）。**JS 侧出现任何未列出的宿主入口即判契约违规**（字符串扫描可验）。C16 的 `host_api` semver 就是本契约的 semver | D39（补 C16 的实体） |
+1375: | **C25** | **`Provenance`** | 工具结果的来源标记（`{tool, origin, sensitive}`）+ 出网前的**粗粒度污染匹配**（规范化后 ≥8 字符连续片段命中即升 L2）。D30① 组合闸门的实现契约 | D33/F4 |
+1376: | **C26** | **`PathResolver`** | **唯一**的路径规范化入口：展开 → 绝对化 → 取句柄真实路径（Win: `GetFinalPathNameByHandle`）→ **拒绝 reparse point（symlink/junction）/UNC/`\\?\`/8.3 短名逃逸**。白名单与黑名单**都必须**经它 | D33/F1（**CRITICAL**） |
+1377: | **C27** | **`PanelManager`** | 单例，**唯一** WebView2 窗口持有者；一会话至多一个面板窗口，**隐藏而非销毁**；面板不可用 → **L2 降级为原生最简确认卡，L2 能力不得消失**；多任务共用，按 correlationId 分区渲染 | D32/D39（补 WebView 无主问题） |
+1378: | **C28** | **`SecretStore`** | 敏感配置存取：Windows DPAPI（CurrentUser）/ macOS Keychain(S8)。**明文 TOML 禁止**；日志与诊断包一律只留后 4 位；首次启动检测到明文自动迁移 | D33（**CRITICAL**） |
+1379: | **C29** | **`ModelManifest`** | 仓库内置**已签名**模型清单（url 候选/sha256/size/license/用途），用 D17 的 minisign 私钥签名、公钥硬编码进二进制。**不得从镜像取哈希**；`verify_signature` 不可关 | D33/F3（**CRITICAL**） |
+1380: | **C30** | **`JobScope`** | Windows Job Object 封装（`KILL_ON_JOB_CLOSE`）：所有子进程入 Job；提供 `TreePrivateBytes()` 作为 **D32 进程树内存口径的度量实现**；主进程异常退出时子进程由 OS 连带清理（防 `msedgewebview2.exe` 孤儿常驻） | D32/D38 |
+1381: | **C31** | **`SessionScope`** | 会话定义（唤起 → 显式结束 / 90s 空闲）；持有 Warm 模型引用计数、面板保活、D45 会话授权、`Settling`/`Warm` 计时；**会话结束必须完整 Dispose（C11）**。BLOCKER B4 的实现契约 | D32/D43 |
+1382: | **C32** | **`RealtimeEngine`** | **云端 S2S realtime provider（D47 的 Path C 增强层）**：音频进/音频出流式 + 服务端端点检测 + barge-in 事件 + **零工具权限**（只能说、不能做）；出现任务意图交回文本循环（C5）；按 audio token 经 C23 计费；转写照常进 task_log。opt-in + 显式「音频将上传」告知 + 首次 L2 隐私确认。<br>**D47 细化（2026-09-19，写契约文件时定稿）：** ① **交接协议**——意图检测由 realtime 模型的结构化 handoff 信号触发（宿主侧受信原语，非工具调用）；payload = 本轮转写 + 会话上下文引用；realtime 会话挂起（不销毁），文本循环以全门控执行任务，结果经通知/播报回传后可恢复 realtime。② **provider 预设表 + 自定义 `base_url`**（同 D8 模式，国内可达候选：豆包 / Qwen-Omni realtime / OpenAI Realtime 经代理等，P15 后评估）。③ **安全硬规则：realtime 大脑的上下文禁止注入本地文件内容与带 taint 内容**——它零工具权限但「说」本身就是出口（F4 的 TTS 通道在 realtime 下的等价物），切断组合外泄的原料 | **D47** |
+
+=== what type is w / m.w in panel_host_windows.go ===
+146:type PanelManager struct {
+222:// webview2.NewWithOptions call in this file - that is, the geometry the window is
+314:// point the S0 spike measured with NewWithOptions + SetHtml + a dispatch round
+386:	w := webview2.NewWithOptions(webview2.WebViewOptions{
+415:	m.w = w
+444:	w := m.w
+463:	w := m.w
+606:	w := m.w
+617:	w := m.w
+618:	m.w = nil
+658:	w := m.w
+
+=== order of Bind vs SetHtml (creation sequence) ===
+36://     a Go->page reply is actually delivered: webview.Dispatch only appends to the
+236:func (m *PanelManager) windowOptions() webview2.WindowOptions {
+268:func (m *PanelManager) IsCreated() bool {
+276:func (m *PanelManager) IsShown() bool {
+285:func (m *PanelManager) LastColdMs() float64 { m.mu.Lock(); defer m.mu.Unlock(); return m.lastColdMs }
+286:func (m *PanelManager) LastHotMs() float64  { m.mu.Lock(); defer m.mu.Unlock(); return m.lastHotMs }
+290:func (m *PanelManager) windowHandle() uintptr {
+302:func (m *PanelManager) currentWindow() webview2.WebView {
+318:func (m *PanelManager) bringUp(ctx context.Context) error {
+405:	bindErr := w.Bind(panelDispatchBinding, func(raw string) string {
+442:func (m *PanelManager) serveNotBuiltNoticeLocked() {
+449:	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
+454:func (m *PanelManager) serveEntry() error {
+468:	w.SetHtml(string(data))
+481:func (m *PanelManager) Show(ctx context.Context) error {
+518:func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+547:func (m *PanelManager) HotShow(ctx context.Context) error {
+574:func (m *PanelManager) Hide() {
+604:func (m *PanelManager) terminateOnThisThread() {
+615:func (m *PanelManager) Destroy() {
+630:func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, error) {
+656:func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
+668:	if err := w.Bind("wispProbeRT", func() string {
+681:	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"></head><body>` +
+
+=== library WebView interface: is the COM handle / browser reachable? ===
+26:type WebView interface {
+30:	Run()
+34:	Terminate()
+39:	Dispatch(f func())
+42:	Destroy()
+47:	Window() unsafe.Pointer
+51:	SetTitle(title string)
+54:	SetSize(w int, h int, hint Hint)
+59:	Navigate(url string)
+63:	SetHtml(html string)
+68:	Init(js string)
+73:	Eval(js string)
+83:	Bind(name string, f interface{}) error
+26: type WebView interface {
+27: 
+28: 	// Run runs the main loop until it's terminated. After this function exits -
+29: 	// you must destroy the webview.
+30: 	Run()
+31: 
+32: 	// Terminate stops the main loop. It is safe to call this function from
+33: 	// a background thread.
+34: 	Terminate()
+35: 
+36: 	// Dispatch posts a function to be executed on the main thread. You normally
+37: 	// do not need to call this function, unless you want to tweak the native
+38: 	// window.
+39: 	Dispatch(f func())
+40: 
+41: 	// Destroy destroys a webview and closes the native window.
+42: 	Destroy()
+43: 
+44: 	// Window returns a native window handle pointer. When using GTK backend the
+45: 	// pointer is GtkWindow pointer, when using Cocoa backend the pointer is
+46: 	// NSWindow pointer, when using Win32 backend the pointer is HWND pointer.
+47: 	Window() unsafe.Pointer
+48: 
+49: 	// SetTitle updates the title of the native window. Must be called from the UI
+50: 	// thread.
+51: 	SetTitle(title string)
+52: 
+53: 	// SetSize updates native window size. See Hint constants.
+54: 	SetSize(w int, h int, hint Hint)
+55: 
+56: 	// Navigate navigates webview to the given URL. URL may be a data URI, i.e.
+57: 	// "data:text/text,<html>...</html>". It is often ok not to url-encode it
+58: 	// properly, webview will re-encode it for you.
+59: 	Navigate(url string)
+60: 
+61: 	// SetHtml sets the webview HTML directly.
+62: 	// The origin of the page is `about:blank`.
+63: 	SetHtml(html string)
+64: 
+65: 	// Init injects JavaScript code at the initialization of the new page. Every
+66: 	// time the webview will open a the new page - this initialization code will
+67: 	// be executed. It is guaranteed that code is executed before window.onload.
+68: 	Init(js string)
+69: 
+70: 	// Eval evaluates arbitrary JavaScript code. Evaluation happens asynchronously,
+71: 	// also the result of the expression is ignored. Use RPC bindings if you want
+72: 	// to receive notifications about the results of the evaluation.
+73: 	Eval(js string)
+74: 
+75: 	// Bind binds a callback function so that it will appear under the given name
+76: 	// as a global JavaScript function. Internally it uses webview_init().
+77: 	// Callback receives a request string and a user-provided argument pointer.
+78: 	// Request string is a JSON array of all the arguments passed to the
+79: 	// JavaScript function.
+80: 	//
+81: 	// f must be a function
+82: 	// f must return either value and error or just error
+83: 	Bind(name string, f interface{}) error
+84: }
+--- webview struct fields ---
+49: type webview struct {
+50: 	hwnd       uintptr
+51: 	mainthread uintptr
+52: 	browser    browser
+53: 	autofocus  bool
+54: 	maxsz      w32.Point
+55: 	minsz      w32.Point
+56: 	m          sync.Mutex
+57: 	bindings   map[string]interface{}
+58: 	dispatchq  []func()
+59: }
+--- does lib expose Window()/browser? ---
+38:type browser interface {
+52:	browser    browser
+74:	// browser instance.
+107:	w.browser = chromium
+385:func (w *webview) Window() unsafe.Pointer {
