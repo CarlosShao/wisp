@@ -244,7 +244,14 @@ grep -rn --include=*.go -A8 'func (rt \*agentRuntime) bookPanelSnapshot' cmd/wis
 （`chat-screen.tsx`／`result-stream.tsx`／`composer.tsx`／`approval-screen.tsx` 四枚），
 ⇒ 对 Go 侧来说它们是"对上但接不上"；真面板今天只读 21 枚。
 
-### §3.2 ②页面要、Go 没交＝**快照契约上 1 枚** ＋ **props-only 族 26 枚叶子**
+### §3.2 ②页面要、Go 没交＝**快照契约上 1 枚（`view`）＋ props-only 族 41 枚叶子**
+
+**41 这枚数怎么来的（可复核的加法，逐组枚数在 §1.3 表内逐行数）**：
+`TaskRow` 5 ＋ `BallStateRow` 4 ＋ `BallRingDemo` 3 ＋ `PaletteItem` 3 ＋ `PaletteGroup` 2 ＋ `ContextUsage` 3 ＋ `TurnMark` 2 ＋
+`GitBranchView` 4 ＋ `TreeSession` 4 ＋ `MonitorEnvRow` 2 ＋ `MonitorAgentRow` 3 ＝ **31**；
+再加 `GitBranchView.worktrees` 的元素枚 2（`branch` `path`）＋ `PanelSidebarProps` 里属"Go 的活"的 4 枚（`workspaceName` `workspacePath` `workspaceSessions` `historyGroups`）＋ `config-screen` 的 `Row` 数据维 4（`group` `name` `desc` `blocked`）＝ **41**。
+⚠ 两处口径写死：①`TurnMark` 页面已从 `results` 现场推导（下表末行），它算"要"但**不需 Go 加字段**；
+②`PanelView.fed`／`selfFed`（§1.3 末行）**不计入**——那是页面手抄的 Go 现状账，不是一枚要喂的字段（§1.5 第 6 条）。
 
 | 页面要的字段 | 谁在读/会读 | Go 侧今天有没有 | 真来源（既有包能不能算出来） |
 |---|---|---|---|
@@ -274,8 +281,9 @@ grep -rn --include=*.go -A8 'func (rt \*agentRuntime) bookPanelSnapshot' cmd/wis
 
 ⇒ 这一档里 **`git`/`currentModel`/`credentialState`/`tasks`/`instructions` 五枚是"Go 真算了、页面没接"**（不是装饰品：有真生产者），而 `generatedAt`/`rewritten`/`artifact` 三枚是**连页面声明了都不读的形状**。区分这两族很重要——前者只差一次读，后者是契约噪声。
 ⇒ **再分第三族**（§1.4 量出来的）：`ResultChunkView.done` 与 `ComposerState` 的 `attachments`/`acceptedAttachmentMimes`/`maxAttachmentBytes`/`attachmentError`
-四枚、`ComposerMode.l2ConfirmNames`、`ComposerWorkspace.spelling`/`reparse`/`reason`、`ComposerAttachment` 的 8 枚——
-**读取点全在没被 import 的组件里**，所以"Go 交了、真面板不读"这一档按 §3.1 同一把尺要再加 **17 枚**（合计 26 枚叶子＋2 段的口径见 §3.1 那条警示）。
+四枚、`ComposerMode.l2ConfirmNames`、`ComposerWorkspace.spelling`/`reparse`/`reason`、`ComposerAttachment` 被读的 8 枚——
+**读取点全在没被 import 的组件里**（`composer.tsx`／`chat-screen.tsx`／`result-stream.tsx`／`approval-screen.tsx`）。
+⇒ **按"真面板路径"口径，③这一档＝8 ＋ 17 ＝ 25 枚叶 ＋ 2 枚整段（29 叶）**；按"页面声明过"口径则是 8 ＋ 2 段。两个口径都要带着，别只报一个。
 
 ### §3.4 ④名字对不上但形状像同一件事＝**3 族**（逐枚给两边原文）
 
