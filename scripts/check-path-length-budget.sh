@@ -192,6 +192,13 @@ WALL_HIGH=217
 #       -> .scratch/wisp/issues/256-resident-gate-built-before-session-grants.md
 #     .scratch/wisp/issues/257-on-a-clean-machine-all-seven-panel-settings-fields-are-unwritable-because-the-default-provider-registry-is-nil-while-the-write-side-requires-an-existing-row-and-no-roster-field-can-create-one.md
 #       -> .scratch/wisp/issues/257-clean-machine-provider-registry-nil-blocks-writes.md
+#       -> (second hop, added 2026-10-07 by the orchestrator under A674 after acceptance
+#           leg 262-v1 named this pair as the one stale pointer in this block: commit
+#           6c96a425 later appended `-done`, so the path above is NOT a tracked path any
+#           more. The pair above stays as written - it records what 46079fcc produced, and
+#           rewriting a recorded reading is what this block exists to prevent. Current
+#           tracked name, verified by `git ls-files .scratch/wisp/issues | grep /257-`:
+#           .scratch/wisp/issues/257-clean-machine-provider-registry-nil-blocks-writes-done.md)
 #   nine more past the old debt line, former -> now (all in 46079fcc):
 #     .scratch/wisp/issues/149-the-corrupt-leg-of-the-offset-field-has-zero-teeth-the-new-comment-claims-a-sufficient-condition-with-counterexamples-and-the-exited-branch-drops-the-summary-done.md
 #       -> .scratch/wisp/issues/149-corrupt-offset-leg-zero-teeth-done.md
