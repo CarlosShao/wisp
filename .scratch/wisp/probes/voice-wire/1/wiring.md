@@ -92,7 +92,7 @@
 ### 跳 5 · 送进模型（`internal/speech` 与 `cmd/wisp/models.go` 那枚 handOff 桩的关系）
 
 - **存在吗**：**两个半边都在，但接的不是对方。**
-  - 消费端（模型入口）**已接好且能追到 main**：`internal/agent/loop.go:339 Loop.Run(ctx, input string)` / `:328 RunAsync`。生产调用点：`cmd/wisp/run.go:1099 bg := loop.RunAsync(ctx, task)`，链 `cmd/wisp/main.go:89 case "run" → :91 cmdRun(args[1:]) (run.go:151) → … → run.go:1099`（另一支内部调用者 `internal/tools/subagent_197.go:344 child.RunAsync(childCtx, prompt)`）。⚠ **`input` 今天的来源是命令行 argv 的文本，不是声音**——全仓没有一枚"转写文本 → `Loop.Run`"的调用点。
+  - 消费端（模型入口）**已接好且能追到 main**：`internal/agent/loop.go:339 Loop.Run(ctx, input string)` / `:328 RunAsync`。生产调用点：`cmd/wisp/run.go:1099 bg := loop.RunAsync(ctx, task)`，链 `cmd/wisp/main.go:89 case "run" → :91 os.Exit(cmdRun(args[1:])) → cmd/wisp/run.go:151 func cmdRun → :181 runTextTask(s runSpec) → :194 task := strings.TrimSpace(firstArg(s.argv)) → … → :1099 bg := loop.RunAsync(ctx, task)`；第二枚产码调用者＝`internal/tools/subagent_197.go:344 bg := child.RunAsync(childCtx, prompt)`（子代理腿，输入是提示词不是声音）。⚠ **`input` 今天的来源已现量定死＝命令行 argv**：`cmd/wisp/run.go:194 task := strings.TrimSpace(firstArg(s.argv))`（同函数注释 `:176` 逐字 "runTextTask executes one CLI text task"），全仓**没有**一枚"转写文本 → `Loop.Run`/`RunAsync`"的调用点。
   - 交还端（模型字节）**也已接好、能追到 main**：链 `cmd/wisp/main.go:102 case "models" → :109 cmdModels(...) → cmd/wisp/models.go:293 store.handOffModel(io_, id, logf) → :302/:303 statemachine.New → :304 models.WireDownloading → :311 bridge.Run(ctx, id) → internal/models/bridge.go:58 VerifyInstalled`（`bridge.go:40/:46/:59/:64` 是产码里**唯一**的 `.Dispatch(` 命中，4 枚，全是下载事件）。
   - **两者的关系＝还没有关系**：`cmd/wisp/models.go:25` 逐字写着 "internal/speech owns adding its own handOffModel call; this file cannot become that reader by wishing"；`:18-19` 逐字 "That capability does not exist in this tree: internal/speech is a doc.go-only boundary stub (DEFERRED: ticket 15/26/41 per its own doc.go)"。`internal/speech` 的 importer ⇒ **0**。
   - 更硬的一条：`cmd/wisp/models.go:36-41` 自己声明 "There is still no reader of model bytes anywhere in `cmd/wisp`'s dependency graph - this process never opens a file under `<store>/<id>/`, it only re-hashes it"。尺的复现：`grep -rn '^func ' internal/models/*.go`（非测试）里 **没有** 任何 load/engine/session/infer 语义的函数；`Manager.Ensure` 返回的是目录路径 `string`，**没有下一跳**。
@@ -124,7 +124,7 @@
 - **追到 main 吗**：**都不能**。
 - **三档**：Path T 的门 **〔已写零调用＝接线〕**；Path C／AEC／realtime 大脑／会话保活 **〔一块没写〕**（其中 realtime 是"配置面〔已写零调用〕＋引擎〔一块没写〕"）。
 - **票**：**59**（P15 AEC spike，**7** 枚未勾）／**60**（C32 RealtimeEngine，**7** 枚未勾）／**28**（C31 SessionScope Warm/Conversation，**6** 枚未勾）／**247**（半双工门所依附的采集腿，10 枚未勾）。
-- **⚠ 全链公共缺口（不属于任何一跳、但每一跳都会撞上）＝状态机副作用没有执行器**：`internal/statemachine/table.go:15` 逐字 "SideEffects are event names only: the machine fires them on the EffectSink"；`machine.go:23-25` 逐字 "Effects are EVENTS: the machine never executes them itself - consumers (session, speech, panel, tickets 08+) wire a Sink. The zero sink is an explicit no-op."；`Options.Sink`(`machine.go:39`) `nil = explicit no-op`；`machine.go:156-166` 把 41 张副作用名（含 `speech.load-vad-asr`／`kws.load`／`tts.stop-bargein-400ms`）投给 sink。尺：`grep -rn 'statemachine\.New(' --include=*.go internal cmd tools`（非测试）⇒ **2**：`cmd/wisp/models.go:303`（`Options{Initial: …}`，**没传 Sink**，且是一枚 `defer machine.Close()` 的一次性机器）与 `cmd/balldebug/main.go:188`〔非生产〕。⇒ **出货进程里没有任何一枚带 Sink 的 Machine，也没有任何一枚常驻 D43 机器**（此读与票 **246** 自述的"常驻腿不持有 Machine"一致）。**`Options.Sink` 的产码传参点 ⇒ 0。**
+- **⚠ 全链公共缺口（不属于任何一跳、但每一跳都会撞上）＝状态机副作用没有执行器**：`internal/statemachine/table.go:15` 逐字 "SideEffects are event names only: the machine fires them on the EffectSink"；`machine.go:23-25` 逐字 "Effects are EVENTS: the machine never executes them itself - consumers (session, speech, panel, tickets 08+) wire a Sink. The zero sink is an explicit no-op."；`Options.Sink`(`machine.go:39`) `nil = explicit no-op`；`machine.go:156-166` 把副作用名投给 sink。尺：`grep -oE 'SideEffects: \[\]string\{[^}]*\}' internal/statemachine/table.go | grep -oE '"[^"]+"' | sort -u` ⇒ **50 枚唯一名，分布在 39 行转移上**（原样名册已落 `logs/side-effect-names.txt`）；其中语音那 22 枚＝`kws.load`/`kws.pause`/`kws.stop-inference`/`kws.keep-alive-alert`、`speech.load-vad-asr`/`speech.unload-asr-tts`、`asr.punctuate`/`asr.exclude-playback`、`audio.stop-capture`/`audio.discard-buffer`/`audio.release-output`、`tts.stop`/`tts.stop-bargein-400ms`、`mic.enable`/`mic.keep-off`、`session.scope-create`/`session.dispose-scope`/`session.zero-load-resume`、`conversation.entered`/`conversation.suspend`/`conversation.ring-solid`/`conversation.privacy-confirm-l2`。尺：`grep -rn 'statemachine\.New(' --include=*.go internal cmd tools`（非测试）⇒ **2**：`cmd/wisp/models.go:303`（`Options{Initial: …}`，**没传 Sink**，且是一枚 `defer machine.Close()` 的一次性机器）与 `cmd/balldebug/main.go:188`〔非生产〕。⇒ **出货进程里没有任何一枚带 Sink 的 Machine，也没有任何一枚常驻 D43 机器**（此读与票 **246** 自述的"常驻腿不持有 Machine"一致）。**`statemachine.Options` 的 `Sink` 字段产码传参点 ⇒ 0**（尺＝上条那两枚 `statemachine.New(` 命中逐字打开：`models.go:303` 的 `Options{Initial: statemachine.StateFirstRun}` 与 `balldebug:188` 的 `Options{Initial: statemachine.StateSleeping}` **都只填 Initial**）。⚠ 口径注意：`grep -rn 'Sink:' --include=*.go internal cmd tools`（非测试）另有 **2** 枚命中——`cmd/wisp/providers.go:194 storeHealthSink`（llm 健康探针的 sink，枚数 1）与 `internal/agent/sink.go:11`（**注释**）——**两枚都不是 `statemachine.Options.Sink`，别把它们当调用者**。
 
 ---
 
@@ -136,7 +136,7 @@
 2. **它产出的是每一跳共用的载具**：pinned 采集线程＋C8 有界帧道（`audio.go:61/:65`）＋被 `HalfDuplexGate` 包好的 `AudioSource`。KWS/VAD/ASR 的输入都是这枚帧道；先立载具，后面每枚引擎落地时是"往已有帧道上挂一个消费者"；反过来先写 ASR，它今天只能吃 `WavInjector`，接真麦时要**重包一层门＋重挂一次 owner＋重走一遍降级**（票 247 AC#6 那三形）。
 3. **它不碰任何一块没写的包**：票 247 `AC#7` 把 `internal/speech` 明列为越界退回路径，所以第一跳的 diff 与第二跳之后的 diff **天然不重叠**，串行代价最小（本票当前也正按 `246-r2`→`247-r1` 排着）。
 
-**第二跳＝给常驻进程立一枚带 `Options.Sink` 的 D43 机器（跳 7 末尾那枚公共缺口）。** 理由：`speech.load-vad-asr`／`kws.load`／`tts.stop` 这三条**已经写在冻结的 D43 表里**，Sink 不落地时，每一枚引擎都只能各自发明一条"从状态到动作"的私路，引擎写完再往表上收，是四遍返工。⚠ 这一枚**票池里没有对应号**（见 §4），且它**不动转移表一字**（只是把那 41 张名投给一个执行器），所以不需要人工批契约——但要不要新立一枚票由编排者定，本腿⛔不建票。
+**第二跳＝给常驻进程立一枚带 `Options.Sink` 的 D43 机器（跳 7 末尾那枚公共缺口）。** 理由：`speech.load-vad-asr`／`kws.load`／`tts.stop` 这三条**已经写在冻结的 D43 表里**，Sink 不落地时，每一枚引擎都只能各自发明一条"从状态到动作"的私路，引擎写完再往表上收，是四遍返工。⚠ 这一枚**票池里没有对应号**（见 §4），且它**不动转移表一字**（只是把那 50 枚名投给一个执行器），所以不需要人工批契约——但要不要新立一枚票由编排者定，本腿⛔不建票。
 
 **第三跳＝跳 4 的本地 ASR（票 15，连带跳 3 的 VAD）。** 理由：有了帧道＋Sink，ASR 才有可挂的输入与可驱动的装载副作用；且票 15 自带 CER harness（量尺先于实现落），此时接能立刻验。**跳 4 之前不要接跳 2**——KWS 与 ASR 共用 `sherpa` 会话层与"engine slot mutex"，先做 KWS 会把会话生命周期写两遍。
 
@@ -171,7 +171,7 @@
 | | **28** | OPEN | **6** | 0 | C31 SessionScope Warm/Conversation 保活 |
 | 全链（Sink 执行器） | **246** | OPEN | 未量 | — | 只裁了"常驻腿不持有 Machine"这件事的**否决通道**一半 |
 | | **07** | DONE | — | — | 逐字声明 "SessionScope creation etc. are no-ops here"＝当时的**设计内** no-op |
-| | — | | | | **⚠「给常驻进程装一枚带 `Options.Sink` 的 Machine＋41 张副作用名的执行器」没有票**（§4） |
+| | — | | | | **⚠「给常驻进程装一枚带 `Options.Sink` 的 Machine＋50 枚副作用名的执行器」没有票**（§4） |
 
 **语音链路上 OPEN 票的未勾 AC 合计（只算本腿量到的 8 枚）**：247=10 ＋ 15=6 ＋ 26=7 ＋ 41=6 ＋ 61=6 ＋ 59=7 ＋ 60=7 ＋ 28=6 ＋ 27=5 ＋ 165=5 ⇒ 10 枚票共 **65** 枚未勾 AC／0 已勾。票池总 open 数＝**166**（`ls | grep -v -- '-done' | wc -l`）。
 另有一枚**契约级、立而不派**的相关票：**165**「先出方案、你点头再动手」那一档（5 枚未勾，标题逐字标 **契约级·立而不派**）——它约束的是语音入口之后的行动门，不是链上的跳。
@@ -180,7 +180,7 @@
 
 ## 4. 判不动（缺什么料，老实列）
 
-1. **`wisp run` 的 `task` 到底从 argv 还是 stdin 取**——我只读到 `run.go:1099 bg := loop.RunAsync(ctx, task)`，没有回溯 `task` 的赋值行（怕整段读进上下文超预算）。⇒ 影响"跳 5 今天这条文本入口是不是已经能吃非命令行来源"的判定；需要一枚 `cmd/wisp/run.go` 里 `task :=` 的行号级定位。
+1. ~~`wisp run` 的 `task` 到底从 argv 还是 stdin 取~~ **已就地判定**（`cmd/wisp/run.go:194 task := strings.TrimSpace(firstArg(s.argv))`，函数注释 `:176` 逐字 "runTextTask executes one CLI text task"）⇒ **只吃 argv，没有 stdin 支**，所以"转写文本喂进去"目前连一个非命令行的入口都不存在。
 2. **VAD 的包归属两说**（`internal/audio/doc.go:3` vs `statemachine/table.go:52` ＋ `models/manifest.go:94`）——我判不动哪一说是权威的，因为两枚文件都是产码注释、票池里 15 号票的正文我没有逐字读完（只读了标题行）。⇒ 这一枚不定，第三跳会写两遍或写进被禁的包。
 3. **「ASR 终稿 → `Loop.Run`」与「常驻 `Options.Sink` 执行器」这两枚缺口，是真的没票，还是被我扫漏了**——我用的口径是：票池 260 枚文件名＋标题级 grep（`EffectSink`/`执行器`/`statemachine.New`/`sink`/`handOff`/`ASR`/`transcri`），命中者已列进 §3。**没有**逐字读完 166 枚 open 票的正文。⇒ 要定案需要一枚把 open 票正文全扫一遍的活（本腿受输出预算限制未做）。
 4. **`272-r2` 正在改的 `cmd/wisp` 测试文件会不会新增音频/语音 import**——我只在 `82a10da4`＋脏树上量了一次"audio importer=0"。它此刻可能已经变。⇒ 任何下游引用这一读数前，**重跑 §1 跳 1 那两把尺**。
