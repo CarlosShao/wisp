@@ -1,0 +1,6 @@
+date: Wed Oct  7 18:36:27 CST 2026
+vet rc=0
+exit status 0xc0000135
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.031s
+FAIL
+test rc=1
