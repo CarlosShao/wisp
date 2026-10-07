@@ -1,0 +1,31 @@
+=== 275-r2 anchor (pre-change) ===
+UTC/LOCAL: 2026-10-07 13:13:08 +0800
+HEAD: 381f18be branch=dev
+md5 attrib.sh: 77ee11a8d0cc8dd8248c6a9b8e164a78
+lines attrib.sh: 459
+sh -n rc=0
+git ls-files *.go count: 935
+porcelain lines: 753
+porcelain cmd:      0
+porcelain internal: 0
+porcelain scripts:  0
+porcelain .github:  0
+porcelain frontend: 0
+porcelain design:   31
+porcelain docs:     0
+log: 381f18be 立票 276（第二桩归口票）＋台账 A669：票 275 那句"另立一票"落成盘上对象；★不做〔已裁，非结案〕＝状态，⛔ 今天不排腿
+log: 3d443cb9 收 275-v1（非实现者验收）＋台账 A668：票 275 翻 AC#4（7 框／5 勾／2 未勾）；★我 A663 那句「代价＝零」被推翻——判据代价确实零，文案代价有两处假话
+log: d528aef6 275-v1: final restore self-proof (md5 unchanged, porcelain 752 vs 753 = my own surface only) + 甲 cost corrected from measured outside-.scratch=0
+--- drift note: first porcelain read (HEAD 3d443cb9) = 752; the anchor read above (HEAD 381f18be) = 753. Another leg committed 381f18be in the shared tree between the two calls; porcelain is a moving count in a shared worktree. Recorded, not cleaned.
+--- pre-change self-test ---
+selftest rc=0
+selftest stdout lines=11 stderr lines=0
+selftest tally: cases=8 failures=0
+tail:    PASS  want rc=0 verdict=ticket-169        got rc=0  .scratch/wisp/probes/169/a-bench-sample.go (untracked, parse_err=0)
+tail: attrib.sh: --self-test cases=8 failures=0
+tail: attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns
+--- pre-change tracked-only (long run: gofumpt over every tracked .go) ---
+tracked-only rc=2
+stdout lines=35 stderr lines=1
+A-ROSTER rows=33
+stderr: attrib.sh: (A) gofumpt exited 123 on the tracked set (>=2 means a file would not parse) - the tracked tree is not readable by this ruler
