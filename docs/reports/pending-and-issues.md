@@ -13545,3 +13545,11 @@ dev 真身我现量重钉：挂载＝`main.tsx:58`（`<App />` **确实无 prop*
 **4. ★这格的天花板（勾旁钉着的限制，腿要求写、我写进票面）**：V3③ 实测把产码钩子里 `native.call(cw, msg)` 换成裸 `native(msg)`（＝`A684` 的 **M-A** 形）之后**三支全绿 rc=0**；夹具里 `writable|configurable|defineProperty` 现量 **0 处**（**M-B**）。⇒ **`:63` 这三支不含、也不能被读成"真浏览器里那条转发成立"**——那一格只由 `:52` 的真窗凭据撑；JS 语义层（`this`／属性可写性）归本票 `:75` 那枚新框，⛔ 不许在两格之间互相借光（第 108 条"死腿的 logs 只是它取过"的镜像形：**一枚绿不许替另一枚绿作证**）。
 
 **5. 排程（据此更新）**：在飞＝**无**（下面这枚即派）。队列：①`35-r4`＝**夹具两面恒真**（`:75` 的 (a) 支：给手写行为尺补"receiver/`this` 建模"＋"覆写被忽略/不可写"两形，各出一枚具名红；写面 `cmd/wisp/panel_transport_35r2_test.go`＋`cmd/wisp` 测试件）⇒ 其后 `35-v4` 非实现者验收；②`:75` 的 (c) 支＝真窗读数的 **CI 载体**或明写〔仅本机可量〕＋逐波复跑口径（与票 111 的**包级**覆盖不同轴，`A684` §3 已查重）；③**朝"机主真能点开面板"那头并行**：票 33／228／248 那条"面板宿主进常驻进程"的链先派**只读普查**（⛔ 不撞 `cmd/wisp` 写面，包级互斥那条）。票 35 现量 **2 勾／7 未勾**（未勾＝`:42` 白名单模糊测试、`:44` 并发配对、`:45` 伪造批准、`:47` 重同步、`:49` 背压、`:51` 泄密扫描、`:75` 新框），⛔ 不加 `-done`；票 274 仍 9 勾／3 未勾；`build/wisp.exe` 未还原（口令「还原 274 前 exe」）；⛔ 零 push（机主 10-07"暂时不推远程"仍生效）、页面分支仍不合。
+
+---
+
+## A(待填)｜2026-10-07 23:1x｜编号由编排者填｜收只读普查腿 `census-resident-panel`（锚 `af68866`，两笔 `6c7dd5ed`→交件笔；件＝`.scratch/wisp/probes/35/census-resident-panel/summary.md`＋`anchor.txt`）
+
+- ★**顶回报单前提一处（腿对）**：派单句"面板在常驻进程里还没被装配起来"**盘上已过期**——`cmd/wisp/resident_windows.go:151`（`newResidentPanelManager`）＋`:157`（`startResidentPanel`）＋`:217`（`withPanelHost` 注进球腿）＋`cmd/wisp/panel_resident_windows.go:253`（非 test 的 `NewPanelManager(` 调用形状，现量恰 1 枚）＝票 33 的ⓐ形（专用 STA 线程＋库 `Run()` 泵，`panel_resident_windows.go:154/:297`；D38(e) 十步逐字未动，`resident_windows.go:146-150`）。引用"生产调用者 0 枚"的旧表（`167-c2`、`wisp-permission-mode-rulings`、票 33 AC#1..AC#4 原句）自本读数起要翻。
+- 真断的三跳：①**页面字节**——`git ls-files frontend/dist`＝仅 `.gitkeep`，双击今天只能开出 `panel_host_windows.go:441/:449` 那页"bundle not built"告示（归口 33 AC#12＝248 AC#9，产物侧未落定＝按住）；②**常驻腿无快照泵**——`NewSnapshotPump(` 非 test 现量仅 `run.go:699` 一枚（145 AC#2／台账 `:12082` 四步的第 0 跳；新键同批要页面声明面，否则撞 `approval_test.go:129`/`composer_test.go:74` 两枚对账红，⛔ 删 Go 字段不在选项）；③**winlive 无 CI 载体**——`ci.yml` 零 `winlive`/零 `-tags`、`git log -S winlive -- .github/workflows/` 空 ⇒ CI 从未有该步骤 success/failure；载体在（`wisp-selfhosted-01 online`，`ci.yml:798`）。
+- 可派性裁定要点（全表在件里）：**可派**＝35 `:75(c)`（写面 `.github/**`，与 cmd/wisp go 窗口互斥）／33 AC#13（时序半现量已换向 `:425`→`:427`，剩"会响断言＋反控"）／33 AC#14 派验收腿翻勾；**死格⛔ 别派**＝248 AC#4（被测物缺失）；**按住**＝256 AC#1（票面自锁"AC#0 具名 A## 批准后"）／33 AC#12／248 AC#9（等机主裁页面分支）。
