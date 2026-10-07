@@ -1,0 +1,6 @@
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestC21DesignTokensFourWayAgree
+--- FAIL: TestC21TableColourRowsMatchTokensCSS
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+--- FAIL: TestResolvePerCallBudget

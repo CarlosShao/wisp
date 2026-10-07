@@ -1,0 +1,13 @@
+=== case 02-noentry dist-state=noentry npm-scenario=noop path=npm tree=/d/tmp/wisp274r2/tree-02-noentry
+=== PATH=/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/d/work/base/go/bin:/e/work/base/msys64/mingw64/bin:/d/tmp/wisp274r2/fakebin
+build.ps1: repo root D:\tmp\wisp274r2\tree-02-noentry (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\tmp\wisp274r2\fakebin\node.exe (v24.9.0); npm = D:\tmp\wisp274r2\fakebin\npm.cmd (274r2-fake-npm 0.0.0)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 2 file(s) [.gitkeep assets\index-STALE01.js] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+fake-npm: called with args=[run build] scenario=noop dist=D:\tmp\wisp274r2\tree-02-noentry\frontend\dist
+fake-npm: reporting success while writing not one byte (the AC#10 shape)
+build.ps1: FATAL: frontend step: frontend/dist has 1 artifact file(s) but no index.html - the entry file internal/panel resolves (panel.EntryFile) is absent, so the bundle can never be served. Named cause: missing entry file.
+CASE_02-noentry_RC=1

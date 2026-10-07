@@ -1,0 +1,3 @@
+cmd: go test -count=2 -run TestResolvePerCallBudget ./internal/risk (GOCACHE=D:/tmp/gocache-274r2)
+ok  	github.com/CarlosShao/wisp/internal/risk	2.515s
+RECHECK_RC=0

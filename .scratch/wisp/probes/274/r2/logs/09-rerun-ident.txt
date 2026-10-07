@@ -1,0 +1,13 @@
+=== case 09-rerun-ident dist-state=keep npm-scenario=ident path=npm tree=/d/tmp/wisp274r2/tree-09-rerun-ident
+=== PATH=/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/d/work/base/go/bin:/e/work/base/msys64/mingw64/bin:/d/tmp/wisp274r2/fakebin
+build.ps1: repo root D:\tmp\wisp274r2\tree-09-rerun-ident (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\tmp\wisp274r2\fakebin\node.exe (v24.9.0); npm = D:\tmp\wisp274r2\fakebin\npm.cmd (274r2-fake-npm 0.0.0)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+fake-npm: called with args=[run build] scenario=ident dist=D:\tmp\wisp274r2\tree-09-rerun-ident\frontend\dist
+fake-npm: wrote artifact names [.gitkeep index.html assets/index-BRKj5OIJ.css assets/index-BVKlegVD.js] scenario=ident
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274r2\tree-09-rerun-ident; snapshot was 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+CASE_09-rerun-ident_RC=1

@@ -1,0 +1,7 @@
+=== case 06-nonpm dist-state=keep npm-scenario=noop path=nonpm tree=/d/tmp/wisp274r2/tree-06-nonpm
+=== PATH=/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/d/work/base/go/bin:/e/work/base/msys64/mingw64/bin:/d/tmp/wisp274r2/fakebin-nonpm
+build.ps1: repo root D:\tmp\wisp274r2\tree-06-nonpm (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: FATAL: frontend step: npm could not be resolved on PATH (tried npm.cmd, then npm). Without npm there is no frontend/dist, and an exe built from that tree carries no page at all - which is exactly what this step exists to prevent, so it fails instead of skipping.
+CASE_06-nonpm_RC=1
