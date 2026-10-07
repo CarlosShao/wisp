@@ -163,7 +163,7 @@ rc=1  RED - roster entry carries an EMPTY reason; the reason is data, not a comm
   `shipped-copy ⇒ rc=1（点名 262v1-ac3-root-…）` vs `m2 ⇒ rc=0／over-budget=57／GREEN`。
   ⇒ **这一支确实是被读的**：它对"浅目录长名"这一形负责，删掉就静默放掉。**这是本票里唯一一枚"改了门还是绿"的形**，
   ⚠ 所以它的凭据**只能是带种子的对照**（本腿已给），⛔ 不许有人拿"删了它门还绿"当"它没用"。
-- 差量自证：每个 mutant 与入库脚本 `diff` 只有 1–2 行（`logs/mutants-log.txt` 的 `changed-line-count=` 段），
+- 差量自证：每个 mutant 与入库脚本 `diff` 只有 **1–2 行**（中和断言那一枚是 **4 行＝两处改动**；`logs/mutants-log.txt` 的 `changed-line-count=` 段逐枚在案），
   对照组＝入库脚本的逐字节副本 `shipped-copy.sh`（`changed-line-count=0`，同路径同样本跑法跑出的 14:15:47 基线 rc=0/GREEN）。
 
 ### 6.2 恒真检查②——`--self-test` 本身是不是恒真（14:15:54／14:15:56／14:15:59／14:16:30）
@@ -218,7 +218,8 @@ rc=1  RED - roster entry carries an EMPTY reason; the reason is data, not a comm
 `ac4-roster-audit-and-ac6-summary.txt`（§6 名册逐枚审＋§8 四门摘要）· `mutants-log.txt`（§6 七种 mutant 全现场，33,215 字节）·
 `m6-with-self-test.txt`（§6.2 那一发）· `ac5-gh-attempts.txt`（§7 只读取数尝试，含 6 发 EOF 原文）·
 `d22scan.txt`／`d22scan-clone.txt`（§8 两发全量）· `gofumpt-noncmdwisp.txt`／`ac6-gofumpt-clean-head.txt`（§8 gofumpt 两口径；
-其中 `gofumpt-clone-head.txt` 是**真空输出＝0 字节**，git 不存空文件，故该读数改以带出处的 `ac6-gofumpt-clean-head.txt` 入库）·
+其中 `gofumpt-clone-head.txt` 是**真·0 字节空输出**（＝0 枚文件会被重排）；本腿起初断言"git 不存空文件"是**错判**，
+`git ls-tree HEAD` 指着它＝`blob e69de29bb2d1d6434b8b29ae775ad8c2e48c5391`（空 blob 已入库），`ac6-gofumpt-clean-head.txt` 只是同一读数的带出处版本）·
 `govet-internal.txt`（§8）· `ac7.txt`（§9 十四枚逐枚）· `restore-proof.txt`（§10）。
 
 ## 9. AC#7（旧名可追：11＋3＝14 枚）——**判：成立（1 枚的"现名"已过期一跳，具名为缺陷；"记在票面"本腿判它满足 AC#7）**
@@ -293,4 +294,26 @@ rc=1  RED - roster entry carries an EMPTY reason; the reason is data, not a comm
 | **AC#5** | **〔待取数〕** | gh step 级读数 6 发 EOF；已取到的只有 run 级（10-07 00:42Z `37545246395` sha `cc315261` **早于今天的改名**）⇒ 需要"该 step 在某 run 出现 success/failure＋日志行可指"；并挂一枚"AC#5 原文与裁定形状不同形"的待裁项 |
 | **AC#6** | **成立（`./cmd/wisp/` 归编排者补跑）** | `d22scan.sh` rc=0 clean ×2（脏树 14:16:58／干净 clone 14:19:15）；`gofumpt -l`（非 cmd/wisp）干净 HEAD **0 枚**、脏树那 4 枚归在飞腿；`go vet ./internal/...` **rc=0**（14:17:39） |
 | **AC#7** | **成立，带 1 枚具名缺陷** | `git show -M --name-status` 复原 **14/14 对**（全 R100）；旧名引用逐枚仍在（0–9 份/枚）无人"修掉"；缺陷＝脚本里 **257** 的"现名"今天已过期一跳（HEAD 上是 `-done` 那一枚，`6c96a425`）；"记在票面"本腿判它满足原文 |
+
+## 14. 收尾读数与本腿自纠（原始件＝`logs/gate-final.txt`＋`logs/final-selfproof.txt`，14:25:28→14:25:48 +08）
+
+- **门禁在 HEAD 上的第三发（⛔ 不带 self-test，纯扫）**：`sh scripts/check-path-length-budget.sh` ⇒ **rc=0／VERDICT GREEN／
+  `tracked paths=7425  over-budget=57  covered by roster=57  not in roster=0`**，`longest=180`、`bands` 中间带 57、越墙 0 枚。
+- **分母三次现量**：`7405`（14:09，本腿第 1 笔之前）→ `7407`（14:11，**差 2 枚＝本腿第 1 笔自己提的 verdict＋log**）→
+  `7425`（14:25，本腿第 2 笔的 19 枚件）。⇒ **本票今天第三次证成"引用必带时刻"**，编排者 13:5x 那发的 7405 在它自己的时刻上是对的。
+- **本腿写面纪律尺**（逐笔核，不是自述）：两笔 commit 的 `git show --name-only --format=` 里
+  **非 `.scratch/wisp/probes/262/v1/` 的文件枚数＝0／0**；
+  五枚禁改路径的 `git hash-object` 与 `HEAD` blob **逐枚全等**、`git status --porcelain` 对它们**逐枚 0 条**（14:26 现跑）：
+  仪器 `scripts/check-path-length-budget.sh`＝`aa4cd3aa6295`、`ci.yml`＝`fc015a3cea32`、
+  票面 262＝`2bceaa5107aa`、`docs/reports/pending-and-issues.md`＝`6ef8062e0dba`、`docs/reports/HANDOVER.md`＝`1add26c03a77`（左右两边同值＝本腿一字未动）；
+  票面 `- [ ]` 枚数收尾仍＝ **8**（本腿 0 次翻框）；`git push` 次数＝**0**。
+- **`go` 命令面**：本腿只跑过 `go vet ./internal/...`（rc=0，止 14:17:39）与 `go install mvdan.cc/gofumpt@latest`（工具安装，⛔ 不落仓内）；
+  **`./cmd/wisp/` 整包本腿 0 次 `go test`／0 次 `go vet`**（那一格在 §8 具名归编排者补跑销账）。
+- **两处本腿自纠**（写重了的话以本段为准）：
+  ① §8 索引里"git 不存空文件"是错判（空 blob 可入库，尺＝`git ls-tree HEAD`）；
+  ② §2 里"§现量 6 的两条线都不点名它们"这句本腿复述时补的半句——原文那 57 枚**今天由门禁点名**，
+     规矩 9 那条词面线（名 ≤100）**仍然只有词面**（没有独立仪器去读 `README.md` 那一行），⛔ 别把这两件事读成一件。
+- **本件的性质**：这是**裁决表**，不是结案文件。⛔ 本件不翻任何 AC 框、不替编排者裁 §7 那枚"AC#5 原文与裁定形状不同形"的歧义、
+  也不替编排者裁 §9 那枚"257 现名过期"要不要改脚本。三处待编排者动作已在 §11／§12 逐枚点名。
+
 

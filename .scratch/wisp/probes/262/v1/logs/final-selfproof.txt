@@ -1,0 +1,32 @@
+=== 262-v1 收尾自证（Wed Oct  7 14:25:48 CST 2026）===
+[1] 本腿两笔 commit 的路径面（尺＝git show --stat，⛔ 不含任何产码/脚本/CI/票面/台账路径）：
+  --- 1d59543e ---
+    1d59543e 票 262 验收腿 262-v1 第 1 笔：锚读数 + verdict 骨架（⛔ AC 框一枚不碰）
+  
+   .scratch/wisp/probes/262/v1/logs/gate-head.txt | 19 +++++++++
+  非本腿写面的文件枚数＝0
+  --- a734653c ---
+    a734653c 票 262 验收腿 262-v1 第 2 笔：AC#0–AC#7 逐格取证装配完成（⛔ AC 框一枚不碰）
+  
+   .scratch/wisp/probes/262/v1/logs/ac0-local.txt     |  14 ++
+  非本腿写面的文件枚数＝0
+[2] 入库脚本与 HEAD blob 全等（本腿一字未动仪器）：
+  hash-object 现值＝aa4cd3aa62954cfe702a57f0806a21e5b3ad711d
+  HEAD blob    ＝aa4cd3aa62954cfe702a57f0806a21e5b3ad711d
+  ci.yml 现值  ＝fc015a3cea32375dc4b1184bee5576f597680f20 / HEAD blob＝fc015a3cea32375dc4b1184bee5576f597680f20
+  票面 262 现值＝2bceaa5107aa976fdecdf7e4fa6d653b4483dd79 / HEAD blob＝2bceaa5107aa976fdecdf7e4fa6d653b4483dd79
+  票面 AC 未勾框枚数＝8（本腿 0 次翻框）
+[3] 门禁在 HEAD 上的收尾读数（原始件＝gate-final.txt）：rc=0／
+  check-path-length-budget.sh: denominator: tracked paths=7425  over-budget=57  covered by roster=57  not in roster=0
+  check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+  分母从 7405（14:09）→ 7407（14:11，本腿第 1 笔）→ 7425（14:25，本腿第 2 笔的 19 枚件）⇒ 本腿三次都现跑，⛔ 从未引用他腿读数当常量
+[4] 越帽跟踪路径（本仓）＝57 枚，其中名册内 57／名册外 0；本腿自己造的 2 枚种子只活在 D:/tmp/262v1/clone，本仓 0 枚
+[5] 工作树里别人的脏项（本腿不碰、不背书）：git status --porcelain 总脏 760 条，本腿写面 2 条
+[6] 仓外产物（不入库、按规矩 8 不删）：D:/tmp/262v1/{clone,mut,**.txt}＝258169 KB
+
+[7] 五枚禁改路径的 hash 对拉（Wed Oct  7 14:26:54 CST 2026，⛔ 本腿只读）：
+  scripts/check-path-length-budget.sh worktree=aa4cd3aa62954cfe702a57f0806a21e5b3ad711d HEAD=aa4cd3aa62954cfe702a57f0806a21e5b3ad711d porcelain-lines=0
+  .github/workflows/ci.yml worktree=fc015a3cea32375dc4b1184bee5576f597680f20 HEAD=fc015a3cea32375dc4b1184bee5576f597680f20 porcelain-lines=0
+  .scratch/wisp/issues/262-tracked-path-length-gate-for-ci-checkout.md worktree=2bceaa5107aa976fdecdf7e4fa6d653b4483dd79 HEAD=2bceaa5107aa976fdecdf7e4fa6d653b4483dd79 porcelain-lines=0
+  docs/reports/pending-and-issues.md worktree=6ef8062e0dba461376f052bb339bbce4cf635569 HEAD=6ef8062e0dba461376f052bb339bbce4cf635569 porcelain-lines=0
+  docs/reports/HANDOVER.md worktree=1add26c03a77ade62c89f77f883a042b58da8f0c HEAD=1add26c03a77ade62c89f77f883a042b58da8f0c porcelain-lines=0
