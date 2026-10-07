@@ -13095,3 +13095,39 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 `273-r1`／`236-m1`／`228 AC#2/AC#11`／`197-r3`／`220` 落地腿／`253 AC#1`（我代笔）随队。在飞仍 1 枚＝`35-a1`（只读，已交第 1 笔 `6f132ca8`）。
 ⚠ AC#5 那一发整包复跑**排队不插队**：它要独占整包读数，等写腿交件后的空窗。⛔ 只 commit 不 push（机主 10-07「暂时不推远程」）；`winlive` CI 那档继续禁；产码面六族路径＝**0 行**（我这轮只有仓外 overlay 拷贝＋两枚 tracked 文档）。
 
+## A662｜2026-10-07 12:1x｜收 `35-a1`（只读普查：C17 那座桥的出向半座落点）⇒ ★**它顶回我三句、三句都算它对**；同时它页面那半的行号引在另一棵树上（dev 上根本不存在）⇒ 票 35 新增一枚「传输层对不上」框（编排者）
+
+**1. 交件**：件 `.scratch/wisp/probes/35/a1/outbound-bridge.md`＝**436 行／44,457 字节**＋15 枚 logs（2,097 行／120,512 字节）；五枚 commit `6f132ca8`／`cdffb610`／`95b1bb0c`／`8976ffab`／`89114888`，
+`git show --stat` 逐枚复认**只碰自己的路径**（卫生良好，与 `A658` 那两次事故成对照）；六族路径终态 status＝空，`D:/wt/fe` 未进、仓内 `frontend/**` 零字节。
+
+**2. ★★承重新发现（我逐把自己复跑协议链坐实，⛔ 不是转述）：页面的请求今天到不了 Go 的白名单。**
+库根 `webview.go:103` 把 `chromium.MessageCallback` 系成 `msgcb`；`pkg/edge/chromium.go:233-245` 收到 `window.chrome.webview.postMessage` 后**先喂 `MessageCallback`、再把同一条 `PostWebMessageAsString` 原样回丢给页面**；
+`msgcb`（`webview.go:140-158`）按 `{id, method, params}` 解析，而页面的信封（`frontend/src/lib/panel.ts:179-186`：`{"method":"panel.approval.request","correlationId":…,"outcome":…}`）**缺 `id`／缺 `params` 但 JSON 合法**
+⇒ `json.Unmarshal` 不报错、解出 `id=0`＋未知 method ⇒ 走 reject 支 ⇒ `w.Eval("window._rpc[0].reject(…)")` 打进**没有该槽位**的页面 ⇒ JS TypeError 静默；回丢那条页面也**没人听**（`frontend/src` 里 `message` 监听＝**0**，`addEventListener` 4 处全是 keydown／mousemove／close 按钮）。
+⇒ **`cmd/wisp/panel_host_windows.go:630 dispatchRaw` 与那 6 枚名册今天收不到任何来自页面的请求**；它在代码上真在、但第一跳只有 Go 测试能直接调（正控＝`panel_host_*_test.go`）。
+⇒ 落成票 35 新框 **AC#「Transport agreement page↔host」**（未勾、⛔ 本票不选形），并写死两条禁区：⛔ 不许"删白名单"做绿、⛔ 不许"让 Go 直接回 RPC 解析器而信封从未到达 `dispatchRaw`"做绿。
+
+**3. ★记我自己三句（原句在票 35 上一节里，不抹，就地降级）**：
+①「页→Go 入向＝真在」**只对 Go 那半截**（见 §2）；②「出向整条不存在」**说过头**——库的出向原语三枚都在，且每次 binding 回执都真走 `Dispatch(Eval(…))`（`webview.go:148/152/156`），缺的是**无人发起的推送**那一支；
+我自己数的四把枚数（`cmd`＋`internal`，非 test）＝`\.Eval(` **0**／`\.Init(` **0**／`\.SetHtml(` **3**／`\.Dispatch(` **7** ⇒ 正确口径＝"泵到面板线程的路真在，把 JS 推给页面的那一句零调用者"。
+③★**我那把尺的病**：我用 `PostWebMessage|EvaluateScript|CreateWebMessageAsJson` 扫并报"0 命中"＝**拼错名字的假阴性**（这三枚是 `pkg/edge` 的 COM vtable 名 `corewebview2.go:106-109`，不是这套 Go API 的拼写）；
+同一把尺全仓真命中＝**3 枚**：`.scratch/wisp/probes/33/p1/q2/main.go:16` 注释、`internal/panel/composer_dispatch_test.go:461` **空桩**（`PostWebMessageAsJson(…) error { return nil }`）、`:561` 注释
+⇒ 教训按第 111 条同族入账：**判"某符号零调用者"之前要先确认那符号是不是这套 API 的真名**；并且"出向在测试侧有一枚会吞成 `nil` 的桩"这句是新的攻击面——⛔ 谁以后拿"这包绿"抵"页面收到过东西"都要先过这枚桩。
+⚠ 顺带坐实两处账面过期：`AddHostObjectToScript` 全仓＝**0**，可页面 `panel.ts:146` 注释写着桥由它安装＝**注释描述的机制不存在**；`go.mod:19` 把 `jchv/go-webview2` 标 `// indirect`，而 `panel_host_windows.go:64`／`panel_resident_windows.go:73` **直接 import** ⇒ `go mod tidy` 会把它挪成直接依赖（⚠ 只登记，本轮不动 `go.mod`）。
+
+**4. ★它自己也有一枚硬伤（我复跑抓到）**：它把页面那半的锚写成 `main.tsx:97`／`App.tsx:91`／常量 `:70-73`——**dev 上 `main.tsx` 只有 61 行、`App.tsx` 只有 117 行，这两个行号在 dev 上不存在**，那组号属于分支 `dsh/feat/frontend-p0-v2`（115／531 行）。
+dev 真身我现量重钉：挂载＝`main.tsx:58`（`<App />` **确实无 prop**）、默认值＝`App.tsx:70`（`snapshot = EMPTY,`）、`EMPTY` 定义＝`App.tsx:49-53`。
+⇒ **结论在 dev 上同样成立，但锚必须按 dev 重钉**——理由具名：票 274 正在把 **dev 这 64 枚 `frontend/src`** 构进 exe，落地判据只能钉在 dev 的树上，⛔ 不许拿分支行号当凭据（这条与本台账 `A658` 那条"页面在另一棵树"的射程是同一族）。
+
+**5. 复认它答对的两格**：`PanelManager` 非 test 构造点唯一＝`cmd/wisp/panel_resident_windows.go:253`（其余 11 处全在 `_test.go`）；`SnapshotPump.Publish` 非 test 调用者只有 `cmd/wisp/panel_pump.go:405`
+（⚠ 另 `internal/agent/loop.go:1041` 那枚是 `opt.Sink.Publish`、**不是同一座桥**，别混）；可抄先例＝同文件 `:349-372` 的 `post()`（两态路由 `Dispatch`／`tasks`）。
+
+**6. 它自报未做完的两格我不代填**：真机再入测量（零编译权限）、`addEventListener('message')` 只证到"本仓无先例"≠"WebView2 里不可行"。⇒ 归后续腿。
+
+**7. 排程（本轮三派）**：`274-r1`（写，落点 `scripts/build.ps1`）／`275-a1`（只读，gofumpt 分母名册）／`273-a3`（只读，AC#1 未修码读数＋乙那一行代价）均在飞；本轮再加 **`35-a2`（只读代价普查）**——
+它要答的是"把页面信封接进 `dispatchRaw` 有哪几种合法形状"：**甲＝Go 用 `Init` 注入一枚 `wispBridge` 垫片**（页面一字不改，垫片把 raw 串以新 id 投进 `wispDispatch`，并为回执槽位补 `window._rpc[id]` 以免 TypeError）；
+**乙＝不走库的 RPC（自己接 `AddWebMessageReceived`）**⇒ 要不要改依赖／本地 fork（⛔ 手改模块依赖本仓禁）；**丙＝页面改叫 `window.wispDispatch(...)`**（⛔ 页面文件不在我射程，仍按代价记一行）。
+⚠ 另有一格必须先量：**这套传输到底是不是 spec 写死的**——若 `docs/specs/SPEC-08`／`PLAN.md` 那句写的是 `AddHostObjectToScript`，则今天的实现与文档相反，修法方向由文档定、不由我裁（票面 §3 已埋这枚问句）。
+本票写腿**继续按住**：`cmd/wisp` 写面此刻由 `274-r1` 的构建与门禁占着（包级互斥）。⛔ 只 commit 不 push；`winlive` CI 那档继续禁；产码面六族路径＝**0 行**。
+
+
