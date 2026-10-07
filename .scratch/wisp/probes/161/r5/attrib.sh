@@ -303,6 +303,96 @@ if [ "$MODE" = selftest ]; then
     # file sits at the path. The 777 ring case above is its pair: a bench path whose
     # number has no ticket file must ring even though it has the right shape.
     st_case 0 ticket-169 '.scratch/wisp/probes/169/a-bench-sample.go'
+    # --- AC#6 (275-r2): a behavioural positive control for the rc=2 roster print ---
+    # WHY THE TEXT CASES ABOVE CANNOT COVER THIS. Every case so far feeds the
+    # classifier a LINE OF TEXT, so not one of them can notice that ruler_a's
+    # `A_RC -gt 1` branch stopped printing rows: 275-v1 commented that print block
+    # out and read `--self-test cases=8 failures=0` GREEN while stdout went from 23
+    # rows to 1 (verdict.md 2(i) and its logs/selftest-neutered.txt). "It prints" was
+    # never the claim; "somebody checks that it prints" is. So this case does not
+    # trust the printout - it runs the real rc=2 path and asserts on its stdout.
+    # WHAT IT RUNS. A throwaway git tree under mktemp (the shape
+    # tracked-dirty-proof.sh:46-52 already uses, and it asserts the path is outside
+    # the repo rather than trusting the name), holding exactly two tracked .go
+    # samples: one that does not parse, and one that parses but is not gofumpt-clean
+    # (the two-space composite-literal indent copied from tracked-dirty-proof.sh:113,
+    # a shape that repo already measured as TRACKED-DIRTY). go.mod and .gitattributes
+    # travel with it: go.mod because this script's own root check requires it (:134),
+    # .gitattributes so the tree normalises *.go the way a CI checkout does
+    # (same reason as tracked-dirty-proof.sh:67-73). The tree is then handed to THIS
+    # script via ATTRIB_ROOT (:127, the instrument's own out-of-repo mechanism) with
+    # --tracked-only, i.e. the mode CI runs.
+    # WHAT MUST HOLD. rc=2 (the guarded branch really executed) AND at least one
+    # 'A-ROSTER' row on that run's STDOUT naming the unformatted sample. Neutralise
+    # the print block and the row count reads 0, this case FAILS loudly with the
+    # captured output, and the self-test exits 1.
+    # WHAT IT DOES NOT PROVE (so nobody over-reads it). Not that the roster is
+    # COMPLETE over the real 935-file denominator - that is 275-v1's directed
+    # ordering experiment, not this case; not that the rows are well-formatted; not
+    # anything about the rc=1 path (this tree is built so that gofumpt exits >=2). It
+    # is sensitive to the print block being deleted, redirected to stderr, silenced,
+    # or the A-ROSTER token renamed; it is blind to the guard, the exit code and the
+    # denominator, all of which other cases and this file's own guards carry.
+    # NOTE ON WRITES AND ON A MISSING gofumpt: this is the first mode in the file
+    # that writes anything at all - only inside that throwaway tree, outside the
+    # repo, and it is left ON DISK when it ends (create-only, as
+    # tracked-dirty-proof.sh:24-26 does); its path is printed either way. If gofumpt
+    # cannot be found this mode is never reached: the startup check at :140 exits 2
+    # with a named reason, which is a loud no and not a silent skip.
+    ST_RUN=$((ST_RUN + 1))
+    CTL_BROKEN=rosterctl/zz_roster_ctl_broken.go
+    CTL_UNFORMATTED=rosterctl/zz_roster_ctl_unformatted.go
+    ctl_dir=""
+    ctl_note=""
+    ctl_rc=0
+    ctl_rows=0
+    if ctl_dir=$(mktemp -d "${TMPDIR:-/tmp}/wisp-275-r2-rosterctl.XXXXXX" 2>/dev/null); then
+        case $ctl_dir/ in
+        "$root"/*) ctl_note="the throwaway tree $ctl_dir landed INSIDE the repo $root - that shape is banned here, refusing to run it" ;;
+        esac
+    else
+        ctl_dir=""
+        ctl_note="mktemp -d failed - the throwaway tracked tree could not be built, so the roster print could not be run at all"
+    fi
+    if [ -z "$ctl_note" ] && { [ ! -f "$root/go.mod" ] || [ ! -f "$root/.gitattributes" ]; }; then
+        ctl_note="$root is missing go.mod or .gitattributes - the throwaway tree cannot be made to look like a checkout"
+    fi
+    if [ -z "$ctl_note" ]; then
+        if ! { mkdir -p "$ctl_dir/rosterctl" \
+            && cp -- "$root/go.mod" "$root/.gitattributes" "$ctl_dir"/ \
+            && printf 'package rosterctl\n\nfunc rosterCtlBroken( {\n    return 1\n}\n' > "$ctl_dir/$CTL_BROKEN" \
+            && printf 'package rosterctl\n\nvar rosterCtlDirty = map[string]int{\n  "two space indent is not gofumpt": 1,\n}\n' > "$ctl_dir/$CTL_UNFORMATTED"; }; then
+            ctl_note="could not populate the throwaway tree $ctl_dir (go.mod, .gitattributes or the two samples)"
+        fi
+    fi
+    if [ -z "$ctl_note" ]; then
+        if ! ( cd "$ctl_dir" && git init -q . && git add -- go.mod .gitattributes "$CTL_BROKEN" "$CTL_UNFORMATTED" ) >/dev/null 2>&1; then
+            ctl_note="git init or git add failed in $ctl_dir - the two samples are not tracked there, so ruler (A) would be handed nothing"
+        fi
+    fi
+    if [ -z "$ctl_note" ]; then
+        ATTRIB_ROOT=$ctl_dir sh "$here/$(basename -- "$0")" --tracked-only \
+            > "$ctl_dir/selftest-roster-stdout.txt" 2> "$ctl_dir/selftest-roster-stderr.txt" \
+            || ctl_rc=$?
+        ctl_rows=$(tr -d '\r' < "$ctl_dir/selftest-roster-stdout.txt" | tr '\\' '/' | grep -c "A-ROSTER.*$CTL_UNFORMATTED" || true)
+        if [ "$ctl_rc" != 2 ]; then
+            ctl_note="the throwaway tree exited $ctl_rc, not 2 - the A_RC -gt 1 branch this case exists to check never ran (roster rows naming the sample: $ctl_rows)"
+        elif [ "$ctl_rows" -lt 1 ]; then
+            ctl_note="rc was 2 but stdout carries no A-ROSTER row naming $CTL_UNFORMATTED - the print block did not print, which is exactly the red-with-zero-names shape 275 was filed for"
+        fi
+    fi
+    if [ -z "$ctl_note" ]; then
+        printf '   PASS  want rc=2+roster-names-the-sample  got rc=%s rows=%s  throwaway tracked tree left at: %s\n' "$ctl_rc" "$ctl_rows" "$ctl_dir"
+    else
+        ST_FAIL=$((ST_FAIL + 1))
+        printf '   FAIL  want rc=2+roster-names-the-sample  got rc=%s rows=%s\n' "$ctl_rc" "$ctl_rows"
+        printf '         why : %s\n' "$ctl_note"
+        if [ -n "$ctl_dir" ]; then
+            printf '         tree: %s (its stdout, then its stderr:)\n' "$ctl_dir"
+            tail -5 "$ctl_dir/selftest-roster-stdout.txt" 2>/dev/null | sed 's/^/         out: /' || true
+            tail -3 "$ctl_dir/selftest-roster-stderr.txt" 2>/dev/null | sed 's/^/         err: /' || true
+        fi
+    fi
     echo "attrib.sh: --self-test cases=$ST_RUN failures=$ST_FAIL"
     if [ "$ST_FAIL" = 0 ]; then
         echo "attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns"
@@ -352,7 +442,7 @@ ruler_a() {
         # makes those already-computed rows visible. Raw as gofumpt printed it (repo-
         # relative path; backslashes on Windows, forward slashes in a CI checkout).
         if [ -n "$A_OUT" ]; then
-            echo "== (A) per-file roster gofumpt emitted before it hit an unparseable file (stdout; exit code unchanged, denominator unchanged):"
+            echo "== (A) roster: every row of A_OUT printed raw, and A_OUT was captured with 2>&1, so these rows are gofumpt's stdout list AND its stderr parse-error diagnostics folded into one stream (count them as rows, not as files); the whole capture is here, it is not a prefix cut off at the unparseable file. exit code unchanged, denominator unchanged:"
             while IFS= read -r roster_line; do
                 [ -n "$roster_line" ] || continue
                 printf '   A-ROSTER	%s\n' "$roster_line"
