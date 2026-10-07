@@ -1,0 +1,20 @@
+# three one-line overlay mutations of internal/panel/bridge.go (repo file UNTOUCHED; copies live in /d/tmp/wisp35r3)
+# each diff vs the working-tree bridge.go, exactly one changed line:
+
+=== bridge_roster.go (neutralizes :132/:135/:139 guard's own return) ===
+132c132
+< 	if !knownComposerMethod(r.Method) {
+---
+> 	if false && !knownComposerMethod(r.Method) {
+
+=== bridge_source.go (neutralizes :132/:135/:139 guard's own return) ===
+135c135
+< 	if strings.TrimSpace(r.Source) != ComposerRequestSource {
+---
+> 	if false && strings.TrimSpace(r.Source) != ComposerRequestSource {
+
+=== bridge_reqid.go (neutralizes :132/:135/:139 guard's own return) ===
+139c139
+< 	if strings.TrimSpace(r.RequestID) == "" {
+---
+> 	if false && strings.TrimSpace(r.RequestID) == "" {
