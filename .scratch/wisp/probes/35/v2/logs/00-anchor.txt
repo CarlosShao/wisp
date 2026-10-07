@@ -1,0 +1,18 @@
+35-v2 starting anchor. HEAD=14d027df datetime=2026-10-07 20:18:06 +0800
+porcelain count: 754
+--- forbidden zone diff vs a7f9781c
+frontend: []
+internal/panel: []
+--- blob hashes at HEAD
+7185ab56d75952247226feb404add6642fc0e336
+26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+bebe8e702a85c640641551e93dd09936530950f4
+--- line numbers present
+0
+0
+638:// panelPostMessageForwardInit is ticket 35 AC#6's Go-side transport forwarding,
+673:var panelPostMessageForwardInit = fmt.Sprintf(`(function () {
+700:	w.Init(panelPostMessageForwardInit)
+--- dispatchRaw call sites
+1
+--- winlive tests in cmd/wisp
