@@ -1,0 +1,21 @@
+Wed Oct  7 15:27:46 CST 2026
+0bb71547 A675 收 274-v1（票 274 翻 AC#1/AC#4/AC#6/AC#7＝7 勾 4 未勾，⛔ 不加 -done）＋新立 AC#10＋我自纠两枚枚数
+dev
+--- embedfiles start
+[dist/.gitkeep dist/assets/index-BRKj5OIJ.css dist/assets/index-BVKlegVD.js dist/index.html]
+--- dist mtimes
+2026-10-07 11:57:42.375396400 +0800 0 frontend/dist/.gitkeep
+2026-09-27 10:59:04.177183500 +0800 49943 frontend/dist/assets/index-BRKj5OIJ.css
+2026-09-27 10:59:04.175813400 +0800 553469 frontend/dist/assets/index-BVKlegVD.js
+2026-09-27 10:59:04.178195900 +0800 1044 frontend/dist/index.html
+--- src newest mtime (metadata only)
+frontend/src
+1790478112.1974323000 2026-09-27 11:01 frontend/src/styles/tokens.generated.css
+1790478112.1968872000 2026-09-27 11:01 frontend/src/styles/theme.css
+1790478112.1958074000 2026-09-27 11:01 frontend/src/main.tsx
+--- src file count
+64
+--- d22scan ps1?
+2:# scripts/d22scan.sh - the only supported way to run the D22 gate (ticket 67 AC#2).
+23:# so a violation added to internal/ or frontend/ cannot invalidate them. Run 1
+24:# of the script passed, a `frontend/src/app.js:1 approval.decide` was then
