@@ -267,8 +267,23 @@ $ git ls-files '*.go' | wc -l        935  == 起手（分母没被我动过；�
 ```
 
 我的仓外产物（⛔ 不入库也不删）：`D:/tmp/wisp275v1/`（clone、`attrib-neutered.sh`、`attrib-blind.sh`、
-`porcelain-anchor.txt`/`porcelain-now.txt`、每发的 raw）。入库件：`.scratch/wisp/probes/275/v1/verdict.md`、
-`anchor-raw.txt`、`logs/*.txt`（19+ 件）。全部 commit 带显式 pathspec、消息先写在仓外文件、⛔ 无 push/amend/reset。
+`porcelain-anchor.txt`/`porcelain-now.txt`/`porcelain-final.txt`、每发的 raw）。入库件：
+`.scratch/wisp/probes/275/v1/verdict.md`、`anchor-raw.txt`、`logs/*.txt`（21 件，第二笔 commit `git show --stat` 自数＝**23 files changed**）。
+全部 commit 带显式 pathspec、消息先写在仓外文件、⛔ 无 push/amend/reset。
+
+**收尾复核（两笔 commit 都落完之后现量，`porcelain-final.txt`）**：
+```
+$ md5sum .scratch/wisp/probes/161/r5/attrib.sh
+77ee11a8d0cc8dd8248c6a9b8e164a78                == 起手（仪器一字未动）
+$ git status --porcelain -- cmd internal scripts tools .github docs frontend | wc -l
+0                                                == 起手
+$ git status --porcelain | wc -l ; diff vs anchor
+752  vs  753  —— 唯一差行＝锚点里的 `?? .scratch/wisp/probes/275/v1/`（我的两件＋logs 现已 commit，
+                 该未跟踪条目自然消失）；其余 752 行**逐字相同**
+$ git ls-files '*.go' | wc -l
+935                                               == 起手（分母没被我动过）
+```
+⇒ 还原自证成立：差集 100% 由我自己的写面构成，别人的在飞物一枚没动。
 
 ### 裁决一览（给编排者，⛔ 我不翻任何框）
 
@@ -295,9 +310,11 @@ $ git ls-files '*.go' | wc -l        935  == 起手（分母没被我动过；�
   "红 + 全具名"：CI 那一发在 rc=1 时本来逐枚打 `TRACKED-DIRTY … <== CI IS RED ON THIS`，在 rc=2 时现在也打名册 ⇒
   第二桩**已经有名字**，缺的只是"绿"，而买绿的价钱（甲＝对 286 枚探针件整体失明，票 §2 第 2 行那个数；
   丙＝拿假绿换安静且至今没有它要求的定向判据）比红着贵。
-  我**不推荐甲**：它顺手把两枚台件的"该被看见"也抹了（票 `:95` 的判断我实测支持），
-  而且它**并不能**让第二步绿——因为 19 枚里 17 枚根本不在 `.scratch/**` 之外……更正：17 枚也**全在** `.scratch/**` 里，
-  所以甲**确实**能变绿，代价恰恰是"对 286 枚全体失明"（＝第 108 族那条：一门能变绿的方式如果等于把尺闭上，就不该被当成修复）。
+  我**不推荐甲**：它顺手把两枚台件的"该被看见"也抹了（票 `:95` 的判断我实测支持）。
+  ⚠ 但我不假装它没用：**甲确实能让那一步绿**——我这手量到 19 枚里 `outside .scratch = 0`、`in probes = 20(含我的样本)`，
+  也就是整个 `exit 1` 分母**全部住在 `.scratch/**` 里**，排除这一族就等于把整批名字闭掉。
+  ⇒ 甲的代价不是我原先写的"只丢 286 枚里的真回归"，而是**这 19 枚全体＋未来任何探针件从此不可见**，
+  而它换来的只是"绿"＝第 108 族那条：一门变绿的方式如果等于把尺闭上，就不该被当成修复。
   ⇒ 结论：**甲＝能绿但等于闭眼；乙＝禁区（改别人的凭据）；丙＝能绿但门失去"语法坏掉"这一支的牙且没补判据；
   丁＋17 枚格式化＝能绿且不掉牙，但要 15 张工单的解冻；不做（保持红、已具名）＝今天最便宜的诚实形状。**
   ⇒ 给编排者的建议：**保留丁；第二桩走"不做＋另立一票逐枚处置 17 枚探针件"，⛔ 不要甲、不要在没补定向判据时走丙。**
