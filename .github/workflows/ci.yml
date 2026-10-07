@@ -201,6 +201,37 @@ jobs:
         # as red, never as green (the vacuous-empty mistake this file's own ancestor
         # made once with `git ls-files -Z`). A step that could pass by matching
         # nothing is the shape ticket 161 exists to refuse.
+        #
+        # ADDED: `if: ${{ !cancelled() }}` (ticket 111 AC#5 second clause, landed
+        # 2026-10-07 by leg 111-r5). WHAT IT FIXES, with the reading named rather
+        # than inferred: GitHub gives every step a default `success()` check, so the
+        # moment the gofmt step above goes red this step is reported `skipped` and
+        # prints NOTHING. That is not hypothetical - the orchestrator's pull of run
+        # 37406757402 reads step 8 `[failure]` (gofmt) then step 9 `[skipped]` (this
+        # one), and this ticket's own record says the same twice (:305 gofmt red =>
+        # the steps after it skipped; :316 registers the residue as unfixed). A step
+        # that exists in the yaml is NOT a step that ran: on that shape this census
+        # has never once produced a CI verdict.
+        #
+        # WHY `!cancelled()` AND NOT THE LITERAL WORDS OF AC#5 (`if: always()`): the
+        # repo already settled that in this file, and this leg follows the settled
+        # shape instead of importing a second one - see the test-windows header below
+        # (the docs warn `always()` runs even on cancel, and recommend `!cancelled()`
+        # for exactly this case; an expression starting with `!` must be braced).
+        # AC#6's recorded evidence counted `!cancelled()` occurrences, not always().
+        #
+        # WHY THIS STEP AND NOT THE GATES ABOVE IT (the two categories stay apart):
+        # this step is a CENSUS - it measures and prints a denominator, so skipping
+        # it destroys a reading while adding a guard weakens nothing (a red here
+        # still reddens the job). gofmt / go vet / staticcheck are production gates
+        # whose ORDER is itself a claim this file makes twice (see the two ordering
+        # notes on the D22 steps above), so they keep failing fast. And the two
+        # `Upload SLO report` steps are deliberately NOT given a guard even though
+        # they carry readings: scripts/slo-freshness.sh P1 (:160-170) fails the nail
+        # if the slo-full job body carries `if:` at all, and :38-45 of that script
+        # states that a FAILED sample must not produce an artifact, because P3 ages
+        # on "a valid sample happened". Registered in the ticket instead.
+        if: ${{ !cancelled() }}
         run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
 
       - name: go vet (module)

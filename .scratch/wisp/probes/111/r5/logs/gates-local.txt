@@ -1,0 +1,56 @@
+== date ==
+2026-10-07 09:13 +0800
+
+== bash -n on the carrier scripts (rc=0 required) ==
+bash -n rc=0  scripts/portable-tests.sh
+bash -n rc=0  scripts/portable-tests-selftest.sh
+bash -n rc=0  scripts/winsec-tests.sh
+bash: scripts/runtests.sh: No such file or directory
+bash -n rc=127  scripts/runtests.sh
+bash -n rc=0  tools/d22scan/runtests.sh
+bash -n rc=0  scripts/slo-freshness.sh
+bash -n rc=0  scripts/d22scan.sh
+bash -n rc=0  scripts/check-path-length-budget.sh
+bash -n rc=0  .scratch/wisp/probes/161/r5/attrib.sh
+
+== the guarded step's own command line, verbatim from ci.yml ==
+ci.yml line: 235:        run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 935)
+attrib.sh: (A) gofumpt exited 123 on the tracked set (>=2 means a file would not parse) - the tracked tree is not readable by this ruler
+attrib.sh --tracked-only rc=2
+
+== YAML census, same parser before/after (PyYAML) ==
+--- before ---
+YAML_PARSE=OK
+lint steps=13 guarded=3 runs-on=ubuntu-latest
+test-core steps=7 guarded=1 runs-on=ubuntu-latest
+test-windows steps=9 guarded=7 runs-on=windows-latest
+slo-smoke steps=6 guarded=0 runs-on=windows-latest
+slo-full steps=5 guarded=0 runs-on=['self-hosted', 'wisp-slo']
+lint-frontend steps=11 guarded=0 runs-on=ubuntu-latest
+TOTAL_STEPS=51
+TOTAL_GUARDED=11
+--- after ---
+YAML_PARSE=OK
+lint steps=13 guarded=4 runs-on=ubuntu-latest
+test-core steps=7 guarded=1 runs-on=ubuntu-latest
+test-windows steps=9 guarded=7 runs-on=windows-latest
+slo-smoke steps=6 guarded=0 runs-on=windows-latest
+slo-full steps=5 guarded=0 runs-on=['self-hosted', 'wisp-slo']
+lint-frontend steps=11 guarded=0 runs-on=ubuntu-latest
+TOTAL_STEPS=51
+TOTAL_GUARDED=12
+
+== step-name census in ci.yml (what each guard-bearing step is) ==
+  234:        if: ${{ !cancelled() }}
+  294:        if: ${{ !cancelled() }}
+  331:        if: ${{ !cancelled() }}
+  387:        if: ${{ !cancelled() }}
+  462:        if: always()
+  522:        if: ${{ !cancelled() }}
+  560:        if: ${{ !cancelled() }}
+  570:        if: ${{ !cancelled() }}
+  592:        if: ${{ !cancelled() }}
+  681:        if: ${{ !cancelled() }}
+  717:        if: ${{ !cancelled() }}
+  733:        if: ${{ !cancelled() }}

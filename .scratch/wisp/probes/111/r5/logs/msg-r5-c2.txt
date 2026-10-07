@@ -1,0 +1,22 @@
+ci(111 r5)：给 lint 作业那枚 tracked 名册普查步补 `if: ${{ !cancelled() }}`＋把 27 枚无守卫步分成三类钉住
+
+改的只有一处形状，读数是量出来的（台件 `probes/111/r5/ci-guards.md` §3/§4）：
+
+- 靶子＝`gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)`，
+  它的上一步 `gofmt (gofumpt)` 按票面 `:305`/`:316` 记录在红，GitHub 默认 `success()` 把这一枚整步跳过
+  ⇒ 这把 tracked 普查尺在 CI 里到今天一次都没执行（编排者给的 run `37406757402` 步 8 [failure] → 步 9 [skipped] 同一形状）。
+  同族对照组＝`test-windows` 的 census 步（守卫 `:650`/run `:651`），那枚一直有守卫。
+- 尺（同一把两向）：PyYAML 真解析 `YAML_PARSE=OK`、`TOTAL_STEPS=51` 不变、`TOTAL_GUARDED` **11 → 12**、
+  `CONTINUE_ON_ERROR` 两向皆 **0**；awk 具名步名册 **28 无守卫/11 有守卫 → 27/12**；
+  `ci.yml` 910 → 941 行，插入 31 行、删除 0 行，新增行非 ASCII **0** 枚，行尾仍纯 LF。
+- ⛔ 三类分开列，不是顺手改：甲类产码门禁 11 枚不加（顺序在 `ci.yml` 里是写明的因果）；
+  丙类 `Upload SLO report` 两枚**看着像读数该加、其实不能加**——`scripts/slo-freshness.sh` P1 `:160-170`
+  把 slo-full 作业体内出现 `if:` 判 FAIL（该尺由 `.github/workflows/slo-fresh.yml:70` 在 CI 真跑），
+  `:38-45` 又写明 FAILED 样本"不该"留下 artifact 才是 P3 的判据；本腿用 P1 自己的范围尺复量：真件 0 命中、
+  往 `/tmp` 拷贝的 slo-full 体内插一枚守卫 ⇒ 1 命中（＝P1 会红）。`lint-frontend` 4 枚 render evidence 判不动（`frontend/**` 禁读）。
+- ★具名交回一枚发现（不撤步、不改别人的仪器）：本腿把补守卫那枚步的命令行逐字复跑 ⇒ **rc=2**。
+  机制钉死：tracked `.go` 935 枚里有 **286** 枚住在 `.scratch/**`，逐枚量 gofumpt 退出码 ⇒ 恰好 **1** 枚非 0
+  （`.scratch/wisp/probes/185/c1/mut/fs_broken.go`，`git cat-file -e HEAD:` ＝ EXISTS_AT_HEAD=yes ⇒ 在 HEAD 上、不是别人没保存）
+  ⇒ `xargs` 交回 123 ⇒ `attrib.sh` 的空分母守卫按设计 exit 2。守卫补上后这枚步在 CI 的第一发**很可能是红**，
+  红因＝"tracked 名册含一枚语法不可解析的样本"，不是格式化回归。按 AC#2"接入第一天就红＝发现"登记。
+- 零 `.go` 读写；`scripts/**` 一字未动；只 commit 不 push。

@@ -1,0 +1,39 @@
+lint|1|74|NO-GUARD||D22 scanner positive control (tools/d22scan tests, seeded red) //  run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+lint|2|83|NO-GUARD||"D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)" //  run: go run . -self-test
+lint|3|108|NO-GUARD||D22 seven-ban + emoji scan (tools/d22scan) //  run: sh scripts/d22scan.sh
+lint|4|136|NO-GUARD||"Tracked path-length budget (ticket 262)" //  run: sh scripts/check-path-length-budget.sh --with-self-test
+lint|5|168|NO-GUARD||gofmt (gofumpt) //  run: /
+lint|6|184|IF@234:${{ !cancelled() }}||"gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)" //  run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
+lint|7|237|NO-GUARD||go vet (module) //  run: go vet ./...
+lint|8|240|NO-GUARD||go vet (tools/d22scan module) //  run: go vet ./...
+lint|9|244|IF@294:${{ !cancelled() }}||staticcheck //  run: /
+lint|10|320|IF@331:${{ !cancelled() }}||mockllm module vet //  run: go vet ./...
+lint|11|335|IF@387:${{ !cancelled() }}||"Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)" //  run: bash scripts/portable-tests-selftest.sh
+test-core|1|406|NO-GUARD||Start compose test services (mock-llm on 18080) //  run: docker compose -f docker/compose.test.yml --profile test up -d --build mock-llm
+test-core|2|409|NO-GUARD||Probe mock-llm //  run: /
+test-core|3|421|NO-GUARD||Environment fork assertion (WISP_ENV=test data dir) //  run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+test-core|4|437|NO-GUARD||Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh) //  run: bash scripts/portable-tests.sh --scope=core
+test-core|5|461|IF@462:always()||Stop compose services //  run: docker compose -f docker/compose.test.yml --profile test down
+test-windows|1|516|IF@522:${{ !cancelled() }}||"Windows ACL sealing gate (internal/winsec's own tests, ticket 110)" //  shell: bash run: bash scripts/winsec-tests.sh
+test-windows|2|559|IF@560:${{ !cancelled() }}|uses|Cache third_party (deps.toml key) //  uses: actions/cache@v4
+test-windows|3|566|IF@570:${{ !cancelled() }}||"cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)" //  run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+test-windows|4|573|IF@592:${{ !cancelled() }}||"cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)" //  shell: bash run: bash scripts/wisp-cli-tests.sh
+test-windows|5|595|IF@681:${{ !cancelled() }}||"Package coverage census (ticket 111 AC#1 + GUARD D)" //  shell: bash run: bash scripts/portable-tests.sh --scope=census
+test-windows|6|684|IF@717:${{ !cancelled() }}||Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord) //  shell: bash run: bash scripts/portable-tests.sh --scope=windows
+test-windows|7|720|IF@733:${{ !cancelled() }}||"PathResolver junction placeholder (real cases tickets 18/20)" //  shell: bash run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
+slo-smoke|1|750|NO-GUARD|uses|Cache third_party (deps.toml key) //  uses: actions/cache@v4
+slo-smoke|2|756|NO-GUARD||Build wisp.exe //  run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+slo-smoke|3|759|NO-GUARD||SLO smoke gate //  run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+slo-smoke|4|762|NO-GUARD|uses|Upload SLO report //  uses: actions/upload-artifact@v4
+slo-full|1|819|NO-GUARD||Build wisp.exe (deps cached on the runner) //  run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+slo-full|2|822|NO-GUARD||SLO full gate (six states + settle + leak) //  run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+slo-full|3|825|NO-GUARD|uses|Upload SLO report //  uses: actions/upload-artifact@v4
+lint-frontend|1|887|NO-GUARD||npm ci (lockfile is the only source of deps) //  run: npm ci
+lint-frontend|2|890|NO-GUARD||typecheck (tsc -b, noEmit per tsconfig.*.json) //  run: npm run typecheck
+lint-frontend|3|893|NO-GUARD||lint (oxlint) //  run: npm run lint
+lint-frontend|4|896|NO-GUARD||token drift guard (generated theme must equal the C21 table) //  run: npm run tokens:check
+lint-frontend|5|902|NO-GUARD||build (vite build -> frontend/dist, the bytes go:embed carries) //  run: npm run build
+lint-frontend|6|905|NO-GUARD||L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence) //  run: npm run render:l2 -- fixtures/l2-card-fs-delete.json
+lint-frontend|7|924|NO-GUARD||Composer states paint the real envelope (render evidence) //  run: npm run render:composer
+lint-frontend|8|930|NO-GUARD||Streaming output honours PLAN.md's SSE row (render evidence) //  run: npm run render:stream
+lint-frontend|9|935|NO-GUARD||Nav rail names only icons PLAN.md's frozen list carries (render evidence) //  run: npm run render:nav
