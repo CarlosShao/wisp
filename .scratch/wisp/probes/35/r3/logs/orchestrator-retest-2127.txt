@@ -1,0 +1,8 @@
+Wed Oct  7 21:27:40 CST 2026
+build rc=0
+three rc=0
+3
+0
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
