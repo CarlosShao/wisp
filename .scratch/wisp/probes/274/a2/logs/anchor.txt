@@ -1,0 +1,64 @@
+# 274-a2 logs/anchor.txt — 起手锚原始输出（现跑，未截断）
+
+$ cd "D:/work/workspace/projects plans/Wisp"
+$ date
+Wed Oct  7 11:02:00 CST 2026
+
+$ git rev-parse --short HEAD
+933a8341
+
+$ git rev-parse --abbrev-ref HEAD
+dev
+
+$ git status --porcelain -- cmd internal scripts tools .github docs frontend
+（无输出，0 行；命令退出码 0）
+[status exit=0 lines above]
+
+$ git ls-files frontend/src | wc -l
+64
+
+$ git ls-files frontend | wc -l
+85
+
+## 附：全仓 status 的信息性快照（不作为本腿终态判据）
+$ git status --porcelain | head -40
+ M .gitignore
+ M .scratch/wisp/probes/152/my152.py
+ M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+ M .scratch/wisp/probes/268/v1/evidence.md
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+?? -
+?? .scratch/.scratch/
+?? .scratch/ci-logs/run-37158259050.err
+?? .scratch/ci-logs/run-37158259050.log
+?? .scratch/ci-logs/run-37166458550-failed.err
+?? .scratch/commit-msg-167-ac1.txt
+?? .scratch/commit-msg-167a2-s01.txt
+?? .scratch/commit-msg-167a2-s23.txt
+?? .scratch/commit-msg-167a2-s4.txt
