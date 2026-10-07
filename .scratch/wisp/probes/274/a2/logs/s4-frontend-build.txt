@@ -1,0 +1,115 @@
+=== out-of-repo copy: dist inventory ===
+/d/tmp/wisp274a2/fe/frontend/dist/.gitkeep 0 bytes
+/d/tmp/wisp274a2/fe/frontend/dist/assets/index-vdBrT8rM.js 552027 bytes
+/d/tmp/wisp274a2/fe/frontend/dist/assets/index-yy8KMgdf.css 49540 bytes
+/d/tmp/wisp274a2/fe/frontend/dist/index.html 1068 bytes
+dist_file_count=4
+/usr/bin/bash: line 2: bc: command not found
+dist_total_bytes=
+
+=== fe-npmci.log tail ===
+  run `npm fund` for details
+
+1 high severity vulnerability
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+
+=== fe-typecheck.log full ===
+
+> frontend@0.0.0 typecheck
+> tsc -b
+
+
+=== fe-build.log full ===
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v8.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 2439 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.06 kB │ gzip:   0.64 kB
+dist/assets/index-yy8KMgdf.css   49.54 kB │ gzip:   9.84 kB
+dist/assets/index-vdBrT8rM.js   552.02 kB │ gzip: 170.74 kB
+
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 801ms[39m
+
+=== package.json scripts ===
+{
+ "dev": "vite",
+ "build": "tsc -b && vite build",
+ "preview": "vite preview",
+ "typecheck": "tsc -b",
+ "lint": "oxlint",
+ "tokens": "node scripts/gen-tokens.mjs",
+ "tokens:check": "node scripts/gen-tokens.mjs --check",
+ "render:l2": "vite build --ssr scripts/render-l2.tsx --outDir node_modules/.tmp/l2render --logLevel warn && node node_modules/.tmp/l2render/render-l2.js",
+ "render:composer": "vite build --ssr scripts/render-composer.tsx --outDir node_modules/.tmp/composerrender --logLevel warn && node node_modules/.tmp/composerrender/render-composer.js",
+ "vendor:beautifului": "node scripts/vendor.mjs",
+ "vendor:shadcn": "node scripts/vendor-shadcn.mjs",
+ "render:stream": "vite build --ssr scripts/render-stream.tsx --outDir node_modules/.tmp/streamrender --logLevel warn && node node_modules/.tmp/streamrender/render-stream.js",
+ "render:nav": "vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js"
+}
+name frontend version 0.0.0
+=== npm ls --depth=0 (installed count) ===
+node_modules_present=yes
+pkg_dirs=52
+=== tracked frontend file inventory by top dir ===
+      1 .gitignore
+      1 .oxlintrc.json
+      1 VENDORED.md
+      1 dist
+      1 embed.go
+      2 fixtures
+      1 index.html
+      1 package-lock.json
+      1 package.json
+      7 scripts
+     64 src
+      1 tsconfig.app.json
+      1 tsconfig.json
+      1 tsconfig.node.json
+      1 vite.config.ts
+=== embed.go content (frontend/embed.go) ===
+// Package frontend holds the built panel bundle and nothing else.
+//
+// Ticket 77 AC#1: `npm run build` in this directory produces dist/, and the
+// go:embed below is the ONLY way those bytes reach wisp.exe. There is no
+// runtime CDN and no local HTTP server (D29 - the WebView2 host answers
+// AddWebResourceRequested from these bytes), so the binary must be
+// self-sufficient on a machine with no node, no npm and no network.
+//
+// dist/ is gitignored (see the note in the root .gitignore) except for the
+// .gitkeep anchor, which exists so that `go build ./...` still resolves the
+// embed pattern in a clean checkout that has not run the frontend build. With
+// only the anchor present, panel.Assets.Built() reports false and the host
+// shows its own "assets not built" state - it can never ship a page that
+// quietly renders the placeholder.
+package frontend
+
+import "embed"
+
+//go:embed all:dist
+var distFS embed.FS
+
+// Dist returns the embedded build output rooted at dist/.
+func Dist() embed.FS {
+	return distFS
+}
+
+// AnchorName is the tracked placeholder that keeps the embed pattern
+// satisfiable before a build has run. Its presence as the ONLY entry is how
+// panel detects "not built yet".
+const AnchorName = ".gitkeep"
+=== EmbedFiles reading (go list, no writes into frontend) ===
+[dist/.gitkeep dist/assets/index-BRKj5OIJ.css dist/assets/index-BVKlegVD.js dist/index.html]

@@ -1,0 +1,86 @@
+=== §5-1 six-family status (must equal anchor: empty) ===
+[lines=0]
+
+=== §5-2 git log --oneline -5 ===
+7da2ab20 274-a2 §3：run 侧读数——三枚产 exe 的 job 里没有任何一步打印过 node/npm 版本或路径（作业侧 npm 可达性＝取不到，零步试过）；slo-full 是 self-hosted 且与本机同一枚机器（Runner name wisp-selfhosted-01 / Machine DESKTOP-LVS7839 / E:\work\base\actions-runner 三项与本机 COMPUTERNAME、用户名、目录逐一对上）；test-windows 与 slo-smoke 日志头是 Hosted Compute Agent
+3d061f1e 274-a2 §2：产 exe 的三枚 job 逐枚点名——test-windows(505)/windows-latest(506)/build.ps1@571、slo-smoke(739)/windows-latest(740)/build.ps1@757、slo-full(797)/[self-hosted, wisp-slo](798)/build.ps1@820；三枚全无 setup-node、全无一步读 frontend/dist（正控分别＝879/11 行/902 各命中处具名）
+3dcfcd23 274-a2 §1：出货 exe 的唯一通路＝scripts/build.ps1:129 的 `go build ./cmd/wisp`（入口 1 枚，另两枚 main 包 balldebug/llmrecord 不在这条路上）
+4c659a2c 台账 A658＋立票 275：★★同一枚 pathspec 事故今天第二次发生（8d30a862 又提走 272-r2 的 10 份 logs＋cmd/wisp/config_reload_223_test.go 52/0，受害者与上午 ca4ae2af 同批），两枚写腿按"死在回报不是死在交付"收档不重派
+1ec9fa19 272-v1 §0 起手锚落盘（非实现者对抗验收腿第 1 笔，任何长跑命令之前）：HEAD e18e32da / dev / 六族路径 status 0 行（起手全干净）；测试文件 log 顶 = 8d30a862（顺手提走那 52 行的编队事故笔）。现量坐实 8d30a862 对 config_reload_223_test.go = 52 插入/0 删除（745→797），8d30a862..HEAD 该文件空 diff，故 HEAD 版==被审版；改前尺锚 = 8d30a862^。产码 config_reload.go HEAD md5 = 5ce441ca5e72b64d18a6c26f1c066882（§6 还原以此为拉）。零产码改动、零 AC 框翻动。
+
+=== §5-3 wc -l -c deliverable ===
+  241 26646 .scratch/wisp/probes/274/a2/shipping-chain.md
+
+=== §5-4 logs inventory ===
+total 164
+drwxr-xr-x 1 swq 197609     0 Oct  7 11:11 .
+drwxr-xr-x 1 swq 197609     0 Oct  7 11:11 ..
+-rw-r--r-- 1 swq 197609  1936 Oct  7 11:02 anchor.txt
+-rw-r--r-- 1 swq 197609  6853 Oct  7 11:03 s1-buildps.txt
+-rw-r--r-- 1 swq 197609 53222 Oct  7 11:02 s1-exe-producers.txt
+-rw-r--r-- 1 swq 197609  1620 Oct  7 11:04 s1-frontend-step-raw.txt
+-rw-r--r-- 1 swq 197609 12554 Oct  7 11:05 s1s2-extras.txt
+-rw-r--r-- 1 swq 197609  3635 Oct  7 11:03 s2-ci-detail.txt
+-rw-r--r-- 1 swq 197609  3043 Oct  7 11:03 s2-ci-jobs.txt
+-rw-r--r-- 1 swq 197609  5342 Oct  7 11:05 s2-steps-bodies.txt
+-rw-r--r-- 1 swq 197609   787 Oct  7 11:03 s2-workflows.txt
+-rw-r--r-- 1 swq 197609  1690 Oct  7 11:08 s3-machine.txt
+-rw-r--r-- 1 swq 197609 10648 Oct  7 11:09 s3-panel-fails.txt
+-rw-r--r-- 1 swq 197609  7105 Oct  7 11:09 s3-reds.txt
+-rw-r--r-- 1 swq 197609 11098 Oct  7 11:04 s3-runside.txt
+-rw-r--r-- 1 swq 197609  4913 Oct  7 11:08 s3-slofull-detail.txt
+-rw-r--r-- 1 swq 197609  4379 Oct  7 11:10 s4-frontend-build.txt
+-rw-r--r-- 1 swq 197609  2041 Oct  7 11:11 s5-final.txt
+=== wc all logs ===
+   199  53222 .scratch/wisp/probes/274/a2/logs/s1-exe-producers.txt
+    32   1620 .scratch/wisp/probes/274/a2/logs/s1-frontend-step-raw.txt
+    81  12554 .scratch/wisp/probes/274/a2/logs/s1s2-extras.txt
+   101   3635 .scratch/wisp/probes/274/a2/logs/s2-ci-detail.txt
+    62   3043 .scratch/wisp/probes/274/a2/logs/s2-ci-jobs.txt
+    82   5342 .scratch/wisp/probes/274/a2/logs/s2-steps-bodies.txt
+    16    787 .scratch/wisp/probes/274/a2/logs/s2-workflows.txt
+    60   1690 .scratch/wisp/probes/274/a2/logs/s3-machine.txt
+    68  10648 .scratch/wisp/probes/274/a2/logs/s3-panel-fails.txt
+    40   7105 .scratch/wisp/probes/274/a2/logs/s3-reds.txt
+    75  11098 .scratch/wisp/probes/274/a2/logs/s3-runside.txt
+    58   4913 .scratch/wisp/probes/274/a2/logs/s3-slofull-detail.txt
+   115   4379 .scratch/wisp/probes/274/a2/logs/s4-frontend-build.txt
+    34   3125 .scratch/wisp/probes/274/a2/logs/s5-final.txt
+  1261 131950 total
+
+=== §5-5 frontend/** untouched: diff vs HEAD ===
+0
+0
+--- local dist 4 files still there, hashes unchanged (listing only) ---
+frontend/dist:
+total 8
+drwxr-xr-x 1 swq 197609    0 Sep 27 10:59 .
+drwxr-xr-x 1 swq 197609    0 Sep 26 10:07 ..
+-rw-r--r-- 1 swq 197609    0 Sep 27 10:59 .gitkeep
+drwxr-xr-x 1 swq 197609    0 Sep 27 10:59 assets
+-rw-r--r-- 1 swq 197609 1044 Sep 27 10:59 index.html
+
+frontend/dist/assets:
+total 596
+drwxr-xr-x 1 swq 197609      0 Sep 27 10:59 .
+drwxr-xr-x 1 swq 197609      0 Sep 27 10:59 ..
+-rw-r--r-- 1 swq 197609  49943 Sep 27 10:59 index-BRKj5OIJ.css
+-rw-r--r-- 1 swq 197609 553469 Sep 27 10:59 index-BVKlegVD.js
+
+=== §5-6 out-of-repo copies (built, not deleted) ===
+170M	/d/tmp/wisp274a2
+fe
+fe-build.log
+fe-driver.log
+fe-npmci.log
+fe-run.sh
+fe-typecheck.log
+gh
+msg
+
+=== §5-7 gh write operations performed? (expect none) ===
+subcommands used: run list / run view --json / run view --job --log (all read-only)
+
+=== §5-8 emoji-free check of my own deliverable (d22scan bands) ===
+d22scan-band chars found: 11 [('0x2260', 7517), ('0x26d4', 8352), ('0x26d4', 9348), ('0x26d4', 12238), ('0x26a0', 14226), ('0x26a0', 14535), ('0x26d4', 16680), ('0x2713', 17588), ('0x2713', 17617), ('0x26a0', 18520)]
+has U+2713: True | has U+2264: False | has arrow U+2192: True

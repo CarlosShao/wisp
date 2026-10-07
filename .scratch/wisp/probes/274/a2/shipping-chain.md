@@ -191,3 +191,51 @@ workflow 文件清单（尺＝`ls -la .github/workflows`）＝`ci.yml`（57948 �
 1. **那句撒谎注释今天真的在 CI 里印出来**：`slo-full` 日志 `183` 行逐字 `build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 搂2.2)`（`搂`＝`§` 在作业控制台代码页下的乱码；源码 `scripts/build.ps1:74` 里是 `§`）⇒ 甲形（改注释）会动到这枚真印出来的字符串，**不是死代码注释**。
 2. **出货 exe 不带页面字节，run 侧已自证**：`test-windows` `2908` 行 `AC#12 reading (head cc31526): shape=anchor-only built=false entry-bytes=0 entry-ctype="" entry-err=panel: embedded assets are not built (run npm run build in frontend/) refs=0 check-err=… manifest-entries=0 … | git-metadata=true tracked=1 tracked-beyond-anchor=0 tracked-has-entry=false ignored-or-untracked=0`，且这一枚 `TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` 的结论是 **`--- PASS`**（`2910` 行）⇒ **这就是工单 274 要的「今天拦不住」凭据：尺读到了 `built=false`，然后放它绿。**
 3. **丙形的落地面今天不干净**：同一枚 `test-windows` 的 `cmd/wisp` 包已有 8 枚具名红（`logs/s3-reds.txt`：`TestAC1AlwaysBranchDoesNotRevertAHandEditedKey`、`TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card`、`TestTicket223PermissionDeniedSitsInItsOwnSentence`、`TestRunPacketCarriesTheLoadedInstructionFiles`、`TestPanelHostRealWindowHopAndLifecycle`、`TestPanelHostLatencyPercentilesAC2`、`TestAC14GoSideEvalPushReachesThePage`、`FAIL github.com/CarlosShao/wisp/cmd/wisp 371.253s`；`portable-tests.sh` 四数＝`=== RUN=335 PASS=230 FAIL=7 SKIP=1`）。其中 panel 那两枚的红因是**冷拉起 3414.339 ms 超 D32 预算 1500 ms**（`logs/s3-panel-fails.txt` 原文 `panel_host_windows_test.go:660/665`、`:999`），**与 dist 无关** ⇒ 丙形（把 `wisp panel-assets` 的 rc=1 牙接进 CI）不会撞上这两枚既有红，但要新起一步，不能塞进现有 `cmd/wisp CLI tests` 里冒充绿。
+
+---
+
+## §4 dev 那 64 枚页面源码今天能不能构建（仓外构建，`frontend/**` 零写入）
+
+原始输出：`logs/s4-frontend-build.txt`（dist 清点 + 三份 npm 日志 + `package.json` scripts + `frontend/embed.go` 原文 + `go list -f {{.EmbedFiles}}`）；驱动脚本与全量日志在仓外 `D:/tmp/wisp274a2/`（`fe-run.sh`、`fe-driver.log`、`fe-npmci.log`、`fe-typecheck.log`、`fe-build.log`、拷贝树 `fe/frontend/**`）——**只建不删，全在那里**。
+
+**做法逐字**（⛔ 没在仓内 `frontend/` 落过一个字节）：
+
+```
+mkdir -p /d/tmp/wisp274a2/fe && git archive HEAD frontend | tar -x -C /d/tmp/wisp274a2/fe
+cd /d/tmp/wisp274a2/fe/frontend && (npm ci || npm install) && npm run build ; echo "rc=$?"
+```
+
+`archive_rc=0`，导出后 `fe/frontend` 顶层＝`VENDORED.md dist embed.go fixtures index.html package-lock.json package.json scripts src tsconfig.app.json tsconfig.json tsconfig.node.json vite.config.ts`（＝跟踪的 85 枚，其中 `src` 64 枚，与 §0 起手锚一致）。
+
+### 4.1 三档读数（逐档 rc 与耗时，尺＝驱动脚本里的 `date +%s` 差）
+
+| 档 | 命令 | rc | 秒 | 结果 |
+|---|---|---|---|---|
+| 装依赖 | `npm ci`（走 lockfile，一次成，未落 `npm install` 退路） | **0** | **10** | `node_modules` 顶层 52 枚包目录；`npm audit` 报 **1 high severity vulnerability**（只报不修） |
+| 只 `tsc -b` | `npm run typecheck`（`package.json` 里 `typecheck: tsc -b`） | **0** | **7** | **`tsc -b` 那一半不红**，零诊断输出 ⇒ 乙形不欠类型账 |
+| 完整构建 | `npm run build`（`tsc -b && vite build`） | **0** | **9** | `vite v8.3.0`，`✓ 2439 modules transformed`、`✓ built in 801ms` |
+
+**总耗时 26 秒**（`ALL_DONE ci=0 tc=0 build=0 total_seconds=26`）。
+
+### 4.2 产物：出得出 `dist/index.html`
+
+尺＝`find …/dist -type f -printf '%p %s bytes\n'` ⇒ **4 枚 / 共 602635 字节**：
+
+| 文件 | 字节 |
+|---|---|
+| `dist/index.html` | **1068**（vite 自报 `1.06 kB │ gzip 0.64 kB`） |
+| `dist/assets/index-vdBrT8rM.js` | **552027**（`552.02 kB │ gzip 170.74 kB`，带 `>500 kB` 分块告警） |
+| `dist/assets/index-yy8KMgdf.css` | **49540**（`49.54 kB │ gzip 9.84 kB`） |
+| `dist/.gitkeep` | 0（导出的锚文件，构建不清空它） |
+
+⇒ **答：能。dev 这一支的页面源码今天是自洽可构建的，`go build` 之前只差「谁去跑这一句 `npm run build`」。**
+
+### 4.3 一处必须具名的现场差异（本机 dist 里有前人产物，本腿没碰）
+
+尺＝`go list -f '{{.EmbedFiles}}' ./frontend`（在仓内只读跑，不写）⇒ **本机工作树**的嵌入集是 4 枚：`dist/.gitkeep`、`dist/assets/index-BRKj5OIJ.css`、`dist/assets/index-BVKlegVD.js`、`dist/index.html`；而 `git ls-files frontend/dist` 只有 `.gitkeep` 一枚 ⇒ 工作树里躺着**别的会话未跟踪的构建产物**（工单 274 里那句「本机 `frontend/dist` 那 4 枚文件」，本腿现量对上）。
+⚠ 关键差异：**哈希名不同**（本机 `index-BRKj5OIJ.css`/`index-BVKlegVD.js` vs 本腿仓外新建 `index-yy8KMgdf.css`/`index-vdBrT8rM.js`）⇒ 本机那批是**旧源码的过期产物**，不是当前 HEAD 的产物。⇒ **「本机 `go build` 出来的 exe 带页面」这一条今天能绿，是这堆未跟踪文件在替它绿**；CI 的纯净检出（`test-windows` 日志 `2908` 行 `shape=anchor-only`）证实 CI 上没有它们。⛔ 本腿没删、没盖、没动这 4 枚，一个字节都没有。
+
+### 4.4 承重原文：`frontend/embed.go` 自己就把乙形写成了唯一通道
+
+`frontend/embed.go`（原文在 `logs/s4-frontend-build.txt`）逐字：「Ticket 77 AC#1: `npm run build` in this directory produces dist/, and the go:embed below is the **ONLY** way those bytes reach wisp.exe. There is no runtime CDN and no local HTTP server (D29 …), so **the binary must be self-sufficient on a machine with no node, no npm and no network**」＋ `//go:embed all:dist` ＋ `const AnchorName = ".gitkeep"`（注释解释：只有锚文件时 `panel.Assets.Built()` 报 false，宿主显示 "assets not built"，永远不会悄悄发占位页）。
+⇒ 这条设计口径把 §3 的结论咬死了：**exe 带页面＝出货机上必须有谁跑过 `npm run build`**，而那三枚产 exe 的 job 今天谁都没跑（§2/§3）。

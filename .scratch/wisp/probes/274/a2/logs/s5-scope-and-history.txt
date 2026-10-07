@@ -1,0 +1,42 @@
+=== does d22scan scan .scratch? (scope lists in main.go) ===
+264:	if err := s.walkGo(filepath.Join(root, "internal")); err != nil {
+267:	if err := s.walkGo(filepath.Join(root, "cmd")); err != nil {
+271:	if err := s.walkText(filepath.Join(root, "frontend"), "panel-approval", s.panelCheck, false); err != nil {
+274:	if err := s.walkText(filepath.Join(root, "internal", "tools"), "internal-artifact-tool", s.artifactCheck, true); err != nil {
+406:	internalGo, cmdGo := goScopeKey(filepath.Join(root, "internal")), goScopeKey(filepath.Join(root, "cmd"))
+409:			label: "bans #1-5 internal/", dir: filepath.Join(root, "internal"),
+413:			label: "bans #1-5 cmd/", dir: filepath.Join(root, "cmd"),
+417:			label: "ban #6 frontend/", dir: filepath.Join(root, "frontend"),
+433:			label: "ban #7 internal/tools/", dir: filepath.Join(root, "internal", "tools"),
+581:		{dir: filepath.Join(root, "design"), label: "design/"},
+582:		{dir: filepath.Join(root, "frontend"), label: "frontend/", everyFile: true},
+583:		{dir: filepath.Join(root, "internal"), label: "internal/", goOnly: true},
+584:		{dir: filepath.Join(root, "cmd"), label: "cmd/", goOnly: true},
+691:		// output or a scratch copy. A tracked file under an ignore rule (the
+891:	`(?:docs|\.scratch|internal|cmd|tools|scripts)/[A-Za-z0-9_./\-\x{4e00}-\x{9fff}]*[A-Za-z0-9_\-]`)
+905:	`(?:docs|\.scratch|internal|cmd|tools|scripts)/[A-Za-z0-9_./\-\x{4e00}-\x{9fff}*…]*`)
+918:// range is registered in .scratch/wisp/probes/212/r2/fix-and-readings.md §6
+951:// rings (212-v1 fixture probe p2, .scratch/wisp/probes/212/v1/verdict.md §2(b)).
+1335:		filepath.Join("internal"),
+1336:		filepath.Join("cmd"),
+
+=== git log --oneline -8 (interleaved legs) ===
+7da2ab20 274-a2 §3：run 侧读数——三枚产 exe 的 job 里没有任何一步打印过 node/npm 版本或路径（作业侧 npm 可达性＝取不到，零步试过）；slo-full 是 self-hosted 且与本机同一枚机器（Runner name wisp-selfhosted-01 / Machine DESKTOP-LVS7839 / E:\work\base\actions-runner 三项与本机 COMPUTERNAME、用户名、目录逐一对上）；test-windows 与 slo-smoke 日志头是 Hosted Compute Agent
+3d061f1e 274-a2 §2：产 exe 的三枚 job 逐枚点名——test-windows(505)/windows-latest(506)/build.ps1@571、slo-smoke(739)/windows-latest(740)/build.ps1@757、slo-full(797)/[self-hosted, wisp-slo](798)/build.ps1@820；三枚全无 setup-node、全无一步读 frontend/dist（正控分别＝879/11 行/902 各命中处具名）
+3dcfcd23 274-a2 §1：出货 exe 的唯一通路＝scripts/build.ps1:129 的 `go build ./cmd/wisp`（入口 1 枚，另两枚 main 包 balldebug/llmrecord 不在这条路上）
+4c659a2c 台账 A658＋立票 275：★★同一枚 pathspec 事故今天第二次发生（8d30a862 又提走 272-r2 的 10 份 logs＋cmd/wisp/config_reload_223_test.go 52/0，受害者与上午 ca4ae2af 同批），两枚写腿按"死在回报不是死在交付"收档不重派
+1ec9fa19 272-v1 §0 起手锚落盘（非实现者对抗验收腿第 1 笔，任何长跑命令之前）：HEAD e18e32da / dev / 六族路径 status 0 行（起手全干净）；测试文件 log 顶 = 8d30a862（顺手提走那 52 行的编队事故笔）。现量坐实 8d30a862 对 config_reload_223_test.go = 52 插入/0 删除（745→797），8d30a862..HEAD 该文件空 diff，故 HEAD 版==被审版；改前尺锚 = 8d30a862^。产码 config_reload.go HEAD md5 = 5ce441ca5e72b64d18a6c26f1c066882（§6 还原以此为拉）。零产码改动、零 AC 框翻动。
+e18e32da 274-a2 §0 起手锚落盘：HEAD 933a8341 / dev / 六族路径 status 0 行 / frontend/src 跟踪 64 枚、frontend 85 枚
+933a8341 收 145-f1(A657)：★页面字段名册填上了，而它把票 145 的标题级前提换了一层——"面板画不出真数据"的第一阻断不是快照太瘦，是 Go→页那一跳与页面耳朵两枚都不存在
+c1144180 145-f1: fix bucket counts to checkable sums (38/21, 1+41, 8+2 sections, 3 families) + two-caliber warning for bucket 3
+
+=== is my §0 commit e18e32da an ancestor of HEAD ===
+yes
+
+=== commits by this leg ===
+7da2ab20 274-a2 §3：run 侧读数——三枚产 exe 的 job 里没有任何一步打印过 node/npm 版本或路径（作业侧 npm 可达性＝取不到，零步试过）；slo-full 是 self-hosted 且与本机同一枚机器（Runner name wisp-selfhosted-01 / Machine DESKTOP-LVS7839 / E:\work\base\actions-runner 三项与本机 COMPUTERNAME、用户名、目录逐一对上）；test-windows 与 slo-smoke 日志头是 Hosted Compute Agent
+3d061f1e 274-a2 §2：产 exe 的三枚 job 逐枚点名——test-windows(505)/windows-latest(506)/build.ps1@571、slo-smoke(739)/windows-latest(740)/build.ps1@757、slo-full(797)/[self-hosted, wisp-slo](798)/build.ps1@820；三枚全无 setup-node、全无一步读 frontend/dist（正控分别＝879/11 行/902 各命中处具名）
+3dcfcd23 274-a2 §1：出货 exe 的唯一通路＝scripts/build.ps1:129 的 `go build ./cmd/wisp`（入口 1 枚，另两枚 main 包 balldebug/llmrecord 不在这条路上）
+4c659a2c 台账 A658＋立票 275：★★同一枚 pathspec 事故今天第二次发生（8d30a862 又提走 272-r2 的 10 份 logs＋cmd/wisp/config_reload_223_test.go 52/0，受害者与上午 ca4ae2af 同批），两枚写腿按"死在回报不是死在交付"收档不重派
+1ec9fa19 272-v1 §0 起手锚落盘（非实现者对抗验收腿第 1 笔，任何长跑命令之前）：HEAD e18e32da / dev / 六族路径 status 0 行（起手全干净）；测试文件 log 顶 = 8d30a862（顺手提走那 52 行的编队事故笔）。现量坐实 8d30a862 对 config_reload_223_test.go = 52 插入/0 删除（745→797），8d30a862..HEAD 该文件空 diff，故 HEAD 版==被审版；改前尺锚 = 8d30a862^。产码 config_reload.go HEAD md5 = 5ce441ca5e72b64d18a6c26f1c066882（§6 还原以此为拉）。零产码改动、零 AC 框翻动。
+e18e32da 274-a2 §0 起手锚落盘：HEAD 933a8341 / dev / 六族路径 status 0 行 / frontend/src 跟踪 64 枚、frontend 85 枚
