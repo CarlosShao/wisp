@@ -1,0 +1,68 @@
+=== test-windows log lines 2895-2940 (which test emits AC#12 + why those FAIL) ===
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0758584Z     --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/a_negative_answer_is_garbage,_and_garbage_is_not_a_second_spelling_of_auto (0.00s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0759008Z === RUN   TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0764077Z time=2026-10-06T23:16:52.931Z level=WARN msg="panel host: [panel] geometry source unreadable, sizing at the host's own default" path=C:\Users\RUNNER~1\AppData\Local\Temp\TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions1862696195\001\no-such-dir\config
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0764612Z --- PASS: TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions (0.00s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0764883Z === RUN   TestTicket255PanelHostBuildsItsWindowOptions
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0765209Z --- PASS: TestTicket255PanelHostBuildsItsWindowOptions (0.00s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0765481Z === RUN   TestTicket255HostStillDoesNotParseConfigItself
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0765826Z --- PASS: TestTicket255HostStillDoesNotParseConfigItself (0.00s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0766111Z === RUN   TestTicket255PanelRosterVerdictIsTheHonestShape
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0766460Z --- PASS: TestTicket255PanelRosterVerdictIsTheHonestShape (0.00s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0766682Z === RUN   TestPanelHostOpensNoListeningSocketL1
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0766954Z --- PASS: TestPanelHostOpensNoListeningSocketL1 (0.00s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0767282Z === RUN   TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0772087Z     panel_host_gate_test.go:109: AC#12 reading (head cc31526): shape=anchor-only built=false entry-bytes=0 entry-ctype="" entry-err=panel: embedded assets are not built (run npm run build in frontend/) refs=0 check-err=panel: embedded assets are not built (run npm 
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0772538Z --- PASS: TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12 (0.09s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0772849Z === RUN   TestAC1SessionDisposeHasAProductionTrigger_AC1
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0775617Z     panel_host_gate_test.go:179: AC#1 dispose scan: 2 production constructor(s) [panel_resident_windows.go:253 resident_windows.go:151] | 2 manager-teardown site(s) [panel_resident_windows.go:447 panel_resident_windows.go:501] | 2 other .Destroy() call site(s), Web
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0777347Z     panel_host_gate_test.go:188: AC#1 dispose reachability: 2 production constructor(s) [panel_resident_windows.go:253, resident_windows.go:151], 2 manager teardown site(s) [panel_resident_windows.go:447, panel_resident_windows.go:501]
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0777700Z --- PASS: TestAC1SessionDisposeHasAProductionTrigger_AC1 (0.01s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0777882Z === RUN   TestCleanCheckoutBuilds_AC11
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0778876Z     panel_host_gate_test.go:414: clean-checkout go build ./... ok in C:\Users\RUNNER~1\AppData\Local\Temp\TestCleanCheckoutBuilds_AC112797839815\001
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0779103Z --- PASS: TestCleanCheckoutBuilds_AC11 (18.42s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0779328Z === RUN   TestPanelHostRealWindowHopAndLifecycle
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0780169Z     panel_host_windows_test.go:660: cold bring-up measured on this box: 3414.339 ms (HEAD cc31526 at read time, 2026-10-06T23:17:14Z)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0781013Z     panel_host_windows_test.go:665: cold bring-up 3414.3 ms exceeds D32 panel cold budget 1500 ms
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0782049Z     panel_host_windows_test.go:713: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 7)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0782986Z     panel_host_windows_test.go:749: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 7)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0784924Z     panel_host_windows_test.go:779: AC#1 denominators (head cc31526): our tree webview=7 direct-children=1 tree-pids=7 | browser hosts pre=[3768] mine=[3768] post=[3768] added=[] mine-died=[] | machine-wide msedgewebview2=7 | same HWND 0xc01f0 across hide->re-show=
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0785491Z     panel_host_windows_test.go:787: hot re-show measured on this box: 35.152 ms
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0786670Z     panel_host_windows_test.go:814: AC#3 listening-socket ruler (head cc31526): IPv4 rows=40 LISTEN-owned-by-tree=0 ; IPv6 rows=21 LISTEN-owned-by-tree=0 err=<nil>
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0789707Z     panel_host_windows_test.go:840: AC#1 after Destroy (head cc31526), ONE sample and no timing claim: our tree webview baseline 0 -> now 6, machine-wide 0 -> 6. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0790028Z --- FAIL: TestPanelHostRealWindowHopAndLifecycle (3.54s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0790267Z === RUN   TestAC4FocusReturnToPriorWindowGap33r5
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0792737Z     panel_host_windows_test.go:944: AC#4 focus hop (head cc31526): foreground before any panel 0x0 | the ruler's own editor window 0x2018a | foreground while hidden (prior) 0x2018a | after Show 0xe0156 | panel hwnd 0xe0156 | prevFocus recorded at Show 0x2018a | aft
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0793041Z --- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.36s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0793256Z === RUN   TestPanelHostLatencyPercentilesAC2
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0793910Z     panel_host_windows_test.go:987: AC#2 appendix (head cc31526, n=1, same-process consecutive runs):
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0794530Z     panel_host_windows_test.go:993:   sample  1: cold=3414.339 ms hot=35.152 ms at 2026-10-06T23:17:14Z
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0795597Z     panel_host_windows_test.go:999: AC#2 percentiles over 1 runs (nearest-rank): cold P50=3414.339 P95=3414.339 (budget 1500) | hot P50=35.152 P95=35.152 (budget 200)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0796315Z     panel_host_windows_test.go:1003: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 3414.339 ms
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0797581Z     panel_host_windows_test.go:1005: cold P95 3414.339 ms over 1 runs exceeds the D32 panel cold budget 1500 ms (the single-run assertion is not the only gate: the tail is what AC#2 asks for)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0797867Z --- FAIL: TestPanelHostLatencyPercentilesAC2 (0.00s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0798174Z === RUN   TestAC3ListeningSocketRulerSeesItsOwnListener
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0799134Z     panel_host_windows_test.go:1054: AC#3 positive control: IPv4 table rows=41, this pid owned 0 before / 1 while 127.0.0.1:56290 is listening
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0800380Z     panel_host_windows_test.go:1076: AC#3 positive control, IPv6 family: listening on [::1]:56291, table rows=22, this pid owns 1 LISTEN rows (baseline 0)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0801289Z     panel_host_windows_test.go:1102: AC#3 positive control verdict: ruler counts a real listener (0 -> 1) and stops after Close (0)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0801646Z --- PASS: TestAC3ListeningSocketRulerSeesItsOwnListener (0.00s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0801900Z === RUN   TestAC9InboundLegFromStdinReachesTheWriteLeg
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0803919Z time=2026-10-06T23:17:15.403Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0804695Z --- PASS: TestAC9InboundLegFromStdinReachesTheWriteLeg (0.05s)
+test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0805027Z === RUN   TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt
+
+=== FAIL reasons for the three panel-named cases ===
+2926:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0790028Z --- FAIL: TestPanelHostRealWindowHopAndLifecycle (3.54s)
+2927-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0790267Z === RUN   TestAC4FocusReturnToPriorWindowGap33r5
+2928-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0792737Z     panel_host_windows_test.go:944: AC#4 focus hop (head cc31526): foreground before any panel 0x0 | the ruler's own editor window 0x2018a | foreground while hidden (prior) 0x2018a | after Show 0xe0156 | panel hwnd 0xe0156 | prevFocus recorded at Show 0x2018a 
+2929-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0793041Z --- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.36s)
+--
+2936:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0797867Z --- FAIL: TestPanelHostLatencyPercentilesAC2 (0.00s)
+2937-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0798174Z === RUN   TestAC3ListeningSocketRulerSeesItsOwnListener
+2938-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0799134Z     panel_host_windows_test.go:1054: AC#3 positive control: IPv4 table rows=41, this pid owned 0 before / 1 while 127.0.0.1:56290 is listening
+2939-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0800380Z     panel_host_windows_test.go:1076: AC#3 positive control, IPv6 family: listening on [::1]:56291, table rows=22, this pid owns 1 LISTEN rows (baseline 0)
+--
+3025:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0899879Z --- FAIL: TestAC14GoSideEvalPushReachesThePage (0.45s)
+3026-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0900012Z === RUN   TestPanelThreadIsSTAAndExitsCleanly
+3027-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0900450Z time=2026-10-06T23:17:53.844Z level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+3028-test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0900647Z wisp: panel window is up (test-harness, cold 240.2 ms, hot path 0.0 ms)

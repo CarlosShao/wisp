@@ -1,0 +1,40 @@
+=== test-windows log: FAIL lines (which cases are red today) ===
+1974:test-windows	UNKNOWN STEP	2026-10-06T23:21:32.9446421Z --- FAIL: TestAC1AlwaysBranchDoesNotRevertAHandEditedKey (1.29s)
+2207:test-windows	UNKNOWN STEP	2026-10-06T23:21:32.9622351Z --- FAIL: TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card (1.08s)
+2502:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0207751Z --- FAIL: TestTicket223PermissionDeniedSitsInItsOwnSentence (1.04s)
+2595:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0322757Z         [FAIL] sherpa-onnx C API                  runtime 1.13.8 does not match build pin unknown
+2596:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0324084Z         [FAIL] onnxruntime.dll version            file version 1.28.2.0 does not match build pin unknown
+2601:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0336647Z         [FAIL] data dir resolvable (dev)          数据根无法解析：用户配置目录不可得（OS 原话：%AppData% is not defined）：数据根本应是 <用户配置目录>\wisp-dev，而 Wisp 拒绝把它回落到当前工作目录（票 128 AC#1 量到回落会搬家：日志、config.toml、DPAPI 私钥存储与 memory.db 跟着启动目录走，换目录再启动就读到空配置）。修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。
+2603:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0339440Z         wisp doctor: FAIL
+2670:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0479577Z time=2026-10-06T23:16:48.114Z level=INFO msg="audit: perm: MODE-READ-FAILED path=\"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing993022272\\\\001\\\\config.toml\" err=config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing993022272\\001\\config.toml: The system cannot find the file specified. mode=ask_every_step origin=startup result=fail-closed detail=\"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）\""
+2731:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0611729Z --- FAIL: TestRunPacketCarriesTheLoadedInstructionFiles (1.04s)
+2926:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0790028Z --- FAIL: TestPanelHostRealWindowHopAndLifecycle (3.54s)
+2936:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0797867Z --- FAIL: TestPanelHostLatencyPercentilesAC2 (0.00s)
+3025:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0899879Z --- FAIL: TestAC14GoSideEvalPushReachesThePage (0.45s)
+3909:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.1762372Z FAIL
+3910:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.1762619Z FAIL	github.com/CarlosShao/wisp/cmd/wisp	371.253s
+3911:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.1762741Z FAIL
+3912:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.2248302Z runtests.sh: go test exited 1 - packages=[./cmd/wisp/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$] top-level: PASS=230 FAIL=7 SKIP=1, === RUN=335, '[no tests to run]'=0
+3913:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.3660442Z portable-tests.sh: four numbers (all from -v output): === RUN=335  --- PASS=230  --- FAIL=7  --- SKIP=1
+3917:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.4761599Z portable-tests.sh:   FAIL (own line) github.com/CarlosShao/wisp/cmd/wisp
+4667:test-windows	UNKNOWN STEP	2026-10-06T23:22:13.6373434Z --- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.07s)
+4672:test-windows	UNKNOWN STEP	2026-10-06T23:22:13.6379229Z --- FAIL: TestCanonicalInputGainsNoSecondForm (0.02s)
+4677:test-windows	UNKNOWN STEP	2026-10-06T23:22:13.6382323Z --- FAIL: TestAListWinsWhereBothTablesHit (0.03s)
+4702:test-windows	UNKNOWN STEP	2026-10-06T23:22:13.6426712Z --- FAIL: TestPathResolverShortNameAListDenied (0.06s)
+4705:test-windows	UNKNOWN STEP	2026-10-06T23:22:13.6431280Z --- FAIL: TestPathResolverUNCAListDenied (0.03s)
+4708:test-windows	UNKNOWN STEP	2026-10-06T23:22:13.6437092Z --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.02s)
+4717:test-windows	UNKNOWN STEP	2026-10-06T23:22:13.6443180Z --- FAIL: TestBListDefaultDenyAndOverride (0.03s)
+
+=== panel_host_gate / AC#12 lines in test-windows log ===
+2761:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0661296Z           leg panel-assets   main.go:112              installs=false handoff=false covered=test TestAC1AC2TaintSourceLegProducesAJudgedR4 drives cmdPanelAssets entries=attachParentConsole|cmdPanelAssets aliases=
+2786:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0684560Z           leg panel-assets main.go:112                install=false records=false ruled=false nails=-                                                          -> no records
+2908:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0772087Z     panel_host_gate_test.go:109: AC#12 reading (head cc31526): shape=anchor-only built=false entry-bytes=0 entry-ctype="" entry-err=panel: embedded assets are not built (run npm run build in frontend/) refs=0 check-err=panel: embedded assets are not built (run npm run build in frontend/) manifest-entries=0 manifest-err=panel: embedded assets are not built (run npm run build in frontend/) | git-metadata=true tracked=1 tracked-beyond-anchor=0 tracked-has-entry=false ignored-or-untracked=0
+2911:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0775617Z     panel_host_gate_test.go:179: AC#1 dispose scan: 2 production constructor(s) [panel_resident_windows.go:253 resident_windows.go:151] | 2 manager-teardown site(s) [panel_resident_windows.go:447 panel_resident_windows.go:501] | 2 other .Destroy() call site(s), WebView2 control teardown and NOT a session dispose [panel_host_windows.go:410 panel_host_windows.go:624]
+2912:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0777347Z     panel_host_gate_test.go:188: AC#1 dispose reachability: 2 production constructor(s) [panel_resident_windows.go:253, resident_windows.go:151], 2 manager teardown site(s) [panel_resident_windows.go:447, panel_resident_windows.go:501]
+2915:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0778876Z     panel_host_gate_test.go:414: clean-checkout go build ./... ok in C:\Users\RUNNER~1\AppData\Local\Temp\TestCleanCheckoutBuilds_AC112797839815\001
+2990:test-windows	UNKNOWN STEP	2026-10-06T23:21:33.0849452Z     panel_resident_windows_test.go:315: Resolve(entry): panel: embedded assets are not built (run npm run build in frontend/)
+
+=== same rulers on slo-smoke log ===
+316:slo-smoke	UNKNOWN STEP	2026-10-06T23:14:16.9027643Z slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+=== same on slo-full log ===
+241:slo-full	UNKNOWN STEP	2026-10-07T00:42:02.3550372Z slo-check.ps1: leak fixture self-test (100MB, must FAIL)

@@ -1,0 +1,58 @@
+=== slo-full job log: build.ps1 printed toolchain line + step boundaries ===
+175:slo-full	UNKNOWN STEP	2026-10-07T00:39:18.5379563Z build.ps1: repo root E:\work\base\actions-runner\_work\wisp\wisp (Env=dev)
+176:slo-full	UNKNOWN STEP	2026-10-07T00:39:18.6946042Z build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+183:slo-full	UNKNOWN STEP	2026-10-07T00:39:29.3789417Z build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 搂2.2)
+184:slo-full	UNKNOWN STEP	2026-10-07T00:40:00.3769760Z build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+185:slo-full	UNKNOWN STEP	2026-10-07T00:40:00.4066499Z build.ps1: DLLs colocated into E:\work\base\actions-runner\_work\wisp\wisp\build
+186:slo-full	UNKNOWN STEP	2026-10-07T00:40:00.4177941Z build.ps1: signed model manifest colocated into E:\work\base\actions-runner\_work\wisp\wisp\build\models
+187:slo-full	UNKNOWN STEP	2026-10-07T00:40:01.4621049Z build.ps1: wrote E:\work\base\actions-runner\_work\wisp\wisp\build\SHA256SUMS
+188:slo-full	UNKNOWN STEP	2026-10-07T00:40:01.4639565Z build.ps1: smoke test - running wisp.exe doctor
+189:slo-full	UNKNOWN STEP	2026-10-07T00:40:01.6272384Z build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+
+=== slo-full: '##\[group\]' step names (what steps ran) ===
+5:slo-full	UNKNOWN STEP	2026-10-07T00:37:08.7518291Z ##[group]GITHUB_TOKEN Permissions
+19:slo-full	UNKNOWN STEP	2026-10-07T00:37:15.3947360Z ##[group]Run actions/checkout@v4
+40:slo-full	UNKNOWN STEP	2026-10-07T00:37:17.6329722Z ##[group]Getting Git version info
+51:slo-full	UNKNOWN STEP	2026-10-07T00:37:18.1800872Z ##[group]Removing previously created refs, to avoid conflicts
+58:slo-full	UNKNOWN STEP	2026-10-07T00:37:20.0561153Z ##[group]Cleaning the repository
+65:slo-full	UNKNOWN STEP	2026-10-07T00:37:20.7994021Z ##[group]Disabling automatic garbage collection
+68:slo-full	UNKNOWN STEP	2026-10-07T00:37:20.8758699Z ##[group]Setting up auth
+77:slo-full	UNKNOWN STEP	2026-10-07T00:37:24.8493544Z ##[group]Fetching the repository
+88:slo-full	UNKNOWN STEP	2026-10-07T00:39:12.8034015Z ##[group]Determining the checkout info
+92:slo-full	UNKNOWN STEP	2026-10-07T00:39:13.0185746Z ##[group]Checking out the ref
+100:slo-full	UNKNOWN STEP	2026-10-07T00:39:13.4527407Z ##[group]Run actions/setup-go@v5
+118:slo-full	UNKNOWN STEP	2026-10-07T00:39:16.4398584Z ##[group]go env
+168:slo-full	UNKNOWN STEP	2026-10-07T00:39:17.0401855Z ##[group]Run powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+209:slo-full	UNKNOWN STEP	2026-10-07T00:40:02.9100722Z ##[group]Run powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+245:slo-full	UNKNOWN STEP	2026-10-07T00:42:14.1585821Z ##[group]Run actions/upload-artifact@v4
+
+=== slo-full: PATH / tool cache hints ===
+112:slo-full	UNKNOWN STEP	2026-10-07T00:39:15.8499778Z (node:12240) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+113:slo-full	UNKNOWN STEP	2026-10-07T00:39:15.8501647Z (Use `node --trace-deprecation ...` to show where the warning was created)
+257:slo-full	UNKNOWN STEP	2026-10-07T00:42:15.2206258Z (node:11060) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+258:slo-full	UNKNOWN STEP	2026-10-07T00:42:15.2208755Z (Use `node --trace-deprecation ...` to show where the warning was created)
+263:slo-full	UNKNOWN STEP	2026-10-07T00:42:16.1053293Z (node:11060) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+272:slo-full	UNKNOWN STEP	2026-10-07T00:42:18.6416195Z (node:13316) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+273:slo-full	UNKNOWN STEP	2026-10-07T00:42:18.6419416Z (Use `node --trace-deprecation ...` to show where the warning was created)
+290:slo-full	UNKNOWN STEP	2026-10-07T00:42:23.8711326Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+
+=== node.exe anywhere in the runner tree (maxdepth 4) ===
+E:/work/base/actions-runner/externals/node20/bin/node.exe
+E:/work/base/actions-runner/externals/node24/bin/node.exe
+--- externals dir ---
+node20
+node24
+
+=== npm global prefix / node install dir ===
+corepack
+corepack.cmd
+install_tools.bat
+node.exe
+node_cache
+node_modules
+nodevars.bat
+npm
+npm.cmd
+npm.ps1
+npx
+npx.cmd

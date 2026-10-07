@@ -126,3 +126,68 @@ param(
 
 两枚 `upload-artifact` 步（`slo-smoke:763`、`slo-full:826`）正文逐字＝`name: slo-smoke-report` / `name: slo-full-report`、`path: build/slo/slo-report.json`（`logs/s2-steps-bodies.txt`）⇒ **上传的是 SLO 报告 JSON，不是 `build\wisp.exe`**；`build\` 下那 4 枚进 SHA256SUMS 的产物（§1.1 表 `152` 行）在三枚 job 里**谁都不上传、谁都不下载、谁都不验**。
 workflow 文件清单（尺＝`ls -la .github/workflows`）＝`ci.yml`（57948 字节）+ `slo-fresh.yml`（4038 字节，`runs-on: ubuntu-latest` `62`，⛔ 不跑 `build.ps1`：`grep -rl 'build\.ps1' .github/workflows` 只命中 `ci.yml`）⇒ **整个仓里产 exe 的 CI 通路就 §2 那三枚 job，一台 hosted Windows × 2、一台 self-hosted Windows × 1。**
+
+---
+
+## §3 那台机器今天有没有 node/npm（run 侧真读数）
+
+**取数方式**：`gh run list --branch dev --limit 6 --json databaseId,conclusion,headSha,workflowName,createdAt,event`（只读）⇒ 6 发读数在 `logs/` 之外的 `D:/tmp/wisp274a2/gh/run-list.json`（原始 JSON，MB 级日志不进仓也不进上下文，遵守纪律 4）：
+
+| databaseId | workflow | event | conclusion | createdAt | headSha |
+|---|---|---|---|---|---|
+| `37545246395` | ci | schedule | failure | 2026-10-06T23:12:27Z | `cc31526` |
+| `37511647900` | slo-fresh | schedule | success | 2026-10-06T18:29:01Z | `cc31526` |
+| `37424357373` | slo-fresh | schedule | success | 2026-10-06T06:33:02Z | `cc31526` |
+| `37406757402` | ci | push | failure | 2026-10-06T02:58:39Z | `cc31526` |
+| `37406422380` | ci | push | failure | 2026-10-06T02:54:30Z | `b948bcb` |
+| `37405698188` | ci | push | failure | 2026-10-06T02:45:36Z | `ec84cff` |
+
+作业级日志＝`gh run view --job <id> --log`，逐枚重定向后才抽段（抽取件在仓内、全量在 `D:/tmp/wisp274a2/gh/logs/`，只建不删）：
+
+| job | jobId | 日志字节 / 行数 | 步结论（`logs/s1s2-extras.txt`） |
+|---|---|---|---|
+| `test-windows` | `112547577399` | 974277 / 5610 | `cgo build smoke` **success**；第 7 步 `cmd/wisp CLI tests` **failure**、第 9 步 `Portable windows tests` **failure** |
+| `slo-smoke` | `112547577433` | 39615 / 372 | `Build wisp.exe` **success**、全 job success |
+| `slo-full` | `112547577499` | 31596 / 290 | `Build wisp.exe (deps cached on the runner)` **success**、全 job success |
+
+抽取件：`logs/s3-runside.txt`（三枚 job 的 node/npm 命中行原文 + runner 身份头）、`logs/s3-slofull-detail.txt`（build.ps1 在作业里的逐行输出 + 步边界 + PATH 线索 + 机侧 node.exe 普查）、`logs/s3-machine.txt`（本机身份与交互式 PATH 读数）、`logs/s3-reds.txt`（今天红哪些枚）、`logs/s3-panel-fails.txt`（panel 那几枚的红因原文）。
+
+### 3.1 ① 产 exe 的 job 里有没有任何一步打印过 `node`/`npm` 的版本或路径
+
+**答：没有一步打印过；就「作业环境里 npm 是否可达」这一问，读数＝取不到（零枚步骤试过硬碰硬的答案）。**
+三枚 job 的 `grep -ci 'node'` 分别是 `test-windows` 7 枚、`slo-smoke` 14 枚、`slo-full` 8 枚，`grep -ci 'npm'` 是 2/0/0——**逐枚点名后全部不是「一步跑 node/npm」**（`logs/s3-runside.txt` 有原文行号）：
+
+- Actions **自带运行时**的弃用告示：`(node:12240) [DEP0040] DeprecationWarning: The punycode module is deprecated`（`slo-full` 日志 `112/113/257/258/263/272/273` 行、`slo-smoke` `164/165/182/253/254/256/331/332/337/347/348/350/351` 行、`test-windows` `158/159/176/1678/1679/1681` 行）；
+- 各 job **末行**的 runner 级告示（`test-windows` `5610`、`slo-smoke` `372`、`slo-full` `290`）逐字：`Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5, actions/upload-artifact@v4` ⇒ **这就是「作业机器上确有 Node 运行时」的 run 侧证据，但它服务的是 actions 本身，不是 `npm run build`**；
+- `test-windows` 那 2 枚 `npm` 命中**不是命令**，是我方 Go 测试的错误文案：`panel_host_gate_test.go:109` 与 `panel_resident_windows_test.go:315` 里那句 `panel: embedded assets are not built (run npm run build in frontend/)`（`2908`、`2990` 行）。
+
+⛔ 按纪律 7，本节不写成「那台机器没有 node」——恰恰相反，见 3.3 的机侧具名读数。
+
+### 3.2 ② hosted 还是 self-hosted（run 侧证据具名，不按 `runs-on` 字符串猜）
+
+- `slo-full` 日志头 `2/3/4` 行逐字：`Runner name: 'wisp-selfhosted-01'`、`Runner group name: 'Default'`、`Machine name: 'DESKTOP-LVS7839'`；`41` 行 `Working directory is 'E:\work\base\actions-runner\_work\wisp\wisp'`；`48` 行 `[command]D:\work\soft\Git\cmd\git.exe config --global --add safe.directory E:\work\base\actions-runner\_work\wisp\wisp`；`45` 行 `Copying 'C:\Users\swq\.gitconfig'` ⇒ **self-hosted，身份三件套齐**。
+- `test-windows`（`logs/s3-runside.txt` 头 6 行）与 `slo-smoke`（同）逐字出现 `##[group]Runner Image Provisioner` + `Hosted Compute Agent` + `Version: 20260901.588` + `Build Date: 2026-09-01T19:56:44Z` ⇒ **hosted（GitHub 托管 Windows 镜像）**，两枚都没有 `Runner name:` 这一行（尺本身在 `slo-full` 命中过 1 枚 ⇒ 负向有正控）。
+
+### 3.3 ③ 如果 self-hosted：这台机器与跑 `slo-full` 的是不是同一枚
+
+**是，同一枚＝编排者本机。** 双向对上了：
+
+| 作业侧（run 侧）| 本机现量（`logs/s3-machine.txt`） |
+|---|---|
+| `Machine name: 'DESKTOP-LVS7839'` | `COMPUTERNAME=DESKTOP-LVS7839` |
+| `Copying 'C:\Users\swq\.gitconfig'` | `USERNAME=swq` |
+| `Working directory is 'E:\work\base\actions-runner\_work\wisp\wisp'` | `E:/work/base/actions-runner` 存在（`_diag`/`_work`/`bin`/`externals`/`config.cmd`/`run.cmd`），且 `E:/work/base/actions-runner/_work/wisp` 里就是 `wisp` |
+| `build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)`（`slo-full` 日志 `176` 行） | `E:/work/base/msys64/mingw64/bin` 存在；仓内工作目录 `D:/work/workspace/projects plans/Wisp` 与 `D:\work\soft\Git` 同机 |
+
+⇒ **乙形若落在 `slo-full`，真实代价就是编排者已知的那枚（每次 push 自启、在本机跑、抢 CPU），而且它已经在跑 `build.ps1`；若落在 `test-windows`／`slo-smoke`，落点是 GitHub 托管镜像——那两枚镜像上 node 可达性本腿无 run 侧读数（3.1），要买这一条只能现加一步去问。**
+
+**机侧补充读数（具名标注＝机侧、不是作业侧，不可当作业结论用）**：
+- 交互式 PATH 上：`node --version` ⇒ **v24.9.0**、`npm --version` ⇒ **11.6.0**；`cmd.exe //c where node` ⇒ `D:\work\server\node14\node.exe`、`where npm` ⇒ `D:\work\server\node14\npm` + `D:\work\server\node14\npm.cmd`。⚠ 目录名叫 `node14` 而装的是 **v24.9.0**——一处名实不符，具名报回。
+- runner 自带：`find E:/work/base/actions-runner -maxdepth 4 -iname 'node.exe'` ⇒ **2 枚**：`externals/node20/bin/node.exe`、`externals/node24/bin/node.exe`（与 3.1 末行「forced to run on Node.js 24」同源）。`runner bin` 目录里 maxdepth 2 无 node ⇒ actions 的 node 走 `externals/`。
+- ⚠ **不能由机侧推作业侧**：`ci.yml:804-806` 那条注释逐字写着「The runner's job environment carries no msys64 on PATH … (on the interactive user PATH only)」，而 `E:\work\base\msys64\mingw64\bin` 在本机确实存在（上表已量）⇒ **同机、同目录，交互式 PATH 有而作业 PATH 没有，这枚坑已经在仓里被具名过一次**。`npm` 是否在同一条作业 PATH 上，仍是**取不到**。
+
+### 3.4 顺手量到的两条与本票选形直接相关的 run 侧事实
+
+1. **那句撒谎注释今天真的在 CI 里印出来**：`slo-full` 日志 `183` 行逐字 `build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 搂2.2)`（`搂`＝`§` 在作业控制台代码页下的乱码；源码 `scripts/build.ps1:74` 里是 `§`）⇒ 甲形（改注释）会动到这枚真印出来的字符串，**不是死代码注释**。
+2. **出货 exe 不带页面字节，run 侧已自证**：`test-windows` `2908` 行 `AC#12 reading (head cc31526): shape=anchor-only built=false entry-bytes=0 entry-ctype="" entry-err=panel: embedded assets are not built (run npm run build in frontend/) refs=0 check-err=… manifest-entries=0 … | git-metadata=true tracked=1 tracked-beyond-anchor=0 tracked-has-entry=false ignored-or-untracked=0`，且这一枚 `TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` 的结论是 **`--- PASS`**（`2910` 行）⇒ **这就是工单 274 要的「今天拦不住」凭据：尺读到了 `built=false`，然后放它绿。**
+3. **丙形的落地面今天不干净**：同一枚 `test-windows` 的 `cmd/wisp` 包已有 8 枚具名红（`logs/s3-reds.txt`：`TestAC1AlwaysBranchDoesNotRevertAHandEditedKey`、`TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card`、`TestTicket223PermissionDeniedSitsInItsOwnSentence`、`TestRunPacketCarriesTheLoadedInstructionFiles`、`TestPanelHostRealWindowHopAndLifecycle`、`TestPanelHostLatencyPercentilesAC2`、`TestAC14GoSideEvalPushReachesThePage`、`FAIL github.com/CarlosShao/wisp/cmd/wisp 371.253s`；`portable-tests.sh` 四数＝`=== RUN=335 PASS=230 FAIL=7 SKIP=1`）。其中 panel 那两枚的红因是**冷拉起 3414.339 ms 超 D32 预算 1500 ms**（`logs/s3-panel-fails.txt` 原文 `panel_host_windows_test.go:660/665`、`:999`），**与 dist 无关** ⇒ 丙形（把 `wisp panel-assets` 的 rc=1 牙接进 CI）不会撞上这两枚既有红，但要新起一步，不能塞进现有 `cmd/wisp CLI tests` 里冒充绿。
