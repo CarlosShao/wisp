@@ -1,0 +1,31 @@
+=== 274-v1 AC#6 full-package run, START roster, Wed Oct  7 14:55:36 CST 2026 ===
+raw -v output kept OUTSIDE the repo at /d/tmp/wisp274v1/gotest-start.txt (816425 bytes) -- MB 级日志不入库（台账纪律），本件只存名册与四数
+$ go test -count=1 -v ./cmd/wisp ./internal/...   (PATH 前置仓内 build/ 以给 cmd/wisp 那批 CLI 用例提供 sherpa DLL)
+FAIL
+GOTEST_START_RC=1
+END Wed Oct  7 14:54:39 CST 2026 RC=0
+--- four numbers ---
+RUN=1839
+PASS=1234
+FAIL=6
+SKIP=7
+--- package-level lines ---
+23
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.315s
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	1.904s
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	13.430s
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	14.069s
+FAIL
+--- NAMED red roster at START (verbatim) ---
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.02s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.25s)
+--- FAIL: TestResolvePerCallBudget (2.70s)
+(rows above = the whole named red roster at start)
+6 .scratch/wisp/probes/274/v1/logs/11-ac6-red-roster-start.txt
+6

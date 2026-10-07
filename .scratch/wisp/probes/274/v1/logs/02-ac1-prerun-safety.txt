@@ -1,0 +1,35 @@
+=== pre-run safety digests (prove the scratch run cannot rewrite repo bytes) ===
+$ df on D:
+D:              501G  301G  200G  61% /d
+$ third_party structural digest BEFORE:
+5fb90621fa637f17f0b3d6154e50d6ab *-
+$ repo build/ contents BEFORE:
+total 175437
+drwxr-xr-x 1 swq 197609        0 Oct  7 11:57 .
+drwxr-xr-x 1 swq 197609        0 Oct  7 10:33 ..
+-rwxr-xr-x 2 swq 197609  6009856 Oct  1 12:48 33p1-receipt.exe
+-rwxr-xr-x 2 swq 197609  6044672 Oct  1 12:45 33p1-reentry.exe
+-rwxr-xr-x 2 swq 197609  6004736 Oct  2 19:52 33p1q1.exe
+-rwxr-xr-x 2 swq 197609  6018048 Oct  2 19:50 33p1q2.exe
+-rwxr-xr-x 2 swq 197609  6004224 Oct  2 19:54 33p1q3.exe
+-rw-r--r-- 2 swq 197609      335 Oct  7 11:57 SHA256SUMS
+-rwxr-xr-x 2 swq 197609  7295488 Sep 30 11:21 balldebug.exe
+-rw-r--r-- 2 swq 197609      177 Sep 20 07:29 leak.json
+drwxr-xr-x 1 swq 197609        0 Sep 20 07:06 models
+-rwxr-xr-x 2 swq 197609 17799168 Sep 11 02:34 onnxruntime.dll
+-rw-r--r-- 2 swq 197609      493 Sep 20 07:32 settle.json
+-rwxr-xr-x 2 swq 197609  4605952 Sep 11 02:43 sherpa-onnx-c-api.dll
+-rwxr-xr-x 2 swq 197609   259584 Sep 11 02:43 sherpa-onnx-cxx-api.dll
+drwxr-xr-x 1 swq 197609        0 Sep 23 13:46 slo
+drwxr-xr-x 1 swq 197609        0 Sep 20 07:14 slo-test-data
+-rwxr-xr-x 2 swq 197609  2906112 Sep 20 07:30 sloprobe.exe
+drwxr-xr-x 1 swq 197609        0 Sep 30 16:05 w228run
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+=== drop the scratch tree's build/ so the scratch go build cannot share an inode with repo build/wisp.exe ===
+scratch build/ removed (repo build/ untouched)
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+=== scratch dist shape check-in (anchor-only) ===
+/d/tmp/wisp274v1/tree/frontend/dist/.gitkeep=0
+repo dist .gitkeep md5:
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+d41d8cd98f00b204e9800998ecf8427e */d/tmp/wisp274v1/tree/frontend/dist/.gitkeep

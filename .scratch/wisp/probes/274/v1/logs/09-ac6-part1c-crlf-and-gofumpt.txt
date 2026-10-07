@@ -1,0 +1,13 @@
+=== 274-v1 AC#6 part 1c, Wed Oct  7 14:50:58 CST 2026 ===
+--- CR census on the .go the gate flagged (A664 EOL trap applied to the gofmt gate itself) ---
+cmd/wisp/models.go CR=334
+cmd/wisp/panel_host_gate_test.go CR=0
+internal/panel/assets.go CR=0
+how many tracked .go files on disk carry CR:
+13
+--- gofumpt v0.12.0 availability ---
+gofumpt.exe
+staticcheck.exe
+gofumpt@v0.12.0
+gofumpt@v0.7.0
+go: mvdan.cc/gofumpt@v0.12.0: loading deprecation for mvdan.cc/gofumpt: module lookup disabled by GOPROXY=off

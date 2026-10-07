@@ -1,0 +1,52 @@
+=== 274-v1 AC#7 evidence pull, Wed Oct  7 14:54:35 CST 2026 ===
+--- r1's start baseline file verbatim (.scratch/wisp/probes/274/r1/logs/02-dist-baseline.txt) ---
+=== dist pre-change inventory (name / md5 / sha256-first8 / bytes) ===
+frontend/dist/.gitkeep md5=d41d8cd98f00b204e9800998ecf8427e sha256_8=e3b0c44298fc1c14 bytes=0
+frontend/dist/assets/index-BRKj5OIJ.css md5=db4db7a27fb34e3de7acf045561d753a sha256_8=f8ff337b2ce80f3b bytes=49943
+frontend/dist/assets/index-BVKlegVD.js md5=70128a3dfdbc73e9f603bb421cdf324c sha256_8=793e606366463f0e bytes=553469
+frontend/dist/index.html md5=f98bfc4ba5dd39d74c9b2f85438de70a sha256_8=2078af7f2343af94 bytes=1044
+
+=== sha256 first8 of each (compare with 'wisp panel-assets -manifest') ===
+(rows above carry sha256_8)
+
+=== backup copy (仓外 /d/tmp/wisp274r1/dist-stale-backup) inventory ===
+/d/tmp/wisp274r1/dist-stale-backup/.gitkeep md5=d41d8cd98f00b204e9800998ecf8427e bytes=0
+/d/tmp/wisp274r1/dist-stale-backup/assets/index-BRKj5OIJ.css md5=db4db7a27fb34e3de7acf045561d753a bytes=49943
+/d/tmp/wisp274r1/dist-stale-backup/assets/index-BVKlegVD.js md5=70128a3dfdbc73e9f603bb421cdf324c bytes=553469
+/d/tmp/wisp274r1/dist-stale-backup/index.html md5=f98bfc4ba5dd39d74c9b2f85438de70a bytes=1044
+
+=== build/wisp.exe pre-state ===
+build/wisp.exe md5=7032d94d36b2e060ec4a24a6a04c1f47 bytes=31076405 mtime=2026-10-06 16:57:18.735673400 +0800
+backed up to /d/tmp/wisp274r1/wisp.exe.pre-274r1-backup
+
+=== frontend/node_modules present ===
+YES
+
+--- repo frontend/dist RIGHT NOW, md5 + size ---
+.gitkeep size=0 md5=d41d8cd98f00b204e9800998ecf8427e
+assets/index-BRKj5OIJ.css size=49943 md5=db4db7a27fb34e3de7acf045561d753a
+assets/index-BVKlegVD.js size=553469 md5=70128a3dfdbc73e9f603bb421cdf324c
+index.html size=1044 md5=f98bfc4ba5dd39d74c9b2f85438de70a
+
+--- r1's scratch artifacts outside the repo ---
+total 31009
+drwxr-xr-x 1 swq 197609        0 Oct  7 11:58 .
+drwxr-xr-x 1 swq 197609        0 Oct  7 14:37 ..
+drwxr-xr-x 1 swq 197609        0 Oct  7 11:58 dist-fresh-274r1
+drwxr-xr-x 1 swq 197609        0 Sep 27 10:59 dist-stale-backup
+drwxr-xr-x 1 swq 197609        0 Oct  7 11:58 dist-stale-staging
+drwxr-xr-x 1 swq 197609        0 Oct  7 11:55 fake-npm-shim
+-rw-r--r-- 1 swq 197609     1236 Oct  7 11:55 mut-i-no-node.ps1
+-rw-r--r-- 1 swq 197609     1167 Oct  7 11:55 mut-ii-stub-npm.ps1
+drwxr-xr-x 1 swq 197609        0 Oct  7 11:58 node-modules-generated-by-npm-ci
+drwxr-xr-x 1 swq 197609        0 Oct  7 11:58 node-modules-pre-274r1
+-rw-r--r-- 1 swq 197609      680 Oct  7 11:54 parse-check.ps1
+pre-274r1 exe backup md5:
+7032d94d36b2e060ec4a24a6a04c1f47 */d/tmp/wisp274r1/wisp.exe.pre-274r1-backup
+current repo exe md5:
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+
+--- AC#7's own literal wording (ticket :53) ---
+sed: can't read .scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md: No such file or directory
+--- AC#1's own literal wording (ticket :47), for the -overlay conflict ---
+sed: can't read .scratch/wisp/issues/274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md: No such file or directory

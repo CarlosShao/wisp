@@ -1,0 +1,67 @@
+=== 274-v1 M-iii rerun, Wed Oct  7 14:20:09 CST 2026: same shape as log 05 but with git.exe NOT resolvable, so build.ps1:190-193 takes the 'nogit' branch and the pipeline can reach the end. Purpose: exe-level reading of the stale-page false green. ===
+dist state going in (stale page present, stub npm will write nothing):
+.gitkeep=0 assets/index-BRKj5OIJ.css=49943 assets/index-BVKlegVD.js=553469 index.html=1044 
+md5 in:
+f98bfc4ba5dd39d74c9b2f85438de70a */d/tmp/wisp274v1/tree/frontend/dist/index.html
+db4db7a27fb34e3de7acf045561d753a */d/tmp/wisp274v1/tree/frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c */d/tmp/wisp274v1/tree/frontend/dist/assets/index-BVKlegVD.js
+build.ps1: repo root D:\tmp\wisp274v1\tree (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\tmp\wisp274v1\fakebin\node.exe (v24.9.0); npm = D:\tmp\wisp274v1\fakebin\npm.cmd (274-v1 STUB npm: claiming success without producing any bytes)
+build.ps1: frontend: node_modules ABSENT -> running npm ci (clean install pinned by package-lock.json).
+274-v1 STUB npm: claiming success without producing any bytes
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+274-v1 STUB npm: claiming success without producing any bytes
+build.ps1: frontend ok: 4 file(s) in frontend/dist (entry index.html is 1044 bytes): .gitkeep=0 assets\index-BRKj5OIJ.css=49943 assets\index-BVKlegVD.js=553469 index.html=1044
+build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+build.ps1: DLLs colocated into D:\tmp\wisp274v1\tree\build
+build.ps1: signed model manifest colocated into D:\tmp\wisp274v1\tree\build\models
+build.ps1: wrote D:\tmp\wisp274v1\tree\build\SHA256SUMS
+build.ps1: smoke test - running wisp.exe doctor
+build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+M_III_RERUN_PROCESS_EXITCODE=0
+=== scratch exe after that run ===
+time=2026-10-07T14:20:14.012+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+-rwxr-xr-x 1 swq 197609 31075893 Oct  7 14:20 /d/tmp/wisp274v1/tree/build/wisp.exe
+29369148e088fbfff624d3a95c862e1f */d/tmp/wisp274v1/tree/build/wisp.exe
+panel assets embedded: 4 files, entry=index.html built=true
+PANEL_ASSETS_EXITCODE=0
+wisp doctor - build chain self-check
+------------------------------------------------------------------------
+[INFO] wisp build                         version=0.0.0-dev commit=nogit built=2026-10-07T06:20:10Z WISP_ENV=dev
+[INFO] Go runtime                         go1.27.1 (toolchain pinned by go.mod)
+[INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)
+[PASS] gcc (build-time)                   gcc.exe (Rev3, Built by MSYS2 project) 16.2.0
+[PASS] sherpa-onnx C API                  runtime 1.13.8 matches build pin (exe dir D:\tmp\wisp274v1\tree\build)
+[PASS] onnxruntime.dll colocated          file version 1.28.2.0 matches build pin 1.28.2
+[INFO] sherpa-onnx built against onnxruntime 1.28.2
+[PASS] DLL colocated: sherpa-onnx-c-api.dll D:\tmp\wisp274v1\tree\build\sherpa-onnx-c-api.dll
+[PASS] DLL colocated: sherpa-onnx-cxx-api.dll D:\tmp\wisp274v1\tree\build\sherpa-onnx-cxx-api.dll
+[PASS] deps.toml sherpa-onnx pin          1.13.8
+[PASS] deps.toml onnxruntime pin          1.28.2
+[PASS] deps.toml sherpa-onnx-go pin       v1.13.8
+[PASS] data dir writable (dev)            C:\Users\swq\AppData\Roaming\wisp-dev
+------------------------------------------------------------------------
+wisp doctor: PASS
+.gitkeep 0 e3b0c44298fc1c14
+assets/index-BRKj5OIJ.css 49943 f8ff337b2ce80f3b
+assets/index-BVKlegVD.js 553469 793e606366463f0e
+index.html 1044 2078af7f2343af94
+=== dist on disk (npm never ran; these are the 09-27 stale bytes) ===
+.gitkeep=0 md5=assets/index-BRKj5OIJ.css=49943 md5=assets/index-BVKlegVD.js=553469 md5=index.html=1044 md5=
+.gitkeep d41d8cd98f00b204
+assets/index-BRKj5OIJ.css db4db7a27fb34e3d
+assets/index-BVKlegVD.js 70128a3dfdbc73e9
+index.html f98bfc4ba5dd39d7
+=== does the git block predate 274? (fair attribution) ===
+99:    $short = (& git rev-parse --short HEAD 2>$null)
+rc=0 (1 => the git block is NOT in the pre-274 file either / or absent)
+=== repo md5 re-check ===
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+[no porcelain rows above]

@@ -1,0 +1,45 @@
+=== 274-v1 AC#4 mutation runner, Wed Oct  7 14:19:13 CST 2026 ===
+node_dir=/d/work/server/node14  go_dir=/d/work/base/go/bin  git_dir=/mingw64/bin  gcc_dir=/e/work/base/msys64/mingw64/bin
+BASE_PATH=/d/work/base/go/bin:/mingw64/bin:/e/work/base/msys64/mingw64/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Program Files/Git/cmd:/c/Program Files/Git/usr/bin
+staged scratch scripts/build.ps1 lines: 265 (expect 265)
+scratch frontend/dist: .gitkeep=0 
+scratch frontend/node_modules present? NO
+---- M-i  no node/npm reachable ----
+$ powershell -NoProfile -ExecutionPolicy Bypass -File D:\tmp\wisp274v1\tree\scripts\build.ps1 -Env dev
+   PATH(posix, MSYS converts for the native child)=/d/work/base/go/bin:/mingw64/bin:/e/work/base/msys64/mingw64/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Program Files/Git/cmd:/c/Program Files/Git/usr/bin
+build.ps1: repo root D:\tmp\wisp274v1\tree (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: FATAL: frontend step: node could not be resolved on PATH (tried node.exe, then node). The page bundle is a build input of wisp.exe, so this script fails instead of skipping it. Install the toolchain pinned in docs/BUILD.md, or run the build on a machine that has node and npm on PATH.
+MUTATION_PROCESS_EXITCODE=1
+
+---- M-iv  node present, npm MISSING ----
+$ powershell -NoProfile -ExecutionPolicy Bypass -File D:\tmp\wisp274v1\tree\scripts\build.ps1 -Env dev
+   PATH(posix, MSYS converts for the native child)=/d/tmp/wisp274v1/bin-nodeonly:/d/work/base/go/bin:/mingw64/bin:/e/work/base/msys64/mingw64/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Program Files/Git/cmd:/c/Program Files/Git/usr/bin
+build.ps1: repo root D:\tmp\wisp274v1\tree (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: FATAL: frontend step: npm could not be resolved on PATH (tried npm.cmd, then npm). Without npm there is no frontend/dist, and an exe built from that tree carries no page at all - which is exactly what this step exists to prevent, so it fails instead of skipping.
+MUTATION_PROCESS_EXITCODE=1
+
+---- M-ii  stub npm exits 0, frontend/dist anchor-only ----
+$ powershell -NoProfile -ExecutionPolicy Bypass -File D:\tmp\wisp274v1\tree\scripts\build.ps1 -Env dev
+   PATH(posix, MSYS converts for the native child)=/d/tmp/wisp274v1/fakebin:/d/work/base/go/bin:/mingw64/bin:/e/work/base/msys64/mingw64/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Program Files/Git/cmd:/c/Program Files/Git/usr/bin
+build.ps1: repo root D:\tmp\wisp274v1\tree (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\tmp\wisp274v1\fakebin\node.exe (v24.9.0); npm = D:\tmp\wisp274v1\fakebin\npm.cmd (274-v1 STUB npm: claiming success without producing any bytes)
+build.ps1: frontend: node_modules ABSENT -> running npm ci (clean install pinned by package-lock.json).
+274-v1 STUB npm: claiming success without producing any bytes
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+274-v1 STUB npm: claiming success without producing any bytes
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds only the anchor file(s) [1 file(s), none beside frontend/dist/.gitkeep]. That is the clean-checkout shape, so the exe would ship with zero page bytes. Named cause: build produced no page artifacts.
+MUTATION_PROCESS_EXITCODE=1
+
+=== repo integrity re-check ===
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+[rows above: dist+wisp.exe md5 must equal the pre-run baseline; porcelain must be empty]

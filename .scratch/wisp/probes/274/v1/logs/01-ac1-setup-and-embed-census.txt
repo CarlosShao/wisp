@@ -1,0 +1,35 @@
+=== 274-v1 AC#1 setup: scratch tree at D:/tmp/wisp274v1/tree (hardlinks of the WORKING TREE, not git archive => EOL identical to repo, see below) ===
+$ repo dist md5 BEFORE any scratch op
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+
+=== make anchor-only dist inside the SCRATCH tree only (unlink = breaks the hardlink, repo file untouched) ===
+scratch frontend/dist now:
+/d/tmp/wisp274v1/tree/frontend/dist/.gitkeep=0
+
+$ repo dist md5 AFTER the scratch unlink (must be byte-identical to BEFORE)
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+REPO DIST UNCHANGED rc=0
+
+=== EOL reading of the scratch tree sources (A664 says git archive -> CRLF; mine are working-tree hardlinks) ===
+frontend/index.html: CR count in scratch=0 ; CR count in repo=0 ; same inode bytes? IDENTICAL
+frontend/src/App.tsx: CR count in scratch=0 ; CR count in repo=0 ; same inode bytes? IDENTICAL
+
+=== embed-level ruler, ANCHOR-ONLY shape (scratch tree) ===
+[dist/.gitkeep]
+rc=0
+
+=== embed-level ruler, POSITIVE CONTROL (this repo working tree, dist holds the 4 real files) ===
+[dist/.gitkeep dist/assets/index-BRKj5OIJ.css dist/assets/index-BVKlegVD.js dist/index.html]
+rc=0
+
+=== old (pre-35633445) build.ps1 staged into the scratch tree; repo copy untouched ===
+172 /d/tmp/wisp274v1/tree/scripts/build.ps1
+265 D:/work/workspace/projects plans/Wisp/scripts/build.ps1
+[six-family porcelain rows above: expect none]

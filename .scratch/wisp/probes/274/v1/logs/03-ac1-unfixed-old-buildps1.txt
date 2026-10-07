@@ -1,0 +1,43 @@
+=== AC#1 UNFIXED-CODE RUN: old build.ps1 (35633445^, 172 lines) driven over the anchor-only scratch tree ===
+$ powershell -NoProfile -ExecutionPolicy Bypass -File D:\tmp\wisp274v1\tree\scripts\build.ps1 -Env dev   (cwd = scratch tree)
+build.ps1: repo root D:\tmp\wisp274v1\tree (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)
+build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+build.ps1: DLLs colocated into D:\tmp\wisp274v1\tree\build
+build.ps1: signed model manifest colocated into D:\tmp\wisp274v1\tree\build\models
+build.ps1: wrote D:\tmp\wisp274v1\tree\build\SHA256SUMS
+build.ps1: smoke test - running wisp.exe doctor
+build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+OLD_BUILD_PS1_PROCESS_EXITCODE=0
+
+=== the exe that run produced (scratch only) ===
+time=2026-10-07T14:17:02.480+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+-rwxr-xr-x 1 swq 197609 30470709 Oct  7 14:17 /d/tmp/wisp274v1/tree/build/wisp.exe
+$ wisp.exe panel-assets
+time=2026-10-07T14:17:02.560+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp panel-assets: assets NOT BUILT
+PANEL_ASSETS_EXITCODE=1
+$ wisp.exe panel-assets -manifest
+time=2026-10-07T14:17:02.624+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)
+MANIFEST_EXITCODE=1
+wisp doctor - build chain self-check
+------------------------------------------------------------------------
+[INFO] wisp build                         version=0.0.0-dev commit=1d59543e built=2026-10-07T06:16:58Z WISP_ENV=dev
+[INFO] Go runtime                         go1.27.1 (toolchain pinned by go.mod)
+[INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)
+[PASS] gcc (build-time)                   gcc.exe (Rev3, Built by MSYS2 project) 16.2.0
+[PASS] sherpa-onnx C API                  runtime 1.13.8 matches build pin (exe dir D:\tmp\wisp274v1\tree\build)
+[PASS] onnxruntime.dll colocated          file version 1.28.2.0 matches build pin 1.28.2
+[INFO] sherpa-onnx built against onnxruntime 1.28.2
+[PASS] DLL colocated: sherpa-onnx-c-api.dll D:\tmp\wisp274v1\tree\build\sherpa-onnx-c-api.dll
+[PASS] DLL colocated: sherpa-onnx-cxx-api.dll D:\tmp\wisp274v1\tree\build\sherpa-onnx-cxx-api.dll
+[PASS] deps.toml sherpa-onnx pin          1.13.8
+[PASS] deps.toml onnxruntime pin          1.28.2
+[PASS] deps.toml sherpa-onnx-go pin       v1.13.8
+[PASS] data dir writable (dev)            C:\Users\swq\AppData\Roaming\wisp-dev
+------------------------------------------------------------------------
+wisp doctor: PASS

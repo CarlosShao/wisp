@@ -1,0 +1,32 @@
+=== 274-v1 AC#6 part 1b, Wed Oct  7 14:50:16 CST 2026: the three readings part 1 left open ===
+--- (a) is cmd/wisp/models.go's unformatted state pre-existing (i.e. not 274's)? byte-identical at 35633445^ ? ---
+IDENTICAL at 35633445^ vs 35633445 (274 did not touch it)
+gofmt -l on the PRE-274 copy printed above (a line = already unformatted before 274)
+diff cmd/wisp/models.go.orig cmd/wisp/models.go
+--- cmd/wisp/models.go.orig
++++ cmd/wisp/models.go
+@@ -1,334 +1,334 @@
+-package main
+-
+-// wisp models - the C29 model store's operator surface, and the place ticket 121
+-// AC#2 put the model hand-off chain into the product.
+-//
+-// WHY THIS FILE EXISTS (R-109-4, the sixth case of "built but nobody calls it").
+-// Before this commit `go list -deps ./cmd/wisp` did not contain
+-// github.com/CarlosShao/wisp/internal/models on any platform. That made three
+--- (b) gofumpt: not on PATH; where does CI get it, and is v0.12.0 in the module cache? ---
+.github/workflows/ci.yml:55:  # gofumpt/vet/staticcheck + D22 seven-ban static scan (tools/d22scan) +
+.github/workflows/ci.yml:168:      - name: gofmt (gofumpt)
+.github/workflows/ci.yml:170:          go install mvdan.cc/gofumpt@latest
+.github/workflows/ci.yml:171:          OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"
+.github/workflows/ci.yml:173:            echo "gofumpt would reformat:"
+.github/workflows/ci.yml:184:      - name: "gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)"
+.github/workflows/ci.yml:191:        # ticket 161 AC#7 was decided on after `gofumpt -l . tools/... must be EMPTY`
+.github/workflows/ci.yml:192:        # was found to be structurally unsatisfiable on a bench tree (gofumpt walks
+GOMODCACHE=D:\work\base\gopath\pkg\mod
+mvdan.cc
+--- (c) continue-on-error: real step keys vs comments in ci.yml ---
+0
+(count of actual continue-on-error: keys above; 0 = none of the 16 textual hits is a step key)
+--- (d) today's repo exe vs today's repo dist (already logged in part 1 §7) : roster names differ ---
+exe manifest: assets/index-B8yINMF1.js 551989 / assets/index-yy8KMgdf.css 49540 ; disk dist: index-BVKlegVD.js 553469 / index-BRKj5OIJ.css 49943
