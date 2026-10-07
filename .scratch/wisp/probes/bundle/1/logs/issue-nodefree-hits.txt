@@ -1,0 +1,13 @@
+.scratch/wisp/issues/117-security-warnings-have-no-listener-in-production-done.md
+.scratch/wisp/issues/125-posix-c26-does-not-install-when-the-temp-dir-is-a-symlink-and-nothing-pins-it.md
+.scratch/wisp/issues/127-the-resident-gui-leg-installs-its-log-listener-with-zero-nails-deleting-20-lines-keeps-146-tests-green-done.md
+.scratch/wisp/issues/167-four-small-outputs-the-panel-needs-occupancy-queue-stop-draft-plus-crash-self-rescue.md
+.scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md
+.scratch/wisp/issues/243-a-closed-ticket-number-still-owns-work-in-25-comments-which-is-the-shape-that-fooled-three-legs-done.md
+.scratch/wisp/issues/244-spec-11-wants-the-gui-subsystem-build.md
+.scratch/wisp/issues/246-the-process-that-runs-tasks-is-not-the-process-holding-the-ball-so-no-veto-channel-has-an-executor.md
+.scratch/wisp/issues/247-the-capture-stack-has-zero-importers-so-no-real-microphone-level-ever-reaches-the-ball.md
+.scratch/wisp/issues/248-the-panel-has-no-settings-route-the-inbound-whitelist-has-zero-config-or-credential-methods.md
+.scratch/wisp/issues/256-resident-gate-built-before-session-grants.md
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer-done.md
+.scratch/wisp/issues/268-resident-leg-folds-missing-config-and-refused-config-into-one-provenance-done.md

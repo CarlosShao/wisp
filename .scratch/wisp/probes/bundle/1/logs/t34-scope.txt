@@ -1,0 +1,9 @@
+== AC lines
+3:**Status:** ready-for-agent
+42:- [ ] `docker build` → dist → `go build` serves the scaffold in the real panel window (33).
+43:- [ ] CI job: tsc, lint, build green; seeded violations (hardcoded hex, an emoji char, a banned
+45:- [ ] Token parity check: scripted diff of token names design/assets/tokens.css ↔
+47:- [ ] Dark+light render of the shell + one sample screen; contrast spot-check ≥AA on both.
+48:- [ ] Bundle budget: initial JS ≤400KB gz (React cost acceptable per D29; motion/Shiki lazy).
+== wc
+50 .scratch/wisp/issues/34-frontend-scaffold.md

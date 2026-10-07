@@ -1,0 +1,15 @@
+15:| **前端构建** | ✅ Node 镜像 | 产物进 `embed.FS`；宿主机不需要装 Node |
+44:  2. 前端产物：存在则跳过；--with-frontend 时走 docker/frontend.Dockerfile（§3.2）
+45:  3. go build（cgo: CGO_ENABLED=1, CC=mingw32-gcc; embed assets/web 已就位）
+69:### 3.2 `frontend.Dockerfile`（前端构建，S5 起需要）
+74:COPY frontend/package*.json ./
+76:COPY frontend/ ./
+77:RUN npm run build          # 产物 /src/dist
+79:COPY --from=build /src/dist /dist
+80:# 用法：docker buildx build --output type=local,dest=assets/web -f docker/frontend.Dockerfile .
+83:- 产物落 `assets/web/` 供 `//go:embed`；宿主机无需 Node；版本随 `package-lock.json` 钉死。
+84:- S5 之前 frontend 目录可空，构建脚本跳过该步。
+122:| `lint` | ubuntu + builder 镜像 | gofumpt/vet/staticcheck + **D22 七禁令静态扫描**（grep/AST）+ 零 emoji 扫描（design/ 与 frontend/） | 阻塞 |
+125:| `frontend` | ubuntu + node 镜像 | tsc/lint/build + 硬编码色值/emoji 扫描 | 阻塞（S5 起） |
+143:    wisp-updater.exe                 # 独立小工具（不 embed 前端资源）
+144:    resources\                       # 前端产物（亦可 embed.FS）

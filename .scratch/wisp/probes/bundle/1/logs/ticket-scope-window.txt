@@ -1,0 +1,18 @@
+### 33-panel-host-c27
+37:来路＝我自己量的那枚 `.gitkeep`；勾仍归非实现者）**：**"能构建"不等于"有页面可发"**。现量：库里 `frontend/dist` 只跟踪**一枚 `.gitkeep`**（尺：`git ls-files frontend` ⇒ `frontend
+37:/dist/.gitkeep`），而活模式是 `frontend/embed.go:19` 的 `//go:embed all:dist`——`all:` 连点文件一起收，所以**AC#11 今天很可能是绿的，而绿的原因是目录里躺着一枚占
+56:- Resources: `//go:embed assets/web/dist` + `AddWebResourceRequestedFilter` mapping 
+242:b.com/CarlosShao/wisp/frontend` 那枚 `all:dist` embed，副本必须带上 `frontend/dist`）花两枚、M1 首发写残 `_ = ctx` 导致 build failed 重跑花两枚、终态门禁复跑三件花三枚。
+### 248-the-panel-has-no-settings-route-the-inbound-whitelist-has-zero-config-or-credential-methods
+49:**另有一条它没问、我 10-01 00:0x 自己量到并要写死的**：`frontend/dist` 在库里**只跟踪着一枚 `.gitkeep`**（尺：`git ls-files frontend` ⇒ `fron
+49:tend/dist/.gitkeep`），而 `frontend/embed.go:19` 的活模式是 `//go:embed all:dist`。`all:` 前缀连点文件也算进去 ⇒ **今天"能构建"很可能是因为目录里躺着一枚占位文件**：
+57:- [ ] **AC#9（宿主在、内容不在这一族）**：设置页要真能点出来，前提是 `//go:embed all:dist` 真匹配到**一包页面产物**。判据形状＝能力型、不问文案、**不问构建退出码**：embed 之后
+149:`。⇒ **票 33 那半边比票面写的更靠前**；但"窗口建得出"≠"机主点得出设置"，缺的是**页面产物**那一格（`frontend/dist` 只有 `.gitkeep`），仍归 AC#4／AC#9。
+156: 真缺的是三样叠一格：①真机才知"窗真开时会不会撞嵌套消息泵重入"，②前端 dist 产物（`git ls-files frontend/dist` 我复量＝**1 行**、逐名 `frontend/dist/.gitkeep`＝AC#9 同一块石头），③一次真机点
+### 77-frontend-scaffold-reactbits-beautifului-shadcn
+53:程骨架**：`frontend/`（Vite + React + TS + Tailwind），构建产物由 Go 侧 `go:embed` 打进 `wisp.exe`，
+74:t-frontend`（`npm ci && npm run typecheck && npm run lint && npm run build`）。
+80:- [ ] **AC#1** `frontend/` 可构建，产物被 `go:embed` 打进二进制，`wisp.exe` 在无 node 环境的机器上能拉起面板。
+124:`frontend/` 骨架（Vite+React+TS+Tailwind）+ `internal/panel` 的 `go:embed` 静态服务
+127:- **14:5x `agent-ticket77` AC#1 落地（构建 + go:embed + 无 node 真拉起）**。
+128:   `npm run build`（Vite 8 + React 19 + TS 6 + Tailwind v4）rc=0：产物 index.html 

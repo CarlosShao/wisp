@@ -1,0 +1,4 @@
+30:stdout 撞 0 枚钉**（捕获名册 11 枚文件，断言形状全是 contains 或对别的字符串／文件枚数计数）⇒ 落点①②成立、③只能 info 级（`build.ps1:167-1
+34:resholds.go`／golden／`tools/d22scan/allowlist.txt`／`internal/agent/approval/**`／`frontend/**`／`design/**` 零字节；`[risk].l1_window_sec` 与它的钳位一字不动；值域 
+40:- ⚠ 如果 AC#0 量到"被拒那一支要让用户看见就必须给页面加一枚承接位"⇒ **停手上报**（那要动 `frontend/**`，本编队不写前端；只把要的字句�
+71:- ⛔ 页面承接位一格未动（`frontend/**` 归 owner 委托的会话）。

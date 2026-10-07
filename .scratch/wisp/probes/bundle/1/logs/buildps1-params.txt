@@ -1,0 +1,13 @@
+4:    One-shot build of wisp.exe on Windows (SPEC-11 §2.2). From a clean clone,
+11:    3. go build with CGO_ENABLED=1 + mingw-w64 gcc, real link of the
+13:    4. output: build\wisp.exe + onnxruntime.dll + sherpa-onnx DLLs colocated
+16:    6. smoke test: runs build\wisp.exe doctor
+24:    [string]$Env = 'dev'
+76:# --- 3. go build ------------------------------------------------------------
+129:    & $go.Source build -trimpath -ldflags $ldflags -o (Join-Path $outDir 'wisp.exe') ./cmd/wisp
+130:    if ($LASTEXITCODE -ne 0) { Fail "go build failed with exit code $LASTEXITCODE" }
+134:Write-Host 'build.ps1: go build ok (cgo linked against sherpa-onnx C API)'
+152:$artifacts = @('wisp.exe', 'onnxruntime.dll', 'sherpa-onnx-c-api.dll', 'sherpa-onnx-cxx-api.dll')
+167:Write-Host 'build.ps1: smoke test - running wisp.exe doctor'
+168:& (Join-Path $outDir 'wisp.exe') doctor
+171:Write-Host 'build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS'

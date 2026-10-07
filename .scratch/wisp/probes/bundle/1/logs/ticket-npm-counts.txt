@@ -1,0 +1,12 @@
+### .scratch/wisp/issues/77-frontend-scaffold-reactbits-beautifului-shadcn.md
+3
+### .scratch/wisp/issues/34-frontend-scaffold.md
+0
+### .scratch/wisp/issues/56-s8-signing-distribution-naming.md
+0
+### .scratch/wisp/issues/01-build-chain-done.md
+0
+### .scratch/wisp/issues/99-the-gate-script-step-that-cache-can-silence-done.md
+0
+### .scratch/wisp/issues/145-panel-snapshot-has-four-fields-so-eleven-of-the-fourteen-ui-states-have-no-input-to-render-grow-the-go-side-carrier.md
+0

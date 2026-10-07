@@ -1,0 +1,2 @@
+42:	info("wisp build", fmt.Sprintf("version=%s commit=%s built=%s WISP_ENV=%s",
+81:	info("sherpa-onnx built against onnxruntime", sherpa.GetOnnxruntimeVersion())

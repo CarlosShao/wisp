@@ -1,0 +1,2 @@
+1:# 56 — S8: code signing, package-manager distribution, P10 residual naming — DEFERRED
+11:Zero-cash signing + trusted distribution: SignPath Foundation application, CA code signing wired

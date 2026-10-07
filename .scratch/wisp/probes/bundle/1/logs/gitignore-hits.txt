@@ -1,0 +1,7 @@
+16:# --- Frontend (built artifacts only; frontend/ source is tracked) ---
+17:node_modules/
+18:# dist/ is a build product, but go:embed needs the directory to exist in a clean
+20:# Built() reports false while the bundle is only that anchor, and the host shows
+22:frontend/dist/*
+23:!frontend/dist/.gitkeep
+24:assets/web/dist/

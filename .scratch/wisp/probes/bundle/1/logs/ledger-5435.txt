@@ -1,0 +1,21 @@
+- **裁定③ 那两枚 staged deletion＝结，字是我的。** 形状：09-22 我用 `git mv` 改 105／116 两枚票面为 `-done`，`git mv` 把改名记成"一加一删"两枚索引条目，而我 commit 时**只列了新名** ⇒ 那两枚删除停在索引里，HEAD 里**新旧两名并存**，而 `-done` 后缀是本仓**防重领的唯一键**；`agent-ticket119b` 按规矩停手没替我提交、只回报"请裁是谁的字"⇒ 我 09-22 17:25 用 `fbbecaa` 自首收编。
+  ⇒ **教训落在我这边**：这类"我自己补完改名"的收编**当时就该在台账落一行**——它只在 commit message 里，票面读不到，于是这个问题在**两天后**又被问我一次（`next=` 第⑥条至今挂着）。审计程这次是靠 `fbbecaa` 正文对上的，属于运气好。
+- ⚠ **我自己的提问前提被这枚程纠正了一处，照实记**：我在派单里把那两枚写成 `docs/evidence/s1/` 下的"115／116 系文件"，**实际是 `.scratch/wisp/issues/` 下的 105／116 旧名票面**；而 `docs/evidence/s1/` 这个目录**历史上从未删除过任何一枚文件**（`--diff-filter=D` 命中 0）。⇒ 我把票面 `:383-386` 的原文读串了路径就写进简报——**票面里每个文件名先 `ls`／先 `git ls-tree`** 这条老规矩又一次生效，只是这次是"我给别人的简报里"的文件名。
+- **编队（17:2x 现量，两席在飞）**：`worker-ticket119-ac7` 已交第一枚码 commit `ddc1583`（**工作树里那枚未提交的 `dataroot_symlink_119_other_test.go` 是它的，一枚都别碰**）；
+  新派 `worker-ticket128-ac4`——**动机不是"补跑一次门禁"，是我在 `A171` 里数出来的那 5 枚 `...128` 子项红**：实现方本机自述"四腿都拒、CWD 全空"，而 CI 的 windows runner 上同一枚用例**从 08:53 那枚 run 起一直红到现在**，这个分歧本身就比那一格值钱 ⇒ 派单写死"两边都要取原文、判清是 (a) 本机也红／(b) 本机绿 CI 红（差异具名到变量·DLL·DACL·`APPDATA`）／(c) 别的根因借名"，并禁它改 `internal/winsec/**`。
+- **推送**：本枚（台账＋那枚审计文件）commit 完就推两远程，照旧"tip 逐字＝HEAD"收口。owner 侧**无待办**。
+- **推送本身**：`git push cnb dev` 一次成（`182daed..a9c8b6e`）；`git push origin dev` **第一次 TLS 握手失败**（`schannel: failed to receive handshake`），**重试一次即成**。⇒ 两远程现同为 `a9c8b6e`，终判据我按老规矩核了：`git ls-remote <每个> dev` 逐字相等。
+  ⚠ 这条要如实记：**`A170⑧` 说"本轮连攒的一共 42＋枚推平"，真值 43 枚**（`git rev-list --count 182daed..HEAD` 现量），而且**积压里有一部分是网络失败不是我让路**。
+- **门禁读数（把"红"拆成可归单的三因，成本两枚 `gh` 调用）**：
+  ① **`lint` 红＝44 条 staticcheck 积压**（`##[error]` 计数＝44，另 2 条落在别的步）：形状是 `U1000` 未用字段/函数 ＋ `ST1012` 错误变量命名 ＋ `S1011` 循环写法，
+     落点在 `cmd/wisp/run.go:110/234/306`、`internal/agent/approval/queue.go:472`、`internal/audio/device.go:45/51/126`、`frontend/embed.go:4`（`// go:embed` 多一个空格＝** ineffectual directive**，这条是**真隐患**不是风格）等既有文件；
+     同一步里 `runtests.sh` 的自检是 **PASS=21 FAIL=0 SKIP=0／`=== RUN`=31＝绿** ⇒ 红只来自 staticcheck。
+  ② **`test-windows` 红＝17 枚具名用例**（`--- FAIL` 的**名字去重**＝17；含子项路径是 21 枚，两个数别混）：
+     `TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128`（**5 个子项**，落点 `cmd/wisp/dataroot_128_test.go`）· `TestTicket101{ManualSwitchSurvivesRestart,SessionGrantDoesNotCrossRestart,UntouchedConfigRestartsAtDefault}` ·
+     `TestSync{UnverifiedRootKeepsFallback,SuspectFallbackWhenUndetectable,SuspectFallbackIsComponentBounded,FallbackAndMatch,FallbackNotDisarmableByWeakRoot}` · `TestPathResolver{UNC,ShortName,ExtendedLengthPrefix}AListDenied` · `TestAListWinsWhereBothTablesHit` · `TestBListDefaultDenyAndOverride` · `TestCanonicalInputGainsNoSecondForm` · `TestClassifyAnchorSpellingIsNotVerdict` · `TestComposedGateBlocksAWriteForTwoSeconds`。
+  ③ **`test-core`／`slo-smoke`／`slo-full`／`lint-frontend` 绿** ⇒ `Q-36` 那笔改造**已把 `slo-full` 从"每推必红"里摘出来**（这条我上面按 `A120①` 说过一次，今天是在**已推 tip 的读数**上第二次核到）。
+- **为什么我先把"不是今天造的"坐实了才推**：`189cb1e`／`33c8acd`（票 119 那两枚）**确实在已推 tip 的祖先里**（`git merge-base --is-ancestor` 逐枚 YES），光看"红了很多枚"是分不清旧账与新伤的；
+  ⇒ 决定性证据不是这个 is-ancestor，而是**同一枚 `ci` 工作流今天 12 枚 push run 全红、且最早那枚（`5c1529a`，08:53）早于今天所有 119/125/129/131/133/136/137 批次**。
+  ⚠ 反向义务照旧：**红着不等于没人欠账**——这 17＋44 条按第①②条的分组各归各的票（128 那 5 个子项就是我队列里的 `128 AC#4/AC#5`，`TestPathResolver*` 三枚是 `R-115-2` 的 8.3 短名族，`TestTicket101*` 三枚是票 101 接线那一族）。
+- **在飞**：`worker-ticket119-ac7`（写码）＋ `auditor-ticket119-next`（只读）各一席；**新 run `35977957915`（`a9c8b6e`）正在跑**，读到终态后我再核一次"红因有没有变"。owner 侧**无待办**。
+- [2026-09-24 16:4x +08] **A169｜两格终裁都真落地了：票 137 AC#4 判成立、我已翻勾；票 119 AC#1／AC#2 的复判表交齐（同一 task-id 第二次、又长了一截）。⇒ 编队空，本轮把 35 枚推平两远程。**

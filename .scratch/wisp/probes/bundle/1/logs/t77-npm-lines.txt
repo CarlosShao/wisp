@@ -1,0 +1,9 @@
+1:# 77 — Frontend scaffold: React + TS + Tailwind + shadcn, vendored react-bits / beautifului components, sharing C21 tokens
+45:## 前提事实（已核，不必重查）
+52:## What to build
+74:6. **CI 新 job**：`lint-frontend`（`npm ci && npm run typecheck && npm run lint && npm run build`）。
+79:## AC（1:1 裁决表，与框逐条对应；能力类框必须回答"生产里谁调用它"）
+105:## 硬规矩（本项目 24 小时内的事故换来的）
+115:## Progress log（append-only）
+128:   `npm run build`（Vite 8 + React 19 + TS 6 + Tailwind v4）rc=0：产物 index.html 1043 B、
+318:  `npm run build` 重生成 + 重编 → `-check` **rc=0** `2 asset refs resolve [./assets/index-UL9kYvYl.js ./assets/index-CEH-Pz8P.css]`。

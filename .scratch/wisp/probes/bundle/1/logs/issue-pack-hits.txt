@@ -1,0 +1,4 @@
+.scratch/wisp/issues/01-build-chain-done.md
+.scratch/wisp/issues/10-agent-loop-core-done.md
+.scratch/wisp/issues/127-the-resident-gui-leg-installs-its-log-listener-with-zero-nails-deleting-20-lines-keeps-146-tests-green-done.md
+.scratch/wisp/issues/56-s8-signing-distribution-naming.md

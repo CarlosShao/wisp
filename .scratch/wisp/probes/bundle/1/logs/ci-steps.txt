@@ -1,0 +1,59 @@
+72:          go-version-file: go.mod
+74:      - name: D22 scanner positive control (tools/d22scan tests, seeded red)
+83:      - name: "D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)"
+106:        working-directory: tools/d22scan
+108:      - name: D22 seven-ban + emoji scan (tools/d22scan)
+136:      - name: "Tracked path-length budget (ticket 262)"
+168:      - name: gofmt (gofumpt)
+184:      - name: "gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)"
+206:      - name: go vet (module)
+209:      - name: go vet (tools/d22scan module)
+211:        working-directory: tools/d22scan
+213:      - name: staticcheck
+289:      - name: mockllm module vet
+302:        working-directory: tools/mockllm
+304:      - name: "Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)"
+373:          go-version-file: go.mod
+375:      - name: Start compose test services (mock-llm on 18080)
+378:      - name: Probe mock-llm
+390:      - name: Environment fork assertion (WISP_ENV=test data dir)
+406:      - name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
+430:      - name: Stop compose services
+435:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+483:          go-version-file: go.mod
+485:      - name: "Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"
+489:        # not sit behind `cgo build smoke`, which has been red before) and it is
+505:        # red before (`cgo build smoke`, run 35551819606) plus a red `PathResolver
+528:      - name: Cache third_party (deps.toml key)
+535:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+540:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+542:      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+548:        # the cache step and build.ps1 above produce; the same command without them
+564:      - name: "Package coverage census (ticket 111 AC#1 + GUARD D)"
+653:      - name: Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+689:      - name: "PathResolver junction placeholder (real cases tickets 18/20)"
+717:          go-version-file: go.mod
+719:      - name: Cache third_party (deps.toml key)
+725:      - name: Build wisp.exe
+726:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+728:      - name: SLO smoke gate
+731:      - name: Upload SLO report
+773:      # (on the interactive user PATH only). build.ps1's own fallback path is
+776:      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+778:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+785:          go-version-file: go.mod
+788:      - name: Build wisp.exe (deps cached on the runner)
+789:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+791:      - name: SLO full gate (six states + settle + leak)
+794:      - name: Upload SLO report
+844:        working-directory: frontend
+848:      - uses: actions/setup-node@v4
+856:      - name: npm ci (lockfile is the only source of deps)
+859:      - name: typecheck (tsc -b, noEmit per tsconfig.*.json)
+862:      - name: lint (oxlint)
+865:      - name: token drift guard (generated theme must equal the C21 table)
+871:      - name: build (vite build -> frontend/dist, the bytes go:embed carries)
+874:      - name: L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)
+893:      - name: Composer states paint the real envelope (render evidence)
+899:      - name: Streaming output honours PLAN.md's SSE row (render evidence)
+904:      - name: Nav rail names only icons PLAN.md's frozen list carries (render evidence)

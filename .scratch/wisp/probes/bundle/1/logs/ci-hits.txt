@@ -1,0 +1,27 @@
+33:  #      slo-smoke/lint-frontend each night.
+60:  # "design/ and frontend/", a tree that does not exist at this HEAD - a stale
+256:        # lint:ignore, no excluded package. The `frontend/embed.go:4` SA9009
+632:        #     executes no test binary at all, which is also why it cannot disturb a
+828:  # ------------------------------------------------------- lint-frontend ----
+829:  # Ticket 77 AC#6: frontend/ is real code now, so it gets a real gate.
+835:  # every step here is node-only: ticket 78's Go-on-Linux problem cannot reach
+840:  lint-frontend:
+844:        working-directory: frontend
+848:      - uses: actions/setup-node@v4
+851:          # with (node v24.9.0); Vite 8 / TS 6 need >= 20.19.
+852:          node-version: 24
+853:          cache: npm
+854:          cache-dependency-path: frontend/package-lock.json
+856:      - name: npm ci (lockfile is the only source of deps)
+857:        run: npm ci
+860:        run: npm run typecheck
+863:        run: npm run lint
+867:        # frontend/src/styles/tokens.generated.css from docs/evidence/s1 and
+869:        run: npm run tokens:check
+871:      - name: build (vite build -> frontend/dist, the bytes go:embed carries)
+872:        run: npm run build
+875:        # Renamed 2026-09-25: the step's content grew at 430ad57 (frontend session,
+885:        run: npm run render:l2 -- fixtures/l2-card-fs-delete.json
+897:        run: npm run render:composer
+902:        run: npm run render:stream
+909:        run: npm run render:nav
