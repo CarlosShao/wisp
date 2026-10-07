@@ -1,0 +1,153 @@
+===== components/tasks-screen.tsx
+25:export type TaskStatus = "running" | "approval" | "blocked" | "queued" | "failed" | "done";
+26-
+27:export interface TaskRow {
+28-  id: string;
+29-  title: string;
+30-  sub: string;
+31-  status: TaskStatus;
+32-  /** A finished/running duration label, verbatim; no timer runs here. */
+33-  elapsed?: string;
+34-}
+35-
+36-const STATUS_LABELS: Record<TaskStatus, string> = {
+37-  running: "运行中",
+38-  approval: "等待确认",
+39-  blocked: "被阻塞",
+40-  queued: "排队中",
+41-  failed: "失败",
+===== components/ball-screen.tsx
+18:export interface BallStateRow {
+19-  /** The state's identifier, as the state machine spells it. */
+20-  state: string;
+21-  /** The visual/motion the frozen row gives this state. */
+22-  visual: string;
+23-  /** What brings the ball into this state. */
+24-  enter: string;
+25-  /** What takes it out, including the timeout. */
+26-  exit: string;
+27-}
+28-
+29:export interface BallRingDemo {
+30-  label: string;
+31-  progress: number;
+32-  tone: "orange" | "green" | "red" | "accent";
+33-}
+34-
+35-export function BallScreen({
+36-  states,
+37-  rings = [],
+38-}: {
+39-  states: readonly BallStateRow[];
+40-  rings?: readonly BallRingDemo[];
+41-}) {
+42-  return (
+43-    <div className="flex w-full flex-col gap-3">
+===== components/palette-screen.tsx
+31:export interface PaletteItem {
+32-  label: string;
+33-  /** A lucide icon name from the fixtures; unknown names draw a plain dot. */
+34-  icon?: string;
+35-  hint?: string;
+36-}
+37-
+38:export interface PaletteGroup {
+39-  name: string;
+40-  items: PaletteItem[];
+41-}
+42-
+43-/** A tiny name table for the icons the fixtures actually use; a name outside
+44-    it falls back to a neutral dot rather than a guessed glyph. */
+45-const ITEM_ICONS: Record<string, LucideIcon> = {
+46-  "shield-check": ShieldCheck,
+47-  settings: Settings,
+48-  moon: Moon,
+49-  terminal: Terminal,
+50-  trash: Trash,
+51-  "folder-input": FolderInput,
+52-  "file-pen": FilePen,
+===== components/context-meter.tsx
+25:export interface ContextUsage {
+26-  /** Cumulative tokens on this session, as the host counts them. */
+27-  tokens?: number;
+28-  /** Fraction of prompt tokens served from cache, 0..1. */
+29-  cacheHitRate?: number;
+30-  /** Fraction of the context window occupied, 0..1. */
+31-  occupancy?: number;
+32-}
+33-
+34-/** `75.9M tok` - the dsh bottom-bar shape: a short count, not a digit
+35-    avalanche. Below 1000 stays exact because below that nobody wants a unit. */
+36-function shortTokens(n: number): string {
+37-  if (n < 1000) return String(n);
+38-  if (n < 1_000_000) return `${(n / 1000).toFixed(n < 10_000 ? 1 : 0)}k`;
+39-  return `${(n / 1_000_000).toFixed(1)}M`;
+===== components/turn-rail.tsx
+38:export interface TurnMark {
+39-  id: string;
+40-  /** One line: what this turn was about, verbatim from the turn. */
+41-  label: string;
+42-}
+43-
+44-export function TurnRail({
+45-  turns,
+46-  activeId,
+47-  onJump,
+48-}: {
+49-  turns: readonly TurnMark[];
+50-  activeId: string | null;
+51-  onJump: (id: string) => void;
+52-}) {
+===== components/git-branch.tsx
+32:export interface GitBranchView {
+33-  /** The branch the workspace is on right now, verbatim. */
+34-  current: string;
+35-  /** Other local branches that can be checked out. */
+36-  local: readonly string[];
+37-  /** Existing worktrees, by branch name. */
+38-  worktrees: readonly { branch: string; path: string }[];
+39-  /** True when the workspace path is a git repository at all. */
+40-  isRepo: boolean;
+41-}
+42-
+43:export interface GitBranchProps {
+44-  view: GitBranchView;
+45-  onCheckout: (branch: string) => void;
+46-  onNewWorktree: (branch: string) => void;
+47-}
+48-
+49-export function GitBranchChip({ view, onCheckout, onNewWorktree }: GitBranchProps) {
+50-  const [open, setOpen] = useState(false);
+51-  const [creating, setCreating] = useState(false);
+52-  const [draft, setDraft] = useState("");
+53-  const popRef = useRef<HTMLDivElement>(null);
+54-  useDismiss(popRef, open, () => setOpen(false));
+55-
+56-  // Not a repository: say so and draw nothing that pretends otherwise. A chip
+57-  // reading "main" over a plain folder is a lie with a git icon on it.
+===== components/panel-sidebar.tsx
+49:export type SessionState = "done" | "failed" | "streaming";
+50-
+51:export interface TreeSession {
+52-  id: string;
+53-  title: string;
+54-  state: SessionState;
+55-  /** Muted right-edge text (time or status), verbatim. */
+56-  meta?: string;
+57-}
+58-
+59:export interface PanelSidebarProps {
+60-  /** Which session the main column is showing, or null. */
+61-  activeSessionId: string | null;
+62-  onSelectSession: (id: string) => void;
+63-  onNewTask: () => void;
+64-  onOpenSettings: () => void;
+65-  onToggleTheme: () => void;
+66-  theme: "light" | "dark";
+67-  settingsOpen: boolean;
+68-  /** The workspace line. Path comes from the snapshot's C26-resolved field. */
+69-  workspaceName: string;
+70-  workspacePath: string;
+71-  /** Sessions under the workspace row. Empty today (ticket 166 owns the feed). */
+72-  workspaceSessions: readonly TreeSession[];
+73-  /** Recent sessions by time bucket (今天 / 近 7 天 / 更早). */
