@@ -1,0 +1,28 @@
+CMD: PATH=$PWD/third_party/sherpa-onnx:$PWD/build:$PATH go test -count=1 -v -run 'TestTicket223RestartTierSaysItWillNotApply' -overlay /d/tmp/wisp272r2/overlay/REPEAT.json ./cmd/wisp/
+START: 2026-10-07T09:22:28+08:00
+RULE: 272-r2 landed ruler (arm1 pre-plant count=0 + arm2 window count=1), worktree cmd/wisp/config_reload_223_test.go
+SHAPE: REPEAT
+time=2026-10-07T09:22:33.035+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-10-07T09:22:33.940+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/07 09:22:33 mockllm: serving on http://127.0.0.1:62016 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-07T09:22:33.964+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply2503032166\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-07T09:22:33.987+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply2503032166\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-07T09:22:33.993+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-07T01:22:33Z duration_ms=6
+time=2026-10-07T09:22:34.000+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply2503032166\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-07T09:22:34.005+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-07T01:22:34Z duration_ms=5
+time=2026-10-07T09:22:34.009+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-07T09:22:34.012+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    config_reload_223_test.go:668: the window since the mark carries "本次运行不会生效" 2 time(s), want exactly one copy caused by this plant; stdout since the plant:
+        wisp run: 这些段的改动本次运行不会生效（D36 重启档，需要重启进程）：[app]。原因：这几枚键在进程启动时被读一次就交给平台层（开机自启注册、单实例锁、界面语言），本次运行没有重新注册它们的路径。涉及：app.language / app.autostart / app.single_instance。注意两件事都没发生：文件里的新值没有被丢掉，内存里的旧值也没有被偷偷替换。
+        wisp run: 这些段的改动本次运行不会生效（D36 重启档，需要重启进程）：[app]。原因：这几枚键在进程启动时被读一次就交给平台层（开机自启注册、单实例锁、界面语言），本次运行没有重新注册它们的路径。涉及：app.language / app.autostart / app.single_instance。注意两件事都没发生：文件里的新值没有被丢掉，内存里的旧值也没有被偷偷替换。
+        
+        audit since the plant:
+        [audit] config: HOT-RELOAD state=restart-pending sections=[app] effect=next-process-start tier=restart
+        [audit] config: RESTART-PENDING detail="这些键只在进程启动时被读一次并交给平台层（开机自启注册、单实例锁、界面语言），本次运行没有重新加载它们的路径；内存里继续用旧值，文件里的新值没有被丢掉，重启进程后生效" keys=["app.language" "app.autostart" "app.single_instance"]
+        [audit] config: HOT-RELOAD state=applied hot=[] reload=[] restart=[app] locked=0
+--- FAIL: TestTicket223RestartTierSaysItWillNotApply (2.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.111s
+FAIL
+RC=1

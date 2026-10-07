@@ -1,0 +1,20 @@
+### m19-table.tsv
+101|101-perm-store-has-no-production-importer-done.md|tier=A|101|nA=1|nI=0|offv=9|offtot=9|strict_unchecked=strictcb=5|101|boxes=5|unind=0|anyind=0|do
+### m24-sign.tsv
+101|signed_files=0|dispatchref_files=0
+### m28-final.txt
+11|11-llm-adapters-rest-done.md|un=0|any=0|chk=6|tot=14|accfiles=acc=1|selfcells=0|evidsec=0
+### m31-sign.txt
+11|11-adversarial-acceptance.md|sig=Acceptor:** orchestrator (not an implem
+### m33-ident.tsv
+11|ACC_ID|acc=1|ident=1
+### passC.tsv
+101|101-perm-store-has-no-production-importer-done.md|b=0/0/5|plv=15|EV=341|ownsec=1|ownref_exist=2|docs/evidence/s1/101-adversarial-acceptance.md doc
+### m27-shape.txt
+11|proglog=1|evidsec=0|lines=67
+### 5g3-derive.tsv
+11|tier=A|acc=|un=0|any=0|chk=6|tot=14|self==0|m31=Acceptor:** orchestrator (not an implem|m33=ident=ident=1|11-adversarial-acceptance.md
+### m25-ac.tsv
+101|face_maxAC=5|face_boxes=5|acc_ACset=0,
+### m25-tokens.txt
+      5 - [x]; << 101

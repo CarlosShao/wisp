@@ -111,7 +111,55 @@ PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v ./cmd/w
 
 ---
 
-## 4. 读数台账（ newest last；每格落地后追加，原话不抹 ）
+## 4. 读数台账（newest last；每格落地后追加，原话不抹）
+
+AC#1 那两节（`4.1` 未改动的尺五发／`4.2` 机制复验结论）在文件**尾部**，编号即节号；
+本票的 AC#2 现量另起一节，写在前面（`## 5`）。读的时候按节号走，不按物理顺序。
+
+## 5. AC#2 —— 落地的一支，与三形撑不住的现量
+
+### 5.1 落地内容（`cmd/wisp/config_reload_223_test.go`，只增不减）
+
+`git diff --numstat` = **52 插入／0 删除**；`git diff -- cmd internal | grep -c '^-[^-]'` = **0**；
+断言形状计数（`needle := range|Contains(out, needle)|Contains(why|Contains(out, "本次运行不会生效")|Contains(whole|windowCount|t.Fatal`）
+在 HEAD 版与本腿版都是 **41 枚**（同一把 grep 对拉，AC#3 的第一条自证）。产码 `cmd/wisp/config_reload.go` **一字未动**。
+
+- **arm 1（`:576-598`，票面之外的具名新增）**：种改动之前那一段流里 `strings.Count(prePlant, restartSentence272) == 0`。
+  `prePlant := r.h.out.String()` 取在 `r.plant` 的前一行 ⇒ 任何一份"不是这次改动打出来的"重启句**当场红**，
+  红在断言句（`t.Errorf`），不靠超时。这一支就是把 `M` 形弄红的那一支。
+- **arm 2（`:651-671`，＝票面的"甲"）**：`mark` 起算的窗里 `strings.Count(窗, restartSentence272) == 1`；
+  计数读在 `HOT-RELOAD state=applied` 那行审计句**之后**（`config_reload.go:179` 在 `CheckAndReload` 返回之后才写，
+  操作员句在 `:321-326` 即回调内先写），所以窗口的字节在计数时已全部落定，不存在"读到半句"的抖动。
+- `restartSentence272`（`:37-43`）只是给这两支臂一个名字；**:592／:617（现 :622／:647）两枚既有字面一字未动**，
+  六枚 needle 仍在 stdout 窗里（`:635-636`），拼接串没回来。
+- **窗口起点没有往前挪**（AC#3 禁的那一支）：`mark := r.h.out.String()` 还在原位，arm 2 只是**重读**同一个窗口的尾。
+
+### 5.2 三形（甲／乙／丙）为什么不能按原样落：每一支都在本腿脚下量过
+
+| 候选 | 量的形 | 读数（件） | 结论 |
+|---|---|---|---|
+| **甲 alone**（只钉窗内计数＝1，不前移起点） | `M` | **PASS 2.15s**（`logs/AC2-candidate-JIA-M.txt`） | 撑不住 AC#2：`M` 的窗与 `cur` 的窗**逐字节相同**（横幅在窗外），窗内怎么数都是 1 |
+| 甲 alone | `REPEAT` | **FAIL 2.12s**（`logs/AC2-candidate-JIA-REPEAT.txt`） | 甲 对"窗内两份"确实有牙 ⇒ 保留为 arm 2，不当主力 |
+| **乙**（标记取在启动横幅之后） | `M` | **PASS 2.88s**（`logs/AC2-candidate-B-M.txt`） | 撑不住：乙 在今天的产码上是**无操作**——`mark` 本来就在全部启动输出之后（`run.go:813` 同步写 `syncWriter`） |
+| 乙 | `cur` | **PASS 2.15s**（`logs/AC2-candidate-B-cur.txt`） | 乙 既不变严也不变松，只证明它与本票要的东西无关 |
+| **丙**（那句的偏移晚于 `state=applied`） | `cur`（正常那一发） | **FAIL 42.20s 超时**（`logs/AC2-candidate-C-cur.txt`，红句 `:594 stdout never carried "本次运行不会生效" AFTER the plant`） | 撑不住且**违 AC#4**：产码里操作员句写在 `state=applied` **之前**（`:321-326` 在 `CheckAndReload` 内，`:179` 在其返回之后），丙 把真绿那一发**确定性地**判红，不是抖动 |
+
+⇒ 本票唯一目的（`M` 必须红）在三形里没有一支能做到，能做到的只有 arm 1；arm 2 是票面点名的"甲"，
+本腿把它一起留下，因为 `REPEAT` 那一发（未改动的尺 PASS 2.22s）量到的是"窗内几份"这另一条缝。
+**这不是把三形换成一支更严的**：arm 1 的红因是"那句在种改动之前就出现了"，正是票面 `:8` 那句本意
+（"横幅里本来就有的那些字样，不许冒充改动真的生效了的证据"）在现量机制下的唯一钉法。是否算 AC#2 达成，交给裁决者判，本腿不自封。
+
+### 5.3 落地尺上五发 + 一发同族回归
+
+| 形 | 落地尺读数 | 红在哪一行 |
+|---|---|---|
+| `cur` | **PASS 2.25s**（`logs/AC2-newruler-cur.txt`） | — |
+| `M` | **FAIL 2.05s**（`logs/AC2-newruler-M.txt`） | `:595` arm 1 断言句（不是超时、不是 build failed） |
+| `PART` | **PASS 2.02s**（`logs/AC2-newruler-PART.txt`） | — |
+| `REPEAT` | **FAIL 2.02s**（`logs/AC2-newruler-REPEAT.txt`） | `:668` arm 2 计数 |
+| `MDEL` | **FAIL 42.05s**（`logs/AC2-newruler-MDEL.txt`） | `:595` arm 1 **并且** `:622` await 超时，两路都红 |
+| 223 全族（无 overlay） | **10 PASS／0 FAIL／rc=0**，26.6s（`logs/AC3-family-223.txt`） | 本腿没碰到的兄弟用例一枚没变 |
+
 
 ### 4.1 AC#1 —— 未改动的尺（`config_reload_223_test.go` blob `ab6c84fb`）上的五发读数
 

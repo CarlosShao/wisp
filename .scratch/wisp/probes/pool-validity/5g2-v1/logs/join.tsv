@@ -1,0 +1,52 @@
+11	甲	sig=Acceptor:** orchestrator (not an imp	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=1 leg_files=0	orchstyle=1 legstyle=0
+63	甲	sig=Acceptor:** orchestrator (not the im	signed_files=1	ACC_ID/acc=1/ident=1	orch_self_files=1 leg_files=0	orchstyle=1 legstyle=0
+66	甲	sig=验收人：** orchestrator（**不�	signed_files=1	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+67	待定	sig=NOSIG	signed_files=1	ACC_ID/acc=3/ident=3	orch_self_files=1 leg_files=1	orchstyle=1 legstyle=0
+69	甲	sig=验收人**：编排者（**非实�	signed_files=1	ACC_ID/acc=1/ident=1	orch_self_files=1 leg_files=1	orchstyle=1 legstyle=0
+73	甲	sig=验收人**：编排者（**非实�	signed_files=1	ACC_ID/acc=1/ident=1	orch_self_files=1 leg_files=1	orchstyle=1 legstyle=0
+74	甲	sig=验收人**：编排者（非实现�	signed_files=1	ACC_ID/acc=1/ident=1	orch_self_files=1 leg_files=1	orchstyle=1 legstyle=0
+76	甲	sig=验收人**：编排者（非实现�	signed_files=1	ACC_ID/acc=1/ident=1	orch_self_files=1 leg_files=1	orchstyle=1 legstyle=0
+79	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=1 leg_files=0	orchstyle=1 legstyle=0
+83	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=1 leg_files=0	orchstyle=1 legstyle=0
+84	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=0 legstyle=0
+87	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+88	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+89	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+93	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+94	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+95	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+96	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+99	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+101	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+104	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+106	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+110	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+116	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+117	甲	sig=验收人：`acceptor-ticket117`（*	signed_files=1	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+118	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+119	待定	sig=NOSIG	signed_files=1	ACC_ID/acc=5/ident=5	orch_self_files=1 leg_files=4	orchstyle=1 legstyle=2
+126	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+127	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+129	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+131	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=5/ident=3	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+134	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=4/ident=3	orch_self_files=0 leg_files=0	orchstyle=1 legstyle=0
+141	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=3/ident=3	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1
+142	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=0 leg_files=2	orchstyle=0 legstyle=1
+143	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=1	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1
+144	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1
+147	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=0 leg_files=2	orchstyle=0 legstyle=1
+149	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=1 leg_files=2	orchstyle=0 legstyle=1
+151	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1
+152	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1
+153	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=3/ident=3	orch_self_files=0 leg_files=2	orchstyle=0 legstyle=1
+154	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=1 leg_files=2	orchstyle=0 legstyle=1
+155	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=1 leg_files=2	orchstyle=0 legstyle=1
+157	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=0 leg_files=2	orchstyle=0 legstyle=1
+162	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=3/ident=3	orch_self_files=0 leg_files=3	orchstyle=0 legstyle=3
+183	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1
+184	丙	NOACC	signed_files=0	NO_CRED/acc=0/ident=0	orch_self_files=0 leg_files=0	orchstyle=0 legstyle=0
+198	甲	sig=验收腿 `198-v2`	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=1 leg_files=2	orchstyle=0 legstyle=1
+212	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1
+221	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1
+241	甲	sig=裁决腿：`241-v1`（必须≠本�	signed_files=0	ACC_ID/acc=2/ident=2	orch_self_files=0 leg_files=2	orchstyle=0 legstyle=1
+257	待定	sig=NOSIG	signed_files=0	ACC_ID/acc=1/ident=1	orch_self_files=0 leg_files=1	orchstyle=0 legstyle=1

@@ -1,0 +1,40 @@
+11	file=11-adversarial-acceptance.md	exists=Y tracked=Y
+  m31sig=sig=Acceptor:** orchestrator (not an implem
+  VERBATIM@3:**Acceptor:** orchestrator (not an implementer of this ticket). **Date:** 2026-09-20.
+  m28(chk/tot/un)=chk=6/tot=14/un=0  m25(face_boxes)=face_boxes=14  passC(b)=b=0/0/14
+63	file=63-adversarial-acceptance.md	exists=Y tracked=Y
+  m31sig=sig=Acceptor:** orchestrator (not the imple
+  VERBATIM@3:**Acceptor:** orchestrator (not the implementer). **Date:** 2026-09-20.
+  m28(chk/tot/un)=chk=6/tot=13/un=0  m25(face_boxes)=face_boxes=13  passC(b)=b=0/0/13
+66	file=66-adversarial-acceptance.md	exists=Y tracked=Y
+  m31sig=sig=验收人：** orchestrator（**不是**实现人
+  VERBATIM@3:**验收人：** orchestrator（**不是**实现人 `agent-ticket66` / `agent-ticket66b`）
+  m28(chk/tot/un)=chk=7/tot=14/un=0  m25(face_boxes)=face_boxes=14  passC(b)=b=0/0/14
+69	file=69-adversarial-acceptance.md	exists=Y tracked=Y
+  m31sig=sig=验收人**：编排者（**非实现者**；实现方是 `agen
+  VERBATIM@3:**验收人**：编排者（**非实现者**；实现方是 `agent-ticket69`）
+  m28(chk/tot/un)=chk=4/tot=6/un=0  m25(face_boxes)=face_boxes=6  passC(b)=b=0/0/6
+73	file=73-adversarial-acceptance.md	exists=Y tracked=Y
+  m31sig=sig=验收人**：编排者（**非实现者**；实现方 `agent
+  VERBATIM@3:**验收人**：编排者（**非实现者**；实现方 `agent-ticket73`，5 个 commit）
+  m28(chk/tot/un)=chk=5/tot=5/un=0  m25(face_boxes)=face_boxes=5  passC(b)=b=0/0/5
+74	file=74-adversarial-acceptance.md	exists=Y tracked=Y
+  m31sig=sig=验收人**：编排者（非实现者；实现方 `agent-tic
+  VERBATIM@3:**验收人**：编排者（非实现者；实现方 `agent-ticket74`，5 个 commit）
+  m28(chk/tot/un)=chk=5/tot=11/un=0  m25(face_boxes)=face_boxes=11  passC(b)=b=0/0/11
+76	file=76-adversarial-acceptance.md	exists=Y tracked=Y
+  m31sig=sig=验收人**：编排者（非实现者；实现方 `agent-tic
+  VERBATIM@3:**验收人**：编排者（非实现者；实现方 `agent-ticket76`，3 个 commit：`d9224af` `39420cf` `974c082`）
+  m28(chk/tot/un)=chk=5/tot=5/un=0  m25(face_boxes)=face_boxes=5  passC(b)=b=0/0/5
+117	file=117-adversarial-acceptance.md	exists=Y tracked=Y
+  m31sig=sig=验收人：`acceptor-ticket117`（**只读
+  VERBATIM@1:# 票 117 — 独立对抗验收（`acceptor-ticket117`）
+  m28(chk/tot/un)=chk=6/tot=6/un=0  m25(face_boxes)=face_boxes=6  passC(b)=b=0/0/6
+198	file=198-firstrun-config-r2.md	exists=Y tracked=Y
+  m31sig=sig=验收腿 `198-v2`
+  VERBATIM@15:**〔本节由编排者代提——腿死于 15:17 前后的模型服务当日额度（通知 15:4x 到、只当未验证；盘上现量为凭）�
+  m28(chk/tot/un)=chk=5/tot=5/un=0  m25(face_boxes)=face_boxes=5  passC(b)=b=0/0/5
+241	file=241-audio-level-producer-r1.md	exists=Y tracked=Y
+  m31sig=sig=裁决腿：`241-v1`（必须≠本腿）
+  VERBATIM@5:实现腿：`241-r1`（本文件作者） · 裁决腿：`241-v1`（必须≠本腿）
+  m28(chk/tot/un)=chk=5/tot=5/un=0  m25(face_boxes)=face_boxes=5  passC(b)=b=0/0/5

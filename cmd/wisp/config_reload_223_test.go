@@ -34,6 +34,14 @@ import (
 // argument, and 票 223 AC#1 asks for it by name).
 const reloadCaseBudget = 40 * time.Second
 
+// restartSentence272 is the causal half of the operator's restart notice: the
+// words that only a planted edit can be evidence for. 票 272 AC#2's two arms
+// (zero copies before the plant, exactly one copy inside the window) name it so
+// they search the same string the case already searches for at :622 (the await)
+// and :647 (the operator's own copy) - those two literals are left verbatim
+// because 票 272 AC#3 forbids touching an existing assertion.
+const restartSentence272 = "本次运行不会生效"
+
 type reloadRun223 struct {
 	h  *replyHost
 	pw *io.PipeWriter
@@ -565,6 +573,29 @@ func TestTicket223RestartTierSaysItWillNotApply(t *testing.T) {
 		// notice.
 		mark := r.h.out.String()
 		errMark := r.h.err.String()
+		// 票 272 AC#2, arm 1 - the one that reddens this ticket's M shape:
+		// no byte printed BEFORE the plant may carry the operator's restart
+		// sentence. Why this is its own arm instead of "move the window start
+		// later" (232/272's shape 乙): the start-up banner is written
+		// synchronously by startConfigReload (run.go:813) into a syncWriter
+		// with no pipe and no copier in between
+		// (approval_reply_201_test.go:64), so the mark taken just above already
+		// excludes every start-up byte. Measured, not assumed - the
+		// shape "banner carries the words, operator sentence deleted" reddens
+		// on the UNMODIFIED ruler at its :592 (the same await sits at :622
+		// below) with an EMPTY window after 40s in
+		// .scratch/wisp/probes/272/r2/logs/AC1-oldruler-MDEL.txt, while the
+		// same banner next to the real sentence passes (AC1-oldruler-M.txt),
+		// which is exactly the ambiguity this arm removes: it bans the copy
+		// itself, wherever in the pre-plant stream it sits. A copy that
+		// arrives between this snapshot and the plant is inside the window
+		// and is caught by arm 2's count. The normal run prints zero copies,
+		// so this arm costs no green (AC1-oldruler-cur.txt PASS).
+		prePlant := r.h.out.String()
+		if n := strings.Count(prePlant, restartSentence272); n != 0 {
+			t.Errorf("the operator stream carried %q %d time(s) BEFORE this run planted the edit; a copy nobody planted cannot be evidence that this run will not use the new values. stdout before the plant:\n%s",
+				restartSentence272, n, prePlant)
+		}
 		r.plant(t, "[fs]", "[app]\nautostart = true\n\n[fs]")
 		pending := r.awaitAuditSince232(t, errMark, "config: HOT-RELOAD state=restart-pending sections=[app]")
 		if !strings.Contains(pending, "effect=next-process-start") {
@@ -616,6 +647,27 @@ func TestTicket223RestartTierSaysItWillNotApply(t *testing.T) {
 		}
 		if !strings.Contains(out, "本次运行不会生效") {
 			t.Errorf("the operator is not told the edit will not land this run; stdout:\n%s", out)
+		}
+		// 票 272 AC#2, arm 2 - the count the ticket names as shape 甲: the
+		// window since the mark must carry EXACTLY ONE copy of the sentence.
+		// Zero means the notice never arrived, two means something else said
+		// it too, and the ruler before this ticket asked neither: it only ever
+		// asked "contains", so a second verbatim copy of the operator's own
+		// Fprintf passed it in 2.22s (shape REPEAT,
+		// .scratch/wisp/probes/272/r2/logs/AC1-oldruler-REPEAT.txt).
+		// The count is taken off a re-read made AFTER the audit line
+		// state=applied, because reportReload books that line only once
+		// CheckAndReload has returned (config_reload.go:179) while the
+		// operator's sentence is written inside that very call
+		// (config_reload.go:321-326) - so by then every stdout byte this plant
+		// causes is already in the stream and the window cannot be counted
+		// mid-sentence. This is not a window-start move (票 272 AC#3 forbids
+		// loosening the start): `mark` still opens the window, the await above
+		// still ends it, and this line only re-reads what is already there.
+		applied := r.awaitAuditSince232(t, errMark, "config: HOT-RELOAD state=applied")
+		if win := r.stdoutSince232(t, mark); strings.Count(win, restartSentence272) != 1 {
+			t.Errorf("the window since the mark carries %q %d time(s), want exactly one copy caused by this plant; stdout since the plant:\n%s\naudit since the plant:\n%s",
+				restartSentence272, strings.Count(win, restartSentence272), win, applied)
 		}
 		// Two tiers, two sentences: the restart notice must not be dressed up as
 		// an immediate one. Read over the WHOLE stream on purpose - a windowed

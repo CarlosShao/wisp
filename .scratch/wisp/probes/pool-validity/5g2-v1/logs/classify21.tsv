@@ -1,0 +1,21 @@
+67	ORCH	docs/evidence/s1/67-adversarial-acceptance.md	3:**验收人**：编排者（**非实现者**；实现方是 `agent-ticket67` 与续做�
+79	ORCH	docs/evidence/s1/79-adversarial-acceptance.md	1:# 票 79 — 对抗验收裁决表（编排者亲自复跑，2026-09-21）
+83	ORCH	docs/evidence/s1/83-adversarial-acceptance.md	1:# 票 83 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 14:3x）
+119	ORCH	docs/evidence/s1/119-ac1-ac2-r2-acceptance.md	1:# 票 119 — AC#1／AC#2 第二轮回判（`acceptor-ticket119-ac1-ac2-r2`，非实现�
+141	BARE_ONLY	docs/evidence/s1/141-ac34-positive-controls-r1.md	5:**作者身份**：编排者。**本文件不是裁决表**——票 141 的非实现者
+142	LEGWORD	docs/evidence/s1/142-non-quiescent-index-guard-accept-r1.md	1:# 142-accept-r1 — 两读不原子守卫的对抗验收（非实现者程）
+143	LEGWORD	docs/evidence/s1/143-panel-assets-r4-leg-accept-r1.md	3:裁决者：**非实现者**（本件作者，对抗验收程）。被验物＝票 143 �
+144	LEGWORD	docs/evidence/s1/144-slo-report-partial-read-r1-accept-r1.md	1:# 144 — 对抗验收 r1（非实现者）：`collectReport` 分"没写完 / 坏了"这
+147	LEGWORD	docs/evidence/s1/147-offset-naming-r1-accept-r1.md	4:- 验收程：**非实现者**（本件作者不是 `2dc2b28` / `1f3ede9` / `e572aa9` �
+149	ORCH+LEGWORD	docs/evidence/s1/149-three-unpinned-outlets-r1-accept-r1.md	4:- 本程角色：**对抗验收程（非实现者）**，只读＋只 commit 本件
+151	LEGWORD	docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md	1:# 151 验收 r1（非实现者对抗验收程）— `Bridge.CloseTask` 只开不关这�
+152	LEGWORD	docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md	1:# 152 对抗验收 r1（非实现者）— 被验版本 `97cfc6e`
+153	LEGWORD	docs/evidence/s1/153-ac2-a-closure-r1.md	1:# 153 AC#2 部件 (a) 那两笔待补的**内容级**复核 · r1（非实现者验收�
+154	ORCH+LEGWORD	docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md	1:# 154 对抗验收程（非实现者）— 「关」只长在环路那一枚 id 上：RE
+155	ORCH+LEGWORD	docs/evidence/s1/155-three-unjudged-cells-r1-accept-r1.md	1:# 155 的三块"无人裁"——**非实现者**对抗验收 r1（复判：那三块是�
+157	LEGWORD	docs/evidence/s1/157-ac5-recheck-r1.md	1:# 票 157 · **AC#5 那一格的重判**（非实现者·第三程 r1；派单＝`.scrat
+162	LEGWORD	docs/evidence/s1/162-fs-edit-accept-r1.md	1:# 162-v1 验收件（**非实现者**）— 票 162 的 AC#1／AC#2／AC#3／AC#4 四格
+183	BARE_ONLY	docs/evidence/s1/183-pointer-exemption-accept-v2.md	1:# 183-v2 — 非实现者对抗验收（收窄版）：宿主指针豁免的三发变异
+212	LEGWORD	docs/evidence/s1/212-comments-phantom-citation-v2.md	1:# 212-v2 对抗验收裁决（票 212 第 2 轮修码 212-r2；非实现者腿，实现�
+221	BARE_ONLY	docs/evidence/s1/221-task-cancel-v1.md	1:# 221 — 非实现者对抗验收表（腿 `221-v1`）
+257	BARE_ONLY	docs/evidence/s1/257-clean-machine-provider-registry-v1.md	3:> 腿：`257-v1`（非实现者终裁，`SPEC-12 §4.3` #1／`AGENTS.md` §0.3）。

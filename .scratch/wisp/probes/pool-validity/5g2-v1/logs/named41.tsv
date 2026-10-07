@@ -1,0 +1,41 @@
+67	ORCH+LEGID	4:- 代理：agent-ticket67-ac3
+79	ORCHonly	1:# 票 79 — 对抗验收裁决表（编排者亲自复跑，2026-09-21）
+83	ORCHonly	1:# 票 83 — 对抗验收裁决表（编排者亲自复跑，2026-09-21 14:3x�
+84	NONE	
+87	LEGIDonly	1:# 票 87 独立对抗验收 —— `acceptor-ticket87`
+88	LEGIDonly	3:**验收代理：** `acceptor-ticket88`（独立对抗验收，不写生产码
+89	LEGIDonly	1:# 票 89 独立对抗验收（acceptor-ticket89）
+93	ORCH+LEGID	1:# 93 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket93`�
+94	ORCH+LEGID	1:# 票 94 独立对抗验收（acceptor-ticket94）
+95	LEGIDonly	1:# 95 — 对抗验收裁决表（acceptor-ticket95 · 终版）
+96	LEGIDonly	3:**验收代理：** `acceptor-ticket96`（独立对抗验收，不写生产码
+99	LEGIDonly	3:验收方：`acceptor-ticket99`（独立对抗验收代理，未参与实现�
+101	LEGIDonly	3:- 验收方：`acceptor-ticket101`（独立对抗验收代理，未参与实�
+104	LEGIDonly	3:**验收方**：`acceptor-ticket104`（只读角色，一行生产码未改）
+106	ORCH+LEGID	1:# 106 — 对抗验收裁决表（acceptor-93-106，独立于 `agent-ticket106
+110	ORCHonly	22:"排前面"与"`if: always()`"两个候选里，票面的选择**在它自己
+116	LEGIDonly	1:# 票 116 对抗验收 —— `acceptor-ticket116`
+118	LEGIDonly	1:# 票 118 独立对抗验收表（acceptor-ticket118）
+119	ORCH+LEGID	1:# 票 119 — AC#1／AC#2 第二轮回判（`acceptor-ticket119-ac1-ac2-r2`，
+126	LEGIDonly	3:**验收方**：`acceptor-ticket126`（本文件唯一作者）
+127	ORCH+LEGID	3:**验收方**：`acceptor-ticket127`（本文件唯一作者）
+129	LEGIDonly	3:裁决方：`acceptor-ticket129-r1`。我不是实现者，下面每一个数�
+131	LEGIDonly	3:**验收方**：`acceptor-ticket131-run2`（本文件唯一作者；只读验�
+134	LEGIDonly	1:# 票 134 对抗验收（AC#1..AC#6）— `acceptor-ticket134-r1`，2026-09-23
+141	ORCH+LEGID	5:**性质**：**只读盘点**。本程**没有运行任何仪器**：零次 `g
+142	LEGIDonly	1:# 142-r1 — 两读不原子的守卫（实现方自证；裁决表须出自�
+143	NONE	
+144	ORCH+LEGID	7:- 派单里编排者写的每一句（含"读数是成立的"那几句）在�
+147	ORCHonly	3:- 被验版本：**`e572aa9435bfee310900f78422ec31984c41dc7b`**（＝编排者
+149	ORCHonly	5:- 本程角色：**实现程**。票面框一枚不勾（`Acceptance` 明写"�
+151	ORCH+LEGID	3:> 本件是**验收表**，不是实现件。派单＝`.scratch/wisp/dispatche
+152	ORCHonly	4:- 派单：`.scratch/wisp/dispatches/2026-09-26-095x-accept-152.md`（含文�
+153	ORCH+LEGID	21:| 派单给的锚点（`9181977`）与我读到的 | 派单写"编排者 14:4
+154	ORCH+LEGID	3:- 派单＝`.scratch/wisp/dispatches/2026-09-26-132x-accept-154-r1.md`（61 �
+155	ORCH+LEGID	3:- 派单：`.scratch/wisp/dispatches/2026-09-26-123x-accept-155-r1.md`（时�
+157	ORCH+LEGID	8:- ⚠ **编排者给的正控我全部复现，无一处不中**：派单 `:57
+162	LEGIDonly	1:# 162-v1 验收件（**非实现者**）— 票 162 的 AC#1／AC#2／AC#3／A
+183	ORCH+LEGID	1:# 183-a1 — 只读设计核：票 177 那枚"宿主自己写下的路径精�
+212	ORCH+LEGID	1:# 212-v2 对抗验收裁决（票 212 第 2 轮修码 212-r2；非实现者腿
+221	LEGIDonly	1:# 221 — 非实现者对抗验收表（腿 `221-v1`）
+257	ORCH+LEGID	1:# 257-v1 终裁件 — 票 257（干净机器上设置写不进去／形 ⓒ �
