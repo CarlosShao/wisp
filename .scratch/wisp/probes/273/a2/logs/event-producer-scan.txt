@@ -1,0 +1,132 @@
+### EvApprovalDenied prod_nonstatemachine_hits=0
+
+### EvApprovalGranted prod_nonstatemachine_hits=0
+
+### EvApprovalNeeded prod_nonstatemachine_hits=0
+
+### EvApprovalTimeout prod_nonstatemachine_hits=0
+
+### EvAudioDeviceLost prod_nonstatemachine_hits=0
+
+### EvBargeIn prod_nonstatemachine_hits=0
+
+### EvBrainFailed prod_nonstatemachine_hits=0
+
+### EvConfigInvalid prod_nonstatemachine_hits=0
+
+### EvConfirmExpired prod_nonstatemachine_hits=0
+
+### EvConversationOn prod_nonstatemachine_hits=0
+
+### EvDownloadCompleted prod_nonstatemachine_hits=1
+internal/models/bridge.go:64:	if _, derr := b.machine.Dispatch(statemachine.EvDownloadCompleted, nil); derr != nil {
+### EvDownloadFailed prod_nonstatemachine_hits=2
+internal/models/bridge.go:46:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:59:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+### EvErrorAck prod_nonstatemachine_hits=0
+
+### EvFirstToken prod_nonstatemachine_hits=0
+
+### EvInterrupt prod_nonstatemachine_hits=1
+cmd/balldebug/main.go:598:			dispatch(b, m, statemachine.EvInterrupt, nil)
+### EvKeyMissing prod_nonstatemachine_hits=0
+
+### EvKwsEnabled prod_nonstatemachine_hits=0
+
+### EvModelMissing prod_nonstatemachine_hits=1
+internal/models/bridge.go:40:	if _, err := b.machine.Dispatch(statemachine.EvModelMissing, nil); err != nil {
+### EvMuteKey prod_nonstatemachine_hits=1
+cmd/balldebug/main.go:603:		dispatch(b, m, statemachine.EvMuteKey, nil)
+### EvNetworkDown prod_nonstatemachine_hits=0
+
+### EvOnboardingCompleted prod_nonstatemachine_hits=0
+
+### EvPanicRecovered prod_nonstatemachine_hits=0
+
+### EvPathConflict prod_nonstatemachine_hits=0
+
+### EvPathLockReleased prod_nonstatemachine_hits=0
+
+### EvQueueDrained prod_nonstatemachine_hits=0
+
+### EvRepeatThreshold prod_nonstatemachine_hits=0
+
+### EvSettleExpired prod_nonstatemachine_hits=0
+
+### EvSpeakDone prod_nonstatemachine_hits=0
+
+### EvStuckAbandon prod_nonstatemachine_hits=0
+
+### EvStuckContinue prod_nonstatemachine_hits=0
+
+### EvSummon prod_nonstatemachine_hits=1
+cmd/balldebug/main.go:600:			dispatch(b, m, statemachine.EvSummon, nil)
+### EvTaskIntent prod_nonstatemachine_hits=0
+
+### EvTimeoutConversation prod_nonstatemachine_hits=0
+
+### EvTimeoutFirstRound prod_nonstatemachine_hits=0
+
+### EvTimeoutInSession prod_nonstatemachine_hits=0
+
+### EvToolsCompleted prod_nonstatemachine_hits=0
+
+### EvVadStop prod_nonstatemachine_hits=0
+
+### EvVeto prod_nonstatemachine_hits=3
+cmd/balldebug/main.go:596:			dispatch(b, m, statemachine.EvVeto, nil)
+cmd/balldebug/main.go:606:			dispatch(b, m, statemachine.EvVeto, nil)
+cmd/balldebug/main.go:608:			dispatch(b, m, statemachine.EvVeto, nil) // Listening veto
+### EvWakeWord prod_nonstatemachine_hits=0
+
+### EvWarmIdle prod_nonstatemachine_hits=0
+
+### EvWatchdogFatal prod_nonstatemachine_hits=0
+
+### EvWatchdogOverrun prod_nonstatemachine_hits=0
+
+### Event prod_nonstatemachine_hits=44
+cmd/balldebug/main.go:617:func dispatch(b *ball.Ball, m *statemachine.Machine, ev statemachine.Event, f *statemachine.Facts) {
+cmd/wisp/resident_approval_windows.go:929:func (u *ballCardUI) Update(_ context.Context, e approval.Event) error {
+cmd/wisp/run.go:1260:func (c consoleSink) Publish(e agent.Event) {
+cmd/wisp/run.go:1393:func (u *consoleApprovalUI) Update(_ context.Context, e approval.Event) error {
+internal/agent/approval/gate.go:307:				_ = g.ui.Update(ctx, Event{
+internal/agent/approval/gate.go:322:			_ = g.ui.Update(ctx, Event{Kind: EventDismissed, CorrelationID: corr, Text: why})
+internal/agent/approval/gate.go:340:			_ = g.ui.Update(ctx, Event{
+internal/agent/approval/gate.go:436:				_ = g.ui.Update(w.ctx, Event{
+internal/agent/approval/gate.go:554:			_ = g.ui.Update(ctx, Event{Kind: EventDismissed, CorrelationID: corr, Text: a.why})
+internal/agent/approval/gate.go:560:			w := Event{
+internal/agent/approval/gate.go:573:			_ = g.ui.Update(ctx, Event{Kind: EventDismissed, CorrelationID: corr, Text: a.why})
+internal/agent/approval/ui.go:70:// Event is one transient update about a live prompt.
+internal/agent/approval/ui.go:71:type Event struct {
+internal/agent/approval/ui.go:86:	Update(ctx context.Context, e Event) error
+internal/agent/approval/ui.go:93:	UpdateFn func(context.Context, Event) error
+internal/agent/approval/ui.go:106:func (u UIFuncs) Update(ctx context.Context, e Event) error {
+internal/agent/compress.go:234:		// the value is the id the Result and every Event of that run carry, so
+internal/agent/loop.go:462:			l.publish(Event{Kind: EvError, TaskID: taskID, Text: msg, Stop: turn.Stop})
+internal/agent/loop.go:480:			l.publish(Event{
+internal/agent/loop.go:485:				l.publish(Event{
+internal/agent/loop.go:512:	l.publish(Event{Kind: EvControl, TaskID: taskID, Verb: verb, Text: utterance})
+internal/agent/loop.go:552:			l.publish(Event{Kind: EvTextDelta, TaskID: taskID, Text: ev.Text})
+internal/agent/loop.go:554:			l.publish(Event{Kind: EvReasoningDelta, TaskID: taskID, Text: ev.Text})
+internal/agent/loop.go:723:		l.publish(Event{
+internal/agent/loop.go:862:		l.publish(Event{
+internal/agent/loop.go:897:		l.publish(Event{
+internal/agent/loop.go:909:	l.publish(Event{
+internal/agent/loop.go:921:	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err})
+internal/agent/loop.go:961:	l.publish(Event{
+internal/agent/loop.go:1039:func (l *Loop) publish(e Event) {
+internal/agent/sink.go:41:// Event is one loop publication. Fields are meaningful per Kind; Text is
+internal/agent/sink.go:44:type Event struct {
+internal/agent/sink.go:64:	Publish(Event)
+internal/agent/sink.go:71:func (NopSink) Publish(Event) {}
+internal/agent/sink.go:81:	events []Event
+internal/agent/sink.go:85:func (s *RecordSink) Publish(e Event) {
+internal/agent/sink.go:92:func (s *RecordSink) Events() []Event {
+internal/agent/sink.go:95:	out := make([]Event, len(s.events))
+internal/agent/sink.go:101:func (s *RecordSink) LastOf(k EventKind) *Event {
+internal/audio/wasapi_windows.go:289:	// Event handle (slot 13 SetEventHandle) for period-driven draining.
+internal/panel/pump.go:392:// done. The key the loop actually has is the task id (agent.Event carries
+internal/panel/pump.go:393:// TaskID, and Event has no per-chunk id of its own) - naming that here is the
+internal/proc/singleinstance_windows.go:67:		// Event existed (stale from a crashed instance): reuse it.
+internal/tools/subagent_197.go:520:func (s subagentTextSink) Publish(e agent.Event) {
