@@ -101,3 +101,19 @@ CI 里有一枚"格式普查"步，它把**版本库里跟踪着的每一枚 `.g
 - AC#3（真回归仍被看见）/AC#4（恒真性进攻）/AC#5（门禁＋还原）三格**未做**，且 AC#3/AC#4 依赖**落地之后**才有对象 ⇒ 落地腿 `275-r1` 交件后再派非实现者验收。
 - **`275-r1` 前置条件（缺一项就不许开工）**：① 本票 §3 的丁已裁并落台账 `A##`；② `attrib.sh` 属**票 161 的跟踪仪器** ⇒ 动它需要**具名解冻 `A##`**（先例 `A487`），⛔ 腿不许自解冻；③ 突变/临时件一律仓外，⛔ 不原地编辑共享工作树（§2(b) 那 13 枚字节就是"原地写的文件"怎么攒出来的现成反面教材）。
 - AC#5 里"CI 那一步真跑过且颜色如何"＝**〔待推送取数〕**：机主 10-07 已说"暂时不推远程"，⛔ 本机读数不许冒充 CI 读数（本仓第 109 条）。
+
+### 10-07 12:4x 收写码腿 `275-r1`（形丁已落地；四笔 commit `4dc6cab6`→`febca8f9`→`d10697eb`→`31261b4d`；编排者现量复跑）
+
+框数尺现量：本票 **6 枚框／3 勾（AC#0 AC#1 AC#2）／3 未勾（AC#3 AC#4 AC#5）**。⛔ 未 `-done`。★本轮**一枚框都没多翻**——落地的凭据出自实现者，翻勾要等非实现者（`275-v1`）复跑。
+
+**1. 我自己复跑的对回（⛔ 不引腿的读数）**：`sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only` ⇒ **rc=2／stdout 35 行／其中 `A-ROSTER` 33 行／stderr 那句"not readable by this ruler"一字未变**。首两行逐字＝`== (A) tracked tree: … (tracked .go files handed to it: 935)` ＋ `== (A) per-file roster gofumpt emitted before it hit an unparseable file (stdout; exit code unchanged, denominator unchanged):`。⇒ **落地前后只差"名字看不看得见"这一件事**：起手动读数 1 行（只那句 banner），现在带 33 枚名册。件＝`/d/tmp/wisp275r1-orch-stdout.txt`／`-stderr.txt`（我 12:4x 自跑）。
+- ★**§3 里我预判的那个风险不成立，腿量对了**：我担心"gofumpt 撞坏文件时可能整份名册都不出"⇒ 那丁就白改。实测 **33 行＝32 枚需格式化＋1 行 `fs_broken.go:4:1` 诊断** ⇒ 名册在退 123 的那一刻**已经在 `A_OUT` 里**，只是过去没人打印。⛔ 这条也顺手证明：**那枚坏样本没有阻断 gofumpt 点名其余文件**，它只污染了退码。
+- **边界我逐条现量（照 `A663` 的解冻口径）**：`git diff febca8f9^ febca8f9 -- attrib.sh`＝**只增 19 行、0 删**，全部落在 `A_RC -gt 1` 那一支的 `exit 2` **之前**；⛔ 退码没动、守卫没动、分母没动（`git ls-files --error-unmatch .scratch/wisp/probes/185/c1/mut/fs_broken.go`＝仍 **TRACKED**）；两枚别人的台件（`probes/241/v1/posctl/badly_formatted.go`／`probes/259/r1/gofumpt-negctl/probe.go`）与 HEAD **逐字节相同**（`git diff --numstat HEAD` 空）；`.github/**` 与那枚 `if: ${{ !cancelled() }}` 未碰。
+- **门没被做瞎**（腿自测、我认可其方向但读数由 `275-v1` 复跑才算凭据）：只差那一枚坏样本的那一发（临时索引）落地前后**逐字节相同**＝`lines=32 files=32`，工作树 CRLF 形；⚠ **CI 等价 LF 形的 19 枚那一发它没复现**（只报了"未复现"，⛔ 没冒充）。
+- 票 161 自己的自检载具 `attrib.sh --self-test` 在我审的这版上＝**rc=0（cases=8 fail=0）**，另有一发仓外"把分类器致盲"的拷贝 ⇒ **SELF-TEST RED rc=1（fail=4）** ⇒ 载具仍有牙。
+
+**2. ★记一枚本仓通用的坑（腿自己抓到，我的派单里没写、票面也没写）**：它最初把门禁读数存成 `*.out`，而 **`.gitignore:8` 是一条 `*.out`（全仓生效）** ⇒ 证据件**被静默跳过、根本没进 commit**，直到它自己发现并改名 `.txt` 重交（`31261b4d`）。⇒ 以后所有派单固定一句：**证据件的扩展名不许用 `.out`**（同族先例＝票 250 的"分母只数 stdout"、第 108 条的"过滤后 grep 空≠没跑"：**落盘没成功时，工具不报错，只是没人看得见**）。
+
+**3. 现场登记（不指控，具名来历）**：我这一轮把尺放到最宽（`-- .scratch/wisp/probes/161 .scratch/wisp/probes/275 .github scripts cmd internal docs frontend design`）时看见 8 枚 ` M .scratch/wisp/probes/161/r6/logs/flip-*.txt` 与 3 枚未跟踪目录（`161/r2/__pycache__`／`161/r2/ctl`／`161/r5/negative-control`），另有 `design/**` 一大片 ` D`/` M`/`??`。逐条量 mtime＝**flip 日志 10-03 11:2x–11:34、`__pycache__` 09-26 22:2x、`negative-control` 09-27 00:07** ⇒ **起手就在，非 `275-r1` 所动**（flip 那族"跑一次就脏自己的跟踪日志"是本仓已知行为）。⛔ 我不提交、不还原、不"顺手清理"别人的在飞物。
+
+**4. 下一步（派 `275-v1`，非实现者）**：AC#3（另造一枚**语法正确但没格式化**的样本，经临时索引证明选形落地后这类真回归仍被看见）、AC#4（对"打印名册"这一支做定向突变——把 `A-ROSTER` 那段注释掉/改成打印空串，指名判据必须红；⛔ 反形仍全绿＝这把尺对这件事不敏感）、AC#5（门禁四数＋还原自证＋**CI 侧〔待推送取数〕**）。三格里任何一格换成反形不红 ⇒ ⛔ 不许翻勾，并把那一格具名退回。
