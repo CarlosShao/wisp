@@ -13266,4 +13266,47 @@ dev 真身我现量重钉：挂载＝`main.tsx:58`（`<App />` **确实无 prop*
 **4. 它自报的两笔纪律细节（我核过，记档不指控）**：(a)(b) 两件事进了**同一笔** `355f05e2`（拆同一枚文件需要禁用的 `stash`/`checkout` 或一轮 revert），起手锚仍单独成笔 `dd71a487`；它起手量到的 HEAD 是 `381f18be`／porcelain 752，与我派单里写的 `3d443cb9`／753 差一枚——⚠ **那一枚差是我自己的**（`381f18be` 把票 276 从 `??` 提进了库里），它登记了来历、⛔ 没"顺手清理"。
 **5. 现场与边界**：全程**未起任何根模块 go 命令**（它自陈，我按 `cmd/**`＋`internal/**` porcelain 0 行复核）；⛔ 只 commit 不 push（机主 10-07：暂时不推远程）；`build/wisp.exe` 仍未还原（`A664`）；产码面 `cmd/**`＋`internal/**`＝**0 行**。
 
+---
+
+## A671｜2026-10-07 13:5x｜收只读普查腿 `35-a3`（页面读字段 × Go 侧真字段逐枚对账，三笔 `6a976294`→`0f0fdaf2`→`06408f3b`，件＝`.scratch/wisp/probes/35/a3/field-reconciliation.md` 246 行＋31 枚现量件）⇒ **票 35 的落地约束我钉死五条（换信封做正控＋三支分开文案），⛔ 本票 AC 框一枚没翻**；★本轮最硬的料是**它和我先前都不知道的一族既有钉**（`l2_grant_boundary_test.go` 按**词根**而非方向把"Go 答审批路由"钉成违规）；另**我自己那句更正写重了，就地改准（记我）**；新立〔待人拍板〕`Q-79`
+
+**1. 它复认／扩我的部分（三把我自己复跑的尺，全部一手）**：`git diff HEAD 16c2f038 -- frontend/src/lib/panel.ts`＝**0 行**（两树各 311 行）⇒ 这条**比我的派单转述更极端**——我派单写"dev 上是另一份较旧的页面源码"，旧度与枚数都对（`App.tsx` 117↔531、`frontend/src` 64↔85 枚），但**契约件本身两树字节相同**，所以"页面读什么"这一侧没有新旧两版；`git grep -n -E 'panel\.approval\.request' HEAD -- '*.go' ':!*_test.go'`＝**0** 且 `HEAD:internal/panel/bridge.go:148` 的 `case` 一次列全 6 枚不含它 ⇒ 入向名册确实不答这枚；三道守卫行号逐枚 `grep -n` 对过（解析 `:128`／名册 判 `:132` 拒 `:133`／来源 判 `:135` 拒 `:136-137`／requestId 判 `:139` 拒 `:140-141`），`DecideFromPanel`＝`internal/agent/approval/gate.go:736`（allow 拒 `:737-746`，reject 走 `:748`）。⚠ 它引 `gate.go:640-642` 是**注释**、我引 `:736` 是**代码**，两层都对，⛔ 以后别混引。它的写面归位尺我复跑＝`git status --porcelain -- .scratch/wisp/probes/35/a3`＝**0 行**；全程零 `go` 命令、零 `checkout`／worktree、`frontend/**`＋`design/**` 零写入、⛔ 未 push。
+
+**2. ★它顶回我票面 `:77` 那枚行号区间＝对，票面已就地更正**：`bridge.go:42-45` 只有 **4 枚**（`config.get`/`config.set` 在 `:66`/`:67`、`:46-65` 是"为什么不加 `panel.` 前缀"那段注释、`case` 表在 `:148`）——**枚数我一贯是对的、区间是没数过顺手写的** ⇒ 第 119 条那一族，原句不抹、更正追加。
+
+**3. ★三处推翻，其中一处推翻的是我自己**：
+- 它 §3-b 把 `:135`／`:139` 算成那枚 approval 信封"还会撞到的第三层"＝**不成立**（名册守卫在最前，那枚信封只可能在 `:133` 被拒；它"这两道先于路由"那半句是对的）。
+- 它 §3-b 那句"全仓命中只有 `composer_test.go:417` 与 `frontend_hygiene_test.go:32`"＝**假枚举**。尺＝同一把 `git grep -n` **去掉** `':!*_test.go'` 过滤：HEAD 现量 **17 行／3 枚文件**，其中 `internal/panel/l2_grant_boundary_test.go` 一枚占 **15 行**。形＝它自己 §7 刚认过的那族（把加了过滤的清单当成全仓清单）。
+- ★**我自己写重的那句**：我 13:4x 在票面写的"腿那句『`:135`/`:139` 先拒』是错的"**比原句更错**（原句只是将范围算宽，我那句把它说成整句颠倒）。已改成"它把这两层算成那枚信封会撞到的后续拒绝＝不成立，另半句对"。**记我**：更正别人时不许把原句换成一枚更重的判断——"定性词不许重于证据"这条对腿成立，对我同样成立。
+
+**4. ★本轮最硬的新事实（我 13:5x 现量，它整族漏了）**：`internal/panel/l2_grant_boundary_test.go` 今天已经把"Go 答审批路由"钉成违规，且**判的是词根不是方向**——`grantRouteWords` **10 枚**（`:192-195`，含 `approval`/`decide`/`verdict`）、`grantFieldWords` **19 枚**里含 **`outcome`**（`:183-188`，**正是页面那枚信封的键名**）、候选名 **11 枚**第一枚就是页面原文（`:1251-1267` 要求 `knownComposerMethod` 拒它们全部）、`:2274` 那发突变要求"bridge.go 答了它"必须被点名、`:1275-1289` 那道 pool 审计还会抓"经另一枚函数答"的路由。尺＝`grep -c l2_grant` 在它 246 行正文＝**0** ⇒ 它 §4.2 那张"落地会撞到的既有钉"表（11 组）**恰好漏掉这一格里最强的一族**。后果写进票面 (d)-1：那格的新料**不是**"审批被拒"（既有钉已覆盖），而是**经页面真用的传输到达**＋**点名是哪一道守卫的文案**，⛔ 不许拿"既有那枚已覆盖"抵账。
+
+**5. 我据此起的落地约束（票 35 那枚 10-07 新框，⛔ 不改它四件要求、只钉用哪枚信封）**：(a) 到达性正控换成**名册内**那枚页面原文信封 `HEAD:frontend/src/lib/panel.ts:246`（`sendRequest` 在 `:211` 会给每请求带 `requestId`＋`source:"panel-composer"`，正是 `:135`/`:139` 要的两枚形状字段）——⛔ 照原框用 approval 信封直落的话，`dispatchRaw` 到达性那一格**结构上永远红**；(b)(c)(d) 三支拒绝各钉各的文案：未注册名＝`:133`、名册内但来源不符＝`:136-137`、名册内但缺 `requestId`＝`:140-141`，⛔ 三支不许共用一句（第 120 条那一族）。另⛔ 35-r1 里不许顺手扩快照字段：那要撞"四键字节钉"**三处**（`pump_test.go:123`、`:291`、`subagent_roster_197_test.go:214`，逐字 `!= "composer,generatedAt,pending,results"`；**它只报了两处**），属另一枚具名解冻面。
+
+**6. 五档计数收下并分凭据层级**（⛔ 不当常量）：同名同义 **41**／同名不同义 **0**／异名同义 **7**／Go 有页面不读 **15 项（展开 45 子键）**／页面读、Go 没有 **4**。只有最后一档我抽验两枚（`panel.approval.request`、`snapshot.view` 读 `HEAD:internal/panel/composer.go:57-92` 全结构无 view）；**41／0／7 三档我没逐枚复跑**，且"同名不同义＝0"它自陈是**读码判**（零运行时）⇒ 引用前必复跑。
+
+**7. 它 §7 那句 dirty 归位解释＝不可复现（原句不抹，降档读）**：它写"起手登记的 8 枚 ` M probes/161/r6/logs/flip-*.txt` 在终态已从 status 消失＝别的腿在此期间自己入库"（第三笔 `06408f3b` 重述一遍）。我 13:54 现量：那 8 枚**仍是 ` M`**、另多 1 枚 `?? flip-7.txt`（共 9 行），而 `git log -- …/flip-1.txt` 最新一枚是 **09-27 16:37 `422c1bc7`**，13:40–13:44 无任何提交动过它。⇒ 它那三枚数（752／781／752）里**"差集怎么来的"那一半不成立**，"只有自己的写面被动过"那一半成立（第 1 条那把尺＝0 行）。
+
+**8. 〔待人拍板〕`Q-79`（与 `Q-76` 同族，⛔ 不阻塞 35-r1）**：面板上那张审批卡的**「拒绝」按钮今天点了没有用**。三层分开——① 「允许」被服务端**一律拒**是**裁决不是缺口**（`gate.go:737-746`＋AGENTS.md §1.2 禁"面板侧来源的 L2『允许』"，⛔ 不动）；② 「拒绝」那一支的**能力在**（`:748 g.q.reject(…)`）、**入向路由不在**；③ 补路由不是"加一枚名册"那么便宜：名字要避开 `grantRouteWords` 那 10 枚词根、载荷要换掉 `outcome` 那枚键形、还要过 `:1275-1289` 的 pool 审计，而**加名＝改 C17 白名单＝契约变更须人工批准**。**只有他能答的那格**：要不要让"在面板上点拒绝"真的把任务停下来。〔已证〕＝①②③三层都有码证；〔未做〕＝没有第三种形状的代价表（要出得再派一枚只读普查）。**默认动作＝不填**（35-r1 只解"在册那几枚能不能到"，票 264/`Q-76` 那族照旧按住），不答的代价＝面板上的拒绝键继续只是一枚画在页面上的按钮。
+
+**9. 排程**：`cmd/wisp` 写面仍被 `274-v1` 占（票 275 AC#5 那半欠我一次 `go vet ./cmd/wisp/`，⛔ 不同批）⇒ **35-r1 继续按住**，料已齐（本条 5＋票面那五条约束＋它 §4.2 那 11 组既有钉）。⚠ 派 `35-r1` 时**必须**在派单里带上第 4 条那族的具体行号，否则它会照它 §4.2 那张表避坑、避开 11 组而撞上第 12 组。
+
+---
+
+## A672｜2026-10-07 14:0x｜★**长度帽那道卫生门在我收 `35-a3` 现跑时是红的**（over-budget 60 vs roster 57，三枚 not-in-roster 正好是票 273/274/275），三枚都是 10-04 立规矩**之后**开的 ⇒ 走不了豁免那一支，改名收掉（`f67af953`，三枚 100% 相似＝内容一字没动）；**红因里有一枚是我自己造的（票 275 是我的 106 字符名）**，另两枚是别的腿造的，⛔ 不指控、只登记机制；撤销口令「撤 A672 改名」＝把三枚退回旧名并让门照旧红
+
+**1. 起手现量（尺＝`sh scripts/check-path-length-budget.sh --with-self-test`，13:5x）**：⇒ **rc＝1、`VERDICT RED`**，逐字三句：`count guard: the roster holds 57 entries, the tree has 60 over-budget tracked paths`＋三行 `RED - over budget and NOT in the roster`＝票 **273**（name **107** 字符）／票 **274**（**105**）／票 **275**（**106**）；band 行 `over the hat=60`。**红不是我这笔改动造的**（我只改 `.md` 正文，没改名），是**文件落库时就已经越帽**。
+
+**2. 为什么只能是改名（⛔ 抬帽是禁区，不是我的偏好）**：`scripts/check-path-length-budget.sh:57` 逐字把 `file-name length > HAT_NAME_LIMIT = 100` 绑到 **README 规矩 9**，`:65` 写明它是这枚文件里**唯一**的阈值旋钮，`:71-72` 更指名"把 `HAT_NAME_LIMIT` 抬到 180/206/217 来静音一发红"就是**票 262 列在"forbidden actions"里的那一枚编辑**。另一支是往 roster 加豁免，但现有豁免理由的形状是逐字 `hist: ticket filed before README rule 9 (100-char hat, added 2026-10-04)`——这三枚**都开在 10-04 之后** ⇒ 那条理由是假话，豁免这条路走不通。⇒ 处置＝改名，先例＝规矩 9 自己的出处 `A584`（"数字更正与 **9 枚改名**"）。
+
+**3. 改后的名与读数（只减 slug、语义一字没丢）**：
+- `273` → `…builds-state-machine-without-a-sink-so-every-d43-effect-falls-into-no-op.md`（107→**96**；去掉 `the-`、`side-`、`a-` 三处虚词）
+- `274` → `no-nail-requires-shipped-exe-to-carry-page-build-ps-step-2-comment-is-false-in-both-halves.md`（105→**97**；去掉两处 `the-`）
+- `275` → `tracked-gofumpt-denominator-carries-deliberately-broken-sample-so-guarded-census-step-exits-2.md`（106→**100**；去掉 `a-`/`the-`，**保留 `deliberately`**——那枚"故意种进去的坏样本"是本票的命门，不许被改名改没了）
+- 同尺改后现量＝**rc=0、`VERDICT GREEN`**，`denominator: tracked paths=7405  over-budget=57  covered by roster=57  not in roster=0`，`bands: over the hat=57 … in the wall interval=0`，`unit cross-check: the byte view and the character view select the SAME 57 paths`。⚠ 顺带一枚分母变化具名报回：**tracked 从 10-06 21:3x 的 6026 涨到 7405（＋1379）**，尺＝`git ls-files | awk -F/ '{print $1"/"$2}'` 归因，**5922 枚住在 `.scratch/wisp`**（编队这两个月的证据件），⛔ 不是任何越帽件；引用分母的旧账（5594/5316/5536/6026）全部按"带锚点才可用"降档读。
+
+**4. 旧路径的引用面（⛔ 一律不改写，本条＝唯一对照表）**：尺＝三枚旧 slug 片段各 `git grep -l <pat> HEAD` 取并集去重＝**13 枚已入库件**还写着旧名——`probes/273/**` 5 枚（`a1/census.md`·`a2/machines.md`·`a3/census.md`·`a3/logs/census-before-reorder-backup.txt`·`a3/logs/25-final-restoration-selfcheck.txt`，最后一枚引的是 **275** 的旧名）、`probes/274/**` 4 枚（`a1/census.md`·`a2/logs/s1-exe-producers.txt`·`a2/logs/s1s2-extras.txt`·`r1/impl.md`）、`probes/275/a1/census.md`、`.scratch/wisp/probes/msg-a652.md`、`.scratch/wisp/probes/merge-dryrun/1/dryrun.md`、本台账。⇒ **以后任何人按旧名 grep 到的是死路径，回到本节换名**；⚠ 特别具名：**`274-v1` 那条验收腿的派单里写的是旧票面路径**，它若报"票面找不到"＝**这是改名不是丢件**，按本节对照表接。
+
+**5. 我欠自己的一笔（记我不记腿）**：规矩 9 是**我** 10-04 代笔立的（`A583`/`A584`），而 **10-06 我开票 275 时没量自己的名**（106 字符）——同一天别的腿开的 273/274 也越帽，说明**这条规矩今天没有任何自动的东西在开票那一刻拦着**：`check-path-length-budget.sh` 只在**跑门禁时**才红，而门禁是腿自己在交件前跑（没人强制开票者跑它），CI 那一步（`.github/workflows/ci.yml:166`）看的又是**已推的树**（机主 10-07：暂时不推远程 ⇒ 下一次推送才会第一次点红）。⇒ 〔待办，归我自己〕：**立一枚"开票即量名"的小尺**（一条 `awk length>100` 扫 `.scratch/wisp/issues/*.md`，交件/派单前置清单里跑一发），并把"开新票必须先跑它"写进 `issues/README` 规矩 9 那一节；这一格**不需要**机主拍（纯纪律、可逆、零功能），我按告知式做，撤销口令「撤 A672 改名」只退改名、不退这条尺的立意。
+
 
