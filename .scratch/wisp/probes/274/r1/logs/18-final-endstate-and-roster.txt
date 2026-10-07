@@ -1,0 +1,72 @@
+=== my commit roster (oldest first) ===
+77e278bf 11:50 274-r1: start anchor (write leg, ticket 274, form = B-1)
+35633445 12:02 274-r1: build.ps1 step 2 now builds the page and fails if it cannot (form B-1)
+58f1df8e 12:03 274-r1: evidence logs and sections 1-7 for ticket 274
+
+=== git show --stat HEAD (evidence commit) ===
+commit 58f1df8e682ef8465a1abe6873ff849051133c57
+Author: CarlosShao <1933942520@qq.com>
+Date:   Wed Oct 7 12:03:19 2026 +0800
+
+    274-r1: evidence logs and sections 1-7 for ticket 274
+    
+    Probe leg deliverable for the write half of ticket 274 (form B-1, landed in
+    scripts/build.ps1 as 35633445). No AC box is ticked here - boxes are the
+    orchestrator's to翻 on non-implementer evidence.
+    
+    What is measured, and by which run:
+    
+    Section 1 is the pre-fix reading, which is the ticket's whole claim: build.ps1
+    run the way CI runs it, on a tree whose frontend/dist holds only the tracked
+    anchor file, exits 0 all the way through the smoke test and ships an exe that
+    answers "wisp panel-assets: assets NOT BUILT" rc=1. The tooth exists and no
+    step bites it; all three panel-assets branches were run, not just the default.
+    
+    Section 3 runs both directed mutations twice each, with exit-code lines and the
+    full named red cause pasted, and records a defect this leg found in its own
+    code from the first pass (node version was probed as `node version`, which
+    throws "Cannot find module ...\\version" and logged an empty version) - fixed
+    to --version and both mutations re-run against the final code.
+    
+    Section 4 is AC#9 done the way the ticket demands: fresh build produced by the
+    fixed step itself (npm ci branch forced by moving node_modules aside), then the
+    exe's own panel-assets -manifest rows compared name-by-name and
+    sha256-fingerprint-by-fingerprint against the files on disk, with -check
+    showing the entry HTML's two asset refs resolve to those same two names inside
+    the binary. The stale local dist is shown to be a different bundle, so a file
+
+=== git show --stat HEAD~1 (the fix) ===
+    new line; the four remaining non-ASCII lines are the pre-existing U+00A7.
+    No Go file, no ci.yml, no frontend file, no .gitignore rule was touched.
+
+ scripts/build.ps1 | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 95 insertions(+), 2 deletions(-)
+
+=== final porcelain -- cmd internal scripts tools .github docs frontend ===
+(empty = back to start except my committed work)
+
+=== final dist state (must equal the stale baseline) ===
+frontend/dist/.gitkeep md5=d41d8cd98f00b204e9800998ecf8427e
+frontend/dist/assets/index-BRKj5OIJ.css md5=db4db7a27fb34e3de7acf045561d753a
+frontend/dist/assets/index-BVKlegVD.js md5=70128a3dfdbc73e9f603bb421cdf324c
+frontend/dist/index.html md5=f98bfc4ba5dd39d74c9b2f85438de70a
+diff -r rc=0 IDENTICAL to backup
+
+=== final build.ps1 md5 / lines / non-ascii ===
+644c2f6af1fa3fc7f8b3ab38c20753f5 *scripts/build.ps1
+265 scripts/build.ps1
+4
+
+=== node_modules back where it started? ===
+present (original tree restored)
+dist-fresh-274r1
+dist-stale-backup
+dist-stale-staging
+fake-npm-shim
+mut-i-no-node.ps1
+mut-ii-stub-npm.ps1
+node-modules-generated-by-npm-ci
+node-modules-pre-274r1
+parse-check.ps1
+run-build.ps1
+wisp.exe.pre-274r1-backup

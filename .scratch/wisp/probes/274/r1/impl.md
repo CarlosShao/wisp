@@ -334,3 +334,35 @@ fresh build 的 3 枚产物也**没删**（`/d/tmp/wisp274r1/dist-fresh-274r1/`�
 13. **日志里含一枚 U+2713**：`logs/13` 捕到 vite 自己那句 `✓ built in 484ms`。那是**被捕获的工具输出**，⛔ 不是本腿写的界面文案，
     且 d22scan 射程不含 `.scratch/`（§0/§5）。我**没有**为好看而抹它——改日志原文比留着它更糟。
 
+---
+
+## 8. commit 名册与终态自查（`logs/18-final-endstate-and-roster.txt`）
+
+三笔，全程 `git add` 与 `git commit` 都带显式 pathspec 字面量，⛔ 零 `add -A`／零裸 commit／⛔ 零 push：
+
+| 笔 | 时刻 | 内容 | `git show --stat` 的文件面 |
+|---|---|---|---|
+| `77e278bf` | 11:50 | 起手锚（§0） | `impl.md`＋`logs/00,01,02`＝4 files, 182 insertions |
+| `35633445` | 12:02 | 产码（乙-1，§2） | **1 file changed, 95 insertions(+), 2 deletions(-)＝只有 `scripts/build.ps1`** |
+| `58f1df8e` | 12:03 | 证据（§1–§7） | `impl.md`＋`logs/03..17`＝16 files, 784 insertions |
+
+★每一笔落地前后我都查了 staged 面：起手那笔之前 `git diff --cached --name-only` ＝ 空；
+产码那笔之前同样只有我自己的 `scripts/build.ps1` 进入提交（`git show --stat` 原文已贴在本节与 commit 里）
+⇒ 没有把别人已 staged 的文件一起提走（今天 `8d30a862`／`ca4ae2af` 那两发的事故形，本腿零复发）。
+
+终态（全部现读，`logs/18`）：
+
+```
+git status --porcelain -- cmd internal scripts tools .github docs frontend   ->  空（＝起手那一条，我的写面已入库）
+frontend/dist  4 枚 md5 逐枚 = 起手基线；diff -r frontend/dist /d/tmp/wisp274r1/dist-stale-backup -> rc=0 IDENTICAL
+scripts/build.ps1  md5=644c2f6af1fa3fc7f8b3ab38c20753f5  lines=265  非 ASCII 行数=4（全为原有 §，无新增）
+frontend/node_modules  present（原树移回原位；npm ci 重建的那棵另存仓外，未删）
+```
+
+仓外留存的临时件（⛔ 一枚未删，`issues/README` 规则 8）：
+`dist-stale-backup/`（改前 dist 原件）、`dist-stale-staging/`（移出用的空壳）、`dist-fresh-274r1/`（本次 fresh build 的 3 枚产物）、
+`node-modules-pre-274r1/`（起手那棵 node_modules 的中转）、`node-modules-generated-by-npm-ci/`（`npm ci` 重建的那棵）、
+`wisp.exe.pre-274r1-backup`（起手 exe）、`fake-npm-shim/npm.cmd`（突变 (ii) 台架）、
+`mut-i-no-node.ps1`／`mut-ii-stub-npm.ps1`／`run-build.ps1`／`parse-check.ps1`（台件）。
+
+
