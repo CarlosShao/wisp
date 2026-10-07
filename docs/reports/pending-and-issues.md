@@ -13130,4 +13130,72 @@ dev 真身我现量重钉：挂载＝`main.tsx:58`（`<App />` **确实无 prop*
 ⚠ 另有一格必须先量：**这套传输到底是不是 spec 写死的**——若 `docs/specs/SPEC-08`／`PLAN.md` 那句写的是 `AddHostObjectToScript`，则今天的实现与文档相反，修法方向由文档定、不由我裁（票面 §3 已埋这枚问句）。
 本票写腿**继续按住**：`cmd/wisp` 写面此刻由 `274-r1` 的构建与门禁占着（包级互斥）。⛔ 只 commit 不 push；`winlive` CI 那档继续禁；产码面六族路径＝**0 行**。
 
+## A663｜2026-10-07 12:2x｜收 `275-a1`（只读普查：tracked gofumpt 分母）＋★**我票面的一处归因被我自己的尺推翻**（32↔19 的差不是 `go.mod`，是行尾符）⇒ 票 275 翻 AC#0/AC#1/AC#2、裁形**丁**、并落一枚**具名解冻**给 `275-r1`（编排者）
+
+**1. 我复跑的四把（raw 全仓外 `D:/tmp/wisp275-orch/`，工作树字节零改动）**：未改动仪器 `attrib.sh --tracked-only`＝**rc 2／stdout 1 行／stderr 一句"the tracked tree is not readable by this ruler"**（935 枚交给 gofumpt，它退 123）；
+临时索引只差那一枚坏样本＝**934 枚／rc=1／stderr 0 字节／`TRACKED-DIRTY` 行 32 枚** ⇒ ①"935 里恰好 1 枚不可解析"由**两把**钉死（不是数 stderr 行数）；②★**剔掉坏样本并不转绿** ⇒ 票 275 §1 那句"要么把分母口径修对（⇒ 就不红）"**归因归错一档**：`fs_broken.go` 只解释 `exit 2`，**完全不解释 `exit 1`**。AC#2 走票面自己写的"若仍红⇒成因判错并扩列"那一支，框翻的是"这把尺跑过且有原始读数"。
+- CI 等价形（`git archive HEAD` 全仓导出，含根 `go.mod`，**LF**）点名 **19** 枚，**产码 0 枚**（19/19 全在 `.scratch/wisp/probes/**`）。
+
+**2. ★记我自己写错的那处（票 275 `:35`，原句不抹）**：我当时把"32 vs 19"记成"含不含 `go.mod` 上下文"。现量真身＝**行尾符**：两形的差＝**13 枚**，逐枚量 ⇒ **13/13 在工作树里是 CRLF**（`cmd/wisp/models.go` 334 行带 `\r`、`internal/risk/provenance.go` 1115、`internal/tools/bridge.go` 1280、`internal/agent/tools.go` 225、`internal/agent/approval/pending_read.go` 131 ＋ `probes/257/r2/mut/M1..M8` 八枚）。
+`.gitattributes` 写 `*.go text eol=lf` 而本机 `core.autocrlf=true` ⇒ `git status` 因 clean-filter 归一化**报干净**、盘上字节却是 CRLF ⇒ `gofumpt -l` 把这 13 枚报成"要格式化"。**这 13 枚不进 CI 分母**（检出按 `eol=lf` 落 LF）。
+真被 `go.mod` 左右的只有 **1 枚**（腿 18 ↔ 我 19 那一枚差）＝`probes/263/v1/src/main.go`，规则＝`os.WriteFile(out, b, 0644)` → `0o644`；我在"上面有 `go.mod`"与"无 `go.mod`"两处各跑一遍**只有前者点名** ⇒ 腿的 18 与我的 19 **都合法**，引用时必须同批说清上下文。
+⚠ **尺的尺（第 108 族）**：判 CRLF ⛔ 不许用 `grep -c $'\r'`（它对同一批文件给出过假 0），要用 `od -c` 或 `tr -cd '\r' | wc -c`。
+
+**3. ★扩列的真红因里躺着两枚别人的台件，⛔ 不许当格式回归顺手格式化**：`probes/241/v1/posctl/badly_formatted.go`（票 241 的**正控**）与 `probes/259/r1/gofumpt-negctl/probe.go`（票 259 的**负控**）⇒ "把这 19 枚改绿"＝摘掉两枚既有仪器的牙，与票 111"不许撤步骤"同族禁止。
+
+**4. 裁形＝丁（票面三形之外我新造的一支，⛔ 不是把三形压低）**：**丁＝`attrib.sh:338-344` 那一支在 `exit 2` 之前先把 `A_OUT` 逐枚名册打到 stdout**——退码照旧 2、守卫照旧、分母照旧不缩。代价＝零；收益＝把"那一步红了但零具名"这一格消掉（今天的形状是 stdout 只有 1 行）。⚠ 丁**不**结 `exit 1` 那桩（那 19 枚要甲/丙 单独裁，而我预判甲比丁代价大得多：它让门对 19 枚全体失明，含两枚台件）。
+**"不做"那一支摆明**：不动仪器 ⇒ 下次推送那步红且**名册零枚**，后果不是"什么都没发生"，是**票 111 刚买的守卫退化成一枚不会说话的红**。⇒ 我不选它，但它必须在票上。
+
+**5. ★具名解冻 `A663`（本票自己就是这条记录，⛔ 腿不许自冻自解）**：**文件**＝`.scratch/wisp/probes/161/r5/attrib.sh`（票 161 交付的跟踪仪器）；**行**＝`:338-344` 那一支，只准在 `exit 2` **之前**加"逐枚打印 `A_OUT`"；**理由**＝本票 AC#2 现量证到 `exit 2` 的红零具名，而票 111 AC#2 要求"红名逐条登记"；**边界**＝⛔ 不改退码语义、⛔ 不缩分母、⛔ 不排除 `.scratch/**`、⛔ 不动 §3 那两枚台件、⛔ 不碰 CI 步骤与 `if: !cancelled()` 守卫；**撤销口令**＝**「撤 A663 解冻」**（把 `attrib.sh` 退回 `git show HEAD:.scratch/wisp/probes/161/r5/attrib.sh`）。
+
+## A664｜2026-10-07 12:4x｜收 `274-r1`（写码腿：`build.ps1` 第 2 步真构建前端，形**乙-1**，`35633445`）⇒ 票 274 翻 AC#3/AC#5/AC#9；★★**`git archive` 那把"干净检出"尺是假的**——它把 `text=auto` 的页面源件转成 CRLF，而工作树是 LF ⇒ 我之前所有"fresh build 名册"都带着这一枚未控变量（编排者）
+
+**1. 落地的对回（我现跑）**：`35633445`＝**1 枚文件／95 插入／2 删除**，只有 `scripts/build.ps1`（172→**265** 行）；六族路径 porcelain＝**0 行**；`git ls-files frontend/dist` 仍＝**1 枚**（票 77 AC#1 那条 `dist/*` 规则没被绕）；
+`build/wisp.exe panel-assets` 现跑＝`4 files, entry=index.html built=true` **rc=0**，`-manifest` 逐枚＝`index-B8yINMF1.js 551989 8f06145dac449fb6`／`index-yy8KMgdf.css 49540 d0b198664b250973`／`index.html 1044 9b7856b949d63989`／`.gitkeep 0 e3b0c44298fc1c14`。
+★**AC#9 那把对拉尺我自己跑**：腿留在仓外的 fresh 产物拷贝 `/d/tmp/wisp274r1/dist-fresh-274r1/` 逐枚 `sha256[0:16]`＝上面三枚**逐字节全等** ⇒ **AC#9 成立**，⚠ 但**只成立在同上下文那一半**（见 §2）。
+
+**2. ★★我 12:2x 又建了一次仓外导出（`/d/tmp/wisp274-det2`，`npm ci` rc=0 ＋ `npm run build` rc=0），出来的仍是 `index-vdBrT8rM.js 552027`／`index.html 1068`——与仓内那枚 `B8yINMF1 551989`／`1044` 不同。这次我没停在"构建不确定"那句省事话上，起了字节尺**：
+`od -c` 示导出份行尾 `\r\n`、工作树份 `\n`；`tr -cd '\r' | wc -c`＝**导出 24／工作树 0**；`frontend/index.html` 尺寸＝**968（导出）vs 944（工作树＝HEAD 字节）**。
+⇒ 真身＝**`.gitattributes` 对 `*.html/*.tsx` 只写 `* text=auto`，本机 `core.autocrlf=true` ⇒ `git archive` 把页面源件落成 CRLF，而工作树那批是工具直接写的 LF**；vite 读进去的字节不同 ⇒ 产物名册与 `index.html` 大小跟着行尾符变（24 字节＝逐行多一个 `\r`）。
+⇒ **三处后果**：①**更正票 274 `:54`（AC#9 那格）里"用 `git archive HEAD` 导出后在仓外新建的那份"这个称法**——它不是"当前源码的 canonical 产物"，是**另一套行尾符下的产物**；AC#9 现按可读形状重述＝"exe 内嵌物 == **同一次运行**里 dist 的产物"。②我在收 `274-a2` 那节末写的"构建非确定性未定因"**作废**：两枚不同路径的仓外导出名册**相同** ⇒ 不是非确定，是行尾符**确定性**分家；⛔ 记在我头上——**我拿着一把会改输入字节的尺，却叫它"干净检出"**。③**CI 的 exe 页面字节今天仍不可预测**（`actions/checkout` 落什么行尾＝〔待推送取数〕）⇒ 任何跨上下文字节相等都不许当判据，这条已写进票面 AC#9 更正。
+
+**3. 三枚翻／四枚不翻（逐格具名，⛔ 没有一格按腿的自述翻）**：翻 **AC#3**（`:74` 那句会印进 CI 日志的谎话改成实话；⚠ 两点如实登记：它同时实做了第 2 步——那句"不许同时实做"禁的是**未经选形的顺手实做**，本票已裁乙-1 ⇒ 条件已满足但**字面被越过**，记在编排者裁形不记成腿违规；它另改了 `:10` 头段＝**超出简报**，我采纳，**撤销口令「撤 274 头段」**）／**AC#5**（numstat 只有 `build.ps1` ⇒ 零新契约面）／**AC#9**（§1 那把哈希对拉）。
+⛔ 不翻 **AC#1/AC#4**（腿跑了未修码读数与两发定向突变——含"npm 谎报成功而 dist 只剩锚文件" ⇒ `FATAL … the exe would ship with zero page bytes` 非零退出——但读数**出自实现者**，我没自跑 ⇒ 归 `274-v1`）／**AC#6/AC#7**（整包逐名作差未取；`-overlay` 半句腿没用，走 `mv`＋逐枚 md5 还原，三次动 dist、一次动 `node_modules`，我现量终态＝起手）／**AC#0/AC#2/AC#8**（要 run 侧取数；AC#8 属 `SPEC-11 §2.2` 归属，⛔ 本票不选形）。
+
+**4. 现场三件我裁（各带撤销口令）**：①**`build/wisp.exe` 保留新的、不还原**（起手那份在 `/d/tmp/wisp274r1/wisp.exe.pre-274r1-backup`，10-06 16:57／31,076,405／md5 `7032d94d…`；我现量无 `wisp` 进程在跑 ⇒ 覆盖没打断任何人）——口令**「还原 274 前 exe」**；②本机那 3 枚陈旧 dist（09-27）`mv` 出→跑完→`mv` 回，md5 逐枚＝起手基线 ⇒ "不许为读数好看动陈旧件"没被破；③`frontend/node_modules` 原件已移回，`npm ci` 那棵另存仓外。
+
+**5. ⚠ 一条环境事实登记，⛔ 归别人**：`git status --porcelain -- design` 现量＝**4 枚 ` D` ＋若干 ` M`**（`design/assets/base.css`／`icons.js`／`theme.js`／`tokens.css` 等），起手即脏、非本波任何腿所动 ⇒ `274-v1` 与后续腿都**不许碰、不许"顺手清理"、不许算进本票作差**。
+
+## A665｜2026-10-07 12:5x｜收 `35-a2`（只读普查：桥的传输形状代价）⇒ ★**它顶回我票面那句"`Dispatch` 7 枚调用点"，那枚数它对**；票 35 新增第 8 枚框（入向判据必须真经这条边）＋我裁形＝**甲的子形①**（编排者）
+
+**1. 它改我那枚枚数（我复跑坐实）**：票 35 `:96` 我写"泵到面板线程的路真在（`Dispatch` **7** 枚调用点）"。全仓非 test `Dispatch(`＝**7** 这个总数没错，⛔ 但其中属 **WebView2 面板线程泵**的只有 **1 枚**＝`cmd/wisp/panel_resident_windows.go:360`（`post()` 内 `:349-372`，两态路由 `Dispatch`／`tasks`），**其余 6 枚是状态机族同名方法**。⇒ 正确口径＝"面板线程 `Dispatch` 调用点＝**1 枚**"。★这是**同名符号凑分母**（第 107 条那一族），**这次是我自己踩的**；票面 `:96` 后已加就地更正引用块，原句不抹。
+
+**2. 规格射程（它问题①，我复跑）**：`docs/PLAN.md` 与 `docs/specs/**` **没有任何一句写死传输方式**（三个候选拼写全 0，命中只在 evidence/ledger）；被写死的只有依赖名 `SPEC-08:145`（`jchv/go-webview2`）与资源通道 `SPEC-08:148-149`（`AddWebResourceRequestedFilter` ＋ 禁 localhost HTTP）。⇒ 选形不被规格绑；但乙形若把库从 `go.mod` 摘掉＝同时撞 `SPEC-08:145`＋既有钉 N4。
+
+**3. ★★恒真性那一格是本票最值钱的（我复认）**：**今天没有任何既有钉能分辨"页面的请求到不到 Go"**——N2/N3（`internal/panel/bridge_test.go:162`、`composer_test.go:510/:518-522`）数**页面词面**（甲不动页面⇒恒绿）；N1（`inbound_roster_253_test.go:419`）数 **Go 名册**（与传输无关⇒恒绿）；★**N6 更硬**：`cmd/wisp/panel_resident_windows_test.go:301/:801/:805/:808/:864` 这些真机用例**今天就是"从 `w.Eval` 里直接叫 `window.wispDispatch(…)`"**＝**测试自己扮演页面**，甲落地后照旧绿 ⇒ 对这条边**零分辨力**。
+⇒ 据此我**新增票 35 第 8 枚框**：入向判据必须①逐字取页面真发的信封（`frontend/src/lib/panel.ts:180-184`）、②经落地后的真传输进去（⛔ 不许直调 `dispatchRaw`、⛔ 不许用 `Eval("window.wispDispatch(…)")` 那种形状）、③断言 `dispatchRaw`（`panel_host_windows.go:630`）或其下游被调用**且带那枚 correlationId**、④未注册名仍被拒；★**删掉转发语句必须让这枚具名用例红**，否则判据不合格退回。
+
+**4. 裁形＝甲子形①（转发原始串进**已绑定的** `window.wispDispatch(raw)`，走库的 binding 回执路）**；⛔ **禁甲子形②**（手造 `{id,method:'wispDispatch',params:[raw]}` 喂 `window.external.invoke`）——腿自己加的第三发 ⓒ 证了那条**今天一把尺都不红**（`external.invoke` 全仓 0、`inbound_roster_253` 不看 JS、`hostChannelCapabilityHits` 跳字符串与 `frontend/`）＝**已知盲区**，要选它必须先给它单独造判据。
+⛔ 不选乙（重写宿主创建＋泵、动 `go.mod`＝人工批准、撞 `SPEC-08:145`＋N4，收益只是"不经库的 RPC 管"，而甲子形①本来也不需要）；⛔ 不选丙（`frontend/**` 机主只放开**只读**，且它算出丙仍拿不到回执）。
+时序陷阱写进派单：`Init` 必须早于首次 `SetHtml`（`:449/:468/:681`）且要活得过后续 `SetHtml` 重建，⛔ 需 `window._rpc` 守卫；⛔ 不许新增点分法名（N1 在加名那刻红，名册属 C17＝人工批准）。
+
+**5. 它顶回我与 `35-a1` 的页面行号（我复量它对）**：`hostBridge()` 真身＝`panel.ts:152-155`（`:146` 是 `declare global` 里那枚过期注释行），"不回东西、只等 PanelSnapshot push"＝`:162-166`；票框里 `:141/:179/:218` 三枚照旧正确。
+另五枚"只是注释过期"具名入账（⛔ 都不是门；写腿不许为对上它们改代码，也不许删注释换绿）：M1 `panel_host_windows.go:402-404` 写"four existing methods"而 `bridge.go:42-47` 现量 **6**；M2 页面 `panel.ts:146` 那句 `AddHostObjectToScript` **全仓 0**＝注释描述的机制不存在；★M3 `composer_dispatch_test.go:461` 那枚空桩拼的是 `PostWebMessageAsJson`，库里真名 **`PostWebMessageAsJSON`**（`corewebview2.go:106`），且它挂在 `writeHostCarrier` 现造的 `type CoreWebView2 struct{}` 上 ⇒ **不是库类型的实现**（⚠ 这条接着修我上一轮的 vtable／Go API 之分——我分开了名字，⛔ 没验那枚桩到底实没实现接口）；M4 `PLAN.md:1747` 指向不存在的 `docs/contracts/`；M5 `go.mod:19` 把被直接 import 的库标成 `// indirect`（只登记，本轮不动）。
+
+**6. 排程变更**：`cmd/wisp` 写面现空（`274-r1` 已入库、`272-v1` 已收）⇒ **票 35 写腿解除按住**，派 `35-r1`（写面＝`cmd/wisp/panel_host_windows.go` ＋ 一枚新 `cmd/wisp/*_test.go` 判据；⛔ 包级互斥，且与票 272 AC#5 的整包复跑**不得同批**）。⛔ 只 commit 不 push。
+
+## A666｜2026-10-07 13:0x｜收 `273-a3`（只读普查：D43 副作用落空罐那一票的 AC#1 未修码读数＋「乙」那一行四件事）⇒ 票 273 翻 AC#1；★**它具名推翻 `273-a1` 那句"三枚都成环"，并新报第四枚同名 `Sink` 罐子**（编排者）
+
+**1. AC#1 翻（凭据我自己复跑，⛔ 不是转述）**：腿用括号平衡扫描（它量到唯一正控跨 3 行字面量＝只看匹配行的尺对正控失明）。我从另一头复跑：非 test `statemachine.New(`＝**2 枚**（`cmd/wisp/models.go:303`／`cmd/balldebug/main.go:188`，两块都是单行 `Options{Initial: …}`），这两枚文件里 `Sink:`＝**0** ⇒ **产码没有任何一台机器带收件人**，与腿同数。
+⚠ **顺手钉掉我自己那把同名尺的假阳性**（第 107/116 族）：全仓非 test `Sink:` 其实有 **3 处**——`cmd/wisp/providers.go:194` 是 `llm.ProbeSuiteOptions.Sink`、`cmd/wisp/run.go:998` 是 `agent.Options.Sink`、`internal/agent/sink.go:11` 是注释——⛔ **没有一枚属 `statemachine.Options`**。⇒ "生产里 `Sink:` 有 3 枚所以副作用有人收"＝把**同名不同型**当同一座；本票判据以后必须**锚在型上**，不锚词面。正控我复跑对回：`internal/models/bridge_test.go:14-18` 确是跨行 `statemachine.Options{… Sink: func(e statemachine.Effect){…}}`。
+
+**2. 它新报第四枚同名罐子**＝`internal/tools/subagent_197.go:301/:303`（装的仍是 `agent.Options.Sink`）⇒ 裸 grep `Sink:` 的假读面**比我票面「新增禁区」列的三枚还宽一处**，已并入票面禁区具名清单。
+
+**3. ★它具名推翻 `273-a1` §2 那句"`statemachine → ball／panel／speech` 任何一枚都成环"，我用它的复现件形状认可**：35 枚包逐包量 ⇒ 7 枚 `prod=1` 指过去**生产成环**；4 枚 `prod=0/test=1` **不是"安全可指"**——`go build` rc=0 而 `go test`/`go vet` 该包 setup failed（`import cycle not allowed in test`），它拿仓外最小复现件 `C:/Users/swq/tmp/cycprobe2` 钉住（对照组 0/0；加边后 BUILD_RC=0／TEST_RC=1／VET_RC=1）；`panel` 在**生产图**上不成环（代价改形＝炸测试腿），`speech` 今天只有 `doc.go`（指过去＝空壳）。⇒ **以后判"这条依赖边能不能指"要同时报 build/test/vet 三把**，⛔ 只看 `go build` rc=0 会把"测试腿炸"读成"能指"。
+另：`machine_test.go:186 TestSinkNoopDefault` 射程内**装任何非空默认罐都不红** ⇒ 乙**今天会真红的既有钉＝0 枚**，代价换成 **16 枚无 Sink 构造点的观测面被静默改写**（含 3 枚 winlive）；恒真预判＝乙之下"摘掉 Sink 必须红"**无处施加** ⇒ 落地前置＝**先补一枚收件人侧的具名用例，再动 `internal/statemachine/machine.go:64-68`**。
+
+**4. 甲的复跑与一处往高数改准**：构造点 2／windows 标记 3 枚／常驻腿与 `wisp run` 零机器 ⇒ 与我三把同数；⚠ 但**票 255 那枚行号钉不同数**＝`evidenceCite` 真断言的 `models.go` 行号只有 `:163` **一枚**（`:183` 只活在注释里、`sectionReadSites` 是文件级），`273-a1` 记成"2 处引用＋`:183`"＝**往高数**，本票按 **1** 改准；"163 以上插行即红、`handOffModel` 以下不红"复认为真。
+
+**5. 门禁**：`sh scripts/d22scan.sh` **rc=0** 且正控先绿（`runtests.sh PASS=35/FAIL=0/SKIP=0`，`[no tests to run]=0`）；⚠ 它 step 1 跑的是 `tools/d22scan` **自己那枚 module** 的测试，本腿零根包 `go test`/`build`/`vet` ⇒ 没占 `cmd/wisp` 写面，与我这轮读数不打架。框数尺：票 273 **7 枚／2 勾／5 未勾**，⛔ 未 `-done`；它自报未做完的九格我**一枚都不代填**。
+
 

@@ -60,6 +60,12 @@ state push making the frontend provably stateless.
       Any fix must be Go-side transport (page files are out of bounds for this fleet), must keep C17's roster unchanged,
       ⛔ and no leg may "make this green" by weakening the whitelist or by answering the RPC parser without the envelope ever
       reaching `dispatchRaw` (`panel_host_windows.go:630`).
+- [ ] **Inbound judge must ride the page's own envelope (added 10-07 by the orchestrator from `35-a2` §4; mandatory — no existing nail may substitute for it)**: one Go-side test that (a) takes the raw envelope string verbatim
+      from what the page actually posts (`frontend/src/lib/panel.ts:180-184`), (b) enters through the transport the page uses **after** the chosen shape lands — ⛔ not by calling `dispatchRaw` directly and ⛔ not via
+      `w.Eval("window.wispDispatch(…)")` (that shape lives at `cmd/wisp/panel_resident_windows_test.go:301/:805`; it is *the test playing the page*, and `35-a2` §4 N6 measured it stays green under shape 甲 ⇒ zero
+      discriminating power for this edge), (c) asserts `dispatchRaw` (`panel_host_windows.go:630`) or its downstream was reached **carrying that correlationId**, and (d) asserts an unregistered method name is still refused.
+      ★Falsifiability: deleting / no-op-ing the forwarding statement **must** redden this named test — if it stays green the judge is not reading this edge and is rejected. ⛔ N1 (Go roster count) and N2/N3 (page-wording
+      counters) may not be claimed as evidence for this edge.
 
 ## Progress log (append-only, newest last)
 
@@ -94,6 +100,7 @@ state push making the frontend provably stateless.
 **2. ★它推翻我的第二句：上一节那句「出向整条不存在」说过头了**。现量：库的出向原语三枚都在（`Eval`／`Init`／`SetHtml`），**而且每次 binding 回执都真的走 `Dispatch(Eval(…))`**（`webview.go:148/152/156`）；
 我们缺的是**无人发起的推送**那一支——我自己数的四把枚数（`cmd`＋`internal`，非 test）：`\.Eval(`＝**0**、`\.Init(`＝**0**、`\.SetHtml(`＝**3**、`\.Dispatch(`＝**7**。
 ⇒ 正确口径＝**"泵到面板线程的路真在（`Dispatch` 7 枚调用点）、把 JS 推给页面的那一句今天零调用者"**；⛔ 别再写"出向整条不存在"。
+> ⚠ **10-07 12:3x 就地更正（原句不抹；凭据见文末「收 `35-a2`」§1）**：上面那 **7 枚**是"全仓所有同名 `Dispatch(`"的总数，⛔ 不是这座桥的泵调用点。属 WebView2 面板线程的只有 **1 枚**＝`cmd/wisp/panel_resident_windows.go:360`（`post()` 内，`:349-372`），其余 6 枚是状态机族的同名方法。⇒ 那句应读作**"泵到面板线程的路真在（`Dispatch` 调用点 1 枚）、把 JS 推给页面的那一句今天零调用者"**。
 
 **3. ★它推翻我的第三句，也是我自己那把尺的病**：我上一节用 `PostWebMessage|EvaluateScript|CreateWebMessageAsJson` 这族拼写去扫，报"0 命中"⇒ **那是拼错名字尺的假阴性**：
 这三枚是 `pkg/edge` 的 **COM vtable 名**（`corewebview2.go:106-109`），不是这套 Go API 的拼写。我复跑同一把尺在**全仓**的命中＝**3 枚**（⛔ 不是 0）：`.scratch/wisp/probes/33/p1/q2/main.go:16` 一句注释、
@@ -118,3 +125,33 @@ dev 真身我现量：挂载＝`frontend/src/main.tsx:58`（`{harness === "1" ? 
 ① 票 274（`274-r1` 10-07 11:5x 已开工，出货 exe 带页面字节）② 票 33 的常驻接线（`NewPanelManager` 已进常驻腿）③ ★**新增前置**＝上面那枚 **AC#「Transport agreement」**：桥的信封格式与泵的接收器不接上，本票那六枚端到端判据**在任何一棵树上都无法执行**；
 ⛔ 本轮不派本票写腿（`cmd/wisp` 写面此刻由 `274-r1` 的构建与门禁占着，且桥的落地形状还没裁）。归属问题（ⓐ 我出表／页面由别人落 ⛔ 默认、ⓑ 我写页面文件〔未放开〕、ⓒ 交给别的会话〔⛔ 禁〕）**维持 ⓐ 不变**，
 但按 §1 的新读数修正一句：**协议断裂那一半是纯 Go 侧的活**（改宿主如何收信封），不需要动页面文件、也不需要动 C17 名册 ⇒ 本票不必等机主再给权限。
+
+### 10-07 12:3x 收只读普查腿 `35-a2`（件 `.scratch/wisp/probes/35/a2/transport-cost.md`，**744 行／49,788 字节**＋`logs/`；commit `f88144b3`；★它顶回我票面一句枚数，那一句**它对**）＋编排者裁形
+
+框数尺现量：本票 **8 枚框／0 勾**（本轮新增第 8 枚＝上面那枚 **Inbound judge must ride the page's own envelope**）。⛔ 未 `-done`。
+
+**1. ★它改我票面 `:96` 那句「泵到面板线程的路真在（`Dispatch` 7 枚调用点）」——枚数错了，按 1 枚算（原句不抹，就地认）**：
+我那句把全仓所有 `\.Dispatch(` 当一个通道数了。它的尺（`logs/q2-init-semantics.txt`）＋**我自己的复跑**：非 test 全仓 `Dispatch(`＝**7 枚**这个总数**是对的**，但其中属于 **WebView2 面板线程泵**的只有 **1 枚**＝`cmd/wisp/panel_resident_windows.go:360 w.Dispatch(fn)`（在 `post()` 里，`:349-372`，两态路由 `Dispatch`／`tasks`）；**其余 6 枚是状态机那族的同名方法**，不是这座桥。
+⇒ 正确口径＝**"面板线程的 `Dispatch` 调用点今天＝1 枚；把 JS 推给页面的那一句零调用者"**。⛔ 谁以后要论证"出向有路"，只能引那一枚，⛔ 不许再引"7 枚"给我这句话充数——**这类"同名符号凑分母"正是第 107 条的形状，我这次是自己踩的**。
+
+**2. 规格射程（它的问题①，我复跑对回）**：`docs/PLAN.md` 与 `docs/specs/**` 里**没有任何一句写死传输方式**（三个候选拼写全 0 命中，命中只在 evidence/ledger 层）；被规格写死的只有**依赖名**与**资源通道**两枚邻居＝`SPEC-08:145`（`jchv/go-webview2`）与 `SPEC-08:148-149`（`AddWebResourceRequestedFilter` ＋ 禁 localhost HTTP）。⇒ **选形不被规格绑**，但乙形若把库从 `go.mod` 摘掉会同时撞 `SPEC-08:145` 与既有钉 N4。⛔ 它与我都没改 `docs/**` 一字。
+
+**3. 三形代价（它只报代价，我据此裁；表在它 §2.4）**：甲＝`cmd/wisp/panel_host_windows.go` **1 枚文件**、一条语句＋一枚 JS 常量、页面 0 枚、`go.mod` 不动、名册不变；⚠ 时序陷阱＝`Init` 必须早于首次 `SetHtml`（`:449/:468/:681`）且要活得过后续 `SetHtml` 重建，且需 `window._rpc` 守卫。乙＝**替换宿主创建＋泵整条路**（`:386`→`:415` 及 pump/`Embed`/`Resize`，数枚文件），要重实现 STA 泵（该文件头 `:29-44` 逐字记着冻结／嵌套泵的坑），若保留包装还要动 `go.mod`/`go.sum`＝**人工批准**，并在 `TestPanelHostIsAttachedAndNamesTheWindowHops` 上**真红**。丙＝只改页面 `frontend/src/lib/panel.ts` 两枚发送点（`:179/:218`）＋`:139-155` 类型，⛔ **页面写权未放开**，且它自己算过"丙仍然拿不到回执"。
+
+**4. ★★它最值钱的一格（恒真性，我复认）＝今天没有任何一枚既有钉能对"页面的请求到不到 Go"分辨**：N2/N3（`bridge_test.go:162`、`composer_test.go:510/:518-522`）数的是**页面词面**（甲不动页面 ⇒ 恒绿）；N1（`inbound_roster_253_test.go:419`）数的是**Go 名册**（与传输无关 ⇒ 恒绿）；★**N6 是同一族的更强一击——`cmd/wisp/panel_resident_windows_test.go:301/:801/:805/:808/:864` 这些真机用例今天就是"从 `Eval` 里直接叫 `window.wispDispatch(…)`"**，也就是**测试自己扮演了页面**，⛔ 因此它对"真页面的请求能不能到 Go"**零分辨力**（甲落地后照旧绿）。⇒ 我据此**新增上面那枚框**，并把它写成"判据必须自己经这条边、且删掉转发语句必须红"。⛔ 后续任何腿不许拿 N1/N2/N3/N6 抵这一格。
+
+**5. 它给的三发定向突变与那枚已知盲区（我采纳进验收口径）**：ⓐ 删掉/中和转发 ⇒ **只有新判据能红**（旧钉全绿）；ⓑ "什么都不解析直接 ack" ⇒ 既有三枚会红（`inbound_roster_253_test.go:465`、`composer_dispatch_test.go:201/:231/:126`），⚠ 但若新判据仍从 `Eval`／直调 `dispatchRaw` 进去，ⓑ 会**在被绕过的地方红、在真边上绿** ⇒ ⓑ 的验收必须同时指认"新判据也红"；ⓒ（它自己加的第三发，成本 0）＝把垫片改成手造 `window.external.invoke({id:0,method:'wispDispatch',params:[raw]}` ⇒ **今天一把尺都不红**（`external.invoke` 全仓 0 命中、`inbound_roster_253` 不看 JS、`hostChannelCapabilityHits` 跳字符串与 `frontend/`）⇒ **这条子形是已知盲区**，我因此把 ⛔ 它禁进选形（见 §6）。
+
+**6. ★编排者裁形＝甲，且只准**甲的子形①**（转发原始串进**已绑定的** `window.wispDispatch(raw)`，走库的 binding 回执路）**：
+- **为什么不选乙**：乙要重写宿主创建＋泵、动 `go.mod`（人工批准）、摘库即撞 `SPEC-08:145`＋N4，收益只是"不经库的 RPC 管道"——而甲子形①本来就不需要页面的 `{id,method}` 信封进那根管。**代价不成比例。**
+- **为什么不选丙**：页面写权未放开（机主 10-07 放开的只有 `frontend/**` **只读**）；且它自己算出丙没有回执。⇒ 丙只作为对照行留在它 §2.3。
+- **⛔ 禁甲的子形②**（手造 `{id,method:'wispDispatch',params:[raw]}` 直接喂 `external.invoke`）：§5 ⓒ 已证这条**今天没有任何尺看得见**，用它＝把一条无牙的路选成产品边。若以后要用，**必须先给它单独造一枚判据**再谈选形。
+- **⛔ 落地禁区（写进派单）**：不许新增点分法名（N1 会在加名的那一刻红，而名册属 C17 面＝人工批准）；不许把新判据写成"来者都 ack"；不许动 `internal/panel/assets.go` 的 fail-closed；⛔ 不许用 `w.Eval("window.wispDispatch(…)")` 那种"测试扮演页面"的形状当凭据（N6 教训）；⛔ 不动 `frontend/**` 一个字节；⛔ 不给 CI 加 `-tags winlive`（真机那两枚 `winlive` 用例只登记〔仅本机可量〕）。
+
+**7. 它复认并扩了我票面的两处，另交回五枚"只是注释过期"（⛔ 都不是门，写腿不许为对上它们而改代码，也不许删注释换绿）**：M1 `panel_host_windows.go:402-404` 写着白名单"fixed at the **four** existing methods"，`bridge.go:42-47` 现量 **6 枚**（与我票面 §1 同数）；M2 页面 `panel.ts:146` 那句"Installed by WebView2's **AddHostObjectToScript** / postMessage pipe"——`AddHostObjectToScript` 全仓 **0 命中**＝**注释描述的机制不存在**；M3 `composer_dispatch_test.go:461` 那枚空桩拼的是 `PostWebMessageAsJson`，而库里真名是 **`PostWebMessageAsJSON`**（大写 JSON，`corewebview2.go:106`），且它挂在 `writeHostCarrier` 现造的 `type CoreWebView2 struct{}` 上 ⇒ **不是库类型的实现**（★这条接着修我上一节：我按第 116 条把 vtable 名与 Go API 名分开了，但没验"这枚桩到底实没实现那个接口"）；M4 `PLAN.md:1747` 指向不存在的 `docs/contracts/`（非本票射程）；M5 `go.mod:19` 把直接 import 的库标成 `// indirect`（只登记，本轮不动 `go.mod`）。
+
+**8. 它顶回我与 `35-a1` 的页面行号（我复量它对）**：`hostBridge()` 真身＝`frontend/src/lib/panel.ts:152-155`（`:146` 是 `declare global` 里那枚过期注释行），"不回东西、只等 PanelSnapshot push"那句＝`:162-166`；票框里引的 `:141`/`:179`/`:218` 三枚**照旧正确**。⇒ 我那枚新框 §5.1 的引用锚按它改。
+
+**9. 它自报未做完的格我不代填**（归 `35-v1`／写腿）：`Init` 语义的两条源码级承重（它 §0 `:391` 具名"单参数是否原样交给 Go 闭包"只读到 `:140-158`／`:450-482`）、真机再入测量（零编译权限）、以及 §5.2 那枚空桩今天被谁依赖（只登记未动）。
+
+**10. 排程（本轮变更）**：`cmd/wisp` 写面**现在空**（`274-r1` 已交完并入库 `35633445`；`272-v1` 已收）⇒ **本票的落地腿解除按住**，可派 `35-r1`（唯一写面＝`cmd/wisp/panel_host_windows.go` ＋ 一枚新 `cmd/wisp/*_test.go` 判据；⛔ 包级互斥：`cmd/wisp` 同一时刻只一枚写手，且它与 `272` 的 AC#5 整包复跑**不得同批**）。⛔ 只 commit 不 push。

@@ -28,7 +28,7 @@
 ## 4. 完成判据（AC 框只有编排者能翻，腿一枚都不许碰）
 - [x] **AC#0 先把枚数量清**：D43 表里副作用名共几枚（逐枚点名）；其中**今天已有真收件人**的几枚、**只有空罐子**的几枚。⛔ 不许引用本票面或任何 logs 里的数当作凭据，要现跑。
   > ✅ **10-07 12:5x 编排者翻（凭据＝非实现者腿 `273-v1` 现跑＋我逐把自己另起一把尺复量；件 `.scratch/wisp/probes/273/v1/verdict.md`，commit `955e3521`）**：三把尺并报＝**表行 56／唯一号 42（1–42 连续无缺号、13 枚号跨行共用）／权威文字 40 条（`PLAN.md:3057`/`:1748`/`:3151` 三处，全文没有一处写 42 或 56）**；名册 **50 枚副作用名／62 次投递点／33 行带效果**；**真收件人＝0**（两枚非 test 的 `statemachine.Options{…}` 构造点 `cmd/wisp/models.go:303`＋`cmd/balldebug/main.go:188` 都只填 `Initial`、都没带 `Sink`），今天总投递只 **1 枚**（行 `#37` `model.verify-sha256-signature`）且落进包内空罐 ⇒ ⛔ 本票 `:65` 那句"只有 1 枚真投给收件人"当场作废、`:61` 那句"代码 42 行"是量纲错，两处更正与档位边界采 ⓑ 的理由见**下方"收 `273-v1`"一节**（原句不抹）。
-- [ ] **AC#1 未修码读数（先证今天拦不住）**：在未改动的那把尺上跑一发"产码里有没有任何一枚 `statemachine.New` 传了 `Sink`"⇒ 期望 **0 枚**；并给一发正向对照（测试里有传 Sink 的形状，证明尺命中得了真名）。
+- [x] **AC#1 未修码读数（先证今天拦不住）**：在未改动的那把尺上跑一发"产码里有没有任何一枚 `statemachine.New` 传了 `Sink`"⇒ 期望 **0 枚**；并给一发正向对照（测试里有传 Sink 的形状，证明尺命中得了真名）。
 - [ ] **AC#2 三形代价表，⛔ 本票不选形**：甲＝装配根注入一枚真 Sink（`cmd/wisp`，与票 246"门由装配根注入"同一条路）；乙＝包内自带一个默认 Sink（会把"没人订阅"变成"包自己决定发给谁"）；丙＝只在常驻腿接、`cmd/wisp` 那条不动。逐形给：动哪几枚文件、撞哪几枚既有钉、要不要新依赖边、以及**"这条边以后谁能看见"**。
 - [ ] **AC#3 零新契约面**：⛔ 不许新造 `C##`、不许往 `C17` 方法白名单加名字（那要人工批准）；如果只有加白名单才能落，本票**停下上报**，不许自作主张。
 - [ ] **AC#4 反形敏感性**：判据必须写成**定向突变**——"把 Sink 摘掉那一形必须红"，⛔ 不许写"有没有 Sink"这种换形也全绿的恒真句（票 270 的 AC#1 今天刚被判出恒真，教训在同一天）。
@@ -86,3 +86,25 @@
 **4. a2 六枚未决的处置**（腿逐枚答在 `verdict.md` §3，其中第 3、6 枚它替 a2 补了尺）：影响本票 AC#1/AC#2 的两枚已并入上表；"未扫机器经 `any`/字段间接持有那一形"与"B 档零运行时读数"**留给落地腿在改完之后自己出读数**，⛔ 不构成翻任何勾的凭据。
 
 **5. ★我翻的框：AC#0 → `[x]`（唯一一枚，凭据＝本节的三把尺并报＋档位边界 ⓑ 具名＋承重句定版）。AC#1–AC#6 维持未勾**（等 `cmd/wisp` 写面空出；此刻 `272-v1` 正在取整包 Go 读数，⛔ 包级互斥）。
+
+### 10-07 12:5x 收只读普查腿 `273-a3`（件 `.scratch/wisp/probes/273/a3/census.md` **468 行／44,913 字节**＋31 枚 `logs/`；三笔 commit `28872c9a`→`3ad43344`→`aac9ed49`；锚 `89114888`；编排者现量收档）
+
+框数尺现量：本票 **7 枚框／2 勾（AC#0＋本轮 AC#1）／5 未勾**。⛔ 未 `-done`。⚠ 上面第 5 行那句"AC#1–AC#6 维持未勾"是**当时的快照**，按"追加不抹"保留，现数以本行为准。
+
+**1. ★AC#1 翻勾——凭据我自己复跑过，⛔ 不是只转述腿的**：腿用**括号平衡扫描**（它量到唯一正控是**跨 3 行字面量**，只看匹配行的尺会对正控失明——这是它自己造的防漏）。我从另一头复跑：
+- `grep -rn 'statemachine\.New(' --include=*.go cmd internal`（去 `_test.go`）＝**2 枚**＝`cmd/wisp/models.go:303`（`machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})`，整块**单行**）＋`cmd/balldebug/main.go:188`（`m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})`）；
+- `grep -n 'Sink:'` 在这两枚文件里＝**0 命中** ⇒ **产码里没有任何一台机器带收件人**，与腿同数。
+- ⚠ **顺手把我自己那把同名尺的假阳性钉掉**（第 107/116 族）：全仓非 test `Sink:` **有 3 处**（`cmd/wisp/providers.go:194`＝`llm.ProbeSuiteOptions.Sink`、`cmd/wisp/run.go:998`＝`agent.Options.Sink`、`internal/agent/sink.go:11` 是一句注释），⛔ **没有一枚属 `statemachine.Options`**。⇒ 谁以后写"生产里 `Sink:` 有 3 枚所以 D43 副作用有人收"就是**把同名不同型当同一座**——这正是本票要防的形状，我这次是自己差点踩的。
+- 正控我复跑对回：`internal/models/bridge_test.go:14-18` 确实是 `statemachine.Options{ … Sink: func(e statemachine.Effect){…} }`（跨行字面量 ⇒ 腿那句"简单匹配行会失明"是真的）。
+
+**2. ★它新报第四枚同名 `Sink` 罐子（比我票面「新增禁区」列的三枚多一处）**：`internal/tools/subagent_197.go:301/:303` 装的是 `agent.Options.Sink`。⇒ 裸 grep `Sink:` 的**假读面比票面上写的还宽一枚**，已并入票面禁区的具名清单（见下条处置）。
+
+**3. AC#2「乙」那一行的四件事它答完了（⛔ 只报代价，不选形；我不替它翻 AC#2）**：①落点唯一＝`internal/statemachine/machine.go:64-68`（`New()` 缺省支），最少 2 枚／最多 4 枚文件、契约文字 **4 处**（`doc.go:11-12`、`doc.go:15`、`machine.go:24-25`、`table.go:15-17`）＋字段注释 `machine.go:39` ⇒ **比我票面 §3 数的"两句"多**；②**会真红的既有钉＝0 枚**（唯一射程内那枚 `machine_test.go:186 TestSinkNoopDefault` 只断"不报错＋状态推进"，装任何非空默认罐都不红），代价换成 **16 枚无 Sink 构造点的观测面被静默改写**（含 3 枚 winlive、2 枚可移植测试）；③依赖边它逐包现量 35 枚：7 枚 `prod=1` 指过去**生产成环**，4 枚 `prod=0/test=1` ⚠ **不是"安全可指"**——它用仓外最小复现件 `C:/Users/swq/tmp/cycprobe2` 钉住"`go build` rc=0 而 `go test`/`go vet` setup failed（`import cycle not allowed in test`）"，⇒ ★**它具名推翻了 `273-a1` §2 那句"`statemachine → ball／panel／speech` 任何一枚都成环"**：`panel` 在**生产图**上不成环（代价变成"炸测试腿"），`speech` 今天只有 `doc.go` 一枚（指过去＝空壳）；④恒真预判：乙之下"把 Sink 摘掉必须红"**无处施加**（产码构造点本来 0 枚带 Sink），"Dispatch 不报错＝投出去了"正是 `TestSinkNoopDefault` 的形状且今天**恒绿** ⇒ 唯一有牙的突变只能改 `machine.go:64-68` 本身，⛔ 观测点必须在**收件人那一侧**。
+
+**4. ★我据此给本票加一条落地前置（写进派单，⛔ 不是翻勾）**：若最终选乙，票面 §3 的"新增禁区"要按**四枚**同名罐子写（`agent.Options.Sink`／`llm.ProbeSuiteOptions.Sink`／注释里那枚／`internal/tools/subagent_197.go:301-303`），且判据必须**锚在 `statemachine.Options` 这个型**上，⛔ 不许锚在词面 `Sink:`；另要**先补一枚"收件人侧"的具名用例**再动缺省支，否则乙落地＝把 16 枚观测面静默改写而全仓零红。
+
+**5. 甲的复跑（它没照抄我的数）**：构造点 2／windows 标记 3 枚／常驻腿与 `wisp run` 零机器 ⇒ **与我三把同数**；⚠ 但**票 255 那枚行号钉不同数**：`evidenceCite` 真断言的 `models.go` 行号只有 `:163` **一枚**（`:183` 只活在注释里、`sectionReadSites` 是文件级），`273-a1` 记成"2 处引用＋`:183`"＝**往高数**，本票按 1 枚改准；"163 以上插行即红、`handOffModel` 以下不红"复认为真。
+
+**6. 门禁（它自跑、我复跑同数）**：`sh scripts/d22scan.sh` **rc=0** 且正控先绿（`runtests.sh PASS=35/FAIL=0/SKIP=0`，`[no tests to run]=0`；⚠ 它 step 1 跑的是 `tools/d22scan` **自己那枚 module** 的测试，本腿零根包 `go test`/`build`/`vet` ⇒ 没占 `cmd/wisp` 写面）。八枚 scope 逐名与票面 §2 一致（`internal/` 228／`cmd/` 38／`#6 frontend/` 85／`#7 internal/tools/` 23／`#8 design/` 39、`frontend/` 85、`internal/` 514、`cmd/` 104）。
+
+**7. 它自报未做完的九格我不代填**（winlive 行为、突变枚数、包内落盘那一形、票 255 实际红名册、第三枚独立名册尺、副作用名→收件人对应表、AC#5 另三门、GOOS 交叉、`#41/#42` 台账）⇒ 归 `cmd/wisp` 落地腿与非实现者验收腿逐枚处置。⛔ 一枚框都没因此多翻。
