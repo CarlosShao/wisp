@@ -1,0 +1,76 @@
+Wed Oct  7 16:43:08 CST 2026
+--- HEAD
+d8299ee7 A676 收 274-r2（票 274 AC#10 落地：build.ps1 加"本趟构建出处"闸门 +41/-1，⛔ AC#10 不翻等 274-v2）＋我这轮整包复跑顶回它"红名册少一枚"＋一枚我已裁可接受的代价
+--- BRANCH
+dev
+--- STATUS
+--- MD5DIST
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+--- TICKET
+274-no-nail-requires-shipped-exe-to-carry-page-build-ps-step-2-comment-is-false-in-both-halves.md
+--- PROBES
+.scratch/wisp/probes/274:
+a1
+a2
+r1
+r2
+v1
+
+.scratch/wisp/probes/274/a1:
+census.md
+logs
+
+.scratch/wisp/probes/274/a1/logs:
+
+.scratch/wisp/probes/274/a2:
+logs
+shipping-chain.md
+
+.scratch/wisp/probes/274/a2/logs:
+anchor.txt
+s1-buildps.txt
+s1-exe-producers.txt
+s1-frontend-step-raw.txt
+s1s2-extras.txt
+s2-ci-detail.txt
+s2-ci-jobs.txt
+s2-steps-bodies.txt
+s2-workflows.txt
+s3-machine.txt
+s3-panel-fails.txt
+s3-reds.txt
+s3-runside.txt
+s3-slofull-detail.txt
+s4-frontend-build.txt
+s5-final.txt
+s5-scope-and-history.txt
+
+.scratch/wisp/probes/274/r1:
+impl.md
+logs
+
+.scratch/wisp/probes/274/r1/logs:
+00-anchor.txt
+01-toolchain.txt
+02-dist-baseline.txt
+03-unfixed-dist-anchor-only-setup.txt
+04-unfixed-buildps1-full.txt
+05-unfixed-exe-notbuilt.txt
+06-restore-proof-run1.txt
+07-mutation-i-no-node.txt
+08-mutation-ii-stub-npm.txt
+09-mutation-i-rerun-after-node-flag-fix.txt
+10-mutation-ii-rerun-after-node-flag-fix.txt
+11-restore-proof-after-mutations.txt
+12-e2e-setup-clean-checkout-shape.txt
+13-fixed-buildps1-end-to-end.txt
+14-ac9-exe-vs-fresh-build-per-file.txt
+15-restore-proof-after-e2e.txt
+16-d22scan.txt
+17-govet.txt
+18-final-endstate-and-roster.txt
+--- BUILDEXE
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
