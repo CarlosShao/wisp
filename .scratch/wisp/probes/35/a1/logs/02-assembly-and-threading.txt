@@ -1,0 +1,211 @@
+### NewPanelManager all call sites (test/non-test)
+cmd/wisp/panel_geometry_255_test.go:110:			m := NewPanelManager(panelDispatchForGeometry255(), nil, "", withGeometrySourceOrNil(tc.src))
+cmd/wisp/panel_geometry_255_test.go:140:	m := NewPanelManager(panelDispatchForGeometry255(), nil, filepath.Join(dir, "webview2"),
+cmd/wisp/panel_geometry_255_test.go:172:	m2 := NewPanelManager(panelDispatchForGeometry255(), nil, "",
+cmd/wisp/panel_geometry_255_winlive_test.go:101:	mgr := NewPanelManager(panelDispatchForGeometry255(), nil, filepath.Join(dataDir, "webview2"),
+cmd/wisp/panel_host_windows.go:213:func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPath string, opts ...panelHostOption) *PanelManager {
+cmd/wisp/panel_host_windows_live_test.go:39:	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: h}, nil, dataPath)
+cmd/wisp/panel_host_windows_test.go:623:	mgr := NewPanelManager(disp, nil, dataPath)
+cmd/wisp/panel_host_windows_test.go:880:	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: h}, nil, dataPath)
+cmd/wisp/panel_resident_windows.go:253:	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), nil
+cmd/wisp/panel_resident_windows_test.go:63:	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
+cmd/wisp/panel_resident_windows_test.go:449:	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
+cmd/wisp/panel_resident_windows_test.go:526:	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
+cmd/wisp/panel_resident_windows_test.go:527:	mgr2 := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath+"-second")
+
+### SnapshotPump.Publish call-shape census
+cmd/wisp/panel_config_248_test.go:249:	cardSnap, cardData, cerr := cards.Publish()
+cmd/wisp/panel_pump.go:381:// produced by rt.pump.Publish(), which only the run's own approval surface and
+cmd/wisp/panel_pump.go:405:	snap, _, err := rt.pump.Publish()
+cmd/wisp/panel_pump_test.go:10:// out of rt.pump.Publish(), and the only calls to the pump are the ones the run
+cmd/wisp/run.go:1260:func (c consoleSink) Publish(e agent.Event) {
+internal/agent/control_test.go:180:				s.Publish(Event{Kind: kind, TaskID: "t", Text: "x"})
+internal/agent/loop.go:1041:		l.opt.Sink.Publish(e)
+internal/agent/sink.go:71:func (NopSink) Publish(Event) {}
+internal/agent/sink.go:85:func (s *RecordSink) Publish(e Event) {
+internal/panel/pump.go:348:func (p *SnapshotPump) Publish() (Snapshot, []byte, error) {
+internal/panel/pump_test.go:245:	snap, data, err := pump.Publish()
+internal/panel/pump_test.go:274:	if _, _, err := pump.Publish(); err != nil {
+internal/panel/subagent_blocked_220_test.go:83:	_, data, err := pump.Publish()
+internal/panel/subagent_blocked_220_test.go:172:	_, data, err := noread.Publish()
+internal/panel/subagent_roster_197_test.go:131:	_, data, err := pump.Publish()
+internal/panel/subagent_roster_197_test.go:226:	_, emptyData, err := empty.Publish()
+internal/panel/subagent_roster_197_test.go:270:	_, data, err := pump.Publish()
+internal/panel/subagent_roster_197_test.go:292:	_, legacyData, err := legacy.Publish()
+internal/panel/subagent_roster_197_test.go:312:	_, blankData, err := blank.Publish()
+internal/panel/subagent_roster_197_test.go:388:	_, data, err := pump.Publish()
+internal/panel/subagent_roster_197_test.go:438:	_, data, err := pump.Publish()
+internal/tools/subagent_197.go:520:func (s subagentTextSink) Publish(e agent.Event) {
+
+### publishPanelSnapshot/bookPanelSnapshot/lastPanelSnapshot census
+cmd/wisp/instructions_200r2_test.go:135:	snap, data, seen := driven.lastPanelSnapshot()
+cmd/wisp/instructions_200r2_test.go:197:	_, dataOff, seen := rtOff.lastPanelSnapshot()
+cmd/wisp/instructions_200r2_test.go:225:	_, dataOn, seenOn := rtOn.lastPanelSnapshot()
+cmd/wisp/panel_pump.go:290:// bookPanelSnapshot is the exit's far end, and it is where this repository's
+cmd/wisp/panel_pump.go:319:func (rt *agentRuntime) bookPanelSnapshot(snap panel.Snapshot, data []byte) error {
+cmd/wisp/panel_pump.go:383:func (rt *agentRuntime) lastPanelSnapshot() (panel.Snapshot, []byte, bool) {
+cmd/wisp/panel_pump.go:392:// publishPanelSnapshot puts one snapshot on the wire. Called where a state the
+cmd/wisp/panel_pump.go:401:func (rt *agentRuntime) publishPanelSnapshot() {
+cmd/wisp/panel_pump_test.go:175:		rt.publishPanelSnapshot()
+cmd/wisp/panel_pump_test.go:176:		live, liveBytes, _ = rt.lastPanelSnapshot()
+cmd/wisp/panel_pump_test.go:310:	finalSnap, finalBytes, sawFinal := driven.lastPanelSnapshot()
+cmd/wisp/panel_pump_test.go:362:		rt.publishPanelSnapshot()
+cmd/wisp/panel_pump_test.go:363:		live, _, _ = rt.lastPanelSnapshot()
+cmd/wisp/run.go:725:		Out:   rt.bookPanelSnapshot,
+cmd/wisp/run.go:735:		rt.ui.publish = rt.publishPanelSnapshot
+cmd/wisp/run.go:998:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+cmd/wisp/subagent_blocked_197_test.go:158:		snap, data, _ = rt.lastPanelSnapshot()
+cmd/wisp/subagent_blocked_197_test.go:209:	// DOES sample (publishPanelSnapshot is the run's own publisher, called here),
+cmd/wisp/subagent_blocked_197_test.go:213:	rt.publishPanelSnapshot()
+cmd/wisp/subagent_blocked_197_test.go:214:	after, afterData, seen := rt.lastPanelSnapshot()
+cmd/wisp/subagent_carrier_197_test.go:27:// the run rather than a coin toss. Case 1 never calls publishPanelSnapshot: every
+cmd/wisp/subagent_carrier_197_test.go:244:	// Nothing above called publishPanelSnapshot, so the retained packet is the last
+cmd/wisp/subagent_carrier_197_test.go:248:	snap, data, seen := driven.lastPanelSnapshot()
+cmd/wisp/subagent_carrier_197_test.go:518:// This case DOES sample (publishPanelSnapshot is the run's own publisher), because
+cmd/wisp/subagent_carrier_197_test.go:543:	driven.publishPanelSnapshot()
+cmd/wisp/subagent_carrier_197_test.go:544:	snap, data, seen := driven.lastPanelSnapshot()
+cmd/wisp/subagent_selfapproval_197_test.go:344:	// This file never calls publishPanelSnapshot, so the packet whose bytes were
+cmd/wisp/subagent_selfapproval_197_test.go:410:		snap, data, ok2 := rt.lastPanelSnapshot()
+
+### rt.ui nilness + resident spec gate
+	// and the gate books `approval: GRANT-DROPPED ... 本机没有接入会话授权记账`
+	// on the route (gate.go's allowSession). resident_windows.go prints the same
+	// limit at boot; widening it needs the gate itself moved into this function,
+	// which is a ruling about AC#1's form 乙, not a line this leg may write.
+	if s.gate != nil {
+		if s.cards == nil || s.ui == nil {
+			fmt.Fprintf(s.stderr, "wisp run: 注入的审批门必须连同它自己的界面与会话账本一起递进来"+
+				"（gate=%v ui=%v cards=%v），已拒绝装配\n", s.gate, s.ui, s.cards)
+			return rt, 2
+		}
+		rt.gate = s.gate
+		rt.ui = nil // no console surface in a process whose cards go to another host
+		rt.liveCards = &nativeCards{h: s.cards}
+	} else {
+		rt.liveCards = newNativeCards()
+		rt.ui = &consoleApprovalUI{out: s.stdout, run: rt, live: rt.liveCards}
+		rt.gate = approval.New(approval.Options{
+			UI:              rt.ui,
+			Channels:        approval.NewChannels(),
+			Window:          time.Duration(cfg.Risk.L1WindowSec) * time.Second,
+			ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
+
+### resident panel thread header
+//go:build windows
+
+package main
+
+// The resident panel thread: the ONE place in this process that owns the panel
+// window's OS thread (ticket 33, orchestrator ruling P1 at 10-01 13:12).
+//
+// Why a dedicated thread and not the ball's ui-sta. Ruling J1 in this ticket first
+// picked "post it to the existing ui-sta", and 33-r1 stopped because it measured
+// something bad happening there. The measurement has now been repeated with a
+// counter-control (probe 33-p1, R34/R35 plus positive control R36): calling
+// bring-up from inside a window callback of a thread that is already pumping does
+// NOT panic - it returns in about half a second, and while it is inside the
+// library's nested pump the OUTER pump's iteration counter freezes, so up to five
+// tasks that were already queued on that thread get executed early by the nested
+// pump. That is order reversal on the ball's own gesture queue, which is worse to
+// ship than a crash. The branch that does panic is reachable but needs a forced
+// WM_QUIT during create (R37) or an MTA apartment (R32/R39). So: a thread of its
+// own, and the ball's pump is never re-entered.
+//
+// Why the library's Run(). webview.Dispatch only appends a closure to the
+// library's private queue and posts a thread message, and Run() is that queue's
+// ONLY reader, so a host that pumps by hand can never deliver a Go -> page reply:
+// 33-p1 §A measured the page's awaited binding replies staying unresolved with the
+// hand pump and arriving in ~107ms with Run(). Run() occupies the thread, so this
+// file also owns the way out (Terminate -> WM_QUIT -> Run returns -> Destroy on
+// the same thread -> the handle's goroutine ends), which is what makes the panel
+// thread's clean exit an observable fact instead of a hope.
+//
+// Why COM is initialised here explicitly, and why a failure is fatal FOR THIS
+// THREAD ONLY. 33-p1 §B-4 measured three shapes on one matrix: STA (0x2) creates
+// fine, an un-initialised thread also creates fine, and a thread initialised as
+// MTA (0x0) panics inside the library (pkg/edge/chromium.go:171 does not catch the
+// failed HRESULT, :175 dereferences the nil environment). "It worked without
+// initialising" is the shape this repo's host and its test harness shipped until
+// now, so this thread asks for 0x2 by name and refuses to create a window if
+// Win32 answers anything other than S_OK / S_FALSE. The cause of the MTA failure is
+// still undetermined (the HRESULT needs an unexported handler to read); the
+// phenomenon is what is encoded here.
+//
+// What this file does NOT do. It never calls Shutdown or os.Exit (A493), it starts
+// no second window, it grants nothing: the only door it exposes to the page is the
+// one cmd/wisp/panel_host_windows.go already binds (panel.ComposerDispatch.Handle
+// behind window.wispDispatch), whose widening branches are fail-closed, and it adds
+// no approval channel of its own. Its teardown is a defer in runResident, the same
+// shape ticket 228 chose for the ball, so the frozen D38(e) ten-step order and its
+// closed hook roster are untouched.
+//
+// What it DOES do since 33-r9, and why that is not a new shape: a show request that
+// bringUp refuses by name (the thread owes somebody an undispatched WM_CLOSE) now
+// ends this thread instead of leaving it up, taking requests and refusing every one
+// of them forever (ticket 33, 33-v2 问①: "拒绝没有出口"). It rides the fatal path this
+// file already had for the CoInitializeEx guard, so the exit adds no thread, no pump
+// and no second window, and it removes nothing from anybody's message queue - which
+// is the thing 33-r9's fifth-shape reading says no recovery here may do: the close it
+// refuses on can belong to a window that is still alive and still owned (readings in
+// cmd/wisp/panel_host_windows.go's bringUp comment).
+
+
+### post()/handOverPump bodies
+
+// handOverPump publishes the control (so later requests route through
+// webview.Dispatch, which Run() drains) and takes one final channel drain under
+// the same lock. That ordering is what makes the routing airtight: post() either
+// sees wRef empty and lands in the channel this drain reads, or sees wRef set and
+// lands in the queue the pump reads.
+func (rp *residentPanel) handOverPump() webview2.WebView {
+	rp.mu.Lock()
+	w := rp.mgr.currentWindow()
+	rp.wRef = w
+	var pending []func()
+drain:
+	for {
+		select {
+		case fn := <-rp.tasks:
+			pending = append(pending, fn)
+		default:
+			break drain
+		}
+	}
+	rp.mu.Unlock()
+	for _, fn := range pending {
+		fn()
+	}
+	if w != nil {
+		close(rp.entered)
+	}
+	return w
+}
+
+// post hands fn to the panel thread without waiting for it. False means "this
+// thread will not run your request" (its queue is full, or it is already going
+// away), which callers report instead of pretending the window moved.
+func (rp *residentPanel) post(fn func()) bool {
+	if rp == nil {
+		return false
+	}
+	if rp.startUpErr() != nil || rp.isFinished() {
+		return false
+	}
+	rp.mu.Lock()
+	if rp.wRef != nil {
+		w := rp.wRef
+		rp.mu.Unlock()
+		w.Dispatch(fn)
+		return true
+	}
+	select {
+	case rp.tasks <- fn:
+		rp.mu.Unlock()
+		return true
+	default:
+		rp.mu.Unlock()
+		rp.failedPost.Add(1)
+		return false
+	}
+}
+
