@@ -92,3 +92,37 @@ param(
 | `.github/workflows/ci.yml:466/520/536/566/809` | 注释或步名里的 `cgo build`，非命令 | 否（真正的命令是 `571/757/820` 三行调 `build.ps1`，见 §2） |
 
 补尺（怕漏 shell 侧）＝`git grep -n 'go build' -- '*.sh' '*.ps1' '*.yml'`（`logs/s2-steps-bodies.txt`）⇒ 除上面这些，其余命中全在 `.scratch/wisp/probes/**` 的历史普查脚本里（`152/e2e-subject-kill*.sh`、`153/*`、`161/r1/bench.sh`、`139/run-mutations.sh`、`111/r4/ci-at-HEAD.yml` 快照），**都不是出货通路**。
+
+---
+
+## §2 三枚产 exe 的 CI job 跑在哪台机器上
+
+原始输出：`logs/s2-ci-jobs.txt`（job 名尺 / `runs-on` 尺 / `setup-node` 尺 / `npm` 尺 / `frontend/dist` 尺）、`logs/s2-ci-detail.txt`（`needs:`、artifact、`uses:`、三段 job 头原文）、`logs/s2-workflows.txt`（workflow 文件清单 + `wisp.exe` 尺）、`logs/s2-steps-bodies.txt`（upload 步正文 + `release` 尺）、`logs/s1s2-extras.txt`（步级结论普查）。
+
+**先量「哪几枚 job 真会跑到 build.ps1」，不按 job 名猜**：尺＝`grep -rn 'build\.ps1' .github` ⇒ 命中 8 行，其中**只有 3 行是 `run:` 命令**（`571`、`757`、`820`），另 5 行是注释/步名（`466`、`566`、`579`、`809`，加 `scripts/build.ps1` 自身）。这 3 行按行号落进 §1.1 之外的 job 区间 ⇒ **产 exe 的 job ＝ `test-windows`(505–738) / `slo-smoke`(739–796) / `slo-full`(797–870)** 这三枚，逐枚点名见下表。
+
+| job（行号） | `runs-on` 原文（行号） | 跑 build.ps1 的那一步（行号） | 步级实际结论 | 有 `setup-node`？ | 有任何一步读 `frontend/dist`？ |
+|---|---|---|---|---|---|
+| `test-windows`（`505`） | `windows-latest`（`506`） | `"cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"`，`566` 步名 / **`571` 命令**，带 `if: ${{ !cancelled() }}` | 该步 **success**（整 job failure，红在第 7、9 步） | **无** | **无** |
+| `slo-smoke`（`739`） | `windows-latest`（`740`） | `Build wisp.exe`，`756` 步名 / **`757` 命令** | **success**（整 job success） | **无** | **无** |
+| `slo-full`（`797`） | `[self-hosted, wisp-slo]`（`798`） | `Build wisp.exe (deps cached on the runner)`，`819` 步名 / **`820` 命令** | **success**（整 job success） | **无** | **无** |
+
+三枚都对 `scripts/build.ps1` 传 `-Env dev`（逐字：`powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev`）。
+另外 `slo-full` 的 `env:` 块里有一条**承重**的具名指认（`797–825` 原文在 `logs/s2-ci-detail.txt`，`86` 行）：`MINGW64_ROOT: E:\work\base\msys64\mingw64\bin`，注释逐字写着「The runner's job environment carries no msys64 on PATH … (on the interactive user PATH only) … build.ps1's own fallback path is `C:\msys64\...`, which is the wrong drive here」⇒ **同机、但 runner 作业环境 ≠ 交互式用户 PATH**，这条对本腿 §3 的 node 问题是直接可迁移的风险。
+
+### 2.1 每条负向读数的正控（同一把尺在别处的命中数）
+
+| 尺 | 产 exe 三枚 job 内命中 | 正控（全文件命中处） |
+|---|---|---|
+| `grep -n 'setup-node'` | 0 | **1 枚**：`879` 在 `lint-frontend`（`871`，`ubuntu-latest` `872`） ⇒ 尺能命中，负向成立 |
+| `grep -n 'npm'` | 0 | **10 枚**：`884`、`887`、`888`、`891`、`894`、`900`、`903`、`916`、`928`、`933`、`940`（逐名 11 行，含 `cache: npm`），**全部落在 `lint-frontend` 区间 871–941** ⇒ `npm run build` 只在**不产 exe** 的那枚 job 里 |
+| `grep -n 'frontend/dist'` | 0 | **1 枚**：`902` 步名注释「build (vite build -> frontend/dist, the bytes go:embed carries)」，也在 `lint-frontend` |
+| `grep -rn 'wisp\.exe' .github/workflows` | 命中 4 行但**无一是产物落点**：`541` 注释、`756`/`819` 步名、`912` 注释（指 `wisp.exe panel-assets -l2 fs.delete`） | 尺本身命中 ⇒ 成立：**没有任何一步把 exe 里的页面字节看一眼** |
+| `grep -n 'needs:'` | 0 | **全文件 0 枚**——**这把尺没有正控可用** ⇒ 读数只能写成「`needs:` 命中 0 枚」，⛔ 不许由它推断任何顺序/无阻塞结论（本腿只复量了同一枚 0，与 `274-a1` 的 0 同形） |
+| `grep -n 'download-artifact'` | 0 | **全文件 0 枚**；同族尺 `upload-artifact` 命中 **2 枚真步**（`763`、`826`）+ 2 枚注释行（`842`、`843`）⇒ upload 尺有正控、download 尺负向成立 |
+| `grep -rn 'release' .github/workflows` | 0 | **两个 workflow 文件全 0 命中**，无正控 ⇒ 只能写「命中 0 枚」。job 名可枚举的正控另给：尺＝`grep -n '^  [a-zA-Z0-9_-]*:$' .github/workflows/ci.yml` 命中 12 行（`11/12/36/38` 属 `on:` 块，`65/395/505/739/797/871` 属 jobs）⇒ **ci.yml 里一共就 6 枚 job，没有名为 `release` 的 job**（这与编排者转述的「`release` job 无落点」略有出入：**不是有 job 没落点，而是根本没有 `release` job**，本腿现量具名报回） |
+
+### 2.2 产出的 exe 今天没有被任何通路留下
+
+两枚 `upload-artifact` 步（`slo-smoke:763`、`slo-full:826`）正文逐字＝`name: slo-smoke-report` / `name: slo-full-report`、`path: build/slo/slo-report.json`（`logs/s2-steps-bodies.txt`）⇒ **上传的是 SLO 报告 JSON，不是 `build\wisp.exe`**；`build\` 下那 4 枚进 SHA256SUMS 的产物（§1.1 表 `152` 行）在三枚 job 里**谁都不上传、谁都不下载、谁都不验**。
+workflow 文件清单（尺＝`ls -la .github/workflows`）＝`ci.yml`（57948 字节）+ `slo-fresh.yml`（4038 字节，`runs-on: ubuntu-latest` `62`，⛔ 不跑 `build.ps1`：`grep -rl 'build\.ps1' .github/workflows` 只命中 `ci.yml`）⇒ **整个仓里产 exe 的 CI 通路就 §2 那三枚 job，一台 hosted Windows × 2、一台 self-hosted Windows × 1。**

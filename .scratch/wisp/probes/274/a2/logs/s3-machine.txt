@@ -1,0 +1,60 @@
+=== this machine identity ===
+COMPUTERNAME=DESKTOP-LVS7839
+USERNAME=swq
+cwd=/d/work/workspace/projects plans/Wisp
+
+=== interactive-PATH node/npm ===
+v24.9.0
+node rc=0
+11.6.0
+npm rc=0
+--- where node/npm (Git Bash: which) ---
+/d/work/server/node14/node
+/d/work/server/node14/npm
+/d/work/server/node14/npx
+
+=== cmd where (Windows PATH) ===
+D:\work\server\node14\node.exe
+D:\work\server\node14\npm
+D:\work\server\node14\npm.cmd
+
+=== runner dir present on this machine? ===
+_diag
+_work
+bin
+config.cmd
+externals
+run-helper.cmd
+run-helper.cmd.template
+run-helper.sh.template
+run.cmd
+--- runner bin ---
+Azure.Core.dll
+Azure.Storage.Blobs.dll
+Azure.Storage.Common.dll
+Microsoft.AspNetCore.WebUtilities.dll
+Microsoft.Bcl.AsyncInterfaces.dll
+Microsoft.Bcl.Cryptography.dll
+Microsoft.CSharp.dll
+Microsoft.DevTunnels.Connections.dll
+Microsoft.DevTunnels.Contracts.dll
+Microsoft.DevTunnels.Management.dll
+Microsoft.DevTunnels.Ssh.Tcp.dll
+Microsoft.DevTunnels.Ssh.dll
+Microsoft.DiaSymReader.Native.amd64.dll
+Microsoft.Extensions.Configuration.Abstractions.dll
+Microsoft.Extensions.DependencyInjection.Abstractions.dll
+Microsoft.Extensions.Diagnostics.Abstractions.dll
+Microsoft.Extensions.FileProviders.Abstractions.dll
+Microsoft.Extensions.Hosting.Abstractions.dll
+Microsoft.Extensions.Logging.Abstractions.dll
+Microsoft.Extensions.Options.dll
+--- node exe under runner bin ---
+
+=== msys64 at the documented root ===
+E:/work/base/msys64/mingw64/bin
+=== E:/work/base/actions-runner/_work/wisp ===
+wisp
+=== run env config (persisted .env / config.sh) ===
+ls: cannot access 'E:/work/base/actions-runner/.env': No such file or directory
+cat: 'E:/work/base/actions-runner/.env': No such file or directory
