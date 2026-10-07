@@ -145,3 +145,49 @@ $ git show 35633445:scripts/build.ps1 | wc -l
   因＝树里没有 `.git` 而 PATH 里有 `git.exe`，`$ErrorActionPreference='Stop'`（`:31`）把原生命令的 stderr 升成终止错误。
   **公平归因**：那一行在 `35633445^:scripts/build.ps1:99` 就有（`logs/08` (a)/(d) 与 `grep -n rev-parse` 现量），⛔ 不是 274 引入的；
   但它说明"在没有 `.git` 的目录里跑 build.ps1"今天会红成一句与前端无关的错——CI 的检出带 `.git` ⇒ 不阻塞本票，登记即可。
+
+---
+
+## §3 实现者（`274-r1`，`.scratch/wisp/probes/274/r1/impl.md`）那几句：逐句复跑后的裁
+1. **确认**（原句逐字，`impl.md:189`）：
+   `build.ps1: FATAL: frontend step: node could not be resolved on PATH (tried node.exe, then node). The page bundle is a build input of wisp.exe, so this script fails instead of skipping it. …`
+   我的复跑＝M-i，`logs/04:10` 打出**同一句**并 `MUTATION_PROCESS_EXITCODE=1`。⛔ 我不引它的 `logs/09`。
+2. **确认**（原句逐字，`impl.md:207`）：
+   `build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds only the anchor file(s) [1 file(s), none beside frontend/dist/.gitkeep]. That is the clean-checkout shape, so the exe would ship with zero page bytes. Named cause: build produced no page artifacts.`
+   我的复跑＝M-ii，`logs/04:33` 同一句＋`MUTATION_PROCESS_EXITCODE=1`；我这发的桩 npm 是 `D:/tmp/wisp274v1/fakebin/npm.cmd`（`logs/04:30` 里 node 被解析成 `fakebin\node.exe (v24.9.0)`），与它的 `fake-npm-shim` 无继承关系。
+3. **确认**（原句逐字，`impl.md:133-134`）：`**出货通路整条绿（EXITCODE=0、走到 smoke test、写了 SHA256SUMS），而交出去的那枚 exe 一个页面字节都不带…**`
+   我的复跑＝`logs/03:12` `OLD_BUILD_PS1_PROCESS_EXITCODE=0`、`logs/03:9` `build.ps1: wrote D:\tmp\wisp274v1\tree\build\SHA256SUMS`、`logs/03:20-21` `assets NOT BUILT` ＋ `PANEL_ASSETS_EXITCODE=1`。
+4. **确认**（原句逐字，`impl.md:319`）：`已跑的替代读数：go vet ./cmd/wisp/ ./internal/panel/ rc=0（编译面干净）＋d22scan 正控先绿再 clean。`
+   我的复跑＝`logs/07`：`GOVET_RC=0`；`runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0` 之后才是真扫，`D22SCAN_RC=0`。
+5. **推翻半句**（原句逐字，`impl.md:269`）：`| gofmt -l／gofumpt v0.12.0 -l | **本腿零 .go 改动 ⇒ 无 .go 可喂，未喂**…| 不适用（如实记） |`
+   "按写面"它没错（`git diff --name-only 35633445^ 35633445` 只回 `scripts/build.ps1`，`logs/07:256`），⛔ 但 AC#6 那一格点名的是 `cmd/wisp`／`internal/panel` 这两枚包，喂下去**不是空**：
+   `gofmt -l cmd/wisp internal/panel` ＝ **`cmd\wisp\models.go`**（`logs/07` §3），`/d/work/base/gopath/bin/gofumpt.exe --version` ＝ **`v0.12.0 (go1.27.1)`**，`gofumpt -l cmd/wisp internal/panel` ＝ **同一枚 `cmd\wisp\models.go`**（`logs/09` 末段）。
+   定因＝**盘上行尾符**：`cmd/wisp/models.go` `tr -cd '\r' | wc -c` ＝ **334**（＝逐行 CRLF），全仓跟踪 `.go` 里带 CR 的 **13 枚**（`/d/tmp/wisp274v1/crlf-go-files.txt`）；
+   而 `git show 35633445^:cmd/wisp/models.go` 与 `35633445:` 那份**逐字节相同**（`cmp` 回 `IDENTICAL`，`logs/08`(a)）⇒ 与 274 无关、与票 275 那条"真未格式化名册"同族。
+   ⇒ 本格读数要写成"**这台机器的 bench 树上这两枚包不是 gofmt/gofumpt-clean，红因＝CRLF，不是 274**"，⛔ 不许写成"不适用"。这正是 A664 那枚行尾符变量**第二次**咬到判据仪器（第一次是 `git archive`）。
+
+## §4 编排者的句子（票面／A664）——本腿推翻或收窄的，逐句给原句与我的尺
+1. **推翻**：票面 `:145` 与台账 `A664` §5 都写 `git status --porcelain -- design` 现量＝"**4 枚 ` D` ＋若干 ` M`**"（派单简报同句照抄）。
+   我的现量（`logs/00-anchor.txt` 末段，尺＝`git status --porcelain -- design | cut -c1-2 | sort | uniq -c`）＝
+   **`16  D` / `4  M` / `11 ??`，共 31 行**。 ⇒ "4 枚 D"少计了 `design/index.html` 与 `design/screens/*.html` 那 11 枚删除。
+   **后果**：处置不变（不碰、不算进作差），但"起手即脏的规模"被写成实际的四分之一；按简报纪律"盘上赢"，本腿所有作差一律排除 `design/**`，且六族 `cmd internal scripts tools .github docs frontend build` 现量 **0 行**（`logs/04`、`logs/06` 末段两次回查）。
+2. **推翻半句**：`A664` §2 那句更正（"`git archive` 不是干净检出，它按本机 autocrlf 改字节"）**成立且我扩一条**——
+   同一枚行尾符变量不只咬 `git archive`，还咬 **gofmt/gofumpt 门禁本身**（见 §3.5）。⇒ 今后任何腿报 `gofmt -l` 之前要先报 `tr -cd '\r' | wc -c`，否则"未格式化"与"CRLF"两种红分不开（这条与台账第 120 条"一个门有多种红法不许压成一格"同形）。
+3. **收窄**：票面 `:108-109`／`A664` §1 的 AC#9 成立口径"exe 内嵌物 == **同一次运行**里 dist 的产物"——我复跑 exe 侧（只读，`logs/07` §7）：
+   `build/wisp.exe` md5 `e6c8e52b…` → `panel assets embedded: 4 files, entry=index.html built=true`、`-manifest` ＝ `.gitkeep 0 e3b0c44298fc1c14`／`assets/index-B8yINMF1.js 551989 8f06145dac449fb6`／`assets/index-yy8KMgdf.css 49540 d0b198664b250973`／`index.html 1044 9b7856b949d63989`（与 `A664` §1 那串**逐枚相同**＝它对）。
+   ⛔ 但**盘上今天的 `frontend/dist` 装的是另外两枚名字**（`index-BVKlegVD.js 553469`／`index-BRKj5OIJ.css 49943`，`logs/10`）⇒
+   "同一次运行"那对**已经从盘上消失了**（dist 被还原成 09-27 基线、exe 留在 11:57 那份）。所以 AC#9 现在的凭据**只剩日志**，盘上无法重建那一对；
+   凡后续再拿 `build/wisp.exe` 报"带页面"，读数主体是**它自己内嵌的那份 fresh 产物**，⛔ 不是工作树的 dist。这一格我按"已成立但不可复核"记。
+4. **确认**：`A664` §4①"exe 被本票重跑覆盖＝保留新的、不还原，起手那份在 `/d/tmp/wisp274r1/wisp.exe.pre-274r1-backup`"——我现量该文件在盘：
+   md5 `7032d94d36b2e060ec4a24a6a04c1f47`／31,076,405 字节，与 `impl.md` 起始那份记录一致（`logs/10`）；仓内现 exe `e6c8e52b…`＝另一枚。⇒ 那句"撤销口令＝「还原 274 前 exe」"是**可执行的**。
+5. **简报里"实现者用 mv 而非 -overlay"这一条：盘上核实为真**——`/d/tmp/wisp274r1/` 里有 `dist-stale-backup`／`dist-stale-staging`／`node-modules-pre-274r1`／`fake-npm-shim` 与两份 `mut-i-no-node.ps1`／`mut-ii-stub-npm.ps1`（`logs/10` 的 `ls`），没有 `-overlay` 用到的 json 层；`impl.md:282-284` 自述三次 `mv` 动 dist＋一次动 `node_modules`。裁定见 §1-AC#7（下节）。
+
+## AC#7（方法裁定：`mv`＋逐枚 md5 还原 算不算 `-overlay` 那句字面）＝**实质成立／字面不成立，且我认为字面那句本身写错了对象**
+- 盘上事实（本腿自跑，`logs/10`）：`frontend/dist` 今天四枚＝`.gitkeep 0 d41d8cd9…`／`index-BRKjOIJ… db4db7a2… 49943`／`index-BVKlegVD.js 70128a3d… 553469`／`index.html f98bfc4b… 1044`
+  与 `r1/logs/02-dist-baseline.txt` 那四枚 md5 **逐枚全等**；六族 porcelain 起手/终态都＝**0 行**。⇒ AC#7 后半句"终态 porcelain＝起手、被审文件与 `git show HEAD:` 逐串对回"＋票面 `:53` 的"dist 枚数与哈希起手/终态必须相同"**都满足**，我独立复核过。
+- 但 `:53` 前半句字面是"**所有突变只走 `go test -overlay`（拷贝放仓外）**"。`274-r1` 走的是 `mv`＋还原，**字面不符**。我的裁量：
+  ① 本票的突变对象是 **PowerShell 流水线的运行环境**（PATH 里有没有 node/npm、dist 目录里有没有字节），`go test -overlay` 在语义上**够不着**这一层——overlay 只替换 Go 编译器读到的文件内容，不改 `Get-ChildItem`/`Test-Path` 看到的真实目录树。⇒ 拿它作唯一合法手段，是**把 Go 侧尺的规矩套到构建脚本侧**。
+  ② `:53` 的字面要求真正的**目的**在票面 `:47` 已经写明：「⛔ 绝不许真删/真盖本机 `frontend/dist` 里那 4 枚文件」，而那一格给的是**两条**合法路线——「**走 `go test -overlay` 或仓外合成 bundle**」。⇒ 两格不自洽：AC#1 允许仓外台件，AC#7 却只允许 `-overlay`。
+  ③ 本腿的台件就是那条被允许的第二路线：仓外**硬链接镜像树**＋树内 `unlink`（`logs/01`：仓内四枚 md5 在我 unlink 前后逐枚相同），⛔ 全程没碰过仓内 dist——可见"不动仓内字节"并不必然需要 `-overlay`。
+  ⇒ **建议**：AC#7 记「实质达成（仓内字节零改动，已由第二方复核），方法偏离字面」；要严格执行字面，就得先把 `:53` 改成与 `:47` 一致的"overlay **或**仓外台件"——那是**票面文字＝契约面**，归人工批准，⛔ 本腿不改一字。
+  我**没**能核到的一点：`274-r1` 三次 `mv` 期间，别的会话若正好读 `frontend/dist`，会读到锚文件形——这段窗口是否真被并发使用过，我无法从盘上判定（记进 §5）。
