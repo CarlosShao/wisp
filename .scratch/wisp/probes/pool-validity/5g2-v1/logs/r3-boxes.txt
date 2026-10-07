@@ -1,0 +1,28 @@
+### ticket .scratch/wisp/issues/74-c21-table-must-mirror-live-drivers-done.md
+m28 row: 74|74-c21-table-must-mirror-live-drivers-done.md|un=0|any=0|chk=5|tot=11|accfiles=acc=1|selfcells=0|
+lines starting '- [ ':
+11
+  of those [x]:
+5
+  of those [ ]:
+0
+  other bracket char (not x/space):
+6
+indented anywhere:
+0
+=== distinct box forms on face ===
+      5 - [x] 
+### ticket .scratch/wisp/issues/162-add-the-patch-one-region-tool-instead-of-rewriting-whole-files-done.md
+m28 row: 162|162-add-the-patch-one-region-tool-instead-of-rewriting-whole-files-done.md|un=0|any=0|chk=8|tot=
+lines starting '- [ ':
+18
+  of those [x]:
+8
+  of those [ ]:
+0
+  other bracket char (not x/space):
+10
+indented anywhere:
+0
+=== distinct box forms on face ===
+      8 - [x] 

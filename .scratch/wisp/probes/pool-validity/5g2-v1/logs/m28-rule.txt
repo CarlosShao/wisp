@@ -1,0 +1,1 @@
+22:echo "== total =="; awk -F'|' '{split($2,a,"="); s[a[2]]++} END{for(k in s) print k" "s[k]}' $L/final-b.tsv
