@@ -463,3 +463,66 @@ $ ls .scratch/wisp/probes/185/c1/mut/fs_broken.go
 5. **票 185 的凭据链**（那枚样本到底被哪些判据依赖）——⛔ **本腿未审**，只在 §4.3 登记为未验证。
 6. **`git log` 具名 `f6b79ab0` 把守卫送进 HEAD** 这一条——⛔ **本腿未复跑**（票 §2 第 6 行的 commit 归属那一环，本腿只验了"守卫现在在 HEAD 上"＝`ci.yml` 工作树==HEAD＋`:234` 现读，没验它是哪一笔 commit 带进来的）。
 7. **甲/乙/丙 三形的选择**——⛔ **本腿不选**（指令 §0/§3 明令，选形归编排者）。
+
+---
+
+## §7 收尾自证补记（第三笔；本腿两笔 commit 之间共享工作树被别人推进过，逐条落档）
+
+```
+$ git log --oneline -8        （终态）
+66df27ba 275-a1: AC#0/AC#1/AC#2 readings (ticket 275 tracked gofumpt denominator)      ← 本腿第二笔
+ccb9f0df probe(35-a2): land opening anchor gate for the transport-cost survey
+3c8ac14e 台账 A662＋票 35 收 35-a1：…
+28872c9a 273-a3 起手锚：票面+三序件整读完毕，…
+77e278bf 274-r1: start anchor (write leg, ticket 274, form = B-1)
+019b4045 275-a1: start anchor (read-only census leg, ticket 275)                        ← 本腿起手锚
+89114888 35-a1 S6+S7: …
+8976ffab 35-a1 S4+S5: …                                                                 ← 本腿起手 HEAD
+
+$ git merge-base --is-ancestor 019b4045 HEAD
+YES 019b4045 is in HEAD history
+$ git merge-base --is-ancestor 8976ffab 019b4045
+YES anchor built on 8976ffab
+```
+
+⇒ **本腿两笔之间，别的腿往 dev 上推了 4 笔**（`77e278bf` 274-r1 起手锚、`28872c9a` 273-a3 起手锚、`3c8ac14e` 台账 A662、`ccb9f0df` 35-a2 起手锚）。
+本腿⛔ 没 push、没 rebase、没 reset，两笔是顺序叠上去的，历史未被本腿改写。
+
+**分母有没有被这四笔改动过（本腿读数还成不成立）——现量：**
+
+```
+$ git ls-files '*.go' | wc -l                                    → 935   （终态）
+$ git ls-tree -r HEAD --name-only | grep -c '\.go$'               → 935
+$ git ls-tree -r 019b4045 --name-only | grep -c '\.go$'           → 935   （起手锚那一笔的树）
+$ diff <(锚树 .go 名单) <(HEAD 树 .go 名单)                        → 空    ⇒ 零枚增删
+```
+
+⇒ §1 的 935 枚名册、§2/§3 的两把读数**对 HEAD 仍然成立**（分母没动）。
+⚠ 但注意：`ci.yml`／`attrib.sh`／那枚坏样本也逐字未动（`git diff HEAD --stat -- …` 空），所以 AC#1 的读数不需要重取。
+
+**工作树被别人推进的证据（⛔ 不是本腿动的，本腿不提交也不还原）：**
+
+```
+$ git status --porcelain -- cmd internal scripts tools .github docs frontend
+ M scripts/build.ps1
+```
+
+⇒ 起手时这一串是**空**的（§0.2 逐字留档），终态多出 ` M scripts/build.ps1`——
+那是指令 §5 预警过的"另一枚腿 `274-r1` 正在改 build.ps1"，**本腿从未碰过 `scripts/`**（本腿两笔 commit 的 name-only 清单里没有任何 `scripts/` 路径，见上一节 git show 输出）。
+全仓 porcelain 行数从起手 **751** 变到终态 **782**（＋31），同样归别人在飞的活。
+
+**本腿终态只写了这两枚路径**（外加一枚自造的暂存副本 `census-2.md`，按"只建不删"留着⛔ 不入库）：
+
+```
+$ git status --porcelain -- .scratch/wisp/probes/275
+?? .scratch/wisp/probes/275/a1/census-2.md      ← 唯一残留，未提交，本腿造的
+$ git show --name-only 019b4045                  → 只有 census.md
+$ git show --name-only 66df27ba | grep -vE '^\.scratch/wisp/probes/275/a1/(census\.md|logs/)' → 空
+```
+
+**一句本腿亲历的 CRLF 旁证**（与 §1.4 同一机制，顺手记下）：commit 第二笔时 git 对 `logs/` 下 18 枚文件逐一警告
+`in the working copy of '…', LF will be replaced by CRLF the next time Git touches it`
+⇒ 这台机器上"git 存 LF、工作树落 CRLF"是**双向**发生的；`.gitattributes` 的 `* text=auto` 对没有显式 `eol=` 的
+`logs/*.txt`／`*.tsv` 就是按这台机器的 `core.autocrlf=true` 走，而 `*.go` 有 `eol=lf` 兜着——
+所以 §1.4 那 5 枚产码文件的 CRLF **不是 git 检出造成的**，是别的写入方（工具／编辑器）留下、又被 `text eol=lf` 归一遮住的。
+⇒ 这句是本腿的**推**，不是本腿量到的成因；要定成因归后续腿，本腿只把"哪些是量到的、哪些是推的"分开写清楚。
