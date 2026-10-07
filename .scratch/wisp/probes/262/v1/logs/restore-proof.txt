@@ -1,0 +1,40 @@
+=== 262-v1 还原自证（取数时刻 Wed Oct  7 14:24:01 CST 2026）===
+[1] 入库脚本原样复跑 --self-test：
+    rc=0
+    check-path-length-budget.sh: positive control bench=/tmp/tmp.ODxjCa1uGy (kept on disk; this project never deletes temp artifacts)
+    check-path-length-budget.sh: control 1/3 ok - bench baseline green, so this gate is not stuck red
+    check-path-length-budget.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+    check-path-length-budget.sh: control 3/3 ok - green again once the planted path is gone
+    check-path-length-budget.sh: positive control PASSED
+[2] 入库脚本与 HEAD blob 是否一字未动（尺＝git diff --stat + hash-object 对拉）：
+    (上面无输出＝0 行差异)
+    script sha now  = aa4cd3aa62954cfe702a57f0806a21e5b3ad711d
+    script sha HEAD = aa4cd3aa62954cfe702a57f0806a21e5b3ad711d
+[3] 本仓工作树里有没有越帽跟踪路径（本腿自己那两枚种子的形状各扫一遍）：
+    over-budget tracked paths in THIS repo now = 57
+[4] git status --porcelain -- .scratch scripts tools .github docs 中与本腿写面相关的行：
+     M .scratch/wisp/probes/262/v1/verdict.md
+    ?? .scratch/wisp/probes/262/v1/logs/ac0-local.txt
+    ?? .scratch/wisp/probes/262/v1/logs/ac3-A.txt
+    ?? .scratch/wisp/probes/262/v1/logs/ac3-B.txt
+    ?? .scratch/wisp/probes/262/v1/logs/ac3-C.txt
+    ?? .scratch/wisp/probes/262/v1/logs/ac3-readings.txt
+    ?? .scratch/wisp/probes/262/v1/logs/ac4-roster-audit-and-ac6-summary.txt
+    ?? .scratch/wisp/probes/262/v1/logs/ac5-gh-attempts.txt
+    ?? .scratch/wisp/probes/262/v1/logs/ac7.txt
+    ?? .scratch/wisp/probes/262/v1/logs/clone-baseline.txt
+    ?? .scratch/wisp/probes/262/v1/logs/d22scan-clone.txt
+    ?? .scratch/wisp/probes/262/v1/logs/d22scan.txt
+    ?? .scratch/wisp/probes/262/v1/logs/gofumpt-clone-head.txt
+    ?? .scratch/wisp/probes/262/v1/logs/gofumpt-noncmdwisp.txt
+    ?? .scratch/wisp/probes/262/v1/logs/govet-internal.txt
+    ?? .scratch/wisp/probes/262/v1/logs/m6-with-self-test.txt
+    ?? .scratch/wisp/probes/262/v1/logs/mutants-log.txt
+    ?? .scratch/wisp/probes/262/v1/logs/restore-proof.txt
+    (本腿写面之外的一切脏项都是别人的在飞活，本腿不碰)
+[5] 仓外拷贝残留（按规矩 8 不删、不入库）：
+    D:/tmp/262v1/clone  = 7407 tracked, HEAD 1d59543e
+    clone 里本腿种过的两枚种子现在的跟踪态：0 枚仍被跟踪（应为 0）
+    clone 里未跟踪残留文件枚数：2
+    D:/tmp/262v1/mut 下 mutant 枚数：9
+    门自己的 bench（脚本主动保留、不删）：6 枚落点记录在 logs 里

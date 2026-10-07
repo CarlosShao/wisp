@@ -1,0 +1,2 @@
+go vet ./internal/... rc=0
+Wed Oct  7 14:17:39 CST 2026

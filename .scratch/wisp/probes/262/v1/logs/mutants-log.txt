@@ -1,0 +1,264 @@
+
+===== MUTANT DIFF SANITY (each mutant must differ from the shipped file, and only where intended) =====
+shipped-copy: changed-line-count=0
+m1-hat999: changed-line-count=2
+< HAT_NAME_LIMIT=100
+> HAT_NAME_LIMIT=999
+m2-no-second-hat: changed-line-count=2
+<     if (len > hatrel || namelen > namecap) {
+>     if (len > hatrel) {
+m3-empty-reason: changed-line-count=2
+<     R[".scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-r
+>     R[".scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-r
+m4-drop-entry: changed-line-count=1
+<     R[".scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-r
+m5-selftest-hat999: changed-line-count=2
+< HAT_NAME_LIMIT=100
+> HAT_NAME_LIMIT=999
+m6-selftest-hat999-assert-neutered: changed-line-count=4
+< HAT_NAME_LIMIT=100
+> HAT_NAME_LIMIT=999
+<     if [ "$rc" -ne 1 ]; then
+>     if false; then
+
+===== M0 BASELINE - shipped script, clean clone  (Wed Oct  7 14:15:47 CST 2026) =====
+
+===== RUN M0-shipped-copy-baseline  mutant=shipped-copy.sh  args=none  date=Wed Oct  7 14:15:47 CST 2026 =====
+shipped-copy.sh: repo=D:/tmp/262v1/clone
+shipped-copy.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+shipped-copy.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+shipped-copy.sh: check: relative_length + 44 > 165, or a last name component > 100
+shipped-copy.sh: denominator read: 7407 tracked paths
+shipped-copy.sh: denominator: tracked paths=7407  over-budget=57  covered by roster=57  not in roster=0
+shipped-copy.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+shipped-copy.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+shipped-copy.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+shipped-copy.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+shipped-copy.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+
+===== rc=0 =====
+
+===== M1 HAT_NAME_LIMIT=999 (threshold tamper) - shipped script stays as control =====
+
+===== RUN M1-hat999-scan  mutant=m1-hat999.sh  args=none  date=Wed Oct  7 14:15:48 CST 2026 =====
+m1-hat999.sh: repo=D:/tmp/262v1/clone
+m1-hat999.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+m1-hat999.sh: hat: rule 9 name cap=999 + issues dir prefix=21 -> relative hat=1020 ; worst checkout prefix=44 -> full-path budget=1064
+m1-hat999.sh: check: relative_length + 44 > 1064, or a last name component > 999
+m1-hat999.sh: denominator read: 7407 tracked paths
+m1-hat999.sh: denominator: tracked paths=7407  over-budget=0  covered by roster=0  not in roster=0
+m1-hat999.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+m1-hat999.sh: worst full path on the self-hosted runner=224 chars (hat budget 1064, wall open interval (206,217])
+m1-hat999.sh: bands: over the hat=0  of which in the 122..180 middle=0  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/dispatches/2026-09-28-114x-accept-179-v1-is-any-of-the-three-new-criteria-tautological-and-who-owns-the-decision-column.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/dispatches/2026-09-28-135x-impl-183-r2-grow-the-two-missing-teeth-and-re-take-the-gates-after-your-own-last-commit.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/dispatches/2026-09-28-142x-readonly-185-c1-who-should-declare-the-read-back-path-and-what-does-each-route-cost.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/126-winsec-tree-attribution-strips-the-volume-so-a-seal-on-one-drive-is-reported-against-another-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/127-the-resident-gui-leg-installs-its-log-listener-with-zero-nails-deleting-20-lines-keeps-146-tests-green-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/128-resolvedatadir-falls-back-to-current-directory-when-appdata-is-missing-moving-config-dpapi-and-memory.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/129-sametree-also-drops-the-absoluteness-segment-so-a-drive-relative-spelling-passes-the-seam-guard-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/134-slofull-autostarts-on-every-push-on-this-laptop-but-making-it-manual-only-would-kill-the-gate-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/135-the-only-teeth-in-ticket-128s-judgement-have-no-self-proof-leg-two-mutations-stacked-go-16-16-green.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/136-the-zero-sample-fail-closed-guard-underneath-the-freshness-nail-has-no-nail-54-tests-stay-green-without-it.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/137-winsecs-12-posix-rejection-legs-go-green-in-the-symlink-shape-for-the-hosts-own-varlink-not-their-own-planted-link-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/139-context-compression-leaves-no-trace-zero-log-calls-in-compress-go-zero-readers-of-res-compression.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/140-job-level-wisp-env-test-makes-the-ask-the-os-hardening-legs-never-get-consulted-on-the-windows-runner.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/141-ban8-emoji-scan-range-is-narrower-than-plan-md-states-41-go-files-carry-u2190-u25ff-today-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/142-the-two-git-spawns-are-not-atomic-so-a-tracked-directory-can-be-skipped-during-the-window-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/143-wisp-panel-assets-l2-cannot-produce-an-r4-card-the-taint-detector-is-not-wired-on-that-path-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/144-wisp-slo-collectreport-reads-a-still-being-written-file-as-a-corrupt-one-one-empty-read-kills-the-run-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/145-panel-snapshot-has-four-fields-so-eleven-of-the-fourteen-ui-states-have-no-input-to-render-grow-the-go-side-carrier.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/147-collectreports-named-red-says-document-stopped-at-offset-n-but-the-unwritten-branch-always-carries-0-and-no-assertion-pins-it-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/148-clonedecision-only-guarded-one-door-the-sibling-replay-outlet-still-hands-out-a-shallow-value-copy-and-what-the-panel-should-receive-is-unwritten.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/150-four-deferred-markers-have-no-row-in-the-spec-12-registry-so-the-1-to-1-rule-is-violated-today-and-no-instrument-scans-it.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/151-bridge-opentask-sits-on-the-dispatch-hot-path-while-closetask-has-zero-callers-repo-wide-so-the-per-task-taint-scope-is-only-ever-opened-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/152-the-real-subject-death-shape-has-never-been-measured-only-faked-to-be-reachable-and-the-offset-fallback-is-a-leg-that-changes-no-reading-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/153-the-compression-trace-has-two-unguarded-ways-to-lie-swapping-the-ran-guard-for-need-keeps-all-four-nails-green-and-the-trace-carries-no-taskid-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/155-ticket-153-leaves-three-cells-unjudged-because-my-attack-point-grid-and-the-ticket-ac-grid-are-not-the-same-coordinate-system-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/156-q-57-landed-as-option-b-exited-asks-the-os-instead-of-our-own-record-and-the-152-leftover-comment-actions-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/158-the-gate-stands-outside-the-shape-that-is-live-today-openscope-closescope-has-no-clause-and-the-bridge-scope-open-is-guarded-only-in-another-package.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/169-a-single-decorative-glyph-in-frontend-makes-the-repo-wide-gate-red-and-kills-every-ci-step-after-it.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/171-three-ruler-holes-ticket-161-cannot-carry-aggregate-rs-selftest-not-in-ci-trailing-comments-counted-as-calls-and-count-blind-pair-legs.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/172-no-ruler-links-the-frozen-tier-in-plan-md-to-the-tier-the-gate-actually-gives-a-zero-tests-go-red.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/173-the-audit-line-prints-in-allowlist-scope-true-when-nothing-was-judged-blank-path-both-meanings-one-field.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/174-task-output-points-at-a-file-the-model-cannot-read-by-default-spill-artifacts-are-outside-fs-allowed-dirs.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/175-task-output-returns-external-content-with-no-c25-provenance-mark-because-marking-is-name-gated-and-the-name-is-not-on-the-roster.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/178-pair-census-ruler-g6-negative-leg-cannot-express-closing-a-scope-opened-elsewhere-and-rings-every-honest-test.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/179-loop-deciderisk-treats-a-declared-l0-as-unclassified-so-every-readonly-builtin-is-refused-on-the-real-cli-and-no-criterion-holds-that-sentence.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/180-panel-width-is-a-config-field-with-zero-production-readers-so-changing-config-toml-has-no-visible-effect.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/181-nothing-in-go-ever-reads-git-so-the-panel-cannot-show-the-branch-and-the-two-mutating-actions-would-need-c17-whitelist-methods.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/182-the-task-monitor-rail-is-outside-ticket-145s-fourteen-row-table-so-nobody-has-counted-which-of-its-stacks-have-a-go-side-source.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/184-a-decision-column-of-five-frozen-values-cannot-tell-an-auto-allowed-l0-from-a-human-approval-and-grant-id-has-zero-production-writers-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/185-every-successful-reread-mints-the-blocker-for-the-next-one-because-the-fs-read-result-becomes-an-undeclared-c25-mark.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/191-the-panel-embedded-terminal-puts-an-execution-surface-on-the-panel-channel-so-it-needs-a-named-ruling-first.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/192-the-browser-and-artifact-preview-stack-is-unclaimed-and-sits-on-the-undefined-web-search-ruling.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/193-lightweight-must-no-longer-constrain-frontend-animation-and-visuals-make-the-per-panel-gates-named.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/194-the-panel-has-two-method-rosters-that-do-not-know-each-other-owner-ruled-align-the-code-to-the-spec.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/195-config-set-needs-a-per-section-write-foundation-before-the-panel-can-touch-it-and-the-only-writer-in-the-repo-is-permmode.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/196-two-task-state-vocabularies-already-coexist-and-the-schema-has-no-check-so-the-d43-names-are-not-the-ones-in-use.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/197-the-panel-must-show-each-subagents-state-and-click-through-to-its-own-streaming-work-page-but-go-side-has-zero-subagent-entity.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/235-the-pool-nail-comment-reason-was-falsified-by-ticket-222-and-only-one-of-three-cases-sees-the-real-bridge-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/243-a-closed-ticket-number-still-owns-work-in-25-comments-which-is-the-shape-that-fooled-three-legs-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/245-the-bare-esc-cancel-default-is-a-global-hotkey-so-the-resident-process-steals-esc-from-every-other-app.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/246-the-process-that-runs-tasks-is-not-the-process-holding-the-ball-so-no-veto-channel-has-an-executor.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/250-portable-tests-guard-c-merges-go-list-stderr-into-its-own-denominator-so-a-cold-module-cache-kills-the-whole-core-scope-reading-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/251-winsec-pin-is-a-pin-nobody-compares-the-winsec-scope-runs-through-explicit-paths-so-guard-c-never-sees-it-done.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/258-the-schema-calls-hotkey-hot-tier-but-the-resident-leg-builds-the-ball-from-default-hotkeys-and-the-only-reloader-caller-is-balldebug.md
+m1-hat999.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/261-the-model-enabled-key-promises-removal-from-discovery-and-selection-but-no-production-code-reads-it-while-the-default-true-tag-is-inert-for-map-entries.md
+m1-hat999.sh: RED - count guard: the roster holds 57 entries, the tree has 0 over-budget tracked paths
+m1-hat999.sh: VERDICT RED
+m1-hat999.sh: unit cross-check: the byte view and the character view select the SAME 0 paths on this tree, recomputed just now in both units
+
+===== rc=1 =====
+
+===== M2 remove the repo-wide last-name-component hat branch =====
+
+===== RUN M2-no-second-hat-scan  mutant=m2-no-second-hat.sh  args=none  date=Wed Oct  7 14:15:49 CST 2026 =====
+m2-no-second-hat.sh: repo=D:/tmp/262v1/clone
+m2-no-second-hat.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+m2-no-second-hat.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+m2-no-second-hat.sh: check: relative_length + 44 > 165, or a last name component > 100
+m2-no-second-hat.sh: denominator read: 7407 tracked paths
+m2-no-second-hat.sh: denominator: tracked paths=7407  over-budget=57  covered by roster=57  not in roster=0
+m2-no-second-hat.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+m2-no-second-hat.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+m2-no-second-hat.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+m2-no-second-hat.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+m2-no-second-hat.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+
+===== rc=0 =====
+
+===== M3 roster reason of the 252 entry blanked (guard D) =====
+
+===== RUN M3-empty-reason-scan  mutant=m3-empty-reason.sh  args=none  date=Wed Oct  7 14:15:50 CST 2026 =====
+m3-empty-reason.sh: repo=D:/tmp/262v1/clone
+m3-empty-reason.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+m3-empty-reason.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+m3-empty-reason.sh: check: relative_length + 44 > 165, or a last name component > 100
+m3-empty-reason.sh: denominator read: 7407 tracked paths
+m3-empty-reason.sh: denominator: tracked paths=7407  over-budget=57  covered by roster=57  not in roster=0
+m3-empty-reason.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+m3-empty-reason.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+m3-empty-reason.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+m3-empty-reason.sh: RED - roster entry carries an EMPTY reason; the reason is data, not a comment: .scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md
+m3-empty-reason.sh: VERDICT RED
+m3-empty-reason.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+
+===== rc=1 =====
+
+===== M4 roster line of the 252 entry deleted (guard A + count guard C) =====
+
+===== RUN M4-drop-entry-scan  mutant=m4-drop-entry.sh  args=none  date=Wed Oct  7 14:15:51 CST 2026 =====
+m4-drop-entry.sh: repo=D:/tmp/262v1/clone
+m4-drop-entry.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+m4-drop-entry.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+m4-drop-entry.sh: check: relative_length + 44 > 165, or a last name component > 100
+m4-drop-entry.sh: denominator read: 7407 tracked paths
+m4-drop-entry.sh: denominator: tracked paths=7407  over-budget=57  covered by roster=56  not in roster=1
+m4-drop-entry.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+m4-drop-entry.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+m4-drop-entry.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=56
+m4-drop-entry.sh: RED - over budget and NOT in the roster: .scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md  (relative 180 chars, name 159 chars, full path on the self-hosted runner 224 chars, budget 165)
+m4-drop-entry.sh: RED - count guard: the roster holds 56 entries, the tree has 57 over-budget tracked paths
+m4-drop-entry.sh: VERDICT RED
+m4-drop-entry.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+
+===== rc=1 =====
+
+===== M2b/M0b WITH the repo-root 108-char-name path tracked again =====
+
+===== RUN M0b-shipped-copy-with-root-plant  mutant=shipped-copy.sh  args=none  date=Wed Oct  7 14:15:52 CST 2026 =====
+shipped-copy.sh: repo=D:/tmp/262v1/clone
+shipped-copy.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+shipped-copy.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+shipped-copy.sh: check: relative_length + 44 > 165, or a last name component > 100
+shipped-copy.sh: denominator read: 7408 tracked paths
+shipped-copy.sh: denominator: tracked paths=7408  over-budget=58  covered by roster=57  not in roster=1
+shipped-copy.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+shipped-copy.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+shipped-copy.sh: bands: over the hat=58  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+shipped-copy.sh: RED - over budget and NOT in the roster: 262v1-ac3-root-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.md  (relative 108 chars, name 108 chars, full path on the self-hosted runner 152 chars, budget 165)
+shipped-copy.sh: RED - count guard: the roster holds 57 entries, the tree has 58 over-budget tracked paths
+shipped-copy.sh: VERDICT RED
+shipped-copy.sh: unit cross-check: the byte view and the character view select the SAME 58 paths on this tree, recomputed just now in both units
+
+===== rc=1 =====
+
+===== RUN M2b-no-second-hat-with-root-plant  mutant=m2-no-second-hat.sh  args=none  date=Wed Oct  7 14:15:53 CST 2026 =====
+m2-no-second-hat.sh: repo=D:/tmp/262v1/clone
+m2-no-second-hat.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+m2-no-second-hat.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+m2-no-second-hat.sh: check: relative_length + 44 > 165, or a last name component > 100
+m2-no-second-hat.sh: denominator read: 7408 tracked paths
+m2-no-second-hat.sh: denominator: tracked paths=7408  over-budget=57  covered by roster=57  not in roster=0
+m2-no-second-hat.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+m2-no-second-hat.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+m2-no-second-hat.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+m2-no-second-hat.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+m2-no-second-hat.sh: unit cross-check: the byte view and the character view select the SAME 58 paths on this tree, recomputed just now in both units
+
+===== rc=0 =====
+
+===== teardown: clone tracked count now =====
+git ls-files count=7407  status porcelain below
+2
+
+===== M5 shipped assertions + HAT_NAME_LIMIT=999 -> --self-test must FAIL OUT LOUD =====
+
+===== RUN M5-selftest-hat999  mutant=m5-selftest-hat999.sh  args=--self-test  date=Wed Oct  7 14:15:54 CST 2026 =====
+m5-selftest-hat999.sh: positive control bench=/tmp/tmp.EkUpkkCxls (kept on disk; this project never deletes temp artifacts)
+warning: in the working copy of 'ok-short-name.md', LF will be replaced by CRLF the next time Git touches it
+m5-selftest-hat999.sh: control 1/3 ok - bench baseline green, so this gate is not stuck red
+warning: in the working copy of '.scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md', LF will be replaced by CRLF the next time Git touches it
+m5-selftest-hat999.sh: CONTROL FAILED - planting a tracked path 125 characters long should be RED (rc=1), got rc=0. The gate may be stuck green
+gate.sh: repo=C:/Users/swq/AppData/Local/Temp/tmp.EkUpkkCxls
+gate.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+gate.sh: hat: rule 9 name cap=999 + issues dir prefix=21 -> relative hat=1020 ; worst checkout prefix=44 -> full-path budget=1064
+gate.sh: check: relative_length + 44 > 1064, or a last name component > 999
+gate.sh: denominator read: 2 tracked paths
+gate.sh: denominator: tracked paths=2  over-budget=0  covered by roster=0  not in roster=0
+gate.sh: longest=125 chars relative (.scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md)
+gate.sh: worst full path on the self-hosted runner=169 chars (hat budget 1064, wall open interval (206,217])
+gate.sh: bands: over the hat=0  of which in the 122..180 middle=0  past the old debt line(180)=0  in the wall interval=0  roster entries=0
+gate.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+gate.sh: unit cross-check: the byte view and the character view select the SAME 0 paths on this tree, recomputed just now in both units
+m5-selftest-hat999.sh: positive control RED - the scan below is not run, because a gate that cannot go red does not get to print green
+
+===== rc=1 =====
+
+===== M6 same tampered threshold AND the control-2 assertion neutered -> shows the assertion is the tooth =====
+
+===== RUN M6-selftest-hat999-assert-neutered  mutant=m6-selftest-hat999-assert-neutered.sh  args=--self-test  date=Wed Oct  7 14:15:56 CST 2026 =====
+m6-selftest-hat999-assert-neutered.sh: positive control bench=/tmp/tmp.X7vjbqtppf (kept on disk; this project never deletes temp artifacts)
+warning: in the working copy of 'ok-short-name.md', LF will be replaced by CRLF the next time Git touches it
+m6-selftest-hat999-assert-neutered.sh: control 1/3 ok - bench baseline green, so this gate is not stuck red
+warning: in the working copy of '.scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md', LF will be replaced by CRLF the next time Git touches it
+m6-selftest-hat999-assert-neutered.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+m6-selftest-hat999-assert-neutered.sh: control 3/3 ok - green again once the planted path is gone
+m6-selftest-hat999-assert-neutered.sh: positive control PASSED
+
+===== rc=0 =====
+
+===== M7 unmodified shipped script --self-test alone (re-confirm rc=0 path) =====
+
+===== RUN M7-selftest-shipped-copy  mutant=shipped-copy.sh  args=--self-test  date=Wed Oct  7 14:15:59 CST 2026 =====
+shipped-copy.sh: positive control bench=/tmp/tmp.DaVtxnb9pT (kept on disk; this project never deletes temp artifacts)
+warning: in the working copy of 'ok-short-name.md', LF will be replaced by CRLF the next time Git touches it
+shipped-copy.sh: control 1/3 ok - bench baseline green, so this gate is not stuck red
+warning: in the working copy of '.scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md', LF will be replaced by CRLF the next time Git touches it
+shipped-copy.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+RED - over budget and NOT in the roster: .scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md  (relative 125 chars, name 104 chars, full path on the self-hosted runner 169 chars, budget 165)
+shipped-copy.sh: control 3/3 ok - green again once the planted path is gone
+shipped-copy.sh: positive control PASSED
+
+===== rc=0 =====
+
+DONE Wed Oct  7 14:16:03 CST 2026
+rc=1
+m6-selftest-hat999-assert-neutered.sh: positive control bench=/tmp/tmp.MKiJ4lvW5c (kept on disk; this project never deletes temp artifacts)
+m6-selftest-hat999-assert-neutered.sh: positive control PASSED
+m6-selftest-hat999-assert-neutered.sh: denominator: tracked paths=7407  over-budget=0  covered by roster=0  not in roster=0
+m6-selftest-hat999-assert-neutered.sh: RED - count guard: the roster holds 57 entries, the tree has 0 over-budget tracked paths
+m6-selftest-hat999-assert-neutered.sh: VERDICT RED

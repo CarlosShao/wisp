@@ -1,0 +1,34 @@
+262-v1 AC#5 — 只读取数尝试的原始回执（腿号 262-v1，取数时刻 2026-10-07 14:12—14:13 +08）
+
+工具：gh version 2.96.0 (2026-07-02)。`gh auth status` 自证（只 grep 三行）：
+  X Failed to log in to github.com account CarlosShao (keyring)
+  - Active account: true
+  - To forget about this account, run: gh auth logout -h github.com -u CarlosShao
+
+--- 一发成功（14:12，run 级读数，⛔ 不是 step 级）---
+$ gh run list -R CarlosShao/wisp --limit 5 --json databaseId,headSha,conclusion,updatedAt,workflowName,event,status
+rc=0，5 条（原始 JSON 存 D:/tmp/262v1/gh-list.txt，本件只抄人读的五行）：
+  37580160337  slo-fresh  2026-10-07T06:11:37Z  sha cc315261  completed success
+  37545246395  ci         2026-10-07T00:42:25Z  sha cc315261  completed failure
+  37511647900  slo-fresh  2026-10-06T18:29:18Z  sha cc315261  completed success
+  37424357373  slo-fresh  2026-10-06T06:33:18Z  sha cc315261  completed success
+  37406757402  ci         2026-10-06T03:08:15Z  sha cc315261  completed failure
+=> 这五发的 sha 全部早于 2026-10-07 13:5x 的三枚改名（`f67af953` 未推送），
+   所以它们不能证明"改名之后的树上这一步跑过"，与编排者 14:0x 那句不冲突。
+
+--- 六发失败（step 级读数取不到；错误逐字）---
+$ gh run list -R CarlosShao/wisp --limit 40 --json ...            (14:12)
+  failed to get runs: Get "https://api.github.com/repos/CarlosShao/wisp/actions/runs?per_page=40&exclude_pull_requests=true": EOF
+$ gh run list -R CarlosShao/wisp --limit 20 --json ...            (14:12)
+  failed to get runs: Get "https://api.github.com/repos/CarlosShao/wisp/actions/runs?per_page=20&exclude_pull_requests=true": EOF
+$ gh run view 37545246395 -R CarlosShao/wisp --json ...,jobs      (14:13)  rc=1，127 字节错误件
+  (同一形状：Get "https://api.github.com/repos/...": EOF)
+$ gh api repos/CarlosShao/wisp/actions/runs/37545246395/jobs      (14:13) ×3 次带退避重试
+  Get "https://api.github.com/repos/CarlosShao/wisp/actions/runs/37545246395/jobs": EOF
+$ gh run view 37545246395 -R CarlosShao/wisp --log-failed         (14:13) ×2 次
+  failed to get run: Get "https://api.github.com/repos/CarlosShao/wisp/actions/runs/37545246395?exclude_pull_requests=true": EOF
+
+⇒ 本腿**没有**读到任何一次 run 里 step 名 "Tracked path-length budget (ticket 262)" 的结论行 ⇒ **AC#5 判〔待取数〕**。
+⇒ 本格还挂着两条结构性的话（不在本件里重复）：① 那一步没带 `if:`，前面的 lint 步红它就 `[skipped]`；
+   ② AC#5 原文要"self-hosted 那一侧跑过"，而裁定后的形状是 ubuntu-latest ⇒ 不同形，待编排者裁。
+⛔ 本腿没有 push、没有 rerun、没有 --debug，只发了上面这些只读请求。

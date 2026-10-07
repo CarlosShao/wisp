@@ -1,0 +1,17 @@
+=== 262-v1 AC#4 roster audit (python over HEAD script + HEAD ls-files), 14:16-14:17 +08 ===
+roster entries parsed: 57
+duplicate keys: 0
+empty reasons: 0
+roster keys not tracked on HEAD: 0
+'still open' but file is -done: 0
+'closed' but file is NOT -done: 0
+reason categories: 54 'hist: ticket filed before README rule' + 3 'hist: dispatch note filed before README rule'
+roster relative-length range: 122 180 ; name range: 101 159
+roster entries whose relative<=121 (name-hat-only exemptions): 0
+
+=== 262-v1 AC#6 hygiene summary ===
+d22scan dirty worktree 14:16:58 rc=0 (see d22scan.txt tail)
+d22scan clean HEAD clone 14:19:15 rc=0 (see d22scan-clone.txt)
+gofumpt -l internal tools/d22scan tools/mockllm : dirty tree 4 names, clean HEAD clone 0 bytes (gofumpt-noncmdwisp.txt / gofumpt-clone-head.txt)
+go vet ./internal/... rc=0 @14:17:39 (govet-internal.txt)
+go vet ./cmd/wisp/ : NOT RUN by 262-v1 - orchestrator owns that cell

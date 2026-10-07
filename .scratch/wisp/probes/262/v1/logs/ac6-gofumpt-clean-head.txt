@@ -1,0 +1,21 @@
+262-v1 AC#6 gofumpt，干净 HEAD 口径（同一条尺跑在两处）
+
+[A] 对象＝本仓脏工作树（含别的腿未提交改动）
+$ gofumpt -version  -> v0.12.0 (go1.27.1)   自证时刻 14:18:08 +08
+$ gofumpt -l internal tools/d22scan tools/mockllm   (⛔ 不含 cmd/wisp)
+  -> rc=0，列出 4 枚（原始件＝gofumpt-noncmdwisp.txt）：
+
+[B] 对象＝仓外 clone 的 HEAD 1d59543e 干净检出
+$ cd /d/tmp/262v1/clone && gofumpt -l internal tools/d22scan tools/mockllm   14:18:26 +08
+  -> rc=0，输出 0 字节＝【0 枚文件会被重排】（原始空输出落在 gofumpt-clone-head.txt，git 不存空文件故在此具名）
+  -> 归因：[A] 那 4 枚在 HEAD 里是干净的 => 它们是别的在飞腿的未提交改动，不是票 262 的扩大
+  [A] 的 4 枚（原始反斜杠形式，tr 换算后）：
+     internal/agent/approval/pending_read.go
+     internal/agent/tools.go
+     internal/risk/provenance.go
+     internal/tools/bridge.go
+  原始行（未换算）：
+     internal\agent\approval\pending_read.go
+     internal\agent\tools.go
+     internal\risk\provenance.go
+     internal\tools\bridge.go

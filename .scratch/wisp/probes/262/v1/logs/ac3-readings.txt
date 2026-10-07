@@ -1,0 +1,20 @@
+ISSUES_NAME_LEN=130 REL_LEN=151  ROOT_NAME_LEN=108 REL_LEN=108
+=== READ A: plant issues-dir path (relative 151, name 130) ===
+rc=1
+check-path-length-budget.sh: denominator: tracked paths=7408  over-budget=58  covered by roster=57  not in roster=1
+check-path-length-budget.sh: RED - over budget and NOT in the roster: .scratch/wisp/issues/262v1-ac3-seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.md  (relative 151 chars, name 130 chars, full path on the self-hosted runner 195 chars, budget 165)
+check-path-length-budget.sh: RED - count guard: the roster holds 57 entries, the tree has 58 over-budget tracked paths
+check-path-length-budget.sh: VERDICT RED
+=== READ B: plant repo-root path (relative 108 = UNDER the relative hat, name 108 > name hat 100) ===
+rc=1
+check-path-length-budget.sh: denominator: tracked paths=7408  over-budget=58  covered by roster=57  not in roster=1
+check-path-length-budget.sh: RED - over budget and NOT in the roster: 262v1-ac3-root-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.md  (relative 108 chars, name 108 chars, full path on the self-hosted runner 152 chars, budget 165)
+check-path-length-budget.sh: RED - count guard: the roster holds 57 entries, the tree has 58 over-budget tracked paths
+check-path-length-budget.sh: VERDICT RED
+=== READ C: un-plant both ===
+rc=0
+check-path-length-budget.sh: denominator: tracked paths=7407  over-budget=57  covered by roster=57  not in roster=0
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+=== clone index state check ===
+?? .scratch/wisp/issues/262v1-ac3-seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.md
+?? 262v1-ac3-root-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.md

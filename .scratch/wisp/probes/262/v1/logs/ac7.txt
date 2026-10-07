@@ -1,0 +1,176 @@
+rename pairs reported by git across the three commits: 14
+---
+commit fd269de1 sim R100
+  old      : 256-resident-leg-cannot-read-those-risk-config-keys-because-approval-new-is-built-before-the-session-ledger-with-grants-nil-so-move-it-into-assembleruntime-deferred-until-confirming-is-measured.md
+  new      : 256-resident-gate-built-before-session-grants.md
+  old len/name=217  new len=69
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 2
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      scripts/check-path-length-budget.sh
+---
+commit fd269de1 sim R100
+  old      : 257-on-a-clean-machine-all-seven-panel-settings-fields-are-unwritable-because-the-default-provider-registry-is-nil-while-the-write-side-requires-an-existing-row-and-no-roster-field-can-create-one.md
+  new      : 257-clean-machine-provider-registry-nil-blocks-writes.md
+  old len/name=219  new len=77
+  new tracked at HEAD : False | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 3
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      .scratch/wisp/probes/262/r1/census.md
+      scripts/check-path-length-budget.sh
+---
+commit 46079fcc sim R100
+  old      : 149-the-corrupt-leg-of-the-offset-field-has-zero-teeth-the-new-comment-claims-a-sufficient-condition-with-counterexamples-and-the-exited-branch-drops-the-summary-done.md
+  new      : 149-corrupt-offset-leg-zero-teeth-done.md
+  old len/name=190  new len=62
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 7
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      .scratch/wisp/probes/212/a3/work/classified.tsv
+      .scratch/wisp/probes/212/a3/work/roster2.tsv
+      .scratch/wisp/probes/evidence-close/2/role-scan.txt
+      docs/evidence/s1/149-three-unpinned-outlets-r1-accept-r1.md
+      docs/evidence/s1/149-three-unpinned-outlets-r1.md
+      scripts/check-path-length-budget.sh
+---
+commit 46079fcc sim R100
+  old      : 154-the-close-only-covers-the-loop-task-id-so-host-supplied-task-ids-still-have-no-owner-and-concurrent-tasks-have-zero-readings-reserved-with-a-trigger-gate-done.md
+  new      : 154-close-covers-loop-task-id-only-done.md
+  old len/name=186  new len=63
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 8
+      .scratch/wisp/dispatches/2026-09-26-115x-impl-154.md
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      .scratch/wisp/probes/212/a3/work/classified.tsv
+      .scratch/wisp/probes/212/a3/work/roster2.tsv
+      .scratch/wisp/voided/154-first-draft-void-premise-falsified.md
+      docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md
+      docs/evidence/s1/154-host-id-never-closed-r1.md
+      scripts/check-path-length-budget.sh
+---
+commit 46079fcc sim R100
+  old      : 176-there-is-no-spawner-runasync-has-zero-production-call-sites-and-taskroster-record-has-zero-writers-so-164-ac4-has-no-object-and-175s-unstamped-path-waits-for-one-writer.md
+  new      : 176-no-spawner-zero-production-call-sites.md
+  old len/name=196  new len=65
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 0
+---
+commit 46079fcc sim R100
+  old      : 177-stamping-external-content-and-letting-the-model-re-read-a-spilled-artifact-are-mutually-exclusive-today-because-the-stub-embeds-the-host-minted-path-and-r4-scans-path-arguments.md
+  new      : 177-stamp-vs-model-reread-spill-exclusive.md
+  old len/name=204  new len=65
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 5
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      .scratch/wisp/probes/212/a3/work/classified.tsv
+      docs/evidence/s1/177-c25-r4-path-exemption-c1.md
+      docs/evidence/s1/177-mutation-shape-a-redlist-m1.md
+      scripts/check-path-length-budget.sh
+---
+commit 46079fcc sim R100
+  old      : 183-the-host-minted-pointer-exemption-does-not-hold-on-the-real-cli-so-r4-refuses-the-models-own-reread-and-the-spilled-output-still-cannot-be-read-back-done.md
+  new      : 183-host-pointer-exemption-fails-real-cli-done.md
+  old len/name=181  new len=70
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 9
+      .scratch/wisp/dispatches/2026-09-28-123x-impl-183-r1-referee-first-then-pick-the-family-that-actually-flips-it.md
+      .scratch/wisp/dispatches/2026-09-28-132x-accept-183-v2-narrowed-incremental-commit-after-the-previous-leg-died.md
+      .scratch/wisp/dispatches/2026-09-28-135x-impl-183-r2-grow-the-two-missing-teeth-and-re-take-the-gates-after-your-own-last-commit.md
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      .scratch/wisp/probes/212/a3/work/classified.tsv
+      .scratch/wisp/probes/212/a3/work/roster2.tsv
+      docs/evidence/s1/174-wiring-cost-census-c2.md
+      docs/evidence/s1/183-pointer-exemption-r1.md
+      scripts/check-path-length-budget.sh
+---
+commit 46079fcc sim R100
+  old      : 253-panel-inbound-has-three-ruler-holes-reachability-nail-only-recognizes-postmessage-config-methods-fall-outside-both-rosters-and-the-legacy-envelope-resolves-null-with-zero-audit.md
+  new      : 253-panel-inbound-three-ruler-holes.md
+  old len/name=204  new len=59
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 3
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      .scratch/wisp/probes/252/v1/roster-diff-nameonly.txt
+      scripts/check-path-length-budget.sh
+---
+commit 46079fcc sim R100
+  old      : 254-the-new-fifth-tier-winsec-has-no-caller-in-ci-so-the-fresh-guard-c-never-fires-unless-winsec-tests-sh-switches-to-scope-or-explicit-paths-are-proven-audited-done.md
+  new      : 254-fifth-tier-winsec-no-ci-caller-done.md
+  old len/name=189  new len=63
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 2
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      scripts/check-path-length-budget.sh
+---
+commit 46079fcc sim R100
+  old      : 259-the-grant-binding-layer-is-an-identity-in-production-code-because-spend-is-fed-the-items-own-stored-digest-while-panelapi-and-panelitem-have-capability-side-ruler-holes.md
+  new      : 259-grant-binding-identity-ruler-holes.md
+  old len/name=196  new len=62
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 4
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      .scratch/wisp/probes/252/v1/roster-diff-nameonly.txt
+      docs/reports/pending-and-issues.md
+      scripts/check-path-length-budget.sh
+---
+commit 46079fcc sim R100
+  old      : 260-the-configured-cancel-hotkey-never-registers-on-any-path-because-the-idle-pass-skips-the-slot-by-design-and-the-borrow-pass-hardcodes-bare-esc-while-a-lost-borrow-is-zero-symptom.md
+  new      : 260-configured-cancel-hotkey-never-registers.md
+  old len/name=206  new len=68
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : True | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 3
+      .scratch/wisp/probes/212/a2/work/den-md.txt
+      docs/reports/pending-and-issues.md
+      scripts/check-path-length-budget.sh
+---
+commit f67af953 sim R100
+  old      : 273-shipping-process-builds-the-state-machine-without-a-sink-so-every-d43-side-effect-falls-into-a-no-op.md
+  new      : 273-shipping-process-builds-state-machine-without-a-sink-so-every-d43-effect-falls-into-no-op.md
+  old len/name=128  new len=117
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : False | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 7
+      .scratch/wisp/issues/262-tracked-path-length-gate-for-ci-checkout.md
+      .scratch/wisp/probes/273/a1/census.md
+      .scratch/wisp/probes/273/a2/machines.md
+      .scratch/wisp/probes/273/a3/census.md
+      .scratch/wisp/probes/273/a3/logs/census-before-reorder-backup.txt
+      .scratch/wisp/probes/msg-a652.md
+      docs/reports/pending-and-issues.md
+---
+commit f67af953 sim R100
+  old      : 274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md
+  new      : 274-no-nail-requires-shipped-exe-to-carry-page-build-ps-step-2-comment-is-false-in-both-halves.md
+  old len/name=126  new len=118
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : False | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 7
+      .scratch/wisp/issues/262-tracked-path-length-gate-for-ci-checkout.md
+      .scratch/wisp/probes/274/a1/census.md
+      .scratch/wisp/probes/274/a2/logs/s1-exe-producers.txt
+      .scratch/wisp/probes/274/a2/logs/s1s2-extras.txt
+      .scratch/wisp/probes/274/r1/impl.md
+      .scratch/wisp/probes/merge-dryrun/1/dryrun.md
+      docs/reports/pending-and-issues.md
+---
+commit f67af953 sim R100
+  old      : 275-tracked-gofumpt-denominator-carries-a-deliberately-broken-sample-so-the-guarded-census-step-exits-2.md
+  new      : 275-tracked-gofumpt-denominator-carries-deliberately-broken-sample-so-guarded-census-step-exits-2.md
+  old len/name=127  new len=121
+  new tracked at HEAD : True | old still tracked : False
+  recorded in script  : False | recorded in ticket face : False
+  HEAD files still citing the old slug (excl. the recorder itself): 3
+      .scratch/wisp/issues/262-tracked-path-length-gate-for-ci-checkout.md
+      .scratch/wisp/probes/273/a3/logs/25-final-restoration-selfcheck.txt
+      .scratch/wisp/probes/275/a1/census.md

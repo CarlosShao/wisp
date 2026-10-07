@@ -1,0 +1,13 @@
+check-path-length-budget.sh: repo=D:/tmp/262v1/clone
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 7408 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=7408  over-budget=58  covered by roster=57  not in roster=1
+check-path-length-budget.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=58  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+check-path-length-budget.sh: RED - over budget and NOT in the roster: 262v1-ac3-root-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.md  (relative 108 chars, name 108 chars, full path on the self-hosted runner 152 chars, budget 165)
+check-path-length-budget.sh: RED - count guard: the roster holds 57 entries, the tree has 58 over-budget tracked paths
+check-path-length-budget.sh: VERDICT RED
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 58 paths on this tree, recomputed just now in both units

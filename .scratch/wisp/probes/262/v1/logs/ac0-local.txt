@@ -1,0 +1,14 @@
+=== 262-v1 AC#0 local-side rulers, 14:11:3x +08 ===
+$ git config --get core.longpaths -> rc=1 (unset)
+$ powershell -File read-longpaths.ps1 (LongPathsEnabled) -> 0   [ruler kept at D:/tmp/262v1/read-longpaths.ps1]
+$ git --version -> git version 2.52.0.windows.1
+$ printf '%s' 'E:\work\base\actions-runner\_work\wisp\wisp' | wc -c -> 43
+$ ls -d E:/work/base/actions-runner/_work/wisp/wisp -> E:/work/base/actions-runner/_work/wisp/wisp
+
+=== 262-v1 AC#0 denominator bands, own awk, 14:11:27 +08 ===
+git -c core.quotepath=false ls-files | awk '{L=length($0); n=split($0,c,"/"); nl=length(c[n]); ...}'
+<=121:7350  122-150:38  151-180:19  >180:(empty=0)  last-name>100:57  total:7407
+middle band single ruler: 57
+over-budget per gate definition (rel>121 OR name>100): 57
+non-ASCII tracked paths: 28
+AC unchecked boxes: 8
