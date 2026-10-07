@@ -1,0 +1,128 @@
+=== date ===
+Wed Oct  7 17:31:21 CST 2026
+=== pwd/branch/HEAD ===
+/d/work/workspace/projects plans/Wisp
+dev
+10899b77 A678 收 274-r3（票 274 AC#11 修形落仓：名册改数组对拉 14/6、305→313 行；⛔ AC#11 不翻，已派 274-v3 非实现者）＋我现跑定住三枚行号（腿与简报都过期）
+=== git log -6 --oneline ===
+10899b77 A678 收 274-r3（票 274 AC#11 修形落仓：名册改数组对拉 14/6、305→313 行；⛔ AC#11 不翻，已派 274-v3 非实现者）＋我现跑定住三枚行号（腿与简报都过期）
+674c1920 274-r3 修 AC#11 那枚 -join/-split 假绿洞：跑前跑后名册一律按数组对拉
+8062c80a 274-r3 起手锚（票 274 AC#11 那枚 -join/-split 假绿洞）
+6c83e6b2 A677 收 274-v2（★我翻 AC#10＋新立 AC#11；票 274＝8 勾 4 未勾，⛔ 不加 -done）＋它推翻/收窄我四句
+188c4b94 274-v2 裁决表：AC#10 闸门五格全射程——三形反形红在 :204（含 r2 没测的 npm 只写 node_modules／同名重写不同字节）、真 npm run build 一发绿且换名、真 vite 第二发实测红、恒真中和 :203 后立刻转绿、既有八支各自报名字（含漏跑的 :136）；⛔ AC 框一枚没翻，self-hosted clean 机制具名取不到
+f1fa87fb 274-v2 起手锚：date/HEAD/porcelain/dist+exe md5 落盘（骨架，裁决表后补）
+=== porcelain six-family ===
+six-family line count:
+0
+=== porcelain full (whole repo, unfiltered) line count ===
+753
+=== dist four md5 ===
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+=== build exe md5 ===
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+=== build.ps1 wc + md5 (orchestrator claims: 313 / 43fb7e20c597192104728befb231e8ea) ===
+313 scripts/build.ps1
+43fb7e20c597192104728befb231e8ea *scripts/build.ps1
+=== git show 674c1920:scripts/build.ps1 | md5sum ===
+43fb7e20c597192104728befb231e8ea *-
+=== numstat 674c1920 ===
+674c1920 274-r3 修 AC#11 那枚 -join/-split 假绿洞：跑前跑后名册一律按数组对拉
+
+46	0	.scratch/wisp/probes/274/r3/logs/10-before-fix-space-name.txt
+14	0	.scratch/wisp/probes/274/r3/logs/11-after-fix-space-name.txt
+14	0	.scratch/wisp/probes/274/r3/logs/12-after-fix-stale-page.txt
+47	0	.scratch/wisp/probes/274/r3/logs/13-after-fix-fresh-spaced-name.txt
+318	0	.scratch/wisp/probes/274/r3/logs/90-gates.txt
+24	0	.scratch/wisp/probes/274/r3/logs/99-final-proof.txt
+=== named lines in disk build.ps1 ===
+47:function Fail([string]$Message) {
+49:    exit 1
+exit 1 count:
+1
+209:$freshNames = @($postRoster | Where-Object { $preRoster -notcontains $_ })
+210:$goneNames = @($preRoster | Where-Object { $postRoster -notcontains $_ })
+158:$preRoster = @($preDistFiles | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) })
+208:$postRoster = @($distAll | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) })
+214:$distRoster = ($distAll | Sort-Object FullName | ForEach-Object { "$($_.FullName.Substring($DistDir.Length + 1))=$($_.Length)" }) -join ' '
+-split count:
+0
+240:    $short = (& git rev-parse --short HEAD 2>$null)
+-join count with context:
+161:Write-Host "build.ps1: frontend: pre-build dist snapshot = $preDistLabel [$($preRoster -join ' ')] (this run's npm must produce an artifact name outside it)."
+212:    Fail "frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=$Env, this run's repo root $RepoRoot; snapshot was $preDistLabel [$preRoster], dist now holds [$($postRoster -join ' ')]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run."
+214:$distRoster = ($distAll | Sort-Object FullName | ForEach-Object { "$($_.FullName.Substring($DistDir.Length + 1))=$($_.Length)" }) -join ' '
+215:Write-Host "build.ps1: frontend ok: $($distAll.Count) file(s) in frontend/dist (entry index.html is $distEntryBytes bytes): $distRoster || provenance: this run's npm added new artifact name(s) [$($freshNames -join ' ')] over the pre-build snapshot $preDistLabel [$preRoster]; gone since snapshot: [$($goneNames -join ' ')]"
+257:) -join ' '
+OFS count:
+0
+=== ls frontend/dist ===
+frontend/dist:
+total 8
+drwxr-xr-x 1 swq 197609    0 Oct  7 11:58 .
+drwxr-xr-x 1 swq 197609    0 Oct  7 11:58 ..
+-rw-r--r-- 2 swq 197609    0 Oct  7 11:57 .gitkeep
+drwxr-xr-x 1 swq 197609    0 Sep 27 10:59 assets
+-rw-r--r-- 1 swq 197609 1044 Sep 27 10:59 index.html
+
+frontend/dist/assets:
+total 596
+drwxr-xr-x 1 swq 197609      0 Sep 27 10:59 .
+drwxr-xr-x 1 swq 197609      0 Oct  7 11:58 ..
+-rw-r--r-- 1 swq 197609  49943 Sep 27 10:59 index-BRKj5OIJ.css
+-rw-r--r-- 1 swq 197609 553469 Sep 27 10:59 index-BVKlegVD.js
+=== tool locations ===
+/mingw64/bin/git.exe
+/mingw64/bin/git.exe
+/d/work/soft/Git/cmd/git.exe
+/d/work/soft/Git/bin/git.exe
+/mingw64/bin/git
+/mingw64/bin/git
+/d/work/soft/Git/cmd/git
+/d/work/soft/Git/bin/git
+/d/work/base/go/bin/go.exe
+/d/work/server/node14/node.exe
+/e/work/base/msys64/mingw64/bin/gcc.exe
+=== PATH dirs ===
+/c/Users/swq/.qoder-cn/bin
+/d/work/soft/Qoder CN/resources/extensions/qoder.computer-control/dist/cli/computerUseWindows/bin
+/c/Users/swq/.qoder-cn/plugins/cache/qoderapp-bundler/qoder-context/1.0.72.34cf9e2f/bin
+/c/Users/swq/bin
+/mingw64/bin
+/usr/local/bin
+/usr/bin
+/bin
+/mingw64/bin
+/usr/bin
+/c/Users/swq/bin
+/c/Users/swq/.qoder-cn/bin
+/c/Users/swq/AppData/Roaming/npm
+/c/Users/swq/AppData/Local/pnpm
+/c/Users/swq/.bun/bin
+/c/Users/swq/.cargo/bin
+/c/Windows/System32
+/c/Windows
+/c/Windows/System32/Wbem
+/c/Windows/System32/WindowsPowerShell/v1.0
+/c/Windows/System32/OpenSSH
+/d/work/server/flutter/flutter/bin
+/d/work/base/openjdk17U/bin
+/d/work/base/Android/Sdk/cmdline-tools/latest/bin
+/d/work/base/Android/Sdk/platform-tools
+/d/work/soft/Microsoft VS Code/bin
+/d/work/soft/Git/cmd
+/d/work/tools/fd-v10.4.2
+/c/Program Files/GitHub CLI
+/c/Program Files/PowerShell/7
+/c/Program Files/Docker/Docker/resources/bin
+/d/work/soft/Yan Agent
+/e/work/data/AI/user data/minimax code/.minimax/bin
+/c/Users/swq/.minimax/bin
+/c/Users/swq/.meituan-catpaw/bin
+/c/Users/swq/.kimi-code/bin
+/c/Users/swq/AppData/Local/hermes/hermes-agent/venv/Scripts
+/c/Users/swq/AppData/Local/hermes/bin
+/d/work/soft/Trae CN/bin
+/c/Users/swq/AppData/Local/Programs/Python/Python312/Scripts

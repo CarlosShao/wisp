@@ -1,0 +1,66 @@
+=== build mirror trees cp -al (no .git, no build, no frontend/node_modules; frontend/dist regular copies) ===
+=== spaced page file into tree-a and tree-b (pre-existing stale, WITH space in name) ===
+=== tree-b build.ps1 must be a REGULAR copy (unlink hardlink before any edit) ===
+281474979820038 /d/tmp/wisp274v3/tree-a/scripts/build.ps1
+281474979820038 /d/tmp/wisp274v3/tree-b/scripts/build.ps1
+281474979820038 scripts/build.ps1
+after unlink+regular copy:
+281474979833764 /d/tmp/wisp274v3/tree-b/scripts/build.ps1
+281474979820038 scripts/build.ps1
+=== repo dist untouched spot-check (inodes + md5) ===
+  844424933107469 frontend/dist/.gitkeep
+36310271997080049 frontend/dist/index.html
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+=== tree dist listings ===
+-- tree-a:
+assets
+index.html
+stale\ spaced\ page.html
+-- tree-b:
+assets
+index.html
+stale\ spaced\ page.html
+-- tree-c:
+assets
+index.html
+=== tree has no .git, git rev-parse fails as expected ===
+****（）。
+**落位：PersonalAudioAssistant`
+-
+.
+..
+.gitattributes
+.github
+.gitignore
+.scratch
+.zcodeignore
+1
+2026-09-24
+2379
+397
+4
+AGENTS.md
+README.md
+agent
+balldebug.exe
+build
+fatal: not a git repository (or any of the parent directories): .git
+GITRC=128
+=== old 91c90aa1 build.ps1 extract for reference ===
+305 .scratch/wisp/probes/274/v3/anchors/old-91c90aa1-build.ps1.txt
+=== old version -join/-split shape (lines 145-205) ===
+152:$preRoster = ($preDistFiles | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) }) -join ' '
+200:if ($preRoster -ne '') { $preNames = @($preRoster -split ' ') }
+204:    Fail "frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=$Env, this run's repo root $RepoRoot; snapshot was $preDistLabel [$preRoster], dist now holds [$($postRoster -join ' ')]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run."
+206:$distRoster = ($distAll | Sort-Object FullName | ForEach-Object { "$($_.FullName.Substring($DistDir.Length + 1))=$($_.Length)" }) -join ' '
+207:Write-Host "build.ps1: frontend ok: $($distAll.Count) file(s) in frontend/dist (entry index.html is $distEntryBytes bytes): $distRoster || provenance: this run's npm added new artifact name(s) [$($freshNames -join ' ')] over the pre-build snapshot $preDistLabel [$preRoster]; gone since snapshot: [$($goneNames -join ' ')]"
+249:) -join ' '
+=== powershell PATH dirs containing git.exe (for throw-strategy) ===
+/d/work/soft/Git/bin/git.exe
+/d/work/soft/Git/cmd/git.exe
+=== stub dirs ===
+done
