@@ -289,7 +289,10 @@ $ 括号平衡尺全仓跑（logs/18-…txt）
 
 ⇒ 16 枚机器构造点今天不带 Sink。乙 一落地，这 16 枚全部开始执行"包自己选的收件人"：
 产码 2 枚（`cmd/wisp/models.go:303`、`cmd/balldebug/main.go:188`）＋包外测试 5 枚（`internal/ball/hotkey_live_test.go:382`、`interaction_live_test.go:54/:134` 三枚 **winlive 门控**、`bridge_test.go:86`、`handoff_window_109_test.go:62`）＋包内测试 9 枚（`machine_test.go:76/:110/:127/:152/:160/:187`、`table_test.go:361/:404/:410`）。
-⚠ 其中 3 枚是 `winlive` 档：本票 §3 明令未批、本腿没跑也没读它们的内容 ⇒ 这一格只能登记成〔**仅本机可量，未批**〕，⛔ 不许写成"乙 会让它们红"或"不会"。
+⚠ "那 3 枚是 winlive 档"本腿**没有只引 `273-a2` 的表**，逐枚现读了构建标记首行（`logs/26-…txt`）：
+`internal/ball/hotkey_live_test.go` 首行＝`//go:build windows && winlive`、`internal/ball/interaction_live_test.go` 首行＝`//go:build windows && winlive`（两枚构造点 `:54`/`:134` 同在这两枚门控文件里）；
+对照另两枚**不是** winlive：`internal/models/bridge_test.go` 与 `internal/models/handoff_window_109_test.go` 首行都是 `package models`（可移植测试，⚠ 乙 若落地，这**两枚**的观测面改写是可以在普通 `go test` 里被看到的，不属于〔仅本机可量〕那一档）。
+⇒ 剩下那一格（这 3 枚 winlive 用例真跑起来会不会因乙 而红）只能登记成〔**仅本机可量，未批**〕，⛔ 不许写成"乙 会让它们红"或"不会"。
 
 #### Ⓔ 与"装配根是唯一接缝"这族既有钉的**语义**冲突（不红，但方向相反）
 
@@ -322,7 +325,7 @@ $ go list -deps ./internal/statemachine   -> 全程 stdlib，wisp 内部只命�
 | **prod=0 但 test=1**（4 枚） | `internal/config`、`internal/observe`、`internal/panel`、`internal/perm` | ⛔ **不是**"安全可指"：`go build` 过，**`go test`／`go vet` 该包直接 setup failed** |
 | **prod=0 test=0**（24 枚） | `internal/agent`、`internal/audio`、`internal/llm`、`internal/memory`、`internal/session`(仅 doc.go/grants/session)、`internal/speech`（**只有 doc.go 一枚**）、`internal/watchdog`（只有 doc.go）、`internal/agent/scheduler`（只有 doc.go）、`internal/risk`、`internal/streamkey`、`internal/perm`…（全名册见 logs/17） | 不成环，**但这些包里今天没有界面收件人**（球／托盘／面板都不在其中） |
 
-★**上面那一行"build 过、test 炸"本腿没有靠推理，在仓外用最小复现钉住了**（`C:/Users/swq/tmp/cycprobe2`，⛔ 不在仓内建任何件）：
+★**上面那一行"build 过、test 炸"本腿没有靠推理，在仓外用最小复现钉住了**（`C:/Users/swq/tmp/cycprobe2`，⛔ 不在仓内建任何件；原始输出已补落 `logs/26-buildein-tags-and-cycle-probe-raw.txt`）：
 
 ```
 对照组（今天 Wisp 的形状：x 非 test 不 import y；x 的 in-package 测试 import y）
@@ -441,7 +444,8 @@ $ git diff --stat HEAD -- cmd internal scripts tools .github docs frontend
 
 ## §5 没做完的格（逐枚具名，⛔ 不写成做完了）
 
-1. **2② Ⓓ 的 3 枚 `winlive` 构造点没量**：`internal/ball/hotkey_live_test.go:382`、`internal/ball/interaction_live_test.go:54`、`:134` 在乙 之下会不会真执行副作用／会不会变红——票面 §3 明令 `winlive` 未批，本腿没跑也没读它们的内容 ⇒ 登记为〔**仅本机可量，未批**〕。
+1. **2② Ⓓ 的 3 枚 `winlive` 构造点没量行为**：`internal/ball/hotkey_live_test.go:382`、`internal/ball/interaction_live_test.go:54`、`:134` 在乙 之下会不会真执行副作用／会不会变红——本腿只现读了这三枚所在文件的 `//go:build windows && winlive` 首行（`logs/26-…txt`），⛔ **没读用例正文、没跑**（票面 §3 明令 `winlive` 未批）⇒ 登记为〔**仅本机可量，未批**〕。
+   ⚠ 同尺把界线划清：另外两枚包外无 Sink 测试（`bridge_test.go:86`、`handoff_window_109_test.go:62`）**不是** winlive 档（首行＝`package models`），它们的观测面改写属可移植腿可量的范围。
 2. **2④ 的恒真预判没有运行时凭据**：全部是"读用例全文＋核对断言原文"级别的读数（Ⓐ 那枚 `TestSinkNoopDefault` 本腿通读了 `:184-195`），⛔ 本腿**一枚突变都没跑**（`go test -overlay` 也没跑）⇒ "把 `machine.go:64-68` 改回空罐会红几名"必须由跑突变的腿现量。
 3. **乙 的"包内落盘"那一形没量**：本腿的尺 A3 只扫了 `slog.`/`log.`/`^func `（结论＝包内唯一对外通道是 `log/slog`）；⛔ 没扫 `os.`／文件写入面。若乙 被选成"包内自己写文件/落盘"，它撞不撞 `cmd/wisp/config_readers_255.go` 的读点扫描名册（`TestTicket255RosterStillMatchesTheActualReadSites`，`config_receipt_255_test.go:230`），本腿**给不了数**。
 4. **票 255 那两枚用例的实际红名册没跑**：本腿只复跑了它们的**引用清单与断言原文**（`logs/17-…txt`），没跑测试 ⇒ 甲/乙 各形下"进红名册几枚"未量（这条正是 a1 §5-1 自己声明过的同一格，本腿没能力替它补）。

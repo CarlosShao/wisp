@@ -1,0 +1,30 @@
+=== 补尺：那 3 枚包外测试到底是不是 winlive 档（§5-1 承重，逐字首行）===
+internal/ball/hotkey_live_test.go :: //go:build windows && winlive||
+internal/ball/interaction_live_test.go :: //go:build windows && winlive||
+internal/models/handoff_window_109_test.go :: package models||
+internal/models/bridge_test.go :: package models||
+
+=== 仓外循环复现件原始输出（§2③ 的凭据，本腿把它补落盘）===
+=== 对照组＝今天 Wisp 的形状（x=panel 非test 不 import y；x 的 in-package 测试 import y）===
+$ go build ./...
+BUILD_RC=0
+$ go test ./...
+ok  	cycprobe2/x	0.021s
+?   	cycprobe2/x/y	[no test files]
+TEST_RC=0
+--- 实验组（新增边 y->x 之后，同目录重跑）---
+$ go build ./...
+BUILD_RC=0
+$ go test ./x/
+# cycprobe2/x
+package cycprobe2/x
+	imports cycprobe2/x/y from x_test.go
+	imports cycprobe2/x from y.go: import cycle not allowed in test
+FAIL	cycprobe2/x [setup failed]
+FAIL
+TEST_RC=1
+$ go vet ./...
+package cycprobe2/x
+	imports cycprobe2/x/y from x_test.go
+	imports cycprobe2/x from y.go: import cycle not allowed in test
+VET_RC=1
