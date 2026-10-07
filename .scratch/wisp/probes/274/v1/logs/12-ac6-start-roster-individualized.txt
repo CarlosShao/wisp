@@ -1,0 +1,32 @@
+=== 274-v1 AC#6 START-roster individualization, Wed Oct  7 14:56:08 CST 2026 ===
+--- four numbers of the start run ---
+RUN=1839 PASS=1234 FAIL=6 SKIP=7 GOTEST_RC=GOTEST_START_RC=1
+--- which package each named red belongs to (verbatim package FAIL lines) ---
+FAIL github.com/CarlosShao/wisp/cmd/wisp 0.315s <= --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+FAIL github.com/CarlosShao/wisp/internal/ball 1.904s <= --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+FAIL github.com/CarlosShao/wisp/internal/ball 1.904s <= --- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL github.com/CarlosShao/wisp/internal/ball 1.904s <= --- FAIL: TestComposerContractTypesMatchFrontend (0.02s)
+FAIL github.com/CarlosShao/wisp/internal/ball 1.904s <= --- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.25s)
+FAIL github.com/CarlosShao/wisp/internal/panel 13.430s <= --- FAIL: TestResolvePerCallBudget (2.70s)
+--- first failure line of each named red (verbatim, one line each) ---
+### TestApprovalCardViewJSONKeysMatchFrontendTypes
+        approval_test.go:167: snapshot round-tripped through 944 bytes of JSON with 1 pending card(s)
+### TestC21DesignTokensFourWayAgree
+### TestC21TableColourRowsMatchTokensCSS
+### TestComposerContractTypesMatchFrontend
+        composer_test.go:132: red as required: 1 line(s) matched, first=composer.tsx:4: <button onClick={() => bridge?.postMessage(JSON.stringify({ method: "approval.decide", target: "mode", to: "auto_approve" }))}>
+### TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+        frontend_hygiene_test.go:242: vendored ai-native: 18 mounted (button.tsx chip.tsx code-block.tsx context-cards.tsx diff-table.tsx entity-chip.tsx loading-state.tsx progress-ring.tsx prompt-bar.tsx segmented-control.tsx shimmer.tsx status-pill.tsx streaming-text.tsx switch.tsx text-row.tsx thinking.tsx tool-chips.tsx value-pill.tsx), 3 unmounted upstream demos (approval-card.tsx stream-text.tsx task-rows.tsx)
+### TestResolvePerCallBudget
+        pathresolver_expansion_test.go:80: risk.c26Pipeline.Resolve (seam installed into winsec): refused as required: risk: expansion moved this path onto a tree the caller did not name: C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp1185845049\001\a%WISP102PROBE_TARGET%b\artifacts expands to C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp1185845049\001\aelsewhereb\artifacts (env); act on the expanded tree only if you asked for it by name
+        pathresolver_expansion_test.go:83: winsec.ResolvePath (sealing caller's view): refused as required: winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp1185845049\001\a%WISP102PROBE_TARGET%b\artifacts: risk: expansion moved this path onto a tree the caller did not name: C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp1185845049\001\a%WISP102PROBE_TARGET%b\artifacts expands to C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp1185845049\001\aelsewhereb\artifacts (env); act on the expanded tree only if you asked for it by name
+--- do these read design/** (the tree another session dirtied)? ---
+internal/panel/frontend_hygiene_test.go
+internal/panel/tokens_fourway_test.go
+internal/ball/tokens.go
+internal/ball/tokens_table_test.go
+internal/ball/tokens_test.go
+--- is design/assets/tokens.css present on disk right now? ---
+ls: cannot access 'design/assets/tokens.css': No such file or directory
+ D design/assets/tokens.css
+ D design/index.html

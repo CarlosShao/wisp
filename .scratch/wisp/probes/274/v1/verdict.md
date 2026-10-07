@@ -191,3 +191,48 @@ $ git show 35633445:scripts/build.ps1 | wc -l
   ③ 本腿的台件就是那条被允许的第二路线：仓外**硬链接镜像树**＋树内 `unlink`（`logs/01`：仓内四枚 md5 在我 unlink 前后逐枚相同），⛔ 全程没碰过仓内 dist——可见"不动仓内字节"并不必然需要 `-overlay`。
   ⇒ **建议**：AC#7 记「实质达成（仓内字节零改动，已由第二方复核），方法偏离字面」；要严格执行字面，就得先把 `:53` 改成与 `:47` 一致的"overlay **或**仓外台件"——那是**票面文字＝契约面**，归人工批准，⛔ 本腿不改一字。
   我**没**能核到的一点：`274-r1` 三次 `mv` 期间，别的会话若正好读 `frontend/dist`，会读到锚文件形——这段窗口是否真被并发使用过，我无法从盘上判定（记进 §5）。
+
+### AC#6（门禁四数）＝**成立（附两条必须并存的具名读数）**（全串行为主，独占整包窗口，原始 `-v` 留仓外 `/d/tmp/wisp274v1/gotest-{start,end}.txt`）
+- `sh scripts/d22scan.sh` ⇒ **rc=0**，且它的第 1 步就是那颗正控（`scripts/d22scan.sh:20-24` 逐字
+  「`runtests.sh -C tools/d22scan ./... - the seeded-violation positive control. It proves the gate CAN go red`」）：
+  `runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0`（`logs/07:240-241`）⇒ 门还能红。
+- `go vet ./cmd/wisp/ ./internal/panel/` ⇒ **rc=0**（`logs/07` §5）。
+- `gofmt -l cmd/wisp internal/panel` ⇒ 列出 **`cmd\wisp\models.go`**；`gofumpt v0.12.0 (go1.27.1)`（`/d/work/base/gopath/bin/gofumpt.exe`）`-l` 同一枚（`logs/09`）。
+  红因＝该文件**盘上 CRLF**（CR 计数 334），⛔ 不是 274（`git diff --name-only 35633445^ 35633445` 只回 `scripts/build.ps1`；两份 blob `cmp` 回 IDENTICAL）。⇒ 见 §3.5。
+- 整包 `go test -count=1 -v ./cmd/wisp ./internal/...` 两发（起手／终态，中间本腿只写过 `.scratch/**`）：
+  **四数起手＝`RUN=1839 PASS=1234 FAIL=6 SKIP=7`（rc=1）；终态＝同一串四数（rc=1）**；
+  逐名红名册起手 6 枚＝终态 6 枚（`logs/11-ac6-red-roster-start.txt` vs `logs/13-ac6-red-roster-end.txt`）：
+  `TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestC21DesignTokensFourWayAgree`／`TestC21TableColourRowsMatchTokensCSS`／
+  `TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestResolvePerCallBudget`；
+  两发的 `diff` **只剩计时括号差异**（`(0.00s)`→`(0.01s)` 等 4 行，`logs/15`），**名字集合作差＝0**，失败包集合起手＝终态（`cmd/wisp`／`internal/ball`／`internal/panel`／`internal/risk`）。
+  ⇒ 作差为 0 是靠**没有放宽任何断言**得到的：我没改过一行 Go，也没改过任何 `.go` 门禁。
+  这 6 枚的因（`logs/12` 逐字）都不属本票：前 5 枚读 `design/**` 与 `frontend/**`（`design/assets/tokens.css` 现量**盘上不存在**、`git status --porcelain -- design` 里 16 枚 ` D`），
+  `TestComposerContractTypesMatchFrontend` 自己写「`red as required: 1 line(s) matched, first=composer.tsx:4: <button onClick={() => bridge?.postMessage(JSON.stringify({ method: "approval.decide"...`」＝D22 禁例在页面源件上按设计红；
+  `TestResolvePerCallBudget` 报「`risk: expansion moved this path onto a tree the caller did not name: C:`」＝`%TEMP%` 路径形状敏感。⇒ **一律登记为别人在飞的数，不算 274 的账**。
+
+## §5 未做完的格（逐枚具名，⛔ 不写成通过）
+1. **AC#0／AC#2／AC#8**：三格都不属本腿射程——AC#0(a)(b) 与 AC#2 的「CI 时长增量」要**推送后的 run 侧取数**（机主 10-07 说暂不推），AC#8 是 `SPEC-11 §2.2` 归属且票面写明**本票不选形**。⇒ 判不动。
+2. **AC#4 的出处那一支我没有把它做成判据**：M-iii 只证了「陈旧页面今天能骗过闸门」，我没去改 `build.ps1` 加名册快照对比（那不是验收腿的写面）。⇒ 结论落 §2，修复归后续写腿。
+3. **6 枚红名册到包的逐枚归属**：我给了失败包**集合**与红名**集合**，没有逐枚 `go test -run` 定位（预算帽）；`awk` 那次映射不可靠已弃用，不作数。
+4. **AC#7 的并发窗口**：`274-r1` 三次 `mv` 期间是否有别的会话正好读过 `frontend/dist`，盘上不可判。⇒ 只能问编排者/别的腿。
+5. **CI runner 的 PATH 里有没有 node、`actions/checkout` 落什么行尾**：仍＝〔待推送取数〕，乙-1 落地后 `test-windows`／`slo-smoke` 会不会因此变红，本腿判不动（票面 `:95` 那句代价没被关闭）。
+
+## §6 终态自证
+- **porcelain vs 起手**：起手六族＝**0 行**（`logs/00-anchor.txt`）。我这一腿**只写过** `.scratch/wisp/probes/274/v1/**`。
+  ⚠ 现在同一条尺回 **` M scripts/check-path-length-budget.sh`**（`ls` 现量 mtime **14:55**，`git diff --stat` ＝ `7 +++++++`，1 file changed）＝
+  **别的会话在我跑整包期间落的**，⛔ 不属本腿、也不属被审件；我不动它、不把它算进任何作差（它也不在 Go/构建胶水的被审面上）。
+- **被审文件字节尺**：`scripts/build.ps1` 盘上 md5 **`644c2f6af1fa3fc7f8b3ab38c20753f5`** ＝ `git show 35633445:scripts/build.ps1 | md5sum` **同一串** ⇒ 我审的就是那一笔的落地件；
+  前一份 `35633445^` 那份 md5 ＝ `9dee32a3c73317a94df456f5208cf1cc`（172 行）。相关尺具 md5：`cmd/wisp/panel_host_gate_test.go 332cf096…`／`internal/panel/assets.go f9e3b3b0…`／`frontend/embed.go d6484e65…`（⛔ 三枚都被本腿**只读**：`assets.go`/`panel_host_gate_test.go` 我一行没改，`frontend/**` 除 `embed.go` 的既有引用外没读页面代码）。
+- **受保护路径起手/终态相同**：`frontend/dist` 四枚 `f98bfc4b…`／`db4db7a2…`／`70128a3d…`／`d41d8cd9…` ＝ 起手基线 ＝ `r1/logs/02-dist-baseline.txt`；`build/wisp.exe e6c8e52b…` ＝ 起手（本腿没重跑过仓内 build.ps1 到 `go build` 那一步）。
+- **本腿 commit 名册**（⛔ 无 push、无 amend）：
+  `5da17c58`（§0 起手锚）→ `ec1ccddd`（§1 AC#1＋AC#4 判据）→ `3f7bd77d`（§2 五发突变）→ `15ff0846`（§3/§4/AC#7）→ `955857e9`（13 份 logs）→ 本笔（AC#6 名册＋§5/§6）。
+- **仓外临时件（只建不删）**：`D:/tmp/wisp274v1/`（镜像树 `tree/`、`fakebin/npm.cmd`、`bin-nodeonly/node.exe`、`gofmt/`、`gotest-start.txt` 816KB、`gotest-end.txt`、`crlf-go-files.txt`、`mutate.sh`、各 msg 文件）。
+
+## 裁决摘要（给编排者翻勾用，本腿一枚不翻）
+| 格 | 裁 | 一句凭据 |
+|---|---|---|
+| **AC#1** | **成立** | 未修码那份 build.ps1 整条 `EXITCODE=0`（`logs/03:12`）而同棵树 exe `assets NOT BUILT` rc=1（`logs/03:20-21`）、embed 尺回 `[dist/.gitkeep]` rc=0，正控同一把尺回 4 枚（`logs/01`） |
+| **AC#4** | **字面成立＋具名残留缺口** | M-i／M-ii／M-iv 三发各自报不同具名原因且码＝1（`logs/04`）；自造 M-iii「npm 什么都没写、dist 里躺着陈旧页面」**落绿 rc=0**（`logs/06:16,23,28`）⇒ 闸门校存在不校出处，那半属 AC#9 |
+| **AC#6** | **成立（附读数）** | d22scan 正控先绿（PASS=35/FAIL=0/SKIP=0）再 rc=0；`go vet` rc=0；gofmt/gofumpt v0.12.0 各列同一枚 `cmd\wisp\models.go`（CRLF，非 274）；整包四数起手＝终态 `RUN=1839 PASS=1234 FAIL=6 SKIP=7`，逐名红名册作差＝0 |
+| **AC#7** | **实质成立／字面不成立**（方法裁定建议） | dist 四枚 md5 今天＝`r1/logs/02` 基线；`mv`＋md5 还原达成的是 `:47` 允许的"仓外/不动仓内字节"这一目的，但 `:53` 的字面 `-overlay` 对 PS 流水线突变够不着，且与 `:47` 自相矛盾 ⇒ 要不要改票面文字＝人工批准 |
+| AC#0／AC#2／AC#8 | **判不动** | 要推送后的 run 侧取数／属 spec 归属，本票不选形 |

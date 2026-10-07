@@ -1,0 +1,32 @@
+=== 274-v1 AC#6 END roster (completed), Wed Oct  7 14:57:16 CST 2026 ===
+GOTEST_END_RC=1
+END Wed Oct  7 14:57:14 CST 2026
+START four numbers: RUN=1839 PASS=1234 FAIL=6 SKIP=7 rc=1
+END   four numbers: RUN=1839 PASS=1234 FAIL=6 SKIP=7 rc=1
+--- END named red roster (verbatim) ---
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.01s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.32s)
+--- FAIL: TestResolvePerCallBudget (4.62s)
+--- named roster START vs END diff ---
+ROSTER DIFF (verbatim):
+3,6c3,6
+< --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+< --- FAIL: TestComposerContractTypesMatchFrontend (0.02s)
+< --- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.25s)
+< --- FAIL: TestResolvePerCallBudget (2.70s)
+---
+> --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.01s)
+> --- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+> --- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.32s)
+> --- FAIL: TestResolvePerCallBudget (4.62s)
+--- failing package set START vs END ---
+PACKAGE SET IDENTICAL START==END
+--- the extra porcelain row that appeared DURING my leg (not mine) ---
+ M scripts/check-path-length-budget.sh
+-rwxr-xr-x 1 swq 197609 45552 14:55 scripts/check-path-length-budget.sh
+ scripts/check-path-length-budget.sh | 7 +++++++
+ 1 file changed, 7 insertions(+)
+[this leg wrote nothing outside .scratch/wisp/probes/274/v1/** -- see my commit list]

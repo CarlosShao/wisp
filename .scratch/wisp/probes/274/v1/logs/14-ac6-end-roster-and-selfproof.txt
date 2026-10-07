@@ -1,0 +1,58 @@
+=== 274-v1 AC#6 END roster, Wed Oct  7 14:56:35 CST 2026 ===
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	9.904s
+END four numbers: RUN=478 PASS=353 FAIL=1 SKIP=2
+--- END named red roster ---
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.01s)
+--- START vs END named roster diff ---
+1,6c1
+< --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+< --- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+< --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+< --- FAIL: TestComposerContractTypesMatchFrontend (0.02s)
+< --- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.25s)
+< --- FAIL: TestResolvePerCallBudget (2.70s)
+---
+> --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.01s)
+--- failing packages both runs ---
+1,4c1,2
+< FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.315s
+< FAIL	github.com/CarlosShao/wisp/internal/ball	1.904s
+< FAIL	github.com/CarlosShao/wisp/internal/panel	13.430s
+< FAIL	github.com/CarlosShao/wisp/internal/risk	14.069s
+---
+> FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.176s
+> FAIL	github.com/CarlosShao/wisp/internal/ball	1.262s
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.315s
+FAIL	github.com/CarlosShao/wisp/internal/ball	1.904s
+FAIL	github.com/CarlosShao/wisp/internal/panel	13.430s
+FAIL	github.com/CarlosShao/wisp/internal/risk	14.069s
+--- design/assets/tokens.css (another session's deleted input) still absent? ---
+ls: cannot access 'design/assets/tokens.css': No such file or directory
+16
+--- §6 self-proof: porcelain now vs anchor ---
+ M scripts/check-path-length-budget.sh
+[0 rows = identical to the §0 anchor reading]
+--- §6 md5 of the files under review ---
+644c2f6af1fa3fc7f8b3ab38c20753f5 *scripts/build.ps1
+644c2f6af1fa3fc7f8b3ab38c20753f5 *-
+9dee32a3c73317a94df456f5208cf1cc *-
+332cf096565f9cf916c18906aee06e51 *cmd/wisp/panel_host_gate_test.go
+f9e3b3b078adeaa6c4d31f7cb2405d78 *internal/panel/assets.go
+d6484e654cd5a233a9ddec1513851138 *frontend/embed.go
+--- §6 my commits ---
+955857e9 274-v1 证据件入库：00/01/02/03/04/05/06/07/08/09/10/11 十三份 logs（AC#1 未修码两形＋五发突变原始码＋门禁四数起手名册 RUN=1839 PASS=1234 FAIL=6 SKIP=7＋AC#7 盘上对拉）；go test -v 原始 816KB 按纪律留在仓外 /d/tmp/wisp274v1/
+15ff0846 274-v1 §3/§4/AC#7：实现者四句确认、gofmt 那句推翻（cmd/wisp/models.go 被 gofmt 与 gofumpt v0.12.0 同列，红因＝盘上 CRLF 334 行，非 274）；编排者 design 4D→16D 推翻；AC#9 同上下文对已从盘上消失（exe=B8yINMF1/yy8KMgdf vs dist=BVKlegVD/BRKj5OIJ）；AC#7 裁实质成立/字面不成立且 :53 与 :47 不自洽
+3f7bd77d 274-v1 §2 恒真句攻击：五发全部自跑（M-i/M-ii 复现实现者两发并坐实具名 FATAL+rc=1；自造 M-iv npm 缺失支＝rc=1；自造 M-iii 陈旧页面支落绿 EXITCODE=0 且 exe 报 built=true 4 files）⇒ AC#4 字面成立＋具名残留缺口归 AC#9
+ec1ccddd 274-v1 AC#1 成立＋AC#4 字面成立：仓外硬链接镜像树复现未修码两形（embed=[dist/.gitkeep] rc=0 / 整条通路 EXITCODE=0 而 exe assets NOT BUILT rc=1）+ 三发突变原始记录落盘
+5da17c58 274-v1 起手锚：§0 现量落盘（HEAD 663a176d / build.ps1 265 行 md5 644c2f6a / 六族 porcelain 0 行 / design 起手脏＝16 D+4 M+11 ??，与简报"4 D"不符，盘上赢）
+955857e9 274-v1 证据件入库：00/01/02/03/04/05/06/07/08/09/10/11 十三份 logs（AC#1 未修码两形＋五发突变原始码＋门禁四数起手名册 RUN=1839 PASS=1234 FAIL=6 SKIP=7＋AC#7 盘上对拉）；go test -v 原始 816KB 按纪律留在仓外 /d/tmp/wisp274v1/
+15ff0846 274-v1 §3/§4/AC#7：实现者四句确认、gofmt 那句推翻（cmd/wisp/models.go 被 gofmt 与 gofumpt v0.12.0 同列，红因＝盘上 CRLF 334 行，非 274）；编排者 design 4D→16D 推翻；AC#9 同上下文对已从盘上消失（exe=B8yINMF1/yy8KMgdf vs dist=BVKlegVD/BRKj5OIJ）；AC#7 裁实质成立/字面不成立且 :53 与 :47 不自洽
+3f7bd77d 274-v1 §2 恒真句攻击：五发全部自跑（M-i/M-ii 复现实现者两发并坐实具名 FATAL+rc=1；自造 M-iv npm 缺失支＝rc=1；自造 M-iii 陈旧页面支落绿 EXITCODE=0 且 exe 报 built=true 4 files）⇒ AC#4 字面成立＋具名残留缺口归 AC#9
+ec1ccddd 274-v1 AC#1 成立＋AC#4 字面成立：仓外硬链接镜像树复现未修码两形（embed=[dist/.gitkeep] rc=0 / 整条通路 EXITCODE=0 而 exe assets NOT BUILT rc=1）+ 三发突变原始记录落盘
+--- final dist/exe md5 (must equal the §0 baseline) ---
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
