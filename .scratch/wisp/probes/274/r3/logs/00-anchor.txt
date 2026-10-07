@@ -1,0 +1,29 @@
+$ date
+Wed Oct  7 17:14:16 CST 2026
+
+$ git rev-parse --abbrev-ref HEAD
+dev
+
+$ git log -1 --oneline
+6c83e6b2 A677 收 274-v2（★我翻 AC#10＋新立 AC#11；票 274＝8 勾 4 未勾，⛔ 不加 -done）＋它推翻/收窄我四句
+
+$ git status --porcelain -- scripts/build.ps1 '.scratch/wisp/probes/274/**' '.scratch/wisp/issues/**' 'frontend/**' '*.go' 'design/**'
+(起手现量：scripts/build.ps1 与 .scratch/wisp/probes/274/** 两枚写面起手均为 clean，无输出行；
+ design/** 那批 D/M 是别人在飞的数，不在本腿写面内，本腿一律不碰；
+ *.go 那批 ?? 全是别人入库/未入库的台件，本腿零 .go 改动也不碰。)
+
+$ md5sum frontend/dist/.gitkeep frontend/dist/assets/* frontend/dist/index.html
+d41d8cd98f00b204e9800998ecf8427e *frontend/dist/.gitkeep
+db4db7a27fb34e3de7acf045561d753a *frontend/dist/assets/index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c *frontend/dist/assets/index-BVKlegVD.js
+f98bfc4ba5dd39d74c9b2f85438de70a *frontend/dist/index.html
+
+$ md5sum build/wisp.exe
+e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+
+$ go list -f '{{.EmbedFiles}}' ./frontend
+[dist/.gitkeep dist/assets/index-BRKj5OIJ.css dist/assets/index-BVKlegVD.js dist/index.html]
+
+$ md5sum scripts/build.ps1 ; $ (Get-Content scripts/build.ps1).Count
+0b5fbbb5f43850f4e3a3545c4f4eaae2 *scripts/build.ps1
+305
