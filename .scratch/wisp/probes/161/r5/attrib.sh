@@ -86,13 +86,15 @@
 #   sh .scratch/wisp/probes/161/r5/attrib.sh                       # both rulers
 #   sh .scratch/wisp/probes/161/r5/attrib.sh --quiet               # verdicts + summary
 #   sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only        # what CI runs (form A)
-#   sh .scratch/wisp/probes/161/r5/attrib.sh --self-test           # classifier, both directions
+#   sh .scratch/wisp/probes/161/r5/attrib.sh --self-test           # classifier both directions + the ticket 275 roster control
 #   sh .scratch/wisp/probes/161/r5/attrib.sh --classify-line 'some/path.go'   # one line, rc 0/1
 # Exit codes as listed above. UNTRACKED/IGNORED lines never change the exit code on
 # their own - being attributable is what keeps them out of it.
 #
-# DELIBERATELY NOT DONE HERE: no exemption list, no path this script formats, no
-# write of any kind outside its own log files. It reads; it does not fix.
+# DELIBERATELY NOT DONE HERE: no exemption list, no path this script formats. It
+# reads the tracked tree; it does not fix it. ONE exception since ticket 275 AC#6:
+# --self-test builds a throwaway git tree under TMPDIR (left in place - this repo's
+# create-only rule) and writes nothing anywhere else.
 
 set -eu
 
@@ -297,8 +299,9 @@ if [ "$MODE" = selftest ]; then
     st_case 0 ticket-161 '.scratch/wisp/probes/161/r5/negative-control/bad-sample.go'
     st_case 0 ticket-161 '.scratch\wisp\probes\161\r5\negative-control\bad-sample.go:19:2: expected declaration, found '\'
     # A second, DIFFERENT real ticket, so that "attributable" cannot be quietly
-    # hardcoded to this program's own number. Every line in this mode is text -
-    # that is the whole point of the mode - and what this case checks is the roster
+    # hardcoded to this program's own number. Every st_case line in this classifier
+    # block is text - that is the whole point of these cases (the roster control
+    # further down really runs gofumpt) - and what this case checks is the roster
     # half of the rule (does .scratch/wisp/issues/169-*.md exist), not whether some
     # file sits at the path. The 777 ring case above is its pair: a bench path whose
     # number has no ticket file must ring even though it has the right shape.
@@ -395,10 +398,10 @@ if [ "$MODE" = selftest ]; then
     fi
     echo "attrib.sh: --self-test cases=$ST_RUN failures=$ST_FAIL"
     if [ "$ST_FAIL" = 0 ]; then
-        echo "attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns"
+        echo "attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns, and the ticket 275 roster control saw an A-ROSTER row naming its own sample"
         exit 0
     fi
-    echo "attrib.sh: SELF-TEST RED - the classifier no longer reads the way AC#7 was decided; do not 'fix' the expectations, fix the classifier"
+    echo "attrib.sh: SELF-TEST RED - the FAIL line above names which case wanted what and got what (classifier cases and the ticket 275 roster control are separate cases); do not 'fix' the expectations, fix the ruler they test"
     exit 1
 fi
 
