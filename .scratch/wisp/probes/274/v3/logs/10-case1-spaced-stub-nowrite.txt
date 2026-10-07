@@ -1,0 +1,30 @@
+﻿=== CASE 01-spaced-stub-nowrite ===
+command: & C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:\tmp\wisp274v3\tree-a\scripts\build.ps1" -Env dev
+expect: rc=1, Named cause: unprovenanced page bytes (spaced name intact in BOTH array rosters)
+date: 2026-10-07T17:38:20.7374328+08:00
+tree: D:\tmp\wisp274v3\tree-a  stub: D:\tmp\wisp274v3\stub-nowrite  treeHasFreshGitRepo=True
+npm resolved -> D:\tmp\wisp274v3\stub-nowrite\npm.cmd
+node resolved -> D:\work\server\node14\node.exe
+go resolved -> D:\work\base\go\bin\go.exe
+gcc resolved -> E:\work\base\msys64\mingw64\bin\gcc.exe
+git resolved -> C:\Users\swq\.qoder-cn\bin\git\mingw64\bin\git.exe
+tree dist BEFORE: .gitkeep | index.html | stale spaced page.html | index-BRKj5OIJ.css | index-BVKlegVD.js
+build.ps1: repo root D:\tmp\wisp274v3\tree-a (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274v3\stub-nowrite\npm.cmd (274-v3 stub-nowrite npm (--version))
+build.ps1: frontend: node_modules ABSENT -> running npm ci (clean install pinned by package-lock.json).
+274-v3 stub-nowrite npm (ci)
+build.ps1: frontend: pre-build dist snapshot = 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html stale spaced page.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+274-v3 stub-nowrite npm (run build)
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274v3\tree-a; snapshot was 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html stale spaced page.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html stale spaced page.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+CASE_01-spaced-stub-nowrite_PROCESS_EXITCODE=1
+tree dist AFTER: .gitkeep | index.html | stale spaced page.html | index-BRKj5OIJ.css | index-BVKlegVD.js
+--- repo (in-repo) md5 AFTER case (must be untouched all through) ---
+d41d8cd98f00b204e9800998ecf8427e  frontend\dist\.gitkeep
+f98bfc4ba5dd39d74c9b2f85438de70a  frontend\dist\index.html
+db4db7a27fb34e3de7acf045561d753a  frontend\dist\assets\index-BRKj5OIJ.css
+70128a3dfdbc73e9f603bb421cdf324c  frontend\dist\assets\index-BVKlegVD.js
+e6c8e52bb14f15a7983bbc6b093e6058  build\wisp.exe
+43fb7e20c597192104728befb231e8ea  scripts\build.ps1

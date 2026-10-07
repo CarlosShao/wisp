@@ -1,0 +1,5 @@
+﻿=== 05 git-throw probe (replicates build.ps1 :238-242 shape in a dir without .git, EAP=Stop) ===
+command: & C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Set-Location -LiteralPath 'D:\tmp\wisp274v3\inner'; & 'D:\tmp\wisp274v3\inner\gitthrow-test.ps1'"
+date: 2026-10-07T17:38:20.2312790+08:00
+THREW git=C:\Users\swq\.qoder-cn\bin\git\mingw64\bin\git.exe EXC=System.Management.Automation.RemoteException MSG=fatal: not a git repository (or any of the parent directories): .git
+gitThrows=True  (if true: per-tree fresh 'git init' + empty commit below neutralizes :240; repo .git is never mirrored)

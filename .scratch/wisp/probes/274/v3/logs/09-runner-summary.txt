@@ -1,0 +1,6 @@
+274-v3 run.ps1: gitThrows=True
+274-v3 run.ps1: case 01-spaced-stub-nowrite rc=1
+274-v3 run.ps1: case 02-reverted-join-split rc=0
+274-v3 run.ps1: case 03-nospace-stub-nowrite rc=1
+274-v3 run.ps1: case 04-spaced-written-green rc=0
+274-v3 run.ps1: SUMMARY 01-spaced-stub-nowrite=1 02-reverted-join-split=0 03-nospace-stub-nowrite=1 04-spaced-written-green=0

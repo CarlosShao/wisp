@@ -1,0 +1,47 @@
+=== 02 revert diff: repo scripts/build.ps1 vs tree-b (the only mutation, must be the :209-210 comparison) ===
+warning: in the working copy of 'scripts/build.ps1', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'D:/tmp/wisp274v3/tree-b/scripts/build.ps1', LF will be replaced by CRLF the next time Git touches it
+@@ -206,8 +206,14 @@ if ($distEntryBytes -le 0) {
+ # ' '-joined string, which is what used to shred a name containing spaces into
+ # fragments and then report the intact name as if this run had produced it.
+ $postRoster = @($distAll | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) })
+-$freshNames = @($postRoster | Where-Object { $preRoster -notcontains $_ })
+-$goneNames = @($preRoster | Where-Object { $postRoster -notcontains $_ })
++# 274-v3 NEUTRALISATION of the AC#11 array-to-array comparison (one spot only):
++# reverts :209-210 to the old 91c90aa1 two-pass -join ' ' / -split ' ' shape.
++$preNames = @()
++if ($preRoster.Count -gt 0) { $preNames = @(($preRoster -join ' ') -split ' ') }
++$postNames = @()
++if ($postRoster.Count -gt 0) { $postNames = @(($postRoster -join ' ') -split ' ') }
++$freshNames = @($postRoster | Where-Object { $preNames -notcontains $_ })
++$goneNames = @($preRoster | Where-Object { $postNames -notcontains $_ })
+ if ($freshNames.Count -le 0) {
+     Fail "frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=$Env, this run's repo root $RepoRoot; snapshot was $preDistLabel [$preRoster], dist now holds [$($postRoster -join ' ')]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run."
+ }
+REVERT_DIFF_RC=0
+
+=== 03 r3 write scope: git show --numstat 674c1920 (claim: scripts/build.ps1 14/6, 305->313) ===
+674c1920
+46	0	.scratch/wisp/probes/274/r3/logs/10-before-fix-space-name.txt
+14	0	.scratch/wisp/probes/274/r3/logs/11-after-fix-space-name.txt
+14	0	.scratch/wisp/probes/274/r3/logs/12-after-fix-stale-page.txt
+47	0	.scratch/wisp/probes/274/r3/logs/13-after-fix-fresh-spaced-name.txt
+318	0	.scratch/wisp/probes/274/r3/logs/90-gates.txt
+24	0	.scratch/wisp/probes/274/r3/logs/99-final-proof.txt
+4	0	.scratch/wisp/probes/274/r3/npm.cmd
+27	0	.scratch/wisp/probes/274/r3/run-case.ps1
+53	0	.scratch/wisp/probes/274/r3/setup.sh
+14	6	scripts/build.ps1
+
+=== 14 exe manifest probe on tree-b build/wisp.exe (spaced name embedded by the false-green build) ===
+/d/tmp/wisp274v3/tree-b/build/wisp.exe
+time=2026-10-07T17:39:21.105+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+panel assets embedded: 5 files, entry=index.html built=true
+PANELASSETS_RC=0
+time=2026-10-07T17:39:21.226+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+.gitkeep 0 e3b0c44298fc1c14
+assets/index-BRKj5OIJ.css 49943 f8ff337b2ce80f3b
+assets/index-BVKlegVD.js 553469 793e606366463f0e
+index.html 1044 2078af7f2343af94
+stale spaced page.html 31 db88a040f8812b50
+MANIFEST_RC=0

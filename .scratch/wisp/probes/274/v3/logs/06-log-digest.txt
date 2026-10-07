@@ -1,0 +1,32 @@
+-- 10-case1-spaced-stub-nowrite (30 lines):
+1:﻿=== CASE 01-spaced-stub-nowrite ===
+3:expect: rc=1, Named cause: unprovenanced page bytes (spaced name intact in BOTH array rosters)
+11:tree dist BEFORE: .gitkeep | index.html | stale spaced page.html | index-BRKj5OIJ.css | index-BVKlegVD.js
+18:build.ps1: frontend: pre-build dist snapshot = 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html stale spaced page.html] (this run's npm must produce an artifact name outside it).
+21:build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274v3\tree-a; snapshot was 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html stale spaced page.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html stale spaced page.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+22:CASE_01-spaced-stub-nowrite_PROCESS_EXITCODE=1
+23:tree dist AFTER: .gitkeep | index.html | stale spaced page.html | index-BRKj5OIJ.css | index-BVKlegVD.js
+-- 11-case2-reverted-join-split (55 lines):
+11:tree dist BEFORE: .gitkeep | index.html | stale spaced page.html | index-BRKj5OIJ.css | index-BVKlegVD.js
+18:build.ps1: frontend: pre-build dist snapshot = 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html stale spaced page.html] (this run's npm must produce an artifact name outside it).
+21:build.ps1: frontend ok: 5 file(s) in frontend/dist (entry index.html is 1044 bytes): .gitkeep=0 assets\index-BRKj5OIJ.css=49943 assets\index-BVKlegVD.js=553469 index.html=1044 stale spaced page.html=31 || provenance: this run's npm added new artifact name(s) [stale spaced page.html] over the pre-build snapshot 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html stale spaced page.html]; gone since snapshot: [stale spaced page.html]
+22:build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+29:wisp doctor - build chain self-check
+46:wisp doctor: PASS
+47:CASE_02-reverted-join-split_PROCESS_EXITCODE=0
+48:tree dist AFTER: .gitkeep | index.html | stale spaced page.html | index-BRKj5OIJ.css | index-BVKlegVD.js
+-- 12-case3-nospace-stub-nowrite (30 lines):
+18:build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html] (this run's npm must produce an artifact name outside it).
+21:build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274v3\tree-c; snapshot was 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+22:CASE_03-nospace-stub-nowrite_PROCESS_EXITCODE=1
+-- 13-case4-spaced-written-green (55 lines):
+1:﻿=== CASE 04-spaced-written-green ===
+3:expect: rc=0 and intact spaced name printed in fresh artifact list
+18:build.ps1: frontend: pre-build dist snapshot = 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html] (this run's npm must produce an artifact name outside it).
+20:274-v3 stub-write npm ran build, wrote the spaced artifact
+21:build.ps1: frontend ok: 5 file(s) in frontend/dist (entry index.html is 1044 bytes): .gitkeep=0 assets\index-BRKj5OIJ.css=49943 assets\index-BVKlegVD.js=553469 index.html=1044 stale spaced page.html=43 || provenance: this run's npm added new artifact name(s) [stale spaced page.html] over the pre-build snapshot 4 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index.html]; gone since snapshot: []
+22:build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+29:wisp doctor - build chain self-check
+46:wisp doctor: PASS
+47:CASE_04-spaced-written-green_PROCESS_EXITCODE=0
+48:tree dist AFTER: .gitkeep | index.html | stale spaced page.html | index-BRKj5OIJ.css | index-BVKlegVD.js
