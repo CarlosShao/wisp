@@ -239,3 +239,29 @@ cd /d/tmp/wisp274a2/fe/frontend && (npm ci || npm install) && npm run build ; ec
 
 `frontend/embed.go`（原文在 `logs/s4-frontend-build.txt`）逐字：「Ticket 77 AC#1: `npm run build` in this directory produces dist/, and the go:embed below is the **ONLY** way those bytes reach wisp.exe. There is no runtime CDN and no local HTTP server (D29 …), so **the binary must be self-sufficient on a machine with no node, no npm and no network**」＋ `//go:embed all:dist` ＋ `const AnchorName = ".gitkeep"`（注释解释：只有锚文件时 `panel.Assets.Built()` 报 false，宿主显示 "assets not built"，永远不会悄悄发占位页）。
 ⇒ 这条设计口径把 §3 的结论咬死了：**exe 带页面＝出货机上必须有谁跑过 `npm run build`**，而那三枚产 exe 的 job 今天谁都没跑（§2/§3）。
+
+---
+
+## §5 终态自证
+
+原始输出：`logs/s5-final.txt`（六族 status / `git log -5` / `wc` / logs 清点 / `frontend` 未被动 / 仓外拷贝位置 / `gh` 子命令清单 / 本件字符扫）、`logs/s5-scope-and-history.txt`（d22scan 射程 + 交错的他人 commit + 祖先核验）。
+
+| 尺 | 读数 | 判定 |
+|---|---|---|
+| `git status --porcelain -- cmd internal scripts tools .github docs frontend` | **0 行**（`[lines=0]`） | 与起手锚逐字相同 ⇒ **六族路径零改动** |
+| `git diff --name-only HEAD -- frontend \| wc -l` | **0** | 未动过 `frontend/**` 一个字节 |
+| `git status --porcelain --untracked-files=all -- frontend \| wc -l` | **0** | 也没在 `frontend/` 里落过未跟踪文件；本机 `frontend/dist` 那 4 枚前人产物逐名仍在（`assets/index-BRKj5OIJ.css` 49943 B、`assets/index-BVKlegVD.js` 553469 B、`index.html` 1044 B、`.gitkeep` 0 B，时间戳全是 `Sep 27 10:59`＝本腿进场前） |
+| `git log --oneline -5` | 本腿四笔 `e18e32da`(§0)、`3dcfcd23`(§1)、`3d061f1e`(§2)、`7da2ab20`(§3)、`c47116da`(§4) 之间**夹着别人的两笔**（`1ec9fa19` 272-v1 §0、`4c659a2c` 台账 A658＋立票 275）⇒ 共享工作树常态，`git merge-base --is-ancestor e18e32da HEAD` ⇒ **yes**，起手锚 `933a8341` 现居 HEAD 之下 7 枚处 | 每节一笔已落，commit-first 成立 |
+| `wc -l -c .scratch/wisp/probes/274/a2/shipping-chain.md` | §4 落盘时点＝**241 行 / 26646 字节**（`logs/s5-final.txt` 逐字）；本节追加后再量一次，终值随交件回报给出 | 件本体存在且非空 |
+| `ls -la .scratch/wisp/probes/274/a2/logs` | **18 枚 logs**，合计 1261 行 / 131950 字节 | 每条读数都指名了出处文件 |
+| `du -s /d/tmp/wisp274a2` | **170 MB**（`fe/` 拷贝树 + `gh/` 五份作业日志 + `msg/` + 四份 npm 日志），⛔ 只建不删 | 仓外，位置已具名 |
+| `gh` 用过的子命令 | 只有 `run list`、`run view --json`、`run view --job <id> --log` | **零写操作**：无 push、无 `gh run rerun`、无 `gh workflow run`、无 `gh api` |
+
+**自陈**：**本腿零产码改动、零 push、零对 `frontend/**` 的写入**；唯一写面＝`.scratch/wisp/probes/274/a2/**`（本件 + 18 枚 logs）与本腿那 5 笔 commit。§4 的拷贝树与全部原始日志**全在 `D:/tmp/wisp274a2/` 仓外**，只建不删。
+
+一处顺手自扫（怕本件自己带 emoji）：尺＝`python` 逐字符扫 `d22scan` 的 `emojiRe` 六段 ⇒ 本件命中 11 枚（`U+26A0`、`U+26D4`、`U+2713`、`U+2260`）。射程判定＝尺读 `tools/d22scan/main.go:581-584` ⇒ ban #8 的四枚 scope 只有 `design/`、`frontend/`、`internal/`、`cmd/`，**不含 `.scratch/`** ⇒ 本件那 11 枚（含引 vite 原输出的 `✓`）**不在仪器射程内**，与 AGENTS.md「UI 代码里零 emoji」那句的射程不冲突；`⇒`/`→` 属 `U+2190–U+21FF` 那截刻意留的空隙，仪器根本不扫（同一句里 `≠` 属 `U+2200–U+22FF` 数学段，真扫得到，但落点在 `.scratch/`）。
+
+### 5.1 与本腿进场时给定的背景不一致的两处（按纪律 8 具名报回）
+
+1. **「`release` job 无落点」这一句与本腿现量不符**：尺＝`grep -rn 'release' .github/workflows` ⇒ **两个 workflow 文件 0 命中**；尺＝job 键枚举（`logs/s2-ci-jobs.txt`，12 行命中里 6 行是 job）⇒ **ci.yml 今天只有 6 枚 job，没有名为 `release` 的 job**。所以准确的形是「**根本没有 release job**」，而不是「有 release job 但没落点」——这条会改变丙形/乙形的落点选法（新闸门只能挂进 `test-windows`／`slo-smoke`／`slo-full` 这三枚既有的产 exe job，或新建一枚）。
+2. **背景里「`scripts/build.ps1:73-74` 整步只一句 `frontend step skipped`」这半句需要收紧**：`73` 行是段头注释 `# --- 2. frontend ---`，`74` 行才是那句 `Write-Host`。⇒ **整个第 2 步是「一行注释 + 一行打印」两行，零命令**；那句不是注释而是**今天真会印进 CI 作业日志的一行输出**（§3.4 第 1 条给了 `slo-full` 日志 `183` 行原文）。甲形若只改「注释」，改不动那句 `Write-Host`——**要修的其实是那句谎话本身**。
