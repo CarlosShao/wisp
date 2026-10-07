@@ -1,0 +1,8 @@
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 6)
+== (A) per-file roster gofumpt emitted before it hit an unparseable file (stdout; exit code unchanged, denominator unchanged):
+   A-ROSTER	.scratch\wisp\probes\275\v1\plant\aaa_broken.go:5:1: imports must appear before other declarations
+   A-ROSTER	.scratch\wisp\probes\275\v1\plant\u1_unformatted.go
+   A-ROSTER	.scratch\wisp\probes\275\v1\plant\u2_unformatted.go
+   A-ROSTER	.scratch\wisp\probes\275\v1\plant\u3_unformatted.go
+   A-ROSTER	.scratch\wisp\probes\275\v1\plant\u4_unformatted.go
+   A-ROSTER	.scratch\wisp\probes\275\v1\plant\u5_unformatted.go

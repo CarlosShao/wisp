@@ -1,0 +1,11 @@
+## run command ledger (275-v1)
+clone=/d/tmp/wisp275v1/clone (git clone --no-hardlinks of the repo at 959529c5; cmd/wisp/models.go CR bytes=0 => CI-equivalent LF shape)
+instrument used in every clone run: clone/.scratch/wisp/probes/161/r5/attrib.sh md5 77ee11a8d0cc8dd8248c6a9b8e164a78 (== shared landed copy)
+
+AC#3 1a full denominator+plant: RC=2 out_lines=23 A-ROSTER=21 plant named at line 20
+AC#3 1b same minus fs_broken: RC=1 TRACKED-DIRTY=20 (=19 CI-equivalent + plant) A-ROSTER=0 stderr 0 bytes
+AC#4i print block (354-362) commented in /d/tmp/wisp275v1/attrib-neutered.sh: RC=2 out_lines=1 A-ROSTER=0 stderr unchanged
+AC#4ii run A (broken FIRST, denom=6): RC=2 A-ROSTER=6 (1 diagnostic + u1..u5)
+AC#4ii run B (no broken, denom=5): RC=1 TRACKED-DIRTY=5 (u1..u5)
+AC#4ii run C (broken LAST, denom=6): RC=2 A-ROSTER=6 (u1..u5 + diagnostic)
+name-set equality rc2 vs rc1 (936/935 denominator): diff clean, 20==20

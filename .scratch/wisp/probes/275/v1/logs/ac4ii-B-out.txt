@@ -1,0 +1,12 @@
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 5)
+   TRACKED-DIRTY	.scratch/wisp/probes/275/v1/plant/u1_unformatted.go	(last commit touching it: )	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/275/v1/plant/u2_unformatted.go	(last commit touching it: )	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/275/v1/plant/u3_unformatted.go	(last commit touching it: )	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/275/v1/plant/u4_unformatted.go	(last commit touching it: )	<== CI IS RED ON THIS
+   TRACKED-DIRTY	.scratch/wisp/probes/275/v1/plant/u5_unformatted.go	(last commit touching it: )	<== CI IS RED ON THIS
+
+attrib.sh: gofumpt v0.12.0 (go1.27.1)
+attrib.sh: (A) tracked-tree  lines=5 files=5  rule: MUST be empty
+attrib.sh: (B) not run in --tracked-only mode - a checkout has no bench working tree to attribute
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: RED (tracked-only) - tracked-dirty=5 files_dirty=5. The CI gofmt step and this step read the same denominator; this one additionally refuses to answer when handed 0 files.
