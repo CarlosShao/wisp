@@ -80,3 +80,36 @@ $ git show 35633445:scripts/build.ps1 | wc -l
 - **AC#4** 反形敏感性：复跑 `274-r1` 那两发定向突变（① node/npm 取不到 ② npm 谎报成功而 dist 只剩锚），**再加本腿自造的突变 ≥1 发**。
 - **AC#6** 门禁四数（独占窗口、串行）：`sh scripts/d22scan.sh` rc=0 ＋ 正控先绿；`gofmt -l`／gofumpt v0.12.0 `-l` 只喂 `.go`；`go vet ./cmd/wisp/ ./internal/panel/` rc=0；`go test ./cmd/wisp ./internal/... -count=1` RUN/PASS/FAIL/SKIP 四数＋首尾逐名红名册作差。
 - **AC#7** 方法裁定：`frontend/dist` 现态 vs 实现者起手基线（逐枚 md5），裁"mv 还原"算不算 `-overlay` 字面。
+
+---
+
+## §1 逐格裁决
+
+### AC#1（未修码读数：今天拦不住）＝**成立**（全部本腿自跑，⛔ 未引 `r1/logs`）
+台件：仓外硬链接镜像树 `D:/tmp/wisp274v1/tree`（`cp -al` 逐条顶层目录，⛔ 不含 `.git`、⛔ 不含 `frontend/node_modules`），
+`frontend/dist` 里我只 **unlink**（`rm` 硬链接＝减链接数，不触原文件）掉 3 枚陈旧件 ⇒ 该树 dist＝`.gitkeep` 一枚＝干净检出形。
+仓内基线在 unlink 前后逐枚 md5 相同（`logs/01:9-19`：BEFORE/AFTER 四枚全同，`REPO DIST UNCHANGED rc=0`），`build/` 在 scratch 侧整目录 `rm -rf`（`logs/02`）⇒ 本腿从未写过仓内 `build/wisp.exe`（终态 md5 仍 `e6c8e52b…`，`logs/04` 末段）。
+
+1. **embed 级尺，锚文件形**（`logs/01`）：
+   `$ cd D:/tmp/wisp274v1/tree && go list -f '{{.EmbedFiles}}' ./frontend` ⇒ 逐字 `[dist/.gitkeep]`、`rc=0`。
+2. **embed 级尺，正控**（同一把尺、本仓工作树、⛔ 未改任何字节）⇒ 逐字
+   `[dist/.gitkeep dist/assets/index-BRKj5OIJ.css dist/assets/index-BVKlegVD.js dist/index.html]`、`rc=0`。尺不瞎。
+3. **整条通路（未修码那份 `35633445^:scripts/build.ps1`，172 行，stage 进 scratch 后原样跑）**（`logs/03`）：
+   - `logs/03:6` 逐字：`build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)`
+   - `logs/03:12` 逐字：`OLD_BUILD_PS1_PROCESS_EXITCODE=0`（走完 `go build ok`／DLL 并置／SHA256SUMS／`wisp doctor: PASS`）
+   - `logs/03:20-21` 逐字：`wisp panel-assets: assets NOT BUILT` ⇒ `PANEL_ASSETS_EXITCODE=1`
+   - `logs/03:24-25` 逐字：`wisp panel-assets: panel: embedded assets are not built (run npm run build in frontend/)` ⇒ `MANIFEST_EXITCODE=1`
+   ⇒ **同一棵源码、页面字节为零、出货通路整条 rc=0**＝票面 §1 那句现象由本腿独立复现，不是转述。
+4. **行尾符口径（A664 §2 要求同时报）**：我的 scratch 树是**工作树硬链接**，不是 `git archive` ⇒
+   `logs/01`：`frontend/index.html` CR 数 scratch＝0／repo＝0、`cmp` 回 `IDENTICAL`；`frontend/src/App.tsx` 同样 0／IDENTICAL。
+   ⛔ 因此 A664 那枚 archive-CRLF 陷阱在本腿台件里**不存在**（尺＝`tr -cd '\r' | wc -c`，⛔ 不是 `grep -c $'\r'`）。
+
+### AC#4（反形敏感性／恒真句攻击）＝**字面成立，带一枚具名残留缺口**（详见 §2）
+被审件行号一律 `35633445:scripts/build.ps1:<line>`（＝盘上 `scripts/build.ps1:<line>`，两树同 265 行、md5 见 §6）：
+- `:38-41` `function Fail([string]$Message) { Write-Host "build.ps1: FATAL: $Message"` / `exit 1` ⇒ 每个失败支都**自己报名字＋非零**，不是"打印后继续"。
+- `:108-111` node 取不到 → `Fail`；`:112-115` npm 取不到 → `Fail`；`:126-127`／`:136-137` `npm ci`／`npm run build` 非零 → `Fail`；
+  `:148-149` dist 目录不存在 → `Fail`；`:155-158` 只剩锚文件 → `Fail`；`:159-160` 无 `index.html` → `Fail`；`:162-165` 入口 0 字节 → `Fail`。
+- CI 侧真的会红：`35633445:.github/workflows/ci.yml:571`／`:757`／`:820` 逐字
+  `run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev`，三处**都没有** `continue-on-error`
+  （尺见 §2 末），所以 `exit 1` 就是那一步红。
+三发突变的原始退出码与具名红因逐字都在 `logs/04`，本腿裁论见 §2。
