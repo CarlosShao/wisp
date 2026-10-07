@@ -91,6 +91,12 @@ PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v ./cmd/w
 - **AC#5 终态作差＝0 这一格**：起手 7 枚红里 `TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card` 是带载型
   （整包并发 50.12s 撞 40s 预算）。终态若它复绿或别枚带载的复红，**作差就不是 0**，本腿不会为它改任何断言，
   只把两法的红名册与差集逐名列出来交给裁决者。
+- **两支臂都盖不住的那一发（本腿不硬造，具名登记为残余）**：产码若把那句挪到 **`mark` 之后、plant 之前**才打
+  （异步横幅／首个 tick 打的欢迎语），那么"窗内恰好一份"与"种改动之前零份"两条**同时成立**，尺照样分不出抵账的那一份是谁打的。
+  要钉死它需要一个 **plant 与那句之间的同流锚点**，而产码里不存在（操作员句在 `cmd/wisp/config_reload.go:321-326` 写，
+  它是 `internal/config/manager.go:201-202` 在 `CheckAndReload` **返回之前**回调的；`HOT-RELOAD state=applied` 那行要等
+  `config_reload.go:179` 的 `reportReload` 才写＝**晚于**操作员句），
+  造这个锚点要改产品文案＝票面 `:40` 禁区＋要人工批准。本腿**不改产码一字**，把这一形写在这里交给裁决者。
 - 其余 AC#1/#3/#4/#6 都在本腿射程内，不需要人拍板。
 
 ---
@@ -107,4 +113,29 @@ PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v ./cmd/w
 
 ## 4. 读数台账（ newest last；每格落地后追加，原话不抹 ）
 
-【待填：AC#1 的三发读数】
+### 4.1 AC#1 —— 未改动的尺（`config_reload_223_test.go` blob `ab6c84fb`）上的五发读数
+
+命令（逐字）：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v -run 'TestTicket223RestartTierSaysItWillNotApply' [-overlay <json>] ./cmd/wisp/`
+五份原始读数：`logs/AC1-oldruler-{cur,M,MDEL,PART,REPEAT}.txt`（19/19/34/19/19 行，共 11.5 KB，全部本腿自跑，**没抄 r1 的**）。
+产码形全部走 `go test -overlay`，拷贝在仓外 `/d/tmp/wisp272r2/mut/<形>/cmd/wisp/config_reload.go`，工作树未动（`git status --porcelain -- cmd internal` 仍 0 行）。
+
+| 形 | 改动行数（对 `git show HEAD:cmd/wisp/config_reload.go` 的 diff） | 语义 | 未改动的尺读数 |
+|---|---|---|---|
+| `cur` | 0（无 overlay） | 基线 | **PASS 2.77s**（件内 `--- PASS` 行 2.38s／包 2.771s） |
+| `M` | **1 行插入**（`127a128`，与 r1 那份 M 逐字节同文） | 启动横幅追加一句同样字样的操作员句，重启句照打 | **PASS 2.38s＝票面 AC#1 要的那发，本腿复到了** |
+| `MDEL` | 1 插 + 6 删（＝票面 `MK` 那一形：横幅带全字样 **且** 操作员重启句删光） | 横幅能不能单独抵账 | **FAIL 42.08s**，红在 `:592` `stdout never carried "本次运行不会生效" AFTER the plant within 40s`，红句里 **`window since the mark:` 那一段是空的**，`上一版横幅` 只出现在 `full stdout:` 第 3 行 |
+| `PART` | 1 行插入 | 横幅只含部分字样（有「重启进程」，**没有**「本次运行不会生效」） | **PASS 2.48s** |
+| `REPEAT` | 6 行插入（`:321-326` 操作员句 Fprintf 原样重复一遍，仍是种改动之后打的） | 窗内出现两份真句 | **PASS 2.22s＝今天窗内计数不钉，重复打印不响** |
+
+### 4.2 ★AC#1 的复验结论：票面 `:10` 那半句机制**复现不了**，但缺口本身换了个形状还在
+
+- **复现不了的那半**：`M` 形 PASS 不是"横幅冒充了重启句"。`MDEL` 这一发（横幅带全字样＋真句删光）在未改动的尺上**红在 40s 超时**，
+  且红句里的窗口段是**空的** ⇒ 启动横幅那一份**根本没进窗**。机制与本腿 §2.1 的读码一致：
+  `startConfigReload()`（`run.go:813`，`assembleRuntime` 内）同步写 `syncWriter`（`approval_reply_201_test.go:64`，无 pipe 无拷贝协程），
+  而 `mark` 在其后的 `onRuntime`→`rtHook`（尺 `:566`）里取 ⇒ **种改动之前打的一切都在 `mark` 前缀里，`TrimPrefix` 天然把它们算到窗外**。
+  ⇒ 票面"窗口起点取早了所以横幅天然落在窗口里"这半句，按本腿现量应读作：**窗口的下界确实早于 plant，但那个位置今天恰好也晚于全部启动输出**。
+- **还在的那半（＝本票真正的价值所在）**：`REPEAT` 形今天**一声不响**（PASS 2.22s）——窗内两份真句与一份真句在这把尺上不可区分；
+  而"横幅能不能抵账"只钉在一条**程序顺序**上：产码哪天把那句改到 `mark` 之后再打（异步打印／首 tick 打印／欢迎语晚一步），
+  `MDEL` 那种抵账立刻就能绿。⇒ 本腿落地的两支臂（见 §5）钉的是"种改动之前零份"＋"窗内恰好一份"，
+  **不**是票面三形里任何一支的原样，理由与量到的证据在 §5.2。
+
