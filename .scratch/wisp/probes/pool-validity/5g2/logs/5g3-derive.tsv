@@ -1,0 +1,52 @@
+11|tier=A|acc=|un=0|any=0|chk=6|tot=14|self==0|m31=Acceptor:** orchestrator (not an implem|m33=ident=ident=1|11-adversarial-acceptance.md
+63|tier=A|acc=|un=0|any=0|chk=6|tot=13|self==0|m31=Acceptor:** orchestrator (not the imple|m33=ident=ident=1|63-adversarial-acceptance.md
+66|tier=A|acc=|un=0|any=0|chk=7|tot=14|self==1|m31=验收人：** orchestrator（**不是**实现人|m33=ident=ident=1|66-adversarial-acceptance.md
+67|tier=A|acc=|un=0|any=0|chk=4|tot=14|self==0|m31=NOSIG|m33=ident=ident=3|67-ac3-ascii-verdict.md  ***CONFLICT
+69|tier=A|acc=|un=0|any=0|chk=4|tot=6|self==0|m31=验收人**：编排者（**非实现者**；实现方是 `agen|m33=ident=ident=1|69-adversarial-acceptance.md
+73|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=验收人**：编排者（**非实现者**；实现方 `agent|m33=ident=ident=1|73-adversarial-acceptance.md
+74|tier=A|acc=|un=0|any=0|chk=5|tot=11|self==0|m31=验收人**：编排者（非实现者；实现方 `agent-tic|m33=ident=ident=1|74-adversarial-acceptance.md
+76|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=验收人**：编排者（非实现者；实现方 `agent-tic|m33=ident=ident=1|76-adversarial-acceptance.md
+79|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|79-adversarial-acceptance.md  ***CONFLICT
+83|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|83-adversarial-acceptance.md  ***CONFLICT
+84|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|84-ac1-bounded-wait.md  ***CONFLICT
+87|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|87-adversarial-acceptance.md  ***CONFLICT
+88|tier=A|acc=|un=0|any=0|chk=6|tot=6|self==0|m31=NOSIG|m33=ident=ident=1|88-adversarial-acceptance.md  ***CONFLICT
+89|tier=A|acc=|un=0|any=0|chk=17|tot=17|self==0|m31=NOSIG|m33=ident=ident=1|89-adversarial-acceptance.md  ***CONFLICT
+93|tier=A|acc=|un=0|any=0|chk=6|tot=6|self==0|m31=NOSIG|m33=ident=ident=1|93-adversarial-acceptance.md  ***CONFLICT
+94|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|94-adversarial-acceptance.md  ***CONFLICT
+95|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|95-adversarial-acceptance.md  ***CONFLICT
+96|tier=A|acc=|un=0|any=0|chk=6|tot=6|self==0|m31=NOSIG|m33=ident=ident=1|96-adversarial-acceptance.md  ***CONFLICT
+99|tier=A|acc=|un=0|any=0|chk=4|tot=4|self==0|m31=NOSIG|m33=ident=ident=1|99-adversarial-acceptance.md  ***CONFLICT
+101|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|101-adversarial-acceptance.md  ***CONFLICT
+104|tier=A|acc=|un=2|any=2|chk=3|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|104-adversarial-acceptance.md  ***CONFLICT
+106|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|106-adversarial-acceptance.md  ***CONFLICT
+110|tier=A|acc=|un=2|any=2|chk=3|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|110-adversarial-acceptance.md  ***CONFLICT
+116|tier=A|acc=|un=0|any=0|chk=6|tot=6|self==0|m31=NOSIG|m33=ident=ident=1|116-adversarial-acceptance.md  ***CONFLICT
+117|tier=A|acc=|un=0|any=0|chk=6|tot=6|self==0|m31=验收人：`acceptor-ticket117`（**只读|m33=ident=ident=1|117-adversarial-acceptance.md
+118|tier=A|acc=|un=0|any=0|chk=8|tot=8|self==3|m31=NOSIG|m33=ident=ident=1|118-adversarial-acceptance.md  ***CONFLICT
+119|tier=A|acc=|un=0|any=0|chk=7|tot=7|self==1|m31=NOSIG|m33=ident=ident=5|119-ac1-ac2-r2-acceptance.md  ***CONFLICT
+126|tier=A|acc=|un=0|any=0|chk=6|tot=6|self==2|m31=NOSIG|m33=ident=ident=1|126-adversarial-acceptance.md  ***CONFLICT
+127|tier=A|acc=|un=0|any=0|chk=4|tot=4|self==0|m31=NOSIG|m33=ident=ident=1|127-adversarial-acceptance.md  ***CONFLICT
+129|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==1|m31=NOSIG|m33=ident=ident=1|129-adversarial-acceptance.md  ***CONFLICT
+131|tier=A|acc=|un=0|any=0|chk=8|tot=8|self==0|m31=NOSIG|m33=ident=ident=3|131-adversarial-acceptance.md  ***CONFLICT
+134|tier=A|acc=|un=0|any=0|chk=6|tot=13|self==0|m31=NOSIG|m33=ident=ident=3|134-ac4-machine-contended-readings.md  ***CONFLICT
+141|tier=A|acc=|un=0|any=0|chk=4|tot=5|self==0|m31=NOSIG|m33=ident=ident=3|141-ac2-stock-inventory-r1.md  ***CONFLICT
+142|tier=A|acc=|un=0|any=0|chk=4|tot=4|self==0|m31=NOSIG|m33=ident=ident=2|142-non-quiescent-index-guard-accept-r1.md  ***CONFLICT
+143|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|143-panel-assets-r4-leg-accept-r1.md  ***CONFLICT
+144|tier=A|acc=|un=0|any=0|chk=5|tot=6|self==0|m31=NOSIG|m33=ident=ident=2|144-slo-report-partial-read-r1-accept-r1.md  ***CONFLICT
+147|tier=A|acc=|un=0|any=0|chk=5|tot=7|self==0|m31=NOSIG|m33=ident=ident=2|147-offset-naming-r1-accept-r1.md  ***CONFLICT
+149|tier=A|acc=|un=0|any=0|chk=6|tot=8|self==1|m31=NOSIG|m33=ident=ident=2|149-three-unpinned-outlets-r1-accept-r1.md  ***CONFLICT
+151|tier=A|acc=|un=0|any=0|chk=5|tot=6|self==0|m31=NOSIG|m33=ident=ident=2|151-task-scope-never-closed-r1-accept-r1.md  ***CONFLICT
+152|tier=A|acc=|un=0|any=0|chk=5|tot=8|self==1|m31=NOSIG|m33=ident=ident=1|152-subject-death-never-measured-r1-accept-r1.md  ***CONFLICT
+153|tier=A|acc=|un=0|any=0|chk=5|tot=8|self==0|m31=NOSIG|m33=ident=ident=3|153-ac2-a-closure-r1.md  ***CONFLICT
+154|tier=A|acc=|un=0|any=0|chk=6|tot=12|self==0|m31=NOSIG|m33=ident=ident=2|154-close-gate-never-rings-r1-accept-r1.md  ***CONFLICT
+155|tier=A|acc=|un=0|any=0|chk=4|tot=6|self==0|m31=NOSIG|m33=ident=ident=2|155-three-unjudged-cells-r1-accept-r1.md  ***CONFLICT
+157|tier=A|acc=|un=0|any=0|chk=5|tot=7|self==0|m31=NOSIG|m33=ident=ident=2|157-ac5-recheck-r1.md  ***CONFLICT
+162|tier=A|acc=|un=0|any=0|chk=8|tot=18|self==0|m31=NOSIG|m33=ident=ident=3|162-fs-edit-accept-r1.md  ***CONFLICT
+183|tier=A|acc=|un=0|any=0|chk=10|tot=10|self==0|m31=NOSIG|m33=ident=ident=2|183-exemption-why-not-live-a1.md  ***CONFLICT
+184|tier=C|acc=|un=0|any=0|chk=9|tot=9|self==0|m31=|m33=NO_CRED|NOACC  ***CONFLICT
+198|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=验收腿 `198-v2`|m33=ident=ident=2|198-firstrun-config-r2.md
+212|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|212-comments-phantom-citation-v2.md  ***CONFLICT
+221|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|221-task-cancel-v1.md  ***CONFLICT
+241|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=裁决腿：`241-v1`（必须≠本腿）|m33=ident=ident=2|241-audio-level-producer-r1.md
+257|tier=A|acc=|un=0|any=0|chk=5|tot=5|self==0|m31=NOSIG|m33=ident=ident=1|257-clean-machine-provider-registry-v1.md  ***CONFLICT

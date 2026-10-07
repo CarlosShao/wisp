@@ -1,0 +1,5 @@
+78|in52=0|idxbucket=C|ledger=10|myruler=NOT_IN_MY_ROSTER(=excluded by ruler B, never name-indexed by me)
+115|in52=0|idxbucket=C|ledger=22|myruler=NOT_IN_MY_ROSTER(=excluded by ruler B, never name-indexed by me)
+250|in52=0|idxbucket=C|ledger=9|myruler=NOT_IN_MY_ROSTER(=excluded by ruler B, never name-indexed by me)
+254|in52=0|idxbucket=C|ledger=8|myruler=NOT_IN_MY_ROSTER(=excluded by ruler B, never name-indexed by me)
+267|in52=0|idxbucket=C|ledger=20|myruler=NOT_IN_MY_ROSTER(=excluded by ruler B, never name-indexed by me)

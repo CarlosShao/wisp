@@ -1,0 +1,81 @@
+== A: distinct bracket tokens across the 52 done tickets ==
+     52 [x]
+      2 [ ]
+== B: AC coverage: distinct AC# on face vs in its acc files ==
+-- tickets whose acc AC set top < face max AC (coverage gap candidates):
+101 F=5 A=0 GAP
+104 F=5 A=0 GAP
+106 F=5 A=0 GAP
+11 F=7 A=0 GAP
+110 F=7 A=0 GAP
+116 F=6 A=0 GAP
+117 F=6 A=0 GAP
+118 F=9 A=0 GAP
+119 F=7 A=0 GAP
+126 F=9 A=0 GAP
+127 F=4 A=0 GAP
+129 F=6 A=0 GAP
+131 F=7 A=0 GAP
+134 F=6 A=0 GAP
+141 F=4 A=0 GAP
+142 F=4 A=0 GAP
+143 F=5 A=0 GAP
+144 F=15 A=0 GAP
+147 F=5 A=0 GAP
+149 F=6 A=0 GAP
+151 F=5 A=0 GAP
+152 F=5 A=0 GAP
+153 F=5 A=0 GAP
+154 F=6 A=0 GAP
+155 F=5 A=0 GAP
+157 F=5 A=0 GAP
+162 F=8 A=0 GAP
+183 F=10 A=0 GAP
+184 F=10 A=0 GAP
+198 F=7 A=0 GAP
+212 F=5 A=0 GAP
+221 F=6 A=0 GAP
+241 F=5 A=0 GAP
+257 F=14 A=0 GAP
+63 F=6 A=0 GAP
+66 F=7 A=0 GAP
+67 F=7 A=0 GAP
+69 F=7 A=0 GAP
+73 F=5 A=0 GAP
+74 F=5 A=0 GAP
+76 F=5 A=0 GAP
+79 F=5 A=0 GAP
+83 F=6 A=0 GAP
+84 F=6 A=0 GAP
+87 F=5 A=0 GAP
+88 F=6 A=0 GAP
+89 F=6 A=0 GAP
+93 F=5 A=0 GAP
+94 F=5 A=0 GAP
+95 F=5 A=0 GAP
+96 F=6 A=0 GAP
+99 F=4 A=0 GAP
+== C: tickets with no Progress log section ==
+NOPL 142 .scratch/wisp/issues/142-the-two-git-spawns-are-not-atomic-so-a-tracked-directory-can-be-skipped-during-the-window-done.md
+NOPL 143 .scratch/wisp/issues/143-wisp-panel-assets-l2-cannot-produce-an-r4-card-the-taint-detector-is-not-wired-on-that-path-done.md
+NOPL 198 .scratch/wisp/issues/198-a-fresh-machine-cannot-run-wisp-because-nothing-creates-config-toml-done.md
+NOPL 241 .scratch/wisp/issues/241-no-anything-computes-a-0-to-1-level-from-pcm-the-whole-main-module-has-no-sqrt-done.md
+NOPL 257 .scratch/wisp/issues/257-clean-machine-provider-registry-nil-blocks-writes-done.md
+== D: tickets with no Evidence/凭据/归口 section on face ==
+NOEVIDSEC 11 acc_cited=1
+NOEVIDSEC 143 acc_cited=2
+NOEVIDSEC 144 acc_cited=4
+NOEVIDSEC 147 acc_cited=3
+NOEVIDSEC 154 acc_cited=5
+NOEVIDSEC 155 acc_cited=3
+NOEVIDSEC 162 acc_cited=10
+NOEVIDSEC 183 acc_cited=5
+NOEVIDSEC 184 acc_cited=5
+NOEVIDSEC 221 acc_cited=1
+NOEVIDSEC 63 acc_cited=2
+NOEVIDSEC 67 acc_cited=4
+NOEVIDSEC 73 acc_cited=4
+NOEVIDSEC 76 acc_cited=1
+NOEVIDSEC 79 acc_cited=1
+NOEVIDSEC 87 acc_cited=1
+NOEVIDSEC 89 acc_cited=2

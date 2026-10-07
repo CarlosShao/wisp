@@ -1,0 +1,4 @@
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+D:\tmp\wisp272r1\waveA\mut\PART\cmd\wisp\config_reload.go:128:121: syntax error: unexpected newline in argument list; possibly missing comma or )
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
