@@ -113,3 +113,35 @@ $ git show 35633445:scripts/build.ps1 | wc -l
   `run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev`，三处**都没有** `continue-on-error`
   （尺见 §2 末），所以 `exit 1` 就是那一步红。
 三发突变的原始退出码与具名红因逐字都在 `logs/04`，本腿裁论见 §2。
+
+---
+
+## §2 恒真句攻击（AC#4 的核心射程；五发全部本腿自跑，原始退出码逐字在 `logs/04`／`logs/05`／`logs/06`）
+
+所有突变都在仓外镜像树 `D:/tmp/wisp274v1/tree` 里跑**当前**那份 265 行 `build.ps1`（staged＝`git show 35633445:scripts/build.ps1`，`logs/04:4`），
+⛔ 仓内 `frontend/dist`／`build/wisp.exe` 一个字节没被写过（每发末尾都有 md5 回查，`logs/04` 末段、`logs/06` 末段：
+`f98bfc4b…`／`db4db7a2…`／`70128a3d…`／`d41d8cd9…`／`e6c8e52b…` 与起手逐枚相同）。
+
+| 发 | 形状 | 我看到的具名红因（逐字）／绿 | 码 |
+|---|---|---|---|
+| **M-i**（实现者的 (i)） | PATH 剥掉 node 与 npm | `build.ps1: FATAL: frontend step: node could not be resolved on PATH (tried node.exe, then node). …` ＝ `35633445:scripts/build.ps1:110` | `MUTATION_PROCESS_EXITCODE=1` |
+| **M-iv**（**本腿自造**，实现者没碰过那一支） | **node 找得到、npm 找不到** | `build.ps1: FATAL: frontend step: npm could not be resolved on PATH (tried npm.cmd, then npm). …` ＝ `:114` | `MUTATION_PROCESS_EXITCODE=1` |
+| **M-ii**（实现者的 (ii)） | 桩 `npm` 报成功而 `frontend/dist` 只剩锚文件 | `build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds only the anchor file(s) [1 file(s), none beside frontend/dist/.gitkeep]. That is the clean-checkout shape, so the exe would ship with zero page bytes. Named cause: build produced no page artifacts.` ＝ `:157` | `MUTATION_PROCESS_EXITCODE=1` |
+| **M-iii-1**（**本腿自造**） | 桩 `npm` 报成功，而 dist 里**已躺着一份真页面（09-27 陈旧件）** | **这一步绿了**：`build.ps1: frontend ok: 4 file(s) in frontend/dist (entry index.html is 1044 bytes): .gitkeep=0 assets\index-BRKj5OIJ.css=49943 assets\index-BVKlegVD.js=553469 index.html=1044`（`logs/05:19`＝`logs/06:16`）——本发整条 run 随后死在 `:192`（见下条侧发现），码 1 | `M_III_PROCESS_EXITCODE=1` |
+| **M-iii-2**（同上，把 `git.exe` 也从 PATH 摘掉让通路走完） | 同上 | 整条走完：`logs/06:16` 那句 `frontend ok` 原样，`logs/06:23` `M_III_RERUN_PROCESS_EXITCODE=0`，`logs/06:28-29` `panel assets embedded: 4 files, entry=index.html built=true` `PANEL_ASSETS_EXITCODE=0`，`-manifest` 逐枚＝`.gitkeep 0`／`assets/index-BRKj5OIJ.css 49943`／`assets/index-BVKlegVD.js 553469`／`index.html 1044` ＝ **npm 这一趟一个字节都没写，exe 仍报带页面** | rc=0 **绿** |
+
+**裁论（诚实版，不替实现者圆场）**
+- AC#4 那句字面判据（票面 `:50`：「把 dist 换成只剩锚文件那一形 ⇒ 出货判据必须红」）＋「不许写成两形都绿的恒真句」——**过了**：
+  三发不同形状各自报出**不同的**具名原因并 `exit 1`，七条失败支一一对得上行号；`Fail` 只有一条出口 `exit 1`（`:38-41`），没有"打印后继续"的支。
+  CI 那三处调用（`35633445:.github/workflows/ci.yml:571`／`:757`／`:820`）逐字都是 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev`，
+  且 `grep -c '^[[:space:]]*continue-on-error:' .github/workflows/ci.yml` ＝ **0**（16 处文字命中全是注释，`logs/07` §6）⇒ `exit 1` 真会把那一步染红。
+- **但本腿自造的 M-iii 落绿了**，且绿得很具体：这道新闸门校的是**"dist 里有没有页面字节"**，不是**"这些字节是不是这一趟构建出来的"**。
+  ⇒ 按派单纪律（"你的突变落绿 ⇒ 那一格不敏感，要说出并拒绝接受本格"）我**不写成无条件成立**：
+  本格的**字面命题成立**，**射程外残留一枚具名缺口**＝「陈旧产物冒充本次产物」这一形今天的闸门看不见。
+  这枚缺口归谁：票面 **AC#9**（`:54`「陈旧产物不许替『带页面』报绿」）正是为它立的框，而 `build.ps1` 那一步**没有**任何 per-file 出处校验可以兑现 AC#9 ⇒
+  翻不翻 AC#4 由编排者拍；若要它自己就有牙，最小增量是现成的：`logs/06` 那种对拉（`frontend ok` 那行的名册必须与**本趟 npm 之前**的快照不同名，或直接校 `index.html` 的 mtime 晚于 `frontend/src` 最新 mtime）。
+- **侧发现一枚（不属 274，但被 274 的通路放大）**：M-iii-1 死在
+  `At D:\tmp\wisp274v1\tree\scripts\build.ps1:192 char:15  +     $short = (& git rev-parse --short HEAD 2>$null)` ⇒ `NativeCommandError`＋整条 rc=1。
+  因＝树里没有 `.git` 而 PATH 里有 `git.exe`，`$ErrorActionPreference='Stop'`（`:31`）把原生命令的 stderr 升成终止错误。
+  **公平归因**：那一行在 `35633445^:scripts/build.ps1:99` 就有（`logs/08` (a)/(d) 与 `grep -n rev-parse` 现量），⛔ 不是 274 引入的；
+  但它说明"在没有 `.git` 的目录里跑 build.ps1"今天会红成一句与前端无关的错——CI 的检出带 `.git` ⇒ 不阻塞本票，登记即可。
