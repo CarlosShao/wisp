@@ -1,0 +1,70 @@
+### module source: exported Chromium roster
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:72:func (e *Chromium) Embed(hwnd uintptr) bool {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:116:func (e *Chromium) Navigate(url string) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:123:func (e *Chromium) NavigateToString(htmlContent string) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:130:func (e *Chromium) Init(script string) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:138:func (e *Chromium) Eval(script string) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:151:func (e *Chromium) Show() error {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:155:func (e *Chromium) Hide() error {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:159:func (e *Chromium) QueryInterface(_, _ uintptr) uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:163:func (e *Chromium) AddRef() uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:167:func (e *Chromium) Release() uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:171:func (e *Chromium) EnvironmentCompleted(res uintptr, env *ICoreWebView2Environment) uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:186:func (e *Chromium) CreateCoreWebView2ControllerCompleted(res uintptr, controller *ICoreWebView2Controller) uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:233:func (e *Chromium) MessageReceived(sender *ICoreWebView2, args *iCoreWebView2WebMessageReceivedEventArgs) uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:250:func (e *Chromium) SetPermission(kind CoreWebView2PermissionKind, state CoreWebView2PermissionState) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:254:func (e *Chromium) SetGlobalPermission(state CoreWebView2PermissionState) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:258:func (e *Chromium) PermissionRequested(_ *ICoreWebView2, args *iCoreWebView2PermissionRequestedEventArgs) uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:281:func (e *Chromium) WebResourceRequested(sender *ICoreWebView2, args *ICoreWebView2WebResourceRequestedEventArgs) uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:292:func (e *Chromium) AddWebResourceRequestedFilter(filter string, ctx COREWEBVIEW2_WEB_RESOURCE_CONTEXT) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:299:func (e *Chromium) Environment() *ICoreWebView2Environment {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:306:func (e *Chromium) AcceleratorKeyPressed(sender *ICoreWebView2Controller, args *ICoreWebView2AcceleratorKeyPressedEventArgs) uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:324:func (e *Chromium) GetSettings() (*ICoreWebViewSettings, error) {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:328:func (e *Chromium) GetController() *ICoreWebView2Controller {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:339:func (e *Chromium) NavigationCompleted(sender *ICoreWebView2, args *ICoreWebView2NavigationCompletedEventArgs) uintptr {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:346:func (e *Chromium) NotifyParentWindowPositionChanged() error {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:355:func (e *Chromium) Focus() {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium_386.go:11:func (e *Chromium) Resize() {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium_amd64.go:12:func (e *Chromium) Resize() {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium_arm64.go:12:func (e *Chromium) Resize() {
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2_3.go:58:func (e *Chromium) GetICoreWebView2_3() *ICoreWebView2_3 {
+
+### PostWebMessage / ExecuteScript anywhere in module
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:144:	_, _, _ = e.webview.vtbl.ExecuteScript.Call(
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:242:	_, _, _ = sender.vtbl.PostWebMessageAsString.Call(
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/corewebview2.go:103:	ExecuteScript                          ComProc
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/corewebview2.go:106:	PostWebMessageAsJSON                   ComProc
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/corewebview2.go:107:	PostWebMessageAsString                 ComProc
+
+### webview.go: Dispatch impl + Run pump + msgcb reply path
+58:	dispatchq  []func()
+103:	chromium.MessageCallback = w.msgcb
+139:func (w *webview) msgcb(msg string) {
+162:func (w *webview) callbinding(d rpcMessage) (interface{}, error) {
+163:	w.m.Lock()
+165:	w.m.Unlock()
+263:func (w *webview) Create(debug bool, window unsafe.Pointer) bool {
+269:func (w *webview) CreateWithOptions(opts WindowOptions) bool {
+347:func (w *webview) Destroy() {
+351:func (w *webview) Run() {
+360:		if msg.Message == w32.WMApp {
+361:			w.m.Lock()
+362:			q := append([]func(){}, w.dispatchq...)
+363:			w.dispatchq = []func(){}
+364:			w.m.Unlock()
+381:func (w *webview) Terminate() {
+385:func (w *webview) Window() unsafe.Pointer {
+389:func (w *webview) Navigate(url string) {
+393:func (w *webview) SetHtml(html string) {
+397:func (w *webview) SetTitle(title string) {
+405:func (w *webview) SetSize(width int, height int, hints Hint) {
+435:func (w *webview) Init(js string) {
+439:func (w *webview) Eval(js string) {
+443:func (w *webview) Dispatch(f func()) {
+444:	w.m.Lock()
+445:	w.dispatchq = append(w.dispatchq, f)
+446:	w.m.Unlock()
+447:	_, _, _ = w32.User32PostThreadMessageW.Call(w.mainthread, w32.WMApp, 0, 0)
+450:func (w *webview) Bind(name string, f interface{}) error {
+458:	w.m.Lock()
+460:	w.m.Unlock()

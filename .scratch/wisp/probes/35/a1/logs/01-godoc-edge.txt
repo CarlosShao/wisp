@@ -1,0 +1,421 @@
+package edge // import "github.com/jchv/go-webview2/pkg/edge"
+
+
+CONSTANTS
+
+const (
+	COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_DENY = iota
+	COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_ALLOW
+	COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_DENY_CORS
+)
+const (
+	COREWEBVIEW2_KEY_EVENT_KIND_KEY_DOWN        = 0
+	COREWEBVIEW2_KEY_EVENT_KIND_KEY_UP          = 1
+	COREWEBVIEW2_KEY_EVENT_KIND_SYSTEM_KEY_DOWN = 2
+	COREWEBVIEW2_KEY_EVENT_KIND_SYSTEM_KEY_UP   = 3
+)
+const (
+	COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC = 0
+	COREWEBVIEW2_MOVE_FOCUS_REASON_NEXT         = 1
+	COREWEBVIEW2_MOVE_FOCUS_REASON_PREVIOUS     = 2
+)
+const (
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL                  = 0
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_DOCUMENT             = 1
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_STYLESHEET           = 2
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_IMAGE                = 3
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_MEDIA                = 4
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_FONT                 = 5
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_SCRIPT               = 6
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_XML_HTTP_REQUEST     = 7
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_FETCH                = 8
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_TEXT_TRACK           = 9
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_EVENT_SOURCE         = 10
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_WEBSOCKET            = 11
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_MANIFEST             = 12
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_SIGNED_EXCHANGE      = 13
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_PING                 = 14
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_CSP_VIOLATION_REPORT = 15
+	COREWEBVIEW2_WEB_RESOURCE_CONTEXT_OTHER                = 16
+)
+
+FUNCTIONS
+
+func IsEqualGUID(guid1 *GUID, guid2 *GUID) bool
+    IsEqualGUID compares two GUID.
+
+    Not constant time comparison.
+
+
+TYPES
+
+type COREWEBVIEW2_COLOR struct {
+	A uint8
+	R uint8
+	G uint8
+	B uint8
+}
+
+type COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND uint32
+
+type COREWEBVIEW2_KEY_EVENT_KIND uint32
+
+type COREWEBVIEW2_MOVE_FOCUS_REASON uint32
+
+type COREWEBVIEW2_PHYSICAL_KEY_STATUS struct {
+	RepeatCount   uint32
+	ScanCode      uint32
+	IsExtendedKey bool
+	IsMenuKeyDown bool
+	WasKeyDown    bool
+	IsKeyReleased bool
+}
+
+type COREWEBVIEW2_WEB_RESOURCE_CONTEXT uint32
+
+type Chromium struct {
+
+	// Settings
+	DataPath string
+
+	// Callbacks
+	MessageCallback              func(string)
+	WebResourceRequestedCallback func(request *ICoreWebView2WebResourceRequest, args *ICoreWebView2WebResourceRequestedEventArgs)
+	NavigationCompletedCallback  func(sender *ICoreWebView2, args *ICoreWebView2NavigationCompletedEventArgs)
+	AcceleratorKeyCallback       func(uint) bool
+	// Has unexported fields.
+}
+
+func NewChromium() *Chromium
+
+func (e *Chromium) AcceleratorKeyPressed(sender *ICoreWebView2Controller, args *ICoreWebView2AcceleratorKeyPressedEventArgs) uintptr
+    AcceleratorKeyPressed is called when an accelerator key is pressed.
+    If the AcceleratorKeyCallback method has been set, it will defer handling of
+    the keypress to the callback. That callback returns a bool indicating if the
+    event was handled.
+
+func (e *Chromium) AddRef() uintptr
+
+func (e *Chromium) AddWebResourceRequestedFilter(filter string, ctx COREWEBVIEW2_WEB_RESOURCE_CONTEXT)
+
+func (e *Chromium) CreateCoreWebView2ControllerCompleted(res uintptr, controller *ICoreWebView2Controller) uintptr
+
+func (e *Chromium) Embed(hwnd uintptr) bool
+
+func (e *Chromium) Environment() *ICoreWebView2Environment
+
+func (e *Chromium) EnvironmentCompleted(res uintptr, env *ICoreWebView2Environment) uintptr
+
+func (e *Chromium) Eval(script string)
+
+func (e *Chromium) Focus()
+
+func (e *Chromium) GetController() *ICoreWebView2Controller
+
+func (e *Chromium) GetICoreWebView2_3() *ICoreWebView2_3
+
+func (e *Chromium) GetSettings() (*ICoreWebViewSettings, error)
+
+func (e *Chromium) Hide() error
+
+func (e *Chromium) Init(script string)
+
+func (e *Chromium) MessageReceived(sender *ICoreWebView2, args *iCoreWebView2WebMessageReceivedEventArgs) uintptr
+
+func (e *Chromium) Navigate(url string)
+
+func (e *Chromium) NavigateToString(htmlContent string)
+
+func (e *Chromium) NavigationCompleted(sender *ICoreWebView2, args *ICoreWebView2NavigationCompletedEventArgs) uintptr
+
+func (e *Chromium) NotifyParentWindowPositionChanged() error
+
+func (e *Chromium) PermissionRequested(_ *ICoreWebView2, args *iCoreWebView2PermissionRequestedEventArgs) uintptr
+
+func (e *Chromium) QueryInterface(_, _ uintptr) uintptr
+
+func (e *Chromium) Release() uintptr
+
+func (e *Chromium) Resize()
+
+func (e *Chromium) SetGlobalPermission(state CoreWebView2PermissionState)
+
+func (e *Chromium) SetPermission(kind CoreWebView2PermissionKind, state CoreWebView2PermissionState)
+
+func (e *Chromium) Show() error
+
+func (e *Chromium) WebResourceRequested(sender *ICoreWebView2, args *ICoreWebView2WebResourceRequestedEventArgs) uintptr
+
+type ComProc uintptr
+    ComProc stores a COM procedure.
+
+func NewComProc(fn interface{}) ComProc
+    NewComProc creates a new COM proc from a Go function.
+
+func (p ComProc) Call(a ...uintptr) (r1, r2 uintptr, lastErr error)
+    Call calls a COM procedure.
+
+type CoreWebView2PermissionKind uint32
+
+const (
+	CoreWebView2PermissionKindUnknownPermission CoreWebView2PermissionKind = iota
+	CoreWebView2PermissionKindMicrophone
+	CoreWebView2PermissionKindCamera
+	CoreWebView2PermissionKindGeolocation
+	CoreWebView2PermissionKindNotifications
+	CoreWebView2PermissionKindOtherSensors
+	CoreWebView2PermissionKindClipboardRead
+)
+type CoreWebView2PermissionState uint32
+
+const (
+	CoreWebView2PermissionStateDefault CoreWebView2PermissionState = iota
+	CoreWebView2PermissionStateAllow
+	CoreWebView2PermissionStateDeny
+)
+type GUID struct {
+	Data1 uint32
+	Data2 uint16
+	Data3 uint16
+	Data4 [8]byte
+}
+    GUID is Windows API specific GUID type.
+
+    This exists to match Windows GUID type for direct passing for COM. Format is
+    in xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx.
+
+func NewGUID(guid string) *GUID
+    NewGUID converts the given string into a globally unique identifier that is
+    compliant with the Windows API.
+
+    The supplied string may be in any of these formats:
+
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+        {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}
+
+    The conversion of the supplied string is not case-sensitive.
+
+func (guid *GUID) String() string
+    String converts the GUID to string form. It will adhere to this pattern:
+
+        {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}
+
+    If the GUID is nil, the string representation of an empty GUID is returned:
+
+        {00000000-0000-0000-0000-000000000000}
+
+type ICoreWebView2 struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2) AddNavigationCompleted(eventHandler *ICoreWebView2NavigationCompletedEventHandler, token *_EventRegistrationToken) error
+
+func (i *ICoreWebView2) AddWebResourceRequestedFilter(uri string, resourceContext COREWEBVIEW2_WEB_RESOURCE_CONTEXT) error
+
+func (i *ICoreWebView2) GetICoreWebView2_3() *ICoreWebView2_3
+
+func (i *ICoreWebView2) GetSettings() (*ICoreWebViewSettings, error)
+
+type ICoreWebView2AcceleratorKeyPressedEventArgs struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2AcceleratorKeyPressedEventArgs) AddRef() uintptr
+
+func (i *ICoreWebView2AcceleratorKeyPressedEventArgs) GetKeyEventKind() (COREWEBVIEW2_KEY_EVENT_KIND, error)
+
+func (i *ICoreWebView2AcceleratorKeyPressedEventArgs) GetPhysicalKeyStatus() (COREWEBVIEW2_PHYSICAL_KEY_STATUS, error)
+
+func (i *ICoreWebView2AcceleratorKeyPressedEventArgs) GetVirtualKey() (uint, error)
+
+func (i *ICoreWebView2AcceleratorKeyPressedEventArgs) PutHandled(handled bool) error
+
+type ICoreWebView2AcceleratorKeyPressedEventHandler struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2AcceleratorKeyPressedEventHandler) AddRef() uintptr
+
+type ICoreWebView2Controller struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2Controller) AddAcceleratorKeyPressed(eventHandler *ICoreWebView2AcceleratorKeyPressedEventHandler, token *_EventRegistrationToken) error
+
+func (i *ICoreWebView2Controller) AddRef() uintptr
+
+func (i *ICoreWebView2Controller) GetBounds() (*w32.Rect, error)
+
+func (i *ICoreWebView2Controller) GetICoreWebView2Controller2() *ICoreWebView2Controller2
+
+func (i *ICoreWebView2Controller) MoveFocus(reason uintptr) error
+
+func (i *ICoreWebView2Controller) NotifyParentWindowPositionChanged() error
+
+func (i *ICoreWebView2Controller) PutBounds(bounds w32.Rect) error
+
+func (i *ICoreWebView2Controller) PutIsVisible(isVisible bool) error
+
+type ICoreWebView2Controller2 struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2Controller2) AddRef() uintptr
+
+func (i *ICoreWebView2Controller2) GetDefaultBackgroundColor() (*COREWEBVIEW2_COLOR, error)
+
+func (i *ICoreWebView2Controller2) PutDefaultBackgroundColor(backgroundColor COREWEBVIEW2_COLOR) error
+
+type ICoreWebView2Environment struct {
+	// Has unexported fields.
+}
+
+func (e *ICoreWebView2Environment) CreateWebResourceResponse(content []byte, statusCode int, reasonPhrase string, headers string) (*ICoreWebView2WebResourceResponse, error)
+
+type ICoreWebView2NavigationCompletedEventArgs struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2NavigationCompletedEventArgs) AddRef() uintptr
+
+type ICoreWebView2NavigationCompletedEventHandler struct {
+	// Has unexported fields.
+}
+
+type ICoreWebView2Settings struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2Settings) AddRef() uintptr
+
+func (i *ICoreWebView2Settings) GetAreDefaultContextMenusEnabled() (bool, error)
+
+func (i *ICoreWebView2Settings) GetAreDefaultScriptDialogsEnabled() (bool, error)
+
+func (i *ICoreWebView2Settings) GetAreDevToolsEnabled() (bool, error)
+
+func (i *ICoreWebView2Settings) GetAreHostObjectsAllowed() (bool, error)
+
+func (i *ICoreWebView2Settings) GetIsBuiltInErrorPageEnabled() (bool, error)
+
+func (i *ICoreWebView2Settings) GetIsScriptEnabled() (bool, error)
+
+func (i *ICoreWebView2Settings) GetIsStatusBarEnabled() (bool, error)
+
+func (i *ICoreWebView2Settings) GetIsWebMessageEnabled() (bool, error)
+
+func (i *ICoreWebView2Settings) GetIsZoomControlEnabled() (bool, error)
+
+func (i *ICoreWebView2Settings) PutAreDefaultContextMenusEnabled(enabled bool) error
+
+func (i *ICoreWebView2Settings) PutAreDefaultScriptDialogsEnabled(areDefaultScriptDialogsEnabled bool) error
+
+func (i *ICoreWebView2Settings) PutAreDevToolsEnabled(areDevToolsEnabled bool) error
+
+func (i *ICoreWebView2Settings) PutAreHostObjectsAllowed(allowed bool) error
+
+func (i *ICoreWebView2Settings) PutIsBuiltInErrorPageEnabled(enabled bool) error
+
+func (i *ICoreWebView2Settings) PutIsScriptEnabled(isScriptEnabled bool) error
+
+func (i *ICoreWebView2Settings) PutIsStatusBarEnabled(isStatusBarEnabled bool) error
+
+func (i *ICoreWebView2Settings) PutIsWebMessageEnabled(isWebMessageEnabled bool) error
+
+func (i *ICoreWebView2Settings) PutIsZoomControlEnabled(enabled bool) error
+
+type ICoreWebView2WebResourceRequest struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2WebResourceRequest) AddRef() uintptr
+
+func (i *ICoreWebView2WebResourceRequest) GetUri() (string, error)
+
+type ICoreWebView2WebResourceRequestedEventArgs struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2WebResourceRequestedEventArgs) AddRef() uintptr
+
+func (i *ICoreWebView2WebResourceRequestedEventArgs) GetRequest() (*ICoreWebView2WebResourceRequest, error)
+
+func (i *ICoreWebView2WebResourceRequestedEventArgs) PutResponse(response *ICoreWebView2WebResourceResponse) error
+
+type ICoreWebView2WebResourceResponse struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2WebResourceResponse) AddRef() uintptr
+
+type ICoreWebView2_2 struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2_2) AddRef() uintptr
+
+type ICoreWebView2_3 struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebView2_3) SetVirtualHostNameToFolderMapping(hostName, folderPath string, accessKind COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND) error
+
+type ICoreWebViewSettings struct {
+	// Has unexported fields.
+}
+
+func (i *ICoreWebViewSettings) AddRef() uintptr
+
+func (i *ICoreWebViewSettings) GetAreBrowserAcceleratorKeysEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetAreDefaultContextMenusEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetAreDefaultScriptDialogsEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetAreDevToolsEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetAreHostObjectsAllowed() (bool, error)
+
+func (i *ICoreWebViewSettings) GetIsBuiltInErrorPageEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetIsPinchZoomEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetIsScriptEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetIsStatusBarEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetIsSwipeNavigationEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetIsWebMessageEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetIsZoomControlEnabled() (bool, error)
+
+func (i *ICoreWebViewSettings) GetUserAgent() (string, error)
+
+func (i *ICoreWebViewSettings) PutAreBrowserAcceleratorKeysEnabled(enabled bool) error
+
+func (i *ICoreWebViewSettings) PutAreDefaultContextMenusEnabled(enabled bool) error
+
+func (i *ICoreWebViewSettings) PutAreDefaultScriptDialogsEnabled(areDefaultScriptDialogsEnabled bool) error
+
+func (i *ICoreWebViewSettings) PutAreDevToolsEnabled(areDevToolsEnabled bool) error
+
+func (i *ICoreWebViewSettings) PutAreHostObjectsAllowed(allowed bool) error
+
+func (i *ICoreWebViewSettings) PutIsBuiltInErrorPageEnabled(enabled bool) error
+
+func (i *ICoreWebViewSettings) PutIsPinchZoomEnabled(enabled bool) error
+
+func (i *ICoreWebViewSettings) PutIsScriptEnabled(isScriptEnabled bool) error
+
+func (i *ICoreWebViewSettings) PutIsStatusBarEnabled(isStatusBarEnabled bool) error
+
+func (i *ICoreWebViewSettings) PutIsSwipeNavigationEnabled(enabled bool) error
+
+func (i *ICoreWebViewSettings) PutIsWebMessageEnabled(isWebMessageEnabled bool) error
+
+func (i *ICoreWebViewSettings) PutIsZoomControlEnabled(enabled bool) error
+
+func (i *ICoreWebViewSettings) PutUserAgent(userAgent string) error
+

@@ -1,0 +1,36 @@
+### cmd/wisp/panel_host_windows.go: type/func roster
+236:func (m *PanelManager) windowOptions() webview2.WindowOptions {
+268:func (m *PanelManager) IsCreated() bool {
+276:func (m *PanelManager) IsShown() bool {
+285:func (m *PanelManager) LastColdMs() float64 { m.mu.Lock(); defer m.mu.Unlock(); return m.lastColdMs }
+286:func (m *PanelManager) LastHotMs() float64  { m.mu.Lock(); defer m.mu.Unlock(); return m.lastHotMs }
+290:func (m *PanelManager) windowHandle() uintptr {
+302:func (m *PanelManager) currentWindow() webview2.WebView {
+318:func (m *PanelManager) bringUp(ctx context.Context) error {
+442:func (m *PanelManager) serveNotBuiltNoticeLocked() {
+454:func (m *PanelManager) serveEntry() error {
+481:func (m *PanelManager) Show(ctx context.Context) error {
+518:func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+547:func (m *PanelManager) HotShow(ctx context.Context) error {
+574:func (m *PanelManager) Hide() {
+604:func (m *PanelManager) terminateOnThisThread() {
+615:func (m *PanelManager) Destroy() {
+630:func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, error) {
+656:func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
+
+### go.mod webview line
+19:	github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808 // indirect
+
+### PRODUCTION outbound-capable calls in cmd+internal (test excluded): Eval|Init|Dispatch|SetHtml|Navigate|Bind
+cmd/balldebug/main.go:618:	to, err := m.Dispatch(ev, f)
+cmd/wisp/panel_host_windows.go:405:	bindErr := w.Bind(panelDispatchBinding, func(raw string) string {
+cmd/wisp/panel_host_windows.go:449:	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
+cmd/wisp/panel_host_windows.go:468:	w.SetHtml(string(data))
+cmd/wisp/panel_host_windows.go:668:	if err := w.Bind("wispProbeRT", func() string {
+cmd/wisp/panel_host_windows.go:681:	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"></head><body>` +
+cmd/wisp/panel_resident_windows.go:360:		w.Dispatch(fn)
+internal/models/bridge.go:40:	if _, err := b.machine.Dispatch(statemachine.EvModelMissing, nil); err != nil {
+internal/models/bridge.go:46:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:59:		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+internal/models/bridge.go:64:	if _, derr := b.machine.Dispatch(statemachine.EvDownloadCompleted, nil); derr != nil {
+internal/statemachine/machine.go:202:	_, _ = m.Dispatch(ev, nil)
