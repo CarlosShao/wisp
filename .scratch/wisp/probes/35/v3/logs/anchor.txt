@@ -1,0 +1,38 @@
+=== HEAD ===
+54091f6765b20c54de601c7a9d03b304082141d2
+=== porcelain count ===
+754
+=== forbidden zone diff 1d70fb2b..HEAD ===
+(empty above = no prod change)
+=== diff 1d70fb2b..HEAD frontend internal/panel ===
+=== blob hashes ===
+bebe8e702a85c640641551e93dd09936530950f4
+bebe8e702a85c640641551e93dd09936530950f4
+7185ab56d75952247226feb404add6642fc0e336
+7185ab56d75952247226feb404add6642fc0e336
+=== new file stat ===
+commit 7f9d6e40c0dbc55ad44b6d3228ef349615aae8c9
+Author: CarlosShao <1933942520@qq.com>
+Date:   Wed Oct 7 21:25:59 2026 +0800
+
+    35-r3 交件（票35 :63 (d) 三支入向守卫红，只写测试）：新增 cmd/wisp/panel_inbound_guards_35r3_test.go（//go:build windows）——三支各经页面那条边（复用 r2 fakeDoc35r2 行为尺：installPanelTransport→openDocument 逐字跑垫片+Bind桩+产码钩子串→pagePost=chrome.webview.postMessage）进来，⛔未直调 dispatchRaw、⛔未用 w.Eval(wispDispatch)（N6）；(d)-1 页面真发的 panel.approval.request 断名册判 :133「不是面板 composer 通路的能力入口」/(d)-2 panel.mode.request+source=panel-composer-x 断来源判 :136-137「按伪造/串台拒绝」/(d)-3 同枚去 requestId 断 :140-141「缺少 requestId」；三支各断本支关键词在·另两支不在·doorRounds==1·spy.reqs==0。恒真性自查＝go test -overlay 在 /d/tmp 各改一行（仓里一字未改）：中和 :132⇒只(d)-1红/:135⇒只(d)-2红/:139⇒只(d)-3红，三支今天分得开。A684 §3 两面恒真（丢receiver/无可写性）不落本三支，但到达依赖 winlive 覆写性那一面已在 M-B 盲区具名。⛔未碰产码/AC框/frontend（git diff HEAD 生产面空）、⛔未改 r2 既有断言。门禁：d22scan rc=0 clean（cmd/ 108）、vet rc=0、internal rc=1 红名册＝已知5作差空、本三支 harness 3/3绿rc=0；证据 .scratch/wisp/probes/35/r3/{impl.md,logs/*} 每件自带rc、⛔无 .out 无0字节件。票面只追加一段。⛔未 push、未开真窗。
+
+ .scratch/wisp/issues/35-panel-bridge-c17.md        |   6 +
+ .scratch/wisp/probes/35/r3/impl.md                 | 103 ++++
+ .scratch/wisp/probes/35/r3/logs/cmd-wisp-full.txt  | 666 +++++++++++++++++++++
+ .scratch/wisp/probes/35/r3/logs/cmd-wisp-note.txt  |   1 +
+ .scratch/wisp/probes/35/r3/logs/cmd-wisp-reds.txt  |   5 +
+ .scratch/wisp/probes/35/r3/logs/gate-d22scan.txt   | 252 ++++++++
+ .scratch/wisp/probes/35/r3/logs/gate-internal.txt  |  99 +++
+ .scratch/wisp/probes/35/r3/logs/gate-vet.txt       |   1 +
+ .scratch/wisp/probes/35/r3/logs/internal-reds.txt  |   5 +
+ .../wisp/probes/35/r3/logs/mut-baseline-green.txt  |  11 +
+ .scratch/wisp/probes/35/r3/logs/mut-reqid.txt      |  13 +
+ .scratch/wisp/probes/35/r3/logs/mut-roster.txt     |  13 +
+ .scratch/wisp/probes/35/r3/logs/mut-source.txt     |  13 +
+ .scratch/wisp/probes/35/r3/logs/overlay-diffs.txt  |  20 +
+ cmd/wisp/panel_inbound_guards_35r3_test.go         | 171 ++++++
+ 15 files changed, 1379 insertions(+)
+=== CR count working vs HEAD bridge.go ===
+0
+0
