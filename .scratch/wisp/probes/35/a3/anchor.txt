@@ -1,0 +1,31 @@
+35-a3 起手锚（只读普查腿 · 对象层读数，未做任何 checkout）
+
+抓取时刻        2026-10-07 13:32 +0800（`date` 现量）
+HEAD 短号       518b89cf
+HEAD 全号       518b89cfccc7ddf749439fd40ca6db1afe5cf52e
+当前分支        dev
+HEAD 提交时刻   2026-10-07 13:30:36 +0800
+页面分支        dsh/feat/frontend-p0-v2 = 16c2f038
+页面分支提交    2026-09-28 10:18:53 +0800（比 dev 旧 9 天 0 小时量级）
+merge-base      c1b10089
+分叉计数        dev 领先 1633 笔 ／ 页面分支领先 21 笔（`git rev-list --left-right --count HEAD...dsh/feat/frontend-p0-v2`）
+起手 dirty 数   752（`git status --porcelain | wc -l`，含别的腿在飞物，本腿不动它）
+
+两棵树 frontend/src 枚数与关键件行数对拉
+  HEAD:frontend/src        文件枚数 = 64
+  16c2f038:frontend/src    文件枚数 = 85
+  HEAD:frontend/src/App.tsx        行数 = 117
+  16c2f038:frontend/src/App.tsx    行数 = 531
+  HEAD:frontend/src/main.tsx       行数 = 61
+  16c2f038:frontend/src/main.tsx   行数 = 115
+（行数一律 `git show <ref>:<path> | wc -l` 现量，两棵树各一遍；文件枚数 `git ls-tree -r --name-only <ref> -- frontend/src | wc -l`）
+
+页面分支那棵树里前端相关件（85 枚全名册）见同目录 raw-branch-frontend-src-files.txt；
+dev 那棵树的 64 枚见 raw-head-frontend-src-files.txt。
+
+本腿纪律自证
+  - 读分支只走对象层：`git show <ref>:<path>` / `git grep <pat> <ref> -- frontend`；无 checkout / switch / worktree。
+  - 不写 frontend/**、不写 design/**；本腿唯一落盘目录 = .scratch/wisp/probes/35/a3/。
+  - 不起根模块 go 命令（go build / test / vet 全禁，让位给 cmd/wisp 读数窗口那条腿）。
+  - 证据件只用 .txt/.tsv/.md（根 .gitignore:8 是全仓 *.out，会被静默跳过）。
+  - 只 commit，不 push；每笔带显式 pathspec。
