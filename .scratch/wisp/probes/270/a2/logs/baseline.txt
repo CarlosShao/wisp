@@ -1,0 +1,13 @@
+HEAD=7ec2f518de4c13c0fbf345675ccdad54f21020c4 short=7ec2f518 branch=dev
+status cmd internal = 0
+status .github = 0
+internal/tools/subagent_197.go work=06caf8f5465ff1c47c310da27fe3ffab head=06caf8f5465ff1c47c310da27fe3ffab same=yes
+cmd/wisp/run.go work=1d95cfaf116d9092514ee0a905a82b23 head=1d95cfaf116d9092514ee0a905a82b23 same=yes
+internal/tools/failclosed_236_teeth_test.go work=c793966c2730c64896d9512de597ddf4 head=c793966c2730c64896d9512de597ddf4 same=yes
+anchors:
+135:	BaseOptions func() (agent.Options, bool)
+256:	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
+258:	}
+278:	base, wired := t.d.BaseOptions()
+293:	opt.Tools = newSubagentToolProvider(t.d.ParentTools)
+		BaseOptions: func() (agent.Options, bool) { return rt.loop

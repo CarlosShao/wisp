@@ -1,0 +1,52 @@
+--- cmd/wisp/subagent_selfapproval_197_test.go 495-545
+// must not outlive the process: rt.auditf writes every gate line to stderr AND to
+// the rolling JSONL under <data>/logs (run.go:732-736), so the on-disk copy is a
+// carrier of its own. Missing directory is not an error - the sink is explicitly
+// allowed to degrade (run.go:199-205) - and an unreadable file is.
+func readRunLogDir197(t *testing.T, dataDir string) string {
+	t.Helper()
+	dir := logSinkDir(dataDir)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return ""
+	}
+	var b strings.Builder
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		src, rerr := os.ReadFile(filepath.Join(dir, e.Name()))
+		if rerr != nil {
+			t.Errorf("持久日志 %s 读不出来：%v（载具扫描不能跳过一格）", e.Name(), rerr)
+			continue
+		}
+		b.Write(src)
+	}
+	return b.String()
+}
+
+// ---------------------------------------------------------------------------
+// Leg (5): the reachability half - no type a subagent is assembled from declares
+// an allow door, and the one approval interface a tool can hold asks and never
+// answers.
+//
+// This is the structural answer to 「子代理不许自带允许出口」: (1)-(4) above measure
+// that a child cannot get today's proof, this measures that there is nothing to
+// get. It is a name-and-signature reading over STATIC types, so the day someone
+// hands the tool layer a *approval.Gate / *approval.Replies, or widens tools.Gate
+// with an answer verb, the leg goes red on its own - which is the failure the
+// 09-29 census described as 「今天没有任何尺会红」.
+// ---------------------------------------------------------------------------
+
+// allowDoorMethods197 is deliberately narrow: the five names that can put an ALLOW
+// into motion (approval.Gate.Native / its two routers / Queue.grantNonce, and
+// approval.Replies.Allow). 「Reject」 and 「Veto」 are not here on purpose - a
+// refusal a child could reach would be its own finding (票 220's neighbourhood),
+// and mixing the two directions would make this leg's red ambiguous. Measured at
+// this anchor, no type outside internal/agent/approval declares any of these five
+// names; the planted control below is what keeps that claim from being a sentence.
+var allowDoorMethods197 = []string{"Allow", "Native", "DecideFromNative", "DecideFromPanel", "GrantNonce"}
+
+// toolAssembledRoots197 are the four production types a subagent's runtime is put
+// together from. A child's loop is a copy of agent.Options (SubagentDeps.BaseOptions),
+// its tool surface is the bridge built from tools.Options, and the spawn path itself

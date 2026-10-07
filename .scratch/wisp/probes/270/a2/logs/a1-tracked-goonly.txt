@@ -1,0 +1,7 @@
+      2 ./cmd/wisp/run.go
+      1 ./cmd/wisp/subagent_selfapproval_197_test.go
+     10 ./internal/tools/failclosed_236_teeth_test.go
+      6 ./internal/tools/subagent_197.go
+      1 ./internal/tools/subagent_197_test.go
+      1 ./internal/tools/subagent_222_test.go
+      1 ./internal/tools/task_cancel_221_legs_test.go

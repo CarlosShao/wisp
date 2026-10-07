@@ -1,0 +1,7 @@
+time=2026-10-07T09:07:24.914+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.079s

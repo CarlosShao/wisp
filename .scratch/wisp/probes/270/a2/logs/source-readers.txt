@@ -1,0 +1,38 @@
+--- task_cancel_221_legs_test.go 218-232
+// form (票面 ⑤: this ticket does NOT claim a two-way 1:1 with SPEC-12 §5, whose
+// instrument is ticket 225's and which carries no task.* row at all). What it
+// claims is its own marker: (a) task.cancel's DEFERRED line is lifted, (b) lifted
+// in the same landing as the wiring - which this file proves by asserting the
+// wiring and the marker in one leg - and task.list's line is untouched.
+func Test221DeferredMarkerForCancelLiftedButListStillMarked(t *testing.T) {
+	src, err := os.ReadFile("task.go")
+	if err != nil {
+		t.Fatalf("读不到 task.go（这把尺的落点是包内源文件）：%v", err)
+	}
+	var cancelMarked, listMarked int
+	for _, line := range strings.Split(string(src), "\n") {
+		if !strings.Contains(line, "DEFERRED") {
+			continue
+		}
+--- failclosed 236 :60-80
+// sub197 harness's NoGate is safe HERE, and only here. Anyone reading this file
+// must not generalise it: an L0 spawn under NoGate proves nothing about an L1
+// call under NoGate.
+//
+// ---------------------------------------------------------------------------
+// Instrument note, pinned here because it is what makes these legs measurable
+// ---------------------------------------------------------------------------
+//
+// All five legs are BEHAVIOURAL: each dispatches one real call through the real
+// bridge and reads the reply back. None of them opens a source file. That is
+// deliberate, because 读盘型 rulers are structurally blind to the instrument
+// this ticket measures with: `go test -overlay` replaces the bytes the
+// COMPILER sees, while os.ReadFile (e.g. task_cancel_221_legs_test.go:224)
+// hits the physical disk, so an overlay mutation of a lexical claim is
+// invisible to the ruler that claims it. A lexical leg here could not be shown
+// to have teeth at all. These five can.
+
+import (
+	"encoding/json"
+	"fmt"
+	"testing"

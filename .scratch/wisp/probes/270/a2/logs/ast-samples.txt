@@ -1,0 +1,7 @@
+internal/tools/task_state_188_test.go:29:	"go/ast"
+internal/tools/task_state_188_test.go:30:	"go/parser"
+internal/tools/task_state_188_test.go:261:		file, perr := parser.ParseFile(fset, path, nil, 0)
+internal/tools/paths_twocontainments_252_r2_test.go:4:	"go/ast"
+internal/tools/paths_twocontainments_252_r2_test.go:5:	"go/parser"
+internal/tools/paths_twocontainments_252_r2_test.go:206:		file, perr := parser.ParseFile(fset, name, nil, parser.ParseComments)
+cmd/wisp/subagent_selfapproval_197_test.go:511:		src, rerr := os.ReadFile(filepath.Join(dir, e.Name()))

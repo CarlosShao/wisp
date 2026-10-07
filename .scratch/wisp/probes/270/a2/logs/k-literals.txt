@@ -1,0 +1,4 @@
+cmd/wisp/run.go:789:		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
+internal/tools/subagent_197_test.go:185:		BaseOptions: func() (agent.Options, bool) {
+internal/tools/subagent_222_test.go:303:		BaseOptions: func() (agent.Options, bool) {
+internal/tools/task_cancel_221_legs_test.go:91:		BaseOptions: func() (agent.Options, bool) {

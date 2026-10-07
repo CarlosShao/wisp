@@ -1,0 +1,42 @@
+证 270-a2（只读腿·配对读数）：票 270 三把锚定尺复跑＋AC#1 恒真判定
+
+件＝.scratch/wisp/probes/270/a2/pairing.md（103 行／23,759 字节，⛔ 零占位符）。
+
+§0 起手锚：HEAD 82a10da4（腿内动到 7ec2f518，行号两刻都复验）；
+git status --porcelain -- cmd internal ＝ 0 行；三枚本体文件 md5 工＝HEAD。
+
+§1 配对：三把锚定尺 3/3 逐枚对上（调用形 19＝副本 17＋tracked 2；判空 19＝17＋2；
+!= nil ＝ 0；SubagentDeps{ ＝7；BuiltinSubagentEntries ＝8；产出者＝run.go:789 唯一）。
+对不上 1 枚＝裸符号尺：它报 194／.scratch 172，我量到 153／131，差 41 枚全在 .scratch 侧，
+差在口径＝它那把尺没带 --include=*.go（按路径后缀清它落盘的 baseoptions-all.txt 可证）；
+副本集合 diff＝0 增 0 删 ⇒ 不是盘变了。引用 a1 的裸符号数请按 153／131 用。
+
+§2 先钉哪枚：票面 AC#1 那条完成判据（摘 :256 整支后整包仍出全量名册 ≈206）**今天就是恒真的**
+——反形正是它自己要读的那一发：236-v1 verdict.md:153 记 A-4（有 recover）＝204/2＝名册全，
+:164 记无 recover 才 25/2＋181 枚零读数 ⇒ "零读数消失"靠的是测试里 spawnGuarded 那层 recover，
+与 :278 有没有装甲无关 ⇒ ⛔ 不许当凭据。有牙的第一枚＝同发突变里
+Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired（等值钉 failclosed:218）红→绿，
+前提＝:278 的 nil 支复用 :257 那句串。另：:195 与 :218 共用 :95 一枚常量 ⇒ 对"哪半边拦的"
+结构性失明，只能当文案凭据。基线本腿实跑 1 发窄测（rc=0／两枚 PASS）。
+
+§3 一票三形：装得住文件（三形同落 internal/tools/subagent_197.go，甲/丙 0 红、乙 3 红属它自己
+那批 236 钉），装不住判据句——:293 那一形按静态读不是崩溃形（newSubagentToolProvider(nil)
+不当场崩，Tools() 在 :553 有 nil 守卫，延迟崩点在 :578 且要真调工具），
+v-m1d1 的 got 逐字＝"子代理…已结束"＝真派生＋空目录 ⇒ 票面 §26 那句"拆任一半不许零读数"
+只对 BaseOptions 半边有意义。建议拆 2 枚（甲＋AC#1 敏感读数／乙＋236 那批钉同批改串）
+＋1 枚待议（空目录算不算诚实＝行为题），⛔ 本腿未建票。
+
+§4-§5 判不动＋登记：AC#1/AC#2 台件读数缺突变腿；名册阈值需按今天盘重定口径；
+a1 那把"25＋1 处无 recover 派发点"的尺命令没写在件内 ⇒ 未复跑；
+过期语句两处登记不改字＝票面 §现量"就在 guard 之后两行"（现量 :258→:278＝20 行）与
+failclosed_236_teeth_test.go:201-203 同一句英文；另补 2 枚＝乙拆支后红句 :197/:221 也说谎。
+★更正一处转述：派单背景说"a1 记着没有任何读盘／embed 的尺去读 subagent_197.go"——a1 件内
+没有这句话，且它在今天的盘上是假的：全仓 22 枚文件用 go/ast|go/parser，
+internal/tools/paths_twocontainments_252_r2_test.go:193-212 已逐枚解析本包全部非 _test.go
+源文件（subagent_197.go 在内），task_cancel_221_legs_test.go:224 已用 os.ReadFile("task.go")
+钉常驻判据 ⇒ 丙的常驻判据零新仪具成本；⛔ 但源形状尺对 go test -overlay 结构性失明
+（failclosed_236_teeth_test.go:68-75 记着），不能顶替 AC#1 的突变读数。
+仓里没有常驻突变执行器（scripts/ tools/ 现量）这一条复认。
+
+纪律：只新建本腿 .scratch/wisp/probes/270/a2/**；⛔ 未改任何 .go／票面；⛔ 未跑 ./cmd/wisp、
+⛔ 未跑整包、⛔ 未跑突变；临时件只建不删；只 commit 不 push。
