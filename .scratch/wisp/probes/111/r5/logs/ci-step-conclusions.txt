@@ -1,0 +1,28 @@
+# 111-r5 CI-side readings, pulled READ-ONLY with gh (historical runs need no push).
+# date: 2026-10-07 09:30 +0800 | local HEAD=f6b79ab0
+# cols: run_id | head8 | lint_job_id | gofmt | TRACKED-DENOMINATOR(=the step this leg guarded) | staticcheck(guarded) | mockllm-vet(guarded) | carrier-self-test
+37545246395 | cc315261 | 112547577533 | failure | skipped | failure | success | STEP-ABSENT
+37406757402 | cc315261 | 112085927883 | failure | skipped | failure | success | STEP-ABSENT
+37406422380 | b948bcb8 | 112084901703 | failure | skipped | failure | success | STEP-ABSENT
+37405698188 | ec84cff1 | 112082660317 | failure | skipped | failure | success | STEP-ABSENT
+37396530365 | c6cf66e6 | 112053738745 | failure | skipped | failure | success | STEP-ABSENT
+37257547572 | c6cf66e6 | 111597759814 | failure | skipped | failure | success | STEP-ABSENT
+37249563077 | 21bec8a1 | 111574243749 | skipped | skipped | failure | success | STEP-ABSENT
+37240161874 | fd269de1 | 111547117948 | skipped | skipped | failure | success | STEP-ABSENT
+37166458550 | fd269de1 | 111330247963 | skipped | skipped | failure | success | STEP-ABSENT
+37158259050 | 941805d0 | 111306098122 | failure | skipped | failure | success | STEP-ABSENT
+37076437856 | 941805d0 | 111067292950 | failure | skipped | failure | success | STEP-ABSENT
+37021179942 | 941805d0 | 110884355182 | failure | skipped | failure | success | STEP-ABSENT
+36981300681 | 315c6f5f | 110756204750 | failure | skipped | failure | success | STEP-ABSENT
+36956193382 | ed459d09 | 110679552733 | failure | skipped | failure | success | STEP-ABSENT
+
+== control group in the SAME workflow, guarded steps DO answer (run 37545246395, test-windows job 112547577399) ==
+step 8 | success | Package coverage census (ticket 111 AC#1 + GUARD D)   <-- carries if: !cancelled()
+step 9 | failure | Portable windows tests (...)                        <-- carries if: !cancelled()
+
+== the nail that forbids an if: inside slo-full is live and green (slo-fresh workflow) ==
+37511647900 2026-10-06T18:29:01Z success
+37424357373 2026-10-06T06:33:02Z success
+37392522160 2026-10-06T00:09:51Z success
+
+== read-back of the four numbers above: gh api repos/CarlosShao/wisp/actions/jobs/<id> --jq, no writes, no push ==

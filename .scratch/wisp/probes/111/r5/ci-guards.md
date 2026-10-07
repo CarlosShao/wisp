@@ -1,7 +1,7 @@
 # 111 / r5 — CI 步守卫普查与补守卫（写码腿 `111-r5`，2026-10-07 09:06 +08 起手）
 
 > 本件是这一枚写腿的台件。写面只有 `.github/workflows/ci.yml` 与本目录；
-> **零 `.go` 读写**；只 commit 不 push。凡编排者转述与本腿读到的原文冲突，一律以原文为准并具名报回（见 §7）。
+> **零 `.go` 读写**；只 commit 不 push。凡编排者转述与本腿读到的原文冲突，一律以原文为准并具名报回（见 §8）。
 
 ## §0 起手锚（现量，不是抄来的）
 
@@ -72,7 +72,8 @@ lint|6|184|NOGUARD|sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
 >       ⇒ 匹配式要能区分"**被测包**"与"日志里出现过这个词"，并用一次阳性自证（种一个只在字符串里出现的包名 ⇒ 不许计入分母）。
 
 ⚠ 原文里 AC#5 那一行写的是 **`if: always()`**，而本仓**实际落地的形状**是 `if: ${{ !cancelled() }}`
-（票 111 自己在 `ci.yml:438-465` 写明了为什么不取 `always()`；AC#6 的凭据读数也按 `!cancelled()` 记）。
+（票 111 自己在 `ci.yml` 的 test-windows 作业头注释里写明了为什么不取 `always()`——**改前** `:438-465`、
+本腿插入 31 行之后是 **`:469-496`**，那一段的起句现在落在 `:488`；AC#6 的凭据读数也按 `!cancelled()` 记）。
 本腿**照仓里已落地的形状**补守卫，不照派单字面把 `always()` 引进来，理由与出处见 §3 末。
 
 ## §3 名册分三类（逐枚列，⛔ 不是"顺手改"）
@@ -158,3 +159,133 @@ attrib.sh --tracked-only rc=2
 本腿**不撤步、不改 `attrib.sh`（那是票 161 的仪器，也不在本腿可写面）**，把这一条按发现交回（§8）。
 顺带一句具名对照：票 161 的注释（现 `ci.yml:191-195`）说 form (A) 治好了"`gofumpt -l .` 在 bench 树上结构性不可满足"，
 本腿这量的结果是**没治好**——分母换成 tracked 集合之后，`.scratch/**` 里那枚故意坏掉的样本照样在 tracked 集合里。
+
+## §5 AC#3（`:27-28`）——判据原文／今天哪一步在做／缺的那半条尺／本腿只证了哪一半
+
+**判据原文拆成两句**（逐字在 `logs/ac-verbatim.txt`）：
+
+1. "scope 校验加上『**声明在范围内但该平台没有任何测试文件 ⇒ 直接失败**』的守卫（与票 93 的"条目腐坏即红"同族）"；
+2. "**并人为抽掉一个包证明它会红**"。
+
+**第 1 句今天在做的位置（尺在盘上，本腿逐行读到）**：
+
+| 守卫 | 代码在哪 | 谁在 CI 里跑它 |
+|---|---|---|
+| GUARD A＝"声明了但本平台编译出 0 个测试文件 ⇒ 红" | `scripts/portable-tests.sh:565`（注释逐字 `GUARD A: the loud empty denominator`）报错行 `:574` | `test-core` 的 `--scope=core`（`ci.yml:437`）、`test-windows` 的 `--scope=windows`（`:717`） |
+| GUARD C＝命名 scope 把自己解析出的 import path 集钉住（**抽掉一个包＝红，不是少跑一个包**） | `scripts/portable-tests.sh:542-560`（报错行 `:553`） | 同上两步，另加 `--scope=census` |
+| GUARD D＝全仓普查：某包本平台编译得出测试文件而**没有任何 tier 认领** ⇒ 拒退 0 | `scripts/portable-tests.sh:407-424`（报错行 `:409`），唯一调用点 `--scope=census` | `test-windows` step 8（本腿自己读的 CI 真读数见下） |
+
+⚠ 票面前提已翻的那半句本腿不复述成事实：`:299` 记的"`internal/session` 在 scope 里却 0 个测试文件"今天不成立，
+`internal/watchdog` 仍 0 枚且**不在任何 scope 里** ⇒ GUARD A 碰不到它，它今天只是被 census 打印一行 `<-NO-TESTS`（与票面 `:320` 末句一致）。
+
+**第 2 句（缺的那半条尺）的常驻载体在哪**：`scripts/portable-tests-selftest.sh`，本腿逐枚点到用例名与行号——
+
+- `:413` `pin-drift-one-package-missing` ＝ GUARD C 的"抽掉一个包会红"；
+- `:422` `guard-a-empty-test-package` ＝ GUARD A 的"空分母直接失败"；
+- `:431` `guard-b-no-result-line` ＝ GUARD B 的分母尺（AC#8 那一半也压在这台上，见 §7）；
+- `:791` `census-unclaimed-package-goes-red` ＋ `:810` `census-unclaimed-zero-count-stays-green` ＝ GUARD D 的正控与负控；
+- `:830` `guard-d-slice-is-what-bites` ＝ 证明 GUARD D 那段切片被换坏时这台机器会咬。
+
+**本腿能证的那一半（现量，`logs/selftest-run.txt`）**：
+`bash scripts/portable-tests-selftest.sh` 全量跑完 ＝ **`32 case(s) ran, 0 assertion(s) failed`**、`selftest_rc=0`、
+逐字末句 `GREEN - every seeded anomaly was refused, and the clean scope passed.`（起 09:2x／止 09:26:47，载体 scratch 留在 `/tmp/tmp.InkKTBvcS0`，按"临时件只建不删"没清）。
+⇒ 上面五枚"必须红才算通过"的用例今天**都在红**（＝"抽掉一个包会红"这台机器**会响**，不是装饰）。
+
+**另一半欠在哪（具名，⛔ 不许说成跑过）**：那台机器**在 CI 上至今一次都没被跑过**。
+本腿不引二手：用 `gh` 只读 API 把最近 **14 发 `ci` run** 的 `lint` 作业步名册逐枚拉出来（台件 `logs/ci-step-conclusions.txt`），
+`Portable tests carrier self-test` 那一列 **14/14 ＝ `STEP-ABSENT`**；同件里 `test-windows` step 8（带守卫的普查步）＝ **success**（run `37545246395`／job `112547577399`）
+⇒ 缺的不是"脚本对不对"，是**载体步还没进过 CI**：它在 `1309757b`（r5b 那笔）之后就没再推过，本腿的守卫补丁同样在未推的一列提交里。
+票面要的第二句若按"红/绿各一次"读，那两发读数**只能在推送之后**取（本编队此轮不 push）。⇒ 本腿对 AC#3 的判语：**只成立一半，另一半判不动（射程外，要推送）**。
+
+## §6 AC#5（`:31-32`）——四把尺今天都有真读数
+
+| 票面逐字要求 | 本腿用的尺 | 读数 |
+|---|---|---|
+| `bash -n` 改动脚本 rc=0 | 本腿**没改任何脚本**；把与本步相关的 8 枚载体脚本全量 `bash -n`（`logs/gates-local.txt:5-14`） | 8/8 **rc=0**；`scripts/runtests.sh` **不存在**（rc=127）⇒ 真件是 `tools/d22scan/runtests.sh`（`bash -n` rc=0），见 §8 冲突③ |
+| `sh scripts/d22scan.sh` 纯净快照 rc=0 | `git archive HEAD^`／`git archive HEAD` 两份 `/tmp` 快照（⛔ 不在仓内建 worktree），各跑一发 | 两份都 **rc=0**、都 `clean - no D22 ban violations`（`logs/d22scan-two-snapshots.txt:7-8`） |
+| ……且各 scope 不降 | 同两发逐字对比 `live scope work` 行 ＋ 55 枚 `ban #` 行 diff | **逐字相同**：`#1-5 internal/=228 cmd/=38`、`#6 frontend/=85`、`#7 internal/tools/=23`、`#8 design/=30 frontend/=85 internal/=514 cmd/=104`；`SCOPES_IDENTICAL=yes` |
+| ⚠ 新步若排在会失败的步骤之后 ⇒ 必须放前面或 `if: always()` | 本腿把它**推广到"已有读数步"**并按"这条规矩实际咬过谁"来量（`logs/ci-step-conclusions.txt`，14 发 `ci` run 的 `lint` 步名册） | 那枚 tracked 普查步 **14/14 全 `skipped`**（其中 3 发连 `gofmt` 自己都是 `skipped`，因为再上面的 `D22 scanner positive control` 先红）；同一 job 里带 `!cancelled()` 的两枚（`staticcheck`＝failure、`mockllm module vet`＝success）**14/14 都有结论** ⇒ 守卫在这个 job 上是**被真实数据证过有效**的，不是纸面推断 |
+
+另外两把本腿自己加的尺（⛔ 不是"语法应该没问题"）：
+
+- **YAML 语法**：先证明工具在＝`python -c "import yaml"` → **PyYAML 6.0.3**（`yamllint`、`ruby` 本机缺；`node` 在但没装 js-yaml，故不引）。
+  尺＝`logs/yaml-guard-census.py`，对**改前/改后两份**都跑：`YAML_PARSE=OK` 两向、`TOTAL_STEPS=51` 不变、
+  `TOTAL_GUARDED` **11 → 12**、`CONTINUE_ON_ERROR` 两向 **0**、逐作业 `lint 13/4`、`test-core 7/1`、`test-windows 9/7`、`slo-smoke 6/0`、`slo-full 5/0`、`lint-frontend 11/0`。
+- **被补守卫那枚步自己的命令行**：见 §4b，本机 **rc=2**（机制已钉死到一枚具体文件）。
+
+⇒ 本腿对 AC#5 的判语：**本机这半边成立**（四把尺全有读数）；`bash -n`／`d22scan` 这两把"本腿复跑件"以前欠的是"非实现者复跑"（票面 `:321` 原话），
+本件就是实现者本人的复跑记录，**不能替非实现者的那一遍**；本格还牵着 AC#5 依赖的"正控进 CI"，那半在 §5 名下仍欠。⛔ 本腿不翻框。
+
+## §7 AC#7（`:75-76`）与 AC#8（`:77-78`）——逐枚：尺在哪／今天响不响／修它要不要动别的包的测试
+
+### AC#7 `R-110-4`（`-run TestSyncRegistryProbeLive` 经 `runtests.sh` 接进 windows 那一档）
+
+- **尺在哪**：不在"某一步跑它"，在"某一步**点名不跑它**"。三处，全部本腿逐行读到——
+  1. `scripts/portable-tests.sh:596` 的 ledger 行：`TestSyncRegistryProbeLive|./internal/risk/|windows|fixture|…`（整行 787 字符，
+     末句逐字 `Remedy for a real run: a host with a sync record, or fold the shape check into the fixture-drive…`）；
+  2. `scripts/portable-tests.sh:680-688` 把整张 ledger 拼成 `skip_pattern`，`:694` 逐字
+     `sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern" 2>&1 | tee "$capture"` ⇒ 它是被 **`-skip`** 的那一枚；
+  3. `tools/d22scan/runtests.sh:88-99`（`skipped=$(count '^--- SKIP')`；非 0 就点名）＝"SKIP 不当成 pass"那把尺。
+- **今天响不响**：**不响（就"它跑了并通过"这句话而言）**。本腿现量：`git grep -c -- '-run TestSyncRegistryProbeLive' HEAD -- scripts tools .github` ＝ **0 命中**；
+  `TestSyncRegistryProbeLive` 在 tracked 面上只出现 4 处（`portable-tests.sh:7`/`:596`、`ci.yml:440`/`:695`，后两处是注释）。
+  ⇒ 票面"至今 0 次"这句话**今天仍成立**，与本腿独立复算同结论。响的是另一半：ledger 每 run 对着编译出的 windows 测试二进制重验并打印"为什么它不跑"（票面 `:202-206` 已把它写成**当众改口径**）。
+- **修它要不要动别的包的测试**：**要，而且两处都在本腿禁面**。用例本体在 `internal/risk/syncdirs_windows_test.go`（ledger 行逐字引 `--- SKIP at syncdirs_windows_test.go:133`）：
+  要么真机 HKCU `Accounts` 键带同步记录（`slo-full` 那台 self-hosted `wisp-slo` 是唯一候选），要么把那枚 `.go` 用例改成 fixture 驱动 ⇒ **`.go` 文件＋别的包**。
+  ⇒ 本腿判语：**不成立（今天 0 次没变）／落地判不动（射程外）**；本票可写的只剩"111 面当众改口径"这一支，它已由票面 `:202-206` 落过一次、并由本件 §7 复算钉到行号；
+  **票 110 面上那句话不在本腿可写面**（`110-*.md` 是 `-done` 票，本腿不碰），归编排者下判（票面 `:270` 已把这一支点名给编排者）。
+
+### AC#8 `R-110-3`（包匹配式缺前缀锚定）
+
+- **尺在哪**：两把匹配式，本腿逐字读到——
+  1. `scripts/portable-tests.sh:720` `escape_re()`（正则转义）、`:730` `result_tail='[[:space:]]+([0-9]+\.[0-9]+s|\[build failed\])$'`（时长尾巴）、
+     `:736` `grep -E "^(ok\|FAIL)[[:space:]]+$(escape_re "$pkg")${result_tail}"` ＝ 行首锚＋转义包名＋尾巴，`:749` 缺行即红；
+  2. `scripts/winsec-tests.sh:122-123` 同形状（`:109` 注释逐字"the line is anchored to ^ok/FAIL, the two tokens Go uses ONLY for a…"）。
+  ⇒ **"被测包 vs 日志里出现过这个词"这一半在盘上**，`"winsec"` 那类宽松串已经不是匹配式了。
+- **今天响不响**：**分母尺响、票面点名的那枚阳性自证不响**。
+  响的：GUARD B 的 own-line 表在 `test-core`／`test-windows` 两步每 run 都打（票面 `:313` 记 core 25 行／windows 8 行，本腿不重述成自己的读数）；
+  载体侧本腿现量＝`guard-b-no-result-line` 在 selftest 全绿的那 32 枚里（§5），它证的是"**缺** own-line 会红"。
+  不响的：票面第二句"**并用一次阳性自证（种一个只在字符串里出现的包名 ⇒ 不许计入分母）**"——本腿按"这句话在说什么"扫（不扫符号名），
+  selftest 的 24 枚用例名册里没有这一枚诱饵用例：`grep -nE '9\.999s|decoy|githubXcom|fmt\.Println.*ok' scripts/portable-tests-selftest.sh` ＝ **0 命中**，
+  `seed-stdout-*` 那几枚种进的是 `go list` 的 stdout（GUARD C 的地盘），不是 `go test` 的结果行。
+  旧腿那两发诱饵实验（合成 capture 4 枚／快照里种 `ac8_decoy_test.go`）只活在票面 `:209-214` 的文字里，**今天不可重放**。
+- **修它要不要动别的包的测试**：**不要**。要动的只有 `scripts/portable-tests-selftest.sh`（加一枚用例：经 `FAKEGO_*` 往 capture 里吐一条以假乱真的
+  `ok  github.com/CarlosShao/wisp/<pkg>  9.999s`，断 GUARD B 的表里**没有**那一行）＋ 它已在 `ci.yml` 里的那枚载体步。
+  ⇒ 本腿判语：**尺在／分母那半响／票面点名的阳性自证不成立（无常驻载体，旧证据不可重放）**；
+  写这枚用例是 `scripts/**` 面的活、且属"另立一票"（票面 `:264` 那种"三张要开的票"的形状），**本票没授权本腿自造判据**，故只做判定不动手。
+
+## §8 具名报回（与编排者转述不符之处）＋待裁＋next
+
+**① AC#5 的行号**：派单写"当前未勾＝`:27` AC#3、**`:29` AC#5**、`:75` AC#7、`:77` AC#8"。原文实测 AC#5 在 **`:31`**，
+`:29` 那一行是**已勾的 AC#4**（`cmd/wisp` 那一格）。其余三枚行号对。未勾枚数本腿复量＝**4**（`- [ ]`）／已勾 **6**（`- [x]`），与派单"十枚框"一致。
+
+**② `if:` 的字面形状**：派单与票面 `:32` 都写 `if: always()`；本仓**已落地并已被真实数据证过**的形状是 `if: ${{ !cancelled() }}`
+（`ci.yml` test-windows 头注释逐字论证为什么不取 `always()`，那段现落在 **`:488-496`**＝本腿插入后的行号，改前是 `:457-465`；
+票面 `:43` 与 AC#6 的凭据读数是"同 job 只有 `Stop compose services` 用 `always()`，其余全是 `!cancelled()`"）。
+本腿按已落地形状补，并在新增注释里点名这处差别（⛔ 没改票面一字）。
+
+**③ "经 `runtests.sh` 接进 windows 那一档"的措辞**：仓里**没有** `scripts/runtests.sh`（本腿 `bash -n` 撞到 rc=127），
+真件是 `tools/d22scan/runtests.sh`，由 `scripts/portable-tests.sh:694` 以 `sh "$strict"` 调用。票面 `:50` 自己就登记过同类"按猜出来的路径取件"的坑，本条与它同族。
+
+**④ 派单引的 run `37406757402` 步 8/步 9**：本腿**自己复验了，结论一致**（`logs/ci-step-conclusions.txt`：
+step 8 `gofmt (gofumpt)`＝failure、step 9 `…the tracked set is the denominator`＝skipped，lint job `112085927883`）。
+但补一条派单没说的：这**不是个例**——最近 14 发 `ci` run **同一形状 14/14**，其中 3 发（`37249563077`/`37240161874`/`37166458550`）连 `gofmt` 自己都是 skipped，
+因为它上面的 `D22 scanner positive control` 先红。⇒ 这把尺**从未在 CI 上执行过**，比"某一发被跳过"更强。
+
+**⑤ 派单说"CI 侧的真实读数这台机器拿不到——必须推送才会有"**：这句本腿要**折扣后**报回——
+`gh`（2.96.0，已登录 `CarlosShao`，token scopes 含 `repo`）能**只读**取历史 run 的步级结论，本件 §5/§6/§8 的 CI 读数全部出自它。
+拿不到的只是**本腿这笔改动之后**的读数（那才要 push）。本腿没做 push、没改任何 workflow 触发、没跑 `gh run rerun`/`workflow run`。
+
+**待裁（本腿不动手，等编排者下判）**
+- 丙类那两枚 `Upload SLO report`（`slo-smoke :762` / `slo-full :825`）：`slo-full` 那枚**不能**加守卫（`scripts/slo-freshness.sh` P1 `:160-170` 判 FAIL，
+  而那把尺由 `.github/workflows/slo-fresh.yml:70` 在 CI 真跑、最近三发 slo-fresh 全 `success`＝它今天是活的），
+  `slo-smoke` 那枚不在 P1 射程内、可以加——本腿**没加**，理由是不让两枚同名步分叉成下一个人"顺手对齐"到 P1 那一侧。要加请点名。
+- `lint-frontend` 的 4 枚 render evidence 步：判不动（要读 `frontend/**` 才能分类，而那是本腿禁读面；该作业头注释逐字写着 `no \`if:\``）。
+- §4b 那枚发现要不要另立一票（tracked 名册里含一枚语法不可解析的样本 ⇒ 补守卫后的普查步第一发会红）：
+  本腿按 AC#2"红名逐条登记进本票面并开票"的精神写进票面追加行，**不撤步、不改别人的仪器**（`attrib.sh` 是票 161 的）。
+
+**next=（都要 push，本腿不接受拿本地绿冒充 CI 绿）**
+1. 推送后第一发 `ci` run：`lint` 作业里 `…the tracked set is the denominator` 那一步**必须有 success 或 failure**（⛔ 再是 skipped 就是没修好）；
+   同发里 `Portable tests carrier self-test` 应第一次出现（它带守卫，理应给出结论）——这一枚同时收 AC#3 第二句与 AC#8 的载体欠账。
+2. 若那一枚普查步红（rc=2）：按 §4b 的机制记账到 `.scratch/wisp/probes/185/c1/mut/fs_broken.go`，
+   归"tracked 分母该不该排除故意坏掉的样本"这一枚**口径**问题（改 `attrib.sh` 属票 161 地界，本腿不动）。
+3. `internal/watchdog` 那句"响亮"今天只是打印 `<-NO-TESTS`：票面 `:320` 已具名，本腿复量它**不在任何 scope 里** ⇒ GUARD A 碰不到，属实现票 42 落地时的耦合（票面 `:268` ③）。

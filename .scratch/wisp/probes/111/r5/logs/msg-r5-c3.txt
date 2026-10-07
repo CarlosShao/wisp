@@ -1,0 +1,22 @@
+probes(111 r5 第 2 格)：AC#3/AC#5 本机四把尺全落读数＋用 gh 只读拉到 CI 侧真名册（14 发 run 同一形状）
+
+台件 `probes/111/r5/ci-guards.md` 补 §5/§6/§7/§8（291 行／28,704 字节／占位符尺 0 命中）。
+
+- ★CI 侧本腿自己复验（`gh` 2.96.0 只读，⛔ 没 push、没 rerun、没改触发）：最近 **14 发 `ci` run** 的 `lint` 作业里
+  `gofmt (gofumpt) - the tracked set is the denominator` **14/14 全是 `skipped`** ⇒ 这把尺从未执行过（比"某一发被跳过"更强）；
+  同一 job 带 `!cancelled()` 的 `staticcheck`／`mockllm module vet` **14/14 都有结论**（failure／success）＝守卫机制的**同行正控**。
+  其中 3 发连 `gofmt` 自己也是 skipped，因为再上面的 `D22 scanner positive control` 先红。台件 `logs/ci-step-conclusions.txt`。
+- AC#3 判据拆成两句后逐枚点到行：守卫本体＝`portable-tests.sh:565/:574`(GUARD A)、`:542-560/:553`(GUARD C)、`:407-424/:409`(GUARD D)；
+  "抽掉一个包会红"的常驻载体＝selftest `:413` `:422` `:431` `:791`＋`:810` 负控 `:830`。
+  能证的一半＝本腿全量跑完 `bash scripts/portable-tests-selftest.sh`：**32 case(s) ran, 0 assertion(s) failed**、rc=0。
+  欠的一半＝那台机器**在 CI 里 14/14 `STEP-ABSENT`**（载体步 `1309757b` 未推）⇒ 判"只成立一半，另一半射程外要推送"。
+- AC#5 四把尺：`bash -n` 相关 8 枚脚本全 rc=0（并具名：仓里**没有** `scripts/runtests.sh`，真件在 `tools/d22scan/runtests.sh`）；
+  `sh scripts/d22scan.sh` 在**两份纯净快照**（`git archive HEAD^`＝`c3183379`／`git archive HEAD`＝`f6b79ab0`，都在 /tmp，⛔ 不在仓内建 worktree）
+  双向 rc=0 且 `live scope work` 逐字相同（#1-5 internal/=228 cmd/=38、#6 frontend/=85、#7 internal/tools/=23、#8 design/=30 frontend/=85 internal/=514 cmd/=104）
+  ⇒ **各 scope 不降**；YAML 尺＝先证 PyYAML 6.0.3 在、再两向 `YAML_PARSE=OK`／`TOTAL_STEPS=51`／`TOTAL_GUARDED` 11→12／`CONTINUE_ON_ERROR` 两向 0。
+- AC#7 判**不成立＋落地判不动**（尺在 `portable-tests.sh:596` ledger＋`:680-694` 把 ledger 拼成 `-skip` 交 strict runner＋`runtests.sh:88-99`；
+  `git grep -c -- '-run TestSyncRegistryProbeLive' HEAD`＝**0**；真跑要 `internal/risk/syncdirs_windows_test.go`＋HKCU 同步记录，两处都在本腿禁面）。
+  AC#8 判**尺在／分母那半响／票面点名的诱饵阳性自证无常驻载体**（`grep -nE '9\.999s|decoy|githubXcom' selftest` ＝ 0 命中，旧腿那两发只活在票面文字里不可重放）。
+- 具名报回四处与转述不符：AC#5 原文在 `:31` 不是 `:29`；`if:` 落地形状是 `!cancelled()` 不是 `always()`；
+  `runtests.sh` 路径；以及"CI 读数这台机器拿不到"只对**本笔改动之后**成立（历史 run 本腿用 gh 只读量到了）。
+- ⛔ 一枚 AC 框未动（`- [ ]`＝4／`- [x]`＝6）；票面正文一字未改；`scripts/**`／`.go` 零读写；只 commit 不 push。

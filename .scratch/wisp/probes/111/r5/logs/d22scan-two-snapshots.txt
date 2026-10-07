@@ -1,0 +1,95 @@
+== date: 2026-10-07 09:24 +0800
+== snapshot heads: before=c3183379 after=f6b79ab0
+archive HEAD^ rc=0
+archive HEAD rc=0
+
+== rc of each run (the AC#5 requirement is rc=0 on a pristine snapshot) ==
+before: d22scan rc=0
+after:  d22scan rc=0
+
+== per-scope lines, before vs after (any line here is a scope and its count) ==
+BEFORE  ban #6 examined 7 and fired in all 7 extension classes
+BEFORE  ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+BEFORE  ban #7 internal/tools/: 23 files
+BEFORE  ban #8 internal/: 514 files
+BEFORE  ban #8 cmd/: 104 files
+BEFORE  ban #6 frontend/: 85 files
+BEFORE  ban #8 frontend/: 85 files
+BEFORE  ban #6 examined 85 frontend/ text files in the real repo
+BEFORE  ban #6 frontend/         examined   1 text files
+BEFORE  ban #7 internal/tools/   examined   1 production Go files
+BEFORE  ban #8 design/           examined   1 text files
+BEFORE  ban #8 frontend/         examined   1 text files
+BEFORE  ban #8 internal/         examined  15 Go files, comments and _test.go included
+BEFORE  ban #8 cmd/              examined   1 Go files, comments and _test.go included
+BEFORE  ban #6 frontend/         examined   1 text files
+BEFORE  ban #7 internal/tools/   examined   0 production Go files
+BEFORE  ban #8 design/           examined   1 text files
+BEFORE  ban #8 frontend/         examined   1 text files
+BEFORE  ban #8 internal/         examined  13 Go files, comments and _test.go included
+BEFORE  ban #8 cmd/              examined   1 Go files, comments and _test.go included
+BEFORE  ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+BEFORE  ban #6 frontend/         examined   2 text files
+BEFORE  ban #7 internal/tools/   examined   1 production Go files
+BEFORE  ban #8 design/           examined   1 text files
+BEFORE  ban #8 frontend/         examined   2 text files
+BEFORE  ban #8 internal/         examined  14 Go files, comments and _test.go included
+BEFORE  ban #8 cmd/              examined   1 Go files, comments and _test.go included
+BEFORE  ban #6 frontend/         examined   0 text files
+BEFORE  ban #7 internal/tools/   examined   1 production Go files
+BEFORE  ban #8 design/           examined   1 text files
+BEFORE  ban #8 frontend/         examined   0 text files
+BEFORE  ban #8 internal/         examined  14 Go files, comments and _test.go included
+BEFORE  ban #8 cmd/              examined   1 Go files, comments and _test.go included
+BEFORE  ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+BEFORE  ban #6 frontend/         examined   1 text files
+BEFORE  ban #7 internal/tools/   examined   0 production Go files
+BEFORE  ban #8 design/           examined   1 text files
+BEFORE  ban #8 frontend/         examined   1 text files
+BEFORE  ban #8 internal/         examined  13 Go files, comments and _test.go included
+BEFORE  ban #8 cmd/              examined   1 Go files, comments and _test.go included
+AFTER   ban #6 examined 7 and fired in all 7 extension classes
+AFTER   ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+AFTER   ban #7 internal/tools/: 23 files
+AFTER   ban #8 internal/: 514 files
+AFTER   ban #8 cmd/: 104 files
+AFTER   ban #6 frontend/: 85 files
+AFTER   ban #8 frontend/: 85 files
+AFTER   ban #6 examined 85 frontend/ text files in the real repo
+AFTER   ban #6 frontend/         examined   1 text files
+AFTER   ban #7 internal/tools/   examined   1 production Go files
+AFTER   ban #8 design/           examined   1 text files
+AFTER   ban #8 frontend/         examined   1 text files
+AFTER   ban #8 internal/         examined  15 Go files, comments and _test.go included
+AFTER   ban #8 cmd/              examined   1 Go files, comments and _test.go included
+AFTER   ban #6 frontend/         examined   1 text files
+AFTER   ban #7 internal/tools/   examined   0 production Go files
+AFTER   ban #8 design/           examined   1 text files
+AFTER   ban #8 frontend/         examined   1 text files
+AFTER   ban #8 internal/         examined  13 Go files, comments and _test.go included
+AFTER   ban #8 cmd/              examined   1 Go files, comments and _test.go included
+AFTER   ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+AFTER   ban #6 frontend/         examined   2 text files
+AFTER   ban #7 internal/tools/   examined   1 production Go files
+AFTER   ban #8 design/           examined   1 text files
+AFTER   ban #8 frontend/         examined   2 text files
+AFTER   ban #8 internal/         examined  14 Go files, comments and _test.go included
+AFTER   ban #8 cmd/              examined   1 Go files, comments and _test.go included
+AFTER   ban #6 frontend/         examined   0 text files
+AFTER   ban #7 internal/tools/   examined   1 production Go files
+AFTER   ban #8 design/           examined   1 text files
+AFTER   ban #8 frontend/         examined   0 text files
+AFTER   ban #8 internal/         examined  14 Go files, comments and _test.go included
+AFTER   ban #8 cmd/              examined   1 Go files, comments and _test.go included
+AFTER   ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+AFTER   ban #6 frontend/         examined   1 text files
+AFTER   ban #7 internal/tools/   examined   0 production Go files
+AFTER   ban #8 design/           examined   1 text files
+AFTER   ban #8 frontend/         examined   1 text files
+AFTER   ban #8 internal/         examined  13 Go files, comments and _test.go included
+AFTER   ban #8 cmd/              examined   1 Go files, comments and _test.go included
+
+== scope-line comparison ==
+before_lines=55
+after_lines=55
+SCOPES_IDENTICAL=yes
