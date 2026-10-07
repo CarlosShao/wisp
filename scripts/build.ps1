@@ -12,6 +12,15 @@
        No node/npm on this machine means this script FAILS; the step never skips
        (ticket 274: '//go:embed all:dist' in frontend/embed.go is what carries
        the page bytes into wisp.exe, so a skipped step ships a pageless exe).
+       Existence is not enough, so the page must also be THIS RUN'S page:
+       frontend/dist's artifact name roster is snapshotted before 'npm run
+       build' and the post-build roster must hold a name outside that snapshot,
+       else the step FAILS with a named cause (ticket 274 AC#10 - a no-op or
+       stubbed npm exits 0 and leaves last month's bytes in dist, which every
+       existence check passes). Roster of names, deliberately not mtimes: a git
+       checkout or copy resets mtimes and any earlier successful build on the
+       same machine leaves dist newer than frontend/src, so an mtime gate
+       green-lights exactly the stale-artifact shape it exists to catch.
     3. go build with CGO_ENABLED=1 + mingw-w64 gcc, real link of the
        sherpa-onnx C API via the official Go bindings
     4. output: build\wisp.exe + onnxruntime.dll + sherpa-onnx DLLs colocated
@@ -130,6 +139,20 @@ if (Test-Path -LiteralPath (Join-Path $FrontendDir 'node_modules')) {
     }
 }
 
+# Provenance snapshot (ticket 274 AC#10). The post-build checks below can only
+# ever prove that page bytes EXIST; they cannot prove THIS run produced them, so
+# dist is snapshotted immediately before the npm invocation that writes it.
+# Roster = the sorted set of paths (relative to frontend/dist) held at that
+# moment. Names, not mtimes and not contents: vite's asset names are
+# content-hashed (assets/index-<hash>.js), so a build that really ran lands at
+# least one name the snapshot never held.
+$preDistExists = Test-Path -LiteralPath $DistDir
+$preDistFiles = @()
+if ($preDistExists) { $preDistFiles = @(Get-ChildItem -LiteralPath $DistDir -Recurse -File -Force) }
+$preRoster = ($preDistFiles | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) }) -join ' '
+$preDistLabel = 'no dist directory'
+if ($preDistExists) { $preDistLabel = "$($preDistFiles.Count) file(s)" }
+Write-Host "build.ps1: frontend: pre-build dist snapshot = $preDistLabel [$preRoster] (this run's npm must produce an artifact name outside it)."
 Write-Host 'build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).'
 Push-Location $FrontendDir
 try {
@@ -163,8 +186,25 @@ $distEntryBytes = (Get-Item -LiteralPath $DistEntry).Length
 if ($distEntryBytes -le 0) {
     Fail "frontend step: $DistEntry is 0 bytes - a present-but-empty entry file is not a page. Named cause: empty entry file."
 }
+# Provenance gate (ticket 274 AC#10) - the existence checks above are not this.
+# A stubbed, no-op, or already-satisfied npm run build exits 0 and leaves
+# frontend/dist holding last month's page bytes; every check above then passes
+# and go:embed ships artifacts this build never made. So the roster is compared
+# with the snapshot taken before this run's npm: a run that really built the
+# page must add at least one artifact name the snapshot never held.
+# Deliberately NOT an mtime comparison - see the .DESCRIPTION note - because a
+# git checkout, a copy, or any earlier successful build on this machine moves
+# mtimes without producing anything, and then this gate would pass forever.
+$postRoster = @($distAll | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) })
+$preNames = @()
+if ($preRoster -ne '') { $preNames = @($preRoster -split ' ') }
+$freshNames = @($postRoster | Where-Object { $preNames -notcontains $_ })
+$goneNames = @($preNames | Where-Object { $postRoster -notcontains $_ })
+if ($freshNames.Count -le 0) {
+    Fail "frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=$Env, this run's repo root $RepoRoot; snapshot was $preDistLabel [$preRoster], dist now holds [$($postRoster -join ' ')]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run."
+}
 $distRoster = ($distAll | Sort-Object FullName | ForEach-Object { "$($_.FullName.Substring($DistDir.Length + 1))=$($_.Length)" }) -join ' '
-Write-Host "build.ps1: frontend ok: $($distAll.Count) file(s) in frontend/dist (entry index.html is $distEntryBytes bytes): $distRoster"
+Write-Host "build.ps1: frontend ok: $($distAll.Count) file(s) in frontend/dist (entry index.html is $distEntryBytes bytes): $distRoster || provenance: this run's npm added new artifact name(s) [$($freshNames -join ' ')] over the pre-build snapshot $preDistLabel [$preRoster]; gone since snapshot: [$($goneNames -join ' ')]"
 
 # --- 3. go build ------------------------------------------------------------
 function Get-DepsValue([string]$Section, [string]$Key) {
