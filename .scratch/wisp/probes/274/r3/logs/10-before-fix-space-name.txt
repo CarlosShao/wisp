@@ -1,0 +1,46 @@
+﻿=== CASE tree=D:\tmp\wisp274r3\tree-mut mode=nothing ===
+NPM_RESOLVES_TO: D:\tmp\wisp274r3\bin\npm.cmd
+GIT_ON_PATH: 
+BUILD_SCRIPT: D:\tmp\wisp274r3\tree-mut\scripts\build.ps1
+build.ps1: repo root D:\tmp\wisp274r3\tree-mut (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274r3\bin\npm.cmd (stub-npm 274-r3: STUB_MODE=nothing args=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index with a space.html index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+stub-npm 274-r3: STUB_MODE=nothing args=run build
+build.ps1: frontend ok: 5 file(s) in frontend/dist (entry index.html is 1044 bytes): .gitkeep=0 assets\index-BRKj5OIJ.css=49943 assets\index-BVKlegVD.js=553469 index with a space.html=1044 index.html=1044 || provenance: this run's npm added new artifact name(s) [index with a space.html] over the pre-build snapshot 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index with a space.html index.html]; gone since snapshot: [index with a space.html]
+build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+build.ps1: DLLs colocated into D:\tmp\wisp274r3\tree-mut\build
+build.ps1: signed model manifest colocated into D:\tmp\wisp274r3\tree-mut\build\models
+build.ps1: wrote D:\tmp\wisp274r3\tree-mut\build\SHA256SUMS
+build.ps1: smoke test - running wisp.exe doctor
+build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS
+powershell.exe : time=2026-10-07T17:20:16.178+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=r
+isk.c26Pipeline probes_passed=2
+At D:\tmp\wisp274r3\run-case.ps1:25 char:1
++ & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $build -Env ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (time=2026-10-07...probes_passed=2:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+wisp doctor - build chain self-check
+------------------------------------------------------------------------
+[INFO] wisp build                         version=0.0.0-dev commit=nogit built=2026-10-07T09:20:13Z WISP_ENV=dev
+[INFO] Go runtime                         go1.27.1 (toolchain pinned by go.mod)
+[INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 搂7.3)
+[PASS] gcc (build-time)                   gcc.exe (Rev3, Built by MSYS2 project) 16.2.0
+[PASS] sherpa-onnx C API                  runtime 1.13.8 matches build pin (exe dir D:\tmp\wisp274r3\tree-mut\build)
+[PASS] onnxruntime.dll colocated          file version 1.28.2.0 matches build pin 1.28.2
+[INFO] sherpa-onnx built against onnxruntime 1.28.2
+[PASS] DLL colocated: sherpa-onnx-c-api.dll D:\tmp\wisp274r3\tree-mut\build\sherpa-onnx-c-api.dll
+[PASS] DLL colocated: sherpa-onnx-cxx-api.dll D:\tmp\wisp274r3\tree-mut\build\sherpa-onnx-cxx-api.dll
+[PASS] deps.toml sherpa-onnx pin          1.13.8
+[PASS] deps.toml onnxruntime pin          1.28.2
+[PASS] deps.toml sherpa-onnx-go pin       v1.13.8
+[PASS] data dir writable (dev)            C:\Users\swq\AppData\Roaming\wisp-dev
+------------------------------------------------------------------------
+wisp doctor: PASS
+PROCESS_EXITCODE=0

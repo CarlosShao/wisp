@@ -1,0 +1,24 @@
+$ date
+Wed Oct  7 17:22:11 CST 2026
+
+=== dist + exe md5 at the end (compare with logs/00-anchor.txt) ===
+frontend/dist/.gitkeep: OK
+frontend/dist/assets/index-BRKj5OIJ.css: OK
+frontend/dist/assets/index-BVKlegVD.js: OK
+frontend/dist/index.html: OK
+build/wisp.exe: OK
+MD5_CHECK_RC=0
+--- diff start vs end (dist+exe lines only) ---
+5d4
+< e6c8e52bb14f15a7983bbc6b093e6058 *build/wisp.exe
+
+$ go list -f '{{.EmbedFiles}}' ./frontend  (final)
+[dist/.gitkeep dist/assets/index-BRKj5OIJ.css dist/assets/index-BVKlegVD.js dist/index.html]
+
+$ md5sum scripts/build.ps1
+43fb7e20c597192104728befb231e8ea *scripts/build.ps1
+
+=== scoped git status (write surface) ===
+ M scripts/build.ps1
+?? .scratch/wisp/probes/274/r3/logs/90-gates.txt
+?? .scratch/wisp/probes/274/r3/logs/99-final-proof.txt

@@ -1,0 +1,14 @@
+﻿=== CASE tree=D:\tmp\wisp274r3\tree-mut mode=nothing ===
+NPM_RESOLVES_TO: D:\tmp\wisp274r3\bin\npm.cmd
+GIT_ON_PATH: 
+BUILD_SCRIPT: D:\tmp\wisp274r3\tree-mut\scripts\build.ps1
+build.ps1: repo root D:\tmp\wisp274r3\tree-mut (Env=dev)
+build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx 1.13.8)
+build.ps1: frontend: node = D:\work\server\node14\node.exe (v24.9.0); npm = D:\tmp\wisp274r3\bin\npm.cmd (stub-npm 274-r3: STUB_MODE=nothing args=--version)
+build.ps1: frontend: node_modules EXISTS -> taking the npm-ci-SKIPPED branch (npm run build only). This branch does not verify the installed tree against package-lock.json; delete frontend/node_modules to force a clean npm ci.
+build.ps1: frontend: pre-build dist snapshot = 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index with a space.html index.html] (this run's npm must produce an artifact name outside it).
+build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).
+stub-npm 274-r3: STUB_MODE=nothing args=run build
+build.ps1: FATAL: frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=dev, this run's repo root D:\tmp\wisp274r3\tree-mut; snapshot was 5 file(s) [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index with a space.html index.html], dist now holds [.gitkeep assets\index-BRKj5OIJ.css assets\index-BVKlegVD.js index with a space.html index.html]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run.
+PROCESS_EXITCODE=1

@@ -146,13 +146,19 @@ if (Test-Path -LiteralPath (Join-Path $FrontendDir 'node_modules')) {
 # moment. Names, not mtimes and not contents: vite's asset names are
 # content-hashed (assets/index-<hash>.js), so a build that really ran lands at
 # least one name the snapshot never held.
+# The roster stays a PowerShell ARRAY on BOTH sides of the npm run (ticket 274
+# AC#11): joining it with ' ' here and splitting it again after the run shreds
+# any name that contains a space, and the shredded whole name then looks like an
+# artifact this run produced - a stub npm that writes nothing would pass the gate
+# on the strength of one spaced-out file name. So: array in, array out, and the
+# ' ' join exists only for the human-readable text below.
 $preDistExists = Test-Path -LiteralPath $DistDir
 $preDistFiles = @()
 if ($preDistExists) { $preDistFiles = @(Get-ChildItem -LiteralPath $DistDir -Recurse -File -Force) }
-$preRoster = ($preDistFiles | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) }) -join ' '
+$preRoster = @($preDistFiles | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) })
 $preDistLabel = 'no dist directory'
 if ($preDistExists) { $preDistLabel = "$($preDistFiles.Count) file(s)" }
-Write-Host "build.ps1: frontend: pre-build dist snapshot = $preDistLabel [$preRoster] (this run's npm must produce an artifact name outside it)."
+Write-Host "build.ps1: frontend: pre-build dist snapshot = $preDistLabel [$($preRoster -join ' ')] (this run's npm must produce an artifact name outside it)."
 Write-Host 'build.ps1: frontend: running npm run build (tsc -b && vite build, output goes to frontend/dist).'
 Push-Location $FrontendDir
 try {
@@ -195,11 +201,13 @@ if ($distEntryBytes -le 0) {
 # Deliberately NOT an mtime comparison - see the .DESCRIPTION note - because a
 # git checkout, a copy, or any earlier successful build on this machine moves
 # mtimes without producing anything, and then this gate would pass forever.
+# AC#11: $preRoster (taken above) and $postRoster are BOTH arrays, so the two
+# comparisons below are array-to-array. Neither roster is ever re-parsed out of a
+# ' '-joined string, which is what used to shred a name containing spaces into
+# fragments and then report the intact name as if this run had produced it.
 $postRoster = @($distAll | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($DistDir.Length + 1) })
-$preNames = @()
-if ($preRoster -ne '') { $preNames = @($preRoster -split ' ') }
-$freshNames = @($postRoster | Where-Object { $preNames -notcontains $_ })
-$goneNames = @($preNames | Where-Object { $postRoster -notcontains $_ })
+$freshNames = @($postRoster | Where-Object { $preRoster -notcontains $_ })
+$goneNames = @($preRoster | Where-Object { $postRoster -notcontains $_ })
 if ($freshNames.Count -le 0) {
     Fail "frontend step: npm run build reported success but frontend/dist holds no artifact name outside the snapshot taken before this run's npm (Env=$Env, this run's repo root $RepoRoot; snapshot was $preDistLabel [$preRoster], dist now holds [$($postRoster -join ' ')]). Named cause: unprovenanced page bytes - nothing in frontend/dist was produced by this build, so wisp.exe would embed an earlier build's artifacts. A stubbed or no-op npm that writes nothing lands here on purpose. If this was a real build of unchanged sources, vite rewrote byte-identical content-hashed names and no disk evidence can separate that from npm writing nothing: delete or move frontend/dist (the tracked anchor frontend/dist/.gitkeep regenerates from git) so the pre-run snapshot is the clean-checkout shape, then re-run."
 }
