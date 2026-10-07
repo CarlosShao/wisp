@@ -1,0 +1,6 @@
+go vet ./cmd/wisp/  起手持数（35-r1，票 35 AC#6）
+command: go vet ./cmd/wisp/
+rc=0
+elapsed_ms=1362
+date: Wed Oct  7 17:35:57 CST 2026
+(空输出＝无 vet 诊断)
