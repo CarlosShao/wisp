@@ -71,3 +71,13 @@
   读数：超阈枚数 57→0、没有一枚被点名成超预算），**入库那枚文件里阈值始终是 100**；名册是 57 枚逐枚点名，无通配；
   §现量 6 那 57 枚中间带在本件 §1.4/§3.1 里逐枚在案，没删不提。
   票面 `- [ ]` 那 8 枚 AC 框本腿一枚未碰（现仍 8 枚未勾）。
+
+- **2026-10-07 14:0x 编排者追加（账 `A672`/`A673`；⛔ AC 框一枚没碰）**：★**这枚门今天第一次自己拦下东西**——我收 `35-a3` 时现跑 `sh scripts/check-path-length-budget.sh --with-self-test` ⇒ **rc=1／`VERDICT RED`／`the roster holds 57 entries, the tree has 60 over-budget tracked paths`**，三枚 not-in-roster 正是 **10-04 之后新开的工单**：`273`（名 **107** 字符）／`274`（**105**）／`275`（**106**，这枚是我自己 10-06 开的）。
+  ⇒ 处置＝**改名**（`f67af953`，三枚 100% 相似＝正文一字没动），⛔ 没走"往名册加豁免"那一支：名册里那种 `hist: ticket filed before README rule 9` 的理由对 10-04 **之后**开的票是假话；⛔ 也没抬帽（脚本 `:71-72` 自己就写着抬 `HAT_NAME_LIMIT` 是本票禁区）。改后同尺 **rc=0／GREEN／over-budget 57＝roster 57**。
+  **AC#7 形状的"曾名／现名"逐枚对（记在本票面而不是脚本里＝本票 AC#7 写的是"脚本名册**或票面**"；我故意不去改那枚正等着被验收的仪器）**：
+  1. 曾名 `273-shipping-process-builds-the-state-machine-without-a-sink-so-every-d43-side-effect-falls-into-a-no-op.md` → 现名 `273-shipping-process-builds-state-machine-without-a-sink-so-every-d43-effect-falls-into-no-op.md`
+  2. 曾名 `274-no-nail-requires-the-shipped-exe-to-carry-the-page-build-ps-step-2-comment-is-false-in-both-halves.md` → 现名 `274-no-nail-requires-shipped-exe-to-carry-page-build-ps-step-2-comment-is-false-in-both-halves.md`
+  3. 曾名 `275-tracked-gofumpt-denominator-carries-a-deliberately-broken-sample-so-the-guarded-census-step-exits-2.md` → 现名 `275-tracked-gofumpt-denominator-carries-deliberately-broken-sample-so-guarded-census-step-exits-2.md`
+  ⚠ 旧名在 **13 枚已入库件**里还写着（尺＝三枚旧 slug 片段各 `git grep -l <pat> HEAD` 取并集去重；逐名在 `A672` §4），⛔ 按脚本 `:184-186` 那句"不许把旧名从 probes/evidence 里'修'掉——那是某一刻的读数"，我一枚都没改。
+  **给 `262-v1` 的两条**：① 我这发红是它 **AC#3/AC#4 的天然旁证、但不是凭据**（AC#3 要的是"自己种一枚越帽路径 ⇒ 门红、拆掉 ⇒ 绿"，我这回是**三枚真实越帽路径恰好已在**，同形状不同来源，它仍要自己种自己拆）；② ★它 AC#3 那一发**必须在仓外拷贝／clone 里种**（先例＝`275-v1` 的仓外 clone 突变；在本仓工作树里留任何一枚越帽跟踪路径，都会让每一枚正在跑这条门禁的腿读到红——我这轮的红就是这么来的），种完当场还原并附 `git status --porcelain -- .scratch scripts tools` 为空的自证。
+  **⛔ AC#5 这一格今天仍给不了**：机主 10-07 说"暂时不推远程" ⇒ `ci.yml:166` 那一步**从未在这三枚改名之后的树上跑过**，它的绿属〔待取数〕，⛔ 谁都不许拿本机 `rc=0` 替它填。
