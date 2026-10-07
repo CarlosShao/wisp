@@ -1,0 +1,35 @@
+time=2026-10-07T20:48:09.345+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor
+    panel_transport_live_35v2_windows_test.go:155: 35v2 RENDERED FORWARDING SCRIPT (Go side, %[1]s already substituted):
+        (function () {
+          var cw = window.chrome && window.chrome.webview;
+          if (!cw || cw.__wispForwardInstalled) { return; }
+          cw.__wispForwardInstalled = true;
+          cw.postMessage = function (message) {
+            if (typeof window.wispDispatch === "function") { window.wispDispatch(message); }
+          };
+        })();
+        35v2 ---- end of rendered script ----
+    panel_transport_live_35v2_windows_test.go:161: 35v2 rendered script is missing the shape the comment at panel_host_windows.go:638 promises: "var native = cw.postMessage"
+    panel_transport_live_35v2_windows_test.go:161: 35v2 rendered script is missing the shape the comment at panel_host_windows.go:638 promises: "native.call(cw, message)"
+    panel_transport_live_35v2_windows_test.go:161: 35v2 rendered script is missing the shape the comment at panel_host_windows.go:638 promises: "finally { inside = false; }"
+    panel_transport_live_35v2_windows_test.go:175: 35v2 webview processes at start: tree=0 machineNamed=29 pids=0
+    panel_transport_live_35v2_windows_test.go:216: 35v2 cold bring-up measured on this box: -1.000 ms, hwnd=0x4b0bc6
+    panel_transport_live_35v2_windows_test.go:218: 35v2: pc-35v2-canary had not arrived after attempt 1 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:218: 35v2: pc-35v2-canary had not arrived after attempt 2 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:218: 35v2: pc-35v2-canary had not arrived after attempt 3 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:218: 35v2: pc-35v2-canary had not arrived after attempt 4 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:219: 35v2 canary arrival=false after 4 post(s); door has recorded []
+    panel_transport_live_35v2_windows_test.go:221: 35v2: pc-35v2-pagepost-1 had not arrived after attempt 1 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:221: 35v2: pc-35v2-pagepost-1 had not arrived after attempt 2 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:221: 35v2: pc-35v2-pagepost-1 had not arrived after attempt 3 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:223: 35v2 AC#6 LIVE ARRIVAL NOT MEASURED: chrome.webview.postMessage from the page did not reach the Go door (0 recordings: [])
+    panel_transport_live_35v2_windows_test.go:232: 35v2: pc-35v2-DESC had not arrived after attempt 1 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:232: 35v2: pc-35v2-DESC had not arrived after attempt 2 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:232: 35v2: pc-35v2-DESC had not arrived after attempt 3 (0 door recordings so far)
+    panel_transport_live_35v2_windows_test.go:239: 35v2 diagnostic lane did not come back - the property facts are UNOBTAINED, the arrival reading above stands on its own
+    panel_transport_live_35v2_windows_test.go:243: 35v2 all door recordings: []
+    panel_transport_live_35v2_windows_test.go:255: 35v2 webview processes after teardown: tree=0 machineNamed=29 pids=0 (start tree=0 pids=0)
+--- FAIL: TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor (58.27s)
+FAIL
+rc=1

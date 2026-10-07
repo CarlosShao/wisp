@@ -1,0 +1,37 @@
+#!/bin/sh
+# 35-v2 mutant rig: builds mutated copies of the shipped forwarding hook WITHOUT
+# touching the repo working tree (go test -overlay only).
+set -u
+SRC='D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go'
+RTEST='D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_transport_35r2_test.go'
+cd /d/tmp/wisp35v2/mut || exit 9
+cp "$SRC" base.go
+
+# M-A : drop the explicit receiver on the native exit (this-loss shape)
+sed 's|return native\.call(cw, message)|return native(message)|' base.go > mA.go
+# M-B : drop the "door not bound yet" typeof guard
+sed 's|if (inside || typeof window\.%\[1\]s !== "function")|if (inside)|' base.go > mB.tmp
+# M-C1: release the re-entry guard BEFORE the synchronous hop (timing mutant)
+sed 's|try { return window\.%\[1\]s(message); } finally { inside = false; }|try { inside = false; return window.%[1]s(message); } finally { inside = false; }|' base.go > mC1.go
+# M-C2: keep the finally block but make its reset a no-op
+sed 's|finally { inside = false; }|finally { inside = inside; }|' base.go > mC2.go
+
+# awk-based guard strip for M-B (sed above can't carry the | delimiter chars)
+awk '{ if (index($0,"if (inside || typeof window.%[1]s !== \"function\")") ) sub(/if \(inside \|\| typeof window\.%\[1\]s !== "function"\)/,"if (inside)") ; print }' base.go > mB.go
+
+for f in mA mB mC1 mC2; do
+  printf '%-5s changed_lines=%s\n' "$f" "$(diff base.go $f.go | grep -c '^>')"
+done
+
+printf 'package wisp\n' > r2-empty.go
+cat > overlay-nor2.json <<EOF
+{"Replace":{"$RTEST":"/d/tmp/wisp35v2/mut/r2-empty.go"}}
+EOF
+
+for m in mA mB mC1 mC2; do
+  cat > overlay-$m.json <<EOF
+{"Replace":{"$SRC":"/d/tmp/wisp35v2/mut/$m.go"}}
+EOF
+done
+ls -la /d/tmp/wisp35v2/mut
+echo "prepared rc=0"

@@ -1,0 +1,19 @@
+#!/bin/sh
+# 35-v2 mutant rig v2 (overlay paths fixed)
+set -u
+MUT=/d/tmp/wisp35v2/mut
+REPO='D:/work/workspace/projects plans/Wisp'
+cp /d/tmp/wisp35v2/*.dll $MUT/ 2>/dev/null
+NAMES='TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3|TestShapeA3SecondPagePostStillDelivers|TestShapeA3ForwardingHookIsIdempotentInOneDocument|TestLegacySubShapeOneHookDiesInAReentryLoop|TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot'
+for m in mA mB mC1 mC2; do
+  ( cd "$REPO" && go test -c -overlay $MUT/overlay-$m.json -o D:/tmp/wisp35v2/mut/$m.test.exe ./cmd/wisp/ ) > $MUT/$m-build.txt 2>&1
+  brc=$?
+  echo "build_rc=$brc" > $MUT/$m-run.txt
+  if [ $brc -ne 0 ]; then echo "run_rc=skip" >> $MUT/$m-run.txt; echo "--- $m BUILD FAIL"; tail -3 $MUT/$m-build.txt; continue; fi
+  ( cd "$REPO/cmd/wisp" && $MUT/$m.test.exe -test.run "$NAMES" -test.v ) >> $MUT/$m-run.txt 2>&1
+  echo "run_rc=$?" >> $MUT/$m-run.txt
+  echo "######## $m"
+  grep -E 'build_rc|run_rc|^--- (PASS|FAIL)|^\s+--- (PASS|FAIL)' $MUT/$m-run.txt
+  grep -E 'panel_transport_35r2_test.go:' $MUT/$m-run.txt | cut -c1-320
+done
+echo "ALLDONE"

@@ -1,0 +1,4 @@
+nor2_build_rc=0
+== panel run 1: fails=6 rc=rc=1 time=
+== panel run 2: fails=5 rc=rc=1 time=
+rc=0 note: panel-2 roster lacks TestTicket223 (same exe same tree) = intermittent; nor2 axis not isolated (see verdict W3)
