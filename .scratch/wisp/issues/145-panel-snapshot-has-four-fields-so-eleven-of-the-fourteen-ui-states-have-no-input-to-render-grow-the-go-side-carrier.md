@@ -186,3 +186,37 @@
 1. **AC#2 里那句归属已失效**（原句：「TS 侧 interface 的对齐**不写 `frontend/**`**，只在证据件里给出'应当长这样'的逐键清单，**由前端会话自己落**」）。两重失效：那个会话 09-28 就废弃了（⛔ 仍不许跨会话转达，这条机主没收回），而今天他**放开了读**。**改后口径＝页面代码我可以读（只读）、由我出对照表、Go 侧字段该加哪几枚由这张表定**；⚠ **读≠写**：他给的是"想看啥看啥"＋"字段你随便对接"，⛔ **我没有把它读成"可以往那棵分支写代码"**，真要写页面文件是另一枚更大的动作，届时按规矩单独具名。⇒ 本票 AC#2 的"逐键清单由别人落"那一支**作废**，但**框我不翻**——它要等 `145-f1` 的表与非实现者读数。
 2. **本票过去三年的半个洞：页面那一侧从没人量过。** `A560`（10-03）已经把我自己标题那句"恰四字段"更正成 **6 枚直接字段**，但**"页面消费哪几枚"这半张表始终空着**——所以"缺 8~10 枚"这个方向今天是**从 Go 侧推出来的，不是从页面侧量出来的**。⇒ 已派只读腿 `145-f1`（`.scratch/wisp/probes/145/f1/field-map.md`）去抽这半张表，方法具名：**只用 git 对象层读那枚分支的 blob**（`git show dsh/feat/frontend-p0-v2:<path>`，`frontend/src` 下 **85 枚**文件），⛔ **不进 `D:/wt/fe` 那棵工作树一个字节**（既有边界里唯一他明确收回的就是"不许看"，"不许进那棵树"我没有替他收回）。
 3. **AC#6 的判据现在有真凭据可查了**：原句问"哪一枚用例断言了它的值来自真来源"。⚠ 别忘了本仓**已经有一枚双向尺**在把 Go 快照字段钉到 TS 侧（`145-c2` 报的 `approval_test.go:105`，它把 `pending[]`／`results[]`／顶层三族钉在 `frontend/src/lib/...` 的形状上）⇒ **加字段要先过它那关**，这条解冻条件是 167-r2 同批，⛔ 不许 `145-f1` 或后续写腿绕过它来"让门变绿"。
+
+## 收 `145-f1`（页面字段名册；件 `.scratch/wisp/probes/145/f1/field-map.md`，**353 行／48,883 字节**；四枚 commit `53d46242`→`7c1ac218`→`a8d607b2`→`c1144180`；锚＝dev `a781fdc8`／页面 `16c2f038`（`frontend/src` 85 枚）；10-07 11:4x，落账 `A657`）
+
+★**这半张空表填上了，而它推翻的是本票的标题级前提。** 四档枚数（腿的尺，逐档我都另起一把复认）：
+
+| 档 | 枚数 | 我的独立复跑 |
+|---|---|---|
+| ①两边都有 | **38 枚叶子**（3 顶层＋10 卡＋3 chunk＋6 composer 段＋3 mode＋5 workspace＋8 attachment） | ⚠ 见下"挂载"一节——**真面板路径只 21 枚** |
+| ②页面要、Go 没交 | 快照契约上**只有 1 枚**＝`view`；另 props-only 族 41 叶 | `git grep -E '\.view\b' … -- 'frontend/src'` ＝ **4 处读取**，而 Go 侧 `Snapshot` 六枚里没有它 ⇒ 与 `panel-views.ts:89-93` 那句"ticket 35's pump owns it"对上 |
+| ③Go 交了、页面不读 | **8 枚具名 key ＋ 2 枚整段（29 叶）** | 我按"这句话在说什么"扫（不是只扫符号名）：同尺打 `frontend/src` 目录形式 ⇒ `.generatedAt`／`.tasks`／`.instructions`／`.git`／`.currentModel`／`.modelKnown`／`.credentialState`／`.credentialKnown`／`.rewritten`／`.artifact` **全 0**，正控 `.pending`＝5／`.results`＝4／`.composer`＝2 ⇒ 读数成立 |
+| ④名字像、词汇不同源 | **3 族** | `TaskRow.id/title ↔ TaskRowView.taskId/label`；`GitBranchView.isRepo(bool) ↔ GitView.Kind＋Reason＋SwitchBlocked`；状态词汇**四套并存**（D43 名／`TaskStatus`／`SessionState`／`MonitorAgentRow.state`）⇒ ⚠ **这不是改字段名能对接上的**，直接改名会把 D43 判决当人话画、把"不许切"那条真判决吞掉 |
+
+**1. ★本票"缺字段"这个方向里，有一族病因根本不在快照：挂载。** 腿报"17 枚叶子的读取点住在没人 import 的组件里"，我逐枚复跑（尺＝`git grep -l -E 'components/<名>"' <ref> -- 'frontend/src'`，剔组件自身）：
+- `composer.tsx` → **0 处引用**；`chat-screen.tsx` → **0 处引用**；而 `result-stream.tsx` 的**唯一**引用者就是那枚已挂死的 `chat-screen.tsx`（⇒ 传递性死）；`approval-screen.tsx` 只被 `showcase.tsx` 挂，而 showcase 走 `main.tsx:104` 的 `?harness=2` 路由——**不是真面板路径**。
+⇒ **我采纳，且这条改变派单口径**：`attachments`／`acceptedAttachmentMimes`／`maxAttachmentBytes`／`attachmentError`／`l2ConfirmNames`／`spelling`／`reparse`／`workspace.reason`／`done` ＋ `ComposerAttachment` 8 枚 ⇒ **⛔ 不许算进"Go 该加的字段"**。把它们当载体扩张派给 Go 侧，会加出**真数据＋假通路**。
+- ⚠ 诚实标注：腿 §5 第 12 条自报这把挂载尺只打了 5 枚组件、**没跑 `tsc`/lint 证伪** ⇒ "17／21"这两枚数**只能当量级、不能当验收凭据**；真要派"改挂载"的活，验收方要补一枚挂载级尺（我写进下面的派单约束）。
+
+**2. ★★最硬的一条不在字段层，而在"有没有耳朵／有没有推送"——而它不归本票，归票 35。** 腿说"最后一跳不存在"，我把它拆成四把尺复跑（⛔ 不是抄它的）：
+- ⓐ`grep -rn --include=*.go -E 'PostWebMessage|EvaluateScript|CreateWebMessageAsJson' cmd/wisp internal/panel`（剔 test）＝**0**；正控＝同一把尺全仓只命中 **1 枚**文件 `.scratch/wisp/probes/33/p1/q2/main.go` ⇒ **今天"推给页面"这件事只活在一枚探针里，不在产码里**。
+- ⓑ记账值的读者：`(rt *agentRuntime).lastPanelSnapshot()` 带括号数调用点＝**10 枚，全部在 `_test.go`，非 test 0 枚**（`cmd/wisp/instructions_200r2_test.go` 3／`panel_pump_test.go` 3／`subagent_*_197_test.go` 4）。⇒ 泵 marshal 出的字节**今天只被测试读过**，没有任何生产读者。
+- ⓒ宿主出向能力面：`func (m *PanelManager) …` 导出方法**共 8 枚**＝`IsCreated/IsShown/LastColdMs/LastHotMs/Show/HotShow/Hide/Destroy`——**没有一枚是"把数据送进去"**；入向那扇 `Bind(panelDispatchBinding, …)`（`panel_host_windows.go:405`）是**页→Go**，方向相反。
+- ⓓ页面耳朵：`git grep -E 'webview\.addEventListener|postMessage|onmessage'` 于 `frontend/src` ＝ **0**；正控＝同树 `addEventListener` 在 8 枚文件里命中（`App.tsx` 2 枚等）⇒ **尺有牙**。页面唯一的桥引用是 `lib/panel.ts:154 return window.wispBridge ?? window.chrome?.webview ?? null`，**只用于发起调用**。
+⇒ **判语（我裁）**：面板"画不出真数据"的第一阻断**不是快照太瘦**，而是**出向那一跳（Go→页）与页面接收器两枚都不存在**。本票的字段扩张若先落地，结果是**更瘦的通路带更肥的字段**，仍画不出来。⇒ 字段名册作为**对接依据入册**，而"先做哪一枚"的排序交给**票 35**（`35-panel-bridge-c17.md`：它就是 C17 那座桥，含 Go→页事件推与 `panel.resync` 全量推）——⛔ **我不另开新票重复它**，只在它面上补一节现状对拉（机主原话"不要重复劳动哈"）。
+
+**3. 我顺手替腿结掉它 §5 的一格（它没做的赋值穷举）**：`snap.Instructions =`／`snap.Tasks =` 的真身＝**`internal/panel/pump.go:304-327`**（两枚都包在 `if p.src.Instructions != nil`／`if p.src.Tasks != nil` 里），而装配根**两枚 reader 都给了**：`cmd/wisp/run.go:718 Instructions: rt.instructionBundle`、`:724 Tasks: rt.taskRosterState` ⇒ **"泵发出的包带不带这两段"＝带**（只要走 `wisp run` 那条泵）。
+- ⇒ 但同一段里我量到一枚**腿没看见、也不在本票射程**的缺口：`PumpSources.L1Windows`（`pump.go:200`）在全仓**零装配点**（尺＝`grep -rn 'L1Windows:' cmd internal` 剔 test ＝**无输出**），于是 `pump.go:324` 那枚 `if p.src.L1Windows != nil` 恒假、`waits` 恒空 ⇒ **票 220 的 `blockedOnApproval` 第二来源今天是黑的**。这条**归队列里那枚待派腿**（task #297「给 L1Windows 供数据那一跳」），⛔ 不算进本票，我只在此具名登记它的现量。
+- ⚠ 另记一枚账面过期：`cmd/wisp/run.go:695-697` 注释逐字写着"this tree carries no WebView2 host (tickets 33/35)"，而 `panel_host_windows.go:405` 今天真在 `Bind` ⇒ **注释与代码相反**，与票 274 §2① 同族（那条我另案处置，本票不动它一字）。
+
+**4. 腿顶回我的两处，我复跑后都算它对（原句不抹）：** ①票面"恰四字段"→ 现量**六枚**（我 A655 §6 早自量得同一枚数，两把尺同读数）；②票面"`UnfedScreen`：除 chat/approval 外每屏渲染一句人话"→ **`UnfedScreen` 全树 0 命中**（正控 `RetiredView` 命中 `App.tsx:327`／`:495`），今天的形状是 **approval／tasks／ball 三枚被判"不是屏"**、其余落到 `Conversation`，而屏名册只有 **9 枚**（`panel-views.ts:26-35`）不是 14 枚。⇒ ⚠ **本票标题里那枚"十四态"是 `PLAN.md:3473-3488` 那张状态表的行数，不是页面屏数**——这两件事以前被我混着讲过，此处具名更正。
+
+**5. 排程与归属（AC 框一枚不翻）**：
+- **AC#2**：那半张空表现在满了，字段该加哪几枚**由这张表定**——但表里的 ② 只有 `view` 一枚真缺，而 ③／④ 两档说明**今天的问题不是"Go 少交"而是"页面没接、且词汇不同源"**。⇒ AC#2 的落地集**不因为表交了就能勾**；它等**非实现者**按 ①②③④ 四档逐档判"谁改哪一边"。
+- **AC#6**：维持未勾，凭据现在有两枚（`approval_test.go:105` 双向尺 ＋ 本表 ③ 档的 0 读数尺）。
+- 下一步不是本票的写腿，而是**票 35 的现状对拉**＋**票 274（构建带页面）**；本票的写腿排在两者之后。⛔ 派单给后续腿时必须带上这一句：**"不许把 ① 档 38 枚读成 38 枚通路"**（真面板路径只 21 枚，且最后一跳为 0）。
