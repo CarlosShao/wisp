@@ -1,0 +1,6 @@
+cmd/wisp/config_readers_255.go:133:	"audio":   hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Audio - internal/audio takes its device and rate from elsewhere",
+cmd/wisp/config_readers_255.go:182:	"Audio":   nil,
+cmd/wisp/config_receipt_255_test.go:73:		"ball", "session", "audio", "llm", "agent", "privacy", "memory",
+cmd/wisp/config_receipt_255_test.go:569:				"ball", "session", "audio", "llm", "agent", "privacy", "memory",
+cmd/wisp/run.go:1176:		Text: flags.Text, Vision: flags.Vision, AudioIn: flags.AudioIn,
+cmd/wisp/run.go:1177:		AudioOut: flags.AudioOut, Thinking: flags.Thinking, FC: flags.FC,
