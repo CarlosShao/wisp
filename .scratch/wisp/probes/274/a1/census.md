@@ -149,8 +149,67 @@
   ③ “embed 到 S5 才落”半句：embed 指令**早已在树里**（embed.go，ci.yml:289 注释自指 embed.go:19），所以「还没落」为过期；而“到 S5 才把页面喂进 exe”那半句对应的机制（frontend.Dockerfile 路径）根本没建——**票②的实证（exe 产线从未与 node 产物同 job）与 spec 的 S5 承诺是两条都没合拢的边**。
 - ⛔ 本腿不改 spec 一字（AC#5：`SPEC-11 §2.2` 那句要不要改＝人工批准）；此处只回答“那句话指什么、今天对不对得上”。
 
-## §4 喂页面给 exe 的合法落点普查（甲/乙/丙，只描形不选形）
-状态：**未开始**。
+## §4 喂页面给 exe 的合法落点普查（甲/乙/丙只描形，⛔ 本腿不选形不裁决）
+
+共同前提（现量）：ci.yml 的 job 名册＝`lint(:65) test-core(:395) test-windows(:505) slo-smoke(:739) slo-full(:797) lint-frontend(:871)`，**`needs:` 全文件 0 枚**（六 job 完全并行）；`.github/workflows/` 只有 `ci.yml` 与 `slo-fresh.yml`——**SPEC-11 §6(:129) 规划的 `release` job 在仓里没有落点**。
+build.ps1 现量：`-File scripts/build.ps1` 在 CI 的执行点恰三枚 `:571/:757/:820`（与编排者/票②一致，§2 附注格就此钉死）；`:73-74` 跳过步逐字如票；`param(` 在 `:22`，全文 `frontend|Frontend` 只命中 `:10/:73/:74`——**SPEC-11 §2.2 承诺的 `--with-frontend` 开关在脚本里不存在**（第④个漂移方向，见 §3 末勘）。
+现存与本题有关的钉（本腿现跑尺，非凭印象）：
+- `cmd/wisp/panel_host_gate_test.go:77 TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12`——唯一现役 AC#12 尺；旧尺 `TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12` **已换名退场**（gate_test:301 注释自陈 + `docs/evidence/s1/33-panel-host-c27-r4.md:132` 逐名 diff「- PASS 旧名 → + PASS 新名（格 5 换名＋装牙）」）。它 :113-139 两支各自 fail-closed、:141-151 provenance 轴只防「built=true 却树里无来源且无未跟踪件」——**两形放行**（票④，本腿逐行确认；关键：本机与「CI 下载 artifact」都满足 `ignored-or-untracked>0`，恒绿）。
+- `internal/panel/assets_test.go` 名册：`TestAnchorOnlyBundleIsNotBuiltAndFailsClosed(:22)`、`TestCheckRejectsEntryNamingAnUnembeddedAsset(:41)`、`TestCheckAcceptsAConsistentBundle(:62)`、`TestCheckIgnoresOutsideAndFragmentReferences(:85)`、`TestBuiltinBundleIsCompleteOrAbsentNeverHalf(:102)`、`TestResolveRefusesPathsOutsideTheBundle(:147)`——全部吃合成 bundle 或「complete-or-absent」二相，**没有一枚要求真 bundle**。
+- `cmd/wisp/panel_assets_143_test.go`（l2 卡面，2 枚族6命中）与 embed 注释面的 d22scan 检查（ci.yml:286-290 一带）不构成甲/乙/丙任何一形的红点。
+- 硬文本约束（票 §3，非测试钉但会退回）：⛔ `internal/panel/assets.go` fail-closed 语义不许动；⛔ `frontend/.gitignore` 的 `dist/*`+`!dist/.gitkeep`（票 77 AC#1 的规矩，本腿 :12-13 逐字在案）不许为了产物入库而改；⛔ 甲形与票 34「host needs no Node」口径正冲（票 AC#2 原格写明）。
+
+### 甲＝build.ps1 第 2 步真跑 `npm ci && npm run build`
+- 动哪几枚文件哪几行：`scripts/build.ps1`（:73-74 换成实步；:22 param 可能加开关；:10 头注释同步说实话）；`.github/workflows/ci.yml` 三枚 build.ps1 执行点所在 job（test-windows/slo-smoke/slo-full）此前各插 `Run actions/setup-node@v4`（对照 lint-frontend :879 现形）。
+- 新 job/新 artifact：**都不需要**。
+- CI 时长量级：现成数＝§2 三发的 lint-frontend 整 job（含 setup-node+npm ci+vite build+其余步）≈**24-25 秒**；Windows runner 上无现成数（量级参考同数量级偏高，vite/tsc 对 CPU 敏感），slo-full 跑 self-hosted、时长取决于该机 node 缓存——标注为量级估、非读数。
+- 这条边以后谁能看见：**所有跑 build.ps1 的机器**——本机＋CI 三线从此 exe 恒带页面；副作用＝「无 Node 的干净编译机」从「能编译出 false 形」变「编译直接红」（把碰巧性换成硬依赖）。
+- 撞的既有钉：AC#12 provenance 轴在「CI 现场 npm build 出未跟踪 dist」形状下 `ignored-or-untracked>0` ⇒ 不红；assets_test 全绿（true 形是它支持的相）；**真代价在人工约束格**（Node 硬依赖 + AC#3 把注释与实做拆成两格）。
+
+### 乙＝CI 跨 job 产物传递（lint-frontend 传 dist → Windows job 先取再 build）
+- 动哪几枚文件哪几行：只有 `.github/workflows/ci.yml`——lint-frontend :903 步后加 `actions/upload-artifact@v4`（现成姿势 :763/:826，SHA pin 先例见 :842-843 注释）；:571/:757/:820 所在 job 各插 `actions/download-artifact@v4`（path 指向 `frontend/dist`）并给三 job 加 `needs: lint-frontend`（**今天 needs: 0 枚，job 序是全新增边**）。
+- 新 job：不需要；新 artifact：**需要 1 枚**（frontend dist 包）；`download-artifact` 今天全仓 0 枚跟踪命中（§1 补测格）⇒ 该 action 属**新引入依赖**，按规矩 pin。
+- CI 时长量级：lint-frontend ≈25s 成为 Windows 三线的前置——**并行度损失＝关键路径 +（slo-smoke ≈2m、test-windows ≈10m 各自起跑延迟）**；artifact 上传下载秒-十分秒级、仓内无现成数。slo-full 在 self-hosted 上，多一层下载落盘。
+- 这条边以后谁能看见：**只有 CI**。本机形状不变——票③「带不带取决于编译机上碰巧有什么」对本机依旧；开发者 exe 与 CI exe 首次可保证同形（都 true）。
+- 撞的既有钉：AC#12 两形放行照绿（untracked artifact 落盘 ⇒ provenance 轴 `ignored-or-untracked>0` 不红）；**「把 dist 提交入库」的乙变体被票 §3 第三枚 ⛔（`frontend/.gitignore` dist 规则不可动）直接禁**，只剩 artifact 形合法；无测试钉红点。
+
+### 丙＝产线不动，只加出货前闸门（强制 `built=true` 且入口字节>0 否则红）
+- 动哪几枚文件哪几行：`.github/workflows/ci.yml`——三枚 build.ps1 步（:571/:757/:820）后各加一步跑 `wisp.exe panel-assets`（默认支 `panel_assets.go:126-129`：not built ⇒ stderr + **rc=1** ⇒ 步失败，天然有牙）或 `-check`（`:118-124`，入口+引用不全 resolve ⇒ rc≠0）；「字节>0」语义 gate 测试 :117-118 已写过（CI 侧要读 manifest 或 `-render` 长度另立小步）。或者：新建 SPEC-11 §6 规划过但未落地的 `release` job/workflow 把闸门挂那里——**那是新文件**（现 workflows 目录仅两枚 yml，本腿具名）。
+- 新 job/新 artifact：挂 CI 三处＝都不新；真要做「发布前」＝新 release job（tag 触发）。
+- CI 时长量级：**每 job 一条命令，秒级**；三形中最小。
+- 这条边以后谁能看见：**只有执行闸门的 CI run**；本机与自托管机不会自然跑它（除非写进 build.ps1 尾——那又回到动产码的射程）。AC#4 反形敏感性丙可满足：干净形 dist（只剩锚）⇒ built=false ⇒ rc=1 ⇒ 红，**不是恒真句**。
+- 撞的既有钉：无测试冲突；票 §3 的 ⛔ 不挡丙（不改 assets.go 语义、不改 .gitignore、不真开窗）；⚠ 但丙单独落地时**exe 仍不带页面**——它只把「没页面」从静默变红牌，与甲/乙是互补不是替代（AC#2 三形本来就是「代价表」不是「三选一」的暗示——此为本腿观察，裁决归编排者）。
+
+### §4 勘（补进 §3 的第④个漂移方向）
+SPEC-11 §2.2 第 2 步写「`--with-frontend` 时走 docker/frontend.Dockerfile（§3.2）」——脚本里没有这个开关的任何实现（grep 尺具名于上），§3.2 的 Dockerfile 0 跟踪（票 §4 尺）。即：**§2.2 描述的入口本身也是化石**，build.ps1:74 那句注释是把一个不存在的开关当成未来承诺引用。
 
 ## §5 边界与自陈
-状态：**未开始**。
+
+**本腿逐枚读过的文件**（全部为只读；产码面只有本 census.md）：
+1. `.scratch/wisp/issues/274-...-build-ps-step-2-...md`（票面，57 行整读）
+2. `scripts/build.ps1`（窗口读 :55-99 全文＋:1-22 的 grep 行——**未整读**）
+3. `cmd/wisp/panel_host_gate_test.go`（窗口读 :56-150、:150-230——未整读）
+4. `cmd/wisp/panel_assets.go`（整读，161 行）
+5. `internal/panel/assets.go`（整读，189 行）
+6. `frontend/embed.go`（整读 26 行；机主具名允许的三枚构建胶水之一）
+7. `frontend/package.json`（整读 43 行；允许维＝构建脚本名，本次未读 `frontend/src/**` 任何一件）
+8. `frontend/.gitignore`（整读 17 行；允许件）
+9. `docs/specs/SPEC-11-build-deploy-containerization.md`（窗口读 :36-135；未改一字）
+
+**未读/未触（边界自证）**：`frontend/src/**` 0 枚；`design/**` 0 枚；`D:/wt/fe` 工作树 0 次访问（含「只读参考」）；`frontend/vite.config.ts` 只拿到 grep 计数与其上 1 行注释引用，未读正文。⚠ 记忆库 10-07 有「放开 frontend/** 只读（走 git show 对象层）」的口径记录，**但本腿派单明写 ⛔ 禁读 src/design 且白名单只有三件胶水——按派单执行，一律未读**；若机主要求按放开口径追读，另派腿。
+
+**与派单/票面冲突、以原文为准的具名上报**：
+- ①（派单 vs 盘上）工单文件名派单写 `...build-ps1-step-2...`，盘上实为 `...build-ps-step-2...`（无「1」）。引用以盘上为准。
+- ②（票 §2② 的尺复跑一致）`npm run build` 全文件确仅 `:903` 一枚 run；`-File scripts/build.ps1` 确为 `:571/:757/:820` 三枚。无冲突。
+- ③（票 §2④ 的 assets.go 行号全数对上）`:29 EntryFile`、`:34 errNotBuilt`、`:44 fs.Sub`、`:54-57 newAssets/built`、`:75-77 Resolve/!Built()/errNotBuilt` 逐一对上。无冲突。
+- ④（新增，超出票面的过期方向）`build.ps1:74` 引「SPEC-11 §2.2」——**§2.2 全文没有「S5」二字**（S5 在 §3.2 标题/末条与 §6 表里）；且 §2.2 承诺的 `--with-frontend` 入口与 §3.2 的 `docker/frontend.Dockerfile`、§2.2 第 3 步的「embed assets/web」在仓里 **0 枚落地**（docker 目录跟踪件、`assets/web` 见票 §4 尺）。⇒ 那句注释不只是两半过期，**引用指向本身指错节**。已具名进 §3/§4 勘。
+- ⑤（票 §2⑤ 与 panel_assets.go 逐字对回）`:135` 默认支格式 = `panel assets embedded: %d files, entry=%s built=%t`，与票⑤读数行一致；且 `:126-129` 在 not-built 时 **rc=1**——「命令有牙、无看门人」形状坐实。
+- ⑥（编排者转述「npm run build 在 ci.yml 只有 1 处（:903，lint-frontend job）」→ 一致；`lint-frontend` 起始行 :871 亦对（本腿 job 尺现量）。
+
+**未做完的格子（如实登记，不写成已完成）**：
+- AC#0(a)「lint-frontend 真跑成功后 npm run build 产出几枚、落在哪」：**未量**——需 `gh run view --log` 全量日志（本腿纪律是大日志只许落 `logs/` 且该格判定不属普查射程，判据已在 §2-3 写明「CI 步名册证明成功、枚数无读数的原因」）。
+- 「历史 run 里是否曾出现过任何 node→build.ps1 相邻形状」：只查了最近 3 发 ci run（§2 名册），**更早 run 未扩样**；且 §2-2 的「无 node 步」判据是步名正则过滤（`npm|node|artifact|build`），若有 node 步名不含这四词会漏（概率低，如实记形状限制）。
+- 族2 的 `placeholder` 独立语义计数：**未单独开窗**（合在族2 尺里，语料侧仅见 gate_test:56/:131 与 embed.go:27 的 placeholder 措辞，结论「无要求形」建立在合尺上）。
+- `logs/` 目录已建（`.scratch/wisp/probes/274/a1/logs/`）**为空**——本腿全程无大输出，未落盘（临时件只建不删，目录保留）。
+
+**纪律自证**：本腿全程 0 次 `go test`／0 次 `go build`（连 `go list` 都未跑）；0 处产码/配置/spec 改动；未 push；未放宽任何断言/阈值/golden。起手 HEAD `15699a2f`；本腿共交三笔：`a781fdc8`（§0/§1）、`29f87d4a`（§2/§3+补测格钉死）、终笔（§4+§5 并一笔——**偏离「每次新增一节就交一笔」具名自报**：§4 写成后紧接着写成了 §5 才到提交点，两节合为一笔，无内容缺失）。`git add` 与 `git commit` 每笔均带显式 pathspec（仅本文件），全程未触碰他人 staged 面。
