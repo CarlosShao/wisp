@@ -1,0 +1,11 @@
+time=2026-10-07T19:46:16.372+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    panel_transport_35r2_test.go:1682: AC#6 RED: the bound door fired 0 time(s), want 1. nativeExitCalls=1 doorRounds=0 maxPostDepth=1 capTripped=false capDepth=0 unparsable=0 unboundSlots=1 evalThrew=1 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+=== RUN   TestShapeA3SecondPagePostStillDelivers
+    panel_transport_35r2_test.go:1712: AC#6 RED: the bound door fired 0 time(s), want 2. nativeExitCalls=2 doorRounds=0 maxPostDepth=1 capTripped=false capDepth=0 unparsable=0 unboundSlots=2 evalThrew=2 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestShapeA3SecondPagePostStillDelivers (0.00s)
+=== RUN   TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    panel_transport_35r2_test.go:1735: AC#6 RED: the bound door fired 0 time(s), want 1. nativeExitCalls=1 doorRounds=0 maxPostDepth=1 capTripped=false capDepth=0 unparsable=0 unboundSlots=1 evalThrew=1 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+FAIL

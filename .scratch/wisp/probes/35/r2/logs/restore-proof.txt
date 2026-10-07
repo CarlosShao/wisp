@@ -1,0 +1,4 @@
+restore proof, re-measured at delivery time (2026-10-07 20:08 +0800):
+  worktree md5  = 3995d6bbb20ec251651544c872f5d359
+  286a7f30 md5  = 3995d6bbb20ec251651544c872f5d359
+  git-diff-exit-code=0 (0 = the four mutant patches left no residue)
