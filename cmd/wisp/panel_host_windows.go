@@ -635,24 +635,53 @@ type pageTransport interface {
 	Init(js string)
 }
 
-// panelPostMessageForwardInit is ticket 35 AC#6's Go-side transport forwarding
-// (orchestrator shape 甲, sub-shape ①, ticket 35:150). The page posts its composer
-// envelope on window.chrome.webview.postMessage (frontend/src/lib/panel.ts:179 and
-// :218 - READ-ONLY for this fleet); left alone that raw string reaches go-webview2's
-// msgcb, is parsed as an RPC frame with id=0 and a method nothing has bound, and
-// dies with no Go-side log and no page-side receipt (ticket 35:52-59). This hook
-// reroutes window.chrome.webview.postMessage into the ALREADY-BOUND
-// window.wispDispatch(raw) - the library's own RPC pipe that dispatchRaw actually
-// reads - so the page's raw envelope arrives at dispatchRaw verbatim. It touches no
-// page file, invents no method name, and does not change C17's roster.
-const panelPostMessageForwardInit = `(function () {
+// panelPostMessageForwardInit is ticket 35 AC#6's Go-side transport forwarding,
+// orchestrator shape 甲 sub-shape ③ (ticket 35:150 as re-ruled 10-07 in ledger A682).
+// The page posts its composer envelope on window.chrome.webview.postMessage
+// (frontend/src/lib/panel.ts:179 and :218 - READ-ONLY for this fleet); left alone that
+// raw string reaches go-webview2's msgcb, parses as an RPC frame whose method nothing
+// has bound (webview.go:131-135 gives ID=0 for an envelope with no id), and dies with
+// no Go-side log and no page-side receipt (ticket 35:52-59).
+//
+// WHY ③ AND NOT THE LANDED ①. Sub-shape ① (commit fb2fb802) replaced that property with
+// "call window.wispDispatch(message)". But the bound stub's only way out of the page is
+// window.external.invoke, and go-webview2 implements it in its own document script -
+// pkg/edge/chromium.go:112, verbatim:
+//
+//	e.Init("window.external={invoke:s=>window.chrome.webview.postMessage(s)}")
+//
+// which reads the chrome.webview.postMessage PROPERTY at call time. So ① pointed the
+// library's exit back at the wrapper it had just installed: wrapper -> wispDispatch ->
+// invoke -> postMessage -> the same wrapper -> a deeper nested frame -> ... The native
+// exit was never called, Go received nothing and the page recursed until the stack gave
+// out (35-v1 verdict G2-4, ledger A682 §2).
+//
+// So this hook captures the native exit FIRST (var native = cw.postMessage) and hands
+// the library's own RPC frames back to it untouched; only a call that did not originate
+// inside the wrapper is folded into the bound door. That is sound because the stub's
+// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+// register window._rpc[seq], invoke, then return the promise), so one boolean re-entry
+// flag distinguishes "the page posted" from "the library is sending a frame". Frames
+// that go back to the native exit are forwarded byte-for-byte - nothing here re-parses
+// or re-serialises them, which is also why this shape, unlike a frame-sniffing one,
+// cannot quietly mangle a legitimate call.
+//
+// The door is addressed as window.<binding name> built from the Go-side constant
+// panelDispatchBinding (fmt.Sprintf), never spelled out in the JS text, so renaming the
+// binding on the Go side cannot leave this hook aiming at a door that no longer exists.
+// Touches no page file, binds nothing new, and leaves C17's roster unchanged.
+var panelPostMessageForwardInit = fmt.Sprintf(`(function () {
   var cw = window.chrome && window.chrome.webview;
   if (!cw || cw.__wispForwardInstalled) { return; }
   cw.__wispForwardInstalled = true;
+  var native = cw.postMessage;
+  var inside = false;
   cw.postMessage = function (message) {
-    if (typeof window.wispDispatch === "function") { window.wispDispatch(message); }
+    if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+    inside = true;
+    try { return window.%[1]s(message); } finally { inside = false; }
   };
-})();`
+})();`, panelDispatchBinding)
 
 // installPanelTransport is the ONE place the page<->host inbound transport is
 // wired. It binds the wispDispatch door (whose Go callback feeds dispatchRaw) and
