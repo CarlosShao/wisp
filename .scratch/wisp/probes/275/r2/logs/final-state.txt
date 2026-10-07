@@ -1,0 +1,23 @@
+=== final state ===
+log: 7170d5ab 275-r2 交件：AC#6 正控进攻原始读数＋六项门禁＋还原自证＋impl.md
+log: 355f05e2 275-r2 落 AC#6 两件事：:355 banner 改实话 ＋ --self-test 补一枚行为级"报名字"正控
+log: 7b3a7b8a 自纠（时刻戳）＋台账 A669 第 5 段：我在 A668/A669 与票 275/276 抬头写的 13:4x／13:5x 是**当时还没到的未来时刻**
+log: dd71a487 275-r2 起手锚：attrib.sh 未改动（md5 77ee11a8／459 行）＋改前两发原始读数
+log: 381f18be 立票 276（第二桩归口票）＋台账 A669：票 275 那句"另立一票"落成盘上对象；★不做〔已裁，非结案〕＝状态，⛔ 今天不排腿
+my commits: dd71a487 / 355f05e2 / 7170d5ab
+porcelain total now = 753 (anchor 753; my 14 evidence lines absorbed)
+porcelain under probes/275/r2 = 1 (0 = everything committed)
+attrib.sh: md5=3475f583fc237ec1b6aada3dc6c9ca82 lines=549 vs HEAD diff=0
+other legs' samples vs HEAD = 0
+tracked .go = 935
+porcelain cmd:      0
+porcelain internal: 0
+porcelain scripts:  0
+porcelain .github:  0
+porcelain frontend: 0
+porcelain design:   31
+porcelain docs:     0
+=== last self-test run on the committed file (re-confirm) ===
+attrib.sh: --self-test cases=9 failures=0
+attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns
+selftest rc=0

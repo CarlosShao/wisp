@@ -2,7 +2,7 @@
 
 写码腿 `275-r2`，起手 HEAD `381f18be`（派单写的 `3d443cb9` 之后另一腿在共享树里立了票 276，见 §7-1）。
 只动一枚文件：`.scratch/wisp/probes/161/r5/attrib.sh`（A668 第 5 段的具名解冻面）。
-笔次：`dd71a487`（起手锚）→ `355f05e2`（两件事落地）。⛔ 没 push（机主 10-07：暂时不推远程）。
+笔次：`dd71a487`（起手锚）→ `355f05e2`（两件事落地）→ `7170d5ab`（证据件＋本文件）→ 收尾笔（`logs/final-state.txt`）。⛔ 没 push（机主 10-07：暂时不推远程）。
 
 ---
 
@@ -170,7 +170,8 @@ MUT2 cases=9 failures=1
 - `.github/**` 自我而起手：`git diff --numstat 3d443cb9 HEAD -- .github` ＝ **0 行**。
 - 终态"与 HEAD 有差的跟踪件"整表 ＝ 31 行：`design/**` 20 枚、`probes/161/r6/logs/flip-*` 8 枚、`.gitignore`、`probes/152/my152.py`、`probes/268/v1/evidence.md`——⛔ 一枚不是我改的（`attrib.sh` 不在表里），逐枚见 `logs/restoration-proof.txt`／`logs/restoration-proof2.txt`。
 - 删除：我一个没删（`git diff --name-status --diff-filter=DRAM HEAD` 里无 D 项属我）。
-- 笔次自数：`dd71a487`＝6 files（`anchor.txt`＋5 件 logs），`355f05e2`＝1 file（`attrib.sh`），本次证据笔见 commit 回显。⛔ 没有 `.out` 扩展名（根 `.gitignore:8` 那条全仓 `*.out` 会静默吞件）；stderr 件用了 `.err`（不在派单列举的 `.txt/.tsv/.md` 里），盘上尺＝它们都以 `??` 出现在 `git status` 且第一笔 `git show --stat` 里逐枚可见 ⇒ 未被 ignore，收档尺成立。
+- 笔次自数：`dd71a487`＝6 files（`anchor.txt`＋5 件 logs），`355f05e2`＝1 file（`attrib.sh`），`7170d5ab`＝18 files（`impl.md`＋17 件 logs），收尾笔＝`logs/final-state.txt`＋本文件这两处更正。⛔ 没有 `.out` 扩展名（根 `.gitignore:8` 那条全仓 `*.out` 会静默吞件）；stderr 件用了 `.err`（不在派单列举的 `.txt/.tsv/.md` 里），盘上尺＝它们都以 `??` 出现在 `git status` 且第一笔 `git show --stat` 里逐枚可见 ⇒ 未被 ignore，收档尺成立。
+- 交完证据笔之后的终态（`logs/final-state.txt`）：porcelain 总枚数回到 **753＝锚点值**（我那 14 枚证据件被吸收；当时读到的 765 是别人在飞物＋我未提交件叠出来的），`probes/275/r2` 只剩 1 行＝`final-state.txt` 自己（即收尾笔的内容）；`attrib.sh` vs HEAD **0 行差**、md5 `3475f583…`／549 行；两枚别人的台件 vs HEAD **0 行**；`git ls-files '*.go'`＝**935**；六族 0 行＋`design` 31 行＝起手值；**在已提交的那枚文件上再跑一次 `--self-test` ⇒ `cases=9 failures=0`／rc=0**（终态自证，不是改前那一发）。
 
 ---
 
