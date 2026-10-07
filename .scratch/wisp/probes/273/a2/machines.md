@@ -345,3 +345,16 @@ github.com/CarlosShao/wisp/internal/tools
 5. **`error.ack` 归 C 档的依据**是"`Close()` 拆定时器"这一读码推理（`machine.go:169-174`＋`models.go:304/:321`），**没有**时间测量；如果哪天 `handOffModel` 在 return 前做够 10s 的事，这一格会变。
 6. **§2 的 12 枚重名去重后＝50**，但"每枚名字分布在几枚行上"我只在表里逐名标了行号，**没有**单独给"每枚名字出现的次数分布尺输出"（`uniq -c` 我跑了 `uniq -d`，见 2.1 那句）。
 
+
+---
+
+## §6 终态自查（照实报，不抹平）
+
+```
+$ git status --porcelain -- cmd internal docs
+ M docs/reports/pending-and-issues.md
+```
+
+⇒ **与起手（空）不一致，但⛔ 不是本腿动的**：起手锚 `15699a2f`＋`git status --porcelain -- cmd internal docs`＝空（见 §0），本腿四次 commit 的 pathspec 一律只指 `.scratch/wisp/probes/273/a2/**`（`git show --stat` 逐枚可查：91/378/72/28 行全在那一枚目录内）。那 20 行新增是**同一共享工作树里别处（编排者台账写作）**落的，内容写着"6. 两处我自己现量对回的数／7. 顺手销掉 A653 §5 那格"，并把我 §3ⓓ 的形状问题记成"转给 `273-a2` §3 具名报回后再裁"。我未改、未还原、未提交它（⛔ 禁 `checkout .`/`stash`/`clean`），只把那枚 diff 的 28 行原文落到 `logs/other-leg-diff-on-ledger.txt` 作终态证据。
+
+**本腿零产码改动**：`cmd/`、`internal/`、`docs/` 三棵树内我一枚文件都没写、没删；未跑任何 `go test`（只用 `grep`／`find`／`git`／`go list`）。
