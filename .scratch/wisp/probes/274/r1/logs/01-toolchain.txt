@@ -1,0 +1,26 @@
+=== node --version ===
+v24.9.0
+=== npm --version ===
+11.6.0
+=== bash which node npm ===
+/d/work/server/node14/node
+/d/work/server/node14/npm
+=== powershell Get-Command node,npm ===
+
+Name     Source                        
+----     ------                        
+node.exe D:\work\server\node14\node.exe
+npm.ps1  D:\work\server\node14\npm.ps1 
+
+
+
+=== powershell Get-Command go.exe,gcc.exe,npm.cmd ===
+
+Name    Source                                 
+----    ------                                 
+go.exe  D:\work\base\go\bin\go.exe             
+npm.cmd D:\work\server\node14\npm.cmd          
+gcc.exe E:\work\base\msys64\mingw64\bin\gcc.exe
+
+
+

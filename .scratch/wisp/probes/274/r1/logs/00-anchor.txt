@@ -1,0 +1,39 @@
+=== date ===
+Wed Oct  7 11:48:31 CST 2026
+
+=== git rev-parse --short HEAD ===
+89114888
+
+=== branch ===
+dev
+
+=== git status --porcelain -- cmd internal scripts tools .github docs frontend ===
+(empty above = clean)
+
+=== sed -n '60,80p' scripts/build.ps1 ===
+}
+# Pitfall (see docs/BUILD.md): mingw gcc fails silently when its bin directory
+# is not on PATH, even when invoked by full path. Prepend it so both the gcc
+# driver and cgo's compiler invocations resolve its helper DLLs and tools.
+$ccDir = Split-Path -Parent $cc
+if (-not ($env:PATH -like "*$ccDir*")) { $env:PATH = "$ccDir;$env:PATH" }
+$ccVersionLine = (& $cc --version | Select-Object -First 1)
+Write-Host "build.ps1: toolchain: $($goVersionLine); CC=$cc ($ccVersionLine)"
+
+# --- 1. fetch-deps ----------------------------------------------------------
+& (Join-Path $PSScriptRoot 'fetch-deps.ps1') -RepoRoot $RepoRoot
+if ($LASTEXITCODE -ne 0) { Fail 'fetch-deps.ps1 failed (see output above).' }
+
+# --- 2. frontend ------------------------------------------------------------
+Write-Host 'build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)'
+
+# --- 3. go build ------------------------------------------------------------
+function Get-DepsValue([string]$Section, [string]$Key) {
+    $inSection = $false
+    foreach ($raw in (Get-Content -LiteralPath (Join-Path $RepoRoot 'deps.toml'))) {
+        $line = $raw.Trim()
+
+=== git ls-files frontend/dist ===
+frontend/dist/.gitkeep
+count:
+1
