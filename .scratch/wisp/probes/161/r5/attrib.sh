@@ -341,6 +341,25 @@ ruler_a() {
     A_OUT=$(git ls-files -z '*.go' | xargs -0 "$GOFUMPT" -l 2>&1) || A_RC=$?
     if [ "$A_RC" -gt 1 ]; then
         echo "attrib.sh: (A) gofumpt exited $A_RC on the tracked set (>=2 means a file would not parse) - the tracked tree is not readable by this ruler" >&2
+        # 275-r1 / A663 (shape 丁): print the per-file roster gofumpt DID emit (A_OUT)
+        # to stdout BEFORE exiting, so this step is red WITH names instead of red with
+        # zero names (the rc=2 path used to exit here, before the loop below ever ran).
+        # Nothing about the verdict moves: exit code stays 2, the >1 guard stays, the
+        # denominator stays every tracked *.go, .scratch/** is not excluded, and no
+        # sample is touched. gofumpt -l lists every file that needs formatting on stdout
+        # and prints the parse-error diagnostic on stderr even while exiting non-zero, so
+        # A_OUT already carries one row per flagged file plus that diagnostic; this only
+        # makes those already-computed rows visible. Raw as gofumpt printed it (repo-
+        # relative path; backslashes on Windows, forward slashes in a CI checkout).
+        if [ -n "$A_OUT" ]; then
+            echo "== (A) per-file roster gofumpt emitted before it hit an unparseable file (stdout; exit code unchanged, denominator unchanged):"
+            while IFS= read -r roster_line; do
+                [ -n "$roster_line" ] || continue
+                printf '   A-ROSTER	%s\n' "$roster_line"
+            done <<EOF
+$A_OUT
+EOF
+        fi
         exit 2
     fi
     A_LINES=0
