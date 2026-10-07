@@ -339,7 +339,88 @@ select { case rp.tasks <- fn: rp.mu.Unlock(); return true
 
 ## S6 终态自证
 
-见本件末尾「S6 输出原文」小节（与 `git status`／`git show --stat HEAD` 实测同批写入）。
+### 6.1 六族路径 status ＝ 与起手逐字相同
+
+```
+$ git status --porcelain -- cmd internal scripts tools .github docs frontend
+（空 —— 与起手锚 367e41b3 时的输出逐字相同）
+```
+- 起手：`367e41b3`（dev，2026-10-07 11:31:51 +0800），六族 status **空**。
+- 终态：六族 status **仍空** ⇒ 本腿没碰任何产码/spec/CI/前端文件。
+- ⚠ 全仓 `git status --porcelain` 非空（` M .gitignore`、`.scratch/wisp/probes/152/**`、`…/161/r6/logs/**` 等别人在飞的未提交件），
+  **一律不属本腿、未还原、未提交、不评价**（派单 §0 的规矩）。本腿的 add/commit 两条命令每次都带字面量
+  `-- .scratch/wisp/probes/35/a1`，没有 `-A`、没有 `.`。
+
+### 6.2 本腿的 commit 名册（全部只 commit、零 push）
+
+| # | 短哈希 | 内容 |
+|---|---|---|
+| 1 | `6f132ca8` | S0 起手锚 |
+| 2 | `cdffb610` | S1 宿主＋库能力面 |
+| 3 | `95b1bb0c` | S2 装配线＋S3 线程/再入 |
+| 4 | `8976ffab` | S4 页侧桥面＋S5 禁区与代价表 |
+| 5 | 本笔 | S6 终态自证 |
+
+### 6.3 纪律自陈（哪条用了什么尺）
+
+- ⛔ 零 `go test` / `go build` / `go vet`。只用了 `go list -deps`（`logs/01-golist-deps.txt`）与两枚 `go doc -all`
+  （`logs/01-godoc-webview2.txt`、`logs/01-godoc-edge.txt`）——都是只读命令，**没有换尺**，也不占 `272-v1` 的包级互斥。
+- ⛔ 未进 `D:/wt/fe` 那棵树；页侧读数全部走 git 对象层（`git show <ref>:<path>`／`git grep <pat> <ref> -- 'frontend/src'`），
+  ref 解析 `dsh/feat/frontend-p0-v2` ＝ `16c2f038`（`logs/03a-panel-ts.txt` 第 1 节）。
+- 负判决一律用**目录形式** `-- 'frontend/src'`，未使用会跳过 `App.tsx` 的 `*.tsx` glob 那一支。
+- 每枚负向读数都带正控（S4.4、S1.2.甲、S2.1、附表 #3/#5）。
+- 长行整行读（探针 393 行／14358 字节按行读，无 `cut -c`）。
+- 中文正文全部 `Write`/`Edit` 落盘；commit 消息走 `-F "$HOME/tmp/msg-35a1-c1.txt"`（第 1 笔）或 `-q -m "…"`（后续，纯 ASCII），
+  **未用未加引号 heredoc**。
+- 调用数闸门：第 25 次调用前后已落第 2 笔（`cdffb610`），第 40 次后无条件落第 3 笔（`95b1bb0c`）；未 push。
+- ⛔ 未动 `design/**`、未动 SLO 阈值／golden／`thresholds.go`、未给 CI 加 `-tags winlive`、未新造 `C##`、未加白名单名。
+
+### 6.4 本腿**没有**做完的格（如实）
+
+1. **S3.2-⑤ 的再入形状是读码推的，未真机量过**——本腿零编译零运行，做不到真机；派单若要以「Eval 闭包内不许阻塞」为前提，应另派带 `winlive` 真机量的腿。
+2. **S4.2-丁（`chrome.webview.addEventListener('message')`）只证到「本仓零先例」，没证到「WebView2 实际可行／不可行」**——
+   需要真机或官方头文件才能定；本腿按规矩写「取不到仓内写法」而不是「没有」。
+3. **探针 `-mode eval`／`eval-disp` 的实际运行结果（EVAL_SEEN 还是 EVAL_NOT_SEEN）没有仓内留档可引**——
+   `probes/33/p1/q2/` 目录里只有 `main.go` 一枚（`ls` 实测），票头的叙述说测过，我没找到原始 log；引用时引的是**票头文字**（`:21-25`、`:29-33`），不是运行输出。
+4. **S2.3 表是代价表，不是方案**——选形归编排者，本腿没选。
+
+## S7 补正（追加，不改写上面任何原话）
+
+S6.4-③ 那句「探针运行结果没有仓内留档可引」**是本腿的错**：我只 `ls` 了 `probes/33/p1/q2/` 一枚目录。
+真留档在 `probes/33/p1/logs/`（原始输出已抄进 `logs/04-probe-verdicts.txt`）。实测读数如下，它们**收窄了 S3.2-② 与 S1.2.丙-③**：
+
+### 7.1 探针真机读数（页面自己的话为判据）
+
+| 跑法 | Go 侧发起 | 页面回执 | 观测延迟 | 收尾 |
+|---|---|---|---|---|
+| `-mode eval`（`q2-eval-1.txt`） | `PUSH issued via w1.Eval (ExecuteScript) on UI thread at_ms=600` | `EVAL_SEEN title=P1Q2-OK-33 polls=3` at_ms=757 | **157ms** | `RESULT=RUN-RETURNED` |
+| `-mode eval`（`q2-eval-3.txt`） | 同上 at_ms=600 | `EVAL_SEEN …` at_ms=745 | 145ms | ⚠ `RESULT=HOST-NEVER-FINISHED`（收到了，但线程没收口） |
+| `-mode eval-disp`（`q2-evaldisp-1.txt`） | `PUSH issued via Dispatch->Eval at_ms=718`（另一条 goroutine 发起） | `EVAL_SEEN title=…-DISP polls=3` at_ms=873 | **155ms** | `RESULT=RUN-RETURNED` |
+
+⇒ **S3.3 那枚「跨线程投球」形状在真机上收到过页面确认**（`eval-disp` 就是从另一条 goroutine 走 `Dispatch→Eval`），延迟 ~155ms、页面轮询 3 拍命中。
+
+### 7.2 ⚠ 修正 S3.2-② 的一句话：`Eval` 与 `Dispatch` **不是同一扇门**，手写泵只关得掉后者
+
+`receipt-selfpump-1.txt` ＋ `selfpump` 那一跑逐字：
+```
+VERDICT selfpump: receipt DID NOT reach the page (awaited value never resolved in 1 reports)
+FORM=selfpump EVAL_ISSUED at=800ms (direct w.Eval on the UI thread, bypassing Dispatch/dispatchq)
+FORM=selfpump ECHO_CALLS=0 … REPORT_FIRST="EVAL_SEEN title=EVAL-OK-33P1 polls=4" REPORT_LATENCY_MS=907 PANICS=0
+VERDICT selfpump+evalcheck: a direct Go-side Eval DID reach the page … even though the binding reply did not
+                            -> push and reply are two different hops
+```
+⇒ 精确表述应为：**`Eval` 是直达 COM 的调用（`chromium.go:144 ExecuteScript.Call`），不经 `dispatchq`，因此在手写泵下照样落到页面；
+只有 `Dispatch` 排的队（含库自己的绑定回执）必须靠 `Run()` 来抽。**
+⇒ 对上文的连带收窄：S1.2.丙-③ 与 S3.2-② 里「手写泵会让 Go→页整条静默失效」这句，
+**只对「经 `Dispatch` 的那一支」成立**；`panel_resident_windows.go:23` 原文讲的也正是「a host that pumps by hand can never deliver a **Go -> page reply**」（reply，不是 push）。
+⇒ 对派单的实用后果：若落地形选「UI 线程上直接 `Eval`」，它**不依赖 `Run()`**；
+若选「别的 goroutine 发起」（即泵那条线程），就**必须**有 `Run()` 在抽队——而 `post()`（S3.3）恰好两态都覆盖，这也是它仍是最有先例那一形的原因。
+⚠ 另一条别漏：`q2-eval-3.txt` 的 `HOST-NEVER-FINISHED` ⇒ **push 成功与线程能收口是两格**，落地票要分开验。
+
+### 7.3 S6.4-③ 作废
+
+该项（「探针实际运行结果没有仓内留档可引」）**不成立**，以本节 7.1/7.2 为准；原话保留不抹。
+S6.4 余下 ①②④ 三条仍然有效。
 
 ## 附：本腿推翻／收窄了派单里的哪几句
 

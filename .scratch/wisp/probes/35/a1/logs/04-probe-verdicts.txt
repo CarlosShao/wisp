@@ -1,0 +1,50 @@
+### q2-eval-*.txt and q2-evaldisp-1.txt full
+----- .scratch/wisp/probes/33/p1/logs/q2-eval-1.txt (9 lines)
+time=2026-10-02T19:45:53.141+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-watchdog owner=33-p1-q2
+time=2026-10-02T19:45:53.143+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-usta owner=33-p1-q2
+MODE=eval CREATE1 ok in 0ms
+PUSH issued via w1.Eval (ExecuteScript) on UI thread at_ms=600
+REPORT_TEXT page-said="EVAL_SEEN title=P1Q2-OK-33 polls=3" at_ms=757
+WATCHDOG forced WM_QUIT to tid=25952 r=1 err=The operation completed successfully. (readings tainted)
+MODE=eval RESULT=RUN-RETURNED
+MODE=eval WMAPP_DEQUEUED=0 REPORTS=1 FIRST_REPORT_MS=757 EVAL_ISSUED=true EVAL_AT_MS=600 QUIT_FORCED=true PANICS=0 SINK_WRITES=0
+VERDICT eval: page reported (1) - see REPORT_TEXT for EVAL_SEEN / EVAL_NOT_SEEN
+----- .scratch/wisp/probes/33/p1/logs/q2-eval-3.txt (8 lines)
+time=2026-10-02T19:48:24.344+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-watchdog owner=33-p1-q2
+time=2026-10-02T19:48:24.346+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-usta owner=33-p1-q2
+MODE=eval CREATE1 ok in 0ms
+PUSH issued via w1.Eval (ExecuteScript) on UI thread at_ms=600
+REPORT_TEXT page-said="EVAL_SEEN title=P1Q2-OK-33 polls=3" at_ms=745
+MODE=eval RESULT=HOST-NEVER-FINISHED
+MODE=eval WMAPP_DEQUEUED=0 REPORTS=1 FIRST_REPORT_MS=745 EVAL_ISSUED=true EVAL_AT_MS=600 QUIT_FORCED=false PANICS=0 SINK_WRITES=0
+VERDICT eval: page reported (1) - see REPORT_TEXT for EVAL_SEEN / EVAL_NOT_SEEN
+----- .scratch/wisp/probes/33/p1/logs/q2-evaldisp-1.txt (10 lines)
+time=2026-10-02T19:50:27.047+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-watchdog owner=33-p1-q2
+time=2026-10-02T19:50:27.049+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=p1q2-usta owner=33-p1-q2
+MODE=eval-disp CREATE1 ok in 0ms
+PUSH issued via Dispatch->Eval at_ms=718
+REPORT_TEXT page-said="EVAL_SEEN title=P1Q2-OK-33-DISP polls=3" at_ms=873
+WATCHDOG clean exit: page reported, WM_QUIT posted to tid=20060
+MODE=eval-disp RESULT=RUN-RETURNED
+MODE=eval-disp WMAPP_DEQUEUED=0 REPORTS=1 FIRST_REPORT_MS=873 EVAL_ISSUED=true EVAL_AT_MS=718 QUIT_FORCED=false PANICS=0 SINK_WRITES=0
+VERDICT eval-disp: page reported (1) - see REPORT_TEXT for EVAL_SEEN / EVAL_NOT_SEEN
+[1002/195031.182:ERROR:ui\gfx\win\window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1412
+
+### receipt-run-1 / receipt-selfpump (the Run-vs-handpump pair)
+----- .scratch/wisp/probes/33/p1/logs/receipt-run-1.txt
+time=2026-10-01T12:35:52.188+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=probe33p1-watchdog owner=33-p1
+FORM=run RESULT=RUN-RETURNED (WM_QUIT consumed the library loop)
+FORM=run ECHO_CALLS=3 ROUNDS_WANT=3 WMAPP_DEQUEUED=0 WMAPP_WITH_HWND=0 OTHER_DEQUEUED=3 REPORTS=1 REPORT_FIRST="0=echo:ping-0;1=echo:ping-1;2=echo:ping-2" REPORT_LATENCY_MS=107 QUIT=not-sent (host finished on its own) PANICS=0
+FORM=run REPORT_RAW=0=echo:ping-0;1=echo:ping-1;2=echo:ping-2
+VERDICT run: receipt REACHED the page in 1 of 1 reports
+----- .scratch/wisp/probes/33/p1/logs/receipt-selfpump-1.txt
+time=2026-10-01T12:35:32.601+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=probe33p1-watchdog owner=33-p1
+FORM=selfpump ECHO_CALLS=3 ROUNDS_WANT=3 WMAPP_DEQUEUED=4 WMAPP_WITH_HWND=0 OTHER_DEQUEUED=27 REPORTS=1 REPORT_FIRST="0=NOT_RESOLVED;1=NOT_RESOLVED;2=NOT_RESOLVED" REPORT_LATENCY_MS=6150 QUIT=not-sent (host finished on its own) PANICS=0
+FORM=selfpump REPORT_RAW=0=NOT_RESOLVED;1=NOT_RESOLVED;2=NOT_RESOLVED
+VERDICT selfpump: receipt DID NOT reach the page (awaited value never resolved in 1 reports)
+----- .scratch/wisp/probes/33/p1/logs/receipt-selfpump-evalcheck.txt
+time=2026-10-01T12:48:39.047+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=probe33p1-watchdog owner=33-p1
+FORM=selfpump EVAL_ISSUED at=800ms (direct w.Eval on the UI thread, bypassing Dispatch/dispatchq)
+FORM=selfpump ECHO_CALLS=0 ROUNDS_WANT=3 WMAPP_DEQUEUED=1 WMAPP_WITH_HWND=0 OTHER_DEQUEUED=27 REPORTS=1 REPORT_FIRST="EVAL_SEEN title=EVAL-OK-33P1 polls=4" REPORT_LATENCY_MS=907 QUIT=not-sent (host finished on its own) PANICS=0
+FORM=selfpump REPORT_RAW=EVAL_SEEN title=EVAL-OK-33P1 polls=4
+VERDICT selfpump+evalcheck: a direct Go-side Eval DID reach the page ([EVAL_SEEN title=EVAL-OK-33P1 polls=4]) even though the binding reply did not -> push and reply are two different hops
