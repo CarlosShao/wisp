@@ -1,0 +1,28 @@
+# 272-v1 终态整包名册 (go test -v ./cmd/wisp ./internal/... -count=1, raw 留 /d/tmp/wisp272v1/end-raw.txt)
+END-RC=END-RC=1
+END-RC=1
+END 四数 RUN/PASS/FAIL/SKIP = 2174/1471/7/8
+START 四数 = 2174/1472/6/7
+## 具名红 (end):
+  --- FAIL: TestPanelHostRealWindowHopAndLifecycle (0.41s)
+  --- FAIL: TestC21TableColourRowsMatchTokensCSS (0.02s)
+  --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+  --- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+  --- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.13s)
+  --- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+  --- FAIL: TestResolvePerCallBudget (1.66s)
+## named-FAIL diff start->end (新增):
+  > --- FAIL: TestPanelHostRealWindowHopAndLifecycle
+## TestPanelHostRealWindowHopAndLifecycle 单跑 clean HEAD = PASS 0.85s ⇒ 该红为带载/环境性 flake，非本票 52 行引入
+## cmd/wisp 包 (end): FAIL	github.com/CarlosShao/wisp/cmd/wisp	376.396s
+## TestTicket223 全族 (end suite):
+  --- PASS: TestTicket223RunArmsTheReloadTick (2.04s)
+  --- PASS: TestTicket223HandEditedFsLooseningCostsAnL2Card (2.06s)
+  --- PASS: TestTicket223RefusedLooseningKeepsOldValues (5.06s)
+  --- PASS: TestTicket223TighteningRaisesNoCard (1.98s)
+  --- PASS: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (2.02s)
+  --- PASS: TestTicket223RestartTierSaysItWillNotApply (1.98s)
+  --- PASS: TestTicket223FailureSentencesAreDistinct (9.17s)
+  --- PASS: TestTicket223PanelInboundSaysHotReloadIsDisabled (0.01s)
+  --- PASS: TestTicket223PermissionDeniedSitsInItsOwnSentence (2.21s)
+  --- PASS: TestTicket223R2FailureSentenceRouting (0.59s)

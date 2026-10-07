@@ -103,11 +103,20 @@ will not use the new values. stdout before the plant: ...
 ### AC#4 — 不许误伤真绿 —— **成立（对本腿测到的形）**
 - `cur`（无 overlay，横幅不含这些字样）：`logs/AC4-headruler-cur.txt` = **PASS 2.09s**。
 - `PART`（横幅只含"需要重启进程"、**不含**"本次运行不会生效"那五字）：`logs/AC4-headruler-PART.txt` = **PASS 2.12s**＝边界不误伤。
-- 同族回归 `-run TestTicket223`：见 §末"未做完格"里补跑读数（若被 40 帽截断则具名登记）。
+- 同族回归 `-run TestTicket223`（本腿自跑 `logs/AC4-family-223.txt`）：**10 PASS / 0 FAIL / 0 SKIP**，含被审那枚；
+  终态整包里 TestTicket223 全族亦 10 枚全绿（`logs/G-end-rednames.txt`）。兄弟用例一枚没被误伤。
 - ⚠ 但"不误伤"的**反面**（该响的没响）由 AC#2 注脚与 §2 进攻(ii) 触及：post-mark 欢迎语形仍漏，见 §2。
 
-### AC#5 — 门禁四数 —— **判不动 / 部分**（详 §末；本腿在 40 帽前优先保 §1–§3 正文，门禁读数尽力跑）
-起手整包名册已在 §0 给出（2174/1472/6/7）。终态作差、d22scan 正控、gofmt/gofumpt/vet 的落点见 §末未做完格具名。
+### AC#5 — 门禁四数 —— **成立（含一枚具名、已定性为环境 flake 的作差非零）**
+本腿自跑（`logs/AC5-d22scan.txt`／`logs/AC5-gates.txt`）：
+- `sh scripts/d22scan.sh` **rc=0**，且脚本**先跑种子违规正控**（`runtests.sh OK PASS=35/FAIL=0`，含 `TestBuiltBinaryGoesRedEndToEnd`）
+  ⇒ 证明门**能红**，随后的全扫"clean"才不是假绿；被审 `cmd/wisp` 落在 ban #8 覆盖的 `cmd/ 104 Go files（含 _test.go、含注释）`，无违例。
+- `gofmt -l` 只喂两枚 `.go`：**clean**；`gofumpt v0.12.0 -l`（GOPATH/bin/gofumpt.exe）：**clean**；`go vet ./cmd/wisp/`：**rc=0**。
+- 终态整包名册（`logs/G-end-rednames.txt`）：RUN/PASS/FAIL/SKIP = **2174/1471/7/8**，起手 = **2174/1472/6/7**。
+  **逐名作差＝ +1 红**：`TestPanelHostRealWindowHopAndLifecycle`（`cmd/wisp`，真面板宿主窗口用例）。
+  本腿单跑它对 clean HEAD ⇒ **PASS 0.85s**，且本腿全程 overlay、工作树 `cmd`/`internal` 逐字节未变（起手与终态跑的是同一份码），
+  ⇒ 该红是**带载/环境性 flake**（票 AC#5 已具名同类 `TestTenOpsInOneToolCallGetOneConfirm` 不许为它改断言），**非那 52 行引入**；SKIP 7→8 同属面板宿主抖动族。
+  ⇒ 严格"作差＝0"这一格**未做到字面 0**，但增量一枚已定性为环境噪声、与本票产码无关；本腿**未放宽任何断言**。
 
 ### AC#6 — 还原自证 —— **成立（本腿全程 overlay，零原地编辑）**
 全部突变走 `go test -overlay`，拷贝在仓外 `D:/tmp/wisp272v1/mut/<形>/`；本腿只写 `.scratch/wisp/probes/272/v1/**`。
@@ -168,3 +177,39 @@ plant is inside the window and is caught by arm 2's count"）在**单份**情形
    落地后 **横幅（pre-plant）这一半被 arm1 堵了**，**欢迎语（post-mark）这一半本腿实测仍不响**（进攻(ii)）。
    ⇒ 若票面"复制进欢迎语"是真实前向场景，**本票目标未完全达成**；要钉死它需要一个 plant 与该句之间的**同流因果锚点**，
    而产码里不存在（操作员句在 `config_reload.go:321-326`、`state=applied` 在 `:179` 更晚），造锚点＝改产品文案＝票 `:40` 禁区＋需人工批准。
+
+---
+
+## §5 未做完的格（逐条具名，⛔ 不留空话）
+
+1. **AC#2 的"乙／丙两支候选尺"未由本腿各自 overlay 复跑**：本腿只独立复现了 `M`(AC#1/AC#2)、`cur`/`PART`/`REPEAT`/`MDEL`，
+   并用**进攻(i)**（arm1 阈值翻转 → `M` 翻绿）间接钉死"甲/arm2 单独对 `M` 零牙"这一承重点。
+   实现件 §5.2 的"乙在 M 上 PASS 2.88s（乙＝无操作）"与"丙在 cur 上 FAIL 42.20s（丙误伤真绿）"两发，本腿**未自跑复现**，
+   仅采信其方向（与我读的机制一致：`mark` 已在全部启动输出之后 ⇒ 乙无操作；操作员句早于 `state=applied` ⇒ 丙钉因果序即钉死假绿）。
+   ⇒ 若裁决要三形各自读数齐，这一格本腿缺两份自跑。
+2. **AC#6 的 porcelain 未逐字等于 §0 起手**：终态 `git status --porcelain -- cmd internal` 多出 `?? internal/winsec/wisp129-dr-15652/`——
+   系本腿两次整包 `go test ./internal/...` 期间 winsec 用例留下的**测试产物目录**（非本腿 authored 代码、非跟踪文件改动）。
+   按票面"临时件只建不删"（`issues/README` 规则 8），本腿**不删它**、如实登记。`cmd/` 侧 porcelain 为空、跟踪文件零改动（见 §6）。
+3. **形定义复用 `272-r2` 的仓外拷贝**（`mut/M`／`MDEL`／`PART`／`REPEAT` 的 `config_reload.go`）：本腿**读数全自跑**，
+   但 `M`/`MDEL`/`PART`/`REPEAT` 四形的**产码突变内容**用的是实现件留在 `/d/tmp/wisp272r2/` 的那份形定义（本腿已 `diff` 对拉确认＝票面语义），
+   非本腿从票面散文另起炉灶重建。进攻(i)/(ii) 两发的突变文件则是本腿自建。
+
+## §6 终态自证（本腿跑完，一切突变只在 overlay／仓外）
+
+- `git status --porcelain -- cmd internal`：`cmd/` 侧 **0 行**；`internal/` 侧仅 §5-2 那枚测试产物目录。
+  ⇒ **跟踪的产码/测试文件一字未回退、未脏改**（GBK 中途炸留脏的情形未发生：本腿从未原地编辑工作树，全程 `-overlay`）。
+- `git show HEAD:cmd/wisp/config_reload.go | md5sum` = **`5ce441ca5e72b64d18a6c26f1c066882`** ＝ §0 起手基线 ＝ 工作树文件 md5。产码一字未动。
+- `git show HEAD:cmd/wisp/config_reload_223_test.go`（md5 **`2ea71578ba9ca015c535673bc9792d09`**）
+  与 `8d30a862` 版逐字节相同（md5 一致）⇒ 本腿审的版 == 落 HEAD 的版；被审的 52 行内容（arm1 `:594-598`、arm2 `:668-671`、
+  `restartSentence272` `:43`）与本件 §1/§3 的逐条描述**对得上**（arm1 阈值句现于 `:595`、其 `t.Errorf` 现于 `:596`；
+  实现件正文写 `:595`/`:622`/`:647` 系行号口径，本腿现量红点为 `:596`、两枚既有字面为 `:623`/`:648`，见 §3-4）。
+- 本腿只写 `.scratch/wisp/probes/272/v1/**`；两笔 commit 均带显式 pathspec（`1ec9fa19` §0、本笔 §1–§6）。
+- ⛔ 未 push、未 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`、未改 SLO/golden/thresholds/PLAN/specs、未给 CI 加 `-tags winlive`、未放宽任何断言。
+
+---
+
+## 一句话总结（给编排者）
+六格中 **AC#1/AC#3/AC#4/AC#6 成立、AC#2 硬要求成立但"三形选一支"字面不成立（钉 M 的是枚举外新臂 arm1，
+按票 `:21` 合法、不退回）**、**AC#5 成立（静态四数全清，终态作差 +1 枚已定性为面板宿主环境 flake）**。
+**最值钱的一条**：本腿进攻(ii) 造出"post-mark 欢迎语单份"那一形，在落地尺上**仍 PASS** ⇒ 票 `:12` 自陈的"复制进欢迎语尺都不响"
+这一前向风险**没堵死**（arm1 只堵 pre-plant、arm2 只堵 ≥2 份）；实现件把它当"本腿不硬造"的散文残余，本腿把它**跑成了活的假绿**。

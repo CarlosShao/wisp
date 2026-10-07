@@ -1,0 +1,10 @@
+# 272-v1 AC#5 门禁四数（本腿自跑；d22scan 原始读数另见 AC5-d22scan.txt）
+## d22scan (正控先绿 + 全扫) -> rc=0 见 AC5-d22scan.txt 末: 'd22scan: clean - no D22 ban violations'
+## gofmt -l (只喂 .go):
+  clean
+## gofumpt v0.12.0 -l (只喂 .go):
+v0.12.0 (go1.27.1)
+  clean
+## go vet ./cmd/wisp/:
+  vet rc=0 clean
+## AC#4 family -run TestTicket223 -> 10 PASS/0 FAIL/0 SKIP (见 AC4-family-223.txt)
