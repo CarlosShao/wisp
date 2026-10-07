@@ -1,0 +1,8 @@
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx
+dsh/feat/frontend-p0-v2:frontend/src/components/composer.tsx
+dsh/feat/frontend-p0-v2:frontend/src/components/l2-approval-card.tsx
+dsh/feat/frontend-p0-v2:frontend/src/components/result-stream.tsx
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts

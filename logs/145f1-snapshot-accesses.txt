@@ -1,0 +1,10 @@
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:92:snapshot.composer
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:206:snapshot.pending
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:208:snapshot.pending
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:321:snapshot.pending
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:431:snapshot.results
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:457:snapshot.results
+dsh/feat/frontend-p0-v2:frontend/src/App.tsx:461:snapshot.results
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:68:snapshot.pending
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:25:snapshot.results
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:99:snapshot.view

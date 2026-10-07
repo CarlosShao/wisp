@@ -1,0 +1,19 @@
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/status-pill.tsx:22:   Panel status   : mounted: the pending-approval status display in the
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/task-rows.tsx:90:  const row2: "pending" | "failed" | "done" = tick < 3 ? "pending" : tick === 3 ? "failed" : "done";
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/task-rows.tsx:122:        row2 === "pending" ? (
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/tool-chips.tsx:11:   - 四态: pending = 旋转弧（border-line-strong 底 + border-t-ink-2 的弧）；
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/tool-chips.tsx:40:export type ToolStatus = "pending" | "running" | "done" | "denied";
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/tool-chips.tsx:60:/* pending 与 running 共用旋转弧；running 另有 shimmer 的「执行中」字样。 */
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:4:   The 审批中心 view, cut to what PanelSnapshot.pending carries, on the
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:68:  const pending = snapshot.pending;
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:83:          {pending.length}
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:94:      {pending.length === 0 ? (
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:103:          {pending.map((view) => (
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:19:             demo page. The ENGINE is a pending owner decision (external
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:34:  pending: [
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:97:  generatedAt: "2026-09-25T18:40:00+08:00",
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:178:  pending: SHOWCASE_APPROVALS,
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:181:  generatedAt: "showcase",
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:359:  { name: "task.extract", status: "pending" as const, summary: "排队等待 doc.read 完成" },
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:130:  pending: ApprovalCardView[];
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:136:  generatedAt: string;

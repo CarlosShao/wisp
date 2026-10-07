@@ -1,0 +1,200 @@
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/button.tsx:35:import { cva, type VariantProps } from "class-variance-authority";
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/button.tsx:69:export type ButtonVariant = NonNullable<VariantProps<typeof buttonVariants>["variant"]>;
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/button.tsx:76:}: ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof buttonVariants>) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/chat-composer.tsx:27:export type ChatMessage = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/chat-composer.tsx:51:export type ChatComposerLabels = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/code-block.tsx:22:export interface CodeSegment {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/code-block.tsx:27:export interface CodeLine {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/context-cards.tsx:18:export interface ContextItem {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/diff-table.tsx:19:export interface DiffRow {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/filter-table.tsx:36:export type TableRow = { task: string; date: string; status: Status; owner: string };
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/filter-table.tsx:38:export type FilterTableLabels = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/fine-tune-card.tsx:121:export type FineTuneField = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/fine-tune-card.tsx:131:export type FineTuneCardLabels = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/fine-tune-card.tsx:140:export type FineTuneState = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/fine-tune-card.tsx:170:export type FineTuneCardProps = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/fine-tune-card.tsx:188:}: FineTuneCardProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/flowchart.tsx:40:export type StepNode = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/glide-menu.tsx:35:export interface GlideMenuProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/glide-menu.tsx:47:}: GlideMenuProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:131:export type CompareSeries = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:206:            Snapshot
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:245:export type AnomalyData = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:282:          Snapshot
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:355:export type AllocationSegment = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:444:export type InsightPage = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/insight-cards.tsx:487:export type InsightCardsLabels = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/prompt-bar.tsx:31:export interface PromptSource {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/prompt-bar.tsx:37:export interface PromptCommand {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/prompt-bar.tsx:43:export interface PromptModel {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/prompt-bar.tsx:52:export interface PromptPermission {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/prompt-bar.tsx:61:export interface PromptEffort {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/prompt-bar.tsx:66:export interface PromptAttachment {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/prompt-bar.tsx:71:export interface PromptBarProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/prompt-bar.tsx:135:}: PromptBarProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/recommendation-card.tsx:30:export type RecommendationOption = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/recommendation-card.tsx:41:export type RecommendationLabels = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:51:type TagColor = { base: string };
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:81:export type RecordRow = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:196:type Prompt = { before: string; chip?: string; after?: string };
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/records-table.tsx:198:type ColumnMeta = { type: string; tool: string; toolKind: ToolKind; inputs?: string; prompt?: Prompt };
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/search-list.tsx:27:export type SearchListLabels = {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/status-pill.tsx:26:import { cva, type VariantProps } from "class-variance-authority";
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/status-pill.tsx:45:type Tone = NonNullable<VariantProps<typeof statusPillVariants>["tone"]>;
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/streaming-text.tsx:26:export interface StreamingSource {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/thinking.tsx:26:export interface ThinkingStep {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/thinking.tsx:32:export interface ThinkingSource {
+dsh/feat/frontend-p0-v2:frontend/src/components/ai-native/tool-chips.tsx:42:export interface ToolCall {
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:4:   The 审批中心 view, cut to what PanelSnapshot.pending carries, on the
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:26:import type { ApprovalCardView, PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/components/approval-screen.tsx:67:export function ApprovalScreen({ snapshot }: { snapshot: PanelSnapshot }) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ball-screen.tsx:18:export interface BallStateRow {
+dsh/feat/frontend-p0-v2:frontend/src/components/ball-screen.tsx:29:export interface BallRingDemo {
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:4:   The conversation view, cut to what PanelSnapshot actually carries: the
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:22:import type { PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/components/chat-screen.tsx:24:export function ChatScreen({ snapshot }: { snapshot: PanelSnapshot }) {
+dsh/feat/frontend-p0-v2:frontend/src/components/config-screen.tsx:70:interface Row {
+dsh/feat/frontend-p0-v2:frontend/src/components/context-meter.tsx:10:   PanelSnapshot has no field for any of the three yet, and the owner's P9 red
+dsh/feat/frontend-p0-v2:frontend/src/components/context-meter.tsx:25:export interface ContextUsage {
+dsh/feat/frontend-p0-v2:frontend/src/components/error-boundary.tsx:43:interface Props {
+dsh/feat/frontend-p0-v2:frontend/src/components/error-boundary.tsx:51:interface State {
+dsh/feat/frontend-p0-v2:frontend/src/components/error-boundary.tsx:56:export class ErrorBoundary extends Component<Props, State> {
+dsh/feat/frontend-p0-v2:frontend/src/components/firstrun-screen.tsx:59:export interface FirstrunModelRow {
+dsh/feat/frontend-p0-v2:frontend/src/components/firstrun-screen.tsx:70:export interface FirstrunScreenProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/firstrun-screen.tsx:347:}: FirstrunScreenProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/git-branch.tsx:32:export interface GitBranchView {
+dsh/feat/frontend-p0-v2:frontend/src/components/git-branch.tsx:43:export interface GitBranchProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/git-branch.tsx:49:export function GitBranchChip({ view, onCheckout, onNewWorktree }: GitBranchProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/glide-highlight.tsx:47:interface Rect {
+dsh/feat/frontend-p0-v2:frontend/src/components/glide-highlight.tsx:93:export interface GlideHighlightProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/glide-highlight.tsx:119:}: GlideHighlightProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/firstrun-overlay.tsx:13:     FirstrunOverlayProps = FirstrunScreenProps & { onClose: () => void }
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/firstrun-overlay.tsx:26:   FirstrunScreenProps so it spreads directly:
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/firstrun-overlay.tsx:32:import { FirstrunScreen, type FirstrunScreenProps } from "@/components/firstrun-screen";
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/firstrun-overlay.tsx:34:export type FirstrunOverlayProps = FirstrunScreenProps & {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/firstrun-overlay.tsx:39:export function FirstrunOverlay({ onClose, ...screen }: FirstrunOverlayProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/firstrun-overlay.tsx:70:   FirstrunScreenProps so the assembler can spread it and add onClose.
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/firstrun-overlay.tsx:74:export const RB_FIRSTRUN: FirstrunScreenProps = {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:29:   PROPS CONTRACT - full interface in src/fixtures/harness-app.ts
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:30:   (HarnessMainProps); the component is props-driven, no data lives here:
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:46:         Data props as listed in HarnessMainProps.
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:79:  type HarnessMainProps,
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:124:}: HarnessMainProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:172:  quickCommands: HarnessMainProps["quickCommands"];
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:176:  onPickCommand?: (command: HarnessMainProps["quickCommands"][number]) => void;
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:280:  onOpenTab?: HarnessMainProps["onOpenTab"];
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/main.tsx:552:  onOpenTab?: HarnessMainProps["onOpenTab"];
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/monitor-popover.tsx:7:   Props-driven; the ANCHOR (absolute positioning shell) belongs to the
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/monitor-popover.tsx:15:export interface MonitorEnvRow {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/monitor-popover.tsx:20:export interface MonitorAgentRow {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/monitor-popover.tsx:26:export interface MonitorPopoverProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/monitor-popover.tsx:59:export function MonitorPopover({ open, env, agents, onPin }: MonitorPopoverProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/monitor-popover.tsx:118:export const RB_MONITOR: Pick<MonitorPopoverProps, "env" | "agents"> = {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/rail-empty-state.tsx:6:   Props-driven: the assembler passes the action list (e.g. 任务运行 / 审批 /
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/rail-empty-state.tsx:13:export interface RailEmptyAction {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/rail-empty-state.tsx:20:export interface RailEmptyStateProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/rail-empty-state.tsx:25:export function RailEmptyState({ actions, onAction }: RailEmptyStateProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:48:export interface RailOpenRequest {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:53:interface RailTabDef {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:77:interface TreeRow {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:110:interface ReviewFile {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:127:      { sign: "+", text: "export function PromptBar({ sources, commands, models }: PromptBarProps) {" },
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:195:export interface RightRailProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:215:}: RightRailProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/settings-modal.tsx:33:export interface SettingsModalProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/settings-modal.tsx:38:export function SettingsModal({ open, onClose }: SettingsModalProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/settings-page.tsx:29:interface Category {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/sidebar.tsx:13:     - PROPS CONTRACT lives in src/fixtures/harness-app.ts (HarnessSidebarProps
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/sidebar.tsx:49:  HarnessSidebarProps,
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/sidebar.tsx:100:}: HarnessSidebarProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/toast.tsx:28:export interface ToastItem {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/workspace-picker.tsx:42:export interface WorkspaceCurrent {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/workspace-picker.tsx:50:export interface WorkspaceRecent {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/workspace-picker.tsx:56:export interface WorkspacePickerProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/workspace-picker.tsx:67:export type WorkspacePickerData = Pick<WorkspacePickerProps, "current" | "recent">;
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/workspace-picker.tsx:77:}: WorkspacePickerProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/palette-screen.tsx:31:export interface PaletteItem {
+dsh/feat/frontend-p0-v2:frontend/src/components/palette-screen.tsx:38:export interface PaletteGroup {
+dsh/feat/frontend-p0-v2:frontend/src/components/panel-sidebar.tsx:51:export interface TreeSession {
+dsh/feat/frontend-p0-v2:frontend/src/components/panel-sidebar.tsx:59:export interface PanelSidebarProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/panel-sidebar.tsx:156:}: PanelSidebarProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/animated-list.tsx:15:                    AnimatedListProps and AnimatedItemProps interfaces, typed
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/animated-list.tsx:37:interface AnimatedItemProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/animated-list.tsx:45:const AnimatedItem = ({ children, delay = 0, index, onMouseEnter, onClick }: AnimatedItemProps) => {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/animated-list.tsx:64:interface AnimatedListProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/animated-list.tsx:100:}: AnimatedListProps) => {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:15:                    BlurTextProps interface, typed the paragraph ref, gave the
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:32:interface BlurTextProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:75:}: BlurTextProps) => {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:113:  const fromSnapshot = animationFrom ?? defaultFrom;
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:114:  const toSnapshots = animationTo ?? defaultTo;
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:116:  const stepCount = toSnapshots.length + 1;
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:123:        const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:136:            initial={fromSnapshot}
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/blur-text.tsx:137:            animate={inView ? animateKeyframes : fromSnapshot}
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/count-up.tsx:13:                    (2) JSX -> TSX: added the CountUpProps interface and typed
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/count-up.tsx:28:interface CountUpProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/count-up.tsx:58:}: CountUpProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/line-sidebar.tsx:33:   (2) JSX -> TSX, with the props interface spelled out (tsconfig runs TS 6
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/line-sidebar.tsx:79:export interface LineSidebarProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/line-sidebar.tsx:122:}: LineSidebarProps) {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/magnet.tsx:14:                    (2) JSX -> TSX: added the MagnetProps interface (over
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/magnet.tsx:30:interface MagnetProps extends HTMLAttributes<HTMLDivElement> {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/magnet.tsx:52:}: MagnetProps) => {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/shiny-text.tsx:14:                    (2) JSX -> TSX: added the ShinyTextProps interface and
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/shiny-text.tsx:37:interface ShinyTextProps {
+dsh/feat/frontend-p0-v2:frontend/src/components/react-bits/shiny-text.tsx:69:}: ShinyTextProps) => {
+dsh/feat/frontend-p0-v2:frontend/src/components/showcase.tsx:73:interface SectionMeta {
+dsh/feat/frontend-p0-v2:frontend/src/components/tasks-screen.tsx:27:export interface TaskRow {
+dsh/feat/frontend-p0-v2:frontend/src/components/turn-rail.tsx:38:export interface TurnMark {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/badge.tsx:16:import { cva, type VariantProps } from "class-variance-authority"
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/badge.tsx:47:}: React.ComponentProps<"span"> &
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/badge.tsx:48:  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/button.tsx:16:import { cva, type VariantProps } from "class-variance-authority"
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/button.tsx:60:}: React.ComponentProps<"button"> &
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/button.tsx:61:  VariantProps<typeof buttonVariants> & {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/card.tsx:18:function Card({ className, ...props }: React.ComponentProps<"div">) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/card.tsx:31:function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/card.tsx:44:function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/card.tsx:54:function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/card.tsx:64:function CardAction({ className, ...props }: React.ComponentProps<"div">) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/card.tsx:77:function CardContent({ className, ...props }: React.ComponentProps<"div">) {
+dsh/feat/frontend-p0-v2:frontend/src/components/ui/card.tsx:87:function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:50:export interface HarnessToolCall {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:58:export interface HarnessThinkingBlock {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:63:export interface HarnessUserMessage {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:69:export interface HarnessAssistantMessage {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:97:export interface HarnessOpenTab {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:108:export interface HarnessSubagentRow {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:114:export interface HarnessChangeFile {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:125:export interface HarnessChanges {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:133:export interface HarnessSession {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:158:export interface HarnessSidebarRow {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:167:export interface HarnessSidebarGroup {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:174:export interface HarnessAutomation {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:186:export interface HarnessProjectChild {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:193:export interface HarnessProject {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:199:export interface HarnessUsagePill {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:206:export interface HarnessQuickCommand {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:212:export interface HarnessRecentTask {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:224:   Props interfaces - the two skeleton components' full wiring contract. The
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:231:export interface HarnessWorkspaceInfo {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:240:export interface HarnessSidebarProps {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:279:export interface HarnessMainProps {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:25:import type { ApprovalCardView, PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:33:export const HARNESS_SNAPSHOT: PanelSnapshot = {
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:177:export const SHOWCASE_APPROVAL_SNAPSHOT: PanelSnapshot = {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:24:import type { PanelSnapshot } from "@/lib/panel";
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:37:export interface PanelView {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:90: * PanelSnapshot yet - ticket 35's pump owns it, and `panel.resync` (the push
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:98:export function currentView(snapshot: PanelSnapshot & { view?: string }): PanelViewId {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:24:export interface ApprovalCardView {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:70:export interface ComposerMode {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:80:export interface ComposerWorkspace {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:95:export interface ComposerAttachment {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:112:export interface ComposerState {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:122:export interface ResultChunkView {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:129:export interface PanelSnapshot {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:140:interface WispHostBridge {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:145:  interface Window {
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel.ts:164: * PanelSnapshot push, never as a return value, because a panel that keeps a

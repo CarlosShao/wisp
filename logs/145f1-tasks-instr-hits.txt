@@ -1,0 +1,21 @@
+dsh/feat/frontend-p0-v2:frontend/src/components/firstrun-screen.tsx:35:   the same class as the tasks screen's state names; every data string rides
+dsh/feat/frontend-p0-v2:frontend/src/components/firstrun-screen.tsx:94:/** The two minisign states, named like the tasks screen names its six. */
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/app-harness.tsx:9:   collapsible context rail (approvals / tasks / usage) on the right, and the
+dsh/feat/frontend-p0-v2:frontend/src/components/harness/right-rail.tsx:105:  { name: "tasks", kind: "dir", depth: 0 },
+dsh/feat/frontend-p0-v2:frontend/src/components/showcase.tsx:13:   ConfigScreen, the palette / tasks / ball screens and the vendored atoms are
+dsh/feat/frontend-p0-v2:frontend/src/components/showcase.tsx:49:import { TasksScreen } from "@/components/tasks-screen";
+dsh/feat/frontend-p0-v2:frontend/src/components/showcase.tsx:84:  { id: "sec-tasks", num: "04", name: "任务", desc: "任务列表：六态色标、运行弧与 80ms 入场节奏。" },
+dsh/feat/frontend-p0-v2:frontend/src/components/showcase.tsx:290:              <TasksScreen tasks={SHOWCASE_TASKS} />
+dsh/feat/frontend-p0-v2:frontend/src/components/tasks-screen.tsx:12:   with the document and feeds nothing back to the host. The tasks themselves
+dsh/feat/frontend-p0-v2:frontend/src/components/tasks-screen.tsx:13:   are pure props; when Go grows a tasks feed, the snapshot becomes the
+dsh/feat/frontend-p0-v2:frontend/src/components/tasks-screen.tsx:95:export function TasksScreen({ tasks }: { tasks: readonly TaskRow[] }) {
+dsh/feat/frontend-p0-v2:frontend/src/components/tasks-screen.tsx:98:  for (const task of tasks) {
+dsh/feat/frontend-p0-v2:frontend/src/components/tasks-screen.tsx:101:  const shown = filter === "all" ? tasks : tasks.filter((task) => task.status === filter);
+dsh/feat/frontend-p0-v2:frontend/src/components/tasks-screen.tsx:104:    { key: "all", label: "全部", count: tasks.length },
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:419:          detail: ['{"written": "tasks\\待办台账.json", "items": 3}'],
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness-app.ts:490:          summary: "tasks\\任务台账.json",
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:27:import type { TaskRow } from "@/components/tasks-screen";
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:350:    { title: "tasks · 待办台账.json", body: "已有未完成待办 5 条，抽取时需做名称去重" },
+dsh/feat/frontend-p0-v2:frontend/src/fixtures/harness.ts:364:  { source: "tasks · 待办台账.json", body: "已有未完成待办 5 条，抽取时需做名称去重" },
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:30:  | "tasks"
+dsh/feat/frontend-p0-v2:frontend/src/lib/panel-views.ts:69:  { id: "tasks", label: "任务", icon: "list-checks", demoIcon: "list-checks", fed: false },
