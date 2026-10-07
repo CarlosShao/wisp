@@ -51,6 +51,7 @@
 - [ ] **AC#5 零新契约面**：⛔ 不新造 `C##`，⛔ 不往 `C17` 方法白名单加名字，⛔ 不动 D29/D41/SPEC-11 的文字（`SPEC-11 §2.2` 那句"embed lands in S5"要不要改＝人工批准，本票只上报不修）。
 - [ ] **AC#6 门禁四数**：`sh scripts/d22scan.sh` rc=0 且正控先绿；`gofmt -l`／gofumpt v0.12.0 `-l` 只喂 `.go`；`go vet ./cmd/wisp/ ./internal/panel/` rc=0；终态 `go test ./cmd/wisp ./internal/... -count=1` 的**逐名红名册与起手作差＝0**。⚠ `cmd/wisp` 写面**同一时刻只能一枚写手**（包级互斥，不接受"改的是不同文件"）。
 - [ ] **AC#7 还原自证**：所有突变只走 `go test -overlay`（拷贝放仓外）；终态 `git status --porcelain -- cmd internal scripts` ＝起手，被审文件与 `git show HEAD:` 逐串对回；⛔ 本机 `frontend/dist` 那 4 枚文件枚数与哈希起手/终态必须相同（尺＝`go list -f '{{.EmbedFiles}}' ./frontend` 两头发）。
+- [ ] **AC#9 陈旧产物不许替"带页面"报绿（由 `274-a2` §4 现量升格，10-07 12:2x 编排者加）**：本机 `frontend/dist/assets` 现量＝`index-BRKj5OIJ.css`／`index-BVKlegVD.js`，而**用 `git archive HEAD` 导出后在仓外新建**的那份＝`index-vdBrT8rM.js`／`index-yy8KMgdf.css` ⇒ **哈希名全不同＝本机那份是旧源码的产物**。⇒ 本票任何"exe 带页面"的读数（含 §2⑤ 那条本机反证）**必须同时给出：①一次 fresh build 的产物文件名名册＋哈希，②exe 内嵌物与之逐枚相同**；⛔ 只报"4 files, built=true"这种枚数级读数不算过这一格。⚠ 这条同时钉住一个反向坑：⛔ 写腿**不许**为了让读数好看去动本机那份陈旧件（它属别人在飞的产物，本票只读；改它要先具名解冻）。
 - [ ] **AC#8 `SPEC-11 §2.2` 那两步的归属裁决（⛔ 本票不选形，由 `274-a1` §3 现量升格而来）**：§2.2 第 2 步逐字要求「存在则跳过；**`--with-frontend` 时走 `docker/frontend.Dockerfile`（§3.2）**」，而今天 ①`build.ps1` **没有这枚开关**（无条件跳过）②`docker/frontend.Dockerfile` 跟踪枚数 **0** ③该节第 3 步还写着「embed **`assets/web`** 已就位」，而 `assets/web` 跟踪枚数 **0**（真实通道是 `frontend/dist`）。⇒ 要裁的是：**这枚开关该由 `build.ps1` 兑现，还是承认 §2.2 那两步已被"CI 里 `lint-frontend` 跑 vite ＋ `frontend/dist`"这一形取代**（取代＝要动 spec 文字＝人工批准，另案；⛔ 任何腿不许"顺手补个开关"来让代码与 spec 对上）。凭据＝`.scratch/wisp/probes/274/a1/census.md` §3（我现读复认，见本票末节）。
 
 ## 6. 排程（编排者自己记，不许腿替我改）
@@ -69,3 +70,28 @@ AC#0/AC#1 可以**先派只读普查腿**（不写产码、不跑整包）——
 3. **腿替我把 CI 侧坐实了**：三发 `dev` run（`37545246395`／`37406757402`／`37406422380`）的步级 conclusion 证明 **`npm run build` 真跑过且全 success**，且**没有一发在 `build.ps1` 之前有 node 步** ⇒ §2②那把尺不再是"yaml 里写着"而是"run 里出现过"。另：`needs:` 全 `ci.yml` **0 枚** ⇒ 乙形要新加依赖边；`release` job 无落点 ⇒ 丙形的"发布前"**今天没有栖息地**（这两条直接进 AC#2 的代价表）。
 4. **⛔ 我不采纳它的一条**：它报"工单盘上真名比派单少个『1』"。尺＝`grep -rl 'build-ps1-step-2' .scratch docs` ＝ **0 命中**，仓内所有引用与本文件名一致 ⇒ 那处拼写差异**盘上查无实据**，记为"腿的自报未经我复认"，不影响它其余读数。
 5. **它自报未做完的三格我不代填**：AC#0(a) `npm run build` 在 CI 侧产出枚数（要全量 run 日志）、更早 run 扩样、`placeholder` 独立尺。⇒ 归后续验收腿逐枚处置。**本票九枚框（AC#0–AC#8，其中 AC#8 由本次收表新增）一枚未翻。**
+
+## 收 `274-a2`（只读普查；件 `.scratch/wisp/probes/274/a2/shipping-chain.md`，**267 行／30,884 字节**＋18 枚 `logs/`；六枚 commit `e18e32da`→`3dcfcd23`→`3d061f1e`→`7da2ab20`→`c47116da`→`44db024a`；10-07 12:2x，落账 `A659`）＋★编排者据它裁形
+
+★**这枚腿是本票的选形前置**（我派单时写得很具体："run 侧真读数答那台机器有没有 node，⛔ 不许从 yaml 猜，也不许把'尺取不到'写成'没有'"）。它交回五节全有读数、**零未决格**，并且**两处顶回我票面的措辞——两处我都复跑坐实、都算它对**。
+
+**1. 出货通路与三枚产 exe 的 job（我复跑对回）**：`scripts/build.ps1:129` 那一句 `go build -o build\wisp.exe ./cmd/wisp` 是**唯一**出货通路、入口只有 1 枚；`param` 块（`:22-25`）只有 `-Env dev|prod`，⛔ 没有前端开关；第 2 步（`:73-74`）**零命令**。`ci.yml` 里产 exe 的三枚 job 逐枚点名＝`test-windows`（`:505`，`windows-latest`，build.ps1 在 `:571`）／`slo-smoke`（`:739`，`windows-latest`，`:757`）／`slo-full`（`:797`，`[self-hosted, wisp-slo]`，`:820`）——**三枚全无 `setup-node`，也没有任何一步读 `frontend/dist`**；`upload-artifact` 只传 SLO 的 JSON，**exe 无人留档**。
+
+**2. ★★dev 自己那 64 枚页面源码今天能构建（这条把本票从"要等合并"里解出来了）**：腿在**仓外**（`D:/tmp/wisp274a2/`，⛔ 没往仓内 `frontend/**` 落一个字节）用 `git archive HEAD frontend` 导出后跑：`npm ci` rc=0（10s）→ `tsc -b` rc=0（7s）→ `npm run build` rc=0（9s），**共 26s，出 4 枚产物／602,635 字节、`index.html` 1,068 字节**。⇒ `A658` §4 那句"乙形不等分支合并"从此有凭据。
+
+**3. ★它顶回我的两处，我现量都坐实（原句不抹，就地更正）**：
+- ⓐ**"`release` job 无落点"这句说轻了**：真读数＝**`ci.yml` 里根本没有 release job**——job 只有 6 枚（`lint`／`test-core`／`test-windows`／`slo-smoke`／`slo-full`／`lint-frontend`），且 `grep -ci release .github/workflows/ci.yml`＝**0**（连这个词都不出现）。⇒ 丙形那句"发布前闸门"今天**连栖息地都没有**，不是"有 job 没落点"。
+- ⓑ**`build.ps1:74` 不是注释，是一句会印进 CI 日志的 `Write-Host`**（我 `sed -n '71,76p'` 现读逐字：`Write-Host 'build.ps1: frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)'`；注释是它上面 `:73` 那段 `# --- 2. frontend ---`）。腿另在 `slo-full` 的 run 日志**第 183 行**捞到了这句原话 ⇒ **它已经在骗读日志的人**，不只是骗读代码的人。⇒ 本票 §2① 的"注释两半都过期"这个称法**当场更正**：要改的是**那句印出来的谎话本身**。
+
+**4. ★★最要紧的一条新发现：本机 `frontend/dist` 是陈旧件，它会替"带页面"报假绿（我自己复跑坐实）**
+- 尺＝把本机 `frontend/dist/assets` 的文件名与腿在仓外**用 HEAD 现建**的那份逐枚对：本机＝`index-BRKj5OIJ.css`／`index-BVKlegVD.js`，HEAD 新建＝`index-vdBrT8rM.js`／`index-yy8KMgdf.css` ⇒ **哈希名全不同＝内容不同**。
+- ⇒ **直接后果**：本票 §2⑤ 那条"本机反证"（`build/wisp.exe panel-assets` → `panel assets embedded: 4 files, entry=index.html built=true`）**结构上成立、字节上是旧账**——它证明的是"dist 非空时 embed 真的带进去"，⛔ **不证明"当前源码能带进当前 exe"**。凡后续拿"本机 exe 带不带页面"作读数，**必须与一次 fresh build 的哈希逐枚相同**才算。⇒ 新增 **AC#9**（框数 **9→10**，一枚未翻）。
+
+**5. ★我据此裁形（编排者裁，⛔ 写腿不许自行改选形）**：
+- **落形＝乙-1**：在 `scripts/build.ps1` 的第 2 步**真构建前端产物**（`npm ci` ＋ `npm run build`，26s 有凭据），并且——⛔ **静默跳过就是本票要修的病**——**node/npm 取不到或构建失败时，具名报错＋非零退出**（不是 `Write-Host` 一句略过、⛔ 不许 `continue-on-error`）。
+- **丙并入乙，不新造 job**：ⓐ说清楚了"没有 release job"，所以"发布前闸门"要么新造一枚 job（超出本票射程），要么就认：**build.ps1 那一枚非零退出本身就是牙**，与 `cmd/wisp/panel_assets.go:125-129` 现成的 rc=1 串成一条线。⇒ ⛔ 任何腿不许以"顺手加个 job"的名义扩张本票。
+- **甲随批**：`=74` 那句改成实话（说清"这一步现在构建前端；机器上没有 node 就整条失败"）。
+- **AC#8 维持不选形**：`--with-frontend` 那枚开关属 spec 文字面（改 `SPEC-11 §2.2`＝人工批准，另案）；乙-1 落地后 §2.2 第 2 步"存在则跳过"这半句自然对上，`--with-frontend` 那一支变**可选**。
+- ⚠ **已知代价，写进派单**：`test-windows`／`slo-smoke` 这两枚 hosted job 的**作业 PATH 里有没有 node＝取不到**（腿 §3：零步试过；机侧另有 node v24.9.0／npm 11.6.0 与 runner 自带 `externals/node20+node24`，但 `ci.yml:804-806` 自己具名写过"交互式 PATH ≠ 作业 PATH"那枚坑）。⇒ **乙-1 落地后这两枚可能变红，红因＝构建前端那一步跑不起来**。按票 111 AC#2 已有的裁例处置＝**红名逐条登记、不撤步骤、不改产码**；⛔ 更不许用"检测不到 node 就跳过"来消红——那正是本票立案的那句谎话。
+
+**6. 排程（写腿按住，具名理由）**：`274-r1`（唯一写面＝`scripts/build.ps1` ＋ 可能 `.github/workflows/ci.yml`）**按住等 `272-v1` 交完**——两枚都要跑整包 Go 读数（本票 AC#5 要求逐名红名册作差），⛔ 同批抢＝洗对方的数。`273-v1`（只读、零 `go test`）不受此限。⛔ 只 commit 不 push；⛔ 不动 `frontend/**` 一个字节（机主放开的只是**只读**）；⛔ 不动 `frontend/.gitignore` 的 `dist/*`（票 77 AC#1）；⛔ 不给 CI 加 `-tags winlive`。
