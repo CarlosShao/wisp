@@ -222,7 +222,9 @@ dev 的 Go 快照比这份契约件**多 7 枚键**（含子键共 52 枚），�
 
 ## 7. 自证与卫生
 
-- **dirty 数对拉**：起手 `git status --porcelain | wc -l`＝**752**（2026-10-07 13:32）→ 收尾同尺＝**781**（13:40）。**差 29 枚，全部不是我**：本腿只写 `.scratch/wisp/probes/35/a3/**`（下条逐枚）。在飞物按派单要求逐枚量 mtime 登记来历：
+- **dirty 数三枚读数（同一把尺 `git status --porcelain | wc -l`）**：起手 **752**（13:32）→ 交件前 **781**（13:40，内含本腿 29 枚未跟踪件）→ **终态 752**（13:44，本腿 commit 之后）。
+  **差集 100% 落在 `.scratch/wisp/probes/35/a3/**`**：终态尺 `git status --porcelain | grep -c 'probes/35/a3'`＝**0**（本腿 30 枚件已全部入库：commit `6a976294` 3 枚＋commit `0f0fdaf2` 30 枚）。
+  **但 781→752 这 29 枚不是全归我**——期间**别的腿动了盘**：起手登记的那 8 枚 ` M .scratch/wisp/probes/161/r6/logs/flip-*.txt` 在终态**已从 status 里消失**（`git status --porcelain | grep -c 'probes/161/r6/logs/flip'`＝**0**），说明那批在飞物在 13:40-13:44 之间被别的腿 commit 掉了。**本腿一枚没提交、没还原、没"顺手清理"**别人的东西（派单原文："数字会动，动的人不是你就不用管，但要逐枚量 mtime 具名登记来历"）；两处在飞物都按此登记：
   - ` M .scratch/wisp/probes/161/r6/logs/flip-*.txt`＝**8 枚**（尺＝`git status --porcelain | grep -c '^ M .scratch/wisp/probes/161/r6/logs/flip'`），mtime 现量样本：`flip-1.txt` 2026-10-03 11:17／`flip-2.txt` 11:19／`flip-3.txt` 11:22（各 117,744 字节）⇒ **10-03 那批腿的旧在飞物，本腿不动、不提交、不还原**。
   - `?? design/`＝**11 枚未跟踪条目**（尺＝`grep -c '^?? design/'`），机主只放**读**，本腿零写入。
   - 其余未跟踪目录（本腿非作者，登记即可）：`.scratch/wisp/probes/35/a1`·`a2`（前一／二条普查腿的件）、`.scratch/ci-logs/run-*.log|err`、`.scratch/.scratch/`。
