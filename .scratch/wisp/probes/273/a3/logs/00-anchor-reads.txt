@@ -1,0 +1,45 @@
+=== sed -n '298,310p' cmd/wisp/models.go
+// This function is the grep target of ticket 121 AC#2: it is the non-test
+// caller of models.WireDownloading and therefore of DownloadingBridge.Run,
+// whose body holds the only non-test call of Manager.VerifyInstalled
+// (internal/models/bridge.go:58). logf receives progress ticks and may be nil.
+func (ms *modelStore) handOffModel(io_ modelsIO, id string, logf func(string, ...any)) int {
+	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+	defer machine.Close()
+	bridge := models.WireDownloading(ms.mgr, machine)
+
+	ctx, cancel := context.WithTimeout(context.Background(), modelHandoffTimeout)
+	defer cancel()
+
+	started := time.Now()
+=== sed -n '183,193p' cmd/balldebug/main.go
+	)
+
+	// Tray Exit and Ctrl+C both land here; the teardown is common.
+	exit := make(chan string, 1)
+
+	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
+	b, err := ball.New(ball.Options{
+		SizePx:      *sizePx,
+		Initial:     statemachine.StateSleeping,
+		WindowTitle: os.Getenv(envBallTitle), // private title when spawned by -diff
+		Events: ball.Events{
+=== sed -n '14,20p' internal/models/bridge_test.go
+	mgr, _ := newTestManager(t, m, nil, nil)
+	var effects []statemachine.Effect
+	machine := statemachine.New(statemachine.Options{
+		Initial: statemachine.StateFirstRun,
+		Sink:    func(e statemachine.Effect) { effects = append(effects, e) },
+	})
+	return WireDownloading(mgr, machine), &effects, machine
+=== git ls-files internal/statemachine | wc -l
+8
+=== git ls-files internal/statemachine
+internal/statemachine/doc.go
+internal/statemachine/events.go
+internal/statemachine/machine.go
+internal/statemachine/machine_test.go
+internal/statemachine/states.go
+internal/statemachine/table.go
+internal/statemachine/table_test.go
+internal/statemachine/timeouts.go
