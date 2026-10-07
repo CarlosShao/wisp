@@ -1,0 +1,5 @@
+time=2026-10-07T18:07:18.185+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+    panel_transport_35r1_test.go:209: AC#6 RED: installPanelTransport registered no page->wispDispatch forwarding hook (no Init string reroutes window.chrome.webview.postMessage into window.wispDispatch). Without it the page's envelope is mis-parsed by msgcb and never reaches dispatchRaw (ticket 35:52-59).
+--- FAIL: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport (0.00s)
+FAIL
