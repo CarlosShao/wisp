@@ -1,0 +1,6 @@
+=== file: .scratch/wisp/probes/185/c1/mut/fs_broken.go
+=== rc: 2
+=== gofumpt -l combined output (verbatim):
+.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations
+=== first error line: .scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations
+
