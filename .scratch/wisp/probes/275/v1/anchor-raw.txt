@@ -1,0 +1,33 @@
+$ date
+Wed Oct  7 12:45:32 CST 2026
+
+$ git rev-parse --short HEAD
+79fbcd57
+
+$ md5sum .scratch/wisp/probes/161/r5/attrib.sh
+77ee11a8d0cc8dd8248c6a9b8e164a78 *.scratch/wisp/probes/161/r5/attrib.sh
+
+$ wc -l attrib.sh
+459
+
+$ sh -n attrib.sh
+sh_n_rc=0
+
+$ git status --porcelain (whole repo, line count)
+753
+
+$ git status --porcelain -- cmd internal scripts tools .github docs frontend
+0
+
+$ git ls-files '*.go' | wc -l
+935
+
+$ git log --oneline -5
+79fbcd57 收 275-r1（形丁已落 attrib.sh）＋台账 A667：★我那句"打印也打印不出东西"的预判被腿的实测顶回
+31261b4d 275-r1: re-commit gate logs as .txt (repo-wide *.out gitignore hid them)
+d10697eb 275-r1: evidence - before/after readings, authority check, gates for shape 丁
+febca8f9 275-r1: shape 丁 on attrib.sh - rc=2 exit now prints the per-file roster (A663)
+4dc6cab6 275-r1: land §0 pre-work anchor for shape 丁 on attrib.sh
+
+$ git diff --numstat febca8f9^ febca8f9 -- attrib.sh (19 add / 0 del)
+19	0	.scratch/wisp/probes/161/r5/attrib.sh
