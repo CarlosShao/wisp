@@ -1,0 +1,15 @@
+git log --oneline -1:
+028f2e24 255-v2 起手锚+Q4/Q5 现量：派单 HEAD 号已漂(现量 6320a16a)、8b32060b 产码名册漏计 panel_resident_windows.go 一枚、config_readers_255.go 两枚内容锚其中 Width: 420 单空格形在 67ab595d 零命中(真形是双空格)、14 枚 file:LINE [token] 逐枚命中、304 引用改动前只有 :17 一枚(顶回派单'两处')、vet/d22scan/gofmt 三把 rc=0、五枚 CR 幻影复认、inbound_raw_leak_35r7 那句未复现
+rc=0
+git rev-parse HEAD:
+028f2e24e75e6b7d1bdaedeee836fc0218ac0d45
+rc=0
+branch:
+dev
+rc=0
+ls r8:
+total 4
+drwxr-xr-x 1 swq 197609 0 Oct  8 11:57 .
+drwxr-xr-x 1 swq 197609 0 Oct  8 11:57 ..
+drwxr-xr-x 1 swq 197609 0 Oct  8 11:57 logs
+rc=0
