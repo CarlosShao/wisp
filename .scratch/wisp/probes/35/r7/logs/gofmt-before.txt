@@ -1,0 +1,1 @@
+gofmt-before rc=0 输出为空

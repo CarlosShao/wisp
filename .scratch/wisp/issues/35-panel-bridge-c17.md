@@ -405,3 +405,21 @@ dev 真身我现量：挂载＝`frontend/src/main.tsx:58`（`{harness === "1" ? 
 
 **给编排者的排程后果（本腿不替他裁，只把可派性摊清）**：**今天真正可派的只有 `:42` 前半格与 `:51` 的残差那一格**（两枚都是纯测试、零产码、零新名、且有牙）。`:44`/`:47`/`:49` 三枚共用同一枚前置＝**出向那一跳**，而它被三枚外部条件挡着（票 `:97` 的 ⓐ/ⓑ/ⓒ 归属未定＋`frontend/**` 只读＋票 194 名册未补）；`:49` 额外要先裁"merge vs truncate"那处与票 197 的正面冲突。`:45`＝归口、零落点。**⛔ 本腿未翻任何框、未加 `-done`、未 push。**
 
+
+### 10-08 写码腿 `35-r7` 交件登记（票面 `:52`「No secret leakage」残差①＝入向 raw 的不泄密仪器；⛔ **只追加本节，AC 框一字未动、零翻勾**）
+
+**尺**：`grep -cE '^[[:space:]]*- \[ \]'` ＝ 追加前 **6** → 追加后 **6**（本腿一枚没翻；未勾行号逐枚仍是 `:42/:44/:45/:47/:49/:52` 所在框）。起手锚＝`052b393f`→交锚 `d1dddb77`（共享树自前进，`bfcb23e4` 祖先尺 rc=0），锚件 `62891ef0`；仪器件＝`6038531c`（`internal/panel/inbound_raw_leak_35r7_test.go`，**唯一产码面改动＝0 枚**，新增仅测试 278 行）。⛔ 全程未动 `cmd/wisp/**`（`255-r1` 在飞脏面 4 行见锚件 §3）、⛔ 零 push、⛔ 零开窗、⛔ 未动 `frontend/**`、⛔ SLO/golden/thresholds 零字节、⛔ 无任何 L2「允许」面改动、无任何新 C17 名。
+
+**做了什么（残差①）**：票 248 那族尺（`cmd/wisp/panel_config_248_test.go` canary `:39`、形状尺 `:43-46`、`hits248` `:52`、六面 `:154`、正控 `:218`——行号＝本腿现量复跑同数）从没把**入向 raw 本身**当被检输入。本腿把 `ComposerDispatch.Handle`（`internal/panel` 的入向整跳）用凭据形状的 raw 打五路由（凭据写成功／普通字段值即 `sk-` 形状／未在册名拒／伪造来源拒／处理器未接拒），逐路由扫**本跳自己产出的三类落盘面**：audit 行（`[audit]` Sink 捕获＝真装配落盘面）、返回给宿主的 receipt、返回的 error（宿主会把它 echo 进审计行）；并断言写通道**真的发生了**（`credCalls==1`、`lastRawSeen==raw`），免得干净读数其实是静音。判定尺＝对 `secretShape248`/`canary248`/`hits248` 的**逐字镜像**（两条规则＋同一枚哨兵，零新增规则），另有 `TestDecisionRulesMirrorTicket248Ruler35r7` 读 `cmd/wisp` 原件对拉，任一单独漂移即红＝一把尺、两端钉死，不是第二套判定器。
+
+**⚠ 具名顶回派单一处（编排者转述与盘上原文冲突）**：派单说「复用既有载具 `hits248` 那一族」——盘上原文：`hits248`/`secretShape248` 是 `cmd/wisp` 包的**包内测试符号**（`panel_config_248_test.go`），Go 不能 import 测试文件、且 `internal/panel` 反 import `cmd/wisp` 成环⇒**该复用跨包物理不可达**；同时普查腿建议的落点「1 枚文件放 `cmd/wisp/`」与本程「⛔ 写面禁 `cmd/wisp/**`（`255-r1` 编译面）」正面冲突。处置＝镜像＋防漂钉（上面那段），冲突具名上报，不静默改写派单。行数 278＞预估 60–150，超出全在文件头纪律注释与三枚控制，判定与断言本体约 120 行。
+
+**残差②（不存在的推载荷）＝具名死格，本腿不造**：票面「不泄密扫描」覆盖 Go→页那一半今天**没有被测物**——出向整跳零产码（`pageTransport` 只有 `Bind`/`Init`，`.Eval(`/`PostWebMessage`/`EvaluateScript` 非 test 全 0，`lastPanelSnapshot()` 非 test 只有定义；尺＝票 `:393` 普查行 `:47` 栏，本腿复跑同色）。⇒「推出去的载荷不泄密」这半句**不许为交活造一个不存在的实现**（先例＝票 248 `AC#4` 从队列摘除）。等出向那一跳落地后，把推载荷补进 `:52` 的被检面清单即可（本腿仪器与 248 原尺同形，扩面成本＝一面清单加一行）。
+
+**突变自证（三形，逐发红句＝件 `logs/mutation-m*.txt`）**：M1 `composer_dispatch.go` 审计行加 `text=%q` ⇒ `TestInboundRawCredentialShapeReachesNoArtifact35r7` 的 refused-unlisted/forged-source/unattached 三子例红，句含「leak surface: audit[0] matches sk-[A-Za-z0-9]{12,}」；M2 `bridge.go` 来源拒绝句带 `原文=%q` ⇒ forged-source 子例 receipt＋error＋audit 三面红；M3 `config_handlers.go` 凭据 accept 审计抄 raw ⇒ credential-write-accepted 子例 audit[1] 红。三发均 rc=1、命中原文全程按 248 纪律不回显（`<canary-redacted>`）；突变已全部原样摘除（`git diff` 三文件＝0 行）。正控两枚：哨兵与通用 `sk-` 形状各种进面具名发火；合法流量（`deepseek-chat` 写角色）照写不误、审计照落，尺不响。
+
+**门禁 rc 名册（逐件自带 rc 行，见 `logs/`）**：`go vet ./internal/panel/` 改前 rc=0／改后 rc=0；`go test ./internal/panel/ -count=1` 改前 rc=1（既有红 4 枚：`TestApprovalCardViewJSONKeysMatchFrontendTypes`/`TestComposerContractTypesMatchFrontend`/`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`/`TestC21DesignTokensFourWayAgree`——全是前端/token 族在飞面，⛔ 非本程账、本腿一枚没放宽）／改后 rc=1（**逐名作差＝新增红 0 枚、新增绿 5 枚（1+4 子例）**）；`-run '35r7' -v` rc=0；`gofmt -l internal/panel` 改前空／改后空；`sh scripts/d22scan.sh`（既有支持起法，仓根 `go run ./tools/d22scan` 会报「module 不含该包」＝本腿现量踩坑具名）rc=0 clean。
+
+**本腿具名限制（不扩范围的边界，交后续程）**：① `record()` 把处理器/封套错误 `err` 逐字 echo 进审计行——若 `cmd/wisp` 的腿把 raw 塞进 error 字符串，本包不 scrub（腿契约「只回状态」写在 `config_handlers.go` 头注，验腿面在 `cmd/wisp`，本程写面禁）；② 普通字段的 `SettingWrite.Value` 直通写腿＝票 248 已裁的设计通道（凭据值不落 `ComposerRequest`），落盘前的值校验在腿侧，同样不在本程；③ 页面声明面未动一笔（`frontend/**` 写权未放开，本仪器亦不需要）。
+
+**给编排者的排程后果**：`:52` 残差①自此**有牙且已被三形突变验过牙**；翻勾与否不归本腿（裁决者≠实现者）。残差②随出向那一跳（`:44` 乙读法/`:47`/`:49` 共用的前置）一起做，本腿已把它从「欠仪器」改口为「欠被测物」，⛔ 别再按测试落点派。

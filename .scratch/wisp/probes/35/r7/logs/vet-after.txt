@@ -1,0 +1,2 @@
+internal\panel\inbound_raw_leak_35r7_test.go:270:85: raw string literal not terminated
+vet rc=1

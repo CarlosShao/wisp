@@ -1,0 +1,23 @@
+time=2026-10-08T11:28:27.999+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestInboundRawCredentialShapeReachesNoArtifact35r7
+=== RUN   TestInboundRawCredentialShapeReachesNoArtifact35r7/credential-write-accepted
+=== RUN   TestInboundRawCredentialShapeReachesNoArtifact35r7/plain-write-with-key-shaped-value
+=== RUN   TestInboundRawCredentialShapeReachesNoArtifact35r7/refused-unlisted-method-carrying-content
+=== RUN   TestInboundRawCredentialShapeReachesNoArtifact35r7/refused-forged-source-carrying-content
+    inbound_raw_leak_35r7_test.go:188: route refused-forged-source-carrying-content: 入向原文的凭据形状被抄进了落盘面（6 处命中；命中原文按票 248 纪律不回显）
+    inbound_raw_leak_35r7_test.go:188: leak surface: receipt matches sk-[A-Za-z0-9]{12,}
+    inbound_raw_leak_35r7_test.go:188: leak surface: receipt matches <canary-redacted>
+    inbound_raw_leak_35r7_test.go:188: leak surface: error matches sk-[A-Za-z0-9]{12,}
+    inbound_raw_leak_35r7_test.go:188: leak surface: error matches <canary-redacted>
+    inbound_raw_leak_35r7_test.go:188: leak surface: audit[0] matches sk-[A-Za-z0-9]{12,}
+    inbound_raw_leak_35r7_test.go:188: leak surface: audit[0] matches <canary-redacted>
+=== RUN   TestInboundRawCredentialShapeReachesNoArtifact35r7/refused-unattached-handler-carrying-content
+--- FAIL: TestInboundRawCredentialShapeReachesNoArtifact35r7 (0.00s)
+    --- PASS: TestInboundRawCredentialShapeReachesNoArtifact35r7/credential-write-accepted (0.00s)
+    --- PASS: TestInboundRawCredentialShapeReachesNoArtifact35r7/plain-write-with-key-shaped-value (0.00s)
+    --- PASS: TestInboundRawCredentialShapeReachesNoArtifact35r7/refused-unlisted-method-carrying-content (0.00s)
+    --- FAIL: TestInboundRawCredentialShapeReachesNoArtifact35r7/refused-forged-source-carrying-content (0.00s)
+    --- PASS: TestInboundRawCredentialShapeReachesNoArtifact35r7/refused-unattached-handler-carrying-content (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.042s
+FAIL
