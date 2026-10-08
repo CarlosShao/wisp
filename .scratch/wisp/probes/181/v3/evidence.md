@@ -80,4 +80,4 @@
 ## 7. 本腿 commit 清单（只 commit、不 push）
 
 - `bf185665` 181-v3 起手锚（`probes/181/v3/00-anchor.md`）。
-- `<本件>` 181-v3 证据件（`probes/181/v3/evidence.md`）。
+- `fe1a9ce6（本行由紧随其后的更正 commit 落，硬指向即该笔）` 181-v3 证据件（`probes/181/v3/evidence.md`）。
