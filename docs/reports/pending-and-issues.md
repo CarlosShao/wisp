@@ -14448,3 +14448,11 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - **收口三张（本笔执行）**：①`125` `**Status:** open`→`done（2026-10-08 19:2x 编排者收口）`；②`258`／`261` 原无 Status 行 ⇒ 标题下一行插入 `**Status:** done（…全勾凭据＝编排者翻勾节＋非实现者验收）`；③三张 `git mv` 改名 `-done`；④尺＝`125` 425 行/未勾 0、`258` 78/0、`261` 95/0；`-done` 总数 **95→98**。⚠ 规则 4 的"更新索引"一步对这三张**是空操作**——`grep -nE '125-|258-|261-' .scratch/wisp/issues/README.md` **零命中**（那三张本就不在索引里），登记不追。
 - **未收口 7 张**（`196`／`211`／`213`／`214`／`215`／`216`／`219`）：**零 AC 框＋无具名裁定节点** ⇒ 不可收口；它们各自的前置原句已抄回件里（`219` 前置序 `201→220`；`211` 只有 c1 前提更正＋r1 日志）。⇒ 保持原名，等各自内容落地再谈。
 - 乙类 8 张（已 `-done` 却有未勾框）**本轮未动**（按 `A740` 口径逐张核"真未做／漏勾"，排下一波）。⛔ 零翻框、零 push。
+
+## A744｜2026-10-08 19:3x｜收 **`259residual-1`**（票 259 `AC#2` 两发"残余风险"突变**实测**：都红、都还原、**无新恒真面**）＋我派单 PATH 第二例自纠
+
+- 交件＝`9272edca`／`28e77127`（件 `probes/259/residual1/`）。**我复跑还原态三把尺**：`internal/agent/approval/approval.go` 工作树 hash＝`67fb1468…`（与它自报种前**逐字等**）／`queue.go`＝`66fec7ae…`（同）／`git status --porcelain -- internal/agent/approval` **空** ✓；HEAD 上那两行＝`if !equalSecret(v, nonce) {` 与 `if it.state != statePending {` ✓。
+- **逐发**：**发 A**（`approval.go:565`，零漂）种成 `if false {` ⇒ **rc=1**，红句 `ticket259_denial_rulers_test.go:139`／`:259`（`returned <nil>`）＋**连带第三枚料文没预判**：`ticket259_panel_capability_rulers_test.go:301`／`:308`；**发 B**（`queue.go:390`）⇒ **rc=1**，红句 `ticket259_denial_rulers_test.go:208`（唯一红、无连带）。两发种后 numstat 各 `1 1`；基线对照 12 PASS／rc=0。
+- **判**：备料腿那两发**预判都对**（A 的 139/259 逐字命中；连带枚它自己在 §4.3 认了"未核"⇒ 未预判非错）；**新恒真面＝无** ⇒ 这两处守卫（store 成员扫描／state 卫）**今天有牙**，票 259 `AC#2` 那两发残余风险从此有实测凭据（不再只是预判）。
+- ⚠ **我派单 PATH 第二例（自纠）**：这次写的 `$PWD/../../third_party/...` 从 `internal/agent/approval` 数**少一层**（`internal/third_party` 不存在），它实按**三级** `$PWD/../../../third_party/sherpa-onnx` 跑通。⇒ 连同今晚早先那例（`third_party/onnxruntime` **不存在**、DLL 全在 `sherpa-onnx/`）记一条定式：**派单里的 PATH 只写 `$PWD/…/third_party/sherpa-onnx` 一枚、层数按"被跑测试所在包目录"现数**，⛔ 不并列不存在的目录、⛔ 不照抄上一个包的层数。
+- 编队：在飞＝`242-corrcensus-1`（只读普查）。⛔ 零翻框、零 push。
