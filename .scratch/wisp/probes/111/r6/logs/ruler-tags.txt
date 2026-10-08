@@ -1,0 +1,16 @@
+== -tags hits ==
+rc=1
+== winlive hits ==
+rc=1
+== go vet lines ==
+117:        # after the first failure. At the time `go vet (module)` was red on ubuntu
+127:        # a current fact: `go vet (module)` is GREEN on ubuntu today (run
+128:        # 35600043583 step 7 = success; and in a real container `go vet ./...` is
+226:        # still reddens the job). gofmt / go vet / staticcheck are production gates
+237:      - name: go vet (module)
+238:        run: go vet ./...
+240:      - name: go vet (tools/d22scan module)
+241:        run: go vet ./...
+332:        run: go vet ./...
+539:        # by three times (A54 static scan behind `go vet`, A61 env assertion
+rc=0

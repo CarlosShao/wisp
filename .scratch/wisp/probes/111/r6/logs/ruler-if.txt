@@ -1,0 +1,25 @@
+ruler = any-whitespace 'if:' lines (matches the orchestrator's predicated step-level ruler; the strict 8-space form under-counts the always() step)
+== job-level if count (lines matching '^    if:' i.e. 4-space = job property) ==
+0
+job_rc=1
+== step-level if count (^\s+if:) ==
+12
+step_rc=0
+==   of which !cancelled() ==
+11
+==   of which always() ==
+1
+== step-level if lines (all) ==
+234:        if: ${{ !cancelled() }}
+294:        if: ${{ !cancelled() }}
+331:        if: ${{ !cancelled() }}
+387:        if: ${{ !cancelled() }}
+462:        if: always()
+522:        if: ${{ !cancelled() }}
+560:        if: ${{ !cancelled() }}
+570:        if: ${{ !cancelled() }}
+592:        if: ${{ !cancelled() }}
+681:        if: ${{ !cancelled() }}
+717:        if: ${{ !cancelled() }}
+733:        if: ${{ !cancelled() }}
+rc=0

@@ -1,0 +1,10 @@
+date: Thu Oct  8 08:57:22 CST 2026
+git log --oneline -1:
+8e98b8f0 台账 A690 编号＋A691 落账（编排者自写，只追加＝diff 25 增/1 删，那一枚删行是 A690 标题行换形、正文一字未动）：A690＝收只读普查腿 35-a5-census（★它写的时间戳 09:0x 错，按它自己那笔台账 commit 真实时刻 08:40 校正为 08:4x＝同形先例 A687/A688 那枚也是我把时刻填错，记我）；A691＝票 35 :75(c) 终裁「明写〔仅本机可量〕、⛔ 不把真窗搬进 CI」的四要素钉形＋被推翻两句转述的归位（①scripts/runtests.sh 不存在＝真件 tools/d22scan/runtests.sh，同一句错话前一腿 census-resident-panel/summary.md:60 也抄过 ⇒ 后续程别照它派单；②我 A688 那条"CI 里 cmd/wisp 压根没跑过（没人备三枚 DLL）"被 ci.yml:561-564/566-571/573-593＋脚本 :73/:82/:94/:109 证伪＝派单里我的暗示把腿带偏，它顶得对；另记我"4 枚 label"混了 runner 名册与 ci.yml:798 作业级选择器那两枚）＋★缺口换形＝windows&&winlive 那 12 枚（cmd/wisp 7＋internal/ball 5）在 CI 连编译都没人查，落成票 111 AC#11 并写清查重（与 AC#7 不同轴、与 AC#9 编译面vs执行面双向、⛔ AC#11 不许读成 :75(c) 载体已建）＋腿没答的三格具名（超时秒数未逐枚抄/:75 两枚毫秒读数未复跑/CI"真跑过 cmd/wisp 并绿过"仍欠一发 success 读数＝wisp-cli-tests.sh:20 与 ci.yml:577 那句 PASS=33 是脚本头自陈不算凭据，这格记编排者欠账、取数要等下一次推送而⛔ 零 push 仍生效）＋排程（35-v4 独占 cmd/wisp go 窗口，起手锚 1d719434；票 111 AC#11 写腿＝新可派格但按在它之后并与 go 窗口错开；票 33 AC#13/AC#14 同后；快照泵按住⛔不解冻⛔不删 Go 字段）＋★自抓：步级 if: 我第一版写"13 处（grep -c 'cancelled'）"＝分母与判据不同形（那尺 25 行含注释），现量两把尺＝步级 12/作业级 0，落笔前换尺记我 ⛔ 未 push、未开窗
+HEAD full:
+8e98b8f099fcdab75eaec42c55bca8ff7696f490
+branch:
+dev
+wc -l ci.yml:
+941 .github/workflows/ci.yml
+rc=0

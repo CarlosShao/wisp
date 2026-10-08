@@ -1,0 +1,19 @@
+== grep -rlE '//go:build.*winlive' --include=*.go ==
+./cmd/wisp/panel_geometry_255_winlive_test.go
+./cmd/wisp/panel_host_windows_live_test.go
+./cmd/wisp/panel_transport_live_35v2_windows_test.go
+./cmd/wisp/resident_approval_live_246_windows_test.go
+./cmd/wisp/resident_ball_live_228_windows_test.go
+./cmd/wisp/resident_hotkey_live_258_windows_test.go
+./cmd/wisp/resident_task_source_live_246_windows_test.go
+./internal/ball/hotkey_cancel_borrow_live_260_test.go
+./internal/ball/hotkey_live_test.go
+./internal/ball/interaction_live_test.go
+./internal/ball/live_guard_windows_test.go
+./internal/ball/live_windows_test.go
+rc=0
+== count ==
+12
+== per-dir ==
+cmd/wisp: 7
+internal/ball: 5

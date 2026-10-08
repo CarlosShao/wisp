@@ -1,0 +1,16 @@
+== grep -nE '^  [a-z0-9-]+:$|^    runs-on:' .github/workflows/ci.yml ==
+12:  push:
+36:  schedule:
+65:  lint:
+66:    runs-on: ubuntu-latest
+395:  test-core:
+396:    runs-on: ubuntu-latest
+505:  test-windows:
+506:    runs-on: windows-latest
+739:  slo-smoke:
+740:    runs-on: windows-latest
+797:  slo-full:
+798:    runs-on: [self-hosted, wisp-slo]
+871:  lint-frontend:
+872:    runs-on: ubuntu-latest
+rc=0
