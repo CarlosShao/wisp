@@ -1,0 +1,7 @@
+== ⓐ current reading: go vet -tags winlive ./cmd/wisp/ ./internal/ball/ ==
+date: Thu Oct  8 08:59:14 CST 2026
+uname: MINGW64_NT-10.0-26100
+go env GOOS/GOARCH/CGO_ENABLED: windows amd64 1
+go version: go version go1.27.1 windows/amd64
+--- go vet output below (empty == clean compile) ---
+rc=0
