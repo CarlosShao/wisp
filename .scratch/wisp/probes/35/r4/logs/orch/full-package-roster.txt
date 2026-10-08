@@ -1,0 +1,22 @@
+cmd/wisp 整包名册（编排者现跑 2026-10-08 08:15→08:3x，载 `35-r4` 夹具的测试 exe，**无** winlive tag，CWD=cmd/wisp，三枚 sherpa/onnxruntime 原生 DLL 摆在 exe 旁）
+exe: /d/tmp/wisp35r4/wispcmd.test.exe   args: '-test.v'
+named-PASS: 341
+named-FAIL: 5
+named-SKIP: 1
+rc=1
+
+FAIL roster（sorted unique，逐名五行，取自 full-package-after-r4.txt 的 '--- FAIL:' 行）:
+TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+TestAC14AwaitedBindingReplyReachesThePage
+TestAC14GoSideEvalPushReachesThePage
+TestAC4FocusReturnToPriorWindowGap33r5
+TestPanelHostRealWindowHopAndLifecycle
+
+对照基线＝`35-v3` 那一版整包读数（`.scratch/wisp/probes/35/v3/logs/cmd-wisp-full-summary.txt`：named-PASS=338 / FAIL=5 / SKIP=1，同样无 winlive tag、同 CWD、同 DLL harness 形）:
+⇒ PASS **+3** 恰＝本程新增的三枚具名用例（`panel_transport_35r2_test.go:1946`／`:1976`／`:2026`）。
+⇒ 红名册**双向作差为 0**（尺＝`comm -3 <我这五名> <v3 那五名>` 输出 0 行）。⚠ 取 v3 那五名时要剥掉它文件里 "named-FAIL: 5" 那行——`grep -oE 'FAIL: [A-Za-z0-9_]+'` 会把那个数字也抓成一个"名字"，我第一次就这么抓到 6 行；正解＝`grep -v '^5$'` 之后再比。
+
+⛔ 这五枚**不记本程账**：全是窗口依赖族（真开窗／真桌面／时序），`35-v3` 交件时同名同数已在册。
+⚠ `rc=1` 由**既有红**造成，不是本程造成；⛔ 任何后续程不许为把它做成 rc=0 去放宽断言。
+⚠ 跨时刻口径：这版与 v3 那版同一台机器、同一 harness、相隔约 11 小时 ⇒ 枚数级读数（341 vs 338）只在**同一次运行内**可作判据，跨时刻只当旁证（第 125 条）。
+⚠ 全量原始输出＝同目录 `full-package-after-r4.txt`（276 KB，`-test.v` 逐条）；那枚件在 `2fc5f5c9` 里是**跑到一半时的快照**（128 KB／241 枚 PASS），本笔换成终态件——这是我的疏漏，具名记：我在整包还没跑完时就把那枚日志抄进了仓。
