@@ -1,0 +1,85 @@
+--- 33-r11 anchor readings, 2026-10-08, taken by the writing leg itself ---
+[1] ls .scratch/wisp/probes/33/r11 before creation:
+total 4
+drwxr-xr-x 1 swq 197609 0 Oct  8 12:20 .
+drwxr-xr-x 1 swq 197609 0 Oct  8 12:20 ..
+drwxr-xr-x 1 swq 197609 0 Oct  8 12:23 logs
+rc=0
+[2] probes/33 listing (r11 absent before this leg, r10 taken by the AC#13 cold-start leg):
+a1
+a2
+a3
+h1
+n1
+p1
+r1
+r10
+r11
+r2
+r3
+r4
+r5
+r6
+r7
+r8
+r8b
+r9
+v2
+v4
+winc1
+rc_ls33=0
+[3] git log --oneline -1 (HEAD at start):
+03899fd8 A711 收 255-v2＋35-r8，含同一程两处自纠（第二条是被"停手闸门腿"在执行前拦住的）：★我顶回验收腿"该翻 AC#4"那句——票面 AC#4 判据逐字要的是"改 width ⇒ 真窗口宽度随之变（只有本机可量那一族，别伪装成 CI 测过）"，而它自己 Q3 现量 grep -rln requestGeometryOnReshow 不含 winlive 件⇒真窗上这一发动没动今天零测量⇒AC#4 不翻、那一发在我自己欠账清单上（panel_resident_windows_test.go:314 带 bundle 族，⛔ 不可派腿也不许算腿的欠账）；⚠口径写死："落点对＋禁区没碰"≠"判据已闭合"，两格不是一件事；其余我采（import 无 internal/config、闭包仍装配根 :253 递、零 go func、HintNone、m.geometry 只构造期写⇒无新竞态；名册须按 5 枚文件，cmd/wisp/panel_resident_windows.go 3/3 改的是对外可见的 PANEL-GEOMETRY state= 口径而 255-r1 三件叙述漏列）；★采它恒真面坐实：M2 在同包兄弟文件加第二条 SetSize(...,HintFixed) 路⇒TestTicket255r1HostResizeCallSiteAsksForHintNoneAndIsTheOnlyOne 照绿 12 枚全绿，正控（同路径换未定义符号）go vet rc=1⇒overlay 真进编译、绿是真绿⇒那枚"only one"AST 尺只覆盖 panel_host_windows.go 一枚文件、名字里的 the host 超出射程，归票255 一族（要嘛钉整包要嘛改名字），⛔ 不新开票；它这发正控形状（同路径换未定义符号验 overlay 落地）我抄进后续派单；★★自纠一：我"把注释改成盘上真形"的裁定照做会自己打红一盏灯——panel_geometry_255_test.go:377 那枚 retired 防漂针的作用正是禁止 config_readers_255.go 出现 "Width:  420," 这枚字串（它就是被撤掉的硬编码几何那一形），单空格形不在名册里⇒我一边说"别动那枚针"一边给了必然把它打红的改法＝派单自相矛盾，⛔ 撤回该捎带项；哪半仍成立＝那两处注释教的字串在它引用的 ref 上从未存在（255-v2 与我各跑一把同数：单空格 0／双空格 1），哪半作废＝"改成双空格形"这个修法；真处置要写的是带 ref 限定的历史指法（现量 panel_host_windows.go:262 已是 Width:  uint(width),，Width:  420, 在当前盘上零命中——AC#4 已撤硬编码几何），这第三种改法我裁定没覆盖⇒按 D22 闸门③停下来不猜，归票255 另裁；＝我第 7 枚"派单里的修法比原病更错"（第 122 条一族）这次被闸门腿在执行前拦住，probes/33/r10 已占⇒7 次调用零写入零 commit；★★自纠二（治理面新事实）：腿的编号会撞名——probes/33/r10 被另一条也叫 33-r10 的腿占着（票33 AC#13"冷启动探测页盖掉真页面"，已交 44d178c9/db6ef1b1 两笔、件齐、每件 .log 自带 rc）⇒定式：引用一条腿必须给三件（票号＋腿号＋那一格判据的内容锚），只给号不足以唯一指认；重派改槽 33-r11；它顺带复认出 ⓐⓒ 前提（firstRoundTripLocked 定义 panel_host_windows.go:840 调用 :448、serveNotBuiltNoticeLocked 定义 :460 调用 :451，两枚方法体起手就 m.mu.Lock()⇒A704"自取锁不要求调用者持锁"成立、"今天无真死锁路"成立、cmd/wisp 里没有命名守卫测试＝ⓒ 确实还没落）；★采它 8 分钟 panic: timed out 两发零命中⇒⛔ 判谁造假都不成立，111-c2 已具名在册这一族（AC14Eval FAIL/PASS 互换、Latency FAIL↔SKIP 互换、名册 261↔335、FAIL 12→6→8→7→6 都漂）＝两把尺两个时刻写在这儿防后续程当现状引；它另复认 5 枚 CR 幻影、inbound_raw_leak_35r7_test 解析报错两枚腿加我都复现不出来⇒A707 那句按"认错件"结案；★收 35-r8＝红着的诚实件（我派单写过"红着的说实话的交件我照收、绿着的假话核出来整件退回"）⇒收下⛔ 不退⛔ 不摘尺⛔ 不放宽，新件 internal/panel/backpressure_bound_35r8_test.go 371 行/4 用例/零产码（pump.go blob wt==head），5 发仓外突变各咬一相（M1 rows 400>64 3.84M runes／M2 614400>cap／M3 counted 0 publishes for 24 attempts／M4 dropped naming=0 want 1536／M5 rows=0 且 B/C 仍红＝红不是空的），恒真面三处它自己具名（heap 项带 1MiB 余量单独不咬人／D 对 M4M5 绿⇒反真空全压在 A／发布次数钉 24⇒不量出口那一路内存）；★账按它顶回③写："键数在、字节不在"——扇出那一路有界（1x/4x 钉住 35072 runes/64 行），⛔ 无扇出 3 流＝1.2M→4.8M runes、heap +1.16MB→+4.83MB 线性无界，丢弃点名账本 3936→15936 名（约 212k runes）也无界⇒:49 不翻、欠的是产码，⛔ 不许写成"有界队列在只缺测试"；★我独立复跑 go test ./internal/panel/ rc=1 逐名 6 FAIL＝2 枚新（TestStreamLogFloodBelowKeyBoundIsNotBounded35r8、TestStreamLogDroppedNamingLedgerIsNotBounded35r8）＋4 枚起手既有（ApprovalCardViewJSONKeys／ComposerContractTypes／PanelColourLiterals／C21DesignTokens）与它逐名同；★这两枚红灯代价落在机主 CI（下次 push internal/... 那步会红，⛔ 今天零 push 所以只红我本机）⇒摆给他的一问按三栏（含"不做"）起草、"留着等修"与"转台件先按住 CI"两支都不动判据⛔ 我不替他选、"不做"栏配现量（无界是代码事实不是已经在漏）；字节上限定过没有我不猜（D22 闸门③）⇒派只读普查 35-a7⛔ 不许发明数、交付按甲／乙／不做三栏；采它顶回②收窄我先前那句"没写"：make(chan func(), 16) 产码没写、cmd/wisp/panel_host_windows_test.go:70 有 1 枚夹具引用（failedPost 仍 0），⚠ 我这把没自己复跑那枚引用＝〔腿报我未复尺〕归 33-r11 之后复认；采它顶回④形状级：它初稿把 ⛔ 写进 Go 注释后自改 ASCII＝对（ban #8 扫 .go 含注释、U+26D4 在射程 2600-27BF 内），正是"别把会被自己扫的东西写进注释"在腿侧的正例；编队 2 枚在飞非只读 1 枚⛔ 没踩地板，具名理由不是没活＝:49 的产码在"规格有没有定过那个数"回来之前物理不可写（写了＝自行假设），⛔ 不为凑枚数派成"先发明一个数"；⛔ 零 push、页面分支不合、exe 未还原
+rc=0
+[4] git branch --show-current:
+dev
+rc=0
+[5] the two self-locking methods, re-confirmed by content anchors not by relayed line numbers:
+460:func (m *PanelManager) serveNotBuiltNoticeLocked() {
+625:func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+840:func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
+rc=0
+[6] body first statement of each:
+func (m *PanelManager) serveNotBuiltNoticeLocked() {
+	m.mu.Lock()
+	w := m.w
+func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+	if prior == 0 {
+		return
+func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
+	m.mu.Lock()
+	w := m.w
+rc=0
+[7] all *Locked funcs in cmd/wisp (rename scope must stay at exactly two):
+cmd/wisp/panel_host_windows.go:460:func (m *PanelManager) serveNotBuiltNoticeLocked() {
+cmd/wisp/panel_host_windows.go:625:func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+cmd/wisp/panel_host_windows.go:840:func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
+rc=0
+[6b] recheck: first statements of the two self-locking bodies, by content anchor:
+840:func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
+841-	m.mu.Lock()
+842-	w := m.w
+843-	m.mu.Unlock()
+rc=0
+460:func (m *PanelManager) serveNotBuiltNoticeLocked() {
+461-	m.mu.Lock()
+462-	w := m.w
+463-	m.mu.Unlock()
+rc=0
+[6c] setPriorFocusLocked body takes no lock:
+625:func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+626-	if prior == 0 {
+627-		return
+628-	}
+629-	if m.hwnd != 0 && sameRootWindow(prior, m.hwnd) {
+630-		return
+631-	}
+632-	m.prevFocus = prior
+633-}
+634-
+rc=0
+[7] all Locked-suffixed funcs in cmd/wisp:
+cmd/wisp/panel_host_windows.go:460:func (m *PanelManager) serveNotBuiltNoticeLocked() {
+cmd/wisp/panel_host_windows.go:625:func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+cmd/wisp/panel_host_windows.go:840:func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
+rc=0
