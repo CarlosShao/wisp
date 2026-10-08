@@ -14378,3 +14378,10 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - **翻勾**：票面 59→**69 行**／未勾 5→**1**／已勾 1→**5**；撤销口令逐格（「撤 259 AC#1/2/3/5」）；⛔ 原句一字未改、只追加 §11。
 - 它没试出来的照收：**"残余风险"那两发突变未种**（拆 store 成员扫描／state 卫——不在派单三枚内，**登记为下一枚可选攻法**）；Mu-1/Mu-3 首种时 `sed` 双命中致 build failed（它自己认下＝不是红读数）；未跑 `cmd/wisp` 整包（AC#4 只读源文定的）。
 - 编队：`259-v1` 已交；在飞＝`card-proof-prep-1`（真举卡配方）；本波新派＝`259-r4`（把 `AC#4` 那两个 id 拆开）。⛔ 零 push、零翻框。
+
+## A735｜2026-10-08 19:0x｜收 **`card-proof-prep-1`**（"真举卡"真机验证配方，83 行）＋我抽验五处锚
+
+- 交件＝`2405be70`／`e060cef6`（件 `probes/card-proof-prep-1/01-recipe.md`）。**我逐字抽验五处全对上**：`internal/tools/bridge.go:424`＝`\tswitch sil.Level {`（判定级那一跳）、`:443`＝`a, why := b.gate.PendingWindow(ctx, *dec)`、`:458`＝`a, why := b.gate.PendingApproval(ctx, *dec)`；`cmd/wisp/resident_approval_windows.go:885`＝`\tfmt.Printf("wisp: 卡片挂起：%s %s（编号 %s）\n", p.Level, p.Tool, p.CorrelationID)`（**卡出现的可观测信号真身**）、`:880`＝`slog.Info("approval: 常驻进程显示一张确认卡片",`；`build/wisp.exe` mtime＝**10-07 11:57**（旧于 HEAD）。
+- **配方五段**（前置判据 P1–P6／喂任务两道／观测点／判红绿／诚实边界）：A 道（winlive 台件，自建 exe＋注入文本）**跑得动**，缺一不可＝mingw＋go、DLL 在盘、真桌面、Esc 空闲；**B 道（真控制台 `task` 动词）今天跑不动**——`%APPDATA%\wisp` 无凭据，而 `build/wisp.exe` 旧于 HEAD（要重建才谈）；另具名：L2 场景**没造**台件、`task` 动词自动覆盖＝0。
+- **两枚"今天判不了"的条件**照收且归口：①Esc 被别的程序占着（`desktop state, not our code`）；②真机那台有没有"桌面会话"——后者正是我名下"真窗读数"那一族的同一前提。⇒ 这一发**仍待跑**（配方就位），且**B 道要 owner 的凭据**（或先只跑 A 道）。
+- 编队：`card-proof-prep-1` 已交；在飞＝`259-r4`（拆 `AC#4` 两个 id）／`gate-snapshot-1`（收工门禁快照）。⛔ 零 push。
