@@ -20,7 +20,7 @@
 - [x] **AC#1 二选一（要 AC#0 交完之后由编排者落一枚具名 `A##` 选边）**：ⓐ **具名降级**＝登记"绑定那一句今天零独立拦截能力，真防线是 store 成员检查＋state 检查"，并把注释与票面口径改到与盘上一致（⛔ 不许留"能挡跨卡"这句话在码里）；ⓑ **做出牙**＝花侧改为**从答复侧实际递交的请求重算摘要**再比（tool／args／level／seq 的来源要换），并补一发**路由级**用例：种下"答复请求的参数与铸造时不同"⇒ 指名用例必须红。⚠ ⓐⓑ 两支都要同时回答 AC#2，不许只挑一支交差。
 - [x] **AC#2 拒因可指名**：把 `spend` 的返回从 `bool` 改成能带原因的形状（或等价物），使"缺失／已用／绑定不对／状态不是 pending"**四种各自可断言**；⚠ 对外文案是否**区分到界面**属 `ui.go:127-130` 那句"故意不区分"的范围——**编排者已裁：内部与审计现场必须区分，对外文案维持合并**（理由＝审计要能一眼归因，界面不暴露"差几个字节就对上"那种逼近信息；撤销口令「259 对外也区分」）。判据＝四种拒因各一枚用例指名红，⛔ 且**不许复用**权限判定那条文案（本仓既有规矩）。
 - [x] **AC#3 三枚能力尺（补票 242 AC#2 不成立那一格，随本票一起做，⛔ 不另开一票）**：① `PanelAPI` 的**方法名封闭集**尺（新增一枚能改变卡状态的方法名 ⇒ 指名红；M-E 那一形必须被它抓到）；② `PanelItem` 的**字段封名单**尺要**按能力**判（能改变状态／能携带凭据形状的字段名怎么改都算——M-D2 那一形必须被抓到，⛔ 只认字符串名的尺不许当凭据）；③ 语义侧尺（出向读面拿到的东西**不可**回填成答复）。⛔ 这三枚只加尺，**不许为此解冻乙形**（`242-v1` 已判"缺的零件可在甲内补"）。
-- [ ] **AC#4 载具前置**：`cmd/wisp/subagent_selfapproval_197_test.go:109` 那枚 `TaskID == CorrelationID` 要拆成两个不同 id（票 242 AC#1 的载具前提）。⚠ 写面＝`cmd/wisp` ⇒ 与 `255-r2`／`257-r1`／`167-r2`／`253 AC#1` 逐枚**串行**。
+- [x] **AC#4 载具前置**：`cmd/wisp/subagent_selfapproval_197_test.go:109` 那枚 `TaskID == CorrelationID` 要拆成两个不同 id（票 242 AC#1 的载具前提）。⚠ 写面＝`cmd/wisp` ⇒ 与 `255-r2`／`257-r1`／`167-r2`／`253 AC#1` 逐枚**串行**。
 - [x] **AC#5 越界检查**：`git diff` 出现 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` 任一路径 ⇒ 直接退回。
 
 ## 禁区（本票全程）
@@ -67,3 +67,11 @@
   - **`AC#5` 成立**：15 笔相关提交对禁列零命中（rc=1，正控命中 `docs/specs`）。
 - **`AC#4` 不成立（唯一未勾格）**：`cmd/wisp/subagent_selfapproval_197_test.go:109` 仍逐字 `TaskID: taskID, CorrelationID: taskID,`（**编排者现取复认**；末次触碰 `a818df46` 09-30，早于立票）⇒ 本格**保持未勾**，落地腿已派出。
 - **撤销口令**：逐格＝「撤 259 AC#1」／「撤 259 AC#2」／「撤 259 AC#3」／「撤 259 AC#5」。⛔ 本节点只追加，票面原句一字未改；⛔ `AC#4` 未动。
+
+## 12. AC#4 翻勾（编排者，2026-10-08 19:0x；凭据＝窄写腿 `259-r4` ＋ **编排者亲跑那两枚测试**）
+
+- **改动**＝`77150dcc`（写面只有 `cmd/wisp/subagent_selfapproval_197_test.go`：12 增 / 5 删）。diff 逐行我读过：**只动**①该函数头注释（扩写成"两个 id 故意不同"的理由）②签名 `startChildWrite197(rt, taskID, corrID, path)` ③`:109` 那行 `CorrelationID: corrID` ④两处调用点给 `childID+"-corr-1"`／`"-corr-2"`（形状照 `run_mode101_test.go` 的 `t101-corr-%d`）——**零断言行被改**。
+- **"拆开会不会碰坏别的断言"它先判了**：不依赖相等。凭据＝改动前 `:131` 逐字 `if c.TaskID == taskID && c.Level == "L2" {`（卡按 `TaskID` 找，而 `TaskID` 只吃 `req.TaskID`，`internal/tools/bridge.go:376`）；九行授权全用卡上现读的 `card.CorrelationID`；审计串由 `rec.corr1/corr2` 拼。
+- ★**编排者亲跑**（承重读数）：`cd cmd/wisp && PATH=… go test . -run '197' -v` ⇒ **rc=0**，`Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands` **PASS 11.44s** ＋`Test197NoAllowDoorIsReachableFromASubagentsAssembly` PASS；日志逐字 `child=… corr1=…-corr-1 corr2=…-corr-2`（**两枚已不同**），六发拒绝读数与"宿主允许=<nil>"同基线。
+- **⛔ 遗留（登记、不立票、不动手）**：**产码默认仍是同一个值**——`internal/agent/loop.go:654` 一带逐字 `TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,`。⇒ 本格只把**测试载具**拆开；真进程里两枚 id 仍会塌到一起。归口＝**票 242 一族**（它 `:14` 那句"造不出两张不同 correlation 的活卡"、`:60`"载具前置仍未做"正是这件事），⛔ 我按查重三处（票扫／README 归口句／台账）判**不新立票**。
+- **翻勾**：票面 69→**79 行**／未勾 1→**0**／已勾 5→**6**；撤销口令＝「撤 259 AC#4」。⛔ 原句一字未改、只追加本节点。
