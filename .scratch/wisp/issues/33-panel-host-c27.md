@@ -355,7 +355,7 @@ declaration consumed by 37's native card.
 它买真窗（`startPanelForTest`），且入口解不出就 `:317` 具名 skip ⇒ 新鲜检出（CI）里这格零仪器。
 新件＝`cmd/wisp/panel_pageover_33r10_windows_test.go::TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe`（`//go:build windows`，不开窗）。
 它问的是**最终文档的能力**，⛔ 不问 `SetHtml` 被调用过几次：
-(a) 最后一份文档**逐字节等于**探测步骤自己写的那份吗？——探测页由 `firstRoundTripLocked` 对着一次性接收器**当场跑出来再取**，⛔ 不是抄进台件的字符串；
+(a) 最后一份文档**逐字节等于**探测步骤自己写的那份吗？——探测页由 `firstRoundTrip`（这枚方法的旧名＝`firstRoundTripLocked`，`33-r11` 的 ⓐ 去掉了后缀）对着一次性接收器**当场跑出来再取**，⛔ 不是抄进台件的字符串；
 (b) 把 `<script>` 剥掉后正文里还有没有可看的东西（元素或文字）？
 (c) 入口解得出时（`panel.Assets.Resolve(panel.EntryFile)`，与产码同一条接缝）：最后一份文档含不含那 `%d` 字节本体、含不含解析出的元素 `id`。
 

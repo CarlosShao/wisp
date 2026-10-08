@@ -1,0 +1,15 @@
+== after: box ruler (grep -cE '^[[:space:]]*- \[ \]') ==
+issues/33-panel-host-c27.md 13
+box-rc=0
+checked-boxes 1
+xbox-rc=0
+== after: wc -l (must stay 394) ==
+394 .scratch/wisp/issues/33-panel-host-c27.md
+wc-rc=0
+== old names left in ticket ==
+39:- [ ] **AC#13（10-01 11:2x 编排者追加，来路＝`33-v1` 验收表 §AC#3"供给那半"＋我自己现读；账 `A494`）：冷启动那段"往返探测"不许把真页面盖掉。** 现读时序（我 11:1x 亲自复认过行号）：`cmd/wisp/panel_host_windows.go:221` 调 `serveEntry()` → `:250` 把 embed 的入口字节 `SetHtml` 进控件，紧接着 `:227` 调 `firstRoundTripLocked(...)` → **`:372-375` 又一发 `SetHtml`，内容是一枚自造的探测页**（`<!doctype html>…<script>if(window.wispProbeRT)window.wispProbeRT();</script>…`）⇒ **每次冷启动最终显示的是那枚探测页，不是面板**。⚠ 这条不是"注释过期"：**面板真接进常驻之后，用户看到的仍然是枚空壳页**，而台件只会绿（它断的是"往返成立"，不是"页面是内容页"）。**完成判据**＝① 探测与供页面**次序重排**或改用资源请求过滤器（`AddWebResourceRequestedFilter` 在 `pkg/edge` 是**导出**的，同文件 `:34` 的注释自己就承认了这一点）；② 一枚**会响的**断言钉"最终文档里含 embed 入口的真内容"（问能力：解析出的条目／文档正文特征，⛔ 不问 `SetHtml` 被调用过）；③ 反控＝把两发 `SetHtml` 的次序调换，该用例**必须**红。〔**10-08 11:1x 编排者就地收窄射程，来源＝非实现者验收腿 `33-v4` 的 Q3/Q4（件 `.scratch/wisp/probes/33/v4/verdict.md`）；⛔ 本框保持未勾，⛔ 不改上面判据的结论**：① 上面那四个行号（`:221`/`:250`/`:227`/`:372-375`）是 10-01 的现读，**已漂**——那段自 33-r5 起被搬进 `coldStartPageHandover`，换向的确切一笔是 `13acad46`（腿用逐版本 dump＋blame 定案，`git log -S` 那把尺会漏）。② 判据②那句"今天零覆盖／只有 CI 才量得到"**按全称读不成立**：本树里 `cmd/wisp/panel_resident_windows_test.go:314`（`//go:build windows`，⛔ **不是** `winlive`）就是那枚有主体、不 skip 的断言；成立的那半是**"CI／新鲜检出那一侧没有主体"**（新鲜检出没有 `frontend/dist/index.html`）。③ 那一发 `:314` 真窗本波**谁都没跑** ⇒ 谁要写"用户看得见面板"，唯一合法凭据是它，欠账归编排者、⛔ 不算腿的。〕⛔ 不许用"删掉探测"来糊——探测是 AC#4/冷启动"可用"判定的来源，删它会把另一格打空。
+321:- **裁定 P2｜AC#14 的判据形状就此定死**：会响的断言必须**由页面自己把拿到的回话报回 Go**（R25 那枚 `wispReport` 形状）。⛔ 三枚今天**同时成立却没有回执**的写法一律不算凭据：断 `Dispatch 被调过`、断 `Eval 没报错`、断 `Go 侧 done 关闭`。⇒ `firstRoundTripLocked` 的射程写死＝**"页→Go 到达"**，它⛔不构成 AC#14 的任何凭据。另：`Eval` 主动推送是**另一维**（R27 在自泵形里也到，907ms）⇒ 票面 `:43` 那句"ⓑ 只能救推送、救不了绑定回话"现在有读数撑着，两半要两枚钉，⛔ 不许并成一句。
+348:`:425` 先调 `firstRoundTripLocked` → 它在 `:757-758` 发探测页 `SetHtml`；`:427` 才调 `serveEntry` → `:467` 把 embed 入口字节 `SetHtml` 进去。
+358:(a) 最后一份文档**逐字节等于**探测步骤自己写的那份吗？——探测页由 `firstRoundTrip`（这枚方法的旧名＝`firstRoundTripLocked`，`33-r11` 的 ⓐ 去掉了后缀）对着一次性接收器**当场跑出来再取**，⛔ 不是抄进台件的字符串；
+385:**这笔账是什么**：`cmd/wisp/panel_host_windows.go` 里 `serveNotBuiltNoticeLocked`（`:460`）与 `firstRoundTripLocked`（`:840` 一带）**带 `Locked` 后缀却自己取锁**，而本仓形制（`setPriorFocusLocked`：注释明写 caller must hold、调用点在持锁段里）说的是反的。`sync.Mutex` 不可重入 ⇒ 照名字办事的后续程会**当场自死锁**。载体是 10-01 那两刀（`13acad46`／`697b4fa`），⛔ 不记在任何一枚近期腿上。
+grep-rc=0

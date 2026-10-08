@@ -1,0 +1,38 @@
+== numstat bb871191..(working, incl. uncommitted ticket edit) excluding r12 ==
+9	0	.gitignore
+1	1	.scratch/wisp/issues/33-panel-host-c27.md
+12	0	.scratch/wisp/probes/152/my152.py
+846	620	.scratch/wisp/probes/161/r6/logs/flip-1.txt
+846	620	.scratch/wisp/probes/161/r6/logs/flip-2.txt
+846	620	.scratch/wisp/probes/161/r6/logs/flip-3.txt
+846	620	.scratch/wisp/probes/161/r6/logs/flip-4.txt
+846	620	.scratch/wisp/probes/161/r6/logs/flip-5.txt
+846	620	.scratch/wisp/probes/161/r6/logs/flip-6.txt
+846	620	.scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+846	620	.scratch/wisp/probes/161/r6/logs/flip-restored.txt
+45	4	.scratch/wisp/probes/242/r3/logs/probe-routed.txt
+4	1	.scratch/wisp/probes/268/v1/evidence.md
+0	518	design/assets/base.css
+0	180	design/assets/icons.js
+0	80	design/assets/theme.js
+0	287	design/assets/tokens.css
+47	3	design/doubao/README.md
+124	11	design/doubao/demo/app.js
+22	2	design/doubao/demo/index.html
+271	1	design/doubao/demo/styles.css
+0	668	design/index.html
+0	1176	design/screens/approval.html
+0	578	design/screens/ball.html
+0	663	design/screens/chat.html
+0	216	design/screens/config.html
+0	191	design/screens/cost.html
+0	158	design/screens/firstrun.html
+0	292	design/screens/palette.html
+0	198	design/screens/privacy.html
+0	213	design/screens/security.html
+0	225	design/screens/states.html
+0	253	design/screens/tasks.html
+numstat-rc=0
+== same, ticket only ==
+1	1	.scratch/wisp/issues/33-panel-host-c27.md
+rc=0
