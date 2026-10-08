@@ -1,0 +1,29 @@
+anchor (35-v4 countershape leg, taken 2026-10-08, Git Bash)
+
+HEAD full = 168a91f0747a7f71c36344dd48f75edd98fe7729   branch = dev   (no push, ever)
+
+forbidden-zone diff 2fc5f5c9..HEAD (cmd/wisp/panel_host_windows.go internal/panel/ frontend/ docs/specs/ docs/PLAN.md)
+  -> measured EMPTY (no lines printed between header and "(end diffstat)")
+
+wc -l  cmd/wisp/panel_transport_35r2_test.go = 2066
+       cmd/wisp/panel_host_windows.go        = 861
+       .scratch/wisp/issues/35-panel-bridge-c17.md = 256
+
+CR counts (tr -cd '\r' | wc -c):
+  cmd/wisp/panel_transport_35r2_test.go CR=0
+  cmd/wisp/panel_host_windows.go        CR=0
+
+blob ids (worktree == HEAD, both files; git status --porcelain on cmd/wisp/ and
+.scratch/wisp/probes/35/r4/ printed nothing = clean):
+  panel_host_windows.go          worktree 26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+                                 HEAD     26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+  panel_transport_35r2_test.go   worktree 31c96f37d32adcd1625a2c01748d5b30016227b2
+                                 HEAD     31c96f37d32adcd1625a2c01748d5b30016227b2
+
+countershape drivers found at (NOT in scripts/, contradicting the dispatch wording):
+  .scratch/wisp/probes/35/r4/scripts/leg-countershape.sh
+  .scratch/wisp/probes/35/r4/scripts/orchestrator-countershape.sh
+  -> the orchestrator driver writes OUT=/d/tmp/wisp35r4 (another leg's dir); my copy
+     redirects OUT to /d/tmp/wisp35v4. Mutant sources are re-created by me, not reused.
+
+rc=0
