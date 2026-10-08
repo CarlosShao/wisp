@@ -1,0 +1,45 @@
+## C1 panel 侧 cost 词面（对账编排者 09-28 "4行命中"与 a1 "零消费者"）
+internal/panel/composer.go:18://	              CLI makes, which still costs the R20/M4 L2 strong confirmation
+internal/panel/composer.go:147:	// L2ConfirmNames lists the transitions that cost an L2 strong confirmation
+internal/panel/composer_dispatch.go:37:// unattached). Fail-closed is the only state that costs nothing to add.
+internal/panel/composer_handlers.go:140:	// one card, raised by Set, for the one档 that costs it.
+internal/panel/config_handlers.go:34:// through panel.mode.request, which costs the L2 card), and it invents no answer
+internal/panel/pump.go:442:// it pushed out of it - the log's own count of what the bound cost.
+internal/panel/pump.go:474:	// floor below is the point where the bookkeeping, not the text, is the cost.
+internal/panel/pump.go:668:// StreamTruncation is what ONE key of the log cost the bound. It is the
+internal/panel/subagent_roster_197.go:79:	// cost, read off the live StreamLog by the host. They say how much of this
+rcC1=0
+## C2 R4正控: 同尺形打已知存在的 .git/HEAD
+internal/panel/git_test.go:72:		".git/HEAD":                            "ref: refs/heads/" + worktree + "\n",
+internal/panel/git_test.go:93:		t.Errorf("branch = %q, want %q read from .git/HEAD", view.Branch, worktree)
+internal/panel/git_test.go:136:		".git/HEAD":           sha + "\n",
+internal/panel/git_test.go:166:		".git/HEAD":                       "ref: refs/heads/dev\n",
+rcC2(grep)=1ok0hit
+## C3 rightbar 动作面（附件 remove / 审批按钮）
+3:   右侧边栏：注册 context / activity / approval 三个面板到 RbPanels
+16:      +   '<button class="rb-panel-action" data-ctx-add><i data-lucide="plus"></i>添加</button>'
+56:        if (row) row.remove();
+74:      +   '<button data-attach-del="' + name + '" title="移除附件"'
+77:      +   '</button>'
+116:RbPanels.register('approval', {
+143:        + '<div data-approval-item style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:hsl(var(--card));border:1px solid hsl(var(--border));margin-bottom:6px;cursor:pointer;transition:border-color .12s"'
+154:    html += '<button data-approval-all class="btn btn-outline btn-sm" style="width:100%;margin-top:6px">查看全部</button>';
+160:      if (e.target.closest('[data-approval-item]') || e.target.closest('[data-approval-all]')) {
+161:        app.showScreen('approval');
+rcC3=0
+## C4 票196 的框形制
+rcC4=0
+## C5 Tasks 载体字段面
+internal/panel/subagent_roster_197.go:94:type TaskRosterState struct {
+internal/panel/subagent_roster_197.go:95:	Rows              []TaskRow
+internal/panel/subagent_roster_197.go:151:	// Rows is every row the host could read, ordered by task id so the packet
+internal/panel/subagent_roster_197.go:153:	Rows []TaskRowView `json:"rows"`
+internal/panel/subagent_roster_197.go:155:	// the cap it holds them against. Both are read, not counted from Rows: see
+internal/panel/subagent_roster_197.go:200:		Rows:              make([]TaskRowView, 0, len(state.Rows)),
+internal/panel/subagent_roster_197.go:226:	for _, row := range state.Rows {
+internal/panel/subagent_roster_197.go:251:		sect.Rows = append(sect.Rows, view)
+internal/panel/subagent_roster_197.go:253:	sort.Slice(sect.Rows, func(i, j int) bool { return sect.Rows[i].TaskID < sect.Rows[j].TaskID })
+rcC5=0
+## C6 快照顶层字段现量计数（对 167-c2 的 6 枚）
+6
+rcC6=0

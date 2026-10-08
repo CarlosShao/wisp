@@ -1,0 +1,69 @@
+## ticket 186
+.scratch/wisp/issues/186-the-composer-area-should-detect-git-and-let-the-user-switch-between-local-worktree-and-branch.md
+34:- [ ] **AC#1 只读普查先答"三样各自怎么读、要不要起新进程"**：① 认 git——读 `.git/HEAD` 这一条文件就够，还是要 `git` 二进制？② 工作树清单——`.git/worktrees/` 目录法能不能拿到"路径＋分支"两样，拿不到要不要跑 `git worktree list --porcelain`；③ 分支清单——`refs/heads/` ＋ `packed-refs` 两堆合不合得上。**每支给一条现跑的命令与读数**（在真仓上跑，本仓就是一棵真 git 树：`git rev-parse --abbrev-ref HEAD`、`ls .git/worktrees 2>/dev/null`、`cat .git/HEAD`）。⚠ **跑外部 `git` 二进制是一枚新的宿主能力**（今天全仓零次），要么给出"不跑也能读全"的证据，要么把"要跑"具名报回并说明它归不归 `allowlist.txt`／`d22scan` 的哪一条管。
+35:- [ ] **AC#2 定"切换请求走哪一枚方法"，并把它写成契约变更入档**：候选＝**复用已在册的 `panel.workspace.request`**（它今天零写腿，正好是"有名无实现"那一形，见票 35 的 `panel.resync` 前例）／新起 `panel.worktree.switch`／新起 `panel.git.switch`。**判据＝哪一枚改动面最小且不新增白名单条目**；若结论是"必须新增条目"，⚠ **C17 白名单定稿是契约面**——owner 09-28 这句"别老说契约冻结"是**方向授权、不逐条点名**，所以**具名报回要加哪一枚、我落 `A##` 之后再写**。
+36:- [ ] **AC#3 安全约束做成实现约束，不许当否决理由**（⚠ 这条是我上一轮的错处，写死在这里）：切走工作区/工作树会换掉**宿主正在用的那棵树**，09-27 真出过一次（7 枚提交落到错误分支，`HANDOVER §4.0u`／`A328`）。⇒ 落地必须回答三问并各带判据：**(i) 有程在飞时这枚请求怎么摆**（拒绝并说明／排队／还是照切——**选一支并给判据**）；**(ii) 切完界面显示的那棵树与运行时真用的那棵树必须同源**（不许显示 A 跑 B——`RequestWorkspaceSwitch` 已经做了"失败保留原范围＋如实渲染"，接线不许绕过它自己写一份）；**(iii) 切换要写审计行**（现成的 `AuditFunc` 腿，不许吞）。
+37:- [ ] **AC#4 非 git 目录那一形必须显式回答**：工作区不是一棵 git 树时（今天 `wisp run` 允许任意授权根），快照里这一维要带**一句人话理由**（票 92／145 的"宁缺毋造"），不许画一枚点了没反应的按钮，也不许留空让用户以为坏了。
+38:- [ ] **AC#5 反向判据（防这一族走偏成"模型能自己切仓库"）**：交付里**不许出现**任何模型可调用的 `git.*` 工具、不许动 `docs/PLAN.md` 的 D34 那张表、不许把切换能力塞进 `internal/tools/` 的执行面。⇒ 补一枚常驻判据钉住"这一维只有宿主侧读面与面板请求两条路"（尺的形状照票 181 AC#3）。
+39:- [ ] **AC#6 覆盖面：切完之后"哪些东西跟着换"要说清**——授权根（C26／`allowed_dirs`）、产物目录、会话历史、污染名册（C25 的 per-scope mark）各自在切换后的行为，逐枚答"保留／重建／作废"，各带一条现跑读数或一个具名落点。⚠ 这一格是本票最容易漏的：**换树不换名册＝上一棵树的证据会咬下一棵树的内容**（票 183/185 那一族在同一根管子上已经咬过三次）。
+40:- [ ] **AC#7 契约轴**：`docs/PLAN.md`（D34／D36／D38／C26 都近邻）、`docs/specs/**`、`allowlist.txt`、`thresholds.go`／golden／审批超时常量一字节不许动；`internal/panel/workspace.go` 的既有语义只许**追加**不许改写（它带着票 92/102 的裁决）。⚠ C17 白名单那一处按 AC#2 的规矩**先入档再改**。
+41:- [ ] **AC#8 门禁**：逐包 `go test -count=1 ./internal/panel/ ./internal/config/ ./internal/risk/`（⚠ `./internal/risk/` **单跑**，并发会假红＝`A359`）；CLI 那一面走 `-overlay` **且带在册 PATH 前缀**（`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，出处 `scripts/wisp-cli-tests.sh:20`；不带就是 `0xc0000135`＝票 98）；`sh scripts/d22scan.sh`（基线 `ban #8 internal/` **examined=433**，多一枚少一枚都要具名解释）；`bash .scratch/wisp/probes/154/gate-clauses.sh` **比红腿名册不比退码**（今天唯一在册红腿＝`G6neg`＝票 178）；⚠ 终态读数取在**你自己最后一枚 commit 之后**。⚠ **不许跑 `probes/161/r6/flip-declaration.sh`**；⚠ **重跑任何既有台件之前先看它往哪枚路径写数**（就地覆盖型 sink 会把别家票逐行引用的读数洗掉，09-28 实测＝`A367`）。
+42:- [ ] **AC#9 界面那一半不在本票写面**：`frontend/**`／`design/**` 归另一枚会话（owner 09-25 决定）。⇒ 本票只交 **Go 侧的读面＋请求腿＋快照字段**，并把"面板要画哪几枚控件、点下去发哪条请求"写成一张**递给前端的需求表**（`docs/evidence/s1/186-panel-ask.md`）。⚠ 编排者会把这张表转给前端会话，**本票不代写前端**。
+## ticket 188
+.scratch/wisp/issues/188-the-task-monitor-rail-s-subagent-and-background-task-stacks-have-no-go-side-source.md
+18:- [x] **AC#1 先答"子代理这一维到底要不要进产品"**＝**乙（进，owner 09-28 18:0x 原话逐字：「子代理必须看到状态，而且点击某个子代理，能看到它们各自的流式工作页面，能明白吗？这是主流 harness 必做的，不要偷懒」）**；⇒ `Q-71` 已裁（账 `A397`）。⚠ 这一句牵出两行既有定案需要改判入档（`PLAN.md:1544` REJECTED"多 Agent 协作"＋`:1447`"S7 前不得开放多任务并发"），**实体层与流层归口＝新票 197**；本票余格只管**后台任务那一维**（`AC#2` 在飞＝`188-r2`）。⚠ 这一格不是技术题——`180-c1＋182-c1` 现量它是**规格真空**，加它＝新需求（牵 D22 双角色／D31 并发审批／D38 线程模型三节）。⇒ 只读普查：要动哪几节规格、有没有更小的等价维（例："这一轮有几个后台任务在跑"而不是"有几个子代理"）。**结论摆给 owner 拍，不许自己定。**
+19:- [ ] **AC#2 后台任务状态这一维先落地**（它不需要新需求，名册已在、缺字段）：给 `Record` 补状态维（枚举要**逐字对齐 D43 状态机权威转移表**，不许自造），并送进快照。⚠ 判据要钉"值来自真名册"，不许硬编码。
+20:- [ ] **AC#3 反向判据**：状态维**不许**变成"面板侧可写"（面板只许显示＋发起请求，R20／票 92 口径）；补一枚常驻判据钉住"这一维没有面板写腿"。
+21:- [ ] **AC#4 与票 145 分账**：快照载体扩张归票 145（`SPEC-08` 那一节的字段表），本票只交"源"；结题时逐条写明谁欠谁。
+22:- [ ] **AC#5 契约轴**：`docs/PLAN.md`（D31／D38／**D43 转移表**）、`docs/specs/**`、`allowlist.txt`、`thresholds.go`／golden 一字节不许动；**C17 白名单一枚不许加**。
+23:- [ ] **AC#6 门禁**：逐包 `go test -count=1 ./internal/tools/ ./internal/agent/ ./internal/panel/`；`sh scripts/d22scan.sh`（基线 `ban #8 internal/` **examined=433**）；`gate-clauses.sh` **比红腿名册**（在册只 `G6neg`）；⚠ `./internal/panel/` 今天有 **2 枚已知红**（`design/assets/tokens.css` 被别家会话删了未 staged），照实记不许当绿、不许顺手修。
+## ticket 189
+.scratch/wisp/issues/189-the-review-stack-needs-uncommitted-count-and-per-file-diff-but-go-side-has-zero-source.md
+12:- [ ] **AC#1 只读设计核**：未提交枚数与 diff 各从哪儿取——`git status --porcelain` 等价读法要不要起外部进程？（⚠ 票 181 已证"认 git／工作树／分支"三样**不需要**起进程；diff 这一样**很可能需要**，因为内容比对不在文件索引里。）⇒ 逐支给现量与代价，并核 `tools/d22scan/main.go` 的 ban 列表原文（`181-c1` 已给结论：七枚 ban **没有一枚管起外部进程**，真要跑会咬到 #1 裸 goroutine／#4 墙钟超时／#2 路径决策过 C26 三条＋D38(b) 的 goroutine 名册）。
+13:- [ ] **AC#2 只读落地**：宿主侧读面（**与票 181 同一枚文件族，不另起一份实现**——两份读面必然漂），送进快照；判据钉"值来自真仓"（在临时目录里 `git init` 一棵合成树，改几个文件，断言枚数与文件名集合正确）。
+14:- [ ] **AC#3 ⚠ 只读边界（这一格是本票的命门）**：交付里**不许出现**任何"提交／推送／接受／回滚"的动作腿。⇒ 普查 `180-c1＋182-c1` 把"diff 接受／回滚"与"面板 git 提交／推送"列为**雷区＝要 owner 逐枚批**；本票只做显示，写动作另立票、且要过 L2 与审计。补一枚常驻判据钉住"审查面只读"。
+15:- [ ] **AC#4 大 diff 的代价**：整棵工作树的 diff 可能巨大——要有**字节上限与截断语义**（照票 164／D15 那根管子的教训：**截断必须带"怎么找回全量"的指针**，否则又是"做了但没生效"）。给一发真读数。
+16:- [ ] **AC#5 契约轴**：D34 那张内置工具权威表**不许加 git 行**（做了就是"模型可调用 git"，那是契约变更）；`docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`thresholds.go`／golden 一字节不动；C17 一枚不加。
+17:- [ ] **AC#6 门禁**：`./internal/panel/ ./internal/tools/`＋`sh scripts/d22scan.sh`（基线 433）＋`gate-clauses.sh` 比名册（在册只 `G6neg`）；⚠ `internal/panel` 那 **2 枚已知红**照实记不修。
+## ticket 190
+.scratch/wisp/issues/190-the-workspace-files-stack-file-tree-has-no-host-side-source.md
+12:- [x] **AC#1 只读设计核**（09-28 17:5x 编排者按现量复跑对格后勾：设计核＝`docs/evidence/s1/190-file-tree-design-a1.md`；根＝**配置根∩工作区的那个集合**（可 0 枚、空根是正常态，`SPEC-03:35` 默认 `allowed_dirs[]=[]`），**树腿不接受面板传根**；`allowed_dirs` 是**判级输入不是执行时硬边界**（`internal/risk/rules_gateway.go:45-49` 越界只吐 `level: L2`、签名里没有 deny 出口）＝账 `A390`）：树的根取哪一枚（工作区根？授权根 `allowed_dirs`？两者不等同时以谁为准）、深度与条目上限、忽略规则（`.git`／`node_modules`／构建产物）；⚠ **忽略过滤必须问 git index，问不到就全扫并响亮自陈**（这仓的 `d22scan` 已定过这条规矩，别另发明一套）。
+13:- [ ] **AC#2 只读落地＋常驻判据**：值来自真目录（临时目录合成一棵树，断言条目集合）；根的选取要一发判据钉住"工作区未窄化时报的是授权根而不是整个盘"。
+14:- [ ] **AC#3 ⚠ 只读边界**：树上**不许**出现删除／移动／重命名／新建任何写动作（普查把它列为雷区＝要 owner 逐枚批）。补常驻判据钉"这一维只读"。
+15:- [ ] **AC#4 越权那一形必须显式回答**：目录不可读／权限拒绝／符号链接与 junction 跨界（票 119／126 那一族）三形各给一条现量与文案，**不许静默少列**。
+16:- [ ] **AC#5 契约轴**：D34 表不加行、`docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`thresholds.go`／golden 不动、C17 不加方法；路径决策一律过 `risk.PathResolver`（**不许**在它之外用 `filepath.Clean|Abs`，那是 d22scan ban #2）。
+17:- [ ] **AC#6 门禁**：`./internal/panel/ ./internal/tools/`＋`d22scan`（基线 433）＋`gate-clauses` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记不修。
+## ticket 191
+.scratch/wisp/issues/191-the-panel-embedded-terminal-puts-an-execution-surface-on-the-panel-channel-so-it-needs-a-named-ruling-first.md
+15:- [x] **AC#0 ⚠ 待人一句话（未答之前本票不许派任何落地腿）**：面板终端走哪一支？**(甲)** 复用既有工具腿＋门控＋审计（不放宽任何边界，代价＝命令集受工具面白名单约束、启动慢一点）；**(乙)** 面板侧独立 pty 直接执行（体验最接近截图，代价＝在面板通道上开一条执行面，要动 `PLAN.md:2027` ①③ 与 R20 两条已定案口径）。**我的推荐＝甲**。**不答的代价＝本票一直挂着，那一栏永远是示意数据。** 口令：「面板终端走甲」／「面板终端走乙」。
+16:- [ ] **AC#1 只读设计核（甲支）**：现有工具面里能承载"跑一条命令并流式回显"的是哪一枚（票 163 的常驻会话在不在名册级？尺：`grep -rn "shell\." --include=*.go internal/tools/ | grep -v _test.go` 现跑），缺什么（流式输出？超时？取消？）。
+17:- [ ] **AC#2 载体与快照**：输入口／输出流怎么进快照（票 145 的载体扩张），⚠ **输出流里的外泄面**（命令输出会带绝对路径、token、环境变量）——必须过 C25 盖戳与外泄检测那套管子（票 175／177／183 同一条管子，别绕）。
+18:- [ ] **AC#3 反向判据（本票的牙）**：交付后必须有一枚常驻判据钉住"面板侧送进来的命令**走的是同一套门控**，没有任何一条路径能绕过 `risk` 分级直接执行"。⚠ 若判据在"甲支"上今天就能绿，它是**不许弄坏的守卫**，不许充当本票新增的牙——牙要长在"绕过门控那一形会红"上（造变异现量）。
+19:- [ ] **AC#4 取消与超时语义**：长命令跑到一半用户关掉面板／按取消，今天这套语义是什么（票 176 的取消语义同族），逐形给读数。
+20:- [ ] **AC#5 契约轴**：`PLAN.md:2027` 那三条**不许由 agent 单方面改写**；D34 表、`allowlist.txt`、`thresholds.go`／golden、审批超时常量一字节不动；C17 若要加方法＝先落 `A##`。
+21:- [ ] **AC#6 门禁**：`./internal/tools/ ./internal/panel/ ./internal/agent/`＋`d22scan`（基线 433）＋`gate-clauses` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记不修。
+## ticket 196
+.scratch/wisp/issues/196-two-task-state-vocabularies-already-coexist-and-the-schema-has-no-check-so-the-d43-names-are-not-the-ones-in-use.md
+## PLAN.md 17.5 表界现量
+1306:意图分类被砍掉了，该态语义改为「思考中（等 LLM 首 token）」。这是 D11 的连锁修正。
+3474:## 17.5 Agent 工作状态的无 emoji 视觉设计（**用户特别点名，重点设计**）
+3481:| **思考中**（等 LLM 首 token） | 回答位置放一条 **2px 高光带**（宽 40%，`--accent` 渐变，两端透明）；右侧 `--fg-tertiary` 12.5px「思考中」+ **已耗时 `1.2s`**（tabular-nums，实时走） | 光带左→右循环流动，1.2s，`--ease-in-out` | ❌ 三个跳动的点（聊天应用俗套）❌ `brain`/`sparkles` 图标 ❌ 转圈 spinner（与"工具执行中"混淆） |
+rc9=$?
+204
+## 17.5 窗口内枚数逐行
+8
+## 找十四行表真实界
+3481: | **思考中**（等 LLM 首 token） | 回
+3482: | **SSE 流式输出** | 文字逐段出现；末尾一个
+3483: | **推理过程**（reasoning delta） 
+3484: | **工具调用** | **chip**（高 28px
+3485: | **工具调用（展开）** | 内嵌 `--bg-ba
+3486: | **审批等待（L2）** | chip 变 **`-
+3487: | **L2 确认卡（面板内）** | `--bg-ra
+3488: | **L1 阻止窗口** | 极简一行：`--warn
+3489: | **L2 原生降级卡**（面板不可用时，C27） |
+3490: | **错误** | 卡片**左侧 2px `--dan
+3491: | **Stuck**（梯度刹车，C22） | **左侧
+3492: | **成本**（C23） | 纯文字：`--font-
+3493: | **已取消 / 被打断** | 一条 `--bord
+3494: | **注入检出**（C25/R4） | `--dang

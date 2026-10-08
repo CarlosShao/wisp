@@ -1,0 +1,55 @@
+## D1 demo 注册表主尺（口径=编排者 09-28 裁定：原型 design/doubao/demo/** 注册表；注意 demo 目录工作树有 12 行在飞改动）
+design/doubao/demo/rb-files.js:8:RbPanels.register('files', {
+design/doubao/demo/rb-plugins.js:6:RbPanels.register('plugins', {
+design/doubao/demo/rb-review.js:6:RbPanels.register('review', {
+design/doubao/demo/rb-terminal.js:6:RbPanels.register('terminal', {
+design/doubao/demo/rightbar.js:8:RbPanels.register('context', {
+design/doubao/demo/rightbar.js:83:RbPanels.register('activity', {
+design/doubao/demo/rightbar.js:116:RbPanels.register('approval', {
+rcD1a=0
+design/doubao/demo/rb-files.js:1
+design/doubao/demo/rb-plugins.js:1
+design/doubao/demo/rb-review.js:1
+design/doubao/demo/rb-terminal.js:1
+design/doubao/demo/rightbar.js:3
+rcD1b=0
+## D2 label 尺
+design/doubao/demo/app.js:300:      label: n.label, icon: n.icon, action: () => { this.closePalette(); this.showScreen(n.id); }
+design/doubao/demo/rb-files.js:10:  label: '文件',
+design/doubao/demo/rb-plugins.js:8:  label: '插件',
+design/doubao/demo/rb-review.js:8:  label: '审阅',
+design/doubao/demo/rb-terminal.js:8:  label: '终端',
+design/doubao/demo/rightbar.js:10:  label: '上下文',
+design/doubao/demo/rightbar.js:85:  label: '活动',
+design/doubao/demo/rightbar.js:118:  label: '审批',
+rcD2=0
+## D3 面板动作面 data-* 尺（雷区 AC#5）
+design/doubao/demo/rb-review.js:23:data-diff-toggle
+design/doubao/demo/rb-files.js:16:data-dir
+design/doubao/demo/rb-files.js:31:data-file
+design/doubao/demo/rb-files.js:18:data-lucide
+design/doubao/demo/rb-plugins.js:32:data-plg-market
+design/doubao/demo/rb-plugins.js:55:data-plg-name
+design/doubao/demo/rb-plugins.js:65:data-plg-toggle
+design/doubao/demo/rb-terminal.js:24:data-tab
+design/doubao/demo/rb-terminal.js:26:data-terminal-add
+rcD3=0
+design/doubao/demo/rb-plugins.js:65:      +   '<div class="switch' + (p.on ? ' on' : '') + '" data-plg-toggle title="切换启用"></div>'
+design/doubao/demo/rb-plugins.js:75:      var sw = e.target.closest('[data-plg-toggle]');
+design/doubao/demo/rb-plugins.js:77:        sw.classList.toggle('on');
+design/doubao/demo/rb-files.js:17:        +   '<span class="rb-tree-toggle' + (open ? ' open' : '') + '">'
+design/doubao/demo/rb-files.js:32:        +   '<span class="rb-tree-toggle" style="visibility:hidden"></span>'
+design/doubao/demo/rb-files.js:42:        +   '<span class="rb-tree-toggle" style="visibility:hidden"></span>'
+design/doubao/demo/rb-files.js:85:      +   '<span class="rb-tree-toggle"><i data-lucide="chevron-right"></i></span>'
+design/doubao/demo/rb-files.js:130:          next.classList.toggle('collapsed');
+design/doubao/demo/rb-files.js:131:          var tog = d.querySelector('.rb-tree-toggle');
+design/doubao/demo/rb-files.js:132:          if (tog) tog.classList.toggle('open');
+design/doubao/demo/rb-review.js:23:        <div class="rb-diff-file-header" data-diff-toggle>
+design/doubao/demo/rb-review.js:63:        <div class="rb-diff-file-header" data-diff-toggle>
+design/doubao/demo/rb-review.js:77:        <div class="rb-diff-file-header" data-diff-toggle>
+design/doubao/demo/rb-review.js:104:    el.querySelectorAll('[data-diff-toggle]').forEach(function (header) {
+design/doubao/demo/rb-review.js:109:        body.classList.toggle('open');
+design/doubao/demo/rb-terminal.js:35:      +     '<div class="rb-terminal-line rb-terminal-output">Changes not staged for commit:</div>'
+design/doubao/demo/rb-terminal.js:66:          t.classList.remove('active');
+design/doubao/demo/rb-terminal.js:99:            cursorLine.remove();
+rcD3b=0

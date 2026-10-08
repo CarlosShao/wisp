@@ -1,0 +1,126 @@
+## R1 票面现量#1 无票认领尺（2026-10-08 现跑）
+.scratch/wisp/issues/182-the-task-monitor-rail-is-outside-ticket-145s-fourteen-row-table-so-nobody-has-counted-which-of-its-stacks-have-a-go-side-source.md
+.scratch/wisp/issues/186-the-composer-area-should-detect-git-and-let-the-user-switch-between-local-worktree-and-branch.md
+.scratch/wisp/issues/188-the-task-monitor-rail-s-subagent-and-background-task-stacks-have-no-go-side-source.md
+.scratch/wisp/issues/189-the-review-stack-needs-uncommitted-count-and-per-file-diff-but-go-side-has-zero-source.md
+.scratch/wisp/issues/190-the-workspace-files-stack-file-tree-has-no-host-side-source.md
+.scratch/wisp/issues/191-the-panel-embedded-terminal-puts-an-execution-surface-on-the-panel-channel-so-it-needs-a-named-ruling-first.md
+.scratch/wisp/issues/196-two-task-state-vocabularies-already-coexist-and-the-schema-has-no-check-so-the-d43-names-are-not-the-ones-in-use.md
+.scratch/wisp/issues/77-frontend-scaffold-reactbits-beautifului-shadcn.md
+rc=0
+## R2 票145 行来源 PLAN.md:3473-3488 现量
+
+## 17.5 Agent 工作状态的无 emoji 视觉设计（**用户特别点名，重点设计**）
+
+这是原型的核心难点：把"思考中 / SSE 流式 / 工具调用 / 审批 / 错误 / 卡住"
+做得**信息密度高但不嘈杂**。原则：**状态靠颜色语义 + 动效节奏 + 排印层级表达，不靠图标堆砌。**
+
+| 状态 | 视觉 | 动效 | 明确不用 |
+|---|---|---|---|
+| **思考中**（等 LLM 首 token） | 回答位置放一条 **2px 高光带**（宽 40%，`--accent` 渐变，两端透明）；右侧 `--fg-tertiary` 12.5px「思考中」+ **已耗时 `1.2s`**（tabular-nums，实时走） | 光带左→右循环流动，1.2s，`--ease-in-out` | ❌ 三个跳动的点（聊天应用俗套）❌ `brain`/`sparkles` 图标 ❌ 转圈 spinner（与"工具执行中"混淆） |
+| **SSE 流式输出** | 文字逐段出现；末尾一个 **1px × 14px 竖线光标**（`--accent`）；右下角 micro 字号实时 token 计数（`--fg-tertiary`） | 光标 opacity 1→0.2→1 呼吸，1s | ❌ 闪烁方块 ❌ 打字机音效 ❌ 逐字符动画（CPU 与可读性都差，**按 SSE 分块追加即可**） |
+| **推理过程**（reasoning delta） | **默认折叠**为一行：`--fg-tertiary` micro「推理过程 · 3.1s」+ `chevron-down`。展开后是**左侧 1px `--border-hair` 竖线引导**的次级文本块，`--fg-secondary` 12.5px | 展开 180ms 高度过渡 | ❌ 与正式回答混排 ❌ 用不同背景色块（视觉噪音） |
+| **工具调用** | **chip**（高 28px，`--bg-subtle`，1px `--border-hair`，`--r-sm`）：<br>左 = 16px 工具类别 SVG（`--fg-secondary`）<br>中 = 工具名（`--font-mono` 12.5px `--fg-primary`）+ 参数摘要（`--fg-tertiary`，单行截断 + 渐隐遮罩）<br>右 = **状态指示 14px**：运行中 = 旋转弧（1.5px stroke，`--accent`）· 成功 = `check`（`--success`）· 失败 = `x`（`--danger`）· 被拒 = `ban`（`--fg-tertiary`）<br>**风险级徽标**：micro 大写 `L0`/`L1`/`L2` + 对应色 **1px 描边胶囊**（不填实底） | 旋转弧 1s linear（仅运行中） | ❌ 用整块彩色背景表示状态 ❌ 每个工具配一个彩色 emoji ❌ 成功/失败用文字而非图标 |
+| **工具调用（展开）** | 内嵌 `--bg-base` 块：完整参数 JSON（**语法着色**：键 `--info`、字符串 `--success`、数字 `--warn`、布尔 `--accent`）+ 结果摘要 + 耗时 + `correlationId`（供 D31 取证） | 180ms | ❌ 直接 dump 未着色 JSON |
+| **审批等待（L2）** | chip 变 **`--warn` 1px 描边**；文字「等待确认」；右侧**队列深度角标**（`--bg-raised` 圆形 + 数字，`--warn`） | **脉冲只跑一次**（`box-shadow` 0→8px 扩散，2s，然后静止） | ❌ 无限循环脉冲（视觉噪音 + 违背 D32 的 CPU 约束）❌ 用红色（红是错误，琥珀才是等待） |
+| **L2 确认卡（面板内）** | `--bg-raised` 卡片，**顶部 2px `--danger` 横条**（不可逆操作的视觉重量）；标题 = 工具名 + `L2` 徽标；正文 = **完整参数**（不是摘要）+ C19 命中的规则（如「R4：包含来自 `web.fetch` 的内容」）；底部**常驻一行提示「点击悬浮球以批准」** + 一个 20px 悬浮球图示（SVG 圆 + 脉冲环）；按钮区只有 **`拒绝`（次级）** 与 **`查看完整参数`（ghost）** —— **没有"允许"按钮**（D33/F2 定案） | 悬浮球图示的环 2s 呼吸（引导视线） | ❌ 面板上放"允许"按钮（已被 §15 第 6 项定案否决） |
+| **L1 阻止窗口** | 极简一行：`--warn` 竖条 + 工具名 + 参数摘要 + **环形倒计时**（20px SVG，2–3s，`stroke-dashoffset` 递减）+ 右侧「单击球 / Esc 取消」micro 提示。**KWS 未加载时提示必须变为「语音取消不可用」**（B1 定案） | 倒计时环 | ❌ 弹窗打断（L1 是"执行前阻止"，不是"必须回答"） |
+rc=0
+## R3 票面现量#4a fs.list 候选源 internal/tools/fs.go:309
+307:// FSListDecl is the host-side declaration for fs.list (same capability as
+309:func FSListDecl() Decl {
+328:		{Tool: fsList{d: d}, Decl: FSListDecl()},
+rc=0
+## R4 票面现量#4c git diff 尺
+grep-rc=1
+## R5 票面现量#3 快照载体 composer.go:57-62/:200-207
+type Snapshot struct {
+	Pending     []ApprovalCardView `json:"pending"`
+	Results     []ResultChunk      `json:"results"`
+	Composer    ComposerState      `json:"composer"`
+	GeneratedAt string             `json:"generatedAt"`
+	// Instructions is ticket 200's carrier: which project instruction files this
+	// run followed, and - when it followed none - which of the five states that
+	// is (off / none_found / refused / not_run / loaded). 200-r2 replaced the
+	// bare list with this section precisely because a list plus omitempty made
+	// four different truths marshal as one missing key.
+	//
+	// A pointer with omitempty is not a shortcut around pump_test's byte nails:
+	// it is the one honest encoding of "this host has no instructions reader".
+	// A pump that HAS one always sends the key, and a pump that does not sends
+	// four keys, exactly the shape pump_test.go:123 and :291 pin. Filling the
+	// key from a live reader is pump.go's job and run.go's assembly; a key whose
+	// value can never arrive is the shape ledger A408 names as 文案在、控件不在.
+	Instructions *InstructionsSection `json:"instructions,omitempty"`
+	// Tasks is ticket 197's carrier: which tasks this process is running, which
+	// of them are subagents and whose, what D43 name each one is filed under,
+	// which key holds each one's own work page, and how much of that page the
+	// stream log had to drop to keep its bound.
+	//
+	// It is a pointer with omitempty for the same reason the field above is, and
+	// the same two byte-level nails (pump_test.go:123, :291) still pass for the
+	// same reason: a pump assembled WITHOUT a roster reader sends four keys, which
+	// is the shape those nails pin, and a pump that has one always sends the key -
+	// including when nothing has been spawned, because the section then says so
+	// with an empty rows array plus the pool numbers rather than by disappearing.
+	// Adding it is a contract move and is reported as one: the two-way
+	// reconciliations against frontend/src/lib/panel.ts (approval_test.go:105,
+	// composer_test.go:48) now name "tasks" as a key the interface does not
+	// declare, which is that ruler doing the job ticket 77 pinned it for, and the
+	// page-side declaration is the UI leg's to write (Q-51, ledger A383).
+	Tasks *TaskRosterSection `json:"tasks,omitempty"`
+}
+
+// ResultChunk is one streamed assistant chunk.
+type ResultChunk struct {
+rc5a=0
+58:	Pending     []ApprovalCardView `json:"pending"`
+59:	Results     []ResultChunk      `json:"results"`
+60:	Composer    ComposerState      `json:"composer"`
+61:	GeneratedAt string             `json:"generatedAt"`
+74:	Instructions *InstructionsSection `json:"instructions,omitempty"`
+91:	Tasks *TaskRosterSection `json:"tasks,omitempty"`
+96:	CorrelationID string `json:"correlationId"`
+97:	Text          string `json:"text"`
+98:	Done          bool   `json:"done"`
+144:	Current string `json:"current"`
+146:	Names []string `json:"names"`
+149:	L2ConfirmNames []string `json:"l2ConfirmNames"`
+177:	To string `json:"to"`
+179:	CorrelationID string `json:"correlationId"`
+212:	Set bool `json:"set"`
+214:	Spelling string `json:"spelling"`
+216:	Canonical string `json:"canonical"`
+218:	Reparse bool `json:"reparse"`
+221:	Rewritten bool `json:"rewritten"`
+224:	Reason string `json:"reason"`
+229:	Path string `json:"path"`
+236:	Mode             ModeView        `json:"mode"`
+237:	Workspace        WorkspaceView   `json:"workspace"`
+238:	Attachments      []AttachmentRef `json:"attachments"`
+239:	AttachmentMIMEs  []string        `json:"acceptedAttachmentMimes"`
+240:	MaxAttachmentB   int64           `json:"maxAttachmentBytes"`
+241:	AttachmentReason string          `json:"attachmentError"`
+246:	Git GitView `json:"git"`
+255:	CurrentModel string `json:"currentModel"`
+256:	ModelKnown   bool   `json:"modelKnown"`
+268:	Credential      CredentialState `json:"credentialState"`
+269:	CredentialKnown bool            `json:"credentialKnown"`
+296:	Text        string          `json:"text"`
+297:	Attachments []AttachmentRef `json:"attachments"`
+rc5b=0
+## R6 bridge.go 入向名册（票面现量#5 引 167-c2 同尺，复核行号）
+35:// "panel.*" literal the Go side does not answer; that nail's own positive
+42:	MethodModeRequest      = "panel.mode.request"
+43:	MethodWorkspaceRequest = "panel.workspace.request"
+44:	MethodAttachmentAdd    = "panel.attachment.add"
+45:	MethodMessageSend      = "panel.message.send"
+51:	//     product spec already carries (docs/specs/SPEC-08-ui-ball-panel.md:168,
+54:	//   - They carry no `panel.` prefix on purpose, and that is load-bearing
+56:	//     `panel.*` literals of this file (git_test.go's whitelistMethodsFromSource
+rc6=0
+	MethodModeRequest      = "panel.mode.request"
+	MethodWorkspaceRequest = "panel.workspace.request"
+	MethodAttachmentAdd    = "panel.attachment.add"
+	MethodMessageSend      = "panel.message.send"
+rc6b=0

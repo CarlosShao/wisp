@@ -1,0 +1,139 @@
+## G1 ComposerState 全字段名册现量
+11
+rc1a=0
+	Mode             ModeView        `json:"mode"`
+	Workspace        WorkspaceView   `json:"workspace"`
+	Attachments      []AttachmentRef `json:"attachments"`
+	AttachmentMIMEs  []string        `json:"acceptedAttachmentMimes"`
+	MaxAttachmentB   int64           `json:"maxAttachmentBytes"`
+	AttachmentReason string          `json:"attachmentError"`
+	Git GitView `json:"git"`
+	CurrentModel string `json:"currentModel"`
+	ModelKnown   bool   `json:"modelKnown"`
+	Credential      CredentialState `json:"credentialState"`
+	CredentialKnown bool            `json:"credentialKnown"`
+rc1b=0
+## G2 成本链 cost.go->guard->loop->panel
+24:	Usage     llm.Usage
+32:// AddUsage prices one Usage block against a price card and accumulates it.
+34:// llm.Usage.Add's max-merge which collapses duplicate reports inside one
+38:func (c *Cost) AddUsage(p config.Price, u llm.Usage) int64 {
+40:	c.Usage = llm.Usage{
+41:		InputTokens:  c.Usage.InputTokens + u.InputTokens,
+42:		OutputTokens: c.Usage.OutputTokens + u.OutputTokens,
+43:		CachedTokens: c.Usage.CachedTokens + u.CachedTokens,
+50:func PriceMicros(p config.Price, u llm.Usage) int64 {
+rc2a=0
+rc2b=1
+internal/agent/cost.go:32:// AddUsage prices one Usage block against a price card and accumulates it.
+internal/agent/cost.go:38:func (c *Cost) AddUsage(p config.Price, u llm.Usage) int64 {
+internal/agent/guard.go:146:// AddUsage folds one Usage event into the task totals and reports whether the
+internal/agent/guard.go:148:func (g *Guard) AddUsage(u llm.Usage) bool {
+internal/agent/guard.go:154:// AddCost accumulates a C23 cost delta in 1e-6 currency units.
+internal/agent/guard.go:155:func (g *Guard) AddCost(micros int64) {
+internal/agent/loop.go:442:			delta := cost.AddUsage(l.opt.Config.Price, turn.Usage)
+internal/agent/loop.go:443:			guard.AddCost(delta)
+internal/agent/loop.go:444:			if guard.AddUsage(turn.Usage) {
+rc2c=0
+## G3 子代理/任务名册 status 维
+15://   - not a judge of status. Whether a filed word is one of D43's 20 names is
+65:	// This package neither validates nor translates it - see the note on Status.
+67:	// Status / StatusKnown / StatusReason are the three halves of
+71:	Status       string
+72:	StatusKnown  bool
+73:	StatusReason string
+111:	// Status is a D43 name, and it is empty EXACTLY when StatusKnown is false:
+112:	// an unread status dimension is never rendered as a word this repository
+114:	Status      string `json:"status"`
+115:	StatusKnown bool   `json:"statusKnown"`
+116:	// StatusReason is the honest half of an unknown status, in the host's own
+118:	// precisely so a display surface can say "no status was filed" instead of
+120:	StatusReason string `json:"statusReason,omitempty"`
+232:			Status:            row.Status,
+233:			StatusKnown:       row.StatusKnown,
+234:			StatusReason:      row.StatusReason,
+241:		if !view.StatusKnown {
+242:			// A name the host's judge refused never travels as a status. This is
+246:			view.Status = ""
+247:			if view.StatusReason == "" {
+rc3a=0
+128:	// Empty means the host filed none. That is a real answer and StateAnswer
+143:// StateAnswer reads the status dimension of one roster record the same way
+158:func (o TaskOutput) StateAnswer() (statemachine.State, string) {
+176:type TaskRoster struct {
+214:// answer that StateAnswer announces (ticket 188), not a hole to paper over.
+353:// StateAnswer keeps saying 「宿主没有登记这一维」 for a root row. What lands is
+753:		if st, readWhy := final.StateAnswer(); st == "" {
+rc3b=0
+cmd/wisp/panel_pump.go:120:// taskRosterState is the pump's reader for ticket 197's 载体层: which tasks this
+cmd/wisp/panel_pump.go:146:func (rt *agentRuntime) taskRosterState() panel.TaskRosterState {
+cmd/wisp/run.go:724:		Tasks: rt.taskRosterState,
+rc3c=0
+## G4 shell/PTY 地基
+internal/agent/spill.go:26:// shell.exec stdout).
+internal/config/unwired.go:63:		missing: "no shell.exec tool is registered in internal/tools, so nothing reads this flag",
+internal/config/unwired.go:64:		lands:   "it lands with the shell.exec tool itself (SPEC-07 sec 3, S3, default-disabled per D14)",
+internal/config/unwired.go:70:		lands:   "it lands with the shell.exec tool (SPEC-06 sec 10 forced-argv rule)",
+internal/config/unwired.go:76:		lands:   "it lands with the shell.exec tool (SPEC-06 sec 10)",
+internal/risk/rules_shell.go:14:// ruleShell implements R6 on the forced argv vector (SPEC-06 §10: shell.exec
+rc4a=0
+cmd/wisp/testdata/esclistener/main.go:117:	ptY    int32
+rc4b=0
+grep: internal/tools/unwired.go: No such file or directory
+rc4c=0
+## G5 git.go 读面字段（票181已落地面）
+96:	Path string `json:"path"`
+98:	Branch string `json:"branch"`
+100:	Sha string `json:"sha"`
+102:	Detached bool `json:"detached"`
+105:	Main bool `json:"main"`
+119:	Kind string `json:"kind"`
+122:	Reason string `json:"reason"`
+124:	Branch string `json:"branch"`
+126:	DetachedSha string `json:"detachedSha"`
+128:	IsDetached bool `json:"isDetached"`
+130:	RepoRoot string `json:"repoRoot"`
+134:	CurrentWorktree string `json:"currentWorktree"`
+136:	Worktrees []GitWorktree `json:"worktrees"`
+141:	Branches []string `json:"branches"`
+144:	SwitchBlocked string `json:"switchBlocked"`
+rc5=0
+rc5b=1
+## G6 宿主侧目录读面（文件树）
+internal/panel/assets.go:105:	err := fs.WalkDir(a.tree, ".", func(p string, d fs.DirEntry, err error) error {
+internal/panel/git.go:22:// NO EXTERNAL PROCESS. Everything is os.Stat / os.ReadFile / os.ReadDir. The
+internal/panel/git.go:465:	entries, err := os.ReadDir(dir)
+internal/panel/git.go:508:	entries, err := os.ReadDir(filepath.Join(commonGitDir, "worktrees"))
+rc6a=0
+178:type fsList struct{ d FSDeps }
+180:type fsListArgs struct {
+185:var fsListSchema = JSONSchema(`{"type":"object","properties":{` +
+190:func (fsList) Name() string           { return "fs.list" }
+191:func (fsList) Description() string    { return "列出一个目录里的条目（名称/类型/大小）" }
+192:func (fsList) Parameters() JSONSchema { return fsListSchema }
+195:func (t fsList) Execute(ctx context.Context, params json.RawMessage, onUpdate func(string)) (Result, error) {
+199:	var a fsListArgs
+309:func FSListDecl() Decl {
+328:		{Tool: fsList{d: d}, Decl: FSListDecl()},
+rc6b=0
+## G7 插件/浏览器两堆 Go 侧
+disposal.go
+disposal_test.go
+doc.go
+rc7a=0
+rc7b=0
+internal/risk/blacklist.go
+cmd/wisp/panel_assets.go
+cmd/wisp/panel_host_windows.go
+rc7c=0
+## G8 注册循环名册
+515:	for _, e := range tools.BuiltinFSEntries(tools.FSDeps{
+530:	// Both are registered from tools.BuiltinTaskEntries below, so this line is
+544:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+780:	for _, e := range tools.BuiltinSubagentEntries(tools.SubagentDeps{
+rc8=0
+internal/tools/fs.go:325:func BuiltinFSEntries(d FSDeps) []Entry {
+internal/tools/fs_write.go:772:func BuiltinFSWriteEntries(d FSDeps) []Entry {
+internal/tools/subagent_197.go:233:func BuiltinSubagentEntries(d SubagentDeps) []Entry {
+internal/tools/task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+rc8b=0

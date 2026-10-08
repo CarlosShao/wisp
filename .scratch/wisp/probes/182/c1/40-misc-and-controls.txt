@@ -1,0 +1,54 @@
+## P1 R4正控: git diff 尺含测试跑
+p1rc(tail)=1
+rcP1b=0
+## P2 publishUsage 现状
+internal/agent/loop.go:445:				l.publishUsage(&res, cost)
+internal/agent/loop.go:449:			l.publishUsage(&res, cost)
+internal/agent/loop.go:983:func (l *Loop) publishUsage(res *Result, cost Cost) {
+rcP2=0
+## P3 rc2b正控: panel_pump 读得到已知名
+120:// taskRosterState is the pump's reader for ticket 197's 载体层: which tasks this
+146:func (rt *agentRuntime) taskRosterState() panel.TaskRosterState {
+209:// gitView reports the read-only git dimension (ticket 181) for the tree this run
+228:func (rt *agentRuntime) gitView() panel.GitView {
+rcP3=0
+## P4 uncommitted 正控（同尺形找已知存在词 branch）
+internal/panel/git.go
+internal/panel/git_test.go
+rcP4=0
+## P5 入向名册全列（bridge.go）
+42:	MethodModeRequest      = "panel.mode.request"
+43:	MethodWorkspaceRequest = "panel.workspace.request"
+44:	MethodAttachmentAdd    = "panel.attachment.add"
+45:	MethodMessageSend      = "panel.message.send"
+66:	MethodConfigGet = "config.get"
+67:	MethodConfigSet = "config.set"
+rcP5=0
+63:	//     `config.approve`/`config.grant`: a route that lets the page change
+64:	//     configuration is not a route that lets the page *approve* anything
+65:	//     (AGENTS.md §1.2 keeps panel-side L2 "allow" off the table entirely).
+rcP5b=0
+## P6 浏览器三命中是什么
+internal/risk/blacklist.go:227:	case aAnyForm(cand, func(s string) bool { return isBrowserCredentialStore(baseName(s)) }):
+internal/risk/blacklist.go:228:		return ClassA, "browser credential store"
+internal/risk/blacklist.go:336:// isBrowserCredentialStore matches the credential databases of Chromium-based
+internal/risk/blacklist.go:337:// browsers by file name (profiles move; the fail-safe direction is a
+internal/risk/blacklist.go:339:func isBrowserCredentialStore(base string) bool {
+cmd/wisp/panel_assets.go:8:// something in the binary can hand back the page bytes without a browser being
+cmd/wisp/panel_host_windows.go:313:// Cold latency = window create + first browser round trip (the same "usable"
+cmd/wisp/panel_host_windows.go:441:// (panel_resident_windows_test.go), buys a real browser and in a fresh checkout
+rcP6=0
+## P7 145 十四行表现量界
+14
+rcP7=0
+| 10 | :3484 | 错误 | `Failures []FailureView` | 分类/技术/重试有源 | ❗ `humanText` 无源 | 无字段＋无泵；文案待写 |
+| 11 | :3485 | Stuck | `Run.Stuck{Tool,Repeat,Level,Text}` | ✅ 逐枚对上 | — | 无字段＋无泵（源在真发） |
+| 12 | :3486 | 成本 | `Cost{In,Out,Cached,Micros,Currency}` | ✅ 五枚全有源 | ⚠ 单位口径未定案 | 无字段＋无泵 |
+| 13 | :3487 | 已取消 | `Run.Status` / `Stop` | ✅ 四枚枚举 | — | 无字段＋无泵；**泵上走哪条要挑明** |
+| 14 | :3488 | 注入检出 | `pending[].reason` 已到 | ✅ 来源有源 | ❗ `fragment` 无源＋要人裁 | 结构化缺；**行本身已能动** |
+rcP7b=0
+## P8 run.go 注册行现量
+515:	for _, e := range tools.BuiltinFSEntries(tools.FSDeps{
+544:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+780:	for _, e := range tools.BuiltinSubagentEntries(tools.SubagentDeps{
+rcP8=0
