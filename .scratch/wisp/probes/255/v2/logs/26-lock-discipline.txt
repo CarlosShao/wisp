@@ -1,0 +1,55 @@
+--- windowOptions body (lock discipline on m.geometry) ---
+// config says at that moment. An ALREADY CREATED window is covered too, since
+// 票 255-r1: Show's re-display branch asks this same method again and hands the live
+// window the answer through requestGeometryOnReshow, which reads the pair as a CLIENT
+// area while this one reads the OUTER FRAME - so one configured value is two widths.
+func (m *PanelManager) windowOptions() webview2.WindowOptions {
+	width, height := panelWidthPx, panelHeightPx
+	if m.geometry != nil {
+		// ONE call per create. Two would be two reads of the same disk file with
+		// nothing guaranteeing they answer the same question, and "the number the
+		// window was born with is the one the config held at that instant" is the
+		// claim AC#4 is here to make; cmd/wisp/panel_geometry_255_test.go counts
+		// this call.
+		gw, gh := m.geometry()
+		if gw > 0 {
+			width = gw
+		}
+		// h == 0 is what internal/config/schema.go's PanelSection.Height answers
+		// for a config that says nothing, and its own comment calls that value
+		// "auto from content". NOBODY implements auto-height: this host has no
+		// content-metric read, so 票 255's ruling lands the minimum-honest form -
+		// 0 keeps the constant 260, and "由内容定高" stays registered as NOT DONE
+		// (cmd/wisp/panel_geometry_255_test.go pins both halves of that). A
+		// negative answer is a garbage value, not a second spelling of 0, and it
+		// falls back the same way rather than inventing a rule for itself.
+		if gh > 0 {
+			height = gh
+		}
+	}
+	return webview2.WindowOptions{
+		Title:  panelTitle,
+		Width:  uint(width),
+--- every write of m.geometry / m.w ---
+200:	return func(m *PanelManager) { m.geometry = src }
+238:	if m.geometry != nil {
+244:		gw, gh := m.geometry()
+414:	m.w = w
+590:// A host nobody sized (m.geometry nil) sends nothing, which is what keeps the
+598:	if m.geometry == nil {
+725:	m.w = nil
+--- is geometry ever reassigned after construction? ---
+82:	// handed it a geometry source (票 255 AC#4: these two are now "the value when
+177:	// geometry answers "how big is the NEXT window", called once per create by
+184:	geometry func() (width, height int)
+197:// PanelManager.geometry for why that has to be a closure from the assembly root.
+200:	return func(m *PanelManager) { m.geometry = src }
+210:// opts is where 票 255 AC#4 enters: the assembly root hands this host a geometry
+222:// webview2.NewWithOptions call in this file - that is, the geometry the window is
+226:// TestTicket255PanelHostBuildsItsWindowOptions (cmd/wisp/panel_geometry_255_test.go
+238:	if m.geometry != nil {
+242:		// claim AC#4 is here to make; cmd/wisp/panel_geometry_255_test.go counts
+244:		gw, gh := m.geometry()
+253:		// (cmd/wisp/panel_geometry_255_test.go pins both halves of that). A
+390:		// One call, one read: the geometry the window is born with is what this
+598:	if m.geometry == nil {

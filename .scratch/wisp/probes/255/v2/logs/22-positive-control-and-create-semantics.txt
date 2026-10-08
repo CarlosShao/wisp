@@ -1,0 +1,40 @@
+### POSITIVE CONTROL for V2-M2: same overlay path with an undefined symbol must break the build, else the overlay was never compiled in
+# github.com/CarlosShao/wisp/cmd/wisp
+# [github.com/CarlosShao/wisp/cmd/wisp]
+vet.exe: D:\tmp\wisp255v2\m2bad.go:5:33: undefined: thisSymbolDoesNotExist255v2
+positive_control_rc=1
+(expect NON-zero => the sibling overlay file IS part of the package build)
+--- sanity: same command with the harmless m2 overlay compiles clean ---
+harmless_rc=0
+### library create path (webview.go 296-320): is the create pair the OUTER FRAME?
+	}
+	_, _, _ = w32.User32RegisterClassExW.Call(uintptr(unsafe.Pointer(&wc)))
+
+	windowName, _ := windows.UTF16PtrFromString(opts.Title)
+
+	windowWidth := opts.Width
+	if windowWidth == 0 {
+		windowWidth = 640
+	}
+	windowHeight := opts.Height
+	if windowHeight == 0 {
+		windowHeight = 480
+	}
+
+	var posX, posY uint
+	if opts.Center {
+		// get screen size
+		screenWidth, _, _ := w32.User32GetSystemMetrics.Call(w32.SM_CXSCREEN)
+		screenHeight, _, _ := w32.User32GetSystemMetrics.Call(w32.SM_CYSCREEN)
+		// calculate window position
+		posX = (uint(screenWidth) - windowWidth) / 2
+		posY = (uint(screenHeight) - windowHeight) / 2
+	} else {
+		// use default position
+		posX = w32.CW_USEDEFAULT
+		posY = w32.CW_USEDEFAULT
+	}
+
+	w.hwnd, _, _ = w32.User32CreateWindowExW.Call(
+		0,
+		uintptr(unsafe.Pointer(className)),

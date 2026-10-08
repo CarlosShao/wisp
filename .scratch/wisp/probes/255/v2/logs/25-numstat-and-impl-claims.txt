@@ -1,0 +1,17 @@
+--- numstat 8b32060b ---
+35	15	cmd/wisp/config_readers_255.go
+8	8	cmd/wisp/panel_geometry_255_test.go
+93	4	cmd/wisp/panel_host_windows.go
+563	0	cmd/wisp/panel_reshow_255r1_windows_test.go
+3	3	cmd/wisp/panel_resident_windows.go
+rc=0
+--- impl.md: any live-window / 立即生效 over-claim? ---
+4:⛔ 本件不宣称量过"真浏览器里的宽度"——那一族只有本机可量，且本程⛔ 没开真窗。
+21:| ① 外框 vs 客户区 | **具名分开写**，⛔ 不宣称"与配置一致"。建窗那份进 `CreateWindowExW`（`webview.go:296-320`，`0xCF0000 WS_OVERLAPPEDWI
+23:| ③ 必须走 Dispatch | 走 `common.go:39 Dispatch`，⛔ 不新造跨线程通道、⛔ 不起 goroutine。仓里对"跨线程直接 `SetWindowPos` 会怎样"**零
+25:⛔ 没有热加载 hook：`tiers.go:34` 写着 `"panel":"hot"` 而 `OnReload` 只对 Reload 档开火，`startConfigReload` 唯一非测试调用者在 `run.go`，常
+80:IMMEDIATE "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：[llm]"
+82:           （票 255 AC#1：这一半不许说成「已立即生效」；逐段的读者判定见 HOT-RELOAD-READER 行）：
+86:判读：`AC#1` 那条判据（"那句已立即生效里不许出现 `[panel]`"）**落地后照字面跑仍然成立**——因为 `AC#1` 量的是
+164:   在我改动之后 **PASS**，且它抓到的进程自打句子里 `已立即生效` 只列 `[llm]`、`[panel]` 落在那句诚实形里（§2 逐字）。
+grep_rc=0

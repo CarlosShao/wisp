@@ -1,0 +1,37 @@
+### 收尾自检
+cmd/wisp/panel_host_windows.go work=098560a31fc11db09957f297d9f2b176049a8316 head=098560a31fc11db09957f297d9f2b176049a8316 same=YES
+cmd/wisp/config_readers_255.go work=e8a7dff7c3f725d285ceacf1dbd872f01a46b502 head=e8a7dff7c3f725d285ceacf1dbd872f01a46b502 same=YES
+cmd/wisp/panel_resident_windows.go work=0f8912fdd3336c0f5f07d2bfef2b411066ecdbc9 head=0f8912fdd3336c0f5f07d2bfef2b411066ecdbc9 same=YES
+cmd/wisp/panel_geometry_255_test.go work=aea7e82622f2bbf142c55a0950e9f568f7712277 head=aea7e82622f2bbf142c55a0950e9f568f7712277 same=YES
+cmd/wisp/panel_reshow_255r1_windows_test.go work=6abd4954f0d6c80d28bd9dbe4addf070c2c14f89 head=6abd4954f0d6c80d28bd9dbe4addf070c2c14f89 same=YES
+looprc=0
+--- 仓里有没有被 overlay 写过（新文件探针） ---
+ls: cannot access 'cmd/wisp/zz_probe_255v2_windows.go': No such file or directory
+ls_rc=2
+--- 起手/收尾工作树作差 ---
+  771 .scratch/wisp/probes/255/v2/logs/01-worktree-start.txt
+  792 /tmp/wt-end.txt
+ 1563 total
+11d10
+<  M .scratch/wisp/probes/255/v2/logs/10-full-package-postchange.txt
+366d364
+< ?? .scratch/wisp/probes/242/r3/
+408,421c406
+< ?? .scratch/wisp/probes/255/v2/logs/20-mutation-V2M1-hardcoded-pair.txt
+< ?? .scratch/wisp/probes/255/v2/logs/21-mutation-V2M2-second-hintfixed-path.txt
+< ?? .scratch/wisp/probes/255/v2/logs/22-positive-control-and-create-semantics.txt
+< ?? .scratch/wisp/probes/255/v2/logs/23-create-is-outer-frame.txt
+< ?? .scratch/wisp/probes/255/v2/logs/24-winlive-coverage.txt
+< ?? .scratch/wisp/probes/255/v2/logs/25-numstat-and-impl-claims.txt
+< ?? .scratch/wisp/probes/255/v2/logs/26-lock-discipline.txt
+< ?? .scratch/wisp/probes/255/v2/logs/30-full-run-summary.txt
+< ?? .scratch/wisp/probes/255/v2/logs/31-control-call-removed.txt
+< ?? .scratch/wisp/probes/255/v2/logs/32-five-fail-reasons.txt
+< ?? .scratch/wisp/probes/255/v2/logs/33-six-nonwindow-fails.txt
+< ?? .scratch/wisp/probes/255/v2/logs/34-control-summary.txt
+< ?? .scratch/wisp/probes/255/v2/logs/35-closure-selfcheck.txt
+< ?? .scratch/wisp/probes/255/v2/verdict.md
+---
+diffrc=0
+--- 在飞件仍不属于本腿：design/ 那批 ---
+31

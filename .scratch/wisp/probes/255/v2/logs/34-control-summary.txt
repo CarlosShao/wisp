@@ -1,0 +1,13 @@
+### V2-C1 CONTROL: whole cmd/wisp package with 甲形那一发调用摘掉（overlay，仓内文件未动）
+cmd: PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -overlay D:/tmp/wisp255v2/m3.json -count=1 ./cmd/wisp/
+--- FAIL: TestTicket223HandEditedFsLooseningCostsAnL2Card (2.21s)
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (5.07s)
+--- FAIL: TestTicket255r1ShowOnAnExistingWindowSendsTheResize (0.00s)
+--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (20.02s)
+--- FAIL: TestAC14AwaitedBindingReplyReachesThePage (20.02s)
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (20.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	505.498s
+FAIL
+rc=1
+package_lines_above

@@ -1,0 +1,33 @@
+time=2026-10-08T11:54:59.220+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the
+time=2026-10-08T11:54:59.225+08:00 level=WARN msg="panel host: [panel] geometry source unreadable, sizing at the host's own default" path=C:\Users\swq\AppData\Local\Temp\
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (5.08s)
+    panel_host_windows_test.go:660: cold bring-up measured on this box: -1.000 ms (HEAD be4a2abf at read time, 2026-10-08T11:55:38+08:00)
+    panel_host_windows_test.go:662: cold bring-up did not produce a browser round trip (got -1.000); the message channel did not come up on the real window
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.15s)
+    panel_host_windows_test.go:944: AC#4 focus hop (head be4a2abf): foreground before any panel 0x50102 | the ruler's own editor window 0x9e08ae | foreground while hidden
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x50102, panel hwnd 0xf907fe (AC#4 says only the panel takes focus when show
+time=2026-10-08T11:55:43.693+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the
+time=2026-10-08T11:55:45.365+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+time=2026-10-08T11:56:39.789+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-08T11:56:39.791+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (20.01s)
+    panel_resident_windows_test.go:315: AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]
+    panel_resident_windows_test.go:325: no report "ac13-probe" from the page within 15s (what DID arrive at the door: nothing at all). AC#13 cannot be decided without the
+time=2026-10-08T11:56:49.876+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-08T11:56:49.930+08:00 level=ERROR msg="panel host: show failed on the panel thread" via=33r9-nail err="panel host: refusing to create the panel window: this 
+wisp: panel could not open (panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x850DE6. The library's create
+time=2026-10-08T11:57:09.947+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-08T11:57:09.947+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC14AwaitedBindingReplyReachesThePage (20.01s)
+    panel_resident_windows_test.go:821: no report "ac14r-0" from the page within 15s (what DID arrive at the door: nothing at all). AC#14's reply hop cannot be decided wi
+time=2026-10-08T11:57:09.947+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold -1.0 ms, hot path 0.0 ms)
+time=2026-10-08T11:57:29.961+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-08T11:57:29.961+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (20.01s)
+    panel_resident_windows_test.go:866: no report "ac14-push" from the page within 15s (what DID arrive at the door: nothing at all). AC#14's push hop cannot be decided w
+time=2026-10-08T11:57:29.962+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold -1.0 ms, hot path 0.0 ms)
+time=2026-10-08T11:57:34.966+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-08T11:57:34.967+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+rc=0

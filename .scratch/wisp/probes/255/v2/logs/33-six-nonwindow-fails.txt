@@ -1,0 +1,55 @@
+--- the 6 non-window FAILs (reasons) ---
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.01s)
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path sp
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	1.200s
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestComposerContractTypesMatchFrontend (0.02s)
+    composer_test.go:74: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:79: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:74: Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare
+    composer_test.go:79: ComposerState <-> ComposerState: 11 JSON keys reconciled
+    composer_test.go:79: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:79: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:79: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:79: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.95s)
+    frontend_hygiene_test.go:216: a second style source appeared in code the bundle actually ships:
+    frontend_hygiene_test.go:219: 57 files reachable from main.tsx carry colour literals only in the generated theme
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path s
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	9.204s
+--- FAIL: TestResolvePerCallBudget (1.90s)
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 2892185 ns/op = 2.892 ms/op (budget 1.000 ms, 402 samples)
+    pathresolver_budget_norace_test.go:37: C26 budget breach: Resolve averages 2.892185ms per call, budget 1ms
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	8.396s
+--- do they read design/ ? ---
+design/assets/tokens.css
+design/assets/tokens.css.
+rc=0
+--- worktree status of design/ (in-flight, not mine) ---
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+--- is design/ deleted at HEAD too? ---
+30
+ls_tree_rc=0
+--- internal/risk TestResolvePerCallBudget: does it touch panel geometry? ---
+ok  	github.com/CarlosShao/wisp/internal/plugin	0.294s
+ok  	github.com/CarlosShao/wisp/internal/proc	3.967s
+ok  	github.com/CarlosShao/wisp/internal/projctx	1.060s
+time=2026-10-08T11:52:33.692+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestResolvePerCallBudget (1.90s)
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 2892185 ns/op = 2.892 ms/op (budget 1.000 ms, 402 samples)
+    pathresolver_budget_norace_test.go:37: C26 budget breach: Resolve averages 2.892185ms per call, budget 1ms
+time=2026-10-08T11:52:38.975+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+FAIL

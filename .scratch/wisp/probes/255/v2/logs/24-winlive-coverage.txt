@@ -1,0 +1,15 @@
+--- winlive files in cmd/wisp ---
+cmd/wisp/panel_geometry_255_winlive_test.go
+--- does any winlive test cover the RESHOW hop? ---
+cmd/wisp/config_readers_255.go
+cmd/wisp/panel_host_windows.go
+cmd/wisp/panel_reshow_255r1_windows_test.go
+grep_rc=0
+--- content of the 255 winlive test (does it assert on-screen width?) ---
+48:	g255GetWindowRect            = g255User32.NewProc("GetWindowRect")
+57:	rc, _, callErr := g255GetWindowRect.Call(hwnd, uintptr(unsafe.Pointer(&r)))
+59:		return r, fmt.Errorf("GetWindowRect(0x%X) returned 0: %w", hwnd, callErr)
+73:// TestTicket255RealWindowWidthFollowsTheConfig is AC#4's on-screen reading: it
+78:func TestTicket255RealWindowWidthFollowsTheConfig(t *testing.T) {
+173:	t.Logf("REAL WINDOW 255: asked %dx%d -> GetWindowRect %dx%d (hwnd 0x%X); after dispose+show asked %dx%d -> %dx%d (hwnd 0x%X); implied s
+rc=0

@@ -1,0 +1,34 @@
+--- webview.go 320-348 (CreateWindowExW args: nWidth/nHeight) ---
+	w.hwnd, _, _ = w32.User32CreateWindowExW.Call(
+		0,
+		uintptr(unsafe.Pointer(className)),
+		uintptr(unsafe.Pointer(windowName)),
+		0xCF0000, // WS_OVERLAPPEDWINDOW
+		uintptr(posX),
+		uintptr(posY),
+		uintptr(windowWidth),
+		uintptr(windowHeight),
+		0,
+		0,
+		uintptr(hinstance),
+		0,
+	)
+	setWindowContext(w.hwnd, w)
+
+	_, _, _ = w32.User32ShowWindow.Call(w.hwnd, w32.SWShow)
+	_, _, _ = w32.User32UpdateWindow.Call(w.hwnd)
+	_, _, _ = w32.User32SetFocus.Call(w.hwnd)
+
+	if !w.browser.Embed(w.hwnd) {
+		return false
+	}
+	w.browser.Resize()
+	return true
+}
+
+func (w *webview) Destroy() {
+	_, _, _ = w32.User32PostMessageW.Call(w.hwnd, w32.WMClose, 0, 0)
+sedrc=0
+--- AdjustWindowRect occurrences in webview.go (only in SetSize?) ---
+427:		_, _, _ = w32.User32AdjustWindowRect.Call(uintptr(unsafe.Pointer(&r)), w32.WSOverlappedWindow, 0)
+grep_rc=0

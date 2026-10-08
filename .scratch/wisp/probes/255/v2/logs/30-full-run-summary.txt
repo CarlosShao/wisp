@@ -1,0 +1,22 @@
+### rc line
+rc=1
+### package-level results (non-ok)
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	577.352s
+FAIL	github.com/CarlosShao/wisp/internal/ball	1.200s
+FAIL	github.com/CarlosShao/wisp/internal/panel	9.204s
+FAIL	github.com/CarlosShao/wisp/internal/risk	8.396s
+### --- FAIL lines
+325:--- FAIL: TestPanelHostRealWindowHopAndLifecycle (5.08s)
+328:--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.15s)
+363:--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (20.01s)
+377:--- FAIL: TestAC14AwaitedBindingReplyReachesThePage (20.01s)
+383:--- FAIL: TestAC14GoSideEvalPushReachesThePage (20.01s)
+880:--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.01s)
+896:--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+901:--- FAIL: TestComposerContractTypesMatchFrontend (0.02s)
+910:--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.95s)
+915:--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+924:--- FAIL: TestResolvePerCallBudget (1.90s)
+### panics/timeouts
+### SKIP count in cmd/wisp
+0

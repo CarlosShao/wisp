@@ -1,0 +1,43 @@
+### V2-M1: requestGeometryOnReshow stops consulting windowOptions (posts host constants)
+cmd: PATH=... go test -overlay D:/tmp/wisp255v2/m1.json -run 'TestTicket255' -count=1 ./cmd/wisp/
+time=2026-10-08T11:57:12.080+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T11:57:14.664+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/08 11:57:14 mockllm: serving on http://127.0.0.1:54427 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-08T11:57:14.697+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection1341582718\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-08T11:57:14.732+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection1341582718\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-08T11:57:14.742+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-08T03:57:14Z duration_ms=9
+time=2026-10-08T11:57:14.757+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptStillNamesTheLiveReadSection1341582718\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-08T11:57:14.767+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-08T03:57:14Z duration_ms=8
+time=2026-10-08T11:57:14.772+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-08T11:57:14.775+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T11:57:17.118+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/08 11:57:17 mockllm: serving on http://127.0.0.1:52144 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-08T11:57:17.144+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered1323551382\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-08T11:57:17.172+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered1323551382\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-08T11:57:17.177+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-08T03:57:17Z duration_ms=5
+time=2026-10-08T11:57:17.187+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket255ReceiptSentenceAssemblyIsFiltered1323551382\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-08T11:57:17.192+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-08T03:57:17Z duration_ms=5
+time=2026-10-08T11:57:17.197+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-08T11:57:17.200+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T11:57:17.238+08:00 level=WARN msg="panel host: [panel] geometry source unreadable, sizing at the host's own default" path=C:\Users\swq\AppData\Local\Temp\TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions2396251932\001\no-such-dir\config.toml err="config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions2396251932\\001\\no-such-dir\\config.toml: The system cannot find the path specified." default=420x260
+--- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch (0.00s)
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/the_configured_pair_goes_out_as_it_stands (0.00s)
+        panel_reshow_255r1_windows_test.go:275: the live window was asked for 420x260, want 517x331 - what goes out must be the pair THIS host resolves from its source at this instant
+        panel_reshow_255r1_windows_test.go:283: the geometry source was consulted 0 times for one re-show, want exactly 1: two reads could size the window from two different versions of the file
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/height_0_keeps_the_host's_260,_the_same_rule_the_create_uses (0.00s)
+        panel_reshow_255r1_windows_test.go:275: the live window was asked for 420x260, want 640x260 - what goes out must be the pair THIS host resolves from its source at this instant
+        panel_reshow_255r1_windows_test.go:283: the geometry source was consulted 0 times for one re-show, want exactly 1: two reads could size the window from two different versions of the file
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/width_0_falls_back_to_the_host_constant,_not_to_a_guess (0.00s)
+        panel_reshow_255r1_windows_test.go:275: the live window was asked for 420x260, want 420x400 - what goes out must be the pair THIS host resolves from its source at this instant
+        panel_reshow_255r1_windows_test.go:283: the geometry source was consulted 0 times for one re-show, want exactly 1: two reads could size the window from two different versions of the file
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/an_unreadable_config_answers_the_host_constants (0.00s)
+        panel_reshow_255r1_windows_test.go:283: the geometry source was consulted 0 times for one re-show, want exactly 1: two reads could size the window from two different versions of the file
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/a_negative_answer_resolves_the_way_the_create_resolves_it (0.00s)
+        panel_reshow_255r1_windows_test.go:283: the geometry source was consulted 0 times for one re-show, want exactly 1: two reads could size the window from two different versions of the file
+--- FAIL: TestTicket255r1ShowOnAnExistingWindowSendsTheResize (0.00s)
+    panel_reshow_255r1_windows_test.go:309: Show asked for {width:420 height:260 hint:0 insideDispatch:true}, want 517x331 under webview2.HintNone
+    panel_reshow_255r1_windows_test.go:312: Show consulted the geometry source 0 times, want 1 (the branch it took reads the source exactly once)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	10.573s
+FAIL
+M1_rc=1
