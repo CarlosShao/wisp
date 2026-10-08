@@ -1,0 +1,36 @@
+mutation m2_handover_ends_on_notice
+NOTE: handover always ends on the offline notice even though the entry resolves; questions 1 and 2 stay green by construction, so only question 3 can catch it
+
+LANDING: snippet occurs 1 time(s) in cmd/wisp/panel_host_windows.go (must be exactly 1)
+LANDING: paired Replace entry "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go" -> "D:/tmp/wisp33v4/mut/m2_handover_ends_on_notice/panel_host_windows.go.repl"
+LANDING: replacement sha16=0cba911ced149c10 vs target sha16=c451ff65f3b96bee (must differ) -> True
+OVERLAY JSON verbatim:
+{
+ "Replace": {
+  "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "D:/tmp/wisp33v4/mut/m2_handover_ends_on_notice/panel_host_windows.go.repl"
+ }
+}
+
+$ go test -c -overlay=D:/tmp/wisp33v4/mut/m2_handover_ends_on_notice/overlay.json -o D:/tmp/wisp33v4/exe/m2_handover_ends_on_notice.test.exe .
+rc=0
+EXE D:/tmp/wisp33v4/exe/m2_handover_ends_on_notice.test.exe sha16=add890e798913219 bytes=41520545 ; differs from pristine exe: True
+
+$ D:/tmp/wisp33v4/exe/m2_handover_ends_on_notice.test.exe -test.run ^TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe$ -test.v -test.count=1
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0
+    panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+    panel_pageover_33r10_windows_test.go:268: after a cold start the last document does not carry the embedded entry's own 1044 byte(s): ticket 33 AC#13's 'final document contains the real embed entry content' is not met
+    panel_pageover_33r10_windows_test.go:277: after a cold start the last document contains NONE of the 1 element id(s) the resolved entry declares [root] (head "<!doctype html><html><head><meta charset=\"utf-8\"><title>panel assets unavailable</title></head><body><p>panel assets una"): the document in the window is not the panel page
+    panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 181 byte(s), 0 of 1 entry id(s) present, entry bytes carried=false
+--- FAIL: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+FAIL
+time=2026-10-08T10:43:27.796+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+rc=1
+COLOUR: RED
+WORLD lines: panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+FIRED assertions:
+  panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0
+  panel_pageover_33r10_windows_test.go:268: after a cold start the last document does not carry the embedded entry's own 1044 byte(s): ticket 33 AC#13's 'final document contains the real embed entry content' is not met
+  panel_pageover_33r10_windows_test.go:277: after a cold start the last document contains NONE of the 1 element id(s) the resolved entry declares [root] (head "<!doctype html><html><head><meta charset=\"utf-8\"><title>panel assets unavailable</title></head><body><p>panel assets una"): the document in the window is not the panel page
+  panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 181 byte(s), 0 of 1 entry id(s) present, entry bytes carried=false
+rc=1

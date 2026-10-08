@@ -1,0 +1,118 @@
+318: func (m *PanelManager) bringUp(ctx context.Context) error {
+319: 	t0 := time.Now()
+320: 	m.mu.Lock()
+321: 	if m.created {
+322: 		m.mu.Unlock()
+323: 		return nil
+324: 	}
+325: 	m.mu.Unlock()
+326: 
+327: 	// PRECONDITION (33-r7): the thread that creates the panel window must have
+328: 	// nothing left to dispatch. This is not belt-and-braces wording - it is the one
+329: 	// thing four measured shapes agree on. Planting "a live window this thread owns
+330: 	// plus one undispatched WM_CLOSE for it" on ONE locked thread and then running
+331: 	// the product's own bringUp gives, three runs each
+332: 	// (.scratch/wisp/probes/33/r7/modes-grid.txt, docs/evidence/s1/33-panel-host-c27-r7.md ①):
+333: 	//   - remove only WM_QUIT before create (the 33-r6 narrow form, kept below): PANIC 3/3.
+334: 	//     The close is dispatched by the create's own pump, the library posts the quit
+335: 	//     it generates, and the quit is not yet visible to the filtered peek
+336: 	//     (measured: removed=0, filtered found=false, next GetMessageW returns WM_QUIT).
+337: 	//   - dispatch the close, then run that same quit drain: PANIC 3/3, same reading.
+338: 	//   - purge the WHOLE queue without dispatching (the 33-r6 wide form, 4be1d3f1):
+339: 	//     the prior owner's window stays alive (thread windows 3 -> 4, an unbounded
+340: 	//     leak per create) and 1 of 3 runs HUNG in Embed's GetMessageW until the test
+341: 	//     binary timed out (modes/wide-2.txt). The full-package reading of that form
+342: 	//     is on disk too: purge hit its cap at 256 removed and the show never
+343: 	//     completed (.scratch/wisp/probes/33/r6/fullpack2.log:640, 4be1d3f1, leg 33-r6's
+344: 	//     log, not re-run by 33-r7).
+345: 	//   - dispatch until the queue reports empty: create SUCCEEDS 3/3 and the orphan is
+346: 	//     really gone (thread windows 3 -> 0).
+347: 	// Only the last one is a repair, and it is not bringUp's to perform: reaching
+348: 	// "empty" means DESTROYING a window whose Go owner is already gone, and only that
+349: 	// owner knows which windows on this thread may die. So bringUp checks and refuses,
+350: 	// by name, instead of creating on a thread it cannot make clean - the alternative
+351: 	// measured here is a half-initialised controller, which on this box can take the
+352: 	// whole process down (rc=139 reading in the evidence file's ①).
+353: 	//
+354: 	// The shipping topology satisfies the precondition by construction: the resident
+355: 	// panel thread (cmd/wisp/panel_resident_windows.go) locks its OS thread for life,
+356: 	// creates nothing before the first show, and is destroyed with its windows and its
+357: 	// quit when loop returns - it never hands a used thread to anyone. That is also why
+358: 	// the drain below stays, and why it is still narrow: an undispatched WM_QUIT with
+359: 	// nothing else queued IS removable, 33-r6's nail pins that, and refusing for a
+360: 	// latched quit we cannot even see would be a guess.
+361: 	//
+362: 	// 33-r9 measured the FIFTH shape the four-shape grid did not contain, the one
+363: 	// 33-v2 问② asked for by name (.scratch/wisp/probes/33/r9/01-fifth-shape-1.txt,
+364: 	// three runs per shape): the thread owns a window that is still ALIVE and still
+365: 	// has a live Go owner, plus one undispatched WM_CLOSE posted at it. The check
+366: 	// refuses that shape exactly like the orphaned one - it names the live window's
+367: 	// own handle ("staleCloseQueued=true hwnd=0x1E10E00 (owner hwnd 0x1E10E00,
+368: 	// same=true)"), the refusal returns in 0 ms, and the live window survives it:
+369: 	// "AFTER the refusal: IsWindow(owner ...)=true owner.IsCreated=true ... close
+370: 	// still queued true ... thread windows=3", while its own Show still works ("Show
+371: 	// on the LIVE owner: ok"). The comparison shape (same window, but its owner
+372: 	// Destroyed it and this thread dispatched that close) reads clean and creates
+373: 	// fine ("PRE-CREATE CHECK: staleCloseQueued=false ... bringUp#2 err=<nil>
+374: 	// created=true in 928ms"), so the two shapes ARE distinguishable to this check,
+375: 	// and this check alone cannot tell an orphaned close from a live owner's.
+376: 	// Consequence, now written down instead of inferred: any recovery that dispatches
+377: 	// or purges this queue to make room for a create destroys a window somebody may
+378: 	// still own, which is what 33-v2 问② refused. So the refusal stays the only
+379: 	// action here, and what changed in 33-r9 is what the resident leg DOES with it -
+380: 	// see errPanelRefusedThread.
+381: 	drainStaleQuitBeforeCreate()
+382: 	if dirty, closedHwnd := staleCloseQueued(); dirty {
+383: 		return fmt.Errorf("%w: this thread still has an undispatched WM_CLOSE queued for hwnd 0x%X. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message", errPanelRefusedThread, closedHwnd)
+384: 	}
+385: 
+386: 	w := webview2.NewWithOptions(webview2.WebViewOptions{
+387: 		Debug:     false,
+388: 		DataPath:  m.dataPath,
+389: 		AutoFocus: false,
+390: 		// One call, one read: the geometry the window is born with is what this
+391: 		// host's source answers RIGHT NOW (票 255 AC#4). See windowOptions.
+392: 		WindowOptions: m.windowOptions(),
+393: 	})
+394: 	if w == nil {
+395: 		return fmt.Errorf("panel host: WebView2 window creation returned nil (runtime missing or blocked)")
+396: 	}
+397: 
+398: 	hwnd := windows.HWND(w.Window())
+399: 
+400: 	// The one inbound door. JS -> Go via a bound function over the WebView2
+401: 	// message channel; the returned string is the receipt that reaches the page.
+402: 	// No new inbound method name is invented here: the raw envelope is parsed by
+403: 	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+404: 	// four existing methods (bridge.go:42-45, ticket 248 owns config methods).
+405: 	// The binding AND the page->host transport forwarding are installed together
+406: 	// by installPanelTransport, split out of bringUp so the shipping wiring can be
+407: 	// driven headlessly (ticket 35 AC#6).
+408: 	if bindErr := m.installPanelTransport(w, ctx); bindErr != nil {
+409: 		w.Destroy()
+410: 		return fmt.Errorf("panel host: bind dispatch door: %w", bindErr)
+411: 	}
+412: 
+413: 	m.mu.Lock()
+414: 	m.w = w
+415: 	m.hwnd = hwnd
+416: 	m.created = true
+417: 	m.mu.Unlock()
+418: 
+419: 	// AC#13's order, and it is the whole fix: prove the message channel first,
+420: 	// hand the page over LAST. firstRoundTripLocked shows a document of its own,
+421: 	// so running it after serveEntry meant every cold start finished on the probe
+422: 	// page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3 "供给那半"). The
+423: 	// probe stays - it is where cold "usable" is decided - it just no longer gets
+424: 	// the last word about what the user sees.
+425: 	rtMs := m.firstRoundTripLocked(ctx, t0)
+426: 
+427: 	if err := m.serveEntry(); err != nil {
+428: 		m.serveNotBuiltNoticeLocked()
+429: 	}
+430: 
+431: 	m.mu.Lock()
+432: 	m.lastColdMs = rtMs
+433: 	m.mu.Unlock()
+434: 	return nil
+435: }

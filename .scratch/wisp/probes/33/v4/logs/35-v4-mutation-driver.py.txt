@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+"""33-v4 acceptance-leg mutation rig (windowless, overlay-only, no shell).
+
+Rules it obeys:
+  * never writes a tracked file: each mutation is written to an out-of-repo copy and fed to
+    the compiler through `go test -c -overlay`, whose JSON always pairs
+    {"Replace": {"<target>": "<replacement>"}} (a one-sided entry is a no-op fake green)
+  * every run carries its own rc= line
+  * landing is PROVED before colour is read:
+      - the snippet being replaced occurs EXACTLY ONCE in the tracked file
+      - replacement bytes != target bytes
+      - the overlay JSON is dumped verbatim into the log
+      - the built exe's sha256 prefix is compared with the pristine exe (proves the overlay
+        reached the compiler, not just the disk)
+"""
+import hashlib
+import json
+import os
+import subprocess
+
+REPO = "D:/work/workspace/projects plans/Wisp"
+PROD = "cmd/wisp/panel_host_windows.go"
+TESTF = "cmd/wisp/panel_pageover_33r10_windows_test.go"
+DIST = "frontend/dist/index.html"
+WORK = "D:/tmp/wisp33v4"
+MUTDIR = WORK + "/mut"
+EXEDIR = WORK + "/exe"
+LOGDIR = WORK + "/logs"
+CASE = "^TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe$"
+CWD_BUILD = REPO + "/cmd/wisp"
+
+PROBE_DOC = ('<!doctype html><html><head><meta charset="utf-8"></head><body>'
+             '<script>if(window.wispProbeRT)window.wispProbeRT();</script></body></html>')
+
+MUTS = [
+    ("m1_entry_serves_probe_bytes", [(PROD,
+        "\tw.SetHtml(string(data))\n",
+        "\t_ = data\n\tw.SetHtml(`" + PROBE_DOC + "`)\n"),],
+     "serveEntry hands the probe step's own document to the control instead of the resolved entry"),
+    ("m2_handover_ends_on_notice", [(PROD,
+        "\tif err := m.serveEntry(); err != nil {\n\t\tm.serveNotBuiltNoticeLocked()\n\t}\n",
+        "\tm.serveEntry()\n\tm.serveNotBuiltNoticeLocked()\n"),],
+     "handover always ends on the offline notice even though the entry resolves; questions 1 and 2 "
+     "stay green by construction, so only question 3 can catch it"),
+    ("m3_probe_page_gets_lookable_p", [(PROD,
+        "`<script>if(window.wispProbeRT)window.wispProbeRT();</script></body></html>`",
+        "`<script>if(window.wispProbeRT)window.wispProbeRT();</script><p>loading the panel</p></body></html>`"),],
+     "probe markup rewritten to be lookable, ORDER untouched: the runtime-captured identity anchor "
+     "must not be quieted (and question 2 alone must not be read as sufficient)"),
+    ("m4_id_question_only_no_import", [(PROD,
+        "\tw.SetHtml(string(data))\n",
+        "\t_ = data\n\tw.SetHtml(`<!doctype html><html><head><meta charset=\"utf-8\"></head><body>"
+        "<div id=\"wispRootMoved\"></div></body></html>`)\n"),
+      (TESTF, "\t\tif !strings.Contains(last, string(entryBytes)) {\n", "\t\tif false {\n")],
+     "served document is a hand-written lookable panel-shaped page that is NOT the resolved entry, "
+     "AND the byte-carry half of question 3 is switched off: does the element-id half still bite alone?"),
+    ("m6_probe_step_deleted_from_handover", [(PROD,
+        "\trtMs := m.firstRoundTripLocked(ctx, t0)\n\n",
+        "\t_, _ = ctx, t0\n\trtMs := float64(-1)\n\n"),],
+     "the round-trip probe is dropped from the handover entirely (cold 'usable' is no longer measured, "
+     "lastColdMs becomes the -1 sentinel 33-r9 registered): does AC#13's ruler notice?"),
+    ("m5_ci_shape_absent_entry_and_script_only_notice",
+     [(DIST, "", "__ABSENT__"),
+      (PROD,
+       "\t\t`</head><body><p>panel assets unavailable: the embedded bundle is not built.</p></body></html>`",
+       "\t\t`</head><body><script>/* notice carries no lookable content */</script></body></html>`")],
+     "the CI / fresh-checkout shape: embed carries no entry so question 3 has no subject, plus a "
+     "not-built notice whose body is script-only: is question 2 alone enough to stay honest?"),
+]
+
+
+def sha(p):
+    with open(p, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()[:16]
+
+
+def run(argv, cwd, log):
+    cp = subprocess.run(argv, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    log.write("$ " + " ".join(argv) + "\n")
+    log.write(cp.stdout or "")
+    log.write(cp.stderr or "")
+    log.write("rc=%d\n" % cp.returncode)
+    return cp.returncode, (cp.stdout or "") + (cp.stderr or "")
+
+
+def main():
+    for d in (MUTDIR, LOGDIR, EXEDIR):
+        os.makedirs(d, exist_ok=True)
+    summary = open(LOGDIR + "/v4-mut-summary.txt", "w", encoding="utf-8", newline="\n")
+    exe_pristine = EXEDIR + "/pristine.test.exe"
+    summary.write("33-v4 mutation rig - summary\n")
+    summary.write("case ruler (-test.run) = %s\n" % CASE)
+    summary.write("build CWD = %s ; run CWD = %s ; harness DLLs live beside every exe\n" % (CWD_BUILD, CWD_BUILD))
+    summary.write("tracked product sha16=%s  tracked test sha16=%s  dist entry sha16=%s\n" % (
+        sha(REPO + "/" + PROD), sha(REPO + "/" + TESTF), sha(REPO + "/" + DIST)))
+    summary.write("pristine exe sha16=%s\n\n" % sha(exe_pristine))
+
+    results = []
+    for name, pairs, note in MUTS:
+        log = open("%s/v4-mut-%s.txt" % (LOGDIR, name), "w", encoding="utf-8", newline="\n")
+        log.write("mutation %s\nNOTE: %s\n\n" % (name, note))
+        d = "%s/%s" % (MUTDIR, name)
+        os.makedirs(d, exist_ok=True)
+        overlay = {}
+        ok = True
+        for rel, old, new in pairs:
+            tgt_abs = (REPO + "/" + rel)
+            with open(tgt_abs, "r", encoding="utf-8", newline="") as f:
+                base = f.read()
+            if new == "__ABSENT__":
+                overlay[tgt_abs] = ""
+                log.write('LANDING: paired Replace entry "%s" -> "" (empty value = file is absent)\n' % tgt_abs)
+                continue
+            n = base.count(old)
+            log.write("LANDING: snippet occurs %d time(s) in %s (must be exactly 1)\n" % (n, rel))
+            if n != 1:
+                ok = False
+                log.write("RESULT: SKIPPED, landing proof failed (snippet count %d)\nrc=9\n" % n)
+                break
+            repl_path = "%s/%s.repl" % (d, os.path.basename(rel))
+            mutated = base.replace(old, new)
+            if mutated == base:
+                ok = False
+                log.write("RESULT: SKIPPED, replacement identical to target -> NO-OP\nrc=9\n")
+                break
+            with open(repl_path, "w", encoding="utf-8", newline="") as f:
+                f.write(mutated)
+            overlay[tgt_abs] = repl_path
+            log.write("LANDING: paired Replace entry \"%s\" -> \"%s\"\n" % (tgt_abs, repl_path))
+            log.write("LANDING: replacement sha16=%s vs target sha16=%s (must differ) -> %s\n" % (
+                sha(repl_path), sha(tgt_abs), sha(repl_path) != sha(tgt_abs)))
+        if not ok:
+            log.close()
+            results.append((name, "SKIPPED", "landing proof failed"))
+            continue
+        oj = d + "/overlay.json"
+        with open(oj, "w", encoding="utf-8", newline="") as f:
+            json.dump({"Replace": overlay}, f, indent=1)
+        log.write("OVERLAY JSON verbatim:\n" + open(oj, encoding="utf-8").read() + "\n\n")
+        exe = "%s/%s.test.exe" % (EXEDIR, name)
+        rc_build, _ = run(["go", "test", "-c", "-overlay=" + oj, "-o", exe, "."], CWD_BUILD, log)
+        if rc_build != 0:
+            log.write("RESULT: BUILD FAILED rc=%d\n" % rc_build)
+            log.close()
+            results.append((name, "BUILD-FAIL rc=%d" % rc_build, "see log"))
+            continue
+        log.write("EXE %s sha16=%s bytes=%d ; differs from pristine exe: %s\n\n" % (
+            exe, sha(exe), os.path.getsize(exe), sha(exe) != sha(exe_pristine)))
+        rc_run, rout = run([exe, "-test.run", CASE, "-test.v", "-test.count=1"], CWD_BUILD, log)
+        colour = "GREEN" if rc_run == 0 else "RED"
+        fired = [ln.strip() for ln in rout.splitlines() if "_test.go:" in ln and "document" in ln]
+        world = [ln.strip() for ln in rout.splitlines() if "33-r10 world" in ln]
+        log.write("COLOUR: %s\n" % colour)
+        log.write("WORLD lines: %s\n" % " || ".join(world))
+        log.write("FIRED assertions:\n")
+        for ln in fired:
+            log.write("  " + ln[:400] + "\n")
+        log.write("rc=%d\n" % rc_run)
+        log.close()
+        results.append((name, "%s runrc=%d" % (colour, rc_run),
+                        " | ".join(x.split("test.go:")[1].split(":")[0] for x in fired) or "no assertion line"))
+
+    summary.write("%-46s %-16s %s\n" % ("mutation", "colour", "which test line fired"))
+    for a, b, c in results:
+        summary.write("%-46s %-16s %s\n" % (a, b, c))
+    summary.write("\nrig rc=0\n")
+    summary.close()
+    for a, b, c in results:
+        print(a, "::", b, "::", c)
+
+
+if __name__ == "__main__":
+    main()
+run it after saving back to a .py outside the repo; it writes only to D:/tmp/wisp33v4

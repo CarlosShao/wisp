@@ -1,0 +1,9 @@
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 421) 	rtMs := m.coldStartPageHandover(ctx, t0)
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 447) func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 448) 	rtMs := m.firstRoundTripLocked(ctx, t0)
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 449) 
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 450) 	if err := m.serveEntry(); err != nil {
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 451) 		m.serveNotBuiltNoticeLocked()
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 452) 	}
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 453) 	return rtMs
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 454) }

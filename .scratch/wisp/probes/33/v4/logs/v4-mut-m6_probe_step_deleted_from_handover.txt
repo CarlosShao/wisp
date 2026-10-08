@@ -1,0 +1,32 @@
+mutation m6_probe_step_deleted_from_handover
+NOTE: the round-trip probe is dropped from the handover entirely (cold 'usable' is no longer measured, lastColdMs becomes the -1 sentinel 33-r9 registered): does AC#13's ruler notice?
+
+LANDING: snippet occurs 1 time(s) in cmd/wisp/panel_host_windows.go (must be exactly 1)
+LANDING: paired Replace entry "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go" -> "D:/tmp/wisp33v4/mut/m6_probe_step_deleted_from_handover/panel_host_windows.go.repl"
+LANDING: replacement sha16=92985b5acd6fc814 vs target sha16=c451ff65f3b96bee (must differ) -> True
+OVERLAY JSON verbatim:
+{
+ "Replace": {
+  "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "D:/tmp/wisp33v4/mut/m6_probe_step_deleted_from_handover/panel_host_windows.go.repl"
+ }
+}
+
+$ go test -c -overlay=D:/tmp/wisp33v4/mut/m6_probe_step_deleted_from_handover/overlay.json -o D:/tmp/wisp33v4/exe/m6_probe_step_deleted_from_handover.test.exe .
+rc=0
+EXE D:/tmp/wisp33v4/exe/m6_probe_step_deleted_from_handover.test.exe sha16=397f0a1da720b643 bytes=41520545 ; differs from pristine exe: True
+
+$ D:/tmp/wisp33v4/exe/m6_probe_step_deleted_from_handover.test.exe -test.run ^TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe$ -test.v -test.count=1
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0
+    panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+    panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 1044 byte(s), 1 of 1 entry id(s) present, entry bytes carried=true
+--- PASS: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+PASS
+time=2026-10-08T10:43:38.116+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+rc=0
+COLOUR: GREEN
+WORLD lines: panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+FIRED assertions:
+  panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0
+  panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 1044 byte(s), 1 of 1 entry id(s) present, entry bytes carried=true
+rc=0

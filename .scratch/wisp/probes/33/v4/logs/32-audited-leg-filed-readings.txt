@@ -1,0 +1,28 @@
+=== the flip commit 13acad46 named ===
+13acad460f4d163914cfc8593ae03e40336dee02 | 2026-10-01 13:52:48 +0800 | feat(panel-host): 33-r5 land the panel in the resident process (ticket 33 items 1-6)
+rc=0
+
+=== the audited leg's own filed mutation logs (read, NOT relied on for Q2) ===
+--- mut-swap
+runrc=1
+--- FAIL: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+rc=1
+--- mut-pristine
+runrc=0
+--- PASS: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+rc=0
+--- mut-shift
+runrc=0
+--- PASS: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+rc=0
+--- mut-widen_swap
+runrc=1
+--- FAIL: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+rc=1
+
+=== their summary log ===
+pristine buildrc=0 runrc=0 colour=GREEN diff=0
+swap buildrc=0 runrc=1 colour=RED diff=1
+shift buildrc=0 runrc=0 colour=GREEN diff=1
+widen_swap buildrc=0 runrc=1 colour=RED diff=1
+rc=0

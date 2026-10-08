@@ -1,0 +1,38 @@
+mutation m4_id_question_only_no_import
+NOTE: served document is a hand-written lookable panel-shaped page that is NOT the resolved entry, AND the byte-carry half of question 3 is switched off: does the element-id half still bite alone?
+
+LANDING: snippet occurs 1 time(s) in cmd/wisp/panel_host_windows.go (must be exactly 1)
+LANDING: paired Replace entry "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go" -> "D:/tmp/wisp33v4/mut/m4_id_question_only_no_import/panel_host_windows.go.repl"
+LANDING: replacement sha16=c7aec069a62775a6 vs target sha16=c451ff65f3b96bee (must differ) -> True
+LANDING: snippet occurs 1 time(s) in cmd/wisp/panel_pageover_33r10_windows_test.go (must be exactly 1)
+LANDING: paired Replace entry "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_pageover_33r10_windows_test.go" -> "D:/tmp/wisp33v4/mut/m4_id_question_only_no_import/panel_pageover_33r10_windows_test.go.repl"
+LANDING: replacement sha16=d2d55a8911a48a2a vs target sha16=824881fe4c6dbbbe (must differ) -> True
+OVERLAY JSON verbatim:
+{
+ "Replace": {
+  "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "D:/tmp/wisp33v4/mut/m4_id_question_only_no_import/panel_host_windows.go.repl",
+  "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_pageover_33r10_windows_test.go": "D:/tmp/wisp33v4/mut/m4_id_question_only_no_import/panel_pageover_33r10_windows_test.go.repl"
+ }
+}
+
+$ go test -c -overlay=D:/tmp/wisp33v4/mut/m4_id_question_only_no_import/overlay.json -o D:/tmp/wisp33v4/exe/m4_id_question_only_no_import.test.exe .
+rc=0
+EXE D:/tmp/wisp33v4/exe/m4_id_question_only_no_import.test.exe sha16=80fbca11c022320e bytes=41520033 ; differs from pristine exe: True
+
+$ D:/tmp/wisp33v4/exe/m4_id_question_only_no_import.test.exe -test.run ^TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe$ -test.v -test.count=1
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0.542
+    panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+    panel_pageover_33r10_windows_test.go:277: after a cold start the last document contains NONE of the 1 element id(s) the resolved entry declares [root] (head "<!doctype html><html><head><meta charset=\"utf-8\"></head><body><div id=\"wispRootMoved\"></div></body></html>"): the document in the window is not the panel page
+    panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 106 byte(s), 0 of 1 entry id(s) present, entry bytes carried=false
+--- FAIL: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+FAIL
+time=2026-10-08T10:43:30.530+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+rc=1
+COLOUR: RED
+WORLD lines: panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+FIRED assertions:
+  panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0.542
+  panel_pageover_33r10_windows_test.go:277: after a cold start the last document contains NONE of the 1 element id(s) the resolved entry declares [root] (head "<!doctype html><html><head><meta charset=\"utf-8\"></head><body><div id=\"wispRootMoved\"></div></body></html>"): the document in the window is not the panel page
+  panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 106 byte(s), 0 of 1 entry id(s) present, entry bytes carried=false
+rc=1

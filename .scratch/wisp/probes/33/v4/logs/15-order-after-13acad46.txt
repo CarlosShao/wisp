@@ -1,0 +1,14 @@
+21:237: 		return fmt.Errorf("panel host: WebView2 window creation returned nil (runtime missing or blocked)")
+27:243: 	// message channel; the returned string is the receipt that reaches the page.
+33:249: 		return reply
+37:253: 		return fmt.Errorf("panel host: bind dispatch door: %w", bindErr)
+40:256: 	m.mu.Lock()
+44:260: 	m.mu.Unlock()
+47:263: 	// hand the page over LAST. firstRoundTripLocked shows a document of its own,
+48:264: 	// so running it after serveEntry meant every cold start finished on the probe
+52:268: 	rtMs := m.firstRoundTripLocked(ctx, t0)
+54:270: 	if err := m.serveEntry(); err != nil {
+58:274: 	m.mu.Lock()
+59:275: 	m.lastColdMs = rtMs
+60:276: 	m.mu.Unlock()
+61:277: 	return nil

@@ -1,0 +1,35 @@
+=== final tracked-file hash cross-check: worktree vs the hashes recorded at start (and at HEAD) ===
+start readings (00-anchor.md):
+  panel_host_windows.go                1f9060dfff33cffab1317e5f653e1a95f9678e97
+  panel_pageover_33r10_windows_test.go   9b9b27478fcae98841f4d202bce0794bc3c97e8a
+  probes/33/r10/impl.md                  a77866624accf3ddef867b619e873d12e8c7f1f6
+now=2026-10-08 10:55:37 +0800
+1f9060dfff33cffab1317e5f653e1a95f9678e97 HEAD=1f9060dfff33cffab1317e5f653e1a95f9678e97 cmd/wisp/panel_host_windows.go
+9b9b27478fcae98841f4d202bce0794bc3c97e8a HEAD=9b9b27478fcae98841f4d202bce0794bc3c97e8a cmd/wisp/panel_pageover_33r10_windows_test.go
+a77866624accf3ddef867b619e873d12e8c7f1f6 HEAD=a77866624accf3ddef867b619e873d12e8c7f1f6 .scratch/wisp/probes/33/r10/impl.md
+83e2e7222f17c041f42c9a0b3be69b0fbc0980b8 HEAD=83e2e7222f17c041f42c9a0b3be69b0fbc0980b8 .scratch/wisp/issues/33-panel-host-c27.md
+1382dc0754f66eb1efd98af8ff1a01a877faf129 HEAD=1382dc0754f66eb1efd98af8ff1a01a877faf129 .scratch/wisp/probes/33/r10/mut/mut-summary.log
+2519782e2d66f7ecf8a27828981571b6b11f8a02 HEAD=2519782e2d66f7ecf8a27828981571b6b11f8a02 cmd/wisp/panel_resident_windows_test.go
+21e42f2480c67fc0ab2ff2d321f320615f57c035 HEAD=e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 frontend/dist/index.html
+c6e6a8562190892faaa4ce5771349a8b47e559a3 HEAD=8fcc12e571a94495335c932e28502ade4e1d259a .gitignore
+rc=0
+
+=== do all four match HEAD (independent of drift)? ===
+MATCH 1f9060dfff33cffab1317e5f653e1a95f9678e97 cmd/wisp/panel_host_windows.go
+MATCH 9b9b27478fcae98841f4d202bce0794bc3c97e8a cmd/wisp/panel_pageover_33r10_windows_test.go
+MATCH a77866624accf3ddef867b619e873d12e8c7f1f6 .scratch/wisp/probes/33/r10/impl.md
+MATCH 83e2e7222f17c041f42c9a0b3be69b0fbc0980b8 .scratch/wisp/issues/33-panel-host-c27.md
+
+=== porcelain recount + HEAD recount ===
+756
+dcbb93d22ffc403d7a1f75b23676f25fa92897d8
+
+=== Q2 wording checks: does the new case let a call count or a line number into a verdict? ===
+0
+^ 0 = no call-count participates in any verdict (rc=1)
+0
+^ 0 = no line-number anchor in any verdict (rc=1)
+
+=== audited evidence dir: impl.md line count ===
+275 .scratch/wisp/probes/33/r10/impl.md
+rc=0

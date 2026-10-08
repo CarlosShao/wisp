@@ -1,0 +1,5 @@
+cmd/wisp/models.go worktreeCR=334 headCR=0
+cmd/wisp/panel_inbound_guards_35r3_test.go worktreeCR=0 headCR=0
+cmd/wisp/panel_transport_35r2_test.go worktreeCR=0 headCR=0
+cmd/wisp/panel_host_windows.go worktreeCR=0 headCR=0
+cmd/wisp/panel_pageover_33r10_windows_test.go worktreeCR=0 headCR=0

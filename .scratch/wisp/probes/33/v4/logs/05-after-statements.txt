@@ -1,0 +1,44 @@
+func (m *PanelManager) bringUp(ctx context.Context) error {
+	t0 := time.Now()
+	m.mu.Lock()
+	if m.created {
+		m.mu.Unlock()
+		return nil
+	}
+	m.mu.Unlock()
+	drainStaleQuitBeforeCreate()
+	if dirty, closedHwnd := staleCloseQueued(); dirty {
+		return fmt.Errorf("%w: this thread still has an undispatched WM_CLOSE queued for hwnd 0x%X. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message", errPanelRefusedThread, closedHwnd)
+	}
+	w := webview2.NewWithOptions(webview2.WebViewOptions{
+		Debug:     false,
+		DataPath:  m.dataPath,
+		AutoFocus: false,
+		WindowOptions: m.windowOptions(),
+	})
+	if w == nil {
+		return fmt.Errorf("panel host: WebView2 window creation returned nil (runtime missing or blocked)")
+	}
+	hwnd := windows.HWND(w.Window())
+	if bindErr := m.installPanelTransport(w, ctx); bindErr != nil {
+		w.Destroy()
+		return fmt.Errorf("panel host: bind dispatch door: %w", bindErr)
+	}
+	m.mu.Lock()
+	m.w = w
+	m.hwnd = hwnd
+	m.created = true
+	m.mu.Unlock()
+	rtMs := m.coldStartPageHandover(ctx, t0)
+	m.mu.Lock()
+	m.lastColdMs = rtMs
+	m.mu.Unlock()
+	return nil
+}
+func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
+	rtMs := m.firstRoundTripLocked(ctx, t0)
+	if err := m.serveEntry(); err != nil {
+		m.serveNotBuiltNoticeLocked()
+	}
+	return rtMs
+}

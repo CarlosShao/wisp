@@ -1,0 +1,11 @@
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 265) 	// page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3 "供给那半"). The
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 266) 	// probe stays - it is where cold "usable" is decided - it just no longer gets
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 267) 	// the last word about what the user sees.
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 268) 	rtMs := m.firstRoundTripLocked(ctx, t0)
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 269) 
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 270) 	if err := m.serveEntry(); err != nil {
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 271) 		m.serveNotBuiltNoticeLocked()
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 272) 	}
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 273) 
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 274) 	m.mu.Lock()
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 275) 	m.lastColdMs = rtMs

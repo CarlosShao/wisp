@@ -1,0 +1,25 @@
+=== RULER: consumers of the final document (assertion shape), tracked files only ===
+cmd/wisp/panel_host_windows.go:486:	w.SetHtml(string(data))
+cmd/wisp/panel_pageover_33r10_windows_test.go:132:func (c *docSink33r10) lastDoc() (string, bool) {
+cmd/wisp/panel_pageover_33r10_windows_test.go:138:	return c.docs[len(c.docs)-1], true
+cmd/wisp/panel_pageover_33r10_windows_test.go:141:func (c *docSink33r10) firstDoc() (string, bool) {
+cmd/wisp/panel_pageover_33r10_windows_test.go:147:	return c.docs[0], true
+cmd/wisp/panel_pageover_33r10_windows_test.go:223:	doc, ok := sink.firstDoc()
+cmd/wisp/panel_pageover_33r10_windows_test.go:255:	last, ok := sink.lastDoc()
+cmd/wisp/panel_resident_windows_test.go:299:		parts = append(parts, fmt.Sprintf("b += (document.getElementById(%q) ? '1' : '0');", id))
+internal/ball/ball_windows.go:116:	// WITHOUT a timer of its own: lastDock is the monotonic anchor of its frame
+internal/ball/ball_windows.go:120:	lastDock time.Time
+internal/ball/ball_windows.go:577:		b.lastDock = time.Now()
+internal/ball/dock_windows.go:76:	dt := time.Since(b.lastDock)
+internal/ball/dock_windows.go:80:	b.lastDock = time.Now()
+internal/ball/dock_windows.go:123:	b.lastDock = time.Now()
+rcE=0
+
+=== RULER: recorders of documents handed to a control (SetHtml method implementations in tests) ===
+cmd/wisp/panel_pageover_33r10_windows_test.go:72:func (c *docSink33r10) SetHtml(html string) {
+rcF=0
+
+=== RULER: case names asking what a cold start ends on ===
+cmd/wisp/panel_pageover_33r10_windows_test.go:241:func TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe(t *testing.T) {
+cmd/wisp/panel_resident_windows_test.go:314:func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
+rcG=0

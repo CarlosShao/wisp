@@ -1,0 +1,36 @@
+mutation m5_ci_shape_absent_entry_and_script_only_notice
+NOTE: the CI / fresh-checkout shape: embed carries no entry so question 3 has no subject, plus a not-built notice whose body is script-only: is question 2 alone enough to stay honest?
+
+LANDING: paired Replace entry "D:/work/workspace/projects plans/Wisp/frontend/dist/index.html" -> "" (empty value = file is absent)
+LANDING: snippet occurs 1 time(s) in cmd/wisp/panel_host_windows.go (must be exactly 1)
+LANDING: paired Replace entry "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go" -> "D:/tmp/wisp33v4/mut/m5_ci_shape_absent_entry_and_script_only_notice/panel_host_windows.go.repl"
+LANDING: replacement sha16=94b6c600d5517d25 vs target sha16=c451ff65f3b96bee (must differ) -> True
+OVERLAY JSON verbatim:
+{
+ "Replace": {
+  "D:/work/workspace/projects plans/Wisp/frontend/dist/index.html": "",
+  "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "D:/tmp/wisp33v4/mut/m5_ci_shape_absent_entry_and_script_only_notice/panel_host_windows.go.repl"
+ }
+}
+
+$ go test -c -overlay=D:/tmp/wisp33v4/mut/m5_ci_shape_absent_entry_and_script_only_notice/overlay.json -o D:/tmp/wisp33v4/exe/m5_ci_shape_absent_entry_and_script_only_notice.test.exe .
+rc=0
+EXE D:/tmp/wisp33v4/exe/m5_ci_shape_absent_entry_and_script_only_notice.test.exe sha16=3cb4fe47aed68abc bytes=41519009 ; differs from pristine exe: True
+
+$ D:/tmp/wisp33v4/exe/m5_ci_shape_absent_entry_and_script_only_notice.test.exe -test.run ^TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe$ -test.v -test.count=1
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0
+    panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed reports Built()=false (not-built branch)
+    panel_pageover_33r10_windows_test.go:264: after a cold start the last document carries nothing a user could look at: with its scripts stripped its body is empty (head "<!doctype html><html><head><meta charset=\"utf-8\"><title>panel assets unavailable</title></head><body><script>/* notice c"). The panel was never handed over, so the panel window would show a shell. Ticket 33 AC#13 item 2 asks the final document about its content, not about whether a call was made
+    panel_pageover_33r10_windows_test.go:282: AC#13 33-r10 read: this tree's embed resolves no entry, so the entry-content question has no subject here; the last document is 172 byte(s) and carries lookable content=false; it is not the probe document=true
+--- FAIL: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+FAIL
+time=2026-10-08T10:43:39.526+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+rc=1
+COLOUR: RED
+WORLD lines: panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed reports Built()=false (not-built branch)
+FIRED assertions:
+  panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0
+  panel_pageover_33r10_windows_test.go:264: after a cold start the last document carries nothing a user could look at: with its scripts stripped its body is empty (head "<!doctype html><html><head><meta charset=\"utf-8\"><title>panel assets unavailable</title></head><body><script>/* notice c"). The panel was never handed over, so the panel window would show a shell. Ticket 33 AC#13 item 2 asks the f
+  panel_pageover_33r10_windows_test.go:282: AC#13 33-r10 read: this tree's embed resolves no entry, so the entry-content question has no subject here; the last document is 172 byte(s) and carries lookable content=false; it is not the probe document=true
+rc=1

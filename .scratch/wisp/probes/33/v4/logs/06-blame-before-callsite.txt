@@ -1,0 +1,5 @@
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 425) 	rtMs := m.firstRoundTripLocked(ctx, t0)
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 426) 
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 427) 	if err := m.serveEntry(); err != nil {
+13acad460 (CarlosShao 2026-10-01 13:52:48 +0800 428) 		m.serveNotBuiltNoticeLocked()
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 429) 	}

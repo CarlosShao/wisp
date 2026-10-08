@@ -1,0 +1,15 @@
+33-v4 mutation rig - summary
+case ruler (-test.run) = ^TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe$
+build CWD = D:/work/workspace/projects plans/Wisp/cmd/wisp ; run CWD = D:/work/workspace/projects plans/Wisp/cmd/wisp ; harness DLLs live beside every exe
+tracked product sha16=c451ff65f3b96bee  tracked test sha16=824881fe4c6dbbbe  dist entry sha16=2078af7f2343af94
+pristine exe sha16=73d9306ac9499591
+
+mutation                                       colour           which test line fired
+m1_entry_serves_probe_bytes                    RED runrc=1      246 | 261 | 264 | 268 | 277 | 279
+m2_handover_ends_on_notice                     RED runrc=1      246 | 268 | 277 | 279
+m3_probe_page_gets_lookable_p                  GREEN runrc=0    246 | 279
+m4_id_question_only_no_import                  RED runrc=1      246 | 277 | 279
+m6_probe_step_deleted_from_handover            GREEN runrc=0    246 | 279
+m5_ci_shape_absent_entry_and_script_only_notice RED runrc=1      246 | 264 | 282
+
+rig rc=0

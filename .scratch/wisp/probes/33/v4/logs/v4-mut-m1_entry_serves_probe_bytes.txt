@@ -1,0 +1,40 @@
+mutation m1_entry_serves_probe_bytes
+NOTE: serveEntry hands the probe step's own document to the control instead of the resolved entry
+
+LANDING: snippet occurs 1 time(s) in cmd/wisp/panel_host_windows.go (must be exactly 1)
+LANDING: paired Replace entry "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go" -> "D:/tmp/wisp33v4/mut/m1_entry_serves_probe_bytes/panel_host_windows.go.repl"
+LANDING: replacement sha16=8fe810b0c1f54752 vs target sha16=c451ff65f3b96bee (must differ) -> True
+OVERLAY JSON verbatim:
+{
+ "Replace": {
+  "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "D:/tmp/wisp33v4/mut/m1_entry_serves_probe_bytes/panel_host_windows.go.repl"
+ }
+}
+
+$ go test -c -overlay=D:/tmp/wisp33v4/mut/m1_entry_serves_probe_bytes/overlay.json -o D:/tmp/wisp33v4/exe/m1_entry_serves_probe_bytes.test.exe .
+rc=0
+EXE D:/tmp/wisp33v4/exe/m1_entry_serves_probe_bytes.test.exe sha16=d0849d95c9000473 bytes=41520033 ; differs from pristine exe: True
+
+$ D:/tmp/wisp33v4/exe/m1_entry_serves_probe_bytes.test.exe -test.run ^TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe$ -test.v -test.count=1
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0.55
+    panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+    panel_pageover_33r10_windows_test.go:261: after a cold start the LAST document handed to the control is byte-for-byte the document the round-trip probe step writes (136 byte(s)). That is ticket 33 AC#13: the user ends on the probe page instead of the panel. Product side: the probe stays - it is where cold usable is decided - but coldStartPageHandover must hand the entry over AFTER it
+    panel_pageover_33r10_windows_test.go:264: after a cold start the last document carries nothing a user could look at: with its scripts stripped its body is empty (head "<!doctype html><html><head><meta charset=\"utf-8\"></head><body><script>if(window.wispProbeRT)window.wispProbeRT();</scrip"). The panel was never handed over, so the panel window would show a shell. Ticket 33 AC#13 item 2 asks the final document about its content, not about whether a call was made
+    panel_pageover_33r10_windows_test.go:268: after a cold start the last document does not carry the embedded entry's own 1044 byte(s): ticket 33 AC#13's 'final document contains the real embed entry content' is not met
+    panel_pageover_33r10_windows_test.go:277: after a cold start the last document contains NONE of the 1 element id(s) the resolved entry declares [root] (head "<!doctype html><html><head><meta charset=\"utf-8\"></head><body><script>if(window.wispProbeRT)window.wispProbeRT();</scrip"): the document in the window is not the panel page
+    panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 136 byte(s), 0 of 1 entry id(s) present, entry bytes carried=false
+--- FAIL: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+FAIL
+time=2026-10-08T10:43:26.577+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+rc=1
+COLOUR: RED
+WORLD lines: panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+FIRED assertions:
+  panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0.55
+  panel_pageover_33r10_windows_test.go:261: after a cold start the LAST document handed to the control is byte-for-byte the document the round-trip probe step writes (136 byte(s)). That is ticket 33 AC#13: the user ends on the probe page instead of the panel. Product side: the probe stays - it is where cold usable is decided - but coldStartPageHandover must hand the entry over AFTER it
+  panel_pageover_33r10_windows_test.go:264: after a cold start the last document carries nothing a user could look at: with its scripts stripped its body is empty (head "<!doctype html><html><head><meta charset=\"utf-8\"></head><body><script>if(window.wispProbeRT)window.wispProbeRT();</scrip"). The panel was never handed over, so the panel window would show a shell. Ticket 33 AC#13 item 2 asks the f
+  panel_pageover_33r10_windows_test.go:268: after a cold start the last document does not carry the embedded entry's own 1044 byte(s): ticket 33 AC#13's 'final document contains the real embed entry content' is not met
+  panel_pageover_33r10_windows_test.go:277: after a cold start the last document contains NONE of the 1 element id(s) the resolved entry declares [root] (head "<!doctype html><html><head><meta charset=\"utf-8\"></head><body><script>if(window.wispProbeRT)window.wispProbeRT();</scrip"): the document in the window is not the panel page
+  panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 136 byte(s), 0 of 1 entry id(s) present, entry bytes carried=false
+rc=1

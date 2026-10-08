@@ -1,0 +1,13 @@
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 413) 	m.mu.Lock()
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 414) 	m.w = w
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 415) 	m.hwnd = hwnd
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 416) 	m.created = true
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 417) 	m.mu.Unlock()
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 418) 
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 419) 	// AC#13's order lives in coldStartPageHandover (33-r10 moved it out verbatim:
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 420) 	// same statements, same order, nothing added or dropped). Read the reason there.
+70b008856 (CarlosShao 2026-10-08 10:16:41 +0800 421) 	rtMs := m.coldStartPageHandover(ctx, t0)
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 422) 
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 423) 	m.mu.Lock()
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 424) 	m.lastColdMs = rtMs
+697b4faeb (CarlosShao 2026-10-01 10:10:29 +0800 425) 	m.mu.Unlock()

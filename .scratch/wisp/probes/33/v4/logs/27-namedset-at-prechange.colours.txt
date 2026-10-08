@@ -1,0 +1,11 @@
+--- PASS: TestAC9ComposerDispatchHasAProductionCaller
+--- PASS: TestAC9InboundLegFromStdinReachesTheWriteLeg
+--- PASS: TestAC9InboundLegRefusesRosterMethodWithNoHandler
+--- PASS: TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+--- PASS: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+--- PASS: TestForwardingHookMustNotLoseTheNativeExitReceiver
+--- PASS: TestPanelHostOpensNoListeningSocketL1
+--- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument
+--- PASS: TestTicket255WindowOptionsFollowTheConfigSource

@@ -1,0 +1,13 @@
+=== prior-leg full-package readings naming the window-dependent red family (I did NOT re-run these: constraint 3) ===
+--- .scratch/wisp/probes/33/r9/09-fullpack-1.txt
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (0.50s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	184.620s
+FAIL
+--- .scratch/wisp/probes/33/r6/fullpack2.log
+--- FAIL: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (2.23s)
+--- FAIL: TestBallPanelGesturesReachThePanelThread (20.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	210.782s
+FAIL
+rc=0

@@ -1,0 +1,17 @@
+=== RULER B (re-run with correct paths): merged statement sequence, comments+blanks stripped ===
+32,35c32
+< 	rtMs := m.firstRoundTripLocked(ctx, t0)
+< 	if err := m.serveEntry(); err != nil {
+< 		m.serveNotBuiltNoticeLocked()
+< 	}
+---
+> 	rtMs := m.coldStartPageHandover(ctx, t0)
+39a37,43
+> }
+> func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
+> 	rtMs := m.firstRoundTripLocked(ctx, t0)
+> 	if err := m.serveEntry(); err != nil {
+> 		m.serveNotBuiltNoticeLocked()
+> 	}
+> 	return rtMs
+rcB=1

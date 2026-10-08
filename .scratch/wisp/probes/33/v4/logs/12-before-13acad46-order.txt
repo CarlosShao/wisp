@@ -1,0 +1,16 @@
+270:	m.mu.Unlock()
+278:	m.mu.Lock()
+280:	m.mu.Unlock()
+292:	m.mu.Lock()
+294:	m.mu.Unlock()
+301:	m.mu.Lock()
+305:	m.mu.Unlock()
+320:	m.mu.Lock()
+326:	m.mu.Unlock()
+349:func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
+350:	m.mu.Lock()
+352:	m.mu.Unlock()
+268:	rtMs := m.firstRoundTripLocked(ctx, t0)
+270:	if err := m.serveEntry(); err != nil {
+296:func (m *PanelManager) serveEntry() error {
+498:func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {

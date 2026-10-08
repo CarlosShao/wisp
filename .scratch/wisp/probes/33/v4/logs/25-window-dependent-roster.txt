@@ -1,0 +1,16 @@
+cases whose own body reaches a window-buying call (NOT executed by this leg, constraint 3):
+  TestAC13BringUpRefusesAThreadWithAQueuedClose                          panel_resident_windows_test.go                 windows windowCalls=1
+  TestAC13BringUpSurvivesAReusedThreadQuit                               panel_resident_windows_test.go                 windows windowCalls=1
+  TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe                     panel_resident_windows_test.go                 windows windowCalls=1
+  TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever         panel_resident_windows_test.go                 windows windowCalls=1
+  TestAC14AwaitedBindingReplyReachesThePage                              panel_resident_windows_test.go                 windows windowCalls=1
+  TestAC14GoSideEvalPushReachesThePage                                   panel_resident_windows_test.go                 windows windowCalls=1
+  TestAC4FocusReturnToPriorWindowGap33r5                                 panel_host_windows_test.go                     windows windowCalls=2
+  TestAC4PriorFocusSurvivesARefusedPanelSample                           panel_resident_windows_test.go                 windows windowCalls=1
+  TestBallPanelGesturesReachThePanelThread                               panel_resident_windows_test.go                 windows windowCalls=1
+  TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor                    panel_transport_live_35v2_windows_test.go      winlive windowCalls=1
+  TestPanelHostRealWindowHopAndLifecycle                                 panel_host_windows_test.go                     windows windowCalls=1
+  TestPanelThreadIsSTAAndExitsCleanly                                    panel_resident_windows_test.go                 windows windowCalls=1
+  TestTicket255PanelHostBuildsItsWindowOptions                           panel_geometry_255_test.go                     windows windowCalls=1
+  TestTicket255RealWindowWidthFollowsTheConfig                           panel_geometry_255_winlive_test.go             winlive windowCalls=1
+total=14 rc=0

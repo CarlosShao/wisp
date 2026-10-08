@@ -1,0 +1,44 @@
+413: 	m.mu.Lock()
+414: 	m.w = w
+415: 	m.hwnd = hwnd
+416: 	m.created = true
+417: 	m.mu.Unlock()
+418: 
+419: 	// AC#13's order lives in coldStartPageHandover (33-r10 moved it out verbatim:
+420: 	// same statements, same order, nothing added or dropped). Read the reason there.
+421: 	rtMs := m.coldStartPageHandover(ctx, t0)
+422: 
+423: 	m.mu.Lock()
+424: 	m.lastColdMs = rtMs
+425: 	m.mu.Unlock()
+426: 	return nil
+427: }
+428: 
+429: // coldStartPageHandover is AC#13's order, and it is the whole fix: prove the
+430: // message channel first, hand the page over LAST. firstRoundTripLocked shows a
+431: // document of its own, so running it after serveEntry meant every cold start
+432: // finished on the probe page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3
+433: // "供给那半"). The probe stays - it is where cold "usable" is decided - it just no
+434: // longer gets the last word about what the user sees.
+435: //
+436: // Why this is a function and not the four lines it was inside bringUp (leg 33-r10,
+437: // ticket 33 AC#13 item 2): bringUp cannot run headlessly - it calls
+438: // webview2.NewWithOptions, which needs a live WebView2 control - so the shipped
+439: // handover order had no ruler that could run without opening a window. The only
+440: // case that ever asked the question, TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+441: // (panel_resident_windows_test.go), buys a real browser and in a fresh checkout
+442: // skips for lack of a bundle. Splitting the tail out is the same move
+443: // installPanelTransport already made for the same reason (ticket 35 AC#6, see the
+444: // comment at that call): it moves zero behaviour, holds no lock across the call,
+445: // and gives AC#13's content assertion a headless way to reach the shipping order.
+446: // That reach is what TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe needs.
+447: func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
+448: 	rtMs := m.firstRoundTripLocked(ctx, t0)
+449: 
+450: 	if err := m.serveEntry(); err != nil {
+451: 		m.serveNotBuiltNoticeLocked()
+452: 	}
+453: 	return rtMs
+454: }
+455: 
+456: // serveNotBuiltNoticeLocked replaces the page with an explicit offline notice when

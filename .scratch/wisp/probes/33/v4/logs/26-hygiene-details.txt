@@ -1,0 +1,18 @@
+=== gofmt -l on the two audited files individually ===
+rc=0 (0 with empty output = both formatted)
+
+=== who last touched the 2 genuinely-unformatted files (not the audited commit) ===
+cmd/wisp/panel_inbound_guards_35r3_test.go last=7f9d6e40 2026-10-07
+cmd/wisp/panel_transport_35r2_test.go last=3a343bc7 2026-10-08
+cmd/wisp/models.go last=5e8748b3 2026-10-03
+rc=0
+
+=== go vet -tags winlive ./cmd/wisp/ ===
+rc=0
+
+=== does the audited commit appear in the 2 unformatted files' history? ===
+3a343bc7 票 35 35-r5 AC#8(i)(ii)(iii)：夹具补上"门存在但不可调用"那一枚世界＋红句前缀拆面＋三处浏览器事实口径收紧（⛔ 零产码改动）
+rc=0 empty-stdout-means-no
+
+=== current line count of the product file ===
+880 cmd/wisp/panel_host_windows.go
