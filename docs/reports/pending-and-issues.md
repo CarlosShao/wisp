@@ -14090,3 +14090,33 @@ dev 真身我现量重钉：挂载＝`main.tsx:58`（`<App />` **确实无 prop*
 **4. ★它自抓的那枚错形，我升格成定式（⛔ 不只在台账里躺着）**：它在证据件里先写"夹在我两笔之间＝1 枚"，真值 **3 枚**；根因＝**范围尺的末 hash 打错一个字符**（`f450f8c6`），命令尾接了 **`2>/dev/null`** ⇒ `fatal: bad object` 被咽掉，**静默空输出被它读成"区间里没有"**。⇒ 定式：**范围尺（`git log A..B`／`git diff A..B` 这类）⛔ 永不接 `2>/dev/null`，跑完必检 `rc`；空输出只有在 `rc=0` 时才允许读成"没有"**。这正是我记忆里"过滤后 grep 空≠没跑（要去管道看原始末几行）"那条的 **git 范围尺版本**，而且这次是**腿自己抓自己**——比我抓它更有传播力，我采并把它写进后续派单模板。
 
 **5. 编队与状态（现量）**：在飞 **3 枚**＝`253-r1`（写面 `cmd/wisp`，只补"绑定字面量"那一枚窄形尺）／`stale-claim-1`（只读，全仓"零调用者"那一族注释的复判）／`ci-if-eval-1`（只读，`gh` 取那 23 枚 CI 守卫**有没有真被求值过**）。⛔ 三枚都不许种产码突变＝`internal/agent/approval` 那格被按住，等 `253-r1` 退出再派 `259-v1`（我名下欠的那张非实现者裁决表）。我自己剩两笔：先重跑真构建刷新 `frontend/dist`（现量 `index.html` mtime 09-27＝过期产物）再复跑那一发真窗，外加 `A696` 第三控制运行；⛔ 真构建会连带重出 `build/wisp.exe`＝属机主"exe 未还原"现役状态，**没他一句话我不动**。⛔ 零 push、⛔ 页面分支不合；机主手上仍**那三问**，本轮没叠第四问（我只问过他一发纯事实句：那 16 枚 `design/` 删除是不是他删的，未答）。
+## A720｜2026-10-08 16:0x｜编排者自写｜收 **`stale-claim-1`**（全仓"零调用者／未接线／DORMANT／NO production caller"那一族注释今天还成立吗）＋★**我把它的锚读错了一个包、差点据此推翻一条正确读数**＋★**它 B-07 那一格我自己跑了＝那枚"矛盾"不成立**
+
+（追加时刻先跑 `date`＝`2026-10-08 16:0x +0800`，节头取现量。）
+
+### 1. 收档
+
+`99e14860` 代提 5 枚 `.md`（`git show --stat`＝**546 insertions(+) / 0 deletions**；`find .scratch/wisp/probes/stale-claim-1 -type f | wc -l`＝**5**；非 `.md`＝**0**；字节现量 8244/37449/14661/12021/13751）。它的尺（我采这套写法进后续派单）＝**按"这句话在说什么"做内容扫、⛔ 不按符号名扫**，判"零调用者"一律走**调用形状**，射程一律 `HEAD`＋`:(exclude).scratch`＋`:(exclude)*_test.go`。自报分档：表一 产码注释 **39 枚**＝过期 15／判不动 9／仍成立 15，表一·补 `_test.go` **4 枚**，表二 票面/派单 **14 枚**，表三 正向断言 **14 枚**；101 行命中里 **62 行**属运行时拒绝文案／fail-closed 分支／标识符自指，具名剔出。⛔ 我没逐枚复跑那 39 枚——**下面 §3 那五把我自己跑过的才采**，其余一律〔仅腿报〕。
+
+### 2. ★记我（假阴性差点推翻一条对的读数）
+
+它 P13 引 `bridge.go:212-213`／`:925-927`，我按**裸文件名**解析成 `internal/panel/bridge.go`，跑了 `git show HEAD:internal/panel/bridge.go | wc -l`＝**167 行**，于是在核对里写下"这两枚锚不可能"。真指代＝**`internal/tools/bridge.go`（1280 行；它 `00` 节 §2 的存在性尺里逐字列着 `1280 internal/tools/bridge.go`）**。我复跑 `sed -n` 现量：`:211-213`＝`b.assess = risk.NewRiskAssessor().WithCanonicalizer(o.Paths).WithSensitiveClassifier(b.classifier)`；`:924-927`＝`assessorFor` 三枚全上、含 `WithTaintDetector(b.prov.Detector(taskID))`；第三处＝`cmd/wisp/panel_assets.go:66`。⇒ **锚成立、腿对、错在我。**
+定式（第 119 条换载体：从"同名符号"到**同名文件**）＝本仓 `bridge.go` 有**两枚**（`internal/panel/` 167 行／`internal/tools/` 1280 行，⚠ 行数随 HEAD 动，引前先量）；凡见"裸文件名:行号"⛔ 不许按我此刻正在读的那枚包去解析，**先用被引符号邻域定包**（本例＝`git grep -n WithCanonicalizer HEAD -- internal cmd ':!*_test.go'` 回 2 处命中，两枚都在 `internal/tools/bridge.go`）再量行数。⚠ 后果具名：我若没改这一步，就会把一条**我名下台账将来要服从**的读数打成"腿造锚"——与第 130 条（腿顶回来的更正我不复跑就落账）同形、方向相反。
+
+### 3. 我自己复跑过、据此采的五把
+
+① `git grep -nE '[A-Za-z0-9_]\.AskOnTaskRoot\(' HEAD -- '*.go' ':!*_test.go'` → **空、rc=1**；全形状 `git grep -n AskOnTaskRoot HEAD -- 'cmd/*.go' ':!*_test.go'` → 4 枚命中**全是注释或定义**（`cmd/wisp/resident_approval_windows.go:688`／`:697`、`cmd/wisp/resident_task_source_windows.go:14`、`cmd/wisp/resident_windows.go:248`）⇒ 生产调用点 **0**。
+② `askConfirmation` 产码调用点唯一一处＝`cmd/wisp/resident_approval_windows.go:700`，而它**住在 `AskOnTaskRoot` 的函数体内** ⇒ `cmd/wisp/resident_windows.go:248` 那句 `This call is the caller` **已过期**〔已证〕，档位＝**〔建了但没接〕**。⚠ 这同时更新我自己：票 246／`A595` 那条"门在卡进得来、还没有任务会举卡"**到今天仍成立**，但现在多了一枚**具名过期注释**要更正（那句 `This call is the caller` 是票 246 落地腿写在 `resident_windows.go` 里的）。
+③ `SealDir` **仍成立**：尺回 **1** 枚＝定义行 `internal/winsec/winsec.go:222`，0 调用点（与票 132 未 `-done` 同形）。
+④ `internal/panel/composer_dispatch.go:50` 那句 `it has NO production caller yet`（`:48` 已漂 2 行）**已过期**〔已证〕：`.Handle(` 产码两处＝`cmd/wisp/panel_host_windows.go:821`、`cmd/wisp/panel_inbound.go:163`（同名 `windows.Handle`／`observe`／`logsink` 那批命中按**类型**剥掉＝第 107/119 条在这枚上执行）。⛔ 但"过期"只到 **Go 侧那一跳**：`raw` 的来源是 `w.Bind(panelDispatchBinding, func(raw string) string{…})`（`panel_host_windows.go:802-804`），**页面到底调不调**＝票 33 `AC#13` 那一发真窗，而我 14:2x 那发因 `frontend/dist` 过期**不可作数**（`A718 §3`）⇒ 后续腿⛔ 不许把这条更正写成"网页→Go 那一跳已通"，只许写"**Go 侧接线在、页面侧零凭据**"。
+⑤ P13 `internal/risk/assessor.go:28-29`：过期的只有 `not yet wired by tickets 18/19` 那枚**括号**，`DORMANT` 一词本身仍是合法行为描述——**它表一里本来就写清了"默认装配两枚／`assessorFor` 三枚全上"，⛔ 没有夸大**（§2 那处错在我）。⇒ 归口登记（⛔ 本轮不开新票、⛔ 不派码）：这族"注释说实话"横跨 `internal/risk`＋`internal/panel`＋`cmd/wisp`，与票 259（授权绑定层）不是一件事，落哪一票待我先查重再裁（第 123 条）。
+
+### 4. ★B-07 我销了（编排者名下；`internal/panel` 不与 `253-r1` 的 `cmd/wisp` 撞包）
+
+尺＝`go test ./internal/panel/ -run TestPanelHostIsAttachedAndNamesTheWindowHops -v` ⇒ **rc=0、PASS 0.24s**，子用例 `positive-control`／`reverse-positive-control` **全 PASS**；`:438` 五枚命中逐字含 `cmd/wisp/panel_host_windows.go:64:imports github.com/jchv/go-webview2`、`cmd/wisp/panel_resident_windows.go:73:imports …`、`go.mod:19`、`go.sum:10`、`go.sum:9`（`production=true dependency=true`）。
+判语＝它表一/表三写的"产码与仪器**直接矛盾**"**不成立**：`internal/panel/composer_dispatch_test.go:440` 那句是 `if !prodSignal { t.Errorf(…) }` 的**红句文案**（它断的是"**必须有**通道"），把文案当谓词读＝第 111 条"按这句话在说什么扫"的反面新实例，这次在腿侧。⇒ B-07 **销账**，它牵制的 P05／P03／Q01／Q12 四枚不再受约束。⚠ 但"该跑而没人跑"这笔账**记在我身上**：派单禁腿跑 `go test`，而这枚判定只有跑才能定 ⇒ 今后凡票格里出现"只有执行才能裁"的，我在派单里就具名写"**这一格归编排者跑**"，⛔ 不许留成腿的欠账（与 10-08 早间那条"需要派单里就禁掉的资源⛔ 不算腿的欠账"同规矩）。
+
+### 5. 纪律与编队现量
+
+⛔ **零翻框**（票 33 此刻 `394 行／13 未勾／1 已勾`、票 259 `5 未勾／1 已勾`、票 242 `3 未勾／0 已勾`，本轮一枚没动）、⛔ 零 `-done`、⛔ 零 push、页面分支不合、`build/wisp.exe` 未还原；机主手上仍那三问、本轮**没叠第四问**。编队＝`253-r1` 在写 `cmd/wisp`（新件 `cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go` mtime 15:25，起手锚 15:10）、`ci-if-eval-1` 交件见 `A721`、`259-v1` 按住（它要种 `internal/agent/approval` 行为突变，与 `cmd/wisp` 编译互洗）。我名下欠账三笔：`frontend/dist` 刷新（⛔ 连带重出 exe，没他一句话不动）＋那一发真窗复跑＋`go list -deps` 那把（B-01，models 段"依赖图里没有任何读者"的射程是**闭包**不是 grep）。它列的 B-03/B-04/B-05/B-06/B-11/B-12/B-13 是"要读控制流／数据默认值"那一族，⛔ 不是枚数尺能给的，后续腿不许拿 grep 填那一格。
+
