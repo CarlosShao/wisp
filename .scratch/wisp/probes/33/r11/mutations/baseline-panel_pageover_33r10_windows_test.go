@@ -20,7 +20,7 @@ package main
 //
 //	(a) the last document the control was handed is not the document the host's
 //	    own probe step writes. The probe document is CAPTURED AT RUNTIME by
-//	    calling firstRoundTrip against a throwaway sink, not copied from a
+//	    calling firstRoundTripLocked against a throwaway sink, not copied from a
 //	    literal in this file, so rewriting the probe page's markup cannot quiet the
 //	    ruler (a content anchor, not a line-number anchor and not a string the
 //	    product could drift away from unnoticed).
@@ -52,7 +52,7 @@ import (
 // docSink33r10 is a webview2.WebView that keeps every document it is handed. It
 // also stands in for the engine's one behaviour the cold probe depends on: the
 // inline script of a freshly shown document runs the moment it is shown, so a
-// bound no-argument function (the shape firstRoundTrip registers) is called
+// bound no-argument function (the shape firstRoundTripLocked registers) is called
 // there. That is modelling, not measuring - no assertion below reads anything but
 // the recorded documents and the embed's own bytes.
 type docSink33r10 struct {
@@ -213,13 +213,13 @@ func entryFromEmbed33r10(t *testing.T) (data []byte, ids []string, ok bool) {
 
 // captureProbeDoc33r10 asks the product's own probe step what document it shows,
 // on a throwaway sink. The probe page is therefore identified by what
-// firstRoundTrip writes right now, not by a string copied into this file.
+// firstRoundTripLocked writes right now, not by a string copied into this file.
 func captureProbeDoc33r10(t *testing.T, assets *panel.Assets) string {
 	t.Helper()
 	sink := newDocSink33r10()
 	m := NewPanelManager(nil, assets, t.TempDir())
 	attachSink33r10(m, sink)
-	rtMs := m.firstRoundTrip(context.Background(), time.Now())
+	rtMs := m.firstRoundTripLocked(context.Background(), time.Now())
 	doc, ok := sink.firstDoc()
 	if !ok {
 		t.Fatalf("the probe step handed no document to the control at all (rtMs=%v): AC#13's subject moved, this ruler needs re-reading", rtMs)
@@ -235,7 +235,7 @@ func captureProbeDoc33r10(t *testing.T, assets *panel.Assets) string {
 // document (it must not be), does it carry lookable content (it must), and does it
 // carry the resolved entry's bytes and element ids (it must, when a bundle exists).
 //
-// AC#13's mutation is exactly the first two questions: put firstRoundTrip
+// AC#13's mutation is exactly the first two questions: put firstRoundTripLocked
 // back after serveEntry and the last document becomes the probe page - different
 // content, no lookable body - so the case is red rather than merely reordered.
 func TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe(t *testing.T) {

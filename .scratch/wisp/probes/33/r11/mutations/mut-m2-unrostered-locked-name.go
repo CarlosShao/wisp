@@ -967,3 +967,7 @@ func staleCloseQueued() (bool, uintptr) {
 	}
 	return true, uintptr(m.hwnd)
 }
+
+// noteColdMsLocked is the M2 mutation: a Locked-suffixed method that takes no lock
+// of its own, i.e. a name the roster has never heard of.
+func (m *PanelManager) noteColdMsLocked(v float64) { m.lastColdMs = v }

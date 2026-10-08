@@ -445,7 +445,7 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 // and gives AC#13's content assertion a headless way to reach the shipping order.
 // That reach is what TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe needs.
 func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
-	rtMs := m.firstRoundTrip(ctx, t0)
+	rtMs := m.firstRoundTripLocked(ctx, t0)
 
 	if err := m.serveEntry(); err != nil {
 		m.serveNotBuiltNotice()
@@ -837,7 +837,7 @@ func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, err
 // The probe page it shows is transient by design and, since AC#13 was fixed, is no
 // longer the last word: bringUp runs this BEFORE serveEntry, so the user ends on the
 // embedded entry. It takes m.mu itself, so a caller must not hold it (33-r11).
-func (m *PanelManager) firstRoundTrip(ctx context.Context, t0 time.Time) float64 {
+func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
 	m.mu.Lock()
 	w := m.w
 	m.mu.Unlock()

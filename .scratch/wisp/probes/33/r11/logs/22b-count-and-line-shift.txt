@@ -1,0 +1,21 @@
+=== 22b: roster census count fixed (lines, not words) + line-shift proof ===
+14
+hitcount_rc=0
+distinct_cites_in_config_readers_255=14
+extract_rc=0
+--- git diff --numstat for every tracked file this leg touched (adds == dels means zero line-number shift) ---
+14	14	cmd/wisp/panel_host_windows.go
+5	5	cmd/wisp/panel_pageover_33r10_windows_test.go
+numstat_rc=0
+--- total line counts, HEAD vs worktree, for the two cited-region files ---
+cmd/wisp/panel_host_windows.go head_lines=969 worktree_lines=969 equal=yes
+cmd/wisp/panel_pageover_33r10_windows_test.go head_lines=293 worktree_lines=293 equal=yes
+linecount_rc=0
+--- the cited line itself, verbatim, still at 262 ---
+		Width:  uint(width),
+sed_rc=0
+--- files in the 14-cite roster that this leg did not open at all (so no shift is possible) ---
+ M cmd/wisp/panel_host_windows.go
+ M cmd/wisp/panel_pageover_33r10_windows_test.go
+?? cmd/wisp/panel_locked_naming_33r11_windows_test.go
+status_rc=0

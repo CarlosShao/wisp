@@ -427,7 +427,7 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 }
 
 // coldStartPageHandover is AC#13's order, and it is the whole fix: prove the
-// message channel first, hand the page over LAST. firstRoundTrip shows a
+// message channel first, hand the page over LAST. firstRoundTripLocked shows a
 // document of its own, so running it after serveEntry meant every cold start
 // finished on the probe page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3
 // "供给那半"). The probe stays - it is where cold "usable" is decided - it just no
@@ -445,19 +445,19 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 // and gives AC#13's content assertion a headless way to reach the shipping order.
 // That reach is what TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe needs.
 func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
-	rtMs := m.firstRoundTrip(ctx, t0)
+	rtMs := m.firstRoundTripLocked(ctx, t0)
 
 	if err := m.serveEntry(); err != nil {
-		m.serveNotBuiltNotice()
+		m.serveNotBuiltNoticeLocked()
 	}
 	return rtMs
 }
 
-// serveNotBuiltNotice replaces the page with an explicit offline notice when the
-// embed carries no bundle: a SetHtml this host writes, so the user never ends on
-// the round-trip probe page, and it opens no socket and loads nothing from the network.
-// It takes m.mu itself, so callers must not hold it (33-r11 dropped the Locked suffix).
-func (m *PanelManager) serveNotBuiltNotice() {
+// serveNotBuiltNoticeLocked replaces the page with an explicit offline notice when
+// the embed carries no bundle. It is a SetHtml of a document this host writes, so
+// the user is never left looking at the round-trip probe page, and it still opens
+// no socket and loads nothing over the network.
+func (m *PanelManager) serveNotBuiltNoticeLocked() {
 	m.mu.Lock()
 	w := m.w
 	m.mu.Unlock()
@@ -794,7 +794,7 @@ var panelPostMessageForwardInit = fmt.Sprintf(`(function () {
 // installPanelTransport is the ONE place the page<->host inbound transport is
 // wired. It binds the wispDispatch door (whose Go callback feeds dispatchRaw) and
 // installs the postMessage forwarding hook above, in that order and before the
-// first SetHtml (bringUp runs it ahead of firstRoundTrip / serveEntry, and an
+// first SetHtml (bringUp runs it ahead of firstRoundTripLocked / serveEntry, and an
 // Init script re-runs on every document so it survives later SetHtml rebuilds).
 // Kept out of bringUp so a test drives this exact shipping wiring on a fake control
 // rather than reaching dispatchRaw directly.
@@ -821,9 +821,9 @@ func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, err
 	return m.disp.Handle(ctx, raw)
 }
 
-// firstRoundTrip drives one JS -> Go cycle and returns its duration, pumping
+// firstRoundTripLocked drives one JS -> Go cycle and returns its duration, pumping
 // the thread's queue until the Go side sees the probe binding or a monotonic
-// deadline passes (a bounded wait, not a wall-clock timeout). It takes m.mu itself.
+// deadline passes (a bounded wait, not a wall-clock timeout).
 //
 // What this proves and what it does NOT (orchestrator ruling P2, 10-01 13:12):
 // its range is "the page reached Go" (H3). The `done` channel closes inside the Go
@@ -835,9 +835,9 @@ func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, err
 // separate dimensions and stay separate tests.
 //
 // The probe page it shows is transient by design and, since AC#13 was fixed, is no
-// longer the last word: bringUp runs this BEFORE serveEntry, so the user ends on the
-// embedded entry. It takes m.mu itself, so a caller must not hold it (33-r11).
-func (m *PanelManager) firstRoundTrip(ctx context.Context, t0 time.Time) float64 {
+// longer the last word: bringUp runs this BEFORE serveEntry, so the document the
+// user ends on is the embedded entry.
+func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
 	m.mu.Lock()
 	w := m.w
 	m.mu.Unlock()

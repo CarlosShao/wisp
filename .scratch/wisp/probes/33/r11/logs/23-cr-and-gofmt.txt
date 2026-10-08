@@ -1,0 +1,11 @@
+=== 23: CR (carriage return) ruler then gofmt, per instruction: measure CR bytes worktree vs HEAD blob before trusting gofmt -l ===
+cmd/wisp/panel_host_windows.go worktreeCR=0 headBlobCR=0
+cmd/wisp/panel_pageover_33r10_windows_test.go worktreeCR=0 headBlobCR=0
+cmd/wisp/panel_locked_naming_33r11_windows_test.go worktreeCR=0 headBlobCR=0
+crloop_rc=0
+--- gofmt -l on the three (empty output = formatted) ---
+gofmt_rc=0
+--- git ls-files --eol for the same three (which side is authoritative for autocrlf) ---
+i/lf    w/lf    attr/text eol=lf      	cmd/wisp/panel_host_windows.go
+i/lf    w/lf    attr/text eol=lf      	cmd/wisp/panel_pageover_33r10_windows_test.go
+eol_rc=0

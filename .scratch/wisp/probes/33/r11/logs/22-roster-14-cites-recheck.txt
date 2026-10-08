@@ -1,0 +1,17 @@
+=== 14-cite roster re-run (own ruler, same shape as probes/255/v2: extract with grep -oE, then sed the line, then grep -qF the token) ===
+census_count=41
+HIT  cmd/wisp/logsink.go:149 [Level: logSinkLevel]
+HIT  cmd/wisp/models.go:163 [cfg.Models.Mirror]
+HIT  cmd/wisp/models.go:183 [func loadModelConfig]
+HIT  cmd/wisp/panel_config_store.go:92 [cfg := s.mgr.Config()]
+HIT  cmd/wisp/panel_config_store.go:96 [cfg.LLM.Roles.Chat.Model]
+HIT  cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)]
+HIT  cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width]
+HIT  cmd/wisp/resident_ball_windows.go:276 [Hotkeys:  cfg,]
+HIT  cmd/wisp/run.go:1014 [cfg.Agent.PerToolTimeoutMS]
+HIT  cmd/wisp/run.go:424 [rt.cfg = cfg]
+HIT  cmd/wisp/run.go:435 [res := llm.NewResolver(cfg, st)]
+HIT  cmd/wisp/run.go:991 [cfg := rt.cfg]
+HIT  internal/ball/ball_windows.go:64 [SizePx]
+HIT  internal/observe/logging.go:50 [RedactPaths]
+loop_rc=0

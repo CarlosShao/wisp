@@ -623,6 +623,8 @@ func (m *PanelManager) requestGeometryOnReshow() {
 //
 // The caller must hold m.mu.
 func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	if prior == 0 {
 		return
 	}
