@@ -1,0 +1,94 @@
+# 180-c1 AC#4 reader classes (census of default-tagged fields in internal/config/schema.go)
+# ruler A: grep -rn "\.<Field>\b" --include=*.go internal/ cmd/ | grep -v _test.go   (the ticket's own ruler)
+# ruler B: same, then drop internal/config/** hits  (does anything OUTSIDE the schema's own package read it?)
+# population: 69 default-tagged fields (= 70 lines containing 'default:' minus schema.go:8, a doc comment)
+
+## CLASS A - zero hits under ruler A : 17
+##   meaning: no non-test line in internal/ or cmd/ mentions .<Field> at all
+  ClickThrough             BallSection        default=true           toml=click_through
+  HideOnFullscreen         BallSection        default=true           toml=hide_on_fullscreen
+  WarmTimeoutSec           SessionSection     default=90             toml=warm_timeout_sec
+  SettlingSec              SessionSection     default=3              toml=settling_sec
+  ConversationIdleSec      SessionSection     default=30             toml=conversation_idle_sec
+  EchoRef                  AECConfig          default=self-render    toml=echo_ref
+  InputDevice              AudioSection       default=default        toml=input_device
+  SampleRate               AudioSection       default=16000          toml=sample_rate
+  DiagnosticsOptIn         PrivacySection     default=false          toml=diagnostics_opt_in
+  RetentionDays            PrivacySection     default=30             toml=retention_days
+  L1Enabled                MemorySection      default=true           toml=l1_enabled
+  L1Max                    MemorySection      default=20             toml=l1_max
+  L3RetentionDays          MemorySection      default=30             toml=l3_retention_days
+  KeepAliveInSession       PanelSection       default=true           toml=keep_alive_in_session
+  SizeMB                   RollConfig         default=10             toml=size_mb
+  Days                     RollConfig         default=7              toml=days
+  SLOSampleIntervalSec     ObserveSection     default=5              toml=slo_sample_interval_sec
+
+## CLASS B - ruler A > 0 but ruler B == 0 : 19
+##   meaning: only internal/config itself touches it (manager.go block copies, defaults.go reflection,
+##            catalog.go). No component outside the schema package reads the value and acts on it.
+  Language                 AppSection         default=zh-CN          hits_all=2   sample=internal/config/manager.go:354
+  Theme                    AppSection         default=dark           hits_all=4   sample=internal/config/manager.go:353
+  Autostart                AppSection         default=false          hits_all=1   sample=internal/config/manager.go:355
+  SingleInstance           AppSection         default=true           hits_all=1   sample=internal/config/manager.go:356
+  OpacityIdle              BallSection        default=0.35           hits_all=2   sample=internal/config/validate.go:62
+  VetoWords                WakeWord           default=取消,停下,别        hits_all=2   sample=internal/config/manager.go:409
+  Speed                    TTSConfig          default=1.0            hits_all=2   sample=internal/config/manager.go:410
+  Punctuation              VoiceSection       default=true           hits_all=2   sample=internal/config/manager.go:411
+  HalfDuplex               AudioSection       default=true           hits_all=1   sample=internal/config/validate.go:72
+  Billing                  ModelSpec          default=pay-per-token  hits_all=4   sample=internal/config/validate.go:197
+  Billing                  Provider           default=pay-per-token  hits_all=4   sample=internal/config/validate.go:197
+  ShellEnabled             RiskSection        default=false          hits_all=3   sample=internal/config/manager.go:432
+  AllowShellString         RiskSection        default=false          hits_all=3   sample=internal/config/manager.go:437
+  BlockPrivateRanges       NetSection         default=true           hits_all=3   sample=internal/config/manager.go:482
+  KeepTranscript           PrivacySection     default=false          hits_all=1   sample=internal/config/validate.go:82
+  KeepAudio                PrivacySection     default=false          hits_all=1   sample=internal/config/validate.go:86
+  AlertThreshold           CostSection        default=0.8            hits_all=2   sample=internal/config/validate.go:159
+  OverBudget               CostSection        default=pause          hits_all=2   sample=internal/config/validate.go:155
+  Tier2Enabled             PluginsSection     default=false          hits_all=4   sample=internal/config/manager.go:501
+
+## CLASS C - ATTRIBUTED reader exists outside internal/config : 14
+##   meaning: a production line outside the schema package names BOTH the owning type AND the field.
+##   THIS is the only class 180-c1 will call 'has a production reader'.
+  Cancel                   HotkeySection      default=Esc            hits_all=38   hits_outside=38  hits_attr=1   sample=internal/agent/approval/approval.go:117
+  Max                      RetryConfig        default=3              hits_all=16   hits_outside=16  hits_attr=1   sample=internal/llm/retry.go:60
+  BackoffMS                RetryConfig        default=1000           hits_all=1    hits_outside=1   hits_attr=1   sample=cmd/wisp/run.go:1226
+  Loose                    Compat             default=false          hits_all=4    hits_outside=4   hits_attr=4   sample=internal/llm/anthropic/adapter.go:314
+  AllowMissingUsage        Compat             default=false          hits_all=7    hits_outside=7   hits_attr=7   sample=internal/llm/anthropic/adapter.go:265
+  Enabled                  ModelSpec          default=true           hits_all=21   hits_outside=15  hits_attr=1   sample=internal/llm/resolver.go:128  [GENERIC-NAME]
+  TimeoutMS                LLMSection         default=60000          hits_all=1    hits_outside=1   hits_attr=1   sample=cmd/wisp/run.go:1086
+  SteeringEnabled          AgentSection       default=true           hits_all=2    hits_outside=2   hits_attr=1   sample=internal/agent/loop.go:283
+  ProjectInstructionsEnabled AgentSection       default=true           hits_all=2    hits_outside=2   hits_attr=2   sample=cmd/wisp/run.go:1055
+  ConfirmTimeoutSec        RiskSection        default=300            hits_all=3    hits_outside=2   hits_attr=2   sample=cmd/wisp/resident_approval_windows.go:516
+  L1WindowSec              RiskSection        default=2              hits_all=4    hits_outside=2   hits_attr=2   sample=cmd/wisp/resident_approval_windows.go:515
+  DeleteEnabled            FSSection          default=false          hits_all=5    hits_outside=3   hits_attr=1   sample=internal/tools/fs_write.go:596
+  Mode                     ProxyConfig        default=system         hits_all=65   hits_outside=59  hits_attr=2   sample=internal/agent/prompt.go:261  [GENERIC-NAME]
+  Width                    PanelSection       default=640            hits_all=2    hits_outside=2   hits_attr=2   sample=cmd/wisp/config_readers_255.go:161  [GENERIC-NAME]
+
+## CLASS AMBIG - hits outside internal/config but ATTRIBUTION UNPROVEN : 19
+##   The name appears outside the schema package, never on a line that also names the owning type.
+##   Two readings are possible and this leg does NOT pick one: (a) pure name collision with another
+##   struct's field, (b) a real reader that copies the value into a local/other struct first, so the
+##   section name and field name never share a line. Ruler C cannot tell these apart. NOT counted as
+##   'has reader', NOT counted as dead key. Each needs a code read by the landing leg.
+  Size                     BallSection        hits_all=17   hits_outside=10  first=internal/memory/artifacts.go:133
+  Enabled                  WakeWord           hits_all=21   hits_outside=15  first=internal/llm/resolver.go:128
+  Provider                 ASRConfig          hits_all=50   hits_outside=36  first=internal/agent/loop.go:202
+  Provider                 TTSConfig          hits_all=50   hits_outside=36  first=internal/agent/loop.go:202
+  Enabled                  AECConfig          hits_all=21   hits_outside=15  first=internal/llm/resolver.go:128
+  Enabled                  RealtimeConfig     hits_all=21   hits_outside=15  first=internal/llm/resolver.go:128
+  Enabled                  VoiceSection       hits_all=21   hits_outside=15  first=internal/llm/resolver.go:128
+  ConversationMode         VoiceSection       hits_all=6    hits_outside=4   first=internal/statemachine/table.go:187
+  MicMutedDefault          AudioSection       hits_all=1    hits_outside=1   first=internal/audio/gate.go:56
+  Temperature              Role               hits_all=8    hits_outside=8   first=internal/agent/prompt.go:252
+  ThinkingIntensity        Role               hits_all=11   hits_outside=10  first=internal/agent/prompt.go:254
+  RepeatThresholds         LoopGuard          hits_all=6    hits_outside=6   first=internal/agent/guard.go:90
+  MaxRounds                AgentSection       hits_all=7    hits_outside=7   first=internal/agent/guard.go:101
+  TokenBudget              AgentSection       hits_all=7    hits_outside=7   first=internal/agent/budgets.go:108
+  PermissionMode           RiskSection        hits_all=20   hits_outside=11  first=internal/panel/composer_handlers.go:127
+  RedactPaths              PrivacySection     hits_all=4    hits_outside=4   first=internal/observe/diagnostics.go:120
+  Enabled                  PanelSection       hits_all=21   hits_outside=15  first=internal/llm/resolver.go:128
+  VerifySignature          ModelsSection      hits_all=2    hits_outside=1   first=internal/models/downloader.go:106
+  Level                    ObserveSection     hits_all=70   hits_outside=68  first=internal/agent/approval/batch.go:36
+
+## totals: A=17 B=19 AMBIG=19 C=14  sum=69
+rc=0

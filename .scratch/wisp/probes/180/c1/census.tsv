@@ -1,0 +1,71 @@
+field	struct	toml_key	default	kind	hits_all	hits_outside_cfg	hits_attributed	sample_all	sample_outside_cfg	collision_flag
+UNPARSED	<none>	schema.go:8			-1	-1			
+Language	AppSection	language	zh-CN	string	2	0	0	internal/config/manager.go:354		
+Theme	AppSection	theme	dark	string	4	0	0	internal/config/manager.go:353		
+Autostart	AppSection	autostart	false	bool	1	0	0	internal/config/manager.go:355		
+SingleInstance	AppSection	single_instance	true	bool	1	0	0	internal/config/manager.go:356		
+Size	BallSection	size	56	int	17	10	0	internal/config/allowdirs.go:162	internal/memory/artifacts.go:133	generic-name
+OpacityIdle	BallSection	opacity_idle	0.35	float64	2	0	0	internal/config/validate.go:62		
+ClickThrough	BallSection	click_through	true	bool	0	0	0			
+HideOnFullscreen	BallSection	hide_on_fullscreen	true	bool	0	0	0			
+Cancel	HotkeySection	cancel	Esc	string	38	38	1	internal/agent/approval/approval.go:117	internal/agent/approval/approval.go:117	
+WarmTimeoutSec	SessionSection	warm_timeout_sec	90	int	0	0	0			
+SettlingSec	SessionSection	settling_sec	3	int	0	0	0			
+ConversationIdleSec	SessionSection	conversation_idle_sec	30	int	0	0	0			
+Enabled	WakeWord	enabled	false	bool	21	15	0	internal/config/catalog.go:126	internal/llm/resolver.go:128	generic-name
+VetoWords	WakeWord	veto_words	取消,停下,别	[]string	2	0	0	internal/config/manager.go:409		
+Provider	ASRConfig	provider	local-sherpa	string	50	36	0	internal/agent/loop.go:202	internal/agent/loop.go:202	generic-name
+Provider	TTSConfig	provider	local-sherpa	string	50	36	0	internal/agent/loop.go:202	internal/agent/loop.go:202	generic-name
+Speed	TTSConfig	speed	1.0	float64	2	0	0	internal/config/manager.go:410		generic-name
+Enabled	AECConfig	enabled	true	bool	21	15	0	internal/config/catalog.go:126	internal/llm/resolver.go:128	generic-name
+EchoRef	AECConfig	echo_ref	self-render	string	0	0	0			
+Enabled	RealtimeConfig	enabled	false	bool	21	15	0	internal/config/catalog.go:126	internal/llm/resolver.go:128	generic-name
+Enabled	VoiceSection	enabled	true	bool	21	15	0	internal/config/catalog.go:126	internal/llm/resolver.go:128	generic-name
+Punctuation	VoiceSection	punctuation	true	bool	2	0	0	internal/config/manager.go:411		
+ConversationMode	VoiceSection	conversation_mode	false	bool	6	4	0	internal/config/manager.go:384	internal/statemachine/table.go:187	
+InputDevice	AudioSection	input_device	default	string	0	0	0			
+SampleRate	AudioSection	sample_rate	16000	int	0	0	0			
+HalfDuplex	AudioSection	half_duplex	true	bool	1	0	0	internal/config/validate.go:72		
+MicMutedDefault	AudioSection	mic_muted_default	true	bool	1	1	0	internal/audio/gate.go:56	internal/audio/gate.go:56	
+Temperature	Role	temperature	0.7	float64	8	8	0	internal/agent/prompt.go:252	internal/agent/prompt.go:252	
+ThinkingIntensity	Role	thinking_intensity	off	string	11	10	0	internal/agent/prompt.go:254	internal/agent/prompt.go:254	
+Max	RetryConfig	max	3	int	16	16	1	internal/llm/retry.go:60	internal/llm/retry.go:60	
+BackoffMS	RetryConfig	backoff_ms	1000	int	1	1	1	cmd/wisp/run.go:1226	cmd/wisp/run.go:1226	
+Loose	Compat	loose	false	bool	4	4	4	internal/llm/anthropic/adapter.go:314	internal/llm/anthropic/adapter.go:314	
+AllowMissingUsage	Compat	allow_missing_usage	false	bool	7	7	7	internal/llm/anthropic/adapter.go:265	internal/llm/anthropic/adapter.go:265	
+Billing	ModelSpec	billing	pay-per-token	string	4	0	0	internal/config/validate.go:197		
+Enabled	ModelSpec	enabled	true	bool	21	15	1	internal/config/catalog.go:126	internal/llm/resolver.go:128	generic-name
+Billing	Provider	billing	pay-per-token	string	4	0	0	internal/config/validate.go:197		
+TimeoutMS	LLMSection	timeout_ms	60000	int	1	1	1	cmd/wisp/run.go:1086	cmd/wisp/run.go:1086	
+RepeatThresholds	LoopGuard	repeat_thresholds	3,5,8	[]int	6	6	0	internal/agent/guard.go:90	internal/agent/guard.go:90	
+MaxRounds	AgentSection	max_rounds	50	int	7	7	0	internal/agent/guard.go:101	internal/agent/guard.go:101	
+TokenBudget	AgentSection	token_budget	200000	int	7	7	0	internal/agent/budgets.go:108	internal/agent/budgets.go:108	
+SteeringEnabled	AgentSection	steering_enabled	true	bool	2	2	1	internal/agent/loop.go:283	internal/agent/loop.go:283	
+ProjectInstructionsEnabled	AgentSection	project_instructions_enabled	true	bool	2	2	2	cmd/wisp/run.go:1055	cmd/wisp/run.go:1055	
+ConfirmTimeoutSec	RiskSection	confirm_timeout_sec	300	int	3	2	2	internal/config/validate.go:145	cmd/wisp/resident_approval_windows.go:516	
+L1WindowSec	RiskSection	l1_window_sec	2	int	4	2	2	internal/config/manager.go:442	cmd/wisp/resident_approval_windows.go:515	
+ShellEnabled	RiskSection	shell_enabled	false	bool	3	0	0	internal/config/manager.go:432		
+AllowShellString	RiskSection	allow_shell_string	false	bool	3	0	0	internal/config/manager.go:437		
+PermissionMode	RiskSection	permission_mode	ask_every_step	string	20	11	0	internal/config/manager.go:453	internal/panel/composer_handlers.go:127	
+DeleteEnabled	FSSection	delete_enabled	false	bool	5	3	1	internal/config/manager.go:470	internal/tools/fs_write.go:596	
+Mode	ProxyConfig	mode	system	string	65	59	2	internal/agent/prompt.go:261	internal/agent/prompt.go:261	generic-name
+BlockPrivateRanges	NetSection	block_private_ranges	true	bool	3	0	0	internal/config/manager.go:482		
+RedactPaths	PrivacySection	redact_paths	false	bool	4	4	0	internal/observe/diagnostics.go:120	internal/observe/diagnostics.go:120	
+DiagnosticsOptIn	PrivacySection	diagnostics_opt_in	false	bool	0	0	0			
+RetentionDays	PrivacySection	retention_days	30	int	0	0	0			
+KeepTranscript	PrivacySection	keep_transcript	false	bool	1	0	0	internal/config/validate.go:82		
+KeepAudio	PrivacySection	keep_audio	false	bool	1	0	0	internal/config/validate.go:86		
+L1Enabled	MemorySection	l1_enabled	true	bool	0	0	0			
+L1Max	MemorySection	l1_max	20	int	0	0	0			
+L3RetentionDays	MemorySection	l3_retention_days	30	int	0	0	0			
+Enabled	PanelSection	enabled	true	bool	21	15	0	internal/config/catalog.go:126	internal/llm/resolver.go:128	generic-name
+Width	PanelSection	width	640	int	2	2	2	cmd/wisp/config_readers_255.go:161	cmd/wisp/config_readers_255.go:161	generic-name
+KeepAliveInSession	PanelSection	keep_alive_in_session	true	bool	0	0	0			
+AlertThreshold	CostSection	alert_threshold	0.8	float64	2	0	0	internal/config/validate.go:159		
+OverBudget	CostSection	over_budget	pause	string	2	0	0	internal/config/validate.go:155		
+Tier2Enabled	PluginsSection	tier2_enabled	false	bool	4	0	0	internal/config/manager.go:501		
+VerifySignature	ModelsSection	verify_signature	true	bool	2	1	0	internal/config/validate.go:96	internal/models/downloader.go:106	
+SizeMB	RollConfig	size_mb	10	int	0	0	0			
+Days	RollConfig	days	7	int	0	0	0			
+Level	ObserveSection	level	info	string	70	68	0	internal/agent/approval/batch.go:36	internal/agent/approval/batch.go:36	generic-name
+SLOSampleIntervalSec	ObserveSection	slo_sample_interval_sec	5	int	0	0	0			
