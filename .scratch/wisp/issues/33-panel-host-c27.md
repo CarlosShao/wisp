@@ -379,3 +379,16 @@ declaration consumed by 37's native card.
 `frontend/dist/index.html`（1044 字节、引用 `assets/index-BVKlegVD.js`＝台账记过的盘上陈旧件），所以 (c) 钉的是
 "最终文档＝宿主从 embed 解析出的那串字节"，⛔ 不钉"那是今天的新构建"，也不钉"用户眼睛看到了面板"（常驻链的另一跳不在这格）。
 CI／新鲜检出里 embed 只有 `.gitkeep` ⇒ 走 not-built 分支，那一支只有 (a)(b) 两枚牙，**"入口真内容"那一问在 CI 没有 subject＝具名欠账**。
+
+## 10-08 11:5x 编排者裁一笔旧账（来源＝只读普查腿 `33-a3`，件 `.scratch/wisp/probes/33/a3/verdict.md`；⛔ AC 框一字未动，本节前尺＝现量追加前后同为未勾框数）
+
+**这笔账是什么**：`cmd/wisp/panel_host_windows.go` 里 `serveNotBuiltNoticeLocked`（`:460`）与 `firstRoundTripLocked`（`:840` 一带）**带 `Locked` 后缀却自己取锁**，而本仓形制（`setPriorFocusLocked`：注释明写 caller must hold、调用点在持锁段里）说的是反的。`sync.Mutex` 不可重入 ⇒ 照名字办事的后续程会**当场自死锁**。载体是 10-01 那两刀（`13acad46`／`697b4fa`），⛔ 不记在任何一枚近期腿上。
+
+**判语（照腿的现量，我自己复跑过两把尺）**：**今天没有一条真死锁路 ⇒ 这是一枚陷阱，不是现行 bug**（两枚各自唯一调用点都在 `coldStartPageHandover` 里、那整段零 `m.mu.` 语句；测试调用者用新造实例不持锁）。⛔ 任何人（含后续程与我）把这笔账写成"已经死锁"都不许落盘。**仪器＝零覆盖且形状上注定看不见**：`tools/d22scan` 八项 ban 无锁项、本仓 CI 与脚本**根本没有 `-race`**（唯一相关是 `pathresolver_budget_norace_test.go:1` 的 `!race`），而⚠ 就算加了 `-race` 它报的是数据竞争、**不是死锁**；全仓又零 `-timeout` ⇒ 真踩中要烧满默认 10 分钟。
+
+**我的选形（裁完就落在这里，⛔ 由后续程执行、⛔ 不许自己扩）**：
+- **ⓐ 改名（把那两枚的后缀去掉）＝做，但排在 `255-r1` 交完之后**。同文件在飞是硬约束（腿现量它已落 `8b32060b`，窗口未关）；改名本身只动 2 枚文件、不增删行 ⇒ 不会踩 `evidenceCite` 那把按 `file:LINE [token]` 解析的尺（⚠ 这一条**是顶回我派单的**：我在派单里写"改名会让 `config_readers_255.go`／`panel_geometry_255_test.go` 内容锚红"，腿现量两枚文件里 `Locked` **命中 0**、`evidenceCite` 只认行号与 token ⇒ **我那句不成立**，我 11:5x 自己复跑 `grep -c 'Locked'` 两枚都是 0／rc=1 追认。它们的脆弱面是**增删行**，那属 ⓑ 的账）。
+- **ⓒ 一枚会响的钉＝与 ⓐ 同批**。形状定死：**绿着交**——凡"`Locked` 后缀 ＋ 函数体自取锁"同时出现即红，现存那 2 枚进**具名豁免名册**直到 ⓐ 落地；⛔ 不许留一枚恒红用例让后续程继承（本项目有此定式）。现成尺形照抄 `internal/config/manager_223_test.go:39-51` 那一族，⛔ 不新造机制。
+- **ⓑ 保住后缀、把取锁挪到调用点＝否掉**。它不是改名，是**动锁形状**：会把 `m.mu` 的持有跨到最长 5 秒的消息泵上，并经 `panel_resident_windows.go:323-324` 那条 `rp.mu → m.mu` 单向持锁边**传染到常驻线程**；且 `:450 m.serveEntry()` 自己取 `m.mu` ⇒ 写错一格就是当场真死锁。⛔ 谁都不许以"顺手统一形制"为名做它。
+
+**同形名册（腿量，归口本票，⛔ 不新开票）**：甲形（**没有** `Locked` 后缀却要求持锁）3 枚，全在 `internal/config`（`reloadPlan.commit:228`／`writeAllowedDirs:139`／`mergeWrite:111`，今天守约但名字不提示）；乙形（后缀不是 mutex 那个意思）3 处（`Manager.ConfirmLocked:51` 契约逐字是 "runs OUTSIDE mu"＝票 223 已结过的判例、`applyStateLocked:342` 命名的是线程亲和、`planLocked:314` 的 "locked" 指 D36 配置档）；丙形（有注释但不写锁契约）13 枚。⚠ 编译面 `Locked` 方法合计 **23 枚**（尺＝`grep -rn --include='*.go' -E '\bfunc \([^)]*\) [A-Za-z0-9_]*Locked\('`，45 处命中里 22 处是 `.scratch` 下不可编译的拷贝，`go list ./...` 对 scratch 零命中）。
