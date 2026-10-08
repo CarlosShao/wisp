@@ -363,3 +363,15 @@ step1–3 success、**step4 failure**、**step5 `Cache third_party` / step6 `cgo
 - **ⓒ 射程**：只买"这 12 枚编译面坏了会红"，`go vet` 不产测试二进制、不跑用例、不开窗、不需 DLL；⛔ **不许**读成票 35 `:52`/`:75(c)` 真窗读数的 CI 载体（那按 `A690` 走"仅本机可量"另一支），⛔ 不与 AC#7/AC#9 互相抵账（盘上原文两条 ⚠ 已覆盖）。
 - **门禁**：`tools/d22scan`（独立 module，`go run . -root ../../`）rc=0 clean；`ci.yml` 经 `python yaml.safe_load` rc=0 解析通过（`test-windows` 步 9→10）。⛔ 未跑 `go test`（35-v4 独占其窗）、⛔ 未跑 `go build ./...`（§4.7 明令）、gofmt 不适用。
 - **具名欠账（这一格今天注定取不到）**：**CI-success 读数=欠（要等推送之后）**——⛔ 零 push ⇒ 无真实 run 可查，本步"在 CI 真跑过一次 success/failure"未证，故本腿**不自称 AC#11 完成**；ⓐ/ⓑ 皆本机读数、runner 上 `-tags winlive` 的 cgo 编译首验亦落在此欠账内。另与转述差异仅一处已点名：§2 的"步级 `if:`=12"用严格 8 空格尺会漏计 :462 `always()`（得 11），本腿取 `^\s+if:` 任意空白尺为准（两把尺都在 `logs/ruler-if.txt`）。本例 ⓐ 今绿、无红名册，故无台账 `A##` 记；CI-success 那笔欠账请编排者记。
+
+
+---
+
+**10-08 09:4x 编排者收验收腿 `111-v1`（非实现者，`3fdfa8ca`／`e250f0f9`／`daf1f5a0`）⇒ ★裁定：`AC#11` ⛔ 不翻，理由只写在 ⓑ 那一格**（⛔ 本框一字未动；现量仍 **5 未勾／6 已勾**，尺＝`grep -cE '^[[:space:]]*- \[ \]'` 与 `- \[x\]`，追加前后各跑一次）
+
+- **成立的两半**：**ⓐ** 现读数 `go vet -tags winlive ./cmd/wisp/ ./internal/ball/` **rc=0**（写腿一遍＋编排者一遍，件 `.scratch/wisp/probes/111/r6/logs/vet-base.txt`／`orch-vet-winline.txt`；绿 ⇒ 无红名册，⛔ 没动那 12 枚里任何断言）。**ⓒ** 射程句在 yaml 注释里明写"compile coverage only"、逐字否认它是票 35 `:52`／`:75(c)` 的真窗载体；验收腿 Q3/Q4 复认没有"绿滑成有牙"，并量到**全仓只有一枚仪器把 `ci.yml` 当数据打开**（`scripts/slo-freshness.sh` 的 P1，在 `slo-fresh.yml:70` 当门）——那截代码抠出来对真文件**实跑 rc=0**（禁键尺按 `slo-full` 锚定，新步在射程外）；**无**任何步数基线常量（射程＝`scripts`＋`tools`＋`.github` 三棵树）。门：d22scan rc=0、`yaml.safe_load` rc=0（`test-windows` 9→10）。
+- **ⓑ 只闭合一半（这就是不翻的理由，具名）**：票面逐字是"**那一步**必须红"。今天被证明会红的是**那条命令**——验收腿自造了另一枚坏法（换文件、换包、换错误阶级：往 `cmd/wisp/panel_transport_live_35v2_windows_test.go` 加未定义符号），带 tag **rc=1**、摘 tag **rc=0**，并加发 **pristine-overlay 正控**（同内容替换 ⇒ rc=0）排除掉"空操作假绿"那一族，还原 12/12 `git hash-object` 逐枚同基线。⛔ 但**工作流里那枚步骤本身**红不红，要等一发真实 run ⇒ **⛔ 零 push 期间这一格只能欠账**，⛔ 谁也不许把"yaml 里有这一步"读成"它跑过"。
+- **注释口径两处代笔更正（`f8810238`，⛔ 零行为改动：非注释增行 0／yaml 解析 ok／步数仍 10／那三行 `name`·`if`·`run` 一字未动）**：①"排在 `third_party`＋`build.ps1` 之后是因为那串备好了本包要链接的 cgo 依赖"＝**假因果**（全仓 `.go` 的 `#cgo` 命中 0；runner 环境文件 token 在 tracked `scripts`/`.github/workflows`/`tools` 命中 0 ⇒ `build.ps1` 的 PATH 到不了下一步；类型检查不需要 DLL）；②原注释用**现在时**写"`-tags` hits 0 times in this file"＝这句话在它生效那刻起成假话（现量 3／7，`8e98b8f0` 上 0／0），已改过去时＋锚 HEAD。★我自己第一版把那个 token 名写进注释，于是"命中 0 次"被自己的 grep 点成 1 ⇒ 改成锚 ref 量并在射程外声明。
+- **★同时更正我自己 `A692` 里盖章接受的一句错话**（三格分开写，⛔ 不压成一格）：我原句"步级 `if:` 12 处（11 处 `!cancelled()` ＋ 1 处 `always()`）"**在加步之前是对的**（`8e98b8f0`：8-空格尺＝12、`!cancelled` 尺＝11）；`111-r6` 报的"严格 8 空格是 11"＝**错**（它拿 `!cancelled`-only 那把尺的数当成了 8-空格那把），**而我在没复跑的情况下把它当更正记进了台账**；`111-v1` 报的"两把尺都＝13"＝**加步之后**的现量（12＋新步），也对。⇒ 定式：**腿顶回来的更正，我要自己复跑那把尺才落账**；引这类数必须同时写"哪个 ref／哪把尺"。
+- **欠账三格具名**：①CI 真实颜色（与台账 `A691` §5③"CI 真跑过 `cmd/wisp` 并绿过"是同一格，推送之后一起取）；②托管 `windows-latest` 默认 PATH 有没有 gcc（腿判不动；它那句"首跑最可能红在 gcc 不在 tag"是**预测**不是读数）；③`slo-freshness.sh` 整支未实跑（`GH_TOKEN` 不在），`tools/d22scan/runtests.sh` 那把尺按结构裁、未实跑。
+- **排程**：本框的终裁**按在有下一次推送之后**（那时取那一步的真实颜色一并判 ⓑ）；在此之前 `111-r6`/`111-v1` 的读数都算有效凭据、⛔ 不许重跑浪费机器。台账见 `A693`。⛔ 零 push、⛔ 未动那 12 枚 winlive 文件、⛔ 未放宽任何断言。
