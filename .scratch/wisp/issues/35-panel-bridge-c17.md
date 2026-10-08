@@ -227,3 +227,30 @@ dev 真身我现量：挂载＝`frontend/src/main.tsx:58`（`{harness === "1" ? 
 **★我自己那处错（先复跑再落笔，第 122 条）**：`A685` §2 末句我写"信封往前走了一步**撞上 requestId 判**"——盘上逐字 reply（`probes/35/r3/logs/mut-roster.txt:5`）是 **`来源 "" 不是 "panel-composer"，按伪造/串台拒绝`** ⇒ 接住它的是**来源判 `:135`/`:136-137`**，不是 requestId 判；我那句是把回显前缀里那个 `(无 requestId)`（只是显示"这封信没带单号"）读成了"报错的那道门"。`impl.md` §② 的原句才是对的。**`A685` 原文不改**（不改已提交的历史），本条即具名更正；这条也正是第 111 条那一族：**看长行里的关键词位置，别按关键词的字面猜因果**。
 
 **⚠ 一处口径被腿收紧（采它）**：它原本要论证"既有钉 `l2_grant_boundary_test.go` 看不见名册被中和"，实测**不成立**（M-R 下 `TestGrantWireShapesAreRefusedAtTheDoor` rc=1，4/5 线形一路 accept）⇒ "不抵账"这个结论仍成立，但**理由只能写两条**：既有钉**不经传输**、且它**说不出是哪一道门答的**。以后引这格区别⛔ 不许再说成"既有钉看不见名册被拆"。
+
+### 10-08 08:2x 编排者收写腿 `35-r4` 的**盘上遗产**（代提笔 `2fc5f5c9`，32 枚件）⇒ ★**这格今天有了自己的牙读数**，但⛔ **本框 `:75` 一个字没动、0 枚勾翻**（实现方自证不算凭据，非实现者 `35-v4` 待派）
+
+**为什么是编排者代提**：`35-r4` 死于**每日额度**（39 次调用／442 万 token／35 分 10 秒，最后一件落盘 10-07 22:36），⛔ 不是任务失败、不是服务端掐大上下文。它把夹具做完了并自己跑绿（`logs/r4-run.txt`＝12 枚 0 FAIL），差的是**交付件与 commit**；那枚 0 字节的 `countershape-driver.txt` 就是它死在"正要跑反形"那一刻的痕迹（我没有把 0 字节件入库，只在这里具名）。
+
+**落了什么（只动测试夹具这一面，`cmd/wisp/panel_transport_35r2_test.go` ＋245／−3；产码零改动）**：
+- `:137` `jsObject` 加 `unwritable map[string]bool`；`:149-160` `markNonWritable`（**Go 侧台件**）；`:163-166` `set` 读表后**静默拒绝覆写**。
+- `:1285-1291` 原生出口桩**改成认 receiver**，丢了就 `panic("TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with …")`。
+- `:1926` 载具 `runShippedHookInOneWorld35r4` 装的是**生产接线**（`installPanelTransport`：绑门＋把产码钩子字符串当值读入），不是另造一份钩子。
+- 三枚具名用例：`:1946` M-A／`:1976` M-B／`:2026` 门不在时回落原生。
+
+**★四发反形是我代跑的（腿那一版四发全部没跑成）**：它的 `logs/leg/mut-summary.txt` 四节都写 `PASS=0 FAIL=0 buildrc=1 runrc=127`＝**编译就没成**，不是"突变没红"。根因一行：台件 `mk_overlay` 里**被替换侧路径走了 `cygpath -w`**，Windows 反斜杠直接进 JSON ⇒ `go: parsing overlay JSON: invalid escape sequence \w in string`。我的 `scripts/orchestrator-countershape.sh` **唯一改动＝那两条路径也走 `-m`**，突变源／`-test.run` 名册／断言沿用腿的原件（`logs/orch/orch-mut-landing.txt` 现量四枚仍各 `changed-line-count=2`＝恰一行被换）。颜色（`logs/orch/orch-mut-summary.txt`，buildrc 全 0）：
+
+| 反形（逐字改了哪一行） | 颜色 |
+|---|---|
+| `ma-hook`：产码 `native.call(cw, message)` → `native(message)` | **9 FAIL／3 PASS**，红名含 `TestForwardingHookMustNotLoseTheNativeExitReceiver` |
+| `ma-detector-gone`：夹具 `if recv != cw {` → `if false {`（**与 ma-hook 同发**） | **12 PASS／0 FAIL**＝摘掉探测器后那 9 枚全转绿 |
+| `mb-set-gone`：夹具 `exists && o.unwritable[name] {` → `exists && false {` | **1 FAIL／11 PASS**＝恰 `TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit` |
+| `mb-typeof-gone`：产码 `if (inside || typeof window.%[1]s !== "function")` → `if (inside)` | **1 FAIL／11 PASS**＝恰 `TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent` |
+
+⇒ 我把两处形状差别**具名写出不抹平**：M-A 是**级联红**（探测器自己 panic ⇒ 凡走原生出口的一起红），它的归因**只能靠** `ma-detector-gone` 那一对（摘探测器 ⇒ 全绿）来支撑，⛔ 不许读成"红了 9 枚所以更凶"；M-B 与 typeof 两发各**恰红 1 枚且名字唯一**，是更强的形。
+
+**门（我现跑）**：`go vet ./cmd/wisp/` **rc=0**；`cd tools/d22scan && go run . -root ../../` **rc=0 clean**（ban #8 覆盖 `cmd/` 108 枚 Go 文件含注释与 `_test.go`）；格式那格**具名带着既有红交件**——`gofmt -l` 会列这枚文件，但**同样 4 行漂移在 HEAD 版本里就在**（HEAD `:775-776`／工作树 `:807-808`，只是被插入顶位移了；CR 计数两版皆 0）⇒ 本笔**不新增**未格式化面，那 4 行是 `35-r2` 落下的，归票 275 那族格式化欠账，⛔ 不在本程顺手改、⛔ 不许为变绿放宽任何断言（`ci.yml:209` 那条注释自己记着 run `37406757402` step 8 gofmt `[failure]` ⇒ step 9 `[skipped]`）。
+
+**⛔ 这格不许被读成什么（腿自己的话逐字在 `impl.md` §3，这里只摘要）**：它买的是"丢了 `this`、或赋值被静默拒绝的钩子，不再被 certify 成送达"；⛔ 它**不买**"WebView2 真会绑 receiver／真让页面换掉 `postMessage`"——那一格在 `:52` 的真窗凭据，两格⛔ 不许互相借光（`A684` §3／`A686` §4 同一条）。`Object.defineProperty` 没做成页面可见方法，`getOwnPropertyDescriptor`／`configurable`／`delete`／accessor 属性**全部未建模**（`impl.md` §4 列全）⇒ 钩子若写成"先 `delete` 再赋值"这类形状，这枚尺今天**看不见**。
+
+**留给 `35-v4`（非实现者）的四问，⛔ 我不代答**：①级联红能不能算 M-A 的牙、那对摘探测器读数够不够；②两枚"恰红 1 枚"的名字唯一性要**自造混文案反形**去顶（本票 `:63` 的 V2 就是这么做的）；③§4 五样未建模里有没有哪样能让这三枚在产码坏掉时照样绿（＝`A684` 两面之外的第三面）；④整包红名册（我这版与 `35-v3` 记的那五枚逐名作差，见台账 `A689`）里有没有新名字要归本程账。
