@@ -1,0 +1,11 @@
+mutation M1: the copy really differs from the working tree file (good)
+--- M1 done
+mutation M2: the copy really differs from the working tree file (good)
+--- M2 done
+mutation M3: the copy really differs from the working tree file (good)
+--- M3 done
+mutation M4: the copy really differs from the working tree file (good)
+--- M4 done
+mutation M5: the copy really differs from the working tree file (good)
+--- M5 done
+rc=0

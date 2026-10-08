@@ -1,0 +1,7 @@
+=== blob pull: working tree vs HEAD (pump.go + neighbours) ===
+internal/panel/pump.go wt=645e1f02bbf97dd35cdc1ff2563c9c212a6f9a18 head=645e1f02bbf97dd35cdc1ff2563c9c212a6f9a18 same=YES
+internal/panel/pump_test.go wt=3f84c3360063bb2ae26dd6cc5ccb819ac510e7a4 head=3f84c3360063bb2ae26dd6cc5ccb819ac510e7a4 same=YES
+internal/panel/subagent_roster_197_test.go wt=f803179df6465eaa7e5ed4933bc1210283023b1d head=f803179df6465eaa7e5ed4933bc1210283023b1d same=YES
+=== git status of the write surface ===
+?? internal/panel/backpressure_bound_35r8_test.go
+[rc=0]

@@ -1,0 +1,6 @@
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+--- FAIL: TestC21DesignTokensFourWayAgree

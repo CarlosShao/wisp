@@ -1,0 +1,26 @@
+time=2026-10-08T12:00:58.934+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+    composer_test.go:74: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:79: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:74: Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare
+    composer_test.go:79: ComposerState <-> ComposerState: 11 JSON keys reconciled
+    composer_test.go:79: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:79: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:79: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:79: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.06s)
+    frontend_hygiene_test.go:216: a second style source appeared in code the bundle actually ships:
+          frontend/src/components/harness/right-rail.tsx:89: diff: [{ sign: "+", text: "  --page: #fafafb;  /* beautiful-ui 主题收编 */" }],
+        Add or reference a C21 token in design/assets/tokens.css instead.
+    frontend_hygiene_test.go:219: 57 files reachable from main.tsx carry colour literals only in the generated theme
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.429s
+FAIL
+rc=1

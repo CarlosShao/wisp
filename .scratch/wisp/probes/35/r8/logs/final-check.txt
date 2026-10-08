@@ -1,0 +1,33 @@
+=== CR ruler: working tree vs the blob that becomes HEAD (index) ===
+internal/panel/backpressure_bound_35r8_test.go wtCR=0 indexBlobCR=0 same=YES
+.scratch/wisp/probes/35/r8/impl.md wtCR=0 indexBlobCR=0 same=YES
+.scratch/wisp/probes/35/r8/logs/mutation-driver.txt wtCR=0 indexBlobCR=0 same=YES
+=== production files still at HEAD blob ===
+645e1f02bbf97dd35cdc1ff2563c9c212a6f9a18
+645e1f02bbf97dd35cdc1ff2563c9c212a6f9a18
+=== staged list ===
+.scratch/wisp/probes/35/r8/impl.md
+.scratch/wisp/probes/35/r8/logs/blob-check.txt
+.scratch/wisp/probes/35/r8/logs/fail-after.txt
+.scratch/wisp/probes/35/r8/logs/fail-before.txt
+.scratch/wisp/probes/35/r8/logs/fail-roster-diff.txt
+.scratch/wisp/probes/35/r8/logs/gate-cr.txt
+.scratch/wisp/probes/35/r8/logs/gate-d22scan.txt
+.scratch/wisp/probes/35/r8/logs/gate-gofmt.txt
+.scratch/wisp/probes/35/r8/logs/gate-test-after.txt
+.scratch/wisp/probes/35/r8/logs/gate-test-before.txt
+.scratch/wisp/probes/35/r8/logs/gate-vet.txt
+.scratch/wisp/probes/35/r8/logs/mut-M1.txt
+.scratch/wisp/probes/35/r8/logs/mut-M2.txt
+.scratch/wisp/probes/35/r8/logs/mut-M3.txt
+.scratch/wisp/probes/35/r8/logs/mut-M4.txt
+.scratch/wisp/probes/35/r8/logs/mut-M5.txt
+.scratch/wisp/probes/35/r8/logs/mut-driver-stdout.txt
+.scratch/wisp/probes/35/r8/logs/mut-restore-check.txt
+.scratch/wisp/probes/35/r8/logs/mut-summary.txt
+.scratch/wisp/probes/35/r8/logs/mutation-driver.txt
+.scratch/wisp/probes/35/r8/logs/r8-run-first.txt
+.scratch/wisp/probes/35/r8/logs/stage.txt
+internal/panel/backpressure_bound_35r8_test.go
+=== emoji recheck on new file ===
+0

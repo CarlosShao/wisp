@@ -1,0 +1,21 @@
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/blob-check.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/fail-after.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/fail-before.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/fail-roster-diff.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/gate-cr.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/gate-d22scan.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/gate-gofmt.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/gate-test-after.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/gate-test-before.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/gate-vet.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mut-M1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mut-M2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mut-M3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mut-M4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mut-M5.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mut-driver-stdout.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mut-restore-check.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mut-summary.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/mutation-driver.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/35/r8/logs/r8-run-first.txt', LF will be replaced by CRLF the next time Git touches it
+add_rc=0

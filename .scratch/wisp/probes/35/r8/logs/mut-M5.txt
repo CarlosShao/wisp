@@ -1,0 +1,15 @@
+time=2026-10-08T12:11:01.606+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8 (0.51s)
+    backpressure_bound_35r8_test.go:259: rows = 0, want exactly the hard ceiling 64: fewer rows than the ceiling means the flood was dropped rather than bounded
+    backpressure_bound_35r8_test.go:270: counting exits silent under a 1600-stream flood: Truncated=false ElidedRunes=0
+    backpressure_bound_35r8_test.go:273: dropped naming = 0 keys, want 1536: every key the log stopped tracking must be named
+    backpressure_bound_35r8_test.go:276: the 1x flood's counting exits disagree with its rows: ElidedRunes=0 dropped=0
+    backpressure_bound_35r8_test.go:278: 35r8 fan-out reading: 1x text=0 rows=0 names=0 heap+7160B | 4x text=0 rows=0 names=0 heap+13096B | cap text=36864 rows=64
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (0.35s)
+    backpressure_bound_35r8_test.go:302: measurement sanity: 1x pinned 0 runes want 1200000, 4x pinned 0 want 4800000 - the harness stopped measuring the flood
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.51s)
+    backpressure_bound_35r8_test.go:329: measurement sanity: 1x named 0 keys want 3936, 4x named 0 want 15936 - the ledger being measured is not the one the log writes
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.965s
+FAIL
+[rc=1]

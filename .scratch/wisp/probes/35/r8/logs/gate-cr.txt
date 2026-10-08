@@ -1,0 +1,6 @@
+=== CR ruler (working tree, tr -cd, NEVER grep -c) ===
+internal/panel/backpressure_bound_35r8_test.go CR=0
+.scratch/wisp/probes/35/r8/logs/anchor.md CR=0
+.scratch/wisp/probes/35/r8/logs/mutation-driver.txt CR=0
+.scratch/wisp/probes/35/r8/logs/gate-test-after.txt CR=0
+[rc=0]

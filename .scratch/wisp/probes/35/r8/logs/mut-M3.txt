@@ -1,0 +1,13 @@
+time=2026-10-08T12:10:49.873+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8 (0.89s)
+    backpressure_bound_35r8_test.go:241: blocked consumer: the pump counted 0 publishes for 24 attempts - a refused exit that stops being counted is a silent drop
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (0.20s)
+    backpressure_bound_35r8_test.go:297: blocked consumer: the pump counted 0 publishes for 9 attempts - a refused exit that stops being counted is a silent drop
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.27s)
+    backpressure_bound_35r8_test.go:324: blocked consumer: the pump counted 0 publishes for 24 attempts - a refused exit that stops being counted is a silent drop
+--- FAIL: TestFloodRulerFiresOnAnUnboundedSink35r8 (0.27s)
+    backpressure_bound_35r8_test.go:351: blocked consumer: the pump counted 0 publishes for 24 attempts - a refused exit that stops being counted is a silent drop
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.689s
+FAIL
+[rc=1]

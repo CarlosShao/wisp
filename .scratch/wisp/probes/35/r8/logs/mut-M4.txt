@@ -1,0 +1,13 @@
+time=2026-10-08T12:10:52.968+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8 (3.21s)
+    backpressure_bound_35r8_test.go:273: dropped naming = 0 keys, want 1536: every key the log stopped tracking must be named
+    backpressure_bound_35r8_test.go:276: the 1x flood's counting exits disagree with its rows: ElidedRunes=3635200 dropped=0
+    backpressure_bound_35r8_test.go:278: 35r8 fan-out reading: 1x text=35072 rows=64 names=0 heap+389928B | 4x text=35072 rows=64 names=0 heap+407752B | cap text=36864 rows=64
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.28s)
+    backpressure_bound_35r8_test.go:309: flood under a blocked consumer with no fan-out (3 streams, so the key bound never engages): 1x pinned 1200000 text runes over 3 rows (live heap +1162080 bytes), 4x pinned 4800000 runes over 3 rows (live heap +4830008 bytes), against the cap this package can state (36864 runes over 64 rows). Retention grew 4.0x for a 4x flood and equals the flood exactly, so ticket 35 :49's "no unbounded memory (heap cap asserted)" has no counterpart in internal/panel below the key bound. pinned text 4800000 runes > the cap 36864; live heap + 4830008 bytes > the cap 1196032
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.60s)
+    backpressure_bound_35r8_test.go:329: measurement sanity: 1x named 0 keys want 3936, 4x named 0 want 15936 - the ledger being measured is not the one the log writes
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	5.762s
+FAIL
+[rc=1]

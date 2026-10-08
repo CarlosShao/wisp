@@ -1,0 +1,41 @@
+=== M1 ===
+--- FAIL: TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8 (0.92s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.50s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.55s)
+--- FAIL: TestFloodRulerFiresOnAnUnboundedSink35r8 (0.56s)
+[rc=1]
+    backpressure_bound_35r8_test.go:246: 400 streams x 60 deltas x 160 runes through a 32-key log is not bounded: rows 400 > the hard ceiling 64; pinned text 3840000 runes > the cap 36864; live heap + 3950584 bytes > the cap 1196032 (flooded 3840000 runes in)
+=== M2 ===
+--- FAIL: TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8 (0.95s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.42s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.52s)
+--- FAIL: TestFloodRulerFiresOnAnUnboundedSink35r8 (0.62s)
+[rc=1]
+    backpressure_bound_35r8_test.go:246: 400 streams x 60 deltas x 160 runes through a 32-key log is not bounded: pinned text 614400 runes > the cap 36864 (flooded 3840000 runes in)
+=== M3 ===
+--- FAIL: TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8 (0.89s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (0.20s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.27s)
+--- FAIL: TestFloodRulerFiresOnAnUnboundedSink35r8 (0.27s)
+[rc=1]
+    backpressure_bound_35r8_test.go:241: blocked consumer: the pump counted 0 publishes for 24 attempts - a refused exit that stops being counted is a silent drop
+=== M4 ===
+--- FAIL: TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8 (3.21s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.28s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.60s)
+[rc=1]
+    backpressure_bound_35r8_test.go:273: dropped naming = 0 keys, want 1536: every key the log stopped tracking must be named
+=== M5 ===
+--- FAIL: TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8 (0.51s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (0.35s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.51s)
+[rc=1]
+    backpressure_bound_35r8_test.go:259: rows = 0, want exactly the hard ceiling 64: fewer rows than the ceiling means the flood was dropped rather than bounded
+=== repo untouched ===
+=== blob pull: working tree vs HEAD (pump.go + neighbours) ===
+internal/panel/pump.go wt=645e1f02bbf97dd35cdc1ff2563c9c212a6f9a18 head=645e1f02bbf97dd35cdc1ff2563c9c212a6f9a18 same=YES
+internal/panel/pump_test.go wt=3f84c3360063bb2ae26dd6cc5ccb819ac510e7a4 head=3f84c3360063bb2ae26dd6cc5ccb819ac510e7a4 same=YES
+internal/panel/subagent_roster_197_test.go wt=f803179df6465eaa7e5ed4933bc1210283023b1d head=f803179df6465eaa7e5ed4933bc1210283023b1d same=YES
+=== git status of the write surface ===
+?? internal/panel/backpressure_bound_35r8_test.go
+[rc=0]

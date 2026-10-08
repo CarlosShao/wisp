@@ -1,0 +1,60 @@
+#!/bin/sh
+# 35-r8 mutation driver. Every mutation is applied to a COPY of pump.go outside the
+# repository and handed to `go test -overlay`; the repository file is never written.
+# Each run appends its own [rc=N] line taken from the command itself (no pipe).
+set -u
+
+REPO="D:/work/workspace/projects plans/Wisp"
+MUTROOT="D:/tmp/wisp35r8/mut"
+SRC="$REPO/internal/panel/pump.go"
+LOG="$REPO/.scratch/wisp/probes/35/r8/logs"
+NAMES='TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8|TestFloodRulerFiresOnAnUnboundedSink35r8|TestStreamLogFloodBelowKeyBoundIsNotBounded35r8|TestStreamLogDroppedNamingLedgerIsNotBounded35r8'
+
+cd "$REPO" || exit 1
+mkdir -p "$MUTROOT"
+
+run_mut() {
+    name="$1"
+    prog="$2"
+    d="$MUTROOT/$name"
+    mkdir -p "$d"
+    cp "$SRC" "$d/pump.go" || return 1
+    perl -0pi -e "$prog" "$d/pump.go" || return 1
+    if ! cmp -s "$SRC" "$d/pump.go"; then
+        echo "mutation $name: the copy really differs from the working tree file (good)"
+    else
+        echo "mutation $name: PATTERN DID NOT MATCH, the mutation is a no-op"
+        echo "[no-op]" >> "$LOG/mut-$name.txt"
+        return 1
+    fi
+    printf '{"Replace":{"%s":"%s"}}\n' "$SRC" "$d/pump.go" > "$d/overlay.json"
+    go test ./internal/panel/ -count=1 -overlay="$d/overlay.json" -run "$NAMES" > "$LOG/mut-$name.txt" 2>&1
+    echo "[rc=$?]" >> "$LOG/mut-$name.txt"
+    echo "--- $name done"
+}
+
+# M1: the key bound never engages (the "take the cap off" shape).
+run_mut M1 's/\tif len\(s\.order\) <= s\.maxKeys \{/\tif true { \/\/ MUT M1: key bound never engages/;'
+
+# M2: clampLocked does nothing (the per-row volume bound is removed everywhere).
+run_mut M2 's/func \(s \*StreamLog\) clampLocked\(key string\) \{/func (s *StreamLog) clampLocked(key string) { if true { return } \/\/ MUT M2: no clamp at all/;'
+
+# M3: the refused exit is no longer counted (silent drop on the blocked-consumer path).
+run_mut M3 's/if err := p\.src\.Out\(snap, data\); err != nil \{\n\t\tp\.count\(\)/if err := p.src.Out(snap, data); err != nil { \/\/ MUT M3: refused exit not counted/;'
+
+# M4: dropped keys stop being named (the counting exit moved out of the truncation path).
+run_mut M4 's/\t\ts\.dropped = append\(s\.dropped, oldest\)/\t\t\/\/ MUT M4: dropped keys are not named/;'
+
+# M5: Append discards every delta. This is the degenerate "bounded by storing nothing"
+# shape: it must NOT be able to turn the two honest reds green.
+run_mut M5 's/func \(s \*StreamLog\) Append\(key, text string\) \{/func (s *StreamLog) Append(key, text string) { if true { return } \/\/ MUT M5: every delta silently dropped/;'
+
+# Restore proof: the repository files must still hash to their HEAD blobs.
+{
+    echo "post-mutation in-repo write check"
+    for f in internal/panel/pump.go internal/panel/backpressure_bound_35r8_test.go; do
+        wt=$(git hash-object "$f")
+        echo "$f working-tree=$wt"
+    done
+} > "$LOG/mut-restore-check.txt" 2>&1
+echo "[rc=$?]" >> "$LOG/mut-restore-check.txt"
