@@ -303,7 +303,7 @@ winlive 档（2）：TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor  TestTi
    仓内那份是它的逐字拷贝（存成 `.py.txt`，⛔ 不给 `.out`，也⛔ 不在仓内执行）。
 3. **一处我**没**做到**：Q6 要的"整包名册色"我没交（见 Q6 末段）——那要开真窗。这是射程限制，不是通过。
 
-## 我这腿的提交（四枚，全部只带显式 pathspec）
+## 我这腿的提交（这张表记到 `a01447bb` 为止）
 
 ```
 162844be 33-v4 start gate: 00-anchor.md + QODER.md
@@ -311,6 +311,9 @@ winlive 档（2）：TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor  TestTi
 8d6190ca 33-v4 verdict: six questions answered cell by cell ...                     (verdict.md)
 a01447bb 33-v4 end integrity: my three commits own only files under probes/33/v4 ... (logs/98)
 ```
+
+⚠ 这张表**必然少一枚**：把这段更正本身交出去的那一枚不可能列在自己的内容里。全名册以
+`git log --oneline` 现量为准，⛔ 不要拿这张表当分母。（`logs/97-closing-measurement.txt` 是那枚收尾件的尺件。）
 
 逐枚 `git show --name-only` 数过：`paths outside probes/33/v4 = 0`（尺与读数在 `logs/98-end-integrity.txt`）。
 
