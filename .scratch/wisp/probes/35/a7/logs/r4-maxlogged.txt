@@ -1,0 +1,14 @@
+== R4 who owns the MaxLoggedString bound and its callers ==
+HEAD:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:296:// single string at observe.MaxLoggedString = 512 characters by rule 4 of its own
+HEAD:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:354:	if len(line) > summaryClamp {
+HEAD:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:364:// summaryClamp is how much of observe.MaxLoggedString this line may use. The
+HEAD:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:367:const summaryClamp = 440
+HEAD:cmd/wisp/panel_config_248_test.go:181:	// to summaryClamp and carries a digest rather than bytes) belongs in this grep
+HEAD:cmd/wisp/panel_pump.go:296:// single string at observe.MaxLoggedString = 512 characters by rule 4 of its own
+HEAD:cmd/wisp/panel_pump.go:354:	if len(line) > summaryClamp {
+HEAD:cmd/wisp/panel_pump.go:364:// summaryClamp is how much of observe.MaxLoggedString this line may use. The
+HEAD:cmd/wisp/panel_pump.go:367:const summaryClamp = 440
+HEAD:internal/observe/redact.go:36:	// MaxLoggedString bounds any single string that reaches the log (rule 4).
+HEAD:internal/observe/redact.go:37:	MaxLoggedString = 512
+HEAD:internal/observe/redact.go:141:	return truncate(s, MaxLoggedString)
+rc=0

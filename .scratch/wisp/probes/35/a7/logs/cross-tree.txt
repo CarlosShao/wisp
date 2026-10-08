@@ -1,0 +1,13 @@
+docs/PLAN.md exists_rc=0 lines=3601
+internal/panel/pump.go exists_rc=0 lines=712
+cmd/wisp/panel_pump.go exists_rc=0 lines=420
+cmd/wisp/panel_resident_windows.go exists_rc=0 lines=553
+internal/observe/redact.go exists_rc=0 lines=224
+internal/observe/thresholds.go exists_rc=0 lines=208
+docs/specs/SPEC-08-ui-ball-panel.md exists_rc=0 lines=249
+docs/specs/SPEC-01-architecture.md exists_rc=0 lines=217
+docs/specs/SPEC-10-testing-acceptance.md exists_rc=0 lines=142
+docs/evidence/s1/197-subagent-stream-r2.md exists_rc=0 lines=225
+.scratch/wisp/issues/35-panel-bridge-c17.md exists_rc=0 lines=425
+internal/panel/backpressure_bound_35r8_test.go exists_rc=0 lines=371
+docs/SLO.md exists_rc=0 lines=583

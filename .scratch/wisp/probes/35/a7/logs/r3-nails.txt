@@ -1,0 +1,176 @@
+== R3 nails reading the stream bound constants ==
+HEAD:.scratch/wisp/probes/151-accept/run.shipped.go:420:	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+HEAD:.scratch/wisp/probes/151/run.head.go:420:	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+HEAD:.scratch/wisp/probes/151/run.mut-noclose.go:420:	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+HEAD:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:183:			StreamElidedRunes: trunc.ElidedRunes,
+HEAD:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:204:	state.StreamElidedRunes = rt.stream.ElidedRunes()
+HEAD:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:205:	state.DroppedStreamKeys = rt.stream.DroppedKeys()
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:344:// NAMED in DroppedKeys() - "nobody is showing this one" is a different sentence from
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:364:// truncating: the first streamTruncateKeepRunes runes, a sliding window of the
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:365:// last streamTruncateKeepRunes, and how many runes that stream has produced in
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:382:	over := len(st.tail) - streamTruncateKeepRunes
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:394:	elided := st.seen - 2*streamTruncateKeepRunes
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:402:	// DefaultStreamKeys is how many concurrent result streams a pump tracks at
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:406:	DefaultStreamKeys = 32
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:408:	// StreamKeyHardCeilingMultiple is how far past maxKeys the key set may grow
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:411:	StreamKeyHardCeilingMultiple = 2
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:413:	// streamTruncateKeepRunes is the head AND the tail every chunk keeps once the
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:416:	streamTruncateKeepRunes = 256
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:444:// NewStreamLog builds an empty results log. maxKeys <= 0 means DefaultStreamKeys.
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:447:		maxKeys = DefaultStreamKeys
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:521:	ceiling := s.maxKeys * StreamKeyHardCeilingMultiple
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:551:	if len(r) <= streamTruncateKeepRunes*2 {
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:555:		head: r[:streamTruncateKeepRunes],
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:556:		tail: r[len(r)-streamTruncateKeepRunes:],
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:560:	s.elided += len(r) - 2*streamTruncateKeepRunes
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:577:// ElidedRunes is how many runes the truncations removed in total. A number, not
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:580:func (s *StreamLog) ElidedRunes() int {
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:589:// DroppedKeys names every key the log stopped tracking at the hard ceiling, oldest
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:593:func (s *StreamLog) DroppedKeys() []string {
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:605:// per-stream half of the same three facts Truncated / ElidedRunes / DroppedKeys
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:614:	// ElidedRunes is how many runes THIS stream lost. Runes, not bytes: the
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:615:	// bound is counted in runes on purpose (pump.go's streamTruncateKeepRunes),
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:617:	ElidedRunes int
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:643:	elided := st.seen - 2*streamTruncateKeepRunes
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:647:	return StreamTruncation{Truncated: true, ElidedRunes: elided}
+HEAD:.scratch/wisp/probes/197/r3b/pre/run.go:471:	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:10:// (Truncated / ElidedRunes / DroppedKeys) had zero production callers, so
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:73:	// StreamTruncated / StreamElidedRunes / StreamDropped are this ONE stream's
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:77:	StreamElidedRunes int
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:94:	StreamElidedRunes int
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:128:	// StreamTruncated / StreamElidedRunes / StreamDropped describe this row's
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:131:	StreamElidedRunes int  `json:"streamElidedRunes"`
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:157:	// StreamElidedRunes is the log's total, across every stream it had to fold.
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:158:	StreamElidedRunes int `json:"streamElidedRunes"`
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:182:		StreamElidedRunes: state.StreamElidedRunes,
+HEAD:.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:212:			StreamElidedRunes: row.StreamElidedRunes,
+HEAD:.scratch/wisp/probes/198/v2/backup/run.go:698:	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+HEAD:cmd/wisp/panel_pump.go:183:			StreamElidedRunes: trunc.ElidedRunes,
+HEAD:cmd/wisp/panel_pump.go:204:	state.StreamElidedRunes = rt.stream.ElidedRunes()
+HEAD:cmd/wisp/panel_pump.go:205:	state.DroppedStreamKeys = rt.stream.DroppedKeys()
+HEAD:cmd/wisp/run.go:698:	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+HEAD:cmd/wisp/subagent_carrier_197_test.go:84:	StreamElidedRunes int    `json:"streamElidedRunes"`
+HEAD:cmd/wisp/subagent_carrier_197_test.go:95:	StreamElidedRunes int             `json:"streamElidedRunes"`
+HEAD:cmd/wisp/subagent_carrier_197_test.go:530:		go sp.launch(rt, carrier197ChildPrompt, panel.DefaultStreamKeys+1)
+HEAD:cmd/wisp/subagent_carrier_197_test.go:549:	if len(driven.stream.Chunks()) <= panel.DefaultStreamKeys {
+HEAD:cmd/wisp/subagent_carrier_197_test.go:551:			"below would be vacuous", len(driven.stream.Chunks()), panel.DefaultStreamKeys)
+HEAD:cmd/wisp/subagent_carrier_197_test.go:555:			sect.StreamTruncated, driven.stream.Truncated(), panel.DefaultStreamKeys+1)
+HEAD:cmd/wisp/subagent_carrier_197_test.go:557:	if sect.StreamElidedRunes != driven.stream.ElidedRunes() {
+HEAD:cmd/wisp/subagent_carrier_197_test.go:559:			sect.StreamElidedRunes, driven.stream.ElidedRunes())
+HEAD:cmd/wisp/subagent_carrier_197_test.go:561:	if strings.Join(sect.DroppedStreamKeys, ",") != strings.Join(driven.stream.DroppedKeys(), ",") {
+HEAD:cmd/wisp/subagent_carrier_197_test.go:563:			driven.stream.DroppedKeys())
+HEAD:cmd/wisp/subagent_carrier_197_test.go:581:		if live := driven.stream.TruncationFor(row.StreamKey); row.StreamElidedRunes != live.ElidedRunes ||
+HEAD:cmd/wisp/subagent_carrier_197_test.go:584:				row.TaskID, row.StreamTruncated, row.StreamElidedRunes, row.StreamDropped, live)
+HEAD:cmd/wisp/subagent_carrier_197_test.go:587:	if len(seenKey) != panel.DefaultStreamKeys+1 {
+HEAD:cmd/wisp/subagent_carrier_197_test.go:589:			len(seenKey), panel.DefaultStreamKeys+1)
+HEAD:cmd/wisp/subagent_carrier_197_test.go:593:		sect.StreamElidedRunes, sect.DroppedStreamKeys)
+HEAD:cmd/wisp/subagent_carrier_197_test.go:612://     DefaultStreamKeys x 2 = 64 keys, i.e. 64 real child loops. 33 was already the
+HEAD:internal/panel/backpressure_bound_35r8_test.go:13://     2*StreamKeyHardCeilingMultiple, which is a count against a constant, in bytes
+HEAD:internal/panel/backpressure_bound_35r8_test.go:71:	dropped := s.log.DroppedKeys()
+HEAD:internal/panel/backpressure_bound_35r8_test.go:196:// row keeps its own head and tail (streamTruncateKeepRunes each) plus that row's own
+HEAD:internal/panel/backpressure_bound_35r8_test.go:200:	rows := DefaultStreamKeys * StreamKeyHardCeilingMultiple
+HEAD:internal/panel/backpressure_bound_35r8_test.go:201:	perRow := 2*streamTruncateKeepRunes + 64 // "...[truncated: N runes elided]..."
+HEAD:internal/panel/backpressure_bound_35r8_test.go:240:	one := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:242:	four := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:247:			DefaultStreamKeys, bad, 400*60*160)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:262:		if len([]rune(c.Text)) < 2*streamTruncateKeepRunes {
+HEAD:internal/panel/backpressure_bound_35r8_test.go:269:	if !four.Truncated() || four.ElidedRunes() == 0 {
+HEAD:internal/panel/backpressure_bound_35r8_test.go:270:		t.Errorf("counting exits silent under a 1600-stream flood: Truncated=%v ElidedRunes=%d", four.Truncated(), four.ElidedRunes())
+HEAD:internal/panel/backpressure_bound_35r8_test.go:272:	if got := len(four.DroppedKeys()); got != 1600-cap.rows {
+HEAD:internal/panel/backpressure_bound_35r8_test.go:275:	if one.ElidedRunes() == 0 || len(one.DroppedKeys()) != 400-cap.rows {
+HEAD:internal/panel/backpressure_bound_35r8_test.go:276:		t.Errorf("the 1x flood's counting exits disagree with its rows: ElidedRunes=%d dropped=%d", one.ElidedRunes(), len(one.DroppedKeys()))
+HEAD:internal/panel/backpressure_bound_35r8_test.go:296:	one := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:298:	four := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:317:// lives, and DroppedKeys() hands the whole ledger out on every read. Rows stay at
+HEAD:internal/panel/backpressure_bound_35r8_test.go:323:	one := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:325:	four := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:366:	bounded := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/pump.go:408:// NAMED in DroppedKeys() - "nobody is showing this one" is a different sentence from
+HEAD:internal/panel/pump.go:428:// truncating: the first streamTruncateKeepRunes runes, a sliding window of the
+HEAD:internal/panel/pump.go:429:// last streamTruncateKeepRunes, and how many runes that stream has produced in
+HEAD:internal/panel/pump.go:446:	over := len(st.tail) - streamTruncateKeepRunes
+HEAD:internal/panel/pump.go:458:	elided := st.seen - 2*streamTruncateKeepRunes
+HEAD:internal/panel/pump.go:466:	// DefaultStreamKeys is how many concurrent result streams a pump tracks at
+HEAD:internal/panel/pump.go:470:	DefaultStreamKeys = 32
+HEAD:internal/panel/pump.go:472:	// StreamKeyHardCeilingMultiple is how far past maxKeys the key set may grow
+HEAD:internal/panel/pump.go:475:	StreamKeyHardCeilingMultiple = 2
+HEAD:internal/panel/pump.go:477:	// streamTruncateKeepRunes is the head AND the tail every chunk keeps once the
+HEAD:internal/panel/pump.go:480:	streamTruncateKeepRunes = 256
+HEAD:internal/panel/pump.go:508:// NewStreamLog builds an empty results log. maxKeys <= 0 means DefaultStreamKeys.
+HEAD:internal/panel/pump.go:511:		maxKeys = DefaultStreamKeys
+HEAD:internal/panel/pump.go:585:	ceiling := s.maxKeys * StreamKeyHardCeilingMultiple
+HEAD:internal/panel/pump.go:615:	if len(r) <= streamTruncateKeepRunes*2 {
+HEAD:internal/panel/pump.go:619:		head: r[:streamTruncateKeepRunes],
+HEAD:internal/panel/pump.go:620:		tail: r[len(r)-streamTruncateKeepRunes:],
+HEAD:internal/panel/pump.go:624:	s.elided += len(r) - 2*streamTruncateKeepRunes
+HEAD:internal/panel/pump.go:641:// ElidedRunes is how many runes the truncations removed in total. A number, not
+HEAD:internal/panel/pump.go:644:func (s *StreamLog) ElidedRunes() int {
+HEAD:internal/panel/pump.go:653:// DroppedKeys names every key the log stopped tracking at the hard ceiling, oldest
+HEAD:internal/panel/pump.go:657:func (s *StreamLog) DroppedKeys() []string {
+HEAD:internal/panel/pump.go:669:// per-stream half of the same three facts Truncated / ElidedRunes / DroppedKeys
+HEAD:internal/panel/pump.go:678:	// ElidedRunes is how many runes THIS stream lost. Runes, not bytes: the
+HEAD:internal/panel/pump.go:679:	// bound is counted in runes on purpose (pump.go's streamTruncateKeepRunes),
+HEAD:internal/panel/pump.go:681:	ElidedRunes int
+HEAD:internal/panel/pump.go:707:	elided := st.seen - 2*streamTruncateKeepRunes
+HEAD:internal/panel/pump.go:711:	return StreamTruncation{Truncated: true, ElidedRunes: elided}
+HEAD:internal/panel/pump_test.go:199:	if sl.ElidedRunes() != 0 {
+HEAD:internal/panel/pump_test.go:200:		t.Errorf("elided = %d, want 0: short streams keep full fidelity past the bound", sl.ElidedRunes())
+HEAD:internal/panel/pump_test.go:211:	if len(got) > 2*StreamKeyHardCeilingMultiple {
+HEAD:internal/panel/pump_test.go:219:	if len(big.DroppedKeys()) != 50-len(got) {
+HEAD:internal/panel/pump_test.go:220:		t.Errorf("dropped = %v, want the %d keys no row covers", big.DroppedKeys(), 50-len(got))
+HEAD:internal/panel/subagent_roster_197.go:10:// (Truncated / ElidedRunes / DroppedKeys) had zero production callers, so
+HEAD:internal/panel/subagent_roster_197.go:78:	// StreamTruncated / StreamElidedRunes / StreamDropped are this ONE stream's
+HEAD:internal/panel/subagent_roster_197.go:82:	StreamElidedRunes int
+HEAD:internal/panel/subagent_roster_197.go:99:	StreamElidedRunes int
+HEAD:internal/panel/subagent_roster_197.go:133:	// StreamTruncated / StreamElidedRunes / StreamDropped describe this row's
+HEAD:internal/panel/subagent_roster_197.go:136:	StreamElidedRunes int  `json:"streamElidedRunes"`
+HEAD:internal/panel/subagent_roster_197.go:162:	// StreamElidedRunes is the log's total, across every stream it had to fold.
+HEAD:internal/panel/subagent_roster_197.go:163:	StreamElidedRunes int `json:"streamElidedRunes"`
+HEAD:internal/panel/subagent_roster_197.go:204:		StreamElidedRunes: state.StreamElidedRunes,
+HEAD:internal/panel/subagent_roster_197.go:238:			StreamElidedRunes: row.StreamElidedRunes,
+HEAD:internal/panel/subagent_roster_197_test.go:41:	StreamElidedRunes int             `json:"streamElidedRunes"`
+HEAD:internal/panel/subagent_roster_197_test.go:59:	StreamElidedRunes int    `json:"streamElidedRunes"`
+HEAD:internal/panel/subagent_roster_197_test.go:344:	if !big.Truncated || big.ElidedRunes != 600-2*streamTruncateKeepRunes {
+HEAD:internal/panel/subagent_roster_197_test.go:346:			big.Truncated, big.ElidedRunes, 600-2*streamTruncateKeepRunes)
+HEAD:internal/panel/subagent_roster_197_test.go:349:	if small.Truncated || small.ElidedRunes != 0 {
+HEAD:internal/panel/subagent_roster_197_test.go:351:			small.Truncated, small.ElidedRunes)
+HEAD:internal/panel/subagent_roster_197_test.go:375:						StreamTruncated: true, StreamElidedRunes: big.ElidedRunes,
+HEAD:internal/panel/subagent_roster_197_test.go:380:						StreamTruncated: small.Truncated, StreamElidedRunes: small.ElidedRunes,
+HEAD:internal/panel/subagent_roster_197_test.go:384:				StreamElidedRunes: log.ElidedRunes(),
+HEAD:internal/panel/subagent_roster_197_test.go:396:	if sect.StreamElidedRunes != log.ElidedRunes() {
+HEAD:internal/panel/subagent_roster_197_test.go:397:		t.Errorf("section total = %d, want the log's own %d", sect.StreamElidedRunes, log.ElidedRunes())
+HEAD:internal/panel/subagent_roster_197_test.go:399:	if got := wireRow(t, sect, "big"); got.StreamElidedRunes != 600-2*streamTruncateKeepRunes || !got.StreamTruncated {
+HEAD:internal/panel/subagent_roster_197_test.go:401:			got.StreamElidedRunes, got.StreamTruncated, 600-2*streamTruncateKeepRunes)
+HEAD:internal/panel/subagent_roster_197_test.go:403:	if got := wireRow(t, sect, "small"); got.StreamTruncated || got.StreamElidedRunes != 0 {
+HEAD:internal/panel/subagent_roster_197_test.go:405:			"make every row look damaged because one row was", got.StreamTruncated, got.StreamElidedRunes)
+HEAD:internal/panel/subagent_roster_197_test.go:407:	if !strings.Contains(string(data), `"streamElidedRunes":88`) {
+HEAD:internal/panel/subagent_roster_197_test.go:417:	log := NewStreamLog(2) // hard ceiling = 2 * StreamKeyHardCeilingMultiple = 4 keys
+HEAD:internal/panel/subagent_roster_197_test.go:421:	dropped := log.DroppedKeys()
+HEAD:internal/panel/subagent_roster_197_test.go:427:			t.Errorf("TruncationFor(%q).Dropped = false although DroppedKeys names it: the per-row "+
+HEAD:internal/panel/subagent_roster_197_test.go:433:			DroppedStreamKeys: log.DroppedKeys(),
+HEAD:internal/panel/subagent_roster_197_test.go:435:			StreamElidedRunes: log.ElidedRunes(),
+HEAD:internal/panel/subagent_stream_197_test.go:109:	if got := sl.ElidedRunes(); got != 0 {
+HEAD:internal/panel/subagent_stream_197_test.go:112:	if got := sl.DroppedKeys(); len(got) != 0 {
+HEAD:internal/panel/subagent_stream_197_test.go:147:	sl := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/subagent_stream_197_test.go:249:		elided := produced - 2*streamTruncateKeepRunes
+HEAD:internal/panel/subagent_stream_197_test.go:266:	if sl.ElidedRunes() != totalElided {
+HEAD:internal/panel/subagent_stream_197_test.go:267:		t.Errorf("ElidedRunes = %d, want %d - 'truncated' that cannot say how much it lost is the old lie with a label on it",
+HEAD:internal/panel/subagent_stream_197_test.go:268:			sl.ElidedRunes(), totalElided)
+HEAD:internal/panel/subagent_stream_197_test.go:270:	if got := sl.DroppedKeys(); len(got) != 0 {
+HEAD:internal/panel/subagent_stream_197_test.go:277:	ceiling := bound * StreamKeyHardCeilingMultiple
+HEAD:internal/panel/subagent_stream_197_test.go:292:	dropped := sl.DroppedKeys()
+rc=0 (count above = hits)
+HEAD:.scratch/wisp/probes/151-accept/run.shipped.go:1
+HEAD:.scratch/wisp/probes/151/run.head.go:1
+HEAD:.scratch/wisp/probes/151/run.mut-noclose.go:1
+HEAD:.scratch/wisp/probes/197/r3b/pre/pump.go:19
+HEAD:.scratch/wisp/probes/197/r3b/pre/run.go:1
+HEAD:.scratch/wisp/probes/198/v2/backup/run.go:1
+HEAD:cmd/wisp/run.go:1
+HEAD:cmd/wisp/subagent_carrier_197_test.go:7
+HEAD:internal/panel/backpressure_bound_35r8_test.go:13
+HEAD:internal/panel/pump.go:19
+HEAD:internal/panel/pump_test.go:1
+HEAD:internal/panel/subagent_roster_197_test.go:5
+HEAD:internal/panel/subagent_stream_197_test.go:3
+rc=0

@@ -1,0 +1,8 @@
+R2b config-knob ruler (re-run of the failed R2, 2026-10-08, 35-a7)
+first attempt failed: git grep -n -E '^\| *`?\[(panel|ui|display|privacy)\]' -> invalid regex, rc=128 (that is why logs/config-keys.txt was 0 bytes)
+HEAD:docs/PLAN.md:2743:| `[panel]` | `enabled` `width` `height` `keep_alive_in_session`(true) `scale` | `hot` |
+grep_[panel]_rc=0
+HEAD:docs/PLAN.md:435:| **单任务 token 预算** | **默认 200k**（`[agent] token_budget`） | 进 `Stuck` 并明示"本次任务已用 X token / 约 ¥Y"（C23） |
+HEAD:docs/PLAN.md:2737:| `[agent]` | `max_rounds`(50 兜底) `token_budget` `per_tool_timeout` `loop_guard{repeat_thresholds:[3,5,8]}` `steering_enabled` | `hot` |
+grep_[agent]_rc=0
+conclusion: D36 [panel] row has no size/limit key (enabled width height keep_alive_in_session scale) -> PLAN.md:2743

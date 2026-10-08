@@ -1,0 +1,4 @@
+== R2 config section keys (D36) ==
+HEAD:docs/PLAN.md:2743:| `[panel]` | `enabled` `width` `height` `keep_alive_in_session`(true) `scale` | `hot` |
+rc=0
+rc=0

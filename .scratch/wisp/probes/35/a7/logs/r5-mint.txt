@@ -1,0 +1,20 @@
+== R5 StreamLog mint sites (production only) ==
+HEAD:cmd/wisp/run.go:698:	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:240:	one := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:242:	four := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:296:	one := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:298:	four := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:323:	one := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:325:	four := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/backpressure_bound_35r8_test.go:366:	bounded := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/pump.go:508:// NewStreamLog builds an empty results log. maxKeys <= 0 means DefaultStreamKeys.
+HEAD:internal/panel/pump.go:509:func NewStreamLog(maxKeys int) *StreamLog {
+HEAD:internal/panel/pump_test.go:172:	sl := NewStreamLog(2)
+HEAD:internal/panel/pump_test.go:206:	big := NewStreamLog(2)
+HEAD:internal/panel/subagent_roster_197_test.go:332:	log := NewStreamLog(2)
+HEAD:internal/panel/subagent_roster_197_test.go:417:	log := NewStreamLog(2) // hard ceiling = 2 * StreamKeyHardCeilingMultiple = 4 keys
+HEAD:internal/panel/subagent_stream_197_test.go:59:	sl := NewStreamLog(bound)
+HEAD:internal/panel/subagent_stream_197_test.go:147:	sl := NewStreamLog(DefaultStreamKeys)
+HEAD:internal/panel/subagent_stream_197_test.go:211:	sl := NewStreamLog(bound)
+HEAD:internal/panel/subagent_stream_197_test.go:278:	sl := NewStreamLog(bound)
+rc=0
