@@ -95,3 +95,11 @@
 
 ## Progress log (append-only, newest last)
 - [2026-09-30 18:2x +08] agent=246-a1 did=前段只读普查交件 `.scratch/wisp/probes/246/a1/census.md`(206 行/31,880 字节, 占位符 0, 骨架先落 f9cbe725→填满 63508c50)。三条现读凭据独立复认成立; 两形代价表各 ①-⑥; 依赖边差集为空(甲乙合规做都 0 条新增包级边, cmd/wisp 已 import agent/approval/ball/proc); D38(e) step3 cancel-task-roots 是 proc 侧两形共用缺口(boot_windows.go:151-161 只填 CloseJob, step1-7 零生产者)。建议乙形(装配根注入, 守"唯一接缝"、不造第二真相源), 最短链『卡片进得来+Esc 真能否决一次』可只注入裸 gate(不需 loop/provider/config/麦)。硬契约改动≈0(D43/C12 一字未动), 需告知功能 3-4 枚, proc hook 注册入口是否算契约面待 owner 裁。go build/vet rc=0; 未跑 go test; A480④ 未归因红留落地腿。零产码、未碰任何 AC 框。next=编排者裁甲/乙后派落地腿
+
+## 编排者裁定（2026-10-08 18:5x；凭据＝只读普查腿 `246-raisercensus-2`；⛔ 票面原句一字未改、⛔ 不撤任何勾）
+
+- **交件**＝`bb1d5ef8`（起手锚）／`eb2a217a`（普查件 `01-census.md`），腿名 `246-raisercensus-2`。它接着上一枚（被我含糊的停手条件卡住的那条）把**第 1/2 步**跑完；全程零 Go 命令。
+- **逐跳（锚→枚数→档位）**：`main.go:66`→`resident_windows.go:260` 起任务源 1 枚〔已接〕；`rts:278` `assembleRuntime(spec:269/270)`〔已接〕；`run.go:606` 注门＋`:748` 交 bridge〔已接〕；控制台 `task` 动词 `rts:387`→`submitTask:430`〔已接〕；`bridge:352`→`:443`/`:458` 两读点〔已接；条件＝有效级 L1 无会话授权／L2 才问门〕；`gate.go:294`/`:536` 两处 `ui.Prompt`〔已接，我复跑：全包恰 2 枚〕；`ballCardUI.Prompt:864`〔已接〕；**`AskOnTaskRoot:697`→0 枚〔建了但没接〕**；**`Gate.Replay` 零调用者〔建了但没接〕**。Esc 链与 D38 第 3 步钩子在场。
+- ★**裁定（那一问：起管线算不算满足 `AC#7`）**：**算**——`AC#7` 的完成判据是"起一条任务管线（或经装配根注入）"，该半今天**静态成立**（无控制台则打 claim 返回 nil，⛔ 不冒充）；**"真举出一张卡"不是这一格**，它要的是**行为凭据**（任务真跑到需要批准那一步 ⇒ 门调 `ui.Prompt`），今天零凭据（winlive 被抑制、〔真模型〕空）。⇒ ⛔ **不撤勾**；把"真举卡行为凭据"**另立为一条待人派的真机读数**（归"真控制台/真窗"那一族，⛔ 不是契约问题、⛔ 不需要 owner 拍板），已登记进台账当下一波候选。
+- ⚠ **两处引用修正（都在我或旧票面上）**：①我 `A725` 引 `resident_windows.go:261`，实测 `src := startResidentTaskSource(rt, ra)` 落 **`:260`**（今日第三次"行号与短语错位"，⛔ 不回改、就地打旧）；②**票面旧引 `:122` 已过期**，现读作 `WithConfig:132`（它现取）。
+- ⛔ 本轮**不派码**：`AskOnTaskRoot`／`Replay` 两条"建了但没接"只登记（是死路还是备用路＝待裁，不在本格）。
