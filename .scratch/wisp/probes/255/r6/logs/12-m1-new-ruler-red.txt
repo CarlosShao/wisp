@@ -1,0 +1,7 @@
+time=2026-10-08T13:23:22.233+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255PanelHostBuildsItsWindowOptions
+    panel_geometry_255_test.go:239: cmd/wisp production sources carry 2 webview2.NewWithOptions call sites [panel_host_windows.go:386 panel_resident_windows.go:558] and cmd/wisp/panel_host_windows.go itself carries 1, want 1 and 1: AC#4's claim is about the geometry THIS create takes, and a second create anywhere in this package's shipped code - not just in this file - would be a second answer to check
+--- FAIL: TestTicket255PanelHostBuildsItsWindowOptions (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.093s
+FAIL
