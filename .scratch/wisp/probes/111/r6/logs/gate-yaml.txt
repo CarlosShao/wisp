@@ -1,0 +1,6 @@
+== gate: ci.yml YAML validity ==
+date: Thu Oct  8 09:03:03 CST 2026
+tool: python -c yaml.safe_load
+top keys: ['name', True, 'concurrency', 'jobs']
+test-windows steps: 10
+rc=0
