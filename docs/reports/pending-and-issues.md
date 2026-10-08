@@ -14165,3 +14165,33 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 
 ⛔ 零 push、零触发 run、零 go 命令；⛔ 未动 `ci.yml`、⛔ 未翻票 111 任何框（`AC#11` 维持"不翻"）；台账只追加，`A710` 那三处（23 枚／20 枚出过色／`:229-233` 行号）就地打旧于此、不回改。
 
+## A722｜2026-10-08 17:2x｜收 **`comment-truth-2`**（那 15 枚"已过期"产码注释逐枚分档＋归口查重）＋★它顶正我 `A720 §3` 一栏（"五把尺"≠"名册五枚"）＋★**最重的一格：票 246 `AC#7` 已勾，但"还没有任务会举卡"到今天仍成立**
+
+（追加时刻先跑 `date`＝`2026-10-08 17:2x +0800` 现量，节头不估。）
+
+### 1. 交件与一枚假号
+
+两笔 commit＝`082bc7ba`（16:21 起手锚，1 枚件）＋**`762b694e`**（17:12 交件，命中 3 枚件）。⚠ **它回报里写的是 `76b694e`，少一位**，`git show 76b694e` 现量＝`fatal: ambiguous argument … unknown revision` ⇒ 我按名册现量纠正过来才落账＝第 113 条"通知里的提交号一律当待验断言"的**现行实例**（这次不是编造的号，是漏了一位，后果一样：不查就当没交过）。
+入库尺＝`git ls-files .scratch/wisp/probes/comment-truth-2 | wc -l`＝**3**（`00-anchor`／`01-triage`／`02-rulers-and-dedup`）；另两枚 `90-msg-00.md`／`91-msg-01.md`（它自己的 commit 消息草稿）**未入库**（`?? `）⇒ 登记在案：那两枚不是交付件，日后⛔ 不许有人把里面的话当"盘上已核"引。
+
+### 2. 我自己复跑过的三处，据此才采
+
+① **票 33 `AC#9` 原文**（`grep -nE 'AC#9' <票面>` ⇒ `:96`）＝`ComposerDispatch.Handle 必须被一枚非 *_test.go 文件真调用`。⇒ 这格判据**今天已成立**（产码两处调用：`cmd/wisp/panel_host_windows.go:821`、`cmd/wisp/panel_inbound.go:163`，见 `A720 §3④`）。⛔ **我没翻勾**——票 33 的勾归非实现者裁（`:194`/`:222` 两处票面自陈写死"勾要非实现者裁"），而那两张验收表（`33-v2`/`33-v3`）还没落到 `AC#9` 这一格。
+② **那枚"含注释一起扫"的禁词仪器真身**＝`internal/panel/composer_dispatch_test.go:714-716`，禁词名册逐枚＝`checkoutBranch`／`changeRepo`／`repoPicker`／`branchSelect`／`vcs.switch`，读法＝`os.ReadFile(… composer_dispatch.go)` 之后 `strings.Contains(string(data), banned)` ⇒ **整枚文件字节，注释也算**。⇒ 它那条"改文案受这枚约束"成立：**今后凡动 `internal/panel/composer_dispatch.go` 的注释，⛔ 这五枚词一个都不许出现**（红句里还具名写着"the switching dimension is ticket 186's, gated on Q-69"）。同族另四把仪器它具名了（`:375 TestDispatcherSpellsNoRouteLiteralOfItsOwn`／`firstrun_257_test.go:430`／`resident_hotkey_258_test.go:73`／`resident_grant_writer_265_windows_test.go:465`），我复跑第一把真身存在。
+③ ★**它顶正我 `A720 §3`，顶得对**：我那节小标题逐字是"我自己复跑过、据此采的**五把**"＝**五把尺**，而落到这 15 枚名册上只覆盖 **4 枚**（P01/P13/P14/P15），因为 `SealDir` 那把我复跑的是**"仍成立"那一族**、根本不在"已过期 15 枚"里。⇒ **我那句把"我跑了几把尺"与"名册里几枚被复跑"压成一栏**（第 126 条"枚数要写清是抽样还是整族"的同形新实例，这次错在我写的台账标题上），就地打旧，⛔ 不回改 `A720`。它另具名两处引用缺陷：P10 的 `loader.go:238` 实为 `SaveFile@:252`（漂 14 行）、P12 系近似转写；〔引用假凭据〕＝**0 枚**（这条我最担心，它逐枚跑了尺）。
+
+### 3. ★最重的一格：`AC#7` 那个勾坐在一条今天仍成立的话上
+
+尺（我自己现跑）：`git grep -nE '[A-Za-z0-9_]\.AskOnTaskRoot\(' HEAD -- '*.go' ':!*_test.go'` ⇒ **空、rc=1**；全形状命中只有注释与定义（`resident_approval_windows.go:688`/`:697`、`resident_task_source_windows.go:14`、`resident_windows.go:248`）。
+而票 246 的 `- [x] **AC#7**` **正文自己就写着**：⚠ "…但 **`askConfirmation`／`AskOnTaskRoot` 生产调用者＝0**（只有用例）⇒ 门在、卡进得来，**还没有任务会去举它**"，完成判据＝"常驻那条腿真起一条任务管线（或…）"。⇒ 三层分开写：ⓐ 判据里"起一条任务管线"那半**今天有**（`resident_windows.go:261 src := startResidentTaskSource(rt, ra)`）；ⓑ "真会有任务举卡"那半**今天仍没有**（`AskOnTaskRoot` 零调用点）；ⓒ `resident_windows.go:248` 那句注释**自相矛盾**（同一句里先说"still had zero product callers"再说"This call is the caller"）。
+**处置＝我⛔ 不回改票 246、⛔ 不撤那个勾、⛔ 不派腿顺手"修注释"**——这一格要的是**一枚能跑突变的非实现者裁决**（它要回答："起了管线就算满足 `AC#7`，还是必须真能举出一张卡才算？"），而那一发要种产码突变、此刻 `253-r1` 占着整个 `cmd/wisp` 导入图 ⇒ **排在 253-r1 退出之后**，与 `259-v1` 同批排队。⚠ 我此前把"246 AC#7 已勾"读成"举卡那一跳通了"的一半，**本程收窄**：那条勾只覆盖到"起管线"。
+
+### 4. 归口表（采它的读数，⛔ 我据此不派任何写腿）
+
+15 枚档位＝**〔只欠文案〕13／〔要动产码〕2（P14/P15，见 §3）／〔要新判据〕0**；撞钉尺＝13 条逐字串在 `*_test.go` **0 命中**（逐条检 rc）。归口逐枚（`锚 → 档 → 承接`）：P01 `composer_dispatch.go:50`→票 33 `AC#9`（判据已成立、见 §2①）｜P03 `panel_inbound.go:11`→同上｜P02 `approval/doc.go:26`→票 12 **三格不承接＝要新立**｜P04 `git.go:76`→票 186（9 格里无"注释"格）｜P06 `config_readers_255.go:43`→票 255（2 格不承接）｜P07/P08 `config_reload.go:11`/`:14`→票 223｜P09 `:18`→票 223 `AC#7`（判据已满足仍未勾）｜P10 `firstrun.go:11`→票 198 **已 `-done`＝要新立**｜P11 `resident_approval_windows.go:282`→票 246（仅 `AC#8` 不承接）｜P12 `approval_reply.go:12`→票 201 `AC#1`，⚠ **票面 `:73` 已登记过＝不算新发现**｜P13 `assessor.go:29`→票 18/19 已 `-done`、无承接格，⚠ **`A720` 已登记**｜P14/P15→见 §3。
+⇒ 结论两枚归我：ⓐ"要新立"的只有 **P02、P10** 两枚，但两枚都是"改一句注释"级——按机主原话"不要重复劳动"与本仓归口规矩（`issues/README.md:70` 那句"都归**票 262**"经它复量射程其实是**票名长度门禁**、⛔ 不是去处），**我不为两句注释立两票**；正解＝等 253-r1 退出后，把 13 枚"只欠文案"**并成一枚窄落地腿**挂到最相近的在册票（`internal/panel` 两枚归票 33、`cmd/wisp` 那几枚归票 223/246），⛔ 逐票散开。ⓑ 本程**未新建任何票、未新建判据、未翻框**（票 33 `394/13/1`、票 259 `5/1`、票 242 `3/0`、票 246 枚数未动，全部复跑同数）。
+
+### 5. 编队与纪律
+
+`253-r1` **仍在飞**（16:56 写了自己的更正件 `probes/253/r1/01-anchor-correction.md`；我另核一件事：它 16:52 摸过产码 `cmd/wisp/panel_host_windows.go`，但 `git status --porcelain -- cmd/wisp`＝**空**＝字节一字未改，只是时间戳被动 ⇒ 不是越格改产码，登记不指控）。`ticket-181-status-1` 最后一笔 16:55（`c9820fb0`），仍在它自己的射程里写。⛔ 零 push、⛔ 零 `-done`、⛔ 零翻框；机主手上仍那三问，本轮**没叠第四问**。我名下欠账未动（`frontend/dist` 刷新受"exe 未还原"牵制、那一发真窗复跑、`go list -deps`）。
+
