@@ -1,0 +1,7 @@
+=== 60: worktree cleanliness after all overlay runs (empty listing = nothing to revert) ===
+status_rc=0
+=== hash-object parity: worktree file vs the committed blob, per file this leg owns ===
+cmd/wisp/panel_host_windows.go worktree=58e2b155dbcc8d380793e90bffc5514ab00743f1 head=58e2b155dbcc8d380793e90bffc5514ab00743f1 equal=yes
+cmd/wisp/panel_pageover_33r10_windows_test.go worktree=dae053d84cdde44a883c840f99463f65f18d3860 head=dae053d84cdde44a883c840f99463f65f18d3860 equal=yes
+cmd/wisp/panel_locked_naming_33r11_windows_test.go worktree=345e53a605ebcdad02cc238e6322854a7e090d16 head=345e53a605ebcdad02cc238e6322854a7e090d16 equal=yes
+hashloop_rc=0

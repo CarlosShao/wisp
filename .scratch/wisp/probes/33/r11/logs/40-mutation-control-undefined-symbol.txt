@@ -1,0 +1,6 @@
+### CONTROL - the declaration is renamed inside the overlay copy while the call site still asks for the old name, so a tree that really used the copy cannot compile. rc=1 IS the pass condition: it proves -overlay feeds this compiler, hence every GREEN below is a green of the tree the overlay describes.
+### build only (go vet), no -run denominator
+# github.com/CarlosShao/wisp/cmd/wisp
+# [github.com/CarlosShao/wisp/cmd/wisp]
+vet.exe: .\.scratch\wisp\probes\33\r11\mutations\mut-control-symbol-moved-outside-the-overlay-copy.go:448:12: m.firstRoundTrip undefined (type *PanelManager has no field or method firstRoundTrip)
+control_rc=1

@@ -1,0 +1,33 @@
+=== 50: full-package name diff, RUN A (pristine HEAD via overlay) vs RUN B (post-change) ===
+--- 30-baseline-full-package: rc line, terminal-state markers
+### RUN A - pristine HEAD via -overlay .scratch/wisp/probes/33/r11/mutations/overlay-baseline.json (guard test removed from the build)
+### command: go test -count=1 -timeout 500s -overlay=... ./cmd/wisp
+baseline_rc=1
+ran_to_terminal=1 panic=0
+fail_names=4
+0
+--- 31-postchange-full-package: rc line, terminal-state markers
+### RUN B - post-change, real worktree
+### command: go test -count=1 -timeout 500s ./cmd/wisp
+postchange_rc=1
+ran_to_terminal=1 panic=0
+fail_names=6
+0
+--- names red in B and not red in A (this is the number that must be zero) ---
+TestAC4FocusReturnToPriorWindowGap33r5
+TestTicket223ModeLooseningChangesTheRunningModeAfterAllow
+comm_rc=0
+--- names red in A and not in B (a red this leg removed, if any) ---
+comm2_rc=0
+--- both lists, for the record ---
+TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+TestAC14AwaitedBindingReplyReachesThePage
+TestAC14GoSideEvalPushReachesThePage
+TestPanelHostRealWindowHopAndLifecycle
+TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+TestAC14AwaitedBindingReplyReachesThePage
+TestAC14GoSideEvalPushReachesThePage
+TestAC4FocusReturnToPriorWindowGap33r5
+TestPanelHostRealWindowHopAndLifecycle
+TestTicket223ModeLooseningChangesTheRunningModeAfterAllow
+cat_rc=0

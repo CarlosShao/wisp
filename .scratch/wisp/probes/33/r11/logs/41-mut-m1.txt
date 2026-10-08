@@ -1,0 +1,7 @@
+### M1 - the pre-rename name put back on the self-locking round trip (declaration plus its call site, so it still compiles). Expect the census to complain twice: unrostered, and named as if the caller held a lock its body takes.
+### -run denominator: 6 named cases (this leg's 5 plus 33-r10's window-free page-over case, which must stay green in every mutation)
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+cmd\wisp\panel_pageover_33r10_windows_test.go:222:12: m.firstRoundTrip undefined (type *PanelManager has no field or method firstRoundTrip)
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
+mutation_m1_rc=1

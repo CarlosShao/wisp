@@ -1,0 +1,28 @@
+### M3 - the rostered honest method made to lock itself. Expect the census red AND the behavioural case red, because the call parks under the m.mu the caller already holds.
+### -run denominator: 6 named cases (this leg's 5 plus 33-r10's window-free page-over case, which must stay green in every mutation)
+time=2026-10-08T12:50:50.734+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLockedSuffixNeverTakesTheLockItself33r11
+    panel_locked_naming_33r11_windows_test.go:233: 33-r11 census: 1 Locked-suffixed func(s) across 34 production source file(s) of package main
+    panel_locked_naming_33r11_windows_test.go:235:   PanelManager.setPriorFocusLocked in panel_host_windows.go line 625: 0 lock operation(s) in its own body []
+--- PASS: TestLockedSuffixNeverTakesTheLockItself33r11 (0.03s)
+=== RUN   TestRosteredLockedMethodReturnsWhileCallerHoldsTheLock33r11
+    panel_locked_naming_33r11_windows_test.go:300: setPriorFocusLocked parked while the caller held m.mu: the method takes that lock itself, so its Locked suffix is a trap and any caller that trusts it deadlocks
+--- FAIL: TestRosteredLockedMethodReturnsWhileCallerHoldsTheLock33r11 (2.00s)
+=== RUN   TestLockedNamingCensusBitesItsOwnFixture33r11
+    panel_locked_naming_33r11_windows_test.go:398: 33-r11 positive control: planted fixtureHost.parkedLocked reported with [f.mu.Lock f.mu.Unlock], honest name clean, unsuffixed self-locker untouched
+--- PASS: TestLockedNamingCensusBitesItsOwnFixture33r11 (0.00s)
+=== RUN   TestLockedNamingCensusRejectsTheOldName33r11
+    panel_locked_naming_33r11_windows_test.go:416: 33-r11 positive control: the pre-rename shape is reported as roundTripHost.firstRoundTripLocked with [m.mu.Lock m.mu.Unlock]
+--- PASS: TestLockedNamingCensusRejectsTheOldName33r11 (0.00s)
+=== RUN   TestCompletedWithinReportsAParkedCall33r11
+    panel_locked_naming_33r11_windows_test.go:435: 33-r11 positive control: a self-locking Locked call parked, was reported as parked, and had touched nothing
+--- PASS: TestCompletedWithinReportsAParkedCall33r11 (0.20s)
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0
+    panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+    panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 1044 byte(s), 1 of 1 entry id(s) present, entry bytes carried=true
+--- PASS: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.338s
+FAIL
+mutation_m3_rc=1
