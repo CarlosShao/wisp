@@ -1,0 +1,13 @@
+=== 33-v4 closing measurement (after the self-disclosure edit) ===
+now=2026-10-08 11:01:18 +0800
+HEAD=a01447bb15c68ec72eed620a1dbae7d1fb495087
+porcelain=756
+--- audited tracked files, worktree hash vs HEAD blob (must still equal the start readings in 00-anchor.md)
+MATCH 1f9060dfff33cffab1317e5f653e1a95f9678e97 cmd/wisp/panel_host_windows.go
+MATCH 9b9b27478fcae98841f4d202bce0794bc3c97e8a cmd/wisp/panel_pageover_33r10_windows_test.go
+MATCH a77866624accf3ddef867b619e873d12e8c7f1f6 .scratch/wisp/probes/33/r10/impl.md
+MATCH 83e2e7222f17c041f42c9a0b3be69b0fbc0980b8 .scratch/wisp/issues/33-panel-host-c27.md
+--- box census
+unchecked=13 checked=1
+--- zero-byte / .out sweep over my own dir
+rc=0 (no lines above = clean)

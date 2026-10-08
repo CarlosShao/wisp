@@ -289,7 +289,31 @@ winlive 档（2）：TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor  TestTi
 
 ---
 
-## 本程硬约束自证
+---
+
+## 本程自曝（⛔ 不是被审件的账，是我这腿自己的两处）
+
+1. **证据件的行尾符**：`git add` 我这批 `.txt` 时 git 报了 45 行
+   `LF will be replaced by CRLF the next time Git touches it`——我写文件用的是 LF，仓库的 autocrlf 口径会把它们
+   归一成 CRLF。⛔ 这只影响我自己的证据件，不影响 Q6 那把尺（被审两枚件两侧 CR 都是 0，见 `logs/23`）。
+   读这些件的人若拿 `grep -c $'\r'` 量它们，会看到与跟踪件不同的数，⛔ 别据此判"未格式化"。
+2. **突变载具的写法**：`logs/35-v4-mutation-driver.py.txt` 里我用 `subprocess` 直接传 argv 列表
+   （⛔ 未走 shell），路径全部是本程自己的常量；这既是躲开 shell 注入面，也是为了让每一发的
+   `-overlay=<json>` 与 `-test.run=<尺>` 原文可审。脚本落在仓外 `D:/tmp/wisp33v4/v4mut.py`，
+   仓内那份是它的逐字拷贝（存成 `.py.txt`，⛔ 不给 `.out`，也⛔ 不在仓内执行）。
+3. **一处我**没**做到**：Q6 要的"整包名册色"我没交（见 Q6 末段）——那要开真窗。这是射程限制，不是通过。
+
+## 我这腿的提交（四枚，全部只带显式 pathspec）
+
+```
+162844be 33-v4 start gate: 00-anchor.md + QODER.md
+58e0d687 33-v4 rulers: every reading this leg took, filed raw with its own rc line   (logs/**)
+8d6190ca 33-v4 verdict: six questions answered cell by cell ...                     (verdict.md)
+a01447bb 33-v4 end integrity: my three commits own only files under probes/33/v4 ... (logs/98)
+```
+
+逐枚 `git show --name-only` 数过：`paths outside probes/33/v4 = 0`（尺与读数在 `logs/98-end-integrity.txt`）。
+
 
 - ⛔ 未改任何跟踪件：起手记下的三枚被审件哈希（`00-anchor.md`）与交件时逐枚 `git hash-object`
   对拉**全等**，票 33 与 HEAD blob 亦全等（`logs/99-hash-table.txt`）。写点只有 `.scratch/wisp/probes/33/v4/**`
