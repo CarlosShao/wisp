@@ -38,7 +38,9 @@ rc=0
         拷贝名册＝6(probes-242-r1/backup)＋2(197/r3b/pre)＋6(242/r1/backup)＋6(259/r2/before)＋1(33/r8b/logs/pristine)＋1(62/v1/m1)
 自由函数尺：grep -rn --include='*.go' -E '\bfunc [A-Za-z_][A-Za-z0-9_]*Locked\(' .          → rc=1，零枚
 字符串字面尺：grep -rn --include='*.go' -E '"[A-Za-z_]*Locked[A-Za-z_]*"' cmd internal tools → rc=1，零枚
-自取锁尺（逐枚抽函数体到行首 } 再 grep '.mu.(Lock|RLock)'）→ 命中只有 #1/#2 两枚，第三枚 rc=1
+自取锁尺（逐枚）：对上表 23 枚声明行号逐枚 `awk -v s=<decl行> 'NR>=s{print} NR>s && /^}/{exit}'` 抽函数体，
+        再 `grep -qE '\.mu\.(Lock|RLock)\(|\.lk\.'` → 输出 23 行中 **SELF-LOCKS 只有 2 行**（`panel_host_windows.go:460`／`:751`（当时读数，现 `:840`）），
+        其余 **21 行全部 no-lock** ⇒ **第三枚自取锁的 `*Locked` 零枚**（该支 rc=1）
 调用尺（每一枚）：<接收者变量>.<方法名>(   —— 带左括号，所以构造点／同名字段／注释不计
 ```
 `<类型全名>＋<调用形状>` 逐枚（**非测试调用者枚数／各自此刻持不持锁**）。三栏＝①注释写没写"caller must hold"②函数体第一句是不是自己取锁③非测试调用者。
@@ -291,15 +293,28 @@ $ grep -rln -E 'Locked|自取锁|不可重入|重入|self-deadlock|self-locking|
 
 ---
 
-## 收尾自证（本腿只写了自己那两件）
+## 收尾自证（本腿只写了自己那两件；尺于 `11:30:26 +08` 现跑）
 
 ```
-$ git status --short -- .scratch/wisp/probes/33/a3/
-（只有本腿两件）      rc=0
-$ git show --stat --format='%h %s' HEAD | head
-（只列 .scratch/wisp/probes/33/a3/*）  rc=0
-$ wc -c .scratch/wisp/probes/33/a3/00-anchor.md .scratch/wisp/probes/33/a3/verdict.md   rc=0
+$ git show --stat --format='%h %s' d1a6ffef | head
+ .scratch/wisp/probes/33/a3/00-anchor.md | 37 ++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)                                        rc=0
+
+$ git show --stat --format='%h %s' 824746eb | head
+ .scratch/wisp/probes/33/a3/verdict.md   | 305 ++++++++++++++++++++++++++
+ 1 file changed, 305 insertions(+)                                       rc=0
+
+$ wc -c .scratch/wisp/probes/33/a3/00-anchor.md .scratch/wisp/probes/33/a3/verdict.md
+ 1670 .scratch/wisp/probes/33/a3/00-anchor.md
+32923 .scratch/wisp/probes/33/a3/verdict.md                              rc=0
+
+$ git status --short -- cmd internal docs .scratch/wisp/issues
+?? internal/panel/inbound_raw_leak_35r7_test.go     ← 35-r7 在飞，⛔ 不是本腿的
+                                                                    rc=0
 ```
+⇒ 本腿两枚 commit（`d1a6ffef`／`824746eb`）**各只带 `probes/33/a3/` 一枚路径**，
+`cmd`＋`internal`＋`docs`＋票池对本腿**零脏面**（唯一那行未跟踪件属 `35-r7`）。
+⚠ 本节自身的落笔 commit 记不进本表（同一枚文件不能列出收录它的那一刀——台账 HEAD 已把这条写成规矩）。
 
 ⛔ 未 push、⛔ 未开真窗、⛔ 未改 `docs/reports/pending-and-issues.md`／`HANDOVER.md`／任何票面、⛔ 未勾任何 AC 框、
-⛔ 未新建 `.sh`/`.ps1`/`.txt`/`.out`、⛔ 未删任何临时件、⛔ 未跑 build/vet/test。
+⛔ 未新建 `.sh`/`.ps1`/`.txt`/`.out`、⛔ 未删任何临时件、⛔ 未跑 build/vet/test（只跑过 `go list`/`go env`，见 §0）。
