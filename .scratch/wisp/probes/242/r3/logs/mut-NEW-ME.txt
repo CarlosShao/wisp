@@ -1,0 +1,20 @@
+time=2026-10-08T12:12:45.571+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce
+    ticket242_binding_test.go:46: AC#1 RED: the rejected nonce was still spendable afterwards - single-use was broken by the forged attempt
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+=== RUN   TestTicket242SpendRequiresTheExactBinding
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+=== RUN   TestTicket242QueuedItemsBindGrantsToTheirOwnDigest
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+=== RUN   TestTicket242ForgedBindingCannotSpendAnotherItemsGrant
+    ticket242_binding_test.go:193: AC#1 RED: a value that was never issued on A returned none instead of spent-or-never-live-nonce - this case can no longer tell "bound to the wrong card" from "no such proof", so the denial it names is not evidence
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+=== RUN   TestTicket242BindDigestSeparatesItemsBySequenceNumber
+--- PASS: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+=== RUN   TestTicket242PanelItemReadFaceIsFullyDeclared
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+=== RUN   TestTicket242PanelItemStaysGrantFree
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	0.034s
+FAIL

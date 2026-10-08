@@ -1,0 +1,4 @@
+warning: in the working copy of '.scratch/wisp/probes/242/r3/logs/git-status-start.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/242/r3/logs/git-status-end.txt', LF will be replaced by CRLF the next time Git touches it
+ .../{git-status-start.txt => git-status-end.txt}   | 23 ----------------------
+ 1 file changed, 23 deletions(-)

@@ -1,0 +1,1 @@
+本件是台本 stdout 回显（台本自身 rc=0）；读数在 mut-summary*.txt，逐名读数在 mut-<形>.txt。0 字节＝台本不往 stdout 写，不属漏交。

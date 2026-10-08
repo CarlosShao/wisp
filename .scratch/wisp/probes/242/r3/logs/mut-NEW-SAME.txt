@@ -1,0 +1,21 @@
+time=2026-10-08T12:12:42.941+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+=== RUN   TestTicket242SpendRequiresTheExactBinding
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+=== RUN   TestTicket242QueuedItemsBindGrantsToTheirOwnDigest
+    ticket242_binding_test.go:104: AC#1 RED: a replayed identity produced the same binding digest; the digest stopped covering the fields that make the two items distinct (on this path: the correlation id the queue issued)
+--- FAIL: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+=== RUN   TestTicket242ForgedBindingCannotSpendAnotherItemsGrant
+    ticket242_binding_test.go:155: AC#1 RED: two distinct pending items share one binding digest - bindDigest stopped separating cards
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+=== RUN   TestTicket242BindDigestSeparatesItemsBySequenceNumber
+    ticket242_binding_test.go:208: AC#1 RED: two bind digests identical in every field except the sequence number came out equal - seq is not folded into bindDigest, so a replayed correlation id can land on the earlier card's digest
+--- FAIL: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+=== RUN   TestTicket242PanelItemReadFaceIsFullyDeclared
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+=== RUN   TestTicket242PanelItemStaysGrantFree
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	0.033s
+FAIL

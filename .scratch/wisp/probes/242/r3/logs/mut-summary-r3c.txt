@@ -1,0 +1,24 @@
+358:	it.grants.issue(nonce, it.bind + "m") // MUTATION M-B: mint side stores a foreign digest
+== MUTATION OLD2-MB (run=TestTicket242) go_test_rc=0
+grep_fail_rc=1
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+blobcheck OLD2-MB internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck OLD2-MB internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-MB (run=TestTicket242) go_test_rc=1
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+grep_fail_rc=0
+    ticket242_binding_test.go:184: AC#1 RED: the positive control was refused too (misbound) - item A's own live grant against item A's own binding digest must spend, otherwise the cross-card refusal above could come from any cause
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+blobcheck NEW-MB internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-MB internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+harness r3c done

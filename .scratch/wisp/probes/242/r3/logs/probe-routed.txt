@@ -1,0 +1,10 @@
+time=2026-10-08T12:19:31.212+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket242R3ProbeRoutedCrossCardDenial
+    ticket242_r3_probe_test.go:51: PROBE depth=2 corrA=approval-1 corrB=approval-2 bindA==bindB=false liveA=1 liveB=0
+    ticket242_r3_probe_test.go:55: PROBE routed cross-card allow(B.corr, A's live nonce) err=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） err==ErrBadGrant=true
+    ticket242_r3_probe_test.go:69: PROBE audit line: approval: GRANT-DENY corr=approval-2 tool=fs.write denial=spent-or-never-live-nonce
+    ticket242_r3_probe_test.go:74: PROBE store spend of a value not live on A => spent-or-never-live-nonce
+    ticket242_r3_probe_test.go:83: PROBE store spend of a live nonce against another card's digest => misbound
+--- PASS: TestTicket242R3ProbeRoutedCrossCardDenial (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	0.038s

@@ -1,0 +1,145 @@
+diff --git a/internal/agent/approval/ticket242_binding_test.go b/internal/agent/approval/ticket242_binding_test.go
+index 1eaba097..8a7b5d2e 100644
+--- a/internal/agent/approval/ticket242_binding_test.go
++++ b/internal/agent/approval/ticket242_binding_test.go
+@@ -14,8 +14,17 @@ import (
+ //     rejected AND must still consume the nonce (a rejected caller cannot
+ //     retry);
+ //   - the mint end: every queued item's grant is bound to a digest covering
+-//     the item's own identity fields, and a replayed correlation id lands on
+-//     a different digest because the sequence number is folded in.
++//     the item's own identity fields, and the sequence number is folded into
++//     that digest.
++//
++// Wording note, corrected against ticket 242 v2 (mutation M-D3): the seq term
++// IS folded in, but no queue-level case can notice its removal, because
++// Queue.push hands every push a fresh correlation id (queue.go:163-165) and the
++// correlation id alone already separates two items of the same identity. The
++// seq term is therefore measured by
++// TestTicket242BindDigestSeparatesItemsBySequenceNumber, which holds every
++// other field fixed and moves only seq; the queue-level case below says what it
++// actually detects instead.
+ //
+ // 259-r1 mechanical note: spend used to return a bool and now returns a
+ // grantDenial (ticket 259 AC#2). Every judgement below is the SAME failure
+@@ -80,17 +89,44 @@ func TestTicket242QueuedItemsBindGrantsToTheirOwnDigest(t *testing.T) {
+ 		t.Fatalf("AC#1 RED: the queued item's binding does not cover its own identity fields (seq/task/tool/level/args)")
+ 	}
+ 
+-	// The replay half: the same identity at a different time must land on a
+-	// different digest (the sequence number is folded in on purpose).
++	// The replay half, stated honestly: pushing the SAME identity a second time
++	// must still land on a different digest. What separates the two here is the
++	// correlation id Queue assigns per push (d.CorrelationID is empty, so
++	// queue.go:163-165 mints "approval-1" then "approval-2") - NOT the sequence
++	// number. Ticket 242 v2's M-D3 folded seq out of bindDigest and this line
++	// stayed green, which is why the seq claim now lives in its own case:
++	// TestTicket242BindDigestSeparatesItemsBySequenceNumber.
+ 	itB, err := q.push(d)
+ 	if err != nil {
+ 		t.Fatalf("enqueue B (replayed identity): %v", err)
+ 	}
+ 	if itB != nil && itB.bind == itA.bind {
+-		t.Fatal("AC#1 RED: a replayed identity produced the same binding digest; the sequence number stopped separating items")
++		t.Fatal("AC#1 RED: a replayed identity produced the same binding digest; the digest stopped covering the fields that make the two items distinct (on this path: the correlation id the queue issued)")
+ 	}
+ }
+ 
++// TestTicket242ForgedBindingCannotSpendAnotherItemsGrant is AC#1's cross-card
++// case, and as of this rewrite the proof it presents is really live: the nonce
++// is minted for item A through Queue.grantNonce - the same call the native
++// prompt makes - and A and B sit pending at the same time (asserted via
++// q.Depth, plus each store's own live count).
++//
++// The previous version of this case passed a literal nonce that had never been
++// issued into any store, so grantStore.spend walked its scan, found no row and
++// returned denialSpentNonce WITHOUT ever reaching the binding comparison
++// (approval.go's spend: the delete/compare pair is inside the loop body). Ticket
++// 242 v2's mutation M-A emptied that comparison and the case stayed green; see
++// .scratch/wisp/probes/242/v2/verdict.md Q2. That is why every refusal below
++// names WHICH denial it expects instead of just "not denialNone", and why the
++// live-proof precondition is asserted rather than assumed.
++//
++// The three shapes are told apart on purpose:
++//   - A's live proof against B's digest    -> denialMisbound (AC#1's outcome)
++//   - A's live proof against A's own digest -> denialNone     (positive control;
++//     without it any cause at all could have produced the refusal above)
++//   - a value never issued anywhere        -> denialSpentNonce (the branch the
++//     toothless case actually landed on; kept asserted so this one cannot slide
++//     back onto it unnoticed)
+ func TestTicket242ForgedBindingCannotSpendAnotherItemsGrant(t *testing.T) {
+ 	q := NewQueue(0, 0, 0, nil)
+ 	itA, err := q.push(tools.Decision{
+@@ -107,9 +143,69 @@ func TestTicket242ForgedBindingCannotSpendAnotherItemsGrant(t *testing.T) {
+ 	if err != nil {
+ 		t.Fatalf("enqueue B: %v", err)
+ 	}
+-	// Item B's binding must not open item A's grant even if a nonce leaked.
+-	if d := itA.grants.spend("leaked-or-guessed-nonce", itB.bind); d == denialNone {
+-		t.Fatal("AC#1 RED: item B's binding spent item A's grant - cross-item binding is broken")
++	// Two cards alive at once, and two digests that actually differ - otherwise
++	// "bound to the wrong card" is not a claim about anything.
++	if q.Depth() != 2 {
++		t.Fatalf("AC#1 RED: expected two simultaneously pending items, queue depth is %d", q.Depth())
++	}
++	if itA.bind == "" || itB.bind == "" {
++		t.Fatal("AC#1 RED: one of the two pending items carries an empty binding digest, so the cross-card comparison below has nothing to mismatch")
++	}
++	if itA.bind == itB.bind {
++		t.Fatal("AC#1 RED: two distinct pending items share one binding digest - bindDigest stopped separating cards")
++	}
++
++	nonceA, err := q.grantNonce(itA)
++	if err != nil {
++		t.Fatalf("mint A's grant: %v", err)
++	}
++	if itA.grants.live() != 1 {
++		t.Fatalf("AC#1 RED: the grant minted for item A is not live on A's own store (live=%d, want 1) - the case below would then be spending a value that was never issued, which is the toothless shape ticket 242 v2 rejected", itA.grants.live())
++	}
++	if itB.grants.live() != 0 {
++		t.Fatalf("AC#1 RED: item B's store already holds %d grant rows after A was minted - the per-item split that really refuses cross-card spends is gone", itB.grants.live())
++	}
++
++	d := itA.grants.spend(nonceA, itB.bind)
++	if d != denialMisbound {
++		t.Fatalf(`AC#1 RED: item A's live grant, spent against item B's binding digest, returned %s and not misbound. spent-or-never-live-nonce means the comparison never ran because the row is not in A's store (the shape this case had before, zero power over bindings); missing-nonce means nothing was presented at all; none means the cross-card grant was accepted.`, d.label())
++	}
++	if itA.grants.live() != 0 {
++		t.Fatalf("AC#1 RED: the refused cross-card spend left %d live grant(s) on A - a rejected answer must still consume the proof, or its holder can retry it", itA.grants.live())
++	}
++
++	// Positive control: the same store, the same minting path, the item's own
++	// digest - this one must open, or the refusal above proves nothing.
++	nonceA2, err := q.grantNonce(itA)
++	if err != nil {
++		t.Fatalf("mint A's second grant: %v", err)
++	}
++	if d := itA.grants.spend(nonceA2, itA.bind); d != denialNone {
++		t.Fatalf("AC#1 RED: the positive control was refused too (%s) - item A's own live grant against item A's own binding digest must spend, otherwise the cross-card refusal above could come from any cause", d.label())
++	}
++	if itA.grants.live() != 0 {
++		t.Fatalf("AC#1 RED: a successful spend left %d live nonces; spending deletes", itA.grants.live())
++	}
++
++	// The discriminator: keep this case from ever becoming the empty-store shape
++	// again by pinning what an unissued value answers.
++	if d := itA.grants.spend("never-issued-value", itA.bind); d != denialSpentNonce {
++		t.Fatalf(`AC#1 RED: a value that was never issued on A returned %s instead of spent-or-never-live-nonce - this case can no longer tell "bound to the wrong card" from "no such proof", so the denial it names is not evidence`, d.label())
++	}
++}
++
++// TestTicket242BindDigestSeparatesItemsBySequenceNumber is the ruler ticket 242
++// v2 found missing: its M-D3 replaced strconv.FormatUint(seq, 10) inside
++// bindDigest with a constant and the whole package stayed green (verdict.md Q2
++// note 4), because every queue-level pair differs by correlation id first. Here
++// corr / task / tool / level / args are held equal and only seq moves, so seq is
++// the sole difference-maker and removing it turns this case red.
++func TestTicket242BindDigestSeparatesItemsBySequenceNumber(t *testing.T) {
++	args := []byte(`{"cmd":"a"}`)
++	one := bindDigest("approval-7", "task-1", "shell.run", "L2", 1, args)
++	two := bindDigest("approval-7", "task-1", "shell.run", "L2", 2, args)
++	if one == two {
++		t.Fatal("AC#1 RED: two bind digests identical in every field except the sequence number came out equal - seq is not folded into bindDigest, so a replayed correlation id can land on the earlier card's digest")
+ 	}
+ }
+ 

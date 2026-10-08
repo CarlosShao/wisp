@@ -1,0 +1,186 @@
+216
+== MUTATION OLDplain (run=TestTicket242) go_test_rc=0
+-- OLDplain red cases:
+grep_fail_rc=1
+-- OLDplain FAIL reason lines:
+-- OLDplain pass cases:
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+blobcheck OLDplain internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck OLDplain internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck OLDplain internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION OLD-MA (run=TestTicket242) go_test_rc=1
+-- OLD-MA red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+grep_fail_rc=0
+-- OLD-MA FAIL reason lines:
+    ticket242_binding_test.go:40: AC#1 RED: a grant bound to item one was spent with item two's digest - the binding layer did not reject the forged binding
+    ticket242_binding_test.go:57: AC#1 RED: empty binding spent a live grant
+    ticket242_binding_test.go:171: AC#1 RED: item A's live grant, spent against item B's binding digest, returned none and not misbound. spent-or-never-live-nonce means the comparison never ran because the row is not in A's store (the shape this case had before, zero power over bindings); missing-nonce means nothing was presented at all; none means the cross-card grant was accepted.
+-- OLD-MA pass cases:
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+blobcheck OLD-MA internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck OLD-MA internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck OLD-MA internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-MA (run=TestTicket242) go_test_rc=1
+-- NEW-MA red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+grep_fail_rc=0
+-- NEW-MA FAIL reason lines:
+    ticket242_binding_test.go:40: AC#1 RED: a grant bound to item one was spent with item two's digest - the binding layer did not reject the forged binding
+    ticket242_binding_test.go:57: AC#1 RED: empty binding spent a live grant
+    ticket242_binding_test.go:171: AC#1 RED: item A's live grant, spent against item B's binding digest, returned none and not misbound. spent-or-never-live-nonce means the comparison never ran because the row is not in A's store (the shape this case had before, zero power over bindings); missing-nonce means nothing was presented at all; none means the cross-card grant was accepted.
+-- NEW-MA pass cases:
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+blobcheck NEW-MA internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck NEW-MA internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-MA internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-MA-FULL (run=ALL) go_test_rc=1
+-- NEW-MA-FULL red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- FAIL: TestTicket259R1DenialNamesMisbound (0.00s)
+grep_fail_rc=0
+-- NEW-MA-FULL FAIL reason lines:
+    ticket242_binding_test.go:40: AC#1 RED: a grant bound to item one was spent with item two's digest - the binding layer did not reject the forged binding
+    ticket242_binding_test.go:57: AC#1 RED: empty binding spent a live grant
+    ticket242_binding_test.go:171: AC#1 RED: item A's live grant, spent against item B's binding digest, returned none and not misbound. spent-or-never-live-nonce means the comparison never ran because the row is not in A's store (the shape this case had before, zero power over bindings); missing-nonce means nothing was presented at all; none means the cross-card grant was accepted.
+-- NEW-MA-FULL pass cases:
+--- PASS: TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem (0.00s)
+--- PASS: TestLiveApprovalsSkipsRowsThatAreNotPending (0.00s)
+--- PASS: TestLiveApprovalsOnNilQueueIsNil (0.00s)
+--- PASS: TestReplySeamWaitingStateNamesTheTwoD43Rows (0.00s)
+--- PASS: TestReplySeamCarriesNoAllowWithoutAGrant (0.00s)
+--- PASS: TestWideningRuleReadsOneLineOffTheCard (0.00s)
+--- PASS: TestLiveApprovalsSharesNoReferenceSlotWithTheQueue (0.00s)
+--- PASS: TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord (0.00s)
+--- PASS: TestLiveL1WindowsSeesAWindowInTheLoop (0.00s)
+--- PASS: TestReadingL1WindowsMovesNoGateState (0.00s)
+--- PASS: TestL1WindowIsPlainDataWithNoRouteToAnAnswer (0.00s)
+--- PASS: TestStartedCallsAreNotReportedAsWaiting (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+--- PASS: TestTicket259R1DenialNamesMissingNonce (0.00s)
+--- PASS: TestTicket259R1DenialNamesSpentOrNeverLiveNonce (0.00s)
+--- PASS: TestTicket259R1DenialNamesCardNotPending (0.00s)
+--- PASS: TestTicket259R1FourDenialLabelsArePairwiseDistinct (0.00s)
+--- PASS: TestTicket259R1OutwardAnswerStaysMergedAcrossDenials (0.00s)
+--- PASS: TestTicket259R1PanelAPIMethodSetIsClosed (0.00s)
+--- PASS: TestTicket259R1PanelCarrierCarriesNoAnswerVerb (0.00s)
+--- PASS: TestTicket259R1PanelItemFieldCapabilityFence (0.00s)
+--- PASS: TestTicket259R1PanelItemCarriesNoCredentialValue (0.00s)
+--- PASS: TestTicket259R1PanelItemProjectionIgnoresGrantState (0.00s)
+--- PASS: TestTicket259R1PanelReadFaceCannotBeLaunderedIntoAnAnswer (0.00s)
+--- PASS: TestBatchAggregatesHomogeneousL1Ops (0.00s)
+--- PASS: TestBatchRefusalsBelowThresholdAndOnSensitiveVerdicts (0.00s)
+--- PASS: TestR7SizedBatchEscalatesToL2Unaggregated (0.00s)
+--- PASS: TestR7SizedBatchThatNobodyAnsweredIsRejectedNotRun (0.00s)
+--- PASS: TestTenOpsInOneToolCallGetOneConfirm (0.06s)
+--- PASS: TestTicket260R4DefaultLabelIsTheOldSentence (0.00s)
+--- PASS: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+--- PASS: TestTicket260R4LabelFollowsTheReaderAcrossAReload (0.00s)
+--- PASS: TestTicket260R4UnloadLineNamesNoKey (0.00s)
+--- PASS: TestTicket260R4SpellingSeamCarriesNoAuthority (0.00s)
+--- PASS: TestTicket260R3EscUnavailableLineNamesNoKey (0.00s)
+--- PASS: TestTicket260R3LoadedCancelLabelIsTheNamedResidual (0.00s)
+--- PASS: TestL2NativeAllowExecutesThroughTheBridge (0.00s)
+--- PASS: TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis (0.00s)
+--- PASS: TestGrantIsSingleUseAndBoundToItsItem (0.00s)
+--- PASS: TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s (0.01s)
+--- PASS: TestReplayRedisplaysUnderAFreshGrant (0.00s)
+--- PASS: TestHostUnreachableAndFullQueueFailClosed (0.00s)
+--- PASS: TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed (0.00s)
+--- PASS: TestTicket224ForgedSessionAnswerRecordsNothing (0.00s)
+--- PASS: TestTicket224SessionAnswerWithoutARecorderSaysTheScopeWasDropped (0.00s)
+--- PASS: TestTicket224RecordingFailureReleasesTheCallButClaimsNoRow (0.00s)
+--- PASS: TestAnUnansweredL2CardResolvesToRejectAtTheQueueDeadline (0.25s)
+--- PASS: TestDefaultQueueDeadlineIsFiniteAtThreeHundredSeconds (0.00s)
+--- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast (0.00s)
+--- PASS: TestAnUnreachablePromptSurfaceIsRefusedImmediatelyNotWaitedOut (0.00s)
+--- PASS: TestAVetoAgainstAnOnScreenL2CardEndsTheWaitNowAndStillRefuses (0.00s)
+--- PASS: TestAVetoNamedByTheHostsOwnKeyStillRefusesThatCard (0.00s)
+--- PASS: TestAnAmbiguousVetoNameIsNotGuessedOnTheRefusalSide (0.00s)
+--- PASS: TestAVetoOnAnUnknownNameLeavesTheCardAllowableByItsOwnGrant (0.00s)
+--- PASS: TestAnAliasCanNeverBuyAnAllow (0.00s)
+--- PASS: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses (0.00s)
+--- PASS: TestL1WindowTimeoutMeansExecute (0.00s)
+--- PASS: TestL1WindowVetoedByEachLoadedChannel (0.00s)
+--- PASS: TestL1WindowUnavailableVoiceChannelIsAnnounced (0.00s)
+--- PASS: TestL1WindowVetoOnForeignCorrelationCannotCancel (0.00s)
+--- PASS: TestL1WindowUnreachableUIFailsClosed (0.00s)
+--- PASS: TestUnadmittedTaskIsRefusedBeforeQueueing (0.00s)
+--- PASS: TestVetoAfterStartYieldsAppliedStepsReport (0.00s)
+--- PASS: TestVetoTravelsBackToTheLoopAsAFailure (0.01s)
+blobcheck NEW-MA-FULL internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck NEW-MA-FULL internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-MA-FULL internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-MD3 (run=TestTicket242) go_test_rc=1
+-- NEW-MD3 red cases:
+grep_fail_rc=1
+-- NEW-MD3 FAIL reason lines:
+-- NEW-MD3 pass cases:
+blobcheck NEW-MD3 internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck NEW-MD3 internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-MD3 internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-MD3-FULL (run=ALL) go_test_rc=1
+-- NEW-MD3-FULL red cases:
+grep_fail_rc=1
+-- NEW-MD3-FULL FAIL reason lines:
+-- NEW-MD3-FULL pass cases:
+blobcheck NEW-MD3-FULL internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck NEW-MD3-FULL internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-MD3-FULL internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-SAME (run=TestTicket242) go_test_rc=1
+-- NEW-SAME red cases:
+--- FAIL: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- FAIL: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+grep_fail_rc=0
+-- NEW-SAME FAIL reason lines:
+    ticket242_binding_test.go:104: AC#1 RED: a replayed identity produced the same binding digest; the digest stopped covering the fields that make the two items distinct (on this path: the correlation id the queue issued)
+    ticket242_binding_test.go:155: AC#1 RED: two distinct pending items share one binding digest - bindDigest stopped separating cards
+    ticket242_binding_test.go:208: AC#1 RED: two bind digests identical in every field except the sequence number came out equal - seq is not folded into bindDigest, so a replayed correlation id can land on the earlier card's digest
+-- NEW-SAME pass cases:
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+blobcheck NEW-SAME internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck NEW-SAME internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-SAME internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-ME (run=TestTicket242) go_test_rc=1
+-- NEW-ME red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+grep_fail_rc=0
+-- NEW-ME FAIL reason lines:
+    ticket242_binding_test.go:46: AC#1 RED: the rejected nonce was still spendable afterwards - single-use was broken by the forged attempt
+    ticket242_binding_test.go:193: AC#1 RED: a value that was never issued on A returned none instead of spent-or-never-live-nonce - this case can no longer tell "bound to the wrong card" from "no such proof", so the denial it names is not evidence
+-- NEW-ME pass cases:
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+blobcheck NEW-ME internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck NEW-ME internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-ME internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+harness done

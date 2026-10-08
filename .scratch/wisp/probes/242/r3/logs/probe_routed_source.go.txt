@@ -1,0 +1,84 @@
+package approval
+
+// 242-r3 THROWAWAY PROBE, injected from outside the repo with `go test -overlay`
+// (so nothing is ever written into internal/agent/approval/ except the one test
+// file this leg owns). It is NOT a shipped ruler and it is not part of the
+// package: it answers one question that ticket 242 AC#1's literal vehicle asks
+// and that production today can only answer with a comment -
+// what denial does a ROUTED cross-card spend actually report?
+//
+// Ticket 242 AC#1 (issue file line 18) names Native().Allow(B的corr, A的grant)
+// and demands 拒因指名"绑定不对". Queue.allow is that route (cmd/wisp's
+// Native().Allow wraps it). This probe mints a genuinely live grant on A, both
+// cards pending, and presents it on B's correlation id.
+
+import (
+	"fmt"
+	"strings"
+	"sync"
+	"testing"
+
+	"github.com/CarlosShao/wisp/internal/tools"
+)
+
+func TestTicket242R3ProbeRoutedCrossCardDenial(t *testing.T) {
+	var mu sync.Mutex
+	var lines []string
+	logf := func(format string, args ...any) {
+		mu.Lock()
+		defer mu.Unlock()
+		lines = append(lines, fmt.Sprintf(format, args...))
+	}
+	q := NewQueue(0, 0, 0, logf)
+	itA, err := q.push(tools.Decision{
+		Tool: "shell.run", TaskID: "task-1", Args: []byte(`{"cmd":"a"}`),
+		Level: 2, Paths: []string{"C:/tmp/a"},
+	})
+	if err != nil {
+		t.Fatalf("probe enqueue A: %v", err)
+	}
+	itB, err := q.push(tools.Decision{
+		Tool: "fs.write", TaskID: "task-2", Args: []byte(`{"path":"b"}`),
+		Level: 2, Paths: []string{"C:/tmp/b"},
+	})
+	if err != nil {
+		t.Fatalf("probe enqueue B: %v", err)
+	}
+	nonceA, err := q.grantNonce(itA)
+	if err != nil {
+		t.Fatalf("probe mint A grant: %v", err)
+	}
+	t.Logf("PROBE depth=%d corrA=%s corrB=%s bindA==bindB=%v liveA=%d liveB=%d",
+		q.Depth(), itA.Corr, itB.Corr, itA.bind == itB.bind, itA.grants.live(), itB.grants.live())
+
+	err = q.allow(itB.Corr, nonceA)
+	t.Logf("PROBE routed cross-card allow(B.corr, A's live nonce) err=%v err==ErrBadGrant=%v", err, err == ErrBadGrant)
+
+	audit := func() []string {
+		mu.Lock()
+		defer mu.Unlock()
+		var out []string
+		for _, l := range lines {
+			if strings.Contains(l, "GRANT-DENY") {
+				out = append(out, l)
+			}
+		}
+		return out
+	}
+	for _, l := range audit() {
+		t.Logf("PROBE audit line: %s", l)
+	}
+
+	// Same store, hand-written mismatch: what denial does the store itself name?
+	d := itA.grants.spend("whatever", itB.bind)
+	t.Logf("PROBE store spend of a value not live on A => %s", d.label())
+	itA2, _ := q.push(tools.Decision{
+		Tool: "shell.run", TaskID: "task-1", Args: []byte(`{"cmd":"a"}`),
+		Level: 2, Paths: []string{"C:/tmp/a"},
+	})
+	n2, err := q.grantNonce(itA2)
+	if err != nil {
+		t.Fatalf("probe mint: %v", err)
+	}
+	t.Logf("PROBE store spend of a live nonce against another card's digest => %s", itA2.grants.spend(n2, itB.bind).label())
+}

@@ -1,0 +1,137 @@
+OLD copy lines: 120 (the new file is 216 lines)
+418:	for _, s := range []string{corr, taskID, tool, level, strconv.FormatUint(0, 10)} {
+== MUTATION OLD2-plain (run=TestTicket242) go_test_rc=0
+-- OLD2-plain red cases:
+grep_fail_rc=1
+-- OLD2-plain FAIL reason lines:
+-- OLD2-plain pass cases:
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+-- OLD2-plain overlay sanity: the seq ruler must be ABSENT from an OLD-file run and PRESENT otherwise
+0
+blobcheck OLD2-plain internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck OLD2-plain internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck OLD2-plain internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION OLD2-MA (run=TestTicket242) go_test_rc=1
+-- OLD2-MA red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+grep_fail_rc=0
+-- OLD2-MA FAIL reason lines:
+    ticket242_binding_test.go:31: AC#1 RED: a grant bound to item one was spent with item two's digest - the binding layer did not reject the forged binding
+    ticket242_binding_test.go:48: AC#1 RED: empty binding spent a live grant
+-- OLD2-MA pass cases:
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+-- OLD2-MA overlay sanity: the seq ruler must be ABSENT from an OLD-file run and PRESENT otherwise
+0
+blobcheck OLD2-MA internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck OLD2-MA internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck OLD2-MA internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-MD3b (run=TestTicket242) go_test_rc=1
+-- NEW-MD3b red cases:
+--- FAIL: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+grep_fail_rc=0
+-- NEW-MD3b FAIL reason lines:
+    ticket242_binding_test.go:208: AC#1 RED: two bind digests identical in every field except the sequence number came out equal - seq is not folded into bindDigest, so a replayed correlation id can land on the earlier card's digest
+-- NEW-MD3b pass cases:
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+-- NEW-MD3b overlay sanity: the seq ruler must be ABSENT from an OLD-file run and PRESENT otherwise
+2
+blobcheck NEW-MD3b internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck NEW-MD3b internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-MD3b internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+== MUTATION NEW-MD3b-FULL (run=ALL) go_test_rc=1
+-- NEW-MD3b-FULL red cases:
+--- FAIL: TestTicket242BindDigestSeparatesItemsBySequenceNumber (0.00s)
+grep_fail_rc=0
+-- NEW-MD3b-FULL FAIL reason lines:
+    ticket242_binding_test.go:208: AC#1 RED: two bind digests identical in every field except the sequence number came out equal - seq is not folded into bindDigest, so a replayed correlation id can land on the earlier card's digest
+-- NEW-MD3b-FULL pass cases:
+--- PASS: TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem (0.00s)
+--- PASS: TestLiveApprovalsSkipsRowsThatAreNotPending (0.00s)
+--- PASS: TestLiveApprovalsOnNilQueueIsNil (0.00s)
+--- PASS: TestReplySeamWaitingStateNamesTheTwoD43Rows (0.00s)
+--- PASS: TestReplySeamCarriesNoAllowWithoutAGrant (0.00s)
+--- PASS: TestWideningRuleReadsOneLineOffTheCard (0.00s)
+--- PASS: TestLiveApprovalsSharesNoReferenceSlotWithTheQueue (0.00s)
+--- PASS: TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord (0.00s)
+--- PASS: TestLiveL1WindowsSeesAWindowInTheLoop (0.00s)
+--- PASS: TestReadingL1WindowsMovesNoGateState (0.00s)
+--- PASS: TestL1WindowIsPlainDataWithNoRouteToAnAnswer (0.00s)
+--- PASS: TestStartedCallsAreNotReportedAsWaiting (0.00s)
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+--- PASS: TestTicket259R1DenialNamesMissingNonce (0.00s)
+--- PASS: TestTicket259R1DenialNamesSpentOrNeverLiveNonce (0.00s)
+--- PASS: TestTicket259R1DenialNamesMisbound (0.00s)
+--- PASS: TestTicket259R1DenialNamesCardNotPending (0.00s)
+--- PASS: TestTicket259R1FourDenialLabelsArePairwiseDistinct (0.00s)
+--- PASS: TestTicket259R1OutwardAnswerStaysMergedAcrossDenials (0.00s)
+--- PASS: TestTicket259R1PanelAPIMethodSetIsClosed (0.00s)
+--- PASS: TestTicket259R1PanelCarrierCarriesNoAnswerVerb (0.00s)
+--- PASS: TestTicket259R1PanelItemFieldCapabilityFence (0.00s)
+--- PASS: TestTicket259R1PanelItemCarriesNoCredentialValue (0.00s)
+--- PASS: TestTicket259R1PanelItemProjectionIgnoresGrantState (0.00s)
+--- PASS: TestTicket259R1PanelReadFaceCannotBeLaunderedIntoAnAnswer (0.00s)
+--- PASS: TestBatchAggregatesHomogeneousL1Ops (0.00s)
+--- PASS: TestBatchRefusalsBelowThresholdAndOnSensitiveVerdicts (0.00s)
+--- PASS: TestR7SizedBatchEscalatesToL2Unaggregated (0.00s)
+--- PASS: TestR7SizedBatchThatNobodyAnsweredIsRejectedNotRun (0.00s)
+--- PASS: TestTenOpsInOneToolCallGetOneConfirm (0.07s)
+--- PASS: TestTicket260R4DefaultLabelIsTheOldSentence (0.00s)
+--- PASS: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+--- PASS: TestTicket260R4LabelFollowsTheReaderAcrossAReload (0.00s)
+--- PASS: TestTicket260R4UnloadLineNamesNoKey (0.00s)
+--- PASS: TestTicket260R4SpellingSeamCarriesNoAuthority (0.00s)
+--- PASS: TestTicket260R3EscUnavailableLineNamesNoKey (0.00s)
+--- PASS: TestTicket260R3LoadedCancelLabelIsTheNamedResidual (0.00s)
+--- PASS: TestL2NativeAllowExecutesThroughTheBridge (0.00s)
+--- PASS: TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis (0.00s)
+--- PASS: TestGrantIsSingleUseAndBoundToItsItem (0.00s)
+--- PASS: TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s (0.01s)
+--- PASS: TestReplayRedisplaysUnderAFreshGrant (0.00s)
+--- PASS: TestHostUnreachableAndFullQueueFailClosed (0.00s)
+--- PASS: TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed (0.00s)
+--- PASS: TestTicket224ForgedSessionAnswerRecordsNothing (0.00s)
+--- PASS: TestTicket224SessionAnswerWithoutARecorderSaysTheScopeWasDropped (0.00s)
+--- PASS: TestTicket224RecordingFailureReleasesTheCallButClaimsNoRow (0.00s)
+--- PASS: TestAnUnansweredL2CardResolvesToRejectAtTheQueueDeadline (0.25s)
+--- PASS: TestDefaultQueueDeadlineIsFiniteAtThreeHundredSeconds (0.00s)
+--- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast (0.00s)
+--- PASS: TestAnUnreachablePromptSurfaceIsRefusedImmediatelyNotWaitedOut (0.00s)
+--- PASS: TestAVetoAgainstAnOnScreenL2CardEndsTheWaitNowAndStillRefuses (0.00s)
+--- PASS: TestAVetoNamedByTheHostsOwnKeyStillRefusesThatCard (0.00s)
+--- PASS: TestAnAmbiguousVetoNameIsNotGuessedOnTheRefusalSide (0.00s)
+--- PASS: TestAVetoOnAnUnknownNameLeavesTheCardAllowableByItsOwnGrant (0.00s)
+--- PASS: TestAnAliasCanNeverBuyAnAllow (0.00s)
+--- PASS: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses (0.00s)
+--- PASS: TestL1WindowTimeoutMeansExecute (0.00s)
+--- PASS: TestL1WindowVetoedByEachLoadedChannel (0.00s)
+--- PASS: TestL1WindowUnavailableVoiceChannelIsAnnounced (0.00s)
+--- PASS: TestL1WindowVetoOnForeignCorrelationCannotCancel (0.00s)
+--- PASS: TestL1WindowUnreachableUIFailsClosed (0.00s)
+--- PASS: TestUnadmittedTaskIsRefusedBeforeQueueing (0.00s)
+--- PASS: TestVetoAfterStartYieldsAppliedStepsReport (0.00s)
+--- PASS: TestVetoTravelsBackToTheLoopAsAFailure (0.01s)
+-- NEW-MD3b-FULL overlay sanity: the seq ruler must be ABSENT from an OLD-file run and PRESENT otherwise
+2
+blobcheck NEW-MD3b-FULL internal/agent/approval/approval.go worktree=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 head=67fb146898dc7b235623bb8ad2fac0e0b2465fe1 SAME
+blobcheck NEW-MD3b-FULL internal/agent/approval/queue.go worktree=66fec7ae375344d7bc741270b42c4ec5050cf41f head=66fec7ae375344d7bc741270b42c4ec5050cf41f SAME
+blobcheck NEW-MD3b-FULL internal/agent/approval/ticket242_binding_test.go worktree=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 head=8a7b5d2e9d80675443a98608c1bc7627378ac5a6 SAME
+harness r3b done
