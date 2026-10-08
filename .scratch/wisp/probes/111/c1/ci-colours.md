@@ -52,7 +52,7 @@ rc=0（Q1 全部命令 rc=0）
 
 - 最近 10 发里 `ci` 占 5 发，**5/5 failure**；`slo-fresh` 占 5 发，5/5 success。
 - 再往前扩量核对（同一条尺，`--limit 100`）：**run 206 → 305 共 100 发 `ci`，conclusion 直方图 = `{failure: 100}`，`success: 0`**；窗口 2026-09-23T04:17:52Z 到 2026-10-07T23:44:30Z。⇒ 可读窗口内 `ci` **从未有过一发绿**。
-- 所有 run 的 `headSha` 都 ≤ `cc31526`（= `origin/dev` tip）。**没有任何一发 run 跑在本地未推的 296+ 枚上。**
+- 所有 run 的 `headSha` 都不晚于 `cc31526`（= `origin/dev` tip）。**没有任何一发 run 跑在本地未推的 296+ 枚上。**
 
 rc=0（`gh run list` 第 1 发因 `runNumber`/`actor` 字段名不存在而 rc=1，改正字段后 rc=0；`--workflow ci --limit 20` 一发遇 `dial tcp 198.18.0.19:443 connectex ... failed to respond` rc=1，**重试一发即通 rc=0**，未据首失败下结论）
 
