@@ -1,0 +1,46 @@
+=== 35-r5 opening rulers (2026-10-08 09:28:58+0800) ===
+--- HEAD ---
+daf1f5a0 票 111 111-v1 Q1+Q3+Q4＋裁决件 verdict.md。Q1＝那一步在 test-windows（runs-on windows-latest ci.yml:506）、名 :595/shell bash :630/if !cancelled :631/run :632；该 job 无 needs/无作业级 if（YAML 尺＝0）⇒ 每次 push 到 main/dev＋PR＋cron 都跑得到；前面顺序 cache third_party(:559)→build.ps1(:566/571)→wisp-cli-tests.sh(:573/593) 复量成立；!cancelled 语义具名＝前步红它照答、job 被取消它不跑（concurrency 只在 PR 开 cancel-in-progress ⇒ push dev 走不到取消支）；新步红不会吞掉它下面 8/9/10（三步都带 !cancelled，YAML 逐步列 if）。★本腿推翻两处：写腿注释 ci.yml:616-619"前面的链 stages the cgo deps this package compiles against"＋编排者转述的"要编译 cgo＋sherpa 头"＝**顺序真、依赖假**——-tags winlive 的 286 枚依赖包里只 2 枚含 cgo（runtime/cgo、github.com/k2-fsa/sherpa-onnx-go-windows），后者 -L 指 gopath **模块缓存**不是 third_party；third_party 现量只有 3 枚 dll、全仓 #cgo 0 处、import "C" 0 处；build.ps1:79/:262 的 PATH/CGO_ENABLED **不出进程**（全仓无 GITHUB_ENV/GITHUB_PATH）⇒ 第 5 步喂不到第 7 步，它真需要的只是 bash 默认 PATH 上有 gcc。预测（⛔非已证）＝首跑最可能红在 cgo 工具链而不是 tag；GOOS 已是 windows 只剩 winlive 一维（被我 A/B 对拉钉住）；工具链错位我排除（go.mod go 1.27/toolchain 1.27.1＋setup-go go-version-file＝与本机同版）。**CI success/failure＝判不动，缺推送**（⛔ 没把"yaml 里有这步"读成"跑过"）。Q3＝**找到 1 枚真仪器**：scripts/slo-freshness.sh P1（ci_file 在 :99，全仓唯一把 ci.yml 当数据打开的脚本；它真在 slo-fresh.yml:70 当门）——我把它 :130-172 的 P1 代码块抠出来对真 ci.yml 实跑 rc=0，禁键尺按 slo-full 作业锚定⇒新步在 test-windows 落在射程外；没有步数基线常量（grep steps=/STEP_COUNT/EXPECTED_STEPS＝空，唯一数步数的是 .scratch 探针非门）；runtests.sh 的 --- SKIP 致命门只读 go test 输出而 winlive 在 .github 里只命中 595/597-603/632＝没有任何 test 步带该 tag。两发门现量：d22scan（cd tools/d22scan && go run . -root ../../）rc=0 clean；python yaml.safe_load rc=0＋逐 job 步数 lint13/test-core7/**test-windows10(if-guarded 8)**/slo-smoke6/slo-full5/lint-frontend11 总 52＝写腿"9→10"为真。注释射程核：:605-615 逐字抄进件＝AC#11 ⓒ"只买编译覆盖＋不是票 35 :52/:75(c) 载体"真落了、也没冒充 AC#7/AC#9；★但 :599-600 用**现在时**写"-tags 0 命中/winlive 0 命中"在它自己生效那刻成假话（同文件今天 7/3 命中）＝注释缺陷非牙失效，同类 slo-freshness.sh:156-158 注释仍写 9 枚 if/键在 :537（现量 13/836）。Q4＝**无死格、无谎**：r6 logs 16 枚逐枚 stat 非 0、零枚 .out（不吃 .gitignore:8）、逐件 rc 自落；两枚 5 字节件 od -c 现量＝rc=0\n（go vet 成功零输出，本仓老坑编排者已自记）；evidence.md 搜滑句⇒只在 §5/§6 且全是否定式（:142 明写不把"yaml 里有这步"读成"它跑过"、不自称 AC#11 完成），grep 'ci run|success|green|run id'＝0 命中；ⓐ 由我 Run C 第三次同色复量。★另推翻编排者两句尺：if 尺严格 8 空格与任意空白**都＝13**（:462 always() 现量就是 8 空格，"11/漏 :462"不可复现）；overlay"路径必须正斜杠"过头——真陷阱是裸单反斜杠（我 D2 逐字复现 invalid escape sequence），正确转义的反斜杠键路径 D 照样替换成功。slo-smoke/slo-full/lint-frontend 转述行号 739/797/871 今天＝778/836/910（加步后＋39）。票 111 框数 5 未勾/6 已勾＝与转述一致，本腿未翻任何框；六笔 r6 commit 逐枚 git cat-file -e 存在；自抓两把坏尺入账（go list .CDependencies 模板报错那版件保留未删；D 差点被我误判成空操作、靠 C 掰回）。⛔ 零 push、零开窗、未动别人在飞的 .gitignore 与 design/**。
+full-HEAD=daf1f5a028f274b113db545c0776f6e409796ab9
+branch=dev
+--- porcelain line count (others' work in flight; 35-r5 touches nothing of it) ---
+porcelain-total=756
+porcelain-on-target-two-files:
+porcelain-on-target-count=0
+--- ticket 35 box census (AC#8 present, nothing checked by this leg) ---
+unchecked=8
+checked=2
+--- AC#8 ruler (where the box lives) ---
+286:### 10-08 09:1x 编排者收验收腿 `35-v4`（非实现者，两笔 `1d719434` 起手锚／`cfc9a5ff` 交件，16 发突变**它自己现跑**、名册 12 枚与 `35-r4` 同组可比）⇒ ★**裁定：`:75` 那一框⛔ 不翻**（它自己的判语也是这一句）＋★**新立一框 `AC#8`** 把四件活钉成可派格＋★顶回我转述两处（记我不记腿）
+291:- ①**`:75(c)` 那句"state 〔仅本机可量〕 **on its face**"今天没落地**：按 `A691` 我裁的是"明写＋逐波复跑"那一支，可四要素那句此刻只活在**票面＋台账**里，`cmd/wisp/panel_transport_live_35v2_windows_test.go` 的文件头注释没有（`35-v4` 判不动第 1 条具名说它判不动这格，因为它⛔ 没被允许开窗）。⇒ 立成 `AC#8(iv)`，派单前它自己先现量那枚 grep。
+292:- ②★**第三面＝真面（恒绿）**：把产码那道守卫（`cmd/wisp/panel_host_windows.go:680`）换成真值判断 `!window.wispDispatch` ⇒ **12 全绿**。两支只在"门存在但不可调用"时分岔，而这台尺**没有那种世界**（门唯一构造点是 `Bind` 桩注入的一个 function），可 `:2019-2021` 那句注释自称要防的正是 "not call a **non-function**"⇒ 它今天只证了 `undefined` 那一格。这枚**不在** `35-r4` 自己那份"未建模清单"上（那张列的是 `defineProperty`／descriptor／`configurable`／`delete`／accessor），也**不在** `:75` 框 (a) 支的措辞里 ⇒ 按"AC 声称要防的结局被造出来就退回、不写附条件"的规矩，这框不许勾。⇒ 立成 `AC#8(i)`，并写明反形：换成真值判断时**新那枚用例必须红**。
+294:- ⚠ 与判 2 的分别我具名写清：**前缀共用不塌 (a)**（(a) 要的是"两面各有自己的具名红"，那两枚红名今天唯一、且它用合并文案两形顶过都不串）；它只是**日志可读性**那一层的活 ⇒ 归 `AC#8(ii)`，不算本框退回理由。
+296:**3. 我自己两处错，记我不记腿**：①`AC#8(i)` 第一版把那枚行号写成 `cmd/wisp/panel_transport_35r2_test.go:680`——现量 `sed -n '678,682p'` 那五行逐字是 hook 体，**属产码 `panel_host_windows.go`**，框已改对；⛔ 这条错如果落出去，下一腿会去改错文件。②派单说"台件脚本在 `scripts/`"＝**又踩第 108 条的镜像形**（在 `scripts/` 找不到尺≠仓里没有），真身在 `.scratch/wisp/probes/35/r4/scripts/`；派单说"载具函数在 `:1926`"现量是**`:1921`**（`:1926` 是函数体里那行 `bf := newFakeDoc35r2()`）。其余我给的行号它逐枚复量**全对**。
+300:**5. 排程（据此更新）＋现量框数**：`35-r5`（**只改夹具＋那枚 winlive 测试文件的头注释**，落 `AC#8` 的 (i)(ii)(iii)(iv) 四格）＝**新可派格，但按在 `111-r6` 交件之后**（此刻 `cmd/wisp` 的编译面被那枚 CI 写腿的 `go vet` 读数占着，同机同时写会把它 ⓐ 的读数染色）；其后 `35-v5` 验收。`:63` 那三支**本腿未裁**，归下一枚验收腿。票 35 框数现量：立 `AC#8` **前 7 未勾／2 勾**、**后 8 未勾／2 勾**（尺＝`grep -cE '^[[:space:]]*- \[ \]'` 与 `- \[x\]`），⛔ 不加 `-done`；⛔ 零 push、页面分支不合、`build/wisp.exe` 未还原。
+--- fixture size / winlive size ---
+ 2066 cmd/wisp/panel_transport_35r2_test.go
+  261 cmd/wisp/panel_transport_live_35v2_windows_test.go
+ 2327 total
+--- (ii) ruler BEFORE: shared red-sentence prefix ---
+M-B-RED-count=6
+1980:		t.Fatalf("M-B RED (wrong death): a non-writable chrome.webview.postMessage must refuse the hook's assignment SILENTLY (sloppy mode, no TypeError), but the page's own post threw: %s. %s",
+1984:		t.Fatalf("M-B RED (fixture blind to writability): the hook's assignment to a property this world marks NON-WRITABLE took effect unnoticed - ignoredWrites=%v, want exactly [postMessage]. This is the A684 §3 face this case exists to make bite: without a refused write the yard cannot tell an armed hook from a silently ignored override. %s",
+1992:		t.Fatalf("M-B RED: with the native exit NOT writable the page's letter still reached the Go door (doorRounds=%d routerRuns=%d) - the model let a silently refused override behave like a successful hook. %s",
+1996:		t.Fatalf("M-B RED: an unarmed forwarding must leave the raw envelope to die at msgcb's unbound-method branch (unboundSlots=1, swallowed reply TypeError=1), got unboundSlots=%d evalThrew=%d. %s",
+2048:		t.Fatalf("M-B RED (guard's typeof half gone): with no door in the page the forwarding hook must fall back to the native exit; it instead invoked a non-function and the page's post threw: %s. %s",
+2052:		t.Fatalf("M-B RED: the door-absent fallback re-entered chrome.webview.postMessage past the cap (%s). %s", bf.firstCapMessage(), bf.summary())
+--- (iii) ruler BEFORE: the three browser-fact claims ---
+1284:	// A browser's host method is not a detached function: Chrome and WebView2 answer an
+1939:// now demands cw itself, the way a browser's host method does, so the receiver-less shape
+1954:		t.Fatalf("M-A RED (receiver lost at the native exit): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. A real browser answers that with Illegal invocation and the page's letter never leaves the page, so this hook must not be certified as a delivery. %s",
+--- (iv) ruler BEFORE: machine-local family words in the winlive file header (expect ZERO) ---
+iv-grep-rc=1 (1 = no match, as ticket 35 AC#8(iv) predicts)
+--- production guard, NOT to be edited (overlay target) ---
+680:    if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+prod-blob=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 HEAD-blob=26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+--- fixture door construction point (Bind stub) ---
+94:// libBindStubScript35r2 reproduces webview.go:462's concatenation, including its use of
+97:func libBindStubScript35r2(name string) string {
+1229:func (bf *fakeDoc35r2) Bind(name string, f interface{}) error {
+1231:	bf.registerInit(libBindStubScript35r2(name))
+rc=0
