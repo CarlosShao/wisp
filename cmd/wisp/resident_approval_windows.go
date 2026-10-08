@@ -279,8 +279,9 @@ func (h *residentGrantHolder) bound() bool {
 // One holder, one bind site, and it happens before any task can be submitted -
 // so no card this process shows can be answered while the holder is unbound for
 // a reason nobody named. Re-binding is allowed by construction (last writer
-// wins) but has no production caller; a second assembly in one process belongs
-// to the ⓐ-Ⅲ shape this ruling refused.
+// wins) and has no production caller - the single bind is startResidentTaskSource's
+// (resident_task_source_windows.go:309); a second assembly in one process
+// belongs to the ⓐ-Ⅲ shape this ruling refused.
 func (ra *residentApproval) bindResidentGrantLedger(l *session.Ledger) {
 	ra.grants.bindSessionLedger(l)
 }

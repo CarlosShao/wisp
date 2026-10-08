@@ -6,12 +6,14 @@ package main
 // capability was never absent. internal/config exports the default table
 // (NewDefaults, defaults.go:58 - the `default:"..."` tags in schema.go are the
 // single source, D36 rule 3) and the atomic sealed writer (SaveFile,
-// loader.go:238), and writeguard.go:125-131 already proves a missing file is
+// loader.go:252), and writeguard.go:125-131 already proves a missing file is
 // creatable through them ("writing it creates what first-run did not"). What
-// no production path ever did was CALL that pair once, at the moment a user
-// first asks `wisp run` for work. On a fresh machine the run leg therefore
-// died at run.go's 配置未就绪 branch with exit 2, quoting a missing file as
-// the user's only experience of the product.
+// no production path had done before this file was CALL that pair once, at the
+// moment a user first asks `wisp run` for work: ensureFirstRunConfig below calls
+// config.SaveFile(cfgPath, config.NewDefaults()), reached from the run entry
+// (run.go). Before it, a fresh machine's run leg died at run.go's 配置未就绪
+// branch with exit 2, quoting a missing file as the user's only experience of
+// the product.
 //
 // WHY THIS FILE AND NOT assembleRuntime (编排者裁定 J1, 账 A514): assembleRuntime
 // is the shared assembly root - the resident leg calls it directly
