@@ -1,0 +1,26 @@
+# Q3 载体取证：Handle 的生产调用方 / Audit 的真落盘面
+-- ComposerDispatch 在非 test 产码里的组装点:
+cmd/wisp/panel_inbound.go:271:	return &panel.ComposerDispatch{
+rc=0
+-- 非 test 里对 .Handle( 的调用:
+cmd/wisp/logsink.go:209:	err := t.primary.Handle(ctx, r)
+cmd/wisp/logsink.go:211:		_ = t.mirror.Handle(ctx, r)
+cmd/wisp/panel_host_windows.go:19://     (panel.ComposerDispatch.Handle) and whose return value is the receipt the
+cmd/wisp/panel_host_windows.go:821:	return m.disp.Handle(ctx, raw)
+cmd/wisp/panel_inbound.go:163:		reply, err := disp.Handle(ctx, raw)
+cmd/wisp/panel_inbound.go:286:  panel.ComposerDispatch.Handle 的入向派发腿。-data 是指定的数据根：本腿不解析
+cmd/wisp/panel_resident_windows.go:43:// one cmd/wisp/panel_host_windows.go already binds (panel.ComposerDispatch.Handle
+internal/observe/logging.go:138:	return h.next.Handle(ctx, out)
+internal/observe/logging.go:505:		if err := next.Handle(ctx, r.Clone()); err != nil {
+internal/observe/logging.go:519:			_ = next.Handle(ctx, rec)
+internal/observe/logging.go:574:	_ = t.buf.Handle(ctx, r)
+internal/observe/logging.go:576:		_ = t.mirror.Handle(ctx, r)
+rc=0
+-- Audit 字段的生产接线（非 test）:
+cmd/wisp/panel_inbound.go:253:		Audit:   auditf,
+cmd/wisp/panel_inbound.go:268:		Audit: auditf,
+cmd/wisp/panel_inbound.go:280:		Audit:  auditf,
+cmd/wisp/run.go:679:		Audit: rt.auditf,
+rc=0
+-- 出向推载荷（Eval/PostWebMessage）非 test 计数:
+rc=0

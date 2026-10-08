@@ -1,0 +1,108 @@
+# panel_inbound.go 255-300（生产装配的 Audit/Config 接线）
+	}
+	// Ticket 248 AC#1/AC#3: the settings leg. It writes through the SAME Manager
+	// object as the mode chain above (one truth, no second loader) and through the
+	// one secret store this repository has (internal/secret, DPAPI), so this route
+	// creates no second place a key could live. A store-directory failure is an
+	// assembly failure here, not a degraded settings page that quietly accepts
+	// writes it cannot persist.
+	secrets, err := secret.NewStore(dir)
+	if err != nil {
+		return nil, fmt.Errorf("凭据存储不可用（%s）：%w", dir, err)
+	}
+	configWrites := &panel.ConfigWriteHandler{
+		Store: newConfigStore(mgr, secrets, auditf, actor),
+		Audit: auditf,
+		Actor: actor,
+	}
+	return &panel.ComposerDispatch{
+		Mode: modeWrites,
+		// Untouched by this slice, and refused by name when they arrive:
+		// workspace = ticket 186, attachment = ticket 92, message = ticket 35.
+		Workspace:  nil,
+		Attachment: nil,
+		Message:    nil,
+		// Ticket 248's two settings doors are answered by the leg above.
+		Config: configWrites,
+		Audit:  auditf,
+	}, nil
+}
+
+const panelInboundUsage = `用法：wisp panel-inbound -data <目录>
+  从 stdin 逐行读入面板 composer 的原始封套（每行一枚 JSON），交进
+  panel.ComposerDispatch.Handle 的入向派发腿。-data 是指定的数据根：本腿不解析
+  数据根，缺它就按票 128 AC#2 的形状拒绝（不写任何文件）。
+  退码：2=装配未完成，1=有请求被拒，0=全部受理。`
+
+// parsePanelInboundFlags takes the one flag this leg has. Manual because the
+// package's other legs read argv the same way and a flag.FlagSet would write
+// usage text this gate's census cannot find.
+func parsePanelInboundFlags(args []string, preset string) (dir string, bad string) {
+	dir = preset
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "-data":
+			if i+1 >= len(args) {
+				return "", "-data 需要一个目录参数"
+			}
+
+# panel_inbound.go 140-175（收到 raw 到 Handle 的那一跳）
+	// the handler's MODE-REFUSED lines come out of the same function, so the two
+	// cannot drift into two formats that a reader has to reconcile by eye.
+	auditf := func(format string, args ...any) {
+		fmt.Fprintln(s.stderr, "[audit] "+fmt.Sprintf(format, args...))
+	}
+
+	disp, err := newPanelInboundDispatch(dir, auditf)
+	if err != nil {
+		fmt.Fprintf(s.stderr, "wisp panel-inbound: 入向装配未完成（Unconfigured）：%v\n", err)
+		return 2
+	}
+
+	ctx := context.Background()
+	sc := bufio.NewScanner(s.stdin)
+	sc.Buffer(make([]byte, 0, 64*1024), panelInboundMaxLine)
+
+	var arrived, accepted, refused int
+	for lineNo := 0; sc.Scan(); lineNo++ {
+		raw := strings.TrimSpace(sc.Text())
+		if raw == "" {
+			continue
+		}
+		arrived++
+		reply, err := disp.Handle(ctx, raw)
+		if err != nil {
+			refused++
+			// The sentence is Handle's, not a paraphrase of it: what the user is
+			// told and what the audit recorded are then the same string, which is
+			// the property a reader of a refusal actually wants.
+			fmt.Fprintf(s.stdout, "wisp panel-inbound: 第 %d 行被拒绝：%s\n", lineNo+1, reply)
+			continue
+		}
+		accepted++
+		// An accepted request returns no text on purpose for the four doors slice A
+		// shipped (the router must not become the second voice in the room), so the
+		// receipt line below is this leg's own and says exactly which hop happened.
+
+# audit 函数在生产里去哪（slog/文件？）
+51://     registered nail; the honest, smaller step is to keep the audit on stderr
+52://     here (the "[audit]" family, same prefix rt.auditf uses) and let the sink
+82:// two origins the audit exists to tell apart.
+139:	// One audit sink for both halves of the hop: the router's refusal lines and
+142:	auditf := func(format string, args ...any) {
+143:		fmt.Fprintln(s.stderr, "[audit] "+fmt.Sprintf(format, args...))
+146:	disp, err := newPanelInboundDispatch(dir, auditf)
+167:			// told and what the audit recorded are then the same string, which is
+209:func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.ComposerDispatch, error) {
+218:	auditf("%s", hotReloadDisabledPanelInbound)
+219:	return newComposerDispatchChain(dir, auditf, panelInboundActor)
+223:// newPanelInboundDispatch, with the audit actor as a parameter. The actor is not
+224:// decoration: the MODE-SWITCH audit line names whoever asked, so a chain built for
+228:func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string) (*panel.ComposerDispatch, error) {
+243:		Logf:    auditf,
+253:		Audit:   auditf,
+267:		Store: newConfigStore(mgr, secrets, auditf, actor),
+268:		Audit: auditf,
+280:		Audit:  auditf,
+
+[sed 只读取证 cmd/wisp/panel_inbound.go] rc=0

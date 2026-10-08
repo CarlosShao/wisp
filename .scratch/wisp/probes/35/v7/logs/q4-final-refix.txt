@@ -1,0 +1,14 @@
+# 收尾复跑（因 11:52 那次 vet 瞬时 rc=1 而重跑全套，输出全部落件）
+## go vet ./internal/panel/
+vet_rc=0 (输出见 q4-vet.txt，字节 9)
+## go test ./internal/panel/ -count=1
+test_rc=1
+name-diff rc=0 (0＝新增红 0)
+## hash 复对
+internal/panel/inbound_raw_leak_35r7_test.go same=YES
+internal/panel/config_handlers.go same=YES
+internal/panel/composer_dispatch.go same=YES
+## 收尾 porcelain（禁区）
+porc rc=0
+## HEAD
+1b8f9c4d430929dea2f3ae5321e0a9bb8389139b

@@ -1,0 +1,8 @@
+# go vet 自证件（vet 成功＝零输出，故把 rc 与零输出一起落名）
+
+- 11:47 首发：`go vet ./internal/panel/` → **rc=0**，raw 输出 0 字节（件 `q4-vet.txt` 当时为空）。
+- 11:52 复跑（q4-vet-attest 初版）：`go vet ./internal/panel/ > /dev/null 2>&1; echo rc=$?` → **瞬时 rc=1**。
+  ⚠ 那一发把输出重定向进了 /dev/null＝本腿自己踩了「门禁件必须自带输出」的坑，**无红句可查**，故不能归因。
+  同刻 `git status --porcelain -- internal/panel cmd/wisp` 未取，共享工作树里此刻很可能正有别的腿在写这两包（收尾 11:54 复跑时脏面已空）。
+- 11:53 复跑（见 `q4-final-refix.txt`）：同一命令 → **rc=0**，raw 输出＝9 字节（那 9 字节是本腿自己追加的 `vet rc=0` 行，命令本体输出仍为 0 字节）。
+- 结论：**vet 面以 rc=0 计**，瞬时 rc=1 具名留在本件，不当绿也不当红账（不归 35-r7 账：35-r7 的件是测试文件，vet 对该文件同刻通过）。

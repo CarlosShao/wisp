@@ -6,3 +6,4 @@ Date:   Thu Oct 8 11:31:15 2026 +0800
 
  internal/panel/inbound_raw_leak_35r7_test.go | 278 +++++++++++++++++++++++++++
  1 file changed, 278 insertions(+)
+[go show --stat 6038531c] rc=0

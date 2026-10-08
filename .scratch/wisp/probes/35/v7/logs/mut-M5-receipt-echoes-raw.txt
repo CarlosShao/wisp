@@ -1,0 +1,6 @@
+$ go test -overlay D:/tmp/wisp35v7/mut\M5-receipt-echoes-raw.json -count=1 -v -run 35r7 ./internal/panel/
+
+
+[rc=1]
+
+[本腿注：首发件因 python gbk 解码崩掉输出（仅剩 115 字节的空壳），已被 mut-M5-cred-receipt-echoes-raw.txt 取代；保留不删（issues/README 规则 8）]

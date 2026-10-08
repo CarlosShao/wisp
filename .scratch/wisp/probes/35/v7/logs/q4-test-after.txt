@@ -1,4 +1,4 @@
-time=2026-10-08T11:43:50.039+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-08T11:48:57.394+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
 --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
     approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
     approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
@@ -13,7 +13,7 @@ time=2026-10-08T11:43:50.039+08:00 level=INFO msg="winsec: sealing path resolver
     composer_test.go:79: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
     composer_test.go:79: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
     composer_test.go:79: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
---- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.07s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.06s)
     frontend_hygiene_test.go:216: a second style source appeared in code the bundle actually ships:
           frontend/src/components/harness/right-rail.tsx:89: diff: [{ sign: "+", text: "  --page: #fafafb;  /* beautiful-ui 主题收编 */" }],
         Add or reference a C21 token in design/assets/tokens.css instead.
@@ -21,7 +21,7 @@ time=2026-10-08T11:43:50.039+08:00 level=INFO msg="winsec: sealing path resolver
 --- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
     tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.
 FAIL
-FAIL	github.com/CarlosShao/wisp/internal/panel	1.935s
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.721s
 FAIL
 
-[go test ./internal/panel/ -count=1 起手基线] rc=1（既有红 4 枚）
+[go test ./internal/panel/ -count=1 收尾] rc=1（同名 4 枚，新增红 0）

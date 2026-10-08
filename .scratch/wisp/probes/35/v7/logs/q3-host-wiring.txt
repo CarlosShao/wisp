@@ -1,0 +1,38 @@
+# host 装配的 Audit 去向 + Handle 回值的页面可见性（只读取证）
+	}); err != nil {
+		return err
+	}
+	w.Init(panelPostMessageForwardInit)
+	return nil
+}
+
+// dispatchRaw runs one page envelope through the router. Kept separate from the
+// bind closure so a test can call the same code path the page reaches.
+func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, error) {
+	if m.disp == nil {
+		return "panel host: no inbound router attached", fmt.Errorf("panel host: nil router")
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	return m.disp.Handle(ctx, raw)
+}
+
+// firstRoundTripLocked drives one JS -> Go cycle and returns its duration, pumping
+// the thread's queue until the Go side sees the probe binding or a monotonic
+// deadline passes (a bounded wait, not a wall-clock timeout).
+//
+// What this proves and what it does NOT (orchestrator ruling P2, 10-01 13:12):
+// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+// body of the binding, which happens before any reply has to travel back, so this
+
+grep_rc=0
+
+# 6038531c 是否 HEAD 祖先
+ancestor_rc=0 (0=是)
+# HEAD 现量
+0c9726f9de51a244e30fedec163bce899edd838e
+# 引入提交的父提交是否含产码（git show --name-only）
+COMMIT=35-r7: 票35 :52「No secret leakage」残差①仪器——入向 raw 的凭据形状不许进本跳产出的任何落盘面（audit/receipt/error 三面五路由），判定尺镜像票248原尺并钉防漂；零产码改动、零新名
+
+internal/panel/inbound_raw_leak_35r7_test.go

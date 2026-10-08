@@ -1,0 +1,30 @@
+# Q4 逐名作差（基线 vs 现跑）
+baseline FAIL names:
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+--- FAIL: TestC21DesignTokensFourWayAgree
+rc_of_grep=0
+
+after FAIL names:
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+--- FAIL: TestC21DesignTokensFourWayAgree
+
+diff_rc=0 (0＝新增红 0 枚)
+
+after 包尾:
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.721s
+FAIL
+
+# 还原自证：被 overlay 的三枚 现 hash vs HEAD blob
+internal/panel/inbound_raw_leak_35r7_test.go wt=d6b225799c98f396a539f6c3a33ce816ab378c8d head=d6b225799c98f396a539f6c3a33ce816ab378c8d same=YES
+internal/panel/config_handlers.go wt=19445546ea1267b15101018d17d464f91a265472 head=19445546ea1267b15101018d17d464f91a265472 same=YES
+internal/panel/composer_dispatch.go wt=1757a487d672897a8e59d221fc613912a48790cf head=1757a487d672897a8e59d221fc613912a48790cf same=YES
+
+# 禁区收尾态
+porcelain_rc=0
+wc -l 全仓 porcelain:
+771

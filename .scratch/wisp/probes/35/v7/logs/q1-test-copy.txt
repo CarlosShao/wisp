@@ -276,3 +276,5 @@ func TestDecisionRulesMirrorTicket248Ruler35r7(t *testing.T) {
 			strings.Count(body, "regexp.MustCompile"))
 	}
 }
+
+[cp internal/panel/... -> 本件] rc=0；源文件 git hash-object=wc 行数见 q1-anchors.txt

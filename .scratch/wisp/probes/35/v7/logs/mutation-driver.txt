@@ -1,0 +1,120 @@
+# 突变驱动脚本（本腿自建，overlay 全在仓外 D:/tmp/wisp35v7/mut）
+## drive.py（M0/M1 首发/M2/M3/M4a/M4b/M5/M6）
+import json, os, subprocess
+
+REPO = "D:/work/workspace/projects plans/Wisp"
+MUT = "D:/tmp/wisp35v7/mut"
+LOGS = REPO + "/.scratch/wisp/probes/35/v7/logs"
+os.makedirs(MUT, exist_ok=True)
+
+TEST = "internal/panel/inbound_raw_leak_35r7_test.go"
+CFG = "internal/panel/config_handlers.go"
+DISP = "internal/panel/composer_dispatch.go"
+ALL35 = ("TestInboundRawCredentialShapeReachesNoArtifact35r7|TestInboundLeakRulerFires"
+         "OnPlantedShapes35r7|TestLegalPanelTrafficIsStillWritten35r7|TestDecisionRules"
+         "MirrorTicket248Ruler35r7")
+
+def src(p):
+    with open(os.path.join(REPO, p), encoding="utf-8") as f:
+        return f.read()
+
+def rep1(text, old, new):
+    n = text.count(old)
+    if n != 1:
+        raise SystemExit("PATTERN COUNT %d for %r" % (n, old[:70]))
+    return text.replace(old, new)
+
+def ret_after(text, anchor):
+    """flip the first 'return err' following anchor to 'return nil'"""
+    i = text.index(anchor)
+    j = text.index("return err", i)
+    return text[:j] + "return nil" + text[j + len("return err"):]
+
+def run(name, files, runfilter=None, extra=()):
+    rep = {}
+    for i, (rel, text) in enumerate(files):
+        mp = os.path.join(MUT, "%s_%d_%s" % (name, i, os.path.basename(rel)))
+        with open(mp, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
+        rep[REPO + "/" + rel] = mp
+    cmd = ["go", "test"]
+    if rep:
+        oj = os.path.join(MUT, "%s.json" % name)
+        with open(oj, "w", encoding="utf-8") as f:
+            json.dump({"Replace": rep}, f)
+        cmd += ["-overlay", oj]
+    cmd += ["-count=1", "-v"]
+    if runfilter:
+        cmd += ["-run", runfilter]
+    cmd += list(extra) + ["./internal/panel/"]
+    p = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True)
+    out = (p.stdout or "") + (p.stderr or "")
+    with open(os.path.join(LOGS, "mut-%s.txt" % name), "w", encoding="utf-8", newline="\n") as f:
+        f.write("$ " + " ".join(cmd) + "\n\n" + out + "\n[rc=%d]\n" % p.returncode)
+    fails = sorted(set(l.split("FAIL: ")[1].split(" ")[0]
+                       for l in out.splitlines() if "FAIL: " in l and l.strip().startswith("--- FAIL")))
+    print("%-22s rc=%d fails=%s" % (name, p.returncode, ",".join(fails) or "(none)"))
+
+t, c, d = src(TEST), src(CFG), src(DISP)
+
+run("M0-baseline", [], ALL35)
+run("M1-ruler-blind", [(TEST, rep1(t, "if re.Find(b) != nil {", "if false {"))], "35r7")
+run("M2-rule-drift-1char", [(TEST, rep1(t, "sk-[A-Za-z0-9]{12,}", "sk-[A-Za-z0-9]{11,}"))], "35r7")
+run("M3-reply-guard-removed", [(TEST, rep1(t, 'if reply != "" {', "if true {"))], "35r7")
+run("M4a-raw-swallowed", [(CFG, rep1(c, "h.Store.StoreCredential(ctx, raw)", 'h.Store.StoreCredential(ctx, "")'))], "35r7")
+run("M4b-leg-never-called", [(CFG, rep1(c, "res, err := h.Store.StoreCredential(ctx, raw)",
+                                        "res, err := SettingWriteResult{}, error(nil)"))], "35r7")
+run("M5-receipt-echoes-raw", [(CFG, rep1(c, "return renderCredentialReceipt(res), nil",
+                                         'return renderCredentialReceipt(res) + " " + raw, nil'))], "35r7")
+m6 = ret_after(d, "名册与派发表不一致")
+m6 = ret_after(m6, "的处理器未接入")
+run("M6-refusals-say-success", [(DISP, m6)], "35r7")
+
+## drive2.py（M1 修正版/M5 修正版/M7）
+import json, os, subprocess
+
+REPO = "D:/work/workspace/projects plans/Wisp"
+MUT = "D:/tmp/wisp35v7/mut"
+LOGS = REPO + "/.scratch/wisp/probes/35/v7/logs"
+TEST = "internal/panel/inbound_raw_leak_35r7_test.go"
+CFG = "internal/panel/config_handlers.go"
+
+def src(p):
+    with open(os.path.join(REPO, p), encoding="utf-8") as f:
+        return f.read()
+
+def rep1(text, old, new):
+    n = text.count(old)
+    if n != 1:
+        raise SystemExit("PATTERN COUNT %d for %r" % (n, old[:70]))
+    return text.replace(old, new)
+
+def run(name, files):
+    rep = {}
+    for i, (rel, text) in enumerate(files):
+        mp = os.path.join(MUT, "%s_%d_%s" % (name, i, os.path.basename(rel)))
+        with open(mp, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
+        rep[REPO + "/" + rel] = mp
+    oj = os.path.join(MUT, "%s.json" % name)
+    with open(oj, "w", encoding="utf-8") as f:
+        json.dump({"Replace": rep}, f)
+    cmd = ["go", "test", "-overlay", oj.replace("/", "\\"), "-count=1", "-v",
+           "-run", "35r7", "./internal/panel/"]
+    p = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    out = (p.stdout or "") + (p.stderr or "")
+    with open(os.path.join(LOGS, "mut-%s.txt" % name), "w", encoding="utf-8", newline="\n") as f:
+        f.write("$ " + " ".join(cmd) + "\n\n" + out + "\n[rc=%d]\n" % p.returncode)
+    fails = sorted(set(l.split("FAIL: ")[1].split(" ")[0]
+                       for l in out.splitlines() if l.strip().startswith("--- FAIL")))
+    print("%-28s rc=%d fails=%s" % (name, p.returncode, ",".join(fails) or "(none)"))
+
+t, c = src(TEST), src(CFG)
+run("M1-ruler-blind", [(TEST, rep1(t, "if re.Find(b) != nil {", "if re.Find(b) != nil && false {"))])
+run("M5-cred-receipt-echoes-raw", [(CFG, rep1(c, "return renderCredentialReceipt(res), nil",
+                                              'return renderCredentialReceipt(res) + " " + raw, nil'))])
+run("M7-plain-receipt-echoes-value", [(CFG, rep1(c, "return renderSettingReceipt(res), nil",
+                                                 'return renderSettingReceipt(res) + " " + value, nil'))])
+
+[cat 驱动脚本] rc=0
