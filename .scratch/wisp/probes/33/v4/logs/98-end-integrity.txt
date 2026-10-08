@@ -1,0 +1,33 @@
+=== 33-v4 end-of-leg integrity: my commits own nothing outside my evidence dir ===
+--- 162844be
+
+ .scratch/wisp/probes/33/v4/00-anchor.md | 144 ++++++++++++++++++++++++++++++++
+ .scratch/wisp/probes/33/v4/QODER.md     |  11 +++
+ 2 files changed, 155 insertions(+)
+paths outside probes/33/v4 = 0
+--- 58e0d687
+
+ .../wisp/probes/33/v4/logs/01-product-diff-raw.txt |  75 ++++++
+ .../wisp/probes/33/v4/logs/02-before-bringup.txt   | 118 ++++++++++
+ .../33/v4/logs/03-after-bringup-and-helper.txt     |  44 ++++
+ .../probes/33/v4/logs/04-before-statements.txt     |  40 ++++
+ .../wisp/probes/33/v4/logs/05-after-statements.txt |  44 ++++
+paths outside probes/33/v4 = 0
+--- 8d6190ca
+
+ .scratch/wisp/probes/33/v4/verdict.md | 304 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 304 insertions(+)
+paths outside probes/33/v4 = 0
+rc=0
+
+=== audited tracked files: start hash vs now vs HEAD ===
+1f9060dfff33cffab1317e5f653e1a95f9678e97 | 1f9060dfff33cffab1317e5f653e1a95f9678e97 | cmd/wisp/panel_host_windows.go
+9b9b27478fcae98841f4d202bce0794bc3c97e8a | 9b9b27478fcae98841f4d202bce0794bc3c97e8a | cmd/wisp/panel_pageover_33r10_windows_test.go
+a77866624accf3ddef867b619e873d12e8c7f1f6 | a77866624accf3ddef867b619e873d12e8c7f1f6 | .scratch/wisp/probes/33/r10/impl.md
+83e2e7222f17c041f42c9a0b3be69b0fbc0980b8 | 83e2e7222f17c041f42c9a0b3be69b0fbc0980b8 | .scratch/wisp/issues/33-panel-host-c27.md
+
+=== in-flight files that were already dirty at my start (NOT mine): the anchor census names them (.gitignore / design/** / probes/161/**); they are untouched by my three commits per the count above ===
+
+=== box census ruler, unchanged through my run ===
+unchecked=13 checked=1
+rc=0
