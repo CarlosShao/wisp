@@ -1,0 +1,73 @@
+# 255-a2 尺面原件（每把尺自落一行 rc=N；HEAD 现量 5738661，工作树 cmd/wisp 与 internal/config 我零写入）
+
+## R1 面板宿主里的改尺寸调用（复核派单那句"一个都没有"）
+尺：grep -n "panelWidthPx\|panelHeightPx\|MoveWindow\|SetWindowPos\|SetBounds" 全仓 --include=*.go
+panel_host_windows.go 命中：:81 注释 / :89 / :90 常量 / :179 注释 / :234 注释 / :237 使用 = 真调用 0 枚，rc=0
+全仓 SetWindowPos 真调用（非面板宿主）：internal/ball/win32_windows.go:38 定义、ball_windows.go:600、monitors_windows.go:97、
+  cmd/balldebug/shot_windows.go:35/:145（球窗 debugMoveWindow）、cmd/wisp/testdata/esclistener/main.go:69/:229、
+  库内 webview.go:428。rc=0
+
+## R2 库侧接口真名（先读接口层再读实现层，防假阴性）
+尺：grep -rn -A40 "^type WebView interface" <modcache>/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/*.go
+common.go:26 接口 / :39 Dispatch(f func()) / :47 Window() unsafe.Pointer / :54 SetSize(w,h int,hint Hint)。rc=0
+尺：grep -rn "SetSize\|MoveWindow\|SetWindowPos\|Dispatch(" 该库 --include=*.go（排 test）
+webview.go:405 SetSize 实现 / :427 AdjustWindowRect / :428 SetWindowPos / :431 browser.Resize / :443 Dispatch 实现 / :447 PostThreadMessageW(mainthread, WMApp)。rc=0
+（注：该库没有名为 MoveWindow 的符号——尺面是 0 命中，⛔ 不是"没有改尺寸能力"，改尺寸在 SetSize 内部。）
+
+## R3 DPI 换算的存在性（顶回派单转述）
+尺：grep -rn "DPI\|dpi\|GetDpiForWindow\|scaleFactor\|LogicalToPhysical\|dpiscale" --include=*.go cmd/ internal/config/ internal/panel/（排 *_test.go）
+唯一命中 internal/config/schema.go:547 是一行注释。rc=0
+尺：grep -rn "\.Scale\b" --include=*.go cmd/ internal/（排 *_test.go）
+唯一命中 internal/agent/budgets.go:94（非 PanelSection 的 Scale）。⇒ PanelSection.Scale 非测试读者 0 枚。rc=0
+
+## R4 回线程的现成机制
+尺：grep -n "func (rp \*residentPanel) post" -A22 cmd/wisp/panel_resident_windows.go
+:347 post / :356 wRef!=nil 分支 / :358 w.Dispatch(fn) / :362 rp.tasks 路 / :366 failedPost。rc=0
+既有同形用户：:450 RequestDispose→Destroy、:482 stop→terminateOnThisThread。rc=0
+锁线程唯一处：:262 runtime.LockOSThread()；STA 初始化 :264；库泵 :299 w.Run()。rc=0
+
+## R5 热加载射程
+尺：grep -rn "startConfigReload\|reloadOnce" --include=*.go cmd/wisp/*.go（排 test）= 4 命中：config_reload.go:101/:105、run.go:813。rc=0
+尺：grep -rn "startConfigReload\|reloadOnce" --include=*.go cmd/wisp/resident*.go = 0 命中（常驻腿不 tick）。rc=1（空）
+尺：grep -rn "CheckAndReload" --include=*.go cmd/ internal/（排 *_test.go）= 非测试调用者：cmd/balldebug/main.go:243、cmd/wisp/config_reload.go:153。rc=0
+OnReload 非测试赋值点：cmd/balldebug/main.go:244（1 枚）。manager.go:54 声明、:198 触发条件 len(rep.Reload)>0。rc=0
+[panel] 档位：internal/config/tiers.go:34 "panel": "hot"。rc=0
+
+## R6 RequestDispose 的非测试调用者（复核 10-08 那枚只读腿）
+尺：grep -rn "RequestDispose" --include=*.go cmd internal = 2 命中，逐枚是 panel_resident_windows.go:439 注释与 :442 定义本体 ⇒ 调用者 0 枚。rc=0
+⚠ 本腿尺面只覆盖 cmd 与 internal（派单给的显式根），tools/ scripts/ 未穷举。
+
+## R7 无窗仪器的接缝（假控件已满足全接口）
+尺：grep -n "func (.*docSink33r10)" cmd/wisp/panel_pageover_33r10_windows_test.go = 14 枚方法。rc=0
+其中 :123 Dispatch(f func())、:130 SetSize(w,h int,hint webview2.Hint) 空体；注入点 :154 m.w = c。rc=0
+尺：grep -rln "webview2.WebView\b" --include=*_test.go cmd/wisp = 2 文件（pageover_33r10、panel_transport_live_35v2）。rc=0
+既有 AST 钉：cmd/wisp/panel_geometry_255_test.go:227 找 NewWithOptions、:239 要求恰好 1 枚、:266 要求 WindowOptions 由 windowOptions() 喂、:279 不许漂回字面量。rc=0
+
+## R8 winlive 家族（本机量那一族的载体）
+尺：grep -rln "go:build.*winlive" --include=*.go cmd internal = 12 枚。rc=0
+cmd/wisp/panel_geometry_255_winlive_test.go
+cmd/wisp/panel_host_windows_live_test.go
+cmd/wisp/panel_transport_live_35v2_windows_test.go
+cmd/wisp/resident_approval_live_246_windows_test.go
+cmd/wisp/resident_ball_live_228_windows_test.go
+cmd/wisp/resident_hotkey_live_258_windows_test.go
+cmd/wisp/resident_task_source_live_246_windows_test.go
+internal/ball/hotkey_cancel_borrow_live_260_test.go
+internal/ball/hotkey_live_test.go
+internal/ball/interaction_live_test.go
+internal/ball/live_guard_windows_test.go
+internal/ball/live_windows_test.go
+真窗几何现例（⛔ 未执行、只读码）：panel_geometry_255_winlive_test.go:48/:57 GetWindowRect、:173 t.Logf 五联读数、:169-171 scale 反推、:181 reads!=2 数几何源读取次数。rc=0
+
+## R9 入站白名单（面板侧写/批准面的尺）
+尺：grep -n "Method[A-Za-z]* *= \"" internal/panel/bridge.go
+:42 panel.mode.request / :43 panel.workspace.request / :44 panel.attachment.add / :45 panel.message.send / :66 config.get / :67 config.set = 6 枚，⛔ 零枚几何/resize。rc=0
+
+## R10 同批撞钉（落地腿必须一起改的文案与行号引用）
+尺：grep -rn "panel_host_windows\.go:[0-9]*" cmd/wisp/config_readers_255.go cmd/wisp/config_receipt_255_test.go
+config_readers_255.go:17（cite :304-305 已漂）/ :141（同）/ :161（逐字含"面板关窗再开即跟上新值"并 cite :262 与 :392）/ config_receipt_255_test.go:440（cite :304）。rc=0
+
+## 纪律自报
+- 零 go build/vet/test。⚠ 越线一枚：起手跑过 1 次 `go env GOMODCACHE`（取库落点，不编译、不写仓），已在落点表「缺陷」§8 具名自报，不自行豁免。
+- 零产码写入：本程 git add 的 pathspec 只有 .scratch/wisp/probes/255/a2/** 与工单 255 一枚文件。
+- 工单追加核验：git diff --stat 显示 12 insertions(+)、0 deletions ⇒ 未改写既有行、未勾任何框。rc=0
