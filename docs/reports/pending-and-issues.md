@@ -14323,3 +14323,20 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 ### 4. 编队现量
 
 在飞＝`comment-fix-prep-1`（备 13 处注释替换文本）／`181-v3`（票 181 `AC#7` 非实现者终裁，种突变中）／`246-raisercensus-2`（本波新派）。`ledger-audit-1` 已交。⛔ 零 push、零翻框、机主三问不叠第四问。
+
+## A730｜2026-10-08 18:5x｜收 **`comment-fix-prep-1`**（13 处"只欠文案"的替换文本全部备齐）＋续派 `comment-fix-check-1`（独立复核这批将要粘进代码的文本）
+
+### 1. 交件（两笔 `14115e8d`／`6410a062`，件 385 行）
+
+`.scratch/wisp/probes/comment-fix-prep-1/01-ready-to-apply.md`＝**13/13 备齐**（P01 P02 P03 P04 P06 P07 P08 P09 P10 P11 P12 P13 P39，逐处四行块：目标锚／原文**逐字整行**／可直接粘贴的替换文本／风险）。自报与我抽验同向：
+- **撞禁词 0/13**（我对料文跑 `grep -cE 'checkoutBranch|changeRepo|repoPicker|branchSelect|vcs\.switch'`＝**0**）；
+- **引用未验对象 0/13**，并现验修正三处旧引用缺陷（P07 `PLAN.md` 2715→**2721**、P10 `loader.go` 238→**252**、P08 引语改现行读法）；
+- 我抽验两条锚与现 HEAD 逐字对上（`internal/panel/composer_dispatch.go:50` 那句 `… NO production caller yet …`；`cmd/wisp/firstrun.go:11` 那句 `… no production path ever did was CALL that pair once …`）。
+- **判不动 3 格**（⛔ 不许糊）：P13（句在 C19 冻结横幅内 ⇒ 边界归人工）／P04（`git.go:82` 那枚 const 连带不连带改＝产码面）／P04+P39（"hop 已落地"的票面粒度）。
+- **它另加两料我采**：C27 宿主 `cmd/wisp/panel_host_windows.go` 已在 HEAD（`01-triage` 未把它列为 `Handle` 调用点）⇒ P03/P04/P39 按现量写；P02 的 bullet 2/4 已落产码（与 triage 口径的差它具名报回）。
+
+### 2. 处置
+
+- ⛔ **本波不派落地腿**：13 枚文本要粘进 `internal/panel`／`cmd/wisp`／`internal/risk` 等文件，而 `181-v3` 此刻正在 `internal/panel`／`internal/tools` **种突变**（同图互洗）⇒ 落地排在它退出之后；且落地腿只许**照料粘**（⛔ 不许临场改写）。
+- ⇒ **续派 `comment-fix-check-1`**：独立复跑这 13 处（锚在不在 HEAD、原文是否逐字、替换文本里有没有撞五禁词、有没有引用未验对象、三处"判不动"是否被误写成了确定句），⛔ 零 Go 命令、只写 `.md`——把关"将来要粘进代码的东西"。
+- ⛔ 零翻框（票面框数一枚未动）、⛔ 未改台账除此节、零 push。
