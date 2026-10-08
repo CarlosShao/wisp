@@ -1,0 +1,28 @@
+### M2 IN PLACE - same reason: a brand new Locked-suffixed method that takes NO lock is appended to the production file, so the roster tooth is the only thing that can fire, and the census only sees it on disk. Then restored and hash-checked.
+2
+time=2026-10-08T12:53:01.543+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLockedSuffixNeverTakesTheLockItself33r11
+    panel_locked_naming_33r11_windows_test.go:233: 33-r11 census: 2 Locked-suffixed func(s) across 34 production source file(s) of package main
+    panel_locked_naming_33r11_windows_test.go:235:   PanelManager.noteColdMsLocked in panel_host_windows.go line 973: 0 lock operation(s) in its own body []
+    panel_locked_naming_33r11_windows_test.go:235:   PanelManager.setPriorFocusLocked in panel_host_windows.go line 625: 0 lock operation(s) in its own body []
+    panel_locked_naming_33r11_windows_test.go:244: PanelManager.noteColdMsLocked (panel_host_windows.go line 973) carries the "Locked" suffix but no roster entry: a new name that claims the caller holds a mutex must be reviewed and named in lockedNamingRoster33r11, or renamed
+--- FAIL: TestLockedSuffixNeverTakesTheLockItself33r11 (0.02s)
+=== RUN   TestRosteredLockedMethodReturnsWhileCallerHoldsTheLock33r11
+    panel_locked_naming_33r11_windows_test.go:305: 33-r11 behaviour: setPriorFocusLocked returned inside the budget while m.mu was held, and it did record the sample
+--- PASS: TestRosteredLockedMethodReturnsWhileCallerHoldsTheLock33r11 (0.00s)
+=== RUN   TestLockedNamingCensusBitesItsOwnFixture33r11
+    panel_locked_naming_33r11_windows_test.go:398: 33-r11 positive control: planted fixtureHost.parkedLocked reported with [f.mu.Lock f.mu.Unlock], honest name clean, unsuffixed self-locker untouched
+--- PASS: TestLockedNamingCensusBitesItsOwnFixture33r11 (0.00s)
+=== RUN   TestLockedNamingCensusRejectsTheOldName33r11
+    panel_locked_naming_33r11_windows_test.go:416: 33-r11 positive control: the pre-rename shape is reported as roundTripHost.firstRoundTripLocked with [m.mu.Lock m.mu.Unlock]
+--- PASS: TestLockedNamingCensusRejectsTheOldName33r11 (0.00s)
+=== RUN   TestCompletedWithinReportsAParkedCall33r11
+    panel_locked_naming_33r11_windows_test.go:435: 33-r11 positive control: a self-locking Locked call parked, was reported as parked, and had touched nothing
+--- PASS: TestCompletedWithinReportsAParkedCall33r11 (0.20s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.296s
+FAIL
+mutation_m2_inplace_rc=1
+restored cmd/wisp/panel_host_windows.go worktree=58e2b155dbcc8d380793e90bffc5514ab00743f1 head=58e2b155dbcc8d380793e90bffc5514ab00743f1 equal=yes
+restored cmd/wisp/panel_pageover_33r10_windows_test.go worktree=dae053d84cdde44a883c840f99463f65f18d3860 head=dae053d84cdde44a883c840f99463f65f18d3860 equal=yes
+status_rc=0

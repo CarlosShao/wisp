@@ -1,0 +1,93 @@
+### 70: the two names that RUN B added over RUN A, asked three times in the POST-CHANGE tree and three times in the PRISTINE HEAD tree (baseline overlay removes this leg's guard from the build and puts the old names back). If they flip in BOTH states the difference is machine-state dependence, not this leg.
+--- RUN C: post-change tree, count=3
+time=2026-10-08T12:53:19.264+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-08T12:53:20.942+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/08 12:53:20 mockllm: serving on http://127.0.0.1:52138 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-08T12:53:20.971+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1361897875\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-08T12:53:20.997+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1361897875\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-08T12:53:21.003+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-08T04:53:20Z duration_ms=6
+time=2026-10-08T12:53:21.010+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1361897875\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-08T12:53:21.018+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-08T04:53:21Z duration_ms=7
+time=2026-10-08T12:53:21.022+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-08T12:53:21.024+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T12:53:22.028+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.11s)
+    panel_host_windows_test.go:944: AC#4 focus hop (head cc5f7627): foreground before any panel 0x50102 | the ruler's own editor window 0x4be092e | foreground while hidden (prior) 0x50102 | after Show 0x50102 | panel hwnd 0x15408b8 | prevFocus recorded at Show 0x50102 | after Hide 0x50102 | Hide attempted restore to 0x50102 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x50102, panel hwnd 0x15408b8 (AC#4 says only the panel takes focus when shown)
+time=2026-10-08T12:53:28.361+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/08 12:53:28 mockllm: serving on http://127.0.0.1:49327 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-08T12:53:28.381+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow2731188063\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-08T12:53:28.406+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow2731188063\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-08T12:53:28.414+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-08T04:53:28Z duration_ms=7
+time=2026-10-08T12:53:28.421+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow2731188063\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-08T12:53:28.427+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-08T04:53:28Z duration_ms=6
+time=2026-10-08T12:53:28.432+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-08T12:53:28.435+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T12:53:29.439+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.11s)
+    panel_host_windows_test.go:944: AC#4 focus hop (head cc5f7627): foreground before any panel 0x50102 | the ruler's own editor window 0x2190f18 | foreground while hidden (prior) 0x50102 | after Show 0x50102 | panel hwnd 0x31b09ac | prevFocus recorded at Show 0x50102 | after Hide 0x50102 | Hide attempted restore to 0x50102 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x50102, panel hwnd 0x31b09ac (AC#4 says only the panel takes focus when shown)
+time=2026-10-08T12:53:35.772+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/08 12:53:35 mockllm: serving on http://127.0.0.1:50152 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-08T12:53:35.794+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1798804594\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-08T12:53:35.823+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1798804594\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-08T12:53:35.830+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-08T04:53:35Z duration_ms=6
+time=2026-10-08T12:53:35.842+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1798804594\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-08T12:53:35.848+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-08T04:53:35Z duration_ms=5
+time=2026-10-08T12:53:35.851+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-08T12:53:35.854+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T12:53:36.857+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.10s)
+    panel_host_windows_test.go:944: AC#4 focus hop (head cc5f7627): foreground before any panel 0x50102 | the ruler's own editor window 0x15708b8 | foreground while hidden (prior) 0x50102 | after Show 0x50102 | panel hwnd 0x1910ba2 | prevFocus recorded at Show 0x50102 | after Hide 0x50102 | Hide attempted restore to 0x50102 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x50102, panel hwnd 0x1910ba2 (AC#4 says only the panel takes focus when shown)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	22.834s
+FAIL
+flip_postchange_rc=1
+3
+--- RUN D: pristine HEAD via overlay, count=3
+time=2026-10-08T12:53:45.626+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-08T12:53:46.790+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/08 12:53:46 mockllm: serving on http://127.0.0.1:49362 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-08T12:53:46.819+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow498056046\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-08T12:53:46.845+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow498056046\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-08T12:53:46.851+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-08T04:53:46Z duration_ms=6
+time=2026-10-08T12:53:46.859+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow498056046\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-08T12:53:46.864+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-08T04:53:46Z duration_ms=5
+time=2026-10-08T12:53:46.868+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-08T12:53:46.871+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T12:53:47.874+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.11s)
+    panel_host_windows_test.go:944: AC#4 focus hop (head cc5f7627): foreground before any panel 0x50102 | the ruler's own editor window 0x2060ee6 | foreground while hidden (prior) 0x50102 | after Show 0x50102 | panel hwnd 0x1cd0cea | prevFocus recorded at Show 0x50102 | after Hide 0x50102 | Hide attempted restore to 0x50102 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x50102, panel hwnd 0x1cd0cea (AC#4 says only the panel takes focus when shown)
+time=2026-10-08T12:53:54.176+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/08 12:53:54 mockllm: serving on http://127.0.0.1:60880 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-08T12:53:54.198+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow457211843\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-08T12:53:54.223+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow457211843\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-08T12:53:54.230+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-08T04:53:54Z duration_ms=6
+time=2026-10-08T12:53:54.238+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow457211843\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-08T12:53:54.243+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-08T04:53:54Z duration_ms=5
+time=2026-10-08T12:53:54.248+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-08T12:53:54.251+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T12:53:55.254+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.11s)
+    panel_host_windows_test.go:944: AC#4 focus hop (head cc5f7627): foreground before any panel 0x50102 | the ruler's own editor window 0x3f80e68 | foreground while hidden (prior) 0x50102 | after Show 0x50102 | panel hwnd 0x1110a0e | prevFocus recorded at Show 0x50102 | after Hide 0x50102 | Hide attempted restore to 0x50102 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x50102, panel hwnd 0x1110a0e (AC#4 says only the panel takes focus when shown)
+time=2026-10-08T12:54:01.659+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/08 12:54:01 mockllm: serving on http://127.0.0.1:53723 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-08T12:54:01.684+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3842341232\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-08T12:54:01.707+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3842341232\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-08T12:54:01.714+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-08T04:54:01Z duration_ms=6
+time=2026-10-08T12:54:01.724+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow3842341232\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-08T12:54:01.731+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-08T04:54:01Z duration_ms=6
+time=2026-10-08T12:54:01.736+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-08T12:54:01.738+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-08T12:54:02.741+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.11s)
+    panel_host_windows_test.go:944: AC#4 focus hop (head cc5f7627): foreground before any panel 0x50102 | the ruler's own editor window 0x1cf0cea | foreground while hidden (prior) 0x50102 | after Show 0x50102 | panel hwnd 0x1b50738 | prevFocus recorded at Show 0x50102 | after Hide 0x50102 | Hide attempted restore to 0x50102 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x50102, panel hwnd 0x1b50738 (AC#4 says only the panel takes focus when shown)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	22.359s
+FAIL
+flip_baseline_rc=1
+--- per-name PASS/FAIL lines, both runs

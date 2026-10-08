@@ -1,0 +1,10 @@
+=== 71: denominators and the five new cases inside RUN B ===
+--- 30-baseline-full-package
+PASS=0 SKIP=0 FAIL=4 duration=cmd/wisp	472.033s
+--- 31-postchange-full-package
+PASS=0 SKIP=0 FAIL=6 duration=cmd/wisp	472.279s
+--- the five 33-r11 cases inside RUN B (whole package, not a -run subset)
+grep_rc=1
+--- the same names inside RUN A: RUN A removed this leg's guard from the build, so zero hits is the expected reading
+0
+grepA_rc=1

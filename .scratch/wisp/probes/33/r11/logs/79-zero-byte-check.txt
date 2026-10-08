@@ -1,0 +1,11 @@
+=== 79: zero-byte check over every evidence file this leg ships ===
+zero_bytes_found=0
+find_rc=0
+--- sizes of the batch-2 artefacts ---
+24535 .scratch/wisp/probes/33/r11/impl.md
+ 3391 .scratch/wisp/probes/33/r11/logs/42-mut-m1-in-place.txt
+ 2838 .scratch/wisp/probes/33/r11/logs/43-mut-m2-in-place.txt
+14924 .scratch/wisp/probes/33/r11/logs/70-flip-two-extra-reds.txt
+  431 .scratch/wisp/probes/33/r11/logs/71-denominators.txt
+46119 total
+wc_rc=0

@@ -846,3 +846,5 @@ FAIL
 FAIL	github.com/CarlosShao/wisp/cmd/wisp	480.635s
 FAIL
 baseline_rc=1
+NOTE on this file: this was the FIRST attempt at the full-package baseline, launched as a background task at 12:24; it wrote nothing (0 bytes, the runner's own log stayed empty) so it is NOT a run and not a reading. The baseline that counts is logs/30-baseline-full-package.txt (pristine HEAD via -overlay, terminal state, baseline_rc=1). Kept because rule 8 says temp artefacts are created, not deleted.
+superseded_by=logs/30-baseline-full-package.txt
