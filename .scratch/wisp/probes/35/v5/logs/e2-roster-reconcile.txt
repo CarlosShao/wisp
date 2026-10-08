@@ -1,0 +1,30 @@
+=== Q6: the leg's 13-name roster vs 35-v4's 12-name roster (2026-10-08 09:58:15+0800) ===
+delivered-baseline PASS count=13 FAIL count=0 SKIP=0
+TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+TestForwardingHookMustNotLoseTheNativeExitReceiver
+TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+TestLegacySubShapeOneHookDiesInAReentryLoop
+TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+TestShapeA3ForwardingHookIsIdempotentInOneDocument
+TestShapeA3SecondPagePostStillDelivers
+TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+v4 roster count=12
+--- set difference: what 13 has that 12 does not ---
+TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+--- set difference: what 12 has that 13 does not ---
+--- MY r0 roster (same carrier, my own build) vs their 13 ---
+mine count=10  diff(mine->13 missing)=
+TestInboundRequestIDGuardRefusesMissingIDOnPageEdge;TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge;TestInboundSourceGuardRefusesForeignSourceOnPageEdge;
+--- my own wide run: rebuild the 13 with the -run the leg used for delivered-baseline ---
+=== restore proof from the driver ===
+=== restore proof: before vs after, per file, whole roster ===
+IDENTICAL: 14 files, zero byte moved
+prod blob worktree=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 HEAD=26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+git status on the two files: []
+rc=0
+rc=0

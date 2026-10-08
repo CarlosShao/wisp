@@ -1,0 +1,111 @@
+=== r0-pristine ===
+PASS=10 FAIL=0 SKIP=0 buildrc=0 runrc=0 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+--- red sentences seen, verbatim prefix ---
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r1-zsyntax ===
+PASS=0 FAIL=0 SKIP=0 buildrc=1 runrc=n/a 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+--- red sentences seen, verbatim prefix ---
+--- did the NEW case appear at all? ---
+   newcase-run-lines=0
+=== r2-a1 ===
+PASS=9 FAIL=1 SKIP=0 buildrc=0 runrc=1 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- red sentences seen, verbatim prefix ---
+         1 M-B3 RED
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r3-a2 ===
+PASS=9 FAIL=1 SKIP=0 buildrc=0 runrc=1 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- red sentences seen, verbatim prefix ---
+         1 M-B3 RED
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r4-a3 ===
+PASS=3 FAIL=7 SKIP=0 buildrc=0 runrc=1 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+   --- FAIL: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+   --- FAIL: TestShapeA3SecondPagePostStillDelivers (0.00s)
+   --- FAIL: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+   --- FAIL: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+   --- FAIL: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- red sentences seen, verbatim prefix ---
+         1 M-B2 READING WRONG
+         1 M-B3 READING WRONG
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r5-weak-shape ===
+PASS=10 FAIL=0 SKIP=0 buildrc=0 runrc=0 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+--- red sentences seen, verbatim prefix ---
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r6-weak-truthy ===
+PASS=9 FAIL=1 SKIP=0 buildrc=0 runrc=1 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- red sentences seen, verbatim prefix ---
+         1 M-B3 RED
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r7-truthy-new ===
+PASS=9 FAIL=1 SKIP=0 buildrc=0 runrc=1 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- red sentences seen, verbatim prefix ---
+         1 M-B3 RED
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r8-mahook ===
+PASS=3 FAIL=7 SKIP=0 buildrc=0 runrc=1 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+   --- FAIL: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+   --- FAIL: TestShapeA3SecondPagePostStillDelivers (0.00s)
+   --- FAIL: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+   --- FAIL: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+   --- FAIL: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- red sentences seen, verbatim prefix ---
+         1 M-A RED
+         1 M-B2 RED
+         1 M-B3 RED
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r9-setgone ===
+PASS=9 FAIL=1 SKIP=0 buildrc=0 runrc=1 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+   --- FAIL: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+--- red sentences seen, verbatim prefix ---
+         1 M-B1 RED
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+=== r10-typeofgone ===
+PASS=8 FAIL=2 SKIP=0 buildrc=0 runrc=1 
+load-failure sentinel (0xc0000135): 0
+--- red roster (names only) ---
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+   --- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- red sentences seen, verbatim prefix ---
+         1 M-B2 RED
+         1 M-B3 RED
+--- did the NEW case appear at all? ---
+   newcase-run-lines=2
+# rc=0 (35-v5: 11 runs; per-run buildrc/runrc inside each block; driver exit rc in b0-driver-stdout.txt)

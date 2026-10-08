@@ -1,0 +1,115 @@
+mutant pristine changed-line-count=0
+mutant a1 changed-line-count=2
+     <     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+     >     if (inside || typeof window.%[1]s === "undefined") { return native.call(cw, message); }
+mutant a2 changed-line-count=2
+     <     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+     >     if (inside || window.%[1]s == null) { return native.call(cw, message); }
+mutant a3 changed-line-count=2
+     <     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+     >     if (inside || typeof window.%[1]s !== "function") { return; }
+mutant truthy changed-line-count=2
+     <     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+     >     if (inside || !window.%[1]s) { return native.call(cw, message); }
+mutant r8-mahook changed-line-count=2
+     <     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+     >     if (inside || typeof window.%[1]s !== "function") { return native(message); }
+mutant r10-typeofgone changed-line-count=2
+     <     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+     >     if (inside) { return native.call(cw, message); }
+r9-setgone FIXTURE mutant changed-line-count=2  [want 2]
+     < 	if _, exists := o.props[name]; exists && o.unwritable[name] {
+     > 	if _, exists := o.props[name]; exists && false {
+weak fixture changed-line-count=14 (all deletions: no line added)
+weak fixture added-line-count=0
+M-B3 tokens surviving in the weak fixture: 5 (before=9)
+guard line in each prod mutant:
+-- /d/tmp/wisp35v5/mut/a1-typeofundef-panel_host_windows.go
+   231:// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+   403:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+   661:// inside the wrapper is folded into the bound door. That is sound because the stub's
+   662:// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+   678:  var inside = false;
+   680:    if (inside || typeof window.%[1]s === "undefined") { return native.call(cw, message); }
+   681:    inside = true;
+   682:    try { return window.%[1]s(message); } finally { inside = false; }
+   721:// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+   781:// so a host that is not inside the resident ui-sta pump has to pump its own
+-- /d/tmp/wisp35v5/mut/a2-isnull-panel_host_windows.go
+   231:// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+   403:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+   661:// inside the wrapper is folded into the bound door. That is sound because the stub's
+   662:// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+   678:  var inside = false;
+   680:    if (inside || window.%[1]s == null) { return native.call(cw, message); }
+   681:    inside = true;
+   682:    try { return window.%[1]s(message); } finally { inside = false; }
+   721:// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+   781:// so a host that is not inside the resident ui-sta pump has to pump its own
+-- /d/tmp/wisp35v5/mut/a3-silentdrop-panel_host_windows.go
+   231:// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+   403:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+   661:// inside the wrapper is folded into the bound door. That is sound because the stub's
+   662:// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+   678:  var inside = false;
+   680:    if (inside || typeof window.%[1]s !== "function") { return; }
+   681:    inside = true;
+   682:    try { return window.%[1]s(message); } finally { inside = false; }
+   721:// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+   781:// so a host that is not inside the resident ui-sta pump has to pump its own
+-- /d/tmp/wisp35v5/mut/broken-panel_host_windows.go
+   231:// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+   403:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+   661:// inside the wrapper is folded into the bound door. That is sound because the stub's
+   662:// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+   678:  var inside = false;
+   680:    if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+   681:    inside = true;
+   682:    try { return window.%[1]s(message); } finally { inside = false; }
+   721:// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+   781:// so a host that is not inside the resident ui-sta pump has to pump its own
+-- /d/tmp/wisp35v5/mut/pristine-panel_host_windows.go
+   231:// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+   403:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+   661:// inside the wrapper is folded into the bound door. That is sound because the stub's
+   662:// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+   678:  var inside = false;
+   680:    if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+   681:    inside = true;
+   682:    try { return window.%[1]s(message); } finally { inside = false; }
+   721:// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+   781:// so a host that is not inside the resident ui-sta pump has to pump its own
+-- /d/tmp/wisp35v5/mut/r10-typeofgone-panel_host_windows.go
+   231:// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+   403:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+   661:// inside the wrapper is folded into the bound door. That is sound because the stub's
+   662:// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+   678:  var inside = false;
+   680:    if (inside) { return native.call(cw, message); }
+   681:    inside = true;
+   682:    try { return window.%[1]s(message); } finally { inside = false; }
+   721:// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+   781:// so a host that is not inside the resident ui-sta pump has to pump its own
+-- /d/tmp/wisp35v5/mut/r8-mahook-panel_host_windows.go
+   231:// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+   403:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+   661:// inside the wrapper is folded into the bound door. That is sound because the stub's
+   662:// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+   678:  var inside = false;
+   680:    if (inside || typeof window.%[1]s !== "function") { return native(message); }
+   681:    inside = true;
+   682:    try { return window.%[1]s(message); } finally { inside = false; }
+   721:// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+   781:// so a host that is not inside the resident ui-sta pump has to pump its own
+-- /d/tmp/wisp35v5/mut/truthy-panel_host_windows.go
+   231:// inside bringUp - so a dispose followed by a fresh show picks up whatever the
+   403:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+   661:// inside the wrapper is folded into the bound door. That is sound because the stub's
+   662:// window.external.invoke hop is synchronous inside the stub body (webview.go:462-478:
+   678:  var inside = false;
+   680:    if (inside || !window.%[1]s) { return native.call(cw, message); }
+   681:    inside = true;
+   682:    try { return window.%[1]s(message); } finally { inside = false; }
+   721:// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+   781:// so a host that is not inside the resident ui-sta pump has to pump its own
+rc=0

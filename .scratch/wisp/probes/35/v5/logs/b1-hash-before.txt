@@ -1,0 +1,15 @@
+a466b4ed49420561d65d22ff7e30d4dc0f6ae571  cmd/wisp/panel_transport_35r2_test.go
+26b5de83b93a9a141f1546dc19a9b03ffa45ede0  cmd/wisp/panel_host_windows.go
+b637a65f605d4d00c0f209d69abf4290d6dc25e6  cmd/wisp/panel_geometry_255_winlive_test.go
+d31c95716e0a3ebd03915e8a73cf2d1782d486d3  cmd/wisp/panel_host_windows_live_test.go
+e778be886e5590965ba5a9d5f01e2f09c3e3e786  cmd/wisp/panel_transport_live_35v2_windows_test.go
+fa1c351f01f288ebbf357e6329b126d2a34ba9ff  cmd/wisp/resident_approval_live_246_windows_test.go
+c2438e6decf689c5b4f9a8fc20df9f587e6fa336  cmd/wisp/resident_ball_live_228_windows_test.go
+6064d43fca1a3a6038f5f072a3ba44998379fbf5  cmd/wisp/resident_hotkey_live_258_windows_test.go
+1659e3998110d0a5f0ee2ed47bb96e3740f8bcb4  cmd/wisp/resident_task_source_live_246_windows_test.go
+f2a0d516ab0b7ac89b001415ddb661fe1361ad7b  internal/ball/hotkey_cancel_borrow_live_260_test.go
+94fb0454db5c1e5d1e7230f8af2745194c192f58  internal/ball/hotkey_live_test.go
+41ef5e7f4fd0dd2c52e80da7a8ba453efdafbff1  internal/ball/interaction_live_test.go
+4c955792f2e2e348b1c543f8eaadb878523ddce7  internal/ball/live_guard_windows_test.go
+402d7e63be8de34a73fd7de0bbf4c29001c7fb4e  internal/ball/live_windows_test.go
+# rc=0 (35-v5: roster taken BEFORE the overlay runs; driver rc recorded separately in b0-driver-stdout.txt; repo byte-identical after = b5-restore.txt)

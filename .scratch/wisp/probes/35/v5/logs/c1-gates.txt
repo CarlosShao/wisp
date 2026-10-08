@@ -21,3 +21,4 @@ gofmt-rc=0
 gofmt -l whole repo tracked .go count: 0
 === does d22scan's emoji ban see anything in my own new files? (self-scan) ===
 rc-of-block=0
+rc=0 (35-v5 gates: go-vet rc=0, d22scan rc=0 clean, gofmt rc=0 with listed-file-count=3 [2 pre-existing + 1 CRLF artefact, see c2])

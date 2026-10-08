@@ -1,0 +1,38 @@
+=== r11 weak-form fixture + silent-drop prod (2026-10-08 09:57:56+0800) ===
+{"Replace":{"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go":"D:/tmp/wisp35v5/mut/a3-silentdrop-panel_host_windows.go","D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_transport_35r2_test.go":"D:/tmp/wisp35v5/mut/weak-panel_transport_35r2_test.go"}}
+buildrc=0
+runrc=1
+r11 PASS=4 FAIL=6
+r11 NEW CASE colour: === RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+=== Q6 roster reconciliation ===
+--- my r0 (write leg's -run) PASS names ---
+TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+TestForwardingHookMustNotLoseTheNativeExitReceiver
+TestLegacySubShapeOneHookDiesInAReentryLoop
+TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+TestShapeA3ForwardingHookIsIdempotentInOneDocument
+TestShapeA3SecondPagePostStillDelivers
+TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+count=10
+--- the leg's own claimed 13-name delivered roster ---
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+(if empty, reading the file directly:)
+=== delivered-tree baseline run (2026-10-08 09:38:20+0800), HEAD=099d8fe6 ===
+carrier: CWD=cmd/wisp, third_party/sherpa-onnx on PATH (3 dlls, load-time requirement)
+buildrc=0
+time=2026-10-08T09:38:23.345+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+    panel_inbound_guards_35r3_test.go:153: (d)-1 roster guard on the page edge: door reply="面板请求被拒绝 [panel.approval.request (无 requestId)]：panel: composer request refused: 方法 \"panel.approval.request\" 不是面板 composer 通路的能力入口"
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+=== RUN   TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+    panel_inbound_guards_35r3_test.go:161: (d)-2 source guard on the page edge: door reply="面板请求被拒绝 [panel.mode.request pc-35r3-2-9e7a-4c1b]：panel: composer request refused: 来源 \"panel-composer-x\" 不是 \"panel-composer\"，按伪造/串台拒绝（requestId=\"pc-35r3-2-9e7a-4c1b\"）"
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+=== RUN   TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+    panel_inbound_guards_35r3_test.go:170: (d)-3 requestId guard on the page edge: door reply="面板请求被拒绝 [panel.mode.request (无 requestId)]：panel: composer request refused: 缺少 requestId，无法与审计/卡片对齐（method=\"panel.mode.request\"）"
+rc=0

@@ -1,0 +1,5 @@
+=== restore proof: before vs after, per file, whole roster ===
+IDENTICAL: 14 files, zero byte moved
+prod blob worktree=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 HEAD=26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+git status on the two files: []
+rc=0

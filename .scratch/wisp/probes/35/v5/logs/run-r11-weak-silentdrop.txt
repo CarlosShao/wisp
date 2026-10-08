@@ -1,0 +1,31 @@
+time=2026-10-08T09:58:01.232+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+--- PASS: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport (0.00s)
+=== RUN   TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    panel_transport_35r2_test.go:1754: AC#6 RED: the native exit (chrome.webview.postMessage's original value) was called 0 time(s), want 1. nativeExitCalls=0 receiverOK=0 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+=== RUN   TestShapeA3SecondPagePostStillDelivers
+    panel_transport_35r2_test.go:1784: AC#6 RED: the native exit (chrome.webview.postMessage's original value) was called 0 time(s), want 2. nativeExitCalls=0 receiverOK=0 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestShapeA3SecondPagePostStillDelivers (0.00s)
+=== RUN   TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    panel_transport_35r2_test.go:1807: AC#6 RED: the native exit (chrome.webview.postMessage's original value) was called 0 time(s), want 1. nativeExitCalls=0 receiverOK=0 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+=== RUN   TestLegacySubShapeOneHookDiesInAReentryLoop
+    panel_transport_35r2_test.go:1844: sub-shape ① under the behavioural yard: re-entered 9 levels (cap 8), native exit called 0 times, door fired 0 times, page error="RangeError: maximum call stack size exceeded - chrome.webview.postMessage re-entered 9 levels (cap 8) with the native exit called 0 times; a page in a real browser dies here"
+--- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop (0.00s)
+=== RUN   TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+--- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot (0.00s)
+=== RUN   TestForwardingHookMustNotLoseTheNativeExitReceiver
+    panel_transport_35r2_test.go:1964: M-A READING WRONG: the native exit was honoured with its receiver 0 time(s), want exactly 1. Zero means the receiver face was never exercised here, so this case would prove nothing. nativeExitCalls=0 receiverOK=0 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+=== RUN   TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+    panel_transport_35r2_test.go:2017: AC#6 RED: the native exit (chrome.webview.postMessage's original value) was called 0 time(s), want 1. nativeExitCalls=0 receiverOK=0 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+    panel_transport_35r2_test.go:2061: M-B2 READING WRONG: the fallback must reach the native exit exactly once, with its receiver: nativeExitCalls=0 receiverOK=0 receiverLost=0. nativeExitCalls=0 receiverOK=0 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=1 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+    panel_transport_35r2_test.go:2126: M-B3 face has teeth: door present as typeof==="string", guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=0, no throw)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+FAIL
+# rc=1 (35-v5: run-r11 exit rc=1 = 6 FAIL as reported in e1-r11-and-roster.txt; the NEW case itself PASSED, that is the finding)

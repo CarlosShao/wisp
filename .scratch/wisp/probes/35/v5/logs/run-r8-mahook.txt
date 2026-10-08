@@ -1,0 +1,34 @@
+=== r8-mahook (2026-10-08 09:57:13+0800) overlay={"Replace":{"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go":"D:/tmp/wisp35v5/mut/r8-mahook-panel_host_windows.go"}} ===
+buildrc=0
+dlls beside exe: 3
+time=2026-10-08T09:57:17.372+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+--- PASS: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport (0.00s)
+=== RUN   TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    panel_transport_35r2_test.go:1749: AC#6 RED: the page's own postMessage threw in the document: TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with undefined, want the chrome.webview object the page holds. nativeExitCalls=0 receiverOK=0 receiverLost=1 ignoredWrites=(none) doorRounds=0 maxPostDepth=3 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+=== RUN   TestShapeA3SecondPagePostStillDelivers
+    panel_transport_35r2_test.go:1781: AC#6 RED: page post #1 threw: TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with undefined, want the chrome.webview object the page holds. nativeExitCalls=0 receiverOK=0 receiverLost=1 ignoredWrites=(none) doorRounds=0 maxPostDepth=3 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestShapeA3SecondPagePostStillDelivers (0.00s)
+=== RUN   TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    panel_transport_35r2_test.go:1805: AC#6 RED: after re-running the Init queue the page's post threw: TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with undefined, want the chrome.webview object the page holds. nativeExitCalls=0 receiverOK=0 receiverLost=1 ignoredWrites=(none) doorRounds=0 maxPostDepth=3 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+=== RUN   TestLegacySubShapeOneHookDiesInAReentryLoop
+    panel_transport_35r2_test.go:1844: sub-shape ① under the behavioural yard: re-entered 9 levels (cap 8), native exit called 0 times, door fired 0 times, page error="RangeError: maximum call stack size exceeded - chrome.webview.postMessage re-entered 9 levels (cap 8) with the native exit called 0 times; a page in a real browser dies here"
+--- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop (0.00s)
+=== RUN   TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+--- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot (0.00s)
+=== RUN   TestForwardingHookMustNotLoseTheNativeExitReceiver
+    panel_transport_35r2_test.go:1956: M-A RED (receiver lost at the native exit): the page's own postMessage threw inside the document, which under this model means the forwarding hook invoked chrome.webview.postMessage without its receiver: TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with undefined, want the chrome.webview object the page holds. nativeExitCalls=0 receiverOK=0 receiverLost=1 ignoredWrites=(none) doorRounds=0 maxPostDepth=3 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+=== RUN   TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+    panel_transport_35r2_test.go:2011: M-B1 CONTROL RED: the same shipped hook in a writable world threw: TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with undefined, want the chrome.webview object the page holds. nativeExitCalls=0 receiverOK=0 receiverLost=1 ignoredWrites=(none) doorRounds=0 maxPostDepth=3 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+    panel_transport_35r2_test.go:2054: M-B2 RED (guard's typeof half gone): with no door in the page the forwarding hook must fall back to the native exit; it instead invoked a non-function and the page's post threw: TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with undefined, want the chrome.webview object the page holds. nativeExitCalls=0 receiverOK=0 receiverLost=1 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+    panel_transport_35r2_test.go:2123: M-B3 RED (guard reduced to a truthiness test): a door that is present but NOT callable must still fall back to the native exit; this hook invoked window.wispDispatch anyway and the page's post threw: TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with undefined, want the chrome.webview object the page holds. nativeExitCalls=0 receiverOK=0 receiverLost=1 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+FAIL
+runrc=1
