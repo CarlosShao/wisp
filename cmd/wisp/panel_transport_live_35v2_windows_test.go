@@ -1,5 +1,26 @@
 //go:build windows && winlive
 
+// 〔仅本机可量、CI 永看不见〕 - ticket 35 AC#8(iv) (ledger A692), written onto THIS file's
+// own face because until now the sentence lived only in the ticket and the ledger. Four
+// elements, no euphemism; precedent form = docs/evidence/s1/33-panel-host-c27-r5.md:78.
+//   ① WHAT IS MACHINE-LOCAL: the credential for ticket 35 `:52` - "does a page-side call of
+//     window.chrome.webview.postMessage(<composer envelope>) reach the Go door" - can only be
+//     taken on this desktop, by opening a real WebView2 window. cmd/wisp/
+//     panel_transport_35r2_test.go is a hand-written interpreter: it models that edge, it
+//     does not measure it, and its green is not this credential.
+//   ② WHO OWNS IT: the ORCHESTRATOR. `winlive` has no CI job, so no leg may claim this file
+//     "was re-run in CI" - ⛔ not in a ticket, not in an evidence table, not in a commit
+//     message. A leg that has not opened a window has not read this file's result.
+//   ③ RE-RUN CADENCE: once per wave that touches the transport, when the desktop is free, the
+//     orchestrator runs one real-window pass with `-tags winlive` AND, in the same wave, one
+//     control-group pass (the same rig over the fb2fb802 hook via `go test -overlay`, repo
+//     untouched). The artefact name and its `rc` are recorded wave by wave under
+//     .scratch/wisp/probes/35/**.
+//   ④ THE PRICE PAID: CI will never catch "this transport is broken in a real browser" - that
+//     regression class is unguarded by any automated gate, and only the ③ cadence notices it.
+// Revocation口令 for this label: give `:52`'s decisive reading a CI-reachable stand-in
+// (then this block is rewritten to name the stand-in, not deleted).
+//
 // Acceptance rig 35-v2 (验收台件 only - NOT production code, NOT a shipping judge,
 // one file added by this leg, no existing assertion touched).
 //
