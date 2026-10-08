@@ -1,0 +1,67 @@
+=== docs/evidence/s1/33-panel-host-c27-r4.md ===
+# `33-r4` — 面板宿主仪器腿（⛔ 只改 `cmd/wisp/*_test.go`；六处"看起来在测、其实看不见"的尺装牙）
+
+- 程：`33-r4`（**写腿·仪器**）｜工单：`.scratch/wisp/issues/33-panel-host-c27.md`（票 33）
+- 判据出处（逐格指回）：`docs/evidence/s1/33-panel-host-c27-v1.md` §AC#1／§AC#2／§AC#3／§AC#4／§AC#12 与 §A#24/#25/#26/#27/#30/#31
+- ⛔ 本件**不勾票面任何一枚 `- [ ]`／`- [x]`**（勾框归编排者与下一枚验收腿）；⛔ 不为变绿放宽任何既有断言。
+- ⛔ 产码那半边（`cmd/wisp/panel_host_windows.go`／`resident_*.go`／`internal/ball/**`／`internal/proc/**`）本程**一字未改**，归 `33-r2`。
+
+---
+--- hit ctx ---
+249-1. **格 2 的"回还那一跳在产码里到底做没做"——本程已把它量出来：没做**。起手我推不出（`panel_host_windows.go:269` 确实记值、`:311-313` 确实 `SetForegroundWindow(prev)`＋`SetFocus(prev)`，机制在场，所以真断言"不一定红"）。真机五发读数（§① 格 2 那张表）给的是**红**：面板在 `bringUp` 建窗时就已拿到前台 ⇒ 第一次 `Hide()` 时 `prev==0`、`if prev != 0` 那一支直接跳过，随后 `Show` 把"当时的前台＝面板自己"记成 `prevFocus` ⇒ 回还目标从第一步就丢了。⇒ 甲（我做的）＝逐名断言＋红因具名交编排者；乙＝先改产码——⛔ 本程写面禁；不做＝⛔ 不许把断言降级成 `t.Logf` 换绿。**这一格现在不再"判不动"，改成"已量、待 `33-r2` 补那一跳"**；留在本节只为说明我起手时它确实判不动（免得下一枚腿以为这是纸上推出来的）。
+250-2. **`AF_INET6` 那一族的"能不能量"已定案，"要不要进门禁"仍归编排者**。本程现量：那台表在本机的行**不是**头文件那套 48 字节/行——探针实测 `56` 字节/行、state 在 48、pid 在 52，同一枚 `[::1]` 监听在这套 layout 下归到本 pid（`0 -> 1`，`11:52:20`），而 48/40/44 读 0 枚＝v1 §B#14 卡住的那一枚假象的根因（§① 格 1 那张矩阵）。⇒ 现在**尺是活的**，但 AC#3 的产品断言我只对 `AF_INET` 开（终跑逐字 `IPv4 rows=314 LISTEN-owned-by-tree=0 ; IPv6 rows=44 LISTEN-owned-by-tree=0`）。甲＝保持现状（IPv6 只进日志＋仪器自检断言）；乙＝编排者点头我就把 `v6 != 0` 也升成产品断言（一行的事，且 layout 已量过）；不做＝⛔ 不拿"今天 webview2 没开 IPv6 端口"（v1 §A#25 的读数）当"不需要覆盖"的理由，也⛔ 不自己扩。
+251:3. **AC#13（冷启探测页盖掉真页面）**。现量：`bringUp` 的 `:221 serveEntry()` 之后 `:227 firstRoundTripLocked(...)`，而后者在 `:374-375` 又 `SetHtml` 一枚自造探针页。⇒ 这是**产码时序**，票面 `:39` 那格的判据（重排次序／过滤器＋一枚会响的"最终文档含真入口"断言）落点在 `panel_host_windows.go`，本程⛔ 不许改。甲＝本程只把"显示的是探针页还是入口页"这条**量出来**（读 embed 入口字节的特征 vs 探针页特征，从 Go 侧字符串比，不读前端文件），交 `33-r2`；乙＝要我现在钉成断言 ⇒ 会造出一枚"本程自己判自己产码缺跳"的红，归属混淆；不做＝⛔ 不留空尺。
+252-4. **`PanelManager` 生产调用者枚数**（dispose 半、也是 owner 那句"我要能点"的那半）。现量：v1 §A#14 全仓 `grep -rn "PanelManager"`＝定义文件＋测试文件两枚 ⇒ **0 枚非 test 调用者**。这一格归 `33-r2`（接常驻）与票 248，本程⛔ 动不了；我能做的是把"dispose 在产品里不可达"从散文变成**一枚会随接线自动转红的具名 skip**。
+253-5. **AC#12 的勾与归口**（谁把 `frontend/dist` 填上）。现量：入库 1 枚 `.gitkeep`、工作树 2 行 `!!`（§④#8）；票面 `:37` 逐字"这一格在'谁把 dist 填上'落定前勾不了"。⇒ 本程**只装牙、不判归口**，⛔ 不造页面产物、⛔ 不写 `frontend/**`。
+=== docs/evidence/s1/33-panel-host-c27-r5.md ===
+# `33-r5` — 面板宿主功能腿：接进常驻＋AC#13 冷启真页面＋AC#4 焦点回还＋AC#14 回执两枚钉＋退净那一支搬 winlive＋两处过期注释
+
+- 程：`33-r5`（**写腿·功能**）｜工单＝票 33 `.scratch/wisp/issues/33-panel-host-c27.md`
+- 题面来源＝票面「编排者裁定（10-01 12:12）」九条 ＋「编排者补裁（二）（10-01 13:12）」P1-P5（P1 线程形状／P2 判据形状／P3 STA 显式初始化／P4 缺口另立票 249／P5 dispatchq 不当门）
+- 读数来源三件：探针 `.scratch/wisp/probes/33/p1/probe.md` §A／§B；仪器腿 `docs/evidence/s1/33-panel-host-c27-r4.md` §① 格 2／格 3／格 5 与 §⑤ 第 18／19／20 项
+- 写面：`cmd/wisp/**`（产码＋测试）＋ `.scratch/wisp/probes/33/r5/**` ＋ 本证据件。⛔ 未动 `internal/ball/**`／`internal/panel/**`／`internal/proc/**`／`internal/observe/**`
+- ⛔ 本件**不勾票面任何一枚 `- [ ]`／`- [x]`**（勾归编排者与非实现者验收腿 `33-v2`）；⛔ 不为变绿放宽任何断言、⛔ 不降级成 `t.Logf`
+
+--- hit ctx ---
+54-| 项 | 读数 |
+55-|---|---|
+56:| 改前（行号现取于 `7a02b121`） | `panel_host_windows.go:221 serveEntry()` → `:250 w.SetHtml(入口字节)` → `:227 firstRoundTripLocked(...)` → `:374-375` 又一发 `SetHtml(自造探测页)` ⇒ **每次冷启动最终显示探测页**。派单那句时序本腿逐字复认（读 `git grep`，未复跑行为） |
+57:| 改后 | `bringUp` 次序重排：探测在前、`serveEntry` 在后（探测**没删**，它仍是冷启"可用"判定的来源）；另加 `serveNotBuiltNoticeLocked()`——bundle 没建成时明写一枚离线提示文档，⛔ 不再把探测页留在屏上充当"页面"。`firstRoundTripLocked` 的射程在注释里写死＝**"页→Go 到达"**，⛔ 不是 AC#14 的凭据（裁定 P2 逐字） |
+58-| 新断言（问能力） | `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`：Go 侧 `panel.Assets.Resolve(panel.EntryFile)` 取入口字节 → 正则抽 `id="..."` 当探针 → **由页面自己**用 `document.getElementById` 逐枚回答，答案经**产品已有的那道门**（`window.wispDispatch`）送回 Go。终态读数（`14:00` 那发）逐字：`AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]` ＋ `AC#13 page answer: "1" - 1 of 1 probe id(s) present in the live document` |
+59-| 反控 M1（派单点名的那一发） | 把两发次序换回去（`serveEntry` 在前、探测在后）⇒ **必须红**：逐字 `after a real cold start the live document contains NONE of the 1 element ids the embedded entry declares (the page itself answered "0")`。⚠ 这条红是**第二版尺**给的：第一版尺在 M1 下**仍然绿**（它自己 re-serve 了入口文档，把突变盖掉了），处置＝重写尺，见 §⑤ 第 22 条 |
+=== docs/evidence/s1/33-panel-host-c27-v1.md ===
+# `33-v1` — 面板宿主真起来：非实现者对抗验收表（射程＝票 33 的 AC#1／AC#2／AC#3／AC#4／AC#11／AC#12）
+
+- 程：`33-v1`（**对抗验收腿，非实现者**）｜工单：`.scratch/wisp/issues/33-panel-host-c27.md`（票 33）
+- 被验腿：`33-r1`（写腿），五枚提交 `e4ed8304`→`697b4fae`→`b1e3d94a`→`fafe0445`→`f0ad3b51`
+- ⛔ 它的证据件 `docs/evidence/s1/33-panel-host-c27-r1.md` 属**〔实现方自述＋台件〕**，**不构成任何一格 AC 的翻勾依据**；本表每一格只用我自己现跑的尺。
+- ⛔ 本表**不勾票面任何一枚 `- [ ]`／`- [x]`**（勾框归编排者）；⛔ 不写"附条件通过"式补判语。
+- 写作顺序（硬要求）：**§A／§B／§C 三节自对抗内容先写满并 commit**，之后才回填 §D 逐格判语。本表判据交付＝`wc -l -c` 这个文件。
+
+--- hit ctx ---
+81-   对照仪器（`panel_host_windows_test.go:114-141`）：它写 `tcpTableOwnerPIDAll = 4 // TCP_TABLE_OWNER_PID_ALL`（真值 **5**；仓里既有采样器 `internal/proc/treemetrics_windows.go:57` 逐字就是 `tcpTableOwnerPIDAll = 5`），并写 `tcpStateListen = 10`（10 是 `MIB_TCP_STATE_ESTAB`，**LISTEN＝2**）⇒ **两枚常量都错位**，它实际过滤的是"本 PID 的已建立连接"，任何监听端口都永远数不到。行偏移本身没错（rowSize 24／pidOffset 20 与 `internal/proc:58-59` 同形），所以**修正常量即有牙**——我的 class=5＋state=2 读数就是证据。另有两枚射程缺口：只传 `AF_INET` ⇒ IPv6 那一族整族不在场；重试耗尽时只 `t.Logf` 后 `return 0`（`:145-146`）＝工具失败也算过。
+82-25. **子进程那一维**：这台机上不跑测试时 LISTEN 表里的 `msedgewebview2.exe`＝**0 枚**，跑窗口测试期间也＝0（S2 那发只有我们自己的 pid 一枚）⇒ "webview2 子进程自己开端口所以看不见"这一维今天**没有实际命中**，但仪器结构上只看 `os.Getpid()`（`:230`），修常量时得把"树内 PID"一起放进去——现成口 `internal/proc/jobscope_windows.go:157 TreePIDs()`。
+83:   - 顺路核 `AGENTS.md` §1.2（⛔ 不扩射程，只核那两条）：`grep -n "filepath\." cmd/wisp/panel_host_windows.go`＝**0 命中**（没有 `risk.PathResolver` 之外的 `Clean`/`Abs` 决策，资源路径全走 `panel.Assets` 的字符串口）；明文凭据＝0（文件里唯二像配置的是常量标题 `"Wisp panel"` 与绑定名 `wispDispatch`）。另核两形顺手记下：裸 `go func(`＝0（#16/#17）；"墙钟时间差实现超时"＝0（`firstRoundTripLocked` 的 `t0.Add(5*time.Second)` 与 `time.Now().After(deadline)` 全程带单调读数，注释在 `:168-173`）。
+84-
+85-### 攻击面⑤：AC#11／AC#12（26–29）
+--
+87-26. **AC#1 那枚"进程树"尺**：票面 `:65-66` 写的是 **process-tree** child-count；仪器 `countWebviewChildren`（`panel_host_windows_test.go:89-105`）是 `CreateToolhelp32Snapshot` 上按**进程名**全机数 `msedgewebview2.exe`，不按父 PID 走树。现量（`11:02:17`→`11:02:29`，tasklist 采样）：不跑测试＝**14 枚**（别人会话的 WebView2 进程）、跑我们一枚窗口期间＝**20 枚**（我们贡献约 6）、销毁后回 **14**。⇒ `before != after`（`:213-215`）与"≤2s 回落基线"（`:263-272`）都建立在 14 枚外部噪声上：别人起一扇窗能假红、别人退一扇窗能假绿。另外**全用例从未比较 hide→re-show 前后的 HWND 是否同一枚句柄**（`:175`/`:237`/`:260` 只判 0／非 0）⇒ 票面"reuses window"这一句没有按身份钉住；这一格里真有牙的是状态断言（`:206-208` `Hide` 后 `IsCreated` 必须仍 true＝hide 不 destroy；`:195-197` mode 处理器 `count()!=1` ⇒ Fatalf）。
+88-27. **AC#4 焦点尺**：Show 后唯一断言是"前台窗非 0"（`:242-243`），**回还那一跳整条只有 `t.Logf`**（`:249-251`），且 `prior := windows.GetForegroundWindow()` 取在 `HotShow` 之后 ⇒ 我 11 发里 `foreground after Show == panel hwnd == foreground prior to test` 逐发同一枚句柄（`0x6f0a60`／`0x11fd0638`／`0x1008065e`／`0x1260a8e`／`0x509079a`／`0x124e08a2`／`0x1a4f057a`／`0x515092a`…）＝"上一次的前台窗"就是面板自己，`Hide` 把焦点还给它刚藏起来的那扇窗。尺：`grep -rn "prevFocus|SetForegroundWindow" --include=*.go cmd internal`（去产码文件）＝测试侧**只命中那句 `t.Logf`**（`:250`）⇒ 全仓零枚焦点回还断言。
+89:28. **冷启路径会把页面盖掉（产码形状，非仪器）**：`bringUp` 先 `serveEntry()`（`:221` ⇒ `SetHtml(真入口字节)`），紧接着 `firstRoundTripLocked`（`:227` ⇒ `:372-375` 又一枚 `SetHtml`，内容是它自己写的探针文档）⇒ **冷启动结束后窗里显示的是探针文档而不是面板页**；`firstRoundTripLocked` 的调用点全仓唯一＝`:227`（grep 现量）。这一条同时削 AC#3 的"离线供给"与 AC#12 的"有页面可发"的现实意义。
+90-29. **AC#11 我自己复尺＋我自己跑的反向证**：`git archive --format=tar HEAD | tar -x` 到仓外 `C:/Users/swq/AppData/Local/Temp/33v1-clean`（副本里 `find frontend/dist -type f` 恰一行 `.gitkeep`）⇒ `GOFLAGS= go build ./...` **exit 0**（`10:52:16`→`10:52:27`；`10:52:43`→`10:52:46` 复跑再一次）；**反向证**：只在**副本**里把 embed 目标改名（`mv frontend/dist frontend/dist-neutralised-33v1`，零删除、⛔ 未改任何前端文件一字）⇒ `go build ./...` **exit 1**，红句逐字 `frontend\embed.go:19:12: pattern all:dist: no matching files found`（`11:01:21`→`11:01:25`；跑完改回）。⇒ **AC#11 这枚判据有牙齿**，票面 `:35` 那句"判据自带反向证"由我在仓外满足，不依赖实现腿（它表里把这枚反向证推给"frontend 的主人"）。附带两枚读数：① `GOFLAGS= go mod tidy -diff` 在该副本 **exit 1**，差异＝把 `github.com/jchv/go-webview2` 从 `// indirect` 块移进直接 require 块（它只跑了 `go get`、没跑 `tidy`）；tidy 另外会抹掉 `golang.org/x/sys v0.47.0` 两行，而那两行**起手就在**（`git show 7a41db9b:go.sum | grep -c "x/sys v0.47.0"`＝**2**）＝不是这程带来的；② 仓里/CI **没有** tidy 门（`grep -rn "go mod tidy" .github/workflows scripts/*.sh`＝0 命中）⇒ 不红，但谁跑一次 tidy 就造出一枚与本腿写面无关的 diff。
+91-30. **AC#12 复尺（能力形，不问退出码／不问文案）**：同一枚 HEAD 两口径各跑一发产码调用口 `wisp panel-assets`（仓外副本＋本机工作树）：
+=== docs/evidence/s1/33-panel-host-c27-v2.md ===
+# 票 33 面板宿主 —— 对抗验收表 `33-v2`（非实现者终裁）
+
+**本腿代号**：`33-v2`（对抗验收腿，非实现者；产码与测试文件一字未改，见 §9 自证）
+**起手锚点（本腿现取，`2026-10-01 16:47:37 +08`）**：HEAD＝`3216ba6da5e53b5239e6dfb3d1f4ed9f3e54959e`，分支 `dev`。
+**票面**：`.scratch/wisp/issues/33-panel-host-c27.md`（340 行）。本腿现读复选框＝**13 未勾／1 已勾**（`grep -c "^- \[ \]"`＝13、`grep -c "^- \[x\]"`＝1；已勾那枚是 AC#11，编排者 10-01 11:1x 翻的）。
+**归属规矩**：⛔ 勾与不勾一律归编排者。本表只出判语（成立／不成立／无法判），不翻任何框、不往票面写任何东西。
+
+---
+--- hit ctx ---
+32-| AC#10 | `:245` | `[panel]` 的 `width`／`height`／`scale` 有生产者（真去设窗口边界，`hot` 生效） | **不成立** | 定义处还在（`internal/config/schema.go:530-538`，票面 `:525-535` 已漂）。读取方现量 `grep -rn "Panel\.\|PanelCfg\|cfg\.Panel" --include=*.go cmd/wisp/ \| grep -v _test`＝**0 命中**；宿主把尺寸**写死**：`panel_host_windows.go:272-273 Width: 420, Height: 260`。⇒ 票面要区分的两边**都不是**（既没读也没设）；`Enabled`／`KeepAliveInSession` 同样零读取方 | 看见窗口真开出来就以为尺寸是被配的——用户改 `[panel] width` 今天**没有任何后果** |
+33-| AC#12 | `:37` | "能构建"≠"有页面可发"：判据要区分"embed 只匹配到占位文件"与"真有一包页面产物" | **无法判**（尺齐了；勾不了——它自己的完成条件是归口未定） | 尺这半齐：`panel_host_gate_test.go:77 TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` 问 Go 侧能力（Built／Resolve／Check／Manifest）＋一条 tracked-vs-ignored 出处轴，本发 `--- PASS`，两形分开报：工作树＝**有真页包**（`entryIDProbes` 逐字 `AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]`），而 d22scan 那行 `skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/]` **独立证明它是未跟踪的工作树产物**（库里 `frontend/dist` 仍只有 `.gitkeep`）。勾不了的原因**是票面 `:37` 自己写的**："在'谁把 dist 填上'落定前勾不了，与票 248 AC#9 同一枚归口"。⚠ 我未对该尺突变（N9；33-r4 自报做过，本腿不采信） | 拿"AC#12 的绿"当"面板有内容"的人：库里那一形**没有内容** |
+34:| AC#13 | `:39-40` | 冷启动的往返探测不许把真页面盖掉（次序/过滤器＋会响的断言＋反控） | **成立（带一注）** | 三条完成判据逐条对上：① 次序已重排——`panel_host_windows.go:308` 先 `firstRoundTripLocked`、`:310` 后 `serveEntry`（票面 `:39` 指认的旧序反过来）；② 断言问的是**文档里有没有 embed 入口的真元素**、由页面自己报回（`panel_resident_windows_test.go:294-331`），不是"`SetHtml` 被调过"；③ **反控本腿亲跑（M3）**：换回旧序 ⇒ 逐字 `AC#13 page answer (head 5cae4cf8): "0" - 0 of 1 probe id(s) present in the live document` ＋ `--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.70s)`；还原后 md5 `00336ed0704e51f4cdb043a6d0b3b852` 逐字节相同。**注（弱处不算缺陷）**＝入口只声明得到 **1 枚 id（`root`）** ⇒ 它证"最终文档不是那枚探测页"，证不了"是那一包页面" | 拿这一格当"面板已能显示真内容"的人 |
+35-| AC#14 | `:42-44` | "Go→页面"这一跳由谁投递；一枚会响的用例＝真页面调绑定并 await，断回话真到达页面 | **成立** | 投递者有名字：`cmd/wisp/panel_resident_windows.go:239 w.Run()`（专用 STA 线程把泵交给库；`:262-284 handOverPump` 先发布 `wRef` 再最后一次排干通道）。**两枚钉分维＋配对突变亲验（M5）**（`post()` 不再走 `Dispatch` ＋ 把 `w.Run()` 换成 Go 侧自泵）⇒ 逐字 `AC#14 nail 1 (reply hop), page's own words: "TIMEOUT-2S,TIMEOUT-2S,TIMEOUT-2S" (Go's handler was reached by 3 of the 3 real requests)` ＋ `--- FAIL: TestAC14AwaitedBindingReplyReachesThePage (7.09s)`，**同一发** `AC#14 nail 2 (Eval push hop) title="PUSHED-33R5-OK"` ＋ `--- PASS`。⇒ 回话确实**只有 `Run()` 送得到**、推送不受它影响——正是票面 `:43`"两半要两枚钉"的正面读数。裁定 P2 拒绝的三种形状在测试文件 `:20-23` 被逐字写成不许用 | 拿"Go 收到了 3 枚请求"当"回执到页面了"的人——这格最容易被冒充，而 M5 正好把冒充形打红 |
+36-
