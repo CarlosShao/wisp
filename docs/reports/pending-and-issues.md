@@ -14218,3 +14218,31 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 
 ⛔ 零翻框（票 181 此刻 94/2/5 与追加前同数、票 33 394/13/1、票 259 5/1、票 242 3/0、票 246 枚数未动）、⛔ 零 `-done`、⛔ 零 push、⛔ 未动 `ci.yml`、⛔ 三枚冻结件未碰；`design/**` 那 16 删 4 改与 `.gitignore` 那节 `.worktrees/` 仍是**别人在飞**，一条腿没读没 add。编队现量（17:2x）：`253-r1` 唯一在飞（写 Go，`cmd/wisp`，16:56 还在写自己的更正件）；`comment-truth-2`、`ticket-181-status-1` 已交并各自收档（`A722`／本节）；`259-v1`／`181-v3`／票 246 那格全部按住等同一枚资源＝`cmd/wisp` 空出。机主手上仍那三问，本轮**没叠第四问**。
 
+## A724｜2026-10-08 18:0x｜**每日额度掐掉三条腿**（253-r1 死在交件后／246-raisercensus 按规矩主动停手／167-a2 死在起手锚之后）⇒ 按定式**不重派**、由编排者收遗产：`253-r1` 交件我亲自复跑（rc=0 PASS）＋`246-raisercensus` 命中台账即停（★我的停手条件没区分"已登记"与"已裁定"）＋`167-a2` 只落起手锚（我代提，标未验证半成品）
+
+（追加时刻先跑 `date`＝`2026-10-08 18:0x +0800` 现量。）
+
+### 1. 死因与处置（逐字）
+
+三条腿的通知逐字都是 `You've reached your daily usage limit for Chat. Come back tomorrow to continue working with me.`（额度按天重置）。按本仓定式（第五种死因那一条）：**当天由编排者把未提交的面代提入库并续跑，⛔ 不重派同一条腿**（重派＝把它们读过的东西再读一遍）。处置逐枚：
+
+### 2. `253-r1`＝**交完了**（两笔 commit，我复跑才采）
+
+- 交件＝`65f4c968`（15:48，新测试文件 **`cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go` 579 行**＋起手锚 34 行）＋`8d865932`（17:34，证据六枚 `.md`，numstat 逐枚 13/57/137/59/31/39 增、**0 删**）。它死在第 7 枚件（`02-commit2-readings-correction.md` 17:34 之后）的收尾上，**交件本身已完整**。
+- ★**我自己复跑**（编排者名下；此刻无别的腿占编译面）：`cd cmd/wisp && PATH="…/third_party/sherpa-onnx:…" go test . -run '253r1' -v` ⇒ **rc=0、PASS 0.25s**，两枚顶层用例 ＋ 四枚子夹具逐枚 PASS：`good`／`drifted-bind`（红句逐字 `rostered but unbound door wispDispatch unrostered bound door wispStaleDoor`）／`empty-bind`／`untied-init`（红句 `w.Init script not tied to the door constant`）。它的 census 行我逐字收：`door constant "panelDispatchBinding" = "wispDispatch"; installPanelTransport at panel_host_windows.go:801 made 1 Bind call(s) and 1 Init call(s); roster holds 1 name(s) over 34 production file(s)`。
+- 足迹核过：票 253 票面 `git hash-object` 工作树＝`HEAD:<票面>` blob（`a966b564…`）＝**一字未动**；`git status --porcelain -- cmd/wisp internal/panel internal/agent/approval`＝**空**＝产码足迹零（除了它自己那一枚已入库的 `_test.go`）；票面四把尺 53 行／未勾 4／已勾 0 与它自报同数。
+- 它的两处自陈我采（读数在 `20-mutations.md`／`30-blind-spots.md`）：①**M5 恒真面实证**——把 JS 模板那行改坏（`window.%[1]s`→`window.wispNothing`）尺仍 rc=0 全绿 ⇒ 这枚尺**不读 JS 文本里 `%[1]s` 用没用到**，那一格今天仍只由 `panel_transport_35r1_test.go:195` 那半守着；②**M7 overlay 反证**——把种好的树拷到仓外只喂 `-overlay`，编译器看到错门名而尺 rc=0 ⇒ "读盘的尺对 overlay 结构性失明"在这枚新尺上现场复现（反过来证明它那六发只有盘上种算数）；③M6 首发那条坑它自己认下：`strings.Clone` 那发在同一命令里先跑零命中 grep ⇒ `grep rc=1` 把 `&&` 链打断、`go test` 一枚字没执行，"rc=1"是断链的 rc 不是尺的 rc。④⚠ 它认下与票面 `:16` 字面的冲突（那句写"判据不许再认某个 JS 调用的词面"，而它交的**正是**词面/AST 尺），理由是照同票 `:42` 编排者自己的窄义口径＋`A717 §5` 的收窄 ⇒ **⛔ 不翻框**，这一格归非实现者验收腿裁（现缺的那发＝`253-v1`）。
+
+### 3. `246-raisercensus`＝**按我派单的硬规矩主动停手**（交付 00-anchor.md 124 行，`f9e7584a`）
+
+它跑第 0 步台账查重，四把尺命中：`246-v2` 命中 9 枚（收它的节头＝`A488 :10094`）、`AC#7+246` 命中 22 枚（它逐枚具名两处**假阳性**：`13473`/`13497` 的"246"是 `panel.ts` 行号、`10252` 指 `AC#1`）、两枚符号 7 枚、举卡族 9 枚；票 246 现量 97 行／勾 8／未勾 1 与 `A488`／`A722`／`A723` 三处同数 ⇒ 它判定"命中我 `A722 §3`"**按规矩停手**，未跑第 1/2 步。⛔ 零 Go 命令、零翻框、未改台账、未 push。
+★**这一笔要记我自己**：我派单写的停手条件是"若其中任何一处**已经裁过**这一问 ⇒ 立刻停手"，而 `A722 §3` 是**登记**（"处置＝不回改不撤勾，登记成一枚**待人裁**的问题"）**不是裁定** ⇒ 它按字面停手是**对**的，但这一问**今天仍然未裁**。定式＝**停手条件必须区分"已登记"与"已裁定"**：写"命中即停"时要点名"命中哪一类算数"，否则腿会把"有人登记过"读成"已裁过"。⇒ `A722 §3` 那一问（起管线 vs 真举卡）**原样挂着**，归下一波裁决腿（与 `253-v1`、`259-v1`、`181-v3` 同批；`cmd/wisp` 现已空）。
+
+### 4. `167-a2`＝死在起手锚之后 ⇒ 我代提 `d33d492d`
+
+只落了 `00-anchor.md`（3946 字节，17:41，标〔未验证半成品〕）。⇒ **"草稿"与"崩溃自救"两格今天仍零现量**（它连第 1 步都没进）。⛔ 不据此翻任何框；归额度恢复后重派或我自己做。
+
+### 5. 编队与欠账（18:0x 现量）
+
+在飞＝**0 枚**（三条全死；额度按天重置 ⇒ 今天派不动新 agent）。`cmd/wisp` / `internal/panel` / `internal/agent/approval` 三面现已全空 ⇒ **下一波可派清单（额度一恢复就发）**：`253-v1`（票 253 `AC#1` 非实现者验收：读那六枚 `.md`＋自己跑变异攻那把尺的恒真面）／`259-v1`／`181-v3`／票 246 那格（"起管线 vs 真举卡"）／`167-a2` 续程／我自己名下三笔（`frontend/dist` 刷新受"exe 未还原"牵制、真窗复跑、`go list -deps`）。⛔ 零 push、⛔ 零翻框、⛔ 零 `-done`；机主手上仍那三问，本轮**没叠第四问**。
+
