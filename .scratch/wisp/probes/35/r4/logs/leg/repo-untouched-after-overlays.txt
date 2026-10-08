@@ -1,0 +1,8 @@
+repo-untouched-after-overlays (2026-10-07 22:33:33+0800)
+prod  before=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 after=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 HEAD=26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+fix   before=31c96f37d32adcd1625a2c01748d5b30016227b2  after=31c96f37d32adcd1625a2c01748d5b30016227b2  (HEAD=7185ab56d75952247226feb404add6642fc0e336, edited by 35-r4 and committed separately)
+git status --porcelain on the two faces (expect only the r4 edit to FIX, or nothing once committed):
+ M cmd/wisp/panel_transport_35r2_test.go
+prod-untouched-by-overlays=YES
+fix-untouched-by-overlays=YES
+rc=0

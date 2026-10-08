@@ -1,0 +1,12 @@
+=== ma-hook ===
+(no FAIL line)
+counts: PASS=0 FAIL=0 buildrc=1 runrc=127 
+=== ma-detector-gone ===
+(no FAIL line)
+counts: PASS=0 FAIL=0 buildrc=1 runrc=127 
+=== mb-set-gone ===
+(no FAIL line)
+counts: PASS=0 FAIL=0 buildrc=1 runrc=127 
+=== mb-typeof-gone ===
+(no FAIL line)
+counts: PASS=0 FAIL=0 buildrc=1 runrc=127 

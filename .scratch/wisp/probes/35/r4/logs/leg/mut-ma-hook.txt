@@ -1,0 +1,8 @@
+=== mutant ma-hook (2026-10-07 22:33:31+0800) overlay=/d/tmp/wisp35r4/overlay-ma-hook.json ===
+{"Replace":{"D:\work\workspace\projects plans\Wisp\cmd\wisp\panel_host_windows.go":"D:\tmp\wisp35r4\mut\ma-hook-panel_host_windows.go"}}
+--- build ---
+go: parsing overlay JSON: invalid escape sequence `\w` in string
+buildrc=1
+--- run (CWD=cmd/wisp) ---
+/d/tmp/wisp35r4/countershape.sh: line 74: /d/tmp/wisp35r4/panel-ma-hook.exe: No such file or directory
+runrc=127

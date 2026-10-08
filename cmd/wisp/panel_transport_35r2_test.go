@@ -125,6 +125,18 @@ func (p *jsPanic) Error() string { return p.msg }
 type jsObject struct {
 	props map[string]jsValue
 	order []string
+	// unwritable is 35-r4's property-writability table (ledger A684 §3, ticket 35:75 (a)
+	// face M-B): a name marked here is a NON-WRITABLE data property. Before this existed
+	// the fixture had no such concept at all - jsObject.set let any overwrite win - so the
+	// shape "a browser/host that does not let chrome.webview.postMessage be replaced, and
+	// a forwarding hook that therefore never takes effect" was structurally invisible.
+	// Semantics modelled: assignment in SLOPPY mode is silently ignored (no TypeError),
+	// the old value stays, and the refused write is recorded so a yard can tell "the hook
+	// armed" apart from "the hook was silently unarmed". NOT modelled: configurable,
+	// delete, accessor properties, and Object.getOwnPropertyDescriptor (see markNonWritable).
+	unwritable map[string]bool
+	// ignoredWrites names every assignment this object refused (one entry per attempt).
+	ignoredWrites []string
 	// onGet lets the browser model wrap one property's reads (chrome.webview.postMessage)
 	// without changing what the scripts see. nil for ordinary objects.
 	onGet func(name string, cur jsValue) jsValue
@@ -134,7 +146,27 @@ func newJSObject() *jsObject { return &jsObject{props: map[string]jsValue{}} }
 
 func (o *jsObject) has(name string) bool { _, ok := o.props[name]; return ok }
 
+// markNonWritable is the fixture-side stand-in for
+// Object.defineProperty(o, name, {writable: false}). It is deliberately Go-side, not a JS
+// Object method: ticket 35:75 (a) needs a WORLD shape a case can be run in, and a page
+// that could descriptor-read its own transport would be a new claim this yard is not
+// entitled to make (see the r4 section at the bottom of this file).
+func (o *jsObject) markNonWritable(names ...string) {
+	if o.unwritable == nil {
+		o.unwritable = map[string]bool{}
+	}
+	for _, n := range names {
+		o.unwritable[n] = true
+	}
+}
+
 func (o *jsObject) set(name string, v jsValue) {
+	if _, exists := o.props[name]; exists && o.unwritable[name] {
+		// Non-writable + sloppy mode: the assignment is ignored, silently, exactly the way
+		// a page cannot tell that its hook did not install.
+		o.ignoredWrites = append(o.ignoredWrites, name)
+		return
+	}
 	if _, ok := o.props[name]; !ok {
 		o.order = append(o.order, name)
 	}
@@ -1177,6 +1209,15 @@ type fakeDoc35r2 struct {
 	rejected       int
 	documents      int
 	scriptThrows   []string
+
+	// 35-r4 readings, for the two faces A684 §3 found this fixture blind to.
+	// nativeExitNonWritable asks openDocument to expose chrome.webview.postMessage as a
+	// NON-WRITABLE property (the world M-B needed); nativeExitReceiverOK counts the native
+	// exit invocations that arrived with chrome.webview as their receiver and
+	// nativeReceiverMismatch counts those that lost it (the world M-A needed).
+	nativeExitNonWritable  bool
+	nativeExitReceiverOK   int
+	nativeReceiverMismatch int
 }
 
 func newFakeDoc35r2() *fakeDoc35r2 {
@@ -1235,7 +1276,21 @@ func (bf *fakeDoc35r2) openDocument() {
 	}
 	// the native exit: what chrome.webview.postMessage actually is in WebView2 - the one
 	// channel into the Go message callback.
-	cw.set("postMessage", &jsFunction{name: "native", host: func(_ jsValue, args []jsValue) jsValue {
+	//
+	// 35-r4, face M-A (ledger A684 §3, ticket 35:75 (a)). This stub used to be
+	// func(_ jsValue, args []jsValue): it DISCARDED its receiver, so a forwarding hook
+	// written as a bare native(message) behaved here exactly like the shipped
+	// native.call(cw, message) - 35-v2's one-line mutant stayed green on all five cases.
+	// A browser's host method is not a detached function: Chrome and WebView2 answer an
+	// invocation that lost its receiver with "TypeError: Illegal invocation", so the stub
+	// now requires cw itself (identity, not type) as the receiver and says so by name.
+	cw.set("postMessage", &jsFunction{name: "native", host: func(recv jsValue, args []jsValue) jsValue {
+		if recv != cw {
+			bf.nativeReceiverMismatch++
+			panic(&jsPanic{"TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with " +
+				jsTypeOf(recv) + ", want the chrome.webview object the page holds"})
+		}
+		bf.nativeExitReceiverOK++
 		bf.nativeCalls++
 		msg := ""
 		if len(args) > 0 {
@@ -1245,6 +1300,13 @@ func (bf *fakeDoc35r2) openDocument() {
 		bf.msgcb(msg)
 		return nil
 	}})
+	// 35-r4, face M-B: the台件 that makes the native exit non-writable, i.e. a host that
+	// does not let the page replace its own transport. The hook's assignment is then
+	// silently ignored and the forwarding never arms - the shape the fixture could not
+	// express before this line.
+	if bf.nativeExitNonWritable {
+		cw.markNonWritable("postMessage")
+	}
 	chrome := newJSObject()
 	chrome.set("webview", cw)
 	win.set("chrome", chrome)
@@ -1384,8 +1446,13 @@ func (bf *fakeDoc35r2) eval(script string) {
 }
 
 func (bf *fakeDoc35r2) summary() string {
-	return fmt.Sprintf("nativeExitCalls=%d doorRounds=%d maxPostDepth=%d capTripped=%v capDepth=%d unparsable=%d unboundSlots=%d evalThrew=%d resolved=%d rejected=%d scriptThrows=%v",
-		bf.nativeCalls, bf.doorRounds, bf.maxPostDepth, bf.capTripped, bf.capDepth,
+	ignored := "(none)"
+	if bf.webview != nil && len(bf.webview.ignoredWrites) > 0 {
+		ignored = fmt.Sprint(bf.webview.ignoredWrites)
+	}
+	return fmt.Sprintf("nativeExitCalls=%d receiverOK=%d receiverLost=%d ignoredWrites=%s doorRounds=%d maxPostDepth=%d capTripped=%v capDepth=%d unparsable=%d unboundSlots=%d evalThrew=%d resolved=%d rejected=%d scriptThrows=%v",
+		bf.nativeCalls, bf.nativeExitReceiverOK, bf.nativeReceiverMismatch, ignored,
+		bf.doorRounds, bf.maxPostDepth, bf.capTripped, bf.capDepth,
 		bf.unparsedFrames, bf.deadSlots, bf.evalThrew, bf.resolved, bf.rejected, bf.scriptThrows)
 }
 
@@ -1821,4 +1888,179 @@ func TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot(t *testing.T) {
 	if bf.resolved != 0 || bf.rejected != 0 {
 		t.Fatalf("calibration: nothing may be settled here, got resolved=%d rejected=%d", bf.resolved, bf.rejected)
 	}
+}
+
+// ---------------------------------------------------------------------------
+// 7. 35-r4: the two faces A684 §3 found this fixture blind to (ticket 35:75 (a))
+// ---------------------------------------------------------------------------
+//
+// WHAT THIS SECTION IS FOR. 35-v2 attacked this yard with two one-line mutants of the
+// shipped hook and BOTH stayed green (ledger A684 §3): M-A replaced native.call(cw,
+// message) with a bare native(message), M-B deleted the 'typeof ... !== "function"' half
+// of the guard. Neither reading was the interpreter's fault: the native exit stub
+// discarded its receiver and jsObject.set had no concept of a non-writable property, so
+// the two shapes had nothing to be wrong *in*. Both halves are now modelled -
+// a receiver-strict native exit, and a per-object writability table - and each face gets
+// its own named red below.
+//
+// WHAT THIS BUYS AND WHAT IT DOES NOT. It buys "a hook that drops this, or whose
+// assignment is silently refused, is no longer certified as a delivery". It does NOT buy
+// "WebView2 really binds the receiver / really lets the page replace postMessage" -
+// A684 §1 puts that格 with ticket 35:52's real-window evidence, and no assertion here
+// stands in for it. Object.defineProperty is NOT implemented as a JS-visible method (only
+// the Go-side markNonWritable台件), so a page that descriptor-reads or descriptor-redefines
+// its own transport still lives outside this yard; descriptor READS
+// (Object.getOwnPropertyDescriptor), configurable and delete are named as un-modelled in
+// .scratch/wisp/probes/35/r4/impl.md rather than quietly skipped.
+
+// runShippedHookInOneWorld35r4 installs the SHIPPING wiring (installPanelTransport: the
+// bound door, then the production forwarding string read as a value) into a document,
+// posts the page's own envelope once, and hands back what the caller asserts on.
+// nonWritable selects the world where chrome.webview.postMessage is exposed as a
+// non-writable data property.
+func runShippedHookInOneWorld35r4(t *testing.T, nonWritable bool) (*fakeDoc35r2, *modeSpy35r1, string) {
+	t.Helper()
+	spy := &modeSpy35r1{}
+	disp := &panel.ComposerDispatch{Mode: spy}
+	mgr := NewPanelManager(disp, nil, "")
+	bf := newFakeDoc35r2()
+	bf.nativeExitNonWritable = nonWritable
+	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+		t.Fatalf("installPanelTransport failed: %v", err)
+	}
+	bf.openDocument()
+	return bf, spy, bf.pagePost(pageModeRequestEnvelope)
+}
+
+// TestForwardingHookMustNotLoseTheNativeExitReceiver is face M-A. The shipped hook hands
+// the native exit its receiver (native.call(cw, message)); 35-v2's mutant dropped it with
+// one character-level edit (native(message)) and all five cases above stayed green,
+// because the stub took func(_ jsValue, ...) and could not see the difference. The stub
+// now demands cw itself, the way a browser's host method does, so the receiver-less shape
+// dies here by name instead of passing silently.
+//
+// TOOTH: overlay-mutating the shipped hook to native(message) reddens the FIRST branch
+// below with the thrown "TypeError: Illegal invocation: chrome.webview.postMessage lost
+// its receiver" in its text; overlay-mutating the stub back to discarding recv turns the
+// mutant green again - both readings are recorded in .scratch/wisp/probes/35/r4/logs.
+func TestForwardingHookMustNotLoseTheNativeExitReceiver(t *testing.T) {
+	bf, spy, thrown := runShippedHookInOneWorld35r4(t, false)
+
+	if thrown != "" {
+		t.Fatalf("M-A RED (receiver lost at the native exit): the page's own postMessage threw inside the document, which under this model means the forwarding hook invoked chrome.webview.postMessage without its receiver: %s. %s",
+			thrown, bf.summary())
+	}
+	if bf.nativeReceiverMismatch != 0 {
+		t.Fatalf("M-A RED (receiver lost at the native exit): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. A real browser answers that with Illegal invocation and the page's letter never leaves the page, so this hook must not be certified as a delivery. %s",
+			bf.nativeReceiverMismatch, bf.summary())
+	}
+	if bf.nativeExitReceiverOK != 1 {
+		t.Fatalf("M-A READING WRONG: the native exit was honoured with its receiver %d time(s), want exactly 1. Zero means the receiver face was never exercised here, so this case would prove nothing. %s",
+			bf.nativeExitReceiverOK, bf.summary())
+	}
+	expectDelivered(t, bf, spy, 1)
+	t.Logf("M-A face has teeth: 1 native-exit call, all with chrome.webview as receiver (receiverLost=%d); a bare native(message) trips it", bf.nativeReceiverMismatch)
+}
+
+// TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit is face M-B's writability
+// half: the fixture used to have NO writable/configurable concept (grep of this file: zero
+// occurrences), so "the host does not let the page replace its own transport, and the
+// forwarding hook therefore never arms" could not be expressed at all - an override always
+// won, and the yard reported a delivery.
+//
+// In the non-writable world the assignment must be REFUSED, SILENTLY (sloppy mode: no
+// TypeError), and the consequence must be the loud reading: the page's letter reaches the
+// native exit unforwarded, dies at msgcb's unbound-method branch (ticket 35:52-59's death)
+// and never reaches the Go door. The writable world is run through the same helper as the
+// control, so this case is not an artefact of a台件 nobody checked.
+func TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit(t *testing.T) {
+	bf, spy, thrown := runShippedHookInOneWorld35r4(t, true)
+
+	if thrown != "" {
+		t.Fatalf("M-B RED (wrong death): a non-writable chrome.webview.postMessage must refuse the hook's assignment SILENTLY (sloppy mode, no TypeError), but the page's own post threw: %s. %s",
+			thrown, bf.summary())
+	}
+	if got := bf.webview.ignoredWrites; len(got) != 1 || got[0] != "postMessage" {
+		t.Fatalf("M-B RED (fixture blind to writability): the hook's assignment to a property this world marks NON-WRITABLE took effect unnoticed - ignoredWrites=%v, want exactly [postMessage]. This is the A684 §3 face this case exists to make bite: without a refused write the yard cannot tell an armed hook from a silently ignored override. %s",
+			got, bf.summary())
+	}
+	if bf.nativeCalls != 1 || bf.nativeReceiverMismatch != 0 {
+		t.Fatalf("M-B READING WRONG: the page's letter must still leave through the untouched native exit exactly once (and with its receiver): got nativeExitCalls=%d receiverLost=%d. %s",
+			bf.nativeCalls, bf.nativeReceiverMismatch, bf.summary())
+	}
+	if bf.doorRounds != 0 || len(spy.reqs) != 0 {
+		t.Fatalf("M-B RED: with the native exit NOT writable the page's letter still reached the Go door (doorRounds=%d routerRuns=%d) - the model let a silently refused override behave like a successful hook. %s",
+			bf.doorRounds, len(spy.reqs), bf.summary())
+	}
+	if bf.deadSlots != 1 || bf.evalThrew != 1 {
+		t.Fatalf("M-B RED: an unarmed forwarding must leave the raw envelope to die at msgcb's unbound-method branch (unboundSlots=1, swallowed reply TypeError=1), got unboundSlots=%d evalThrew=%d. %s",
+			bf.deadSlots, bf.evalThrew, bf.summary())
+	}
+	if len(bf.nativeFrames) != 1 || bf.nativeFrames[0] != pageModeRequestEnvelope {
+		t.Fatalf("M-B READING WRONG: want the page's envelope to reach the native exit UNFORWARDED exactly once, got %v", bf.nativeFrames)
+	}
+
+	bf2, spy2, thrown2 := runShippedHookInOneWorld35r4(t, false)
+	if thrown2 != "" {
+		t.Fatalf("M-B CONTROL RED: the same shipped hook in a writable world threw: %s. %s", thrown2, bf2.summary())
+	}
+	if len(bf2.webview.ignoredWrites) != 0 {
+		t.Fatalf("M-B CONTROL RED: the writable world refused %d assignment(s) (%v) - the台件 is not selecting on writability. %s",
+			len(bf2.webview.ignoredWrites), bf2.webview.ignoredWrites, bf2.summary())
+	}
+	expectDelivered(t, bf2, spy2, 1)
+	t.Logf("M-B face has teeth: non-writable world refused the hook (doorRounds=0, unboundSlots=1), writable world armed it (doorRounds=%d)", bf2.doorRounds)
+}
+
+// TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent is M-B's other half as
+// 35-v2 hit it: deleting 'typeof window.wispDispatch !== "function"' from the shipped
+// guard changed nothing, because in every world this yard ran the door was always bound.
+// The half-branch exists for the document whose binding did not register, so that world is
+// now built (the Bind stub script is dropped, the forwarding hook is kept) and the guard
+// has work to do: the hook must fall back to the native exit and forward byte-for-byte,
+// not call a non-function.
+//
+// TOOTH: overlay-deleting the typeof half makes the wrapper reach window.wispDispatch,
+// which is undefined here, and the page's post throws a TypeError the case reports by name
+// (logs/mut-typof-half.txt).
+func TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent(t *testing.T) {
+	spy := &modeSpy35r1{}
+	disp := &panel.ComposerDispatch{Mode: spy}
+	mgr := NewPanelManager(disp, nil, "")
+	bf := newFakeDoc35r2()
+	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+		t.Fatalf("installPanelTransport failed: %v", err)
+	}
+	// installPanelTransport queues the library's Bind stub first and the forwarding hook
+	// second (panel_host_windows.go:693-699, the order this yard already models); dropping
+	// script 0 leaves a document with the hook and NO window.wispDispatch.
+	bf.initScripts = bf.initScripts[1:]
+	if len(bf.initScripts) != 1 {
+		t.Fatalf("calibration: want the forwarding hook alone queued, got %d script(s)", len(bf.initScripts))
+	}
+	bf.openDocument()
+	if bf.window.has(panelDispatchBinding) {
+		t.Fatalf("calibration: the door %q is present in the page, so this world does not exercise the guard's typeof half at all", panelDispatchBinding)
+	}
+
+	thrown := bf.pagePost(pageModeRequestEnvelope)
+	if thrown != "" {
+		t.Fatalf("M-B RED (guard's typeof half gone): with no door in the page the forwarding hook must fall back to the native exit; it instead invoked a non-function and the page's post threw: %s. %s",
+			thrown, bf.summary())
+	}
+	if bf.capTripped {
+		t.Fatalf("M-B RED: the door-absent fallback re-entered chrome.webview.postMessage past the cap (%s). %s", bf.firstCapMessage(), bf.summary())
+	}
+	if bf.nativeCalls != 1 || bf.nativeExitReceiverOK != 1 || bf.nativeReceiverMismatch != 0 {
+		t.Fatalf("M-B READING WRONG: the fallback must reach the native exit exactly once, with its receiver: nativeExitCalls=%d receiverOK=%d receiverLost=%d. %s",
+			bf.nativeCalls, bf.nativeExitReceiverOK, bf.nativeReceiverMismatch, bf.summary())
+	}
+	if len(bf.nativeFrames) != 1 || bf.nativeFrames[0] != pageModeRequestEnvelope {
+		t.Fatalf("M-B READING WRONG: the door-absent fallback must forward the page's bytes untouched, got %v", bf.nativeFrames)
+	}
+	if bf.doorRounds != 0 || len(spy.reqs) != 0 || bf.deadSlots != 1 || bf.evalThrew != 1 {
+		t.Fatalf("M-B READING WRONG: an absent door must leave the envelope dead at msgcb's unbound branch (doorRounds=0 routerRuns=0 unboundSlots=1 evalThrew=1), got doorRounds=%d routerRuns=%d unboundSlots=%d evalThrew=%d. %s",
+			bf.doorRounds, len(spy.reqs), bf.deadSlots, bf.evalThrew, bf.summary())
+	}
+	t.Logf("door absent: the guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=%d, no throw)", len(bf.nativeFrames))
 }

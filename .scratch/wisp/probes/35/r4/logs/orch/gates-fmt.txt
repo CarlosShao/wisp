@@ -1,0 +1,5 @@
+--- gofmt -l on the changed file ---
+cmd/wisp/panel_transport_35r2_test.go
+gofmt rc=0
+--- gofumpt present? ---
+no gofumpt on PATH

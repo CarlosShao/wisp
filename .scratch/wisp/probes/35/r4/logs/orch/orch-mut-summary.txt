@@ -1,0 +1,20 @@
+=== ma-hook ===
+--- FAIL: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- FAIL: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- FAIL: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+--- FAIL: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+--- FAIL: TestShapeA3SecondPagePostStillDelivers (0.00s)
+--- FAIL: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+--- FAIL: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+--- FAIL: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+--- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+counts: PASS=3 FAIL=9 buildrc=0 runrc=1 
+=== ma-detector-gone ===
+(no FAIL line)
+counts: PASS=12 FAIL=0 buildrc=0 runrc=0 
+=== mb-set-gone ===
+--- FAIL: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+counts: PASS=11 FAIL=1 buildrc=0 runrc=1 
+=== mb-typeof-gone ===
+--- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+counts: PASS=11 FAIL=1 buildrc=0 runrc=1 

@@ -1,0 +1,15 @@
+r4 anchor 2026-10-07 22:14:00+0800
+HEAD=6c7dd5ed348b8f070da1b344c54359b97509132b
+--- forbidden zone diff 1d70fb2b..HEAD ---
+rc=0
+--- working tree vs HEAD on prod faces ---
+rc=0
+--- blob hashes ---
+7185ab56
+bebe8e70
+--- CR counts (autocrlf phantom check) ---
+cmd/wisp/panel_transport_35r2_test.go wt=0 head=0
+cmd/wisp/panel_inbound_guards_35r3_test.go wt=0 head=0
+--- r2 fixture blind-spot baseline ---
+0
+rc=1

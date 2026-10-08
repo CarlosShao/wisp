@@ -1,0 +1,2 @@
+--- go vet ./cmd/wisp/ ---
+vetrc=0

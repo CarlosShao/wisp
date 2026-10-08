@@ -1,0 +1,8 @@
+=== mutant mb-set-gone (2026-10-07 22:33:32+0800) overlay=/d/tmp/wisp35r4/overlay-mb-set-gone.json ===
+{"Replace":{"D:\work\workspace\projects plans\Wisp\cmd\wisp\panel_transport_35r2_test.go":"D:\tmp\wisp35r4\mut\mb-set-gone-panel_transport_35r2_test.go"}}
+--- build ---
+go: parsing overlay JSON: invalid escape sequence `\w` in string
+buildrc=1
+--- run (CWD=cmd/wisp) ---
+/d/tmp/wisp35r4/countershape.sh: line 74: /d/tmp/wisp35r4/panel-mb-set-gone.exe: No such file or directory
+runrc=127

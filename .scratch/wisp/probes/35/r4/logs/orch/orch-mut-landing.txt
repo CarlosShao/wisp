@@ -1,0 +1,13 @@
+orchestrator mutant re-landing (2026-10-08 08:17:30+0800): counts taken against the CURRENT working tree
+mutant ma-hook changed-line-count=2
+<     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+>     if (inside || typeof window.%[1]s !== "function") { return native(message); }
+mutant mb-typeof-gone changed-line-count=2
+<     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+>     if (inside) { return native.call(cw, message); }
+mutant ma-detector-gone changed-line-count=2
+< 		if recv != cw {
+> 		if false {
+mutant mb-set-gone changed-line-count=2
+< 	if _, exists := o.props[name]; exists && o.unwritable[name] {
+> 	if _, exists := o.props[name]; exists && false {

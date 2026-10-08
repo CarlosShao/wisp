@@ -1,0 +1,2 @@
+buildrc=0
+cp rc=0
