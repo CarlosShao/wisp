@@ -1,0 +1,29 @@
+--- exact grep of the two new content anchors as written in config_readers_255.go, against git show 67ab595d ---
+[A] grep -n 'Width: 420' (single space, as the file tells you to grep):
+rc=1
+[B] grep -n 'Height: 260':
+305:			Height: 260,
+rc=0
+[C] grep -n 'Width:  420' (double space, actual gofmt output):
+304:			Width:  420,
+rc=0
+--- lines 386-398 of panel_host_windows.go at HEAD (the create at :392) ---
+	w := webview2.NewWithOptions(webview2.WebViewOptions{
+		Debug:     false,
+		DataPath:  m.dataPath,
+		AutoFocus: false,
+		// One call, one read: the geometry the window is born with is what this
+		// host's source answers RIGHT NOW (票 255 AC#4). See windowOptions.
+		WindowOptions: m.windowOptions(),
+	})
+	if w == nil {
+		return fmt.Errorf("panel host: WebView2 window creation returned nil (runtime missing or blocked)")
+	}
+
+	hwnd := windows.HWND(w.Window())
+--- what config_readers_255.go literally says about the anchors ---
+18:// create call inside bringUp spelled its geometry as the literals `Width: 420` /
+19:// `Height: 260` (grep those two in
+146:	// create block inside bringUp spelled it as the literals `Width: 420` /
+147:	// `Height: 260` (a CONTENT anchor, grep it in
+rc=0

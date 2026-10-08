@@ -1,0 +1,12 @@
+--- recheck the two internal/ cites with correct paths ---
+	SizePx   int // configured orb size 44..72 (0 = default 56)
+	// RedactPaths is [privacy] redact_paths.
+--- cites in panel_geometry_255_test.go ---
+rc=0
+--- line-number cites (file:NNN without token) in the two 255 files ---
+cmd/wisp/panel_host_windows.go:304
+cmd/wisp/run.go:409
+internal/config/tiers.go:34
+panel_host_windows.go:304
+--- ticket 255 file: locate ---
+255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md

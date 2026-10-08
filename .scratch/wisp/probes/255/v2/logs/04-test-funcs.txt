@@ -1,0 +1,32 @@
+97:func newGeoSink255r1() *geoSink255r1 {
+101:func (c *geoSink255r1) Run()       {}
+102:func (c *geoSink255r1) Terminate() {}
+104:func (c *geoSink255r1) Dispatch(f func()) {
+118:func (c *geoSink255r1) Destroy() {
+124:func (c *geoSink255r1) Window() unsafe.Pointer { return nil }
+125:func (c *geoSink255r1) SetTitle(string)        {}
+126:func (c *geoSink255r1) Init(string)            {}
+127:func (c *geoSink255r1) Eval(string)            {}
+128:func (c *geoSink255r1) Navigate(string)        {}
+130:func (c *geoSink255r1) SetHtml(html string) {
+136:func (c *geoSink255r1) Bind(name string, f interface{}) error {
+146:func (c *geoSink255r1) SetSize(w, h int, hint webview2.Hint) {
+158:func (c *geoSink255r1) snapshot() (sized, bare []sizeCall255r1, dispatches int) {
+169:func attachGeoSink255r1(m *PanelManager, c *geoSink255r1) {
+178:func managerOnRecordedWindow(t *testing.T, src func() (int, int), calls *int) (*PanelManager, *geoSink255r1) {
+194:func TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch(t *testing.T) {
+293:func TestTicket255r1ShowOnAnExistingWindowSendsTheResize(t *testing.T) {
+319:func TestTicket255r1SinkTellsDispatchFromABareCall(t *testing.T) {
+336:func TestTicket255r1ReshowWithNoLiveControlSendsNothing(t *testing.T) {
+360:func TestTicket255r1ShowAsksForGeometryOnlyOnTheReshowBranch(t *testing.T) {
+392:func TestTicket255r1HostResizeCallSiteAsksForHintNoneAndIsTheOnlyOne(t *testing.T) {
+425:func parseHostFile255r1(t *testing.T) *ast.File {
+439:func funcDecl255r1(t *testing.T, file *ast.File, name string) *ast.FuncDecl {
+453:func isNotCreatedTest255r1(cond ast.Expr) bool {
+462:func countCall255r1(root ast.Node, methodName string) int {
+475:func callIsBareStatement255r1(block *ast.BlockStmt, methodName string) bool {
+497:func dispatchWrapsSetSize255r1(fn *ast.FuncDecl) bool {
+522:func isPackageSelector255r1(e ast.Expr, pkg, name string) bool {
+531:func selectorText255r1(e ast.Expr) string {
+541:func fmtTypeName255r1(e ast.Expr) string {
+552:func typeName255r1(e ast.Expr) string {

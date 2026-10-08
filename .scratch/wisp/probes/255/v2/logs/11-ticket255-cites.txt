@@ -1,0 +1,28 @@
+--- wc ---
+167 .scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md
+--- file:LINE [token] cites in ticket ---
+rc=0
+--- AC lines ---
+5:**性质**：⚠ **AC#1 算产品行为**（程序自己说了一句不成立的话）；AC#2／AC#3 是仪器与治理；AC#4 才是"让它真生效"那件�
+20:- [ ] **AC#4 让 `[panel] width` 真生效（这才是 owner 那句"改了要有反应"）**：落点＝**装配根把配置递给面板宿主**（既有裁�
+32:- 写面＝`internal/config`＋`cmd/wisp`（AC#1／AC#2／AC#4 三格都碰）⇒ **此刻 `248-v1` 正在整包跑 `cmd/wisp`** ⇒ **按住**，起跑判�
+34:- ⛔ 拆腿建议两枚：**255-r1**＝AC#1＋AC#3（说实话＋会响的尺，纯 Go 测试与文案）；**255-r2**＝AC#4（真窗口尺寸，本机可�
+52:**排程（收 `255-a1` 给的两枚耦合点）**：ⓑ 与 AC#3 **共用同一枚反射枚举器**（"新增一枚哑键必红"那枚正控要真改 `schem
+54:**⚠ 行号更正（2026-10-02 13:1x，台账 `A531`；原话不改，就地追加）**：上面 AC#5 那格写的 `cmd/wisp/panel_config_store.go:227` **�
+56:**★ AC#4 的撞钉预检＋两格裁死（10-03 09:5x，只读腿 `255-c2` 交件＝`.scratch/wisp/probes/255/c2/census.md` 289 行／8 节全填／7 枚 c
+58:- ⚠⚠ **AC#4 落地那一次必须同批改本票自己的尺**（这是第 64／70 条规矩现出的现场，⛔ 不许留给下一程踩）：`255-r2` 
+59:- **我裁两格（⛔ 不摆 owner，低利害＋可逆＋零契约）**：**形＝取值闭包**（宿主每次建窗现读，dispose→show 重建即跟�
+61:- **可照抄的定式（腿量＋我复认形状）**：AC#4 不需要新造机制——最像的现成件＝热键桥（`internal/ball/hotkey_reload.go:11-
+65:⚠ 这一格**归进已有的 `AC#1`**（那句"已立即生效只许说真话"），⛔ 不新开 AC 号——本票 `AC#4` 也已经把"`[panel] width` �
+72:**给下一位碰这一格的判据（⛔ 不是本程的活）**：把 `:161` 那句改成说实话（"重启进程后生效"），或者把"重建"那一�
+74:## 10-08 10:4x 机主当场拍板（原话入台账 `A698`）：`AC#4` 的口径从"重启后生效"**升为"不用重启就见效"**
+77:⇒ 本票 `AC#4` 从此不是"把话说实话"那一格（那是 `AC#1` 的活），而是**一枚功能**：已存在的面板窗口要在配置变更后�
+100:- **热加载那一跳今天挂不上**：`OnReload` 只对 Reload 档开火（`manager.go:198`）而 `tiers.go:34` 写着 `"panel":"hot"`；`startConfigRel
+138:② **`AC#1` 的正控前提没有随本票 `AC#4` 翻转**：那一发照字面跑 **PASS**，进程自打的句子里 `已立即生效` 只列 `[llm]`、
+158:（＝**票 33 的 AC#4 焦点那格**，与本票 AC#4 无关）／`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／
+--- tiers.go:34 check ---
+	"panel":   "hot",
+--- panel_host_windows.go:304 at HEAD ---
+	defer m.mu.Unlock()
+--- git diff 18655988..HEAD for ticket file (did later legs touch it) ---
+rc=0

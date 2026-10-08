@@ -1,0 +1,30 @@
+--- grep '15' in 111-c2 attribution.md ---
+25:| `TestAC14GoSideEvalPushReachesThePage` | `panel_resident_windows_test.go:869` `the page reports its title as "", want "PUSHED-33R5-OK"`——**页报回了、报的是空标题** ⇒ 要的是 **Go→页的 `Eval` �
+26:| `TestPanelHostLatencyPercentilesAC2`（派单追加） | run 305 是 **SKIP**（`:985` `no cold/hot sample recorded in this process`）；**run 300 不是"换成"一个新因**，它红在 `:1005 cold P95 3743.192 m
+30:本腿按第 108 条**自己复跑了那把尺**（`logs/03`）：**15 枚**（`33-v4` 那件是 14 枚；差的恰一枚＝`TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`，`winlive` 档，两边名册都�
+32:- **只在 CI 红那侧**：另外 4 枚（短名族 3 ＋ `icacls` 1）**根本不在窗口依赖名册里**（它们体扫零命中，本腿复跑确认它们不在 15 枚内）⇒ **"6 枚红都属窗口族"这个�
+53:5. `winlive` 那 3 枚（`TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor`／`TestTicket255RealWindowWidthFollowsTheConfig`／`TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`）在任何一侧都**零色
+76:另具名一条形状差：**8 发里只有 run 305 是 `-1`**，其余 7 发（含 run 300）是"量到正数、超 1500 ms 预算"那一支（`logs/02`）——`111-c1` 把 run 300 也写成 `-1`，本腿顶回（�
+100:3. **ⓑ/ⓒ 与"红就是环境红"在本仓的先例**：`A451:9564`（icacls／短名＝环境，逐字）＋`A617:12088`（"runner 机器耦合…⛔ 不新立案"）＋`A526:10718`（`cold=3499.615 ms` 是**那�
+112:- **稳定集（8 发全红）＝2 枚**：`TestRunPacketCarriesTheLoadedInstructionFiles`、`TestPanelHostRealWindowHopAndLifecycle`（⚠ 后者**同名两种坏法**：305 是 `-1`／294–304 是"正数超 1500 m
+135:| 8.3 短名 ↔ 长名分家 | **票 252**（未 `-done`，10-02 立）；先例件票 115（`-done`）、票 106/112（`-done`，winsec 在 CI runner 首跑红） |
+138:| 托管机有没有运行库（甲）与"能不能真开可见窗"（乙） | **`33-n1`** §4／§5／§6（甲=装了、乙不升档、R-a..R-e 待采）＋台账 **`A526`**（甲升【已证】、`cold=3499.615 ms
+151:1. **`111-c1` 与本腿派单把 run 300 的 lifecycle 红写成"`got -1.000`；the message channel did not come up"** ⇒ **只有 run 305 是那一形。** 盘上原文：run 300 `panel_host_windows_test.go:660: co
+154:4. **`33-v4` 的窗口依赖名册 14 枚** ⇒ 本腿在同仓现量（HEAD `052b393f`）**15 枚**，多出的恰是 `TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`（`winlive` 档）。⛔ 不是它错�
+rc=0
+--- window-dependent roster candidate blocks ---
+10:证据件（逐枚自带尺与 rc）：`logs/01-run305-red-sentences.md`｜`logs/02-cross-run-colour-matrix.md`｜`logs/03-roster-rerun-vs-33v4.md`｜`logs/04-local-colours.md`｜`logs/05-minus-one
+28:### 名册作差（本机窗口依赖名册 vs CI 红名册）
+30:本腿按第 108 条**自己复跑了那把尺**（`logs/03`）：**15 枚**（`33-v4` 那件是 14 枚；差的恰一枚＝`TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`，`winlive` �
+32:- **只在 CI 红那侧**：另外 4 枚（短名族 3 ＋ `icacls` 1）**根本不在窗口依赖名册里**（它们体扫零命中，本腿复跑确认它们不在 15 枚内）⇒ **"6 枚红都
+33:- **只在窗口名册那侧**：13 枚；其中 **8 枚在 CI 那台机器上是 PASS**（`logs/03` 的表），**2 枚本机红而 CI 绿**（`TestAC14AwaitedBindingReplyReachesThePage`、`TestAC
+101:4. **⚠ 两枚必须先摆清的事实，⛔ 本腿不裁**：(i) 窗口族在 CI **不是"跑不了"**——8 枚窗口依赖用例同发绿、还有 `msedgewebview2` 子进程计数（`logs/07`
+108:## 问 5 · 红名册的稳定性（⛔ 未把大日志读进上下文）
+113:- **近 7 发稳定、最早那发绿＝2 枚**：`TestAC1AlwaysBranchDoesNotRevertAHandEditedKey`、`TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card`（run 294 **PASS**，299–305 FAIL）⇒
+119:  - 名册**规模**也在漂：`=== RUN` 261→323→335，`FAIL` 12→6→8→7→6。
+123:归口（⛔ 不新立）：**票 236 标题第 5 格**逐字"**在册红名册不是稳定集合**"＋台账 `A451:9626`"**'在册红名册是稳定集合'这句话今天第三次被推翻**"，�
+131:**有，四条机制链全部有名字；⛔ 不新立任何票。** 扫描逐变体（含"CI 上没有 WebView2／真窗不进 CI／窗口依赖名册／环境红／skip 兜底／仅本机可量�
+139:| 红名册不稳定 | **票 236 第 5 格**＋`A451:9626`（第三次推翻）＋票 70（CI 分诊总框，`blocked-on-owner`） |
+142:**唯一今天找不到既有格子的一格**（⛔ 本腿不立、只具名）：`TestAC14GoSideEvalPushReachesThePage` **CI 红在 `:869`（页报回空标题）而本机红在 `:866`（页零�
+154:4. **`33-v4` 的窗口依赖名册 14 枚** ⇒ 本腿在同仓现量（HEAD `052b393f`）**15 枚**，多出的恰是 `TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`（`winlive` 档）
+169:- 大输出：`D:/tmp/wisp111c2/`（`run*.log` 8 枚 1.8–2.2 MB／`cli-run*.txt`／`clean-run*.txt`／`roster-rerun.txt`／`file-tags.txt`／`ci20.json`），⛔ 未入库、⛔ 未删（临时�

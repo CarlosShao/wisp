@@ -1,0 +1,15 @@
+--- what files do the 255 rulers read? ---
+208:	src := readHostFileForGeometry255(t, filepath.Join(hostPkgDir255(t), "panel_host_windows.go"))
+210:	file, err := parser.ParseFile(fset, "panel_host_windows.go", src, parser.AllErrors)
+315:	hostPath := filepath.Join(dir, "panel_host_windows.go")
+343:	root := readHostFileForGeometry255(t, filepath.Join(hostPkgDir255(t), "panel_resident_windows.go"))
+376:	src := readHostFileForGeometry255(t, filepath.Join(hostPkgDir255(t), "config_readers_255.go"))
+430:	t.Fatalf("no readable body for function %s in cmd/wisp/panel_host_windows.go", name)
+--- SetWindowPos / MoveWindow / SetBounds needles anywhere in cmd/wisp tests ---
+cmd/wisp/panel_reshow_255r1_windows_test.go:27://	    holds no measurement of a cross-thread SetWindowPos - reddens (b) while
+cmd/wisp/panel_reshow_255r1_windows_test.go:262:				t.Errorf("%d SetSize call(s) went out WITHOUT Dispatch: %+v - the repository holds no me
+cmd/wisp/panel_reshow_255r1_windows_test.go:417:		t.Errorf("requestGeometryOnReshow does not post its SetSize from inside a Dispatch closure
+cmd/wisp/panel_host_windows.go:550:// SetWindowPos and then browser.Resize(). C27 is untouched - nothing here hides,
+cmd/wisp/panel_host_windows.go:557://     before SetWindowPos runs), while windowOptions' pair goes to CreateWindowExW
+cmd/wisp/panel_host_windows.go:575://     SetWindowPos does to a WebView2 window (255-a2 asked; its words: 仓里没有
+rc=0

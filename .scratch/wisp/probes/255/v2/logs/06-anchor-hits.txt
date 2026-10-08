@@ -1,0 +1,16 @@
+--- grep 304 in config_readers_255.go (worktree) ---
+rc=1
+--- same at 18655988 ---
+0
+rc=1
+--- same at d37e75bd (pre-change) ---
+17:// (cmd/wisp/panel_host_windows.go:304-305 at HEAD 67ab595d hard-coded
+rc=0
+--- diff 18655988..HEAD for this file ---
+rc=0
+--- content anchors at 67ab595d ---
+304:			Width:  420,
+rc=0
+--- NewPanelManager signature at 67ab595d ---
+175:func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPath string) *PanelManager {
+rc=0

@@ -1,0 +1,33 @@
+--- all file:LINE [token] cites in config_readers_255.go (own ruler, no pipe on rc) ---
+cmd/wisp/logsink.go:149 [Level: logSinkLevel]
+cmd/wisp/models.go:163 [cfg.Models.Mirror]
+cmd/wisp/models.go:183 [func loadModelConfig]
+cmd/wisp/panel_config_store.go:92 [cfg := s.mgr.Config()]
+cmd/wisp/panel_config_store.go:96 [cfg.LLM.Roles.Chat.Model]
+cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)]
+cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width]
+cmd/wisp/resident_ball_windows.go:276 [Hotkeys:  cfg,]
+cmd/wisp/run.go:1014 [cfg.Agent.PerToolTimeoutMS]
+cmd/wisp/run.go:424 [rt.cfg = cfg]
+cmd/wisp/run.go:435 [res := llm.NewResolver(cfg, st)]
+cmd/wisp/run.go:991 [cfg := rt.cfg]
+internal/ball/ball_windows.go:64 [SizePx]
+internal/observe/logging.go:50 [RedactPaths]
+count=14
+
+--- per-cite hit check against the CURRENT file at that line ---
+HIT  cmd/wisp/logsink.go:149 [Level: logSinkLevel]
+HIT  cmd/wisp/models.go:163 [cfg.Models.Mirror]
+HIT  cmd/wisp/models.go:183 [func loadModelConfig]
+HIT  cmd/wisp/panel_config_store.go:92 [cfg := s.mgr.Config()]
+HIT  cmd/wisp/panel_config_store.go:96 [cfg.LLM.Roles.Chat.Model]
+HIT  cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)]
+HIT  cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width]
+HIT  cmd/wisp/resident_ball_windows.go:276 [Hotkeys:  cfg,]
+HIT  cmd/wisp/run.go:1014 [cfg.Agent.PerToolTimeoutMS]
+HIT  cmd/wisp/run.go:424 [rt.cfg = cfg]
+HIT  cmd/wisp/run.go:435 [res := llm.NewResolver(cfg, st)]
+HIT  cmd/wisp/run.go:991 [cfg := rt.cfg]
+MISS internal/ball/ball_windows.go:64 [SizePx]   (line 64 = )
+MISS internal/observe/logging.go:50 [RedactPaths]   (line 50 = )
+looprc=0

@@ -1,0 +1,30 @@
+405:func (w *webview) SetSize(width int, height int, hints Hint) {
+406-	index := w32.GWLStyle
+407-	style := w32.GetWindowLong(w.hwnd, index)
+408-	if hints == HintFixed {
+409-		style &^= (w32.WSThickFrame | w32.WSMaximizeBox)
+410-	} else {
+411-		style |= (w32.WSThickFrame | w32.WSMaximizeBox)
+412-	}
+413-	w32.SetWindowLong(w.hwnd, index, style)
+414-
+415-	if hints == HintMax {
+416-		w.maxsz.X = int32(width)
+417-		w.maxsz.Y = int32(height)
+418-	} else if hints == HintMin {
+419-		w.minsz.X = int32(width)
+420-		w.minsz.Y = int32(height)
+421-	} else {
+422-		r := w32.Rect{}
+423-		r.Left = 0
+424-		r.Top = 0
+425-		r.Right = int32(width)
+426-		r.Bottom = int32(height)
+427-		_, _, _ = w32.User32AdjustWindowRect.Call(uintptr(unsafe.Pointer(&r)), w32.WSOverlappedWindow, 0)
+428-		_, _, _ = w32.User32SetWindowPos.Call(
+429-			w.hwnd, 0, uintptr(r.Left), uintptr(r.Top), uintptr(r.Right-r.Left), uintptr(r.Bottom-r.Top),
+430-			w32.SWPNoZOrder|w32.SWPNoActivate|w32.SWPNoMove|w32.SWPFrameChanged)
+431-		w.browser.Resize()
+432-	}
+433-}
+rc=0

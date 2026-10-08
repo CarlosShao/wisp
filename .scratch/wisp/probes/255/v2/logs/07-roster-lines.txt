@@ -1,0 +1,8 @@
+--- :262 and :392 in panel_host_windows.go (HEAD) ---
+		Width:  uint(width),
+		WindowOptions: m.windowOptions(),
+--- :207 and :253 in panel_resident_windows.go ---
+		return cfg.Panel.Width, cfg.Panel.Height
+	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), nil
+--- diff 18655988..HEAD for the two host files ---
+rc=0
