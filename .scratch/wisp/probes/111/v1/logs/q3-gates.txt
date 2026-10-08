@@ -1,0 +1,40 @@
+=== which scripts actually OPEN ci.yml as data (not just mention it in a comment) ===
+scripts/slo-freshness.sh:99:ci_file=${SLO_FRESH_CI:-$root/.github/workflows/ci.yml}
+scripts/slo-check.ps1:455:    # The step in .github/workflows/ci.yml stays unconditional (D22 mode-6:
+--- the only data-path reader is slo-freshness.sh:99 ci_file= ---
+=== Q3.8 run slo-freshness.sh's OWN P1 code block (lines 130-172) verbatim against real ci.yml ===
+rc_P1block=0
+=== Q3.9 gate 1: d22scan (separate module) ===
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 266 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 228 production Go files
+d22scan: scope bans #1-5 cmd/           examined  38 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 514 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 108 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=228, bans #1-5 cmd/=38, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=514, ban #8 cmd/=108; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 514 Go files, comments and _test.go included; cmd/ 108 Go files, comments and _test.go included
+rc_d22scan=0
+=== Q3.10 gate 2: yaml.safe_load on ci.yml + step counts ===
+  job=lint           runs-on=ubuntu-latest                steps=13 if-guarded=4
+  job=test-core      runs-on=ubuntu-latest                steps=7 if-guarded=1
+  job=test-windows   runs-on=windows-latest               steps=10 if-guarded=8
+  job=slo-smoke      runs-on=windows-latest               steps=6 if-guarded=0
+  job=slo-full       runs-on=['self-hosted', 'wisp-slo']  steps=5 if-guarded=0
+  job=lint-frontend  runs-on=ubuntu-latest                steps=11 if-guarded=0
+TOTAL_STEPS=52
+   test-windows step 1: actions/checkout@v4
+   test-windows step 2: actions/setup-go@v5
+   test-windows step 3: Windows ACL sealing gate (internal/winsec's own tests, ticket 110)
+   test-windows step 4: Cache third_party (deps.toml key)
+   test-windows step 5: cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)
+   test-windows step 6: cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)
+   test-windows step 7: winlive compile gate (go vet -tags winlive, ticket 111 AC#11)
+   test-windows step 8: Package coverage census (ticket 111 AC#1 + GUARD D)
+   test-windows step 9: Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+   test-windows step 10: PathResolver junction placeholder (real cases tickets 18/20)
+winlive step present in test-windows: True -> ['winlive compile gate (go vet -tags winlive, ticket 111 AC#11)']
+YAML_OK rc=0
+rc_yaml=0

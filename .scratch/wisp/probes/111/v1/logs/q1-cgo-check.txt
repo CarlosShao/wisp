@@ -1,0 +1,38 @@
+=== DECISIVE cgo check over the gate command's own dep graph (-tags winlive) ===
+packages listed: 286
+packages with CgoFiles>0: 2
+packages with CFiles>0: 1
+packages with SFiles>0 (hand asm, needs gcc-ish toolchain): 36
+internal/abi|0|0|2
+internal/cpu|0|0|2
+internal/bytealg|0|0|5
+internal/chacha8rand|0|0|1
+internal/runtime/atomic|0|0|1
+=== VERBATIM: the new step's placement rationale (ci.yml:616-632) ===
+        # WHY IT SITS HERE (windows leg, after the third_party + build.ps1 +
+        # cmd/wisp CLI chain that stages the cgo deps this package compiles
+        # against; precedent ci.yml:561-571 + scripts/wisp-cli-tests.sh): with
+        # `if: ${{ !cancelled() }}` it still answers when a step above it is red,
+        # the same shape every non-setup step in this job already carries. No
+        # continue-on-error, no job-level `if:`, no skip flag anywhere here (D22
+        # run-away mode 6).
+        #
+        # TODAY'S COLOR IS MEASURED, NOT ASSUMED, AND A RED IS A FINDING: the
+        # command read `rc=0` on a windows host at the HEAD this step was added
+        # (see probes/111/r6/logs/vet-base.txt). If the runner ever says otherwise
+        # that is the hole this step exists to name - no assertion is weakened,
+        # none of the 12 files is edited, and nothing here is tuned to make it
+        # green.
+        shell: bash
+        if: ${{ !cancelled() }}
+        run: go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+=== VERBATIM: the now-false present-tense hit-count claim (ci.yml:596-604) ===
+        # WHY THIS STEP EXISTS (compile coverage, not execution): the 12 files
+        # carrying `//go:build windows && winlive` (7 under cmd/wisp, 5 under
+        # internal/ball; ruler `grep -rlE '//go:build.*winlive' --include=*.go`)
+        # were never even COMPILED anywhere in this workflow. `-tags` hits 0 times
+        # and `winlive` hits 0 times in this file, and the only `go vet ./...`
+        # (:238, lint job) runs on ubuntu, where the `windows` half of the tag
+        # already excludes them; no step on the windows leg ever passed the
+        # `winlive` half. So all twelve sat outside every CI compile check - break
+        # one and nothing reddened.

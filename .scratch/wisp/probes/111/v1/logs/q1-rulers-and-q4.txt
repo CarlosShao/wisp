@@ -1,0 +1,46 @@
+=== Q1.15 the step-level if: rulers, three spellings (settles the r6-vs-orchestrator dispute) ===
+A) grep -cE '^ {8}if: '  (strict 8 spaces): 13
+B) grep -cE '^[[:space:]]+if: ' (any indent): 13
+C) YAML-authoritative step 'if' keys summed over jobs:   lint=4  test-core=1  test-windows=8  slo-smoke=0  slo-full=0  lint-frontend=0
+13
+D) job-level if:/needs: keys (YAML): 0
+E) always() occurrences: 7
+F) the if: lines at each spelling, with line numbers (to see WHO differs):
+234:        if: ${{ !cancelled() }}
+294:        if: ${{ !cancelled() }}
+331:        if: ${{ !cancelled() }}
+387:        if: ${{ !cancelled() }}
+462:        if: always()
+522:        if: ${{ !cancelled() }}
+560:        if: ${{ !cancelled() }}
+570:        if: ${{ !cancelled() }}
+592:        if: ${{ !cancelled() }}
+631:        if: ${{ !cancelled() }}
+720:        if: ${{ !cancelled() }}
+756:        if: ${{ !cancelled() }}
+772:        if: ${{ !cancelled() }}
+=== Q1.16 does test-windows have steps 1-2 unguarded (checkout/setup-go)? ===
+  step 1  if=None                   actions/checkout@v4
+  step 2  if=None                   actions/setup-go@v5
+  step 3  if='${{ !cancelled() }}'  Windows ACL sealing gate (internal/winsec's ow
+  step 4  if='${{ !cancelled() }}'  Cache third_party (deps.toml key)
+  step 5  if='${{ !cancelled() }}'  cgo build smoke (build.ps1 fetch-deps + mingw 
+  step 6  if='${{ !cancelled() }}'  cmd/wisp CLI tests (needs the sherpa DLLs stag
+  step 7  if='${{ !cancelled() }}'  winlive compile gate (go vet -tags winlive, ti
+  step 8  if='${{ !cancelled() }}'  Package coverage census (ticket 111 AC#1 + GUA
+  step 9  if='${{ !cancelled() }}'  Portable windows tests (proc/secret/config/ris
+  step 10 if='${{ !cancelled() }}'  PathResolver junction placeholder (real cases 
+=== Q4.1 r6 evidence vs claims: the two 5-byte logs (go vet success = zero output) ===
+vet-winline-base.txt: 0000000   r   c   =   0  \n 0000005 
+orch-vet-winline.txt: 0000000   r   c   =   0  \n 0000005 
+=== Q4.2 any .out-suffixed artifact in r6 (would be silently gitignored)? ===
+0
+=== Q4.3 r6's own HEAD claim vs the six commits on disk ===
+e250f0f9 10-08 09:16 票 111 111-v1 Q2＝ⓑ 反形有牙（本腿自造坏法，⛔ 未�
+3fdfa8ca 10-08 09:13 票 111 AC#11 对抗验收腿 111-v1 第 1 笔＝锚件（只含本�
+a809ab74 10-08 09:10 台账 A692（只追加＝diff 14 增/0 删，A690/A691/A692 现量�
+b437d82a 10-08 09:06 票 111 r6 交付件：evidence.md（§0 锚+在飞冲突检查／§1
+fb51dfbd 10-08 09:06 票35 收验收腿 35-v4＋★立 AC#8（只追加＝diff 24 增/0 �
+e6981776 10-08 09:03 票 111 r6 门禁两发：d22scan 独立 module（cd tools/d22scan &&
+04b01c6c 10-08 09:02 票 111 r6 ⓑ 反形自证（全程 go vet -overlay，⛔ 未动任�
+cfc9a5ff 10-08 09:01 35-v4 交付（对抗验收裁决，⛔ 翻勾归编排者）：四�

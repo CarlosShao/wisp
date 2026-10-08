@@ -1,0 +1,49 @@
+=== Q3.1 slo-freshness.sh P1 replication against the REAL ci.yml (this instrument DOES read ci.yml as data) ===
+rc=0 for P1 grep: ^[[:space:]]*(on:|true:)[[:space:]]*$
+rc=0 for P1 grep: ^[[:space:]]*push:[[:space:]]*$
+rc=0 for P1 grep: ^[[:space:]]*branches:[[:space:]]*\[[^]]*dev[^]]*\]|^[[:space:]]*-[[:space:]]*(main|dev)[[:space:]]*$
+rc=0 for P1 grep: ^[[:space:]]*(-[[:space:]]*)?cron:[[:space:]]*['"]?[0-9]
+slo-full job_body lines=75
+banned 'if:'/'continue-on-error:' inside slo-full body hits: 0
+rc=1 (grep -c exits 1 when 0 hits = P1 passes)
+=== Q3.2 same banned-key check scoped to test-windows (where the NEW step lives) ===
+step-level if: lines inside test-windows: 8
+continue-on-error: KEY lines inside test-windows: 0
+=== Q3.3 is slo-freshness.sh wired into CI at all? ===
+.github/workflows/ci.yml:230:        # they carry readings: scripts/slo-freshness.sh P1 (:160-170) fails the nail
+.github/workflows/ci.yml:831:  # probe P3 of scripts/slo-freshness.sh now ages on the newest uploaded
+.github/workflows/ci.yml:886:          #      P3 in scripts/slo-freshness.sh (the record of "a valid sample
+.github/workflows/slo-fresh.yml:20:# What makes it red (stable tokens, see scripts/slo-freshness.sh):
+.github/workflows/slo-fresh.yml:29:# records can no longer see that, so scripts/slo-freshness.sh grew probe P3 and
+.github/workflows/slo-fresh.yml:70:        run: sh scripts/slo-freshness.sh
+.github/workflows/slo-fresh.yml:78:          sh -n scripts/slo-freshness.sh
+.github/workflows/slo-fresh.yml:83:          shellcheck -s sh scripts/slo-freshness.sh
+=== Q3.4 gh available for a live run of the pin? ===
+/c/Program Files/GitHub CLI/gh
+GH_TOKEN set: no
+=== Q3.5 d22scan runtests.sh: does it read ci.yml / count steps? ===
+allowlist.txt
+d22scan.exe
+gitignore.go
+go.mod
+main.go
+runtests.sh
+scan_test.go
+selftest.go
+selftest_test.go
+selftestsamples.go
+24:#   2. any `--- SKIP`                             -> SKIP is NOT a pass. A test
+88:skipped=$(count '^--- SKIP')
+93:summary="packages=[$*] top-level: PASS=$passed FAIL=$failed SKIP=$skipped, === RUN=$ran, '[no tests to run]'=$noresult"
+99:    echo "runtests.sh: $skipped test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3) - $summary" >&2
+=== Q3.6 other workflows mentioning -tags or winlive ===
+.github/workflows/ci.yml:595:      - name: "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"
+.github/workflows/ci.yml:597:        # carrying `//go:build windows && winlive` (7 under cmd/wisp, 5 under
+.github/workflows/ci.yml:598:        # internal/ball; ruler `grep -rlE '//go:build.*winlive' --include=*.go`)
+.github/workflows/ci.yml:599:        # were never even COMPILED anywhere in this workflow. `-tags` hits 0 times
+.github/workflows/ci.yml:600:        # and `winlive` hits 0 times in this file, and the only `go vet ./...`
+.github/workflows/ci.yml:603:        # `winlive` half. So all twelve sat outside every CI compile check - break
+.github/workflows/ci.yml:613:        # and are NOT wired here; do not read this step as "the winlive cases now
+.github/workflows/ci.yml:632:        run: go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+=== Q3.7 total steps per job (does any tracked instrument carry a step-count baseline?) ===
+(empty = none)

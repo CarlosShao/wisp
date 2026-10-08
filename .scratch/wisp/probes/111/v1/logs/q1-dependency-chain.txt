@@ -1,0 +1,24 @@
+=== Q1.11 does the gate command's dep graph contain ANY cgo file? ===
+packages in deps: 286
+--- packages with CgoFiles>0 (empty = none, so no C compiler / no sherpa HEADERS needed) ---
+internal/goarch cgo=0 cdeps=template: main:1:50: executing "main" at <.CDependencies>: can't evaluate field CDependencies in type *load.PackagePublic
+rc_golist=0
+'import "C"' hits in tracked go files: 0
+=== Q1.12 toolchain parity: host vs CI's go-version-file ===
+go version go1.27.1 windows/amd64
+3:go 1.27
+5:toolchain go1.27.1
+--- setup-go in test-windows uses go-version-file: go.mod (ci.yml:512-514) ---
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+=== Q1.13 are all 12 roster files _test.go? (vet checks test files too) ===
+0
+(0 = all twelve are _test.go)
+=== Q1.14 the ubuntu go vet ./... step the comment cites at :238 ===
+
+      - name: go vet (module)
+        run: go vet ./...
+
+      - name: go vet (tools/d22scan module)
