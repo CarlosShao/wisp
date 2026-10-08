@@ -1,0 +1,8 @@
+commit 6038531cd8972bc00707520d06c2f64d383119a5
+Author: CarlosShao <1933942520@qq.com>
+Date:   Thu Oct 8 11:31:15 2026 +0800
+
+    35-r7: 票35 :52「No secret leakage」残差①仪器——入向 raw 的凭据形状不许进本跳产出的任何落盘面（audit/receipt/error 三面五路由），判定尺镜像票248原尺并钉防漂；零产码改动、零新名
+
+ internal/panel/inbound_raw_leak_35r7_test.go | 278 +++++++++++++++++++++++++++
+ 1 file changed, 278 insertions(+)

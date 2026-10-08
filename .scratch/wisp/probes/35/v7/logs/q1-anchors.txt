@@ -1,0 +1,35 @@
+# Q1 起手锚（本腿现量，2026-10-08）
+HEAD=e05b8a2b027151648d583db881d75193d9b0e41c
+branch=dev
+rc=0
+
+## 被审件
+-rw-r--r-- 1 swq 197609 12158 Oct  8 11:27 internal/panel/inbound_raw_leak_35r7_test.go
+rc=0
+278 internal/panel/inbound_raw_leak_35r7_test.go
+wc rc=0
+
+## 引入提交 + pathspec 自证（git show --stat 见 q1-gitshow.txt）
+6038531c 35-r7: 票35 :52「No secret leakage」残差①仪器——入向 raw 的凭据形状不许进本跳产出的任何落盘面（audit/receipt/error 三面五路由），判定尺镜像票248原尺并钉防漂；零产码改动、零新名
+rc=0
+
+## 票面勾/框现量（带 [[:space:]]* 的尺）
+unchecked=6 rc=0
+checked=4 rc=0
+42:- [ ] Whitelist fuzz: 50 random/forbidden method names → all rejected + logged; each listed
+44:- [ ] Concurrency routing: 10 parallel invokes with shuffled replies → correct pairing.
+45:- [ ] Forged panel allow: direct bridge call `approval.decide{allow:true}` from the webview
+47:- [ ] Resync: hide → tool state changes → show → UI reflects fresh state; SDK forbids cross-show
+49:- [ ] Backpressure: flood events under blocked consumer → merges, no unbounded memory (heap cap
+52:- [ ] No secret leakage scan across bridge payloads.
+grep rc=0
+
+## 禁区起手态（定向 porcelain）
+rc=0 (空输出＝这些路径今天无在飞脏面)
+
+## 全仓 porcelain 行数与含 cmd/wisp 的行
+756
+rc=0
+0
+grep_rc=1 (1＝零命中)
+cp_rc=0

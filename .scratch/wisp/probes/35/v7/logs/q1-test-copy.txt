@@ -1,0 +1,278 @@
+package panel
+
+// Ticket 35 AC#6 (票面 :51) - the inbound raw's own leak surface, ruled.
+//
+// WHAT THIS ADDS (and only this). The standing ruler family for "a bridge payload
+// must not carry a credential shape" lives in cmd/wisp/panel_config_248_test.go:
+// canary248 (:39), secretShape248 (:43-46) and hits248 (:52), scanning receipt /
+// audit / slog-sink / snapshot / ledger-line / data-root (:187-192) with its own
+// firing control at :218. Ticket 35-a6's census found the one face that family
+// never points at: the INBOUND raw string itself - what the page hands Go. The
+// 248 family feeds raw in through the real settings leg; nobody fed it through
+// this package's own inbound hop (ComposerDispatch.Handle) and asked which of the
+// surfaces THIS hop produces (the audit lines this package writes, the receipt
+// and error strings it returns to the host) come back carrying the shape. That
+// is this file, and nothing else.
+//
+// WHY A MIRROR INSTEAD OF A CALL, stated because it is a deviation from the
+// dispatch's wording "reuse hits248": hits248/secretShape248 are package-private
+// TEST symbols of cmd/wisp. Go cannot import test files, and internal/panel must
+// not import cmd/wisp (that is the dependency's other direction), so the ruler
+// is unreachable from this package. The mirror below therefore copies the ruler
+// VERBATIM - both rules and the canary literal, no third rule added - and
+// TestDecisionRulesMirrorTicket248Ruler35r7 reads the original file off disk and
+// fails if either copy moves alone. One ruler, pinned at both ends, not two.
+//
+// FAILURE-PATH DISCIPLINE inherited from the original (its header :20-21): a hit
+// is reported as surface + rule, never as matched text, because a t.Errorf that
+// quotes the artifact puts the credential shape into the test log - one of the
+// surfaces the ruler exists to guard.
+//
+// WHAT THIS DELIBERATELY DOES NOT DO: it adds no production behaviour, no new
+// method name, no whitelist entry, no L2 anything; it does not touch the SLO or
+// any golden; and the credential channel itself (the leg receiving the raw bytes,
+// and SettingWrite.Value for an ordinary field) stays the designed write-only
+// pass-through ticket 248 ruled - this file checks the ARTIFACTS, and asserts
+// the channel really fired, because a clean reading from a hop that did nothing
+// is silence, not coverage.
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"testing"
+)
+
+// canary248Mirror is canary248 verbatim (cmd/wisp/panel_config_248_test.go:39 at
+// this leg's anchor). Same sentinel, same shape rule - see the mirror test.
+const canary248Mirror = "sk-canary248notarealkey0f2a9b7c"
+
+// secretShape248Mirror copies secretShape248 (:43-46) rule for rule, nothing added.
+var secretShape248Mirror = []*regexp.Regexp{
+	regexp.MustCompile(`sk-[A-Za-z0-9]{12,}`),
+	regexp.MustCompile(canary248Mirror),
+}
+
+// hits35r7 mirrors hits248 (:52) including why it is a function: the positive
+// controls and the real cases below must run the SAME code path, or a zero-hit
+// reading could just mean the ruler is blind.
+func hits35r7(label string, blobs ...[]byte) []string {
+	var out []string
+	for _, b := range blobs {
+		for _, re := range secretShape248Mirror {
+			if re.Find(b) != nil {
+				out = append(out, label+" matches "+re.String())
+			}
+		}
+	}
+	return out
+}
+
+// checkArtifacts35r7 runs the ruler over every artifact one Handle call produced.
+// Surfaces: the returned receipt/refusal string, the returned error (the host
+// echoes it into its own audit lines), and every line this package wrote to the
+// audit sink - the [audit] sink is a disk-landing face in the real assembly.
+func checkArtifacts35r7(t *testing.T, route, reply string, err error, audit []string) {
+	t.Helper()
+	var hits []string
+	if reply != "" {
+		hits = append(hits, hits35r7("receipt", []byte(reply))...)
+	}
+	if err != nil {
+		hits = append(hits, hits35r7("error", []byte(err.Error()))...)
+	}
+	for i, line := range audit {
+		hits = append(hits, hits35r7(fmt.Sprintf("audit[%d]", i), []byte(line))...)
+	}
+	if len(hits) > 0 {
+		t.Errorf("route %s: 入向原文的凭据形状被抄进了落盘面（%d 处命中；命中原文按票 248 纪律不回显）",
+			route, len(hits))
+		for _, h := range hits {
+			t.Errorf("leak surface: %s", strings.ReplaceAll(h, canary248Mirror, "<canary-redacted>"))
+		}
+	}
+}
+
+// newDispatch35r7 assembles the hop with the audit sink captured.
+func newDispatch35r7(leg ConfigStore, audit *[]string) *ComposerDispatch {
+	sink := func(format string, args ...any) {
+		*audit = append(*audit, fmt.Sprintf(format, args...))
+	}
+	d := &ComposerDispatch{Audit: sink}
+	if leg != nil {
+		d.Config = &ConfigWriteHandler{Store: leg, Actor: "35r7", Audit: sink}
+	}
+	return d
+}
+
+// AC#6 residual: drive the inbound hop with credential shapes parked in the
+// envelope's CONTENT fields (the dedicated credential key, the ordinary value
+// field, the free-text field) across accepted AND refused routes, and require
+// every artifact the hop itself produces to stay shape-clean.
+func TestInboundRawCredentialShapeReachesNoArtifact35r7(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("credential-write-accepted", func(t *testing.T) {
+		var audit []string
+		leg := &cfg248Leg{res: SettingWriteResult{
+			Field:      FieldProviderCredential,
+			Written:    []string{"llm.providers.deepseek.api_key_ref"},
+			Tier:       EffectiveRestart,
+			Credential: CredentialSummary{Ref: "dpapi:35r7refnotablob", Recorded: true, Provider: "deepseek"},
+		}}
+		raw := cfg248Raw(t, map[string]any{
+			"method": MethodConfigSet, "requestId": "r-35r7-cred", "source": ComposerRequestSource,
+			"configField": FieldProviderCredential, "configProvider": "deepseek",
+			credentialValueKeyForTest: canary248Mirror,
+		})
+		reply, err := newDispatch35r7(leg, &audit).Handle(ctx, raw)
+		if err != nil {
+			t.Fatalf("the credential write was refused, so a clean reading below would be silence: %v", err)
+		}
+		if leg.credCalls != 1 || leg.lastRawSeen != raw {
+			t.Fatalf("the write-only channel did not really carry the raw (credCalls=%d)", leg.credCalls)
+		}
+		checkArtifacts35r7(t, "credential-write-accepted", reply, err, audit)
+		if !strings.Contains(reply, "dpapi:35r7refnotablob") {
+			t.Errorf("the receipt lost the reference, so the write may not have been told at all: %q", reply)
+		}
+	})
+
+	t.Run("plain-write-with-key-shaped-value", func(t *testing.T) {
+		var audit []string
+		leg := &cfg248Leg{res: SettingWriteResult{
+			Field:   FieldProviderBaseURL,
+			Written: []string{"llm.providers.deepseek.base_url"}, Tier: EffectiveRestart,
+		}}
+		raw := cfg248Raw(t, map[string]any{
+			"method": MethodConfigSet, "requestId": "r-35r7-val", "source": ComposerRequestSource,
+			"configField": FieldProviderBaseURL, "configProvider": "deepseek",
+			"configValue": "sk-35r7plantedshapedvalue0001",
+		})
+		reply, err := newDispatch35r7(leg, &audit).Handle(ctx, raw)
+		if err != nil {
+			t.Fatalf("write refused: %v", err)
+		}
+		if leg.applyCalls != 1 {
+			t.Fatalf("the leg never saw the write (calls=%d)", leg.applyCalls)
+		}
+		checkArtifacts35r7(t, "plain-write-with-key-shaped-value", reply, err, audit)
+	})
+
+	t.Run("refused-unlisted-method-carrying-content", func(t *testing.T) {
+		var audit []string
+		raw := cfg248Raw(t, map[string]any{
+			"method": "panel.approval.request", "requestId": "r-35r7-unlisted",
+			"source": ComposerRequestSource, "text": canary248Mirror,
+		})
+		reply, err := newDispatch35r7(nil, &audit).Handle(ctx, raw)
+		if err == nil {
+			t.Fatal("an unlisted method was accepted")
+		}
+		checkArtifacts35r7(t, "refused-unlisted-method-carrying-content", reply, err, audit)
+	})
+
+	t.Run("refused-forged-source-carrying-content", func(t *testing.T) {
+		var audit []string
+		raw := cfg248Raw(t, map[string]any{
+			"method": MethodModeRequest, "requestId": "r-35r7-forged",
+			"source": "not-the-panel-composer", "text": canary248Mirror,
+		})
+		reply, err := newDispatch35r7(nil, &audit).Handle(ctx, raw)
+		if err == nil {
+			t.Fatal("a forged source was accepted")
+		}
+		checkArtifacts35r7(t, "refused-forged-source-carrying-content", reply, err, audit)
+	})
+
+	t.Run("refused-unattached-handler-carrying-content", func(t *testing.T) {
+		var audit []string
+		raw := cfg248Raw(t, map[string]any{
+			"method": MethodMessageSend, "requestId": "r-35r7-unatt",
+			"source": ComposerRequestSource, "text": "here is my key: " + canary248Mirror,
+		})
+		reply, err := newDispatch35r7(nil, &audit).Handle(ctx, raw)
+		if err == nil {
+			t.Fatal("a request with no handler attached was reported as handled")
+		}
+		checkArtifacts35r7(t, "refused-unattached-handler-carrying-content", reply, err, audit)
+	})
+}
+
+// The eyesight control the 248 family carries at :218, same form: the ruler
+// pointed at artifacts that DO carry each shape must fire. Without this, every
+// zero-hit reading above could mean the mirror is blind, not the route clean.
+func TestInboundLeakRulerFiresOnPlantedShapes35r7(t *testing.T) {
+	canaryHits := hits35r7("planted-audit", []byte("audit line: "+canary248Mirror))
+	if len(canaryHits) == 0 {
+		t.Fatal("the mirrored ruler did not fire on an audit line carrying the sentinel")
+	}
+	// The generic vendor-key spelling (rule 1) must fire WITHOUT the canary,
+	// or the mirror degenerated into a name search.
+	shapeHits := hits35r7("planted-receipt", []byte("设置已写入 sk-35r7plantedshapedvalue0001"))
+	if len(shapeHits) == 0 {
+		t.Fatal("the mirrored ruler did not fire on a receipt carrying a generic key shape")
+	}
+	for _, h := range append(canaryHits, shapeHits...) {
+		t.Logf("fired: %s", strings.ReplaceAll(h, canary248Mirror, "<canary-redacted>"))
+	}
+}
+
+// The other positive control (the door must not be painted black): ordinary
+// traffic with no credential shape is still routed, still audited, and the ruler
+// stays silent over the very same capture path.
+func TestLegalPanelTrafficIsStillWritten35r7(t *testing.T) {
+	var audit []string
+	leg := &cfg248Leg{res: SettingWriteResult{
+		Field:   FieldRoleChatModel,
+		Written: []string{"llm.roles.chat"}, Tier: EffectiveNextTask,
+	}}
+	raw := cfg248Raw(t, map[string]any{
+		"method": MethodConfigSet, "requestId": "r-35r7-legal", "source": ComposerRequestSource,
+		"configField": FieldRoleChatModel, "configValue": "deepseek-chat",
+	})
+	reply, err := newDispatch35r7(leg, &audit).Handle(context.Background(), raw)
+	if err != nil {
+		t.Fatalf("legal traffic was refused: %v", err)
+	}
+	if leg.applyCalls != 1 || !strings.Contains(reply, "设置已写入") {
+		t.Fatalf("legal traffic did not reach the leg/receipt: calls=%d reply=%q", leg.applyCalls, reply)
+	}
+	if len(audit) == 0 {
+		t.Fatal("legal traffic wrote no audit line - the capture path itself is broken")
+	}
+	var hits []string
+	for i, line := range audit {
+		hits = append(hits, hits35r7(fmt.Sprintf("legal-audit[%d]", i), []byte(line))...)
+	}
+	if len(hits) > 0 {
+		t.Errorf("the ruler fired on traffic that carried no credential shape: %d hits", len(hits))
+	}
+}
+
+// The anti-drift nail for the mirror: read the original ruler off disk and fail
+// if either side moved alone. A missing or unreadable source is fatal, not a skip
+// - an orphan mirror is exactly the second ruler this file promises is not allowed
+// to exist.
+func TestDecisionRulesMirrorTicket248Ruler35r7(t *testing.T) {
+	path := filepath.Join(panelRepoRoot(t), "cmd", "wisp", "panel_config_248_test.go")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("the 248 ruler's source is unreadable (%v): the mirror below cannot be checked against anything", err)
+	}
+	body := string(data)
+	if !strings.Contains(body, `const canary248 = "`+canary248Mirror+`"`) {
+		t.Errorf("canary drifted from the 248 original: the mirror and the standing ruler no longer share a sentinel")
+	}
+	needle := "regexp.MustCompile(`" + secretShape248Mirror[0].String() + "`)"
+	if !strings.Contains(body, needle) {
+		t.Errorf("the generic key-shape rule drifted from the 248 original")
+	}
+	if strings.Count(body, "regexp.MustCompile") != 2 {
+		t.Errorf("the 248 ruler is no longer the two-rule shape this mirror copies (MustCompile count = %d)",
+			strings.Count(body, "regexp.MustCompile"))
+	}
+}
