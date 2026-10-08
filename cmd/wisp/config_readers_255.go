@@ -40,9 +40,10 @@ package main
 //
 // WHY IT ASKS config.TierOf AND NOT A COPY OF THE TIER WORDS. Ticket 255 AC#2-ⓑ
 // landed the tier table in internal/config/tiers.go (commit dd92bb92) with TierOf
-// as its accessor - and TierOf had ZERO production callers (measured at HEAD
-// 8a3790f0: grep -rn "TierOf(" over cmd internal tools scripts returns the
-// definition and nothing else). A receipt that hand-listed hot sections would be a
+// as its accessor - and TierOf had ZERO production callers at that point (measured
+// at HEAD 8a3790f0: grep -rn "TierOf(" over cmd internal tools scripts returned
+// the definition and nothing else). This file is its first production caller
+// since. A receipt that hand-listed hot sections would be a
 // fourth tier word table (the census's T1-T4 problem). So hotRowsFor() resolves
 // each name plan() booked through TierOf/TierRegistry, and manager.go's own
 // same-source guard (plan()'s panic when a walked section is not registered "hot")

@@ -73,12 +73,16 @@ const (
 // actions this ticket does NOT implement. It is not a policy call and it is not
 // a refusal to be worked around: the inbound channel that a switch would arrive
 // on (the WebView2 host of ticket 33, its postMessage receiver, and a router for
-// ComposerRequest) has zero production callers in this tree - measured, with the
-// grep lines, in census §⑤. A panel that drew a working switcher on top of that
-// would be a button wired to nothing.
+// ComposerRequest) has since landed in code - the C27 host, the postMessage
+// transport and the composer router are in this tree (cmd/wisp/panel_host_windows.go,
+// internal/panel/composer_dispatch.go), and the router has production callers on
+// the host and stdin legs. What is still not built is the switching dimension
+// itself - ticket 186's work, gated on Q-69 - so a panel that drew a working
+// switcher on top would still be a button wired to nothing.
 //
-// The day the inbound hop lands, this constant stops being true and ticket 186
-// owns replacing it - not this file.
+// The constant's own hop sentence is now stale (it still says 无 postMessage
+// 接收器、无 router、无 WebView2 宿主); re-wording it is ticket 186's call, not
+// this file's.
 const GitSwitchBlockedReason = "切换分支／切换工作树今天不可用：网页到宿主的那一跳还没有落地（无 postMessage 接收器、无 router、无 WebView2 宿主），面板只有快照这一条出向通道"
 
 // gitNoWorkspaceReason is the honest answer when nothing was narrowed. It is a
