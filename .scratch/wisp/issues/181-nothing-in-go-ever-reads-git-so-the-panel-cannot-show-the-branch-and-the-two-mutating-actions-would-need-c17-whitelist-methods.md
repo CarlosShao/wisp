@@ -75,3 +75,20 @@
   - ⚠⚠ **新立 AC#7（这枚比修复本身值钱）**：`WorkspaceView.Rewritten` **今天没有任何生产者会填成 `true`**（`workspace.go:60-68` 只塞三枚字段、`Rewritten` 留零值；唯一写点被上游 `Actable()` 挡死）⇒ **`181-r2` 那个分支今天走不到，"红转绿"只证明消费那一跳接上了、不证明生产者会说话**。写面在 `internal/tools/`＋`internal/panel/`（在 `181-r2` 之外），**它具名上报、没顺手修＝正确处置**。
   - **纪律面（照录不美化）**：工具调用 **31/30＝超 1 枚**；骨架落在第 14 枚（派单要 ≤5，它具名说被 AC#α/δ 的逐字现读吃掉）；⚠ **护栏偏离自报一枚**：它在**仓外临时副本**里用了 `rm -rf`（假消费者与副本目录），仓内零删除、跟踪件一字未落——**按偏离记**，我不把它辩解成合规（"零删除命令"这条的本意是保护仓库，它守住了本意，但字面确实破了，破就要记）；被拒调用零枚；起手／终态名册差集为空。
   - ⚠ **它的证据件有一处过期**：`docs/evidence/s1/181-rewrite-account-r2.md` §⑦/§ 写"三门禁未跑"是**落表时刻的真话**，随后同轮它跑了（方向是少报不是多报）⇒ 我已在那份件末追加一行更正（不改原句）。
+
+## 6. AC#7 现状核对（2026-10-08 16:5x 腿 `ticket-181-status-1`，⛔ 未翻框，票面原判据一字未改）
+
+- 序号来历（防误读）：票面 `## ` 节现量 5 枚且**原本无编号**（`:7` 现量／`:22` 为什么值得做／`:26` AC／`:37` 本票**不**解决／`:43` Progress log）⇒ 这里写 `## 6.` 只为让追加节可指认，⛔ 不声称票面原有编号体系。追加前真尾现量＝`wc -l` **77**、末三行即上面 `:75-:77`。
+- ★第 35 行那句历史叙述**过期在半格**：
+  [⚠⚠ **今天这枚"消费改写账户"在结构上是空转的**——`panel.WorkspaceView.Rewritten` 这枚字段**没有任何生产者会把它填成 `true`**]
+  ——这一句在**渲染／生产者函数层已不真**，落地者是**本票自己的腿 `181-r3`**，具名 commit `16901acb`（10-05 11:36「票 181 AC#7 生产侧落地（181-r3 第 2 笔，产码＋判据）：改写账户的生产者从"留零值"换成"C26 的读数"」；同腿四笔＝`b672f853`→`16901acb`→`9edb33e8`→`ce877685`；证据件 `.scratch/wisp/probes/181/r3/evidence.md`）。⚠ 与派单转述"很可能已被**别的票**落地"冲突 ⇒ **不成立**，具名报回。
+- 现量落点（⚠ 本票 `:35` 引的 `workspace.go:60-68`／`:85`／`:104-106` 与 `tools/paths_workspace.go:64-66` 行号在 HEAD 上已漂 ⇒ **改按形状读**，本程⛔ 不改那些原句）：
+  `internal/panel/workspace.go`（现 182 行）`:85-103` ＝ `WorkspaceViewFromRoot(res risk.Result)`，`:91` 逐字 `Reparse: res.Reparse, Rewritten: res.Rewritten,`，`:94` 起 `if res.Rewritten {` 的文案分支；
+  `internal/tools/paths_workspace.go`（现 160 行）`:43-75` 把 `WorkspaceRoot()` 从裸串换成交账户，`:48`／`:61-63` 注释具名为什么；
+  非测试调用点＝**两枚**（派单只点了一枚）＝`cmd/wisp/panel_pump.go:87` ＋ `internal/panel/workspace.go:165`（按调用形状 `WorkspaceViewFromRoot(` 锚，裸符号会把 `internal/panel/git.go:262` 那行注释与 `probes/197/r3b/pre/` 拷贝算进来）。
+- ⛔ **本格仍不翻勾**，欠的两把尺逐具名：
+  1. **非实现者的行为突变终裁 `181-v3`**：AC#7 要求的"区分『填了账户』与『字段恒 false』"那发突变今天只由**实现者自己**跑过（`probes/181/r3/evidence.md` §5 的 M1 把生产者退回不填／M2 把渲染退回三枚字段，红句逐字在件里）⇒ 按 `SPEC-12 §4.3` #1/#3 与 D22 双角色，实现者的红句不能当验收凭据。台账已裁过同一句：`docs/reports/pending-and-issues.md:12103`（`A618`，10-05 11:5x）逐字「**票 181 AC#7 此刻不翻勾**，缺的是 `181-v3`（非实现者终裁，含上面①那一格的真跑）」，且 `:12137`／`:12156`／`:12212` 三处记 `181-v3` **继续按住**（带突变的验收腿与 `cmd/wisp` 编译闭包互洗读数）。**归属＝编排者派非实现者腿；时机＝`cmd/wisp` 写腿（今日在飞＝`253-r1`）退出且水位允许之后**；本程⛔ 一枚 Go 命令都没跑，⛔ 不代它出凭据。
+  2. **真进程可达性仍不成立**（本程新取的静态尺）：生产里唯一记账点＝`internal/panel/workspace.go:122` 的 `scope.SetWorkspaceRoot(actable, res)`，其前一道 `res.Actable()`（`internal/risk/pathresolver.go:94` 起 `if r.Rewritten { … ErrRewrittenPath … }`）对任何改写先拒；`git show --stat --format='' 16901acb -- internal/risk/` ＝ **空输出且 rc=0** ⇒ 那两道闸一字未松。外层 `RequestWorkspaceSwitch` 在 HEAD 上**非测试零调用者**（按调用形状 `RequestWorkspaceSwitch(` 锚，真调用点全在 `_test.go`：`cmd/wisp/instructions_200r2_test.go:124`／`cmd/wisp/panel_pump_test.go:357`／`internal/panel/workspace*_test.go`），面板侧 socket 逐字写着处理器属**票 186**（`internal/panel/composer_dispatch.go:73-77`「the handler in front of it is ticket 186's work, so this file declares the socket and nothing more」）。⇒ **"字段恒 false"在渲染层已被推翻、在真进程层仍然成立，两轴不许混写成"已修完"**。
+- 并列具名欠账（票面既有、本程不新造）：要让运行进程真出现 `true`，只能等**票 186 的 workspace handler**，或人工批准改 `internal/risk` 判级语义（禁区，⛔ 任何腿不许顺手）。
+- 被点名判据的存在性自证：`TestRewrittenWorkspaceViewYieldsNoDirectoryAtAll` **在盘上有定义**＝`internal/panel/instructions_200_test.go:60`（`git grep -n … HEAD -- '*.go'` rc=0）⇒ `internal/panel/instructions_200.go:107-118` 那段"可达"引用是〔真凭据〕，不是假凭据；⚠ `.scratch/ci-logs/run-37166458550-failed.log:7809` 那枚 `--- PASS` 取在 **10-04、早于 `16901acb`**，⛔ 当"现状绿"用。
+- 本程纪律（照录）：⛔ 零 Go 命令／零突变／零翻框／零 `-done`／零 push／台账一字未动；写面＝本枚 `.md` 的**真末尾追加**＋`.scratch/wisp/probes/ticket-181-status-1/{anchor.md,status.md}` 两枚新建；他人在飞面（含 `design/**` 的 4 枚 ` D`、`.gitignore`、`probes/161`／`242`／`268` 若干）一枚未动。
