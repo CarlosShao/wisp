@@ -154,3 +154,72 @@
      ⇒ 全部枚数出自文本尺与 Python 走查，没有一把是编译器给的；
      没做 76 枚的逐枚归口（要读全工单池，超一条只读腿射程）；
      未读、未引 `frontend/**`／`design/**` 任何内容 ⇒ "读侧没有出口"这句的射程**只到 Go 侧为止**。
+
+## 10-08 现量（`180-c1` 追加节，正文与上面所有 AC 框一字未改、一枚框未勾）
+
+- 10-08 10:2x `180-c1`（**第三枚只读普查腿**；派单三格全只读。表 `docs/evidence/` 未写——本程证据件落
+  `.scratch/wisp/probes/180/c1/`：`00-anchor.md`／`10-ac1-verdict.md`／`20-census-notes.md`／`census.tsv`／
+  `reader-classes.txt`／`30-landing-material.md` ＋ 两把尺的脚本 `census.py`／`classes.py`）。
+  起手 HEAD `601c2b18`（＝派单地板），读数终态 `70b00885`（跑尺期间工作树被 `93147902`／`0ec19368`／`70b00885`
+  三枚他人 commit 推进，本程引用的 `cmd/wisp/panel_host_windows.go` 行号**已按 `70b00885` 逐行复核**；
+  `git diff 601c2b18..HEAD -- internal/config/schema.go | wc -l` ＝ **0** ⇒ `schema.go` 全区间无人动过）；
+  **AC 框一枚未碰、产码零字节未动、SLO／golden／`thresholds.go` 未碰、台账 `pending-and-issues.md` 未碰**。零 go 命令。
+  1. **⚠ 票面 AC#1 的前提判定＝「已过期」（本程头一格）**。
+     AC#1 那三把尺**各自今天全部可复现**：尺 `grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test` ⇒ **空输出 rc=1**；
+     `internal/panel/pump.go:15-17` 整行逐字读毕，`"no WebView2 host"` 确在 `:16`。
+     ⇒ 但**推理失效而非读数失效**：那是**射程错配**——面板宿主从来在 `cmd/wisp/`，`internal/panel/` 只有 snapshot／pump（数据半），
+     在该包内搜建窗得 0 **对"全树有没有面板窗口"没有回答能力**。
+     ⇒ **面板窗口今天存在**：`go.mod:19` `github.com/jchv/go-webview2`（⚠ 标 `// indirect`）；
+     `NewPanelManager` 定义 `cmd/wisp/panel_host_windows.go:213`，`windowOptions()`（`:236`）返回
+     `webview2.WindowOptions{Title,Width,Height}`（`:260-264`），交建于建窗调用点 `:392`。
+     ⇒ 装配腿与真开时机（判语第二格）：`cmd/wisp/resident_windows.go:151` → `panel_resident_windows.go:228 newResidentPanelManager`
+     → `:253 NewPanelManager(..., withGeometrySource(panelGeometrySource(dataDir)))`；
+     **非开机即开**——常驻 panel 线程在 `loop` 的 select 上等 show 请求，`show(via)`→`showOnThread`（`:408`）→`rp.mgr.Show`（`:409`）；
+     且**只有常驻 `wisp` 进程建宿主，`wisp run` 不建**（`config_readers_255.go:151-153`）。
+     `NewPanelManager` **非测试调用点恰 1 枚**＝`panel_resident_windows.go:253`。
+     ⇒ **连带两笔具名过期**（本程只上报不修，两处均在他人写面）：① `pump.go:16` 的 `(ticket 33 is unclaimed)`（票 33 在场且 `33-r10` 正在续做）；
+     ② 票面「那五枚 `[panel]` 字段的生产读取方各 **0**」**今天只对 `enabled`／`keep_alive_in_session` 成立**，
+     `Width`／`Height` 已有读者（`panel_resident_windows.go:207` **`return cfg.Panel.Width, cfg.Panel.Height`**），是**票 255 AC#4 接的**，不是本票。
+  2. **宽度那一跳今天差几跳＝接线那一跳 0 跳不差，差的另 1 跳是"重新生效"**（`30-landing-material.md` §2 四行现量）：
+     `Show` 只在 `!created` 才 `bringUp`（`panel_host_windows.go:499-509`）⇒ 建过的窗**不再重读几何**；
+     C27 原文 `PLAN.md:1377`「单例…**隐藏而非销毁**」⇒ 用户"关窗再开"在码上是 Hide/Show 对；
+     唯一 Destroy 是进程级（`stop()` `:454`／`teardown()` `:496`），`RequestDispose()`（`:442`）**非测试调用者 0 枚**；
+     产码无 resize 路（`MoveWindow|SetWindowPos|Resize(|SetBounds` 非测试命中只剩注释与 `cmd/wisp/testdata/`）。
+     ⇒ **真实生效条件＝重启进程**；⚠ 因而 `residentPanelGeometryNote`（`panel_resident_windows.go:177-179`）与
+     `config_readers_255.go:161` 那句「面板关窗再开即跟上新值」**是过强宣称**（本程不动，具名交编排者）。
+  3. **AC#4 同族普查（主产出）**：母体先定数——`grep -c 'default:' schema.go`＝**70 行**，其中 `schema.go:8`
+     是**文档注释在引用 `default:"..."` 这个写法本身**（非字段标签）、无任何行含两枚标签 ⇒
+     **字段母体＝69 枚**，去重名 **62**。（⇒ 派单 70 与票内两程 69 **都对**，差的就是 `:8` 那一行。）
+     跑**三把**尺而非票面一把：**A 名字尺（票面原尺）零命中 17**／**B 再去 `internal/config/**` 零 36**／
+     **C 归属尺（同行须现所属类型名）零 55** ⇒ **确证有生产读者仅 14 枚**（含 `Width`）。
+     分解 17＋19＋19＋14＝69；⛔ **票面 AC#4 单跑尺 A 会得"只有 17 枚哑键"，比可证的多算 3 倍乐观**，
+     因为它把 `manager.go` 整块拷贝、`defaults.go` 反射填标签、`catalog.go` 名册字符串与 21 枚**别家同名 `Enabled`** 全当读者。
+     逐枚 TSV＝`census.tsv`（11 列，含 `hits_attributed` 与 `collision_flag`）；三档清单＝`reader-classes.txt`。
+     ⚠ **`[panel] height`／`scale` 不在 69 枚母体内**（`schema.go:544` 无 `default:` 标签），
+     而 `height` 今天其实有读者——**票面"五枚"与本程"69 枚"是两个不同母体，别互相引用数字**。
+  4. **三处控制各配一发**（派单点名反造假格）：
+     ① **正控**：`Width`=2／`Mirror`=3（真读者 `cmd/wisp/models.go:163`）／`Enabled`=21／`Scale`=1 ⇒ 尺对确实在读者给非 0，**通过**；
+     ⛔ 自报一枚**无效控制** `RetainTurns`=0——`grep -n "RetainTurns|retain_turns" schema.go` ⇒ **rc=1**，它根本不是 `default:` 字段，是挑错样本，不参与结论。
+     ② **反控**：尺报 0 的 16 枚**逐枚单独复跑去管道看 raw** ⇒ **12 枚 raw>0（1–3 命中）全部落在 `internal/config/boundary_test.go`**
+     （`WarmTimeoutSec` 另有 `loader_test.go`）⇒ 准确说法是**「只有测试读者」不是「名字不存在」**；
+     真·全树无提及的是 `EchoRef`／`SizeMB`／`Days` raw＝0。**未对任何一枚追认"其实有读者"**。
+     ③ **同名撞车单标**：尺 A 高报四例现量 `Ball.Size` 17→归属 **0**、`Observe.Level` 68→**0**、`App.Theme` 4→**0**、`Proxy.Mode` 59→**2**（这枚真）；
+     `PanelSection.Enabled` 立尺 `grep -rn "Panel\.Enabled|panel\.Enabled" … | grep -v _test.go` ⇒ **rc=1 空输出**，21 枚命中**无一枚属它**；
+     坐实一例撞车：`internal/ball/hotkey_windows.go:104-105` 的 `cfg.Panel` 是**热键字符串字段**，与 `config.Config.Panel` 同名不同物。
+     ⇒ **19 枚判"归属未定"，⛔ 不算有读者也不算死键**（尺 C 对"先取进局部变量再传"的读者系统性漏报，**55 是上界、14 是下界**）。
+  5. **AC#2／AC#3 落点料（不落地）**：补 §2 那一跳**最少动 3 枚文件**——`panel_host_windows.go`（`:499-509`／`:236-264`）＋
+     `panel_resident_windows.go`（`:442` 无人调用）＋ `config_readers_255.go`（⚠ `:192 sectionReadSites["Panel"]` 是文件级钉，
+     **新增读者文件必与名册同改**，否则红的是"名册与码不一致"）；透出"不生效"给面板侧则要第 4 处 `internal/panel/composer.go` `Snapshot`。
+     **契约面只指认不碰**：**D36**＝`PLAN.md:2743` `[panel] … hot`（本程现量说明 `hot` 今天只以"重启进程"兑现，要么补实现要么改规格文字＝人工批准）；
+     **C27**＝`PLAN.md:1377`「单例／隐藏而非销毁」⇒ 重新生效的实现不得违反它；**C17**＝`PLAN.md:1367`（Snapshot 键集／方法白名单），
+     且 `AGENTS.md` §2 未定义即停清单**确有**一条罩着「C17 方法白名单定稿」⇒ **本程已停，只上报**。
+     **AC#3 单独一句：本程默认数值一字节没改**，两把尺＝`git diff HEAD -- schema.go` 空 **rc=0** 且 `git diff 601c2b18..HEAD -- schema.go | wc -l`＝**0**。
+  6. **与派单／前几程的冲突（具名报回）**：① 派单说"非测试调用者在 `cmd/wisp/resident_windows.go`"——
+     **文件名差一个前缀**：该文件 `:141` 只是**一句提到 `NewPanelManager` 的注释**，`:151` 调的是包装函数 `newResidentPanelManager`；
+     真调用点是 **`cmd/wisp/panel_resident_windows.go:253`**（派单方向对、名错，本程一律以现量为准）。
+     ② 派单入口尺 70 与票内 69：见本节第 3 条，差 `schema.go:8` 注释行，两边都对。
+     ③ 本程 AC#4 的 55／14 与 10-02 `180-a1` 的 **76**／150 **不矛盾也不可互换**——a1 分母是全部叶子键，本程是带 `default:` 的 69 枚。
+  7. **本程没做（明写，不写成"以后加固"）**：没跑任何编译／测试类尺（硬约束 1：`cmd/wisp` 测试面归在飞腿）⇒
+     **全部 69 枚读数出自文本尺，没有一把是编译器给的**；没做 55 枚的逐枚归口与逐枚开票（超一条只读腿射程）；
+     未读未引 `frontend/**`／`design/**` ⇒ "零读者"这句**射程只到 Go 侧的 `internal/`＋`cmd/` 为止**；
+     ⛔ 未勾 AC#2／AC#3／AC#4（勾归落地腿与验收腿）；尺的缺陷逐条具名见 `20-census-notes.md` §5（九条）。
