@@ -42,3 +42,19 @@ cd cmd/wisp                                                    # CWD 必须是�
 
 日志里这一行是**坏读数**：`35v2 cold bring-up measured on this box: -1.000 ms, hwnd=0x1d0d7a`。
 负数毫秒不可能是时长，形状像是"哨兵值 −1 没被替换"。⇒ **`cmd/wisp/panel_transport_live_35v2_windows_test.go` 那枚冷启动时延 `t.Logf` 今天不可引用**（它不是断言，所以用例仍 PASS，⛔ 但任何人拿这行去答"面板冷启动多少毫秒"就是拿一个未初始化常量当实测）。本程不改（改它要再跑一发真窗，归下一枚碰传输的写腿；先例排程＝票 33 `AC#13` 那一族同波做）。
+
+## 6. ★§2 那句"产码未动"当场作废（我自己写歪了，附本波第二发读数）
+
+原文 §2 写着"产码未动尺＝`git status --porcelain -- cmd/ …`＝0 行（本发全程只跑，不改）"、§起手写着"HEAD 起点＝`601c2b18`"。**两句都不成立**：并行写腿 `33-r10` 在 **10:16** 落了 `70b00885`，把 `cmd/wisp/panel_host_windows.go` 的 `bringUp` 尾段抽成新函数 `coldStartPageHandover`（＋30／−11）。我那发 `go test -c -tags winlive` 建在 10:1x 与 10:2x 之间，**不能断定编进去的是搬动前还是搬动后的源码**。⚠ 我原文那句"0 行"本身是真的，但它证的是"我没改产码"，⛔ 被我写成了"这一波的产码没动"——这是我造的一句超出证据的话（第 130 条那一族，这次是我自己）。
+
+**补救（同法重跑，读数与 HEAD 绑定）**：
+
+```
+HEAD at rerun=2dcef1a6898ac08e54dc54312494c954aeb7ce83      # 含 33-r10 的产码改动
+git hash-object cmd/wisp/panel_host_windows.go = 1f9060dfff33cffab1317e5f653e1a95f9678e97
+go test -c -tags winlive -o /d/tmp/wisp35v6/live.test.exe ./cmd/wisp/    # rebuild rc=0
+/d/tmp/wisp35v6/live.test.exe -test.run '^TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor$' -test.count=1
+→ logs/live-rerun-at-33r10.txt：PASS ／ RERUN rc=0 ／ 件里带 HEAD= 行
+```
+
+⇒ 现在对**含本波产码改动的树**有一份绑 HEAD 的真窗读数；上面 §2／§3 那些读数**归属仍按本条收紧**：只到"编排者那一发跑过、颜色如此"，不再被读成"整波产码未动"。

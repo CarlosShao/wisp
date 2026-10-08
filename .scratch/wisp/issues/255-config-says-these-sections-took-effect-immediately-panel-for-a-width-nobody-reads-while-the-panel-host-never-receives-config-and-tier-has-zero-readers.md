@@ -59,3 +59,14 @@
 - **我裁两格（⛔ 不摆 owner，低利害＋可逆＋零契约）**：**形＝取值闭包**（宿主每次建窗现读，dispose→show 重建即跟上新值），理由＝`tiers.go:34` 已把 `[panel]` 段登记为 `hot`，值快照形（＝重启才生效）与登记表矛盾；**回执文案随之必须诚实**＝"面板关窗再开即跟上新值"，⛔ 不许写成"拖动即变"（今天没有 resize 路，见上）。撤销口令**「255 AC#4 改取值快照」**。**`[panel] height`＝0 的语义**（schema 注释说"0=auto from content"而宿主侧无任何实现读过 "auto"）＝**未定义即停**那一类，我按最小诚实定：**0 ⇒ 沿用现常量 260，并把"由内容定高"具名登记为没做**（⛔ 谁也不许替它猜一个高度算法）；撤销口令**「255 height 那格重开」**。
 - 一枚〔腿报，未复核〕的盘上不一致（不裁、只登记）：`cmd/wisp/panel_host_windows_test.go:1` 只带 `//go:build windows`，而 `:6` 注释自称属 `winlive` 档（"NO CI job"）；我现量 `ci.yml` 里 `tags`／`GOFLAGS` **零命中**⇒按标签读那枚真窗用例**会进 CI windows 档**。此事归已交件的 `winlive-census-1` 那一族，⛔ 本程不据此派改造腿。
 - **可照抄的定式（腿量＋我复认形状）**：AC#4 不需要新造机制——最像的现成件＝热键桥（`internal/ball/hotkey_reload.go:11-13` 明写"消费包刻意不 import 配置，宿主供闭包"＋`type HotkeySource func() HotkeyConfig`），改动面最小＝变参 hook（`cmd/wisp/resident_ball_windows.go:63-81`，原文自述 hook 而非参数⇒不必改那 7 处测试构造点），同一条裁定还有审批门（`cmd/wisp/resident_windows.go:110-123` "BUILT HERE, by the assembly root"＋"Zero new package-level dependency edges"）。⇒ **"不开 `panel→config` 依赖边"这一格答＝不用开**：`PanelManager` 在 `cmd/wisp` 的 `package main` 里，而 `cmd/wisp` 本来就 import `internal/config`。⚠ 图级证明（`GOOS=windows go list -deps`）腿没跑（禁 Go 命令），**写腿自己补那一发**。
+
+## 10-08 10:3x 编排者补格（来源＝只读普查腿 `180-c1`，件 `.scratch/wisp/probes/180/c1/`；AC 框一枚未动）
+
+⚠ 这一格**归进已有的 `AC#1`**（那句"已立即生效只许说真话"），⛔ 不新开 AC 号——本票 `AC#4` 也已经把"`[panel] width` 真生效"登记在案，`180-c1` 独立量到同一件事 ⇒ **票 180 的 AC#2/AC#3 从此归口本票，不在 180 里重复施工**（记我：180 立票在前、255 落地在后，我没查重到这一步，第 123 条同族）。
+
+**现量到的过强宣称**（`180-c1` 具名上报，本程**一字未改**，它在别人写面上）：`cmd/wisp/config_readers_255.go:161` 那句写着 `[panel] width` 属"每次 `wisp run` 重读、关窗再开即跟上新值"这一档。三把尺对拉后：
+1. `cmd/wisp/panel_host_windows.go` 的 `Show` 只在 `!created` 时才走 `bringUp`（`:499-509`，现量 `created := m.created` 与 `if !created {` 同段）；
+2. C27 定的是**隐藏而非销毁**，而 `RequestDispose` 的**非测试调用者＝0 枚** ⇒ 面板一旦建过，关窗再开**不会**重建，尺寸也就不会重读；
+3. ⇒ 真实生效条件＝**重启常驻进程**，不是"关窗再开"。
+
+**给下一位碰这一格的判据（⛔ 不是本程的活）**：把 `:161` 那句改成说实话（"重启进程后生效"），或者把"重建"那一跳真接上并配一发**会响**的仪器（两种都行，选哪种归 `AC#4` 的落地腿一起裁——那枚腿本来就在处理宽度生效）。⚠ 无论哪种，⛔ 不许只把文案里的时间口径改宽来交差（那正是 `AC#1` 存在的理由）。
