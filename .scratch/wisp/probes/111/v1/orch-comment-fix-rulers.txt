@@ -1,0 +1,17 @@
+编排者代笔销注两处前自己的尺（2026-10-08 09:3x，HEAD 起 daf1f5a0）
+1_repo_hashcgo=0
+2_github_env_in_scripts_workflows_tools=1
+3_third_party_dlls=3
+4_ciyml_now_tags_hits=3 winlive_hits=7
+5_ciyml_at_8e98b8f0_tags_hits=0 winlive_hits=0
+6_steplevel_if_strict8_now=13 anyws_now=13 notcancelled_only_now=12
+7_steplevel_if_strict8_at_8e98b8f0=12 notcancelled_only_at_8e98b8f0=11
+8_yaml_parse_and_steps=10
+9_noncomment_added_lines=0
+rc=0
+10_self_referential_catch: 上一版注释里那句"GITHUB_ENV hits 0 times"被自己的尺点出＝枚数从 0 变 1（grep 命中本注释自己那行）⇒ 已改成"按 8e98b8f0 量、并注明这把尺会命中本注释"
+10_envtoken_worktree_now=0 envtoken_at_8e98b8f0=0
+11_hashcgo_still=0
+12_yaml_and_steps=ok 10
+13_noncomment_added_lines=0
+rc=0
