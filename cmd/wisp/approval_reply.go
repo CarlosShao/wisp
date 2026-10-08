@@ -10,10 +10,12 @@ package main
 // L1 verdict and Gate.PendingApproval for an L2 one, and cmd/wisp's own mode
 // switch raises a host-side L2 card - while the ANSWERING side,
 // Gate.DecideFromNative / Gate.DecideFromPanel / Gate.Veto, had zero callers
-// outside _test.go. Every card this process shows was therefore answered by
-// nobody: an L2 card waited out the full C18 deadline and auto-rejected, and an
-// L1 window could not be opposed at all. 票 201's 现量 table names the same hole
-// from the other end ("三种人能答复的入口 - 生产零调用者").
+// outside _test.go at census time. Every card this process showed was therefore
+// answered by nobody: an L2 card waited out the full C18 deadline and
+// auto-rejected, and an L1 window could not be opposed at all. 票 201 :10 names
+// the same hole from the other end, row verbatim: | 三种"人能答复"的入口 | **生产零调用者** |.
+// This file (with the Replies routes it drives) is what closed it - .Veto,
+// .DecideFromNative and .DecideFromPanel all have production call sites today.
 //
 // WHAT WAS BUILT, and what was deliberately NOT. The census's second
 // conclusion is the design constraint: the correct shape of an answer already

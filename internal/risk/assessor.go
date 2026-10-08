@@ -25,8 +25,10 @@ import (
 //	R8  irreversibility               delete/overwrite/power/close-window/send -> L2
 //	R9  judge panic / invalid input   fail-closed L2
 //
-// Absent dependencies (PathCanonicalizer / SensitiveClassifier / TaintDetector
-// not yet wired by tickets 18/19) leave the corresponding rule DORMANT — an
+// The tickets 18/19 dependencies (PathCanonicalizer / SensitiveClassifier /
+// TaintDetector) are wired at the assembly sites today (internal/tools/bridge.go's
+// New and assessorFor; cmd/wisp/panel_assets.go for the C25 detector); where an
+// assembly leaves one absent, the corresponding rule stays DORMANT — an
 // integration gap, not a judged result. A WIRED dependency that panics or
 // errors is a judged failure: panic -> R9 fail-closed L2 (recovered here);
 // canonicalization error -> R2 fail-closed L2.
