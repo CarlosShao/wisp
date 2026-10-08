@@ -14120,3 +14120,48 @@ dev 真身我现量重钉：挂载＝`main.tsx:58`（`<App />` **确实无 prop*
 
 ⛔ **零翻框**（票 33 此刻 `394 行／13 未勾／1 已勾`、票 259 `5 未勾／1 已勾`、票 242 `3 未勾／0 已勾`，本轮一枚没动）、⛔ 零 `-done`、⛔ 零 push、页面分支不合、`build/wisp.exe` 未还原；机主手上仍那三问、本轮**没叠第四问**。编队＝`253-r1` 在写 `cmd/wisp`（新件 `cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go` mtime 15:25，起手锚 15:10）、`ci-if-eval-1` 交件见 `A721`、`259-v1` 按住（它要种 `internal/agent/approval` 行为突变，与 `cmd/wisp` 编译互洗）。我名下欠账三笔：`frontend/dist` 刷新（⛔ 连带重出 exe，没他一句话不动）＋那一发真窗复跑＋`go list -deps` 那把（B-01，models 段"依赖图里没有任何读者"的射程是**闭包**不是 grep）。它列的 B-03/B-04/B-05/B-06/B-11/B-12/B-13 是"要读控制流／数据默认值"那一族，⛔ 不是枚数尺能给的，后续腿不许拿 grep 填那一格。
 
+## A721｜2026-10-08 16:0x｜收 **`ci-if-eval-1`**（那 23 枚 CI 步级 `if:` 守卫到底被求值过没有）＋★**它顶正我自己 `A710` 的枚数：HEAD 上"零求值"＝26 枚不是 23**＋★**我自己那把不带 pathspec 的加法尺先错过一回**
+
+（追加时刻先跑 `date` 取现量，节头不估。）
+
+### 1. 交件与我复跑同数的盘上尺
+
+`8e085ad4`（2 枚 `.md`、`234 insertions(+) / 0 deletions`，`git add`/`commit` 只带 `-- .scratch/wisp/probes/ci-if-eval-1` 一枚 pathspec；⛔ 未动 `ci.yml`、零 go 命令、零触发 run、零 push）。我自己现跑、逐把同数：
+- `git show HEAD:.github/workflows/ci.yml | grep -cE '^[[:space:]]+if:[[:space:]]'` ＝ **36**；
+- `git diff --stat cc31526165 HEAD -- .github/workflows/ci.yml` ＝ **160 insertions(+) / 0 deletions** ⇒ 它那句"零枚既有步被改名／挪位／删除，所以按步名对齐历史 run 安全"立得住；
+- `gh api repos/CarlosShao/wisp/git/ref/heads/dev --jq .object.sha` ＝ **`cc31526165734e612de297848bb2080bd459ccba`**（与它逐字符同）；
+- `gh api repos/CarlosShao/wisp/commits/e6dc79ed5bd14380cce1507f94886d65a51ee63f` ＝ **HTTP 422 `No commit found for SHA`**。
+⚠ 我这发**先抖了两回才通**（`Get https://api.github.com/…: EOF`、`git ls-remote` 撞 `schannel: failed to receive handshake`），第三回（attempt 2）才取到 422 与 sha ⇒ 定式补一句：**第 124 条"腿报取不到我先重试一次"有反向实例——这次是腿取到了、我没取到**；重试到通为止之前，⛔ 我不许把 `EOF` 读成"那格没数"。另⚠：我那两行 `rc=0` 是管道尾 `tail` 的退码、**不是 `gh` 的**（第 108 条"过滤后空≠没跑"的同形），具名写下免得日后我自己把它当凭据。
+
+### 2. ★顶正我 `A710` 的枚数（不回改 `A710`，就地打旧）
+
+HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 8 空格步级 `if:` 总量（全部我现跑）：`cc31526165`（＝远端 `dev`）＝**10** → `e6dc79ed^`＝`05992d05`＝**13** → `e6dc79ed`＝**36** → HEAD＝**36**；逐 commit 加法：`e6dc79ed` **＋23**、`1309757b`／`f6b79ab0`／`351e5a5e` 各 **＋1**、`f8810238` ＋0。⇒ 后果两枚，都很实在：
+ⓐ **「撤 `A710` 那 23 枚 `if:` 守卫」这句撤销口令射程不足**——它不覆盖 `351e5a5e` 那枚 winlive 编译门（`ci.yml:654`）。今后真要撤，得说"撤 26 枚"或逐枚点名，⛔ 不许再按 23 枚那句话说"撤完了"。
+ⓑ 我 `A710 §3` 那句"真 `skipped` 那三枚"里 **`lint:239` 不在这 23 枚内**（它由 `f6b79ab0` 加）⇒ 按代拆，23 枚里 skipped-only＝**2 枚**（`:243 go vet (module)`／`:247 go vet (tools/d22scan module)`）、出过色＝**21 枚**（我原写 20）。
+
+### 3. ★记我第二把尺（同一次自抓，定式级）
+
+我第一发跑 `git show e6dc79ed | grep -c '^+        if: '` ＝ **36**，与腿的 23 冲突、差点判腿错。加 pathspec 才看清：`git show e6dc79ed -- .github/workflows/ci.yml` ＝ **23**（`-` 侧 **0**），多出的 **13** 枚来自同一 commit 里的 `.scratch/wisp/probes/111/ciif1/logs/ci-head.bin`（证据件摘抄了 yaml 片段）。⇒ 定式＝**逐 commit 的"加法尺"不带 pathspec 时量的是"这个 commit 改过的所有文件"，不是"那枚被改的文件"**；本仓证据件爱摘抄配置文本，这类计数天然会被自己的日志污染（第 129 条"词频尺≠结构尺"的同族、新载体）。派单模板从此加一句：**枚数尺必须写明射程文件**。
+
+### 4. 甲乙两轴（它的框架我采，⛔ 不压成一格）
+
+**甲轴＝守卫表达式在真实 run 里被求值过没有** ⇒ `e6dc79ed` 那 23 枚**零枚求值过**，凭据三条独立：远端 `dev` 停在 `cc31526165`＋上面那发 422＋`ci.yml` 端点 `created>=2026-10-08T00:00:00Z` **回空**而正控 `>=2026-10-07` 回 **1 发**（`37703959747`）＝过滤器非哑。
+**乙轴＝那一步出过什么色**（采样 6 发完整 id：`37703959747`(n305)／`37406757402`(n303)／`37405698188`(n301)／`37396530365`(n300)／`37166458550`(n296)／`37021179942`(n293)；色值域只有 `success`／`failure`／`skipped`）⇒ 36 枚里 **甲档 31**（出过 success/failure，其中**甲-加强 10**＝步与守卫在那版 yaml 里同时存在＝盘上唯一有真求值读数的十枚）／**乙档 3**（6/6 只 `skipped`＝**加了从未生效**：`lint:239`／`:243`／`:247`；凶手同场可见＝`lint:173 gofmt (gofumpt)` 六发里五发 failure，所以它下游那几步从未被求值）／**丙档 2**（结构性取不到：`lint:394 Portable tests carrier self-test` 由 `1309757b` 引入、`test-windows:654 winlive compile gate` 由 `351e5a5e` 引入，两枚都**晚于远端 HEAD**）。⚠ 丙档那句它自己收窄得对：⛔ 不读成"从未跑过"，读成"该步自那枚 commit 起才在盘上、更早的 run 里没有对应步骤"。另半丙两枚（`lint:169` 4/6、`test-windows:743` 3/6）分母不是 6，⛔ 不与零枚混写——这个纪律我采。
+
+### 5. 票 111 `AC#11` 现量（非转述，⛔ 不翻任何框）
+
+"今天盘上有没有那一步"＝**有**：`6547fd30:.github/workflows/ci.yml:606` 步起手、`if:` 在 **`:654`**、`runs-on` 由 `:516-517` ＝ `test-windows`／`windows-latest`＝**托管**（与我 11:2x 那句"搬进托管那一步"同色）。"从未进过任何 run"＝**复认成立**（丙档）。补一处形＝规划写的"12 枚"在 **ci.yml 步尺**上＝**1 枚**；若"12"是脚本内分母，那不在步数上（本腿未数，我也没数）。⇒ 与我 11:2x 那句"`AC#11` ⛔ 不翻（ⓑ 只闭合到命令层、⛔ 零 push 期间欠 CI 色）"**同色、裁定不变**。
+
+### 6. `A710 §4` 的行号落点它现量了（⚠ 我这枚也过期）
+
+`:229-233` 在 `0c9726f9`／`f6b79ab0`／`05992d05` 上**正是那段豁免注释**（`:229` 逐字 `` # `Upload SLO report` steps are deliberately NOT given a guard even though ``），`e6dc79ed` 起整段**漂到 `:234-238`**；`:521` 在 HEAD 仍落在一枚无守卫 setup 步（`- uses: actions/checkout@v4`，test-windows），而 **`:469` 在 HEAD 落在一枚守卫本身上**（test-core `Portable package tests`）⇒ **我 `A710` 用行号指"setup 步豁免"这件事在 HEAD 上已不自洽**。改按**形状**读＝16 枚无守卫步＝12 枚 setup（68/70、407/409、521/523、806/808、877/879、942/944）＋2 枚 `Upload SLO report`（`827` slo-smoke／`890` slo-full）＋`slo-full:884/887`；`slo-full` 整 job **5 枚零守卫**复认，且文件 `:234-238` 就写着理由（`scripts/slo-freshness.sh` 的 P1 钉子——⛔ 该脚本它未读、我也未读，这句只是注释转述）。`slo-full` 在 `37703959747` 里 job＝success、5 枚 yaml 步全跑到 ⇒ **"豁免"是有意欠账，不是跑不到**（这条与我 10-06 那句"⛔ 不解冻 slo-full"同向）。
+
+### 7. 看不见格 8 条（原样留档，⛔ 不填空）
+
+40 发以前的 run 未翻（甲-加强那 10 枚更早是否拦过东西未取）；`timed out`／`cancelled` 需更多发或日志，未取（单发 JSON 14.3–14.9 KB，⛔ 未碰日志正文）；`lint:169`／`test-windows:743` 的引入 commit 未逐枚 pickaxe；`scripts/slo-freshness.sh` 未读；`slo-fresh.yml`（另一枚 workflow，最新发 `37736935814`）结构尺＝3 步 0 守卫，只具名；setup 步在 API 里显成 `Run actions/…`，12 枚无 `name:` 的步未逐枚比；`Cache third_party`／`Upload SLO report` 跨 job 同名，一律用 `(job,步名)` 键未压扁；文件 `:523` 引的 `35591482293` 按待验断言核过＝**真实**（`ci` @ `440dd88765…`，09-21，failure），但该发那一步的色未取。
+工具坑留账：Git Bash 的 `/tmp` 与原生 Windows python 不同路径 ⇒ 首发 python `FileNotFoundError`，改仓外 `D:/tmp/ciifeval` 后通（我记忆里"仓外临时件"那条的现行实例）。
+
+### 8. 纪律
+
+⛔ 零 push、零触发 run、零 go 命令；⛔ 未动 `ci.yml`、⛔ 未翻票 111 任何框（`AC#11` 维持"不翻"）；台账只追加，`A710` 那三处（23 枚／20 枚出过色／`:229-233` 行号）就地打旧于此、不回改。
+
