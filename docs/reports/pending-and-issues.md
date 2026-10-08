@@ -14340,3 +14340,13 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - ⛔ **本波不派落地腿**：13 枚文本要粘进 `internal/panel`／`cmd/wisp`／`internal/risk` 等文件，而 `181-v3` 此刻正在 `internal/panel`／`internal/tools` **种突变**（同图互洗）⇒ 落地排在它退出之后；且落地腿只许**照料粘**（⛔ 不许临场改写）。
 - ⇒ **续派 `comment-fix-check-1`**：独立复跑这 13 处（锚在不在 HEAD、原文是否逐字、替换文本里有没有撞五禁词、有没有引用未验对象、三处"判不动"是否被误写成了确定句），⛔ 零 Go 命令、只写 `.md`——把关"将来要粘进代码的东西"。
 - ⛔ 零翻框（票面框数一枚未动）、⛔ 未改台账除此节、零 push。
+
+## A731｜2026-10-08 18:5x｜收 **`181-v3`**（票 181 `AC#7` 非实现者终裁＝**成立但附条件**；★M4 那条恒真面我亲自复现）＋**`AC#7` 翻勾**
+
+- **凭据**＝`bf185665`／`fe1a9ce6`／`b4602f13`，件 `probes/181/v3/evidence.md`（12,089 字节）；scoped porcelain 空、两件 hash 逐字回。
+- **判语＝成立但附条件**：①真进程层仍不可达（`workspace.go:122` 被 `:120` `Actable` 闸挡死／`RequestWorkspaceSwitch` 非测试零调用者／面板 handler 归票 186／`16901acb` 对 `internal/risk/` 空 diff）；②**M4 恒真面**（见下）。
+- **四发突变**：M1 `workspace.go:91` 填 `false` ⇒ 红 `workspace_account_181r3_test.go:83`／`:150`；M2 同行填 `true` ⇒ 红 `:66`／`:107`（**两向区分**＝`AC#7` 判据要的就是这个）；M3 `internal/tools/paths_workspace.go:74` 焊 `false` ⇒ 红 `paths_workspace_account_181r3_test.go:133`；**M4 `workspace.go:141` 填 `true` ⇒ rc=0 全绿**。
+- ★**M4 我亲手复现**：`sed` 现取 `:141`（`RequestWorkspaceSwitch` 成功路径的填充点）改 `Rewritten: true,` ⇒ `go test . -run 'TestWorkspaceViewCar|TestWorkspaceAccoun|TestScopeThatChange'`＝**rc=0 全绿**；种前/还原 hash `4db510ce…` 逐字回、scoped porcelain 空。⇒ `:141` 今天**零仪器**（该路被 `Actable` 闸结构恒挡、`:144-146` 死枝）；**登记为盲区，不否 `AC#7`**（判据问的是"生产者会不会填"，`:91`＋`:74` 两向可判已够）。
+- **`AC#7` 翻勾**：票面 94→**101 行**／未勾 2→**1**／已勾 5→**6**；**撤销口令＝「撤 181 AC#7」**；票面原句一字未改、只追加 §7。
+- 它没试出来的照收：活进程"黑盒证不可达"没做（只静态）；整包 `./internal/panel/`／`./cmd/wisp/` 未跑（在册红禁令）；`181-r3` 四笔全族谱只核了 `16901acb`。
+- 编队：`181-v3` 已交；在飞＝`246-raisercensus-2`／`comment-fix-check-1`；下一波派 `259-v1`（approval 绑定层终裁，要种突变——此刻 `cmd/wisp` 图无其它突变腿，独占）。⛔ 零 push。
