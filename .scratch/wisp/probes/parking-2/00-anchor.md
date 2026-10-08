@@ -33,3 +33,15 @@
 ## 5. 本腿 commit 名册
 
 （追加完成后补：c1＝起手锚（本件最初形）／c2＝HANDOVER 新节＋`01-section.md`／c3＝本件读数更新；笔号用 `git log --oneline -- .scratch/wisp/probes/parking-2 docs/reports/HANDOVER.md` 现取。）
+
+## 4. 追加后自证（四把尺；本笔＝c3 补）
+
+追加动作＝`cat .scratch/wisp/probes/parking-2/01-section.md >> docs/reports/HANDOVER.md`（守门三条追加前全过：`wc -l`＝1882、`porcelain` 空、前 1882 行 hash＝`0dd29f83…`；一次通过，18:33）。
+
+- ① `wc -l`：**1882 → 1911**，增量＝**29**＝`01-section.md` 行数（`wc -l` 两处同值 29，逐字相等）。
+- ② 节头枚数：`grep -cE '^## '` **38 → 38**（本节＝块引用形，未新增 `## `）；`grep -cE '^> \*\*[0-9]'`（本文件块引用日志节头形状）**57 → 58**（+1＝本节头，位于第 **1884** 行；第 1883 行＝空行分隔）。
+- ③ `git diff --numstat 351ba36 HEAD -- docs/reports/HANDOVER.md`＝**`29	0	docs/reports/HANDOVER.md`**（只有这一枚文件、零删除）；同尺限本腿两处＝**`00-anchor.md 35	0`／`01-section.md 29	0`／HANDOVER `29	0`**（三枚逐枚纯增）。
+- ④ `git status --porcelain -- docs/reports/HANDOVER.md`（commit 后）＝**空、rc=0**；`-- docs/reports/HANDOVER.md .scratch/wisp/probes/parking-2` 同尺亦空。
+- 防吞锚（加厚）：`head -n 1882 docs/reports/HANDOVER.md | git hash-object --stdin`＝`0dd29f8357e4778cc871e8a52574d3e9d45dfffe`＝追加前同值 ⇒ 前 1882 行逐字节未动；追加段 `tail -n 29 … | cmp - 01-section.md`＝**identical**。
+- commit 名册（逐笔现取）：**`4263812a`**（c1 起手锚＋本件 35 行）→ **`1ae79210`**（c2 HANDOVER 29 行＋`01-section.md` 29 行＝2 文件 58 增 0 删）→ **本笔（c3）**。⛔ 零 push、三笔都带显式 pathspec。
+- ⚠ 后验（⛔ 不回改 HANDOVER 追加段）：追加段落笔后盘上又动一笔——`73b2438c`（18:32，「`253-v1` 对抗验收件：五组盘上突变读数…判'AC#1 成立但附条件'」，逐字见 `git log`）＝**`253-v1` 已产出验收件**；追加段内"在飞 3 枚"的读数时刻＝18:27–18:30，最新状态以本条为准。
