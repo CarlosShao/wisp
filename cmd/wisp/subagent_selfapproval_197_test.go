@@ -85,13 +85,20 @@ type childWrite197 struct {
 	execErr error
 }
 
-// startChildWrite197 fires the call and returns immediately. The context is bounded
+// startChildWrite197 fires the call and returns immediately. taskID and corrID are
+// two DIFFERENT values on purpose (ticket 259 AC#4 - the carrier ticket 242 AC#1
+// needs for its two-live-cards case): taskID is the child's roster identity, while
+// corrID is the per-call name a reply is routed by (C18), so two calls from the
+// same child no longer collapse onto the task id. The call sites mint corrID in
+// the shape run_mode101_test.go's t101call already uses (t101-corr-%d).
+//
+// The context is bounded
 // on purpose: an unanswered L2 would otherwise sit on the C18 300s default, and a
 // bounded context makes the abandonment (which resolves as a reject) the test's own
 // act rather than the queue's. 30s is far above this case's own polling granularity
 // (2ms) and far below the package's timeout, so a stuck leg fails loudly instead of
 // eating the whole run.
-func startChildWrite197(rt *agentRuntime, taskID, path string) *childWrite197 {
+func startChildWrite197(rt *agentRuntime, taskID, corrID, path string) *childWrite197 {
 	w := &childWrite197{done: make(chan struct{})}
 	args, err := json.Marshal(map[string]string{
 		"path": filepath.ToSlash(path), "content": selfApp197ProbeContent,
@@ -106,7 +113,7 @@ func startChildWrite197(rt *agentRuntime, taskID, path string) *childWrite197 {
 		defer cancel()
 		defer close(w.done)
 		out, e := rt.bridge.Execute(ctx, agent.ToolRequest{
-			TaskID: taskID, CorrelationID: taskID,
+			TaskID: taskID, CorrelationID: corrID,
 			CallID: "self197-" + filepath.Base(path),
 			Name:   "fs.write", Args: args,
 		})
@@ -386,7 +393,7 @@ func probeSelfApproval197(t *testing.T, rt *agentRuntime, rec *selfApp197Reading
 	defer revoke()
 
 	// ---- card 1: 允许出口被逐头发拒，然后宿主那一发落地 ---------------------
-	w1 := startChildWrite197(rt, childID, file1)
+	w1 := startChildWrite197(rt, childID, childID+"-corr-1", file1)
 	card1, ok := waitForChildCard197(rt.liveCards, childID, 20*time.Second)
 	if !ok {
 		<-w1.done
@@ -453,7 +460,7 @@ func probeSelfApproval197(t *testing.T, rt *agentRuntime, rec *selfApp197Reading
 	rec.mu.Unlock()
 
 	// ---- card 2: 真令牌在不受信路线上露一次面，就再也花不出去了 --------------
-	w2 := startChildWrite197(rt, childID, file2)
+	w2 := startChildWrite197(rt, childID, childID+"-corr-2", file2)
 	card2, ok := waitForChildCard197(rt.liveCards, childID, 20*time.Second)
 	if !ok {
 		<-w2.done
