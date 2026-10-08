@@ -1,0 +1,50 @@
+warning: in the working copy of '.github/workflows/ci.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/insert_guards.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/ci-guard-comments.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/ci-head.bin', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/commit-1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/d22scan.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/final-checks.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/gh-auth.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/job-map.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/pathlen.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/rulers-after.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/rulers.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/run-list.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/slo-freshness-constraints.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/slofull-body.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/step-conclusions-named.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/step-conclusions.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/step-open-lines-before.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/ticket111-guard-lines.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/zero-byte-check.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/roster.py', LF will be replaced by CRLF the next time Git touches it
+[dev e6dc79ed] 111-ciif1 ci.yml 步级 if: 守卫补挂 23 枚（结构尺 13->36，作业级仍 0）：lint 7 + test-core 4 + slo-smoke 3 + lint-frontend 9；slo-full 与两枚 Upload 按 slo-freshness P1/ci.yml:229-233 刻意不动；go vet x2 本机 rc=0 无新红；含名册/3发真读数/尺子自证
+ 28 files changed, 2602 insertions(+)
+ create mode 100644 .scratch/wisp/probes/111/ciif1/impl.md
+ create mode 100644 .scratch/wisp/probes/111/ciif1/insert_guards.py
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/ci-guard-comments.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/ci-head.bin
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/commit-1.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/d22scan.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/final-checks.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/gh-auth.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/insert-applied.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/insert-plan-dryrun.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/job-map.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/local-govet-d22scan.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/local-govet-root.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/pathlen.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/roster-after.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/roster.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/rulers-after.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/rulers.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/run-list.json
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/slo-freshness-constraints.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/slofull-body.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/step-conclusions-named.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/step-conclusions.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/step-open-lines-before.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/ticket111-guard-lines.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/zero-byte-check.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/roster.py

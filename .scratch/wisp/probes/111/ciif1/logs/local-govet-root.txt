@@ -1,0 +1,5 @@
+command: CGO_ENABLED=1 go vet ./...  (cwd = repo root, go1.27.1 windows/amd64, CGO_ENABLED=1 set explicitly)
+rc=0
+output: NONE. go vet prints diagnostics only, so an empty stdout+stderr together with rc=0 == zero diagnostics == clean.
+note: 这枚文件起手是 0 字节，那格的真读数就是"零诊断"。按"证据件不许 0 字节"补写命令＋rc＋判读；⛔ 未删除任何件，⛔ 未改判读。
+caveat: 本机 windows / CI 该 job ubuntu-latest；此 rc 不是 CI 颜色。交叉佐证 = ci.yml:127-129 记录的 ubuntu 读数 (run 35600043583 step 7 = success)。

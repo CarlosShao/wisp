@@ -1,0 +1,5 @@
+command: cd tools/d22scan && go vet ./...  (own Go module, go1.27.1 windows/amd64)
+rc=0
+output: NONE — zero diagnostics == clean.
+note: 同 local-govet-root.txt：0 字节就是读数本身，此处补写命令＋rc＋判读，未删件未改判。
+caveat: 本机读数非 CI 颜色；CI 侧这一步过去 3/3 发都是 [skipped]（logs/step-conclusions.txt），本程是它有机会第一次被求值。
