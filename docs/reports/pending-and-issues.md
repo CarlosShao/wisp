@@ -14482,3 +14482,11 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - **合计**：14 枚未勾框＝**漏勾 10／判不动 3／真未做 1**；`probes/<NN>/` 8 票**全空**（rc=1）。README 票 62 先例**在场**（它逐字抄回："八个 AC 框一个都没勾（`^- [ ]`=8 / `^- [x]`=0）且 AC#8 要求的 `62-adversarial-acceptance.md` 不存在的情况下给它加了 `-done` 后缀"）。
 - **补票 `281`**（本笔立，4 框）：乙类 8 张**逐张归位**——漏勾逐枚"补勾（引凭据节点＋读数）或撤名（一笔一笔）"／105＋110 两张 Status 相抵**逐字留档后改**／07 那格**摆 owner 眼睛**（⛔ 不代签）／115 两格**归票 230** 不越界；收口后 8 张复跑对拉。⛔ 本票不批量、不动其它票。
 - 编队：`done-class-b-1` 已交；在飞＝`242-corrland-1`（correlation 落地）。⛔ 零翻框、零 push。
+
+## A748｜2026-10-08 20:0x｜收 **`242-corrland-1`**（correlation 落地：铸形／注释／钉子三格都做了）＋★它**主动自报越格**＋**补票 282**（越格块的非实现者复核）
+
+- 交件＝三笔 `133b1bfa`→`0abe217c`（台账/票面零动、零 push）。**我核五处**：`internal/agent/loop.go:603`＝`func callCorr(taskID, callID string, index int) string {` ✓；`:676`＝`TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),` ✓；钉子新句区（`internal/tools/loop_approval_test.go:215` 一带）已按 C18 原文重述（注释逐字在盘）✓；新用例 `internal/agent/corr_percall_242_test.go:82 TestCorrPerCallTwoAsksSameTask242` ✓；新访问器 `internal/tools/cancel.go:67 func TaskID(ctx context.Context) string` ✓；`git status --porcelain -- internal cmd` 空 ✓。
+- **四边界逐条对**：①契约文本未动（它没碰 `docs/PLAN.md`/`SPEC-*`）；②钉子**未放宽**——新句 `=="" || ==res.TaskID || !strings.HasPrefix(…)` ⇒ 空／旧形等值／无前缀**三形皆红**（比旧句更严）；③`loop.go:363` 注释已按 C18 重述（删了 `correlation == task id`）；④三枚构造点判"不改"并各给理由（直供桥夹具、corr 宿主自选）。
+- ★**它主动自报越格**（裁定之外）：corr 不能再当任务 id ⇒ 给桥加 taskID 携带＋新访问器 `TaskID(ctx)`，并把 `subagent_197:262`／`task.go:708` 的任务身份改读它（理由＝不读则**深度判定静默失效、父停不了子**）。⇒ 按本仓定式"越格自报的腿＝编排者先跑行为尺、但**没变松要由下一枚非实现者答**"⇒ **补票 `282`**（5 框：种坏验牙／逐枚核断言等价或更强／深度判定与父子停机两发读数／两条残余登记核实／越界检查）。⛔ 我本轮**不给它盖章**。
+- 它自报的两条残余（journal 非生产组合行仍 taskID／`bridge.go` 既有 CRLF 未洗）在 `probes/242/corrland1/10-landing.md`；票 282 `AC#4` 逐条核。
+- 编队：在飞＝0 枚。⛔ 零翻框、零 push。
