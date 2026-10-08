@@ -1,0 +1,38 @@
+=== (a) v4 fixture-mutant line anchors: claimed vs actual, before vs after ===
+ruler = sed -n '<n>p' on each blob; LANDING = the printed today-line still is the target the script's comment names
+line 164 [v-set-gone] wants "if _, exists := o.props[name]; exists && o.unwritable[name] {"
+   before: if _, exists := o.props[name]; exists && o.unwritable[name] {
+   after : if _, exists := o.props[name]; exists && o.unwritable[name] {
+   verdict: LANDS
+   actual target now lives at line(s): 164 
+line 1288 [v-detector-gone] wants "if recv != cw {"
+   before: if recv != cw {
+   after : // after Chrome/WebView2 and never offered as a WebView2 behaviour record: the stub
+   verdict: DEAD (hits a comment line)
+   actual target now lives at line(s): 1293 
+line 1290 [v-no-panic] wants "panic(&jsPanic{"TypeError: Illegal invocation:"
+   before: panic(&jsPanic{"TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called with " +
+   after : // real-window reading of this edge lives in
+   verdict: DEAD (hits a comment line)
+   actual target now lives at line(s): 1295 
+line 1947 [v-ma-world-swap] wants "bf, spy, thrown := runShippedHookInOneWorld35r4(t, false)"
+   before: bf, spy, thrown := runShippedHookInOneWorld35r4(t, false)
+   after : //
+   verdict: DEAD (hits a comment line)
+   actual target now lives at line(s): 1953 
+line 1977 [v-mb-world-swap] wants "bf, spy, thrown := runShippedHookInOneWorld35r4(t, true)"
+   before: bf, spy, thrown := runShippedHookInOneWorld35r4(t, true)
+   after : // In the non-writable world the assignment must be REFUSED, SILENTLY (sloppy mode: no
+   verdict: DEAD (hits a comment line)
+   actual target now lives at line(s): 1983 
+line 1954 [v-label-ma] wants "t.Fatalf("M-A RED (receiver lost at the native exit)"
+   before: t.Fatalf("M-A RED (receiver lost at the native exit): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. A real browser answers that with Illegal invocation and the page's letter never leaves the page, so this hook must not be certified as a delivery. %s",
+   after : 
+   verdict: DEAD (hits a blank line)
+   actual target now lives at line(s): 1956 1960 
+line 2048 [v-label-mb] wants "t.Fatalf("M-B RED (guard's typeof half gone)"
+   before: t.Fatalf("M-B RED (guard's typeof half gone): with no door in the page the forwarding hook must fall back to the native exit; it instead invoked a non-function and the page's post threw: %s. %s",
+   after : if bf.window.has(panelDispatchBinding) {
+   verdict: MISLANDS
+   actual target now lives at line(s): 
+rc=0

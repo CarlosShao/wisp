@@ -1,0 +1,12 @@
+=== (i) the new case: exact line anchors ===
+2097:func TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable(t *testing.T) {
+--- first assertion (red sentence) line ---
+2123:		t.Fatalf("M-B3 RED (guard reduced to a truthiness test): a door that is present but NOT callable must still fall back to the native exit; this hook invoked window.%s anyway and the page's post threw: %s. %s",
+--- 台件 (the world-staging line) ---
+2116:	bf.window.set(panelDispatchBinding, "not-a-function")
+--- the production guard line 680 verbatim ---
+    if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+prod blob worktree=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 HEAD=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 daf1f5a0=26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+zero-prod-change numstat (expect NO output):
+numstat-rc=0
+rc=0

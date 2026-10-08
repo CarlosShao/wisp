@@ -1,0 +1,14 @@
+=== roster the write leg claims 13 PASS: which top-level tests match -run ===
+--- matching top-level funcs across the whole package's NON-windows test files ---
+cmd/wisp/panel_transport_35r1_test.go:195:func TestPagePostMessageEnvelopeReachesDispatchRawViaTransport(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1736:func TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1769:func TestShapeA3SecondPagePostStillDelivers(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1791:func TestShapeA3ForwardingHookIsIdempotentInOneDocument(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1817:func TestLegacySubShapeOneHookDiesInAReentryLoop(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1860:func TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1952:func TestForwardingHookMustNotLoseTheNativeExitReceiver(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1982:func TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:2032:func TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:2097:func TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable(t *testing.T) {
+count=10
+rc=0

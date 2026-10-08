@@ -1,0 +1,22 @@
+=== (ii) prefix census on the CURRENT fixture (re-measured, not restated) ===
+line-count fixture=2142
+'M-B RED'  lines=0  occurrences=0
+'M-B1'  lines=9  occurrences=9
+'M-B2'  lines=5  occurrences=5
+'M-B3'  lines=9  occurrences=9
+'M-A RED'  lines=2  occurrences=2
+--- the trailing-space ruler form the write leg used ---
+M-B1space=9 M-B2space=5 M-B3space=9
+=== same ruler on the daf1f5a0 (pre-35-r5) blob ===
+'M-B RED'  lines=6
+'M-B1'  lines=0
+'M-B2'  lines=0
+'M-B3'  lines=0
+'M-A RED'  lines=2
+before line-count=2066
+=== assertion-strength ruler ===
+t.Fatalf before=47 after=56 delta=9
+t.Errorf before=9 after=9
+t.Logf before=5 after=6
+func Test before=8 after=9
+rc=0

@@ -1,0 +1,23 @@
+=== Q3 side-check: is any LIVE instrument grepping the literal M-B-plus-RED? ===
+--- (1) the .sh/.py/.ps1/.go instruments in the repo that mention it ---
+.scratch/wisp/probes/35/r5/scripts/after-rulers.sh
+.scratch/wisp/probes/35/r5/scripts/anchor-rulers.sh
+.scratch/wisp/probes/35/v4/scripts/countershape-v4.sh
+--- (2) every .sh instrument that mentions it, with its lines ---
+## .scratch/wisp/probes/35/r5/scripts/after-rulers.sh
+15:  echo "BEFORE (daf1f5a0 blob): 'M-B RED'=$(grep -c 'M-B RED' "$LOGS/before-35r2-fixture.copy")  [ruler asked for 6]"
+16:  echo "AFTER  (working copy) : 'M-B RED'=$(grep -c 'M-B RED' "$FIX")  [want 0]"
+18:  echo "AFTER 'M-B RED'-family line map (prefix -> which case owns it):"
+## .scratch/wisp/probes/35/r5/scripts/anchor-rulers.sh
+29:  echo "M-B-RED-count=$(grep -c 'M-B RED' cmd/wisp/panel_transport_35r2_test.go)"
+30:  grep -n 'M-B RED' cmd/wisp/panel_transport_35r2_test.go
+## .scratch/wisp/probes/35/v4/scripts/countershape-v4.sh
+53:mkfix v-label-ma 1954 '\t\tt.Fatalf("M-B RED (fixture blind to writability): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. A real browser answers that with Illegal invocation and the page'"'"'s letter never leaves the page, so this hook must not be certified as a delivery. %s", '
+55:mkfix v-label-mb 2048 '\t\tt.Fatalf("M-B RED (wrong death): with no door in the page the forwarding hook must fall back to the native exit; it instead invoked a non-function and the page'"'"'s post threw: %s. %s",'
+--- (3) do CI / tools / scripts reference any red-sentence prefix at all? ---
+(no CI/tools/scripts hit)
+--- (4) is any .sh grepping the WORKING-COPY fixture rather than a saved blob copy? ---
+## .scratch/wisp/probes/35/r5/scripts/after-rulers.sh : 9 working-copy read(s), 9 blob-anchored read(s)
+## .scratch/wisp/probes/35/r5/scripts/anchor-rulers.sh : 4 working-copy read(s), 0 blob-anchored read(s)
+## .scratch/wisp/probes/35/v4/scripts/countershape-v4.sh : 0 working-copy read(s), 0 blob-anchored read(s)
+rc=0

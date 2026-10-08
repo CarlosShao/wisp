@@ -1,0 +1,5 @@
+=== (b) prod-hook mutant anchors (panel_host_windows.go) - prod unchanged, so expect ALL LAND ===
+line 675 : if (!cw || cw.__wispForwardInstalled) { return; }
+line 680 : if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+line 682 : try { return window.%[1]s(message); } finally { inside = false; }
+rc=0

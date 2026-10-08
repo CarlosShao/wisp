@@ -1,0 +1,14 @@
+=== (iv) the 〔仅本机可量〕 label ===
+grep -c '仅本机可量' on cmd/wisp/panel_transport_live_35v2_windows_test.go = 1
+file length=282
+--- is every added header line a comment? (non-comment lines in 1..25, expect 1 = the //go:build line at most) ---
+(all comment/blank in 1..30)
+--- four elements + revocation ruler ---
+'仅本机可量' -> 1 hit(s)
+'WHAT IS MACHINE-LOCAL' -> 1 hit(s)
+'WHO OWNS IT' -> 1 hit(s)
+'RE-RUN CADENCE' -> 1 hit(s)
+'PRICE PAID' -> 1 hit(s)
+'Revocation' -> 1 hit(s)
+'ORCHESTRATOR' -> 1 hit(s)
+rc=0

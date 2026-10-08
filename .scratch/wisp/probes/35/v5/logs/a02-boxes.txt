@@ -1,0 +1,6 @@
+=== ticket AC#8 box census (must be 8 unchecked / 2 checked, both before and after this leg) ===
+unchecked=8
+checked-strict=2
+--- AC#8 body line range ---
+77:- [ ] **Behavioural yard: the third face, the shared red-sentence prefix, and the 〔仅本机可量〕 label on its own file (added 10-08 by the orchestrator from `35-v4` 判 2/判 3/判 4 and ledger `A692`; mandatory — NOT satisfied by the current 2066-line fixture)**: `35-v4` reproduced both named reds that `:75` (a) demands, then attacked the yard with shapes nobody had tried and came back with **one real tautology face plus three hygiene gaps**. Four cells, each with its own named proof:
+rc=0

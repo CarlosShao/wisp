@@ -1,0 +1,35 @@
+=== (c) the repo-wide literal census the orchestrator restated as '19' ===
+A) tracked, ALL files, LINES            = 60
+B) tracked, non-.go, LINES              = 60
+C) tracked, non-.go, FILES              = 25
+D) tracked, *.md, LINES                 = 13
+E) tracked, *.md, FILES                 = 4
+F) tracked, non-.go minus probes logs/  = 20
+G) .go files (expect 0)                 = 0
+--- per-file breakdown, non-.go ---
+.scratch/wisp/issues/35-panel-bridge-c17.md:3
+.scratch/wisp/probes/35/r4/logs/orch/orch-mut-ma-hook.txt:1
+.scratch/wisp/probes/35/r4/logs/orch/orch-mut-mb-set-gone.txt:1
+.scratch/wisp/probes/35/r4/logs/orch/orch-mut-mb-typeof-gone.txt:1
+.scratch/wisp/probes/35/r5/impl.md:3
+.scratch/wisp/probes/35/r5/logs/after-ii.txt:3
+.scratch/wisp/probes/35/r5/logs/before-35r2-fixture.copy:6
+.scratch/wisp/probes/35/r5/logs/folded-prefix-copy:8
+.scratch/wisp/probes/35/r5/logs/opening-rulers.txt:6
+.scratch/wisp/probes/35/r5/logs/scope-diff-ii.txt:2
+.scratch/wisp/probes/35/r5/scripts/after-rulers.sh:3
+.scratch/wisp/probes/35/r5/scripts/anchor-rulers.sh:2
+.scratch/wisp/probes/35/v4/logs/mut-summary.txt:3
+.scratch/wisp/probes/35/v4/logs/mut-summary3.txt:1
+.scratch/wisp/probes/35/v4/logs/run-v-guard-gone+label-mb.txt:1
+.scratch/wisp/probes/35/v4/logs/run-v-guard-gone.txt:1
+.scratch/wisp/probes/35/v4/logs/run-v-ma-hook+label-ma.txt:1
+.scratch/wisp/probes/35/v4/logs/run-v-ma-hook.txt:1
+.scratch/wisp/probes/35/v4/logs/run-v-mb-world-swap.txt:1
+.scratch/wisp/probes/35/v4/logs/run-v-native-window.txt:1
+.scratch/wisp/probes/35/v4/logs/run-v-set-gone.txt:1
+.scratch/wisp/probes/35/v4/logs/run3-v-cap-tight.txt:1
+.scratch/wisp/probes/35/v4/scripts/countershape-v4.sh:2
+.scratch/wisp/probes/35/v4/verdict.md:4
+docs/reports/pending-and-issues.md:3
+rc=0
