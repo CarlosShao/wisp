@@ -1,0 +1,28 @@
+=== M1 Snapshot 顶层键现量 ===
+	Pending     []ApprovalCardView `json:"pending"`
+	Results     []ResultChunk      `json:"results"`
+	Composer    ComposerState      `json:"composer"`
+	GeneratedAt string             `json:"generatedAt"`
+	Instructions *InstructionsSection `json:"instructions,omitempty"`
+	Tasks *TaskRosterSection `json:"tasks,omitempty"`
+rc=0
+=== M2 gate-clauses.sh 路径 ===
+-rw-r--r-- 16 swq 197609 48783 Oct  3 10:54 .scratch/wisp/probes/154/gate-clauses.sh
+rc=0
+=== M3 审查原型 rb-review.js 的 data- 动作属性 ===
+-rw-r--r-- 17 swq 197609 6177 Sep 25 21:59 design/doubao/demo/rb-review.js
+17:        <i data-lucide="git-pull-request"></i>
+23:        <div class="rb-diff-file-header" data-diff-toggle>
+26:          <i data-lucide="chevron-down" class="rb-diff-chevron" style="width:14px;height:14px;flex-shrink:0;color:hsl(var(--muted-foreground));transition:transform .15s;transform:rotate(180deg);"></i>
+63:        <div class="rb-diff-file-header" data-diff-toggle>
+66:          <i data-lucide="chevron-down" class="rb-diff-chevron" style="width:14px;height:14px;flex-shrink:0;color:hsl(var(--muted-foreground));transition:transform .15s;"></i>
+70:            <i data-lucide="file-image" style="width:14px;height:14px;flex-shrink:0;"></i>
+77:        <div class="rb-diff-file-header" data-diff-toggle>
+80:          <i data-lucide="chevron-down" class="rb-diff-chevron" style="width:14px;height:14px;flex-shrink:0;color:hsl(var(--muted-foreground));transition:transform .15s;"></i>
+97:        <i data-lucide="check" style="width:14px;height:14px;"></i>
+104:    el.querySelectorAll('[data-diff-toggle]').forEach(function (header) {
+rc=0
+=== M4 同族 review 原型里的按钮语义（accept/revert/commit/push 词面） ===
+rc=0
+=== M5 Go 侧是否有面板发起的写/批准动作腿 ===
+rc=1

@@ -1,0 +1,105 @@
+=== P1 composer.go 头注释（契约钉原文） ===
+//	attachments   The page names a source; the native side reads, sniffs, stores
+//	              (see attachments.go) and answers with a reference.
+//
+// The JSON keys of every type here are reconciled against frontend/src/lib/
+// panel.ts by TestComposerContractTypesMatchFrontend in composer_test.go, the
+// same two-way check ticket 77 pinned for the approval card.
+
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/CarlosShao/wisp/internal/risk"
+)
+
+// Snapshot is the one push the panel receives per state change (ticket 35 owns
+// the pump). It is the whole truth: nothing on screen lives outside it. Moved
+// here from approval_test.go by ticket 92, because a view model that only a
+// test can build is a view model production never sends.
+//
+// The key set is the contract, and ticket 145 measured how many pins hold it:
+// FOUR, not one. Two two-way reconciliations against frontend/src/lib/panel.ts
+// (composer_test.go:48 and approval_test.go:105) plus two byte-level nails on
+// the published packet (pump_test.go:111-124 and :270-276, whose own comment
+// reads "the four keys are the contract"). Adding a fifth key therefore moves
+// panel.ts and those two byte nails in the same commit, and Q-51 - who may
+// write panel.ts - is still open. It also needs a reader handed over at the
+// pump's assembly root (cmd/wisp/run.go:421-427): measured there unchanged, a
+// new section leaves the running process as {"depth":0,"windowMs":0,
+// "vetoChannels":null} while pending and results in the same packet are live.
+// A key without that reader is the constant this file was moved here to stop.
+// Readings: docs/evidence/s1/145-snapshot-fields-landed-r1.md sections 2 and 3.
+rc=0
+=== P2 composer.go:240-250 Git 载体上下文 ===
+	Attachments      []AttachmentRef `json:"attachments"`
+	AttachmentMIMEs  []string        `json:"acceptedAttachmentMimes"`
+	MaxAttachmentB   int64           `json:"maxAttachmentBytes"`
+	AttachmentReason string          `json:"attachmentError"`
+	// Git is the read-only git dimension (ticket 181). It is a NEW KEY on a
+	// section whose key set is pinned by the frontend contract, and the
+	// declaration that matches it on the page side is not this session's to
+	// write - see the note on Snapshot above and Q-51.
+	Git GitView `json:"git"`
+	// CurrentModel is the model id this boot actually resolved for its text
+	// role, handed over at the pump's assembly root from the one endpoint the
+	// runtime built (llm.Endpoint.Model). It is NOT a selectable catalog and NOT
+	// an effort-tier set - neither of those has an exported source in this tree
+rc=0
+=== P3 composer_test.go:43-80 尺本体 ===
+// TestComposerContractTypesMatchFrontend reconciles the composer view models
+// with the TypeScript interfaces the page reads, in both directions - the same
+// promise ticket 77 made for the approval card, extended to what this ticket
+// adds. A renamed field on one side must go red here, not render "undefined"
+// inside a permission indicator.
+func TestComposerContractTypesMatchFrontend(t *testing.T) {
+	root := panelRepoRoot(t)
+	data, err := os.ReadFile(filepath.Join(root, "frontend", "src", "lib", "panel.ts"))
+	if err != nil {
+		t.Fatalf("read frontend/src/lib/panel.ts: %v", err)
+	}
+	text := string(data)
+	pairs := []struct {
+		name    string
+		goType  any
+		tsIface string
+	}{
+		{"Snapshot", Snapshot{}, "PanelSnapshot"},
+		{"ComposerState", ComposerState{}, "ComposerState"},
+		{"ModeView", ModeView{}, "ComposerMode"},
+		{"WorkspaceView", WorkspaceView{}, "ComposerWorkspace"},
+		{"AttachmentRef", AttachmentRef{}, "ComposerAttachment"},
+		{"ResultChunk", ResultChunk{}, "ResultChunkView"},
+	}
+	for _, p := range pairs {
+		goKeys := jsonKeysOf(p.goType)
+		tsKeys, ok := tsInterfaceKeys(text, p.tsIface)
+		if !ok {
+			t.Fatalf("frontend/src/lib/panel.ts declares no interface %s - the composer contract was renamed on one side only", p.tsIface)
+		}
+		if missing := subtract(goKeys, tsKeys); len(missing) > 0 {
+			t.Errorf("Go %s emits %v that interface %s does not declare", p.name, missing, p.tsIface)
+		}
+		if extra := subtract(tsKeys, goKeys); len(extra) > 0 {
+			t.Errorf("interface %s reads %v that Go %s never sends - those fields render as undefined", p.tsIface, extra, p.name)
+		}
+		t.Logf("%s <-> %s: %d JSON keys reconciled", p.name, p.tsIface, len(goKeys))
+	}
+rc=0
+=== P4 panel.ts 正控（尺能响吗） ===
+311
+53:   Composer contract (ticket 92)
+55:   The three interfaces below are the view models in internal/panel/composer.go
+57:   TestComposerContractTypesMatchFrontend compares the key sets in both
+70:export interface ComposerMode {
+80:export interface ComposerWorkspace {
+95:export interface ComposerAttachment {
+111:/** The composer section of a snapshot: what the input row may show. */
+112:export interface ComposerState {
+113:  mode: ComposerMode;
+114:  workspace: ComposerWorkspace;
+115:  attachments: ComposerAttachment[];
+133:  composer: ComposerState;
+rc=0

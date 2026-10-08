@@ -1,0 +1,49 @@
+=== F1 panel.ts 是否存在 ===
+-rw-r--r-- 10 swq 197609 12404 Sep 25 12:53 frontend/src/lib/panel.ts
+rc=0
+=== F2 panel.ts 里 git 那一格 ===
+rc=0
+=== F3 d22scan 脚本本体（找基线数） ===
+build.ps1
+check-path-length-budget.sh
+d22scan.sh
+dev
+fetch-deps.ps1
+portable-tests-selftest.sh
+portable-tests.sh
+sign-models.ps1
+slo-check.ps1
+slo-freshness.sh
+spike
+testdata
+winsec-tests.sh
+wisp-cli-tests.sh
+rc=0
+=== F4 d22scan.sh 全文行数 ===
+54 scripts/d22scan.sh
+rc=0
+=== F5 基线/在册红点名册 ===
+scripts/check-path-length-budget.sh
+scripts/spike/bin/shell-baseline.exe
+scripts/spike/bin/speech-baseline.exe
+scripts/spike/model-residency/main.go
+scripts/spike/run.ps1
+scripts/spike/shell-baseline/main.go
+scripts/spike/speech-baseline/main.go
+scripts/spike/xy-verdict/session_cgo.go
+docs/evidence/s1/121-preflight-deps-reachability.md
+docs/evidence/s1/128-ac1-consequences.md
+docs/evidence/s1/133-ac1-ac2-instrument.md
+docs/evidence/s1/134-ac6-contended-no-conclusion.md
+docs/evidence/s1/136-ac12-ac13-impl.md
+docs/evidence/s1/136-ac12-ac13-r1-acceptance.md
+docs/evidence/s1/136-ac15-denominator-census-r1.md
+docs/evidence/s1/136-ac15-target-census-r2.md
+docs/evidence/s1/136-ac8-ac9-impl.md
+docs/evidence/s1/136-ac8-ac9-r1-acceptance.md
+docs/evidence/s1/136-instr-fixes-r1.md
+docs/evidence/s1/138-cancel-kills-children-r1.md
+rc=0
+=== F6 工单 189 AC#6 引的在册红 ===
+.scratch/wisp/issues/189-the-review-stack-needs-uncommitted-count-and-per-file-diff-but-go-side-has-zero-source.md:17:- [ ] **AC#6 门禁**：`./internal/panel/ ./internal/tools/`＋`sh scripts/d22scan.sh`（基线 433）＋`gate-clauses.sh` 比名册（在册只 `G6neg`）；⚠ `internal/panel` 那 **2 枚已知红**照实记不修。
+rc=0

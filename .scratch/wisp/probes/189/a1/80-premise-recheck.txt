@@ -1,0 +1,50 @@
+=== K1 rb-review.js 动作词面（无管道尾，真 rc） ===
+rc=1
+=== K2 正控：同尺在 rb-plugins.js 上能响（写动作形状） ===
+65:      +   '<div class="switch' + (p.on ? ' on' : '') + '" data-plg-toggle title="切换启用"></div>'
+75:      var sw = e.target.closest('[data-plg-toggle]');
+rc=0
+=== K3 180-182 census 被引行现读 ===
+| S2 | 环境信息（本地路径／分支／未提交枚数／提交或推送） | 票 182 AC#1 目测清单 ＋ 票 181 票面（分支／工作树）＋ 票 186（composer 那一排的 git，**不同地界**） |
+| S2 未提交枚数 | **规格真空**（票 182 AC#4 把它划给"本票那一堆"，但本票只普查不实现） | 同 S3 尺 ⇒ **0** | 无 |
+| S3 审查 diff | **无源＋规格真空** | 尺（票 182 现量第 4 条同形）`grep -rn "git diff\|diff --numstat\|numstat\|unified diff" --include=*.go internal/ cmd/` ⇒ **0** | 无 |
+| S2 未提交枚数／提交／推送 | **没票认领 ⇒ 要立票**（＋动作那一半是雷区，见 §7） | 票 181 AC#4 只管"非 git 目录那一形"的显示；票 186:48 逐字"不动输入框宽度（＝票 180）、**不裁任务监控那一栏缺哪些堆（＝票 182）**" ⇒ 186 明确不认领 |
+| S3 审查 diff | **没票认领 ⇒ 要立票** | 票 181 AC#3 逐字"交付里**不许出现**任何模型可调用的 `git.*` 工具…`internal/panel/bridge.go:42-45` 那四枚 `panel.*` **一枚不许加**" ⇒ 181 只走只读快照通道，不含 diff |
+## 7. 票 182 AC#5 — 雷区清单（逐堆：有无面板发起的批准／写动作）
+| S3 审查 diff | 只读那一半**无**；⚠ "接受／回滚改动"那一半＝写动作（`fs.write`／`fs.edit` 级，L2） | 今天 diff 零源 ⇒ 两半都不存在；登记为**立票时的边界** |
+1. **雷区 4 处**（§7）：面板里的 git **提交／推送**、diff 的**接受／回滚**、文件树上的**删除／移动**、
+rc=0
+=== K4 在册红最新名册（internal/panel） ===
+docs/evidence/s1/197-subagent-carrier-r3.md:205:   两枚都在起手那 4 枚在册红里 ⇒ "名册未变"成立，但**红因变了**，界面那支要补的不止一张表（键集见 §④.3 末）。
+docs/evidence/s1/197-subagent-carrier-r3.md:239:## ④ 门禁逐包读数 ＋ 在册红名册逐名比对 ＋ 格式门
+docs/evidence/s1/197-subagent-carrier-r3.md:268:### ④.3 在册红名册逐名比对（起手 4 枚 vs 终态 4 枚，`internal/panel`）
+docs/evidence/s1/197-subagent-carrier-r3.md:270:| 起手在册红（派单给名） | 终态现量（`grep '^--- FAIL' final-v-panel.txt`） | 结论 |
+docs/evidence/s1/197-subagent-entity-r1b.md:218:## ④ 门禁终态逐包读数 ＋ 在册红名册逐名比对
+docs/evidence/s1/197-subagent-entity-r1b.md:233:**在册红名册逐名比对**（起手 4 枚 vs 终态 4 枚，`internal/panel`）：
+docs/evidence/s1/197-subagent-entity-r1b.md:235:| 起手在册红（编排者给名） | 终态现量 | 结论 |
+docs/evidence/s1/197-subagent-entity-r1b.md:280:「跟踪集 gofumpt 未净里 `internal/`、`cmd/` 为 0」；起手在册红 4 枚的名字与终态逐名一致；
+rc=0
+=== K5 panel.ts PanelSnapshot 键集 ===
+}
+
+/** What the host pushes on every state change (ticket 35 owns the pump). */
+export interface PanelSnapshot {
+  pending: ApprovalCardView[];
+  results: ResultChunkView[];
+  /** The input row's state, always read from here - never remembered (AC#4). */
+  composer: ComposerState;
+  /** ISO-8601 stamp of when Go built the snapshot; display only, never used
+      to derive state - the panel keeps none. */
+  generatedAt: string;
+}
+
+/** Shape of the object WebView2 installs on the host page (C17). */
+interface WispHostBridge {
+  postMessage(message: string): void;
+}
+
+declare global {
+  interface Window {
+rc=0
+=== K6 jsonKeysOf 是否含 omitempty ===
+rc=1

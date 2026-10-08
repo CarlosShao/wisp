@@ -1,0 +1,95 @@
+=== C1 GitView 结构体原文（嵌点候选） ===
+type GitView struct {
+	// Kind is one of the four GitKind* values above.
+	Kind string `json:"kind"`
+	// Reason is mandatory and never empty: it is the sentence the panel shows
+	// when the state is anything but "here is a repo on branch X".
+	Reason string `json:"reason"`
+	// Branch is the symref name (short: "dev", not "refs/heads/dev").
+	Branch string `json:"branch"`
+	// DetachedSha is the 40-hex HEAD when there is no branch.
+	DetachedSha string `json:"detachedSha"`
+	// IsDetached is HEAD's shape, decided by its first five bytes ("ref: ").
+	IsDetached bool `json:"isDetached"`
+	// RepoRoot is the working tree that owns the shared git dir.
+	RepoRoot string `json:"repoRoot"`
+	// CurrentWorktree is the directory this run is scoped to. It is the SAME
+	// value WorkspaceView.Canonical carries (cmd/wisp/panel_pump.go), so the two
+	// sections of one packet cannot name different trees.
+	CurrentWorktree string `json:"currentWorktree"`
+	// Worktrees is main-first, then attached, each sorted by path.
+	Worktrees []GitWorktree `json:"worktrees"`
+	// Branches is the full local set: refs/heads walked RECURSIVELY (a branch
+	// named "feat/x" is a directory "feat" holding a file "x", so one-level
+	// listing drops it - census §④ measured 3 vs the real 4 here) merged with
+	// packed-refs, loose winning on a name clash.
+	Branches []string `json:"branches"`
+	// SwitchBlocked is the status field, not git data: empty would mean
+	// "switchable", which is false in this tree, so it carries the reason.
+	SwitchBlocked string `json:"switchBlocked"`
+}
+
+// GitViewNotProbed is what the pump sends when the assembly attached no reader
+// at all. Same rule as the mode section: a value nobody read is reported as
+// unread, never as a plausible default.
+func GitViewNotProbed() GitView {
+rc=0
+=== C2 composer.go 里 Git 载体 ===
+50:// panel.ts and those two byte nails in the same commit, and Q-51 - who may
+90:	// page-side declaration is the UI leg's to write (Q-51, ledger A383).
+125:		composer.Git = GitViewNotProbed()
+245:	// write - see the note on Snapshot above and Q-51.
+246:	Git GitView `json:"git"`
+285:		Git: GitViewNotProbed(),
+rc=0
+=== C3 pump.go 泵钩子 ===
+145:	// Git reads the host-side git dimension for that same root (ticket 181). It
+150:	Git func() GitView
+275:	if p.src.Git != nil {
+278:		composer.Git = p.src.Git()
+rc=0
+=== C4 panel_pump.go 装配/reader ===
+209:// gitView reports the read-only git dimension (ticket 181) for the tree this run
+220:// account on its own fields, and panel.ReadGitForWorkspace reads that account
+228:func (rt *agentRuntime) gitView() panel.GitView {
+229:	return panel.ReadGitForWorkspace(rt.workspaceView())
+rc=0
+=== C5 入向方法名册（C17 面） ===
+42:	MethodModeRequest      = "panel.mode.request"
+43:	MethodWorkspaceRequest = "panel.workspace.request"
+44:	MethodAttachmentAdd    = "panel.attachment.add"
+45:	MethodMessageSend      = "panel.message.send"
+66:	MethodConfigGet = "config.get"
+67:	MethodConfigSet = "config.set"
+rc=0
+=== C6 前端契约钉测试 ===
+./.scratch/wisp/probes/197/r3b/pre/pump.go:26:// is untouched, so TestComposerContractTypesMatchFrontend (composer_test.go:48)
+./.scratch/wisp/probes/197/r3b/pre/pump.go:350:// TestComposerContractTypesMatchFrontend). The accessors below are the host-facing
+./.scratch/wisp/probes/197/r3b/pre/subagent_roster_197.go:120:	// reconciled by TestComposerContractTypesMatchFrontend).
+./internal/panel/composer.go:28:// panel.ts by TestComposerContractTypesMatchFrontend in composer_test.go, the
+./internal/panel/composer_test.go:43:// TestComposerContractTypesMatchFrontend reconciles the composer view models
+./internal/panel/composer_test.go:48:func TestComposerContractTypesMatchFrontend(t *testing.T) {
+./internal/panel/pump.go:26:// frontend/src/lib/panel.ts is untouched, so TestComposerContractTypesMatchFrontend
+./internal/panel/pump.go:414:// TestComposerContractTypesMatchFrontend). The accessors below are the host-facing
+./internal/panel/subagent_roster_197.go:125:	// reconciled by TestComposerContractTypesMatchFrontend).
+./internal/panel/subagent_stream_197_test.go:327://     TestComposerContractTypesMatchFrontend reconciles that pair); the visible
+rc=0
+=== C7 前端契约类型文件在哪 ===
+VENDORED.md
+dist
+embed.go
+fixtures
+index.html
+node_modules
+package-lock.json
+package.json
+public
+scripts
+src
+tsconfig.app.json
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+rc=0
+=== C8 d22scan 基线 ===
+rc=0

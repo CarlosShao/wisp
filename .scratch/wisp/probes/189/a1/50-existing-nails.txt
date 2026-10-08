@@ -1,0 +1,81 @@
+=== N1 panel.ts ComposerState 键集 ===
+/** The composer section of a snapshot: what the input row may show. */
+export interface ComposerState {
+  mode: ComposerMode;
+  workspace: ComposerWorkspace;
+  attachments: ComposerAttachment[];
+  acceptedAttachmentMimes: string[];
+  maxAttachmentBytes: number;
+  attachmentError: string;
+}
+
+/** One streamed assistant/result chunk for the result region. */
+export interface ResultChunkView {
+  correlationId: string;
+  text: string;
+  done: boolean;
+}
+
+/** What the host pushes on every state change (ticket 35 owns the pump). */
+export interface PanelSnapshot {
+  pending: ApprovalCardView[];
+  results: ResultChunkView[];
+  /** The input row's state, always read from here - never remembered (AC#4). */
+  composer: ComposerState;
+  /** ISO-8601 stamp of when Go built the snapshot; display only, never used
+      to derive state - the panel keeps none. */
+rc=0
+=== N2 pump_test.go 字节钉 105-130 ===
+	if snap.GeneratedAt != "2026-09-25T12:00:00Z" {
+		t.Errorf("generatedAt = %q, want the injected clock, RFC3339 UTC", snap.GeneratedAt)
+	}
+
+	// And the bytes: the four keys are the contract, so a fifth arriving here is
+	// a contract change dressed as a bug fix.
+	data, err := pump.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var generic map[string]json.RawMessage
+	if err := json.Unmarshal(data, &generic); err != nil {
+		t.Fatal(err)
+	}
+	got := make([]string, 0, len(generic))
+	for k := range generic {
+		got = append(got, k)
+	}
+	if strings.Join(sortedCopy(got), ",") != "composer,generatedAt,pending,results" {
+		t.Errorf("snapshot JSON keys = %v, want exactly the four PanelSnapshot declares", got)
+	}
+}
+
+func TestAPumpWithNoReadersSaysSoInsteadOfInventingState(t *testing.T) {
+	snap := NewSnapshotPump(PumpSources{}).Snapshot()
+
+rc=0
+=== N3 pump_test.go 字节钉 265-285 ===
+	var gotSnap Snapshot
+	pump := NewSnapshotPump(PumpSources{
+		Mode: func() risk.Mode { return risk.ModeAskEveryStep },
+		Now:  fixedClock(time.Date(2026, 9, 25, 13, 0, 0, 0, time.UTC)),
+		Out: func(s Snapshot, data []byte) error {
+			got, gotSnap = data, s
+			return nil
+		},
+	})
+	if _, _, err := pump.Publish(); err != nil {
+		t.Fatal(err)
+	}
+	if len(got) == 0 {
+		t.Fatal("the exit received no bytes")
+	}
+	// The exit gets the same bytes Marshal produces for the same state, and the
+	// packet is the four-key shape the renderer reads - not a Go-side struct
+	// dump with unexported fields or an extra key.
+	var wire map[string]json.RawMessage
+	if err := json.Unmarshal(got, &wire); err != nil {
+		t.Fatal(err)
+rc=0
+=== N4 run.go 泵装配处 Git ===
+703:		Git:       rt.gitView,
+rc=0

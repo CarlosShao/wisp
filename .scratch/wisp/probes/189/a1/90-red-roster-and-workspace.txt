@@ -1,0 +1,62 @@
+=== Z1 197 在册红名册（逐名） ===
+### ④.3 在册红名册逐名比对（起手 4 枚 vs 终态 4 枚，`internal/panel`）
+
+| 起手在册红（派单给名） | 终态现量（`grep '^--- FAIL' final-v-panel.txt`） | 结论 |
+|---|---|---|
+| `TestApprovalCardViewJSONKeysMatchFrontendTypes` | `--- FAIL` 在 | **名册未变**（本腿一未修、二未 Skip、三未放宽） |
+| `TestComposerContractTypesMatchFrontend` | `--- FAIL` 在 | **名册未变** |
+| `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme` | `--- FAIL` 在 | **名册未变** |
+| `TestC21DesignTokensFourwayAgree` | `--- FAIL` 在 | **名册未变** |
+
+**没有第 5 枚、也没有任何一枚消失**；`cmd/wisp` 与 `internal/tools` 终态各 **0** 枚红。
+两枚名册钉的红因**加长了一枚**（这就是派单 §2(a) 说的"这是它该做的工"）：
+
+```
+approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+```
+
+`[instructions]` → `[instructions tasks]`：**`tasks` 是载体层新加的那一枚**，界面侧 `PanelSnapshot` 还没声明它。
+要交给界面那支的键集（逐字段，本腿只出 Go 侧现读，`frontend/**` 零写面、内容不转述）：
+rc=0
+=== Z2 WorkspaceView 字段（186 那条链） ===
+	Set bool `json:"set"`
+	Spelling string `json:"spelling"`
+	Canonical string `json:"canonical"`
+	Reparse bool `json:"reparse"`
+	Rewritten bool `json:"rewritten"`
+	Reason string `json:"reason"`
+rc=0
+=== Z3 工单 189 引用的 181 AC#3/AC#4 原文 ===
+30:- [x] **AC#3 反向判据（防"把 git 读成工具"这一形走偏）**：交付里**不许出现**任何模型可调用的 `git.*` 工具、不许动 `docs/PLAN.md` 的 D34 表、`internal/panel/bridge.go:42-45` 那四枚 `panel.*` **一枚不许加**（只读显示走**已有的快照推送通道**，不需要新请求方法）。⇒ 若实现判"必须加方法才能读到"，**停手上报**，那说明它把只读那一半和动作那一半又捆上了。
+31:- [x] **AC#4 非 git 目录那一形必须显式回答**：工作区不是一棵 git 树（今天 `wisp run` 允许任意授权根）时，快照里这一维画什么？⚠ 三档候选（不显示／显示"非代码工作区"／显示未知）各给一句后果，**由我裁、不由写手自选**；不许静默给空数组（那与票 145 判"空数组＝按钮不画"是同一个坑）。
+55:- 09-28 15:4x **编排者收 `181-r1` ⇒ 翻 AC#1／AC#2／AC#3／AC#4／AC#5 五格，AC#6 不翻**（台账 `A376`）。
+64:  - **AC#4 那一格按格面要"由我裁"，我现在裁**：**采用写手交付的那一形＝`kind=not_a_repo` ＋必填 `reason` 一句**（不显示／空数组／把"读不到"混进"不是仓库"三形都不选）。理由：票 92／145 那条"空数组＝按钮不画"的坑是**同族病**，而 `wisp run` 今天允许任意授权根（非 git 目录是**正常输入**、不是错误），所以界面必须能区分"这里就没有仓库"与"我读不了这里"——写手用 `unreadable`＋`gitdir:` 指向消失目录那一形把它钉住了（判据 `TestReadGitVanishedPointerIsUnreadable`），我复跑没红。
+rc=0
+=== Z4 git.go 三段式自陈头（只读边界原文） ===
+// WHAT THIS FILE IS. A host-side read surface that answers three questions by
+// reading files and nothing else: is this workspace a git tree, which branch (or
+// which bare commit) is checked out in it, and which worktrees does it have. The
+// answers ride the snapshot push that already exists (internal/panel/pump.go ->
+// cmd/wisp/panel_pump.go), which is the outbound half ticket 181's census
+// (docs/evidence/s1/181-186-git-detection-census-c1.md §⑤) measured as really
+// running today.
+//
+// WHAT THIS FILE IS NOT. It is not a tool. D34's built-in tool table
+// (docs/PLAN.md §D34) carries no git row, and giving the model a `git.*` tool
+// would be a contract change, not a display feature - so nothing here is
+// registered in internal/tools and nothing here is reachable from a model call.
+// TestGitDimensionHasNoModelCallableTool nails that. It is also not the inbound
+// half: "switch branch / switch tree" needs the page -> Go hop (a postMessage
+// receiver plus a router), and that hop does not exist in this tree, which is why
+// SwitchBlocked below is a constant sentence rather than a computed verdict.
+//
+// NO EXTERNAL PROCESS. Everything is os.Stat / os.ReadFile / os.ReadDir. The
+// census §② took this repository's own three shapes as live data and concluded
+// that recognising a repo, the current branch and detached HEAD needs no `git`
+// binary; spawning one would additionally drag in D38's goroutine-owner rules and
+// d22scan ban #1 for no gain.
+//
+// THE THREE SHAPES THIS HAS TO EAT (census §②, all measured on real data):
+//
+//	ordinary repo   <dir>/.git is a DIRECTORY; HEAD lives inside it.
+rc=0

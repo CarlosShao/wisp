@@ -1,0 +1,124 @@
+=== G1 scripts/d22scan.sh 全文 ===
+#!/bin/sh
+# scripts/d22scan.sh - the only supported way to run the D22 gate (ticket 67 AC#2).
+#
+# Why a wrapper exists: tools/d22scan is its OWN Go module, so from the repo
+# root `go run ./tools/d22scan -root .` fails inside the ROOT module and the
+# scanner never starts - and `cd tools/d22scan && go run .` (default -root .)
+# walks a tree with no internal/ or cmd/, so every ban examines zero files.
+# Both forms used to look like success. The scanner now refuses to print a
+# verdict it did not compute (see checkRoot in tools/d22scan/main.go), and this
+# script removes the path choices that made the mistake possible: it derives
+# the repository root from its own location, so it works from any directory.
+#
+# Both commands are load-bearing and run in this order on purpose:
+#   1. runtests.sh -C tools/d22scan ./... - the seeded-violation positive
+#      control. It proves the gate CAN go red, so a later "clean" cannot mean
+#      "the gate is blind".
+#   2. go run . -root - the real scan of the working tree.
+#
+# Why step 1 goes through tools/d22scan/runtests.sh and not bare `go test`
+# (ticket 99 AC#2, measured in a /tmp snapshot of HEAD, not theorized):
+# several tests here - TestScannerSelfScanOfRealRepoIsGreen above all - read the
+# repository tree at RUNTIME, and the go test cache only records build inputs,
+# so a violation added to internal/ or frontend/ cannot invalidate them. Run 1
+# of the script passed, a `frontend/src/app.js:1 approval.decide` was then
+# planted, run 2 of step 1 printed:
+#
+#	ok  	github.com/CarlosShao/wisp/tools/d22scan	(cached)
+#
+# with exit code 0 - the positive control endorsed a tree it had never looked
+# at again. Step 2 still caught it, so the script as a whole stayed red, but a
+# control that has to be trusted cannot be the one served from a cache.
+# runtests.sh forces -count=1 (and -v, and "SKIP is not a pass"), which is the
+# SAME instrument CI's "D22 scanner positive control" step already calls, so the
+# two call sites no longer hold two different rules for one job (ticket 71
+# AC#3's lesson: bare `go test` is not a gate).
+#
+# No skippable step, no `|| true`, no continue-on-error (D22 run-away mode 6).
+set -eu
+
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+root=$(CDPATH= cd -- "$here/.." && pwd)
+
+if [ ! -f "$root/go.mod" ]; then
+    echo "d22scan.sh: no go.mod at derived repo root $root - refusing to scan" >&2
+    exit 2
+fi
+
+cd "$root/tools/d22scan"
+
+echo "d22scan.sh: positive control - runtests.sh -C tools/d22scan ./..."
+sh "$root/tools/d22scan/runtests.sh" -C tools/d22scan ./...
+
+echo "d22scan.sh: scan of $root"
+go run . -root "$root"
+rc=0
+=== G2 d22scan ban 列表头 ===
+// Command d22scan is the D22 seven-ban + zero-emoji static scanner
+// (ticket 08; SPEC-10 §8 item 5). It is the CI lint gate and the local
+// self-check; loosening or skipping it is the D22 run-away mode 6.
+//
+// Bans (PLAN.md D22 fourth-round additions), production scope internal/ +
+// cmd/ (non-test, non-testdata) unless stated:
+//
+//	1 bare-goroutine      every `go <anything>` - closure literal OR named
+//	                      call (widened by R16#1; the pre-R16 matcher saw only
+//	                      `go func(` and "clean" therefore meant "no bare
+//	                      closures", not "nothing bypasses Spawn").
+//	                      Every goroutine via observe.Registry.Spawn; the only
+//	                      file-level exemption is internal/observe/goroutine.go,
+//	                      which implements Registry itself.
+//	2 pathresolver-bypass filepath.Clean / filepath.Abs outside the allowlist
+//	                      (C26 PathResolver is the only path comparison)
+//	3 plaintext-key       key/token/secret-named identifier assigned a
+//	                      string literal (SecretStore C28 refs only)
+//	4 wallclock-timeout   wall-clock deltas in timeout/deadline logic
+//	                      (D42#9: monotonic clock only)
+//	5 mirror-hash         hash material mentioned together with a mirror
+//	                      (C29: hashes come from the signed manifest only)
+//	6 panel-approval      `approval.decide` in frontend/ (D33/F2: allow
+//	                      decisions are native-side only) - scope: frontend/
+//	                      (TEXT UNCHANGED - D22 owns it. ARMED LIVE since
+//	                      ticket 88: ticket 77 landed frontend/ at 63ef895, so
+//	                      the exemption ticket 67 registered ("the tree does not
+//	                      exist, keeping this would be pretending to scan")
+//	                      became a false claim, and its own drift guard fired.
+//	                      The walk now examines 40 text files in this repo
+//	                      (measured 2026-09-25 at 467f8a4 on a `git archive HEAD`
+//	                      snapshot, and the SAME 40 on a worktree that has run a
+//	                      frontend build - ledger A207: before the walks excluded
+//	                      gitignored paths a built worktree read 43 here, and the
+//	                      ledger therefore carried 37 / 40 / 43 as three mutually
+//	                      irreconcilable readings of one scope)
+//	                      and an empty scope is fatal - see declaredScopes)
+//	7 internal-artifact-tool  host-internal artifact writes implemented as
+//	                      gated tool names (D34 note 2) - scope: internal/tools/
+//	8 emoji               zero emoji in design/ (every text file), in frontend/
+//	                      (EVERY file, ticket 96 - same walk shape as ban #6, no
+//	                      suffix allowlist) and in the Go sources of internal/ +
+//	                      cmd/ - comments and
+//	                      _test.go INCLUDED (D23). This is the one ban whose
+//	                      scope is NOT the "production, non-test" default
+rc=0
+=== G3 git.go 里的 filepath 用法（PathResolver 规矩） ===
+296:		dot := filepath.Join(dir, ".git")
+308:			parent := filepath.Dir(dir)
+337:	if !filepath.IsAbs(pointer) {
+340:		pointer = filepath.Join(dir, pointer)
+349:		repoRoot := filepath.Dir(common)
+394:	raw, err := os.ReadFile(filepath.Join(worktreeGitDir, "commondir"))
+402:	return filepath.Join(worktreeGitDir, rel), true
+408:	raw, err := os.ReadFile(filepath.Join(gitDir, "HEAD"))
+445:	walkRefs(filepath.Join(commonGitDir, "refs", "heads"), "", loose)
+472:			walkRefs(filepath.Join(dir, e.Name()), name+"/", set)
+483:	raw, err := os.ReadFile(filepath.Join(commonGitDir, "packed-refs"))
+508:	entries, err := os.ReadDir(filepath.Join(commonGitDir, "worktrees"))
+517:		dir := filepath.Join(commonGitDir, "worktrees", e.Name())
+520:		if raw, err := os.ReadFile(filepath.Join(dir, "gitdir")); err == nil {
+526:				path = filepath.Dir(p)
+rc=0
+=== G4 工单 189/181 落的在册红原文 ===
+docs/evidence/s1/181-rewrite-account-r2.md:247:2. `bash .scratch/wisp/probes/154/gate-clauses.sh`（在册红腿名册，只 `G6neg`）——**没跑**。
+docs/evidence/s1/181-rewrite-account-r2.md:250:5. `./internal/panel/` 里那 3 枚在册红**没看根因**（前两枚归别家地界；未验证 `TestC21DesignTokensFourWayAgree` 与本程无关，仅按派单 §3 记为在册）。
+rc=0

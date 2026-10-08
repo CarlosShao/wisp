@@ -1,0 +1,49 @@
+=== R1 git.go 行数 ===
+569 internal/panel/git.go
+rc=0
+=== R2 git.go 导出符号面 ===
+65:const (
+82:const GitSwitchBlockedReason = "切换分支／切换工作树今天不可用：网页到宿主的那一跳还没有落地（无 postMessage 接收器、无 router、无 WebView2 宿主），面板只有快照这一条出向通道"
+86:const gitNoWorkspaceReason = "本轮未选择工作区，git 这一维没有可探测的目录"
+93:type GitWorktree struct {
+117:type GitView struct {
+150:func GitViewNotProbed() GitView {
+154:func newGitView(kind, reason string) GitView {
+172:func ReadGit(workspaceRoot string) GitView {
+240:func ReadGitForWorkspace(ws WorkspaceView) GitView {
+277:func GitViewRewritten(ws WorkspaceView) GitView {
+287:type gitDirs struct {
+294:func locateGitDirs(start string) (gitDirs, string, string) {
+325:func resolvePointerFile(dot, dir string) (gitDirs, string, string) {
+368:func parseGitdirFile(content string) string {
+383:func plainGitdirPath(content string) string {
+393:func readCommondir(worktreeGitDir string) (string, bool) {
+407:func readHead(gitDir string) (branch, sha string, detached bool, kind, reason string) {
+443:func listLocalBranches(commonGitDir string) []string {
+464:func walkRefs(dir, prefix string, set map[string]bool) {
+481:func readPackedRefs(commonGitDir string) map[string]bool {
+507:func listLinkedWorktrees(commonGitDir string) []GitWorktree {
+539:func firstLine(content string) string {
+549:func isHex(s string) bool {
+567:func ioReason(err error) string {
+rc=0
+=== R3 panel 包内 os/exec 与 exec.Command ===
+rc=1
+=== R4 全仓产码 exec.Command（排测试） ===
+internal/llm/adaptertest/mockllm.go:65:	build := exec.Command(goBin, "build", "-o", exe, ".")
+internal/llm/adaptertest/mockllm.go:72:	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+cmd/balldebug/diff_windows.go:409:	cmd := exec.Command(exe, childArgs...)
+cmd/wisp/doctor.go:316:	out, err := exec.Command(cc, "--version").Output()
+cmd/wisp/slo_windows.go:492:	cmd := exec.Command(exe, args...)
+tools/d22scan/gitignore.go:373:	cmd := exec.CommandContext(ctx, "git", args...)
+rc=0
+=== R5 git*.go 文件族名册 ===
+git.go
+git_test.go
+rc=0
+=== R6 panel 包内读 git status 的形状（porcelain/status 词面） ===
+rc=1
+=== R7 正控：R6 同形尺含测试 ===
+cmd/wisp/panel_host_gate_test.go
+cmd/wisp/slo_report_144_windows_test.go
+rc=0
