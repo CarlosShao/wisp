@@ -14385,3 +14385,9 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - **配方五段**（前置判据 P1–P6／喂任务两道／观测点／判红绿／诚实边界）：A 道（winlive 台件，自建 exe＋注入文本）**跑得动**，缺一不可＝mingw＋go、DLL 在盘、真桌面、Esc 空闲；**B 道（真控制台 `task` 动词）今天跑不动**——`%APPDATA%\wisp` 无凭据，而 `build/wisp.exe` 旧于 HEAD（要重建才谈）；另具名：L2 场景**没造**台件、`task` 动词自动覆盖＝0。
 - **两枚"今天判不了"的条件**照收且归口：①Esc 被别的程序占着（`desktop state, not our code`）；②真机那台有没有"桌面会话"——后者正是我名下"真窗读数"那一族的同一前提。⇒ 这一发**仍待跑**（配方就位），且**B 道要 owner 的凭据**（或先只跑 A 道）。
 - 编队：`card-proof-prep-1` 已交；在飞＝`259-r4`（拆 `AC#4` 两个 id）／`gate-snapshot-1`（收工门禁快照）。⛔ 零 push。
+
+## A736｜2026-10-08 19:0x｜收 **`gate-snapshot-1`**（收工门禁快照）＋我复跑同数
+
+- 交件＝`50b34971`／`8ace2272`（件 `probes/gate-snapshot-1/`），只读零修、零越界写、零 push。
+- **读数（我复跑同数）**：①`sh scripts/d22scan.sh` ⇒ **rc=0 clean**；分母@`50b34971`：`bans #1-5 internal/=228 cmd/=38`、`#6 f/=85`、`#7 tools/=23`、`#8 design/=39 f/=85 internal/=516 cmd/=113`（⚠ 引这类数必带 ref）。②`gofmt -l cmd internal` ⇒ **7 命中**，我逐枚问来历：**6 枚既有**（`cmd/wisp/models.go` 与 `internal/risk/provenance.go`＝10-03 21:07 `5e8748b3`；`cmd/wisp/panel_inbound_guards_35r3_test.go`＝10-07 21:25；`pending_read.go`＝10-04 10:37；`internal/agent/tools.go` 与 `internal/tools/bridge.go`＝10-04 09:19）＋**1 枚今天的**（`cmd/wisp/panel_transport_35r2_test.go`＝10-08 09:37 `3a343bc7`，**已提交、树净**）⇒ **没有"今天新写且未提交"那种形**；⛔ 我**不擅自修**这 7 枚（改它们＝"顺手改"；且 CI 那一步量的是 **gofumpt** 不是 `gofmt`，两者不是同一把尺）。③`go func(` 词面总 **1**（唯一位点 `cmd/wisp/testdata/esclistener/main.go`）＝**不是判定**，ban 要人看有没有 owner/recover。④四路径 porcelain＝**全空**（18:58 时点；⚠ 我 19:0x 复量已见 ` M cmd/wisp/subagent_selfapproval_197_test.go` ＝`259-r4` 正在写，**不是异常**）。⑤未推＝**427**（18:58）→我 19:0x 复量 **431**。
+- ⛔ 零翻框、零 push。
