@@ -1,0 +1,3 @@
+repo=CarlosShao/wisp
+name=wisp-selfhosted-01|os=Windows|status=online|labels=self-hosted,Windows,X64,wisp-slo
+rc=0

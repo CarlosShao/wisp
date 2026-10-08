@@ -1,0 +1,114 @@
+== ci.yml structural grep ==
+4:# test-windows + slo-smoke; slo-full runs on the self-hosted wisp-slo runner
+10:on:
+11:  pull_request:
+12:  push:
+17:  # scripts/slo-check.ps1) is what keeps a contended sample from pretending to
+19:  # for that: at 19:37 UTC (03:37 local on the wisp-slo laptop, when the review
+24:  #   1. GitHub evaluates cron ONLY against the config on the DEFAULT BRANCH
+25:  #      (main). Until this file reaches main this schedule fires zero times -
+30:  #   3. A scheduled run executes ALL SIX jobs of this workflow, not just
+36:  schedule:
+37:    - cron: '37 19 * * *'
+38:  workflow_dispatch:
+50:  group: ci-${{ github.workflow }}-${{ github.ref }}${{ github.event_name == 'push' && format('-{0}', github.sha) || '' }}
+51:  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+66:    runs-on: ubuntu-latest
+75:        # runtests.sh asserts that the tests ACTUALLY RAN (ticket 71 AC#3):
+76:        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+81:        run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+129:        # rc=0 with cgo on, rc=1 only for cmd/wisp with cgo off). The ball/mulA
+134:        run: sh scripts/d22scan.sh
+142:        # not the trigger table above, not the concurrency group, not any `runs-on`,
+146:        # section 1 measured the self-hosted checkout directory at 43 characters
+149:        # self-hosted side. A step placed after `actions/checkout` in that job is a
+153:        # scripts/check-path-length-budget.sh (WORST_PREFIX=44, same source) rather
+156:        # self-hosted runner. It is a paper budget, checked everywhere, not a
+166:        run: sh scripts/check-path-length-budget.sh --with-self-test
+230:        # they carry readings: scripts/slo-freshness.sh P1 (:160-170) fails the nail
+235:        run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
+340:        # WHAT IT RUNS. scripts/portable-tests-selftest.sh is the standing carrier
+341:        # that judges the DENOMINATOR of scripts/portable-tests.sh, and its case
+347:        # is already in force (scripts/portable-tests.sh, census arm, `exit 1`);
+354:        # `dash -n scripts/portable-tests-selftest.sh` exits 2 at its line 246
+356:        # (scripts/portable-tests.sh fails `dash -n` at :231, scripts/winsec-tests.sh
+358:        # judged one case. The carrier's own Usage block says `bash scripts/portable-tests-selftest.sh`,
+366:        # with scripts/testdata/portable-tests/go on a private PATH prefix
+370:        # judged (portable-tests.sh, winsec-tests.sh, runtests.sh) that runs for
+388:        run: bash scripts/portable-tests-selftest.sh
+396:    runs-on: ubuntu-latest
+422:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+429:        # and no threshold changed): it sat below a step that bare `go test` lets
+435:        run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+437:      - name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
+438:        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+441:        # printed the same bytes as a pass. scripts/portable-tests.sh delegates
+442:        # every verdict to tools/d22scan/runtests.sh (the strict runner from
+452:        # and a ./internal/agent/... glob was quietly carrying a third (scheduler).
+459:        run: bash scripts/portable-tests.sh --scope=core
+466:  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+506:    runs-on: windows-latest
+557:        run: bash scripts/winsec-tests.sh
+566:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+571:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+573:      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+576:        # scripts/wisp-cli-tests.sh's header for the four readings. Short version:
+578:        # pinned third_party/sherpa-onnx DLLs are on PATH, which is exactly what
+579:        # the cache step and build.ps1 above produce; the same command without them
+588:        # on all five steps, being unable to run because the DLLs are absent is
+593:        run: bash scripts/wisp-cli-tests.sh
+599:        # claims it (scripts/portable-tests.sh:392-399, message :407-423). Before
+617:        # .../sherpa-onnx-go-linux@v1.13.8` (reproduced three times independently:
+619:        # scripts/portable-tests.sh:326-332, and probes/111/r2 section 1.2 at
+621:        # takes its refusal branch (portable-tests.sh:337-351) and exits 1 rather
+629:        # WHY IT SITS HERE IN THE JOB (between `cmd/wisp CLI tests` and `Portable
+638:        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+639:        # third_party, no DLLs on PATH - so it is placed below the two steps whose
+655:        #     cmd/wisp, 5 of those files carrying 13 `t.Skip` calls whose literal
+657:        #     cmd/wisp/resident_hotkey_live_258_windows_test.go:55), while
+658:        #     tools/d22scan/runtests.sh:98-102 treats ANY `--- SKIP` as fatal and
+682:        run: bash scripts/portable-tests.sh --scope=census
+685:        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+699:        # would be either a permanent red (runtests.sh treats SKIP as fatal, by
+700:        # design) or a false green (bare `go test` prints `ok`) - which is the
+703:        # on THIS platform: because risk is in the scope, portable-tests.sh
+705:        # `go test -list` and prints the row with its class and reason in this
+710:        # The package list moved INTO scripts/portable-tests.sh as the named
+718:        run: bash scripts/portable-tests.sh --scope=windows
+721:        # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
+723:        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+729:        # classify B, want ClassA), and runtests.sh propagates a non-zero `go
+734:        run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
+740:    runs-on: windows-latest
+757:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+760:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+770:  # Full six-state SLO gate + settle + leak on the self-hosted Windows runner
+771:  # (interactive desktop-capable machine, label wisp-slo). Same script as
+773:  # scope unchanged). Merges require this green locally/self-hosted.
+776:  # live per commit and the daily schedule adds one interference-free sample.
+777:  # What changed is what a red MEANS: scripts/slo-check.ps1 now refuses to
+792:  # probe P3 of scripts/slo-freshness.sh now ages on the newest uploaded
+798:    runs-on: [self-hosted, wisp-slo]
+801:      # The runner's job environment carries no msys64 on PATH: measured on the
+802:      # wisp-slo machine, `msys64` appears 0 times in _diag/Worker_*.log for the
+804:      # (on the interactive user PATH only). build.ps1's own fallback path is
+807:      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+808:      # weakening the step. Verified locally with msys removed from PATH:
+809:      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+820:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+823:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+847:          #      P3 in scripts/slo-freshness.sh (the record of "a valid sample
+849:          #   2. slo-check.ps1 prints NO CONCLUSION (machine-contended) with
+872:    runs-on: ubuntu-latest
+rc=0
+== slo-fresh.yml ==
+7:# <=0.5%, RSS <=25MB) and it can only run on one machine: the self-hosted
+17:# kills slo-full. It gets its own clock: a schedule plus a manual entry point,
+41:# Like every other cron here, this schedule is only evaluated for the config on
+44:# Until then the nail still runs on every workflow_dispatch.
+46:on:
+47:  schedule:
+51:    - cron: '23 */6 * * *'
+52:  workflow_dispatch:
+62:    runs-on: ubuntu-latest
+rc2=0

@@ -1,0 +1,72 @@
+./.scratch/wisp/probes/245/v1/esclistener/main.go:28://	                  winlive suite runs).
+./.scratch/wisp/probes/260/v1/logs/head-copy-resident_approval_windows.go:108:	// A real window is a winlive rig and this leg is forbidden to run one (see
+./.scratch/wisp/probes/260/v1/logs/head-copy-resident_approval_windows.go:377:// window is a winlive rig this leg is forbidden to run (see
+./.scratch/wisp/probes/33/r5/logs/prev-test-copy.go:26:// cannot create one is red, not skipped. winlive (the quiet-desktop tier, no CI
+./cmd/wisp/panel_geometry_255_test.go:41:// the on-screen width following along - is a winlive reading and is recorded in
+./cmd/wisp/panel_geometry_255_winlive_test.go:1://go:build windows && winlive
+./cmd/wisp/panel_geometry_255_winlive_test.go:11:// to the 只有本机可量 family. This file is that reading, and it is tagged winlive so
+./cmd/wisp/panel_host_gate_test.go:29:// only on the desktop box (winlive has no CI job) in panel_host_windows_test.go.
+./cmd/wisp/panel_host_windows_live_test.go:1://go:build windows && winlive
+./cmd/wisp/panel_host_windows_live_test.go:18:// docs/evidence/s1/33-panel-host-c27-r5.md: winlive has NO CI job, so this clause
+./cmd/wisp/panel_host_windows_live_test.go:49:		t.Fatalf("bringUp for the winlive exit clause: %v", err)
+./cmd/wisp/panel_host_windows_live_test.go:68:	t.Logf("winlive exit clause: our tree webview baseline %d -> peak %d -> now %d (tree pids %d) | machine-wide %d -> %d",
+./cmd/wisp/panel_host_windows_test.go:6:// WebView2 window, so they belong to the winlive tier, which has NO CI job
+./cmd/wisp/panel_host_windows_test.go:605:// TestPanelHostRealWindowHopAndLifecycle is the winlive measurement for ticket
+./cmd/wisp/panel_host_windows_test.go:609:// on this desktop: winlive has no CI job.
+./cmd/wisp/panel_host_windows_test.go:744:	// winlive exit clause uses (panel_host_windows_live_test.go:60); no
+./cmd/wisp/panel_host_windows_test.go:840:	t.Logf("AC#1 after Destroy (head %s), ONE sample and no timing claim: our tree webview baseline %d -> now %d, machine-wide %d -> %d. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job",
+./cmd/wisp/panel_resident_windows_test.go:26:// cannot create one is red, not skipped. winlive (the quiet-desktop tier, no CI
+./cmd/wisp/panel_transport_35r2_test.go:50:// (-tags winlive) is 35-v2's, not this file's: no browser is started here.
+./cmd/wisp/panel_transport_live_35v2_windows_test.go:1://go:build windows && winlive
+./cmd/wisp/resident_approval_246_windows_test.go:10:// resident_approval_live_246_windows_test.go behind -tags winlive, for the same
+./cmd/wisp/resident_approval_246_windows_test.go:131:// winlive file.
+./cmd/wisp/resident_approval_live_246_windows_test.go:1://go:build windows && winlive
+./cmd/wisp/resident_approval_live_246_windows_test.go:32://	PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -tags winlive ./cmd/wisp \
+./cmd/wisp/resident_approval_windows.go:124:	// A real window is a winlive rig and this leg is forbidden to run one (see
+./cmd/wisp/resident_approval_windows.go:583:// window is a winlive rig this leg is forbidden to run (see
+./cmd/wisp/resident_ball_228_test.go:23:// the shipped no-args process produces, and the winlive case looks for the real
+./cmd/wisp/resident_ball_live_228_windows_test.go:1://go:build windows && winlive
+./cmd/wisp/resident_ball_live_228_windows_test.go:20://	  go test -tags winlive ./cmd/wisp -run TestLive228 -v
+./cmd/wisp/resident_ball_live_228_windows_test.go:22:// Why "alone" is a rule and not a preference: internal/ball's winlive guard
+./cmd/wisp/resident_ball_live_228_windows_test.go:25:// purpose, in another process. `go test -tags winlive ./...` runs the two
+./cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:24:// (that is internal/ball, and a real window is a winlive rig this leg may not run;
+./cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:85:	// zero-value ball cannot answer an uiRun, and a real window is winlive.
+./cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:22:// RegisterHotKey). A live ball window is a winlive rig - this leg is forbidden to
+./cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:26:// pinned by reading plus the winlive claim constant, and is booked as 〔未实测〕 in
+./cmd/wisp/resident_hotkey_258_test.go:82:// sinkRebindLineHas258 is the reading rule the winlive rebind ruler
+./cmd/wisp/resident_hotkey_258_test.go:100:// winlive ruler's format mismatch) pinned in CI: a JSON sink record of the
+./cmd/wisp/resident_hotkey_258_windows_test.go:16://     说得出这句话") is checked as a sentence the process prints: the winlive
+./cmd/wisp/resident_hotkey_258_windows_test.go:245:// data, because the verdict embeds them ("hotkeys from %s") and the winlive
+./cmd/wisp/resident_hotkey_live_258_windows_test.go:1://go:build windows && winlive
+./cmd/wisp/resident_hotkey_live_258_windows_test.go:15://	  go test -tags winlive ./cmd/wisp -run TestLive258 -v
+./cmd/wisp/resident_hotkey_live_258_windows_test.go:192:// the same way the rest of the winlive family checks it.
+./cmd/wisp/resident_hotkey_live_258_windows_test.go:250:// winlive occupied ruler: it registers the desktop-wide combination in THIS
+./cmd/wisp/resident_task_source_246_windows_test.go:31:// resident_task_source_live_246_windows_test.go behind -tags winlive, because only
+./cmd/wisp/resident_task_source_live_246_windows_test.go:1://go:build windows && winlive
+./cmd/wisp/resident_task_source_live_246_windows_test.go:40://	PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -tags winlive ./cmd/wisp \
+./cmd/wisp/resident_task_source_live_246_windows_test.go:80:// ⚠ This file is winlive: CI never runs it (scripts/wisp-cli-tests.sh and
+./internal/agent/approval/cancel_key_label_260r4_test.go:164:// needs a real window (winlive, not run by this leg) - booked as 〔未实测〕 in
+./internal/ball/hotkey_borrow_refused_260r5_test.go:15:// winlive (logs/ruler-takeesc-testcallers.txt and logs/ruler-build-tags.txt under
+./internal/ball/hotkey_borrow_refused_260r5_test.go:95:// next to this file under -tags winlive.
+./internal/ball/hotkey_cancel_borrow_260_test.go:325:// winlive helper requireEscBorrowed (internal/ball/hotkey_live_test.go:90, whose
+./internal/ball/hotkey_cancel_borrow_260_test.go:327:// "Ctrl+Alt+V" - a value copied here because that file is the winlive layer and this
+./internal/ball/hotkey_cancel_borrow_260_test.go:330:// not of the code, and those four winlive callers would read red until the orchestrator
+./internal/ball/hotkey_cancel_borrow_260_test.go:331:// rules on it. 260-r1 did not edit that file and did not run the winlive tier.
+./internal/ball/hotkey_cancel_borrow_260_test.go:349:		"bare-Esc premise is now config-dependent (winlive tier not run this round)", fixture.Cancel, line.Acc.VK)
+./internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:8:// The winlive helper requireEscBorrowed (hotkey_live_test.go:90) used to spell its
+./internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:16:// (the winlive tier is not run this round):
+./internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:82:		{"the winlive fixture seed at hotkey_live_test.go:42", "Ctrl+Alt+V", Accelerator{Mods: 0x4003, VK: 0x56}, false},
+./internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:168:	// Positive control on the same ruler: the seeds the winlive fixtures use parse,
+./internal/ball/hotkey_cancel_borrow_live_260_test.go:1://go:build windows && winlive
+./internal/ball/hotkey_cancel_borrow_live_260_test.go:11://	seconds each, so they are owed to the winlive window (named in
+./internal/ball/hotkey_cancel_borrow_live_260_test.go:14://	go test -tags winlive ./internal/ball/ -run "260" -v
+./internal/ball/hotkey_live_test.go:1://go:build windows && winlive
+./internal/ball/hotkey_live_test.go:10://	go test -tags winlive ./internal/ball/ -run TestLiveHotkey -v
+./internal/ball/hotkey_status_test.go:8:// live layer (hotkey_live_test.go, -tags winlive) proves the same codes come
+./internal/ball/interaction_live_test.go:1://go:build windows && winlive
+./internal/ball/live_guard_windows_test.go:1://go:build windows && winlive
+./internal/ball/live_windows_test.go:1://go:build windows && winlive
+./internal/ball/live_windows_test.go:8://	go test -tags winlive ./internal/ball/ -run TestBallLive -v
+./internal/ball/sta_release_windows_test.go:41:// -tags winlive this file compiles next to live_guard_windows_test.go, which
+./internal/ball/tokens_test.go:184:// off the pure mapping only (no window, no desktop, no -tags winlive):
+rc=0

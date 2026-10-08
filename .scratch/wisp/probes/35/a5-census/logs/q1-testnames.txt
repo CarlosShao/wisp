@@ -1,0 +1,31 @@
+== all Test names in winlive files ==
+./cmd/wisp/panel_geometry_255_winlive_test.go:78:func TestTicket255RealWindowWidthFollowsTheConfig(t *testing.
+./cmd/wisp/panel_host_windows_live_test.go:36:func TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive(t 
+./cmd/wisp/panel_transport_live_35v2_windows_test.go:151:func TestLive35v2PagePostMessageEnvelopeReachesTheGoD
+./cmd/wisp/resident_approval_live_246_windows_test.go:72:func TestLive246ConfirmingCardBorrowsEscVetoesAndRetu
+./cmd/wisp/resident_approval_live_246_windows_test.go:195:func TestLive246ExitRefusesAHangingL2Card(t *testing
+./cmd/wisp/resident_approval_live_246_windows_test.go:289:func TestLive246ExitAbandonsAHangingL1Window(t *test
+./cmd/wisp/resident_ball_live_228_windows_test.go:89:func TestLive228ResidentLegOwnsABallWindowOnTheDesktop(t 
+./cmd/wisp/resident_hotkey_live_258_windows_test.go:40:func TestLive258ResidentBootNamesProvenanceAndDefaults(
+./cmd/wisp/resident_hotkey_live_258_windows_test.go:77:func TestLive258ResidentBootTakesConfigHotkeys(t *testi
+./cmd/wisp/resident_hotkey_live_258_windows_test.go:120:func TestLive258ResidentRebindsWithoutRestart(t *testi
+./cmd/wisp/resident_hotkey_live_258_windows_test.go:193:func TestLive258ResidentOccupiedCombinationNamesTheNew
+./cmd/wisp/resident_task_source_live_246_windows_test.go:95:func TestLive246ResidentPipelineRaisesACardAndEscV
+./cmd/wisp/resident_task_source_live_246_windows_test.go:256:func TestLive246ExitCancelsARunningTask(t *testin
+./internal/ball/hotkey_cancel_borrow_live_260_test.go:33:func TestLiveCancelBorrowDefaultUnchanged260(t *testi
+./internal/ball/hotkey_cancel_borrow_live_260_test.go:58:func TestLiveCancelBorrowFollowsConfig260(t *testing.
+./internal/ball/hotkey_live_test.go:182:func TestLiveHotkeyRebindEndToEnd(t *testing.T) {
+./internal/ball/hotkey_live_test.go:286:func TestLiveHotkeyOccupiedVsNotAttempted(t *testing.T) {
+./internal/ball/hotkey_live_test.go:381:func TestLiveMuteHotkeyEndToEnd(t *testing.T) {
+./internal/ball/hotkey_live_test.go:449:func TestLiveSleepingZeroTimerHandles(t *testing.T) {
+./internal/ball/interaction_live_test.go:53:func TestLiveClickSummonsAndDragDoesNot(t *testing.T) {
+./internal/ball/interaction_live_test.go:133:func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
+./internal/ball/interaction_live_test.go:282:func TestLiveNeverStealsFocus(t *testing.T) {
+./internal/ball/interaction_live_test.go:351:func TestLiveTransparentCornerFallsThrough(t *testing.T) {
+./internal/ball/live_windows_test.go:44:func TestBallLiveLifecycle(t *testing.T) {
+./internal/ball/live_windows_test.go:147:func TestBallLivePositionPersistence(t *testing.T) {
+./internal/ball/live_windows_test.go:211:func TestBallLiveIdleBorderTransition(t *testing.T) {
+./internal/ball/live_windows_test.go:316:func TestBallLiveEdgeDock(t *testing.T) {
+./internal/ball/live_windows_test.go:474:func TestBallLiveEdgeDockHover(t *testing.T) {
+./internal/ball/live_windows_test.go:625:func TestBallLiveAudioLiquidGate(t *testing.T) {
+rc=0

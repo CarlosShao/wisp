@@ -1,0 +1,15 @@
+== tasklist census (read-only, no window opened) ==
+343
+pattern[wisp]=0
+pattern[msedgewebview2]=18
+pattern[WebView2]=0
+pattern[electron]=0
+pattern[chrome]=0
+pattern[node]=9
+pattern[go_test]=0
+pattern[test.exe]=0
+-- any process whose name contains wisp --
+-- any *test*.exe running --
+-- shell sessions / consoles --
+21
+rc=0

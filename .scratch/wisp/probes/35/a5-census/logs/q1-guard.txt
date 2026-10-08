@@ -1,0 +1,34 @@
+== winlive guard shape in internal/ball ==
+10://     "WispBallWindow" and FAILS with the offending pid when one is not ours:
+76:func ballWndProcProbe(hwnd, msg, wParam, lParam uintptr) uintptr {
+94:func subclassTimers(t *testing.T, b *Ball) (*timerCount, func()) {
+123:// its pid and title. Class-name matching is exactly what the ticket says to
+125:func enumerateBallWindows() []struct {
+127:	pid   uint32
+132:		pid   uint32
+142:		var pid uint32
+143:		pGetWindowThreadProcessID.Call(hwnd, uintptr(unsafe.Pointer(&pid)))
+147:			hwnd: windows.HWND(hwnd), pid: pid,
+158:// requireQuietBallDesktop fails the test when the desktop is not ours alone:
+159:// another process's ball (a leftover demo harness) holds hotkey registrations
+162:func requireQuietBallDesktop(t *testing.T) {
+166:		if w.pid != mine {
+167:			t.Fatalf("foreign Wisp ball window on the desktop: hwnd=%v pid=%d title=%q. "+
+168:				"Live measurements must own the desktop: another process holds the window class "+
+170:				"Kill pid %d (a leftover balldebug/wisp) and re-run. t.Skip is not an option here.",
+171:				w.hwnd, w.pid, w.title, w.pid)
+178:// liveBallTitle returns a window title no other run can guess, so every
+180:func liveBallTitle(t *testing.T) string {
+187:func newLiveBall(t *testing.T, opts Options) *Ball {
+209:func windowAlive(hwnd windows.HWND) bool {
+217:func threadWindowClasses(hwnd windows.HWND) []string {
+232:func ballWindowsOnThread(hwnd windows.HWND) int {
+243:func guiResources(which uintptr) uint64 {
+251:func sendMouse(b *Ball, msg, wParam, lParam uintptr) uintptr {
+261:func sendMessage(b *Ball, msg, wParam, lParam uintptr) uintptr {
+266:func lParamPoint(x, y int32) uintptr {
+274:func injectHotkey(mods uint32, vk uint32) bool {
+312:func keyIsDown(vk uintptr) bool {
+319:func readState(t *testing.T, b *Ball) statemachine.State {
+333:func uiUserObjects() uint64 { return guiResources(grUserObjects) }
+rc=0

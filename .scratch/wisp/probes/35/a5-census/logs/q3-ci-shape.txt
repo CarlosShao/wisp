@@ -1,0 +1,47 @@
+== job names + runs-on ==
+4:# test-windows + slo-smoke; slo-full runs on the self-hosted wisp-slo runner
+11:  pull_request:
+12:  push:
+19:  # for that: at 19:37 UTC (03:37 local on the wisp-slo laptop, when the review
+36:  schedule:
+38:  workflow_dispatch:
+65:  lint:
+66:    runs-on: ubuntu-latest
+142:        # not the trigger table above, not the concurrency group, not any `runs-on`,
+146:        # section 1 measured the self-hosted checkout directory at 43 characters
+149:        # self-hosted side. A step placed after `actions/checkout` in that job is a
+156:        # self-hosted runner. It is a paper budget, checked everywhere, not a
+395:  test-core:
+396:    runs-on: ubuntu-latest
+505:  test-windows:
+506:    runs-on: windows-latest
+739:  slo-smoke:
+740:    runs-on: windows-latest
+770:  # Full six-state SLO gate + settle + leak on the self-hosted Windows runner
+771:  # (interactive desktop-capable machine, label wisp-slo). Same script as
+773:  # scope unchanged). Merges require this green locally/self-hosted.
+797:  slo-full:
+798:    runs-on: [self-hosted, wisp-slo]
+802:      # wisp-slo machine, `msys64` appears 0 times in _diag/Worker_*.log for the
+871:  lint-frontend:
+872:    runs-on: ubuntu-latest
+== on: block ==
+10:on:
+11:  pull_request:
+12:  push:
+13:    branches: [main, dev]
+24:  #   1. GitHub evaluates cron ONLY against the config on the DEFAULT BRANCH
+25:  #      (main). Until this file reaches main this schedule fires zero times -
+30:  #   3. A scheduled run executes ALL SIX jobs of this workflow, not just
+== go test lines ==
+76:        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+422:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+429:        # and no threshold changed): it sat below a step that bare `go test` lets
+438:        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+638:        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+685:        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+700:        # design) or a false green (bare `go test` prints `ok`) - which is the
+705:        # `go test -list` and prints the row with its class and reason in this
+723:        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+== rc ==
+rc=0

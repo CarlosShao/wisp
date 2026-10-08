@@ -1,0 +1,76 @@
+== native DLL staging across scripts+workflows ==
+scripts/portable-tests.sh:129:#   cli     cmd/wisp, whose test binary needs the sherpa DLLs (ticket 98's load
+scripts/portable-tests.sh:258:    # the test binary dies at LOAD time without the sherpa DLLs on PATH (ticket
+scripts/portable-tests.sh:346:            echo "portable-tests.sh: GOOS=linux (sherpa-onnx-go-linux excludes all its files there), so the"
+scripts/wisp-cli-tests.sh:8:# STATUS_DLL_NOT_FOUND (0xc0000135): the test binary links against the sherpa-onnx
+scripts/wisp-cli-tests.sh:17:#                                    sherpa-onnx-c-api.dll: cannot open shared
+scripts/wisp-cli-tests.sh:20:#   windows, PATH=third_party/sherpa-onnx ... runtests.sh: PASS=33 FAIL=0 SKIP=0,
+scripts/wisp-cli-tests.sh:24:#                                    sherpa-onnx-go-linux" (vet rc=1)
+scripts/wisp-cli-tests.sh:71:# the sections [sherpa-onnx.dll."<name>"] are what fetch-deps.ps1 extracts into
+scripts/wisp-cli-tests.sh:72:# third_party/sherpa-onnx/, so a pin added there is required here automatically.
+scripts/wisp-cli-tests.sh:73:dll_dir="$root/third_party/sherpa-onnx"
+scripts/wisp-cli-tests.sh:82:need=$(sed -n 's/^\[sherpa-onnx\.dll\."\(.*\)"\]$/\1/p' "$root/deps.toml")
+scripts/wisp-cli-tests.sh:84:    echo "wisp-cli-tests.sh: GUARD - no [sherpa-onnx.dll.*] sections found in deps.toml, so" \
+scripts/wisp-cli-tests.sh:95:    echo "wisp-cli-tests.sh: cmd/wisp's test binary links the sherpa cgo import library, so a" >&2
+scripts/wisp-cli-tests.sh:103:#   `pwd -W` form (D:/work/.../third_party/sherpa-onnx) -> exit status 0xc0000135,
+scripts/build.ps1:25:       sherpa-onnx C API via the official Go bindings
+scripts/build.ps1:26:    4. output: build\wisp.exe + onnxruntime.dll + sherpa-onnx DLLs colocated
+scripts/build.ps1:78:if (-not ($env:PATH -like "*$ccDir*")) { $env:PATH = "$ccDir;$env:PATH" }
+scripts/build.ps1:231:$sherpaVersion = Get-DepsValue 'sherpa-onnx' 'version'
+scripts/build.ps1:232:$ortVersion = Get-DepsValue 'onnxruntime' 'version'
+scripts/build.ps1:233:if (-not $sherpaVersion -or -not $ortVersion) {
+scripts/build.ps1:234:    Fail 'could not read sherpa-onnx/onnxruntime versions from deps.toml'
+scripts/build.ps1:254:    "-X $BuildInfoPkg.SherpaOnnxVersion=$sherpaVersion",
+scripts/build.ps1:255:    "-X $BuildInfoPkg.OnnxRuntimeVersion=$ortVersion",
+scripts/build.ps1:275:Write-Host 'build.ps1: go build ok (cgo linked against sherpa-onnx C API)'
+scripts/build.ps1:278:$dllSource = Join-Path $RepoRoot 'third_party\sherpa-onnx'
+scripts/build.ps1:279:Copy-Item -Path (Join-Path $dllSource '*.dll') -Destination $outDir -Force
+scripts/build.ps1:293:$artifacts = @('wisp.exe', 'onnxruntime.dll', 'sherpa-onnx-c-api.dll', 'sherpa-onnx-cxx-api.dll')
+scripts/build.ps1:312:Write-Host 'build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS'
+scripts/fetch-deps.ps1:9:    - Cache fast path: if every pinned DLL already sits in third_party/sherpa-onnx/
+scripts/fetch-deps.ps1:12:    - Otherwise downloads the pinned sherpa-onnx Windows shared release (direct
+scripts/fetch-deps.ps1:15:      into third_party/sherpa-onnx/.
+scripts/fetch-deps.ps1:106:$sherpa = $deps['sherpa-onnx']
+scripts/fetch-deps.ps1:107:$targetDir = Join-Path $RepoRoot 'third_party\sherpa-onnx'
+scripts/fetch-deps.ps1:108:$dllSections = @($deps.Keys | Where-Object { $_ -like 'sherpa-onnx.dll.*' } | Sort-Object)
+scripts/fetch-deps.ps1:110:    Write-Host "fetch-deps: FATAL: no [sherpa-onnx.dll.*] entries in deps.toml"
+scripts/fetch-deps.ps1:125:        if ($manifest.sha256 -ne $sherpa['sha256'] -or $manifest.version -ne $sherpa['version']) { $cachedOk = $false }
+scripts/fetch-deps.ps1:130:        $dest = Join-Path $targetDir ($sec -replace '^sherpa-onnx\.dll\.', '')
+scripts/fetch-deps.ps1:136:    Write-Host "fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx $($sherpa['version']))"
+scripts/fetch-deps.ps1:143:$archiveName = [System.IO.Path]::GetFileName($sherpa['source'])
+scripts/fetch-deps.ps1:146:    if (-not (Invoke-DownloadWithFallback -Url $sherpa['source'] -MirrorPrefix $sherpa['mirror_prefix'] -OutFile $archive)) {
+scripts/fetch-deps.ps1:147:        Write-Host "fetch-deps: FATAL: could not download $($sherpa['source']) (direct and mirror both failed)"
+scripts/fetch-deps.ps1:151:    if ($actual -ne $sherpa['sha256']) {
+scripts/fetch-deps.ps1:154:        Write-Host "  expected: $($sherpa['sha256'])"
+scripts/fetch-deps.ps1:173:        $destName = $sec -replace '^sherpa-onnx\.dll\.', ''
+scripts/fetch-deps.ps1:188:        Write-Host "fetch-deps: extracted $($pin['archive_path']) -> third_party/sherpa-onnx/$destName (sha256 ok)"
+scripts/fetch-deps.ps1:192:        version    = $sherpa['version']
+scripts/fetch-deps.ps1:193:        url        = $sherpa['source']
+scripts/fetch-deps.ps1:194:        sha256     = $sherpa['sha256']
+scripts/fetch-deps.ps1:198:    Write-Host "fetch-deps: done (sherpa-onnx $($sherpa['version']))"
+.github/workflows/ci.yml:573:      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+.github/workflows/ci.yml:578:        # pinned third_party/sherpa-onnx DLLs are on PATH, which is exactly what
+.github/workflows/ci.yml:617:        # .../sherpa-onnx-go-linux@v1.13.8` (reproduced three times independently:
+== who references cmd/wisp in scripts ==
+scripts/build.ps1:246:# keep their stdout because attachParentConsole (cmd/wisp/console_windows.go:33-43)
+scripts/build.ps1:270:    & $go.Source build -trimpath -ldflags $ldflags -o (Join-Path $outDir 'wisp.exe') ./cmd/wisp
+scripts/portable-tests.sh:80:#   bash scripts/portable-tests.sh --scope=cli        # cmd/wisp, after third_party
+scripts/portable-tests.sh:129:#   cli     cmd/wisp, whose test binary needs the sherpa DLLs (ticket 98's load
+scripts/portable-tests.sh:206:github.com/CarlosShao/wisp/cmd/wisp
+scripts/portable-tests.sh:257:    # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
+scripts/portable-tests.sh:260:    scope=(./cmd/wisp/)
+scripts/wisp-cli-tests.sh:2:# scripts/wisp-cli-tests.sh - the CI step that runs cmd/wisp's OWN tests on the
+scripts/wisp-cli-tests.sh:5:# AC#4 ASKED FOR A MEASURED ANSWER TO "can cmd/wisp be tested on CI at all", and
+scripts/wisp-cli-tests.sh:7:# is that `go test ./cmd/wisp/` on this host fails at LOAD time with
+scripts/wisp-cli-tests.sh:29:# So the answer is: on CI it CAN run, on exactly one of the two legs. cmd/wisp is
+scripts/wisp-cli-tests.sh:43:# file) and GUARD B (cmd/wisp must print its own anchored top-level result line).
+scripts/wisp-cli-tests.sh:62:    # the shared DLLs. On linux cmd/wisp builds and runs but 19 cases are red
+scripts/wisp-cli-tests.sh:65:    echo "wisp-cli-tests.sh: GUARD - this is the windows leg of the cmd/wisp gate," \
+scripts/wisp-cli-tests.sh:95:    echo "wisp-cli-tests.sh: cmd/wisp's test binary links the sherpa cgo import library, so a" >&2
+scripts/wisp-cli-tests.sh:111:echo "wisp-cli-tests.sh: scope=./cmd/wisp/ dll_dir=$dll_dir (pinned: $(printf '%s\n' $need | tr '\n' ' '))"
+.github/workflows/ci.yml:129:        # rc=0 with cgo on, rc=1 only for cmd/wisp with cgo off). The ball/mulA
+.github/workflows/ci.yml:573:      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+.github/workflows/ci.yml:629:        # WHY IT SITS HERE IN THE JOB (between `cmd/wisp CLI tests` and `Portable
+.github/workflows/ci.yml:655:        #     cmd/wisp, 5 of those files carrying 13 `t.Skip` calls whose literal
+.github/workflows/ci.yml:657:        #     cmd/wisp/resident_hotkey_live_258_windows_test.go:55), while
+rc=0

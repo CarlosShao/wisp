@@ -1,0 +1,55 @@
+== -tags occurrences across test scripts (must be 0 for winlive) ==
+0
+4
+== secrets/permissions/concurrency/timeout/continue-on-error in ci.yml ==
+6:# skippable: no `if: false`, no continue-on-error, no skip flags. Runner
+34:  # No `if:`, no continue-on-error, no skip flag anywhere in this block
+40:concurrency:
+104:        # an `if:`, or made continue-on-error (D22 run-away mode 6).
+124:        # skippability, or given continue-on-error (D22 run-away mode 6).
+138:        # step was moved, edited, deleted, given an `if:`, or made continue-on-error
+142:        # not the trigger table above, not the concurrency group, not any `runs-on`,
+180:      # `if:`, or made continue-on-error. It sits directly BELOW the gofmt step
+280:        #    answers. continue-on-error is NOT used (D22 run-away mode 6,
+337:        # edited, deleted, reordered, given continue-on-error, or has its own
+377:        # continue-on-error is not used (D22 run-away mode 6). It matters here
+499:  # step was deleted, and NO step here carries `continue-on-error`, whose entire
+543:        # continue-on-error (D22 run-away mode 6).
+556:        # continue-on-error, and the package stays in the list.
+647:        # step here carries `continue-on-error` (D22 run-away mode 6) - a red
+782:  # deliberately not a skip (no `if:`, no continue-on-error, no -Skip switch) -
+833:          # unconditional (no `if:`, no continue-on-error, D22 mode-6), so the
+869:  # D22 mode-6: no `if:`, no `continue-on-error`, no skip flag, no path filter.
+== winlive Test roster ==
+TestBallLiveAudioLiquidGate
+TestBallLiveEdgeDock
+TestBallLiveEdgeDockHover
+TestBallLiveIdleBorderTransition
+TestBallLiveLifecycle
+TestBallLivePositionPersistence
+TestLive228ResidentLegOwnsABallWindowOnTheDesktop
+TestLive246ConfirmingCardBorrowsEscVetoesAndReturns
+TestLive246ExitAbandonsAHangingL1Window
+TestLive246ExitCancelsARunningTask
+TestLive246ExitRefusesAHangingL2Card
+TestLive246ResidentPipelineRaisesACardAndEscVetoesIt
+TestLive258ResidentBootNamesProvenanceAndDefaults
+TestLive258ResidentBootTakesConfigHotkeys
+TestLive258ResidentOccupiedCombinationNamesTheNewValue
+TestLive258ResidentRebindsWithoutRestart
+TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor
+TestLiveCancelBorrowDefaultUnchanged260
+TestLiveCancelBorrowFollowsConfig260
+TestLiveClickSummonsAndDragDoesNot
+TestLiveConfirmingCancelAndEscReturned
+TestLiveHotkeyOccupiedVsNotAttempted
+TestLiveHotkeyRebindEndToEnd
+TestLiveMuteHotkeyEndToEnd
+TestLiveNeverStealsFocus
+TestLiveSleepingZeroTimerHandles
+TestLiveTransparentCornerFallsThrough
+TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive
+TestTicket255RealWindowWidthFollowsTheConfig
+== count ==
+29
+rc=0

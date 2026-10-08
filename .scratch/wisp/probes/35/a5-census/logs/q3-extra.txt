@@ -1,0 +1,19 @@
+== runner name evidence on disk ==
+./.scratch/wisp/issues/134-slofull-autostarts-on-every-push-on-this-laptop-but-making-it-manual-only-would-kill-the-gate-done.md:4
+./.scratch/wisp/issues/146-liveapprovals-says-copies-but-the-value-shares-a-map-and-three-slices-with-the-queue-done.md:126:  next
+./.scratch/wisp/probes/274/a2/shipping-chain.md:168:- `slo-full` 日志头 `2/3/4` 行逐字：`Runner name: 'wisp-selfhosted-01'`
+./.scratch/wisp/probes/35/census-resident-panel/summary.md:52:| 35 `:75`(c) winlive CI 载体 | 35 `:22`（框内） | 要么 CI �
+./.scratch/wisp/probes/35/census-resident-panel/summary.md:63:- 机器事实（只读）：`gh api .../actions/runners`＝`wisp-se
+./.scratch/wisp/probes/ci-red/ci-red-1.md:113:| `slo-full :: Upload SLO report` | **今晚新增（只在后一发红）**：`3655
+== timeout-minutes / if: in ci.yml jobs (structural) ==
+397:    env:
+507:    env:
+741:    env:
+799:    env:
+== slo-fresh.yml trigger block ==
+46:on:
+47:  schedule:
+51:    - cron: '23 */6 * * *'
+52:  workflow_dispatch:
+62:    runs-on: ubuntu-latest
+rc=0

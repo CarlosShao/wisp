@@ -1,0 +1,10 @@
+== the 4 -tags occurrences in scripts + runtests.sh ==
+Binary file scripts/spike/bin/model-residency.exe matches
+Binary file scripts/spike/bin/speech-baseline.exe matches
+Binary file scripts/spike/bin/xy-verdict.exe matches
+scripts/spike/run.ps1:47:        if ($Tags) { $args += @("-tags", $Tags) }
+== winlive in scripts/ (prior leg claimed zero) ==
+0
+== winlive in slo-check.ps1 ==
+0
+rc=1

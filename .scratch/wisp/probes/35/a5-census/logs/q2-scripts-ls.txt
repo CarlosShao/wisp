@@ -1,0 +1,41 @@
+== workflows ==
+ci.yml
+slo-fresh.yml
+== scripts ==
+build.ps1
+check-path-length-budget.sh
+d22scan.sh
+dev
+fetch-deps.ps1
+portable-tests-selftest.sh
+portable-tests.sh
+sign-models.ps1
+slo-check.ps1
+slo-freshness.sh
+spike
+testdata
+winsec-tests.sh
+wisp-cli-tests.sh
+== script line counts ==
+    313 scripts/build.ps1
+    584 scripts/check-path-length-budget.sh
+     54 scripts/d22scan.sh
+      0 scripts/dev
+    202 scripts/fetch-deps.ps1
+    880 scripts/portable-tests-selftest.sh
+    767 scripts/portable-tests.sh
+     69 scripts/sign-models.ps1
+    625 scripts/slo-check.ps1
+    378 scripts/slo-freshness.sh
+      0 scripts/spike
+      0 scripts/testdata
+    174 scripts/winsec-tests.sh
+    113 scripts/wisp-cli-tests.sh
+   4159 total
+== gitignore out rule ==
+8:*.out
+19:# checkout (ticket 77 AC#1), so one anchor file stays tracked; panel.Assets.
+42:# --- Test outputs ---
+48:# A worktree is a full second checkout of this repo. It must never show up as
+49:# untracked noise in the main checkout's `git status`, and it must never be
+rc=0

@@ -1,0 +1,33 @@
+== 仅本机可量 / machine-local bookkeeping precedents ==
+.scratch/wisp/issues/250-portable-tests-guard-c-merges-go-list-stderr-into-its-own-denominator-so-a-cold-module-cache-kills-the-whole-core-scope-reading-done.md:26:- [x] **AC#3 常驻判据（不能�
+.scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md:20:- [ ] **AC#4 让 `
+.scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md:34:- ⛔ 拆腿建议
+.scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md:52:**排程（收 `25
+.scratch/wisp/issues/273-shipping-process-builds-state-machine-without-a-sink-so-every-d43-effect-falls-into-no-op.md:25:- ⛔ **`winlive` 未批**：任何"真开窗口看图标变没变"的读数都
+.scratch/wisp/issues/274-no-nail-requires-shipped-exe-to-carry-page-build-ps-step-2-comment-is-false-in-both-halves.md:34:- ⛔ **不许动 `winlive`**：任何"真开面板看一眼"的读数都不�
+.scratch/wisp/issues/33-panel-host-c27.md:308:  **裁定＝乙**：那一支**移出默认档、进 `winlive`（安静桌面那一档）**，**上界仍写 2 秒**，⛔ 不许放宽成 5s/10s、⛔ �
+.scratch/wisp/issues/33-panel-host-c27.md:342:- `agent=33-r8b did=接管腿（写面只有 internal/ball/** ＋自己的证据件；⛔ cmd/wisp 与 internal/config 在飞、一字未碰、其测试�
+.scratch/wisp/issues/35-panel-bridge-c17.md:75:- [ ] **Behavioural yard must model `this` and property writability, and `:52`'s live proof must stop being machine-local (added 10-07 by the orchestrato
+.scratch/wisp/issues/35-panel-bridge-c17.md:156:- **⛔ 落地禁区（写进派单）**：不许新增点分法名（N1 会在加名的那一刻红，而名册属 C17 面＝人工批准）；不许�
+.scratch/wisp/issues/35-panel-bridge-c17.md:204:**凭据（非实现者腿 `35-v2`，两笔 `8b75816a`／`3eeff4a7`，24 枚件）**：真窗那一发**取到了**，载体＝产品路径 `bringUp`→
+docs/evidence/s1/33-panel-host-c27-r5.md:78:- ⚠ 代价逐字写进文件与本判决：**`winlive` 在 CI 零岗位 ⇒ 这一支从此〔仅本机可量、CI 永看不见〕**；引用它的任何�
+docs/evidence/s1/33-panel-host-c27-r5.md:114:9. **`winlive` 搬档可能被我搬成"默认档不再有退净判定"而没人知道**。那一支上界仍写 **2 秒**，⛔ 不放宽、⛔ 不删、�
+docs/reports/HANDOVER.md:268:- `255-r2`（写）＝**cmd/wisp＋internal/config**：票 255 AC#1（`config_reload.go:171` 那句"这些段已立即生效"只列真有生产读者的段；正控＝手�
+docs/reports/pending-and-issues.md:10282:- **裁定＝乙**：把"Destroy 后子进程在 2s 内退净"这一支**移出默认档、进 `winlive`（安静桌面那一档）**，**上界仍写 2 秒、
+docs/reports/pending-and-issues.md:10395:- **乙（无人值守环境能不能真建可见窗／前台焦点／像素／毫秒时序）＝未定**：能建窗只有旁证（同一发 `8/8 tests passin
+docs/reports/pending-and-issues.md:10408:- **拆族结果（这格本来没人量过）**：A 依赖运行库真窗＝**1**；B 音频设备＝**0**；C 悬浮球／GDI 像素比对＝**19**；D 托�
+docs/reports/pending-and-issues.md:10440:  ⚠ **三行必须并列摆着，不许外推**：① 版本号／`msedgewebview2.exe`／`WebView2Loader.dll` 这一发**零读数**（日志里根本没有�
+docs/reports/pending-and-issues.md:10441:- **新立票 250＝`scripts/portable-tests.sh` 的 GUARD C 把 `go list` 的 stderr 并进自己的分母**（票面 46 行／7,679 字节，已提交）。�
+docs/reports/pending-and-issues.md:10458:  2. **票 54（S7 验收闸门）它自陈是"本页最没底的一格"**，改判待定会把链从 6 枚／27 格降到 5 枚／22 格 ⇒ **裁＝桶归待
+docs/reports/pending-and-issues.md:10681:**3. 立票 255**（`.scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-...md`，4 格）：**AC#1＝那句"已立即生效"只�
+docs/reports/pending-and-issues.md:10718:⇒ **甲（那台机器装了 WebView2 Runtime）由【旁证级】升为【已证】**：证的是"非测试代码路径之外的窗在那台机器上建得�
+docs/reports/pending-and-issues.md:10752:**4. 排程（腿给的两枚耦合点，我照收）**：ⓑ 与 AC#3 **共用同一枚反射枚举器**（"新增哑键必红"那枚正控要真改 `schema.g
+docs/reports/pending-and-issues.md:10962:**3. ★ 修法选形＝甲（五样齐）**：**文件**＝`scripts/build.ps1:103-110` 的 `$ldflags` 数组追加一枚 `-H=windowsgui`（全线 11 入口自
+docs/reports/pending-and-issues.md:11059:   - `255-r2`（写）＝**cmd/wisp＋internal/config**：AC#1 那句"这些段已立即生效"只列真有生产读者的段（正控手改 `[panel] width` �
+docs/reports/pending-and-issues.md:11120:- `247-a2`（票 247 四问，`.scratch/wisp/probes/247/a2/census.md` **216 行／36,824 字节**，9 枚 commit 最末 `0583276e`）：落点**推荐甲**（�
+docs/reports/pending-and-issues.md:12897:**5. `273-a1` 交件（`ae6c010e` 1567/0 ＋ `e227c1f8` 44/4；件 `census.md` 261 行／34,437 字节／占位 0，起手锚 `c318337`，全程零 `go test`�
+docs/reports/pending-and-issues.md:13519:**3. ★那把新尺被攻出两面恒真（W1，成立；这正是我在派单第 127 条里预想的形状）**：`35-v2` 用 `go test -overlay` 造了两枚
+docs/reports/pending-and-issues.md:13535:**5. 排程（据此更新）**：票 35 现量 **9 枚框＝1 勾（`:52`）／8 未勾**。在飞＝`35-v3`（验 `:63`）；其后两程＝**夹具两面恒
+docs/reports/pending-and-issues.md:13547:**5. 排程（据此更新）**：在飞＝**无**（下面这枚即派）。队列：①`35-r4`＝**夹具两面恒真**（`:75` 的 (a) 支：给手写行为
+docs/reports/pending-and-issues.md:13608:**5. 排程（据此更新）**：在飞 **两枚**＝`35-v4`（非实现者攻 `:75` (a) 的牙；**`cmd/wisp` 的 go 读数窗口此刻交给它独占**，�
+rc=0

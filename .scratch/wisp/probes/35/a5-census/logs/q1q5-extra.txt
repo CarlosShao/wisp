@@ -1,0 +1,39 @@
+== desktop-ownership rules in cmd/wisp winlive files ==
+cmd/wisp/panel_geometry_255_winlive_test.go:108:		t.Fatalf("the first real create: %v", err)
+cmd/wisp/panel_geometry_255_winlive_test.go:121:		t.Fatalf("which thread owns the panel window: %v", err)
+cmd/wisp/panel_geometry_255_winlive_test.go:125:		t.Fatalf("the first window's rect: %v", err)
+cmd/wisp/panel_geometry_255_winlive_test.go:154:		t.Fatalf("the recreate after dispose: %v", showErr)
+cmd/wisp/panel_geometry_255_winlive_test.go:162:		t.Fatalf("the recreated window's rect: %v", err)
+cmd/wisp/panel_host_windows_live_test.go:49:		t.Fatalf("bringUp for the winlive exit clause: %v", err)
+cmd/wisp/panel_host_windows_live_test.go:55:		t.Fatalf("the window is up but our tree holds %d msedgewebview2 process(es) - t
+cmd/wisp/panel_transport_live_35v2_windows_test.go:188:		runtime.LockOSThread()
+cmd/wisp/panel_transport_live_35v2_windows_test.go:208:		t.Fatalf("35v2 NO LIVE READING: bring-up never handed the window ove
+cmd/wisp/panel_transport_live_35v2_windows_test.go:211:		t.Fatalf("35v2 NO LIVE READING: the product bring-up produced no win
+cmd/wisp/panel_transport_live_35v2_windows_test.go:214:		t.Fatalf("35v2 host reports not created after bring-up")
+cmd/wisp/resident_approval_live_246_windows_test.go:78:		t.Fatalf("the observer rig is blind: with its OWN global bare-Esc re
+cmd/wisp/resident_approval_live_246_windows_test.go:85:		t.Fatalf("ticket 246 RED (desktop state, not our code): an injected 
+cmd/wisp/resident_approval_live_246_windows_test.go:86:			"foreground window before Wisp started (keydown_esc=%d, wm_hotkey=%
+cmd/wisp/resident_approval_live_246_windows_test.go:94:		t.Fatalf("ticket 246 RED: this leg could not create the ball window,
+cmd/wisp/resident_approval_live_246_windows_test.go:134:		t.Fatalf("WaitingState() = %q/%v with an L1 window open, want Confi
+cmd/wisp/resident_approval_live_246_windows_test.go:140:		t.Fatalf("live hot key set during Confirming = %d (%+v), want 4", l
+cmd/wisp/resident_approval_live_246_windows_test.go:143:	// (a) + (b): the observer's window takes the foreground and injects
+cmd/wisp/resident_approval_live_246_windows_test.go:147:		t.Fatalf("(a) FAIL: the second process still received the injected 
+cmd/wisp/resident_approval_live_246_windows_test.go:158:		t.Fatalf("(b) FAIL: the card answered %s (%q) after the injected Es
+cmd/wisp/resident_approval_live_246_windows_test.go:162:		t.Fatalf("(b) the veto reason does not name the channel: %q", res.w
+cmd/wisp/resident_approval_live_246_windows_test.go:165:		t.Fatalf("(b) FAIL: no ANSWER-VETO audit line after a veto that rea
+== evidence files recording winlive has no CI carrier ==
+docs/evidence/s1/07-adversarial-acceptance.md
+docs/evidence/s1/228-resident-ball-v1.md
+docs/evidence/s1/239-ball-square-fix-v1.md
+docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md
+docs/evidence/s1/245-esc-not-a-standby-global-hotkey-v1.md
+docs/evidence/s1/246-resident-task-source-r2.md
+docs/evidence/s1/246-resident-task-source-v2.md
+docs/evidence/s1/246-veto-channel-in-the-resident-process-r1.md
+docs/evidence/s1/246-veto-channel-in-the-resident-process-v1.md
+docs/evidence/s1/265-267-evidence-index.md
+docs/evidence/s1/33-panel-host-c27-r1.md
+docs/evidence/s1/33-panel-host-c27-r4.md
+== ledger size for append anchor ==
+13608 docs/reports/pending-and-issues.md
+rc=0

@@ -1,0 +1,13 @@
+./cmd/wisp/panel_geometry_255_winlive_test.go	//go:build windows && winlive 	len=241	skip=0	lock=0	tasklist=0	deadline=0	runtime=0
+./cmd/wisp/panel_host_windows_live_test.go	//go:build windows && winlive 	len=74	skip=0	lock=0	tasklist=0	deadline=0	runtime=0
+./cmd/wisp/panel_transport_live_35v2_windows_test.go	//go:build windows && winlive 	len=261	skip=0	lock=1	tasklist=0	deadline=2	runtime=0
+./cmd/wisp/resident_approval_live_246_windows_test.go	//go:build windows && winlive 	len=543	skip=0	lock=0	tasklist=0	deadline=4	runtime=0
+./cmd/wisp/resident_ball_live_228_windows_test.go	//go:build windows && winlive 	len=194	skip=0	lock=0	tasklist=0	deadline=0	runtime=0
+./cmd/wisp/resident_hotkey_live_258_windows_test.go	//go:build windows && winlive 	len=328	skip=4	lock=1	tasklist=0	deadline=0	runtime=0
+./cmd/wisp/resident_task_source_live_246_windows_test.go	//go:build windows && winlive 	len=589	skip=0	lock=0	tasklist=0	deadline=2	runtime=0
+./internal/ball/hotkey_cancel_borrow_live_260_test.go	//go:build windows && winlive 	len=110	skip=0	lock=0	tasklist=0	deadline=0	runtime=0
+./internal/ball/hotkey_live_test.go	//go:build windows && winlive 	len=669	skip=4	lock=0	tasklist=0	deadline=0	runtime=0
+./internal/ball/interaction_live_test.go	//go:build windows && winlive 	len=420	skip=2	lock=0	tasklist=0	deadline=0	runtime=0
+./internal/ball/live_guard_windows_test.go	//go:build windows && winlive 	len=333	skip=1	lock=0	tasklist=0	deadline=1	runtime=0
+./internal/ball/live_windows_test.go	//go:build windows && winlive 	len=689	skip=2	lock=0	tasklist=0	deadline=2	runtime=0
+rc=0
