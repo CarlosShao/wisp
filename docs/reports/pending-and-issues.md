@@ -14369,3 +14369,12 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - **另两条轻差**（它具名）：P09 引短语"这一档"属 `AC#7`（`AC#2` 写"第二档"）；P12 把 risk 的 `.Veto(` 两处当作 `Gate.Veto`（真身 `replies.go:463`，漏列），且票 201 那句"row verbatim"只引了两格。
 - ★**它给的第三件加料（我照收并把它写进落地纪律）＝"跨处互踩"**：13 处里有**多处在同一文件**（P01+2 与 P39 都动 `cmd/wisp/run.go`；P11+1 与 P02 同动 `resident_*`；等等），⇒ **批次粘贴必然互改行号**。⇒ **落地纪律（本票新定式）**：①**一次只贴一处**，每贴完**立即重取下一处的锚**（`sed -n` 现量）再贴；②每处贴完**跑该文件相关的在册钉**（至少 `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`）；③⛔ 不许"一次性全文替换"；④P02/P10/P39 三处按上面修正版贴（P39 贴前先确认它落点是否在 `:991` 之前——若在之前，须同笔把 `config_readers_255.go:109` 那枚引用与 `config_receipt_255_test.go` 的期望**另行裁定**处理，⛔ 不许默默让钉子变红）。
 - ⇒ 落地腿的派单里这四条是**硬纪律**（等 `259-v1` 退出后发；写面 `cmd/wisp`＋`internal/panel`＋`internal/risk`）。⛔ 零翻框、零 push。
+
+## A734｜2026-10-08 19:0x｜收 **`259-v1`**（票 259 逐格终裁：**四格成立、`AC#4` 不成立**）⇒ 翻四勾、留一格
+
+- 交件＝`0af6594d`／`ccf16baa`（件 `probes/259/v1/01-evidence.md`），零翻框、零改票/台账/冻结件、零 push。
+- **判语**：`AC#1`（ⓐ 具名降级）**成立**——改前那句 `cannot be replayed onto a different request`（存档 `queue.go:44` r2 before）已撤、编译树零"能挡跨卡"字样、**无测试钉新文案**（四把钉尺 rc=1）；`AC#2` **成立**——`spend` 现回 `grantDenial`（**我现取复认**：`approval.go:558`＝`func (s *grantStore) spend(nonce, bind string) grantDenial`），四因各有 label＋审计行＋指名用例（12/12 绿），对外合并句仍逐字钉住（`:250`）＝符合"内部区分、对外合并"裁定；`AC#3` **成立**——两枚尺件在库（`ticket259_denial_rulers_test.go`／`ticket259_panel_capability_rulers_test.go`，6+6 枚），**三发突变逐枚见红**（Mu-1 真花令牌 ⇒ 红 `:73/:82/:101/:111`；Mu-2 `PanelItem` 加 `Permitted bool` ⇒ 红 `:174`；Mu-3 `PanelItem` 加 `Grant string`＋填活 nonce ⇒ 红 `:199/:229/:301/:308`），三发 hash 逐字回、porcelain 空、复绿 12/12；`AC#5` **成立**（15 笔提交对禁列零命中 rc=1、正控命中 `docs/specs`）。
+- **`AC#4` 不成立（唯一未勾格）**：`cmd/wisp/subagent_selfapproval_197_test.go:109` 仍逐字 `TaskID: taskID, CorrelationID: taskID,`（**我现取复认**；末碰 `a818df46` 09-30）⇒ 保持未勾，已派窄落地腿。
+- **翻勾**：票面 59→**69 行**／未勾 5→**1**／已勾 1→**5**；撤销口令逐格（「撤 259 AC#1/2/3/5」）；⛔ 原句一字未改、只追加 §11。
+- 它没试出来的照收：**"残余风险"那两发突变未种**（拆 store 成员扫描／state 卫——不在派单三枚内，**登记为下一枚可选攻法**）；Mu-1/Mu-3 首种时 `sed` 双命中致 build failed（它自己认下＝不是红读数）；未跑 `cmd/wisp` 整包（AC#4 只读源文定的）。
+- 编队：`259-v1` 已交；在飞＝`card-proof-prep-1`（真举卡配方）；本波新派＝`259-r4`（把 `AC#4` 那两个 id 拆开）。⛔ 零 push、零翻框。
