@@ -13548,8 +13548,37 @@ dev 真身我现量重钉：挂载＝`main.tsx:58`（`<App />` **确实无 prop*
 
 ---
 
-## A(待填)｜2026-10-07 23:1x｜编号由编排者填｜收只读普查腿 `census-resident-panel`（锚 `af68866`，两笔 `6c7dd5ed`→交件笔；件＝`.scratch/wisp/probes/35/census-resident-panel/summary.md`＋`anchor.txt`）
+## A687｜2026-10-07 22:1x｜编号由编排者填｜收只读普查腿 `census-resident-panel`（锚 `af68866`，两笔 `6c7dd5ed`→交件笔；件＝`.scratch/wisp/probes/35/census-resident-panel/summary.md`＋`anchor.txt`）
 
 - ★**顶回报单前提一处（腿对）**：派单句"面板在常驻进程里还没被装配起来"**盘上已过期**——`cmd/wisp/resident_windows.go:151`（`newResidentPanelManager`）＋`:157`（`startResidentPanel`）＋`:217`（`withPanelHost` 注进球腿）＋`cmd/wisp/panel_resident_windows.go:253`（非 test 的 `NewPanelManager(` 调用形状，现量恰 1 枚）＝票 33 的ⓐ形（专用 STA 线程＋库 `Run()` 泵，`panel_resident_windows.go:154/:297`；D38(e) 十步逐字未动，`resident_windows.go:146-150`）。引用"生产调用者 0 枚"的旧表（`167-c2`、`wisp-permission-mode-rulings`、票 33 AC#1..AC#4 原句）自本读数起要翻。
 - 真断的三跳：①**页面字节**——`git ls-files frontend/dist`＝仅 `.gitkeep`，双击今天只能开出 `panel_host_windows.go:441/:449` 那页"bundle not built"告示（归口 33 AC#12＝248 AC#9，产物侧未落定＝按住）；②**常驻腿无快照泵**——`NewSnapshotPump(` 非 test 现量仅 `run.go:699` 一枚（145 AC#2／台账 `:12082` 四步的第 0 跳；新键同批要页面声明面，否则撞 `approval_test.go:129`/`composer_test.go:74` 两枚对账红，⛔ 删 Go 字段不在选项）；③**winlive 无 CI 载体**——`ci.yml` 零 `winlive`/零 `-tags`、`git log -S winlive -- .github/workflows/` 空 ⇒ CI 从未有该步骤 success/failure；载体在（`wisp-selfhosted-01 online`，`ci.yml:798`）。
 - 可派性裁定要点（全表在件里）：**可派**＝35 `:75(c)`（写面 `.github/**`，与 cmd/wisp go 窗口互斥）／33 AC#13（时序半现量已换向 `:425`→`:427`，剩"会响断言＋反控"）／33 AC#14 派验收腿翻勾；**死格⛔ 别派**＝248 AC#4（被测物缺失）；**按住**＝256 AC#1（票面自锁"AC#0 具名 A## 批准后"）／33 AC#12／248 AC#9（等机主裁页面分支）。
+
+---
+
+## A688｜2026-10-08 08:2x｜编号由编排者写｜收只读普查腿 `census-resident-panel`（`6c7dd5ed` 起手锚 22:07／`bcfb459b` 交件 22:17，全程零 go 命令、零开窗；件＝`.scratch/wisp/probes/35/census-resident-panel/summary.md` 79 行＋`anchor.txt`）＋★★**它顶回我派单的第一句前提**（"面板在常驻进程里还没被装配起来"**盘上已过期**——票 33 的ⓐ形早就落了，我自己复量到行才敢写这句）＋★一票 248 的格判成**死格**（省下一次必败的白跑）
+
+**0. 先销我自己两笔账**：①`A687` 那节是**腿自己追加的**，它按派单留了枚 `A(待填)`，编号与时间戳由我填——我第一次填成了 `21:4x`（抄了上一节 `A686` 的时刻），现按交件笔 `bcfb459b` 的真实时刻 **22:17** 改成 `22:1x`；这处改动是**改我自己填的那两处**，腿写的正文一字未动。②我派单里给它的锚写成 `af68866`——那是**我 `A686` 那笔**（`af68866c`，22:01），当时确实是 HEAD，读数没错，但⛔ 以后派单别只给 7 位短号，共享树里 22:01→22:07 已经前进过一笔（`35-r4` 的起手锚 `1eec984c` 就具名报了这件事）。
+
+**1. ★我自己复量过的那处更正（腿对）**：我派单开头写"Go 侧有面板宿主代码，但**面板在常驻进程里还没被装配起来**"——那是**过期读数**。现量（本轮我自己 `sed` 逐行读过）：`cmd/wisp/resident_windows.go` **:151** `rp, rpErr := newResidentPanelManager(rt.Layout.DataDir)`、**:157** `panel = startResidentPanel(rt.Registry, rp)`、**:217** `startResidentBall(... withPanelHost(func(via string) bool { return panel.RequestToggle(via) })`；`:148-150` 那三行注释逐字写着"the frozen D38(e) ten-step order (`internal/proc/shutdown.go`) is not touched: no new step, no new hook name on that closed roster"；`cmd/wisp/panel_resident_windows.go:253`＝`NewPanelManager(disp, assets, dataPath, withGeometrySource(...))`，而 `NewPanelManager` 的**定义**在 `panel_host_windows.go:213` ⇒ **常驻腿里真有生产调用者，装配那ⓐ形（专用 STA 线程＋库 `Run()` 泵）早就进了仓**。⇒ 以后⛔ 不许再说"面板没接进常驻"；⚠ 但这句此前只活在**我的派单**里，盘上任何件里都没有 ⇒ 没有第二份脏读数要改，记我一枚就够。（今天被我现量顶回的派单前提已有 `A682`／`A684`／`A685`／`A686` 各一枚＋这一枚，五枚全记我不记腿。）
+
+**2. 真断的三跳（腿给的表，我只把"我自己复量到行"的那些写死）**：
+- **①页面字节没进 embed**：常驻腿今天能把窗开起来，但页面源件在**另一棵没合的分支**（`D:/wt/fe` 的 `dsh/feat/frontend-p0-v2`；机主 10-07 裁"先不合、等'构建带页面'落地再说"），dev 这棵树里 `frontend/dist` 只有 `.gitkeep` ⇒ 宿主走到 `panel_host_windows.go:441/:449` 那枚"bundle not built"告示支路。**这条不在我射程内**（合并与否是机主的决定；票 274 的 AC#0／AC#2 两格还要一次推送才能收，⛔ 零 push 仍生效）。
+- **②常驻快照泵那一跳（票 145 `AC#2` 的第 0 跳）**：`NewSnapshotPump(` 我现量**非 test 生产调用者恰 1 枚＝`cmd/wisp/run.go:699`**（定义 `internal/panel/pump.go:229`；`.scratch/**` 里那十几枚是别人的台件拷贝，不算消费者）⇒ 泵只接在"命令行跑任务"那一支，常驻腿没接。**写面可派，但今天按住**，理由具名：新加的任何快照键会**同批撞两枚今天已为红的双向键对账钉**——**`internal/panel/approval_test.go:129`**、**`internal/panel/composer_test.go:74`**（两枚同一句 `t.Errorf("Go %s emits %v that interface %s does not declare", …)`，红因＝Go 发了页面未声明的 `[instructions tasks]` 与 `[git currentModel modelKnown credentialState credentialKnown]`），而那两枚钉的**另一半在 `frontend/**`**（写面冻结）。⚠ 顺手记我一枚自己的错：**我先前把第一枚钉的文件名写成 `internal/agent/approval/approval_test.go`——那条路径根本不存在**（`ls` 现量报 No such file），真身在 `internal/panel/`；这就是第 116 条那一族"名字对、文件指错"，落笔前 `ls` 一把为准。⇒ **我与腿 here 分歧，我裁**：腿 §7 第 2 条建议"今天合法路只有带话／解冻两选一，先问机主"——**两我都不走，也不问他**（按第 14 款：这是排程与归属账，不是功能级请求，问了只会换来一句"看都看不懂"）＝⛔ 不解冻 `frontend/**`、⛔ 不删 Go 侧字段换绿；dev 那份页面源件本来就是旧版，现在动它只会在合并那天多造一处冲突。**"页面声明面必须同批处理"写成落地腿的前置条件**，与机主"先不合"那条一致。
+- **③winlive 那格没有 CI 载体**：`ci.yml` 里 `winlive` 零命中、`git log -S winlive -- .github/workflows/` 空 ⇒ **CI 历史上从未有过这一步的 success/failure**（载体在线＝`wisp-selfhosted-01`，`ci.yml:798`）。⇒ 这条只支持"⛔ 谁都不许把 `:52` 的真窗读数读成 CI 有牙"，它本身就是票 35 `:75` 的 (c) 支。
+- **④票 248 `AC#4` 判成死格⛔ 别派**：被测物不存在——页面字节没进 embed 时，双击那条路只能开出"bundle not built"告示页，任何"整链真机走一遍"的判据今天都**不可能被满足**（第 8 条那一族的另一形：不是我的禁字造死格，是**上游缺一块料**造死格）。⇒ 从队列摘掉，归到"合并＋274 落地之后"再复量。
+
+**3. 可派发性（我据普查重排，⛔ 与 `35-r4` 的 `cmd/wisp` 读数窗口互斥的都按住）**：①票 35 `:75` 的 **(c) 支**（winlive 进 CI 的载体）＝写面 `.github/**`，与 go 窗口不撞 ⇒ **今天可派，但按在 `35-r4` 之后**，且⛔ 不许任何件把"yaml 里有这一步"读成"它跑过"（第 109 条那一课）；⚠ 要紧的编队副作用要具名：这台机＝**机主的开发机**，真窗步骤一旦进 CI，就是**每次提交都在他机器上开一扇真窗**，落地那天我必须先告知再合。②票 33 `AC#13`（探测页时序）＝可派写腿，普查现量时序**已换向**（`:425` 探测先于 `:427` 供页）⇒ 我此前那句"探测晚于供页"按此改读，剩"会响的断言＋换序反控"。③票 33 `AC#14`（Go→页投递）＝可派**验收**腿（`installPanelTransport` 已在 `:693`），勾归非实现者。④在飞＝`35-r4`（夹具两面恒真，起手锚 `1eec984c`）。
+
+**4. 机主视角那张零术语表**（我按腿 `summary.md:67-73` 那四行**压缩改写**，⛔ 不是逐字引用；原文在那件里，要看逐字就读件）：
+
+| 今天的样子 | 缺的那块落地后会怎样 | 不做的后果 |
+|---|---|---|
+| 双击图标后程序在后台跑，按面板快捷键会弹出一扇窗口——可窗口里只有一行英文告示"页面内容还没打包进来" | 窗口里出现真正的面板：输入框、状态、结果都看得见也点得动 | 永远只看到那行告示；功能全都"在"，就是没有一扇能用的门 |
+| 就算窗口开出来了，模型、凭据录没录、任务清单这几样在"双击打开"这种用法下是空的（喂数据的管道只接在"命令行跑任务"那一支） | 一开就能看见当前模型、任务、凭据状态，并随运行刷新 | 界面是死的，他会以为程序坏了 |
+| "点了没反应"今天算坏、而且不算意外：这条链只能在这台电脑上手工验，没进自动检查 | 每次提交，自动检查自己把"点开、点了有反应"跑一遍 | 换台机器、下次改动都可能悄悄坏掉，没人知道 |
+| 唯一能签收的办法是"真窗口里看见真页面"，而那页面还在另一棵没合的分支上（他已裁先不合） | 构建真的带上页面字节，双击就有效果 | 出货闸门会查"带没带页面"，可闸门另一头还没人把页面交进来 |
+
+⚠ 定性（我给这张表加的标）：**这四行全是"读码推出来的形状"，今天没有一行是我在真机上双击量过的**（这枚普查腿零 go 命令、零开窗，且 `build/wisp.exe` 仍未还原，口令「还原 274 前 exe」）。⇒ ⛔ 谁以后引用这张表，不许读成"实测过"；要实测就等桌面空出、我起一次真 exe，再逐行改标〔真机量过〕。
+
+**5. 排程（据此更新）**：⛔ **`35-r4`（夹具两形那枚写腿）已死于每日额度**，不是任务失败：39 次调用／442 万 token／35 分 10 秒，最后一件落盘 22:36（遗产与我的代跑代提另记 `A689`）。队列按此序：①`35-r4` 的**遗产由我代跑＋代提**，判语⛔ 不代填，归非实现者 **`35-v4`**；②`:75` 的 **(c) 支**＝winlive 的 CI 载体（写面 `.github/**`；同批顺手补 `ci.yml:166` 那处缺 `if: !cancelled()` 的第 109 条欠账，⛔ 两件事分开记牙）；③票 33 `AC#13` 写腿＋`AC#14` 验收腿；④**快照泵那一跳继续按住**，直到页面声明面能同批处理（见 §2②）。票 35 仍 **2 勾／7 未勾**（未勾＝`:42` `:44` `:45` `:47` `:49` `:51` `:75`），⛔ 不加 `-done`；票 274 仍 9 勾／3 未勾；⛔ 零 push（机主 10-07"暂时不推远程"仍生效）、页面分支仍不合、`build/wisp.exe` 未还原。
