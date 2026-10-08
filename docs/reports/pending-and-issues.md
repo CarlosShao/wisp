@@ -14266,3 +14266,15 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - 两轴分开：崩溃**重连行为**那一面它没跑（零 Go 命令），标"缺跑面尺"；"该不该有崩溃位"属契约判断，⛔ 不是腿的格。
 - ⇒ 票 167 的两格从"零现量"变成"有判据底料"；⛔ 我**不据此派码**（`frontend/**` 写权未放开＋`cmd/wisp` 此刻被 `253-v1` 的突变占着），登记为下一波候选。⛔ 零翻框（票 167 停在 92/6/1）。
 
+
+## A727｜2026-10-08 18:3x｜编排者清欠账：`B-01`（`cmd/wisp/models.go` 那句"依赖图里没有模型字节的读者"）量到了，判**半成立**——操作那半真、字面那半不真＋一笔小自纠（`A724`/`A725` 节头时间）
+
+**尺与读数（全部我自己现跑，HEAD 18:3x）**：
+- `go list -deps ./cmd/wisp/` ⇒ 依赖闭包里**确实含** `internal/models`。
+- 产码里 import `internal/models` 的只有两处：`cmd/wisp/models.go` 与 `tools/signmodels/main.go`（尺＝`git grep -ln 'CarlosShao/wisp/internal/models' HEAD -- '*.go' ':!*_test.go'`）。
+- `models.*` 在 `cmd/wisp` 的调用点逐枚：`ResolveManifestPath`（`:152`）／`LoadSignedManifest`（`:156`）／`NewManager`（`:167`）／`WireDownloading`（`:305`）；其余命中全是**注释**或类型名字段（`:139`/`:140`/`:10`/`:148`/`:299`）。⇒ **没有**任何一处是"把模型字节喂给引擎/加载器"的调用。
+- 引擎侧现量：`internal/speech/` 只有 `doc.go`（尺＝`git ls-tree -r --name-only HEAD internal/speech/`）⇒ **加载器这一块今天不存在**。
+**判语**：ⓐ 操作那半**真**——产品里没有"模型字节的端点半"（下载/校验有，消费没有；它那句 "the segment has no end point in the product today" 成立）。ⓑ 字面那半（"**anywhere in** cmd/wisp's dependency graph 没有 reader"）**不真**：依赖闭包里就带着 `internal/models` 自己（下载器与 `VerifyInstalled` 那一族要开文件重哈希，`cmd/wisp/models.go:29-31` 那句"it only re-hashes it"正是这件事）⇒ 严格照字面读，图上**有**开文件的代码。⇒ 与 `A720 §3⑤` 那条同族：**过期的不是结论、是那句的射程写法**；⛔ 我不改这句注释（它属 `A722 §4` 那张 13 枚"只欠文案"的归口表，落地时由那条窄腿一并处理），本格只清"我名下欠的读数"。
+
+**小自纠**：`A724` 节头写 `18:0x`、`A725` 写 `18:1x`，而落笔现量分别是 `17:59`／`18:01` ⇒ 两处节头比实际早/晚约 1 分钟，⛔ 不回改已提交行，照本仓规矩就地打旧（引这两节的时间以本行为准）。
+
