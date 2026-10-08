@@ -98,3 +98,13 @@
   未裁完（具名，见证据件 §8）：`rb-files.js`／`rb-review.js` 的 `data-*` 名册、两把字面尺**未打正控**故相应 0 命中记〔不可判〕、
   票 145 十四行表只复算到行 12。预算 21 枚／上限 20，超那 1 枚被"零命中尺串了 `&&`"吃掉，已具名。
 - 09-28 17:5x 编排者收 `182-a1`（两枚 commit `95da23bf`／`05c5656d`）：堆数 7 我复跑对格、`AC#1` 已勾；`AC#2`／`AC#3` **不勾**（抽查到一处不对格：它写面板对成本零消费者，我现量 `internal/panel/` 非测试里 cost 相关命中 4 行）＝留非实现者表。**口径钉死**：本栏堆数＝**原型 `design/doubao/demo/**` 注册表口径**，不是产品真身；且它**实质订正**了早上 `180-182-panel-fields-census-c1.md` 的成员（同为 7、成员不同）。账 `A392`。
+
+## 182-c1 交件（2026-10-08 10:4x，二轮只读普查·锚 `17a54338`）
+
+- 零产码、零 go 命令、`frontend/**` 未读未引、AC 框一枚没勾（本腿 ⛔ 无权翻勾）。证据件目录 `.scratch/wisp/probes/182/c1/`：`00-anchor.md`＋`10-ticket-rulers-recheck.txt`＋`20-rail-tickets-boxes.txt`＋`30-go-side-readings.txt`＋`40-misc-and-controls.txt`＋`50-demo-registry.txt`＋`60-cost-minefield-controls.txt`＋`100-census.md`（逐堆表／归属／雷区／缺陷全在 `100-census.md`）。
+- **AC#1 堆数现量**：demo 注册表尺 `RbPanels.register(`＝**7 枚有位**（files/plugins/review/terminal/context/activity/approval，与 a1 成员一致；工作树值，demo 有 12 行在飞改动）＋**3 枚有名无位**（K8 子代理／K9 后台任务／K10 浏览器）＝**10 枚可点名**，逐堆"在哪看到的"与"owner 截图是外部产品界面不是本仓规格"写明在 `100-census.md` §1。
+- **AC#2 三档现量**（每堆尺＋命中数见 `100-census.md` §2）：有源缺载体＝K1 token/成本（源链 `loop.go:442-449`→`publishUsage:983`，panel 消费 0 枚字段）、K2 细维；**载体已在**（相对 09-28 的最大状态订正）＝K8/K9（票 197 已落：`TaskRowView.Status/StatusKnown/StatusReason`＋`run.go:724` 装配，唯根行状态维仍缺＝票 188 AC#2）、K6 显示半（票 181 已落：`git.go` 15 枚 json 字段）；无源但规格已立＝K4（宿主尺 3 命中全非工作区树）、K6 diff/未提交（两把尺 0 命中且各打了同形正控）、K7（注册尺无 Shell 支、PTY 尺 1 命中是 testdata 假阳）；规格真空＝**只剩 K5 插件列表**（`internal/plugin`＝disposal.go+doc.go，"列已装"零读面、零认领）。占用条/序号/停止三堆**引用 167-c2 未重跑**（其 §5.3 一处枚数表述与其自身列举冲突，具名报回：ComposerState 现量 11 枚）。
+- **AC#3 归属**（指认前逐张读了 145/181/163/186/188/189/190/191/168 的框）：**票面"票池里没有一张票认领它"已过期**——尺 R1 现量 8 枚命中（186/188/189/190/191/196/77/182），立票链已把 K3→167、K4→190、K6→189、K7→191(甲, A379)+163、K8/K9→188/197/196、K10→168(被 50/51 扣闸) 各自接住；**仍须立票或摆 owner 的只剩 K5 与 K1 占用条的产品口径裁**。K1 token→票 145 行 12（`docs/evidence/s1/145-snapshot-field-census-r1.md:182` 现读对格，AC#2 未勾）。**共享实现问两败具名交编排者裁，本腿不选形**（`100-census.md` §3 末段）。
+- **AC#4 与票 181 分工核毕**：181 勾框（AC#1–5）全部只管"状态显示"，本栏内容审查（diff/未提交）＝票 189 未勾框，两票无"归口到对方已勾格充数"形状（189 AC#2"同一文件族不另起实现"＝复用指引非归口）。
+- **AC#5 雷区单列 6 枚待人拍板**（批准/开关写/接受回滚/提交推送/发起执行/附件移除；现量：demo approval 面板今天只跳屏、Go 入向名册 6 枚无 decide/allow/stop，`bridge.go:63-65` 注释逐字引 `AGENTS.md §1.2` 禁令）——本腿没提"顺手接批准"，见 `100-census.md` §4。
+- **AC#6/AC#7 合规**：`docs/PLAN.md`／`docs/specs/**`／`internal/**`／`cmd/**`／`frontend/**`／`design/**` 零字节；台账未碰。⚠ 行号漂具名三处：票 145 行来源 `PLAN.md:3473-3488` 现量只剩 8 行，**全表现位 `:3481-3494`**；c1 日志 `run.go:345/:365`→现量 `:515/:544`；`loop.go:976`→`:983`。腿的尺缺陷（哪发没正控／哪发转引未复跑）逐条在 `100-census.md` §6。
