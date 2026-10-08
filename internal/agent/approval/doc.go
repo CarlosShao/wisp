@@ -24,7 +24,7 @@
 // makes a panel-sourced allow unrepresentable rather than merely disallowed.
 //
 // Wiring owed by the ticket 12 list. Landed since this paragraph was written:
-// approval.New is composed in cmd/wisp (run.go:612, resident_approval_windows.go:369)
+// approval.New is composed in cmd/wisp (run.go:612, resident_approval_windows.go:370)
 // and handed to the tool bridge as tools.Options.Gate (run.go:748); Gate.AdmitTextTask
 // has production call sites (run.go's mode-switch card and admitTask, the config-reload
 // tick, the resident card path); and the D31 ledger seam is wired (tools.Options.Cancel
