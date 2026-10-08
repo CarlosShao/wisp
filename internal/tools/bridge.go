@@ -520,9 +520,13 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 	defer cancel()
 	ectx = withInFlightSlot(ectx, slot)
 	// D31: the running tool's only window onto the approval layer is its own
-	// context. The handle carries the correlation id the veto is keyed on, and
-	// Complete releases the gate's post-handoff record when the call is over.
-	ectx = withCancel(ectx, cancelHandle{corr: orDefault(req.CorrelationID, req.TaskID), bus: b.cancel})
+	// context. The handle carries the correlation id the veto is keyed on (and
+	// the task id, the tool's task-level identity since the corr went per-call
+	// in ticket 242), and Complete releases the gate's post-handoff record
+	// when the call is over.
+	ectx = withCancel(ectx, cancelHandle{
+		corr: orDefault(req.CorrelationID, req.TaskID), taskID: req.TaskID, bus: b.cancel,
+	})
 	// Ticket 177 shape A: a fresh per-call box for the ONE path this call's
 	// tool might itself write into its result text (task.output's re-read
 	// pointer is the only declaration today). Per-call by construction, so an

@@ -360,7 +360,13 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 	l.setCurrent(root)
 	defer l.setCurrent(nil)
 
-	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+	// The journal books this task's rows and takes the TASK id for both of its
+	// ids. C18 does not equate correlationId with the task id: it is the
+	// approval reply's routing key, a queue-item field sitting BESIDE the task
+	// id (docs/PLAN.md:1368). Since ticket 242 the loop mints one correlation
+	// id per tool call at the dispatch hop (callCorr), so the request-side corr
+	// is per-call while task-level traceability stays taskID.
+	j := newTaskJournal(l.opt.Journal, taskID, taskID)
 	// D47: register the task with the host's approval layer before any tool
 	// call can reach a gate. The revocation runs when the task ends, so an
 	// admitted id cannot outlive the task that earned it.
@@ -585,6 +591,22 @@ type toolPlan struct {
 	local    bool // answered by the loop (reserved list_tools path)
 }
 
+// callCorr mints the correlation id of ONE tool call (ticket 242). C18 defines
+// correlationId as a field of the approval-queue item AND the key the reply is
+// routed by - a value sitting BESIDE the task id, never required to be equal to
+// it (docs/PLAN.md:1368). The queue keys every card by this value, so two
+// concurrent calls of one task that shared it would collapse onto one routing
+// key. The shape keeps the task id as the prefix - task-level traceability
+// still goes through taskID - and appends the provider's call id, the id the
+// wire, the history and the tool_call rows already key each call by. An
+// id-less call falls back to its position inside the turn.
+func callCorr(taskID, callID string, index int) string {
+	if callID == "" {
+		return fmt.Sprintf("%s#call-%d", taskID, index)
+	}
+	return taskID + "#" + callID
+}
+
 // executeCalls runs a turn's tool calls: risk policy first (pass-through until
 // ticket 21), then D38d-capped concurrent execution with the C22 per-tool
 // timeout, then D15(3) spill, then the results back into the history. Tool
@@ -651,8 +673,9 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 		}
 		timeout := guard.PerToolTimeout()
 		req := ToolRequest{
-			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
-			Name: p.call.Name, Args: p.call.Args, Timeout: timeout,
+			TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),
+			CallID: p.call.ID,
+			Name:   p.call.Name, Args: p.call.Args, Timeout: timeout,
 		}
 		h := l.reg.Spawn("tool-exec-"+taskID, "agent", root, func(c context.Context) {
 			sem <- struct{}{}

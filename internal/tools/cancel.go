@@ -33,12 +33,14 @@ type CancelBus interface {
 // cancelKey is the context key carrying the running call's cancel handle.
 type cancelKey struct{}
 
-// cancelHandle binds a running tool to its own correlation id. A nil bus means
-// "no approval layer wired", which makes every veto answer false while still
-// letting the tool read its correlation id for logging.
+// cancelHandle binds a running tool to its own correlation id and to the id of
+// the task the call belongs to. A nil bus means "no approval layer wired",
+// which makes every veto answer false while still letting the tool read its
+// correlation id for logging.
 type cancelHandle struct {
-	corr string
-	bus  CancelBus
+	corr   string
+	taskID string
+	bus    CancelBus
 }
 
 func withCancel(ctx context.Context, h cancelHandle) context.Context {
@@ -55,6 +57,16 @@ func cancelOf(ctx context.Context) (cancelHandle, bool) {
 func CorrelationID(ctx context.Context) string {
 	h, _ := cancelOf(ctx)
 	return h.corr
+}
+
+// TaskID returns the id of the task the running call belongs to, or "" when
+// the tool was invoked outside the bridge. This is the task-level identity:
+// since ticket 242 the loop mints CorrelationID per CALL (C18 keys the
+// approval reply by it), so a tool that must name its own task - roster
+// registration, parent/child checks - reads this, never the correlation id.
+func TaskID(ctx context.Context) string {
+	h, _ := cancelOf(ctx)
+	return h.taskID
 }
 
 // Vetoed reports whether the user vetoed this call. A running side-effecting

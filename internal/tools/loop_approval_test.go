@@ -210,8 +210,16 @@ func TestLoopPassesDeclaredL1WriteThroughTheGate(t *testing.T) {
 	if r.Outcome != agent.OutcomeSuccess {
 		t.Errorf("outcome = %q, want success", r.Outcome)
 	}
-	if r.CorrelationID == "" || r.CorrelationID != res.TaskID {
-		t.Errorf("correlation_id = %q, want the task id %q (C18)", r.CorrelationID, res.TaskID)
+	// C18 makes correlationId the key the approval reply is routed by, a
+	// queue-item field BESIDE the task id; it never required the two to be
+	// equal (docs/PLAN.md:1368). Since ticket 242 the loop mints one
+	// correlation id per tool call, traceable back to this task by its task-id
+	// prefix, so the row must carry a non-empty per-call id that routes back
+	// to this task - not the task id itself, and not an empty string.
+	if r.CorrelationID == "" || r.CorrelationID == res.TaskID ||
+		!strings.HasPrefix(r.CorrelationID, res.TaskID) {
+		t.Errorf("correlation_id = %q, want a non-empty per-call id routing back to task %q (C18)",
+			r.CorrelationID, res.TaskID)
 	}
 	// The loop must not have booked a second row of its own: one call, one
 	// authoritative record.

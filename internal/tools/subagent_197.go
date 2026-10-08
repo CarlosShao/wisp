@@ -256,7 +256,10 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
 		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
 	}
-	parentID := CorrelationID(ctx)
+	// The task-level id of the caller: since ticket 242 the correlation id is
+	// minted per call (C18 routes approval replies by it), so it can no longer
+	// name a task; the roster is keyed by task ids.
+	parentID := TaskID(ctx)
 	if parentID == "" {
 		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，" +
 			"就没法登记父子关系，也没法把结论盖戳进父任务的 C25 作用域）", IsError: true}, nil

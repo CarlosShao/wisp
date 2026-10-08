@@ -699,11 +699,13 @@ func (t taskCancel) Execute(ctx context.Context, params json.RawMessage, onUpdat
 	if t.d.Roster == nil {
 		return Result{Text: "任务名册未接线（fail-closed：拒绝停掉任何任务——名册才是唯一的停法）", IsError: true}, nil
 	}
-	// The caller's identity is the host's, not an argument: CorrelationID is what
-	// the bridge stamps from the call it dispatched, so a model cannot name whose
-	// child it is by editing parameters. Same source task.spawn uses to fill in
-	// ParentTaskID, which is what makes the two sides agree by construction.
-	caller := CorrelationID(ctx)
+	// The caller's identity is the host's, not an argument: the bridge stamps
+	// the dispatching TASK's id into the call context (TaskID; the correlation
+	// id went per-call in ticket 242 and no longer names a task), so a model
+	// cannot name whose child it is by editing parameters. Same source
+	// task.spawn uses to fill in ParentTaskID, which is what makes the two
+	// sides agree by construction.
+	caller := TaskID(ctx)
 	if caller == "" {
 		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）", IsError: true}, nil
 	}
