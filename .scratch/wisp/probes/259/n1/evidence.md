@@ -172,3 +172,56 @@ $ git commit -F .scratch/wisp/probes/259/n1/msg-commit1.md -- .scratch/wisp/issu
 
 ⇒ 第 1 笔＝`0017fdef`，**1 file changed, 14 insertions(+), 0 deletions**；改后 `wc -l`＝**59**（45＋14）、改后框尺复量＝未勾 **5**／已勾 **1**（与改前同数）。
 第 2 笔＝本目录收档（只带 `.scratch/wisp/probes/259/n1` 一枚 pathspec），哈希见交件回报。
+
+## 14. 第 3 笔：本腿自己注记里一把尺会假阴性，当场改锚到 commit
+
+改第 1 笔后 HEAD **前进了**（现量尺＝`git log --format='%h %ad %s' --date=format:'%m-%d %H:%M' -8`：`8311d630` 13:56＝编排者 A716、`f450f8c2` 14:03＝33-r13 证据笔、`28d608f8` 14:10＝ruler-dedup-1；另有 `b7a23d8d` 13:40＝255-r6 交付、`2eda85fe` 13:43＝33-r13 措辞归位，都在我第 1 笔之前），而我 `:51` 那把尺逐字写的是 `git log -1 --format=%B | grep -o '…'` ⇒ **下条腿照它跑必然零命中**，就会把"A714 那次自抓"读成"没发生过"＝正是这一节要防的错形。
+
+```
+$ git show -s --format=%B 53d73db4 | grep -o '我 A714 那条「票 259 那份合并裁定我下轮读原文再裁」前提已过期'
+我 A714 那条「票 259 那份合并裁定我下轮读原文再裁」前提已过期      （命中＝改锚后那把尺仍成立）
+$ git show -s --format=%B 8311d630 > /tmp/a716.txt ; wc -c /tmp/a716.txt ; grep -c '我 A714' /tmp/a716.txt
+2400 ／ 0 ／ grep-rc=1                            （＝旧尺在 13:56 之后的 HEAD 上零命中的现证）
+```
+
+⇒ `:51` 改为 `git show -s --format=%B 53d73db4`＋具名"⛔ 别用 `git log -1`"；`:54` 补"取数时 HEAD＝`53d73db4`；本腿两笔只动 `.md`，approval 面未变"。
+现量尺（第 3 笔前后）：`wc -l` **59 → 59**（行数零增减）、框尺 **5／1 → 5／1**、`git diff -U0` hunk 头＝`@@ -51 +51 @@`＋`@@ -54 +54 @@` ⇒ **改动全落在本腿自己追加的那一节**，1–45 一字未动；`git diff --numstat`＝2/2。第 3 笔＝`80488848`（1 file changed, 2 insertions(+), 2 deletions(-)）。
+
+## 15. 顶回派单一处＋本腿自抓四处（五条都带自己的尺）
+
+1. ⚠ **派单约束 5 那句"约 30 枚 tracked 文件因 autocrlf 报'已修改'"被盘面推翻**：
+```
+$ git diff --name-only 2>/dev/null | wc -l                        → 32
+$ git diff --ignore-cr-at-eol --name-only 2>/dev/null | wc -l     → 32
+$ comm -23 <(git diff --name-only | sort) <(git diff --ignore-cr-at-eol --name-only | sort)
+(回空＝零枚消失)
+```
+⇒ **每一枚都是真内容改动、零枚是换行幻影**（这与编排者 `8311d630`／A716 那条自抓一致：他那把尺量到 33 枚，我 14:0x 量到 32 枚，差的那一枚被中间某笔收走了＝枚数在动，形状结论一致）。本腿照约束**一枚没碰**（`git diff --name-only | grep -E 'issues/259|probes/259/n1'` ⇒ 零命中，rc=1）。
+2. ⚠ **第 6／12 节那两处"此刻"读数在落笔时就已老化**（自抓，⛔ 不是别人的错）：`255-r6` 落在 `b7a23d8d` **13:40**（现量尺＝`git log --format='%h %ad' --date=format:'%m-%d %H:%M' -1 -- cmd/wisp/panel_geometry_255r6_range_windows_test.go cmd/wisp/panel_geometry_255_test.go`），而我那发 dirty 读数取于 **13:30**、第 1 笔提交于 **13:47** ⇒ 注记里"同一写面此刻有别的腿在飞"那句**落笔时已经老了一发**（14:1x 复量 `git status --porcelain -- cmd/wisp`＝**回空＝干净**）。⇒ 交件具名报回这一条；下条腿要判 AC#4 是否被占必须自己重跑，⛔ 别拿我这发当常量。
+3. ⚠ **AC#4 那一句本身没老化**（14:1x 重跑）：`git show HEAD:cmd/wisp/subagent_selfapproval_197_test.go | sed -n '109p'` ⇒ 逐字仍是 `			TaskID: taskID, CorrelationID: taskID,`（HEAD 已含 `255-r6`/33-r13/ruler-dedup-1 那几笔）；该文件最近一笔＝`a818df46` 09-30 12:05（`255-r6` 那笔现量没碰它）。
+4. ⛔ **本腿自己的一发假读数，抓到就改**：我第一版本节里写了两枚 commit 号（`283101d1`／`281f3600`）是**凭印象落的、没现跑**——`git log` 对它们报 `fatal: ambiguous argument … unknown revision` ⇒ 逐字推翻，本节与 §14 已换成上表那几枚现量号（`b7a23d8d`／`2eda85fe`／`8311d630`／`f450f8c2`／`28d608f8`）。定式＝**"别家的 commit 号"和"别处的行内容"一样必须现跑现抄**，尤其是写"此刻谁在飞"这种句子——这正是本票第 10 节要防的那个错形的**我这面朝内版本**。
+5. ⛔ 另记一笔自抓：我起手把"票 259 的落地只有三笔"当尺跑时，同一把 `git log -- internal/agent/approval/` 就把 10-08 两笔 `242-r3` 一起带回来了——**那把尺量的其实是"整个 approval 写面"，不是"259 的落地腿"**；要看 259 自己动过什么得用 `git log -- <两枚尺件路径>` ＋逐笔 `git show --stat`。已按这个口径写进注记。
+
+## 16. 交件时终量（本腿三笔已落＋第四笔＝本目录再收档）
+
+```
+$ git log --format='%h %ad %s' --date=format:'%m-%d %H:%M' -8 | cut -c1-46
+80488848 10-08 14:12 票 259 腿 259-n1 第 3 笔（本腿：票面 :51/:54 改锚，+2/-2）
+28d608f8 10-08 14:10 ruler-dedup-1 …            （别人的腿）
+f450f8c2 10-08 14:03 33-r13 证据笔 …            （别人的腿）
+9705fe92 10-08 13:57 票 259 腿 259-n1 第 2 笔（本腿：本目录四枚 .md，+231/-0）
+8311d630 10-08 13:56 A716 落账 …                （编排者）
+0017fdef 10-08 13:47 票 259 腿 259-n1 第 1 笔（本腿：票面追加第 10 节，+14/-0）
+2eda85fe 10-08 13:43 33-r13 措辞归位 …          （别人的腿）
+b7a23d8d 10-08 13:40 票255-r6 交付 …            （别人的腿）
+$ git status --porcelain -- .scratch/wisp/issues/259-grant-binding-identity-ruler-holes.md
+(回空＝干净)
+$ git show HEAD:.scratch/wisp/issues/259-grant-binding-identity-ruler-holes.md | wc -l   → 59
+$ … | grep -cE '^[[:space:]]*- \[ \]'                                                   → 5
+$ … | grep -cE '^[[:space:]]*- \[x\]'                                                   → 1
+$ date '+%Y-%m-%d %H:%M %z'                                                             → 2026-10-08 14:20 +0800
+```
+
+⇒ 全程尺账：**`wc -l` 45 → 59**（第 1 笔 +14、第 3 笔行数零增减）；**框尺 5／1 三笔前后同数**；AC#0 那个已勾框与 1–45 行原判据一字未动（`git diff -U0` 现量 hunk 头只落在 `@@ -45,0 +46,14 @@` 与 `@@ -51 +51 @@`／`@@ -54 +54 @@`）；文件名**未加 `-done`**；⛔ 零 Go 命令（票面「排程与互斥」逐字：approval 面突变与 `cmd/wisp` 互斥）；⛔ 零 push；四笔每笔都带**显式 pathspec 且写在命令上**（`git add -- <p> && git commit -F <msg> -- <p>`，中间不停顿）；工作树里那 32 枚不属于本腿的真内容改动**一枚没碰**（`git diff --name-only | grep -E 'issues/259|probes/259/n1'` ⇒ 零命中）。
+⚠ 唯一残留：第 1 笔的**提交说明**里逐字带着那把会假阴性的 `git log -1 --format=%B`（已提交的历史不改写，`issues/README` 规则＝要更正就追加新 commit）⇒ **票面 `:51` 已是改锚后的尺**，以票面为准，别照第 1 笔消息跑。
+
