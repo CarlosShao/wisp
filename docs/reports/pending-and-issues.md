@@ -14246,3 +14246,12 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 
 在飞＝**0 枚**（三条全死；额度按天重置 ⇒ 今天派不动新 agent）。`cmd/wisp` / `internal/panel` / `internal/agent/approval` 三面现已全空 ⇒ **下一波可派清单（额度一恢复就发）**：`253-v1`（票 253 `AC#1` 非实现者验收：读那六枚 `.md`＋自己跑变异攻那把尺的恒真面）／`259-v1`／`181-v3`／票 246 那格（"起管线 vs 真举卡"）／`167-a2` 续程／我自己名下三笔（`frontend/dist` 刷新受"exe 未还原"牵制、真窗复跑、`go list -deps`）。⛔ 零 push、⛔ 零翻框、⛔ 零 `-done`；机主手上仍那三问，本轮**没叠第四问**。
 
+
+## A725｜2026-10-08 18:1x｜编排者自取数（额度期内自己跑）｜★**举卡那一跳量清了：有一条会举卡的产码路，但"今天会不会真举出一张"仍无凭据**——`A722 §3` 的措辞按此收窄（⛔ 不撤、⛔ 不翻框）
+
+逐字尺与读数（全部我自己现跑，`HEAD` 18:0x）：
+- `cmd/wisp/resident_task_source_windows.go:270` 逐字 `ui:      ra.ui,`（同块 `:269 gate: ra.gate`）⇒ 常驻任务管线装配时**注入的就是 resident 的 gate 与它的展示面**。
+- `cmd/wisp/resident_approval_windows.go:365` 逐字 `ra.ui = &ballCardUI{ra: ra}`；`:369-376` 的 `approval.New(approval.Options{ UI: ra.ui, …})` ⇒ **门举卡走的是 UI 接口**。
+- `cmd/wisp/resident_approval_windows.go:864` 逐字 `func (u *ballCardUI) Prompt(_ context.Context, p approval.…` ＝**举卡那一跳的真身**（`:929 Update` 是它的回收面）。
+- 另一条路：`AskOnTaskRoot`（`:697`）→ `askConfirmation`（`:700` 唯一产码调用点）**生产调用点仍＝0**（形状尺 rc=1）。
+⇒ **三层分开**：ⓐ "有没有一条会举卡的产码路"＝**有**（gate→`ballCardUI.Prompt`，常驻装配里就接着）；ⓑ "今天会不会真举出一张"＝**仍无凭据**（要等一枚任务真跑到"需要批准"那一步才发生；本机测试那一路 `:255-258` 具名写着"本机没有可交互控制台，挂起的卡片只能由取消键否决"＝**只读＋Esc 否决**形）；ⓒ `resident_windows.go:248` 那句 `This call is the caller` 若按字面读（指 `AskOnTaskRoot` 有了调用者）**不成立**，若按"这条管线现在会举卡"读则**成立** ⇒ 该句是**歧义**而非纯假，⛔ 我不改它、只在台账记清两种读法。⇒ `A722 §3` 与 `246-raisercensus` 的停手点按此**收窄**（那一格要裁的从此是"起了管线算不算满足 `AC#7`"＋"`Prompt` 这一跳要不要行为凭据"）。⛔ 未翻框、未改码、零 push。
