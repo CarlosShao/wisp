@@ -1,0 +1,25 @@
+35-v4 roster coverage ruler (2026-10-08 08:49:46+0800): which repo files read the shipping wiring at all
+cmd/wisp/panel_host_windows.go:408:	if bindErr := m.installPanelTransport(w, ctx); bindErr != nil {
+cmd/wisp/panel_host_windows.go:673:var panelPostMessageForwardInit = fmt.Sprintf(`(function () {
+cmd/wisp/panel_host_windows.go:693:func (m *PanelManager) installPanelTransport(w pageTransport, ctx context.Context) error {
+cmd/wisp/panel_host_windows.go:700:	w.Init(panelPostMessageForwardInit)
+cmd/wisp/panel_inbound_guards_35r3_test.go:97:	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+cmd/wisp/panel_inbound_guards_35r3_test.go:98:		t.Fatalf("installPanelTransport failed: %v", err)
+cmd/wisp/panel_transport_35r1_test.go:202:	if err := mgr.installPanelTransport(fc, ctx); err != nil {
+cmd/wisp/panel_transport_35r1_test.go:203:		t.Fatalf("installPanelTransport: %v (the shipping transport wiring itself failed to install)", err)
+cmd/wisp/panel_transport_35r1_test.go:209:		t.Fatal("AC#6 RED: installPanelTransport registered no page->wispDispatch forwarding hook " +
+cmd/wisp/panel_transport_35r2_test.go:1738:	if err := mgr.installPanelTransport(bf, ctx); err != nil {
+cmd/wisp/panel_transport_35r2_test.go:1739:		t.Fatalf("installPanelTransport failed: %v", err)
+cmd/wisp/panel_transport_35r2_test.go:1769:	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+cmd/wisp/panel_transport_35r2_test.go:1770:		t.Fatalf("installPanelTransport failed: %v", err)
+cmd/wisp/panel_transport_35r2_test.go:1791:	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+cmd/wisp/panel_transport_35r2_test.go:1792:		t.Fatalf("installPanelTransport failed: %v", err)
+cmd/wisp/panel_transport_35r2_test.go:1820:	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+cmd/wisp/panel_transport_35r2_test.go:1821:		t.Fatalf("installPanelTransport failed: %v", err)
+cmd/wisp/panel_transport_35r2_test.go:1928:	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+cmd/wisp/panel_transport_35r2_test.go:1929:		t.Fatalf("installPanelTransport failed: %v", err)
+cmd/wisp/panel_transport_35r2_test.go:2031:	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+cmd/wisp/panel_transport_35r2_test.go:2032:		t.Fatalf("installPanelTransport failed: %v", err)
+--- build tags of the live file (why it is not in any run today)
+//go:build windows && winlive
+rc=0

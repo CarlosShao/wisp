@@ -1,0 +1,40 @@
+=== run v-ma-hook+detector-gone (2026-10-08 08:49:52+0800) overlay=/d/tmp/wisp35v4/overlay-v-ma-hook+detector-gone.json roster=12 transport names ===
+{"Replace":{"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go":"D:/tmp/wisp35v4/mut/v-ma-hook-cmd/wisp/panel_host_windows.go","D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_transport_35r2_test.go":"D:/tmp/wisp35v4/mut/v-detector-gone-cmd/wisp/panel_transport_35r2_test.go"}}
+--- build ---
+buildrc=0
+--- run roster, CWD=cmd/wisp, no -tags winlive ---
+time=2026-10-08T08:49:56.000+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+    panel_inbound_guards_35r3_test.go:153: (d)-1 roster guard on the page edge: door reply="面板请求被拒绝 [panel.approval.request (无 requestId)]：panel: composer request refused: 方法 \"panel.approval.request\" 不是面板 composer 通路的能力入口"
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+=== RUN   TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+    panel_inbound_guards_35r3_test.go:161: (d)-2 source guard on the page edge: door reply="面板请求被拒绝 [panel.mode.request pc-35r3-2-9e7a-4c1b]：panel: composer request refused: 来源 \"panel-composer-x\" 不是 \"panel-composer\"，按伪造/串台拒绝（requestId=\"pc-35r3-2-9e7a-4c1b\"）"
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+=== RUN   TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+    panel_inbound_guards_35r3_test.go:170: (d)-3 requestId guard on the page edge: door reply="面板请求被拒绝 [panel.mode.request (无 requestId)]：panel: composer request refused: 缺少 requestId，无法与审计/卡片对齐（method=\"panel.mode.request\"）"
+--- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+=== RUN   TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+--- PASS: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport (0.00s)
+=== RUN   TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    panel_transport_35r2_test.go:1750: shape ③ delivery: nativeExitCalls=1 receiverOK=1 receiverLost=0 ignoredWrites=(none) doorRounds=1 maxPostDepth=3 capTripped=false capDepth=0 unparsable=0 unboundSlots=0 evalThrew=0 resolved=1 rejected=0 scriptThrows=[] | frame="{\"id\":1,\"method\":\"wispDispatch\",\"params\":[\"{\\\"method\\\":\\\"panel.mode.request\\\",\\\"requestId\\\":\\\"pc-1-3f2b1c0d-9e7a-4c1b-8f14-e45fceea469a\\\",\\\"source\\\":\\\"panel-composer\\\",\\\"to\\\":\\\"ask_every_step\\\"}\"]}" | door reply=""
+--- PASS: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+=== RUN   TestShapeA3SecondPagePostStillDelivers
+--- PASS: TestShapeA3SecondPagePostStillDelivers (0.00s)
+=== RUN   TestShapeA3ForwardingHookIsIdempotentInOneDocument
+--- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+=== RUN   TestLegacySubShapeOneHookDiesInAReentryLoop
+    panel_transport_35r2_test.go:1839: sub-shape ① under the behavioural yard: re-entered 9 levels (cap 8), native exit called 0 times, door fired 0 times, page error="RangeError: maximum call stack size exceeded - chrome.webview.postMessage re-entered 9 levels (cap 8) with the native exit called 0 times; a page in a real browser dies here"
+--- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop (0.00s)
+=== RUN   TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+--- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot (0.00s)
+=== RUN   TestForwardingHookMustNotLoseTheNativeExitReceiver
+    panel_transport_35r2_test.go:1962: M-A face has teeth: 1 native-exit call, all with chrome.webview as receiver (receiverLost=0); a bare native(message) trips it
+--- PASS: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+=== RUN   TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+    panel_transport_35r2_test.go:2012: M-B face has teeth: non-writable world refused the hook (doorRounds=0, unboundSlots=1), writable world armed it (doorRounds=1)
+--- PASS: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+    panel_transport_35r2_test.go:2065: door absent: the guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=1, no throw)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+PASS
+runrc=0

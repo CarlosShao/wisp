@@ -1,0 +1,23 @@
+35-v4 driver2 (2026-10-08 08:46:34+0800): name-uniqueness shapes. Red attribution is read by TEST NAME only; the two label mutants rewrite the red SENTENCE so both cases say the same thing.
+baseline buildrc=buildrc=0 PASS=12 FAIL=0
+--- v-guard-gone
+v-guard-gone buildrc=buildrc=0 PASS=12 FAIL=0
+  FAIL names:
+  newly-FAIL vs baseline:
+  red-reasons:
+--- v-set-gone
+v-set-gone buildrc=buildrc=0 PASS=12 FAIL=0
+  FAIL names:
+  newly-FAIL vs baseline:
+  red-reasons:
+--- v-guard-gone+label-mb
+v-guard-gone+label-mb buildrc=buildrc=0 PASS=12 FAIL=0
+  FAIL names:
+  newly-FAIL vs baseline:
+  red-reasons:
+--- v-ma-hook+label-ma
+v-ma-hook+label-ma buildrc=buildrc=0 PASS=12 FAIL=0
+  FAIL names:
+  newly-FAIL vs baseline:
+  red-reasons:
+rc=0

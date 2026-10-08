@@ -1,0 +1,76 @@
+35-v4 run summary (2026-10-08 08:45:11+0800)  attribution = FAIL-name set difference vs my own baseline roster (12 transport names, same 12 the leg r4 ran)
+targeted roster chosen because a FULL-package run measured >30 min on this box (150/346 tests in ~14 min); the roster is the complete set of tests that read the shipping wiring -尺 in logs/roster-coverage.txt
+baseline buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+--- v-ma-hook
+v-ma-hook buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-ma-hook+detector-gone
+v-ma-hook+detector-gone buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-ma-hook+no-panic
+v-ma-hook+no-panic buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-native-window
+v-native-window buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-guard-truthy
+v-guard-truthy buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-idem-guard-gone
+v-idem-guard-gone buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-finally-stuck
+v-finally-stuck buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-return-gone
+v-return-gone buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-detector-gone
+v-detector-gone buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-ma-world-swap
+v-ma-world-swap buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-mb-world-swap
+v-mb-world-swap buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-init-keep-bind
+v-init-keep-bind buildrc=buildrc=0 runrc=runrc=0 PASS=12 FAIL=0 SKIP=0
+  newly-FAIL:
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+rc=0

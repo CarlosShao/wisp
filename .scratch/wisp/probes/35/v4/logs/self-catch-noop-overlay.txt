@@ -1,0 +1,39 @@
+35-v4 self-catch: my own first-pass counter-shape readings were a no-op-overlay false green
+taken 2026-10-08, before any verdict was written. ⛔ 这些读数不算任何人的凭据，只算我这把尺的缺陷记录。
+
+WHAT HAPPENED
+- My driver's `mk_overlay` takes arguments of the form "repoPath|mutantPath". I called it as
+  `mk_overlay v-ma-hook "$(P v-ma-hook)"` where P() returned ONLY the mutant path, so
+  `${pair%%|*}` and `${pair##*|}` both produced the same string and every overlay JSON became
+  {"Replace":{"/d/tmp/.../v-ma-hook-...go":"/d/tmp/.../v-ma-hook-...go"}}.
+  Two defects in one: (1) key = the mutant file instead of the repo file, so the repo file was
+  never replaced (a file mapped onto itself); (2) both sides were MSYS `/d/tmp/...` paths, not
+  the `cygpath -m` Windows form Go needs.
+- Symptom shape: buildrc=0, runrc=0, and PASS=12 FAIL=0 on all thirteen runs, INCLUDING v-ma-hook
+  (the very mutant leg r4 measured as 9 FAIL) and v-ma-hook+detector-gone. A green roster on a
+  mutant whose green is impossible = the mutant was never compiled in.
+- Why it looked plausible: the 12-name roster genuinely is green on clean code, so nothing failed;
+  the numbers were self-consistent. This is ledger rule #128's shape ("零读数先按 buildrc 分诊")
+  with the sign flipped — a NON-zero, all-PASS reading that still had no mutant behind it.
+  The catch was the positive control: re-running the leg's own ma-hook, whose colour I already
+  knew had to be red (`.scratch/wisp/probes/35/r4/logs/orch/orch-mut-summary.txt`:
+  ma-hook PASS=3 FAIL=9). ⛔ Had I only run my NEW mutants, I would have reported thirteen
+  "green" counter-shapes as tautology faces and every one of them would have been noise.
+
+WHAT I DID
+- Preserved the invalid pass-1 artefacts in place under the prefix `pass1-noopoverlay-`
+  (nothing deleted): mut-summary.txt / names-*.txt / run-*.txt / run2-*.txt.
+- Fixed P()/F() to emit "$REPOPROD|$(cygpath -m ...)" (pair form + Windows forward-slash paths),
+  verified by dumping overlay-v-ma-hook.json:
+  {"Replace":{"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go":
+  "D:/tmp/wisp35v4/mut/v-ma-hook-cmd/wisp/panel_host_windows.go"}}
+- Re-ran all sixteen mutant runs plus my own baseline (`mut-summary.txt` after the fix).
+- Made the positive control explicit for pass 2: v-ma-hook MUST redden; if it does not, no other
+  reading in this leg is interpretable and the leg reports 无法判 instead of a verdict.
+- Second harness bug found and fixed the same pass: the driver's first version ran the WHOLE
+  cmd/wisp package per mutant; a measured 150/346 tests in ~14 min made 13 such runs impossible,
+  so the roster is now the 12 named tests that are the complete set of consumers of the shipping
+  wiring (ruler: logs/roster-coverage.txt). That is also why the leg's own 12-name roster and my
+  pass-2 roster are the same set and directly comparable.
+
+rc=0

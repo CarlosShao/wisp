@@ -1,0 +1,48 @@
+35-v4 mutant landing (2026-10-08 08:49:43+0800), counts vs the CURRENT worktree files
+diff: /tmp/wisp35v4/mut/v-native-window-cmd/wisp/panel_host_windows.go: No such file or directory
+mutant v-native-window changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-native-window-cmd/wisp/panel_host_windows.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-guard-truthy-cmd/wisp/panel_host_windows.go: No such file or directory
+mutant v-guard-truthy changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-guard-truthy-cmd/wisp/panel_host_windows.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-ma-hook-cmd/wisp/panel_host_windows.go: No such file or directory
+mutant v-ma-hook changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-ma-hook-cmd/wisp/panel_host_windows.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-idem-guard-gone-cmd/wisp/panel_host_windows.go: No such file or directory
+mutant v-idem-guard-gone changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-idem-guard-gone-cmd/wisp/panel_host_windows.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-finally-stuck-cmd/wisp/panel_host_windows.go: No such file or directory
+mutant v-finally-stuck changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-finally-stuck-cmd/wisp/panel_host_windows.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-return-gone-cmd/wisp/panel_host_windows.go: No such file or directory
+mutant v-return-gone changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-return-gone-cmd/wisp/panel_host_windows.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-detector-gone-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-detector-gone changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-detector-gone-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-no-panic-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-no-panic changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-no-panic-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-ma-world-swap-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-ma-world-swap changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-ma-world-swap-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-mb-world-swap-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-mb-world-swap changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-mb-world-swap-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-init-keep-bind-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-init-keep-bind changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-init-keep-bind-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-guard-gone-cmd/wisp/panel_host_windows.go: No such file or directory
+mutant v-guard-gone changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-guard-gone-cmd/wisp/panel_host_windows.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-set-gone-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-set-gone changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-set-gone-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-label-mb-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-label-mb changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-label-mb-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut/v-label-ma-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-label-ma changed-line-count=0
+diff: /tmp/wisp35v4/mut/v-label-ma-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+all-one-line=NO
+rc=1
