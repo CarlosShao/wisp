@@ -1,0 +1,33 @@
+=== Q5 follow-ups (the two checks whose || bound wrong in d1) ===
+git cat-file -t fb2fb802 -> commit
+git log -1 --format=%H fb2fb802 -> fb2fb802f75a0e3eeacad488f1adc6f064e29f85
+--- any tracked script that runs -tags winlive? ---
+grep-rc=0 hits=2
+.github/workflows/ci.yml
+.scratch/wisp/probes/35/v4/scripts/countershape-v4.sh
+--- what DOES mention 'tags winlive' anywhere tracked? ---
+.github/workflows/ci.yml
+.scratch/wisp/issues/07-ball-state-machine-core-done.md
+.scratch/wisp/issues/111-ci-tests-20-of-33-packages.md
+.scratch/wisp/issues/12-cli-text-path-s1-gate.md
+.scratch/wisp/issues/20-host-bridge-fs-tools.md
+.scratch/wisp/issues/239-the-ball-was-cut-into-a-square-by-its-own-window-three-numbers-changed-at-the-09-30-sign-off.md
+.scratch/wisp/issues/245-the-bare-esc-cancel-default-is-a-global-hotkey-so-the-resident-process-steals-esc-from-every-other-app.md
+.scratch/wisp/issues/246-the-process-that-runs-tasks-is-not-the-process-holding-the-ball-so-no-veto-channel-has-an-executor.md
+.scratch/wisp/issues/260-configured-cancel-hotkey-never-registers.md
+.scratch/wisp/issues/265-resident-gate-has-no-session-grant-writer-done.md
+.scratch/wisp/issues/272-restart-tier-test-window-starts-before-the-plant-so-a-banner-carrying-the-same-words-passes.md
+.scratch/wisp/issues/274-no-nail-requires-shipped-exe-to-carry-page-build-ps-step-2-comment-is-false-in-both-halves.md
+--- any control-group artefact for the winlive rig? ---
+hits=2
+cmd/wisp/panel_transport_live_35v2_windows_test.go
+docs/reports/pending-and-issues.md
+--- ci.yml: does any job carry the winlive tag? (the label's ② claim) ---
+595:      - name: "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"
+597:        # carrying `//go:build windows && winlive` (7 under cmd/wisp, 5 under
+598:        # internal/ball; ruler `grep -rlE '//go:build.*winlive' --include=*.go`)
+602:        # 8e98b8f0, before this step, `-tags` and `winlive` each hit 0 times here,
+605:        # leg ever passed the `winlive` half. So all twelve sat outside every CI
+615:        # and are NOT wired here; do not read this step as "the winlive cases now
+644:        run: go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+rc=0

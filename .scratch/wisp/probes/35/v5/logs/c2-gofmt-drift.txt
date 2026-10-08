@@ -1,0 +1,43 @@
+=== gofmt drift: which files were ALREADY dirty at daf1f5a0? (2026-10-08 09:54:55+0800) ===
+--- gofmt -l on BEFORE blobs ---
+C:\Users\swq\AppData\Local\Temp\gf35\before\panel_inbound_guards_35r3_test.go
+C:\Users\swq\AppData\Local\Temp\gf35\before\panel_transport_35r2_test.go
+before-rc=0
+--- gofmt -l on AFTER (worktree copies) ---
+C:\Users\swq\AppData\Local\Temp\gf35\after\models.go
+C:\Users\swq\AppData\Local\Temp\gf35\after\panel_inbound_guards_35r3_test.go
+C:\Users\swq\AppData\Local\Temp\gf35\after\panel_transport_35r2_test.go
+after-rc=0
+--- CR ( carriage return) census on the three the working tree lists ---
+cmd/wisp/models.go CR-bytes=334 gofmt-diff-lines=672
+cmd/wisp/panel_inbound_guards_35r3_test.go CR-bytes=0 gofmt-diff-lines=14
+cmd/wisp/panel_transport_35r2_test.go CR-bytes=0 gofmt-diff-lines=14
+--- what gofmt actually wants to change in the fixture (is it 35-r5's edit?) ---
+diff cmd/wisp/panel_transport_35r2_test.go.orig cmd/wisp/panel_transport_35r2_test.go
+--- cmd/wisp/panel_transport_35r2_test.go.orig
++++ cmd/wisp/panel_transport_35r2_test.go
+@@ -804,8 +804,8 @@
+ 	i    int
+ }
+ 
+-func (p *jsParser) peek() jsTok    { return p.toks[p.i] }
+-func (p *jsParser) next() jsTok    { t := p.toks[p.i]; p.i++; return t }
++func (p *jsParser) peek() jsTok { return p.toks[p.i] }
++func (p *jsParser) next() jsTok { t := p.toks[p.i]; p.i++; return t }
+ func (p *jsParser) atPunct(s string) bool {
+ 	t := p.peek()
+ 	return t.kind == "punct" && t.text == s
+--- models.go / guards drift sample ---
+diff cmd/wisp/models.go.orig cmd/wisp/models.go
+--- cmd/wisp/models.go.orig
++++ cmd/wisp/models.go
+@@ -1,334 +1,334 @@
+-package main
+-
+-// wisp models - the C29 model store's operator surface, and the place ticket 121
+-// AC#2 put the model hand-off chain into the product.
+-//
+-// WHY THIS FILE EXISTS (R-109-4, the sixth case of "built but nobody calls it").
+-// Before this commit `go list -deps ./cmd/wisp` did not contain
+-// github.com/CarlosShao/wisp/internal/models on any platform. That made three
+rc=0

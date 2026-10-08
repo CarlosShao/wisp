@@ -1,0 +1,89 @@
+=== Q5: is the label written in TWO places, and is the wording同形? (2026-10-08 09:55:53+0800) ===
+--- every tracked file carrying the family words ---
+   .scratch/wisp/issues/111-ci-tests-20-of-33-packages.md
+   .scratch/wisp/issues/250-portable-tests-guard-c-merges-go-list-stderr-into-its-own-denominator-so-a-cold-module-cache-kills-the-whole-core-scope-reading-done.md
+   .scratch/wisp/issues/273-shipping-process-builds-state-machine-without-a-sink-so-every-d43-effect-falls-into-no-op.md
+   .scratch/wisp/issues/274-no-nail-requires-shipped-exe-to-carry-page-build-ps-step-2-comment-is-false-in-both-halves.md
+   .scratch/wisp/issues/33-panel-host-c27.md
+   .scratch/wisp/issues/35-panel-bridge-c17.md
+   .scratch/wisp/probes/111/r6/evidence.md
+   .scratch/wisp/probes/111/r6/logs/anchor.txt
+   .scratch/wisp/probes/224/c2/census.md
+   .scratch/wisp/probes/263/r1/fix-and-readings.md
+   .scratch/wisp/probes/273/a1/census.md
+   .scratch/wisp/probes/273/a3/census.md
+   .scratch/wisp/probes/273/a3/logs/census-before-reorder-backup.txt
+   .scratch/wisp/probes/33/n1/verdict.md
+   .scratch/wisp/probes/33/r8b/verdict.md
+   .scratch/wisp/probes/33/winc1/families.md
+   .scratch/wisp/probes/35/a5-census/logs/q5-machinelocal.txt
+   .scratch/wisp/probes/35/a5-census/summary.md
+   .scratch/wisp/probes/35/census-resident-panel/summary.md
+   .scratch/wisp/probes/35/r1/impl.md
+   .scratch/wisp/probes/35/r5/impl.md
+   .scratch/wisp/probes/35/r5/logs/after-iii.txt
+   .scratch/wisp/probes/35/r5/logs/after-iv.txt
+   .scratch/wisp/probes/35/r5/logs/folded-prefix-copy
+   .scratch/wisp/probes/35/r5/logs/opening-rulers.txt
+   .scratch/wisp/probes/35/r5/logs/scope-diff-ii.txt
+   .scratch/wisp/probes/35/r5/scripts/after-rulers.sh
+   .scratch/wisp/probes/35/v5/logs/a01-identity.txt
+   .scratch/wisp/probes/35/v5/logs/a02-boxes.txt
+   .scratch/wisp/probes/35/v5/logs/a05-iv-label.txt
+   .scratch/wisp/probes/35/v5/scripts/a0-anchor-rulers.sh
+   .scratch/wisp/probes/evidence-close/6/backfill-worklist.md
+   .scratch/wisp/probes/expired-premises/7b/logs/ruler-4f-full.txt
+   .scratch/wisp/probes/expired-premises/7b2/logs/scan-sentences.txt
+   .scratch/wisp/probes/msg-a653.md
+   .scratch/wisp/probes/orchestrator/ci223-1/raw_range_roster.txt
+   .scratch/wisp/probes/panel-resident/1/hops.md
+   cmd/wisp/panel_transport_35r2_test.go
+   cmd/wisp/panel_transport_live_35v2_windows_test.go
+   docs/evidence/s1/33-panel-host-c27-r5.md
+   docs/reports/pending-and-issues.md
+--- the sentence in the ticket vs the file (verbatim compare) ---
+[ticket]:
+     11 〔仅本机可量〕
+[ledger]:
+      1 〔仅本机可量、CI 永看不见〕
+      1 〔仅本机可量、未批〕
+     19 〔仅本机可量〕
+      1 〔仅本机可量，CI 永看不见〕
+[file header]:
+      1 〔仅本机可量、CI 永看不见〕
+[exemplar 33]:
+      2 〔仅本机可量、CI 永看不见〕
+--- does r5's own delivery doc (impl.md) carry it? (the 'second place' rule) ---
+impl.md hits=4
+--- revocation口令: new block vs exemplar ---
+21:// Revocation口令 for this label: give `:52`'s decisive reading a CI-reachable stand-in
+.scratch/wisp/issues/35-panel-bridge-c17.md:81:  - **(iv) `:52` 那一支的〔仅本机可量〕要写到**它自己的脸上****：按 `A691` 裁的是"明写＋逐波复跑"那一支，而四要素那句今天只活在票面与台账里，**`cmd/wisp/panel_transport_live_35v2_windows_test.go` 的文件头注释没有**（派单前自己现量：`grep -n '仅本机\|machine-local' cmd/wisp/panel_transport_live_35v2_windows_test.go`）。⇒ 同一句写进该文件头＋判决件两处，带撤销口令（先例形＝票 33 的 `docs/evidence/s1/33-panel-host-c27-r5.md:78`＋`cmd/wisp/panel_host_windows_test.go:6`）。
+.scratch/wisp/issues/35-panel-bridge-c17.md:323:**格 (iv)**＝尺 `grep -n '仅本机\|machine-local\|CI 永看不见' cmd/wisp/panel_transport_live_35v2_windows_test.go`：**改前 rc=1／枚数 0**（＝派单让本腿自己复现的那发，票面预言成立）→ **改后 rc=0／枚数 1**（第 3 行），四要素各命中 1 枚：①现象＝`:52` 那枚"页面自己发的 `chrome.webview.postMessage` 到不到 Go 门"的凭据只有本机能取（夹具的绿是在建模不是在测量）；②归谁＝**编排者**，⛔ 任何腿不许声称它在 CI 里复跑过（winlive 零 CI 岗位）；③复跑口径＝每波由编排者在桌面空出时起一发 `-tags winlive` 真窗**并同波跑一发控制组**，件名＋`rc` 逐波进 `.scratch/wisp/probes/35/**`；④代价＝⛔ CI 永远不会拦下"这条传输在真浏览器里坏掉"这类回归。撤销口令＝给 `:52` 的决定性读数一枚 CI 可达替身（改写此段、⛔ 不许删）。写法形先例＝`docs/evidence/s1/33-panel-host-c27-r5.md:78`。文件 261→282 行**全是注释**，`//go:build` 行与任何断言未动；⛔ 本腿没开过窗，因此不声称取过任何 winlive 读数。
+docs/evidence/s1/33-panel-host-c27-r5.md:78:- ⚠ 代价逐字写进文件与本判决：**`winlive` 在 CI 零岗位 ⇒ 这一支从此〔仅本机可量、CI 永看不见〕**；引用它的任何表必须带这句（撤销口令＝「33 退净断言回默认档」）。
+docs/evidence/s1/33-panel-host-c27-r5.md:163:5. **CI 那枚 windows cli 腿上有没有 WebView2 Runtime**。现量：未量（那是 `33-v2` 的格，票面 `:310` 逐字"判法＝读 `.github/workflows/ci.yml` 的 runner 标签＋那一步的命令"）。本腿新增的真窗用例**沿用既有默认档形状**（`//go:build windows`、起不来＝红不是 skip），所以这一格的暴露面**随本腿变大**（多几枚真窗用例）。⇒ 甲＝具名上报"我把默认档真窗用例从 N 枚涨到 M 枚"（读数在 §六件终态）；乙＝自己把它们搬进 `winlive`（⛔ 那是编排者的档级裁定，撤销口令都写好了的那一枚只有退净那一支归我）；本腿做**甲**。
+docs/evidence/s1/33-panel-host-c27-r5.md:182:3. §⑤ 第 27 条那处取舍（`Hide` 之后**保留** `prevFocus`、不清零）＝**产品形状微裁，归我**：我追认"保留＋把两枚 Win32 返回值取进可观察字段"这一形，⛔ 不升成断言；撤销点它已写明＝`PanelManager.Hide` 那段注释。撤销口令「**33 焦点清零改回**」。
+--- the ③ cadence names a control group: does ANY control-group rig exist? ---
+searching for a winlive control-group artifact...
+   fb2fb802 mentioned in: .scratch/wisp/issues/35-panel-bridge-c17.md
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/r1/impl.md
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/r2/impl.md
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/r2/start.md
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/r5/logs/before-35r2-fixture.copy
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/r5/logs/before-livedoc.copy
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/r5/logs/folded-prefix-copy
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/v1/logs/gitlog.txt
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/v1/start.md
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/v2/verdict.md
+   fb2fb802 mentioned in: .scratch/wisp/probes/35/v5/logs/before-fixture.copy
+   fb2fb802 mentioned in: cmd/wisp/panel_host_windows.go
+   fb2fb802 mentioned in: cmd/wisp/panel_transport_35r2_test.go
+   fb2fb802 mentioned in: cmd/wisp/panel_transport_live_35v2_windows_test.go
+   fb2fb802 mentioned in: docs/reports/pending-and-issues.md
+commit fb2fb802 exists? commit
+   (no control-group artifact under probes/35)
+   mentions: .scratch/wisp/probes/35/r5/impl.md
+   mentions: .scratch/wisp/probes/35/v2/verdict.md
+   mentions: cmd/wisp/panel_transport_live_35v2_windows_test.go
+--- is there any -tags winlive runner script in the repo? ---
+   runner: .scratch/wisp/probes/35/v4/scripts/countershape-v4.sh
+rc=0
