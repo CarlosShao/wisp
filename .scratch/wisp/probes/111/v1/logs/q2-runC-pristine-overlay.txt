@@ -1,0 +1,2 @@
+### RUN C (WITH tag, overlay -> PRISTINE copy: positive control that the red came from overlay content) ###
+rc_C=0

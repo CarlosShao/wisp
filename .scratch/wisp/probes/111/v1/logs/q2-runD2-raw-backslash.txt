@@ -1,0 +1,3 @@
+### RUN D2 (RAW single-backslash JSON, the shape the orchestrator described) ###
+go: parsing overlay JSON: invalid escape sequence `\w` in string
+rc_D2=1

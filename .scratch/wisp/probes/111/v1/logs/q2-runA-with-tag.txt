@@ -1,0 +1,5 @@
+### RUN A (WITH -tags winlive + mutant overlay) ###
+# github.com/CarlosShao/wisp/cmd/wisp
+# [github.com/CarlosShao/wisp/cmd/wisp]
+vet.exe: D:\tmp\wisp111v1\mutant.go:263:22: undefined: undefinedIdent111V1
+rc_A=1

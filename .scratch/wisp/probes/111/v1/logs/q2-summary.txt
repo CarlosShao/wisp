@@ -1,0 +1,10 @@
+Q2 SUMMARY (111-v1, my own breakage, all runs go vet -overlay, zero window opening)
+mutant: cmd/wisp/panel_transport_live_35v2_windows_test.go + trailing 'var wisp111v1Probe = undefinedIdent111V1'
+  (different file AND different package AND different error class than r6's ball/live_windows_test.go parse error)
+RUN A  -tags winlive + mutant overlay : rc=1  -> vet.exe: D:\tmp\wisp111v1\mutant.go:263:22: undefined: undefinedIdent111V1
+RUN B  NO -tags + same mutant overlay: rc=0  (mutant invisible = today's CI shape cannot see these 12)
+RUN C  -tags winlive + PRISTINE overlay: rc=0 (anti-no-op: red came from overlay CONTENT, not from overlay existing)
+RUN D  json.dumps-escaped backslash key paths: rc=1 SAME red -> escaped backslash paths WORK
+RUN D2 raw single-backslash JSON: rc=1 but 'go: parsing overlay JSON: invalid escape sequence' -> that is the real trap
+RESTORE: roster 12/12 identical, git hash-object 12/12 identical to pre-run baseline, git status cmd/wisp+internal/ball = 0 lines dirty, whole tree still 753 (others' in-flight untouched)
+NOTE red path form: 'D:\tmp\wisp111v1\mutant.go' (replacement file, backslashes) - normal Go output under -overlay, NOT a broken ruler
