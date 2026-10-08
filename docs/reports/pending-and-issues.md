@@ -14456,3 +14456,11 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - **判**：备料腿那两发**预判都对**（A 的 139/259 逐字命中；连带枚它自己在 §4.3 认了"未核"⇒ 未预判非错）；**新恒真面＝无** ⇒ 这两处守卫（store 成员扫描／state 卫）**今天有牙**，票 259 `AC#2` 那两发残余风险从此有实测凭据（不再只是预判）。
 - ⚠ **我派单 PATH 第二例（自纠）**：这次写的 `$PWD/../../third_party/...` 从 `internal/agent/approval` 数**少一层**（`internal/third_party` 不存在），它实按**三级** `$PWD/../../../third_party/sherpa-onnx` 跑通。⇒ 连同今晚早先那例（`third_party/onnxruntime` **不存在**、DLL 全在 `sherpa-onnx/`）记一条定式：**派单里的 PATH 只写 `$PWD/…/third_party/sherpa-onnx` 一枚、层数按"被跑测试所在包目录"现数**，⛔ 不并列不存在的目录、⛔ 不照抄上一个包的层数。
 - 编队：在飞＝`242-corrcensus-1`（只读普查）。⛔ 零翻框、零 push。
+
+## A745｜2026-10-08 19:4x｜收 **`242-corrcensus-1`**（correlation 语义与读者普查）＋**我裁方向：产码默认应改**（附四条边界）＋下一波落地腿排定
+
+- 交件＝`9ae812d6`（锚）／`0e0ac7b9`（四枚件）。**我核三处**：`internal/agent/loop.go:363` 逐字 `j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id` ✓；`internal/tools/loop_approval_test.go:213-214` 逐字 `if r.CorrelationID == "" || r.CorrelationID != res.TaskID { … want the task id %q (C18) }`（**唯一一处把"等值"写成断言**）✓；`CorrelationID: taskID` 在 `*_test.go` 恰 3 命中（`pointer_183…:127`／`pointer_185…:120`／`ticket175r2…:95`）✓。
+- **它交的读数（采，⛔ C18 原文那半标〔仅腿报〕）**：C18 定义＝`correlationId` 是**审批队列每项字段＋答复路由键**、"与所属任务标识**并列、未要求同值**"（`docs/PLAN.md:1368`；旁证 `SPEC-06:106`）；**决定行为读点 29 处**（`tools/bridge.go` 5／`approval/gate.go` 10／`queue.go` 3／`replies.go` 5／`subagent_197.go` 1／`task.go` 1／`subagent_roster_197.go` 2／`resident_approval_windows.go` 4／`run.go` 1／`models.go` 1／`report.go` 1）／只进审计日志 13／只做标识 45；**其它产码赋值点 22 组**（新造 12＋誊抄 10），关键＝`loop.go:363` 的 journal 也两值同源。
+- ★**裁定（方向＝应改，附四条边界）**：产码默认**应**改为"**每次工具调用铸一枚独立 correlation id**（形状沿用现有 id；任务级溯源仍走 taskID）"。依据＝①C18 未要求同值（`PLAN.md:1368` 读法）；②`approval/queue.go:163` 那枚 corr 是**队列主键** ⇒ 同任务并发两张卡会**塌成一枚**（正是票 242 `AC#1` 要防的形状）。**边界**：⛔ 不动 C1–C32 任何契约文本；⛔ **不许**为了变绿去放宽 `loop_approval_test.go:213-214` 那枚断言——那格是"钉子本身要不要重判"，落地时须**具名重判**（要么改成"corr 非空且能路由回本任务"，要么让新铸形不经过它）；⛔ `loop.go:363` 那句 `// C18: correlation == task id` 属"**引用与原文不符**"候选，落地同批重判；⛔ 三枚 `CorrelationID: taskID` 测试构造点按各自上下文重判（⛔ 不批量改）。**撤销口令＝「撤 242 改 corr 方向」**。
+- **下一波**：`242-corrland-1`（写腿：铸 id 形＋那枚钉子与注释的具名重判＋**新用例**"同一任务并发两问 ⇒ 两枚 corr 不同且各自可路由"）；落地后交**非实现者**验收（本普查件不算验收凭据）。⛔ owner 不必拍板（内部路由 id、契约文本不动）。
+- 编队：在飞＝0 枚（本波全交）。⛔ 零翻框、零 push。
