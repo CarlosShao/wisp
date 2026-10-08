@@ -1,0 +1,11 @@
+time=2026-10-08T11:25:10.790+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTicket255r1ShowOnAnExistingWindowSendsTheResize (0.00s)
+    panel_reshow_255r1_windows_test.go:306: Show on an existing window sent 0 resize(s), want exactly 1: []
+--- FAIL: TestTicket255r1ShowAsksForGeometryOnlyOnTheReshowBranch (0.00s)
+    panel_reshow_255r1_windows_test.go:381: the `if !created` branch calls requestGeometryOnReshow 1 time(s), want 0: a cold Show already sizes the window at create
+    panel_reshow_255r1_windows_test.go:384: the already-created branch calls requestGeometryOnReshow 0 time(s), want exactly 1 - that call IS AC#4's 甲形 on a live window
+    panel_reshow_255r1_windows_test.go:387: the re-show branch does not run requestGeometryOnReshow as an unconditional statement, so whether a given show asks is hidden behind a condition this file cannot see
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.069s
+FAIL
+mutC_rc=1

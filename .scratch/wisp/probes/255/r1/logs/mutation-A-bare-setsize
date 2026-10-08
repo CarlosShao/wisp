@@ -1,0 +1,26 @@
+time=2026-10-08T11:24:36.147+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch (0.00s)
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/the_configured_pair_goes_out_as_it_stands (0.00s)
+        panel_reshow_255r1_windows_test.go:262: 1 SetSize call(s) went out WITHOUT Dispatch: [{width:517 height:331 hint:0 insideDispatch:false}] - the repository holds no measurement of a cross-thread SetWindowPos on a WebView2 window (255-a2 says so by name), so the resize has to ride the library's own thread hop
+        panel_reshow_255r1_windows_test.go:265: the re-show sent 0 SetSize request(s) through Dispatch, want exactly 1: []
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/height_0_keeps_the_host's_260,_the_same_rule_the_create_uses (0.00s)
+        panel_reshow_255r1_windows_test.go:262: 1 SetSize call(s) went out WITHOUT Dispatch: [{width:640 height:260 hint:0 insideDispatch:false}] - the repository holds no measurement of a cross-thread SetWindowPos on a WebView2 window (255-a2 says so by name), so the resize has to ride the library's own thread hop
+        panel_reshow_255r1_windows_test.go:265: the re-show sent 0 SetSize request(s) through Dispatch, want exactly 1: []
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/width_0_falls_back_to_the_host_constant,_not_to_a_guess (0.00s)
+        panel_reshow_255r1_windows_test.go:262: 1 SetSize call(s) went out WITHOUT Dispatch: [{width:420 height:400 hint:0 insideDispatch:false}] - the repository holds no measurement of a cross-thread SetWindowPos on a WebView2 window (255-a2 says so by name), so the resize has to ride the library's own thread hop
+        panel_reshow_255r1_windows_test.go:265: the re-show sent 0 SetSize request(s) through Dispatch, want exactly 1: []
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/an_unreadable_config_answers_the_host_constants (0.00s)
+        panel_reshow_255r1_windows_test.go:262: 1 SetSize call(s) went out WITHOUT Dispatch: [{width:420 height:260 hint:0 insideDispatch:false}] - the repository holds no measurement of a cross-thread SetWindowPos on a WebView2 window (255-a2 says so by name), so the resize has to ride the library's own thread hop
+        panel_reshow_255r1_windows_test.go:265: the re-show sent 0 SetSize request(s) through Dispatch, want exactly 1: []
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/a_negative_answer_resolves_the_way_the_create_resolves_it (0.00s)
+        panel_reshow_255r1_windows_test.go:262: 1 SetSize call(s) went out WITHOUT Dispatch: [{width:420 height:260 hint:0 insideDispatch:false}] - the repository holds no measurement of a cross-thread SetWindowPos on a WebView2 window (255-a2 says so by name), so the resize has to ride the library's own thread hop
+        panel_reshow_255r1_windows_test.go:265: the re-show sent 0 SetSize request(s) through Dispatch, want exactly 1: []
+--- FAIL: TestTicket255r1ShowOnAnExistingWindowSendsTheResize (0.00s)
+    panel_reshow_255r1_windows_test.go:303: Show sent 1 resize(s) outside Dispatch: [{width:517 height:331 hint:0 insideDispatch:false}]
+    panel_reshow_255r1_windows_test.go:306: Show on an existing window sent 0 resize(s), want exactly 1: []
+--- FAIL: TestTicket255r1HostResizeCallSiteAsksForHintNoneAndIsTheOnlyOne (0.00s)
+    panel_reshow_255r1_windows_test.go:417: requestGeometryOnReshow does not post its SetSize from inside a Dispatch closure: 票 255-a2 recorded NO credential for a cross-thread SetWindowPos, and this file must not promote common sense to a measurement
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.070s
+FAIL
+mutA_rc=1

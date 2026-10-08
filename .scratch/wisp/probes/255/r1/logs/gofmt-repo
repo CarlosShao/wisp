@@ -1,0 +1,10 @@
+cmd\wisp\models.go
+cmd\wisp\panel_inbound_guards_35r3_test.go
+cmd\wisp\panel_transport_35r2_test.go
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\panel\inbound_raw_leak_35r7_test.go:270:85: raw string literal not terminated
+internal\panel\inbound_raw_leak_35r7_test.go:277:3: missing ',' before newline in argument list
+internal\risk\provenance.go
+internal\tools\bridge.go
+gofmtrc=2

@@ -1,0 +1,20 @@
+time=2026-10-08T11:24:52.374+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch (0.00s)
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/the_configured_pair_goes_out_as_it_stands (0.00s)
+        panel_reshow_255r1_windows_test.go:279: the resize went out with hint 1, want webview2.HintNone (0): HintFixed would clear WSThickFrame/WSMaximizeBox and take away the user's ability to drag the window edge, which 票 255 does not own
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/height_0_keeps_the_host's_260,_the_same_rule_the_create_uses (0.00s)
+        panel_reshow_255r1_windows_test.go:279: the resize went out with hint 1, want webview2.HintNone (0): HintFixed would clear WSThickFrame/WSMaximizeBox and take away the user's ability to drag the window edge, which 票 255 does not own
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/width_0_falls_back_to_the_host_constant,_not_to_a_guess (0.00s)
+        panel_reshow_255r1_windows_test.go:279: the resize went out with hint 1, want webview2.HintNone (0): HintFixed would clear WSThickFrame/WSMaximizeBox and take away the user's ability to drag the window edge, which 票 255 does not own
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/an_unreadable_config_answers_the_host_constants (0.00s)
+        panel_reshow_255r1_windows_test.go:279: the resize went out with hint 1, want webview2.HintNone (0): HintFixed would clear WSThickFrame/WSMaximizeBox and take away the user's ability to drag the window edge, which 票 255 does not own
+    --- FAIL: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/a_negative_answer_resolves_the_way_the_create_resolves_it (0.00s)
+        panel_reshow_255r1_windows_test.go:279: the resize went out with hint 1, want webview2.HintNone (0): HintFixed would clear WSThickFrame/WSMaximizeBox and take away the user's ability to drag the window edge, which 票 255 does not own
+--- FAIL: TestTicket255r1ShowOnAnExistingWindowSendsTheResize (0.00s)
+    panel_reshow_255r1_windows_test.go:309: Show asked for {width:517 height:331 hint:1 insideDispatch:true}, want 517x331 under webview2.HintNone
+--- FAIL: TestTicket255r1HostResizeCallSiteAsksForHintNoneAndIsTheOnlyOne (0.00s)
+    panel_reshow_255r1_windows_test.go:412: the resize is posted with hint webview2.HintFixed, want webview2.HintNone - HintFixed would clear WSThickFrame/WSMaximizeBox and switch off the user dragging the window edge, which is an interface behaviour change outside 票 255
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.063s
+FAIL
+mutB_rc=1

@@ -1,0 +1,5 @@
+cmd/wisp/models.go anchor_unformatted=0
+cmd/wisp/panel_inbound_guards_35r3_test.go anchor_unformatted=1
+.scratch/wisp/probes/255/r1/logs/gofmt-anchor-check/panel_inbound_guards_35r5_test.go.anchor:1:1: expected 'package', found 'EOF'
+cmd/wisp/panel_inbound_guards_35r5_test.go anchor_unformatted=0
+rc=0
