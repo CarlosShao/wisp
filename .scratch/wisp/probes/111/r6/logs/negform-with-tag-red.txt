@@ -1,0 +1,4 @@
+== ⓑ shot (i): WITH -tags winlive + overlay (broken winlive file) => gate command must go RED ==
+date: Thu Oct  8 09:01:52 CST 2026
+internal\ball\live_windows_test.go:691:1: expected declaration, found this
+rc=1

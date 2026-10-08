@@ -1,0 +1,5 @@
+== ⓑ shot (ii): overlay applied but WITHOUT the winlive tag (== the shape today's CI compiles these pkgs in) => corruption must be INVISIBLE, rc=0 ==
+date: Thu Oct  8 09:02:02 CST 2026
+note: on GOOS=windows the file is gated by 'windows && winlive'; with no -tags winlive it is excluded from the build, so go vet never parses the broken bytes.
+--- run the plain (no-tag) vet over the same two packages, same overlay ---
+rc=0

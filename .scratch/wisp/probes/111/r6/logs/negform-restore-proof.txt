@@ -1,0 +1,11 @@
+== ⓑ restore self-proof: tracked files were never touched (overlay only) ==
+date: Thu Oct  8 09:02:15 CST 2026
+--- baseline hash lines (from anchor roster-sha.txt) ---
+--- now: re-hash the 12 winlive files ---
+baseline count: 12
+now count:      12
+--- diff baseline vs now (empty == identical) ---
+diff_rc=0
+--- git status --porcelain on cmd/wisp and internal/ball (expect empty = no tracked edit) ---
+status_rc=0 (empty output above == clean)
+rc=0
