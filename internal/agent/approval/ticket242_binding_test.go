@@ -208,9 +208,3 @@ func TestTicket242BindDigestSeparatesItemsBySequenceNumber(t *testing.T) {
 		t.Fatal("AC#1 RED: two bind digests identical in every field except the sequence number came out equal - seq is not folded into bindDigest, so a replayed correlation id can land on the earlier card's digest")
 	}
 }
-
-// sameDigest keeps the failure message honest when bindDigest's encoding
-// changes shape: the assertion is identity coverage, not a hex spelling.
-func sameDigest(a, b string) bool {
-	return a == b
-}
