@@ -1,0 +1,29 @@
+=== zero production-code change (self-proof) (2026-10-08 09:36:35+0800) ===
+git diff --numstat daf1f5a0 -- cmd/wisp/panel_host_windows.go  ->  [expect NO output]
+numstat-rc=0 (rc 0 with empty output = that file has no line changed)
+prod blob now=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 at-daf1f5a0=26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+changed tracked files on this leg:
+cmd/wisp/panel_transport_35r2_test.go
+cmd/wisp/panel_transport_live_35v2_windows_test.go
+full name-status of everything 35-r5 stages (must be only the fixture, the winlive doc and probes/35/r5):
+ M cmd/wisp/panel_transport_35r2_test.go
+ M cmd/wisp/panel_transport_live_35v2_windows_test.go
+?? .scratch/wisp/probes/35/r5/logs/after-ii.txt
+?? .scratch/wisp/probes/35/r5/logs/after-iii.txt
+?? .scratch/wisp/probes/35/r5/logs/after-iv.txt
+?? .scratch/wisp/probes/35/r5/logs/before-35r2-fixture.copy
+?? .scratch/wisp/probes/35/r5/logs/before-livedoc.copy
+?? .scratch/wisp/probes/35/r5/logs/countershape-summary.txt
+?? .scratch/wisp/probes/35/r5/logs/folded-prefix-copy
+?? .scratch/wisp/probes/35/r5/logs/mutant-landing.txt
+?? .scratch/wisp/probes/35/r5/logs/repo-untouched.txt
+?? .scratch/wisp/probes/35/r5/logs/run-a-pristine.txt
+?? .scratch/wisp/probes/35/r5/logs/run-b-truthy-new.txt
+?? .scratch/wisp/probes/35/r5/logs/run-c-truthy-old.txt
+?? .scratch/wisp/probes/35/r5/logs/run-d-typeofgone-new.txt
+?? .scratch/wisp/probes/35/r5/logs/run-z-compile-probe.txt
+?? .scratch/wisp/probes/35/r5/logs/scope-diff-ii.txt
+?? .scratch/wisp/probes/35/r5/logs/zero-prod-change.txt
+?? .scratch/wisp/probes/35/r5/scripts/after-rulers.sh
+?? .scratch/wisp/probes/35/r5/scripts/countershape-35r5.sh
+rc=0

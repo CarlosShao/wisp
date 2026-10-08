@@ -1,0 +1,8 @@
+=== repo untouched by all overlays (2026-10-08 09:36:57+0800) ===
+prod before=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 after=26b5de83b93a9a141f1546dc19a9b03ffa45ede0 HEAD=26b5de83b93a9a141f1546dc19a9b03ffa45ede0
+fix  before=a466b4ed49420561d65d22ff7e30d4dc0f6ae571  after=a466b4ed49420561d65d22ff7e30d4dc0f6ae571
+prod-untouched-by-overlays=YES
+fix-untouched-by-overlays=YES
+prod-vs-daf1f5a0 diff line count (expect 0, zero production changes this leg):
+numstat-rc=0
+rc=0

@@ -1,0 +1,22 @@
+=== 35-r5 gates (2026-10-08 09:38:36+0800) HEAD=099d8fe6 ===
+--- gate 1: go vet, CWD=cmd/wisp, sherpa dlls on PATH; log body=/d/tmp/wisp35r5/gate-vet.log (go vet prints NOTHING when clean, so a 0-byte body is the PASS shape) ---
+vet log byte-size=0  content-if-any:
+vet-rc=0 (measured live in the same call that ran it; reproduced here: )
+vet-rc-recheck=0
+--- gate 2: d22scan (independent module: cd tools/d22scan && go run . -root ../../) ---
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 266 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 228 production Go files
+d22scan: scope bans #1-5 cmd/           examined  38 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 514 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 108 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=228, bans #1-5 cmd/=38, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=514, ban #8 cmd/=108; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 514 Go files, comments and _test.go included; cmd/ 108 Go files, comments and _test.go included
+d22scan-rc=0
+--- gate 3: gofmt -l on the two touched files ---
+cmd/wisp/panel_transport_35r2_test.go
+gofmt-rc=0 ; listed-file-count=1 = cmd/wisp/panel_transport_35r2_test.go, and that drift is PRE-EXISTING (daf1f5a0 blob is listed too: before-listed=1 after-listed=1, hunk = jsParser peek/next alignment, 4 lines). Not fixed here: it is not this leg's line.
+gofmt-rc=0

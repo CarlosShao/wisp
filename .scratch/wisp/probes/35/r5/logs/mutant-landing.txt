@@ -1,0 +1,22 @@
+=== mutant landing (2026-10-08 09:36:28+0800): changed-line-count must be 2 (= one line replaced), oldfixture must differ only by 35-r5's edit ===
+mutant z-compile-probe changed-line-count=2
+< var panelPostMessageForwardInit = fmt.Sprintf(`(function () {
+> var panelPostMessageForwardInit = fmt(((syntax error.Sprintf(`(function () {
+mutant a-pristine changed-line-count=0
+mutant b-truthy changed-line-count=2
+<     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+>     if (inside || !window.%[1]s) { return native.call(cw, message); }
+mutant d-typeofgone changed-line-count=2
+<     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+>     if (inside) { return native.call(cw, message); }
+oldfixture changed-line-count=116 (the AC#8(i) case this leg added, reversed out)
+guard line in each mutant:
+-- /d/tmp/wisp35r5/mut/broken-panel_host_windows.go
+680:    if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+-- /d/tmp/wisp35r5/mut/pristine-panel_host_windows.go
+680:    if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+-- /d/tmp/wisp35r5/mut/truthy-panel_host_windows.go
+680:    if (inside || !window.%[1]s) { return native.call(cw, message); }
+-- /d/tmp/wisp35r5/mut/typeofgone-panel_host_windows.go
+(no such line)
+rc=0

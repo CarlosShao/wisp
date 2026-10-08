@@ -1,0 +1,13 @@
+=== run z-compile-probe (2026-10-08 09:36:29+0800) overlay=/d/tmp/wisp35r5/overlay-z-compile-probe.json ===
+{"Replace":{"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go":"D:/tmp/wisp35r5/mut/broken-panel_host_windows.go"}}
+--- CWD=/d/work/workspace/projects plans/Wisp/cmd/wisp, sherpa-onnx dlls on PATH (load-time requirement) ---
+buildrc=1
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+D:\tmp\wisp35r5\mut\broken-panel_host_windows.go:673:48: syntax error: unexpected name error, expected )
+D:\tmp\wisp35r5\mut\broken-panel_host_windows.go:684:30: syntax error: unexpected newline, expected )
+D:\tmp\wisp35r5\mut\broken-panel_host_windows.go:693:1: syntax error: unexpected keyword func in argument list; possibly missing comma or )
+D:\tmp\wisp35r5\mut\broken-panel_host_windows.go:694:65: syntax error: unexpected {, expected (
+D:\tmp\wisp35r5\mut\broken-panel_host_windows.go:695:12: syntax error: unexpected := in parameter list; possibly missing comma or )
+D:\tmp\wisp35r5\mut\broken-panel_host_windows.go:696:3: syntax error: non-declaration statement outside function body
+(no test binary produced - build failed on purpose for z-compile-probe)
+runrc=n/a

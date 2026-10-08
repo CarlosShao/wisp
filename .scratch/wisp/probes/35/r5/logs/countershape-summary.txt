@@ -1,0 +1,21 @@
+=== z-compile-probe ===
+(no FAIL line)
+counts: PASS=0 FAIL=0 SKIP=0 buildrc=1 runrc=n/a 
+red-sentence prefixes seen: 
+=== a-pristine ===
+(no FAIL line)
+counts: PASS=10 FAIL=0 SKIP=0 buildrc=0 runrc=0 
+red-sentence prefixes seen: 
+=== b-truthy-new ===
+--- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+counts: PASS=9 FAIL=1 SKIP=0 buildrc=0 runrc=1 
+red-sentence prefixes seen:       1 M-B3 RED;
+=== c-truthy-old ===
+(no FAIL line)
+counts: PASS=9 FAIL=0 SKIP=0 buildrc=0 runrc=0 
+red-sentence prefixes seen: 
+=== d-typeofgone-new ===
+--- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+--- FAIL: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+counts: PASS=8 FAIL=2 SKIP=0 buildrc=0 runrc=1 
+red-sentence prefixes seen:       1 M-B2 RED;      1 M-B3 RED;

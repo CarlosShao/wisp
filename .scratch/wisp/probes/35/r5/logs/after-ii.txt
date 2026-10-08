@@ -1,0 +1,34 @@
+=== (ii) shared red-sentence prefix, before vs after (2026-10-08 09:36:33+0800) ===
+BEFORE (daf1f5a0 blob): 'M-B RED'=6  [ruler asked for 6]
+AFTER  (working copy) : 'M-B RED'=0  [want 0]
+AFTER per-face token counts: M-B1=9 M-B2=5 M-B3=9
+AFTER 'M-B RED'-family line map (prefix -> which case owns it):
+1986:		t.Fatalf("M-B1 RED (wrong death): a non-writable chrome.webview.postMessage must refuse the hook's assignment SILENTLY (sloppy mode, no TypeError), but the page's own post threw: %s. %s",
+1990:		t.Fatalf("M-B1 RED (fixture blind to writability): the hook's assignment to a property this world marks NON-WRITABLE took effect unnoticed - ignoredWrites=%v, want exactly [postMessage]. This is the A684 §3 face this case exists to make bite: without a refused write the yard cannot tell an armed hook from a silently ignored override. %s",
+1994:		t.Fatalf("M-B1 READING WRONG: the page's letter must still leave through the untouched native exit exactly once (and with its receiver): got nativeExitCalls=%d receiverLost=%d. %s",
+1998:		t.Fatalf("M-B1 RED: with the native exit NOT writable the page's letter still reached the Go door (doorRounds=%d routerRuns=%d) - the model let a silently refused override behave like a successful hook. %s",
+2002:		t.Fatalf("M-B1 RED: an unarmed forwarding must leave the raw envelope to die at msgcb's unbound-method branch (unboundSlots=1, swallowed reply TypeError=1), got unboundSlots=%d evalThrew=%d. %s",
+2006:		t.Fatalf("M-B1 READING WRONG: want the page's envelope to reach the native exit UNFORWARDED exactly once, got %v", bf.nativeFrames)
+2011:		t.Fatalf("M-B1 CONTROL RED: the same shipped hook in a writable world threw: %s. %s", thrown2, bf2.summary())
+2014:		t.Fatalf("M-B1 CONTROL RED: the writable world refused %d assignment(s) (%v) - the台件 is not selecting on writability. %s",
+2018:	t.Logf("M-B1 face has teeth: non-writable world refused the hook (doorRounds=0, unboundSlots=1), writable world armed it (doorRounds=%d)", bf2.doorRounds)
+2054:		t.Fatalf("M-B2 RED (guard's typeof half gone): with no door in the page the forwarding hook must fall back to the native exit; it instead invoked a non-function and the page's post threw: %s. %s",
+2058:		t.Fatalf("M-B2 RED: the door-absent fallback re-entered chrome.webview.postMessage past the cap (%s). %s", bf.firstCapMessage(), bf.summary())
+2061:		t.Fatalf("M-B2 READING WRONG: the fallback must reach the native exit exactly once, with its receiver: nativeExitCalls=%d receiverOK=%d receiverLost=%d. %s",
+2065:		t.Fatalf("M-B2 READING WRONG: the door-absent fallback must forward the page's bytes untouched, got %v", bf.nativeFrames)
+2068:		t.Fatalf("M-B2 READING WRONG: an absent door must leave the envelope dead at msgcb's unbound branch (doorRounds=0 routerRuns=0 unboundSlots=1 evalThrew=1), got doorRounds=%d routerRuns=%d unboundSlots=%d evalThrew=%d. %s",
+2111:		t.Fatalf("M-B3 CALIBRATION RED: this world must hold the door name %q so the guard has a value to test; the page has none, which is the :2026 door-absent face, not AC#8(i)'s.", panelDispatchBinding)
+2114:		t.Fatalf("M-B3 CALIBRATION RED: the Bind stub did not put a function behind %q, so the台件 never had a callable door to make uncallable (got %s).", panelDispatchBinding, jsTypeOf(bf.window.props[panelDispatchBinding]))
+2118:		t.Fatalf("M-B3 CALIBRATION RED: the台件 was supposed to leave a TRUTHY NON-FUNCTION in the page, got typeof window.%s == %s.", panelDispatchBinding, got)
+2123:		t.Fatalf("M-B3 RED (guard reduced to a truthiness test): a door that is present but NOT callable must still fall back to the native exit; this hook invoked window.%s anyway and the page's post threw: %s. %s",
+2127:		t.Fatalf("M-B3 RED: the not-callable-door fallback re-entered chrome.webview.postMessage past the cap (%s). %s", bf.firstCapMessage(), bf.summary())
+2130:		t.Fatalf("M-B3 READING WRONG: the fallback must reach the native exit exactly once, with its receiver: nativeExitCalls=%d receiverOK=%d receiverLost=%d. %s",
+2134:		t.Fatalf("M-B3 READING WRONG: a present-but-uncallable door must still forward the page's bytes untouched, got %v", bf.nativeFrames)
+2137:		t.Fatalf("M-B3 READING WRONG: an uncallable door must leave the envelope dead at msgcb's unbound branch (doorRounds=0 routerRuns=0 unboundSlots=1 evalThrew=1), got doorRounds=%d routerRuns=%d unboundSlots=%d evalThrew=%d. %s",
+2140:	t.Logf("M-B3 face has teeth: door present as typeof===%q, guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=%d, no throw)",
+--- SCOPE PROOF: fold M-B1/M-B2/M-B3 back to M-B, diff vs the before blob. Expect ONLY
+    the AC#8(i) addition and the AC#8(iii) wording changes, nothing else. ---
+scope-diff changed-line-count=88 (lines: (i) case added + (iii) three claims)
+assertion-strength sanity: t.Fatalf count before=47 after=56
+test-func count before=8 after=9
+rc=0

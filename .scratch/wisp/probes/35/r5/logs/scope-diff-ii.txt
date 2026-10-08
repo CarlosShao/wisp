@@ -1,0 +1,95 @@
+1284,1286c1284,1291
+< 	// A browser's host method is not a detached function: Chrome and WebView2 answer an
+< 	// invocation that lost its receiver with "TypeError: Illegal invocation", so the stub
+< 	// now requires cw itself (identity, not type) as the receiver and says so by name.
+---
+> 	// A browser's host method is not a detached function: Chrome and WebView2 are reported
+> 	// to answer an invocation that lost its receiver with "TypeError: Illegal invocation".
+> 	// THIS RULER CANNOT PRODUCE THAT CREDENTIAL (ticket 35 AC#8(iii)) - it is a hand-written
+> 	// interpreter, so the behaviour recorded below is THIS FIXTURE'S OWN ANSWER, modelled
+> 	// after Chrome/WebView2 and never offered as a WebView2 behaviour record: the stub
+> 	// requires cw itself (identity, not type) as the receiver and says so by name. The only
+> 	// real-window reading of this edge lives in
+> 	// cmd/wisp/panel_transport_live_35v2_windows_test.go, which is 〔仅本机可量〕.
+1939,1940c1944,1946
+< // now demands cw itself, the way a browser's host method does, so the receiver-less shape
+< // dies here by name instead of passing silently.
+---
+> // now demands cw itself - the rule THIS FIXTURE answers with, modelled after what Chrome
+> // and WebView2 are reported to do (this yard never observes a browser; AC#8(iii)) - so the
+> // receiver-less shape dies here by name instead of passing silently.
+1954c1960
+< 		t.Fatalf("M-A RED (receiver lost at the native exit): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. A real browser answers that with Illegal invocation and the page's letter never leaves the page, so this hook must not be certified as a delivery. %s",
+---
+> 		t.Fatalf("M-A RED (receiver lost at the native exit): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. THIS FIXTURE answers that with Illegal invocation - modelled after what Chrome and WebView2 are reported to do, NOT a WebView2 behaviour record (AC#8(iii); the real-window reading is the 〔仅本机可量〕 winlive rig) - and on that model the page's letter never leaves the page, so this hook must not be certified as a delivery. %s",
+2065a2072,2141
+> }
+> 
+> // TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable is ticket 35 AC#8(i),
+> // the face `35-v4` measured as a REAL tautology (恒绿): replacing the shipped guard's
+> // typeof half (cmd/wisp/panel_host_windows.go:680, expanded as
+> // typeof window.wispDispatch !== "function") with the truthiness test !window.wispDispatch
+> // left all twelve cases green - reading .scratch/wisp/probes/35/v4/logs/run-v-guard-truthy.txt.
+> // The two branches only diverge in a world where the door NAME exists but holds something
+> // uncallable, and this yard had no such world: the door's only construction point is the
+> // library's Bind stub (:1229 -> libBindStubScript35r2 at :97), which injects a function.
+> // So the case that documents itself as guarding "not call a non-function" (:2019-2021 above)
+> // had only ever proved the undefined half of that sentence.
+> //
+> // THE WORLD: window.wispDispatch is a TRUTHY NON-FUNCTION (a string). Staged Go-side, the
+> // same way 35-r4 stages the writability world with markNonWritable (:149) - deliberately not
+> // as a JS Object method: Object.defineProperty stays invisible to this interpreter (named in
+> // the r4 un-modelled list), and AC#8(i) asks for no descriptor. The guard reads
+> // window.<binding> at POST time rather than at hook-install time, so overwriting the property
+> // between openDocument and pagePost is the whole world this face needs.
+> //
+> // TOOTH: overlay-replacing the guard's typeof half with the truthiness test makes this case
+> // the ONLY red one in the family - the wrapper reaches window.wispDispatch, the interpreter
+> // answers a string invocation with "TypeError: string is not a function", and the case
+> // reports it by name. Under the shipped guard it is green. Both readings are in
+> // .scratch/wisp/probes/35/r5/logs.
+> func TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable(t *testing.T) {
+> 	spy := &modeSpy35r1{}
+> 	disp := &panel.ComposerDispatch{Mode: spy}
+> 	mgr := NewPanelManager(disp, nil, "")
+> 	bf := newFakeDoc35r2()
+> 	if err := mgr.installPanelTransport(bf, context.Background()); err != nil {
+> 		t.Fatalf("installPanelTransport failed: %v", err)
+> 	}
+> 	bf.openDocument()
+> 
+> 	// Calibration first: this face is only this face if the door NAME is there. Without
+> 	// this check the台件 could silently degrade into the :2026 world and re-green the same
+> 	// mutant that face already reddens.
+> 	if !bf.window.has(panelDispatchBinding) {
+> 		t.Fatalf("M-B CALIBRATION RED: this world must hold the door name %q so the guard has a value to test; the page has none, which is the :2026 door-absent face, not AC#8(i)'s.", panelDispatchBinding)
+> 	}
+> 	if _, isFunction := bf.window.props[panelDispatchBinding].(*jsFunction); !isFunction {
+> 		t.Fatalf("M-B CALIBRATION RED: the Bind stub did not put a function behind %q, so the台件 never had a callable door to make uncallable (got %s).", panelDispatchBinding, jsTypeOf(bf.window.props[panelDispatchBinding]))
+> 	}
+> 	bf.window.set(panelDispatchBinding, "not-a-function")
+> 	if got := jsTypeOf(bf.window.props[panelDispatchBinding]); got == "undefined" || got == "function" {
+> 		t.Fatalf("M-B CALIBRATION RED: the台件 was supposed to leave a TRUTHY NON-FUNCTION in the page, got typeof window.%s == %s.", panelDispatchBinding, got)
+> 	}
+> 
+> 	thrown := bf.pagePost(pageModeRequestEnvelope)
+> 	if thrown != "" {
+> 		t.Fatalf("M-B RED (guard reduced to a truthiness test): a door that is present but NOT callable must still fall back to the native exit; this hook invoked window.%s anyway and the page's post threw: %s. %s",
+> 			panelDispatchBinding, thrown, bf.summary())
+> 	}
+> 	if bf.capTripped {
+> 		t.Fatalf("M-B RED: the not-callable-door fallback re-entered chrome.webview.postMessage past the cap (%s). %s", bf.firstCapMessage(), bf.summary())
+> 	}
+> 	if bf.nativeCalls != 1 || bf.nativeExitReceiverOK != 1 || bf.nativeReceiverMismatch != 0 {
+> 		t.Fatalf("M-B READING WRONG: the fallback must reach the native exit exactly once, with its receiver: nativeExitCalls=%d receiverOK=%d receiverLost=%d. %s",
+> 			bf.nativeCalls, bf.nativeExitReceiverOK, bf.nativeReceiverMismatch, bf.summary())
+> 	}
+> 	if len(bf.nativeFrames) != 1 || bf.nativeFrames[0] != pageModeRequestEnvelope {
+> 		t.Fatalf("M-B READING WRONG: a present-but-uncallable door must still forward the page's bytes untouched, got %v", bf.nativeFrames)
+> 	}
+> 	if bf.doorRounds != 0 || len(spy.reqs) != 0 || bf.deadSlots != 1 || bf.evalThrew != 1 {
+> 		t.Fatalf("M-B READING WRONG: an uncallable door must leave the envelope dead at msgcb's unbound branch (doorRounds=0 routerRuns=0 unboundSlots=1 evalThrew=1), got doorRounds=%d routerRuns=%d unboundSlots=%d evalThrew=%d. %s",
+> 			bf.doorRounds, len(spy.reqs), bf.deadSlots, bf.evalThrew, bf.summary())
+> 	}
+> 	t.Logf("M-B face has teeth: door present as typeof===%q, guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=%d, no throw)",
+> 		jsTypeOf(bf.window.props[panelDispatchBinding]), len(bf.nativeFrames))

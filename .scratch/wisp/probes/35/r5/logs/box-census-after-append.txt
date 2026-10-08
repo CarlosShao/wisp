@@ -1,0 +1,10 @@
+=== box census AFTER 35-r5's append (2026-10-08 09:42:05+0800) ===
+unchecked=8  checked=2   [want 8 / 2, same as before the append]
+AC#8 box still unchecked at line: 77
+file length: before-append=300 after-append=327 (append-only: the 5 previous paragraphs must still be byte-identical)
+--- append-only proof: diff of the ticket vs its daf1f5a0 blob must show ONLY added lines ---
+27	0	.scratch/wisp/issues/35-panel-bridge-c17.md
+removed-line-count=0
+added-line-count=16
+checkbox-token introduced by the append (want 0): 0
+rc=0

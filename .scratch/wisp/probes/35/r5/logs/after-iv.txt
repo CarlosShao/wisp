@@ -1,0 +1,16 @@
+=== (iv) the 〔仅本机可量〕 label on its own file, before vs after (2026-10-08 09:36:34+0800) ===
+--- BEFORE (daf1f5a0 blob) : the family grep the ticket said to re-measure ---
+before-grep-rc=1 [1 = zero hits, as AC#8(iv) predicted]
+before-count=0
+--- AFTER (working copy) ---
+3:// 〔仅本机可量、CI 永看不见〕 - ticket 35 AC#8(iv) (ledger A692), written onto THIS file's
+after-grep-rc=0
+after-count=1
+--- four elements present in the header block? ---
+① WHAT IS MACHINE-LOCAL -> 1 hit(s)
+② WHO OWNS IT -> 1 hit(s)
+③ RE-RUN CADENCE -> 1 hit(s)
+④ THE PRICE PAID -> 1 hit(s)
+orchestrator-owner=1  probes-35-cadence=1  revocation=1
+file length before=261 after=282
+rc=0

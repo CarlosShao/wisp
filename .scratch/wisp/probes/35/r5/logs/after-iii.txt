@@ -1,0 +1,22 @@
+=== (iii) three browser-fact claims, before vs after (2026-10-08 09:36:34+0800) ===
+--- BEFORE, verbatim from the daf1f5a0 blob ---
+1284:	// A browser's host method is not a detached function: Chrome and WebView2 answer an
+1939:// now demands cw itself, the way a browser's host method does, so the receiver-less shape
+1954:		t.Fatalf("M-A RED (receiver lost at the native exit): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. A real browser answers that with Illegal invocation and the page's letter never leaves the page, so this hook must not be certified as a delivery. %s",
+before-claim-count=3 [want 3]
+--- AFTER, verbatim from the working copy ---
+1286:	// THIS RULER CANNOT PRODUCE THAT CREDENTIAL (ticket 35 AC#8(iii)) - it is a hand-written
+1944:// now demands cw itself - the rule THIS FIXTURE answers with, modelled after what Chrome
+1960:		t.Fatalf("M-A RED (receiver lost at the native exit): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. THIS FIXTURE answers that with Illegal invocation - modelled after what Chrome and WebView2 are reported to do, NOT a WebView2 behaviour record (AC#8(iii); the real-window reading is the 〔仅本机可量〕 winlive rig) - and on that model the page's letter never leaves the page, so this hook must not be certified as a delivery. %s",
+after-unqualified-claim-count=0 [want 0]
+--- the three after-strings in full (each must still name its case's red) ---
+1286:	// THIS RULER CANNOT PRODUCE THAT CREDENTIAL (ticket 35 AC#8(iii)) - it is a hand-written
+1287-	// interpreter, so the behaviour recorded below is THIS FIXTURE'S OWN ANSWER, modelled
+--
+1944:// now demands cw itself - the rule THIS FIXTURE answers with, modelled after what Chrome
+1945-// and WebView2 are reported to do (this yard never observes a browser; AC#8(iii)) - so the
+--
+1960:		t.Fatalf("M-A RED (receiver lost at the native exit): %d native-exit invocation(s) reached the host without chrome.webview as their receiver. THIS FIXTURE answers that with Illegal invocation - modelled after what Chrome and WebView2 are reported to do, NOT a WebView2 behaviour record (AC#8(iii); the real-window reading is the 〔仅本机可量〕 winlive rig) - and on that model the page's letter never leaves the page, so this hook must not be certified as a delivery. %s",
+1961-			bf.nativeReceiverMismatch, bf.summary())
+M-A RED prefix still present: 2 occurrences
+rc=0

@@ -298,3 +298,30 @@ dev 真身我现量：挂载＝`frontend/src/main.tsx:58`（`{harness === "1" ? 
 **4. 它自己那把尺的两处缺陷（它主动入账、旧件改名保留未删，这是我要的形，记它不记我）**：pass 1 的十三发＝`mk_overlay` 少传"对形"造出的 `{"Replace":{突变:突变}}` **空操作假绿**（连 `ma-hook` 都绿，抓它的是正控），旧件改名 `pass1-noopoverlay-*` 保留；两把提取尺第一版各坏一次（awk 分段没匹配 ⇒ 三行都报 `PASS=0 FAIL=0`，不是读数），按现量行号重算才算数。⇒ ⛔ 任何后续程不许引 pass 1 那批发绿。
 
 **5. 排程（据此更新）＋现量框数**：`35-r5`（**只改夹具＋那枚 winlive 测试文件的头注释**，落 `AC#8` 的 (i)(ii)(iii)(iv) 四格）＝**新可派格，但按在 `111-r6` 交件之后**（此刻 `cmd/wisp` 的编译面被那枚 CI 写腿的 `go vet` 读数占着，同机同时写会把它 ⓐ 的读数染色）；其后 `35-v5` 验收。`:63` 那三支**本腿未裁**，归下一枚验收腿。票 35 框数现量：立 `AC#8` **前 7 未勾／2 勾**、**后 8 未勾／2 勾**（尺＝`grep -cE '^[[:space:]]*- \[ \]'` 与 `- \[x\]`），⛔ 不加 `-done`；⛔ 零 push、页面分支不合、`build/wisp.exe` 未还原。
+
+### 10-08 09:4x 写码腿 `35-r5` 交件登记（**只追加本节，⛔ 上面任何一枚框一字未动**）
+
+**框数尺（追加前/后各跑一次）**：追加前 `8 未勾／2 勾`（现量＝`.scratch/wisp/probes/35/r5/logs/opening-rulers.txt:11-12`，起手时刻 09:28:58）；追加后 `8 未勾／2 勾`（＝`logs/box-census-after-append.txt`）。⛔ 本腿没勾任何框、没加 `-done`、没 push；别人在飞的 `.gitignore` 与 `design/**` 未 stage。
+
+**锚**：起手 HEAD＝`daf1f5a028f274b113db545c0776f6e409796ab9`（`dev`）。本腿四笔：`633c4afa`（锚尺，先于任何长跑命令）→ `3a343bc7`（(i)(ii)(iii)）→ `099d8fe6`（(iv)）→ 第 4 笔＝本节＋`impl.md`＋探针件。⚠ 三格并在一笔里＝本腿只能整文件 stage（`git add -p` 属交互式，`issues/README` 规则里禁），不是把三格混做；逐格尺在 `impl.md` §3。
+
+**⛔ 产码零改动（自证三把尺在 `logs/zero-prod-change.txt`）**：`git diff --numstat daf1f5a0 -- cmd/wisp/panel_host_windows.go` 空输出 rc=0；该件 blob 起手＝交件＝`26b5de83b93a9a141f1546dc19a9b03ffa45ede0`；五发 overlay 跑完再量 `prod-untouched-by-overlays=YES`。
+
+**四格读数（正文＝`.scratch/wisp/probes/35/r5/impl.md`）**：
+
+**格 (i)**＝新用例 `TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable`（`cmd/wisp/panel_transport_35r2_test.go:2097`，台件 `:2116`，红句 `:2123`），世界＝`window.wispDispatch` 是**真值非函数**（Go 侧 `bf.window.set(name, "not-a-function")`，⛔ 没用 descriptor，框身 `:78` 明写不需要）。反形五发（`go test -c -overlay`，突变源在仓外 `D:/tmp/wisp35r5/`）：
+`a-pristine`＝逐字节同原件替换 → **PASS=10/FAIL=0**（不改颜色）；
+`z-compile-probe`＝故意塞语法错 → **buildrc=1**（★这发才证明 overlay 的**键路径真匹配**——pristine 单独顶不起这一格，同色既可能是"换成相同原件"也可能是"没换"；`35-v4` 的 pass 1 就是死在后者的空操作假绿上，本腿第一版脚本也以另一种形式撞到：替换件文件名里带了 `cmd/wisp/`，五发全 buildrc=1 并报 `open …pristine-cmd\wisp\panel_host_windows.go: cannot find the path`，旧读数保留未删）；
+`b-truthy-new`＝`:680` 换成 `!window.%[1]s` → **FAIL=1**，唯一红＝新那枚，红句 `panel_transport_35r2_test.go:2123: M-B3 RED … TypeError: string is not a function` ⇒ ★框文要求的"新那枚必须红"成立；
+`c-truthy-old`＝同一产码突变＋`daf1f5a0` 那版夹具 → **PASS=9/FAIL=0** ⇒ 本腿自己复现了 `35-v4` 的恒绿读数，新用例是那一面唯一载体；
+`d-typeofgone-new`＝摘掉 `typeof` 半支 → **FAIL=2**（`:2054 M-B2 RED … undefined is not a function` ＋ `:2123 M-B3 RED … string is not a function`）⇒ 两面红名册不同＝不是同一台探测器报销两次。⚠ 名册分母与 `35-v4` 的"12"不同形（本腿 `-run` 点到 9／10 枚），不许对拉。
+
+**格 (ii)**＝尺 `'M-B RED'` 枚数 **6 → 0**；改后 `M-B1`=9（"静默拒覆写"面）、`M-B2`=5（"门不在"面）、`M-B3`=9（本面）。⚠ **越格自报**：框身 `:79` 只点名 6 枚 `M-B RED`，本腿把同一两枚用例里共用 `M-B ` 前缀的 **14 枚** token 全拆了（多出的是 `M-B READING WRONG`／`M-B CONTROL RED`／`t.Logf … face has teeth`），依据＝派单那句"要成对、要各面唯一"；留一半仍是同一把串色尺。验收腿若判越界，回退点与理由写在 `impl.md` §0/§3。**只改前缀的自证**＝把 `M-B1/M-B2/M-B3` 折回 `M-B` 再与 `daf1f5a0` blob 对拉（`logs/scope-diff-ii.txt`，差异只剩 (i) 的新用例与 (iii) 的文案）；`t.Fatalf` 枚数 **47 → 56**（增量恰＝新用例 9 枚）、`func Test` **8 → 9**、既有用例名与断言强度一字未动。
+
+**格 (iii)**＝尺（三句原文的联合 grep）枚数 **3 → 0**。改后逐字（短）：`:1286` `THIS RULER CANNOT PRODUCE THAT CREDENTIAL (ticket 35 AC#8(iii)) … the behaviour recorded below is THIS FIXTURE'S OWN ANSWER, modelled after Chrome/WebView2 and never offered as a WebView2 behaviour record`；`:1944` `the rule THIS FIXTURE answers with, modelled after what Chrome / and WebView2 are reported to do (this yard never observes a browser; AC#8(iii))`；`:1960`（**在 `t.Fatalf` 运行时文案里**）`THIS FIXTURE answers that with Illegal invocation - modelled after what Chrome and WebView2 are reported to do, NOT a WebView2 behaviour record (AC#8(iii); the real-window reading is the 〔仅本机可量〕 winlive rig)`。⚠ 红句仍指认用例：`M-A RED` 仍 2 枚命中、`%d/%s/%s` 参数序未动、断言没放松。
+
+**格 (iv)**＝尺 `grep -n '仅本机\|machine-local\|CI 永看不见' cmd/wisp/panel_transport_live_35v2_windows_test.go`：**改前 rc=1／枚数 0**（＝派单让本腿自己复现的那发，票面预言成立）→ **改后 rc=0／枚数 1**（第 3 行），四要素各命中 1 枚：①现象＝`:52` 那枚"页面自己发的 `chrome.webview.postMessage` 到不到 Go 门"的凭据只有本机能取（夹具的绿是在建模不是在测量）；②归谁＝**编排者**，⛔ 任何腿不许声称它在 CI 里复跑过（winlive 零 CI 岗位）；③复跑口径＝每波由编排者在桌面空出时起一发 `-tags winlive` 真窗**并同波跑一发控制组**，件名＋`rc` 逐波进 `.scratch/wisp/probes/35/**`；④代价＝⛔ CI 永远不会拦下"这条传输在真浏览器里坏掉"这类回归。撤销口令＝给 `:52` 的决定性读数一枚 CI 可达替身（改写此段、⛔ 不许删）。写法形先例＝`docs/evidence/s1/33-panel-host-c27-r5.md:78`。文件 261→282 行**全是注释**，`//go:build` 行与任何断言未动；⛔ 本腿没开过窗，因此不声称取过任何 winlive 读数。
+
+**门三件（`logs/gates.txt`）**：`go vet ./`（CWD＝`cmd/wisp`）rc=**0**（件体 0 字节＝vet 干净时本就零输出，不是没跑，已在同一格复跑第二次确认）；`d22scan`（`cd tools/d22scan && go run . -root ../../`，独立 module）rc=**0**、末行 `clean`；`gofmt -l` rc=**0**，列出 1 枚＝`panel_transport_35r2_test.go` 的**既有 4 行漂移**（同一把尺对 `daf1f5a0` blob 也列 1 枚，hunk＝`jsParser peek/next` 对齐），⛔ 没顺手改无关行；winlive 件 gofmt 干净。交件名册现量（`logs/delivered-baseline.txt`，在 `099d8fe6` 上现 build 现跑）＝**PASS=13 / FAIL=0 / SKIP=0，buildrc=0 runrc=0**，载具＝CWD`cmd/wisp`＋仓内 `third_party/sherpa-onnx` 三枚 dll 上 PATH。⛔ 本腿没整包跑 `./cmd/wisp/`（346 枚、~14 分钟、5 枚窗口依赖既有红），⛔ 没为 rc 好看放宽任何断言。
+
+**这格不许被读成什么**（全文＝`impl.md` §5）：⛔ 不买「WebView2 真绑 receiver」，⛔ 不买「真浏览器里 `postMessage` 真不可写／真可被页面换掉」，⛔ 不买「`wispDispatch` 在真 WebView2 里可能是非函数值」——(i) 只说这种世界出现时守卫必须退回原生出口。★ `:52`（真窗、〔仅本机可量〕）与 `AC#8(i)`（解释器里的第三个世界）是两枚凭据，⛔ 两格不许互相借光；本腿也**不**声称 `AC#8` 整框可勾——框身 `:82` 那两条覆盖面边界（再入标志的**释放**、去 `return` 的等价形、帽数只有下界）本腿一枚没碰，勾不勾归 `35-v5`。留给验收腿的 7 问在 `impl.md` §6，⛔ 本腿不代答。
