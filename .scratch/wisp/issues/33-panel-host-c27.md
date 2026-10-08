@@ -340,3 +340,42 @@ declaration consumed by 37's native card.
 7. **推送仍按住，理由换了**：不再是因为本案那枚红（它已修），而是因为 **`33-v2` 需要一台安静的机器**——`slo-full` 跑在本机 self-hosted runner 上、每次 push 自启抢 CPU（见 `wisp-ci-selfhosted-topology` 那一族的坑）。终裁交完、逐名比过红名集合再推。当前 **214 枚未推**（`origin/dev`／`cnb/dev` 同位，`16:42:01` 取数，仅在此刻有效）。
 
 - `agent=33-r8b did=接管腿（写面只有 internal/ball/** ＋自己的证据件；⛔ cmd/wisp 与 internal/config 在飞、一字未碰、其测试一枚未跑）：复尺 ebe3bd57 那枚死腿半成品，⛔ 推翻题面两句——① `releaseThread` **零枚调用者**（尺＝grep -rn "releaseThread|releaseOwnQueueToQuiet|forgetWindow|releaseCOM" internal/ tools/ cmd/，命中只有 sta_windows.go:147 的定义与四处注释），在位的仍是 `:72` 那句 `defer s.releaseCOM() // TEMP pre-fix shape ... reverted immediately` ⇒ **那句 "reverted immediately" 没被执行，那一格不是"未验证"而是"未验证＋未接线"**；② `go vet` rc=0 对这一维是**瞎的**（Go 不因未使用方法报错），判这一族只能看调用点枚数或整包颜色。基线自取（⛔ 不转述）：默认档整包 rc=1、顶层 52 PASS／3 FAIL／0 SKIP，两枚红就是它自己那两枚新用例（钉子有牙），第三枚 TestC21TableColourRowsMatchTokensCSS 非本程（design/assets/tokens.css 不在本机工作树）。改法＝**产码只改一行**（:72 → `defer s.releaseThread()`，净 -66 字节；LIFO 让"拆窗→派空自己队列→CoUninitialize"在 UnlockOSThread 之前、仍锁着线程时跑完）。判据补两处、⛔ 未放宽任何断言：新增 TestReleasePumpCapIsALoudReadingNotAGreen（种 4160 枚线程级消息 ⇒ pumped 恰＝4096、head-after 仍报 msg 0x82F9、WARN 原文进断言；控制腿种 8 枚 ⇒ pumped=8／empty／零日志 ⇒ 上限那格就此是"响亮读数不是绿"，⛔ 4096 与 pmRemove 一字节未动）＋ 一条 `releaseLogged != ""` 必红（M3b 实测：**补牙之前**只摘 ball_windows.go:964 那枚 forgetWindow() 时其余断言全绿 rc=0 ⇒ 那 5 行原本是无人看守的承重墙；补法只把产码已有的 ERROR 日志升成判据，⛔ 未改任何行为）。突变六发逐名各打红（载具 probes/33/r8b/mutate.py，逐发还原＋md5 核、MUT-M 残留＝0/0/0）：M0 不接线 2 红／M1 不拆窗 2 红／M2 不泵队列 **1** 红（head 只剩线程级那枚 ⇒ 独立复认"只有线程级植物咬得住泵那一半"）／M3 记录不清零 **1** 红／M3b **1** 红／M4 PM_NOREMOVE 2 红；`door=real-Close` 全程绿＝真出货路径分得开 clean 与 dirty，⛔ 不是恒真也不是钝尺。门禁终态：build rc=0、vet rc=0、gofumpt -l 三枚文件空、sh scripts/d22scan.sh rc=0 clean（ban #8 internal/=481·cmd/=86 ＝**被扫文件枚数**）；默认档 55/1/0、winlive 档逐名 **69 PASS／1 FAIL／0 SKIP**（14 枚 winlive 全名册在证据件 ⑤，含真球那 6 枚；⛔ 仅本机可量、CI 零岗位；那枚 33-r8 自述的 "Winlive smoke passes on the real ball path" 本腿不采信、名册是自己的）；`-count=2` 把收摊钉与真建窗用例挤进同一进程 ⇒ 顶层 18 PASS。⚠ 两枚具名"没做到"：(a) winlive 整包在**不接线**那一形下也只这两枚钉自己红、零连带、grep -c panic＝0 ⇒ **顺序依赖毒源本机未复现**，本腿只主张"不变式已钉住＋还回去的线程用得掉"，⛔ 不许读成"已排除"；(b) `releaseThread` 丢掉 `releaseOwnQueueToQuiet()` 的返回值（sta_windows.go:159 裸调用）⇒ 真撞上限照样还池、只多一条 WARN，改不改属产品形状决策、归编排者。⛔ 票面 AC 框一枚未碰（现读 13 未勾／1 已勾）、台账未写、未改名 -done、只 commit 不 push（49448d7f 产码＋判据／c38bc731 证据件）。⚠ 顺带更正裁定（三）第 5 格里那三行行号：`LockOSThread`＋`defer UnlockOSThread` 现在在 **sta_windows.go:64-65**、`quit()` 的 `pPostQuitMessage.Call(0)` 在 **:267**（函数头 `:262`）——尺＝`git show ebe3bd57^:internal/ball/sta_windows.go` 与现文件逐行对照，位移分别是 **+12**（52→64）与 **+106**（156/161→262/267），⛔ 不是"同一处"，事实未变、只是 `ebe3bd57` 在文件前半加了 106 行。next=编排者收表＋把这一格并入 33-v2 之后的验收；仍判不动八条具名在证据件 ⑦（含"上限撞了要不要改变收摊行为"与"19 枚那一尺本包量不到、实测 14"）。文件=.scratch/wisp/probes/33/r8b/verdict.md ＋ internal/ball/sta_windows.go ＋ internal/ball/sta_release_windows_test.go`
+
+## 33-r10 进度追加（**2026-10-08 10:2x**；起手 HEAD `128bf600fa0890c02887e1d005dc7d6b1bd87a43`；⛔ 一枚 AC 框不翻，本节前尺 **13 未勾／1 已勾**）
+
+**① AC#13 框里那句"每次冷启动最终显示的是那枚探测页"＝编排者 10-01 11:1x 的行号读数，今天已过期，具名更正。**
+现量（尺＝`grep -n 'serveEntry\|firstRoundTrip\|SetHtml\|wispProbeRT' cmd/wisp/panel_host_windows.go`，本文件当时 861 行）：
+`:425` 先调 `firstRoundTripLocked` → 它在 `:757-758` 发探测页 `SetHtml`；`:427` 才调 `serveEntry` → `:467` 把 embed 入口字节 `SetHtml` 进去。
+**次序与框里写的 `:221` 供页→`:250` 真页→`:227` 探测→`:372-375` 覆盖是反的**：今天后一发覆盖的是探测页，用户最终落在入口页；
+最坏是 `:425`→`:427` 之间那一段的闪动，不是"最终停在空壳页"。换向那一刀的出处＝`13acad46`（33-r5，10-01），台账 `A688`/`A689` 记过。
+⇒ 框的 ①（次序重排）早已落地；⛔ 本腿不为此造 bug，本节就是把新事实写进盘面。
+
+**② 但"没有任何仪器钉着最终文档含真内容"这一句今天成立，已补。**
+旧名册里唯一问最终文档的那枚＝`cmd/wisp/panel_resident_windows_test.go:305 TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`，
+它买真窗（`startPanelForTest`），且入口解不出就 `:317` 具名 skip ⇒ 新鲜检出（CI）里这格零仪器。
+新件＝`cmd/wisp/panel_pageover_33r10_windows_test.go::TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe`（`//go:build windows`，不开窗）。
+它问的是**最终文档的能力**，⛔ 不问 `SetHtml` 被调用过几次：
+(a) 最后一份文档**逐字节等于**探测步骤自己写的那份吗？——探测页由 `firstRoundTripLocked` 对着一次性接收器**当场跑出来再取**，⛔ 不是抄进台件的字符串；
+(b) 把 `<script>` 剥掉后正文里还有没有可看的东西（元素或文字）？
+(c) 入口解得出时（`panel.Assets.Resolve(panel.EntryFile)`，与产码同一条接缝）：最后一份文档含不含那 `%d` 字节本体、含不含解析出的元素 `id`。
+
+**③ 反控与三发正控（全部 `go test -c -overlay`＋仓外拷贝 `D:/tmp/wisp33r10/`，⛔ 没改跟踪文件；日志 `.scratch/wisp/probes/33/r10/mut/`）**
+`swap`（把两发 `SetHtml` 的次序调换＝框点名的突变）**RED**：四句红逐字在 `mut-swap.log`；
+`pristine`（替换件与原件逐字节相同）**GREEN＝不改色**；
+`shift`（在同一枚函数前插 8 行注释/空行，行号全位移）**GREEN**⇒ 锚是内容锚不是行号锚；
+`widen_swap`（既调换次序、又给探测页加一枚 `<p>loading the panel</p>` 打掉 (b) 那枚牙）**仍 RED**（(a) 身份与 (c) 入口字节各咬一口）。
+
+**产码面只动 `cmd/wisp/panel_host_windows.go` 一处，`git diff --numstat`＝`30 11`**：把 `bringUp` 尾段那两发原样搬进
+`coldStartPageHandover`（`:447-454`），语句一条不加不减、次序不变、跨调用不持锁；理由＝`bringUp` 调
+`webview2.NewWithOptions` 造真控件 ⇒ 不开窗就够不着这尾段，这跟 `installPanelTransport` 为票 35 AC#6 做的拆分同形。
+⛔ 没加 `AddWebResourceRequestedFilter`（次序已经对，过滤器那一支没有具名理由，本腿不动它）。
+
+**名册与门（分母一律带 `-run`）**：`-run 'TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe|TestPanelHostOpensNoListeningSocketL1|TestAC9InboundLegFromStdinReachesTheWriteLeg|TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt|TestAC9InboundLegRefusesRosterMethodWithNoHandler|TestAC9ComposerDispatchHasAProductionCaller'`
+＝ 6 枚选中／**6 PASS／0 FAIL／0 SKIP**（`.scratch/wisp/probes/33/r10/gate-named-tests.log`）。整包 346 枚⛔ 没跑（其中 5 枚窗口依赖既有红，不记本腿账）。
+`go vet ./cmd/wisp/` rc=0；`tools/d22scan` `clean - no D22 ban violations` rc=0；`gofmt -l` 本腿两枚件＝零行 rc=0；
+包内被列出的 3 枚（`models.go`／`panel_inbound_guards_35r3_test.go`／`panel_transport_35r2_test.go`）HEAD 就在，⛔ 未顺手改。
+
+**这格不许被读成什么**：⛔ 不是"面板今天开得出真页面"。本树 `go:embed all:dist` 编进去的入口是**未跟踪**的
+`frontend/dist/index.html`（1044 字节、引用 `assets/index-BVKlegVD.js`＝台账记过的盘上陈旧件），所以 (c) 钉的是
+"最终文档＝宿主从 embed 解析出的那串字节"，⛔ 不钉"那是今天的新构建"，也不钉"用户眼睛看到了面板"（常驻链的另一跳不在这格）。
+CI／新鲜检出里 embed 只有 `.gitkeep` ⇒ 走 not-built 分支，那一支只有 (a)(b) 两枚牙，**"入口真内容"那一问在 CI 没有 subject＝具名欠账**。

@@ -1,0 +1,45 @@
+# 33-r10 证据件名册（只建不删；⛔ 无一以 .out 结尾）
+# rc 格口径：每枚 .log 末尾自带一行 rc=N；00-anchor.md 的 rc 在其 §3；
+# impl.md 的 rc 在其 §8；run-mutations.py 是载具（rc 走它写出的 .log）。
+total 60
+drwxr-xr-x 1 swq 197609     0 Oct  8 10:23 .
+drwxr-xr-x 1 swq 197609     0 Oct  8 10:06 ..
+-rw-r--r-- 1 swq 197609  7681 Oct  8 10:08 00-anchor.md
+-rw-r--r-- 1 swq 197609  3076 Oct  8 10:20 01-product-diff.log
+-rw-r--r-- 1 swq 197609    96 Oct  8 10:23 files.txt
+-rw-r--r-- 1 swq 197609  1258 Oct  8 10:19 gate-d22scan.log
+-rw-r--r-- 1 swq 197609     5 Oct  8 10:19 gate-gofmt-mine.log
+-rw-r--r-- 1 swq 197609   105 Oct  8 10:19 gate-gofmt-package-context.log
+-rw-r--r-- 1 swq 197609  1662 Oct  8 10:18 gate-named-tests.log
+-rw-r--r-- 1 swq 197609     5 Oct  8 10:19 gate-vet.log
+-rw-r--r-- 1 swq 197609 21282 Oct  8 10:22 impl.md
+drwxr-xr-x 1 swq 197609     0 Oct  8 10:18 mut
+--- wc -c ---
+7681 ./00-anchor.md
+3076 ./01-product-diff.log
+844 ./files.txt
+1258 ./gate-d22scan.log
+5 ./gate-gofmt-mine.log
+105 ./gate-gofmt-package-context.log
+1662 ./gate-named-tests.log
+5 ./gate-vet.log
+21282 ./impl.md
+958 ./mut/mut-pristine.log
+948 ./mut/mut-shift.log
+184 ./mut/mut-summary.log
+2364 ./mut/mut-swap.log
+1909 ./mut/mut-widen_swap.log
+5316 ./mut/run-mutations.py
+--- tail rc lines ---
+./01-product-diff.log :: 1 rc line(s)
+./gate-d22scan.log :: 1 rc line(s)
+./gate-gofmt-mine.log :: 1 rc line(s)
+./gate-gofmt-package-context.log :: 1 rc line(s)
+./gate-named-tests.log :: 1 rc line(s)
+./gate-vet.log :: 1 rc line(s)
+./mut/mut-pristine.log :: 1 rc line(s)
+./mut/mut-shift.log :: 1 rc line(s)
+./mut/mut-summary.log :: 1 rc line(s)
+./mut/mut-swap.log :: 1 rc line(s)
+./mut/mut-widen_swap.log :: 1 rc line(s)
+rc=0

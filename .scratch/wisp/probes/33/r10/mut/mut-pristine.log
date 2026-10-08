@@ -1,0 +1,17 @@
+variant=pristine
+overlay_json={"Replace": {"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "D:/tmp/wisp33r10/panel_host_windows_pristine.go"}}
+replacement_differs_from_target=0
+exe_bytes=41520545
+buildrc=0
+runrc=0
+test_output_begin
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0.553
+    panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+    panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 1044 byte(s), 1 of 1 entry id(s) present, entry bytes carried=true
+--- PASS: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+PASS
+time=2026-10-08T10:17:55.848+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+test_output_end
+colour=GREEN
+rc=0

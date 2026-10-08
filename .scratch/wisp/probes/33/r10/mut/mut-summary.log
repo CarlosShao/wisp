@@ -1,0 +1,5 @@
+pristine buildrc=0 runrc=0 colour=GREEN diff=0
+swap buildrc=0 runrc=1 colour=RED diff=1
+shift buildrc=0 runrc=0 colour=GREEN diff=1
+widen_swap buildrc=0 runrc=1 colour=RED diff=1
+rc=0

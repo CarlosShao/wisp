@@ -1,0 +1,21 @@
+variant=swap
+overlay_json={"Replace": {"D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "D:/tmp/wisp33r10/panel_host_windows_swap.go"}}
+replacement_differs_from_target=1
+exe_bytes=41521057
+buildrc=0
+runrc=1
+test_output_begin
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:246: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0
+    panel_pageover_33r10_windows_test.go:248: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+    panel_pageover_33r10_windows_test.go:261: after a cold start the LAST document handed to the control is byte-for-byte the document the round-trip probe step writes (136 byte(s)). That is ticket 33 AC#13: the user ends on the probe page instead of the panel. Product side: the probe stays - it is where cold usable is decided - but coldStartPageHandover must hand the entry over AFTER it
+    panel_pageover_33r10_windows_test.go:264: after a cold start the last document carries nothing a user could look at: with its scripts stripped its body is empty (head "<!doctype html><html><head><meta charset=\"utf-8\"></head><body><script>if(window.wispProbeRT)window.wispProbeRT();</scrip"). The panel was never handed over, so the panel window would show a shell. Ticket 33 AC#13 item 2 asks the final document about its content, not about whether a call was made
+    panel_pageover_33r10_windows_test.go:268: after a cold start the last document does not carry the embedded entry's own 1044 byte(s): ticket 33 AC#13's 'final document contains the real embed entry content' is not met
+    panel_pageover_33r10_windows_test.go:277: after a cold start the last document contains NONE of the 1 element id(s) the resolved entry declares [root] (head "<!doctype html><html><head><meta charset=\"utf-8\"></head><body><script>if(window.wispProbeRT)window.wispProbeRT();</scrip"): the document in the window is not the panel page
+    panel_pageover_33r10_windows_test.go:279: AC#13 33-r10 read: last document 136 byte(s), 0 of 1 entry id(s) present, entry bytes carried=false
+--- FAIL: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+FAIL
+time=2026-10-08T10:18:02.955+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+test_output_end
+colour=RED
+rc=1

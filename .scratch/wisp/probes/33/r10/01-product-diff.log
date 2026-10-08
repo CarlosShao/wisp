@@ -1,0 +1,60 @@
+diff --git a/cmd/wisp/panel_host_windows.go b/cmd/wisp/panel_host_windows.go
+index 26b5de83..1f9060df 100644
+--- a/cmd/wisp/panel_host_windows.go
++++ b/cmd/wisp/panel_host_windows.go
+@@ -416,17 +416,9 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
+ 	m.created = true
+ 	m.mu.Unlock()
+ 
+-	// AC#13's order, and it is the whole fix: prove the message channel first,
+-	// hand the page over LAST. firstRoundTripLocked shows a document of its own,
+-	// so running it after serveEntry meant every cold start finished on the probe
+-	// page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3 "供给那半"). The
+-	// probe stays - it is where cold "usable" is decided - it just no longer gets
+-	// the last word about what the user sees.
+-	rtMs := m.firstRoundTripLocked(ctx, t0)
+-
+-	if err := m.serveEntry(); err != nil {
+-		m.serveNotBuiltNoticeLocked()
+-	}
++	// AC#13's order lives in coldStartPageHandover (33-r10 moved it out verbatim:
++	// same statements, same order, nothing added or dropped). Read the reason there.
++	rtMs := m.coldStartPageHandover(ctx, t0)
+ 
+ 	m.mu.Lock()
+ 	m.lastColdMs = rtMs
+@@ -434,6 +426,33 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
+ 	return nil
+ }
+ 
++// coldStartPageHandover is AC#13's order, and it is the whole fix: prove the
++// message channel first, hand the page over LAST. firstRoundTripLocked shows a
++// document of its own, so running it after serveEntry meant every cold start
++// finished on the probe page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3
++// "供给那半"). The probe stays - it is where cold "usable" is decided - it just no
++// longer gets the last word about what the user sees.
++//
++// Why this is a function and not the four lines it was inside bringUp (leg 33-r10,
++// ticket 33 AC#13 item 2): bringUp cannot run headlessly - it calls
++// webview2.NewWithOptions, which needs a live WebView2 control - so the shipped
++// handover order had no ruler that could run without opening a window. The only
++// case that ever asked the question, TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
++// (panel_resident_windows_test.go), buys a real browser and in a fresh checkout
++// skips for lack of a bundle. Splitting the tail out is the same move
++// installPanelTransport already made for the same reason (ticket 35 AC#6, see the
++// comment at that call): it moves zero behaviour, holds no lock across the call,
++// and gives AC#13's content assertion a headless way to reach the shipping order.
++// That reach is what TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe needs.
++func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
++	rtMs := m.firstRoundTripLocked(ctx, t0)
++
++	if err := m.serveEntry(); err != nil {
++		m.serveNotBuiltNoticeLocked()
++	}
++	return rtMs
++}
++
+ // serveNotBuiltNoticeLocked replaces the page with an explicit offline notice when
+ // the embed carries no bundle. It is a SetHtml of a document this host writes, so
+ // the user is never left looking at the round-trip probe page, and it still opens
+rc=0
