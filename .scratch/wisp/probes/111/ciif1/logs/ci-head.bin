@@ -78,7 +78,6 @@ jobs:
         # proves the gate below CAN go red - see TestBuiltBinaryGoesRedEndToEnd
         # in tools/d22scan/scan_test.go, which compiles the binary and asserts
         # process exit codes 1 and 2 on seeded violations.
-        if: ${{ !cancelled() }}
         run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
 
       - name: "D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)"
@@ -103,7 +102,6 @@ jobs:
         # nearer this sits to the top, the less often its verdict is the one that
         # goes missing. Added step only: no existing step was moved, edited, given
         # an `if:`, or made continue-on-error (D22 run-away mode 6).
-        if: ${{ !cancelled() }}
         run: go run . -self-test
         working-directory: tools/d22scan
 
@@ -133,7 +131,6 @@ jobs:
         # live: `staticcheck` fails and its dependent `mockllm module vet` reports
         # `skipped` in that same run - ticket 85's instrument hole, which is why
         # the guard below was added to that step and why the ordering rule stays.
-        if: ${{ !cancelled() }}
         run: sh scripts/d22scan.sh
 
       - name: "Tracked path-length budget (ticket 262)"
@@ -166,11 +163,9 @@ jobs:
         # forbidden action. The step runs the seeded-path positive control first (in
         # a throwaway repository, so the control cannot be red because of this tree)
         # and refuses to run the scan at all if that control cannot be made red.
-        if: ${{ !cancelled() }}
         run: sh scripts/check-path-length-budget.sh --with-self-test
 
       - name: gofmt (gofumpt)
-        if: ${{ !cancelled() }}
         run: |
           go install mvdan.cc/gofumpt@latest
           OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"
@@ -240,11 +235,9 @@ jobs:
         run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
 
       - name: go vet (module)
-        if: ${{ !cancelled() }}
         run: go vet ./...
 
       - name: go vet (tools/d22scan module)
-        if: ${{ !cancelled() }}
         run: go vet ./...
         working-directory: tools/d22scan
 
@@ -411,11 +404,9 @@ jobs:
           go-version-file: go.mod
 
       - name: Start compose test services (mock-llm on 18080)
-        if: ${{ !cancelled() }}
         run: docker compose -f docker/compose.test.yml --profile test up -d --build mock-llm
 
       - name: Probe mock-llm
-        if: ${{ !cancelled() }}
         run: |
           for i in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:18080/v1/models > /dev/null; then
@@ -441,7 +432,6 @@ jobs:
         # verdict, which is the A44-1 shape ticket 71 already fixed once in the
         # lint job. It needs neither compose nor mock-llm, so nothing it depends
         # on moved.
-        if: ${{ !cancelled() }}
         run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
 
       - name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
@@ -466,7 +456,6 @@ jobs:
         # them to print its own anchored top-level result line. Four packages with
         # tests and no CI step were pulled in on the way: internal/ball,
         # internal/perm, internal/plugin, cmd/llmrecord.
-        if: ${{ !cancelled() }}
         run: bash scripts/portable-tests.sh --scope=core
 
       - name: Stop compose services
@@ -810,18 +799,15 @@ jobs:
           go-version-file: go.mod
 
       - name: Cache third_party (deps.toml key)
-        if: ${{ !cancelled() }}
         uses: actions/cache@v4
         with:
           path: third_party
           key: wisp-third_party-${{ hashFiles('deps.toml') }}
 
       - name: Build wisp.exe
-        if: ${{ !cancelled() }}
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
 
       - name: SLO smoke gate
-        if: ${{ !cancelled() }}
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
 
       - name: Upload SLO report
@@ -950,26 +936,21 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: npm ci (lockfile is the only source of deps)
-        if: ${{ !cancelled() }}
         run: npm ci
 
       - name: typecheck (tsc -b, noEmit per tsconfig.*.json)
-        if: ${{ !cancelled() }}
         run: npm run typecheck
 
       - name: lint (oxlint)
-        if: ${{ !cancelled() }}
         run: npm run lint
 
       - name: token drift guard (generated theme must equal the C21 table)
         # AC#2's independent second channel: gen-tokens --check regenerates
         # frontend/src/styles/tokens.generated.css from docs/evidence/s1 and
         # fails on any byte of difference, so nobody can hand-edit the theme.
-        if: ${{ !cancelled() }}
         run: npm run tokens:check
 
       - name: build (vite build -> frontend/dist, the bytes go:embed carries)
-        if: ${{ !cancelled() }}
         run: npm run build
 
       - name: L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)
@@ -983,7 +964,6 @@ jobs:
         # output. Every assertion is derived from that JSON, and the vendored
         # Beautiful UI demo questionnaire appearing anywhere is a failure - so
         # this step goes red if the card ever renders library props.
-        if: ${{ !cancelled() }}
         run: npm run render:l2 -- fixtures/l2-card-fs-delete.json
 
       # Three more render harnesses existed as package.json scripts with no step
@@ -996,13 +976,11 @@ jobs:
         # react-dom/server paints the composer over fixtures/composer-states.html:
         # no-host attached, workspace chosen with a stored video, and an
         # unsupported attachment told to the user. Red if a state stops painting.
-        if: ${{ !cancelled() }}
         run: npm run render:composer
 
       - name: Streaming output honours PLAN.md's SSE row (render evidence)
         # Reads PLAN.md's "SSE 流式输出" row and throws if that row or the tokens
         # it names are gone, so this cannot pass by quietly checking nothing.
-        if: ${{ !cancelled() }}
         run: npm run render:stream
 
       - name: Nav rail names only icons PLAN.md's frozen list carries (render evidence)
@@ -1010,6 +988,5 @@ jobs:
         # the two interim substitutions (chat, cost) must be exactly two, and the
         # nav layer must hold no view state of its own. Throws when the parser
         # loses a name the list does carry - a broken ruler refuses to conclude.
-        if: ${{ !cancelled() }}
         run: npm run render:nav
 

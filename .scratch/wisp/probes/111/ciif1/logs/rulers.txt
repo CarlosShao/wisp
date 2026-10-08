@@ -1,0 +1,33 @@
+--- A. word-frequency ruler (the bad ruler, for cross-check only)
+27
+grep-cancelled rc=0
+--- A2. grep -n cancelled
+205:        # ADDED: `if: ${{ !cancelled() }}` (ticket 111 AC#5 second clause, landed
+216:        # WHY `!cancelled()` AND NOT THE LITERAL WORDS OF AC#5 (`if: always()`): the
+219:        # (the docs warn `always()` runs even on cancel, and recommend `!cancelled()`
+221:        # AC#6's recorded evidence counted `!cancelled()` occurrences, not always().
+234:        if: ${{ !cancelled() }}
+277:        #    `gofmt (gofumpt)`). `if: ${{ !cancelled() }}` is the one shape
+294:        if: ${{ !cancelled() }}
+331:        if: ${{ !cancelled() }}
+373:        # WHY `if: ${{ !cancelled() }}` AND WHY IT SITS AT THE BOTTOM OF THE JOB.
+375:        # mockllm module vet above): ticket 85 ruled `!cancelled()` the one shape
+387:        if: ${{ !cancelled() }}
+469:  # EVERY STEP BELOW THE SETUP ONES CARRIES `if: ${{ !cancelled() }}` (ticket 111
+488:  # WHY `!cancelled()` AND NOT `always()`: the runner applies the default
+492:  # critical failure (a cancelled job can leave such a step running until the
+494:  # `if: ${{ !cancelled() }}`. It runs on green, runs on red, and stands down on
+501:  # run under `!cancelled()` that exits non-zero still fails the job exactly as
+522:        if: ${{ !cancelled() }}
+560:        if: ${{ !cancelled() }}
+570:        if: ${{ !cancelled() }}
+587:        # staging. That is a dependency, not a masking risk - with `!cancelled()`
+592:        if: ${{ !cancelled() }}
+627:        # does not need a DLL on PATH anyway. With `if: ${{ !cancelled() }}` it
+643:        if: ${{ !cancelled() }}
+686:        # `if: ${{ !cancelled() }}`, so a step below a red one still answers. This
+732:        if: ${{ !cancelled() }}
+768:        if: ${{ !cancelled() }}
+784:        if: ${{ !cancelled() }}
+--- B. structural ruler: step-level if: lines (^<spaces>- if:)
+--- C. job-level if: candidates (^<2spaces>if: under jobs.<id>)

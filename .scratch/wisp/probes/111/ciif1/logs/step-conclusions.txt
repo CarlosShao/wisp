@@ -1,0 +1,231 @@
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Build wisp.exe (deps cached on the runner)|success
+null|SLO full gate (six states + settle + leak)|success
+null|Upload SLO report|success
+null|Post Run actions/setup-go@v5|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-node@v4|success
+null|npm ci (lockfile is the only source of deps)|success
+null|typecheck (tsc -b, noEmit per tsconfig.*.json)|success
+null|lint (oxlint)|success
+null|token drift guard (generated theme must equal the C21 table)|success
+null|build (vite build -> frontend/dist, the bytes go:embed carries)|success
+null|L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)|success
+null|Composer states paint the real envelope (render evidence)|success
+null|Streaming output honours PLAN.md's SSE row (render evidence)|success
+null|Nav rail names only icons PLAN.md's frozen list carries (render evidence)|success
+null|Post Run actions/setup-node@v4|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Cache third_party (deps.toml key)|success
+null|Build wisp.exe|success
+null|SLO smoke gate|success
+null|Upload SLO report|success
+null|Post Cache third_party (deps.toml key)|success
+null|Post Run actions/setup-go@v5|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Start compose test services (mock-llm on 18080)|success
+null|Probe mock-llm|success
+null|Environment fork assertion (WISP_ENV=test data dir)|success
+null|Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)|failure
+null|Stop compose services|success
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Windows ACL sealing gate (internal/winsec's own tests, ticket 110)|success
+null|Cache third_party (deps.toml key)|success
+null|cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)|success
+null|cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)|failure
+null|Package coverage census (ticket 111 AC#1 + GUARD D)|success
+null|Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)|failure
+null|PathResolver junction placeholder (real cases tickets 18/20)|success
+null|Post Cache third_party (deps.toml key)|skipped
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|D22 scanner positive control (tools/d22scan tests, seeded red)|success
+null|D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)|success
+null|D22 seven-ban + emoji scan (tools/d22scan)|success
+null|Tracked path-length budget (ticket 262)|success
+null|gofmt (gofumpt)|failure
+null|gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)|skipped
+null|go vet (module)|skipped
+null|go vet (tools/d22scan module)|skipped
+null|staticcheck|failure
+null|mockllm module vet|success
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+view 37703959747 rc=0
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-node@v4|success
+null|npm ci (lockfile is the only source of deps)|success
+null|typecheck (tsc -b, noEmit per tsconfig.*.json)|success
+null|lint (oxlint)|success
+null|token drift guard (generated theme must equal the C21 table)|success
+null|build (vite build -> frontend/dist, the bytes go:embed carries)|success
+null|L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)|success
+null|Composer states paint the real envelope (render evidence)|success
+null|Streaming output honours PLAN.md's SSE row (render evidence)|success
+null|Nav rail names only icons PLAN.md's frozen list carries (render evidence)|success
+null|Post Run actions/setup-node@v4|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Windows ACL sealing gate (internal/winsec's own tests, ticket 110)|success
+null|Cache third_party (deps.toml key)|success
+null|cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)|success
+null|cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)|failure
+null|Package coverage census (ticket 111 AC#1 + GUARD D)|success
+null|Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)|failure
+null|PathResolver junction placeholder (real cases tickets 18/20)|success
+null|Post Cache third_party (deps.toml key)|skipped
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Cache third_party (deps.toml key)|success
+null|Build wisp.exe|success
+null|SLO smoke gate|success
+null|Upload SLO report|success
+null|Post Cache third_party (deps.toml key)|success
+null|Post Run actions/setup-go@v5|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Start compose test services (mock-llm on 18080)|success
+null|Probe mock-llm|success
+null|Environment fork assertion (WISP_ENV=test data dir)|success
+null|Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)|failure
+null|Stop compose services|success
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Build wisp.exe (deps cached on the runner)|success
+null|SLO full gate (six states + settle + leak)|success
+null|Upload SLO report|success
+null|Post Run actions/setup-go@v5|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|D22 scanner positive control (tools/d22scan tests, seeded red)|success
+null|D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)|success
+null|D22 seven-ban + emoji scan (tools/d22scan)|success
+null|Tracked path-length budget (ticket 262)|success
+null|gofmt (gofumpt)|failure
+null|gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)|skipped
+null|go vet (module)|skipped
+null|go vet (tools/d22scan module)|skipped
+null|staticcheck|failure
+null|mockllm module vet|success
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+view 37545246395 rc=0
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Start compose test services (mock-llm on 18080)|success
+null|Probe mock-llm|success
+null|Environment fork assertion (WISP_ENV=test data dir)|success
+null|Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)|failure
+null|Stop compose services|success
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Build wisp.exe (deps cached on the runner)|success
+null|SLO full gate (six states + settle + leak)|success
+null|Upload SLO report|success
+null|Post Run actions/setup-go@v5|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|D22 scanner positive control (tools/d22scan tests, seeded red)|success
+null|D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)|success
+null|D22 seven-ban + emoji scan (tools/d22scan)|success
+null|Tracked path-length budget (ticket 262)|success
+null|gofmt (gofumpt)|failure
+null|gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)|skipped
+null|go vet (module)|skipped
+null|go vet (tools/d22scan module)|skipped
+null|staticcheck|failure
+null|mockllm module vet|success
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Cache third_party (deps.toml key)|success
+null|Build wisp.exe|success
+null|SLO smoke gate|success
+null|Upload SLO report|success
+null|Post Cache third_party (deps.toml key)|success
+null|Post Run actions/setup-go@v5|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-node@v4|success
+null|npm ci (lockfile is the only source of deps)|success
+null|typecheck (tsc -b, noEmit per tsconfig.*.json)|success
+null|lint (oxlint)|success
+null|token drift guard (generated theme must equal the C21 table)|success
+null|build (vite build -> frontend/dist, the bytes go:embed carries)|success
+null|L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)|success
+null|Composer states paint the real envelope (render evidence)|success
+null|Streaming output honours PLAN.md's SSE row (render evidence)|success
+null|Nav rail names only icons PLAN.md's frozen list carries (render evidence)|success
+null|Post Run actions/setup-node@v4|success
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+null|Set up job|success
+null|Run actions/checkout@v4|success
+null|Run actions/setup-go@v5|success
+null|Windows ACL sealing gate (internal/winsec's own tests, ticket 110)|success
+null|Cache third_party (deps.toml key)|success
+null|cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)|success
+null|cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)|failure
+null|Package coverage census (ticket 111 AC#1 + GUARD D)|success
+null|Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)|failure
+null|PathResolver junction placeholder (real cases tickets 18/20)|success
+null|Post Cache third_party (deps.toml key)|skipped
+null|Post Run actions/setup-go@v5|skipped
+null|Post Run actions/checkout@v4|success
+null|Complete job|success
+view 37406757402 rc=0

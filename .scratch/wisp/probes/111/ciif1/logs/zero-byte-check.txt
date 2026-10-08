@@ -1,0 +1,3 @@
+.scratch/wisp/probes/111/ciif1/logs/local-govet-d22scan.txt
+.scratch/wisp/probes/111/ciif1/logs/local-govet-root.txt
+.scratch/wisp/probes/111/ciif1/logs/zero-byte-check.txt

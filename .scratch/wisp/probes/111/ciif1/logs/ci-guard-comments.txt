@@ -1,0 +1,32 @@
+35:  # (D22 mode-6: "A skippable job is a job that will one day be skipped").
+48:  # PR events deliberately keep the old per-ref group + cancel-in-progress so
+100:        # below it can be skipped by an earlier red (that disease is ticket 71/85/111
+132:        # `skipped` in that same run - ticket 85's instrument hole, which is why
+161:        # 100-character name cap), deliberately NOT from the wall at relative
+193:        # .scratch/**, which by definition holds deliberately-broken samples), and a
+208:        # moment the gofmt step above goes red this step is reported `skipped` and
+210:        # 37406757402 reads step 8 `[failure]` (gofmt) then step 9 `[skipped]` (this
+212:        # the steps after it skipped; :316 registers the residue as unfixed). A step
+228:        # notes on the D22 steps above), so they keep failing fast. And the two
+229:        # `Upload SLO report` steps are deliberately NOT given a guard even though
+230:        # they carry readings: scripts/slo-freshness.sh P1 (:160-170) fails the nail
+257:        #    skipped 93 / failure 28 / success 0 - the gate had literally never
+283:        #    R-4 (that step `skipped` as collateral damage of the staticcheck
+323:        # in run 35600043583 job 106334066361 it reported `skipped` because
+329:        # it has never produced a finding) is ticket 85's and is deliberately not
+394:  # by platform, not skipped: they run in test-windows / slo jobs.
+478:  # `skipped`. Measured twice, on two runs:
+480:  #     =failure, the next four steps =skipped (those four were all `success` on
+483:  #     shape, STILL LIVE - gate=failure, 5..8=skipped.
+521:        # itself guarded so a red checkout/setup cannot make it inconclusive.
+548:        # ticket 108's deliberate red-before-fix probes in
+567:        # AC#6: red on run 35551819606 before, and skipped behind the winsec gate
+590:        # inconclusive skip.
+655:        # wired into this workflow. Its filename is deliberately not spelled out in
+684:        # 35599458439: step4 failure, steps 5-8 all `skipped`). The fix already in
+694:        # this step instead of quietly shortening the one below. It is deliberately
+833:  # deliberately not a skip (no `if:`, no continue-on-error, no -Skip switch) -
+843:  # probe P3 of scripts/slo-freshness.sh now ages on the newest uploaded
+898:          #      P3 in scripts/slo-freshness.sh (the record of "a valid sample
+902:          #      (deliberately NOT the report path, so it is never uploaded).
+921:  # A skippable job is a job that will one day be skipped.

@@ -1,0 +1,75 @@
+  slo-full:
+    runs-on: [self-hosted, wisp-slo]
+    env:
+      WISP_ENV: test
+      # The runner's job environment carries no msys64 on PATH: measured on the
+      # wisp-slo machine, `msys64` appears 0 times in _diag/Worker_*.log for the
+      # runs that failed here, while gcc lives at E:\work\base\msys64\mingw64\bin
+      # (on the interactive user PATH only). build.ps1's own fallback path is
+      # C:\msys64\..., which is the wrong drive here, so its discovery found no
+      # compiler and the step died before compiling anything. MINGW64_ROOT is
+      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+      # weakening the step. Verified locally with msys removed from PATH:
+      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+      MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Build wisp.exe (deps cached on the runner)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: SLO full gate (six states + settle + leak)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+
+      - name: Upload SLO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-full-report
+          path: build/slo/slo-report.json
+          # Ticket 134 AC#6 (was: error). On the machine-contended path the
+          # gate exits 0 WITHOUT a report - that is the whole trade the owner
+          # approved under Q-36 - and the step above this one stays
+          # unconditional (no `if:`, no continue-on-error, D22 mode-6), so the
+          # only way to keep "no conclusion" from being red is to stop
+          # demanding the file here. error would redden the job one step later
+          # and make AC#6 decoration.
+          #
+          # What replaces the missing-file error is NOT silence:
+          #   1. warn keeps an annotation on the run page ("No files were found
+          #      with the provided path ... No artifacts will be uploaded"),
+          #      verified against the very build the runner downloads today:
+          #      actions/upload-artifact@v4 -> ea165f8d65b6e75b540449e92b4886f43607fa02,
+          #      src/upload/upload-artifact.ts lines 31-52 - warn and ignore
+          #      both sit inside `if (filesToUpload.length === 0)`, so they
+          #      neither fail NOR create an empty artifact. That last part is
+          #      load-bearing: this artifact's existence is the input of probe
+          #      P3 in scripts/slo-freshness.sh (the record of "a valid sample
+          #      was produced"), so an empty placeholder would blind the nail.
+          #   2. slo-check.ps1 prints NO CONCLUSION (machine-contended) with
+          #      one line per reason and writes build/slo/slo-no-conclusion.json
+          #      (deliberately NOT the report path, so it is never uploaded).
+          #   3. slo-smoke below keeps `error`: the owner's ruling is about the
+          #      D32 merge gate on the contended laptop, and widening it to the
+          #      hosted PR gate was never on the table. Consequence stated
+          #      plainly: if a hosted runner ever refuses to sample, slo-smoke
+          #      still goes red - at this step instead of the gate step.
+          if-no-files-found: warn
+
+  # ------------------------------------------------------- lint-frontend ----
+  # Ticket 77 AC#6: frontend/ is real code now, so it gets a real gate.
+  #
+  # It is its OWN job on purpose. The disease this ticket keeps hitting (A44-1,
+  # written up in the lint job above) is "a step exists but never produced a
+  # verdict", because it sat below a step that has been red on ubuntu since
+  # fd8f838. Jobs are independent, so no other job's red can mask this one, and
+  # every step here is node-only: ticket 78's Go-on-Linux problem cannot reach
+  # it, and none of these steps may be moved behind another gate.
+  #
+  # D22 mode-6: no `if:`, no `continue-on-error`, no skip flag, no path filter.
+  # A skippable job is a job that will one day be skipped.
+  lint-frontend:

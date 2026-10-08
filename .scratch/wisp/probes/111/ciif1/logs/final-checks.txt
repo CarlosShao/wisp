@@ -1,0 +1,37 @@
+### P1 check replicated verbatim (scripts/slo-freshness.sh:160-167 regex)
+banned=if: matched rc=1 (1 = not present = P1 satisfied)
+banned=continue-on-error: matched rc=1 (1 = not present = P1 satisfied)
+P1 slo-check-present rc=0 (0 = still present)
+### full slo-freshness.sh with GITHUB_REPOSITORY set
+slo-freshness: no GH_TOKEN/GITHUB_TOKEN - the freshness probes cannot look (this is not a pass)
+rc=2
+### final numstat
+warning: in the working copy of '.github/workflows/ci.yml', LF will be replaced by CRLF the next time Git touches it
+23	0	.github/workflows/ci.yml
+rc=0
+### final status of my two paths
+ M .github/workflows/ci.yml
+?? .scratch/wisp/probes/111/ciif1/insert_guards.py
+?? .scratch/wisp/probes/111/ciif1/logs/ci-guard-comments.txt
+?? .scratch/wisp/probes/111/ciif1/logs/ci-head.bin
+?? .scratch/wisp/probes/111/ciif1/logs/commit-1.txt
+?? .scratch/wisp/probes/111/ciif1/logs/d22scan.txt
+?? .scratch/wisp/probes/111/ciif1/logs/final-checks.txt
+?? .scratch/wisp/probes/111/ciif1/logs/gh-auth.txt
+?? .scratch/wisp/probes/111/ciif1/logs/insert-applied.txt
+?? .scratch/wisp/probes/111/ciif1/logs/insert-plan-dryrun.txt
+?? .scratch/wisp/probes/111/ciif1/logs/job-map.txt
+?? .scratch/wisp/probes/111/ciif1/logs/local-govet-d22scan.txt
+?? .scratch/wisp/probes/111/ciif1/logs/local-govet-root.txt
+?? .scratch/wisp/probes/111/ciif1/logs/pathlen.txt
+?? .scratch/wisp/probes/111/ciif1/logs/roster-after.txt
+?? .scratch/wisp/probes/111/ciif1/logs/roster.txt
+?? .scratch/wisp/probes/111/ciif1/logs/rulers.txt
+?? .scratch/wisp/probes/111/ciif1/logs/run-list.json
+?? .scratch/wisp/probes/111/ciif1/logs/slo-freshness-constraints.txt
+?? .scratch/wisp/probes/111/ciif1/logs/slofull-body.txt
+?? .scratch/wisp/probes/111/ciif1/logs/step-conclusions-named.txt
+?? .scratch/wisp/probes/111/ciif1/logs/step-conclusions.txt
+?? .scratch/wisp/probes/111/ciif1/logs/ticket111-guard-lines.txt
+?? .scratch/wisp/probes/111/ciif1/roster.py
+rc=0

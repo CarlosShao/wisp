@@ -1,0 +1,52 @@
+68 uses: actions/checkout@v4
+70 uses: actions/setup-go@v5
+74 name: D22 scanner positive control (tools/d22scan tests, seeded red)
+83 name: "D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)"
+108 name: D22 seven-ban + emoji scan (tools/d22scan)
+136 name: "Tracked path-length budget (ticket 262)"
+168 name: gofmt (gofumpt)
+184 name: "gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)"
+237 name: go vet (module)
+240 name: go vet (tools/d22scan module)
+244 name: staticcheck
+320 name: mockllm module vet
+335 name: "Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)"
+400 uses: actions/checkout@v4
+402 uses: actions/setup-go@v5
+406 name: Start compose test services (mock-llm on 18080)
+409 name: Probe mock-llm
+421 name: Environment fork assertion (WISP_ENV=test data dir)
+437 name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
+461 name: Stop compose services
+510 uses: actions/checkout@v4
+512 uses: actions/setup-go@v5
+516 name: "Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"
+559 name: Cache third_party (deps.toml key)
+566 name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+573 name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+595 name: "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"
+646 name: "Package coverage census (ticket 111 AC#1 + GUARD D)"
+735 name: Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+771 name: "PathResolver junction placeholder (real cases tickets 18/20)"
+795 uses: actions/checkout@v4
+797 uses: actions/setup-go@v5
+801 name: Cache third_party (deps.toml key)
+807 name: Build wisp.exe
+810 name: SLO smoke gate
+813 name: Upload SLO report
+863 uses: actions/checkout@v4
+865 uses: actions/setup-go@v5
+870 name: Build wisp.exe (deps cached on the runner)
+873 name: SLO full gate (six states + settle + leak)
+876 name: Upload SLO report
+928 uses: actions/checkout@v4
+930 uses: actions/setup-node@v4
+938 name: npm ci (lockfile is the only source of deps)
+941 name: typecheck (tsc -b, noEmit per tsconfig.*.json)
+944 name: lint (oxlint)
+947 name: token drift guard (generated theme must equal the C21 table)
+953 name: build (vite build -> frontend/dist, the bytes go:embed carries)
+956 name: L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)
+975 name: Composer states paint the real envelope (render evidence)
+981 name: Streaming output honours PLAN.md's SSE row (render evidence)
+986 name: Nav rail names only icons PLAN.md's frozen list carries (render evidence)

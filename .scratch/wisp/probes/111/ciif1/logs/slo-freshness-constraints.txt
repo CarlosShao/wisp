@@ -1,0 +1,42 @@
+=== P1 / slo-full if: constraints in scripts/slo-freshness.sh ===
+3:# RED when the slo-full job stops being triggered, and (since ticket 134 AC#6)
+6:# Why this file exists at all. Ticket 134 had to decouple slo-full from the
+15:# slo-full goes N days without a single trigger record, something here fails
+27:#   the record P3 ages on = the newest workflow artifact named `slo-full-report`
+48:#   P1 static   - .github/workflows/ci.yml still carries the triggers that make
+49:#                 slo-full auto-run (push on main/dev + a schedule), and the
+50:#                 slo-full job still has no `if:` / `continue-on-error`. This
+53:#   P2 dynamic  - the newest slo-full JOB in a `ci` workflow run on main/dev is
+55:#                 P1 cannot: the self-hosted runner goes offline and the job
+60:#   P3 sampling - the newest `slo-full-report` ARTIFACT is younger than
+66:#   slo-full-trigger-missing   /  slo-full-never-triggered  /  slo-full-stale
+67:#   slo-full-sample-never      /  slo-full-sample-stale
+80:# Exit codes: 0 = all three probes agree slo-full is alive and sampling,
+130:# ---------------------------------------------------------------- P1 static --
+132:# is also what makes it cheap: if a future edit moves slo-full to a manual-only
+141:    fail "slo-full-trigger-missing: $ci_file has no top-level 'on:' block at all"
+144:    fail "slo-full-trigger-missing: $ci_file has no 'push:' trigger; slo-full can only run when a human presses something"
+147:    fail "slo-full-trigger-missing: $ci_file pushes are not scoped to main/dev, so an automatic run is not guaranteed"
+150:    fail "slo-full-trigger-missing: $ci_file has no 'cron:' schedule entry (ticket 134 shape B); nobody has to press a button any more"
+153:# The job body must stay un-skippable. Anchored to the slo-full job so a
+154:# legitimate `if: ${{ !cancelled() }}` in ANOTHER job cannot mask its removal
+156:# claim was stale): ci.yml carries 9 indented `if:` lines, 8 of them
+157:# `${{ !cancelled() }}` and one `always()`, at :178 :215 :291 :351 :389 :399
+158:# :421 :457 :473 - ALL of them outside the slo-full job (whose key is at :537),
+160:job_body=$(sed -n '/^  slo-full:/,/^  [a-z-]*:$/p' "$ci_file")
+162:    fail "slo-full-trigger-missing: no 'slo-full:' job found in $ci_file - the merge gate it guards no longer exists"
+164:    for banned in 'if:' 'continue-on-error:'; do
+166:            fail "slo-full-trigger-missing: the slo-full job now carries '$banned' (D22 mode-6: a skippable job is a job that will one day be skipped)"
+170:        fail "slo-full-trigger-missing: the slo-full job no longer runs scripts/slo-check.ps1 -Subset full"
+218:    # branches that carry the merge gate. The first run that HAS a slo-full job
+232:                  | select(.name=="slo-full")
+245:    fail 'slo-full-never-triggered: no slo-full job found in the 25 newest ci runs on main/dev'
+251:        fail "slo-full-never-triggered: the record has no created_at: $record"
+257:        echo "slo-freshness: P2 newest slo-full job record: created_at=$created status=$status conclusion=$conclusion"
+261:            fail "slo-full-stale: no slo-full trigger record for $age_days day(s) (> $max_age_days). Either nobody pushed and the schedule stopped firing, or the self-hosted runner has been deaf. D32 has had no automatic verdict since $created."
+263:            fail "slo-full-stale: the newest slo-full job is still '$status' after $((age / 3600)) hour(s) - a queued job that never starts is a silent death too."
+282:sample_artifact=slo-full-report
+360:    fail "slo-full-sample-never: no uploaded $sample_artifact artifact at all ($sample_scan_note). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified."
+369:        fail "slo-full-sample-stale: the last VALID SLO SAMPLE is $sample_age_days day(s) old (> $sample_max_age_days). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was $best_ts (run $best_run). D32 has been unverified since then."
+377:echo 'slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window'
+grep rc=0

@@ -1,0 +1,7 @@
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/git-status-start-tracked.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/111/ciif1/logs/git-status-start.txt', LF will be replaced by CRLF the next time Git touches it
+[dev 0c9726f9] 111-ciif1 起手锚：HEAD 实测 6320a16a（派单写的 e05b8a2b 取不到，顶回）+ ci.yml 起手干净 + 773 条在飞改动登记
+ 3 files changed, 831 insertions(+)
+ create mode 100644 .scratch/wisp/probes/111/ciif1/anchor.md
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/git-status-start-tracked.txt
+ create mode 100644 .scratch/wisp/probes/111/ciif1/logs/git-status-start.txt

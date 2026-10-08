@@ -1,0 +1,13 @@
+### AFTER word-frequency ruler: grep -c 'cancelled'
+50
+rc=0
+### AFTER structural ruler: step-level if: lines
+36
+rc=0
+### AFTER: always() guards
+473:        if: always()
+rc=0
+### AFTER: job-level if: (^    if: )
+rc=1 (1 = none)
+### ignored files inside my paths (rc=0 means at least one is ignored)
+check-ignore rc=1

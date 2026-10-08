@@ -1,0 +1,48 @@
+=== job headers (indent 2) ===
+11:  pull_request:
+12:  push:
+36:  schedule:
+38:  workflow_dispatch:
+65:  lint:
+395:  test-core:
+505:  test-windows:
+790:  slo-smoke:
+848:  slo-full:
+922:  lint-frontend:
+=== indent-0 keys ===
+1:name: ci
+10:on:
+40:concurrency:
+53:jobs:
+=== context around :825-845 ===
+  # -------------------------------------------------------------- slo-full --
+  # Full six-state SLO gate + settle + leak on the self-hosted Windows runner
+  # (interactive desktop-capable machine, label wisp-slo). Same script as
+  # slo-smoke - only the subset differs (SPEC-10 §3: script identical,
+  # scope unchanged). Merges require this green locally/self-hosted.
+  #
+  # Ticket 134 (shape C + B): the triggers stay - push keeps the merge gate
+  # live per commit and the daily schedule adds one interference-free sample.
+  # What changed is what a red MEANS: scripts/slo-check.ps1 now refuses to
+  # produce numbers when the machine is busy (its log says "machine-contended",
+  # D32's thresholds are not evaluated at all on that path). A machine-contended
+  # run is a VALIDITY refusal, not a performance regression: re-run it when the
+  # laptop is quiet, and never read a D32 number out of it. That refusal is
+  # deliberately not a skip (no `if:`, no continue-on-error, no -Skip switch) -
+  # D22 mode-6. If this job ever stops being triggered altogether, the pin in
+  # .github/workflows/slo-fresh.yml goes red (ticket 134 AC#3).
+  #
+  # Ticket 134 AC#6 (Q-36, owner 2026-09-23 "都按推荐") finishes the sentence
+  # above: a VALIDITY refusal no longer colours this job red either - the gate
+  # step exits 0 and prints "NO CONCLUSION (machine-contended)", because A115
+  # measured that a badge kept red by a busy laptop hides real breakage (ticket
+  # 131's Linux compile error, sick for 4h17m). The trade is two halves and the
+  # second one is the pay-off: "no valid sample" may never stay unnoticed, so
+  # probe P3 of scripts/slo-freshness.sh now ages on the newest uploaded
+  # slo-full-report artifact (a report exists only if numbers were produced)
+  # instead of on this job's record, and this laptop refusing to sample for
+  # days reddens that nail by itself. Cancel phrase: "slo-full 恢复判红".
+  # A run that DID sample and did not pass still exits 1 and still goes red.
+  slo-full:
+    runs-on: [self-hosted, wisp-slo]
+    env:

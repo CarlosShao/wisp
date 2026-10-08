@@ -1,0 +1,28 @@
+planned insertions: 23
+  lint           step  3 name@:  74 insert before :  81 ind= 8 | run: bash tools/d22scan/runtests.sh -C tools/d22scan ./... | name: D22 scanner positive control (tools/d22scan tests, seeded 
+  lint           step  4 name@:  83 insert before : 105 ind= 8 | run: go run . -self-test | name: "D22 scanner self-test (ticket 161 AC#2 - every ban, both 
+  lint           step  5 name@: 108 insert before : 134 ind= 8 | run: sh scripts/d22scan.sh | name: D22 seven-ban + emoji scan (tools/d22scan)
+  lint           step  6 name@: 136 insert before : 166 ind= 8 | run: sh scripts/check-path-length-budget.sh --with-self-test | name: "Tracked path-length budget (ticket 262)"
+  lint           step  7 name@: 168 insert before : 169 ind= 8 | run: | | name: gofmt (gofumpt)
+  lint           step  9 name@: 237 insert before : 238 ind= 8 | run: go vet ./... | name: go vet (module)
+  lint           step 10 name@: 240 insert before : 241 ind= 8 | run: go vet ./... | name: go vet (tools/d22scan module)
+  test-core      step  3 name@: 406 insert before : 407 ind= 8 | run: docker compose -f docker/compose.test.yml --profile tes | name: Start compose test services (mock-llm on 18080)
+  test-core      step  4 name@: 409 insert before : 410 ind= 8 | run: | | name: Probe mock-llm
+  test-core      step  5 name@: 421 insert before : 435 ind= 8 | run: bash tools/d22scan/runtests.sh ./internal/proc/ -run Te | name: Environment fork assertion (WISP_ENV=test data dir)
+  test-core      step  6 name@: 437 insert before : 459 ind= 8 | run: bash scripts/portable-tests.sh --scope=core | name: Portable package tests (core scope; the list and its guard
+  slo-smoke      step  3 name@: 801 insert before : 802 ind= 8 | uses: actions/cache@v4 | name: Cache third_party (deps.toml key)
+  slo-smoke      step  4 name@: 807 insert before : 808 ind= 8 | run: powershell -NoProfile -ExecutionPolicy Bypass -File scr | name: Build wisp.exe
+  slo-smoke      step  5 name@: 810 insert before : 811 ind= 8 | run: powershell -NoProfile -ExecutionPolicy Bypass -File scr | name: SLO smoke gate
+  lint-frontend  step  3 name@: 938 insert before : 939 ind= 8 | run: npm ci | name: npm ci (lockfile is the only source of deps)
+  lint-frontend  step  4 name@: 941 insert before : 942 ind= 8 | run: npm run typecheck | name: typecheck (tsc -b, noEmit per tsconfig.*.json)
+  lint-frontend  step  5 name@: 944 insert before : 945 ind= 8 | run: npm run lint | name: lint (oxlint)
+  lint-frontend  step  6 name@: 947 insert before : 951 ind= 8 | run: npm run tokens:check | name: token drift guard (generated theme must equal the C21 tabl
+  lint-frontend  step  7 name@: 953 insert before : 954 ind= 8 | run: npm run build | name: build (vite build -> frontend/dist, the bytes go:embed car
+  lint-frontend  step  8 name@: 956 insert before : 967 ind= 8 | run: npm run render:l2 -- fixtures/l2-card-fs-delete.json | name: L2 card renders the real risk fields, its shapes, and no a
+  lint-frontend  step  9 name@: 975 insert before : 979 ind= 8 | run: npm run render:composer | name: Composer states paint the real envelope (render evidence)
+  lint-frontend  step 10 name@: 981 insert before : 984 ind= 8 | run: npm run render:stream | name: Streaming output honours PLAN.md's SSE row (render evidenc
+  lint-frontend  step 11 name@: 986 insert before : 991 ind= 8 | run: npm run render:nav | name: Nav rail names only icons PLAN.md's frozen list carries (r
+
+slo-full body = 848..921; planned edits inside = 0 (must be 0)
+jobs=6 steps=52
+DRY RUN (no write)
