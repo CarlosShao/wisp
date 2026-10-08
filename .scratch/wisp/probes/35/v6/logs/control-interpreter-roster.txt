@@ -1,0 +1,17 @@
+time=2026-10-08T10:16:39.269+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestShapeA3ForwardingHookIsIdempotentInOneDocument
+--- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+=== RUN   TestForwardingHookMustNotLoseTheNativeExitReceiver
+    panel_transport_35r2_test.go:1968: M-A face has teeth: 1 native-exit call, all with chrome.webview as receiver (receiverLost=0); a bare native(message) trips it
+--- PASS: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+=== RUN   TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+    panel_transport_35r2_test.go:2018: M-B1 face has teeth: non-writable world refused the hook (doorRounds=0, unboundSlots=1), writable world armed it (doorRounds=1)
+--- PASS: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+    panel_transport_35r2_test.go:2071: door absent: the guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=1, no throw)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+    panel_transport_35r2_test.go:2140: M-B3 face has teeth: door present as typeof==="string", guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=1, no throw)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+PASS
+INTERPRETER-ROSTER rc=0

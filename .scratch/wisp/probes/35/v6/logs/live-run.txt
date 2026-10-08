@@ -1,0 +1,26 @@
+time=2026-10-08T10:15:50.284+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor
+    panel_transport_live_35v2_windows_test.go:176: 35v2 RENDERED FORWARDING SCRIPT (Go side, %[1]s already substituted):
+        (function () {
+          var cw = window.chrome && window.chrome.webview;
+          if (!cw || cw.__wispForwardInstalled) { return; }
+          cw.__wispForwardInstalled = true;
+          var native = cw.postMessage;
+          var inside = false;
+          cw.postMessage = function (message) {
+            if (inside || typeof window.wispDispatch !== "function") { return native.call(cw, message); }
+            inside = true;
+            try { return window.wispDispatch(message); } finally { inside = false; }
+          };
+        })();
+        35v2 ---- end of rendered script ----
+    panel_transport_live_35v2_windows_test.go:196: 35v2 webview processes at start: tree=0 machineNamed=18 pids=0
+    panel_transport_live_35v2_windows_test.go:237: 35v2 cold bring-up measured on this box: -1.000 ms, hwnd=0x1d0d7a
+    panel_transport_live_35v2_windows_test.go:240: 35v2 canary arrival=true after 1 post(s); door has recorded [pc-35v2-canary]
+    panel_transport_live_35v2_windows_test.go:247: 35v2 DELIVERED TO GO: method="panel.mode.request" requestId="pc-35v2-pagepost-1" source="panel-composer" to="ask_every_step" (attempt 1)
+    panel_transport_live_35v2_windows_test.go:256: 35v2 PAGE-SIDE FACTS (diagnostic lane, asserted for nothing): pc-35v2-DESC-OWN-WR-CF-HOOK-NOERR
+    panel_transport_live_35v2_windows_test.go:264: 35v2 all door recordings: [pc-35v2-canary pc-35v2-pagepost-1 pc-35v2-desc-ping pc-35v2-DESC-OWN-WR-CF-HOOK-NOERR]
+    panel_transport_live_35v2_windows_test.go:276: 35v2 webview processes after teardown: tree=0 machineNamed=18 pids=0 (start tree=0 pids=0)
+--- PASS: TestLive35v2PagePostMessageEnvelopeReachesTheGoDoor (8.30s)
+PASS
+LIVE rc=0
