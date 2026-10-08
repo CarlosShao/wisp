@@ -1,0 +1,8 @@
+=== v-idem-guard-gone ===
+    panel_transport_35r2_test.go:1802: AC#6 RED: the string that arrived inside the RPC frame is not the page's envelope verbatim: got "{\"id\":1,\"method\":\"wispDispatch\",\"params\":[\"{\\\"method\
+    panel_transport_35r2_test.go:1802: AC#6 RED: dispatchRaw's downstream ran 0 time(s), want 1. []
+=== v-finally-stuck ===
+    panel_transport_35r2_test.go:1779: AC#6 RED: the bound door fired 1 time(s), want 2. nativeExitCalls=2 receiverOK=2 receiverLost=0 ignoredWrites=(none) doorRounds=1 maxPostDepth=3 capTripped=false
+=== v-ma-world-swap ===
+    panel_transport_35r2_test.go:1961: AC#6 RED: the bound door fired 0 time(s), want 1. nativeExitCalls=1 receiverOK=1 receiverLost=0 ignoredWrites=[postMessage] doorRounds=0 maxPostDepth=1 capTrippe
+=== v-init-keep-bind ===

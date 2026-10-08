@@ -1,0 +1,8 @@
+35-v4 premise replication roster table (2026-10-08 08:55:08+0800)
+prer4-clean: PASS=0 FAIL=0 buildrc=buildrc=0 runrc=
+    present-in-roster=0 of 12 named; r4's three cases are absent from that blob by construction
+prer4+ma-hook: PASS=0 FAIL=0 buildrc=buildrc=0 runrc=
+    present-in-roster=0 of 12 named; r4's three cases are absent from that blob by construction
+prer4+guard-gone: PASS=0 FAIL=0 buildrc=buildrc=0 runrc=
+    present-in-roster=0 of 12 named; r4's three cases are absent from that blob by construction
+rc=0

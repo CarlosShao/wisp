@@ -1,0 +1,37 @@
+35-v4 premise replication, FIXED table (2026-10-08 08:56:03+0800).
+★ the first table (prem-replication-table.txt) is NOT a reading: its awk segment never matched, so it reported PASS=0 FAIL=0 for all three rows - a broken ruler of mine, self-caught on the same pass. Corrected here by byte ranges of logs/prem-replication.txt (headers at the line numbers quoted in the log of this file).
+marker line 3
+marker line 6
+marker line 9
+marker line 12
+marker line 15
+marker line 17
+marker line 20
+marker line 22
+marker line 24
+marker line 27
+marker line 31
+marker line 34
+marker line 37
+marker line 40
+marker line 43
+marker line 45
+marker line 48
+marker line 50
+marker line 52
+marker line 55
+marker line 59
+marker line 62
+marker line 65
+marker line 68
+marker line 71
+marker line 73
+marker line 76
+marker line 78
+marker line 80
+marker line 83
+[prer4-clean] PASS=9 FAIL=0 names-FAIL:
+[prer4+ma-hook] PASS=9 FAIL=0 names-FAIL:
+[prer4+guard-gone] PASS=9 FAIL=0 names-FAIL:
+note: the 3 r4 cases (:1946 :1976 :2026) do not exist in the 2fc5f5c9^ blob, so 9 of 12 roster names run there; that is expected and is not read as a colour
+rc=0

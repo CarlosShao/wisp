@@ -1,0 +1,40 @@
+35-v4 premise replication table, FINAL (2026-10-08 08:56:38+0800)
+source log = logs/prem-replication.txt ; segment headers measured at lines:
+3:=== prer4-clean ===
+31:=== prer4+ma-hook ===
+59:=== prer4+guard-gone ===
+total lines = 86
+[prer4-clean] lines 4-30 buildrc=buildrc=0 runrc=runrc=0 PASS=9 FAIL=0
+    --- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+    --- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+    --- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+    --- PASS: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+    --- PASS: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    --- PASS: TestShapeA3SecondPagePostStillDelivers
+    --- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    --- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop
+    --- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+[prer4+ma-hook] lines 32-58 buildrc=buildrc=0 runrc=runrc=0 PASS=9 FAIL=0
+    --- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+    --- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+    --- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+    --- PASS: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+    --- PASS: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    --- PASS: TestShapeA3SecondPagePostStillDelivers
+    --- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    --- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop
+    --- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+[prer4+guard-gone] lines 60-86 buildrc=buildrc=0 runrc=runrc=0 PASS=9 FAIL=0
+    --- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+    --- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+    --- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+    --- PASS: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+    --- PASS: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    --- PASS: TestShapeA3SecondPagePostStillDelivers
+    --- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    --- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop
+    --- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+READING: on the pre-r4 fixture (git show 2fc5f5c9^:cmd/wisp/panel_transport_35r2_test.go = 1824 lines, blob 7185ab56d75952247226feb404add6642fc0e336) BOTH of 35-v2's break-shapes stay green - the bare-native receiver break (ma-hook) and the deleted typeof-half guard (guard-gone) - exactly as ledger A684 §3 and ticket 35:75 assert. That premise is now measured by this leg, not inherited.
+NOTE: 9 of the 12 roster names exist in that blob (r4's three cases :1946 :1976 :2026 do not), so 'roster shrinks' is expected and is not read as a colour.
+★尺 defects of this leg, both self-caught on the same pass: (1) the first table (prem-replication-table.txt) used an awk segment that never matched and printed PASS=0 FAIL=0 three times - not a reading; (2) the first fix here used guessed byte ranges that overlapped a segment header; the ranges above are the measured ones.
+rc=0

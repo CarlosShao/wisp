@@ -1,0 +1,14 @@
+35-v4 driver3 mutant landing (2026-10-08 08:52:19+0800) - each must be exactly one changed line
+diff: /tmp/wisp35v4/mut3/v-no-panic-fix-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-no-panic-fix changed-line-count=0
+diff: /tmp/wisp35v4/mut3/v-no-panic-fix-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut3/v-ma-hook-cmd/wisp/panel_host_windows.go: No such file or directory
+mutant v-ma-hook changed-line-count=0
+diff: /tmp/wisp35v4/mut3/v-ma-hook-cmd/wisp/panel_host_windows.go: No such file or directory
+diff: /tmp/wisp35v4/mut3/v-cap-loose-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-cap-loose changed-line-count=0
+diff: /tmp/wisp35v4/mut3/v-cap-loose-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+diff: /tmp/wisp35v4/mut3/v-cap-tight-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+mutant v-cap-tight changed-line-count=0
+diff: /tmp/wisp35v4/mut3/v-cap-tight-cmd/wisp/panel_transport_35r2_test.go: No such file or directory
+rc=0

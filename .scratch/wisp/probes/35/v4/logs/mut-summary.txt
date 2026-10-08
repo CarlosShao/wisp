@@ -113,3 +113,36 @@ v-guard-gone buildrc=buildrc=0 runrc=runrc=1 PASS=11 FAIL=1 SKIP=0
   vanished-names(should be none; a missing name = that test did not run):
   red-reasons (verbatim first line of each failure):
 --- v-set-gone
+v-set-gone buildrc=buildrc=0 runrc=runrc=1 PASS=11 FAIL=1 SKIP=0
+  newly-FAIL:
+    FAIL TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-guard-gone+label-mb
+v-guard-gone+label-mb buildrc=buildrc=0 runrc=runrc=1 PASS=11 FAIL=1 SKIP=0
+  newly-FAIL:
+    FAIL TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+--- v-ma-hook+label-ma
+v-ma-hook+label-ma buildrc=buildrc=0 runrc=runrc=1 PASS=3 FAIL=9 SKIP=0
+  newly-FAIL:
+    FAIL TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+    FAIL TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+    FAIL TestForwardingHookMustNotLoseTheNativeExitReceiver
+    FAIL TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+    FAIL TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+    FAIL TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+    FAIL TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    FAIL TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    FAIL TestShapeA3SecondPagePostStillDelivers
+  no-longer-FAIL:
+  vanished-names(should be none; a missing name = that test did not run):
+  red-reasons (verbatim first line of each failure):
+    AC#6 RED: after re-running the Init queue the page's post threw: TypeError: Illegal invocation: chrome.webview.pos
+    AC#6 RED: page post #1 threw: TypeError: Illegal invocation: chrome.webview.postMessage lost its receiver - called
+    M-B CONTROL RED: the same shipped hook in a writable world threw: TypeError: Illegal invocation: chrome.webview.p
+    M-B RED (guard's typeof half gone): with no door in the page the forwarding hook must fall back to the native exi
+rc=0

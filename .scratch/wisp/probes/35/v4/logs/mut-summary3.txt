@@ -1,0 +1,43 @@
+35-v4 driver3 (2026-10-08 08:52:20+0800): 3 shapes, same 12-name roster as countershape-v4.sh pass 2
+--- v-ma-hook+no-panic buildrc=buildrc=0 runrc=runrc=1 PASS=10 FAIL=2
+  FAIL names:
+    FAIL TestForwardingHookMustNotLoseTheNativeExitReceiver
+    FAIL TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+  vanished vs baseline (a missing name = it did not run):
+  red-reasons:
+    M-B face has teeth: non-writable world refused the hook (doorRounds=0, unboundSlots=1), writable world 
+--- v-cap-loose buildrc=buildrc=0 runrc=runrc=1 PASS=4 FAIL=8
+  FAIL names:
+    FAIL TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+    FAIL TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+    FAIL TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+    FAIL TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    FAIL TestShapeA3SecondPagePostStillDelivers
+    FAIL TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    FAIL TestForwardingHookMustNotLoseTheNativeExitReceiver
+    FAIL TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+  vanished vs baseline (a missing name = it did not run):
+  red-reasons:
+    AC#6 RED: after re-running the Init queue the page's post threw: RangeError: maximum call stack size exc
+    AC#6 RED: page post #1 threw: RangeError: maximum call stack size exceeded - chrome.webview.postMessage 
+    M-B CONTROL RED: the same shipped hook in a writable world threw: RangeError: maximum call stack size e
+    RangeError: maximum call stack size exceeded - chrome.webview.postMessage re-entered 3 levels (cap 2) with the
+--- v-cap-tight buildrc=buildrc=0 runrc=runrc=1 PASS=3 FAIL=9
+  FAIL names:
+    FAIL TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge
+    FAIL TestInboundSourceGuardRefusesForeignSourceOnPageEdge
+    FAIL TestInboundRequestIDGuardRefusesMissingIDOnPageEdge
+    FAIL TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    FAIL TestShapeA3SecondPagePostStillDelivers
+    FAIL TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    FAIL TestForwardingHookMustNotLoseTheNativeExitReceiver
+    FAIL TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+    FAIL TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+  vanished vs baseline (a missing name = it did not run):
+  red-reasons:
+    AC#6 RED: after re-running the Init queue the page's post threw: RangeError: maximum call stack size exc
+    AC#6 RED: page post #1 threw: RangeError: maximum call stack size exceeded - chrome.webview.postMessage 
+    M-B CONTROL RED: the same shipped hook in a writable world threw: RangeError: maximum call stack size e
+    M-B RED (guard's typeof half gone): with no door in the page the forwarding hook must fall back to the 
+    RangeError: maximum call stack size exceeded - chrome.webview.postMessage re-entered 2 levels (cap 1) with the
+rc=0
