@@ -229,10 +229,10 @@ func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPat
 //
 // The source is consulted HERE, on every call, and windowOptions is called from
 // inside bringUp - so a dispose followed by a fresh show picks up whatever the
-// config says at that moment. That is the whole of what "改了要有反应" can mean on
-// today's host, and it is stated as such rather than as a resize: this host has no
-// MoveWindow/SetWindowPos/SetBounds call at all (measured, 票 255 AC#4's 现量), so
-// an ALREADY CREATED window keeps its geometry until it is destroyed and rebuilt.
+// config says at that moment. An ALREADY CREATED window is covered too, since
+// 票 255-r1: Show's re-display branch asks this same method again and hands the live
+// window the answer through requestGeometryOnReshow, which reads the pair as a CLIENT
+// area while this one reads the OUTER FRAME - so one configured value is two widths.
 func (m *PanelManager) windowOptions() webview2.WindowOptions {
 	width, height := panelWidthPx, panelHeightPx
 	if m.geometry != nil {
@@ -496,6 +496,12 @@ func (m *PanelManager) serveEntry() error {
 // after creation was the panel's own HWND, so Hide handed focus back to the window
 // it had just hidden). The sampled value goes through setPriorFocusLocked, which
 // refuses to record the panel itself or one of its own child windows.
+//
+// The two branches below answer "did this Show create the window, or reveal one
+// that already existed", and 票 255 AC#4's 甲形 hangs off that split: a create
+// already read the geometry source inside bringUp, so only the RE-SHOW branch has
+// anything left to catch up. That is what requestGeometryOnReshow is for, and it
+// runs only when created was already true.
 func (m *PanelManager) Show(ctx context.Context) error {
 	m.mu.Lock()
 	created := m.created
@@ -506,6 +512,11 @@ func (m *PanelManager) Show(ctx context.Context) error {
 		if err := m.bringUp(ctx); err != nil {
 			return err
 		}
+	} else {
+		// The window survived the hide (C27 hide-don't-destroy), so bringUp never
+		// ran and the create-time read never happened: ask the source again and
+		// hand the live window the answer.
+		m.requestGeometryOnReshow()
 	}
 
 	m.mu.Lock()
@@ -524,6 +535,84 @@ func (m *PanelManager) Show(ctx context.Context) error {
 	m.shown = true
 	m.mu.Unlock()
 	return nil
+}
+
+// requestGeometryOnReshow is 票 255 AC#4's 甲形 on the live window (orchestrator
+// ruling 10-08 11:0x, ledger A700 §1/§4): it asks this host's geometry source once
+// more and posts the answer to the window that already exists, so a config edit
+// reaches a panel that was never destroyed. It runs only from Show's re-show
+// branch, which is the whole of what "不用重启就见效" means on today's assembly -
+// see "WHAT STILL DOES NOT MOVE" below; this is NOT a hot-reload hook and nobody
+// presses it when the file changes.
+//
+// The exit is the library's own, not a new Win32 call: webview2.WebView.SetSize
+// (common.go:54, implemented at webview.go:405) runs AdjustWindowRect +
+// SetWindowPos and then browser.Resize(). C27 is untouched - nothing here hides,
+// destroys or recreates a window.
+//
+// THREE things this method owes by name, because the ruling named all three:
+//
+//  1. TWO GEOMETRY SEMANTICS, NOT ONE NUMBER TWICE. The pair handed to SetSize is
+//     read as the CLIENT area (AdjustWindowRect turns that rect into a window rect
+//     before SetWindowPos runs), while windowOptions' pair goes to CreateWindowExW
+//     and is read as the OUTER FRAME (webview.go:296-320, the 0xCF0000
+//     WS_OVERLAPPEDWINDOW create). So the same [panel] value produces two
+//     different window widths depending on which hop carried it. This method does
+//     NOT correct for that: the frame delta is a per-machine quantity
+//     〔仅本机可量〕, and inventing a subtraction here would be common sense
+//     dressed up as a measurement. Consequence stated rather than hidden: a
+//     re-show can move the outer width even when the config did not change, and
+//     "the on-screen width now equals [panel] width" is not a claim this file
+//     makes - only "the pair the host resolves right now was sent" is.
+//  2. THE HINT IS webview2.HintNone, deliberately. HintFixed would clear
+//     WSThickFrame and WSMaximizeBox (webview.go:408-413), which takes away the
+//     user's ability to drag the window edge - an interface behaviour change that
+//     票 255 does not own. HintMin/HintMax would only re-record the window's
+//     bounds and resize nothing (webview.go:415-419).
+//  3. IT GOES THROUGH Dispatch. Show is reached from the panel thread in today's
+//     resident assembly, but nothing in this package enforces that for every
+//     caller, and the repository holds NO measurement of what a cross-thread
+//     SetWindowPos does to a WebView2 window (255-a2 asked; its words: 仓里没有
+//     凭据). So the resize is posted through the library's own thread hop - the
+//     same channel cmd/wisp/panel_resident_windows.go's post() already routes
+//     every other request through once a window exists (common.go:39). No new
+//     goroutine, no new thread, no lock held across the call.
+//
+// WHAT STILL DOES NOT MOVE, and why the wording here cannot say 立即生效: the tick
+// that would call this the moment config.toml changes does not exist in this
+// process. internal/config/manager.go's OnReload only fires for Reload-tier
+// sections while internal/config/tiers.go registers "panel" as "hot", and
+// startConfigReload's only non-test caller is cmd/wisp/run.go - the resident leg
+// never starts it. Until that hop is landed, the new size arrives on the NEXT
+// show request (a hot key, a tray item, a ball gesture), not at the instant the
+// file is saved.
+//
+// A host nobody sized (m.geometry nil) sends nothing, which is what keeps the
+// pre-AC#4 construction sites behaving exactly as they did. When a source IS
+// attached, the pair sent is the one windowOptions resolves right now - the same
+// function the create consults, so the "height 0 is not auto-height" and the
+// "unreadable config falls back to the host constants" rules live in one place.
+// That last consequence is worth naming: with an unreadable config a re-show moves
+// the window to those constants, just as a fresh create would.
+func (m *PanelManager) requestGeometryOnReshow() {
+	if m.geometry == nil {
+		return
+	}
+	m.mu.Lock()
+	w := m.w
+	m.mu.Unlock()
+	if w == nil {
+		// Destroy ran between Show's created check and here. Nothing to resize, no
+		// file to read for a request that cannot go anywhere, and the next create
+		// reads the source anyway.
+		return
+	}
+	options := m.windowOptions()
+	width, height := int(options.Width), int(options.Height)
+
+	w.Dispatch(func() {
+		w.SetSize(width, height, webview2.HintNone)
+	})
 }
 
 // setPriorFocusLocked records the caller's foreground sample for Hide to hand

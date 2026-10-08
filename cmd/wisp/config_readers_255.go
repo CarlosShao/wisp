@@ -13,10 +13,15 @@ package main
 // reported "已立即生效" off a memory write. 票 255's 现量 says the same thing in
 // the owner's words: 「它报的是内存里的值换掉了，不是有人按新值做了事」. A hand edit
 // of [panel] width therefore printed a claim that could not be true: at the time
-// this file was written the shipped panel host received no config object at all
-// (cmd/wisp/panel_host_windows.go:304-305 at HEAD 67ab595d hard-coded
-// Width: 420 / Height: 260 inside the create call, and NewPanelManager took no
-// config parameter). 票 255 AC#4 has since landed in this same package: the
+// this file was written the shipped panel host received no config object at all.
+// The evidence is quoted as CONTENT, not as a line number: at HEAD 67ab595d the
+// create call inside bringUp spelled its geometry as the literals `Width: 420` /
+// `Height: 260` (grep those two in
+// `git show 67ab595d:cmd/wisp/panel_host_windows.go`), and NewPanelManager took no
+// config parameter. No line number is quoted here on purpose - that cold-start
+// block has moved twice since (its tail went into coldStartPageHandover in 33-r5,
+// and 33-v4 named the rot on 10-08), so a bare file:LINE would have been a stale
+// pointer by now. 票 255 AC#4 has since landed in this same package: the
 // resident assembly root hands the host a per-creation geometry closure, and the
 // [panel] row below is what that changed in THIS file's claim. What did not
 // change is the judgement this file exists to enforce - a section is only claimed
@@ -137,28 +142,43 @@ var hotRowClaims = map[string]string{
 	"observe": hotClaimNoReader + "cmd/wisp/logsink.go:149 [Level: logSinkLevel] - the log sinks choose their level themselves, never from cfg.Observe",
 
 	// [panel]: the section 票 255 was 立 for, and AC#4 landed while this file was
-	// open. The host used to hard-code its own geometry here
-	// (`Width: 420 / Height: 260` in cmd/wisp/panel_host_windows.go's create block
-	// at HEAD 67ab595d) and received no config at all; both halves of that are
-	// gone, and what replaced them is NOT a reader in this host:
+	// open. The host used to hard-code its own geometry - at HEAD 67ab595d the
+	// create block inside bringUp spelled it as the literals `Width: 420` /
+	// `Height: 260` (a CONTENT anchor, grep it in
+	// `git show 67ab595d:cmd/wisp/panel_host_windows.go`; this file quotes no line
+	// number for it because that block has moved twice since) - and received no
+	// config at all. Both halves of that are gone, and what replaced them is still
+	// NOT a reader in this host:
 	//
 	// cmd/wisp/panel_resident_windows.go's assembly root now hands the host a
 	// closure that re-reads [panel] width/height at every window creation, and the
 	// host asks it for the number the window is born with. So a value DOES act,
 	// and the row says which value acts where rather than claiming a reader this
-	// command never had. Two facts the wording has to carry, both measured:
+	// command never had. Three facts the wording has to carry, all measured:
 	//   - the reader lives in the resident `wisp` process, which is the only
 	//     process that builds a panel host at all (NewPanelManager's one non-test
 	//     call site, cmd/wisp/panel_resident_windows.go:253). `wisp run` never
 	//     opens a panel window, so on THIS seam nothing acts on the new number -
 	//     the same shape [models] is booked in above, which is why this row is
 	//     other-process and not consumed.
-	//   - the effect is "close it and reopen it" (关窗再开), never "drag it and it
-	//     resizes": this host contains no MoveWindow / SetWindowPos / SetBounds
-	//     call, so an already-created window keeps its geometry until it is
-	//     destroyed and rebuilt. Pinned by
-	//     TestTicket255PanelRosterVerdictIsTheHonestShape.
-	"panel": hotClaimOtherProcess + "cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)], reached from the create at :392); 面板关窗再开即跟上新值, and this `wisp run` process builds no panel host at all",
+	//   - "close it and reopen it" (关窗再开) still follows the new value, because
+	//     the create re-reads the source. Since 票 255-r1 an ALREADY-created window
+	//     is covered too: Show's re-show branch asks the same source once more and
+	//     posts the resolved pair through the library's SetSize on Dispatch
+	//     (panel_host_windows.go's requestGeometryOnReshow). That hop is a
+	//     CLIENT-area request while the create is an OUTER-FRAME one, so the same
+	//     width value is not the same pixels on screen - the frame delta is
+	//     〔仅本机可量〕 and no ruler here claims the on-screen width equals
+	//     [panel] width.
+	//   - what still does NOT move is the tick: nothing calls that on the instant
+	//     config.toml is saved. internal/config/manager.go's OnReload only fires for
+	//     Reload-tier sections while internal/config/tiers.go registers "panel" as
+	//     "hot", and startConfigReload's only non-test caller is cmd/wisp/run.go -
+	//     the resident leg never starts it. So the honest tense is "the next show
+	//     request picks it up", never "改完立刻自己变". Pinned by
+	//     TestTicket255PanelRosterVerdictIsTheHonestShape and by
+	//     TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch.
+	"panel": hotClaimOtherProcess + "cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)], reached from the create at :392); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all",
 
 	// Per-key sections: planApp/planVoice book the SECTION name into rep.Hot, so
 	// the claim must be settled per key row and only claimed when every hot row

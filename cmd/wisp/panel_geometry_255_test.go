@@ -352,8 +352,8 @@ func TestTicket255HostStillDoesNotParseConfigItself(t *testing.T) {
 // TestTicket255PanelRosterVerdictIsTheHonestShape pins the wording AC#4 owes the
 // operator once the value really arrives. Two halves, both from 票 255's ruling:
 // the sentence is "close the panel and open it again", never "drag it and it
-// resizes" (there is no resize path today), and [panel]'s roster row must name
-// the live read site rather than the retired literal.
+// resizes" (the resize 票 255-r1 added runs on a show request, never at the instant
+// config.toml is saved), and [panel]'s roster row must name the live read site.
 func TestTicket255PanelRosterVerdictIsTheHonestShape(t *testing.T) {
 	verdict, ok := hotRowClaims["panel"]
 	if !ok {
@@ -361,18 +361,18 @@ func TestTicket255PanelRosterVerdictIsTheHonestShape(t *testing.T) {
 	}
 	for _, lie := range []string{"拖动即变", "立即改变窗口大小", "自动改大小", "auto from content 已实现"} {
 		if strings.Contains(verdict, lie) {
-			t.Errorf("the [panel] verdict claims %q and this host has no resize path at all; the honest shape is 关窗再开: %q", lie, verdict)
+			t.Errorf("the [panel] verdict claims %q; the only resize this host has fires on the NEXT show request, never at the instant config.toml is saved, so the honest shape stays 关窗再开: %q", lie, verdict)
 		}
 	}
 	if !strings.Contains(verdict, "关窗再开") {
 		t.Errorf("the [panel] verdict must state the effect the operator can actually get, 关窗再开即跟上新值: %q", verdict)
 	}
 	// The retired cite must not survive as if it still described the code. AC#4
-	// removed the literal at panel_host_windows.go:304, and a roster that keeps
-	// pointing there is how a fixed bug goes on being reported as present -
-	// TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim would catch the token
-	// drift, but only for a cite that survives the line-number shuffle, and this
-	// one is about the whole claim.
+	// removed the hard-coded geometry literals from bringUp's create block, and a
+	// roster pointing at that retired shape is how a fixed bug keeps being
+	// reported as present. TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim
+	// would catch token drift, but only for a cite that survives the line shuffle,
+	// and this one is about the whole claim - both needles below are CONTENT.
 	src := readHostFileForGeometry255(t, filepath.Join(hostPkgDir255(t), "config_readers_255.go"))
 	for _, retired := range []string{"panel_host_windows.go:304 [", "Width:  420,"} {
 		for i, line := range strings.Split(src, "\n") {

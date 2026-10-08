@@ -174,9 +174,9 @@ const residentPanelHotReloadNote = "panel host (resident): this leg does not tic
 // What still does not move, and this line says so out loud instead of letting the
 // operator infer it: the tick, and with it every OTHER hot section of this
 // process, keeps needing a restart.
-const residentPanelGeometryNote = "config: PANEL-GEOMETRY state=per-create reads=[panel] width/height " +
-	"detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值。本腿不轮询 config.toml，" +
-	"所以其余热加载段仍要重启进程才生效，已建好的窗口也不会自己改大小（今天没有 resize 路）。\""
+const residentPanelGeometryNote = "config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height " +
+	"detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时" +
+	"也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。\""
 
 // panelGeometrySource is [panel] width/height, re-read from disk every time the
 // panel host is about to create a window. Built by the assembly root, handed down
