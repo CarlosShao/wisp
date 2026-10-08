@@ -1,0 +1,51 @@
+MUTATION MA go_test_rc=1
+-- MA red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+grep_fail_rc=0
+-- MA pass cases:
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+MUTATION MB go_test_rc=0
+-- MB red cases:
+grep_fail_rc=1
+-- MB pass cases:
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+MUTATION MC go_test_rc=1
+-- MC red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+grep_fail_rc=0
+-- MC pass cases:
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+MUTATION MD go_test_rc=1
+-- MD red cases:
+grep_fail_rc=1
+-- MD pass cases:
+MUTATION ME go_test_rc=1
+-- ME red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+grep_fail_rc=0
+-- ME pass cases:
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+--- additional legs run outside run_mutations.sh ---
+M-D (first attempt) go_test_rc=1 BUILD FAILED: strconv imported and not used -> voided, not counted as red
+M-D3 (seq folded out of bindDigest) -run TestTicket242: 6 PASS / 0 FAIL rc=0 ; full package: ok rc=0, 0 FAIL (mut-MD3-fullpkg.txt)
+M-B full package: rc=1, reds = ticket224_reply_grant_test.go:278/:303, ticket87_veto_l2_test.go:226, ticket97_alias_direction_test.go:119 (mut-MB-fullpkg.txt)
+M-F (PanelAPI gains real Allow verb) full package rc=1, 68 PASS, reds = TestTicket259R1PanelAPIMethodSetIsClosed + TestTicket259R1PanelCarrierCarriesNoAnswerVerb; both ticket242 panelface cases PASS (mut-MF-fullpkg.txt)
+M-G (PanelItem gains Permitted bool + readface entry) rc=1, only TestTicket259R1PanelItemFieldCapabilityFence FAIL; both ticket242 panelface cases PASS (mut-MG-test.txt)
+repo-integrity rc=0: approval.go/queue.go/ui.go/ticket242_binding_test.go/ticket242_panelface_test.go all git hash-object == HEAD blob

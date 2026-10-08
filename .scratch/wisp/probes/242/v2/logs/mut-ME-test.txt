@@ -1,0 +1,18 @@
+time=2026-10-08T11:56:46.043+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce
+    ticket242_binding_test.go:37: AC#1 RED: the rejected nonce was still spendable afterwards - single-use was broken by the forged attempt
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+=== RUN   TestTicket242SpendRequiresTheExactBinding
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+=== RUN   TestTicket242QueuedItemsBindGrantsToTheirOwnDigest
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+=== RUN   TestTicket242ForgedBindingCannotSpendAnotherItemsGrant
+    ticket242_binding_test.go:112: AC#1 RED: item B's binding spent item A's grant - cross-item binding is broken
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+=== RUN   TestTicket242PanelItemReadFaceIsFullyDeclared
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+=== RUN   TestTicket242PanelItemStaysGrantFree
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	0.069s
+FAIL

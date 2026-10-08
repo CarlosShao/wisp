@@ -1,0 +1,55 @@
+0a1
+>  M .github/workflows/ci.yml
+272a274,276
+> ?? .scratch/wisp/probes/111/ciif1/insert_guards.py
+> ?? .scratch/wisp/probes/111/ciif1/logs/ci-guard-comments.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/ci-head.bin
+273a278,287
+> ?? .scratch/wisp/probes/111/ciif1/logs/d22scan.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/gh-auth.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/insert-applied.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/insert-plan-dryrun.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/job-map.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/local-govet-d22scan.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/local-govet-root.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/pathlen.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/roster-after.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/roster.txt
+274a289,294
+> ?? .scratch/wisp/probes/111/ciif1/logs/run-list.json
+> ?? .scratch/wisp/probes/111/ciif1/logs/slo-freshness-constraints.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/slofull-body.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/step-conclusions.txt
+> ?? .scratch/wisp/probes/111/ciif1/logs/ticket111-guard-lines.txt
+> ?? .scratch/wisp/probes/111/ciif1/roster.py
+304d323
+< ?? .scratch/wisp/probes/182/c2/20-c17-roster.md
+410c429,435
+< ?? .scratch/wisp/probes/255/v2/
+---
+> ?? .scratch/wisp/probes/255/v2/logs/20-mutation-V2M1-hardcoded-pair.txt
+> ?? .scratch/wisp/probes/255/v2/logs/21-mutation-V2M2-second-hintfixed-path.txt
+> ?? .scratch/wisp/probes/255/v2/logs/22-positive-control-and-create-semantics.txt
+> ?? .scratch/wisp/probes/255/v2/logs/23-create-is-outer-frame.txt
+> ?? .scratch/wisp/probes/255/v2/logs/24-winlive-coverage.txt
+> ?? .scratch/wisp/probes/255/v2/logs/25-numstat-and-impl-claims.txt
+> ?? .scratch/wisp/probes/255/v2/logs/26-lock-discipline.txt
+547,564d571
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M0-baseline.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M1-ruler-blind.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M2-rule-drift-1char.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M3-reply-guard-removed.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M4a-raw-swallowed.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M4b-leg-never-called.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M5-cred-receipt-echoes-raw.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M5-receipt-echoes-raw.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M6-refusals-say-success.txt
+< ?? .scratch/wisp/probes/35/v7/logs/mut-M7-plain-receipt-echoes-value.txt
+< ?? .scratch/wisp/probes/35/v7/logs/q3-carrier.txt
+< ?? .scratch/wisp/probes/35/v7/logs/q3-host-wiring.txt
+< ?? .scratch/wisp/probes/35/v7/logs/q3-production-wiring.txt
+< ?? .scratch/wisp/probes/35/v7/logs/q4-d22scan.txt
+< ?? .scratch/wisp/probes/35/v7/logs/q4-diff-and-restore.txt
+< ?? .scratch/wisp/probes/35/v7/logs/q4-gates.txt
+< ?? .scratch/wisp/probes/35/v7/logs/q4-test-after.txt
+< ?? .scratch/wisp/probes/35/v7/logs/q4-vet.txt

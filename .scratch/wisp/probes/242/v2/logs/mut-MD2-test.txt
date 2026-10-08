@@ -1,0 +1,5 @@
+# github.com/CarlosShao/wisp/internal/agent/approval [github.com/CarlosShao/wisp/internal/agent/approval.test]
+C:\Users\swq\242v2-mut\approval-MD2.go:418:118: syntax error: unexpected newline in composite literal; possibly missing comma or }
+C:\Users\swq\242v2-mut\approval-MD2.go:419:21: syntax error: unexpected ], expected { after for clause
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval [build failed]
+FAIL

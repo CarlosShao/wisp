@@ -1,0 +1,18 @@
+time=2026-10-08T11:56:38.458+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce
+    ticket242_binding_test.go:34: AC#1 RED: after a rejected spend the nonce survived (1 live); a rejected answer must still consume the grant or the forged caller can retry it
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+=== RUN   TestTicket242SpendRequiresTheExactBinding
+    ticket242_binding_test.go:51: AC#1 RED: the rejected empty-binding spend left 1 live nonces; consumption-on-reject is the retry killer
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+=== RUN   TestTicket242QueuedItemsBindGrantsToTheirOwnDigest
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+=== RUN   TestTicket242ForgedBindingCannotSpendAnotherItemsGrant
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+=== RUN   TestTicket242PanelItemReadFaceIsFullyDeclared
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+=== RUN   TestTicket242PanelItemStaysGrantFree
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	0.036s
+FAIL

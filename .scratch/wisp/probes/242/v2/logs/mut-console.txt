@@ -1,0 +1,45 @@
+MUTATION MA go_test_rc=1
+-- MA red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+grep_fail_rc=0
+-- MA pass cases:
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+MUTATION MB go_test_rc=0
+-- MB red cases:
+grep_fail_rc=1
+-- MB pass cases:
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+MUTATION MC go_test_rc=1
+-- MC red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242SpendRequiresTheExactBinding (0.00s)
+grep_fail_rc=0
+-- MC pass cases:
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+MUTATION MD go_test_rc=1
+-- MD red cases:
+grep_fail_rc=1
+-- MD pass cases:
+MUTATION ME go_test_rc=1
+-- ME red cases:
+--- FAIL: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+--- FAIL: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+grep_fail_rc=0
+-- ME pass cases:
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+DONE rc=0

@@ -1,0 +1,21 @@
+time=2026-10-08T12:01:44.070+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket242PanelItemReadFaceIsFullyDeclared
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+=== RUN   TestTicket242PanelItemStaysGrantFree
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+=== RUN   TestTicket259R1PanelAPIMethodSetIsClosed
+--- PASS: TestTicket259R1PanelAPIMethodSetIsClosed (0.00s)
+=== RUN   TestTicket259R1PanelCarrierCarriesNoAnswerVerb
+--- PASS: TestTicket259R1PanelCarrierCarriesNoAnswerVerb (0.00s)
+=== RUN   TestTicket259R1PanelItemFieldCapabilityFence
+    ticket259_panel_capability_rulers_test.go:174: AC#3 RED: PanelItem.Permitted has type bool - a bool on the card a panel reads IS a verdict bit (allowed / not allowed); the panel read face is plain display data and has no decisions to report. This is the M-D2 shape: the field name is free, the list is updatable by the same hand that adds the field, so the fence has to be about what the field CAN carry (ticket 259 AC#3)
+--- FAIL: TestTicket259R1PanelItemFieldCapabilityFence (0.00s)
+=== RUN   TestTicket259R1PanelItemCarriesNoCredentialValue
+--- PASS: TestTicket259R1PanelItemCarriesNoCredentialValue (0.00s)
+=== RUN   TestTicket259R1PanelItemProjectionIgnoresGrantState
+--- PASS: TestTicket259R1PanelItemProjectionIgnoresGrantState (0.00s)
+=== RUN   TestTicket259R1PanelReadFaceCannotBeLaunderedIntoAnAnswer
+--- PASS: TestTicket259R1PanelReadFaceCannotBeLaunderedIntoAnAnswer (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	0.041s
+FAIL

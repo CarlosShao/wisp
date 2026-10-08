@@ -1,0 +1,48 @@
+time=2026-10-08T11:57:19.685+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTicket259R1PanelReadFaceCannotBeLaunderedIntoAnAnswer (0.00s)
+    ticket259_panel_capability_rulers_test.go:308: AC#3 RED: the panel-observable values were refused, but so was the live native grant (approval: 原生令牌无效（缺失/已用/与本次请求不绑定）) - the card stopped being answerable before the control ran, which makes the pass above meaningless
+--- FAIL: TestR7SizedBatchEscalatesToL2Unaggregated (3.00s)
+    batch_test.go:110: 原生允许失败：approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    fakes_test.go:277: 闸门退出时仍有 1 个待审批项未清理
+--- FAIL: TestL2NativeAllowExecutesThroughTheBridge (3.00s)
+    queue_test.go:67: 原生允许被拒：approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    fakes_test.go:277: 闸门退出时仍有 1 个待审批项未清理
+--- FAIL: TestGrantIsSingleUseAndBoundToItsItem (3.00s)
+    queue_test.go:174: DecideFromNative with a real grant: approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    fakes_test.go:277: 闸门退出时仍有 1 个待审批项未清理
+--- FAIL: TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s (0.01s)
+    queue_test.go:256: 后续审批被拒：approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+--- FAIL: TestReplayRedisplaysUnderAFreshGrant (3.00s)
+    queue_test.go:308: 重放后原生允许失败：approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    fakes_test.go:277: 闸门退出时仍有 1 个待审批项未清理
+--- FAIL: TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed (3.00s)
+    ticket224_reply_grant_test.go:186: Native().AllowSession: approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    ticket224_reply_grant_test.go:136: 1 pending approvals left at exit
+--- FAIL: TestTicket224ForgedSessionAnswerRecordsNothing (3.00s)
+    ticket224_reply_grant_test.go:257: Native().AllowSession: approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    ticket224_reply_grant_test.go:136: 1 pending approvals left at exit
+--- FAIL: TestTicket224SessionAnswerWithoutARecorderSaysTheScopeWasDropped (3.00s)
+    ticket224_reply_grant_test.go:278: a host with no ledger must still be answerable, got approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    ticket224_reply_grant_test.go:136: 1 pending approvals left at exit
+--- FAIL: TestTicket224RecordingFailureReleasesTheCallButClaimsNoRow (3.00s)
+    ticket224_reply_grant_test.go:303: Native().AllowSession: approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    ticket224_reply_grant_test.go:136: 1 pending approvals left at exit
+--- FAIL: TestAVetoOnAnUnknownNameLeavesTheCardAllowableByItsOwnGrant (3.00s)
+    ticket87_veto_l2_test.go:226: Allow after an unrelated veto: approval: 原生令牌无效（缺失/已用/与本次请求不绑定）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    fakes_test.go:277: 闸门退出时仍有 1 个待审批项未清理
+--- FAIL: TestAnAliasCanNeverBuyAnAllow (3.00s)
+    ticket97_alias_direction_test.go:119: 精确键的 Allow 失败: approval: 原生令牌无效（缺失/已用/与本次请求不绑定）（前题破：卡片不可批准 ⇒ 本用例零信息）
+    fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）
+    fakes_test.go:277: 闸门退出时仍有 1 个待审批项未清理
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	30.488s
+FAIL

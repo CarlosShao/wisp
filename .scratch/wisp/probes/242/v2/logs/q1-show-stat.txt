@@ -1,0 +1,8 @@
+commit 4bf7e683b9177c9442bf9692e1621803dc1c93b8
+Author: CarlosShao <1933942520@qq.com>
+Date:   Fri Oct 2 20:48:42 2026 +0800
+
+    242-r1(编排者代笔，票 242 判据①甲形落地)：腿断流后按 A542 预案我直接写，写面一枚＝internal/agent/approval/ticket242_binding_test.go 四枚用例（花侧：伪造 bind 必拒且拒后 nonce 必消费=重试被烧掉／空 bind 必拒且拒后也消费／精确 digest 必通且通后删除；铸侧：队列项 bind 必非空且逐字段覆盖 corr/task/tool/level/seq/args、重放同身份因 seq 折入必得不同 digest；跨卡：B 的 bind 打不开 A 的 grant）。变异自证两发：M1 花侧校验掏空（equalSecret(stored,bind)|| bind!=""，避免裸 true 的编译错）⇒ 红句逐字 AC#1 RED: a grant bound to item one was spent with item two's digest；M2 铸侧 bind 置空 ⇒ 红句逐字 the queued item's grant carries an empty binding；两发还原 md5 一致（d97267a8/a170f3f2）。读数：approval 包 ok 0.350s（45 PASS 含新 4）、config 包 ok、build rc=0、d22scan clean、gofumpt clean。判据②出向读面反射尺未做（预检已量好形状钉 approval.PanelItem，留 242-r2 一程一格）；票面 AC 框一枚未碰，翻勾归非实现者验收。⚠ 派单修正两处照 242-precheck-1 执行：撤销"先改 :109"前置（真阻断是时序烧牌）、判据②不许碰 panel.ApprovalCardView。调试插曲如实记：第一版 M1 用裸 true 造成变量未使用编译错＝build failed 不是红，换等价恒真形重跑
+
+ internal/agent/approval/ticket242_binding_test.go | 113 ++++++++++++++++++++++
+ 1 file changed, 113 insertions(+)

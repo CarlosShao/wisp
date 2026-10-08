@@ -1,0 +1,203 @@
+time=2026-10-08T11:54:04.032+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem
+--- PASS: TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem (0.00s)
+=== RUN   TestLiveApprovalsSkipsRowsThatAreNotPending
+--- PASS: TestLiveApprovalsSkipsRowsThatAreNotPending (0.00s)
+=== RUN   TestLiveApprovalsOnNilQueueIsNil
+--- PASS: TestLiveApprovalsOnNilQueueIsNil (0.00s)
+=== RUN   TestReplySeamWaitingStateNamesTheTwoD43Rows
+--- PASS: TestReplySeamWaitingStateNamesTheTwoD43Rows (0.00s)
+=== RUN   TestReplySeamCarriesNoAllowWithoutAGrant
+--- PASS: TestReplySeamCarriesNoAllowWithoutAGrant (0.00s)
+=== RUN   TestWideningRuleReadsOneLineOffTheCard
+--- PASS: TestWideningRuleReadsOneLineOffTheCard (0.00s)
+=== RUN   TestLiveApprovalsSharesNoReferenceSlotWithTheQueue
+--- PASS: TestLiveApprovalsSharesNoReferenceSlotWithTheQueue (0.00s)
+=== RUN   TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord
+--- PASS: TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord (0.00s)
+=== RUN   TestLiveL1WindowsSeesAWindowInTheLoop
+--- PASS: TestLiveL1WindowsSeesAWindowInTheLoop (0.00s)
+=== RUN   TestReadingL1WindowsMovesNoGateState
+--- PASS: TestReadingL1WindowsMovesNoGateState (0.00s)
+=== RUN   TestL1WindowIsPlainDataWithNoRouteToAnAnswer
+--- PASS: TestL1WindowIsPlainDataWithNoRouteToAnAnswer (0.00s)
+=== RUN   TestStartedCallsAreNotReportedAsWaiting
+--- PASS: TestStartedCallsAreNotReportedAsWaiting (0.00s)
+=== RUN   TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce
+--- PASS: TestTicket242SpendRejectsForgedBindingAndConsumesTheNonce (0.00s)
+=== RUN   TestTicket242SpendRequiresTheExactBinding
+--- PASS: TestTicket242SpendRequiresTheExactBinding (0.00s)
+=== RUN   TestTicket242QueuedItemsBindGrantsToTheirOwnDigest
+--- PASS: TestTicket242QueuedItemsBindGrantsToTheirOwnDigest (0.00s)
+=== RUN   TestTicket242ForgedBindingCannotSpendAnotherItemsGrant
+--- PASS: TestTicket242ForgedBindingCannotSpendAnotherItemsGrant (0.00s)
+=== RUN   TestTicket242PanelItemReadFaceIsFullyDeclared
+--- PASS: TestTicket242PanelItemReadFaceIsFullyDeclared (0.00s)
+=== RUN   TestTicket242PanelItemStaysGrantFree
+--- PASS: TestTicket242PanelItemStaysGrantFree (0.00s)
+=== RUN   TestTicket259R1DenialNamesMissingNonce
+--- PASS: TestTicket259R1DenialNamesMissingNonce (0.00s)
+=== RUN   TestTicket259R1DenialNamesSpentOrNeverLiveNonce
+--- PASS: TestTicket259R1DenialNamesSpentOrNeverLiveNonce (0.00s)
+=== RUN   TestTicket259R1DenialNamesMisbound
+--- PASS: TestTicket259R1DenialNamesMisbound (0.00s)
+=== RUN   TestTicket259R1DenialNamesCardNotPending
+--- PASS: TestTicket259R1DenialNamesCardNotPending (0.00s)
+=== RUN   TestTicket259R1FourDenialLabelsArePairwiseDistinct
+--- PASS: TestTicket259R1FourDenialLabelsArePairwiseDistinct (0.00s)
+=== RUN   TestTicket259R1OutwardAnswerStaysMergedAcrossDenials
+--- PASS: TestTicket259R1OutwardAnswerStaysMergedAcrossDenials (0.00s)
+=== RUN   TestTicket259R1PanelAPIMethodSetIsClosed
+--- PASS: TestTicket259R1PanelAPIMethodSetIsClosed (0.00s)
+=== RUN   TestTicket259R1PanelCarrierCarriesNoAnswerVerb
+--- PASS: TestTicket259R1PanelCarrierCarriesNoAnswerVerb (0.00s)
+=== RUN   TestTicket259R1PanelItemFieldCapabilityFence
+--- PASS: TestTicket259R1PanelItemFieldCapabilityFence (0.00s)
+=== RUN   TestTicket259R1PanelItemCarriesNoCredentialValue
+--- PASS: TestTicket259R1PanelItemCarriesNoCredentialValue (0.00s)
+=== RUN   TestTicket259R1PanelItemProjectionIgnoresGrantState
+--- PASS: TestTicket259R1PanelItemProjectionIgnoresGrantState (0.00s)
+=== RUN   TestTicket259R1PanelReadFaceCannotBeLaunderedIntoAnAnswer
+--- PASS: TestTicket259R1PanelReadFaceCannotBeLaunderedIntoAnAnswer (0.00s)
+=== RUN   TestBatchAggregatesHomogeneousL1Ops
+--- PASS: TestBatchAggregatesHomogeneousL1Ops (0.00s)
+=== RUN   TestBatchRefusalsBelowThresholdAndOnSensitiveVerdicts
+--- PASS: TestBatchRefusalsBelowThresholdAndOnSensitiveVerdicts (0.00s)
+=== RUN   TestR7SizedBatchEscalatesToL2Unaggregated
+--- PASS: TestR7SizedBatchEscalatesToL2Unaggregated (0.00s)
+=== RUN   TestR7SizedBatchThatNobodyAnsweredIsRejectedNotRun
+--- PASS: TestR7SizedBatchThatNobodyAnsweredIsRejectedNotRun (0.00s)
+=== RUN   TestTenOpsInOneToolCallGetOneConfirm
+--- PASS: TestTenOpsInOneToolCallGetOneConfirm (0.09s)
+=== RUN   TestTicket260R4DefaultLabelIsTheOldSentence
+--- PASS: TestTicket260R4DefaultLabelIsTheOldSentence (0.00s)
+=== RUN   TestTicket260R4SeededKeyReplacesEscOnEveryFace
+    cancel_key_label_260r4_test.go:142: r4 L2 veto: returned after 0s (start=11:54:04, end=11:54:04)
+--- PASS: TestTicket260R4SeededKeyReplacesEscOnEveryFace (0.00s)
+=== RUN   TestTicket260R4LabelFollowsTheReaderAcrossAReload
+--- PASS: TestTicket260R4LabelFollowsTheReaderAcrossAReload (0.00s)
+=== RUN   TestTicket260R4UnloadLineNamesNoKey
+--- PASS: TestTicket260R4UnloadLineNamesNoKey (0.00s)
+=== RUN   TestTicket260R4SpellingSeamCarriesNoAuthority
+--- PASS: TestTicket260R4SpellingSeamCarriesNoAuthority (0.00s)
+=== RUN   TestTicket260R3EscUnavailableLineNamesNoKey
+--- PASS: TestTicket260R3EscUnavailableLineNamesNoKey (0.00s)
+=== RUN   TestTicket260R3LoadedCancelLabelIsTheNamedResidual
+--- PASS: TestTicket260R3LoadedCancelLabelIsTheNamedResidual (0.00s)
+=== RUN   TestL2NativeAllowExecutesThroughTheBridge
+--- PASS: TestL2NativeAllowExecutesThroughTheBridge (0.00s)
+=== RUN   TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis
+=== RUN   TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis/面板声称自己是原生，且不带令牌
+=== RUN   TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis/面板声称原生并携带真实令牌
+--- PASS: TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis (0.00s)
+    --- PASS: TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis/面板声称自己是原生，且不带令牌 (0.00s)
+    --- PASS: TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis/面板声称原生并携带真实令牌 (0.00s)
+=== RUN   TestGrantIsSingleUseAndBoundToItsItem
+--- PASS: TestGrantIsSingleUseAndBoundToItsItem (0.00s)
+=== RUN   TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s
+--- PASS: TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s (0.01s)
+=== RUN   TestReplayRedisplaysUnderAFreshGrant
+--- PASS: TestReplayRedisplaysUnderAFreshGrant (0.00s)
+=== RUN   TestHostUnreachableAndFullQueueFailClosed
+=== RUN   TestHostUnreachableAndFullQueueFailClosed/宿主不可达
+=== RUN   TestHostUnreachableAndFullQueueFailClosed/队列已满
+--- PASS: TestHostUnreachableAndFullQueueFailClosed (0.00s)
+    --- PASS: TestHostUnreachableAndFullQueueFailClosed/宿主不可达 (0.00s)
+    --- PASS: TestHostUnreachableAndFullQueueFailClosed/队列已满 (0.00s)
+=== RUN   TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed
+--- PASS: TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed (0.00s)
+=== RUN   TestTicket224ForgedSessionAnswerRecordsNothing
+--- PASS: TestTicket224ForgedSessionAnswerRecordsNothing (0.00s)
+=== RUN   TestTicket224SessionAnswerWithoutARecorderSaysTheScopeWasDropped
+--- PASS: TestTicket224SessionAnswerWithoutARecorderSaysTheScopeWasDropped (0.00s)
+=== RUN   TestTicket224RecordingFailureReleasesTheCallButClaimsNoRow
+--- PASS: TestTicket224RecordingFailureReleasesTheCallButClaimsNoRow (0.00s)
+=== RUN   TestAnUnansweredL2CardResolvesToRejectAtTheQueueDeadline
+    ticket84_no_owner_test.go:76: unanswered L2 (250ms deadline): returned after 250.4195ms (start=11:54:04, end=11:54:04)
+--- PASS: TestAnUnansweredL2CardResolvesToRejectAtTheQueueDeadline (0.25s)
+=== RUN   TestDefaultQueueDeadlineIsFiniteAtThreeHundredSeconds
+--- PASS: TestDefaultQueueDeadlineIsFiniteAtThreeHundredSeconds (0.00s)
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Native.Allow
+    ticket84_no_owner_test.go:168: Native.Allow: approval: correlation_id 无对应待审批项 in 0s
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Native.Reject
+    ticket84_no_owner_test.go:168: Native.Reject: approval: correlation_id 无对应待审批项 in 0s
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Panel.Reject
+    ticket84_no_owner_test.go:168: Panel.Reject: approval: correlation_id 无对应待审批项 in 0s
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/DecideFromNative.reject
+    ticket84_no_owner_test.go:168: DecideFromNative.reject: approval: correlation_id 无对应待审批项 in 0s
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/DecideFromNative.allow
+    ticket84_no_owner_test.go:168: DecideFromNative.allow: approval: correlation_id 无对应待审批项 in 0s
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/DecideFromPanel.reject
+    ticket84_no_owner_test.go:168: DecideFromPanel.reject: approval: correlation_id 无对应待审批项 in 0s
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Veto.unknown
+    ticket84_no_owner_test.go:168: Veto.unknown: approval: correlation_id 无对应待审批项 in 0s
+=== RUN   TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Veto.empty
+    ticket84_no_owner_test.go:168: Veto.empty: approval: correlation_id 无对应待审批项 in 0s
+--- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast (0.00s)
+    --- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Native.Allow (0.00s)
+    --- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Native.Reject (0.00s)
+    --- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Panel.Reject (0.00s)
+    --- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/DecideFromNative.reject (0.00s)
+    --- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/DecideFromNative.allow (0.00s)
+    --- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/DecideFromPanel.reject (0.00s)
+    --- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Veto.unknown (0.00s)
+    --- PASS: TestEveryAnswerRouteForAnUnknownCorrelationFailsFast/Veto.empty (0.00s)
+=== RUN   TestAnUnreachablePromptSurfaceIsRefusedImmediatelyNotWaitedOut
+    ticket84_no_owner_test.go:189: prompt surface unreachable: returned after 0s (start=11:54:04, end=11:54:04)
+--- PASS: TestAnUnreachablePromptSurfaceIsRefusedImmediatelyNotWaitedOut (0.00s)
+=== RUN   TestDefaultDeadlineWallClockMeasurement
+    ticket84_no_owner_test.go:224: 有意慢：300s 墙钟计量，只在 WISP_84_MEASURE=1 时跑（票 84 AC#1；见 docs/evidence/s1/84-ac1-bounded-wait.md）
+--- SKIP: TestDefaultDeadlineWallClockMeasurement (0.00s)
+=== RUN   TestAVetoAgainstAnOnScreenL2CardEndsTheWaitNowAndStillRefuses
+    ticket87_veto_l2_test.go:91: veto against an on-screen L2 card: returned after 0s (start=11:54:04, end=11:54:04)
+--- PASS: TestAVetoAgainstAnOnScreenL2CardEndsTheWaitNowAndStillRefuses (0.00s)
+=== RUN   TestAVetoNamedByTheHostsOwnKeyStillRefusesThatCard
+    ticket87_veto_l2_test.go:147: veto addressed by the task id: returned after 0s (start=11:54:04, end=11:54:04)
+--- PASS: TestAVetoNamedByTheHostsOwnKeyStillRefusesThatCard (0.00s)
+=== RUN   TestAnAmbiguousVetoNameIsNotGuessedOnTheRefusalSide
+--- PASS: TestAnAmbiguousVetoNameIsNotGuessedOnTheRefusalSide (0.00s)
+=== RUN   TestAVetoOnAnUnknownNameLeavesTheCardAllowableByItsOwnGrant
+--- PASS: TestAVetoOnAnUnknownNameLeavesTheCardAllowableByItsOwnGrant (0.00s)
+=== RUN   TestAnAliasCanNeverBuyAnAllow
+    ticket97_alias_direction_test.go:134: 别名驱动的拒绝: returned after 0s (start=11:54:04, end=11:54:04)
+--- PASS: TestAnAliasCanNeverBuyAnAllow (0.00s)
+=== RUN   TestEveryRefusalRouteOnAnUnknownEntryStillRefuses
+=== RUN   TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/veto
+    ticket97_alias_direction_test.go:212: 路线 veto 的别名拒绝: returned after 0s (start=11:54:04, end=11:54:04)
+=== RUN   TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/native_reject
+    ticket97_alias_direction_test.go:212: 路线 native_reject 的别名拒绝: returned after 0s (start=11:54:04, end=11:54:04)
+=== RUN   TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/panel_reject
+    ticket97_alias_direction_test.go:212: 路线 panel_reject 的别名拒绝: returned after 0s (start=11:54:04, end=11:54:04)
+=== RUN   TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/decide_from_native
+    ticket97_alias_direction_test.go:212: 路线 decide_from_native 的别名拒绝: returned after 0s (start=11:54:04, end=11:54:04)
+=== RUN   TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/decide_from_panel
+    ticket97_alias_direction_test.go:212: 路线 decide_from_panel 的别名拒绝: returned after 0s (start=11:54:04, end=11:54:04)
+--- PASS: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses (0.00s)
+    --- PASS: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/veto (0.00s)
+    --- PASS: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/native_reject (0.00s)
+    --- PASS: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/panel_reject (0.00s)
+    --- PASS: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/decide_from_native (0.00s)
+    --- PASS: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses/decide_from_panel (0.00s)
+=== RUN   TestL1WindowTimeoutMeansExecute
+--- PASS: TestL1WindowTimeoutMeansExecute (0.00s)
+=== RUN   TestL1WindowVetoedByEachLoadedChannel
+=== RUN   TestL1WindowVetoedByEachLoadedChannel/ball
+=== RUN   TestL1WindowVetoedByEachLoadedChannel/esc
+--- PASS: TestL1WindowVetoedByEachLoadedChannel (0.00s)
+    --- PASS: TestL1WindowVetoedByEachLoadedChannel/ball (0.00s)
+    --- PASS: TestL1WindowVetoedByEachLoadedChannel/esc (0.00s)
+=== RUN   TestL1WindowUnavailableVoiceChannelIsAnnounced
+--- PASS: TestL1WindowUnavailableVoiceChannelIsAnnounced (0.00s)
+=== RUN   TestL1WindowVetoOnForeignCorrelationCannotCancel
+--- PASS: TestL1WindowVetoOnForeignCorrelationCannotCancel (0.00s)
+=== RUN   TestL1WindowUnreachableUIFailsClosed
+--- PASS: TestL1WindowUnreachableUIFailsClosed (0.00s)
+=== RUN   TestUnadmittedTaskIsRefusedBeforeQueueing
+--- PASS: TestUnadmittedTaskIsRefusedBeforeQueueing (0.00s)
+=== RUN   TestVetoAfterStartYieldsAppliedStepsReport
+--- PASS: TestVetoAfterStartYieldsAppliedStepsReport (0.00s)
+=== RUN   TestVetoTravelsBackToTheLoopAsAFailure
+--- PASS: TestVetoTravelsBackToTheLoopAsAFailure (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	0.419s

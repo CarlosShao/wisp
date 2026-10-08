@@ -1,0 +1,6 @@
+diff_rc= ; 0 differing lines below == identical PASS roster before/after => 新增红 0
+baseline PASS count = 70
+after    PASS count = 70
+baseline FAIL count = 0
+after    FAIL count = 0
+--- diff body (empty above means clean) ---

@@ -1,0 +1,1 @@
+cmd: go vet ./internal/agent/approval/   -> rc=0, zero stdout/stderr (this file's only content is this note; rc=0 means clean)
