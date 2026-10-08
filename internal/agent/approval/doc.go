@@ -23,16 +23,16 @@
 // admission guard, D31's applied-steps report + Bus, and the native grant that
 // makes a panel-sourced allow unrepresentable rather than merely disallowed.
 //
-// Wiring still owed by ticket 12 (this package has NO production caller yet,
-// so nothing here runs in cmd/wisp today):
-//   - compose approval.New(...) as tools.Options.Gate (replacing NoGate);
-//   - call Gate.AdmitTextTask(taskID) once per TEXT-loop task and defer its
-//     revoke - unadmitted tasks are refused by design (D47), so forgetting it
-//     fails closed, it does not fall open;
+// Wiring owed by the ticket 12 list. Landed since this paragraph was written:
+// approval.New is composed in cmd/wisp (run.go:612, resident_approval_windows.go:369)
+// and handed to the tool bridge as tools.Options.Gate (run.go:748); Gate.AdmitTextTask
+// has production call sites (run.go's mode-switch card and admitTask, the config-reload
+// tick, the resident card path); and the D31 ledger seam is wired (tools.Options.Cancel
+// takes Gate.ToolsCancelBus, and the fs.write family fills Result.AppliedSteps).
+// Still owed:
 //   - hand Queue.Native() to the ball click / native card / hotkey handlers
 //     and Queue.Panel() to the ticket 37 panel bridge;
-//   - have the fs.write family (ticket 20 segment 2) poll Gate.Bus() and fill
-//     Result.AppliedSteps;
-//   - delete loop.decideRisk's declared-L1/L2 refusal, which currently kills
-//     fs.write before the bridge ever assesses it.
+//   - delete loop.decideRisk's declared-L1/L2 refusal: the branch still exists
+//     (loop.go:794), but `wisp run` binds AdmitTask (run.go:1008), so it is no
+//     longer reached; the deletion is dead-code cleanup now, not a live fix.
 package approval

@@ -8,10 +8,11 @@ package main
 // production callers - `grep -rn "ComposerDispatch" internal/ cmd/ tools/ |
 // grep -v _test.go` answered only its own definition and comments. This file is
 // that missing caller: `wisp panel-inbound` reads one raw envelope per stdin
-// line and hands the bytes to (*panel.ComposerDispatch).Handle. Nothing else in
-// this repository calls Handle today, and the judgement in
-// panel_inbound_33_test.go reads THAT fact off the disk rather than off this
-// paragraph, so deleting the line below reddens a case instead of passing quietly.
+// line and hands the bytes to (*panel.ComposerDispatch).Handle. A second
+// production caller now exists - cmd/wisp/panel_host_windows.go's dispatchRaw,
+// the C27 host's dispatch door - and the judgement in panel_inbound_33_test.go
+// reads the cmd/wisp call sites off the disk rather than off this paragraph,
+// so deleting the line below reddens a case instead of passing quietly.
 //
 // WHY THIS SHAPE AND NOT THE WINDOW. The 33-a1 census (docs/evidence/s1/
 // 33-inbound-hop-design-a1.md §4) put the only common hole across H4-H9 in "raw

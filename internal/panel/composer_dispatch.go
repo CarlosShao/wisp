@@ -47,9 +47,11 @@ package panel
 // WHAT THIS DOES NOT DO, stated so nobody infers it from the file's existence:
 // it opens no window and imports no WebView2 symbol (slice A is the half of the
 // hop that needs neither); it writes no reply back to the page, which is H10 and
-// belongs to the host; and it has NO production caller yet. The honest state of
-// that question is recorded in docs/evidence/s1/33-minimal-inbound-hop-r1.md
-// rather than in a comment that reads better than it is.
+// belongs to the host. Slice A shipped with zero production callers; both callers
+// exist today - cmd/wisp/panel_host_windows.go's dispatchRaw and
+// cmd/wisp/panel_inbound.go (`wisp panel-inbound`, one envelope per stdin line) -
+// and the slice-A reading, with its grep lines, is in
+// docs/evidence/s1/33-minimal-inbound-hop-r1.md §④.
 
 import (
 	"context"
