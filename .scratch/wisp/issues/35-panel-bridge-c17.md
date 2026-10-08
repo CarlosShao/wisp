@@ -48,6 +48,7 @@ state push making the frontend provably stateless.
       caches (architecture test/lint).
 - [ ] Backpressure: flood events under blocked consumer → merges, no unbounded memory (heap cap
       asserted), content integrity kept.
+  〔**10-08 11:3x 编排者就地裁冲突，来源＝只读普查腿 `35-a6`（件 `.scratch/wisp/probes/35/a6/verdict.md`，盘上逐字我未复跑，⛔ 本框保持未勾）**：这一格三句里 **"merges" 与 "content integrity kept" 两句已被票 197 leg B 的重裁取代**——产码 `internal/panel/pump.go:397` 逐字写着 `Overflow TRUNCATES and never merges (ticket 197 leg B re-cut this rule`，且该规则有命名测试钉死（三枚既有尺反咬 merge）。⇒ 本框今天**只剩"no unbounded memory（heap cap asserted）"那半句算账**，而那一半按普查是"每面板推队列没写"＝一块没写。⛔ **任何后续程不许把 pump 改成"会合并"来迎合上面那句旧话**（那是把一枚已裁的契约规则倒回去），要改必须先落 `A##` 并经人工批准。〕
 - [ ] No secret leakage scan across bridge payloads.
 - [x] **Transport agreement page↔host (added 10-07 by `35-a1`, shape NOT chosen here)**: the page posts its envelope on
       `window.chrome.webview.postMessage` (`frontend/src/lib/panel.ts:141` interface, `:179`/`:218` the two senders), while Go's
