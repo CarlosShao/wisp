@@ -10,15 +10,19 @@ package main
 //
 //   - Manager.CheckAndReload - its only non-test caller was cmd/balldebug, a
 //     side program. `wisp run` never re-read config.toml, so D36's three-tier
-//     semantics (立即/重载/重启, PLAN.md:2715) had an engine and no driver.
-//   - Manager.ConfirmLocked - zero assignments outside *_test.go, and
-//     manager.go reads it as `approved := m.ConfirmLocked != nil && ...`, so an
-//     unwired hook is a silent fail-closed DENY of every [fs] loosening: D33's
+//     semantics (立即/重载/重启, PLAN.md:2721) had an engine and no driver.
+//     This file added the driver: reloadOnce() below calls CheckAndReload.
+//   - Manager.ConfirmLocked - before this file, zero assignments outside
+//     *_test.go; manager.go snapshots the hook under mu (confirm := m.ConfirmLocked)
+//     and a nil hook denies (approved := confirm != nil && ...), so an unwired
+//     hook was a silent fail-closed DENY of every [fs] loosening: D33's
 //     「热加载放宽必须触发 L2 级重新确认」 was attached to a dead wire.
-//   - Manager.OnRestartPending - zero assignments outside *_test.go too, so the
-//     restart tier said nothing at all: a hand edit of [app] simply did not
-//     happen, silently, which is the one shape 票 223 AC#2 forbids
-//     (不许用「静默不生效」充当这一档).
+//     startConfigReload assigns it below, before the tick is spawned.
+//   - Manager.OnRestartPending - zero assignments outside *_test.go too before
+//     this file, so the restart tier said nothing at all: a hand edit of [app]
+//     simply did not happen, silently, which is the one shape 票 223 AC#2 forbids
+//     (不许用「静默不生效」充当这一档). startConfigReload assigns it below,
+//     before the tick is spawned.
 //
 // TRIGGER SHAPE, NAMED (AC#1). A resident tick - not a file notification, and
 // not only an explicit command: one goroutine spawned through
