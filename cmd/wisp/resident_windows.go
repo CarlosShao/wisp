@@ -18,6 +18,31 @@ import (
 	"github.com/CarlosShao/wisp/internal/proc"
 )
 
+// hotkeyReloadSource296 is ticket 258's hot-tier [hotkey] source - the reload
+// bridge's src, hoisted out of runResident so the ticket-296 case in
+// cmd/wisp/resident_hotkey_296_windows_test.go drives the body production
+// actually runs. Ticket 258 hoisted the construction half the same way
+// (residentBallHotkeyChain258); the reason is the same: a re-typed copy of a
+// closure inside a test is not an instrument for a bug that lives in the
+// closure's own body, it reads green whichever way production changed.
+//
+// It answers what config.toml says, one fresh read per call, and nothing else -
+// the per-tick shape panelGeometrySource has used since ticket 255 AC#4. The
+// bridge diffs against what the ball holds, so an unchanged file costs zero
+// Win32 calls.
+func hotkeyReloadSource296(dataDir string) ball.HotkeyConfig {
+	c, _, err := config.LoadFile(filepath.Join(dataDir, configFileName), nil)
+	if err != nil || c == nil {
+		// The bridge keeps the current bindings on an empty answer
+		// (hotkey_reload.go leaves the applied set untouched when the source
+		// errors into all-empty after the first diff), and the refresh Warn
+		// it prints names the failure - the AC#1 fallback stays said, per
+		// tick, in the log.
+		return ball.HotkeyConfig{}
+	}
+	return ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel}
+}
+
 // runResident is the no-args path: boot (env layout, Job Object, single
 // instance, goroutine registry), host the floating ball window and its tray
 // (resident_ball_windows.go), take the task source AC#7 added
@@ -202,18 +227,15 @@ func runResident() {
 	// AC#4 and models.go:184 before it. CheckAndReload's diff still runs inside
 	// the bridge (it diffs against what the ball holds), so an unchanged file
 	// costs zero Win32 calls.
-	hotReload258 := func() ball.HotkeyConfig {
-		c, _, err := config.LoadFile(filepath.Join(rt.Layout.DataDir, configFileName), nil)
-		if err != nil || c == nil {
-			// The bridge keeps the current bindings on an empty answer
-			// (hotkey_reload.go leaves the applied set untouched when the source
-			// errors into all-empty after the first diff), and the refresh Warn
-			// it prints names the failure - the AC#1 fallback stays said, per
-			// tick, in the log.
-			return ball.HotkeyConfig{}
-		}
-		return ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel}
-	}
+	// Ticket 296: hotReload258's body is hotkeyReloadSource296 below, hoisted to
+	// package scope so the ticket-296 case drives the SAME code the assembly root
+	// runs (ticket 258 hoisted the construction half the same way, as
+	// residentBallHotkeyChain258). The two halves stay two separate closures on
+	// purpose: the construction view is read once and its defaults are merged by
+	// the consumer, the reload view goes to the bridge as-is (that hoisting is
+	// what makes the naked mapping measurable - a re-typed copy in a test reads
+	// green no matter what production does).
+	hotReload258 := func() ball.HotkeyConfig { return hotkeyReloadSource296(rt.Layout.DataDir) }
 	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {
 		return panel.RequestToggle(via)
 	}))
