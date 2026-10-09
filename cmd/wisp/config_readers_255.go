@@ -136,7 +136,18 @@ var hotRowClaims = map[string]string{
 	// config_receipt_255_test.go re-measures it on every run).
 	"ball":    hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx] - the ball's own option carries the size, and nothing outside internal/config reads cfg.Ball",
 	"session": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Session - the three session timeouts this section names drive nothing yet",
-	"audio":   hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Audio - internal/audio takes its device and rate from elsewhere",
+	// Ticket 247 moved [audio] out of the reader-less class: the resident
+	// process's capture assembly reads mic_muted_default at boot and hands it to
+	// audio.WithStartMuted, which is the sentence internal/audio/gate.go:57 wrote
+	// when it asked for that boot wiring ("map [audio] mic_muted_default here at
+	// boot wiring") and got none. Two facts keep this row out of "consumed":
+	// the reader is a fresh config.LoadFile at boot, not a re-read of the live
+	// Manager (a changed [audio] waits for a restart), and it lives in the
+	// resident `wisp` process, which builds the capture leg - `wisp run` does
+	// not. The device/rate half of the section still reads from nowhere:
+	// internal/audio takes input_device and sample_rate from the OS default
+	// endpoint and the seam constant, not from cfg.Audio.
+	"audio":   hotClaimOtherProcess + "cmd/wisp/resident_audio_windows.go:196 [c.Audio.MicMutedDefault] - the resident capture leg is [audio]'s first production reader and it reads the file once at boot, so a hot reload of this section waits for a restart instead of acting in this run",
 	"privacy": hotClaimNoReader + "internal/observe/logging.go:50 [RedactPaths] - the mirror field exists and is filled by callers, never from cfg.Privacy",
 	"memory":  hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Memory - the L1/L3 knobs have no consumer",
 	"cost":    hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Cost - the C23 budget knobs (ticket 44) are not landed",
@@ -185,10 +196,10 @@ var hotRowClaims = map[string]string{
 	// the claim must be settled per key row and only claimed when every hot row
 	// behind the name is consumed.
 	"app.theme":                  hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App - manager.go's planApp compares and copies it, and no component re-skins from it",
-	"voice.tts.speed":            hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Voice - the TTS knobs are not threaded to the voice path yet",
-	"voice.punctuation":          hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Voice - the punctuation switch has no consumer yet",
-	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Voice - the wake-word tunables are not consumed by the KWS path yet",
-	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Voice - the veto list is not consumed by the KWS path yet",
+	"voice.tts.speed":            hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's only production reader since ticket 247 is cmd/wisp/resident_audio_windows.go:197 [c.Voice.Enabled], which decides whether the capture leg is built at all) - the TTS knobs are not threaded to the voice path yet",
+	"voice.punctuation":          hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's only production reader since ticket 247 is cmd/wisp/resident_audio_windows.go:197 [c.Voice.Enabled], which decides whether the capture leg is built at all) - the punctuation switch has no consumer yet",
+	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's only production reader since ticket 247 is cmd/wisp/resident_audio_windows.go:197 [c.Voice.Enabled], which decides whether the capture leg is built at all) - the wake-word tunables are not consumed by the KWS path yet",
+	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's only production reader since ticket 247 is cmd/wisp/resident_audio_windows.go:197 [c.Voice.Enabled], which decides whether the capture leg is built at all) - the veto list is not consumed by the KWS path yet",
 }
 
 // sectionReadSites pins, per Config field, which production files the reader scan
@@ -200,7 +211,13 @@ var hotRowClaims = map[string]string{
 var sectionReadSites = map[string][]string{
 	"Ball":    nil,
 	"Session": nil,
-	"Audio":   nil,
+	// Ticket 247's capture assembly is the first production reader of both
+	// sections: it reads [audio] mic_muted_default into audio.WithStartMuted and
+	// [voice] enabled as "build the collector at all, or not". Both reads are
+	// one fresh config.LoadFile per boot in the resident process (the same
+	// per-boot shape [hotkey] has used since ticket 258), so neither lands in
+	// the "consumed by a live re-reader" class - see the [audio] row above.
+	"Audio":   {"cmd/wisp/resident_audio_windows.go"},
 	"Privacy": nil,
 	"Memory":  nil,
 	"Cost":    nil,
@@ -212,7 +229,7 @@ var sectionReadSites = map[string][]string{
 	// AC#4 forbids (TestTicket255HostStillDoesNotParseConfigItself checks both).
 	"Panel":  {"cmd/wisp/panel_resident_windows.go"},
 	"App":    nil,
-	"Voice":  nil,
+	"Voice":  {"cmd/wisp/resident_audio_windows.go"},
 	"Agent":  {"cmd/wisp/run.go"},
 	"Models": {"cmd/wisp/models.go"},
 	"LLM":    {"cmd/wisp/panel_config_store.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/llm/resolver.go"},
