@@ -83,9 +83,36 @@ $ … | wc -l
 ⇒ 球的 `OnMuteHotkey`/`OnTrayMute` 两枚闭包**必须**在 fire 时刻才去取那枚门（本进程已有的
 `rb` 指针 → 后置注入的执行者），不能在 `ball.New` 时刻取。
 
-## 6. 改前整包名册（两发，`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ ./internal/audio/ -count=1`）
+## 6. 改前整包名册（两发，`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -v ./cmd/wisp/ ./internal/audio/ -count=1`）
 
-（本腿在长跑之前先交这一节骨架；读数由下面第 6.1/6.2 两发填。）
+原始件＝同目录 `raw-pre-1.md`／`raw-pre-2.md`（`.md` 后缀，⛔ 非 `.out`：根 `.gitignore:7` 忽略 `*.out`）。
+计数尺＝`grep -c -- '--- PASS'` / `'--- FAIL'` / `'--- SKIP'`（含子测试，两发同一支 harness，⛔ 未加 `-skip`）。
+
+| 发次 | PASS | FAIL | SKIP | `go test` rc | 包级行 | `0xc0000135` | `0xc000013a` |
+|---|---|---|---|---|---|---|---|
+| pre run 1 | 418 | 5 | 3 | rc=1 | `FAIL github.com/CarlosShao/wisp/cmd/wisp 464.624s`／`ok github.com/CarlosShao/wisp/internal/audio 15.945s` | 0 | 0 |
+| pre run 2 | 418 | 5 | 3 | rc=1 | `FAIL …/cmd/wisp 465.462s`／`ok …/internal/audio 16.226s` | 0 | 0 |
+
+改前红名册逐名（两发**完全同一组**，本票改前两发就红）：
+1. `TestPanelHostRealWindowHopAndLifecycle` (5.06s / 5.06s)
+2. `TestAC4FocusReturnToPriorWindowGap33r5` (5.11s / 5.12s)
+3. `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` (20.01s / 20.01s)
+4. `TestAC14AwaitedBindingReplyReachesThePage` (20.01s / 20.01s)
+5. `TestAC14GoSideEvalPushReachesThePage` (20.01s / 20.01s)
+
+⇒ 全 5 枚都是面板/WebView2 那一族（与 289-v1 记的 panel 族红同族），`internal/audio` 两发都 `ok`。
+
+改前三枚 SKIP 逐名（⛔ 不是读数，只是没跑）：
+`TestPanelHostLatencyPercentilesAC2`、`TestAC247LiveMicrophoneLevelsReachTheBallSeam`（`WISP_LIVE_MIC=1` 才跑）、
+`TestLiveWasapiSmoke`。
+
+⚠ 基线具名交代**用了哪支 harness**＝带 sherpa DLL 前缀那一支（`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`），
+⇒ 两发 `0xc0000135` 计数都是 0（派单说的环境红没出现）；本票两发也**没有** 289-v1 那枚 `0xc000013a`
+（`TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink` 两发都绿）。
+⚠ 派单让本件把 `internal/panel` 也入册：本腿没有单跑 `./internal/panel/`，
+理由＝票面 AC#5 与派单第 5 段逐字给的门禁尺只有 `./cmd/wisp/ ./internal/audio/` 两包，
+⛔ 不自作主张扩包集（要并入 `internal/panel` 请由裁决腿定），故此处具名欠这一枚、未改尺。
+
 
 ## 7. 真机相关的前置量（进程数必须为 0）
 
