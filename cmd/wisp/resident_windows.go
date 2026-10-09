@@ -30,17 +30,27 @@ import (
 // the per-tick shape panelGeometrySource has used since ticket 255 AC#4. The
 // bridge diffs against what the ball holds, so an unchanged file costs zero
 // Win32 calls.
+//
+// NO SLOT IS EVER ANSWERED EMPTY (ticket 296). Both branches merge through
+// ball.ApplyHotkeyDefaults, which is the precondition ball.HotkeySource states
+// in its own doc comment and the shape the construction half gets from
+// residentBallHotkeyChain258. The bridge does NOT keep the current bindings on
+// an empty answer: Check()'s only skip is the DeepEqual diff against what is
+// applied, and internal/ball has no all-empty guard, so four empty strings from
+// here would re-register the set and leave summon, mute and panel dead until
+// the next read - which is exactly the regression this closure caused on the
+// owner's machine (an empty [hotkey] slot means "unset", not "turned off").
 func hotkeyReloadSource296(dataDir string) ball.HotkeyConfig {
 	c, _, err := config.LoadFile(filepath.Join(dataDir, configFileName), nil)
 	if err != nil || c == nil {
-		// The bridge keeps the current bindings on an empty answer
-		// (hotkey_reload.go leaves the applied set untouched when the source
-		// errors into all-empty after the first diff), and the refresh Warn
-		// it prints names the failure - the AC#1 fallback stays said, per
-		// tick, in the log.
-		return ball.HotkeyConfig{}
+		// Ticket 296: the unreadable branch answers the compiled defaults, not
+		// four empty strings - the same fallback hotCfg258 prints a Warn for at
+		// construction, said per tick by the value it hands the bridge.
+		return ball.ApplyHotkeyDefaults(ball.HotkeyConfig{})
 	}
-	return ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel}
+	// Ticket 296: the three slots the owner's file leaves empty are "unset", and
+	// the bridge would read them as "disabled by config". Merge before the hop.
+	return ball.ApplyHotkeyDefaults(ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel})
 }
 
 // runResident is the no-args path: boot (env layout, Job Object, single
@@ -227,14 +237,15 @@ func runResident() {
 	// AC#4 and models.go:184 before it. CheckAndReload's diff still runs inside
 	// the bridge (it diffs against what the ball holds), so an unchanged file
 	// costs zero Win32 calls.
-	// Ticket 296: hotReload258's body is hotkeyReloadSource296 below, hoisted to
-	// package scope so the ticket-296 case drives the SAME code the assembly root
-	// runs (ticket 258 hoisted the construction half the same way, as
+	// Ticket 296: hotReload258's body is the package-scope hotkeyReloadSource296
+	// above, hoisted so the ticket-296 case drives the SAME code the assembly
+	// root runs (ticket 258 hoisted the construction half the same way, as
 	// residentBallHotkeyChain258). The two halves stay two separate closures on
-	// purpose: the construction view is read once and its defaults are merged by
-	// the consumer, the reload view goes to the bridge as-is (that hoisting is
-	// what makes the naked mapping measurable - a re-typed copy in a test reads
-	// green no matter what production does).
+	// purpose: the construction view is read once and merged by its consumer
+	// (residentBallHotkeyChain258), the reload view is merged by this source
+	// itself because its consumer - the bridge - performs no merge at all
+	// (ticket 296). Hoisting is what makes the merge measurable: a re-typed copy
+	// of the closure inside a test reads green no matter what production does.
 	hotReload258 := func() ball.HotkeyConfig { return hotkeyReloadSource296(rt.Layout.DataDir) }
 	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {
 		return panel.RequestToggle(via)
