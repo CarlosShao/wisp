@@ -16,7 +16,9 @@
 - 红名册＝**空**（0 枚 FAIL）。
 - SKIP 名册（逐字）＝`TestDefaultDeadlineWallClockMeasurement`（`--- SKIP: TestDefaultDeadlineWallClockMeasurement (0.00s)`，基线输出第 153 行）。
 - 与 `242-v2` 现量基线（`docs/evidence/s1/242-grant-binding-v2.md:8`，HEAD `2bdf385d`，90 PASS／0 FAIL）**枚数等值**；本腿不需顶回差。
-- ⚠ `--- PASS` 里有同名重复行（表驱动子用例的顶层名各计一次，例：`TestEveryAnswerRouteForAnUnknownCorrelationFailsFast` 9 次、`TestEveryRefusalRouteOnAnUnknownEntryStillRefuses` 6 次）。**90 是行枚数口径**，不是唯一用例名口径（唯一名＝61 枚）。分母一律按行枚数记，别拿"唯一名 61"当基线。
+- ⚠ `--- PASS` 里有同名重复行（表驱动子用例的顶层名各计一次，例：`TestEveryAnswerRouteForAnUnknownCorrelationFailsFast` 9 次、`TestEveryRefusalRouteOnAnUnknownEntryStillRefuses` 6 次）。**90 是行枚数口径**，不是唯一用例名口径
+  （现量唯一名＝**72 枚**，`grep -oE '--- (PASS|SKIP): [A-Za-z0-9_]+' | sort -u | wc -l` 于收工前复量；
+  ⛔ 初稿在这里写"61 枚"是本腿未量就下笔的一处错，就地订正，见腿的收工 commit）。分母一律按行枚数记。
 
 ## 名册（90 PASS ＋ 1 SKIP，按 `-v` 输出 `--- ` 行原样抽取，含重复）
 
