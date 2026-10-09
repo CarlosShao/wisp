@@ -32,10 +32,10 @@
 
 | 用例 | 断什么 | 关键行 |
 |---|---|---|
-| `TestTicket285R1CrossCardAllowNamesTheDenialInTheAudit` | 两枚活卡（`corr-285-xcard-a`／`-b`，同一本 queue，`Depth()==2`）、A 的**未花**令牌（前置 `cardA.grants.live()==1`）递给 `Native().Allow(B.corr, nonceA)` ⇒ 对外仍是合并 `ErrBadGrant`（`:104`），且**审计面读出**`:125` 那枚 `approval: GRANT-DENY corr=corr-285-xcard-b tool=shell.run denial=spent-or-never-live-nonce`；行归 B 不归 A（`:131`）；本轮恰好 1 枚 `GRANT-DENY`（`:135`）；不落进另外三枚名字（`:139`）；合并句 `FORGED-OR-STALE` 仍在（`:147`）；**正控**＝A 的令牌没被foreign那一发烧掉、A 自己仍开卡（`:157`／`:160`） | 尺面＝审计行，不是返回值 |
-| `TestTicket285R1UnknownCorrelationBooksNoDenialLine` | 242-v2 具名的那枚"看着像但不是"的形状：`corr-285-never-pushed` 从未 push ⇒ `ErrUnknownCorrelation`（`:181`）且 `GRANT-DENY` 行数**必须为 0**（`:184`）。这一枚是让上一枚不恒真的另一半：**拒了 ≠ 读得出拒因**；`queue_test.go` 那一发今天读的正是这一形，所以它不构成 AC#1 | 鉴别器 |
+| `TestTicket285R1CrossCardAllowNamesTheDenialInTheAudit` | 两枚活卡（`corr-285-xcard-a`／`-b`，同一本 queue，`Depth()==2`）、A 的**未花**令牌（前置 `cardA.grants.live()==1`）递给 `Native().Allow(B.corr, nonceA)` ⇒ 对外仍是合并 `ErrBadGrant`（`:109`），且**审计面读出**`:125` 那枚 `approval: GRANT-DENY corr=corr-285-xcard-b tool=shell.run denial=spent-or-never-live-nonce`；行归 B 不归 A（`:131`）；本轮恰好 1 枚 `GRANT-DENY`（`:135`）；不落进另外三枚名字（`:139`）；合并句 `FORGED-OR-STALE` 仍在（`:145`）；**正控**＝A 的令牌没被foreign那一发烧掉、A 自己仍开卡（`:153`／`:156`，ANSWER-ALLOW 行 `:159`） | 尺面＝审计行，不是返回值 |
+| `TestTicket285R1UnknownCorrelationBooksNoDenialLine` | 242-v2 具名的那枚"看着像但不是"的形状：`corr-285-never-pushed` 从未 push ⇒ `ErrUnknownCorrelation`（`:180`）且 `GRANT-DENY` 行数**必须为 0**（`:183`）。这一枚是让上一枚不恒真的另一半：**拒了 ≠ 读得出拒因**；`queue_test.go` 那一发今天读的正是这一形，所以它不构成 AC#1 | 鉴别器 |
 
-辅助：`xcardLive()`（`:66`）＝卡还 pending **且** `lookupForAllowLocked(它自己的 corr)` 取回它自己 ⇒
+辅助：`xcardLive()`（`:63`）＝卡还 pending **且** `lookupForAllowLocked(它自己的 corr)` 取回它自己 ⇒
 "这条路由没在跑"那一维由**仪器**排除，不再由"缺失的卡"给出（242-v2 `:105` 的抱怨就是这一条）。
 
 ⛔ 没有把"路由能回 `misbound`"写进判据：`:139` 那个循环是**反向**钉（这一发不许落进另外三枚名字），
@@ -82,7 +82,7 @@
 - 种前 `approval.go` = `67fb146898dc7b235623bb8ad2fac0e0b2465fe1`；
   种后 `sed -n '574p'` 逐字：`	return denialNone // MU-M planted by leg 285-r1 re-run: membership scan gutted`
 - 整包 rc=1／**82 PASS／10 FAIL**（＝242-v2 记的 9 枚红**全部仍在** ＋ 本腿 1 枚）。本腿那一枚红句原文：
-  `    ticket285_route_denial_name_rulers_test.go:104: AC#1 RED: the two-live-card cross-card answer returned <nil>, want the merged ErrBadGrant`
+  `    ticket285_route_denial_name_rulers_test.go:109: AC#1 RED: the two-live-card cross-card answer returned <nil>, want the merged ErrBadGrant`
   ⇒ 成员扫描被掏空时，跨卡那一发**真的放行**，新尺在第一现场（返回值）就红，不必等审计行。
   既有 9 枚红名册与逐字红句见 `20-ac3-no-relaxation.md`。
 - 还原：`approval.go` = `67fb146898dc7b235623bb8ad2fac0e0b2465fe1`。
@@ -105,6 +105,11 @@
 - 收工复跑：`go test ./internal/agent/approval/ -count=1 -v` ⇒ rc=0／**92 PASS／0 FAIL／1 SKIP**／`ok … 0.456s`
   （SKIP 仍是指手画脚的那一枚墙钟计量 `TestDefaultDeadlineWallClockMeasurement`，基线就在，本腿没碰）。
 - 四枚产码件收工 hash ＝ 起手 hash **逐字等值**；`git status --porcelain -- internal cmd` **空**。
+- ⚠ **本文件自报一处自己造的漂**：初稿把新尺在 MU-M 那一发的红句行号写成 `:104`、并把表里六处辅助行号按记忆写成
+  `:66`/`:147`/`:157`/`:160`/`:181`/`:184`；收工前用同一次取数复量（`grep -n "t\.Fatalf\|t\.Errorf\|^func "` 对
+  本文件＋`grep -o 'rulers_test.go:[0-9]*' ` 对四份原始 `-v` 日志逐枚比）⇒ 真值＝`:63`/`:109`/`:145`/`:153`/`:156`/`:159`/`:180`/`:183`，
+  已就地改齐。**这正是票面 `:12` 那条"行号一律现读"的规矩，写腿对自己同样适用**；四发的原始 `-v` 日志在仓外
+  会话临时目录 `/tmp/285r1-mu-{q,p,t,m2}.txt`（⛔ 没有落进仓，`.gitignore` 第 8 行那枚全仓 `*.out` 因此无关）。
 
 ## 停手项
 

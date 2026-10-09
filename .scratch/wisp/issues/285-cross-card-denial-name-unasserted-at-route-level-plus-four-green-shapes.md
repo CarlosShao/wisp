@@ -51,7 +51,7 @@
 - 突变五发全部种在盘上（⛔ 零 `-overlay`）：MU-285q（`queue.go:423` 摘掉 `denial=%s`）⇒ 新尺红 `:125`；
   MU-285p（`approval.go:518` 两枚名折成一枚 `"denied"`）⇒ 新尺＋259 两枚尺共 3 红；
   **MU-285t（本腿自己的用例种坏：期望名换成 `denial=misbound`，产码不动）⇒ 新尺红 `:125`**＝尺非恒真；
-  MU-M 带着新文件复跑 ⇒ 82 PASS／**10 FAIL**（原 9 枚全在＋新尺 1 枚，红在新尺 `:104` 返回值那一层）。
+  MU-M 带着新文件复跑 ⇒ 82 PASS／**10 FAIL**（原 9 枚全在＋新尺 1 枚，红在新尺 `:109` 返回值那一层）。
 - **AC#3＝四发红句逐枚复跑，全部「仍在」，枚数与 `242-v2` 一致，行号未漂**：
   MU-A⇒4 红（`ticket242_binding_test.go:40/:57/:171`＋`ticket259_denial_rulers_test.go:172`）／
   MU-M⇒9 红（含走路由的 `queue_test.go:167`、`ticket259_denial_rulers_test.go:139`、
