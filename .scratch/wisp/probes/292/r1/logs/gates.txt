@@ -1,0 +1,4 @@
+build rc=0
+d22scan rc=0
+gofmt rc=0 files=3
+gofumpt rc=0 files=3

@@ -33,3 +33,4 @@
 ## Progress log
 
 （追加式；每条 `- [YYYY-MM-DD HH:MM:SS +08] agent=… did=… next=…`，钟点由 `date` 的 stdout 插值，不手打。）
+- [2026-10-09 17:51:57 +08] agent=292-r1 did=票 292 四格跑完：AC#1 只读裁四问（四问各带文件:行逐字引文，含一项票面未记的读数——本件的 spawn 不经模型 tool call，是 carrier_197_test.go:173-174 把 ToolRequest 直接放上桥）；AC#2 只改 :598-600 三行注释（numstat 3/3、diff -U0 全量 6 行纯注释、noncomment=0、唯一 hunk @@ -598,3 +598,3 @@）；AC#3 整包四发（改前 4/5 红→交集 4，改后 5/7 红→交集 5，交集尺上多出的一枚 TestAC246DevLegIgnoresTheTestTaskInjection 与编排者 17:27:04 起的 build\wisp.exe PID 9084 逐发同在场同缺席，我没停它）；AC#4 四把门禁 rc 全 0，gofmt/gofumpt 各 3 枚既有件未动 next=交编排者三件：裁「那枚外因红算不算新增」（补一发改后整包约 8 分钟即可坐成 0）、修票面「gofmt -l 空」的措辞为「新增 0 枚」、以及票面 AC#2 未写明「:600 的尾巴锁死在 :601 的谓语上、故 tool_choice 那节删不掉」
