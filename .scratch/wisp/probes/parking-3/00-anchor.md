@@ -24,6 +24,12 @@
 - ⇒ 终态与派单简报一致：在飞＝`281-r1`（写面＝乙类 8 张票面＋`probes/281/**`）＋`283-r1`（写面＝`internal/tools/**`＋`probes/283/**`）。⚠ 出入具名：08:40 起手尺那一刻 `281-r1` 零盘迹（锚 08:42 才落），不是我漏量。
 - HEAD 漂移具名：起手 `c39e2853` → 写节时 `7c7e69c2`（+2 枚他腿锚 commit）；`git diff --numstat c39e2853..7c7e69c2 -- docs/reports/HANDOVER.md`＝**空（rc=0）** ⇒ 四把尺的 numstat 基数取 `c39e2853` 不混入他腿改动。
 
-## 四把自证尺（追加后跑，读数回填本件末尾）
+## 四把自证尺（追加＋两行节头改完后跑）
 
-- （pending：追加＋两行节头改完后回填。）
+1) `wc -l docs/reports/HANDOVER.md`＝**1938**（追加前 1913；增量 25＝1 空行＋新节 24 行）。
+2) `grep -cE '^## 4\.0a[f]' docs/reports/HANDOVER.md`＝**1**。
+3) `git diff --numstat c39e2853 HEAD -- docs/reports/HANDOVER.md`＝**`26	1	docs/reports/HANDOVER.md`**（只这一枚文件；26 增＝`4.0ae` 新节头 1＋追加 25；1 删＝旧节头行）。
+4) `git status --porcelain -- docs/reports/HANDOVER.md`＝**空**（节 commit 后跑，rc=0）。
+
+- 节头逐个核（防"插到旧节中间／吞掉旧节头"）：`^## 4.0a` 全部＝aa:87／ab:167／ad:261／ac:287／ae:1884／af:1915（6 枚，旧 5 枚位置未动）；`grep -cE '^## '` 39→**40**。`4.0ae` 节头已打旧为"已被 `4.0af` 取代——见本文件末尾"（正文一字未动）。
+- 落盘 commit：起手锚＝`4e9a2df6`（08:43）；4.0af 节＝`ef56d0d8`（08:44）。程末复量（节 commit 后）＝**484 枚未推**（08:45:05 现量；⚠ 共享树里会漂，引前自取；含本腿两笔）。⛔ 零 push。
