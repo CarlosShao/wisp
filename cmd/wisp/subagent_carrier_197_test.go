@@ -595,9 +595,9 @@ func TestRunPacketReportsTheStreamLogPastItsBound(t *testing.T) {
 
 // WHAT THIS FILE DID NOT MEASURE.
 //
-//  1. blockedOnApproval is never asserted on a production packet. The join needs a card
-//     whose correlation id equals a CHILD task id, and nothing in this tree can make
-//     that happen from the outside: the agent loop never sends tool_choice, so mockllm
+//  1. blockedOnApproval is never asserted on a production packet. The join has two
+//     producers (subagent_roster_197.go:214, :219-220): a card's corr, never a task id
+//     for the loop (loop.go:603), and L1 windows no run feeds; no tool_choice is sent, so mockllm
 //     never answers with a tool call, so a spawned child never reaches the gate. The
 //     field is therefore asserted at the pump against a real ApprovalCardView
 //     (internal/panel's TestTheRosterReaderPutsSubagentsOnTheWire), and on this path it
