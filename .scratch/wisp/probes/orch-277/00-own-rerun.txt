@@ -1,0 +1,25 @@
+time=2026-10-09T09:59:21.690+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLive246ResidentPipelineRaisesACardAndEscVetoesIt
+    resident_task_source_live_246_windows_test.go:100: observer [-steal]: READY hwnd=0x17A0946 foreground=0x17A0946 foreground_is_mine=true steal=true
+        READING keydown_esc=0 syskeydown_esc=0 wm_hotkey=1 other_keys=0 foreground_is_mine=true steal=true
+    resident_task_source_live_246_windows_test.go:106: observer [-watch]: READY hwnd=0x33A020E foreground=0x33A020E foreground_is_mine=true steal=false
+        READING keydown_esc=1 syskeydown_esc=0 wm_hotkey=0 other_keys=0 foreground_is_mine=true steal=false
+    resident_task_source_live_246_windows_test.go:145: AC#7 LIVE steps 1-2: wisp: 卡片挂起：L1 fs.write（编号 900bb089-cbbd-42d8-9ed8-48dd33ff78df#call_246r2）
+    resident_task_source_live_246_windows_test.go:150: armed observer: READY hwnd=0x33B020E foreground=0x33B020E foreground_is_mine=true steal=false
+        READING keydown_esc=0 syskeydown_esc=0 wm_hotkey=0 other_keys=0 foreground_is_mine=true steal=false
+    resident_task_source_live_246_windows_test.go:178: AC#7 LIVE step 4 (D43 row 22): wisp run: 任务 900bb089-cbbd-42d8-9ed8-48dd33ff78df 结束（completed，2 轮，1 次工具调用，成本 0 CNY（未计价））
+    resident_task_source_live_246_windows_test.go:181: resident sink C:\Users\swq\AppData\Local\Temp\TestLive246ResidentPipelineRaisesACardAndEscVetoesIt1452660601\002\logs: 1 file(s), 40 record(s)
+    resident_task_source_live_246_windows_test.go:188: AC#7 LIVE veto record: audit: approval: ANSWER-VETO corr=900bb089-cbbd-42d8-9ed8-48dd33ff78df#call_246r2 tool=fs.write channel=esc decision=veto
+    resident_task_source_live_246_windows_test.go:215: observer [-watch]: READY hwnd=0x4D0786 foreground=0x4D0786 foreground_is_mine=true steal=false
+        READING keydown_esc=1 syskeydown_esc=0 wm_hotkey=0 other_keys=0 foreground_is_mine=true steal=false
+    resident_task_source_live_246_windows_test.go:233: resident sink C:\Users\swq\AppData\Local\Temp\TestLive246ResidentPipelineRaisesACardAndEscVetoesIt1452660601\002\logs: 1 file(s), 51 record(s)
+    resident_task_source_live_246_windows_test.go:242: AC#7 LIVE: observer keydown 1->0->1 (steal control 0)
+--- PASS: TestLive246ResidentPipelineRaisesACardAndEscVetoesIt (17.48s)
+=== RUN   TestLive246ExitCancelsARunningTask
+    resident_task_source_live_246_windows_test.go:290: resident sink C:\Users\swq\AppData\Local\Temp\TestLive246ExitCancelsARunningTask1558465369\001\logs: 1 file(s), 38 record(s)
+    resident_task_source_live_246_windows_test.go:302: AC#7 LIVE (exit cancels a running task): wisp run: 任务已取消
+time=2026-10-09T09:59:53.479+08:00 level=INFO msg="httptest.Server blocked in Close after 5 seconds, waiting for connections:\n  *net.TCPConn 0x1b10bd3300c0 127.0.0.1:58575 in state active"
+--- PASS: TestLive246ExitCancelsARunningTask (25.49s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	43.090s
+rc=0
