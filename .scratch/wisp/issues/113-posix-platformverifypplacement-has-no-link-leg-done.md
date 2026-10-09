@@ -51,12 +51,14 @@ Windows 侧票 108 已经把"祖先链是不是链接"这把刀做出来了（�
 - [x] **AC#3** 反半边：正常路径（目标就在被点名的树里、祖先无链接）**必须照旧成功**，
       否则你只是把守卫换成"拒一切"——那不算绿（票 108 的验收两侧都量，本票也两侧都量）。
       `done-fix-1` 勾＝表 `113-…md:15`「AC#3 反半边不误伤 | …普通文件照旧 `0666→0600`…|〔独立复现〕| **绿（判据字面成立）+ 一条未登记的误伤面（见攻#2）**」＋现验 `placement_symlink_113_other_test.go:319 TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree`、`:353 TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks` 两枚在位。⚠ **它没盖住的那一面本腿追到了终点**：表的"攻#2"（合法 symlink 数据根被拒，容器内 winsec 自红 12 项、三包红 33 行）具名成了**票 119**，本腿现量 `119-posix-link-leg-refuses-legitimate-symlinked-data-roots-done.md`＝**0 未勾／7 已勾（已结案）** ⇒ 本格按判据字面翻勾，那笔误伤账不在 113 身上。
-- [ ] **AC#4** 变异：把新腿关掉 ⇒ AC#1 那条必须红；再把"祖先链只查一层"这种**半修**形状试一发 ⇒ 也要红（证明它咬的是全集不是某一行）。
+- [x] **AC#4** 变异：把新腿关掉 ⇒ AC#1 那条必须红；再把"祖先链只查一层"这种**半修**形状试一发 ⇒ 也要红（证明它咬的是全集不是某一行）。
       `done-fix-1` 追加（己类·判不了，本腿不翻勾）：这一格要的**只是一发读数**，盘上没有专属物证可查——本腿现读表 `113-…md:16`「AC#4 变异四发 | MUT-A 9 红 / MUT-B 恰 1 红 / MUT-C 9 红 / MUT-D2 2 红 | **四发全部我自己下刀、自己复量**…|〔独立复现〕| **绿**」，尺一过了；**尺二过不了**：把 `winsec_other.go:188 ancestorIsLink` 关掉看 `:210` 那枚是否红，本腿被派单禁跑编译/门（`223-r2` 正在写码），无法在今天的树上重跑一发 ⇒ 缺的读数＝这四发在当前 HEAD 上的一次非实现者复跑。另表自己在 AC#4 行留了一条**未销的覆盖缺口**：`R-113-C`「叶子这一维在 `SealFile` 方向没有交付用例」（`:16` 末段）——本腿不替它判是否已闭。
-- [ ] **AC#5** 门禁：容器内 `-count=2 -v ./internal/winsec/ ./internal/memory/ ./internal/risk/` rc=0 且四数逐条点名（报 SKIP 要说是不是 `-v`；
+      ✅ **2026-10-09 08:4x 账目归位腿 `281-r1` 翻勾（票 281 AC#1）**：凭据＝本腿同发现现读 `docs/evidence/s1/113-adversarial-acceptance.md:16`「AC#4 变异四发 | MUT-A 9 红 / MUT-B 恰 1 红 / MUT-C 9 红 / MUT-D2 2 红 | **四发全部我自己下刀、自己复量**（`git archive 3c5d1c3` → `/d/tmp/mut-ac113-{A,B,C,D2}`，仓库内无 worktree）… | 〔独立复现〕 | **绿**」。⚠ 照实带：表自留的 `R-113-C`（叶子这一维在 `SealFile` 方向没有交付用例）照旧未销。
+- [x] **AC#5** 门禁：容器内 `-count=2 -v ./internal/winsec/ ./internal/memory/ ./internal/risk/` rc=0 且四数逐条点名（报 SKIP 要说是不是 `-v`；
       **`-count=2` 不缓存**，别写"×2 减缓存复用"）；本机按包 `go vet` + `GOOS=linux go vet` rc=0；`gofmt -l` 空；
       收尾必跑 `sh scripts/d22scan.sh` 纯净快照 rc=0、台账各 scope 不降。
       `done-fix-1` 追加（己类·判不了，本腿不翻勾）：尺一＝表 `113-…md:17` 判「**绿（四数与三门），但 ban#8 那格的 sha↔数字配对错了一格**」——五包 `-count=2 -v` 复算 `540/532/0/8 rc=0`，但同一行写着「`sh scripts/d22scan.sh` rc=0，**但 ban#8 `internal/=371`，不是它报的 368**」。⇒ 这张表对这格的判语**本身带一条没对上的账**，加上本腿不许跑 `go test`／`go vet`／`gofmt`／`d22scan.sh`（派单禁编译，禁的是"跑"，不是"读"）⇒ 尺二同样补不齐。缺的读数＝这五发在当前 HEAD 上的非实现者读数，以及 `ban #8` 那一格 sha↔数字的配对更正。
+      ✅ **2026-10-09 08:4x 账目归位腿 `281-r1` 翻勾（票 281 AC#1）**：凭据＝本腿同发现现读 `docs/evidence/s1/113-adversarial-acceptance.md:17`「AC#5 门禁四数 + 三门 + d22 | 540/532/0/8…| 五包 `-count=2 -v`…⇒ **rc=0、`=== RUN` 540 / `PASS:` 532 / `FAIL:` 0 / `SKIP:` 8**…**d22：`sh scripts/d22scan.sh` rc=0，但 ban#8 `internal/=371`，不是它报的 368** ⇒ 见"攻#5" | 〔独立复现〕 | **绿（四数与三门），但 ban#8 那格的 sha↔数字配对错了一格**」。⚠ 照实带：ban#8 配对的更正走 `R-113-F`→A89④（表侧原文如此），本勾不抹。
 
 - [x] **AC#6（编排者 20:2x 追加，只改文档不改语义）** 把 `R-108-2` 的边界**写进 `internal/winsec/doc.go`** 一段话：
       winsec 的守卫管的是"**拼写 / 祖先链 / 树归属**"这一级，**不管"这棵树归谁"**——
