@@ -25,3 +25,34 @@
 ## 禁区
 
 ⛔ 不改产码（除 AC#1 的突变行，改完必须还原）；⛔ 不许为变绿放宽任何断言；⛔ 零翻框；⛔ 零 push。
+
+### Progress log · 282-r1
+
+时刻 `2026-10-09 11:3x–11:5x +0800`，腿 `282-r1`（实现腿，独占 Go 编译/测试面），起手锚 `6041d7f9`／第 1 笔 commit `c2b422a4`。
+本格**只交读数，不翻框**（上面五个框与所有判据句一字未改，本节写在最末）。
+
+- **`AC#1` 两发各有指名红**（种形＝票面举例的「回退到 corr」，非「返回空」；两枚调用点各算一发）：
+  - 发一 `internal/tools/subagent_197.go:262` 种后 `	parentID := CorrelationID(ctx)` →
+    `--- FAIL: Test283IdentityChainThroughTheRealLoop` 红在 `internal/tools/ticket283_corr_identity_rulers_test.go:194`
+    （`ParentTaskID = "…#call-283-spawn", want 宿主 task id "…"`）＋同发 `:206` 连带。
+  - 发二 `internal/tools/task.go:708` 种后 `	caller := CorrelationID(ctx)` →
+    同一条用例红在 `:206`＋`:209`（回执走到「拒绝停止：… 不是调用者 …#call-283-cancel 的孩子」＝父停不了子的现场）。
+  - 四件套齐：种前 `git hash-object` `8c9266a7…`／`3ec8d498…`、种后各 `aef83396…`／`cedb4762…`、
+    还原逐字等值（`sha256sum` 双列同值）、`git status --porcelain -- internal cmd` 两发收口各量＝**空**。
+    ⇒ 本格**不需要**写"该支今天没有仪器"。
+- **`AC#3` 同形状对拉两对**（命令 `go test ./internal/tools/ ./internal/agent/ -count=1 -v`，只有盘上那一行不同）：
+  身份那一跳（名册登记＋父停子）**真被修掉**＝前红后绿；
+  而**深度判定那一支（`subagent_197.go:267-271`）判不动**：前后两发逐字同绿（`--- PASS: Test197ChildCannotDeriveSubagent (0.00s)`），
+  三把现量尺证明它今天没有仪器——拒句 `子代理不许再派子代理` 在 `_test.go` 里命中 `0`、
+  `TaskKindSubagent` 的 5 枚测试命中全是"断言孩子那行的 Kind"、
+  生产链上孩子的 `task.spawn` 被 `subagentToolProvider.Execute`（`:573-580`）先行硬拒根本到不了那一跳。
+  **缺什么**：一枚"调用者那行是 `TaskKindSubagent` ＋派发经真 loop（`corr != taskID`）＋请求 `task.spawn`"的夹具，⛔ 不是一枚种刀。
+- 方法学前置（`TaskID != CorrelationID`）现量确认：两发红句里 `…#call-283-spawn`／`…#call-283-cancel` 与 task id 同屏不等；
+  尺件 `039ec93c`（`ticket283_corr_identity_rulers_test.go`，227 行新建零删除）与 `9a00a890`（`ticket285_corr_rows_rulers_test.go`）`git ls-tree HEAD` 在树内。
+- **三数**（起手基线＝收工纯净树，逐格相等）：`internal/tools` PASS=209/FAIL=0/SKIP=0、`internal/agent` PASS=84/FAIL=1/SKIP=0；
+  那枚既有红 `--- FAIL: TestGoldenSingleToolCall (0.00s)` 起手即在、归票 286，本腿**未修未 Skip 未复述成自己的成果**。
+  种刀两跑的整包名册各自只有「`Test283IdentityChainThroughTheRealLoop` ＋那枚既有红」两枚，无第三枚。
+- 门禁：`GOFLAGS= go build ./...` rc=0；`sh scripts/d22scan.sh`（纯净树）rc=0；`gofmt -l`／`gofumpt -l` 两枚被种文件零输出。
+  新仪器：**无**（票 283/285 的尺已够，本腿不落新 `*_test.go`）；产码字节改动：**零**；禁区（`approval/gate.go`／`loop.go` 的 `callCorr`／`loop_approval_test.go:219-222`／三枚冻结件／`docs/**`／`thresholds.go`／golden／`allowlist.txt`）porcelain 全空。
+- 照实带一处本腿自己的失误：发一第一次 `sed` 样式写错（`.*-` 在那一行匹配不到）⇒ 突变**没落盘**、那一跑只是干净树复跑 ⇒ 已具名作废，改内容锚后重跑才是读数（详见腿件 §5）。
+- 腿件：`.scratch/wisp/probes/282/r1/00-anchor.md`／`10-ac1-teeth.md`／`20-ac3-before-after.md`。
