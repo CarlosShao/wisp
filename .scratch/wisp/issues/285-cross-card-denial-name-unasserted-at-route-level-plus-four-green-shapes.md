@@ -74,3 +74,43 @@
   四枚产码件收工 hash 与起手逐字等值；`git status --porcelain -- internal cmd` 空。
   `gofmt -l`／`gofumpt -l` 对本腿新建测试件均**空输出**。
 - 读数全文：`.scratch/wisp/probes/285/r1/00-anchor.md`／`10-ac1-ruler.md`／`20-ac3-no-relaxation.md`。
+
+### 2026-10-09 11:04–11:20 · 腿 `285-r2` 交件读数（AC#4 第五形补尺；⛔ 本节不翻任何勾、⛔ 未改上面任何一句判据）
+
+- **AC#4＝补尺已落地，落点＝甲＋乙都给**，零产码字节改动（`git diff --name-status ce18b3d..HEAD -- '*.go'`
+  只有两枚 `A`）。起手锚 `ce18b3d6`，第一笔＝起手锚 commit `28258cd2`（先锚后跑），交件 commit `9a00a890`。
+  - 甲＝`internal/agent/ticket285_corr_distinct_rulers_test.go`（144 行／`Test285CallCorrIsDistinctPerCall`
+    ＋`Test285LoopDispatchesOneCorrPerCall`）：包内直接对未导出的 `callCorr` 的**两支各自作差**
+    （带 call id 支／回落到轮内位置支），＋ 真 loop 派发侧两枚 corr 作差与"corr 后缀＝自己的 call id"。
+  - 乙＝`internal/tools/ticket285_corr_rows_rulers_test.go`（113 行／`Test285RosterRowsCarryDistinctCorrPerCall`）：
+    续票 283 的真链（真 loop→真 bridge→真工具→真 `tool_call` 行），断言面落在 `ListToolCallsByTask` 读回的
+    **两枚持久行**上＝票面判据那句 `rows[0].CorrelationID != rows[1].CorrelationID`（`乙:81`）。
+    复用 283 现成夹具（`build221`／`windowGate221`／`parent283Provider`／`fake197Provider`），⛔ 未改该件一字。
+  - 甲不可替代的那一发＝回落支：现量 `grep -rn '#call-' internal/ --include=*_test.go` ＝ 空输出，
+    全仓 SSE 夹具没有一枚不带 call id ⇒ 真链走不到那一支，只有包内直接调用能打死它（MU-2 的对照读数）。
+- **四件套突变三发全部种在盘上（⛔ 零 `-overlay`），种刀只有 `internal/agent/loop.go` 的 `callCorr`**：
+  MU-1（带 id 支塌成常量后缀）⇒ 甲 `:79`/`:85`/`:89` ＋ 甲 loop `:124` ＋ 乙 `:82`/`:90`/`:95`/`:107` 全红，
+  **同发下票 283 的尺二 `--- PASS`**＝作差那一发是新增承重件；
+  MU-2（回落支 `index` 抹常量）⇒ 只有甲的单元作差红（`:79`/`:85`/`:89`），
+  甲的 loop 那一发与乙与 283 全部 `--- PASS`＝"这一支今天除甲之外零尺"的直接读数；
+  MU-3（保住互不相等、摘掉 task 前缀）⇒ 前缀轴与"后缀＝自己 call id"轴红（`:76`/`:133`/`:137`／乙 `:76`），
+  **作差那一发静默**，同发 283 的尺二也红（那一形今天已有尺，本腿不占功）。
+  三发还原后 `internal/agent/loop.go` hash 与起手逐字等值（`8eb37e9f…843`），`git status --porcelain -- internal cmd` 空。
+  夹具前置（"TaskID != CorrelationID 否则两发必同绿不算读数"）在甲 `:72`/`:119` 与乙 `:72` 都是**断言**不是注释。
+- **⚠ 本格判据的前提要在盘上复核（本腿的顶回，逐字全文见 `10-ac4-ruler.md` §5）**：
+  ① `internal/agent/corr_percall_242_test.go:99-105` **今天已经在作差**
+  （`c1, c2 := p.corr("call_p1"), p.corr("call_p2")` ⇒ `if c1 == c2 { t.Fatalf(...) }`，
+  并在 `:109-133` 用各自的 corr 唤醒各自那一枚调用），票面尺①按 `callCorr` **字样**扫、尺②按
+  `CorrelationID ==` **形状**扫，两把都漏了它 ⇒ "第五形今天零尺"这句按现量应窄化为
+  **"名册行级作差零尺＋回落支作差零尺"**（这两发＝本腿交付）。
+  ② 票面尺①那句"产码 3 枚"现量是 **4 枚**（`loop.go:594` 的文档注释里也写着 `callCorr`，锚上就在）。
+  ③ `internal/agent` 整包**在锚上就是红的**：`TestGoldenSingleToolCall`（`loop_golden_test.go:70`）
+  期望 `CorrelationID == TaskID`，与票 242 的 per-call 铸形相互矛盾；同文件 `:341` 期望行 corr 等于 task id
+  却是绿的。本腿⛔ 未裁定、未放宽、未顺手改（不属 AC#4 射程），`rc` 起手 1＝收工 1。
+- 基线与收工（`-count=1`）：`internal/agent` 起手 **82 PASS／1 FAIL／0 SKIP**（`rc=1`）→ 收工
+  **84 PASS／1 FAIL／0 SKIP**（`rc=1`，红仍是起手那枚、名目逐字同）；
+  `internal/tools` 起手 **208 PASS／0 FAIL／0 SKIP**（`rc=0`）→ 收工 **209 PASS／0 FAIL／0 SKIP**（`rc=0`）。
+  `gofmt -l`／`gofumpt -l` 对两枚新件均空输出；`tools/d22scan -root .` ＝ clean（`rc=0`）；
+  ⛔ 零 `t.Skip`、⛔ 未动 `internal/tools/loop_approval_test.go` 那一带、⛔ 未碰 `approval/gate.go`（票 284 搭载格不触发）、
+  ⛔ 三枚冻结件一字不动、⛔ 零 push。
+- 读数全文：`.scratch/wisp/probes/285/r2/00-anchor.md`／`10-ac4-ruler.md`／`20-mutations.md`。
