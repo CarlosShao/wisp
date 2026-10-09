@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/CarlosShao/wisp/internal/audio"
+	"github.com/CarlosShao/wisp/internal/ball"
 	"github.com/CarlosShao/wisp/internal/buildinfo"
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/observe"
@@ -340,3 +341,34 @@ func (f *failingSource) Start(context.Context, chan<- []byte) error { return f.e
 func (f *failingSource) Stop() error                                { return nil }
 func (f *failingSource) Stats() audio.Stats                         { return audio.Stats{LastError: f.lastErr} }
 func (f *failingSource) Err() error                                 { return f.err }
+
+// TestAC247HandingTheLevelToTheSeamIsNotVisibility is AC#10's reading half.
+//
+// This leg may claim one thing: the scalar reaches Ball.SetAudioLevel. It may
+// not claim the orb breathes on screen, because while prototypeVisuals is off
+// - which is the shipped default, and this leg is forbidden to flip it for a
+// prettier AC#2 - applyLevel returns at internal/ball/liquid_windows.go:52
+// before any pixel can move. Flipping that default belongs to ticket 68 AC#2.
+// The reading is taken off the exported flag, not off a comment.
+func TestAC247HandingTheLevelToTheSeamIsNotVisibility(t *testing.T) {
+	if ball.PrototypeVisualsEnabled() {
+		t.Fatal("prototypeVisuals is ON in this assembly: the shipped default is off, and a leg that says it turned it on has crossed AC#10")
+	}
+	rt, _ := bootAudioRuntime(t)
+	dir := writeAudioConfig(t, nil)
+	tap := &levelTap{}
+	ra := assembleCapture(rt, dir, tap.call, newRealCaptureSource)
+	if ra.gate == nil {
+		t.Fatalf("no collector to hand anything to: %q", ra.verdict)
+	}
+	// The seam still takes the number even though nothing on screen can move.
+	ra.levelOut(tap.call)(0.3)
+	if got := ra.levels.Load(); got != 1 {
+		t.Fatalf("levels handed to the seam = %d, want 1", got)
+	}
+	if tap.count() != 1 {
+		t.Fatalf("the destination saw %d levels, want 1", tap.count())
+	}
+	t.Logf("AC#10 reading: PrototypeVisualsEnabled()=%v levels_reaching_the_ball_seam=%d (a number arriving is not a pixel moving)",
+		ball.PrototypeVisualsEnabled(), ra.levels.Load())
+}
