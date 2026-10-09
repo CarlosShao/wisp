@@ -112,4 +112,4 @@ cmd/wisp/resident_ball_windows.go:353:		bridge := ball.NewHotkeyReloader(b, b.Co
 internal/ball/ball_windows.go:840:func (b *Ball) ConfiguredHotkeys() HotkeyConfig {
 ```
 
-（逐字全文见 `raw-scratch-copies.txt`，本目录内。）
+R1/R1b/R3/R4 的逐字全文另见 `raw-scratch-copies.md`（本目录，`.md` 而非 `.txt`——理由见那份的自报段）。
