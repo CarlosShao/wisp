@@ -127,7 +127,8 @@ b1bdc61f capture-seam tests (internal/audio)
 cdaf5953 assembly tests (AC#4/AC#5/AC#6) + the WISP_LIVE_MIC AC#2 harness
 ada5c563 ticket-255 config-reader roster re-adjudication (forced by its own instrument)
 fb846b69 AC#10 reading test (PrototypeVisualsEnabled()=false at the shipped default)
-(+ this evidence file and the ticket Progress-log line, one further commit)
+618d833b evidence (10-gates.md, 20-ac-readings.md) + the ticket Progress-log line
+303670a5 gofumpt on the two files this leg authored (formatting only)
 ```
 
 Zero push. Nothing was deleted from the repo; the two raw long logs this leg produced
