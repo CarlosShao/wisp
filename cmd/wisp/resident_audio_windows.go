@@ -167,7 +167,8 @@ func buildResidentAudio(rt *proc.Runtime, dataDir string, out func(float32)) *re
 }
 
 func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
-	newSource func(opts ...audio.CaptureOption) captureSource) *residentAudio {
+	newSource func(opts ...audio.CaptureOption) captureSource,
+) *residentAudio {
 	ra := &residentAudio{}
 
 	// The per-fresh-read shape this package already uses for hot-tier views
@@ -253,7 +254,7 @@ func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
 		slog.Error("audio: capture device unavailable",
 			"class", class, "err", lastErr, "posture", "boot continues, no state pushed")
 		fmt.Printf("wisp: 麦克风不可用（错误分类 %s）：%s\n", class, lastErr)
-		fmt.Printf("wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，"+
+		fmt.Printf("wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，" +
 			"启动期没有；票 128 只定了「没有数据根」这一种拒绝启动\n")
 	case !gate.Open():
 		ra.verdict = "采集腿在跑但设备未交接（gate 未 open）：球不会收到电平"

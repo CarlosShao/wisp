@@ -90,7 +90,7 @@ func TestAC247LevelSinkGetsOneScalarPerSeamFrame(t *testing.T) {
 		if l < MinLevel || l > MaxLevel {
 			t.Fatalf("level %d = %v, outside the closed scale [%v,%v]", i, l, MinLevel, MaxLevel)
 		}
-		want := float32(LevelOfSamples(inj.samples[i*FrameSamples:(i+1)*FrameSamples]))
+		want := float32(LevelOfSamples(inj.samples[i*FrameSamples : (i+1)*FrameSamples]))
 		if l != want {
 			t.Fatalf("level %d = %v, want the same frame's FrameLevel %v", i, l, want)
 		}
