@@ -367,6 +367,6 @@ PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" ./build/wisp.exe   # 默认
 | `date` / `git log --oneline -1` / `git status --short -- internal cmd \| head` | 0 | 起手锚，原样在件首 |
 | `ls -d third_party/sherpa-onnx build` | 0 | 两枚都在，harness 可用 |
 | `git show HEAD:<path>`（对 5 枚文件）／`git grep`／`git blame -L`／`git ls-files`／`sed -n`／`grep -n` | 0 | 全部只读；`git blame` 那一次是"在飞改动"的唯一证人 |
-| `sh scripts/check-path-length-budget.sh` | 见交件回报 | 本腿唯一像样的门禁：新建路径的 ≤100 字符帽（README 规矩 9） |
+| `sh scripts/check-path-length-budget.sh`（交件后现跑，15:3x） | **rc=1 VERDICT RED，⛔ 红在本腿以外** | 分母 8559 枚 tracked path、超帽 58、名册覆盖 57、**名册外 1 枚＝`.scratch/wisp/issues/290-nothing-in-production-ever-turns-the-gate-on-so-the-default-config-cannot-deliver-level-to-the-ball.md`（名 106 字符 > 规矩 9 的 100 帽）**⇒ 这一枚是票 290 建票时留下的债（同一族缺陷已由编排者在 `7c89ba13` 的 commit message 里逐字自抓、票 291 的 `:45` 也记了改名），**本腿零改票面、零改名**，只具名报回。**本腿那枚件不是超标项**：相对路径 60 字符、末段名 34 字符（帽 100）。 |
 | `go build` / `go vet` / `go test` / `go list` / `go env` | **未跑（不适用）** | **本腿零 Go 命令**：受 `290-r1` 独占 Go 面约束。`sh scripts/d22scan.sh`／`tools/d22scan/d22scan.exe` 也未跑——本腿零产码、零 Go 文件改动，跑它们要占 Go 面，不属本腿射程 |
 | 写点 | — | 唯一写点＝本件 `.md`；零 `frontend/**` 零 `design/**`；未碰 `.gitignore`／`design/**`／`probes/{152,161,242,268}`／任何票面；零 AC 框翻动；零 push；两笔 commit 均带显式 pathspec，未用 `add -A`/`amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean` |
