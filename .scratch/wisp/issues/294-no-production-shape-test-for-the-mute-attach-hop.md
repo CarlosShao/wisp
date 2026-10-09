@@ -43,3 +43,5 @@
 ## Progress log
 
 （追加式；每条 `- [YYYY-MM-DD HH:MM:SS +08] agent=… did=… next=…`，钟点由 `date` 的 stdout 插值，不手打。）
+
+- [2026-10-09 21:06:56 +08] agent=294-a1（只读普查腿，非落地腿） did=AC#0 普查 + AC#1..3 落点判定两件落 `.scratch/wisp/probes/294/a1/`（`ac0-census.md`/`ac1-ac3-shapes.md`），commit `b6a41f69` + 本笔；名册：`startResidentBall` 测试调用 10 枚全真窗、手搓 `&residentBall{}` 13 枚、`attachMuteGate` 3 枚测试直调全挂手搓球；`attachMuteGate` 锚形状＝产码 1（现随 296-r1 并发从 `:325`→`:336`）/测试直调 3/定义 1/注释 1/AST 走查 0；装配根"直调有走查零"欠账除静音外 ≥4 枚（bindBallHost·RegisterShutdownHook(StepCancelTasks)·startResidentTaskSource 调用点·startResidentAudio）；AC#1 模板 `resident_hotkey_258_test.go` 是 `*ast.Ident` 形状，`rb.attachMuteGate` 是 `*ast.SelectorExpr` 方法调用、不能纯照抄须加一层；AC#2 `HotkeyReport.IsLive` 存在且 internal/ball 已对 hkMute 读，但 hkMute 非导出、cmd/wisp 无镜像常量、从未对 mute 读 IsLive；AC#3 无一人断 `executed==true`（`:197` 只断无门⇒false），happy 世界在 290 夹具里已可造真门、缺的只是那半枚断言，且 M2 反形翻 `:172/:174` 撞票 295 同写面须串行 next=待 294-r1 持 Go 编译面现跑：AC#1 走查红/绿＋AC#2 本机真窗 `IsLive(hkMute 镜像)` 实读（SKIP-LOUD 在本机不是退路）＋AC#3 `executed==true`（与 295 串行）；票面 `:303/:217/:278` 行号已漂一律改锚形状（本腿 ⛔ 未自改票面正文）。本把 ⛔ 零 go 命令、⛔ 零翻框、⛔ 未动 docs。
