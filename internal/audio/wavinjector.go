@@ -8,8 +8,6 @@ import (
 	"os"
 	"sync"
 	"time"
-
-	"github.com/CarlosShao/wisp/internal/observe"
 )
 
 // WavInjector is the C8 test backbone (SPEC-04 sec 3/9): it replays a WAV
@@ -25,6 +23,7 @@ type WavInjector struct {
 	samples []int16 // 16k mono, the seam rate
 	pace    time.Duration
 	meter   *meter
+	cfg     CaptureConfig // registry owner + level sink (ticket 247 P4/P6)
 
 	mu     sync.Mutex
 	cancel context.CancelFunc
@@ -33,6 +32,15 @@ type WavInjector struct {
 
 // InjectorOption configures a WavInjector.
 type InjectorOption func(*WavInjector)
+
+// WithInjectorCapture hands the injector its capture-side seams (registry
+// owner and level sink) using the same CaptureOption vocabulary the real
+// microphone takes, so a test that drives this C8 seam exercises the same
+// injection points production uses. The default is unchanged from before the
+// seam existed: the process registry and no level sink.
+func WithInjectorCapture(opts ...CaptureOption) InjectorOption {
+	return func(w *WavInjector) { w.cfg = newCaptureConfig(opts...) }
+}
 
 // WithInjectorPace sets the inter-frame delay. The default is FrameDuration
 // (real-time replay). A pace of 0 floods (no pacing), which is how back-
@@ -62,6 +70,7 @@ func NewWavInjector(path string, opts ...InjectorOption) (*WavInjector, error) {
 		samples: samples,
 		pace:    FrameDuration,
 		meter:   newMeter("wav-injector"),
+		cfg:     newCaptureConfig(),
 		done:    make(chan struct{}),
 	}
 	for _, o := range opts {
@@ -81,7 +90,7 @@ func (w *WavInjector) Start(ctx context.Context, buf chan<- []byte) error {
 	cctx, cancel := context.WithCancel(ctx)
 	w.cancel = cancel
 	w.done = make(chan struct{})
-	observe.Default.Spawn("audio-capture", "audio", nil, func(ctx context.Context) {
+	SpawnCapture(w.cfg.Registry, func(ctx context.Context) {
 		w.pump(cctx, buf)
 		close(w.done)
 	})
@@ -126,7 +135,13 @@ func (w *WavInjector) pump(ctx context.Context, buf chan<- []byte) {
 			return
 		default:
 		}
-		w.meter.push(buf, EncodeFrame(w.samples[off:min(off+FrameSamples, len(w.samples))]))
+		frame := EncodeFrame(w.samples[off:min(off+FrameSamples, len(w.samples))])
+		w.meter.push(buf, frame)
+		// Same contract as the microphone path: the level is measured inside
+		// this audio-capture goroutine and leaves as one scalar, so a test that
+		// drives the C8 seam exercises the production injection point rather
+		// than a second copy of it (ticket 247 P6/P8 form 甲).
+		w.cfg.emitLevel(frame)
 	}
 }
 

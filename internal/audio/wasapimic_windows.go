@@ -36,6 +36,7 @@ type WASAPIMicrophone struct {
 	watcher DeviceWatcher
 	opener  streamOpener
 	meter   *meter
+	cfg     CaptureConfig // registry owner + level sink (ticket 247 P4/P6)
 
 	threadID atomic.Uint32 // OS thread of the pinned capture loop (diagnostics/pinned test)
 
@@ -48,17 +49,21 @@ type WASAPIMicrophone struct {
 }
 
 // NewWASAPIMicrophone builds the real device stack (MMDeviceEnumerator
-// watcher + WASAPI shared-mode opener).
-func NewWASAPIMicrophone() *WASAPIMicrophone {
-	return newWASAPIMicrophoneWith(newMMDeviceWatcher(), wasapiOpener{})
+// watcher + WASAPI shared-mode opener). CaptureOption seams (ticket 247)
+// choose which goroutine registry owns the capture thread and where the
+// per-frame level goes; with no options it keeps the pre-247 shape, the
+// process registry and no level sink.
+func NewWASAPIMicrophone(opts ...CaptureOption) *WASAPIMicrophone {
+	return newWASAPIMicrophoneWith(newMMDeviceWatcher(), wasapiOpener{}, opts...)
 }
 
 // newWASAPIMicrophoneWith injects the seams (tests).
-func newWASAPIMicrophoneWith(w DeviceWatcher, o streamOpener) *WASAPIMicrophone {
+func newWASAPIMicrophoneWith(w DeviceWatcher, o streamOpener, opts ...CaptureOption) *WASAPIMicrophone {
 	return &WASAPIMicrophone{
 		watcher: w,
 		opener:  o,
 		meter:   newMeter("wasapi-mic"),
+		cfg:     newCaptureConfig(opts...),
 		hotplug: make(chan struct{}, 1),
 	}
 }
@@ -80,7 +85,12 @@ func (m *WASAPIMicrophone) Start(ctx context.Context, buf chan<- []byte) error {
 	m.mu.Unlock()
 
 	started := make(chan error, 1)
-	observe.Default.Spawn("audio-capture", "audio", nil, func(c context.Context) {
+	// The capture thread is booked through SpawnCapture, the package's one
+	// sanctioned entry for the D38b "audio-capture" name, so the registry that
+	// owns it is the one the assembly root handed in (ticket 247 P4 form 甲).
+	// The level sink runs inside this same goroutine (P8 form 甲): no second
+	// roster name, no second thread.
+	SpawnCapture(m.cfg.Registry, func(c context.Context) {
 		// c is the registry's ctx (nil root -> background); the loop must
 		// honor the CONSUMER's ctx, so run the derived one explicitly.
 		m.run(loopCtx, buf, started)
@@ -228,7 +238,15 @@ func (m *WASAPIMicrophone) run(ctx context.Context, buf chan<- []byte, started c
 		}
 		pending = append(pending, res.Process(samples)...)
 		for len(pending) >= FrameSamples {
-			m.meter.push(buf, EncodeFrame(pending[:FrameSamples]))
+			frame := EncodeFrame(pending[:FrameSamples])
+			m.meter.push(buf, frame)
+			// The level of this frame is measured here, on the capture
+			// thread, and handed out as one scalar (ticket 247 P6/P8 form
+			// 甲). Emitting regardless of the push outcome is deliberate:
+			// the drop is a slow-consumer fact, the loudness is a
+			// microphone fact, and a process with no frame consumer yet
+			// must still see its own microphone.
+			m.cfg.emitLevel(frame)
 			pending = append(pending[:0], pending[FrameSamples:]...)
 		}
 	}

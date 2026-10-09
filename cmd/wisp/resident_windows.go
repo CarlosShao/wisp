@@ -259,6 +259,24 @@ func runResident() {
 	// report prints includes whatever this registered.
 	src := startResidentTaskSource(rt, ra)
 
+	// Ticket 247 AC#1/AC#5: the capture leg. This is the line that makes
+	// internal/audio have a non-test importer - before it the whole stack
+	// (real WASAPI shared mode, the D38d bounded frame path, the gate, ticket
+	// 241's level scale) had zero production callers, and the only number ever
+	// handed to Ball.SetAudioLevel came from cmd/balldebug's command line.
+	//
+	// It runs AFTER startResidentBall because the level's destination is that
+	// window, and BEFORE the report below so the step roster the report prints
+	// includes D38(e) step 4 if this leg really owns it. The ball host is
+	// handed a nil-safe method value taking one float32: no sample, no
+	// transcript and no second dependency edge cross into internal/ball (AC#3),
+	// and internal/audio still does not import the ball (AC#0 甲 + 乙-2 exit).
+	//
+	// No defer here on purpose: the teardown is the StepStopAudio hook this call
+	// registers, so the frozen ten-step order closes the device - not a LIFO
+	// accident that would leave step 4 reporting a stop it did not perform.
+	raudio := startResidentAudio(rt, rb.setAudioLevel)
+
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).
 	registered := rt.RegisteredShutdownSteps()
@@ -268,6 +286,13 @@ func runResident() {
 	}
 	fmt.Printf("wisp: %s; 任务来源：%s; 面板：%s; D38(e) steps with an owner in this process: %s\n",
 		ra.residentStatusLine(), src.taskPosture(), panel.statusLine(), strings.Join(names, ", "))
+	// Ticket 247 AC#6/AC#10: the capture posture gets its own line, taken off
+	// the state the assembly recorded. It says which of the three shapes this
+	// process is in (no collector / armed and muted / running) and it does NOT
+	// claim the ball is visibly breathing: with prototypeVisuals off, which is
+	// the default and this leg's ruling forbids flipping, Ball.SetAudioLevel
+	// returns at once (internal/ball/liquid_windows.go:52).
+	fmt.Printf("wisp: 采集腿：%s\n", raudio.posture())
 
 	// The boot report has to match what happens next: if an exit request already
 	// arrived during the ball path, printing "resident event loop running" and then
