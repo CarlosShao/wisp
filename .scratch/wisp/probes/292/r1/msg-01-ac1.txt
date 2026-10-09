@@ -1,0 +1,23 @@
+票 292 腿 292-r1 AC#1：只读裁完 :598-600 的四问，四问各带文件:行逐字引文
+
+零产码改动。证据件 .scratch/wisp/probes/292/r1/00-anchor-and-scales.md。
+
+四问判语（逐字引文与尺都在件里，§3/§4）：
+- 问 a（join 来源枚数）：票面成立。internal/panel/subagent_roster_197.go:212/:214 是卡片那一半，
+  :219/:220 是 L1 确认窗口那一半（可只凭 task id 点亮 :236）。原句只说了半个 join。
+- 问 b（corr == task id）：今天是结构上不可能，不是「只是从外面做不到」。
+  internal/agent/loop.go:603-608 两支返回都带 # 追加段，用在 :676。
+- 问 c（nothing in this tree can make that happen）：仍成立，但根因换了。
+  grep -rn "L1Windows:" --include=*.go . 得 1 命中（internal/panel/subagent_blocked_220_test.go:81，测试内注入）；
+  grep -c L1Windows cmd/wisp/run.go 得 0，装配点 cmd/wisp/run.go:699 的 PumpSources 里无该字段。
+  生产侧还没人供数据＝票 220 落地腿的活，本腿不接。
+- 问 d（tool_choice 两环）：结论真、因果链在本件里多余。
+  grep -rn ToolChoice internal/agent/ 全量 0 命中；tools/mockllm/chat.go:172 把整个 tool-call 决策
+  挂在 req.ToolChoice != nil 上，故 loop 不发 tool_choice 对 mockllm 是充分的。
+  但本件的 spawn 不经模型 tool call：cmd/wisp/subagent_carrier_197_test.go:173-174 是测试把
+  ToolRequest 直接放到装配好的桥上（票面 :16 把这一环交给我裁，我把读数一并交回，不扩写）。
+
+票面行号现场点数复核：roster :212/:214/:219/:220/:236 与 loop.go :603/:676 全对；
+未发现票面与盘上的实质冲突（不符点只有派单的工作树枚数计数口径，见件 §6 N1）。
+
+下一步：AC#2 只改那三行注释；AC#3 改前后各两发整包（带 sherpa harness）；AC#4 门禁。
