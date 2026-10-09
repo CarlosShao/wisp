@@ -3,6 +3,7 @@
 **立票**：2026-10-09 10:5x 编排者（来路＝非实现者腿 `242-v2` 的"具名判不动"一节，件 `docs/evidence/s1/242-grant-binding-v2.md:102-110`；台账 `A757`）
 **性质**：补仪器。**⛔ 不改产码、不改任何已定案的对外文案**——票 259 选形 ⓐ（`A562`／`A619`：对外一句合并 `ErrBadGrant`、拆分只在对内）是**已批准的契约形状**，本票不动它，只把"这个形状今天有没有人钉"补上。
 
+**Status:** **done**（2026-10-09 11:3x 编排者收口：四格全勾。`AC#1`/`AC#2`/`AC#3` 凭据＝腿 `285-r1` 五发突变＋编排者独立跑 92/0/1；`AC#4` 凭据＝腿 `285-r2` 两枚新尺＋三发突变，编排者独立跑三枚新用例全 PASS。⚠ `AC#4` 原字面前提「今天零尺」不成立，按窄化字面勾，见文末「更正二」。残余另立**票 286**＝`internal/agent` 起手即在的那枚红。）**
 ## 现量（引用前先重跑；枚数口径**逐条写明是抽样还是整族**）
 
 - **① 路由级"两枚都活着的卡"跨卡那一发，`denial=` 那枚名字零断言面（整族结论）**：`internal/agent/approval` 里唯一带两枚活卡走 `Native().Allow` 的断言在 `queue_test.go:161` 一带，而它的 `corr-B` **从未 push** ⇒ 拿到的是 `ErrUnknownCorrelation`，**不是** grant denial；真·两枚活卡那一发只在 `cmd/wisp/subagent_selfapproval_197_test.go:473`，它断的是 `errors.Is(err, ErrBadGrant/ErrPanelAllow)`，**该测试不捕获 gate 的 `Logf`** ⇒ 审计面那句 `GRANT-DENY … denial=` 在两个包里都无人读（尺＝`git grep -c GRANT-DENY` 对产码/测试面零命中，今天只有裁决表与台账写过它）。
@@ -23,12 +24,14 @@
 
 ## 追加一格（2026-10-09 10:4x 编排者，来路＝只读复核腿 `282-v1` 顶回＋编排者自己复跑）⚠ 不改上面三格任何字
 
-- [ ] **AC#4 第五形：per-call corr 的"每枚调用各不相同"这件事，今天零尺**（这一格是**我自己欠的**，不是实现腿的）。台账 `A745` 我给落地腿的派单里**明写了要一枚新用例**＝"同一任务并发两问 ⇒ 两枚 corr **不同**且各自可路由"；编排者现跑两把尺（HEAD）＝
+- [x] **AC#4 第五形：per-call corr 的"每枚调用各不相同"这件事，今天零尺**（这一格是**我自己欠的**，不是实现腿的）。台账 `A745` 我给落地腿的派单里**明写了要一枚新用例**＝"同一任务并发两问 ⇒ 两枚 corr **不同**且各自可路由"；编排者现跑两把尺（HEAD）＝
   ① `git grep -nE 'callCorr' HEAD -- '*.go'` ⇒ 产码 **3 枚**（`internal/agent/loop.go:603` 定义／`:676` 唯一调用点／`:367` 注释）＋测试面 **1 枚**——而且那一枚只是 `ticket283_corr_identity_rulers_test.go:13` 的**注释文字**，不是断言 ⇒ **`callCorr` 零测试引用**；
   ② 全仓扫"两枚 corr 互不相等"形状 ⇒ 只有 `internal/agent/approval/ticket87_veto_l2_test.go:173`（`len(cards) != 2 || cards[0].CorrelationID == cards[1].CorrelationID`），而那枚是**直接往门里 push 两张卡**，**不经 loop 的铸造那一跳**。
   ⇒ 后果形状：`loop.go:603 callCorr(taskID, callID, index)` 若退化成**同一任务内两枚调用返回同一个串**（例如 `callID` 空时那支 `%s#call-%d` 回落跨轮同键），今天**没有任何用例看得见**——票 283 的尺二确实跑了两枚调用，但它在 `:222` 只逐枚断"非空／不等于 taskID／以 taskID 为前缀"，⛔ **没有把两枚互相作差**。
   **要建什么**：一枚会响的断言＝同一任务两枚调用 ⇒ `rows[0].CorrelationID != rows[1].CorrelationID`，且四件套齐（种坏 `callCorr` 的 `index`／`callID` 两支各一发，指名用例必须红）。⚠ 前置同票 283：夹具必须 `TaskID != CorrelationID`，否则两发必同绿不算读数（`282-v1` 具名的方法学坑）。
   ⛔ **本格今天只登记形状，落地按串行铁律排队**（`internal/tools`＋`internal/agent` 的突变面此刻归 `285-r1`/后续腿独占）。
+      ✅ 编排者 2026-10-09 11:2x 翻勾，**但按缩后的字面勾、⛔ 不按本格原字面**——原句那句"今天零尺"**前提不成立**（见文末「更正二」：`internal/agent/corr_percall_242_test.go:99-105` 早已在两枚并发调用间作差，我派单里那两把尺一枚按字样扫、一枚按 `CorrelationID ==` 形状扫，都漏了它）。真债窄化成两形＝**名册（journal rows）那一侧的行级作差零尺**＋**`callID==""` 回落支的作差零尺**，腿 `285-r2` 交付的正是这两发：新件 `internal/agent/ticket285_corr_distinct_rulers_test.go`（143 行／两枚用例，含 `callCorr` 直测与 loop 派发两形）＋`internal/tools/ticket285_corr_rows_rulers_test.go`（113 行／一枚用例，钉 `rows[0].CorrelationID != rows[1].CorrelationID`）。⛔ 零产码字节改动（编排者现跑 `git diff --name-status ce18b3d6..HEAD -- '*.go'` ＝整族只有这两行 `A`）、`git status --porcelain -- internal cmd` 交件前后均空。编排者独立跑 `go test ./internal/agent/ ./internal/tools/ -count=1 -v` ⇒ 三枚新用例全 **PASS**（`Test285CallCorrIsDistinctPerCall`／`Test285LoopDispatchesOneCorrPerCall`／`Test285RosterRowsCarryDistinctCorrPerCall`）、`internal/tools ok 13.6s`。有牙凭据（三发突变全种在 `callCorr` 一支上、盘上落地、还原 `md5sum` 逐字等值）：`MU-1` 常量后缀 ⇒ 甲乙两尺同红而**票 283 那把尺仍绿**（证明新尺咬的是 283 没覆盖的那一形）；`MU-2` 把回落支的 `index` 抹常量 ⇒ **只有甲那把单元尺红**＝回落支今天确实无人管（＝本格那半边债）；`MU-3` 摘前缀 ⇒ 前缀轴红而作差轴静默（那一形已有 283 `:223` 的尺）。夹具前置 `TaskID != CorrelationID` 是**断言**不是注释（甲 `:72`/`:119`、乙 `:72`）。
+      ⚠ **本腿交回一枚我在派单里没有的现量，我认**：`internal/agent` 整包在锚 `ce18b3d6` 上就**起手即红**（`--- FAIL: TestGoldenSingleToolCall`，`loop_golden_test.go:70` 还钉着"corr 等于 taskID"，与票 242 落地的 per-call 形状矛盾；同文件 `:341` 同一形状却绿＝journal 侧残余，正是票 282 `AC#4`(a) 我裁"留"的那笔）。腿⛔ 未裁定、未放宽、未顺手改＝**纪律正确**；我已现跑复认（rc=1／1 FAIL）并**另立票 286**，本格零触碰它。
 
 ## 禁区
 
@@ -114,3 +117,10 @@
   ⛔ 零 `t.Skip`、⛔ 未动 `internal/tools/loop_approval_test.go` 那一带、⛔ 未碰 `approval/gate.go`（票 284 搭载格不触发）、
   ⛔ 三枚冻结件一字不动、⛔ 零 push。
 - 读数全文：`.scratch/wisp/probes/285/r2/00-anchor.md`／`10-ac4-ruler.md`／`20-mutations.md`。
+
+## 更正二（**2026-10-09 11:2x 编排者就地打旧**，来路＝写腿 `285-r2` 顶回＋编排者自己现读；⛔ 上面四格判据句一字未改）
+
+- **`AC#4` 的前提写错了，错在我这里**。本格原句逐字是「**per-call corr 的"每枚调用各不相同"这件事，今天零尺**」，而盘上现读不是零尺：`internal/agent/corr_percall_242_test.go:99-105` 已经在作差——逐字 `c1, c2 := p.corr("call_p1"), p.corr("call_p2")` … `if c1 == c2 { t.Fatalf("both concurrent calls of one task carry the same corr %q: the two asks collapsed onto one routing key", c1) }`，`:109-133` 还各自**按自己那枚 corr 唤醒自己那一个调用**；编排者现跑 `go test ./internal/agent/ -count=1 -v` ⇒ `--- PASS: TestCorrPerCallTwoAsksSameTask242`。
+- **我为什么漏了它（这是病根，不是笔误）**：我那两把尺一枚扫字样（`git grep -nE 'callCorr'`，只认函数名）、一枚扫形状（扫 `CorrelationID ==` 那一族写法），而既有那一枚用的是**测试桩自己的取数口 `p.corr(...)` ＋局部变量作差**（`c1 == c2`），两个形状都不落在我扫的那两串字面上。⇒ 定式：**判"这件事今天没人管"之前，必须按语义变体枚举手名册**（函数名／字段名／局部变量名／桩里的取数口／位置参数），⛔ 一把字样尺加一把形状尺不等于全集；本仓同类已抓过两次（写"没人管 X"前先按语义变体扫代码侧）。
+- **窄化后的本格判据（`AC#4` 按这一形勾，原句留档在本节）**：真债只剩两形——① **名册（`tool_call` rows）那一侧的行级作差零尺**；② **`callID == ""` 回落支的作差零尺**（`MU-2` 把那支的 `index` 抹成常量 ⇒ 只有新那把单元尺红，既有全部尺全绿）。腿交付的两枚新件各钉其一，四件套齐、⛔ 零产码改动。
+- ⚠ **本票不处理、另立票 286 的那一枚**：`internal/agent` 起手即在的红（`loop_golden_test.go:70` 钉"corr 等于 taskID"，与票 242 落地的形状矛盾；同件 `:341` 靠 journal 侧残余而绿）。归因、权威判定、旧等值钉全名册、搬完的反形自证——四格都在票 286 面上，⛔ 不许有任何后续程把这枚红读成"票 285 的尺造成的"（腿的三发突变全部已还原、`md5sum internal/agent/loop.go` 与起手逐字等值＝`8eb37e9f59e563b58325d2ebc898b843`）。
