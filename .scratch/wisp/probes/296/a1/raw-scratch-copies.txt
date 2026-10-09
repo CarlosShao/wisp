@@ -1,0 +1,8 @@
+.scratch/wisp/probes/258/v1/mut0/cmd/wisp/resident_windows.go:182:			return ball.HotkeyConfig{}
+.scratch/wisp/probes/258/v1/mut0/cmd/wisp/resident_windows.go:188:		return ball.HotkeyConfig{Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel}
+.scratch/wisp/probes/258/v1/mut0/cmd/wisp/resident_windows.go:206:			return ball.HotkeyConfig{}
+.scratch/wisp/probes/258/v1/mut0/cmd/wisp/resident_windows.go:208:		return ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel}
+.scratch/wisp/probes/258/v1/mut3/cmd/wisp/resident_windows.go:183:			return ball.HotkeyConfig{}
+.scratch/wisp/probes/258/v1/mut3/cmd/wisp/resident_windows.go:189:		return ball.HotkeyConfig{Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel}
+.scratch/wisp/probes/258/v1/mut3/cmd/wisp/resident_windows.go:207:			return ball.HotkeyConfig{}
+.scratch/wisp/probes/258/v1/mut3/cmd/wisp/resident_windows.go:209:		return ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel}
