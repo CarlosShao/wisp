@@ -113,3 +113,4 @@
 4. **页面两处 `postMessage` 调用点中 `requestApprovalResolution`（`panel.ts:179`）那一处的返回串语义**我没追：它不在 AC#8 这条腿上，超出射程。
 5. **`msgcb` 的 `id` 与页面 `requestId` 之间有没有我漏掉的映射表**：尺是词面 + 语义变体两把，若映射写在非 Go 侧（如前端某处自己维护 seq↔requestId 表），本腿的 pathspec 看不到——我在 `frontend/**` 只读了 `panel.ts` 一个文件。
 6. **未答**：这活该落票 35 还是另立（派单明令不裁）。
+7. **锚后新增的在飞字节（不是我写的，我全程没碰它）**：交件前的 `git status --porcelain -- internal cmd frontend` 出现 ` M internal/agent/loop_golden_test.go`——起手快照那一行是**空输出**，所以这一枚是**本腿运行期间别的写腿落进去的**。本腿所有读数都取自 `HEAD`（锚 `98482adc`）对象层，**不受它影响**；交件 commit 用显式 pathspec，那枚在飞字节**没有被带走**（`git show --name-only` 只列本文件）。特此具名。
