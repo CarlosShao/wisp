@@ -79,8 +79,11 @@ import (
 type residentAudio struct {
 	// gate and mic are nil when the collector was never built (voice disabled,
 	// or the config read refused to guess).
-	gate   *audio.HalfDuplexGate
-	mic    *audio.WASAPIMicrophone
+	gate *audio.HalfDuplexGate
+	// mic is behind the captureSource seam: the reads this leg makes of it are
+	// Stats() (the posture switch) and Err() (the error class), so AC#6's
+	// device failures can be assembled without unplugging hardware.
+	mic    captureSource
 	cancel context.CancelFunc
 
 	// The two config facts this leg acted on, recorded so the boot line and any
@@ -129,17 +132,49 @@ func (rb *residentBall) setAudioLevel(level float32) {
 	rb.b.SetAudioLevel(level)
 }
 
-// startResidentAudio assembles the capture leg at boot. It never stops the
-// boot: every branch that cannot open a microphone returns a handle with its
-// verdict already written, and the caller prints that verdict.
+// startResidentAudio assembles the capture leg at boot, reading [voice] and
+// [audio] off this process's own data root. It never stops the boot: every
+// branch that cannot open a microphone returns a handle with its verdict
+// already written, and the caller prints that verdict.
 func startResidentAudio(rt *proc.Runtime, out func(float32)) *residentAudio {
+	return buildResidentAudio(rt, rt.Layout.DataDir, out)
+}
+
+// captureSource is the capture side this leg drives: the C8 seam plus the two
+// telemetry reads the posture is built from. *audio.WASAPIMicrophone is the
+// production answer; the seam exists so AC#6's three device failures (occupied
+// / permission denied / no device) can be shown at THIS assembly level - "the
+// process still boots and says the loss out loud" is a claim about the resident
+// leg, not about internal/audio's own hotplug tests.
+type captureSource interface {
+	audio.AudioSource
+	Stats() audio.Stats
+	Err() error
+}
+
+// newRealCaptureSource is the production factory.
+func newRealCaptureSource(opts ...audio.CaptureOption) captureSource {
+	return audio.NewWASAPIMicrophone(opts...)
+}
+
+// buildResidentAudio is the same assembly with the config directory named: the
+// privacy posture this leg decides (does a double click open the microphone?)
+// has to be testable against a config.toml the test wrote, not against the
+// developer's own data root. The runtime handle still supplies the registry and
+// the shutdown-hook slot, so nothing about the production shape is bypassed.
+func buildResidentAudio(rt *proc.Runtime, dataDir string, out func(float32)) *residentAudio {
+	return assembleCapture(rt, dataDir, out, newRealCaptureSource)
+}
+
+func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
+	newSource func(opts ...audio.CaptureOption) captureSource) *residentAudio {
 	ra := &residentAudio{}
 
 	// The per-fresh-read shape this package already uses for hot-tier views
 	// (hotCfg258 above, panelGeometrySource since ticket 255 AC#4): the task
 	// pipeline's Manager does not exist at this point of the boot, so [voice]
 	// and [audio] are read off the file rather than held.
-	cfgPath := filepath.Join(rt.Layout.DataDir, configFileName)
+	cfgPath := filepath.Join(dataDir, configFileName)
 	c, _, err := config.LoadFile(cfgPath, nil)
 	cfgSource := cfgPath
 	if err != nil || c == nil {
@@ -170,7 +205,7 @@ func startResidentAudio(rt *proc.Runtime, out func(float32)) *residentAudio {
 		return ra
 	}
 
-	mic := audio.NewWASAPIMicrophone(
+	mic := newSource(
 		audio.WithCaptureRegistry(rt.Registry),
 		audio.WithLevelSink(ra.levelOut(out)),
 	)
@@ -214,7 +249,7 @@ func startResidentAudio(rt *proc.Runtime, out func(float32)) *residentAudio {
 			}
 			lastErr = devErr.Error()
 		}
-		ra.verdict = fmt.Sprintf("麦克风不可用（分类 %s）：设备打开失败，球不会收到电平；本进程继续跑", class)
+		ra.verdict = fmt.Sprintf("麦克风不可用（分类 %s）：%s；球不会收到电平，本进程继续跑", class, lastErr)
 		slog.Error("audio: capture device unavailable",
 			"class", class, "err", lastErr, "posture", "boot continues, no state pushed")
 		fmt.Printf("wisp: 麦克风不可用（错误分类 %s）：%s\n", class, lastErr)
@@ -281,15 +316,15 @@ func (ra *residentAudio) posture() string {
 		return "采集腿未装配：本进程没有任何麦克风路径"
 	}
 	if !ra.started {
-		return ra.absentClaim()
+		return ra.unrunningClaim()
 	}
 	return ra.verdict + "；帧消费侧（ASR/KWS，internal/speech 一块没写）不属于本票，" +
 		"帧按 D38d 计数丢弃并由 meter 限流告警"
 }
 
-// absentClaim states the no-collector shapes in the words that are true for
+// unrunningClaim states the no-collector shapes in the words that are true for
 // them, so the boot line cannot be read as "the mic is merely muted".
-func (ra *residentAudio) absentClaim() string {
+func (ra *residentAudio) unrunningClaim() string {
 	if ra != nil && ra.verdict != "" {
 		return ra.verdict
 	}
