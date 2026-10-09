@@ -55,3 +55,10 @@ FAIL
 FAIL	github.com/CarlosShao/wisp/internal/panel	7.409s
 FAIL
 panel_rc=0
+
+## 3) 更正我自己上面那两行的读法（2026-10-09 14:0x 编排者，⛔ 上面两节原样不动）
+
+- ⛔⛔ **`cli_tests_rc=0`／`panel_rc=0` 这两行是假的退码**：它们是从管道尾元素取的，不是 `go test` 的退码。判据在我自己抄进去的正文里——`:20` 逐字 `FAIL	github.com/CarlosShao/wisp/cmd/wisp	479.994s`、`:55` 逐字 `FAIL	github.com/CarlosShao/wisp/internal/panel	7.409s` ⇒ **两次 `go test` 的退码必然非 0**。此刻不重跑（`289-r1` 正在跑同包的改前基线，我不给它添 CPU 噪声），但"包级 FAIL 行存在"这一条足以判死那两行 rc。
+- ★**`TestApprovalCardViewJSONKeysMatchFrontendTypes` 今天没有转绿——是我把"没看见表头"读成了"没有"**。这一节的正文是从输出中段开始截的，那枚 `--- FAIL:` 表头被截掉了，但它的**红句本体在盘上**：`:32` 逐字 `approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare`。静态对拉同形（14:0x 现跑）：Go 侧 `internal/panel/composer.go:57-92` 的 `Snapshot` 有六枚 json 键（`pending`/`results`/`composer`/`generatedAt`/`instructions,omitempty`/`tasks,omitempty`），而 `frontend/src/lib/panel.ts:129` 的 `export interface PanelSnapshot` 只声明四枚（`pending`/`results`/`composer`/`generatedAt`）⇒ `missing=[instructions tasks]` 必非空 ⇒ `t.Errorf` 必响。
+- ⇒ **连带影响**：票 289 `AC#3` 里我写的"`internal/panel` 现量 **5** 枚具名红"**枚数偏低**（真值＝上面那 5 枚＋这一枚＝**6**）。归位与台账记 `A779`；⛔ 票面那句先不改，等 `289-r1` 交回来再按同一把尺一次性写（它自己会跑到真值，判据是"逐名作差＝新增红 0 枚"，不受我这枚错数影响）。
+- ⚠ 新规矩（同 `A773` 那条"红枚数要带是哪把尺"并形）：**从长跑输出里截段落盘时，必须连表头一起截**，否则"某一枚没出现在名册里"⛔ 读不成"它绿了"。
