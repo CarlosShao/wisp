@@ -29,3 +29,44 @@
 ## 禁区
 
 ⛔ 不改产码（除 AC#1 新测试件与它必需的最小接线）；⛔ 不动票 259 的选形 ⓐ 与对外那句合并 `ErrBadGrant`；⛔ 不为变绿放宽任何断言、`t.Skip` 不算通过；⛔ 三枚冻结件一字不动；⛔ 零 push；⛔ 不许顺手把票 242/259 的框改了（翻勾归编排者）。
+
+## Progress log
+
+### 2026-10-09 11:5x · 腿 `285-r1` 交件读数（⛔ 本节不翻任何勾、⛔ 不改上面任何一句判据）
+
+- **AC#1＝已闭合，落点＝甲**（全部在 `internal/agent/approval` 包内，**零产码字节改动**）。
+  新建 `internal/agent/approval/ticket285_route_denial_name_rulers_test.go`（185 行／两枚用例），
+  复用 `ticket259_denial_rulers_test.go` 的现成夹具 `r1Audit`(`:36`)／`r1Card`(`:71`)／`r1CardIn`(`:83`)（⛔ 未新造捕获面）。
+  ⚠ 本节写于编排者 11:4x 追加 **AC#4** 之后；AC#4（`callCorr` 每枚调用互不相等那一枚尺）**不属本腿派单**，
+  本腿零读零断零动，四格的框一律未翻。
+  两枚活卡（`corr-285-xcard-a`／`-b`，同一本 queue，`Depth()==2`，两枚都还 pending 且各自可被 `lookupForAllowLocked` 取回）
+  ⇒ `Native().Allow(B.corr, A 的未花令牌)` ⇒ 对外仍是合并 `ErrBadGrant`，
+  **审计面读回 `denial=spent-or-never-live-nonce`**（尺句落点 `ticket285_route_denial_name_rulers_test.go:125`），
+  并钉这一行归 B 不归 A、恰好一枚 `GRANT-DENY`、不落进另外三枚名字、`FORGED-OR-STALE` 合并句仍在、
+  正控＝A 的令牌未被 foreign 那一发烧掉且 A 自己仍开卡。
+  第二枚是鉴别器：从未 push 的 corr ⇒ `ErrUnknownCorrelation` 且 **`GRANT-DENY` 行数必须为 0**
+  ——这一枚就是"为什么 `queue_test.go:161` 那一发不构成 AC#1"的仪器化说法。
+- 甲／乙 裁量理由与"零停手项"的现量：`Native().Allow → q.allow → q.allowScoped` 四跳今天全暴露给包内测试，
+  ⛔ 因此本腿**没碰 `gate.go`** ⇒ 票 284 的条件搭载不触发（未为它单开改动）；乙形要写 `cmd/wisp`，甲形既够就没有理由抢那一枚面。
+- 突变五发全部种在盘上（⛔ 零 `-overlay`）：MU-285q（`queue.go:423` 摘掉 `denial=%s`）⇒ 新尺红 `:125`；
+  MU-285p（`approval.go:518` 两枚名折成一枚 `"denied"`）⇒ 新尺＋259 两枚尺共 3 红；
+  **MU-285t（本腿自己的用例种坏：期望名换成 `denial=misbound`，产码不动）⇒ 新尺红 `:125`**＝尺非恒真；
+  MU-M 带着新文件复跑 ⇒ 82 PASS／**10 FAIL**（原 9 枚全在＋新尺 1 枚，红在新尺 `:104` 返回值那一层）。
+- **AC#3＝四发红句逐枚复跑，全部「仍在」，枚数与 `242-v2` 一致，行号未漂**：
+  MU-A⇒4 红（`ticket242_binding_test.go:40/:57/:171`＋`ticket259_denial_rulers_test.go:172`）／
+  MU-M⇒9 红（含走路由的 `queue_test.go:167`、`ticket259_denial_rulers_test.go:139`、
+  `ticket259_panel_capability_rulers_test.go:301`＋同发 `:308`）／MU-D2a⇒2 红／MU-D2c⇒2 红／MU-E⇒2 红（4 条句 `:73/:82/:101/:111`）／
+  MU-OUT⇒1 红（`ticket259_denial_rulers_test.go:252`）。⛔ 零枚变绿、⛔ 零枚断言被放宽。
+  顺带复认票面 `:8`／`:12` 两处现量：`queue_test.go:161` 的 `corr-B` 从未 push（仍成立）、
+  `queue.go:414` 两端恒等（仍成立）。
+- **AC#2＝只裁形状，⛔ 一律不动手**：②「补尺，另派」——`int`＋无人填那一形今天只有词面尺看得见，
+  变真洞的条件＝填进去的值不随 `revoke()` 变化（`:229` 的不变性轴只看这一枚），形状＝加第二枚不可变性轴；
+  ③「有独立钉的形状，仍属补尺」——名单在 `ticket242_panelface_test.go:21` 手写＝同手可扩，本包内无解，
+  独立钉＝把期望集搬到另一只手才会碰的工件（`PanelItem` 唯一包外消费者＝`cmd/wisp/approval_reply.go:397`），
+  ⚠ 但新建金样属禁区块上的契约变更，要 owner 拍板；④「补尺，另派」——`cmd/wisp/approval_reply_201_test.go:387`
+  仍是子串钉（现量逐字 `{"yes " + corr, "原生令牌无效"},`），形状＝换成等值钉；本腿⛔ 未种（种它要写 `cmd/wisp`）。
+- 基线与收工：起手 HEAD `37f2a0b`／`go test ./internal/agent/approval/ -count=1 -v`＝**90 PASS／0 FAIL／1 SKIP**
+  （SKIP＝`TestDefaultDeadlineWallClockMeasurement`，基线就在）；收工同命令＝**92 PASS／0 FAIL／1 SKIP**。
+  四枚产码件收工 hash 与起手逐字等值；`git status --porcelain -- internal cmd` 空。
+  `gofmt -l`／`gofumpt -l` 对本腿新建测试件均**空输出**。
+- 读数全文：`.scratch/wisp/probes/285/r1/00-anchor.md`／`10-ac1-ruler.md`／`20-ac3-no-relaxation.md`。
