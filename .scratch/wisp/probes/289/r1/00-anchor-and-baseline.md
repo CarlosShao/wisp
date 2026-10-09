@@ -52,4 +52,60 @@ done
 
 ## 4. 改前基线 `go test`（AC#3 的前一半）
 
-待填：见本件 §4 之后的追加（跑完即追加，不改上面任何一行）。
+用的那一发（具名写清）：harness 的 PATH 逐字按票面/派单给的形状，**只多插了一个 `-v`**，
+因为 AC#3 要的是逐用例三数（PASS/FAIL/SKIP），非 `-v` 时 `ok` 包里不列通过项、拿不到 PASS 与 SKIP 的名册：
+
+```
+cd "D:\work\workspace\projects plans\Wisp" && \
+PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -v ./internal/panel/ ./cmd/wisp/ -count=1
+```
+
+- 命令：改前那一刻跑，工作树里这 4 枚件＝HEAD 内容（§2 已证 `git diff --stat HEAD` 空），
+  别人在飞的改动（`design/**` 若干删除、`.gitignore` 修改、别人的 probes 件）一律未动、未还原。
+- 原始输出全量落盘＝本目录 `raw-pre.md`（2427 行）。
+- **rc=1**（本来就不绿，见下）。
+- 环境红排查：`grep -c "0xc0000135" raw-pre.md` = **0** ⇒ 用例真的跑了（`cmd/wisp` 耗时 460.508s 即证）。
+
+三数（并排）＋包级读数：
+
+| 包 | PASS | FAIL | SKIP | 包级行 |
+|---|---|---|---|---|
+| `internal/panel` | 124 | 6 | 0 | `FAIL github.com/CarlosShao/wisp/internal/panel 7.019s` |
+| `cmd/wisp` | 265 | 6 | 2 | `FAIL github.com/CarlosShao/wisp/cmd/wisp 460.508s` |
+| 合计（顶层 `^--- X:`） | **389** | **12** | **2** | rc=1 |
+| （含子测试的 `PASS`，另尺） | 573 | 12 | 2 | 尺＝`grep -cE "^[[:space:]]*--- X:"` |
+
+改前红名册（逐名，顶层 12 枚）：
+
+`internal/panel`（6 枚）：
+1. `TestApprovalCardViewJSONKeysMatchFrontendTypes`
+2. `TestStreamLogFloodBelowKeyBoundIsNotBounded35r8`
+3. `TestStreamLogDroppedNamingLedgerIsNotBounded35r8`
+4. `TestComposerContractTypesMatchFrontend`
+5. `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`
+6. `TestC21DesignTokensFourWayAgree`
+
+`cmd/wisp`（6 枚）：
+7. `TestTicket223ModeLooseningChangesTheRunningModeAfterAllow`
+8. `TestPanelHostRealWindowHopAndLifecycle`
+9. `TestAC4FocusReturnToPriorWindowGap33r5`
+10. `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`
+11. `TestAC14AwaitedBindingReplyReachesThePage`
+12. `TestAC14GoSideEvalPushReachesThePage`
+
+★ 与票面现量表的**一处不符，具名报回（不采纳票面、按现跑数走）**：
+票 289 `AC#3` 写「`internal/panel` 现量 **5 枚具名红**」并列了 5 个名字；现跑是 **6 枚**——
+票面漏了 `TestApprovalCardViewJSONKeysMatchFrontendTypes`，它与票面已点名的
+`TestComposerContractTypesMatchFrontend` 同属"前端契约"那一族（同一个被删的 `design/assets/` 与前端类型文件的因）。
+⇒ 本腿把改前基线记成 6 枚，并把这一处当作**票面文字的缺陷**上报，不改票面一字。
+另：`cmd/wisp` 那 6 枚（真窗口／WebView2 那一族）票面**完全没有列**，本腿照样逐名入册，
+因为作差的尺是"名册逐名"，不是"票面列了几枚"。
+⛔ 上面 12 枚一枚不当"新增红"处理，也一枚不还原/不判绿；尺只有"改后名册 ⊖ 改前名册＝∅"。
+
+## 5. 改后那一发（指针）
+
+改后三数、逐名作差、那一枚红转绿的具名归因、以及三处"派单/票面与代码原文不符"的上报，
+全部在 `30-test-comparison.md`（同一把尺、同一支 harness，只多 `-v`）。
+本件 §4 的改前读数一个字没回填改动。
+
+
