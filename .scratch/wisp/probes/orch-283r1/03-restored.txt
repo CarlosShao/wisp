@@ -1,0 +1,15 @@
+time=2026-10-09T09:41:56.173+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test283TaskIDAccessorIsTheTaskIDNotTheCorr
+--- PASS: Test283TaskIDAccessorIsTheTaskIDNotTheCorr (0.00s)
+=== RUN   Test283IdentityChainThroughTheRealLoop
+time=2026-10-09T09:41:56.205+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test283IdentityChainThroughTheRealLoop4033112275\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-09T09:41:56.215+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-09T01:41:56Z duration_ms=10
+time=2026-10-09T09:41:56.228+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test283IdentityChainThroughTheRealLoop4033112275\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-09T09:41:56.233+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-09T01:41:56Z duration_ms=5
+time=2026-10-09T09:41:56.242+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-09T09:41:56.244+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-09T09:41:56.250+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-22ef6b66-84e3-4eb3-a32f-a867ed7fb0e5 owner=tools
+--- PASS: Test283IdentityChainThroughTheRealLoop (0.08s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.126s
+rc=0

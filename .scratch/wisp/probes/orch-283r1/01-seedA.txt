@@ -1,0 +1,19 @@
+time=2026-10-09T09:41:18.690+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test283TaskIDAccessorIsTheTaskIDNotTheCorr
+    ticket283_corr_identity_rulers_test.go:40: TaskID = "corr-283", want the task id: a handle whose corr differs from its task id must not answer with the corr
+--- FAIL: Test283TaskIDAccessorIsTheTaskIDNotTheCorr (0.00s)
+=== RUN   Test283IdentityChainThroughTheRealLoop
+time=2026-10-09T09:41:18.721+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test283IdentityChainThroughTheRealLoop1774256983\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-09T09:41:18.730+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-09T01:41:18Z duration_ms=8
+time=2026-10-09T09:41:18.740+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test283IdentityChainThroughTheRealLoop1774256983\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-09T09:41:18.746+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-09T01:41:18Z duration_ms=5
+time=2026-10-09T09:41:18.750+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-09T09:41:18.752+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-09T09:41:18.757+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fdd15db7-dc73-45d1-8d7f-6080fe1d59ee owner=tools
+    ticket283_corr_identity_rulers_test.go:194: 子代理行的 ParentTaskID = "3bd3adf1-1222-453b-82ad-967d84ce53f6#call-283-spawn", want 宿主 task id "3bd3adf1-1222-453b-82ad-967d84ce53f6"（task.spawn 读的是 TaskID(ctx)，不是 per-call corr）
+    ticket283_corr_identity_rulers_test.go:206: task.cancel 的回执没有走到权威判定通过那一支: "本用例不带 L2 队列"
+--- FAIL: Test283IdentityChainThroughTheRealLoop (0.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.118s
+FAIL
+rc=1

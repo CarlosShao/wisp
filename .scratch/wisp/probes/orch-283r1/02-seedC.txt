@@ -1,0 +1,18 @@
+time=2026-10-09T09:41:41.229+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test283TaskIDAccessorIsTheTaskIDNotTheCorr
+--- PASS: Test283TaskIDAccessorIsTheTaskIDNotTheCorr (0.00s)
+=== RUN   Test283IdentityChainThroughTheRealLoop
+time=2026-10-09T09:41:41.269+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test283IdentityChainThroughTheRealLoop3807741176\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-09T09:41:41.282+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-09T01:41:41Z duration_ms=12
+time=2026-10-09T09:41:41.294+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test283IdentityChainThroughTheRealLoop3807741176\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-09T09:41:41.301+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-09T01:41:41Z duration_ms=7
+time=2026-10-09T09:41:41.307+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-09T09:41:41.310+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-09T09:41:41.315+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3b9158ab-23cb-40be-997e-9ee1f195974c owner=tools
+    ticket283_corr_identity_rulers_test.go:206: task.cancel 的回执没有走到权威判定通过那一支: "拒绝停止：3b9158ab-23cb-40be-997e-9ee1f195974c 是任务 fbebba90-2807-4be5-811b-80b39f769460 派生的孩子，不是调用者 fbebba90-2807-4be5-811b-80b39f769460#call-283-cancel 的孩子——只有父任务能停自己的孩子，兄弟之间、旁支之间都停不了（票 221 AC#3 的正控）。"
+    ticket283_corr_identity_rulers_test.go:209: 父任务停自己的孩子被身份判定拒了（调用者读到的不是 task id）: "拒绝停止：3b9158ab-23cb-40be-997e-9ee1f195974c 是任务 fbebba90-2807-4be5-811b-80b39f769460 派生的孩子，不是调用者 fbebba90-2807-4be5-811b-80b39f769460#call-283-cancel 的孩子——只有父任务能停自己的孩子，兄弟之间、旁支之间都停不了（票 221 AC#3 的正控）。"
+--- FAIL: Test283IdentityChainThroughTheRealLoop (0.09s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.158s
+FAIL
+rc=1
