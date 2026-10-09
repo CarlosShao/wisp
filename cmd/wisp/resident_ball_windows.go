@@ -37,6 +37,19 @@ package main
 // (ledger A481, form 乙) asked for. The ball-click veto, the KWS veto word and
 // the panel's reject button remain unhosted here, each with its own ticket.
 //
+// What changed since (ticket 290, form 甲-1). The two mute gestures - the global
+// mute hot key and the tray's mute item - now have an executor in this process:
+// they turn the capture gate this same process assembled (the residentAudio
+// handle built by startResidentAudio in cmd/wisp/resident_audio_windows.go).
+// That closes the half ticket 247 left open: the microphone leg was mounted,
+// muted by default (which is correct and unchanged), and nothing in production
+// could ever turn it. The gate's own muted flag is the truth source for "who is
+// muted" (internal/audio/gate.go:20-21); this host keeps no copy of it - see
+// muteGesture, whose sentence is read back off the gate after the write.
+// What did NOT change here: no state machine event is dispatched (D43's
+// Sleeping -> Muted edge does not exist, and inventing one is a human-approved
+// contract change, not a wiring detail), and no second "am I muted" flag.
+//
 // Failure posture: a ball that cannot be created is loud and non-fatal, the
 // same stance installLogSink takes above. A machine with no desktop (a service
 // session, a CI runner) must still boot, still hold its Job Object and still
@@ -48,6 +61,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/ball"
@@ -61,6 +75,18 @@ import (
 // shape every leg had before ticket 246, and the shape a host that cannot build
 // one falls back to), and the gesture is then recorded as unhosted.
 type escVetoFunc func() string
+
+// muteGestureFunc is the whole of what the ball host knows about the thing that
+// happens when a mute gesture arrives: somebody handed this process a function
+// that flips the capture gate and said back what the gate now reports. The
+// sentence is the gate's, not this file's - the gate owns the muted flag
+// (internal/audio/gate.go), and a second "who is muted" in this host is the
+// shape ticket 246's ruling rejected for the approval side.
+//
+// executed=false means "there was no gate to turn in this process" (voice off,
+// or the capture leg refused to assemble), and the caller says that instead of
+// reporting a mute nobody asked for.
+type muteGestureFunc func() (outcome string, executed bool)
 
 // ballHostHook is how the assembly root hands the ball host one capability it does
 // not know how to build. It follows the shape ticket 246's ruling (ledger A481) set
@@ -137,6 +163,20 @@ type residentBall struct {
 	// (resident_hotkey_258_seam_windows.go) that drives one poll hop
 	// synchronously instead of waiting on the real ticker. nil = no bridge.
 	hotkeyBridge *ballHotkeyBridge258
+	// muteGate is the injected gate-side executor for the two mute gestures
+	// (ticket 290 AC#2, form 甲-1). It is attached AFTER the window exists
+	// because the assembly root builds the ball before it builds the capture leg
+	// that owns the gate (cmd/wisp/resident_windows.go: startResidentBall runs
+	// first, startResidentAudio after it), so no closure handed to ball.New can
+	// name the gate at construction time. nil is legal and is said out loud.
+	//
+	// muteMux is what makes that late attach visible to the ui-sta thread: the
+	// hot key is live from the moment the window comes up, so a plain field
+	// would be a race between the boot goroutine writing it and a key press
+	// reading it. The attach also orders everything the boot wrote into the
+	// residentAudio handle before any gesture may read it.
+	muteMux  sync.Mutex
+	muteGate muteGestureFunc
 }
 
 // ballHotkeyBridge258 carries the reloader handle the host installed. The type
@@ -278,11 +318,11 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 		Events: ball.Events{
 			OnClickBall:     func() { recordBallGesture("click") },
 			OnSummonHotkey:  func() { recordBallGesture("summon-hotkey") },
-			OnMuteHotkey:    func() { recordBallGesture("mute-hotkey") },
+			OnMuteHotkey:    func() { rb.muteGesture("mute-hotkey") },
 			OnCancelHotkey:  func() { recordCancelHotkey(onCancelEsc) },
 			OnPanelHotkey:   hs.requestPanelOpen("panel-hotkey"),
 			OnTrayPanel:     hs.requestPanelOpen("tray-open-panel"),
-			OnTrayMute:      func() { recordBallGesture("tray-mute") },
+			OnTrayMute:      func() { rb.muteGesture("tray-mute") },
 			OnTrayPauseWake: func() { recordBallGesture("tray-pause-wake") },
 			OnTrayExit:      recordTrayExit,
 			OnDragEnd:       func() { recordBallDragEnd() },
@@ -347,8 +387,10 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 	slog.Info("ball: the resident leg created the floating ball window",
 		"hotkeys_provenance", provenance,
 		"hotkeys_live", len(rep.Live()), "hotkeys", hotkeySummary(b),
-		"gestures", "recorded only except the cancel key: this leg has no task pipeline and no microphone, "+
-			"and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)")
+		"gestures", "recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) "+
+			"and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is "+
+			"assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four "+
+			"veto channels stay reduced here to the one the assembly root injected")
 	return rb
 }
 
@@ -398,16 +440,102 @@ func (rb *residentBall) stop() {
 // console, booked in the log file, and identical between the two so neither can
 // drift into a claim the other does not make.
 //
-// It names the two gestures that are NOT unhosted as exceptions, on purpose. Since
-// ticket 246 the resident process holds an approval gate (the cancel key), and
-// since ticket 33 it holds a panel host (the panel hot key and the tray's open-panel
-// item, which reach the dedicated panel thread through panelHostHooks). The
-// pre-246 wording ("no approval gate", "no panel host") would otherwise be a
-// sentence every remaining gesture tells in order to cover the ones that stopped
-// being one.
-const ballGestureWhy = "this process has no task pipeline and no microphone, so the gesture has no executor here; " +
-	"the gestures that DO have one are the cancel key the assembly root wired (ticket 246) and the two panel " +
-	"gestures that reach the resident panel thread (ticket 33)"
+// RE-DERIVED BY TICKET 290, because the sentence it replaced was false twice
+// over. The old wording opened with "this process has no task pipeline and no
+// microphone", and ticket 247 mounted a real capture leg in this very process
+// (cmd/wisp/resident_audio_windows.go), while ticket 290 handed the mute
+// gestures their executor. A reason a gesture gives in order to explain itself
+// has to be a reason that gesture still has.
+//
+// What the gestures this file still records as unhosted actually lack, named:
+//   - the ball click and the summon key: no executor is handed to THIS host for
+//     them. The leg does assemble a task pipeline
+//     (cmd/wisp/resident_task_source_windows.go), but it reads the console, and
+//     nothing here turns a click on the orb into a task; that hop is not this
+//     ticket's to invent.
+//   - the tray's pause-wake item: the wake-word listener it would pause lives in
+//     internal/speech, which is unwritten, and wake_word.enabled ships false.
+//   - the drag end and the tray Exit item state their own reasons
+//     (recordBallDragEnd, recordTrayExit) instead of this one.
+//
+// The gestures that DO have an executor are named conditionally on purpose: each
+// one depends on something the assembly root had to inject, so a flat "these
+// always work" would become the lie the moment a host starts without it.
+const ballGestureWhy = "no executor was handed to this ball host for this gesture; the gestures with one are the " +
+	"cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it " +
+	"injected a panel host (ticket 33) and the two mute gestures when this process assembled a capture leg " +
+	"(ticket 290) - what is left is recorded by name, never invented"
+
+// attachMuteGate hands this host the executor that turns a mute gesture into a
+// flip of this process's capture gate (ticket 290 AC#2). The assembly root calls
+// it once, right after the capture leg exists, and it is the only writer.
+func (rb *residentBall) attachMuteGate(fn muteGestureFunc) {
+	if rb == nil {
+		return
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	rb.muteGate = fn
+}
+
+// currentMuteGate reads the attached executor back under the same lock, so the
+// ui-sta thread can never see a half-written handoff.
+func (rb *residentBall) currentMuteGate() muteGestureFunc {
+	if rb == nil {
+		return nil
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	return rb.muteGate
+}
+
+// muteGesture is the one shape both mute gestures take: the global mute hot key
+// (internal/ball's hkMute branch) and the tray's mute menu item both end up here,
+// and both get the same sentence the gate answered with.
+//
+// It asks for the OPPOSITE of what the gate currently reports and reads the
+// result back, so the printed state is the gate's, never a hope and never a
+// mirrored flag (internal/audio/gate.go:20-21 makes the gate's muted the truth
+// source; ticket 246's ruling is the precedent for not keeping a second copy).
+//
+// Threading, because it is not free: callbacks run ON the ui-sta thread and
+// Ball.fire's contract is "quick and non-blocking". Turning the gate on is
+// synchronous inside internal/audio - HalfDuplexGate.SetMuted starts the inner
+// source, WASAPIMicrophone.Start waits for the pinned capture thread's single
+// device open, and that open is one enumeration plus one activation, not a retry
+// loop. So the key can hold the message pump for the length of a device open,
+// which is the same bounded COM work the boot goroutine already does in
+// assembleCapture, and the alternative (a goroutine per gesture) is forbidden by
+// D38b's resident roster. Named here rather than left for the next reader.
+//
+// It returns the sentence it said. ball.Events wants func(), and the two closures
+// that call this discard the result on purpose; the return value exists so a
+// caller that hands a key press to this host can read what the gate answered
+// instead of scraping the console.
+func (rb *residentBall) muteGesture(name string) string {
+	fn := rb.currentMuteGate()
+	if fn == nil {
+		// Only reachable inside the boot window: the window and its hot key exist
+		// before the capture leg does. Say which window that is, do not pretend
+		// the key did something.
+		const why = "no capture leg had been assembled when this key arrived, so there was no gate to turn; " +
+			"the assembly root attaches the mute key to the gate at the end of boot (ticket 290)"
+		slog.Warn("mute gesture arrived before its executor was attached", "gesture", name, "why", why)
+		fmt.Printf("wisp: ball %s: %s\n", name, why)
+		return why
+	}
+	outcome, executed := fn()
+	if !executed {
+		// The capture leg answered "this process owns no gate" and named why
+		// (voice off, or the leg never assembled). The gesture is not a mute.
+		slog.Warn("mute gesture found no gate to turn", "gesture", name, "why", outcome)
+		fmt.Printf("wisp: ball %s: %s\n", name, outcome)
+		return outcome
+	}
+	slog.Info("mute gesture turned this process's capture gate", "gesture", name, "outcome", outcome)
+	fmt.Printf("wisp: ball %s: %s\n", name, outcome)
+	return outcome
+}
 
 // recordBallGesture books one ball gesture that arrived with nowhere to go.
 //

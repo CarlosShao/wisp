@@ -43,6 +43,13 @@ package main
 //   - stop (AC#5): the hook slot proc.StepStopAudio already exists in the
 //     frozen D38(e) order at step 4; this registers into it. Ten steps, one
 //     order, nothing new. WASAPIMicrophone.Stop carries its own bounded 2s join.
+//   - mute (ticket 290 AC#2, form 甲-1): the gate mounted here is turned by the
+//     user's own mute gestures, through residentAudio.toggleMute below. Before
+//     that hop existed the half-open chain ticket 247 left behind was silent:
+//     the gate sat at its muted default and no path a user could reach asked it
+//     to open. No default value moved and no persistence was added - the shipped
+//     semantics stay "starts every session muted" (internal/config/schema.go), so
+//     a restart returns to the closed posture and the gesture opens it again.
 //
 // What this file does NOT claim (AC#10): handing the level to the ball is not
 // "the user sees the ball breathe". prototypeVisuals defaults to off
@@ -130,6 +137,59 @@ func (rb *residentBall) setAudioLevel(level float32) {
 		return
 	}
 	rb.b.SetAudioLevel(level)
+}
+
+// toggleMute is the gate-side executor the ball host's mute gestures call
+// (ticket 290 AC#2, form 甲-1): the orb's mute hot key and the tray's mute item
+// turn THIS process's gate, the one mounted by assembleCapture above with
+// WithStartMuted(c.Audio.MicMutedDefault). It asks for the opposite of what the
+// gate reports and then reads the gate back, so the sentence describes the
+// device rather than the request, and no mute state is mirrored out of the gate
+// into this leg (internal/audio/gate.go:20-21 makes the gate's own flag the
+// truth source; ticket 246's ruling is the precedent for not keeping a second
+// copy of a decision somebody else already owns).
+//
+// executed=false is the shape where this process owns no gate to turn - voice
+// disabled, or a capture leg that never assembled - and the reason travels in
+// the same words the boot posture printed, so the gesture says the true thing
+// instead of reporting a mute nobody performed.
+func (ra *residentAudio) toggleMute() (string, bool) {
+	if ra == nil || ra.gate == nil || ra.mic == nil {
+		return ra.unrunningClaim(), false
+	}
+
+	gate := ra.gate
+	gate.SetMuted(!gate.Muted())
+
+	// started mirrors what the gate now reports. It is derived state, not a
+	// second truth source, and keeping it current is what stops a later reading
+	// of this handle from claiming a device the user just closed (or denying one
+	// the user just opened).
+	ra.started = gate.Open()
+
+	switch {
+	case gate.Muted():
+		return "已静音：采集已关闭，设备未打开（再按一次取消静音）", true
+	case gate.Open():
+		return "已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）", true
+	default:
+		// Asked to open, and the gate says nothing was handed over. Name the
+		// error class and the guidance the capture side ended with, off the same
+		// two reads the boot switch above uses - never print a success here.
+		class := string(observe.ClassAudioDevice)
+		detail := ra.mic.Stats().LastError
+		if devErr := ra.mic.Err(); devErr != nil {
+			var oe *observe.Error
+			if errors.As(devErr, &oe) {
+				class = string(oe.Class)
+			}
+			detail = devErr.Error()
+		}
+		if detail == "" {
+			detail = "无设备错误记录：门从未进入已 Start 的装配态（见启动时那句采集腿 verdict）"
+		}
+		return fmt.Sprintf("已取消静音但设备未交接（gate 未 open，错误分类 %s）：%s；球不会收到电平", class, detail), true
+	}
 }
 
 // startResidentAudio assembles the capture leg at boot, reading [voice] and

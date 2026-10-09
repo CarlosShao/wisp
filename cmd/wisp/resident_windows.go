@@ -277,6 +277,31 @@ func runResident() {
 	// accident that would leave step 4 reporting a stop it did not perform.
 	raudio := startResidentAudio(rt, rb.setAudioLevel)
 
+	// Ticket 290 AC#2 (form 甲-1, orchestrator ruling 2026-10-09 14:2x): the hop
+	// that makes the default posture something a user can leave. The capture leg
+	// exists from the line above, so the two mute gestures - the orb's global mute
+	// hot key and the tray's mute item - are now pointed at the gate THIS process
+	// assembled, and turning it is their only effect.
+	//
+	// Why a setter and not a parameter: the ball is built first (its window is
+	// where the level is going, so startResidentBall has to precede the capture
+	// leg), while the gate is built here. residentBall's own lock orders this
+	// handoff against a key press that arrives inside that boot window, and the
+	// gesture says so out loud when it does.
+	//
+	// What this deliberately does NOT do: no state machine event is dispatched
+	// (D43's table has no Sleeping -> Muted edge, and inventing one is a
+	// human-approved contract change, not a wiring detail - ticket 290's ruling
+	// names that follow-up as outside this installment), no second "who is muted"
+	// flag anywhere
+	// (the gate's own flag is the truth source, internal/audio/gate.go:20-21), no
+	// new goroutine (the gestures fire on the ui-sta thread and the device open is
+	// synchronous inside internal/audio, on the roster name ticket 247 already
+	// booked), and no mirror of the gate into the tray's own checkmark - the
+	// ball-side trayMuted display flag stays undriven here rather than becoming a
+	// second authority nobody reconciles.
+	rb.attachMuteGate(raudio.toggleMute)
+
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).
 	registered := rt.RegisteredShutdownSteps()
