@@ -233,7 +233,7 @@ Ticket sentence (`247…md:28`) verbatim: "⛔ 裸 `go func(`（ban #1 …），
 - Owner: `internal/audio/audio.go:180-182` verbatim
   `func SpawnCapture(registry *observe.Registry, run func(ctx context.Context)) *observe.Handle {` /
   `	return registry.Spawn("audio-capture", "audio", nil, run)` — the two new call sites are
-  `wasapimic_windows.go:88` and `wavinjector.go:93`, both inside the diff's added lines.
+  `wasapimic_windows.go:93` and `wavinjector.go:93`, both inside the diff's added lines.
 - Recover: `internal/observe/goroutine.go:296` verbatim `		if rec := recover(); rec != nil {`, inside
   `func (r *Registry) run(...)` (`:285`), which is the body `Spawn` launches — so the capture
   goroutine inherits owner+recover from the sanctioned entry.
@@ -244,7 +244,7 @@ Ticket sentence (`247…md:28`) verbatim: "⛔ 裸 `go func(`（ban #1 …），
   `// audio-capture, hotkey-listener, db-writer, watchdog, log-flusher).` /
   `const ResidentBaseline = 6` / `var ResidentNames = []string{` `	"ui-sta", "audio-capture", …`.
   The level is computed on that same goroutine (`captureopt.go:101-111 emitLevel`, called from
-  `wasapimic_windows.go` inside the frame loop and from `wavinjector.go:138` in `pump`), so the only
+  `wasapimic_windows.go:249` inside the frame loop and from `wavinjector.go:144` in `pump`), so the only
   name ever spawned by the batch is `audio-capture`, already on the roster.
   Roster-warning path (`goroutine.go:270-273` `slog.Warn("goroutine outside the D38 roster …")`) never
   fires for this batch — no new name exists to fire it.
