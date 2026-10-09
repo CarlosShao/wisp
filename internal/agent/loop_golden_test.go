@@ -66,8 +66,19 @@ func TestGoldenSingleToolCall(t *testing.T) {
 	if call.Req.Name != "echo" || call.Req.CallID != "call_e1" {
 		t.Errorf("call = %+v", call.Req)
 	}
-	if call.Req.TaskID != res.TaskID || call.Req.CorrelationID != res.TaskID {
-		t.Errorf("call identity = %+v, want task %s", call.Req, res.TaskID)
+	// Ticket 242 mints one correlation id per tool call (loop.go:603 callCorr,
+	// sole call site loop.go:676). C18 seats correlationId BESIDE the task id and
+	// never requires equality (docs/PLAN.md:1368), so this request's corr is the
+	// task id prefixed onto the call's own wire id - call_e1 in this replay, the
+	// same id pinned two lines above. All three halves are pinned: the task id
+	// prefix, the exact call-id suffix and inequality with the bare task id.
+	// "corr is non-empty" would not do - the pre-242 value passed that too.
+	wantCorr := res.TaskID + "#call_e1"
+	if call.Req.TaskID != res.TaskID ||
+		!strings.HasPrefix(call.Req.CorrelationID, res.TaskID) ||
+		strings.TrimPrefix(call.Req.CorrelationID, res.TaskID+"#") != "call_e1" ||
+		call.Req.CorrelationID == res.TaskID {
+		t.Errorf("call identity = %+v, want task %s and correlation id %s (task id prefix + this call's own id, never the bare task id)", call.Req, res.TaskID, wantCorr)
 	}
 	if res.Text != "现在是 22 摄氏度，晴。" {
 		t.Errorf("final text = %q", res.Text)
