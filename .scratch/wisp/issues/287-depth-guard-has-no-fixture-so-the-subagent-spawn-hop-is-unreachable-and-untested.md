@@ -12,7 +12,8 @@
 
 ## 要建什么
 
-- [ ] **AC#1 先把三把尺自己复跑一遍**（不许照抄本票现量）：拒句在 `_test.go` 的命中枚数、`TaskKindSubagent` 的测试命中逐枚读法、以及"`:267` 到不到得了"的调用形状尺。⇒ 若任一把握**不复现**，本票前提当场作废并具名报回。
+- [x] **AC#1 先把三把尺自己复跑一遍**（不许照抄本票现量）：拒句在 `_test.go` 的命中枚数、`TaskKindSubagent` 的测试命中逐枚读法、以及"`:267` 到不到得了"的调用形状尺。⇒ 若任一把握**不复现**，本票前提当场作废并具名报回。
+      ✅ 编排者 2026-10-09 12:2x 翻勾（凭据＝只读腿 `287-a1` 件 `.scratch/wisp/probes/287/a1/00-three-rulers-re-run.md` 340 行／22,461 字节，commit `18c9c794`；腿零源码改动、票框一枚未碰。**判语＝三把尺全部复现，前提不作废**，其中两把我自己在 HEAD 上复量过逐字：`subagent_197.go:262`＝`parentID := TaskID(ctx)`、`:267`＝`if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {`、`:270` 那句「子代理不许再派子代理。」、`:573-580` 那道名字闸——**四枚行号与票面逐字一致**，本票不属"锚已腐烂"那一族）。**两处按腿报更正/收窄，都记在我这张票面上**：① 尺② 的**枚数**票面写"5 枚测试命中"，现量＝**9 行测试命中／6 枚断言位点**（另有 9 行产码命中），⛔ 票面那个"5"没定义单位、按两把尺都不对 ⇒ **我裁单位＝断言位点**（本格要问的是"有没有一枚仪器把**调用者那行**摆成 subagent"，那是位点数；现量 6 枚**全部**断言孩子那行 ⇒ 实质结论与票面一致）。② 尺① 的**证据力窄于票面措辞**：`subagent_197_test.go:661` 是按 `"深度"` 子串断言 provider 的拒答，所以"拒句在 `_test.go` 零命中"只证**那句话无钉**、⛔ 不证**那个行为无仪器**——真正承重的是尺③（调用形状：孩子的 `opt.Tools` 在 `:296` 被换成 provider、`:574` 的名字闸先出闸，`:267` 到不了）。⚠ **另两笔按规矩登记、不并入本格**：a) 票面 `:11` 那句"并发 8"与现产码分家（`subagent_197.go:85 MaxConcurrentSubagents = 4`、`bridge.go:24 MaxToolConcurrency = 4`，且 `subagent_197_test.go:446-447` 明写"8"是旧 bypass 留下的错数）——**这是票 211 那一族的地界，⛔ 不由本票顺手修**；b) 深度名册（供 `AC#2` 定挂载点）＝真·树深度产码 **11 处**（`subagent_197.go` 8＋`task.go` 3），`internal/agent/**` **0 处**，须剔的同名异物＝approval 队列 `Depth` **15 处**＋`prompt.go:384` 一枚。
 - [ ] **AC#2 造那枚夹具**：让**调用者那一行**的 `Kind == TaskKindSubagent`、派发经**真 loop**（因而 `corr != taskID`）、请求 `task.spawn` ——三件缺一都作不出读数（方法学前置＝票 282 那条：`TaskID != CorrelationID` 必须真在红句里同屏）。判据＝**新增用例今天必须是"能红"的**：把它种坏（把 `:267` 那一支的深度判定摘掉／改成恒通过）⇒ **指名用例必须红**，四件套齐（种前 hash／`sed -n` 复量／红句 `文件:行` 逐字／还原 hash 等值＋`git status --porcelain -- internal cmd` 空）。⛔ 不许用"字段非空"充当判据、⛔ 不许 `t.Skip`。
 - [ ] **AC#3 顺手答一句"要不要让它走到"**（⛔ 不改产码）：孩子的 `task.spawn` 被 `subagentToolProvider` 硬拒 ＝ **设计如此**（深度 1）还是**挡住了一枚本该走到的检查**？两形各写"要动哪几枚文件＋会不会把深度上限放开"，交编排者裁。⚠ 这一格交的是**代价表**，⛔ 本票不许落地。
 - [ ] **AC#4 边界与门禁**：写面只许 `internal/tools/**`（夹具＋用例）；⛔ 不碰 `internal/agent/loop.go` 的 `callCorr`、⛔ 不碰 `approval/gate.go`、⛔ 三枚冻结件一字不动（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）；`GOFLAGS= go build ./...`、`go test ./internal/tools/ -count=1` 改前改后各一次（**PASS/FAIL/SKIP 三数并排＋红名册差集**）、`gofmt -l`／`gofumpt -l` 对动过的件空、`sh scripts/d22scan.sh` 纯净树 rc=0；`frontend/**`／`design/**` 零读零写零转述；⛔ 零 push、commit 必带显式 pathspec。
@@ -21,4 +22,4 @@
 
 ⛔ 不许为变绿放宽任何既有断言；⛔ 不许"顺手"把深度上限改成 2 或放开子级 `task.spawn`（那是契约面，须人工批准）；⛔ 不许把 AC#3 的代价表读成已裁。
 
-**Status:** **未开工**（2026-10-09 11:5x 立票）。排程＝⛔ 按住等 Go 编译/测试面空（此刻 `286-w1` 独占），且**按在票 282 结案之后**——本票承接它未闭合的那一半，先有归属再开工。⛔ 零翻框、零 push。
+**Status:** **AC#1 已闭合，余三格未开工**（2026-10-09 12:2x 编排者：只读腿 `287-a1` 交件、我复量关键锚后翻 `AC#1`，前提三把尺全部复现 ⇒ 本票不作废）。排程＝⛔ 仍按在 Go 编译/测试面空（此刻编排者自己占着 `cmd/wisp` 跑基线），且 `AC#2` 是**写腿**（要造夹具＋跑 `go test`），⛔ 不许与 `247-r1` 同批——`247-r1` 独占 `cmd/wisp` 与整个导入图。`AC#3` 那张代价表是只读格，可随下一枚只读腿补派。⛔ 零 push。
