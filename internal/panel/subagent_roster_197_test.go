@@ -463,11 +463,11 @@ func TestDroppedStreamsAreNamedOnTheWire(t *testing.T) {
 //     (TestTaskState188AC3PanelHasNoWriteLeg). If the host ever stopped calling
 //     StateAnswer and started passing StatusKnown: true for anything, no case in
 //     this file would notice.
-//  3. The blockedOnApproval join is asserted against a card this file made. On the
-//     production path the pairing depends on the loop dispatching with
-//     CorrelationID == TaskID (internal/agent/loop.go:647); a host that used a
-//     different pairing would report every row as not blocked, and the only thing
-//     that would catch it is the cmd/wisp case, which uses the real gate.
+//  3. The blockedOnApproval join is asserted against a card this file made. On
+//     the production path it pairs the row's task id, not the corr: since
+//     bd124b2a callCorr mints one corr per call (loop.go:603, used :676),
+//     shape <taskID>#<callID>, never == taskID. A host that paired on the
+//     corr alone would miss every row; only cmd/wisp's real gate catches it.
 //  4. No byte-size bound: nothing marshals a saturated roster and measures the
 //     packet against the ledger's 512-rune log bound. A run with 4 children each
 //     at the retained floor is still a packet the exit can carry and no ruler here

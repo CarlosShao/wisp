@@ -53,9 +53,9 @@ type TaskRow struct {
 	// (agent.newTaskID), not by this carrier.
 	TaskID string
 	// ParentTaskID is the task that derived this one. Empty means a root row.
-	// The entity leg files the deriving call's correlation id, and the agent
-	// loop dispatches with CorrelationID == TaskID (internal/agent/loop.go:647),
-	// so on the production path this reads as the parent's task id.
+	// The entity leg files the deriving call's task id (TaskID(ctx),
+	// internal/tools/subagent_197.go:262), never its correlation id: since
+	// bd124b2a loop.go's callCorr mints one per call (<taskID>#<callID>, :603/:676).
 	ParentTaskID string
 	// Label is the row's short title (a subagent's description, the root's own
 	// task text). It is text the host filed, carried verbatim: a carrier that

@@ -152,8 +152,8 @@ func TestAL1WindowInWaitingLightsItsRow(t *testing.T) {
 	assertBlocked(t, data, "child-1", true)
 	assertBlocked(t, data, "root-1", false)
 
-	// The production pairing (the loop dispatches with CorrelationID == TaskID,
-	// internal/agent/loop.go:647) lights through the correlation id alone.
+	// Since bd124b2a the loop's corr is per call (<taskID>#<callID>, loop.go:603,
+	// used :676), never == taskID: the corr-only pairing below is this fixture's.
 	data = blockedPacket(t, nil, []L1WindowWait{{CorrelationID: "child-1", TaskID: ""}})
 	assertBlocked(t, data, "child-1", true)
 

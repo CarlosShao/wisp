@@ -17,10 +17,10 @@ package main
 // own top (cmd/wisp/run.go), and s.onRuntime runs BEFORE execute() (run.go:201). So
 // nothing can spawn synchronously from the hook without failing closed, and nothing
 // may call the spawner by hand either - the only honest route is the assembled
-// bridge with the ids the agent loop itself uses (TaskID == CorrelationID,
-// internal/agent/loop.go:647, which is also what makes the roster's parent link read
-// as a task id). The spawn therefore waits for the ROOT's own roster row - proof the
-// root loop is live - and only then dispatches through rt.bridge.
+// bridge with the fixture's OWN ids (TaskID == CorrelationID at :173), which is
+// NOT the loop's: since bd124b2a callCorr mints one corr per call
+// (<taskID>#<callID>, internal/agent/loop.go:603, used :676). The spawn waits
+// for the ROOT's own roster row - proof it is live - then uses rt.bridge.
 //
 // The /__control/latency switch widens the distance between the root's own publishes
 // and the child's join, so that "the packet the run published" describes a state of
