@@ -40,3 +40,21 @@ git：只 commit 不 push；⛔ `add -A`／`amend`／`reset`／`rebase`／`stash
 
 （追加式；每条 `- [YYYY-MM-DD HH:MM:SS +08] agent=… did=… next=…`，钟点由 `date` 的 stdout 插值，不手打。）
 - [2026-10-09 18:19:00 +08] agent=编排者 did=立票 298（来路=292-r1 的 C2 那一问）；三把尺现跑：工作树 gofmt -l cmd/wisp=3 枚、HEAD blob 那一把=2 枚、models.go 的 CR=334 且 git ls-files --eol 逐字 i/lf w/crlf attr/text eol=lf、core.autocrlf=true、全包 w/crlf 计数=1、git status 对它零输出 next=排 298-r1（按在任何碰 cmd/wisp 的写腿交完之后，起手先跑 git status 判据非空即按住）
+
+## 编排者更正（2026-10-09 19:3x，来路＝收 `292-v1` 时我把同一把 `gofmt` 尺**扩了射程**重跑；⛔ 上面各节原句一字不改，本节追加）
+
+★**现量节那句"第三枚是假枚"＝枚数说少了，根因是我那把尺的射程只写到 `cmd/wisp`。本节把三档读数钉在一起，今后引本票必带射程。**
+
+- **同一条尺、三种射程，三个数**（全部 19:2x–19:3x 现跑）：
+  | 尺（逐字） | 命中 | 里面什么是真债 |
+  |---|---|---|
+  | `gofmt -l cmd/wisp`（工作树，我立票时那把） | **3** | 2 枚 35 族测试件 |
+  | `gofmt -l cmd/wisp internal tools`（工作树，本轮扩的） | **7** | 同上那 2 枚 |
+  | HEAD blob（`git archive HEAD cmd/wisp internal tools \| tar -x -C <仓外临时目录>` 再 `gofmt -l`；`gofumpt -l` 同树同结果） | **2** | 就是那 2 枚 |
+  ⇒ **差额 5 枚全是本机 checkout 的换行符假枚**，逐枚 `git ls-files --eol`＝`i/lf w/crlf attr/text eol=lf`：`cmd/wisp/models.go`／`internal/agent/approval/pending_read.go`／`internal/agent/tools.go`／`internal/risk/provenance.go`／`internal/tools/bridge.go`。**HEAD 上那两枚真债的判定不变**，`gofmt` 与 `gofumpt` 两把工具在 blob 那一把上给的是同一对文件名（⇒ 不是某一把工具的口味差）。
+- ★**新第三档，本票原来没有这一类**：全仓 **tracked** 的 `.go` 里有 **22 枚** 位于 `.scratch/**` 的**变异拷贝／正控夹具**是**故意脏格式**并被版本库跟踪着的（尺＝`git ls-files '*.go' | xargs gofmt -l` ⇒ 29 命中＝22 枚 `.scratch/**` ＋ 7 枚真码）。⇒ 本票 `AC#3` 那句"必须同时写明'对 HEAD blob 量'还是'对工作树量'"**要再加一维：还要写明射程目录**。不写的话，下一位复跑会在这三档里任意命中一档，而**三档之差最大是 27 枚**。
+- **`AC#2` 的射程同步（不改判据，只改枚数）**：那一格的判据是"写清楚怎么让它不误导人"、⛔ 不许清洗 ⇒ 对那 5 枚假枚**同形适用**，⛔ 不因为枚数从 1 变 5 就新增任何清洗动作；"要不要真换成本机 LF"那一问**仍归编排者裁**（代价＝一次全内容重写；收益＝名册少 5 枚假账 ⇒ **本轮我不换**，理由＝机主的 `core.autocrlf=true` 是他的 git 配置，AGENTS.md「NEVER update the git config」逐字压着，而逐文件 `.gitattributes` 改动属新射程、不在本票欠账里）。
+- **本票新增一条凭据去向**：`292-v1` 那条"`gate.go:275` 已漂"由我复跑定为**真值 `:281`**（尺＝`grep -n "orDefaultText(d.CorrelationID" internal/agent/approval/gate.go`，工作树与 `git show HEAD:` 两把都给 `:281` 与 `:521`；票面引 `:275`、腿报 `:282`，**三方三个号**）⇒ 这一格随本票 `AC#3` 一起处理，**入账方式＝内容锚（认那句 `corr := orDefaultText(d.CorrelationID, d.TaskID)`），不认行号**；⛔ 不新开票。
+- **排程补一句具名理由**：`298-r1` 起手那条 `git status --porcelain -- cmd/wisp/panel_inbound_guards_35r3_test.go cmd/wisp/panel_transport_35r2_test.go` 非空即按住——本轮实测**跟踪状态不等于干净**：那 52 枚 `??` 全在 `.scratch/**` 下，真码工作树是干净的，所以判据要看**具体两枚路径**、⛔ 不许拿"仓库整体脏"当理由自停（`255-r1` 那回虚惊同形，记我派单要写清）。
+
+- [2026-10-09 19:42:59 +08] agent=编排者 did=收 292-v1 时扩射程重跑 gofmt 那把尺 ⇒ 本票现量节"一枚 CRLF 假枚"更正为 **5 枚**（射程从 cmd/wisp 扩到 cmd/wisp internal tools：工作树 7、HEAD blob 仍 2），并补第三档＝22 枚 .scratch 下故意脏格式的 tracked 变异拷贝（尺 git ls-files '*.go' | xargs gofmt -l ⇒ 29）⇒ AC#3 的钉法加一维"射程目录必写"；gate.go 行号真值定为 :281（票面 :275／腿报 :282）入账方式改内容锚 next=298-r1 排在当前 cmd/wisp 写腿（296-r1）交完之后
