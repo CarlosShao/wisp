@@ -32,7 +32,7 @@
 
 ## Progress log
 
-### 2026-10-09 11:5x · 腿 `285-r1` 交件读数（⛔ 本节不翻任何勾、⛔ 不改上面任何一句判据）
+### 2026-10-09 10:4x–10:5x · 腿 `285-r1` 交件读数（⛔ 本节不翻任何勾、⛔ 不改上面任何一句判据）
 
 - **AC#1＝已闭合，落点＝甲**（全部在 `internal/agent/approval` 包内，**零产码字节改动**）。
   新建 `internal/agent/approval/ticket285_route_denial_name_rulers_test.go`（185 行／两枚用例），
