@@ -76,3 +76,16 @@ Status: OPEN（编排者 09-30 23:0x 立，料全部出自 `240-c1`／票 241 �
 - **裁：问③（降级）取形①＝只落日志／verdict，⛔ 不加"球上降级态"**。现量理由三条：① 三形（设备被占／无权限／无设备）**都有活分岔**、分类信息在 `internal/audio/device.go:86/:89/:98-101` 就已经带上 `observe.Error(ClassAudioDevice)`，**断点在第 0 跳**（`internal/audio` 非测试 importer＝0）⇒ 先接线就能把"可见"做到；② 球侧今天**没有合法可画的态**：`EvAudioDeviceLost` 唯一边是 `Listening→Error`（`internal/ball/table.go:97`），启动期根本没有 `Listening`，20 枚态里没有降级态、`Visual` 里没有 prose 字段；③ ⛔ 新造状态词＝碰 D43 冻结转移表，那是人工批准面。⇒ **最坏形状照实说**：接完之后，"麦克风用不了"这件事在**日志／审计面**看得见、**球上看不见**。**如果机主要球上也能看出来**，撤销／升级口令：**「247 要球上显降级形」**（那一支＝`247-a3` 的形②，要再动 2～3 枚文件、且需要一个**不进状态机**的降级位）。
 - **本格不闭合的三寸（照实带，⛔ 不算腿的欠账）**：① 真机三形的逐字回串（`0x8889000A`／`DEVICE_INVALIDATED`／`NOT_INIT` 到底哪一枚）＝要真设备＋真跑，归写腿与 `AC#2`；② 电平循环进了 pinned 线程之后的周期读数复量（`A485`-P8 那条既有要求）＝要真跑；③ 面板／页侧文字面在 `frontend/**`，普查腿零读、本票也不动（只读放开的那条口径不变）。
 - **下一步**：`AC#0` 已裁 ⇒ **写腿 `247-r1` 具备开工条件**，但按串行铁律排队——此刻 Go 编译/测试面与 `cmd/wisp` 面各有占用者，排程记在台账 `A766`；⛔ 写腿不许顺手把球侧那 2～3 枚文件的"形②"做掉（那要机主一句话）。
+
+## 更正与现量补充（2026-10-09 11:5x 编排者，⛔ 题面与 AC 原句一字不改；只追加指名打旧）
+
+来路＝只读普查腿 `247-a4`（件 `.scratch/wisp/probes/247/a4/00-findings.md` 62 行，commit `b02c41d8`，锚 `d106fc25`；零 go、零 frontend/design、零产码）。
+
+- ⛔⛔ **本票两处锚按假路径写的，逐枚纠正（错记在我脸上）**：
+  1. 第 76 行那句"`EvAudioDeviceLost` 唯一边是 `Listening→Error`（**`internal/ball/table.go:97`**）"——**该路径在 HEAD 不存在**（尺＝`git cat-file -e HEAD:internal/ball/table.go` ⇒ `fatal: path … does not exist`；`git ls-tree -r --name-only HEAD internal/ball | grep -i table` 只有 `tokens_table_test.go`）。**真身＝`internal/statemachine/table.go:97`**，逐字 `D43: 14, From: StateListening, Event: EvAudioDeviceLost, To: StateError,`（事件名定义在 `internal/statemachine/events.go:30`）。⇒ 结论层**不变**（那枚边确实只有一枚、20 枚态里确实没有降级态），错的只是我写的路径；台账 `A766` 第 14688 行同错，由本波 `A771` 指名打旧。
+  2. 本票与既往台账里"`SetAudioLevel` 在 `ball/table.go:97` 一带"这一族引用——**真身＝`internal/ball/liquid_windows.go:42`**，逐字 `func (b *Ball) SetAudioLevel(level float32) {`（它上面 `:40-41` 那句注释逐字写着"这是本项目唯一的 render-side 音频入口：没有任何采样或转写文本跨过球（C25 污染面）"）。⇒ 本票 `AC#3`"只过一枚 `float32`"的**判据形状正好由这枚签名自己钉着**，写腿照 `:42` 引，⛔ 别再按 `ball/table.go` 找。
+- **现量补充（`247-a4` 问①②，我独立复跑过形状尺）**：
+  - `internal/audio` **没有"当前电平"访问器**——`AudioSource.Start` 只吐 PCM 通道；电平是 `internal/audio/level.go` 里的纯函数 `FrameLevel`。⛔ 所以"接上"必须新增采集侧的一枚 `func(float32)` 回调（最小形），⛔ 不是改个调用点就有。
+  - **现成接缝＝`SpawnCapture`（`internal/audio/audio.go:180`）非测试调用者＝0**；注入先例＝`WithGateEvents`。⇒ 与我 `AC#0` 裁的"恰好一条新边 `cmd/wisp → internal/audio`"**不冲突**，落地只碰这一条。
+  - `SetAudioLevel` 的非测试调用形状尺＝**2 枚，全在 `cmd/balldebug`**（`:418` 合成包络／`:477` 喂 0）⇒ **真麦生产者＝0**，本票前提照旧成立。测试侧另有 4 枚（`internal/ball/live_windows_test.go:637/:648/:656/:685`），⛔ 不许被读成"接上了"。
+  - 配置那三枚默认值现量＝`voice.enabled` `schema.go:245` **true**、`wake_word.enabled` `:197` **false**、`mic_muted`（`MicMutedDefault`）`:277` **true**；**唯一非测试读取处＝`internal/config/manager.go:380/:394/:395`**（reload 分层用，⛔ 不是开麦的判定）。⇒ `AC#4`"默认值与读取处一字不改"这一格今天**没有被谁动过**；同时新量出一枚**哑键**：`MicMutedDefault` **产码零读取处**——⛔ 不在本票射程（那是票 180/255 的哑键名册那一族），本波只在台账挂号。

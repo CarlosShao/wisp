@@ -157,3 +157,15 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
 - **AC#8／AC#10 的凭据归 `255-r2`，不归票 33、不归前端**（我复量：`cmd/wisp/panel_config_store.go:228` 与 `:275` **无条件** `res.Tier = panel.EffectiveRestart`，前面零按键判断；`internal/panel/config_handlers.go:199-200` 的 `EffectiveNow`／`EffectiveNextTask` 非测试**写者 0 枚**；`internal/config/tiers.go:30 "llm":"hot"`／`:34 "panel":"hot"` 在）。⇒ 这两格翻勾的起跑判据＝`255-r2` 把 `:228/:275` 的硬填换成 `config.TierOf(...)`。
 - **AC#2 卡在一枚"读前端 TS 的差集尺"**（我复量机制：`internal/panel/composer_test.go:48 TestComposerContractTypesMatchFrontend` 用 `os.ReadFile` 读前端类型文件做双向减集）；Go 半边四样全在（`internal/panel/composer.go:268-269` 两枚 json tag `credentialState`／`credentialKnown`、`pump.go` 的 reader 钩子、`cmd/wisp/run.go` 那一枚生产接线＝唯一调用点）。⚠ 界面侧那半**只写进票面由 owner 自己带给他用的那枚 agent**，⛔ 本编队永不转达。
 - 一句〔腿报，未复核〕留着：`TierOf` 的生产调用者枚数（起手段 0／现段 1）由 `255-c2` 量，等 `255-r2` 终态我整包复跑再认。
+
+## 8. AC#8 第二半的**两道外部前置**（2026-10-09 11:5x 编排者追加；⛔ 本节不翻任何框、⛔ 不改 §要建什么 里 AC#8 的判据原句）
+
+来路＝只读腿 `248-w1`（件 `.scratch/wisp/probes/248/w1/00-findings.md` 126 行，commit `9b029e61`；编排者对拉过它的字样族读数——在它自己的锚 `c2b422a4` 上**逐枚精确复现**，见台账 `A769`）。
+
+第 126 行那节我把 AC#8 判成「**归 `255-r2` 落地**，等 `255-r2` 交完由非实现者一并裁」。**这句现在不完整**，照实补齐（⛔ 不是推翻，是少说了一半）：
+
+- **`255-r2` 只闭合第一半**＝"回执那句『什么时候生效』必须由同一份登记表产出"（票 255 `AC#1`＋`AC#5`，同一块石头）。
+- **第二半「"要重启"必须到达页面可见面」今天有两道外部前置，`255-r2` 一道都不解**：
+  1. **Go→页那一跳的返回值没人接**：Go 侧已经把那句话交回绑定（`cmd/wisp/panel_host_windows.go:802-804` 逐字 `reply, _ := m.dispatchRaw(ctx, raw)` / `return reply`），断点在页面侧——`frontend/src/lib/panel.ts:211` 的 `sendRequest(...): void` 不取返回值、`:140-142` 桥接口只有 `postMessage(message: string): void`、`internal/panel/composer.go:58-91` 的快照没有回执字段。⇒ **这一半的正解落在 `frontend/**`，按本编队现行口径（`A102` 族＋票面规则 7）⛔ 不由我写**，界面侧需求只能写进票面/台账由机主自己带给他在用的那枚 agent。
+  2. **Go 侧"请求↔回执"配对这一块本身还没写**：票 35 的 C17 面 `:44` 那格已登记为**"一块没写"**（`ComposerDispatch` 结构体零请求态容器；`internal/panel/bridge.go:80 NewRequestID()` 非 test 调用者 **0**；答复回程走 `msgcb → Eval`、不走包裹器返回值）。⇒ 归属＝**票 35**，⛔ 本票不重复施工、⛔ 不在这里另立一张（同一物理缺陷链只记一次）。
+- **因此 AC#8 那格现在的诚实状态**＝"⛔ 不勾，且**不能只等 `255-r2`**"：登记表那一半做完之后，这格仍会因"到不了页面可见面"而不成立。谁把哪一半补上，上面两条具名。
