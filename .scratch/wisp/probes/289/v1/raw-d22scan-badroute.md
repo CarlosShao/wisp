@@ -1,0 +1,2 @@
+main module (github.com/CarlosShao/wisp) does not contain package github.com/CarlosShao/wisp/tools/d22scan
+rc(go run ./tools/d22scan)=1
