@@ -47,12 +47,12 @@
 
 ## 判据（落地腿必须逐条给读数；缺一条就具名报"没测"）
 
-- **AC#1**：`MaxConcurrentSubagents` **实测等于** `MaxToolConcurrency`（现跑 `grep -n` 两枚常量并排打印）。
-- **AC#2**：常驻判据一条——池常量**大于**桥天花板时**必须红**；正控＝人为把池写成 8 时那一枚判据确实红（不许只写"相等"这种恒真断言）。
-- **AC#3**：池满时第 5 枚**硬拒＋可读理由**（理由里带上"当前在跑的是哪几枚 `taskID`"），且**不占名册行、不占池位**（这条 `197-r1` 已有判据，改数之后要复跑）。
-- **AC#4**：AC#3 那枚"池=4"的测量**走真桥**（父任务真次派生），不再靠 `spawnDirect` 绕开桥；
+- [ ] **AC#1**：`MaxConcurrentSubagents` **实测等于** `MaxToolConcurrency`（现跑 `grep -n` 两枚常量并排打印）。
+- [ ] **AC#2**：常驻判据一条——池常量**大于**桥天花板时**必须红**；正控＝人为把池写成 8 时那一枚判据确实红（不许只写"相等"这种恒真断言）。
+- [ ] **AC#3**：池满时第 5 枚**硬拒＋可读理由**（理由里带上"当前在跑的是哪几枚 `taskID`"），且**不占名册行、不占池位**（这条 `197-r1` 已有判据，改数之后要复跑）。
+- [ ] **AC#4**：AC#3 那枚"池=4"的测量**走真桥**（父任务真次派生），不再靠 `spawnDirect` 绕开桥；
   如果绕行的那枚测试还留着，它必须**自己说清**它量的是"池语义"而不是"生产并发"。
-- **AC#5**：`internal/tools/bridge.go` 与 `internal/agent/budgets.go` 那两枚 **4 一字未动**（`git diff` 为空即证），
+- [ ] **AC#5**：`internal/tools/bridge.go` 与 `internal/agent/budgets.go` 那两枚 **4 一字未动**（`git diff` 为空即证），
   本票不借"改池"去碰契约——这是甲/乙的界线，谁越界要能在 diff 里看见。
 
 ## 禁区
@@ -61,3 +61,4 @@
 - **不许**新建第二座桥或给子代理单开桥实例来绕过 choke point（那是乙的实质内容，得先有批准记录）。
 - **不许**动 `frontend/**`、`design/**`；**不许**动 `internal/panel/tokens_fourway_test.go`。
 - 只 commit 不 push；commit 带显式 pathspec；禁 `git add -A` / `--amend` / `reset` / `rebase` / `stash` / `checkout .` / `clean`。
+— 2026-10-09 12:0x 编排者腿 boxes-1 搬框：本节原为散句 bullet，现改成 - [ ] 形以进全勾尺；⛔ 判据文字一字未改、⛔ 未翻任何框。
