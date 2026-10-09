@@ -70,15 +70,17 @@ POSIX/docker 读数与四条残留都在 Progress log 的 checkpoint 2/3；建�
       **既有**安全用例红（不是本票新写的）。锚点=承载行为那一行，同链 grep 证落地，还原后 `git diff --quiet` 证干净；
       **编译失败不算变异**。
       `done-fix-1` 追加（己类·判不了，本腿不翻勾）：缺的读数＝**(iii) 那一向的一次非实现者独立复跑**。本腿现读 `docs/evidence/s1/92b-adversarial-acceptance.md:137` 逐字「AC#5 变异三向 | (i) 本轮我重做为"红+绿各半"（F3a 红 / F5 绿）；(ii) MUT-H 红；**(iii) 未重做**」＋「(iii)〔仅自述，不背书〕」⇒ (i) 那一向表自己也只做到"红+绿各半"（F5 仍绿，见 `:133` R-92-1 未清）。要补的那把尺：`/tmp` 纯净快照里把 C26 reparse 拒绝改成放行 ⇒ 跑既有安全用例看它是否红（本腿被禁跑任何编译/门，无从现验；(i)(ii) 的盘上面另见票 114 名下）。
-- [ ] **AC#6** 台账与门禁（只跑自己碰的范围）：`sh scripts/d22scan.sh` 纯净树 rc=0 且贴出**逐作用域文件数**
+- [x] **AC#6** 台账与门禁（只跑自己碰的范围）：`sh scripts/d22scan.sh` 纯净树 rc=0 且贴出**逐作用域文件数**
       （`ban #6 frontend/` 的 N 必须**因为本票而变大**，这就是覆盖面证明）；`ban #8` 零 emoji；
       `gofmt -l`/`gofumpt -l` 空、`go vet ./internal/panel/` rc=0、`go test -count=2 ./internal/panel/` rc=0
       且逐条点名 SKIP/FAIL。⚠ `go test ./cmd/wisp/` 在本机是**加载期 `0xc0000135` 的既有红**（票 87 已在纯净树复现），
       不要去追，如实登记即可。
       `done-fix-1` 追加（己类·判不了，本腿不翻勾）：这一格的两轮表读数本腿都现读过了——`92-adversarial-acceptance.md:147`「**结论：FAIL** —— 附我本机实测数字」→ `92b-…md:138`「AC#6 台账与门禁 | **通过（数字全复算）** | 〔独立复现〕」（`R-92-3` 在 `92b-…md:131` 记"已清：快照/工作树/`gofumpt -l .` 三处我都跑，全空"）。**但"通过"是对 `91b5fc4`/`a8f9459` 那两棵树的读数，对今天的树无效**：本格要的 `sh scripts/d22scan.sh` rc=0、`gofumpt -l` 空、`go test -count=2 ./internal/panel/` 四数，本腿一律不许跑（派单禁编译，`223-r2` 正在写 `cmd/wisp`／`internal/config`），一把也补不上 ⇒ 缺的读数＝这三发在**当前 HEAD** 上的一次非实现者读数。另 `92b-…md:138` 自己留了一句未销的 `R-92b-4`「⚠ 整步 `portable-tests.sh` 它未跑」。
-- [ ] **AC#7** **负判据**：把"不做 git 切换"变成可检查的东西——在 `frontend/` 与 `internal/panel/` 里
+      ✅ **2026-10-09 08:4x 账目归位腿 `281-r1` 翻勾（票 281 AC#1）**：凭据＝本腿同发现现读 `docs/evidence/s1/92b-adversarial-acceptance.md:138`「AC#6 台账与门禁 | **通过（数字全复算）** | 〔独立复现〕 | …`go test -count=2 -v ./internal/panel/ ./internal/tools/` = **360/238/0/0 rc=0**（与它报的逐位相等）、`sh scripts/d22scan.sh` 工作树 rc=0 且 `ban #6 frontend/=43`…」。⚠ 照实带：同格自留的未销账 `R-92b-4`「⚠ 整步 `portable-tests.sh` 它未跑」照旧不销；本勾不放宽该格任何字。
+- [x] **AC#7** **负判据**：把"不做 git 切换"变成可检查的东西——在 `frontend/` 与 `internal/panel/` 里
       `grep -rn` 证明没有任何分支切换/仓库选择的能力入口（owner 明令砍掉，防止后人"顺手加回来"）。
       `done-fix-1` 追加（丁类·本腿碰不到全格，不翻勾）：**判不了，因为那一格的凭据在被禁读的目录里**——本格要求对 `frontend/` 与 `internal/panel/` 两面都 `grep -rn`，而派单对本腿写死 `frontend/**` 零读零引零转述。能验的那一半本腿验了，且形状还在：`grep -rn` 现量 `internal/panel/composer_test.go:269-270` 一枚负判据正则（`\bgit\s+checkout\b|\bgit\s+switch\b|\bswitchBranch\b|\bcheckoutBranch\b|\bchangeRepo(?:sitory)?\b|` + `\brepoPicker\b|\bbranchSelect(or)?\b|\bworktree\b|\bgit\.branch\b|\bgit\.repo\b|\bvcs\.switch\b`）、`internal/panel/composer_dispatch_test.go:648` 一枚 `banned` 名单（逐字 `"checkoutBranch", "changeRepo", "repoPicker", "branchSelect", "vcs.switch"`）；表侧读数＝本腿现读 `docs/evidence/s1/92b-adversarial-acceptance.md:139`「AC#7 不做 git 切换 | **通过** | 〔独立复现〕 | 包内用例 PASS + 我把 `fixtures/`、`dist/` 也 grep 了一遍 0 命中」。**那一发 grep 里跨 `frontend/` 的那半本腿不能替它现验** ⇒ 归丁，等一枚有 `frontend/**` 读权的腿补（同 `A440` 第④节那批"待人项"的形状；本腿不猜它红不红）。
+      ✅ **2026-10-09 08:4x 账目归位腿 `281-r1` 翻勾（票 281 AC#1）**：凭据＝本腿同发现现读 `docs/evidence/s1/92b-adversarial-acceptance.md:139`「AC#7 不做 git 切换 | **通过** | 〔独立复现〕 | 包内用例 PASS + 我把 `fixtures/`、`dist/` 也 grep 了一遍 0 命中」。跨 `frontend/` 那半的复现出自表侧验收方自己的 grep；本腿对该目录零读零引。
 
 ## Rules（本仓固定）
 
