@@ -21,16 +21,16 @@ Status: OPEN（编排者 09-30 23:0x 立，料全部出自 `240-c1`／票 241 �
 ## 判据（⛔ 框归编排者，产码腿与验收腿一枚都不许碰）
 
 - [x] **AC#0 先把四问的代价摆开（不许直接开写）**：① **落点**＝采集协程归常驻那条腿（`cmd/wisp`，与票 246 同一枚进程）还是归 `internal/audio` 自己起？两形各写"要动哪几枚文件＋新增哪几条包级依赖边＋协程 owner 走不走 `observe`／`rt.Registry`"。② **隐私闸门**＝接上之后麦克风在什么条件下真的打开，默认档（`voice.enabled=true` × `wake_word.enabled=false`）下今天这台机器会不会一双击就采音？③ **降级**＝设备被占／无权限／无设备时球的形状与文案说什么（SPEC-05 §3.4：分类＋可见，不许静默）。④ **第六环形状**＝`Armed` 那一格（现量 6）本票做还是留给谁。完成判据＝四问各带现读凭据（文件:行＋尺的读数），由编排者裁后再派 `247-r1`。⛔ **普查腿不许改任何产码**，写点只准落在 `.scratch/wisp/probes/247/a1/census.md`。
-- [ ] **AC#1 生产者半有人真调用**：接完之后 `internal/audio` 的非测试 importer **≥1 枚**（尺＝现量 1 那把，接前接后各一发，读数进表），且那枚 importer 就是**跑着的那条腿**（⛔ 不许是又一枚调试用 cmd）。
+- [x] **AC#1 生产者半有人真调用**：接完之后 `internal/audio` 的非测试 importer **≥1 枚**（尺＝现量 1 那把，接前接后各一发，读数进表），且那枚 importer 就是**跑着的那条腿**（⛔ 不许是又一枚调试用 cmd）。
 - [ ] **AC#2 球上的数来自声音，不来自命令行**：一发真机读数＝对麦克风说话与不说话时 `SetAudioLevel` 收到的值**不同**，并给出两形的采样数与出处；⛔ 不许用 `balldebug` 的合成包络冒充（现量 2 那条尾巴要剪掉，不是把它做大）。
-- [ ] **AC#3 只过一枚 `float32`**：任何新增代码里，跨过 `internal/ball` 边界的数据**只许是一个标量电平**。尺＝能力型（新增的跨包调用签名里出现 `[]byte`／`[]int16`／samples 即判越界），⛔ 不许做成"扫注释里有没有 samples 这个词"的词面型。
+- [x] **AC#3 只过一枚 `float32`**：任何新增代码里，跨过 `internal/ball` 边界的数据**只许是一个标量电平**。尺＝能力型（新增的跨包调用签名里出现 `[]byte`／`[]int16`／samples 即判越界），⛔ 不许做成"扫注释里有没有 samples 这个词"的词面型。
 - [ ] **AC#4 隐私默树一格都不许动**：`voice.enabled`／`wake_word.enabled` 的**默认值与读取处**一字不改，且真机读数要证明"默认档下麦克风不会被这条腿打开"（或反过来具名说出它打开了、由哪一行决定）。
-- [ ] **AC#5 协程有 owner、有 recover**：⛔ 裸 `go func(`（ban #1，`tools/d22scan/d22scan.exe` 会点红），采集协程必须挂在现成的 owner 上（`observe.Root`／`rt.Registry`），退出序列里被 join——**不许新造 D38(e) 的第 11 步，十步顺序一字不动**。
+- [x] **AC#5 协程有 owner、有 recover**：⛔ 裸 `go func(`（ban #1，`tools/d22scan/d22scan.exe` 会点红），采集协程必须挂在现成的 owner 上（`observe.Root`／`rt.Registry`），退出序列里被 join——**不许新造 D38(e) 的第 11 步，十步顺序一字不动**。
 - [ ] **AC#6 降级照跑**：拔麦／无权限／设备被占三形里任取两形，本进程**仍要把球与任务管线跑起来**并且把损失说响亮（现量：票 128 定的是"没有数据根才拒绝启动"，别把它扩大）。
-- [ ] **AC#7 越界检查**：`git diff` 里出现 `internal/speech`（一块没写的包）、`scripts/spike`、`frontend/**`、`design/**`、`PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`allowlist.txt` 任一路径 ⇒ 直接退回。唤醒词／ASR／TTS **都不属于本票**。
-- [ ] **AC#8 门禁四数**：`GOFLAGS= go build ./...`、`gofumpt -l <自己动过的目录>`、`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/audio/ ./internal/ball/ -count=1`、`./tools/d22scan/d22scan.exe`（⚠ 它是**独立模块**，只能跑那枚 exe，`go run ./tools/d22scan` 必失败），逐名照抄终态。
+- [x] **AC#7 越界检查**：`git diff` 里出现 `internal/speech`（一块没写的包）、`scripts/spike`、`frontend/**`、`design/**`、`PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`allowlist.txt` 任一路径 ⇒ 直接退回。唤醒词／ASR／TTS **都不属于本票**。
+- [x] **AC#8 门禁四数**：`GOFLAGS= go build ./...`、`gofumpt -l <自己动过的目录>`、`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/audio/ ./internal/ball/ -count=1`、`./tools/d22scan/d22scan.exe`（⚠ 它是**独立模块**，只能跑那枚 exe，`go run ./tools/d22scan` 必失败），逐名照抄终态。
 
-- [ ] **AC#10（09-30 23:2x 编排者追加，来路＝`247-a1` ④ 节；勾要非实现者裁）**：**"接上了"不等于"看得见"**——本票把电平接进生产之后，屏幕上仍然**不会**出现"球随声音呼吸"，因为还有一道独立闸：`prototypeVisuals` 默认**关**（`internal/ball/statevisual.go:102`，产码里只有 `cmd/balldebug:122` 打开它），而 `SetAudioLevel` 在它关着的时候**直接 return**（`internal/ball/liquid_windows.go:52`）。⇒ 本格判据＝票面与本仓文档**不许**把"电平接好"写成"用户能看见球在动"；那一句归口**票 68 AC#2**（`statevisual.go:93` 自己写明"翻默认值"归它），⛔ 本腿不许顺手 `ball.EnablePrototypeVisuals(true)` 来让 AC#2 好看——owner 09-30 明说过「形状算你过关，好不好看以后再说」，翻视觉默认值是**样式决策**，不由接线腿代做。
+- [x] **AC#10（09-30 23:2x 编排者追加，来路＝`247-a1` ④ 节；勾要非实现者裁）**：**"接上了"不等于"看得见"**——本票把电平接进生产之后，屏幕上仍然**不会**出现"球随声音呼吸"，因为还有一道独立闸：`prototypeVisuals` 默认**关**（`internal/ball/statevisual.go:102`，产码里只有 `cmd/balldebug:122` 打开它），而 `SetAudioLevel` 在它关着的时候**直接 return**（`internal/ball/liquid_windows.go:52`）。⇒ 本格判据＝票面与本仓文档**不许**把"电平接好"写成"用户能看见球在动"；那一句归口**票 68 AC#2**（`statevisual.go:93` 自己写明"翻默认值"归它），⛔ 本腿不许顺手 `ball.EnablePrototypeVisuals(true)` 来让 AC#2 好看——owner 09-30 明说过「形状算你过关，好不好看以后再说」，翻视觉默认值是**样式决策**，不由接线腿代做。
 
 ## 编排者裁定（09-30 23:2x，台账 `A485`）：`247-a1` 的八问逐条判完，落地腿可以派了
 
@@ -91,3 +91,33 @@ Status: OPEN（编排者 09-30 23:0x 立，料全部出自 `240-c1`／票 241 �
   - **现成接缝＝`SpawnCapture`（`internal/audio/audio.go:180`）非测试调用者＝0**；注入先例＝`WithGateEvents`。⇒ 与我 `AC#0` 裁的"恰好一条新边 `cmd/wisp → internal/audio`"**不冲突**，落地只碰这一条。
   - `SetAudioLevel` 的非测试调用形状尺＝**2 枚，全在 `cmd/balldebug`**（`:418` 合成包络／`:477` 喂 0）⇒ **真麦生产者＝0**，本票前提照旧成立。测试侧另有 4 枚（`internal/ball/live_windows_test.go:637/:648/:656/:685`），⛔ 不许被读成"接上了"。
   - 配置那三枚默认值现量＝`voice.enabled` `schema.go:245` **true**、`wake_word.enabled` `:197` **false**、`mic_muted`（`MicMutedDefault`）`:277` **true**；**唯一非测试读取处＝`internal/config/manager.go:380/:394/:395`**（reload 分层用，⛔ 不是开麦的判定）。⇒ `AC#4`"默认值与读取处一字不改"这一格今天**没有被谁动过**；同时新量出一枚**哑键**：`MicMutedDefault` **产码零读取处**——⛔ 不在本票射程（那是票 180/255 的哑键名册那一族），本波只在台账挂号。
+
+## 编排者按非实现者验收腿 `247-v1` 判语的处置（**2026-10-09 13:5x**，⛔ 题面与 AC 原句一字不改）
+
+凭据＝验收腿件 `.scratch/wisp/probes/247/v1/`（`00-skeleton`／`10-gates`／`20-ac-verdicts`／`30-ac2-level-ruler`／`40-cross-ticket-255`／`50-seams-and-defaults`，合计 68,302 字节，commit `a4363b78`／`3598b257`／`d4734b2e`；交件时 `git status --porcelain -- internal cmd docs .scratch/wisp/issues`＝**零行**、⛔ AC 框它一枚未碰）。**下面每一格都是它的判语＋我复尺后的处置，⛔ 没有一格按通知追认。**
+
+| 格 | 判语（验收腿现跑） | 我复尺后翻不翻 | 缺的那一发（⛔ 不算腿的欠账） |
+|---|---|---|---|
+| `AC#1` | **成立**：`internal/audio` 非测试 importer **0→1**（`cmd/wisp/resident_audio_windows.go`），`go list -deps` 名册里 `wisp/internal/audio` 命中 1、打进 `ball`/`statemachine` 命中 0，且 `main.go:66→runResident→:278` 证明那枚 importer **就是跑着的那条腿** | ✅ **翻** | — |
+| `AC#2` | **不成立**：它自跑 `WISP_LIVE_MIC=1` 那发 rc=1，三窗 `quietA 0.368462 / sound 0.381574 / quietB 0.382262` ⇒ **两枚静默窗之间的漂移 0.10178 比"有声"窗的增量 0.09917 还大**＝这一发证不出"声音造成的差别" | ⛔ **不翻** | 两发：① 那一形得是**人声**（外放不算，票面逐字是"对麦克风说话"）；② **先消底噪**——见下面"新缺口一"。⛔ 不许动断言或门槛。⇒ 分别归**机主在场那一发**（记我）与**新立票 291** |
+| `AC#3` | **成立**：新增跨包调用 11 条逐条列（`20-ac-verdicts.md` 表），跨进球的**只有** `resident_audio_windows.go:132 rb.b.SetAudioLevel(float32)` | ✅ **翻** | — |
+| `AC#4` | **部分成立**：`internal/config` 零改动、`schema.go:197/245/277` 逐字未动、`wake_word` 无新增产码读点；⚠ **缺"默认档真机开机"那一发**（现有证据全在装配测试面） | ⛔ **不翻** | 真机一发：出厂默认档双击一次，读"设备有没有被打开"。⇒ 与 `AC#2` 同属需要机主在场的那族，**记我** |
+| `AC#5` | **成立**：批内裸 `go func(`＝0；owner＝`audio.go:180 SpawnCapture`→`Registry.run` 的 recover 在 `goroutine.go:296`；`audio-capture` **本在六枚 D38(b) 名册内**＝零膨胀；`proc`/`observe`/`statemachine` 名册零改动；十步与 step-4 用例它跑 PASS | ✅ **翻** | — |
+| `AC#6` | **部分成立**：三形（含票面"任取两形"的两倍量）PASS；⚠ 但 **HRESULT 是造出来的**，且**"球与任务管线仍在跑"这一维零仪器**（该族用例里 `任务管线\|startResidentTaskSource` 命中 0） | ⛔ **不翻** | 两发：真设备那三形的**逐字回串**（要真被占／真无权限，与 `AC#2` 同族）＋"降级时球与任务管线仍在跑"那枚仪器。⇒ 仪器那半**记我排程**，真设备那半归机主在场 |
+| `AC#7` | **成立**：两把 `--no-renames` 尺对全部禁区路径 ⇒ **0 命中**，本批名册 13 枚 | ✅ **翻** | — |
+| `AC#8` | **成立**：`go build` rc=0；`gofumpt` 对本批 10 枚＝空（目录面剩 3 枚属 212/258-r1、35-r3、35-r5，**非本批**）；三包 `PASS=374／FAIL=6／SKIP=3` rc=1；`d22scan.exe` rc=0 **且** `sh scripts/d22scan.sh` rc=0（它发现那枚 exe 比 `main.go` 旧 1h45m，于是两把都跑——这形我认）；不带 harness 时 `0xc0000135`＝环境红，它复现并注明 | ✅ **翻** | — |
+| `AC#10` | **成立**：`statevisual.go:102 var prototypeVisuals bool`、`liquid_windows.go:52-54` 早退、产码里 `EnablePrototypeVisuals` 的调用者只有 `cmd/balldebug/main.go:122`；本批新增文字里"呼吸"两枚命中**全是否定句** | ✅ **翻**（票面逐字要求"勾要非实现者裁"，本格判语出自 `247-v1`） | — |
+
+**四处"实现者自报不符"我的裁定**（验收腿各给了独立答，我按答处置）：
+
+1. **改票 255 的名册件 `cmd/wisp/config_readers_255.go`＝允许，不算放宽**。凭据（验收腿跑）：`claimable` 那把尺只认 `consumed:` 前缀（`config_readers_255.go:289-300` 逐字），`[audio]` 升到 `other-process` 之后**仍落在 quiet 侧**；票 255 那 20 枚用例它跑 **rc=0**；新锚 `:150`/`:196`/`:197` 逐字对；四枚 `[voice]` 行的**判定常量一枚未升**，反而多出四枚**受行号校验的锚**；守卫没失明（被验样本格是 `[session]`/`[llm]`，`section=audio` 零断言）。⇒ 这笔我认，**归 255 名册的正常随行更新**。
+2. **自加的未导出接缝 `captureSource`／`assembleCapture(…, newSource)`＝合法测试接缝**。凭据：未导出、生产只走 `newRealCaptureSource`、三形红句里**没有一处把注入出来的失败写成真设备失败**；另它证了 `mic.Start` 阻塞在 `<-started`（`wasapimic_windows.go:87/:98`）⇒ 分类那支在生产确实可达。⛔ 但这枚接缝**不是 `AC#6` 的真设备凭据**，所以 `AC#6` 保持未勾。
+3. **`config.toml` 读不到时落 `config.NewDefaults()`＋响亮报来源＝保留，但欠一枚尺**。凭据：不撞票 198、不静默（Warn＋来源进每条 verdict）；⚠ 但它**零测试覆盖**，而同形 `[hotkey]` 那族早有哨兵＋用例（`cmd/wisp/resident_hotkey_258*_test.go:131/:175`）。⇒ 处置＝**保留行为＋补尺**，补尺随下一枚真动 `cmd/wisp/**` 的腿同批（撤销形状＝删 `resident_audio_windows.go:181-194` 一段，**必须同批**改 255 名册的 `:196/:197` 两枚锚——这半边我按票 288 同形登记，⛔ 不上机主清单）。
+4. **`AC#3` 那句是我票面写坏了**：原文一句话里混了两条射程（第一句"跨过 `internal/ball` 边界的数据"＋第二句"新增的跨包调用签名里出现 `[]byte`/`[]int16`/samples"），⚠ 按第二句字面宽读会让 `AC#1` 与 `AC#3` **互斥**（`cmd/wisp→internal/audio` 本来就传 PCM）。⇒ 采受验腿独立的读法＝**判球边界**，本格按此成立；**票面原句我一个字不改**，把这条缺陷记在台账 `A777`（我写票时把两条射程塞进一句话，是造死格的同源错法，同 `A758`/票 244 那两次）。
+
+★**本票翻勾后仍不结案的三格，加两枚新立票（这一程最该带给下一位的两条新事实）**：
+
+- **新缺口一＝电平尺不减直流**（`AC#2` 那发的根因，⛔ 不是"尺算错"也⛔ 不是"设备坏了"）：验收腿用仓里**现成的 DC 夹具**（`internal/audio/capturelevel_windows_test.go:21-24`，样值 12345）读出 **0.376740**，与本机麦克风的 **0.368462** 差 2% ⇒ **纯直流就能解释整个底噪**；而 max/mean 比 1.06–1.09 说明另有一层真交流内容＝设备/增益面。⚠⚠ 更要紧的是**门槛本身**：用例那枚 2× 判据在本机要 **≈ −3.9 dBFS**（接近削波）才够，**正常说话不可达** ⇒ 这格不立新票就会变成"只能靠回退判据才能满足"的死格（`A758` 同形）。⇒ **新立票 291**（电平尺的定义要不要去 DC＋门槛怎么重定；⛔ 本票任何程不许为此放宽断言）。
+- **新缺口二＝默认档下球永远收不到电平**：`mic_muted_default=true` 把门开在静音位（本票 P1 甲，正确的保守形），但 `HalfDuplexGate.SetMuted` 的**产码调用者＝0**（尺＝`git grep -n "SetMuted(" HEAD -- internal cmd`，非测试命中只有它自己的定义行与 `gate.go:97` 那句注释），而球的静音键在常驻进程里**只记一笔手势**（`cmd/wisp/resident_ball_windows.go:281` 逐字 `OnMuteHotkey: func() { recordBallGesture("mute-hotkey") }`）⇒ **没有任何一条生产路径能把门拧开**。这不是缺陷暴露、是链路只接了一半：电平那半接上了，"谁允许它开"那半还没人写。⇒ **新立票 290**（那一跳归静音热键／面板／说话起始，先只读普查再落地票，⛔ 不许由后续程顺手挑一支）。
+
+**Status:** **未结案**（7 已勾／3 未勾＝`AC#2`＋`AC#4`＋`AC#6`）。残余三笔全部具名：① 机主在场那两发（人声 `AC#2`＋默认档开机 `AC#4`）；② "降级时球与任务管线仍在跑"那枚仪器；③ 真设备三形的逐字回串。新排程：`291`（电平尺定义，⛔ 按在验收过之后）→`290`（开门那一跳，先普查）→`255-r2`→票 287 `AC#2`→票 289→票 288。⛔ 零 push。
