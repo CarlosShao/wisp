@@ -55,7 +55,10 @@ go test -count=1 -timeout 420s -v -run 'TestAC14AwaitedBindingReplyReachesThePag
   `TestAC14AwaitedBindingReplyReachesThePage` 起于 **:812**，体内⛔ embed/dist 跳过，输入只有 `startPanelForTest`／`showAndWait`／`evalOnPanelThread`／`awaitReport`。
 - ⚠ 反面对照（母仓台面）：母仓 `frontend/dist` **有旧产物字节**，所以 `TestAC13…` 在母仓有对象、跟着一起红（`probes/302/orch/g4-local-three-cases.txt` 里它给的是 `AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]`）；
   同一枚用例在干净 clone 里会走 `:317` 的具名跳过 ⇒ **⛔ 它是最小复现集**（票面 `:17` 的陷阱本腿认了，并用路①那发把它钉死）。
-  这一发的逐字件＝`15-ac13-skips-in-clean-clone.txt`（bisect 跑完之后补，⛔ 并发跑两发 go）。
+  这一发已经**在同一枚干净 clone 里现量到**（bisect 之后补的那一对定向发里带着它）：`fb2fb802` 与 `fb2fb802^` 两发都逐字给
+  `--- SKIP: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.00s)`＋:317 的具名理由
+  `AC#13 has no subject in this tree: the embed resolves no entry …`，而**同发的 `TestAC14…` 照旧跑、照旧判**（红／绿各一发）
+  ⇒ 件＝`18-pair-a-culprit-red.txt`／`19-pair-b-parent-green.txt`（本腿⛔ 并发跑两发 go，所以这一枚排在 bisect 之后）。
 
 ## ③ 复现率＝同一条命令 `-count=3` 的三色
 

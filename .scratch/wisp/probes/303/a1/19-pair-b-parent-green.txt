@@ -1,0 +1,15 @@
+time=2026-10-10T17:16:10.079+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+    panel_resident_windows_test.go:315: Resolve(entry): panel: embedded assets are not built (run npm run build in frontend/)
+    panel_resident_windows_test.go:317: AC#13 has no subject in this tree: the embed resolves no entry, so there is no page content that could be covered. Named skip; the working-tree reading is the one that ran, recorded in docs/evidence/s1/33-panel-host-c27-r5.md
+--- SKIP: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.00s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+time=2026-10-10T17:16:10.089+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 1153.7 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:825: AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)
+time=2026-10-10T17:16:11.502+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T17:16:11.503+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (1.41s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.723s
+rc=0 (go test 退码，尺=targeted-pair.sh b-green @fb2fb802^=f718e9b6，同发 AC#13 走具名跳过)

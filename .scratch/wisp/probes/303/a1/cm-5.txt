@@ -1,0 +1,8 @@
+303-a1 AC#1 归因到一笔（仓外 bisect 收敛）＋终态锚
+
+- first bad commit＝fb2fb802f75a0e3eeacad488f1adc6f064e29f85（35-r1，2026-10-07 18:05:53 +0800，单亲 f718e9b6，区间 742 枚 0 枚 merge＝线性，父发即"只那一笔不在"）
+- 12 步全有效：GOOD 4／BAD 8／INVALID 0（判红只认逐字 no report "ac14r-0" from the page within 15s，判绿只认 ^--- PASS: TestAC14…；台件 bisect-step.sh 已入库）
+- 那一笔名册只有 2 枚：cmd/wisp/panel_host_windows.go（产码 +57/-5）与 cmd/wisp/panel_transport_35r1_test.go（新增测试码 +243）⇒ 两样都动，⛔ 纯夹具 commit（本格只报名册，⛔ 下判语）
+- 定向两发齐全：(a) fb2fb802 → --- FAIL (20.00s) 判据句逐字；(b) fb2fb802^ → --- PASS (1.41s) 带页面话 REPLIED,REPLIED,REPLIED（Go's handler was reached by 3 of the 3 real requests）；同两发还现量到 TestAC13… 在干净 clone 里走 :317 具名跳过 ⇒ 最小复现集⛔ 依赖 frontend/dist 钉死
+- 加料两发（⛔ 本格要求，为 AC#2 铺）：那一笔的测试文件单独删掉⇒仍红；产码半边换父发⇒build failed（installPanelTransport undefined，按 R4＝INVALID）
+- 终态锚与起手同形：scoped porcelain 0 行／wisp.exe=0／balldebug.exe=0／go test 18 发自报；五笔名册全落 probes/303/a1/**，与授权名册差集＝∅；⛔ push、⛔ 改断言、⛔ 动产码

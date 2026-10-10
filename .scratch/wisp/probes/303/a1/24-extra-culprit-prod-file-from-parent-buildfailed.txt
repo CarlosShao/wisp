@@ -1,0 +1,6 @@
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+cmd\wisp\panel_transport_35r1_test.go:202:16: mgr.installPanelTransport undefined (type *PanelManager has no field or method installPanelTransport)
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
+rc=1
+rc=1 (go test 退码；INVALID=build failed 按 R4 尺既非 bad 亦非 good)

@@ -1,0 +1,7 @@
+303-a1 起手锚：票 303 AC#0/AC#1 复现钉死与仓外 bisect 的尺清单先落盘
+
+- HEAD 现量 dce0f133（dev）、scoped porcelain 0 行、tasklist wisp.exe/balldebug.exe 各 0、go1.27.1
+- PATH 两枚目录具名（母仓 third_party/sherpa-onnx 与 build，clone 无 DLL 会 0xc0000135＝无效步）
+- 最小复现集钉在 TestAC14AwaitedBindingReplyReachesThePage（AC13 依赖 frontend/dist，干净 clone 复现不出）
+- bisect 判红只认逐字 no report "ac14r-0" from the page within 15s，其余红一律具名记为无效步并 skip
+- 附 tmp-baseline-grep.txt：基线那发两枚绿句的现量尺（:1293 REPLIED / :1300 PUSHED-33R5-OK）

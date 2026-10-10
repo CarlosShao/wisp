@@ -1,0 +1,13 @@
+step	sha	verdict	go_rc	reason	body
+1	cc31526165734e612de297848bb2080bd459ccba	GOOD	0	page reply hop reached (--- PASS)	/c/Users/swq/wisp-303-steps/step001-cc31526165734e612de297848bb2080bd459ccba.txt
+2	bcd0a543c28d32029a69af3e217d76e72312b7bf	BAD	1	ticket red sentence verbatim	/c/Users/swq/wisp-303-steps/step002-bcd0a543c28d32029a69af3e217d76e72312b7bf.txt
+3	1ce8c7115056a1648b05ffbdf9318235e96945fa	BAD	1	ticket red sentence verbatim	/c/Users/swq/wisp-303-steps/step003-1ce8c7115056a1648b05ffbdf9318235e96945fa.txt
+4	bedc0e09d8c65e28722b034123ab3be89d697b34	GOOD	0	page reply hop reached (--- PASS)	/c/Users/swq/wisp-303-steps/step004-bedc0e09d8c65e28722b034123ab3be89d697b34.txt
+5	50341a861493d75cf54e01ed9ad86a63d4268b61	BAD	1	ticket red sentence verbatim	/c/Users/swq/wisp-303-steps/step005-50341a861493d75cf54e01ed9ad86a63d4268b61.txt
+6	8d496dd09d6d84d35537947ada10bcdde9a6b08d	BAD	1	ticket red sentence verbatim	/c/Users/swq/wisp-303-steps/step006-8d496dd09d6d84d35537947ada10bcdde9a6b08d.txt
+7	10899b774e7a7e810b57c0acb8df99364b7f4048	GOOD	0	page reply hop reached (--- PASS)	/c/Users/swq/wisp-303-steps/step007-10899b774e7a7e810b57c0acb8df99364b7f4048.txt
+8	a7f9781c7d6b64506f14e0ad75f81d86f96749d9	BAD	1	ticket red sentence verbatim	/c/Users/swq/wisp-303-steps/step008-a7f9781c7d6b64506f14e0ad75f81d86f96749d9.txt
+9	f718e9b618bc9cef463cad9df37cf77b1a833930	GOOD	0	page reply hop reached (--- PASS)	/c/Users/swq/wisp-303-steps/step009-f718e9b618bc9cef463cad9df37cf77b1a833930.txt
+10	ce6a40809bb699040ea7855b63b885ac28086395	BAD	1	ticket red sentence verbatim	/c/Users/swq/wisp-303-steps/step010-ce6a40809bb699040ea7855b63b885ac28086395.txt
+11	1e42fc6197951a44381e407511d38df77f7aeb68	BAD	1	ticket red sentence verbatim	/c/Users/swq/wisp-303-steps/step011-1e42fc6197951a44381e407511d38df77f7aeb68.txt
+12	fb2fb802f75a0e3eeacad488f1adc6f064e29f85	BAD	1	ticket red sentence verbatim	/c/Users/swq/wisp-303-steps/step012-fb2fb802f75a0e3eeacad488f1adc6f064e29f85.txt
