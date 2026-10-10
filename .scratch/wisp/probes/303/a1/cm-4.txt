@@ -1,0 +1,8 @@
+303-a1 AC#0 复现钉死（票 303 ①②③④ 四小格各带尺与件）
+
+- 起点 cc315261 在仓外干净 clone 里 --- PASS (1.59s)，逐字带页面话 REPLIED,REPLIED,REPLIED（比 CI 归档件更强：同机同尺）
+- 终点两枚分开各留一发＝bcd0a543 --- FAIL (20.02s) 判据句逐字／现 HEAD --- FAIL (20.02s)
+- 最小复现集跑法逐字：PATH 铺母仓 shell 形式两枚目录 /d/work/…/third_party/sherpa-onnx 与 /d/work/…/build（出处 scripts/wisp-cli-tests.sh:101-109）
+- 具名回答它⛔ 依赖 frontend/dist：干净 clone 里 dist 产物字节 0 枚，PASS/FAIL 两形都照常出；:317 那枚具名跳过只属 AC#13
+- 复现率＝同一条命令 -count=3 三色：FAIL 3／PASS 0／SKIP 0，判据句 3 次命中
+- CI 同码也红那一枚＝引 ci-after-cli-block.txt:1360，⛔ 为这句推 CI
