@@ -1,0 +1,48 @@
+time=2026-10-10T10:35:04.840+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands
+time=2026-10-10T10:35:06.263+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 10:35:06 mockllm: serving on http://127.0.0.1:58761 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-10T10:35:06.300+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands2821438657\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-10T10:35:06.336+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands2821438657\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T10:35:06.343+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T02:35:06Z duration_ms=7
+time=2026-10-10T10:35:06.359+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands2821438657\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T10:35:06.365+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T02:35:06Z duration_ms=5
+time=2026-10-10T10:35:06.373+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T10:35:06.375+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T10:35:06.383+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-bd3576d2-2b4c-45c0-8813-7004aa6fa9a5 owner=tools
+    subagent_selfapproval_197_test.go:366: child=bd3576d2-2b4c-45c0-8813-7004aa6fa9a5 corr1=bd3576d2-2b4c-45c0-8813-7004aa6fa9a5-corr-1 corr2=bd3576d2-2b4c-45c0-8813-7004aa6fa9a5-corr-2 | 空令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 假令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 自称来源=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 借证=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 重放=approval: correlation_id 无对应待审批项 | 面板递证=面板来源的「允许」被服务端 API 直接拒绝（F2 第三层），可改为拒绝或查看完整参数 | 烧后再试=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 宿主允许=<nil> | 落盘=true/false
+--- PASS: Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands (11.56s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	11.635s
+time=2026-10-10T10:35:19.510+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands
+time=2026-10-10T10:35:20.626+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 10:35:20 mockllm: serving on http://127.0.0.1:56176 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-10T10:35:20.655+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands1451561321\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-10T10:35:20.694+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands1451561321\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T10:35:20.701+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T02:35:20Z duration_ms=6
+time=2026-10-10T10:35:20.710+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands1451561321\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T10:35:20.718+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T02:35:20Z duration_ms=7
+time=2026-10-10T10:35:20.726+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T10:35:20.730+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T10:35:20.737+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e2c8c0e5-45f1-44d4-8d25-e80735de1522 owner=tools
+    subagent_selfapproval_197_test.go:366: child=e2c8c0e5-45f1-44d4-8d25-e80735de1522 corr1=e2c8c0e5-45f1-44d4-8d25-e80735de1522-corr-1 corr2=e2c8c0e5-45f1-44d4-8d25-e80735de1522-corr-2 | 空令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 假令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 自称来源=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 借证=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 重放=approval: correlation_id 无对应待审批项 | 面板递证=面板来源的「允许」被服务端 API 直接拒绝（F2 第三层），可改为拒绝或查看完整参数 | 烧后再试=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 宿主允许=<nil> | 落盘=true/false
+--- PASS: Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands (11.31s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	11.430s
+time=2026-10-10T10:35:33.942+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands
+time=2026-10-10T10:35:35.143+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 10:35:35 mockllm: serving on http://127.0.0.1:49449 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-10T10:35:35.180+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands3858224144\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-10T10:35:35.217+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands3858224144\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T10:35:35.225+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T02:35:35Z duration_ms=6
+time=2026-10-10T10:35:35.233+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands3858224144\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T10:35:35.239+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T02:35:35Z duration_ms=5
+time=2026-10-10T10:35:35.249+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T10:35:35.251+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T10:35:35.258+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5f8f32b6-12c2-4384-a69a-4c2640483e1d owner=tools
+    subagent_selfapproval_197_test.go:366: child=5f8f32b6-12c2-4384-a69a-4c2640483e1d corr1=5f8f32b6-12c2-4384-a69a-4c2640483e1d-corr-1 corr2=5f8f32b6-12c2-4384-a69a-4c2640483e1d-corr-2 | 空令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 假令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 自称来源=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 借证=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 重放=approval: correlation_id 无对应待审批项 | 面板递证=面板来源的「允许」被服务端 API 直接拒绝（F2 第三层），可改为拒绝或查看完整参数 | 烧后再试=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 宿主允许=<nil> | 落盘=true/false
+--- PASS: Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands (11.34s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	11.499s

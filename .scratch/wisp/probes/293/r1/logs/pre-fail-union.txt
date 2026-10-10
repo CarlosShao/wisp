@@ -1,0 +1,7 @@
+--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+--- FAIL: TestAC14AwaitedBindingReplyReachesThePage
+--- FAIL: TestAC14GoSideEvalPushReachesThePage
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5
+--- FAIL: TestAC4PriorFocusSurvivesARefusedPanelSample
+--- FAIL: TestC21TableColourRowsMatchTokensCSS
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle
