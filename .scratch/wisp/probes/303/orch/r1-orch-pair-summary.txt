@@ -1,0 +1,19 @@
+date_start=2026-10-10T17:24:47+08:00
+clone_dir=/c/Users/swq/wisp-303-bisect
+fb2fb802
+== 复跑前工作树脏枚数（clone 内）==
+0
+rc_checkout_a=0
+HEAD_a=fb2fb802
+rc_pair_a=1
+1
+    panel_resident_windows_test.go:821: no report "ac14r-0" from the page within 15s (what DID arrive at the door: nothing at all). AC#14's reply hop cannot be decided without the page's own answer, and the three shapes that are all true with no reply (Dispatch called, Eval returned, Go-side channel closed) are not assertions
+rc_checkout_b=0
+HEAD_b=f718e9b6
+rc_pair_b=0
+1
+    panel_resident_windows_test.go:825: AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)
+rc_restore=0
+HEAD_final=f76091cd
+date_end=2026-10-10T17:25:27+08:00
+SCRIPT_rc=0

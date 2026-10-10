@@ -1,0 +1,36 @@
+
+## A820｜2026-10-10 17:3x｜★★**页面→Go 那一跳的断口归因收敛到一笔＝`fb2fb802`（票 35 的 35-r1，10-07 18:05），单撤它即复绿，且定向两发由我在同一枚仓外 clone 上逐字复跑对上**＋收 `300-v3`（票 300 翻 `AC#3`＋★新格 `AC#6`：一枚常量今天全仓⛔ 任一把尺钉得住）＋收 `111-a6b`（票 111 翻 `AC#12`：盲区名册两条独立来路同数，★连带面＝拉 4 枚包进 windows 档会把 **341 枚**从未在 windows 求值的用例推进分母）
+
+**触发**：三枚腿同批交回（`300-v3` 两笔／`303-a1` 六笔／`111-a6b` 三笔——后者是 17:0x 那枚死于"模型连接中断"的 `111-a6` 的重派，死腿**零件零提交**，所以按定式直接重试一发，并在派单里加了"第 3～5 次调用内先落第 1 笔"）。我逐枚复跑承重读数后才落账。
+
+### ① ★★票 303＝今天最硬的一条：断口有名字了
+
+- first bad＝**`fb2fb802f75a0e3eeacad488f1adc6f064e29f85`**（35-r1：`installPanelTransport` 绑上 `wispDispatch` 门＋把 postMessage 转给 Init）。腿的 bisect＝仓外 clone、`cc315261`→`bcd0a543`＝742 枚、0 merge、**12 步全有效（GOOD 4／BAD 8／INVALID 0）**，判红**只认逐字判据句**（`0xc0000135`／`[build failed]`／`no tests to run` 一律算无效步＝这条我派单里点过名，它守住了）。
+- ★**由我复跑的定向两发**（件 `probes/303/orch/r1-orch-pair-summary.txt`＋`r1-pair-a-culprit.txt`／`r1-pair-b-parent.txt`，17:2x，同一枚 clone，复跑前 clone 工作树脏枚数＝0）：
+  (a) `fb2fb802` ⇒ `rc=1`、`--- FAIL: TestAC14AwaitedBindingReplyReachesThePage`，红句逐字 `no report "ac14r-0" from the page within 15s (what DID arrive at the door: nothing at all)`；
+  (b) 父发 `f718e9b6` ⇒ `rc=0`、`--- PASS`，绿句逐字 `page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)`。
+  ⇒ **单撤一笔即复绿**＝⛔"多枚同犯"那一支；⛔ 纯夹具（那一笔动 2 枚文件＝`cmd/wisp/panel_host_windows.go` **产码** +57/−5 ＋ `cmd/wisp/panel_transport_35r1_test.go` 新增 +243，我 16:4x 就跑过这把名册尺）。
+- ★**销掉我自己那枚欠账**：`-count=3` ⇒ **FAIL 3／PASS 0／SKIP 0**（`A819` 我写的是"单发、复现率⛔ 知"）。
+- ★新知一枚（进所有今后派单）：**`PATH` 必须 shell 形 `/d/…`**，写成 `D:/…` 就 `0xc0000135`（尺＝`scripts/wisp-cli-tests.sh:101-109`；腿起手把它写成 `113-118` 并自己更正）。
+- ⚠ **反证我自己票面一句**：票 303 现量段说"`TestAC13ColdStart…` 是 SKIP→FAIL 那一枚"——**只对母仓／CI 台面成立**，**干净 clone 今天仍 SKIP**（它的判据要看 `frontend/dist` 产物字节，仓里只跟踪 `.gitkeep`）。⇒ 定式：**引用"某枚用例今天是什么色"必须同时写台面**（母仓工作树／仓外干净 clone／CI），这是"射程口径"那一族第五次同名事故。
+- ⚠ **残体一件（机主台面上看得见）**：腿终态 `msedgewebview2.exe` **24 枚**（起手⛔ 量，它自报），`wisp.exe`／`balldebug.exe`＝0，宿主 `go test` 全退 ⇒ 测试遗留的**孤儿渲染进程**。我 17:32:53 复量仍＝**24 枚**（`wisp.exe`／`balldebug.exe` 各 0）。⛔ 按"只杀自己起的"办＝**⛔ 杀⛔ 假装没事**；处置＝下一程具名量父链（`Get-CimInstance`）后再定停哪些，并把"窗退了而渲染进程没退"这一族**单独归口**（真窗档里本有 `*_WinLive` 那枚 2s 判据在管，⛔ 进 CI）。
+
+### ② 收 `300-v3`：翻 `AC#3`＋★新格 `AC#6`（一枚钉不住的常量）
+
+- `AC#3` 判语＝**成立，带两枚限定**：可复现形状成立（tracked 用例＋仓外突变，红句 `tag = 0, want 3 (…at byte 24)` 四形齐、写回 26 那一发 `rc=1／FAIL=5`）；"本机混音格式确实是 extensible＋float"只到本机此刻〔仅本机可量、归编排者〕；★**"0.3677 就是它"⛔ 成立**（我两把尺现跑：票 297 `^- [ ]`＝**5 全未勾**、`^- [x]`＝**0**；`probes/297/` 只有 `a1/`；它那枚真设备判别仪器盘上⛔ 存在）。
+- ★顶回我一处并**比我原句更要紧**：票面写"票 297 三支里的 **③**（切错字节）"，而票 297 权威清单（我 `sed -n '24,30p'` 现读）里 **②＝字节切错（`convertPacket` 那层拼装）**、**③＝设备本底就是这样** ⇒ **同名不同号、且落点不同层**。⇒ 处置＝票 297 一字不改，本票按**标签**引、今后两票关系⛔ 按号引（编号锚＝行号锚的兄弟，一样会腐烂）。
+- ★它量到一枚**新缺口**（这条比翻勾值钱，我用读码复核了原因）：把常量 `waveFormatFloat` 由 3 改成 1 ⇒ **整包 41 枚顶层全绿 `rc=0`**。原因＝`internal/audio/wasapi_windows.go:378` 是 `floating := s.format.tag == waveFormatFloat`，而用例 `parse_wave_format_300_windows_test.go:152-153` **两侧都用同一枚常量**比 ⇒ 改常量同时挪两侧，恒等式照成立 ⇒ 全仓 `grep -rn 'floating'`（我现跑）只命中"生产那行＋注释＋用例那两行"，**零枚**尺钉"这个常量⛔ 是 3"。⇒ 票 300 追加 **`AC#6`**（换形攻击必须红＋成对两发＋⛔ 用字面等值再包一层同义反复，先例＝`A710` 那枚"照抄模板造恒绿假钉"）。
+- ⚠ 我那句"audio 的 windows 半边⛔ 会被任何档求值"（票 300 `AC#5` 引 `297-a1`）**已过期**＝票 301 落地笔 `0a0f62ef` 把 `./internal/audio/` 写进 `windows)` 档并同笔补 `win_pin`。⇒ `AC#5` 那格**⛔ 翻**（CI 那发色仍欠），但旧句按快照读（同族＝"读数的世代"，见 `A819`）。
+
+### ③ 收 `111-a6b`：翻 `AC#12`，两枚侧数⛔ 我盖章
+
+- ★**盲区名册＝4 枚包／15 枚文件／32 枚用例**由**两条独立来路同数**（腿读面＝`git archive HEAD` 逐枚 cksum 对拉；我 14:0x 写进票面的那三个数来自 `301-a2`）＝本仓最硬的凭据形状之一，⇒ **翻勾**。全模块 tagged 面＝105 文件／378 用例（同样复现票面第二发）。
+- ★**新量到的反形（票面⛔ 写）**：`cmd/wisp` 唯一认领档＝`cli`（只在 windows 跑）⇒ 它 `!windows` 那一支**同样永不被执行**。实证我现跑：`git grep -l -E '//go:build.*!windows' HEAD -- cmd/wisp` 命中 8 枚文件（含非测试件）。⚠ 与腿的"1 文件／3 用例"⛔ 同（我这把扫整枚 blob、它那把只看前 3 行）⇒ **枚数口径⛔ 由我盖章、留给非实现者终裁**。另一枚我复跑到的同类实证＝`cmd/wisp/leg_sink_nail_131_windows_test.go` 的 `head -3` 第一行直接是 `package main` ⇒ **名字带 `_windows` 而体内零 build 约束**（"名⛔ 等于内容"这一族的反向形）。
+- ★**最贵的那枚连带数**：把那 4 枚包拉进 `windows` 档 ⇒ 该档分母变 **373 枚**、其中 **341 枚无 tag 用例从未在 windows 求值过**（放大 11.7 倍）。⚠ 这两枚是**算式级**（从名册算出来）而⛔ 是 runner 上的真色——腿自己把"341 枚在托管 windows 上红不红"列进欠账 ⇒ **裁形前欠的就是那一发 CI 色**，⛔ 本机代跑。
+- ★最贵的一枚具名代价：`TestShellTrashLeavesARecycleBinEntryTheOSCanEnumerate`（我复跑定位＝`internal/tools/recycle_windows_test.go`）是 **windows-tagged 而体内有 `t.Skip(`** ⇒ 一进分母就撞 `tools/d22scan/runtests.sh:98`→`:102` 那枚"SKIP ⛔ 算过"的门；而 ledger 里 `internal/tools` 那 3 行登记的是 `platform=linux`（我 16:4x 为票 302 逐行读过），**方向恰好相反** ⇒ ⛔ 能被现有 ledger 兜住。
+- ⚠ 侧数降级〔仅腿报〕两枚："16 枚文件内容有 windows tag 而文件名不带"＝我这把同族尺给 **28**（排除 `winlive`）／**33**（⛔ 排除），差别全在射程定义；"反形 1 文件 3 用例"＝我数到测试件 2 枚／其中 `resident_ball_228_test.go` 顶层 `func Test` **2** 枚。⇒ 名册级结论⛔ 动，侧数⛔ 引。
+
+### ④ 编队与欠账（⛔ 我给任何腿盖章）
+
+- 三枚已交 ⇒ **0 枚在飞**（`111-a6` 死腿重派后也交完了）。本笔落完推 `origin dev`（`A813` 授权内），随后派 **`303-r1`**：先答票 303 `AC#2` 机制三形（页面 JS⛔ 跑／绑定名⛔ 接上／再入帽挡住门），再改那一笔的产码半边；硬约束＝⛔ 放宽任何断言、⛔ 造 `--- SKIP`、⛔ 碰 D32 预算、⛔ 动档／tag／ledger（那是票 302 的射程）。
+- 欠账（具名）：① 票 302 甲／乙的裁语等 `AC#2`；② 票 303 `AC#4` 那批 CI 色＋票 300 `AC#5` 与票 111 那 341 枚的托管 windows 色**同一批推送一起取**（⛔ 为它们单推）；③ 24 枚孤儿 `msedgewebview2.exe` 的父链取证与停法；④ 票 300 `AC#6` 的落点只读一发；⑤ 真机窗口欠机主那五枚读数（照挂）；⑥ 12 枚 `internal/risk` CI 红仍〔待归因〕（`A817` §3）；⑦ `300-v3` 与 `111-a6b` 各自具名的编译面欠读数（`--scope=census` 真实退码、`go list ./...` 包全集枚数、那枚 skip 的条件、11 枚 `mic` 子串消歧）。
