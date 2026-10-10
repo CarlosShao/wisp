@@ -118,7 +118,7 @@ var hotRowClaims = map[string]string{
 	"models": hotClaimOtherProcess + "cmd/wisp/models.go:163 [cfg.Models.Mirror] - only the wisp models subcommands read it, in their own process, off a fresh LoadFile",
 
 	// Since ticket 258 (form A): the resident leg's ball host takes [hotkey]
-	// from config (cmd/wisp/resident_ball_windows.go:316 [Hotkeys:  cfg,],
+	// from config (cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,],
 	// mapped by the chain in cmd/wisp/resident_windows.go) and its ticket-64
 	// bridge rebinds the ball on a real diff. The reader is real, but it lives
 	// in the RESIDENT `wisp` process - this receipt prints in `wisp run`, which
@@ -126,7 +126,7 @@ var hotRowClaims = map[string]string{
 	// adjudicated into when its reader moved to the resident panel host. The
 	// rebind drops an in-flight Esc borrow (internal/ball/ball_windows.go:807-812);
 	// that residual stays ticket 245's, named rather than hidden.
-	"hotkey": hotClaimOtherProcess + "cmd/wisp/resident_ball_windows.go:316 [Hotkeys:  cfg,] - the resident ball host binds from [hotkey] and its reloader bridge rebinds on change (cmd/wisp/resident_windows.go), but the ball lives in the resident process, not in this `wisp run` host",
+	"hotkey": hotClaimOtherProcess + "cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,] - the resident ball host binds from [hotkey] and its reloader bridge rebinds on change (cmd/wisp/resident_windows.go), but the ball lives in the resident process, not in this `wisp run` host",
 
 	// Zero production readers (票 180's census classes these keys "D"). Two shapes
 	// of evidence, and the roster test demands one of them per row: a cite naming

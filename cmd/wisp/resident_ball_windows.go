@@ -178,14 +178,9 @@ type residentBall struct {
 	muteMux  sync.Mutex
 	muteGate muteGestureFunc
 	// trayMuteRead and trayCheckPush are ticket 293 AC#2's projection pair for the
-	// tray's "静音" checkmark: read the gate's own mute flag, hand it to the ball's
-	// tray display setter. They sit under the muteMux above for the same reason
-	// muteGate does - the assembly root writes them on the boot goroutine while a
-	// gesture may read them on the ui-sta thread - and they hold NO state of their
-	// own: the single truth source stays internal/audio's gate flag
-	// (HalfDuplexGate.Muted), and trayCheckPush is literally
-	// (*ball.Ball).SetTrayChecks, so the ball-side trayMuted bool is a projection
-	// of the gate rather than a second authority nobody reconciles.
+	// tray's "静音" checkmark (see attachTrayMuteProjection and mirrorTrayMute at
+	// the bottom of this file); they hold no state - gate.Muted() stays the only
+	// truth and the push is literally (*ball.Ball).SetTrayChecks.
 	trayMuteRead  func() (muted, ownsGate bool)
 	trayCheckPush func(muted, pausedWake bool)
 }
