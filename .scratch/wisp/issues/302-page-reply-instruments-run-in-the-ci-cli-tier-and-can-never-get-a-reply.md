@@ -88,3 +88,35 @@ next=票 301 `AC#4`/`AC#5` 的验收腿 `301-v3`（在飞）→ `302-a1`（`AC#0
 ## Progress log（本节）
 
 - [2026-10-10 16:4x +0800] agent=编排者 did=收 `302-a1`（件 `probes/302/a1/40-census.md`，commit `8267be8a`，逐笔名册＝自家目录 2 枚，⛔ 越界）⇒ **翻 `AC#0`**＋**`AC#1` 按住**＋★票面四句前提就地改写（`:1`／`:4`／`:14`／`:15`）＋★新量到一枚**可本机复现的回归**（`G4`：三枚本机全 `--- FAIL (20.01s)`、红句逐字同 CI ⇒ "环境差"作废，⚠ 我此前那句是拿旧码探针当现行读数）＋★我 16:0x 那句"三枚都是新可见"⛔ 只对 1 枚（两枚基线**绿**）记我＋三枚读数我代腿取（`G1` rc=0／`G2` rc=0·301 枚含三枚名·带正控／`G3` `0xc0000135` rc=1 列名 0 枚 ⇒ **乙形今天⛔ 可行**）＋认七处顶回；next=**票 303**（页面→Go 回执断口的归因，本机可复现⇒⛔ 依赖 CI）→ 回来再裁本票甲／乙 → 票 300 `300-v3` → 票 111 `AC#12`
+
+## 编排者裁（2026-10-10 19:1x，CI 改后那一发到手）⇒ §⑥ 的前置条件 (ii) **判死**：甲／乙**都⛔ 落**，`AC#1` 继续按住（⛔ 翻任何一枚 `- [ ]`）
+
+件＝`.scratch/wisp/probes/303/orch/r9-ci-after-red-roster.txt`（票 303 那格 CI 色的原件，本票**借用**它，⛔ 复制一份读数到本票目录——先例＝同一份读数⛔ 两处重记）。
+
+### ① 承重那一句（逐字，尺＝`gh run view --log --job 114194107792`，headSha `05db4bc6`＝票 303 修复那一笔）
+
+`cmd/wisp/panel_resident_windows_test.go:825` 逐字：
+`AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)`
+⇒ `--- PASS (0.30s)`。同一枚用例在**修复的父发**（`cf46c24a`，job `114187968428`）是 `--- FAIL (20.02s)`＋逐字 `:821: no report "ac14r-0" from the page within 15s (what DID arrive at the door: nothing at all)`。
+
+- 这回答的是 §⑥ 那条**具名前置条件 (ii)**："只有当归因结论是『这一跳在 CI 台面上永远拿不到回执』时，搬档／进 ledger 才有意义"。盘上答＝**结论⛔ 是那一句**：CI 那台机器**拿得到回执**，而且判据是页面自己报回的（⛔ 是 Go 侧自说自话）。
+- ⇒ **甲（搬 `winlive` 档）／乙（进 `portable-tests.sh` 的 `-skip` ledger）都⛔ 落**。落下去的后果正是 §⑥ 自己警告的那一句：**把一枚真回归搬进隐形**（还撞上 `AC#2` 那条"⛔ 让分母变成既⛔ 跑也⛔ 编"）。
+- ⛔ 由此翻 `AC#1`：本格是**落地格**，而本程零产码；它的正确现态＝"按住，且本票⛔ 有可落的形"，⛔ 是"做完了"。
+
+### ② 票面 `:11` 那句"另有 1 枚基线红→改后 `--- SKIP`＝`TestPanelHostLatencyPercentilesAC2`"——**这一发又翻回去了**（原句一字不改，留在上面当快照）
+
+同一把尺（步日志 `portable-tests.sh: four numbers` 那行逐字）在 `cmd/wisp` 档：`RUN=398 PASS=278 FAIL=8 SKIP=2` → `RUN=398 PASS=279 FAIL=8 SKIP=1`。
+- 名集合作差（⛔ 比枚数）＝**被修好 1 枚（nail1）／新增 1 枚（`TestPanelHostLatencyPercentilesAC2` 由具名 SKIP 走进 `--- FAIL`）**；`FAIL=8↔8` 同数而名不同 ⇒ ⚠ **两把尺⛔ 同物**，本票 `:11` 早就为同一枚坑写过一句同款警告，这次是它的第二次。
+- 那枚新红的逐字＝`:1005: cold P95 2747.460 ms over 1 runs exceeds the D32 panel cold budget 1500 ms (the single-run assertion is not the only gate: the tail is what AC#2 asks for)`；它 SKIP 掉的前提（`:985` 逐字 `no cold/hot sample recorded in this process … Named skip - an empty aggregate is not a green latency gate`）随修复消失——上面的 lifecycle 用例**真的产出了样本**，判据才开始求值。
+- ★这一枚**⛔ 属本票射程**（本票管"档／放置"，这枚的颜色变化来自"回执通道接上"＝票 303 的产码面），但它又**⛔ 是新坏**：§① 那张基线表里同一枚回归前就红过（`--- FAIL (0.00s)`）。⇒ 具名交下一程裁归口（候选＝票 33 的 D32 预算面／票 305 的文档交接面），⛔ 我盖章，⛔ 为它动 1500 那一枚数。
+
+### ③ 本票现在的残差清单（谁仍红、归哪一票）——这是"丙＝登记成具名已知红"那一支能剩下的全部
+
+- `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC14GoSideEvalPushReachesThePage`：**仍红，且已换形**（CI 上逐字＝`:327 AC#13 page answer … "0" - 0 of 1 probe id(s) present in the live document`；`:867 AC#14 nail 2 … page's own words: title=""`）⇒ 归**票 305**（产码面＝`bringUp` 的 `serveEntry`／探针文档交接次序＋`Eval` 推那一条），⛔ 本票的档面。
+- `TestPanelHostRealWindowHopAndLifecycle`＋上面那枚百分位：红在**预算**那一支 ⇒ 归口⛔ 定（见 ②）。
+- `internal/risk` 那 12 枚（A/List 表判定与 under-profile fallback 族）⇒ 仍按票面边界段留在台账 `A817`，先例＝票 115，⛔ 塞进本票。
+- ⇒ 本票⛔ 改 `-done`（`AC#1`／`AC#2`／`AC#3`／`AC#4` 四枚 `- [ ]` 一枚没做完；先例＝票 62 那族"已收口而仍有未勾框"的教训，本票连收口动作都⛔ 触发）。
+- ⚠ 一处台面口径要写进后续派单：本票 §① 的基线表用的是 10-06 那发（`cc315261`）与 10-10 改前那发（`cf46c24a`）对拉；本次新增的是**第三发**（`05db4bc6`）。三发同档同版本（逐字 `Image: windows-2025-vs2026`／`Version: 20260925.250.1`／agent `2.337.0`）⇒ "镜像漂"那一支在这三发之间⛔ 有依据。★而我 18:0x 在 `r7-ci-before-red-roster.txt` 里写的"`ImageVersion` 那把尺⛔ 命中"＝**我那把 grep 找的是 API 字段名，而日志里那行叫 `Version:`**，⛔ 是"盘上没这行"。**记我。**
+
+- Progress log：
+  - [2026-10-10 19:1x +0800] agent=编排者 did=取 CI 改后那一发（run `38045508579`／job `114194107792`／headSha `05db4bc6`）⇒ **§⑥ 前置条件 (ii) 判死**：托管 runner 上拿到了页面原话 `REPLIED,REPLIED,REPLIED`（`:825` 逐字）⇒ **甲／乙都⛔ 落**、`AC#1` **继续按住**且⛔ 翻框（本票⛔ 有可落的形，⛔ 是"做完了"）；★票面 `:11` 那句"1 枚基线红→改后 SKIP"这一发**又翻回去**（`TestPanelHostLatencyPercentilesAC2` 具名 SKIP→`--- FAIL`，逐字 `cold P95 2747.460 ms … exceeds the D32 panel cold budget 1500 ms`）＝回执接上的**次生色**，⛔ 本票射程、⛔ 新坏（基线发同枚 `--- FAIL (0.00s)`），归口交下一程；⚠ 四数尺 `FAIL=8↔8` 与名册作差⛔ 同物（同一枚坑本票第二次踩到，我按 `:11` 原句口径写清）；残差清单三条各自归口（票 305／预算归口未定／`internal/risk` 12 枚留 `A817`）；★`r7` 里我那格"ImageVersion ⛔ 命中"改正是**我的 grep 找错载体**（日志那行叫 `Version:`），定式并回＝换载体取读数先现量字面写法；本票⛔ 改 `-done`；next=票 303 `303-v1`（含本件 ② 那枚归口的必答题）→ `305-a1`

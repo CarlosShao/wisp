@@ -23,7 +23,7 @@
 - [x] **`AC#2` 机制层（三形分开答，⛔ 合一格）**：**(甲) 页面 JS 压根⛔ 跑**／**(乙) JS 跑了但绑定名⛔ 接上**（`wispDispatch` 那枚注入名）／**(丙) 钩子接上了但门被再入帽挡住**。每形必答两问：① **能把这一形与另两形分开的读数长什么样**（现量给得出就给，给不出就具名写"缺哪枚读数＋谁来取"）；② 本票字节到不到得了那一步（`302-a1` 已判：这三形在现有 CI 字节里**分⛔ 开**，`-1.000` 与"零回执"**同时出现**）。⚠ 判"产品路径也断"必须⛔ 依赖这三形里任何一形的**假设**，要一发真机或一条真调用链读数。
 - [ ] **`AC#3` 修复（只在 `AC#1`/`AC#2` 交完之后开工）**：**硬约束四条**——① ⛔ 放宽任何断言：`no report … within 15s (what DID arrive at the door: nothing at all)` 那三句判据本体一字⛔ 动；② ⛔ 把 `t.Fatalf` 换成 `t.Skip`、⛔ 造 `--- SKIP`（`tools/d22scan/runtests.sh:98`→`:102` 把任何 `^--- SKIP` 判红，那是**故意的**）；③ ⛔ 动 SLO 阈值／`thresholds.go`／D32 那一面（`TestPanelHostRealWindowHopAndLifecycle` 基线红在**预算**那一支属 SLO，⛔ 用"改预算"换绿）；④ 产码改动落在**门**那一侧（`cmd/wisp/**` 宿主传输边），⛔ 顺手改档／tag／ledger（那是票 302 的射程，本票⛔ 动 `scripts/portable-tests.sh`）。凭据＝成对两发＋三枚本机色（修后 `TestAC13`／两枚 `TestAC14*` 全绿）。
 - [ ] **`AC#4` 门禁与越界**：`go vet ./cmd/wisp/` rc=0；`go vet -tags winlive ./cmd/wisp/ ./internal/ball/` rc=0；`sh scripts/d22scan.sh` rc=0；`gofmt -l cmd/wisp` 与 HEAD blob 那把**并排两把**都要报（先例＝票 298：加严残留具名、⛔ 顺手修）；`cmd/wisp` 整包改前／改后各两发取交集 ⇒ **新增红 0 枚**（⚠ 本机整包要铺 sherpa `PATH`，缺 DLL 是 `0xc0000135` 且**无 `--- FAIL`**＝用例根本没跑）；`git show --name-only --format=` **逐笔**名册＋与授权名册差集（⛔ 区间尺）；每把门禁件自落一行 `rc=N`（⛔ 0 字节＝那格没交）；⛔ 零 push、commit 必带显式 pathspec 且写在 `$( … )` **之外**。
-- [ ] **`AC#5` 交回后由编排者办的两件**（⛔ 腿做）：① 票 302 的甲／乙裁语按 `AC#1` 结论回填（若"这一跳在本机都断"⇒ 修完就该回绿 ⇒ **甲／乙都⛔ 落**）；② 本票那一发 CI 色（修后推送产生的 `test-windows` 四数与红名册）。
+- [x] **`AC#5` 交回后由编排者办的两件**（⛔ 腿做）：① 票 302 的甲／乙裁语按 `AC#1` 结论回填（若"这一跳在本机都断"⇒ 修完就该回绿 ⇒ **甲／乙都⛔ 落**）；② 本票那一发 CI 色（修后推送产生的 `test-windows` 四数与红名册）。
 
 ## 边界（⛔ 本票射程，混进来＝顺手改错那半）
 
@@ -116,3 +116,45 @@ next=`303-a1`（`AC#0`＋`AC#1`：复现钉死＋仓外 bisect 到一笔）→ �
 - **现态＝3 勾／3 未勾**（`AC#0`／`AC#1`／`AC#2` 勾；`AC#3`／`AC#4`／`AC#5` 未勾），⛔ 改 `-done`。next＝推送取 CI 色 → `303-v1`（非实现者一次裁 `AC#3`：ⓐ 有⛔ 变松／ⓑ 有⛔ 扩权限／ⓒ 更正后的目标闭不闭合 ＋ 裁 `AC#4` 欠的那一发 ＋ 裁甲那枚欠读）→ `305-a1`。
 - Progress log：
   - [2026-10-10 18:3x +0800] agent=编排者 did=收 `303-r1`（两笔，件 `probes/303/r1/**`，越界 0）⇒ 翻 `AC#2`、⛔ 翻 `AC#3`／`AC#4`／`AC#5`（★`AC#3` 那格我⛔ 按"更正后的目标"自盖章，交 `303-v1` 一次裁ⓐⓑⓒ）；★**销我自己票面那句"修后三枚全绿"**（clone 里回归之前那发拿到逐字同一句红 ⇒ nail2⛔ 是本票那一笔造成的）；★还腿具名欠的那格（clone 成对两发：268/17/3 ↔ 270/16/2，被修好 2 枚／逐名新增红 1 枚）；★那 1 枚新增红我用**交替换头**隔离发判成⛔ 归因给修复（同一枚二进制 47 秒内 5 绿→3 红；两枚 SHA 都出过两色），⛔ 顺手盖"新增红 0"；⚠ 另立缺口＝真窗焦点类判据本机 13 发 5 绿／8 红；★腿的门禁件 `31-` 末尾⛔ 落 `rc=N` 那行，记档⛔ 顺手修；next=推送（`A813`）→ `303-v1` → `305-a1`
+
+## 编排者收 CI 改后那一发（2026-10-10 19:1x，件 `probes/303/orch/r9-ci-after-red-roster.txt`）⇒ **翻 `AC#5`**（两件都有盘上凭据了），`AC#3`／`AC#4` ⛔ 碰
+
+### 0. 这一格原文要的两件，逐件答
+
+- **② 本票那一发 CI 色**＝已取。改前发＝run `38043392486`／job `test-windows` `114187968428`／headSha `cf46c24a`（＝修复的**父发**）；改后发＝run `38045508579`／job `test-windows` `114194107792`／headSha `05db4bc6`。改后那发六枚 job 结论逐字（尺＝`gh run view --json jobs --jq`）＝`lint-frontend`=success／`slo-full`=success／`slo-smoke`=success／`test-windows`=failure／`lint`=failure／`test-core`=failure。
+- **① 票 302 的甲／乙回填**＝**甲／乙都⛔ 落**，凭据从两枚来：本票 `AC#1` 已证"这一跳在**本机**都断"（⇒ 修完就该回绿，⛔ 是环境差），而这枚 CI 对拉把它**反过来**也证了——修复那一发在**托管 runner** 上拿到了页面自己的话（逐字：`AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)`，`cmd/wisp/panel_resident_windows_test.go:825`）。票 302 票面那句"那台机器永远给不出回执"⛔ 成立 ⇒ 搬档（甲）／进 `-skip` ledger（乙）都⛔ 落；丙那一支剩下的射程只是"仍红的哪几枚、各归哪一票"，按下面第 3 节那份清单办。
+
+### 1. 逐名作差（尺＝两份 `--- FAIL:` 顶层名 `sort -u` 后 `comm`，⛔ 比枚数；件＝`r9-ci-after-red-roster.txt`）
+
+- 改前 20 枚／改后 20 枚 ⇒ **仍红 19 枚（逐字同名）／被修好 1 枚／新增 1 枚**。
+- **FIXED**＝`TestAC14AwaitedBindingReplyReachesThePage`：改前 `--- FAIL (20.02s)`＋逐字 `panel_resident_windows_test.go:821: no report "ac14r-0" from the page within 15s (what DID arrive at the door: nothing at all)` ⇒ 改后 `--- PASS (0.30s)`＋上面那句页面原话。**判据是页面自己报回的**，⛔ 是 Go 侧自说自话（票 33 `A502` 形）。
+- **NEW**＝`TestPanelHostLatencyPercentilesAC2`：改前 `--- SKIP (0.00s)`（`:985` 逐字 `no cold/hot sample recorded in this process … Named skip - an empty aggregate is not a green latency gate`）⇒ 改后 `--- FAIL (0.00s)`（`:1005` 逐字 `cold P95 2747.460 ms over 1 runs exceeds the D32 panel cold budget 1500 ms …`）。
+- ⚠ **四数那把尺⛔ 能佐证"没变化"**：`cmd/wisp` 档逐字 `RUN=398 PASS=278 FAIL=8 SKIP=2` → `RUN=398 PASS=279 FAIL=8 SKIP=1`——`FAIL` 枚数**同数**而名集合作了差（＋1／−1），两把尺⛔ 同物（先例＝票 302 `:11` 那句同款坑）。
+
+### 2. 本票边界段授权的那一枚"形状迁移"，CI 上如实拿到了（⛔ 更多）
+
+- `TestPanelHostRealWindowHopAndLifecycle` 颜色**没变**（两发皆红），变的是形：改前 `:660` 逐字 `cold bring-up measured on this box: -1.000 ms`＋`:662` `did not produce a browser round trip (got -1.000); the message channel did not come up on the real window` ⇒ 改后 `:660` 逐字 `cold bring-up measured on this box: 2747.460 ms (HEAD 05db4bc at read time, 2026-10-10T10:41:20Z)`＋`:665` `cold bring-up 2747.5 ms exceeds D32 panel cold budget 1500 ms`。
+- ⇒ 从**回执为零**移回**红于预算**，＝票面边界段写死允许的那一支，且⛔ 越界：⛔ 动 SLO 阈值／`thresholds.go`／D32 的 1500 那一枚数（一字未动，本程零产码）。
+- ★⛔ 把这枚红读成"本票修复造成的退步"：票 302 现量补充节那张表里，**回归之前**的基线发（`cc315261`，10-06）同一枚就是红于预算（逐字 `cold bring-up 2889.2 ms exceeds D32 panel cold budget 1500 ms`）⇒ 2747.460 那一形是**旧形的回来**，⛔ 新坏。
+- ⚠ 那枚 SKIP→FAIL 是上面这枚迁移的**次生色**（SKIP 的前提"本二进制里没有冷启样本"随修复消失，判据才开始求值）。它该归哪一票＝**⛔ 我裁**（本票只授权"移回红于预算"这一迁移，⛔ 顺手把预算面收进本票）；具名交 `303-v1`／票 302 的归口那格。
+
+### 3. 票 305 那两枚症状在托管 runner 上一比一复现（换形而⛔ 换因）＝票 305 的台面⛔ 限于本机
+
+- `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`：改前 `:325` 逐字 `no report "ac13-probe" … nothing at all`（`20.01s`）⇒ 改后 `:327` 逐字 `AC#13 page answer (head 05db4bc): "0" - 0 of 1 probe id(s) present in the live document`＋`:330` `… the round-trip probe page is the last document shown, so the user sees a stub instead of the panel.`（`0.62s`，同发逐字 `wisp: panel window is up (test-harness, cold 470.2 ms, hot path 0.0 ms)`）
+- `TestAC14GoSideEvalPushReachesThePage`：改前 `:866` 逐字 `no report "ac14-push" … nothing at all`（`20.02s`）⇒ 改后 `:867` 逐字 `AC#14 nail 2 (Eval push hop), page's own words: title=""`＋`:869` `Go's Eval push did not reach the document … This is the push dimension, separate from the awaited-reply dimension …`（`0.37s`）
+- ⇒ 与我本机 clone 台件拿到的是**同一句逐字**（件 `r5-r6-orch-pair-verdict.txt`／`52-restore-analysis-and-topback.md` 那两枚形状）。⚠ 一处台面差要具名：改前两枚各走满 15s 超时（20.01s／20.02s），改后 0.62s／0.37s——时长差本身是"回执到了而内容不对"的证据，⛔ 当分母用。**派票 305 的腿时必须把这两条逐字带进派单。**
+
+### 4. ★台面那格：`r7` 里我具名欠的那枚读数，这次取到了，而⛔ 取不到是我那把尺写坏的
+
+两发同一 job 的 `Set up job` 段逐字：`Image: windows-2025-vs2026`／`Version: 20260925.250.1`／`Current runner version: '2.337.0'` ⇒ **同档同版本**，"镜像漂"那一支在这枚对拉里⛔ 有依据。
+`r7-ci-before-red-roster.txt` 里我写的"`ImageVersion` 这一把尺⛔ 命中"＝**我的尺的缺陷**：我在日志里找的是 GitHub API 的字段名 `ImageVersion`，而日志里那行写在 `##[group]Runner Image` 下面、叫 `Version:`。**记我**；定式并回＝**同一枚事实在两种载体上名字⛔ 相同（API 字段 ↔ 步日志文本），换载体取读数要先现量那一行的字面写法，⛔ 把"我这把 grep 没命中"写成"盘上没这行"**。
+
+### 5. 翻勾与现态
+
+- **`AC#5` ✔**：本格文本自己写死了"⛔ 腿做、交回后由编排者办的两件"⇒ 两件都办了且各带盘上凭据（①＝票 302 现量补充节＋本件第 0 节那条页面原话；②＝本件第 1 节）。⛔ 实现者＝我（修复那一笔的作者是 `303-r1`），⛔ 角色撞。
+- **`AC#3` ⛔ 动**：仍交 `303-v1` 三道必答（ⓐ 有⛔ 变松／ⓑ 有⛔ 扩权限／ⓒ 按更正形状本格闭不闭合）。CI 那一发的逐字红句**正是**ⓐⓑ 要的对照料，已写进派单。
+- **`AC#4` ⛔ 动**：票面要"整包改前／改后**各两发**取交集"，欠的那一发仍然欠（我这程做的是 CI 档的另一把尺，⛔ 用换尺去补主尺的缺，先例＝我上一条定式）。
+- **现态＝4 勾／2 未勾**（勾＝`AC#0`／`AC#1`／`AC#2`／`AC#5`；未勾＝`AC#3`／`AC#4`），⛔ 改 `-done`。
+- next＝**`303-v1`**（非实现者，锚 `9cef4589` 之后我这一笔）一次裁 `AC#3` 三道＋`AC#4` 欠的那一发＋甲那枚门外 `Eval` 欠读 → **`305-a1`**（票 305 落点只读，带上面第 3 节两条逐字）→ 票 302 的归口那格（含本件第 2 节那枚次生色）。
+- Progress log：
+  - [2026-10-10 19:1x +0800] agent=编排者 did=取 CI 改后那一发并与 `r7` 改前名册逐名作差 ⇒ **翻 `AC#5`**（① 票 302 甲／乙**都⛔ 落**，凭据＝托管 runner 上页面原话 `REPLIED,REPLIED,REPLIED`；② 四数＋名册作差已交，件 `r9-ci-after-red-roster.txt`）；★FIXED 1 枚（nail1，红句 `nothing at all`→页面原话）／NEW 1 枚（`TestPanelHostLatencyPercentilesAC2` 由具名 SKIP 走进 FAIL，`cold P95 2747.460 ms` 超 D32 的 1500）／仍红 19 枚逐字同名；★本票边界授权的那枚"回执为零→红于预算"迁移**如实出现**且⛔ 是新坏（基线发同枚逐字 2889.2 ms 同形），⛔ 动预算；★票 305 两枚症状在 CI 一比一复现（逐字已在件里）⇒ 票 305 台面⛔ 限本机；⚠ 四数尺 `FAIL=8↔8` 与名册作差⛔ 同物；★销掉 `r7` 里我那格"ImageVersion ⛔ 命中"＝**我那把 grep 找的是 API 字段名而日志那行叫 `Version:`**（两发同 `20260925.250.1`，镜像漂那一支⛔ 成立），定式并回＝换载体取读数先现量那一行字面写法；`AC#3`／`AC#4` ⛔ 碰；next=`303-v1` → `305-a1`

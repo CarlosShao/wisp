@@ -1,0 +1,634 @@
+# 编排者复验 300-r2（AC#6 的 C2 形）
+captured_local=2026-10-10 19:22:23 +0800
+HEAD_sha=9cef4589b8ce5f02af290a878346812295e48bd4
+exported_tree=/tmp/300r2-verify-20261010-192222/repo
+artifact=.scratch/wisp/probes/300/orch/logs/r1-verify-300r2-20261010-192222.txt
+
+## 0. 起手尺：工作树⛔ 动过（导出树＝HEAD 对象层，与盘上脏无关）
+porcelain_lines=0
+
+## 1. 导出 HEAD 到仓外树
+archive_rc=0
+testfile_present=yes
+top_level_cases_in_pkg=43
+declare_line_before=98:	waveFormatFloat = 3
+
+## 2. 导出树里那枚用例与 HEAD blob 逐字节同（cmp）
+cmp_head_blob=IDENTICAL
+
+## 3. 门① go vet ./internal/audio/
+rc_vet=0
+
+## 4. 门② 定向用例 pristine
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word
+    wave_format_float_300_windows_test.go:194: waveFormatFloat observed 0x0003 against test-carried 0x0003; waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as int16; at 1 it would fire for PCM mix formats and never for float ones, at 0 for nothing at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag
+    wave_format_float_300_windows_test.go:194: waveFormatExt observed 0xfffe against test-carried 0xfffe; waveFormatExt is the tag parseWaveFormat tests before it expands SubFormat; off 0xFFFE every extensible mix format keeps 0xFFFE as its tag and never resolves to a subtype at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag
+    wave_format_float_300_windows_test.go:194: waveFormatPCM observed 0x0001 against test-carried 0x0001; waveFormatPCM is declared and unused in this package (300-a2 F2, zero uses), so before this case no ruler of any kind read it; this cell pins its value and does NOT delete it -- deleting an unused declaration is a different cell under a different authorization
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded
+--- PASS: TestWaveFormatConstantsMatchMmregAuthority300 (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.073s
+rc_targeted_pristine=0
+
+## 5. 门③ 编排者补跑那一枚：GOFLAGS= go build ./...（腿⛔ 跑、我 17:5x 派单漏列，本程我销账）
+rc_build=0
+
+## 6. 突变一发：waveFormatFloat 3 -> 1
+declare_line_mutated=98:	waveFormatFloat = 1
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word
+    wave_format_float_300_windows_test.go:191: waveFormatFloat = 0x0001, want 0x0003; mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT 0x0003, copied out of the SDK header, not derived from this package. waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as int16; at 1 it would fire for PCM mix formats and never for float ones, at 0 for nothing at all
+    wave_format_float_300_windows_test.go:194: waveFormatFloat observed 0x0001 against test-carried 0x0003; waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as int16; at 1 it would fire for PCM mix formats and never for float ones, at 0 for nothing at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag
+    wave_format_float_300_windows_test.go:194: waveFormatExt observed 0xfffe against test-carried 0xfffe; waveFormatExt is the tag parseWaveFormat tests before it expands SubFormat; off 0xFFFE every extensible mix format keeps 0xFFFE as its tag and never resolves to a subtype at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag
+    wave_format_float_300_windows_test.go:194: waveFormatPCM observed 0x0001 against test-carried 0x0001; waveFormatPCM is declared and unused in this package (300-a2 F2, zero uses), so before this case no ruler of any kind read it; this cell pins its value and does NOT delete it -- deleting an unused declaration is a different cell under a different authorization
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table
+    wave_format_float_300_windows_test.go:214: waveFormatPCM and waveFormatFloat both = 0x0001, but mmreg.h gives WAVE_FORMAT_PCM 1, WAVE_FORMAT_IEEE_FLOAT 0x0003 and WAVE_FORMAT_EXTENSIBLE 0xFFFE as three distinct values, so one of those two constants has moved off the value copied from mmreg.h:2418/2110/2376
+    wave_format_float_300_windows_test.go:229: waveFormatFloat = 0x0001, but mmreg.h reserves 0x0001 for WAVE_FORMAT_PCM (mmreg.h:2418), which this package declares as waveFormatPCM; the constant names and the authority values no longer map one to one
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded
+--- FAIL: TestWaveFormatConstantsMatchMmregAuthority300 (0.00s)
+    --- FAIL: TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag (0.00s)
+    --- FAIL: TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.042s
+FAIL
+rc_mut_3to1=1
+restore_after_3to1=IDENTICAL
+
+## 7. 突变二发：waveFormatFloat 3 -> 0
+declare_line_mutated=98:	waveFormatFloat = 0
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word
+    wave_format_float_300_windows_test.go:191: waveFormatFloat = 0x0000, want 0x0003; mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT 0x0003, copied out of the SDK header, not derived from this package. waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as int16; at 1 it would fire for PCM mix formats and never for float ones, at 0 for nothing at all
+    wave_format_float_300_windows_test.go:194: waveFormatFloat observed 0x0000 against test-carried 0x0003; waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as int16; at 1 it would fire for PCM mix formats and never for float ones, at 0 for nothing at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag
+    wave_format_float_300_windows_test.go:194: waveFormatExt observed 0xfffe against test-carried 0xfffe; waveFormatExt is the tag parseWaveFormat tests before it expands SubFormat; off 0xFFFE every extensible mix format keeps 0xFFFE as its tag and never resolves to a subtype at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag
+    wave_format_float_300_windows_test.go:194: waveFormatPCM observed 0x0001 against test-carried 0x0001; waveFormatPCM is declared and unused in this package (300-a2 F2, zero uses), so before this case no ruler of any kind read it; this cell pins its value and does NOT delete it -- deleting an unused declaration is a different cell under a different authorization
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table
+    wave_format_float_300_windows_test.go:235: waveFormatFloat = 0x0000, which is none of WAVE_FORMAT_PCM 1, WAVE_FORMAT_IEEE_FLOAT 0x0003 or WAVE_FORMAT_EXTENSIBLE 0xFFFE as copied from mmreg.h:2418/2110/2376
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded
+--- FAIL: TestWaveFormatConstantsMatchMmregAuthority300 (0.00s)
+    --- FAIL: TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag (0.00s)
+    --- FAIL: TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.050s
+FAIL
+rc_mut_3to0=1
+restore_after_3to0=IDENTICAL
+
+## 8. 还原后再跑一发 pristine（成对两发的'绿'腿）
+ok  	github.com/CarlosShao/wisp/internal/audio	0.044s
+rc_restored=0
+
+## 9. internal/audio 整包两发红名册（同一把尺：两发都带 -v；改前＝把那枚新用例从导出树里挪走）
+=== RUN   TestAC247RealCaptureLoopEmitsLevels
+--- PASS: TestAC247RealCaptureLoopEmitsLevels (0.30s)
+=== RUN   TestAC247LevelSinkGetsOneScalarPerSeamFrame
+--- PASS: TestAC247LevelSinkGetsOneScalarPerSeamFrame (0.01s)
+=== RUN   TestAC247LevelSinkRunsEvenWithNoFrameConsumer
+time=2026-10-10T19:23:09.204+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wav-injector dropped_frames_total=1 dropped_bytes_total=1024 bounded_window=192ms frame_ms=32
+--- PASS: TestAC247LevelSinkRunsEvenWithNoFrameConsumer (0.09s)
+=== RUN   TestAC247CaptureRegistryReplacesTheDefault
+--- PASS: TestAC247CaptureRegistryReplacesTheDefault (0.00s)
+=== RUN   TestAC247CaptureConfigDefaultsKeepTheOldShape
+time=2026-10-10T19:23:09.279+08:00 level=ERROR msg="audio level: seam frame rejected, no level emitted" err="audio level: frame is 1022 bytes, the C8 seam guarantees 1024 (FrameSamples 512 int16 samples)"
+--- PASS: TestAC247CaptureConfigDefaultsKeepTheOldShape (0.00s)
+=== RUN   TestGateHalfDuplexClosedZeroFrames
+--- PASS: TestGateHalfDuplexClosedZeroFrames (0.65s)
+=== RUN   TestGatePathCFullDuplex
+--- PASS: TestGatePathCFullDuplex (0.11s)
+=== RUN   TestGateMutedEvents
+--- PASS: TestGateMutedEvents (0.89s)
+=== RUN   TestGateStartMuted
+--- PASS: TestGateStartMuted (0.45s)
+=== RUN   TestGateStopIdempotent
+--- PASS: TestGateStopIdempotent (0.01s)
+=== RUN   TestHotplugReenumerateOnce
+time=2026-10-10T19:23:11.470+08:00 level=INFO msg="audio capture reopened after device change" source=wasapi-mic device="Fake Mic B"
+time=2026-10-10T19:23:11.574+08:00 level=INFO msg="audio capture reopened after device change" source=wasapi-mic device="Fake Mic B"
+--- PASS: TestHotplugReenumerateOnce (0.27s)
+=== RUN   TestHotplugStaleHandleFailsLoudly
+time=2026-10-10T19:23:11.743+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: hotplug reopen failed; keeping no stale handle (previous device Dying Mic): audio_device: Open capture on device Dying Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+--- PASS: TestHotplugStaleHandleFailsLoudly (0.40s)
+=== RUN   TestHotplugReenumerateFailureNamesDevice
+time=2026-10-10T19:23:12.115+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: hotplug reopen failed; keeping no stale handle (previous device Unplugged Mic): audio_device: capture device enumeration failed: audio_device: no capture endpoint present"
+--- PASS: TestHotplugReenumerateFailureNamesDevice (0.06s)
+=== RUN   TestOpenOccupiedAndPermissionDenied
+=== RUN   TestOpenOccupiedAndPermissionDenied/occupied_(exclusive_mode)
+time=2026-10-10T19:23:12.116+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: Initialize(shared mode) on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+=== RUN   TestOpenOccupiedAndPermissionDenied/permission_denied
+time=2026-10-10T19:23:12.116+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: Initialize(shared mode) on device Busy Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+--- PASS: TestOpenOccupiedAndPermissionDenied (0.00s)
+    --- PASS: TestOpenOccupiedAndPermissionDenied/occupied_(exclusive_mode) (0.00s)
+    --- PASS: TestOpenOccupiedAndPermissionDenied/permission_denied (0.00s)
+=== RUN   TestEndpointsPairQueryable
+--- PASS: TestEndpointsPairQueryable (0.00s)
+=== RUN   TestPinnedThreadStable10s
+time=2026-10-10T19:23:13.672+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=1 dropped_bytes_total=1024 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:14.676+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=12 dropped_bytes_total=12288 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:15.722+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=23 dropped_bytes_total=23552 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:16.805+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=35 dropped_bytes_total=35840 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:17.852+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=46 dropped_bytes_total=47104 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:18.876+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=57 dropped_bytes_total=58368 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:19.995+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=68 dropped_bytes_total=69632 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:20.998+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=79 dropped_bytes_total=80896 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:22.098+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=90 dropped_bytes_total=92160 bounded_window=192ms frame_ms=32
+--- PASS: TestPinnedThreadStable10s (10.02s)
+=== RUN   TestLiveWasapiSmoke
+    hotplug_test.go:527: live WASAPI smoke requires WISP_LIVE_MIC=1 and a real microphone (真机冒烟待票 16)
+--- SKIP: TestLiveWasapiSmoke (0.00s)
+=== RUN   TestCaptureLoopWavIntegrity
+--- PASS: TestCaptureLoopWavIntegrity (1.07s)
+=== RUN   TestLevelSilentFrameIsExactZero
+--- PASS: TestLevelSilentFrameIsExactZero (0.00s)
+=== RUN   TestLevelFullScaleSquareEndpoints
+--- PASS: TestLevelFullScaleSquareEndpoints (0.00s)
+=== RUN   TestLevelSineAgainstRootTwo
+--- PASS: TestLevelSineAgainstRootTwo (0.00s)
+=== RUN   TestLevelIsLinearInAmplitude
+--- PASS: TestLevelIsLinearInAmplitude (0.00s)
+=== RUN   TestLevelSineToleranceIsNamedAndBounded
+--- PASS: TestLevelSineToleranceIsNamedAndBounded (0.00s)
+=== RUN   TestLevelSameInputSameBits
+--- PASS: TestLevelSameInputSameBits (0.00s)
+=== RUN   TestFrameLevelRejectsNonSeamFrames
+--- PASS: TestFrameLevelRejectsNonSeamFrames (0.00s)
+=== RUN   TestSeamCodecRoundTrip
+--- PASS: TestSeamCodecRoundTrip (0.00s)
+=== RUN   TestLevelOverBoundedChannelFromWavInjector
+--- PASS: TestLevelOverBoundedChannelFromWavInjector (0.10s)
+=== RUN   TestLevelFrameIsOneSeamFrame
+--- PASS: TestLevelFrameIsOneSeamFrame (0.00s)
+=== RUN   TestParseWaveFormatSubFormatOffset300
+=== RUN   TestParseWaveFormatSubFormatOffset300/S1_float_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26
+--- PASS: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+=== RUN   TestResample48kTo16kLengthExact
+--- PASS: TestResample48kTo16kLengthExact (0.00s)
+=== RUN   TestResamplerSineSNR48k
+--- PASS: TestResamplerSineSNR48k (0.00s)
+=== RUN   TestResamplerSineSNR44k1
+--- PASS: TestResamplerSineSNR44k1 (0.00s)
+=== RUN   TestResamplerChunkInvariant
+--- PASS: TestResamplerChunkInvariant (0.00s)
+=== RUN   TestResamplerLatencyBounded
+--- PASS: TestResamplerLatencyBounded (0.00s)
+=== RUN   TestResamplerPassthroughAndFlush
+--- PASS: TestResamplerPassthroughAndFlush (0.00s)
+=== RUN   TestMonoDownmixAndFloatConvert
+--- PASS: TestMonoDownmixAndFloatConvert (0.00s)
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word
+    wave_format_float_300_windows_test.go:194: waveFormatFloat observed 0x0003 against test-carried 0x0003; waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as int16; at 1 it would fire for PCM mix formats and never for float ones, at 0 for nothing at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag
+    wave_format_float_300_windows_test.go:194: waveFormatExt observed 0xfffe against test-carried 0xfffe; waveFormatExt is the tag parseWaveFormat tests before it expands SubFormat; off 0xFFFE every extensible mix format keeps 0xFFFE as its tag and never resolves to a subtype at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag
+    wave_format_float_300_windows_test.go:194: waveFormatPCM observed 0x0001 against test-carried 0x0001; waveFormatPCM is declared and unused in this package (300-a2 F2, zero uses), so before this case no ruler of any kind read it; this cell pins its value and does NOT delete it -- deleting an unused declaration is a different cell under a different authorization
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded
+--- PASS: TestWaveFormatConstantsMatchMmregAuthority300 (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded (0.00s)
+=== RUN   TestWavInjectorFrameExact
+--- PASS: TestWavInjectorFrameExact (0.10s)
+=== RUN   TestWavInjectorRateConversion
+--- PASS: TestWavInjectorRateConversion (0.01s)
+=== RUN   TestWavInjectorBackpressureDropCounted
+--- PASS: TestWavInjectorBackpressureDropCounted (1.24s)
+=== RUN   TestWavInjectorCtxCancel
+--- PASS: TestWavInjectorCtxCancel (0.16s)
+=== RUN   TestWavInjectorBadFile
+--- PASS: TestWavInjectorBadFile (0.01s)
+=== RUN   TestBoundedWindowInvariants
+--- PASS: TestBoundedWindowInvariants (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	16.033s
+rc_pkg_after=0
+moved_aside=removed-300r2-test.go
+=== RUN   TestAC247RealCaptureLoopEmitsLevels
+--- PASS: TestAC247RealCaptureLoopEmitsLevels (0.29s)
+=== RUN   TestAC247LevelSinkGetsOneScalarPerSeamFrame
+--- PASS: TestAC247LevelSinkGetsOneScalarPerSeamFrame (0.01s)
+=== RUN   TestAC247LevelSinkRunsEvenWithNoFrameConsumer
+time=2026-10-10T19:23:27.569+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wav-injector dropped_frames_total=1 dropped_bytes_total=1024 bounded_window=192ms frame_ms=32
+--- PASS: TestAC247LevelSinkRunsEvenWithNoFrameConsumer (0.09s)
+=== RUN   TestAC247CaptureRegistryReplacesTheDefault
+--- PASS: TestAC247CaptureRegistryReplacesTheDefault (0.00s)
+=== RUN   TestAC247CaptureConfigDefaultsKeepTheOldShape
+time=2026-10-10T19:23:27.643+08:00 level=ERROR msg="audio level: seam frame rejected, no level emitted" err="audio level: frame is 1022 bytes, the C8 seam guarantees 1024 (FrameSamples 512 int16 samples)"
+--- PASS: TestAC247CaptureConfigDefaultsKeepTheOldShape (0.00s)
+=== RUN   TestGateHalfDuplexClosedZeroFrames
+--- PASS: TestGateHalfDuplexClosedZeroFrames (0.65s)
+=== RUN   TestGatePathCFullDuplex
+--- PASS: TestGatePathCFullDuplex (0.11s)
+=== RUN   TestGateMutedEvents
+--- PASS: TestGateMutedEvents (0.88s)
+=== RUN   TestGateStartMuted
+--- PASS: TestGateStartMuted (0.44s)
+=== RUN   TestGateStopIdempotent
+--- PASS: TestGateStopIdempotent (0.01s)
+=== RUN   TestHotplugReenumerateOnce
+time=2026-10-10T19:23:29.816+08:00 level=INFO msg="audio capture reopened after device change" source=wasapi-mic device="Fake Mic B"
+time=2026-10-10T19:23:29.919+08:00 level=INFO msg="audio capture reopened after device change" source=wasapi-mic device="Fake Mic B"
+--- PASS: TestHotplugReenumerateOnce (0.27s)
+=== RUN   TestHotplugStaleHandleFailsLoudly
+time=2026-10-10T19:23:30.084+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: hotplug reopen failed; keeping no stale handle (previous device Dying Mic): audio_device: Open capture on device Dying Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+--- PASS: TestHotplugStaleHandleFailsLoudly (0.39s)
+=== RUN   TestHotplugReenumerateFailureNamesDevice
+time=2026-10-10T19:23:30.458+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: hotplug reopen failed; keeping no stale handle (previous device Unplugged Mic): audio_device: capture device enumeration failed: audio_device: no capture endpoint present"
+--- PASS: TestHotplugReenumerateFailureNamesDevice (0.07s)
+=== RUN   TestOpenOccupiedAndPermissionDenied
+=== RUN   TestOpenOccupiedAndPermissionDenied/occupied_(exclusive_mode)
+time=2026-10-10T19:23:30.469+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: Initialize(shared mode) on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+=== RUN   TestOpenOccupiedAndPermissionDenied/permission_denied
+time=2026-10-10T19:23:30.469+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: Initialize(shared mode) on device Busy Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+--- PASS: TestOpenOccupiedAndPermissionDenied (0.00s)
+    --- PASS: TestOpenOccupiedAndPermissionDenied/occupied_(exclusive_mode) (0.00s)
+    --- PASS: TestOpenOccupiedAndPermissionDenied/permission_denied (0.00s)
+=== RUN   TestEndpointsPairQueryable
+--- PASS: TestEndpointsPairQueryable (0.00s)
+=== RUN   TestPinnedThreadStable10s
+time=2026-10-10T19:23:31.980+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=1 dropped_bytes_total=1024 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:33.035+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=12 dropped_bytes_total=12288 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:34.081+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=23 dropped_bytes_total=23552 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:35.106+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=34 dropped_bytes_total=34816 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:36.152+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=45 dropped_bytes_total=46080 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:37.235+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=57 dropped_bytes_total=58368 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:38.278+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=68 dropped_bytes_total=69632 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:39.327+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=79 dropped_bytes_total=80896 bounded_window=192ms frame_ms=32
+time=2026-10-10T19:23:40.362+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=90 dropped_bytes_total=92160 bounded_window=192ms frame_ms=32
+--- PASS: TestPinnedThreadStable10s (10.06s)
+=== RUN   TestLiveWasapiSmoke
+    hotplug_test.go:527: live WASAPI smoke requires WISP_LIVE_MIC=1 and a real microphone (真机冒烟待票 16)
+--- SKIP: TestLiveWasapiSmoke (0.00s)
+=== RUN   TestCaptureLoopWavIntegrity
+--- PASS: TestCaptureLoopWavIntegrity (1.09s)
+=== RUN   TestLevelSilentFrameIsExactZero
+--- PASS: TestLevelSilentFrameIsExactZero (0.00s)
+=== RUN   TestLevelFullScaleSquareEndpoints
+--- PASS: TestLevelFullScaleSquareEndpoints (0.00s)
+=== RUN   TestLevelSineAgainstRootTwo
+--- PASS: TestLevelSineAgainstRootTwo (0.00s)
+=== RUN   TestLevelIsLinearInAmplitude
+--- PASS: TestLevelIsLinearInAmplitude (0.00s)
+=== RUN   TestLevelSineToleranceIsNamedAndBounded
+--- PASS: TestLevelSineToleranceIsNamedAndBounded (0.00s)
+=== RUN   TestLevelSameInputSameBits
+--- PASS: TestLevelSameInputSameBits (0.00s)
+=== RUN   TestFrameLevelRejectsNonSeamFrames
+--- PASS: TestFrameLevelRejectsNonSeamFrames (0.00s)
+=== RUN   TestSeamCodecRoundTrip
+--- PASS: TestSeamCodecRoundTrip (0.00s)
+=== RUN   TestLevelOverBoundedChannelFromWavInjector
+--- PASS: TestLevelOverBoundedChannelFromWavInjector (0.10s)
+=== RUN   TestLevelFrameIsOneSeamFrame
+--- PASS: TestLevelFrameIsOneSeamFrame (0.00s)
+=== RUN   TestParseWaveFormatSubFormatOffset300
+=== RUN   TestParseWaveFormatSubFormatOffset300/S1_float_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26
+--- PASS: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+=== RUN   TestResample48kTo16kLengthExact
+--- PASS: TestResample48kTo16kLengthExact (0.00s)
+=== RUN   TestResamplerSineSNR48k
+--- PASS: TestResamplerSineSNR48k (0.00s)
+=== RUN   TestResamplerSineSNR44k1
+--- PASS: TestResamplerSineSNR44k1 (0.00s)
+=== RUN   TestResamplerChunkInvariant
+--- PASS: TestResamplerChunkInvariant (0.00s)
+=== RUN   TestResamplerLatencyBounded
+--- PASS: TestResamplerLatencyBounded (0.00s)
+=== RUN   TestResamplerPassthroughAndFlush
+--- PASS: TestResamplerPassthroughAndFlush (0.00s)
+=== RUN   TestMonoDownmixAndFloatConvert
+--- PASS: TestMonoDownmixAndFloatConvert (0.00s)
+=== RUN   TestWavInjectorFrameExact
+--- PASS: TestWavInjectorFrameExact (0.10s)
+=== RUN   TestWavInjectorRateConversion
+--- PASS: TestWavInjectorRateConversion (0.01s)
+=== RUN   TestWavInjectorBackpressureDropCounted
+--- PASS: TestWavInjectorBackpressureDropCounted (1.24s)
+=== RUN   TestWavInjectorCtxCancel
+--- PASS: TestWavInjectorCtxCancel (0.16s)
+=== RUN   TestWavInjectorBadFile
+--- PASS: TestWavInjectorBadFile (0.01s)
+=== RUN   TestBoundedWindowInvariants
+--- PASS: TestBoundedWindowInvariants (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	16.058s
+rc_pkg_before=0
+names_after_lines=1
+names_before_lines=1
+new_red_or_skip_comm_minus13=0
+gone_comm_minus23=0
+before_names_verbatim:
+--- SKIP: TestLiveWasapiSmoke (0.00s)
+after_names_verbatim:
+--- SKIP: TestLiveWasapiSmoke (0.00s)
+
+pkg_before_summary=ok  	github.com/CarlosShao/wisp/internal/audio	16.058s
+pkg_after_summary=ok  	github.com/CarlosShao/wisp/internal/audio	16.033s
+
+## 10. 格式两把并排（射程目录＝internal/audio；工作树一把＋HEAD blob 一把）
+gofmt_worktree=0
+gofmt_worktree_names: 
+
+## 11. d22scan（射程＝全仓，跑在真仓里；只读）
+d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+=== RUN   TestScanDetectsAllSeededViolations
+--- PASS: TestScanDetectsAllSeededViolations (0.08s)
+=== RUN   TestScanCleanRepoIsGreen
+--- PASS: TestScanCleanRepoIsGreen (0.06s)
+=== RUN   TestAllowlistSuppressesOnlyListedPaths
+--- PASS: TestAllowlistSuppressesOnlyListedPaths (0.10s)
+=== RUN   TestCheckRootRejectsBlindRoots
+=== RUN   TestCheckRootRejectsBlindRoots/empty_dir
+=== RUN   TestCheckRootRejectsBlindRoots/go.mod_only
+=== RUN   TestCheckRootRejectsBlindRoots/the_d22scan_module_itself
+=== RUN   TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files
+--- PASS: TestCheckRootRejectsBlindRoots (0.09s)
+    --- PASS: TestCheckRootRejectsBlindRoots/empty_dir (0.00s)
+    --- PASS: TestCheckRootRejectsBlindRoots/go.mod_only (0.01s)
+    --- PASS: TestCheckRootRejectsBlindRoots/the_d22scan_module_itself (0.01s)
+    --- PASS: TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files (0.07s)
+=== RUN   TestScanAloneIsNotAFalsifier
+--- PASS: TestScanAloneIsNotAFalsifier (0.01s)
+=== RUN   TestCheckRootAcceptsRealRepo
+    scan_test.go:250: real repo production Go files in scope: 268
+--- PASS: TestCheckRootAcceptsRealRepo (0.42s)
+=== RUN   TestScannerSelfScanOfRealRepoIsGreen
+--- PASS: TestScannerSelfScanOfRealRepoIsGreen (2.72s)
+=== RUN   TestEmojiBanCoversGoSourcesNotJustDesign
+--- PASS: TestEmojiBanCoversGoSourcesNotJustDesign (0.06s)
+=== RUN   TestBan8MathBandAndRemainingGaps
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band
+=== RUN   TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band
+=== RUN   TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept
+--- PASS: TestBan8MathBandAndRemainingGaps (0.56s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c) (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c) (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c) (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c) (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept (0.05s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept (0.06s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept (0.04s)
+=== RUN   TestBan8CommentExemptionInGoSources
+=== RUN   TestBan8CommentExemptionInGoSources/line_comment
+=== RUN   TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration
+=== RUN   TestBan8CommentExemptionInGoSources/one-line_block_comment
+=== RUN   TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line
+=== RUN   TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code
+=== RUN   TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment
+=== RUN   TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment
+=== RUN   TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker
+=== RUN   TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment
+=== RUN   TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all
+--- PASS: TestBan8CommentExemptionInGoSources (0.54s)
+    --- PASS: TestBan8CommentExemptionInGoSources/line_comment (0.05s)
+    --- PASS: TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration (0.05s)
+    --- PASS: TestBan8CommentExemptionInGoSources/one-line_block_comment (0.06s)
+    --- PASS: TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line (0.06s)
+    --- PASS: TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code (0.05s)
+    --- PASS: TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment (0.05s)
+    --- PASS: TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment (0.06s)
+    --- PASS: TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker (0.06s)
+    --- PASS: TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment (0.05s)
+    --- PASS: TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all (0.05s)
+=== RUN   TestBan8CommentExemptionInTextScopes
+=== RUN   TestBan8CommentExemptionInTextScopes/tsx_line_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line
+=== RUN   TestBan8CommentExemptionInTextScopes/html_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/css_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph
+=== RUN   TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line
+=== RUN   TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope
+=== RUN   TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line
+--- PASS: TestBan8CommentExemptionInTextScopes (0.61s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/tsx_line_comment (0.07s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line (0.06s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/html_comment (0.06s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/css_comment (0.07s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph (0.07s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line (0.07s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment (0.07s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope (0.08s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line (0.07s)
+=== RUN   TestDeclaredEmojiScopeCannotWalkZeroFiles
+--- PASS: TestDeclaredEmojiScopeCannotWalkZeroFiles (0.19s)
+=== RUN   TestScopeReportMatchesRealCoverage
+--- PASS: TestScopeReportMatchesRealCoverage (3.03s)
+=== RUN   TestVerdictGreenOnFullyLiveFixture
+--- PASS: TestVerdictGreenOnFullyLiveFixture (0.08s)
+=== RUN   TestVerdictRedOnEmptyBan7Scope
+--- PASS: TestVerdictRedOnEmptyBan7Scope (0.07s)
+=== RUN   TestVerdictRedOnGoScopeWithOnlyTestFiles
+--- PASS: TestVerdictRedOnGoScopeWithOnlyTestFiles (0.16s)
+=== RUN   TestExemptScopeCannotOutliveItsAbsentTree
+--- PASS: TestExemptScopeCannotOutliveItsAbsentTree (0.14s)
+=== RUN   TestBan6ScopeIsNotNarrowedByAnExtensionFilter
+    scan_test.go:1002: ban #6 examined 7 and fired in all 7 extension classes
+--- PASS: TestBan6ScopeIsNotNarrowedByAnExtensionFilter (0.11s)
+=== RUN   TestVerdictRedOnUndeclaredCounter
+--- PASS: TestVerdictRedOnUndeclaredCounter (0.08s)
+=== RUN   TestRealRepoBan8CoversFrontendTreeAtBan6sCount
+--- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount (3.15s)
+=== RUN   TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter
+    scan_test.go:1155: ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+--- PASS: TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter (0.10s)
+=== RUN   TestLedgerCountsMatchAnIndependentWalk
+    scan_test.go:1261: verified bans #1-5 internal/: 229 files
+    scan_test.go:1261: verified bans #1-5 cmd/: 39 files
+    scan_test.go:1261: verified ban #7 internal/tools/: 23 files
+    scan_test.go:1261: verified ban #8 internal/: 526 files
+    scan_test.go:1261: verified ban #8 cmd/: 119 files
+    scan_test.go:1261: verified ban #6 frontend/: 85 files
+    scan_test.go:1261: verified ban #8 frontend/: 85 files
+--- PASS: TestLedgerCountsMatchAnIndependentWalk (3.06s)
+=== RUN   TestWalksSkipGitIgnoredPaths
+    scan_test.go:1375: note: d22scan: skipped as git-ignored: 3 file(s) under 1 ignored director(ies) [internal/build/], decided by .gitignore (2 path(s)), frontend/.gitignore (2 path(s))
+--- PASS: TestWalksSkipGitIgnoredPaths (0.48s)
+=== RUN   TestTrackedPathsAreNeverSkippedByTheIgnoreFilter
+--- PASS: TestTrackedPathsAreNeverSkippedByTheIgnoreFilter (1.27s)
+=== RUN   TestFullTrackedListCoversWhatTheNarrowListCannot
+--- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (1.18s)
+=== RUN   TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules
+--- PASS: TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules (1.32s)
+=== RUN   TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked
+--- PASS: TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked (0.16s)
+=== RUN   TestGitIgnoreRuleSemantics
+--- PASS: TestGitIgnoreRuleSemantics (0.01s)
+=== RUN   TestRealRepoLedgerIsHonest
+    scan_test.go:2207: ban #6 examined 85 frontend/ text files in the real repo
+--- PASS: TestRealRepoLedgerIsHonest (2.72s)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_136109517/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 16 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_136109517/001
+        d22scan: scope bans #1-5 internal/      examined  15 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        internal/bad/leak.go:5: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+        stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_2170722916/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_2170722916/001
+        d22scan: scope bans #1-5 internal/      examined  13 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel4142106667/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel4142106667/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   2 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   2 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        frontend/src/app.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+        stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared1622196012/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared1622196012/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   0 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   0 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li1070410692/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li1070410692/001
+        d22scan: scope bans #1-5 internal/      examined  13 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0
+    scan_test.go:2363: rc=0 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_03341230997/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_03341230997/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+        stderr=
+--- PASS: TestBuiltBinaryGoesRedEndToEnd (2.50s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1 (0.23s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2 (0.18s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1 (0.19s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2 (0.18s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2 (0.19s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0 (0.18s)
+=== RUN   TestBan9PrefixTablesAreTheSameList
+--- PASS: TestBan9PrefixTablesAreTheSameList (0.00s)
+=== RUN   TestSelfTestEntryPassesEveryCase
+--- PASS: TestSelfTestEntryPassesEveryCase (2.99s)
+=== RUN   TestSelfTestRosterAuditRejectsAHollowTable
+--- PASS: TestSelfTestRosterAuditRejectsAHollowTable (0.00s)
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers
+--- PASS: TestSelfTestRefusesToAuditAnEmptyRoster (0.01s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster (0.00s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers (0.00s)
+=== RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+--- PASS: TestSelfTestFlagIsWiredInTheBuiltBinary (7.23s)
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	35.369s
+runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 268 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 229 production Go files
+d22scan: scope bans #1-5 cmd/           examined  39 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 526 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=229, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=526, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 526 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included
+rc_d22scan=0
+
+## 12. census totals 行（逐字对拉基线 35/7/7/0）
+census: portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+rc_census_pipeline=0
+
+## 13. 台面清理（导出树在 /tmp，⛔ 入库；只建⛔ 删＝本件自建的临时树按名留着）
+done=2026-10-10 19:24:52 +0800

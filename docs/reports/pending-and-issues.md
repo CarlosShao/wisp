@@ -15520,3 +15520,37 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 **4. ★一处归口的"⛔ 顺手"**：`TestAC4FocusReturnToPriorWindowGap33r5` 那枚"本机⛔ 确定、CI 绿"的真窗焦点仪器，**⛔ 塞进票 303**（本票只管回执通道），也**⛔ 塞进票 305**（那两枚症状⛔ 这一形）。⇒ 记为**编排者名下欠账**，归口＝**票 302 的 `AC#5`① 回填那一步**（它的甲／乙／丙代价表正是"真窗类仪器该放哪一档、能不能进 CI"这一族），完成判据＝具名写成"这台面上这枚仪器的命中率＝本机 13 发 5 绿／8 红＋CI 那发零命中"，残缺表现＝**后来人会拿单发颜色当"这枚红是码坏了"**。⛔ 现在派腿修它。
 
 **5. 编队与排程**：`303-r1` 已收（写面＝1 枚产码 ＋ 9 枚自家探针件；越界 ∅）。在飞 **0 枚**。CI 改前红名册已存（`r7-ci-before-red-roster.txt`，run 38043392486，台面 `windows-2025-vs2026`／agent `2.337.0`，⚠ `ImageVersion` 那把尺⛔ 命中＝没取到，具名）。next＝**推送**（`A813`：`dev` fast-forward，终判据＝远程 tip 逐字等于本地 HEAD）→ 取 `test-windows` 那发颜色与这 20 枚作差 → 派 `300-r2`（票 300 `AC#6`＝C2 形四条硬要求，件 `probes/300/orch/2026-10-10-mmreg-authority.txt` 我收件时自己再跑那把 grep）→ `303-v1` → `305-a1`。⛔ 单目的推送（票 300 `AC#5`／票 111 那 341 枚的 CI 色**同一批**取）。票 302 的甲／乙继续按住，具名理由＝★修复落地后 nail1 在 CI 应当回绿，此时搬档＝把一枚**真回归**搬进隐形。
+
+## A824｜2026-10-10 19:2x｜CI 改后那一发作差＋收 `300-r2`（编排者自己同台面复跑）⇒ **翻票 303 `AC#5`**、★**判死票 302 §⑥ 前置条件 (ii)＝甲／乙都⛔ 落**、`AC#6` ⛔ 由我翻（判语归 `300-v4`）、★**新现量推翻 `297-a1` 交给票 300 `AC#5` 的那句前提**
+
+**1. 承重读数（件＝`.scratch/wisp/probes/303/orch/r9-ci-after-red-roster.txt`；尺＝`gh run view --log --job`，逐字抽 `--- FAIL:` 顶层名后 `sort -u`，再 `comm`）**
+- 改前＝run `38043392486`／job `114187968428`／headSha `cf46c24a`（＝票 303 修复的**父发**）；改后＝run `38045508579`／job `114194107792`／headSha `05db4bc6`（＝修复那一笔）。两发 `test-windows` 皆 conclusion＝failure；改后那发六枚 job＝`lint-frontend`✓／`slo-full`✓／`slo-smoke`✓／`test-windows`✗／`lint`✗／`test-core`✗。
+- 名册作差＝**被修好 1 枚**（`TestAC14AwaitedBindingReplyReachesThePage`：改前 `:821 no report "ac14r-0" … nothing at all (20.02s)` ⇒ 改后 `:825 page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)` `(0.30s)`）＋**新增 1 枚**（`TestPanelHostLatencyPercentilesAC2` 由具名 `--- SKIP` 走进 `--- FAIL`，`:1005 cold P95 2747.460 ms over 1 runs exceeds the D32 panel cold budget 1500 ms`）＋**仍红 19 枚逐字同名**。
+- 四数尺（`cmd/wisp` 档，逐字）＝`RUN=398 PASS=278 FAIL=8 SKIP=2` → `RUN=398 PASS=279 FAIL=8 SKIP=1`。⚠ **`FAIL` 同数而名集合作了差** ⇒ 两把尺⛔ 同物（票 302 `:11` 为同一枚坑写过原话，这是它第二次）。
+- 台面（★这栏把 `A823`/`r7` 里我具名欠的那格补上）＝两发 `Set up job` 段逐字同＝`Image: windows-2025-vs2026`／`Version: 20260925.250.1`／`Current runner version: '2.337.0'` ⇒ **"镜像漂"那一支在这两发之间⛔ 有依据**。★而我在 `r7` 里写的"`ImageVersion` 那把尺⛔ 命中"＝**我那把 grep 找的是 GitHub API 字段名，日志里那行写在 `##[group]Runner Image` 下面、叫 `Version:`**。**记我。** 定式并回＝**同一枚事实在两种载体（API 字段 ↔ 步日志文本）上名字⛔ 相同；换载体取读数要先现量那一行的字面写法，⛔ 把"我这把 grep 没命中"写成"盘上没这行"**。
+
+**2. 票 303：翻 `AC#5`（两件都办了），`AC#3`／`AC#4` ⛔ 碰**
+- 本格原文自写"⛔ 腿做、交回后由编排者办的两件"⇒ ① 票 302 甲／乙回填 ＋ ② CI 色都有盘上凭据（件名写死在票面本节）。实现者＝`303-r1`（⛔ 我），角色⛔ 撞。
+- ★**本票边界段授权的那枚形状迁移如实出现**：`TestPanelHostRealWindowHopAndLifecycle` 两发皆红，但形从 `:662 did not produce a browser round trip (got -1.000)` 变成 `:665 cold bring-up 2747.5 ms exceeds D32 panel cold budget 1500 ms`＝"回执为零 → 红于预算"，⛔ 更多；⚠ **⛔ 是新坏**（票 302 那张基线表里回归前的基线发同枚逐字 `2889.2 ms exceeds … 1500 ms`）。⛔ 动 SLO 阈值／`thresholds.go`／那枚 1500（本程零产码）。
+- 票 305 那两枚症状在 CI 上**一比一复现且换了形**（`AC13`：`nothing at all (20.01s)` → `:327 "0" - 0 of 1 probe id(s) present in the live document (0.62s)`；`nail2`：`nothing at all (20.02s)` → `:867 title="" (0.37s)`）⇒ **票 305 的台面⛔ 限本机**，`305-a1` 派单必带这两条逐字。⚠ 时长差（20.0x s → 0.3~0.6 s）本身是"回执到了而内容不对"的证据，⛔ 当分母。
+- `AC#4` 仍欠那一发"整包改前／改后各两发取交集"（我这程做的是 CI 档的另一把尺，⛔ 用换尺补主尺的缺，先例＝我 18:3x 那条定式）。现态＝**4 勾／2 未勾**，⛔ `-done`。
+
+**3. 票 302：§⑥ 的具名前置条件 (ii) 判死 ⇒ 甲／乙都⛔ 落，`AC#1` 继续按住（且⛔ 翻任何框）**
+- (ii) 原文＝"只有当归因结论是『这一跳在 CI 台面上永远拿不到回执』时，搬档／进 ledger 才有意义"。盘上答＝**结论⛔ 是那一句**（页面原话出在托管 runner 那一发上，判据由页面自报＝票 33 `A502` 形）。⇒ **甲（搬 `winlive` 档）／乙（进 `-skip` ledger）都⛔ 落**，落了就是把一枚真回归搬进隐形（正撞 `AC#2` 自己警告的那句）。
+- ★`AC#1`⛔ 翻：它是**落地格**而本程零产码；正确现态＝"按住，本票⛔ 有可落的形"，⛔ 等于"做完了"。票面 `:11` 那句"另有 1 枚基线红→改后 `--- SKIP`"这一发**又翻回去**了（原句⛔ 改，追加节具名）。
+- 残差归口清单（＝"丙＝登记成具名已知红"剩下的全部射程）：`AC13`／`nail2` ⇒ **票 305**；`RealWindowHopAndLifecycle`＋`LatencyPercentilesAC2`（超预算那一支＋它的次生色）⇒ **归口⛔ 定**，交 `303-v1`／下一程；`internal/risk` 12 枚 ⇒ 仍留台账 `A817`（先例票 115），⛔ 塞进本票。本票⛔ 改 `-done`（四枚 `- [ ]` 一枚没做完）。
+- ★顺带量一枚"推下去会不会把 CI 顶红"的前提：`core_pin`／`win_pin`（`scripts/portable-tests.sh:163`起／`:193`起）是**包名名册**而⛔ 用例数名册 ⇒ 新增一枚用例文件⛔ 需要动 pin。
+
+**4. 收 `300-r2`（票 300 `AC#6`＝C2 形，七笔 `a0339995`→`9cef4589`，写面并集＝一枚新用例＋自家 probes＋票面一节，越界 0）**
+- 编排者**自己同台面复跑**（件＝`probes/300/orch/logs/r1-verify-300r2-20261010-192222.txt`，脚本＝`probes/300/orch/r1-verify-300r2.sh`；台面＝`git archive 9cef4589 | tar -x` 的仓外导出树，起手 `git status --porcelain -- internal cmd docs scripts .github`＝**0 行**，用例↔HEAD blob `cmp`＝**IDENTICAL**）：`go vet` `rc=0`／定向 pristine `rc=0`（顶层 1＋子测试 6 逐名）／★`GOFLAGS= go build ./...` `rc=0`（**腿具名⛔ 跑、我那枚 17:5x 派单漏列 ⇒ 记我，本程我销账**）／成对两发 3→1 `rc=1`（三句逐字 `:191`／`:214`／`:229`）＋ 3→0 `rc=1`（两句 `:191`／`:235`），两发各自 `cp`→跑→写回→`cmp` **IDENTICAL**，还原后 `rc=0`／整包两发同一把尺红名册**逐字同形**（都只剩 `--- SKIP: TestLiveWasapiSmoke`，`comm` 双向 **0**）⇒ **新增红 0 枚**／枚数尺 43（与腿的 42→43 对得上）／`gofmt -l internal/audio`（工作树）0 枚／`d22scan` `rc=0`（ban #8 `internal/`=526 实扫）／census totals 逐字未变 `35/7/7/0`。
+- ⇒ **`AC#6` ⛔ 由我翻**（本格原文⛔ 许实现腿自勾，而我 17:5x 裁语把判语给了非实现者 `300-v4`；我这一发＝**复验**⛔ 终裁）。六道必答题 ⓐ..ⓕ 已写进票面追加节（ⓐ 同义反复形状／ⓑ "抄自仓外头文件的字面量"这种权威强度够不够／ⓒ 顺带钉 `waveFormatExt`／`waveFormatPCM` 算⛔ 算本格射程／ⓓ 残余 R2（到不了 `Drain` 那行）／ⓔ 残余 R1（覆盖尺）／ⓕ `AC#4` 两枚具名欠＝腿的门③射程只 `./internal/audio/` 而票面要 `./internal/audio/ ./cmd/wisp/` 且各 ≥2 发）。⚠ (ⓕ) 那半要真窗台面＋sherpa `PATH` ⇒ 按我 10-08 那条定式，**⛔ 算腿的欠账，记编排者**，派单里就禁掉的资源⛔ 回头问腿要。现态＝仍 **4 勾／3 未勾**，⛔ `-done`。
+
+**5. ★新现量推翻 `297-a1` 交给票 300 `AC#5` 的前提（那句"windows-tagged 的 `internal/audio` 用例整条 CI 无一档真跑"⛔ 成立）**
+- 尺①（脚本面，工作树）＝`scripts/portable-tests.sh:253` 的 `windows` 档 `scope` 里逐字写着 `./internal/audio/`（core 档 `:242` 写的是 `./internal/audio/...`）；`:195` 的 `win_pin` 名册逐字含 `github.com/CarlosShao/wisp/internal/audio`。
+- 尺②（归档 CI 字节，job `114194107792`）＝逐字 `ok  	github.com/CarlosShao/wisp/internal/audio	16.739s`，且同发 `--- PASS` 名册里有 `TestParseWaveFormatSubFormatOffset300`（`parse_wave_format_300_windows_test.go` 那枚，`_windows` 文件名层就只在 windows 建）与 `TestMonoDownmixAndFloatConvert` ⇒ 托管 windows runner **确实求值了** `internal/audio` 的 windows 档用例。
+- 尺③＝改前发（job `114187968428`）的 `packages=[…]` 行同样含 `./internal/audio/` ⇒ ⛔ 只在改后发偶然出现。
+- ⇒ 落点 C2 的 **CI 可见性成立**（`windows` 档）。⚠ 而那枚**新用例**落在 `9a442923`，晚于本程分析的两发 ⇒ **它的 CI 色仍欠**，本程推送之后才取得（已登记待办）；`AC#5` ⛔ 翻。
+
+**6. 编队与排程**：`300-r2` 已收（写面一枚新用例）。本程之后在飞＝**`303-v1`**（非实现者，一次裁票 303 `AC#3` 的 ⓐⓑⓒ ＋ `AC#4` 欠的那一发 ＋ 甲那枚门外 `Eval` 欠读 ＋ 第 2 节那枚超预算红的归口）∥ **`300-v4`**（非实现者，一次裁票 300 `AC#6`／`AC#4`，必答题 ⓐ..ⓕ）。排队＝`305-a1`（派单必带票 305 两枚症状的 CI 逐字）→ `296-r2` → `295-r1` → `294-r1` → `294-v1` → `298-v1`。
+
+**7. 推送**：腿的七笔＋本程账目笔按 `A813`（fast-forward 到 `origin dev`）推；推前尺＝`git rev-list --count origin/dev..HEAD`，推后终判据＝**远程 tip 逐字等于本地 HEAD**；⛔ 动 `cnb`（那枚远端仍留后，属另一格）。

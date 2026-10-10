@@ -1,0 +1,83 @@
+# 303 编排者·CI 改后红名册（修复那一发推送之后）＋与改前名册的逐名作差
+
+尺＝`gh run view --log --job <jobId>`，逐字抽 `--- FAIL: <名>` 再 `sort -u`；⚠ 这把尺数的是**顶层名**（全 job 跨步），含子测试的形另算。
+本件⛔ 放原始日志（改后 1,422,264 字节／改前 1,418,337 字节，都只留在 `/tmp`，⛔ 入库），只留名册＋尺＋逐字红句。
+
+## 两发的身份（逐字取自 `gh run view --json`）
+- 改前：run `38043392486`，job `test-windows`＝`114187968428`，headSha＝`cf46c24a9e9e5a3e62f69a63fa5790cdbbee7af4`（＝本票修复的**父发**），conclusion＝failure
+- 改后：run `38045508579`，job `test-windows`＝`114194107792`，headSha＝`05db4bc621479f52bbc457dbec4e7fa4dc0020b3`（＝本票修复那一发），conclusion＝failure，workflow＝`ci`
+- 改后那发六枚 job 结论（尺＝`gh run view --json jobs --jq`）：`lint-frontend`=success／`slo-full`=success／`slo-smoke`=success／`test-windows`=failure／`lint`=failure／`test-core`=failure
+- captured_local＝2026-10-10 19:1x +0800（改前那份我**重新取过一次**，字节数 1,418,337 与 `r7-ci-before-red-roster.txt` 里记的那枚逐字相同 ⇒ 同一份日志，⛔ 第二次抓取换了内容）
+
+## 台面（★这一栏 r7 那件里欠的读数，本件补上，并把 r7 那把尺的缺陷具名）
+两发同一 job 的 `Set up job` 段逐字：
+- 改前 `:16-17`＝`Image: windows-2025-vs2026` / `Version: 20260925.250.1`
+- 改后 `:16-17`＝`Image: windows-2025-vs2026` / `Version: 20260925.250.1`
+- `Current runner version: '2.337.0'` 两发同
+⇒ **镜像漂那一支在这枚对拉里⛔ 成立**（同档同版本），r7 那件里"ImageVersion 那把尺⛔ 命中"那一格**是我那把尺写坏了**：我在日志里找的是 API 字段名 `ImageVersion`，而日志里那行写的是 `##[group]Runner Image` 下面的 `Version:`。**记我。**
+
+## 四数（尺＝步日志里 `portable-tests.sh: four numbers (all from -v output)` 那行逐字；⚠ 一把尺一个档，三档⛔ 相加）
+`cmd/wisp CLI tests` 那一档（本票射程）：
+- 改前＝`=== RUN=398  --- PASS=278  --- FAIL=8  --- SKIP=2`
+- 改后＝`=== RUN=398  --- PASS=279  --- FAIL=8  --- SKIP=1`
+另两档逐字（用于说明"四数"⛔ 是全 job 分母）：`internal/winsec` 档两发同＝`RUN=101 PASS=58 FAIL=0 SKIP=0`；portable 档两发同＝`RUN=624 PASS=427 FAIL=12 SKIP=1`。
+⚠ `cmd/wisp` 档 `FAIL` 枚数**没变（8↔8）**而名册作差是"被修好 1 枚／新增 1 枚"——两把尺⛔ 同物，⛔ 拿 `FAIL=8` 去说"没变化"。
+
+## 名册作差（尺＝`comm` 两份 `sort -u` 后的顶层名册，⛔ 比枚数）
+- 改前 20 枚（`r7-ci-before-red-roster.txt`）／改后 20 枚 ⇒ **仍红 19 枚／被修好 1 枚／新增 1 枚**
+- FIXED（只在改前）＝`TestAC14AwaitedBindingReplyReachesThePage`
+- NEW（只在改后）＝`TestPanelHostLatencyPercentilesAC2`
+- 改后 20 枚逐字名册：
+  TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+  TestAC14GoSideEvalPushReachesThePage
+  TestAC1AlwaysBranchDoesNotRevertAHandEditedKey
+  TestAListWinsWhereBothTablesHit
+  TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card
+  TestBListDefaultDenyAndOverride
+  TestCanonicalInputGainsNoSecondForm
+  TestClassifyAnchorSpellingIsNotVerdict
+  TestPanelHostLatencyPercentilesAC2
+  TestPanelHostRealWindowHopAndLifecycle
+  TestPathResolverExtendedLengthPrefixAListDenied
+  TestPathResolverShortNameAListDenied
+  TestPathResolverUNCAListDenied
+  TestRunPacketCarriesTheLoadedInstructionFiles
+  TestSyncFallbackNotDisarmableByWeakRoot
+  TestSyncFixtureFallbackAndMatch
+  TestSyncSuspectFallbackIsComponentBounded
+  TestSyncSuspectFallbackWhenUndetectable
+  TestSyncUnverifiedRootKeepsFallback
+  TestTicket223PermissionDeniedSitsInItsOwnSentence
+- SKIP 名册作差（同一把尺，`--- SKIP:` 顶层名）：改前 3 枚含 `TestPanelHostLatencyPercentilesAC2`，改后 2 枚 ⇒ 该枚**从具名跳过走进 FAIL**（另两枚两发同＝`TestAC247LiveMicrophoneLevelsReachTheBallSeam`／`TestSyncRedTeamRealOneDrive`）
+
+## 与本票有关的那四枚：逐字改前 ↔ 改后（★形状对拉，⛔ 只看颜色）
+1) `TestAC14AwaitedBindingReplyReachesThePage` ＝ 本票修复的目标枚
+- 改前 `--- FAIL (20.02s)`（`panel_resident_windows_test.go:821` 那一支）：`no report "ac14r-0" from the page within 15s (what DID arrive at the door: nothing at all)`
+- 改后 `--- PASS (0.30s)`，且逐字带页面自己的话（`panel_resident_windows_test.go:825`）：`AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)`
+⇒ **这一跳在托管 runner 上也接上了**（判据是页面自己报回的，⛔ 是 Go 侧自说自话）。
+
+2) `TestPanelHostRealWindowHopAndLifecycle`（颜色没变，形状变了＝本票边界段授权的那一枚形状迁移）
+- 改前 `--- FAIL (5.03s)`：`:660` 逐字 `cold bring-up measured on this box: -1.000 ms (HEAD cf46c24 at read time, …)` ＋ `:662` 逐字 `cold bring-up did not produce a browser round trip (got -1.000); the message channel did not come up on the real window`
+- 改后 `--- FAIL (2.88s)`：`:660` 逐字 `cold bring-up measured on this box: 2747.460 ms (HEAD 05db4bc at read time, 2026-10-10T10:41:20Z)` ＋ `:665` 逐字 `cold bring-up 2747.5 ms exceeds D32 panel cold budget 1500 ms`
+⇒ 从**回执为零**移回**红于预算**。★这一形**不是新坏**：票 302 现量补充节那张表里，回归之前的基线发（`cc315261`，10-06）同一枚就是红于预算（逐字 `cold bring-up 2889.2 ms exceeds D32 panel cold budget 1500 ms`）。⛔ 动那枚 1500 的预算（D32 面）。
+
+3) `TestPanelHostLatencyPercentilesAC2` ＝ 那枚 NEW／也是本票的**次生形状**
+- 改前 `--- SKIP (0.00s)`：`:985` 逐字 `no cold/hot sample recorded in this process: the lifecycle test did not run in this binary … Named skip - an empty aggregate is not a green latency gate`
+- 改后 `--- FAIL (0.00s)`：`:999` 逐字 `AC#2 percentiles over 1 runs (nearest-rank): cold P50=2747.460 P95=2747.460 (budget 1500) | hot P50=42.158 P95=42.158 (budget 200)` ＋ `:1003` `AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 2747.460 ms` ＋ `:1005` 逐字 `cold P95 2747.460 ms over 1 runs exceeds the D32 panel cold budget 1500 ms (the single-run assertion is not the only gate: the tail is what AC#2 asks for)`
+⇒ 成因清楚：那枚 SKIP 的前提是"本二进制里没有冷启样本"，而修复让上面的 lifecycle 用例**真的产出了样本**（2747.460/42.158），于是判据开始求值并红。**这条红是回执通道接上之后露出来的预算面，⛔ 是回执面。** 该不该由本票收＝⛔ 我判（本票边界只授权"从回执为零移回红于预算"那一迁移）；本格⛔ 翻勾，把它连同上面 2) 一起交给 `303-v1` 与票 302 的归口那格。
+
+4) `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` ／ `TestAC14GoSideEvalPushReachesThePage`（＝票 305 的两枚症状，CI 上一比一复现）
+- AC13 改前 `--- FAIL (20.01s)`：`:325` 逐字 `no report "ac13-probe" from the page within 15s (what DID arrive at the door: nothing at all)`
+- AC13 改后 `--- FAIL (0.62s)`：`:327` 逐字 `AC#13 page answer (head 05db4bc): "0" - 0 of 1 probe id(s) present in the live document` ＋ `:330` 逐字 `after a real cold start the live document contains NONE of the 1 element ids the embedded entry declares (the page itself answered "0"). That is ticket 33 AC#13: the round-trip probe page is the last document shown, so the user sees a stub instead of the panel.`（同发还逐字 `wisp: panel window is up (test-harness, cold 470.2 ms, hot path 0.0 ms)`）
+- nail2 改前 `--- FAIL (20.02s)`：`:866` 逐字 `no report "ac14-push" from the page within 15s (what DID arrive at the door: nothing at all)`
+- nail2 改后 `--- FAIL (0.37s)`：`:867` 逐字 `AC#14 nail 2 (Eval push hop), page's own words: title=""` ＋ `:869` 逐字 `Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other`
+⇒ 两枚都**换了形**（页面已能答，卡在"活文档是探针 stub／Eval 推不到那份文档"），与我在本机 clone 台件上拿到的是**同一句逐字**。⇒ 票 305 的两枚症状**在托管 runner 上同样成立**，⛔ 是"CI 才有"或"本机才有"。
+⚠ 一处台面差要具名：改前那两枚各 `20.01s`／`20.02s`（15s 超时那支走满），改后 `0.62s`／`0.37s`——时长差本身是"回执到了而内容不对"的证据，⛔ 能当分母用。
+
+## 与本票无关的 16 枚（⛔ 塞进本票，只是把它们和上面分开）
+`internal/risk` 那一族 12 枚（A/List 表判定与 under-profile fallback，归口＝台账 `A817`、先例票 115）＋`TestRunPacketCarriesTheLoadedInstructionFiles`＋`TestTicket223PermissionDeniedSitsInItsOwnSentence`＋上面 2)3) 那两枚预算形。两发红名册的**交集**＝19 枚，逐字同名 ⇒ 本票那一笔在这 19 枚上⛔ 造成颜色变化。
+
+## 票 303 `AC#5` 的两件，本件的答
+- ② CI 色：上面四数＋名册作差＋逐字形状对拉已交 ⇒ 本件即凭据（件名写死，后续引用引本件）。
+- ① 票 302 甲／乙回填：`AC#1` 归因＋本件 1) 那条逐字（页面原话 `REPLIED,REPLIED,REPLIED` 出在**托管 runner** 那一发上）⇒ 票 302 的前提"那台机器永远给不出回执"**已被盘上证据否证**，故 甲（搬 `winlive` 档）／乙（进 `-skip` ledger）**都⛔ 落**；丙（不动，登记成具名已知红）剩下的射程只剩"仍红的哪几枚、各归哪一票"，按本件第 3)、4) 节那份归口清单办。
+- ⚠ 本件⛔ 答的：那枚 `cold 2747.460 ms` 超预算该归哪一票（票 33 的 D32 预算面？票 302 的归口面？票 305 的文档交接面？）＝**未裁**，交 `303-v1`／编排者下一程；⛔ 为让它闭而去动 1500 那一枚数。
