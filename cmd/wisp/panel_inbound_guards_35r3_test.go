@@ -63,8 +63,8 @@ import (
 // cases may assert the same sentence (:63's "三支不许共用一句文案").
 const (
 	guard35r3Roster    = `不是面板 composer 通路的能力入口` // bridge.go:133 (name %q ... 不是面板 composer 通路的能力入口)
-	guard35r3Source    = `按伪造/串台拒绝`               // bridge.go:136-137 (来源 %q 不是 %q，按伪造/串台拒绝...)
-	guard35r3RequestID = `缺少 requestId`                // bridge.go:140-141 (缺少 requestId，无法与审计/卡片对齐...)
+	guard35r3Source    = `按伪造/串台拒绝`              // bridge.go:136-137 (来源 %q 不是 %q，按伪造/串台拒绝...)
+	guard35r3RequestID = `缺少 requestId`          // bridge.go:140-141 (缺少 requestId，无法与审计/卡片对齐...)
 )
 
 // The three envelopes, all in the page's own posting shape.

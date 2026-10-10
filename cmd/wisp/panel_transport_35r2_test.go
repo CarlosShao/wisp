@@ -804,8 +804,8 @@ type jsParser struct {
 	i    int
 }
 
-func (p *jsParser) peek() jsTok    { return p.toks[p.i] }
-func (p *jsParser) next() jsTok    { t := p.toks[p.i]; p.i++; return t }
+func (p *jsParser) peek() jsTok { return p.toks[p.i] }
+func (p *jsParser) next() jsTok { t := p.toks[p.i]; p.i++; return t }
 func (p *jsParser) atPunct(s string) bool {
 	t := p.peek()
 	return t.kind == "punct" && t.text == s
