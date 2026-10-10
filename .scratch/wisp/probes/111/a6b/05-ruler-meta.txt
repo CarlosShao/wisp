@@ -1,0 +1,135 @@
+# R6 尺口径与来路现量（HEAD f76091cd，全部走对象层）
+--- 1. portable-tests.sh: OS 字样命中，代码 vs 注释
+total lines: 768
+OS-word hits (all): 25
+OS-word hits on comment lines: 15
+OS-word hits on NON-comment lines:
+221:tiers='core windows cli winsec census'
+249:windows)
+370:            core) pin=$core_pin ;; windows) pin=$win_pin ;; cli) pin=$cli_pin ;;
+593:    "TestHelperProcess|./internal/proc/|windows|reexec|child-process entry point of the job-object cases (jobscope_windows_test.go:87, //go:build windows); skips unless re-exec'd with the helper env var set"
+594:    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio endpoint, so the case has no subject there. Real-hardware smoke is ticket 16's"
+597:    "TestSyncRegistryProbeLive|./internal/risk/|windows|fixture|P12 live registry evidence; on ubuntu it is now out of scope by platform instead of by skip (ticket 93 AC#2 moved it verbatim into syncdirs_windows_test.go), and on a Windows host whose HKCU Accounts key carries no UserFolder the hive has nothing to say. Measured on a windows host at HEAD 84e43af: --- SKIP at syncdirs_windows_test.go:133. As of ticket 110 AC#4 the windows leg carries ./internal/risk/ in its scope, so this row is re-verified against the compiled WINDOWS test binary (go test -list) and printed with its reason in that step's log - which is the step-level answer R-93-4 asked for. Remedy for a real run: a host with a sync record, or fold the shape check into the fixture-driven case. next= on ticket 93"
+598:    "TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|./internal/risk/|linux|fixture|needs a handle-resolved form of an existing directory, which POSIX has no object for (pathresolver_rewrite_account_test.go:138). AC#2's remedy is a platform-layer move, impossible from this ticket: the file matches this ticket's forbidden pattern internal/risk/pathresolver*.go. The case RUNS AND PASSES on windows, so the assertion is not lost, it is only un-evaluable here. next= an owner for that file"
+599:    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The case is AC#3(ii) with a REAL junction: on windows it builds one with cmd /c mklink /J and asserts the switch is refused (runs and passes here). On POSIX there is nothing to refuse, because the detection it exercises is itself a Windows implementation - internal/tools/paths_workspace_test.go:198 skips with 'C26's reparse detection is a Windows implementation (risk.pathresolver_other.go reparseComponents returns nil elsewhere); nothing to deny on linux'. Registered rather than deleted because the file's own comment promises 'the skip is reported, never averaged away', and runtests.sh making every SKIP fatal is what turns that promise into a red step: an unaccounted skip on the ubuntu leg (test-core step 7, measured PASS=578 FAIL=0 SKIP=1 on run 35599458439) is exactly what this row exists to name. OWNER of the POSIX half: whoever lands reparseComponents in risk.pathresolver_other.go - that file is forbidden to this ticket (internal/risk/pathresolver*.go, same wall as the row above), so the POSIX-equivalent criterion is NOT faked here. The row is re-verified against the compiled LINUX test binary on every run: delete the skip, and the case starts running here; delete the case, and GUARD's staleness check goes red."
+600:    "TestD34WriteMatrix|./internal/tools/|linux|fixture|the table needs a second volume from otherVolumeDir (fs_write_test.go:140/151), and the volume-identity call it uses is a Windows API - on POSIX there is no object to ask. In a CI ubuntu container /tmp and / are one filesystem anyway. It RUNS AND PASSES on a two-volume windows host, so if a windows host ever has a single volume this entry does not cover it and the step goes red on purpose"
+601:    "TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop|./internal/tools/|linux|fixture|same otherVolumeDir requirement as the write matrix row above (fs_write_test.go:677); on POSIX there is no volume identity to compare, so the case has no subject. Runs and passes on a two-volume windows host"
+--- 2. ci.yml: job x runs-on x scope 调用点
+11:  pull_request:
+12:  push:
+36:  schedule:
+38:  workflow_dispatch:
+50:  group: ci-${{ github.workflow }}-${{ github.ref }}${{ github.event_name == 'push' && format('-{0}', github.sha) || '' }}
+51:  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+65:  lint:
+66:    runs-on: ubuntu-latest
+419:  test-core:
+420:    runs-on: ubuntu-latest
+475:        # TICKET 111 moved the list behind a NAME (`--scope=core`) and added three
+487:        run: bash scripts/portable-tests.sh --scope=core
+533:  test-windows:
+534:    runs-on: windows-latest
+675:        # WHY THIS STEP EXISTS. `--scope=census` is the ONLY call site GUARD D has:
+761:        run: bash scripts/portable-tests.sh --scope=census
+797:        run: bash scripts/portable-tests.sh --scope=windows
+818:  slo-smoke:
+819:    runs-on: windows-latest
+879:  slo-full:
+880:    runs-on: [self-hosted, wisp-slo]
+953:  lint-frontend:
+954:    runs-on: ubuntu-latest
+--- 3. portable-tests.sh 的全部调用点（HEAD，产码面）
+HEAD:.github/workflows/ci.yml:348:        # that judges the DENOMINATOR of scripts/portable-tests.sh, and its case
+HEAD:.github/workflows/ci.yml:354:        # is already in force (scripts/portable-tests.sh, census arm, `exit 1`);
+HEAD:.github/workflows/ci.yml:363:        # (scripts/portable-tests.sh fails `dash -n` at :231, scripts/winsec-tests.sh
+HEAD:.github/workflows/ci.yml:377:        # judged (portable-tests.sh, winsec-tests.sh, runtests.sh) that runs for
+HEAD:.github/workflows/ci.yml:411:  # scripts/portable-tests.sh both name it from that commit on -- re-read them,
+HEAD:.github/workflows/ci.yml:464:      - name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
+HEAD:.github/workflows/ci.yml:468:        # printed the same bytes as a pass. scripts/portable-tests.sh delegates
+HEAD:.github/workflows/ci.yml:487:        run: bash scripts/portable-tests.sh --scope=core
+HEAD:.github/workflows/ci.yml:678:        # claims it (scripts/portable-tests.sh:392-399, message :407-423). Before
+HEAD:.github/workflows/ci.yml:698:        # scripts/portable-tests.sh:326-332, and probes/111/r2 section 1.2 at
+HEAD:.github/workflows/ci.yml:700:        # takes its refusal branch (portable-tests.sh:337-351) and exits 1 rather
+HEAD:.github/workflows/ci.yml:761:        run: bash scripts/portable-tests.sh --scope=census
+HEAD:.github/workflows/ci.yml:782:        # on THIS platform: because risk is in the scope, portable-tests.sh
+HEAD:.github/workflows/ci.yml:789:        # The package list moved INTO scripts/portable-tests.sh as the named
+HEAD:.github/workflows/ci.yml:797:        run: bash scripts/portable-tests.sh --scope=windows
+HEAD:scripts/portable-tests-selftest.sh:3:# judges the DENOMINATOR of scripts/portable-tests.sh (the line set GUARD C pins
+HEAD:scripts/portable-tests-selftest.sh:18:# takes (scripts/winsec-tests.sh:94) hands scripts/portable-tests.sh an EXPLICIT
+HEAD:scripts/portable-tests-selftest.sh:37:# scripts/winsec-tests.sh, which hands scripts/portable-tests.sh an explicit package
+HEAD:scripts/portable-tests-selftest.sh:39:# Cases 19-20 drive the real chain (winsec-tests.sh -> portable-tests.sh) on the fake
+HEAD:scripts/portable-tests-selftest.sh:48:#   git show d253703a^:scripts/portable-tests.sh >/tmp/pre254-portable.sh
+HEAD:scripts/portable-tests-selftest.sh:55:# scripts/portable-tests.sh, GUARD A/B/C, the ledger staleness check,
+HEAD:scripts/portable-tests-selftest.sh:63:# against scripts/portable-tests.sh as it stood before the ticket 250 fix:
+HEAD:scripts/portable-tests-selftest.sh:65:#     bash scripts/portable-tests.sh --scope=core          # exit 1 in ~12 s, 303 MB
+HEAD:scripts/portable-tests-selftest.sh:71:#   bash scripts/portable-tests-selftest.sh <case> <other-portable-tests.sh>
+HEAD:scripts/portable-tests-selftest.sh:74:#        tree:  git show <sha>:scripts/portable-tests.sh >/tmp/prefix.sh  and point
+HEAD:scripts/portable-tests-selftest.sh:90:script="$root/scripts/portable-tests.sh"
+HEAD:scripts/portable-tests-selftest.sh:99:# Optional second argument: a portable-tests.sh to judge INSTEAD of the working one.
+HEAD:scripts/portable-tests-selftest.sh:108:    cp "$2" "$shadow/scripts/portable-tests.sh"
+HEAD:scripts/portable-tests-selftest.sh:112:    script="$shadow/scripts/portable-tests.sh"
+HEAD:scripts/portable-tests-selftest.sh:225:    cp "$1" "$shadow/scripts/portable-tests.sh"
+--- 4. 载体（carrier）与 GUARD D 字样落点
+HEAD:.github/workflows/ci.yml:342:      - name: "Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)"
+HEAD:.github/workflows/ci.yml:350:        # that makes GUARD D ring for real: it seeds a package that compiles a test
+HEAD:.github/workflows/ci.yml:352:        # `GUARD D - 1 package(s) compile a test file for GOOS=` plus
+HEAD:.github/workflows/ci.yml:674:      - name: "Package coverage census (ticket 111 AC#1 + GUARD D)"
+HEAD:.github/workflows/ci.yml:675:        # WHY THIS STEP EXISTS. `--scope=census` is the ONLY call site GUARD D has:
+HEAD:.github/workflows/ci.yml:744:        #   - it does not re-run GUARD A/B/C. It adds exactly one claim: every
+HEAD:.github/workflows/ci.yml:749:        # `census totals: packages=35 ... unclaimed-with-tests=0` and exits 0
+HEAD:scripts/portable-tests-selftest.sh:55:# scripts/portable-tests.sh, GUARD A/B/C, the ledger staleness check,
+HEAD:scripts/portable-tests-selftest.sh:283:# platform, and is claimed by NO tier pin. Ticket 111's GUARD D is the guard for
+HEAD:scripts/portable-tests-selftest.sh:303:echo "portable-tests-selftest.sh: 111 GUARD D universe = core_pin ($pinc) + $unclaimed_path ($uccount lines, claimed by no tier)"
+HEAD:scripts/portable-tests-selftest.sh:421:# 8. AC#4: GUARD A, seeded empty denominator.
+HEAD:scripts/portable-tests-selftest.sh:426:    has 'GUARD A - these packages are declared in scope mode=core'
+HEAD:scripts/portable-tests-selftest.sh:531:    has 'census totals: packages='
+HEAD:scripts/portable-tests-selftest.sh:562:        hasnt 'census totals: packages='
+HEAD:scripts/portable-tests-selftest.sh:766:# 23. TICKET 111 (this leg) - GUARD D's regression coverage, which did not exist
+HEAD:scripts/portable-tests-selftest.sh:767:#     before: `grep -Ec 'GUARD D|unclaimed|UNCLAIMED'` over THIS carrier read 0 at
+HEAD:scripts/portable-tests-selftest.sh:769:#     named for the next leg, re-taken here rather than copied). GUARD D is the census
+HEAD:scripts/portable-tests-selftest.sh:772:#     :407-423 refuses, message starts `portable-tests.sh: GUARD D -`). None of the
+HEAD:scripts/portable-tests-selftest.sh:782:#       (a) package in no tier pin, count 1/0        -> RED, GUARD D names it
+HEAD:scripts/portable-tests-selftest.sh:786:#     being unclaimed: an unclaimed package with no denominator is GUARD A's subject
+HEAD:scripts/portable-tests-selftest.sh:789:#     111 AC#3 refuses). Without (c), (a) could go red on bytes where GUARD D is dead
+HEAD:scripts/portable-tests-selftest.sh:796:    has 'GUARD D - 1 package\(s\) compile a test file for GOOS='
+HEAD:scripts/portable-tests-selftest.sh:800:    has 'census totals: packages='"$uccount"' .*unclaimed-with-tests=1'
+HEAD:scripts/portable-tests-selftest.sh:806:    has 'GUARD D - 1 package\(s\) compile a test file for GOOS='
+HEAD:scripts/portable-tests-selftest.sh:813:    hasnt 'GUARD D -'
+HEAD:scripts/portable-tests-selftest.sh:816:    has 'census totals: packages='"$uccount"' .*unclaimed-with-tests=0'
+HEAD:scripts/portable-tests-selftest.sh:820:#     regression pin: same seed, MUTATED COPY of the script under test, GUARD D's
+HEAD:scripts/portable-tests-selftest.sh:835:    printf '\n== case guard-d-slice-is-what-bites: mutant replaced %s line (GUARD D'"'"'s' "$touched"
+HEAD:scripts/portable-tests-selftest.sh:840:        printf '   FAIL the mutant seed took %s line(s), expected exactly 1 - GUARD D'"'"'s case arm moved' "$touched"
+HEAD:scripts/portable-tests-selftest.sh:849:        printf '   mutant (the 0/0 arm swallows every count): same seed, GUARD D neutered.\n'
+HEAD:scripts/portable-tests-selftest.sh:852:        hasnt 'GUARD D -'
+HEAD:scripts/portable-tests-selftest.sh:854:        has 'census totals: packages='"$uccount"' .*unclaimed-with-tests=0'
+HEAD:scripts/portable-tests-selftest.sh:862:        has 'GUARD D - 1 package\(s\) compile a test file for GOOS='
+HEAD:scripts/portable-tests.sh:58:#   GUARD A (AC#3)  a declared package that compiles ZERO test files on this
+HEAD:scripts/portable-tests.sh:67:#   GUARD D (this ticket's AC#1, added by the r1 leg) the CENSUS refuses to exit 0
+HEAD:scripts/portable-tests.sh:72:#                   a row is deleted from a list that still exists; GUARD D bites
+HEAD:scripts/portable-tests.sh:110:#           put them back: GUARD A rejects them until they have a test file, and
+HEAD:scripts/portable-tests.sh:111:#           GUARD D names them the moment they do have one and no entry.
+HEAD:scripts/portable-tests.sh:288:    # GUARD A's numbers for EVERY package in the module, plus which named scope
+HEAD:scripts/portable-tests.sh:386:            # GUARD D's split of the NO-SCOPE rows: `0/0` is a package with no
+--- 5. ledger 里 platform 行
+591:    "TestDefaultDeadlineWallClockMeasurement|./internal/agent/approval/|any|opt-in|300s wall-clock measurement gated by WISP_84_MEASURE=1 (ticket84_no_owner_test.go:224, docs/evidence/s1/84-ac1-bounded-wait.md); it measures a deadline instead of asserting a property, so a CI run of it produces a duration nobody checks"
+592:    "TestSubprocessCrashWriter|./internal/memory/|any|reexec|child-process entry point of TestCrashRecoveryKillMidWrite (concurrent_test.go:186); not a test of its own, it skips whenever it is not the re-exec'd child"
+593:    "TestHelperProcess|./internal/proc/|windows|reexec|child-process entry point of the job-object cases (jobscope_windows_test.go:87, //go:build windows); skips unless re-exec'd with the helper env var set"
+594:    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio endpoint, so the case has no subject there. Real-hardware smoke is ticket 16's"
+595:    "TestRealDownloadVadThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:120); CI has no business pulling model archives from a third-party mirror"
+596:    "TestRealDownloadPuncArchiveThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:147); same reason as the VAD row"
+597:    "TestSyncRegistryProbeLive|./internal/risk/|windows|fixture|P12 live registry evidence; on ubuntu it is now out of scope by platform instead of by skip (ticket 93 AC#2 moved it verbatim into syncdirs_windows_test.go), and on a Windows host whose HKCU Accounts key carries no UserFolder the hive has nothing to say. Measured on a windows host at HEAD 84e43af: --- SKIP at syncdirs_windows_test.go:133. As of ticket 110 AC#4 the windows leg carries ./internal/risk/ in its scope, so this row is re-verified against the compiled WINDOWS test binary (go test -list) and printed with its reason in that step's log - which is the step-level answer R-93-4 asked for. Remedy for a real run: a host with a sync record, or fold the shape check into the fixture-driven case. next= on ticket 93"
+598:    "TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|./internal/risk/|linux|fixture|needs a handle-resolved form of an existing directory, which POSIX has no object for (pathresolver_rewrite_account_test.go:138). AC#2's remedy is a platform-layer move, impossible from this ticket: the file matches this ticket's forbidden pattern internal/risk/pathresolver*.go. The case RUNS AND PASSES on windows, so the assertion is not lost, it is only un-evaluable here. next= an owner for that file"
+599:    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The case is AC#3(ii) with a REAL junction: on windows it builds one with cmd /c mklink /J and asserts the switch is refused (runs and passes here). On POSIX there is nothing to refuse, because the detection it exercises is itself a Windows implementation - internal/tools/paths_workspace_test.go:198 skips with 'C26's reparse detection is a Windows implementation (risk.pathresolver_other.go reparseComponents returns nil elsewhere); nothing to deny on linux'. Registered rather than deleted because the file's own comment promises 'the skip is reported, never averaged away', and runtests.sh making every SKIP fatal is what turns that promise into a red step: an unaccounted skip on the ubuntu leg (test-core step 7, measured PASS=578 FAIL=0 SKIP=1 on run 35599458439) is exactly what this row exists to name. OWNER of the POSIX half: whoever lands reparseComponents in risk.pathresolver_other.go - that file is forbidden to this ticket (internal/risk/pathresolver*.go, same wall as the row above), so the POSIX-equivalent criterion is NOT faked here. The row is re-verified against the compiled LINUX test binary on every run: delete the skip, and the case starts running here; delete the case, and GUARD's staleness check goes red."
+600:    "TestD34WriteMatrix|./internal/tools/|linux|fixture|the table needs a second volume from otherVolumeDir (fs_write_test.go:140/151), and the volume-identity call it uses is a Windows API - on POSIX there is no object to ask. In a CI ubuntu container /tmp and / are one filesystem anyway. It RUNS AND PASSES on a two-volume windows host, so if a windows host ever has a single volume this entry does not cover it and the step goes red on purpose"
+601:    "TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop|./internal/tools/|linux|fixture|same otherVolumeDir requirement as the write matrix row above (fs_write_test.go:677); on POSIX there is no volume identity to compare, so the case has no subject. Runs and passes on a two-volume windows host"
+ledger rows total: 11
+ledger platform=windows rows: 3
+ledger platform=linux rows: 4
+--- 6. 包单位读数落点（票面 ⓒ 那三处）
+/tmp/pt.sh:70:#                   audited the packages a scope FORGETS, which is why "20 of 33"
+/tmp/pt.sh:407:    echo "portable-tests.sh: census totals: packages=$n with-zero-compiled-tests=$empty claimed-by-no-scope=$noscope unclaimed-with-tests=$guardd"
+/tmp/pt.sh:414:            echo "portable-tests.sh: this row is the ticket 111 field itself ('CI 只测 33 个包里的 20 个')."
+/tmp/ci.yml:318:            echo "--- module $mod: exit=$step_rc packages=$m_pkgs findings=$m_find toolchain-crash-lines=$m_crash"
+/tmp/ci.yml:324:          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount packages=$pkgs findings=$findings toolchain-crash-lines=$crashes (step exit is $rc)"
+/tmp/ci.yml:749:        # `census totals: packages=35 ... unclaimed-with-tests=0` and exits 0
+rc=0
