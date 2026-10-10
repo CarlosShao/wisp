@@ -1,0 +1,11 @@
+298-r1 第 1 笔（锚）：开工闸门读数落件 .scratch/wisp/probes/298/r1/00-anchor.md
+
+锚点 6414a4bb 2026-10-10T16:10:11+08:00。停手条件（票面 AC#1 起手那条）未触发＝
+git status --porcelain -- 两枚目标路径 给 0 行 rc=0，另加 diff <(git show HEAD:<path>) <path> 两枚皆 IDENTICAL
+⇒ 工作树内容＝HEAD blob，本腿 gofmt -w 不会吞别人未提交的活。
+tasklist wisp.exe／balldebug.exe 各 0 枚（只记录，未杀任何进程）。
+改前两把尺复现票面现量：gofmt -l cmd/wisp 工作树那一把＝3 枚、HEAD blob 那一把（仓外 mktemp 目录）＝2 枚，
+models.go 不在 blob 那把 ⇒ 落点只有那 2 枚 35 族测试件，第三枚按 AC#2 只标注不清洗。
+换行符三把尺同跑：core.autocrlf=true、git ls-files --eol 三枚给 i/lf w/crlf（仅 models.go）＋i/lf w/lf（那两枚）、CR 计数 334/0/0。
+引入首笔具名：7f9d6e40（35-r3 腿，inbound_guards_35r3）／286a7f30（35-r2 腿，panel_transport_35r2）。
+本笔只新建 probes/298/r1/00-anchor.md＋本 logs 件，⛔ 未碰任何 .go，⛔ 未碰 models.go／.gitattributes／git 配置，⛔ 未 push。
