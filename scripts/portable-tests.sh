@@ -192,6 +192,7 @@ github.com/CarlosShao/wisp/internal/winsec
 '
 win_pin='
 github.com/CarlosShao/wisp/cmd/llmrecord
+github.com/CarlosShao/wisp/internal/audio
 github.com/CarlosShao/wisp/internal/ball
 github.com/CarlosShao/wisp/internal/config
 github.com/CarlosShao/wisp/internal/perm
@@ -249,7 +250,7 @@ windows)
     scope=(
         ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
         ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
-        ./internal/session/ ./internal/projctx/
+        ./internal/session/ ./internal/projctx/ ./internal/audio/
     )
     pinned=$win_pin
     ;;
