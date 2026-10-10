@@ -1,0 +1,26 @@
+$ 尺（描述，⛔ 我这条命令的逐字原文）＝对 a1r 那枚台件与我入库这枚各跑
+  sed 's/[[:space:]]*\/\/.*$//'   （剥掉行尾注释）后再 diff，射程＝两枚文件全文
+  逐字命令见本仓件 20-ac2-rig.md §1.1（同一形，路径写全）
+结果判读＝剥注释之后只剩三类差异：块注释被剥成空行的位置差（26a27,32 / 73a80,85 / 123a136）
+＋S4 那枚 why 字符串被扩了一短语 ⇒ **十处 le.PutUint 写入与四形 face300{} 字面量、断言代码逐字节同形**
+26a27,32
+> 
+> 
+> 
+> 
+> 
+> 
+73a80,85
+> 
+> 
+> 
+> 
+> 
+> 
+103c115
+< 			why:     "positive control for offset sensitivity: malformed face with Data1 two bytes late; per the authoritative layout the value at byte 24 is 0, so an assertion that passes here would read nothing meaningful",
+---
+> 			why:     "positive control for offset sensitivity (the weakest face in this set, see the scan note above): malformed face with Data1 two bytes late; per the authoritative layout the value at byte 24 is 0, so an assertion that passes here would read nothing meaningful",
+123a136
+> 
+rc-diff-nocomment=1

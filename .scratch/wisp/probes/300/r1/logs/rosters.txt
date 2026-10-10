@@ -1,0 +1,32 @@
+# commit #1 名册尺（本件自身⛔ 出现在下面的列表里：它是在 git add 自己之前写下的，逐字两段）
+=== git diff --cached --name-only ===
+.scratch/wisp/issues/300-parsewaveformat-subformat-offset-reads-two-bytes-past-the-guid.md
+.scratch/wisp/probes/300/r1/10-ac2-change.md
+.scratch/wisp/probes/300/r1/20-ac2-rig.md
+.scratch/wisp/probes/300/r1/30-gates.md
+.scratch/wisp/probes/300/r1/90-unrun-rulers.md
+.scratch/wisp/probes/300/r1/logs/change.diff
+.scratch/wisp/probes/300/r1/logs/d22scan-final.txt
+.scratch/wisp/probes/300/r1/logs/d22scan.txt
+.scratch/wisp/probes/300/r1/logs/diff-vs-a1r-nocomment.txt
+.scratch/wisp/probes/300/r1/logs/diff-vs-a1r-rig.txt
+.scratch/wisp/probes/300/r1/logs/entry-1.txt
+.scratch/wisp/probes/300/r1/logs/entry-2.txt
+.scratch/wisp/probes/300/r1/logs/format-rulers.txt
+.scratch/wisp/probes/300/r1/logs/postB-1.txt
+.scratch/wisp/probes/300/r1/logs/postB-2.txt
+.scratch/wisp/probes/300/r1/logs/postB-entry-final.txt
+.scratch/wisp/probes/300/r1/logs/preA-1.txt
+.scratch/wisp/probes/300/r1/logs/preA-2.txt
+.scratch/wisp/probes/300/r1/logs/preA-3.txt
+.scratch/wisp/probes/300/r1/logs/preA-4.txt
+.scratch/wisp/probes/300/r1/logs/progress-line-clock.txt
+.scratch/wisp/probes/300/r1/logs/rig-writes.txt
+.scratch/wisp/probes/300/r1/logs/vet.txt
+internal/audio/parse_wave_format_300_windows_test.go
+internal/audio/wasapi_windows.go
+=== git status --porcelain -- internal cmd（提交前）===
+A  internal/audio/parse_wave_format_300_windows_test.go
+M  internal/audio/wasapi_windows.go
+=== 名册里出现非我射程路径？（判据＝下面这行为空）===
+(以上为空＝零越界)

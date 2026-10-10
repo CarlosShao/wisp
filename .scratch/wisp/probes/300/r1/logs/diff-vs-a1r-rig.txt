@@ -1,0 +1,87 @@
+5c5
+< // Ticket 300 AC#1 decisive rig (probe 300-a1r).
+---
+> // Ticket 300 AC#2 tracked test, landed with the offset fix.
+7,10c7,14
+< // This file exists ONLY inside the out-of-repo export tree produced by
+< //   git archive b2933dc9 | tar -x -C /tmp/wisp300-a1r/tree
+< // It is deliberately NOT committed: the assertions below are red at the
+< // anchor, and an always-red tracked test is banned by repo convention.
+---
+> // This is the rig that 300-a1r ran in an out-of-repo export tree and that
+> // 300-v1 re-ran and scanned across five offsets (20/22/24/26/28). It is
+> // committed here because parseWaveFormat now reads SubFormat at the
+> // authoritative offset: the four faces below assert the values that the
+> // authoritative layout actually holds there (3 / 1 / 7 / 0), so the suite is
+> // green at this offset and red at every other one. The "must be red before
+> // the fix" half of the evidence lives in .scratch/wisp/probes/300/ (a1r, v1,
+> // orch), never in this tree -- an always-red tracked test is banned here.
+14c18,19
+< // which is compiled with 1-byte packing, so there is no padding anywhere):
+---
+> // compiled with 1-byte packing via pshpack1.h, so there is no padding
+> // anywhere), NOT from either implementation in this package:
+25c30,31
+< // takes an unsafe.Pointer, so the face is built by hand in a []byte.
+---
+> // takes an unsafe.Pointer, so the face is built by hand in a []byte. No
+> // Initialize, no Start.
+51,53c57,59
+< 	le.PutUint16(b[0:], 0xFFFE)                        // WAVE_FORMAT_EXTENSIBLE (mmreg.h:2376)
+< 	le.PutUint16(b[2:], f.channels)                    // nChannels
+< 	le.PutUint32(b[4:], f.rate)                        // nSamplesPerSec
+---
+> 	le.PutUint16(b[0:], 0xFFFE)                                       // WAVE_FORMAT_EXTENSIBLE (mmreg.h:2376)
+> 	le.PutUint16(b[2:], f.channels)                                   // nChannels
+> 	le.PutUint32(b[4:], f.rate)                                       // nSamplesPerSec
+55,60c61,66
+< 	le.PutUint16(b[12:], f.channels*(f.bits/8))        // nBlockAlign
+< 	le.PutUint16(b[14:], f.bits)                       // wBitsPerSample
+< 	le.PutUint16(b[16:], 22)                           // cbSize = 22 (mmreg.h:2540/2550)
+< 	le.PutUint16(b[18:], f.bits)                       // Samples.wValidBitsPerSample
+< 	le.PutUint32(b[20:], uint32((1<<f.channels)-1))     // dwChannelMask
+< 	le.PutUint32(b[f.data1At:], f.data1)               // SubFormat.Data1
+---
+> 	le.PutUint16(b[12:], f.channels*(f.bits/8))                       // nBlockAlign
+> 	le.PutUint16(b[14:], f.bits)                                      // wBitsPerSample
+> 	le.PutUint16(b[16:], 22)                                          // cbSize = 22 (mmreg.h:2540/2550)
+> 	le.PutUint16(b[18:], f.bits)                                      // Samples.wValidBitsPerSample
+> 	le.PutUint32(b[20:], uint32((1<<f.channels)-1))                   // dwChannelMask
+> 	le.PutUint32(b[f.data1At:], f.data1)                              // SubFormat.Data1
+70,73c76,85
+< // at 26 (the offset the anchor's parseWaveFormat reads) and therefore demands
+< // 0, because at offset 24 of that face the authoritative layout has the tail of
+< // dwChannelMask plus zero bytes. A ruler that let both S1 and S4 through would
+< // be a ruler that distinguishes nothing.
+---
+> // at 26 and therefore demands 0, because at offset 24 of that face the
+> // authoritative layout has the tail of dwChannelMask plus zero bytes. A ruler
+> // that let both S1 and S4 through would be a ruler that distinguishes nothing.
+> //
+> // 300-v1's offset scan is what says where the discriminating power actually
+> // sits, and the naming here follows it: S2 (Data1 = 1 collides with a
+> // dwChannelMask of 3 at offset 20) and S3 (7 collides with nothing) carry it;
+> // S4 is the weakest face in the set -- on its own it stays green at offsets
+> // 22, 24 and 28 -- and S1 on its own stays green at 20 and 24. No single face
+> // here is the decisive one; the four together only accept 24.
+103c115
+< 			why:     "positive control for offset sensitivity: malformed face with Data1 two bytes late; per the authoritative layout the value at byte 24 is 0, so an assertion that passes here would read nothing meaningful",
+---
+> 			why:     "positive control for offset sensitivity (the weakest face in this set, see the scan note above): malformed face with Data1 two bytes late; per the authoritative layout the value at byte 24 is 0, so an assertion that passes here would read nothing meaningful",
+124,126c136,139
+< 			// Header sanity: these three offsets are read correctly even at the
+< 			// anchor, so a pass line here proves the face is a well-formed
+< 			// WAVEFORMATEXTENSIBLE and that only the SubFormat position is in play.
+---
+> 			// Header sanity: these three offsets are read correctly whatever
+> 			// happens to SubFormat, so a pass line here proves the face is a
+> 			// well-formed WAVEFORMATEXTENSIBLE and that only the SubFormat
+> 			// position is in play.
+132,134c145,147
+< 			// Real-world consequence named in ticket 300: convertPacket picks the
+< 			// sample path from floating alone, so a wrong tag silently reparses
+< 			// 32-bit float frames as int16.
+---
+> 			// Real-world consequence named in ticket 300: convertPacket picks
+> 			// the sample path from floating alone, so a wrong tag silently
+> 			// reparses 32-bit float frames as int16.

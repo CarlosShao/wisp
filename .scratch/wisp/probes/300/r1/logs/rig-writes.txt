@@ -1,0 +1,23 @@
+$ grep -n "le.PutUint" internal/audio/parse_wave_format_300_windows_test.go   # 夹具 10 处写入逐处行号
+57:	le.PutUint16(b[0:], 0xFFFE)                                       // WAVE_FORMAT_EXTENSIBLE (mmreg.h:2376)
+58:	le.PutUint16(b[2:], f.channels)                                   // nChannels
+59:	le.PutUint32(b[4:], f.rate)                                       // nSamplesPerSec
+60:	le.PutUint32(b[8:], f.rate*uint32(f.channels)*(uint32(f.bits)/8)) // nAvgBytesPerSec
+61:	le.PutUint16(b[12:], f.channels*(f.bits/8))                       // nBlockAlign
+62:	le.PutUint16(b[14:], f.bits)                                      // wBitsPerSample
+63:	le.PutUint16(b[16:], 22)                                          // cbSize = 22 (mmreg.h:2540/2550)
+64:	le.PutUint16(b[18:], f.bits)                                      // Samples.wValidBitsPerSample
+65:	le.PutUint32(b[20:], uint32((1<<f.channels)-1))                   // dwChannelMask
+66:	le.PutUint32(b[f.data1At:], f.data1)                              // SubFormat.Data1
+
+$ grep -n "data1At" internal/audio/parse_wave_format_300_windows_test.go
+46:	data1At  int    // byte offset the face writes Data1 at (24 = authoritative)
+66:	le.PutUint32(b[f.data1At:], f.data1)                              // SubFormat.Data1
+95:			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 3, data1At: 24},
+101:			face:    face300{channels: 2, rate: 48000, bits: 16, data1: 1, data1At: 24},
+107:			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 7, data1At: 24},
+113:			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 3, data1At: 26},
+
+=== 无设备两把尺 ===
+31:// Initialize, no Start.
+0

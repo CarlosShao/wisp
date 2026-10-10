@@ -1,0 +1,39 @@
+diff --git a/internal/audio/wasapi_windows.go b/internal/audio/wasapi_windows.go
+index 22996206..7e0248f3 100644
+--- a/internal/audio/wasapi_windows.go
++++ b/internal/audio/wasapi_windows.go
+@@ -180,8 +180,23 @@ type waveFormat struct {
+ }
+ 
+ // parseWaveFormat reads WAVEFORMATEX (+ WAVEFORMATEXTENSIBLE SubFormat) from
+-// a CoTaskMem-allocated format pointer. Layout: tag@0, channels@2, rate@4,
+-// bits@14, cbSize@16, [validBits@18, channelMask@22, SubFormat@26].
++// a CoTaskMem-allocated format pointer. The layout is the WAVEFORMATEXTENSIBLE
++// declared in the Windows SDK header shared/mmreg.h, which is included under
++// pshpack1.h (packing = 1, so nothing is padded): WAVEFORMATEX is 18 bytes
++// with tag@0, channels@2, rate@4, avgBytes@8, blockAlign@12, bits@14,
++// cbSize@16, and the extension -- documented in that header with cbSize = 22
++// -- adds Samples@18, dwChannelMask@20 and SubFormat@24, 40 bytes in total.
++// Samples@18 is a two-byte union of three WORDs (wValidBitsPerSample,
++// wSamplesPerBlock, wReserved); "validBits" is not a field name.
++//
++// SubFormat is the member that carries the real subtype behind a 0xFFFE
++// wFormatTag, so Data1 is read at byte 24. KSDATAFORMAT_SUBTYPE_PCM is 1 and
++// KSDATAFORMAT_SUBTYPE_IEEE_FLOAT is 3, both with a zero high half word, so a
++// read two bytes late resolves every extensible mix format to 0; and because
++// convertPacket branches on floating alone, that would re-slice 32-bit float
++// frames as int16 while returning the very same frame count. The sibling
++// wavinjector.go parses the same layout at body+24 under the same 40-byte
++// total: mmreg.h is the authority for both, not that file.
+ func parseWaveFormat(p unsafe.Pointer) (waveFormat, error) {
+ 	if p == nil {
+ 		return waveFormat{}, observe.New(observe.ClassAudioDevice, "GetMixFormat returned no format")
+@@ -193,7 +208,7 @@ func parseWaveFormat(p unsafe.Pointer) (waveFormat, error) {
+ 		bits:     *(*uint16)(unsafe.Add(p, 14)),
+ 	}
+ 	if f.tag == waveFormatExt {
+-		sub := *(*windows.GUID)(unsafe.Add(p, 26))
++		sub := *(*windows.GUID)(unsafe.Add(p, 24))
+ 		f.tag = uint16(sub.Data1) // KSDATAFORMAT_SUBTYPE_* low word: 1=PCM 3=FLOAT
+ 	}
+ 	if f.rate == 0 || f.channels == 0 {
