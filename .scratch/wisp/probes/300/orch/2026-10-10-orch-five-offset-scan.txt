@@ -1,0 +1,118 @@
+ORCH RE-RUN 2026-10-10 13:02:21 anchor-tree=/tmp/wisp300-a1r/tree orig=/tmp/wisp300-v1-orig/wasapi_windows.go
+sed 射程＝只改 sub := *(*windows.GUID)(unsafe.Add(p, N)) 那一行（★第一发我把 channels@2/rate@4/bits@14 一起改了＝无效台件，具名留痕不删）
+===== MUT offset=20 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 20))
+=== RUN   TestParseWaveFormatSubFormatOffset300
+=== RUN   TestParseWaveFormatSubFormatOffset300/S1_float_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 3, want 1 (KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24)
+    parse_wave_format_300_windows_test.go:138: floating = true, want false (convertPacket would take the int16 path)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 3, want 7 (positive control: an obviously wrong Data1 must NOT be swallowed into PCM/FLOAT; the parser has to report the value it actually read, so this face may not go green on a constant)
+    parse_wave_format_300_windows_test.go:138: floating = true, want false (convertPacket would take the int16 path)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26
+    parse_wave_format_300_windows_test.go:122: tag = 3, want 0 (positive control for offset sensitivity: malformed face with Data1 two bytes late; per the authoritative layout the value at byte 24 is 0, so an assertion that passes here would read nothing meaningful)
+    parse_wave_format_300_windows_test.go:138: floating = true, want false (convertPacket would take the int16 path)
+--- FAIL: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.024s
+FAIL
+rc-gotest=1
+SUBTEST tally: PASS=1 FAIL=3
+===== MUT offset=22 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 22))
+=== RUN   TestParseWaveFormatSubFormatOffset300
+=== RUN   TestParseWaveFormatSubFormatOffset300/S1_float_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 3 (KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24)
+    parse_wave_format_300_windows_test.go:138: floating = false, want true (convertPacket would take the float32 path)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 1 (KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 7 (positive control: an obviously wrong Data1 must NOT be swallowed into PCM/FLOAT; the parser has to report the value it actually read, so this face may not go green on a constant)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26
+--- FAIL: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.025s
+FAIL
+rc-gotest=1
+SUBTEST tally: PASS=2 FAIL=6
+===== MUT offset=24 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 24))
+=== RUN   TestParseWaveFormatSubFormatOffset300
+=== RUN   TestParseWaveFormatSubFormatOffset300/S1_float_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24
+=== RUN   TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26
+--- PASS: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.026s
+rc-gotest=0
+SUBTEST tally: PASS=6 FAIL=6
+===== MUT offset=26 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 26))
+=== RUN   TestParseWaveFormatSubFormatOffset300
+=== RUN   TestParseWaveFormatSubFormatOffset300/S1_float_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 3 (KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24)
+    parse_wave_format_300_windows_test.go:138: floating = false, want true (convertPacket would take the float32 path)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 1 (KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 7 (positive control: an obviously wrong Data1 must NOT be swallowed into PCM/FLOAT; the parser has to report the value it actually read, so this face may not go green on a constant)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26
+    parse_wave_format_300_windows_test.go:122: tag = 3, want 0 (positive control for offset sensitivity: malformed face with Data1 two bytes late; per the authoritative layout the value at byte 24 is 0, so an assertion that passes here would read nothing meaningful)
+    parse_wave_format_300_windows_test.go:138: floating = true, want false (convertPacket would take the int16 path)
+--- FAIL: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.029s
+FAIL
+rc-gotest=1
+SUBTEST tally: PASS=6 FAIL=10
+===== MUT offset=28 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 28))
+=== RUN   TestParseWaveFormatSubFormatOffset300
+=== RUN   TestParseWaveFormatSubFormatOffset300/S1_float_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 3 (KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24)
+    parse_wave_format_300_windows_test.go:138: floating = false, want true (convertPacket would take the float32 path)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 1 (KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 7 (positive control: an obviously wrong Data1 must NOT be swallowed into PCM/FLOAT; the parser has to report the value it actually read, so this face may not go green on a constant)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26
+--- FAIL: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.026s
+FAIL
+rc-gotest=1
+SUBTEST tally: PASS=7 FAIL=13
+restore_cmp=IDENTICAL
+restore_add26_count=1
+⚠ 本件里那三行 SUBTEST tally 是**整份日志的累计值**（我把 grep 打在 $OUT 全文而⛔ 只打当节）＝一枚坏尺；有效读数＝逐节 rc-gotest ＋ 下面这张按节重新统计的表。
+
+=== 按节重新统计（★这一行之后就是上面那句承诺的表；尺=awk 把 grep 射程钉在当节内，只数缩进的子测试行 '^    --- PASS:' / '^    --- FAIL:'，父测试行不计） ===
+offset=20 pass=1 fail=3 rc=1
+offset=22 pass=1 fail=3 rc=1
+offset=24 pass=4 fail=0 rc=0
+offset=26 pass=0 fail=4 rc=1
+offset=28 pass=1 fail=3 rc=1
+⇒ 只有 offset=24 让四形同时绿（rc=0）；26 四形全红；20/22/28 各只绿一枚。S4 在 20/22/24/28 都绿、仅 26 红＝四形里最弱的一枚哨兵。
+★本件自抓两枚坏尺记在这里：① 上面那三行 SUBTEST tally＝整份日志的累计值（射程错）；② 第一发我把 sed 射程打宽到整文件那枚台件无效（它的读数⛔ 进本件——现量＝本件只含 5 节 ===== MUT offset= ／ 20·22·24·26·28，那一发的输出没被保留，所以这一条只有本行这句凭据、⛔ 读数）。①②都留在原位⛔ 抹。
