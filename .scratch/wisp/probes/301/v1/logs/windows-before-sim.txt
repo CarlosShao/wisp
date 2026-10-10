@@ -1,0 +1,1590 @@
+portable-tests.sh: platform=windows scope=[./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/ ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/session/ ./internal/projctx/]
+portable-tests.sh: 11 ledger entries, 7 accounted on this platform:
+portable-tests.sh:   TestDefaultDeadlineWallClockMeasurement              [opt-in] 300s wall-clock measurement gated by WISP_84_MEASURE=1 (ticket84_no_owner_test.go:224, docs/evidence/s1/84-ac1-bounded-wait.md); it measures a deadline instead of asserting a property, so a CI run of it produces a duration nobody checks
+portable-tests.sh:   TestSubprocessCrashWriter                            [reexec] child-process entry point of TestCrashRecoveryKillMidWrite (concurrent_test.go:186); not a test of its own, it skips whenever it is not the re-exec'd child
+portable-tests.sh:   TestHelperProcess                                    [reexec] child-process entry point of the job-object cases (jobscope_windows_test.go:87, //go:build windows); skips unless re-exec'd with the helper env var set
+portable-tests.sh:   TestLiveWasapiSmoke                                  [fixture] live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio endpoint, so the case has no subject there. Real-hardware smoke is ticket 16's
+portable-tests.sh:   TestRealDownloadVadThroughPipeline                   [opt-in] real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:120); CI has no business pulling model archives from a third-party mirror
+portable-tests.sh:   TestRealDownloadPuncArchiveThroughPipeline           [opt-in] real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:147); same reason as the VAD row
+portable-tests.sh:   TestSyncRegistryProbeLive                            [fixture] P12 live registry evidence; on ubuntu it is now out of scope by platform instead of by skip (ticket 93 AC#2 moved it verbatim into syncdirs_windows_test.go), and on a Windows host whose HKCU Accounts key carries no UserFolder the hive has nothing to say. Measured on a windows host at HEAD 84e43af: --- SKIP at syncdirs_windows_test.go:133. As of ticket 110 AC#4 the windows leg carries ./internal/risk/ in its scope, so this row is re-verified against the compiled WINDOWS test binary (go test -list) and printed with its reason in that step's log - which is the step-level answer R-93-4 asked for. Remedy for a real run: a host with a sync record, or fold the shape check into the fixture-driven case. next= on ticket 93
+portable-tests.sh: -skip pattern built from the ledger: ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$
+=== RUN   TestBootTestEnvBootsAllPackages
+time=2026-10-10T15:16:53.235+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:53.239+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:53.239+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:53.239+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:53.239+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:53.239+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:53.239+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestBootTestEnvBootsAllPackages (0.02s)
+=== RUN   TestBootSingleInstanceConflict
+time=2026-10-10T15:16:53.255+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:53.255+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:53.255+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:53.255+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:53.255+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:53.255+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:53.255+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestBootSingleInstanceConflict (0.01s)
+=== RUN   TestCrossVetForLinux
+--- PASS: TestCrossVetForLinux (0.85s)
+=== RUN   TestMutexNamesPerEnv
+time=2026-10-10T15:16:54.125+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.125+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.125+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:54.125+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.125+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.126+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.126+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+time=2026-10-10T15:16:54.132+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.132+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.132+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:54.132+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.132+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.132+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.132+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+time=2026-10-10T15:16:54.133+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.133+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.133+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:54.133+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.133+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.133+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.133+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+time=2026-10-10T15:16:54.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:54.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.135+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestMutexNamesPerEnv (0.03s)
+=== RUN   TestLayoutForProdDev
+--- PASS: TestLayoutForProdDev (0.00s)
+=== RUN   TestLayoutForTestEnv
+=== RUN   TestLayoutForTestEnv/explicit_WISP_TEST_DATA_DIR
+=== RUN   TestLayoutForTestEnv/falls_back_to_TEMP_per_pid
+    envfork_test.go:139: test DataDir = "C:\\Users\\swq\\AppData\\Local\\Temp\\wisp-test-23088" (TMPDIR = "C:\\Users\\swq\\AppData\\Local\\Temp", which reaches "C:\\Users\\swq\\AppData\\Local\\Temp")
+--- PASS: TestLayoutForTestEnv (0.02s)
+    --- PASS: TestLayoutForTestEnv/explicit_WISP_TEST_DATA_DIR (0.01s)
+    --- PASS: TestLayoutForTestEnv/falls_back_to_TEMP_per_pid (0.01s)
+=== RUN   TestLayoutForkMatrix
+--- PASS: TestLayoutForkMatrix (0.00s)
+=== RUN   TestPortableOverride
+=== RUN   TestPortableOverride/no_marker_is_a_no-op
+=== RUN   TestPortableOverride/explicit_test_data_dir_beats_the_marker
+--- PASS: TestPortableOverride (0.02s)
+    --- PASS: TestPortableOverride/no_marker_is_a_no-op (0.00s)
+    --- PASS: TestPortableOverride/explicit_test_data_dir_beats_the_marker (0.01s)
+=== RUN   TestSummaryBadge
+--- PASS: TestSummaryBadge (0.00s)
+=== RUN   TestLayoutForUnknownEnv
+--- PASS: TestLayoutForUnknownEnv (0.00s)
+=== RUN   TestDefaultLayoutUnknownEnvFails
+--- PASS: TestDefaultLayoutUnknownEnvFails (0.00s)
+=== RUN   TestExternalSamplerReadsSubjectFromOutside
+--- PASS: TestExternalSamplerReadsSubjectFromOutside (0.05s)
+=== RUN   TestExternalSamplerRefusesToMeasureItself
+--- PASS: TestExternalSamplerRefusesToMeasureItself (0.00s)
+=== RUN   TestExternalSamplerFailClosedOnDeadSubject
+--- PASS: TestExternalSamplerFailClosedOnDeadSubject (0.01s)
+=== RUN   TestExternalSamplerTracksSubjectGrowth
+--- PASS: TestExternalSamplerTracksSubjectGrowth (0.30s)
+=== RUN   TestJobScopeKillsChildOnClose
+--- PASS: TestJobScopeKillsChildOnClose (0.02s)
+=== RUN   TestJobScopeTreeAccounting
+--- PASS: TestJobScopeTreeAccounting (0.04s)
+=== RUN   TestStartInJobRejectsBadCommand
+--- PASS: TestStartInJobRejectsBadCommand (0.02s)
+=== RUN   TestShutdownHookSetRunsEveryRegisteredStepInOrder
+--- PASS: TestShutdownHookSetRunsEveryRegisteredStepInOrder (0.00s)
+=== RUN   TestShutdownHookSetRefusesEveryShapeThatWouldLie
+=== RUN   TestShutdownHookSetRefusesEveryShapeThatWouldLie/nil_hook_is_not_a_registration
+=== RUN   TestShutdownHookSetRefusesEveryShapeThatWouldLie/steps_without_a_slot_are_refused
+=== RUN   TestShutdownHookSetRefusesEveryShapeThatWouldLie/one_slot_has_one_owner
+time=2026-10-10T15:16:54.643+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.643+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.643+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.643+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.643+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.643+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+time=2026-10-10T15:16:54.643+08:00 level=INFO msg="shutdown step skipped (module not present)" step=9 name=close-job-object
+=== RUN   TestShutdownHookSetRefusesEveryShapeThatWouldLie/registration_after_the_sequence_started_is_refused
+--- PASS: TestShutdownHookSetRefusesEveryShapeThatWouldLie (0.00s)
+    --- PASS: TestShutdownHookSetRefusesEveryShapeThatWouldLie/nil_hook_is_not_a_registration (0.00s)
+    --- PASS: TestShutdownHookSetRefusesEveryShapeThatWouldLie/steps_without_a_slot_are_refused (0.00s)
+    --- PASS: TestShutdownHookSetRefusesEveryShapeThatWouldLie/one_slot_has_one_owner (0.00s)
+    --- PASS: TestShutdownHookSetRefusesEveryShapeThatWouldLie/registration_after_the_sequence_started_is_refused (0.00s)
+=== RUN   TestShutdownHookSetZeroValueIsUsable
+--- PASS: TestShutdownHookSetZeroValueIsUsable (0.00s)
+=== RUN   TestRuntimeCancelStepExecutesWhenRegistered
+time=2026-10-10T15:16:54.645+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.645+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.645+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.645+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.645+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.645+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestRuntimeCancelStepExecutesWhenRegistered (0.00s)
+=== RUN   TestRuntimeCancelStepIsSkippedWhenUnregistered
+time=2026-10-10T15:16:54.650+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.650+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.650+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:54.650+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.650+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.650+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.650+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestRuntimeCancelStepIsSkippedWhenUnregistered (0.00s)
+=== RUN   TestRuntimeRegistrationRefusalsReachTheCaller
+time=2026-10-10T15:16:54.653+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.653+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.653+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.653+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.653+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.653+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestRuntimeRegistrationRefusalsReachTheCaller (0.00s)
+=== RUN   TestShutdownOrderAudit
+--- PASS: TestShutdownOrderAudit (0.00s)
+=== RUN   TestShutdownFastPathSkipsOnlyStep7
+time=2026-10-10T15:16:54.654+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+--- PASS: TestShutdownFastPathSkipsOnlyStep7 (0.00s)
+=== RUN   TestShutdownBoundedWaitAbandonsAndContinues
+time=2026-10-10T15:16:54.654+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.654+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.734+08:00 level=ERROR msg="shutdown step abandoned wait (deadline exceeded)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:54.734+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.734+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.795+08:00 level=ERROR msg="shutdown step abandoned wait (deadline exceeded)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=9 name=close-job-object
+--- PASS: TestShutdownBoundedWaitAbandonsAndContinues (0.14s)
+=== RUN   TestShutdownNilHooksAreRecordedSkipped
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+time=2026-10-10T15:16:54.795+08:00 level=INFO msg="shutdown step skipped (module not present)" step=9 name=close-job-object
+--- PASS: TestShutdownNilHooksAreRecordedSkipped (0.00s)
+=== RUN   TestSingleInstanceSecondExitsAfterSignallingFirst
+--- PASS: TestSingleInstanceSecondExitsAfterSignallingFirst (0.03s)
+=== RUN   TestAcquireRejectsEmptyNames
+--- PASS: TestAcquireRejectsEmptyNames (0.00s)
+=== RUN   TestParseSystemProcessesKeepsLastSnapshotEntry
+--- PASS: TestParseSystemProcessesKeepsLastSnapshotEntry (0.00s)
+=== RUN   TestWalkSystemProcessesStopsAtTerminator
+--- PASS: TestWalkSystemProcessesStopsAtTerminator (0.00s)
+=== RUN   TestParseSystemProcessesSkipsPIDZero
+--- PASS: TestParseSystemProcessesSkipsPIDZero (0.00s)
+=== RUN   TestParseSystemProcessesRejectsTruncatedEntry
+--- PASS: TestParseSystemProcessesRejectsTruncatedEntry (0.00s)
+=== RUN   TestParseSystemProcessesRejectsNonAdvancingEntry
+--- PASS: TestParseSystemProcessesRejectsNonAdvancingEntry (0.00s)
+=== RUN   TestSystemProcessSnapshotSeesSelf
+--- PASS: TestSystemProcessSnapshotSeesSelf (0.01s)
+=== RUN   TestWalkSystemProcessesEmptyBuffer
+--- PASS: TestWalkSystemProcessesEmptyBuffer (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/proc	1.684s
+=== RUN   TestExistsAndDelete
+--- PASS: TestExistsAndDelete (0.04s)
+=== RUN   TestBlobPathRejectsTraversalOutsideCharset
+--- PASS: TestBlobPathRejectsTraversalOutsideCharset (0.01s)
+=== RUN   TestBlobsListsMetadataOnly
+--- PASS: TestBlobsListsMetadataOnly (0.03s)
+=== RUN   TestBlobsEmptyAndMissingDir
+--- PASS: TestBlobsEmptyAndMissingDir (0.01s)
+=== RUN   TestConfigRefs
+--- PASS: TestConfigRefs (0.01s)
+=== RUN   TestMigratePlaintextMigratesAndBacksUp
+--- PASS: TestMigratePlaintextMigratesAndBacksUp (0.05s)
+=== RUN   TestMigratePlaintextIdempotent
+--- PASS: TestMigratePlaintextIdempotent (0.03s)
+=== RUN   TestMigratePlaintextNoConfigIsNoOp
+--- PASS: TestMigratePlaintextNoConfigIsNoOp (0.00s)
+=== RUN   TestMigratePlaintextKeepsFirstBackup
+--- PASS: TestMigratePlaintextKeepsFirstBackup (0.04s)
+=== RUN   TestMigratePlaintextLeavesNonSecretsAlone
+=== RUN   TestMigratePlaintextLeavesNonSecretsAlone/empty_api_key_is_not_migrated
+=== RUN   TestMigratePlaintextLeavesNonSecretsAlone/unparseable_config_is_an_explicit_error
+--- PASS: TestMigratePlaintextLeavesNonSecretsAlone (0.01s)
+    --- PASS: TestMigratePlaintextLeavesNonSecretsAlone/empty_api_key_is_not_migrated (0.00s)
+    --- PASS: TestMigratePlaintextLeavesNonSecretsAlone/unparseable_config_is_an_explicit_error (0.01s)
+=== RUN   TestParseRefValid
+--- PASS: TestParseRefValid (0.00s)
+=== RUN   TestParseRefInvalid
+--- PASS: TestParseRefInvalid (0.00s)
+=== RUN   TestNewRefUniqueAndParseable
+--- PASS: TestNewRefUniqueAndParseable (0.00s)
+=== RUN   TestValidBlobIDCharset
+--- PASS: TestValidBlobIDCharset (0.00s)
+=== RUN   TestStoreResolveRoundTrip
+--- PASS: TestStoreResolveRoundTrip (0.04s)
+=== RUN   TestBlobFileNotPlaintext
+--- PASS: TestBlobFileNotPlaintext (0.01s)
+=== RUN   TestStoreRejectsEnvRefsAndEmpty
+--- PASS: TestStoreRejectsEnvRefsAndEmpty (0.01s)
+=== RUN   TestResolveEnvRef
+=== RUN   TestResolveEnvRef/arbitrary_placeholder_value
+=== RUN   TestResolveEnvRef/missing_variable_is_an_explicit_error
+=== RUN   TestResolveEnvRef/empty_variable_is_an_explicit_error
+--- PASS: TestResolveEnvRef (0.01s)
+    --- PASS: TestResolveEnvRef/arbitrary_placeholder_value (0.00s)
+    --- PASS: TestResolveEnvRef/missing_variable_is_an_explicit_error (0.00s)
+    --- PASS: TestResolveEnvRef/empty_variable_is_an_explicit_error (0.00s)
+=== RUN   TestPortableDecryptFailureExplicit
+=== RUN   TestPortableDecryptFailureExplicit/portable_mode_surfaces_ErrPortableDecrypt_with_env:_guidance
+=== RUN   TestPortableDecryptFailureExplicit/portable_mode_still_decrypts_own_blobs
+=== RUN   TestPortableDecryptFailureExplicit/non-portable_mode_also_fails_explicitly
+--- PASS: TestPortableDecryptFailureExplicit (0.05s)
+    --- PASS: TestPortableDecryptFailureExplicit/portable_mode_surfaces_ErrPortableDecrypt_with_env:_guidance (0.02s)
+    --- PASS: TestPortableDecryptFailureExplicit/portable_mode_still_decrypts_own_blobs (0.01s)
+    --- PASS: TestPortableDecryptFailureExplicit/non-portable_mode_also_fails_explicitly (0.01s)
+=== RUN   TestResolveErrorsCarryNoSecret
+--- PASS: TestResolveErrorsCarryNoSecret (0.02s)
+=== RUN   TestRedactSecret
+--- PASS: TestRedactSecret (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/secret	0.467s
+time=2026-10-10T15:16:53.932+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestBoundaryNoPlaintextSecretFields
+--- PASS: TestBoundaryNoPlaintextSecretFields (0.00s)
+=== RUN   TestBoundaryNoRuntimeObservationFields
+--- PASS: TestBoundaryNoRuntimeObservationFields (0.00s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.05s)
+=== RUN   TestRoundTripBytes
+--- PASS: TestRoundTripBytes (0.00s)
+=== RUN   TestResolvedNeverPersists
+--- PASS: TestResolvedNeverPersists (0.02s)
+=== RUN   TestValidateTextChainValid
+--- PASS: TestValidateTextChainValid (0.00s)
+=== RUN   TestValidateTextChainUnknownElement
+--- PASS: TestValidateTextChainUnknownElement (0.00s)
+=== RUN   TestValidateVoiceCloudChains
+=== RUN   TestValidateVoiceCloudChains/valid_cloud_chains
+=== RUN   TestValidateVoiceCloudChains/unknown_element_named
+=== RUN   TestValidateVoiceCloudChains/local-sherpa_never_in_chains
+--- PASS: TestValidateVoiceCloudChains (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/valid_cloud_chains (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/unknown_element_named (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/local-sherpa_never_in_chains (0.00s)
+=== RUN   TestValidateRoleReferences
+=== RUN   TestValidateRoleReferences/both_empty_is_unset-ok
+=== RUN   TestValidateRoleReferences/provider_without_model
+=== RUN   TestValidateRoleReferences/model_without_provider
+=== RUN   TestValidateRoleReferences/unknown_provider_named
+=== RUN   TestValidateRoleReferences/unknown_model_named
+=== RUN   TestValidateRoleReferences/valid_pair
+--- PASS: TestValidateRoleReferences (0.00s)
+    --- PASS: TestValidateRoleReferences/both_empty_is_unset-ok (0.00s)
+    --- PASS: TestValidateRoleReferences/provider_without_model (0.00s)
+    --- PASS: TestValidateRoleReferences/model_without_provider (0.00s)
+    --- PASS: TestValidateRoleReferences/unknown_provider_named (0.00s)
+    --- PASS: TestValidateRoleReferences/unknown_model_named (0.00s)
+    --- PASS: TestValidateRoleReferences/valid_pair (0.00s)
+=== RUN   TestValidateRealtimeReferences
+=== RUN   TestValidateRealtimeReferences/disabled_with_dangling_pair_tolerated
+=== RUN   TestValidateRealtimeReferences/enabled_requires_existing_pair
+=== RUN   TestValidateRealtimeReferences/enabled_without_pair_rejected
+=== RUN   TestValidateRealtimeReferences/enabled_valid_pair
+--- PASS: TestValidateRealtimeReferences (0.00s)
+    --- PASS: TestValidateRealtimeReferences/disabled_with_dangling_pair_tolerated (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_requires_existing_pair (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_without_pair_rejected (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_valid_pair (0.00s)
+=== RUN   TestSplitChainElement
+--- PASS: TestSplitChainElement (0.00s)
+=== RUN   TestTicket261P1MissingEnabledKeyDecodesFalse
+--- PASS: TestTicket261P1MissingEnabledKeyDecodesFalse (0.02s)
+=== RUN   TestTicket261P1SettingsWriteMaterializesFalse
+time=2026-10-10T15:16:54.053+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.mock261.models.t261-nokey.context_window wrote=[llm.providers.mock261.models.t261-nokey.context_window]
+--- PASS: TestTicket261P1SettingsWriteMaterializesFalse (0.03s)
+=== RUN   TestLoadFileMergesDefaultsAndOverrides
+--- PASS: TestLoadFileMergesDefaultsAndOverrides (0.01s)
+=== RUN   TestLoadFileUnknownKeyErrorNamesLine
+--- PASS: TestLoadFileUnknownKeyErrorNamesLine (0.01s)
+=== RUN   TestLoadFileUnknownKeyLineNumbersAreOneBased
+--- PASS: TestLoadFileUnknownKeyLineNumbersAreOneBased (0.01s)
+=== RUN   TestLoadFileWrongTypeErrorHasPosition
+--- PASS: TestLoadFileWrongTypeErrorHasPosition (0.01s)
+=== RUN   TestLoadFileRejectsInvalidValues
+--- PASS: TestLoadFileRejectsInvalidValues (0.01s)
+=== RUN   TestLoadFilePresetInheritance
+--- PASS: TestLoadFilePresetInheritance (0.01s)
+=== RUN   TestLoadFileUnknownProviderNeedsProtocol
+--- PASS: TestLoadFileUnknownProviderNeedsProtocol (0.01s)
+=== RUN   TestLoadFileResolvesSecrets
+--- PASS: TestLoadFileResolvesSecrets (0.01s)
+=== RUN   TestLoadFileResolveFailureIsError
+--- PASS: TestLoadFileResolveFailureIsError (0.01s)
+=== RUN   TestLoadFileNilResolverSkipsResolution
+--- PASS: TestLoadFileNilResolverSkipsResolution (0.01s)
+=== RUN   TestLoadFileNewerSchemaVersionRejected
+--- PASS: TestLoadFileNewerSchemaVersionRejected (0.01s)
+=== RUN   TestSaveFileRoundTripsThroughLoad
+--- PASS: TestSaveFileRoundTripsThroughLoad (0.01s)
+=== RUN   TestConfirmLockedRunsOutsideTheManagerLock
+time=2026-10-10T15:16:54.193+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestConfirmLockedRunsOutsideTheManagerLock (0.02s)
+=== RUN   TestCheckAndReloadAsksOncePerFileChange
+time=2026-10-10T15:16:54.210+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestCheckAndReloadAsksOncePerFileChange (0.02s)
+=== RUN   TestManagerHotTierAppliesImmediately
+--- PASS: TestManagerHotTierAppliesImmediately (0.02s)
+=== RUN   TestManagerRestartTierKeepsOldValues
+--- PASS: TestManagerRestartTierKeepsOldValues (0.02s)
+=== RUN   TestManagerThemeIsHotInsideApp
+--- PASS: TestManagerThemeIsHotInsideApp (0.02s)
+=== RUN   TestManagerReloadTierEmitsEvent
+--- PASS: TestManagerReloadTierEmitsEvent (0.02s)
+=== RUN   TestManagerVoiceHotKeysDoNotEmitReload
+--- PASS: TestManagerVoiceHotKeysDoNotEmitReload (0.02s)
+=== RUN   TestManagerLockedLooseningRejectedKeepsOld
+time=2026-10-10T15:16:54.320+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedLooseningRejectedKeepsOld (0.02s)
+=== RUN   TestManagerLockedLooseningApprovedApplies
+time=2026-10-10T15:16:54.337+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedLooseningApprovedApplies (0.02s)
+=== RUN   TestManagerLockedTighteningHotAppliesWithoutHook
+time=2026-10-10T15:16:54.353+08:00 level=INFO msg="config: locked section tightened, hot-applied" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedTighteningHotAppliesWithoutHook (0.02s)
+=== RUN   TestManagerLockedNilConfirmHookDenies
+time=2026-10-10T15:16:54.368+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedNilConfirmHookDenies (0.01s)
+=== RUN   TestManagerLockedBothDirectionsLogged
+--- PASS: TestManagerLockedBothDirectionsLogged (0.03s)
+=== RUN   TestManagerLoadErrorKeepsCurrentConfig
+--- PASS: TestManagerLoadErrorKeepsCurrentConfig (0.06s)
+=== RUN   TestManagerMissingFileKeepsCurrentAndErrors
+--- PASS: TestManagerMissingFileKeepsCurrentAndErrors (0.00s)
+=== RUN   TestMigrateV1Fixture
+--- PASS: TestMigrateV1Fixture (0.01s)
+=== RUN   TestMigrateNoVersionKeyAssumedV1
+--- PASS: TestMigrateNoVersionKeyAssumedV1 (0.01s)
+=== RUN   TestMigrateCorruptFileUntouched
+--- PASS: TestMigrateCorruptFileUntouched (0.01s)
+=== RUN   TestMigrateUnsupportedVersionUntouched
+--- PASS: TestMigrateUnsupportedVersionUntouched (0.00s)
+=== RUN   TestMigrateHigherIntermediateVersionRejected
+--- PASS: TestMigrateHigherIntermediateVersionRejected (0.00s)
+=== RUN   TestAC2BaselineModeIsDecorative
+    private_acl_windows_test.go:56: seeded wide parent C:\Users\swq\AppData\Local\Temp\TestAC2BaselineModeIsDecorative1679482232\001\data
+        C:\Users\swq\AppData\Local\Temp\TestAC2BaselineModeIsDecorative1679482232\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                           NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                           BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                           DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:63: BASELINE (pre-wiring shape) icacls C:\Users\swq\AppData\Local\Temp\TestAC2BaselineModeIsDecorative1679482232\001\data\config.toml.bak-1
+        C:\Users\swq\AppData\Local\Temp\TestAC2BaselineModeIsDecorative1679482232\001\data\config.toml.bak-1 BUILTIN\Users:(I)(RX)
+                                                                                                             NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                             BUILTIN\Administrators:(I)(F)
+                                                                                                             DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2BaselineModeIsDecorative (0.11s)
+=== RUN   TestAC2MigrationBackupLandsPrivate
+    private_acl_windows_test.go:77: seeded wide parent C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate301338299\001\data
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate301338299\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                             NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                             BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                             DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+time=2026-10-10T15:16:54.681+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate301338299\001\data\config.toml.bak-1 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-10T15:16:54.684+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate301338299\001\data\.wisp-config-3917823588.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    private_acl_windows_test.go:89: icacls C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate301338299\001\data\config.toml.bak-1
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate301338299\001\data\config.toml.bak-1 NT AUTHORITY\SYSTEM:(F)
+                                                                                                               BUILTIN\Administrators:(F)
+                                                                                                               DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:90: icacls C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate301338299\001\data\config.toml
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupLandsPrivate301338299\001\data\config.toml NT AUTHORITY\SYSTEM:(F)
+                                                                                                         BUILTIN\Administrators:(F)
+                                                                                                         DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2MigrationBackupLandsPrivate (0.15s)
+=== RUN   TestAC2SaveFileLandsPrivate
+    private_acl_windows_test.go:108: seeded wide parent C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate1791213019\001\data
+        C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate1791213019\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                       NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                       BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                       DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:122: BASELINE (pre-wiring shape) icacls C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate1791213019\001\data\config.toml
+        C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate1791213019\001\data\config.toml BUILTIN\Users:(I)(RX)
+                                                                                                   NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                   BUILTIN\Administrators:(I)(F)
+                                                                                                   DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+time=2026-10-10T15:16:54.872+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate1791213019\001\data\.wisp-config-169626682.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    private_acl_windows_test.go:130: icacls C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate1791213019\001\data\config.toml
+        C:\Users\swq\AppData\Local\Temp\TestAC2SaveFileLandsPrivate1791213019\001\data\config.toml NT AUTHORITY\SYSTEM:(F)
+                                                                                                   BUILTIN\Administrators:(F)
+                                                                                                   DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2SaveFileLandsPrivate (0.16s)
+=== RUN   TestAC11SettingWriteReportsTheKeyPathItChanged
+time=2026-10-10T15:16:54.919+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+--- PASS: TestAC11SettingWriteReportsTheKeyPathItChanged (0.01s)
+=== RUN   TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure
+time=2026-10-10T15:16:54.928+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+--- PASS: TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure (0.01s)
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list
+--- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical (0.03s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list (0.00s)
+=== RUN   TestAC11SettingWriteKeepsAForeignHandEditedKey
+time=2026-10-10T15:16:54.978+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC11SettingWriteKeepsAForeignHandEditedKey (0.02s)
+=== RUN   TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit
+time=2026-10-10T15:16:54.998+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.02s)
+=== RUN   TestAC3SettingWriteStoresARefNeverAValue
+time=2026-10-10T15:16:55.008+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestAC3SettingWriteStoresARefNeverAValue (0.01s)
+=== RUN   TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes
+time=2026-10-10T15:16:55.017+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-10T15:16:55.021+08:00 level=INFO msg="config: config.toml already carries this key; nothing written" key=llm.providers.deepseek.base_url
+--- PASS: TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes (0.01s)
+=== RUN   TestTicket257R1AC1CleanMachineRefusesAllSevenFields
+    settings_257_test.go:183: clean machine, seven refusals by reason: map[第 2 种拒因：行不存在:7] (fields: 7)
+--- PASS: TestTicket257R1AC1CleanMachineRefusesAllSevenFields (0.01s)
+=== RUN   TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields
+time=2026-10-10T15:16:55.047+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-10T15:16:55.053+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-10T15:16:55.057+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+time=2026-10-10T15:16:55.063+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.price.in wrote=[llm.providers.deepseek.models.deepseek-chat.price.in]
+time=2026-10-10T15:16:55.069+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.models.deepseek-chat.price.out wrote=[llm.providers.deepseek.models.deepseek-chat.price.out]
+time=2026-10-10T15:16:55.075+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.roles.chat.model wrote=[llm.roles.chat.model]
+time=2026-10-10T15:16:55.081+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields (0.05s)
+=== RUN   TestTicket257R1AC2MissingFileIsItsOwnSentence
+--- PASS: TestTicket257R1AC2MissingFileIsItsOwnSentence (0.00s)
+=== RUN   TestTicket257R1AC2MissingRowIsItsOwnSentence
+--- PASS: TestTicket257R1AC2MissingRowIsItsOwnSentence (0.01s)
+=== RUN   TestTicket257R1AC2InvalidValueIsItsOwnSentence
+--- PASS: TestTicket257R1AC2InvalidValueIsItsOwnSentence (0.00s)
+=== RUN   TestEverySectionHasATierInRegistry
+--- PASS: TestEverySectionHasATierInRegistry (0.00s)
+=== RUN   TestRegistryCoversSchemaSectionsGreen
+--- PASS: TestRegistryCoversSchemaSectionsGreen (0.00s)
+=== RUN   TestPerKeySectionsAreRegisteredPerKey
+--- PASS: TestPerKeySectionsAreRegisteredPerKey (0.00s)
+=== RUN   TestVoicePerKeyRowsMirrorPlanVoiceWalks
+--- PASS: TestVoicePerKeyRowsMirrorPlanVoiceWalks (0.00s)
+=== RUN   TestEveryAppKeyIsRegisteredInTierRegistry
+--- PASS: TestEveryAppKeyIsRegisteredInTierRegistry (0.00s)
+=== RUN   TestAppKeyWalkSeesTheRosterItClaims
+--- PASS: TestAppKeyWalkSeesTheRosterItClaims (0.00s)
+=== RUN   TestUnwiredSecurityKeysFailLoudly
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides
+=== RUN   TestUnwiredSecurityKeysFailLoudly/net.allowlist
+=== RUN   TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges
+--- PASS: TestUnwiredSecurityKeysFailLoudly (0.03s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled (0.01s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/net.allowlist (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges (0.00s)
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/empty_file
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected
+--- PASS: TestUnwiredGuardLeavesHonestConfigsAlone (0.02s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/empty_file (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads (0.01s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected (0.00s)
+=== RUN   TestUnwiredGuardFiresBeforeAnyFileWrite
+--- PASS: TestUnwiredGuardFiresBeforeAnyFileWrite (0.01s)
+=== RUN   TestUnwiredGuardIsScopedNotABigStick
+--- PASS: TestUnwiredGuardIsScopedNotABigStick (0.01s)
+=== RUN   TestUnwiredKeysStillRoundTripAtTheByteLevel
+--- PASS: TestUnwiredKeysStillRoundTripAtTheByteLevel (0.00s)
+=== RUN   TestEveryLockedSectionKeyIsAccountedFor
+--- PASS: TestEveryLockedSectionKeyIsAccountedFor (0.00s)
+=== RUN   TestValidateDefaultsPass
+--- PASS: TestValidateDefaultsPass (0.00s)
+=== RUN   TestValidateEnumErrors
+=== RUN   TestValidateEnumErrors/theme
+=== RUN   TestValidateEnumErrors/observe.level
+=== RUN   TestValidateEnumErrors/proxy.mode
+=== RUN   TestValidateEnumErrors/over_budget
+=== RUN   TestValidateEnumErrors/protocol
+=== RUN   TestValidateEnumErrors/provider_billing
+=== RUN   TestValidateEnumErrors/model_billing
+=== RUN   TestValidateEnumErrors/thinking_intensity
+=== RUN   TestValidateEnumErrors/thinking_levels_element
+--- PASS: TestValidateEnumErrors (0.00s)
+    --- PASS: TestValidateEnumErrors/theme (0.00s)
+    --- PASS: TestValidateEnumErrors/observe.level (0.00s)
+    --- PASS: TestValidateEnumErrors/proxy.mode (0.00s)
+    --- PASS: TestValidateEnumErrors/over_budget (0.00s)
+    --- PASS: TestValidateEnumErrors/protocol (0.00s)
+    --- PASS: TestValidateEnumErrors/provider_billing (0.00s)
+    --- PASS: TestValidateEnumErrors/model_billing (0.00s)
+    --- PASS: TestValidateEnumErrors/thinking_intensity (0.00s)
+    --- PASS: TestValidateEnumErrors/thinking_levels_element (0.00s)
+=== RUN   TestValidateEnumAcceptsEveryListedValue
+--- PASS: TestValidateEnumAcceptsEveryListedValue (0.00s)
+=== RUN   TestValidateHardcodedReadOnly
+=== RUN   TestValidateHardcodedReadOnly/audio.half_duplex=false
+=== RUN   TestValidateHardcodedReadOnly/privacy.keep_transcript=true
+=== RUN   TestValidateHardcodedReadOnly/privacy.keep_audio=true
+=== RUN   TestValidateHardcodedReadOnly/models.verify_signature=false
+--- PASS: TestValidateHardcodedReadOnly (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/audio.half_duplex=false (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/privacy.keep_transcript=true (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/privacy.keep_audio=true (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/models.verify_signature=false (0.00s)
+=== RUN   TestValidateBallSizeRange
+--- PASS: TestValidateBallSizeRange (0.00s)
+=== RUN   TestValidateRiskConfirmTimeoutRange
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_30
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_10
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_3601
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_99999
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_0
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_-1
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_31
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_300
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_3600
+--- PASS: TestValidateRiskConfirmTimeoutRange (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_30 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_10 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_3601 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_99999 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_0 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_-1 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_31 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_300 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_3600 (0.00s)
+=== RUN   TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne
+--- PASS: TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne (0.00s)
+=== RUN   TestValidateAPIKeyRefFormat
+=== RUN   TestValidateAPIKeyRefFormat/empty_is_keyless
+=== RUN   TestValidateAPIKeyRefFormat/dpapi_ref
+=== RUN   TestValidateAPIKeyRefFormat/env_ref
+=== RUN   TestValidateAPIKeyRefFormat/plaintext_key
+=== RUN   TestValidateAPIKeyRefFormat/bare_blob_id
+=== RUN   TestValidateAPIKeyRefFormat/traversal_blob_id
+=== RUN   TestValidateAPIKeyRefFormat/empty_env_name
+=== RUN   TestValidateAPIKeyRefFormat/unknown_scheme
+--- PASS: TestValidateAPIKeyRefFormat (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/empty_is_keyless (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/dpapi_ref (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/env_ref (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/plaintext_key (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/bare_blob_id (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/traversal_blob_id (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/empty_env_name (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/unknown_scheme (0.00s)
+=== RUN   TestValidateRealtimeAPIKeyRefFormat
+--- PASS: TestValidateRealtimeAPIKeyRefFormat (0.00s)
+=== RUN   TestAC1AllowedDirsWriteKeepsAHandEditedKey
+time=2026-10-10T15:16:55.186+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC1AllowedDirsWriteKeepsAHandEditedKey (0.02s)
+=== RUN   TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit
+--- PASS: TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.02s)
+=== RUN   TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept
+--- PASS: TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept (0.02s)
+=== RUN   TestAC2CleanWriteReportsOneKeyAtInfoLevel
+--- PASS: TestAC2CleanWriteReportsOneKeyAtInfoLevel (0.01s)
+=== RUN   TestAC2UnreadableFileIsRefusedAndNothingIsWritten
+--- PASS: TestAC2UnreadableFileIsRefusedAndNothingIsWritten (0.02s)
+=== RUN   TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+time=2026-10-10T15:16:55.254+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-10-10T15:16:55.283+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC3AdoptionClaimsOnlyWhatThisWriteProduced (0.04s)
+=== RUN   TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory
+time=2026-10-10T15:16:55.302+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[fs.allowed_dirs]
+time=2026-10-10T15:16:55.304+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory (0.02s)
+=== RUN   TestAC4PermissionModeWriteKeepsAHandEditedKey
+time=2026-10-10T15:16:55.321+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=risk.permission_mode wrote=[risk.permission_mode] kept_in_file_not_in_memory=[ball.size]
+time=2026-10-10T15:16:55.325+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+--- PASS: TestAC4PermissionModeWriteKeepsAHandEditedKey (0.02s)
+=== RUN   TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber
+time=2026-10-10T15:16:55.345+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber (0.02s)
+=== RUN   TestAddAllowedDirStillRefusesARelativeHop
+--- PASS: TestAddAllowedDirStillRefusesARelativeHop (0.01s)
+=== RUN   TestGuardedWriteFailureRollsBackMemory
+--- PASS: TestGuardedWriteFailureRollsBackMemory (0.00s)
+=== RUN   TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt
+time=2026-10-10T15:16:55.379+08:00 level=INFO msg="config: config.toml already carries this key; nothing written" key=fs.allowed_dirs
+--- PASS: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.01s)
+=== RUN   TestDiffKeyPathsNamesRealKeyPaths
+--- PASS: TestDiffKeyPathsNamesRealKeyPaths (0.00s)
+=== RUN   TestConfirmTimeoutFloorSitsAboveApprovalWarningLead
+--- PASS: TestConfirmTimeoutFloorSitsAboveApprovalWarningLead (0.00s)
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_2
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_20
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600
+--- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath (0.04s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_1 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_2 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_20 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600 (0.00s)
+=== RUN   TestMinimumLegalConfirmTimeoutKeepsC18Warning
+    validate_267_test.go:136: smallest legal timeout 31s, warning lead 30s, arming lead 1s > 0
+--- PASS: TestMinimumLegalConfirmTimeoutKeepsC18Warning (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	1.580s
+time=2026-10-10T15:16:53.967+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestR9PanicInSubAssessorFailsClosed
+--- PASS: TestR9PanicInSubAssessorFailsClosed (0.00s)
+=== RUN   TestR9PanicInWiredDependencyFailsClosed
+--- PASS: TestR9PanicInWiredDependencyFailsClosed (0.00s)
+=== RUN   TestFusionTakesMaxSeverity
+--- PASS: TestFusionTakesMaxSeverity (0.00s)
+=== RUN   TestFusionSingleDenyBeatsAnyConfirm
+--- PASS: TestFusionSingleDenyBeatsAnyConfirm (0.00s)
+=== RUN   TestFusionR4BlocksSessionOverride
+--- PASS: TestFusionR4BlocksSessionOverride (0.00s)
+=== RUN   TestDecisionGoldenSnapshots
+--- PASS: TestDecisionGoldenSnapshots (0.00s)
+=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+--- PASS: TestClassifyAnchorSpellingIsNotVerdict (0.19s)
+=== RUN   TestClassifySpellingInvariance
+--- PASS: TestClassifySpellingInvariance (0.05s)
+=== RUN   TestCanonicalInputGainsNoSecondForm
+--- PASS: TestCanonicalInputGainsNoSecondForm (0.02s)
+=== RUN   TestOverrideOnlyAcceptsTheResolvedForm
+--- PASS: TestOverrideOnlyAcceptsTheResolvedForm (0.11s)
+=== RUN   TestAListWinsWhereBothTablesHit
+--- PASS: TestAListWinsWhereBothTablesHit (0.06s)
+=== RUN   TestClassifyFailClosedWhenSpellingUnprovable
+--- PASS: TestClassifyFailClosedWhenSpellingUnprovable (0.15s)
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 488202 ns/op = 0.488 ms/op (budget 1.000 ms, 3267 samples)
+--- PASS: TestResolvePerCallBudget (3.55s)
+=== RUN   TestC26ExpansionMustNotRewriteOntoAnotherTree
+=== RUN   TestC26ExpansionMustNotRewriteOntoAnotherTree/percent_env_var_spelling
+    pathresolver_expansion_test.go:80: risk.c26Pipeline.Resolve (seam installed into winsec): refused as required: risk: expansion moved this path onto a tree the caller did not name: C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp3369715484\001\a%WISP102PROBE_TARGET%b\artifacts expands to C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp3369715484\001\aelsewhereb\artifacts (env); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:83: winsec.ResolvePath (sealing caller's view): refused as required: winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp3369715484\001\a%WISP102PROBE_TARGET%b\artifacts: risk: expansion moved this path onto a tree the caller did not name: C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp3369715484\001\a%WISP102PROBE_TARGET%b\artifacts expands to C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp3369715484\001\aelsewhereb\artifacts (env); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:86: risk.syncSet.resolveTarget (fs.write sync judgement): refused as required: risk: expansion moved this path onto a tree the caller did not name: C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp3369715484\001\a%WISP102PROBE_TARGET%b\artifacts expands to C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp3369715484\001\aelsewhereb\artifacts (env); act on the expanded tree only if you asked for it by name
+=== RUN   TestC26ExpansionMustNotRewriteOntoAnotherTree/leading_tilde_spelling
+    pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~\wisp102-tilde-probe\artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ~\wisp102-tilde-probe\artifacts: refused as required: winsec: refusing to seal ~\wisp102-tilde-probe\artifacts: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ~\wisp102-tilde-probe\artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~/wisp102-tilde-probe/artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ~/wisp102-tilde-probe/artifacts: refused as required: winsec: refusing to seal ~/wisp102-tilde-probe/artifacts: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ~/wisp102-tilde-probe/artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+--- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree (0.01s)
+    --- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree/percent_env_var_spelling (0.00s)
+    --- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree/leading_tilde_spelling (0.00s)
+=== RUN   TestPathResolverJunctionWindows
+--- PASS: TestPathResolverJunctionWindows (0.08s)
+=== RUN   TestPathResolverShortNameAListDenied
+--- PASS: TestPathResolverShortNameAListDenied (0.01s)
+=== RUN   TestPathResolverUNCAListDenied
+--- PASS: TestPathResolverUNCAListDenied (0.01s)
+=== RUN   TestPathResolverExtendedLengthPrefixAListDenied
+--- PASS: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+=== RUN   TestPathResolverCaseAndDotMixDenied
+--- PASS: TestPathResolverCaseAndDotMixDenied (0.01s)
+=== RUN   TestReparseExceptionExplicitPathOnly
+--- PASS: TestReparseExceptionExplicitPathOnly (0.23s)
+=== RUN   TestAListDenyAndUnoverridable
+--- PASS: TestAListDenyAndUnoverridable (0.02s)
+=== RUN   TestBListDefaultDenyAndOverride
+--- PASS: TestBListDefaultDenyAndOverride (0.01s)
+=== RUN   TestResolveIdempotent
+--- PASS: TestResolveIdempotent (0.01s)
+=== RUN   TestResolveExpansion
+--- PASS: TestResolveExpansion (0.01s)
+=== RUN   TestC26RewriteAccountIsRecorded
+=== RUN   TestC26RewriteAccountIsRecorded/percent_env_var
+=== RUN   TestC26RewriteAccountIsRecorded/dollar_env_var
+=== RUN   TestC26RewriteAccountIsRecorded/leading_home_tilde
+=== RUN   TestC26RewriteAccountIsRecorded/clean_absolute_is_not_marked
+=== RUN   TestC26RewriteAccountIsRecorded/unexpandable_construct_is_not_marked
+--- PASS: TestC26RewriteAccountIsRecorded (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/percent_env_var (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/dollar_env_var (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/leading_home_tilde (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/clean_absolute_is_not_marked (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/unexpandable_construct_is_not_marked (0.00s)
+=== RUN   TestC26RewrittenSyncRootDoesNotDisarmSuspectNet
+--- PASS: TestC26RewrittenSyncRootDoesNotDisarmSuspectNet (0.00s)
+=== RUN   TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+--- PASS: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.05s)
+=== RUN   TestResolveCanonicalIsPlatformShaped
+--- PASS: TestResolveCanonicalIsPlatformShaped (0.01s)
+=== RUN   TestResolveKeepsSeparatorsOutOfPosixNames
+--- PASS: TestResolveKeepsSeparatorsOutOfPosixNames (0.00s)
+=== RUN   TestDoubleSlashSpellingIsNotUNC
+--- PASS: TestDoubleSlashSpellingIsNotUNC (0.00s)
+=== RUN   TestTierAAnchorsMatchNativeSpelling
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.ssh/**
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.ssh/_dir_itself
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.git-credentials
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.kube/config
+=== RUN   TestTierAAnchorsMatchNativeSpelling/.git/config
+=== RUN   TestTierAAnchorsMatchNativeSpelling/%APPDATA%\wisp\config.toml
+=== RUN   TestTierAAnchorsMatchNativeSpelling/%APPDATA%\Microsoft\Protect\**
+=== RUN   TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\**
+=== RUN   TestTierAAnchorsMatchNativeSpelling/browser_credential_store
+--- PASS: TestTierAAnchorsMatchNativeSpelling (0.03s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.ssh/** (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.ssh/_dir_itself (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.git-credentials (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.kube/config (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/.git/config (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%APPDATA%\wisp\config.toml (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%APPDATA%\Microsoft\Protect\** (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\** (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/browser_credential_store (0.00s)
+=== RUN   TestOverrideKeyKeepsPosixBackslashesDistinct
+--- PASS: TestOverrideKeyKeepsPosixBackslashesDistinct (0.01s)
+=== RUN   TestSyncAncestorWalkVerifiesNativeChain
+--- PASS: TestSyncAncestorWalkVerifiesNativeChain (0.01s)
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+--- PASS: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.01s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.01s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+--- PASS: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.01s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits (0.01s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+--- PASS: TestPointer183ForeignMarkCarryingSamePathStillHits (0.01s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits (0.01s)
+=== RUN   TestPointer183WorstCaseOfTheLandedExemptionIsPinned
+--- PASS: TestPointer183WorstCaseOfTheLandedExemptionIsPinned (0.01s)
+=== RUN   TestPointer183DeclaredPathAbsentFromBodyStillHits
+--- PASS: TestPointer183DeclaredPathAbsentFromBodyStillHits (0.01s)
+=== RUN   TestPointer185SecondRereadOfAHostArtifactIsClean
+--- PASS: TestPointer185SecondRereadOfAHostArtifactIsClean (0.01s)
+=== RUN   TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt
+--- PASS: TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt (0.01s)
+=== RUN   TestPointer185AModelNominatedFileIsNotOnTheRoster
+--- PASS: TestPointer185AModelNominatedFileIsNotOnTheRoster (0.01s)
+=== RUN   TestPointer185ForeignContentCarryingTheHostPathStillHits
+--- PASS: TestPointer185ForeignContentCarryingTheHostPathStillHits (0.01s)
+=== RUN   TestPointer185RosterDoesNotCrossScopeIDs
+--- PASS: TestPointer185RosterDoesNotCrossScopeIDs (0.01s)
+=== RUN   TestPointer185RosterDiesWithTheMarksItWasDerivedFrom
+--- PASS: TestPointer185RosterDiesWithTheMarksItWasDerivedFrom (0.01s)
+=== RUN   TestPointer185SiblingArtifactInSameDirectoryStillHits
+--- PASS: TestPointer185SiblingArtifactInSameDirectoryStillHits (0.01s)
+=== RUN   TestPointer185OneRuneDifferentPathStillHits
+--- PASS: TestPointer185OneRuneDifferentPathStillHits (0.01s)
+=== RUN   TestPointer185SameBasenameOtherDirectoryStillHits
+--- PASS: TestPointer185SameBasenameOtherDirectoryStillHits (0.01s)
+=== RUN   TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan
+--- PASS: TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan (0.04s)
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_native_spelling
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_all-forward-slash
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_both_separators_at_once
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_forward_slash_under_a_backslash_parent
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_native_spelling
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_all-forward-slash
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_both_separators_at_once
+--- PASS: TestExfilSyncWriteWindowsSpellingInvariant (0.03s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_native_spelling (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_all-forward-slash (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_both_separators_at_once (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_forward_slash_under_a_backslash_parent (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_native_spelling (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_all-forward-slash (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_both_separators_at_once (0.00s)
+=== RUN   TestMarkInspectSourceAttribution
+--- PASS: TestMarkInspectSourceAttribution (0.00s)
+=== RUN   TestMarkNegativeNoTaintNoHit
+--- PASS: TestMarkNegativeNoTaintNoHit (0.01s)
+=== RUN   TestMarkEmptyAfterNormalization
+--- PASS: TestMarkEmptyAfterNormalization (0.01s)
+=== RUN   TestMarkUnknownSourceToolFailClosed
+--- PASS: TestMarkUnknownSourceToolFailClosed (0.01s)
+=== RUN   TestSensitiveSourceSetComplete
+--- PASS: TestSensitiveSourceSetComplete (0.00s)
+=== RUN   TestFourChannelExfilSuite
+=== RUN   TestFourChannelExfilSuite/web.search_query
+=== RUN   TestFourChannelExfilSuite/notify_text
+=== RUN   TestFourChannelExfilSuite/notify_url
+=== RUN   TestFourChannelExfilSuite/clipboard.write
+=== RUN   TestFourChannelExfilSuite/fs.write_into_sync_dir
+--- PASS: TestFourChannelExfilSuite (0.01s)
+    --- PASS: TestFourChannelExfilSuite/web.search_query (0.00s)
+    --- PASS: TestFourChannelExfilSuite/notify_text (0.00s)
+    --- PASS: TestFourChannelExfilSuite/notify_url (0.00s)
+    --- PASS: TestFourChannelExfilSuite/clipboard.write (0.00s)
+    --- PASS: TestFourChannelExfilSuite/fs.write_into_sync_dir (0.00s)
+=== RUN   TestR4EndToEndViaAssessor
+--- PASS: TestR4EndToEndViaAssessor (0.01s)
+=== RUN   TestSyncWriteNegative
+--- PASS: TestSyncWriteNegative (0.01s)
+=== RUN   TestDetectorUnknownToolScansEverything
+--- PASS: TestDetectorUnknownToolScansEverything (0.01s)
+=== RUN   TestScopesNeverInherit
+--- PASS: TestScopesNeverInherit (0.01s)
+=== RUN   TestDisposalScopeClearsTaints
+time=2026-10-10T15:16:58.877+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposalScopeClearsTaints (0.01s)
+=== RUN   TestInspectUnknownScopeIsEmptyStore
+--- PASS: TestInspectUnknownScopeIsEmptyStore (0.01s)
+=== RUN   TestNamedChannelParamEscape
+=== RUN   TestNamedChannelParamEscape/table_key_still_gets_its_contract_label
+=== RUN   TestNamedChannelParamEscape/renamed_query_key
+=== RUN   TestNamedChannelParamEscape/abbreviated_key
+=== RUN   TestNamedChannelParamEscape/harmless_table_key,_tainted_extra_key
+=== RUN   TestNamedChannelParamEscape/payload_under_another_name
+=== RUN   TestNamedChannelParamEscape/nested_object_payload
+=== RUN   TestNamedChannelParamEscape/array_payload
+=== RUN   TestNamedChannelParamEscape/[]string_payload
+=== RUN   TestNamedChannelParamEscape/byte_payload
+=== RUN   TestNamedChannelParamEscape/deep_map_under_an_unknown_key
+--- PASS: TestNamedChannelParamEscape (0.01s)
+    --- PASS: TestNamedChannelParamEscape/table_key_still_gets_its_contract_label (0.00s)
+    --- PASS: TestNamedChannelParamEscape/renamed_query_key (0.00s)
+    --- PASS: TestNamedChannelParamEscape/abbreviated_key (0.00s)
+    --- PASS: TestNamedChannelParamEscape/harmless_table_key,_tainted_extra_key (0.00s)
+    --- PASS: TestNamedChannelParamEscape/payload_under_another_name (0.00s)
+    --- PASS: TestNamedChannelParamEscape/nested_object_payload (0.00s)
+    --- PASS: TestNamedChannelParamEscape/array_payload (0.00s)
+    --- PASS: TestNamedChannelParamEscape/[]string_payload (0.00s)
+    --- PASS: TestNamedChannelParamEscape/byte_payload (0.00s)
+    --- PASS: TestNamedChannelParamEscape/deep_map_under_an_unknown_key (0.00s)
+=== RUN   TestWriteGateNotSelectedByPayloadKey
+--- PASS: TestWriteGateNotSelectedByPayloadKey (0.07s)
+=== RUN   TestWriteGatePlainLocalWriteNotFlagged
+--- PASS: TestWriteGatePlainLocalWriteNotFlagged (0.04s)
+=== RUN   TestWriteGateEveryPathTargetJudged
+=== RUN   TestWriteGateEveryPathTargetJudged/decoy_path_+_real_dest
+=== RUN   TestWriteGateEveryPathTargetJudged/reversed_order
+=== RUN   TestWriteGateEveryPathTargetJudged/file+destination,_no_tool_name
+=== RUN   TestWriteGateEveryPathTargetJudged/three-way:_path+dest_non-sync,_file_in_sync_root
+=== RUN   TestWriteGateEveryPathTargetJudged/single_sync_dest_only
+=== RUN   TestWriteGateEveryPathTargetJudged/casing_decoy:_Path_hides_the_sync_target_from_an_exact-match_scan
+=== RUN   TestWriteGateEveryPathTargetJudged/path-shaped_key_with_no_checkable_value
+--- PASS: TestWriteGateEveryPathTargetJudged (0.05s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/decoy_path_+_real_dest (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/reversed_order (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/file+destination,_no_tool_name (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/three-way:_path+dest_non-sync,_file_in_sync_root (0.01s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/single_sync_dest_only (0.01s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/casing_decoy:_Path_hides_the_sync_target_from_an_exact-match_scan (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/path-shaped_key_with_no_checkable_value (0.00s)
+=== RUN   TestWriteGateAllPathsNonSyncStaysExempt
+--- PASS: TestWriteGateAllPathsNonSyncStaysExempt (0.07s)
+=== RUN   TestDeepNestingFailsClosedNotSilent
+--- PASS: TestDeepNestingFailsClosedNotSilent (0.01s)
+=== RUN   TestNormalizationEndToEnd
+=== RUN   TestNormalizationEndToEnd/combining_mark
+=== RUN   TestNormalizationEndToEnd/lowercase
+=== RUN   TestNormalizationEndToEnd/whitespace_split
+=== RUN   TestNormalizationEndToEnd/full-width
+=== RUN   TestNormalizationEndToEnd/zero-width_split
+=== RUN   TestNormalizationEndToEnd/soft-hyphen
+=== RUN   TestNormalizationEndToEnd/bom/word-joiner
+--- PASS: TestNormalizationEndToEnd (0.01s)
+    --- PASS: TestNormalizationEndToEnd/combining_mark (0.00s)
+    --- PASS: TestNormalizationEndToEnd/lowercase (0.00s)
+    --- PASS: TestNormalizationEndToEnd/whitespace_split (0.00s)
+    --- PASS: TestNormalizationEndToEnd/full-width (0.00s)
+    --- PASS: TestNormalizationEndToEnd/zero-width_split (0.00s)
+    --- PASS: TestNormalizationEndToEnd/soft-hyphen (0.00s)
+    --- PASS: TestNormalizationEndToEnd/bom/word-joiner (0.00s)
+=== RUN   TestFragmentThresholdClampedToContractFloor
+--- PASS: TestFragmentThresholdClampedToContractFloor (0.00s)
+=== RUN   TestFragmentThresholdStricterAllowed
+--- PASS: TestFragmentThresholdStricterAllowed (0.00s)
+=== RUN   TestResidualLimitsAreLoggedNotSilent
+--- PASS: TestResidualLimitsAreLoggedNotSilent (0.00s)
+=== RUN   TestConcurrentMarkInspect
+--- PASS: TestConcurrentMarkInspect (0.01s)
+=== RUN   TestLLMParaphraseResidual
+--- PASS: TestLLMParaphraseResidual (0.01s)
+=== RUN   TestScopeCloseRefusesAnotherOwnersRegistration
+--- PASS: TestScopeCloseRefusesAnotherOwnersRegistration (0.00s)
+=== RUN   TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible
+--- PASS: TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible (0.01s)
+=== RUN   TestScopeCloseIsIdempotent
+--- PASS: TestScopeCloseIsIdempotent (0.00s)
+=== RUN   TestScopeIDGrantsNoPower
+--- PASS: TestScopeIDGrantsNoPower (0.00s)
+=== RUN   TestRuleDeclaredR1
+--- PASS: TestRuleDeclaredR1 (0.00s)
+=== RUN   TestRulePathAllowlistR2
+--- PASS: TestRulePathAllowlistR2 (0.00s)
+=== RUN   TestRuleSensitivePathR3
+--- PASS: TestRuleSensitivePathR3 (0.00s)
+=== RUN   TestRuleTaintR4
+--- PASS: TestRuleTaintR4 (0.00s)
+=== RUN   TestRuleNetworkR5
+--- PASS: TestRuleNetworkR5 (0.00s)
+=== RUN   TestRuleShellR6
+--- PASS: TestRuleShellR6 (0.00s)
+=== RUN   TestRuleBatchScaleR7
+--- PASS: TestRuleBatchScaleR7 (0.00s)
+=== RUN   TestRuleIrreversibleR8
+--- PASS: TestRuleIrreversibleR8 (0.00s)
+=== RUN   TestShapeAHostReReadOfDeclaredPathIsClean
+--- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.01s)
+=== RUN   TestShapeAW1RestOfHostMarkStillIndexed
+--- PASS: TestShapeAW1RestOfHostMarkStillIndexed (0.01s)
+=== RUN   TestShapeAW2ForeignMarkCarryingSamePathStillHits
+--- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits (0.01s)
+=== RUN   TestShapeAW3NeverMintedSiblingUnderSameDirStillHits
+--- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits (0.01s)
+=== RUN   TestShapeAW4PositionalExclusionNeverLeavesHostMark
+--- PASS: TestShapeAW4PositionalExclusionNeverLeavesHostMark (0.01s)
+=== RUN   TestShapeAFExclusionDiesWithScopeClose
+--- PASS: TestShapeAFExclusionDiesWithScopeClose (0.01s)
+=== RUN   TestShapeAW5EmptyCheckPrecedesExclusion
+--- PASS: TestShapeAW5EmptyCheckPrecedesExclusion (0.01s)
+=== RUN   TestShapeAOrderOneSpanLocatedAfterNormalization
+--- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization (0.01s)
+=== RUN   TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+    syncdirs_ancestor_actable_leg_116_test.go:218: raw="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163514276225\\001\\%WISP116ANC\\\\B%\\new.md"
+         anc="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163514276225\\001\\%WISP116ANC\\B%"
+         moved="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163514276225\\wisp116-escape"
+        verdict: Sync=true Root={Provider:sync-suspect Path: Source:suspect-fallback} Why="write target spelling could not be anchored on a C26-verifiable ancestor (8.3/\\\\?\\/missing chain); fail-closed as sync-suspect: risk: expansion moved this path onto a tree the caller did not name: C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163514276225\\001\\%WISP116ANC\\B% expands to C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163514276225\\wisp116-escape (env); act on the expanded tree only if you asked for it by name"
+--- PASS: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.01s)
+=== RUN   TestSyncAncestorLegStillMatchesPlainSameTreeWrite116
+--- PASS: TestSyncAncestorLegStillMatchesPlainSameTreeWrite116 (0.01s)
+=== RUN   TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+--- PASS: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.09s)
+=== RUN   TestSyncAncestorLegNotExemptedStaysFailClosed
+--- PASS: TestSyncAncestorLegNotExemptedStaysFailClosed (0.09s)
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes
+    syncdirs_redteam_windows_test.go:85: sync root long  = C:\Users\swq\AppData\Local\Temp\TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes1194048921\001\profile\OneDrive Copilot Sync
+    syncdirs_redteam_windows_test.go:86: sync root 8.3   = C:\Users\swq\AppData\Local\Temp\TESTSY~1\001\profile\ONEDRI~1
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined
+--- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes (0.04s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling (0.01s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling (0.01s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling (0.01s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined (0.01s)
+=== RUN   TestSyncRedTeamGuardPlainNewFileWriteAllowed
+    syncdirs_redteam_windows_test.go:152: non-sync dir 8.3 = C:\Users\swq\AppData\Local\Temp\TESTSY~1\001\profile\work
+--- PASS: TestSyncRedTeamGuardPlainNewFileWriteAllowed (0.03s)
+=== RUN   TestSyncRedTeamUnverifiableChainFailClosed
+--- PASS: TestSyncRedTeamUnverifiableChainFailClosed (1.29s)
+=== RUN   TestSyncRedTeamRealOneDrive
+    syncdirs_redteam_windows_test.go:215: P12 evidence: live OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_redteam_windows_test.go:234: no 8.3 alias exists for the live root C:\Users\swq\OneDrive (name is already 8.3-clean); the \\?\ legs below still cross the boundary
+    syncdirs_redteam_windows_test.go:247: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:252: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+    syncdirs_redteam_windows_test.go:247: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:252: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+--- PASS: TestSyncRedTeamRealOneDrive (0.01s)
+=== RUN   TestSyncDefaultLocationProbe
+--- PASS: TestSyncDefaultLocationProbe (0.01s)
+=== RUN   TestSyncDropboxHostDBConfig
+--- PASS: TestSyncDropboxHostDBConfig (0.01s)
+=== RUN   TestSyncFixtureFallbackAndMatch
+--- PASS: TestSyncFixtureFallbackAndMatch (0.01s)
+=== RUN   TestSyncFallbackNotDisarmableByWeakRoot
+--- PASS: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)
+=== RUN   TestSyncUnverifiedRootKeepsFallback
+--- PASS: TestSyncUnverifiedRootKeepsFallback (0.01s)
+=== RUN   TestSyncEnvConfiguredRoots
+--- PASS: TestSyncEnvConfiguredRoots (0.01s)
+=== RUN   TestSyncRegistryProbeTable
+=== RUN   TestSyncRegistryProbeTable/empty_hive_yields_nothing
+=== RUN   TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored
+=== RUN   TestSyncRegistryProbeTable/duplicate_accounts_dedupe
+=== RUN   TestSyncRegistryProbeTable/dropbox_installer_path
+--- PASS: TestSyncRegistryProbeTable (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/empty_hive_yields_nothing (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/duplicate_accounts_dedupe (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/dropbox_installer_path (0.00s)
+=== RUN   TestSyncSuspectFallbackIsComponentBounded
+--- PASS: TestSyncSuspectFallbackIsComponentBounded (0.01s)
+=== RUN   TestSyncNormalNewFileWriteNotFlagged
+--- PASS: TestSyncNormalNewFileWriteNotFlagged (0.01s)
+=== RUN   TestSyncSuspectFallbackWhenUndetectable
+--- PASS: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+=== RUN   TestSyncUnresolvablePathFailClosed
+--- PASS: TestSyncUnresolvablePathFailClosed (0.01s)
+=== RUN   TestSyncDotDotTailFailsClosed
+--- PASS: TestSyncDotDotTailFailsClosed (0.01s)
+=== RUN   TestSyncRootsIntrospection
+--- PASS: TestSyncRootsIntrospection (0.01s)
+=== RUN   TestSyncDetectionOnThisMachine
+    syncdirs_test.go:491: P12 evidence: detected OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_test.go:509: P12 evidence: OneDrive at C:\Users\swq\OneDrive flagged as sync channel
+--- PASS: TestSyncDetectionOnThisMachine (0.00s)
+=== RUN   TestSyncConfirmedGradesDisarmFallbackWindows
+--- PASS: TestSyncConfirmedGradesDisarmFallbackWindows (0.02s)
+=== RUN   TestWriteGatePlainTargetInsideProfileWindows
+--- PASS: TestWriteGatePlainTargetInsideProfileWindows (0.01s)
+=== RUN   TestNormalizeTaintContractForm
+--- PASS: TestNormalizeTaintContractForm (0.00s)
+=== RUN   TestFragmentMatchExactBoundary
+--- PASS: TestFragmentMatchExactBoundary (0.00s)
+=== RUN   TestFragmentMatchAcrossTransforms
+--- PASS: TestFragmentMatchAcrossTransforms (0.00s)
+=== RUN   TestFragmentMatchCJK
+--- PASS: TestFragmentMatchCJK (0.00s)
+=== RUN   TestNormalizeTaintDropsIgnorableChars
+=== RUN   TestNormalizeTaintDropsIgnorableChars/zwsp
+=== RUN   TestNormalizeTaintDropsIgnorableChars/zwnj+zwj
+=== RUN   TestNormalizeTaintDropsIgnorableChars/soft_hyphen
+=== RUN   TestNormalizeTaintDropsIgnorableChars/word_joiner
+=== RUN   TestNormalizeTaintDropsIgnorableChars/bom
+=== RUN   TestNormalizeTaintDropsIgnorableChars/combining_marks
+=== RUN   TestNormalizeTaintDropsIgnorableChars/full-width_+_ignorable_mix
+--- PASS: TestNormalizeTaintDropsIgnorableChars (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/zwsp (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/zwnj+zwj (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/soft_hyphen (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/word_joiner (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/bom (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/combining_marks (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/full-width_+_ignorable_mix (0.00s)
+=== RUN   TestFragmentIndexShortSourceNeverMatches
+--- PASS: TestFragmentIndexShortSourceNeverMatches (0.00s)
+=== RUN   TestFragmentHashCollisionCannotFakeHit
+--- PASS: TestFragmentHashCollisionCannotFakeHit (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	7.087s
+=== RUN   TestDockGeometryShape
+--- PASS: TestDockGeometryShape (0.00s)
+=== RUN   TestDockTangentMeansGapZero
+--- PASS: TestDockTangentMeansGapZero (0.00s)
+=== RUN   TestDockPosKeepsTheOrbTangentAtEveryRampLevel
+--- PASS: TestDockPosKeepsTheOrbTangentAtEveryRampLevel (0.00s)
+=== RUN   TestDockSquashIsMonotonicAndClamped
+--- PASS: TestDockSquashIsMonotonicAndClamped (0.00s)
+=== RUN   TestDockProgressReadsThePush
+--- PASS: TestDockProgressReadsThePush (0.00s)
+=== RUN   TestNearestDockEdgePicksTheEdgeYouPushed
+--- PASS: TestNearestDockEdgePicksTheEdgeYouPushed (0.00s)
+=== RUN   TestDockedLeavesAHittableStrip
+--- PASS: TestDockedLeavesAHittableStrip (0.00s)
+=== RUN   TestDockFreePosKeepsTheBallReachable
+--- PASS: TestDockFreePosKeepsTheBallReachable (0.00s)
+=== RUN   TestDockOnSecondaryMonitorWithNegativeOrigin
+--- PASS: TestDockOnSecondaryMonitorWithNegativeOrigin (0.00s)
+=== RUN   TestDockHoverPopBackWalksTheRampHome
+--- PASS: TestDockHoverPopBackWalksTheRampHome (0.00s)
+=== RUN   TestDockRampWalksItsBudget
+--- PASS: TestDockRampWalksItsBudget (0.00s)
+=== RUN   TestWindowlessSTAReachesTheBorrowWiring260r5
+time=2026-10-10T15:16:53.947+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+    hotkey_borrow_refused_260r5_test.go:293: 260-r5 rig: IsWindow(0x1D0A5C)=0 uiRun-inline=true closure-entered=true sta.hwnd=0x0 door="260-r5 rig: this door creates no window and runs no pump" refusal="Invalid window handle."
+--- PASS: TestWindowlessSTAReachesTheBorrowWiring260r5 (0.03s)
+=== RUN   TestRefusedBorrowIsNamedOnTheReport260r5
+time=2026-10-10T15:16:53.978+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+    hotkey_borrow_refused_260r5_test.go:386: 260-r5 refused borrow: line={Name:cancel ID:3 Binding:Ctrl+Alt+F9 Status:registration failed Acc:{Mods:16387 VK:120} Err:Invalid window handle. Note:} problems=["hotkey cancel = \"Ctrl+Alt+F9\" was not registered: Invalid window handle."] logged="time=2026-10-10T15:16:53.979+08:00 level=ERROR msg=\"cancel takeover refused by Win32; Confirming will have no cancel key\" hotkey=cancel binding=Ctrl+Alt+F9 err=\"Invalid window handle.\"\n"
+--- PASS: TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)
+=== RUN   TestRefusedBorrowIsNotAStandingAnnouncement260r5
+time=2026-10-10T15:16:53.982+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+F9
+--- PASS: TestRefusedBorrowIsNotAStandingAnnouncement260r5 (0.00s)
+=== RUN   TestBorrowDefaultIsBitIdentical260
+time=2026-10-10T15:16:53.986+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.986+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.986+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestBorrowDefaultIsBitIdentical260 (0.00s)
+=== RUN   TestBorrowFollowsConfiguredBinding260
+time=2026-10-10T15:16:53.986+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+time=2026-10-10T15:16:53.986+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Space
+time=2026-10-10T15:16:53.987+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=F9
+--- PASS: TestBorrowFollowsConfiguredBinding260 (0.00s)
+=== RUN   TestBorrowUnparsableFallsBackLoudly260
+time=2026-10-10T15:16:53.987+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-10T15:16:53.987+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.987+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+--- PASS: TestBorrowUnparsableFallsBackLoudly260 (0.00s)
+=== RUN   TestBorrowReceiptSharesOneSourceWithRegistration260
+--- PASS: TestBorrowReceiptSharesOneSourceWithRegistration260 (0.00s)
+=== RUN   TestBorrowFailureNamesTheKeyItTried260
+time=2026-10-10T15:16:53.987+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Ctrl+Alt+K err="invalid argument"
+time=2026-10-10T15:16:53.987+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- PASS: TestBorrowFailureNamesTheKeyItTried260 (0.00s)
+=== RUN   TestConfiguredCancelStillNeverBoundWhileIdle260
+time=2026-10-10T15:16:53.987+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+K
+--- PASS: TestConfiguredCancelStillNeverBoundWhileIdle260 (0.00s)
+=== RUN   TestLiveBorrowHelperPremiseIsConfigDependent260
+    hotkey_cancel_borrow_260_test.go:347: named conflict for the orchestrator: hotkey_live_test.go:107 reads rep.Live()[hkCancel].VK == vkEscape for a ball booted with liveHotkeys().Cancel = "Ctrl+Alt+V"; under 形ⓐ that slot holds VK 0x56, so the helper's bare-Esc premise is now config-dependent (winlive tier not run this round)
+--- PASS: TestLiveBorrowHelperPremiseIsConfigDependent260 (0.00s)
+=== RUN   TestBorrowWishFollowsSeed260r2
+--- PASS: TestBorrowWishFollowsSeed260r2 (0.00s)
+=== RUN   TestBorrowWishDefaultCellIsBitIdentical260r2
+--- PASS: TestBorrowWishDefaultCellIsBitIdentical260r2 (0.00s)
+=== RUN   TestBorrowWishRefusedSeedIsNotSilent260r2
+--- PASS: TestBorrowWishRefusedSeedIsNotSilent260r2 (0.00s)
+=== RUN   TestRegisterAllLiveSet
+time=2026-10-10T15:16:53.990+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestRegisterAllLiveSet (0.00s)
+=== RUN   TestDefaultHotkeysIdlePassHoldsNoEsc
+time=2026-10-10T15:16:53.990+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestDefaultHotkeysIdlePassHoldsNoEsc (0.00s)
+=== RUN   TestCancelBorrowRoundTrip
+time=2026-10-10T15:16:53.990+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.990+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.990+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="Hot key is already registered."
+--- PASS: TestCancelBorrowRoundTrip (0.00s)
+=== RUN   TestCancelBorrowFailureIsAProblemLine
+time=2026-10-10T15:16:53.990+08:00 level=ERROR msg="cancel takeover refused by Win32; Confirming will have no cancel key" hotkey=cancel binding=Esc err="invalid argument"
+time=2026-10-10T15:16:53.990+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestCancelBorrowFailureIsAProblemLine (0.00s)
+=== RUN   TestStandbyIsNotDisabledAndNotAProblem
+time=2026-10-10T15:16:53.991+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.991+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-10T15:16:53.992+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=cancel binding=Ctrl+Alt+NotAKey+ err="unknown key \"NotAKey\" in hotkey \"Ctrl+Alt+NotAKey+\""
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+--- PASS: TestStandbyIsNotDisabledAndNotAProblem (0.00s)
+=== RUN   TestRegisterAllSplitsFailureFamilies
+time=2026-10-10T15:16:53.992+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.992+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+--- PASS: TestRegisterAllSplitsFailureFamilies (0.00s)
+=== RUN   TestUnregisterAllDropsKnownSlots
+--- PASS: TestUnregisterAllDropsKnownSlots (0.00s)
+=== RUN   TestHotkeyStatusString
+--- PASS: TestHotkeyStatusString (0.00s)
+=== RUN   TestHotkeyReloaderRebindsOnConfigChange
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=3
+--- PASS: TestHotkeyReloaderRebindsOnConfigChange (0.00s)
+=== RUN   TestHotkeyReloaderSectionsHookIgnoresOtherSections
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T15:16:53.992+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=3
+--- PASS: TestHotkeyReloaderSectionsHookIgnoresOtherSections (0.00s)
+=== RUN   TestApplyHotkeyDefaults
+--- PASS: TestApplyHotkeyDefaults (0.00s)
+=== RUN   TestParseAccelerator
+--- PASS: TestParseAccelerator (0.00s)
+=== RUN   TestDefaultHotkeys
+--- PASS: TestDefaultHotkeys (0.00s)
+=== RUN   TestLiquidRotationIsMonotonicInLevel
+--- PASS: TestLiquidRotationIsMonotonicInLevel (0.00s)
+=== RUN   TestLiquidConvergesAndBorderFadesInOnSilence
+--- PASS: TestLiquidConvergesAndBorderFadesInOnSilence (0.00s)
+=== RUN   TestSummonBurstIsBoundedAndRetires
+--- PASS: TestSummonBurstIsBoundedAndRetires (0.00s)
+=== RUN   TestMotionOnlyAppliesInPrototypeMode
+--- PASS: TestMotionOnlyAppliesInPrototypeMode (0.00s)
+=== RUN   TestBorderIsNeverAppliedInOneFrame
+--- PASS: TestBorderIsNeverAppliedInOneFrame (0.00s)
+=== RUN   TestBorderGlidesInAfterTheSessionEnds
+--- PASS: TestBorderGlidesInAfterTheSessionEnds (0.00s)
+=== RUN   TestSpeakingGlidesTheBorderBackOut
+--- PASS: TestSpeakingGlidesTheBorderBackOut (0.00s)
+=== RUN   TestTransitionTimerSetIsTheFrozenTimerSet
+--- PASS: TestTransitionTimerSetIsTheFrozenTimerSet (0.00s)
+=== RUN   TestSleepingFrameLosesTheBorderAuthority
+--- PASS: TestSleepingFrameLosesTheBorderAuthority (0.00s)
+=== RUN   TestLiquidDrivenStateSet
+--- PASS: TestLiquidDrivenStateSet (0.00s)
+=== RUN   TestPushLevelIsInputHardened
+--- PASS: TestPushLevelIsInputHardened (0.00s)
+=== RUN   TestRepaintIsSkippedWhenNothingChanged
+--- PASS: TestRepaintIsSkippedWhenNothingChanged (0.00s)
+=== RUN   TestPositionStoreRoundTrip
+--- PASS: TestPositionStoreRoundTrip (0.03s)
+=== RUN   TestResolvePosition
+=== RUN   TestResolvePosition/saved_visible_on_its_monitor:_kept
+=== RUN   TestResolvePosition/saved_partially_off_right_edge:_clamped
+=== RUN   TestResolvePosition/saved_monitor_detached:_primary_default
+=== RUN   TestResolvePosition/nothing_saved:_primary_default
+=== RUN   TestResolvePosition/saved_point_on_no_monitor:_that-monitor_default_impossible_->_primary
+=== RUN   TestResolvePosition/primary_detection_when_listed_second
+--- PASS: TestResolvePosition (0.00s)
+    --- PASS: TestResolvePosition/saved_visible_on_its_monitor:_kept (0.00s)
+    --- PASS: TestResolvePosition/saved_partially_off_right_edge:_clamped (0.00s)
+    --- PASS: TestResolvePosition/saved_monitor_detached:_primary_default (0.00s)
+    --- PASS: TestResolvePosition/nothing_saved:_primary_default (0.00s)
+    --- PASS: TestResolvePosition/saved_point_on_no_monitor:_that-monitor_default_impossible_->_primary (0.00s)
+    --- PASS: TestResolvePosition/primary_detection_when_listed_second (0.00s)
+=== RUN   TestDefaultPositionInsideWorkArea
+--- PASS: TestDefaultPositionInsideWorkArea (0.00s)
+=== RUN   TestSTAReleaseAfterFailedCreateHandsBackNoWindow
+    sta_release_windows_test.go:268: 33-r8 create-error door: tid=33072 planted hwnd=0x1FA0BC0 | after plant: ball windows=1 all windows=2 classes=[WispBallWindow IME] queue head=empty
+    sta_release_windows_test.go:270: 33-r8 create-error door: after the plants (window-addressed PostMessageW rc=1, thread-addressed PostThreadMessageW rc=1): ball windows=1 all=2 classes=[WispBallWindow IME] queue head=msg 0x82F8 on hwnd 0x1FA0BC0
+    sta_release_windows_test.go:272: 33-r8 create-error door: the instant start() returned: ball windows=0 all windows=0 classes=[] queue head=empty (start err=plant: renderer init failed plant err=<nil>)
+--- PASS: TestSTAReleaseAfterFailedCreateHandsBackNoWindow (0.04s)
+=== RUN   TestSTAReleaseAfterPumpExitDispatchesItsQueue
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=quit-only: tid=24724 hwnd=0x1FB0BC0 createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=1 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=real-Close: tid=24724 hwnd=0x1FC0BC0 createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=0 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+--- PASS: TestSTAReleaseAfterPumpExitDispatchesItsQueue (0.04s)
+=== RUN   TestReleasePumpCapIsALoudReadingNotAGreen
+    sta_release_windows_test.go:602: 33-r8b cap leg (planted 4160, want pump to stop at the cap): tid=24724 posted=4160 postErr=<nil> pumped=4096 head-after="msg 0x82F9 on hwnd 0x0" windows(ball/all)=0/0 classes=[] | own drain moved 64, head-final="empty" | logged="time=2026-10-10T15:16:54.189+08:00 level=WARN msg=\"ball: the ui-sta release pump hit its cap before the thread's queue was empty; the thread goes back to the Go pool non-empty\" cap=4096 pumped=4096\n"
+    sta_release_windows_test.go:605: 33-r8b control leg (planted 8, under the cap): tid=24724 posted=8 postErr=<nil> pumped=8 head-after="empty" windows(ball/all)=0/0 classes=[] | own drain moved 0, head-final="empty" | logged=""
+--- PASS: TestReleasePumpCapIsALoudReadingNotAGreen (0.09s)
+=== RUN   TestC21TableColourRowsMatchCode
+    tokens_table_test.go:780: light table reuses the :root value by cascade for 2 field(s): BallHalo, OnSolid (the table states this in prose above its light rows)
+    tokens_table_test.go:805: verified 114/114 colour rows against tokens.go (40 palette fields checked in code -> table, 36 look colours, 4 looks)
+--- PASS: TestC21TableColourRowsMatchCode (0.00s)
+=== RUN   TestC21GeometryRowsMatchCodeConstants
+    tokens_table_test.go:955: docs/evidence/s1/c21-native-tokens.md:169: this row states a rule (缓动) without naming a Go constant, so there is no value to compare
+    tokens_table_test.go:1059: MATCHED WITHOUT THE PROMISED UNIT (4): BallSizeMaxPx=72 @ docs/evidence/s1/c21-native-tokens.md:141, BallSizeMinPx=44 @ docs/evidence/s1/c21-native-tokens.md:141, FontSizeMicroPx=11 @ docs/evidence/s1/c21-native-tokens.md:159, FontSizeMonoPx=12.5 @ docs/evidence/s1/c21-native-tokens.md:159
+    tokens_table_test.go:1063: NUMBERS NO NAMED CONSTANT CLAIMS (52): 0.35 @ docs/evidence/s1/c21-native-tokens.md:155, 0.55 @ docs/evidence/s1/c21-native-tokens.md:162, 0.8s @ docs/evidence/s1/c21-native-tokens.md:151, 1 @ docs/evidence/s1/c21-native-tokens.md:154, 1 @ docs/evidence/s1/c21-native-tokens.md:155, 1 @ docs/evidence/s1/c21-native-tokens.md:162, 1 @ docs/evidence/s1/c21-native-tokens.md:163, 1000 @ docs/evidence/s1/c21-native-tokens.md:165, 10fps @ docs/evidence/s1/c21-native-tokens.md:149, 160ms @ docs/evidence/s1/c21-native-tokens.md:157, 16px @ docs/evidence/s1/c21-native-tokens.md:166, 180ms @ docs/evidence/s1/c21-native-tokens.md:167, 2 @ docs/evidence/s1/c21-native-tokens.md:167, 2.1 @ docs/evidence/s1/c21-native-tokens.md:157, 21.75 @ docs/evidence/s1/c21-native-tokens.md:166, 22 @ docs/evidence/s1/c21-native-tokens.md:166, 22 @ docs/evidence/s1/c21-native-tokens.md:166, 220ms @ docs/evidence/s1/c21-native-tokens.md:167, 22px @ docs/evidence/s1/c21-native-tokens.md:168, 24 @ docs/evidence/s1/c21-native-tokens.md:168, 260ms @ docs/evidence/s1/c21-native-tokens.md:148, 2px @ docs/evidence/s1/c21-native-tokens.md:152, 3 @ docs/evidence/s1/c21-native-tokens.md:151, 30 @ docs/evidence/s1/c21-native-tokens.md:166, 30 @ docs/evidence/s1/c21-native-tokens.md:168, 300ms @ docs/evidence/s1/c21-native-tokens.md:167, 32 @ docs/evidence/s1/c21-native-tokens.md:168, 33 @ docs/evidence/s1/c21-native-tokens.md:163, 33ms @ docs/evidence/s1/c21-native-tokens.md:165, 34.72px @ docs/evidence/s1/c21-native-tokens.md:145, 4.2 @ docs/evidence/s1/c21-native-tokens.md:163, 44 @ docs/evidence/s1/c21-native-tokens.md:166, 56 @ docs/evidence/s1/c21-native-tokens.md:145, 5px @ docs/evidence/s1/c21-native-tokens.md:166, 62 @ docs/evidence/s1/c21-native-tokens.md:145, 62 @ docs/evidence/s1/c21-native-tokens.md:166, 72 @ docs/evidence/s1/c21-native-tokens.md:166, 74 @ docs/evidence/s1/c21-native-tokens.md:157, 74 @ docs/evidence/s1/c21-native-tokens.md:162, 74 @ docs/evidence/s1/c21-native-tokens.md:163, 8 @ docs/evidence/s1/c21-native-tokens.md:145, 8 @ docs/evidence/s1/c21-native-tokens.md:157, 8 @ docs/evidence/s1/c21-native-tokens.md:166, 8 @ docs/evidence/s1/c21-native-tokens.md:167, 838 @ docs/evidence/s1/c21-native-tokens.md:145, 8px @ docs/evidence/s1/c21-native-tokens.md:166, 9 @ docs/evidence/s1/c21-native-tokens.md:166, 9 @ docs/evidence/s1/c21-native-tokens.md:168, 900ms @ docs/evidence/s1/c21-native-tokens.md:167, 96dpi @ docs/evidence/s1/c21-native-tokens.md:161, 96dpi @ docs/evidence/s1/c21-native-tokens.md:166, 96dpi @ docs/evidence/s1/c21-native-tokens.md:168
+    tokens_table_test.go:1065: checked 67 constant declarations across 29 geometry rows against 56 exported tokens.go constants + 11 tabled from hit.go/liquid.go
+--- PASS: TestC21GeometryRowsMatchCodeConstants (0.03s)
+=== RUN   TestC21TokenConsumerReport
+    tokens_table_test.go:1149: ZERO-CONSUMER TOKENS (27 of 116 checked; 89 are referenced by 18 non-test files):
+    tokens_table_test.go:1156:   UNCONSUMED BallSizeLargePx (declared at docs/evidence/s1/c21-native-tokens.md:143)
+    tokens_table_test.go:1156:   UNCONSUMED BallSizeSmallPx (declared at docs/evidence/s1/c21-native-tokens.md:142)
+    tokens_table_test.go:1156:   UNCONSUMED CountdownFontPx (declared at docs/evidence/s1/c21-native-tokens.md:159)
+    tokens_table_test.go:1156:   UNCONSUMED DurBaseMs (declared at docs/evidence/s1/c21-native-tokens.md:147)
+    tokens_table_test.go:1156:   UNCONSUMED DurFastMs (declared at docs/evidence/s1/c21-native-tokens.md:146)
+    tokens_table_test.go:1156:   UNCONSUMED DurSlowMs (declared at docs/evidence/s1/c21-native-tokens.md:148)
+    tokens_table_test.go:1156:   UNCONSUMED FirstRunGuidePulseMs (declared at docs/evidence/s1/c21-native-tokens.md:154)
+    tokens_table_test.go:1156:   UNCONSUMED FontSizeMonoPx (declared at docs/evidence/s1/c21-native-tokens.md:159)
+    tokens_table_test.go:1156:   UNCONSUMED Palette.FgPrimary
+    tokens_table_test.go:1156:   UNCONSUMED Palette.FgTertiary
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassHiSoft
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassRing
+    tokens_table_test.go:1156:   UNCONSUMED Palette.InfoLine
+    tokens_table_test.go:1156:   UNCONSUMED Palette.OrbShadow
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintAccentHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintDangerHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintDangerLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintNeutralHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintNeutralLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintSuccessHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintSuccessLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarmHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarmLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarnHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarnLo
+    tokens_table_test.go:1156:   UNCONSUMED looks[*].Deep
+    tokens_table_test.go:1198: 未接线豁免: 24 row(s) attribute all 27 zero-consumer token(s); 89/116 checked tokens are live
+--- PASS: TestC21TokenConsumerReport (0.03s)
+=== RUN   TestC21CodeTokensAreTabledOrExempt
+    tokens_table_test.go:1304: EXEMPT HTClient (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT HTTransparent (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT HTNowhere (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT AltSummonSpace (hotkey_windows.go) is outside the table on purpose: Default hotkey text (SPEC-04 surface), not a C21 token
+--- PASS: TestC21CodeTokensAreTabledOrExempt (0.09s)
+=== RUN   TestC21TableColourRowsMatchTokensCSS
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+=== RUN   TestTokenGoldenValues
+--- PASS: TestTokenGoldenValues (0.00s)
+=== RUN   TestPremultipliedDerivation
+--- PASS: TestPremultipliedDerivation (0.00s)
+=== RUN   TestNoHardcodedColorsInBallPackage
+--- PASS: TestNoHardcodedColorsInBallPackage (0.02s)
+=== RUN   TestVisualForCoversAllTwentyStates
+--- PASS: TestVisualForCoversAllTwentyStates (0.00s)
+=== RUN   TestSleepingSizeTruthTable
+--- PASS: TestSleepingSizeTruthTable (0.00s)
+=== RUN   TestRecordedSleepingDiffBoxIsNotA44pxBody
+--- PASS: TestRecordedSleepingDiffBoxIsNotA44pxBody (0.00s)
+=== RUN   TestAnimatedWhitelist
+--- PASS: TestAnimatedWhitelist (0.00s)
+=== RUN   TestAnimationPolicyZeroTimerInSleeping
+--- PASS: TestAnimationPolicyZeroTimerInSleeping (0.00s)
+=== RUN   TestHitTestAndDPIInjection
+--- PASS: TestHitTestAndDPIInjection (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.512s
+time=2026-10-10T15:16:53.965+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket90ThreeModesAndNoFourth
+--- PASS: TestTicket90ThreeModesAndNoFourth (0.00s)
+=== RUN   TestTicket90OnlyAutoCostsAConfirmAndAllThreeAreAudited
+--- PASS: TestTicket90OnlyAutoCostsAConfirmAndAllThreeAreAudited (0.00s)
+=== RUN   TestTicket90NoConfirmChannelMeansNoAuto
+--- PASS: TestTicket90NoConfirmChannelMeansNoAuto (0.00s)
+=== RUN   TestTicket90ConfirmRefusalLeavesModeAlone
+--- PASS: TestTicket90ConfirmRefusalLeavesModeAlone (0.00s)
+=== RUN   TestTicket90PersistFailureKeepsMemory
+--- PASS: TestTicket90PersistFailureKeepsMemory (0.00s)
+=== RUN   TestTicket90SnapshotIsReadOnly
+--- PASS: TestTicket90SnapshotIsReadOnly (0.00s)
+=== RUN   TestTicket90ScreenTable
+--- PASS: TestTicket90ScreenTable (0.00s)
+=== RUN   TestTicket90TaintFlagAndDenyAreNeverSilenced
+--- PASS: TestTicket90TaintFlagAndDenyAreNeverSilenced (0.00s)
+=== RUN   TestTicket90ParseModeIsLoud
+--- PASS: TestTicket90ParseModeIsLoud (0.00s)
+=== RUN   TestTicket90ManualSwitchSurvivesRestart
+time=2026-10-10T15:16:54.014+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+time=2026-10-10T15:16:54.035+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+--- PASS: TestTicket90ManualSwitchSurvivesRestart (0.07s)
+=== RUN   TestTicket90UntouchedConfigStartsAtTheDefault
+--- PASS: TestTicket90UntouchedConfigStartsAtTheDefault (0.03s)
+=== RUN   TestTicket90SessionGrantDoesNotSurviveRestart
+--- PASS: TestTicket90SessionGrantDoesNotSurviveRestart (0.17s)
+=== RUN   TestTicket90ConfigKeyChangesWhatTheChainAsks
+--- PASS: TestTicket90ConfigKeyChangesWhatTheChainAsks (0.05s)
+=== RUN   TestTicket90HandEditLooseningGoesThroughD36
+time=2026-10-10T15:16:54.332+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+    ticket90_persist_test.go:365: t90dump file=2569 bytes err=<nil> report=&{Hot:[] Reload:[] Restart:[] Locked:[{Section:risk Direction:loosen Approved:true Keys:[risk.permission_mode]}]} locked=[{Section:risk Direction:loosen Approved:true Keys:[risk.permission_mode]}]
+time=2026-10-10T15:16:54.366+08:00 level=INFO msg="config: locked section tightened, hot-applied" section=risk keys=[risk.permission_mode]
+time=2026-10-10T15:16:54.372+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+--- PASS: TestTicket90HandEditLooseningGoesThroughD36 (0.09s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/perm	0.523s
+=== RUN   TestDisposeRunsInReverseOrder
+time=2026-10-10T15:16:53.947+08:00 level=INFO msg="scope disposed" scope=task-reverse completed=3 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposeRunsInReverseOrder (0.01s)
+=== RUN   TestDisposeIsIdempotent
+time=2026-10-10T15:16:53.959+08:00 level=INFO msg="scope disposed" scope=task-idempotent completed=2 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposeIsIdempotent (0.00s)
+=== RUN   TestDisposePanicDoesNotBlockOthers
+time=2026-10-10T15:16:53.963+08:00 level=ERROR msg="goroutine panic recovered" goroutine=disposal-worker owner=scope:task-panic root="" error_class=internal recovered="destroy failed: injected" stack="goroutine 37 [running]:\nruntime/debug.Stack()\n\tD:/work/base/go/src/runtime/debug/stack.go:26 +0x5e\ngithub.com/CarlosShao/wisp/internal/observe.(*Registry).run.func1()\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:302 +0xbe\npanic({0x7ff7a2041208?, 0x7ff7a1e7d230?})\n\tD:/work/base/go/src/runtime/panic.go:859 +0x125\ngithub.com/CarlosShao/wisp/internal/plugin.TestDisposePanicDoesNotBlockOthers.func1()\n\tD:/work/workspace/projects plans/Wisp/internal/plugin/disposal_test.go:87 +0x25\ngithub.com/CarlosShao/wisp/internal/plugin.(*DisposalScope).Dispose.func1({0x7ff7a1d06dbe?, 0x909e1793f60?})\n\tD:/work/workspace/projects plans/Wisp/internal/plugin/disposal.go:297 +0x13\ngithub.com/CarlosShao/wisp/internal/observe.(*Registry).run(0x7ff7a1d953c0?, 0x909e176e400?, {0x7ff7a1e6a8e6?, 0x909e1793fd0?}, {0x909e15b8300?, 0x7ff7a1d95e1b?}, 0x909e176e400?, 0x7ff7a206cad8?)\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x97\ncreated by github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn in goroutine 34\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x387\n" at=2026-10-10T07:16:53Z
+time=2026-10-10T15:16:53.966+08:00 level=ERROR msg="disposal step failed" scope=task-panic step=panics kind=panic err="internal: panic in goroutine \"disposal-worker\" (owner scope:task-panic): destroy failed: injected"
+time=2026-10-10T15:16:53.966+08:00 level=INFO msg="scope disposed" scope=task-panic completed=2 failed=1 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposePanicDoesNotBlockOthers (0.01s)
+=== RUN   TestDisposeTimeoutMarksIncomplete
+time=2026-10-10T15:16:54.028+08:00 level=ERROR msg="disposal step failed" scope=task-timeout step=blocks kind=incomplete err="timed out after 60ms (total budget 60ms)"
+time=2026-10-10T15:16:54.028+08:00 level=ERROR msg="disposal step failed" scope=task-timeout step=never-runs kind=incomplete err="disposal budget exhausted before this step ran"
+time=2026-10-10T15:16:54.028+08:00 level=INFO msg="scope disposed" scope=task-timeout completed=0 failed=2 disposal_incomplete=true timed_out=true
+--- PASS: TestDisposeTimeoutMarksIncomplete (0.07s)
+=== RUN   TestDisposeTailOrder
+time=2026-10-10T15:16:54.039+08:00 level=INFO msg="scope disposed" scope=task-tail completed=1 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposeTailOrder (0.01s)
+=== RUN   TestDeferAfterDisposeIsVisible
+time=2026-10-10T15:16:54.040+08:00 level=INFO msg="scope disposed" scope=task-late completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-10-10T15:16:54.040+08:00 level=ERROR msg="disposal_incomplete: Defer called after Dispose" scope=task-late step=step-1
+--- PASS: TestDeferAfterDisposeIsVisible (0.00s)
+=== RUN   TestGoGoroutineGetsScopeCtx
+time=2026-10-10T15:16:54.044+08:00 level=INFO msg="scope disposed" scope=task-go completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestGoGoroutineGetsScopeCtx (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/plugin	0.193s
+time=2026-10-10T15:16:53.948+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRecordWithoutKeyFailsExplicitly
+--- PASS: TestRecordWithoutKeyFailsExplicitly (0.01s)
+=== RUN   TestRecordCapturesSSEAndWritesParsableGolden
+recorded C:\Users\swq\AppData\Local\Temp\TestRecordCapturesSSEAndWritesParsableGolden3873546730\001\record-smoke.sse (167 bytes of SSE)
+--- PASS: TestRecordCapturesSSEAndWritesParsableGolden (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/llmrecord	0.135s
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+time=2026-10-10T15:16:54.010+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224RecordWritesOneRowPerAnswer4188970279\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.035+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=21
+time=2026-10-10T15:16:54.059+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224RecordWritesOneRowPerAnswer4188970279\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.069+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=10
+time=2026-10-10T15:16:54.078+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.088+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.19s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+time=2026-10-10T15:16:54.164+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224RecordRefusesUnusableSubjects1465004372\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.175+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=11
+time=2026-10-10T15:16:54.190+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224RecordRefusesUnusableSubjects1465004372\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.198+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=7
+time=2026-10-10T15:16:54.204+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.208+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.10s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+time=2026-10-10T15:16:54.261+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224CoveringMatchesItsOwnSession151924620\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.275+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=14
+time=2026-10-10T15:16:54.290+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224CoveringMatchesItsOwnSession151924620\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.299+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=8
+time=2026-10-10T15:16:54.304+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.308+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.10s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+time=2026-10-10T15:16:54.467+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224CoveringDoesNotCrossToANewSession4208417932\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.475+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=7
+time=2026-10-10T15:16:54.488+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224CoveringDoesNotCrossToANewSession4208417932\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.496+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=7
+time=2026-10-10T15:16:54.500+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.503+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.19s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+time=2026-10-10T15:16:54.544+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224ExpiredOrRevokedRowIsNotLive4103417201\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.555+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=11
+time=2026-10-10T15:16:54.566+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224ExpiredOrRevokedRowIsNotLive4103417201\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.574+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=7
+time=2026-10-10T15:16:54.579+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.582+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.08s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+time=2026-10-10T15:16:54.628+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224NewLedgerRefusesHandWrittenIDs1025633322\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.638+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=10
+time=2026-10-10T15:16:54.656+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224NewLedgerRefusesHandWrittenIDs1025633322\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.663+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=7
+time=2026-10-10T15:16:54.668+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.670+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.08s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+time=2026-10-10T15:16:54.706+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224WildcardRowCoversAConcretePath3693532461\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.716+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=10
+time=2026-10-10T15:16:54.725+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224WildcardRowCoversAConcretePath3693532461\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.733+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=7
+time=2026-10-10T15:16:54.742+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.745+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.09s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+time=2026-10-10T15:16:54.792+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexquestion_mark_is_a_singl3283957952\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.803+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=10
+time=2026-10-10T15:16:54.817+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexquestion_mark_is_a_singl3283957952\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.828+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=10
+time=2026-10-10T15:16:54.833+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.837+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+time=2026-10-10T15:16:54.881+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexbracket_is_a_class_over_3007360366\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.892+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=11
+time=2026-10-10T15:16:54.904+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexbracket_is_a_class_over_3007360366\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.911+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=7
+time=2026-10-10T15:16:54.917+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.919+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+time=2026-10-10T15:16:54.958+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexa_regex-shaped_row_is_ho1087423451\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:54.965+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:54Z duration_ms=7
+time=2026-10-10T15:16:54.974+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexa_regex-shaped_row_is_ho1087423451\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:54.981+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:54Z duration_ms=6
+time=2026-10-10T15:16:54.989+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:54.992+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.24s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.09s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.07s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+time=2026-10-10T15:16:55.031+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224PatternWithoutStarIsNeverReinterpreted1520941108\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:55.040+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:55Z duration_ms=8
+time=2026-10-10T15:16:55.049+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224PatternWithoutStarIsNeverReinterpreted1520941108\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:55.056+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:55Z duration_ms=6
+time=2026-10-10T15:16:55.060+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:55.064+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.08s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+time=2026-10-10T15:16:55.107+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk3752788038\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:55.116+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:55Z duration_ms=8
+time=2026-10-10T15:16:55.125+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk3752788038\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:55.131+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:55Z duration_ms=6
+time=2026-10-10T15:16:55.136+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:55.139+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T15:16:55.170+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk3752788038\002\ghost-data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T15:16:55.178+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T07:16:55Z duration_ms=7
+time=2026-10-10T15:16:55.187+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk3752788038\002\ghost-data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T15:16:55.194+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T07:16:55Z duration_ms=7
+time=2026-10-10T15:16:55.198+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T15:16:55.201+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.14s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	1.370s
+time=2026-10-10T15:16:53.924+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestWalksUpFromWorkspaceInPriorityOrder
+--- PASS: TestWalksUpFromWorkspaceInPriorityOrder (0.04s)
+=== RUN   TestUpwardWalkTerminatesAtTheRoot
+--- PASS: TestUpwardWalkTerminatesAtTheRoot (0.03s)
+=== RUN   TestFileNamePriorityInsideOneDirectory
+--- PASS: TestFileNamePriorityInsideOneDirectory (0.04s)
+=== RUN   TestSameFileSeenTwiceIsInjectedOnce
+--- PASS: TestSameFileSeenTwiceIsInjectedOnce (0.02s)
+=== RUN   TestOverBudgetDropsBroadFirstAndTruncatesOnlyTheLast
+--- PASS: TestOverBudgetDropsBroadFirstAndTruncatesOnlyTheLast (0.02s)
+=== RUN   TestLoaderHasNoImportPathToPermOrConfig
+--- PASS: TestLoaderHasNoImportPathToPermOrConfig (0.00s)
+=== RUN   TestLoadedContentCarriesTheExistingC25SourceName
+--- PASS: TestLoadedContentCarriesTheExistingC25SourceName (0.02s)
+=== RUN   TestPanelCarrierCarriesTheManifest
+--- PASS: TestPanelCarrierCarriesTheManifest (0.01s)
+=== RUN   TestOffSwitchReadsNothingAndSaysWhy
+--- PASS: TestOffSwitchReadsNothingAndSaysWhy (0.02s)
+=== RUN   TestZeroBudgetIsStatedNotSilent
+--- PASS: TestZeroBudgetIsStatedNotSilent (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/projctx	0.310s
+FAIL
+runtests.sh: go test exited 1 - packages=[./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/ ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/session/ ./internal/projctx/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$] top-level: PASS=398 FAIL=1 SKIP=0, === RUN=577, '[no tests to run]'=0
+portable-tests.sh: four numbers (all from -v output): === RUN=577  --- PASS=398  --- FAIL=1  --- SKIP=0
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/cmd/llmrecord
+portable-tests.sh:   FAIL (own line) github.com/CarlosShao/wisp/internal/ball
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/config
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/perm
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/plugin
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/proc
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/projctx
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/risk
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/secret
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/session

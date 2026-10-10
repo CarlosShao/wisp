@@ -1,0 +1,27 @@
+301-v1 anchors（验收腿双锚；每一行都是现量，⛔ 转述）
+
+OPENING（起手，任何门禁跑之前）
+  time                    = 2026-10-10 15:0x +0800（本机钟，起手那批命令的 stdout）
+  git rev-parse --short HEAD                 = 3a5771ce
+  git status --porcelain=v1 | wc -l          = 815
+  git status --porcelain=v1 -- scripts internal .github | wc -l = 0
+  go env GOOS / GOARCH / go version          = windows / amd64 / go1.27.1
+  tasklist wisp.exe / balldebug.exe          = 0 / 0（"No tasks are running"）
+      ⚠ 这一读数在落成本件之前只存在于本腿的工具调用记录里，⛔ 当场落件；
+        第二发读数见 logs/tasklist-post.txt（15:22:26 +0800，仍 0 / 0）。具名记在 50-verdict.md §5。
+
+PRE-COMMIT CLOSING（交回前现量，本笔 commit 之前）
+  git rev-parse --short HEAD                 = 3a5771ce（＝起手锚，本腿期间无人推进 HEAD 之外的面）
+  git status --porcelain -- scripts internal .github | wc -l = 0
+      ⚠ 反形（摘 win_pin 的 audio 一行）与 before 复现（装 0a0f62ef~1 的脚本 blob）两次工作树窗口
+        均已逐字节还原：cmp scripts/portable-tests.sh <git show HEAD:scripts/portable-tests.sh> rc=0，
+        窗口关闭后各复量一次 porcelain = 0 行（共四次，见 50-verdict.md §2-D）。
+  bash -n scripts/portable-tests.sh（还原后重跑） = rc=0，件 logs/bashn-restored.rc.txt
+  sh scripts/d22scan.sh（本腿全部件落盘后重跑）    = rc=0，件 logs/d22scan-final.rc.txt
+
+门禁退码一览（⛔ 每枚都非 0 字节，尺 = wc -c）
+  bashn 0 / d22scan 0 / selftest 0 / census-head 0 / census-before-sim 0
+  windows-head 1 / windows-positive-control 1 / windows-before-sim 1 / windows-pinremoved 1（GUARD C 红，预期）
+  core-head 1
+  注：三枚 rc=1 的档差发（windows-head / windows-positive-control / windows-before-sim）红的是同一枚既有红
+      TestC21TableColourRowsMatchTokensCSS；core-head 的 8 枚红改前改后逐字相同；⛔ 一枚新增红。

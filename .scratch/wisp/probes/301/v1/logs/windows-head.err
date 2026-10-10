@@ -1,0 +1,1 @@
+portable-tests.sh: strict runner exited 1 for scope=[./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/ ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/session/ ./internal/projctx/ ./internal/audio/]
