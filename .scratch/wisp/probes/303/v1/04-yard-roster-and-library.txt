@@ -1,0 +1,34 @@
+### 件 04: the behavioural yard that executes the SHIPPING constant, and whether the implementer's -run selector is cherry-picked
+selector used by 303-r1 (件 probes/303/r1/40-transport-after.txt) = 'Transport|ShapeA3|LegacySubShape|Unforwarded|ForwardingHook'
+
+roster of Test funcs in the two transport files (尺 = grep -n '^func Test'):
+cmd/wisp/panel_transport_35r1_test.go:195:func TestPagePostMessageEnvelopeReachesDispatchRawViaTransport(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1736:func TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1769:func TestShapeA3SecondPagePostStillDelivers(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1791:func TestShapeA3ForwardingHookIsIdempotentInOneDocument(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1817:func TestLegacySubShapeOneHookDiesInAReentryLoop(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1860:func TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1952:func TestForwardingHookMustNotLoseTheNativeExitReceiver(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:1982:func TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:2032:func TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:2097:func TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable(t *testing.T) {
+
+total=10 matched_by_selector=10  => coverage = ALL
+
+### the yard's own claim that it reads the shipping constant, verbatim:
+cmd/wisp/panel_transport_35r2_test.go:25://	(c) the PRODUCTION runtime string panelPostMessageForwardInit - read as a value from
+cmd/wisp/panel_transport_35r2_test.go:1732:// from panelPostMessageForwardInit as a value) is installed, a document is opened, and the
+cmd/wisp/panel_transport_35r2_test.go:1828:	// Drop the shipping forwarding (the last script queued is panelPostMessageForwardInit)
+
+### the library shim the fix wraps, verbatim (module object layer, read-only):
+	e.Init("window.external={invoke:s=>window.chrome.webview.postMessage(s)}")
+func (e *Chromium) Eval(script string) {
+
+	_, _, _ = e.webview.vtbl.ExecuteScript.Call(
+		uintptr(unsafe.Pointer(e.webview)),
+		uintptr(unsafe.Pointer(_script)),
+		0,
+
+### vtable has a title-change event, nothing in this repo wires it:
+120:	AddDocumentTitleChanged                ComProc
+0

@@ -1,0 +1,2 @@
+### go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+rc=0

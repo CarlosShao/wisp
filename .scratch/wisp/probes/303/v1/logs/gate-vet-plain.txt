@@ -1,0 +1,2 @@
+### go vet ./cmd/wisp/  (run in /d/work/workspace/projects plans/Wisp, cwd mother)
+rc=0

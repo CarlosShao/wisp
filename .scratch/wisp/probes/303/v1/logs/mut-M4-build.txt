@@ -1,0 +1,2 @@
+### M4 build (in the exported tree only)
+rc=0

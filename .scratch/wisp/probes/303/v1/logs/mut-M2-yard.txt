@@ -1,0 +1,37 @@
+time=2026-10-10T20:48:10.968+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTransportDoorBindingMatchesRoster253r1
+    panel_dispatch_binding_roster_253r1_windows_test.go:358: 253-r1 census: door constant "panelDispatchBinding" = "wispDispatch"; installPanelTransport at panel_host_windows.go:828 made 1 Bind call(s) and 1 Init call(s); roster holds 1 name(s) over 35 production file(s)
+    panel_dispatch_binding_roster_253r1_windows_test.go:401: 253-r1 lockstep: w.Init(panelPostMessageForwardInit) at panel_host_windows.go:835 derives its window.<door> reference from "panelDispatchBinding", the same constant the Bind uses
+--- PASS: TestTransportDoorBindingMatchesRoster253r1 (0.03s)
+=== RUN   TestPagePostMessageEnvelopeReachesDispatchRawViaTransport
+--- PASS: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport (0.00s)
+=== RUN   TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3
+    panel_transport_35r2_test.go:1754: AC#6 RED: the bound door fired 0 time(s), want 1. nativeExitCalls=1 receiverOK=1 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=1 evalThrew=1 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+=== RUN   TestShapeA3SecondPagePostStillDelivers
+    panel_transport_35r2_test.go:1784: AC#6 RED: the bound door fired 0 time(s), want 2. nativeExitCalls=2 receiverOK=2 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=2 evalThrew=2 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestShapeA3SecondPagePostStillDelivers (0.00s)
+=== RUN   TestShapeA3ForwardingHookIsIdempotentInOneDocument
+    panel_transport_35r2_test.go:1807: AC#6 RED: the bound door fired 0 time(s), want 1. nativeExitCalls=1 receiverOK=1 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=1 evalThrew=1 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+=== RUN   TestLegacySubShapeOneHookDiesInAReentryLoop
+    panel_transport_35r2_test.go:1844: sub-shape ① under the behavioural yard: re-entered 9 levels (cap 8), native exit called 0 times, door fired 0 times, page error="RangeError: maximum call stack size exceeded - chrome.webview.postMessage re-entered 9 levels (cap 8) with the native exit called 0 times; a page in a real browser dies here"
+--- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop (0.00s)
+=== RUN   TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot
+--- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot (0.00s)
+=== RUN   TestForwardingHookMustNotLoseTheNativeExitReceiver
+    panel_transport_35r2_test.go:1967: AC#6 RED: the bound door fired 0 time(s), want 1. nativeExitCalls=1 receiverOK=1 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=1 evalThrew=1 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+=== RUN   TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit
+    panel_transport_35r2_test.go:2017: AC#6 RED: the bound door fired 0 time(s), want 1. nativeExitCalls=1 receiverOK=1 receiverLost=0 ignoredWrites=(none) doorRounds=0 maxPostDepth=2 capTripped=false capDepth=0 unparsable=0 unboundSlots=1 evalThrew=1 resolved=0 rejected=0 scriptThrows=[]
+--- FAIL: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent
+    panel_transport_35r2_test.go:2071: door absent: the guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=1, no throw)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+=== RUN   TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable
+    panel_transport_35r2_test.go:2140: M-B3 face has teeth: door present as typeof==="string", guard's typeof half routed the page's envelope to the native exit byte-for-byte (frames=1, no throw)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.154s
+FAIL
+rc=1

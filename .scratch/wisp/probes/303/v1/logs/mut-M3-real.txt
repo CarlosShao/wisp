@@ -1,0 +1,16 @@
+time=2026-10-10T20:48:49.228+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: -1.000 ms (HEAD HEAD-unknown at read time, 2026-10-10T20:48:54+08:00)
+    panel_host_windows_test.go:662: cold bring-up did not produce a browser round trip (got -1.000); the message channel did not come up on the real window
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (5.09s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+time=2026-10-10T20:48:54.331+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold -1.0 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:821: no report "ac14r-0" from the page within 15s (what DID arrive at the door: nothing at all). AC#14's reply hop cannot be decided without the page's own answer, and the three shapes that are all true with no reply (Dispatch called, Eval returned, Go-side channel closed) are not assertions
+time=2026-10-10T20:49:14.350+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T20:49:14.350+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC14AwaitedBindingReplyReachesThePage (20.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	25.341s
+FAIL
+rc=1

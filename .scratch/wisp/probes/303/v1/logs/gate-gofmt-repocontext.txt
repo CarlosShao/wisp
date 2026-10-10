@@ -1,0 +1,15 @@
+### whole-repo gofmt residual (context only, NOT this leg's range)
+.scratch\wisp\probes\161\r1\runs\b8-probe-bands\internal\a\p_b8.go
+.scratch\wisp\probes\161\r1\runs\unp-bad\internal\a\p_unp.go:5:14: expected ')', found '{'
+.scratch\wisp\probes\161\r1\runs\unp-bad\internal\a\p_unp.go:6:8: missing ',' before newline in parameter list
+.scratch\wisp\probes\161\r1\runs\unp-hides-bans\internal\a\p_unp.go:15:14: expected ')', found '{'
+.scratch\wisp\probes\161\r1\runs\unp-hides-bans\internal\a\p_unp.go:16:8: missing ',' before newline in parameter list
+.scratch\wisp\probes\161\r3\pre-format\guard.no1.go
+.scratch\wisp\probes\161\r3\pre-format\guard.no3.go
+.scratch\wisp\probes\161\r5\negative-control\bad-sample.go
+.scratch\wisp\probes\162\r4\fs_write_m2.go
+.scratch\wisp\probes\163\a1\main.go
+.scratch\wisp\probes\183\r2\mut\task-boxset-off.go
+.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations
+total=38
+rc=0

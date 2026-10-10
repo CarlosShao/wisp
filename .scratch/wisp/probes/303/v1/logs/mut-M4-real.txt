@@ -1,0 +1,25 @@
+time=2026-10-10T20:58:17.148+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: -1.000 ms (HEAD HEAD-unknown at read time, 2026-10-10T20:58:22+08:00)
+    panel_host_windows_test.go:662: cold bring-up did not produce a browser round trip (got -1.000); the message channel did not come up on the real window
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (5.10s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+time=2026-10-10T20:58:22.264+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold -1.0 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:825: AC#14 nail 1 (reply hop), page's own words: "TIMEOUT-2S,TIMEOUT-2S,TIMEOUT-2S" (Go's handler was reached by 3 of the 3 real requests)
+    panel_resident_windows_test.go:828: the awaited JS binding reply did not reach the page: the page reported "TIMEOUT-2S,TIMEOUT-2S,TIMEOUT-2S". Go did receive the calls (3 reached the handler), so this is the H10 half and not H3: webview.Dispatch only appends a closure and posts a thread message, and only the library's Run() drains that queue (33-p1 §A, R25 versus R26). The panel thread has to hand its pump over to Run()
+time=2026-10-10T20:58:33.396+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T20:58:33.396+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC14AwaitedBindingReplyReachesThePage (11.13s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+time=2026-10-10T20:58:33.396+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold -1.0 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:867: AC#14 nail 2 (Eval push hop), page's own words: title=""
+    panel_resident_windows_test.go:869: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other
+time=2026-10-10T20:58:38.517+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T20:58:38.517+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (5.12s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	21.536s
+FAIL
+rc=1

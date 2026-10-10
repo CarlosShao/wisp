@@ -1,0 +1,28 @@
+### 303-v1 门禁与交集尺的自落读数（每把尺一行 rc=；⛔ 0 字节件）
+
+台面＝仓外干净 clone ~/wisp-303-v1（四发同一枚 clone，只差一次 git checkout --detach）；导出树＝~/wisp-303-v1-mut-*（git archive HEAD | tar -x）。
+
+尺名=AC4-整包-改前-1        detached=cf46c24a 尺A PASS=267 FAIL=18 SKIP=3 rc=1
+尺名=AC4-整包-改前-2        detached=cf46c24a 尺A PASS=267 FAIL=18 SKIP=3 rc=1
+尺名=AC4-整包-改后-1        detached=807497c1 尺A PASS=269 FAIL=17 SKIP=2 rc=1
+尺名=AC4-整包-改后-2        detached=807497c1 尺A PASS=270 FAIL=16 SKIP=2 rc=1
+尺名=AC4-改前两发红名逐字相同  尺=diff names-before-1 names-before-2  rc=0（空差＝相同）
+尺名=AC4-新增红=交集作差       尺=comm -13 before-red-intersect.txt after-red-intersect.txt 枚数=0 件=new-red.txt(0 字节即"空集"，本行即其 rc 替身) rc=0
+尺名=AC4-被修好=交集作差       尺=comm -23 同上 枚数=2 件=fixed-red.txt 名=TestAC14AwaitedBindingReplyReachesThePage,TestPanelHostRealWindowHopAndLifecycle rc=0
+尺名=AC4-gate-go-vet-plain    件=gate-vet-plain.txt rc=0
+尺名=AC4-gate-go-vet-winlive  件=gate-vet-winlive.txt rc=0
+尺名=AC4-gate-d22scan         件=gate-d22scan.txt rc=0
+尺名=AC4-尺C-gofmt-工作树      件=gate-gofmt-worktree.txt 射程=cmd/wisp 母仓工作树 枚数=1 名=cmd\wisp\models.go（既有加严残留，⛔ 本腿文件，⛔ 顺手修）rc=0
+尺名=AC4-尺C-gofmt-HEADblob    件=gate-gofmt-headblob.txt 射程=cmd/wisp 导出树(HEAD) 枚数=0 rc=0
+尺名=AC4-尺C-gofmt-全仓(仅上下文) 件=gate-gofmt-repocontext.txt 射程=. 母仓**工作树**(脏，别的腿在飞) 枚数=38（⛔ 本腿射程、⛔ 修；⚠ 与派单里"全仓 5 枚"那把尺对不上，差别＝工作树 vs blob／CRLF，具名报差⛔ 自行调和）rc=0
+
+### ⓐ 变异取证（每形一行；尺A=顶层 ^--- FAIL/^--- PASS）
+形=pristine 件=mut-pristine-yard.txt rc=0 尺A PASS=11 FAIL=0（=两档 transport 夹具 10 枚 ＋ 选择器另命中 TestTransportDoorBindingMatchesRoster253r1 1 枚）| 件=mut-pristine-real.txt rc=0 cold=1341.042ms nail1=REPLIEDx3
+形=M1-删折入支 件=mut-M1-yard.txt rc=1 尺A FAIL=5 PASS=6 | 件=mut-M1-real.txt rc=0 nail1=PASS cold=1116.089ms ← 假绿可达，被那 5 枚钉抓到；⚠ 抓到它的**全部是 35-r2 行为钉**，35-r1 能力钉 TestPagePostMessageEnvelopeReachesDispatchRawViaTransport 与 253r1 名册钉在 M1 下**仍绿**
+形=M2-inside 置位点挪走 件=mut-M2-yard.txt rc=1 FAIL=5 PASS=6（同一批五枚钉逐字同名）
+形=M3-夹具换 postMessage 入口+撤修复 件=mut-M3-yard.txt rc=0 FAIL=0 | 件=mut-M3-real.txt rc=1 nail1=FAIL(no report ac14r-0 ... nothing at all) cold=-1.000ms ← 假绿不可达；另暴露夹具/真窗台面差（具名欠账 1）
+形=M4-Go 侧拆双包帧+撤修复 件=mut-M4-yard.txt rc=0 FAIL=0 PASS=10 | 件=mut-M4-real.txt rc=1 nail1=FAIL(TIMEOUT-2S x3, Go did receive the calls 3) cold=-1.000ms ← 具名网眼（欠账 2）
+尺名=选择器覆盖面 total=10 matched=10 件=../04-yard-roster-and-library.txt rc=0
+
+### 定向一发（ⓖ／ⓣ 承重）
+尺名=f718e9b6(回归笔父发)三枚定向 台面=同一枚 clone 件=nails-at-f718e9b6.txt rc=1 nail1=PASS REPLIEDx3 / nail2=FAIL 逐字 title="" / AC13=SKIP(具名 the embed resolves no entry)

@@ -1,0 +1,3 @@
+### gofmt -l cmd/wisp  (WORKING TREE ruler, mother repo)
+cmd\wisp\models.go
+rc=0

@@ -1,0 +1,2 @@
+### gofmt -l cmd/wisp  (HEAD BLOB ruler: git archive HEAD | tar -x into $HOME)
+rc=0

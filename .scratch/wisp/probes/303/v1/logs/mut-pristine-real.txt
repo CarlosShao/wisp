@@ -1,0 +1,20 @@
+time=2026-10-10T20:46:53.910+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:660: cold bring-up measured on this box: 1341.042 ms (HEAD HEAD-unknown at read time, 2026-10-10T20:46:55+08:00)
+    panel_host_windows_test.go:713: AC#1 pre-hide tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 25)
+    panel_host_windows_test.go:749: AC#1 re-show tree settle: reading held after 1 extra sample(s) at our tree webview=7 (machine-wide 25)
+    panel_host_windows_test.go:779: AC#1 denominators (head HEAD-unknown): our tree webview=7 direct-children=1 tree-pids=7 | browser hosts pre=[28628] mine=[28628] post=[28628] added=[] mine-died=[] | machine-wide msedgewebview2=25 | same HWND 0x30b0b78 across hide->re-show=true
+    panel_host_windows_test.go:787: hot re-show measured on this box: 42.626 ms
+    panel_host_windows_test.go:814: AC#3 listening-socket ruler (head HEAD-unknown): IPv4 rows=333 LISTEN-owned-by-tree=0 ; IPv6 rows=39 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:840: AC#1 after Destroy (head HEAD-unknown), ONE sample and no timing claim: our tree webview baseline 0 -> now 7, machine-wide 18 -> 25. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.72s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+time=2026-10-10T20:46:55.656+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 1317.0 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:825: AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)
+time=2026-10-10T20:46:57.223+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T20:46:57.223+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (1.57s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.538s
+rc=0

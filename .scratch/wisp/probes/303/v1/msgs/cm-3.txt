@@ -1,0 +1,11 @@
+303-v1(3/4): 七问判语正文 + 变异取证四形(M1/M2/M3/M4) + 门禁四把与 f718e9b6 定向一发
+
+- 10-verdicts-ac3-ac4.md：ⓐ..ⓖ 每问 verdict＋承重读数＋件名；本腿⛔ 翻任何 - [ ] 框。
+- ⓐ：修复⛔ 变松（判据两档自 cc315261 起 commits=0；+27 行全落 JS 原始串内 :800-:819）；另找四形假绿编辑形状实测：M1/M2 被 35-r2 五枚行为钉抓到（M1 真窗两枚全绿＝可达的假绿），M3 夹具换入口造不出绿（产码自己的 wispProbeRT 直调入口是钉子，:879/:892-893），M4 Go 侧拆帧让 10 枚 transport 钉全绿＝具名网眼，但它自己也造不出绿（页面 await 的回执⛔ 到）。
+- ⓑ：链读遍并具名到行（installPanelTransport :828-837 / dispatchRaw :841-849 / composer_dispatch.go :155-167,:177-212,:217-224 / bridge.go :126-141,:146-152 六法闭集 / composer_handlers.go :117-137 ErrNoModeWriter・fail-closed・ErrNoL2Confirm / perm/store.go:194 / 库 chromium.go:112 证明 external.invoke 修前已可达）。结论＝⛔ 扩权限，且 invoke 直调那一路是**变窄**；另具名一枚⛔ 本笔引入的名册洞（wispProbeRT 绑在 installPanelTransport 外，253r1 射程⛔ 覆盖）。
+- ⓒ：ⓣ 判'本格凭据句有缺陷'（本腿亲跑 f718e9b6：nail1 PASS／nail2 逐字同一句红＝回归之前就这么红），⛔ 判'修复⛔ 成立'；ⓤ 更正形状下闭合，挂 ⓓ/ⓖ 两枚条件。
+- ⓓ：各两发同台面（仓外 clone detach cf46c24a／807497c1）红名交集作差＝新增红 **0 枚**；被修好 2 枚；四把门禁 rc 全 0（vet／vet winlive／d22scan／gofmt 两把并排：工作树 1 枚 models.go、HEAD blob 0 枚）；台面档差具名（AC13 四发全具名 SKIP、no native DLLs 族、0xc0000135＝0 命中）。
+- ⓔ：门外读数取到了——但⛔ 是设想的那枚（库 Chromium.Eval 丢结果，chromium.go:138,:143-147；DocumentTitleChanged 全仓 0 命中）；取到的是 firstRoundTrip 那枚不经 router 不经页面自报的正数：本机改后 980.666/1002.355/1341.042 ms，改前两发逐字 -1.000 ⇒ 甲直接判死，残口＝入口文档那半归票 305。
+- ⓕ：归票 302 的归口面（runner 时序⛔ 作我们的性能读数，先例 pending-and-issues.md:10718 逐字；本机 1002/1341 < 1500 ⇒ D32 预算面⛔ 破；P11 >2000 那一档本机未触发）；⛔ 动 1500、⛔ 另立一票。
+- ⓖ：另立票 305 正确（f718e9b6 逐字同句红＝⛔ 该笔造成；修复名册⛔ 碰 bringUp/serveEntry ⇒ 收进本票＝动第二枚未归因产码）；并具名 M3 那枚夹具/真窗台面差。
+- 本腿欠账四条写在件末节；⛔ 产码、⛔ 翻框、⛔ push。
