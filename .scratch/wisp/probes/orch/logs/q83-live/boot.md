@@ -1,0 +1,28 @@
+time=2026-10-10T08:52:58.358+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp 0.0.0-dev (29081a13, built 2026-10-10T00:51:10Z)
+WISP_ENV=dev (data dir rules: SPEC-03 §5)
+sherpa-onnx runtime version: 1.13.8
+time=2026-10-10T08:52:58.362+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Roaming\wisp-dev\logs min_level=info early_records=1 early_dropped=0
+wisp: resident runtime booted (Wisp · dev, data dir = C:\Users\swq\AppData\Roaming\wisp-dev, portable = false, job object = on, single instance = true)
+time=2026-10-10T08:52:58.363+08:00 level=INFO msg="resident gate: [risk] tier taken at construction" provenance=config config_path=C:\Users\swq\AppData\Roaming\wisp-dev\config.toml window_sec_read=2 confirm_timeout_sec_read=300 gate_window=2s gate_queue_timeout=5m0s scope="construction time only: approval.Gate and Queue copy these in New and nothing re-applies them (ticket 256)"
+time=2026-10-10T08:52:58.363+08:00 level=INFO msg="panel host: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed"
+wisp: panel host (resident): this leg does not tick config.toml either; the reload tick lives in `wisp run` (config_reload.go), and this leg has no approval card, so a loosening it could read would have nowhere to be confirmed
+time=2026-10-10T08:52:58.369+08:00 level=INFO msg="panel host: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail=\"面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。\""
+wisp: config: PANEL-GEOMETRY state=per-create-and-per-reshow reads=[panel] width/height detail="面板宿主每次建窗现读一次 [panel] width/height：关窗再开即跟上新值；已建好的窗口在下一次重新显示（Show）时也会把此刻解析出的那一对数发给它一次（票 255-r1，走库的 SetSize，客户区语义，与建窗那份外框语义不是同一个宽度）。本腿不轮询 config.toml，也没有任何东西在文件被保存那一刻去按这一下，所以面板尺寸要等下一次显示请求才跟上，其余热加载段仍要重启进程才生效。"
+time=2026-10-10T08:52:58.369+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-10T08:52:58.369+08:00 level=INFO msg="ball: [hotkey] view read from config.toml" summon="" mute="" cancel=Esc panel="" empty_slots_note="empty slots are filled from the product defaults by ball.ApplyHotkeyDefaults; when the merged set is the compiled defaults the verdict prints the word defaults (ticket 258-r2)"
+time=2026-10-10T08:53:00.698+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-10T08:53:00.711+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=defaults
+wisp: ball hotkey reload bridge armed (provenance=defaults); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-10T08:53:00.711+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=defaults hotkeys_live=3 hotkeys="summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+time=2026-10-10T08:53:00.711+08:00 level=INFO msg="audit: resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）"
+wisp: [audit] resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）
+time=2026-10-10T08:53:00.711+08:00 level=WARN msg="task source: 任务入口未启用" why="interactiveStdin() 返回 nil：标准输入不是本进程拥有的控制台输入缓冲" effect=没有东西会去举一张确认卡片；球、托盘与退出序列照旧
+wisp: 任务入口未启用（本机没有可交互控制台）：本进程仍然带球常驻、仍然会在退出时拒绝挂起的卡片，但没有任何东西会去举一张卡
+time=2026-10-10T08:53:00.725+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Roaming\wisp-dev\config.toml path=T
+wisp: 审批门已装配进本进程（取消通道：Esc 已加载；等待中的确认项：0）; 任务来源：无（任务入口未启用，理由见上面那行）; 面板：panel thread up (STA, dedicated pump; window not created yet, 0 show request(s), 0 toggle(s)); D38(e) steps with an owner in this process: 3:cancel-task-roots, 4:stop-audio
+wisp: 采集腿：采集腿已装配、门处于静音：设备未打开（[audio] mic_muted_default=true，来源 C:\Users\swq\AppData\Roaming\wisp-dev\config.toml）
+wisp: resident event loop running (task source: 无（任务入口未启用，理由见上面那行）); the floating ball window is up in this process (tray icon added, hotkeys from defaults, hotkeys live 3/4: summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live) (Ctrl+C exits cleanly)
+time=2026-10-10T08:53:24.959+08:00 level=INFO msg="panel host: panel: INBOUND-DISPATCH request=\"\" method=\"wispProbeRT\" source=\"\" origin=\"panel\" err=panel: composer request refused: 方法 \"wispProbeRT\" 不是面板 composer 通路的能力入口 detail=\"处理器未被调用：该请求没有任何一侧发生变化\""
+wisp: panel: INBOUND-DISPATCH request="" method="wispProbeRT" source="" origin="panel" err=panel: composer request refused: 方法 "wispProbeRT" 不是面板 composer 通路的能力入口 detail="处理器未被调用：该请求没有任何一侧发生变化"
+wisp: panel window is up (panel-hotkey, cold -1.0 ms, hot path 0.0 ms)
