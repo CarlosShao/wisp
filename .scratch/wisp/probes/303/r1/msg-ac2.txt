@@ -1,0 +1,8 @@
+303-r1: AC#2 机制三形分开答（活动形=丙，有硬读数）
+
+甲：green->red 唯一 delta 是一枚 JS 钩子，门外 Eval-return 读数缺（归 303-v1）。
+乙：代码+父发因果+HEAD 自洽三重否证。
+丙：活动形。headless 行为尺现量 re-entered 9 / native exit 0 / door fired 0；
+   HEAD ③ 钩子的 inside 仅在 postMessage 入口置真，受害三枚直调 window.wispDispatch
+   绕过覆盖层 -> inside 恒假 -> 库 RPC 帧被折回 -> 门收到双包 -> nothing at all + -1.0 哨兵。
+判据本体三句一字未动。件 10-/14-/16-/20-。

@@ -1,0 +1,82 @@
+commit fb2fb802f75a0e3eeacad488f1adc6f064e29f85
+Author: CarlosShao <1933942520@qq.com>
+Date:   Wed Oct 7 18:05:53 2026 +0800
+
+    35-r1 票35 AC#6(:52) 页面↔宿主传输接上（Go 侧，甲子形①）：installPanelTransport 绑定 wispDispatch 门并安装 postMessage 转发 Init；新增 cmd/wisp 判据经页面真用的那条边喂 panel.ts:246 在册信封原文，断 dispatchRaw 下游带 requestId 到达。不动 frontend/、不改 C17 名册、不新造 C##。
+
+diff --git a/cmd/wisp/panel_host_windows.go b/cmd/wisp/panel_host_windows.go
+index 419f5bd6..69613cbf 100644
+--- a/cmd/wisp/panel_host_windows.go
++++ b/cmd/wisp/panel_host_windows.go
+@@ -402,11 +402,10 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
+ 	// No new inbound method name is invented here: the raw envelope is parsed by
+ 	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+ 	// four existing methods (bridge.go:42-45, ticket 248 owns config methods).
+-	bindErr := w.Bind(panelDispatchBinding, func(raw string) string {
+-		reply, _ := m.dispatchRaw(ctx, raw)
+-		return reply
+-	})
+-	if bindErr != nil {
++	// The binding AND the page->host transport forwarding are installed together
++	// by installPanelTransport, split out of bringUp so the shipping wiring can be
++	// driven headlessly (ticket 35 AC#6).
++	if bindErr := m.installPanelTransport(w, ctx); bindErr != nil {
+ 		w.Destroy()
+ 		return fmt.Errorf("panel host: bind dispatch door: %w", bindErr)
+ 	}
+@@ -625,6 +624,54 @@ func (m *PanelManager) Destroy() {
+ 	}
+ }
+ 
++// pageTransport is the slice of the WebView2 control the page<->host inbound
++// transport needs: bind the door and install the page-side forwarding hook. It is
++// deliberately this narrow so the shipping wiring in installPanelTransport can be
++// driven headlessly by a test (ticket 35 AC#6) with no real browser; the
++// webview2.WebView the host runs on satisfies it structurally, so bringUp hands the
++// live control over unchanged.
++type pageTransport interface {
++	Bind(name string, f interface{}) error
++	Init(js string)
++}
++
++// panelPostMessageForwardInit is ticket 35 AC#6's Go-side transport forwarding
++// (orchestrator shape 甲, sub-shape ①, ticket 35:150). The page posts its composer
++// envelope on window.chrome.webview.postMessage (frontend/src/lib/panel.ts:179 and
++// :218 - READ-ONLY for this fleet); left alone that raw string reaches go-webview2's
++// msgcb, is parsed as an RPC frame with id=0 and a method nothing has bound, and
++// dies with no Go-side log and no page-side receipt (ticket 35:52-59). This hook
++// reroutes window.chrome.webview.postMessage into the ALREADY-BOUND
++// window.wispDispatch(raw) - the library's own RPC pipe that dispatchRaw actually
++// reads - so the page's raw envelope arrives at dispatchRaw verbatim. It touches no
++// page file, invents no method name, and does not change C17's roster.
++const panelPostMessageForwardInit = `(function () {
++  var cw = window.chrome && window.chrome.webview;
++  if (!cw || cw.__wispForwardInstalled) { return; }
++  cw.__wispForwardInstalled = true;
++  cw.postMessage = function (message) {
++    if (typeof window.wispDispatch === "function") { window.wispDispatch(message); }
++  };
++})();`
++
++// installPanelTransport is the ONE place the page<->host inbound transport is
++// wired. It binds the wispDispatch door (whose Go callback feeds dispatchRaw) and
++// installs the postMessage forwarding hook above, in that order and before the
++// first SetHtml (bringUp runs it ahead of firstRoundTripLocked / serveEntry, and an
++// Init script re-runs on every document so it survives later SetHtml rebuilds).
++// Kept out of bringUp so a test drives this exact shipping wiring on a fake control
++// rather than reaching dispatchRaw directly.
++func (m *PanelManager) installPanelTransport(w pageTransport, ctx context.Context) error {
++	if err := w.Bind(panelDispatchBinding, func(raw string) string {
++		reply, _ := m.dispatchRaw(ctx, raw)
++		return reply
++	}); err != nil {
++		return err
++	}
++	w.Init(panelPostMessageForwardInit)
++	return nil
++}
++
+ // dispatchRaw runs one page envelope through the router. Kept separate from the
+ // bind closure so a test can call the same code path the page reaches.
+ func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, error) {
+rc=0
