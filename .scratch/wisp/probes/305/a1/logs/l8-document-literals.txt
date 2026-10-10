@@ -1,0 +1,20 @@
+ruler: git show a81c2980:$P | sed -n '<lines>p' | sed -n 's/^.*\x60\(.*\)\x60.*$/\1/p'  (\x60 = backtick literal delimiter) ; scope = HEAD blob 的行内字面量，逐行抽出后拼接再 wc -c
+--- blob lines 892-893 raw ---
+	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"></head><body>` +
+		`<script>if(window.wispProbeRT)window.wispProbeRT();</script></body></html>`)
+probe_bytes=136
+probe_title_hits=0
+probe_id_hits=0
+--- blob lines 467-468 raw ---
+	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
+		`</head><body><p>panel assets unavailable: the embedded bundle is not built.</p></body></html>`)
+notice_bytes=181
+<title>panel assets unavailable</title>
+notice_id_hits=0
+--- entry (embed-resolved; 母仓 working tree, UNTRACKED) ---
+entry_bytes=1044
+<title>Wisp</title>
+entry_id_root_hits=1
+--- 空串那一支 ---
+empty_sethtml_count=0
+rc=0
