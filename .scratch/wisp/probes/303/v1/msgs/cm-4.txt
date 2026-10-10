@@ -1,0 +1,5 @@
+303-v1(4/4): 终态锚＋越界自查＋rc 补件（*.out 命名踩过一次已具名补件；代码面足迹现量 0 行）
+
+- 99-final-anchor.md：起手锚 34e1962b 现量、本腿四笔逐笔越界尺＝0、台面纪律（仓外 clone detach 五发＋git archive 导出树五棵）、进程纪律（⛔ 杀任何进程；wisp/balldebug/mockllm 复现量 0，msedgewebview2 24 枚＝机主四棵树先例 A821）。
+- 交付件尺名现量：find .scratch/wisp/probes/303/v1 -type f = 56 枚（*.out 一枚被根 .gitignore 第 8 行静默挡住 ⇒ 入库 55）；0 字节件一枚＝logs/new-red.txt（空集即读数），rc 替身＝logs/new-red-count.rc.txt；另补 logs/before-pair-identical.rc.txt（两枚改前发名册逐字相同那把尺）。
+- 代码面足迹＝git status --porcelain -- cmd internal 行数 0、-- tools .github scripts 行数 0 ⇒ ⛔ 产码、⛔ 测试件、⛔ 门禁件字节改动；⛔ 翻任何 - [ ] 框；⛔ push。

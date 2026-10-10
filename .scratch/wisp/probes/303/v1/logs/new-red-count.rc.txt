@@ -1,0 +1,1 @@
+ruler=comm -13 before-red-intersect.txt after-red-intersect.txt  new_red_count=0 rc=0  (件 new-red.txt 本身 0 字节＝"空集"就是读数，本行是它的 rc 替身)

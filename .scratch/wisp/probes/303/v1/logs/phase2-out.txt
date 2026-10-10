@@ -1,0 +1,7 @@
+M1 applied
+M2 applied
+  File "<stdin>", line 13
+    old3='"window.wispDispatch(" + env("REP[i]", "got.replace(/[^A-Za-z0-9-]/g, \'\\')") + ");" +'
+                                                                                     ^
+SyntaxError: unmatched ')'
+M3: fix removed as well

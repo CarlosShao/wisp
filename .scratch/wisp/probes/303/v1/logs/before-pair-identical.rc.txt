@@ -1,0 +1,1 @@
+ruler=diff names-before-1.txt names-before-2.txt  empty_diff=yes rc=0 (两枚改前发红+跳名册逐字相同)
