@@ -1,0 +1,2 @@
+scope-lines=0
+gitignore-line8=*.out

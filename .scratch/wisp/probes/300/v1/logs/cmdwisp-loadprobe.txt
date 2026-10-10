@@ -1,0 +1,30 @@
+PROVENANCE date=2026-10-10 12:46:20 +0800 treeA=/tmp/wisp300-v1/treeA (git archive efd85155, NO third_party dll)
+
+CMD: go test -c -o /tmp/wisp300-v1/cmdwisp.test.exe ./cmd/wisp/  (inside treeA, plain PATH, no dll anywhere)
+
+real	0m8.497s
+user	0m0.061s
+sys	0m0.045s
+rc-gotest-c=0
+built? -rwxr-xr-x 1 swq 197609 41410959 Oct 10 12:46 /tmp/wisp300-v1/cmdwisp.test.exe
+
+CMD: objdump -p import table, DLL names referenced by that test binary
+	DLL Name: KERNEL32.dll
+	DLL Name: msvcrt.dll
+	DLL Name: sherpa-onnx-c-api.dll
+
+CMD: are those dll findable in treeA at all?
+(empty = not present in the export tree)
+
+CMD: run the built test binary with -test.list=^ZZZNOSUCHTESTZZZ (executes no test, but must LOAD)
+rc-loadprobe=127
+
+CMD: now colocate the 3 dll next to the test binary and re-run the same load probe
+/tmp/wisp300-v1/onnxruntime.dll
+/tmp/wisp300-v1/sherpa-onnx-c-api.dll
+/tmp/wisp300-v1/sherpa-onnx-cxx-api.dll
+time=2026-10-10T12:46:32.252+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+rc-loadprobe-with-dll=0
+
+CMD: cleanup collocated copies out of treeA only (dll left in /tmp/wisp300-v1, NOT in repo)
+repo third_party dll still 3, untouched: 3

@@ -1,0 +1,13 @@
+### treeA 3 包逐包 PASS（尺＝awk 按 RUN 段归属，只当粗分母用；逐字计数见下）
+internal/panel RUN 行数: 322
+有 panic 吗: 0
+FAIL 包名册: FAIL	github.com/CarlosShao/wisp/internal/panel	6.564s|ok  	github.com/CarlosShao/wisp/internal/audio	16.362s|ok  	github.com/CarlosShao/wisp/internal/ball	0.193s|
+### 293 红名册里属于 cmd/wisp 的枚数（尺＝把它 27 行 FAIL 名逐枚 grep -rl 定位到包）
+TestAC2RealProcessRefusesOnEveryLegWithoutAppData128 => cmd/wisp/dataroot_128_windows_test.go
+TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord => cmd/wisp/early_log_nail_130_windows_test.go
+TestAC246ShippedResidentProcessOwnsItsCancelStep => cmd/wisp/resident_approval_246_windows_test.go
+TestAC228ResidentLegReportsAndBooksItsBall => cmd/wisp/resident_ball_228_windows_test.go
+TestAC1ResidentLegInstallsItsLogListenerOnDisk => cmd/wisp/resident_sink_nail_127_windows_test.go
+TestSecretArgvCarriesNoSecret => cmd/wisp/secret_argv_windows_test.go
+TestCleanCheckoutBuilds_AC11 => cmd/wisp/panel_host_gate_test.go
+TestPanelHostRealWindowHopAndLifecycle => cmd/wisp/panel_host_windows_test.go

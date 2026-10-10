@@ -1,0 +1,27 @@
+PROVENANCE date=2026-10-10 12:48:07 +0800 treeA=/tmp/wisp300-v1/treeA (git archive efd85155; third_party/sherpa-onnx ABSENT)
+NOTE 本发用 -run '^$' ⇒ 不执行任何用例，只让 go test 建好并载入测试二进制（=④ 要的那一发）。⛔ 跑整包 cmd/wisp 测试。
+
+===== SHAPE A: export tree WITHOUT the 3 dll =====
+exit status 0xc0000135
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.033s
+FAIL
+rc-pipeline=1
+
+===== does PATH resolve anywhere on this box? =====
+find in PATH dirs for sherpa-onnx-c-api.dll: NONE (0 PATH dirs contain it)
+System32 copy? ls: cannot access '/c/Windows/System32/sherpa-onnx-c-api.dll': No such file or directory
+module-cache lib dir: onnxruntime.dll
+sherpa-onnx-c-api.dll
+sherpa-onnx-cxx-api.dll
+
+===== SHAPE B: same tree, copy the 3 dll into the path the harness names =====
+3
+time=2026-10-10T12:48:13.565+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+testing: warning: no tests to run
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.070s [no tests to run]
+rc-pipeline=0
+
+===== RESTORE treeA to archive shape (remove the dir I added; it is MY tree, ⛔ repo) =====
+treeA third_party now: ls: cannot access '/tmp/wisp300-v1/treeA/third_party': No such file or directory
+repo untouched, dll count: 3

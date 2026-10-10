@@ -1,0 +1,80 @@
+PROVENANCE date=2026-10-10 12:45:01 +0800 anchor=2a74812f
+
+CMD: ls 293-v1 logs
+total 117
+-rw-r--r-- 1 swq 197609   118 Oct 10 11:48 ac293-counts.txt
+-rw-r--r-- 1 swq 197609     5 Oct 10 11:06 build.txt
+-rw-r--r-- 1 swq 197609   117 Oct 10 11:07 crlf-count.txt
+-rw-r--r-- 1 swq 197609 23091 Oct 10 11:07 d22scan.txt
+-rw-r--r-- 1 swq 197609   246 Oct 10 11:45 extra-checks.txt
+-rw-r--r-- 1 swq 197609   148 Oct 10 11:07 gofmt-crlf-strip.txt
+-rw-r--r-- 1 swq 197609   146 Oct 10 11:07 gofmt-headblob.txt
+-rw-r--r-- 1 swq 197609   105 Oct 10 11:07 gofmt-touch.txt
+-rw-r--r-- 1 swq 197609     5 Oct 10 11:07 gofumpt-mine.txt
+-rw-r--r-- 1 swq 197609   105 Oct 10 11:07 gofumpt-touch.txt
+-rw-r--r-- 1 swq 197609   673 Oct 10 11:19 headrun1-fails.txt
+-rw-r--r-- 1 swq 197609     9 Oct 10 11:19 headrun1-rc.txt
+-rw-r--r-- 1 swq 197609    97 Oct 10 11:49 instrument-pre-sha.txt
+-rw-r--r-- 1 swq 197609   727 Oct 10 11:49 instrument-revert.txt
+-rw-r--r-- 1 swq 197609 14648 Oct 10 11:10 mutantA.txt
+-rw-r--r-- 1 swq 197609 13549 Oct 10 11:11 mutantB.txt
+-rw-r--r-- 1 swq 197609 13776 Oct 10 11:44 mutantC.txt
+-rw-r--r-- 1 swq 197609   185 Oct 10 11:10 pre-mutant-sha.txt
+-rw-r--r-- 1 swq 197609  1821 Oct 10 11:34 prepost-compare.txt
+
+CMD: grep -rn 'sherpa|0xc0000135|0xC0000135|build failed|LOAD|dll' .scratch/wisp/probes/293/v1/ (all files)
+.scratch/wisp/probes/293/v1/00-anchor.md:48:- go 测试一律带 harness：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test …`。
+.scratch/wisp/probes/293/v1/10-mutants.md:6:`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -v -run 'TestAC293'`
+.scratch/wisp/probes/293/v1/10-mutants.md:17:`cmd\wisp\resident_ball_windows.go:554:2: declared and not used: muted` ＋ `FAIL ... [build failed]`、
+.scratch/wisp/probes/293/v1/20-ac4-gates.md:53:票面尺＝`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ ./internal/audio/ ./internal/ball/ -count=1 -v`；
+.scratch/wisp/probes/293/v1/30-cross-ticket-instrument.md:15:`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -v -run 'TestTicket255RosterEvidenceLines'`
+
+CMD: does 293-v1's gates file record per-package result lines (cmd/wisp)?
+27:| `gofmt -l cmd/wisp` | **3 枚**：`models.go`、`panel_inbound_guards_35r3_test.go`、`panel_transport_35r2_test.go` |
+28:| `"$(go env GOPATH)/bin/gofumpt.exe" -l cmd/wisp` | **同一 3 枚**，`rc=0`（两把并排＝同一批，⛔ 一把有牙一把没跑） |
+30:| 裸 `gofumpt -l cmd/wisp` | `command not found`（`logs/extra-checks.txt`；⚠ 那一发的 rc 被管道吞了，本腿⛔ 声称量到 `rc=127`，只报"命令不存在"这一条现量） |
+36:| `cmd/wisp/models.go` | **334** | 未列（剥 CR 后 `gofmt -l` ⇒ 空） | **CRLF 签出形态**（`core.autocrlf=true`，`git status cmd/wisp` 干净），不是格式债 |
+37:| `cmd/wisp/panel_inbound_guards_35r3_test.go` | 0 | **列出来了** | **HEAD blob 真未格式化** |
+38:| `cmd/wisp/panel_transport_35r2_test.go` | 0 | **列出来了** | **HEAD blob 真未格式化**；`gofmt -d` 的实形逐字＝两行 `func (p *jsParser) peek()/next()` 的**对齐空格**（@@ -804,8 +804,8 @@） |
+53:票面尺＝`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ ./internal/audio/ ./internal/ball/ -count=1 -v`；
+55:`go test ./cmd/wisp/ ./internal/panel/ ./internal/audio/ ./internal/ball/ -count=1 -v`（⛔ 两把尺的数不可互比，包集不同）。
+68:已验：`$TEMP/pre293/cmd/wisp/resident_tray_mute_293_windows_test.go` **不存在**（`grep` 回 `rc=2`）⇒ 导出的确实是开工前那一枚锚。
+
+CMD: go.mod sherpa module lines
+8:	github.com/k2-fsa/sherpa-onnx-go v1.13.8
+21:	github.com/k2-fsa/sherpa-onnx-go-linux v1.13.8 // indirect
+22:	github.com/k2-fsa/sherpa-onnx-go-macos v1.13.8 // indirect
+23:	github.com/k2-fsa/sherpa-onnx-go-windows v1.13.8 // indirect
+
+CMD: cgo in the sherpa go binding module (GOMODCACHE)
+module dir: /d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-linux@v1.13.8/
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-linux@v1.13.8/build_linux_amd64.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-linux@v1.13.8/build_linux_arm.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-linux@v1.13.8/build_linux_arm64.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-linux@v1.13.8/build_linux_amd64.go:5:// #cgo LDFLAGS: -L ${SRCDIR}/lib/x86_64-unknown-linux-gnu -lsherpa-onnx-c-api -lonnxruntime -Wl,-rpath,${SRCDIR}/lib/x86_64-unknown-linux-gnu
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-linux@v1.13.8/build_linux_arm.go:5:// #cgo LDFLAGS: -L ${SRCDIR}/lib/arm-unknown-linux-gnueabihf -lsherpa-onnx-c-api -lonnxruntime -Wl,-rpath,${SRCDIR}/lib/arm-unknown-linux-gnueabihf
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-linux@v1.13.8/build_linux_arm64.go:5:// #cgo LDFLAGS: -L ${SRCDIR}/lib/aarch64-unknown-linux-gnu -lsherpa-onnx-c-api -lonnxruntime -Wl,-rpath,${SRCDIR}/lib/aarch64-unknown-linux-gnu
+module dir: /d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-macos@v1.13.8/
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-macos@v1.13.8/build_darwin_amd64.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-macos@v1.13.8/build_darwin_arm64.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-macos@v1.13.8/sherpa_onnx.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-macos@v1.13.8/build_darwin_amd64.go:5:// #cgo LDFLAGS: -L ${SRCDIR}/lib/x86_64-apple-darwin -lsherpa-onnx-c-api -lonnxruntime -Wl,-rpath,${SRCDIR}/lib/x86_64-apple-darwin
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-macos@v1.13.8/build_darwin_arm64.go:5:// #cgo LDFLAGS: -L ${SRCDIR}/lib/aarch64-apple-darwin -lsherpa-onnx-c-api -lonnxruntime -Wl,-rpath,${SRCDIR}/lib/aarch64-apple-darwin
+module dir: /d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-windows@v1.13.8/
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-windows@v1.13.8/build_windows_386.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-windows@v1.13.8/build_windows_amd64.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-windows@v1.13.8/build_windows_arm64.go
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-windows@v1.13.8/build_windows_386.go:5:// #cgo LDFLAGS: -L ${SRCDIR}/lib/i686-pc-windows-gnu -lsherpa-onnx-c-api -lonnxruntime
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-windows@v1.13.8/build_windows_amd64.go:5:// #cgo LDFLAGS: -L ${SRCDIR}/lib/x86_64-pc-windows-gnu -lsherpa-onnx-c-api -lonnxruntime
+/d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-windows@v1.13.8/build_windows_arm64.go:5:// #cgo LDFLAGS: -L ${SRCDIR}/lib/aarch64-pc-windows-gnu -lsherpa-onnx-c-api -lonnxruntime
+module dir: /d/work/base/gopath/pkg/mod/github.com/k2-fsa/sherpa-onnx-go@v1.13.8/
+
+CMD: build treeA export from HEAD WITHOUT dll
+tar-rc=0
+treeA third_party/sherpa-onnx listing: ls: cannot access '/tmp/wisp300-v1/treeA/third_party/sherpa-onnx/': No such file or directory
+treeA internal/audio wasapi has 26? 1
+
+CMD: run internal/audio package suite in treeA (NO dll present) with the ticket PATH harness
+ok  	github.com/CarlosShao/wisp/internal/audio	15.973s
+ok  	github.com/CarlosShao/wisp/internal/ball	0.214s
+rc-pipeline=0
