@@ -239,3 +239,46 @@
 ⛔ 现在就派 `300-r2`：它要 `go test`（`internal/audio`）并新增一枚 `_test.go`，而 **`303-r1` 正在 `cmd/wisp` 写产码＋跑真窗**（既有定式＝一枚 `cmd/wisp` 写腿在飞时整个导入图⛔ 动源码；先例 `A710`/票 111 那节）。next＝`303-r1` 交完并由我复跑过 → **`300-r2`（`AC#6` 按上面四条硬要求落地）** → `300-v4`（非实现者裁 `AC#6`/`AC#4`，⛔ 落地腿自勾）→ `AC#5` 的 CI 色与票 303／票 111 那批**同一枚推送**一起取。
 
 - [2026-10-10 17:5x +0800] agent=编排者 did=收 `300-a2`（六笔 `ae5ee86d`→`fbeefd1d`，越界我自己取并集重算＝0）⇒ **裁 `AC#6` 落点＝C2**（新枚 `windows`-tagged 用例，期望侧⛔ 经该常量、按 `mmreg.h:2110` 那行的 `0x0003` 形写权威字面、红句具名点名常量〔我派单漏抄那半句，腿顶回对〕、顺带钉 `waveFormatExt`/`waveFormatPCM` 但⛔ 删它、成对两发）；**⛔ C1**（与 `AC#1`/`AC#2` 凭据共用同一枚文件且钉⛔ 值）／**⛔ C3 落盘**（未登记 SKIP＝红 ⇒ 必改 `scripts/**`＝撞 `AC#4` 名册；改为"权威证据进探针件、⛔ 进 CI"，收件时我自己再跑那把 grep）／**⛔ C4 当裁判**（★我裁"⛔ 拿仓内另一枚实现当裁判"**对"值"同样成立**，两枚实现可以一起错；它的覆盖缺口降成残余 R1）／**⛔ C5**（改产码语义面）；★补一枚⛔ 在腿射程里的读数（本机 `mmreg.h` 三行逐字 `0x0003`／`0xFFFE`／`1`）＋一处术语更正（`KSDATAFORMAT_SUBTYPE_IEEE_FLOAT` 那枚 GUID 在 `ksmedia.h`、⛔ `mmreg.h`）；两把词面尺降级（"零覆盖"⛔ 覆盖尺；logs 枚数它报 12 我数 **11**）；排程＝`300-r2` **按住等 `303-r1`**（`cmd/wisp` 写腿在飞时整个导入图⛔ 动源码）→ `300-v4` → `AC#5` 的 CI 色与票 303／111 同批推送取。
+
+
+## 300-r2 交回（落地腿，2026-10-10 18:5x；⛔ 翻框、⛔ 改上面任何原句；本节只追加）
+
+**本格＝`AC#6`，落点＝编排者收 `300-a2` 裁语 ③ 定的 C2 形。`AC#6` 的判语归非实现者 `300-v4`，本腿⛔ 自勾任何一枚 `- [ ]`。**
+
+起手锚 `05db4bc6`（porcelain `-- internal cmd docs .scratch/wisp/issues`＝**0 行**）；本腿四笔＝`a0339995`→`9a442923`→`cdced117`→（本节那一笔）→（终名册那一笔）。
+件＝`.scratch/wisp/probes/300/r2/`（`00-anchor`／`10-shape`／`20-mutations`／`30-gates`／`40-final` ＋ `logs/` **14** 枚，尺＝`find .scratch/wisp/probes/300/r2/logs -type f | wc -l`，⛔ 0 字节＝本腿自己现量）。⛔ push。
+
+- ★**交付形状**：新增一枚 `internal/audio/wave_format_float_300_windows_test.go`（`//go:build windows`）。
+  **期望侧三枚字面量按 `mmreg.h` 那一行逐字写：`0x0003`／`0xFFFE`／`1`**（⛔ 化简成 `3`），期望侧⛔ 出现 `waveFormatFloat`／`waveFormatExt`／`waveFormatPCM` 任何一枚；
+  观察侧＝那三枚常量本身 ＋ `parseWaveFormat` 解析出来的 `tag`。⇒ `:152-153` 那枚"两侧同枚常量"的恒等式**没有**被复制。
+- ★**成对两发突变都红、且红句点名常量**（⛔ 指向 `tag` 的等值比较那一形只出现在钉 `waveFormatExt` 的两枚子测试里）：
+  `waveFormatFloat` 3→1 ⇒ `rc=1`、三句 `Errorf`（`waveFormatFloat = 0x0001, want 0x0003; mmreg.h:2110 …`／`waveFormatPCM and waveFormatFloat both = 0x0001 …`／`… mmreg.h reserves 0x0001 for WAVE_FORMAT_PCM …`）；
+  3→0 ⇒ `rc=1`、两句（`waveFormatFloat = 0x0000, want 0x0003 …`／`… which is none of WAVE_FORMAT_PCM 1, WAVE_FORMAT_IEEE_FLOAT 0x0003 or WAVE_FORMAT_EXTENSIBLE 0xFFFE …`）；
+  两发各自 `cp` 备份→跑→写回→`cmp` ⇒ **IDENTICAL**，声明行回到 `98:	waveFormatFloat = 3`，复跑 ⇒ `rc=0`。逐字读数＝`20-mutations.md` ＋ `logs/mut-m0..m3`。
+  ⚠ 台面＝**仓外导出树**（`git archive HEAD`，⛔ clone、⛔ 在共享工作树里做任何 checkout／改产码），四处两两 `cmp` 证与工作树逐字节同；⛔ 拿"一发母仓、一发 clone"作差。
+- ★**八把门禁**：① `go vet ./internal/audio/` `rc=0`（输出 0 字节，两件事⛔ 混写）② 定向用例 pristine `rc=0`（顶层 `--- PASS` 1／子测试 6／`=== RUN` 7）
+  ③ 整包两发同一枚台面（改前＝本文件还⛔ 在树里那发）⇒ 顶层红名册尺 `grep -E '^--- (FAIL|SKIP): '` 两发**逐字同形**，`comm -13`／`-23`／`-3` **三把全空 ⇒ 新增红 0**；三数带尺名：顶层 `--- PASS` 41→42、含子测试 6→12、`=== RUN` 48→55
+  ④ 格式三把并排（工作树／HEAD blob／锚 `05db4bc6` blob，射程目录都写 `internal/audio`）名册各 **0 枚**；全仓残留 **5 枚**（`cmd/wisp/models.go` 等）⛔ 一枚在本腿射程、⛔ 顺手修、只具名
+  ⑤ `sh scripts/d22scan.sh` `rc=0`，输出自证 ban #8 实扫 `internal/` **526** 枚 Go 文件且"comments and `_test.go` included" ⇒ 本用例在仪器射程内、⛔ 命中（红句里⛔ U+26D4／U+2713／U+2264／U+1F000–1FAFF／U+2200–22FF／U+2600–27BF／U+2B00–2BFF／`U+FE0F`／U+1F1E6–1F1FF；整枚新文件纯 ASCII，尺＝`grep -cP '[^\x00-\x7F]'` ⇒ 0）
+  ⑥ `bash scripts/portable-tests.sh --scope=census` totals 行**逐字未变**＝`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`；⚠ 同族一枚读数＝`internal/audio` 那行从 `8/0` 变 **`9/0`**（本腿那枚文件确实编进本平台测试二进制，分母⛔ 动）
+  ⑦ 名册差集＝**逐笔** `git show --name-only --format=`，三笔全部落在"允许动的写面"名册内 ⇒ 越界 **∅**（明细见 `40-final.md`）
+  ⑧ `internal/audio` 顶层用例枚数（尺＝逐文件 blob `grep -c '^func Test'`）：**42 → 43**；⚠ 口径具名＝**新增一枚顶层用例** `TestWaveFormatConstantsMatchMmregAuthority300` ＋ 它内部 6 枚子测试，⛔ 是"只加子测试"。裁语 ④ 要具名的那枚就是它（`0a0f62ef` 之后 audio 在 `windows)` 档，`test-windows` 红名册作差面多的那一枚⛔ 同这个名字）。
+- ⚠**`--- SKIP` 一枚的归因写死**：改前那发盘上**已有** `--- SKIP: TestLiveWasapiSmoke`（`scripts/portable-tests.sh` 夹具台账里已登记的 fixture 例外），两发名册逐字同形 ⇒ 既有、已登记、**⛔ 本腿造的、也⛔ 本腿让它消失的**。本腿⛔ 用 `t.Skip`、⛔ 把 `t.Fatalf` 换成 `t.Skip`。
+- ⚠**一枚我造过又拆掉的假仪器（具名留痕，⛔ 抹）**：`waveFormatPCM/Float/Ext` 当 **map 字面量的键**时，3→1 那一发⛔ 是红而**是 `duplicate key 1 in map literal` 编译错误**（`rc=1` 而零句 `--- FAIL`）⇒ 我用一枚仓外最小件证了这条语言行为，交付里换成运行期切片＋两两比较。**突变攻击要的读数是一句具名红，⛔ 是一个非零 rc。**
+- ⚠**观察侧到不了生产那一行（具名，⛔ 造假日为面）**：`waveFormatFloat` 唯一消费者在 `(*wasapiStream).Drain()` 体内（要活流＝真设备，票 300 票面第 31 行⛔ 归腿），`convertPacket` 收的是 `floating bool` **参数** ⇒ 残余＝裁语里的 **R2**（走 C5 才买得到＝改产码语义面，本票⛔ 授权）。injector 那两支的覆盖面＝**R1** 未动（本件⛔ 调 `parseWav`，⛔ 拿 C4 当本格裁判）。
+- ⚠**⛔ 删 `waveFormatPCM`**：`F2` 那句"声明后零使用"是词面尺；本件按裁语 ③ 只钉它的值（它此前**零尺**），删它归另一格。
+
+**★报回三处派单转述与票面原文的差别（一律按票面原文办）**
+
+1. **裁语 C3 指定落地腿交一件 `probes/300/r2/logs/authority-mmreg.txt`**（票面原文："**落地腿交一件**…那把 `grep -n -E 'define +WAVE_FORMAT_(IEEE_FLOAT|PCM|EXTENSIBLE)' <头文件>` 自己落一行 `rc=N`"），而派单只转述了"本用例⛔ 读盘"。
+   ⇒ 两者⛔ 矛盾（一件是**出处的证据**，一枚是**测试的运行时依赖**），但派单**没把这件列进我要交的清单**——我按票面原文补交了，`rc=0`，三行读数与编排者存档 `orch/2026-10-10-mmreg-authority.txt` 逐字同。⚠ 我⛔ 授权读仓外文件去⛔ 是这条给的：票面裁语 C3 那句"补位只读腿⛔ 授权射程＝由我代跑并具名"读起来像**编排者代跑**，与本格"落地腿交一件"两句**互相张力**——我按后一句（指名落地腿的那句）办了，这一处分歧交 `300-v4` 裁。
+2. **派单硬要求第 4 条（顺带钉 `waveFormatExt`／`waveFormatPCM`）**⛔ 在 `AC#6` 原文（票面第 186 行那句"给 `waveFormatFloat` 那枚常量装一枚钉"）里，它出自**裁语 ③**。⇒ 我按裁语办了，并注明来源，⛔ 把它算进 `AC#6` 原文的要求。
+3. **派单说"⛔ 与既有件同名，名册＝`300-a2` 的 `F5` 那 8 枚"**——票面裁语 ③ 原文是"真名由腿定且⛔ 与既有 8 枚同名"，一致；本腿名册尺已现跑（`10-shape.md` 第一节），8 枚既有名⛔ 撞。
+4. ⚠**记我一枚过期读数**：`9a442923` 那笔的 commit 消息写着"子测试 PASS **5**"，实测是 **6** 枚（尺＝`grep -c '^    --- PASS: '`）。已推送的历史⛔ 改（⛔ `--amend`），以本节与 `30-gates.md` 门②为准。
+
+**本腿没做到／票面没覆盖的（具名，⛔ 自己填）**
+
+- `AC#4`／`AC#5` 两格⛔ 闭合：本腿⛔ 跑 `GOFLAGS= go build ./...`（⛔ 在我这八把清单里，⛔ 替 `AC#4` 交它），CI 那一发色仍欠（编排者 17:3x：与票 303／111 同批推送一起取）。⇒ **要不要现在补 `go build ./...` 那一发，我⛔ 自己假设，问一句。**
+- 本腿⛔ 跑覆盖尺（`-coverprofile`）⇒ R1 那格"injector 两支到底有⛔ 有覆盖"仍只有词面尺。
+- 本腿⛔ 动任何产码 ⇒ `waveFormatFloat` 在生产里"真的这么判"那一枚可观察性⛔ 买到（R2）。
+- 本工作树**盘上有 834 行既有 dirt**（`design/**` 一批 ` D`、`.gitignore` ` M`、`.scratch/` 一堆未跟踪件，尺＝`git status --porcelain | wc -l`；⛔ 本腿造的，本腿只碰自己的 pathspec）——⚠ `internal`／`cmd` 两枚目录下 dirt＝**0 行**，⇒ 本腿的门③"同一枚台面"成立；但**这一枚事实我⛔ 能从派单里预知**，具名报回给编排者排程用。
