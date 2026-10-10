@@ -15351,3 +15351,16 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 
 `lint`／`test-core`／`test-windows`＝红，`lint-frontend`／`slo-smoke`／`slo-full`＝绿，**基线与改后逐枚同色**（尺＝`gh run view --json jobs`）。`continue-on-error` 全仓 0 枚真用（`grep -n` 9 处命中枚枚在注释）⇒ "步红＝job 红＝run 红"在本仓是硬的，⛔ 谁以为有一枚灯是假灯。
 最新一笔 `a0e55a51`（含 `AC#5` 注释笔 `b761b584`）＝run `38035842314`，16:0x 现量 `test-windows` **in_progress** ⇒ **`AC#5` 落地后的 CI 色本发⛔ 有读数**（纯注释面预期不变色，⚠ 预期⛔ 等于读数，等终态回填）。
+
+## A818｜2026-10-10 16:1x｜★**更正我自己一条传了两周的派单规矩**（"腿的写面⛔ `.sh`／`.ps1`／`.txt`，那会挪 gofumpt／d22scan 分母"——**实测⛔ 成立**）＋这枚更正的射程与残留
+
+**触发**：我给 `302-a1`／`298-r1`／`301-v3` 写派单时照例禁止"新建 `.sh`／`.ps1`／`.txt`"，出处＝记忆库 `feedback-subagent-fleet.md` 那条 10-08 的记法。本发我自己为量 CPU／内存建了一枚 `.ps1` 并让它随目录进了仓（`probes/301/orch/msgs/measure.ps1`，随 `48e7b0a4`），于是顺手把那两把尺打了一遍——**两把都对那句话不利**。
+
+1. **d22scan 的射程⛔ 含 `.scratch/**`**（尺＝`sh scripts/d22scan.sh` 现跑，rc=**0**，原始输出＝`probes/301/orch/logs/d22scan-after-ps1.txt`，内层件枚数逐字引：`bans #1-5 internal/=229, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=525, ban #8 cmd/=119`）。四枚 scope 名枚枚是 `design/`／`frontend/`／`internal/`／`cmd/` ⇒ **`.md`／`.txt`／`.ps1` 落在 `.scratch` 里对这把门是零影响**；那把尺对**本波新装进该目录的 28 枚路径**（`.md`／`.txt`／`.log`／`.ps1` 混合）的命中枚数＝**0**（尺＝`grep -c -e 'measure.ps1' -e 'ci-color-backfill' -e 'probes/301/orch'` 于该输出）。
+2. **CI 那枚"tracked set 是分母"的步只数 tracked 的 `.go`**（尺＝`git show HEAD:.github/workflows/ci.yml | sed -n '189,212p'`）：那一步的注释逐字写着 "handed **ZERO tracked .go files** the script exits 2"，而它上面 `:176` 那条命令是 `OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"`——`gofumpt` 本身只吃 `.go`。⇒ **非 `.go` 的探针件⛔ 进那枚分母**。
+3. ★**所以那句话错在哪一层要说清**（⛔ 把一条纪律整枚作废）：它当初的**真风险**是"**别往 `.scratch` 里交 `.go`**"——那一支今天**仍然成立**（`.go` 会被 `gofmt -l cmd/wisp` 那类工作树尺与票 298 正在处理的"tracked `.go` 分母"看见，而且探针目录里的 `.go` 会变成真正的编译面成员）。被我把"`.go`"扩写成了"`.sh/.ps1/.txt`"＝**射程写宽**（同族第四次：枚数单位、行号锚、包级↔文件级、这次是**文件类型**）。
+
+**残留（具名，⛔ 我给自己盖章"已闭"）**：
+- ⚠ **仓外 blob 那一把我没重跑**（只跑了工作树那把 d22scan＋读了 `ci.yml` 的对象层文本）。判"这条更正全面成立"要一枚非实现者把那两把尺各打一遍——归**票 298 的 `AC#2`／今后任何引"分母"的派单**。
+- ⚠ **枚数照给（第一把我自己写的是"24 枚"，现量对不上，改正）**：本波我给 `probes/301/orch/**` 装了 **28 枚**路径（尺＝`git show --name-only --format= 6414a4bb | grep -c 'probes/301/orch'`＝28；另有 **10** 枚路径随第二笔 `48e7b0a4` 进出，含新增与改写），其中 **1 枚 `.ps1`** ＋ **3 枚 915 KB 级 `.log`**；该目录现量＝**3,757 KB**（尺＝`du -sk`）。这些**⛔ 动任何门点**（§1 那两把尺），但"MB 级日志进不进仓"这一条我的旧定式是"**⛔ 入库也⛔ 删**"（死腿遗产那族，`feedback-dispatch-output-budget`）。这次我**自己破了那条**（把三枚托管 runner 的 job 日志提交了）。差别要诚实写出来：那三枚是**本票的凭据本体**（票 301 `AC#2` 的 CI 色，⛔ 可重取——GitHub 那端 90 天后会滚掉），⛔ 是别人的死腿原料；可判死的尺＝CI 的门点⛔ 变红（已证 d22scan rc=0）＋`git show --name-only` 名册⛔ 越界（已证）。⚠ 代价照记：**仓体积＋约 3.7 MB／这一波**，且下一个人 clone 会拿到托管 runner 的完整 stdout（里面**有**临时目录路径、**无**任何凭据——尺＝`grep -E -c -e '-----BEGIN' -e 'ghp_' -e 'github_pat_' -e 'xox[abp]' -e 'sk-[A-Za-z0-9]{20}'` 逐枚打在**本波新装的三枚** job 日志上＝`0`／`0`／`0`（16:1x 现跑，读数留在 `logs/secret-scan-new-logs.txt`；`github_pat_` 那枚 pattern 是新加的，之前那把尺⛔ 含它）。
+- **定式（今后派单照这句写，⛔ 再写宽）**：*腿的写面⛔ 新建 **`.go`**（那才动分母）；`.md`／`.txt`／日志件⛔ 在分母里；`.sh`／`.ps1` 只⛔ 建在会被 `bash -n`／`PSScriptAnalyzer` 之类**点名扫**的位置——本仓今天没有那种步（尺＝`grep -n 'portable-tests\|\.ps1' .github/workflows/ci.yml` 的命中枚枚是调用既有脚本、⛔ 扫格式）。*
