@@ -43,6 +43,10 @@
    - `git show HEAD:<file>` 首行 `//go:build`
    - `git show HEAD:.github/workflows/ci.yml` 里对应那一步的名册
 
-## 自报：本腿跑过的 go 命令
+## 自报：本腿跑过的 go 命令（终态）
 
-（随进度追加；截至本件首次 commit，尚未跑任何 go 命令。）
+- **跑过、且只跑过这一条**：`go env GOMODCACHE GOFLAGS GOVERSION` ⇒ `D:\work\base\gopath\pkg\mod`／（`GOFLAGS` 空行）／`go1.27.1`。用途＝定位依赖模块目录（件 `20` 的尺①）。
+- ⛔ **没跑 `go list`**（原计划用得上，最终靠 `git show HEAD:go.mod`＋`git grep -n 'jchv' HEAD` 就够，不必再派生一层读数）。
+- ⛔ **没跑任何编译面**：`go build`／`go vet`／`go test` 全 0 发（同包写腿 `293-r1` 独占，本腿未碰）。⇒ 件 `40` Q3 里那句"AC#13 在今天的 CI 上会 skip"是**预测**，已具名标注，⛔ 不是读数。
+- 其余全部读数来自 `git show HEAD:<path>`／`git grep -n … HEAD`／`git ls-tree`／`git check-ignore`／`wc -c`，以及对**工作树构建产物** `frontend/dist/**` 的 grep（该件不在 HEAD 对象层，理由与后果见件 `10` §0）。
+- 依赖模块目录内的 grep＝对 `GOMODCACHE` 里 `github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808` 的只读 grep，⛔ 未在该目录内新建／修改任何文件；大输出（49 行 API 名册／248 行 webview2 命中／37 行 CSP 命中）先落 `$TEMP/wisp-299-a1/`（仓外），⛔ 未落仓内、⛔ 未生成 `.out`。
