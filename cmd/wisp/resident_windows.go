@@ -330,10 +330,42 @@ func runResident() {
 	// (the gate's own flag is the truth source, internal/audio/gate.go:20-21), no
 	// new goroutine (the gestures fire on the ui-sta thread and the device open is
 	// synchronous inside internal/audio, on the roster name ticket 247 already
-	// booked), and no mirror of the gate into the tray's own checkmark - the
-	// ball-side trayMuted display flag stays undriven here rather than becoming a
-	// second authority nobody reconciles.
+	// booked), and - as of ticket 293 - a one-way MIRROR of the gate into the
+	// tray's own checkmark. The relation is master and projection, not two
+	// authorities: gate.Muted() (internal/audio/gate.go) is the only truth about
+	// mute, the ball-side trayMuted flag is display state written FROM it and read
+	// back by nothing, and the hop below is the only production writer of
+	// Ball.SetTrayChecks. Undriven stopped being the honest choice the moment
+	// ticket 290 made the tray item turn the real gate: an unchecked "静音" sitting
+	// next to a microphone the user just opened is a privacy lie, so the checkmark
+	// now follows the gate instead of staying a stranger to it.
 	rb.attachMuteGate(raudio.toggleMute)
+
+	// Ticket 293 AC#2 (form 甲, orchestrator ruling 2026-10-09 20:2x): injected
+	// from THIS side, so internal/ball keeps zero changes, zero new package-level
+	// dependency edges and zero new goroutines.
+	//
+	// Why this one shape covers all three ways the shown state can change:
+	//   - the tray's mute item and the orb's global mute hot key both land in
+	//     residentBall.muteGesture, and that function re-projects after every flip
+	//     the gate accepted;
+	//   - the factory posture (audio.mic_muted_default, shipped true) never passes
+	//     through a gesture, so the line below projects it once, immediately after
+	//     the leg that owns the gate exists.
+	// The menu is rebuilt from b.trayMuted on every right-click
+	// (internal/ball/ball_windows.go's showMenu hop), so pushing the projection on
+	// each change is exactly what makes the next right-click show the state as of
+	// that moment - and a projection nobody pushed would stay at the zero value
+	// forever, which is the bug this ticket is.
+	//
+	// The nil guard comes first because it has to precede the method value: taking
+	// rb.b.SetTrayChecks on a host whose window never came up would panic at the
+	// expression itself (startResidentBall returns with rb.b == nil on that
+	// branch), and every other ball-facing hop in this process keeps the guard.
+	if rb.b != nil {
+		rb.attachTrayMuteProjection(raudio.trayMuteState, rb.b.SetTrayChecks)
+		rb.mirrorTrayMute()
+	}
 
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).

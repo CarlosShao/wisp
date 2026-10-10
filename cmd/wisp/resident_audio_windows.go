@@ -192,6 +192,24 @@ func (ra *residentAudio) toggleMute() (string, bool) {
 	}
 }
 
+// trayMuteState is ticket 293 AC#2's READ half of the tray checkmark projection:
+// it answers with the gate's own mute flag - the single truth source this leg was
+// told not to copy (internal/audio/gate.go, HalfDuplexGate.Muted) - and with
+// whether this process owns a gate at all. It stores nothing, derives nothing
+// and turns nothing: it is the same read toggleMute performs three lines above,
+// exposed for a display that has to show the state rather than claim one.
+//
+// muted=false with ownsGate=true is the honest "not muted" answer; muted=false
+// with ownsGate=false means "this process has no microphone gate to report on"
+// (voice disabled, a leg that never assembled, or a nil handle), and the caller
+// writes nothing for it rather than inventing a checkmark.
+func (ra *residentAudio) trayMuteState() (bool, bool) {
+	if ra == nil || ra.gate == nil {
+		return false, false
+	}
+	return ra.gate.Muted(), true
+}
+
 // startResidentAudio assembles the capture leg at boot, reading [voice] and
 // [audio] off this process's own data root. It never stops the boot: every
 // branch that cannot open a microphone returns a handle with its verdict

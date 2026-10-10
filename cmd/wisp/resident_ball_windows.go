@@ -177,6 +177,17 @@ type residentBall struct {
 	// residentAudio handle before any gesture may read it.
 	muteMux  sync.Mutex
 	muteGate muteGestureFunc
+	// trayMuteRead and trayCheckPush are ticket 293 AC#2's projection pair for the
+	// tray's "静音" checkmark: read the gate's own mute flag, hand it to the ball's
+	// tray display setter. They sit under the muteMux above for the same reason
+	// muteGate does - the assembly root writes them on the boot goroutine while a
+	// gesture may read them on the ui-sta thread - and they hold NO state of their
+	// own: the single truth source stays internal/audio's gate flag
+	// (HalfDuplexGate.Muted), and trayCheckPush is literally
+	// (*ball.Ball).SetTrayChecks, so the ball-side trayMuted bool is a projection
+	// of the gate rather than a second authority nobody reconciles.
+	trayMuteRead  func() (muted, ownsGate bool)
+	trayCheckPush func(muted, pausedWake bool)
 }
 
 // ballHotkeyBridge258 carries the reloader handle the host installed. The type
@@ -489,6 +500,72 @@ func (rb *residentBall) currentMuteGate() muteGestureFunc {
 	return rb.muteGate
 }
 
+// attachTrayMuteProjection hands this host the two halves of ticket 293 AC#2's
+// tray checkmark projection (form 甲, orchestrator ruling 2026-10-09 20:2x):
+// `read` is the capture leg's own answer about the gate it owns, `push` is the
+// ball window's display setter. The assembly root calls it once, immediately
+// after attachMuteGate, and it is the only writer.
+//
+// Both halves are optional on purpose: with no ball window the host never
+// attaches anything (the guard is at the call site, where taking the method
+// value rb.b.SetTrayChecks would itself panic on a nil window), and with no
+// capture leg there is no gate to read. Either gap leaves mirrorTrayMute saying
+// "nothing was projected" instead of writing a checkmark out of a hope.
+func (rb *residentBall) attachTrayMuteProjection(read func() (bool, bool), push func(bool, bool)) {
+	if rb == nil {
+		return
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	rb.trayMuteRead = read
+	rb.trayCheckPush = push
+}
+
+// mirrorTrayMute projects this process's gate onto the tray's "静音" checkmark:
+// it reads gate.Muted() back off the capture leg - never off a flag this host
+// keeps, never off what the gesture hoped for - and hands that single bool to
+// the ball's tray display surface. It returns true only when a projection really
+// was written.
+//
+// Threading: callers are the boot goroutine and muteGesture, which runs ON the
+// ui-sta thread. Ball.SetTrayChecks only queues onto that thread's own task
+// (internal/ball/sta_windows.go's PostTask is documented safe from any goroutine
+// and does not wait), so this neither blocks the message pump nor needs a thread
+// of its own: no new goroutine (D38b's resident roster stays at its booked six).
+//
+// The push's SECOND argument is a literal false, and that asymmetry is the point
+// rather than an oversight (ticket 293's ruling, 禁区②):
+//   - the mute half has a truth source to read (the gate), so leaving it undriven
+//     would show "not muted" next to a microphone the user just opened - a lie
+//     about privacy, which is what this whole hop exists to stop;
+//   - the pause-wake half has NOTHING to read yet: the wake-word listener it
+//     would pause lives in internal/speech, which is still only a doc.go, the
+//     shipped [voice].wake_word.enabled default is false, and the tray's
+//     pause-wake item is still an unhosted gesture booked by name
+//     (recordBallGesture, Events.OnTrayPauseWake above). Unchecked is therefore
+//     the true reading today, not a suppressed one; inventing a flag to make the
+//     two arguments look symmetric would create exactly the second authority
+//     this ticket forbids.
+func (rb *residentBall) mirrorTrayMute() bool {
+	if rb == nil {
+		return false
+	}
+	rb.muteMux.Lock()
+	read, push := rb.trayMuteRead, rb.trayCheckPush
+	rb.muteMux.Unlock()
+	if read == nil || push == nil {
+		return false
+	}
+	muted, ownsGate := read()
+	if !ownsGate {
+		// This process owns no gate (voice off, or a leg that never assembled),
+		// so there is no mute state to show and nothing is written.
+		return false
+	}
+	push(muted, false)
+	return true
+}
+
 // muteGesture is the one shape both mute gestures take: the global mute hot key
 // (internal/ball's hkMute branch) and the tray's mute menu item both end up here,
 // and both get the same sentence the gate answered with.
@@ -497,6 +574,12 @@ func (rb *residentBall) currentMuteGate() muteGestureFunc {
 // result back, so the printed state is the gate's, never a hope and never a
 // mirrored flag (internal/audio/gate.go:20-21 makes the gate's muted the truth
 // source; ticket 246's ruling is the precedent for not keeping a second copy).
+//
+// Since ticket 293 the gate's flag is also PROJECTED outward after a successful
+// flip (mirrorTrayMute, at the bottom of this function) so the tray's "静音"
+// checkmark says what the gate now is. That projection is one-way and never read
+// back here: this sentence, like the outcome it prints, is still taken off the
+// gate alone.
 //
 // Threading, because it is not free: callbacks run ON the ui-sta thread and
 // Ball.fire's contract is "quick and non-blocking". Turning the gate on is
@@ -532,6 +615,11 @@ func (rb *residentBall) muteGesture(name string) string {
 		fmt.Printf("wisp: ball %s: %s\n", name, outcome)
 		return outcome
 	}
+	// Ticket 293 AC#2: the gate changed hands on the line above, so the tray's
+	// "静音" checkmark is re-projected from the gate itself before this returns -
+	// both start points a user has (the tray item and the global hot key) come
+	// through this one exit, which is why the mirror lives here and nowhere else.
+	rb.mirrorTrayMute()
 	slog.Info("mute gesture turned this process's capture gate", "gesture", name, "outcome", outcome)
 	fmt.Printf("wisp: ball %s: %s\n", name, outcome)
 	return outcome
