@@ -5,7 +5,7 @@
 | | 起手 | 交回 |
 |---|---|---|
 | `date`（原生 stdout，⛔ `TZ=`） | `Sat Oct 10 13:45:29 CST 2026` | `2026-10-10 14:1x +0800`（本件写完现取，见下） |
-| HEAD（短／全） | `41329475`／`413294755ea09ea8f18c94b8bb1276b5e702583a` ✅＝派单给的号 | `6b0e…`（我这一笔，见 §⑤）；**期间 HEAD 漂过** ⇒ `849ce6e9`（`301-a2`，13:52:33） |
+| HEAD（短／全） | `41329475`／`413294755ea09ea8f18c94b8bb1276b5e702583a` ✅＝派单给的号 | `21c9abe3`（＝我第二笔 commit，写下这行时现取）；**期间 HEAD 漂过 ⇒ `849ce6e9`（`301-a2`，13:52:33）**，而**我这把的交回号⛔ 就是这一枚** ⇒ 见 §⑤ 末行 |
 | `git status --porcelain` | **814** 行（`783 ??`／`16 M`／`16 D`） | 同量级（他腿在飞，⛔ 我射程） |
 | `git status --porcelain -- internal cmd` | **0 行** | **0 行**（我这把全程⛔ 动产码） |
 
@@ -52,8 +52,12 @@
 ```
 $ git log --oneline -2        # 交回时现取，两枚都是我的
 69b3bbb8  probe(300-v2): AC#2 five-offset scan …          → 名册 2 枚：00-anchor.md ＋ 10-ac2-offset-scan.md
-<HEAD>    probe(300-v2): verdict …                        → 名册 4 枚：20-comment-falsifiability.md ＋ 30-baseline-entry.md ＋ 40-discipline.md ＋ 50-verdict.md
+21c9abe3  probe(300-v2): AC#2 verdict=holds …             → 名册 4 枚：20-comment-falsifiability.md ＋ 30-baseline-entry.md ＋ 40-discipline.md ＋ 50-verdict.md
 ```
+
+- ★**我这一列自己踩了一次"占位符／凭记忆写号"，具名留痕⛔ 抹**：上表原本把交回号写成 `6b0e…`（一枚**我脑补的**短号，⛔ 现取）、§⑤ 那行写成 `<HEAD>`（**未填的模板占位符**——正是我在 `50` 件里判 `30-gates.md:116` 那枚 `<!--ROSTER-->` 同一形的缺陷）。
+  ⇒ 更正＝**同一枚件的追加一笔**（⛔ `--amend`）；**那一笔的号⛔ 写进本件**（写下这行的时刻＝它还不存在的时刻，写进去就又是一枚凭印象的号）⇒ **取法＝交回正文里现跑 `git log --oneline -3`**，三枚应全是 `probes/300/v2/**`。
+  ⇒ 并回＝**"blob 层⛔ 等于静止的面"这一条我自己也中过一次**；凡交回里写号，**落笔前先 `git rev-parse --short HEAD` 一发**，⛔ 一枚凭印象的号进件。
 
 - 每笔都带**显式 pathspec**；⛔ `git add -A`／`.`、⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`、⛔ `--no-verify`、**⛔ push**（机主从未授权）。
 - ⛔ 翻过一枚 `- [ ]`（票 300 现 **4 枚未勾／2 枚已勾**，交回由编排者翻）；⛔ 改过 `internal/**`／`cmd/**` 一个字节（`git status --porcelain -- internal cmd` 交回仍 **0 行**）。
