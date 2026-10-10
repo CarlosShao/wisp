@@ -157,3 +157,18 @@ rc-line: rc=0
 .scratch/wisp/probes/300/a2/snap/ticket-300.md
 .scratch/wisp/probes/300/a2/snap/v3-20-teeth.md
 rc=0
+
+## 追加四：再更正追加三那把尺（⛔ 抹原句，只追加）——越界枚数的真值＝0
+
+追加三印出的「总枚数 24／越界 4」⛔ 是文件名册：我把 \ 那 4 行**标签**一起喂进了同一个管道再作差 ⇒ 4 枚越界＝我自己的 4 行标签，⛔ 产码、⛔ 别人件。同族先例＝票面 ★ⓑ/★ⓒ 那节里编排者自己踩的第二形（计数尺的射程⛔ 钉在被数的那一节内）。
+
+正确尺＝逐笔只取 git show 的 --name-only 输出、⛔ 往管道里掺任何 echo（下面 stdout 逐字）：
+文件枚数（去重）:
+20
+越界枚数（授权名册 probes/300/a2/** 之外）:
+0
+终态锚（现跑）:
+3c79e2a9 2026-10-10T17:52:01+08:00 probes/300/a2: correct the diff-set ruler in 90 (range had swept other legs commits; per-commit roster gives 0 cross-boundary)
+台面脏数（cmd internal scripts .github docs）:
+1
+rc=0
