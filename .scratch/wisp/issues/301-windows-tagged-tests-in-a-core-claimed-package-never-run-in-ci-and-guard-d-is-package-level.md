@@ -17,8 +17,8 @@
 ## 要建什么（⛔ 一进来就动清单；先量代价，再决定落不落）
 
 - [x] **`AC#0` 只读代价普查（这一格⛔ 任何产码，⛔ 任何 go 编译面）**：把三张表交回——① **会被拉进分母的枚数与名字**：对 HEAD blob 逐枚列出 `internal/audio` 里 windows-tagged 的**顶层用例名**（尺要写清是 `grep -n '^func Test'` 还是 `go list`，后者算编译面＝本票⛔）；② **每一枚的前置条件**：它读不读 `WISP_LIVE_MIC`、要不要真设备、会不会在托管 runner 上因缺音频端点而**红**（⛔ 把"skip"当"绿"——按本仓既有口径，`skipped` 与"从未求值"是两回事）；③ **`:593` 那行 ledger 今天到底 inert 与否**（判据＝它声称的那个用例在当前档下有没有被任何档跑到）。＋**`:593` 里那枚行号锚 `hotplug_test.go:527` 在 HEAD 上指向的是不是那件事**（锚腐烂先例＝票 255 `AC#6` 那一族）。判据＝每条都带"哪把尺＋射程目录＋blob 还是工作树"，⛔ 裸数。
-- [ ] **`AC#1` 落地形（只在 `AC#0` 交出代价、并经编排者裁"落／不落"之后才开工）**：**同一笔 commit** 里改两处——`windows)` 档清单加 `./internal/audio/` ＋ `win_pin` 补上 `github.com/CarlosShao/wisp/internal/audio`。⚠ 那句要求的原文**跨两行**、逐字是这样（尺＝`sed -n '417,418p' scripts/portable-tests.sh`，两行各自都以 `echo "portable-tests.sh: ` 起头）：`:417` 尾部 `… Pull the package` ／ `:418` 开头 `into a named scope and update that tier's pin in the SAME commit, or` ⇒ 引用时⛔ 把它写成一行"逐字"。⛔ 拆成两笔＝第二笔会让 GUARD C 在中间态红；⛔ 顺手改别的档的清单或别的档的 pin。
-- [ ] **`AC#2` 让它真的开口（反恒真那一格）**：交付要包含一次**同一枚用例在两种档下各跑一发**的对照读数＝改清单前该用例在 CI 语义下从未被求值／改清单后被求值（本机可复跑的最便宜形＝`bash scripts/portable-tests.sh --scope=windows` 前后各一发，名册逐名作差，具名新增枚数）。⚠⛔ 拿 `go test ./internal/audio/` 本机跑绿当这格的凭据——那证的是本机，⛔ 是"CI 现在会跑它"。
+- [x] **`AC#1` 落地形（只在 `AC#0` 交出代价、并经编排者裁"落／不落"之后才开工）**：**同一笔 commit** 里改两处——`windows)` 档清单加 `./internal/audio/` ＋ `win_pin` 补上 `github.com/CarlosShao/wisp/internal/audio`。⚠ 那句要求的原文**跨两行**、逐字是这样（尺＝`sed -n '417,418p' scripts/portable-tests.sh`，两行各自都以 `echo "portable-tests.sh: ` 起头）：`:417` 尾部 `… Pull the package` ／ `:418` 开头 `into a named scope and update that tier's pin in the SAME commit, or` ⇒ 引用时⛔ 把它写成一行"逐字"。⛔ 拆成两笔＝第二笔会让 GUARD C 在中间态红；⛔ 顺手改别的档的清单或别的档的 pin。
+- [x] **`AC#2` 让它真的开口（反恒真那一格）**：交付要包含一次**同一枚用例在两种档下各跑一发**的对照读数＝改清单前该用例在 CI 语义下从未被求值／改清单后被求值（本机可复跑的最便宜形＝`bash scripts/portable-tests.sh --scope=windows` 前后各一发，名册逐名作差，具名新增枚数）。⚠⛔ 拿 `go test ./internal/audio/` 本机跑绿当这格的凭据——那证的是本机，⛔ 是"CI 现在会跑它"。
 - [x] **`AC#3` 门的盲区要不要也收口（本格只裁**形状**，⛔ 默认必做）**：`AC#1` 之后，"某包里 windows-tagged 的判进不了任何档"这一类**仍然**无人管——因为 GUARD D 天生只到包级。要不要给它一枚用例级的钉，是**比本票大一枚**的射程。交付＝一份两形代价表（甲＝不动门、把"哪些包里有 tagged 用例"钉成一枚名册断言；乙＝门扩射程），交编排者裁。⚠ 若腿自行判断"顺手把门改了"＝越界，停手上报。
 - [ ] **`AC#4` 门禁与越界**：`sh scripts/d22scan.sh` rc=0；`bash scripts/portable-tests.sh --scope=census` rc=0（⚠ 它的 `STALE` 腿只列表、⛔ 计退码，判定看名册⛔ 看颜色）；`--scope=windows` 与 `--scope=core` 改前改后各一发、逐名作差**具名新增红 0 枚**（⛔ 只报枚数不报名字）；`git show --stat` 名册只含 `scripts/portable-tests.sh` ＋ `probes/301/**`（`AC#1` 那笔⛔ 碰 `.github/workflows/ci.yml`——清单在脚本里，动 yml 就是第二枚射程）；`frontend/**`／`design/**`／三枚冻结件／golden／`thresholds.go`／`tools/d22scan/allowlist.txt`／D43 表零字节；每把门禁件自落一行 `rc=N`（⛔ 0 字节＝那格没交）；⛔ 零 push、commit 必带显式 pathspec。
 - [ ] **`AC#5`（2026-10-10 13:3x 编排者追加，来路＝只读腿 `301-a1` 派单必答⑥第 ④ 条；⛔ 不改上面各格原句）把 `ci.yml:400-401` 那两行过期注释改成说实话**：blob 上逐字是 `  # Windows-only packages (ball GUI, cgo speech) are out of this job's scope` ＋ `  # by platform, not skipped: they run in test-windows / slo jobs.`。★现量：对 `internal/audio` 这两句**今天两条都⛔ 成立**——它⛔ 在 `windows)` 档（`:248-253` 十枚路径 `grep -c audio`＝0），也⛔ 在 slo 那两档里跑该包。⇒ 这两行是 `A804` 那条"门只到包级"的**同一根、长在另一枚文件里**。**次序硬约束＝⛔ 现在动它**：那两行该改成什么，取决于 `AC#1` 落不落地（落了＝"runs in test-windows" 半句成真、"slo jobs" 那半句仍⛔ 真），所以**必须按在 `AC#1` 落地并核过之后**。判据＝纯注释面、零行为（`git diff -U0` 逐行看，⛔ 一行可执行 yaml 都不许多变）；⚠ **单独一笔 commit**，pathspec＝`.github/workflows/ci.yml` ＋ `probes/301/**`（⛔ 与 `AC#1` 那笔合并，那笔被 `AC#4` 逐字禁碰 yml）；文案里⛔ 写会被自己扫的现在时计数；⛔ 零 push。
@@ -83,3 +83,38 @@
 5. **一枚对上了的复跑**：`301-a2` 表①里 `internal/audio` 那行的 total `_test.go`＝8、tagged＝3，我这一枚用同一把 `git ls-tree`＋`head -3` 尺独立复认（8 枚文件／3 枚 tagged／42 枚用例）⇒ **这一格从〔仅腿量，编排者未复跑〕销账**。仍未销的两格⛔ 变：census 真读数、`--scope=core`／`--scope=windows` 的本机颜色（都要 go 面，此刻归 `301-r1`）。
 - [2026-10-10 14:3x +0800] agent=编排者 did=在飞补量一节（本件最上那节「编排者补量」）：更正 `AC#1` 代价面＝分母粒度是**包**（audio 全部 42 枚顶层用例，其中 32 枚无 tag 从未在 windows 上被求值过）＋新现量 `-skip` ⛔ 产 `--- SKIP`（两发归档 CI 字节 488/492、SKIP=1 且那枚 SKIP 有名有 file:line）⇒ 落地⛔ 因 ledger `:593` 变红＋写死 Δ 预测三行 next=核 `301-r1` 交件的三行 Δ；⛔ 零 push；⛔ 零翻勾
 - [2026-10-10 14:5x +0800] agent=编排者 did=收 `301-r1`（六笔 `74eb032c`→`3a5771ce`）＋纯文本尺复跑对上：windows A-evaluated 399→**440**（＋41＝我 14:3x 写死的预测逐字命中）、新增 41 枚枚枚 ∈ audio 那 42 枚名册、42 里唯一⛔ 被新求值的＝`TestLiveWasapiSmoke`（静默过滤，两个独立方向各证一次）、消失 0 枚、core 两发名册与 four numbers 逐字相同、census 差异只一行（audio `core`→`corewindows`）、九枚 rc 件全非 0 字节、六笔里 `ci.yml`／`internal/**` 各 0 枚、票框⛔ 一枚被它自勾。★我自抓两枚：Δ 预测式少写"摘除"那一侧（实测 A-pass ＋42 因 `TestResolvePerCallBudget` 红→绿＝墙钟噪声、⛔ 读成成绩）；`A811④` 那枚归属机制盘上判不了（两说产同名册）⇒ 降级成纵深防御、AGENTS.md 规则 1.4 那枚违反记在腿自己头上。⛔ 翻勾（`AC#1`／`AC#2`／`AC#4` 全交 `301-v1`，含 GUARD C 反形那发）；⛔ 零 push
+
+---
+
+## 编排者收 `301-v1`（2026-10-10 15:3x，非实现者判语表＝`.scratch/wisp/probes/301/v1/50-verdict.md`，凭据＝`probes/301/v1/{logs,rosters}/**`）
+
+判语来源＝`301-v1`（⛔ 实现者、⛔ 本票产码者）。我这边**只采我自己复跑上的那一半**，其余标〔腿裁，编排者未复跑〕。
+
+### 翻两格、留一格
+
+- **`AC#1` ⇒ 勾**。凭据两半：本体（`0a0f62ef` 那一笔两枚 token，我在 blob 层复跑过＝`win_pin` 11 枚／档清单含 `./internal/audio/`）＋★**反形那一发**（把 `win_pin` 里 audio 那枚摘掉 ⇒ `--scope=windows` 当场 `exit 1`，红句逐字含 `Pinned: 10, resolved: 11` 与 `> github.com/CarlosShao/wisp/internal/audio`，且 stdout＝0 字节＝压根⛔ 走到跑测试；还原后正控再跑⇒ `GUARD C` 命中 0、名册与首发逐字相同、`cmp` vs `git show HEAD:` rc=0 ＋ `porcelain -- scripts` 四次全 0 行）。⇒ 这两枚 token **是枚被活门看着的钉**，⛔ 一句写在注释里的愿望。〔反形＝腿跑，编排者未复跑；我复跑的是还原后的树干净＝0 行〕
+- **`AC#2` ⇒ 勾**。判语＝按票面逐字预授权的"本机档差"形结，⛔ 把 111 `AC#11`（那格票面自含"CI 真跑过一次"）搬过来。腿用自己的两发复现了改前（A-evaluated **399**）与改后（**440**），`comm -13`＝41／`comm -23`＝0，41 枚枚 ∈ 它独立抽的 audio 42 枚名册，唯一未求值＝`TestLiveWasapiSmoke`（本机复认"静默过滤"）。**★这与我 14:3x 在腿交件前写死的 Δ 预测逐字对上**（＋41／SKIP 0／A-evaluated 440）。
+  - ⚠ **本格结掉⛔ 等于"CI 上已经有颜色"**。v1 具名欠我一发：`test-windows`（`ci.yml:516-517`，调用点 `:780`）在**托管** runner 上的首跑；红时先看 `TestPinnedThreadStable10s` 与 `waitForLevels(5*time.Second)` 那族计时。**这发欠账已于 15:2x 由推送启动**（见下"推送"一节），读数回来前本格凭据射程＝本机。
+- **`AC#4` ⇒ ⛔ 勾，理由具名**。本格列的子句里"commit 必带显式 pathspec"被实现方**自己违反并自报**（v1 判＝缺陷成立、归写腿、只能靠追加闭）。⛔ `--amend`（AGENTS.md 硬禁）⇒ 追溯⛔ 可能，而"追加闭是否**满足**这格的子句"是一枚判语、⛔ 我给自己盖章能给的东西。⇒ 处理形＝随 `AC#5` 的验收腿（`301-v3`）带一枚必答裁它；在那之前这格留空。其余子句**都已交**：`d22scan` rc=0、`census` rc=0、`windows`／`core` 改前改后逐名作差**具名新增红 0 枚**、六笔名册尺越界 0 枚（相对本票射程）、三枚冻结件／golden／`thresholds.go`／`allowlist.txt` 零字节、九枚（腿）＋12 枚（v1）rc 件全非 0 字节、⛔ 零 push（腿与验收腿都⛔ 推）。
+
+### ★更正本票 `AC#4` 里我写的一句机制话（⛔ 改原句，只追加这一节）
+
+原句逐字＝"⚠ 它的 `STALE` 腿只列表、⛔ 计退码，判定看名册⛔ 看颜色"。**盘上两处都⛔ 对**，我 15:3x 自己在 HEAD blob 上复跑确认：
+
+1. 那枚 stale 腿**长在档路径里、⛔ 长在 census 里**：`--scope=census` 那一支从 `:287` 到 `:425` 打完 totals 就 `exit 0`（GUARD D 命中时 `exit 1`），**永远⛔ 进到** `:627-675` 那个 ledger 循环 ⇒ **"census 的 STALE 腿"⛔ 存在这枚东西**。
+2. 活着那支的行为与"⛔ 计退码"**相反**：`:652` `listed=$(go test -list "^${name}\$" "$pkg")` 按 ledger 行自己的包问，`:653-655` 不中则进 `stale`，`:667-674` **`exit 1`＝计退码**。
+- ⇒ 后果（写给下一个读这格的人）：`--scope=windows`／`--scope=core` 今天**带着**那枚 ledger 行改名／删用例就当场红的活钉。⛔ 因此放宽 `AC#4` 任何子句，⛔ 因为"看名册⛔ 看颜色"这句话省得一发。⚠ 另一枚连带：`AC#4` 原文那句"⛔ 动 `:594` 那行"（原 `:593`）的理由现在比立票时更硬——**删那行⛔ 只是少一行注释，会一并摘掉那枚活钉**（v1 独立读到同一段码）。
+- 归属：这句误述⛔ 是本票造成的（立票时就那样写），⛔ 影响任何一格判定，⛔ 谁的欠账。
+
+### 一枚既有红转绿＝⛔ 是成绩（v1 的决定性读数，我复跑不了它那一发，标〔腿裁〕）
+
+`TestResolvePerCallBudget`（`internal/risk/pathresolver_budget_norace_test.go`，1 ms 预算属⛔ 动面、两枚腿都⛔ 动）：v1 量到**同树同机一分钟之内**`--scope=core` 那发 `--- FAIL (3.90s)`、`--scope=windows` 那发 `--- PASS`，且装回 before-blob 的复现里它本来就是绿的 ⇒ 判语＝"第 5 枚负载敏感读数"，登记为**待归因红（负载敏感计时判据）**，归编排者＋那枚 1 ms 预算的契约面（`internal/risk`／C26）。⛔ 许任何人把它读成"这次改动让它变绿"。
+
+### 推送（2026-10-10 15:2x，机主当场授权）
+
+- 授权原话入台账 `A813`。执行＝`git push origin dev`，`cc315261..bcd0a543`（**741 枚**），fast-forward 已核（`HEAD..origin/dev`＝0），终判据已核（远端 tip 逐字＝本地 HEAD）。⛔ `cnb`（第二远端）＝⛔ 动，仍差 921 枚。推送前预检＝密钥形状 `ghp_`／`AKIA`／`xox*`／`-----BEGIN` 各 0 命中，7 枚 `sk-` 命中全是票名 slug 里的词片段（`-task-scope-…`、`-risk-assessor…`）。⚠ 事实一句：`CarlosShao/wisp` 在 GitHub 上⛔ 是私有，**是公开仓库**（现量 `gh repo view` ⇒ visibility＝PUBLIC）。
+- ★这一推顺带把上面那枚 `test-windows` 首跑欠账**启动**了（run `38034689386`）。
+
+### Progress log（本节）
+
+- [2026-10-10 15:3x +0800] agent=编排者 did=收 `301-v1` 判语表 ⇒ 翻 `AC#1`／`AC#2` 两格、`AC#4` 具名留空（子句"显式 pathspec"被实现方自报违反、⛔ 追溯修、裁"追加闭算⛔ 算满足"归下一枚非实现者）＋追加更正本票 `AC#4` 那两句 stale 机制话（我在 HEAD blob 上复跑确认：census `:287→:425` 就 exit、stale 腿在 `:627-675` 且 `:674 exit 1`＝计退码）＋推送执行（`A813`）next=`AC#5` 落地腿（v1 已给七条形状）→ 其验收腿带 `AC#4` 那枚残留必答；`test-windows` 首跑读数
