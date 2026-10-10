@@ -1,0 +1,10 @@
+FINAL ANCHOR RAW READINGS (taken after commit below, see 90)
+e4d9a223 2026-10-10T17:48:22+08:00
+rc=0
+0
+rc=0
+830
+rc=0
+wisp.exe=0
+balldebug.exe=0
+msedgewebview2.exe=24

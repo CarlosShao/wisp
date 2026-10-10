@@ -1,0 +1,143 @@
+=== N1. convertPacket / FloatToPCM16 / MonoDownmix sites (no .scratch) ===
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:149:			// Real-world consequence named in ticket 300: convertPacket picks
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:155:				t.Errorf("floating = %v, want %v (convertPacket would take the %s path)",
+HEAD:internal/audio/resample.go:100:// MonoDownmix averages interleaved multi-channel samples to mono. chans <= 1
+HEAD:internal/audio/resample.go:102:func MonoDownmix(in []int16, chans int) []int16 {
+HEAD:internal/audio/resample.go:118:// FloatToPCM16 converts interleaved float32 samples [-1,1] to int16.
+HEAD:internal/audio/resample.go:119:func FloatToPCM16(in []float32) []int16 {
+HEAD:internal/audio/resample_test.go:157:// TestMonoDownmix and float conversion cover the WASAPI mix-format path.
+HEAD:internal/audio/resample_test.go:158:func TestMonoDownmixAndFloatConvert(t *testing.T) {
+HEAD:internal/audio/resample_test.go:160:	mono := MonoDownmix(stereo, 2)
+HEAD:internal/audio/resample_test.go:164:	same := MonoDownmix(stereo, 1)
+HEAD:internal/audio/resample_test.go:169:	pcm := FloatToPCM16(f)
+HEAD:internal/audio/wasapi_windows.go:196:// convertPacket branches on floating alone, that would re-slice 32-bit float
+HEAD:internal/audio/wasapi_windows.go:400:			out = append(out, convertPacket(data, int(frames), ch, floating, flags&audclntBufferFlagsSilent != 0)...)
+HEAD:internal/audio/wasapi_windows.go:408:// convertPacket turns one interleaved device packet into mono int16.
+HEAD:internal/audio/wasapi_windows.go:409:func convertPacket(data unsafe.Pointer, frames, channels int, floating, silent bool) []int16 {
+HEAD:internal/audio/wasapi_windows.go:415:		return MonoDownmix(FloatToPCM16(f), channels)
+HEAD:internal/audio/wasapi_windows.go:418:	return MonoDownmix(i, channels)
+HEAD:internal/audio/wavinjector.go:54:// (same MonoDownmix + linear resampler as the microphone path) and returns a
+HEAD:internal/audio/wavinjector.go:65:	samples = MonoDownmix(samples, chans)
+HEAD:internal/audio/wavinjector.go:224:		return FloatToPCM16(f), rate, chans, nil
+HEAD:internal/audio/wavinjector_test.go:137:	want := ResampleLinear(MonoDownmix(stereo, 2), 48000, TargetRate)
+=== N2. frozen level tokens sites ===
+HEAD:internal/audio/level.go:13:// the last 512 samples, normalised 0..1") plus SilenceLevelGate = 0.06
+HEAD:internal/audio/level.go:35://	  a full-scale sine reads 1/sqrt(2) = 0.7071067812, within SineLevelTolerance.
+HEAD:internal/audio/level.go:39://	  does, with SilenceLevelGate).
+HEAD:internal/audio/level.go:66:// SineLevelTolerance is the named tolerance for "a sine of amplitude A reads
+HEAD:internal/audio/level.go:76:const SineLevelTolerance = 5e-5
+HEAD:internal/audio/level_test.go:16:// one named tolerance in the package (SineLevelTolerance). No wall clock and no
+HEAD:internal/audio/level_test.go:36:// rounding (see the derivation on SineLevelTolerance).
+HEAD:internal/audio/level_test.go:135:	if l := LevelOfSamples(full); math.Abs(l-rootTwo) > SineLevelTolerance {
+HEAD:internal/audio/level_test.go:137:			l, rootTwo, SineLevelTolerance, math.Abs(l-rootTwo))
+HEAD:internal/audio/level_test.go:141:	if l := LevelOfSamples(half); math.Abs(l-halfWant) > SineLevelTolerance {
+HEAD:internal/audio/level_test.go:143:			l, halfWant, SineLevelTolerance, math.Abs(l-halfWant))
+HEAD:internal/audio/level_test.go:150:	if math.Abs(float64(gotFull)-rootTwo) > SineLevelTolerance {
+HEAD:internal/audio/level_test.go:151:		t.Fatalf("FrameLevel(full-scale sine) = %.10f, want %.10f within %v", gotFull, rootTwo, SineLevelTolerance)
+HEAD:internal/audio/level_test.go:157:	if math.Abs(float64(gotHalf)-halfWant) > SineLevelTolerance {
+HEAD:internal/audio/level_test.go:158:		t.Fatalf("FrameLevel(half-amplitude sine) = %.10f, want %.10f within %v", gotHalf, halfWant, SineLevelTolerance)
+HEAD:internal/audio/level_test.go:163:	if l := LevelOfSamples(quarter); math.Abs(l-rootTwo/4) > SineLevelTolerance {
+HEAD:internal/audio/level_test.go:164:		t.Fatalf("quarter-amplitude sine level = %.10f, want %.10f within %v", l, rootTwo/4, SineLevelTolerance)
+HEAD:internal/audio/level_test.go:175:	// Each side is already inside SineLevelTolerance of its own ideal, so the
+HEAD:internal/audio/level_test.go:177:	if drift := math.Abs(2*quiet - loud); drift > 2*SineLevelTolerance {
+HEAD:internal/audio/level_test.go:179:			quiet, loud, drift, 2*SineLevelTolerance)
+HEAD:internal/audio/level_test.go:199:	if !(SineLevelTolerance >= LevelLSB) {
+HEAD:internal/audio/level_test.go:200:		t.Fatalf("SineLevelTolerance = %v is below one quantisation step %v: the sine nails would be asserting a rounding error that cannot exist", SineLevelTolerance, LevelLSB)
+HEAD:internal/audio/level_test.go:202:	if !(SineLevelTolerance <= 1e-3) {
+HEAD:internal/audio/level_test.go:203:		t.Fatalf("SineLevelTolerance = %v is above 1e-3: the scale stops distinguishing normal speech levels", SineLevelTolerance)
+HEAD:internal/audio/level_test.go:209:	if !(gap > 100*SineLevelTolerance) {
+HEAD:internal/audio/level_test.go:210:		t.Fatalf("octave gap %v is not more than 100x the tolerance %v (tolerance too wide)", gap, SineLevelTolerance)
+HEAD:internal/ball/liquid.go:30:	SilenceLevelGate   = 0.06 // envelope below this counts as "nobody speaking"
+HEAD:internal/ball/liquid.go:215:	if raw < SilenceLevelGate {
+HEAD:internal/ball/liquid_test.go:60:	if m.level > SilenceLevelGate {
+HEAD:internal/ball/tokens_table_test.go:552:	"SilenceLevelGate":  SilenceLevelGate,
+=== N3. audio tests touching observe/thresholds/golden ===
+HEAD:internal/audio/audio.go:180:func SpawnCapture(registry *observe.Registry, run func(ctx context.Context)) *observe.Handle {
+HEAD:internal/audio/capturelevel_windows_test.go:34:	reg := observe.NewRegistry()
+HEAD:internal/audio/capturelevel_windows_test.go:39:	baseDefault := observe.Default.CountByName("audio-capture")
+HEAD:internal/audio/capturelevel_windows_test.go:59:	if n := observe.Default.CountByName("audio-capture") - baseDefault; n != 0 {
+HEAD:internal/audio/captureopt.go:32:// field with the process registry (observe.Default - what both sources used
+HEAD:internal/audio/captureopt.go:39:	Registry *observe.Registry
+HEAD:internal/audio/captureopt.go:51:func WithCaptureRegistry(r *observe.Registry) CaptureOption {
+HEAD:internal/audio/captureopt.go:79:	c := CaptureConfig{Registry: observe.Default}
+HEAD:internal/audio/captureopt.go:84:		c.Registry = observe.Default
+HEAD:internal/audio/captureopt_test.go:154:	reg := observe.NewRegistry()
+HEAD:internal/audio/captureopt_test.go:155:	baseDefault := observe.Default.CountByName("audio-capture")
+HEAD:internal/audio/captureopt_test.go:173:	if got := observe.Default.CountByName("audio-capture") - baseDefault; got != 0 {
+HEAD:internal/audio/captureopt_test.go:194:	if c.Registry != observe.Default {
+HEAD:internal/audio/captureopt_test.go:201:	if c2.Registry != observe.Default {
+HEAD:internal/audio/device.go:94:func DeviceError(hr uintptr, dev DeviceDescriptor, what string) *observe.Error {
+HEAD:internal/audio/device.go:99:		return observe.New(observe.ClassAudioDevice, detail+" ("+code+"): "+privacyGuidance)
+HEAD:internal/audio/device.go:101:		return observe.New(observe.ClassAudioDevice, detail+" ("+code+"): "+inUseGuidance)
+HEAD:internal/audio/device.go:103:		return observe.New(observe.ClassAudioDevice, detail+" ("+code+"): device invalidated (unplugged or disabled)")
+HEAD:internal/audio/device.go:105:		return observe.New(observe.ClassAudioDevice, detail+" ("+code+"): unsupported device mix format")
+HEAD:internal/audio/device.go:107:		return observe.New(observe.ClassAudioDevice, detail+" ("+code+"): endpoint creation failed")
+HEAD:internal/audio/device.go:109:		return observe.New(observe.ClassAudioDevice, detail+" ("+code+")")
+HEAD:internal/audio/device.go:127:	e, ok := err.(*observe.Error)
+HEAD:internal/audio/device.go:131:	return e.Class == observe.ClassAudioDevice && e.ProviderCode == hresultString(hrAUDCLNTDeviceInv)
+HEAD:internal/audio/gate.go:140:		evs = append(evs, GateEvent{Kind: EventSpeakingStarted, At: observe.NowWallUTC()})
+HEAD:internal/audio/gate.go:143:		evs = append(evs, GateEvent{Kind: EventSpeakingStopped, At: observe.NowWallUTC()})
+HEAD:internal/audio/gate.go:149:			evs = append(evs, GateEvent{Kind: EventCaptureOpened, Reason: reason, At: observe.NowWallUTC()})
+HEAD:internal/audio/gate.go:154:		evs = append(evs, GateEvent{Kind: EventCaptureClosed, Reason: reason, At: observe.NowWallUTC()})
+HEAD:internal/audio/gate.go:180:	evs = append(evs, GateEvent{Kind: kind, At: observe.NowWallUTC()})
+HEAD:internal/audio/gate.go:185:			evs = append(evs, GateEvent{Kind: EventCaptureOpened, Reason: "unmuted", At: observe.NowWallUTC()})
+HEAD:internal/audio/gate.go:190:		evs = append(evs, GateEvent{Kind: EventCaptureClosed, Reason: "muted", At: observe.NowWallUTC()})
+HEAD:internal/audio/hotplug_test.go:37:		return DeviceDescriptor{}, observe.New(observe.ClassAudioDevice, "no capture endpoint present")
+HEAD:internal/audio/hotplug_test.go:288:			if got, ok := observe.ClassOf(err); !ok || got != observe.ClassAudioDevice {
+HEAD:internal/audio/hotplug_test.go:360:			if got, ok := observe.ClassOf(err); !ok || got != observe.ClassAudioDevice {
+HEAD:internal/audio/hotplug_test.go:408:			if got, ok := observe.ClassOf(err); !ok || got != observe.ClassAudioDevice {
+HEAD:internal/audio/mmdevice_windows.go:86:		return DeviceDescriptor{}, observe.New(observe.ClassAudioDevice,
+HEAD:internal/audio/mmdevice_windows.go:94:		return DeviceDescriptor{}, observe.New(observe.ClassAudioDevice,
+HEAD:internal/audio/mmdevice_windows.go:117:		return nil, observe.New(observe.ClassAudioDevice, "nil hotplug callback")
+HEAD:internal/audio/wasapi_windows.go:168:		return nil, nil, observe.New(observe.ClassAudioDevice,
+HEAD:internal/audio/wasapi_windows.go:202:		return waveFormat{}, observe.New(observe.ClassAudioDevice, "GetMixFormat returned no format")
+HEAD:internal/audio/wasapi_windows.go:215:		return f, observe.New(observe.ClassAudioDevice, "degenerate mix format")
+HEAD:internal/audio/wasapi_windows.go:307:		return observe.Wrap(observe.ClassAudioDevice, err, "CreateEvent for capture")
+HEAD:internal/audio/wasapimic_windows.go:116:	tm := observe.NewTimeout(2 * time.Second)
+HEAD:internal/audio/wasapimic_windows.go:178:		err := observe.Wrap(observe.ClassAudioDevice, err, "hotplug notification registration failed")
+HEAD:internal/audio/wasapimic_windows.go:279:		return nil, observe.Wrap(observe.ClassAudioDevice, err, "capture device enumeration failed")
+HEAD:internal/audio/wasapimic_windows.go:285:// (observe.ClassAudioDevice.RetryPolicy() == RetryOnce, D37). Success bumps
+HEAD:internal/audio/wasapimic_windows.go:291:		return nil, observe.Wrap(observe.ClassAudioDevice, err,
+rc=0
+=== N4. instruments that count windows-tagged files / census ===
+HEAD:scripts/portable-tests-selftest.sh:775:#     `go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' <pkg>` probe at all -
+HEAD:scripts/portable-tests.sh:291:    # as 0 there and non-zero on the other. A NO-SCOPE row is zero coverage said in
+HEAD:scripts/portable-tests.sh:365:        counts=$(go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' "$p" 2>/dev/null || echo '?/?')
+HEAD:scripts/portable-tests.sh:384:            where=' NO-SCOPE'
+HEAD:scripts/portable-tests.sh:386:            # GUARD D's split of the NO-SCOPE rows: `0/0` is a package with no
+HEAD:scripts/portable-tests.sh:566:# GUARD A: the loud empty denominator. `.TestGoFiles`+`.XTestGoFiles` are the
+HEAD:scripts/portable-tests.sh:571:denom=$(go list -f '{{if or .TestGoFiles .XTestGoFiles}}{{else}}EMPTY {{.ImportPath}}
+HEAD:scripts/testdata/portable-tests/go:30:#                           `go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}'
+HEAD:scripts/testdata/portable-tests/go:60:        # probe is `go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' <pkg>`,
+HEAD:scripts/testdata/portable-tests/go:70:        '{{len .TestGoFiles}}/{{len .XTestGoFiles}}')
+=== N5. ledger A809 heading ===
+15151:## A809｜2026-10-10 14:1x｜裁 **票 301 `AC#3`**＝本格⛔ 落任何一形、整枚射程搬去 **票 111 新格 `AC#12`**（GUARD D 包级→用例级**＋档级 OS 语义**）＋★两枚定式并回（**① 扩射程的格子，落点＝那道门的出处票**；②⚠⚠**我又踩了反引号那一枚坑，同一族的第二次**：inline `echo` 里的 `` `AC#12` `` 被当命令替换**真的跑了**，把节头打成"新格 \ 的来历"）＋⚠ 派单措辞错误记我
+=== N6. A809 first 900 chars ===
+## A809｜2026-10-10 14:1x｜裁 **票 301 `AC#3`**＝本格⛔ 落任何一形、整枚射程搬去 **票 111 新格 `AC#12`**（GUARD D 包级→用例级**＋档级 OS 语义**）＋★两枚定式并回（**① 扩射程的格子，落点＝那道门的出处票**；②⚠⚠**我又踩了反引号那一枚坑，同一族的第二次**：inline `echo` 里的 `` `AC#12` `` 被当命令替换**真的跑了**，把节头打成"新格 \ 的来历"）＋⚠ 派单措辞错误记我
+=== N7. waveFormat build tag of wasapi_windows.go ===
+//go:build windows
+
+package audio
+
+=== N8. does any tracked test assert audio pkg case counts? ===
+HEAD:cmd/wisp/config_readers_255.go:141:	// audio.WithStartMuted, which is the sentence internal/audio/gate.go:57 wrote
+HEAD:cmd/wisp/config_readers_255.go:148:	// internal/audio takes input_device and sample_rate from the OS default
+HEAD:cmd/wisp/resident_audio_247_live_windows_test.go:13:// shape: not cmd/balldebug's synthetic envelope, not internal/audio's wav
+HEAD:cmd/wisp/resident_audio_247_live_windows_test.go:36:	"github.com/CarlosShao/wisp/internal/audio"
+HEAD:cmd/wisp/resident_audio_247_windows_test.go:20:	"github.com/CarlosShao/wisp/internal/audio"
+HEAD:cmd/wisp/resident_audio_247_windows_test.go:221:// text in internal/audio/device.go:86/:89/:103, not a paraphrase.
+HEAD:cmd/wisp/resident_audio_windows.go:7:// What this file is. Until it existed, internal/audio had ZERO non-test
+HEAD:cmd/wisp/resident_audio_windows.go:20://     cmd/wisp -> internal/audio. internal/audio still does not import
+HEAD:cmd/wisp/resident_audio_windows.go:76:	"github.com/CarlosShao/wisp/internal/audio"
+HEAD:cmd/wisp/resident_audio_windows.go:148:// into this leg (internal/audio/gate.go:20-21 makes the gate's own flag the
+HEAD:cmd/wisp/resident_audio_windows.go:208:// leg, not about internal/audio's own hotplug tests.
+HEAD:cmd/wisp/resident_audio_windows.go:409:// told not to copy (internal/audio/gate.go, HalfDuplexGate.Muted) - and with
+HEAD:cmd/wisp/resident_ball_windows.go:47:// muted" (internal/audio/gate.go:20-21); this host keeps no copy of it - see
+HEAD:cmd/wisp/resident_ball_windows.go:83:// (internal/audio/gate.go), and a second "who is muted" in this host is the
+HEAD:cmd/wisp/resident_ball_windows.go:570:// mirrored flag (internal/audio/gate.go:20-21 makes the gate's muted the truth
+HEAD:cmd/wisp/resident_ball_windows.go:581:// synchronous inside internal/audio - HalfDuplexGate.SetMuted starts the inner
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:28:	"github.com/CarlosShao/wisp/internal/audio"
+HEAD:cmd/wisp/resident_tray_mute_293_windows_test.go:31:	"github.com/CarlosShao/wisp/internal/audio"
+HEAD:cmd/wisp/resident_windows.go:296:	// internal/audio have a non-test importer - before it the whole stack
+HEAD:cmd/wisp/resident_windows.go:306:	// and internal/audio still does not import the ball (AC#0 甲 + 乙-2 exit).
+rc=0

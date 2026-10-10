@@ -1,0 +1,322 @@
+=== R1. who cites wasapi_windows.go / parse_wave_format_300 by line number (no .scratch) ===
+HEAD:cmd/wisp/approval_reply.go:76:// They are LABELS, not authority: gate.go:594-600 says in as many words that no
+HEAD:cmd/wisp/approval_reply_201_test.go:492:	// is 31s - 30s = 1s > 0, so gate.go:528 arms the C18 pre-timeout warning and
+HEAD:cmd/wisp/approval_reply_201_test.go:493:	// gate.go:557-566 hands it to the approval UI as an Event of kind "warning"
+HEAD:cmd/wisp/approval_reply_201_test.go:494:	// with the text gate.go:563 formats. This host has no panel and no injected
+HEAD:cmd/wisp/approval_reply_201_test.go:505:			"= 1s > 0 must arm it (gate.go:528), stdout:\n%s", sentences)
+HEAD:cmd/wisp/config_readers_255.go:141:	// audio.WithStartMuted, which is the sentence internal/audio/gate.go:57 wrote
+HEAD:cmd/wisp/resident_approval_windows.go:183:// New (gate.go:160, "grants: o.Grants"), and the pair it needs - the minted
+HEAD:cmd/wisp/resident_approval_windows.go:207:// (gate.go:689-690), which says out loud that the call was released but the
+HEAD:cmd/wisp/resident_approval_windows.go:267:// (gate.go:86-88 keeps Options.Grants write-only), and nothing in production
+HEAD:cmd/wisp/resident_approval_windows.go:320:// here in cmd/wisp - the interface is one method (gate.go:66-68), so a host
+HEAD:cmd/wisp/resident_audio_247_windows_test.go:134:// mic_muted_default handed into it (gate.go:57's "map it here at boot wiring",
+HEAD:cmd/wisp/resident_audio_247_windows_test.go:221:// text in internal/audio/device.go:86/:89/:103, not a paraphrase.
+HEAD:cmd/wisp/resident_audio_windows.go:148:// into this leg (internal/audio/gate.go:20-21 makes the gate's own flag the
+HEAD:cmd/wisp/resident_ball_windows.go:47:// muted" (internal/audio/gate.go:20-21); this host keeps no copy of it - see
+HEAD:cmd/wisp/resident_ball_windows.go:570:// mirrored flag (internal/audio/gate.go:20-21 makes the gate's muted the truth
+HEAD:cmd/wisp/resident_windows.go:330:	// (the gate's own flag is the truth source, internal/audio/gate.go:20-21), no
+HEAD:cmd/wisp/subagent_selfapproval_197_test.go:710://	M4 internal/tools/gate.go: add an answer verb to the Gate interface -> leg (5)
+HEAD:cmd/wisp/subagent_selfapproval_197_test.go:712://	M5 internal/agent/approval/gate.go: consult Request.Source for authority (e.g.
+HEAD:docs/evidence/s1/121-adversarial-acceptance.md:148:（`internal/agent/approval/approval.go:48/232`、`gate.go:159` 三处注释写着"rulings M-7 / C-3 in docs/reports/pending-and-issues.md"）�
+HEAD:docs/evidence/s1/141-ac2-stock-inventory-r1.md:360:| 12 | `internal/audio/gate.go:26` | ③ U+2462 | 1 | 注释 | 否 |`// persisted or logged here (D16③).` |
+HEAD:docs/evidence/s1/141-q46c-accept-r1.md:358:→ `internal/agent/approval/gate.go:556 Reason: d.Reason`（`queue.go:455` 同一条）
+HEAD:docs/evidence/s1/145-snapshot-field-census-r1.md:330:——"It is the ONLY place an allow can arrive"；`Gate.Native()`（`internal/agent/approval/gate.go:572`）。
+HEAD:docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md:430:  gate.go:274 / :387  Kind: EventWarning, Remaining: g.window          ← 静态窗口长
+HEAD:docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md:431:  gate.go:512         Remaining: g.q.WarningLead()                     ← 静态提前量
+HEAD:docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md:433:倒计时本体＝gate.go:257 `deadline := g.clock.After(g.window)`；approval 包内 `time.Until(`/`Until(` **零命中** ⇒ 无"
+HEAD:docs/evidence/s1/145-snapshot-fields-landed-r1.md:69:| 单调时钟 | `internal/observe/clock.go`＋`internal/agent/approval/gate.go:257`＋AGENTS §1.2 | `remainingMs` 这类计时字段能不�
+HEAD:docs/evidence/s1/145-snapshot-fields-landed-r1.md:85:| P6 | 普查 §2.8 行 8："`approval` 那一组**全有源，且生产者今天已经在跑**"，含倒计时 `remainingMs` | 逐枚分：**
+HEAD:docs/evidence/s1/145-snapshot-fields-landed-r1.md:220:| `approval.remainingMs` | ❗ **无源**（P6）：`EventTick` 零生产者，倒计时是 `gate.go:257 clock.After`，无"还剩多少"读�
+HEAD:docs/evidence/s1/145-snapshot-fields-landed-r1.md:498:`g.window`／`g.q.WarningLead()`（静态长度，`gate.go:274`／`:387`／`:510-513`）；倒计时本体 `gate.go:257` 的
+HEAD:docs/evidence/s1/145-snapshot-growth-r2.md:111:| `approval.remainingMs` | ❗ **无源**（r1 P6 已把普查甲组这一枚挪进乙组：`approval.EventTick` 声明了全仓零生产者；倒�
+HEAD:docs/evidence/s1/145-snapshot-growth-r3.md:71:| `pending[].taskId`／`.callId`（`LiveApproval.Decision.TaskID`，生产填于 `internal/tools/bridge.go:331`、经 `approval/gate.go:550` 进队�
+HEAD:docs/evidence/s1/145-snapshot-growth-r3.md:73:| `pending[].timeoutMs`／`windowMs`（`approval.Queue.Timeout()` `queue.go:126`，生产由 `run.go:380 cfg.Risk.ConfirmTimeoutSec` 喂；L1 窗口 
+HEAD:docs/evidence/s1/145-snapshot-growth-r3.md:97:- **N1 · `pending[]` 那一族的用例之家与钉**：`taskId`/`callId` 真源齐全（`bridge.go:331`→`gate.go:550`→`pending_read.go:46 LiveA
+HEAD:docs/evidence/s1/146-liveapprovals-r1-accept-r2.md:156:派单单要查的四点，逐点现量（`tools.Decision` 全文读自锚点 `internal/tools/gate.go:15-53`）：
+HEAD:docs/evidence/s1/146-liveapprovals-r1-accept-r2.md:339:2. **没追 `gate.go:553` 那枚 `Params: d.Params` 的下游**。§6.2 只量了"面板泵不读 `LiveApprovals` 的 `Params`"，
+HEAD:docs/evidence/s1/146-liveapprovals-r1-accept-r2.md:340:   但 `internal/agent/approval/gate.go:553` 在生产里**确实**把 `Decision.Params` 往另一枚结构里搬。
+HEAD:docs/evidence/s1/146-liveapprovals-r1.md:55:现量的字段表（`tools.Decision`，`internal/tools/gate.go:15-53`）：
+HEAD:docs/evidence/s1/146-liveapprovals-r1.md:61:| 3 | **`Params`** | **`map[string]any`**（`gate.go:18`） | **是** | ✅ |
+HEAD:docs/evidence/s1/146-liveapprovals-r1.md:62:| 4 | **`Args`** | **`json.RawMessage`＝`[]byte`**（`gate.go:19`） | **是** | ✅ |
+HEAD:docs/evidence/s1/146-liveapprovals-r1.md:64:| 6 | **`RulesHit`** | **`[]risk.RuleID`**（`gate.go:21`） | **是** | ✅ |
+HEAD:docs/evidence/s1/146-liveapprovals-r1.md:66:| 8 | **`Paths`** | **`[]string`**（`gate.go:23`） | **是** | ✅ |
+HEAD:docs/evidence/s1/146-liveapprovals-r1.md:69:| 14 | **`Blacklist`** | **`BlacklistNote`**（`gate.go:43`）→ 结构体内含 **`Absolute []string` / `Unlockable []string` / `AlreadyUnlocked []st
+HEAD:docs/evidence/s1/146-liveapprovals-r1.md:109:- (b) 全仓（剔 `_test.go`）切片就地写形状 **4 处**：`internal/agent/approval/gate.go:232`（自己 `append` 到新底层数组，
+HEAD:docs/evidence/s1/146-liveapprovals-r1.md:127:| `Decision` 的引用字段 | 5 枚（1 map + 4 slice 形） | **8 枚槽位**（1 map + 7 slice） | 票面漏计 `Blacklist BlacklistNote` 里的�
+HEAD:docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md:125:⇒ 只有 `loop.go:125/128/767/783`、`agent/tools.go:23`、`tools/gate.go:133` 五处，**组合根一处都没有**）。
+HEAD:docs/evidence/s1/151-task-scope-never-closed-r1-accept-r1.md:316:| **③ 内存只量到斜率、没量上界** | 本程复到的斜率＝**37,820 B/轮**（它记 37,652，同一枚探针、差 
+HEAD:docs/evidence/s1/151-task-scope-never-closed-r1.md:125:- 同一条任务生命周期的另一张表——D47 的 admitted 表——**有**淘汰（`approval/gate.go:167` 的
+HEAD:docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md:96:| "`TaskID` 非空"＝值域问题，grep 给不出答案 | 本程没有能答它的仪器；但**有一条他们没写的近似**�
+HEAD:docs/evidence/s1/154-host-id-never-closed-r1.md:342:| 10 | `audio`：`NewHalfDuplexGate` / `WASAPIMicrophone{}` / `NewWavInjector` ↔ `Stop()` | **0**：三者在 `internal`＋`cmd` 的生产码
+HEAD:docs/evidence/s1/155-three-unjudged-cells-r1.md:624:5365cb22:internal/agent/approval/gate.go:160:func (g *Gate) AdmitTextTask(taskID string) (revoke func()) {
+HEAD:docs/evidence/s1/155-three-unjudged-cells-r1.md:640:| `l.opt.AdmitTask(taskID)` `loop.go:362` | 签名 `Options.AdmitTask func(taskID string) (revoke func())`（`:169`）；宿主把 `approval.Ga
+HEAD:docs/evidence/s1/160-design-core-c1.md:100:- `grep -rn "DisposalScope" internal/tools internal/agent cmd/wisp --include="*.go" | grep -v _test.go` → **只命中一枚注释**：`internal/agent/
+HEAD:docs/evidence/s1/160-design-core-c1.md:235:1. **`OpenScope` 从哪儿拿到"任务的持有者"**？生产码今天**没有任何一枚 `*plugin.DisposalScope` 走到 `internal/tools`/`internal/a
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:99:| **B 路由层** | `tools.Gate.PendingWindow`／`PendingApproval`（接口方法 `internal/tools/gate.go:102`／`:105`）；实现 `internal/agent/a
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:199:     internal/agent/approval/gate.go:260  fn=PendingWindow      g.ui.Prompt
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:200:     internal/agent/approval/gate.go:486  fn=PendingApproval    g.ui.Prompt
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:205:     internal/agent/approval/gate.go:236  fn=PendingWindow      g.PendingApproval   # R7 批量升级改道
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:262:| **生产码 · C 层「问题真到人眼前」** | 非 test 的 `ui.Prompt(` 调用点 | **2** | `internal/agent/approval/gate.go:260`、`:486` |
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:263:| **生产码 · B 层「路由进审批机构」** | 非 test 的 Gate 方法调用点 | **1（L1）＋3（L2）＝4** | `internal/tools/bridge.go:
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:280:| **答案侧 7 枚符号各 0 枚** | 尺 B `method_uses` 里这 7 个键**没有任何非 TEST 条目** | `grep -rn "\.Veto(\|\.Native()\|\.Panel(
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:287:internal/agent/approval/gate.go:108:		ch = DefaultChannels()            <- New() 的 fallback，见下方正文
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:288:internal/agent/approval/gate.go:609:// DecideFromNative is the router for the native transport.
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:289:internal/agent/approval/gate.go:610:func (g *Gate) DecideFromNative(ctx context.Context, r Request) error {
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:290:internal/agent/approval/gate.go:618:// DecideFromPanel is the server-side API the panel reaches (SPEC-06 §9 layer
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:291:internal/agent/approval/gate.go:622:func (g *Gate) DecideFromPanel(ctx context.Context, r Request) error {
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:318:| §4-1 "把 `Decide/Admit/Ask/AwaitingApproval` **那一族**钉出来" | `Decide*` 是**答案路由**（`gate.go:610/622`），`AdmitTextTask` �
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:356:| §12 里"L1 必放行、L2 必自拒"的因果 | 〔我本轮现跑过〕：读自 `gate.go:284-294`／`:521-524` 与 `run.go:357 approval.NewChan
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:362:**1）不是"门没人按"。** C 层今天有 **2 枚**生产发问点（`internal/agent/approval/gate.go:260` 的 L1 窗口、
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:376:  `if o.Channels == nil { ch = DefaultChannels() }`（`internal/agent/approval/gate.go:106-109`，
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:379:  **L1 窗口一定走满并放行**（`gate.go:284` "Timeout MEANS EXECUTE"）且**没有任何通道能否决**；
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:380:  **L2 卡一定 300s 自拒**（`gate.go:521`），因为没有入口能送 allow。
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:425:   「AC#3 现量（锚 `7e8cfdc`）：生产码里 `ui.Prompt` 发起点 **2 枚**（`approval/gate.go:260/:486`）、
+HEAD:docs/evidence/s1/161-doorbell-census-r1.md:426:   `Gate.PendingWindow/PendingApproval` 路由点 **4 枚**（`bridge.go:380/:395`、`approval/gate.go:236`、`cmd/wisp/run.go:479`）、
+HEAD:docs/evidence/s1/161-gates-selftest-accept-r1.md:151:| C 层「问题真到人眼前」生产发问点 | **2**：`approval/gate.go:260`、`:486` | **2**：同两枚 file:line 逐字相同 | ✅ |
+HEAD:docs/evidence/s1/161-gates-selftest-accept-r1.md:152:| B 层路由点（`PendingWindow/PendingApproval` 非 test 调用） | **4** | **4**（bridge.go:380/:395、gate.go:236、run.go:479） | ✅
+HEAD:docs/evidence/s1/163-persistent-shell-session-design-core-a1.md:70:- 完整 `bridge.Execute` 审批链路（需接 approval UI）未构造；R4→L2→拒的那条链以逐行读码＋`gate.go:14
+HEAD:docs/evidence/s1/163-persistent-shell-session-design-core-a1.md:101:6. **无审批通道的后果**：`internal/tools/gate.go:144` 逐字「`L2 审批通道尚未接入（票 21），已拒绝执
+HEAD:docs/evidence/s1/174-pointer-honesty-accept-v1.md:131:  ⇒ 那句话在**今天的默认形状**（审批通道未接线＝恒拒，`gate.go:135-144` 逐字"尚未接入（票 21），已拒绝�
+HEAD:docs/evidence/s1/174-pointer-honesty-accept-v1.md:160:- 被告＝**没有**：判据用的是真 `Bridge`＋真 `NewPathCanonicalizer`＋真 `fs.read`＋真落盘文件（`task_output_pointer_not
+HEAD:docs/evidence/s1/179-cli-reread-r2.md:110:| `…L2 级…已拒绝执行`（loop 的审批未接入那一形） | **0 / 0 / 0** | `grep -rn "L2 级" --include=*.go internal/agent/loop.go internal
+HEAD:docs/evidence/s1/184-audit-vocabulary-census-c1.md:26:| 8 | `PassThroughUnclassifiedRisk` 生产零赋值 | 非测试命中：`loop.go:125`（字段注释）/`:128`（字段声明）/`:774`（注
+HEAD:docs/evidence/s1/184-audit-vocabulary-census-c1.md:32:调用链（静态坐实，**未跑 go test**，见 §3）：`cmd/wisp → loop.decideRisk`（`loop.go:622`，agent 内建工具）与 `cmd/w
+HEAD:docs/evidence/s1/197-ac5-selfapproval-v1.md:72:| **M5**（`gate.go:718 DecideFromNative`（`:723` 那一支） 让 `Source=="subagent-self"` 直接放行＝把 `Request.Source` 变成权威） | 
+HEAD:docs/evidence/s1/197-ac5-selfapproval-v1.md:100:   `approval.PanelItem` 只服务 `PanelAPI.Head()/View()`（`gate.go:697-699`），**没有任何一条路把它的字段带进快照字节**。
+HEAD:docs/evidence/s1/197-ac5-selfapproval-v1.md:182:| 1 | `:428` 空令牌 → `:249` 要红 | `nativeAPI.Allow`（`gate.go:624`）→ `q.allow` → `allowScoped:376 grants.spend("")` → `equalSecre
+HEAD:docs/evidence/s1/197-ac5-selfapproval-v1.md:212:`L2 审批通道尚未接入（票 21），已拒绝执行`＝`internal/tools/gate.go:144` 的 `NoGate`），
+HEAD:docs/evidence/s1/197-ac5-selfapproval-v1.md:219:`tools.Gate` 的 `NoGate` 缺省（`internal/tools/gate.go:135-145`）确实会"自己返回 `AnswerReject`"，
+HEAD:docs/evidence/s1/197-blocked-carrier-r4.md:50:| 4 | `cmd/wisp/subagent_blocked_197_test.go:120`＝`rt.gate.PendingApproval(ctxCard, tools.Decision{TaskID: id, CorrelationID: id, ...})` | 同一�
+HEAD:docs/evidence/s1/197-blocked-carrier-r4.md:52:| 6 | `cmd/wisp/subagent_blocked_197_test.go:211 cancelCard()` → `internal/agent/approval/gate.go:529`（`ctx.Done` ⇒ `q.abandon`） | 撤卡那�
+HEAD:docs/evidence/s1/197-blocked-carrier-r4.md:93:  （`internal/agent/approval/gate.go:529` 的 abandon 分支 ⇒ `queue.go:427` 返 `AnswerReject`），
+HEAD:docs/evidence/s1/197-blocked-carrier-r4.md:202:2. **L1 确认窗口不会被这枚字段报出来**。现读：`internal/agent/approval/gate.go:218 PendingWindow` 走
+HEAD:docs/evidence/s1/197-blocked-carrier-r4.md:217:7. **孩子活着时那枚 `AdmitTextTask` 的副作用没测**：本腿为孩子的 id 第二次登记，`gate.go:160` 的
+HEAD:docs/evidence/s1/197-blocked-carrier-r4.md:253:   所以**只依赖孩子自己那枚登记**的第一发 `PendingApproval` 有可能撞上 D47 未登记被拒（`gate.go:453` 直接 return rejec
+HEAD:docs/evidence/s1/197-blocked-carrier-r4.md:258:   撤卡那一发自己回 `answer=reject`／`why="任务上下文已结束，审批请求已作废并按拒绝处理"`（`gate.go:529`→`queue.go
+HEAD:docs/evidence/s1/197-subagent-carrier-r3.md:211:   （`internal/panel/doc.go:2/:9`、`internal/agent/approval/gate.go:595`），**今天没有 Go 侧 `PanelBridge` 接口**，
+HEAD:docs/evidence/s1/201-reply-listener-r1.md:30:  → 只剩 gate.go:610 / gate.go:622 两枚定义行（含各自注释行），生产调用者 = 0
+HEAD:docs/evidence/s1/201-reply-listener-r1.md:33:  → 生产构造点只有一枚：cmd/wisp/run.go:406（另 gate.go:108 是包内 Options 默认路径的注释行）
+HEAD:docs/evidence/s1/201-reply-listener-r2-verdict.md:371:   路由侧仍拒（`gate.go:638-649`），泄露的 nonce 也会被 `revokeGrants` 烧掉——**但那是"事后烧"，不是"不给你看
+HEAD:docs/evidence/s1/21-segment1-adversarial-acceptance.md:12:| 2 | L2 展示全参 + `rules_hit`；原生放行执行；伪造面板放行被拒；300s 拒 + 270s 预警 + 重放 | `[ ]` | **正确�
+HEAD:docs/evidence/s1/21-segment1-adversarial-acceptance.md:13:| 3 | 10 个 L1 操作 → 一次确认；L2 永不聚合；单次 ≥50 → L2（R7） | `[ ]` | **正确未勾，且实现站错了轴*
+HEAD:docs/evidence/s1/21-segment1-adversarial-acceptance.md:54:- `e669567`：`gate.go:447-483` 加 `markStarted(incoming)`（L2 放行才记已开工）+ `report.go` 无否决分支，
+HEAD:docs/evidence/s1/212-comments-phantom-citation-v2.md:31:| 3 | 三处注释现在说的是不是真话 | **带条件成立**：三处逐枚对得上、路标全存在、ban #9 全仓不红；**一
+HEAD:docs/evidence/s1/212-comments-phantom-citation-v2.md:110:| `internal/agent/approval/pending_read.go:43-46` | 冻结注真身＝`internal/tools/gate.go:13` | `gate.go:13` 逐字＝`// renders Rule
+HEAD:docs/evidence/s1/212-comments-phantom-citation-v2.md:113:| 同上（**唯一指错处**） | "RulesHit, Reason, **Level 和 SessionOverrideBlocked** are the fields the L2 card shows verbatim, **p
+HEAD:docs/evidence/s1/212-comments-phantom-citation-v2.md:117:⇒ 它们引用的路径逐枚存在（本程另在 §4 逐行复认了 `guard.go:271`／`errors.go`／`loop.go:692-694`／`gate.go:13`�
+HEAD:docs/evidence/s1/212-comments-phantom-citation-v2.md:206:| 7 | `pending_read.go:41-43` 的四枚字段**出处记错**（`gate.go:13` 只覆盖 RulesHit/Reason 两枚；四枚之说在 `cmd/wisp/
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:22:| AC#1「本次」 | 有，但**形状不是这张票要的**：在飞件 `cmd/wisp/approval_reply.go:193 allow(corr)` → `:291 decid
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:23:| AC#1「本次会话内同类」 | **零枚，而且 201/220/222 三枚前置一枚都不造它。** 现读：`memory.InsertGrant`（
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:26:| AC#3「面板送进来的 allow 必须判红」 | **执行者今天就有，票面却把它写成"不许勾"**：`DecideFromPanel`�
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:29:| AC#6「L1 与 L2 分表」 | 具名给票 220 了（`Gate.windows` 无枚举口，`gate.go:64`；`LiveApprovals` 只走 `q.pending`�
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:100:- **包内**：`Request` 结构**早就带 `Reason`**（`gate.go:617-622`），`DecideFromNative` 走 allow 分支时**丢掉它**（
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:105:- 顺带纠正票 §1 那句"`DecideFromPanel` 只有三参"：现签名是 `DecideFromPanel(ctx, Request)`（`gate.go:638`），
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:115:Go 侧真正的牙齿（现读四枚，全部在）：`DecideFromPanel` 的路由级拒绝（`gate.go:638`）＋`PanelAPI` 无 Allow�
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:138:但要说清它为什么抓不到：孩子拿不到答复面（结构上），它的工具面是 `rt.bridge`，而答复面只由 `Ga
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:142:断言"孩子那一侧的 `Request.Source` 声称 native 也不给它发面"。现读：`Request.Source` 的注释逐字 **ADVISORY O
+HEAD:docs/evidence/s1/219-approval-reply-design-adversarial.md:147:**(b) 面板送进来越权 allow**：**今天会红，已被抓住。** 落点同样不加新名：直接以 `Request{Allow:true, Gr
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:32:`gate.go:564-573`、`bridge.go:363` 这几枚，**在当前工作树上不存在对应内容**：
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:39:- `DecideFromPanel` 的实际位置是 **`internal/agent/approval/gate.go:622`**（不是 564）。
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:60:本腿对前程读数**复测了二十余枚关键行号**（DecideFrom* 零生产调用者、gate.go:218/371/452/610/622、
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:77:- `Veto{}` 的**生产构造点：零**（全仓 grep 排除测试，只有 `gate.go:437` 包内自读）——比"零调用者"更强：连�
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:90:| `Gate.DecideFromPanel` | `internal/agent/approval/gate.go:622` | **零** | `queue_test.go:118`、`ticket84_no_owner_test.go:143-144`、`tick
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:91:| `Gate.DecideFromNative` | `gate.go:610` | **零** | `queue_test.go:171`、`ticket84_no_owner_test.go:137-141`、`ticket97_alias_direction_te
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:92:| `Gate.Veto` | `gate.go:371` | **零** | `batch_test.go:171`、`ticket84:147,150`、`ticket87_veto_l2_test.go:87,144,180,212`、`ticket97:131
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:93:| `Gate.PendingWindow`（L1 问的一侧） | `gate.go:218` | **`internal/tools/bridge.go:382`**（`b.gate.PendingWindow(ctx, *dec)`） | — 
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:94:| `Gate.PendingApproval`（L2 问的一侧） | `gate.go:452` | **`internal/tools/bridge.go:397`** ＋ `gate.go:236`（R7 升级内部自调�
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:118:出口：`Gate.Native()` `gate.go:572`、`Gate.Panel()` `gate.go:576`。
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:126:`gate.go:622-639` 逐字（要点）：
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:146:`Request.Source` 的注释（`gate.go:595-600`）逐字：**"Source is ADVISORY ONLY … no branch in this package reads it"**，
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:252:| `risk.Decision` | `assessor.go:90-96`：`Level / RulesHit / Reason / SessionOverrideBlocked` | `SessionOverrideBlocked` **就是 D45 §3 �
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:254:| `tools.Decision` | `internal/tools/gate.go:15-53`：`Tool / Params / Args / Level / RulesHit / Reason / Paths / CorrelationID / TaskID / Mo
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:356:**那是"被问的那一方"给出的理由**（`risk.Decision.Reason`，`gate.go:547 promptFor` 一路带到 `Prompt.Reason` `ui.go:36`）�
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:358:`PanelItem.Reason`（`ui.go:50`）有（**已是面板可见字段**）、`Request.Reason`（`gate.go:605`）**只有 reject 分支被消费*
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:376:  审批族 `approval: PANEL-ALLOW-REJECTED corr=%s claimed_source=%q grant_offered=%v`（`gate.go:624-625`）、
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:481:| 2 | `DecideFromPanel` `gate.go:622`／`DecideFromNative` `:610`／`Veto` `:371`／`PendingWindow` `:218`／`PendingApproval` `:452`／`prom
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:482:| 3 | `Request` 五枚字段、`Request.Reason` 在 `gate.go:605` | `type Request struct` `:601`；`CorrelationID :602`／`Allow :603`／`Gra
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:492:| 12 | `AnswerAllow`／`q.reject`／`q.allow` 那族理由链 | 现读：`AnswerAllow Answer = "allow"` 在 **`internal/tools/gate.go:78`**�
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:521:| **R3** | `:27` | Go 侧现状：`decider.go:115` 写死 `Source:"wisp-panel"`；`bridge.go:174-176` 只判 CorrelationID 非空；`gate.go:
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:529:| **本次** | `:37` | **我说错了**（锚点不存在；语义与"零持久化"这半句成立） | ①锚错：`decider.go:118` 不存�
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:537:| **1**「今天整条审批链路上没有任何『理由』字段（`PanelDecision` 只有 `CorrelationID`＋`Answer`；`DecideFromPanel` �
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:539:| **3**「理由三条去向：①审计（`[audit]` 那族现成 sink）②回给模型（今天只有固定文案 "rejected by the user"，
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:597:  加一枚 `in io.Reader` 字段（默认 `os.Stdin`，照 `run.go:139-140` 那两行 `if s.stdout == nil { s.stdout = os.Stdout }` 的形�
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:600:  ②**零新枚举**——`AnswerAllow`（`tools/gate.go:78`）／`AnswerReject`／`GrantScopeSession` 全是现成的；
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:601:  ③**零 goroutine**——`answer` 通道容量＝1（`queue.go:160` `answer: make(chan answer, 1)`，另 `:491` 重放时同形），而 `
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:611:- ⚠ **两枚必须写进派单的副作用**：①**C18 的 300s 死线在 `Prompt` 之前就已 armed**（`gate.go:478-483` `deadline := g
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:618:- **改哪一段**：`internal/agent/approval/gate.go:610`（`DecideFromNative` 现只打 `corr/allow/claimed_source`）与 `queue.go:393` `r
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:627:  ③查表时机＝`internal/tools/bridge.go:371 route()` 之内、判级之后执行之前，**且必须先读 `risk.Decision.SessionOverri
+HEAD:docs/evidence/s1/219-approval-reply-surface-c1.md:772:| `Gate.Veto` | `gate.go:371` | **`:387`** | grep -n 现取 |
+HEAD:docs/evidence/s1/224-r2-progress.md:49:M4＝验收腿 `224-v1` §2 那一发原样复现：`internal/agent/approval/gate.go:678` 的
+HEAD:docs/evidence/s1/224-session-grant-v1.md:100:1. **"写"那一跳零判据**（最重）。票面写的是"**答复** ⇒ 有一行"，而答复到落行之间有四跳：`replySurface.session`（
+HEAD:docs/evidence/s1/224-session-grant-v1.md:101:   ⇒ 我不接受"读代码看着通"，所以做了**定向突变 M4**：把 `gate.go:678` 的 `id, err := g.grants.Record(ctx, tool, p)` 换成 `i
+HEAD:docs/evidence/s1/224-session-grant-v1.md:208:| 1 | **答复路零判据**：M4（`gate.go:678` 的 `Record` 摘掉，答复照旧放行、盘上零行、还照打 `GRANT-RECORDED`）下 approval 
+HEAD:docs/evidence/s1/224-session-grant-v2.md:56:### M4 复跑（正向：摘掉 `gate.go:678` 的 `Record`）〔我现跑 13:40〕
+HEAD:docs/evidence/s1/224-session-grant-v2.md:112:`Record` 返回 error，答复路会走 `GRANT-RECORD-FAILED`（`gate.go:681-688`）而不是谎报。
+HEAD:docs/evidence/s1/224-session-grant-v2.md:381:- ⚛ **`GRANT-DROPPED` 的「卡片主题在答复前已离开队列」那一支**（`gate.go:674-677` 的 `tool == ""` 分支）：
+HEAD:docs/evidence/s1/224-session-grant-v2.md:424:| **M4** 摘掉 `gate.go:678` 的 `Record` | `internal/agent/approval/gate.go` | 31010→31082 | `git cat-file blob HEAD:…>同路径` | **31010** | 
+HEAD:docs/evidence/s1/241-audio-level-producer-r1.md:96:  - SKIP 点名：`TestLiveWasapiSmoke`（`hotplug_test.go:527`，既有跳过条件 `WISP_LIVE_MIC != 1`，注释逐字"真机冒烟待票 16"�
+HEAD:docs/evidence/s1/241-audio-level-producer-v1.md:573:- **那枚 SKIP**：`TestLiveWasapiSmoke` 的跳过条件是**既有代码**（`hotplug_test.go:526`，只看 `WISP_LIVE_MIC != 1`；注释逐�
+HEAD:docs/evidence/s1/242-grant-binding-v1.md:81:  并在 `panelAPI`（`gate.go:695` 那枚 `Gate.Panel()` 返回的具体类型）上实现成 `p.q.allow(corr, grant)`——
+HEAD:docs/evidence/s1/242-grant-binding-v1.md:84:  （`approval.go:223-224`、`ui.go:155`、`ui.go:164-166`、`gate.go:632`、`queue.go:358` 五处逐字），
+HEAD:docs/evidence/s1/242-grant-binding-v1.md:125:| **M-E** **照票面那一形种能力侧**（本表最重的一发） | `ui.go:167-171` `PanelAPI` 接口加 `Allow(correlationID, grant string) err
+HEAD:docs/evidence/s1/242-grant-binding-v2.md:42:| MU-E | `ui.go:171` → `	Allow(correlationID, grant string) error` ＋ `gate.go:703` → `func (p panelAPI) Allow(corr, grant string) error   { retur
+HEAD:docs/evidence/s1/242-grant-binding-v2.md:136:  ＋ `gate.go:703` 把它实现成真花令牌 `p.q.allow(corr, grant)`）⇒ 2 枚红／88 PASS（真断言句，非编译失败），逐字：
+HEAD:docs/evidence/s1/246-resident-task-source-v2.md:112:顺带本腿现读的接缝默认值（实现者 §7.4 那两条代价，本腿自己核过、判它说得对）：`approval/gate.go:139-145` �
+HEAD:docs/evidence/s1/246-resident-task-source-v2.md:212:   本腿自己核过写腿说得对（现读 `approval/gate.go:135-145` 的 `win <= 0 → DefaultL1Window` 钳位、`approval/queue.go:107/115
+HEAD:docs/evidence/s1/246-veto-channel-in-the-resident-process-r1.md:85:  `gate.PendingWindow`（L1 窗口，`gate.go:246`）／`gate.PendingApproval`（L2 入 C18 队列，`gate.go:496`）；
+HEAD:docs/evidence/s1/248-settings-write-path-r1.md:303:   - 常量与钳位（现读，前人那三行我逐行复认，路径是 `internal/agent/approval/` 不是 `internal/approval/`）：`queue.go
+HEAD:docs/evidence/s1/248-settings-write-path-r1.md:304:   - 记账被丢那两行：`gate.go:668` 与 `:674` 的 `"approval: GRANT-DROPPED ..."`（本腿只读，⛔ 未跑那套仪器）。
+HEAD:docs/evidence/s1/265-267-evidence-index.md:190:  2. **`267-r2` 那枚 C18 正向读数是否恒真**：种 31 ⇒ `lead = 31 − 30 = 1 > 0` ⇒ 那句提示"真到达装配根 stdout"（链 `gat
+HEAD:docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:61:  `q.allow(`（`gate.go:581`、`:615`；`queue.go:343` 是定义）· `q.reject(` ·
+HEAD:docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:62:  `DecideFromNative`（`gate.go:610`，**allow 侧的路由**）· `DecideFromPanel`（`gate.go:622`）·
+HEAD:docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:144:so this refuses"，与 `gate.go:487`/`:522` 的 abandon／expire 路径对得上）。
+HEAD:docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:153:| 宿主答题的那侧 | `DecideFromPanel` / `Native().Allow` 非测试调用者 **0 枚** | 定义在 `internal/agent/approval/gate.g
+HEAD:docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:160:⇒ 这一点很重要：**`DecideFromPanel` 的拒 allow 逻辑（`gate.go:622-636`，含真 grant 也烧掉
+HEAD:docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:282:| 4 问用户会驱动泵 | `gate.go:486` `g.ui.Prompt(ctx, p)` ＋ `:504/:516/:523` `g.ui.Update(...)` → `cmd/wisp/run.go` 的 `cons
+HEAD:docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md:409:`DecideFromPanel` 那枚"allow 一律拒、还给真 grant 烧 nonce"的保险丝（`gate.go:622-636`）
+HEAD:docs/evidence/s1/35-panel-snapshot-pump-r1.md:47:| `internal/agent/approval/gate.go:595` | 注释 | "**a future PanelBridge**" —— 实现者自己承认它将来才有 |
+HEAD:docs/evidence/s1/75-independent-verification.md:574:  …/internal/agent/approval.(*Gate).PendingApproval(…)  /src/internal/agent/approval/gate.go:473 +0x816
+HEAD:docs/evidence/s1/75-independent-verification.md:893:   @ `internal/agent/approval/gate.go:473`，同一用例已跑到 **4m45s**）+ 改前树的 **4m41s**（5a）。
+HEAD:docs/evidence/s1/75-independent-verification.md:906:本段多了：goroutine 栈证据（`PendingApproval` @ gate.go:473，4m45s 越过 300 s 上界）、
+HEAD:docs/evidence/s1/75-independent-verification.md:919:  …/internal/agent/approval.(*Gate).PendingApproval(…)  /src/internal/agent/approval/gate.go:473 +0x816
+HEAD:docs/evidence/s1/75-linux-mutation-check.md:190:  `approval.(*Gate).PendingApproval` @ `internal/agent/approval/gate.go:473`
+HEAD:docs/evidence/s1/75-rootcause-locator-report.md:54:| 600s 超时的真名 | `TestVetoInsideTheWindowWritesNothing (4m48s)`，栈在 `approval/gate.go:473`。**未截断时有四条测试各烧满
+HEAD:docs/evidence/s1/84-ac1-bounded-wait.md:9:`PendingApproval`（`internal/agent/approval/gate.go:432`）**不是**"查一个已存在的待审批项"——它自己
+HEAD:docs/evidence/s1/84-ac1-bounded-wait.md:48:现实现（`gate.go:456` 用 `g.clock.After(g.q.Timeout())` 武装上界；`queue.go:70-87` 的 `NewQueue` 把
+HEAD:docs/evidence/s1/84-ac1-bounded-wait.md:56:| (i) 把上界摘掉 ⇒ 退回"没有上界" | `internal/agent/approval/gate.go:456`：`deadline := g.clock.After(g.q.Timeout())` → `deadline := mak
+HEAD:docs/evidence/s1/84-ac1-bounded-wait.md:57:| (ii) 把 fail-closed 拒绝改成默默放行 | `gate.go:469`：`return tools.AnswerReject, "审批界面不可达，已 fail-closed 拒绝执行"` �
+HEAD:docs/evidence/s1/85-preflight-staticcheck.md:252:- ✅ 一条值得看的死代码 —— `internal/audio/device.go:126 func isDeviceInvalidated is unused`、
+HEAD:docs/evidence/s1/87-adversarial-acceptance.md:48:**锚点**：快照 `internal/agent/approval/gate.go:426` —— 已核对原文件该行确为
+HEAD:docs/evidence/s1/87-adversarial-acceptance.md:188:  而 `reject()` 的全部 5 个上游都是拒绝路线——`gate.go:426`（Veto）、`:584`（`nativeAPI.Reject`）、
+HEAD:docs/evidence/s1/87-adversarial-acceptance.md:273:gate.go:477-480  lead := g.q.Timeout() - g.q.WarningLead(); warn = g.clock.After(lead)   → 300-30=270s 起
+HEAD:docs/evidence/s1/87-adversarial-acceptance.md:274:gate.go:507-519  case <-warn: 发 EventWarning，Text=「审批将在 %d 秒后自动拒绝，请尽快确认」，且 warn=nil（只发一次，
+HEAD:docs/evidence/s1/87-adversarial-acceptance.md:287:同理票面 AC#4 引的 `gate.go:456-460/487-499` 在落地树里是 `477-480/507-519`。记 **允许残留**。
+HEAD:docs/evidence/s1/87-adversarial-acceptance.md:351:| **AC#4** 一个数字都不改；30s 提示若未实现只登记 | 300/30 不许调小 | const 块 `63ef895` vs `1068eb9` **零差异**；纯�
+HEAD:docs/evidence/s1/97-adversarial-acceptance.md:15:| AC#3 | 5 条拒绝路线矩阵逐条点名（每条一个子测试名）+ "其中一条被改成放行 ⇒ 有用例红"的反向变异 | **通�
+HEAD:docs/evidence/s1/97-adversarial-acceptance.md:23:1. **`AnswerAllow` 的产生点全包唯一**：`grep -rn "AnswerAllow"` → 只有 `queue.go:360`（在 `q.allow` 内、且 `it.grants.spend(nonc
+HEAD:docs/evidence/s1/97-adversarial-acceptance.md:27:5. **面板侧根本没有放行口**：`grep "func (.*) Allow("` 只有 `nativeAPI.Allow`（`gate.go:580`）；`panelAPI` 只有 `Reject`（`:588
+HEAD:docs/evidence/s1/ci-read-a1fd5bf-r1.md:202:| 16 | `internal/audio/device.go:45` | U1000 | `77538f1` | 09-19 | 存量 |
+HEAD:docs/evidence/s1/ci-read-a1fd5bf-r1.md:203:| 17 | `internal/audio/device.go:51` | U1000 | `77538f1` | 09-19 | 存量 |
+HEAD:docs/evidence/s1/ci-read-a1fd5bf-r1.md:204:| 18 | `internal/audio/device.go:126` | U1000 | `77538f1` | 09-19 | 存量 |
+HEAD:docs/evidence/s1/ci-read-a1fd5bf-r1.md:254:`internal/audio/device.go:45/51/126`、`frontend/embed.go:4` —— 与本趟 CI 自报 `findings=44` **数与名都对得上**。
+HEAD:docs/evidence/s1/panel-l2-grant-nail-accept-r2.md:422:| 头段的 "NOTHING IS WIRED TODAY" | 同上三条 | 三条独立复算全中；另加我本程自己跑的：`PanelBridge` 在非测试生�
+HEAD:docs/evidence/s2/13-adversarial-acceptance.md:38:`gate.go:151-155/255-259`：`!shouldOpen && g.open` → `closeInnerLocked()` → `inner.Stop()`；gate 内**无任何数据过滤/丢弃路径**�
+HEAD:docs/evidence/s2/13-adversarial-acceptance.md:54:`wasapi_windows.go:422-430` 槽位 Initialize=3/GetMixFormat=8/GetDevicePeriod=9/Start=10/Stop=11/SetEventHandle=13/GetService=14，与 audioclien
+HEAD:docs/reports/2026-09-24-gap-analysis-audit-verdict.md:64:| 13 全屏时自动收起来 | **半真** | 三项提案里**两项已存在**：「手动静默」已有（D43 #8/#10 `Muted`、SPEC-04 
+HEAD:docs/reports/HANDOVER.md:373:  ① 「网页里送进来的 `allow` 今天真能批掉 L2 卡」**为假**——真实形状是**问得到、答不进去**：问那侧在生产（`internal/tools/
+HEAD:docs/reports/HANDOVER.md:767:- **新立两枚要 owner的票（都在票面自带了上下文＋推荐＋不按推荐来的坏处，不催）**：**票 169**（那枚字符＝接手件，本编�
+HEAD:docs/reports/HANDOVER.md:2007:  - **票 290**＝**门装上了、没有一条生产路径能把它拧开**：`SetMuted`/`SetSpeaking` 非测试调用者＝**0**（尺 `git grep -n "SetMuted(" HEA
+HEAD:docs/reports/HANDOVER.md:2018:- **票 290 裁完并翻 `AC#0`/`AC#1`**：落点＝**甲-1**（静音手势＋托盘静音接到本进程已装配的 `gate.SetMuted`，**门侧 `muted` 是唯一�
+HEAD:docs/reports/HANDOVER.md:2039:- **此刻在飞＝1 枚**：**`290-r1`**（票 290 甲-1 落地腿，写 `cmd/wisp`，独占 Go 编译/测试面）——把球侧 `OnMuteHotkey` 与托盘 `OnTrayM
+HEAD:docs/reports/HANDOVER.md:2248:- ★**此刻在飞＝1 枚**：`300-r1`，写面＝`internal/audio/**`＋`probes/300/r1/**`，三件事成对落地＝① `wasapi_windows.go:196` 那枚 `unsafe.Add
+HEAD:docs/reports/frontend-session-log.md:408:| R-05 | `panel.grants.list` | 安全"本会话生效授权" | 工具、路径通配、级、**剩余时间/会话结束失效** | `internal/agent/approva
+HEAD:docs/reports/frontend-session-log.md:1083:从 `pending` 摘走——那一支有数值：C18 超时 300s、一律判拒绝（`internal/agent/approval/gate.go:30-32`
+HEAD:docs/reports/pending-and-issues.md:2412:  `PendingApproval @ gate.go:473 ← bridge.go:340` 的栈，**正好复现票 75 那个形状**）；
+HEAD:docs/reports/pending-and-issues.md:2442:  `TestVetoInsideTheWindowWritesNothing (4m45s)` 卡在 `approval.(*Gate).PendingApproval @ gate.go:473`
+HEAD:docs/reports/pending-and-issues.md:5435:     落点在 `cmd/wisp/run.go:110/234/306`、`internal/agent/approval/queue.go:472`、`internal/audio/device.go:45/51/126`、`frontend/embed.go:4`（`// 
+HEAD:docs/reports/pending-and-issues.md:6283:  **③ 我从它留的空格 ② 开了票 146，并且把它报窄的范围读大了**：它只点了两枚切片。我 18:2x 逐字段读被拷贝的那
+HEAD:docs/reports/pending-and-issues.md:6355:  我票面那张表点了 `Params`(map)／`Args`／`RulesHit`／`Paths`／`Capabilities` 五枚，**漏了 `Blacklist BlacklistNote` 里那三枚 `[]strin
+HEAD:docs/reports/pending-and-issues.md:7740:- **AC#3 的答案是分层的，不是一枚数**（证据件 `docs/evidence/s1/161-doorbell-census-r1.md`，锚 `7e8cfdc`，三枚提交 `8995b366 cd9997
+HEAD:docs/reports/pending-and-issues.md:7741:  ⇒ 我本轮自己现读了它引的那三处并确认：`cmd/wisp/run.go:355` 接了 `consoleApprovalUI`（**问话会印**）、`:357` 传的是 **`ap
+HEAD:docs/reports/pending-and-issues.md:7864:- **编排者独立复现（本轮现跑）**：`git grep -nEw 'OpenScope|CloseScope' HEAD -- internal cmd 排测试排 risk` ⇒ **三处**：`cmd/wisp/pa
+HEAD:docs/reports/pending-and-issues.md:8064:- **它的三格落点裁定（我只复述、不改判）**：寿命绑在 `CloseTask` 那一跳（**同文件**，落 G6 射程；`DisposalScope` 被否�
+HEAD:docs/reports/pending-and-issues.md:8270:- **翻勾裁定（票 183 六格一次翻齐，凭据逐格写在票面 AC#8 下面那块 14:1x 引文里）**：**AC#9／AC#2b／AC#4／AC#6／AC#2／AC#
+HEAD:docs/reports/pending-and-issues.md:8626:  ① `models`／`efforts`＝票 187 的射程；② `pending[].taskId`／`callId`——**真源齐全**（`bridge.go:331`→`gate.go:550`），
+HEAD:docs/reports/pending-and-issues.md:9038:- ⚠ **又一枚"注释声称盘上核不到的数"**：`internal/panel/subagent_roster_197.go:36` 写着那是 C17 的"第 5 枚 composer 方法"，而�
+HEAD:docs/reports/pending-and-issues.md:9050:- ⚠ **它留给我／owner 的一格（本条只登记未裁）**：`blockedOnApproval` 今天**只报 L2**——`PendingWindow`（`gate.go:218` 一带�
+HEAD:docs/reports/pending-and-issues.md:9077:  **但射程只管 `frontend/` 文本**，Go 侧那扇门今天不管：`decider.go:115` 把来源**写死** `Source: "wisp-panel"`、`bridge.go:174-176` 
+HEAD:docs/reports/pending-and-issues.md:9080:- ⚠ **"理由"这一维今天整条链路上不存在**：`PanelDecision` 只有 `CorrelationID`＋`Answer`（`decider.go:113-116`）、`DecideFromPanel`
+HEAD:docs/reports/pending-and-issues.md:9099:    「**问**」这一侧确在生产——`internal/tools/bridge.go:382` 真调 `gate.PendingWindow`（L1）、`:397` 真调 `gate.PendingApproval`（L2�
+HEAD:docs/reports/pending-and-issues.md:9100:    「**答**」这一侧**在生产路径上是零调用者的死代码**——全仓（`internal`／`cmd`／`tools`，剥 `_test.go`）`DecideFromNative
+HEAD:docs/reports/pending-and-issues.md:9102:  ② 我当时引的 `decider.go:115`／`bridge.go:174-176`／`gate.go:564-573` **枚枚对不上现树**，且 `internal/agent/approval/decider.go` **这
+HEAD:docs/reports/pending-and-issues.md:9104:  ③ "「允许」这一支今天没有任何门挡着"也**假**：`Q-49` 丙那一族的门**已经写好了**——`ui.go:143` 的 `NativeAPI`（`Allow
+HEAD:docs/reports/pending-and-issues.md:9121:  ① **AC#5 今天＝〔仅文档〕**：孩子**结构上**拿不到答复面（递给工具的 `Gate` 接口只有 `PendingWindow`／`PendingApproval`�
+HEAD:docs/reports/pending-and-issues.md:9124:  ③ **名册"卡在等批准"那一格比 A418 说的更漏**：`internal/panel/subagent_roster_197.go:190-210` 是**用 `card.CorrelationID` 建表、�
+HEAD:docs/reports/pending-and-issues.md:9184:  ⑥ **假腿两枚**：**(a) 子代理自批今天什么都抓不到——我此前那句"零尺会红"成立**，且它是**能力缺口**（`gate.go:58
+HEAD:docs/reports/pending-and-issues.md:9221:- **`220-c1` 三枚复认**：名册**建索引用卡键、查用任务键**（`internal/panel/subagent_roster_197.go:190` `waiting[card.CorrelationID]` vs
+HEAD:docs/reports/pending-and-issues.md:9795:- **AC#2 不成立的那一发是本票命门**〔验收腿现跑〕：把「internal/agent/approval/gate.go:678」的「Record」摘掉 ⇒ **盘上一行
+HEAD:docs/reports/pending-and-issues.md:9817:**那一枚"仪器终于有牙"的正面对立**：同一发突变（摘掉「internal/agent/approval/gate.go:678」的「Record」），「224-v1」读到
+HEAD:docs/reports/pending-and-issues.md:10038:1. **"默认档不开麦"这件好事，挡住它的不是默认值，是"没有路径"**。`voice.enabled`／`wake_word.enabled` 的**产码读取处只�
+HEAD:docs/reports/pending-and-issues.md:10043:**其余四问**：P2 甲＋不做（本票不动 `liquidDriven`，"接好了"的判据挂 `Listening`；`Armed` 归口唤醒词票——`EvKwsEnabled` **
+HEAD:docs/reports/pending-and-issues.md:10244:- **另外三裁（详情在票面，此处只留归口与凭据枚数）**：**F7 裁甲＝新增第五枚 `Events` 键**——我答了腿分不清的�
+HEAD:docs/reports/pending-and-issues.md:10848:**3. 它推翻我票面三句（都成立、三笔归我）**：① AC#0 题面"常驻卡片 UI／热键答复／**托盘「允许一次」**各一处"那
+HEAD:docs/reports/pending-and-issues.md:10857:**5. 另定形一枚我票面自己的洞**：票 256 AC#2 原句"`GRANT-DROPPED` 必须不再出现"**读下来做不到**——那行有**两形**，第
+HEAD:docs/reports/pending-and-issues.md:11080:**1. 收 `258-a2`（606 行／55,101 字节，六枚 commit `3736f0dd`→`06d89e25`→`5c3c22d8`→`761b5d45`→`0c72c253`→`5d4f5343`，占位符 grep�
+HEAD:docs/reports/pending-and-issues.md:11114:**1. ★具名批准（`220-r1` 甲形，五样齐）**：**文件**＝`internal/agent/approval/gate.go`（新增**一枚只读枚举口**，把 `Gate.win
+HEAD:docs/reports/pending-and-issues.md:11139:**2. `228-a5` 交回来的落地料（票 228 AC#2／待派那格的开工前提，我按〔腿报〕＋两处复认入账）**：托盘加一枚"允许�
+HEAD:docs/reports/pending-and-issues.md:11168:- **"开"不缺**：控制台形状**已有触发且时机对**（`internal/agent/approval/gate.go:283` 置窗口早于 `:294` 的 `ui.Prompt`，而后者
+HEAD:docs/reports/pending-and-issues.md:11309:- **收 `212-v1c`**（第三任接第二任骨架取数填满，88 行零真占位；fd8fce1f 21 件）：三发探针 (a) AppliedSteps 静默 ✓ (b) `in
+HEAD:docs/reports/pending-and-issues.md:11311:- **票 212 终态**：六格全勾（AC#1..AC#5＋翻勾节）；**AC#3 带条件＝裁ⓐ（regex 排除 `...`/`…`/`*` token，补一枚缩写形 sile
+HEAD:docs/reports/pending-and-issues.md:11410:- 三处"半假诚实化"我逐处 sed 现读，**都改成了实话且指名对象存在**：`internal/agent/tools.go:88-93`（"D37 的 17 类里没有 i
+HEAD:docs/reports/pending-and-issues.md:11470:- ⚠ **我自己抓到两把坏尺（记我）**：① 第一发我用 `grep 'grants: o.Grants'` **零命中**——真身在 `gate.go:160`，是**结构
+HEAD:docs/reports/pending-and-issues.md:11474:- **`Grants`＝互斥的一半，今天不可派**：账本唯一产码构造点在门构造点**之后约 129 行**（`run.go:473→487` vs `resident_win
+HEAD:docs/reports/pending-and-issues.md:11477:- **AC#2 定形（认下普查件的判语）**：唯一有效正控＝`ra.gate.Queue().Timeout()`（`gate.go:169`＋`queue.go:126`）；`Window()` 被 `g
+HEAD:docs/reports/pending-and-issues.md:11492:- **那枚"注释指错出处"成立**：`internal/agent/approval/pending_read.go:41-43` 把 `Reason`/`Level`/`SessionOverrideBlocked` 连同 `RulesHit` �
+HEAD:docs/reports/pending-and-issues.md:11627:- 它报的事实我先用**错的尺**量了一遍（见 §3），改用真名 `channelNames` 复跑后**腿是对的**：`internal/agent/approval/approv
+HEAD:docs/reports/pending-and-issues.md:11629:- **具名解冻（五样齐）**：**文件**＝`internal/agent/approval/approval.go`（把 `channelNames` 那张 `var` 表改成**读取时求值**的�
+HEAD:docs/reports/pending-and-issues.md:11639:**5. 排程**：在飞＝`260-r4`（写，`internal/agent/approval`＋`cmd/wisp`）＋`263-v1`（唯一验收腿）。其后依次 `260-v1`（攻 `260-r3`
+HEAD:docs/reports/pending-and-issues.md:11663:- ★ 一枚**两时刻都真**的漂移（按第 75 条只写"哪一天哪一发"，⛔ 不写成互相推翻）：`channelNames` 全仓命中在 **12:06
+HEAD:docs/reports/pending-and-issues.md:11716:- 三档只选一档，凭据〔仅读码，未跑〕：不是"悄悄放宽"（`gate.go:673` 放行本次、不记任何规则＝fail-closed 方向），�
+HEAD:docs/reports/pending-and-issues.md:11719:- 两句话都由 `err == nil` 那一路自然产出（`gate.allowSession` 先放行、再落 `GRANT-DROPPED`、然后 `return nil`＝`gate.go:673-677`）
+HEAD:docs/reports/pending-and-issues.md:11722:- 三条正面理由（⛔ 不是"别的做不到"）：① **它是唯一一形把那两句假话直接变成真话**——写侧接上即兑现，不用
+HEAD:docs/reports/pending-and-issues.md:11760:- ★ **我自己复认的是机制两枚（读码，⛔ 不是种子读数）**：① `grep -n "ConfirmTimeout\|L1Window\|Risk\." internal/config/validat
+HEAD:docs/reports/pending-and-issues.md:11910:- 关键读数（腿的，我复认）：**`WarningLead` 生产里恒零值**——全仓非测试零枚生产者 ⇒ `queue.go:88` 兜成 `DefaultApprova
+HEAD:docs/reports/pending-and-issues.md:11911:- **裁 ⓐ（值域进门）**：落 `internal/config/validate.go` 的 `validateRisk`（今天只断 `permission_mode`），带＝**下界 31s／上界 3
+HEAD:docs/reports/pending-and-issues.md:11913:- ★ 它顺带顶回我票面一处：§现量 3 那句 `resident_approval_windows.go:310` **行号已漂**（真身 `:460`；`run.go:616`/`gate.go:528`/
+HEAD:docs/reports/pending-and-issues.md:11932:- 处置（已做）：新派只读腿 **`267-a2`**（⛔ 禁跑任何 go 命令，`267-r1` 是当机唯一跑 go 的腿），任务＝逐枚读那八处�
+HEAD:docs/reports/pending-and-issues.md:11982:**2. 我复跑的两把（其余转述一律标〔腿报〕）**：★**C18 的 300 s 在生产可见文案里零枚字面**这条我独立复认——尺
+HEAD:docs/reports/pending-and-issues.md:12021:- ★**它顺手替票 267 AC#2 拿到了那半格没人拿得到的东西**：种 31 时逐字 `[warning] 审批将在 30 秒后自动拒绝，请尽快�
+HEAD:docs/reports/pending-and-issues.md:12076:- ★它推翻 census 六条，其中一条是**剔除**：`:33` 那枚「`DefaultL1Window`=3s 同源瑕疵」属整条误读（fallback 走 `gate.go:146`
+HEAD:docs/reports/pending-and-issues.md:12130:- **理由**＝ⓑ 那一刀今天**结构上做不到**：答复面只带 `Request{CorrelationID, Allow, Grant, Reason, Source}`（`gate.go:715-721`）�
+HEAD:docs/reports/pending-and-issues.md:13290:**8. 〔待人拍板〕`Q-79`（与 `Q-76` 同族，⛔ 不阻塞 35-r1）**：面板上那张审批卡的**「拒绝」按钮今天点了没有用**。�
+HEAD:docs/reports/pending-and-issues.md:13821:- `:45` 伪造面板批准：**与 `:63` 的 (d)-1 是同一枚物理缺陷 ⇒ 落点 0，就地归口**（铁证＝`panel_inbound_guards_35r3_test.go:80
+HEAD:docs/reports/pending-and-issues.md:14356:- 交件＝`bb1d5ef8`／`eb2a217a`（件 `probes/246/raisercensus2/01-census.md`），零 Go 命令、零翻框、零 push。**我抽验四处逐字对上
+HEAD:docs/reports/pending-and-issues.md:14541:  - `Gate.Replay` ⇒ **〔备用路，不删〕且证据更硬**：定义现量 **`HEAD:internal/agent/approval/gate.go:755`**（台账 `:11139` 抄 `:74
+HEAD:docs/reports/pending-and-issues.md:14584:- **AC#2＝成立**，且这一格的价值全在**能力侧**（票面要求的正是"不是词面"）：`MU-D2a`（`PanelItem.Permitted bool`）⇒ `pan
+HEAD:docs/reports/pending-and-issues.md:14586:- **我这轮欠他的四处行号漂（腿现量顶回，我复认，全部按"行号与短语同一次取数"重取）**：载具 `subagent_selfapproval
+HEAD:docs/reports/pending-and-issues.md:14805:- **我自己复的尺（⛔ 没按通知追认翻勾）**：`SetMuted(`/`SetSpeaking(` 的非测试命中＝**只有定义行 `internal/audio/gate.go:168
+HEAD:docs/reports/pending-and-issues.md:14829:- **我自己复跑的承重尺（腿的结论我逐把对拉，全复现）**：`EvMuteKey` 在冻结表里只有三枚边（`internal/statemachine/table
+HEAD:docs/reports/pending-and-issues.md:14886:- ★**M1 这一发是这一波最值钱的一条，它顶正的判据不是产码**：票面 `AC#2` 的尺原文逐字＝「尺＝非测试调用者枚�
+HEAD:docs/reports/pending-and-issues.md:14913:- ★**新立票 297（`73db600a`）＝那枚 0.3677 的安静底**。三件现量：①`LevelOfSamples` 是纯 RMS/`LevelFullScale`、无任何加性底�
+HEAD:docs/reports/pending-and-issues.md:15066:- ⚠**我⛔ 复跑、所以⛔ 当结论的它的读数（三处，全部转给落地腿自己重取）**：① "wav 注入形不能把 0.3677 归因到
+HEAD:docs/reports/pending-and-issues.md:15121:- **⛔ 顺手多算一格**：`:593` 那行夹具 ledger 里带着一枚行号锚 `hotplug_test.go:527`，它 inert 与否**我没量**⇒ 写进票 301 
+HEAD:docs/reports/pending-and-issues.md:15130:- ★③**假靶一枚（我派单的错，记我）**：我在派单表② 里把 `TestEndpointsPairQueryable` 当成"要真设备"的候选，实测它 
+HEAD:docs/reports/pending-and-issues.md:15179:- ⚠ 载入形风险（`cmd/wisp` 缺 sherpa DLL ⇒ `0xc0000135` 且零 `--- FAIL` 那枚旧例）在这一枚上⛔ 适用：尺＝8 枚测试文件的
+HEAD:docs/reports/pending-and-issues.md:15437:- ★它量到一枚**新缺口**（这条比翻勾值钱，我用读码复核了原因）：把常量 `waveFormatFloat` 由 3 改成 1 ⇒ **整包 41 �
+HEAD:docs/reports/survey-2026-09-28-dsh-ui-packages.md:249:- 撤销：`grep -rniE "undo" --include=*.go internal cmd | grep -v _test.go` = **20 行**，**逐名全不是布局撤销**——审批否�
+HEAD:docs/reports/survey-2026-09-28-minimax-agent-modules.md:481:  面板侧出口在 `internal/agent/approval/ui.go`；`internal/agent/approval/gate.go:595` 注释里还有一句
+HEAD:internal/agent/approval/pending_read.go:43:// internal/tools/gate.go:12-13 (ticket 17) names exactly TWO fields the card
+HEAD:internal/agent/approval/ticket220_l1_window_read_test.go:4:// enumeration the L1 short window never had: gate.go:302-316 opens and closes
+HEAD:internal/agent/approval/ticket87_veto_l2_test.go:126:// (gate.go:451, tools/bridge.go:397), which is not the string the queue issues
+HEAD:internal/agent/approval/window_read.go:14:// (gate.go:346-360) and read by name by Veto (gate.go:415ff), which needs the id
+HEAD:internal/agent/approval/window_read.go:38:// per orDefaultText at gate.go:275); TaskID is the task the call belongs to, so a
+HEAD:internal/config/validate.go:109:// condition. internal/agent/approval/gate.go:528 arms the pre-timeout warning
+HEAD:internal/config/validate_267_test.go:120:// evaluates the very expression internal/agent/approval/gate.go:528 branches
+HEAD:internal/panel/pump.go:53:// static window length (gate.go:274, :387, :510-513), and the live countdown
+HEAD:internal/panel/pump.go:54:// is gate.go:257's clock.After, which exposes no "how much is left". What the
+HEAD:internal/panel/subagent_blocked_220_test.go:12://     back to the task id (internal/agent/approval/gate.go:275 and :471). The
+HEAD:internal/panel/subagent_roster_197.go:180:// decision with no correlation id inherits the task id (gate.go:275, :471) - and
+HEAD:scripts/portable-tests.sh:594:    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windo
+=== R2. is there a test that verifies the 255 roster anchors ===
+HEAD:cmd/wisp/config_receipt_255_test.go:58:	"config_readers_255.go": true,
+HEAD:cmd/wisp/config_receipt_255_test.go:129:			t.Errorf("hot row %q has no verdict in hotRowClaims (cmd/wisp/config_readers_255.go): ticket 255 AC#1 forbids cl
+HEAD:cmd/wisp/config_receipt_255_test.go:245:			t.Errorf("section %q (field %s) is read by %v in production, the roster names %v: something moved and cmd/wisp/c
+HEAD:cmd/wisp/config_reload.go:177:// ticket was立 for. The hot list is now filtered by cmd/wisp/config_readers_255.go's
+HEAD:cmd/wisp/config_reload_223_test.go:367:		// reader (cmd/wisp/config_readers_255.go's `ball` row, 票 180's census
+HEAD:cmd/wisp/panel_geometry_255_test.go:376:	src := readHostFileForGeometry255(t, filepath.Join(hostPkgDir255(t), "config_readers_255.go"))
+HEAD:cmd/wisp/panel_geometry_255_test.go:380:				t.Errorf("config_readers_255.go:%d still carries the retired geometry evidence %q as if it were live: %s",
+=== R3. d22scan / emoji面 risk for new files (does it scan _test.go? ban list scope) ===
+HEAD:tools/d22scan/main.go:44://	                      _test.go INCLUDED (D23). This is the one ban whose
+HEAD:tools/d22scan/main.go:48://	                      there in scan_test.go rather than in the footer,
+HEAD:tools/d22scan/main.go:55://	                      internal/ and cmd/ ONLY - tools/** and _test.go are
+HEAD:tools/d22scan/main.go:88://     can go red. scan_test.go's TestTrackedPathsAreNeverSkippedByTheIgnoreFilter
+HEAD:tools/d22scan/main.go:176:// emojiRe is ban #8's character class.
+HEAD:tools/d22scan/main.go:185:// any further band belongs in scan_test.go's pin, not here.
+HEAD:tools/d22scan/main.go:186:var emojiRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1
+HEAD:tools/d22scan/main.go:249:// caller is scan_test.go's ticket-142 case, which must run THOSE SAME WALKS over
+HEAD:tools/d22scan/main.go:447:			kind = "Go files, comments and _test.go included"
+HEAD:tools/d22scan/main.go:479:// scan_test.go against a SYNTHETIC exempt scope (TestExemptScopeCannotOutliveItsAbsentTree),
+HEAD:tools/d22scan/main.go:563:// literal label in scan_test.go rather than by inspecting this function body.
+HEAD:tools/d22scan/main.go:596:			kind = "Go files, comments and _test.go included"
+HEAD:tools/d22scan/main.go:687:		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+HEAD:tools/d22scan/main.go:889:// convicted. scan_test.go's TestBan9PrefixTablesAreTheSameList is the nail.

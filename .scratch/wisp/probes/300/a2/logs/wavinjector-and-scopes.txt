@@ -1,0 +1,119 @@
+=== W1. wavinjector_test.go: test names ===
+77:func TestWavInjectorFrameExact(t *testing.T) {
+123:func TestWavInjectorRateConversion(t *testing.T) {
+151:func TestWavInjectorBackpressureDropCounted(t *testing.T) {
+219:func TestWavInjectorCtxCancel(t *testing.T) {
+243:func TestWavInjectorBadFile(t *testing.T) {
+277:func TestBoundedWindowInvariants(t *testing.T) {
+=== W2. wavinjector_test float/extensible coverage ===
+46:func sineI16At(n, rate int, freq, amp float64) []int16 {
+49:		out[i] = int16(math.Round(amp * 32767 * math.Sin(2*math.Pi*freq*float64(i)/float64(rate))))
+=== W3. windows-tagged audio test func names ===
+-- hotplug_test.go
+199:func TestHotplugReenumerateOnce(t *testing.T) {
+260:func TestHotplugStaleHandleFailsLoudly(t *testing.T) {
+334:func TestHotplugReenumerateFailureNamesDevice(t *testing.T) {
+378:func TestOpenOccupiedAndPermissionDenied(t *testing.T) {
+427:func TestEndpointsPairQueryable(t *testing.T) {
+443:func TestPinnedThreadStable10s(t *testing.T) {
+523:// WISP_LIVE_MIC=1, it exercises the actual WASAPI COM path end to end. CI
+525:func TestLiveWasapiSmoke(t *testing.T) {
+526:	if os.Getenv("WISP_LIVE_MIC") != "1" {
+527:		t.Skip("live WASAPI smoke requires WISP_LIVE_MIC=1 and a real microphone (真机冒烟待票 16)")
+573:func TestCaptureLoopWavIntegrity(t *testing.T) {
+-- capturelevel_windows_test.go
+19:func TestAC247RealCaptureLoopEmitsLevels(t *testing.T) {
+=== W4. K1 scope bodies ===
+=== K1. portable-tests.sh scope bodies 230-270 ===
+winsec_scope=./internal/winsec/...
+
+scope=()
+pinned=''
+case $mode in
+core)
+    scope=(
+        ./internal/agent/ ./internal/agent/approval/
+        ./internal/llm/... ./internal/config/...
+        ./internal/memory/... ./internal/observe/... ./internal/secret/...
+        ./internal/risk/... ./internal/statemachine/...
+        ./internal/tools/... ./internal/models/...
+        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+        ./internal/panel/... ./internal/ball/ ./internal/perm/
+        ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
+        ./internal/session/ ./internal/projctx/
+    )
+    pinned=$core_pin
+    ;;
+windows)
+    scope=(
+        ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
+        ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
+        ./internal/session/ ./internal/projctx/ ./internal/audio/
+    )
+    pinned=$win_pin
+    ;;
+cli)
+    # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
+    # the test binary dies at LOAD time without the sherpa DLLs on PATH (ticket
+    # 98), and that script stages them and refuses to run if they are not there.
+    scope=(./cmd/wisp/)
+    pinned=$cli_pin
+    ;;
+winsec)
+    # Ticket 251 AC#1: winsec_pin existed with no branch to resolve it, so the pin
+    # was never compared to anything this script actually ran. Glob scope + that
+    # pin, both read from the declarations above; GUARD C then bites on a split,
+    # a rename or a package that stopped resolving, in BOTH directions.
+    scope=("$winsec_scope")
+    pinned=$winsec_pin
+=== K2. GUARD region 355-420 ===
+=== W5. K3 fixture ledger ===
+=== K3. fixture ledger region 580-600 ===
+        echo "portable-tests.sh: test, or take the entry out and say where its coverage lives."
+    } >&2
+    rm -f "$resolved"
+    exit 1
+fi
+
+# name|package|platform|class|reason
+#   class: fixture = the machine or OS cannot supply the subject at all
+#          opt-in  = deliberately slow or real-network, gated by an env var
+#          reexec  = not a test, the child-process entry point of another test
+ledger=(
+    "TestDefaultDeadlineWallClockMeasurement|./internal/agent/approval/|any|opt-in|300s wall-clock measurement gated by WISP_84_MEASURE=1 (ticket84_no_owner_test.go:224, docs/evidence/s1/84-ac1-bounded-wait.md); it measures a deadline instead of asserting a property, so a CI run of it produces a duration nobody checks"
+    "TestSubprocessCrashWriter|./internal/memory/|any|reexec|child-process entry point of TestCrashRecoveryKillMidWrite (concurrent_test.go:186); not a test of its own, it skips whenever it is not the re-exec'd child"
+    "TestHelperProcess|./internal/proc/|windows|reexec|child-process entry point of the job-object cases (jobscope_windows_test.go:87, //go:build windows); skips unless re-exec'd with the helper env var set"
+    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio endpoint, so the case has no subject there. Real-hardware smoke is ticket 16's"
+    "TestRealDownloadVadThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:120); CI has no business pulling model archives from a third-party mirror"
+    "TestRealDownloadPuncArchiveThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:147); same reason as the VAD row"
+    "TestSyncRegistryProbeLive|./internal/risk/|windows|fixture|P12 live registry evidence; on ubuntu it is now out of scope by platform instead of by skip (ticket 93 AC#2 moved it verbatim into syncdirs_windows_test.go), and on a Windows host whose HKCU Accounts key carries no UserFolder the hive has nothing to say. Measured on a windows host at HEAD 84e43af: --- SKIP at syncdirs_windows_test.go:133. As of ticket 110 AC#4 the windows leg carries ./internal/risk/ in its scope, so this row is re-verified against the compiled WINDOWS test binary (go test -list) and printed with its reason in that step's log - which is the step-level answer R-93-4 asked for. Remedy for a real run: a host with a sync record, or fold the shape check into the fixture-driven case. next= on ticket 93"
+    "TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|./internal/risk/|linux|fixture|needs a handle-resolved form of an existing directory, which POSIX has no object for (pathresolver_rewrite_account_test.go:138). AC#2's remedy is a platform-layer move, impossible from this ticket: the file matches this ticket's forbidden pattern internal/risk/pathresolver*.go. The case RUNS AND PASSES on windows, so the assertion is not lost, it is only un-evaluable here. next= an owner for that file"
+    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The case is AC#3(ii) with a REAL junction: on windows it builds one with cmd /c mklink /J and asserts the switch is refused (runs and passes here). On POSIX there is nothing to refuse, because the detection it exercises is itself a Windows implementation - internal/tools/paths_workspace_test.go:198 skips with 'C26's reparse detection is a Windows implementation (risk.pathresolver_other.go reparseComponents returns nil elsewhere); nothing to deny on linux'. Registered rather than deleted because the file's own comment promises 'the skip is reported, never averaged away', and runtests.sh making every SKIP fatal is what turns that promise into a red step: an unaccounted skip on the ubuntu leg (test-core step 7, measured PASS=578 FAIL=0 SKIP=1 on run 35599458439) is exactly what this row exists to name. OWNER of the POSIX half: whoever lands reparseComponents in risk.pathresolver_other.go - that file is forbidden to this ticket (internal/risk/pathresolver*.go, same wall as the row above), so the POSIX-equivalent criterion is NOT faked here. The row is re-verified against the compiled LINUX test binary on every run: delete the skip, and the case starts running here; delete the case, and GUARD's staleness check goes red."
+    "TestD34WriteMatrix|./internal/tools/|linux|fixture|the table needs a second volume from otherVolumeDir (fs_write_test.go:140/151), and the volume-identity call it uses is a Windows API - on POSIX there is no object to ask. In a CI ubuntu container /tmp and / are one filesystem anyway. It RUNS AND PASSES on a two-volume windows host, so if a windows host ever has a single volume this entry does not cover it and the step goes red on purpose"
+=== K4. any count pins mentioning audio/10 ===
+=== W6. ticket 301: audio in windows tier + denominator ===
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:1:# 票 301 — 一枚包已被某个 scope **认领**，于是它里面 `//go:build windows` 的那一半**永远不会在 CI 上被执行**，而 GUARD D 因为判定单位是**导入路径**而⛔ 看得见这件事：把 `./internal/audio/` 拉进 `windows)` 档是唯一能让它开口的形
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:5:**为什么要紧**：票 300 的落地腿正要往 `internal/audio` 里交一枚 `//go:build windows` 的判据。按本票现量，那枚判据交进来以后**在 CI 上从未被执行过一次**，而 `--scope=census` 那枚门⛔ 会为此变红 ⇒ 下一个读"用例已经进仓了"的人会把一件**只有本机成立**的事当成有持续防护的事。本仓已经吃过三次同形（`winlive` 无 tag 档、真机读数只有本机有、票 33 `AC#13` 那句"②零覆盖"），这一枚是**把第三次的根因收口**。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:10:- ★**`internal/audio` 已被 `core` 认领**（尺＝`grep -n 'internal/audio' scripts/portable-tests.sh` ⇒ `core` 档清单里确有 `./internal/audio/...`），而 `core` 那档跑在 `ubuntu-latest`（尺＝`sed -n '402,403p' .github/workflows/ci.yml` ⇒ `test-core:` ＋ `runs-on: ubuntu-latest`）。⇒ **本票那枚新用例落进 `internal/audio` 之后，CI 上没有任何一步会跑它。**
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:11:- **HEAD 上 `internal/audio` 的 windows-tagged 名册**（尺＝对 HEAD blob 逐枚 `git show HEAD:<path> | head -3 | grep -c 'go:build windows'`，⛔ 对工作树量——本票起手时那棵工作树里正躺着票 300 落地腿的未提交件）：**七枚 `_test.go`，其中 2 枚 tagged**＝`capturelevel_windows_test.go`／`hotplug_test.go`。⚠ 后者**文件名不带 `_windows` 而里面有 tag** ⇒ 按文件名分类的那把尺会读错这一枚（我已经踩过一次）。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:14:- ⚠**仓里已经有一行是按"audio 会在 windows 档"那个形状写的**（尺＝`sed -n '593p' scripts/portable-tests.sh`）：夹具 ledger 逐字起头 `TestLiveWasapiSmoke|./internal/audio/|windows|fixture|`，其后那句理由里还带着一枚**行号锚** `hotplug_test.go:527`。⇒ 这一枚今天到底 inert 与否＝本票 `AC#0` 的一格必答，⛔ 现在当成已知。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:15:- ⛔**"改一枚清单"不是零成本**（这句写给派单，也写给下一个读的人）：把 `./internal/audio/` 拉进 `windows)` 档，会同时把该包**其余** windows-tagged 用例（上面那 2 枚，以及票 300 正要交进来的那一枚）一起拉进 `test-windows` 那个 job 的分母——每一枚都可能带自己的前置条件（真麦克风、活设备、`WISP_LIVE_MIC=1`）。代价枚数＝`AC#0` 的产物，⛔ 由本票票面替它填数。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:19:- [x] **`AC#0` 只读代价普查（这一格⛔ 任何产码，⛔ 任何 go 编译面）**：把三张表交回——① **会被拉进分母的枚数与名字**：对 HEAD blob 逐枚列出 `internal/audio` 里 windows-tagged 的**顶层用例名**（尺要写清是 `grep -n '^func Test'` 还是 `go list`，后者算编译面＝本票⛔）；② **每一枚的前置条件**：它读不读 `WISP_LIVE_MIC`、要不要真设备、会不会在托管 runner 上因缺音频端点而**红**（⛔ 把"skip"当"绿"——按本仓既有口径，`skipped` 与"从未求值"是两回事）；③ **`:593` 那行 ledger 今天到底 inert 与否**（判据＝它声称的那个用例在当前档下有没有被任何档跑到）。＋**`:593` 里那枚行号锚 `hotplug_test.go:527` 在 HEAD 上指向的是不是那件事**（锚腐烂先例＝票 255 `AC#6` 那一族）。判据＝每条都带"哪把尺＋射程目录＋blob 还是工作树"，⛔ 裸数。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:20:- [x] **`AC#1` 落地形（只在 `AC#0` 交出代价、并经编排者裁"落／不落"之后才开工）**：**同一笔 commit** 里改两处——`windows)` 档清单加 `./internal/audio/` ＋ `win_pin` 补上 `github.com/CarlosShao/wisp/internal/audio`。⚠ 那句要求的原文**跨两行**、逐字是这样（尺＝`sed -n '417,418p' scripts/portable-tests.sh`，两行各自都以 `echo "portable-tests.sh: ` 起头）：`:417` 尾部 `… Pull the package` ／ `:418` 开头 `into a named scope and update that tier's pin in the SAME commit, or` ⇒ 引用时⛔ 把它写成一行"逐字"。⛔ 拆成两笔＝第二笔会让 GUARD C 在中间态红；⛔ 顺手改别的档的清单或别的档的 pin。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:21:- [x] **`AC#2` 让它真的开口（反恒真那一格）**：交付要包含一次**同一枚用例在两种档下各跑一发**的对照读数＝改清单前该用例在 CI 语义下从未被求值／改清单后被求值（本机可复跑的最便宜形＝`bash scripts/portable-tests.sh --scope=windows` 前后各一发，名册逐名作差，具名新增枚数）。⚠⛔ 拿 `go test ./internal/audio/` 本机跑绿当这格的凭据——那证的是本机，⛔ 是"CI 现在会跑它"。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:24:- [x] **`AC#5`（2026-10-10 13:3x 编排者追加，来路＝只读腿 `301-a1` 派单必答⑥第 ④ 条；⛔ 不改上面各格原句）把 `ci.yml:400-401` 那两行过期注释改成说实话**：blob 上逐字是 `  # Windows-only packages (ball GUI, cgo speech) are out of this job's scope` ＋ `  # by platform, not skipped: they run in test-windows / slo jobs.`。★现量：对 `internal/audio` 这两句**今天两条都⛔ 成立**——它⛔ 在 `windows)` 档（`:248-253` 十枚路径 `grep -c audio`＝0），也⛔ 在 slo 那两档里跑该包。⇒ 这两行是 `A804` 那条"门只到包级"的**同一根、长在另一枚文件里**。**次序硬约束＝⛔ 现在动它**：那两行该改成什么，取决于 `AC#1` 落不落地（落了＝"runs in test-windows" 半句成真、"slo jobs" 那半句仍⛔ 真），所以**必须按在 `AC#1` 落地并核过之后**。判据＝纯注释面、零行为（`git diff -U0` 逐行看，⛔ 一行可执行 yaml 都不许多变）；⚠ **单独一笔 commit**，pathspec＝`.github/workflows/ci.yml` ＋ `probes/301/**`（⛔ 与 `AC#1` 那笔合并，那笔被 `AC#4` 逐字禁碰 yml）；文案里⛔ 写会被自己扫的现在时计数；⛔ 零 push。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:32:- ⚠ **在飞的票 300 落地腿握着的两枚面**：⛔ 第二枚走 Go 编译面的腿；⛔ 任何人动 `internal/audio/**`。本票 `AC#0` 只读、⛔ 编译面 ⇒ 可以在那一枚在飞时开工；`AC#1`⛔。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:45:- **名册（我复跑＝对上了）**：`git ls-tree --name-only 772ff880 internal/audio/` ＋ 逐枚 `git show | head -3 | grep -c 'go:build windows'` ＋ `grep -c '^func Test'` ⇒ **7 枚 `_test.go`／2 枚 windows-tagged／顶层用例 9 名**（`capturelevel_windows_test.go` 1 ＋ `hotplug_test.go` 8）。★**腿顶我第 ⑥-1 条成立、我按它改读法**：本票"现量"节里那句"上面那 2 枚"指的是**文件**，谁按**用例**读就把代价少算 **7 枚**——原句⛔ 改，以本节为准（同一枚毛病＝`A791` 名册口径那一族：⛔ 写清"文件还是用例"的尺就会造出一枚假小的代价数）。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:46:- **锚稳定（＝我在 `A806` 欠自己的那一格，腿先做了、我又复一遍）**：`git diff --stat 772ff880..8c29a526 -- internal/audio scripts tools/d22scan internal/proc internal/memory` 输出**空**（0 行）⇒ 两锚下我量过的每枚 blob 逐字相同；腿在 13:2x 于新锚重跑表① 得同一张（7／2／9），与 13:1x 那张对得上。⚠ 两枚在飞面（` M internal/audio/wasapi_windows.go`、`?? internal/audio/parse_wave_format_300_windows_test.go`）13:30 我现量仍躺原处、⛔ 被任何人的 commit 顺走、⛔ 计入本票任何名册（票 300 那枚新用例⛔ 在 blob 上）。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:48:- ★**我自己新量一枚、腿与我都⛔ 写过（它决定 `AC#1` 落地后的真颜色）**：`skip_pattern` 是**从 ledger 现造的**——`:680` 空档时落到 `^portable_tests_ledger_is_empty_on_this_platform$`、`:686` 否则 `^(A|B|…)$`，`:688` 会把样式打进日志。⇒ 把 `./internal/audio/` 拉进 `windows)` 档之后，第 9 枚 `TestLiveWasapiSmoke` 走的是**被 `-skip` 排除＝从未求值**那一形，⛔ 是它自己 `t.Skip` 出 `--- SKIP`；而 `runtests.sh` 那两枚判红我逐行读到（`:98` `if [ "$skipped" -ne 0 ]` ⇒ `:102 exit 1`，文案含 "SKIP is not a pass (ticket 71 AC#3)" 与 "do not relax this script"；`:104-108` 还有一枚"退 0 而零顶层结果＝`-run` 打空"的判红）。⇒ **`AC#2` 的作差应当＝新增被求值 8 枚、第 9 枚以"未求值"出现而门⛔ 红**；而**只要谁在那一笔里顺手删了 `:593`，第 9 枚就真跑出 `--- SKIP` 并把 `test-windows` 判红**＝腿第 ⑥-3 那条警告的形状，我复跑机制后确认成立 ⇒ **`AC#1` 派单必须逐字带"⛔ 动 `scripts/portable-tests.sh:593` 那一行"**。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:49:- **另两枚数（我复跑）**：`WISP_LIVE_MIC` 在 `internal/audio` blob 上 **3 处命中、全在 `hotplug_test.go`**，在 `ci.yml` blob 上 **0**（CI 从不设它）⇒ 第 9 枚在 CI 上必走 skip 支，与其 ledger 理由那句"hosted runner 无音频端点"同向；`-short` 在 `portable-tests.sh`／`ci.yml`／`runtests.sh` 三份 blob 里 **0／0／0**，而 `TestPinnedThreadStable10s` 的出口是 `testing.Short()`（`hotplug_test.go:444-446`）⇒ 那一枚的 skip 支今天永不触发，进档就实打实占 **10 秒**（代价＝时长，⛔ 缺硬件）。⚠ 腿第 ⑥-2 条也成立：`TestEndpointsPairQueryable` 名字带 `Endpoints` 而 `:428-437` 全用 `fakeWatcher/fakeStream/fakeOpener` ⇒ **派单里按用例名猜前置条件⛔ 是取证**（这一条靶是我给的，记我）。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:52:- **腿第 ⑥-4 条交给我的一枚过期注释，我裁成 `AC#5`**（⛔ 塞进 `AC#1` 那笔：`AC#4` 逐字禁那一笔碰 `.github/workflows/ci.yml`；而我量完才敢说它多过期：`ci.yml` blob 上 `internal/audio` **0 命中**、两枚 slo job 各自只跑 `scripts/slo-check.ps1`（`:825` smoke／`:888` full），而那份脚本里 `go test` 与 `audio` **各只有 1 处命中、两处都在注释里**——`:336` 那枚 `go test` 说的是"别的腿正在跑"、`:15` 逐字写着 `(memory/handle subset, no audio)` ⇒ slo 那两档对本包零执行、脚本自己也这么声明 ⇒ "they run in test-windows / slo jobs" 那半句对本包**两条都假**）。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:63:- **`300-r1` 那枚新用例算不算本票 `AC#0` 名册的第 10 枚——裁＝算**（尺＝`41329475` 上 `internal/audio` ＝3 枚 tagged 文件／10 枚顶层用例，多的那枚＝`parse_wave_format_300_windows_test.go`）。⇒ **`AC#1` 落地腿做 `AC#2` 前后作差时分母按 10 枚**，⛔ 拿已裁的 9 枚旧数去对（"名册口径"那一族已第五次：`A791`／`A799`／`A803`／`A805`／本条）。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:64:- **排程（改）**：⛔ 现在派 111 `AC#12`。硬序＝`300-v2` → `301-r1`（`AC#1`＋`AC#2` **同一笔**：档清单加 `./internal/audio/` ＋ `win_pin` 补 `internal/audio`；⛔ 拆两笔、⛔ 碰 `ci.yml`、⛔ 动 `portable-tests.sh:593`）→ `301-v1` → 票 300 `AC#5` → **111 `AC#12` 的普查腿**（先量那 4 枚盲包各自 tagged 用例的前置条件）→ 111 `AC#12` 落地腿。⛔ 零 push（机主从未授权）。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:69:- [2026-10-10 13:22:37 +0800] agent=编排者 did=立票 301 并派 `301-a1`（只读、⛔ go 编译面、写面＝只新建 `probes/301/a1/**`）⇒ 本票 `AC#0` 开工；票面"现量"节全部尺子逐条重跑在 HEAD `772ff880`（⛔ 引工作树——此刻工作树里躺着票 300 落地腿的未提交改动 `wasapi_windows.go` ＋未跟踪新件 `parse_wave_format_300_windows_test.go`，按工作树量会把在飞的活当既有事实）＝`ci.yml:402-403`／`:658`／`:744`／`:780`、`portable-tests.sh:241`／`:248-253`／`:193`／`:364`／`:382-397`／`:413`／`:417-418`／`:593` 逐枚 sed 读到那一行；两枚数＝HEAD 上 `internal/audio` 七枚 `_test.go` 里 2 枚 windows-tagged（`capturelevel_windows_test.go`／`hotplug_test.go`★文件名不带 `_windows` 而内有 tag）、`windows)` 档清单与 `win_pin` 今天各 10 枚且逐枚同形；★`AC#1` 那句"同一笔 commit 改两处"的原文要求跨两行，票面已按两行抄并具名标⛔ 写成一行"逐字"（今天刚为同类事裁过一把）；`AC#3` 只裁形状、⛔ 默认必做，腿若自判"顺手把门改了"＝越界停手；归口关系＝与票 255 那族**同族⛔ 同一枚**，`:593` 里那枚行号锚 `hotplug_test.go:527` 我⛔ 量、写成 `AC#0` 必答 next=`301-a1` 三张表交回后我复跑并对拉尺子口径，再裁 `AC#1` 落不落；⛔ 翻任何框（本票 `AC#0`..`AC#4` 五格全未勾）；⛔ 零 push
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:70:- [2026-10-10 13:34:25 +0800] agent=编排者 did=收 301-a1（两笔 c2853233→8c29a526；三枚 .md 逐枚现量 1,179／23,307／4,215、0 字节=0 枚、逐笔越界 0 枚）⇒ **翻本票 AC#0**（凭据＝承重读数我全部在 blob 772ff880 自己复跑：7 枚 _test.go／2 枚 windows-tagged／9 枚顶层用例，尺＝git ls-tree ＋逐枚 git show｜head -3 grep -c go:build windows ＋ grep -c ^func Test；runtests.sh:98 if [ "$skipped" -ne 0 ] ⇒ :102 exit 1 逐行读到；skip_pattern 从 ledger 现造＝:680／:686／:688；WISP_LIVE_MIC 在 internal/audio blob 上 3 处全在 hotplug_test.go、在 ci.yml blob 上 0；-short 三份脚本 0／0／0 而 TestPinnedThreadStable10s 出口是 testing.Short()（hotplug_test.go:444-446）⇒ 进档实占 10 秒）；★本格射程具名＝表② 那半句"八枚求值并 PASS"⛔ 算已证、归 AC#2 真跑；★**腿顶我三处我全认**：①票面"上面那 2 枚"指文件、按用例读会少算 7 枚（原句⛔ 改，以裁定节为准，定式入 A807④"几枚必带单位名"）；②派单表② 把 TestEndpointsPairQueryable 当要硬件的靶是**我给的假靶**（blob:427-438 用 fakeWatcher＋fakeOpener、⛔ 真枚举）；③派单表③ 那句"判整行 inert"射程不足——`:593` 那行有两条腿，`-skip` 那条今天打空（:694 只喂 scope、:639-641 在 ubuntu 上 continue）而 `go test -list` 陈旧性那条**活着**（:651-653 按行自己的包跑），删它会摘掉一枚监管"改名/删用例"的钉（A807①）；★我自己新量一枚补进裁定节：包进了档后第 9 枚走的是**被 pattern 排除＝从未求值**、⛔ 是自己 t.Skip 出 `--- SKIP`（后者才判红）⇒ AC#2 作差应读成"新增求值 8 枚＋1 枚仍未求值而门⛔ 红"；三枚同表锚（memory:186／proc:87／audio:527）我逐枚读到全是 `t.Skip(` 行⇒ 惯例成立、本票⛔ 供一枚腐烂锚、我派单那枚"可能漂"的靶记我；裁 **AC#1＝落、⛔ 现在开工**（撤销口令「301 不落 audio 档」），硬序＝300-r1→300-v2→301-r1，起因＝--scope=windows 那一跑会把在飞 300-r1 未提交的两枚面吞进同枚包分母（13:3x 现量：` M internal/audio/wasapi_windows.go` ＋ `?? internal/audio/parse_wave_format_300_windows_test.go` 仍在、⛔ 被顺走、⛔ 计入本票名册）；AC#3 本格⛔ 动门⛔ 派腿；腿第 ④ 条那枚过期注释我裁成**新格 AC#5**（ci.yml:400-401 逐字称 windows-only 包"they run in test-windows / slo jobs"，对本包两条都假：ci.yml blob 上 internal/audio 0 命中、两枚 slo job 只跑 slo-check.ps1（:825／:888）而那脚本里 go test 与 audio 各只 1 处命中且两处都在注释（:336／:15 逐字 "(memory/handle subset, no audio)"）；次序硬约束＝⛔ 现在动，那两行该写什么取决于 AC#1 落不落地，且**单独一笔**（AC#4 逐字禁 AC#1 那笔碰 ci.yml）） next=等 300-r1；⛔ 其余四格（AC#1..AC#5）一枚不碰；⛔ 零 push
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:79:1. **★更正 `AC#1` 的代价面（那句话是我自己写的，记我）**：现量节末条写的是"拉进 `windows)` 档会把该包**其余 windows-tagged 用例**一起拉进分母"。**分档的单位是包**，所以进分母的是 `./internal/audio/` 的**全部 42 枚顶层用例**（尺＝HEAD blob 逐枚 `grep -c '^func Test'`，rc=0：8 枚文件＝tagged 3 枚文件 10 用例／无 tag 5 枚文件 32 用例）。⇒ 本票真正在赌的是那 **32 枚无 tag 的**——它们在 CI 上到今天只⛔ 在 ubuntu 的 `core` 档里被求值过，**在 windows 平台上从未被求值过一枚**。`AC#0` 那三张表里"前置条件"那一列射程窄了 3 倍，后续引用⛔ 再按"只有 tagged 有前置"读。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:82:4. **我在腿交件之前写死的 Δ 预测**（对 `AC#2`／`AC#4` 那两发本机 `--scope=windows`；⛔ 读数、是判据）：**Δ `=== RUN` ＝ +41**（42 减被过滤的那枚 `TestLiveWasapiSmoke`；报 +9/+10 ＝ 量的是 tagged 那一半，⛔ 是这一档的真实分母；报 +42 ＝ 那一发里 `-skip` 根本没生效，具名上报）；**Δ `--- SKIP` ＝ 0**（若 Δ SKIP≥1 且名字来自 `internal/audio`，则第 2 条被推翻，归因＝"SKIP 是红"那一形，⛔ "audio 的判据坏"）；**Δ `--- PASS` ＝ 41 −（逐名报出的新增红）**，⛔ 枚数一致当"没问题"。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:83:5. **一枚对上了的复跑**：`301-a2` 表①里 `internal/audio` 那行的 total `_test.go`＝8、tagged＝3，我这一枚用同一把 `git ls-tree`＋`head -3` 尺独立复认（8 枚文件／3 枚 tagged／42 枚用例）⇒ **这一格从〔仅腿量，编排者未复跑〕销账**。仍未销的两格⛔ 变：census 真读数、`--scope=core`／`--scope=windows` 的本机颜色（都要 go 面，此刻归 `301-r1`）。
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:95:- **`AC#1` ⇒ 勾**。凭据两半：本体（`0a0f62ef` 那一笔两枚 token，我在 blob 层复跑过＝`win_pin` 11 枚／档清单含 `./internal/audio/`）＋★**反形那一发**（把 `win_pin` 里 audio 那枚摘掉 ⇒ `--scope=windows` 当场 `exit 1`，红句逐字含 `Pinned: 10, resolved: 11` 与 `> github.com/CarlosShao/wisp/internal/audio`，且 stdout＝0 字节＝压根⛔ 走到跑测试；还原后正控再跑⇒ `GUARD C` 命中 0、名册与首发逐字相同、`cmp` vs `git show HEAD:` rc=0 ＋ `porcelain -- scripts` 四次全 0 行）。⇒ 这两枚 token **是枚被活门看着的钉**，⛔ 一句写在注释里的愿望。〔反形＝腿跑，编排者未复跑；我复跑的是还原后的树干净＝0 行〕
+.scratch/wisp/issues/301-windows-tagged-tests-in-a-core-claimed-package-never-run-in-ci-and-guard-d-is-package-level.md:121:- [2026-10-10 15:5x +0800] agent=编排者 did=收 `301-r2`（`4be5168c`→`b761b584`）＋自己复跑四把尺（名册 7 枚／非注释 `+/-` 行 0 枚／可执行键新增 0 枚／`yaml.safe_load` 正规化 HEAD~2≡HEAD＝True／三发门禁 rc=0 且 census totals 逐字未变）＋★落 `A816`：它顶回我派单 §1 那句"audio ⛔ 在 ubuntu 的可求值集合里"（包级⛔ 对：`core)` 数组含 `./internal/audio/...`、linux 解析 `9/5`；真话只到文件级＝3 枚 windows-tagged 文件）——这是本波第三枚"粒度"错、定式补"说包级还是文件级"；`AC#5` ⛔ 翻（等 `301-v3`，带 `AC#4` 那枚残留必答）next=推 `b761b584` 让 CI 跑这枚 yml；`test-windows` 首跑颜色三次抓取遇 GitHub API TLS timeout、待回填；⛔ 零翻勾
