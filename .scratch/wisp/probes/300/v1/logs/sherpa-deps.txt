@@ -1,0 +1,88 @@
+CMD: grep -rln 'sherpa' --include=*.go . (repo-wide, count)
+54
+CMD: files:
+./.scratch/probes-255-r1c/schema-pristine.go
+./.scratch/wisp/probes/156-accept/anchor/slo_report_144.go
+./.scratch/wisp/probes/223/v2/overlay/zz_v2probe_cmdwisp_test.go
+./.scratch/wisp/probes/224/v1/probe_a_prod_test.go
+./.scratch/wisp/probes/228/v1/twobreak/main.go
+./.scratch/wisp/probes/231/r1/zz_231r1_ac1_probe_test.go
+./.scratch/wisp/probes/231/v1/mutation/config_sentences_223r2_pre_ac3_test.go
+./.scratch/wisp/probes/231/v1/zz_231v1_ac1_probe_test.go
+./.scratch/wisp/probes/255/r6/mutations/baseline-panel_geometry_255_test.go
+./.scratch/wisp/probes/255/r6/mutations/delivered-panel_geometry_255_test.go
+./.scratch/wisp/probes/255/v1/backup/schema.go
+./cmd/wisp/always_write_no_clobber_226_test.go
+./cmd/wisp/approval_always_201_test.go
+./cmd/wisp/approval_reply_201_test.go
+./cmd/wisp/approval_seam_201_test.go
+./cmd/wisp/config_receipt_255_test.go
+./cmd/wisp/config_reload_223_test.go
+./cmd/wisp/config_sentences_223r2_test.go
+./cmd/wisp/dataroot_128_windows_test.go
+./cmd/wisp/doctor.go
+./cmd/wisp/firstrun_198r2_test.go
+./cmd/wisp/leg_sink_gate_131_test.go
+./cmd/wisp/leg_sink_nail_131_windows_test.go
+./cmd/wisp/logsink.go
+./cmd/wisp/logsink_test.go
+./cmd/wisp/main.go
+./cmd/wisp/panel_geometry_255_test.go
+./cmd/wisp/panel_host_windows_test.go
+./cmd/wisp/panel_reshow_255r1_windows_test.go
+./cmd/wisp/resident_approval_live_246_windows_test.go
+./cmd/wisp/resident_ball_live_228_windows_test.go
+./cmd/wisp/resident_hotkey_live_258_windows_test.go
+./cmd/wisp/resident_task_source_live_246_windows_test.go
+./cmd/wisp/restart_tier_keys_255r2_test.go
+./cmd/wisp/run_mode101_test.go
+./cmd/wisp/secret_argv_windows_test.go
+./cmd/wisp/slo_report_144_windows_test.go
+./internal/config/catalog.go
+./internal/config/catalog_test.go
+./internal/config/manager_test.go
+./internal/config/schema.go
+./internal/memory/open.go
+./internal/models/assembly_reachability_121_test.go
+./internal/models/manifest.go
+./internal/observe/errors.go
+./internal/proc/crossvet_test.go
+./internal/speech/doc.go
+./internal/tools/grant_test.go
+./scripts/spike/model-residency/main.go
+./scripts/spike/speech-baseline/main.go
+./scripts/spike/xy-verdict/main.go
+./scripts/spike/xy-verdict/session_cgo.go
+./scripts/spike/xy-verdict/session_nocgo.go
+./tools/mockllm/main.go
+
+CMD: grep -rln 'onnxruntime' --include=*.go .
+./cmd/wisp/dataroot_128_windows_test.go
+./cmd/wisp/doctor.go
+./cmd/wisp/versioninfo_other.go
+./internal/speech/doc.go
+./scripts/spike/speech-baseline/main.go
+
+CMD: imports of internal/audio (all non-test .go + test)
+internal/observe
+
+CMD: does any of those import cgo/sherpa? check internal/audio test files names
+internal/audio/capturelevel_windows_test.go
+internal/audio/captureopt_test.go
+internal/audio/gate_test.go
+internal/audio/hotplug_test.go
+internal/audio/level_test.go
+internal/audio/resample_test.go
+internal/audio/wavinjector_test.go
+
+CMD: packages that use cgo repo-wide
+
+CMD: which packages does cmd/wisp test pull (sherpa holder)? grep -l sherpa in internal
+internal/config/catalog.go:13:// named in the error. The local sherpa cascade is the terminal voice
+internal/config/catalog.go:20:const localSherpaProvider = "local-sherpa"
+internal/config/catalog.go:49:// the provider's catalog, and the reserved local-sherpa name is rejected.
+internal/config/catalog.go:59:			"config.toml: %s element %q: the local sherpa cascade is the terminal voice fallback and must not appear in a cloud chain", chain, el))
+internal/config/catalog_test.go:81:	t.Run("local-sherpa never in chains", func(t *testing.T) {
+internal/config/catalog_test.go:83:		c.Voice.CloudASRChain = []string{"local-sherpa/parakeet"}
+internal/config/catalog_test.go:85:		if err == nil || !strings.Contains(err.Error(), "local-sherpa") {
+internal/config/catalog_test.go:86:			t.Fatalf("local-sherpa must be rejected from cloud chains (terminal fallback, never a member), got: %v", err)

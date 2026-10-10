@@ -1,0 +1,74 @@
+PROVENANCE anchor=efd85155 tree=/tmp/wisp300-a1r/tree date=2026-10-10 12:44:08 +0800  (each iteration restores from /tmp/wisp300-v1-orig/wasapi_windows.go before sed, so every mutation starts from the pristine 26)
+pristine backup cmp: yes
+
+===== MUT offset=20 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 20))
+rc-gotest=1
+top-level PASS/FAIL lines: 1
+subtest PASS count: 1
+subtest FAIL count: 3
+--- FAIL: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+    parse_wave_format_300_windows_test.go:122: tag = 3, want 1 (KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24)
+    parse_wave_format_300_windows_test.go:138: floating = true, want false (convertPacket would take the int16 path)
+    parse_wave_format_300_windows_test.go:122: tag = 3, want 7 (positive control: an obviously wrong Data1 must NOT be swallowed into PCM/FLOAT; the parser has to report the value it actually read, so this face may not go green on a constant)
+    parse_wave_format_300_windows_test.go:138: floating = true, want false (convertPacket would take the int16 path)
+    parse_wave_format_300_windows_test.go:122: tag = 3, want 0 (positive control for offset sensitivity: malformed face with Data1 two bytes late; per the authoritative layout the value at byte 24 is 0, so an assertion that passes here would read nothing meaningful)
+    parse_wave_format_300_windows_test.go:138: floating = true, want false (convertPacket would take the int16 path)
+
+===== MUT offset=22 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 22))
+rc-gotest=1
+top-level PASS/FAIL lines: 1
+subtest PASS count: 1
+subtest FAIL count: 3
+--- FAIL: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 3 (KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24)
+    parse_wave_format_300_windows_test.go:138: floating = false, want true (convertPacket would take the float32 path)
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 1 (KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24)
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 7 (positive control: an obviously wrong Data1 must NOT be swallowed into PCM/FLOAT; the parser has to report the value it actually read, so this face may not go green on a constant)
+
+===== MUT offset=24 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 24))
+rc-gotest=0
+top-level PASS/FAIL lines: 1
+subtest PASS count: 4
+subtest FAIL count: 0
+--- PASS: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+
+===== MUT offset=28 =====
+landed-as: 196:		sub := *(*windows.GUID)(unsafe.Add(p, 28))
+rc-gotest=1
+top-level PASS/FAIL lines: 1
+subtest PASS count: 1
+subtest FAIL count: 3
+--- FAIL: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 3 (KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24)
+    parse_wave_format_300_windows_test.go:138: floating = false, want true (convertPacket would take the float32 path)
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 1 (KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24)
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 7 (positive control: an obviously wrong Data1 must NOT be swallowed into PCM/FLOAT; the parser has to report the value it actually read, so this face may not go green on a constant)
+
+===== RESTORE =====
+restored-identical=yes
+grep -c 'unsafe.Add(p, 26)' after restore = 1
+grep -c 'unsafe.Add(p, 24)' after restore = 0
+grep -c other offsets 20/22/28 after restore = 0
+cmp vs a1r backup: yes-vs-a1r
+CMD: waveFormatExt constant definition (does the fixture enter the extensible branch?)
+99:	waveFormatExt   = 0xFFFE
+195:	if f.tag == waveFormatExt {
