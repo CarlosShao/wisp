@@ -121,3 +121,39 @@ my-file-sizes:
 13433 .scratch/wisp/probes/300/a2/snap/v3-20-teeth.md
 go-compile-face self-report: go build/test/vet/run/list = 0 calls; go env = 0 calls
 rc-line: rc=0
+
+## 追加三：更正追加二那把尺的射程（⛔ 抹原句，只追加；出处＝本腿自查）
+
+原句diff-set count: 20＝**射程打错了**：追加二那条 git log 的范围 4e00357f..HEAD ⛔ 只含本腿四笔，它把中间**别腿的两笔**一起算进来了（e4d9a223 A821 台账笔／ae8ebfbd 303-r1 产码笔，正合在飞写腿一 commit，HEAD 就会动那句派单警告）。⇒ 20 枚＝那两笔的文件，⛔ 本腿写的。
+
+正确尺＝对本腿**逐笔** show 名册（--no-renames）再作差：
+本腿名册总枚数(去重):
+24
+越界枚数(名册减去授权 probes/300/a2/**):
+4
+逐笔名册（去重后）:
+-- commit 3d0f8ccc:
+-- commit 62688150:
+-- commit ae5ee86d:
+-- commit bb314f3b:
+.scratch/wisp/probes/300/a2/00-anchor.md
+.scratch/wisp/probes/300/a2/10-candidate-landing-points.md
+.scratch/wisp/probes/300/a2/20-near-miss-nails.md
+.scratch/wisp/probes/300/a2/30-ci-visibility.md
+.scratch/wisp/probes/300/a2/90-final.md
+.scratch/wisp/probes/300/a2/logs/anchor-rot.txt
+.scratch/wisp/probes/300/a2/logs/ci-guards.txt
+.scratch/wisp/probes/300/a2/logs/ci-jobs.txt
+.scratch/wisp/probes/300/a2/logs/ci-visibility.txt
+.scratch/wisp/probes/300/a2/logs/final-anchor-raw.txt
+.scratch/wisp/probes/300/a2/logs/grep-constants.txt
+.scratch/wisp/probes/300/a2/logs/near-miss.txt
+.scratch/wisp/probes/300/a2/logs/roster-audio.txt
+.scratch/wisp/probes/300/a2/logs/sec-B-and-prod.txt
+.scratch/wisp/probes/300/a2/logs/sec-B2-prod.txt
+.scratch/wisp/probes/300/a2/logs/wavinjector-and-scopes.txt
+.scratch/wisp/probes/300/a2/snap/ledger.md
+.scratch/wisp/probes/300/a2/snap/parse_wave_format_300_windows_test.go.txt
+.scratch/wisp/probes/300/a2/snap/ticket-300.md
+.scratch/wisp/probes/300/a2/snap/v3-20-teeth.md
+rc=0
