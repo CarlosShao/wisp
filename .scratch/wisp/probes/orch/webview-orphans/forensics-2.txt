@@ -1,0 +1,29 @@
+﻿ruler = Get-CimInstance Win32_Process, full CommandLine scan (read-only)
+captured_local = 2026-10-10 17:41:30 +08:00
+
+total processes on machine = 356
+
+== R2. any process whose command line names Wisp as a WebView2 host? ==
+  HIT pid=20904 name=mockllm.exe cmd=C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden"
+  HIT pid=25660 name=mockllm.exe cmd=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden"
+  HIT pid=20804 name=bash.exe cmd=C:\Users\swq\.qoder-cn\bin\git\bin\bash.exe -c "{ source '/c/Users/swq/.qoder-cn/shell-snapshots/snapshot-bash-1791592737274-ukxluw.sh' 2>/dev/null || true; } && export PATH=\"${__QODER_BASH_PATH_PREFIX:+$__QODER_BASH_PATH_PREFIX:}$PATH\" && { shopt -u extglob 2>/dev/null || true; } && eval 'cd \".s ...
+  HIT pid=33588 name=bash.exe cmd="C:\Users\swq\.qoder-cn\bin\git\bin\..\usr\bin\bash.exe" -c "{ source '/c/Users/swq/.qoder-cn/shell-snapshots/snapshot-bash-1791592737274-ukxluw.sh' 2>/dev/null || true; } && export PATH=\"${__QODER_BASH_PATH_PREFIX:+$__QODER_BASH_PATH_PREFIX:}$PATH\" && { shopt -u extglob 2>/dev/null || true; } &&  ...
+  HIT pid=27784 name=bash.exe cmd="C:\Users\swq\.qoder-cn\bin\git\bin\..\usr\bin\bash.exe" -c "{ source '/c/Users/swq/.qoder-cn/shell-snapshots/snapshot-bash-1791592737274-ukxluw.sh' 2>/dev/null || true; } && export PATH=\"${__QODER_BASH_PATH_PREFIX:+$__QODER_BASH_PATH_PREFIX:}$PATH\" && { shopt -u extglob 2>/dev/null || true; } &&  ...
+  HIT pid=28068 name=powershell.exe cmd=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\orch\webview-orphans\forensics2.ps1"
+  HIT pid=28052 name=bash.exe cmd=C:\Users\swq\.qoder-cn\bin\git\bin\bash.exe -c "{ source '/c/Users/swq/.qoder-cn/shell-snapshots/snapshot-bash-1791592737274-ukxluw.sh' 2>/dev/null || true; } && export PATH=\"${__QODER_BASH_PATH_PREFIX:+$__QODER_BASH_PATH_PREFIX:}$PATH\" && { shopt -u extglob 2>/dev/null || true; } && eval 'cd \"D: ...
+  HIT pid=28492 name=bash.exe cmd="C:\Users\swq\.qoder-cn\bin\git\bin\..\usr\bin\bash.exe" -c "{ source '/c/Users/swq/.qoder-cn/shell-snapshots/snapshot-bash-1791592737274-ukxluw.sh' 2>/dev/null || true; } && export PATH=\"${__QODER_BASH_PATH_PREFIX:+$__QODER_BASH_PATH_PREFIX:}$PATH\" && { shopt -u extglob 2>/dev/null || true; } &&  ...
+  HIT pid=8836 name=bash.exe cmd="C:\Users\swq\.qoder-cn\bin\git\bin\..\usr\bin\bash.exe" -c "{ source '/c/Users/swq/.qoder-cn/shell-snapshots/snapshot-bash-1791592737274-ukxluw.sh' 2>/dev/null || true; } && export PATH=\"${__QODER_BASH_PATH_PREFIX:+$__QODER_BASH_PATH_PREFIX:}$PATH\" && { shopt -u extglob 2>/dev/null || true; } &&  ...
+
+== R2b. distinct --webview-exe-name= values across the whole machine ==
+  clipsync-desktop.exe         count=5
+  magpie-windows-amd64.exe     count=5
+  SearchHost.exe               count=5
+  wetype_update.exe            count=5
+
+== R3. leftover test binaries ==
+  none (count = 0)
+
+== R3b. go / go test / build.exe currently running? ==
+  none (count = 0)
+
+end_of_forensics_2

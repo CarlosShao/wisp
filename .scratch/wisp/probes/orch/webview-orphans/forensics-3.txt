@@ -1,0 +1,47 @@
+﻿ruler = Get-CimInstance Win32_Process + Test-Path + Get-NetTCPConnection (read-only)
+captured_local = 2026-10-10 17:42:43 +08:00
+
+mockllm.exe count = 2
+
+--- pid=20904 ---
+  started        = 2026-10-08 08:42:21   ageMinutes = 3420
+  workingSetMB   = 6.6   privateMB = 44.5
+  cpuSeconds     = 0.2
+  parent pid=11724 -> GONE (parent no longer exists)
+  cmdFull        = C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden"
+  tempdir        = C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599\001
+  tempdir exists = True
+  testname       = 001
+  sibling Test* dirs under C:\Users\swq\AppData\Local\Temp\TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599 = 0
+  tcp socket     = 127.0.0.1:54887 state=Listen
+
+--- pid=25660 ---
+  started        = 2026-10-08 11:35:29   ageMinutes = 3247
+  workingSetMB   = 7.2   privateMB = 45.9
+  cpuSeconds     = 0.2
+  parent pid=20036 -> GONE (parent no longer exists)
+  cmdFull        = C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden"
+  tempdir        = C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780\001
+  tempdir exists = True
+  testname       = 001
+  sibling Test* dirs under C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780 = 0
+  tcp socket     = 127.0.0.1:58918 state=Listen
+
+== how many Temp dirs named Test* are sitting in the profile temp root ==
+
+  count = 21
+  (no recursive size scan: this profile temp root carried 2.4 GB of snapshots, see the /tmp census)
+  oldest five by CreationDate:
+      TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780
+      TestSLO144LoopGiveUpSentencesOnRealFiles2237962421
+      TestRollingWriterRetentionSweep3838303947
+      TestRollingWriterRetentionSweep3638913217
+      TestRollingWriterRetentionSweep3835089158
+  newest five by CreationDate:
+      TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780
+      TestSLO144LoopGiveUpSentencesOnRealFiles2237962421
+      TestRollingWriterRetentionSweep3838303947
+      TestRollingWriterRetentionSweep3638913217
+      TestRollingWriterRetentionSweep3835089158
+
+end_of_forensics_3

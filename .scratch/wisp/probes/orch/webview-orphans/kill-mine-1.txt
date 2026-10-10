@@ -1,0 +1,11 @@
+﻿ruler = Get-CimInstance (re-verify) -> Stop-Process -Id (named pids only)
+captured_local = 2026-10-10 17:44:24 +08:00
+
+candidates matching BOTH rules (name=mockllm.exe AND this repo golden dir) = 2
+  KILL pid=20904 started=2026-10-08 08:42:21 parent=11724 GONE, ppid re-verified absent
+  KILL pid=25660 started=2026-10-08 11:35:29 parent=20036 GONE, ppid re-verified absent
+killed = 2
+mockllm.exe count after = 0
+msedgewebview2.exe count after (must stay 24, NOT mine) = 24
+
+end_of_kill_mine

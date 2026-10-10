@@ -1,0 +1,62 @@
+﻿ruler = Get-CimInstance Win32_Process (read-only, no kill / no start / no modify)
+captured_local = 2026-10-10 17:38:57 +08:00
+
+== A. totals ==
+msedgewebview2.exe count = 24
+sum working set MB = 2031.4
+sum private bytes MB = 1647.7
+
+== B. group by --type= token ==
+  utility          count=8
+  gpu-process      count=4
+  renderer         count=4
+  crashpad-handler count=4
+  BROWSER(root)    count=4
+
+== C. per-PID row: pid, ppid, parent alive?, parent name, type, age, WS MB ==
+  pid=12812   ppid=9004    parentAlive=YES parentName=SearchHost.exe         type=BROWSER          started=10-07 08:36:30 ageMin=4862    wsMb=107.7
+  pid=12948   ppid=12812   parentAlive=YES parentName=msedgewebview2.exe     type=crashpad-handler started=10-07 08:36:30 ageMin=4862    wsMb=11.9
+  pid=12536   ppid=12812   parentAlive=YES parentName=msedgewebview2.exe     type=utility          started=10-07 08:36:31 ageMin=4862    wsMb=39.4
+  pid=12524   ppid=12812   parentAlive=YES parentName=msedgewebview2.exe     type=gpu-process      started=10-07 08:36:31 ageMin=4862    wsMb=54.7
+  pid=12412   ppid=12812   parentAlive=YES parentName=msedgewebview2.exe     type=utility          started=10-07 08:36:31 ageMin=4862    wsMb=17.6
+  pid=13376   ppid=12812   parentAlive=YES parentName=msedgewebview2.exe     type=renderer         started=10-07 08:36:31 ageMin=4862    wsMb=92.4
+  pid=28208   ppid=16852   parentAlive=YES parentName=wetype_update.exe      type=BROWSER          started=10-08 15:50:33 ageMin=2988    wsMb=113.8
+  pid=30272   ppid=28208   parentAlive=YES parentName=msedgewebview2.exe     type=crashpad-handler started=10-08 15:50:33 ageMin=2988    wsMb=12.7
+  pid=3460    ppid=28208   parentAlive=YES parentName=msedgewebview2.exe     type=gpu-process      started=10-08 15:50:33 ageMin=2988    wsMb=57.3
+  pid=14280   ppid=28208   parentAlive=YES parentName=msedgewebview2.exe     type=utility          started=10-08 15:50:33 ageMin=2988    wsMb=35.1
+  pid=28256   ppid=28208   parentAlive=YES parentName=msedgewebview2.exe     type=utility          started=10-08 15:50:33 ageMin=2988    wsMb=17.9
+  pid=28516   ppid=28208   parentAlive=YES parentName=msedgewebview2.exe     type=renderer         started=10-08 15:50:34 ageMin=2988    wsMb=96.5
+  pid=10780   ppid=9144    parentAlive=YES parentName=clipsync-desktop.exe   type=BROWSER          started=10-09 22:59:50 ageMin=1119    wsMb=149.2
+  pid=6448    ppid=10780   parentAlive=YES parentName=msedgewebview2.exe     type=crashpad-handler started=10-09 22:59:50 ageMin=1119    wsMb=12
+  pid=29472   ppid=10780   parentAlive=YES parentName=msedgewebview2.exe     type=gpu-process      started=10-09 22:59:50 ageMin=1119    wsMb=117
+  pid=17260   ppid=10780   parentAlive=YES parentName=msedgewebview2.exe     type=utility          started=10-09 22:59:50 ageMin=1119    wsMb=40.6
+  pid=27452   ppid=10780   parentAlive=YES parentName=msedgewebview2.exe     type=utility          started=10-09 22:59:50 ageMin=1119    wsMb=19.6
+  pid=32624   ppid=10780   parentAlive=YES parentName=msedgewebview2.exe     type=renderer         started=10-09 22:59:51 ageMin=1119    wsMb=196
+  pid=33412   ppid=33384   parentAlive=YES parentName=magpie-windows-amd64.exe type=BROWSER          started=10-10 15:16:13 ageMin=143     wsMb=135.8
+  pid=25488   ppid=33412   parentAlive=YES parentName=msedgewebview2.exe     type=crashpad-handler started=10-10 15:16:13 ageMin=143     wsMb=13.1
+  pid=3348    ppid=33412   parentAlive=YES parentName=msedgewebview2.exe     type=gpu-process      started=10-10 15:16:14 ageMin=143     wsMb=127.9
+  pid=2536    ppid=33412   parentAlive=YES parentName=msedgewebview2.exe     type=utility          started=10-10 15:16:14 ageMin=143     wsMb=37.6
+  pid=12296   ppid=33412   parentAlive=YES parentName=msedgewebview2.exe     type=utility          started=10-10 15:16:14 ageMin=143     wsMb=19.2
+  pid=32652   ppid=33412   parentAlive=YES parentName=msedgewebview2.exe     type=renderer         started=10-10 15:16:15 ageMin=143     wsMb=506.2
+
+== D. root(s): a webview process whose parent is NOT another webview process ==
+  ROOT pid=12812 type=BROWSER ppid=9004 parent=SearchHost.exe
+       cmd = "C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.53\msedgewebview2.exe" --embedded-browser-webview=1 --webview-exe-name=SearchHost.exe --webview-exe-version=2126.8901.20.0 --user-data-dir="C:\Users\swq\AppData\Local\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\LocalState\EBWebView" --noerrdialogs --disable-features=msSmartScreenProtection --edge-webview-enable-mojo-ipcz --enable-features=msEdgeFluentOverlayScrollbar --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; Cortana 1.18.9.23723; 10.0.0.0.26100.8457) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.26100 IsWebView2/True (WebView2Version 154.0.4258.37)" --lang=en-US --mojo-named-platform-channel-pipe=9004.12756.3562689258902219730 /pfhostedapp:7dbcc57e0f994d354684581365ebf4657f94d789
+  ROOT pid=28208 type=BROWSER ppid=16852 parent=wetype_update.exe
+       cmd = "C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --embedded-browser-webview=1 --webview-exe-name=wetype_update.exe --webview-exe-version=2.1.1.16 --user-data-dir="C:\Users\swq\AppData\Local\flutter_webview_windows\wetype_update\EBWebView" --noerrdialogs --disable-web-security --mojo-named-platform-channel-pipe=16852.448.15338615907464202274 /pfhostedapp:86231030c61c56f2b1d5386176a1f00d9b681767
+  ROOT pid=10780 type=BROWSER ppid=9144 parent=clipsync-desktop.exe
+       cmd = "C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --embedded-browser-webview=1 --webview-exe-name=clipsync-desktop.exe --webview-exe-version=0.1.1 --user-data-dir="C:\Users\swq\AppData\Local\com.clipsync.desktop\EBWebView" --noerrdialogs --embedded-browser-webview-dpi-awareness=2 --disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --lang=en-US --mojo-named-platform-channel-pipe=9144.19284.13492435487948479621 /pfhostedapp:30772ee6035b08914d5777258b9285198f0059f8
+  ROOT pid=33412 type=BROWSER ppid=33384 parent=magpie-windows-amd64.exe
+       cmd = "C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --embedded-browser-webview=1 --webview-exe-name=magpie-windows-amd64.exe --webview-exe-version=0.1.1155 --user-data-dir="C:\Users\swq\AppData\Roaming\magpie-windows-amd64.exe\EBWebView" --noerrdialogs --embedded-browser-webview-dpi-awareness=2 --disable-features=msSmartScreenProtection --mojo-named-platform-channel-pipe=33384.33948.10574829882642237850 /pfhostedapp:4b2ffed1da4cac7dd66ef2e6106955004da9eee7
+
+== E. does any wisp.exe / balldebug.exe still exist on the machine? ==
+  none (count = 0)
+
+== F. parent PIDs of the webview roots, looked up by name even if pid reuse suspected ==
+  distinct root ppids = 9004, 9144, 16852, 33384
+  ppid 9004 -> name=SearchHost.exe started=10-07 08:36:28 cmd="C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe" -ServerName:CortanaUI.AppXstmwaab17q5s3y22tp6apqz7a45vwv65.mca
+  ppid 9144 -> name=clipsync-desktop.exe started=10-09 22:59:50 cmd="target\debug\clipsync-desktop.exe"
+  ppid 16852 -> name=wetype_update.exe started=10-07 08:36:53 cmd="C:\Program Files\Tencent\WeType\2.1.1.16\wetype_update.exe"
+  ppid 33384 -> name=magpie-windows-amd64.exe started=10-10 15:16:13 cmd=D:\work\AI\tools\反代工具\magpie-windows-amd64.exe gui plugins
+
+end_of_forensics
