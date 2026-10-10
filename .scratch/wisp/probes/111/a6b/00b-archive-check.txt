@@ -1,0 +1,3 @@
+R0 archive-vs-HEAD self-check (cksum must match per row)
+internal/tools/fs_write_test.go  git=1076704822 30497  disk=1076704822 30497 /tmp/tmp.r8VT0x7ZvO/internal/tools/fs_write_test.go
+cmd/wisp/always_write_no_clobber_226_test.go  git=185000003 4099  disk=185000003 4099 /tmp/tmp.r8VT0x7ZvO/cmd/wisp/always_write_no_clobber_226_test.go

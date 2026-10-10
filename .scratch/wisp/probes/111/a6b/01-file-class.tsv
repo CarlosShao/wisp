@@ -1,0 +1,377 @@
+cmd/llmrecord/main_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/always_write_no_clobber_226_test.go	NONE	-	1	FN_PLAIN
+cmd/wisp/approval_always_201_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/approval_reply_201_test.go	NONE	-	5	FN_PLAIN
+cmd/wisp/approval_seam_201_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/config_receipt_255_test.go	NONE	-	8	FN_PLAIN
+cmd/wisp/config_reload_223_test.go	NONE	-	8	FN_PLAIN
+cmd/wisp/config_reload_perm_223_windows_test.go	WIN	//go:build windows	1	FN_WIN
+cmd/wisp/config_sentences_223r2_test.go	NONE	-	1	FN_PLAIN
+cmd/wisp/dataroot_128_test.go	NONE	-	4	FN_PLAIN
+cmd/wisp/dataroot_128_windows_test.go	WIN	//go:build windows	1	FN_WIN
+cmd/wisp/early_log_nail_130_windows_test.go	WIN	//go:build windows	2	FN_WIN
+cmd/wisp/firstrun_198_test.go	NONE	-	5	FN_PLAIN
+cmd/wisp/firstrun_198r2_test.go	NONE	-	5	FN_PLAIN
+cmd/wisp/firstrun_257_nonpreset_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/firstrun_257_test.go	NONE	-	6	FN_PLAIN
+cmd/wisp/firstrun_acl_198_windows_test.go	WIN	//go:build windows	1	FN_WIN
+cmd/wisp/instructions_200r2_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/leg_dispatch_gate_133_test.go	NONE	-	1	FN_PLAIN
+cmd/wisp/leg_sink_gate_131_test.go	NONE	-	1	FN_PLAIN
+cmd/wisp/leg_sink_nail_131_windows_test.go	NONE	-	3	FN_WIN
+cmd/wisp/logsink_test.go	NONE	-	3	FN_PLAIN
+cmd/wisp/logsink_windows_test.go	WIN	//go:build windows	3	FN_WIN
+cmd/wisp/panel_assets_143_test.go	NONE	-	6	FN_PLAIN
+cmd/wisp/panel_config_248_test.go	NONE	-	9	FN_PLAIN
+cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go	WIN	//go:build windows	2	FN_WIN
+cmd/wisp/panel_geometry_255_test.go	WIN	//go:build windows	5	FN_PLAIN
+cmd/wisp/panel_geometry_255_winlive_test.go	WIN_LIVE	//go:build windows && winlive	1	FN_PLAIN
+cmd/wisp/panel_geometry_255r6_range_windows_test.go	WIN	//go:build windows	0	FN_WIN
+cmd/wisp/panel_host_gate_test.go	NONE	-	4	FN_PLAIN
+cmd/wisp/panel_host_windows_live_test.go	WIN_LIVE	//go:build windows && winlive	1	FN_PLAIN
+cmd/wisp/panel_host_windows_test.go	WIN	//go:build windows	4	FN_WIN
+cmd/wisp/panel_inbound_33_test.go	NONE	-	5	FN_PLAIN
+cmd/wisp/panel_inbound_guards_35r3_test.go	WIN	//go:build windows	3	FN_PLAIN
+cmd/wisp/panel_locked_naming_33r11_windows_test.go	WIN	//go:build windows	5	FN_WIN
+cmd/wisp/panel_pageover_33r10_windows_test.go	WIN	//go:build windows	1	FN_WIN
+cmd/wisp/panel_pump_test.go	NONE	-	3	FN_PLAIN
+cmd/wisp/panel_reshow_255r1_windows_test.go	WIN	//go:build windows	6	FN_WIN
+cmd/wisp/panel_resident_windows_test.go	WIN	//go:build windows	11	FN_WIN
+cmd/wisp/panel_transport_35r1_test.go	WIN	//go:build windows	1	FN_PLAIN
+cmd/wisp/panel_transport_35r2_test.go	WIN	//go:build windows	9	FN_PLAIN
+cmd/wisp/panel_transport_live_35v2_windows_test.go	WIN_LIVE	//go:build windows && winlive	1	FN_WIN
+cmd/wisp/providers_test.go	NONE	-	4	FN_PLAIN
+cmd/wisp/resident_approval_246_windows_test.go	WIN	//go:build windows	8	FN_WIN
+cmd/wisp/resident_approval_live_246_windows_test.go	WIN_LIVE	//go:build windows && winlive	3	FN_WIN
+cmd/wisp/resident_approval_risk_256_windows_test.go	WIN	//go:build windows	5	FN_WIN
+cmd/wisp/resident_approval_risk_268_windows_test.go	WIN	//go:build windows	3	FN_WIN
+cmd/wisp/resident_audio_247_live_windows_test.go	WIN	//go:build windows	1	FN_WIN
+cmd/wisp/resident_audio_247_windows_test.go	WIN	//go:build windows	7	FN_WIN
+cmd/wisp/resident_ball_228_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/resident_ball_228_windows_test.go	WIN	//go:build windows	2	FN_WIN
+cmd/wisp/resident_ball_live_228_windows_test.go	WIN_LIVE	//go:build windows && winlive	1	FN_WIN
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go	WIN	//go:build windows	3	FN_WIN
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go	WIN	//go:build windows	5	FN_WIN
+cmd/wisp/resident_grant_writer_265_windows_test.go	WIN	//go:build windows	9	FN_WIN
+cmd/wisp/resident_hotkey_258_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/resident_hotkey_258_windows_test.go	WIN	//go:build windows	7	FN_WIN
+cmd/wisp/resident_hotkey_296_windows_test.go	WIN	//go:build windows	2	FN_WIN
+cmd/wisp/resident_hotkey_live_258_windows_test.go	WIN_LIVE	//go:build windows && winlive	4	FN_WIN
+cmd/wisp/resident_hotkey_v1probe_test.go	WIN	//go:build windows	2	FN_PLAIN
+cmd/wisp/resident_mute_290_windows_test.go	WIN	//go:build windows	6	FN_WIN
+cmd/wisp/resident_sink_nail_127_windows_test.go	WIN	//go:build windows	3	FN_WIN
+cmd/wisp/resident_task_source_246_windows_test.go	WIN	//go:build windows	7	FN_WIN
+cmd/wisp/resident_task_source_live_246_windows_test.go	WIN_LIVE	//go:build windows && winlive	2	FN_WIN
+cmd/wisp/resident_tray_mute_293_windows_test.go	WIN	//go:build windows	7	FN_WIN
+cmd/wisp/restart_tier_keys_255r2_test.go	NONE	-	1	FN_PLAIN
+cmd/wisp/run_mode101_test.go	NONE	-	5	FN_PLAIN
+cmd/wisp/run_test.go	NONE	-	6	FN_PLAIN
+cmd/wisp/secret_argv_windows_test.go	WIN	//go:build windows	4	FN_WIN
+cmd/wisp/secret_dataroot_119b_test.go	POSIX	//go:build !windows	3	FN_PLAIN
+cmd/wisp/secret_test.go	NONE	-	14	FN_PLAIN
+cmd/wisp/slo_exit_os_156_windows_test.go	WIN	//go:build windows	5	FN_WIN
+cmd/wisp/slo_report_144_windows_test.go	WIN	//go:build windows	14	FN_WIN
+cmd/wisp/subagent_blocked_197_test.go	NONE	-	1	FN_PLAIN
+cmd/wisp/subagent_carrier_197_test.go	NONE	-	3	FN_PLAIN
+cmd/wisp/subagent_selfapproval_197_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/subagent_stream_key_197_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/task_scope_close_151_test.go	NONE	-	2	FN_PLAIN
+cmd/wisp/tempdir_resolved_124_test.go	NONE	-	0	FN_PLAIN
+cmd/wisp/ticket224_assembly_test.go	NONE	-	3	FN_PLAIN
+internal/agent/approval/batch_test.go	NONE	-	5	FN_PLAIN
+internal/agent/approval/cancel_key_label_260r4_test.go	NONE	-	5	FN_PLAIN
+internal/agent/approval/cancel_key_wording_260r3_test.go	NONE	-	2	FN_PLAIN
+internal/agent/approval/fakes_test.go	NONE	-	0	FN_PLAIN
+internal/agent/approval/pending_read_test.go	NONE	-	3	FN_PLAIN
+internal/agent/approval/queue_test.go	NONE	-	6	FN_PLAIN
+internal/agent/approval/replies_201_test.go	NONE	-	3	FN_PLAIN
+internal/agent/approval/tempdir_resolved_124_test.go	NONE	-	0	FN_PLAIN
+internal/agent/approval/ticket146_liveapprovals_backing_test.go	NONE	-	2	FN_PLAIN
+internal/agent/approval/ticket220_l1_window_read_test.go	NONE	-	4	FN_PLAIN
+internal/agent/approval/ticket224_reply_grant_test.go	NONE	-	4	FN_PLAIN
+internal/agent/approval/ticket242_binding_test.go	NONE	-	5	FN_PLAIN
+internal/agent/approval/ticket242_panelface_test.go	NONE	-	2	FN_PLAIN
+internal/agent/approval/ticket259_denial_rulers_test.go	NONE	-	6	FN_PLAIN
+internal/agent/approval/ticket259_panel_capability_rulers_test.go	NONE	-	6	FN_PLAIN
+internal/agent/approval/ticket285_route_denial_name_rulers_test.go	NONE	-	2	FN_PLAIN
+internal/agent/approval/ticket84_no_owner_test.go	NONE	-	5	FN_PLAIN
+internal/agent/approval/ticket87_veto_l2_test.go	NONE	-	4	FN_PLAIN
+internal/agent/approval/ticket97_alias_direction_test.go	NONE	-	2	FN_PLAIN
+internal/agent/approval/window_test.go	NONE	-	8	FN_PLAIN
+internal/agent/compress_test.go	NONE	-	4	FN_PLAIN
+internal/agent/compress_trace_test.go	NONE	-	7	FN_PLAIN
+internal/agent/control_test.go	NONE	-	7	FN_PLAIN
+internal/agent/corr_percall_242_test.go	NONE	-	1	FN_PLAIN
+internal/agent/declared_l0_risk_179_test.go	NONE	-	3	FN_PLAIN
+internal/agent/forensics_test.go	NONE	-	2	FN_PLAIN
+internal/agent/guard_test.go	NONE	-	9	FN_PLAIN
+internal/agent/harness_test.go	NONE	-	0	FN_PLAIN
+internal/agent/instructions_test.go	NONE	-	4	FN_PLAIN
+internal/agent/loop_golden_test.go	NONE	-	11	FN_PLAIN
+internal/agent/prompt_test.go	NONE	-	6	FN_PLAIN
+internal/agent/spill_acl_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/agent/spill_name_injectivity_test.go	NONE	-	7	FN_PLAIN
+internal/agent/spill_path_invariant_test.go	NONE	-	4	FN_PLAIN
+internal/agent/spill_pointer_authority_ac3_174r4_test.go	NONE	-	1	FN_PLAIN
+internal/agent/spill_pointer_honesty_174_test.go	NONE	-	8	FN_PLAIN
+internal/agent/spill_test.go	NONE	-	6	FN_PLAIN
+internal/agent/tempdir_resolved_124_test.go	NONE	-	0	FN_PLAIN
+internal/agent/testtools_test.go	NONE	-	0	FN_PLAIN
+internal/agent/ticket285_corr_distinct_rulers_test.go	NONE	-	2	FN_PLAIN
+internal/agent/truncation_test.go	NONE	-	2	FN_PLAIN
+internal/audio/capturelevel_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/audio/captureopt_test.go	NONE	-	4	FN_PLAIN
+internal/audio/gate_test.go	NONE	-	5	FN_PLAIN
+internal/audio/hotplug_test.go	WIN	//go:build windows	8	FN_PLAIN
+internal/audio/level_test.go	NONE	-	10	FN_PLAIN
+internal/audio/parse_wave_format_300_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/audio/resample_test.go	NONE	-	7	FN_PLAIN
+internal/audio/wavinjector_test.go	NONE	-	6	FN_PLAIN
+internal/ball/dock_test.go	NONE	-	11	FN_PLAIN
+internal/ball/hotkey_borrow_refused_260r5_test.go	WIN	//go:build windows	3	FN_PLAIN
+internal/ball/hotkey_cancel_borrow_260_test.go	WIN	//go:build windows	7	FN_PLAIN
+internal/ball/hotkey_cancel_borrow_expect_260r2_test.go	WIN	//go:build windows	3	FN_PLAIN
+internal/ball/hotkey_cancel_borrow_live_260_test.go	WIN_LIVE	//go:build windows && winlive	2	FN_PLAIN
+internal/ball/hotkey_live_test.go	WIN_LIVE	//go:build windows && winlive	4	FN_PLAIN
+internal/ball/hotkey_status_test.go	WIN	//go:build windows	11	FN_PLAIN
+internal/ball/hotkey_test.go	WIN	//go:build windows	2	FN_PLAIN
+internal/ball/interaction_live_test.go	WIN_LIVE	//go:build windows && winlive	4	FN_PLAIN
+internal/ball/liquid_test.go	NONE	-	12	FN_PLAIN
+internal/ball/live_guard_windows_test.go	WIN_LIVE	//go:build windows && winlive	0	FN_WIN
+internal/ball/live_windows_test.go	WIN_LIVE	//go:build windows && winlive	6	FN_WIN
+internal/ball/position_test.go	NONE	-	3	FN_PLAIN
+internal/ball/sta_release_windows_test.go	WIN	//go:build windows	3	FN_WIN
+internal/ball/tokens_table_test.go	NONE	-	5	FN_PLAIN
+internal/ball/tokens_test.go	NONE	-	9	FN_PLAIN
+internal/buildinfo/env_test.go	NONE	-	2	FN_PLAIN
+internal/config/boundary_test.go	NONE	-	5	FN_PLAIN
+internal/config/c26_seam_posix_125_test.go	POSIX	//go:build !windows	2	FN_PLAIN
+internal/config/catalog_test.go	NONE	-	6	FN_PLAIN
+internal/config/enabled_261_test.go	NONE	-	2	FN_PLAIN
+internal/config/loader_test.go	NONE	-	12	FN_PLAIN
+internal/config/manager_223_test.go	NONE	-	2	FN_PLAIN
+internal/config/manager_test.go	NONE	-	12	FN_PLAIN
+internal/config/migrate_test.go	NONE	-	5	FN_PLAIN
+internal/config/private_acl_windows_test.go	WIN	//go:build windows	3	FN_WIN
+internal/config/settings_248_test.go	NONE	-	7	FN_PLAIN
+internal/config/settings_257_test.go	NONE	-	5	FN_PLAIN
+internal/config/tempdir_resolved_124_test.go	NONE	-	0	FN_PLAIN
+internal/config/tiers_255_test.go	NONE	-	4	FN_PLAIN
+internal/config/tiers_app_255r2_test.go	NONE	-	2	FN_PLAIN
+internal/config/unwired_test.go	NONE	-	6	FN_PLAIN
+internal/config/validate_267_test.go	NONE	-	3	FN_PLAIN
+internal/config/validate_test.go	NONE	-	9	FN_PLAIN
+internal/config/writeguard_226_test.go	NONE	-	13	FN_PLAIN
+internal/llm/adaptertest/registry_test.go	NONE	-	4	FN_PLAIN
+internal/llm/anthropic/cache_test.go	NONE	-	6	FN_PLAIN
+internal/llm/anthropic/helpers_test.go	NONE	-	0	FN_PLAIN
+internal/llm/anthropic/suite_test.go	NONE	-	3	FN_PLAIN
+internal/llm/catalog_test.go	NONE	-	10	FN_PLAIN
+internal/llm/enabled_gate_261_r1_test.go	NONE	-	3	FN_PLAIN
+internal/llm/enabled_reach_261_test.go	NONE	-	3	FN_PLAIN
+internal/llm/fallback_test.go	NONE	-	5	FN_PLAIN
+internal/llm/golden/golden_test.go	NONE	-	7	FN_PLAIN
+internal/llm/llm_test.go	NONE	-	25	FN_PLAIN
+internal/llm/matrix_14_2_test.go	NONE	-	5	FN_PLAIN
+internal/llm/openaichat/adapter_test.go	NONE	-	6	FN_PLAIN
+internal/llm/openaichat/harness_golden_test.go	NONE	-	3	FN_PLAIN
+internal/llm/openaichat/helpers_test.go	NONE	-	0	FN_PLAIN
+internal/llm/openaichat/mockllm_integ_test.go	NONE	-	7	FN_PLAIN
+internal/llm/openairesponses/protocol_test.go	NONE	-	5	FN_PLAIN
+internal/llm/openairesponses/suite_test.go	NONE	-	3	FN_PLAIN
+internal/llm/probe_health_test.go	NONE	-	9	FN_PLAIN
+internal/llm/probe_thinking_test.go	NONE	-	4	FN_PLAIN
+internal/llm/ratelimit_pace_test.go	NONE	-	5	FN_PLAIN
+internal/llm/tempdir_resolved_124_test.go	NONE	-	0	FN_PLAIN
+internal/memory/artifacts_junction_tripwire_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/memory/artifacts_path_invariant_test.go	NONE	-	5	FN_PLAIN
+internal/memory/artifacts_stray_test.go	NONE	-	4	FN_PLAIN
+internal/memory/concurrent_test.go	NONE	-	3	FN_PLAIN
+internal/memory/dao_providerhealth_test.go	NONE	-	3	FN_PLAIN
+internal/memory/dao_test.go	NONE	-	8	FN_PLAIN
+internal/memory/migrate_v1seed_test.go	NONE	-	1	FN_PLAIN
+internal/memory/privacy_test.go	NONE	-	1	FN_PLAIN
+internal/memory/retention_test.go	NONE	-	4	FN_PLAIN
+internal/memory/schema_test.go	NONE	-	7	FN_PLAIN
+internal/memory/tempdir_resolved_124_test.go	NONE	-	0	FN_PLAIN
+internal/models/acl_sid_121_test.go	NONE	-	3	FN_PLAIN
+internal/models/acl_sid_121_windows_test.go	WIN	//go:build windows	0	FN_WIN
+internal/models/assembly_reachability_121_test.go	NONE	-	1	FN_PLAIN
+internal/models/bridge_test.go	NONE	-	3	FN_PLAIN
+internal/models/downloader_test.go	NONE	-	9	FN_PLAIN
+internal/models/handoff_reuse_109_test.go	NONE	-	2	FN_PLAIN
+internal/models/handoff_window_109_test.go	NONE	-	1	FN_PLAIN
+internal/models/handoff_window_109_windows_test.go	WIN	//go:build windows	2	FN_WIN
+internal/models/helpers_test.go	NONE	-	0	FN_PLAIN
+internal/models/manifest_real_test.go	NONE	-	5	FN_PLAIN
+internal/models/manifest_test.go	NONE	-	4	FN_PLAIN
+internal/models/minisign_test.go	NONE	-	5	FN_PLAIN
+internal/models/no_seal_ruling_test.go	NONE	-	1	FN_PLAIN
+internal/models/no_seal_ruling_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/models/verify_cost_121_bench_test.go	NONE	-	2	FN_PLAIN
+internal/models/verify_tree_121_other_test.go	POSIX	//go:build !windows	3	FN_POSIX
+internal/models/verify_tree_121_test.go	NONE	-	3	FN_PLAIN
+internal/observe/clock_test.go	NONE	-	2	FN_PLAIN
+internal/observe/diagnostics_test.go	NONE	-	3	FN_PLAIN
+internal/observe/earlylog_130_test.go	NONE	-	7	FN_PLAIN
+internal/observe/errors_test.go	NONE	-	6	FN_PLAIN
+internal/observe/goroutine_test.go	NONE	-	5	FN_PLAIN
+internal/observe/logging_test.go	NONE	-	12	FN_PLAIN
+internal/observe/nobarego_test.go	NONE	-	1	FN_PLAIN
+internal/observe/observer_cost_test.go	NONE	-	3	FN_PLAIN
+internal/observe/sampler_faketree_guard_136_test.go	NONE	-	3	FN_PLAIN
+internal/observe/sampler_settle_coverage_136_test.go	NONE	-	4	FN_PLAIN
+internal/observe/sampler_settle_gate_136_test.go	NONE	-	6	FN_PLAIN
+internal/observe/sampler_settle_zerosample_136_test.go	NONE	-	2	FN_PLAIN
+internal/observe/sampler_test.go	NONE	-	15	FN_PLAIN
+internal/observe/sampler_zerosample_136_test.go	NONE	-	2	FN_PLAIN
+internal/observe/window_wait_136_test.go	NONE	-	0	FN_PLAIN
+internal/panel/approval_test.go	NONE	-	4	FN_PLAIN
+internal/panel/assets_test.go	NONE	-	6	FN_PLAIN
+internal/panel/attachments_test.go	NONE	-	5	FN_PLAIN
+internal/panel/backpressure_bound_35r8_test.go	NONE	-	4	FN_PLAIN
+internal/panel/bridge_test.go	NONE	-	3	FN_PLAIN
+internal/panel/composer_dispatch_test.go	NONE	-	12	FN_PLAIN
+internal/panel/composer_handlers_test.go	NONE	-	6	FN_PLAIN
+internal/panel/composer_test.go	NONE	-	11	FN_PLAIN
+internal/panel/config_route_248_test.go	NONE	-	11	FN_PLAIN
+internal/panel/frontend_hygiene_test.go	NONE	-	5	FN_PLAIN
+internal/panel/git_test.go	NONE	-	13	FN_PLAIN
+internal/panel/inbound_raw_leak_35r7_test.go	NONE	-	4	FN_PLAIN
+internal/panel/inbound_roster_253_test.go	NONE	-	5	FN_PLAIN
+internal/panel/instructions_200_test.go	NONE	-	4	FN_PLAIN
+internal/panel/l2_grant_boundary_test.go	NONE	-	7	FN_PLAIN
+internal/panel/pump_test.go	NONE	-	6	FN_PLAIN
+internal/panel/subagent_blocked_220_test.go	NONE	-	4	FN_PLAIN
+internal/panel/subagent_roster_197_test.go	NONE	-	5	FN_PLAIN
+internal/panel/subagent_stream_197_test.go	NONE	-	5	FN_PLAIN
+internal/panel/tokens_fourway_test.go	NONE	-	1	FN_PLAIN
+internal/panel/workspace_account_181r3_test.go	NONE	-	3	FN_PLAIN
+internal/panel/workspace_test.go	NONE	-	6	FN_PLAIN
+internal/perm/store_test.go	NONE	-	9	FN_PLAIN
+internal/perm/tempdir_resolved_124_test.go	NONE	-	0	FN_PLAIN
+internal/perm/ticket90_persist_test.go	NONE	-	5	FN_PLAIN
+internal/plugin/disposal_test.go	NONE	-	7	FN_PLAIN
+internal/proc/boot_windows_test.go	WIN	//go:build windows	2	FN_WIN
+internal/proc/crossvet_test.go	NONE	-	1	FN_PLAIN
+internal/proc/envfork_mutex_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/proc/envfork_test.go	NONE	-	7	FN_PLAIN
+internal/proc/externalsampler_windows_test.go	WIN	//go:build windows	4	FN_WIN
+internal/proc/jobscope_windows_test.go	WIN	//go:build windows	4	FN_WIN
+internal/proc/shutdown_hooks_test.go	NONE	-	3	FN_PLAIN
+internal/proc/shutdown_hooks_windows_test.go	WIN	//go:build windows	3	FN_WIN
+internal/proc/shutdown_test.go	NONE	-	4	FN_PLAIN
+internal/proc/singleinstance_windows_test.go	WIN	//go:build windows	2	FN_WIN
+internal/proc/systemprocs_windows_test.go	WIN	//go:build windows	7	FN_WIN
+internal/projctx/projctx_test.go	NONE	-	10	FN_PLAIN
+internal/risk/assessor_test.go	NONE	-	6	FN_PLAIN
+internal/risk/pathresolver_anchor_spelling_windows_test.go	WIN	//go:build windows	6	FN_WIN
+internal/risk/pathresolver_bench_test.go	NONE	-	1	FN_PLAIN
+internal/risk/pathresolver_budget_norace_test.go	TAG_OTHER	//go:build !race	1	FN_PLAIN
+internal/risk/pathresolver_expansion_test.go	NONE	-	1	FN_PLAIN
+internal/risk/pathresolver_junction_windows_test.go	WIN	//go:build windows	10	FN_WIN
+internal/risk/pathresolver_rewrite_account_test.go	NONE	-	3	FN_PLAIN
+internal/risk/pathshape_portable_test.go	NONE	-	6	FN_PLAIN
+internal/risk/pointer_183_test.go	NONE	-	8	FN_PLAIN
+internal/risk/pointer_185_test.go	NONE	-	10	FN_PLAIN
+internal/risk/provenance_syncdirs_other_test.go	POSIX	//go:build !windows	1	FN_POSIX
+internal/risk/provenance_syncdirs_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/risk/provenance_test.go	NONE	-	28	FN_PLAIN
+internal/risk/rules_test.go	NONE	-	8	FN_PLAIN
+internal/risk/shape_a_exemption_test.go	NONE	-	8	FN_PLAIN
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go	NONE	-	4	FN_PLAIN
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go	WIN	//go:build windows	2	FN_WIN
+internal/risk/syncdirs_other_test.go	POSIX	//go:build !windows	3	FN_POSIX
+internal/risk/syncdirs_redteam_windows_test.go	WIN	//go:build windows	4	FN_WIN
+internal/risk/syncdirs_test.go	NONE	-	14	FN_PLAIN
+internal/risk/syncdirs_windows_test.go	WIN	//go:build windows	3	FN_WIN
+internal/risk/taintmatch_test.go	NONE	-	9	FN_PLAIN
+internal/secret/delete_test.go	WIN	//go:build windows	5	FN_PLAIN
+internal/secret/migrate_test.go	WIN	//go:build windows	5	FN_PLAIN
+internal/secret/refs_test.go	NONE	-	4	FN_PLAIN
+internal/secret/store_test.go	WIN	//go:build windows	7	FN_PLAIN
+internal/session/grants_test.go	NONE	-	9	FN_PLAIN
+internal/session/ticket224_pattern_dialect_test.go	NONE	-	5	FN_PLAIN
+internal/statemachine/machine_test.go	NONE	-	5	FN_PLAIN
+internal/statemachine/table_test.go	NONE	-	5	FN_PLAIN
+internal/tools/bridge_a18_kill_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/tools/bridge_junction_windows_test.go	WIN	//go:build windows	6	FN_WIN
+internal/tools/bridge_path_account_ticket105_test.go	NONE	-	3	FN_PLAIN
+internal/tools/bridge_scope_open_ticket158_test.go	NONE	-	1	FN_PLAIN
+internal/tools/bridge_test.go	NONE	-	11	FN_PLAIN
+internal/tools/failclosed_236_teeth_test.go	NONE	-	6	FN_PLAIN
+internal/tools/fs_edit_ac34_test.go	NONE	-	8	FN_PLAIN
+internal/tools/fs_edit_ac3b_test.go	NONE	-	6	FN_PLAIN
+internal/tools/fs_edit_ac4b_kill_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/tools/fs_edit_ac5_gate_r4_test.go	NONE	-	4	FN_PLAIN
+internal/tools/fs_edit_ac5_sweep_r4_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/tools/fs_edit_test.go	NONE	-	5	FN_PLAIN
+internal/tools/fs_staging_windows_test.go	WIN	//go:build windows	4	FN_WIN
+internal/tools/fs_test.go	NONE	-	9	FN_PLAIN
+internal/tools/fs_write_test.go	NONE	-	13	FN_PLAIN
+internal/tools/fswrite_silentloss_ac1_test.go	NONE	-	1	FN_PLAIN
+internal/tools/grant_test.go	NONE	-	8	FN_PLAIN
+internal/tools/helpers_test.go	NONE	-	0	FN_PLAIN
+internal/tools/loop_approval_test.go	NONE	-	2	FN_PLAIN
+internal/tools/paths_rewrite_ticket102_test.go	NONE	-	1	FN_PLAIN
+internal/tools/paths_shortname_252_probe_test.go	WIN	//go:build windows	3	FN_PLAIN
+internal/tools/paths_shortname_252_r1_test.go	WIN	//go:build windows	4	FN_PLAIN
+internal/tools/paths_ticket107_portable_test.go	NONE	-	2	FN_PLAIN
+internal/tools/paths_ticket107b_probes_test.go	NONE	-	3	FN_PLAIN
+internal/tools/paths_twocontainments_252_r2_test.go	NONE	-	2	FN_PLAIN
+internal/tools/paths_twocontainments_252_r2_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/tools/paths_workspace_account_181r3_test.go	NONE	-	4	FN_PLAIN
+internal/tools/paths_workspace_test.go	NONE	-	4	FN_PLAIN
+internal/tools/pathshape_portable_test.go	NONE	-	4	FN_PLAIN
+internal/tools/pointer_183_cli_seam_test.go	NONE	-	2	FN_PLAIN
+internal/tools/pointer_185_cli_seam_test.go	NONE	-	6	FN_PLAIN
+internal/tools/recycle_windows_test.go	WIN	//go:build windows	3	FN_WIN
+internal/tools/subagent_197_test.go	NONE	-	11	FN_PLAIN
+internal/tools/subagent_222_test.go	NONE	-	3	FN_PLAIN
+internal/tools/task_cancel_221_legs_test.go	NONE	-	7	FN_PLAIN
+internal/tools/task_cancel_221_test.go	NONE	-	1	FN_PLAIN
+internal/tools/task_output_ac2_before_test.go	NONE	-	1	FN_PLAIN
+internal/tools/task_output_canonicalize_fail_174_test.go	NONE	-	2	FN_PLAIN
+internal/tools/task_output_leg_test.go	NONE	-	9	FN_PLAIN
+internal/tools/task_output_pointer_notice_test.go	NONE	-	10	FN_PLAIN
+internal/tools/task_pointer_authority_ac3_174r4_windows_test.go	WIN	//go:build windows	3	FN_WIN
+internal/tools/task_state_188_test.go	NONE	-	4	FN_PLAIN
+internal/tools/tasklist_deferred_236r3_teeth_test.go	NONE	-	2	FN_PLAIN
+internal/tools/tempdir_resolved_124_test.go	NONE	-	0	FN_PLAIN
+internal/tools/tempdir_resolved_124x_test.go	NONE	-	0	FN_PLAIN
+internal/tools/ticket175r2_stamp_live_test.go	NONE	-	5	FN_PLAIN
+internal/tools/ticket176r1_start_port_test.go	NONE	-	4	FN_PLAIN
+internal/tools/ticket224_grantid_column_test.go	NONE	-	1	FN_PLAIN
+internal/tools/ticket224_setter_scope_test.go	NONE	-	1	FN_PLAIN
+internal/tools/ticket283_corr_identity_rulers_test.go	NONE	-	2	FN_PLAIN
+internal/tools/ticket285_corr_rows_rulers_test.go	NONE	-	1	FN_PLAIN
+internal/tools/ticket90_test.go	NONE	-	8	FN_PLAIN
+internal/tools/wiring_test.go	NONE	-	5	FN_PLAIN
+internal/winsec/absoluteness_attribution_129_windows_test.go	WIN	//go:build windows	4	FN_WIN
+internal/winsec/absoluteness_seam_landing_129_windows_test.go	WIN	//go:build windows	4	FN_WIN
+internal/winsec/acl_windows_test.go	WIN	//go:build windows	5	FN_WIN
+internal/winsec/ancestor_separator_108_other_test.go	POSIX	//go:build !windows	4	FN_POSIX
+internal/winsec/dataroot_symlink_119_other_test.go	POSIX	//go:build !windows	5	FN_POSIX
+internal/winsec/export_test.go	NONE	-	0	FN_PLAIN
+internal/winsec/inherited_narrow_notice_104_windows_test.go	WIN	//go:build windows	4	FN_WIN
+internal/winsec/migrate_windows_test.go	WIN	//go:build windows	2	FN_WIN
+internal/winsec/narrow_notice_windows_test.go	WIN	//go:build windows	2	FN_WIN
+internal/winsec/notice_attribution_115_windows_test.go	WIN	//go:build windows	2	FN_WIN
+internal/winsec/notice_kind_and_everyone_118_windows_test.go	WIN	//go:build windows	4	FN_WIN
+internal/winsec/pathpieces_108_test.go	NONE	-	2	FN_PLAIN
+internal/winsec/placement_leaf_118_other_test.go	POSIX	//go:build !windows	2	FN_POSIX
+internal/winsec/placement_symlink_113_other_test.go	POSIX	//go:build !windows	8	FN_POSIX
+internal/winsec/private_fail_test.go	NONE	-	2	FN_PLAIN
+internal/winsec/private_other_test.go	POSIX	//go:build !windows	4	FN_POSIX
+internal/winsec/private_set_sid_windows_test.go	WIN	//go:build windows	3	FN_WIN
+internal/winsec/production_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/winsec/reparse_windows_test.go	WIN	//go:build windows	5	FN_WIN
+internal/winsec/resolve_windows_test.go	WIN	//go:build windows	2	FN_WIN
+internal/winsec/seam_bypass_108_windows_test.go	WIN	//go:build windows	6	FN_WIN
+internal/winsec/seam_guard_windows_test.go	WIN	//go:build windows	5	FN_WIN
+internal/winsec/seam_probe_root_125_other_test.go	POSIX	//go:build !windows	3	FN_POSIX
+internal/winsec/tempdir_resolved_124_other_test.go	POSIX	//go:build !windows	0	FN_POSIX
+internal/winsec/tempdir_resolved_124_windows_test.go	WIN	//go:build windows	0	FN_WIN
+internal/winsec/tree_ownership_112_windows_test.go	WIN	//go:build windows	1	FN_WIN
+internal/winsec/volume_attribution_126_windows_test.go	WIN	//go:build windows	4	FN_WIN
+rc=0  # R1/R2/R1f. cols: path | content-tag-class | raw //go:build line (searched in FIRST 3 LINES ONLY) | top-level Test/Benchmark/Fuzz/Example count | filename-class. Universe=376 module _test.go under cmd internal from git archive HEAD (no .scratch, no sub-module dirs)
