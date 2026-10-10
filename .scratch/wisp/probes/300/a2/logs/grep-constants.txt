@@ -1,0 +1,112 @@
+=== A. waveFormatFloat in GO files (HEAD) ===
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:152:			gotFloat := got.tag == waveFormatFloat
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:153:			wantFloat := tc.wantTag == waveFormatFloat
+HEAD:internal/audio/wasapi_windows.go:98:	waveFormatFloat = 3
+HEAD:internal/audio/wasapi_windows.go:378:	floating := s.format.tag == waveFormatFloat
+rc=0
+=== B. KSDATAFORMAT/WAVE_FORMAT/FFFE/65534 in GO ===
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:59:	le.PutUint16(b[0:], 0xFFFE)                                       // WAVE_FORMAT_EXTENSIBLE (mmreg.h:2376)
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:101:			why:     "KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24",
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:107:			why:     "KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2475, Data1=0x00000001) at byte 24",
+HEAD:internal/audio/wasapi_windows.go:99:	waveFormatExt   = 0xFFFE
+HEAD:internal/audio/wasapi_windows.go:192:// SubFormat is the member that carries the real subtype behind a 0xFFFE
+HEAD:internal/audio/wasapi_windows.go:193:// wFormatTag, so Data1 is read at byte 24. KSDATAFORMAT_SUBTYPE_PCM is 1 and
+HEAD:internal/audio/wasapi_windows.go:194:// KSDATAFORMAT_SUBTYPE_IEEE_FLOAT is 3, both with a zero high half word, so a
+HEAD:internal/audio/wasapi_windows.go:212:		f.tag = uint16(sub.Data1) // KSDATAFORMAT_SUBTYPE_* low word: 1=PCM 3=FLOAT
+HEAD:internal/audio/wavinjector.go:163:// (format 1) and IEEE float32 (format 3, incl. WAVE_FORMAT_EXTENSIBLE with a
+HEAD:internal/audio/wavinjector.go:192:			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+HEAD:internal/ball/live_windows_test.go:511:	const hwndTopMost = uintptr(0xFFFFFFFFFFFFFFFE) // (HWND)(LONG_PTR)-2
+rc=0
+=== C. internal/audio roster (HEAD) ===
+internal/audio/audio.go
+internal/audio/capturelevel_windows_test.go
+internal/audio/captureopt.go
+internal/audio/captureopt_test.go
+internal/audio/device.go
+internal/audio/doc.go
+internal/audio/gate.go
+internal/audio/gate_test.go
+internal/audio/hotplug_test.go
+internal/audio/level.go
+internal/audio/level_test.go
+internal/audio/mmdevice_windows.go
+internal/audio/parse_wave_format_300_windows_test.go
+internal/audio/resample.go
+internal/audio/resample_test.go
+internal/audio/wasapi_other.go
+internal/audio/wasapi_windows.go
+internal/audio/wasapimic_windows.go
+internal/audio/wavinjector.go
+internal/audio/wavinjector_test.go
+rc=0
+=== D. floating in GO ===
+HEAD:.scratch/wisp/probes/151-accept/run.shipped.go:352:	// console run: no floating ball, no global Esc hook, so an L1 window can
+HEAD:.scratch/wisp/probes/151-accept/run.shipped.go:465:// cannot be reached from a surface that cannot ask them. The floating ball /
+HEAD:.scratch/wisp/probes/151/run.head.go:352:	// console run: no floating ball, no global Esc hook, so an L1 window can
+HEAD:.scratch/wisp/probes/151/run.head.go:465:// cannot be reached from a surface that cannot ask them. The floating ball /
+HEAD:.scratch/wisp/probes/151/run.mut-noclose.go:352:	// console run: no floating ball, no global Esc hook, so an L1 window can
+HEAD:.scratch/wisp/probes/151/run.mut-noclose.go:465:// cannot be reached from a surface that cannot ask them. The floating ball /
+HEAD:.scratch/wisp/probes/197/r3b/pre/run.go:403:	// console run: no floating ball, no global Esc hook, so an L1 window can
+HEAD:.scratch/wisp/probes/197/r3b/pre/run.go:565:// cannot be reached from a surface that cannot ask them. The floating ball /
+HEAD:.scratch/wisp/probes/198/v2/backup/run.go:552:	// console run: no floating ball, no global Esc hook, so an L1 window can
+HEAD:.scratch/wisp/probes/198/v2/backup/run.go:830:// cannot be reached from a surface that cannot ask them. The floating ball /
+HEAD:.scratch/wisp/probes/228/v1/twobreak/main.go:48:	ballCreatedFragment    = "ball: the resident leg created the floating ball window"
+HEAD:.scratch/wisp/probes/255/v1/backup/schema.go:164:	// Size is the floating ball diameter in px, range 44-72 (SPEC-03 sec 3).
+HEAD:.scratch/wisp/probes/258/v1/mut0/cmd/wisp/resident_windows.go:22:// instance, goroutine registry), host the floating ball window and its tray
+HEAD:.scratch/wisp/probes/258/v1/mut1/cmd/wisp/resident_ball_windows.go:5:// The floating ball, hosted by the leg that stays alive.
+HEAD:.scratch/wisp/probes/258/v1/mut1/cmd/wisp/resident_ball_windows.go:103:// residentBall is this process's handle on the floating ball: the window and
+HEAD:.scratch/wisp/probes/258/v1/mut1/cmd/wisp/resident_ball_windows.go:197:// startResidentBall creates the floating ball window, the tray icon and the
+HEAD:.scratch/wisp/probes/258/v1/mut1/cmd/wisp/resident_ball_windows.go:285:		rb.verdict = fmt.Sprintf("this process has NO floating ball window: %v", err)
+HEAD:.scratch/wisp/probes/258/v1/mut1/cmd/wisp/resident_ball_windows.go:286:		slog.Error("ball: the resident leg could not create the floating ball window", "err", err)
+HEAD:.scratch/wisp/probes/258/v1/mut1/cmd/wisp/resident_ball_windows.go:338:	rb.verdict = fmt.Sprintf("the floating ball window is up in this process (tray icon added, hotkeys from %s, hotkeys live %d/4: %s)",
+HEAD:.scratch/wisp/probes/258/v1/mut1/cmd/wisp/resident_ball_windows.go:340:	slog.Info("ball: the resident leg created the floating ball window",
+HEAD:.scratch/wisp/probes/258/v1/mut1/cmd/wisp/resident_ball_windows.go:353:		return "this process has NO floating ball window (the ball host never ran)"
+HEAD:.scratch/wisp/probes/258/v1/mut3/cmd/wisp/resident_windows.go:22:// instance, goroutine registry), host the floating ball window and its tray
+HEAD:.scratch/wisp/probes/259/r2/before/approval.go:54:	ChannelBall  Channel = "ball"  // click the floating ball
+HEAD:.scratch/wisp/probes/33/r8b/logs/pristine-ball_windows.go:80:// Ball is the floating ball surface. All mutating methods are goroutine-safe
+HEAD:cmd/balldebug/main.go:132:	// the ball floating in the middle of the screen while evidence is taken.
+HEAD:cmd/wisp/approval_reply.go:49:// run.go:406). The floating ball is built only by cmd/balldebug, and
+HEAD:cmd/wisp/main.go:8:// frozen D38(e) 10-step shutdown order. The floating ball GUI is ticket 07.
+HEAD:cmd/wisp/main.go:25:                   floating ball window, its tray icon and its four global hot
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:69:	bound := ra.bindBallHost(&residentBall{verdict: "this process has NO floating ball window: injected failure"})
+HEAD:cmd/wisp/resident_ball_228_test.go:3:// Ticket 228 AC#1: the floating ball must be hosted by a production leg, not
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:39:	ballCreatedMsg = "ball: the resident leg created the floating ball window"
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:42:	ballRefusedMsg = "ball: the resident leg could not create the floating ball window"
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:47:	ballUpClaim     = "the floating ball window is up in this process"
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:48:	ballAbsentClaim = "this process has NO floating ball window"
+HEAD:cmd/wisp/resident_ball_windows.go:5:// The floating ball, hosted by the leg that stays alive.
+HEAD:cmd/wisp/resident_ball_windows.go:129:// residentBall is this process's handle on the floating ball: the window and
+HEAD:cmd/wisp/resident_ball_windows.go:250:// startResidentBall creates the floating ball window, the tray icon and the
+HEAD:cmd/wisp/resident_ball_windows.go:338:		rb.verdict = fmt.Sprintf("this process has NO floating ball window: %v", err)
+HEAD:cmd/wisp/resident_ball_windows.go:339:		slog.Error("ball: the resident leg could not create the floating ball window", "err", err)
+HEAD:cmd/wisp/resident_ball_windows.go:391:	rb.verdict = fmt.Sprintf("the floating ball window is up in this process (tray icon added, hotkeys from %s, hotkeys live %d/4: %s)",
+HEAD:cmd/wisp/resident_ball_windows.go:393:	slog.Info("ball: the resident leg created the floating ball window",
+HEAD:cmd/wisp/resident_ball_windows.go:408:		return "this process has NO floating ball window (the ball host never ran)"
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:49:// lose "the floating ball window is up in this process" or change the
+HEAD:cmd/wisp/resident_other.go:15:// the floating ball window feeds. All three are //go:build windows in
+HEAD:cmd/wisp/resident_windows.go:57:// instance, goroutine registry), host the floating ball window and its tray
+HEAD:cmd/wisp/run.go:552:	// console run: no floating ball, no global Esc hook, so an L1 window can
+HEAD:cmd/wisp/run.go:830:// cannot be reached from a surface that cannot ask them. The floating ball /
+HEAD:internal/agent/approval/approval.go:54:	ChannelBall  Channel = "ball"  // click the floating ball
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:150:			// the sample path from floating alone, so a wrong tag silently
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:155:				t.Errorf("floating = %v, want %v (convertPacket would take the %s path)",
+HEAD:internal/audio/wasapi_windows.go:196:// convertPacket branches on floating alone, that would re-slice 32-bit float
+HEAD:internal/audio/wasapi_windows.go:378:	floating := s.format.tag == waveFormatFloat
+HEAD:internal/audio/wasapi_windows.go:400:			out = append(out, convertPacket(data, int(frames), ch, floating, flags&audclntBufferFlagsSilent != 0)...)
+HEAD:internal/audio/wasapi_windows.go:409:func convertPacket(data unsafe.Pointer, frames, channels int, floating, silent bool) []int16 {
+HEAD:internal/audio/wasapi_windows.go:413:	if floating {
+HEAD:internal/ball/ball_windows.go:80:// Ball is the floating ball surface. All mutating methods are goroutine-safe
+HEAD:internal/ball/doc.go:1:// Package ball owns the floating ball UI surface (SPEC-01 §3): the Win32
+HEAD:internal/ball/interaction_live_test.go:410:		t.Fatalf("could not free the ball from the dock (edge=%d owns=%v); click tests need a floating orb", e, owns)
+HEAD:internal/config/schema.go:164:	// Size is the floating ball diameter in px, range 44-72 (SPEC-03 sec 3).
+HEAD:internal/proc/boot_windows.go:135:				// and clear it. It has no window to bring forward - the floating
+rc=0
+=== E. audio pkg files with go:build windows ===
+HEAD:internal/audio/capturelevel_windows_test.go:1://go:build windows
+HEAD:internal/audio/hotplug_test.go:1://go:build windows
+HEAD:internal/audio/mmdevice_windows.go:1://go:build windows
+HEAD:internal/audio/parse_wave_format_300_windows_test.go:1://go:build windows
+HEAD:internal/audio/wasapi_other.go:1://go:build !windows
+HEAD:internal/audio/wasapi_windows.go:1://go:build windows
+HEAD:internal/audio/wasapimic_windows.go:1://go:build windows
+rc=0

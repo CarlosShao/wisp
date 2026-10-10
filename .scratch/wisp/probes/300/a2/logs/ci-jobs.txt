@@ -1,0 +1,42 @@
+=== J1. job names (keys under jobs, 4-space indent) ===
+11:  pull_request:
+12:  push:
+36:  schedule:
+38:  workflow_dispatch:
+65:  lint:
+67:    steps:
+419:  test-core:
+421:    env:
+423:    steps:
+533:  test-windows:
+535:    env:
+537:    steps:
+818:  slo-smoke:
+820:    env:
+822:    steps:
+879:  slo-full:
+881:    env:
+893:    steps:
+953:  lint-frontend:
+955:    defaults:
+958:    steps:
+=== J2. context around each --scope call site (name/run/if) ===
+--- pattern: --scope=core
+18:486-        if: ${{ !cancelled() }}
+19:487:        run: bash scripts/portable-tests.sh --scope=core
+--- pattern: --scope=census
+5:671-        if: ${{ !cancelled() }}
+8:674-      - name: "Package coverage census (ticket 111 AC#1 + GUARD D)"
+18:760-        if: ${{ !cancelled() }}
+19:761:        run: bash scripts/portable-tests.sh --scope=census
+--- pattern: --scope=windows
+8:796-        if: ${{ !cancelled() }}
+9:797:        run: bash scripts/portable-tests.sh --scope=windows
+--- pattern: wisp-cli-tests.sh
+3:598-        if: ${{ !cancelled() }}
+6:601-      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+18:620-        if: ${{ !cancelled() }}
+19:621:        run: bash scripts/wisp-cli-tests.sh
+=== J3. step-level if: count and any guarding windows tier ===
+56
+=== J4. job-level if: lines ===

@@ -1,0 +1,109 @@
+=== T1. top-level test funcs per file in internal/audio (HEAD) ===
+internal/audio/capturelevel_windows_test.go :: 1
+internal/audio/captureopt_test.go :: 4
+internal/audio/gate_test.go :: 5
+internal/audio/hotplug_test.go :: 8
+internal/audio/level_test.go :: 10
+internal/audio/parse_wave_format_300_windows_test.go :: 1
+internal/audio/resample_test.go :: 7
+internal/audio/wavinjector_test.go :: 6
+=== T2. build tags of each audio test file (first 3 lines) ===
+internal/audio/capturelevel_windows_test.go :: //go:build windows||package audio|
+internal/audio/captureopt_test.go :: package audio||import (|
+internal/audio/gate_test.go :: package audio||import (|
+internal/audio/hotplug_test.go :: //go:build windows||package audio|
+internal/audio/level_test.go :: package audio||import (|
+internal/audio/parse_wave_format_300_windows_test.go :: //go:build windows||package audio|
+internal/audio/resample_test.go :: package audio||import (|
+internal/audio/wavinjector_test.go :: package audio||import (|
+=== T3. wavinjector.go 155-215 ===
+	for i, s := range samples {
+		frame[2*i] = byte(s)
+		frame[2*i+1] = byte(s >> 8)
+	}
+	return frame
+}
+
+// parseWav parses the minimal RIFF/WAVE subset the injector needs: PCM16
+// (format 1) and IEEE float32 (format 3, incl. WAVE_FORMAT_EXTENSIBLE with a
+// float SubFormat). Anything else is a loud error, never a silent mangle.
+func parseWav(data []byte) (samples []int16, rate, chans int, err error) {
+	if len(data) < 12 || string(data[0:4]) != "RIFF" || string(data[8:12]) != "WAVE" {
+		return nil, 0, 0, fmt.Errorf("not a RIFF/WAVE file")
+	}
+	var (
+		fmtTag    uint16
+		bits      uint16
+		fmtSeen   bool
+		dataChunk []byte
+	)
+	off := 12
+	for off+8 <= len(data) {
+		id := string(data[off : off+4])
+		size := int(binary.LittleEndian.Uint32(data[off+4 : off+8]))
+		body := off + 8
+		if body+size > len(data) {
+			size = len(data) - body // tolerate a truncated final chunk
+		}
+		switch id {
+		case "fmt ":
+			if size < 16 {
+				return nil, 0, 0, fmt.Errorf("fmt chunk too short (%d)", size)
+			}
+			fmtTag = binary.LittleEndian.Uint16(data[body : body+2])
+			chans = int(binary.LittleEndian.Uint16(data[body+2 : body+4]))
+			rate = int(binary.LittleEndian.Uint32(data[body+4 : body+8]))
+			bits = binary.LittleEndian.Uint16(data[body+14 : body+16])
+			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+				if size < 40 {
+					return nil, 0, 0, fmt.Errorf("extensible fmt chunk too short (%d)", size)
+				}
+				fmtTag = binary.LittleEndian.Uint16(data[body+24 : body+26])
+			}
+			fmtSeen = true
+		case "data":
+			dataChunk = data[body : body+size]
+		}
+		off = body + size + (size & 1) // chunks are word-aligned
+	}
+	if !fmtSeen {
+		return nil, 0, 0, fmt.Errorf("missing fmt chunk")
+	}
+	if chans <= 0 || rate <= 0 {
+		return nil, 0, 0, fmt.Errorf("bad format: rate=%d chans=%d", rate, chans)
+	}
+	switch {
+	case fmtTag == 1 && bits == 16:
+		n := len(dataChunk) / 2
+		samples = make([]int16, n)
+		for i := 0; i < n; i++ {
+			samples[i] = int16(binary.LittleEndian.Uint16(dataChunk[2*i : 2*i+2]))
+=== T4. waveFormatPCM / waveFormatExt use sites (go only) ===
+HEAD:internal/audio/wasapi_windows.go:97:	waveFormatPCM   = 1
+HEAD:internal/audio/wasapi_windows.go:99:	waveFormatExt   = 0xFFFE
+HEAD:internal/audio/wasapi_windows.go:210:	if f.tag == waveFormatExt {
+=== T5. wasapi_other.go constants ===
+=== T6. floating in cmd/wisp audio-related ===
+HEAD:cmd/wisp/approval_reply.go:49:// run.go:406). The floating ball is built only by cmd/balldebug, and
+HEAD:cmd/wisp/main.go:8:// frozen D38(e) 10-step shutdown order. The floating ball GUI is ticket 07.
+HEAD:cmd/wisp/main.go:25:                   floating ball window, its tray icon and its four global hot
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:69:	bound := ra.bindBallHost(&residentBall{verdict: "this process has NO floating ball window: injected failure"})
+HEAD:cmd/wisp/resident_ball_228_test.go:3:// Ticket 228 AC#1: the floating ball must be hosted by a production leg, not
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:39:	ballCreatedMsg = "ball: the resident leg created the floating ball window"
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:42:	ballRefusedMsg = "ball: the resident leg could not create the floating ball window"
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:47:	ballUpClaim     = "the floating ball window is up in this process"
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:48:	ballAbsentClaim = "this process has NO floating ball window"
+HEAD:cmd/wisp/resident_ball_windows.go:5:// The floating ball, hosted by the leg that stays alive.
+HEAD:cmd/wisp/resident_ball_windows.go:129:// residentBall is this process's handle on the floating ball: the window and
+HEAD:cmd/wisp/resident_ball_windows.go:250:// startResidentBall creates the floating ball window, the tray icon and the
+HEAD:cmd/wisp/resident_ball_windows.go:338:		rb.verdict = fmt.Sprintf("this process has NO floating ball window: %v", err)
+HEAD:cmd/wisp/resident_ball_windows.go:339:		slog.Error("ball: the resident leg could not create the floating ball window", "err", err)
+HEAD:cmd/wisp/resident_ball_windows.go:391:	rb.verdict = fmt.Sprintf("the floating ball window is up in this process (tray icon added, hotkeys from %s, hotkeys live %d/4: %s)",
+HEAD:cmd/wisp/resident_ball_windows.go:393:	slog.Info("ball: the resident leg created the floating ball window",
+HEAD:cmd/wisp/resident_ball_windows.go:408:		return "this process has NO floating ball window (the ball host never ran)"
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:49:// lose "the floating ball window is up in this process" or change the
+HEAD:cmd/wisp/resident_other.go:15:// the floating ball window feeds. All three are //go:build windows in
+HEAD:cmd/wisp/resident_windows.go:57:// instance, goroutine registry), host the floating ball window and its tray
+HEAD:cmd/wisp/run.go:552:	// console run: no floating ball, no global Esc hook, so an L1 window can
+HEAD:cmd/wisp/run.go:830:// cannot be reached from a surface that cannot ask them. The floating ball /
+rc=0

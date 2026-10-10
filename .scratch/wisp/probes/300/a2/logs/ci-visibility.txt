@@ -1,0 +1,89 @@
+=== I0. TestMain in audio? ===
+rc=1
+=== I1. wavinjector fmtTag==3 case ===
+			samples[i] = int16(binary.LittleEndian.Uint16(dataChunk[2*i : 2*i+2]))
+		}
+		return samples, rate, chans, nil
+	case fmtTag == 3 && bits == 32:
+		n := len(dataChunk) / 4
+		f := make([]float32, n)
+		for i := 0; i < n; i++ {
+			f[i] = math.Float32frombits(binary.LittleEndian.Uint32(dataChunk[4*i : 4*i+4]))
+		}
+		return FloatToPCM16(f), rate, chans, nil
+	default:
+		return nil, 0, 0, fmt.Errorf("unsupported wav format: tag=%d bits=%d (want PCM16 or float32)", fmtTag, bits)
+	}
+}
+=== I2. portable-tests.sh scope case labels ===
+235:core)
+249:windows)
+257:cli)
+272:census)
+370:            core) pin=$core_pin ;; windows) pin=$win_pin ;; cli) pin=$cli_pin ;;
+--- scope list bodies ---
+=== I3. pins ===
+164:core_pin='
+165-github.com/CarlosShao/wisp/cmd/llmrecord
+166-github.com/CarlosShao/wisp/internal/agent
+167-github.com/CarlosShao/wisp/internal/agent/approval
+--
+193:win_pin='
+194-github.com/CarlosShao/wisp/cmd/llmrecord
+195-github.com/CarlosShao/wisp/internal/audio
+196-github.com/CarlosShao/wisp/internal/ball
+--
+206:cli_pin='
+207-github.com/CarlosShao/wisp/cmd/wisp
+208-'
+209:winsec_pin='
+210-github.com/CarlosShao/wisp/internal/winsec
+211-'
+212-
+--
+247:    pinned=$core_pin
+248-    ;;
+249-windows)
+250-    scope=(
+--
+255:    pinned=$win_pin
+256-    ;;
+257-cli)
+258-    # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
+--
+262:    pinned=$cli_pin
+263-    ;;
+264-winsec)
+265-    # Ticket 251 AC#1: winsec_pin existed with no branch to resolve it, so the pin
+--
+370:            core) pin=$core_pin ;; windows) pin=$win_pin ;; cli) pin=$cli_pin ;;
+371-            winsec) pin=$winsec_pin ;;
+372-            *)
+373-                {
+=== I4. audio mentions in portable-tests.sh ===
+168:github.com/CarlosShao/wisp/internal/audio
+195:github.com/CarlosShao/wisp/internal/audio
+242:        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+253:        ./internal/session/ ./internal/projctx/ ./internal/audio/
+594:    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio endpoint, so the case has no subject there. Real-hardware smoke is ticket 16's"
+=== I5. ci.yml jobs + runs-on + scope call sites ===
+1:name: ci
+10:on:
+40:concurrency:
+53:jobs:
+66:    runs-on: ubuntu-latest
+72:          go-version-file: go.mod
+420:    runs-on: ubuntu-latest
+428:          go-version-file: go.mod
+487:        run: bash scripts/portable-tests.sh --scope=core
+534:    runs-on: windows-latest
+542:          go-version-file: go.mod
+604:        # scripts/wisp-cli-tests.sh's header for the four readings. Short version:
+621:        run: bash scripts/wisp-cli-tests.sh
+761:        run: bash scripts/portable-tests.sh --scope=census
+797:        run: bash scripts/portable-tests.sh --scope=windows
+819:    runs-on: windows-latest
+827:          go-version-file: go.mod
+880:    runs-on: [self-hosted, wisp-slo]
+898:          go-version-file: go.mod
+954:    runs-on: ubuntu-latest

@@ -1,0 +1,171 @@
+=== K1. portable-tests.sh scope bodies 230-270 ===
+winsec_scope=./internal/winsec/...
+
+scope=()
+pinned=''
+case $mode in
+core)
+    scope=(
+        ./internal/agent/ ./internal/agent/approval/
+        ./internal/llm/... ./internal/config/...
+        ./internal/memory/... ./internal/observe/... ./internal/secret/...
+        ./internal/risk/... ./internal/statemachine/...
+        ./internal/tools/... ./internal/models/...
+        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+        ./internal/panel/... ./internal/ball/ ./internal/perm/
+        ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
+        ./internal/session/ ./internal/projctx/
+    )
+    pinned=$core_pin
+    ;;
+windows)
+    scope=(
+        ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
+        ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
+        ./internal/session/ ./internal/projctx/ ./internal/audio/
+    )
+    pinned=$win_pin
+    ;;
+cli)
+    # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
+    # the test binary dies at LOAD time without the sherpa DLLs on PATH (ticket
+    # 98), and that script stages them and refuses to run if they are not there.
+    scope=(./cmd/wisp/)
+    pinned=$cli_pin
+    ;;
+winsec)
+    # Ticket 251 AC#1: winsec_pin existed with no branch to resolve it, so the pin
+    # was never compared to anything this script actually ran. Glob scope + that
+    # pin, both read from the declarations above; GUARD C then bites on a split,
+    # a rename or a package that stopped resolving, in BOTH directions.
+    scope=("$winsec_scope")
+    pinned=$winsec_pin
+=== K2. GUARD region 355-420 ===
+    rm -f "$census_out"
+    n=$(printf '%s\n' "$all" | grep -c . || true)
+    echo "portable-tests.sh: census GOOS=$goos - go list ./... = $n packages (one row each)"
+    printf 'portable-tests.sh: %-46s %-11s %s\n' PACKAGE 'TESTS(t/x)' 'CLAIMED BY'
+    empty=0
+    noscope=0
+    guardd=0
+    unclaimed=''
+    while IFS= read -r p; do
+        [ -n "$p" ] || continue
+        counts=$(go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' "$p" 2>/dev/null || echo '?/?')
+        where=''
+        for m in $tiers; do
+            if [ "$m" = census ]; then continue; fi # the auditor owns no pin (ticket 251 AC#4)
+            case $m in
+            core) pin=$core_pin ;; windows) pin=$win_pin ;; cli) pin=$cli_pin ;;
+            winsec) pin=$winsec_pin ;;
+            *)
+                {
+                    echo "portable-tests.sh: census - tier '$m' is in tiers= but this loop has no pin for"
+                    echo "portable-tests.sh:   it, so census could only ever report it as covering nothing."
+                    echo "portable-tests.sh: Name the pin (ticket 251 AC#4), do not add a tier silently."
+                } >&2
+                exit 1
+                ;;
+            esac
+            if printf '%s\n' "$pin" | grep -qxF "$p"; then where="$where$m"; fi
+        done
+        if [ -z "$where" ]; then
+            where=' NO-SCOPE'
+            noscope=$((noscope + 1))
+            # GUARD D's split of the NO-SCOPE rows: `0/0` is a package with no
+            # denominator on THIS platform (GUARD A's business, and a scope entry
+            # for it would be the false claim ticket 111 AC#3 refuses), while
+            # anything else - a non-zero count, or `?/?`/empty because the count
+            # could not be read - is a package with tests that no step will ever
+            # run. Default-deny: an unreadable count is counted as a hole, never
+            # as covered.
+            case $counts in
+            0/0) ;;
+            *)
+                unclaimed="$unclaimed$p  tests-compiled-for-$goos=${counts:-UNKNOWN}"$'\n'
+                guardd=$((guardd + 1))
+                where="$where <-UNCLAIMED-HAS-TESTS"
+                ;;
+            esac
+        fi
+        case $counts in
+        0/0) empty=$((empty + 1)); where="$where <-NO-TESTS" ;;
+        esac
+        printf 'portable-tests.sh: %-46s %-11s %s\n' "$p" "$counts" "$where"
+    done <<<"$all"
+    echo "portable-tests.sh: census totals: packages=$n with-zero-compiled-tests=$empty claimed-by-no-scope=$noscope unclaimed-with-tests=$guardd"
+    if [ "$guardd" -ne 0 ]; then
+        {
+            echo "portable-tests.sh: GUARD D - $guardd package(s) compile a test file for GOOS=$goos and"
+            echo "portable-tests.sh:   NO named scope claims them, so no CI step runs them and no CI step"
+            echo "portable-tests.sh:   can ever go red over them:"
+            printf '%s' "$unclaimed" | sed 's/^/portable-tests.sh:   /'
+            echo "portable-tests.sh: this row is the ticket 111 field itself ('CI 只测 33 个包里的 20 个')."
+            echo "portable-tests.sh: The census used to PRINT these rows and exit 0, so the hole was visible"
+            echo "portable-tests.sh: only to whoever thought to run it by hand - which is how internal/session"
+            echo "portable-tests.sh: (2 files, ticket 224) and internal/projctx (1 file, ticket 200) sat at"
+            echo "portable-tests.sh: zero coverage for four days after their tests landed. Pull the package"
+            echo "portable-tests.sh: into a named scope and update that tier's pin in the SAME commit, or"
+            echo "portable-tests.sh: state on the ticket where its coverage lives. What this guard forbids"
+=== K3. fixture ledger region 580-600 ===
+        echo "portable-tests.sh: test, or take the entry out and say where its coverage lives."
+    } >&2
+    rm -f "$resolved"
+    exit 1
+fi
+
+# name|package|platform|class|reason
+#   class: fixture = the machine or OS cannot supply the subject at all
+#          opt-in  = deliberately slow or real-network, gated by an env var
+#          reexec  = not a test, the child-process entry point of another test
+ledger=(
+    "TestDefaultDeadlineWallClockMeasurement|./internal/agent/approval/|any|opt-in|300s wall-clock measurement gated by WISP_84_MEASURE=1 (ticket84_no_owner_test.go:224, docs/evidence/s1/84-ac1-bounded-wait.md); it measures a deadline instead of asserting a property, so a CI run of it produces a duration nobody checks"
+    "TestSubprocessCrashWriter|./internal/memory/|any|reexec|child-process entry point of TestCrashRecoveryKillMidWrite (concurrent_test.go:186); not a test of its own, it skips whenever it is not the re-exec'd child"
+    "TestHelperProcess|./internal/proc/|windows|reexec|child-process entry point of the job-object cases (jobscope_windows_test.go:87, //go:build windows); skips unless re-exec'd with the helper env var set"
+    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio endpoint, so the case has no subject there. Real-hardware smoke is ticket 16's"
+    "TestRealDownloadVadThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:120); CI has no business pulling model archives from a third-party mirror"
+    "TestRealDownloadPuncArchiveThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:147); same reason as the VAD row"
+    "TestSyncRegistryProbeLive|./internal/risk/|windows|fixture|P12 live registry evidence; on ubuntu it is now out of scope by platform instead of by skip (ticket 93 AC#2 moved it verbatim into syncdirs_windows_test.go), and on a Windows host whose HKCU Accounts key carries no UserFolder the hive has nothing to say. Measured on a windows host at HEAD 84e43af: --- SKIP at syncdirs_windows_test.go:133. As of ticket 110 AC#4 the windows leg carries ./internal/risk/ in its scope, so this row is re-verified against the compiled WINDOWS test binary (go test -list) and printed with its reason in that step's log - which is the step-level answer R-93-4 asked for. Remedy for a real run: a host with a sync record, or fold the shape check into the fixture-driven case. next= on ticket 93"
+    "TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|./internal/risk/|linux|fixture|needs a handle-resolved form of an existing directory, which POSIX has no object for (pathresolver_rewrite_account_test.go:138). AC#2's remedy is a platform-layer move, impossible from this ticket: the file matches this ticket's forbidden pattern internal/risk/pathresolver*.go. The case RUNS AND PASSES on windows, so the assertion is not lost, it is only un-evaluable here. next= an owner for that file"
+    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The case is AC#3(ii) with a REAL junction: on windows it builds one with cmd /c mklink /J and asserts the switch is refused (runs and passes here). On POSIX there is nothing to refuse, because the detection it exercises is itself a Windows implementation - internal/tools/paths_workspace_test.go:198 skips with 'C26's reparse detection is a Windows implementation (risk.pathresolver_other.go reparseComponents returns nil elsewhere); nothing to deny on linux'. Registered rather than deleted because the file's own comment promises 'the skip is reported, never averaged away', and runtests.sh making every SKIP fatal is what turns that promise into a red step: an unaccounted skip on the ubuntu leg (test-core step 7, measured PASS=578 FAIL=0 SKIP=1 on run 35599458439) is exactly what this row exists to name. OWNER of the POSIX half: whoever lands reparseComponents in risk.pathresolver_other.go - that file is forbidden to this ticket (internal/risk/pathresolver*.go, same wall as the row above), so the POSIX-equivalent criterion is NOT faked here. The row is re-verified against the compiled LINUX test binary on every run: delete the skip, and the case starts running here; delete the case, and GUARD's staleness check goes red."
+    "TestD34WriteMatrix|./internal/tools/|linux|fixture|the table needs a second volume from otherVolumeDir (fs_write_test.go:140/151), and the volume-identity call it uses is a Windows API - on POSIX there is no object to ask. In a CI ubuntu container /tmp and / are one filesystem anyway. It RUNS AND PASSES on a two-volume windows host, so if a windows host ever has a single volume this entry does not cover it and the step goes red on purpose"
+=== K4. any count pins mentioning audio/10 ===
+59:#                   platform is a red step - the entry must gain a denominator
+104:#   core    test-core (ubuntu). Every portable package with a test denominator on
+128:#   windows test-windows' portable step - the same denominator in its windows shape.
+151:# top-level result line. That is a POSIX denominator of 20 assertions, not a
+168:github.com/CarlosShao/wisp/internal/audio
+195:github.com/CarlosShao/wisp/internal/audio
+242:        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+253:        ./internal/session/ ./internal/projctx/ ./internal/audio/
+387:            # denominator on THIS platform (GUARD A's business, and a scope entry
+432:    # ad-hoc list has no expectation to be faithful to" - true of an ad-hoc list,
+434:    # ./internal/winsec/, which IS a tier's own scope and does have an expectation to
+457:# TICKET 250: THE DENOMINATOR IS STDOUT ALONE. This block used to read
+475:# Keeping stderr out of the denominator is not the same as throwing it away: a
+500:        "(progress, not packages, not in the denominator):"
+510:# Every line that made it into the denominator has to BE an import path. Asserting
+534:        echo "portable-tests.sh:   import paths, so this $pkgcount-line denominator cannot be trusted:"
+566:# GUARD A: the loud empty denominator. `.TestGoFiles`+`.XTestGoFiles` are the
+578:        echo "portable-tests.sh: a scope entry with no denominator cannot fail, so keeping it there"
+594:    "TestLiveWasapiSmoke|./internal/audio/|windows|fixture|live WASAPI capture needs WISP_LIVE_MIC=1 and a physical microphone (hotplug_test.go:527, //go:build windows); a hosted runner has no audio endpoint, so the case has no subject there. Real-hardware smoke is ticket 16's"
+=== K5. SDK header precedent in scripts/tools/docs ===
+HEAD:docs/reports/HANDOVER.md:2215:- ★**这票从"嫌疑"升成"已证的偏移错"，两枚硬事实我自己现跑（⛔ 引腿的数）**：① **权威偏移＝24**——我亲手开盘上那枚 `C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\shared\mmreg.h`（176,680 字节），`sed -n '2521,2534p'` 逐字读到 `WAVEFORMATEXTENSIBLE{ WAVEFORMATEX Format; union{WORD wValidBitsPerSample;WORD wSamplesPerBlock;WORD wReserved;} Samples; DWORD dwChannelMask; GUID SubFormat; }`、`:31-36` 读到 `#include "pshpack1.h"`、`grep -n "cbSize = 22"` ⇒ **`:2540`／`:2550`** ⇒ 我自己累加＝`Samples@18`／`dwChannelMask@20`／**`SubFormat@24`**／总长 40 ⇒ **`internal/audio/wasapi_windows.go` 那枚 26 错**；② 腿留的导出树 `/tmp/wisp300-a1r/tree` 里我先核那行逐字仍是 `unsafe.Add(p, 26)`，再跑两形＝**原样 4/4 FAIL**（红句逐字进票面 ★ⓒ）／**只把 26 改成 24 ⇒ 4/4 PASS**，还原＝同一条命令内 `cp`→跑→写回→`cmp` ⇒ **`restore_cmp=IDENTICAL`**、`grep -c 'unsafe.Add(p, 26)'` 回到 1 ⇒ 这套凭据⛔ 恒真那一形。
+HEAD:docs/reports/HANDOVER.md:2217:- ⚠**记我自己两处（都只追加）**：票面第 13 行那句"`nValidSamples` 与 `dwChannelMask` 同一个 union"**⛔**（union 的名字是 `Samples`、`dwChannelMask` 是独立成员、头文件里⛔ `wValidSamples` 这个名字）——**结论层不变**，错的只是我的机制句；另我派单里的示例路径 `Include/*/um/mmreg.h` 盘上⛔ 命中（真身 `shared/`）⇒ 定式＝**派单出现盘上路径，落笔前先 `ls`／`find`**（与 `A797` 那枚同族）。
+HEAD:docs/reports/HANDOVER.md:2291:- **编排者代笔一笔**（只改注释与说明串三处：那句假话／`mmreg.h:2474`⇒`:2475`／把某台机器专属的绝对路径改成 `shared/mmreg.h`）：⛔ 动偏移、⛔ 动断言、⛔ 动夹具字节；七把门禁各落 `rc=`（`gofumpt`／`gofmt` 名册空、非 ASCII 命中 0、`go vet` rc=0、定向用例 rc=0、`d22scan` rc=0、`go build ./...` rc=0），件＝`probes/300/orch/2026-10-10-comment-fix-gates.md`。⚠ 另记我一次：第一发我见 PATH 里没 `gofumpt` 就把那格当"跑⛔ 了"，实际它在 `$(go env GOPATH)/bin`——**命令找不到⛔ 等于检查通过**。
+HEAD:docs/reports/pending-and-issues.md:15080:## A802｜2026-10-10 12:4x｜收 **`300-a1r`**（票 300 只读＋台件腿，四笔 `70a6b9d9`→`cc878604`→`1c007bf6`→`efd85155`；四枚 `.md` 我逐枚 `find -printf '%s %p\n'` 现量＝`00` 4,612／`10` 12,509／`20` 17,598／`90` 11,103，`logs/` 8 枚、**0 字节＝0 枚**）⇒ **翻票 300 的 `AC#0`／`AC#1` 两格**，⛔ `AC#2`..`AC#5` 一枚不碰（`AC#2` 的开工权在**非实现者** `300-v1` 手上，票面我自己写的那句"⛔ 只有 `AC#1` 红过并经非实现者裁之后才动"我⛔ 让它静默 dissolve）；＋★**两枚硬事实由我自己现跑得出**（⛔ 引腿的数）：① 权威偏移＝**24**（我亲手 `sed -n '2521,2534p'` 读盘上 `.../10.0.26100.0/shared/mmreg.h` 的 `WAVEFORMATEXTENSIBLE` ＋ `:31-36` 的 `pshpack1.h` ＋ `grep -n "cbSize = 22"` ⇒ `:2540`／`:2550` 两处，自己累加字段宽度算出 `Samples@18`／`dwChannelMask@20`／`SubFormat@24`／总长 40）⇒ **`parseWaveFormat` 那枚 26 是错的**；② 台件两形配对我在腿留的导出树里自己跑＝**原样（`unsafe.Add(p, 26)`）4/4 FAIL**、**只把树上 26 改成 24 ⇒ 4/4 PASS**，还原证明＝同一条命令内 `cp`→跑→`cp` 写回→`cmp` ⇒ **`restore_cmp=IDENTICAL`** 且 `grep -c 'unsafe.Add(p, 26)'` 回到 **1**；＋★**接受腿两处顶我（只追加，⛔ 改原句）**（票面第 13 行那句 union 说错了／我派单里的示例路径 `Include/*/um/mmreg.h` 在盘上⛔ 成立，真身 `shared/`）；＋★★**一枚新事实直接给我 1 小时前那条定式打补丁**（`third_party/sherpa-onnx` 的三枚 DLL **未被跟踪** ⇒ `git archive` 的导出树里那条 harness PATH 指向不存在的目录）⇒ **A801 那条"改前基线永远取得到"从此带一条前置尺**
+HEAD:docs/reports/pending-and-issues.md:15083:- ★**`AC#0` 我自己重算的偏移（逐字凭据在我手里，⛔ 转述）**：`WAVEFORMATEX` ＝ `wFormatTag`2＋`nChannels`2＋`nSamplesPerSec`4＋`nAvgBytesPerSec`4＋`nBlockAlign`2＋`wBitsPerSample`2＋`cbSize`2 ＝ **18**；`union { WORD wValidBitsPerSample; WORD wSamplesPerBlock; WORD wReserved; } Samples` ＝ **2（@18）**；`DWORD dwChannelMask` ＝ **4（@20）**；`GUID SubFormat` ＝ **16（@24）**；packing＝1（`pshpack1.h`）⇒ 总长 **40**，与 `cbSize = 22`（2＋4＋16）自洽。⇒ **票面第 13 行我那句"`nValidSamples` 是与 `dwChannelMask` 同一个 union 的成员"⛔**：union 的名字是 `Samples`、成员是那三枚 `WORD`，`dwChannelMask` 是**独立成员**，而这枚头文件里⛔ `wValidSamples` 这个名字。**结论层不变**（偏移仍 24、`wasapi_windows.go` 仍错），错的只是我用来解释"为什么 26 不自洽"的机制句。⚠ 记我第二枚派单缺陷（同族）：**派单里出现盘上路径，落笔前先 `ls`／`find` 一发**——我给腿的示例 glob `Include/*/um/mmreg.h` 在盘上⛔ 命中（真身 `shared/`），与 `A797` 那条"声明 HEAD 对象层射程之前先 `git show`"是同一枚毛病的两个面。
+=== K6. disk-reading authority tests (go) ===
+HEAD:internal/ball/tokens.go:4:// C21 DesignTokens；design/assets/tokens.css 为唯一样式真相源").
+HEAD:internal/ball/tokens.go:6:// This file is the machine-checked twin of design/assets/tokens.css: every
+HEAD:internal/ball/tokens.go:72:// design/assets/tokens.css (checked against the CSS by the evidence table).
+HEAD:internal/ball/tokens.go:127:// DarkPalette returns the :root palette of tokens.css.
+HEAD:internal/ball/tokens.go:178:// LightPalette returns the [data-theme="light"] palette of tokens.css.
+HEAD:internal/ball/tokens.go:295:// so that it stays the plain data twin of tokens.css).
+HEAD:internal/ball/tokens_table_test.go:24://   - the 80 panel-only declarations of design/assets/tokens.css. Ticket 74 AC#4
+HEAD:internal/ball/tokens_table_test.go:63:	cssClaim string // second column: what the table says tokens.css declares
+HEAD:internal/ball/tokens_table_test.go:495:	// Geometry + motion tokens (SPEC-08 §2 / tokens.css).
+HEAD:internal/ball/tokens_table_test.go:1348:// ------------------------------------- check 5: the tokens.css leg (ticket 74)
+HEAD:internal/ball/tokens_table_test.go:1350:// Ticket 12 AC#7 established the table's authority chain: design/assets/tokens.css
+HEAD:internal/ball/tokens_table_test.go:1359://     no tokens.css citation to check, and inventing one would fake the very
+rc=0
