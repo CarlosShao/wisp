@@ -1,0 +1,180 @@
+# 306-r1 logs/40-outofbounds.txt 时刻=2026-10-11 07:39:39 +0800（第二把尺；第一把的两个缺陷具名：见 40-outofbounds-attempt1-flawed.txt 里 'fatal: invalid --pretty format' 与 rc_show 取到的是 tail 的退码）
+
+## 0. 本腿全部笔（现量 5 枚，含这一笔之前的 4 枚）
+c888420e 收 305-a1 并裁完（A829）：翻票 305 AC#0＋★裁 AC#2 ⛔ 降级（那两枚症状是回归、有绿点 416d9d56）＋★我自己三处文案被盘上否证就地更正＋★台面规矩补第二轴
+fbd150e3 306-r1 AC#2 / AC#2b 落点：三对各带一发突变凭据（红句逐字引，cmp 逐字节还原，复绿 rc=0）
+c0d5ec24 306-r1 AC#3 落点：把那句"GUID 不在 mmreg.h"改成盘上的实话（只动注释，16 加 5 删全是 // 行）
+52a5eb23 305-a1: tables 3-4 + final self-audit (AC#0 read-only survey complete)
+1b34e475 306-r1 AC#1 落点：乙形夹具＝一份 40 字节 extensible + float32 的 wav 面（只写测试侧）
+53c854e3 305-a1: tables 1-2 (live-document roster + separated attribution)
+4e73d0a5 306-r1 起手锚（AC#4 台面那一半的第 1 笔，commit-first）
+5f891575 305-a1: anchor + raw ruler logs (AC#0 read-only survey, no Go compile surface)
+
+## 1. 逐笔尺（⛔ 区间尺）：git show --name-only --format=%H <hash>，每枚单独退码纯重定向
+===== 4e73d0a5 =====
+rc_show=0
+4e73d0a58e87dc05dd84de41806fd925377127ff
+
+.scratch/wisp/probes/306/r1/00-anchor.md
+.scratch/wisp/probes/306/r1/logs/00-anchor.txt
+.scratch/wisp/probes/306/r1/logs/00-blob-wavinjector.txt
+.scratch/wisp/probes/306/r1/logs/00-driff-internal.txt
+.scratch/wisp/probes/306/r1/logs/00-porcelain-full.txt
+.scratch/wisp/probes/306/r1/logs/00-porcelain-scoped.txt
+.scratch/wisp/probes/306/r1/logs/msg-c1.txt
+files_in_this_commit=7
+outside_write_face=7
+===== 1b34e475 =====
+rc_show=0
+1b34e4753a8b0322823fa680506e6787efa475e8
+
+.scratch/wisp/probes/306/r1/10-fixture.md
+.scratch/wisp/probes/306/r1/logs/10-gofmt-before.txt
+.scratch/wisp/probes/306/r1/logs/10-targeted-green.txt
+.scratch/wisp/probes/306/r1/logs/msg-c2.txt
+internal/audio/wavinjector_extensible_float_306_test.go
+files_in_this_commit=5
+outside_write_face=5
+===== c0d5ec24 =====
+rc_show=0
+c0d5ec24c702e4b9fcb92477f15287dc1f6fa2be
+
+.scratch/wisp/probes/306/r1/30-ac3-comment.md
+.scratch/wisp/probes/306/r1/logs/30-ac3-selfcheck.txt
+.scratch/wisp/probes/306/r1/logs/30-ac6-shape.txt
+.scratch/wisp/probes/306/r1/logs/30-sdk-headers.txt
+.scratch/wisp/probes/306/r1/logs/msg-c3.txt
+internal/audio/wave_format_float_300_windows_test.go
+files_in_this_commit=6
+outside_write_face=6
+===== fbd150e3 =====
+rc_show=0
+fbd150e314e07751dedc2fa309d96e114607a5d0
+
+.scratch/wisp/probes/306/r1/20-nails.md
+.scratch/wisp/probes/306/r1/logs/00-commit1.txt
+.scratch/wisp/probes/306/r1/logs/00-driff-internal.txt
+.scratch/wisp/probes/306/r1/logs/00-porcelain-scoped.txt
+.scratch/wisp/probes/306/r1/logs/10-commit2.txt
+.scratch/wisp/probes/306/r1/logs/30-commit3.txt
+.scratch/wisp/probes/306/r1/logs/HEAD-of-source-repo.txt
+.scratch/wisp/probes/306/r1/logs/base-pkg-run.txt
+.scratch/wisp/probes/306/r1/logs/msg-c4.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-01-mutated.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-02-nofixture-fullpkg.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-03-red.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-04-cmp.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-05-regreen.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-SUMMARY.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-01-mutated.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-02-nofixture-fullpkg.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-03-red.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-04-cmp.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-05-regreen.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-SUMMARY.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-01-mutated.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-02-nofixture-fullpkg.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-03-red.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-04-cmp.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-05-regreen.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-SUMMARY.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-01-mutated.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-02-nofixture-fullpkg.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-03-red.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-04-cmp.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-05-regreen.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-SUMMARY.txt
+.scratch/wisp/probes/306/r1/logs/mutate-final-safety.txt
+.scratch/wisp/probes/306/r1/logs/mutate.sh
+files_in_this_commit=35
+outside_write_face=35
+
+## 2. 四笔并集名册＋写面外的行（期望空集）
+union_files=51
+internal_audio=2
+probes_306_r1=49
+outside=0
+(上面这行若空 = 越界名册空集 = 结论)
+new_wav_binary_tracked=0 (期望 0，与 306-a1 同尺)
+frontend_or_design_hits=0
+
+## 3. 区间差集尺（辅证：区间里混着编排者与 305-a1 的笔，故 internal/ 之外那两行⛔ 算本腿头上）
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+internal/audio/wave_format_float_300_windows_test.go
+internal/audio/wavinjector_extensible_float_306_test.go
+rc_rangediff=0
+其中 internal/ = 
+internal/audio/wave_format_float_300_windows_test.go
+internal/audio/wavinjector_extensible_float_306_test.go
+逐笔归属核对：这两枚分别出自 1b34e475 与 c0d5ec24（都是本腿的笔）
+
+## 4. 禁改清单逐枚零字节尺（rc_diff=0 即 ⛔ 动）
+internal/observe/thresholds.go rc_diff=0
+tools/d22scan/allowlist.txt rc_diff=0
+internal/panel/tokens_fourway_test.go rc_diff=0
+internal/panel/l2_grant_boundary_test.go rc_diff=0
+internal/perm/ticket90_persist_test.go rc_diff=0
+docs/PLAN.md rc_diff=0
+internal/audio/wavinjector.go rc_diff=0
+internal/audio/wasapi_windows.go rc_diff=0
+internal/audio/parse_wave_format_300_windows_test.go rc_diff=0
+internal/audio/hotplug_test.go rc_diff=0
+internal/audio/wavinjector_test.go rc_diff=0
+
+## 5. 别家的脏面（⛔ 本腿碰、⛔ 本腿暂存）：本腿四笔之后 scoped porcelain 仍 0 行
+rc_porcelain_scoped_now=0
+porcelain_scoped_lines=0
+
+## 6. census 的 audio 那一行（可见面：编译期测试枚数从 8 枚变 10 枚，totals 行⛔ 变）
+portable-tests.sh: github.com/CarlosShao/wisp/internal/audio      10/0        corewindows
+--- 同一把尺在改前台面上的那一行（对照，件＝40-census-before-raw.txt）---
+
+## 7. 更正本件 §1 里那枚贴错标签的尺（追加，⛔ 删原句）
+§1 每笔末尾那行 'outside_write_face=N' 的 awk 数的是命中写面的行数，⛔ 是写面外的行数，标签⛔ 配读数。下面这把才是那半句的尺（逐笔名册里⛔ 属于本腿写面的行，期望每笔 0）：
+4e73d0a5 total=7 inside_write_face=7 OUTSIDE=0
+1b34e475 total=5 inside_write_face=5 OUTSIDE=0
+c0d5ec24 total=6 inside_write_face=6 OUTSIDE=0
+fbd150e3 total=35 inside_write_face=35 OUTSIDE=0
+
+## 8. 更正 §6 末行那枚待取的改前 census 对照（那件本腿⛔ 造，原因写死）
+usage: git archive [<options>] <tree-ish> [<path>...]
+   or: git archive --list
+   or: git archive --remote <repo> [--exec <cmd>] [<options>] <tree-ish> [<path>...]
+   or: git archive --remote <repo> [--exec <cmd>] --list
+
+    --[no-]format <fmt>   archive format
+    --[no-]prefix <prefix>
+                          prepend prefix to each pathname in the archive
+    --[no-]add-file <file>
+                          add untracked file to archive
+    --[no-]add-virtual-file <path:content>
+                          add untracked file to archive
+    -o, --[no-]output <file>
+                          write the archive to this file
+    --[no-]worktree-attributes
+                          read .gitattributes in working directory
+    -v, --[no-]verbose    report archived files on stderr
+    --mtime <time>        set modification time of archive entries
+    -NUM                  set compression level
+
+    -l, --[no-]list       list supported archive formats
+
+    --[no-]remote <repo>  retrieve the archive from remote repository <repo>
+    --[no-]exec <command> path to the remote git-upload-archive command
+
+改前那一发 census ⛔ 在导出树上取：scripts/portable-tests.sh 要问 git（索引/包名册），而  导出的树⛔ 带 .git；⛔ 为了对照在共享工作树里做任何 checkout（那是本票硬边界）。
+totals 行（判据那一句）在本腿全部笔落完之后逐字＝盘上现量，与派单给的期望串⛔ 差一字：
+packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+rc_expected_string_verbatim=期望串 packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+改前/改后的枚数差另取一把能跑的尺（顶层测试函数计数，射程＝internal/audio 的全部 _test.go，blob 侧两枚锚点并排）：
+at 5480434f: 43 个顶层 Test 函数
+at HEAD    : 45 个（差＝2＝本腿那两枚指名用例）
+census 那一行读法：internal/audio 10/0 = 编译期测试计数器的 10 枚（8 枚旧 + 2 枚本腿新增），0＝?（该列含义由脚本定义，本腿⛔ 解释，只报逐字）
+
+## 9. 更正（具名自己的雷，派单第 3 节第 6 条那枚）：§8 里那两行被 shell 反引号展开污染
+§8 第二行原文想写的是：'而 git archive 导出的树⛔ 带 .git'，本腿把命令名写进了反引号里，
+于是命令替换真的跑了 git archive（无参）→ 它的使用说明被灌进本件（见 §8 那段 usage），
+紧跟那句里的命令名也因此消失。读数本身⛔ 受影响：§8 的 totals 行、两枚顶层 Test 函数计数（43 / 45）都是从别处现量后落的字面文本，⛔ 来自那次误跑。
+定式入交件：**含反引号或美元符的中文句子⛔ 能进双引号的 echo，只能走 Write 工具或单引号**（派单第 3 节第 6 条本来只讲了 commit 消息，本腿把它扩展到证据件生成，同一枚雷）。
+干净重述：改前那一发 census 无法在导出树上取，因为 scripts/portable-tests.sh 要问 git（索引与包名册），而 tar 解出来的导出树⛔ 带 .git；⛔ 为对照在共享工作树做任何 checkout（本票硬边界）。

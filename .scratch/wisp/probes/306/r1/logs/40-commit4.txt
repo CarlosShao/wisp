@@ -1,0 +1,69 @@
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/00-commit1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/00-driff-internal.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/00-porcelain-scoped.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/10-commit2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/30-commit3.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/HEAD-of-source-repo.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/base-pkg-run.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-01-mutated.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-02-nofixture-fullpkg.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-03-red.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-04-cmp.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-05-regreen.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-SUMMARY.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-01-mutated.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-02-nofixture-fullpkg.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-03-red.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-04-cmp.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-05-regreen.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-SUMMARY.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-01-mutated.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-02-nofixture-fullpkg.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-03-red.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-04-cmp.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-05-regreen.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-SUMMARY.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-01-mutated.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-02-nofixture-fullpkg.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-03-red.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-04-cmp.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-05-regreen.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-SUMMARY.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/mutate-final-safety.txt', LF will be replaced by CRLF the next time Git touches it
+[dev fbd150e3] 306-r1 AC#2 / AC#2b 落点：三对各带一发突变凭据（红句逐字引，cmp 逐字节还原，复绿 rc=0）
+ 35 files changed, 1226 insertions(+)
+ create mode 100644 .scratch/wisp/probes/306/r1/20-nails.md
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/00-commit1.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/10-commit2.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/30-commit3.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/HEAD-of-source-repo.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/base-pkg-run.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/msg-c4.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-01-mutated.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-02-nofixture-fullpkg.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-03-red.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-04-cmp.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-05-regreen.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-SUMMARY.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-01-mutated.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-02-nofixture-fullpkg.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-03-red.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-04-cmp.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-05-regreen.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-SUMMARY.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-01-mutated.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-02-nofixture-fullpkg.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-03-red.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-04-cmp.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-05-regreen.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-SUMMARY.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-01-mutated.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-02-nofixture-fullpkg.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-03-red.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-04-cmp.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-05-regreen.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-SUMMARY.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mutate-final-safety.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/mutate.sh
+rc_commit=0

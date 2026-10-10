@@ -1,0 +1,26 @@
+# 306-r1 logs/40-gofmt.txt 时刻=2026-10-11 07:37:57 +0800
+=== 尺 A：工作树那把，射程目录=internal/audio（gofmt -l internal/audio）===
+rc_gofmt_worktree=0
+worktree_unformatted_count=0
+=== 尺 B：HEAD blob 那把，逐个 git show HEAD:<path> 落到仓外 tmp 目录再 gofmt -l ===
+tr: warning: an unescaped backslash at end of string is not portable
+blob_files_dumped=22 (射程=internal/audio 的全部 .go，含 _test.go)
+rc_gofmt_blob=0
+blob_unformatted_count=0
+=== 两把并排的差：工作树名册枚数 vs blob 名册枚数 ===
+delta_files=0 vs blob=0
+=== 新增那枚文件在两把尺里的位置 ===
+worktree side: 0 (0 = 净)
+blob side: the file is NOT in HEAD (it is this leg's addition): 1 in HEAD listing above? see next line
+rc_in_head=0 (1 = 它确实不在 HEAD，是本腿新增；它在工作树那把尺里 0 命中=格式净)
+
+=== 更正上面一处措辞缺陷（本腿自己写的标签与盘上不符，追加而不删原句）===
+上面那句 'the file is NOT in HEAD' 写错了：本腿的第 2 笔（fbd150e3 的祖先）已经把新用例落进 commit，
+所以现量 HEAD=c888420e 里那枚文件存在（rc_in_head=0 才是盘上读数）。
+为让新增 0 枚这句有一把⛔ 被自己的 commit 污染的尺，另取两把并排：
+blob dump from the ENTRY anchor 5480434f: files=21 (this is the pre-work face)
+rc_gofmt_blob_before_anchor=0
+unformatted at 5480434f blobs = 0
+unformatted at HEAD blobs (22 files, incl. the new fixture) = 0
+unformatted in the worktree (gofmt -l internal/audio) = 0
+file counts: 5480434f .go in internal/audio = 21 ; HEAD = 22 ; 差 = 1 = 本腿新增那枚（它⛔ 进未格式名册）

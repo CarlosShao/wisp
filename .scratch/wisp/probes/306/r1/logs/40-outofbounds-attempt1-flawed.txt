@@ -1,0 +1,42 @@
+# 306-r1 logs/40-outofbounds.txt 时刻=2026-10-11 07:39:13 +0800
+--- 逐笔尺（⛔ 区间尺）：git show --name-only --format=<hash> <hash> ---
+== commit 4e73d0a5 ==
+fatal: invalid --pretty format: 4e73d0a5
+rc_show=0
+== commit 1b34e475 ==
+fatal: invalid --pretty format: 1b34e475
+rc_show=0
+== commit c0d5ec24 ==
+fatal: invalid --pretty format: c0d5ec24
+rc_show=0
+== commit fbd150e3 ==
+fatal: invalid --pretty format: fbd150e3
+rc_show=0
+--- 全部笔的名册并集（应只含 internal/audio/** 与 .scratch/wisp/probes/306/r1/**）---
+51
+0
+rc_lines_outside_write_face=1 (上面这枚数＝0 才算越界 0)
+--- 越界名册逐字（⛔ 本腿写面之外的行；期望空集＝结论）---
+--- 差集尺（区间，含别家 leg 的笔，故只作辅证）：git diff --name-only 5480434f HEAD -- internal cmd tools docs scripts .github ---
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+internal/audio/wave_format_float_300_windows_test.go
+internal/audio/wavinjector_extensible_float_306_test.go
+rc_rangediff=0
+--- 其中 internal/ 那几枚逐笔归属（⛔ 别家的行被算进本腿头上）---
+internal/audio/wave_format_float_300_windows_test.go
+internal/audio/wavinjector_extensible_float_306_test.go
+--- 禁改清单逐枚零字节尺 ---
+internal/observe/thresholds.go rc_diff=0 (0 = ⛔ 动)
+tools/d22scan/allowlist.txt rc_diff=0 (0 = ⛔ 动)
+internal/panel/tokens_fourway_test.go rc_diff=0 (0 = ⛔ 动)
+internal/panel/l2_grant_boundary_test.go rc_diff=0 (0 = ⛔ 动)
+internal/perm/ticket90_persist_test.go rc_diff=0 (0 = ⛔ 动)
+docs/PLAN.md rc_diff=0 (0 = ⛔ 动)
+internal/audio/wavinjector.go rc_diff=0 (0 = ⛔ 动)
+internal/audio/wasapi_windows.go rc_diff=0 (0 = ⛔ 动)
+internal/audio/parse_wave_format_300_windows_test.go rc_diff=0 (0 = ⛔ 动)
+--- frontend/** 与 design/** 在本腿四笔里的命中（期望 0）---
+0
+--- census 里 audio 那一行（测试枚数随本腿新增而变的可见面）---
+portable-tests.sh: github.com/CarlosShao/wisp/internal/audio      10/0        corewindows

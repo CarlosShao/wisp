@@ -1,0 +1,11 @@
+# 306-r1 before-bench 时刻=2026-10-11 07:34:47 +0800 台面=C:/Users/swq/tmp/306r1-before-20261011 (git archive 5480434f = 本腿进场锚, 无新用例、无注释格)
+0
+count_of_306_files_in_tree_above (0 = the fixture is absent, this is the pre-work bench)
+rc_before_1=0
+rc_before_2=0
+before-1: top_pass=42 top_fail=0 top_skip=1 sub_pass=12 sub_fail=0
+ok  	github.com/CarlosShao/wisp/internal/audio	15.940s
+before-2: top_pass=42 top_fail=0 top_skip=1 sub_pass=12 sub_fail=0
+ok  	github.com/CarlosShao/wisp/internal/audio	15.981s
+--- SKIP: TestLiveWasapiSmoke (0.00s)
+roster_1_vs_2_lines_diff=0

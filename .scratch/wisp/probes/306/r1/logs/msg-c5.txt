@@ -1,0 +1,23 @@
+306-r1 AC#4 落点：门禁全套读数＋越界逐笔尺（三数带口径、交集尺盲区具名）
+
+编译面五把，件 logs/40-build-vet-d22scan.txt + logs/40-raw-*.txt：
+  go build ./... rc=0；go vet(mod) rc=0；GOOS=linux go vet ./internal/audio/ rc=0（平台中立那一面保住）；
+  GOOS=linux go build ./internal/audio/ rc=0（产码未被改成引用常量的正控）；GOOS=windows go vet rc=0。
+sh scripts/d22scan.sh rc=0，ban #8 自证行逐字留件：internal/=527（派单快照 526，差 1＝本腿那枚新文件，
+且它就在"注释不豁免"的射程里跑绿）、cmd/=119（逐字同派单）。
+格式名册三把并排：工作树 gofmt -l internal/audio = 0 枚；5480434f blob（21 枚 .go）= 0 枚；
+现 HEAD blob（22 枚，含新增）= 0 枚 ⇒ 新增未格式 0 枚。
+go test ./internal/audio/ -count=1 -v 同一台面：改前 2 发（archive 5480434f，顶层 PASS 42/FAIL 0/SKIP 1、子测试 12）、
+改后 2 发（archive fbd150e3，PASS 44/FAIL 0/SKIP 1、子测试 12）＋同树把新用例 mv 走的正控 1 发（回到 42）。
+红名册尺 comm -13/-23 五对全 0 ⇒ 成论口径只写"稳定新增红 0 枚"，并具名该尺盲区（只红过一次会被排除；
+五份名册逐字相同＝只有既有的 --- SKIP: TestLiveWasapiSmoke，非本腿所造）。两把尺⛔ 相加。
+portable-tests.sh --scope=census rc=0，totals 行逐字未变：packages=35 with-zero-compiled-tests=7
+claimed-by-no-scope=7 unclaimed-with-tests=0；audio 那一行 10/0（8->10＝本腿两枚用例）。
+越界：逐笔 git show --name-only --format=%H 四笔 OUTSIDE=0/0/0/0；并集 51 枚（internal/audio 2 + 自家 probes 49）；
+被跟踪 .wav=0；frontend/design 命中 0；禁改清单 11 枚逐枚 git diff --quiet rc=0；scoped porcelain 0 行。
+
+具名自报四处自己的尺缺陷（详见 40-gates.md §7 与 40-outofbounds.txt §7/§8/§9）：
+驱动脚本自读自写被 grep 拒（名册已另起尺重导 SUMMARY）；第一版越界件里 --format 非法且 rc 取了管道尾（整件保留改名）；
+反引号进 echo 真跑了 git archive（usage 灌进件，读数不受影响，已追加更正）；
+本腿曾在仓库根 rm -f 两枚自己的临时计数件，撞"临时件只建不删"，具名报回。
+五枚 0 字节的 go build/vet 原始件改成响亮写明"空即读数"的件，⛔ 空文件交出去。

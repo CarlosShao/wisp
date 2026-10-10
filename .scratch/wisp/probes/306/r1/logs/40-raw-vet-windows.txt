@@ -1,0 +1,5 @@
+# EMPTY BY DESIGN, AND THAT IS THE READING (this is NOT a missing cell)
+# command: GOOS=windows GOFLAGS= go vet ./internal/audio/
+# go build and go vet print NOTHING on success. The exit code of this exact command is
+# landed as its own rc line in logs/40-build-vet-d22scan.txt (rc_build_all / rc_vet_windows_default /
+# rc_vet_linux / rc_build_linux_pkg / rc_vet_windows_explicit, all =0), and 40-gates.md section 1 cites it.

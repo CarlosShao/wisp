@@ -1,0 +1,30 @@
+# 306-r1 after-bench 时刻=2026-10-11 07:35:54 +0800 台面=C:/Users/swq/tmp/306r1-after-20261011 (git archive fbd150e3 = 含新夹具 + AC#3 注释格)
+fixture_present_files=1
+rc_after_1=0
+rc_after_2=0
+rc_after_3_nofixture=0
+after-1: top_pass=44 top_fail=0 top_skip=1 sub_pass=12 sub_fail=0
+ok  	github.com/CarlosShao/wisp/internal/audio	15.951s
+after-2: top_pass=44 top_fail=0 top_skip=1 sub_pass=12 sub_fail=0
+ok  	github.com/CarlosShao/wisp/internal/audio	16.562s
+after-3-nofixture: top_pass=42 top_fail=0 top_skip=1 sub_pass=12 sub_fail=0
+ok  	github.com/CarlosShao/wisp/internal/audio	16.152s
+--- 新用例两枚在 after-1 里的逐字行 ---
+--- PASS: TestParseWavExtensibleFloat32306 (0.00s)
+--- PASS: TestWavInjectorExtensibleFloat32306 (0.00s)
+--- comm 尺（红名册：^--- (FAIL|SKIP): 后 sort -u）---
+comm -13 b1.su a1.su (only-in-after = new red) lines=0
+comm -23 b1.su a1.su (only-in-before = red that vanished) lines=0
+comm -13 b1.su a2.su (only-in-after = new red) lines=0
+comm -23 b1.su a2.su (only-in-before = red that vanished) lines=0
+comm -13 b2.su a1.su (only-in-after = new red) lines=0
+comm -23 b2.su a1.su (only-in-before = red that vanished) lines=0
+comm -13 b2.su a2.su (only-in-after = new red) lines=0
+comm -23 b2.su a2.su (only-in-before = red that vanished) lines=0
+comm -13 b1.su a3.su (only-in-after = new red) lines=0
+comm -23 b1.su a3.su (only-in-before = red that vanished) lines=0
+--- 名册逐字（b1 与 a1 的并集）---
+--- SKIP: TestLiveWasapiSmoke (0.00s)
+--- 三数两把尺（after-1）---
+top: PASS=44 FAIL=0 SKIP=1
+with-subtests: PASS=12 FAIL=0 SKIP=0
