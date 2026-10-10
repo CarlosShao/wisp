@@ -1,0 +1,11 @@
+Sat Oct 10 17:58:13 CST 2026
+ruler = grep -n -E "define +WAVE_FORMAT_(IEEE_FLOAT|PCM|EXTENSIBLE)" <那枚头文件>  （仓外只读，⛔ 任何写入）
+header = C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\shared\mmreg.h
+2110:#define  WAVE_FORMAT_IEEE_FLOAT                 0x0003 /* Microsoft Corporation */
+2376:#define  WAVE_FORMAT_EXTENSIBLE                 0xFFFE /* Microsoft */
+2418:#define WAVE_FORMAT_PCM         1
+rc=0
+--- cross-check: same file, the WAVEFORMATEX layout lines that ticket 300 AC#0 cites ---
+3786:    WORD  wFormatTag;
+3797:    WORD  wFormatTag;
+rc2=0
