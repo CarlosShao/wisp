@@ -15285,3 +15285,27 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 ### ③ 排程照旧（⛔ 因推送而变的东西只有一件）
 
 `301-r2`（票 301 `AC#5`＝`ci.yml:400-401` 两行注释，⛔ 一笔、纯注释面）在飞 ⇒ 它交件后我核 §3 那两把尺（hunk 全落 `#` 行／新增行里 `^\s*(name|runs-on|if|run|steps|uses|with):` 命中 0），再由我推送（授权＝`A813`）＋派 `301-v3` 验收（带 `AC#4` 那枚"追加闭算⛔ 算满足"的必答）。其后＝`300-v3` → 票 111 `AC#12` 普查腿 → 队列 `296-r2`／`298-r1`／`295-r1`／`294-r1`／`294-v1`。⛔ 第二远端 `cnb` 仍⛔ 动（差 921 枚）。
+
+## A816｜2026-10-10 15:5x｜收 **`301-r2`**（票 301 `AC#5`，两笔 `4be5168c`→`b761b584`）⇒ `AC#5` ⛔ 勾（判语归 `301-v3`）＋★它顶回我派单里一句⛔ 老实的话（"audio ⛔ 在 ubuntu 的可求值集合里"——**包级成立、文件级才⛔ 成立**）＋我这边独立复跑过的四把尺
+
+### 1. 我亲手复跑、⛔ 采信转述的部分（每行带尺）
+
+- 名册：`git show --stat --format= b761b584` ＝ **7 枚路径**＝`.github/workflows/ci.yml` ＋ `.scratch/wisp/probes/301/r2/**`（6 枚自家件）。⛔ `scripts/**`、⛔ `internal/**`、⛔ 别人的 `design/**`／脏 `.gitignore`（⇒ §3-2 那条"pathspec 只写自家目录、⛔ 票级 glob"这一发**真起作用了**，与 `A811④`/`A813` 那族归因之争正面对照）。
+- 纯注释面：`git show b761b584 -- ci.yml` 的 `+/-` 行共 **21 枚**，其中**非注释行 0 枚**（尺＝`grep -E '^[+-]' | grep -vcE '^[+-][[:space:]]*#'`）、新增行里 `^\+[[:space:]]*(name|runs-on|if|run|steps|uses|with):` 命中 **0**；hunk **一枚**＝`@@ -397,8 +397,25 @@`（＝腿报的 `-U0` 形 `@@ -400,2 +400,19 @@` 同一处，⛔ 三号冲突）。
+- ★**零行为我用了第三把独立尺（⛔ 是腿那两把）**：`python -c "yaml.safe_load"` 对 `HEAD~2` 与 `HEAD` 两版正规化后 **PARSE_EQUAL = True**；`jobs` 6↔6；`test-core` 键集 `['env','runs-on','steps']` 相同、步骤数 7↔7、步骤名序列逐字相同。⇒ 那条注释面改动在**解析层**⛔ 改变任何东西（腿自己那把尺给出同一结论，我这把⛔ 复用它的脚本）。
+- 门禁三发 rc 件非 0 字节（4／42／255 行），`d22scan`／`bash -n`／`--scope=census` 全 `rc=0`；census totals 逐字仍＝`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`、`internal/audio` 那行 `8/0 corewindows` 没动。
+
+### 2. ★它顶回我派单的一处（记我——那句话是我写的，而且⛔ 是本票的主叙事）
+
+我派单 §1 写："…`internal/audio` 此刻**既⛔ 在 `test-core`（ubuntu）的可求值集合里**（windows-tagged 文件在那台机器上根本编不进分母）…"。**盘上按包级读这句是⛔ 的**：`core)` 数组逐字含 `./internal/audio/...`，且 linux 目标下该包照样解析出源文件与**无 tag 的测试文件**（它的尺＝`CGO_ENABLED=0 GOOS=linux go list -f '{{len .GoFiles}}/{{len .TestGoFiles}}' ./internal/audio/` ⇒ `9/5`；windows ⇒ `11/8`）。⇒ 真话只到**文件级**：ubuntu 求值⛔ 到的那部分是 3 枚 `//go:build windows` 的文件，⛔ 是这枚包。⚠ **这正是 `A812①` 那枚"粒度"错的第三次现身**（第一次＝票面"其余 tagged 进分母"、第二次＝名册/分母口径，这次＝我把"包进⛔ 进档"写成"包可求值⛔ 可求值"）⇒ **定式补一条：说"某包在⛔ 在 CI 上被求值"必须同时写明"包级还是文件级"**，两级的答案在本仓今天是相反的。落地文案已按文件级改写（那 19 行注释里逐字写着 "a per-FILE statement, not a per-package one"）。
+
+### 3. 它自己报的两枚过程事（照录，⛔ 我修饰）
+
+- 起手 `tasklist` 量到 `wisp.exe = 3`（⛔ 本腿起的、它⛔ 杀），约两分钟后复核＝0；⇒ 那段窗口里机主在用（或刚用完）程序本体，本票那三发门禁都落在其后。⚠ 排班含义：**`wisp.exe` 非 0 时⛔ 要派计时敏感的腿**（本票 `AC#2` 那族 `TestPinnedThreadStable10s` 就是计时形）。
+- 它第一次 Edit 把 `  test-core:` 那一行一起吞了，`git diff` 当场抓到并补回，并因此**自加第三把尺**（就是上面那把 yaml 正规化）。⇒ 判语⛔ 由我给（`301-v3` 必答之一：那枚"吞行—抓回—补尺"的过程是⛔ 影响最终笔的成立性）。
+
+### 4. 排程
+
+- `301-v3`（非实现者）现在可派：核 `AC#5` 那笔（含 slo 半句那三处尺的独立重打：`scripts/slo-check.ps1:15` 的 "(memory/handle subset, no audio)"、全文 `grep -nE 'portable-tests|go test|internal/audio'`＝3 hits、`ci.yml` 里 `internal/audio` 出现 0 次）＋**带上 `A814` 那枚残留必答**（"追加闭"是否满足票 301 `AC#4` 的"commit 必带显式 pathspec"子句）。
+- ⚠ 一枚⛔ 定量的欠账仍在：`test-windows` 的首跑颜色（run `38034689386`）。15:5x 我三次抓它，GitHub API 两次 TLS handshake timeout／EOF ⇒ **读数待回填**，回填前票 301 `AC#2` 那句"欠一枚具名 CI 色"⛔ 销（本格已勾，⛔ 许被读成"CI 已验证"——见 `A814`）。
+- `AC#5` 本格⛔ 翻（等 `301-v3`）；推送：`A813` 授权下我先推 `b761b584` 让 CI 自己跑一遍这枚 yml（解析层已证等值，推失败就重试，⛔ 动配置）。
