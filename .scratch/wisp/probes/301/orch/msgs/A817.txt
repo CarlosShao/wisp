@@ -1,0 +1,42 @@
+
+## A817｜2026-10-10 16:0x｜**票 301 `AC#2` 欠的那枚具名 CI 色已回填（编排者自跑）**⇒ 改后该档被求值面 399→440＝我 14:3x 写死的 Δ 预测**在 CI 那台机器上同数**＋红名集合改前改后**逐字相同（12↔12）**、与 audio 名册交集 **0 枚**＋★顺手量到一枚与本票无关的新红族并立成**票 302**（三枚要页面回执的判据躺在 `--scope=cli` 里被托管 runner 求值＝CI 恒红）＋`internal/risk` 那 12 枚逐枚具名入账待归因
+
+正文＝`.scratch/wisp/probes/301/orch/2026-10-10-ci-color-backfill.md`（本发只新建该件＋`logs/**`，⛔ 产码、⛔ 动档、⛔ 翻框）。
+
+### 1. 载具与一枚必须写清的前提（⛔ 把它当"改前对照"来引）
+
+origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **742 枚** commit（尺＝`git rev-list --count cc315261..bcd0a543`＝742）。⇒ **盘上不存在"票 301 `AC#1` 前一笔"的 CI 读数**。能拿的最接近对照＝同一台 runner 上跑 `cc315261` 的那发（run `38004428359`／job `114069831344`，10-09 23:26 schedule）。
+**所以本发证的到底是两件事，分开引**：①「`AC#1` 落地后 `--scope=windows` 真被求值了多少」＝已证；②「那 12 枚红是 742 枚里哪一笔带来的」＝**未证**（要逐笔 bisect，⛔ 共享工作树上做，也⛔ 本票射程）。
+
+### 2. 逐字读数（尺＝步日志里 `portable-tests.sh: four numbers` 那一行）
+
+| 档 | 改前（`cc315261`） | 改后（`bcd0a543`，含 `0a0f62ef`） |
+|---|---|---|
+| `--scope=windows` | `RUN=577 PASS=386 FAIL=12 SKIP=1` | `RUN=624 PASS=427 FAIL=12 SKIP=1` |
+| A-evaluated（PASS+FAIL+SKIP，我算） | **399** | **440**（＋41＝14:3x 预测同数） |
+| census totals | `packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0` | 逐字相同 |
+| `--scope=cli`（`cmd/wisp`） | `RUN=335 PASS=231 FAIL=6 SKIP=1` | `RUN=398 PASS=278 FAIL=8 SKIP=2` ← **本条⛔ 属票 301，见 §4** |
+
+名集合尺（⛔ 只比枚数那类）：两发 `--- FAIL` 名册 `diff` **空**（12↔12 枚枚同名）；改后红名 ∩ `probes/301/r1/rosters/audio-toplevel-names.txt` ＝`comm -12` **0 枚**；`RUN` 624 与本机 `windows-after.B-evaluated.txt`（624 行）**同数**。本机↔runner 逐名色差＝**13 枚**（12 枚本机绿／runner 红 ＋ `TestSyncRedTeamRealOneDrive` 在 runner `--- SKIP`），反方向 1 枚 `TestC21TableColourRowsMatchTokensCSS`（成因＝机主工作树里 `design/assets/tokens.css` 脏，早具名过）。
+⇒ **票 301 `AC#2` 那句"CI 现在真会跑它"从今天起有 CI 自己的字节；`AC#4` 里"具名新增红 0 枚"那半句同理**。本格⛔ 因此翻（`AC#4` 整格仍等 `301-v3` 裁那枚 pathspec 残留）。
+
+### 3. ★我又踩了一次"尺取反方向"（记我，具名）
+
+第一把抽红句文案的尺取的是 `--- FAIL:` **之后** 20 行 ⇒ 12 枚里 6 枚读到 0 命中、我差点写"半数红句不含 `RUNNER~1`"。**Go 的 `-v` 把 `t.Errorf` 明细写在 `--- FAIL:` 之前**，正确射程＝`=== RUN` ↔ `--- FAIL` 之间。重跑后的数：**5/12 枚红句逐字含 `C:\Users\RUNNER~1`**（`TestClassifyAnchorSpellingIsNotVerdict`／`TestCanonicalInputGainsNoSecondForm`／`TestPathResolverShortNameAListDenied`／`TestPathResolverUNCAListDenied`／`TestPathResolverExtendedLengthPrefixAListDenied`）、**2 枚同文件同族但红句不含该串**（`TestAListWinsWhereBothTablesHit`、`TestBListDefaultDenyAndOverride`，机制**未证**）、**5 枚是 `syncdirs_test.go` 的 under-profile fallback 家族**（`:162/:213/:233/:355/:402`，机制**未证**）。⇒ 定式：**"红句里有没有那枚串"这种存在性尺，先把射程区间与方向写进件里再落笔**（同族第二次，第一次是 09-28 那枚"词面尺带不带冒号"）。
+
+### 4. ★立票 302：三枚"要页面自己回话"的判据被 CI 求值＝恒红（⛔ 属票 301，本票只是看见它的人）
+
+`--scope=cli` 新增红 3 枚（尺＝`comm -13` 两发红名册）＝`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC14AwaitedBindingReplyReachesThePage`／`TestAC14GoSideEvalPushReachesThePage`；红句三条同形（逐字）`no report "ac13-probe" / "ac14r-0" / "ac14-push" from the page within 15s (what DID arrive at the door: nothing at all)`（`cmd/wisp/panel_resident_windows_test.go:325/:821/:866`，另含 `panel_pageover_33r10_windows_test.go`）。
+★**同发上下文里窗体那一侧是建成的**（逐字 `embed resolves 1068 entry byte(s)`、`entry bytes carried=true`、`probe document is 136 byte(s)`）⇒ **"CI 开不出面板"那句在本发⛔ 成立**，缺的是页面→Go 那一跳的回执；本机同码不红（票 33 探针腿 `33-p1`：闭环 145~187 ms）。
+性质＝**放置／归口问题**（票 33 那族 AC#13/AC#14 判据长在 `--scope=cli` 档里），⛔ 缺陷、⛔ 断言写坏。这与 10-08 对票 35 `:75(c)` 的裁定（真窗判据⛔ 搬进 CI）同根。
+票面给了三形并**把"丙＝不动、登记成具名已知红"当合法选项**（撤销口令「撤票 302」＝删该件即可，尚未派任何腿）；★硬约束写进票面：**⛔ 为变绿放宽任何断言**——"没有回执就⛔ 判"那句必须原样保住。
+⚠ 归因边界具名：这 3 枚⛔ 是本票造成的（票 301 两笔产码面＝`scripts/portable-tests.sh` 两行 ＋ `ci.yml` 注释，一枚没碰 `cmd/wisp`，逐笔名册尺见 `301-v1` §3-⑥）；它们只是随本批第一次进 CI 才现形。另 1 枚基线红→改后 `--- SKIP`＝`TestPanelHostLatencyPercentilesAC2`，**⛔ 由本票带来、机制本发未查**，记在票 302 `AC#0` ① 的名册射程里。
+
+### 5. `internal/risk` 那 12 枚：**待归因登记，⛔ 塞进票 302**
+
+那一族的修法在"判据读的是哪棵树"（先例＝票 115 `AC#2`／`AC#3` 做过 runner 8.3 形状的复现与 tree attribution），票 302 的修法在"档"——两族混一票必然顺手改错那半。故此处只**逐枚具名入账**（名单见 §3），归口另待一枚普查腿定射程；引这 12 枚时**必须带**"同一台 runner 上改前改后名集合逐字相同"这半句，⛔ 写成本次的代价。
+
+### 6. 六枚 job 色与一枚纪律句
+
+`lint`／`test-core`／`test-windows`＝红，`lint-frontend`／`slo-smoke`／`slo-full`＝绿，**基线与改后逐枚同色**（尺＝`gh run view --json jobs`）。`continue-on-error` 全仓 0 枚真用（`grep -n` 9 处命中枚枚在注释）⇒ "步红＝job 红＝run 红"在本仓是硬的，⛔ 谁以为有一枚灯是假灯。
+最新一笔 `a0e55a51`（含 `AC#5` 注释笔 `b761b584`）＝run `38035842314`，16:0x 现量 `test-windows` **in_progress** ⇒ **`AC#5` 落地后的 CI 色本发⛔ 有读数**（纯注释面预期不变色，⚠ 预期⛔ 等于读数，等终态回填）。

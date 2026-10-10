@@ -1,0 +1,12 @@
+TestAListWinsWhereBothTablesHit  lines=3  RUNNER~1-hits=0
+TestBListDefaultDenyAndOverride  lines=3  RUNNER~1-hits=0
+TestCanonicalInputGainsNoSecondForm  lines=3  RUNNER~1-hits=1
+TestClassifyAnchorSpellingIsNotVerdict  lines=3  RUNNER~1-hits=1
+TestPathResolverExtendedLengthPrefixAListDenied  lines=3  RUNNER~1-hits=1
+TestPathResolverShortNameAListDenied  lines=3  RUNNER~1-hits=1
+TestPathResolverUNCAListDenied  lines=3  RUNNER~1-hits=1
+TestSyncFallbackNotDisarmableByWeakRoot  lines=6  RUNNER~1-hits=0
+TestSyncFixtureFallbackAndMatch  lines=3  RUNNER~1-hits=0
+TestSyncSuspectFallbackIsComponentBounded  lines=3  RUNNER~1-hits=0
+TestSyncSuspectFallbackWhenUndetectable  lines=3  RUNNER~1-hits=0
+TestSyncUnverifiedRootKeepsFallback  lines=3  RUNNER~1-hits=0

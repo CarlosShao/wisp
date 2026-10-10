@@ -2329,3 +2329,17 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 - ⚠ **两枚待回填读数挂着**：① `test-windows` 首跑颜色（run `38034689386`）＝票 301 `AC#2` 已勾但**⛔ 等于 CI 验过**的那半句欠账——15:5x 我三次抓 GitHub API，两次 TLS handshake timeout／EOF，⛔ 硬试；② `TestResolvePerCallBudget` 那枚**待归因红（负载敏感计时判据）**的归口（`internal/risk`／C26 那 1 ms 预算契约面）。
 - ⚠ 一枚排班新事实：`301-r2` 起手量到 `wisp.exe = 3`（⛔ 它起的、⛔ 它杀，两分钟后＝0）⇒ **机主在用程序本体的那段窗口⛔ 要派计时敏感的腿**（本票的 `TestPinnedThreadStable10s`／`waitForLevels(5s)` 正是计时形）。
 - 推送：`A813` 授权下我把 `b761b584` 推上去，让 CI 自己跑一遍这枚 yml（⛔ 第二远端 `cnb` 仍⛔ 动）。
+
+### 4.0bo 停车点（**2026-10-10 16:0x**，编排者；⛔ 不改上面各节原句，只追加）
+
+**一句话**：票 301 欠的那枚 CI 色拿到了并在账上销了——同一台 runner 上该档被求值面 399→440、新增红 0 枚；顺手量到一枚**与本票无关**的恒红新族并立成票 302；验收腿 `301-v3` 在飞（它裁 `AC#5` ＋ `AC#4` 那枚残留必答）。
+
+- **现在在哪**：HEAD＝我的落账笔（父＝`a0e55a51`）。票 301＝**4 勾（`AC#0`/`AC#1`/`AC#2`/`AC#3`）／2 未勾（`AC#4`/`AC#5`）**，两枚未勾都**只**等 `301-v3` 的判语（⛔ 我给）。票 300＝3 勾／3 未勾。票 302＝**新立、⛔ 派任何腿**（`AC#0` 只读普查先）。台账 `grep -c '^## A[0-9]'`＝**545**（新行 `A817`）；本节＝`### 4.0b` 系列的第 **15** 枚。
+- **本轮新钉死的事实（可引，⛔ 重跑）**：尺＝`gh api repos/CarlosShao/wisp/actions/jobs/<id>/logs`（原始字节留在 `probes/301/orch/logs/`，件＝`job-114162576251.log` 改后／`job-114069831344-baseline.log` 基线）。`--scope=windows` 改后 `RUN=624 PASS=427 FAIL=12 SKIP=1` ↔ 基线 `577/386/12/1`；红名集合 `diff` 空；audio 交集 0；census totals 两发逐字同；job 色六枚同。证据正文＝`probes/301/orch/2026-10-10-ci-color-backfill.md`。
+- ⚠⚠ **引用这节必须先带那句载具口径**：origin/dev 停在 `cc315261`（10-06）而今天首推一次带 **742 枚** ⇒ **⛔ 存在"票 301 `AC#1` 前一笔"的 CI 读数**。已证＝"落地后该档真被求值"；**⛔ 证**＝"那 12 枚红属哪一笔"。⛔ 谁把基线那发读成"本票改前"。
+- ★**票 302（新立）＝真窗判据的放置票**：`--scope=cli` 里 3 枚要页面回执的判据（`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC14AwaitedBindingReplyReachesThePage`／`TestAC14GoSideEvalPushReachesThePage`）在托管 runner 上恒红，红句 `no report … from the page within 15s (what DID arrive at the door: nothing at all)`；⚠ 同发里窗体那一侧是**建成**的（`embed resolves 1068 entry byte(s)`）⇒ ⛔ 用"CI 开不出面板"那句话说这件事。三形里**丙＝不动、登记成具名已知红是合法选项**；硬约束＝⛔ 为变绿放宽断言。撤销口令「撤票 302」。next=`301-v3` → `302-a1`（`AC#0` 只读）→ 我裁形 → `302-r1` → `302-v1`。
+- ⚠ `internal/risk` 那 **12 枚**（5 枚红句含 runner TEMP 的 `C:\Users\RUNNER~1`、2 枚同族但红句不含、5 枚 `syncdirs_test.go` under-profile fallback）＝**待归因**，逐枚具名在 `A817` §3/§5，归口另待一枚普查腿定射程（先例＝票 115 `AC#2`／`AC#3` 的 tree attribution）。⛔ 并进票 302。
+- **待回填的读数（仍挂着，⛔ 别当已交）**：① `AC#5` 落地笔 `b761b584` 那发 run `38035842314` 的 `test-windows` **终态**（16:0x＝in_progress；纯注释面预期不变色，⚠ 预期⛔ 读数）；② `cmd/wisp` 那 3 枚的**死因两形**（runner 无 WebView2 Runtime ↔ 有 Runtime 拿不到回执）归在飞的 `33-n1`；③ 真机窗口欠机主的五枚读数、`293-v1` 那把含 `cmd/wisp` 档的复跑、`TestResolvePerCallBudget` 那枚负载敏感待归因红——**原样未销**。
+- **在飞**：`301-v3`（非实现者验收，写面＝只新建 `probes/301/v3/**`，⛔ 碰票面/台账/HANDOVER/产码，⛔ push）。⚠ 我在同一时间窗动的是 `probes/301/orch/**` ＋ `docs/**` ＋票池 ⇒ 写面不重叠；若它先交，先读它的件再落 `AC#4`/`AC#5`。
+- **推送**：`A813` 授权仍有效（只 `origin dev`、fast-forward、⛔ force，撤销口令「撤 A813 推送授权」）。本笔落完即推，推后终判据＝远程 tip 逐字等于本地 HEAD。⚠ 推送＝机主这台机器真被抢 CPU（`slo-full` 在上面跑），**派计时敏感腿前先 `gh run view --json jobs` 量台面**（`A815①` 那条我写错的读数已具名作废）。
+- **你需要做什么（机主）**：**没有需要你拍板的事**。屏幕上不会有新东西；今天的改动只有：仓库多了几份"CI 到底跑了什么"的记录件＋一张新工单（票 302），你机器上的程序本体一个字节没变。

@@ -1,0 +1,48 @@
+### TestAListWinsWhereBothTablesHit
+712-=== RUN   TestAListWinsWhereBothTablesHit
+713-    pathresolver_anchor_spelling_windows_test.go:238: B-only control must stay overridable by design: {Allow:false NeedL2:true Class:B Reason:B-list sensitive path; single-file override requires one L2 confirm: id_*}
+714:--- FAIL: TestAListWinsWhereBothTablesHit (0.02s)
+### TestBListDefaultDenyAndOverride
+752-=== RUN   TestBListDefaultDenyAndOverride
+753-    pathresolver_junction_windows_test.go:292: B-list single-file override must allow: {Allow:false NeedL2:true Class:B Reason:B-list sensitive path; single-file override requires one L2 confirm: .env*}
+754:--- FAIL: TestBListDefaultDenyAndOverride (0.01s)
+### TestCanonicalInputGainsNoSecondForm
+707-=== RUN   TestCanonicalInputGainsNoSecondForm
+708-    pathresolver_anchor_spelling_windows_test.go:140: canonical "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestCanonicalInputGainsNoSecondForm4019438579\\001\\not-created-yet\\deep.txt" produced 2 comparison forms ["c:\\users\\runner~1\\appdata\\local\\te
+709:--- FAIL: TestCanonicalInputGainsNoSecondForm (0.10s)
+### TestClassifyAnchorSpellingIsNotVerdict
+702-=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+703-    pathresolver_anchor_spelling_windows_test.go:57: Resolve("C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestClassifyAnchorSpellingIsNotVerdict484475104\\001\\profile\\.ssh\\id_testkey") canonical "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestClassify
+704:--- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.06s)
+### TestPathResolverExtendedLengthPrefixAListDenied
+743-=== RUN   TestPathResolverExtendedLengthPrefixAListDenied
+744-    pathresolver_junction_windows_test.go:182: \\?\ spelling normalized to "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverExtendedLengthPrefixAListDenied2977748093\\001\\.git-credentials", want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\Te
+745:--- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+### TestPathResolverShortNameAListDenied
+737-=== RUN   TestPathResolverShortNameAListDenied
+738-    pathresolver_junction_windows_test.go:135: short name did not expand to long path: got "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied439913515\\001\\.git-credentials" want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\
+739:--- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+### TestPathResolverUNCAListDenied
+740-=== RUN   TestPathResolverUNCAListDenied
+741-    pathresolver_junction_windows_test.go:164: UNC spelling "\\\\?\\UNC\\localhost\\c$\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverUNCAListDenied3702314258\\001\\.git-credentials" normalized to "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\Tes
+742:--- FAIL: TestPathResolverUNCAListDenied (0.01s)
+### TestSyncFallbackNotDisarmableByWeakRoot
+1052-    syncdirs_test.go:213: source "options": under-profile fallback must stay armed
+1053-    syncdirs_test.go:213: source "": under-profile fallback must stay armed
+1054:--- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.01s)
+### TestSyncFixtureFallbackAndMatch
+1046-=== RUN   TestSyncFixtureFallbackAndMatch
+1047-    syncdirs_test.go:162: write under fixture root must be sync
+1048:--- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+### TestSyncSuspectFallbackIsComponentBounded
+1070-=== RUN   TestSyncSuspectFallbackIsComponentBounded
+1071-    syncdirs_test.go:355: under-profile must be suspect
+1072:--- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.01s)
+### TestSyncSuspectFallbackWhenUndetectable
+1075-=== RUN   TestSyncSuspectFallbackWhenUndetectable
+1076-    syncdirs_test.go:402: under-profile path must be sync-suspect, got {Sync:false Root:{Provider: Path: Source:} Why:write target is not under any sync root}
+1077:--- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+### TestSyncUnverifiedRootKeepsFallback
+1055-=== RUN   TestSyncUnverifiedRootKeepsFallback
+1056-    syncdirs_test.go:233: suspect fallback must stay armed
+1057:--- FAIL: TestSyncUnverifiedRootKeepsFallback (0.01s)

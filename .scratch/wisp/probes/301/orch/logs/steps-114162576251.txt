@@ -1,0 +1,15 @@
+1	Set up job	success
+2	Run actions/checkout@v4	success
+3	Run actions/setup-go@v5	success
+4	Windows ACL sealing gate (internal/winsec's own tests, ticket 110)	success
+5	Cache third_party (deps.toml key)	success
+6	cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)	success
+7	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)	failure
+8	winlive compile gate (go vet -tags winlive, ticket 111 AC#11)	success
+9	Package coverage census (ticket 111 AC#1 + GUARD D)	success
+10	Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)	failure
+11	PathResolver junction placeholder (real cases tickets 18/20)	success
+20	Post Cache third_party (deps.toml key)	skipped
+21	Post Run actions/setup-go@v5	skipped
+22	Post Run actions/checkout@v4	success
+23	Complete job	success

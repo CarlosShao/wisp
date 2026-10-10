@@ -1,0 +1,7 @@
+WF=ci
+114069831181	lint	failure
+114069831241	test-core	failure
+114069831264	slo-smoke	success
+114069831316	lint-frontend	success
+114069831344	test-windows	failure
+114069831363	slo-full	success
