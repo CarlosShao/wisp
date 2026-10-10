@@ -1,0 +1,10 @@
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-commit5.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-outofbounds.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/90-commit6.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c7.txt', LF will be replaced by CRLF the next time Git touches it
+[dev 53aa4b16] 306-r1 终局更正一笔：并集尺撞了共享 /tmp 的宽 glob（就地重算，坏件保留⛔ 删）
+ 6 files changed, 154 insertions(+)
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-commit5.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/90-commit6.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/msg-c7.txt
+rc_commit=0

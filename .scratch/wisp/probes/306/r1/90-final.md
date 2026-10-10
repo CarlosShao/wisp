@@ -115,3 +115,8 @@
   `git status --porcelain -- internal cmd docs scripts .github` **0 行**；`internal/audio` 工作树那 **22** 枚 `.go` 对 HEAD blob 逐枚 `cmp`
   ⇒ `mismatching_files=0`（⛔ 未提交残留）；定向复绿第三发 `rc_final_targeted=0`（两枚指名用例逐字 `--- PASS`）；
   票面框普查 `checked=1 / unchecked=5`（本腿⛔ 翻勾），票面 diff＝**26 加 0 删**（append-only，⛔ 改原句、⛔ 动 `-done`）。
+- ★上面那句"实际交件＝六笔"落笔于第 6 笔之后，第 7 笔（`53aa4b16`，就是 §7 这条更正所在的那一笔）让它自己过期。
+  ⇒ **枚数⛔ 再写死，尺在句子里**＝`git log --format='%h %s' 5480434f..HEAD` 里标题以 `306-r1` 起头的那一批（逐笔名册另有两把现量的尺：
+  `logs/40-outofbounds.txt` §10 的六枚逐笔 `OUTSIDE=0`，与 §11 那把显式件名的并集尺 75 枚／越界 0 枚）；
+  本腿写面⛔ 变过一枚（永远只有 `internal/audio/**` ＋ `.scratch/wisp/probes/306/r1/**` ＋票 306 那一枚追加），
+  所以多一笔只是多一层证据、⛔ 动任何一条判据。
