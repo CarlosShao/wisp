@@ -24,3 +24,100 @@
 7. **顶回一处枚数口径**：派单/票面那句"整包 **41** 枚顶层"与本腿源码尺（blob 名册逐枚统计 func Test 行）数到的 **42 枚**差 1，而该包 func TestMain 命中 **0** ⇒ 两把尺⛔ 同形（PASS 行 vs 源码行），⛔ 我判谁对，落笔请带尺名。
 8. **顶回一处派单措辞**：票面 AC#6 原文还有一半边派单⛔ 写——"且红句具名指向那枚常量而⛔ 指向 tag 的等值比较"；本腿按**原文**办（原文优先于转述），差异具名报回。
 9. ⛔ 派单一处**⛔ 我拍**：C4（跨实现一致性）撞票面 AC#0 那句"⛔ 拿本仓另一枚实现当裁判"的**字面射程**——那一格钉偏移、本候选钉**值**，算⛔ 同一条禁令＝编排者裁；C3 撞既有注释声明＋要改 scripts（越出 AC#4 名册）＝编排者裁；C5 改产码语义面＝⛔ 本票授权范围，需编排者明示。
+
+## 追加：终态读数（尺现跑，取于本件入库那一发之前）
+
+anchor-start:
+4e00357f 2026-10-10T17:34:47+08:00
+porcelain-mine:
+1
+porcelain-full:
+823
+tasklist:
+wisp.exe=0 balldebug.exe=0 msedgewebview2.exe=24 
+tip:
+62688150 2026-10-10T17:51:14+08:00
+rc-last=$?
+
+## 追加二：逐笔名册与差集（尺现跑，--no-renames；取于 tip=62688150 之后）
+
+roster-of-my-commits (4e00357f..HEAD, --no-renames):
+COMMIT 62688150 2026-10-10T17:51:14+08:00 probes/300/a2: final piece 90 plus remaining log files (landing survey complete)
+
+.scratch/wisp/probes/300/a2/90-final.md
+COMMIT ae8ebfbd 2026-10-10T17:50:19+08:00 303-r1: AC#2 机制三形分开答（活动形=丙，有硬读数）
+
+.scratch/wisp/probes/303/r1/10-culprit-prod-diff.txt
+.scratch/wisp/probes/303/r1/14-ac2-shape3-reentry-read.txt
+.scratch/wisp/probes/303/r1/16-ac2-mechanism-three-shapes.md
+.scratch/wisp/probes/303/r1/20-targeted-before-red.txt
+.scratch/wisp/probes/303/r1/msg-ac2.txt
+COMMIT 3d0f8ccc 2026-10-10T17:49:55+08:00 probes/300/a2: AC#6 landing-point survey (candidates, near-miss nails, CI visibility)
+
+.scratch/wisp/probes/300/a2/10-candidate-landing-points.md
+.scratch/wisp/probes/300/a2/20-near-miss-nails.md
+.scratch/wisp/probes/300/a2/30-ci-visibility.md
+.scratch/wisp/probes/300/a2/logs/anchor-rot.txt
+.scratch/wisp/probes/300/a2/logs/final-anchor-raw.txt
+.scratch/wisp/probes/300/a2/logs/near-miss.txt
+.scratch/wisp/probes/300/a2/logs/wavinjector-and-scopes.txt
+COMMIT e4d9a223 2026-10-10T17:48:22+08:00 A821 取证否证我自己那笔"24 枚孤儿 webview"的欠账（那是机主四个应用的进程树）＋★同一次抓到真残留立票 304（测试二进制被外力杀 ⇒ 子进程不随父退，2 枚 mockllm.exe 已挂 3420 分钟）
+
+.scratch/wisp/issues/304-test-binaries-killed-from-outside-orphan-their-children-two-mockllm-exe-still-listening-on-the-owners-machine.md
+.scratch/wisp/probes/orch/webview-orphans/forensics-1.txt
+.scratch/wisp/probes/orch/webview-orphans/forensics-2.txt
+.scratch/wisp/probes/orch/webview-orphans/forensics-3.txt
+.scratch/wisp/probes/orch/webview-orphans/forensics.ps1
+.scratch/wisp/probes/orch/webview-orphans/forensics2.ps1
+.scratch/wisp/probes/orch/webview-orphans/forensics3.ps1
+.scratch/wisp/probes/orch/webview-orphans/kill-mine-1.txt
+.scratch/wisp/probes/orch/webview-orphans/kill-mine.ps1
+.scratch/wisp/probes/orch/webview-orphans/msgs/A821.txt
+.scratch/wisp/probes/orch/webview-orphans/msgs/cm-1.txt
+.scratch/wisp/probes/orch/webview-orphans/msgs/handover-40bs.txt
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+COMMIT ae5ee86d 2026-10-10T17:41:30+08:00 probes/300/a2: anchor deposit 1 (HEAD-object-layer greps only, no readings verdict yet)
+
+.scratch/wisp/probes/300/a2/00-anchor.md
+.scratch/wisp/probes/300/a2/logs/ci-guards.txt
+.scratch/wisp/probes/300/a2/logs/ci-jobs.txt
+.scratch/wisp/probes/300/a2/logs/ci-visibility.txt
+.scratch/wisp/probes/300/a2/logs/grep-constants.txt
+.scratch/wisp/probes/300/a2/logs/roster-audio.txt
+.scratch/wisp/probes/300/a2/logs/sec-B-and-prod.txt
+.scratch/wisp/probes/300/a2/logs/sec-B2-prod.txt
+.scratch/wisp/probes/300/a2/snap/ledger.md
+.scratch/wisp/probes/300/a2/snap/parse_wave_format_300_windows_test.go.txt
+.scratch/wisp/probes/300/a2/snap/ticket-300.md
+.scratch/wisp/probes/300/a2/snap/v3-20-teeth.md
+COMMIT 03fa5840 2026-10-10T17:36:43+08:00 303-r1: 起手锚 (HEAD 4e00357f, 台面 0 脏, 进程 wisp/balldebug=0)
+
+.scratch/wisp/probes/303/r1/00-anchor.md
+diff-set (mine minus authorized roster probes/300/a2), count:
+20
+authorized-roster file count:
+20
+my-file-sizes:
+2463 .scratch/wisp/probes/300/a2/00-anchor.md
+11603 .scratch/wisp/probes/300/a2/10-candidate-landing-points.md
+7240 .scratch/wisp/probes/300/a2/20-near-miss-nails.md
+7289 .scratch/wisp/probes/300/a2/30-ci-visibility.md
+7575 .scratch/wisp/probes/300/a2/90-final.md
+56919 .scratch/wisp/probes/300/a2/logs/anchor-rot.txt
+18936 .scratch/wisp/probes/300/a2/logs/ci-guards.txt
+1309 .scratch/wisp/probes/300/a2/logs/ci-jobs.txt
+3114 .scratch/wisp/probes/300/a2/logs/ci-visibility.txt
+166 .scratch/wisp/probes/300/a2/logs/final-anchor-raw.txt
+10676 .scratch/wisp/probes/300/a2/logs/grep-constants.txt
+15407 .scratch/wisp/probes/300/a2/logs/near-miss.txt
+6052 .scratch/wisp/probes/300/a2/logs/roster-audio.txt
+10889 .scratch/wisp/probes/300/a2/logs/sec-B-and-prod.txt
+6694 .scratch/wisp/probes/300/a2/logs/sec-B2-prod.txt
+30135 .scratch/wisp/probes/300/a2/logs/wavinjector-and-scopes.txt
+4250525 .scratch/wisp/probes/300/a2/snap/ledger.md
+7492 .scratch/wisp/probes/300/a2/snap/parse_wave_format_300_windows_test.go.txt
+72382 .scratch/wisp/probes/300/a2/snap/ticket-300.md
+13433 .scratch/wisp/probes/300/a2/snap/v3-20-teeth.md
+go-compile-face self-report: go build/test/vet/run/list = 0 calls; go env = 0 calls
+rc-line: rc=0
