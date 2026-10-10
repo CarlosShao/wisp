@@ -1,0 +1,5 @@
+gate 1 rc=  : go vet ./internal/audio/  (scored at 2026-10-10 18:43:10 +0800)
+cmd         : go vet ./internal/audio/
+rc=0
+vet stdout+stderr bytes = 0  (0 bytes IS the pass shape for go vet; rc=0 is the gate, the two are not mixed)
+--- verbatim output below (empty means empty) ---
