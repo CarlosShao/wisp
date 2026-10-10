@@ -25,3 +25,10 @@ sub-test --- PASS count  = 6
     --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded (0.00s)
 PASS
 ok  	github.com/CarlosShao/wisp/internal/audio	0.072s
+
+--- recheck after the final commit (scored 2026-10-10 18:52:49 +0800) ---
+cmd: PATH=$PWD/third_party/sherpa-onnx:$PWD/build:$PATH go test ./internal/audio/ -count=1 -run TestWaveFormatConstantsMatchMmregAuthority300 -v
+--- PASS: TestWaveFormatConstantsMatchMmregAuthority300 (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/audio	0.047s
+rc_targeted_recheck=0
+note: this recheck ran WITHOUT -v subtest expansion in the grep scope, so it prints only the top-level --- PASS line; the 6 sub-test PASS lines from the original run are above.

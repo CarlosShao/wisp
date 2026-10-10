@@ -3,3 +3,8 @@ cmd         : go vet ./internal/audio/
 rc=0
 vet stdout+stderr bytes = 0  (0 bytes IS the pass shape for go vet; rc=0 is the gate, the two are not mixed)
 --- verbatim output below (empty means empty) ---
+
+--- recheck after the final commit (scored 2026-10-10 18:52:48 +0800, terminal commit of the leg) ---
+context: go vet re-run against the tree AS COMMITTED, not against an intermediate state
+rc_vet_recheck=0
+gofmt -l internal/audio roster lines = 0
