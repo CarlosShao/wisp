@@ -1,0 +1,1 @@
+300-v4 起手锚（非实现者验收腿，⛔ 落地腿自勾）：锚 34e1962b 现量对上；进程闸门 wisp=0 balldebug=0 mockllm=0、msedgewebview2=24 按 A821 ⛔ 判残留；工作树脏（他人正在飞的活）⇒ 本腿只读、⛔ 任何 checkout/reset/stash/clean；允许写面 .scratch/wisp/probes/300/v4/**（新建，件名 ⛔ .out＝根 .gitignore:8 全仓 *.out）
