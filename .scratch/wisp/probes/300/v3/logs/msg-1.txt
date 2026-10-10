@@ -1,0 +1,1 @@
+probe(300-v3): opening anchor - HEAD dce0f133 read live, scoped porcelain (cmd internal scripts tools) = 0 lines, tasklist wisp.exe=0 balldebug.exe=0, ruler roster R1-R8 named, in-flight constraint recorded (303-a1 owns cmd/wisp window tests so I take no package-level readings and open no window)
