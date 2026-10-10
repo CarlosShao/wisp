@@ -1,0 +1,4 @@
+command: cd /tmp/wisp300-a1r/tree && PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go vet ./internal/audio/
+rc-vet=0 (taken from ${PIPESTATUS[0]} of the tee pipeline)
+stdout+stderr bytes = 0  <-- empty BY DESIGN: go vet prints nothing when clean.
+This line exists so the 0-byte raw log is not mistaken for an unsubmitted cell.

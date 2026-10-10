@@ -1,0 +1,16 @@
+internal\audio/parse_wave_format_300_windows_test.go:49:11: make([]byte, 40) escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:109:18: func literal escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:112:46: len(face) escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:119:71: tc.why escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:122:43: got.tag escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:122:51: tc.wantTag escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:122:63: tc.why escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:129:9: got.channels escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:129:23: got.rate escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:129:33: got.bits escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:130:13: tc.face.channels escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:130:31: tc.face.rate escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:130:45: tc.face.bits escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:139:6: gotFloat escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:139:16: wantFloat escapes to heap
+internal\audio/parse_wave_format_300_windows_test.go:139:75: map[bool]string{...}[wantFloat] escapes to heap

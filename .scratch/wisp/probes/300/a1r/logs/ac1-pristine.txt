@@ -1,0 +1,19 @@
+=== RUN   TestParseWaveFormatSubFormatOffset300
+=== RUN   TestParseWaveFormatSubFormatOffset300/S1_float_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 3 (KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24)
+    parse_wave_format_300_windows_test.go:138: floating = false, want true (convertPacket would take the float32 path)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 1 (KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24
+    parse_wave_format_300_windows_test.go:122: tag = 0, want 7 (positive control: an obviously wrong Data1 must NOT be swallowed into PCM/FLOAT; the parser has to report the value it actually read, so this face may not go green on a constant)
+=== RUN   TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26
+    parse_wave_format_300_windows_test.go:122: tag = 3, want 0 (positive control for offset sensitivity: malformed face with Data1 two bytes late; per the authoritative layout the value at byte 24 is 0, so an assertion that passes here would read nothing meaningful)
+    parse_wave_format_300_windows_test.go:138: floating = true, want false (convertPacket would take the int16 path)
+--- FAIL: TestParseWaveFormatSubFormatOffset300 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+    --- FAIL: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.023s
+FAIL
