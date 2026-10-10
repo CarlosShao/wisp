@@ -1,0 +1,7 @@
+Sun Oct 11 07:50:34 CST 2026
+HEAD=e4740e35ff62d9dc8a9732a20cfedbbf4d501a17
+dispatch_snapshot_said=6284a489
+--- commits since 6284a489 ---
+e4740e35 306-r1 交件名册逐字（终局）
+53aa4b16 306-r1 终局更正一笔：并集尺撞了共享 /tmp 的宽 glob（就地重算，坏件保留⛔ 删）
+rc=0
