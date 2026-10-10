@@ -1,0 +1,8 @@
+PROBE-REPORT classic-inline
+PROBE-REPORT baseuri:about:blank
+PROBE-REPORT module-inline
+PROBE-REPORT blob-url
+PROBE-REPORT eval-probe
+PROBE-VERDICT withMeta=false reports=5 list=[classic-inline baseuri:about:blank module-inline blob-url eval-probe]
+PROBE-SUMMARY classicInline=true moduleInline=true relativeLoaded=false relativeErrored=false blobRan=true evalProbe=true
+PROBE-BASEURI baseuri:about:blank

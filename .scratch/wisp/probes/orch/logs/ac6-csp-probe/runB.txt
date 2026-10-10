@@ -1,0 +1,4 @@
+PROBE-REPORT eval-probe
+PROBE-VERDICT withMeta=true reports=1 list=[eval-probe]
+PROBE-SUMMARY classicInline=false moduleInline=false relativeLoaded=false relativeErrored=false blobRan=false evalProbe=true
+[1010/102208.374:ERROR:ui\gfx\win\window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1411
