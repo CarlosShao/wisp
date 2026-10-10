@@ -27,7 +27,7 @@ frontend/dist/.gitkeep
 ### 这个差别对判据意味着什么（具名回答）
 
 1. **"运行时名册"不是一份 HEAD 静态事实，而是"某一次构建的产物"的事实。** 同一枚 commit 上换一次 `npm run build`，hash 名就换（票面现量第 2 条用的 `index-B8yINMF1.js` 就是 08:51 那一发的名字）。⇒ 名册的可复现锚只能是**产物本身**（工作树 `frontend/dist/**`，或 `build/wisp.exe` 里的字节），⛔ 不可能写成 `HEAD:<path>`。
-2. **exe 里那棵树是构建期才有的**（尺＝`git show HEAD:frontend/embed.go` 逐字 `//go:embed all:dist` ＋ `var distFS embed.FS` ＋ `func Dist() embed.FS`）。在 HEAD 的对象层里那棵树只有 `.gitkeep`，所以**从 HEAD 读 `Assets` 永远读到 `Built()==false`**（`internal/panel/assets.go:54-60` `newAssets` 逐字：只有 `fs.Stat(tree, EntryFile)` 成功才置 `a.built = true`）。⇒ 任何"Resolve 取不取得到"的判语都必须声明"以一枚构建过的树为前题"，否则一律是 `errNotBuilt`（`assets.go:35`）。
+2. **exe 里那棵树是构建期才有的**（尺＝`git show HEAD:frontend/embed.go` 逐字 `//go:embed all:dist` ＋ `var distFS embed.FS` ＋ `func Dist() embed.FS`）。在 HEAD 的对象层里那棵树只有 `.gitkeep`，所以**从 HEAD 读 `Assets` 永远读到 `Built()==false`**（`internal/panel/assets.go:54-60` `newAssets` 逐字：只有 `fs.Stat(tree, EntryFile)` 成功才置 `a.built = true`）。⇒ 任何"Resolve 取不取得到"的判语都必须声明"以一枚构建过的树为前题"，否则一律是 `errNotBuilt`（`assets.go:34` 逐字 `var errNotBuilt = errors.New("panel: embedded assets are not built (run npm run build in frontend/)")`）。
 3. **本腿因此用两把尺并列**：名册内容取自工作树产物（08:51 那一发，mtime 实测＝`Oct 10 08:51`）；"取不取得到"取自 `Resolve`/`contentTypeOf` 的 HEAD 源码语义。工作树那一半⛔ 不能当契约锚，只能当"今天这台机器上这一发的读数"。
 
 ## 1. 第一层：入口 HTML 的引用（`entryRefRe` 同形正则）
