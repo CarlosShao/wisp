@@ -1,0 +1,83 @@
+ruler: grep -rn over the dependency blob (module cache, read-only) + grep -rn over cmd internal ; scope = 依赖导出面 与 本仓调用面 各一把，⛔ 相加
+=== pkg/edge vtbl methods available (NavigationCompleted / AddWebResourceRequestedFilter / ExecuteScript) ===
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/corewebview2.go:103:ExecuteScript
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/corewebview2.go:106:PostWebMessageAsJSON
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/corewebview2.go:107:PostWebMessageAsString
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventArgs.go:10:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventArgs.go:11:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:123:NavigateToString
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:124:NavigateToString
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/corewebview2.go:131:AddWebResourceRequestedFilter
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventHandler.go:13:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:144:ExecuteScript
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventArgs.go:14:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventHandler.go:17:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:216:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventHandler.go:21:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:242:PostWebMessageAsString
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventHandler.go:25:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventHandler.go:26:NavigationCompleted
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:292:AddWebResourceRequestedFilter
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/chromium.go:293:AddWebResourceRequestedFilter
+D:/work/base/gopath/pkg/mod/github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808/pkg/edge/ICoreWebView2NavigationCompletedEventHandler.go:29:NavigationCompleted
+=== does the library export a way to subscribe to NavigationCompleted? (add_ / Event) ===
+72:func (e *Chromium) Embed(hwnd uintptr) bool {
+116:func (e *Chromium) Navigate(url string) {
+123:func (e *Chromium) NavigateToString(htmlContent string) {
+130:func (e *Chromium) Init(script string) {
+138:func (e *Chromium) Eval(script string) {
+151:func (e *Chromium) Show() error {
+155:func (e *Chromium) Hide() error {
+159:func (e *Chromium) QueryInterface(_, _ uintptr) uintptr {
+163:func (e *Chromium) AddRef() uintptr {
+167:func (e *Chromium) Release() uintptr {
+171:func (e *Chromium) EnvironmentCompleted(res uintptr, env *ICoreWebView2Environment) uintptr {
+186:func (e *Chromium) CreateCoreWebView2ControllerCompleted(res uintptr, controller *ICoreWebView2Controller) uintptr {
+233:func (e *Chromium) MessageReceived(sender *ICoreWebView2, args *iCoreWebView2WebMessageReceivedEventArgs) uintptr {
+250:func (e *Chromium) SetPermission(kind CoreWebView2PermissionKind, state CoreWebView2PermissionState) {
+254:func (e *Chromium) SetGlobalPermission(state CoreWebView2PermissionState) {
+258:func (e *Chromium) PermissionRequested(_ *ICoreWebView2, args *iCoreWebView2PermissionRequestedEventArgs) uintptr {
+281:func (e *Chromium) WebResourceRequested(sender *ICoreWebView2, args *ICoreWebView2WebResourceRequestedEventArgs) uintptr {
+292:func (e *Chromium) AddWebResourceRequestedFilter(filter string, ctx COREWEBVIEW2_WEB_RESOURCE_CONTEXT) {
+299:func (e *Chromium) Environment() *ICoreWebView2Environment {
+306:func (e *Chromium) AcceleratorKeyPressed(sender *ICoreWebView2Controller, args *ICoreWebView2AcceleratorKeyPressedEventArgs) uintptr {
+324:func (e *Chromium) GetSettings() (*ICoreWebViewSettings, error) {
+328:func (e *Chromium) GetController() *ICoreWebView2Controller {
+339:func (e *Chromium) NavigationCompleted(sender *ICoreWebView2, args *ICoreWebView2NavigationCompletedEventArgs) uintptr {
+346:func (e *Chromium) NotifyParentWindowPositionChanged() error {
+355:func (e *Chromium) Focus() {
+=== webview2.WebView exported surface (common.go interface) ===
+26:type WebView interface {
+27-
+28-	// Run runs the main loop until it's terminated. After this function exits -
+29-	// you must destroy the webview.
+30-	Run()
+31-
+32-	// Terminate stops the main loop. It is safe to call this function from
+33-	// a background thread.
+34-	Terminate()
+35-
+36-	// Dispatch posts a function to be executed on the main thread. You normally
+37-	// do not need to call this function, unless you want to tweak the native
+38-	// window.
+39-	Dispatch(f func())
+40-
+41-	// Destroy destroys a webview and closes the native window.
+42-	Destroy()
+43-
+44-	// Window returns a native window handle pointer. When using GTK backend the
+45-	// pointer is GtkWindow pointer, when using Cocoa backend the pointer is
+46-	// NSWindow pointer, when using Win32 backend the pointer is HWND pointer.
+47-	Window() unsafe.Pointer
+48-
+=== what this repo calls on the control (non-test) ===
+      2 .Bind(
+      2 .Destroy(
+      8 .Dispatch(
+      2 .Init(
+      1 .Run(
+      3 .SetHtml(
+      1 .SetSize(
+      2 .Terminate(
+      1 .Window(
+rc=0

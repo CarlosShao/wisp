@@ -1,0 +1,44 @@
+ruler: git show --name-only --format='%h %s' <本腿每一笔> ; scope = 逐笔（⛔ 区间尺）；判据 = 名册⛔ 越出 .scratch/wisp/probes/305/a1/** 一格
+=== 本腿已落的两笔 ===
+5f891575 305-a1: anchor + raw ruler logs (AC#0 read-only survey, no Go compile surface)
+
+.scratch/wisp/probes/305/a1/00-anchor.md
+.scratch/wisp/probes/305/a1/logs/l1-anchor.txt
+.scratch/wisp/probes/305/a1/logs/l2-call-sites.txt
+.scratch/wisp/probes/305/a1/logs/l3-library-hops.txt
+.scratch/wisp/probes/305/a1/logs/l4-earlier-green-readings.txt
+.scratch/wisp/probes/305/a1/logs/l5-suspect-70b00885.txt
+.scratch/wisp/probes/305/a1/logs/l6-entry-html-surface.txt
+.scratch/wisp/probes/305/a1/logs/l7-anchor-verify-head-blob.txt
+---
+53c854e3 305-a1: tables 1-2 (live-document roster + separated attribution)
+
+.scratch/wisp/probes/305/a1/10-table1-live-document-roster.md
+.scratch/wisp/probes/305/a1/20-table2-attribution.md
+.scratch/wisp/probes/305/a1/logs/l8-document-literals.txt
+=== 新建 .go 枚数（应为 0）===
+0
+(另一把尺：逐笔)
+5f891575 go_files=0
+53c854e3 go_files=0
+=== 工作树里本腿名册（未提交部分）===
+?? .scratch/wisp/probes/305/a1/30-table3-push-dimension.md
+?? .scratch/wisp/probes/305/a1/40-table4-cost-and-pump-answer.md
+?? .scratch/wisp/probes/305/a1/logs/l10-oob-selfaudit.txt
+?? .scratch/wisp/probes/305/a1/logs/l9-dependency-surface.txt
+=== 别人的脏面仍然原样（本腿⛔ 动、⛔ 暂存）===
+ M .gitignore
+ M .scratch/wisp/probes/152/my152.py
+ M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+ M .scratch/wisp/probes/242/r3/logs/probe-routed.txt
+ M .scratch/wisp/probes/268/v1/evidence.md
+=== HEAD 现在 ===
+53c854e3
+rc=0
