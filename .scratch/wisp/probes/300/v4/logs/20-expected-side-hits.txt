@@ -1,0 +1,9 @@
+70:	mmregWaveFormatPCM uint16 = 1
+74:	mmregWaveFormatIEEEFloat uint16 = 0x0003
+78:	mmregWaveFormatExtensible uint16 = 0xFFFE
+159:			got:       waveFormatFloat,
+160:			want:      mmregWaveFormatIEEEFloat,
+169:			got:       waveFormatExt,
+170:			want:      mmregWaveFormatExtensible,
+178:			got:       waveFormatPCM,
+179:			want:      mmregWaveFormatPCM,

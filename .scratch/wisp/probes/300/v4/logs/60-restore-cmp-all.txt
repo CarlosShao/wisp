@@ -1,0 +1,8 @@
+11-mut-3to1 restore_cmp=IDENTICAL
+12-mut-3to0 restore_cmp=IDENTICAL
+21-A1 restore_cmp=IDENTICAL
+22-A2 restore_cmp=IDENTICAL
+23-A3 restore_cmp=IDENTICAL
+24-A4 restore_cmp=IDENTICAL
+50 restore_cmp=IDENTICAL
+51 restore_cmp=IDENTICAL

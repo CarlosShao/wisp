@@ -1,0 +1,19 @@
+# 300-v4 — roster / comm readings（四枚 0 字节件的读数写在这里，防"0 字节＝没交"那把尺误读）
+
+尺（全部三数口径③：射程目录＝`./internal/audio/`；台面＝仓外导出树 `git archive 34e1962b | tar -x`，工作树＝HEAD blob 同字节）
+名册形状＝`grep -E '^--- FAIL|^    --- FAIL'` 后 `sed 's/ (.*//' | sort`，**顶层与子测试并名册**。
+
+## 件 `44-comm-only-with-new.txt`
+- 0 字节 ＝ `comm -23 with-new-run1 without-new-run2` **空**＝**新增红 0 枚**（新用例进包之后没有一枚红是"只有它有"的）。
+- 读法：空＝这条判据成立，⛔ "没跑"。跑的那发在 `70-40-with-new-run1.txt`（`rc=0`、`top_fail=0`、`subtest_fail=0`）。
+
+## 件 `45-comm-only-without-new.txt`
+- 0 字节 ＝ `comm -13` 反方向也**空**＝两侧名册**逐字同形**（既没有"只有拆掉才有"的红，也没有新增的红）。
+- 两发同形另证：`70-40-with-new-run1.txt` 与 `70-40-with-new-run2.txt` 四个计数逐字相等；`70-41-without-new-run1.txt` 与 `70-42-without-new-run2.txt` 同。
+
+## 件 `71-roster-failnames-with-new.txt` / `72-roster-failnames-without-new.txt`
+- 0 字节 ＝ **红名册为空**（两侧都空）。⛔ 混作"件没交"：包级行 `ok github.com/CarlosShao/wisp/internal/audio 17.014s / 16.601s / 16.029s / 16.323s` 逐字记在 `70-*.txt` 的 `pack_line` 行，`rc=0` 同件。
+
+## 本腿自己的 `rc=N` 逐把（⛔ 0 字节）
+- `30-vet.txt` rc=0；`31-gofmt-scope.txt` rc=0 count=0；`32-d22scan-tail.txt` 内 `rc=0`；`33-build-all.txt` rc=0；
+  `34-cov-run.txt` rc=0；`10/11/12/13/21/22/23/24/25-*-*.txt` 末尾各带一行 `rc=N`；`60-restore-cmp-all.txt` 六枚 `restore_cmp=IDENTICAL`。

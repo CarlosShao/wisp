@@ -1,0 +1,22 @@
+Sat Oct 10 20:17:48 CST 2026
+ruler = sed -n '<N>p' on the installed SDK header, read-only, out of repo
+header = C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\shared\mmreg.h  (SDK version 10.0.26100.0; sole mmreg.h on this host: find over both Program Files Windows Kits trees returned exactly 1 hit)
+:2110#define  WAVE_FORMAT_IEEE_FLOAT                 0x0003 /* Microsoft Corporation */
+:2376#define  WAVE_FORMAT_EXTENSIBLE                 0xFFFE /* Microsoft */
+:2418#define WAVE_FORMAT_PCM         1
+rc_sed=0
+--- GUID object, cross-check of the 17:5x terminology correction ---
+2480:#if !defined( STATIC_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT )
+2481:#define STATIC_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT\
+2483:DEFINE_GUIDSTRUCT("00000003-0000-0010-8000-00aa00389b71", KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
+2484:#define KSDATAFORMAT_SUBTYPE_IEEE_FLOAT DEFINE_GUIDNAMED(KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
+mmreg_guid_rc=0
+851:#if !defined( STATIC_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT )
+852:#define STATIC_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT\
+854:DEFINE_GUIDSTRUCT("00000003-0000-0010-8000-00aa00389b71", KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
+855:#define KSDATAFORMAT_SUBTYPE_IEEE_FLOAT DEFINE_GUIDNAMED(KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
+ksmedia_guid_rc=0
+--- sibling AC#1/AC#2 citation it contradicts (in-repo, read-only) ---
+101:			why:     "KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24",
+107:			why:     "KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2475, Data1=0x00000001) at byte 24",
+rc=0

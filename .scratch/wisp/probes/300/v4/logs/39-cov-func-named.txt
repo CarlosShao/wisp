@@ -1,0 +1,5 @@
+github.com/CarlosShao/wisp/internal/audio/wasapi_windows.go:200:	parseWaveFormat			81.8%
+github.com/CarlosShao/wisp/internal/audio/wasapi_windows.go:376:	Drain				0.0%
+github.com/CarlosShao/wisp/internal/audio/wasapi_windows.go:409:	convertPacket			0.0%
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:56:		NewWavInjector			100.0%
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:165:		parseWav			70.0%

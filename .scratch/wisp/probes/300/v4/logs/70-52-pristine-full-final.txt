@@ -1,0 +1,6 @@
+ruler = ^--- FAIL (top-level) / ^    --- FAIL (subtest) / ^--- SKIP / ^--- PASS top-level, all from go test -v stdout
+run=52-pristine-full-final
+rc=rc=0
+top_fail=0  subtest_fail=0  skip=1  pass_top=42
+skip_names: --- SKIP: TestLiveWasapiSmoke
+pack_line: ok  	github.com/CarlosShao/wisp/internal/audio	16.007s
