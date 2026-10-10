@@ -1,0 +1,13 @@
+销 A826 那笔欠账：票 303 AC#3 的"不可满足判据"正式登记（A828，形照票 141）＋派两枚（306-r1 写腿 ∥ 305-a1 只读）＋★新现量＝cmd/wisp 的导入图含 internal/audio
+
+★登记本体（插在 AC#3 与 AC#3b 之间，⛔ 改 AC#3 原句、⛔ 翻那一格）：那句"修后 TestAC13／两枚 TestAC14* 全绿"结构性⛔ 可满足＝把两枚本票射程外、且属还没做出来的功能算进了分母。凭据三边各带件名：① nail2 的红句在回归之前那一发就逐字同形（probes/303/orch/r3-f718e9b6-three-nails.txt，f718e9b6＝fb2fb802 的父发、同一枚干净 clone 台面）；② TestAC13… 在干净 clone 恒 --- SKIP（跟踪的 frontend/dist 只有 .gitkeep）、在母仓恒红且红的是"活文档还是探针那张页"＝票 305 症状①；③ 非实现者 303-v1 判语（probes/303/v1/10-verdicts-ac3-ac4.md:48-51）＝ⓣ 凭据句本身有缺陷／ⓤ 更正形状（nail1 绿＋两枚残余另立票 305）下闭合、附 ⓓⓖ 两条件，两条件我 21:4x 各自现跑核闭（ⓓ＝整包红名册逐名对拉、ⓖ＝票 305 已在盘上）。⇒ 可满足那半句在 AC#3b（已勾）；修复做没做看 AC#3b＋AC#4；⛔ 把 AC#3 读成"漏勾"，⛔ 为凑它放宽任何断言／改 D32 那枚 1500／造 SKIP。撤销＝口令「撤 303 AC#3 登记」（射程只删本段，⛔ 随之撤 AC#3b/AC#4 的勾）。票 303 现态 6 勾／1 未勾，⛔ 改 -done＝改名与索引更新下一程办（⚠ git mv 中间态会惊在飞腿，先例 255-r1 虚惊）。
+
+★新现量（这是"票 300 AC#4 那半本程⛔ 补"的原因，⛔ 记成腿的欠账）：尺＝GOFLAGS=-mod=mod go list -deps ./cmd/wisp/（⛔ 编译、只列依赖）⇒ 命中 1 枚 github.com/CarlosShao/wisp/internal/audio ⇒ cmd/wisp 的导入图**含** audio。写腿 306-r1 会为三对突变凭据临时 sed internal/audio/wavinjector.go（票面授权的形状），它飞行期间我跑任何 cmd/wisp 编译／整包名册都可能在被临时改过的产码上取色 ⇒ ./internal/audio/ ＋ ./cmd/wisp/ 改前改后各 ≥2 发取交集那一发按住到 306-r1 交完。先例＝我 10-08 那条"一枚 cmd/wisp 写腿在飞时整个导入图都不许改源码"的反向用法。
+
+两枚派单（都在飞，判语⛔ 由我代填）：306-r1＝票 306 落地腿，选形＝306-a1 表③ 的乙形（40 字节 extensible＋float32 面进 internal/audio 测试侧，⛔ 新二进制夹具、⛔ 加 //go:build windows），交付 AC#1（断言解析出来的值、⛔ 断"分支被调用过"）＋AC#2/AC#2b 三对成对突变凭据（:192 0xFFFE→0xFFFD、:196 body+24→body+26、:218 3→2）＋AC#3 只改注释格＋AC#4 门禁；派单逐字带了⛔ 改成引用常量（我把 GOOS=linux rc=1 那两句 undefined 抄进去）、⛔ 动 C5-R2、⛔ 删 waveFormatPCM、⛔ 放宽票 300 AC#6 那枚钉、纯重定向取 rc、⛔ .out、写腿 commit-first、"排除 N 枚必须＝名册行数"、"交集尺成论只到稳定新增红 0"。305-a1＝票 305 AC#0 只读四张表（①活文档名册／②两枚症状分开归因／③push 缺哪一跳／④代价表＋必答），⛔ Go 编译面（go env/go list 可跑须自报），② 的凭据＝把它手里那四件读数逐字读回作差；派单带了票 303 那两句托管 CI 逐字红句、行号一律现跑对不上就改内容锚、枚数必带尺口径（哪把尺＋射程目录＋工作树还是 blob）、前后对照必同台面（母仓有旧 frontend/dist、clone 没有 ⇒ AC13 两色）、嫌疑笔 70b00885＝〔仅腿报〕⛔ 当结论、必答撞⛔ 撞票 33 那条"面板线程＝专用 STA＋库 Run() 泵"。
+
+编队闸门现量（22:19）：tasklist 命中行数 wisp.exe/balldebug.exe/mockllm.exe＝0/0/0、msedgewebview2.exe＝18（⛔ 归本程）；负载尺＝仓外 C:/Users/swq/tmp/loadcheck-306.ps1 经 -File（⛔ 内联 $_ 会被 bash 换成工作目录）＝cpu_pct=57／mem_pct=59 ⇒ 低于 70，可派。门禁＝sh scripts/d22scan.sh rc=0（ban #8 internal/=526、cmd/=119 实扫；⛔ 新 .go ⇒ 分母零移动）；porcelain（internal cmd docs scripts .github）＝0 行。
+
+现态：票 306 1 勾／5 未勾；票 303 6 勾／1 未勾＋本登记；票 300 6 勾／1 未勾（AC#4 按住，理由见上）。next＝收 306-r1（我自己复跑三对突变＋门禁）→ 派 306-v1 → 补票 300 AC#4 那半 → 收 305-a1 并裁 → 票 303 改名 -done＋索引 → 296-r2 → 295-r1 → 294-r1 → 294-v1 → 298-v1。⛔ 动 D32 那枚 1500、⛔ 为变绿放宽任何断言、⛔ 动三枚冻结件与 frontend/src/**。
+
+本笔故意⛔ 推（A813 授权仍在、射程不变）：推送会自启 slo-full，而那一档跑在机主这台开发机的 self-hosted runner 上，抢 CPU 会让 306-r1 的整包名册与时序敏感那一族（cold 预算／TestPanelHostLatencyPercentilesAC2）给出假色。远程停在 a81c2980、本地多这一笔；⛔ 把"未推"读成"未交"，两枚腿交完一并推（推前核 fast-forward 两把尺）。
