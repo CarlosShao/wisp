@@ -36,11 +36,22 @@ package audio
 //
 // Terminology, because AC#6 asked that two things not be merged into one
 // citation: the WORD values WAVE_FORMAT_PCM, WAVE_FORMAT_IEEE_FLOAT and
-// WAVE_FORMAT_EXTENSIBLE are defined in mmreg.h. The GUID
-// KSDATAFORMAT_SUBTYPE_IEEE_FLOAT is a different object and lives in ksmedia.h,
-// not in mmreg.h; mmreg.h is also what fixed the field offsets back in AC#0.
-// Same header family, different things -- AC#0 pinned the OFFSET, this case
-// pins the VALUE.
+// WAVE_FORMAT_EXTENSIBLE are defined in mmreg.h (installed 10.0.26100.0 tree:
+// :2418, :2110, :2376). The GUID KSDATAFORMAT_SUBTYPE_IEEE_FLOAT is a different
+// object, and this paragraph used to say it lives in ksmedia.h and "not in
+// mmreg.h". That second half is wrong on disk, and ticket 306 AC#3 corrects
+// exactly that sentence and nothing else: mmreg.h DOES define the GUID, at
+// mmreg.h:2480-2484, whose DEFINE_GUIDSTRUCT("00000003-0000-0010-8000-00aa00389b71", KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
+// sits at :2483; ksmedia.h:850-855 carries an alternative second definition of
+// the same GUID, wrapped in a defined(_INC_MMREG) guard and spelled from the same
+// DEFINE_WAVEFORMATEX_GUID(WAVE_FORMAT_IEEE_FLOAT). One definition per header,
+// identical value -- what holds is "both headers define it", not "it is not in
+// mmreg.h". Neither definition is what this case pins: the authority behind the
+// mmregWaveFormatIEEEFloat literal below is the FORMAT TAG at mmreg.h:2110
+// (WAVE_FORMAT_IEEE_FLOAT 0x0003), NOT that GUID; the two merely share the value
+// 3 because the GUID is built out of the tag. mmreg.h is also what fixed the
+// field offsets back in AC#0. Same header family, different things -- AC#0
+// pinned the OFFSET, this case pins the VALUE.
 //
 // What this case can NOT observe, stated plainly instead of faked: the only
 // production consumer of waveFormatFloat is the line
