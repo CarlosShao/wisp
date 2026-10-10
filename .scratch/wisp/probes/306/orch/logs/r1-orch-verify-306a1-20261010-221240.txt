@@ -1,0 +1,157 @@
+# 306 编排者独立复跑（收 306-a1 之前）  时刻=2026-10-10 22:12:40 +0800
+
+## 0. 台面
+HEAD_sha=408c0d06
+HEAD_full=408c0d0632262f6c84f1569936a747de05d27f30
+rc_porcelain_scoped=0
+porcelain_internal_cmd_docs_scripts_github_lines=0
+rc_blob_vs_worktree_cmp=0
+
+## 1. 表②那两支的调用链（我现跑）
+rc_grep_newinj=0
+newinj_all_lines=13
+newinj_nondeff_lines=12
+newinj_nontest_nonself_lines=0
+--- 逐字（非 _test.go 命中）---
+internal/audio/doc.go:16:// error mapping) and WavInjector (the test backbone; ALL pipeline tests
+internal/audio/gate.go:29:// [WASAPIMicrophone | WavInjector] -> Gate -> consumer unchanged.
+rc_grep_comments=0
+
+## 1b. writeWav 枚数两把尺并排（腿报 11＝含定义行）
+writewiv_incl_def_lines=11
+writewiv_callsites_excl_def=10
+--- 逐字调用点（剥定义行）---
+internal/audio/captureopt_test.go:68:	writeWav(t, path, samples, TargetRate, 1)
+internal/audio/captureopt_test.go:113:	writeWav(t, path, samples, TargetRate, 1)
+internal/audio/captureopt_test.go:152:	writeWav(t, path, samples, TargetRate, 1)
+internal/audio/gate_test.go:15:	writeWav(t, p, samples, TargetRate, 1)
+internal/audio/hotplug_test.go:576:	writeWav(t, p, samples, TargetRate, 1)
+internal/audio/level_test.go:320:	writeWav(t, path, samples, TargetRate, 1)
+internal/audio/wavinjector_test.go:81:	writeWav(t, p, samples, TargetRate, 1)
+internal/audio/wavinjector_test.go:131:	writeWav(t, p, stereo, 48000, 2)
+internal/audio/wavinjector_test.go:159:	writeWav(t, p, samples, TargetRate, 1)
+internal/audio/wavinjector_test.go:222:	writeWav(t, p, samples, TargetRate, 1)
+--- 按文件计数 ---
+      3 internal/audio/captureopt_test.go
+      1 internal/audio/gate_test.go
+      1 internal/audio/hotplug_test.go
+      1 internal/audio/level_test.go
+      4 internal/audio/wavinjector_test.go
+
+## 1c. 旁路入口与夹具硬编码（内容锚逐字）
+	parsed, rate, chans, err := parseWav(raw)
+rc_sed_hotplug581=0
+	buf.Write(u32le(16))
+	buf.Write(u16le(1)) // PCM
+	buf.Write(u16le(16))
+rc_sed_writewav_lines=0
+--- parseWav doc comment 实际跨 162-164（腿引 163-164）---
+// parseWav parses the minimal RIFF/WAVE subset the injector needs: PCM16
+// (format 1) and IEEE float32 (format 3, incl. WAVE_FORMAT_EXTENSIBLE with a
+// float SubFormat). Anything else is a loud error, never a silent mangle.
+
+## 2. 覆盖尺我自己复跑（go test ./internal/audio/ -coverprofile）
+rc_test=0
+ok  	github.com/CarlosShao/wisp/internal/audio	15.967s	coverage: 59.3% of statements
+rc_coverfunc=0
+total:									(statements)			59.3%
+rc_grep_func=0
+--- wavinjector.go 行段块计数（188-226）---
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:188.4,192.24 5 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:193.5,193.18 1 0
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:194.6,195.1 1 0
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:196.5,196.65 1 0
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:198.4,198.18 1 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:200.4,200.38 1 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:202.3,202.33 1 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:204.2,204.14 1 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:205.3,206.1 1 0
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:207.2,207.29 1 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:208.3,209.1 1 0
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:210.2,210.9 1 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:212.3,214.26 3 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:215.4,216.1 1 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:217.3,217.35 1 1
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:219.3,221.26 3 0
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:222.4,223.1 1 0
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:224.3,224.43 1 0
+github.com/CarlosShao/wisp/internal/audio/wavinjector.go:226.3,226.111 1 1
+rc_grep_blocks=0
+saved_cover_copy_rc=0
+
+## 3. 戊类同形异族 6 枚具名排除（我逐枚 sed）
+[1] internal/tools/recycle_windows.go:37
+	foDelete = 0x0003 // FO_DELETE
+[2] cmd/wisp/panel_host_windows_test.go:181
+		style:         0x0003, // CS_HREDRAW | CS_VREDRAW
+[3] cmd/wisp/notify_windows.go:27
+	nimModify = 0x00000001
+[4] cmd/wisp/notify_windows.go:30
+	nifMessage = 0x00000001
+[5] cmd/wisp/notify_windows.go:35
+	niifInfo        = 0x00000001
+rc_sed_exclusions=0
+--- 仓里 0x0003/0x00000001 全部命中枚数（不加族尺=虚报的源头）---
+rc_grep_0003=0
+lines=12
+internal/audio/parse_wave_format_300_windows_test.go:107:			why:     "KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2475, Data1=0x00000001) at byte 24",
+internal/audio/wave_format_float_300_windows_test.go:66:// (0x0003, not a simplified 3 -- simplifying it would recreate the same-source
+internal/audio/wave_format_float_300_windows_test.go:73:	// "#define  WAVE_FORMAT_IEEE_FLOAT                 0x0003 /* Microsoft Corporation */"
+internal/audio/wave_format_float_300_windows_test.go:74:	mmregWaveFormatIEEEFloat uint16 = 0x0003
+internal/audio/wave_format_float_300_windows_test.go:161:			authority: "mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT 0x0003, copied out of the SDK header, not derived from this package",
+internal/audio/wave_format_float_300_windows_test.go:215:						"WAVE_FORMAT_IEEE_FLOAT 0x0003 and WAVE_FORMAT_EXTENSIBLE 0xFFFE as three distinct values, "+
+internal/audio/wave_format_float_300_windows_test.go:235:				t.Errorf("%s = %#04x, which is none of WAVE_FORMAT_PCM 1, WAVE_FORMAT_IEEE_FLOAT 0x0003 or "+
+internal/tools/recycle_windows.go:37:	foDelete = 0x0003 // FO_DELETE
+cmd/wisp/notify_windows.go:27:	nimModify = 0x00000001
+cmd/wisp/notify_windows.go:30:	nifMessage = 0x00000001
+cmd/wisp/notify_windows.go:35:	niifInfo        = 0x00000001
+cmd/wisp/panel_host_windows_test.go:181:		style:         0x0003, // CS_HREDRAW | CS_VREDRAW
+
+## 4. 甲/乙两形的成本尺（我现跑）
+rc_lsfiles=0
+tracked_wav_count=0
+rc_find_testdata=0
+internal/agent/testdata
+internal/llm/testdata
+internal/models/testdata
+cmd/wisp/testdata
+rc_grep_gitignore_wav=1 (1=零命中=不会被静默跳过)
+0
+
+## 5. CI 可见性：core 与 windows 两档都含 audio（我现跑）
+        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+        ./internal/session/ ./internal/projctx/ ./internal/audio/
+rc_sed_scope=0
+core_pin='
+github.com/CarlosShao/wisp/internal/audio
+win_pin='
+github.com/CarlosShao/wisp/internal/audio
+rc_sed_pins=0
+  test-core:
+    runs-on: ubuntu-latest
+        run: bash scripts/portable-tests.sh --scope=core
+  test-windows:
+    runs-on: windows-latest
+        run: bash scripts/portable-tests.sh --scope=windows
+rc_sed_ci=0
+
+## 6. 硬前提决定性两发（平台中立件不能引那三枚常量）
+rc_archive_export=0
+rc_sed_mutate=0
+--- 改后那两行逐字 ---
+			if fmtTag == waveFormatExt { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+	case fmtTag == waveFormatFloat && bits == 32:
+rc_linux_mutated=1
+# github.com/CarlosShao/wisp/internal/audio
+internal\audio\wavinjector.go:192:17: undefined: waveFormatExt
+internal\audio\wavinjector.go:218:17: undefined: waveFormatFloat
+rc_windows_mutated=0
+rc_linux_build_pristine_worktree=0
+rc_final_blob_cmp=0 (0=产码面一字未动)
+
+## 7. 越界自查
+rc_final_porcelain=0
+final_porcelain_lines=0
+new_go_files_in_probes=0
+out_files_in_probes=0
+ticket_box_lines_changed=0
