@@ -1,0 +1,8 @@
+internal/audio/wavinjector.go:192:			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+internal/audio/wavinjector.go:211:	case fmtTag == 1 && bits == 16:
+internal/audio/wavinjector.go:218:	case fmtTag == 3 && bits == 32:
+185:			if size < 16 {
+193:				if size < 40 {
+196:				fmtTag = binary.LittleEndian.Uint16(data[body+24 : body+26])
+211:	case fmtTag == 1 && bits == 16:
+218:	case fmtTag == 3 && bits == 32:

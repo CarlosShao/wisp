@@ -1,0 +1,72 @@
+internal/audio/parse_wave_format_300_windows_test.go:59:	le.PutUint16(b[0:], 0xFFFE)                                       // WAVE_FORMAT_EXTENSIBLE (mmreg.h:2376)
+internal/audio/parse_wave_format_300_windows_test.go:99:			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 3, data1At: 24},
+internal/audio/parse_wave_format_300_windows_test.go:101:			why:     "KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24",
+internal/audio/parse_wave_format_300_windows_test.go:105:			face:    face300{channels: 2, rate: 48000, bits: 16, data1: 1, data1At: 24},
+internal/audio/parse_wave_format_300_windows_test.go:107:			why:     "KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2475, Data1=0x00000001) at byte 24",
+internal/audio/parse_wave_format_300_windows_test.go:111:			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 7, data1At: 24},
+internal/audio/parse_wave_format_300_windows_test.go:117:			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 3, data1At: 26},
+internal/audio/parse_wave_format_300_windows_test.go:152:			gotFloat := got.tag == waveFormatFloat
+internal/audio/parse_wave_format_300_windows_test.go:153:			wantFloat := tc.wantTag == waveFormatFloat
+internal/audio/wasapi_windows.go:97:	waveFormatPCM   = 1
+internal/audio/wasapi_windows.go:98:	waveFormatFloat = 3
+internal/audio/wasapi_windows.go:99:	waveFormatExt   = 0xFFFE
+internal/audio/wasapi_windows.go:192:// SubFormat is the member that carries the real subtype behind a 0xFFFE
+internal/audio/wasapi_windows.go:193:// wFormatTag, so Data1 is read at byte 24. KSDATAFORMAT_SUBTYPE_PCM is 1 and
+internal/audio/wasapi_windows.go:194:// KSDATAFORMAT_SUBTYPE_IEEE_FLOAT is 3, both with a zero high half word, so a
+internal/audio/wasapi_windows.go:210:	if f.tag == waveFormatExt {
+internal/audio/wasapi_windows.go:212:		f.tag = uint16(sub.Data1) // KSDATAFORMAT_SUBTYPE_* low word: 1=PCM 3=FLOAT
+internal/audio/wasapi_windows.go:378:	floating := s.format.tag == waveFormatFloat
+internal/audio/wave_format_float_300_windows_test.go:8:// product -- waveFormatFloat had NO ruler in this repository that could be
+internal/audio/wave_format_float_300_windows_test.go:9:// broken by changing it. 300-v3 proved that by mutation (N2: waveFormatFloat
+internal/audio/wave_format_float_300_windows_test.go:14:// BOTH sides of the comparison (got.tag == waveFormatFloat versus
+internal/audio/wave_format_float_300_windows_test.go:15:// tc.wantTag == waveFormatFloat), so moving the constant moves both sides and
+internal/audio/wave_format_float_300_windows_test.go:22:// waveFormatFloat, waveFormatExt or waveFormatPCM.
+internal/audio/wave_format_float_300_windows_test.go:38:// citation: the WORD values WAVE_FORMAT_PCM, WAVE_FORMAT_IEEE_FLOAT and
+internal/audio/wave_format_float_300_windows_test.go:40:// KSDATAFORMAT_SUBTYPE_IEEE_FLOAT is a different object and lives in ksmedia.h,
+internal/audio/wave_format_float_300_windows_test.go:46:// production consumer of waveFormatFloat is the line
+internal/audio/wave_format_float_300_windows_test.go:47:// "floating := s.format.tag == waveFormatFloat" inside (*wasapiStream).Drain,
+internal/audio/wave_format_float_300_windows_test.go:66:// (0x0003, not a simplified 3 -- simplifying it would recreate the same-source
+internal/audio/wave_format_float_300_windows_test.go:73:	// "#define  WAVE_FORMAT_IEEE_FLOAT                 0x0003 /* Microsoft Corporation */"
+internal/audio/wave_format_float_300_windows_test.go:74:	mmregWaveFormatIEEEFloat uint16 = 0x0003
+internal/audio/wave_format_float_300_windows_test.go:77:	// "#define  WAVE_FORMAT_EXTENSIBLE                 0xFFFE /* Microsoft */"
+internal/audio/wave_format_float_300_windows_test.go:78:	mmregWaveFormatExtensible uint16 = 0xFFFE
+internal/audio/wave_format_float_300_windows_test.go:132:	{mmregWaveFormatPCM, "WAVE_FORMAT_PCM", "mmreg.h:2418", "waveFormatPCM"},
+internal/audio/wave_format_float_300_windows_test.go:133:	{mmregWaveFormatIEEEFloat, "WAVE_FORMAT_IEEE_FLOAT", "mmreg.h:2110", "waveFormatFloat"},
+internal/audio/wave_format_float_300_windows_test.go:134:	{mmregWaveFormatExtensible, "WAVE_FORMAT_EXTENSIBLE", "mmreg.h:2376", "waveFormatExt"},
+internal/audio/wave_format_float_300_windows_test.go:140:// the test carries from mmreg.h. Changing waveFormatFloat therefore moves the
+internal/audio/wave_format_float_300_windows_test.go:143:// waveFormatPCM), and 3 -> 0 fires both as well (0 is none of the three
+internal/audio/wave_format_float_300_windows_test.go:158:			constName: "waveFormatFloat",
+internal/audio/wave_format_float_300_windows_test.go:159:			got:       waveFormatFloat,
+internal/audio/wave_format_float_300_windows_test.go:161:			authority: "mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT 0x0003, copied out of the SDK header, not derived from this package",
+internal/audio/wave_format_float_300_windows_test.go:162:			consequence: "waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == " +
+internal/audio/wave_format_float_300_windows_test.go:163:				"waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as " +
+internal/audio/wave_format_float_300_windows_test.go:168:			constName: "waveFormatExt",
+internal/audio/wave_format_float_300_windows_test.go:169:			got:       waveFormatExt,
+internal/audio/wave_format_float_300_windows_test.go:171:			authority: "mmreg.h:2376 WAVE_FORMAT_EXTENSIBLE 0xFFFE, copied out of the SDK header",
+internal/audio/wave_format_float_300_windows_test.go:172:			consequence: "waveFormatExt is the tag parseWaveFormat tests before it expands SubFormat; off 0xFFFE every " +
+internal/audio/wave_format_float_300_windows_test.go:173:				"extensible mix format keeps 0xFFFE as its tag and never resolves to a subtype at all",
+internal/audio/wave_format_float_300_windows_test.go:177:			constName: "waveFormatPCM",
+internal/audio/wave_format_float_300_windows_test.go:178:			got:       waveFormatPCM,
+internal/audio/wave_format_float_300_windows_test.go:181:			consequence: "waveFormatPCM is declared and unused in this package (300-a2 F2, zero uses), so before this " +
+internal/audio/wave_format_float_300_windows_test.go:199:	// Second, independent face for waveFormatFloat: the three constants must map
+internal/audio/wave_format_float_300_windows_test.go:207:			{"waveFormatPCM", waveFormatPCM},
+internal/audio/wave_format_float_300_windows_test.go:208:			{"waveFormatFloat", waveFormatFloat},
+internal/audio/wave_format_float_300_windows_test.go:209:			{"waveFormatExt", waveFormatExt},
+internal/audio/wave_format_float_300_windows_test.go:215:						"WAVE_FORMAT_IEEE_FLOAT 0x0003 and WAVE_FORMAT_EXTENSIBLE 0xFFFE as three distinct values, "+
+internal/audio/wave_format_float_300_windows_test.go:235:				t.Errorf("%s = %#04x, which is none of WAVE_FORMAT_PCM 1, WAVE_FORMAT_IEEE_FLOAT 0x0003 or "+
+internal/audio/wave_format_float_300_windows_test.go:236:					"WAVE_FORMAT_EXTENSIBLE 0xFFFE as copied from mmreg.h:2418/2110/2376", o.name, o.value)
+internal/audio/wave_format_float_300_windows_test.go:241:	// Behavioural face for waveFormatExt: the tag gate inside parseWaveFormat is
+internal/audio/wave_format_float_300_windows_test.go:244:	// waveFormatFloat at all (parseWaveFormat does not use it), so it is named for
+internal/audio/wave_format_float_300_windows_test.go:245:	// waveFormatExt and is not to be read as the float nail.
+internal/audio/wave_format_float_300_windows_test.go:251:				"%#04x, want %#04x (mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT); waveFormatExt is the constant the parser "+
+internal/audio/wave_format_float_300_windows_test.go:252:				"compares that tag against, so waveFormatExt off 0xFFFE switches the extensible branch off and the "+
+internal/audio/wave_format_float_300_windows_test.go:253:				"tag field is left holding 0xFFFE",
+internal/audio/wavinjector.go:192:			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+internal/audio/wavinjector.go:211:	case fmtTag == 1 && bits == 16:
+internal/audio/wavinjector.go:218:	case fmtTag == 3 && bits == 32:
+internal/tools/recycle_windows.go:37:	foDelete = 0x0003 // FO_DELETE
+cmd/wisp/notify_windows.go:27:	nimModify = 0x00000001
+cmd/wisp/notify_windows.go:30:	nifMessage = 0x00000001
+cmd/wisp/notify_windows.go:35:	niifInfo        = 0x00000001
+cmd/wisp/panel_host_windows_test.go:181:		style:         0x0003, // CS_HREDRAW | CS_VREDRAW
+rc_roster=0
