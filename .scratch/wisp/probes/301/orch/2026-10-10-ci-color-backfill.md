@@ -103,3 +103,15 @@ four numbers（尺＝该步日志里 `portable-tests.sh: four numbers` 那一行
 
 ⚠ 口径写清：本发的第 2 枚锚与交件锚**同一枚时间窗**（16:0x），因为本件全程只读 `gh api` ＋读盘上日志，中间没跑任何长跑、⛔ 动过工作树 ⇒ 两枚读数之间的漂移窗口今天⛔ 存在，但这条**是我判的、⛔ 是量出来的**，下一个人若要引用请按「一发读数」读。
 `gh` 的失败重试记录：起手 `gh run view 38034689386 --json jobs` 第一次回 `failed to get run: ... EOF`，第二次成功（原始字节都在 `logs/`）。
+
+## 9. 欠账①已销：`AC#5`（注释笔 `b761b584`）落地后的 CI 读数（16:1x 现跑，⛔ 预测）
+
+本件 §5 结尾那句"`a0e55a51` 那发的 `test-windows` 终态本件写时未落"到 16:1x 落了。尺＝`gh api repos/CarlosShao/wisp/actions/jobs/114165960653/logs`（run `38035842314`，sha `a0e55a51`＝`b761b584` ＋我的落账笔），原始字节＝`logs/job-114165960653-ac5.log`（6,163 行／915,516 B）。
+
+- `--scope=windows` four numbers＝`RUN=624  --- PASS=427  --- FAIL=12  --- SKIP=1` ⇒ 与 §2 那发（`bcd0a543`）**逐字相同**。
+- 该档 `--- FAIL` 名册 12 枚，`diff` 对 `ci-windows-fail-names.txt` ＝**空**（`logs/ci-ac5-fail-names.txt`）。
+- `--scope=cli`＝`RUN=398 PASS=278 FAIL=8 SKIP=2` ⇒ 同样逐字相同（票 302 那三枚仍在）。
+- census totals＝`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0` ⇒ 逐字相同（GUARD D 没被顺手改动，这条正是票 301 `AC#5` 形状⑥要的那把尺）。
+- 六枚 job 色＝`slo-smoke`/`slo-full`/`lint-frontend` 绿、`test-core`/`test-windows`/`lint` 红 ⇒ 与基线（§1、§5）逐枚相同。
+
+⇒ **判语（这格仍归 `301-v3`，本节只交读数）**：`AC#5` 那笔**零变色**，与"纯注释面"的判据形状一致；`A817` §6 当时写的"预期不变色"从今天起是**量过的**，⛔ 是预期的。

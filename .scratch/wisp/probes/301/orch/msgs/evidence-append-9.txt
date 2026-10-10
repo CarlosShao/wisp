@@ -1,0 +1,12 @@
+
+## 9. 欠账①已销：`AC#5`（注释笔 `b761b584`）落地后的 CI 读数（16:1x 现跑，⛔ 预测）
+
+本件 §5 结尾那句"`a0e55a51` 那发的 `test-windows` 终态本件写时未落"到 16:1x 落了。尺＝`gh api repos/CarlosShao/wisp/actions/jobs/114165960653/logs`（run `38035842314`，sha `a0e55a51`＝`b761b584` ＋我的落账笔），原始字节＝`logs/job-114165960653-ac5.log`（6,163 行／915,516 B）。
+
+- `--scope=windows` four numbers＝`RUN=624  --- PASS=427  --- FAIL=12  --- SKIP=1` ⇒ 与 §2 那发（`bcd0a543`）**逐字相同**。
+- 该档 `--- FAIL` 名册 12 枚，`diff` 对 `ci-windows-fail-names.txt` ＝**空**（`logs/ci-ac5-fail-names.txt`）。
+- `--scope=cli`＝`RUN=398 PASS=278 FAIL=8 SKIP=2` ⇒ 同样逐字相同（票 302 那三枚仍在）。
+- census totals＝`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0` ⇒ 逐字相同（GUARD D 没被顺手改动，这条正是票 301 `AC#5` 形状⑥要的那把尺）。
+- 六枚 job 色＝`slo-smoke`/`slo-full`/`lint-frontend` 绿、`test-core`/`test-windows`/`lint` 红 ⇒ 与基线（§1、§5）逐枚相同。
+
+⇒ **判语（这格仍归 `301-v3`，本节只交读数）**：`AC#5` 那笔**零变色**，与"纯注释面"的判据形状一致；`A817` §6 当时写的"预期不变色"从今天起是**量过的**，⛔ 是预期的。
