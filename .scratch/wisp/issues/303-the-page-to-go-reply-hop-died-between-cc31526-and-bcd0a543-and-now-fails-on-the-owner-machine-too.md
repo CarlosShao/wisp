@@ -21,8 +21,9 @@
 - [x] **`AC#0` 复现钉死（⛔ 归因）**：① 起点／终点具名（起点＝`cc315261` 那台 CI 台面能拿到回执；终点＝`bcd0a543` 或**当前 HEAD**，两者要分清并各留一发）；② 最小复现集＝**一枚用例名**＋跑法逐字（含 `PATH` 那两枚目录、`-count`、`-timeout`），并**具名回答它依赖⛔ 依赖 `frontend/dist`**；③ **复现率**＝同一条命令 `-count=3` 的三色（⛔ 单发当恒红）；④ 一枚"这⛔ 是我这台机器的毛病"的对照＝**同码在 CI 那发也红**（引用现量第 3 条，⛔ 重跑 CI 来证这句）。判据＝每条带"哪把尺＋射程目录＋工作树还是 HEAD"。
 - [x] **`AC#1` 归因到**一笔**（⛔ 一块批）**：在**仓外** clone 里做（⛔ 在仓内建 worktree 或 checkout；AGENTS §1.4），交回＝`git bisect` 的**那笔 SHA**＋该笔的**定向复现两发**＝(a) 在该笔上跑最小复现集 ⇒ 红，(b) 只把那⼀笔单独 revert（或 `git checkout <父号>` 同尺）⇒ 绿。**两发缺任一发＝本格⛔ 交**。若两枚以上同犯（例如"绑定名"与"再入帽"各断一半）必须具名写"单 revert ⛔ 复绿"并给组合读数。⛔ 共享工作树上做任何 checkout。
 - [x] **`AC#2` 机制层（三形分开答，⛔ 合一格）**：**(甲) 页面 JS 压根⛔ 跑**／**(乙) JS 跑了但绑定名⛔ 接上**（`wispDispatch` 那枚注入名）／**(丙) 钩子接上了但门被再入帽挡住**。每形必答两问：① **能把这一形与另两形分开的读数长什么样**（现量给得出就给，给不出就具名写"缺哪枚读数＋谁来取"）；② 本票字节到不到得了那一步（`302-a1` 已判：这三形在现有 CI 字节里**分⛔ 开**，`-1.000` 与"零回执"**同时出现**）。⚠ 判"产品路径也断"必须⛔ 依赖这三形里任何一形的**假设**，要一发真机或一条真调用链读数。
-- [ ] **`AC#3` 修复（只在 `AC#1`/`AC#2` 交完之后开工）**：**硬约束四条**——① ⛔ 放宽任何断言：`no report … within 15s (what DID arrive at the door: nothing at all)` 那三句判据本体一字⛔ 动；② ⛔ 把 `t.Fatalf` 换成 `t.Skip`、⛔ 造 `--- SKIP`（`tools/d22scan/runtests.sh:98`→`:102` 把任何 `^--- SKIP` 判红，那是**故意的**）；③ ⛔ 动 SLO 阈值／`thresholds.go`／D32 那一面（`TestPanelHostRealWindowHopAndLifecycle` 基线红在**预算**那一支属 SLO，⛔ 用"改预算"换绿）；④ 产码改动落在**门**那一侧（`cmd/wisp/**` 宿主传输边），⛔ 顺手改档／tag／ledger（那是票 302 的射程，本票⛔ 动 `scripts/portable-tests.sh`）。凭据＝成对两发＋三枚本机色（修后 `TestAC13`／两枚 `TestAC14*` 全绿）。
-- [ ] **`AC#4` 门禁与越界**：`go vet ./cmd/wisp/` rc=0；`go vet -tags winlive ./cmd/wisp/ ./internal/ball/` rc=0；`sh scripts/d22scan.sh` rc=0；`gofmt -l cmd/wisp` 与 HEAD blob 那把**并排两把**都要报（先例＝票 298：加严残留具名、⛔ 顺手修）；`cmd/wisp` 整包改前／改后各两发取交集 ⇒ **新增红 0 枚**（⚠ 本机整包要铺 sherpa `PATH`，缺 DLL 是 `0xc0000135` 且**无 `--- FAIL`**＝用例根本没跑）；`git show --name-only --format=` **逐笔**名册＋与授权名册差集（⛔ 区间尺）；每把门禁件自落一行 `rc=N`（⛔ 0 字节＝那格没交）；⛔ 零 push、commit 必带显式 pathspec 且写在 `$( … )` **之外**。
+- [ ] **`AC#3` 修复（只在 `AC#1`/`AC#2` 交完之后开工）**：**硬约束四条**——① ⛔ 放宽任何断言：`no report … within 15s (what DID arrive at the door: nothing at all)` 那三句判据本体一字⛔ 动；② ⛔ 把 `t.Fatalf` 换成 `t.Skip`、⛔ 造 `--- SKIP`（`tools/d22scan/runtests.sh:98`→`:102` 把任何 `^--- SKIP` 判红，那是**故意的**）；③ ⛔ 动 SLO 阈值／`thresholds.go`／D32 那一面（`TestPanelHostRealWindowHopAndLifecycle` 基线红在**预算**那一支属 SLO，⛔ 用"改预算"换绿）；④ 产码改动落在**门**那一侧（`cmd/wisp/**` 宿主传输边），⛔ 顺手改档／tag／ledger（那是票 302 的射程，本票⛔ 动 `scripts/portable-tests.sh`）。凭据＝成对两发＋三枚本机色（修后 `TestAC13`／两枚 `TestAC14*` 全绿）。⚠ **2026-10-10 21:4x 编排者判：这半句凭据在本票里从来⛔ 可能成立**（那两枚属票 305 的症状，逐字凭据见下面"收 `303-v1`"那一节第 2 节）⇒ **本格⛔ 翻、原句⛔ 改**，可满足的部分搬到下面新格 `AC#3b`。
+- [x] **`AC#3b`（2026-10-10 21:4x 编排者追加，来路＝`303-v1` 的 ⓤ 判语＋我自己三条对拉；它承担 `AC#3` 那半句⛔ 可满足的凭据，⛔ 取代 `AC#3` 上面任何一行原文）**：修复那一笔在本票射程内**成立**的判据＝以下三件**同时**真——① `AC#3` 那四条硬约束逐条有编排者自己现跑的尺与读数（⛔ 任何一条只凭腿自述）；② 修后 `TestAC14AwaitedBindingReplyReachesThePage` **绿**且判据**由页面自己报回**（逐字 `REPLIED,REPLIED,REPLIED`，本机＋CI 两侧各有）；③ `cmd/wisp` 整包改前／改后**各两发、同一台面取交集＝稳定新增红 0 枚**，且**单发红过的那一枚⛔ 被这把尺藏住**——必具名报出并写清归因（本程＝`TestTicket223HandEditedFsLooseningCostsAnL2Card`，⛔ 归本票修复）。⇒ ⛔ 拿本格去说"票 303 修完三枚都绿了"：剩下两枚的账在**票 305**。判语正文与三条读数＝票面"编排者收 `303-v1`"那一节（⛔ 在此重复，免成第二份真相源）。
+- [x] **`AC#4` 门禁与越界**：`go vet ./cmd/wisp/` rc=0；`go vet -tags winlive ./cmd/wisp/ ./internal/ball/` rc=0；`sh scripts/d22scan.sh` rc=0；`gofmt -l cmd/wisp` 与 HEAD blob 那把**并排两把**都要报（先例＝票 298：加严残留具名、⛔ 顺手修）；`cmd/wisp` 整包改前／改后各两发取交集 ⇒ **新增红 0 枚**（⚠ 本机整包要铺 sherpa `PATH`，缺 DLL 是 `0xc0000135` 且**无 `--- FAIL`**＝用例根本没跑）；`git show --name-only --format=` **逐笔**名册＋与授权名册差集（⛔ 区间尺）；每把门禁件自落一行 `rc=N`（⛔ 0 字节＝那格没交）；⛔ 零 push、commit 必带显式 pathspec 且写在 `$( … )` **之外**。
 - [x] **`AC#5` 交回后由编排者办的两件**（⛔ 腿做）：① 票 302 的甲／乙裁语按 `AC#1` 结论回填（若"这一跳在本机都断"⇒ 修完就该回绿 ⇒ **甲／乙都⛔ 落**）；② 本票那一发 CI 色（修后推送产生的 `test-windows` 四数与红名册）。
 
 ## 边界（⛔ 本票射程，混进来＝顺手改错那半）
@@ -158,3 +159,48 @@ next=`303-a1`（`AC#0`＋`AC#1`：复现钉死＋仓外 bisect 到一笔）→ �
 - next＝**`303-v1`**（非实现者，锚 `9cef4589` 之后我这一笔）一次裁 `AC#3` 三道＋`AC#4` 欠的那一发＋甲那枚门外 `Eval` 欠读 → **`305-a1`**（票 305 落点只读，带上面第 3 节两条逐字）→ 票 302 的归口那格（含本件第 2 节那枚次生色）。
 - Progress log：
   - [2026-10-10 19:1x +0800] agent=编排者 did=取 CI 改后那一发并与 `r7` 改前名册逐名作差 ⇒ **翻 `AC#5`**（① 票 302 甲／乙**都⛔ 落**，凭据＝托管 runner 上页面原话 `REPLIED,REPLIED,REPLIED`；② 四数＋名册作差已交，件 `r9-ci-after-red-roster.txt`）；★FIXED 1 枚（nail1，红句 `nothing at all`→页面原话）／NEW 1 枚（`TestPanelHostLatencyPercentilesAC2` 由具名 SKIP 走进 FAIL，`cold P95 2747.460 ms` 超 D32 的 1500）／仍红 19 枚逐字同名；★本票边界授权的那枚"回执为零→红于预算"迁移**如实出现**且⛔ 是新坏（基线发同枚逐字 2889.2 ms 同形），⛔ 动预算；★票 305 两枚症状在 CI 一比一复现（逐字已在件里）⇒ 票 305 台面⛔ 限本机；⚠ 四数尺 `FAIL=8↔8` 与名册作差⛔ 同物；★销掉 `r7` 里我那格"ImageVersion ⛔ 命中"＝**我那把 grep 找的是 API 字段名而日志那行叫 `Version:`**（两发同 `20260925.250.1`，镜像漂那一支⛔ 成立），定式并回＝换载体取读数先现量那一行字面写法；`AC#3`／`AC#4` ⛔ 碰；next=`303-v1` → `305-a1`
+
+## 编排者收 `303-v1`（2026-10-10 21:4x，四笔 `8fc42230`→`d9864baf`→`2d68e28d`→`49f7e371`，件 `probes/303/v1/**`；越界＝我自己逐笔取名册重算＝**0 枚**、`git diff --name-only origin/dev..HEAD -- '*.go'`＝**0 枚**）⇒ **翻 `AC#4`**＋**补一枚可满足的 `AC#3b` 并翻它**、★**`AC#3` 原句⛔ 翻（那枚凭据句在本票里从来⛔ 可能成立，原句⛔ 删，只追加本节）**＋★**它交回的整包名册与我 18:1x 自己那对逐名对拉上了：改后那一侧⛔ 一字之差、改前那一侧只差一枚已具名的 flake**
+
+### 0. ★两把独立名册对拉（本程最要紧的一把尺：⛔ 信任何一方的转述）
+
+- 我 18:1x 那对（件 `probes/303/orch/r5-orch-package-before-names.txt`／`r6-orch-package-after-names.txt`，台面＝仓外 clone，各**一发**）vs 它这对（`logs/names-{before,after}-{1,2}.txt`，台面＝另一枚仓外干净 clone `~/wisp-303-v1`，各**两发**）。尺＝剥 `--- FAIL:` 前缀与时长后 `sort`，`diff`／`comm` 比**集合**、⛔ 比枚数：
+  - **改后那一侧＝`IDENTICAL_SETS`**：它的"两发改后取交集"16 枚与**我那一发改后**的 16 枚**逐名同集合**（无一枚只在其中一边）。
+  - **改前那一侧只差一枚**＝`TestAC4FocusReturnToPriorWindowGap33r5`（它两发**都红**、我那一发**恰好绿**）。⇒ 这正是我 A823 里写过的那枚**非确定性真窗焦点仪**（台账既有先例：本机 13 跑 5 绿／8 红）。
+  - ⇒ ★**我 A823 那句"逐名新增红 1 枚"在这里被我这把尺自己收回一半**：那一枚当时是 flake 撞在我那一发上；把它按"各两发取交集"这把尺放平＝**新增红 0 枚**。**枚数没变、结论换了＝换尺的效果**，⛔ 写成"它算对了而 I 算错了"，两把尺各带各自射程（我＝各一发、它＝各两发取交集）。
+- ⚠ **这把"交集尺"的盲区必须具名（⛔ 让本格被引成"从来⛔ 新增红"）**：取两发交集＝**只红过一次的枚会被排除**。它的 `after-1` 里就多红过一枚 `TestTicket223HandEditedFsLooseningCostsAnL2Card`（`after-2` 没有）。⇒ 本格成论的射程＝**"稳定新增红 0 枚"**；那一枚单发红我⛔ 归因给本票那笔修复（它属 FS／L2 时序一族，台账 `:10553` 有过同一枚 SHA 两发一红一绿的决定性读数），登记成 flake 形状残余。
+
+### 1. 四条硬约束——本程**我自己**在 `git diff cf46c24a 807497c1` 上现跑（⛔ 抄腿的 ⓐ 判语）
+
+| 硬约束（票面原句） | 我这把尺 | 读数 |
+|---|---|---|
+| ① ⛔ 放宽任何断言（那三句 `no report … nothing at all` 本体一字⛔ 动） | `git diff cf46c24a 807497c1 \| grep -c '^-[^-]'` | **0**（整个区间**零删行**，唯一产码文件＝`cmd/wisp/panel_host_windows.go`，＋27 行全在新增的注释块＋`external.invoke` 包装里） |
+| ② ⛔ `t.Fatalf`→`t.Skip`、⛔ 造 `--- SKIP` | `git diff … -- cmd/wisp/panel_host_windows.go \| grep -E '^+' \| grep -cE 't\.Skip\|SKIP\|budget\|1500\|thresholds'` | **0**（diff 里那几处 `SKIP`／`no report` 命中全在 `probes/303/r1/**` 的**日志文本**里，⛔ 产码行） |
+| ③ ⛔ 动 SLO 阈值／`thresholds.go`／D32 那一面 | 同上那一把＋名册 | 产码只碰一枚文件、零 `budget`/`1500` 新增；`internal/observe/thresholds.go` **0 字节** |
+| ④ 改动落在**门**那一侧、⛔ 顺手改档／tag／ledger | `git diff --name-only cf46c24a 807497c1` | 只 `cmd/wisp/panel_host_windows.go`＋自家 `probes/303/r1/**`；`scripts/portable-tests.sh` **零字节**＝⛔ 碰票 302 射程 |
+
+### 2. ★`AC#3` ⛔ 翻，⛔ 是因为修复没落地——是因为**那半句凭据在本票里从来⛔ 可能成立**
+
+- 原句要"成对两发＋**三枚本机色**（修后 `TestAC13`／两枚 `TestAC14*` 全绿）"。现量（三边独立）：修后 `TestAC14AwaitedBindingReplyReachesThePage` **绿**（页面原话 `REPLIED,REPLIED,REPLIED`，CI 与本机两侧都有）；`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` 在干净 clone 里**恒 SKIP**、在母仓**恒红**（红句＝页面自己答 `"0"`）；`TestAC14GoSideEvalPushReachesThePage` **同一句红在它回归之前那发就在**（`f718e9b6`，腿件 `logs/nails-at-f718e9b6.txt` ＋**我 18:0x 自己在同一枚 clone 上复跑过那一发**，件 `probes/303/orch/r3-f718e9b6-three-nails.txt`）。
+- ⇒ 后两枚**⛔ 是本票那一笔造成的**，它们是**票 305** 的两枚症状（我 18:4x 立票时就是按这个判的）。所以"三枚全绿"这半句⛔ 满足得了一个还没被做过的功能——**本格⛔ 翻、⛔ 删原句**，可满足的那部分搬到下面新格。
+- ⚠ 腿自己那条判语（ⓣ＝凭据句本身有缺陷／⛔＝修复⛔ 成立／ⓤ＝更正形状下闭合，挂 ⓓⓖ 两条件）我认；ⓓ（各两发补齐）＝本程第 0 节已独立对拉过、ⓖ（另立票 305）＝票已在盘上 ⇒ **两个条件都闭了**，闭合形状落成 `AC#3b`。
+
+- ⇒ 可满足的那部分搬到票面 AC 清单里的新格 **`AC#3b`**（紧接 `AC#3` 之后，勾已翻；判据正文与三条射程＝本节，⛔ 重复一遍造成第二份真相源）。
+
+### 3. `AC#4` 翻勾的凭据与⛔ 它覆盖的三样
+
+- 门禁逐把我自己核过（件 `probes/303/v1/logs/`）：`go vet ./cmd/wisp/` rc=0、`go vet -tags winlive ./cmd/wisp/ ./internal/ball/` rc=0、`sh scripts/d22scan.sh` rc=0、**`gofmt` 并排两把**＝工作树 `cmd/wisp` **1 枚**（`models.go`，既有加严残留、⛔ 顺手修，先例＝票 298）／HEAD blob 导出树 **0 枚**。四发同一枚 clone、只差一次 `git checkout --detach`（⛔ 母仓工作树）。
+- ⚠ 一枚**我派单里写错的尺**要更正：我给的"全仓 `gofmt` 大约 5 枚"那把尺对不上它现量的**38 枚**。它**报差⛔ 自行调和＝对**。⇒ 差额属**射程／台面**那一族（工作树 vs HEAD blob／CRLF），**归我下一程现量核对并具名改正**（记我：本票与票 296 那两处派单都引过"5 枚"那句）。
+- ⛔ 本格⛔ 覆盖的三样，逐枚留在票面与台账、⛔ 塞进翻勾句：① 腿的 **M1–M4 变异取证**＝〔仅腿报，我⛔ 复跑〕；★其中 M3 那一形的台件在 `logs/phase2-out.txt` 里**中途撞上一行 Python `SyntaxError: unmatched ')'`**（它随后自陈"M3: fix removed as well"＝机制那一发⛔ 干净），那部分判语我⛔ 盖章。② 它自陈的 **M4 网眼**＝拆 Go 侧帧那一形十枚钉全绿＝今天⛔ 任何仪器看得见，欠补钉设计。③ 它自陈**母仓台面 lifecycle 色未复测**。
+
+### 4. ★那枚超预算红的归口（`AC#5` ②那格⛔ 答的一半，本程裁掉）
+
+- 形状：CI 托管 runner 上 `cold 2747.460 ms` 超 D32 面板冷启预算 `1500` ⇒ `TestPanelHostRealWindowHopAndLifecycle` 与 `TestPanelHostLatencyPercentilesAC2` 各红（A824 §"本票有关那四枚"逐字）；而**改后本机同一枚码⛔ 红**——腿报的三发 `cold 980.666／1002.355／1341.042 ms` 我⛔ 复跑，但**我自己那对名册（第 0 节 `r6`）里 lifecycle 压根不在红侧** ⇒ "本机不红"这一支我有凭据，"具体那三个毫秒数"＝〔仅腿报〕。
+- **裁语**＝⛔ 动那枚 `1500`（D32 面，人工批准才动）、⛔ 为它另立票、**归口＝票 302 的"runner 时序 vs 我们的读数"那一面**（先例＝`pending-and-issues.md:10553` 那枚同 SHA 两发一红一绿的决定性读数）。⇒ 这条从 A824 挂着的"未裁"里销掉；票 302 那格保持"按住＝⛔ 做完了"。
+
+### 5. 现态与 next
+
+- 票 303 现态＝**6 勾／1 未勾**（勾＝`AC#0`/`AC#1`/`AC#2`/`AC#4`/`AC#5`/`AC#3b`；未勾＝⛔ 满足的 `AC#3` 原句那一格，理由见本节第 2 节）⇒ **⛔ 改 `-done`**：收口那一步（全勾→`Status: done`→改名→更新索引）等我把 `AC#3` 这枚"死凭据句"按票 141 那枚不可满足判据的先例正式登记完再办，⛔ 顺手盖。
+- next＝**派 `306-a1`**（票 306 的 `AC#0` 三张表，只读）→ **`305-a1`**（票 305 的归因，派单必带票 305 现量那两句逐字）→ `296-r2` → `295-r1` → `294-r1` → `294-v1` → `298-v1`；我这边两笔小账＝**现量核对 `gofmt` 那 38 枚的射程并具名更正派单口径**、**M4 网眼那枚欠账具名入票面**。
+- Progress log：
+  - [2026-10-10 21:4x +0800] agent=编排者 did=收 `303-v1`（四笔，越界逐笔重算 0、`-- '*.go'` 0 枚；它误名 `logs/phase2.out` 那件我 `cmp` 补件＝逐字节 SAME 292 字节）＋★**两把独立名册对拉**（它的"各两发取交集"vs 我 18:1x 的"各一发"：改后那一侧 `IDENTICAL_SETS`＝16 枚逐名同集合；改前那一侧只差 `TestAC4FocusReturnToPriorWindowGap33r5`＝已具名 flake，它两发都红而我那一发恰好绿）⇒ **我 A823 那句"逐名新增红 1 枚"换尺后＝0 枚**，同时把"交集尺会藏单发红"这枚盲区写死（`after-1` 多红过一枚 `TestTicket223HandEditedFsLooseningCostsAnL2Card`，⛔ 归本票修复，台账 `:10553` 有同 SHA 一红一绿先例）；★**四条硬约束我在 `git diff cf46c24a 807497c1` 上自己现跑**（整个区间**零删行**、产码唯一文件 `cmd/wisp/panel_host_windows.go` 的＋27 行里 `t.Skip|SKIP|budget|1500|thresholds` 命中 **0**、`scripts/portable-tests.sh` 零字节）；⇒ **翻 `AC#4`**＋**补 `AC#3b`（可满足形状）并翻它**；**`AC#3` ⛔ 翻**＝它那半句"三枚本机色全绿"要的是票 305 那两枚症状（`AC13` 干净 clone 恒 SKIP／母仓恒红、nail2 回归前同句已红＝我自己 18:0x 在 clone 上复跑过的 `r3-f718e9b6`），⛔ 删原句、只追加本节；★**裁掉一枚挂着未裁的归因**＝CI `cold 2747.460 ms` 超 D32 `1500` ⛔ 动预算、⛔ 另立票、归口票 302 的 runner 时序那一面（"本机不红"我有我自己 `r6` 的凭据，三个毫秒数＝〔仅腿报〕）；⛔ 给腿的 M1–M4 变异判语盖章（M3 台件 `logs/phase2-out.txt` 中途撞 Python `SyntaxError`、M4 十枚全绿那枚网眼欠补钉、母仓 lifecycle 色未复测，三样各自留档）；⚠ 我派单"全仓 gofmt 约 5 枚"对不上它现量 38 枚＝**报差不自调、对**，差额归我下一程核并更正两处派单口径；现态 6 勾／1 未勾（`AC#3` 那枚死凭据句），⛔ `-done`（收口等按票 141 先例正式登记不可满足判据）；next=派 `306-a1` → `305-a1` → `296-r2`
