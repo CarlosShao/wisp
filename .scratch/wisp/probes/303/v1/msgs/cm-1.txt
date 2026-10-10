@@ -1,0 +1,8 @@
+303-v1(1/4): 起手锚 + 修复 diff 逐行取证 + 仓外 clone 整包「改前两发」同台面名册
+
+- 锚现量 git rev-parse HEAD = 34e1962bb166b4494670b77296263c79bd8671a3；tasklist 起手 wisp.exe/balldebug.exe/mockllm.exe 各 0（msedgewebview2 24 枚＝机主自有应用树，非残留，先例 A821）。
+- 00-e3341368-diff.txt：e3341368 的 cmd/wisp/panel_host_windows.go 半边逐行（+27/-0，git show --numstat 逐笔）。
+- 01-head-panel_host_windows.go.txt：HEAD 对象层导出的整档（读面一律 git show HEAD:<path>，未碰工作树那枚文件）。
+- logs/full-before-1.txt / full-before-2.txt：AC#4 欠的那一发按「各两发＋同台面」补齐全——台面＝仓外干净 clone ~/wisp-303-v1 上 git checkout --detach cf46c24a，两发顶层尺均为 267 PASS / 18 FAIL / 3 SKIP、rc=1，两份名册逐字相同（names-before-1.txt 与 names-before-2.txt diff 为空）。
+- 与编排者 r5 那发的名册差＝1 枚，且差在改前台面本身（TestAC4FocusReturnToPriorWindowGap33r5 在我这两发里都红）。
+- attack-rig.sh / ac4-second-pair.sh：本腿台件（甲那枚门外读数的取证与 ⓐ 假绿形状取证用），⛔ 动仓内任何产码／测试件，变异只落 $HOME 下的 git archive 导出树。

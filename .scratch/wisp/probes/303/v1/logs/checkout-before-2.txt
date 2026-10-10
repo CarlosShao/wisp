@@ -1,0 +1,4 @@
+HEAD is now at cf46c24a A822 收 300-a2（六笔 ae5ee86d→fbeefd1d，越界我自己取并集重算＝0）⇒ 裁票300 AC#6 落点＝C2 形＋★我替 AC#0 那句"⛔ 拿本仓另一枚实现当裁判"扩射程：对"值"同样成立（两枚仓内实现可以一起错）据此⛔ C4
+checkout_rc=0 detached=cf46c24a headfile=cf46c24a
+969
+0

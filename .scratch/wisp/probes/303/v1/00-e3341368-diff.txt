@@ -1,0 +1,73 @@
+commit e33413681218a7ab7944ca5f77a083b87871a3c2
+Author: CarlosShao <1933942520@qq.com>
+Date:   Sat Oct 10 18:01:24 2026 +0800
+
+    303-r1: AC#3 修复（门那一侧 panel_host_windows.go）+ 一处顶回
+    
+    修复：panelPostMessageForwardInit 加一枚 window.external.invoke 包装，在库桩发出 RPC 帧的
+    那一刻抬起 inside，使覆盖层把库自己的帧逐字节交回 native 出口，只折页面直接 postMessage 的信封。
+    修的是 direct-window.wispDispatch 入口（AC#14 nail1 / firstRoundTrip 探针走法）里 inside 恒假
+    -> 帧被折回 -> 门收到双包 RPC -> Handle 路由前丢弃 -> nothing at all + firstRoundTrip -1.0 哨兵。
+    
+    约束遵守：
+    - 只动 cmd/wisp/panel_host_windows.go 一枚产码（+27 行）；测试夹具一枚没碰；判据本体三句一字未动。
+    - 未动 SLO/golden/thresholds/D32；未放宽断言、未 t.Skip、未造 --- SKIP；未动 frontend/design。
+    - 加法：不改绑定名/不新绑/不动 C17/不重解析 message（逐字节透传保留）。
+    
+    凭据（成对反证）：
+    - (a) 撤修复回 HEAD -> 三枚逐字红 nothing at all（50-revert-red.txt rc=1）。
+    - (b) cmp 逐字节还原（51-restore-green.txt：cmp_rc=0 identical）-> TestAC14AwaitedBindingReplyReachesThePage PASS，
+      绿句 page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)。
+    
+    顶回（见 52-）：票 AC#3 "三枚全绿" 不成立。AC#13 与 nail2 回执通道已被接上（页面能答/报回），
+    现卡另一形=bringUp serveEntry 与探针文档交接次序（探针 stub 是冷启后最后文档，属票33 AC#13/70b00885，非 fb2fb802）。
+    本腿不动 bringUp 交接，具名上报非实现者，不盖章。
+    
+    门禁四把 rc：go vet ./cmd/wisp/=0；go vet -tags winlive ./cmd/wisp/ ./internal/ball/=0；
+    sh scripts/d22scan.sh=0；gofmt -l cmd/wisp 工作树=1（models.go 既有 CRLF/加严残留，非本腿文件，HEAD-blob 名册=0，具名不顺手修）。
+    新增红 0 枚（改后红集 ⊆ 改前逐枚已知红）；整包同条件干净改前 -v 名册欠（背景发编译晚于编辑，见 52-）。
+
+diff --git a/cmd/wisp/panel_host_windows.go b/cmd/wisp/panel_host_windows.go
+index 58e2b155..5089236a 100644
+--- a/cmd/wisp/panel_host_windows.go
++++ b/cmd/wisp/panel_host_windows.go
+@@ -778,12 +778,39 @@ type pageTransport interface {
+ // panelDispatchBinding (fmt.Sprintf), never spelled out in the JS text, so renaming the
+ // binding on the Go side cannot leave this hook aiming at a door that no longer exists.
+ // Touches no page file, binds nothing new, and leaves C17's roster unchanged.
++//
++// WHY THE external.invoke WRAPPER (ticket 303, the fb2fb802 regression). A boolean alone
++// cannot tell "the page posted a fresh envelope" from "the bound stub is sending its own
++// RPC frame", because the stub's frame is emitted from inside window.external.invoke, and
++// a page that calls the bound door window.wispDispatch(env) DIRECTLY (which is exactly what
++// AC#13/AC#14's own JS and firstRoundTrip's probe do, and what go-webview2's bound stub is
++// meant to be called as) never passes through the postMessage override, so the `inside` flag
++// the override would raise is still false when the stub's invoke -> chrome.webview.postMessage
++// (the RPC frame) reaches this wrapper - and the frame used to be folded back into
++// wispDispatch, double-wrapping it into {id, method:"wispDispatch", params:[the RPC frame]}.
++// msgcb then hands dispatchRaw an envelope whose method is the binding name, not a roster
++// method, ComposerDispatch.Handle drops it before the mode handler, and the door records
++// nothing -> "what DID arrive at the door: nothing at all" (real window) while the headless
++// 35-r2 yard - which posts via chrome.webview.postMessage, never via a direct wispDispatch
++// call - still reported a clean native exit. So the flag is now raised where a frame is
++// actually emitted: wrapping invoke marks the whole invoke -> postMessage hop as "library
++// traffic", so such a frame is routed byte-for-byte to the native exit, while a page's own
++// postMessage (which does not go through invoke) is still folded into the door once. It reads
++// no message and re-serialises nothing - the byte-for-byte, no-sniffing property above is kept.
+ var panelPostMessageForwardInit = fmt.Sprintf(`(function () {
+   var cw = window.chrome && window.chrome.webview;
+   if (!cw || cw.__wispForwardInstalled) { return; }
+   cw.__wispForwardInstalled = true;
+   var native = cw.postMessage;
+   var inside = false;
++  var ex = window.external;
++  if (ex && typeof ex.invoke === "function") {
++    var nativeInvoke = ex.invoke;
++    ex.invoke = function (s) {
++      inside = true;
++      try { return nativeInvoke(s); } finally { inside = false; }
++    };
++  }
+   cw.postMessage = function (message) {
+     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
+     inside = true;
