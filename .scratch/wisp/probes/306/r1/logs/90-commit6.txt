@@ -1,0 +1,6 @@
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c6.txt', LF will be replaced by CRLF the next time Git touches it
+[dev 6284a489] 306-r1 终局：90-final.md（现态／我⛔ 做到的名册／越界自查／七处与盘上不符具名报回）＋票 306 末尾追加一条 Progress log bullet（append-only）
+ 3 files changed, 150 insertions(+)
+ create mode 100644 .scratch/wisp/probes/306/r1/90-final.md
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/msg-c6.txt
+rc_commit=0

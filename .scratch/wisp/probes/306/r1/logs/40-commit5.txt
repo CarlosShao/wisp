@@ -1,0 +1,44 @@
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-build-vet-d22scan.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-census-raw.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-commit4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-gofmt.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-outofbounds-attempt1-flawed.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-outofbounds.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-raw-build-all.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-raw-build-linux.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-raw-d22scan.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-raw-vet-linux.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-raw-vet-mod.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/40-raw-vet-windows.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/after-roster-1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/after-roster-2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/after-roster-3-nofixture.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/after-summary.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/before-roster-1.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/before-roster-2.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/before-summary.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c5.txt', LF will be replaced by CRLF the next time Git touches it
+[dev 71249b05] 306-r1 AC#4 落点：门禁全套读数＋越界逐笔尺（三数带口径、交集尺盲区具名）
+ 21 files changed, 1095 insertions(+)
+ create mode 100644 .scratch/wisp/probes/306/r1/40-gates.md
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-build-vet-d22scan.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-census-raw.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-commit4.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-gofmt.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-outofbounds-attempt1-flawed.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-outofbounds.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-raw-build-all.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-raw-build-linux.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-raw-d22scan.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-raw-vet-linux.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-raw-vet-mod.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/40-raw-vet-windows.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/after-roster-1.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/after-roster-2.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/after-roster-3-nofixture.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/after-summary.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/before-roster-1.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/before-roster-2.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/before-summary.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/msg-c5.txt
+rc_commit=0

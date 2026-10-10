@@ -1,0 +1,16 @@
+306-r1 终局更正一笔：并集尺撞了共享 /tmp 的宽 glob（就地重算，坏件保留⛔ 删）
+
+§10 那把并集尺用了 cat /tmp/f-*.txt，而 /tmp 在本机跨腿共享，别家腿留在同目录的件被吞进来
+=> union_files=101 与 OUTSIDE_COUNT=26 两枚数都⛔ 是本腿名册（那 26 行逐字是别家
+check-path-length-budget.sh 的读数，含 seeded-/controlled- 那种长名夹具行）。逐笔尺那六枚 OUTSIDE=0
+走的是显式 sha 件名，⛔ 受影响。
+
+重算（输入只有本腿六笔的 git show 输出，逐枚显式命名）：六笔并集 75 枚 = internal/audio 2 +
+自家 probes/306/r1 72 + 票 306 文件 1 => 越界 0 枚；逐笔 OUTSIDE 六枚全 0（7/5/6/35/21/3 全在写面内）。
+定式：临时件⛔ 用宽 glob 聚合，逐枚显式命名。
+
+同批落终局三面尺（逐字在 logs/40-outofbounds.txt §10/§11）：gofmt -l internal/audio = 0 枚；
+scoped porcelain = 0 行；internal/audio 工作树 22 枚 .go 对 HEAD blob 逐枚 cmp => mismatching_files=0；
+定向复绿第三发 rc=0；票面框普查 1 勾 / 5 未勾（本腿⛔ 翻框），票面 diff = 26 加 0 删。
+
+40-gates.md §7 加第 6 条自报；90-final.md 加 §7（⛔ 回头改 §1 那张表，保持落笔顺序）。⛔ push。

@@ -178,3 +178,72 @@ census 那一行读法：internal/audio 10/0 = 编译期测试计数器的 10 �
 紧跟那句里的命令名也因此消失。读数本身⛔ 受影响：§8 的 totals 行、两枚顶层 Test 函数计数（43 / 45）都是从别处现量后落的字面文本，⛔ 来自那次误跑。
 定式入交件：**含反引号或美元符的中文句子⛔ 能进双引号的 echo，只能走 Write 工具或单引号**（派单第 3 节第 6 条本来只讲了 commit 消息，本腿把它扩展到证据件生成，同一枚雷）。
 干净重述：改前那一发 census 无法在导出树上取，因为 scripts/portable-tests.sh 要问 git（索引与包名册），而 tar 解出来的导出树⛔ 带 .git；⛔ 为对照在共享工作树做任何 checkout（本票硬边界）。
+
+## 10. 终局并集尺（六笔全量，写面含票 306 文件那一枚授权追加；时刻=2026-10-11 07:45:34 +0800）
+commit 4e73d0a5 total=7 inside_write_face=7 OUTSIDE=0
+commit 1b34e475 total=5 inside_write_face=5 OUTSIDE=0
+commit c0d5ec24 total=6 inside_write_face=6 OUTSIDE=0
+commit fbd150e3 total=35 inside_write_face=35 OUTSIDE=0
+commit 71249b05 total=21 inside_write_face=21 OUTSIDE=0
+commit 6284a489 total=3 inside_write_face=3 OUTSIDE=0
+--- 六笔并集 ---
+union_files=101
+internal_audio=2
+probes_306_r1=72
+ticket_306=1
+OUTSIDE_COUNT=26  (0 = 越界空集 = 结论；下面逐字列出任何一行)
+RED - over budget and NOT in the roster: .scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md  (relative 125 chars, name 104 chars, full path on the self-hosted runner 169 chars, budget 165)
+check-path-length-budget.sh: RED - count guard: the roster holds 57 entries, the tree has 58 over-budget tracked paths
+check-path-length-budget.sh: RED - over budget and NOT in the roster: .scratch/wisp/issues/controlled-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-final-head-check.md  (relative 137 chars, name 116 chars, full path on the self-hosted runner 181 chars, budget 165)
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: VERDICT RED
+check-path-length-budget.sh: bands: over the hat=57  of which in the 122..180 middle=57  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+check-path-length-budget.sh: bands: over the hat=58  of which in the 122..180 middle=58  past the old debt line(180)=0  in the wall interval=0  roster entries=57
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: control 1/3 ok - bench baseline green, so this gate is not stuck red
+check-path-length-budget.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+check-path-length-budget.sh: control 3/3 ok - green again once the planted path is gone
+check-path-length-budget.sh: denominator read: 5289 tracked paths
+check-path-length-budget.sh: denominator read: 5290 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=5289  over-budget=57  covered by roster=57  not in roster=0
+check-path-length-budget.sh: denominator: tracked paths=5290  over-budget=58  covered by roster=57  not in roster=1
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: longest=180 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md)
+check-path-length-budget.sh: positive control PASSED
+check-path-length-budget.sh: positive control bench=/tmp/tmp.c3ce9gRgD3 (kept on disk; this project never deletes temp artifacts)
+check-path-length-budget.sh: repo=C:/Users/swq/AppData/Local/Temp/plb-clone-262r1-final
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 58 paths on this tree, recomputed just now in both units
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+check-path-length-budget.sh: worst full path on the self-hosted runner=224 chars (hat budget 165, wall open interval (206,217])
+warning: in the working copy of '.scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ok-short-name.md', LF will be replaced by CRLF the next time Git touches it
+--- 终局三面尺 ---
+rc_final_gofmt_worktree=0 (无输出 = 0 枚)
+rc_final_scoped_porcelain=0 lines=0
+--- internal/audio 工作树 vs HEAD 逐枚 cmp（⛔ 未提交残留）---
+mismatching_files=0 (0 = 工作树那 22 枚 .go 与 HEAD 逐字节相同)
+--- 终局定向复绿（同一把尺第三次读数，⛔ 是门禁那两发）---
+=== RUN   TestParseWavExtensibleFloat32306
+--- PASS: TestParseWavExtensibleFloat32306 (0.00s)
+=== RUN   TestWavInjectorExtensibleFloat32306
+--- PASS: TestWavInjectorExtensibleFloat32306 (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.054s
+rc_final_targeted=0
+--- 票面框普查（⛔ 翻勾自查）---
+checked=1 unchecked=5 (期望 1/5，与 §6 那条逐字同数)
+ticket_deleted_lines=26	0	.scratch/wisp/issues/306-inline-authoritative-format-tag-literals-in-wavinjector-go-have-no-ruler-at-all.md
+
+## 11. 更正 §10 那枚并集尺（具名自报一枚新踩的雷：共享 /tmp 的 glob 撞车）
+§10 里那句 cat /tmp/f-*.txt 命中的⛔ 只有本腿那六枚件：/tmp 是共享的，别的腿在同目录留了 f-<别的名字>.txt，于是 union_files=101 与 OUTSIDE_COUNT=26 两枚数都⛔ 是本腿的名册——那 26 行逐字是别家 check-path-length-budget.sh 的读数（含 seeded-/controlled- 那种长名夹具行），与本票⛔ 关。定式＝临时件⛔ 用宽 glob 聚合，逐枚显式命名（本腿 §10 之前那把逐笔尺走的就是显式 sha 件名，所以六笔 OUTSIDE=0/0/0/0/0/0 那六枚数⛔ 受影响）。 
+下面这把是重算的（每行 sha 前缀 + 档名，输入只有本腿六笔的 git show 输出）：
+union_files=75
+internal_audio=2
+probes_306_r1=72
+ticket_306=1
+OUTSIDE_COUNT=0  (0 = 越界名册空集 = 结论)
+逐字列出任何一行：
+--- 六笔并集里 internal/audio 那两枚逐字 ---
+internal/audio/wave_format_float_300_windows_test.go
+internal/audio/wavinjector_extensible_float_306_test.go

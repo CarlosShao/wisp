@@ -128,3 +128,9 @@ portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed
    但动作本身⛔ 合规）。定式＝临时计数件一律直接落到自家 `logs/`，⛔ 落仓库根、⛔ 删。
 5. **新写的那枚 Go 文件全 ASCII**（⛔ emoji 形状字符、⛔ `≤`／`✓`／⛔ 变体选择符），且它**在** ban #8 射程里（`internal/` 527 枚那一行就是它进册的证据）；
    自查＝上面 §2 那发 `rc_d22scan=0` 加 `logs/40-raw-d22scan.txt` 的 clean 末行。
+6. ★**终局那把并集尺踩过共享 `/tmp` 的 glob 撞车**（本件 §6 那句"并集 51 枚"用的是逐枚显式件名那把尺，⛔ 受影响；后来追加的 §10 那发用了
+   `cat /tmp/f-*.txt`，把别家腿留在同一目录的件也吞了进去 ⇒ 那两枚数（`union_files=101`／`OUTSIDE_COUNT=26`）⛔ 是本腿的名册，
+   那 26 行逐字是别家 `check-path-length-budget.sh` 的读数）。已就地重算并追加更正（`logs/40-outofbounds.txt` §11）：
+   六笔并集＝**75 枚**＝`internal/audio/` **2** ＋ `.scratch/wisp/probes/306/r1/` **72** ＋ 票 306 文件 **1** ⇒ **越界 0 枚**；
+   逐笔尺六枚分别 `OUTSIDE=0`（`4e73d0a5` 7／`1b34e475` 5／`c0d5ec24` 6／`fbd150e3` 35／`71249b05` 21／`6284a489` 3）。
+   定式＝临时件⛔ 用宽 glob 聚合，逐枚显式命名。

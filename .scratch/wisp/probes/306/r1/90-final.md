@@ -102,3 +102,16 @@
 - 三枚行内值的牙各自那发红句在 `20-nails.md` §一／§二／§三，逐字、互异（`tag=65534`／`tag=3`／`tag=0`），可逐枚重跑：`bash logs/mutate.sh <树>`（脚本在本件里，⛔ 入库到产码面）。
 - 想复核"⛔ 让行内值消失"那半：本腿的正控是 `rc_build_linux_pkg=0`（`logs/40-raw-build-linux.txt` 那枚件自陈"空即读数"）＋`internal/audio/wavinjector.go` 三把 `cmp`。
 - 想复核 `AC#3` 那格的"只动注释"：`git show c0d5ec24 -- internal/audio/wave_format_float_300_windows_test.go | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)|^[+-]//'` 期望零命中。
+
+## 7. 本件写完之后的终局追加（⛔ 回头改 §1 那张表，只在这里补，保持落笔顺序）
+
+- §1 那张表落笔时只有五笔；实际交件＝**六笔**：`4e73d0a5` → `1b34e475` → `c0d5ec24` → `fbd150e3` → `71249b05`（门禁）→ `6284a489`（本件＋票面追加）。⛔ push。
+- ★**再自报一枚自己的尺缺陷**（派单第 3 节第 7 条"临时件只建不删"之外的那条——用宽 glob 聚合临时件）：终局那把并集尺用了
+  `cat /tmp/f-*.txt`，而 `/tmp` 在本机是**跨腿共享**的 ⇒ 别家腿留在同目录的件被吞进来，那两枚读数（`union_files=101`／`OUTSIDE_COUNT=26`）
+  ⛔ 是本腿名册，26 行逐字是别家 `check-path-length-budget.sh` 的读数（含 `seeded-…over-the-hat.md`／`controlled-zzz…md` 那种长名夹具）。
+  坏件**保留⛔ 删**，就地重算并追加更正＝`logs/40-outofbounds.txt` §11 ⇒ **六笔并集 75 枚**＝`internal/audio/` **2** ＋ `.scratch/wisp/probes/306/r1/` **72** ＋ 票 306 文件 **1**，
+  **越界 0 枚**；逐笔六枚 `OUTSIDE` 全 0（`7/5/6/35/21/3` 全在写面内）。§3 第 14 条那枚 `rm` 自报⛔ 撤回——本腿此后一律 `mv`，⛔ 再删。
+- 终局三面尺（写本件那一笔之后现量，逐字在 `logs/40-outofbounds.txt` §10 末段）：`gofmt -l internal/audio` **0 枚**；
+  `git status --porcelain -- internal cmd docs scripts .github` **0 行**；`internal/audio` 工作树那 **22** 枚 `.go` 对 HEAD blob 逐枚 `cmp`
+  ⇒ `mismatching_files=0`（⛔ 未提交残留）；定向复绿第三发 `rc_final_targeted=0`（两枚指名用例逐字 `--- PASS`）；
+  票面框普查 `checked=1 / unchecked=5`（本腿⛔ 翻勾），票面 diff＝**26 加 0 删**（append-only，⛔ 改原句、⛔ 动 `-done`）。
