@@ -15263,3 +15263,25 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - **一枚既有红转绿的登记**（v1 的决定性读数，我⛔ 复跑）：`TestResolvePerCallBudget` 同树同机一分钟之内 core＝`--- FAIL (3.90s)`／windows＝`--- PASS`，before-blob 复现里本来绿 ⇒ 判语＝负载敏感判据的第 5 个读数，**⛔ 是成绩**，登记为**待归因红（负载敏感计时判据）**，归编排者＋`internal/risk`／C26 那枚 1 ms 预算的契约面。⛔ 任何人把它写成"这次改动让它变绿"。
 - **验收腿自己报的三枚缺口**（⛔ 它给自己盖章，我照录）：`tasklist` 只在起手量了且当时⛔ 落件（同一把尺打它判给写腿的那格，它自己也部分成立）；它做了一发**票面⛔ 授权的**工作树改动（装回 before-blob 跑 census＋windows 两发；窗口形与反形同一把、`cmp` rc=0、四个窗口各复量 0 行、产物只建⛔ 删）；第一次反形因 `$(pwd)` 带空格导致 `cp` 全失败——**脚本当时未被动过**（当刻 porcelain＝0 行）。★第三枚正是我记忆里那条旧坑的又一次现身：**这枚仓根路径带空格，任何变量插值⛔ 加引号就会造出"参数被拆成两枚"的假动作** ⇒ 补进派单固定句。
 - 排程更新：`AC#5`（`ci.yml:400-401` 两行注释）七条形状由 v1 逐条给好（单独一笔／pathspec 写在 `$( … )` 之外⛔ 用票级 glob／纯注释面判据＝每个 hunk 只落 `#` 行且 `^\s*(name|runs-on|if|run|steps):` 命中 0／文案必须写"test-windows 那半变真、slo 那半仍⛔ 真"这枚不对称／⛔ 现在时计数／门禁三发）⇒ **`301-r2` 现在可派**（go 面空）。⛔ 零翻框权下放到我之外。
+
+## A815｜2026-10-10 15:4x｜**更正 `A813` 最后一行我自己那句读数**（self-hosted runner 那把尺用错了）＋推送后 CI 首量的四枚颜色逐枚归因（三枚⛔ 是本次带来的、各有来路）
+
+### ① ★更正：我写"本机 `dotnet.exe` 匹配 0 枚 ⇒ 这次推送今天⛔ 该抢本机 CPU"——**机制错了，而且当场被推翻**
+
+- 事实：run `38034689386` 的 `slo-full` 那档**跑完了、结论＝success**。那一档按既有账（`wisp-ci-selfhosted-topology`）就落在**机主这台开发机**上 ⇒ 这次推送**确实**在本机起了一次真实负载，时序＝我 15:2x 推、15:3x 查它已经 completed。
+- ⚠ 我这把尺坏在哪：我用 `Get-CimInstance Win32_Process -Filter "Name='dotnet.exe'"` 去猜 runner 在⛔ 在跑。**runner 的进程名⛔ 是 `dotnet.exe` 这件事我⛔ 证过**——"匹配 0 枚"只证明"没有 dotnet.exe"，⛔ 证明"没有 runner"。⇒ 定式：**判 self-hosted runner 活⛔ 活，⛔ 用进程名猜**，两把可用的尺＝(a) `gh run view <id> --json jobs` 里那档的 `status`／`conclusion`（我这发就是这么抓到它的），(b) runner 自己的日志目录时间戳。
+- ⚠ 连带后果（写给排班）：**推送＝本机一次真实 CPU 抢占**，与"派 go 面腿"这件事互相污染读数。本次的暴露面⛔ 大（`301-r2` 只做注释面＋三发⛔ 计时的门禁），但下一条要跑整包／真窗的腿之前，我该先看一眼 CI 有没有在跑那一档。**机主 15:1x 那句"直接推"⛔ 取消这条自查**——它给的是推送权，⛔ 是"⛔ 用看颜色"。
+
+### ② 推送后 CI 首量：四枚颜色逐枚归因（⛔ 一枚是本次带来的新红，逐枚有来路）
+
+| 档／步 | 颜色 | 归因（现量尺） |
+|---|---|---|
+| `lint` ＝ `gofmt (gofumpt)` **两枚步骤** | 红 | **已知红，且 `ci.yml` 自己逐字声明**（blob `:385`：`because this job has known-red steps above it (\`gofmt (gofumpt)\` and \`staticcheck\`)`）。我本机同尺复跑（`$(go env GOPATH)/bin/gofumpt -l . tools/d22scan tools/mockllm`）＝**46 行**，⛔ 一枚在 `internal/`／`cmd/`——逐枚都在 `.scratch/wisp/probes/**` 的探针 `.go` 件（`161/r1/runs/…`、`197/r1c/pre/…` 那一族）。⚠ **记我一枚口径缺陷**：票 300 那批"gofumpt 名册空"的七道闸门我打的是**产码射程**（`internal/**`），⛔ 是 CI 那一步的射程（`.` 递归含 `.scratch/**` 的跟踪件）⇒ **"名册空"这四种字在两枚射程下都成立过，只有后者管 CI 的颜色**。 |
+| `lint` ＝ `staticcheck` | 红 | 既有登记欠账（本仓 task：⚓ 36 条逐条判"只能在 CI 那版尺上量，本机版解不开 go1.27 export data"）。⛔ 本次新增。 |
+| `test-core` ＝ `Portable package tests (core scope…)` | 红 | 本机同一把尺同样红：`--scope=core` ⇒ `RUN=1866 PASS=1257 FAIL=8 SKIP=0`，**8 枚具名**（两枚腿＋验收腿三把名册 `diff` 全 0）。⇒ ⛔ 本机／CI 分歧，⛔ 本次带来的。 |
+| `slo-smoke`／`slo-full` | **绿** | slo-full 落在本机、completed success（见 ①）。 |
+| `test-windows` | in_progress（15:4x 时点） | ★**这一发的颜色才是票 301 `AC#2` 欠的那枚 CI 色**（audio 进档后 41 枚新求值用例在托管 runner 上的真颜色）。它自己的前两步已绿（winsec 封根闸门／cgo build smoke），`cmd/wisp CLI tests` 在跑，"Portable windows tests"那一步还⛔ 到。⇒ **回填之前 `AC#2` 那句"欠一枚具名 CI 色"⛔ 销**；红时先看 `TestPinnedThreadStable10s`（本机 10.04s PASS）与 `waitForLevels(..., 5*time.Second)` 那族计时。 |
+
+### ③ 排程照旧（⛔ 因推送而变的东西只有一件）
+
+`301-r2`（票 301 `AC#5`＝`ci.yml:400-401` 两行注释，⛔ 一笔、纯注释面）在飞 ⇒ 它交件后我核 §3 那两把尺（hunk 全落 `#` 行／新增行里 `^\s*(name|runs-on|if|run|steps|uses|with):` 命中 0），再由我推送（授权＝`A813`）＋派 `301-v3` 验收（带 `AC#4` 那枚"追加闭算⛔ 算满足"的必答）。其后＝`300-v3` → 票 111 `AC#12` 普查腿 → 队列 `296-r2`／`298-r1`／`295-r1`／`294-r1`／`294-v1`。⛔ 第二远端 `cnb` 仍⛔ 动（差 921 枚）。
