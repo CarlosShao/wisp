@@ -14,10 +14,11 @@ package audio
 // half of the evidence lives in .scratch/wisp/probes/300/ (a1r, v1, orch),
 // never in this tree -- an always-red tracked test is banned here.
 //
-// Fixture byte layout comes from the AC#0 authority (on-disk Windows SDK
-// header C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\shared\mmreg.h,
-// compiled with 1-byte packing via pshpack1.h, so there is no padding
-// anywhere), NOT from either implementation in this package:
+// Fixture byte layout comes from the AC#0 authority (the Windows SDK header
+// shared/mmreg.h in the installed Kits include tree -- the absolute path is
+// machine- and build-version-specific, so it is deliberately not written out
+// here), compiled with 1-byte packing via pshpack1.h, so there is no padding
+// anywhere, and NOT from either implementation in this package:
 //
 //	WAVEFORMATEX      : tag@0 channels@2 rate@4 avgBytes@8 blockAlign@12
 //	                  bits@14 cbSize@16                       -> 18 bytes
@@ -82,8 +83,10 @@ func (f face300) build() []byte {
 // sits, and the naming here follows it: S2 (Data1 = 1 collides with a
 // dwChannelMask of 3 at offset 20) and S3 (7 collides with nothing) carry it;
 // S4 is the weakest face in the set -- on its own it stays green at offsets
-// 22, 24 and 28 -- and S1 on its own stays green at 20 and 24. No single face
-// here is the decisive one; the four together only accept 24.
+// 22, 24 and 28 -- and S1 on its own stays green at 20 and 24, so neither of
+// those two pins the offset by itself. S2 and S3 do: each of them is green
+// ONLY at 24, so either one alone already rejects 20, 22, 26 and 28. The four
+// faces together still accept 24 and nothing else.
 func TestParseWaveFormatSubFormatOffset300(t *testing.T) {
 	cases := []struct {
 		name    string
@@ -101,7 +104,7 @@ func TestParseWaveFormatSubFormatOffset300(t *testing.T) {
 			name:    "S2_pcm_at_24",
 			face:    face300{channels: 2, rate: 48000, bits: 16, data1: 1, data1At: 24},
 			wantTag: 1,
-			why:     "KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2474, Data1=0x00000001) at byte 24",
+			why:     "KSDATAFORMAT_SUBTYPE_PCM (mmreg.h:2475, Data1=0x00000001) at byte 24",
 		},
 		{
 			name:    "S3_bogus_subtype_7_at_24",
