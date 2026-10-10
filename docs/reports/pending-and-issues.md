@@ -15167,3 +15167,38 @@ HEAD 上"**零求值**"的守卫是 **26 枚**，不是我写的 23。文件内 
 - ⛔ **翻的两格写清理由**（免得下一程以为我漏了）：`AC#3` 只剩"判语归位"那一半＝**判语**⇒ 另派非实现者（⛔ 我裁）；`AC#5` ⛔ 翻＝本格逐字指名"**落地腿**自己现跑那三跳"，而实际量到的是**验收腿** ⇒ **指名人⛔ 跑＝⛔ 闭合**，自然闭合点＝票 301 `AC#1` 落地腿的前后名册作差（分母按 **10 枚用例**，`A809`）。★这属"谁跑"与"跑了什么"要分开记那一族（先例：票 244 `AC#5`ⓐ、票 223 `AC#5`）。
 - ⚠**编排者代笔一笔的边界与自抓**：只动 `internal/audio/parse_wave_format_300_windows_test.go` 的**注释与 `why:` 说明串**三处（⛔ 动产码偏移、⛔ 动断言、⛔ 动夹具字节），件＝`.scratch/wisp/probes/300/orch/2026-10-10-comment-fix-gates.md`；七把各落 `rc=`＝`gofumpt` 名册空／`gofmt` 名册空／改动区非 ASCII 命中 0／`go vet` rc=0／定向用例 rc=0（顶层 `--- PASS` 1＋`=== RUN` 5＝1 父＋4 子，**⛔ 报成"一把尺 6 枚"**）／`d22scan` rc=0／`GOFLAGS= go build ./...` rc=0。★**自抓记我**：第一发见本机 PATH ⛔ `gofumpt` 就把那格当"⛔ 跑"，第二发才用 `$(go env GOPATH)/bin/gofumpt` 取到读数——**命令找不到⛔ 等于检查通过，先定位再判**（`A` 账"0 字节＝那格没交"的姊妹形）。
 - ★**这轮编队健康度报一句**（⛔ 把"数量达标"当健康）：在飞＝**0 枚**（`300-v2`、`301-a2` 都交完，`300-r1` 早已落地）；写面 `internal/audio/**` 与 Go 编译面**同时空** ⇒ 本轮下一发＝**派 `301-r1`**（audio 进 `windows)` ＋同笔补 `win_pin`；三句逐字禁区＝⛔ 动 `portable-tests.sh:593`、⛔ 拆两笔、⛔ 碰 `ci.yml`；`AC#2` 前后作差分母按 10 枚）。队列其后＝`301-v1` → `300-v3`（只裁 `AC#3` 判语归位）→ 票 111 `AC#12` 普查腿 → `296-r2` → `298-r1` → `295-r1` → `294-r1` → `294-v1`；票 293 只剩 `AC#5`（合并真机窗口，欠机主五枚读数）；票 299 按在 `Q-84`（⛔ 不催）；我还欠自己那发"照 `293-v1` 逐字配方含 `cmd/wisp` 重跑坐实 677"（现在编译面空，可排）。⛔ 零 push（机主从未授权）。台账现 **538** 枚（尺＝`grep -c '^## A[0-9]'`；宽松那把 `^## A` ⇒ 539，差的仍是一枚⛔ 账的节头，见 `A803`）。
+
+## A811｜2026-10-10 14:4x｜编排者补量（`301-r1` 在飞期间，⛔ 任何 go 编译面）：★票 301 的 `AC#1` **代价面被我写小了一枚粒度**＋★新现量"`-skip` 是静默过滤器、⛔ 产 `--- SKIP`"（两发归档 CI 字节）＋三行 Δ 预测**写在腿交件之前**＋一枚我自己造的落点事故（探针写进了在飞腿的 pathspec 射程）
+
+**这一枚是"编排者在别人写码时能干哪些真有用活"的正例**：⛔ 碰 `scripts/**`、⛔ 碰 `internal/**`、⛔ 跑 go 面，交回来的三件东西都⛔ 依赖腿的转述，且都落在腿交件**之前**——所以它交回来时我手里已经有判据，⛔ 只有它的说法。
+
+### ① 更正我自己写在票 301 现量节末条那句话（记我，⛔ 改原句，更正落在同日"编排者补量"一节）
+
+- 原句：把 `./internal/audio/` 拉进 `windows)` 档"会同时把该包**其余 windows-tagged 用例**一起拉进 `test-windows` 的分母"。**分档单位是包**（`scope=( ./internal/audio/ )` → `go test` 收的是整枚包），⇒ 进分母的⛔ 是"其余 tagged"，**是 audio 全部 42 枚顶层用例**（尺＝`0a0f62ef^` blob 逐枚 `grep -c '^func Test'`，rc=0：8 枚文件＝tagged 3 枚文件 10 用例／**无 tag 5 枚文件 32 用例**）。
+- ⇒ 本票真正在赌的是那 **32 枚无 tag 的**——它们在 CI 上到今天只⛔ 在 ubuntu 的 `core` 档跑过，**在 windows 平台上从未被求值过一枚**。`301-a1` 的 AC#0 三张表里"前置条件"那一列射程窄了 3 倍；后续引用⛔ 再按"只有 tagged 有前置"读。
+- ⚠ 载入形风险（`cmd/wisp` 缺 sherpa DLL ⇒ `0xc0000135` 且零 `--- FAIL` 那枚旧例）在这一枚上⛔ 适用：尺＝8 枚测试文件的 import 块逐枚读，rc=0，全纯 Go、⛔ cgo、⛔ 设备依赖，唯一包外依赖＝`internal/observe`。**风险面是计时**，具名两枚先记：`hotplug_test.go:443` `TestPinnedThreadStable10s` 只在 `-short` 下跳，而 `portable-tests.sh:694` 那条命令**从⛔ 传 `-short`**（尺＝`grep -n -- '-short' scripts/portable-tests.sh` ⇒ 0 命中）⇒ 落地一次＝那一档多 10 秒墙钟，且它判 `LockOSThread` 独占性（托管 runner＝共享机器）；同族＝`capturelevel_windows_test.go` 的 `waitForLevels(..., 5*time.Second)`。
+
+### ② ★新现量（⛔ 在任何一份腿报告里，⛔ 在任何一张票面上）：`-skip` 过滤掉的用例**⛔ 产 `--- SKIP` 行**
+
+- 为什么这一枚要紧：`runtests.sh:98-104` 逐字是 `if [ "$skipped" -ne 0 ] ... SKIP is not a pass (ticket 71 AC#3) ... exit 1`，而 audio 进档会激活 ledger `:593`（`TestLiveWasapiSmoke|./internal/audio/|windows|fixture|`）那一行。⇒ 如果 `-skip` 自己产 SKIP 行，`AC#1` 那笔落地**当天就会把 `--scope=windows` 打红**，而归因会被写成"audio 的用例坏"。
+- 证据＝两枚**归档 CI 运行日志**（射程＝仓外 `.scratch/ci-logs/`，托管 windows runner 真跑出来的字节，⛔ 本机、⛔ 推断）：run `37158259050`（2026-10-03）windows 档 `RUN=488 PASS=335 FAIL=12 SKIP=1`；run `37166458550`（2026-10-04）同一档 `RUN=492 PASS=339 FAIL=12 SKIP=1`。两发的 `-skip` 模式串都含 **7 枚名字**，其中 `TestHelperProcess`（`./internal/proc/`）与 `TestSyncRegistryProbeLive`（`./internal/risk/`）**枚枚都在那一档的 scope 里** ⇒ 过滤会产 SKIP 的话至少该 `SKIP=3`。实测 `SKIP=1`，且那枚 SKIP 的**名字与出处逐字**在日志里＝`--- SKIP: TestSyncRedTeamRealOneDrive` ＋ `syncdirs_redteam_windows_test.go:220: no live sync root on this machine (detected roots: [])`——它⛔ 在 ledger 里，是**自己 `t.Skip`** 的。
+- ⇒ 判据级结论：`-skip` ＝过滤器，被过滤者连 `=== RUN` 都⛔ 打；只有用例自己 `t.Skip` 才产 `--- SKIP`、才把那一档打红。⇒ **`AC#1` 落地⛔ 会因为 ledger `:593` 变红，这一支担心到此收掉**（⛔ 等于"落地必绿"——那 32 枚另算）。
+- ⚠ 顺带把 `301-a2` 表①里 audio 那行（total `_test.go`＝8、tagged＝3）用同一把尺独立复认 ⇒ **那一格从〔仅腿量，编排者未复跑〕销账**；仍欠的两格⛔ 变（census 真读数、`--scope=core`／`windows` 的本机颜色——`301-r1` 正在跑）。
+
+### ③ 三行 Δ 预测（写在腿交件之前；落点＝`.scratch/wisp/probes/301/orch/2026-10-10-baseline-and-delta-prediction.md` 第 4 节）
+
+- 腿的 before 读数已交回并核过（尺＝`0a0f62ef` 里的 `probes/301/r1/rosters|logs`）：`census-before` rc=0、`packages=35`、`with-zero-compiled-tests=7`、`claimed-by-no-scope=7`、**`unclaimed-with-tests=0`**、`internal/audio 8/0` claimed-by `core`（⇒ `301-a2` 那条"⛔ 实跑过 census"的推断**现在是实测**）；`windows-before` rc=1、A-evaluated=399、A-pass=397、**A-fail=2 枚具名**＝`TestC21TableColourRowsMatchTokensCSS`（`internal/ball/tokens_table_test.go`）＋`TestResolvePerCallBudget`（`internal/risk/pathresolver_budget_norace_test.go`），**两枚所在包今天已经在 windows 档里 ⇒ 既有红、⛔ 这枚落地带来的**；`core-before` rc=1、A-fail=8 枚具名。
+- 预测：**Δ A-evaluated ＝ +41**（399→**440**；42 枚减掉被静默过滤的 `TestLiveWasapiSmoke`）。⚠ 撞名检查现量过＝audio 那 42 枚名对 `windows-before.A-evaluated.txt` 作差 `comm -12` ⇒ **0 枚重合**，所以 +41 是干净的（腿⛔ 报这行尺；`sort -u` 那把尺一旦遇到跨包同名就会静默吞掉一枚，那一形今天⛔ 发生）。报 +9／+10 ⇒ 它量的是"tagged 那一半"；报 +42 ⇒ 那一发里 `-skip` 根本没生效（另案，具名上报）。
+- 预测：**Δ A-skip ＝ 0**。若 A-skip≥1 且名字来自 `internal/audio` ⇒ ② 那两发被推翻，归因＝"SKIP 是红"那一形，⛔ "audio 的判据坏"。
+- 预测：**Δ A-pass ＝ 41 −（逐名报出的新增红）**。⛔ 枚数一致当"没问题"；红必须连文案一起报。
+
+### ④ ★一枚我自己造的落点事故（记我，⛔ 改写历史）
+
+- 我把补量件写在 `.scratch/wisp/probes/**301**/orch/…`，而在飞写腿 `301-r1` 的显式 pathspec 是 `probes/301/**`（票面 `AC#4` 逐字允许的那枚射程）⇒ 我那枚 77 行件**被腿的 commit `0a0f62ef` 一起提交了**（`git show --stat` 里它排在腿自己的件之前）。
+- 后果分三层：⛔ 工作丢了（件在盘上、在历史里）；`AC#4` 的名册自判**⛔ 因此被破**（那句逐字是"只含 `scripts/portable-tests.sh` ＋ `probes/301/**`"，我的件正好在射程内）；⛔ 但**归属会变脏**——下一个读 `0a0f62ef` 的人以为那 77 行是写腿作的分析。**这一行就是为堵这个而写的**。
+- ⇒ 定式（下一波起生效）：**给在飞写腿当补位用的探针件，落点⛔ 许落在该腿的 pathspec glob 射程内**；本仓现行 `probes/<ticket>/orch/` 与腿的 `probes/<ticket>/**` 天然重叠 ⇒ 编排者的补位件改用 **`probes/orch/<ticket>/`**（新目录，⛔ 迁移既有件，⛔ 删）。
+
+### ⑤ 边界
+
+- ⛔ 零 push、⛔ 任何 AC 框翻勾（`AC#1`／`AC#2` 的翻勾归非实现者 `301-v1`）；⛔ 动 `.github/workflows/ci.yml`（`AC#5` 那一笔按在 `AC#1` 核过之后、单独一笔）；⛔ 动 ledger `:593` 那行（腿已证它逐字节未变，只是被 win_pin 插入顶到 `:594`——一枚具名行号腐烂，⛔ 内容变化）。
+- 排程：`301-r1` 的 after 两发**在跑**（22 枚文件在最近 4 分钟内被touch）⇒ 它交件后我按 ③ 那三行对，然后才谈 `301-v1`。
