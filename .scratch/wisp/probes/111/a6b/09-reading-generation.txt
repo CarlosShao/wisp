@@ -1,0 +1,5 @@
+读数世代锚（票 111 AC#12 本腿三件的唯一有效锚点）
+  本腿全部读数取自 HEAD = f76091cd (2026-10-10T17:04:15+08:00)，读面=git archive HEAD 于 17:1x 落地；
+  本腿收尾时 HEAD 已漂到 4832730e，f76091cd..HEAD 在 cmd/ 与 internal/ 的差集＝[（空＝两锚之间产码面无改动）]
+  ⇒ 跨波引用本腿任何枚数必须带上 f76091cd；换了锚点要现跑 bash .scratch/wisp/probes/111/a6b/01-rulers.sh 重取。
+rc=0
