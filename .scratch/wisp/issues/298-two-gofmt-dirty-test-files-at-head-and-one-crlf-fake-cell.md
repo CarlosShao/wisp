@@ -58,3 +58,59 @@ git：只 commit 不 push；⛔ `add -A`／`amend`／`reset`／`rebase`／`stash
 - **排程补一句具名理由**：`298-r1` 起手那条 `git status --porcelain -- cmd/wisp/panel_inbound_guards_35r3_test.go cmd/wisp/panel_transport_35r2_test.go` 非空即按住——本轮实测**跟踪状态不等于干净**：那 52 枚 `??` 全在 `.scratch/**` 下，真码工作树是干净的，所以判据要看**具体两枚路径**、⛔ 不许拿"仓库整体脏"当理由自停（`255-r1` 那回虚惊同形，记我派单要写清）。
 
 - [2026-10-09 19:42:59 +08] agent=编排者 did=收 292-v1 时扩射程重跑 gofmt 那把尺 ⇒ 本票现量节"一枚 CRLF 假枚"更正为 **5 枚**（射程从 cmd/wisp 扩到 cmd/wisp internal tools：工作树 7、HEAD blob 仍 2），并补第三档＝22 枚 .scratch 下故意脏格式的 tracked 变异拷贝（尺 git ls-files '*.go' | xargs gofmt -l ⇒ 29）⇒ AC#3 的钉法加一维"射程目录必写"；gate.go 行号真值定为 :281（票面 :275／腿报 :282）入账方式改内容锚 next=298-r1 排在当前 cmd/wisp 写腿（296-r1）交完之后
+
+## 298-r1 追加（2026-10-10 16:2x，落地腿；⛔ 上面各节原句一字不改，本节只追加）
+
+### AC#3 落点＝本票与今后派单：那把尺的口径（一句话＋逐字尺，⛔ 不改票 292 原句）
+
+> **可复用判据：碰 Go 面的票在写 `gofmt -l`（或 `gofumpt -l`）那一格时，必须同时写明四件事——① 射程目录（`cmd/wisp`／`cmd/wisp internal tools`／全仓 tracked），② 量的是 **HEAD blob** 还是**工作树**，③ 交件时把**两把的枚数并排**给出，并具名指出差额里哪些是本机 `core.autocrlf=true` 造成的换行符假枚，④ 名册尺要写明 stdout／stderr 怎么处置并把 `rc` 一起交回。**
+
+逐字尺（两把并排；下一位可原样重跑，落点⛔ 不落仓内）：
+
+```
+gofmt -l cmd/wisp                                              # ① 射程照票改写 ② 工作树那一把
+B=$(mktemp -d); mkdir -p "$B/blob"
+for p in $(git ls-files cmd/wisp | grep '\.go$'); do git show "HEAD:$p" > "$B/blob/$(basename $p)"; done
+gofmt -l "$B/blob"                                             # ② HEAD blob 那一把（宽域形＝git archive HEAD cmd/wisp internal tools | tar -x -C $B）
+```
+
+假枚标注法（第③件事的落笔形状）＝逐枚同跑三把小尺：`git ls-files --eol <路径>` 给 `i/lf w/crlf` ＋
+`tr -cd '\r' | wc -c` 给的 CR 数＝该件行数 ＋ blob 那一把不命中 ⇒ 名册里写
+`<路径>（换行符假枚：i/lf w/crlf，CR=<n>，blob 尺不命中）`，⛔ 计入格式债枚数。
+
+本腿 2026-10-10 16:1x–16:2x 现跑的口径读数（⛔ 引用前重跑；原件＝`probes/298/r1/logs/ac3-four-rulers.txt`／`ac3-wide-ruler-fixed.txt`／`ac3-blob-wide-ruler.txt`）：
+
+| 尺 | 改前 | 改后 |
+|---|---|---|
+| `gofmt -l cmd/wisp`（工作树） | 3 | **1**（＝`models.go` 假枚） |
+| `gofmt -l cmd/wisp internal tools`（工作树） | 7 | **5**（＝AC#2 那 5 枚假枚） |
+| `git show HEAD:<path>`／`git archive HEAD …` 落仓外再 `gofmt -l`（blob） | 2 | **0**（114 枚与 658 枚两种射程都给空） |
+| `git ls-files '*.go' \| xargs gofmt -l`（全仓 tracked，工作树） | 29 | **27**＝22 枚 `.scratch/**` 故意脏拷贝＋5 枚假枚，真债 **0** |
+
+⚠ **第④件为什么必须写（本腿撞到，⛔ 不是代码差）**：最后那一把实测 **`rc=123` 而非 0**——
+`.scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1: imports must appear before other declarations`
+（一枚故意做坏的变异夹具让 `gofmt` 报错，`xargs` 因此退 123）⇒ 复跑必须 stdout／stderr 分开取，
+否则报错行会被 `wc -l` 计进名册（本腿第一次就多数 1 枚：28 vs 真值 27）。
+
+### 本轮清洗结果（AC#0..AC#4 的交件在 `probes/298/r1/`，判语⛔ 本腿不填、五格框⛔ 本腿不勾）
+
+- 已洗＝`cmd/wisp/panel_inbound_guards_35r3_test.go`（脏形＝const 块内尾随注释列对齐，1 hunk，`:63-64` 系）／
+  `cmd/wisp/panel_transport_35r2_test.go`（脏形＝两枚单行方法的花括号前空格，1 hunk，`:804-807` 系）；
+  各 numstat `2 2`，`git diff -U0` 逐段过目＝改动全在空白层，⛔ 标识符／字符串／断言／用例名／注释文字一字未动。
+- 归因链（⛔ 推测，是尺）：两枚都**首笔即脏**——`7f9d6e40`（票 35 的 35-r3 腿）与 `286a7f30`（票 35 的 35-r2 腿）；
+  35r2 首笔 blob 脏形在 `:772` 系，漂到 HEAD 的 `:804` 系（位移 +32 行），
+  与 `2fc5f5c9` 提交正文自己记的那句「gofmt 那 4 行漂移 HEAD 同处也在…⛔ 不顺手改」逐字对上 ⇒ 本票是这条债的第一次真修。
+- 门禁：`GOFLAGS= go build ./...` 改前后各 rc=0；`sh scripts/d22scan.sh` 改前后各 rc=0 clean、
+  名册级作差（剥掉计时与临时目录号）**逐字相同**＝新增红 0 枚、`runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0` 两把同值。
+- ⛔ `cmd/wisp/models.go` 一个字节未动（禁区节）；⛔ `.gitattributes`／git 配置未动；⛔ 整包未顺洗；
+  `frontend/**`／`design/**`／`internal/**`／`scripts/**`／`.github/**`／三枚冻结件／golden／`thresholds.go`／`allowlist.txt` 零字节改动。
+- ⚠ **两处具名报回（本腿不自裁）**：
+  ① **派单与票面 `AC#4` 冲突**＝派单写着「`cmd/wisp` 的整包测试⛔ 跑，`go build` 就够」，
+     而票面 `AC#4` 要求 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1` 改前改后各 ≥2 发取交集。
+     本腿按派单禁令执行 ⇒ **那一格的读数欠着**（欠的是"两把名册作差"，⛔ 是"门禁红"：build＋d22scan 两把都 rc=0），
+     由编排者二选一（补跑或订正 `AC#4` 措辞）。
+  ② **gofumpt 残留 1 枚**＝`panel_transport_35r2_test.go` 有 gofumpt 加严规则（`type ( … )` 成组、复合字面量换行、相邻 `func` 补空行）要改，
+     `gofmt -w` 管不到、⛔ 本票射程（`AC#1` 只许 `gofmt -w`）；已证那是 HEAD 既有债、本腿让 gofumpt 的抱怨只减不增（工作树 3 枚→2 枚），
+     要不要另立一票归编排者裁。
+
+- [2026-10-10 16:28:00 +08] agent=298-r1（落地腿） did=起手闸门四把全跑（锚点 6414a4bb；git status --porcelain -- 两枚目标路径给 0 行＝停手条件未触发，另证 diff <(git show HEAD:<path>) <path> 两枚 IDENTICAL；tasklist wisp.exe／balldebug.exe 各 0 枚）⇒ 改前两把尺复现票面（工作树 3／HEAD blob 2）⇒ gofmt -w 那 2 枚（各 1 hunk／numstat 2 2，全空白层）⇒ 改后工作树 1（＝models.go 假枚）／HEAD blob 0；gofumpt 工作树 3⇒2；GOFLAGS= go build rc=0（改前后）；sh scripts/d22scan.sh rc=0 clean（改前后，名册级作差逐字相同、PASS=35 FAIL=0 同值）；首笔即脏以 blob 尺证成（7f9d6e40／286a7f30，35r2 脏形 :772→:804）⇒ 交件 probes/298/r1/{00-anchor,10-ac0-dirt-shape,20-ac2-ac3-annotation-and-wording,30-gates}.md＋logs/*（每件自落 rc、无 0 字节、无 .out、无 .sh／.ps1）；本段为票面追加（AC#3 口径四件必写＋两处具名报回：go test 冲突＝读数欠着归编排者二选一／gofumpt 残留 1 枚归编排者裁） next=非实现者 298-v1 翻勾判五格；⛔ 本腿零翻框、零 push；⛔ models.go／.gitattributes／git 配置／整包格式零字节改动

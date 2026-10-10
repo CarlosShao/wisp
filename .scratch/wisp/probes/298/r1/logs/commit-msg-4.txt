@@ -1,0 +1,21 @@
+298-r1 第 4 笔（门禁件＋票面追加）：30-gates 交五格读数与越界逐笔；票 298 只追加 AC#3 口径与 Progress log
+
+probes/298/r1/30-gates.md＝停手条件读数（两枚目标路径 0 行＋两枚工作树内容＝blob IDENTICAL）／
+AC#1 逐枚 hunk 形状与 numstat 2 2／AC#4 每把尺自落 rc＝
+GOFLAGS= go build 改前后 rc=0、sh scripts/d22scan.sh 改前后 rc=0 clean 且名册级作差 rc=0 逐字相同（PASS=35 FAIL=0 同值）、
+gofmt -l cmd/wisp 工作树 3⇒1、HEAD blob 2⇒0（114 枚与 658 枚两种射程都空）、
+gofumpt 工作树 3⇒2、宽域 7⇒6（⛔ 新增 0 枚，改后名册逐把都是改前的子集）；
+"减少了哪几枚⛔ 哪几枚本来没动"的名册逐档给出（减＝那两枚 35 族测试件；没动＝models.go＋4 枚 internal 假枚＋22 枚 .scratch 故意脏拷贝）。
+
+★越界尺这一笔现量撞到的事实已具名写进 §7：区间 6414a4bb..HEAD 现量 7 笔而非 4 笔——
+编排者的 36efbd80／48e7b0a4／6da0e688／514d3c84 与我的笔交错 ⇒ `git diff --name-only A..B` 会把别人的笔算到我头上，
+本表一律用 `for c in <显式 sha 逐枚>; do git show --name-only --format= $c; done`（原件 logs/ac4-forbidden-and-scope.txt：
+禁区 grep 命中 0 枚、models.go 全区间 numstat 空、core.autocrlf 仍 true、cmd/wisp 提交后 0 行、0 字节件 0 枚、.out/.sh/.ps1 0 枚）。
+另如实记两笔自己的手滑：第 1 笔先用 git commit -- pathspec 被拒（新建件须先 git add -- 显式路径），改正后 rc=0；
+第 3 档全仓尺第一次把 stderr 计进 wc -l（数成 28，真值 27），改正后分跑。
+
+票面追加（只追加、上面各节原句一字不改）＝AC#3 那句可复用判据扩为四件必写
+（射程目录＋blob 还是工作树＋两把枚数并排＋stdout/stderr 处置与 rc），含假枚标注法三把小尺与四档实测表；
+两处具名报回归编排者裁＝① 派单"⛔ 跑整包 go test"与票面 AC#4 那两发读数冲突，本腿按派单禁令执行故那一格读数欠着；
+② gofumpt 残留 1 枚（35r2 的加严规则，gofmt -w 管不到、⛔ 本票射程）。
+⛔ 翻任何框（五格判语归 298-v1）、⛔ push、⛔ 碰 models.go／.gitattributes／git 配置／frontend／design／internal／scripts／．github／docs／三枚冻结件／golden／thresholds.go／allowlist.txt。
