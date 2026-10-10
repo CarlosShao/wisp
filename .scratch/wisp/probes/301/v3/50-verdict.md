@@ -315,6 +315,13 @@
   与起手那发的输出差 **138 行**、差行全是 `-v` 结果行的**耗时字段回声**（`0.06s`→`0.05s` 那一形），
   `grep -ciE 'violation\|banned\|forbid'` 在差行里＝**0** ⇒ 没有一枚分母被我挪动。**定式建议（归编排者裁，⛔ 我动文本）**＝
   "`cmp` 的底片一律落成 `.txt` 名"，别按被比文件的后缀起名。
+- ⚠**一枚体量自报（⛔ 违规，只是自报）**：我这发把 **约 4.7 MB** 的 CI 原始日志提交进了自己的面——
+  `logs/a0e55a51-test-windows.log` 1,419,603 B（承重：§2-③ 的"注释笔也被 CI 求值过"那一发）、
+  `logs/core-after.log` 1,376,627 B ＋ `logs/core-baseline.log` 910,589 B（**⛔ 承重**：那两发是我为验"CI 侧 census totals"下的 test-core 日志，
+  下来才发现 `--scope=census` 那一步**长在 test-windows 那枚 job 里**、test-core 里⛔ 有 census 字样＝`grep -ci census`＝0，
+  于是改判据用了 windows 档那两发）。⛔ 删（`issues/README` 规则 8 只建不删）、⛔ 改写历史（硬禁）⇒ 留仓并在此具名；
+  定式建议（归编排者）＝**"先 `gh run view --json jobs` 定位调用点所在 job，再 `--log --job=` 下载"**，
+  我这发的顺序反过来，多下了 2.3 MB 的死件。
 - ⛔ push、⛔ `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`/`--no-verify`、⛔ `git add -A`/`.`、⛔ 在仓内建 worktree、
   ⛔ 改 git 配置、⛔ 动 SLO 阈值/golden/`internal/observe/thresholds.go`/`tools/d22scan/allowlist.txt`/D43 表/C1–C32/D1–D47、
   ⛔ 为变绿放宽任何断言、⛔ 顺手修任何产码（我看到⛔ 舒服的地方只有派单措辞，全部写进 §6⛔ 动盘上件）。
