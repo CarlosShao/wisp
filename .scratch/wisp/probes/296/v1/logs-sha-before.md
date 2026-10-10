@@ -1,0 +1,2 @@
+c8182a684decbd54a5477e99b879249788dc900801d871752e0bbe2fba7cc968 *cmd/wisp/resident_windows.go
+c8182a684decbd54a5477e99b879249788dc900801d871752e0bbe2fba7cc968 */tmp/wisp-296-v1/resident_windows.go.orig
