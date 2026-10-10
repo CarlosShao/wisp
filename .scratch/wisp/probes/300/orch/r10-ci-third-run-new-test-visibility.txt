@@ -1,0 +1,51 @@
+# 300 编排者·r10：票 300 AC#5 的终读数（新造的常量大钉在 CI 执行面上真的跑到了）
+
+尺＝`gh run view --log --job 114205089889` 落 `/tmp/ci-third-testwindows.log`（1,425,356 字节，⛔ 入库、⛔ 删，只留本件）；
+所有下面引用的行号＝**那份日志里的行号**，逐字抄。捕获时刻＝2026-10-10 20:4x +0800。
+
+## 0. 这发是谁（尺＝`gh run list --workflow ci --json databaseId,headSha,startedAt`＋`gh run view --json attempt,jobs`）
+- run `38049322056`，attempt `1`，headSha `34e1962bb166b4494670b77296263c79bd8671a3`（＝编排者 19:41 那一发推送的本地 HEAD，`git ls-remote` 已核逐字同），startedAt `2026-10-10T11:41:52Z`
+- job：`test-windows`=`114205089889` failure／`test-core`=114205090024 failure／`lint`=114205090146 failure／`slo-full`=114205090022 success／`slo-smoke`=114205090099 success／`lint-frontend`=114205090061 success
+  ⇒ **job 颜色与上一发（r9 那发）逐枚同形，没有因为这一笔新增用例而多红一枚 job。**
+
+## 1. 台面（尺＝`Set up job` 段逐字；⚠ 与 r9 那两个世代同一台面，作差合法）
+- `:1` `Current runner version: '2.337.0'`
+- `:16` `Image: windows-2025-vs2026`  `:17` `Version: 20260925.250.1`
+- ⚠ `:4` 另有 `Version: 20260901.588` 一行——那是**另一组**下面的 Version（系统信息档），⛔ 拿它当镜像版本；r9 用的那把尺指 `:16-17`，本件沿用同一把。
+⇒ 三发（`cf46c24a` 改前／`05db4bc6` 改后／`34e1962b` 本发）镜像＋版本＋agent 全同 ⇒ **台面漂那一支在本票这三发里不成立**。
+
+## 2. ★本票要的终读数：`internal/audio` 的两枚新用例在 CI 上被执行且为绿（逐字）
+- `:6075` `=== RUN   TestParseWaveFormatSubFormatOffset300`（`028529fc`，票 300 AC#1/AC#2 那枚偏移用例）
+- `:6080` `--- PASS: TestParseWaveFormatSubFormatOffset300 (0.00s)` ＋ `:6081-6084` 四枚子测试逐枚 PASS（`S1_float_at_24`／`S2_pcm_at_24`／`S3_bogus_subtype_7_at_24`／`S4_data1_shifted_to_26`）
+- `:6099` `=== RUN   TestWaveFormatConstantsMatchMmregAuthority300`（`9a442923`，AC#6 的常量大钉）
+- `:6109` `--- PASS: TestWaveFormatConstantsMatchMmregAuthority300 (0.00s)` ＋ `:6110-6115` **六枚**子测试逐枚 PASS（`ieee_float_low_word`／`extensible_tag`／`pcm_tag`／`the_three_constants_map_one_to_one_onto_the_authority_table`／`parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value`／`control_plain_pcm_tag_is_not_expanded`）
+- 步名（`:6075` 那一行的第二列逐字）＝`Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)` ⇒ 落在 **portable windows 档**，与 `scripts/portable-tests.sh:253` 的 windows scope 含 `./internal/audio/`（A824 已现量）闭合。
+- `:6129` `ok  	github.com/CarlosShao/wisp/internal/audio	16.380s`；`:6137` `portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/audio`
+
+### 2a. 对 `9a442923` 那句 commit 消息的具名更正（⛔ amend，只追加）
+那消息写"顶层 PASS 1、子测试 PASS **5**"，CI 这一发逐字是 **6** 枚子测试（`:6110-6115`）。腿自己在 `148c0f43` 已把这条列为"过期读数⛔ amend 只追加更正"，本件就是那枚追加的凭据。⇒ **以后引用那枚钉的形状，按 6 枚子测试引，⛔ 引 commit 消息里的 5。**
+
+## 3. 四数（尺＝步日志 `portable-tests.sh: four numbers (all from -v output)` 逐字；⚠ 一把尺一个档，三档⛔ 相加）
+- `:1670` winsec 档＝`=== RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0`
+- `:4343` cmd/wisp 档＝`=== RUN=398  --- PASS=279  --- FAIL=8  --- SKIP=1`
+- `:6133` portable windows 档＝`=== RUN=631  --- PASS=428  --- FAIL=12  --- SKIP=1`
+- `:6160` junction 那步＝`PASS=1 FAIL=0 SKIP=0, === RUN=1`
+### 3a. 与 r9 那一发（`05db4bc6`）的作差，只算 portable 档
+`624 → 631`＝`=== RUN` **+7**；顶层 `PASS 427 → 428`＝**+1**；`FAIL=12` **不变**；`SKIP=1` **不变**；cmd/wisp 档四数与 r9 逐字同（`398/279/8/1`）。
+⇒ **+7/+1 归因已证**：`git diff --name-status 05db4bc6 34e1962b -- '*.go'` 整段只有**一枚**文件变化（`A internal/audio/wave_format_float_300_windows_test.go`），而那枚文件在 CI 上正好产 1 枚顶层＋6 枚子测试＝7 个 `=== RUN`、1 个顶层 `--- PASS`。`TestParseWaveFormatSubFormatOffset300`（`028529fc`）**已在 `05db4bc6` 里**，对这次作差净贡献 0——⛔ 把它算进 +7。
+
+## 4. 红名册（尺＝`grep -oE -- '--- FAIL: <名>' | sort -u`，全 job 跨步顶层名；⛔ 与四数那把尺同物）
+- 本发 20 枚；与 r9 那发的 20 枚 `comm` **双向皆空**（NEW 0／GONE 0／同名 20）。名册逐字＝r9 件 `:31-50` 那份，⛔ 在此重抄一遍造成第二份真相源。
+- SKIP 顶层名册：本发 2 枚＝与 r9 改后那发同（`TestPanelHostLatencyPercentilesAC2` 已在 FAIL 侧）。
+⚠ 一处必须具名：`FAIL` 枚数没变（12↔12）与"新增用例全绿"是**同一件事的两把尺**，⛔ 拿 `FAIL=12` 去说"这发没带入新东西"（三数那一栏的 `+7/+1` 才是新东西的痕迹）。
+
+## 5. 本件答的是票 300 AC#5 那格问的那句
+票面原句（逐字，票 `:26`）："⇒ 落地腿**自己现跑那三跳**（`.github/workflows/ci.yml` → `scripts/wisp-cli-tests.sh` → `portable-tests.sh --scope=<名>`）并具名回答：**本票新造的用例到底进不进 CI 执行面**"。
+- **答：进。** 凭据⛔ 是"读了脚本推出来的"，而是**执行面自己吐出来的那两行 `--- PASS`**（本件 §2 逐字）＋它落在哪一步的具名（§2 第三列）。这比"三跳"更强：三跳是**从配置推**能不能到，本件是**已到**。
+- ⚠ **具名一枚归属差（记我，不改票面原句）**：那"三跳"是**派给落地腿 300-r2 的动作**，而 300-r2⛔ 跑过（它交回的是 `297-a1` 那条被推翻的旧前提，见 A824）。⇒ 本格凭据的**执行者＝编排者**，⛔ 写成"腿自证"。AC#5 因此翻勾，但票面那一格下面必须同时留着这条具名残余："三跳那一发⛔ 由落地腿交回，改由 CI 执行记录销账"。
+- ⛔ 本件答的：AC#4 那格要求的 `cmd/wisp` 改前改后各 ≥2 发红名**交集**（300-v4 判ⓕ 附条件成立，条件＝那一半边⛔ 交任何人读数，归编排者同批推送）＝**仍欠**，本件⛔ 顶那格；AC#4⛔ 翻。
+
+## 6. 我⛔ 做的三件事（自陈，防后续程误读本件）
+1. ⛔ 翻任何框（本件只交读数；翻勾动作在票 300 §7 那一节，凭据引本件件名）。
+2. ⛔ 动原始日志入库（1.4 MB 级只留 `/tmp`，规则＝证据件⛔ `.out`、大日志⛔ 入库⛔ 删）。
+3. ⛔ 把 §3 的 `+7/+1` 与 §4 的"名册未变"混成一句"CI 无变化"——**两把尺两个结论**，前者说"新用例进了执行面"，后者说"没顶红任何一枚既有红"。
