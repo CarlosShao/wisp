@@ -1,0 +1,15 @@
+Sat Oct 10 17:04:52 CST 2026
+R1 尺＝PATH 铺 /d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx 与 :/d/work/workspace/projects plans/Wisp/build；go test -count=1 -timeout 420s -v -run TestAC14AwaitedBindingReplyReachesThePage ./cmd/wisp/
+time=2026-10-10T17:04:59.344+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+time=2026-10-10T17:04:59.355+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold -1.0 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:821: no report "ac14r-0" from the page within 15s (what DID arrive at the door: nothing at all). AC#14's reply hop cannot be decided without the page's own answer, and the three shapes that are all true with no reply (Dispatch called, Eval returned, Go-side channel closed) are not assertions
+time=2026-10-10T17:05:19.373+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T17:05:19.373+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC14AwaitedBindingReplyReachesThePage (20.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	20.193s
+FAIL
+rc=1
+Sat Oct 10 17:05:19 CST 2026

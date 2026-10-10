@@ -1,0 +1,5 @@
+303-a1 AC#0 终点读数（HEAD）＋bisect 台件
+
+- 10-repro-head-count1.txt：HEAD b3f9c6d7（射程＝工作树，scoped porcelain 0 行）最小复现集 -count=1 ＝ rc=1、--- FAIL (20.02s)、判据句逐字命中 :7
+- 11-repro-head-count3.txt：同一条命令 -count=3 ＝ rc=1、三枚 --- FAIL、0 PASS、0 SKIP、判据句 3 次命中 ⇒ 复现率 3/3
+- bisect-step.sh：R4 台件（GOOD=--- PASS / BAD=判据句逐字 / 其余一律 125 INVALID 并具名原因），PATH 铺母仓 shell 形式两枚目录（D:/ 形＝0xc0000135，出处 scripts/wisp-cli-tests.sh:113-118）
