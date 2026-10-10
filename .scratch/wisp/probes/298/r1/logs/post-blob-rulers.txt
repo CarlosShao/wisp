@@ -1,0 +1,12 @@
+## post-commit HEAD blob 那一把（落点＝仓外 /tmp/tmp.gEyYNmeogP）
+ruler: git show HEAD:<path> > blob; gofmt -l <blob-dir>
+rc=0 count=0
+ruler: 同目录 gofumpt -l
+C:\Users\swq\AppData\Local\Temp\tmp.gEyYNmeogP\blob\panel_transport_35r2_test.go
+rc=0 count=1
+ruler: git diff HEAD~1 HEAD --numstat（本笔改动面）
+2	2	cmd/wisp/panel_inbound_guards_35r3_test.go
+2	2	cmd/wisp/panel_transport_35r2_test.go
+rc=0
+ruler: git status --porcelain -- cmd/wisp（提交后应只剩我的 logs 件不在 cmd 下）
+rc=0 lines=0

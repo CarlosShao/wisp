@@ -1,0 +1,22 @@
+## 首笔 blob 那一把（AC#0 归因链；blob 尺，落点＝仓外 /tmp/tmp.S44hjiGRd0/first，⛔ 不落仓内）
+命令链（逐字可重跑）:
+  git show "7f9d6e40:cmd/wisp/panel_inbound_guards_35r3_test.go" > $N/first/…
+  git show "286a7f30:cmd/wisp/panel_transport_35r2_test.go" > $N/first/…
+  gofmt -l "$N/first"
+读数:
+C:\Users\swq\AppData\Local\Temp\tmp.S44hjiGRd0\first\panel_inbound_guards_35r3_test.go
+C:\Users\swq\AppData\Local\Temp\tmp.S44hjiGRd0\first\panel_transport_35r2_test.go
+rc=0 count=2
+
+首笔 blob 的 hunk 落点（gofmt -d 的 @@ 行）:
+  panel_inbound_guards_35r3_test.go hunks=1  @@ -63,8 +63,8 @@
+  panel_transport_35r2_test.go hunks=1  @@ -772,8 +772,8 @@
+
+首笔 blob vs 本腿改前的 HEAD blob（内容同一性）:
+  panel_inbound_guards_35r3_test.go = SAME（首笔以来那枚件的 blob 一字未变）
+  panel_transport_35r2_test.go = DIFFERENT（中间被后续笔改过，见下行）
+  35r2 首笔 blob 行数=1824 字节=52759 ；改前 HEAD blob 行数=2142 字节=73476
+  ⇒ 脏形位移对照＝35r2 首笔落点 :772-775 系（@@ -772,8 +772,8 @@）→ 改前 HEAD 落点 :804-807 系（@@ -804,8 +804,8 @@），
+     位移 +32 行；这与 2fc5f5c9 提交正文自己记的那句「gofmt 那 4 行漂移 HEAD 同处也在（:775-776→:807-808 位移，CR 两版皆 0）」逐字对得上，
+     ⇒ 归因链闭合＝脏形自 286a7f30（35-r2 首笔）带入、后续笔只搬位置未修，本票 298-r1 是第一次真修。
+  ⇒ 35r3 首笔落点 :63-64 系（@@ -63,8 +63,8 @@）＝改前 HEAD 同一号，且 blob 逐字节 SAME ⇒ 7f9d6e40 创建那一刻就是脏的，中间无人动过。

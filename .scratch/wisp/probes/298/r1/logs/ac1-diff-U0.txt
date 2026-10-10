@@ -1,0 +1,18 @@
+diff --git a/cmd/wisp/panel_inbound_guards_35r3_test.go b/cmd/wisp/panel_inbound_guards_35r3_test.go
+index a917e0dc..9713dc37 100644
+--- a/cmd/wisp/panel_inbound_guards_35r3_test.go
++++ b/cmd/wisp/panel_inbound_guards_35r3_test.go
+@@ -66,2 +66,2 @@ const (
+-	guard35r3Source    = `按伪造/串台拒绝`               // bridge.go:136-137 (来源 %q 不是 %q，按伪造/串台拒绝...)
+-	guard35r3RequestID = `缺少 requestId`                // bridge.go:140-141 (缺少 requestId，无法与审计/卡片对齐...)
++	guard35r3Source    = `按伪造/串台拒绝`              // bridge.go:136-137 (来源 %q 不是 %q，按伪造/串台拒绝...)
++	guard35r3RequestID = `缺少 requestId`          // bridge.go:140-141 (缺少 requestId，无法与审计/卡片对齐...)
+diff --git a/cmd/wisp/panel_transport_35r2_test.go b/cmd/wisp/panel_transport_35r2_test.go
+index a466b4ed..52d3c1b2 100644
+--- a/cmd/wisp/panel_transport_35r2_test.go
++++ b/cmd/wisp/panel_transport_35r2_test.go
+@@ -807,2 +807,2 @@ type jsParser struct {
+-func (p *jsParser) peek() jsTok    { return p.toks[p.i] }
+-func (p *jsParser) next() jsTok    { t := p.toks[p.i]; p.i++; return t }
++func (p *jsParser) peek() jsTok { return p.toks[p.i] }
++func (p *jsParser) next() jsTok { t := p.toks[p.i]; p.i++; return t }

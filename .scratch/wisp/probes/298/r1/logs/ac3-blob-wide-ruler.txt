@@ -1,0 +1,9 @@
+## HEAD blob 那一把的宽域尺（票面现量节自落的形：git archive HEAD <三目录> | tar -x -C <仓外>，再 gofmt -l／gofumpt -l 同树）
+落点＝仓外 /tmp/tmp.AW4RjCugZ2（⛔ 不落仓内）
+rc=0 archive-extract-ok
+树内 .go 枚数=658
+ruler: gofmt -l \/cmd/wisp \/internal \/tools
+rc=0 count=0
+ruler: gofumpt -l 同树
+C:\Users\swq\AppData\Local\Temp\tmp.AW4RjCugZ2\cmd\wisp\panel_transport_35r2_test.go
+rc=0 count=1

@@ -1,0 +1,23 @@
+## AC#3 三档／四档尺的改后现跑（本腿亲跑，⛔ 转抄）
+ruler: gofmt -l cmd/wisp  (工作树)
+cmd\wisp\models.go
+rc=0 count=1
+ruler: gofmt -l cmd/wisp internal tools  (工作树)
+cmd\wisp\models.go
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+internal\tools\bridge.go
+rc=0 count=5
+ruler: git ls-files '*.go' | xargs gofmt -l  (全仓 tracked，工作树)
+rc=123 count=28 其中 .scratch 下=23 非 .scratch=5
+非 .scratch 名册：
+cmd/wisp/models.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+internal/tools/bridge.go
+
+### 可复用那把尺逐字重跑（blob 那一把，整目录展开）
+blob 目录枚数=114
+rc=0 count=0

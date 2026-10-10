@@ -1,0 +1,101 @@
+diff C:/Users/swq/AppData/Local/Temp/tmp.XnATepEG0K/blob/panel_transport_35r2_test.go.orig C:/Users/swq/AppData/Local/Temp/tmp.XnATepEG0K/blob/panel_transport_35r2_test.go
+--- C:/Users/swq/AppData/Local/Temp/tmp.XnATepEG0K/blob/panel_transport_35r2_test.go.orig
++++ C:/Users/swq/AppData/Local/Temp/tmp.XnATepEG0K/blob/panel_transport_35r2_test.go
+@@ -400,18 +400,22 @@
+ // nodes
+ type jsNode = any
+ 
+-type jsIdent struct{ name string }
+-type jsLit struct{ v jsValue }
+-type jsMember struct {
+-	obj  jsNode
+-	name string
+-}
+-type jsIndex struct{ obj, index jsNode }
+-type jsCallNode struct {
+-	callee jsNode
+-	args   []jsNode
+-	isNew  bool
+-}
++type (
++	jsIdent  struct{ name string }
++	jsLit    struct{ v jsValue }
++	jsMember struct {
++		obj  jsNode
++		name string
++	}
++)
++type (
++	jsIndex    struct{ obj, index jsNode }
++	jsCallNode struct {
++		callee jsNode
++		args   []jsNode
++		isNew  bool
++	}
++)
+ type jsUnary struct {
+ 	op string
+ 	x  jsNode
+@@ -421,12 +425,14 @@
+ 	x  jsNode
+ 	y  jsNode
+ }
+-type jsAssignNode struct{ target, value jsNode }
+-type jsPostInc struct{ target jsNode }
+-type jsFuncExpr struct {
+-	params []string
+-	body   []jsStmt
+-}
++type (
++	jsAssignNode struct{ target, value jsNode }
++	jsPostInc    struct{ target jsNode }
++	jsFuncExpr   struct {
++		params []string
++		body   []jsStmt
++	}
++)
+ type jsObjLit struct {
+ 	keys []string
+ 	vals []jsNode
+@@ -698,8 +704,10 @@
+ 	num  float64
+ }
+ 
+-var jsPuncts = []string{"===", "!==", "=>", "==", "!=", "&&", "||", "++",
+-	"(", ")", "{", "}", "[", "]", ";", ",", ".", "=", "!", "+", "-", ":"}
++var jsPuncts = []string{
++	"===", "!==", "=>", "==", "!=", "&&", "||", "++",
++	"(", ")", "{", "}", "[", "]", ";", ",", ".", "=", "!", "+", "-", ":",
++}
+ 
+ func jsLex(src string) []jsTok {
+ 	var out []jsTok
+@@ -804,16 +812,18 @@
+ 	i    int
+ }
+ 
+-func (p *jsParser) peek() jsTok    { return p.toks[p.i] }
+-func (p *jsParser) next() jsTok    { t := p.toks[p.i]; p.i++; return t }
++func (p *jsParser) peek() jsTok { return p.toks[p.i] }
++func (p *jsParser) next() jsTok { t := p.toks[p.i]; p.i++; return t }
+ func (p *jsParser) atPunct(s string) bool {
+ 	t := p.peek()
+ 	return t.kind == "punct" && t.text == s
+ }
++
+ func (p *jsParser) atID(s string) bool {
+ 	t := p.peek()
+ 	return t.kind == "id" && t.text == s
+ }
++
+ func (p *jsParser) eatPunct(s string) bool {
+ 	if p.atPunct(s) {
+ 		p.i++
+@@ -821,6 +831,7 @@
+ 	}
+ 	return false
+ }
++
+ func (p *jsParser) expectPunct(s string) {
+ 	if !p.eatPunct(s) {
+ 		panic(&jsPanic{"SyntaxError: expected " + s + ", saw " + p.peek().text})

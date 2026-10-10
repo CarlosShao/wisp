@@ -1,0 +1,2 @@
+2	2	cmd/wisp/panel_inbound_guards_35r3_test.go
+2	2	cmd/wisp/panel_transport_35r2_test.go

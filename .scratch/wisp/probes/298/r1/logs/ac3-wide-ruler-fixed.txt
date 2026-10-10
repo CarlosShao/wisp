@@ -1,0 +1,12 @@
+## 全仓 tracked 档重跑（把 stderr 与 stdout 分开，⛔ 不许混计）
+ruler: git ls-files '*.go' | xargs gofmt -l 2>/dev/null
+rc=123 count=27
+  其中 .scratch 下=22  非 .scratch=5
+cmd/wisp/models.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+internal/tools/bridge.go
+ruler: 同尺的 stderr（gofmt 报错的行，⛔ 不计入名册）
+.scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1: imports must appear before other declarations
+== 同尺在 HEAD blob 那一把（全仓 tracked 太宽，取 cmd/wisp internal tools 三目录 114+ 枚）

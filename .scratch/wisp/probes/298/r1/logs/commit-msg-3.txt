@@ -1,0 +1,17 @@
+298-r1 第 3 笔（凭据件）：AC#0 脏形逐枚抄出＋AC#2 假枚标注法＋AC#3 尺口径四件必写
+
+新建（只 .md／.txt，⛔ .sh／.ps1，⛔ .out，⛔ 0 字节，已 find -size 0 验＝无输出）：
+probes/298/r1/10-ac0-dirt-shape.md（AC#0：blob 那一把的 gofmt -d 落点形状逐段引，各 1 hunk；
+  35r3＝const 块尾随注释列对齐 :63-64 系，35r2＝单行方法花括号前空格 :804-807 系；
+  归因＝首笔即脏，7f9d6e40（35-r3 腿）／286a7f30（35-r2 腿），35r2 脏形自 :772 漂到 :804（+32 行），
+  与 2fc5f5c9 提交正文自记那句"那 4 行漂移 HEAD 同处也在…⛔ 不顺手改"逐字对上）
+probes/298/r1/20-ac2-ac3-annotation-and-wording.md（AC#2＝本腿⛔ 清洗⛔ 动 .gitattributes⛔ 动 git 配置，
+  只给三把小尺的标注写法，"要不要真换成本机 LF"按票面具名归编排者裁、本轮编排者已判不换；
+  AC#3＝四件必写的口径（射程目录＋blob 还是工作树＋两把枚数并排＋stdout/stderr 处置与 rc），
+  并含 gofumpt 那格的口径：残留 1 枚＝35r2 的 gofumpt 加严规则，gofmt -w 管不到、⛔ 本票射程）
+probes/298/r1/logs/*（改前改后各尺原件：blob gofmt -d 两份、post-gofumpt -d、gofumpt 残留 pre/post 对拉、
+  first-commit blob 尺、ac3 三把尺、d22scan 名册级作差 rc=0）
+
+★撞到的口径坑具名记档：尺 `git ls-files '*.go' | xargs gofmt -l` 实测 rc=123 而非 0，
+根因＝故意做坏的变异夹具 .scratch/wisp/probes/185/c1/mut/fs_broken.go 让 gofmt 报错行进了 wc -l（本腿第一次数成 28，真值 27）。
+本笔⛔ 碰任何 .go（.go 面只有第 2 笔那两枚），⛔ 碰 frontend/design/internal/scripts/.github/docs，未 push。

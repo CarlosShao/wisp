@@ -1,0 +1,13 @@
+1c1
+< +++ C:/Users/swq/AppData/Local/Temp/tmp.XnATepEG0K/blob/panel_transport_35r2_test.go
+---
+> +++ cmd/wisp/panel_transport_35r2_test.go
+72,79d71
+<  	i    int
+<  }
+<  
+< -func (p *jsParser) peek() jsTok    { return p.toks[p.i] }
+< -func (p *jsParser) next() jsTok    { t := p.toks[p.i]; p.i++; return t }
+< +func (p *jsParser) peek() jsTok { return p.toks[p.i] }
+< +func (p *jsParser) next() jsTok { t := p.toks[p.i]; p.i++; return t }
+<  func (p *jsParser) atPunct(s string) bool {

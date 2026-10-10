@@ -1,0 +1,18 @@
+298-r1 第 2 笔（AC#1 本体）：gofmt -w 只洗 cmd/wisp 那两枚 35 族测试件的 HEAD 真格式债
+
+落点＝票面 blob 那一把（git show HEAD:<path> 落仓外 mktemp 目录后 gofmt -l）命中的 2 枚：
+cmd/wisp/panel_inbound_guards_35r3_test.go（引入首笔 7f9d6e40＝35-r3 腿）
+cmd/wisp/panel_transport_35r2_test.go（引入首笔 286a7f30＝35-r2 腿）
+起手停手判据未触发＝git status --porcelain -- 这两枚路径给 0 行，且两枚工作树内容与 HEAD blob diff 皆 IDENTICAL
+⇒ 本笔覆盖的是 blob 自身，⛔ 未吞任何人未提交的改动。
+
+改动形状（git diff -U0 逐枚过目，见 probes/298/r1/logs/ac1-diff-U0.txt）：各 1 hunk、各 2 行换 2 行、numstat 2/2。
+35r3＝const 块内尾随注释的列对齐（gofmt 按 rune 数对齐，CJK 原文按显示宽度多打了空格）；
+35r2＝两枚单行方法 peek/next 的花括号前空格对齐。
+⇒ 全部落在空白层：⛔ 标识符、⛔ 字符串字面量、⛔ 断言、⛔ 用例名、⛔ 注释文字，一行语义未改。
+
+⛔ 本笔不含 cmd/wisp/models.go（票面禁区节逐字：它没格式债；它是本机 core.autocrlf=true 的换行符假枚，CR=334，i/lf w/crlf）。
+⛔ 不含 .gitattributes、⛔ 不含 git 配置、⛔ 未顺手洗整包（git diff --numstat 除这两枚外无任何 .go 路径）。
+门禁：GOFLAGS= go build ./... rc=0（改前后各一次，同值）；gofmt -l cmd/wisp 3 枚⇒1 枚（只减不增，剩的那枚＝models.go 假枚）；
+gofmt -l <两枚目标> rc=0 空；gofumpt -l cmd/wisp 3 枚⇒2 枚（只减不增）。
+未 push。判语归非实现者 298-v1，五格⛔ 本腿自勾。

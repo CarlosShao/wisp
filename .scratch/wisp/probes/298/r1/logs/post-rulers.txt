@@ -1,0 +1,20 @@
+## post-change worktree rulers (after gofmt -w, before commit)
+ruler: gofmt -l cmd/wisp
+cmd\wisp\models.go
+rc=0 count=1
+ruler: gofmt -l <两枚目标>
+rc=0 count=0
+ruler: gofumpt -l cmd/wisp
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+rc=0 count=2
+ruler: gofumpt -l cmd/wisp internal tools
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+internal\tools\bridge.go
+rc=0 count=6
+ruler: GOFLAGS= go build ./...
+build-rc=0
