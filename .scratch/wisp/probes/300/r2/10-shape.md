@@ -61,3 +61,25 @@ A4 的第一版是 `map[uint16]string{waveFormatPCM: …, waveFormatFloat: …, 
 本件新增**一枚顶层用例**（`--- PASS` 那把尺 1 枚；源码 `^func Test` 那把尺也是 1 枚），内部 5 枚子测试。
 顶层名＝`TestWaveFormatConstantsMatchMmregAuthority300` ⇒ audio 进 `windows)` 档之后（`0a0f62ef`），
 `test-windows` 那一档的红名册作差面多出的就是**这一枚**。⚠ 本腿**没有**跑托管 CI，本机两发整包对照的读数在 `30-gates.md` 门③。
+
+---
+
+## ★追加更正（同一枚腿，18:5x，写完突变读数之后对拉上表发现；上表原句⛔ 删、⛔ 改，本节只追加）
+
+上表那五行"设计上 3→1／3→0"是**预测**，而**预测里有三格与实测相反**。实测以 `20-mutations.md` 与
+`logs/mut-m1-float-3to1.txt`／`logs/mut-m2-float-3to0.txt` 为准（两发的 `--- FAIL` 都只挂在
+`ieee_float_low_word` 与 `the_three_constants_map_one_to_one_onto_the_authority_table` 两枚子测试上，其余四枚两发全绿）。逐格改正：
+
+| 断言 | 上表写的 | **实测** | 为什么 |
+|---|---|---|---|
+| A3 `pcm_tag` | 3→1 红、3→0 红（"与 A4 同时"） | **两发都绿** | 那枚子测试比的是 `waveFormatPCM ⇔ 1`，⛔ 碰 `waveFormatFloat`；我写预测时把"A4 红"错记成"A3 红" |
+| A4 两两互不相同那一支 | 3→0 红 | **3→0 绿**（3→1 确实红） | `1`／`0`／`0xFFFE` 三枚值两两仍不相等 ⇒ 那一支⛔ 触发；3→0 的红全部来自 A5 |
+| A5 值⇔名字那一支 | 3→1 红、3→0 红 | **两发都红**（3→1 走 `reserves 0x0001 for WAVE_FORMAT_PCM` 那句；3→0 走 `none of WAVE_FORMAT_PCM 1, WAVE_FORMAT_IEEE_FLOAT 0x0003 or WAVE_FORMAT_EXTENSIBLE 0xFFFE` 那句） | 对，⛔ 改 |
+
+⇒ **每枚断言的实测列（这才是 `AC#6` 那两发突变真正的覆盖面）**：
+A1 `ieee_float_low_word` 红／红；A2 `extensible_tag` 绿／绿；A3 `pcm_tag` 绿／绿；
+A4 两支＝红／绿；A5 两支＝红／红；A6+A7 `parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value` 绿／绿；
+A8 `control_plain_pcm_tag_is_not_expanded` 绿／绿。
+⇒ 最硬一句⛔ 变：**两枚独立断言（A1 与 A5）在 3→1 与 3→0 两形都红**，且都点名 `waveFormatFloat`；
+A4 只在 3→1 那一形红（⇒ 它是第三枚哨兵，⛔ 是⛔ 响的那一枚，形状与 `300-v1` 对 S4 的裁法同族：留着是因为⛔ 该悄悄删一枚只红一次的哨兵）。
+⇒ 定式并回（我自己踩的，记我⛔ 抹）：**"设计上"那一列⛔ 能靠记忆填**，预测与读数对拉要逐枚走一遍再落笔（`A810` 那条"我自己写的按节表与我写的结论句必须逐枚对拉"的同一枚毛病，这次中尺的是我这枚腿）。
