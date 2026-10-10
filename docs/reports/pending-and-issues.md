@@ -15364,3 +15364,52 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 - ⚠ **仓外 blob 那一把我没重跑**（只跑了工作树那把 d22scan＋读了 `ci.yml` 的对象层文本）。判"这条更正全面成立"要一枚非实现者把那两把尺各打一遍——归**票 298 的 `AC#2`／今后任何引"分母"的派单**。
 - ⚠ **枚数照给（第一把我自己写的是"24 枚"，现量对不上，改正）**：本波我给 `probes/301/orch/**` 装了 **28 枚**路径（尺＝`git show --name-only --format= 6414a4bb | grep -c 'probes/301/orch'`＝28；另有 **10** 枚路径随第二笔 `48e7b0a4` 进出，含新增与改写），其中 **1 枚 `.ps1`** ＋ **3 枚 915 KB 级 `.log`**；该目录现量＝**3,757 KB**（尺＝`du -sk`）。这些**⛔ 动任何门点**（§1 那两把尺），但"MB 级日志进不进仓"这一条我的旧定式是"**⛔ 入库也⛔ 删**"（死腿遗产那族，`feedback-dispatch-output-budget`）。这次我**自己破了那条**（把三枚托管 runner 的 job 日志提交了）。差别要诚实写出来：那三枚是**本票的凭据本体**（票 301 `AC#2` 的 CI 色，⛔ 可重取——GitHub 那端 90 天后会滚掉），⛔ 是别人的死腿原料；可判死的尺＝CI 的门点⛔ 变红（已证 d22scan rc=0）＋`git show --name-only` 名册⛔ 越界（已证）。⚠ 代价照记：**仓体积＋约 3.7 MB／这一波**，且下一个人 clone 会拿到托管 runner 的完整 stdout（里面**有**临时目录路径、**无**任何凭据——尺＝`grep -E -c -e '-----BEGIN' -e 'ghp_' -e 'github_pat_' -e 'xox[abp]' -e 'sk-[A-Za-z0-9]{20}'` 逐枚打在**本波新装的三枚** job 日志上＝`0`／`0`／`0`（16:1x 现跑，读数留在 `logs/secret-scan-new-logs.txt`；`github_pat_` 那枚 pattern 是新加的，之前那把尺⛔ 含它）。
 - **定式（今后派单照这句写，⛔ 再写宽）**：*腿的写面⛔ 新建 **`.go`**（那才动分母）；`.md`／`.txt`／日志件⛔ 在分母里；`.sh`／`.ps1` 只⛔ 建在会被 `bash -n`／`PSScriptAnalyzer` 之类**点名扫**的位置——本仓今天没有那种步（尺＝`grep -n 'portable-tests\|\.ps1' .github/workflows/ci.yml` 的命中枚枚是调用既有脚本、⛔ 扫格式）。*
+
+## A819｜2026-10-10 16:4x｜收三枚交件（`301-v3`／`298-r1`／`302-a1`）＋★★**票 302 的前提被盘上字节改写，顺带量到一枚"页面→Go 回执"的真回归并已在本机复现**⇒ 立票 303＋★我自己两处更正（"三枚都是新可见"只对 1 枚／"环境差"那句是拿旧码探针当现行读数）＋四枚由我代腿取的 Go 面读数
+
+**触发**：`301-v3`（票 301 非实现者验收，`aea74556`→`514d3c84`→`83cd66a8`）、`298-r1`（票 298 格式腿四笔 `24ae75b7`→`18d43f8e`→`c14fd204`→`1b311587`）、`302-a1`（票 302 `AC#0` 只读普查，`8267be8a`）同批交回；我收件时按老规矩**先把腿的承重读数自己复跑一遍再落账**，其中三把复跑把我的票面打红了。
+
+### ① ★★最重要的一条：那三枚 CI 红**今天在我这台机器上也红**（⇒ ⛔ 环境差，且⛔ 只有搬档这一治法）
+
+- 尺＝编排者现跑（件＝`probes/302/orch/g4-local-three-cases.txt`）：`PATH` 铺 `third_party/sherpa-onnx`＋`build`，`go test -count=1 -timeout 420s -v -run '<三枚>'  ./cmd/wisp/` ⇒ **`rc=1`、三枚全 `--- FAIL (20.01s)`、红句逐字同 CI**（`no report "ac13-probe" … (what DID arrive at the door: nothing at all)`／`"ac14r-0"`／`"ac14-push"`）。
+  射程口径：被测＝工作树，而 `git status --porcelain -- cmd internal scripts .github docs` 现量 **0 行** ⇒ 工作树≡HEAD；`tasklist` 起手 `wisp.exe`／`balldebug.exe` 各 0 枚。**⚠ 单发，复现率未量**（＝票 303 `AC#0` ③）。
+- ★**基线那一发（`cc315261`，10-06 的 CI）同两枚是 PASS 的**，且逐字带着页面自己的话（尺＝`^--- [A-Z]*: <名>` 在两发归档切片里各打一遍，件＝`probes/301/orch/logs/ci-{baseline,after}-cli-block.txt`；两发 Runner Image／agent 版本逐字相同 ⇒ "镜像漂"⛔ 依据）：
+  `TestAC14AwaitedBindingReplyReachesThePage` **PASS(1.25s，`REPLIED,REPLIED,REPLIED`／`Go's handler was reached by 3 of the 3 real requests`)→FAIL(20.04s)**；`TestAC14GoSideEvalPushReachesThePage` **PASS(0.97s，`title="PUSHED-33R5-OK"`)→FAIL(20.03s)**；同发还有 `machine-wide msedgewebview2=7`、`same HWND 0xc014c across hide->re-show=true` ⇒ **托管 runner 上窗建得起、回执拿得到**（`302-a1` 的"形①＝runner 没有 Runtime"就此**否证**，任何文案⛔ 许再写那句）。
+- ⇒ 票 302 在盘上是**两件事**：归口／放置 ＋ **一枚未归因回归**。回归那一半**立成票 303**（本机可复现 ⇒ 归因⛔ 依赖 CI：bisect 在**仓外** clone 里做，最小复现集挑⛔ 依赖 `frontend/dist` 的那枚——`TestAC13ColdStart…` 依赖 dist 产物字节，干净 clone 里它会走具名跳过、复现⛔ 出来）。
+- ⚠〔读码推的，⛔ 实测〕**产品形状候选**：这道门（票 35 `installPanelTransport`／消息钩子那条边）是面板与宿主共用的 ⇒ 最可能的用户可见形＝"把面板叫出来之后点什么都没反应"。把这句判死＝票 303 `AC#2` 的一格，⛔ 现在当已知。
+
+### ② ★两处更正记在我名下（⛔ 原句不改，本节＝现行读数）
+
+1. 我 16:0x 在证据件 §4／票 302 `:11` 写的"三枚都是**新可见**、⛔ 是新坏"——**只对 1 枚成立**（`TestAC13ColdStart…` 那枚是 `--- SKIP`→`FAIL`；另两枚基线是**绿**的）。⇒ "别读成退步"那句提醒本身没错，⛔ 该套在三枚上。
+2. 票 302 `:15` 那句"本机同码⛔ 红 ⇒ 这是环境差"引的是 `33-p1`，那是**旧码**的读数，⛔ 覆盖当前 HEAD ⇒ **作废**。
+3. ★同族第四次（射程写宽）之外，这次是**来源层过期**：⛔ 拿"某枚探针在旧码上成立"替"现行码上也成立"背书。**定式：凡在票面写"本机⛔ 红／本机红"，必须当场现跑一发并把件名写进去；引用别枚探针的读数时⛔ 离开它那一行的锚点日期。**
+
+### ③ 四枚由我代腿取的 Go 面读数（腿⛔ go 编译面，欠账归我）
+
+| # | 尺（逐字） | 读数 | 买到什么 |
+|---|---|---|---|
+| `G1` | `go vet -tags winlive ./cmd/wisp/ ./internal/ball/`（件 `probes/302/orch/g1-vet-winline.txt`） | **rc=0**，输出 0 字节 | 票 111 `AC#11` 那道编译门在 HEAD 上本机仍是绿的 |
+| `G2` | `go test -tags winlive -list '.*' ./cmd/wisp/`（件 `g2-list-winline.txt`） | **rc=0／名册 301 枚／含那三枚名**；★同尺**正控**＝winlive-tagged 文件里的用例确实出现（`cmd/wisp/panel_host_windows_live_test.go` 的 `TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`） | 票 302 `AC#2` 要的"搬进 `winlive` 仍进编译面"那一发的**形状已验通**（⛔ "既⛔ 跑也⛔ 编"那枚假绿） |
+| `G3` | `go test -list '.*' ./cmd/wisp/`，PATH **未**铺 `build/`（件 `g3-list-nopath.txt`＋`g3-list-nopath-body.txt`） | **`exit status 0xc0000135`／rc=1／列名 0 枚**（DLL 在目录里、只是⛔ 在 PATH 上） | ★**乙形（把三枚加进 ledger 的 `-skip`）今天⛔ 可行**：ledger 的包会进 `portable-tests.sh:617` 全域 universe（⛔ 铺 PATH、⛔ 分档）⇒ 加 3 行＝把 `--scope=windows` 那步今天的绿数拖成 rc=1。要用乙必须先动 `:617`（`scripts/**` 产码 ⇒ 触发 `AC#1`③"同笔连 pin 一起改"） |
+| `G4` | 见 ① 第一行 | **rc=1／三枚全红／红句同 CI** | 上面① |
+
+另有两把我拿它核对票面枚数的独立尺：`git grep -l -E '^//go:build.*winlive' HEAD -- '*.go'`＝**12**（`33-n1` 那句"8 枚"作废）；`git show HEAD:scripts/portable-tests.sh | sed -n '221p'`＝`tiers='core windows cli winsec census'` ⇒ 我派单那句"三档"⛔ 对（盘上 5 档）。
+
+### ④ 收 `301-v3` ⇒ 票 301 翻 `AC#5`、`AC#4` **具名永久留空**、追加 `AC#4b`
+
+- 它七条判语全成立，⚠ 第 ② 条（pathspec）**命令行那一半它标〔⛔ 盘上判不了〕** ⇒ 我照它翻勾但那半句⛔ 算已证，写在票面追加节里、⛔ 洗进正文。
+- `AC#4` 残体＝`0a0f62ef` 取集 28 ⊋ 授权集 27 这件**历史事实**，它的判语三段＝(a) 那枚子句管"怎么判这一格"、⛔ 管"让已发生的那笔满足它"；(b) ⇒ `AC#4` ⛔ 能整格翻；(c) 机制层盘上判不了（`A811④`/`A814` 两说产同一份名册）。⇒ **本格⛔ 勾、原句⛔ 改**，票面追加 `AC#4b`＝三件正向闸门（逐笔名册／pathspec 写在 `$( … )` 之外且只落腿自家目录／编排者复跑每笔名册）。票 301 现态＝**5 勾／2 未勾，⛔ 改 `-done`**。
+- ★它顶回我两处，两处理由都在盘上，我认：ⓐ 我派单写"ci.yml 里有 `--scope=cli` 调用点"——**⛔ 有**（HEAD blob 上该串命中 **0 枚**；`cmd/wisp` 那档由 `scripts/wisp-cli-tests.sh` 在 `ci.yml:621` 内部 hand 给 `portable-tests.sh`）；ⓑ 我自己的行号锚又漂：**census 调用点 `:744`→现量 `:761`**（`AC#5` 那笔自己加的 19 行把它推下去了）。⇒ 同族第三次生效，派单一律内容锚（`grep -n 'portable-tests.sh --scope'` 现跑）。
+- ★Δ 分解它给成一枚数（`RUN +47 − 顶层求值 +41 ＝ 6 枚子测试`），我用两把独立尺复算对上（改后 `=== RUN` 624 行、带 `/` 的 184 行 ⇒ 顶层 440；基线 577/178 ⇒ 顶层 399；47−41＝6 ✓）。
+
+### ⑤ 收 `298-r1` ⇒ 两枚欠读由我接手，加严残留登记为**范围外**、⛔ 新建票
+
+- 它四笔的越界尺我复跑：`18d43f8e` 的逐笔名册＝**恰好 2 枚文件**；`models.go` 在该批 **0 笔**；`gofmt -l cmd/wisp` 工作树＝**1 枚**、HEAD blob 名册＝**0 枚** ⇒ 那 1 枚是**加严残留**（票 298 自己的尺把 HEAD 也判红），**具名记为范围外残留、⛔ 顺手修、⛔ 为它建票**。
+- 它留给我的**二选一**（那两枚整包 `go test` 读数归腿还是归编排者）我裁＝**归我**（派单里我禁了它跑 Go 编译面，⛔ 事后追算它的欠账；这条与记忆库"欠账归谁"同形，本次再钉一次）。
+
+### 残留（具名，⛔ 我给自己盖章"已闭"）
+
+- ⚠ `G1`／`G2`／`G3`／`G4` 都是**本机台面、单发**；ubuntu 台面那一枚（`go test -list` 在 `--scope=core` 下的退码）⛔ 在盘上，只有 CI 能给 ⇒ 票 302 若真要走乙，欠的就是那一枚。
+- ⚠ `G4` 的**复现率**⛔ 知（单发）。⇒ 票 303 `AC#0` ③ 必带 `-count=3` 的三色。
+- ⚠ 票 303 的嫌疑面**枚数随文件集变**：腿那把 4 枚文件＝5 笔、我这把我那 4 枚文件＝**7 笔**（`9995f9b1`／`8b32060b`／`70b00885`／`3a343bc7`／`2fc5f5c9`／`286a7f30`／`fb2fb802`）；两把都⛔ 是归因，⛔ 引其中任何一把当结论。
+- ⚠ 我落本节时票 301 的 `AC#4b` 是**我追加的新格**（⛔ 由我判它成立），今后任何写腿引用它要先看它⛔ 勾。

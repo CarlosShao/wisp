@@ -1,0 +1,29 @@
+16:4x 收三枚交件（301-v3／298-r1／302-a1）＝A819＋票301 翻 AC#5 并追加 AC#4b（AC#4 具名永久留空）＋★★票302 前提就地改写（那三枚里两枚基线是绿的）＋★立票303（页面→Go 回执断了＝一枚本机可复现的真回归）
+
+★★最重要的一条（记在我名下）：我 16:0x 写进票 302 与证据件 §4 的"三枚都是新可见、⛔ 是新坏"⚠ **只对 1 枚成立**。
+尺＝`^--- [A-Z]*: <名>` 在两发归档切片里各打一遍（件 probes/301/orch/logs/ci-{baseline,after}-cli-block.txt；两发 Runner Image／agent 版本逐字相同 ⇒ "镜像漂"⛔ 依据）：
+TestAC14AwaitedBindingReplyReachesThePage **PASS(1.25s，页面逐字 REPLIED,REPLIED,REPLIED)→FAIL(20.04s)**、
+TestAC14GoSideEvalPushReachesThePage **PASS(0.97s，title="PUSHED-33R5-OK")→FAIL(20.03s)**、
+TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe 才是 SKIP→FAIL（`the embed resolves no entry` 具名跳过 ⇒ 票 274 之后 embed 有 1068 字节＝新可见）。
+⇒ 票 302 在盘上是**两件事**：归口／放置 ＋ 一枚未归因回归。回归那一半立成票 303，票 302 的 AC#1 按住（⛔ 派 302-r1；只有归因结论是"这一跳在 CI 台面上永远拿不到回执"时搬档才有意义，否则搬＝把真回归搬进隐形＝票面 AC#2 自己警告的那枚形状）。
+
+★第二件（同一把尺指向我自己）：票 302 `:15` 那句"本机同码⛔ 红 ⇒ 这是环境差"引的是 33-p1，那是**旧码**的读数 ⇒ **作废**。
+现量（编排者 16:4x 现跑，件 probes/302/orch/g4-local-three-cases.txt）＝PATH 铺 third_party/sherpa-onnx＋build，`go test -count=1 -timeout 420s -v -run '<三枚>' ./cmd/wisp/`
+⇒ **rc=1、三枚全 `--- FAIL (20.01s)`、红句逐字同 CI**（`what DID arrive at the door: nothing at all`）。射程口径：被测＝工作树，而 `git status --porcelain -- cmd internal scripts .github docs` 现量 0 行 ⇒ ≡HEAD；`tasklist` wisp.exe／balldebug.exe 各 0。⚠ 单发、复现率⛔ 知（＝票 303 AC#0 ③）。
+⇒ 定式进台账：**凡在票面写"本机⛔ 红／本机红"，当场现跑一发并把件名写进去；引用别枚探针的读数⛔ 离开它那一行的锚点日期**（射程写宽的同族，这次错在"来源层过期"）。
+
+四枚我代腿取的 Go 面读数（302-a1 全程⛔ go 编译面 ⇒ 欠账归我，与记忆库"欠账归谁"同形）：
+G1 `go vet -tags winlive ./cmd/wisp/ ./internal/ball/` rc=0；
+G2 `go test -tags winlive -list '.*' ./cmd/wisp/` rc=0／名册 301 枚／含那三枚名，★同尺正控＝winlive-tagged 文件的用例确实出现（panel_host_windows_live_test.go 的 TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive）⇒ 票 302 AC#2 要的"搬进 winlive 仍进编译面"形状已验通；
+G3 `go test -list '.*' ./cmd/wisp/`（PATH 未铺 build/）⇒ **`exit status 0xc0000135`／rc=1／列名 0 枚** ⇒ ★**乙形（进 ledger `-skip`）今天⛔ 可行**：ledger 的包会进 portable-tests.sh:617 全域 universe（⛔ 铺 PATH、⛔ 分档），加 3 行＝把 --scope=windows 那步今天的绿数拖成 rc=1；要用乙必须先动 :617（scripts/** 产码 ⇒ 触发 AC#1③）；
+G4 见上。另两把核枚数的独立尺：`git grep -l -E '^//go:build.*winlive' HEAD -- '*.go'`＝**12**（33-n1 那句"8 枚"作废）；portable-tests.sh:221 逐字 `tiers='core windows cli winsec census'` ⇒ 我派单那句"三档"⛔ 对。
+
+票 301（301-v3 的判语）：**翻 AC#5**（它七条全成立，⚠ 第②条命令行那一半它自标〔⛔ 盘上判不了〕⇒ 那半句照记、⛔ 洗进正文）＋**AC#4 按它的判语具名永久留空**（残体＝`0a0f62ef` 取集 28 ⊋ 授权 27 这件历史事实；它的三段 (a) 子句管"怎么判这一格"⛔ 管"让已发生的那笔满足它" (b) ⇒ ⛔ 能整格翻 (c) 机制层盘上判不了）＋**追加 AC#4b** 三件正向闸门（逐笔名册＋差集／pathspec 写在 `$( … )` 之外且只落腿自家目录／编排者复跑每笔名册）。本票现态＝5 勾／2 未勾，⛔ 改 -done。
+★认它两处顶回：ⓐ 我派单写"ci.yml 里有 --scope=cli 调用点"**⛔ 是**（HEAD blob 上该串命中 0 枚；cmd/wisp 那档由 scripts/wisp-cli-tests.sh 在 ci.yml:621 内部 hand 给 portable-tests.sh）；ⓑ 我自己的行号锚又漂：census `:744`→现量 `:761`（AC#5 那笔自己加的 19 行推下去的；同族第三次 ⇒ 派单一律内容锚）。
+★Δ 分解它给成一枚数（RUN +47 − 顶层 +41 ＝ 6 枚子测试），我两把独立尺复算对上（改后 === RUN 624／带 / 的 184 ⇒ 顶层 440；基线 577/178 ⇒ 399；47−41＝6 ✓）。
+
+票 298（格式腿四笔 24ae75b7→18d43f8e→c14fd204→1b311587）：它的二选一我裁＝那两枚整包 `go test` 读数**归编排者**；越界尺我复跑（18d43f8e 逐笔名册＝恰好 2 枚文件、models.go 该批 0 笔）；`gofmt -l cmd/wisp` 工作树 1 枚／HEAD blob 名册 0 枚 ⇒ 那枚**加严残留具名记为范围外**，⛔ 顺手修、⛔ 为它建票。
+票 302 另收 302-a1 七处顶回，逐枚认（具名在票面追加节），并把 AC#1② 那句"⛔ 动 cmd/wisp/** 的产码"口径现在就定死：**"产码"＝非测试文件**，测试函数逐字搬家＝甲形本体、判据正文⛔ 改一字。
+
+⛔ 本笔零产码改动（只有票面／台账／停车点／读数件）。残留具名三条（⛔ 我自盖章"已闭"）：ubuntu 台面那枚 `go test -list` 退码盘上⛔ 有；G4 的复现率⛔ 知；票 303 嫌疑面枚数随文件集变（腿那把 5 笔／我这把 7 笔＝9995f9b1 8b32060b 70b00885 3a343bc7 2fc5f5c9 286a7f30 fb2fb802），两把都⛔ 是归因。
+本笔后推 origin dev（A813 授权内，终判据＝远程 tip 逐字等于本地 HEAD），随后派 303-a1（只读＋仓外 clone bisect，⛔ 在仓内 checkout／worktree，⛔ push）。
