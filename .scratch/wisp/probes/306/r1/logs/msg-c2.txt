@@ -1,0 +1,13 @@
+306-r1 AC#1 落点：乙形夹具＝一份 40 字节 extensible + float32 的 wav 面（只写测试侧）
+
+新文件 internal/audio/wavinjector_extensible_float_306_test.go（package audio，无 build 标签，
+不新增任何被跟踪的 .wav、不建 testdata/）：
+  - tag=0xFFFE / cbSize=22 / fmt 块 size=40 / SubFormat.Data1=0x00000003 在 body+24 / bits=32；
+  - 两枚入口：同包直调 parseWav（先例 hotplug_test.go:581）与 NewWavInjector(t.TempDir())；
+  - 断言全是解析出来的值：err / rate / chans / len(samples)==8（区分 float32 与把同 32 字节读成 16 枚 PCM16）
+    以及逐枚 int16，want 手推、不调用 FloatToPCM16，也不引用产码里的行内字面量（形状照票 300 AC#6）。
+产码面一字未动：wavinjector.go 保持 HEAD blob（cmp 见 logs/00-anchor.txt）。
+刻意不装：size<40 错误支、裸 tag=3 面、PCM16 与 default 支（票面禁"顺手补其它分支"）。
+
+读数：gofmt -l 第一发列出该文件，gofmt -w 后 0 枚；定向 go test -run 306 -v 两枚用例 PASS，rc=0。
+证据件＝.scratch/wisp/probes/306/r1/10-fixture.md + logs/10-gofmt-before.txt + logs/10-targeted-green.txt。

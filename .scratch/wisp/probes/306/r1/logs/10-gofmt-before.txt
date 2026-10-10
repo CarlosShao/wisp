@@ -1,0 +1,4 @@
+internal/audio/wavinjector_extensible_float_306_test.go
+rc_gofmt_l=0
+rc_gofmt_w=0
+rc_gofmt_after=0
