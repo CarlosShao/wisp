@@ -1,0 +1,26 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index ae84b347..a5075a3e 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -400,2 +400,19 @@ jobs:
+-  # Windows-only packages (ball GUI, cgo speech) are out of this job's scope
+-  # by platform, not skipped: they run in test-windows / slo jobs.
++  # Windows-only packages (ball GUI, cgo speech) are out of this job's scope by
++  # platform, not skipped -- that is a per-FILE statement, not a per-package one,
++  # and the sentence this block replaced got its two named jobs wrong in different
++  # directions. As checked on 2026-10-10 for ticket 301: ./internal/audio/ is named
++  # in this tier's own array (`core)`), and a linux target still resolves sources
++  # plus untagged test files there -- ruler (list only, runs nothing):
++  # `CGO_ENABLED=0 GOOS=linux go list -f '{{len .GoFiles}}/{{len .TestGoFiles}}'
++  # ./internal/audio/`. What ubuntu cannot evaluate is only the `//go:build windows`
++  # set. The tail of that sentence was the half that lied, and its two halves are
++  # asymmetric: test-windows has taken ./internal/audio/ since ticket 301 AC#1
++  # landed (2026-10-10; the `windows)` scope array and win_pin in
++  # scripts/portable-tests.sh both name it from that commit on -- re-read them,
++  # this comment is not the evidence), while on that same date the slo tiers
++  # reached no package list: slo-smoke and slo-full hand their gate to
++  # scripts/slo-check.ps1, which builds wisp.exe and samples D32 states instead of
++  # running package tests, and whose header restricts the smoke subset to
++  # "(memory/handle subset, no audio)". Ruler for that half (whole file, prints
++  # which lines match and nothing else):
++  # `grep -nE 'portable-tests|go test|internal/audio' scripts/slo-check.ps1`.

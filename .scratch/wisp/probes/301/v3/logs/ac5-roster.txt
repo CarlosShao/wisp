@@ -1,0 +1,7 @@
+.github/workflows/ci.yml
+.scratch/wisp/probes/301/r2/10-ac5-comment-and-measures.md
+.scratch/wisp/probes/301/r2/logs/ac5-diff-U0.txt
+.scratch/wisp/probes/301/r2/logs/bash-n-portable-tests.rc.txt
+.scratch/wisp/probes/301/r2/logs/census.rc.txt
+.scratch/wisp/probes/301/r2/logs/d22scan.rc.txt
+.scratch/wisp/probes/301/r2/msgs/10-ac5.txt

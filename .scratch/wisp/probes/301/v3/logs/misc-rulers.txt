@@ -1,0 +1,20 @@
+=== A. digits inside the added comment lines ===
+      1 0       3 1       2 2026-10-10       2 301       1 32 
+=== B. is AC#1 and 301-v1 an ancestor of the AC#5 commit (order hard-constraint)? ===
+0a0f62ef ancestor-of-b761b584=yes
+bcd0a543 ancestor-of-b761b584=yes
+b761b584 ancestor-of-b761b584=yes
+=== C. audio _test.go file counts across the three refs (explains census 5/0 -> 8/0) ===
+cc315261 audio_test_files=5
+772ff880 audio_test_files=7
+HEAD audio_test_files=8
+=== D. ledger line untouched 0a0f62ef~1..HEAD ===
+ledger_line_byte_identical=yes
+=== E. python yaml ruler (orchestrator's fourth ruler) ===
+safe_load_equal= True jobs_before= 6 jobs_after= 6 core_steps_before= 7
+=== F. foreign file content still in HEAD tree? ===
+orch_file_in_HEAD=yes
+0a0f62ef 2026-10-10T14:34:30+08:00
+=== G. zero-byte evidence files under probes/301/** (all legs) ===
+.scratch/wisp/probes/301/orch/logs/ci-fail-intersect-audio.txt .scratch/wisp/probes/301/orch/logs/ci-windows-verdict-names.txt .scratch/wisp/probes/301/r1/logs/census-after.err .scratch/wisp/probes/301/r1/logs/census-before.err .scratch/wisp/probes/301/r1/logs/d22scan.err .scratch/wisp/probes/301/r1/logs/selftest.err .scratch/wisp/probes/301/r1/rosters/census-before.A-evaluated.txt .scratch/wisp/probes/301/r1/rosters/census-before.A-fail.txt .scratch/wisp/probes/301/r1/rosters/census-before.A-pass.txt .scratch/wisp/probes/301/r1/rosters/census-before.A-skip.txt .scratch/wisp/probes/301/r1/rosters/census-before.B-evaluated.txt .scratch/wisp/probes/301/r1/rosters/core-after.A-skip.txt .scratch/wisp/probes/301/r1/rosters/core-before.A-skip.txt .scratch/wisp/probes/301/r1/rosters/windows-after.A-skip.txt .scratch/wisp/probes/301/r1/rosters/windows-before.A-skip.txt .scratch/wisp/probes/301/r1/rosters/windows-comm23.A-evaluated.txt .scratch/wisp/probes/301/r1/rosters/windows-comm23.B-evaluated.txt .scratch/wisp/probes/301/v1/logs/bashn-restored.err .scratch/wisp/probes/301/v1/logs/bashn-restored.txt .scratch/wisp/probes/301/v1/logs/bashn.err .scratch/wisp/probes/301/v1/logs/bashn.txt .scratch/wisp/probes/301/v1/logs/census-before-sim.err .scratch/wisp/probes/301/v1/logs/census-head.err .scratch/wisp/probes/301/v1/logs/d22scan-final.err .scratch/wisp/probes/301/v1/logs/d22scan.err .scratch/wisp/probes/301/v1/logs/selftest.err .scratch/wisp/probes/301/v1/logs/windows-pinremoved.txt .scratch/wisp/probes/301/v1/rosters/windows-head.A-skip.mine.txt .scratch/wisp/probes/301/v3/logs/ac5-noncomment-normalized.diff .scratch/wisp/probes/301/v3/logs/bashn.err .scratch/wisp/probes/301/v3/logs/bashn.txt .scratch/wisp/probes/301/v3/logs/census.err .scratch/wisp/probes/301/v3/logs/ci.err .scratch/wisp/probes/301/v3/logs/core.err .scratch/wisp/probes/301/v3/logs/d22scan.err .scratch/wisp/probes/301/v3/logs/golist.err 
+misc_rc=0

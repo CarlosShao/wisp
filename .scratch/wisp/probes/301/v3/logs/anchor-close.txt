@@ -1,0 +1,18 @@
+2026-10-10 16:26:42 +0800
+--- HEAD ---
+6da0e688 2026-10-10T16:22:20+08:00 16:2x 落 A818＝★更正我自己传了两�
+--- porcelain scripts internal .github docs frontend ---
+porcelain_lines=0
+--- porcelain own face ---
+36
+--- tasklist ---
+INFO: No tasks are running which match the specified criteria.
+INFO: No tasks are running which match the specified criteria.
+--- gate faces still == HEAD blobs ---
+scripts/portable-tests.sh==HEAD
+.github/workflows/ci.yml==HEAD
+scripts/slo-check.ps1==HEAD
+scripts/d22scan.sh==HEAD
+--- my own commits so far ---
+aea74556 2026-10-10T16:07:50+08:00 301-v3 start anchor: HEAD + porcelain + tasklist readings before any ruler
+close_rc=0

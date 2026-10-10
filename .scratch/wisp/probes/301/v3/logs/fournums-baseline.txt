@@ -1,0 +1,5 @@
+portable-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+portable-tests.sh: four numbers (all from -v output): === RUN=335  --- PASS=231  --- FAIL=6  --- SKIP=1
+portable-tests.sh: four numbers (all from -v output): === RUN=577  --- PASS=386  --- FAIL=12  --- SKIP=1
+rc_fournums=0

@@ -1,0 +1,2 @@
+.scratch/wisp/probes/301/r2/00-anchor.md
+.scratch/wisp/probes/301/r2/msgs/00-anchor.txt
