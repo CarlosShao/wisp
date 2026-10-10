@@ -1,0 +1,9 @@
+### go vet ./cmd/wisp/
+vet_cli_rc=0
+### go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+vet_winline_rc=0
+### gofmt -l cmd/wisp (working tree)
+cmd\wisp\models.go
+gofmt_wt_rc=0
+### gofmt HEAD-blob roster (cmd/wisp)
+gofmt_head_rc=0

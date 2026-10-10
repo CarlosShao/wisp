@@ -778,12 +778,39 @@ type pageTransport interface {
 // panelDispatchBinding (fmt.Sprintf), never spelled out in the JS text, so renaming the
 // binding on the Go side cannot leave this hook aiming at a door that no longer exists.
 // Touches no page file, binds nothing new, and leaves C17's roster unchanged.
+//
+// WHY THE external.invoke WRAPPER (ticket 303, the fb2fb802 regression). A boolean alone
+// cannot tell "the page posted a fresh envelope" from "the bound stub is sending its own
+// RPC frame", because the stub's frame is emitted from inside window.external.invoke, and
+// a page that calls the bound door window.wispDispatch(env) DIRECTLY (which is exactly what
+// AC#13/AC#14's own JS and firstRoundTrip's probe do, and what go-webview2's bound stub is
+// meant to be called as) never passes through the postMessage override, so the `inside` flag
+// the override would raise is still false when the stub's invoke -> chrome.webview.postMessage
+// (the RPC frame) reaches this wrapper - and the frame used to be folded back into
+// wispDispatch, double-wrapping it into {id, method:"wispDispatch", params:[the RPC frame]}.
+// msgcb then hands dispatchRaw an envelope whose method is the binding name, not a roster
+// method, ComposerDispatch.Handle drops it before the mode handler, and the door records
+// nothing -> "what DID arrive at the door: nothing at all" (real window) while the headless
+// 35-r2 yard - which posts via chrome.webview.postMessage, never via a direct wispDispatch
+// call - still reported a clean native exit. So the flag is now raised where a frame is
+// actually emitted: wrapping invoke marks the whole invoke -> postMessage hop as "library
+// traffic", so such a frame is routed byte-for-byte to the native exit, while a page's own
+// postMessage (which does not go through invoke) is still folded into the door once. It reads
+// no message and re-serialises nothing - the byte-for-byte, no-sniffing property above is kept.
 var panelPostMessageForwardInit = fmt.Sprintf(`(function () {
   var cw = window.chrome && window.chrome.webview;
   if (!cw || cw.__wispForwardInstalled) { return; }
   cw.__wispForwardInstalled = true;
   var native = cw.postMessage;
   var inside = false;
+  var ex = window.external;
+  if (ex && typeof ex.invoke === "function") {
+    var nativeInvoke = ex.invoke;
+    ex.invoke = function (s) {
+      inside = true;
+      try { return nativeInvoke(s); } finally { inside = false; }
+    };
+  }
   cw.postMessage = function (message) {
     if (inside || typeof window.%[1]s !== "function") { return native.call(cw, message); }
     inside = true;

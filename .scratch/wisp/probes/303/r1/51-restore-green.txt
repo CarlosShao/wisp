@@ -1,0 +1,29 @@
+time=2026-10-10T17:56:31.457+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+    panel_resident_windows_test.go:315: AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]
+time=2026-10-10T17:56:31.469+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 465.8 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:327: AC#13 page answer (head fbeefd1d): "0" - 0 of 1 probe id(s) present in the live document
+    panel_resident_windows_test.go:330: after a real cold start the live document contains NONE of the 1 element ids the embedded entry declares (the page itself answered "0"). That is ticket 33 AC#13: the round-trip probe page is the last document shown, so the user sees a stub instead of the panel. Product side: bringUp must hand the entry over AFTER the probe - the probe stays, because it is where cold usable is decided
+time=2026-10-10T17:56:32.154+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T17:56:32.154+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.69s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+time=2026-10-10T17:56:32.156+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 390.1 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:825: AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)
+time=2026-10-10T17:56:32.696+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T17:56:32.697+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (0.54s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+time=2026-10-10T17:56:32.697+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 394.9 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:867: AC#14 nail 2 (Eval push hop), page's own words: title=""
+    panel_resident_windows_test.go:869: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other
+time=2026-10-10T17:56:33.243+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-10T17:56:33.243+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.55s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.924s
+FAIL
+rc=1

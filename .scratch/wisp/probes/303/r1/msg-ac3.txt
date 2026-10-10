@@ -1,0 +1,24 @@
+303-r1: AC#3 修复（门那一侧 panel_host_windows.go）+ 一处顶回
+
+修复：panelPostMessageForwardInit 加一枚 window.external.invoke 包装，在库桩发出 RPC 帧的
+那一刻抬起 inside，使覆盖层把库自己的帧逐字节交回 native 出口，只折页面直接 postMessage 的信封。
+修的是 direct-window.wispDispatch 入口（AC#14 nail1 / firstRoundTrip 探针走法）里 inside 恒假
+-> 帧被折回 -> 门收到双包 RPC -> Handle 路由前丢弃 -> nothing at all + firstRoundTrip -1.0 哨兵。
+
+约束遵守：
+- 只动 cmd/wisp/panel_host_windows.go 一枚产码（+27 行）；测试夹具一枚没碰；判据本体三句一字未动。
+- 未动 SLO/golden/thresholds/D32；未放宽断言、未 t.Skip、未造 --- SKIP；未动 frontend/design。
+- 加法：不改绑定名/不新绑/不动 C17/不重解析 message（逐字节透传保留）。
+
+凭据（成对反证）：
+- (a) 撤修复回 HEAD -> 三枚逐字红 nothing at all（50-revert-red.txt rc=1）。
+- (b) cmp 逐字节还原（51-restore-green.txt：cmp_rc=0 identical）-> TestAC14AwaitedBindingReplyReachesThePage PASS，
+  绿句 page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)。
+
+顶回（见 52-）：票 AC#3 "三枚全绿" 不成立。AC#13 与 nail2 回执通道已被接上（页面能答/报回），
+现卡另一形=bringUp serveEntry 与探针文档交接次序（探针 stub 是冷启后最后文档，属票33 AC#13/70b00885，非 fb2fb802）。
+本腿不动 bringUp 交接，具名上报非实现者，不盖章。
+
+门禁四把 rc：go vet ./cmd/wisp/=0；go vet -tags winlive ./cmd/wisp/ ./internal/ball/=0；
+sh scripts/d22scan.sh=0；gofmt -l cmd/wisp 工作树=1（models.go 既有 CRLF/加严残留，非本腿文件，HEAD-blob 名册=0，具名不顺手修）。
+新增红 0 枚（改后红集 ⊆ 改前逐枚已知红）；整包同条件干净改前 -v 名册欠（背景发编译晚于编辑，见 52-）。
