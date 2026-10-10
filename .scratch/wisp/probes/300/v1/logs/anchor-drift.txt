@@ -1,0 +1,14 @@
+CMD: git log --oneline b2933dc9..efd85155 -- internal/audio | wc -l
+0
+CMD: git diff --stat b2933dc9 efd85155 -- internal/audio
+(empty above = zero change)
+CMD: git log --oneline b2933dc9..efd85155 | head
+efd85155 probe(300-a1r): hygiene gates (d22scan 0, build 0, internal+cmd scope 0 lines) and one appended ticket progress line
+1c007bf6 probe(300-a1r): AC#1 rig - four byte faces, 4/4 FAIL at anchor offset 26 and 4/4 PASS with offset mutated to 24 in the export tree
+cc878604 probe(300-a1r): AC#0 authority - WAVEFORMATEXTENSIBLE SubFormat offset is 24, per on-disk mmreg.h pack(1) plus Learn cross-check
+70a6b9d9 probe(300-a1r): anchor gate at b2933dc9 + env and landing-zone hygiene readings (no code)
+CMD: grep -c 'unsafe.Add(p, 26)' work-tree internal/audio/wasapi_windows.go
+1
+CMD: content anchor of the bad line, work tree
+196:		sub := *(*windows.GUID)(unsafe.Add(p, 26))
+rc=0
