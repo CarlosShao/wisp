@@ -11,6 +11,21 @@
 | `git status --porcelain -- .scratch/wisp/probes/301` | 0 | **0**（本腿件全部已提交） |
 | `date` | 2026-10-10 14:26:28 +0800 | 2026-10-10 14:51:25 +0800 |
 
+★**本文件所属那笔＝`32e8aa29`（第 4 笔）**，它⛔ 在 §1 那两列里——上表「交回」列的 `42617eba` 是本文件落笔**之前**现量的 HEAD（一笔自引用⛔ 存在，⛔ amend）。
+⇒ **真·交回锚＝`32e8aa29`**，四笔名册＝`74eb032c`(锚) → `0a0f62ef`(AC#1 两枚 token 同一笔) → `42617eba`(AC#2 名册 34 枚) → `32e8aa29`(本文件)。
+交回后再量的两枚尺记在下面 §1.2。
+
+### 1.2 真·交回读数（`32e8aa29` 落笔后现量）
+
+- `git rev-parse --short HEAD` ＝ **`32e8aa29`**
+- `git status --porcelain -- .scratch/wisp/probes/301` ＝ **0**（本腿件全落仓，无遗漏）
+- `git status --porcelain -- scripts internal .github` ＝ **0**（写面干净：改动已提交，工作树⛔ 残留）
+- `git log --format='%h' 64ceaacd..HEAD | wc -l` ＝ **6**：本腿 **4** 枚（`74eb032c`/`0a0f62ef`/`42617eba`/`32e8aa29`）
+  ＋编排者 **2** 枚（`98e0b81f`/`6c2dd788`）⇒ **HEAD 在两锚之间漂过别人 2 枚 commit**，写面交集＝**0 枚**（尺＝§1.1 那一把，
+  输出只 `scripts/portable-tests.sh` 一枚＝本腿自己的改动）。
+- `git diff --stat 64ceaacd..HEAD -- scripts/portable-tests.sh` ＝ **`1 file changed, 2 insertions(+), 1 deletion(-)`**
+  ⇒ 三笔探针 commit 对 `scripts/` 零字节，本票在 `scripts` 上的全部净效果＝那两枚 token，可一枚尺读完。
+
 ### 1.1 两锚之间 HEAD 漂过别人的 commit —— 具名列出并证名册⛔ 含别人的东西
 
 `git log --format='%h %an %ad' --date=format:'%H:%M' 64ceaacd..HEAD` 名册（5 枚）＝
