@@ -1,0 +1,46 @@
+CMD: guiddef path=/c/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/guiddef.h ; grep -n 'typedef struct _GUID' -A 8 /c/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/guiddef.h
+22:typedef struct _GUID {
+23-    unsigned long  Data1;
+24-    unsigned short Data2;
+25-    unsigned short Data3;
+26-    unsigned char  Data4[ 8 ];
+27-} GUID;
+28-#endif
+29-#endif
+30-
+
+CMD: x/sys windows path=/d/work/base/gopath/pkg/mod/golang.org/x/sys@v0.42.0/windows/types_windows.go ; grep -n 'type GUID struct' -A 7 /d/work/base/gopath/pkg/mod/golang.org/x/sys@v0.42.0/windows/types_windows.go
+1815:type GUID struct {
+1816-	Data1 uint32
+1817-	Data2 uint16
+1818-	Data3 uint16
+1819-	Data4 [8]byte
+1820-}
+1821-
+1822-var WSAID_CONNECTEX = GUID{
+
+CMD: sha256 of mmreg.h (provenance of the on-disk authority)
+fefd34e6c15d6e632b8b74137ad50d9bf61a5726 */c/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/guiddef.h
+bc7753053eb77641df4df9fc39eba76d1557b2ff */c/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/mmreg.h
+
+CMD: ksmedia SubFormat GUIDs
+2472:#if !defined( STATIC_KSDATAFORMAT_SUBTYPE_PCM )
+2473:#define STATIC_KSDATAFORMAT_SUBTYPE_PCM\
+2475:DEFINE_GUIDSTRUCT("00000001-0000-0010-8000-00aa00389b71", KSDATAFORMAT_SUBTYPE_PCM);
+2476:#define KSDATAFORMAT_SUBTYPE_PCM DEFINE_GUIDNAMED(KSDATAFORMAT_SUBTYPE_PCM)
+2480:#if !defined( STATIC_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT )
+2481:#define STATIC_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT\
+
+CMD: wavinjector offsets (repo impl, NOT used as judge)
+192:			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+193:				if size < 40 {
+196:				fmtTag = binary.LittleEndian.Uint16(data[body+24 : body+26])
+
+CMD: wasapi header comment content anchor
+184:// bits@14, cbSize@16, [validBits@18, channelMask@22, SubFormat@26].
+
+CMD: does internal/audio use cgo?
+0
+CMD: lazy dll / LoadDLL names in internal/audio
+CMD: test files in internal/audio (work tree)
+7
