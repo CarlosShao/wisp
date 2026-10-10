@@ -1,0 +1,4 @@
+gate=bash-n-portable-tests label=bash -n scripts/portable-tests.sh (syntax only, runs nothing) date=2026-10-10 15:44:06 +0800
+tasklist-pre-run wisp.exe=0 balldebug.exe=0
+rc=0
+tasklist-post-run wisp.exe=0 balldebug.exe=0

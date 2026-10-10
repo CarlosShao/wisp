@@ -1,0 +1,45 @@
+301 AC#5: stop the test-core comment block from lying about internal/audio
+
+Comment face only, one file, no behaviour change. The two lines above the
+test-core job used to vouch for two other jobs in one breath: "Windows-only
+packages (ball GUI, cgo speech) are out of this job's scope by platform, not
+skipped: they run in test-windows / slo jobs." Measured at HEAD before this
+commit, three of its claims were wrong or stale for ./internal/audio/:
+
+  1. "they run in slo jobs" - false for every package, not just this one.
+     slo-smoke and slo-full call scripts/slo-check.ps1, which builds wisp.exe
+     and samples D32 states; grep -nE 'portable-tests|go test|go\.exe|internal/
+     audio|audio' over that 625-line script returns 3 lines, none of them a
+     test invocation (its own header labels the smoke subset "(memory/handle
+     subset, no audio)").
+  2. "they run in test-windows" - true for ./internal/audio/ only since ticket
+     301 AC#1 landed (2026-10-10), when it entered the windows) scope array and
+     win_pin in scripts/portable-tests.sh. The replacement names that day and
+     points at those two lists instead of freezing an answer.
+  3. "out of this job's scope by platform" - per-file, not per-package: audio is
+     also named in this tier's own array (core)), and a linux target still
+     resolves it (GOOS=linux go list: GoFiles=9, TestGoFiles=5 vs 11/8 on
+     windows), so test-core compiles and runs its 5 untagged test files; only
+     the three //go:build windows test files are unevaluable on ubuntu.
+
+Evidence that nothing executable moved: git diff -U0 is a single hunk
+(-400,2 +400,19) whose every +/- line is a comment; the added-line count
+matching ^[[:space:]]*(name|runs-on|if|run|steps|uses|with): is 0; and
+yaml.safe_load of the HEAD blob vs the working copy compare equal
+(PARSED_STRUCTURE_EQUAL = True, 6 jobs, test-core keys and step names identical).
+
+Gates (tasklist re-measured before each, readings logged beside each rc,
+wisp.exe=0 balldebug.exe=0 all three times):
+  sh scripts/d22scan.sh rc=0
+  bash -n scripts/portable-tests.sh rc=0
+  bash scripts/portable-tests.sh --scope=census rc=0, roster unchanged:
+    totals still "packages=35 with-zero-compiled-tests=7
+    claimed-by-no-scope=7 unclaimed-with-tests=0", internal/audio row still
+    "8/0  corewindows", zero STALE lines (the census arm exits before the
+    ledger/stale loop).
+
+Probes: .scratch/wisp/probes/301/r2/ (00-anchor.md, 10-ac5-comment-and-measures.md,
+logs/). Includes the four dispatch premises this leg disputes with rulers -
+notably that the literal ^#+ comment ruler cannot pass on an indented comment
+block, and that "audio is not in test-core's evaluable set" is false per-package.
+No push. AC#5 box left for the orchestrator to tick.
