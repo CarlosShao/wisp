@@ -1,0 +1,19 @@
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word
+    wave_format_float_300_windows_test.go:194: waveFormatFloat observed 0x0003 against test-carried 0x0003; waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as int16; at 1 it would fire for PCM mix formats and never for float ones, at 0 for nothing at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag
+    wave_format_float_300_windows_test.go:194: waveFormatExt observed 0xfffe against test-carried 0xfffe; waveFormatExt is the tag parseWaveFormat tests before it expands SubFormat; off 0xFFFE every extensible mix format keeps 0xFFFE as its tag and never resolves to a subtype at all
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag
+    wave_format_float_300_windows_test.go:194: waveFormatPCM observed 0x0001 against test-carried 0x0001; waveFormatPCM is declared and unused in this package (300-a2 F2, zero uses), so before this case no ruler of any kind read it; this cell pins its value and does NOT delete it -- deleting an unused declaration is a different cell under a different authorization
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value
+=== RUN   TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded
+--- PASS: TestWaveFormatConstantsMatchMmregAuthority300 (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value (0.00s)
+    --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.049s

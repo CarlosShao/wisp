@@ -1,0 +1,6 @@
+mutation rig identity checks (scored 2026-10-10 18:47:19 +0800)
+tree = /tmp/wisp300-r2/tree  (git archive HEAD | tar -x, out of repo)
+cmp tree/internal/audio/wave_format_float_300_windows_test.go <-> working tree file : IDENTICAL
+cmp tree/internal/audio/wasapi_windows.go <-> working tree file (after restore)      : IDENTICAL
+grep -n 'waveFormatFloat = 3' tree/internal/audio/wasapi_windows.go : 98:	waveFormatFloat = 3
+dll count inside export tree (third_party/sherpa-onnx/*.dll) = 0 ; has .git = 0 (both inert for ./internal/audio, see 20-mutations.md)

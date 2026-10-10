@@ -1,0 +1,23 @@
+gate 4: format, three rulers side by side (scored at 2026-10-10 18:49:03 +0800)
+ruler A (working tree, scope dir = internal/audio): gofmt -l internal/audio
+  -> roster lines: 0
+  -> roster (empty means empty):
+rc_gofmt_working_tree=0
+
+ruler B (HEAD blob layer, scope dir = internal/audio; HEAD = 9a442923):
+  for f in $(git ls-tree -r --name-only HEAD -- internal/audio | grep '\.go$'); do git show HEAD:$f | gofmt -l /dev/stdin; done
+  -> dirty count in scope = 0
+rc_gofmt_head_blob=0
+
+ruler C (anchor 05db4bc6 blob layer, same scope dir, this is the BEFORE reading):
+  -> dirty count in scope = 0
+
+NEW dirty rows caused by this leg = 0 (scope dir internal/audio; all three rosters above are empty)
+
+repo-wide gofmt residue, named and NOT touched by this leg (ruler: gofmt -l cmd internal scripts tools):
+cmd\wisp\models.go
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+internal\tools\bridge.go
+  -> 5 files, none of them in this leg write scope; explicitly NOT formatted here (AC#6 dispatch: fix someone else's residue is out of scope, name it instead)

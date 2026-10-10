@@ -1,0 +1,22 @@
+authority reading for AC#6 (ticket 300, orchestrator ruling on C3: the evidence about the value goes in a
+probe file, not into the CI denominator). This is evidence about the CITATION only.
+The case itself reads no disk and never t.Skip.
+scored by leg 300-r2 at 2026-10-10 18:47:59 +0800
+
+cmd (verbatim, re-runnable):
+  H='C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/mmreg.h'
+  grep -n -E 'define +WAVE_FORMAT_(IEEE_FLOAT|PCM|EXTENSIBLE)' "$H"
+H is a LOCAL SDK path; on a hosted runner it is not guaranteed to exist, which is exactly why
+the three literals were copied into the test instead of being read at run time.
+
+2110:#define  WAVE_FORMAT_IEEE_FLOAT                 0x0003 /* Microsoft Corporation */
+2376:#define  WAVE_FORMAT_EXTENSIBLE                 0xFFFE /* Microsoft */
+2418:#define WAVE_FORMAT_PCM         1
+rc=0
+
+-rw-r--r-- 1 swq 197609 176680 Apr 15 11:15 C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/mmreg.h
+
+cross-check against the orchestrator archive of the same file (same three lines):
+4:2110:#define  WAVE_FORMAT_IEEE_FLOAT                 0x0003 /* Microsoft Corporation */
+5:2376:#define  WAVE_FORMAT_EXTENSIBLE                 0xFFFE /* Microsoft */
+6:2418:#define WAVE_FORMAT_PCM         1

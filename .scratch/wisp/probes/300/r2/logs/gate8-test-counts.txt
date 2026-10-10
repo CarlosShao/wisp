@@ -1,0 +1,31 @@
+gate 8: top-level test-case count, two readings (scored at 2026-10-10 18:49:03 +0800)
+ruler: per-file git show <ref>:<file> | grep -c '^func Test'  (NOT by file name; hotplug_test.go is the precedent that a name-based guess mis-counts)
+scope dir = internal/audio
+
+--- anchor 05db4bc6 (before this leg) ---
+  1  internal/audio/capturelevel_windows_test.go
+  4  internal/audio/captureopt_test.go
+  5  internal/audio/gate_test.go
+  8  internal/audio/hotplug_test.go
+  10  internal/audio/level_test.go
+  1  internal/audio/parse_wave_format_300_windows_test.go
+  7  internal/audio/resample_test.go
+  6  internal/audio/wavinjector_test.go
+  total_top_level_source_ruler=42   (files: 8)
+
+--- HEAD (after this leg) ---
+  1  internal/audio/capturelevel_windows_test.go
+  4  internal/audio/captureopt_test.go
+  5  internal/audio/gate_test.go
+  8  internal/audio/hotplug_test.go
+  10  internal/audio/level_test.go
+  1  internal/audio/parse_wave_format_300_windows_test.go
+  7  internal/audio/resample_test.go
+  1  internal/audio/wave_format_float_300_windows_test.go
+  6  internal/audio/wavinjector_test.go
+  total_top_level_source_ruler=43   (files: 9)
+
+delta = +1 top-level test function, named: TestWaveFormatConstantsMatchMmregAuthority300
+shape = NEW TOP-LEVEL CASE (1) plus 6 sub-tests inside it; it is NOT 'sub-tests only'.
+runtime-ruler counterpart from gate 3: top-level '--- PASS' 41 -> 42, sub-test '    --- PASS' 6 -> 12, '=== RUN' 48 -> 55
+cross-check against 300-a2 F5: its blob ruler gave 42 at that anchor; this leg reproduces 42 at 05db4bc6.
