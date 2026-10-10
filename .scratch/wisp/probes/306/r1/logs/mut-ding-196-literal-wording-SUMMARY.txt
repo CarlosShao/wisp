@@ -1,0 +1,9 @@
+# cycle ding-196-literal-wording
+--- named-case roster in the mutated run (ruler = grep -E '^--- (FAIL|PASS|SKIP): ' on mut-ding-196-literal-wording-03-red.txt) ---
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+top_fail_count=1
+top_pass_count=0
+top_skip_count=0
+--- verbatim failure bodies (the red sentences) ---
+--- rc line already in the file ---
+rc_named_cases_with_mutation=1

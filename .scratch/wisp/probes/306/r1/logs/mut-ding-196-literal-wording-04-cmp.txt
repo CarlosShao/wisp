@@ -1,0 +1,1 @@
+rc_cmp_restore=0 (0 = byte-for-byte identical to the pristine copy)

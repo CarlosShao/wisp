@@ -1,0 +1,12 @@
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/30-ac3-selfcheck.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/30-ac6-shape.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/30-sdk-headers.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c3.txt', LF will be replaced by CRLF the next time Git touches it
+[dev c0d5ec24] 306-r1 AC#3 落点：把那句"GUID 不在 mmreg.h"改成盘上的实话（只动注释，16 加 5 删全是 // 行）
+ 6 files changed, 273 insertions(+), 5 deletions(-)
+ create mode 100644 .scratch/wisp/probes/306/r1/30-ac3-comment.md
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/30-ac3-selfcheck.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/30-ac6-shape.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/30-sdk-headers.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/msg-c3.txt
+rc_commit=0

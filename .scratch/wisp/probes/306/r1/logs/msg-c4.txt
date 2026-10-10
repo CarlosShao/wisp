@@ -1,0 +1,21 @@
+306-r1 AC#2 / AC#2b 落点：三对各带一发突变凭据（红句逐字引，cmp 逐字节还原，复绿 rc=0）
+
+台面＝仓外导出树（git archive c0d5ec24 | tar -x 到 tmp/306r1-mut-20261011-0730）；
+真仓 internal/audio/wavinjector.go 全程一字未动（cmp 对 pristine / 对工作树 / 对 HEAD blob 三把尺各 rc=0）。
+
+三枚各一对（每对四发：夹具 mv 走整包照绿 -> 夹具在场目标用例当场红 -> cmp 还原 -> 定向复绿）：
+  一 :192 0xFFFE -> 0xFFFD   红句 tag=65534  rc_red=1  rc_cmp=0  rc_regreen=0  改前整包 rc=0 / FAIL 0 / PASS 42
+  二 :218 3 -> 2             红句 tag=3      同上；票面 §现量 那句"包级尺照绿、PASS 42"在同台面复跑并对拉逐字复现
+  三 :196 body+24 -> body+26 红句 tag=0      同上；改的是"读哪儿"，读出 GUID 里 Data1 的高两字节 = 0
+三枚红句互不相同，故"一次夹具装了牙"未被当作三格都闭的读数。
+
+具名偏差（以盘上为准）：派单写"只改那一处偏移，语句其余字不动"。字面那一发（只动起点）在盘上是
+panic: index out of range [1] with length 0（空切片喂 binary.LittleEndian.Uint16），会炸掉整个测试二进制、
+另一枚指名用例根本没跑到，故本格主凭据取"同一枚切片上下界一起移"（data[body+26 : body+28]）那一发；
+字面那一发作为第四发完整交上，不丢。
+
+另具名一处自己的尺缺陷：驱动脚本往自己 grep 的那枚件里追加汇总，GNU grep 拒绝（input file is also the output），
+两处尾部汇总因此是报错句；名册与红句已另起一把尺重导进 mut-*-SUMMARY.txt，$(grep -c) 那三枚计数走管道故为真读数。
+
+顺带把起手那两枚 0 字节件改成"空集＝结论"的响亮写法（scoped porcelain 0 行、漂移区间 internal/ 0 行）。
+证据件＝.scratch/wisp/probes/306/r1/20-nails.md + logs/mut-*（24 枚）+ logs/mutate.sh + logs/mutate-final-safety.txt。

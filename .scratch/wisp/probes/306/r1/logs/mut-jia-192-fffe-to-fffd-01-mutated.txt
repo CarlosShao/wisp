@@ -1,0 +1,16 @@
+################ CYCLE jia-192-fffe-to-fffd ################
+--- mutated line 192 verbatim ---
+			if fmtTag == 0xFFFD { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+--- pristine line 192 verbatim (for the byte-for-byte pair) ---
+			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+--- whole-file diff pristine vs mutated (must be exactly one hunk) ---
+@@ -189,7 +189,7 @@
+ 			chans = int(binary.LittleEndian.Uint16(data[body+2 : body+4]))
+ 			rate = int(binary.LittleEndian.Uint32(data[body+4 : body+8]))
+ 			bits = binary.LittleEndian.Uint16(data[body+14 : body+16])
+-			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
++			if fmtTag == 0xFFFD { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+ 				if size < 40 {
+ 					return nil, 0, 0, fmt.Errorf("extensible fmt chunk too short (%d)", size)
+ 				}
+rc_diff=0

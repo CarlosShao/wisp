@@ -1,0 +1,10 @@
+=== RUN   TestParseWavExtensibleFloat32306
+--- PASS: TestParseWavExtensibleFloat32306 (0.00s)
+=== RUN   TestWavInjectorExtensibleFloat32306
+--- PASS: TestWavInjectorExtensibleFloat32306 (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.054s
+rc_regreen=0
+grep: input file ‘mut-yi-218-three-to-two-05-regreen.txt’ is also the output
+rc_regreen=0
+grep: input file ‘mut-yi-218-three-to-two-05-regreen.txt’ is also the output

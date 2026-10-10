@@ -1,0 +1,11 @@
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/10-gofmt-before.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/10-targeted-green.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c2.txt', LF will be replaced by CRLF the next time Git touches it
+[dev 1b34e475] 306-r1 AC#1 落点：乙形夹具＝一份 40 字节 extensible + float32 的 wav 面（只写测试侧）
+ 5 files changed, 336 insertions(+)
+ create mode 100644 .scratch/wisp/probes/306/r1/10-fixture.md
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/10-gofmt-before.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/10-targeted-green.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/msg-c2.txt
+ create mode 100644 internal/audio/wavinjector_extensible_float_306_test.go
+rc_commit=0

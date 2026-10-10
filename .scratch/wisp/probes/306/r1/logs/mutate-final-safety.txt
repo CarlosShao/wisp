@@ -1,0 +1,14 @@
+# 306-r1 logs/mutate-final-safety.txt 时刻=2026-10-11 07:33:55 +0800
+--- export tree production file vs the pristine copy taken straight from git archive c0d5ec24 ---
+rc_final_cmp_pristine=0
+--- export tree production file vs the REAL repo worktree (must be identical: this leg never touched it) ---
+rc_final_cmp_vs_real_worktree=0
+--- and against the real repo HEAD blob ---
+rc_final_cmp_vs_head_blob_of_real_repo=0
+--- real repo scoped porcelain after all four mutation cycles ---
+rc_porcelain_after_mutations=0 (0 with no output above = only my own committed files, no stray edits)
+--- driver cycle lines (rerun of the same script echoes) ---
+CYCLE jia-192-fffe-to-fffd rc_no_fixture_fullpkg=0 rc_red=1 rc_cmp=0 rc_regreen=0
+CYCLE yi-218-three-to-two rc_no_fixture_fullpkg=0 rc_red=1 rc_cmp=0 rc_regreen=0
+CYCLE bing-196-off24-to-26 rc_no_fixture_fullpkg=0 rc_red=1 rc_cmp=0 rc_regreen=0
+CYCLE ding-196-literal-wording rc_no_fixture_fullpkg=0 rc_red=1 rc_cmp=0 rc_regreen=0

@@ -1,0 +1,29 @@
+=== RUN   TestParseWavExtensibleFloat32306
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+panic: runtime error: index out of range [1] with length 0 [recovered, repanicked]
+
+goroutine 8 [running]:
+testing.tRunner.func1.2({0x7ff6475aa7c8, 0x32dff7812228})
+	D:/work/base/go/src/testing/testing.go:2123 +0x239
+testing.tRunner.func1()
+	D:/work/base/go/src/testing/testing.go:2126 +0x329
+panic({0x7ff6475aa7c8?, 0x32dff7812228?})
+	D:/work/base/go/src/runtime/panic.go:859 +0x125
+encoding/binary.littleEndian.Uint16(...)
+	D:/work/base/go/src/encoding/binary/binary.go:70
+github.com/CarlosShao/wisp/internal/audio.parseWav({0x32dff781c380, 0x64, 0x64})
+	C:/Users/swq/tmp/306r1-mut-20261011-0730/internal/audio/wavinjector.go:196 +0x8d4
+github.com/CarlosShao/wisp/internal/audio.TestParseWavExtensibleFloat32306(0x32dff77fc400)
+	C:/Users/swq/tmp/306r1-mut-20261011-0730/internal/audio/wavinjector_extensible_float_306_test.go:175 +0x10d
+testing.tRunner(0x32dff77fc400, 0x7ff6475b9740)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.033s
+FAIL
+rc_named_cases_with_mutation=1
+--- verbatim red lines (top-level) ---
+grep: input file ‘mut-ding-196-literal-wording-03-red.txt’ is also the output
+NO TOP-LEVEL FAIL LINE
+--- verbatim failure text ---
+grep: input file ‘mut-ding-196-literal-wording-03-red.txt’ is also the output

@@ -1,0 +1,3 @@
+# EMPTY SET IS THE CONCLUSION (not a missing reading)
+# 306-r1: git status --porcelain -- internal cmd docs scripts .github
+# rc_porcelain_scoped=0 ; lines=0 -> the scoped write face was CLEAN at the 306-r1 start anchor 5480434f.

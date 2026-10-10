@@ -1,0 +1,16 @@
+################ CYCLE yi-218-three-to-two ################
+--- mutated line 218 verbatim ---
+	case fmtTag == 2 && bits == 32:
+--- pristine line 218 verbatim (for the byte-for-byte pair) ---
+	case fmtTag == 3 && bits == 32:
+--- whole-file diff pristine vs mutated (must be exactly one hunk) ---
+@@ -215,7 +215,7 @@
+ 			samples[i] = int16(binary.LittleEndian.Uint16(dataChunk[2*i : 2*i+2]))
+ 		}
+ 		return samples, rate, chans, nil
+-	case fmtTag == 3 && bits == 32:
++	case fmtTag == 2 && bits == 32:
+ 		n := len(dataChunk) / 4
+ 		f := make([]float32, n)
+ 		for i := 0; i < n; i++ {
+rc_diff=0

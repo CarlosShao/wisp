@@ -1,0 +1,14 @@
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/00-anchor.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/00-blob-wavinjector.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/00-porcelain-full.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c1.txt', LF will be replaced by CRLF the next time Git touches it
+[dev 4e73d0a5] 306-r1 起手锚（AC#4 台面那一半的第 1 笔，commit-first）
+ 7 files changed, 1176 insertions(+)
+ create mode 100644 .scratch/wisp/probes/306/r1/00-anchor.md
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/00-anchor.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/00-blob-wavinjector.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/00-driff-internal.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/00-porcelain-full.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/00-porcelain-scoped.txt
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/msg-c1.txt
+rc_commit=0

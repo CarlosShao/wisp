@@ -1,0 +1,4 @@
+# EMPTY SET IS THE CONCLUSION (not a missing reading)
+# 306-r1: git diff --name-only a81c2980 5480434f -- internal
+# rc_diff_internal=0 ; lines=0 -> the dispatch anchor and the re-anchor commit differ by ZERO files under internal/,
+# so the three content anchors (:192 / :196 / :218 of wavinjector.go) are byte-identical across the drift.

@@ -1,0 +1,16 @@
+################ CYCLE bing-196-off24-to-26 ################
+--- mutated line 196 verbatim ---
+				fmtTag = binary.LittleEndian.Uint16(data[body+26 : body+28])
+--- pristine line 196 verbatim (for the byte-for-byte pair) ---
+				fmtTag = binary.LittleEndian.Uint16(data[body+24 : body+26])
+--- whole-file diff pristine vs mutated (must be exactly one hunk) ---
+@@ -193,7 +193,7 @@
+ 				if size < 40 {
+ 					return nil, 0, 0, fmt.Errorf("extensible fmt chunk too short (%d)", size)
+ 				}
+-				fmtTag = binary.LittleEndian.Uint16(data[body+24 : body+26])
++				fmtTag = binary.LittleEndian.Uint16(data[body+26 : body+28])
+ 			}
+ 			fmtSeen = true
+ 		case "data":
+rc_diff=0
