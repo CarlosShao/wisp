@@ -1,0 +1,3 @@
+command: GOFLAGS= go build ./...   (run at repo root, anchor b2933dc9 + my 3 probe commits)
+rc-build=0
+stdout+stderr bytes = 0  <-- empty BY DESIGN: go build prints nothing when it succeeds.

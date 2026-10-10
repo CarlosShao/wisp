@@ -1,0 +1,2 @@
+command: git status --porcelain -- internal cmd
+lines = 0  <-- empty BY DESIGN: zero tracked paths touched under internal/ or cmd/.
