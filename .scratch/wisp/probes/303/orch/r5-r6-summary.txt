@@ -1,0 +1,16 @@
+start_local=2026-10-10 18:07:58 +0800
+clone_head_before=807497c1
+main_head=807497c1
+scoped_porcelain_main=0
+detached=cf46c24a panel_host_lines=969
+before_fail=17 before_skip=3
+detached=807497c1
+after_fail=16 after_skip=2
+=== NEW REDS (after minus before, per-name) ===
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5
+=== FIXED (before-red minus after-red) ===
+--- FAIL: TestAC14AwaitedBindingReplyReachesThePage
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle
+=== restored clone to origin/dev ===
+clone_head_end=cf46c24a
+end_local=2026-10-10 18:24:40 +0800

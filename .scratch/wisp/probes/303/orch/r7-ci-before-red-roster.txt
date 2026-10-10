@@ -1,0 +1,41 @@
+# 303 编排者·CI 改前红名册（推送修复之前那台面上的一发）
+
+尺＝gh run view --log --job 114187968428（job 名＝test-windows），逐字抽 '--- FAIL: <名>' 再 sort -u；⚠ 这把尺数的是**顶层名**，含子测试的形另算
+run＝38043392486（headSha=cf46c24a＝本票修复的**父发**，10-10 18:00:29 +08 推送产生）；captured_local＝2026-10-10 18:22:50 +0800
+原始日志＝1,418,337 字节，⛔ 不入库（本件只留名册＋尺）；全 job 计数＝FAIL 标记 20 枚／SKIP 标记 6 枚／PASS 标记 1101 枚（尺＝同一份日志里 grep -c 的三个数，⚠ 含重复行，只当量级不当分母）
+
+## 20 枚红名（逐字）
+  TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+  TestAC14AwaitedBindingReplyReachesThePage
+  TestAC14GoSideEvalPushReachesThePage
+  TestAC1AlwaysBranchDoesNotRevertAHandEditedKey
+  TestAListWinsWhereBothTablesHit
+  TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card
+  TestBListDefaultDenyAndOverride
+  TestCanonicalInputGainsNoSecondForm
+  TestClassifyAnchorSpellingIsNotVerdict
+  TestPanelHostRealWindowHopAndLifecycle
+  TestPathResolverExtendedLengthPrefixAListDenied
+  TestPathResolverShortNameAListDenied
+  TestPathResolverUNCAListDenied
+  TestRunPacketCarriesTheLoadedInstructionFiles
+  TestSyncFallbackNotDisarmableByWeakRoot
+  TestSyncFixtureFallbackAndMatch
+  TestSyncSuspectFallbackIsComponentBounded
+  TestSyncSuspectFallbackWhenUndetectable
+  TestSyncUnverifiedRootKeepsFallback
+  TestTicket223PermissionDeniedSitsInItsOwnSentence
+
+## 与本票相关的四枚（具名）
+  TestAC14AwaitedBindingReplyReachesThePage   ← 本票修复的目标枚（改前在 CI 也红）
+  TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe ← 症状①，归票 305
+  TestAC14GoSideEvalPushReachesThePage        ← 症状②，归票 305
+  TestPanelHostRealWindowHopAndLifecycle      ← D32 预算／哨兵 -1.000 那一族，票面边界段已具名
+
+## 推送后要答的问题（票 303 AC#5②）
+  同一把尺在修复那一发上：上面四枚各变成什么色，名册作差⛔ 比枚数；⚠ 台面口径＝同一 job 名／同镜像（引 Runner Image 与 agent 版本逐字，先例＝票 302 现量段第 1 条）
+
+## 台面出处（⛔ 跨发对拉时缺这一栏＝不可比，先例＝票 302 现量段第 1 条）
+  Runner 档名逐字＝`windows-2025-vs2026`（尺＝同一份日志里 `grep -oE 'windows-20[0-9]+[-a-z0-9]*'` 唯一命中）
+  runner agent 版本＝Current runner version: '2.337.0'
+  ⚠ ImageVersion（形如 20260925.250.1）这一把尺⛔ 命中＝那份日志里没写这行，推送后要的那发改时⛔ 假定它相同，必须各自现取；取不到就把'镜像漂'那一支写成本票未闭合的读数

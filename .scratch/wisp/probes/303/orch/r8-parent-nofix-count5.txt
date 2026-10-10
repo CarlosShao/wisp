@@ -1,0 +1,27 @@
+sha=cf46c24a label=parent-nofix count=5 start=18:28:58
+time=2026-10-10T18:29:04.860+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head cf46c24a): foreground before any panel 0x20b0cc8 | the ruler's own editor window 0x6720856 | foreground while hidden (prior) 0x30514 | after Show 0x30514 | panel hwnd 0xf70dc0 | prevFocus recorded at Show 0x30514 | after Hide 0x30514 | Hide attempted restore to 0x30514 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x30514, panel hwnd 0xf70dc0 (AC#4 says only the panel takes focus when shown)
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.36s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head cf46c24a): foreground before any panel 0x30514 | the ruler's own editor window 0x4e70caa | foreground while hidden (prior) 0x20b0cc8 | after Show 0x20b0cc8 | panel hwnd 0x33404ac | prevFocus recorded at Show 0x20b0cc8 | after Hide 0x20b0cc8 | Hide attempted restore to 0x20b0cc8 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x20b0cc8, panel hwnd 0x33404ac (AC#4 says only the panel takes focus when shown)
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.22s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head cf46c24a): foreground before any panel 0x20b0cc8 | the ruler's own editor window 0x4ea0d8c | foreground while hidden (prior) 0x20b0cc8 | after Show 0x20b0cc8 | panel hwnd 0x5a106dc | prevFocus recorded at Show 0x20b0cc8 | after Hide 0x20b0cc8 | Hide attempted restore to 0x20b0cc8 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x20b0cc8, panel hwnd 0x5a106dc (AC#4 says only the panel takes focus when shown)
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.21s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head cf46c24a): foreground before any panel 0x20b0cc8 | the ruler's own editor window 0x9f60e80 | foreground while hidden (prior) 0x20b0cc8 | after Show 0x20b0cc8 | panel hwnd 0xef0e4e | prevFocus recorded at Show 0x20b0cc8 | after Hide 0x20b0cc8 | Hide attempted restore to 0x20b0cc8 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x20b0cc8, panel hwnd 0xef0e4e (AC#4 says only the panel takes focus when shown)
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.20s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head cf46c24a): foreground before any panel 0x20b0cc8 | the ruler's own editor window 0x6d09a0 | foreground while hidden (prior) 0x20b0cc8 | after Show 0x20b0cc8 | panel hwnd 0x5a306dc | prevFocus recorded at Show 0x20b0cc8 | after Hide 0x20b0cc8 | Hide attempted restore to 0x20b0cc8 (SetForegroundWindow 1, SetFocus 0)
+    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x20b0cc8, panel hwnd 0x5a306dc (AC#4 says only the panel takes focus when shown)
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (5.20s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	26.432s
+FAIL
+rc=1
+  colors: 0 pass / 5 fail

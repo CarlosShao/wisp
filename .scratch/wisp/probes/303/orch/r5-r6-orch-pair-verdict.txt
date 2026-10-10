@@ -1,0 +1,37 @@
+# 303 编排者·整包「改前／改后」成对两发（补 `303-r1` 具名欠的那一格）
+
+★**台面口径**（本件全部读数只在**仓外干净 clone** `~/wisp-303-bisect` 上跑，⛔ 母仓、⛔ 在共享工作树做任何 checkout）：
+- 尺＝`go test -C <clone> ./cmd/wisp/ -count=1 -timeout 900s -v`，PATH 铺母仓的 `third_party/sherpa-onnx` ＋ `build`（⚠ 必须 shell 形 `/d/…`，写成 `D:/…` 直接 `0xc0000135`）
+- 名册尺＝同一份日志里 `grep -E '^--- (FAIL|SKIP): '` 再剥时长后排序 ⇒ **顶层名**那一把尺，⛔ 与"含子测试"那把混用
+- 台件＝`r5-r6-package-pair.sh`；改前发＝`r5-orch-package-before.txt`；改后发＝`r6-orch-package-after.txt`
+- 时刻＝start 18:07:58 → end 18:24:40（+0800）；改前 `detached=cf46c24a`（＝修复那笔的**父发**，`panel_host_windows.go` 969 行）；改后 `detached=807497c1`（含 `e3341368` 那 +27/−0）
+
+## 四数（逐字来自那两发）
+
+| 发 | 顶层 PASS | 顶层 FAIL | 顶层 SKIP | rc |
+|---|---|---|---|---|
+| 改前 `cf46c24a` | 268 | 17 | 3 | `rc_before=1` |
+| 改后 `807497c1` | 270 | 16 | 2 | `rc_after=1` |
+
+## 作差（⛔ 比枚数，逐名）
+
+- ★**被修好的**（改前红 ∖ 改后红）＝ 2 枚：
+  - `TestAC14AwaitedBindingReplyReachesThePage` ← 本票归因那枚断口的目标枚
+  - `TestPanelHostRealWindowHopAndLifecycle` ← 改前红句是哨兵 `-1.000`（"did not produce a browser round trip"），改后在这枚台面上 **PASS(1.30s)**；⚠ **同码在母仓**（腿那发 `31-package-after.txt`）**仍 FAIL 且仍是 `-1.000` 那一支** ⇒ 颜色随台面，见票 305 症状①那一族
+- ⚠**新增红**（改后红 ∖ 改前红）＝ **1 枚**：`TestAC4FocusReturnToPriorWindowGap33r5`（改前 `--- PASS (5.28s)`／改后 `--- FAIL (0.46s)`，红句逐字＝`the panel did not take the foreground on Show: foreground 0x20b0cc8, panel hwnd 0x4f7094c (AC#4 says only the panel takes focus when shown)`，件 `panel_host_windows_test.go:948`）
+  ⇒ ★**这一枚让我不能盖"新增红 0 枚"**，处理方式见下面"这三枚我另开一发"那一节与台账 `A823`。
+- SKIP 那一支：改前有／改后无＝`TestPanelHostLatencyPercentilesAC2`（改前 `--- SKIP`、改后 `--- PASS (0.00s)`＝负载敏感那族的形，⛔ 当凭据）
+
+## clone 台面独有的两族（⛔ 与母仓混读；先例＝票面 `:17` ＋ 本轮新立的台面规则）
+
+1. **14 枚**红句逐字含 `no native DLLs in ..\..\third_party\sherpa-onnx - run scripts/fetch-deps.ps1 first`（尺＝改前那发里 `grep -c 'no native DLLs'` ＝ 14；名册＝上面 17 枚减掉面板族 3 枚）。⚠ 这是**有声自报**而⛔ `0xc0000135` 那形（同一发里 `0xc0000135` ＝ **0 命中**，尺＝`grep -c`）⇒ 两发同台面 ⇒ 作差时**抵消**，⛔ 拿来判"码坏了"。
+2. `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` 在 clone 里**两发都 `--- SKIP`**（具名理由逐字 `the embed resolves no entry`），而母仓里它是 `--- FAIL` ⇒ 凡引用它的颜色**必须写台面**。
+
+## 这三枚我另开了一发（件＝`r8-ac4focus-isolation.sh` ＋ `r8-*.txt`）
+
+`TestAC4FocusReturnToPriorWindowGap33r5` 是**本机前台焦点**类判据（同一枚 clone、同一条 `-run`、`-count` 交替换头跑两色）⇒ 只有那发能回答"新增的那一枚红是**修复造成的**还是**桌面状态造成的**"。⛔ 我在此之前给任何一格盖"新增红 0"。
+
+## 腿那两枚门禁件的自报缺口（记档，⛔ 我顺手修）
+
+- `30-package-before.txt` ＝ **5 字节**（只有 `rc=1`，没名册）＝它自己具名欠的那格，本件就是还它的。
+- `31-package-after.txt` ＝ 328,419 字节、名册齐，但**末尾没有 `rc=N` 那一行**（尺＝`grep -n '^rc=' 31-package-after.txt` 0 命中）⇒ 踩的是我那条"每把门禁件自落一行 `rc=N`"的规矩；颜色仍可从 `FAIL` 标记读出，⛔ 因此判它没交，归口＝编队模板那条（票 304 `AC#4`/`AC#4b` 同族）。

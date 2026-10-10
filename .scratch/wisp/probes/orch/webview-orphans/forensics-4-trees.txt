@@ -1,0 +1,12 @@
+captured=2026-10-10 18:18:05
+total=18 trees=3
+  tree root=10780 host=clipsync-desktop.exe parent=clipsync-desktop.exe started=10-09 22:59:50 size=6 wsMB=588.2
+  tree root=12812 host=SearchHost.exe parent=SearchHost.exe started=10-07 08:36:30 size=6 wsMB=324.1
+  tree root=28208 host=wetype_update.exe parent=wetype_update.exe started=10-08 15:50:33 size=6 wsMB=334.5
+
+== forensics-4 · webview 按'树'归属（尺＝probes/orch/webview-orphans/webtree.ps1，⛔ 按 --webview-exe-name= 词面分组）==
+ruler = Get-CimInstance Win32_Process，先按 ppid 链在本机 msedgewebview2 集合内归树，再逐树报 root pid / --webview-exe-name= / 父进程名 / 起始时间 / 树内枚数 / WS 合计
+captured_local = 2026-10-10 18:18:05 +08:00
+
+读数（逐字）见上；同一把尺 60 秒前的另一发（18:17:03，件未单存，命令＝按 --webview-exe-name= 词面计数）里多出 wisp.test.exe = 8 枚／2 棵 root＝编排者自己那发整包 go test（仓外 clone ~/wisp-303-bisect，r5 改前名册）正开着的窗；⇒ ★新知一条：⚠ 编队在飞时任何'本机 webview 枚数'读数都含在飞腿自己的树，⛔ 拿总枚数当残留数（本件 18 枚＝3 棵别人树×6，wisp 系 0；而 62 秒前同一台面上是 28 枚含 2 棵 wisp 系树）。
+★与 304 的关系：wisp 系那 2 棵树在腿正常退出后被收掉（18:17:30／18:18:05 两发 wisp 系＝0）＝票 304 说的'只有外部 TerminateProcess 那一形才留孤'的辅证（⛔ 本格凭据，AC#0 那三形各一发才作数）。

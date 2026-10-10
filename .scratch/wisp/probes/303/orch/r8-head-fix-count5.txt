@@ -1,0 +1,21 @@
+sha=807497c1 label=head-fix count=5 start=18:28:45
+time=2026-10-10T18:28:51.550+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head 807497c1): foreground before any panel 0x20b0cc8 | the ruler's own editor window 0x2a20e66 | foreground while hidden (prior) 0x2a20e66 | after Show 0xbd0dec | panel hwnd 0xbd0dec | prevFocus recorded at Show 0x2a20e66 | after Hide 0x2a20e66 | Hide attempted restore to 0x2a20e66 (SetForegroundWindow 1, SetFocus 44174950)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (1.73s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head 807497c1): foreground before any panel 0x2a20e66 | the ruler's own editor window 0xe70e4e | foreground while hidden (prior) 0xe70e4e | after Show 0x2520fd0 | panel hwnd 0x2520fd0 | prevFocus recorded at Show 0xe70e4e | after Hide 0xe70e4e | Hide attempted restore to 0xe70e4e (SetForegroundWindow 1, SetFocus 15142478)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.68s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head 807497c1): foreground before any panel 0xe70e4e | the ruler's own editor window 0x3eb0efa | foreground while hidden (prior) 0x3eb0efa | after Show 0x1820b44 | panel hwnd 0x1820b44 | prevFocus recorded at Show 0x3eb0efa | after Hide 0x3eb0efa | Hide attempted restore to 0x3eb0efa (SetForegroundWindow 1, SetFocus 65736442)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (1.08s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head 807497c1): foreground before any panel 0x3eb0efa | the ruler's own editor window 0x2a50e66 | foreground while hidden (prior) 0x2a50e66 | after Show 0xcb0e56 | panel hwnd 0xcb0e56 | prevFocus recorded at Show 0x2a50e66 | after Hide 0x2a50e66 | Hide attempted restore to 0x2a50e66 (SetForegroundWindow 1, SetFocus 44371558)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.79s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:944: AC#4 focus hop (head 807497c1): foreground before any panel 0x2a50e66 | the ruler's own editor window 0x1a60c5c | foreground while hidden (prior) 0x1a60c5c | after Show 0x28c0f62 | panel hwnd 0x28c0f62 | prevFocus recorded at Show 0x1a60c5c | after Hide 0x1a60c5c | Hide attempted restore to 0x1a60c5c (SetForegroundWindow 1, SetFocus 27659356)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.81s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	5.414s
+rc=0
+  colors: 5 pass / 0 fail

@@ -1,0 +1,25 @@
+# 303 编排者·`TestAC4FocusReturnToPriorWindowGap33r5` 交替换头隔离发（答"那枚新增红归不归修复"）
+
+台面＝同一枚仓外干净 clone `~/wisp-303-bisect`（⛔ 母仓、⛔ 共享工作树 checkout）；尺＝`go test -C <clone> ./cmd/wisp/ -count=N -timeout 300s -v -run TestAC4FocusReturnToPriorWindowGap33r5`，PATH 铺母仓 `third_party/sherpa-onnx`＋`build`（shell 形）；台件＝`r8-ac4focus-isolation.sh`；三发逐字件＝`r8-head-fix-count5.txt`／`r8-parent-nofix-count5.txt`／`r8-head-fix-again-count3.txt`。
+
+## 读数（三发按时间序）
+
+| 时刻(+0800) | detached | 计数 | PASS | FAIL | rc |
+|---|---|---|---|---|---|
+| 18:28:45 | `807497c1`（含修复） | `-count=5` | **5** | 0 | 0 |
+| 18:28:58 | `cf46c24a`（修复的父发） | `-count=5` | 0 | **5** | 1 |
+| 18:29:32 | `807497c1`（同一个二进制） | `-count=3` | 0 | **3** | 1 |
+
+- 父发那 5 枚红句逐字＝`the panel did not take the foreground on Show: foreground 0x…, panel hwnd 0…(AC#4 says only the panel takes focus when shown)`，与改后那 3 枚**同一句话**；时长形不同（父发 5.20–5.36s／HEAD 第二批 0.65–1.37s）。
+- ★**决定性的一枚对照**：`r5-orch-package-before.txt`（改前整包，同一枚 clone，18:12 那一发）里这枚是 `--- PASS (5.28s)` ⇒ **父发也出现过两色**。
+
+## 判语（我这把尺买到什么、买不到什么）
+
+1. ✔ **买到**：`r5-r6-orch-pair-verdict.txt` 那"逐名作差 ⇒ 新增红 1 枚"**⛔ 能归因给修复**。证据＝**两枚 SHA 各自都出现过两色**，而 `807497c1` 那一个二进制在 **47 秒内**先 5 连绿再 3 连红（中间只夹了父发那一发）⇒ 变色跟的是**时刻／桌面状态／前一枚跑过什么**，跟的不是码。
+2. ✔ 同一条判据的红句在**有修复**与**无修复**两支下一字不差 ⇒ 它测的那件事（Show 时前台焦点归谁）与 `panelPostMessageForwardInit` 那 +27 行（页面消息转发钩子）**不在同一层**。
+3. ⛔ **买不到**："它是 flake 所以⛔ 是缺陷"。这枚用例今天的行为是**前台焦点拿不到就红**，而它在一台**真有人在用**的机器上命中率看着不低（本机现量 13 发＝5 绿／8 红，尺＝上面三发＋整包两发里的那一枚）。⇒ 具名转成一条**独立缺口**（这台面上一枚"真窗焦点"判据⛔ 有可重跑的确定性），归票 304 `AC#0` 那种"三形各一发"的写法处理，⛔ 混进本票 `AC#4` 的门禁。
+4. ⛔ 因为 3 那一句把 `AC#4` 翻勾：票面 `AC#4` 写的是**整包改前／改后各两发**取交集，我手上是各**一发**＋一枚定向隔离发 ⇒ 本格**不满足票面要求的形状**，保持未勾，欠的那一发具名交 `303-v1`（或我自己下一程补）。
+
+## 顺带一枚（同一把尺撞到的）
+
+`TestPanelHostLatencyPercentilesAC2` 在同一对整包发里改前 `--- SKIP`／改后 `--- PASS (0.00s)` ⇒ 与上面同一族：**这枚 clone 台面上的"颜色"里有两枚随负载／桌面状态漂**。⇒ 凡引用 `cmd/wisp` 真窗档的颜色，⛔ 单发定色（先例＝记忆里那条"红枚数必带哪把尺＋是否 `-v`"，本票 302 现量段那条同族）。

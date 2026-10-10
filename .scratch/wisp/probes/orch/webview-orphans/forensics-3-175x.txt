@@ -1,5 +1,5 @@
 ﻿ruler = Get-CimInstance Win32_Process (read-only, no kill / no start / no modify)
-captured_local = 2026-10-10 18:02:59 +08:00
+captured_local = 2026-10-10 18:02:58 +08:00
 
 == A. totals ==
 msedgewebview2.exe count = 18
