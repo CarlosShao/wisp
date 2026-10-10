@@ -1,0 +1,14 @@
+301-r2 anchor: dual anchor + tasklist readings before touching ci.yml comments
+
+Leg = 301-r2, the comment-face landing leg for ticket 301 AC#5. Main body of AC#5
+(portable-tests.sh windows) tier + win_pin) already landed and was accepted by a
+non-implementer; this leg only fixes the two stale comment lines above test-core:
+in .github/workflows/ci.yml.
+
+Readings: HEAD 7e32af9d, branch dev, `git status --porcelain -- scripts internal
+.github docs | wc -l` = 0, date 2026-10-10 15:35 +0800.
+tasklist wisp.exe: first sample 3, re-sample 0 (they exited between samples; this
+leg killed nothing). balldebug.exe = 0. Every gate run re-measures and logs the
+reading next to its rc.
+
+No yaml behaviour change in this commit: probe file only.
