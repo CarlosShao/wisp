@@ -1,0 +1,61 @@
+#!/bash
+# 300-v3 R5c — 第三把：把 rig-mutation-2 里那发**装置红**（编译失败）换成能编译的反形，
+# 并补两发整包级读数（射程具名＝只有 ./internal/audio/，⛔ cmd/wisp，⛔ 起任何窗）。
+set -u
+REPO="/d/work/workspace/projects plans/Wisp"
+ROOT=/tmp/wisp300-v3
+TREE=$ROOT/tree
+LOGS=$ROOT/logs
+WASAPI=$TREE/internal/audio/wasapi_windows.go
+TEST=$TREE/internal/audio/parse_wave_format_300_windows_test.go
+CASE=TestParseWaveFormatSubFormatOffset300
+
+run() { # $1=标签 $2=包内 -run 参数（空＝整包）
+  local tag="$1"
+  local out="$LOGS/$tag.txt"
+  local pat="$2"
+  local -a sel=()
+  if [ -n "$pat" ]; then sel=(-run "$pat"); fi
+  ( cd "$TREE" && PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" \
+      go test ./internal/audio/ "${sel[@]}" -v -count=1 -timeout 300s ) > "$out" 2>&1
+  local rc=$?
+  # 三数带尺名：顶层 --- PASS ／ 子测试 --- PASS ／ FAIL ／ SKIP（SKIP 单列＝A807 那条"被排除≠自己 SKIP"）
+  echo "@@@ tag=$tag rc=$rc top-PASS=$(grep -c '^--- PASS' "$out") sub-PASS=$(grep -c '^    --- PASS' "$out") FAIL=$(grep -c -- '--- FAIL' "$out") SKIP=$(grep -c -- '--- SKIP' "$out") builderr=$(grep -c '^# ' "$out") load0xc=$(grep -c '0xc0000135' "$out")"
+}
+
+mutate() {
+  local tag="$1" file="$2" expr="$3" anchor="$4" want="$5" pat="$6"
+  cp "$file" "$file.bak-$tag"
+  perl -i -pe "$expr" "$file" || { echo "@@@ tag=$tag LANDS=PERL-FAIL"; return 1; }
+  local landed; landed=$(grep -c -- "$anchor" "$file")
+  echo "@@@ tag=$tag LANDS-anchor=\"$anchor\" hits=$landed want=$want"
+  grep -n -- "$anchor" "$file" | sed 's/^/        LANDS: /'
+  if [ "$landed" != "$want" ]; then
+    echo "@@@ tag=$tag ABORT-not-landed"
+    cp "$file.bak-$tag" "$file"; cmp -s "$file.bak-$tag" "$file" && echo "@@@ tag=$tag restore=ABORT-ROLLBACK-IDENTICAL"
+    return 1
+  fi
+  run "$tag" "$pat"
+  grep -E -- '--- FAIL|tag = |floating = |^ok |^FAIL ' "$LOGS/$tag.txt" | sed 's/^/        LINE: /' | head -14
+  cp "$file.bak-$tag" "$file"
+  cmp -s "$file.bak-$tag" "$file" && echo "@@@ tag=$tag restore_cmp=IDENTICAL residual=$(grep -c -- "$anchor" "$file")" \
+    || echo "@@@ tag=$tag restore_cmp=DIFFERS-!!!STOP!!!"
+}
+
+echo '### N0 整包 pristine（射程＝只 ./internal/audio/；这一发同时是「本包 windows 档今天跑不跑得起来」那枚读数）'
+run N0-wholepkg-pristine ""
+
+echo; echo "### N1 M6b＝产码语义反形：SubFormat 那一读恒成常量 3（sub 仍被用，保证⛔ 又是装置红）"
+mutate N1-prod-constant-tag "$WASAPI" 's/uint16\(sub\.Data1\)/uint16(sub.Data1*0+3)/' 'sub\.Data1\*0\+3' 1 "$CASE"
+
+echo; echo "### N2 M4b＝waveFormatFloat 从 3 改成 1，跑**整包**：本包还有没有⛔ 这枚用例之外的尺钉住那枚常量"
+mutate N2-floatconst-wholepkg "$WASAPI" 's/^\twaveFormatFloat = 3$/\twaveFormatFloat = 1/' 'waveFormatFloat = 1' 1 ""
+
+echo; echo "### N3 终态：两枚文件 ↔ blob 对拉 ＋ 目标用例复跑"
+cd "$REPO" || exit 90
+for f in internal/audio/wasapi_windows.go internal/audio/parse_wave_format_300_windows_test.go; do
+  cmp -s "$TREE/$f" "$ROOT/head-$(basename "$f")" && echo "@@@ final $f = IDENTICAL" || echo "@@@ final $f = DIFFERS-!!!STOP!!!"
+done
+echo "@@@ residual: prod24=$(grep -c 'unsafe.Add(p, 24)' "$WASAPI") prod26=$(grep -c 'unsafe.Add(p, 26)' "$WASAPI") tagassign=$(grep -c 'f.tag = uint16(sub.Data1)' "$WASAPI") floatconst3=$(grep -c 'waveFormatFloat = 3' "$WASAPI") S1at24=$(grep -c 'data1At: 24' "$TEST") want3=$(grep -c 'wantTag: 3,' "$TEST")"
+run N3-final-recheck "$CASE"
+echo "rc=$?"

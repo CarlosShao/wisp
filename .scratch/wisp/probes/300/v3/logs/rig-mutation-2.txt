@@ -1,0 +1,63 @@
+#!/bash
+# 300-v3 R5b — 第二把突变台件（复用 rig-mutation.txt 那棵已验还原的树）
+# 为什么重跑这两发：rig-mutation.txt 里 M2/M3 被**我自己那道 LANDS 门**拦下
+# （`data1: 3, data1At: 26` 与 `wantTag: 0,` 这两串在 S4 那形里本来就存在 ⇒ 命中 2 枚 ≠ 期望 1 枚
+#  ⇒ 按 A805/A810 那条"落地先自证"的规矩当场作废、回滚并 cmp 验同值，⛔ 任何读数取自它）。
+# 这一把把锚换成**全树唯一**的形状，其余纪律不变。
+set -u
+ANCHOR=dce0f133b5123967e527ffbbcf9f3fb3ed4ce14c
+REPO="/d/work/workspace/projects plans/Wisp"
+ROOT=/tmp/wisp300-v3
+TREE=$ROOT/tree
+LOGS=$ROOT/logs
+WASAPI=$TREE/internal/audio/wasapi_windows.go
+TEST=$TREE/internal/audio/parse_wave_format_300_windows_test.go
+CASE=TestParseWaveFormatSubFormatOffset300
+
+run() {
+  local tag="$1" out="$LOGS/$tag.txt"
+  ( cd "$TREE" && PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" \
+      go test ./internal/audio/ -run "$CASE" -v -count=1 -timeout 300s ) > "$out" 2>&1
+  local rc=$?
+  echo "@@@ tag=$tag rc=$rc top-PASS=$(grep -c '^--- PASS' "$out") subtest-PASS=$(grep -c '^    --- PASS' "$out") FAIL=$(grep -c -- '--- FAIL' "$out")"
+  grep -- '--- FAIL\|tag = \|floating = ' "$out" | sed 's/^/        REDLINE: /' | head -12
+}
+
+mutate() {
+  local tag="$1" file="$2" expr="$3" anchor="$4" want="$5"
+  cp "$file" "$file.bak-$tag"
+  perl -i -pe "$expr" "$file" || { echo "@@@ tag=$tag LANDS=PERL-FAIL"; return 1; }
+  local landed; landed=$(grep -c -- "$anchor" "$file")
+  echo "@@@ tag=$tag LANDS-anchor=\"$anchor\" hits=$landed want=$want"
+  grep -n -- "$anchor" "$file" | sed 's/^/        LANDS: /'
+  if [ "$landed" != "$want" ]; then
+    echo "@@@ tag=$tag ABORT-not-landed (⛔ 读数不可引用)"
+    cp "$file.bak-$tag" "$file"; cmp -s "$file.bak-$tag" "$file" && echo "@@@ tag=$tag restore=ABORT-ROLLBACK-IDENTICAL"
+    return 1
+  fi
+  run "$tag"
+  cp "$file.bak-$tag" "$file"
+  cmp -s "$file.bak-$tag" "$file" && echo "@@@ tag=$tag restore_cmp=IDENTICAL residual=$(grep -c -- "$anchor" "$file")" \
+    || echo "@@@ tag=$tag restore_cmp=DIFFERS-!!!STOP!!!"
+}
+
+echo "### 起手：树仍须是 pristine（两枚内容锚各 1 命中）"
+echo "prod24=$(grep -c 'unsafe.Add(p, 24)' "$WASAPI") tagassign=$(grep -c 'f.tag = uint16(sub.Data1)' "$WASAPI") S1at24=$(grep -c 'data1At: 24' "$TEST") want3=$(grep -c 'wantTag: 3,' "$TEST")"
+
+echo; echo "### M2b 反形＝夹具侧：只把 S1 的 Data1 写到 **22**（⛔ 产码，全树唯一形状）"
+mutate M2b-fixture-S1-at-22 "$TEST" 's/bits: 32, data1: 3, data1At: 24/bits: 32, data1: 3, data1At: 22/' 'bits: 32, data1: 3, data1At: 22' 1
+
+echo; echo "### M3b 反形＝期望侧：只把 S1 的 wantTag 写成 **5**（⛔ 产码⛔ 夹具）"
+mutate M3b-expect-S1-want-5 "$TEST" 's/wantTag: 3,/wantTag: 5,/' 'wantTag: 5,' 1
+
+echo; echo "### M6 反形＝产码语义侧：把 SubFormat 那一读换成**常量 3**（S3 头顶 why 明说这一形不许绿）"
+mutate M6-prod-constant-tag "$WASAPI" 's/f\.tag = uint16\(sub\.Data1\)/f.tag = 3/; s/sub := \(\*windows\.GUID\)\(unsafe\.Add\(p, 24\)\)/_ = (*windows.GUID)(unsafe.Add(p, 24))/' 'f.tag = 3' 1
+
+echo; echo "### 终态对拉"
+cd "$REPO" || exit 90
+for f in internal/audio/wasapi_windows.go internal/audio/parse_wave_format_300_windows_test.go; do
+  cmp -s "$TREE/$f" "$ROOT/head-$(basename "$f")" && echo "@@@ final $f = IDENTICAL" || echo "@@@ final $f = DIFFERS-!!!STOP!!!"
+done
+echo "@@@ residual: prod24=$(grep -c 'unsafe.Add(p, 24)' "$WASAPI") prod26=$(grep -c 'unsafe.Add(p, 26)' "$WASAPI") tagassign=$(grep -c 'f.tag = uint16(sub.Data1)' "$WASAPI") S1at24=$(grep -c 'data1At: 24' "$TEST") want3=$(grep -c 'wantTag: 3,' "$TEST")"
+run M7-final-recheck
+echo "rc=$?"

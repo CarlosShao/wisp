@@ -1,0 +1,100 @@
+#!/bash
+# 300-v3 R5 定向突变台件（仓外导出树，⛔ 入库、⛔ 留在被跟踪文件里）
+# 攻的问题：AC#1/AC#2 的判据把「判据本体换成反形」之后还红不红（恒真性）。
+# 三件硬要求：① 输出先落文件；② finally 里逐字节还原并 cmp 证还原；③ 自带正控
+# （M0 pristine 该绿、M1 明知该红的要红）。每发 mutation 自带 LANDS 自证（内容锚）。
+set -u
+
+ANCHOR=dce0f133b5123967e527ffbbcf9f3fb3ed4ce14c   # 我起手锚，显式号，⛔「当时 HEAD」
+REPO="/d/work/workspace/projects plans/Wisp"
+ROOT=/tmp/wisp300-v3
+TREE=$ROOT/tree
+LOGS=$ROOT/logs
+WASAPI=$TREE/internal/audio/wasapi_windows.go
+TEST=$TREE/internal/audio/parse_wave_format_300_windows_test.go
+CASE=TestParseWaveFormatSubFormatOffset300
+
+mkdir -p "$TREE" "$LOGS"
+cd "$REPO" || exit 90
+echo "### build export tree from $ANCHOR"
+git archive "$ANCHOR" | tar -x -C "$TREE" || exit 91
+
+# A802 前置尺：导出树里 sherpa DLL 枚数（本包按 A805 是 harness-inert，仍数一发具名）
+echo "### dll-precount: $(ls "$TREE"/third_party/sherpa-onnx/*.dll 2>/dev/null | wc -l)"
+
+# A807 双锚：tree ↔ HEAD blob 逐字节对拉（证我读的就是盘上跟踪那版）
+for f in internal/audio/wasapi_windows.go internal/audio/parse_wave_format_300_windows_test.go; do
+  git show "$ANCHOR:$f" > "$ROOT/head-$(basename "$f")" 2>/dev/null
+  if cmp -s "$TREE/$f" "$ROOT/head-$(basename "$f")"; then
+    echo "### tree-vs-blob $f = IDENTICAL"
+  else
+    echo "### tree-vs-blob $f = DIFFERS"
+  fi
+done
+
+run() { # $1 = 标签
+  local tag="$1"
+  local out="$LOGS/$tag.txt"
+  ( cd "$TREE" && PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" \
+      go test ./internal/audio/ -run "$CASE" -v -count=1 -timeout 300s ) > "$out" 2>&1
+  local rc=$?
+  # 三数带尺名（⛔ 一把合计数）；grep 射程钉在当发自己的文件内（A805 那枚坑）
+  local top sub fail
+  top=$(grep -c "^--- PASS" "$out")
+  sub=$(grep -c "^    --- PASS" "$out")
+  fail=$(grep -c -- "--- FAIL" "$out")
+  echo "@@@ tag=$tag rc=$rc top-PASS=$top subtest-PASS=$sub FAIL=$fail load0xc=$(grep -c '0xc0000135' "$out")"
+}
+
+mutate() { # $1=标签 $2=文件 $3=perl表达式 $4=落地校验用的 grep 模式 $5=期望命中数
+  local tag="$1" file="$2" expr="$3" anchor="$4" want="$5"
+  cp "$file" "$file.bak-$tag"
+  # shellcheck disable=SC2086
+  perl -i -pe "$expr" "$file" || { echo "@@@ tag=$tag LANDS=PERL-FAIL"; return 1; }
+  local landed
+  landed=$(grep -c -- "$anchor" "$file")
+  echo "@@@ tag=$tag LANDS-anchor=\"$anchor\" hits=$landed want=$want"
+  grep -n -- "$anchor" "$file" | sed 's/^/        LANDS: /'
+  if [ "$landed" != "$want" ]; then
+    echo "@@@ tag=$tag ABORT-not-landed (⛔ 这一发的读数不可引用)"
+    cp "$file.bak-$tag" "$file"; cmp "$file.bak-$tag" "$file" && echo "@@@ tag=$tag restore=ABORT-ROLLBACK-IDENTICAL"
+    return 1
+  fi
+  run "$tag"
+  cp "$file.bak-$tag" "$file"
+  if cmp -s "$file.bak-$tag" "$file"; then
+    echo "@@@ tag=$tag restore_cmp=IDENTICAL residual-anchor-hits=$(grep -c -- "$anchor" "$file")"
+  else
+    echo "@@@ tag=$tag restore_cmp=DIFFERS-!!!STOP!!!"
+  fi
+}
+
+echo; echo "### pristine 内容锚（⛔ 信行号，只认形状）"
+echo "prod-offset-24-hits=$(grep -c 'unsafe.Add(p, 24)' "$WASAPI")"
+echo "prod-offset-26-hits=$(grep -c 'unsafe.Add(p, 26)' "$WASAPI")"
+echo "S1-fixture-24-hits=$(grep -c 'data1: 3, data1At: 24' "$TEST")"
+echo "S1-wantTag-3-hits=$(grep -c 'wantTag: 3,' "$TEST")"
+
+echo; echo "### M0 pristine 正控（该绿：4 枚子测试全 PASS）"
+run M0-pristine
+
+echo; echo "### M1 产码偏移 24→26＝已知该红那一形（历史凭据 a1r/v1/orch 三把，我这把再证一次台件是活的）"
+mutate M1-prod-offset-26 "$WASAPI" 's/unsafe\.Add\(p, 24\)/unsafe.Add(p, 26)/' 'unsafe\.Add(p, 26)' 1
+
+echo; echo "### M2 反形＝夹具那一侧：只把 S1 的 Data1 写到 26，产码⛔ 动（判据本体换成反形）"
+mutate M2-fixture-S1-at-26 "$TEST" 's/data1: 3, data1At: 24/data1: 3, data1At: 26/' 'data1: 3, data1At: 26' 1
+
+echo; echo "### M3 反形＝期望那一侧：只把 S1 的 wantTag 写成 0，产码与夹具⛔ 动"
+mutate M3-expect-S1-want-0 "$TEST" 's/wantTag: 3,/wantTag: 0,/' 'wantTag: 0,' 1
+
+echo; echo "### M4 反形＝下游那枚 derived 断言的射程：把 waveFormatFloat 换成 1（tag 仍读对，floating 语义被偷）"
+mutate M4-floatconst-1 "$WASAPI" 's/^\twaveFormatFloat = 3$/\twaveFormatFloat = 1/' 'waveFormatFloat = 1' 1
+
+echo; echo "### 终态：整棵树 ↔ blob 再对拉一发（⛔ 任何 mutation 残留）"
+for f in internal/audio/wasapi_windows.go internal/audio/parse_wave_format_300_windows_test.go; do
+  cmp -s "$TREE/$f" "$ROOT/head-$(basename "$f")" && echo "@@@ final $f = IDENTICAL" || echo "@@@ final $f = DIFFERS-!!!STOP!!!"
+done
+echo "@@@ residual: 24-hits=$(grep -c 'unsafe.Add(p, 24)' "$WASAPI") 26-hits=$(grep -c 'unsafe.Add(p, 26)' "$WASAPI") S1-24-hits=$(grep -c 'data1: 3, data1At: 24' "$TEST") wantTag3-hits=$(grep -c 'wantTag: 3,' "$TEST") floatconst3=$(grep -c 'waveFormatFloat = 3' "$WASAPI")"
+echo "@@@ leftover-backups=$(ls "$TREE"/internal/audio/*.bak-* 2>/dev/null | wc -l)（只建不删，清理归编排者）"
+run M5-final-recheck
+echo "rc=$?"

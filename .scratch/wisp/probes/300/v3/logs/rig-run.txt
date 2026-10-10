@@ -1,0 +1,47 @@
+### build export tree from dce0f133b5123967e527ffbbcf9f3fb3ed4ce14c
+### dll-precount: 0
+### tree-vs-blob internal/audio/wasapi_windows.go = IDENTICAL
+### tree-vs-blob internal/audio/parse_wave_format_300_windows_test.go = IDENTICAL
+
+### pristine 内容锚（⛔ 信行号，只认形状）
+prod-offset-24-hits=1
+prod-offset-26-hits=0
+S1-fixture-24-hits=1
+S1-wantTag-3-hits=1
+
+### M0 pristine 正控（该绿：4 枚子测试全 PASS）
+@@@ tag=M0-pristine rc=0 top-PASS=1 subtest-PASS=4 FAIL=0 load0xc=0
+
+### M1 产码偏移 24→26＝已知该红那一形（历史凭据 a1r/v1/orch 三把，我这把再证一次台件是活的）
+@@@ tag=M1-prod-offset-26 LANDS-anchor="unsafe\.Add(p, 26)" hits=1 want=1
+        LANDS: 211:		sub := *(*windows.GUID)(unsafe.Add(p, 26))
+@@@ tag=M1-prod-offset-26 rc=1 top-PASS=0 subtest-PASS=0 FAIL=5 load0xc=0
+@@@ tag=M1-prod-offset-26 restore_cmp=IDENTICAL residual-anchor-hits=0
+
+### M2 反形＝夹具那一侧：只把 S1 的 Data1 写到 26，产码⛔ 动（判据本体换成反形）
+@@@ tag=M2-fixture-S1-at-26 LANDS-anchor="data1: 3, data1At: 26" hits=2 want=1
+        LANDS: 99:			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 3, data1At: 26},
+        LANDS: 117:			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 3, data1At: 26},
+@@@ tag=M2-fixture-S1-at-26 ABORT-not-landed (⛔ 这一发的读数不可引用)
+@@@ tag=M2-fixture-S1-at-26 restore=ABORT-ROLLBACK-IDENTICAL
+
+### M3 反形＝期望那一侧：只把 S1 的 wantTag 写成 0，产码与夹具⛔ 动
+@@@ tag=M3-expect-S1-want-0 LANDS-anchor="wantTag: 0," hits=2 want=1
+        LANDS: 100:			wantTag: 0,
+        LANDS: 118:			wantTag: 0,
+@@@ tag=M3-expect-S1-want-0 ABORT-not-landed (⛔ 这一发的读数不可引用)
+@@@ tag=M3-expect-S1-want-0 restore=ABORT-ROLLBACK-IDENTICAL
+
+### M4 反形＝下游那枚 derived 断言的射程：把 waveFormatFloat 换成 1（tag 仍读对，floating 语义被偷）
+@@@ tag=M4-floatconst-1 LANDS-anchor="waveFormatFloat = 1" hits=1 want=1
+        LANDS: 98:	waveFormatFloat = 1
+@@@ tag=M4-floatconst-1 rc=0 top-PASS=1 subtest-PASS=4 FAIL=0 load0xc=0
+@@@ tag=M4-floatconst-1 restore_cmp=IDENTICAL residual-anchor-hits=0
+
+### 终态：整棵树 ↔ blob 再对拉一发（⛔ 任何 mutation 残留）
+@@@ final internal/audio/wasapi_windows.go = IDENTICAL
+@@@ final internal/audio/parse_wave_format_300_windows_test.go = IDENTICAL
+@@@ residual: 24-hits=1 26-hits=0 S1-24-hits=1 wantTag3-hits=1 floatconst3=1
+@@@ leftover-backups=4（只建不删，清理归编排者）
+@@@ tag=M5-final-recheck rc=0 top-PASS=1 subtest-PASS=4 FAIL=0 load0xc=0
+rc=0

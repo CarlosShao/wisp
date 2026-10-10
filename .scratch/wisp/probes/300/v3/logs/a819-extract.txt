@@ -1,0 +1,25 @@
+## A819｜2026-10-10 16:4x｜收三枚交件（`301-v3`／`298-r1`／`302-a1`）＋★★**票 302 的前提被盘上字节改写，顺带量到一枚"页面→Go 回执"的真回归并已在本机复现**⇒ 立票 303＋★我自己两处更正（"三枚都是新可见"只对 1 枚／"环境差"那句是拿旧码探针当现行读数）＋四枚由我代腿取的 Go 面读数
+
+**触发**：`301-v3`（票 301 非实现者验收，`aea74556`→`514d3c84`→`83cd66a8`）、`298-r1`（票 298 格式腿四笔 `24ae75b7`→`18d43f8e`→`c14fd204`→`1b311587`）、`302-a1`（票 302 `AC#0` 只读普查，`8267be8a`）同批交回；我收件时按老规矩**先把腿的承重读数自己复跑一遍再落账**，其中三把复跑把我的票面打红了。
+
+### ① ★★最重要的一条：那三枚 CI 红**今天在我这台机器上也红**（⇒ ⛔ 环境差，且⛔ 只有搬档这一治法）
+
+- 尺＝编排者现跑（件＝`probes/302/orch/g4-local-three-cases.txt`）：`PATH` 铺 `third_party/sherpa-onnx`＋`build`，`go test -count=1 -timeout 420s -v -run '<三枚>'  ./cmd/wisp/` ⇒ **`rc=1`、三枚全 `--- FAIL (20.01s)`、红句逐字同 CI**（`no report "ac13-probe" … (what DID arrive at the door: nothing at all)`／`"ac14r-0"`／`"ac14-push"`）。
+  射程口径：被测＝工作树，而 `git status --porcelain -- cmd internal scripts .github docs` 现量 **0 行** ⇒ 工作树≡HEAD；`tasklist` 起手 `wisp.exe`／`balldebug.exe` 各 0 枚。**⚠ 单发，复现率未量**（＝票 303 `AC#0` ③）。
+- ★**基线那一发（`cc315261`，10-06 的 CI）同两枚是 PASS 的**，且逐字带着页面自己的话（尺＝`^--- [A-Z]*: <名>` 在两发归档切片里各打一遍，件＝`probes/301/orch/logs/ci-{baseline,after}-cli-block.txt`；两发 Runner Image／agent 版本逐字相同 ⇒ "镜像漂"⛔ 依据）：
+  `TestAC14AwaitedBindingReplyReachesThePage` **PASS(1.25s，`REPLIED,REPLIED,REPLIED`／`Go's handler was reached by 3 of the 3 real requests`)→FAIL(20.04s)**；`TestAC14GoSideEvalPushReachesThePage` **PASS(0.97s，`title="PUSHED-33R5-OK"`)→FAIL(20.03s)**；同发还有 `machine-wide msedgewebview2=7`、`same HWND 0xc014c across hide->re-show=true` ⇒ **托管 runner 上窗建得起、回执拿得到**（`302-a1` 的"形①＝runner 没有 Runtime"就此**否证**，任何文案⛔ 许再写那句）。
+- ⇒ 票 302 在盘上是**两件事**：归口／放置 ＋ **一枚未归因回归**。回归那一半**立成票 303**（本机可复现 ⇒ 归因⛔ 依赖 CI：bisect 在**仓外** clone 里做，最小复现集挑⛔ 依赖 `frontend/dist` 的那枚——`TestAC13ColdStart…` 依赖 dist 产物字节，干净 clone 里它会走具名跳过、复现⛔ 出来）。
+- ⚠〔读码推的，⛔ 实测〕**产品形状候选**：这道门（票 35 `installPanelTransport`／消息钩子那条边）是面板与宿主共用的 ⇒ 最可能的用户可见形＝"把面板叫出来之后点什么都没反应"。把这句判死＝票 303 `AC#2` 的一格，⛔ 现在当已知。
+
+### ② ★两处更正记在我名下（⛔ 原句不改，本节＝现行读数）
+
+1. 我 16:0x 在证据件 §4／票 302 `:11` 写的"三枚都是**新可见**、⛔ 是新坏"——**只对 1 枚成立**（`TestAC13ColdStart…` 那枚是 `--- SKIP`→`FAIL`；另两枚基线是**绿**的）。⇒ "别读成退步"那句提醒本身没错，⛔ 该套在三枚上。
+2. 票 302 `:15` 那句"本机同码⛔ 红 ⇒ 这是环境差"引的是 `33-p1`，那是**旧码**的读数，⛔ 覆盖当前 HEAD ⇒ **作废**。
+3. ★同族第四次（射程写宽）之外，这次是**来源层过期**：⛔ 拿"某枚探针在旧码上成立"替"现行码上也成立"背书。**定式：凡在票面写"本机⛔ 红／本机红"，必须当场现跑一发并把件名写进去；引用别枚探针的读数时⛔ 离开它那一行的锚点日期。**
+
+### ③ 四枚由我代腿取的 Go 面读数（腿⛔ go 编译面，欠账归我）
+
+| # | 尺（逐字） | 读数 | 买到什么 |
+|---|---|---|---|
+| `G1` | `go vet -tags winlive ./cmd/wisp/ ./internal/ball/`（件 `probes/302/orch/g1-vet-winline.txt`） | **rc=0**，输出 0 字节 | 票 111 `AC#11` 那道编译门在 HEAD 上本机仍是绿的 |
+| `G2` | `go test -tags winlive -list '.*' ./cmd/wisp/`（件 `g2-list-winline.txt`） | **rc=0／名册 301 枚／含那三枚名**；★同尺**正控**＝winlive-tagged 文件里的用例确实出现（`cmd/wisp/panel_host_windows_live_test.go` 的 `TestPanelHostWebViewChildrenExitWithinTwoSeconds_WinLive`） | 票 302 `AC#2` 要的"搬进 `winlive` 仍进编译面"那一发的**形状已验通**（⛔ "既⛔ 跑也⛔ 编"那枚假绿） |

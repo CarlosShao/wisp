@@ -1,0 +1,15 @@
+### 300-v3 终态锚（与起手同形）
+date: Sat Oct 10 17:20:24 CST 2026
+HEAD-full: 48ee655edc8ba6ebd903df23a539dc857cbe98d1
+HEAD-ad: Sat Oct 10 17:14:06 2026 +0800
+HEAD-subject: 303-a1 AC#0 复现钉死（票 303 ①②③④ 四小格各带尺与件）
+porcelain-all-lines: 848
+porcelain-scoped-lines(cmd internal scripts tools): 0
+tasklist-wisp.exe=0
+tasklist-balldebug.exe=0
+my-commit-rosters:
+diff-vs-anchor -- internal cmd scripts tools: 0 lines
+tracked-files-in-v3=2
+files-on-disk-in-v3=14
+zero-byte-files=0
+rc=0
