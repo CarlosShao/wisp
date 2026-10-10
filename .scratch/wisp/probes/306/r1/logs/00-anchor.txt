@@ -1,0 +1,57 @@
+# 306-r1 logs/00-anchor.txt 时刻=2026-10-10 22:49:23 +0800
+HEAD_sha=5480434f
+HEAD_full=5480434f82f2a2344cb78701decc97b6acba2958
+branch=dev
+dispatch_anchor=a81c2980
+--- git status --porcelain -- internal cmd docs scripts .github ---
+rc_porcelain_scoped=0
+porcelain_scoped_lines=0
+--- git status --porcelain (whole tree, others dirty surfaces, NOT touched by this leg) ---
+rc_porcelain_full=0
+porcelain_full_lines=828
+--- blob vs worktree cmp of wavinjector.go ---
+rc_blob_dump=0
+rc_blob_vs_worktree_cmp=0
+--- content anchors of the three in-line literals (HEAD blob, line numbers as of this anchor) ---
+			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+				fmtTag = binary.LittleEndian.Uint16(data[body+24 : body+26])
+	case fmtTag == 3 && bits == 32:
+rc_sed_anchors=0
+## drift readings (re-run at the moment of re-anchor)
+HEAD_sha_now=5f891575
+HEAD_full_now=5f891575466f2adc49765a8cc3cd83b73565dcf6
+dispatch_anchor=a81c2980 drifted_to=5480434f
+--- git diff --name-only a81c2980 HEAD -- internal ---
+rc_diff_internal=0
+diff_internal_lines=0 (0 = internal/ byte-identical between the two anchors)
+--- git diff --name-only a81c2980 HEAD (whole tree) ---
+.scratch/wisp/issues/303-the-page-to-go-reply-hop-died-between-cc31526-and-bcd0a543-and-now-fails-on-the-owner-machine-too.md
+.scratch/wisp/probes/305/a1/00-anchor.md
+.scratch/wisp/probes/305/a1/logs/l1-anchor.txt
+.scratch/wisp/probes/305/a1/logs/l2-call-sites.txt
+.scratch/wisp/probes/305/a1/logs/l3-library-hops.txt
+.scratch/wisp/probes/305/a1/logs/l4-earlier-green-readings.txt
+.scratch/wisp/probes/305/a1/logs/l5-suspect-70b00885.txt
+.scratch/wisp/probes/305/a1/logs/l6-entry-html-surface.txt
+.scratch/wisp/probes/305/a1/logs/l7-anchor-verify-head-blob.txt
+.scratch/wisp/probes/306/orch/msgs/cm-40bz.txt
+.scratch/wisp/probes/306/orch/msgs/r3-A828.md
+.scratch/wisp/probes/306/orch/msgs/r3-handover-40bz.md
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+rc_diff_whole=0
+--- re-check the three content anchors on current HEAD blob ---
+			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+				fmtTag = binary.LittleEndian.Uint16(data[body+24 : body+26])
+	case fmtTag == 3 && bits == 32:
+rc_sed_anchors_head=0
+rc_blob_vs_worktree_cmp_head=0
+--- concurrent-writer check on the lane (name-only log, 3 commits) ---
+9a442923 300-r2 落 AC#6 的 C2 形：新增 internal/audio/wave_format_float_300_windows_test.go（//go:build windows，期望侧三枚字面量逐字按 mmreg.h:2110/2376/2418 抄录、经侧⛔ 读那三枚常量，观察侧＝waveFormatFloat/waveFormatExt/waveFormatPCM 本身；红句点名常量；顺带钉 waveFormatPCM 的值而⛔ 删它）；门①go vet rc=0、门②定向用例 pristine rc=0（顶层 PASS 1、子测试 PASS 5）；10-shape 具名两枚造过又拆掉的形状（常量做 map 键会把突变跑成编译错误而⛔ 是一句红）与'观察侧到不了 Drain 那行'那一枚残余
+internal/audio/wave_format_float_300_windows_test.go
+64ceaacd 收 300-v2 ⇒ 票 300 AC#2 翻勾＋★★我自己那两句假话被这枚腿顶回（凭据一直在我自己那份按节表里）＋编排者代笔一笔注释修正＋A810／§4.0bj
+internal/audio/parse_wave_format_300_windows_test.go
+028529fc fix(audio): read WAVEFORMATEXTENSIBLE SubFormat at byte 24, not 26 (ticket 300 AC#2)
+internal/audio/parse_wave_format_300_windows_test.go
+internal/audio/wasapi_windows.go
+rc_log_lane=0

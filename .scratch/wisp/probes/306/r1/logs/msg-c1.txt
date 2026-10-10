@@ -1,0 +1,13 @@
+306-r1 起手锚（AC#4 台面那一半的第 1 笔，commit-first）
+
+台面＝HEAD 5480434f（dev）。派单锚号 a81c2980 在本腿两次读数之间漂移一枚
+（漂移源＝编排者自己那笔 A828 登记，它同时把 306-r1 派出来），以盘上为准重锚，
+并现量证明漂移不影响本票：git diff --name-only a81c2980 5480434f -- internal = 0 行，
+wavinjector.go 的 :192 / :196 / :218 三枚内容锚在新旧 blob 上逐字相同。
+
+scoped porcelain = 0 行；blob vs worktree cmp rc = 0；
+整棵树 porcelain = 828 行（design/** 与别家 probes/** ＝ 别人的脏面，本腿一枚不碰）；
+车道在飞写者自查 = 最近三枚碰 internal/audio 的全是票 300 那一程。
+
+本笔只写 .scratch/wisp/probes/306/r1/**（00-anchor.md + logs/00-*.txt），
+不碰任何产码、不碰票面 AC 框。
