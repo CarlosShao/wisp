@@ -1,0 +1,9 @@
+303-v1(2/4): AC#4 那一发补齐成「各两发＋同台面」＝新增红 0 枚；判据完整性独立取证
+
+- logs/full-{before-1,before-2}.txt 台面＝仓外干净 clone ~/wisp-303-v1 detached=cf46c24a；两发顶层尺**逐字同名**（267 PASS/18 FAIL/3 SKIP，rc=1），红名交集＝18 枚。
+- logs/full-{after-1,after-2}.txt 同一枚 clone detached=807497c1；269/17/2 与 270/16/2（rc=1），红名交集＝16 枚。
+- ★新增红（after 交集 ∖ before 交集）＝**0 枚**；被修好＝TestAC14AwaitedBindingReplyReachesThePage ＋ TestPanelHostRealWindowHopAndLifecycle（本票边界段授权的那枚形状迁移，本机 clone 台面 1002.355 ms 走进预算内）。
+- after-1 单发多红一枚＝TestTicket223HandEditedFsLooseningCostsAnL2Card（4 发里只这 1 发红；同发逐字带 goroutine outside the D38 roster (leak symptom) goroutine=mockllm-stdout-reader＝票 303 边界段明写⛔ 本票射程那一族）。
+- SKIP 面差具名：改前含 TestPanelHostLatencyPercentilesAC2、改后不含（负载敏感）；AC13 在本台面**四发全具名 SKIP**（the embed resolves no entry，clone 无 frontend/dist）⇒ 与母仓台面不同，⛔ 混进新增红。
+- 02-criteria-integrity.txt：判据本体两档（panel_resident_windows_test.go／panel_host_windows_test.go）自基线 cc315261 起 commits=0；thresholds.go／PLAN.md／docs/specs 同 commits=0；e3341368 名册里 ⛔ 测试件⛔ 阈值件⛔ 档（grep -cE 命中 0）。
+- 03-fb2fb802-culprit-diff.txt：造成回归那一笔的产码半边逐字（那枚无布尔、把**一切** postMessage 折回 wispDispatch 的覆盖层原文）。

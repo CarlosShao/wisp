@@ -1,0 +1,27 @@
+### gate-A: files whose bytes the fix must not touch, commits since baseline cc315261
+docs/PLAN.md                                                     commits=0
+docs/specs                                                       commits=0
+internal/observe/thresholds.go                                   commits=0
+cmd/wisp/panel_resident_windows_test.go                          commits=0
+cmd/wisp/panel_host_windows_test.go                              commits=0
+cmd/wisp/panel_transport_35r1_test.go                            commits=1
+cmd/wisp/panel_transport_35r2_test.go                            commits=4
+cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go     commits=1
+
+### gate-B: verbatim D32 budget lines in the instrument (HEAD object layer)
+664:	if coldMs > 1500 {
+665:		t.Errorf("cold bring-up %.1f ms exceeds D32 panel cold budget 1500 ms", coldMs)
+791:		t.Errorf("hot re-show %.1f ms exceeds D32 panel hot budget 200 ms", hotMs)
+962:// assertions use (cold 1500 ms, hot 200 ms) - at P50 and P95 instead of one
+999:	t.Logf("AC#2 percentiles over %d runs (nearest-rank): cold P50=%.3f P95=%.3f (budget 1500) | hot P50=%.3f P95=%.3f (budget 200)",
+1004:	if coldP95 > 1500 {
+1005:		t.Errorf("cold P95 %.3f ms over %d runs exceeds the D32 panel cold budget 1500 ms (the single-run assertion is not the only gate: the tail is what AC#2 asks for)", coldP95, len(cold))
+1008:		t.Errorf("hot re-show P95 %.3f ms over %d runs exceeds the D32 panel hot budget 200 ms", hotP95, len(hot))
+
+### gate-C: thresholds.go verbatim (HEAD object layer)
+23:	memCapPanel        int64 = 600 << 20
+56:		return memCapPanel
+144:		// appendix B.2: ~1.3ms CPU per read, i.e. 0.52% all-core at a 250ms
+
+### gate-D: e3341368 touched NONE of these
+0

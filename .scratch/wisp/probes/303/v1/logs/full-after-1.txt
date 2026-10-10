@@ -1650,3 +1650,421 @@ time=2026-10-10T20:18:41.497+08:00 level=INFO msg="pre-migration backup written"
 time=2026-10-10T20:18:41.503+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:18:41Z duration_ms=6
 time=2026-10-10T20:18:41.508+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
 time=2026-10-10T20:18:41.510+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:19:21.544+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart4221702332\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:19:21.565+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:01.638+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket101SessionGrantDoesNotCrossRestart (81.69s)
+=== RUN   TestTicket101ModeSwitchUsesTheRealL2Gate
+time=2026-10-10T20:20:02.930+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:02 mockllm: serving on http://127.0.0.1:60448 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:02.955+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate846267500\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:02.984+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate846267500\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:02.990+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:02Z duration_ms=5
+time=2026-10-10T20:20:02.998+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate846267500\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:03.003+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:02Z duration_ms=5
+time=2026-10-10T20:20:03.008+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:03.010+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket101ModeSwitchUsesTheRealL2Gate (1.74s)
+=== RUN   TestTicket101UnreadableModeFailsLoudlyAndStrict
+time=2026-10-10T20:20:04.668+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:04 mockllm: serving on http://127.0.0.1:54424 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:04.694+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2425088888\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:04.723+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2425088888\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:04.731+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:04Z duration_ms=7
+time=2026-10-10T20:20:04.740+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2425088888\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:04.746+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:04Z duration_ms=6
+time=2026-10-10T20:20:04.750+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:04.754+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    run_mode101_test.go:604: control log for reference (no fail-closed line expected here):
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        echo: ## scene
+        当前时间：2026-10-10 12:20 +00:00
+        wisp run: 任务 ba0195bf-deab-4e1c-83d3-41ece39c70b8 结束（completed，1 轮，0 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+        [audit] wisp run: SESSION-MINT id=sess_a11ba08763176f2ca11fefe375bb39ad (结束点＝本进程退出，A435 第 2 条)
+        [audit] p
+=== RUN   TestTicket101UnreadableModeFailsLoudlyAndStrict/存储损坏
+time=2026-10-10T20:20:04.780+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict存储损坏1882649155\001\logs min_level=info early_records=0 early_dropped=0
+=== RUN   TestTicket101UnreadableModeFailsLoudlyAndStrict/版本不认识
+time=2026-10-10T20:20:04.791+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict版本不认识308004414\001\logs min_level=info early_records=0 early_dropped=0
+=== RUN   TestTicket101UnreadableModeFailsLoudlyAndStrict/权限读不到
+time=2026-10-10T20:20:04.804+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict权限读不到315747476\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket101UnreadableModeFailsLoudlyAndStrict (1.42s)
+    --- PASS: TestTicket101UnreadableModeFailsLoudlyAndStrict/存储损坏 (0.01s)
+    --- PASS: TestTicket101UnreadableModeFailsLoudlyAndStrict/版本不认识 (0.01s)
+    --- PASS: TestTicket101UnreadableModeFailsLoudlyAndStrict/权限读不到 (0.01s)
+=== RUN   TestRunTextTaskTextPathEndToEnd
+time=2026-10-10T20:20:06.146+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:06 mockllm: serving on http://127.0.0.1:54429 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:06.169+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd1503231049\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:06.196+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd1503231049\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:06.203+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:06Z duration_ms=7
+time=2026-10-10T20:20:06.211+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd1503231049\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:06.217+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:06Z duration_ms=5
+time=2026-10-10T20:20:06.221+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:06.222+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:06.255+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestRunTextTaskTextPathEndToEnd (1.45s)
+=== RUN   TestRunTextTaskFailNextIsClassified
+time=2026-10-10T20:20:07.595+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:07 mockllm: serving on http://127.0.0.1:54432 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:07.622+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified3794817938\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:07.649+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified3794817938\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:07.655+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:07Z duration_ms=6
+time=2026-10-10T20:20:07.663+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified3794817938\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:07.667+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:07Z duration_ms=4
+time=2026-10-10T20:20:07.675+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:07.676+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:07.714+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestRunTextTaskFailNextIsClassified (1.46s)
+=== RUN   TestHostDispatchThroughTheAssembledBridge
+time=2026-10-10T20:20:09.033+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:09 mockllm: serving on http://127.0.0.1:54423 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:09.056+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge2178493507\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:09.083+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge2178493507\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:09.091+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:09Z duration_ms=8
+time=2026-10-10T20:20:09.099+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge2178493507\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:09.104+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:09Z duration_ms=4
+time=2026-10-10T20:20:09.108+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:09.111+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:09.153+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestHostDispatchThroughTheAssembledBridge (1.44s)
+=== RUN   TestComposedGateBlocksAWriteForTwoSeconds
+time=2026-10-10T20:20:10.495+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:10 mockllm: serving on http://127.0.0.1:62739 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:10.521+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds1759133722\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:10.546+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds1759133722\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:10.553+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:10Z duration_ms=6
+time=2026-10-10T20:20:10.561+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds1759133722\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:10.567+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:10Z duration_ms=5
+time=2026-10-10T20:20:10.572+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:10.574+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:12.651+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestComposedGateBlocksAWriteForTwoSeconds (3.50s)
+=== RUN   TestRunTextTaskKeyResolvesInTheStore
+time=2026-10-10T20:20:14.161+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:14 mockllm: serving on http://127.0.0.1:62742 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:14.191+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore3475971855\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:14.232+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore3475971855\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:14.244+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:14Z duration_ms=11
+time=2026-10-10T20:20:14.256+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore3475971855\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:14.261+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:14Z duration_ms=5
+time=2026-10-10T20:20:14.264+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:14.267+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestRunTextTaskKeyResolvesInTheStore (1.64s)
+=== RUN   TestMissingBlobFailsUnconfiguredNeverSilently
+time=2026-10-10T20:20:15.640+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:15 mockllm: serving on http://127.0.0.1:62746 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:15.670+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestMissingBlobFailsUnconfiguredNeverSilently1418815015\002\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestMissingBlobFailsUnconfiguredNeverSilently (1.40s)
+=== RUN   TestSecretArgvCarriesNoSecret
+    secret_argv_windows_test.go:271: no native DLLs in ..\..\third_party\sherpa-onnx - run scripts/fetch-deps.ps1 first (glob err <nil>)
+--- FAIL: TestSecretArgvCarriesNoSecret (4.47s)
+=== RUN   TestSecretRealBinaryRefusesValueFlag
+    secret_argv_windows_test.go:367: no native DLLs in ..\..\third_party\sherpa-onnx - run scripts/fetch-deps.ps1 first (glob err <nil>)
+--- FAIL: TestSecretRealBinaryRefusesValueFlag (4.49s)
+=== RUN   TestProcessCommandLineProbeHelperProcess
+--- PASS: TestProcessCommandLineProbeHelperProcess (0.00s)
+=== RUN   TestProcessCommandLineProbeDetectsAPlantedValue
+--- PASS: TestProcessCommandLineProbeDetectsAPlantedValue (0.08s)
+=== RUN   TestSecretSetGetListRoundTrip
+--- PASS: TestSecretSetGetListRoundTrip (0.03s)
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/traversal
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/dotdot
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/separator
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/space
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/empty
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/empty_stdin
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/multiline_stdin
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/no_name
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/two_names
+--- PASS: TestSecretSetRejectsBadNamesAndEmptyInput (0.01s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/traversal (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/dotdot (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/separator (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/space (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/empty (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/empty_stdin (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/multiline_stdin (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/no_name (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/two_names (0.00s)
+=== RUN   TestSecretSetConfirmationMismatchStoresNothing
+--- PASS: TestSecretSetConfirmationMismatchStoresNothing (0.00s)
+=== RUN   TestSecretSetWithoutConsolePointsAtFromStdin
+--- PASS: TestSecretSetWithoutConsolePointsAtFromStdin (0.00s)
+=== RUN   TestSecretFlagsAreBoolOnly
+--- PASS: TestSecretFlagsAreBoolOnly (0.00s)
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--value
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--secret
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--key
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/-k
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--api-key
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--from-file
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--file
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--stdin
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/positional
+--- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--value (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--secret (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--key (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/-k (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--api-key (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--from-file (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--file (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--stdin (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/positional (0.00s)
+=== RUN   TestSecretFromStdinWritesNoIntermediateFile
+--- PASS: TestSecretFromStdinWritesNoIntermediateFile (0.50s)
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/bad_dpapi_decrypt_(corrupted_blob,_non-portable)
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/bad_dpapi_decrypt_(portable,_P13)
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/unwritable_store_dir
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob)
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/store_write_failure_surfaces_the_ref_only
+--- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext (0.06s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/bad_dpapi_decrypt_(corrupted_blob,_non-portable) (0.01s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/bad_dpapi_decrypt_(portable,_P13) (0.01s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/unwritable_store_dir (0.01s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob) (0.01s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/store_write_failure_surfaces_the_ref_only (0.01s)
+=== RUN   TestSecretUnsetRefusesWhileReferenced
+=== RUN   TestSecretUnsetRefusesWhileReferenced/refused_while_referenced
+=== RUN   TestSecretUnsetRefusesWhileReferenced/refused_for_a_voice.realtime_reference_too
+=== RUN   TestSecretUnsetRefusesWhileReferenced/an_unreadable_config_fails_closed
+=== RUN   TestSecretUnsetRefusesWhileReferenced/force_deletes_and_writes_an_audit_line
+=== RUN   TestSecretUnsetRefusesWhileReferenced/unreferenced_delete_is_audited_at_info
+=== RUN   TestSecretUnsetRefusesWhileReferenced/no_config_at_all_means_no_references
+--- PASS: TestSecretUnsetRefusesWhileReferenced (0.04s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/refused_while_referenced (0.00s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/refused_for_a_voice.realtime_reference_too (0.00s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/an_unreadable_config_fails_closed (0.00s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/force_deletes_and_writes_an_audit_line (0.00s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/unreferenced_delete_is_audited_at_info (0.01s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/no_config_at_all_means_no_references (0.01s)
+=== RUN   TestSecretSameNameUnderThreeEnvsIsThreeBlobs
+--- PASS: TestSecretSameNameUnderThreeEnvsIsThreeBlobs (0.04s)
+=== RUN   TestSecretPortableModeUsesTicket06Seam
+--- PASS: TestSecretPortableModeUsesTicket06Seam (0.02s)
+=== RUN   TestSecretEndToEndConfigRefResolvesAtRequestTime
+--- PASS: TestSecretEndToEndConfigRefResolvesAtRequestTime (0.01s)
+=== RUN   TestSecretUsageAndUnknownSubcommand
+--- PASS: TestSecretUsageAndUnknownSubcommand (0.00s)
+=== RUN   TestSecretOverwriteIsAnnounced
+--- PASS: TestSecretOverwriteIsAnnounced (0.02s)
+=== RUN   TestSLO156FixtureChildrenDoWhatTheirNamesSay
+--- PASS: TestSLO156FixtureChildrenDoWhatTheirNamesSay (0.06s)
+=== RUN   TestSLO156ExitedAsksTheOSForAChildNobodyReaped
+--- PASS: TestSLO156ExitedAsksTheOSForAChildNobodyReaped (0.05s)
+=== RUN   TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+    slo_exit_os_156_windows_test.go:206: Wait on a killed child reports the kill as an error (exit status 1); that is the fixture, not a failure
+--- PASS: TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees (0.01s)
+=== RUN   TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn
+--- PASS: TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn (0.05s)
+=== RUN   TestSLO156WaitReadyNamesTheDeadSubjectToo
+--- PASS: TestSLO156WaitReadyNamesTheDeadSubjectToo (0.06s)
+=== RUN   TestSLO144EveryPrefixOfARealReportIsUnwrittenNotCorrupt
+--- PASS: TestSLO144EveryPrefixOfARealReportIsUnwrittenNotCorrupt (0.03s)
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/html-head
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/stray-comma
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/wrong-type
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/trailing-garbage
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/second-document
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/complete-but-no-state-report
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/empty-object-is-a-finished-lie
+--- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/html-head (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/stray-comma (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/wrong-type (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/trailing-garbage (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/second-document (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/complete-but-no-state-report (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/empty-object-is-a-finished-lie (0.00s)
+=== RUN   TestSLO144LoopRetriesAnUnfinishedFileAndReadsTheWholeReport
+--- PASS: TestSLO144LoopRetriesAnUnfinishedFileAndReadsTheWholeReport (0.03s)
+=== RUN   TestSLO144LoopGiveUpSentencesOnRealFiles
+--- PASS: TestSLO144LoopGiveUpSentencesOnRealFiles (0.05s)
+=== RUN   TestSLO144CorruptReportIsJudgedOnTheFirstRead
+--- PASS: TestSLO144CorruptReportIsJudgedOnTheFirstRead (0.00s)
+=== RUN   TestSLO144UnfinishedReportKeepsPollingThenNamesBudgetAndBytes
+--- PASS: TestSLO144UnfinishedReportKeepsPollingThenNamesBudgetAndBytes (0.06s)
+=== RUN   TestSLO144ReportThatArrivesAfterMissingReadingsIsCollected
+--- PASS: TestSLO144ReportThatArrivesAfterMissingReadingsIsCollected (0.00s)
+=== RUN   TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt
+--- PASS: TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt (0.02s)
+=== RUN   TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead
+--- PASS: TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead (0.06s)
+=== RUN   TestSLO147OffsetSemanticsRenderThreeDifferentSentences
+--- PASS: TestSLO147OffsetSemanticsRenderThreeDifferentSentences (0.04s)
+=== RUN   TestSLO149CorruptSentenceNamesThePositionTheDecoderObjectedAt
+--- PASS: TestSLO149CorruptSentenceNamesThePositionTheDecoderObjectedAt (0.00s)
+=== RUN   TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd
+--- PASS: TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd (0.00s)
+=== RUN   TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne
+--- PASS: TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne (0.00s)
+=== RUN   TestSLO149ExitedGiveUpSentenceCarriesTheLastReading
+--- PASS: TestSLO149ExitedGiveUpSentenceCarriesTheLastReading (0.03s)
+=== RUN   TestRunPacketMarksTheRosterRowACardIsHolding
+time=2026-10-10T20:20:27.519+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:27 mockllm: serving on http://127.0.0.1:64950 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:27.550+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding1021916924\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:27.580+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding1021916924\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:27.594+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:27Z duration_ms=13
+time=2026-10-10T20:20:27.603+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding1021916924\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:27.609+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:27Z duration_ms=6
+time=2026-10-10T20:20:27.614+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:27.618+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:27.625+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2692a9c7-c5da-4539-8753-e1562f7becc1 owner=tools
+    subagent_blocked_197_test.go:168: tasks wire bytes: {"rows":[{"taskId":"2692a9c7-c5da-4539-8753-e1562f7becc1","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"799a3f2d-bce1-4a2f-99b6-3af5f3749033","status":"Thinking","statusKnown":true,"streamKey":"subagent:2692a9c7-c5da-4539-8753-e1562f7becc1","blockedOnApproval":true,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"799a3f2d-bce1-4a2f-99b6-3af5f3749033","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"799a3f2d-bce1-4a2f-99b6-3af5f3749033","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_blocked_197_test.go:222: tasks wire bytes: {"rows":[{"taskId":"2692a9c7-c5da-4539-8753-e1562f7becc1","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"799a3f2d-bce1-4a2f-99b6-3af5f3749033","status":"Settling","statusKnown":true,"streamKey":"subagent:2692a9c7-c5da-4539-8753-e1562f7becc1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"799a3f2d-bce1-4a2f-99b6-3af5f3749033","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"799a3f2d-bce1-4a2f-99b6-3af5f3749033","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":0,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_blocked_197_test.go:234: blocked row on the run's own packet: task=2692a9c7-c5da-4539-8753-e1562f7becc1 status=Thinking streamKey=subagent:2692a9c7-c5da-4539-8753-e1562f7becc1 card=ticket197.blocked.probe pending=1 bytes=3147 sha256=bddfc53daff9476a | after the card: blocked=false answer=reject why="任务上下文已结束，审批请求已作废并按拒绝处理"
+--- PASS: TestRunPacketMarksTheRosterRowACardIsHolding (1.93s)
+=== RUN   TestRunPacketCarriesTheSubagentItsRosterRowFed
+time=2026-10-10T20:20:29.324+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:29 mockllm: serving on http://127.0.0.1:49557 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:29.351+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed2525073854\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:29.374+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed2525073854\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:29.382+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:29Z duration_ms=7
+time=2026-10-10T20:20:29.392+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed2525073854\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:29.397+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:29Z duration_ms=5
+time=2026-10-10T20:20:29.402+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:29.404+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:29.411+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a88bdac1-935d-4f5f-a0c3-263401870d40 owner=tools
+    subagent_carrier_197_test.go:278: tasks wire bytes: {"rows":[{"taskId":"30810c28-1c07-4398-a66d-781e5c7326f0","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"30810c28-1c07-4398-a66d-781e5c7326f0","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"a88bdac1-935d-4f5f-a0c3-263401870d40","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"30810c28-1c07-4398-a66d-781e5c7326f0","status":"Thinking","statusKnown":true,"streamKey":"subagent:a88bdac1-935d-4f5f-a0c3-263401870d40","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_carrier_197_test.go:388: packet tasks section: rows=2 poolCap=4 child=a88bdac1-935d-4f5f-a0c3-263401870d40 runStatus=Thinking afterStatus=Settling key=subagent:a88bdac1-935d-4f5f-a0c3-263401870d40 bytes=2845
+--- PASS: TestRunPacketCarriesTheSubagentItsRosterRowFed (1.80s)
+=== RUN   TestSubagentStreamKeyHasOneMintSite
+--- PASS: TestSubagentStreamKeyHasOneMintSite (0.18s)
+=== RUN   TestRunPacketReportsTheStreamLogPastItsBound
+time=2026-10-10T20:20:31.235+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:31 mockllm: serving on http://127.0.0.1:52152 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:31.262+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound3491740918\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:31.286+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound3491740918\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:31.292+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:31Z duration_ms=6
+time=2026-10-10T20:20:31.300+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound3491740918\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:31.305+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:31Z duration_ms=5
+time=2026-10-10T20:20:31.310+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:31.311+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:31.318+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-cda95c43-0200-4715-a533-9d7a599411ed owner=tools
+time=2026-10-10T20:20:31.324+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0b6aa9fd-32dd-4399-bcb8-e68db118a40b owner=tools
+time=2026-10-10T20:20:31.329+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4697c64d-93cc-45b7-8423-4c7bba6299ff owner=tools
+time=2026-10-10T20:20:31.335+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1fafd7a6-32a9-4de4-84a0-e6d566831568 owner=tools
+time=2026-10-10T20:20:31.341+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-24ffea1f-67a0-47bc-a489-a86d48064b94 owner=tools
+time=2026-10-10T20:20:31.346+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-09d12f74-2c83-48bf-a57b-56df93d77776 owner=tools
+time=2026-10-10T20:20:31.352+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-63963deb-52ac-4165-a751-324f94517887 owner=tools
+time=2026-10-10T20:20:31.358+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-40c89f63-bd90-469c-9a4f-f2e30506badd owner=tools
+time=2026-10-10T20:20:31.364+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-cafdf6db-0174-4874-bfee-d38e6d70d4e3 owner=tools
+time=2026-10-10T20:20:31.369+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-655e3377-b0bc-4d15-84a7-37266138c35d owner=tools
+time=2026-10-10T20:20:31.374+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d0cfb5c0-e3b4-47f5-88d0-2de42fffb016 owner=tools
+time=2026-10-10T20:20:31.380+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-7ae8c723-d75a-4dba-95ff-91a23d14bd8e owner=tools
+time=2026-10-10T20:20:31.385+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-affa078d-102a-4eb6-80ea-aeb4524826a8 owner=tools
+time=2026-10-10T20:20:31.391+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9aeb3dc7-5707-4ee7-a6cf-77d7e078746c owner=tools
+time=2026-10-10T20:20:31.397+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ea5ae493-2911-4d57-adff-a72dc63bb0ec owner=tools
+time=2026-10-10T20:20:31.402+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3ab31a89-aa1b-49f6-ac37-0cb26c8cf6e6 owner=tools
+time=2026-10-10T20:20:31.409+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b142e40f-d972-453c-be17-6f4a8c549693 owner=tools
+time=2026-10-10T20:20:31.416+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-67282e93-526b-4de0-b580-62c69b5e05b6 owner=tools
+time=2026-10-10T20:20:31.422+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4b48f372-f903-4293-b202-252d4f7c5f0d owner=tools
+time=2026-10-10T20:20:31.428+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ce2fbaea-8507-4166-93a9-658296610eac owner=tools
+time=2026-10-10T20:20:31.434+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1087710a-b826-446c-bdda-4542b2aa5cbf owner=tools
+time=2026-10-10T20:20:31.440+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-88e54831-9e15-4b75-ba4f-375dd21048c9 owner=tools
+time=2026-10-10T20:20:31.446+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-696a4d26-2994-4864-a3f2-9f50d9a97abe owner=tools
+time=2026-10-10T20:20:31.452+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-eb2de10f-7898-411c-8391-7c6c12cc27de owner=tools
+time=2026-10-10T20:20:31.458+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1041da40-c112-4522-8787-6cab6bd2de3c owner=tools
+time=2026-10-10T20:20:31.465+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-010c2d50-a8c7-4eff-8c9f-06001fd70f9c owner=tools
+time=2026-10-10T20:20:31.474+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8fd6adf8-80db-4ae9-ace0-39e2101da97a owner=tools
+time=2026-10-10T20:20:31.480+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b5810e51-7284-4972-9172-0f1d2ace3642 owner=tools
+time=2026-10-10T20:20:31.486+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c2af8320-6815-49c8-a6ce-c58f0c9a04da owner=tools
+time=2026-10-10T20:20:31.493+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a67a8abe-1317-40ec-8605-fb6c3d0daf15 owner=tools
+time=2026-10-10T20:20:31.500+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c2ad21d2-73eb-4d8b-a0e9-248246e813b3 owner=tools
+time=2026-10-10T20:20:31.507+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-60476d6a-3df1-458e-b577-acead7835d7a owner=tools
+time=2026-10-10T20:20:31.513+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-98176de2-722f-442f-b422-0425c95153b5 owner=tools
+    subagent_carrier_197_test.go:548: tasks wire bytes: {"rows":[{"taskId":"010c2d50-a8c7-4eff-8c9f-06001fd70f9c","label":"溢出正控 25 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:010c2d50-a8c7-4eff-8c9f-06001fd70f9c","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"09d12f74-2c83-48bf-a57b-56df93d77776","label":"溢出正控 05 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:09d12f74-2c83-48bf-a57b-56df93d77776","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"0b6aa9fd-32dd-4399-bcb8-e68db118a40b","label":"溢出正控 01 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:0b6aa9fd-32dd-4399-bcb8-e68db118a40b","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"1041da40-c112-4522-8787-6cab6bd2de3c","label":"溢出正控 24 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:1041da40-c112-4522-8787-6cab6bd2de3c","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"1087710a-b826-446c-bdda-4542b2aa5cbf","label":"溢出正控 20 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:1087710a-b826-446c-bdda-4542b2aa5cbf","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"1fafd7a6-32a9-4de4-84a0-e6d566831568","label":"溢出正控 03 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:1fafd7a6-32a9-4de4-84a0-e6d566831568","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"24ffea1f-67a0-47bc-a489-a86d48064b94","label":"溢出正控 04 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:24ffea1f-67a0-47bc-a489-a86d48064b94","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"3ab31a89-aa1b-49f6-ac37-0cb26c8cf6e6","label":"溢出正控 15 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:3ab31a89-aa1b-49f6-ac37-0cb26c8cf6e6","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"40c89f63-bd90-469c-9a4f-f2e30506badd","label":"溢出正控 07 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:40c89f63-bd90-469c-9a4f-f2e30506badd","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"4697c64d-93cc-45b7-8423-4c7bba6299ff","label":"溢出正控 02 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:4697c64d-93cc-45b7-8423-4c7bba6299ff","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"4b48f372-f903-4293-b202-252d4f7c5f0d","label":"溢出正控 18 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:4b48f372-f903-4293-b202-252d4f7c5f0d","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"60476d6a-3df1-458e-b577-acead7835d7a","label":"溢出正控 31 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:60476d6a-3df1-458e-b577-acead7835d7a","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"63963deb-52ac-4165-a751-324f94517887","label":"溢出正控 06 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:63963deb-52ac-4165-a751-324f94517887","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"655e3377-b0bc-4d15-84a7-37266138c35d","label":"溢出正控 09 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:655e3377-b0bc-4d15-84a7-37266138c35d","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"67282e93-526b-4de0-b580-62c69b5e05b6","label":"溢出正控 17 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:67282e93-526b-4de0-b580-62c69b5e05b6","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"696a4d26-2994-4864-a3f2-9f50d9a97abe","label":"溢出正控 22 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:696a4d26-2994-4864-a3f2-9f50d9a97abe","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"7ae8c723-d75a-4dba-95ff-91a23d14bd8e","label":"溢出正控 11 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:7ae8c723-d75a-4dba-95ff-91a23d14bd8e","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"88e54831-9e15-4b75-ba4f-375dd21048c9","label":"溢出正控 21 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:88e54831-9e15-4b75-ba4f-375dd21048c9","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"8fd6adf8-80db-4ae9-ace0-39e2101da97a","label":"溢出正控 26 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:8fd6adf8-80db-4ae9-ace0-39e2101da97a","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"98176de2-722f-442f-b422-0425c95153b5","label":"溢出正控 32 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:98176de2-722f-442f-b422-0425c95153b5","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"9aeb3dc7-5707-4ee7-a6cf-77d7e078746c","label":"溢出正控 13 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:9aeb3dc7-5707-4ee7-a6cf-77d7e078746c","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","label":"总结一下 这份笔记","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"a67a8abe-1317-40ec-8605-fb6c3d0daf15","label":"溢出正控 29 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:a67a8abe-1317-40ec-8605-fb6c3d0daf15","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"affa078d-102a-4eb6-80ea-aeb4524826a8","label":"溢出正控 12 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:affa078d-102a-4eb6-80ea-aeb4524826a8","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"b142e40f-d972-453c-be17-6f4a8c549693","label":"溢出正控 16 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:b142e40f-d972-453c-be17-6f4a8c549693","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"b5810e51-7284-4972-9172-0f1d2ace3642","label":"溢出正控 27 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:b5810e51-7284-4972-9172-0f1d2ace3642","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"c2ad21d2-73eb-4d8b-a0e9-248246e813b3","label":"溢出正控 30 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:c2ad21d2-73eb-4d8b-a0e9-248246e813b3","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"c2af8320-6815-49c8-a6ce-c58f0c9a04da","label":"溢出正控 28 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:c2af8320-6815-49c8-a6ce-c58f0c9a04da","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"cafdf6db-0174-4874-bfee-d38e6d70d4e3","label":"溢出正控 08 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:cafdf6db-0174-4874-bfee-d38e6d70d4e3","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"cda95c43-0200-4715-a533-9d7a599411ed","label":"溢出正控 00 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:cda95c43-0200-4715-a533-9d7a599411ed","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"ce2fbaea-8507-4166-93a9-658296610eac","label":"溢出正控 19 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:ce2fbaea-8507-4166-93a9-658296610eac","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"d0cfb5c0-e3b4-47f5-88d0-2de42fffb016","label":"溢出正控 10 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:d0cfb5c0-e3b4-47f5-88d0-2de42fffb016","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"ea5ae493-2911-4d57-adff-a72dc63bb0ec","label":"溢出正控 14 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:ea5ae493-2911-4d57-adff-a72dc63bb0ec","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"eb2de10f-7898-411c-8391-7c6c12cc27de","label":"溢出正控 23 llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll","kind":"subagent","parentTaskId":"9ff43a9f-bf23-4d50-ba15-eefbeb1a9bfa","status":"Settling","statusKnown":true,"streamKey":"subagent:eb2de10f-7898-411c-8391-7c6c12cc27de","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":0,"poolCap":4,"streamTruncated":true,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_carrier_197_test.go:591: bound crossed: rows=34 streams=34 truncated=true elided=0 dropped=[]
+--- PASS: TestRunPacketReportsTheStreamLogPastItsBound (1.59s)
+=== RUN   Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands
+time=2026-10-10T20:20:32.939+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:32 mockllm: serving on http://127.0.0.1:51747 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:32.964+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands635929014\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:32.991+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands635929014\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:33.002+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:32Z duration_ms=10
+time=2026-10-10T20:20:33.010+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands635929014\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:33.016+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:33Z duration_ms=5
+time=2026-10-10T20:20:33.021+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:33.024+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:33.031+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-816f532e-9004-4daa-a981-6982e6d61412 owner=tools
+    subagent_selfapproval_197_test.go:366: child=816f532e-9004-4daa-a981-6982e6d61412 corr1=816f532e-9004-4daa-a981-6982e6d61412-corr-1 corr2=816f532e-9004-4daa-a981-6982e6d61412-corr-2 | 空令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 假令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 自称来源=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 借证=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 重放=approval: correlation_id 无对应待审批项 | 面板递证=面板来源的「允许」被服务端 API 直接拒绝（F2 第三层），可改为拒绝或查看完整参数 | 烧后再试=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 宿主允许=<nil> | 落盘=true/false
+--- PASS: Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands (11.54s)
+=== RUN   Test197NoAllowDoorIsReachableFromASubagentsAssembly
+--- PASS: Test197NoAllowDoorIsReachableFromASubagentsAssembly (0.00s)
+=== RUN   TestSubagentStreamKeyPrefixAgreesAcrossBothPackages
+--- PASS: TestSubagentStreamKeyPrefixAgreesAcrossBothPackages (0.00s)
+=== RUN   TestSubagentStreamKeyBuildersAgreeAcrossBothPackages
+--- PASS: TestSubagentStreamKeyBuildersAgreeAcrossBothPackages (0.00s)
+=== RUN   TestCompositionRootClosesTheLoopTasksTaintScope
+time=2026-10-10T20:20:44.426+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:44 mockllm: serving on http://127.0.0.1:53739 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:44.450+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope3129973728\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:44.474+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope3129973728\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:44.480+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:44Z duration_ms=6
+time=2026-10-10T20:20:44.488+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope3129973728\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:44.494+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:44Z duration_ms=6
+time=2026-10-10T20:20:44.499+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:44.500+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestCompositionRootClosesTheLoopTasksTaintScope (1.52s)
+=== RUN   TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit
+time=2026-10-10T20:20:45.896+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:45 mockllm: serving on http://127.0.0.1:53742 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:45.921+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1858995529\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:45.946+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1858995529\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:45.953+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:45Z duration_ms=6
+time=2026-10-10T20:20:45.960+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1858995529\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:45.967+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:45Z duration_ms=6
+time=2026-10-10T20:20:45.971+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:45.974+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (1.42s)
+=== RUN   TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun
+time=2026-10-10T20:20:47.849+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:47 mockllm: serving on http://127.0.0.1:56819 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:47.878+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun2300314917\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:47.915+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun2300314917\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:47.923+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:47Z duration_ms=7
+time=2026-10-10T20:20:47.933+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun2300314917\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:47.940+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:47Z duration_ms=5
+time=2026-10-10T20:20:47.947+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:47.949+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:48.000+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:48.014+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun (2.01s)
+=== RUN   TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking
+time=2026-10-10T20:20:49.348+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:49 mockllm: serving on http://127.0.0.1:56193 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:49.372+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking2282160981\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:49.402+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking2282160981\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:49.409+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:49Z duration_ms=6
+time=2026-10-10T20:20:49.418+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking2282160981\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:49.425+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:49Z duration_ms=6
+time=2026-10-10T20:20:49.431+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:49.433+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:51.524+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking (3.51s)
+=== RUN   TestTicket224ProductionSessionDoesNotSurviveRestart
+time=2026-10-10T20:20:53.101+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/10 20:20:53 mockllm: serving on http://127.0.0.1:52748 (golden dir C:\Users\swq\wisp-303-v1\internal\llm\testdata\golden)
+time=2026-10-10T20:20:53.130+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket224ProductionSessionDoesNotSurviveRestart1730925331\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:53.165+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224ProductionSessionDoesNotSurviveRestart1730925331\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-10T20:20:53.174+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-10T12:20:53Z duration_ms=9
+time=2026-10-10T20:20:53.184+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224ProductionSessionDoesNotSurviveRestart1730925331\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-10T20:20:53.192+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-10T12:20:53Z duration_ms=7
+time=2026-10-10T20:20:53.198+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-10T20:20:53.203+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:53.251+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket224ProductionSessionDoesNotSurviveRestart1730925331\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-10T20:20:53.275+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-10T20:20:55.353+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224ProductionSessionDoesNotSurviveRestart (3.83s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	441.925s
+FAIL
+rc=1
+end=2026-10-10 20:20:55 +0800
