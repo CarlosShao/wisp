@@ -24,6 +24,12 @@
 - CI 原始字节：`.scratch/wisp/probes/301/orch/logs/`（`job-114162576251.log` 914906 B＝改后、
   `job-114069831344-baseline.log` 832029 B＝基线；切片 4 枚 `_cli-block`/`_cli-fail` 已在）。
 
-## 终态锚
+## 终态锚（交件前现量，与起手同形）
 
-（交件前再跑同形一发，见文末）
+- `date` ⇒ `2026-10-10 16:3x +0800`
+- `git log -1 --format='%h %ad' --date=iso-strict` ⇒ 起手 `6414a4bb 2026-10-10T16:10:11+08:00` ／ 终态 `83cd66a8 2026-10-10T16:30:51+08:00`
+  ⇒ **HEAD 在本腿期间被同机别的腿前进过**（起手锚＝我全部 blob 行号的读法基准，终态锚＝交件基准）。
+- `git status --porcelain -- scripts internal .github docs cmd | wc -l` ⇒ 起手 `0` ／ 终态 `0`
+- `tasklist` 现量 ⇒ 起手 `wisp.exe=0`、`balldebug.exe=0` ／ 终态 `wisp.exe=0`、`balldebug.exe=0`（机主全程没动 CPU）
+- ⛔ 编译面：`go build`/`go test`/`go list`/`go vet`/`go run` 本腿 **0 次**；`go env` 也 **0 次**（⛔ 例外需自报，因为⛔ 例外）。
+- 本腿新增件（只建⛔ 删）：`00-anchor.md`、`40-census.md`、`cm-1.txt`／`cm-2.txt`（commit 文案临时件，⛔ 入库 ⇒ pathspec 里⛔ 列它们）。
