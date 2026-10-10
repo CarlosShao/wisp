@@ -1,0 +1,29 @@
+ruler: grep -rn over --include=*.go cmd internal ; scope = working tree of cmd/ + internal/ ; measures the WORKING TREE (clean vs HEAD for cmd/**, see l1)
+=== SetHtml call sites, non-test ===
+cmd/wisp/panel_host_windows.go:52:// through SetHtml over embedded bytes (still offline, still no listener).
+cmd/wisp/panel_host_windows.go:95:// SetHtml produces (about:blank): offline, no host name, no port.
+cmd/wisp/panel_host_windows.go:314:// point the S0 spike measured with NewWithOptions + SetHtml + a dispatch round
+cmd/wisp/panel_host_windows.go:457:// embed carries no bundle: a SetHtml this host writes, so the user never ends on
+cmd/wisp/panel_host_windows.go:467:	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
+cmd/wisp/panel_host_windows.go:486:	w.SetHtml(string(data))
+cmd/wisp/panel_host_windows.go:824:// first SetHtml (bringUp runs it ahead of firstRoundTrip / serveEntry, and an
+cmd/wisp/panel_host_windows.go:825:// Init script re-runs on every document so it survives later SetHtml rebuilds).
+cmd/wisp/panel_host_windows.go:890:	// A page that immediately calls the probe. SetHtml of a tiny document keeps
+cmd/wisp/panel_host_windows.go:892:	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"></head><body>` +
+=== navigation calls, non-test ===
+=== Eval call sites, non-test (production) ===
+EVAL_PROD_HITS=0
+=== Eval call sites, all (incl tests) ===
+cmd/wisp/panel_inbound_guards_35r3_test.go:24:// w.Eval("window.wispDispatch(...)") (that is N6, the test playing the page, zero
+cmd/wisp/panel_pageover_33r10_windows_test.go:103:func (c *docSink33r10) Eval(js string) {
+cmd/wisp/panel_reshow_255r1_windows_test.go:127:func (c *geoSink255r1) Eval(string)            {}
+cmd/wisp/panel_resident_windows_test.go:175:		w.Eval(js)
+cmd/wisp/panel_transport_35r1_test.go:18:// edge) and does NOT run w.Eval("window.wispDispatch(...)") (that is N6, the test
+cmd/wisp/panel_transport_live_35v2_windows_test.go:42:// w.Eval("window.wispDispatch(...)") as evidence: there the test plays the page *at the
+cmd/wisp/panel_transport_live_35v2_windows_test.go:159:		wv.Dispatch(func() { wv.Eval(script) })
+=== build-tag header of the files this leg cites ===
+cmd/wisp/panel_host_windows.go : //go:build windows
+cmd/wisp/panel_resident_windows.go : //go:build windows
+cmd/wisp/panel_resident_windows_test.go : //go:build windows
+cmd/wisp/panel_pageover_33r10_windows_test.go : //go:build windows
+rc=0

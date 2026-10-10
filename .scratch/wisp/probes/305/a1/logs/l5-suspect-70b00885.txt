@@ -1,0 +1,58 @@
+ruler: git show --stat --format + git show <sha> -- <path> | grep -E '^[-+@]' ; scope = HEAD object layer (git show), NOT working tree
+=== 70b00885 identity + stat ===
+70b00885 2026-10-08 10:16:41 +0800 test(33-r10 AC#13 item 2): give the cold-start page handover a window-free content ruler
+
+ cmd/wisp/panel_host_windows.go                |  41 +++-
+ cmd/wisp/panel_pageover_33r10_windows_test.go | 293 ++++++++++++++++++++++++++
+ 2 files changed, 323 insertions(+), 11 deletions(-)
+=== 70b00885 hunks in cmd/wisp/panel_host_windows.go (verbatim +/-) ===
+--- a/cmd/wisp/panel_host_windows.go
++++ b/cmd/wisp/panel_host_windows.go
+@@ -416,17 +416,9 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
+-	// AC#13's order, and it is the whole fix: prove the message channel first,
+-	// hand the page over LAST. firstRoundTripLocked shows a document of its own,
+-	// so running it after serveEntry meant every cold start finished on the probe
+-	// page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3 "供给那半"). The
+-	// probe stays - it is where cold "usable" is decided - it just no longer gets
+-	// the last word about what the user sees.
+-	rtMs := m.firstRoundTripLocked(ctx, t0)
+-
+-	if err := m.serveEntry(); err != nil {
+-		m.serveNotBuiltNoticeLocked()
+-	}
++	// AC#13's order lives in coldStartPageHandover (33-r10 moved it out verbatim:
++	// same statements, same order, nothing added or dropped). Read the reason there.
++	rtMs := m.coldStartPageHandover(ctx, t0)
+@@ -434,6 +426,33 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
++// coldStartPageHandover is AC#13's order, and it is the whole fix: prove the
++// message channel first, hand the page over LAST. firstRoundTripLocked shows a
++// document of its own, so running it after serveEntry meant every cold start
++// finished on the probe page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3
++// "供给那半"). The probe stays - it is where cold "usable" is decided - it just no
++// longer gets the last word about what the user sees.
++//
++// Why this is a function and not the four lines it was inside bringUp (leg 33-r10,
++// ticket 33 AC#13 item 2): bringUp cannot run headlessly - it calls
++// webview2.NewWithOptions, which needs a live WebView2 control - so the shipped
++// handover order had no ruler that could run without opening a window. The only
++// case that ever asked the question, TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
++// (panel_resident_windows_test.go), buys a real browser and in a fresh checkout
++// skips for lack of a bundle. Splitting the tail out is the same move
++// installPanelTransport already made for the same reason (ticket 35 AC#6, see the
++// comment at that call): it moves zero behaviour, holds no lock across the call,
++// and gives AC#13's content assertion a headless way to reach the shipping order.
++// That reach is what TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe needs.
++func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
++	rtMs := m.firstRoundTripLocked(ctx, t0)
++
++	if err := m.serveEntry(); err != nil {
++		m.serveNotBuiltNoticeLocked()
++	}
++	return rtMs
++}
++
+=== host-file commits in 416d9d56..f718e9b6 ===
+4658dbb6 2026-10-03 255-r3（编排者代提·死腿半成品·未验证）：面板尺寸取值闭包已落码＋票 255 自己的两枚判据同批改了
+7a0236b3 2026-10-01 feat(panel-host): give the named pre-create refusal an exit (33-r9, form A)
+f7d28ef0 2026-10-01 fix(33-r7 面板建窗的线程前提)：owner 侧把还池的线程派到空；bringUp 只检查、只具名拒绝，不动别人的队列
+rc=0

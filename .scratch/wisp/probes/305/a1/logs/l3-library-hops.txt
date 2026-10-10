@@ -1,0 +1,61 @@
+ruler: grep -n -A over the module cache blob of github.com/jchv/go-webview2@v0.0.0-20260205173254-56598839c808 (dependency source, read-only; dir resolved by 'go list -m -f {{.Dir}}', no code changed)
+MODULE_DIR=D:\work\base\gopath\pkg\mod\github.com\jchv\go-webview2@v0.0.0-20260205173254-56598839c808
+rc_golist=0
+=== webview.go: SetHtml / Eval / Dispatch / browser field ===
+393:func (w *webview) SetHtml(html string) {
+394-	w.browser.NavigateToString(html)
+395-}
+396-
+397-func (w *webview) SetTitle(title string) {
+398-	_title, err := windows.UTF16FromString(title)
+399-	if err != nil {
+--
+439:func (w *webview) Eval(js string) {
+440-	w.browser.Eval(js)
+441-}
+442-
+443:func (w *webview) Dispatch(f func()) {
+444-	w.m.Lock()
+445-	w.dispatchq = append(w.dispatchq, f)
+446-	w.m.Unlock()
+447-	_, _, _ = w32.User32PostThreadMessageW.Call(w.mainthread, w32.WMApp, 0, 0)
+448-}
+449-
+=== pkg/edge/chromium.go: NavigateToString / Init / Eval ===
+123:func (e *Chromium) NavigateToString(htmlContent string) {
+124-	_, _, _ = e.webview.vtbl.NavigateToString.Call(
+125-		uintptr(unsafe.Pointer(e.webview)),
+126-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(htmlContent))),
+127-	)
+128-}
+129-
+130-func (e *Chromium) Init(script string) {
+131-	_, _, _ = e.webview.vtbl.AddScriptToExecuteOnDocumentCreated.Call(
+132-		uintptr(unsafe.Pointer(e.webview)),
+133-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(script))),
+134-		0,
+135-	)
+--
+138:func (e *Chromium) Eval(script string) {
+139-	_script, err := windows.UTF16PtrFromString(script)
+140-	if err != nil {
+141-		log.Fatal(err)
+142-	}
+143-
+144-	_, _, _ = e.webview.vtbl.ExecuteScript.Call(
+145-		uintptr(unsafe.Pointer(e.webview)),
+146-		uintptr(unsafe.Pointer(_script)),
+147-		0,
+148-	)
+149-}
+150-
+=== any NavigationCompleted / ExecuteScript callback wiring in pkg/edge ===
+29:	navigationCompleted   *ICoreWebView2NavigationCompletedEventHandler
+43:	NavigationCompletedCallback  func(sender *ICoreWebView2, args *ICoreWebView2NavigationCompletedEventArgs)
+66:	e.navigationCompleted = newICoreWebView2NavigationCompletedEventHandler(e)
+144:	_, _, _ = e.webview.vtbl.ExecuteScript.Call(
+216:	_, _, _ = e.webview.vtbl.AddNavigationCompleted.Call(
+339:func (e *Chromium) NavigationCompleted(sender *ICoreWebView2, args *ICoreWebView2NavigationCompletedEventArgs) uintptr {
+340:	if e.NavigationCompletedCallback != nil {
+341:		e.NavigationCompletedCallback(sender, args)
+rc=0

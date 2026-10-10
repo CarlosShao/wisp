@@ -1,0 +1,9 @@
+ruler: wc -c + grep -n -o over frontend/dist/index.html ; scope = 母仓 WORKING TREE, and the file is UNTRACKED at HEAD (git ls-tree shows only frontend/dist/.gitkeep) => this is a surface reading, not a HEAD blob
+frontend/dist/.gitkeep
+bytes=1044
+14:      http-equiv="Content-Security-Policy"
+18:    <title>Wisp</title>
+19:    <script type="module" crossorigin src="./assets/index-B8yINMF1.js"></script>
+23:    <div id="root"></div>
+mtime=-rw-r--r-- 1 swq 197609 1044 2026-10-10 08:51 frontend/dist/index.html
+rc=0

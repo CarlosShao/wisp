@@ -1,0 +1,59 @@
+ruler: grep -rn -E 'PASS: TestAC13ColdStart|PASS: TestAC14GoSideEvalPush' over docs/evidence/s1/ ; scope = tracked evidence dir at HEAD
+docs/evidence/s1/33-panel-host-c27-r6.md:36:14:24:22  AC13 alone, count=1:  --- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.47s)
+docs/evidence/s1/33-panel-host-c27-r7.md:201:--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.97s)
+docs/evidence/s1/33-panel-host-c27-r7.md:205:--- PASS: TestAC14GoSideEvalPushReachesThePage (0.50s)
+docs/evidence/s1/33-panel-host-c27-r7.md:241:--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.11s)
+docs/evidence/s1/33-panel-host-c27-r7.md:245:--- PASS: TestAC14GoSideEvalPushReachesThePage (0.55s)
+docs/evidence/s1/33-panel-host-c27-r7.md:277:--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.97s)
+docs/evidence/s1/33-panel-host-c27-r7.md:281:--- PASS: TestAC14GoSideEvalPushReachesThePage (0.45s)
+--- r7 anchor line (HEAD of that reading) ---
+## 起手锚点（同发取，`date` + `git log -1 --format=%H` + `rev-parse --abbrev-ref HEAD`）
+
+- 时刻：`2026-10-01 15:41:26 +08`
+- HEAD：`416d9d56977a89a070e29e23391b1a2f02bdc9b5`（标题 `docs(33-r6 收尾两枚落盘)：A504＋它表尾的编排者标注……`）
+- 分支：`dev`
+- 台件目录：`.scratch/wisp/probes/33/r7/`（现读 `ls .scratch/wisp/probes/33/`＝a1 a2 h1 p1 r1 r2 r3 r4 r5 r6 ⇒ r7 未占）
+--- r7 four-number + panel family roster (186,208) ---
+### 发 1（`.scratch/wisp/probes/33/r7/fullpack-1.txt`，共 1347 行：`ok` 在 1329、`rc=0` 在 1330、尾 `date` 1331、1332-1347 是 tasklist 块；首枚日志行 `16:18:31`、尾行 `Thu Oct  1 16:21:55 CST 2026`，那发起手的 `date` 落进了任务 stdout 而非本文件）
+
+- **rc=0**，`ok  	github.com/CarlosShao/wisp/cmd/wisp	204.702s`
+- 三数（只认 `--- FAIL`/`--- PASS`/`--- SKIP` 行）：**PASS=240、FAIL=0、SKIP=0**
+- **逐名红册＝空**（`grep -cE '^--- FAIL|^    --- FAIL'` = 0）
+- 桌面枚数：起手（15:41）6 枚 → 这发终态 13 枚。逐枚查过归属：6 枚属 `SearchHost`（任务栏搜索，起手那 6 枚就是它）、
+  6 枚属 owner 自己的 `clipsync-desktop.exe`、**1 枚是我这发之前探针跑留下的孤儿**（PID 3112，
+  `--user-data-dir=C:\Users\swq\AppData\Local\Temp\wisp-33r7-plant-dispatch\EBWebView`，父进程 16064 已不存在）。
+  16:23 我已 `taskkill //PID 3112 //F` 收掉它，收后 `Get-CimInstance` 里再无 `wisp*` 目录的 webview 进程（13→12）。
+  ⇒ 不是"机器上本来就该有 13 枚"，也不是"跑了整包就多 7 枚"：**多出来的一枚是我的，已经清掉**。
+- 面板家族逐名（这一发里真跑了、不是被跳过）：
+
+```
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.10s)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.50s)
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.97s)
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (0.80s)
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose (1.02s)
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (0.49s)
+--- PASS: TestAC14GoSideEvalPushReachesThePage (0.50s)
+--- PASS: TestPanelThreadIsSTAAndExitsCleanly (0.34s)
+--- PASS: TestPanelThreadNameIsNotInResidentRoster (0.00s)
+--- PASS: TestBallPanelGesturesReachThePanelThread (0.34s)
+--- r6 ① section (28,45) ---
+
+## ① 最小复现（哪一枚先跑导致、逐字读数）
+
+所有读数用同法编译的测试二进制 `.scratch/wisp/probes/33/r6/wisp.test`（DLL 走
+`third_party/sherpa-onnx` + `build`），HEAD `05f91799`（起手）。逐时刻：
+
+**对照（隔离单跑）——本腿未复跑编排者的三发，自己复跑一发同形：**
+```
+14:24:22  AC13 alone, count=1:  --- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.47s)
+```
+
+**组 A（一枚 harness 窗 + AC13，count=3）：两枚全绿——单枚 harness 不足以致红。**
+```
+14:24:34-41  RealWindowHop PASS ×3 ; AC13 PASS ×3 (1.32 / 0.71 / 0.80s)
+```
+
+**组 B（两枚 harness 窗 + AC13，count=5）——AC13 命中目标红，逐字：**
+```
+rc=0

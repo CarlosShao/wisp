@@ -1,0 +1,28 @@
+ruler: git rev-parse --short HEAD ; git status --porcelain -- internal cmd docs scripts .github ; surface = shared working tree at branch dev
+5480434f
+5480434f82f2a2344cb78701decc97b6acba2958
+dev
+--- porcelain (internal cmd docs scripts .github) ---
+(0 lines above = those dirs are clean at read time => working tree == HEAD blob for the two files this leg cites)
+--- porcelain full (untouched, for the record) ---
+ M .gitignore
+ M .scratch/wisp/probes/152/my152.py
+ M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+ M .scratch/wisp/probes/242/r3/logs/probe-routed.txt
+ M .scratch/wisp/probes/268/v1/evidence.md
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+rc=0

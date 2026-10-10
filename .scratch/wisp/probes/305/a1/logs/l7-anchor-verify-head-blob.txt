@@ -1,0 +1,35 @@
+ruler: git show <blob>:<path> | sed -n '<N>p' ; scope = HEAD OBJECT LAYER (a81c2980), 每枚锚点现量那一行逐字 ; 判据 = 那一行必须含预期的符号
+cmd/wisp/panel_host_windows.go             :318   MATCH
+cmd/wisp/panel_host_windows.go             :421   MATCH
+cmd/wisp/panel_host_windows.go             :447   MATCH
+cmd/wisp/panel_host_windows.go             :448   MATCH
+cmd/wisp/panel_host_windows.go             :450   MATCH
+cmd/wisp/panel_host_windows.go             :451   MATCH
+cmd/wisp/panel_host_windows.go             :467   MATCH
+cmd/wisp/panel_host_windows.go             :472   MATCH
+cmd/wisp/panel_host_windows.go             :486   MATCH
+cmd/wisp/panel_host_windows.go             :867   MATCH
+cmd/wisp/panel_host_windows.go             :892   MATCH
+cmd/wisp/panel_resident_windows_test.go    :166   MATCH
+cmd/wisp/panel_resident_windows_test.go    :175   MATCH
+cmd/wisp/panel_resident_windows_test.go    :315   MATCH
+cmd/wisp/panel_resident_windows_test.go    :317   MATCH
+cmd/wisp/panel_resident_windows_test.go    :323   MATCH
+cmd/wisp/panel_resident_windows_test.go    :327   MATCH
+cmd/wisp/panel_resident_windows_test.go    :330   MATCH
+cmd/wisp/panel_resident_windows_test.go    :856   MATCH
+cmd/wisp/panel_resident_windows_test.go    :863   MATCH
+cmd/wisp/panel_resident_windows_test.go    :864   MATCH
+cmd/wisp/panel_resident_windows_test.go    :867   MATCH
+cmd/wisp/panel_resident_windows_test.go    :869   MATCH
+cmd/wisp/panel_resident_windows.go         :299   MATCH
+cmd/wisp/panel_resident_windows.go         :349   MATCH
+cmd/wisp/panel_resident_windows.go         :360   MATCH
+cmd/wisp/panel_resident_windows.go         :262   MATCH
+cmd/wisp/panel_resident_windows.go         :238   MATCH
+--- the four ticket-line anchors checked against HEAD blob ---
+cmd/wisp/panel_resident_windows_test.go    :660   >>		why     string
+cmd/wisp/panel_resident_windows_test.go    :821   >>		outcomes = append(outcomes, awaitReport(t, h, fmt.Sprintf("ac14r-%d", i), "AC#14's reply hop"))
+cmd/wisp/panel_resident_windows_test.go    :825   >>	t.Logf("AC#14 nail 1 (reply hop), page's own words: %q (Go's handler was reached by %d of the 3 rea
+cmd/wisp/panel_resident_windows_test.go    :866   >>	answer := awaitReport(t, h, "ac14-push", "AC#14's push hop")
+rc=0
