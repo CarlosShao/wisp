@@ -1,0 +1,16 @@
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:69:	bound := ra.bindBallHost(&residentBall{verdict: "this process has NO floating ball window: injected failure"})
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:95:	ra.bindBallHost(&residentBall{})
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:331:	if bound := ra2.bindBallHost(&residentBall{cancelHosted: true}); bound {
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:364:	if bound := ra.bindBallHost(&residentBall{}); bound {
+HEAD:cmd/wisp/resident_ball_windows.go:303:	rb := &residentBall{cancelHosted: onCancelEsc != nil}
+HEAD:cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:89:		if !ra.bindBallHost(&residentBall{b: &ball.Ball{}, cancelHosted: true}) {
+HEAD:cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:131:			if ra.bindBallHost(&residentBall{}) {
+HEAD:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:99:		if !ra2.bindBallHost(&residentBall{b: &ball.Ball{}, cancelHosted: true}) {
+HEAD:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:141:		ra2.bindBallHost(&residentBall{b: &ball.Ball{}, cancelHosted: true})
+HEAD:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:165:			ra.bindBallHost(&residentBall{})
+HEAD:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:179:			ra2.bindBallHost(&residentBall{b: &ball.Ball{}})
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:92:	rb := &residentBall{}
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:205:	rb := &residentBall{}
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:220:	rb := &residentBall{}
+HEAD:cmd/wisp/resident_tray_mute_293_windows_test.go:212:	rb := &residentBall{}
+HEAD:cmd/wisp/resident_tray_mute_293_windows_test.go:249:	rb := &residentBall{}

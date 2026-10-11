@@ -1,0 +1,9 @@
+HEAD:cmd/wisp/resident_ball_windows.go:475:// attachMuteGate hands this host the executor that turns a mute gesture into a
+HEAD:cmd/wisp/resident_ball_windows.go:478:func (rb *residentBall) attachMuteGate(fn muteGestureFunc) {
+HEAD:cmd/wisp/resident_ball_windows.go:502:// after attachMuteGate, and it is the only writer.
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:93:	rb.attachMuteGate(ra.toggleMute)
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:206:	rb.attachMuteGate(ra.toggleMute)
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:235:	nilBall.attachMuteGate(func() (string, bool) { return "", false })
+HEAD:cmd/wisp/resident_tray_mute_293_windows_test.go:213:	rb.attachMuteGate(ra.toggleMute)
+HEAD:cmd/wisp/resident_tray_mute_293_windows_test.go:293:	rb.attachMuteGate(nilLeg.toggleMute)
+HEAD:cmd/wisp/resident_windows.go:342:	rb.attachMuteGate(raudio.toggleMute)

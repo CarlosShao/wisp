@@ -1,0 +1,19 @@
+HEAD:cmd/wisp/approval_reply_201_test.go:474:		t.Fatalf("an unanswered L2 card executed: %+v", out)
+HEAD:cmd/wisp/instructions_200r2_test.go:7:// one, so the JSON key could never arrive in a run anybody actually executed.
+HEAD:cmd/wisp/panel_resident_windows.go:15:// tasks that were already queued on that thread get executed early by the nested
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:128:// the step is registered through the seam, executed inside the frozen sequence,
+HEAD:cmd/wisp/resident_approval_live_246_windows_test.go:192:// involved) when the D38(e) sequence runs. The step must be executed, not
+HEAD:cmd/wisp/resident_approval_live_246_windows_test.go:281:	t.Logf("AC#4 READING: step3 executed in %s, card answered %s, ANSWER-REJECT booked; no-skipped=%v",
+HEAD:cmd/wisp/resident_audio_windows.go:152:// executed=false is the shape where this process owns no gate to turn - voice
+HEAD:cmd/wisp/resident_ball_windows.go:86:// executed=false means "there was no gate to turn in this process" (voice off,
+HEAD:cmd/wisp/resident_ball_windows.go:89:type muteGestureFunc func() (outcome string, executed bool)
+HEAD:cmd/wisp/resident_ball_windows.go:605:	outcome, executed := fn()
+HEAD:cmd/wisp/resident_ball_windows.go:606:	if !executed {
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:196:	outcome, executed := ra.toggleMute()
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:197:	if executed {
+HEAD:cmd/wisp/resident_task_source_246_windows_test.go:120:		t.Fatalf("a resident leg with no ball executed a write it had nowhere to confirm: %+v", out)
+HEAD:cmd/wisp/resident_task_source_live_246_windows_test.go:90:// absent after the veto is the reading that the vetoed call never executed.
+HEAD:cmd/wisp/resident_task_source_live_246_windows_test.go:161:	// The vetoed call never executed - the reading the whole ticket is about.
+HEAD:cmd/wisp/resident_tray_mute_293_windows_test.go:291:	// executed=false), so the checkmark can never drift ahead of the gate.
+HEAD:cmd/wisp/resident_windows.go:190:		fmt.Printf("wisp: panel host unavailable (%v): the panel hot key and the tray item will be recorded, not executed\n", rpErr)
+HEAD:cmd/wisp/run_mode101_test.go:311:		t.Errorf("the silenced L1 write should have executed, got: %s", text)

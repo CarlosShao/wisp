@@ -1,0 +1,3 @@
+HEAD:internal/tools/bridge.go:297:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+HEAD:internal/tools/bridge.go:920:// assessorFor returns the assessor whose R4 input is bound to this task's
+HEAD:internal/tools/bridge.go:924:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {

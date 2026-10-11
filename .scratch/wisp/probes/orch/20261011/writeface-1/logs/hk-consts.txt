@@ -1,0 +1,4 @@
+HEAD:internal/ball/hotkey_windows.go:36:	hkSummon = 1
+HEAD:internal/ball/hotkey_windows.go:37:	hkMute   = 2
+HEAD:internal/ball/hotkey_windows.go:38:	hkCancel = 3
+HEAD:internal/ball/hotkey_windows.go:39:	hkPanel  = 4

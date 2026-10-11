@@ -1,0 +1,11 @@
+HEAD:cmd/wisp/resident_audio_247_live_windows_test.go:148:	if !ra.started {
+HEAD:cmd/wisp/resident_audio_247_windows_test.go:113:	if ra.started {
+HEAD:cmd/wisp/resident_audio_247_windows_test.go:155:	if ra.started {
+HEAD:cmd/wisp/resident_audio_247_windows_test.go:256:			if ra.started {
+HEAD:cmd/wisp/resident_audio_windows.go:168:	ra.started = gate.Open()
+HEAD:cmd/wisp/resident_audio_windows.go:323:		ra.started = true
+HEAD:cmd/wisp/resident_audio_windows.go:379:	if !ra.started {
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:124:		if !ra.started {
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:141:		if ra.gate.Open() || ra.started {
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:142:			t.Fatalf("%s: capture stayed handed over after muting (open=%v started=%v)", gesture, ra.gate.Open(), ra.started)
+HEAD:cmd/wisp/resident_mute_290_windows_test.go:174:	if ra.started {

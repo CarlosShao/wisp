@@ -1,0 +1,1 @@
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:72:// slots under (internal/ball/hotkey_windows.go's hkSummon=1, hkPanel=4).

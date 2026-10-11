@@ -1,0 +1,7 @@
+HEAD:cmd/wisp/resident_hotkey_296_windows_test.go:22://   - hotReload = hotkeyReloadSource296, the production hot-tier source, hoisted
+HEAD:cmd/wisp/resident_hotkey_296_windows_test.go:156:	hotReload := func() ball.HotkeyConfig { return hotkeyReloadSource296(dir) }
+HEAD:cmd/wisp/resident_hotkey_296_windows_test.go:201:	hotReload := func() ball.HotkeyConfig { return hotkeyReloadSource296(reloadDir) }
+HEAD:cmd/wisp/resident_windows.go:21:// hotkeyReloadSource296 is ticket 258's hot-tier [hotkey] source - the reload
+HEAD:cmd/wisp/resident_windows.go:43:func hotkeyReloadSource296(dataDir string) ball.HotkeyConfig {
+HEAD:cmd/wisp/resident_windows.go:240:	// Ticket 296: hotReload258's body is the package-scope hotkeyReloadSource296
+HEAD:cmd/wisp/resident_windows.go:249:	hotReload258 := func() ball.HotkeyConfig { return hotkeyReloadSource296(rt.Layout.DataDir) }

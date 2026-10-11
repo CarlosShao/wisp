@@ -1,0 +1,41 @@
+HEAD:cmd/wisp/leg_dispatch_gate_133_test.go:418:func qualifiedName133(sel *ast.SelectorExpr) string {
+HEAD:cmd/wisp/leg_dispatch_gate_133_test.go:431:	case *ast.SelectorExpr:
+HEAD:cmd/wisp/leg_dispatch_gate_133_test.go:537:	sel, ok := star.X.(*ast.SelectorExpr)
+HEAD:cmd/wisp/leg_dispatch_gate_133_test.go:603:	case *ast.Ident, *ast.SelectorExpr:
+HEAD:cmd/wisp/leg_dispatch_gate_133_test.go:683:	case *ast.SelectorExpr:
+HEAD:cmd/wisp/leg_dispatch_gate_133_test.go:775:	case *ast.SelectorExpr:
+HEAD:cmd/wisp/leg_dispatch_gate_133_test.go:1021:		if sel, ok := rhs.(*ast.SelectorExpr); ok && qualifiedName133(sel) == "os.Args" {
+HEAD:cmd/wisp/leg_sink_gate_131_test.go:769:		case *ast.SelectorExpr:
+HEAD:cmd/wisp/leg_sink_gate_131_test.go:907:	case *ast.SelectorExpr:
+HEAD:cmd/wisp/leg_sink_gate_131_test.go:1109:			case *ast.SelectorExpr:
+HEAD:cmd/wisp/leg_sink_gate_131_test.go:1207:		case *ast.SelectorExpr:
+HEAD:cmd/wisp/leg_sink_gate_131_test.go:1322:	case *ast.SelectorExpr:
+HEAD:cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:176:	sel, ok := call.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:203:			sel, ok := call.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_geometry_255_test.go:227:			if sel, ok := node.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "NewWithOptions" {
+HEAD:cmd/wisp/panel_geometry_255_test.go:257:		sel, ok := call.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_geometry_255_test.go:397:	sel, ok := e.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_geometry_255r6_range_windows_test.go:91:			sel, ok := call.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_host_gate_test.go:252:				case *ast.SelectorExpr:
+HEAD:cmd/wisp/panel_host_gate_test.go:264:			sel, ok := call.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_host_gate_test.go:289:	case *ast.SelectorExpr:
+HEAD:cmd/wisp/panel_inbound_33_test.go:305:			se, ok := ce.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_inbound_33_test.go:343:	se, ok := e.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_locked_naming_33r11_windows_test.go:121:			sel, ok := call.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_locked_naming_33r11_windows_test.go:157:	case *ast.SelectorExpr:
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:398:			if sel, ok := call.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "SetSize" {
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:466:			if sel, ok := call.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == methodName {
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:482:		case *ast.SelectorExpr:
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:487:			if sel, ok := x.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == methodName {
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:508:		sel, ok := call.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:523:	sel, ok := e.(*ast.SelectorExpr)
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:532:	if sel, ok := e.(*ast.SelectorExpr); ok {
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:556:	case *ast.SelectorExpr:
+HEAD:cmd/wisp/resident_approval_risk_256_windows_test.go:349:		sel, ok := lit.Type.(*ast.SelectorExpr)
+HEAD:cmd/wisp/resident_approval_risk_256_windows_test.go:550:				if sel, ok := call.Args[0].(*ast.SelectorExpr); ok && sel.Sel != nil && sel.Sel.Name == "DataDir" {
+HEAD:cmd/wisp/resident_approval_risk_268_windows_test.go:246:			sel, ok := node.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/resident_approval_risk_268_windows_test.go:256:				if arg, ok := node.Args[1].(*ast.SelectorExpr); ok && arg.Sel != nil && arg.Sel.Name == "ErrNotExist" {
+HEAD:cmd/wisp/resident_ball_228_test.go:115:				sel, ok := call.Fun.(*ast.SelectorExpr)
+HEAD:cmd/wisp/resident_ball_228_test.go:261:		if sel, ok := d.Call.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "stop" {
+HEAD:cmd/wisp/resident_ball_228_test.go:293:			if sel, ok := lit.Type.(*ast.SelectorExpr); !ok || sel.Sel.Name != "Events" {
+HEAD:cmd/wisp/resident_grant_writer_265_windows_test.go:695:	case *ast.SelectorExpr:

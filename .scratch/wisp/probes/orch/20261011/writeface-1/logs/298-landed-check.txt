@@ -1,0 +1,8 @@
+=== cmd/wisp/panel_inbound_guards_35r3_test.go ===
+HEAD blob = 9713dc37a072b9580f4e1c83e61e5bd1bc30a884
+18d43f8e blob = 9713dc37a072b9580f4e1c83e61e5bd1bc30a884
+is 18d43f8e ancestor of HEAD? YES
+=== cmd/wisp/panel_transport_35r2_test.go ===
+HEAD blob = 52d3c1b2d78164835b7fd858e2f5e511c62fc445
+18d43f8e blob = 52d3c1b2d78164835b7fd858e2f5e511c62fc445
+is 18d43f8e ancestor of HEAD? YES

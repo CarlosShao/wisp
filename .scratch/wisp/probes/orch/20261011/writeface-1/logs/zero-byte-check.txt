@@ -1,0 +1,5 @@
+# 尺＝ find <本腿目录> -type f -size 0
+# 命中＝ logs/296ac5-anchor2.txt（grep 零命中件，已补命令＋rc＋跨行说明使其⛔ 为 0 字节）
+#        logs/race-gate.txt（同上，已补两把尺并排的说明）
+#        logs/zero-byte-check.txt（本件自身，写入时长度 0）
+# ⇒ 入库前复跑本尺的真命中数以 90-final 的自报为准

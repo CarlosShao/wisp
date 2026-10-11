@@ -1,0 +1,7 @@
+# 尺（逐字）＝ git grep -n "dead until the next read" HEAD -- cmd internal
+# rc=1（无命中）／命中 0 行
+# ★这不是"注释里没这句话"，而是**这句话跨了两行**：
+#   cmd/wisp/resident_windows.go blob :40 末 = "...and leave summon, mute and panel dead until"
+#   cmd/wisp/resident_windows.go blob :41 首 = "the next read - which is exactly ..."
+# ⇒ 教训入件：跨行字面量⛔ 能用一句短语做 grep 锚；本腿改用逐短语尺（"only skip is the DeepEqual" 等）
+#   与 blob 直读（sed -n '33,44p'）两把并排，才拿到三处落点。三处逐字见 10 号件 A 节。

@@ -1,0 +1,2 @@
+HEAD:cmd/wisp/resident_windows.go:38:// an empty answer: Check()'s only skip is the DeepEqual diff against what is
+HEAD:cmd/wisp/resident_windows.go:42:// owner's machine (an empty [hotkey] slot means "unset", not "turned off").

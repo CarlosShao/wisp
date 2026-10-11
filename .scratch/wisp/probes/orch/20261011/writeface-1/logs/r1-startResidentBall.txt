@@ -1,0 +1,14 @@
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:314:	rb := startResidentBall(observe.NewRegistry(), nil, nil, nil)
+HEAD:cmd/wisp/resident_approval_live_246_windows_test.go:92:	rb := startResidentBall(reg, ra.vetoByEsc, nil, nil)
+HEAD:cmd/wisp/resident_approval_live_246_windows_test.go:202:	rb := startResidentBall(reg, ra.vetoByEsc, nil, nil)
+HEAD:cmd/wisp/resident_approval_live_246_windows_test.go:296:	rb := startResidentBall(reg, ra.vetoByEsc, nil, nil)
+HEAD:cmd/wisp/resident_ball_windows.go:302:func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg func() ball.HotkeyConfig, hotReload func() ball.HotkeyConfig, hooks ...ballHostHook) *residentBall {
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:278:	rb := startResidentBall(observe.NewRegistry(), nil, src, src)
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:341:	rb := startResidentBall(observe.NewRegistry(), nil, src, nil)
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:384:	rb := startResidentBall(observe.NewRegistry(), nil, src, src)
+HEAD:cmd/wisp/resident_hotkey_296_windows_test.go:19:// startResidentBall(reg, nil, hotCfg, hotReload) over a live ball, with
+HEAD:cmd/wisp/resident_hotkey_296_windows_test.go:26:// the SAME closure to both halves (startResidentBall(..., src, src)) and plants
+HEAD:cmd/wisp/resident_hotkey_296_windows_test.go:158:	rb := startResidentBall(observe.NewRegistry(), nil, hotCfg, hotReload)
+HEAD:cmd/wisp/resident_hotkey_296_windows_test.go:203:	rb := startResidentBall(observe.NewRegistry(), nil, hotCfg, hotReload)
+HEAD:cmd/wisp/resident_hotkey_v1probe_test.go:57:	rb := startResidentBall(observe.NewRegistry(), nil, src, src)
+HEAD:cmd/wisp/resident_windows.go:250:	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {

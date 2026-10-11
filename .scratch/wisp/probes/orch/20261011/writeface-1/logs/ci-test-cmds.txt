@@ -1,0 +1,13 @@
+137:        run: sh scripts/d22scan.sh
+170:        run: sh scripts/check-path-length-budget.sh --with-self-test
+395:        run: bash scripts/portable-tests-selftest.sh
+487:        run: bash scripts/portable-tests.sh --scope=core
+585:        run: bash scripts/winsec-tests.sh
+599:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+621:        run: bash scripts/wisp-cli-tests.sh
+761:        run: bash scripts/portable-tests.sh --scope=census
+797:        run: bash scripts/portable-tests.sh --scope=windows
+838:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+842:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+902:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+905:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6

@@ -1,0 +1,41 @@
+		}
+	}
+	return false
+}
+
+// windowsResidentLeg228 is clause (3)'s subject: the body of the Windows
+// runResident.
+func windowsResidentLeg228(files map[string]*ast.File) (*ast.BlockStmt, string) {
+	for name, f := range files {
+		if !isWindowsBuild228(name, f) {
+			continue
+		}
+		for _, d := range f.Decls {
+			if fn, ok := d.(*ast.FuncDecl); ok && fn.Recv == nil && fn.Name.Name == "runResident" {
+				return fn.Body, name
+			}
+		}
+	}
+	return nil, ""
+}
+
+// filesWithRunResident228 names what the instrument did see, so a rename of the
+// resident leg reads as a finding rather than as a silent zero.
+func filesWithRunResident228(files map[string]*ast.File) []string {
+	var out []string
+	for name, f := range files {
+		for _, d := range f.Decls {
+			if fn, ok := d.(*ast.FuncDecl); ok && fn.Recv == nil && fn.Name.Name == "runResident" {
+				out = append(out, fmt.Sprintf("%s(build-windows=%v)", name, isWindowsBuild228(name, f)))
+			}
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// TestAC228ResidentLegIsTheBallHost is AC#1's shape claim, in four clauses that
+// each fail for a different deletion.
+func TestAC228ResidentLegIsTheBallHost(t *testing.T) {
+	files := productionFiles228(t)
+	hosts, importers := hostsOfBall228(files)

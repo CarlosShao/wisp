@@ -1,0 +1,1 @@
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:290:	if !boot.IsLive(hkSummon258) {

@@ -1,0 +1,37 @@
+HEAD:cmd/wisp/config_receipt_255_test.go:445:		if !strings.Contains(line, "panel_resident_windows.go:207") {
+HEAD:cmd/wisp/leg_sink_gate_131_test.go:791:// has runResident in resident_windows.go and a fail-closed counterpart in
+HEAD:cmd/wisp/panel_geometry_255_test.go:304:// cmd/wisp/panel_resident_windows.go's assembly root, which cmd/wisp already
+HEAD:cmd/wisp/panel_geometry_255_test.go:343:	root := readHostFileForGeometry255(t, filepath.Join(hostPkgDir255(t), "panel_resident_windows.go"))
+HEAD:cmd/wisp/panel_geometry_255_test.go:345:		t.Errorf("cmd/wisp/panel_resident_windows.go no longer reads [panel] through config.LoadFile - the read site the roster cites has moved")
+HEAD:cmd/wisp/panel_geometry_255_test.go:348:		t.Errorf("cmd/wisp/panel_resident_windows.go no longer hands the host a geometry source: AC#4's wiring was removed and the host is back to its own constants")
+HEAD:cmd/wisp/panel_host_gate_test.go:160:// resident leg now constructs the host (cmd/wisp/panel_resident_windows.go), so the
+HEAD:cmd/wisp/panel_host_windows_test.go:38:// panel thread (cmd/wisp/panel_resident_windows.go), never here. The goroutine
+HEAD:cmd/wisp/panel_host_windows_test.go:100:		// cmd/wisp/panel_resident_windows.go: loop() locks for life and never unlocks.
+HEAD:cmd/wisp/panel_host_windows_test.go:924:	// posts to cmd/wisp/panel_resident_windows.go's thread). Called from a foreign
+HEAD:cmd/wisp/panel_resident_windows_test.go:638:// cmd/wisp/panel_resident_windows.go already has a channel for (the same startUp the
+HEAD:cmd/wisp/panel_transport_live_35v2_windows_test.go:38:// process makes at panel_resident_windows.go:299 - on a thread locked for life. This
+HEAD:cmd/wisp/panel_transport_live_35v2_windows_test.go:220:		wv.Run() // the library pump, exactly like panel_resident_windows.go:299
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:178:// the hook can write. Deleting the registration in resident_windows.go takes both
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:220:				" residue of deleting the injection in resident_windows.go, that is exactly the lie.",
+HEAD:cmd/wisp/resident_approval_246_windows_test.go:304://   - no executor: the host is started exactly the way resident_windows.go starts
+HEAD:cmd/wisp/resident_approval_risk_256_windows_test.go:45:// (resident_windows.go:132 to :260) and behind a conditional early return
+HEAD:cmd/wisp/resident_approval_risk_256_windows_test.go:515:// config-fed constructor. Measured off the tree of resident_windows.go, so a
+HEAD:cmd/wisp/resident_approval_risk_256_windows_test.go:519:	path := filepath.Join(risk256Dir(t), "resident_windows.go")
+HEAD:cmd/wisp/resident_approval_risk_268_windows_test.go:201:		t.Errorf("the refused branch wrote %d stdout lines carrying %q, want exactly 1. AC#1 asks that this shape reach a user's eye at least once from a terminal; one line is the shape resident_windows.go's [hotkey] fallback has carried since ticket 258",
+HEAD:cmd/wisp/resident_ball_228_test.go:218:	// resident_windows.go and this clause is the red name.
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:22:// cmd/wisp/resident_windows.go makes this case red because the ball posture is
+HEAD:cmd/wisp/resident_ball_228_windows_test.go:182:// signal.Notify block in cmd/wisp/resident_windows.go and this case is the red
+HEAD:cmd/wisp/resident_hotkey_258_test.go:11:// resident_windows.go must still read config.toml for them. Deleting either
+HEAD:cmd/wisp/resident_hotkey_258_test.go:28:	f, err := parser.ParseFile(fset, filepath.Join(".", "resident_windows.go"), nil, parser.ParseComments)
+HEAD:cmd/wisp/resident_hotkey_258_test.go:30:		t.Fatalf("parsing resident_windows.go (the instrument, not the code): %v", err)
+HEAD:cmd/wisp/resident_hotkey_258_test.go:34:			return fn.Body, "resident_windows.go"
+HEAD:cmd/wisp/resident_hotkey_258_test.go:43:		t.Fatalf("no runResident found in resident_windows.go (the instrument, not the code)")
+HEAD:cmd/wisp/resident_hotkey_258_test.go:73:	src, err := os.ReadFile(filepath.Join(".", "resident_windows.go"))
+HEAD:cmd/wisp/resident_hotkey_258_test.go:75:		t.Fatalf("read resident_windows.go (the instrument): %v", err)
+HEAD:cmd/wisp/resident_hotkey_258_test.go:78:		t.Errorf("resident_windows.go no longer reads config.toml for the [hotkey] chain: the construction source moved, re-adjudicate this walk")
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:12://     resident_windows.go feeds and resident_ball_windows.go consumes. The case
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:98:// production closures (resident_windows.go) do.
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:148:	// The missing-file shape, driven exactly the way resident_windows.go drives
+HEAD:cmd/wisp/resident_sink_nail_127_windows_test.go:8:// the whole install block of cmd/wisp/resident_windows.go (the 20 lines from
+HEAD:cmd/wisp/resident_sink_nail_127_windows_test.go:413:// Delete the install block in resident_windows.go and this case is the one that
+HEAD:cmd/wisp/resident_sink_nail_127_windows_test.go:557:// resident_windows.go are registered in a specific order so that the D38(e)

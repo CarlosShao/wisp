@@ -1,0 +1,15 @@
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:71:// hkSummon258 / hkPanel258 are the wParam ids internal/ball registers the four
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:74:	hkSummon258 uint32 = 1
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:290:	if !boot.IsLive(hkSummon258) {
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:293:	if got := boot.Live()[hkSummon258].VK; got != 'Z' {
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:310:		seen = rb.b.RegisteredHotkeys()[hkSummon258].VK == 'R'
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:317:		t.Fatalf("the [hotkey] edit never reached Win32: summon VK = 0x%X (%+v), want 'R'. The hot tier's promise (no-restart rebind) did not hold.", live[hkSummon258].VK, live)
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:320:	if got := rep.Live()[hkSummon258].VK; got != 'R' {
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:357:	if live[hkSummon258].VK == 'R' {
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:358:		t.Fatalf("MUTATION CONTROL RED: with the bridge hop removed the NEW summon still went live (VK=0x%X), so Test258BridgeRebindsLiveKeysFromConfigEdit is measuring nothing", live[hkSummon258].VK)
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:360:	if live[hkSummon258].VK != 'Q' {
+HEAD:cmd/wisp/resident_hotkey_258_windows_test.go:361:		t.Fatalf("the old binding did not survive a no-rebind host (VK=0x%X): the premise moved", live[hkSummon258].VK)
+HEAD:cmd/wisp/resident_hotkey_v1probe_test.go:67:	if got := rb.b.RegisteredHotkeys()[hkSummon258].VK; got != 'Z' {
+HEAD:cmd/wisp/resident_hotkey_v1probe_test.go:85:		arrived = rb.b.RegisteredHotkeys()[hkSummon258].VK == newVK258
+HEAD:cmd/wisp/resident_hotkey_v1probe_test.go:92:		t.Fatalf("258-v1 PROBE RED: the [hotkey] edit never reached Win32: summon VK = 0x%X (%+v), want 0x37", live[hkSummon258].VK, live)
+HEAD:cmd/wisp/resident_hotkey_v1probe_test.go:98:	if got := rb.b.HotkeyReport().Live()[hkSummon258].VK; got != newVK258 {

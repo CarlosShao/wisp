@@ -1,0 +1,5 @@
+# 尺（逐字）＝ git grep -nE "\-race" HEAD -- scripts .github tools
+# 命中 0 行 ⇒ rc=1（git grep 的"零命中"退码，⛔ 是尺失效）
+# 对照尺（同一条命令去掉 pathspec）＝ git grep -lE "\-race" HEAD  ⇒ 命中 **162 枚文件**
+#   本腿⛔ 逐枚判那 162 枚的性质（射程太宽，多数在 .scratch/** 与 docs/** 的转述里）
+#   ⇒ 两把并读的结论＝"门禁/脚本/CI 三处⛔ 有 race 那一把"（复现票 295 现量节那句，尺形不同、结论同）
