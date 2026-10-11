@@ -1,0 +1,23 @@
+## A841｜2026-10-11 11:5x｜编排者车队卫生第二笔（⛔ 任何一票射程，⛔ 动别人的件）：台账引用的 **275** 枚证据件名里有 **12** 枚**只在盘上、从未提交**、另有 **2** 枚"查无此件"＝**一枚是我这把尺自己造的假发现、一枚是台账 `A695` 的路径笔误**
+
+**为什么记这一笔**：`A837` 记的是"异位垃圾件⛔ 是真读数"；这一笔是同一族的**反向**形状＝**台账里的件名⛔ 保证盘上可核**。工作树哪一天被清（或换一台机器 clone），那 12 枚读数就只剩我这段转述，⛔ 可重跑。
+
+### 1. 现量（尺与射程全部逐字可重跑；件＝`probes/orch/20261011/logs/orch-cited-paths-check.txt`＋`.roster`，脚本＝同目录 `cited-paths-check.sh`）
+
+- 尺①（射程＝**HEAD 的台账 blob**，⛔ 工作树）＝`git show HEAD:docs/reports/pending-and-issues.md | grep -oE 'probes/[A-Za-z0-9_./-]+\.(md|txt|sh)' | sed 's|^|.scratch/wisp/|' | sort -u` ⇒ **275** 枚被引件名。
+- 尺②（逐枚两问）＝先 `git cat-file -e HEAD:<path>`，不中就 `[ -e <path> ]` ⇒ **at_head=261**／**只在盘上、从未提交=12**／**盘上⛔ 也⛔ 有=2**；那 12 枚合计 **1,945,966 B**。
+- 12 枚按归属分两堆（尺＝路径段名）：**腿名下 4 枚**＝`probes/201/r2/gates-full.txt`(5859)／`probes/222/r1/gates-full.txt`(5928)／`probes/223/r2/orchestrator-flake20.txt`(1263，⚠ 名字里带 orchestrator 而**住在腿目录**，别按名字认人)／`probes/300/r1/logs/post-commit-recheck.txt`(817)；**编排者名下 8 枚**＝`probes/orch/296-ac3-runsheet.md`(3352)／`probes/300/orch/logs/r3-orch-v4-attacks-rcfixed-20261010-204046.txt`(3205)／`probes/293/orch/logs/orch-3pkg-run1.txt`(361593)／`probes/orchestrator/33r5-head-roster.txt`(198451)／`33r6`(117286)／`33r7`(197097)／`r9-head-fullpack.txt`(201374)／`probes/235/orch-rerun/full.txt`(849741)。
+- ⚠ 其中 **6 枚 ≥100 KB**（最大 849 KB）＝正是我记过的既定口径"**MB 级日志⛔ 入库也⛔ 删**"；剩下 **6 枚 ≤6 KB** 那堆里，腿名下 4 枚＋我自己名下 2 枚是**当时只写不提交**（⛔ 补提交＝那是别腿名下的东西、⛔ 删＝规矩 8"临时件只建不删"）。
+
+### 2. ★那两枚"查无此件"逐枚具名处理（都⛔ 是假账，成因⛔ 同一枚）
+
+- `probes/292/v1/22-changed-lines.md` ⇒ **我这把尺造的假发现**。台账 `A789` 那一行原文写的是带后缀的 `…/22-changed-lines.md.tmp`（540 B、逐字"未提交"、随票留档），盘上真件＝`22-changed-lines.md.tmp` **在**；我的正则 `(md|txt|sh)` 在 `.md` 处**把 `.tmp` 截掉了**，于是量出一枚不存在的名字。⇒ 定式：**校件名存在性要逐字取台账里那一整串，⛔ 用正则重建**（与"⛔ 按文件名猜语义"同族，这次猜的是我自己的尺）。
+- `probes/35/v4/countershape-v4.sh` ⇒ **台账 `A695` 那一处是路径笔误**（少写一段 `scripts/`）。真件在盘＝`probes/35/v4/scripts/countershape-v4.sh`（`find .scratch -name 'countershape*' -type f`＝**5** 命中：`35/v4/scripts/` 那三枚 `-v4`/`-v4b`/`-v4c` ＋ `35/r5/scripts/countershape-35r5.sh` ＋ `35/r5/logs/countershape-summary.txt`）。⚠ `A695` 那句讲的是"**突变台件按行号开刀会腐烂**"这件真事，笔误⛔ 动摇它；**`A695` 原句⛔ 改，只在这里更正**，下一位要开那套台件请用带 `scripts/` 的那串。
+
+### 3. 处置与 next
+
+- 处置＝⛔ 删、⛔ 搬、⛔ 补提交别人的件，只在这里落"它是什么＋哪一堆归谁"。
+- ★**给下一位的判据**（⛔ 新立仪器票，⛔ 同一件事记两次）：**凡引台账里的件名当凭据，先跑尺②那一发**；`git cat-file -e HEAD:<path>` 不中 ⇒ 那句凭据的性质要改写成〔只在盘上／从未入库〕，⛔ 让读者以为 `git show` 取得到。
+- 现态＝票 307 `-done`；票 72 4 勾／2 未勾＋末尾"取证尺换形"一节（`ffcb21e9`）；票 308 新立 6 枚框全未勾；台账 `A838`/`A839`/`A840` 已落（`9c83598d`）。在飞＝**`72-r1`**（写腿，甲族 7 枚期望侧＋2 枚负向钉）∥ **`taskid-a1`**（只读，答 `bridge.go:925` 的 `taskID == ""` 那问）。
+- next＝收两枚腿 ⇒ 我自己复跑 `72-r1` 那两台面四发＋反形 → 派票 308 的程（同一枚 `internal/risk/*_test.go` 写面，⛔ 与 `72-r1` 并行）→ 队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`；票 300 `AC#4` 与票 305 那六发按在编队静的窗口（那两格都要跑 `cmd/wisp`，⛔ 与写腿同批）。
+- ⛔ push（`A813` 那枚授权仍⛔ 用＝一推就自启 `slo-full` 抢机主 CPU；且 `internal/risk` 的 CI 色作差要和票 300／303／111 欠的色同批取）。⚠ 本笔⛔ 新增任何欠读数，它是我在两枚腿之间顺手做的两把只读尺。
