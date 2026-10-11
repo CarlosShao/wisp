@@ -1,0 +1,6 @@
+83b1aea9 parents=3b8066a2 304-v1b: opening anchor, own HEAD reading (/3b8066a2/), staged=0, scope clean
+3b8066a2 parents=cf627625 编排者代提：两枚验收腿（额度掐断）＋`304-r1`／`309-r3` 的未提交小件入库（判语⛔ 代填）
+cf627625 parents=fa24aa78 309-v3: opening anchor, own HEAD reading, write-surface declaration
+fa24aa78 parents=c27928d6 编排者 A852/A853 落账（收两枚落地腿，四发复量里我自己判废两发）＋§4.0cp 停车点＋派 `304-v1` ∥ `309-v3`
+c27928d6 parents=04f2ecbc 304-v1: opening anchor, own HEAD reading and write-surface declaration
+04f2ecbc parents=715f63cb 304-r1: correct the over-reach roster (a foreign commit hash had been printed in my own log)

@@ -1,0 +1,8 @@
+total 15
+-rw-r--r-- 1 swq 197609  138 Oct 11 19:12 ancestry.txt
+-rw-r--r-- 1 swq 197609  141 Oct 11 19:12 anchor-state.txt
+-rw-r--r-- 1 swq 197609 2095 Oct 11 19:10 gitlog.txt
+-rw-r--r-- 1 swq 197609    0 Oct 11 19:21 labels.stderr
+-rw-r--r-- 1 swq 197609  696 Oct 11 19:21 r-labels.txt
+-rwxr-xr-x 1 swq 197609 4843 Oct 11 19:24 rig-shapes.txt
+leftovers_ls_rc=0
