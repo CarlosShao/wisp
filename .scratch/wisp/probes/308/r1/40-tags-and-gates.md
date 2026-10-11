@@ -52,4 +52,4 @@
 - **⛔ 扩票 307**：票 307 已 `-done`（`.scratch/wisp/issues/307-*-done.md`），残余归 `A839` §3。本票⛔ 借道⛔ 一枚 307 的框。尺＝`ls .scratch/wisp/issues/307*` 只一枚 `-done`。
 - **⛔ 把票 300／301／302 三档 windows 档搬运活并进本票**：票 §边界逐字禁；本腿只交自⛔ 两枚档位读数（上表）＋新件档，⛔ 动票 300/301/302 任何一枚。
 - **⛔ 动产码**：`internal/risk/pathresolver.go` 与 `internal/risk/pathresolver_windows.go` 逐字节⛔ 变（尺＝`git diff --numstat -- internal/risk/pathresolver.go internal/risk/pathresolver_windows.go`＝0 行；写面声明见 `00-anchor.md`）。
-- **⛔ 动票面正文**：本腿只在票 308 末尾追加**一枚** bullet（`git diff --numstat` 应＝1 加 0 删，尺＝commit 后 `git show --numstat --format=`）。
+- **⛔ 动票面正文**：本腿只在票 308 末尾追加**一枚** append-only bullet（纯 +1 行文本，⛔ 动上面各节原句）。★ 但那枚 bullet ⛔ 由本腿 commit——票文件工作树/索引此刻同时躺着编排者⛔ 提交的并发编辑（AC#0 由 `- [ ]`→`- [x]` 一枚**框翻转**、末尾一整节 `## 编排者裁定（A846）`），`git show :<票> | grep -cE '^- \[x\] AC#0'`＝1、`grep -c 编排者裁定`＝1（⛔ 本腿写）。commit 它＝把编排者在飞中间态＋一枚⛔ 我翻的框并入本腿账 ⇒ 本腿⛔ `git add`⛔ commit 票文件，交编排者把 A846 节连同本腿 bullet 一起收（见 `90-final.md` Q-308-r1-D）。
