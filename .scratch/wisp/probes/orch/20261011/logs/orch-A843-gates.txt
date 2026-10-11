@@ -1,0 +1,10 @@
+d22scan_rc=0
+lenbudget_rc=0
+staged_total=20 staged_go=0
+ledger_numstat=31	0	docs/reports/pending-and-issues.md
+handover_numstat=32	0	docs/reports/HANDOVER.md
+worktree_dirty_internal_cmd=0
+handover_4_0c_headers=0
+ledger_A84x_headers=4
+handover_4_0c_headers_corrected=8
+# 上一行 handover_4_0c_headers=0 是那把尺自己坏了（echo 双引号里 \ 多吃掉一个反斜杠 ⇒ grep 找的是字面反斜杠）；0 命中＝尺坏，非"没有节"

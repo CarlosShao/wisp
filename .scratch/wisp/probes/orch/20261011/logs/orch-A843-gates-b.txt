@@ -1,0 +1,18 @@
+d22scan_rc=0
+lenbudget_rc=0
+staged_total=30 staged_go=0
+ledger_numstat=32	0	docs/reports/pending-and-issues.md
+handover_numstat=32	0	docs/reports/HANDOVER.md
+worktree_dirty_internal_cmd=0
+handover_4_0c_headers_b=0
+ledger_A84x_headers_b=4
+prefix_ledger_vs_head=IDENTICAL
+prefix_handover_vs_head=IDENTICAL
+lines_ledger=16174 lines_ledger_head=16142
+lines_handover=2684 lines_handover_head=2652
+A843_file_lines=31 sec40ch_file_lines=31
+--- appended by orchestrator (same file, ⛔ 删上面那行坏读数) ---
+handover_4_0c_headers_b_IS_BROKEN: the pattern used '[a-z]?' while grep default is BRE, where '?' is a literal character => that line reads 0 for a ruler reason, not a content reason (same family as the earlier echo-ate-the-backslash line).
+handover_4_0c_headers_correct_bre=8
+handover_4_0c_headers_ere=8
+names: ### 4.0ca ### 4.0cb ### 4.0cc ### 4.0cd ### 4.0ce ### 4.0cf ### 4.0cg ### 4.0ch 

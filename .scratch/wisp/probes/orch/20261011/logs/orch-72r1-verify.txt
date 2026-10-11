@@ -1,0 +1,124 @@
+# orch-72r1-verify start 2026-10-11 11:54:10 HEAD=d3e04b72
+archive_rc=0 tree_go=648
+=== [1] HEAD 两台面（判据＝别名台面 FAIL 应为 0；本机台面颜色应与 A839 那次同形） ===
+--- phase=P1-aliased-head aliased rc=0 elapsed=7s
+    RUN=200 PASS=199 FAIL=0 SKIP=1
+    fail names:
+--- phase=P1-default-head default-TEMP rc=0 elapsed=5s
+    RUN=200 PASS=199 FAIL=0 SKIP=1
+    fail names:
+=== [2] M-a 退回改前三枚测试件（判据＝别名台面应恰 7 枚红，名册＝票 72 甲族） ===
+revert_rc=0 internal/risk/pathresolver_anchor_spelling_windows_test.go
+revert_rc=0 internal/risk/pathresolver_junction_windows_test.go
+revert_rc=0 internal/risk/syncdirs_test.go
+--- phase=P2-aliased-pristtest aliased rc=1 elapsed=6s
+    RUN=200 PASS=192 FAIL=7 SKIP=1
+    fail names:
+      --- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.09s)
+      --- FAIL: TestCanonicalInputGainsNoSecondForm (0.01s)
+      --- FAIL: TestAListWinsWhereBothTablesHit (0.02s)
+      --- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+      --- FAIL: TestPathResolverUNCAListDenied (0.01s)
+      --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+      --- FAIL: TestBListDefaultDenyAndOverride (0.02s)
+=== [3] M-b namesSameFile 换成 strings.EqualFold(a,b)（判据＝甲族 #1/#4/#5/#6 应转红＝那枚夹具确实是这四枚的承重件） ===
+mb_patch_lines=1
+--- phase=P3-aliased-equalfold aliased rc=1 elapsed=6s
+    RUN=200 PASS=195 FAIL=4 SKIP=1
+    fail names:
+      --- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.09s)
+      --- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+      --- FAIL: TestPathResolverUNCAListDenied (0.01s)
+      --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+mb_restore_lines=1
+=== [4] M-c 单形那一支也恒交两形（判据＝若整包零红，则 AC#5 那句「只产一种比较形」确实零仪器；⚠ 若转红要看红句是不是大小写敏感那另一件事） ===
+mc_patch_lines=1
+--- phase=P4-aliased-twofields aliased rc=0 elapsed=6s
+    RUN=200 PASS=199 FAIL=0 SKIP=1
+    fail names:
+mc_restore_lines=1
+=== [5] M-d syncdirs.go 兜底支退恒真（判据＝新那两枚负向钉必须红；旧正向全绿） ===
+md_patch_lines=1
+--- phase=P5-aliased-tautology aliased rc=1 elapsed=5s
+    RUN=186 PASS=166 FAIL=19 SKIP=1
+    fail names:
+      --- FAIL: TestExfilSyncWriteWindowsSpellingInvariant (0.01s)
+      --- FAIL: TestSyncWriteNegative (0.01s)
+      --- FAIL: TestWriteGateNotSelectedByPayloadKey (0.01s)
+      --- FAIL: TestWriteGatePlainLocalWriteNotFlagged (0.01s)
+      --- FAIL: TestWriteGateEveryPathTargetJudged (0.01s)
+      --- FAIL: TestWriteGateAllPathsNonSyncStaysExempt (0.01s)
+      --- FAIL: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+      --- FAIL: TestSync307AliasShortRootMembership (0.01s)
+      --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+      --- FAIL: TestSyncRedTeamGuardPlainNewFileWriteAllowed (0.01s)
+      --- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+      --- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.03s)
+      --- FAIL: TestSyncUnverifiedRootKeepsFallback (0.01s)
+      --- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.01s)
+      --- FAIL: TestSyncNormalNewFileWriteNotFlagged (0.01s)
+      --- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+      --- FAIL: TestSyncDotDotTailFailsClosed (0.01s)
+      --- FAIL: TestSyncConfirmedGradesDisarmFallbackWindows (0.01s)
+      --- FAIL: TestWriteGatePlainTargetInsideProfileWindows (0.01s)
+    新负向钉那两句在 M-d 里的红句（带文件:行）：
+          syncdirs_test.go:230: source "default": "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncFallbackNotDisarmableByWeakRoot3499038992\\001\\not-a-sync-tree\\notes.md" is outside the profile and outside the injected root, must NOT be sync: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncfallbacknotdisarmablebyweakroot3499038992\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+          syncdirs_test.go:230: source "fixture": "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncFallbackNotDisarmableByWeakRoot3499038992\\001\\not-a-sync-tree\\notes.md" is outside the profile and outside the injected root, must NOT be sync: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncfallbacknotdisarmablebyweakroot3499038992\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+          syncdirs_test.go:230: source "options": "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncFallbackNotDisarmableByWeakRoot3499038992\\001\\not-a-sync-tree\\notes.md" is outside the profile and outside the injected root, must NOT be sync: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncfallbacknotdisarmablebyweakroot3499038992\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+          syncdirs_test.go:230: source "": "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncFallbackNotDisarmableByWeakRoot3499038992\\001\\not-a-sync-tree\\notes.md" is outside the profile and outside the injected root, must NOT be sync: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncfallbacknotdisarmablebyweakroot3499038992\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+          syncdirs_test.go:254: a write outside the profile and outside the unverified root must not be flagged: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncunverifiedrootkeepsfallback381921185\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+=== [6] M-e 恒真形 + syncdirs_test.go 退回 PRE（判据＝红数应比 M-d 少，少的正是新钉那两枚） ===
+me_revert_rc=0
+--- phase=P6-aliased-taut-noNails aliased rc=1 elapsed=6s
+    RUN=186 PASS=168 FAIL=17 SKIP=1
+    fail names:
+      --- FAIL: TestExfilSyncWriteWindowsSpellingInvariant (0.01s)
+      --- FAIL: TestSyncWriteNegative (0.01s)
+      --- FAIL: TestWriteGateNotSelectedByPayloadKey (0.01s)
+      --- FAIL: TestWriteGatePlainLocalWriteNotFlagged (0.01s)
+      --- FAIL: TestWriteGateEveryPathTargetJudged (0.01s)
+      --- FAIL: TestWriteGateAllPathsNonSyncStaysExempt (0.01s)
+      --- FAIL: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+      --- FAIL: TestSync307AliasShortRootMembership (0.01s)
+      --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+      --- FAIL: TestSyncRedTeamGuardPlainNewFileWriteAllowed (0.01s)
+      --- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+      --- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.01s)
+      --- FAIL: TestSyncNormalNewFileWriteNotFlagged (0.01s)
+      --- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+      --- FAIL: TestSyncDotDotTailFailsClosed (0.01s)
+      --- FAIL: TestSyncConfirmedGradesDisarmFallbackWindows (0.02s)
+      --- FAIL: TestWriteGatePlainTargetInsideProfileWindows (0.01s)
+    M-d ⇄ M-e 红名作差：
+      only_in_Md=2
+        TestSyncFallbackNotDisarmableByWeakRoot
+        TestSyncUnverifiedRootKeepsFallback
+      only_in_Me=0
+=== [7] 还原自证（逐枚 sha256 前 16 位 ⇄ 仓内 HEAD blob） ===
+archive_rc=0 tree_go=648
+      SAME 6f330d03f56b1df5 internal/risk/pathresolver_anchor_spelling_windows_test.go
+      SAME ab07caa3f3083f40 internal/risk/pathresolver_junction_windows_test.go
+      SAME 653a9c88fb0ced3f internal/risk/syncdirs_test.go
+      SAME c347e1cfc5401f09 internal/risk/pathresolver.go
+      SAME aa4779bb52704f43 internal/risk/syncdirs.go
+      SAME b8f316794704b04b internal/risk/blacklist.go
+=== 正控：还原后的树再跑一发别名（应仍 FAIL=0） ===
+--- phase=P7-aliased-restored aliased rc=0 elapsed=5s
+    RUN=200 PASS=199 FAIL=0 SKIP=1
+    fail names:
+=== [8] 门禁 ===
+build_rc=0 (件 0 字节)
+vet_rc=0 (件 0 字节)
+d22scan_rc=0
+gofmt_wt_internal_risk=1
+      internal\risk\provenance.go
+      blob_gofmt internal/risk/pathresolver_anchor_spelling_windows_test.go = 0
+      blob_gofmt internal/risk/pathresolver_junction_windows_test.go = 0
+      blob_gofmt internal/risk/syncdirs_test.go = 0
+eol_三枚写面:
+      i/lf    w/lf    attr/text eol=lf      	internal/risk/pathresolver_anchor_spelling_windows_test.go
+      i/lf    w/lf    attr/text eol=lf      	internal/risk/pathresolver_junction_windows_test.go
+      i/lf    w/lf    attr/text eol=lf      	internal/risk/syncdirs_test.go
+worktree_dirty_internal_cmd=0
+ticket72_boxes=6 unchecked=2
+# done 2026-10-11 11:55:36
