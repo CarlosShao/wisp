@@ -1,0 +1,34 @@
+=== pre: sha256[:16]=995c23d2ef6ea16c bytes=56324 HEAD=3974ab4d
+guard_line=989:	if b.injected || b.prov == nil || taskID == "" {
+attach_line=995:		WithTaintDetector(b.prov.Detector(taskID))
+=== CONTROL (pristine) rc=0
+ok  	github.com/CarlosShao/wisp/internal/tools	0.046s
+--- SHOT1-drop-empty-limb
+old=[if b.injected || b.prov == nil || taskID == "" {]
+new=[if b.injected || b.prov == nil {]
+mutated_lines=1	1	internal/tools/bridge.go 
+rc=1
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.048s
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.01s)
+restored=IDENTICAL sha256[:16]=995c23d2ef6ea16c
+diff_after_restore_lines=0
+--- SHOT2-detector-not-attached
+old=[WithTaintDetector(b.prov.Detector(taskID))]
+new=[WithTaintDetector(nil)]
+mutated_lines=1	1	internal/tools/bridge.go 
+rc=1
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.043s
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+restored=IDENTICAL sha256[:16]=995c23d2ef6ea16c
+diff_after_restore_lines=0
+=== final proof
+cmp_with_backup=IDENTICAL
+sha256_now=995c23d2ef6ea16c (pre=995c23d2ef6ea16c)
+worktree_diff_bridge=
+cmp_with_HEAD_blob=IDENTICAL
+dirty_internal_cmd_tools=0
+staged=0

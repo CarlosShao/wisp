@@ -1,0 +1,58 @@
+=== A) commit reality + scope (its report: 3974ab4d, 83 files, +8924/-0, go=0, forbidden=0)
+cat-file=commit head=3974ab4d
+files=83
+numstat=+8924 -0
+go_paths=0
+forbidden_design=0 forbidden_gitignore=0 forbidden_gomod=0
+inflight_faces=0
+foreign_outside_allowed=0
+--- foreign list (empty above = 0):
+ticket309_numstat=1	0	.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md 
+evidence_files=1
+staged_now=0 dirty_internal_cmd_tools=0
+=== B) ticket 309 state (its report: untouched 3/3)
+path=.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md bytes=47538
+boxes_done=3 boxes_open=3
+--- AC#3 line and AC#1/AC#2 lines (first 300 chars each):
+32:- [ ] **`AC#1` 给三枚前提装上仪器**：判据＝**恒真形必须响**——把 `taskID == ""` 那一肢改成"空 id 也挂探测器"或整枚摘掉守卫时，指名用例必须红；反过来探测器没挂上时也要红。⛔ 只交"改⇒红"不交"换反形也红"＝那格没交。
+33:- [ ] **`AC#2` 结构保证那一问**：今天靠"生产构造点只有 1 枚"保证非空＝**接线事实、⛔ 结构保证**（`bridge.go:872-875` 已点名三类未来候选者：自带 id 的面板/球宿主、重试包装器、跨轮次带 id 的定时任务）。本格只回答并落地�
+34:- [ ] **`AC#3` 文案一致性**：`bridge.go:869-876` 那段引的 `loop.go:332/:321` 行号已漂 ⇒ 换成**内容锚**；同段那句"Today no production code dispatches on the bridge except loop.go"要带尺重述（现量＝构造点 1 枚）。⛔ 改这段里的任何**契约声称**文�
+--- ticket tail bullet added by it:
+- [2026-10-11 15:0x] agent=`309-r2`（写腿，⛔ 裁决者）did=照编排者 §4 那五件落地。**① roots**：`tools` 进、★`scripts` 也进——判据⛔ 是"我记得的语言规则"，�
+- [2026-10-11 16:5x] agent=`309-v2`（非实现者终裁腿，⛔ 实现者；★⛔ 翻任何框／⛔ 动 `Status:`／⛔ 改名 `-done`／⛔ push）did=裁 `309-r2` 有没有真关掉 `309-v1` 的
+=== C) the over-claim sentence it says is falsified (bridge.go:955-970)
+file=internal/panel/bridge.go
+=== D) the nail: where it lives, its ruler literal, and its denominator constant
+--- find the test:
+internal/tools/assessorfor_taint_instrument_309_test.go:36:func Test309AssessorForEmptyTaskIDDropsTaintDetector(t *testi
+internal/tools/bridge.go:982:// Who rings if this limb's shape changes is Test309AssessorForEmptyTaskIDDropsTaintDetecto
+internal/tools/bridge.go:988:	// this call); see the doc block above and Test309AssessorForEmptyTaskIDDropsTaintDetector
+--- find 293 / denominator constants in that file:
+F=internal/tools/assessorfor_taint_instrument_309_test.go
+=== E) does the instrument's pattern set cover new(agent.ToolRequest)?
+--- repo-wide spellings of a ToolRequest creation (three shapes):
+literal_braces=63
+amp_form=0
+new_form=1
+--- named new() sites:
+internal/tools/toolrequest_nail_309_test.go:56://   · new(agent.ToolRequest)／make([]agent.ToolRequest, n)／反射或解码构�
+=== F) run the nail on today's tree (green expected; ⛔ I do NOT flip on its word alone)
+pkg=./internal/tools/
+ok  	github.com/CarlosShao/wisp/internal/tools	0.215s
+run_rc=0
+=== G) its zero-byte gate artefacts (rule: 0-byte gate file = cell not delivered)
+gate-build.log         1 bytes=11
+gate-vet.log           1 bytes=9
+gate-d22scan.log       252 bytes=23095
+gate-pathlen.log       20 bytes=2547
+gate2-d22scan.log      252 bytes=23103
+gate2-pathlen.log      20 bytes=2561
+r4-grep-rulers.txt     15 bytes=516
+rigA.txt               120 bytes=5963
+rigB.txt               224 bytes=9786
+rigC.txt               46 bytes=2411
+rigD.txt               52 bytes=2856
+rigE.txt               47 bytes=2879
+zero_byte=2
+--- rc lines self-landed?
+      6 rc=0      14 rc=1       6 rc=2 

@@ -16478,3 +16478,106 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 1. **`grep -c` 退码截断链——第二次**：`git diff --name-only … | grep -c 'probes.*\.go$'` 命中 0 时 rc＝1，把 `&&` 后面"越界名册"那把尺整段跳掉，我第一发把"没跑完"当成了"越界 0"。⇒ 定式＝凡"某枚计数应当为 0"的链一律 `N=$(… || true)` ＋把"empty above＝0 枚"写进件里。
 2. **给已删除的路径做 `git add`**＝`git add -- <票的旧名>` 在 `git mv` 之后报 `fatal: pathspec … did not match any files`（exit 128）＝**整条 add 一起失败**，我第一发以为暂存成功了。⇒ `git mv` 之后只 add 新路径（旧路径那一半由 `git mv` 自己带进索引）。
 3. **一发就定性**＝代提那笔我第一发 `git log --oneline -2` 顶端仍是 `d1e84a05`，据此以为 commit 没落；再量一次 `git rev-parse --short HEAD`＝**`f6067e5d`** ⇒ commit 真落了。这次侥幸方向是"我以为失败、其实成功"，反过来（以为成功、其实失败）就更危险 ⇒ **同一条尺重跑第二把才算数**。
+
+## A850｜2026-10-11 16:5x｜收 `304-a1`（两笔 `b5954339`＋`93de4b4a`，23＋1 枚件，我逐笔 `diff-tree` 现量＝`foreign=0 go=0`）⇒ ★票 304 `AC#0` 我翻勾＋裁形＝**甲**（把在库的 `internal/proc.JobScope` 的 `KILL_ON_JOB_CLOSE` 接到两枚 spawn 点）；★`AC#0` ② 那一格腿交不了（要跑 Go，派单硬边界＝我定的）⇒ **由编排者本人实测三形**：(a) 正常收尾＝**0 枚残留**／(b) `go test -timeout` panic＝**漏 1 枚**（pid 7816，父 30656 现量已没）／(c) 外力 `TerminateProcess`＝**漏 1 枚**（pid 8980，父 28584 现量已没），第二条症状同因递增（`%TEMP%\Test*` 目录 **21→22→23**）
+
+### 1. 腿报的数 ⇄ 我这轮复跑的尺（逐枚；⛔ 一件拿"读文档/读码推"冒充读数）
+
+| # | 腿报 | 我这把尺（可逐字重跑） | 读数 |
+|---|---|---|---|
+| 1 | spawn 全族 72＝测试 66＋非测试 6 | `git ls-files internal cmd tools` 取 `.go`（669 枚）→ `grep -nHE 'exec\.Command(Context)?\('` | **72／66／6 逐字同**，且那 6 枚站点名逐枚对上（`internal/llm/adaptertest/mockllm.go:65`＋`:72`、`cmd/balldebug/diff_windows.go:409`、`cmd/wisp/doctor.go:316`、`cmd/wisp/slo_windows.go:492`、`tools/d22scan/gitignore.go:373`） |
+| 2 | 66 用集合差切 18＋48（⛔ 手数） | 名册**行数**尺：`logs/partition-start18.txt`＝18 行／`partition-sync48.txt`＝48 行／`grep-m1-testonly.txt`＝66 行且 `file:line` 去重仍 66 | ✓ **18＋48＝66**，分母非空证过 |
+| 3 | `mockllm.exe` 残留 0 枚 | 件 `mockllm-procs.ps1`（`Get-CimInstance` ＋ 归属守卫＝命令行含本仓 golden 目录） | **0** ✓（票面 `:9` 那两枚是历史读数＝`:7` 自己立的"⛔ 引用前先重跑"那枚雷兑现） |
+| 4 | `msedgewebview2.exe` 18 枚＝3 棵×6 | 同一把尺 `count_total=18`，三枚父进程全在、wisp 系 0 | ✓ 与 `A821` 口径同 |
+| 5 | `%TEMP%\Test*` 目录 21 枚 | `Get-ChildItem -Directory -Filter 'Test*'` | **21** ✓（我这轮跑完变 23＝我自己两发泄漏造成的，见 §3，⛔ 归腿） |
+| 6 | CI 那侧"零进程计数" | 逐字复跑腿那把尺 `grep -cE 'tasklist\|IMAGENAME\|Get-CimInstance' .github/workflows/ci.yml` | **0** ✓ ⚠ 但 `grep -ci mockllm` ＝ **11** ⇒ **"ci.yml grep 0" 这句⛔ 能裸引**，它的射程＝"没有任何数／杀进程的命令"，而那 11 枚命中全在 `gofumpt`/`vet` 的独立模块名册那一支（`ci.yml:176`/`:309`/`:327`/`:340`） |
+| 7 | 乙形用不了那枚单调钟 | `tools/mockllm/go.mod` 在（`module …/tools/mockllm`）＋根 `go.mod` 对它 require/replace＝0＋无 `go.work`＋该模块 11 枚 `.go` 对 `wisp/internal/observe`/`NewTimeout` 命中 0 | ✓ 独立 stdlib-only 模块成立；`main.go` flag 现量 4 枚、无 shutdown 端点 ✓ |
+| 8 | 墙钟仪器只认一条拼写 | 逐字节看 `tools/d22scan/main.go:166` ＝ `wallclockRe = regexp.MustCompile(` + 反引号 + `\.Sub\(time\.Now\(\)\)` + 反引号 + `)`；应用块 `:781-792`（空行与 `//` 开头 `continue`＝注释豁免、字符串⛔ 豁免）＋第二支 unix×timeout 同行词 | ✓ 腿那句"存在性轮询／`time.After`／`Add`＋`After`／`observe.NewTimeout` 全⛔ 在射程内"成立 |
+| 9 | 甲的仪器与验收在库 | `internal/proc/jobscope_windows.go:71 func OpenJobScope`；真用例 `TestJobScopeKillsChildOnClose:106`／`TestJobScopeTreeAccounting:156`／`TestStartInJobRejectsBadCommand:199`；**★我多量出一枚腿没写的**＝产码同形调用点 `cmd/wisp/slo_windows.go:500` `rt.Job.StartInJob(cmd)` | ✓ 比腿报更硬：产品码今天已经在用 job 端子代 ⇒ 甲⛔ 是新造轮子 |
+| 10 | 票面 `:5①`"起手名册只列两名"已过期 | `HANDOVER.md:2431`/`:2455`/`:2466`/`:2474`/`:2490` 逐枚 `grep -c mockllm` | 各 **1** ⇒ 五行都在数 `mockllm.exe`，腿对、票面那半句过期 |
+
+### 2. ★我自己这轮自抓四处（全记我，⛔ 记腿）
+
+1. **路径按名字猜**：先拿 `internal/adaptertest/mockllm.go` 去量 ⇒ `MISSING`，真身是 `internal/llm/adaptertest/mockllm.go`。同一次会话里第二次犯（上一枚＝`A848` 把 blob 号配错文件）⇒ **定式＝先 `cat-file`／`ls-files` 反查再对拉**（已写进记忆 `feedback-orchestrator-self-accounting` 第 23 形）。
+2. **把腿的引用读成另一种尺**：腿写"`jobscope_windows_test.go:92-104` 那句判据逐字 `helper survived for %v after Job close`"，我第一反应是"那一段是 `waitGone` 辅助函数、⛔ 是用例 ⇒ 腿引错了"。现读 `:92-104` ⇒ 那句 `t.Fatalf` **逐字在 `:99`**，用例在 `:106`。**定式＝引"某句判据落在哪几行"与引"哪枚用例存在"是两把不同的尺；判对方引错之前先读原文那几行。**
+3. ⛔⛔ **第一发 (b) 形整枚是假读数，而它长得像"绿"**：我帽设 `-timeout 14s`，可那枚用例 **4.112s 就跑完了** ⇒ panic 从未触发，"之后 0 枚残留"量的是一枚没发生的事件。抓回它的正是我自己埋的标记行 `timeout_panic=$(grep -c 'test timed out after')` ＝ **0** ⇒ 具名作废、把帽压到 3s 重打，第二发才拿到 `panic: test timed out after 3s` ＋ 残留 1 枚。**这与 `A839`／`A840` 那批缺 `go.mod` 的导出树同族（命令跑了、退码像读数、其实是零次执行）。** ⇒ 定式（进派单模板与我的门禁件口径）：**凡"坏世界必现形／改前必红"那一类夹具，件里必须同行落"那个坏世界真被造出来了"的证据行（panic 行／marker 行），⛔ 只落"之后没残留"。"0"⛔ 是读数。**
+4. 名册作差尺第一版带了耗时/端口列 ⇒ 同 `A848` 那枚，先剥再差（`newpids` 只取 `^pid=` 列）。
+
+### 3. `AC#0` ② 三形实测（编排者自取；锚 `93de4b4a`；件＝`logs/orch-A850-shapes.txt`＋`logs/orch-A850-shape-b2.txt`＋`mockllm-procs.ps1`＋`shapes2.sh`＋`shapesb2.sh`；台面＝本机工作树，⛔ 导出树）
+
+| 形 | 怎么造 | "世界造出来了"的证据 | 子进程读数（尺＝`Get-CimInstance`＋golden 归属） |
+|---|---|---|---|
+| (a) 用例正常结束 | `go test ./internal/llm/openaichat/ -run '^TestMockllmGoldenByteIdenticalEvents$' -count=1 -timeout 300s` | `rc=0`、1 顶层 PASS＋3 子 PASS、`panic=0`、耗时 6s | **0 枚残留**（`t.Cleanup` 的 Kill＋Wait 走通）⇒ 绿，且**这一形本来就⛔ 能证修法**（票面 `:24` 说的就是这件事） |
+| (b) `go test -timeout` panic | 同一条命令、帽压到 **3s** | `rc=1`＋`panic: test timed out after 3s`（marker 行 1＋1）＋日志 `FAIL … 8.050s` | **漏 1 枚**＝pid **7816**，`ppid=30656` 现量已没、`REPO_GOLDEN`、cpu 0.02、`-addr 127.0.0.1:0`；`temp_test_dirs` **22→23** |
+| (c) 外力 `TerminateProcess` | `go test -c -o oc.test.exe`（14046208 字节）→ 后台起它 → 轮询确认子代已在（t=1s，pid 8980）→ `Stop-Process -Id 28584 -Force`（⛔ 停我自己起的那一枚） | 起前名册 `count=1 pids=[28584]`、起后 `still-running test exes: count=0`（＝父确实没了）| **漏 1 枚**＝pid **8980**，`ppid=28584` **PARENT_GONE**、`REPO_GOLDEN`、cpu 0.06；`temp_test_dirs` **21→22** |
+
+- ★两枚我自己造出来的残留**逐枚按三条守卫停掉**（名字必须是 `mockllm.exe` ＋ 命令行含本仓 golden 目录 ＋ 父 PID 现量不存在），终态 `count_total=0 count_repo_golden=0`；⛔ 动过别的任何进程（`msedgewebview2` 全程 18 枚未变、`wisp.exe`/`balldebug.exe` 全程 0）。守卫与停法逐字在 `mockllm-procs.ps1 -CleanIds` 分支里，⛔ 一次性手敲命令。
+- ⇒ **票面 `:24` 那句"只有 (b)(c) 的形状能让修法成立"今天兑现＝两形都实测会漏**，甲形之所以入选正是它同时覆盖这两形（见 §4）。
+
+### 4. ★裁形＝**甲**（编排者的动作，票面 `:25` 明写归我）；撤销口令**「304 改乙」／「304 改丙」**
+
+- **甲＝把在库的 `internal/proc.JobScope`（`KILL_ON_JOB_CLOSE`）接到两枚 spawn 点**：job 句柄是**进程句柄**，父进程无论正常退出、panic 还是被外力 `TerminateProcess`，OS 都会关句柄 ⇒ 成员一起端。⇒ **今天量到的 (b)(c) 两形被同一机制覆盖**，而它⛔ 依赖任何 Go 代码跑到收尾——这正是这枚票的机制缺口所在。仪器／用例／产码同形调用点都在库（§1#9）。
+  - 边界①（腿点到、我追认）：`jobscope_windows.go` 带 `//go:build windows` ⇒ 落地必须是一枚**跨平台形**：windows 走 `StartInJob`，非 windows **明确 no-op 且⛔ 假装受保护**，并把"ubuntu 那一支今天仍会漏"具名写进件里。
+  - 边界②：⛔ 顺手把整棵进程树塞进 job。job 只端**显式成员**（两枚入口 `Assign`/`StartInJob`；`CreateJobObject(nil,nil)` 句柄不可继承）；托管 runner 那一层的颜色＝`Q-304-a1-B`，归我、按在推送那批，⛔ 在本票里把"读码级⛔ 会端别人"说成"已证⛔ 会"。
+- **乙落选，落选的是一枚今天量到的具体坏形状＝PID 会复用**：票面 `:10` 里"当时查不到"的那枚 PPID `11724`，我这轮现量已经是 `RuntimeBroker.exe`；我自己两发的父 PID（30656／28584）也在几十秒内被回收走。⇒ "父 PID 还在不在"作为子进程自退判据**会被复用号骗成"父还活着"⇒ 永不自退**。＋独立 stdlib-only 模块用⛔ 单调钟 ⇒ 轮询写法要不要算 `AGENTS §1.2` 那句"墙钟超时"＝`Q-304-a1-D` 是一枚**没主的规格问**，我⛔ 替它答，也⛔ 因选了甲就追认它合法。
+- **丙（不动＋只记名册）单靠它⛔ 够**：票面 `:45` 明写它是合法选项，但 ② 的实测把它的代价从"会累积"变成可指认的一次一物——**我这一轮自己就造了两发，每发＝＋1 枚挂着不退的假大脑（持一枚 `-addr 127.0.0.1:0` 的 Listen）＋＋1 枚 `Test*` 目录**。丙的另一半（`AC#4`/`AC#4b` 起手与终态名册的可见性＋"数到⛔ 归我"那条）**照做**，因为它管的是"我看得见别人起的"，甲管的是"我自己起的会跟着死"，两件⛔ 互相替代。
+- ⇒ **落地下一步＝`304-r1`**（硬约束沿用票面 `AC#1` 五条＋上面边界①②；`AC#2` 的成对两发要**在两枚 spawn 点上各发一遍**，并把 §5 那枚 `Q-304-v2-A` 一起结掉）。
+
+### 5. 欠账归位（⛔ 记腿；这是我自己排班造成的）
+
+`Q-304-a1-A` **已销**（② 由我实测，读数在 §3）。`-B` CI 颜色层＝归我、推送那批（⛔ 用 `A813` 之前不动远程）。`-C` 原写"乙形候选写法的 d22scan rc"⇒ **改判**＝乙落选后这枚变成"甲落地后要证明甲那写法⛔ 撞墙钟 ban"，归 `304-r1` 的门禁格。`-D` 规格层"存在性轮询算不算超时实现"＝⛔ 归本票、只留台账一句（⛔ 授权任何人替机主答）。`-E` 那枚 powershell 的 CI 色＝推送那批。`-F` 票面 `:10` 的占用/CPU/Listen 读数随进程没掉＝**结构性欠账**（永远复量不了）⇒ 处置＝引用那行时一律标〔历史读数〕，⛔ 当现量。`-G`（magpie 名下那 6 枚去哪了）与 `-H`（现量 23 枚 `Test*` 目录逐枚归属）＝**未定，⛔ 归我判**，`304-r1` 之后再摆。`-I`（⛔ 走 `os/exec` 的直调形）＝下一枚只读腿的活。`-J`＝**我裁：⛔ 算本票射程**——`ci.yml:430` 那枚是 `docker compose … up -d mock-llm` 起的容器，生命周期归 docker/runner，与本票"Windows ⛔ 父死子随"机制不同形；要数容器残留另立。
+★新增一枚：`Q-304-v2-A`＝② 的三形只在 `openaichat` 那一枚 spawn 点实测（另一枚 `internal/llm/adaptertest/mockllm.go:65`/`:72` 是 helper，经我现量**有 17 枚测试文件**走它），helper 那枚的三形实测**并进 `AC#2` 的成对读数**（那格本来就要在两枚 spawn 点上各跑一遍）。
+
+### 6. 翻勾面（我对票 304 动了什么，逐字可查）
+
+- `AC#0` 框 `- [ ]` → `- [x]`（**唯一**一处框动；其余五格 `AC#1`/`AC#2`/`AC#3`/`AC#4`/`AC#4b` 原样未勾）；票尾 append-only 一条 Progress bullet＝本格的凭据与残余（＋1 行／0 删）；`Status:` 行、`-done` 改名、别的票、`internal/**`/`cmd/**`/`tools/**`/`scripts/**`/`.github/**` 一字节⛔ 动。
+- 尺（本批终态）：`boxes_done=1 boxes_open=5`；numstat 票面＝框那行 1 加 1 删 ＋ bullet 1 加；`go_under_probes=0`；`staged_by_others=83`（＝`309-v2` 在飞暂存，⛔ 我提交、⛔ 我清空，我这笔只 `git commit -F … -- <显式 pathspec>`）；门禁四把 `build_rc=0`／`d22scan_rc=0`（ban #8 internal/=531、cmd/=119、frontend/=85、design/=39）／`pathlen_rc=0` VERDICT GREEN（tracked=10779、over-budget=57 ⇄ roster=57、not-in-roster=0、worst=228）。
+- 编队：在飞＝**`309-v2`**（起手锚 `f6067e5d`，裁票 309 剩三格）；已收＝`304-a1`。队列＝`304-r1`（**按在 `309-v2` 交完之后**：它要新增 `internal/llm`→`internal/proc` 这枚导入边，而导入图一动就会洗掉验收腿的逐枚名册对拉——`A849` 那条同形规矩）→ `298-v2`（要 `cmd/wisp` 静默窗口）→ `296-r2` → `295-r1` → `294-r1` → `294-v1`。
+
+### 7. 这一笔对机主的意义（人话，正文在 HANDOVER §4.0co）
+
+跑测试的那个"假大脑"程序，我当场试了两种让测试中途断掉的办法，**两种都留下一个赖着不走的它**（正常跑完则不留）。仓库里已经有一件收摊用的工具、产品码自己每天都在用它收自己起的子进程，所以我定了：**让它也把我们测试起的这个"假大脑"一起收掉**。这条只在 Windows 生效，Linux 那一支还欠着，已写明。
+
+## A851｜2026-10-11 17:1x｜收 `309-v2`（终裁腿，一笔 `3974ab4d`／83 枚件／`+8924 −0`）⇒ ★**`AC#1` 我复跑后翻勾**（自跑两发反形＋正控，还原 `sha256[:16]=995c23d2ef6ea16c` ⇄ 腿报同一条）／★**`AC#2` 我覆核后判⛔ 翻**——腿的"成立"撞它自己的名册（全称判据 vs 具名 9 形全绿），这是**编排者否决验收腿的一处判语**，理由与尺逐枚在 §2／`AC#3` 附条件成立＝条件与 `AC#2` 同一枚（`bridge.go:959-962` 那句 over-claim）⇒ 派 `309-r3` → `309-v3`
+
+### 1. 腿的自报 ⇄ 我的复跑（逐枚，全 rc 现量）
+
+| 它报 | 我的尺 | 读数 |
+|---|---|---|
+| `3974ab4d` 83 枚件／`+8924 −0` | `git cat-file -t` ＋ `show --name-only --format=` 行数 ＋ `diff --numstat` 累加 | **83／+8924／−0** ✓ |
+| `.go` 命中 0／`design`·`.gitignore`·`go.mod` 命中 0／越界 0 | 名册逐枚 `grep`（前缀尺只放行 `docs/evidence/s1/`＋`probes/309/v2/`＋`issues/`） | **0／0／0／0** ✓（越界那把尺的空名册我另起一行写"empty above＝0 枚"，防 `grep -c` 的 rc=1 截断） |
+| 票面 numstat `1/0`（append-only bullet，⛔ 动框、⛔ 动 `Status:`） | `git diff --numstat -- issues/309…` ＋框普查 | **1 加／0 删** ✓；框 `3 勾／3 未勾` ✓（它确实没碰，`AC#1` 那一枚是**我这轮**翻的） |
+| `AC#1` 四发反形各自红＋还原逐字节（`sha 995c23d2ef6e…`） | ★**我自己重打两发**（台件 `probes/orch/20261011/rig309ac1.sh`，读数 `logs/orch-A851-309ac1-rig.txt`）：正控 `rc=0 ok`／SHOT1 摘 `|| taskID == ""` ⇒ `rc=1` ＋逐字 `--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector`／SHOT2 `WithTaintDetector(b.prov.Detector(taskID))`→`WithTaintDetector(nil)` ⇒ 同一枚 FAIL；两发各自 `mutated_lines=1 加 1 删`、`cmp` IDENTICAL、`sha256[:16]=995c23d2ef6ea16c`（⇄ 腿同一条）、终态 `git diff bridge.go` 空 ＋ 与 `git show HEAD:` blob `cmp` IDENTICAL ＋ `internal cmd tools` 工作树 0 行 | ✓ ⇒ **`AC#1` 翻勾**（"恒真形必须响"两侧我各有读数） |
+| `AC#2` 成立 | ★**我复核后不采**，理由与尺在 §2 | ⛔ 翻 |
+| `AC#3` 附条件成立（条件＝`bridge.go:959-963` "every/wherever" 被 B14 打穿） | 我 sed 到 `:952-990` 整段，逐字读到那句（绝对行 `:959-962`）＋读到钉自己的射程登记 `:52`/`:53-58`/`:60` | 条件**指实** ⇒ ⛔ 翻，与 `AC#2` 同一枚条件 |
+| 六枚欠账 `Q-309-v2-1..6` | 逐枚读进我的账（`-6`＝`probes/**` 下 314 枚 tracked `.go`＝别家的尺，⛔ 记本票） | 接住，归位见 §4 |
+
+### 2. ★编排者否决验收腿的一处判语：`AC#2` 全称判据 vs 它自己列的 9 枚反例
+
+- 那一格的原文是"将来**任一** caller 手搭 `ToolRequest` 递进空 `TaskID`，要让它在盘上可核地响"。
+- 交付它的那枚钉 `internal/tools/toolrequest_nail_309_test.go` 在 `:52` 逐字写着"**这把尺仍⛔ 是全覆盖**……具名列出"，条目 `:53`/`:54`/`:55`/`:56`/`:57`/`:58`/`:60`＝**7 条项、展开 9 形**（`:56` 一条里含 `new(agent.ToolRequest)`／`make([]agent.ToolRequest,n)`／反射或 `json.Unmarshal` 解码三形），且腿自己的两发读数 RIG-5／RIG-6 就是**绿**；腿也把它记成欠账 `-3-blind-shape-rings-green`（B14、E3＝分母 293→294 而钉绿）。
+- ⇒ **同一件事⛔ 一边记欠账一边判"成立"**。我记忆里那条定式在这里兑现：**全称判据被造出反例＝退回，不写成"附条件成立"**（[[feedback-adversarial-review-orchestration]]）。处置＝`AC#2`⛔ 翻、`AC#3`⛔ 翻，派 `309-r3` 补最容易的三形（`new`／`make`／定义型再转换），再由**第三程 `309-v3`（非实现者）**复判两格。
+- ⚠ 我把"这条⛔ 覆盖腿的判语"写成上面这种**并列句**⛔ 写成"腿错了"：腿的**读数**（B14/E3 两发绿）我复跑一致、也是它自己把那 9 形交出来的；不对的是**把读数拼成"成立"那一步的判据口径**。
+- ⛔ 反射／解码两形有静态尺：真要全覆盖得走 ⓐ 入口断言，而 ⓐ 已被 `AC#0`（`A843`/`A844` 我裁的 Ⓑ）拒了 ⇒ 这是一条**真实残余**，处置＝写进注释＋台账，⛔ 任何一程宣布"全覆盖"；要不要为它另立一枚运行时闸门**归我下一轮摆**，⛔ 擅自重开 `AC#0`。
+- ⚠ 我⛔ 复跑的一格照实说：`-2`（roots 缩到 `cmd internal` 时地板 200→1 都⛔ 响，B7/B8）我这轮没重打，但我判 `AC#2`⛔ 依赖它——我用的是那 9 形登记＋腿自己的两发绿读数。
+
+### 3. 卫生面的两处口径（记腿为"不齐"、⛔ 记为"违规"）
+
+- 它自报的两枚 0 字节件（`logs/rigA.stdout`／`rigB.stdout`）我核过：同一次取数的正文在**别的件名**里（逐发日志 `rigA-a1..a6.log`、`rigB-b1..b14.log`＋六枚 `rigB-file*.code` 带退码；汇总 `rigA.txt` 5963 字节里逐字有 `rc=0`/`rc=1`，`rigB.txt` 9786 字节是射程表）⇒ ⛔"那格没交"。⚠ 但按实说：**只有 `rigA.txt` 落到了 `rc=` 行**，`rigB/C/D/E` 的汇总件里没有 ⇒ 记**口径不齐**，下一程仍按"每把自落一行 `rc=N`"要求（[[feedback-dispatch-output-budget]] 第 10 条）。
+- ⚠ 同一枚"rigA"在两条句子里指不同文件（它报的 8789＝`rigA-instrument.log`，我数的 5963＝`rigA.txt`）⇒ 两把都对得上盘上，但**引件名必须带扩展名**（[[feedback-ruler-scope-and-provenance]]）。
+
+### 4. 队列与编队（本波起两枚腿，⛔ 我盖章它们的判语）
+
+- 在飞＝**`304-r1`**（票 304 `AC#1`＝甲形落地，写面 `internal/llm/**`＋`internal/proc` 只读；硬约束＝票面 `AC#1` 五条＋我在 `A850` §4 追的两条边界）∥ **`309-r3`**（写面 `internal/tools/toolrequest_nail_309_test.go` 的 matcher＋`internal/tools/bridge.go` 的注释面；⛔ 动任何语义字节、⛔ 翻框、⛔ 碰 `Status:`）。两枚写面互不相交、也不撞整包名册腿。
+- 交回后各派**非实现者**复判：`304-v1`（裁甲形落地＋`AC#2` 成对两发）∥ `309-v3`（裁 `AC#2`/`AC#3` 两格）。
+- 按住＝**`298-v2`**（要 `cmd/wisp` 静默窗口，⛔ 与任何腿并发）→ `296-r2` → `295-r1` → `294-r1` → `294-v1`。
+- 欠账归位：`Q-309-v2-1..6` 六枚照收；`-6`（`probes/**` 下 314 枚 tracked `.go`）**⛔ 本票的账**（那是别家的尺），我另档盯；`Q-304-*` 见 `A850` §5。推送类欠账（`Q-304-a1-B`/`-E`、票 300/303/111 的颜色、票 72 `AC#4` runner 半、`AC#6` 步名、300 `AC#4`/305 六发色）仍**合并成一次推送窗口**，⛔ 用 `A813`。
+- 门禁（本批＝docs＋票面＋probes，⛔ 产码字节；rig 已还原）：`build_rc=0`／`d22scan_rc=0`／`pathlen_rc=0` VERDICT GREEN（tracked=10779、over-budget=57 ⇄ roster=57、worst=228）／`go_under_probes=0`；`staged=0`；本波我对 `internal/tools/bridge.go` 的两笔临时改动的**还原证明**在 §1 第 4 行。
+
+### 5. ★我这轮自抓的四处（⛔ 不外推、⛔ 记腿）
+
+1. **第二次"按名字猜目录"**：先猜 `internal/panel/bridge.go` 去 sed `:952-970`（打出空＝那文件没那么长），真身＝`internal/tools/bridge.go`。定式已进记忆第 23 形：**先 `git grep -l <符号>`／`ls-files` 反查，再取行**。
+2. **draft 里写出一枚不存在的 commit 号** `b5954b39`（真身 `b5954339`）——`cat-file` 尺在**落盘之前**抓住的，所以票面上没留假号；记为"假交件第五形"的同族（我在写正文时续出一枚差一个字符的号）。
+3. **我把腿的一句引用读成另一种尺**（"`:92-104` 是用例"）差点判它引错；现读那句判据在 `:99`、用例在 `:106` ⇒ 定式：**判对方引错之前先读原文那几行**。
+4. **第一发 (b) 形整枚假读数**（帽 14s、用例 4.112s 就完了＝panic 从未触发）——由我埋的 marker 行抓住，具名作废重打。⇒ 已写进 `A850` §2#3 与记忆（"坏世界必现形"那一类夹具，件里必同行落"坏世界真被造出来了"的证据行；**"0"⛔ 是读数**）。
+

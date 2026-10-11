@@ -1,0 +1,94 @@
+=== HEAD / branch
+head=93de4b4a branch=dev
+anchor_leg_reported=d75db9ee exists=commit
+=== ruler 1: spawn statements in internal cmd tools (.go)
+go_files_total=669
+spawn_all=72
+spawn_test=66 spawn_nontest=6
+--- non-test sites (name:line):
+cmd/balldebug/diff_windows.go:409:	cmd := exec.Command(exe, childArgs...)
+cmd/wisp/doctor.go:316:	out, err := exec.Command(cc, "--version").Output()
+cmd/wisp/slo_windows.go:492:	cmd := exec.Command(exe, args...)
+internal/llm/adaptertest/mockllm.go:65:	build := exec.Command(goBin, "build", "-o", exe, ".")
+internal/llm/adaptertest/mockllm.go:72:	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+tools/d22scan/gitignore.go:373:	cmd := exec.CommandContext(ctx, "git", args...)
+--- distinct files with spawns:
+46
+=== ruler 2: the two mockllm spawn sites the leg named
+MISSING internal/adaptertest/mockllm.go
+-- ./internal/llm/openaichat/mockllm_integ_test.go
+	// 2. Start it against the SHARED golden fixtures.
+	proc := &mockllmProc{}
+	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+		"-golden-dir", filepath.Join(repoRoot, "internal", "llm", "testdata", "golden"))
+	stdout, err := proc.cmd.StdoutPipe()
+=== ruler 3: jobscope instrument in-repo (甲)
+-rw-r--r-- 20 swq 197609 7533 Sep 20 07:02 internal/proc/jobscope_windows.go
+-rw-r--r-- 20 swq 197609 6204 Sep 19 15:23 internal/proc/jobscope_windows_test.go
+--- jobscope_windows.go:71 (claim: 71-181 block)
+func OpenJobScope() (*JobScope, error) {
+--- jobscope_windows_test.go:92 (claim: 92-104 case)
+func (h *testHelper) waitGone(t *testing.T, within time.Duration) {
+jobscope_exported_fns=11
+callers_outside_test=3
+=== ruler 4: is tools/mockllm a separate module (乙 premise)
+mockllm_gomod=tools/mockllm/go.mod
+root_gomod_requires_mockllm=0
+replace_or_require=
+go.work=ls: cannot access 'go.work': No such file or directory
+module_line=module github.com/CarlosShao/wisp/tools/mockllm
+mockllm_imports_observe=tools/mockllm/capability_test.go:0 tools/mockllm/chat.go:0 tools/mockllm/control.go:0 tools/mockllm/goldenfmt.go:0 tools/mockllm/main.go:0 tools/mockllm/messages.go:0 tools/mockllm/mockllm_test.go:0 tools/mockllm/responses.go:0 tools/mockllm/server.go:0 tools/mockllm/sse.go:0 tools/mockllm/thinking_capability_test.go:0 
+=== ruler 5: does CI count/kill processes (丙)
+ci_yml_hits[mockllm]=11
+ci_yml_hits[tasklist]=0
+ci_yml_hits[Get-Process]=0
+ci_yml_hits[Stop-Process]=0
+ci_yml_hits[Get-CimInstance]=0
+scripts_dir_hits[mockllm]=0
+=== ruler 6: live process / temp residue (my own reading now)
+date=2026-10-11 16:42:34 +0800
+proc[mockllm.exe]=0
+proc[wisp.exe]=0
+proc[balldebug.exe]=0
+proc[msedgewebview2.exe]=18
+temp_test_dirs=21
+temp_test_dirs_ALT=21
+wisp_side_webview_parents=0
+=== ruler 7: d22scan wall-clock instrument literal
+788:				"wall-clock delta (Sub(time.Now())) in what must be monotonic logic (D42#9/D22)")
+--- main.go:166 (leg claim)
+	wallclockRe      = regexp.MustCompile(`\.Sub\(time\.Now\(\)\)`)
+--- main.go:781,792 (leg claim)
+	for i, line := range lines {
+		code := strings.TrimSpace(line)
+		if code == "" || strings.HasPrefix(code, "//") {
+			continue
+		}
+		if wallclockRe.MatchString(code) {
+			s.add("wallclock-timeout", path, i+1,
+				"wall-clock delta (Sub(time.Now())) in what must be monotonic logic (D42#9/D22)")
+		} else if unixTimeRe.MatchString(code) && timeoutWordRe.MatchString(code) {
+			s.add("wallclock-timeout", path, i+1,
+				"unix timestamp on a timeout/deadline line - monotonic clock required (D42#9/D22)")
+		}
+other_timeout_spellings_in_scope=63
+=== ruler 8: ticket 304 text + HANDOVER staleness claim
+ticket_path=.scratch/wisp/issues/304-external-killed-test-binaries-orphan-mockllm-exe.md
+--- ticket :5 and :17
+**为什么要紧**：① 编队每程起手都跑 `tasklist` 数 `wisp.exe`／`balldebug.exe` 当"桌面干净"的凭据——**`mockllm.exe` 不在这两名册里**，所以我们可能一直踩着一台"有活的假大脑在听 127.0.0.1"的机器自认为是干净的。② 它**会累积**：今天这两枚分别起于 10-08 08:42 与 11:35＝那两天被外力杀掉的测试二进制留下的；每死一次腿就可能多一枚。③ 机制层的缺口是通用的：`t.Cleanup` 只在测试二进制**自己走到收尾**时才跑，而 Windows **没有"父死子随"**。
+- ★**处置已经发生（立案时就把这两枚停了）**：`kill-mine.ps1` 具名 `Stop-Process -Id`，守卫三条＝**名字必须是 `mockllm.exe`** 且 **命令行必须含本仓 golden 目录** 且 **父 PID 现量不存在**，任一条不满足就 SKIP 不动。改后现量＝`mockllm.exe` **0 枚**，`msedgewebview2.exe` **仍 24 枚**（⛔ 动过，理由见 `A821`）。件 `kill-mine-1.txt`。
+--- HANDOVER lines that allegedly already count mockllm.exe:
+H:2431: - **台面现量（19:3x，尺＝`tasklist //FI "IMAGENAME eq <名>"` 各一发的命中�
+H:2455: - **现量（**21:3x**，尺＝`tasklist //FI "IMAGENAME eq <名>"` 各一发命中行数�
+H:2466: - **现量（**22:19 +0800**，尺＝`tasklist //FI "IMAGENAME eq <名>"` 各一发命中�
+H:2474: - **编队闸门现量**（22:19，尺＝`tasklist //FI "IMAGENAME eq <名>"` 命中行数
+H:2490: - **编队闸门现量**（07:34，尺＝`tasklist //FI "IMAGENAME eq <名>"` 命中行数
+handover_mockllm_total=18
+=== ruler 9: leg artefact denominators (row counts, not prose)
+00-anchor    bytes=2482 lines=29
+10-residual  bytes=6567 lines=50
+20-roster    bytes=16505 lines=90
+30-costs     bytes=12941 lines=48
+90-final     bytes=9918 lines=43
+logs_files=17
+zero_byte_logs=0

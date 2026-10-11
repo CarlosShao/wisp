@@ -1,0 +1,16 @@
+=== shape (b) re-taken @ 2026-10-11 16:54:24  HEAD=93de4b4a
+cap set to 3s because the whole test needs ~4.1s (measured: ok/... 4.112s) => the panic must land mid-flight
+before: count_total=0 count_repo_golden=0 pids=[]
+rc=1
+timeout_panic_lines=1
+panic_lines=1
+panic: test timed out after 3s
+FAIL	github.com/CarlosShao/wisp/internal/llm/openaichat	8.050s
+FAIL
+after: count_total=1 count_repo_golden=1 pids=[7816]
+pid=7816 ppid=30656 start=2026-10-11 16:54:26 REPO_GOLDEN PARENT_GONE cpu=0.02 addr_port=0
+count_total=1 count_repo_golden=1 temp_test_dirs=23
+repo_golden_pids=[7816]
+clean ids=[7816]
+killed pid=7816 ppid=30656 guards=name=mockllm.exe+repo-golden-path+parent-gone
+final: count_total=0 count_repo_golden=0 pids=[]

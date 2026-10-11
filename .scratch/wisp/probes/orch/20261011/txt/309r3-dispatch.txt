@@ -1,0 +1,36 @@
+# 派单 `309-r3`（写腿）＝补 `internal/tools/toolrequest_nail_309_test.go` 的射程 ＋ 改正 `internal/tools/bridge.go` 那句过头的话
+
+你是**实现者**。⛔ 你自己翻任何框、⛔ 你自己宣布 `AC#2`／`AC#3` 成立（判语归下一程非实现者腿 `309-v3`）。⛔ push。
+
+## 0. 起手（第 3～5 次调用之内必须做完第 3 步，⛔ 等任何调用数）
+1. `git rev-parse --short HEAD` ＋ `git status --porcelain -- internal cmd tools scripts` 行数，写进你的 `00-anchor.md`。**派单不写锚号**＝你这一刻的读数；看到与我下面转述冲突的原文，**以原文为准并具名报回**。
+2. 起手量一把**全索引**暂存枚数（`git -c core.quotePath=false diff --cached --name-only | grep -c ''`）。★此刻**另有一枚腿在飞**（`304-r1`，写面 `internal/llm/**`）⇒ 索引里出现别家路径是**正常的**：**⛔ 你自己清空**、只写"我看到 N 枚、我没动"；你的名册尺一律**限定在自己的 pathspec 内**，全索引枚数只报数⛔ 归因。⛔ `reset`／`stash`／`checkout .`／`clean`；唯一允许的归位动作＝`git restore --staged -- <你自己的路径>`。
+3. **第 1 笔 commit 立刻做**（只交 `00-anchor.md`）：`git add -- <显式路径>` ＋ `git commit -F <自家 logs 里的消息件> -- <同样显式路径>`。**⛔ 裸 commit**（提交的是整个 index；这一条要执行两遍：add 与 commit **两处**都要 pathspec）。**⛔ `git add -A`／`git add .`／`git add <目录>` 一把扫**——只列你自己那些件的路径，一处都不许扩。
+
+## 1. 背景：为什么是你（⛔ 这不是"腿做错了"，是判据口径）
+- `309-v2`（非实现者终裁腿，`3974ab4d`）判 `AC#1` 成立／`AC#2` 成立／`AC#3` 附条件成立。**编排者覆核**：`AC#1` 我复跑了两种反形（各自 `--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector`，还原 `cmp` IDENTICAL、`sha256[:16]=995c23d2ef6ea16c`）⇒ **已翻勾**；`AC#2` 我**否决**、`AC#3` 我**不翻**，理由与逐枚尺在 `docs/reports/pending-and-issues.md` 的 **`A851` 节 §2**（先读那一节再动手）。
+- 一句话：**`AC#2` 的判据是全称句**（"将来**任一** caller 手搭 `ToolRequest` 递进空 `TaskID`，要让它在盘上可核地响"），而那枚钉**自己在注释里列出了今天抓不住的写法名册**（`internal/tools/toolrequest_nail_309_test.go`：题头 `:52`"这把尺仍⛔ 是全覆盖……具名列出"，条目 `:53`/`:54`/`:55`/`:56`/`:57`/`:58`/`:60`＝7 条、展开 **9 形**；`:63` 自陈"判据是恒真形必须响、⛔ 类型级完美（那要引 `go/types`）"）。**同一件事⛔ 一边记欠账一边判成立** ⇒ 退回。
+- ★你本轮只做**两件最小事**（⛔ 扩大范围、⛔ 顺手重构）：
+  - **(A) 补射程**：把 **三形**接进 matcher——`new(agent.ToolRequest)`／`make([]agent.ToolRequest, n)`（含 `make(..., 0)` 那种长度写法）／定义型 `type X agent.ToolRequest` 之后再 `agent.ToolRequest(x)` 那枚转换。**⛔ 引 `go/types`**（`:63` 那句口径保留）：只用现有 `go/ast`＋`parser` 能做的判定；做不到的那几形（跨包别名／函数体内别名／改名与 dot-import／反射与 `json.Unmarshal` 解码／省类型的嵌套元素／裸名按 package 子句放行）**照原样留在名册里逐枚具名**，⛔ 删条目、⛔ 写成"已全覆盖"。
+  - **(B) 改正文案**：`internal/tools/bridge.go` 里那句 "…counts **every** production construction point of that type across the four roots … **so a second one rings wherever it is written**, including inside `internal/agent`…"（我这轮 sed 到绝对行 **`:959-962`**，你自己现读为准）改成**与实测射程一致**的说法：说清它数的是哪些写法、**明说 `new(...)`／解码这类⛔ 在它射程内**、并把"那几形今天没有尺看得见"这句留在原地（指回钉的登记）。★⛔ 改这段里的任何**契约声称**文字（票面 `AC#3` 原话：只改行号与枚数／射程，⛔ 动承诺本身）；⛔ 改 `assessorFor` 的**语义字节**（那肢 `taskID == ""` 的行为、`WithTaintDetector(...)` 的实参、返回路径，一字⛔ 动）。
+
+## 2. 硬约束（一条都不许漂）
+1. ⛔ 放宽任何断言换绿；⛔ 造 `--- SKIP`；⛔ 动 SLO 阈值／golden／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt`／D43 转移表／C1–C32／D1–D47／三枚冻结件。
+2. ⛔ 动 `internal/risk/**` 生产分级、⛔ 删 `bridge.go` 里那枚空 id 肢、⛔ 改 `lit236*` 常量、⛔ 给 `agent.ToolRequest` 加字段（这些都是本票族既定的禁区，出处＝票面与 `A843`/`A844`）。
+3. 写面只有：`.scratch/wisp/probes/309/r3/**` ＋ `internal/tools/toolrequest_nail_309_test.go` ＋ `internal/tools/bridge.go` 的**注释行** ＋ 票 309 末尾**一条** bullet。⛔ 动 `docs/reports/**`／`docs/evidence/s1/**`（裁决表归 `309-v3`）／任何别的票／`internal/agent/**`／`cmd/**`／`scripts/**`／`.github/**`。
+4. ★**证明新射程有牙**（这是本轮最硬的交付件，缺一发⛔ 算没交）：对**每一枚新增形**各发一发"往树里加一枚真的构造点 ⇒ 指名钉必须红"，并各发一发"把那枚加的拿掉 ⇒ 同一枚钉必须绿"；⛔ 一把正则推整族、⛔ 只在内存里造 AST。⛔ 在**共享工作树**里留下任何变异件：变异台件跑之前先 `cp` 备份，`trap`/`finally` 还原，并落 **`cmp` ＋ `sha256sum`** 两行自证；每一发的输出**先落文件**再取退码（⛔ `cmd | head; echo $?`——那取的是 `head` 的退码）。★并补一枚**正控**：原树整包 `go test ./internal/tools/ -count=1` 的逐名名册跑**改前／改后各一发**（同一枚台面），作差必须＝0 枚新增红；名册作差前先剥耗时列（`sed -E 's/ \([0-9.]+s\)$//'`），否则你会造出几十行假差异。
+5. ⛔ 宣布 `AC#2`/`AC#3` 成立（那是 `309-v3` 的活）；你只交"改了什么＋每一发的原始读数＋我还欠哪几枚"。
+
+## 3. 交付件与门禁
+- `10-matcher-and-comment.md`：逐枚 文件:行；新射程判定用了哪几条 AST 形状；被拒的形照原样列出（引 `:53-60` 的原文行号）。
+- `20-teeth.md`：§2#4 那些发，逐发落"加了什么／红了什么（具名用例＋红句逐字，⛔ 只报颜色）／还原证明两行"。红名册⛔ 区分坏法种类 ⇒ **连失败文案一起引**。
+- `30-gates.md`：`GOFLAGS= go build ./...`、`GOFLAGS= go vet ./internal/tools/`、`sh scripts/d22scan.sh`（★注意 ban #8 扫 `⛔`(U+26D4) 一类字形：**注释豁免、字符串不豁免** ⇒ 你⛔ 把这些字形放进 Go 字符串字面量）、`bash scripts/check-path-length-budget.sh --with-self-test`、格式名册两把并排（工作树 ⇄ HEAD blob，写清射程目录＋枚数）。**每把门禁件自落一行 `rc=N`**（⛔ 0 字节＝那格没交）。
+- `90-final.md`：结论一页内＋指回件名；结尾**具名写你欠的读数**（`Q-309-r3-…`，至少含：反射／解码那两形仍⛔ 可静态覆盖＝这是真实残余、⛔ 由你宣布解决）。
+- 票尾**一条** append-only bullet（`1 加／0 删`；⛔ 动框、⛔ 碰 `Status:`、⛔ 改名 `-done`）。
+
+## 4. 输出预算与死活规矩
+- ⛔ 把上百行原文读进对话；大输出先落你自家 `logs/`，对话里只给 `wc -l`／`head -3` 级摘要。
+- 证据件一律 `.md`／`.txt`；⛔ `.out`（被根 `.gitignore` 全仓忽略＝静默丢件）；⛔ 在 `probes/**` 下建 `.go`；件名⛔ 带 `§`、⛔ 长名（相对 ≤121／末段 ≤100／全路径 ≤165，新建前自己跑那把长度门）；临时件**只建不删**。
+- 目标调用数 **≤35**（本轮是窄改动，别扩射程）；第 25 次之前把 `90-final.md`＋票尾 bullet 写满并 commit。
+- ★`grep -c` 命中 0 时 rc＝1 会截断 `&&` ⇒ 凡"某枚计数应当为 0"的链一律 `N=$(… || true)` ＋件里写"empty above＝0 枚"。
+- 遗产可用：`probes/309/r2/logs/`（前一枚写腿的台件 `nail-rigs.txt`／`nail-rigs-tree.txt`／`nail-rig-5-elided.log`）与 `probes/309/v2/logs/rigB-b*.log`／`rigB-file*.code`（终裁腿的逐发读数）**已提交在盘上**——先 `wc -l`＋`head -3` 摸口径、只补缺的那几把尺；⛔ 把它们的 logs 当判语抄。

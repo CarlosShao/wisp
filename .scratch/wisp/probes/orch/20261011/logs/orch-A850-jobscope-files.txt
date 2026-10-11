@@ -1,0 +1,8 @@
+internal/observe/sampler.go
+internal/panel/doc.go
+internal/proc/boot_windows.go
+internal/proc/doc.go
+internal/proc/jobscope_windows.go
+internal/proc/jobscope_windows_test.go
+internal/proc/shutdown.go
+internal/proc/treemetrics_windows.go

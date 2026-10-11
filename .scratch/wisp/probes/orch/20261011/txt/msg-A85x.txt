@@ -1,0 +1,6 @@
+编排者 A850/A851 落账＋两格翻勾（都由我自己现量，不认腿的自报）
+
+- 票 304 `AC#0` 翻勾：三形死法由我当场实测（正常收尾 0 枚残留／`go test -timeout` panic 留 1 枚 pid 7816 父已没／外力 `TerminateProcess` 留 1 枚 pid 8980 父已没），裁形＝甲（复用 `internal/proc` 的 `JobScope` `KILL_ON_JOB_CLOSE`，两枚 spawn 点同批）；乙形按一枚现量否掉（票面当尺用的父 PID `11724` 现已复用成 `RuntimeBroker.exe`＝"父在不在"这把尺不可信）。
+- 票 309 `AC#1` 翻勾：我在仓外成对导出树复跑该钉，坏色与腿自报逐字同（`bridge.go` sha256[:16]=`995c23d2ef6ea16c`，还原 `cmp`  IDENTICAL）；`AC#2`/`AC#3` 按住不勾——那两格的全称许诺被钉自己那 9 形盲册（反射／`json.Unmarshal` 造出的空 TaskID）否掉，属判据射程分歧，不是腿判错。
+- 台账 `A850`+`A851` 追加 103 行 / 删 0 行、`HANDOVER` §4.0co 追加 28 行 / 删 0 行，两枚前置字节流 `sha256` 逐枚验过 = IDENTICAL；两票各 `+2 −1`（一行框翻转＋一条 Progress bullet，append-only）。
+- 门禁：`pathlen_rc=0`（over-budget=57 ⇄ 名册=57、VERDICT GREEN）、`d22scan_rc=0`；本笔⛔ 动任何产码字节（写面＝两枚报告＋两枚票面＋自家 `probes/orch/20261011/**`），⛔ push。

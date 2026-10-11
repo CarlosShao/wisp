@@ -1,0 +1,53 @@
+=== RUN 2026-10-11 16:53:06 +0800  HEAD=93de4b4a  staged=0
+ruler: mockllm.exe roster via Get-CimInstance; attribution guard = command line contains this repo's golden dir
+target test: ./internal/llm/openaichat/ -run ^TestMockllmGoldenByteIdenticalEvents$ (spawns mockllm.exe at mockllm_integ_test.go:73, reaps at :106)
+--- snap base @ 16:53:07
+count_total=0 count_repo_golden=0 temp_test_dirs=21
+repo_golden_pids=[]
+=== SHAPE (a) normal end
+rc=0 elapsed=6s
+markers: 5 RUN / 1 PASS / 0 FAIL / panic=0
+    --- PASS: TestMockllmGoldenByteIdenticalEvents/tool-call (0.01s)
+    --- PASS: TestMockllmGoldenByteIdenticalEvents/max-tokens (0.00s)
+    --- PASS: TestMockllmGoldenByteIdenticalEvents/usage-multichunk (0.00s)
+    --- PASS: TestMockllmGoldenByteIdenticalEvents/long-text (2.72s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	4.445s
+--- snap a-after @ 16:53:15
+count_total=0 count_repo_golden=0 temp_test_dirs=21
+repo_golden_pids=[]
+shape_a_new_pids=[]
+shape_a_after_count_total=0 count_repo_golden=0 pids=[]
+=== SHAPE (b) -timeout panic
+mid-run: world HAS a live child at t=2s :: count_total=1 count_repo_golden=1 pids=[32016]
+rc=0 (124/2 expected if the timeout fired)
+markers: timeout_panic=0 RUN=5 PASS=1 FAIL=0
+    --- PASS: TestMockllmGoldenByteIdenticalEvents/usage-multichunk (0.00s)
+    --- PASS: TestMockllmGoldenByteIdenticalEvents/long-text (2.72s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	4.112s
+world_constructed_before_panic=1 (t=2no)
+--- snap b-after @ 16:53:38
+count_total=0 count_repo_golden=0 temp_test_dirs=21
+repo_golden_pids=[]
+shape_b_new_pids=[]
+shape_b_after_count_total=0 count_repo_golden=0 pids=[]
+=== SHAPE (c) external TerminateProcess
+build_rc=0 exe_bytes=14046208
+test-exe-roster: name=oc.test.exe count=1 pids=[28584]
+mid-run: live child at t=1s :: count_total=1 count_repo_golden=1 pids=[8980]
+terminated test exe pid=28584 (only the pid this script launched)
+--- snap c-after @ 16:53:48
+pid=8980 ppid=28584 start=2026-10-11 16:53:42 REPO_GOLDEN PARENT_GONE cpu=0.06 addr_port=0
+count_total=1 count_repo_golden=1 temp_test_dirs=22
+repo_golden_pids=[8980]
+shape_c_new_pids=[8980,]
+shape_c_after_count_total=1 count_repo_golden=1 pids=[8980]
+still-running test exes: name=oc.test.exe count=0 pids=[]
+markers-c: 0 PASS lines in its own log
+=== CLEAN (guards: name=mockllm.exe AND cmdline has repo golden dir AND parent PID gone) ids=[8980]
+killed pid=8980 ppid=28584 guards=name=mockllm.exe+repo-golden-path+parent-gone
+--- snap final @ 16:53:52
+count_total=0 count_repo_golden=0 temp_test_dirs=22
+repo_golden_pids=[]
+=== end 16:53:52

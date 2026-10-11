@@ -1,0 +1,169 @@
+=== A) the real mockllm spawner (my first ruler guessed the wrong dir)
+exists=yes bytes=13475
+--- :55-:95
+	}
+	goBin, err := exec.LookPath("go")
+	if err != nil {
+		goBin = filepath.Join(runtime.GOROOT(), "bin", "go"+exeSuffix())
+		if _, statErr := os.Stat(goBin); statErr != nil {
+			t.Skipf("go toolchain not found (PATH nor GOROOT/bin): %v", statErr)
+		}
+	}
+	root := RepoRoot()
+	exe := filepath.Join(t.TempDir(), "mockllm"+exeSuffix())
+	build := exec.Command(goBin, "build", "-o", exe, ".")
+	build.Dir = filepath.Join(root, "tools", "mockllm")
+	if out, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build tools/mockllm: %v\n%s", err, out)
+	}
+
+	proc := &Mockllm{t: t}
+	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+		"-golden-dir", GoldenDir())
+	stdout, err := proc.cmd.StdoutPipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	proc.cmd.Stderr = os.Stderr
+	if err := proc.cmd.Start(); err != nil {
+		t.Fatalf("start mockllm: %v", err)
+	}
+	// Cleanup is registered before the readiness wait so every failure path
+	// below still reaps the child and joins the reader spawn.
+	spawnRoot := observe.NewRoot("adaptertest:mockllm")
+	ready := make(chan error, 1)
+	h := mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot,
+		func(_ context.Context) {
+			sc := bufio.NewScanner(stdout)
+			for sc.Scan() {
+				if v, ok := strings.CutPrefix(sc.Text(), "MOCKLLM_ADDR="); ok {
+					proc.Base = "http://" + v
+					ready <- nil
+					return
+				}
+			}
+--- does the parent wait/kill? (grep in this file)
+98:	t.Cleanup(func() {
+99:		_ = proc.cmd.Process.Kill() // without this, Wait blocks forever: mockllm is a server
+100:		_, _ = proc.cmd.Process.Wait()
+101:		if left := spawnRoot.Wait(mockllmJoinBudget); left != 0 {
+107:	defer timer.Stop()
+126:		_ = proc.cmd.Process.Kill()
+146:	defer resp.Body.Close()
+158:	defer resp.Body.Close()
+370:	t.Cleanup(cancel)
+383:	defer resp.Body.Close()
+=== B) jobscope: real Test funcs + who calls it in production
+--- func Test* in jobscope_windows_test.go:
+59:func TestHelperProcess(t *testing.T) {
+106:func TestJobScopeKillsChildOnClose(t *testing.T) {
+156:func TestJobScopeTreeAccounting(t *testing.T) {
+199:func TestStartInJobRejectsBadCommand(t *testing.T) {
+--- the 3 non-test files that mention JobScope-ish names:
+internal/observe/sampler.go
+internal/panel/doc.go
+internal/proc/boot_windows.go
+internal/proc/doc.go
+internal/proc/jobscope_windows.go
+internal/proc/jobscope_windows_test.go
+internal/proc/shutdown.go
+internal/proc/treemetrics_windows.go
+--- production (non _test.go) call sites, with line:
+internal/observe/sampler.go:18:// JobScope, not single-process RSS - the WebView2 children are the classic
+internal/observe/sampler.go:31:// (WindowsTreeReader on Windows over proc.JobScope). Goroutine counts come
+internal/observe/sampler.go:88:// TreeReader reads the process tree (C30 JobScope on Windows).
+internal/panel/doc.go:8://     child processes all join the Job Object (proc.JobScope)
+internal/proc/boot_windows.go:31:	Job       *JobScope
+internal/proc/boot_windows.go:94:	job, err := OpenJobScope()
+internal/proc/doc.go:1:// Package proc owns OS-process-level machinery (SPEC-01 §3): the JobScope
+internal/proc/doc.go:6://   - JobScope: every child process is assigned to one Job Object with
+internal/proc/jobscope_windows.go:15:// JobScope — contract C30 (D32, D38e step 9, SPEC-01 §2/§3).
+internal/proc/jobscope_windows.go:60:// JobScope owns the process-wide Job Object. Create with OpenJobScope; the
+internal/proc/jobscope_windows.go:62:type JobScope struct {
+internal/proc/jobscope_windows.go:68:// OpenJobScope creates the Job Object with KILL_ON_JOB_CLOSE. The caller
+internal/proc/jobscope_windows.go:71:func OpenJobScope() (*JobScope, error) {
+internal/proc/jobscope_windows.go:85:	return &JobScope{handle: h}, nil
+internal/proc/jobscope_windows.go:89:func (j *JobScope) Assign(p *os.Process) error {
+internal/proc/jobscope_windows.go:110:func (j *JobScope) StartInJob(cmd *exec.Cmd) (*os.Process, error) {
+internal/proc/jobscope_windows.go:129:func (j *JobScope) TreePrivateBytes() (int64, error) {
+internal/proc/jobscope_windows.go:146:func (j *JobScope) TreeProcessCount() (int, error) {
+internal/proc/jobscope_windows.go:157:func (j *JobScope) TreePIDs() ([]uint32, error) {
+internal/proc/jobscope_windows.go:170:func (j *JobScope) Close() error {
+internal/proc/jobscope_windows.go:184:func (j *JobScope) Closed() bool {
+internal/proc/jobscope_windows.go:190:func (j *JobScope) pids() ([]uint32, error) {
+internal/proc/shutdown.go:88:	CloseJob              func(ctx context.Context) error // step 9 (proc.JobScope.Close)
+internal/proc/treemetrics_windows.go:32:	job     *JobScope
+internal/proc/treemetrics_windows.go:36:// NewTreeSampler binds the sampler to a JobScope.
+internal/proc/treemetrics_windows.go:37:func NewTreeSampler(job *JobScope) *TreeSampler {
+--- does anything already use job scope to reap children in production?
+internal/proc/boot_windows.go:94:	job, err := OpenJobScope()
+internal/proc/jobscope_windows.go:60:// JobScope owns the process-wide Job Object. Create with OpenJobScope; the
+internal/proc/jobscope_windows.go:68:// OpenJobScope creates the Job Object with KILL_ON_JOB_CLOSE. The caller
+internal/proc/jobscope_windows.go:71:func OpenJobScope() (*JobScope, error) {
+=== C) ci.yml: the 11 mockllm references (what do they actually do)
+133:        # live: `staticcheck` fails and its dependent `mockllm module vet` reports
+176:          OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"
+272:        #    see tools/d22scan and tools/mockllm - they are separate go.mod
+274:        #    2 d22scan findings and 1 mockllm finding had never been looked at
+288:        #    ci.yml header). The `mockllm module vet` step below already
+309:          for mod in . tools/d22scan tools/mockllm; do
+327:      - name: mockllm module vet
+329:        # SEPARATE module (tools/mockllm, which nothing else in this job vets) and
+340:        working-directory: tools/mockllm
+382:        # mockllm module vet above): ticket 85 ruled `!cancelled()` the one shape
+388:        # `mockllm module vet` rather than an insertion that overtakes the two D22
+--- any cleanup/kill step in ci.yml at all?
+221:        # WHY `!cancelled()` AND NOT THE LITERAL WORDS OF AC#5 (`if: always()`): the
+490:        if: always()
+568:        # without `if: always()`, and this ticket's zero-coverage package). It
+=== D) does HANDOVER already count mockllm.exe (ticket :5 one staleness claim)
+H:2431 has_mockllm=1 :: - **台面现量（19:3x，尺＝`tasklist //FI "IMAGENAME eq <名>"` 各一发的命中行数）**：`wisp.exe`＝**0**／`balldebug.exe`＝**0**／`
+H:2455 has_mockllm=1 :: - **现量（**21:3x**，尺＝`tasklist //FI "IMAGENAME eq <名>"` 各一发命中行数）**：`wisp.exe`＝**0**／`balldebug.exe`＝**0**／`mockl
+H:2466 has_mockllm=1 :: - **现量（**22:19 +0800**，尺＝`tasklist //FI "IMAGENAME eq <名>"` 各一发命中行数）**：`wisp.exe`＝**0**／`balldebug.exe`＝**0**／
+H:2474 has_mockllm=1 :: - **编队闸门现量**（22:19，尺＝`tasklist //FI "IMAGENAME eq <名>"` 命中行数；负载＝仓外 `C:/Users/swq/tmp/loadcheck-306.ps1` 经 
+H:2490 has_mockllm=1 :: - **编队闸门现量**（07:34，尺＝`tasklist //FI "IMAGENAME eq <名>"` 命中行数；负载＝仓外 `loadcheck-306.ps1` 经 `-File`）：`wis
+handover_lines_with_mockllm=18
+--- every HANDOVER line naming mockllm.exe AND tasklist in the same line:
+8
+=== E) leg roster denominators (row counts of its own tables)
+--- heading lines:
+3:## 0. 尺名册（每把都写射程目录＋枚数来源）
+21:## 1. 会留下活子代那一档（18 枚，逐枚：文件:行｜起什么｜回收挂在哪｜外力 `TerminatePro
+48:## 2. 非测试文件里的 6 枚（R2−R1 的作差，逐枚）
+61:## 3. 同步 inline 那一档（**48 枚＝集合差算出来的，⛔ 手数**）
+82:## 4. 这几把尺看不见什么（派单 §4：命中 0 ⛔ 等于没问题）
+--- markdown table rows per section:
+49
+--- separator rows:
+4
+claims_18_48=2
+occurrences_of_18=8
+occurrences_of_48=6
+occurrences_of_66=6
+occurrences_of_72=4
+--- where 18/48 appear (context):
+17:**枚数是整族还是抽样＝整族**：R1/R2 的每一枚都逐枚进了本件（R2 的 72＝R1 的 66＋非测试的 6，作差＝量来的两条尺相�
+21:## 1. 会留下活子代那一档（18 枚，逐枚：文件:行｜起什么｜回收挂在哪｜外力 `TerminateProcess` 时子代命运）
+44:| 18 | `internal/proc/jobscope_windows_test.go:206`｜`:207` | 不存在的 exe（正向控制，`TestStartInJobRejectsBadCommand` decl `:199` 已核） | �
+54:| N3 | `cmd/balldebug/diff_windows.go:409` | 产码（调试工具）起子进程，`CREATE_NEW_PROCESS_GROUP :412` | 产码侧，⛔ 本票射程（票面 `
+61:## 3. 同步 inline 那一档（**48 枚＝集合差算出来的，⛔ 手数**）
+63:推导尺（可逐字重跑，件＝`logs/partition-66-18-48.txt`＋两份名册 `logs/partition-start18.txt`／`logs/partition-sync48.txt`）：
+65:`cut -d: -f1,2 logs/grep-m1-testonly.txt | sort`（66） 对 `18 枚 Start 档名册`（§1 全表）作差 `comm -23` ⇒ **48**；两向作差皆空（⇒ 
+67:按**实参形**分组（枚数＝6＋2＋8＋7＋7＋8＋1＋9＝**48**，分组靠逐枚读过的调用形，⛔ 一把正则推整族）：
+80:⇒ **甲/乙/丙的射程只该打 §1 那 18 枚**：同步形那一档父进程等它退出，外力杀父时它们**要么已经退了、要么跟着管�
+86:3. **R3（`.Start()`）看不见 `StartInJob` 那一支**（`Start` 在 `jobscope_windows.go:114` 里）＝#18 那一枚；也⛔ 看得见"同一个 spawn �
+=== F) what the leg literally wrote about ci.yml / grep 0
+--- .scratch/wisp/probes/304/a1/30-costs.md
+9:| **甲＝Windows Job Object＋`JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`**（测试二进制自己建 job，把 mockllm 塞进去） | 两枚 spawn：`internal/llm/openaicha
+11:| **丙＝不动＋登记具名已知残留＋把 `mockllm.exe` 写进起手闸名册** | ⛔ 动产品码；只动**模板/名册**文本（`AC#4` 那一格） | 编�
+20:4. **〔需真机／需 CI 现量〕本仓今天已经在这两台机器上跑 job 用例**：`TestJobScopeKillsChildOnClose` 一类（`jobscope_windows_test.go:107`/`
+21:5. **〔需机主〕自托管那一支**：`ci.yml:880 runs-on: [self-hosted, wisp-slo]`＝**机主自己那台笔记本**（台账同口径现量记在 `docs/reports/
+--- .scratch/wisp/probes/304/a1/90-final.md
+16:**表③**：**甲形在本仓⛔ 是空想**——仪器与验收都在（`internal/proc/jobscope_windows.go:71-181`＋`internal/proc/jobscope_windows_test.go:41`/`:9
+18:**必答 (I)**：甲形"⛔ 会端别人"停在**读码级**（job 只有 `Assign`/`StartInJob` 两枚入口、只端显式成员；`CreateJobObject(nil,nil)` ⇒ 句�
+34:| **`Q-304-a1-J`** | `ci.yml:430` 那枚 compose 起的 mock-llm 算⛔ 算本票"测试里起子进程"的射程 | 本腿按票面字面（"测试里起子进程"）�
+--- .scratch/wisp/probes/304/a1/20-roster.md
+35:| 9 | `cmd/wisp/resident_approval_live_246_windows_test.go:446`｜`:457` | `esclistener.exe`／wisp 子进程 | `t.Cleanup` Kill＋Wait `:460-463` | 留着（⚠ `//go
+57:| N6 | `tools/d22scan/gitignore.go:373` | 工具自己的 `git`（独立 module，`ci.yml:246` 那把 `go vet (tools/d22scan module)` 尺） | `exec.CommandContext`＝
+78:| 跑自家／别的二进制并等它退出 | **9** | `cmd/wisp/dataroot_128_windows_test.go:128`（`CommandContext`＋`defer cancel`＋`Run`，120s ctx＝**守卫⛔
+88:5. **词面尺⛔ 能证的**：`mockllm` 之外还有没有**别的假大脑/别的长驻夹具**（例：`docker compose` 起的那枚 mock-llm，`ci.yml:430` 的 `S

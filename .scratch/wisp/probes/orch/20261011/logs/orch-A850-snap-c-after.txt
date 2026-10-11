@@ -1,0 +1,3 @@
+pid=8980 ppid=28584 start=2026-10-11 16:53:42 REPO_GOLDEN PARENT_GONE cpu=0.06 addr_port=0
+count_total=1 count_repo_golden=1 temp_test_dirs=22
+repo_golden_pids=[8980]

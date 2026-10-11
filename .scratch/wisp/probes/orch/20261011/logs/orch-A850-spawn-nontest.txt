@@ -1,0 +1,6 @@
+cmd/balldebug/diff_windows.go:409:	cmd := exec.Command(exe, childArgs...)
+cmd/wisp/doctor.go:316:	out, err := exec.Command(cc, "--version").Output()
+cmd/wisp/slo_windows.go:492:	cmd := exec.Command(exe, args...)
+internal/llm/adaptertest/mockllm.go:65:	build := exec.Command(goBin, "build", "-o", exe, ".")
+internal/llm/adaptertest/mockllm.go:72:	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+tools/d22scan/gitignore.go:373:	cmd := exec.CommandContext(ctx, "git", args...)
