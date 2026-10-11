@@ -1,0 +1,107 @@
+﻿MUTATION=d literal-anchor-roundtrip-changed=True
+time=2026-10-11T10:19:04.338+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSyncAncestorWalkVerifiesNativeChain
+--- PASS: TestSyncAncestorWalkVerifiesNativeChain (0.01s)
+=== RUN   TestSyncWriteNegative
+    provenance_test.go:267: local (non-sync) write of tainted content must not be an R4 exfil hit
+--- FAIL: TestSyncWriteNegative (0.01s)
+=== RUN   TestSync307AliasHomeUnderProfileStaysSuspect
+    syncdirs_alias_307_windows_test.go:82: name-prefix sibling must not be swept into the suspect net, got {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsy~1\001\thirty~1 Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+--- FAIL: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+=== RUN   TestSync307AliasShortRootMembership
+    syncdirs_alias_307_windows_test.go:139: false positive: plain write outside every root flagged, got {Sync:true Root:{Provider:Nutstore Path:C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TESTSY~1\001\THIRTY~2\ThirtySevenAliasMissingRoot Source:fixture} Why:write target is under a detected sync root}
+--- FAIL: TestSync307AliasShortRootMembership (0.01s)
+=== RUN   TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+    syncdirs_ancestor_actable_leg_116_test.go:210: precondition: "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161631286956\\wisp116-escape" is not a sync tree and must read as such, got {Sync:true Root:{Provider:Ticket116Sync Path:C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161631286956\001 Source:env} Why:write target is under a detected sync root}
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116 (0.00s)
+=== RUN   TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+=== RUN   TestSyncAncestorLegStillMatchesPlainSameTreeWrite116
+--- PASS: TestSyncAncestorLegStillMatchesPlainSameTreeWrite116 (0.00s)
+=== RUN   TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+--- PASS: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.07s)
+=== RUN   TestSyncAncestorLegNotExemptedStaysFailClosed
+--- PASS: TestSyncAncestorLegNotExemptedStaysFailClosed (0.06s)
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes
+    syncdirs_redteam_windows_test.go:85: sync root long  = C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes2153751581\001\profile\OneDrive Copilot Sync
+    syncdirs_redteam_windows_test.go:86: sync root 8.3   = C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TESTSY~1\001\profile\ONEDRI~1
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined
+--- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes (0.02s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined (0.00s)
+=== RUN   TestSyncRedTeamGuardPlainNewFileWriteAllowed
+    syncdirs_redteam_windows_test.go:152: non-sync dir 8.3 = C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TESTSY~1\001\profile\work
+    syncdirs_redteam_windows_test.go:164: false positive: normal new-file write flagged as sync: {Sync:true Root:{Provider:OneDrive Path:C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestSyncRedTeamGuardPlainNewFileWriteAllowed3453278482\001\profile\OneDrive Copilot Sync Source:registry} Why:write target is under a detected sync root}
+--- FAIL: TestSyncRedTeamGuardPlainNewFileWriteAllowed (0.01s)
+=== RUN   TestSyncRedTeamUnverifiableChainFailClosed
+--- PASS: TestSyncRedTeamUnverifiableChainFailClosed (0.01s)
+=== RUN   TestSyncRedTeamRealOneDrive
+    syncdirs_redteam_windows_test.go:215: P12 evidence: live OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_redteam_windows_test.go:234: no 8.3 alias exists for the live root C:\Users\swq\OneDrive (name is already 8.3-clean); the \\?\ legs below still cross the boundary
+    syncdirs_redteam_windows_test.go:247: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:252: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+    syncdirs_redteam_windows_test.go:247: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:252: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+--- PASS: TestSyncRedTeamRealOneDrive (0.01s)
+=== RUN   TestSyncDefaultLocationProbe
+--- PASS: TestSyncDefaultLocationProbe (0.00s)
+=== RUN   TestSyncDropboxHostDBConfig
+--- PASS: TestSyncDropboxHostDBConfig (0.01s)
+=== RUN   TestSyncFixtureFallbackAndMatch
+    syncdirs_test.go:179: path outside the user profile must not be suspect
+--- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+=== RUN   TestSyncFallbackNotDisarmableByWeakRoot
+--- PASS: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)
+=== RUN   TestSyncUnverifiedRootKeepsFallback
+--- PASS: TestSyncUnverifiedRootKeepsFallback (0.00s)
+=== RUN   TestSyncEnvConfiguredRoots
+--- PASS: TestSyncEnvConfiguredRoots (0.01s)
+=== RUN   TestSyncRegistryProbeTable
+=== RUN   TestSyncRegistryProbeTable/empty_hive_yields_nothing
+=== RUN   TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored
+=== RUN   TestSyncRegistryProbeTable/duplicate_accounts_dedupe
+=== RUN   TestSyncRegistryProbeTable/dropbox_installer_path
+--- PASS: TestSyncRegistryProbeTable (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/empty_hive_yields_nothing (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/duplicate_accounts_dedupe (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/dropbox_installer_path (0.00s)
+=== RUN   TestSyncSuspectFallbackIsComponentBounded
+    syncdirs_test.go:358: sibling directory with a name prefix of the profile must not be suspect
+--- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.01s)
+=== RUN   TestSyncNormalNewFileWriteNotFlagged
+    syncdirs_test.go:374: precondition: C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestSyncNormalNewFileWriteNotFlagged2544184861\001\cloud\work\brand-new.md must be judged a plain non-sync target: {Sync:true Root:{Provider:OneDrive Path:C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestSyncNormalNewFileWriteNotFlagged2544184861\001\cloud\OneDrive Source:registry} Why:write target is under a detected sync root}
+--- FAIL: TestSyncNormalNewFileWriteNotFlagged (0.01s)
+=== RUN   TestSyncSuspectFallbackWhenUndetectable
+    syncdirs_test.go:406: path outside the user profile must not be suspect
+--- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+=== RUN   TestSyncUnresolvablePathFailClosed
+--- PASS: TestSyncUnresolvablePathFailClosed (0.00s)
+=== RUN   TestSyncDotDotTailFailsClosed
+    syncdirs_test.go:440: precondition: C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestSyncDotDotTailFailsClosed1951756673\001\cloud\work\brand-new.md must be judged a plain non-sync target: {Sync:true Root:{Provider:OneDrive Path:C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestSyncDotDotTailFailsClosed1951756673\001\cloud\OneDrive Source:registry} Why:write target is under a detected sync root}
+--- FAIL: TestSyncDotDotTailFailsClosed (0.01s)
+=== RUN   TestSyncRootsIntrospection
+--- PASS: TestSyncRootsIntrospection (0.00s)
+=== RUN   TestSyncDetectionOnThisMachine
+    syncdirs_test.go:491: P12 evidence: detected OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_test.go:509: P12 evidence: OneDrive at C:\Users\swq\OneDrive flagged as sync channel
+--- PASS: TestSyncDetectionOnThisMachine (0.00s)
+=== RUN   TestSyncConfirmedGradesDisarmFallbackWindows
+    syncdirs_windows_test.go:55: source "registry": confirmed root must lift the blanket suspect net
+    syncdirs_windows_test.go:55: source "config": confirmed root must lift the blanket suspect net
+    syncdirs_windows_test.go:55: source "env": confirmed root must lift the blanket suspect net
+--- FAIL: TestSyncConfirmedGradesDisarmFallbackWindows (0.01s)
+=== RUN   TestSyncRegistryProbeLive
+    syncdirs_windows_test.go:133: no registry-grade sync record on this machine (HKCU Accounts without UserFolder is the documented reality here)
+--- SKIP: TestSyncRegistryProbeLive (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.349s
+FAIL
+---- mutation=d rc=1 PASS=26 FAIL=11 SKIP=1 run=TestSync table=aliased sha256_tree_after_restore=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36 sha256_pristine=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36

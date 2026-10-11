@@ -1,0 +1,18 @@
+﻿MUTATION=c literal-anchor-roundtrip-changed=True
+time=2026-10-11T10:19:02.233+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSyncFixtureFallbackAndMatch
+--- PASS: TestSyncFixtureFallbackAndMatch (0.01s)
+=== RUN   TestZZ307ProbeFixtureRootAttribution
+    zz307probe_test.go:26: ZZ307PROBE home=C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestZZ307ProbeFixtureRootAttribution4263225922\001\profile
+    zz307probe_test.go:27: ZZ307PROBE syncRoot=C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestZZ307ProbeFixtureRootAttribution4263225922\001\profile\Cloud\NutstoreSync exists=false statErr=GetFileAttributesEx C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestZZ307ProbeFixtureRootAttribution4263225922\001\profile\Cloud\NutstoreSync: The system cannot find the path specified.
+    zz307probe_test.go:28: ZZ307PROBE target=C:\Users\swq\tmp\RISKAT~1\RUNNER~1\TestZZ307ProbeFixtureRootAttribution4263225922\001\profile\Cloud\NutstoreSync\out\secret.md
+    zz307probe_test.go:29: ZZ307PROBE roots=[{Provider:Nutstore Path:C:/Users/swq/tmp/RISKAT~1/RUNNER~1/TestZZ307ProbeFixtureRootAttribution4263225922/001/profile/Cloud/NutstoreSync Source:fixture}]
+    zz307probe_test.go:30: ZZ307PROBE complete=false
+    zz307probe_test.go:31: ZZ307PROBE st={Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testzz307probefixturerootattribution4263225922\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+    zz307probe_test.go:32: ZZ307PROBE st.Root={Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testzz307probefixturerootattribution4263225922\001\profile Source:suspect-fallback}
+    zz307probe_test.go:33: ZZ307PROBE SPLIT Sync=true Provider="sync-suspect" Path="c:\\users\\swq\\tmp\\riskat~1\\runner~1\\testzz307probefixturerootattribution4263225922\\001\\profile" Source="suspect-fallback" Why="no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)"
+    zz307probe_test.go:37: ZZ307PROBE LOCAL Split Sync=true Provider="sync-suspect" Path="c:\\users\\swq\\tmp\\riskat~1\\runner~1\\testzz307probefixturerootattribution4263225922\\001\\profile" Source="suspect-fallback" Why="no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)"
+--- PASS: TestZZ307ProbeFixtureRootAttribution (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.056s
+---- mutation=c rc=0 PASS=2 FAIL=0 SKIP=0 run=TestSyncFixtureFallbackAndMatch|TestZZ307ProbeFixtureRootAttribution table=aliased sha256_tree_after_restore=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36 sha256_pristine=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36

@@ -1,0 +1,13 @@
+﻿MUTATION=fullrevert TABLE=default literal-anchor-roundtrip-changed=True
+TABLE=default TMPDIR=[] TEMP=[C:\Users\swq\AppData\Local\Temp] TMP=[C:\Users\swq\AppData\Local\Temp]
+time=2026-10-11T10:20:20.518+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSync307AliasHomeUnderProfileStaysSuspect
+    syncdirs_alias_307_windows_test.go:71: ticket 307 fail-open: write under an alias-homed profile read as not-sync, home="C:\\Users\\swq\\AppData\\Local\\Temp\\TESTSY~1\\001\\THIRTY~1" got {Sync:false Root:{Provider: Path: Source:} Why:write target is not under any sync root}
+--- FAIL: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+=== RUN   TestSync307AliasShortRootMembership
+    syncdirs_alias_307_windows_test.go:120: ticket 307 fail-open at the root-membership branch: write under a short-spelled missing root read as not-sync, root="C:\\Users\\swq\\AppData\\Local\\Temp\\TESTSY~1\\001\\THIRTY~2\\ThirtySevenAliasMissingRoot" got {Sync:false Root:{Provider: Path: Source:} Why:write target is not under any sync root}
+--- FAIL: TestSync307AliasShortRootMembership (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.056s
+FAIL
+---- mutation=fullrevert rc=1 PASS=0 FAIL=2 SKIP=0 run=TestSync307Alias table=aliased sha256_tree_after_restore=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36 sha256_pristine=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36

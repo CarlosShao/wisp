@@ -1,0 +1,10 @@
+﻿MUTATION=pristine TABLE=default literal-anchor-roundtrip-changed=False
+TABLE=default TMPDIR=[] TEMP=[C:\Users\swq\AppData\Local\Temp] TMP=[C:\Users\swq\AppData\Local\Temp]
+time=2026-10-11T10:20:22.137+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSync307AliasHomeUnderProfileStaysSuspect
+--- PASS: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+=== RUN   TestSync307AliasShortRootMembership
+--- PASS: TestSync307AliasShortRootMembership (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.053s
+---- mutation=pristine rc=0 PASS=2 FAIL=0 SKIP=0 run=TestSync307Alias table=aliased sha256_tree_after_restore=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36 sha256_pristine=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36
