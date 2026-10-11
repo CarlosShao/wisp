@@ -1,0 +1,6 @@
+308-r2: hand-in hash roster stated as a ruler, not as a frozen hash
+
+The previous commit wrote "hand-in HEAD = c30b7abe", which cannot be
+self-true. This adds logs/handin-hash.md with the 5-commit roster and
+the two commands anyone can run to re-derive the last one. Delivery
+files and the ticket are untouched by this commit.
