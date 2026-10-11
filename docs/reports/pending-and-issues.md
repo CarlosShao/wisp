@@ -16109,3 +16109,34 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 - next＝收两枚腿 ⇒ 我自己复跑 `72-r1` 那两台面四发＋反形 → 派票 308 的程（同一枚 `internal/risk/*_test.go` 写面，⛔ 与 `72-r1` 并行）→ 队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`；票 300 `AC#4` 与票 305 那六发按在编队静的窗口（那两格都要跑 `cmd/wisp`，⛔ 与写腿同批）。
 - ⛔ push（`A813` 那枚授权仍⛔ 用＝一推就自启 `slo-full` 抢机主 CPU；且 `internal/risk` 的 CI 色作差要和票 300／303／111 欠的色同批取）。⚠ 本笔⛔ 新增任何欠读数，它是我在两枚腿之间顺手做的两把只读尺。
 
+## A842｜2026-10-11 12:0x｜收 `taskid-a1`（只读腿一笔 `93643a29`，件 `probes/orch/taskid-a1/**`）⇒ ★**结掉 `A838` §3 我自己登记那枚欠读数**：`bridge.go:925` 的 `taskID == ""` 那一肢**今天不可达**（生产构造点全仓 1 枚、实参收敛到恒 36 字符的 `newTaskID()`），但它是**接线事实⛔ 结构保证**；同一种"宿主没给任务 id"在三处三种处置（静默摘探测器／自命名并写明／fail-closed 拒绝）⇒ **立票 309**（六格，`AC#0` 未裁形之前⛔ 派落地腿）
+
+**为什么要紧（大白话）**：那条链是"程序要写你的文件之前，先问一句这地方敏不敏感"。有一枚开关写在代码里：如果这次调用没带任务号，就**不挂那个报警器**。我这发查清两件事——① 今天没有任何真路径会把"没带任务号"送到那儿；② 那里⛔ 有警报器盯着"没带任务号时到底挂没挂"，而同样情形在隔壁两处的做法**一个是拒绝、一个是自己编一个号并写明故意**。⇒ 这不是"现在坏了"，是"将来有人新接一条路进来时，没人管、也没人会发现"。
+
+### 1. 腿的读数 ⇄ 我这发的独立复跑（八问逐枚，⛔ 抄腿；尺名＋射程写在正文）
+
+| 腿的读数 | 我这发自己复跑 |
+|---|---|
+| 六跳链＋"另拓一跳是地板"（`provenance.go:727` 对未开 scope 无条件 hit） | `sed -n '725,730p' internal/risk/provenance.go` ⇒ `:726 marks, unbound := p.scopeMarks(scopeID)`／`:727 if unbound {`／`SrcTool: SrcUnboundScope`＋逐字 `Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)"` ⇒ **成立**；★后果我照它认＝**摘掉那一肢⛔ 是"更严"，而是每次写都报＝误报风暴** ⇒ 票 309 的边界里逐字禁这条走法 |
+| 守卫逐字三枚前提 | `sed -n '920,932p' internal/tools/bridge.go` ⇒ `:924 func (b *Bridge) assessorFor(taskID string)`、`:925 if b.injected \|\| b.prov == nil \|\| taskID == "" {`、`:926 return b.assess`、`:931 WithTaintDetector(b.prov.Detector(taskID))`；文档块 `:920-923`（锚 `assessorFor returns the assessor whose R4 input is bound to this task's`）**只讲 per-scope 绑定**、⛔ 一字讲空串那一肢 ⇒ **成立**（⛔ 注释里有"故意"这回事） |
+| `assessorFor` 生产 caller＝1 枚 | 尺＝`grep -rn 'assessorFor' internal cmd --include=*.go`（滤 `_test.go`）＝6 命中，其中**真调用点 1 枚**＝`bridge.go:297`（锚 `verdict := b.assessorFor(req.TaskID)`），其余 4 枚是注释＋定义自己 ⇒ **成立**，⚠ 口径按我记过的"按函数名 grep 的调用点数要显式剥定义行"写 |
+| `ToolRequest` 生产构造点＝1 枚 ⇒ 空串今天不可达 | 尺＝`grep -rn 'ToolRequest{' internal cmd --include=*.go`（滤测试）＝**1 行**＝`internal/agent/loop.go:675`；`newTaskID()` 在 `:1153`，返回 `h[0:8]+"-"+h[8:12]+"-"+h[12:16]+"-"+h[16:20]+"-"+h[20:]`＝**恒 36 字符**，且熵失败那支退化为 `time.Now().UnixNano()` 派生**仍非空** ⇒ **成立**；⚠ 我把它定性成**接线事实、⛔ 结构保证**（想自带 id 上桥必须手搭 `ToolRequest`，`bridge.go:872-875` 那段注释已点名三类候选者） |
+| 同形三处置：静默／自命名写明／拒绝 | 逐字复核：②`cmd/wisp/panel_assets.go:164` 注释逐字 `a CLI probe has no task, so it names one`；③`internal/tools/subagent_197.go:262-263`（锚 `parentID := TaskID(ctx)` 后 `if parentID == "" {`）回 `IsError: true`＋文案逐字"这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，就没法登记父子关系，也没法把结论盖戳进父任务的 C25 作用域）" ⇒ **成立**（腿报的 `:259` 偏 3 行＝行号腐烂，内容锚对得上，⛔ 因此改判） |
+| 仪器面：点名 `assessorFor` 的用例 0 枚，但空 id 被经过过 | 尺＝`grep -rn --include=*_test.go 'assessorFor' internal cmd`＝唯一命中 `panel_assets_143_test.go:7`＝注释行 ⇒ **0 枚用例点名**；★而 `internal/tools/failclosed_236_teeth_test.go:244`（锚 `func Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID`）在 **`:288`**（腿报 `:287`，偏 1 行）逐字 `TaskID: "", CorrelationID: "", CallID: "call-236r2-spawn-no-parent"` 真把空 id 喂进 `Execute`，断言全是 `res.IsError`／字面量／`h.roster.Count()` ⇒ **成立**；⚠ **口径我按腿的更正收窄**：⛔ 写"零仪器经过"，写**被经过、未被观测**（腿自己顶回我派单里那句预设，记它一次对） |
+| `injected` 那一肢同样不挂探测器 | 尺＝`grep -rn 'Assessor:' internal cmd --include=*.go`（滤测试）＝**1 命中且是注释**（`bridge.go:132` `injected bool // assess came from Options.Assessor: do not rebuild per call`）⇒ 生产赋值点 0 枚 ⇒ `injected` 今天恒 false；⛔ 塞进票 309（那是装配面另一问），只在这里落"它属别家" |
+| 越界与卫生 | 腿一笔我自己重跑＝`git show --name-only --format= 93643a29`＝6 枚全在 `probes/orch/taskid-a1/**`、外 **0**；⛔ Go 编译面读数复认＝腿自报"零次 `go build`/`vet`/`test`/`env`/`list`"，与我这发编队一致（同一时刻 `72-r1` 独占 `internal/risk` 的编译与测试面）⇒ **成立** |
+
+### 2. ★裁语
+
+- **`A838` §3 那枚"新抓具名欠读数"＝结掉**（问一／问二／问三三问齐）。⛔ 改 `A838` 原句，结欠在这一笔。
+- **立票 309**（`.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md`，名 63 字符＜规矩 9 那枚 100 帽；框尺＝`grep -cE '^[[:space:]]*- \[[ x]\]'`＝**6**、未勾 **6**）＝六格：`AC#0` 三处同形处置的归口与两形代价（ⓐ入口拒绝⇄ⓑ写明故意，两形都⛔ 是"删掉那一肢"）／`AC#1` 给三枚前提装仪器（恒真形必须响）／`AC#2` 结构保证那一问（只问"将来谁递进空 id 要让它在盘上可核地响"）／`AC#3` 注释行号腐烂换内容锚（我这发现量＝尺 `grep -n 'func (l \*Loop) Run\|func (l \*Loop) RunAsync\|newTaskID()' internal/agent/loop.go` ⇒ `RunAsync` 起 **`:328`**（铸造点 `:329`）、`Run` 起 **`:339`**（`:340`），而注释逐字写的是 `loop.go:332/:321` ⇒ 两枚号全漂）／`AC#4` 门禁与越界／`AC#5` 与票 307／40／197／242 的四家对账。★次序硬门＝`AC#0` 没裁形之前⛔ 派落地腿。
+- ⛔ 塞进票 307（已 `-done`、成因⛔ 同：307 是折法不对称，本票是装配前提无仪器⛔ 无保证）；⛔ 塞进票 40（那是页面消费者）；⛔ 并入票 197／242（两家的射程是那两支自己的处置与 id 语义，本票只问"第三种处置⛔ 有仪器"）。
+- 排程＝按在 **`72-r1`** 之后（它的 `AC#1` 写面是 `internal/tools/*_test.go`，与 308 那枚 `internal/risk/*_test.go` 各不相撞，但⛔ 两枚腿同时抢 Go 编译面）。
+- ⚠ 长度门我这一发现跑复认（票 309 落盘之后）＝`sh scripts/check-path-length-budget.sh --with-self-test` **GREEN**：正控 PASSED、分母 tracked 9923、over-budget 57＝roster 57、`not in roster=0`、`worst full path=228`、`in the wall interval=0` ⇒ 新票名⛔ 需要新登记豁免。
+
+### 3. 现态与 next
+
+- 现态＝票 307 `-done`；票 72 4 勾／2 未勾＋末尾"取证尺换形"一节；票 308 六格全未勾；票 309 六格全未勾；台账 `A837`–`A841` 已落（最新笔 `a9ddc020`）。
+- 在飞＝**`72-r1`** 一枚（起手锚笔 `f9b38d5f` 已落＝commit-first 定式生效）。`taskid-a1` 已收＝本笔。
+- next＝收 `72-r1` ⇒ 我自己复跑它那两台面四发＋三发反形 ⇒ 派 `308-a1`（⛔ 与它并行，同写面）⇒ `298-v1` → `296-r2` → `295-r1` → `294-r1` → `294-v1`；票 300 `AC#4` 与票 305 那六发按在编队静的窗口（两格都要跑 `cmd/wisp`）。
+- ⛔ push（`A813` 授权仍未用＝一推自启 `slo-full` 抢机主 CPU；`internal/risk` 的 CI 色作差要和票 300／303／111 欠的色同批取）。⚠ 本笔⛔ 新增欠读数（它结一枚、立一枚带格子的票，⛔ 记两遍）。
