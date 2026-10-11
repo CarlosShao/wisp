@@ -1,0 +1,70 @@
+### ruler1: find -type f (all my files)
+.scratch/wisp/probes/307/a1/00-anchor.md
+.scratch/wisp/probes/307/a1/10-fold-roster.md
+.scratch/wisp/probes/307/a1/20-landing-shapes.md
+.scratch/wisp/probes/307/a1/30-test-nails.md
+.scratch/wisp/probes/307/a1/40-machine-alias.md
+.scratch/wisp/probes/307/a1/90-final.md
+.scratch/wisp/probes/307/a1/logs/00-anchor-readings.log
+.scratch/wisp/probes/307/a1/logs/00-anchor-readings.log.2
+.scratch/wisp/probes/307/a1/logs/00-commit-msg.txt
+.scratch/wisp/probes/307/a1/logs/40-alias-probe.ps1
+.scratch/wisp/probes/307/a1/logs/40-alias-probe.txt
+.scratch/wisp/probes/307/a1/logs/41-alias-world-probe.ps1
+.scratch/wisp/probes/307/a1/logs/41-alias-world-probe.txt
+.scratch/wisp/probes/307/a1/logs/50-selfcheck.txt
+.scratch/wisp/probes/307/a1/logs/90-commit-msg.txt
+.scratch/wisp/probes/307/a1/logs/g-a-defs.txt
+.scratch/wisp/probes/307/a1/logs/g-b-resolver.txt
+.scratch/wisp/probes/307/a1/logs/g-c-prov.txt
+.scratch/wisp/probes/307/a1/logs/g-d-home.txt
+.scratch/wisp/probes/307/a1/logs/g-e-nails.txt
+.scratch/wisp/probes/307/a1/logs/g-g-noprobe.txt
+.scratch/wisp/probes/307/a1/logs/g-h-prod.txt
+.scratch/wisp/probes/307/a1/logs/g-i-negatives.txt
+.scratch/wisp/probes/307/a1/logs/g-j-misc.txt
+.scratch/wisp/probes/307/a1/logs/g-k-crossface.txt
+.scratch/wisp/probes/307/a1/logs/g-k-crossface.txt.2
+count_files=26
+### ruler2: zero-byte (with -type f)
+.scratch/wisp/probes/307/a1/logs/00-anchor-readings.log.2
+.scratch/wisp/probes/307/a1/logs/g-k-crossface.txt.2
+count_zero=2
+### ruler3: new .go under my dir
+0
+### ruler4: .out under my dir
+0
+### ruler5: repo-root new untracked files by me (should be none of mine)
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+?? -
+?? .scratch/.scratch/
+?? .scratch/ci-logs/run-37158259050.err
+?? .scratch/ci-logs/run-37158259050.log
+?? .scratch/ci-logs/run-37166458550-failed.err
+?? .scratch/commit-msg-167-ac1.txt
+?? .scratch/commit-msg-167a2-s01.txt
+?? .scratch/commit-msg-167a2-s23.txt
+?? .scratch/commit-msg-167a2-s4.txt
+?? .scratch/commit-msg-167a2-s56.txt
+?? .scratch/commit-msg-167a2-s78.txt
+?? .scratch/commit-msg-167a2-s85.txt
+?? .scratch/commit-msg-167a2-skeleton.txt
+?? .scratch/commit-msg-171r3-step1.txt
+### ruler6: mojibake check in my md files
+24:⇒ 具名报回：**只有产码那两枚 `:425`/`:429` 腐烂**（同一文件里 `resolveTarget` 与 `home` 赋值点没动，所以是 `match()` 内部被删过 3 行）。落点腿一律以内容锚定位。
+rc_self=0

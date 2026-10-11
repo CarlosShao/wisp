@@ -1,0 +1,132 @@
+### grep: isUnder( call sites in internal (non-test) with line numbers
+internal/risk/blacklist.go:169:func isUnder(path, dir string) bool {
+internal/risk/blacklist.go:321:	return isUnder(cand.root, anchor.root) || isUnder(anchor.root, cand.root)
+internal/risk/syncdirs.go:422:		if isUnder(cand, e.canon) {
+internal/risk/syncdirs.go:428:	if !s.complete && s.home != "" && isUnder(cand, s.home) {
+
+### grep: SyncDetectionComplete callers (all, incl test)
+internal/risk/provenance_syncdirs_other_test.go:106:	if !p.SyncDetectionComplete() {
+internal/risk/provenance_syncdirs_windows_test.go:37:// and not a SyncDetectionComplete() POSIX cannot ever report — is what makes
+internal/risk/provenance_test.go:457:// the previous shape required SyncDetectionComplete() before the negative
+internal/risk/syncdirs.go:458:func (p *Provenance) SyncDetectionComplete() bool {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:128:// SyncDetectionComplete() is NOT asserted here, unlike those tests: on POSIX no
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:67:	if !p.SyncDetectionComplete() {
+internal/risk/syncdirs_other_test.go:20://   - so SyncDetectionComplete() is false, the under-profile suspect net stays
+internal/risk/syncdirs_other_test.go:43://     SyncDetectionComplete(); that branch flips by itself and needs no edit
+internal/risk/syncdirs_other_test.go:71:		if p.SyncDetectionComplete() {
+internal/risk/syncdirs_other_test.go:94:	if e.p.SyncDetectionComplete() {
+internal/risk/syncdirs_redteam_windows_test.go:76:	if !p.SyncDetectionComplete() {
+internal/risk/syncdirs_test.go:171:	if p.SyncDetectionComplete() {
+internal/risk/syncdirs_test.go:209:		if p.SyncDetectionComplete() {
+internal/risk/syncdirs_test.go:229:	if p.SyncDetectionComplete() {
+internal/risk/syncdirs_test.go:367:// the plain directory inside the profile and required SyncDetectionComplete()
+internal/risk/syncdirs_test.go:397:	if p.SyncDetectionComplete() {
+internal/risk/syncdirs_test.go:434:// put `work` inside the profile and required SyncDetectionComplete() so that the
+internal/risk/syncdirs_test.go:489:	if p.SyncDetectionComplete() {
+internal/risk/syncdirs_test.go:500:	if !p.SyncDetectionComplete() {
+internal/risk/syncdirs_windows_test.go:18:// and confirmed-GRADE (env/registry/config). So `SyncDetectionComplete()` is
+internal/risk/syncdirs_windows_test.go:51:		if !p.SyncDetectionComplete() {
+internal/risk/syncdirs_windows_test.go:88:	if !p.SyncDetectionComplete() {
+
+### grep: HomeDir / LocalAppData / AppData fields in ProvOptions + where filled
+226:	// HomeDir/LocalAppData/AppData relocate the P12 probes (tests); empty
+228:	HomeDir      string
+229:	LocalAppData string
+345:		s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+
+### provenance.go 320-370
+   320		}
+   321		for t, keys := range o.ChannelKeys {
+   322			existing := map[string]bool{}
+   323			var merged []string
+   324			for _, k := range ch[t] {
+   325				existing[k] = true
+   326				merged = append(merged, k)
+   327			}
+   328			for _, k := range keys {
+   329				if !existing[k] {
+   330					merged = append(merged, k)
+   331				}
+   332			}
+   333			ch[t] = merged
+   334		}
+   335		p := &Provenance{
+   336			scopes:   map[string]*scopeReg{},
+   337			minChars: minChars,
+   338			maxSrc:   maxSrc,
+   339			maxScan:  maxScan,
+   340			maxDepth: maxDepth,
+   341			maxMarks: maxMarks,
+   342			channel:  ch,
+   343		}
+   344		if o.NoProbe {
+   345			s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+   346			for _, r := range o.SyncRoots {
+   347				s.add(r)
+   348			}
+   349			if o.SyncFixturePath != "" {
+   350				for _, r := range fixtureRoots(o.SyncFixturePath) {
+   351					s.add(r)
+   352				}
+   353			}
+   354			s.finalize()
+   355			p.sync = s
+   356		} else {
+   357			p.sync = detectSyncSet(o)
+   358		}
+   359		return p
+   360	}
+   361	
+   362	// --- scope lifetime (handle carries its own closer) --------------------------
+   363	//
+   364	// This is ticket 160's shape. Before it, scope lifetime was TWO independent
+   365	// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+   366	// name any id, and "forgot to close" was only a breach of discipline. The
+   367	// close side is now a method on the handle the open side hands back, and the
+   368	// id it closes is a private field of that handle.
+   369	//
+   370	// What this does NOT buy, measured rather than claimed (see
+
+### provenance.go 900-940
+   900	//     inside OneDrive, because the ordered pathKeys table meant only the
+   901	//     first match was ever examined);
+   902	//   - nothing in the call addresses a remote destination, neither by key name
+   903	//     nor by a URL-shaped value, and the nesting budget did not cut that check
+   904	//     short (unproven = open).
+   905	//
+   906	// Which key carries the payload is not an input to that decision, so the
+   907	// exemption cannot be dodged — nor claimed — by naming.
+   908	func (p *Provenance) writeGate(tool string, params map[string]any) (open bool, ch Channel) {
+   909		def, named := channelTable[tool]
+   910		if named && def.ch != ChSyncWrite {
+   911			return true, ChUnknown // named non-write channel: no local-write exemption
+   912		}
+   913		targets, hasPath, unverified := pathTargets(params)
+   914		if !hasPath {
+   915			if named {
+   916				// fs.write whose target cannot be verified is the shape the gate
+   917				// exists to protect: fail closed toward scanning.
+   918				return true, ChSyncWrite
+   919			}
+   920			return true, ChUnknown // nothing write-shaped: the generic scan
+   921		}
+   922		remote, cut := hasRemoteSink(params, p.maxDepth)
+   923		// C-3: the exemption must hold for EVERY path-shaped parameter, not just
+   924		// the first one pathKeys happens to match. One sync (or unresolvable, or
+   925		// reparse-traversing, or '..'-carrying) target among them keeps the gate
+   926		// open — IsSyncPath fail-closes on all of those.
+   927		for _, t := range targets {
+   928			if p.IsSyncPath(t).Sync {
+   929				return true, ChSyncWrite
+   930			}
+   931		}
+   932		switch {
+   933		case remote || cut:
+   934			return true, ChHTTP // a sink in the same call: the payload can leave
+   935		case unverified:
+   936			// A path-shaped key whose value is not a checkable string target: the
+   937			// landing site it names is unproven, so the call is not a confirmed
+   938			// plain local write.
+   939			if named {
+   940				return true, ChSyncWrite
+rc_c=0

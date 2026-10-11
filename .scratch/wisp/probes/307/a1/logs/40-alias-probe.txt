@@ -1,0 +1,65 @@
+COMPUTERNAME=DESKTOP-LVS7839
+USERNAME=swq
+USERPROFILE=C:\Users\swq
+TEMP=C:\Users\swq\AppData\Local\Temp
+TMP=C:\Users\swq\AppData\Local\Temp
+TMPDIR=
+LOCALAPPDATA=C:\Users\swq\AppData\Local
+ALIAS SHORT==LONG long=C:\Users\swq short=C:\Users\swq
+ALIAS SHORT==LONG long=C:\Users short=C:\Users
+ALIAS SHORT==LONG long=C:\Users\swq short=C:\Users\swq
+ALIAS SHORT==LONG long=C:\Users\swq\AppData\Local short=C:\Users\swq\AppData\Local
+ALIAS SHORT==LONG long=C:\Users\swq\AppData\Local\Temp short=C:\Users\swq\AppData\Local\Temp
+ALIAS SHORT==LONG long=C:\Users\swq\tmp short=C:\Users\swq\tmp
+ALIAS SHORT!=LONG long=C:\Users\swq\tmp\riskattrib1 short=C:\Users\swq\tmp\RISKAT~1
+ALIAS SHORT!=LONG long=C:\Users\swq\tmp\riskattrib1\RunnerTempAreaForAttribution1 short=C:\Users\swq\tmp\RISKAT~1\RUNNER~1
+--- segment walk of LOCALAPPDATA\Temp (each prefix, short vs long) ---
+SEG SHORT!=LONG prefix=C: short=C:\
+SEG SHORT==LONG prefix=C:\Users short=C:\Users
+SEG SHORT==LONG prefix=C:\Users\swq short=C:\Users\swq
+SEG SHORT==LONG prefix=C:\Users\swq\AppData short=C:\Users\swq\AppData
+SEG SHORT==LONG prefix=C:\Users\swq\AppData\Local short=C:\Users\swq\AppData\Local
+SEG SHORT==LONG prefix=C:\Users\swq\AppData\Local\Temp short=C:\Users\swq\AppData\Local\Temp
+--- dir listing of C:\Users (does any account name have a short alias?) ---
+USERS SHORT!=LONG long=C:\Users\All Users short=C:\Users\ALLUSE~1
+USERS SHORT!=LONG long=C:\Users\CarlosShao short=C:\Users\CARLOS~1
+USERS SHORT!=LONG long=C:\Users\CodexSandboxOffline short=C:\Users\CODEXS~1
+USERS SHORT==LONG long=C:\Users\Default short=C:\Users\Default
+USERS SHORT!=LONG long=C:\Users\Default User short=C:\Users\DEFAUL~1
+USERS SHORT==LONG long=C:\Users\Public short=C:\Users\Public
+USERS SHORT==LONG long=C:\Users\shaowq short=C:\Users\shaowq
+USERS SHORT==LONG long=C:\Users\swq short=C:\Users\swq
+USERS SHORT!=LONG long=C:\Users\WsiAccount short=C:\Users\WSIACC~1
+USERS SHORT==LONG long=C:\Users\zaiuser1 short=C:\Users\zaiuser1
+--- ntfs 8dot3 name creation behaviour (read-only query) ---
+Usage: fsutil behavior query <option>
+
+<options>
+  allowExtChar
+  bugcheckOnCorrupt
+  defaultNtfsTier
+  disable8dot3 [<Volume Path>]
+  disableCompression
+  disableCompressionLimit
+  disableDeleteNotify [NTFS|ReFS]
+  disableEncryption
+  disableFileMetadataOptimization
+  disableLastAccess
+  disableSpotCorruptionHandling
+  disableTxF [<Volume Path>]
+  disableWriteAutoTiering [<Volume Path>]
+  enableMaximumHardLinks
+  enableNonpagedNtfs
+  enableReallocateAllDataWrites [<Volume Path>]
+  encryptPagingFile
+  memoryUsage
+  mftZone
+  parallelFlushOpenThreshold
+  parallelFlushThreads
+  quotaNotify
+  symlinkEvaluation
+
+Please use "fsutil 8dot3name query /?" for more information.
+For disableDeleteNotify if neither "NTFS" nor "ReFS" is specified, both values are shown.
+fsutil_rc=1
+rc_ps1=0

@@ -1,0 +1,25 @@
+### pathresolver_other.go resolveHandle (POSIX half)
+     1	//go:build !windows
+     2	
+     3	package risk
+     4	
+     5	// DEFERRED(macOS/Linux): SPEC-06 §4 requires realpath + lstat symlink reject
+     6	// for non-Windows platforms. Until that ticket lands, handle-based resolution
+     7	// is unsupported here and Resolve falls back to the lexical pipeline, which
+     8	// still classifies (fail-closed for the blacklist) but does not detect
+     9	// reparse traversal on these platforms.
+    10	func resolveHandle(p string) (string, bool) { return "", false }
+    11	
+    12	func reparseComponents(p string) []string { return nil }
+
+### SyncDetectionComplete( ruler: grep -rn --include=*.go over internal cmd
+22
+-- non-comment test call sites --
+14
+-- non-test files only --
+internal/risk/syncdirs.go:458:func (p *Provenance) SyncDetectionComplete() bool {
+
+### pathresolver_windows.go resolveHandle signature line
+internal/risk/pathresolver_windows.go:25:func resolveHandle(p string) (string, bool) {
+internal/risk/pathresolver_other.go:10:func resolveHandle(p string) (string, bool) { return "", false }
+rc_j=0

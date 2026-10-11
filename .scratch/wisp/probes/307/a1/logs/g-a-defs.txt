@@ -1,0 +1,7 @@
+internal/risk/blacklist.go:133:func normPath(p string) string {
+internal/risk/blacklist.go:169:func isUnder(path, dir string) bool {
+internal/risk/blacklist.go:347:func envOr(key, fallback string) string {
+internal/risk/blacklist.go:354:func userHomeDir() string {
+internal/risk/pathresolver.go:150:func expandInput(input string) string {
+internal/risk/pathresolver.go:229:func unifySeparators(p string) string {
+rc_a=0

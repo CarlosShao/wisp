@@ -1,0 +1,85 @@
+### risk tests: negative-side assertions (would flip if home/roots get stricter)
+internal/risk/provenance_syncdirs_windows_test.go:78:			if !p.IsSyncPath(tc.path).Sync {
+internal/risk/provenance_test.go:487:	if p.IsSyncPath(plain).Sync {
+internal/risk/provenance_test.go:627:	if p.IsSyncPath(plain2).Sync {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:209:	if st := p.IsSyncPath(filepath.Join(moved, hiddenLeaf)); st.Sync {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:212:	if st := p.IsSyncPath(filepath.Join(filepath.Dir(tree), plainDir, hiddenLeaf)); st.Sync {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:219:	if !st.Sync {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:327:	if !st.Sync {
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:90:	if !st.Sync {
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:123:	if !st.Sync {
+internal/risk/syncdirs_other_test.go:91:	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
+internal/risk/syncdirs_redteam_windows_test.go:115:			if !st.Sync {
+internal/risk/syncdirs_redteam_windows_test.go:163:		if st.Sync {
+internal/risk/syncdirs_redteam_windows_test.go:179:	if !p.IsSyncPath(filepath.Join(root, "Notes", "x.md")).Sync {
+internal/risk/syncdirs_redteam_windows_test.go:244:		if !st.Sync {
+internal/risk/syncdirs_test.go:89:	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
+internal/risk/syncdirs_test.go:161:	if !p.IsSyncPath(filepath.Join(syncRoot, "out", "secret.md")).Sync {
+internal/risk/syncdirs_test.go:174:	if !p.IsSyncPath(filepath.Join(home, "LocalOnly", "a.txt")).Sync {
+internal/risk/syncdirs_test.go:178:	if p.IsSyncPath(outOfProfile(t, home)).Sync {
+internal/risk/syncdirs_test.go:179:		t.Fatal("path outside the user profile must not be suspect")
+internal/risk/syncdirs_test.go:212:		if !p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
+internal/risk/syncdirs_test.go:216:		if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
+internal/risk/syncdirs_test.go:232:	if !p.IsSyncPath(filepath.Join(home, "Documents", "x.md")).Sync {
+internal/risk/syncdirs_test.go:354:	if !p.IsSyncPath(filepath.Join(home, "Documents", "x.txt")).Sync {
+internal/risk/syncdirs_test.go:357:	if p.IsSyncPath(filepath.Join(sibling, "x.txt")).Sync {
+internal/risk/syncdirs_test.go:358:		t.Fatal("sibling directory with a name prefix of the profile must not be suspect")
+internal/risk/syncdirs_test.go:375:	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
+internal/risk/syncdirs_test.go:376:		t.Fatalf("normal new-file write into a plain dir must NOT be sync: %+v", st)
+internal/risk/syncdirs_test.go:405:	if p.IsSyncPath(outOfProfile(t, home)).Sync {
+internal/risk/syncdirs_test.go:406:		t.Fatal("path outside the user profile must not be suspect")
+internal/risk/syncdirs_test.go:417:	if !p.IsSyncPath("").Sync {
+internal/risk/syncdirs_test.go:447:	if st := e.p.IsSyncPath(folded); st.Sync {
+internal/risk/syncdirs_test.go:451:	if !st.Sync {
+internal/risk/syncdirs_test.go:501:		if !p.IsSyncPath(filepath.Join(home, "Documents", "x.txt")).Sync {
+internal/risk/syncdirs_test.go:506:		if !p.IsSyncPath(filepath.Join(od, "anything.txt")).Sync {
+internal/risk/syncdirs_windows_test.go:54:		if p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
+internal/risk/syncdirs_windows_test.go:58:		if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
+internal/risk/syncdirs_windows_test.go:92:	if st := p.IsSyncPath(inside); st.Sync {
+
+### risk tests: cases that read userHomeDir or live home for the fallback
+internal/risk/pathresolver_junction_windows_test.go:109:		home := normDir(userHomeDir())
+internal/risk/pathresolver_junction_windows_test.go:110:		t.Errorf("USERPROFILE=%q HOME=%q -> userHomeDir()=%q", os.Getenv("USERPROFILE"), os.Getenv("HOME"), home)
+internal/risk/syncdirs_redteam_windows_test.go:206:	home := userHomeDir()
+internal/risk/syncdirs_test.go:496:	home := userHomeDir()
+internal/risk/syncdirs_windows_test.go:125:	roots := registryProbe(probeEnv{Home: userHomeDir()})
+
+### syncdirs_windows_test.go 40-125 head
+    44			t.Fatal(err)
+    45		}
+    46		for _, src := range []string{"registry", "config", "env"} {
+    47			p := NewProvenance(ProvOptions{
+    48				NoProbe: true, HomeDir: home,
+    49				SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}},
+    50			})
+    51			if !p.SyncDetectionComplete() {
+    52				t.Errorf("source %q must count as confirmed", src)
+    53			}
+    54			if p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
+    55				t.Errorf("source %q: confirmed root must lift the blanket suspect net", src)
+    56			}
+    57			// ...while the confirmed root itself keeps flagging.
+    58			if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
+    59				t.Errorf("source %q: writes under the confirmed root must be sync", src)
+    60			}
+    75	func TestWriteGatePlainTargetInsideProfileWindows(t *testing.T) {
+    76		base := t.TempDir()
+    77		home := filepath.Join(base, "profile")
+    78		root := filepath.Join(home, "OneDrive")
+    79		work := filepath.Join(home, "work")
+    80		for _, d := range []string{root, work} {
+    81			if err := os.MkdirAll(d, 0o755); err != nil {
+    82				t.Fatal(err)
+    83			}
+    84		}
+    85		p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
+    86			{Provider: "OneDrive", Path: root, Source: "registry"},
+    87		}})
+    88		if !p.SyncDetectionComplete() {
+    89			t.Fatal("precondition: the injected registry-grade root must confirm detection, so the suspect net is NOT what decides these cases")
+    90		}
+    91		inside := filepath.Join(work, "brand-new.md") // under-profile, not under any root
+    92		if st := p.IsSyncPath(inside); st.Sync {
+    93			t.Fatalf("a confirmed root must have disarmed the under-profile net for %s: %+v", inside, st)
+    94		}
+    95		p.OpenScope("task-1")

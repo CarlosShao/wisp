@@ -1,0 +1,34 @@
+### NoProbe occurrences (non-test)
+internal/risk/provenance.go:231:	// NoProbe skips registry/config/default probing entirely (pure unit
+internal/risk/provenance.go:233:	NoProbe bool
+internal/risk/provenance.go:344:	if o.NoProbe {
+cmd/wisp/panel_assets.go:230:// ProvOptions.NoProbe is the one difference from the bridge, and it cannot
+cmd/wisp/panel_assets.go:239:	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+cmd/wisp/run.go:743:	c25 := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+rc_non=0
+
+### NoProbe occurrences (test) count
+25
+
+### NewProvenance( call sites, non-test
+internal/risk/provenance.go:293:func NewProvenance(o ProvOptions) *Provenance {
+cmd/wisp/panel_assets.go:226:// (risk.NewProvenance(...).Detector(taskID), see internal/tools/bridge.go's
+cmd/wisp/panel_assets.go:239:	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+cmd/wisp/run.go:743:	c25 := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+
+### SyncRoots option feeding (o.SyncRoots origin, non-test)
+
+### d22scan ban list names (fresh grep for the pathresolver-bypass rule)
+internal/agent/approval/pending_read.go:50:// about filepath.Clean/Abs outside risk.PathResolver, and its phantom-citation
+internal/agent/spill.go:66:// Nothing here normalizes a path by hand: filepath.Clean|Abs outside C26's
+internal/memory/open.go:169:	abs, err := filepath.Abs(dir)
+internal/models/downloader.go:576:		// No filepath.Clean here on purpose, twice over: manifest.ParseManifest
+internal/models/downloader.go:578:		// (validRelPath), and D22 bans filepath.Clean outside the C26 path
+internal/models/manifest.go:293:	clean := filepath.ToSlash(filepath.Clean(p))
+internal/projctx/projctx.go:31:// filepath.Abs / filepath.Clean to make a decision of its own.
+internal/tools/fs.go:32:	// it: filepath.Clean/Abs outside risk's resolver is a CI-failing pattern
+internal/tools/paths.go:14:// D22/CI-banned patterns (filepath.Clean, filepath.Abs) appear NOWHERE in this
+internal/tools/task.go:47:	// that question any other way - filepath.Clean/Abs of one's own - is the
+internal/winsec/resolve.go:16:// from a lexically absolutized string (the filepath.Abs at winsec.go:126 as
+internal/winsec/winsec.go:176:// quietly reintroducing filepath.Abs.
+cmd/wisp/firstrun.go:72:// d22scan prohibition is on filepath.Clean/Abs decisions outside

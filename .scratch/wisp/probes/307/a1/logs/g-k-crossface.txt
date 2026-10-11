@@ -1,0 +1,4 @@
+rc=0 lines=0
+rc_k=1
+internal/risk/provenance.go:928:		if p.IsSyncPath(t).Sync {
+internal/risk/syncdirs.go:187:func (p *Provenance) IsSyncPath(rawPath string) SyncStatus { return p.sync.match(rawPath) }

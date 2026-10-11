@@ -1,0 +1,29 @@
+### syncSet{home: occurrences (all files incl test)
+internal/risk/pathresolver_expansion_test.go:85:		got3, err3 := (&syncSet{}).resolveTarget(input)
+internal/risk/pathresolver_expansion_test.go:100:			got3, err3 := (&syncSet{}).resolveTarget(input)
+internal/risk/pathresolver_rewrite_account_test.go:134:	control := &syncSet{}
+internal/risk/pathresolver_rewrite_account_test.go:145:	rewritten := &syncSet{}
+internal/risk/provenance.go:345:		s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+internal/risk/syncdirs.go:88:	s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+
+### s.home / home: field writes
+internal/risk/provenance.go:345:		s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+internal/risk/syncdirs.go:88:	s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+internal/risk/syncdirs.go:428:	if !s.complete && s.home != "" && isUnder(cand, s.home) {
+internal/risk/syncdirs.go:431:			Root: SyncRoot{Provider: "sync-suspect", Path: s.home, Source: "suspect-fallback"},
+internal/risk/syncdirs_other_test.go:99:	if st := e.p.IsSyncPath(filepath.Join(e.home, "Documents", "x.txt")); !st.Sync || st.Root.Source != "suspect-fallback" {
+internal/risk/syncdirs_test.go:71:		home:  filepath.Join(base, "profile"),
+internal/risk/syncdirs_test.go:76:	for _, d := range []string{e.home, e.root, e.work} {
+internal/risk/syncdirs_test.go:83:	e.p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: e.home, SyncRoots: []SyncRoot{
+internal/risk/syncdirs_test.go:379:	e.p.Mark("task-1", SrcFSRead, filepath.Join(e.home, "secret.txt"), marker)
+internal/risk/syncdirs_test.go:460:	if !e.p.Mark("task-1", SrcFSRead, filepath.Join(e.home, "secret.txt"), marker) {
+
+### s.add( / detectSyncSet( call sites
+internal/risk/provenance.go:347:			s.add(r)
+internal/risk/provenance.go:351:				s.add(r)
+internal/risk/provenance.go:357:		p.sync = detectSyncSet(o)
+internal/risk/syncdirs.go:87:func detectSyncSet(o ProvOptions) *syncSet {
+internal/risk/syncdirs.go:114:		s.add(r)
+
+### who sets ProvOptions.HomeDir (non-test)
+rc_d=1

@@ -1,0 +1,48 @@
+### run.go around 743
+   738		// c25 is the ONE C25 engine this process has: the bridge marks sensitive
+   739		// results with it, and task.spawn stamps a subagent's conclusion into its
+   740		// parent's scope with the same engine under the same registered source name
+   741		// (risk.SrcTaskOutput). Handing the spawner a second engine would split the
+   742		// taint index the R4 checks read.
+   743		c25 := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+   744		rt.c25 = c25
+   745		rt.bridge = tools.New(tools.Options{
+   746			Registry: reg,
+   747			Paths:    rt.paths,
+   748			Gate:     rt.gate,
+   749			Cancel:   rt.gate.ToolsCancelBus(),
+   750			Journal:  mem,
+   751			// AC#1/AC#4's anchor line: the档 this boot read enters the decision
+   752			// chain here and nowhere else.
+
+### panel_assets.go around 239
+   226	// (risk.NewProvenance(...).Detector(taskID), see internal/tools/bridge.go's
+   227	// assessorFor). Returns nil when no source was declared, which is the caller's
+   228	// signal to wire nothing at all.
+   229	//
+   230	// ProvOptions.NoProbe is the one difference from the bridge, and it cannot
+   231	// change a verdict on this path: the panel builds its parameters from the
+   232	// argv (internal/panel's paramsFromArgs yields the "command" and "argv" keys
+   233	// only), neither of which is a write target, so the sync-directory gate this
+   234	// option would feed is never consulted for a call of that shape.
+   235	func (f *taintSourceFlag) detector() risk.TaintDetector {
+   236		if len(f.sources) == 0 {
+   237			return nil
+   238		}
+   239		prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+   240		// Discarded on purpose, and named so: the handle OpenScope hands back is
+   241		// this scope's only closer, and a process-lifetime probe has no boundary to
+   242		// close it on. `_ =` says out loud what the old bare statement hid.
+   243		_ = prov.OpenScope(taintSourceScopeID)
+   244		for _, s := range f.sources {
+   245			prov.Mark(taintSourceScopeID, s.tool, s.origin, s.content)
+   246		}
+
+### ProvOptions with empty/NoProbe in tests that hit the live-probe half (syncdirs.go:88)
+internal/risk/syncdirs_redteam_windows_test.go:210:	p := NewProvenance(ProvOptions{}) // live env: env/registry/config/default probes
+internal/risk/syncdirs_test.go:488:	p := NewProvenance(ProvOptions{}) // live env
+
+### tests NOT passing NoProbe (i.e. reach detectSyncSet)
+internal/risk/syncdirs_redteam_windows_test.go:210:	p := NewProvenance(ProvOptions{}) // live env: env/registry/config/default probes
+internal/risk/syncdirs_test.go:488:	p := NewProvenance(ProvOptions{}) // live env
+rc_h=0

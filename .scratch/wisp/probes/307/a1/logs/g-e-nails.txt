@@ -1,0 +1,88 @@
+### risk package test file list (fresh: ls)
+22
+assessor.go
+assessor_test.go
+blacklist.go
+doc.go
+hostpath_185.go
+mode.go
+pathresolver.go
+pathresolver_anchor_spelling_windows_test.go
+pathresolver_bench_test.go
+pathresolver_budget_norace_test.go
+pathresolver_expansion_test.go
+pathresolver_junction_windows_test.go
+pathresolver_other.go
+pathresolver_rewrite_account_test.go
+pathresolver_windows.go
+pathshape_portable_test.go
+pointer_183_test.go
+pointer_185_test.go
+provenance.go
+provenance_syncdirs_other_test.go
+provenance_syncdirs_windows_test.go
+provenance_test.go
+rules_gateway.go
+rules_irreversible.go
+rules_network.go
+rules_scale.go
+rules_shell.go
+rules_test.go
+shape_a_exemption_test.go
+syncdirs.go
+syncdirs_ancestor_actable_leg_116_test.go
+syncdirs_ancestor_reparse_ticket105_windows_test.go
+syncdirs_other.go
+syncdirs_other_test.go
+syncdirs_redteam_windows_test.go
+syncdirs_test.go
+syncdirs_windows.go
+syncdirs_windows_test.go
+taintmatch.go
+taintmatch_test.go
+winsec_c26.go
+
+### assertions that read Root.Path (sync verdict shape)
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:95:		if got := filepath.Clean(st.Root.Path); !strings.EqualFold(got, filepath.Clean(target)) {
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:97:				"spelling means the ancestor was never re-resolved", st.Root.Path, target)
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:106:		!strings.EqualFold(filepath.Clean(direct.Root.Path), filepath.Clean(target)) {
+
+### tests in internal/risk that inject HomeDir
+internal/risk/pathresolver_junction_windows_test.go
+internal/risk/pathresolver_rewrite_account_test.go
+internal/risk/provenance_syncdirs_other_test.go
+internal/risk/provenance_test.go
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go
+internal/risk/syncdirs_other_test.go
+internal/risk/syncdirs_redteam_windows_test.go
+internal/risk/syncdirs_test.go
+internal/risk/syncdirs_windows_test.go
+
+### test funcs in the 5 syncdirs* windows/other/prov files
+internal/risk/syncdirs_windows_test.go:40:func TestSyncConfirmedGradesDisarmFallbackWindows(t *testing.T) {
+internal/risk/syncdirs_windows_test.go:75:func TestWriteGatePlainTargetInsideProfileWindows(t *testing.T) {
+internal/risk/syncdirs_windows_test.go:124:func TestSyncRegistryProbeLive(t *testing.T) {
+internal/risk/syncdirs_other_test.go:53:func TestSyncNoGradeIsConfirmedOnPosix(t *testing.T) {
+internal/risk/syncdirs_other_test.go:86:func TestSyncMembershipDecidesOffProfilePosix(t *testing.T) {
+internal/risk/syncdirs_other_test.go:110:func TestSyncRegistryProbeIsAStubHere(t *testing.T) {
+internal/risk/syncdirs_redteam_windows_test.go:82:func TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes(t *testing.T) {
+internal/risk/syncdirs_redteam_windows_test.go:149:func TestSyncRedTeamGuardPlainNewFileWriteAllowed(t *testing.T) {
+internal/risk/syncdirs_redteam_windows_test.go:187:func TestSyncRedTeamUnverifiableChainFailClosed(t *testing.T) {
+internal/risk/syncdirs_redteam_windows_test.go:205:func TestSyncRedTeamRealOneDrive(t *testing.T) {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:153:func TestSyncAncestorActableLegFailsClosedOnMovedAncestor116(t *testing.T) {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:239:func TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116(t *testing.T) {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:270:func TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116(t *testing.T) {
+internal/risk/syncdirs_ancestor_actable_leg_116_test.go:307:func TestSyncAncestorLegStillMatchesPlainSameTreeWrite116(t *testing.T) {
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:58:func TestSyncAncestorLegReResolvesThroughJunctionToRealTree(t *testing.T) {
+internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:115:func TestSyncAncestorLegNotExemptedStaysFailClosed(t *testing.T) {
+internal/risk/provenance_syncdirs_windows_test.go:41:func TestExfilSyncWriteWindowsSpellingInvariant(t *testing.T) {
+internal/risk/provenance_syncdirs_other_test.go:62:func TestExfilSyncWritePosixSpellingInvariant(t *testing.T) {
+
+### func containing the 5 named assertion lines (fresh grep -n of the messages)
+162:		t.Fatal("write under fixture root must be sync")
+213:			t.Errorf("source %q: under-profile fallback must stay armed", src)
+233:		t.Fatal("suspect fallback must stay armed")
+355:		t.Fatal("under-profile must be suspect")
+402:		t.Fatalf("under-profile path must be sync-suspect, got %+v", st)
+rc_e=0

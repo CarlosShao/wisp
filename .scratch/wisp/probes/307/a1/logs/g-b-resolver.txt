@@ -1,0 +1,92 @@
+### blacklist.go 125-180
+       1		return bOverrides[cand.real]
+       2	}
+       3	
+       4	// normPath folds a path into the comparison form: alternate separators unified
+       5	// into the platform one, lowercased, trailing separator trimmed. It is a
+       6	// COMPARISON fold and stays inside this package; the shape it produces must
+       7	// never be handed to the OS or printed as a path (ticket 75) - that shape is
+       8	// C26's canonical, which is platform-native by construction.
+       9	func normPath(p string) string {
+      10		u := strings.ToLower(unifySeparators(p))
+      11		// Trimming the root itself (POSIX "/", Windows "\") would erase the only
+      12		// thing that makes the path absolute, so keep it.
+      13		if t := strings.TrimSuffix(u, sepStr); t != "" || u != sepStr {
+      14			return t
+      15		}
+      16		return u
+      17	}
+      18	
+      19	// normDir normalizes an anchor directory for prefix matching.
+      20	func normDir(p string) string {
+      21		if d := normPath(p); d != "" {
+      22			return d
+      23		}
+      24		return p
+      25	}
+      26	
+      27	// anchorPath puts an anchor directory and its literal child segments together
+      28	// in the comparison shape. Both sides arrive separator-unified (normPath /
+      29	// normDir above), so a plain sepStr join is all this is - and it has to be the
+      30	// platform separator, because the result goes into formsOf, which absolutizes
+      31	// and Lstats it. A backslash glued onto a POSIX home names a file that can
+      32	// never exist (ticket 75).
+      33	func anchorPath(dir string, parts ...string) string {
+      34		out := dir
+      35		for _, p := range parts {
+      36			if out == sepStr {
+      37				out += p // never build "//" off the POSIX root
+      38				continue
+      39			}
+      40			out += sepStr + p
+      41		}
+      42		return out
+      43	}
+      44	
+      45	func isUnder(path, dir string) bool {
+      46		return path == dir || strings.HasPrefix(path, dir+sepStr)
+      47	}
+      48	
+      49	func baseName(p string) string {
+      50		if i := strings.LastIndex(p, sepStr); i >= 0 {
+      51			return p[i+1:]
+      52		}
+      53		return p
+      54	}
+      55	
+      56	// classifyWith matches the canonical path against the A and B tier rules.
+
+### wc -l of relevant files
+   359 internal/risk/blacklist.go
+   436 internal/risk/pathresolver.go
+  1115 internal/risk/provenance.go
+   644 internal/risk/syncdirs.go
+  2554 total
+
+### grep formsOf|anchorForms|func Resolve|Actable|Canonical =|lexCanonical
+internal/risk/blacklist.go:63:// expanded again (formsOf below) and so is every anchor, because a spelling
+internal/risk/blacklist.go:78:	cand := formsOf(canonical)
+internal/risk/blacklist.go:154:// platform separator, because the result goes into formsOf, which absolutizes
+internal/risk/blacklist.go:183:	return classifyForms(formsOf(canonical))
+internal/risk/blacklist.go:187:// (see pathresolver.go: formsOf / pathForms).
+internal/risk/blacklist.go:208:	// strings are handed to formsOf, which absolutizes and Lstats them, so a
+internal/risk/blacklist.go:214:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials`))):
+internal/risk/blacklist.go:218:	case aUnder(cand, anchorForms(anchorPath(appDataS, `wisp`))) &&
+internal/risk/blacklist.go:219:		aEq(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`))):
+internal/risk/blacklist.go:221:	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
+internal/risk/blacklist.go:223:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`))):
+internal/risk/blacklist.go:225:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
+internal/risk/blacklist.go:229:	case appDataS != "" && aUnder(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`))):
+internal/risk/blacklist.go:231:	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+internal/risk/pathresolver.go:31:// (formsOf / anchorForms below): classification must not depend on which
+internal/risk/pathresolver.go:52:type Result struct {
+internal/risk/pathresolver.go:93:func (r Result) Actable() (string, error) {
+internal/risk/pathresolver.go:105:func Resolve(input string, exceptions []string) (Result, error) {
+internal/risk/pathresolver.go:343:// formsOf expands one spelling into its comparison forms using the C26 handle
+internal/risk/pathresolver.go:345:func formsOf(spelling string) pathForms {
+internal/risk/pathresolver.go:390:// anchorForms is formsOf for an anchor spelling, with the cache above.
+internal/risk/pathresolver.go:391:func anchorForms(spelling string) pathForms {
+internal/risk/pathresolver.go:399:	f := formsOf(spelling)
+internal/risk/pathresolver_anchor_spelling_windows_test.go:121:// hands to every production caller), formsOf must produce exactly one
+internal/risk/pathresolver_anchor_spelling_windows_test.go:138:		f := formsOf(res.Canonical)
+rc_b=0

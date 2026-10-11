@@ -1,0 +1,18 @@
+chore(307-a1): AC#0 折法名册 + 最小落点候选 + 既有钉名册 + ★台面短名现量
+
+票 307 的 `AC#0` 那一格只读取数（腿 307-a1，进场锚 1eaa91f/dev）。
+
+交四路射程，产码零字节：
+- 10-fold-roster.md：home 侧 2 枚赋值点（syncdirs.go:88 / provenance.go:345，均只过
+  normPath、0 枚过 Resolve）；e.canon 侧 3 枚（:152/:156 过 Resolve、:160 连 lexCanonical
+  都没过）；cand 侧折法；roots 上游链；票面行号腐烂对照（425->422、429->428）
+- 20-landing-shapes.md：三形候选 A/B/C + 一枚登记用的反形，逐形的动行、变严变松、
+  AC#1 四条硬约束边缘位（含 :160 修补的"空串变全局前缀"陷阱读数）
+- 30-test-nails.md：点名 5 枚的归属与依赖位、同族未点名 8 枚、负向钉 13 枚、
+  SyncDetectionComplete( 非测试调用者=0 的三义、需编排者车道跑的具名发数
+- 40-machine-alias.md：★必答——本机 TEMP/USERPROFILE 全链 SHORT==LONG 而 riskattrib1 链
+  SHORT!=LONG、新建长名目录可取别名（WI0253~1/LONGSE~1）；答"无别名台面上那 5 枚
+  会静悄悄全绿"，故本机绿不可当凭据
+
+Go 编译面发数=0（go build/vet/test/gofmt/d22scan/env/list 全部未跑）。
+fsutil 8dot3name query C: 取不到（Access denied，rc=1），已具名记为欠读数。

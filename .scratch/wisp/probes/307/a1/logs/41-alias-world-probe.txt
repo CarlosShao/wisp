@@ -1,0 +1,16 @@
+PROBE-BASE long=C:\Users\swq\AppData\Local\Temp\wisp307a1AliasWorldProbe
+PROBE-BASE C:\Users\swq\AppData\Local\Temp\WI0253~1
+PROBE-LEAF long=C:\Users\swq\AppData\Local\Temp\wisp307a1AliasWorldProbe\LongSegmentNameBeyondEight
+PROBE-LEAF C:\Users\swq\AppData\Local\Temp\WI0253~1\LONGSE~1
+--- fsutil 8dot3name query (machine + C: volume state, read-only) ---
+The registry state is: 2 (Per volume setting - the default)
+fsutil_machine_rc=0
+Failed to open the volume.
+Error 5: Access is denied.
+fsutil_volume_rc=1
+--- what Go would see: TMP/TEMP/TMPDIR as inherited by a child process ---
+TEMP=C:\Users\swq\AppData\Local\Temp
+TMP=C:\Users\swq\AppData\Local\Temp
+TMPDIR=
+TEMP-short=C:\Users\swq\AppData\Local\Temp
+rc_ps1b=0
