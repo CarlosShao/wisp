@@ -16,7 +16,15 @@ import (
 // got zero evaluation (the shape ticket 308 is about -- looks like red, is
 // really "this run never finished").
 //
-// This is the single place the drive letter is taken. 编排者裁语 ⓑ/ⓒ: the
+// Within this test surface this is the single place the drive letter is taken.
+// The repo takes it in one other place, guarded and outside this ticket:
+// production internal/risk/pathresolver.go (normalizeLocalUNC) checks
+// len(drive) == 2 && drive[1] == '$' before its drive[:1], and
+// internal/tools/volume_windows.go reads filepath.VolumeName (volumeID,
+// volumeRootOf) without slicing it at all. Census 2026-10-11, scope
+// `internal cmd tools` (ruler: git grep -e 'vol[:1]' -e 'drive[:1]' -- '*.go'):
+// drive-letter slice evaluation sites = 2 -- that production line and this
+// helper -- and every other line the pattern hits is a comment. 编排者裁语 ⓑ/ⓒ: the
 // guard's teeth are on the INPUT layer (a caller asks driveShare and reacts to
 // ok), NOT on a machine that happens to hand out a volume-less temp -- this
 // ticket may not depend on being able to build such a surface (ⓑ: 本机造不出).

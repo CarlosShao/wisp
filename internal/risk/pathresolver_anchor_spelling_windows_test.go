@@ -97,19 +97,40 @@ func TestClassifyAnchorSpellingIsNotVerdict(t *testing.T) {
 // TestClassifySpellingInvariance states the invariant directly: one and the
 // same file, classified through every spelling the OS accepts, yields one
 // class. The 8.3 spelling is only folded in when this volume generates short
-// names (same probe the ticket-18 case uses); every other spelling is
-// unconditional, so the test never quietly stops measuring.
+// names (same probe the ticket-18 case uses). Since ticket 308 the two UNC
+// spellings are conditional too: driveShare reports no drive letter on a
+// volume-less path, volumeInvariantSpellings drops those two BY NAME, and this
+// case logs the kept count and the dropped names when that happens. The
+// denominator measured here is therefore 9 spellings on a volume-qualified
+// temp, 10 when the 8.3 slot fills -- measured 2026-10-11 on the two temp
+// surfaces reachable here (default temp and the 8.3 alias temp, both
+// volume-qualified; probes/308/r2/logs/probe-denominator*.txt). The
+// volume-less figure, 7, is
+// measured on the INPUT face by TestVolumeInvariantSpellingsVolumeLess308,
+// never by an env shape; on that input the 8.3 slot measures empty too
+// (getShortPath returned "" in the same probe run), so it is 7, not 8.
+// "Never quietly stops measuring" holds because a drop is NAMED and LOGGED,
+// not because the spellings are unconditional.
 func TestClassifySpellingInvariance(t *testing.T) {
 	home := tmpHome(t)
 	long := filepath.Join(home, ".ssh", "id_testkey")
 
 	// ticket 308 guard: the drive letter is taken through driveShare, never an
-	// inline vol[:1]. On a volume-less temp the two UNC spellings cannot be
-	// built, so volumeInvariantSpellings drops them BY NAME and the remaining
-	// seven volume-free spellings still run -- the case ends with a verdict, it
-	// does NOT panic the binary and does NOT t.Skip (AC#1; the old inline
+	// inline vol[:1]. What is pinned, and where: volumeInvariantSpellings, fed a
+	// volume-less literal as INPUT, returns instead of panicking, drops the two
+	// UNC spellings BY NAME and keeps the seven volume-free spellings in the map
+	// -- TestVolumeInvariantSpellingsVolumeLess308 asserts that selection half
+	// (AC#1's carrier; this file holds zero t.Skip calls, and the old inline
 	// strings.ToLower(vol[:1]) panicked "slice bounds out of range [:1] with
 	// length 0" and took every other case in the package's evaluation with it).
+	// What no fixture pins: THIS windows-tagged case's len(dropped) > 0 branch.
+	// tmpHome(t) came back volume-qualified on both surfaces measured here (the
+	// default temp and the 8.3 alias temp), so the t.Logf sentinel below was
+	// measured hitting 0 times in the full-package run of each (HEAD export tree,
+	// probes/308/r2/logs/pre-head-full*.txt), and under GOOS=linux this file is
+	// not part of ./internal/risk/'s test set at all (go list: 22 test files
+	// windows / 17 linux). Q-308-v1-B: the guard's teeth are on the input face,
+	// not in this branch.
 	spellings, dropped := volumeInvariantSpellings(home, long)
 	if len(dropped) > 0 {
 		t.Logf("ticket 308: filepath.VolumeName(%q) has no drive letter; dropped the two volume-derived spellings by name %v; %d volume-free spellings still evaluated", long, dropped, len(spellings))
