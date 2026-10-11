@@ -1,0 +1,32 @@
+########## BEFORE (unmutated) ##########
+time=2026-10-11T13:00:29.085+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309AssessorForEmptyTaskIDDropsTaintDetector
+--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.040s
+BEFORE_rc=0
+925:	if b.injected || b.prov == nil {
+########## RIG A_drop_limb ##########
+time=2026-10-11T13:00:32.968+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309AssessorForEmptyTaskIDDropsTaintDetector
+    assessorfor_taint_instrument_309_test.go:64: 空 task id 竟判出了 R4（rules=[R4]）：assessorFor 的 `taskID == ""` 那一肢被摘掉／改成"空 id 也挂探测器"时才会这样（空 id 撞 unbound-scope fail-closed）。② 这一腿的存在就是为了：恒真形（守卫被削弱）必须在这里红
+    assessorfor_taint_instrument_309_test.go:70: 两向没有拉开（空/非空同为 [R4] 或同不为 R4）：这枚仪器对"探测器挂没挂"是瞎的
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.038s
+FAIL
+RIG_A_drop_limb_rc=1
+931:		WithTaintDetector(nil)
+########## RIG B_no_detector ##########
+time=2026-10-11T13:00:36.799+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309AssessorForEmptyTaskIDDropsTaintDetector
+    assessorfor_taint_instrument_309_test.go:54: 非空 task id 的判级器没判出 R4（level=L0 rules=[]）：assessorFor 的 WithTaintDetector 那一支若被摘掉，R4 就整条不发生；① 这一腿的存在就是为了：探测器真没挂上时这里必须红
+    assessorfor_taint_instrument_309_test.go:70: 两向没有拉开（空/非空同为 [] 或同不为 R4）：这枚仪器对"探测器挂没挂"是瞎的
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.038s
+FAIL
+RIG_B_no_detector_rc=1
+warning: in the working copy of 'internal/tools/bridge.go', CRLF will be replaced by LF the next time Git touches it
+RESTORE_BYTE_IDENTICAL=yes rc=0
+IDENTICAL_TO_ORIG=yes

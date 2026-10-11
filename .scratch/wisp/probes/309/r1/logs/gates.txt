@@ -1,0 +1,9 @@
+# 309-r1 gates (each self-lands rc=N)  2026-10-11T13:12:31+08:00
+## HEAD now: 1ad483331a8e25a7335969aab2a64f86b244b831
+GOFLAGS= go build ./... -> rc=0
+go vet ./internal/tools/ -> rc=0
+sh scripts/d22scan.sh -> rc=0
+go test ./internal/tools/ (full) -> rc=0
+gofmt -l internal/tools/ flagged -> 0
+gofumpt -l internal/tools/ flagged -> 0
+KNOWN gofumpt -l cmd/wisp (not mine, untouched) -> cmd\wisp\models.go cmd\wisp\panel_transport_35r2_test.go 
