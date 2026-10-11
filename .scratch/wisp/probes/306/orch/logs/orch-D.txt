@@ -1,0 +1,10 @@
+=== RUN   TestParseWavExtensibleFloat32306
+    wavinjector_extensible_float_306_test.go:177: parseWav error = unsupported wav format: tag=3 bits=32 (want PCM16 or float32), want nil: an extensible fmt tag with a float SubFormat has to resolve to the float32 path (tag read at wavinjector.go:192 and :196, branch chosen at :218); rate=0 chans=0
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+=== RUN   TestWavInjectorExtensibleFloat32306
+    wavinjector_extensible_float_306_test.go:213: NewWavInjector error = wav C:\Users\swq\AppData\Local\Temp\TestWavInjectorExtensibleFloat323062028876410\001\extensible-float32-306.wav: unsupported wav format: tag=3 bits=32 (want PCM16 or float32), want nil: the injector must accept a 40-byte extensible fmt chunk with a float32 SubFormat, not reject it as an unsupported wav format
+--- FAIL: TestWavInjectorExtensibleFloat32306 (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.051s
+FAIL
+rc_D=1

@@ -1,0 +1,9 @@
+=== RUN   TestParseWavExtensibleFloat32306
+    wavinjector_extensible_float_306_test.go:182: rate = 48000, want 48000 (read at fmt body +4)
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+=== RUN   TestWavInjectorExtensibleFloat32306
+--- PASS: TestWavInjectorExtensibleFloat32306 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.038s
+FAIL
+rc_F1=1

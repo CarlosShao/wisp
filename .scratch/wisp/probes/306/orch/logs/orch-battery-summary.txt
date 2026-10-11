@@ -1,0 +1,22 @@
+== 起手：工作树⛔ 被碰的自证（scoped porcelain）
+1
+== 发 A 台面自检（pristine，两枚具名用例必须发出颜色）
+A rc=0 FAIL=0 PASS=2 SKIP=0
+== 发 B mut192（0xFFFE -> 0xFFFD，行内权威值取坏）
+B rc=1 FAIL=2 PASS=0 SKIP=0
+restored_B=identical
+== 发 C mut196 上下界同移（data[body+24:body+26] -> [body+26:body+28]）
+C rc=1 FAIL=2 PASS=0 SKIP=0
+== 发 D mut218（bits == 32 -> 16）
+D rc=1 FAIL=2 PASS=0 SKIP=0
+== 发 E 无夹具正控（新用例 mv 走 + mut192 + 整包）
+E rc=0 FAIL=0 PASS=42 SKIP=1
+== 发 F FLIP 两枚（把断言的等号倒过来：码没动、用例必须响）
+F1 rc=1 FAIL=1 PASS=1 SKIP=0
+F2 rc=1 FAIL=1 PASS=1 SKIP=0
+== 收局：两枚文件对 HEAD blob 逐字节还原自证
+cmp_internal/audio/wavinjector.go=identical rc=0
+cmp_internal/audio/wavinjector_extensible_float_306_test.go=identical rc=0
+Z rc=0 FAIL=0 PASS=2 SKIP=0
+== 完（临时件只建不删：/c/Users/swq/tmp/wisp-306-orch-shelf-20261011-0822 与 /c/Users/swq/tmp/wisp-306-orch-20261011-0821 均留下）
+rc_battery=0

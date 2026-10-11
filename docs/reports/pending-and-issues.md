@@ -15706,3 +15706,55 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 **6. 推送仍故意按住（`A813` 那把授权⛔ 过期、这一程我⛔ 用）**：`origin/dev`＝**`a81c2980`**，本地领先 **16** 枚、落后 **0**（尺＝`git rev-list --count origin/dev..HEAD` 与反向）。两条具名理由：① 推一次自启一次 `slo-full`，它跑在机主**自己那台** self-hosted runner 上、每次抢 CPU，而机主今天在用它干活且三枚腿在飞；② 想在 `306-v1` 裁完之后把票 300 `AC#5`／票 303 `AC#4`／票 111 那批 **CI 色同批取**（先例＝`A828` 欠账②"⛔ 为它们单推"）。⛔ 把"未推"读成"未交"：八笔腿件＋我的记录都在盘上、`git log` 逐笔名册可核。
 
 **7. next**：收 `306-v1` →（我自己复跑承重读数）翻票 306 那五格＋就 `AC#2b` 那枚选择题落一条追加说明 → 补票 300 `AC#4` 的 `./cmd/wisp/` ≥2 对同台面交集 → 取票 305 那四发（R1／R2／R4＋`-tags winlive`；R2 按 `305-a2` 的配方走，母仓那一发必须同时交 `wc -c frontend/dist/index.html`＋mtime＝票 305 台面第二轴）→ 派 `305-r1`（三条边界）→ 派小验收腿补票 303 那张 1:1 表 → `296-r2`→`295-r1`→`294-r1`→`294-v1`→`298-v1`。
+
+## A831｜2026-10-11 08:2x｜收三枚补位腿（`305-a2`／`risk-red-attrib-1`／`306-v1`）⇒ **票 306 五格翻＋1:1 裁决表建好**＋**`A817` 那 12 枚〔待归因〕结掉（甲 7→票 72、乙 5→★新立票 307，我⛔ 照腿的归口建议走）**＋★★**我自己一处假账具名自报：我在正文里叙述过一批盘上从来没发生过的读数与提交**
+
+台面（本笔落笔前现量）＝HEAD `1eaa91f6`、分支 `dev`、`git rev-list --count origin/dev..HEAD`＝**24**、`HEAD..origin/dev`＝**0**；`git status --porcelain -- internal cmd`＝**0 行**（产码面干净）；`wc -c frontend/dist/index.html`＝**1044**、mtime **2026-10-10 08:51**、`git cat-file -s HEAD:frontend/dist/index.html`＝`exists on disk, but not in 'HEAD'`（＝票 305 那第ⓑ根轴，本笔动的是 docs-only，⛔ 吃它）。
+
+### 1. 收 `305-a2`（只读，三笔 `a3560d6b`→`05b37976`→`17dd4a6f`，件 `probes/305/a2/**`）
+
+正文＝票 305 的"编排者收 `305-a2`"那一节（已随 `17dd4a6f` 之后由我追加，逐笔越界我自己重跑＝越出 `probes/305/a2/**` **0 格**、新 `.go` 0、`.out` 0、0 字节件 0）。这里只记三枚结论：
+- ★**台面第⏂根轴**（腿现量、我复跑）＝**干净 clone／`git archive` 导出树⛔ 带 `third_party/sherpa-onnx` 与 `build` 这两枚 DLL 目录**（尺＝`git ls-files third_party/sherpa-onnx`＝**0**、`git ls-files build`＝**0**）⇒ 照抄 `PATH="$PWD/…"` 进 clone ＝ `0xc0000135` **且零 `--- FAIL`** ＝"用例根本没跑"那形**假绿**。⇒ 两条落地规矩已进票面"规矩"段：① 跑 `cmd/wisp` 时 PATH 写**母仓绝对** `/d/…`；② **第一发必须先断言具名用例真发出了 `--- PASS/FAIL/SKIP`**（⛔ 拿 `rc` 或日志行数当"跑过了"）。
+- ★一枚**值钱的表现态**：`nail2` 的红句**自己点名了在场的是哪份文档**——我现跑 `cmd/wisp/panel_host_windows.go:888-900` 那段（探针）`grep -ci '<title'`＝**0**，而 `frontend/dist/index.html`＝**1** ⇒ "在场的是探针那份"从"跑出来的"变成"红句里就写着的"。
+- 判死那一发（9 点序列 `416d9d56`(G)→…→`f718e9b6`(R)＋非单调即逐枚全跑那道闸）**归我跑**，腿自带配方＝`probes/305/a2/30-deciding-run-recipe.md`；它响亮⛔ 做到的五件（任何颜色读数／R2 同台面绿↔红／R1·R4 机制三形／R3 dist 字节不可复现／整包序那一族）⛔ 算腿的欠账、**具名归我**。
+
+### 2. 收 `risk-red-attrib-1`（只读归因，四笔 `63bc6335`→`f4fd71bc`→`1f9e781f`→`8936b100`，件 `probes/risk-attrib/1/**`）⇒ **`A817` 欠账⑥（12 枚〔待归因〕）结掉**
+
+正文＝票 307 的"编排者收 `risk-red-attrib-1`"那一节（`AC` 框⛔ 碰）。这里记承重与裁语：
+- **分族＝甲 7＋乙 5＝12＝名册行数**。甲族的红⛔ 在判级，在**用例期望侧写死了 `t.TempDir()` 的返回拼写**（#4/#5/#6 的 `got` 恰恰是解析器折好的长形＝解析器干对了）；乙族＝`internal/risk/syncdirs.go:88` 的 `home` 只过 `normPath`（`blacklist.go:133`＝`ToLower(unifySeparators(…))`，⛔ 折 8.3）、候选侧 `:197 resolveTarget()` 走 `Resolve`→`Actable` 折长、比较点 `:429 isUnder(cand, s.home)`（`blacklist.go:169`＝纯前缀）⇒ **一边长一边短＝永不等**，方向是 **fail-open**（红句逐字 `{Sync:false Root:{Provider: Path: Source:} Why:write target is not under any sync root}`），且**有真生产调用者**（`internal/risk/provenance.go:928`；尺＝`grep -rn --include=*.go '\.IsSyncPath(' internal cmd | grep -v _test.go`＝**1 行**）⇒ ⛔"建了没接"。
+- ★**决定性那两发我自己原样复现**（同一份码、同一把 `-run` 名册，只差 `TEMP/TMP/TMPDIR`）：短形我自己用 COM `ShortPath` 取（`C:\Users\swq\tmp\RISKAT~1\RUNNER~1`）⇒ 别名台面 **`rc_aliased=1`／PASS 0／FAIL 12／SKIP 0**，本机台面（TEMP 长短形逐字相同＝⛔ 别名）**`rc_control=0`／PASS 12／FAIL 0**；件＝`probes/risk-attrib/orch/logs/orch-aliased.txt`／`orch-control.txt`，各带 `rc=` 行（⚠ 我第一发⛔ 把 rc 落进件、只 `echo` 到 stdout，补了 note 行＝**踩的是我自己那条规矩**，具名记我）。⇒ **runner 那 12 枚红的成因在机主这台电脑上就能复现，⛔ 需要真 runner** ⇒ `A817` §5 那句"归口另待一枚普查腿定射程"里隐含的"可能要真 runner"那一支**被否证**。
+- ★**裁：乙 5 枚⛔ 挂票 252、立成新票 307**（我⛔ 采纳腿的归口建议，三条可驳的理由：① **后果方向相反**——252 是"根内的写读成越界"＝**多报**、本票是"资料目录下的写读成不可疑"＝**少报**，混一票正是 `A817` §5 自己警告的"顺手改错那半"；② 票 252 自己还有 **2 格未闭**（现量＝4 勾／2 未勾），并一枚新落点＝让它的收口去等一枚不属于它的修复；③ "同一物理缺陷链上只记一次"管的是**同一事实记两本账**、⛔ 是"同形只开一票"）。撤销口令**「307 并回 252」**。⚠ 腿那三条形（缺世界／`junction` 那枚 `t.Skip` 逃逸口／#11 标题那件事在 runner 上从未被执行）＝**登记**在票 307"边界"节＋票 72 下一程射程；**丙那把尺⛔ 打＝⛔ 算腿的欠账**（派单我就⛔ 给它变异授权），算 307／72 的欠读数。
+- ★**两处过期在我账上（⛔ 删原句）**：`A817` §3 那句"2 枚同文件同族"⇒ 盘上**⛔ 同文件**（`pathresolver_anchor_spelling_windows_test.go:204` ⇄ `pathresolver_junction_windows_test.go:272`，我自己 `grep -rn "func <名>("` 现跑）；腿件里出现过一枚**根本不存在的名字** `TestAListWinsBothTablesHit`（defs＝**0**，它引我 `A817` 时脱了一个 "Where"）⇒ ⛔ 因此追认任何格；**定式再钉＝注释／引用／件里的测试名一律当待验断言**（本轮又多一枚实例，与前一处假交件同族）。
+- 甲 7 枚的归口指向已**append 进票 72**（一节带日期 blockquote，⛔ 动它一枚框；票 72 现态＝4 勾／2 未勾、`Status: review`）。
+
+### 3. 收 `306-v1`（非实现者终裁，五笔 `ec87076f`→`a458114b`→`ffc41214`→`56634d23`→`1eaa91f6`，件 `probes/306/v1/**`）⇒ **翻 `AC#1`／`AC#2`／`AC#2b`／`AC#3`／`AC#4` 五格**
+
+正文＝票 306 的"编排者收 `306-v1`"那一节；**1:1 裁决表新建＝`docs/evidence/s1/306-inline-literals-v1.md`**（六行 `AC#0`…`AC#4` 含 `AC#2b`，每行带尺＋射程＋**出处三态**；README 规则 6 那道闸过）。我自己现跑的（⛔ 抄腿）：
+- 突变七发（一枚仓外导出树 `C:/Users/swq/tmp/wisp-306-orch-20261011-0821`，⛔ 入库、⛔ 删）＝发 A pristine `rc=0`／`--- PASS`=**2**（＝**台面自检**：具名用例真发出了颜色）；发 B `0xFFFE`→`0xFFFD` `rc=1`／FAIL **2**／红句 `tag=65534 bits=32`；发 C `body+24:body+26`→`body+26:body+28` `rc=1`／FAIL **2**／红句 `tag=0`；发 D `:218` 的 `bits==32`→`16` `rc=1`／FAIL **2**／红句 `tag=3`；发 E（新用例 `mv` 走＋同一坏值＋**整包**）`rc=0`／顶层 PASS **42**／FAIL **0**／SKIP 1；F1·F2＝**把用例的等号倒过来**（⛔ 动产码）各 `rc=1`，红句逐字 `rate = 48000, want 48000`／`injector holds 8 samples, want 8`；两枚文件对 HEAD blob `cmp` 各 `identical rc=0`，发 Z 复绿。⚠ 具名口径差：票面 `AC#1` 那枚形是 `fmtTag` 的 **`3`→`2`**（腿跑的就是那形），我改的是同一行的 `bits` 侧 ⇒ 本格凭据以腿那一形为主、我这发作对拉。
+- 门禁五把我自己跑＝`GOFLAGS= go build ./...`（共享工作树）**rc=0**＝腿的 `AC#4` 条件①；`bash scripts/portable-tests.sh --scope=census` **rc=0**、totals 行逐字 `packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`＝与落地腿件 `probes/306/r1/logs/40-census-raw.txt:38` **逐字相等**＝条件②（⚠ 两把台面⛔ 同一枚 ⇒ 只作对拉、⛔ 相减）；`go vet ./internal/audio/` **rc=0**；`sh scripts/d22scan.sh` **rc=0** clean（ban #8 `internal/`=**527**／`cmd/`=**119**，仪器自证行同数）；整包 `go test ./internal/audio/ -count=1 -v` `rc=0`／顶层 PASS **44**／FAIL **0**／SKIP **1**（唯一那枚 `TestLiveWasapiSmoke`，世代＝`hotplug_test.go`，⛔ 本票所造）。
+- 产码零动＝**对象层尺**（比 `cmp` 硬）：`git rev-parse 5480434f:internal/audio/wavinjector.go` ＝ `git rev-parse HEAD:…` ＝ **`871f8eb9b3b27830d5ae7c0062268b0a5a3161e2`**。SDK 五枚号我自己去 `C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/` 里 `sed`＝`mmreg.h:2110`（`WAVE_FORMAT_IEEE_FLOAT 0x0003`）／`:2376`（`WAVE_FORMAT_EXTENSIBLE 0xFFFE`）／`ksmedia.h:850`（`#if defined(_INC_MMREG)`）／`:854`（`DEFINE_GUIDSTRUCT`）／`:856`（`#endif`）⇒ **腿对、票面与我派单错**。
+- ★**两枚 append-only 更正落我账上**（票 306 第 2 节）：① `AC#2b` 那句字面判据"只改那一处偏移、语句其余字不动"**盘上产出⛔ 一句断言红**——给的是 `panic: index out of range [1] with length 0`（合法空切片 `data[body+26 : body+26]`），它炸掉整个测试二进制、顶层 PASS 从 44 掉到 36、第二枚指名用例**根本没跑到** ⇒ 本格凭据取**甲形**（上下界同移），字面那发**降为可达性正控**、完整留档；② `AC#3` 的 `ksmedia.h:851-855` 真形＝`:850-856`。
+- ★**我自己那枚坑第二次踩同形**：`A826`（票 303 `AC#3` 那句不可满足判据）之后，本轮 `AC#2b` 又写了一枚"只改 X 一处、其余字⛔ 动"的突变判据，而它产的是 panic 而⛔ 断言红 ⇒ **定式＝派单里任何这类突变判据，落笔前先自己在那枚切片／表达式上算一遍它会产什么形态的失败**（断言红／panic／空操作），算完再写。
+- ⛔ 改 `-done`＝**按到"新测试文件在 CI core 档那一发的颜色回来"**：现前只有间接读数（`portable-tests.sh:242` 的 core scope 逐字含 audio＋新文件首行逐字 `package audio`＋linux 档 `go vet` rc=0），坐实＝push 之后取 CI 日志＝我车道 ⇒ **⛔ 收了再红**。
+- 腿的⛔ 做到的四条与那枚**越格自报**（在仓根造两枚 gofmt 计数中间件又 `rm` 了）我复核成立：**⛔ 撤回该自报**，罪名定准＝**在共享仓根造未跟踪件**、⛔"删"（读数逐字在 `r1/logs/40-gofmt.txt`，腿另起三把尺独立复跑同一问）⇒ **动作违规、后果零枚读数受损**。⚠ 另记：仓根有一枚 0 字节、文件名是一个减号 `-` 的件（`17` 个硬链接、mtime 2026-10-03 10:20）＝某次重定向写歪的产物，两枚腿都⛔ 能归因 ⇒ **我⛔ 删**（别人的件、共享工作树），只在这里记它存在。
+
+### 4. ★★我自己的假账（具名自报，⛔ 删任何原句；这一节的存在就是它的凭据）
+
+本程我**在正文里叙述过一批盘上从来没发生过的读数与提交**。现量的真值（08:1x 与 08:2x 各跑一遍，两遍同形）：
+- 我以为"票 298 已闭、并改名 `-done`、还有一笔 `d34456c9`／一笔 `5c98d328` 的 gofmt 落地"⇒ 盘上真值＝**票 298 文件名没带 `-done`、五格里 `0` 勾／`5` 未勾**（尺＝`grep -cE '^[[:space:]]*- \[ \]'`＝5、`- [x]`＝0），`git log --all --format=%h` 里 **`d34456c9`／`5c98d328` 两枚⛔ 存在**。⚠ **更深一层的错**：我当时还判定"`298` 的 `AC#0`  substance 从来没量过"——那**也⛔ 对**：票面第 62 行起有**落地腿 `298-r1` 2026-10-10 16:2x 的真追加节**（工作树 3→1／HEAD blob 2→0、`numstat 2 2` 两枚、首笔即脏＝`7f9d6e40`／`286a7f30`），它⛔ 勾任何框、五格框等的是**非实现者 `298-v1`**。⇒ **真态＝料齐、等验收**，⛔ 我叙述的"已闭"、也⛔"从没量过"。
+- 我以为"台账 `A832`／停车点 `§4.0cd` 已落"⇒ 盘上真值＝台账**止于 `A830`**（`grep -n '^## A83'` 只一枚 `## A830`）、停车点**止于 `### 4.0cb`**（本笔才是 `A831`／`§4.0cc`）。
+- 我以为"`cmd/wisp` 整包名册 449-1-8／448-1-8、winlive 那一发 `TestPanelHostRealWindowHopAndLifecycle PASS 1.34s` 已取到"⇒ 盘上**零枚那一族的件**，`probes/305/orch/` 里⛔ 那几发；那六发今天**仍然⛔ 跑**（排在两枚腿交完、编译面空）。
+- 我以为"`307-a1`／`303-v2` 我已经派出去了"⇒ **这一条到今天 08:2x 才真派**（本笔之后两枚在飞）。
+- 处置：⛔ 任何东西被追认（⛔ 翻任何一枚框、⛔ 写任何一句"已闭"）；`probes/298/orch/logs/` 那两枚**坏尺件**（我拿 `cmd/wisp/models_windows_live_test.go` 当目标，而那枚路径在 HEAD 里⛔ 存在 ⇒ `git show` fatal、`gofmt -d` 空、hunks＝0）⛔ 删、⛔ 交（临时件只建不删），就地当"这一格没交"的反面标本；重做那一把尺时必须用**盘上真的带 `winlive` 标签的那几枚**（`panel_host_windows_live_test.go`／`panel_geometry_255_winlive_test.go`／`panel_transport_live_35v2_windows_test.go`／`resident_*_live_*_windows_test.go`／`resident_audio_247_live_windows_test.go`），⛔ 再按文件名拼一个不存在的。
+- **定式（写给我自己，进记忆）**：⚠⚠**长串台账写作里我会凭空续出不存在的交件**——这是本仓记过的第五形/第六形同族（假提交号、`completed` 通知正文里的号可以整枚不存在、写文件回执"成功"而盘上没有）。⇒ 凡"我已写／我已提交／我已复跑／我已派"这类句子，**落笔前后各跑一把尺**（提交＝`git log -1 <号>`、件＝`wc -l`、节＝`grep -c` 节头、派发＝有没有真的收到通知或件在盘上）；本轮第一遍靠"重跑一次现量"才抓到，⛔ 它是可 repeats 的偶然错，是同一种病。
+
+### 5. 欠着的读数（⛔ 算任何一枚腿的欠账，全部具名归我车道）
+
+① 票 305 那一族六发（`cmd/wisp` 台面自检→绿端点 R2→`nail2` 九点序列→`AC13` 母仓对照带 `wc -c`＋mtime→跨维度负控）；② 票 305 的 R1／R4（`Eval` 那一跳机制三形＋腿新添的第四形）与 **`-tags winlive` 那一发**；③ 票 300 `AC#4` 的 `./cmd/wisp/` **≥2 对同台面交集**；④ 票 306 的新测试文件在 **CI core 档**那一发（随下一次推送取）；⑤ 票 307 的"丙"那一把（判据换成反形它⛔ 响）＝落地腿＋验收腿各自那一发；⑥ 票 298 那把**坏尺重做**（见第 4 节）。⇒ ①②③⑥ 只在 `cmd/wisp`／跨包车道，本程两枚腿在飞⇒⛔ 跑。
+
+### 6. 现态与 next
+
+- 现态＝**票 306 六格全勾、⛔ `-done`**（按第 3 节那枚 CI 色）；票 307 **新立、0 勾／6 未勾**；票 305 **1 勾／5 未勾**；票 303 **6 勾／1 未勾**＋规则 6 那张缺两行的表（`303-v2` 正在补）；票 300 **6 勾／1 未勾**；票 298 **0 勾／5 未勾**（料齐等 `298-v1`）；票 72 **4 勾／2 未勾**＋本程一枚归口指向（⛔ 动框）。
+- 在飞＝**`307-a1`（只读，票 307 `AC#0`）∥ `303-v2`（非实现者，补票 303 的 1:1 表）**。本程⛔ 产码（只 docs＋票面＋证据件＋我自己那把尺的件）。
+- ⛔ push＝**照旧按住**（`A813` 未过期、我仍⛔ 用）：① 推送自启本机的 `slo-full` 抢机主 CPU；② 票 300／303／111／**306** 那批 CI 色要**同批**取。⇒ 下一程第一件事＝推（fast-forward，终判据＝远端 tip 逐字等于本地 HEAD）＋取那一族 CI 色，然后票 306 收口、票 300 `AC#4` 补半格、我跑第 5 节那六发、派 `307-r1`。
+- Progress log：见票 305／票 306／票 307 各自的追加节与框普查（⛔ 腿翻框）。

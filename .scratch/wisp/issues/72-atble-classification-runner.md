@@ -246,3 +246,7 @@ A 表判定**遍历所有拼写形式**，任一命中即判 A ⇒ 这是从严�
    的非测试命中只有 `blacklist.go:76` 它自己的定义 ⇒ 今天还没有生产 caller 传 override 表；
    `Classify` 侧的生产 caller 是 `internal/tools/paths.go:131`，它传的是 `Resolve` 的 canonical），所以"恒为 1"不是可依赖的前提。
 
+
+> **[2026-10-11 08:0x] 编排者·一枚归口指向本票（⛔ 动本票任何一枚框；现量＝4 勾／2 未勾、`Status: review`）**：台账 `A817` 那 12 枚 CI 红〔待归因〕已由只读腿 `risk-red-attrib-1` ＋ 编排者**自己复跑**结掉分族＝**甲 7 枚归本票**（`TestClassifyAnchorSpellingIsNotVerdict`／`TestCanonicalInputGainsNoSecondForm`／`TestAListWinsWhereBothTablesHit`／`TestBListDefaultDenyAndOverride`／`TestPathResolverShortNameAListDenied`／`TestPathResolverUNCAListDenied`／`TestPathResolverExtendedLengthPrefixAListDenied`），机制＝**用例的期望侧写死了 `t.TempDir()` 的返回拼写**（判级本身⛔ 被证伪——`#4`/`#5`/`#6` 的 `got` 恰恰是解析器折好的那个长形＝解析器干对了）。凭据＝编排者自己两发、同一份码只差 `TEMP/TMP/TMPDIR` 一枚 env＝别名台面 `rc=1`／`PASS=0`／`FAIL=12`、本机台面 `rc=0`／`PASS=12`／`FAIL=0`（件 `probes/risk-attrib/orch/logs/orch-aliased.txt`／`orch-control.txt`；腿件 `probes/risk-attrib/1/**`，四笔 `63bc6335`→`8936b100`）。
+> ⚠ **两处过期在我账上，具名更正（⛔ 改 `A817` 原句）**：① `A817` §3 说那两枚"同文件同族"⇒ 盘上⛔ 同文件（`pathresolver_anchor_spelling_windows_test.go:204` ⇄ `pathresolver_junction_windows_test.go:272`，我 `grep -rn "func <名>("` 现跑）；② 腿件里出现过一枚**根本不存在的名字** `TestAListWinsBothTablesHit`（defs＝0，它引我 `A817` 时脱了一个 "Where"）⇒ ⛔ 因此追认任何格，⚠ 定式再钉一遍＝**注释／引用／件里的测试名一律当待验断言**。
+> ⛔ **乙 5 枚归本票**（`syncdirs_test.go` 那一族＝真缺陷、方向是**少报**）＝另立新票 **307**（"⛔ 把同一件事记两本账"的对账写在 307 的 `AC#5`）。⇒ 本票下一程读这一节时＝**只处理那 7 枚的期望侧**、⛔ 扩到 `syncdirs`、⛔ 动那 5 枚、⛔ 动 `--scope`／档位那一面（票 302 射程）。另两枚仪器缺口（`junction` 文件里那枚 `t.Skip` 逃逸口、`#11` 那件事在 runner 上从未被执行）＝登记在**票 307 的"边界"节**，⛔ 本票顺手修。

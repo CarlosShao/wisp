@@ -1,0 +1,7 @@
+=== RUN   TestParseWavExtensibleFloat32306
+--- PASS: TestParseWavExtensibleFloat32306 (0.00s)
+=== RUN   TestWavInjectorExtensibleFloat32306
+--- PASS: TestWavInjectorExtensibleFloat32306 (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/audio	0.050s
+rc_A=0
