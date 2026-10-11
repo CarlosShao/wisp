@@ -1,0 +1,21 @@
+=== BI 第 5 笔自量（改名前后各一把尺） ===
+BI_pre_note=两枚 blob 副本从 .go 改成 .txt（git mv，内容⛔ 动）
+BI_go_files_in_my_write_surface_now=2
+.scratch/wisp/probes/306/v1/logs/00-blob-wavinjector.go
+.scratch/wisp/probes/306/v1/logs/R4-blob-306.go
+BI_untracked_in_logs=4
+BI_content_check_after_mv:
+  rc_cmp_blob1_vs_e4740e35=0
+  rc_cmp_blob2_vs_17dd4a6f=0
+rc_outer=0
+=== BI2 net effect of the pending 5th commit, measured against the working tree BEFORE committing (尺=git diff --name-only ec87076f^ -- '*.go'，量的是工作树+索引，⛔ HEAD) ===
+0
+BI2_produced_code_scope(internal cmd tools docs scripts .github):
+0
+BI2_uncommitted_my_paths=5
+ M .scratch/wisp/probes/306/v1/90-final.md
+R  .scratch/wisp/probes/306/v1/logs/00-blob-wavinjector.go -> .scratch/wisp/probes/306/v1/logs/00-blob-wavinjector.txt
+R  .scratch/wisp/probes/306/v1/logs/R4-blob-306.go -> .scratch/wisp/probes/306/v1/logs/R4-blob-306.txt
+?? .scratch/wisp/probes/306/v1/logs/BH-final.txt
+?? .scratch/wisp/probes/306/v1/logs/BI-close.txt
+rc=0

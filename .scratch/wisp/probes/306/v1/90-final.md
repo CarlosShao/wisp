@@ -109,3 +109,17 @@ scoped porcelain（射程＝`probes/306`＋票 306＋`internal/audio`）终局�
 - 交件＝`probes/306/v1/{00-anchor,10-sensitivity,20-scope-and-gates,30-judgments,90-final}.md` ＋ `logs/**`
   （原始件＋三枚驱动脚本＋每把尺的 `rc=` 行；0 字节枚数与 `.out` 枚数在末笔里自量，⛔ 空着报）。
 - next＝编排者复跑承重读数（§6 那两发＋`AC#2b` 追加更正）后自己翻勾；队列里 `305-a1`/`305-a2`/`risk-attrib-1` 都在顶（本程 HEAD 漂了两次是证据）。
+
+## 8. 终局追加（⛔ 改上面任何一句，本节是就地更正＋收尾）
+
+1. ★本腿交完之后**还有第 5 笔**（本件 §4 那张表落到第 4 笔为止，读数⛔ 作废、只是过期）：
+   第 5 笔＝把本腿 `logs/` 里那两枚**HEAD blob 副本**从 `.go` 档名改成 `.txt`（`git mv`，内容逐字节⛔ 动）＋落本件与自量件。
+   理由＝共享测量面上的规矩：仓里别的尺会数 `probes/**` 里的 `.go`（票 303 收腿笔就数过"`.scratch/wisp/probes/**` 33 枚、其中 11 枚在 HEAD 里"那一形），
+   本腿那两枚是 `cmp` 用的 blob 副本、⛔ 产码、⛔ 该进任何一枚 `.go` 分母 ⇒ `mv` ⛔ 删（腿 `306-r1` §3 第 14 条同一形：走 `mv` 那六枚是合规做法）。
+   改后本腿写面里 `.go` 枚数＝**0**（尺＝`git diff --name-only ec87076f^ HEAD -- '*.go'`，读数在 `logs/BI-close.txt`）。
+2. ★与本腿无关但编排者该知道的台面观察：**§6 欠的那两发此刻正被编排者自己取**——
+   本腿终局 scoped porcelain 里出现两枚新的未跟踪件 `probes/306/orch/logs/g1-build-all-worktree.txt` 与 `g6-census-worktree.txt`
+   （＝工作树整包 `go build ./...` 那一发与 census 那一发，件名逐字对得上 §6 那两条）。⛔ 碰、⛔ 替它们读数、⛔ 把它们算成自家名册。
+3. 票面追加那一笔的自证尺与读数：`git diff --numstat -- <票 306>`＝**1 加 0 删**、
+   `git diff -- <票> | grep -E '^[+-]- \[[ x]\]'`＝**零命中**（`rc_grep=1`）、追加后框普查仍＝**1 勾／5 未勾**（件＝`logs/BG-postappend.txt`）。
+
