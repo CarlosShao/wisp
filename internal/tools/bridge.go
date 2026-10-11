@@ -858,7 +858,8 @@ func (b *Bridge) OpenTask(taskID string) {
 
 // CloseTask closes one task's taint scope. The composition root defers this on
 // the task's own boundary: cmd/wisp wires it into agent.Options.AdmitTask's
-// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+// revoke, which the TEXT loop already defers (in internal/agent/loop.go the
+// "defer revokeAdmission()" line that runs right after the AdmitTask hook), so a
 // task that ends takes its taint with it (ticket 151). A caller that dispatches
 // on the bridge outside that boundary - a host-internal call with its own task
 // id - still has no owner here, and stays fail-closed: a task that never closes
@@ -868,12 +869,17 @@ func (b *Bridge) OpenTask(taskID string) {
 // WHICH LEGS STILL HAVE NO OWNER HERE - ticket 154, read this before assuming
 // ticket 151 finished the job. 151 put the close on ONE boundary: cmd/wisp's
 // admitTask hook, which the TEXT loop defers. That covers only ids the loop
-// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+// mints itself (Run/RunAsync -> newTaskID: RunAsync's "id := newTaskID()" and
+// Run's "return l.run(ctx, newTaskID(), input)", both in internal/agent/loop.go).
 // So ask one question about your own leg: does the TaskID you dispatch with
 // come from that boundary? If it comes from anywhere else - a panel or ball
 // host inventing its own id, a retry wrapper, a scheduled task carrying one id
 // across turns - nothing in this tree closes it, and no test will tell you so.
-// Today no production code dispatches on the bridge except loop.go, so being
+// As measured today (a present count, not a permanent promise): no production code
+// dispatches on the bridge except loop.go. Ruler: grep -rn 'ToolRequest{' internal
+// cmd --include=*.go minus _test.go yields the single internal/agent/loop.go point;
+// Test309ToolRequestProductionConstructionNail pins points outside internal/agent to
+// 0. So being
 // such a caller means being the first one; the gates meant to ring when that
 // happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
 // this bridge leg, and G5 for a C25 taint scope opened with no paired close in
@@ -921,7 +927,30 @@ func (b *Bridge) CloseTask(taskID string) {
 // scope. The frozen C19 TaintDetector seam takes no tool name
 // (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
 // task; the canonicalizer and classifier are shared and immutable.
+//
+// The `taskID == ""` limb is on purpose, and it UNDER-REPORTS rather than refuses:
+// an empty task id falls through to `return b.assess`, which holds no TaintDetector,
+// so ruleTaint short-circuits on its `if ctx.taint == nil` guard
+// (internal/risk/rules_gateway.go) and the R4 branch never fires for that call - no
+// error, no trace. Every other gate still runs; only R4 is dropped, silently.
+//
+// Two things keep that sentence honest, both checkable now:
+//   - No production caller reaches the limb today. Dispatch funnels through the one
+//     `newTaskID()` construction point in internal/agent/loop.go (id 36 chars, never
+//     empty); Test309ToolRequestProductionConstructionNail pins `agent.ToolRequest{`
+//     construction points outside internal/agent to 0.
+//   - Removing the limb to look stricter is not correctness: scopeMarks in
+//     internal/risk/provenance.go fail-closes an unregistered scope to R4 whenever a
+//     DIFFERENT scope still holds marks, so with the limb gone an empty id trades this
+//     silent under-report for a conditional false-positive storm, not for a check.
+//
+// Who rings if this limb's shape changes is Test309AssessorForEmptyTaskIDDropsTaintDetector:
+// it fails if a weakened guard attaches the detector for the empty id, and fails if the
+// attach branch stops attaching the detector for a real id. The compiler guards nothing
+// here - that test is the only instrument, and this comment states the debt, not a guarantee.
 func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+	// `taskID == ""` here is deliberate and under-reports (R4 silently dropped for
+	// this call); see the doc block above and Test309AssessorForEmptyTaskIDDropsTaintDetector.
 	if b.injected || b.prov == nil || taskID == "" {
 		return b.assess
 	}
