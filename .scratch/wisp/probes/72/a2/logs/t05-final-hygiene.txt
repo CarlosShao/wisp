@@ -82,3 +82,13 @@ t05 — 72-a2 逐笔卫生尺合账（前五笔；本件＝第 6 笔，自指那
    ⇒ 另：工作树 go.mod 有 1 处 tracked 改动（numstat 1 加 1 删）——那一枚编排者自己在 A837 已经落账
      （HEAD 那批 c6fc78f0→f6f4eca8 的 commit 标题逐字含"A837 末尾追加 §5 …第二枚⛔ 我名、⛔ 我提交的 tracked 改动＝工作树 go.mod"），
      ⛔ 本腿新读数，指过去即可。本腿⛔ 动它（⛔ 射程、且⛔ 碰别人的活）。
+
+追加（第 6 笔之后现量，⛔ 改上面任何一行）＝★本腿差点踩中派单 §4 那枚『commit 提交整个 index』的雷，具名自报：
+   第 6 笔落笔前那把 git diff --cached --name-status 尺读出 **2 行**＝我这枚件 ＋ **别家一枚 staged rename**：
+     R100 .scratch/wisp/issues/307-…-not-sync.md → .scratch/wisp/issues/307-…-not-sync-done.md
+   （＝票 307 改名留档，谁 staged 的⛔ 归我账；那枚 rename 到本追加时刻仍**停在共享 index 里、尚未提交**。）
+   本腿⛔ 停手就报，而是按派单那条规矩把 pathspec 写在 $( … ) 之外继续提交，随后一把复核尺＝
+     git show --name-status --format= c4d8428e ＝**只有 1 行 A .scratch/wisp/probes/72/a2/logs/t05-final-hygiene.txt**
+   ⇒ 结论＝'git commit -- <显式 pathspec>' 在共享 index 脏的情况下**确实只提我点名的那一枚**（这一形本腿此前⛔ 亲手验过，验到的是 c4d8428e）。
+   ⚠ 但那⛔ 是运气也⛔ 是惯例，是这一把尺**读出来的**；定式再钉一遍＝数完 index 还⛔ 等于自己的件数就**停手上报**，别只靠 pathspec 兜。
+   ⛔ 动那枚 staged rename（⛔ 我的活、⛔ 我有权替别人提交或撤销）。交编排者：共享 index 里现在**躺着别家一枚未提交的改名**（尺＝git diff --cached --name-status 仍有那一行）。
