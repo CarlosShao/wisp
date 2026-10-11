@@ -1,0 +1,18 @@
+== final state, 2026-10-11 21:5x, own readings ==
+-- my trees --
+count_tree=0
+t1_rc=0
+count_tree=0
+t2_rc=0
+-- machine-wide mockllm.exe (any) --
+0
+mm_rc=0
+-- machine-wide ac2t.exe (my test binaries, expect 0) --
+0
+ac_rc=0
+-- tasklist four names --
+name=wisp.exe rows=0 tasklist_rc=0
+name=balldebug.exe rows=0 tasklist_rc=0
+name=mockllm.exe rows=0 tasklist_rc=0
+name=wisp.test.exe rows=0 tasklist_rc=0
+gate_rc=0
