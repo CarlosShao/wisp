@@ -1,0 +1,17 @@
+time=2026-10-11T11:43:52.196+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+--- PASS: TestClassifyAnchorSpellingIsNotVerdict (0.09s)
+=== RUN   TestCanonicalInputGainsNoSecondForm
+--- PASS: TestCanonicalInputGainsNoSecondForm (0.02s)
+=== RUN   TestAListWinsWhereBothTablesHit
+--- PASS: TestAListWinsWhereBothTablesHit (0.02s)
+=== RUN   TestPathResolverShortNameAListDenied
+--- PASS: TestPathResolverShortNameAListDenied (0.01s)
+=== RUN   TestPathResolverUNCAListDenied
+--- PASS: TestPathResolverUNCAListDenied (0.01s)
+=== RUN   TestPathResolverExtendedLengthPrefixAListDenied
+--- PASS: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+=== RUN   TestBListDefaultDenyAndOverride
+--- PASS: TestBListDefaultDenyAndOverride (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.234s

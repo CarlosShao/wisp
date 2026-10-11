@@ -1,0 +1,8 @@
+# eol + gofmt facet ruler for the three authorized test files and provenance.go (11:48:45)
+i/lf    w/lf    attr/text eol=lf      	internal/risk/pathresolver_anchor_spelling_windows_test.go
+i/lf    w/lf    attr/text eol=lf      	internal/risk/pathresolver_junction_windows_test.go
+i/lf    w/crlf  attr/text eol=lf      	internal/risk/provenance.go
+i/lf    w/lf    attr/text eol=lf      	internal/risk/syncdirs_test.go
+gofmt -l on those four: [internal/risk/provenance.go ]
+HEAD-blob gofmt -l internal/risk: []
+HEAD-blob eol of provenance.go from archive: 0000000   p   a   c   k   a   g   e       r   i   s   k  \n

@@ -1,0 +1,47 @@
+# gates 11:46:18
+build_rc=0 outbytes=0
+vet_rc=0 outbytes=0
+d22scan_script_present=0
+d22scan_rc=0 outbytes=23088
+# format roster two ranges
+worktree_gofmt_l_internal_risk=[internal\risk\provenance.go ] count=1
+HEADblob_gofmt_l_internal_risk=[] count=0
+# mutations (tree only, restored + sha after each)
+pristine_sha_syncdirs=aa4779bb52704f43 pristine_sha_blacklist=b8f316794704b04b pristine_sha_junction=ab07caa3f3083f40
+=== MUT A: revert class A #4/#5/#6 expectation to the old EqualFold form
+landed=3 namesSameFile_left=1
+mutA_rc=1 FAIL=3 SKIP=0
+  --- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+  --- FAIL: TestPathResolverUNCAListDenied (0.01s)
+  --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+restored_sha_junction=ab07caa3f3083f40
+=== MUT B: sync fallback guard to constant true (heng-zhen form)
+landed=1
+mutB_rc=1 FAIL=13 SKIP=1 PASS=16
+  --- FAIL: TestSyncWriteNegative (0.01s)
+  --- FAIL: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+  --- FAIL: TestSync307AliasShortRootMembership (0.01s)
+  --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+  --- FAIL: TestSyncRedTeamGuardPlainNewFileWriteAllowed (0.01s)
+  --- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+  --- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)
+  --- FAIL: TestSyncUnverifiedRootKeepsFallback (0.01s)
+  --- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.01s)
+  --- FAIL: TestSyncNormalNewFileWriteNotFlagged (0.01s)
+  --- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+  --- FAIL: TestSyncDotDotTailFailsClosed (0.01s)
+  --- FAIL: TestSyncConfirmedGradesDisarmFallbackWindows (0.01s)
+  ring_messages:
+        syncdirs_test.go:230: source "": "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncFallbackNotDisarmableByWeakRoot1123908254\\001\\not-a-sync-tree\\notes.md" is outside the profile and outside the injected root, must NOT be sync: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncfallbacknotdisarmablebyweakroot1123908254\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+        syncdirs_test.go:230: source "default": "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncFallbackNotDisarmableByWeakRoot1123908254\\001\\not-a-sync-tree\\notes.md" is outside the profile and outside the injected root, must NOT be sync: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncfallbacknotdisarmablebyweakroot1123908254\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+        syncdirs_test.go:230: source "fixture": "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncFallbackNotDisarmableByWeakRoot1123908254\\001\\not-a-sync-tree\\notes.md" is outside the profile and outside the injected root, must NOT be sync: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncfallbacknotdisarmablebyweakroot1123908254\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+        syncdirs_test.go:230: source "options": "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestSyncFallbackNotDisarmableByWeakRoot1123908254\\001\\not-a-sync-tree\\notes.md" is outside the profile and outside the injected root, must NOT be sync: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncfallbacknotdisarmablebyweakroot1123908254\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+        syncdirs_test.go:254: a write outside the profile and outside the unverified root must not be flagged: {Sync:true Root:{Provider:sync-suspect Path:c:\users\swq\tmp\riskat~1\runner~1\testsyncunverifiedrootkeepsfallback1000462968\001\profile Source:suspect-fallback} Why:no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)}
+restored_sha_syncdirs=aa4779bb52704f43
+=== MUT C: production override narrow-rule guard removed
+landed=1
+mutC_rc=1 FAIL=1
+  --- FAIL: TestOverrideOnlyAcceptsTheResolvedForm (0.06s)
+restored_sha_blacklist=b8f316794704b04b
+=== control: restored tree must be green again on alias, 7 named + sync
+restored_rc=0

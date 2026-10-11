@@ -1,0 +1,20 @@
+# 72-r1 two-surface start 2026-10-11 11:43:42 +0800 ref=HEAD tree=/c/Users/swq/tmp/w72r1/treeA
+rm_rf_rc=0 (own out-of-repo tree)
+archive_rc=0  tree_top=cmd go.mod go.sum internal   tree_go_files=648
+repo_dirty_internal_cmd=0
+=== surface probe (same API t.TempDir uses, out-of-repo module) ===
+  ALIASED: tempdir_probe env TEMP=C:\Users\swq\tmp\RISKAT~1\RUNNER~1 TMP=C:\Users\swq\tmp\RISKAT~1\RUNNER~1 TMPDIR=C:\Users\swq\tmp\RISKAT~1\RUNNER~1 os.TempDir()=C:\Users\swq\tmp\RISKAT~1\RUNNER~1 created=C:\Users\swq\tmp\RISKAT~1\RUNNER~1\W72R1PROBE638957454 hasTilde=true err=<nil>
+  MACHINE: tempdir_probe env TEMP=C:\Users\swq\AppData\Local\Temp TMP=C:\Users\swq\AppData\Local\Temp TMPDIR=C:\Users\swq\AppData\Local\Temp os.TempDir()=C:\Users\swq\AppData\Local\Temp created=C:\Users\swq\AppData\Local\Temp\W72R1PROBE3605685462 hasTilde=false err=<nil>
+---- alias-7named rc=0 temp=C:\Users\swq\tmp\RISKAT~1\RUNNER~1 raw=tmp-after-alias-7.txt
+     RUN=7 PASS=7 FAIL=0 SKIP=0
+     REDPOS: 
+---- alias-16all rc=0 temp=C:\Users\swq\tmp\RISKAT~1\RUNNER~1 raw=tmp-after-alias-16.txt
+     RUN=20 PASS=20 FAIL=0 SKIP=0
+     REDPOS: pathresolver_budget_norace_test.go:34: 
+---- machine-7named rc=0 temp=C:\Users\swq\AppData\Local\Temp raw=tmp-after-machine-7.txt
+     RUN=7 PASS=7 FAIL=0 SKIP=0
+     REDPOS: 
+---- machine-16all rc=0 temp=C:\Users\swq\AppData\Local\Temp raw=tmp-after-machine-16.txt
+     RUN=20 PASS=20 FAIL=0 SKIP=0
+     REDPOS: pathresolver_budget_norace_test.go:34: 
+# done 2026-10-11 11:43:56 +0800
