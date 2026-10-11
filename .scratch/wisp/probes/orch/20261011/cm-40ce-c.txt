@@ -1,0 +1,9 @@
+长度门从 RED 回 GREEN：票 303／304 的短名（那两枚超帽票名是我 10-10 自己造的）＋A836 落账（含我自己两处提交分组错的具名自报）
+
+- 改前现量：sh scripts/check-path-length-budget.sh ⇒ rc=1 VERDICT RED，点名 303（相对 125／名 104）与 304（相对 137／名 116）"over budget and NOT in the roster"，count guard＝名册 57 ⇄ 树上 59 ⇒ 成因＝我 10-10 立那两枚票时超了 README 规矩 9 的 100 字符帽（同一枚雷我 A789 踩过一次，本轮同形再中）。
+- 修法＝改短名（先例 A584 改短 9 枚），⛔ 给违规登记豁免：303-page-to-go-reply-hop-died-and-fails-on-owner-machine.md（相对 80／名 59）、304-external-killed-test-binaries-orphan-mockllm-exe.md（相对 76／名 55）。两笔 git mv 都是 R100＝正文一字未动（行数对拉 216/216、47/47）。
+- 改后现量：同一把尺 ⇒ rc=0 VERDICT GREEN，bands 逐字 over the hat=57 middle=56 debt(180)=1 wall=0 roster entries=57（57⇄57 对上）。
+- ⛔ 夸大成"CI 那一步今天因此变绿"：尺在 ci.yml:170，但本轮 lint 先在 gofmt 步红在 fs_broken.go，后面步有没有被吃掉⛔ 在我这发证过（那件事归票 269／275／236 AC#6）。
+- 具名残余：仓里 4 处证据件正文仍写旧长 slug（probes/303/v2/logs/{platform-and-census,reconcile-and-gates}.txt、probes/306/r1/logs/00-anchor.txt、probes/300/a2/90-final.md）⇒ ⛔ 改（那是腿当场取证的逐字正文），本笔就是"旧路径现在叫什么"的对账处。
+- ★记我自己两处提交分组错（A836 §1）：A835 与票 306 的改名都随上一笔 a4fb152f 走了（那笔主题只写 307）⇒ 中间态盘上出现过"文件名带 -done、里面还⛔ 有 Status/收口节"的票；根因＝git commit 提交整个 index、⛔ 只提我点名的 pathspec ⇒ 定式＝每笔 commit 前先 git diff --cached --name-only 数 index，git mv 之后立刻单独成一笔。⛔ amend（已入库历史只追加更正）。本笔之前我现量 index＝恰那两条 R100。
+- push 0。

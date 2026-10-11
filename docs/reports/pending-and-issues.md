@@ -15910,3 +15910,32 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 - 在飞＝**`307-v1`**（票 307 五格非实现者终裁）；`307-r1` 五笔已交、我的复跑与它的账逐枚同数（见 `A834`）。
 - next＝① 收 `307-v1` ⇒ 翻格或退回；② 我票 305 那六发（前提动摇，先量"哪一枚变量"）；③ 推送⛔ 排（`A813` 未过期仍⛔ 用；`51a0a0f2` 起 `internal/risk` 那批 CI 色要同批作差）；④ 队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。
 - ★**记我自己一枚测量陷阱（与 `A834` §2 同形，两处都踩）**：凡以**行尾锚**取名字的 git／log 尺，这台机器输出带 `\r` ⇒ 必须先 `tr -d '\r'`；"0 枚"这种全称读数落笔前必有一把把原始名册逐行打印的尺对拉。（本笔里那三枚 `grep -c` 我先在**已按 job 前缀切过、逐行看过**的两份名册上跑，⛔ 裸跑计数。）
+
+## A836｜2026-10-11 10:4x｜★我自己两处提交分组错（具名自报＋定式）＋**长度门那把 RED 是我 10-10 造的**（票 303／304 名字超了规矩 9 的 100 字符帽）⇒ 本笔改短名、门现量回 GREEN
+
+### 1. 两处提交分组错（⛔ amend，只在这里更正）
+
+1. **`A835`（票 306 收口那条账）随上一笔 `a4fb152f` 一起入库了**，而那笔主题只写"307-r1 收档＋A834"⇒ 一笔的主题⛔ 覆盖它带的内容。
+2. **票 306 的改名（`git mv` 加 `-done`）也进了 `a4fb152f`**（`--name-status` 逐字＝`R100 …306-…at-all.md → …306-…at-all-done.md`，且那枚 blob 行数＝**184**＝改名时的旧正文），它的收口节（＋35 行）落在下一笔 `23fe077e`。⇒ **中间态盘上出现过一枚"文件名带 `-done`、里面还⛔ 有 `Status: done` 与收口凭据"的票**（这正是我在记忆里记过的"改名中间态会吓在飞腿"那一形，本轮轮到我自己造它）。
+   ⇒ **根因**＝`git commit` 提交的是**整个 index**，⛔ 只提我 `git add --` 点的那几枚；我先 `git mv`（它自己就往 index 里塞了一条改名）再写上一笔的 message，于是别人没写、我也没打算带的那两条一起走了。
+   ⇒ **定式（进记忆，与"commit 必带显式 pathspec"并列）**：**每笔 `git commit` 之前先 `git diff --cached --name-only` 数一遍 index**，枚数与主题不符就**先把多出来那几行写进 message**或分两笔；`git mv` 之后**立刻单独成一笔**，⛔ 让它隔着一次别的提交。
+   ⛔ 追损：两笔的正文与内容都⛔ 丢、⛔ 无别人的活被误带（`git show --name-status a4fb152f` 12 行逐条我都在场），所以**处置＝只记只更正，⛔ amend、⛔ revert**（AGENTS §1.4：已入库的历史要更正就追加新 commit）。
+
+### 2. ★长度门：RED 的成因是我，修法与现量读数
+
+- 现量（改之前）＝`sh scripts/check-path-length-budget.sh` ⇒ **`rc=1`、`VERDICT RED`**，点名两枚"over budget and NOT in the roster"：
+  `303-the-page-to-go-reply-hop-died-between-cc31526-and-bcd0a543-and-now-fails-on-the-owner-machine-too.md`（相对 **125**／名 **104**）与
+  `304-test-binaries-killed-from-outside-orphan-their-children-two-mockllm-exe-still-listening-on-the-owners-machine.md`（相对 **137**／名 **116**）；count guard＝`名册 57 ⇄ 树上 59`。⇒ 那两枚是**我 10-10 立的票**（`A819`／`A821` 那两波），**超了 README 规矩 9 的 100 字符帽**（"新立票一律 `NN-短 slug.md` ≤100 字符"），⛔ 登记进名册。⚠ 我这轮踩过这条雷两次（`A789` 那句"今天三枚新票名全超帽、把这把尺打成 VERDICT RED"就是我自己的账），本轮又中同形 ⇒ **开票前先数名字字符数**这条我自己⛔ 执行到位。
+- 与 CI 的关系（⛔ 夸大成"CI 现在红在这一步"）：这把尺**确实在 CI 里**（`.github/workflows/ci.yml:170`＝`sh scripts/check-path-length-budget.sh --with-self-test`），但本轮那发 run 的 `lint` job 先在 gofmt 那一步红在 `fs_broken.go`（见 `A835` §2），**后面的步有没有被吃掉⛔ 在我这发里证过**——那件事本身已归票 **269**（标题原话"gofmt step is held red by its own committed mutation sample and **eats three unprotected steps**"）与票 **275**、票 **236** `AC#6`。⇒ 我⛔ 在这里替它判颜色，只说"本机这把尺从 RED 变 GREEN 是我这一笔做的"。
+- 修法＝**改短名**（先例＝`A584`/262-a1 把遗留 9 枚超长路径全部改短名），⛔ 给它们登记豁免（那等于把我的违规洗成规矩）：
+  `303-page-to-go-reply-hop-died-and-fails-on-owner-machine.md`（相对 **80**／名 **59**）
+  `304-external-killed-test-binaries-orphan-mockllm-exe.md`（相对 **76**／名 **55**）
+  尺＝`${#path}` 逐枚（相对路径字符数）＋`basename | wc -c`（⚠ 后者含换行，比真名多 1，读数我照实写）。⛔ 动两枚票的正文一字（`git mv`＝R100，改名前后 `wc -l` 相同）。
+- 改完之后现量＝`sh scripts/check-path-length-budget.sh` ⇒ **`rc=0`、`VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`**；bands 行逐字＝`over the hat=57  of which in the 122..180 middle=56  past the old debt line(180)=1  in the wall interval=0  roster entries=57`（57⇄57 对上）。件＝`C:/Users/swq/tmp/len-gate-40ce.txt`（RED 那发）／`len-gate-after.txt`（GREEN 那发），⛔ 入库⛔ 删。
+- ⚠ **具名残余（这笔⛔ 闭的）**：仓里另有 **4 处历史引用**仍写着旧长 slug，全部是**证据件正文**（`git grep -l -F <旧slug> HEAD` 尺）＝`probes/303/v2/logs/platform-and-census.txt`、`probes/306/r1/logs/00-anchor.txt`（引 303）与 `probes/300/a2/90-final.md`、`probes/303/v2/logs/reconcile-and-gates.txt`（引 304）。⇒ **⛔ 改**（那些是腿当场取证的逐字正文，改了就把尺的来源洗掉）；本笔就是那枚"旧路径现在叫什么"的对账处。
+- ⚠ 一枚边界：规矩 9 的帽**只有词面**——今天没有任何仪器拦下"新立的一枚 101+ 字符的票名"（`A584`/票 262 `AC#4` 已把这件事登记成债，那三把 guard 管的是**已入库跟踪路径**，⛔ 是"落笔那一刻"）。⇒ 归票 262 那一族，⛔ 我顺手补。
+
+### 3. 现态与 next
+
+- 现态＝票 306 `-done`（`23fe077e`）；票 303／304 文件名已改短、正文一字未动；票 307 **1 勾／5 未勾**，在飞＝**`307-v1`**；长度门本机 **GREEN**。
+- next＝收 `307-v1` → 我逐格翻或退回 → 我跑票 305 那六发 → 推送（⛔ 排；`A813` 未过期仍⛔ 用）→ 队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。⚠ 推送那一笔现在多一枚附带好处＝**把这两枚改名与 `-done` 一起带上去**，⛔ 为此提前推（欠的 CI 色还是要同批作差）。
