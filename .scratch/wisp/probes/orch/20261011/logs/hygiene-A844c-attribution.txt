@@ -1,0 +1,87 @@
+date=2026-10-11 12:38:50 +0800
+HEAD=5f2289e35e5b93282ea5ff9246d3c9a214b47cc5
+ruler=for each missing path: git ls-files -- '*/<basename>' (tracked anywhere) + find .scratch -name '<basename>' (on disk anywhere)
+--- probes/201/r2/gates-full.txt
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/201/r2/gates-full.txt .scratch/wisp/probes/222/r1/gates-full.txt ]
+--- probes/222/r1/gates-full.txt
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/201/r2/gates-full.txt .scratch/wisp/probes/222/r1/gates-full.txt ]
+--- probes/223/r2/orchestrator-flake20.txt
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/223/r2/orchestrator-flake20.txt ]
+--- probes/235/orch-rerun/full.txt
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/235/orch-rerun/full.txt ]
+--- probes/292/v1/22-changed-lines.md
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[]
+--- probes/293/orch/logs/orch-3pkg-run1.txt
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/293/orch/logs/orch-3pkg-run1.txt ]
+--- probes/300/orch/logs/r3-orch-v4-attacks-rcfixed-20261010-204046.txt
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/300/orch/logs/r3-orch-v4-attacks-rcfixed-20261010-204046.txt ]
+--- probes/300/r1/logs/post-commit-recheck.txt
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/300/r1/logs/post-commit-recheck.txt ]
+--- probes/35/v4/countershape-v4.sh
+    exact_tracked=[]
+    basename_tracked_anywhere=[.scratch/wisp/probes/35/v4/scripts/countershape-v4.sh ]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/35/v4/scripts/countershape-v4.sh ]
+--- probes/35/v4/scripts/countershape-v4.sh
+    exact_tracked=[.scratch/wisp/probes/35/v4/scripts/countershape-v4.sh]
+    basename_tracked_anywhere=[.scratch/wisp/probes/35/v4/scripts/countershape-v4.sh ]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/35/v4/scripts/countershape-v4.sh ]
+--- probes/72/r1/20-canonical-form-choice.md
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[]
+--- probes/orch/296-ac3-runsheet.md
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/orch/296-ac3-runsheet.md ]
+--- probes/orchestrator/33r5-head-roster.txt
+    exact_tracked=[]
+    basename_tracked_anywhere=[]
+    basename_on_disk_anywhere=[.scratch/wisp/probes/orchestrator/33r5-head-roster.txt ]
+=== also: which ledger section cites each (line numbers in docs/reports/pending-and-issues.md) ===
+--- gates-full.txt
+9238:- ⚠ **第一处：我把自己的门禁读数写错了**（`A427`／`4.0w 补三`）。`gates-full.txt` 现跑 `grep -E "^FAIL\s+github"`＝**三包**：
+9269:- **它的两发整包原始日志我自己读了**（`/tmp/222r1/gates-full.txt` 与 `gates-full2.txt`，各 67 行）：两发都 **24 枚包 ok／FAIL �
+9296:- **我这发的名册（口径：`PATH` 带 sherpa/build、`-count=1`、全量落 `.scratch/wisp/probes/222/r1/gates-full.txt`、**没接 `tail`**）**：
+16096:- 12 枚按归属分两堆（尺＝路径段名）：**腿名下 4 枚**＝`probes/201/r2/gates-full.txt`(5859)／`probes/222/r1/gates-full.txt`(5928)／`
+--- orchestrator-flake20.txt
+9455:- ✅ **尺一（间歇红）我自己重跑**：20 连发＝**runs=20／ok=20／fail=0／非零 exit=0**（16:55:17→16:56:53，件 `.scratch/wisp/probes
+16096:- 12 枚按归属分两堆（尺＝路径段名）：**腿名下 4 枚**＝`probes/201/r2/gates-full.txt`(5859)／`probes/222/r1/gates-full.txt`(5928)／`
+--- 22-changed-lines.md
+14939:- **自记一笔（腿申报）**：它起手误建 `…/probes/292/v1/22-changed-lines.md.tmp`（540 字节、未提交）⇒ **按规矩不删**，随�
+16101:- `probes/292/v1/22-changed-lines.md` ⇒ **我这把尺造的假发现**。台账 `A789` 那一行原文写的是带后缀的 `…/22-changed-lines.md.tm
+--- orch-3pkg-run1.txt
+15073:- **我自己复跑的（四把，⛔ 全照抄它的判语）**：① `git grep -n "SetTrayChecks" HEAD -- internal cmd` ⇒ 传值点 **1 枚**＝`cmd/w
+16096:- 12 枚按归属分两堆（尺＝路径段名）：**腿名下 4 枚**＝`probes/201/r2/gates-full.txt`(5859)／`probes/222/r1/gates-full.txt`(5928)／`
+--- r3-orch-v4-attacks-rcfixed-20261010-204046.txt
+15571:- 凭据＝腿的两发（`logs/21-A1`／`22-A2`）**＋我自己的两发**（件 `probes/300/orch/logs/r3-orch-v4-attacks-rcfixed-20261010-204046.txt`�
+16096:- 12 枚按归属分两堆（尺＝路径段名）：**腿名下 4 枚**＝`probes/201/r2/gates-full.txt`(5859)／`probes/222/r1/gates-full.txt`(5928)／`
+--- post-commit-recheck.txt
+15165:- **两枚交付形状缺陷**（具名、⛔ 阻断 `AC#2`，但记在账上）：`probes/300/r1/logs/post-commit-recheck.txt`（817 B）**从未入库**
+16096:- 12 枚按归属分两堆（尺＝路径段名）：**腿名下 4 枚**＝`probes/201/r2/gates-full.txt`(5859)／`probes/222/r1/gates-full.txt`(5928)／`
+--- countershape-v4.sh
+13710:**3. ★新规矩：台件会腐烂（`35-v5` 题外抓到的一枚真事）**：`.scratch/wisp/probes/35/v4/countershape-v4.sh` 那套突变台件**按�
+16102:- `probes/35/v4/countershape-v4.sh` ⇒ **台账 `A695` 那一处是路径笔误**（少写一段 `scripts/`）。真件在盘＝`probes/35/v4/scripts/cou
+--- 20-canonical-form-choice.md
+16165:- ⚠ **我自己抓到的两枚注释缺陷**（⛔ 由我顺手改，同两枚文件⛔ 是我射程）：①`pathresolver_anchor_spelling_windows_test.
+--- 296-ac3-runsheet.md
+14962:- **排程现状（21:1x）**：在飞＝`296-r1`（`AC#3`/`AC#4` 未完）。队列＝296 交回并裁＋我亲跑真机那发（runsheet＝`.scratch/wis
+16096:- 12 枚按归属分两堆（尺＝路径段名）：**腿名下 4 枚**＝`probes/201/r2/gates-full.txt`(5859)／`probes/222/r1/gates-full.txt`(5928)／`
+--- 33r5-head-roster.txt
+10306:- **⚠ 我补跑抓到的那一枚真红（这一格它没有读数）**：我独占机器整包复跑 `cmd/wisp`（`-count=1 -v`，带 sherpa PATH，日
+16096:- 12 枚按归属分两堆（尺＝路径段名）：**腿名下 4 枚**＝`probes/201/r2/gates-full.txt`(5859)／`probes/222/r1/gates-full.txt`(5928)／`

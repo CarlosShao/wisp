@@ -1,0 +1,60 @@
+# 编排者更正跑（取退码的口径改为纯重定向）
+captured_local=2026-10-10 20:40:46 +0800
+HEAD_sha=d9864baf3561c3fbb4ced91262b60a1f9e20f181  exported_tree=/tmp/300v4-orch-fix-20261010-204046/repo
+supersedes_rc_lines_of=logs/r2-orch-verify-v4-attacks-20261010-203134.txt（那一件的**颜色**证据仍有效，只有 rc_ 那几行作废）
+porcelain_lines=0
+archive_rc=0
+
+## 1. 正控：定向用例 pristine
+rc_pristine_targeted=0
+ok  	github.com/CarlosShao/wisp/internal/audio	0.041s
+
+## 2. 反攻 A1：期望侧 mmregWaveFormatIEEEFloat 0x0003 -> 1（腿那一发的形，应＝红）
+74:	mmregWaveFormatIEEEFloat uint16 = 1
+rc_A1=1
+A1_top_FAIL=1
+A1_sub_FAIL=2
+A1_first_error_verbatim:
+    wave_format_float_300_windows_test.go:191: waveFormatFloat = 0x0003, want 0x0001; mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT 0x0003, copied out of the SDK header, not derived from this package. waveFormatFloat is the constant wasapi_windows.go
+    wave_format_float_300_windows_test.go:235: waveFormatFloat = 0x0003, which is none of WAVE_FORMAT_PCM 1, WAVE_FORMAT_IEEE_FLOAT 0x0003 or WAVE_FORMAT_EXTENSIBLE 0xFFFE as copied from mmreg.h:2418/2110/2376
+restore_A1=IDENTICAL
+
+## 3. 反攻 A2：期望侧 0x0003 -> 0xFFFE（与 extensible 撞车那一形，应＝红）
+74:	mmregWaveFormatIEEEFloat uint16 = 0xFFFE
+rc_A2=1
+A2_top_FAIL=1
+A2_sub_FAIL=2
+A2_error_verbatim:
+    wave_format_float_300_windows_test.go:191: waveFormatFloat = 0x0003, want 0xfffe; mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT 0x0003, copied out of the SDK header, not derived from this package. waveFormatFloat is the constant wasapi_windows.go
+    wave_format_float_300_windows_test.go:235: waveFormatFloat = 0x0003, which is none of WAVE_FORMAT_PCM 1, WAVE_FORMAT_IEEE_FLOAT 0x0003 or WAVE_FORMAT_EXTENSIBLE 0xFFFE as copied from mmreg.h:2418/2110/2376
+    wave_format_float_300_windows_test.go:229: waveFormatExt = 0xfffe, but mmreg.h reserves 0xfffe for WAVE_FORMAT_IEEE_FLOAT (mmreg.h:2110), which this package declares as waveFormatFloat; the constant names and the authority values no lon
+restore_A2=IDENTICAL
+
+## 4. 反攻 R1b-甲：wavinjector.go 行内的 case fmtTag == 3 改成 == 2（同族零尺，预期＝整包照绿）
+218:	case fmtTag == 3 && bits == 32:
+after_sed:
+211:	case fmtTag == 1 && bits == 16:
+218:	case fmtTag == 2 && bits == 32:
+rc_R1b_jia_pkg=0
+R1b_a_top_FAIL=0
+R1b_a_top_PASS=42
+R1b_a_summary_line=ok  	github.com/CarlosShao/wisp/internal/audio	15.999s
+restore_R1b_jia=IDENTICAL
+
+## 5. 反攻 R1b-乙：wavinjector.go 行内的 fmtTag == 0xFFFE 改成 0xFFFD（预期＝整包照绿）
+192:			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+after_sed:
+192:			if fmtTag == 0xFFFD { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+rc_R1b_yi_pkg=0
+R1b_b_top_FAIL=0
+R1b_b_top_PASS=42
+R1b_b_summary_line=ok  	github.com/CarlosShao/wisp/internal/audio	15.991s
+restore_R1b_yi=IDENTICAL
+
+## 6. 还原后正控（成对的绿腿）：定向 + 整包
+rc_targeted_after_restores=0
+ok  	github.com/CarlosShao/wisp/internal/audio	0.038s
+rc_pkg_after_restores=0
+ok  	github.com/CarlosShao/wisp/internal/audio	16.021s
+worktree_internal_audio_dirty_lines=0
+done=2026-10-10 20:42:02 +0800

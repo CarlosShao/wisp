@@ -1,0 +1,10 @@
+CPU_loadpct=37 MEM_usedpct=56.2
+go*=1
+gopls*=0
+gotest*=0
+compile*=0
+link*=0
+wisp*=1
+node*=9
+runner*=1
+git*=4

@@ -1,0 +1,43 @@
+date=2026-10-11 12:38:15 +0800
+HEAD=934b350abb41523d08eca950fd7dd8d647dec148
+ruler=sed -n '/^## A840/,$p' docs/reports/pending-and-issues.md | grep -oE 'probes/[A-Za-z0-9_./*-]+'  (short form, resolve to .scratch/wisp/<path>)
+v1_self_report=v1 used pattern '.scratch/wisp/probes/...' -> distinct_paths=0 = FALSE CLEAN, my ledger cites short form
+raw_matches=20
+MISS_HEAD .scratch/wisp/probes/201/r2/gates-full.txt
+MISS_HEAD .scratch/wisp/probes/222/r1/gates-full.txt
+MISS_HEAD .scratch/wisp/probes/223/r2/orchestrator-flake20.txt
+MISS_HEAD .scratch/wisp/probes/235/orch-rerun/full.txt
+MISS_DISK .scratch/wisp/probes/292/v1/22-changed-lines.md
+MISS_HEAD .scratch/wisp/probes/292/v1/22-changed-lines.md
+MISS_HEAD .scratch/wisp/probes/293/orch/logs/orch-3pkg-run1.txt
+MISS_HEAD .scratch/wisp/probes/300/orch/logs/r3-orch-v4-attacks-rcfixed-20261010-204046.txt
+MISS_HEAD .scratch/wisp/probes/300/r1/logs/post-commit-recheck.txt
+MISS_DISK .scratch/wisp/probes/35/v4/countershape-v4.sh
+MISS_HEAD .scratch/wisp/probes/35/v4/countershape-v4.sh
+MISS_DISK .scratch/wisp/probes/72/r1/20-canonical-form-choice.md
+MISS_HEAD .scratch/wisp/probes/72/r1/20-canonical-form-choice.md
+MISS_HEAD .scratch/wisp/probes/orch/296-ac3-runsheet.md
+MISS_HEAD .scratch/wisp/probes/orchestrator/33r5-head-roster.txt
+miss_disk=3
+miss_head=12
+--- the matches, verbatim ---
+probes/201/r2/gates-full.txt
+probes/222/r1/gates-full.txt
+probes/223/r2/orchestrator-flake20.txt
+probes/235/orch-rerun/full.txt
+probes/292/v1/22-changed-lines.md
+probes/293/orch/logs/orch-3pkg-run1.txt
+probes/300/orch/logs/r3-orch-v4-attacks-rcfixed-20261010-204046.txt
+probes/300/r1/logs/post-commit-recheck.txt
+probes/309/a1/**
+probes/309/a1/20-shape-a-cost.md
+probes/35/v4/countershape-v4.sh
+probes/35/v4/scripts/countershape-v4.sh
+probes/72/a2/**
+probes/72/r1/**
+probes/72/r1/20-canonical-form-choice.md
+probes/orch/20261011/logs/orch-72r1-verify.txt
+probes/orch/20261011/logs/orch-cited-paths-check.txt
+probes/orch/296-ac3-runsheet.md
+probes/orch/taskid-a1/**
+probes/orchestrator/33r5-head-roster.txt

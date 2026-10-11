@@ -1,7 +1,7 @@
-cited_total=275
-at_head=261
+cited_total=280
+at_head=265
 on_disk_not_head=12
-nowhere=2
+nowhere=3
 --- roster ---
 ON-DISK-NOT-HEAD 5859 B .scratch/wisp/probes/201/r2/gates-full.txt
 ON-DISK-NOT-HEAD 5928 B .scratch/wisp/probes/222/r1/gates-full.txt
@@ -12,6 +12,7 @@ ON-DISK-NOT-HEAD 361593 B .scratch/wisp/probes/293/orch/logs/orch-3pkg-run1.txt
 ON-DISK-NOT-HEAD 3205 B .scratch/wisp/probes/300/orch/logs/r3-orch-v4-attacks-rcfixed-20261010-204046.txt
 ON-DISK-NOT-HEAD 817 B .scratch/wisp/probes/300/r1/logs/post-commit-recheck.txt
 NOT-ANYWHERE .scratch/wisp/probes/35/v4/countershape-v4.sh
+NOT-ANYWHERE .scratch/wisp/probes/72/r1/20-canonical-form-choice.md
 ON-DISK-NOT-HEAD 3352 B .scratch/wisp/probes/orch/296-ac3-runsheet.md
 ON-DISK-NOT-HEAD 198451 B .scratch/wisp/probes/orchestrator/33r5-head-roster.txt
 ON-DISK-NOT-HEAD 117286 B .scratch/wisp/probes/orchestrator/33r6-head-roster.txt

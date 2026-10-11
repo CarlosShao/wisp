@@ -1,0 +1,7 @@
+date=2026-10-11 12:37:48 +0800
+HEAD=934b350abb41523d08eca950fd7dd8d647dec148
+ruler=ledger sections A840..A844 -> paths matching .scratch/wisp/probes/... ; checked two ways: test -f (disk) and git cat-file -e HEAD:<path> (committed)
+distinct_paths=0
+miss_disk=0
+miss_head=0
+note: MISS_HEAD on a directory path is expected only if git does not track dirs by that name
