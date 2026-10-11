@@ -1,0 +1,3 @@
+# github.com/CarlosShao/wisp/internal/agent
+internal\agent\z309b_collision.go:3:6: ToolRequest redeclared in this block
+	internal\agent\tools.go:54:6: other declaration of ToolRequest
