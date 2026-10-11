@@ -17,6 +17,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/llm"
+	"github.com/CarlosShao/wisp/internal/llm/adaptertest"
 	"github.com/CarlosShao/wisp/internal/llm/golden"
 	"github.com/CarlosShao/wisp/internal/observe"
 )
@@ -77,7 +78,13 @@ func startMockllm(t *testing.T) *mockllmProc {
 		t.Fatal(err)
 	}
 	proc.cmd.Stderr = os.Stderr
-	if err := proc.cmd.Start(); err != nil {
+	// Ticket 304, the SECOND spawn point (both are changed in the same batch,
+	// otherwise this file stays the second leak source): the child starts as an
+	// explicit member of a KILL_ON_JOB_CLOSE job (Windows) so the OS reaps it
+	// even when this test binary dies before the t.Cleanup below runs.
+	// adaptertest.StartChildGuarded on a non-Windows platform is a plain Start
+	// and protects nothing; that branch is named as still leaking.
+	if err := adaptertest.StartChildGuarded(t, proc.cmd); err != nil {
 		t.Fatalf("start mockllm: %v", err)
 	}
 

@@ -1,0 +1,19 @@
+=== p1 shape(a) @ 2026-10-11 17:38:43 +0800 HEAD=2a6f11a5
+ruler: mockllm-procs.ps1 -Quick (Get-CimInstance Win32_Process Name='mockllm.exe', attribution guard = cmdline matches *Wisp\internal\llm\testdata\golden*)
+measured against: the WORKTREE (my landed bytes), not a HEAD blob
+before: count_total=0 count_repo_golden=0 pids=[]
+--- SP2-openaichat pkg=./internal/llm/openaichat/ run=^TestMockllmGoldenByteIdenticalEvents$
+rc=0 elapsed=7s
+markers: RUN=5 PASS=5 FAIL=0 panic=0 timedout=0
+    --- PASS: TestMockllmGoldenByteIdenticalEvents/long-text (2.72s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	4.924s
+after-SP2: count_total=0 count_repo_golden=0 pids=[]
+--- SP1-adaptertest pkg=./internal/llm/openaichat/ run=^TestMockllmSharedFaultSuite$
+rc=0 elapsed=5s
+markers: RUN=6 PASS=6 FAIL=0 panic=0 timedout=0
+    --- PASS: TestMockllmSharedFaultSuite/request_wire_shape_understood_by_mockllm (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	3.798s
+after-SP1: count_total=0 count_repo_golden=0 pids=[]
+=== end 17:39:00

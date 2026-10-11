@@ -76,7 +76,13 @@ func StartMockllm(t *testing.T) *Mockllm {
 		t.Fatal(err)
 	}
 	proc.cmd.Stderr = os.Stderr
-	if err := proc.cmd.Start(); err != nil {
+	// Ticket 304: the child starts as an explicit member of a
+	// KILL_ON_JOB_CLOSE job (Windows) so the OS reaps it even when this test
+	// binary dies before t.Cleanup runs - a `go test -timeout` panic or an
+	// external TerminateProcess used to leave one mockllm.exe per death.
+	// StartChildGuarded on a non-Windows platform is a plain Start and
+	// protects nothing; that branch is named as still leaking.
+	if err := StartChildGuarded(t, proc.cmd); err != nil {
 		t.Fatalf("start mockllm: %v", err)
 	}
 	// Cleanup is registered before the readiness wait so every failure path
