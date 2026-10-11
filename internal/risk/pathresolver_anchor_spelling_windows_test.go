@@ -20,6 +20,22 @@ import (
 // the general shape "anchor spelling != handle-resolved spelling", and a
 // junction as the profile spelling produces that shape on any volume.
 
+// namesSameFile answers the ONE question about spelling a ticket-72 case is
+// allowed to ask: do these two strings name the same file? The answer comes
+// from the package's own form family (formsOf, i.e. the handle pipeline), so
+// it is true on a volume that generates 8.3 names and on one that does not --
+// unlike strings.EqualFold against a path the test joined itself, which pinned
+// whichever spelling t.TempDir() happened to hand back (甲族 #1/#4/#5/#6: the
+// expectation side was the bug, the resolver's long expanded answer was right).
+//
+// Ticket 72 invariant: a verdict (and a premise, which is a verdict about the
+// fixture) may not depend on spelling. real == "" means this side cannot be
+// proven expanded, which is never "same file".
+func namesSameFile(a, b string) bool {
+	fa, fb := formsOf(a), formsOf(b)
+	return fa.real != "" && fb.real != "" && strings.EqualFold(fa.real, fb.real)
+}
+
 // TestClassifyAnchorSpellingIsNotVerdict seeds a real profile tree, points
 // USERPROFILE at it through a junction (so the anchor's spelling is not the
 // handle's spelling), and classifies the handle-resolved canonical. Every A
@@ -53,7 +69,16 @@ func TestClassifyAnchorSpellingIsNotVerdict(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Resolve(%q): %v", p, err)
 		}
-		if !strings.EqualFold(res.Canonical, p) {
+		// Premise, restated in the shape the ticket-72 invariant demands. It
+		// used to be strings.EqualFold(res.Canonical, p): a comparison against
+		// the spelling THIS test joined from t.TempDir(), which on a volume
+		// with 8.3 generation aborts here with the resolver having answered
+		// correctly (the long form), so Classify and Gate below were never
+		// reached on the aliased surface. Same file, decided by the handle
+		// pipeline instead of by a string, keeps the premise a premise -- and
+		// it still fails closed (t.Fatalf) when the candidate is not the real
+		// path, which is what AC#3 (1) names as this case's mutation target.
+		if !namesSameFile(res.Canonical, p) {
 			t.Fatalf("Resolve(%q) canonical %q: test premise broken (candidate must be the real path)", p, res.Canonical)
 		}
 		if got := Classify(res.Canonical); got != ClassA {
@@ -116,31 +141,62 @@ func TestClassifySpellingInvariance(t *testing.T) {
 	}
 }
 
-// TestCanonicalInputGainsNoSecondForm bounds the blast radius of ticket 72:
-// for a path that already IS the handle's spelling (which is what Resolve
-// hands to every production caller), formsOf must produce exactly one
-// comparison form and call it certain. That is the precise statement of "this
-// fix does not change the verdict for a path that has no second spelling";
-// the tests above cover the other half.
+// TestCanonicalInputGainsNoSecondForm bounds the blast radius of ticket 72.
+// It used to read "formsOf(Resolve(p)) yields exactly one comparison form",
+// a count hard-coded to 1 -- and on a volume that generates 8.3 names the
+// path Resolve returns for a NOT-YET-EXISTING leaf is still spelled with the
+// short form of its ancestors (Resolve expands what it can open), so that
+// path genuinely has two spellings and the count was the wrong question: the
+// resolver was right, the expectation was the bug.
+//
+// What this case pins now is the sentence AC#5 was actually promising, in the
+// shape the invariant allows: for the paths Resolve hands to every production
+// caller the verdict is the pre-ticket-72 verdict (.ssh/** and
+// .git-credentials still A, everything here still None), and it is that
+// verdict under EVERY comparison form the path has, 1 or 2. certain() stays
+// exactly as it was. See probes/72/r1/20-canonical-form-choice.md for why the
+// count itself is no longer assertable without either a production change
+// (make Resolve expand missing leaves: out of ticket 72's scope, it feeds
+// Actable/syncdirs/internal-tools) or a test-side oracle that would be
+// formsOf wearing a different hat.
 func TestCanonicalInputGainsNoSecondForm(t *testing.T) {
 	home := tmpHome(t)
-	for _, p := range []string{
-		filepath.Join(home, ".ssh", "id_testkey"),
-		filepath.Join(home, ".git-credentials"),
-		filepath.Join(home, "plain.txt"),
-		home,
-		filepath.Join(home, "not-created-yet", "deep.txt"),
+	for _, tc := range []struct {
+		path string
+		want Class
+	}{
+		{filepath.Join(home, ".ssh", "id_testkey"), ClassA},
+		{filepath.Join(home, ".git-credentials"), ClassA},
+		{filepath.Join(home, "plain.txt"), ClassNone},
+		{home, ClassNone},
+		{filepath.Join(home, "not-created-yet", "deep.txt"), ClassNone},
 	} {
-		res, err := Resolve(p, nil)
+		res, err := Resolve(tc.path, nil)
 		if err != nil {
-			t.Fatalf("Resolve(%q): %v", p, err)
+			t.Fatalf("Resolve(%q): %v", tc.path, err)
 		}
 		f := formsOf(res.Canonical)
-		if got := len(f.spellings()); got != 1 {
-			t.Errorf("canonical %q produced %d comparison forms %q, want 1 (verdict must not move for a path with one spelling)", res.Canonical, got, f.spellings())
+		fs := f.spellings()
+		if len(fs) == 0 {
+			t.Fatalf("canonical %q produced no comparison form at all", res.Canonical)
 		}
 		if !f.certain() {
 			t.Errorf("canonical %q is not certain: root=%q real=%q partial=%v", res.Canonical, f.root, f.real, f.partial)
+		}
+		if got := Classify(fs[0]); got != tc.want {
+			t.Errorf("canonical %q: form %q classified %v, want %v (this ticket may not move a verdict)", res.Canonical, fs[0], got, tc.want)
+		}
+		// The same verdict from every form, or the blast radius is not bounded.
+		for _, sp := range fs[1:] {
+			if got := Classify(sp); got != tc.want {
+				t.Errorf("canonical %q: forms %q and %q classify differently (%v vs %v, want %v): the verdict may not depend on spelling",
+					res.Canonical, fs[0], sp, Classify(fs[0]), got, tc.want)
+			}
+			base := Gate(fs[0], nil)
+			d := Gate(sp, nil)
+			if d.Allow != base.Allow || d.NeedL2 != base.NeedL2 || d.Class != base.Class {
+				t.Errorf("canonical %q: forms %q and %q gate differently (%+v vs %+v)", res.Canonical, fs[0], sp, base, d)
+			}
 		}
 	}
 }
@@ -230,11 +286,29 @@ func TestAListWinsWhereBothTablesHit(t *testing.T) {
 
 	// Control: the very same B patterns outside the A tree stay B (approvable
 	// after one L2 confirm), and an ordinary file stays ClassNone.
+	//
+	// The override is now asked the way production asks it (internal/tools
+	// mode.go: confirmations -> Canonicalize -> risk.Gate): the file exists,
+	// and the spelling handed to Gate -- and recorded as the key -- is the ONE
+	// form the OS vouches for. The old control keyed the override on the
+	// string tmpHome(t) had joined, which on an aliased volume is the 8.3
+	// short form; overrideApplies deliberately refuses to unlock anything that
+	// is not the handle-resolved spelling (编排者插单 10:08: an ALLOW rests on
+	// a narrower basis than a DENY), so the control was failing for a spelling
+	// reason while asserting nothing about the rule. Deleting this control is
+	// not an option either -- it is the only proof that the narrow rule is a
+	// rule and not a blanket deny (see TestOverrideOnlyAcceptsTheResolvedForm
+	// assertion (4)).
 	out := filepath.Join(home, "proj", "id_bothkey")
+	mustWrite(t, out, "secret")
+	resOut, err := Resolve(out, nil)
+	if err != nil {
+		t.Fatalf("Resolve(%q): %v", out, err)
+	}
 	if got := Classify(out); got != ClassB {
 		t.Fatalf("B-only control %q classified %v, want ClassB", out, got)
 	}
-	if d := Gate(out, map[string]bool{strings.ToLower(out): true}); !d.Allow {
+	if d := Gate(resOut.Canonical, map[string]bool{strings.ToLower(resOut.Canonical): true}); !d.Allow {
 		t.Fatalf("B-only control must stay overridable by design: %+v", d)
 	}
 	if got := Classify(filepath.Join(home, "proj", "main.go")); got != ClassNone {

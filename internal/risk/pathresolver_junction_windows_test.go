@@ -131,8 +131,8 @@ func TestPathResolverShortNameAListDenied(t *testing.T) {
 	if err != nil {
 		t.Fatalf("short name is not a reparse point, want clean resolve: %v", err)
 	}
-	if !strings.EqualFold(res.Canonical, long) {
-		t.Fatalf("short name did not expand to long path: got %q want %q", res.Canonical, long)
+	if !namesSameFile(res.Canonical, long) {
+		t.Fatalf("short name did not expand to the file the test wrote: got %q, written path %q", res.Canonical, long)
 	}
 	if got := Classify(res.Canonical); got != ClassA {
 		t.Fatalf("8.3 spelling of A-list file classified %v, want ClassA", got)
@@ -160,8 +160,17 @@ func TestPathResolverUNCAListDenied(t *testing.T) {
 		if err != nil {
 			t.Fatalf("UNC spelling %q: unexpected reparse error: %v", spelling, err)
 		}
-		if !strings.EqualFold(res.Canonical, long) {
-			t.Fatalf("UNC spelling %q normalized to %q, want %q", spelling, res.Canonical, long)
+		// Ticket 72 甲族 #5: the target of this check is the FILE the UNC
+		// spelling names, not the string long -- long is whatever
+		// tmpHome(t)/t.TempDir() handed back, and on a volume with 8.3
+		// generation the resolver's answer is the expanded form of that same
+		// file. Same-file is decided by namesSameFile (handle pipeline); the
+		// verdict itself is pinned by the two assertions after it.
+		if !namesSameFile(res.Canonical, long) {
+			t.Fatalf("UNC spelling %q normalized to %q, which is not a spelling of the written file %q", spelling, res.Canonical, long)
+		}
+		if got := Classify(res.Canonical); got != ClassA {
+			t.Fatalf("UNC spelling of A-list file classified %v, want ClassA", got)
 		}
 		if d := gateFor(t, res.Canonical); d.Allow {
 			t.Fatalf("UNC spelling of A-list file granted: %q -> %+v", spelling, d)
@@ -178,8 +187,14 @@ func TestPathResolverExtendedLengthPrefixAListDenied(t *testing.T) {
 	if err != nil {
 		t.Fatalf("\\\\?\\ prefix is not a reparse point: %v", err)
 	}
-	if !strings.EqualFold(res.Canonical, long) {
-		t.Fatalf("\\\\?\\ spelling normalized to %q, want %q", res.Canonical, long)
+	// Ticket 72 甲族 #6: same-file, not same-string -- `long` is this test's
+	// own join of tmpHome(t) and the resolver legitimately returns the
+	// expanded spelling of it on an 8.3 volume.
+	if !namesSameFile(res.Canonical, long) {
+		t.Fatalf("\\\\?\\ spelling normalized to %q, not to a spelling of the written file %q", res.Canonical, long)
+	}
+	if got := Classify(res.Canonical); got != ClassA {
+		t.Fatalf("\\\\?\\ spelling of A-list file classified %v, want ClassA", got)
 	}
 	if d := gateFor(t, res.Canonical); d.Allow {
 		t.Fatalf("\\\\?\\ spelling of A-list file granted: %+v", d)
@@ -288,7 +303,21 @@ func TestBListDefaultDenyAndOverride(t *testing.T) {
 	Logf = func(f string, a ...any) { logs = append(logs, sprintf(f, a...)) }
 	defer func() { Logf = nil }()
 	p := filepath.Join(home, "proj", ".env.local")
-	if d := Gate(p, map[string]bool{strings.ToLower(p): true}); !d.Allow {
+	// Ticket 72 甲族 #7: the confirmed file is asked about the way production
+	// asks (internal/tools mode.go: the caller Canonicalizes first, then Gates
+	// with the confirmation table keyed on that canonical). The old form keyed
+	// the override on tmpHome(t)'s own join, i.e. on the 8.3 short spelling on
+	// an aliased volume, and overrideApplies refuses every spelling that is
+	// not the handle-resolved one -- by design (编排者插单 10:08). So this
+	// control measured a spelling, not the rule; the rule is what it measures
+	// now, and the log assertion below it runs for real instead of being
+	// skipped by this Fatalf.
+	mustWrite(t, p, "secret")
+	resP, err := Resolve(p, nil)
+	if err != nil {
+		t.Fatalf("Resolve(%q): %v", p, err)
+	}
+	if d := Gate(resP.Canonical, map[string]bool{strings.ToLower(resP.Canonical): true}); !d.Allow {
 		t.Fatalf("B-list single-file override must allow: %+v", d)
 	}
 	if len(logs) == 0 {
