@@ -1,0 +1,21 @@
+2026-10-11 11:30 +0800
+9c83598d
+dev
+--- my authorized faces dirty check (expect empty)
+--- alias surface dirs
+C:/Users/swq/tmp/RISKAT~1/RUNNER~1
+C:/Users/swq/tmp/riskattrib1/RunnerTempAreaForAttribution1
+--- env in this shell
+TEMP=/tmp
+TMP=/tmp
+--- red positions verbatim (HEAD blob = worktree, expect same)
+			t.Fatalf("Resolve(%q) canonical %q: test premise broken (candidate must be the real path)", p, res.Canonical)
+			t.Errorf("canonical %q produced %d comparison forms %q, want 1 (verdict must not move for a path with one spelling)", res.Canonical, got, f.spellings())
+		t.Fatalf("B-only control must stay overridable by design: %+v", d)
+		t.Fatalf("short name did not expand to long path: got %q want %q", res.Canonical, long)
+			t.Fatalf("UNC spelling %q normalized to %q, want %q", spelling, res.Canonical, long)
+		t.Fatalf("\\\\?\\ spelling normalized to %q, want %q", res.Canonical, long)
+		t.Fatalf("B-list single-file override must allow: %+v", d)
+			t.Errorf("source %q: under-profile fallback must stay armed", src)
+			t.Errorf("source %q: writes under the injected root must be sync", src)
+		t.Fatal("suspect fallback must stay armed")
