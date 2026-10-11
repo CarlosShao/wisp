@@ -1,0 +1,7 @@
+"alias-literal"
+"conversion-to-tool-request"
+"make-slice-of-tool-request"
+"new-of-tool-request"
+"qualified-literal"
+"same-package-bare-literal"
+"var-decl-no-initializer"

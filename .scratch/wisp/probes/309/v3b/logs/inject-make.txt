@@ -1,0 +1,5 @@
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func z309bRigMake(n int) []agent.ToolRequest { return make([]agent.ToolRequest, n) }

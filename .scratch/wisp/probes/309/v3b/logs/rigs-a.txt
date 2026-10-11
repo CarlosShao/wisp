@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# 309-v3b AC#2 rigs. Out-of-repo export trees only, pinned to 3b8066a2. No repo mutations.
+# Layout per teeth pair: pristine green -> inject one shape -> red (exact line recorded) -> mv aside -> green -> cmp proof.
+set -u
+cd "/d/work/workspace/projects plans/Wisp" || exit 1
+P=.scratch/wisp/probes/309/v3b
+L=$P/logs
+ANCHOR=3b8066a2
+SUM=$L/rigs-a-summary.txt
+mkdir -p /d/tmp "$L"
+
+echo "rig_started_at=$(date '+%F %T %z')" >> "$SUM"
+echo "git_HEAD_at_rig_time=$(git rev-parse --short HEAD)" >> "$SUM"
+echo "anchor_pinned=$ANCHOR" >> "$SUM"
+echo "go_version=$(go version)" >> "$SUM"
+git merge-base --is-ancestor a1f84d39 "$ANCHOR"; echo "anchor_contains_a1f84d39_rc=$?" >> "$SUM"
+git merge-base --is-ancestor df8d517d "$ANCHOR"; echo "anchor_contains_df8d517d_rc=$?" >> "$SUM"
+
+fp() { ( cd "$1" && find . -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1 ); }
+run() { ( cd "$1" && GOFLAGS= go test ./internal/tools/ -run '^Test309ToolRequestProductionConstructionNail$' -count=1 ) > "$2" 2>&1; echo $?; }
+
+# ---------- injection sources (kept as .txt, copied into trees as .go) ----------
+cat > "$L/inject-new.txt" <<'EOF'
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func z309bRigNew() *agent.ToolRequest { return new(agent.ToolRequest) }
+EOF
+cat > "$L/inject-make.txt" <<'EOF'
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func z309bRigMake(n int) []agent.ToolRequest { return make([]agent.ToolRequest, n) }
+EOF
+cat > "$L/inject-conv.txt" <<'EOF'
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+type z309bRigSame agent.ToolRequest
+
+func z309bRigConv(x z309bRigSame) agent.ToolRequest { return agent.ToolRequest(x) }
+EOF
+
+rig() { # $1 tag  $2 inject relpath
+  tag=$1; rel=$2
+  R=$L/rig-$tag.txt
+  if grep -q '^DONE' "$R" 2>/dev/null; then echo "skip $tag already done" >> "$SUM"; return 0; fi
+  T=$(mktemp -d /d/tmp/wisp-309v3b-"$tag"-XXXXXX)
+  git archive "$ANCHOR" go.mod go.sum internal cmd tools scripts | tar -x -C "$T"
+  exp_rc=$?
+  ngo=$(find "$T" -name '*.go' | wc -l)
+  nnt=$(find "$T" -name '*.go' ! -name '*_test.go' | wc -l)
+  pre=$(fp "$T")
+  rcp=$(run "$T" "$L/run-$tag-pristine.txt")
+  cp "$L/inject-$tag.txt" "$T/$rel"
+  sha_inj=$(sha256sum "$T/$rel" | cut -d' ' -f1)
+  rci=$(run "$T" "$L/run-$tag-injected.txt")
+  vt=$(grep -c -E 'walk |GetFileAttributesEx|build failed|no test files|FAIL\s+\[build failed\]' "$L/run-$tag-injected.txt" 2> "$L/void-$tag.stderr")
+  vtb=$(wc -c < "$L/void-$tag.stderr")
+  mv "$T/$rel" "$T-aside-$tag.go"; mvr=$?
+  sha_aside=$(sha256sum "$T-aside-$tag.go" | cut -d' ' -f1)
+  cmp -s "$T-aside-$tag.go" "$L/inject-$tag.txt"; cmp_aside=$?
+  rcr=$(run "$T" "$L/run-$tag-restored.txt")
+  post=$(fp "$T")
+  cmp -s <(echo "$pre") <(echo "$post"); fp_rc=$?
+  {
+    echo "tag=$tag"
+    echo "tree=$T"
+    echo "export_rc=$exp_rc go_files=$ngo non_test_go=$nnt"
+    echo "rc_pristine=$rcp rc_injected=$rci rc_restored=$rcr"
+    echo "sha_injected=$sha_inj"
+    echo "sha_aside=$sha_aside sha_match=$([ "$sha_inj" = "$sha_aside" ] && echo YES || echo NO)"
+    echo "aside_cmp_injectcopy_rc=$cmp_aside mv_rc=$mvr"
+    echo "fp_pre=$pre"
+    echo "fp_post=$post fp_cmp_rc=$fp_rc"
+    echo "void_tokens_in_injected_run=$vt void_stderr_bytes=$vtb"
+    echo "-- injected run vital lines --"
+    grep -E '^--- (PASS|FAIL)|_test\.go:[0-9]+:|名册=|分母=|^ok |^FAIL' "$L/run-$tag-injected.txt" | cut -c1-500
+    echo "-- pristine run vital lines --"
+    grep -E '^--- (PASS|FAIL)|^ok ' "$L/run-$tag-pristine.txt" | cut -c1-200
+    echo "-- restored run vital lines --"
+    grep -E '^--- (PASS|FAIL)|^ok ' "$L/run-$tag-restored.txt" | cut -c1-200
+    echo "DONE"
+  } > "$R"
+  echo "rig $tag done rcs=$rcp/$rci/$rcr" >> "$SUM"
+}
+
+rig new internal/tools/z309b_new.go
+rig make internal/tools/z309b_make.go
+rig conv internal/tools/z309b_conv.go
+
+# ---------- census rig: label visibility + false-positive demonstration ----------
+RT=$L/rig-census.txt
+if grep -q '^DONE' "$RT" 2>/dev/null; then echo "skip census already done" >> "$SUM"; else
+T=$(mktemp -d /d/tmp/wisp-309v3b-census-XXXXXX)
+git archive "$ANCHOR" go.mod go.sum internal cmd tools scripts | tar -x -C "$T"
+exp_rc=$?
+ngo=$(find "$T" -name '*.go' | wc -l)
+nnt=$(find "$T" -name '*.go' ! -name '*_test.go' | wc -l)
+pre=$(fp "$T")
+rcp=$(run "$T" "$L/run-census-pristine.txt")
+
+cat > "$T/internal/tools/z309b_census.go" <<'EOF'
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+type z309bRigAlias = agent.ToolRequest
+
+var z309bRigDecl agent.ToolRequest
+
+func z309bRigQualified() agent.ToolRequest { return agent.ToolRequest{TaskID: ""} }
+
+func z309bRigAliasLit() z309bRigAlias { return z309bRigAlias{TaskID: ""} }
+
+func z309bRigTouch() { z309bRigDecl.TaskID = "" }
+EOF
+cp "$T/internal/tools/z309b_census.go" "$L/inject-census-go.txt"
+sha_census=$(sha256sum "$T/internal/tools/z309b_census.go" | cut -d' ' -f1)
+rc1=$(run "$T" "$L/run-census-phase1.txt")
+
+mkdir -p "$T/internal/tools/fakeagent"
+cat > "$T/internal/tools/fakeagent/fake.go" <<'EOF'
+package agent
+
+type ToolRequest struct{ TaskID string }
+
+var Sample = ToolRequest{TaskID: ""}
+EOF
+cat > "$T/internal/tools/z309b_fp.go" <<'EOF'
+package tools
+
+import agent "github.com/CarlosShao/wisp/internal/tools/fakeagent"
+
+func z309bRigFP() agent.ToolRequest { return agent.ToolRequest{TaskID: ""} }
+EOF
+cp "$T/internal/tools/z309b_fp.go" "$L/inject-fp-go.txt"
+sha_fp=$(sha256sum "$T/internal/tools/z309b_fp.go" | cut -d' ' -f1)
+sha_fake=$(sha256sum "$T/internal/tools/fakeagent/fake.go" | cut -d' ' -f1)
+rc2=$(run "$T" "$L/run-census-phase2-fp.txt")
+
+mv "$T/internal/tools/z309b_census.go" "$T-aside-census.go"; mvr1=$?
+mv "$T/internal/tools/z309b_fp.go" "$T-aside-fp.go"; mvr2=$?
+mv "$T/internal/tools/fakeagent" "$T-aside-fakeagent"; mvr3=$?
+cmp -s "$T-aside-census.go" "$L/inject-census-go.txt"; cmp1=$?
+cmp -s "$T-aside-fp.go" "$L/inject-fp-go.txt"; cmp2=$?
+sha_fake_aside=$(sha256sum "$T-aside-fakeagent/fake.go" | cut -d' ' -f1)
+rcr=$(run "$T" "$L/run-census-restored.txt")
+post=$(fp "$T")
+cmp -s <(echo "$pre") <(echo "$post"); fp_rc=$?
+{
+  echo "tag=census"
+  echo "tree=$T"
+  echo "export_rc=$exp_rc go_files=$ngo non_test_go=$nnt"
+  echo "rc_pristine=$rcp rc_phase1_literals=$rc1 rc_phase2_fp=$rc2 rc_restored=$rcr"
+  echo "sha_census=$sha_census sha_fp=$sha_fp sha_fake=$sha_fake"
+  echo "mv_rcs=$mvr1/$mvr2/$mvr3 cmp_census=$cmp1 cmp_fp=$cmp2 sha_fake_aside=$sha_fake_aside"
+  echo "fp_pre=$pre"
+  echo "fp_post=$post fp_cmp_rc=$fp_rc"
+  echo "-- phase1 vital lines --"
+  grep -E '^--- (PASS|FAIL)|_test\.go:[0-9]+:|名册=|分母=|^ok |^FAIL' "$L/run-census-phase1.txt" | cut -c1-600
+  echo "-- phase2 (fp) vital lines --"
+  grep -E '^--- (PASS|FAIL)|_test\.go:[0-9]+:|名册=|分母=|^ok |^FAIL' "$L/run-census-phase2-fp.txt" | cut -c1-700
+  echo "-- restored vital lines --"
+  grep -E '^--- (PASS|FAIL)|^ok ' "$L/run-census-restored.txt" | cut -c1-200
+  echo "DONE"
+} > "$RT"
+echo "rig census done rcs=$rcp/$rc1/$rc2/$rcr" >> "$SUM"
+fi
+
+echo "== summary ==" >> "$SUM"
+for t in new make conv census; do grep -E '^(tag=|rc_|sha_|aside_|fp_cmp|void_)' "$L/rig-$t.txt" >> "$SUM" 2>/dev/null; done
+echo "rigs_script_rc=0" >> "$SUM"
+tail -40 "$SUM" | cut -c1-220

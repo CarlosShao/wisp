@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# 309-v3b AC#3 rulers: (B) comment-only independent re-verification + constants + claim rulers + label set + FP latent scan.
+set -u
+cd "/d/work/workspace/projects plans/Wisp" || exit 1
+L=.scratch/wisp/probes/309/v3b/logs
+E=$L/ac3-rulers-out.txt
+: > "$E"
+R() { echo "$1" >> "$E"; }
+
+R "ac3_started_at=$(date '+%F %T %z')  repo_HEAD=$(git rev-parse --short HEAD)"
+
+# ---- 1. ruler A: git numstat + name-only for (B) ----
+git show a1f84d39 --numstat -- internal/tools/bridge.go > "$L/ac3-numstat.txt" 2> "$L/ac3-numstat.stderr"
+R "numstat_rc=$? numstat_body_bytes=$(wc -c < "$L/ac3-numstat.txt") stderr_bytes=$(wc -c < "$L/ac3-numstat.stderr")"
+cat "$L/ac3-numstat.txt" >> "$E"
+git show a1f84d39 --name-only --format= > "$L/ac3-nameonly.txt" 2> "$L/ac3-nameonly.stderr"
+R "nameonly_rc=$? names=$(wc -l < "$L/ac3-nameonly.txt") stderr_bytes=$(wc -c < "$L/ac3-nameonly.stderr")"
+cat "$L/ac3-nameonly.txt" >> "$E"
+
+# ---- 2. ruler B: -U0 diff, classify every +/- content line ----
+git diff -U0 a1f84d39^ a1f84d39 -- internal/tools/bridge.go > "$L/ac3-diff-u0.txt" 2> "$L/ac3-diff-u0.stderr"
+R "diff_u0_rc=$? diff_body_bytes=$(wc -c < "$L/ac3-diff-u0.txt") stderr_bytes=$(wc -c < "$L/ac3-diff-u0.stderr")"
+awk '
+/^[+-]/ {
+  if (substr($0,1,3)=="+++" || substr($0,1,3)=="---") next;
+  s=substr($0,2); t=s; sub(/^[ \t]+/,"",t);
+  if (substr($0,1,1)=="+") add++; else del++;
+  if (t !~ /^\/\//) { nc++; print "NONCOMMENT_LINE: " $0 > "/dev/stderr" }
+}
+END { printf "ADDED=%d REMOVED=%d NONCOMMENT=%d\n", add, del, nc }
+' "$L/ac3-diff-u0.txt" > "$L/ac3-diff-classify.txt" 2> "$L/ac3-diff-classify-noncomment.stderr"
+R "classify_rc=$? classify=$(cat "$L/ac3-diff-classify.txt") noncomment_lines_logged=$(wc -l < "$L/ac3-diff-classify-noncomment.stderr")"
+
+# ---- 3. ruler C: blob-level, strip full-line comments, two-sided cmp ----
+git show a1f84d39^:internal/tools/bridge.go > "$L/ac3-blob-parent.txt" 2> "$L/ac3-blob-parent.stderr"
+R "blob_parent_rc=$? bytes=$(wc -c < "$L/ac3-blob-parent.txt")"
+git show a1f84d39:internal/tools/bridge.go > "$L/ac3-blob-b.txt" 2> "$L/ac3-blob-b.stderr"
+R "blob_b_rc=$? bytes=$(wc -c < "$L/ac3-blob-b.txt")"
+grep -v '^[[:space:]]*//' "$L/ac3-blob-parent.txt" > "$L/ac3-blob-parent-stripped.txt" 2> "$L/ac3-strip-parent.stderr"
+grep -v '^[[:space:]]*//' "$L/ac3-blob-b.txt" > "$L/ac3-blob-b-stripped.txt" 2> "$L/ac3-strip-b.stderr"
+cmp "$L/ac3-blob-parent-stripped.txt" "$L/ac3-blob-b-stripped.txt" > "$L/ac3-blob-cmp.txt" 2>&1
+R "blob_strip_cmp_rc=$? cmp_out_bytes=$(wc -c < "$L/ac3-blob-cmp.txt") strip_stderr_bytes=$(wc -c < "$L/ac3-strip-parent.stderr")+$(wc -c < "$L/ac3-strip-b.stderr")"
+R "sha_stripped_parent=$(sha256sum "$L/ac3-blob-parent-stripped.txt" | cut -d' ' -f1)"
+R "sha_stripped_b=$(sha256sum "$L/ac3-blob-b-stripped.txt" | cut -d' ' -f1)"
+R "sha_raw_parent=$(sha256sum "$L/ac3-blob-parent.txt" | cut -d' ' -f1)"
+R "sha_raw_b=$(sha256sum "$L/ac3-blob-b.txt" | cut -d' ' -f1)"
+R "lines_raw_parent=$(wc -l < "$L/ac3-blob-parent.txt") lines_raw_b=$(wc -l < "$L/ac3-blob-b.txt")"
+R "lines_stripped_parent=$(wc -l < "$L/ac3-blob-parent-stripped.txt") lines_stripped_b=$(wc -l < "$L/ac3-blob-b-stripped.txt")"
+R "cr_parent=$(tr -dc '\r' < "$L/ac3-blob-parent.txt" | wc -c) cr_b=$(tr -dc '\r' < "$L/ac3-blob-b.txt" | wc -c)"
+
+# ---- 4. guard limb + detector argument, both blobs, cmp ----
+grep -n 'if b.injected || b.prov == nil || taskID == "" {' "$L/ac3-blob-parent.txt" | cut -d: -f1 > "$L/ac3-guard-parent-line.txt"
+grep -n 'if b.injected || b.prov == nil || taskID == "" {' "$L/ac3-blob-b.txt" | cut -d: -f1 > "$L/ac3-guard-b-line.txt"
+R "guard_line_parent=$(cat "$L/ac3-guard-parent-line.txt") guard_line_b=$(cat "$L/ac3-guard-b-line.txt")"
+grep 'if b.injected || b.prov == nil || taskID == "" {' "$L/ac3-blob-parent.txt" > "$L/ac3-guard-parent.txt"
+grep 'if b.injected || b.prov == nil || taskID == "" {' "$L/ac3-blob-b.txt" > "$L/ac3-guard-b.txt"
+cmp -s "$L/ac3-guard-parent.txt" "$L/ac3-guard-b.txt"; R "guard_cmp_rc=$?"
+grep 'WithTaintDetector(b.prov.Detector(taskID))' "$L/ac3-blob-parent.txt" > "$L/ac3-det-parent.txt"
+grep 'WithTaintDetector(b.prov.Detector(taskID))' "$L/ac3-blob-b.txt" > "$L/ac3-det-b.txt"
+cmp -s "$L/ac3-det-parent.txt" "$L/ac3-det-b.txt"; R "detector_cmp_rc=$? (detector_hits_parent=$(wc -l < "$L/ac3-det-parent.txt") b=$(wc -l < "$L/ac3-det-b.txt"))"
+
+# ---- 5. nail + constants untouched; no later commits touched the two files ----
+git diff a1f84d39^ a1f84d39 -- internal/tools/toolrequest_nail_309_test.go > "$L/ac3-diff-nail.txt" 2> "$L/ac3-diff-nail.stderr"
+R "diff_nail_rc=$? bytes=$(wc -c < "$L/ac3-diff-nail.txt") stderr_bytes=$(wc -c < "$L/ac3-diff-nail.stderr")"
+git log --oneline a1f84d39..HEAD -- internal/tools/toolrequest_nail_309_test.go internal/tools/bridge.go > "$L/ac3-later-touch.txt" 2> "$L/ac3-later-touch.stderr"
+R "later_touch_rc=$? lines=$(wc -l < "$L/ac3-later-touch.txt") stderr_bytes=$(wc -c < "$L/ac3-later-touch.stderr")"
+git diff a1f84d39 HEAD -- internal/tools/toolrequest_nail_309_test.go internal/tools/bridge.go > "$L/ac3-diff-a1f8-HEAD.txt" 2> "$L/ac3-diff-a1f8-HEAD.stderr"
+R "diff_a1f8_HEAD_rc=$? bytes=$(wc -c < "$L/ac3-diff-a1f8-HEAD.txt") stderr_bytes=$(wc -c < "$L/ac3-diff-a1f8-HEAD.stderr")"
+grep -n 'wantTotal\|wantOwner\|examined < 200\|ownerRationale' internal/tools/toolrequest_nail_309_test.go > "$L/ac3-constants.txt" 2> "$L/ac3-constants.stderr"
+R "constants_rc=$? lines=$(wc -l < "$L/ac3-constants.txt") stderr_bytes=$(wc -c < "$L/ac3-constants.stderr")"
+cat "$L/ac3-constants.txt" >> "$E"
+
+# ---- 6. contract claims (C19/C25/C26) in the (B) diff ----
+grep -E '^[+-]' "$L/ac3-diff-u0.txt" 2>/dev/null | grep -cE 'C19|C25|C26' > "$L/ac3-contract-hits.txt" 2> "$L/ac3-contract-hits.stderr"
+R "contract_hits=$(cat "$L/ac3-contract-hits.txt") stderr_bytes=$(wc -c < "$L/ac3-contract-hits.stderr")"
+
+# ---- 7. label set: naive ruler vs reachable roster labels ----
+grep -oE 'return "[a-z0-9-]+"' internal/tools/toolrequest_nail_309_test.go | sort -u > "$L/ac3-labels-naive.txt" 2> "$L/ac3-labels-naive.stderr"
+R "labels_naive_count=$(wc -l < "$L/ac3-labels-naive.txt") stderr_bytes=$(wc -c < "$L/ac3-labels-naive.stderr")"
+cat "$L/ac3-labels-naive.txt" >> "$E"
+grep -oE '"(qualified-literal|same-package-bare-literal|alias-literal|var-decl-no-initializer|new-of-tool-request|make-slice-of-tool-request|conversion-to-tool-request)"' internal/tools/toolrequest_nail_309_test.go | sort -u > "$L/ac3-labels-reachable.txt" 2> "$L/ac3-labels-reachable.stderr"
+R "labels_reachable_count=$(wc -l < "$L/ac3-labels-reachable.txt") stderr_bytes=$(wc -c < "$L/ac3-labels-reachable.stderr")"
+cat "$L/ac3-labels-reachable.txt" >> "$E"
+grep -n '"literal"' internal/tools/toolrequest_nail_309_test.go > "$L/ac3-literal-fallback.txt" 2> "$L/ac3-literal-fallback.stderr"
+R "literal_fallback_rc=$? (context) stderr_bytes=$(wc -c < "$L/ac3-literal-fallback.stderr")"
+cat "$L/ac3-literal-fallback.txt" >> "$E"
+
+# ---- 8. bridge comment inside-list vs reachable labels: extract the sentence ----
+sed -n '956,972p' internal/tools/bridge.go > "$L/ac3-bridge-comment-window.txt" 2> "$L/ac3-bridge-comment-window.stderr"
+R "bridge_window_rc=$? stderr_bytes=$(wc -c < "$L/ac3-bridge-comment-window.stderr")"
+
+# ---- 9. comment ruler from bridge.go, re-executed verbatim (both forms) ----
+grep -rn 'ToolRequest{' internal cmd --include=*.go > "$L/ac3-comment-ruler-raw.txt" 2> "$L/ac3-comment-ruler-raw.stderr"
+R "comment_ruler_raw_rc=$? total=$(wc -l < "$L/ac3-comment-ruler-raw.txt") stderr_bytes=$(wc -c < "$L/ac3-comment-ruler-raw.stderr")"
+awk -F: '{f=$1; t=substr($0,length($1)+length($2)+3); if (f ~ /_test\.go$/) next; if (t ~ /^[ \t]*\/\//) next; n++} END{print n+0}' "$L/ac3-comment-ruler-raw.txt" > "$L/ac3-comment-ruler-strict.txt"
+R "comment_ruler_strict_after_both_strips=$(cat "$L/ac3-comment-ruler-strict.txt")"
+grep -v '_test\.go' "$L/ac3-comment-ruler-raw.txt" | wc -l > "$L/ac3-comment-ruler-naive.txt"
+R "comment_ruler_naive_shorthand=$(cat "$L/ac3-comment-ruler-naive.txt")"
+awk -F: '{f=$1; if (f ~ /_test\.go$/) next; n++} END{print n+0}' "$L/ac3-comment-ruler-raw.txt" > "$L/ac3-comment-ruler-filesuffix.txt"
+R "comment_ruler_after_filename_strip_only=$(cat "$L/ac3-comment-ruler-filesuffix.txt")"
+
+# ---- 10. foreign package named agent under roots (FP vector, current tree) ----
+grep -rnE '"[^"]*/agent"' internal cmd tools scripts --include=*.go > "$L/ac3-agent-imports-all.txt" 2> "$L/ac3-agent-imports-all.stderr"
+R "agent_imports_rc=$? total=$(wc -l < "$L/ac3-agent-imports-all.txt") stderr_bytes=$(wc -c < "$L/ac3-agent-imports-all.stderr")"
+grep '"wisp/internal/agent"' "$L/ac3-agent-imports-all.txt" | wc -l > "$L/ac3-agent-imports-wisp.txt"
+grep -v '"wisp/internal/agent"' "$L/ac3-agent-imports-all.txt" > "$L/ac3-agent-imports-foreign.txt"
+R "agent_imports_wisp=$(cat "$L/ac3-agent-imports-wisp.txt") agent_imports_foreign=$(wc -l < "$L/ac3-agent-imports-foreign.txt")"
+echo "AC3_DONE" >> "$E"
+tail -60 "$E" | cut -c1-220

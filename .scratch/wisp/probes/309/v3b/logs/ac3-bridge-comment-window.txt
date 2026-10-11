@@ -1,0 +1,17 @@
+// Two things keep that sentence honest, both checkable now:
+//   - No production caller reaches the limb today. Dispatch funnels through the one
+//     `newTaskID()` construction point in internal/agent/loop.go (id 36 chars, never empty);
+//     Test309ToolRequestProductionConstructionNail counts the construction points it can
+//     recognise BY SYNTAX, across the four roots cmd, internal, tools and scripts, and pins
+//     the TOTAL to 1, named as that file. Its range as of 309-r3 is seven named shape
+//     labels: qualified literal, same-package bare literal, alias literal, var declaration
+//     with no initializer, new(agent.ToolRequest), make([]agent.ToolRequest, n) and the
+//     conversion agent.ToolRequest(x) written after a defined type. A second point written
+//     in any of those shapes rings wherever it is written, including inside internal/agent,
+//     which the pre-309-r2 version skipped whole. OUTSIDE that range: a value that arrives
+//     by reflection or by decoding (json.Unmarshal into the struct), an alias declared in
+//     another package or inside a function body, a renamed or dot import, and a nested
+//     element written without its type. Those shapes ring nothing today - the test's own
+//     head comment registers them one by one, and the reflection/decode pair is not
+//     reachable by any static ruler, so that list is the debt and this sentence is a range,
+//     never a claim of full coverage.

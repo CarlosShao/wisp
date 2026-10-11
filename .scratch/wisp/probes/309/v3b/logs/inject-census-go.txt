@@ -1,0 +1,13 @@
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+type z309bRigAlias = agent.ToolRequest
+
+var z309bRigDecl agent.ToolRequest
+
+func z309bRigQualified() agent.ToolRequest { return agent.ToolRequest{TaskID: ""} }
+
+func z309bRigAliasLit() z309bRigAlias { return z309bRigAlias{TaskID: ""} }
+
+func z309bRigTouch() { z309bRigDecl.TaskID = "" }

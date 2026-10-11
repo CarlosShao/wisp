@@ -1,0 +1,7 @@
+374:	if examined < 200 {
+384:		wantTotal      = 1
+385:		wantOwner      = "internal/agent/loop.go"
+386:		ownerRationale = "the one newTaskID() dispatch, id always 36 chars, never empty"
+388:	single := len(points) == wantTotal && strings.HasSuffix(moduleRel309(points[0].file), wantOwner)
+394:			roots, len(points), wantTotal, wantOwner, ownerRationale,
+479:		roots, len(points), wantOwner, examined, perRootString309(perRoot))

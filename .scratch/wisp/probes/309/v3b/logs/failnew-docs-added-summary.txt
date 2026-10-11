@@ -1,0 +1,8 @@
+docs-added experiment in AFTER tree (/d/tmp/wisp-309v3b-rosterA-5EqvK9), archive_rc=0 run_rc=1
+FAIL_rows=1  PASS_rows=3
+--- PASS: TestTicket252P1OwnerMachineReachability (0.01s)
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.02s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+    paths_shortname_252_probe_test.go:260: cwd="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools" derived repo root="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"
+    paths_shortname_252_probe_test.go:270: workspace dir="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs" short="D:\\tmp\\WIE557~1\\docs"

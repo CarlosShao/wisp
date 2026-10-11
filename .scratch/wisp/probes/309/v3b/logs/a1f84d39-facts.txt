@@ -1,0 +1,32 @@
+== a1f84d39 facts ==
+commit=a1f84d39
+parents=df8d517d
+author=CarlosShao
+date=Sun Oct 11 18:00:04 2026 +0800
+subject=309-r3 (B): narrow bridge.go every/wherever to the nail measured range The doc block above assessorFor claimed that Test309ToolRequestProductionConstructionNail "counts every production construction point of that type ... so a second one rings wherever it is written". 309-v2 B14 and the orchestrator A851 section 2 falsified that against the nail own register. The sentence now names the seven shape labels the matcher recognises after part (A), names the shapes that ring nothing today (reflection or decode, cross-package and function-body aliases, renamed and dot imports, elided nested element), and points at that register. Comment lines only: noncomment_changed=0, both blobs with full-line comments deleted are cmp IDENTICAL at 854 lines, sha256 496ed6d683e8e070, CR=0, guard limb and WithTaintDetector argument byte counts unchanged. No contract claim touched.
+
+internal/tools/bridge.go
+commit a1f84d39a9296f42c801ba9320a581049ab2e57a
+Author: CarlosShao <1933942520@qq.com>
+Date:   Sun Oct 11 18:00:04 2026 +0800
+
+    309-r3 (B): narrow bridge.go every/wherever to the nail measured range
+    The doc block above assessorFor claimed that
+    Test309ToolRequestProductionConstructionNail "counts every production construction
+    point of that type ... so a second one rings wherever it is written". 309-v2 B14
+    and the orchestrator A851 section 2 falsified that against the nail own register.
+    The sentence now names the seven shape labels the matcher recognises after part (A),
+    names the shapes that ring nothing today (reflection or decode, cross-package and
+    function-body aliases, renamed and dot imports, elided nested element), and points
+    at that register. Comment lines only: noncomment_changed=0, both blobs with
+    full-line comments deleted are cmp IDENTICAL at 854 lines, sha256 496ed6d683e8e070,
+    CR=0, guard limb and WithTaintDetector argument byte counts unchanged. No contract
+    claim touched.
+
+14	4	internal/tools/bridge.go
+== log chain ==
+a1f84d39 parents=df8d517d 309-r3 (B): narrow bridge.go every/wherever to the nail measured range The doc block above assessorFor claimed that Test309ToolRequestProductionConstructionNail "counts every production construction point of that type ... so a second one rings wherever it is written". 309-v2 B14 and the orchestrator A851 section 2 falsified that against the nail own register. The sentence now names the seven shape labels the matcher recognises after part (A), names the shapes that ring nothing today (reflection or decode, cross-package and function-body aliases, renamed and dot imports, elided nested element), and points at that register. Comment lines only: noncomment_changed=0, both blobs with full-line comments deleted are cmp IDENTICAL at 854 lines, sha256 496ed6d683e8e070, CR=0, guard limb and WithTaintDetector argument byte counts unchanged. No contract claim touched.
+df8d517d parents=e875f00f 309-r3 (A): widen the nail matcher to new()/make([]T,n)/defined-type conversion Adds three statically recognisable shapes to internal/tools/toolrequest_nail_309_test.go so the AC#2 universal claim has fewer in-register counterexamples: new(agent.ToolRequest), make([]agent.ToolRequest, n) (including the make(..., 0) length form) and the conversion agent.ToolRequest(x) written after a defined type. go/ast and parser only - no go/types, so the head comment line "no type-level perfection" stays verbatim and the missed shapes stay named by item: cross-package alias, function-body alias, renamed and dot import, reflection/decode construction, elided nested element, bare name gated on the package clause. 12 new controls, both directions, two of them pinning that a still-blind shape really counts 0. No assertion weakened, no SKIP, no production byte touched. rc=0 on the nail alone with the tree count still 1.
+e875f00f parents=2a6f11a5 304-r1: land job-object guard on both mockllm spawn points (AC#1, shape A)
+2a6f11a5 parents=b9f37892 编排者 A850/A851 落账＋两格翻勾（都由我自己现量，不认腿的自报）
+b9f37892 parents=f4920906 304-r1: anchor readings at leg start (HEAD 3974ab4d, dev, index clean)

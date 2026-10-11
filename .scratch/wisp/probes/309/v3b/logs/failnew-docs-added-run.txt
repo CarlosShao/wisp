@@ -1,0 +1,118 @@
+time=2026-10-11T21:40:39.956+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket252P1OwnerMachineReachability
+    paths_shortname_252_probe_test.go:260: cwd="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools" derived repo root="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"
+    paths_shortname_252_probe_test.go:270: workspace dir="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs" short="D:\\tmp\\WIE557~1\\docs"
+    paths_shortname_252_probe_test.go:271: CASE W-long docs
+    paths_shortname_252_probe_test.go:271:   roots as configured : ["D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"]
+    paths_shortname_252_probe_test.go:271:   asked raw           : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   risk.Resolve        : err=<nil> Canonical="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252p1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:271:   Canonicalize        : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   Roots()                       : ["d:\\tmp\\wisp-309v3b-rostera-5eqvk9"]
+    paths_shortname_252_probe_test.go:271:   foldPath(canonical)           : "d:\\tmp\\wisp-309v3b-rostera-5eqvk9\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:271:   resolvedForm(canonical)        : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252p1-new-note.md" ok=true
+    paths_shortname_252_probe_test.go:271:   foldPath(resolvedForm)         : "d:\\tmp\\wisp-309v3b-rostera-5eqvk9\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:271:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:271:   FIRST FAILING LEG              : none: both legs hold
+    paths_shortname_252_probe_test.go:272: CASE W-short docs
+    paths_shortname_252_probe_test.go:272:   roots as configured : ["D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"]
+    paths_shortname_252_probe_test.go:272:   asked raw           : "D:\\tmp\\WIE557~1\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   risk.Resolve        : err=<nil> Canonical="D:\\tmp\\WIE557~1\\docs\\q252p1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:272:   Canonicalize        : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   NOTE: Canonicalize and risk.Resolve disagree: "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252p1-new-note.md" vs "D:\\tmp\\WIE557~1\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   Roots()                       : ["d:\\tmp\\wisp-309v3b-rostera-5eqvk9"]
+    paths_shortname_252_probe_test.go:272:   foldPath(canonical)           : "d:\\tmp\\wisp-309v3b-rostera-5eqvk9\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:272:   resolvedForm(canonical)        : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252p1-new-note.md" ok=true
+    paths_shortname_252_probe_test.go:272:   foldPath(resolvedForm)         : "d:\\tmp\\wisp-309v3b-rostera-5eqvk9\\docs\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:272:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:272:   FIRST FAILING LEG              : none: both legs hold
+    paths_shortname_252_probe_test.go:270: workspace dir="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools" short="D:\\tmp\\WIE557~1\\internal\\tools"
+    paths_shortname_252_probe_test.go:271: CASE W-long internal\tools
+    paths_shortname_252_probe_test.go:271:   roots as configured : ["D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"]
+    paths_shortname_252_probe_test.go:271:   asked raw           : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   risk.Resolve        : err=<nil> Canonical="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252p1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:271:   Canonicalize        : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   Roots()                       : ["d:\\tmp\\wisp-309v3b-rostera-5eqvk9"]
+    paths_shortname_252_probe_test.go:271:   foldPath(canonical)           : "d:\\tmp\\wisp-309v3b-rostera-5eqvk9\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:271:   resolvedForm(canonical)        : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252p1-new-note.md" ok=true
+    paths_shortname_252_probe_test.go:271:   foldPath(resolvedForm)         : "d:\\tmp\\wisp-309v3b-rostera-5eqvk9\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:271:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:271:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:271:   FIRST FAILING LEG              : none: both legs hold
+    paths_shortname_252_probe_test.go:272: CASE W-short internal\tools
+    paths_shortname_252_probe_test.go:272:   roots as configured : ["D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"]
+    paths_shortname_252_probe_test.go:272:   asked raw           : "D:\\tmp\\WIE557~1\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   risk.Resolve        : err=<nil> Canonical="D:\\tmp\\WIE557~1\\internal\\tools\\q252p1-new-note.md" Resolved=false Rewritten=false Rewrites=[]
+    paths_shortname_252_probe_test.go:272:   Canonicalize        : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   NOTE: Canonicalize and risk.Resolve disagree: "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252p1-new-note.md" vs "D:\\tmp\\WIE557~1\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   Roots()                       : ["d:\\tmp\\wisp-309v3b-rostera-5eqvk9"]
+    paths_shortname_252_probe_test.go:272:   foldPath(canonical)           : "d:\\tmp\\wisp-309v3b-rostera-5eqvk9\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG1 rootsContain(roots,folded): true
+    paths_shortname_252_probe_test.go:272:   resolvedForm(canonical)        : "D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252p1-new-note.md" ok=true
+    paths_shortname_252_probe_test.go:272:   foldPath(resolvedForm)         : "d:\\tmp\\wisp-309v3b-rostera-5eqvk9\\internal\\tools\\q252p1-new-note.md"
+    paths_shortname_252_probe_test.go:272:   LEG2 rootsContain(roots,foldRF): true
+    paths_shortname_252_probe_test.go:272:   InAllowlist(canonical)         : true
+    paths_shortname_252_probe_test.go:272:   FIRST FAILING LEG              : none: both legs hold
+--- PASS: TestTicket252P1OwnerMachineReachability (0.01s)
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame
+    paths_shortname_252_r1_test.go:107: cwd="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools" derived repo root="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/wisp-309v3b-rosterA-5EqvK9
+    paths_shortname_252_r1_test.go:116: tree long="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9" short="D:\\tmp\\WIE557~1"
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\WIE557~1] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\WIE557~1] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\WIE557~1] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\WIE557~1] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\WIE557~1] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\WIE557~1] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\WIE557~1] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\WIE557~1] legs(SHORT): leg1=true leg2=true final=true
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/docs
+    paths_shortname_252_r1_test.go:116: tree long="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs" short="D:\\tmp\\WIE557~1\\docs"
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\WIE557~1\docs] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\WIE557~1\docs] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\WIE557~1\docs] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\WIE557~1\docs] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\WIE557~1] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\WIE557~1] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\docs\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\WIE557~1] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\WIE557~1] legs(SHORT): leg1=true leg2=true final=true
+=== RUN   TestTicket252R1BothSpellingsAnswerTheSame/tools
+    paths_shortname_252_r1_test.go:116: tree long="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools" short="D:\\tmp\\WIE557~1\\internal\\tools"
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\wisp-309v3b-rosterA-5EqvK9] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\WIE557~1\internal\tools] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\WIE557~1\internal\tools] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\WIE557~1\internal\tools] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\WIE557~1\internal\tools] legs(SHORT): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:121: roots=[D:\tmp\WIE557~1] canonical(LONG)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:122: roots=[D:\tmp\WIE557~1] canonical(SHORT)="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools\\q252r1-round-trip.md"
+    paths_shortname_252_r1_test.go:123: roots=[D:\tmp\WIE557~1] legs(LONG): leg1=true leg2=true final=true
+    paths_shortname_252_r1_test.go:124: roots=[D:\tmp\WIE557~1] legs(SHORT): leg1=true leg2=true final=true
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.02s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/wisp-309v3b-rosterA-5EqvK9 (0.00s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/docs (0.00s)
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/tools (0.01s)
+=== RUN   TestTicket252R1AlignmentAddsNoAuthorization
+    paths_shortname_252_r1_test.go:163: cwd="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools" derived repo root="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"
+    paths_shortname_252_r1_test.go:166: 前置条件缺失：D:\tmp 的短名回显 D:\tmp 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+=== RUN   TestTicket252R1CanonicalStillNamesOneTree
+    paths_shortname_252_r1_test.go:262: cwd="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9\\internal\\tools" derived repo root="D:\\tmp\\wisp-309v3b-rosterA-5EqvK9"
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.070s
+FAIL

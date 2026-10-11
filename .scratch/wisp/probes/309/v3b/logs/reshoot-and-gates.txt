@@ -1,0 +1,17 @@
+fscan_rc=0 wisp_hits=47 wisp_grep_rc=0 foreign_lines=2 foreign_grep_rc=0 foreign_stderr_bytes=0 alias_lines=0 alias_rc=1 alias_stderr_bytes=0
+st_reshot count=0 rc=0 stderr=0
+fmt-nail scope=internal/tools/toolrequest_nail_309_test.go rc=0 listed= body_bytes= stderr_bytes=
+final-gofmt-scoped scope=internal/tools rc=0 listed= body_bytes= stderr_bytes=
+final-gofmt-twofiles scope=two-files rc=0 listed=0 body_bytes=0 stderr_bytes=
+final-gofumpt-scoped scope=internal/tools rc=0 listed= body_bytes= stderr_bytes=
+gates rc_build=0 rc_vet=0 rc_d22scan=0 rc_pathlen=0 d22_live_line=2 pathlen_green_line=1
+probes_v3b_go_files=0
+== non-wisp /agent import hits ==
+internal/tools/toolrequest_nail_309_test.go:68://   · 改名 import（import ag "…/internal/agent" 后 ag.ToolRequest{...}）与 dot-import ＝漏；
+internal/tools/toolrequest_nail_309_test.go:381:	// named. Before 309-r2 this was "0 outside internal/agent" with the whole agent
+(end)
+fmt_nail(files=1) rc= listed=0 body_bytes=0 stderr_bytes=0
+fmt-nail body=fmt-nail-reshot-body.txt listed=0 body_bytes=0 stderr_bytes=0
+final-gofmt-scoped body=final-gofmt-reshot-scoped-body.txt listed=0 body_bytes=0 stderr_bytes=n/a
+final-gofmt-twofiles body=final-gofmt-reshot-twofiles-body.txt listed=0 body_bytes=0 stderr_bytes=n/a
+final-gofumpt-scoped body=final-gofumpt-reshot-body.txt listed=0 body_bytes=0 stderr_bytes=0

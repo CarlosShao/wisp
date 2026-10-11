@@ -1,0 +1,7 @@
+return "alias-literal"
+return "conversion-to-tool-request"
+return "literal"
+return "make-slice-of-tool-request"
+return "new-of-tool-request"
+return "qualified-literal"
+return "same-package-bare-literal"

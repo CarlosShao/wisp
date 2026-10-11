@@ -1,0 +1,25 @@
+tag=census
+tree=/d/tmp/wisp-309v3b-census-nf5VLV
+export_rc=0 go_files=682 non_test_go=295
+rc_pristine=0 rc_phase1_literals=1 rc_phase2_fp=1 rc_restored=0
+sha_census=8a446fa8f4fd6fc3116d2c66ebc517bb56e986f81173d1886d189d368a46d3c8 sha_fp=1f7e76beac6f120bb7859b567485d2a923fa6054fae77f15b5b0acb115e10dc4 sha_fake=8529b969f1d1f160cf161a944f7cd9692f9ff9cb1560555dc3b8a848cc951a46
+mv_rcs=0/0/0 cmp_census=0 cmp_fp=0 sha_fake_aside=8529b969f1d1f160cf161a944f7cd9692f9ff9cb1560555dc3b8a848cc951a46
+fp_pre=a8d3bc60d3520472d71d2e38882e8963563b7930b566d7e9e83b9762c78e8481
+fp_post=a8d3bc60d3520472d71d2e38882e8963563b7930b566d7e9e83b9762c78e8481 fp_cmp_rc=0
+-- phase1 vital lines --
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.17s)
+    toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 4 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal)。分母=296 枚非测试源（每 root=cmd=40 internal=232 scr
+    toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=4（==1，那枚＝internal/agent/loop.go），分母=296 枚非测试源（每 root=cmd=40 internal=232 scripts=11 tools=13）
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.218s
+FAIL
+-- phase2 (fp) vital lines --
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.18s)
+    toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 6 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/fakeagent/fake.go:5(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal) | internal/tools/z309b_fp.go:5(qualified-literal)。分母=298 枚非测试源（每 root=cmd=40 in
+    toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=6（==1，那枚＝internal/agent/loop.go），分母=298 枚非测试源（每 root=cmd=40 internal=234 scripts=11 tools=13）
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.229s
+FAIL
+-- restored vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.199s
+DONE

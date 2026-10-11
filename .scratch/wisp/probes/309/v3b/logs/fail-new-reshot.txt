@@ -1,0 +1,21 @@
+fail-new re-shoot (newly RED = FAIL lines present after, absent before)
+trees: BEFORE=3974ab4d tree=/d/tmp/wisp-309v3b-rosterB-tobucA export_rc=0  AFTER=a1f84d39 tree=/d/tmp/wisp-309v3b-rosterA-5EqvK9 export_rc=0
+rc_before=1 rc_after=1
+roster_rows before=276 after=276
+top_level before=211 after=211
+child before=65 after=65
+FAIL_rows before=4 after=4
+SKIP_rows before=0 after=0
+added_lines=0 removed_lines=0
+newly_red_count=0 count_ruler_rc=1 count_stderr_bytes=0
+void_tokens before=3 after=3 (stderr bytes 0/0)
+-- added/removed lines --
+-- FAIL rows in FULL rosters (both sides) --
+--- FAIL: TestTicket252P1OwnerMachineReachability
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization
+--- FAIL: TestTicket252R1BothSpellingsAnswerTheSame
+--- FAIL: TestTicket252R1CanonicalStillNamesOneTree
+--- FAIL: TestTicket252P1OwnerMachineReachability
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization
+--- FAIL: TestTicket252R1BothSpellingsAnswerTheSame
+--- FAIL: TestTicket252R1CanonicalStillNamesOneTree

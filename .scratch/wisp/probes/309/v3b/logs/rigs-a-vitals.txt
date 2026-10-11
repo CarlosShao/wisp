@@ -1,0 +1,60 @@
+===== new =====
+fp_post=a8d3bc60d3520472d71d2e38882e8963563b7930b566d7e9e83b9762c78e8481 fp_cmp_rc=0
+void_tokens_in_injected_run=0 void_stderr_bytes=0
+-- injected run vital lines --
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.17s)
+    toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.g
+    toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=296 枚非测试�
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.208s
+FAIL
+-- pristine run vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.199s
+-- restored run vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.216s
+===== make =====
+fp_post=a8d3bc60d3520472d71d2e38882e8963563b7930b566d7e9e83b9762c78e8481 fp_cmp_rc=0
+void_tokens_in_injected_run=0 void_stderr_bytes=0
+-- injected run vital lines --
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.14s)
+    toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.g
+    toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=296 枚非测试�
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.180s
+FAIL
+-- pristine run vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.189s
+-- restored run vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.186s
+===== conv =====
+fp_post=a8d3bc60d3520472d71d2e38882e8963563b7930b566d7e9e83b9762c78e8481 fp_cmp_rc=0
+void_tokens_in_injected_run=0 void_stderr_bytes=0
+-- injected run vital lines --
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.15s)
+    toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.g
+    toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=296 枚非测试�
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.184s
+FAIL
+-- pristine run vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.188s
+-- restored run vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.186s
+===== census =====
+fp_post=a8d3bc60d3520472d71d2e38882e8963563b7930b566d7e9e83b9762c78e8481 fp_cmp_rc=0
+-- phase1 vital lines --
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.17s)
+    toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 4 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.g
+    toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=4（==1，那枚＝internal/agent/loop.go），分母=296 枚非测试�
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.218s
+FAIL
+-- phase2 (fp) vital lines --
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.18s)
+    toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 6 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.g
+    toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=6（==1，那枚＝internal/agent/loop.go），分母=298 枚非测试�
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.229s
+FAIL
+-- restored vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.199s

@@ -1,0 +1,7 @@
+== absolute loop.go refs in bridge.go ==
+113:// consumer-side seam the agent loop already calls (loop.go:563 and
+114:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+230:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+252:// treats non-nil as "the provider broke" (internal/agent/loop.go:692-694) and
+1129:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+grep_rc=0

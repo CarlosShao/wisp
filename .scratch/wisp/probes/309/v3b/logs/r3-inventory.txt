@@ -1,0 +1,80 @@
+== r3 logs listing ==
+total 738
+-rw-r--r-- 1 swq 197609   3337 Oct 11 17:23 bridge-855-900.txt
+-rw-r--r-- 1 swq 197609   4686 Oct 11 17:23 bridge-930-1000.txt
+-rw-r--r-- 1 swq 197609    279 Oct 11 17:59 bridge-comment-scope-2.log
+-rw-r--r-- 1 swq 197609    792 Oct 11 17:58 bridge-comment-scope.log
+-rw-r--r-- 1 swq 197609  22233 Oct 11 17:59 bridge-head-nocomment.txt
+-rw-r--r-- 1 swq 197609  22727 Oct 11 17:58 bridge-head-stripped.txt
+-rw-r--r-- 1 swq 197609  22233 Oct 11 17:59 bridge-work-nocomment.txt
+-rw-r--r-- 1 swq 197609  22737 Oct 11 17:58 bridge-work-stripped.txt
+-rw-r--r-- 1 swq 197609  57172 Oct 11 18:03 bridge.go.at-commit.txt
+-rw-r--r-- 1 swq 197609    178 Oct 11 17:22 commit-00.log
+-rw-r--r-- 1 swq 197609  11715 Oct 11 18:35 commit-30.log
+-rw-r--r-- 1 swq 197609   2356 Oct 11 18:40 commit-90.log
+-rw-r--r-- 1 swq 197609    935 Oct 11 18:00 commit-bridge.log
+-rw-r--r-- 1 swq 197609    982 Oct 11 17:55 commit-code.log
+-rw-r--r-- 1 swq 197609     54 Oct 11 18:11 fail-after.txt
+-rw-r--r-- 1 swq 197609     54 Oct 11 18:11 fail-before.txt
+-rw-r--r-- 1 swq 197609      0 Oct 11 18:11 fail-new.txt
+-rw-r--r-- 1 swq 197609  23086 Oct 11 18:39 final-d22scan-body.txt
+-rw-r--r-- 1 swq 197609      0 Oct 11 18:39 final-gofmt.txt
+-rw-r--r-- 1 swq 197609     54 Oct 11 18:39 final-nail-309.log
+-rw-r--r-- 1 swq 197609   2534 Oct 11 18:39 final-pathlen-body.txt
+-rw-r--r-- 1 swq 197609      0 Oct 11 17:54 fmt-nail.txt
+-rw-r--r-- 1 swq 197609    256 Oct 11 18:32 gate-assertions.log
+-rw-r--r-- 1 swq 197609     11 Oct 11 18:00 gate-build-mid.log
+-rw-r--r-- 1 swq 197609  23113 Oct 11 18:22 gate-d22scan-with-my-files.log
+-rw-r--r-- 1 swq 197609  23099 Oct 11 18:14 gate-d22scan.log
+-rw-r--r-- 1 swq 197609    368 Oct 11 18:15 gate-fmt.log
+-rw-r--r-- 1 swq 197609   2561 Oct 11 18:22 gate-pathlen-with-my-files.log
+-rw-r--r-- 1 swq 197609   2547 Oct 11 18:14 gate-pathlen.log
+-rw-r--r-- 1 swq 197609      9 Oct 11 18:14 gate-vet.log
+-rw-r--r-- 1 swq 197609     13 Oct 11 17:20 h.txt
+-rw-r--r-- 1 swq 197609    440 Oct 11 17:22 msg-00.txt
+-rw-r--r-- 1 swq 197609    685 Oct 11 18:24 msg-30.txt
+-rw-r--r-- 1 swq 197609    608 Oct 11 18:40 msg-90.txt
+-rw-r--r-- 1 swq 197609    870 Oct 11 18:00 msg-bridge.txt
+-rw-r--r-- 1 swq 197609    915 Oct 11 17:55 msg-code.txt
+-rw-r--r-- 1 swq 197609   3401 Oct 11 18:40 my-files.txt
+-rw-r--r-- 1 swq 197609    612 Oct 11 17:54 nail-after-worktree.log
+-rw-r--r-- 1 swq 197609   1371 Oct 11 18:03 rig-conv-add.log
+-rw-r--r-- 1 swq 197609    612 Oct 11 18:03 rig-conv-del.log
+-rw-r--r-- 1 swq 197609   1371 Oct 11 18:02 rig-make-add.log
+-rw-r--r-- 1 swq 197609    612 Oct 11 18:02 rig-make-del.log
+-rw-r--r-- 1 swq 197609   1363 Oct 11 18:02 rig-new-add.log
+-rw-r--r-- 1 swq 197609    612 Oct 11 18:02 rig-new-del.log
+-rw-r--r-- 1 swq 197609    612 Oct 11 18:01 rig-pristine.log
+-rw-r--r-- 1 swq 197609   6651 Oct 11 18:03 rig-shapes.log
+-rwxr-xr-x 1 swq 197609   4183 Oct 11 18:01 rig-shapes.txt
+-rw-r--r-- 1 swq 197609     86 Oct 11 18:11 roster-added.txt
+-rw-r--r-- 1 swq 197609 132493 Oct 11 18:11 roster-after.log
+-rw-r--r-- 1 swq 197609  17295 Oct 11 18:11 roster-after.names
+-rw-r--r-- 1 swq 197609  17295 Oct 11 18:11 roster-after.sorted
+-rw-r--r-- 1 swq 197609 132674 Oct 11 18:10 roster-before.log
+-rw-r--r-- 1 swq 197609  17296 Oct 11 18:10 roster-before.names
+-rw-r--r-- 1 swq 197609  17296 Oct 11 18:11 roster-before.sorted
+-rw-r--r-- 1 swq 197609   1335 Oct 11 18:11 roster-control.log
+-rwxr-xr-x 1 swq 197609   3158 Oct 11 18:06 roster-control.txt
+-rw-r--r-- 1 swq 197609     87 Oct 11 18:11 roster-removed.txt
+-rw-r--r-- 1 swq 197609    762 Oct 11 18:35 selfref-ruler-final.log
+-rw-r--r-- 1 swq 197609      0 Oct 11 17:20 st.txt
+-rw-r--r-- 1 swq 197609  24462 Oct 11 18:03 toolrequest_nail_309_test.go.at-commit.txt
+-rw-r--r-- 1 swq 197609     27 Oct 11 18:02 tree-conv.dir
+-rw-r--r-- 1 swq 197609     27 Oct 11 18:02 tree-make.dir
+-rw-r--r-- 1 swq 197609     26 Oct 11 18:01 tree-new.dir
+-rw-r--r-- 1 swq 197609     31 Oct 11 18:01 tree-pristine.dir
+ls_rc=0
+== r3 root listing ==
+total 64
+-rw-r--r-- 1 swq 197609 1995 Oct 11 17:22 00-anchor.md
+-rw-r--r-- 1 swq 197609 8740 Oct 11 18:19 10-matcher-and-comment.md
+-rw-r--r-- 1 swq 197609 8343 Oct 11 18:21 20-teeth.md
+-rw-r--r-- 1 swq 197609 5166 Oct 11 18:24 30-gates.md
+-rw-r--r-- 1 swq 197609 8167 Oct 11 18:40 90-final.md
+drwxr-xr-x 1 swq 197609    0 Oct 11 18:40 logs
+== hits for 0-byte names in r3 docs ==
+.scratch/wisp/probes/309/r3/00-anchor.md:9:| 工作树脏行数 | **0** | `git status --porcelain -- internal cmd tools scripts \| wc -l`＝件 `logs/st.txt`，`wc -l`＝0 | `internal` `cmd` `tools` `scripts` 四根 | 工作树 ⇄ HEAD |
+.scratch/wisp/probes/309/r3/20-teeth.md:109:| **newly RED**（after 有、before 无的 FAIL） | — | **`newly_red_count=0`**（`logs/fail-new.txt` 空＝0 枚） |
+.scratch/wisp/probes/309/r3/30-gates.md:16:d22scan 两轮都 `rc=0` 就是这一条的读数（第二轮见下面第 3 节）。⛔ 动 `tools/d22scan/allowlist.txt`（尺＝`git status --porcelain -- tools scripts internal/observe`＝**0 行**，第 4 节）。
+grep_rc=0

@@ -1,0 +1,33 @@
+rig_started_at=2026-10-11 21:32:37 +0800
+git_HEAD_at_rig_time=afd954ed
+anchor_pinned=3b8066a2
+go_version=go version go1.27.1 windows/amd64
+anchor_contains_a1f84d39_rc=0
+anchor_contains_df8d517d_rc=0
+rig new done rcs=0/1/0
+rig make done rcs=0/1/0
+rig conv done rcs=0/1/0
+rig census done rcs=0/1/1/0
+== summary ==
+tag=new
+rc_pristine=0 rc_injected=1 rc_restored=0
+sha_injected=0894926883d1788e66e7aec48e3db4b09355ac5d649d98687554dbc6f15fb395
+sha_aside=0894926883d1788e66e7aec48e3db4b09355ac5d649d98687554dbc6f15fb395 sha_match=YES
+aside_cmp_injectcopy_rc=0 mv_rc=0
+void_tokens_in_injected_run=0 void_stderr_bytes=0
+tag=make
+rc_pristine=0 rc_injected=1 rc_restored=0
+sha_injected=d57182001be4ec2fae9d5a1beacd7466fa9a1d3e9e3ad7b6f652d71f0e3e875b
+sha_aside=d57182001be4ec2fae9d5a1beacd7466fa9a1d3e9e3ad7b6f652d71f0e3e875b sha_match=YES
+aside_cmp_injectcopy_rc=0 mv_rc=0
+void_tokens_in_injected_run=0 void_stderr_bytes=0
+tag=conv
+rc_pristine=0 rc_injected=1 rc_restored=0
+sha_injected=f31e22ffa32c23a2c29fd1f217fcfe93116bca8a220c3e48404e84e9991d34f8
+sha_aside=f31e22ffa32c23a2c29fd1f217fcfe93116bca8a220c3e48404e84e9991d34f8 sha_match=YES
+aside_cmp_injectcopy_rc=0 mv_rc=0
+void_tokens_in_injected_run=0 void_stderr_bytes=0
+tag=census
+rc_pristine=0 rc_phase1_literals=1 rc_phase2_fp=1 rc_restored=0
+sha_census=8a446fa8f4fd6fc3116d2c66ebc517bb56e986f81173d1886d189d368a46d3c8 sha_fp=1f7e76beac6f120bb7859b567485d2a923fa6054fae77f15b5b0acb115e10dc4 sha_fake=8529b969f1d1f160cf161a944f7cd9692f9ff9cb1560555dc3b8a848cc951a46
+rigs_script_rc=0

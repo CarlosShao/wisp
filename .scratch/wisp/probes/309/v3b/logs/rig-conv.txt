@@ -1,0 +1,22 @@
+tag=conv
+tree=/d/tmp/wisp-309v3b-conv-MsGRY5
+export_rc=0 go_files=682 non_test_go=295
+rc_pristine=0 rc_injected=1 rc_restored=0
+sha_injected=f31e22ffa32c23a2c29fd1f217fcfe93116bca8a220c3e48404e84e9991d34f8
+sha_aside=f31e22ffa32c23a2c29fd1f217fcfe93116bca8a220c3e48404e84e9991d34f8 sha_match=YES
+aside_cmp_injectcopy_rc=0 mv_rc=0
+fp_pre=a8d3bc60d3520472d71d2e38882e8963563b7930b566d7e9e83b9762c78e8481
+fp_post=a8d3bc60d3520472d71d2e38882e8963563b7930b566d7e9e83b9762c78e8481 fp_cmp_rc=0
+void_tokens_in_injected_run=0 void_stderr_bytes=0
+-- injected run vital lines --
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.15s)
+    toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_conv.go:7(conversion-to-tool-request)。分母=296 枚非测试源（每 root=cmd=40 internal=232 scripts
+    toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=296 枚非测试源（每 root=cmd=40 internal=232 scripts=11 tools=13）
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.184s
+FAIL
+-- pristine run vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.188s
+-- restored run vital lines --
+ok  	github.com/CarlosShao/wisp/internal/tools	0.186s
+DONE

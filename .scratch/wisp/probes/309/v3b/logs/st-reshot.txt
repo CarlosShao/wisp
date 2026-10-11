@@ -1,0 +1,3 @@
+ruler: git status --porcelain -- internal cmd tools scripts | wc -l
+count=0
+ruler_rc=0 stderr_bytes=0

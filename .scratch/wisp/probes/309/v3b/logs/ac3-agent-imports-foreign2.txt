@@ -1,0 +1,2 @@
+internal/tools/toolrequest_nail_309_test.go:68://   · 改名 import（import ag "…/internal/agent" 后 ag.ToolRequest{...}）与 dot-import ＝漏；
+internal/tools/toolrequest_nail_309_test.go:381:	// named. Before 309-r2 this was "0 outside internal/agent" with the whole agent

@@ -1,0 +1,43 @@
+== internal/tools imports of internal/agent ==
+internal/tools/bridge.go:13:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/bridge_junction_windows_test.go:16:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/bridge_scope_open_ticket158_test.go:32:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/bridge_test.go:15:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/failclosed_236_teeth_test.go:82:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/fswrite_silentloss_ac1_test.go:13:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/fs_edit_test.go:9:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/grant_test.go:40:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/helpers_test.go:11:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/loop_approval_test.go:17:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/loop_approval_test.go:18:	"github.com/CarlosShao/wisp/internal/agent/approval"
+internal/tools/pointer_183_cli_seam_test.go:52:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/pointer_185_cli_seam_test.go:63:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/subagent_197.go:11:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/subagent_197_test.go:12:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/subagent_222_test.go:13:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/task.go:13:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/task_backfill.go:6:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/task_cancel_221_legs_test.go:30:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/task_output_ac2_before_test.go:8:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/task_output_leg_test.go:13:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/task_output_pointer_notice_test.go:12:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/ticket175r2_stamp_live_test.go:55:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/ticket176r1_start_port_test.go:45:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/ticket224_grantid_column_test.go:31:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/ticket283_corr_identity_rulers_test.go:30:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/ticket285_corr_rows_rulers_test.go:20:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/ticket90_test.go:14:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/toolrequest_nail_309_test.go:408:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:411:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:415:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:424:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:427:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:432:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:436:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:439:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:442:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:446:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/toolrequest_nail_309_test.go:460:			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+internal/tools/wiring_test.go:14:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/wiring_test.go:15:	"github.com/CarlosShao/wisp/internal/agent/approval"
+grep_rc=0

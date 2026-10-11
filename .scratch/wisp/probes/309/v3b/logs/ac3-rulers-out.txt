@@ -1,0 +1,75 @@
+ac3_started_at=2026-10-11 21:35:42 +0800  repo_HEAD=afd954ed
+numstat_rc=0 numstat_body_bytes=1076 stderr_bytes=0
+commit a1f84d39a9296f42c801ba9320a581049ab2e57a
+Author: CarlosShao <1933942520@qq.com>
+Date:   Sun Oct 11 18:00:04 2026 +0800
+
+    309-r3 (B): narrow bridge.go every/wherever to the nail measured range
+    The doc block above assessorFor claimed that
+    Test309ToolRequestProductionConstructionNail "counts every production construction
+    point of that type ... so a second one rings wherever it is written". 309-v2 B14
+    and the orchestrator A851 section 2 falsified that against the nail own register.
+    The sentence now names the seven shape labels the matcher recognises after part (A),
+    names the shapes that ring nothing today (reflection or decode, cross-package and
+    function-body aliases, renamed and dot imports, elided nested element), and points
+    at that register. Comment lines only: noncomment_changed=0, both blobs with
+    full-line comments deleted are cmp IDENTICAL at 854 lines, sha256 496ed6d683e8e070,
+    CR=0, guard limb and WithTaintDetector argument byte counts unchanged. No contract
+    claim touched.
+
+14	4	internal/tools/bridge.go
+nameonly_rc=0 names=1 stderr_bytes=0
+internal/tools/bridge.go
+diff_u0_rc=0 diff_body_bytes=1822 stderr_bytes=0
+classify_rc=0 classify=ADDED=14 REMOVED=4 NONCOMMENT=0 noncomment_lines_logged=0
+blob_parent_rc=0 bytes=56324
+blob_b_rc=0 bytes=57172
+blob_strip_cmp_rc=0 cmp_out_bytes=0 strip_stderr_bytes=0+0
+sha_stripped_parent=496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2
+sha_stripped_b=496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2
+sha_raw_parent=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba
+sha_raw_b=e6c685da6bfbcfdfbfd0415ad50e52234b4bab4cddcf338797288c029f77b611
+lines_raw_parent=1348 lines_raw_b=1358
+lines_stripped_parent=854 lines_stripped_b=854
+cr_parent=0 cr_b=0
+guard_line_parent=989 guard_line_b=999
+guard_cmp_rc=0
+detector_cmp_rc=0 (detector_hits_parent=1 b=1)
+diff_nail_rc=0 bytes=0 stderr_bytes=0
+later_touch_rc=0 lines=0 stderr_bytes=0
+diff_a1f8_HEAD_rc=0 bytes=0 stderr_bytes=0
+constants_rc=0 lines=7 stderr_bytes=0
+374:	if examined < 200 {
+384:		wantTotal      = 1
+385:		wantOwner      = "internal/agent/loop.go"
+386:		ownerRationale = "the one newTaskID() dispatch, id always 36 chars, never empty"
+388:	single := len(points) == wantTotal && strings.HasSuffix(moduleRel309(points[0].file), wantOwner)
+394:			roots, len(points), wantTotal, wantOwner, ownerRationale,
+479:		roots, len(points), wantOwner, examined, perRootString309(perRoot))
+contract_hits=0 stderr_bytes=0
+labels_naive_count=7 stderr_bytes=0
+return "alias-literal"
+return "conversion-to-tool-request"
+return "literal"
+return "make-slice-of-tool-request"
+return "new-of-tool-request"
+return "qualified-literal"
+return "same-package-bare-literal"
+labels_reachable_count=7 stderr_bytes=0
+"alias-literal"
+"conversion-to-tool-request"
+"make-slice-of-tool-request"
+"new-of-tool-request"
+"qualified-literal"
+"same-package-bare-literal"
+"var-decl-no-initializer"
+literal_fallback_rc=0 (context) stderr_bytes=0
+183:		return "literal"
+bridge_window_rc=0 stderr_bytes=0
+comment_ruler_raw_rc=0 total=72 stderr_bytes=0
+comment_ruler_strict_after_both_strips=1
+comment_ruler_naive_shorthand=2
+comment_ruler_after_filename_strip_only=2
+agent_imports_rc=0 total=49 stderr_bytes=0
+agent_imports_wisp=0 agent_imports_foreign=49
+AC3_DONE

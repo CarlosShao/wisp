@@ -1,0 +1,14 @@
+== label ruler reshot (repo read-only) ==
+ruler_rc=0
+hits=7
+stderr_bytes=0
+return "alias-literal"
+return "conversion-to-tool-request"
+return "literal"
+return "make-slice-of-tool-request"
+return "new-of-tool-request"
+return "qualified-literal"
+return "same-package-bare-literal"
+== shape: labels (second ruler, field form) ==
+shape: "var-decl-no-initializer"
+field_ruler_rc=0

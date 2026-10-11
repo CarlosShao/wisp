@@ -1,0 +1,5 @@
+package tools
+
+import agent "github.com/CarlosShao/wisp/internal/tools/fakeagent"
+
+func z309bRigFP() agent.ToolRequest { return agent.ToolRequest{TaskID: ""} }

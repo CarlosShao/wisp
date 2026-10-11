@@ -1,0 +1,7 @@
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+type z309bRigSame agent.ToolRequest
+
+func z309bRigConv(x z309bRigSame) agent.ToolRequest { return agent.ToolRequest(x) }

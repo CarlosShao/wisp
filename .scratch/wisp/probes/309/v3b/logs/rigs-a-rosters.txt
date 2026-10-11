@@ -1,0 +1,67 @@
+== roster extracts (grep -o 'name-list up to the period') ==
+-- new injected/phase logs --
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_new.go:5(new-of-tool-request)。
+internal/tools/z309b_new.go:5(new-of-tool-request)
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal)。
+internal/tools/z309b_census.go:11(alias-literal)
+internal/tools/z309b_census.go:7(var-decl-no-initializer)
+internal/tools/z309b_census.go:9(qualified-literal)
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/fakeagent/fake.go:5(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal) | internal/tools/z309b_fp.go:5(qualified-literal)。
+internal/tools/z309b_census.go:11(alias-literal)
+internal/tools/z309b_census.go:7(var-decl-no-initializer)
+internal/tools/z309b_census.go:9(qualified-literal)
+internal/tools/z309b_fp.go:5(qualified-literal)
+-- make injected/phase logs --
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_make.go:5(make-slice-of-tool-request)。
+internal/tools/z309b_make.go:5(make-slice-of-tool-request)
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal)。
+internal/tools/z309b_census.go:11(alias-literal)
+internal/tools/z309b_census.go:7(var-decl-no-initializer)
+internal/tools/z309b_census.go:9(qualified-literal)
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/fakeagent/fake.go:5(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal) | internal/tools/z309b_fp.go:5(qualified-literal)。
+internal/tools/z309b_census.go:11(alias-literal)
+internal/tools/z309b_census.go:7(var-decl-no-initializer)
+internal/tools/z309b_census.go:9(qualified-literal)
+internal/tools/z309b_fp.go:5(qualified-literal)
+-- conv injected/phase logs --
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_conv.go:7(conversion-to-tool-request)。
+internal/tools/z309b_conv.go:7(conversion-to-tool-request)
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal)。
+internal/tools/z309b_census.go:11(alias-literal)
+internal/tools/z309b_census.go:7(var-decl-no-initializer)
+internal/tools/z309b_census.go:9(qualified-literal)
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/fakeagent/fake.go:5(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal) | internal/tools/z309b_fp.go:5(qualified-literal)。
+internal/tools/z309b_census.go:11(alias-literal)
+internal/tools/z309b_census.go:7(var-decl-no-initializer)
+internal/tools/z309b_census.go:9(qualified-literal)
+internal/tools/z309b_fp.go:5(qualified-literal)
+-- census injected/phase logs --
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal)。
+internal/tools/z309b_census.go:11(alias-literal)
+internal/tools/z309b_census.go:7(var-decl-no-initializer)
+internal/tools/z309b_census.go:9(qualified-literal)
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/fakeagent/fake.go:5(same-package-bare-literal) | internal/tools/z309b_census.go:11(alias-literal) | internal/tools/z309b_census.go:7(var-decl-no-initializer) | internal/tools/z309b_census.go:9(qualified-literal) | internal/tools/z309b_fp.go:5(qualified-literal)。
+internal/tools/z309b_census.go:11(alias-literal)
+internal/tools/z309b_census.go:7(var-decl-no-initializer)
+internal/tools/z309b_census.go:9(qualified-literal)
+internal/tools/z309b_fp.go:5(qualified-literal)
+== label strings seen per file ==
+-- run-new-injected.txt
+      1 new-of-tool-request
+      1 same-package-bare-literal
+-- run-make-injected.txt
+      1 make-slice-of-tool-request
+      1 same-package-bare-literal
+-- run-conv-injected.txt
+      1 conversion-to-tool-request
+      1 same-package-bare-literal
+-- run-census-phase1.txt
+      1 alias-literal
+      1 qualified-literal
+      1 same-package-bare-literal
+      1 var-decl-no-initializer
+-- run-census-phase2-fp.txt
+      1 alias-literal
+      2 qualified-literal
+      2 same-package-bare-literal
+      1 var-decl-no-initializer

@@ -1,0 +1,4 @@
+fmt-nail scope=internal/tools/toolrequest_nail_309_test.go rc=0 listed= body_bytes= stderr_bytes=
+final-gofmt-scoped scope=internal/tools rc=0 listed= body_bytes= stderr_bytes=
+final-gofmt-twofiles scope=two-files rc=0 listed=0 body_bytes=0 stderr_bytes=
+final-gofumpt-scoped scope=internal/tools rc=0 listed= body_bytes= stderr_bytes=
