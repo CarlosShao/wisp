@@ -1,0 +1,18 @@
+309-r2 anchor: declare write face, record start state
+
+Write leg for ticket 309 section 4 (the five conditions 309-v1 attached to
+AC#1/AC#2/AC#3). Anchor commit only.
+
+Declares the granted write face: internal/tools**, probes/309/r2**, and one
+append-only bullet at the end of ticket 309. Declares the zero-list this leg
+works under: no checkbox flips, no Status edits, no edit of the guard's
+boolean expression or of internal/risk, no new fixture for the prov-nil
+limb, no second instrument for the "other gates" sentence.
+
+Records the shared-worktree caveat: go.mod carries another leg's in-flight
+edit, so the before/after full-package roster is taken from two out-of-repo
+export trees (git archive) rather than from the worktree.
+
+Readings kept in logs: start state (porcelain for internal/tools,
+internal/risk and cmd = 0 lines), pre-change nail PASS with denominator 245,
+and check-path-length-budget.sh --with-self-test rc=0 (VERDICT GREEN).
