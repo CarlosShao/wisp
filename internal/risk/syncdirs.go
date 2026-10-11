@@ -418,14 +418,28 @@ func (s *syncSet) match(rawPath string) SyncStatus {
 			Root: SyncRoot{Provider: "sync-suspect", Source: "suspect-fallback"}, Why: why,
 		}
 	}
+	// Ticket 307: cand arrives already C26-expanded by resolveTarget, while the
+	// two anchors below are stored in whatever spelling the probe or the
+	// environment handed us (s.home is only normPath'd, never Resolve'd; a root
+	// that is not on disk takes syncdirs.go add()'s short path). isUnder over
+	// mismatched spellings read a genuine under-profile write as "not under any
+	// sync root" = fail-OPEN. Both sides now go through the package's existing
+	// form family (formsOf / anchorForms / aUnder), the ticket 72 invariant:
+	// the verdict must not depend on the spelling a path arrived in. The
+	// spelling set is a union and aRelates' tie-breaker only ever turns a miss
+	// into a deny, so no existing hit can be lost and no stored value changed.
+	// Computed once: the extra ancestor walk is paid per query, not per root.
+	candForms := formsOf(cand)
 	for _, e := range s.roots {
-		if isUnder(cand, e.canon) {
+		if aUnder(candForms, anchorForms(e.canon)) {
 			return SyncStatus{Sync: true, Root: e.root, Why: "write target is under a detected sync root"}
 		}
 	}
 	// Component-bounded under-profile test (isUnder, not a raw prefix: a
-	// sibling `profileevil` must not be swept in — MINOR N-5).
-	if !s.complete && s.home != "" && isUnder(cand, s.home) {
+	// sibling `profileevil` must not be swept in — MINOR N-5). aUnder keeps
+	// that bounding: rel is still isUnder, applied per spelling pair, so a
+	// sibling whose name merely starts with the profile name stays out.
+	if !s.complete && s.home != "" && aUnder(candForms, anchorForms(s.home)) {
 		return SyncStatus{
 			Sync: true,
 			Root: SyncRoot{Provider: "sync-suspect", Path: s.home, Source: "suspect-fallback"},

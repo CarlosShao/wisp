@@ -1,0 +1,16 @@
+﻿==== begin tag=pre at 2026-10-11 10:11:23
+COUNTS name=full table=default tag=pre rc=0 RUN=198 PASS=197 FAIL=0 SKIP=1 seconds=6.95
+COUNTS name=full2 table=default tag=pre rc=0 RUN=198 PASS=197 FAIL=0 SKIP=1 seconds=3.20
+COUNTS name=full table=aliased tag=pre rc=1 RUN=198 PASS=185 FAIL=12 SKIP=1 seconds=3.37
+COUNTS name=full2 table=aliased tag=pre rc=1 RUN=198 PASS=185 FAIL=12 SKIP=1 seconds=3.50
+COUNTS name=syncrun table=default tag=pre rc=0 RUN=36 PASS=35 FAIL=0 SKIP=1 seconds=1.09
+COUNTS name=syncrun table=aliased tag=pre rc=1 RUN=36 PASS=30 FAIL=5 SKIP=1 seconds=1.08
+==== end tag=pre at 2026-10-11 10:11:43
+==== begin tag=post at 2026-10-11 10:14:28
+COUNTS name=full table=default tag=post rc=0 RUN=200 PASS=199 FAIL=0 SKIP=1 seconds=5.42
+COUNTS name=full2 table=default tag=post rc=0 RUN=200 PASS=199 FAIL=0 SKIP=1 seconds=3.65
+COUNTS name=full table=aliased tag=post rc=1 RUN=200 PASS=192 FAIL=7 SKIP=1 seconds=3.40
+COUNTS name=full2 table=aliased tag=post rc=1 RUN=200 PASS=192 FAIL=7 SKIP=1 seconds=3.50
+COUNTS name=syncrun table=default tag=post rc=0 RUN=38 PASS=37 FAIL=0 SKIP=1 seconds=1.15
+COUNTS name=syncrun table=aliased tag=post rc=0 RUN=38 PASS=37 FAIL=0 SKIP=1 seconds=1.05
+==== end tag=post at 2026-10-11 10:14:46

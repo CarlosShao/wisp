@@ -1,0 +1,1 @@
+﻿table=aliased TMPDIR=[C:\Users\swq\tmp\RISKAT~1\RUNNER~1] TEMP=[C:\Users\swq\tmp\RISKAT~1\RUNNER~1] TMP=[C:\Users\swq\tmp\RISKAT~1\RUNNER~1]

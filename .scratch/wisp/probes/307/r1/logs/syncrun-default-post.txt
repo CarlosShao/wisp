@@ -1,0 +1,96 @@
+﻿time=2026-10-11T10:14:45.168+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSyncAncestorWalkVerifiesNativeChain
+--- PASS: TestSyncAncestorWalkVerifiesNativeChain (0.00s)
+=== RUN   TestSyncWriteNegative
+--- PASS: TestSyncWriteNegative (0.01s)
+=== RUN   TestSync307AliasHomeUnderProfileStaysSuspect
+--- PASS: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+=== RUN   TestSync307AliasShortRootMembership
+--- PASS: TestSync307AliasShortRootMembership (0.01s)
+=== RUN   TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+    syncdirs_ancestor_actable_leg_116_test.go:218: raw="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161798256048\\001\\%WISP116ANC\\\\B%\\new.md"
+         anc="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161798256048\\001\\%WISP116ANC\\B%"
+         moved="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161798256048\\wisp116-escape"
+        verdict: Sync=true Root={Provider:sync-suspect Path: Source:suspect-fallback} Why="write target spelling could not be anchored on a C26-verifiable ancestor (8.3/\\\\?\\/missing chain); fail-closed as sync-suspect: risk: expansion moved this path onto a tree the caller did not name: C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161798256048\\001\\%WISP116ANC\\B% expands to C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161798256048\\wisp116-escape (env); act on the expanded tree only if you asked for it by name"
+--- PASS: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+=== RUN   TestSyncAncestorLegStillMatchesPlainSameTreeWrite116
+--- PASS: TestSyncAncestorLegStillMatchesPlainSameTreeWrite116 (0.00s)
+=== RUN   TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+--- PASS: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.06s)
+=== RUN   TestSyncAncestorLegNotExemptedStaysFailClosed
+--- PASS: TestSyncAncestorLegNotExemptedStaysFailClosed (0.06s)
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes
+    syncdirs_redteam_windows_test.go:85: sync root long  = C:\Users\swq\AppData\Local\Temp\TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes4164714766\001\profile\OneDrive Copilot Sync
+    syncdirs_redteam_windows_test.go:86: sync root 8.3   = C:\Users\swq\AppData\Local\Temp\TESTSY~1\001\profile\ONEDRI~1
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined
+--- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes (0.02s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined (0.00s)
+=== RUN   TestSyncRedTeamGuardPlainNewFileWriteAllowed
+    syncdirs_redteam_windows_test.go:152: non-sync dir 8.3 = C:\Users\swq\AppData\Local\Temp\TESTSY~1\001\profile\work
+--- PASS: TestSyncRedTeamGuardPlainNewFileWriteAllowed (0.04s)
+=== RUN   TestSyncRedTeamUnverifiableChainFailClosed
+--- PASS: TestSyncRedTeamUnverifiableChainFailClosed (0.01s)
+=== RUN   TestSyncRedTeamRealOneDrive
+    syncdirs_redteam_windows_test.go:215: P12 evidence: live OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_redteam_windows_test.go:234: no 8.3 alias exists for the live root C:\Users\swq\OneDrive (name is already 8.3-clean); the \\?\ legs below still cross the boundary
+    syncdirs_redteam_windows_test.go:247: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:252: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+    syncdirs_redteam_windows_test.go:247: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:252: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+--- PASS: TestSyncRedTeamRealOneDrive (0.02s)
+=== RUN   TestSyncDefaultLocationProbe
+--- PASS: TestSyncDefaultLocationProbe (0.01s)
+=== RUN   TestSyncDropboxHostDBConfig
+--- PASS: TestSyncDropboxHostDBConfig (0.01s)
+=== RUN   TestSyncFixtureFallbackAndMatch
+--- PASS: TestSyncFixtureFallbackAndMatch (0.01s)
+=== RUN   TestSyncFallbackNotDisarmableByWeakRoot
+--- PASS: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)
+=== RUN   TestSyncUnverifiedRootKeepsFallback
+--- PASS: TestSyncUnverifiedRootKeepsFallback (0.01s)
+=== RUN   TestSyncEnvConfiguredRoots
+--- PASS: TestSyncEnvConfiguredRoots (0.01s)
+=== RUN   TestSyncRegistryProbeTable
+=== RUN   TestSyncRegistryProbeTable/empty_hive_yields_nothing
+=== RUN   TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored
+=== RUN   TestSyncRegistryProbeTable/duplicate_accounts_dedupe
+=== RUN   TestSyncRegistryProbeTable/dropbox_installer_path
+--- PASS: TestSyncRegistryProbeTable (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/empty_hive_yields_nothing (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/duplicate_accounts_dedupe (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/dropbox_installer_path (0.00s)
+=== RUN   TestSyncSuspectFallbackIsComponentBounded
+--- PASS: TestSyncSuspectFallbackIsComponentBounded (0.03s)
+=== RUN   TestSyncNormalNewFileWriteNotFlagged
+--- PASS: TestSyncNormalNewFileWriteNotFlagged (0.01s)
+=== RUN   TestSyncSuspectFallbackWhenUndetectable
+--- PASS: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+=== RUN   TestSyncUnresolvablePathFailClosed
+--- PASS: TestSyncUnresolvablePathFailClosed (0.00s)
+=== RUN   TestSyncDotDotTailFailsClosed
+--- PASS: TestSyncDotDotTailFailsClosed (0.01s)
+=== RUN   TestSyncRootsIntrospection
+--- PASS: TestSyncRootsIntrospection (0.00s)
+=== RUN   TestSyncDetectionOnThisMachine
+    syncdirs_test.go:491: P12 evidence: detected OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_test.go:509: P12 evidence: OneDrive at C:\Users\swq\OneDrive flagged as sync channel
+--- PASS: TestSyncDetectionOnThisMachine (0.00s)
+=== RUN   TestSyncConfirmedGradesDisarmFallbackWindows
+--- PASS: TestSyncConfirmedGradesDisarmFallbackWindows (0.01s)
+=== RUN   TestSyncRegistryProbeLive
+    syncdirs_windows_test.go:133: no registry-grade sync record on this machine (HKCU Accounts without UserFolder is the documented reality here)
+--- SKIP: TestSyncRegistryProbeLive (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.436s
+---- rc=0 total_seconds=1.15 table=default name=syncrun tag=post

@@ -1,0 +1,1 @@
+﻿table=default TMPDIR=[] TEMP=[C:\Users\swq\AppData\Local\Temp] TMP=[C:\Users\swq\AppData\Local\Temp]
