@@ -1,0 +1,26 @@
+=== gate rc lines (self-landed) ===
+date=2026-10-11 15:07:33 +0800 HEAD=d75db9ee batch=A848
+gate_build_rc=0
+gate_vet_risk_rc=0
+gate_vet_tools_rc=0
+gate_d22scan_rc=0
+d22scan_findings_in_internal_risk=0
+d22scan_findings_in_internal_tools=12
+d22scan_total_finding_lines=63
+gate_pathlen_rc=0
+RED - over budget and NOT in the roster: .scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md  (relative 125 chars, name 104 chars, full path on the self-hosted runner 169 chars, budget 165)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: worst full path on the self-hosted runner=228 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+=== hygiene ===
+staged_total=27 staged_go=0 staged_dot_out=0 foreign_staged=0 inflight_staged=0 zero_byte_staged=3
+numstat_ledger=49	0	docs/reports/pending-and-issues.md 
+numstat_handover=18	0	docs/reports/HANDOVER.md 
+numstat_t308=132	0	.scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume-done.md 
+rename_t308=R087	.scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume.md	.scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume-done.md 
+prefix_ledger=IDENTICAL
+prefix_handover=IDENTICAL
+box_308=6/0
+status_done_lines_308=1
+worktree_dirty_internal_cmd_tools=0
+ticket309_or_304_touched_by_me=0

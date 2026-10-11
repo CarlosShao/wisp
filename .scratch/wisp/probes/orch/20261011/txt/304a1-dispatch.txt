@@ -1,0 +1,45 @@
+你是 Wisp 仓库（工作目录 `D:\work\workspace\projects plans\Wisp`，分支 `dev`）的一枚**只读普查腿**，代号 `304-a1`，工作是票 304 的 `AC#0` 的一部分。你⛔ 写任何产品码、⛔ 写任何测试码。
+
+## 0. 起手必做（逐条现跑，把读数落进自家件）
+1. `git rev-parse --short HEAD` ＝**必须等于 `d75db9ee`**；不等就停下，在 `00-anchor.md` 里写你实际看到的号＋你⛔ 开工的理由，然后交回（不要按过期锚点做判读）。
+2. `git status --porcelain -- internal cmd tools | wc -l` 现跑一次并把数字写进 `00-anchor.md`（派单时刻＝**0 行**）。★`309-r2` 的**产码笔已落**（`d75db9ee`＝`internal/tools/bridge.go`＋`toolrequest_nail_309_test.go`），但那枚腿可能还在**继续交证据件笔** ⇒ Go 编译面仍按"有人占着"处理。
+3. 因此本腿有一条硬边界：**⛔ 任何 Go 编译面／运行面命令**（⛔ `go build`、⛔ `go vet`、⛔ `go test`、⛔ 跑任何 `.exe`、⛔ `bash scripts/d22scan.sh`、⛔ `scripts/portable-tests.sh`）。`go env`、`go list`（只列不编）⛔ 用不到就别用；用了要在自报里具名。**这条不是欠账**——是派单选的这个形状，缺的读数归编排者补，见 §4。
+
+## 1. 射程（本票自己的定义，逐字来自 `.scratch/wisp/issues/304-*.md` 的 `AC#0`；先自己 `sed -n '1,40p'` 读一遍原件，⛔ 只读我这段转述）
+本格原文要求三张表：① 全名册、② 三种死法**分开实测**、③ 三形代价表＋必答两问。
+**本腿只做 ① 与 ③（含必答两问），外加一枚"当前残留名册重量"。② 那格本派单⛔ 做**（它要真起子进程＋`go test -timeout` 那一形 ⇒ 需要 Go 运行面，而运行面现在被在飞腿占着）。⛔ 不许用"读文档／读代码推出来的结论"去冒充 ② 的实测读数——那正是票 304 自己写着"⛔ 读文档当读数"的那一枚雷。
+
+## 2. 要交回的三样
+**(A) 当前残留名册重量**（尺＝`Get-CimInstance Win32_Process`，PowerShell 走 `powershell -NoProfile -Command` 或 `pwsh`；⚠ 内联 PowerShell 里⛔ 用 `$_`——bash 会把它换成本机工作目录，那是本机已知的一次真事故）。票面快照写的是 2 枚 `mockllm.exe`（pid 20904 起于 2026-10-08 08:42:21／pid 25660 起于 11:35:29，两枚 PPID 当时都已不存在）。请现量：
+- 现在还在不在？逐枚给 `pid`／`CreationDate`／`CommandLine`（命令行里带它自己的 `t.TempDir()` 全路径＝归属证据，必须**逐字**贴，因为路径首段就是用例名）／父 PID 现在在不在。
+- 顺手同尺数一遍 `wisp.exe`／`balldebug.exe`／`msedgewebview2.exe` 三族（枚数＋各自的归属三件：谁起的、命令行里的具名路径、父链在不在）。**⛔ "N 枚进程＝谁的残留"这种归属结论必须由命令行具名路径＋父 PID 支撑，⛔ 靠枚数猜。**
+- **⛔ 杀任何进程**。这格只量不动手：处置方式（甲 Job Object／乙 parent-pid 自退／丙 登记为已知残留）是 `AC#1` 的裁，还没裁。
+
+**(B) 表① 全名册**：本仓所有"测试里起子进程"的地方。尺必须写清你打的是什么射程（例：`grep -rn 'exec.Command' --include=*_test.go internal cmd tools` 是一档，再单独打 `adaptertest/**`、`**/testdata/**`、以及**非测试码里起的测试夹具**如 `cmd/mockllm`／`cmd/balldebug` 是另一档），并具名回答**枚数是整族还是抽样**。逐枚给：`文件:行`＋它起的是什么＋**有没有回收**＋回收挂在 `t.Cleanup` 还是 `defer` 还是`os.Exit`／panic 路径上根本跑不到、还是**根本没挂**。★特别注意：`defer proc.Kill()` 在测试二进制被外力 `TerminateProcess` 那种死法下**一行都不会执行**——这一类要单独标出来，它就是本票的缺陷面。
+
+**(C) 表③ 三形代价表**：甲＝Windows Job Object＋`JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`；乙＝子进程自己盯父 PID（`mockllm` 加 `--parent-pid`）；丙＝不动，登记成具名已知残留＋把 `mockllm.exe` 加进编队起手闸门的名册。必答两问：
+- **(I)** 甲形在**托管 runner** 上会不会把 CI 的别的进程一起端掉（job 的射程边界）。你⛔ 碰不到那台机器 ⇒ 这一问只许交〔读码推／仅文档〕级答案，并**具名写"哪一层是读码推的、哪一层需要真机"**。可参考的仓内证据：`scripts/portable-tests.sh`、`.github/workflows/ci.yml`（⚠ `ci.yml` 是 tracked，读它⛔ 动它）、以及仓里已有的 winlive／`test-windows` 相关记账（`docs/reports/pending-and-issues.md` 里 `A7xx`/`A8xx` 有 CI 拓扑的现量，可 grep `test-windows`、`托管`、`self-hosted`）。
+- **(II)** 乙形那种"轮询父 PID"要不要撞 D22 的"⛔ 用墙钟时间差实现超时"。★查判据要看**仪器实际扫什么**，不是看规格怎么写：先 `grep -n` 读 `tools/d22scan/main.go` 里那条 ban 的**正则字面**（记忆里那条 ban 只认 `.Sub(time.Now())` 一类拼写），再判断"轮询父 PID＋`time.Sleep`／`time.After`"这种写法在⛔ 在它的射程里。⚠ 规格与仪器射程不是一回事，两条分开写。
+
+## 3. 写面（越界＝判失败，逐字守）
+- **只新建**：`.scratch/wisp/probes/304/a1/**`（件名短、⛔ `§`、⛔ 空格、⛔ `.out` 后缀；日志一律 `logs/*.txt`；**⛔ 在 `probes/**` 下建 `.go`**——那会挪别人的 gofumpt/d22scan 分母）。
+- 票 304 末尾**追加 1 条 Progress log bullet**（形如 `- [2026-10-11 15:0x] agent=\`304-a1\` did=...`），numstat 必＝**＋1 行 −0 行**。⛔ 改票面任何原句、⛔ 勾任何框（`- [ ]`／`- [x]` 一枚都不许动）、⛔ 碰 `Status:` 行、⛔ 改名 `-done`。判语与翻框归非实现者。
+- ⛔ 动 `docs/reports/**`、⛔ 动 `docs/evidence/s1/**`（本腿是普查⛔ 裁决）、⛔ 动 `internal/**`／`cmd/**`／`tools/**`／`scripts/**`／`.github/**`、⛔ 动 `AGENTS.md`／`docs/PLAN.md`／`docs/specs/**`。
+- ⛔ 在仓内建 worktree／checkout；⛔ 删任何件（临时件只建不删，从一开始就落进 `probes/304/a1/logs/`，⛔ 仓库根）。
+
+## 4. 记账纪律（这一段是本仓硬规矩，违反会被判退回）
+- 每一个数字都要带**尺名＋射程目录＋是量来的还是算来的**；provenance 三态要分清（工作树 ⇄ HEAD blob ⇄ 仓外导出树）。
+- "命中 0 枚"⛔ 等于"没有问题"：写清这把尺看不见什么。若一枚尺两种形状都放行，它就不是凭据——具名写出来。
+- ⛔ 引用票面或记忆里的行号/枚数当现值；一律重跑，并把"重跑值 ⇄ 快照值"并排写。
+- ⛔ 把注释里提到的测试名／判据名当已存在（本仓出过一次"注释指名一枚根本不存在的用例"的真事故）。要引用就先 `go test -run` 之类验证？——本腿⛔ 跑 Go，所以改用**词面尺**：`grep -rn '<名>' --include=*.go .` 命中⛔ 止于注释自身，才算它存在；只命中注释就写"仅注释提及，存在性未证"。
+- 结尾必须具名写**本腿欠的读数**：`Q-304-a1-…` 逐枚编号，至少包含 ② 那一格（三形实测）归编排者在 Go 面空出后补，以及 (I) 那问的〔仅读码〕层级。
+
+## 5. 交件动作（commit-first）
+1. 先写 `90-final.md`（结论一页内＋三张表指回件名）与 `logs/msg-handin.txt`。
+2. `git add` **只用显式 pathspec**：`git add -- .scratch/wisp/probes/304/a1 .scratch/wisp/issues/<304 的完整文件名>`。**⛔ `git add -A`／`.`**；提交前 `git -c core.quotePath=false diff --cached --name-only` 数一遍，具名确认 `foreign_staged=0`、`zero_byte_staged=0`、`staged_go=0`（⚠ 含非 ASCII 的路径必须 `git -c core.quotePath=false`＋`-z` 读，否则你的尺会报假越界——本仓踩过）。
+3. `git commit -F <你自家 logs 里的消息件>`，消息里写清代号与"只新建 .md/.txt＋票尾 1 行"。**⛔ push**（推送永远归编排者，且现在有一枚 `A813` 授权我⛔ 用）。**⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`。**
+4. 交回正文里必须逐字列出你的 commit 号（`git log --oneline -3`），并附**盘上尺**：`ls -l` 你新建的件＋`wc -c`（写完文件后要自己 `wc -c` 证明它真在盘上，工具的"创建成功"回执不算数）。
+
+## 6. 零 emoji 门的形状（写中文正文时要知道）
+本仓 `tools/d22scan` 的 ban #8 扫 `U+1F000–1FAFF`／`U+2200–22FF`／`U+2600–27BF`／`U+2B00–2BFF`／`U+FE0F`／`U+1F1E6–1F1FF`，**注释豁免、字符串不豁免**：`⛔`(U+26D4)、`≈`(U+2248)、`✓`(U+2713)、`≤`(U+2264) 都在射程内 ⇒ 这几种符号⛔ 进 `.go` 字符串字面量（含 `t.Fatalf` 格式串），注释里可以用；`→`(U+2192)、`①`(U+2460) 是刻意留的空隙、不扫。本腿⛔ 写 `.go`，所以主要影响＝**⛔ 碰 `tools/d22scan/allowlist.txt`，一字节都不许**。
+另外：中文正文里那些带反引号/`$` 的句子⛔ 塞进双引号 shell 串（会被真的执行）。要写这类文本就用写文件的工具，或者 `cat` 一个已经写好的件。

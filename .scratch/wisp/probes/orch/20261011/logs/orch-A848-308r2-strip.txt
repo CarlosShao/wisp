@@ -1,0 +1,115 @@
+=== internal/risk/pathresolver_anchor_spelling_windows_test.go ===
+lines base_total=367 work_total=388
+lines base_code=233 work_code=233
+blockcomment_hits_base=6 work=6
+cr_count base=0 work=0
+STRIPPED_CMP=IDENTICAL
+md5 base_code=7fcd06b12f2e work_code=7fcd06b12f2e
+=== internal/risk/pathresolver_volumeless_spelling_308_test.go ===
+lines base_total=120 work_total=128
+lines base_code=70 work_code=70
+blockcomment_hits_base=0 work=0
+cr_count base=0 work=0
+STRIPPED_CMP=IDENTICAL
+md5 base_code=b2f9c14e797e work_code=b2f9c14e797e
+=== production files touched by this leg? (must be empty) ===
+internal/risk/pathresolver_anchor_spelling_windows_test.go
+internal/risk/pathresolver_volumeless_spelling_308_test.go
+=== full changed-file list base..HEAD ===
+.scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume.md
+.scratch/wisp/probes/308/r2/00-anchor.md
+.scratch/wisp/probes/308/r2/10-three-sentences.md
+.scratch/wisp/probes/308/r2/20-proof-code-unchanged.md
+.scratch/wisp/probes/308/r2/30-gates.md
+.scratch/wisp/probes/308/r2/90-final.md
+.scratch/wisp/probes/308/r2/logs/closing-note.md
+.scratch/wisp/probes/308/r2/logs/diff-proof.txt
+.scratch/wisp/probes/308/r2/logs/final-readings.txt
+.scratch/wisp/probes/308/r2/logs/format-rosters.txt
+.scratch/wisp/probes/308/r2/logs/gate-build-final.rc.txt
+.scratch/wisp/probes/308/r2/logs/gate-build-final.txt
+.scratch/wisp/probes/308/r2/logs/gate-build.rc.txt
+.scratch/wisp/probes/308/r2/logs/gate-build.txt
+.scratch/wisp/probes/308/r2/logs/gate-d22scan-run3.rc.txt
+.scratch/wisp/probes/308/r2/logs/gate-d22scan-run3.txt
+.scratch/wisp/probes/308/r2/logs/gate-d22scan-run4.rc.txt
+.scratch/wisp/probes/308/r2/logs/gate-d22scan-run4.txt
+.scratch/wisp/probes/308/r2/logs/gate-d22scan.rc.txt
+.scratch/wisp/probes/308/r2/logs/gate-d22scan.txt
+.scratch/wisp/probes/308/r2/logs/gate-pathlen.rc.txt
+.scratch/wisp/probes/308/r2/logs/gate-pathlen.txt
+.scratch/wisp/probes/308/r2/logs/gate-vet-final.rc.txt
+.scratch/wisp/probes/308/r2/logs/gate-vet-final.txt
+.scratch/wisp/probes/308/r2/logs/gate-vet.rc.txt
+.scratch/wisp/probes/308/r2/logs/gate-vet.txt
+.scratch/wisp/probes/308/r2/logs/handin-hash.md
+.scratch/wisp/probes/308/r2/logs/mine-tree-path.txt
+.scratch/wisp/probes/308/r2/logs/msg-anchor.txt
+.scratch/wisp/probes/308/r2/logs/msg-code.txt
+.scratch/wisp/probes/308/r2/logs/msg-evidence.txt
+.scratch/wisp/probes/308/r2/logs/msg-final.txt
+.scratch/wisp/probes/308/r2/logs/msg-handin.txt
+.scratch/wisp/probes/308/r2/logs/msg-hash.txt
+.scratch/wisp/probes/308/r2/logs/msg-hashfix.txt
+.scratch/wisp/probes/308/r2/logs/post-worktree-final-full.rc.txt
+.scratch/wisp/probes/308/r2/logs/post-worktree-final-full.txt
+.scratch/wisp/probes/308/r2/logs/post-worktree-full.rc.txt
+.scratch/wisp/probes/308/r2/logs/post-worktree-full.txt
+.scratch/wisp/probes/308/r2/logs/pre-head-full-alias.rc.txt
+.scratch/wisp/probes/308/r2/logs/pre-head-full-alias.txt
+.scratch/wisp/probes/308/r2/logs/pre-head-full.rc.txt
+.scratch/wisp/probes/308/r2/logs/pre-head-full.txt
+.scratch/wisp/probes/308/r2/logs/pre-tree-path.txt
+.scratch/wisp/probes/308/r2/logs/probe-denominator-alias.txt
+.scratch/wisp/probes/308/r2/logs/probe-denominator.rc.txt
+.scratch/wisp/probes/308/r2/logs/probe-denominator.txt
+.scratch/wisp/probes/308/r2/logs/probe-tree-path.txt
+.scratch/wisp/probes/308/r2/logs/roster-post-final.txt
+.scratch/wisp/probes/308/r2/logs/roster-post.txt
+.scratch/wisp/probes/308/r2/logs/roster-pre-alias.txt
+.scratch/wisp/probes/308/r2/logs/roster-pre.txt
+.scratch/wisp/probes/308/r2/logs/scan-mine-tree-final.rc.txt
+.scratch/wisp/probes/308/r2/logs/scan-mine-tree-final.txt
+.scratch/wisp/probes/308/r2/logs/scan-mine-tree.rc.txt
+.scratch/wisp/probes/308/r2/logs/scan-mine-tree.txt
+.scratch/wisp/probes/308/r2/logs/scan-worktree-direct.rc.txt
+.scratch/wisp/probes/308/r2/logs/scan-worktree-direct.txt
+.scratch/wisp/probes/308/r2/logs/strip-result-final.txt
+.scratch/wisp/probes/308/r2/logs/strip-result-final2.txt
+.scratch/wisp/probes/308/r2/logs/strip-result.txt
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.dispatch
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.dispatch.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.final
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.final.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.final2
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.final2.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.head
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.head.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.head.stripped
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.work
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.work.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_anchor_spelling_windows_test.go.work.stripped
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.dispatch
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.dispatch.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.final
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.final.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.final2
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.final2.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.head
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.head.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.head.stripped
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.work
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.work.code
+.scratch/wisp/probes/308/r2/logs/strip/pathresolver_volumeless_spelling_308_test.go.work.stripped
+.scratch/wisp/probes/308/r2/logs/sub-post.txt
+.scratch/wisp/probes/308/r2/logs/sub-pre.txt
+.scratch/wisp/probes/308/r2/logs/ticket-bullet.txt
+.scratch/wisp/probes/309/r2/00-anchor.md
+.scratch/wisp/probes/309/r2/logs/msg-anchor.txt
+.scratch/wisp/probes/309/r2/logs/pathlen-start.log
+.scratch/wisp/probes/309/r2/logs/start-state.log
+internal/risk/pathresolver_anchor_spelling_windows_test.go
+internal/risk/pathresolver_volumeless_spelling_308_test.go
+=== sha256 of the two production files at HEAD vs baseline ===
+internal/risk/pathresolver.go base=c347e1cf head=c347e1cf SAME
+internal/tools/volume_windows.go base=434ac852 head=434ac852 SAME

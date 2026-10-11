@@ -1,0 +1,6 @@
+
+### 7. 门禁实跑读数（追加，位置在 §6 之后；内容兑现 §3 那句条件句——§3 写于跑门之前）
+
+`GOFLAGS= go build ./...` **rc=0**／`go vet ./internal/risk/` **rc=0**／`go vet ./internal/tools/` **rc=0**（★后者现在能绿＝`309-r2` 的产码笔已落 `d75db9ee`，工作树 `internal cmd tools` 现跑 **0 行**）／`sh scripts/d22scan.sh` **rc=0**／长度门 `--with-self-test` **rc=0 VERDICT GREEN**（over-hat ⇄ roster 同枚数、worst full path **228**＝与票 §规矩同值，RED 那行点名的是既有那枚 `issues/seeded-xxxx…` 种子件，⛔ 我账⛔ 我碰）。⇒ ⚠ §3 里那句"若红先按 `internal/tools` 归因"**这发没用上**（没红），⛔ 拿它当本轮读数的解释。
+★两把具名的尺坏在半路、当场补：①**`d22scan_findings_in_internal_tools=12` 不是 12 枚 finding**＝词面尺数的是扫描器输出里出现该路径的字样（含它自己的 scope 行），真判据只有 `rc=`；这条写法以后进派单模板。②**三枚件 0 字节**＝`build`／`vet×2` 绿时 stdout 本就空 ⇒ 我把 `rc=0` 追进同一枚件（沿用 `308-v1` 那把的处理），⛔ 交回 0 字节当"本格已交付"。
+★台面观察（记编排者，⛔ 算腿账）＝我这把卫生尺第二发数到 `zero_byte_staged=11`，其中 **8 枚在 `probes/309/r2/logs/`**＝那枚腿在**两跑之间自己 `git add` 了证据件、还没 commit**。第一发我数到 `staged_total=27 foreign_staged=0` ⇒ **共享工作树的索引是活的，"越界 0"只对我那一发成立**。⇒ 我的 commit 一律带**显式 pathspec**（本仓硬规矩），并在提交后再数一次别人的暂存件还在不在（那把尺的读数**不在本笔预告**，归下一笔 `A849` 落账）。

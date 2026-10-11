@@ -1,0 +1,136 @@
+treeA=/tmp/tmp.4fiKUEyc4p treeB=/tmp/tmp.zLmJluNQD9
+202ed4a5 go_files=995 has_go.mod=yes
+daa2f9be go_files=995 has_go.mod=yes
+rc_A=0
+rc_B=0
+--- A ---
+RUN=201 toplevel_PASS=132 any_PASS=200 SKIP=1 FAIL=0 panic=0
+sentinel_dropped_the_two=0
+sentinel_cannot_be_constructed=0
+--- SKIP: TestSyncRegistryProbeLive (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/risk	4.470s
+--- B ---
+RUN=201 toplevel_PASS=132 any_PASS=200 SKIP=1 FAIL=0 panic=0
+sentinel_dropped_the_two=0
+sentinel_cannot_be_constructed=0
+--- SKIP: TestSyncRegistryProbeLive (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/risk	3.309s
+=== roster diff A vs B (empty = identical name+colour) ===
+5,6c5,6
+< --- PASS: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.12s)
+< --- PASS: TestC26RewriteAccountIsRecorded (0.00s)
+---
+> --- PASS: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.18s)
+> --- PASS: TestC26RewriteAccountIsRecorded (0.01s)
+8c8
+< --- PASS: TestCanonicalInputGainsNoSecondForm (0.01s)
+---
+> --- PASS: TestCanonicalInputGainsNoSecondForm (0.02s)
+11,12c11,12
+< --- PASS: TestClassifySpellingInvariance (0.03s)
+< --- PASS: TestConcurrentMarkInspect (0.00s)
+---
+> --- PASS: TestClassifySpellingInvariance (0.02s)
+> --- PASS: TestConcurrentMarkInspect (0.01s)
+14,15c14,15
+< --- PASS: TestDeepNestingFailsClosedNotSilent (0.00s)
+< --- PASS: TestDetectorUnknownToolScansEverything (0.00s)
+---
+> --- PASS: TestDeepNestingFailsClosedNotSilent (0.01s)
+> --- PASS: TestDetectorUnknownToolScansEverything (0.01s)
+31,33c31,33
+< --- PASS: TestLLMParaphraseResidual (0.00s)
+< --- PASS: TestMarkEmptyAfterNormalization (0.00s)
+< --- PASS: TestMarkInspectSourceAttribution (0.00s)
+---
+> --- PASS: TestLLMParaphraseResidual (0.01s)
+> --- PASS: TestMarkEmptyAfterNormalization (0.01s)
+> --- PASS: TestMarkInspectSourceAttribution (0.01s)
+35c35
+< --- PASS: TestMarkUnknownSourceToolFailClosed (0.00s)
+---
+> --- PASS: TestMarkUnknownSourceToolFailClosed (0.01s)
+37c37
+< --- PASS: TestNormalizationEndToEnd (0.00s)
+---
+> --- PASS: TestNormalizationEndToEnd (0.01s)
+41c41
+< --- PASS: TestOverrideOnlyAcceptsTheResolvedForm (0.09s)
+---
+> --- PASS: TestOverrideOnlyAcceptsTheResolvedForm (0.10s)
+45c45
+< --- PASS: TestPathResolverShortNameAListDenied (0.01s)
+---
+> --- PASS: TestPathResolverShortNameAListDenied (0.02s)
+56c56
+< --- PASS: TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan (0.01s)
+---
+> --- PASS: TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan (0.02s)
+68c68
+< --- PASS: TestReparseExceptionExplicitPathOnly (0.21s)
+---
+> --- PASS: TestReparseExceptionExplicitPathOnly (0.29s)
+70,71c70,71
+< --- PASS: TestResolveCanonicalIsPlatformShaped (0.00s)
+< --- PASS: TestResolveExpansion (0.01s)
+---
+> --- PASS: TestResolveCanonicalIsPlatformShaped (0.01s)
+> --- PASS: TestResolveExpansion (0.02s)
+74c74
+< --- PASS: TestResolvePerCallBudget (1.31s)
+---
+> --- PASS: TestResolvePerCallBudget (1.15s)
+87c87
+< --- PASS: TestScopesNeverInherit (0.00s)
+---
+> --- PASS: TestScopesNeverInherit (0.01s)
+90,94c90,94
+< --- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.00s)
+< --- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization (0.00s)
+< --- PASS: TestShapeAW1RestOfHostMarkStillIndexed (0.01s)
+< --- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits (0.00s)
+< --- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits (0.00s)
+---
+> --- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.01s)
+> --- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization (0.01s)
+> --- PASS: TestShapeAW1RestOfHostMarkStillIndexed (0.00s)
+> --- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits (0.01s)
+> --- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits (0.01s)
+100c100
+< --- PASS: TestSyncAncestorLegNotExemptedStaysFailClosed (0.07s)
+---
+> --- PASS: TestSyncAncestorLegNotExemptedStaysFailClosed (0.11s)
+104,105c104,105
+< --- PASS: TestSyncConfirmedGradesDisarmFallbackWindows (0.01s)
+< --- PASS: TestSyncDefaultLocationProbe (0.01s)
+---
+> --- PASS: TestSyncConfirmedGradesDisarmFallbackWindows (0.02s)
+> --- PASS: TestSyncDefaultLocationProbe (0.00s)
+110c110
+< --- PASS: TestSyncFallbackNotDisarmableByWeakRoot (0.03s)
+---
+> --- PASS: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)
+113c113
+< --- PASS: TestSyncFixtureFallbackAndMatch (0.02s)
+---
+> --- PASS: TestSyncFixtureFallbackAndMatch (0.01s)
+116c116
+< --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes (0.04s)
+---
+> --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes (0.03s)
+118c118
+< --- PASS: TestSyncRedTeamUnverifiableChainFailClosed (1.26s)
+---
+> --- PASS: TestSyncRedTeamUnverifiableChainFailClosed (0.01s)
+126c126
+< --- PASS: TestTierAAnchorsMatchNativeSpelling (0.02s)
+---
+> --- PASS: TestTierAAnchorsMatchNativeSpelling (0.03s)
+128,129c128,129
+< --- PASS: TestWriteGateAllPathsNonSyncStaysExempt (0.06s)
+< --- PASS: TestWriteGateEveryPathTargetJudged (0.03s)
+---
+> --- PASS: TestWriteGateAllPathsNonSyncStaysExempt (0.07s)
+> --- PASS: TestWriteGateEveryPathTargetJudged (0.05s)
+diff_rc=1
+namesA=133 namesB=133

@@ -1,0 +1,1 @@
+rc=0 (go build ./... silent when green; this line lands the rc so the cell is not 0 bytes)
