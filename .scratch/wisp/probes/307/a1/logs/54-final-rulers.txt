@@ -1,0 +1,47 @@
+### 307-a1 终局自证尺（现跑 2026-10-11，逐笔⛔ 区间尺）
+-- 自家三笔 --
+205ce69f 10-11 09:57 chore(307-a1): 90-final 补逐笔越界尺与自报缺陷 — 第 3 笔，写面仍仅自家 probes/307/a1
+4d4c10d4 10-11 09:55 chore(307-a1): AC#0 折法名册 + 最小落点候选 + 既有钉名册 + ★台面短名现量
+08cc614e 10-11 09:42 chore(307-a1): anchor — HEAD 1eaa91f +台面读数第 1 笔
+-- 逐笔名册（git show --name-only --format=%H）--
+SHA=08cc614ec1915c76e385ab9e070645512f5861e0
+.scratch/wisp/probes/307/a1/00-anchor.md
+.scratch/wisp/probes/307/a1/logs/00-anchor-readings.log
+.scratch/wisp/probes/307/a1/logs/00-anchor-readings.log.2
+.scratch/wisp/probes/307/a1/logs/00-commit-msg.txt
+SHA=4d4c10d4f03cfd29def0713b42dc5bc9078e8445
+.scratch/wisp/probes/307/a1/10-fold-roster.md
+.scratch/wisp/probes/307/a1/20-landing-shapes.md
+.scratch/wisp/probes/307/a1/30-test-nails.md
+.scratch/wisp/probes/307/a1/40-machine-alias.md
+.scratch/wisp/probes/307/a1/90-final.md
+.scratch/wisp/probes/307/a1/logs/00-anchor-readings.log.2
+.scratch/wisp/probes/307/a1/logs/40-alias-probe.ps1
+.scratch/wisp/probes/307/a1/logs/40-alias-probe.txt
+.scratch/wisp/probes/307/a1/logs/41-alias-world-probe.ps1
+.scratch/wisp/probes/307/a1/logs/41-alias-world-probe.txt
+.scratch/wisp/probes/307/a1/logs/50-selfcheck.txt
+.scratch/wisp/probes/307/a1/logs/51-zero-fix.txt
+.scratch/wisp/probes/307/a1/logs/90-commit-msg.txt
+.scratch/wisp/probes/307/a1/logs/g-a-defs.txt
+.scratch/wisp/probes/307/a1/logs/g-b-resolver.txt
+.scratch/wisp/probes/307/a1/logs/g-c-prov.txt
+.scratch/wisp/probes/307/a1/logs/g-d-home.txt
+.scratch/wisp/probes/307/a1/logs/g-e-nails.txt
+.scratch/wisp/probes/307/a1/logs/g-g-noprobe.txt
+.scratch/wisp/probes/307/a1/logs/g-h-prod.txt
+.scratch/wisp/probes/307/a1/logs/g-i-negatives.txt
+.scratch/wisp/probes/307/a1/logs/g-j-misc.txt
+.scratch/wisp/probes/307/a1/logs/g-k-crossface.txt
+.scratch/wisp/probes/307/a1/logs/g-k-crossface.txt.2
+SHA=205ce69f8632d32230940d36c4f7723b9782ea29
+.scratch/wisp/probes/307/a1/90-final.md
+.scratch/wisp/probes/307/a1/logs/52-commit2.txt
+-- 名册里越出自家区间的行数（尺=grep -v '^\.scratch/wisp/probes/307/a1/'，⛔ 空输出行）--
+0
+0
+0
+-- 件数/0 字节/.go/.out --
+files=30 zero=0 go=0 out=0
+-- push 次数＝0；本腿 Go 编译面发数＝0（build/vet/test/gofmt/d22scan/env/list 全 0）--
+rc_54=0
