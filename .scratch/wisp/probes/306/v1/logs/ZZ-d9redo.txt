@@ -1,0 +1,43 @@
+=== D9redo: B1 vs B2 roster diff (both from sens) ===
+rc_diff_B1_B2=0
+B1_lines=1 B2_lines=1
+B1_roster_verbatim:
+--- SKIP: TestLiveWasapiSmoke
+B2_roster_verbatim:
+--- SKIP: TestLiveWasapiSmoke
+=== B5 (driver2, no-fixture + mut192) recount from file ===
+rc_B5_note=not_recorded_in_summary(script_parse_error); recounting
+B5_topFAIL=0 B5_topPASS=42 B5_topSKIP=1 B5_okline=1
+ok  	github.com/CarlosShao/wisp/internal/audio	16.163s
+=== failure messages, key scenarios ===
+--- P1-mut192 ---
+    wavinjector_extensible_float_306_test.go:177: parseWav error = unsupported wav format: tag=65534 bits=32 (want PCM16 or float32), want nil: an extensible fmt tag with a float SubFormat has to resolve to the float32 path (tag read at wavinjector.go:192 and :196, branch chosen at :218); rate=0 chans=0
+    wavinjector_extensible_float_306_test.go:213: NewWavInjector error = wav C:\Users\swq\AppData\Local\Temp\TestWavInjectorExtensibleFloat323062335602401\001\extensible-float32-306.wav: unsupported wav format: tag=65534 bits=32 (want PCM16 or float32), want nil: the injector must accept a 40-byte extensible fmt chunk with a float32 SubFormat, not reject it as an unsupported wav format
+--- P2-mut218 ---
+    wavinjector_extensible_float_306_test.go:177: parseWav error = unsupported wav format: tag=3 bits=32 (want PCM16 or float32), want nil: an extensible fmt tag with a float SubFormat has to resolve to the float32 path (tag read at wavinjector.go:192 and :196, branch chosen at :218); rate=0 chans=0
+    wavinjector_extensible_float_306_test.go:213: NewWavInjector error = wav C:\Users\swq\AppData\Local\Temp\TestWavInjectorExtensibleFloat323061467010185\001\extensible-float32-306.wav: unsupported wav format: tag=3 bits=32 (want PCM16 or float32), want nil: the injector must accept a 40-byte extensible fmt chunk with a float32 SubFormat, not reject it as an unsupported wav format
+--- P3-mut196-boundsshift ---
+    wavinjector_extensible_float_306_test.go:177: parseWav error = unsupported wav format: tag=0 bits=32 (want PCM16 or float32), want nil: an extensible fmt tag with a float SubFormat has to resolve to the float32 path (tag read at wavinjector.go:192 and :196, branch chosen at :218); rate=0 chans=0
+    wavinjector_extensible_float_306_test.go:213: NewWavInjector error = wav C:\Users\swq\AppData\Local\Temp\TestWavInjectorExtensibleFloat32306888516161\001\extensible-float32-306.wav: unsupported wav format: tag=0 bits=32 (want PCM16 or float32), want nil: the injector must accept a 40-byte extensible fmt chunk with a float32 SubFormat, not reject it as an unsupported wav format
+--- P4-mut196-literalwording ---
+panic: runtime error: index out of range [1] with length 0 [recovered, repanicked]
+--- VR-mut192 ---
+    wavinjector_extensible_float_306_test.go:182: rate = 0, want 48000 (read at fmt body +4)
+    wavinjector_extensible_float_306_test.go:185: chans = 0, want 2 (read at fmt body +2)
+    wavinjector_extensible_float_306_test.go:188: len(samples) = 0, want 8: 8 float32 samples are 32 data bytes, and the only other reading of those bytes is 16 PCM16 samples
+--- VR-mut196boundsshift ---
+    wavinjector_extensible_float_306_test.go:182: rate = 0, want 48000 (read at fmt body +4)
+    wavinjector_extensible_float_306_test.go:185: chans = 0, want 2 (read at fmt body +2)
+    wavinjector_extensible_float_306_test.go:188: len(samples) = 0, want 8: 8 float32 samples are 32 data bytes, and the only other reading of those bytes is 16 PCM16 samples
+--- VA-mut218 ---
+    wavinjector_extensible_float_306_test.go:177: parseWav error = unsupported wav format: tag=3 bits=32 (want PCM16 or float32), want nil: an extensible fmt tag with a float SubFormat has to resolve to the float32 path (tag read at wavinjector.go:192 and :196, branch chosen at :218); rate=0 chans=0
+    wavinjector_extensible_float_306_test.go:213: NewWavInjector error = wav C:\Users\swq\AppData\Local\Temp\TestWavInjectorExtensibleFloat32306640943450\001\extensible-float32-306.wav: unsupported wav format: tag=3 bits=32 (want PCM16 or float32), want nil: the injector must accept a 40-byte extensible fmt chunk with a float32 SubFormat, not reject it as an unsupported wav format
+--- FLIP-line187 ---
+    wavinjector_extensible_float_306_test.go:188: len(samples) = 8, want 8: 8 float32 samples are 32 data bytes, and the only other reading of those bytes is 16 PCM16 samples
+--- FLIP-line192 ---
+    wavinjector_extensible_float_306_test.go:193: sample 0 = 32767, want 32767 (float32 1 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 1 = -32768, want -32768 (float32 -1 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 2 = 16384, want 16384 (float32 0.5 converted through the format-3 branch)
+--- FLIP-line217 ---
+    wavinjector_extensible_float_306_test.go:218: injector holds 8 samples, want 8
+rc=0

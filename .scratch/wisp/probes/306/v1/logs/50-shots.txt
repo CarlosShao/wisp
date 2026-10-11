@@ -1,0 +1,28 @@
+=== N0 pristine check of tree + start Sun Oct 11 08:08:32 CST 2026 ===
+N0_rc_tree_inj_clean=0
+=== N1 parse_wave_format_300_windows_test.go:101 (the ticket's 兄弟件 :101 claim) ===
+			face:    face300{channels: 2, rate: 48000, bits: 32, data1: 3, data1At: 24},
+			wantTag: 3,
+			why:     "KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24",
+		},
+		{
+101:			why:     "KSDATAFORMAT_SUBTYPE_IEEE_FLOAT (mmreg.h:2483, Data1=0x00000003) at byte 24",
+=== N2 three more full-package shots at HEAD tree (single-shot rosters) ===
+SHOT3 rc=0 topFAIL=0 topPASS=44 topSKIP=1 subPASS=12
+  roster3: --- SKIP: TestLiveWasapiSmoke|
+SHOT4 rc=0 topFAIL=0 topPASS=44 topSKIP=1 subPASS=12
+  roster4: --- SKIP: TestLiveWasapiSmoke|
+SHOT5 rc=0 topFAIL=0 topPASS=44 topSKIP=1 subPASS=12
+  roster5: --- SKIP: TestLiveWasapiSmoke|
+=== N3 pairwise roster diffs across 5 shots (single-shot ruler, not intersection) ===
+diff_B1_vs_B2_rc=0
+diff_B1_vs_B3_rc=0
+diff_B1_vs_B4_rc=0
+=== N4 fixture present + mut196 literal, FULL -v (does the sibling test run?) ===
+N4 rc=1 topFAIL=1 topPASS=36 topSKIP=1 RUN306=1 panics=1
+=== RUN   TestParseWavExtensibleFloat32306
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+panic: runtime error: index out of range [1] with length 0 [recovered, repanicked]
+=== N5 restore tree ===
+N5_rc_restored=0
+rc_outer=0

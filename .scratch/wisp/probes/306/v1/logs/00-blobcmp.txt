@@ -1,0 +1,19 @@
+=== blob vs worktree cmp (wavinjector.go) ===
+rc_show=0
+rc_blob_vs_worktree_cmp=0
+=== line 192/196/218 in blob, verbatim ===
+			if fmtTag == 0xFFFE { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+				fmtTag = binary.LittleEndian.Uint16(data[body+24 : body+26])
+	case fmtTag == 3 && bits == 32:
+=== files in internal/audio matching 306 ===
+internal/audio/wave_format_float_300_windows_test.go
+internal/audio/wavinjector.go
+internal/audio/wavinjector_extensible_float_306_test.go
+internal/audio/wavinjector_test.go
+=== wc -l ===
+  228 internal/audio/wavinjector.go
+  225 internal/audio/wavinjector_extensible_float_306_test.go
+  282 internal/audio/wave_format_float_300_windows_test.go
+  310 internal/audio/wavinjector_test.go
+ 1045 total
+rc=0

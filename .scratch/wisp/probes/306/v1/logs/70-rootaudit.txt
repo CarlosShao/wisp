@@ -1,0 +1,39 @@
+=== W1 root-level untracked files: mtimes (which, if any, are mine after 07:45 today) ===
+2026-10-11 08:11:06.000000000 +0800 -
+2026-10-06 16:57:57.940214000 +0800 1
+2026-10-06 16:57:57.901935900 +0800 4
+2026-10-03 10:21:07.707204100 +0800 2026-09-24
+2026-10-02 09:15:21.324989300 +0800 2379
+2026-10-06 16:57:57.863310400 +0800 397
+2026-10-03 10:21:41.342966500 +0800 agent
+2026-10-10 14:44:24.427611600 +0800 core-after.A-evaluated.txt
+2026-10-10 14:44:24.616738400 +0800 core-after.A-fail.txt
+2026-10-10 14:44:24.536201200 +0800 core-after.A-pass.txt
+2026-10-10 14:44:24.665311600 +0800 core-after.A-skip.txt
+2026-10-10 14:44:24.489491800 +0800 core-after.B-evaluated.txt
+2026-09-27 17:39:38.119222400 +0800 part1-state1-fixed.txt
+2026-09-27 17:40:49.275472300 +0800 part2-nog6-fixed.txt
+2026-09-25 18:48:20.354277200 +0800 .zcodeignore
+W1_newest_after_0745:
+=== W2 leg's own 00-anchor.md HEAD claim ===
+10:| `git rev-parse HEAD`（第一发，本腿进场） | `a81c2980eb261940001e90190b90456139373225` ＝ 与派单锚号**一致** |
+11:| 派单里给的锚号 | `a81c2980` |
+12:| ★`git rev-parse HEAD`（第二发，落锚件时同一条命令里再量） | **`5480434f82f2a2344cb78701decc97b6acba2958`** ⇒ **锚在两次读数之间漂移了一枚** |
+13:| ★**具名报回（派单第 3 节第 1 条）** | 漂移的那枚＝编排者自己的 `5480434f`（逐字标题起头＝`销 A826 那笔欠账：票 303 AC#3 的"不可满足判据"正式登记（A828，形照票 141）＋派两枚（306-r1 写腿 只读）`），它同时把 **`306-r1` 派了出去** ⇒ 本腿进场时它已经在 `dev` 上。**以盘上为准**：本腿的工作锚＝**`5480434f`**，"改前那发"的导出树也从这一枚取。 |
+14:| ★漂移的影响面（尺＝`git diff --name-only a81c2980 HEAD`） | 名册 22 行里**⛔ 一枚 `internal/`**（尺＝`git diff --name-only a81c2980 HEAD -- internal` ＝ **0 行**，件内 `rc_diff_internal=0`／`diff_internal_lines=0`）⇒ 只动 `docs/reports/**` ＋ `.scratch/wisp/probes/**` ＋ 票 303 文件；`wavinjector.go` 的 `:192`／`:196`／`:218` 三枚内容锚在新旧两枚 HEAD blob 上**逐字相同**（件内 `rc_sed_anchors_head=0` 那三行）。⇒ 漂移⛔ 影响本票任何一行号或判据。 |
+15:| `git rev-parse --abbrev-ref HEAD` | `dev` |
+17:| `git show HEAD:internal/audio/wavinjector.go \| cmp - internal/audio/wavinjector.go` | **`rc_blob_vs_worktree_cmp=0`**（漂移后复量一次仍＝0）⇒ 票面/复验件引用的 `:192`／`:196`／`:218` 三枚行号在工作树与 blob 上逐字相同（两把尺并排，读数⛔ 假设） |
+32:3. commit 带**显式 pathspec**、写在 `$( … )` **之外**；含中文／反引号／`$` 的提交消息一律先 `Write` 成 `logs/msg-*.txt` 再 `git commit -F`；⛔ `git add -A`/`.`、⛔ `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`/`--no-verify`；⛔ 在仓库目录内建 worktree／checkout（"改前那发"台面＝`git archive 5480434f | tar -x` 到 `C:/Users/swq/tmp/` 下的仓外导出树，⛔ `a81c2980`——见 §1 漂移那一行，`internal/` 两枚锚点逐字相同，取盘上最新那枚）。
+=== W3 what is r1/logs/90-commit8.txt (untracked leftover) ===
+644 .scratch/wisp/probes/306/r1/logs/90-commit8.txt
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c8.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/90-commit7.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/306/r1/logs/msg-c8.txt', LF will be replaced by CRLF the next time Git touches it
+[dev e4740e35] 306-r1 交件名册逐字（终局）
+ 3 files changed, 20 insertions(+)
+ create mode 100644 .scratch/wisp/probes/306/r1/logs/90-commit7.txt
+=== W4 r1 committed-vs-disk file counts ===
+disk=78 tracked=77
+=== W5 HEAD now ===
+17dd4a6f1ef38d88973aae8b1e3431f48175e86e
+rc=0

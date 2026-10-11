@@ -1,0 +1,1 @@
+ok  	github.com/CarlosShao/wisp/internal/audio	16.146s	coverage: 60.2% of statements

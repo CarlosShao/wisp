@@ -1,0 +1,36 @@
+=== X1 content of the root file named '-' (owner check) ===
+0 -
+
+--- does it match anything this leg ran? ---
+=== X2 my own session's redirect targets (self-audit: every > in my drivers) ===
+> 
+> "$LOG/B1-roster.txt
+> "$LOG/B2-roster.txt
+> "$LOG/D9-b1-b2-roster-diff.txt
+> "$LOG/g1-vet-worktree.txt
+> "$LOG/g2-d22scan-worktree.txt
+> "$LOG/g3-build-all-exporttree.txt
+> "$LOG/g3b-vet-exporttree.txt
+> "$LOG/g4-gofmt-worktree-internalaudio.txt
+> "$LOG/g4b-gofmt-worktree-fullrepo.txt
+> "$LOG/g5-gofmt-blob-$sha.txt
+> "$SUM
+> "$out
+> $(sed -n 
+>"$LOG/B1-fullpkg-shot1.txt
+>"$LOG/B2-fullpkg-shot2.txt
+>"$LOG/B3-nofixture-fullpkg-v.txt
+>"$LOG/B4-mut192-fullpkg-v.txt
+>"$LOG/B5-nofixture-mut192-fullpkg.txt
+>"$LOG/C1-head-fullpkg.txt
+>"$LOG/C2-nofixture-fullpkg.txt
+>"$LOG/C3-newtests-only.txt
+>"$out
+>&1
+>&1; note 
+>&1; rc=$?
+>/dev/null; showfix
+>= 169 && $. != 207' 
+=== X3 confirm my scoped paths clean after this batch ===
+41
+rc=0

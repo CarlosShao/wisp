@@ -1,0 +1,7 @@
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+    wavinjector_extensible_float_306_test.go:182: rate = 0, want 48000 (read at fmt body +4)
+    wavinjector_extensible_float_306_test.go:185: chans = 0, want 2 (read at fmt body +2)
+    wavinjector_extensible_float_306_test.go:188: len(samples) = 0, want 8: 8 float32 samples are 32 data bytes, and the only other reading of those bytes is 16 PCM16 samples
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.042s
+FAIL

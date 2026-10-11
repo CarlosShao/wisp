@@ -1,0 +1,5 @@
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+    wavinjector_extensible_float_306_test.go:177: parseWav error = <nil>, want nil: an extensible fmt tag with a float SubFormat has to resolve to the float32 path (tag read at wavinjector.go:192 and :196, branch chosen at :218); rate=48000 chans=2
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.038s
+FAIL

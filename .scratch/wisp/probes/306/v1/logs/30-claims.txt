@@ -1,0 +1,77 @@
+=== K1 ticket checkbox state on worktree now (HEAD=17dd4a6f1ef38d88973aae8b1e3431f48175e86e) ===
+29:- [x] **`AC#0` 只读普查（决定落点，⛔ 预设答案）**：交回三张表——
+33:- [ ] **`AC#1` 决定性一发（⛔ 先红再修；本格只产**测试侧**夹具，⛔ 改产码语义）**：让 `0xFFFE`＋`bits==32` 那一支**真的被执行**（extensible 头＋float3
+34:- [ ] **`AC#2` 同族第二枚的牙**：`:192` 的 `0xFFFE`→`0xFFFD` 也必须让指名用例红。⚠ 两枚各一对（改⇒红／`cmp` 逐字节还原⇒绿），缺一枚⛔ 算本格闭合。
+35:- [ ] **`AC#2b` 第三枚行内权威值的牙（★`306-a1` 表① 现量新增、立票时⛔ 数到；凭据与裁语在下面的收腿节 3）**：`:196` 的 SubFormat 偏移 `body+24`→`bod
+36:- [ ] **`AC#3` 只改注释那一格（最小面，⛔ 与 `AC#1`/`AC#2` 同批落）**：把 `wave_format_float_300_windows_test.go:38-41` 那句改成实话（
+37:- [ ] **`AC#4` 门禁＋越界（每把尺自落一行 `rc=N`，0 字节件⛔ 算交）**：`GOFLAGS= go build ./...`／`go vet ./internal/audio/`／`sh s
+K1_checked=1 unchecked=5
+=== K2 did any 306-r1 commit touch a checkbox line? ===
+K2_rc=0  (no output above = 0 checkbox lines touched)
+26	0	.scratch/wisp/issues/306-inline-authoritative-format-tag-literals-in-wavinjector-go-have-no-ruler-at-all.md
+=== K3 claims in the new test-file comment ===
+-- wavinjector_test.go:18,26,27,32 --
+func writeWav(t *testing.T, path string, samples []int16, rate int, chans int) {
+	buf.Write(u32le(16))
+	buf.Write(u16le(1)) // PCM
+	buf.Write(u16le(16))
+-- writeWav call sites (strip definition) --
+11
+10
+      3 internal/audio/captureopt_test.go
+      1 internal/audio/gate_test.go
+      1 internal/audio/hotplug_test.go
+      1 internal/audio/level_test.go
+      4 internal/audio/wavinjector_test.go
+-- hotplug_test.go:581 --
+	parsed, rate, chans, err := parseWav(raw)
+-- wavinjector.go:166 and :65-68 --
+	samples = MonoDownmix(samples, chans)
+	if rate != TargetRate {
+		samples = ResampleLinear(samples, rate, TargetRate)
+	}
+	if len(data) < 12 || string(data[0:4]) != "RIFF" || string(data[8:12]) != "WAVE" {
+-- resample.go:119-129 --
+func FloatToPCM16(in []float32) []int16 {
+	out := make([]int16, len(in))
+	for i, v := range in {
+		s := int64(v*32767 + 0.5)
+		if v < 0 {
+			s = int64(v*32768 - 0.5)
+		}
+		out[i] = clampI16(int32(s))
+	}
+	return out
+}
+-- wasapi_windows.go:188-193 and :378 --
+// -- adds Samples@18, dwChannelMask@20 and SubFormat@24, 40 bytes in total.
+// Samples@18 is a two-byte union of three WORDs (wValidBitsPerSample,
+// wSamplesPerBlock, wReserved); "validBits" is not a field name.
+//
+// SubFormat is the member that carries the real subtype behind a 0xFFFE
+// wFormatTag, so Data1 is read at byte 24. KSDATAFORMAT_SUBTYPE_PCM is 1 and
+	floating := s.format.tag == waveFormatFloat
+-- wave_format_float_300:101 --
+	b := make([]byte, 40)
+	le := binary.LittleEndian
+	le.PutUint16(b[0:], tag)
+	le.PutUint16(b[2:], channels)
+	le.PutUint32(b[4:], rate)
+-- TargetRate def --
+internal/audio/audio.go:43:const TargetRate = 16000
+internal/audio/audio.go:53:const FrameDuration = FrameSamples * time.Second / TargetRate // 32ms
+internal/audio/wasapimic_windows.go:195:	res := NewResampler(stream.Rate(), TargetRate)
+=== K4 P4 panic detail: which test, did sibling run ===
+1:--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+2:panic: runtime error: index out of range [1] with length 0 [recovered, repanicked]
+4:goroutine 8 [running]:
+=== K5 leg's deleted-temp-file content survived? ===
+ls: cannot access 'gtmp-wt.txt': No such file or directory
+ls: cannot access 'gtmp-blob.txt': No such file or directory
+10-gofmt-before.txt
+40-gofmt.txt
+56:    （`gtmp-wt.txt`／`gtmp-blob.txt`）并 `rm -f` 了它们（内容已逐字在 `40-gofmt.txt` 的计数行里，⛔ 证据丢失，但动作本身⛔ 合规）。
+=== K6 repo root leftovers (any stray temp files at root) ===
+ M .gitignore
+ M go.mod
+rc_outer=0

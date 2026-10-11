@@ -1,0 +1,12 @@
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+    wavinjector_extensible_float_306_test.go:193: sample 0 = 32767, want 32767 (float32 1 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 1 = -32768, want -32768 (float32 -1 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 2 = 16384, want 16384 (float32 0.5 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 3 = -16384, want -16384 (float32 -0.5 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 4 = 8192, want 8192 (float32 0.25 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 5 = -8192, want -8192 (float32 -0.25 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 6 = 4096, want 4096 (float32 0.125 converted through the format-3 branch)
+    wavinjector_extensible_float_306_test.go:193: sample 7 = -4096, want -4096 (float32 -0.125 converted through the format-3 branch)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.031s
+FAIL

@@ -1,0 +1,44 @@
+.scratch\wisp\probes\161\r1\runs\b8-probe-bands\internal\a\p_b8.go
+.scratch\wisp\probes\161\r1\runs\unp-bad\internal\a\p_unp.go:5:14: expected ')', found '{'
+.scratch\wisp\probes\161\r1\runs\unp-bad\internal\a\p_unp.go:6:8: missing ',' before newline in parameter list
+.scratch\wisp\probes\161\r1\runs\unp-hides-bans\internal\a\p_unp.go:15:14: expected ')', found '{'
+.scratch\wisp\probes\161\r1\runs\unp-hides-bans\internal\a\p_unp.go:16:8: missing ',' before newline in parameter list
+.scratch\wisp\probes\161\r3\pre-format\guard.no1.go
+.scratch\wisp\probes\161\r3\pre-format\guard.no3.go
+.scratch\wisp\probes\161\r5\negative-control\bad-sample.go
+.scratch\wisp\probes\162\r4\fs_write_m2.go
+.scratch\wisp\probes\163\a1\main.go
+.scratch\wisp\probes\183\r2\mut\task-boxset-off.go
+.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations
+.scratch\wisp\probes\185\r1\mut-m1\hostpath_185.go
+.scratch\wisp\probes\212\v1\mut\main-noq9.go
+.scratch\wisp\probes\222\v1\mutations\m11-budget-50ms-gated\subagent_222_test.go
+.scratch\wisp\probes\224\v2\dialect_probe_test.go
+.scratch\wisp\probes\224\v2\posctrl.go
+.scratch\wisp\probes\226\v1\probe2\main.go
+.scratch\wisp\probes\226\v1\probe3\main.go
+.scratch\wisp\probes\226\v1\probe4\main.go
+.scratch\wisp\probes\226\v1\probe7\main.go
+.scratch\wisp\probes\231\v1\mutation\config_reload_branch_after_prefix.go
+.scratch\wisp\probes\235\v1\mut\prereadoff-m3_222_test.go
+.scratch\wisp\probes\241\v1\posctl\badly_formatted.go
+.scratch\wisp\probes\241\v1\probe_v1_readings_test.go
+.scratch\wisp\probes\257\r2\mut\M1\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M2\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M3\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M4\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M5\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M6\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M7\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M8\firstrun_257_nonpreset_test.go
+.scratch\wisp\probes\259\r1\gofumpt-negctl\probe.go
+.scratch\wisp\probes\33\p1\q1\main.go
+.scratch\wisp\probes\33\p1\q2\main.go
+.scratch\wisp\probes\33\p1\q3\main.go
+.scratch\wisp\probes\33\r5\block_ac13_ac14.go:16:1: expected 'package', found 'func'
+.scratch\wisp\probes\33\r5\logs\prev-test-copy.go
+cmd\wisp\models.go
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+internal\tools\bridge.go

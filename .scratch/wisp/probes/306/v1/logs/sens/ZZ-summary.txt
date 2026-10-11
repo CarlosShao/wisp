@@ -1,0 +1,142 @@
+=== 306-v1 driver start Sun Oct 11 07:57:20 CST 2026 TREE=/c/Users/swq/tmp/306v1-mut-20261011-075658 ===
+SCENARIO=P0-pristine rc=0 topFAIL=0 topPASS=0 topSKIP=0 paniclines=0
+  [P0-pristine] ok  	github.com/CarlosShao/wisp/internal/audio	0.047s
+P1 line192:if fmtTag == 0xFFFD { // WAVE_FORMAT_EXTENSIBLE: real tag is SubFormat[0:2]
+SCENARIO=P1-mut192 rc=1 topFAIL=2 topPASS=0 topSKIP=0 paniclines=0
+  [P1-mut192] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [P1-mut192] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [P1-mut192] FAIL
+  [P1-mut192] FAIL	github.com/CarlosShao/wisp/internal/audio	0.052s
+  [P1-mut192] FAIL
+P2 line218:case fmtTag == 2 && bits == 32:
+SCENARIO=P2-mut218 rc=1 topFAIL=2 topPASS=0 topSKIP=0 paniclines=0
+  [P2-mut218] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [P2-mut218] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [P2-mut218] FAIL
+  [P2-mut218] FAIL	github.com/CarlosShao/wisp/internal/audio	0.041s
+  [P2-mut218] FAIL
+P3 line196:fmtTag = binary.LittleEndian.Uint16(data[body+26 : body+28])
+SCENARIO=P3-mut196-boundsshift rc=1 topFAIL=2 topPASS=0 topSKIP=0 paniclines=0
+  [P3-mut196-boundsshift] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [P3-mut196-boundsshift] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.01s)
+  [P3-mut196-boundsshift] FAIL
+  [P3-mut196-boundsshift] FAIL	github.com/CarlosShao/wisp/internal/audio	0.072s
+  [P3-mut196-boundsshift] FAIL
+P4 line196:fmtTag = binary.LittleEndian.Uint16(data[body+26 : body+26])
+SCENARIO=P4-mut196-literalwording rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=1
+  [P4-mut196-literalwording] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [P4-mut196-literalwording] panic: runtime error: index out of range [1] with length 0 [recovered, repanicked]
+  [P4-mut196-literalwording] FAIL	github.com/CarlosShao/wisp/internal/audio	0.035s
+  [P4-mut196-literalwording] FAIL
+VA_inert_count=6
+SCENARIO=VA-pristine rc=0 topFAIL=0 topPASS=0 topSKIP=0 paniclines=0
+  [VA-pristine] ok  	github.com/CarlosShao/wisp/internal/audio	0.040s
+SCENARIO=VA-mut192 rc=1 topFAIL=2 topPASS=0 topSKIP=0 paniclines=0
+  [VA-mut192] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [VA-mut192] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [VA-mut192] FAIL
+  [VA-mut192] FAIL	github.com/CarlosShao/wisp/internal/audio	0.041s
+  [VA-mut192] FAIL
+SCENARIO=VA-mut218 rc=1 topFAIL=2 topPASS=0 topSKIP=0 paniclines=0
+  [VA-mut218] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [VA-mut218] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [VA-mut218] FAIL
+  [VA-mut218] FAIL	github.com/CarlosShao/wisp/internal/audio	0.043s
+  [VA-mut218] FAIL
+SCENARIO=VA-mut196boundsshift rc=1 topFAIL=2 topPASS=0 topSKIP=0 paniclines=0
+  [VA-mut196boundsshift] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [VA-mut196boundsshift] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.01s)
+  [VA-mut196boundsshift] FAIL
+  [VA-mut196boundsshift] FAIL	github.com/CarlosShao/wisp/internal/audio	0.049s
+  [VA-mut196boundsshift] FAIL
+SCENARIO=VA-mut196literal rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=1
+  [VA-mut196literal] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [VA-mut196literal] panic: runtime error: index out of range [1] with length 0 [recovered, repanicked]
+  [VA-mut196literal] FAIL	github.com/CarlosShao/wisp/internal/audio	0.037s
+  [VA-mut196literal] FAIL
+VR_lines=176:	if false && err != nil {;
+SCENARIO=VR-pristine rc=0 topFAIL=0 topPASS=0 topSKIP=0 paniclines=0
+  [VR-pristine] ok  	github.com/CarlosShao/wisp/internal/audio	0.055s
+SCENARIO=VR-mut192 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [VR-mut192] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [VR-mut192] FAIL
+  [VR-mut192] FAIL	github.com/CarlosShao/wisp/internal/audio	0.042s
+  [VR-mut192] FAIL
+SCENARIO=VR-mut218 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [VR-mut218] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [VR-mut218] FAIL
+  [VR-mut218] FAIL	github.com/CarlosShao/wisp/internal/audio	0.036s
+  [VR-mut218] FAIL
+SCENARIO=VR-mut196boundsshift rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [VR-mut196boundsshift] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [VR-mut196boundsshift] FAIL
+  [VR-mut196boundsshift] FAIL	github.com/CarlosShao/wisp/internal/audio	0.029s
+  [VR-mut196boundsshift] FAIL
+SCENARIO=VR-mut196literal rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=1
+  [VR-mut196literal] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [VR-mut196literal] panic: runtime error: index out of range [1] with length 0 [recovered, repanicked]
+  [VR-mut196literal] FAIL	github.com/CarlosShao/wisp/internal/audio	0.031s
+  [VR-mut196literal] FAIL
+FLIP line171 => if len(raw) == 12+8+40+8+len(w306Floats)*4 {
+SCENARIO=FLIP-line171 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line171] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [FLIP-line171] FAIL
+  [FLIP-line171] FAIL	github.com/CarlosShao/wisp/internal/audio	0.033s
+  [FLIP-line171] FAIL
+FLIP line176 => if err == nil {
+SCENARIO=FLIP-line176 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line176] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [FLIP-line176] FAIL
+  [FLIP-line176] FAIL	github.com/CarlosShao/wisp/internal/audio	0.038s
+  [FLIP-line176] FAIL
+FLIP line181 => if rate == 48000 {
+SCENARIO=FLIP-line181 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line181] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [FLIP-line181] FAIL
+  [FLIP-line181] FAIL	github.com/CarlosShao/wisp/internal/audio	0.032s
+  [FLIP-line181] FAIL
+FLIP line184 => if chans == 2 {
+SCENARIO=FLIP-line184 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line184] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [FLIP-line184] FAIL
+  [FLIP-line184] FAIL	github.com/CarlosShao/wisp/internal/audio	0.036s
+  [FLIP-line184] FAIL
+FLIP line187 => if len(samples) == len(w306WantI16) {
+SCENARIO=FLIP-line187 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line187] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [FLIP-line187] FAIL
+  [FLIP-line187] FAIL	github.com/CarlosShao/wisp/internal/audio	0.033s
+  [FLIP-line187] FAIL
+FLIP line192 => if samples[i] == want {
+SCENARIO=FLIP-line192 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line192] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [FLIP-line192] FAIL
+  [FLIP-line192] FAIL	github.com/CarlosShao/wisp/internal/audio	0.031s
+  [FLIP-line192] FAIL
+FLIP line212 => if err == nil {
+SCENARIO=FLIP-line212 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line212] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [FLIP-line212] FAIL
+  [FLIP-line212] FAIL	github.com/CarlosShao/wisp/internal/audio	0.029s
+  [FLIP-line212] FAIL
+FLIP line217 => if len(inj.samples) == len(w306WantI16) {
+SCENARIO=FLIP-line217 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line217] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [FLIP-line217] FAIL
+  [FLIP-line217] FAIL	github.com/CarlosShao/wisp/internal/audio	0.033s
+  [FLIP-line217] FAIL
+FLIP line221 => if inj.samples[i] == want {
+SCENARIO=FLIP-line221 rc=1 topFAIL=1 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-line221] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [FLIP-line221] FAIL
+  [FLIP-line221] FAIL	github.com/CarlosShao/wisp/internal/audio	0.034s
+  [FLIP-line221] FAIL
+SCENARIO=FLIP-all-from-169 rc=1 topFAIL=2 topPASS=0 topSKIP=0 paniclines=0
+  [FLIP-all-from-169] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [FLIP-all-from-169] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [FLIP-all-from-169] FAIL
+  [FLIP-all-from-169] FAIL	github.com/CarlosShao/wisp/internal/audio	0.030s
+  [FLIP-all-from-169] FAIL
+rc_final_cmp_inj=0
+rc_final_cmp_test=0
+=== driver done Sun Oct 11 07:58:09 CST 2026 ===

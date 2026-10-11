@@ -1,0 +1,57 @@
+=== driver3 start Sun Oct 11 08:03:41 CST 2026 ===
+H1_head_now=17dd4a6f1ef38d88973aae8b1e3431f48175e86e
+H1_head_used_for_tree=e4740e35ff62d9dc8a9732a20cfedbbf4d501a17
+  [H1 newcommit] 17dd4a6f 305-a2 终局：三张表现态＋越界尺逐笔＋我⛔ 做到的四条具名；票 305 末尾追加一条 Progress log bullet（append-only，⛔ 改原句、⛔ 碰框）
+  [H1 newcommit] 8936b100 risk-attrib-1 越界尺名册（逐笔 git show --name-only --format=<hash>，⛔ 区间尺）：三笔 21 枚路径枚枚在 probes/risk-attrib/1/** 自家区间内，⛔ 产码／⛔ _test.go／⛔ 别家路径
+  [H1 newcommit] 1f9e781f risk-attrib-1 表③＋90-final：甲 7 枚该挂票 72（用例名下的比对面／前提面）／乙 5 枚该挂票 252（同一物理缺陷的第二枚调用点 syncdirs 归属网，fail-open，provenance.go:928 已接）／仪器三形登记归裁决者；⛔ 立新票、⛔ 塞票 302；12/12 本机判死
+  [H1 newcommit] 05b37976 305-a2 表①②③落盘（窗口候选名册／文档交接与 Eval 链／判死配方）
+  [H1 newcommit] f4fd71bc risk-attrib-1 表①＋表②（A817 那 12 枚）：名册 12/12 全在 internal/risk；本机 8.3 形状复现一发把 12 枚一次全打红（甲 7＝期望侧读的是调用方拼写／乙 5＝syncdirs 归属比较两侧归一层不对称、fail-open、provenance.go:928 有真生产调用者）＋缺世界 1 枚＋纪律自报 rc= 落空
+  [H1 newcommit] b55a3ff6 收 306-r1 并裁完（A830）：八笔在盘＋★"产码零动"换成 blob hash 复认＋★我派单第二枚⛔ 产不出断言红的判据（AC#2b，取形归 306-v1）＋票 303 的 -done 本轮⛔ 办（规则 6 缺五行 1:1 表）
+  [H1 newcommit] 63bc6335 risk-attrib-1 起手锚（A817 那 12 枚 CI 红的只读归因普查腿·第 1 笔）：台面＋重锚 HEAD=ec87076f＋允许 Go 命令面自陈＋A817 三档待核清单
+  [H1 newcommit] ec87076f 306-v1 起手锚（验收腿 commit-first 第 1 笔）：台面＋重锚 HEAD=e4740e35（派单写的 6284a489 已腐烂，具名报回）＋scoped porcelain＋进程闸门自陈
+  [H1 newcommit] a3560d6b 305-a2 起手闸门重锚：HEAD e4740e35（任务书写的 6284a489 已腐烂）
+  [H1 internal_diff_count] 0
+H1 rc_diffquiet_internal_audio_e4740e35_vs_now=0
+  [H2 preexisting_skip_owner] 5480434f:internal/audio/hotplug_test.go:1
+  [H2 file] 5480434f:internal/audio/hotplug_test.go
+  [H2 interval_files] internal/audio/wave_format_float_300_windows_test.go
+  [H2 interval_files] internal/audio/wavinjector_extensible_float_306_test.go
+PKG run D1-before-nofixture-pristine-shot2 rc=0 topFAIL=0 topPASS=42 topSKIP=1 panics=0
+  [D1-before-nofixture-pristine-shot2] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [D1-before-nofixture-pristine-shot2] ok  	github.com/CarlosShao/wisp/internal/audio	15.958s
+PKG run D2-nofixture-mut192 rc=0 topFAIL=0 topPASS=42 topSKIP=1 panics=0
+  [D2-nofixture-mut192] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [D2-nofixture-mut192] ok  	github.com/CarlosShao/wisp/internal/audio	16.010s
+PKG run D3-nofixture-mut218 rc=0 topFAIL=0 topPASS=42 topSKIP=1 panics=0
+  [D3-nofixture-mut218] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [D3-nofixture-mut218] ok  	github.com/CarlosShao/wisp/internal/audio	16.123s
+PKG run D4-nofixture-mut196boundsshift rc=0 topFAIL=0 topPASS=42 topSKIP=1 panics=0
+  [D4-nofixture-mut196boundsshift] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [D4-nofixture-mut196boundsshift] ok  	github.com/CarlosShao/wisp/internal/audio	15.948s
+PKG run D5-nofixture-mut196literal rc=0 topFAIL=0 topPASS=42 topSKIP=1 panics=0
+  [D5-nofixture-mut196literal] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [D5-nofixture-mut196literal] ok  	github.com/CarlosShao/wisp/internal/audio	15.999s
+PKG run D6-fixture-mut196boundsshift-fullpkg rc=1 topFAIL=2 topPASS=42 topSKIP=1 panics=0
+  [D6-fixture-mut196boundsshift-fullpkg] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [D6-fixture-mut196boundsshift-fullpkg] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [D6-fixture-mut196boundsshift-fullpkg] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [D6-fixture-mut196boundsshift-fullpkg] FAIL
+  [D6-fixture-mut196boundsshift-fullpkg] FAIL	github.com/CarlosShao/wisp/internal/audio	15.937s
+  [D6-fixture-mut196boundsshift-fullpkg] FAIL
+PKG run D7-fixture-mut218-fullpkg rc=1 topFAIL=2 topPASS=42 topSKIP=1 panics=0
+  [D7-fixture-mut218-fullpkg] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [D7-fixture-mut218-fullpkg] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [D7-fixture-mut218-fullpkg] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [D7-fixture-mut218-fullpkg] FAIL
+  [D7-fixture-mut218-fullpkg] FAIL	github.com/CarlosShao/wisp/internal/audio	15.993s
+  [D7-fixture-mut218-fullpkg] FAIL
+D8 rc_final_cmp_inj=0
+D8 rc_final_cmp_test=0
+  [D8 hide_dir_leftover] wavinjector_extensible_float_306_test.go
+D9 rc_diff_B1_B2_rosters=2 bytes=240
+  [D10 gofmt_fullrepo_internalaudio_hits] 0
+  [D10 gofmt_fullrepo_lines] 44
+  [D10 tail] internal\agent\tools.go
+  [D10 tail] internal\risk\provenance.go
+  [D10 tail] internal\tools\bridge.go
+=== driver3 done Sun Oct 11 08:05:44 CST 2026 ===

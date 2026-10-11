@@ -1,0 +1,29 @@
+=== R1 interval rulers re-run against CURRENT HEAD=17dd4a6f1ef38d88973aae8b1e3431f48175e86e (earlier readings used HEAD=e4740e35) ===
+M	internal/audio/wave_format_float_300_windows_test.go
+A	internal/audio/wavinjector_extensible_float_306_test.go
+16	5	internal/audio/wave_format_float_300_windows_test.go
+225	0	internal/audio/wavinjector_extensible_float_306_test.go
+rc_diffquiet_wavinjector=0
+rc_diffquiet_wavinjector_test=0
+--- leg's exact non-comment ruler, at current HEAD ---
+rc_leg_ruler=1
+--- my stricter ruler (also drops indented // lines) ---
+rc_strict_ruler=1
+=== R2 forbidden-path zero-byte checks at current HEAD (票 AC#4 那句禁改清单，本腿自己逐枚) ===
+  rc_diffquiet[internal/audio/wavinjector.go]=0
+  rc_diffquiet[internal/audio/wasapi_windows.go]=0
+  rc_diffquiet[internal/observe/thresholds.go]=0
+  rc_diffquiet[tools/d22scan/allowlist.txt]=0
+  rc_diffquiet[docs/PLAN.md]=0
+  rc_diffquiet[internal/audio/parse_wave_format_300_windows_test.go]=0
+  rc_diffquiet[internal/audio/wave_format_float_300_windows_test.go]=1
+=== R3 三枚冻结件 + frontend/design 命中 ===
+0
+2
+=== R4 new fixture file byte-identical blob vs worktree at current HEAD ===
+rc_306test_blob_vs_worktree=0
+=== R5 gofmt on the new file alone (both rulers) ===
+rc_gofmt_newfile_worktree=0 count_above=0_means_clean
+=== R6 current HEAD again ===
+17dd4a6f1ef38d88973aae8b1e3431f48175e86e
+rc_outer=0

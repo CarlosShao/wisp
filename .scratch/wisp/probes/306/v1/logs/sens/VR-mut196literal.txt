@@ -1,0 +1,22 @@
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+panic: runtime error: index out of range [1] with length 0 [recovered, repanicked]
+
+goroutine 8 [running]:
+testing.tRunner.func1.2({0x7ff72220a708, 0x268faf09a240})
+	D:/work/base/go/src/testing/testing.go:2123 +0x239
+testing.tRunner.func1()
+	D:/work/base/go/src/testing/testing.go:2126 +0x329
+panic({0x7ff72220a708?, 0x268faf09a240?})
+	D:/work/base/go/src/runtime/panic.go:859 +0x125
+encoding/binary.littleEndian.Uint16(...)
+	D:/work/base/go/src/encoding/binary/binary.go:70
+github.com/CarlosShao/wisp/internal/audio.parseWav({0x268faf0a4380, 0x64, 0x64})
+	C:/Users/swq/tmp/306v1-mut-20261011-075658/internal/audio/wavinjector.go:196 +0x8d4
+github.com/CarlosShao/wisp/internal/audio.TestParseWavExtensibleFloat32306(0x268faf084400)
+	C:/Users/swq/tmp/306v1-mut-20261011-075658/internal/audio/wavinjector_extensible_float_306_test.go:175 +0x105
+testing.tRunner(0x268faf084400, 0x7ff722219680)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.031s
+FAIL

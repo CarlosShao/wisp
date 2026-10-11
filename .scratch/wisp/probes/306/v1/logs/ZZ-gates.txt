@@ -1,0 +1,108 @@
+=== G0 tree path = /c/Users/swq/tmp/306v1-mut-20261011-075658 ===
+G0_head=05b379765081f8ca3e4cbecf2296fde7a49ca412
+G1 rc_go_vet_internal_audio_worktree=0  lines=0
+G2 rc_d22scan_worktree=0
+  [G2] 198:        d22scan: scope ban #8 design/           examined   1 text files
+  [G2] 199:        d22scan: scope ban #8 frontend/         examined   1 text files
+  [G2] 200:        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+  [G2] 201:        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+  [G2] 202:        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+  [G2] 204:    scan_test.go:2363: rc=0 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_02761763425/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+  [G2] 205:        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_02761763425/001
+  [G2] 206:        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+  [G2] 207:        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+  [G2] 208:        d22scan: scope ban #6 frontend/         examined   1 text files
+  [G2] 209:        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+  [G2] 210:        d22scan: scope ban #8 design/           examined   1 text files
+  [G2] 211:        d22scan: scope ban #8 frontend/         examined   1 text files
+  [G2] 212:        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+  [G2] 213:        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+  [G2] 214:        d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+  [G2] 219:    --- PASS: TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1 (0.13s)
+  [G2] 221:    --- PASS: TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2 (0.11s)
+  [G2] 223:=== RUN   TestBan9PrefixTablesAreTheSameList
+  [G2] 224:--- PASS: TestBan9PrefixTablesAreTheSameList (0.00s)
+  [G2] 242:d22scan: examined 268 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+  [G2] 243:d22scan: scope bans #1-5 internal/      examined 229 production Go files
+  [G2] 244:d22scan: scope bans #1-5 cmd/           examined  39 production Go files
+  [G2] 245:d22scan: scope ban #6 frontend/         examined  85 text files
+  [G2] 246:d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+  [G2] 247:d22scan: scope ban #8 design/           examined  39 text files
+  [G2] 248:d22scan: scope ban #8 frontend/         examined  85 text files
+  [G2] 249:d22scan: scope ban #8 internal/         examined 527 Go files, comments and _test.go included
+  [G2] 250:d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included
+  [G2] 251:d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=229, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=527, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 527 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included
+G3 rc_go_build_all_EXPORTTREE=0  (scope: git archive e4740e35 tree, NOT the shared worktree)  lines=0
+G3b rc_go_vet_internal_audio_EXPORTTREE=0
+G4 rc_gofmt_worktree=0 roster_count=0 scope=worktree:internal/audio
+G4b rc_gofmt_worktree_fullrepo=2 roster_count=44 scope=worktree:whole_repo_tracked_and_untracked_files
+G5 rc_archive_5480434f=0 rc_archive_HEAD=0
+G5 gofmt -l blob=5480434f scope=internal/audio rc=0 unformatted_count=0 total_go_files_in_scope=21
+G5 gofmt -l blob=e4740e35 scope=internal/audio rc=0 unformatted_count=0 total_go_files_in_scope=22
+  [G6 ban8] 25:=== RUN   TestEmojiBanCoversGoSourcesNotJustDesign
+  [G6 ban8] 26:--- PASS: TestEmojiBanCoversGoSourcesNotJustDesign (0.04s)
+  [G6 ban8] 33:=== RUN   TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band
+  [G6 ban8] 45:    --- PASS: TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band (0.03s)
+  [G6 ban8] 93:=== RUN   TestDeclaredEmojiScopeCannotWalkZeroFiles
+  [G6 ban8] 94:--- PASS: TestDeclaredEmojiScopeCannotWalkZeroFiles (0.10s)
+  [G6 ban8] 113:    scan_test.go:1155: ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+  [G6 ban8] 119:    scan_test.go:1261: verified ban #8 internal/: 527 files
+  [G6 ban8] 120:    scan_test.go:1261: verified ban #8 cmd/: 119 files
+  [G6 ban8] 122:    scan_test.go:1261: verified ban #8 frontend/: 85 files
+  [G6 ban8] 148:        d22scan: scope ban #8 design/           examined   1 text files
+  [G6 ban8] 149:        d22scan: scope ban #8 frontend/         examined   1 text files
+  [G6 ban8] 150:        d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+  [G6 ban8] 151:        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+  [G6 ban8] 161:        d22scan: scope ban #8 design/           examined   1 text files
+  [G6 ban8] 162:        d22scan: scope ban #8 frontend/         examined   1 text files
+  [G6 ban8] 163:        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+  [G6 ban8] 164:        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+  [G6 ban8] 173:        d22scan: scope ban #8 design/           examined   1 text files
+  [G6 ban8] 174:        d22scan: scope ban #8 frontend/         examined   2 text files
+  [G6 ban8] 175:        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+  [G6 ban8] 176:        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+  [G6 ban8] 186:        d22scan: scope ban #8 design/           examined   1 text files
+  [G6 ban8] 187:        d22scan: scope ban #8 frontend/         examined   0 text files
+  [G6 ban8] 188:        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+  [G6 ban8] 189:        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+  [G6 ban8] 190:        stderr=d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+  [G6 ban8] 198:        d22scan: scope ban #8 design/           examined   1 text files
+  [G6 ban8] 199:        d22scan: scope ban #8 frontend/         examined   1 text files
+  [G6 ban8] 200:        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+  [G6 ban8] 201:        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+  [G6 ban8] 210:        d22scan: scope ban #8 design/           examined   1 text files
+  [G6 ban8] 211:        d22scan: scope ban #8 frontend/         examined   1 text files
+  [G6 ban8] 212:        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+  [G6 ban8] 213:        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+  [G6 ban8] 214:        d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+  [G6 ban8] 247:d22scan: scope ban #8 design/           examined  39 text files
+  [G6 ban8] 248:d22scan: scope ban #8 frontend/         examined  85 text files
+  [G6 ban8] 249:d22scan: scope ban #8 internal/         examined 527 Go files, comments and _test.go included
+  [G6 ban8] 250:d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included
+  [G6 ban8] 251:d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=229, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=527, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 527 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included
+  [G6 d22tail] === RUN   TestSelfTestRosterAuditRejectsAHollowTable
+  [G6 d22tail] --- PASS: TestSelfTestRosterAuditRejectsAHollowTable (0.00s)
+  [G6 d22tail] === RUN   TestSelfTestRefusesToAuditAnEmptyRoster
+  [G6 d22tail] === RUN   TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster
+  [G6 d22tail] === RUN   TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers
+  [G6 d22tail] --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster (0.00s)
+  [G6 d22tail]     --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster (0.00s)
+  [G6 d22tail]     --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers (0.00s)
+  [G6 d22tail] === RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+  [G6 d22tail] --- PASS: TestSelfTestFlagIsWiredInTheBuiltBinary (5.00s)
+  [G6 d22tail] PASS
+  [G6 d22tail] ok  	github.com/CarlosShao/wisp/tools/d22scan	21.401s
+  [G6 d22tail] runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+  [G6 d22tail] d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+  [G6 d22tail] d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+  [G6 d22tail] d22scan: examined 268 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+  [G6 d22tail] d22scan: scope bans #1-5 internal/      examined 229 production Go files
+  [G6 d22tail] d22scan: scope bans #1-5 cmd/           examined  39 production Go files
+  [G6 d22tail] d22scan: scope ban #6 frontend/         examined  85 text files
+  [G6 d22tail] d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+  [G6 d22tail] d22scan: scope ban #8 design/           examined  39 text files
+  [G6 d22tail] d22scan: scope ban #8 frontend/         examined  85 text files
+  [G6 d22tail] d22scan: scope ban #8 internal/         examined 527 Go files, comments and _test.go included
+  [G6 d22tail] d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included
+  [G6 d22tail] d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=229, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=527, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 527 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included
+=== done Sun Oct 11 08:02:58 CST 2026 ===

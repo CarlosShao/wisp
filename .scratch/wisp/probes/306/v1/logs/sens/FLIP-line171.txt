@@ -1,0 +1,5 @@
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+    wavinjector_extensible_float_306_test.go:172: fixture length = 100, want 100
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.033s
+FAIL

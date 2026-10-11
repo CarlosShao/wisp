@@ -1,0 +1,102 @@
+=== M1 where is the mmreg.h:2483 citation in the 300 windows test ===
+25:// out of the Windows SDK header shared/mmreg.h -- an out-of-repo file, not
+28:// .scratch/wisp/probes/300/orch/2026-10-10-mmreg-authority.txt. This case does
+39:// WAVE_FORMAT_EXTENSIBLE are defined in mmreg.h (installed 10.0.26100.0 tree:
+42:// mmreg.h". That second half is wrong on disk, and ticket 306 AC#3 corrects
+43:// exactly that sentence and nothing else: mmreg.h DOES define the GUID, at
+44:// mmreg.h:2480-2484, whose DEFINE_GUIDSTRUCT("00000003-0000-0010-8000-00aa00389b71", KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
+45:// sits at :2483; ksmedia.h:850-855 carries an alternative second definition of
+49:// mmreg.h". Neither definition is what this case pins: the authority behind the
+50:// mmregWaveFormatIEEEFloat literal below is the FORMAT TAG at mmreg.h:2110
+52:// 3 because the GUID is built out of the tag. mmreg.h is also what fixed the
+80:	// mmreg.h:2418, verbatim: "#define WAVE_FORMAT_PCM         1"
+81:	mmregWaveFormatPCM uint16 = 1
+83:	// mmreg.h:2110, verbatim:
+85:	mmregWaveFormatIEEEFloat uint16 = 0x0003
+87:	// mmreg.h:2376, verbatim:
+89:	mmregWaveFormatExtensible uint16 = 0xFFFE
+131:// r2AuthorityEntry is one row of the table copied out of mmreg.h. The table is
+143:	{mmregWaveFormatPCM, "WAVE_FORMAT_PCM", "mmreg.h:2418", "waveFormatPCM"},
+144:	{mmregWaveFormatIEEEFloat, "WAVE_FORMAT_IEEE_FLOAT", "mmreg.h:2110", "waveFormatFloat"},
+145:	{mmregWaveFormatExtensible, "WAVE_FORMAT_EXTENSIBLE", "mmreg.h:2376", "waveFormatExt"},
+151:// the test carries from mmreg.h. Changing waveFormatFloat therefore moves the
+171:			want:      mmregWaveFormatIEEEFloat,
+172:			authority: "mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT 0x0003, copied out of the SDK header, not derived from this package",
+181:			want:      mmregWaveFormatExtensible,
+182:			authority: "mmreg.h:2376 WAVE_FORMAT_EXTENSIBLE 0xFFFE, copied out of the SDK header",
+190:			want:      mmregWaveFormatPCM,
+191:			authority: "mmreg.h:2418 WAVE_FORMAT_PCM 1, copied out of the SDK header",
+225:					t.Errorf("%s and %s both = %#04x, but mmreg.h gives WAVE_FORMAT_PCM 1, "+
+227:						"so one of those two constants has moved off the value copied from mmreg.h:2418/2110/2376",
+240:					t.Errorf("%s = %#04x, but mmreg.h reserves %#04x for %s (%s), which this package declares as "+
+247:					"WAVE_FORMAT_EXTENSIBLE 0xFFFE as copied from mmreg.h:2418/2110/2376", o.name, o.value)
+258:		face := r2Face(mmregWaveFormatExtensible, 2, 48000, 32, 22, uint32(mmregWaveFormatIEEEFloat), 24)
+260:		if got.tag != mmregWaveFormatIEEEFloat {
+261:			t.Errorf("parseWaveFormat on a face tagged %#04x (mmreg.h:2376 WAVE_FORMAT_EXTENSIBLE) returned tag = "+
+262:				"%#04x, want %#04x (mmreg.h:2110 WAVE_FORMAT_IEEE_FLOAT); waveFormatExt is the constant the parser "+
+265:				mmregWaveFormatExtensible, got.tag, mmregWaveFormatIEEEFloat)
+274:		face := r2Face(mmregWaveFormatPCM, 1, 48000, 16, 0, uint32(mmregWaveFormatIEEEFloat), 24)
+276:		if got.tag != mmregWaveFormatPCM {
+277:			t.Errorf("parseWaveFormat on a face tagged %#04x (mmreg.h:2418 WAVE_FORMAT_PCM, cbSize 0) returned tag = "+
+279:				mmregWaveFormatPCM, got.tag, mmregWaveFormatPCM)
+=== M2 leg's 40-gofmt.txt verbatim (does the deleted gtmp content survive) ===
+26 .scratch/wisp/probes/306/r1/logs/40-gofmt.txt
+# 306-r1 logs/40-gofmt.txt 时刻=2026-10-11 07:37:57 +0800
+=== 尺 A：工作树那把，射程目录=internal/audio（gofmt -l internal/audio）===
+rc_gofmt_worktree=0
+worktree_unformatted_count=0
+=== 尺 B：HEAD blob 那把，逐个 git show HEAD:<path> 落到仓外 tmp 目录再 gofmt -l ===
+tr: warning: an unescaped backslash at end of string is not portable
+blob_files_dumped=22 (射程=internal/audio 的全部 .go，含 _test.go)
+rc_gofmt_blob=0
+blob_unformatted_count=0
+=== 两把并排的差：工作树名册枚数 vs blob 名册枚数 ===
+delta_files=0 vs blob=0
+=== 新增那枚文件在两把尺里的位置 ===
+worktree side: 0 (0 = 净)
+blob side: the file is NOT in HEAD (it is this leg's addition): 1 in HEAD listing above? see next line
+rc_in_head=0 (1 = 它确实不在 HEAD，是本腿新增；它在工作树那把尺里 0 命中=格式净)
+
+=== 更正上面一处措辞缺陷（本腿自己写的标签与盘上不符，追加而不删原句）===
+上面那句 'the file is NOT in HEAD' 写错了：本腿的第 2 笔（fbd150e3 的祖先）已经把新用例落进 commit，
+所以现量 HEAD=c888420e 里那枚文件存在（rc_in_head=0 才是盘上读数）。
+为让新增 0 枚这句有一把⛔ 被自己的 commit 污染的尺，另取两把并排：
+blob dump from the ENTRY anchor 5480434f: files=21 (this is the pre-work face)
+rc_gofmt_blob_before_anchor=0
+unformatted at 5480434f blobs = 0
+unformatted at HEAD blobs (22 files, incl. the new fixture) = 0
+unformatted in the worktree (gofmt -l internal/audio) = 0
+file counts: 5480434f .go in internal/audio = 21 ; HEAD = 22 ; 差 = 1 = 本腿新增那枚（它⛔ 进未格式名册）
+=== M3 dirty go.mod: what does it change ===
+warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next time Git touches it
+ go.mod | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next time Git touches it
+diff --git a/go.mod b/go.mod
+index 204d08ed..fdfd1466 100644
+--- a/go.mod
++++ b/go.mod
+@@ -5,6 +5,7 @@ go 1.27
+ toolchain go1.27.1
+ 
+ require (
++	github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808
+ 	github.com/k2-fsa/sherpa-onnx-go v1.13.8
+ 	github.com/pelletier/go-toml/v2 v2.2.4
+ 	golang.org/x/crypto v0.57.0
+@@ -16,7 +17,6 @@ require (
+ require (
+ 	github.com/dustin/go-humanize v1.0.1 // indirect
+ 	github.com/google/uuid v1.6.0 // indirect
+-	github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808 // indirect
+ 	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
+ 	github.com/k2-fsa/sherpa-onnx-go-linux v1.13.8 // indirect
+ 	github.com/k2-fsa/sherpa-onnx-go-macos v1.13.8 // indirect
+=== M4 dirty .gitignore (not mine, context only) ===
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+ .gitignore | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+=== M5 does the interval 5480434f..HEAD touch go.mod/go.sum ===
+0
+M5_rc_diffquiet_gomod_gosum=0
+rc_outer=0

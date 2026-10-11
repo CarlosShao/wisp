@@ -1,0 +1,93 @@
+=== V1 r1 deliverable roster (leg claims 6 md + 66 logs, find -size 0 = 0, .out = 0) ===
+V1_md=6 logs=72 zero_byte=0 dot_out=0
+V1_zero_list:
+=== V2 union roster over the 8 306-r1 commits (explicit hashes, NO /tmp glob) ===
+V2_union=80
+V2_internal_audio=2
+V2_probes_r1=77
+V2_issue_ticket=1
+V2_outside_count=0
+=== V3 per-commit outside counts ===
+  4e73d0a5 files=7 outside=0
+  1b34e475 files=5 outside=0
+  c0d5ec24 files=6 outside=0
+  fbd150e3 files=35 outside=0
+  71249b05 files=21 outside=0
+  6284a489 files=3 outside=0
+  53aa4b16 files=6 outside=0
+  e4740e35 files=3 outside=0
+=== V4 parentage / anchor drift ===
+4e73d0a5 parent=5f891575
+5480434f parent=a81c2980
+=== V5 tracked .wav count (leg claim 0) ===
+0
+V5_wav_count_rc=1
+=== V6 top-level func Test counts in internal/audio ===
+at 5480434f: 43
+at HEAD:    45
+=== V7 my own scoped porcelain (end of leg session) ===
+?? .scratch/wisp/probes/306/r1/logs/90-commit8.txt
+?? .scratch/wisp/probes/306/v1/logs/00-blob-wavinjector.go
+?? .scratch/wisp/probes/306/v1/logs/00-blobcmp.txt
+?? .scratch/wisp/probes/306/v1/logs/10-diffscope.txt
+?? .scratch/wisp/probes/306/v1/logs/20-ac3-diff.txt
+?? .scratch/wisp/probes/306/v1/logs/20-sdk-find.txt
+?? .scratch/wisp/probes/306/v1/logs/20-sdk-lines.txt
+?? .scratch/wisp/probes/306/v1/logs/30-claims.txt
+?? .scratch/wisp/probes/306/v1/logs/40-misc.txt
+?? .scratch/wisp/probes/306/v1/logs/50-shots.txt
+?? .scratch/wisp/probes/306/v1/logs/60-legclaims.txt
+?? .scratch/wisp/probes/306/v1/logs/D1-before-nofixture-pristine-shot2.txt
+?? .scratch/wisp/probes/306/v1/logs/D2-nofixture-mut192.txt
+?? .scratch/wisp/probes/306/v1/logs/D3-nofixture-mut218.txt
+?? .scratch/wisp/probes/306/v1/logs/D4-nofixture-mut196boundsshift.txt
+?? .scratch/wisp/probes/306/v1/logs/D5-nofixture-mut196literal.txt
+?? .scratch/wisp/probes/306/v1/logs/D6-fixture-mut196boundsshift-fullpkg.txt
+?? .scratch/wisp/probes/306/v1/logs/D7-fixture-mut218-fullpkg.txt
+?? .scratch/wisp/probes/306/v1/logs/D9-b1-b2-roster-diff.txt
+?? .scratch/wisp/probes/306/v1/logs/D9redo-roster-diff.txt
+?? .scratch/wisp/probes/306/v1/logs/N4-fixture-mut196literal-fullpkg-v.txt
+?? .scratch/wisp/probes/306/v1/logs/TREE-PATH.txt
+?? .scratch/wisp/probes/306/v1/logs/V2-union.txt
+?? .scratch/wisp/probes/306/v1/logs/ZZ-controls.txt
+?? .scratch/wisp/probes/306/v1/logs/ZZ-d9redo.txt
+?? .scratch/wisp/probes/306/v1/logs/ZZ-gates.txt
+?? .scratch/wisp/probes/306/v1/logs/controls-driver.sh
+?? .scratch/wisp/probes/306/v1/logs/cov-roster-driver.sh
+?? .scratch/wisp/probes/306/v1/logs/g1-vet-worktree.txt
+?? .scratch/wisp/probes/306/v1/logs/g2-d22scan-worktree.txt
+?? .scratch/wisp/probes/306/v1/logs/g3-build-all-exporttree.txt
+?? .scratch/wisp/probes/306/v1/logs/g3b-vet-exporttree.txt
+?? .scratch/wisp/probes/306/v1/logs/g4-gofmt-worktree-internalaudio.txt
+?? .scratch/wisp/probes/306/v1/logs/g4b-gofmt-worktree-fullrepo.txt
+?? .scratch/wisp/probes/306/v1/logs/g5-gofmt-blob-5480434f.txt
+?? .scratch/wisp/probes/306/v1/logs/g5-gofmt-blob-e4740e35.txt
+?? .scratch/wisp/probes/306/v1/logs/gates-driver.sh
+?? .scratch/wisp/probes/306/v1/logs/sens-driver.sh
+?? .scratch/wisp/probes/306/v1/logs/sens-smoke.txt
+?? .scratch/wisp/probes/306/v1/logs/sens/
+=== V8 repo-root untracked leftovers from MY session (scope=repo root only, non-recursive) ===
+?? -
+?? .zcodeignore
+?? 1
+?? 2026-09-24
+?? 2379
+?? 397
+?? 4
+?? agent
+?? core-after.A-evaluated.txt
+?? core-after.A-fail.txt
+?? core-after.A-pass.txt
+?? core-after.A-skip.txt
+?? core-after.B-evaluated.txt
+?? part1-state1-fixed.txt
+?? part1-state1-pristine.txt
+?? part1-state2-fixed.txt
+?? part1-state2-pristine.txt
+?? part2-nog6-fixed.txt
+?? part2-nog6-pristine.txt
+?? part3-stale-fixed.txt
+V8_root_untracked=47
+=== V9 current HEAD again ===
+17dd4a6f1ef38d88973aae8b1e3431f48175e86e
+rc_outer=0

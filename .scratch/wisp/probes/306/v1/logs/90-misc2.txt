@@ -1,0 +1,34 @@
+=== Y1 waveFormatPCM still present (leg claim: wasapi 1 行 / test file 7 行) ===
+internal/audio/wasapi_windows.go:1
+internal/audio/wave_format_float_300_windows_test.go:7
+internal/audio/parse_wave_format_300_windows_test.go:0
+=== Y2 build-tag check on the new file (lines 1-2 verbatim) ===
+package audio
+
+1
+=== Y3 票 300 两枚钉的形状（本腿自己跑，-v 过滤） ===
+rc_Y3=0
+  --- PASS: TestParseWaveFormatSubFormatOffset300 (0.00s)
+      --- PASS: TestParseWaveFormatSubFormatOffset300/S1_float_at_24 (0.00s)
+      --- PASS: TestParseWaveFormatSubFormatOffset300/S2_pcm_at_24 (0.00s)
+      --- PASS: TestParseWaveFormatSubFormatOffset300/S3_bogus_subtype_7_at_24 (0.00s)
+      --- PASS: TestParseWaveFormatSubFormatOffset300/S4_data1_shifted_to_26 (0.00s)
+  --- PASS: TestWaveFormatConstantsMatchMmregAuthority300 (0.00s)
+      --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/ieee_float_low_word (0.00s)
+      --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/extensible_tag (0.00s)
+      --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/pcm_tag (0.00s)
+      --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/the_three_constants_map_one_to_one_onto_the_authority_table (0.00s)
+      --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/parseWaveFormat_expands_a_face_tagged_with_the_authority_extensible_value (0.00s)
+      --- PASS: TestWaveFormatConstantsMatchMmregAuthority300/control_plain_pcm_tag_is_not_expanded (0.00s)
+  ok  	github.com/CarlosShao/wisp/internal/audio	0.031s
+topPASS=2 subPASS=10
+=== Y4 cross-platform vet (leg's extra two, ticket asks only windows) ===
+rc_Y4_goos_linux_vet=0
+rc_Y4_goos_windows_vet=0
+rc_Y4_goos_linux_build=0
+=== Y5 the root file named '-' still untouched by me ===
+2026-10-11 08:12:33.000000000 +0800 size=0 -
+=== Y6 HEAD now + internal/audio untouched since e4740e35 ===
+17dd4a6f1ef38d88973aae8b1e3431f48175e86e
+rc_Y6_diffquiet=0
+rc_outer=0

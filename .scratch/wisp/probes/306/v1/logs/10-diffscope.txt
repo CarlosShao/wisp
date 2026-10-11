@@ -1,0 +1,128 @@
+=== A. git diff 5480434f..HEAD -- internal/audio (name-status + numstat) ===
+M	internal/audio/wave_format_float_300_windows_test.go
+A	internal/audio/wavinjector_extensible_float_306_test.go
+rc_diff_ns=0
+16	5	internal/audio/wave_format_float_300_windows_test.go
+225	0	internal/audio/wavinjector_extensible_float_306_test.go
+=== B. per-commit name-only (7 commits) ===
+--- 4e73d0a5 ---
+4e73d0a58e87dc05dd84de41806fd925377127ff 306-r1 起手锚（AC#4 台面那一半的第 1 笔，commit-first）
+
+.scratch/wisp/probes/306/r1/00-anchor.md
+.scratch/wisp/probes/306/r1/logs/00-anchor.txt
+.scratch/wisp/probes/306/r1/logs/00-blob-wavinjector.txt
+.scratch/wisp/probes/306/r1/logs/00-driff-internal.txt
+.scratch/wisp/probes/306/r1/logs/00-porcelain-full.txt
+.scratch/wisp/probes/306/r1/logs/00-porcelain-scoped.txt
+.scratch/wisp/probes/306/r1/logs/msg-c1.txt
+--- 1b34e475 ---
+1b34e4753a8b0322823fa680506e6787efa475e8 306-r1 AC#1 落点：乙形夹具＝一份 40 字节 extensible + float32 的 wav 面（只写测试侧）
+
+.scratch/wisp/probes/306/r1/10-fixture.md
+.scratch/wisp/probes/306/r1/logs/10-gofmt-before.txt
+.scratch/wisp/probes/306/r1/logs/10-targeted-green.txt
+.scratch/wisp/probes/306/r1/logs/msg-c2.txt
+internal/audio/wavinjector_extensible_float_306_test.go
+--- c0d5ec24 ---
+c0d5ec24c702e4b9fcb92477f15287dc1f6fa2be 306-r1 AC#3 落点：把那句"GUID 不在 mmreg.h"改成盘上的实话（只动注释，16 加 5 删全是 // 行）
+
+.scratch/wisp/probes/306/r1/30-ac3-comment.md
+.scratch/wisp/probes/306/r1/logs/30-ac3-selfcheck.txt
+.scratch/wisp/probes/306/r1/logs/30-ac6-shape.txt
+.scratch/wisp/probes/306/r1/logs/30-sdk-headers.txt
+.scratch/wisp/probes/306/r1/logs/msg-c3.txt
+internal/audio/wave_format_float_300_windows_test.go
+--- fbd150e3 ---
+fbd150e314e07751dedc2fa309d96e114607a5d0 306-r1 AC#2 / AC#2b 落点：三对各带一发突变凭据（红句逐字引，cmp 逐字节还原，复绿 rc=0）
+
+.scratch/wisp/probes/306/r1/20-nails.md
+.scratch/wisp/probes/306/r1/logs/00-commit1.txt
+.scratch/wisp/probes/306/r1/logs/00-driff-internal.txt
+.scratch/wisp/probes/306/r1/logs/00-porcelain-scoped.txt
+.scratch/wisp/probes/306/r1/logs/10-commit2.txt
+.scratch/wisp/probes/306/r1/logs/30-commit3.txt
+.scratch/wisp/probes/306/r1/logs/HEAD-of-source-repo.txt
+.scratch/wisp/probes/306/r1/logs/base-pkg-run.txt
+.scratch/wisp/probes/306/r1/logs/msg-c4.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-01-mutated.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-02-nofixture-fullpkg.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-03-red.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-04-cmp.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-05-regreen.txt
+.scratch/wisp/probes/306/r1/logs/mut-bing-196-off24-to-26-SUMMARY.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-01-mutated.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-02-nofixture-fullpkg.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-03-red.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-04-cmp.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-05-regreen.txt
+.scratch/wisp/probes/306/r1/logs/mut-ding-196-literal-wording-SUMMARY.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-01-mutated.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-02-nofixture-fullpkg.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-03-red.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-04-cmp.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-05-regreen.txt
+.scratch/wisp/probes/306/r1/logs/mut-jia-192-fffe-to-fffd-SUMMARY.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-01-mutated.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-02-nofixture-fullpkg.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-03-red.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-04-cmp.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-05-regreen.txt
+.scratch/wisp/probes/306/r1/logs/mut-yi-218-three-to-two-SUMMARY.txt
+.scratch/wisp/probes/306/r1/logs/mutate-final-safety.txt
+.scratch/wisp/probes/306/r1/logs/mutate.sh
+--- 71249b05 ---
+71249b05e602077ee2021b749f3187126117d987 306-r1 AC#4 落点：门禁全套读数＋越界逐笔尺（三数带口径、交集尺盲区具名）
+
+.scratch/wisp/probes/306/r1/40-gates.md
+.scratch/wisp/probes/306/r1/logs/40-build-vet-d22scan.txt
+.scratch/wisp/probes/306/r1/logs/40-census-raw.txt
+.scratch/wisp/probes/306/r1/logs/40-commit4.txt
+.scratch/wisp/probes/306/r1/logs/40-gofmt.txt
+.scratch/wisp/probes/306/r1/logs/40-outofbounds-attempt1-flawed.txt
+.scratch/wisp/probes/306/r1/logs/40-outofbounds.txt
+.scratch/wisp/probes/306/r1/logs/40-raw-build-all.txt
+.scratch/wisp/probes/306/r1/logs/40-raw-build-linux.txt
+.scratch/wisp/probes/306/r1/logs/40-raw-d22scan.txt
+.scratch/wisp/probes/306/r1/logs/40-raw-vet-linux.txt
+.scratch/wisp/probes/306/r1/logs/40-raw-vet-mod.txt
+.scratch/wisp/probes/306/r1/logs/40-raw-vet-windows.txt
+.scratch/wisp/probes/306/r1/logs/after-roster-1.txt
+.scratch/wisp/probes/306/r1/logs/after-roster-2.txt
+.scratch/wisp/probes/306/r1/logs/after-roster-3-nofixture.txt
+.scratch/wisp/probes/306/r1/logs/after-summary.txt
+.scratch/wisp/probes/306/r1/logs/before-roster-1.txt
+.scratch/wisp/probes/306/r1/logs/before-roster-2.txt
+.scratch/wisp/probes/306/r1/logs/before-summary.txt
+.scratch/wisp/probes/306/r1/logs/msg-c5.txt
+--- 6284a489 ---
+6284a48987da6a88ad787e722720c51c3012c073 306-r1 终局：90-final.md（现态／我⛔ 做到的名册／越界自查／七处与盘上不符具名报回）＋票 306 末尾追加一条 Progress log bullet（append-only）
+
+.scratch/wisp/issues/306-inline-authoritative-format-tag-literals-in-wavinjector-go-have-no-ruler-at-all.md
+.scratch/wisp/probes/306/r1/90-final.md
+.scratch/wisp/probes/306/r1/logs/msg-c6.txt
+--- 53aa4b16 ---
+53aa4b16ca7ec76a4b118152ab1b0cda4eafd2e1 306-r1 终局更正一笔：并集尺撞了共享 /tmp 的宽 glob（就地重算，坏件保留⛔ 删）
+
+.scratch/wisp/probes/306/r1/40-gates.md
+.scratch/wisp/probes/306/r1/90-final.md
+.scratch/wisp/probes/306/r1/logs/40-commit5.txt
+.scratch/wisp/probes/306/r1/logs/40-outofbounds.txt
+.scratch/wisp/probes/306/r1/logs/90-commit6.txt
+.scratch/wisp/probes/306/r1/logs/msg-c7.txt
+--- e4740e35 ---
+e4740e35ff62d9dc8a9732a20cfedbbf4d501a17 306-r1 交件名册逐字（终局）
+
+.scratch/wisp/probes/306/r1/90-final.md
+.scratch/wisp/probes/306/r1/logs/90-commit7.txt
+.scratch/wisp/probes/306/r1/logs/msg-c8.txt
+=== C. wavinjector.go diff bytes in interval ===
+rc_pipe_note=see_below
+rc_diffquiet_wavinjector=0
+rc_diffquiet_wavinjector_test=0
+=== D. c0d5ec24 non-comment-line ruler (the leg's ruler, rerun) ===
+rc_noncomment=1  (grep rc=1 means ZERO hits = clean)
+=== E. same ruler on the FULL interval, not just one commit ===
+rc_noncomment_interval=1
+=== F. numstat of the two internal/audio files in interval ===
+16	5	internal/audio/wave_format_float_300_windows_test.go
+rc_outer=0

@@ -1,0 +1,7 @@
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+    wavinjector_extensible_float_306_test.go:172: fixture length = 100, want 100
+--- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+    wavinjector_extensible_float_306_test.go:213: NewWavInjector error = <nil>, want nil: the injector must accept a 40-byte extensible fmt chunk with a float32 SubFormat, not reject it as an unsupported wav format
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.030s
+FAIL

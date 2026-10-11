@@ -1,0 +1,6 @@
+=== SDK trees installed ===
+10.0.26100.0
+=== resolve mmreg.h/ksmedia.h used ===
+C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/mmreg.h
+C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared/ksmedia.h
+rc=0

@@ -1,0 +1,86 @@
+=== cov/roster driver start Sun Oct 11 07:58:53 CST 2026 ===
+tree_head_tree=17
+go_version=go version go1.27.1 windows/amd64
+C1 rc=0 coverage_total=440
+  C1 block 185.4,185.17 1 1
+  C1 block 186.5,187.1 1 0
+  C1 block 188.4,192.24 5 1
+  C1 block 193.5,193.18 1 1
+  C1 block 194.6,195.1 1 0
+  C1 block 196.5,196.65 1 1
+  C1 block 198.4,198.18 1 1
+  C1 block 200.4,200.38 1 1
+  C1 block 202.3,202.33 1 1
+  C1 block 204.2,204.14 1 1
+  C1 block 205.3,206.1 1 0
+  C1 block 207.2,207.29 1 1
+  C1 block 208.3,209.1 1 0
+  C1 block 210.2,210.9 1 1
+  C1 block 212.3,214.26 3 1
+  C1 block 215.4,216.1 1 1
+  C1 block 217.3,217.35 1 1
+  C1 block 219.3,221.26 3 1
+  C1 block 222.4,223.1 1 1
+  C1 block 224.3,224.43 1 1
+  C1 block 226.3,226.111 1 1
+C2 rc=0  topPASS_in_C2=1
+  C2 block 185.4,185.17 1 1
+  C2 block 186.5,187.1 1 0
+  C2 block 188.4,192.24 5 1
+  C2 block 193.5,193.18 1 0
+  C2 block 194.6,195.1 1 0
+  C2 block 196.5,196.65 1 0
+  C2 block 198.4,198.18 1 1
+  C2 block 200.4,200.38 1 1
+  C2 block 202.3,202.33 1 1
+  C2 block 204.2,204.14 1 1
+  C2 block 205.3,206.1 1 0
+  C2 block 207.2,207.29 1 1
+  C2 block 208.3,209.1 1 0
+  C2 block 210.2,210.9 1 1
+  C2 block 212.3,214.26 3 1
+  C2 block 215.4,216.1 1 1
+  C2 block 217.3,217.35 1 1
+  C2 block 219.3,221.26 3 0
+  C2 block 222.4,223.1 1 0
+  C2 block 224.3,224.43 1 0
+  C2 block 226.3,226.111 1 1
+C3 rc=0
+  C3 block 185.4,185.17 1 1
+  C3 block 186.5,187.1 1 0
+  C3 block 188.4,192.24 5 1
+  C3 block 193.5,193.18 1 1
+  C3 block 194.6,195.1 1 0
+  C3 block 196.5,196.65 1 1
+  C3 block 198.4,198.18 1 1
+  C3 block 200.4,200.38 1 1
+  C3 block 202.3,202.33 1 1
+  C3 block 204.2,204.14 1 1
+  C3 block 205.3,206.1 1 0
+  C3 block 207.2,207.29 1 1
+  C3 block 208.3,209.1 1 0
+  C3 block 210.2,210.9 1 1
+  C3 block 212.3,214.26 3 0
+  C3 block 215.4,216.1 1 0
+  C3 block 217.3,217.35 1 0
+  C3 block 219.3,221.26 3 1
+  C3 block 222.4,223.1 1 1
+  C3 block 224.3,224.43 1 1
+  C3 block 226.3,226.111 1 0
+B1 rc=0 topFAIL=0 topPASS=44 topSKIP=1 subPASS=12 subFAIL=0 okline=1
+  [B1] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [B1] ok  	github.com/CarlosShao/wisp/internal/audio	15.954s
+B2 rc=0 topFAIL=0 topPASS=44 topSKIP=1 subPASS=12 subFAIL=0
+  [B2] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [B2] ok  	github.com/CarlosShao/wisp/internal/audio	16.144s
+B1vsB2 roster diff (FAIL+SKIP names):
+rc_B1_B2_roster_diff=0
+B3 rc=0 topFAIL=0 topPASS=42 topSKIP=1
+  [B3] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [B3] ok  	github.com/CarlosShao/wisp/internal/audio	15.965s
+B4 rc=1 topFAIL=2 topPASS=42 topSKIP=1
+  [B4] --- SKIP: TestLiveWasapiSmoke (0.00s)
+  [B4] --- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+  [B4] --- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+  [B4 msg]     wavinjector_extensible_float_306_test.go:177: parseWav error = unsupported wav format: tag=65534 bits=32 (want PCM16 or float32), want nil: an extensible fmt tag with a float SubFormat has to resolve to the float32 path (tag read at wavinjector.go:192 and :196, branch chosen at :218); rate=0 chans=0
+  [B4 msg]     wavinjector_extensible_float_306_test.go:213: NewWavInjector error = wav C:\Users\swq\AppData\Local\Temp\TestWavInjectorExtensibleFloat323063815472136\001\extensible-float32-306.wav: unsupported wav format: tag=65534 bits=32 (want PCM16 or float32), want nil: the injector must accept a 40-byte extensible fmt chunk with a float32 SubFormat, not reject it as an unsupported wav format

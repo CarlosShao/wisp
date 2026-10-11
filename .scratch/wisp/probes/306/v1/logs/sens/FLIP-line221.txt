@@ -1,0 +1,12 @@
+--- FAIL: TestWavInjectorExtensibleFloat32306 (0.00s)
+    wavinjector_extensible_float_306_test.go:222: seam sample 0 = 32767, want 32767
+    wavinjector_extensible_float_306_test.go:222: seam sample 1 = -32768, want -32768
+    wavinjector_extensible_float_306_test.go:222: seam sample 2 = 16384, want 16384
+    wavinjector_extensible_float_306_test.go:222: seam sample 3 = -16384, want -16384
+    wavinjector_extensible_float_306_test.go:222: seam sample 4 = 8192, want 8192
+    wavinjector_extensible_float_306_test.go:222: seam sample 5 = -8192, want -8192
+    wavinjector_extensible_float_306_test.go:222: seam sample 6 = 4096, want 4096
+    wavinjector_extensible_float_306_test.go:222: seam sample 7 = -4096, want -4096
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.034s
+FAIL

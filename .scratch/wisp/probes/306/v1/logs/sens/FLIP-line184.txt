@@ -1,0 +1,5 @@
+--- FAIL: TestParseWavExtensibleFloat32306 (0.00s)
+    wavinjector_extensible_float_306_test.go:185: chans = 2, want 2 (read at fmt body +2)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.036s
+FAIL
