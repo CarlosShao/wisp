@@ -1,0 +1,2 @@
+pid=10184 ppid=6744 parent_alive=False tempdir_testname=TestMockllmSharedFaultSuite2868402985 cmdline=C:\Users\swq\AppData\Local\Temp\TestMockllmSharedFaultSuite2868402985\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden"
+count_repo_golden=1

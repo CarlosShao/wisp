@@ -1,0 +1,3 @@
+pid=25952 ppid=22740 start=2026-10-11 18:01:51 REPO_GOLDEN PARENT_GONE cpu=0.06 addr_port=0
+count_total=1 count_repo_golden=1 temp_test_dirs=34
+repo_golden_pids=[25952]

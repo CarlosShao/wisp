@@ -1,0 +1,76 @@
+=== paired dir=rev @ 2026-10-11 18:01:45 +0800 HEAD=a1f84d39
+tree measured = WORKTREE of D:/work/workspace/projects plans/Wisp (dir=rev); landed bytes = HEAD tree + this leg's edits
+rulers = .scratch/wisp/probes/orch/20261011/mockllm-procs.ps1 (Get-CimInstance Win32_Process Name='mockllm.exe', guard = cmdline like *Wisp\internal\llm\testdata\golden) + this leg's watch-kill.ps1 (observe-and-terminate inside one PowerShell process) + cmdline-dump.ps1 (attribution by the test name in the child's TempDir path)
+spawn points: SP2=internal/llm/openaichat/mockllm_integ_test.go:73 via -run ^TestMockllmGoldenByteIdenticalEvents$ ; SP1=internal/llm/adaptertest/mockllm.go:72 (the helper, reached from an openaichat test) via -run ^TestMockllmSharedFaultSuite$
+caps: -timeout 3s sized by p1 (SP2 4.924s test / 7s wall, SP1 3.798s test / 5s wall) => the panic has to land mid-flight
+start: count_total=0 count_repo_golden=0 pids=[]
+compile_test_exe_rc=0 exe_bytes=14051328
+--- SHAPE(b) SP2 : go test -timeout 3s ; the same test reaches its own end at ~4-5s (see p1)
+before: count_total=0 count_repo_golden=0 pids=[]
+world_constructed t=3x0.5s: go test still in flight (bash kill-0 held on wrapper pid=14701) ; count_total=1 count_repo_golden=1 pids=[25952]
+  pid=25952 ppid=22740 start=2026-10-11 18:01:51 REPO_GOLDEN PARENT_GONE cpu=0.06 addr_port=0
+  count_total=1 count_repo_golden=1 temp_test_dirs=34
+  test-binary_pid=22740 present_at_that_instant=NO (Windows pid => the presence check is valid; bash MSYS pids are not Windows pids)
+rc=1  timeout_panic_lines=1  panic_lines=1
+  bad-world-evidence: panic: test timed out after 3s
+after: count_total=1 count_repo_golden=1 pids=[25952]
+  pid=25952 ppid=22740 start=2026-10-11 18:01:51 REPO_GOLDEN PARENT_GONE cpu=0.06 addr_port=0
+  count_total=1 count_repo_golden=1 temp_test_dirs=34
+  repo_golden_pids=[25952]
+  attribution of the residue in this shot:
+  pid=25952 ppid=22740 parent_alive=False tempdir_testname=TestMockllmGoldenByteIdenticalEvents3140925201 cmdline=C:\Users\swq\AppData\Local\Temp\TestMockllmGoldenByteIdenticalEvents3140925201\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\
+  count_repo_golden=1
+VERDICT-b-SP2: world_constructed=1 (t=3) ; count_total=1 count_repo_golden=1 pids=[25952]
+  clean: killed pid=25952 ppid=22740 guards=name=mockllm.exe+repo-golden-path+parent-gone 
+--- SHAPE(c) SP2 : run the compiled test exe, then watch-kill.ps1 (single PowerShell process) observes a live mockllm.exe child OF THAT PID and TerminateProcess-es exactly that pid
+before: count_total=0 count_repo_golden=0 pids=[]
+test-exe-roster: name=paired.test.exe count=1 pids=[22432] (bash wrapper pid=14809; Windows pids are the ones in pids=[])
+  watch-kill: world_constructed: child pid=7876 ppid=22432 start=2026-10-11 18:02:07 cmdline_has_repo_golden=YES
+  watch-kill: parent_present_before_stop=True
+  watch-kill: terminate_issued pid=22432 (the only pid this script stops)
+  watch-kill: parent_present_after_stop=False
+exe_wait_rc=127 (TerminateProcess exit code is what Stop-Process -Force sets; not used as the judgement)
+after: count_total=1 count_repo_golden=1 pids=[7876]
+  pid=7876 ppid=22432 start=2026-10-11 18:02:07 REPO_GOLDEN PARENT_GONE cpu=0.02 addr_port=0
+  count_total=1 count_repo_golden=1 temp_test_dirs=35
+  repo_golden_pids=[7876]
+  attribution of the residue in this shot:
+  pid=7876 ppid=22432 parent_alive=False tempdir_testname=TestMockllmGoldenByteIdenticalEvents3292549456 cmdline=C:\Users\swq\AppData\Local\Temp\TestMockllmGoldenByteIdenticalEvents3292549456\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\w
+  count_repo_golden=1
+VERDICT-c-SP2: world_constructed=1 terminate_issued=1 target_pid=22432 ; count_total=1 count_repo_golden=1 pids=[7876]
+  clean: killed pid=7876 ppid=22432 guards=name=mockllm.exe+repo-golden-path+parent-gone 
+--- SHAPE(b) SP1 : go test -timeout 3s ; the same test reaches its own end at ~4-5s (see p1)
+before: count_total=0 count_repo_golden=0 pids=[]
+world_constructed t=3x0.5s: go test still in flight (bash kill-0 held on wrapper pid=14878) ; count_total=1 count_repo_golden=1 pids=[10184]
+  pid=10184 ppid=6744 start=2026-10-11 18:02:18 REPO_GOLDEN PARENT_GONE cpu=0.02 addr_port=0
+  count_total=1 count_repo_golden=1 temp_test_dirs=36
+  test-binary_pid=6744 present_at_that_instant=NO (Windows pid => the presence check is valid; bash MSYS pids are not Windows pids)
+rc=1  timeout_panic_lines=1  panic_lines=1
+  bad-world-evidence: panic: test timed out after 3s
+after: count_total=1 count_repo_golden=1 pids=[10184]
+  pid=10184 ppid=6744 start=2026-10-11 18:02:18 REPO_GOLDEN PARENT_GONE cpu=0.02 addr_port=0
+  count_total=1 count_repo_golden=1 temp_test_dirs=36
+  repo_golden_pids=[10184]
+  attribution of the residue in this shot:
+  pid=10184 ppid=6744 parent_alive=False tempdir_testname=TestMockllmSharedFaultSuite2868402985 cmdline=C:\Users\swq\AppData\Local\Temp\TestMockllmSharedFaultSuite2868402985\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\workspace\projects 
+  count_repo_golden=1
+VERDICT-b-SP1: world_constructed=1 (t=3) ; count_total=1 count_repo_golden=1 pids=[10184]
+  clean: killed pid=10184 ppid=6744 guards=name=mockllm.exe+repo-golden-path+parent-gone 
+--- SHAPE(c) SP1 : run the compiled test exe, then watch-kill.ps1 (single PowerShell process) observes a live mockllm.exe child OF THAT PID and TerminateProcess-es exactly that pid
+before: count_total=0 count_repo_golden=0 pids=[]
+test-exe-roster: name=paired.test.exe count=1 pids=[32160] (bash wrapper pid=14977; Windows pids are the ones in pids=[])
+  watch-kill: world_constructed: child pid=29264 ppid=32160 start=2026-10-11 18:02:34 cmdline_has_repo_golden=YES
+  watch-kill: parent_present_before_stop=True
+  watch-kill: terminate_issued pid=32160 (the only pid this script stops)
+  watch-kill: parent_present_after_stop=False
+exe_wait_rc=127 (TerminateProcess exit code is what Stop-Process -Force sets; not used as the judgement)
+after: count_total=1 count_repo_golden=1 pids=[29264]
+  pid=29264 ppid=32160 start=2026-10-11 18:02:34 REPO_GOLDEN PARENT_GONE cpu=0.02 addr_port=0
+  count_total=1 count_repo_golden=1 temp_test_dirs=37
+  repo_golden_pids=[29264]
+  attribution of the residue in this shot:
+  pid=29264 ppid=32160 parent_alive=False tempdir_testname=TestMockllmSharedFaultSuite1603513437 cmdline=C:\Users\swq\AppData\Local\Temp\TestMockllmSharedFaultSuite1603513437\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\workspace\projects
+  count_repo_golden=1
+VERDICT-c-SP1: world_constructed=1 terminate_issued=1 target_pid=32160 ; count_total=1 count_repo_golden=1 pids=[29264]
+  clean: killed pid=29264 ppid=32160 guards=name=mockllm.exe+repo-golden-path+parent-gone 
+=== end dir=rev 18:02:41  final: count_total=0 count_repo_golden=0 pids=[]

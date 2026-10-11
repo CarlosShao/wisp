@@ -1,0 +1,2 @@
+pid=7876 ppid=22432 parent_alive=False tempdir_testname=TestMockllmGoldenByteIdenticalEvents3292549456 cmdline=C:\Users\swq\AppData\Local\Temp\TestMockllmGoldenByteIdenticalEvents3292549456\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir "D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden"
+count_repo_golden=1

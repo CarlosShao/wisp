@@ -1,0 +1,11 @@
+304-r1: anchor readings at leg start (HEAD 3974ab4d, dev, index clean)
+
+Writes only .scratch/wisp/probes/304/r1/00-anchor.md: the live anchor
+readings required by dispatch step 0.1 (short HEAD, branch, dirty count
+over internal/cmd/tools/scripts = 0 lines, full-index staged count = 0),
+the write-face declaration for this leg, and a named note that the
+jobscope_windows.go line numbers quoted in the brief are snapshots to be
+re-measured rather than authority.
+
+No production bytes in this commit. No AC box flipped, no AC declared to
+hold: judging belongs to a separate non-implementing leg.

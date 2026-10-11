@@ -1,0 +1,5 @@
+census_before_totals=packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+census_after_totals=packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+census_totals_delta=IDENTICAL
+ticket_AC3_stated_baseline=packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+worktree_vs_headblob_format_delta=2 worktree-lines vs 2 headblob-lines (both include their own header/rc lines)

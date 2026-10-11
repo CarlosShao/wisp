@@ -1,0 +1,2 @@
+format_headblob_rc=0
+scope=same four paths, dumped from git show HEAD:<path> into /d/tmp/wisp-304-r1/headblobs ruler=gofumpt -l (HEAD blob)

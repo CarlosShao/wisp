@@ -1,0 +1,2 @@
+format_worktree_rc=0
+scope=internal/llm/adaptertest/childjob_windows.go internal/llm/adaptertest/childjob_other.go internal/llm/adaptertest/mockllm.go internal/llm/openaichat/mockllm_integ_test.go ruler=gofumpt -l (worktree)

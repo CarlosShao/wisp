@@ -1,0 +1,3 @@
+pid=28996 ppid=32440 start=2026-10-11 17:52:32 REPO_GOLDEN PARENT_ALIVE cpu=0.03 addr_port=0
+count_total=1 count_repo_golden=1 temp_test_dirs=28
+repo_golden_pids=[28996]

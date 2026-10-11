@@ -1,0 +1,5 @@
+304-r1: land job-object guard on both mockllm spawn points (AC#1, shape A)
+
+Both spawn points now start mockllm through adaptertest.StartChildGuarded, which on Windows opens the in-repo C30 proc.JobScope (KILL_ON_JOB_CLOSE), assigns only that child via StartInJob, and arms t.Cleanup(job.Close); on non-Windows the same call is a plain cmd.Start() that guards nothing and says so in its doc comment (ticket 304 boundary 1: the linux branch still leaks). No new job wrapper, no other process is ever a member, no assertion touched.
+
+Includes this leg's anchor, the path-length gate reading (rc=0 GREEN) and the shape (a) timing probe that sizes the later -timeout caps.

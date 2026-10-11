@@ -1,0 +1,14 @@
+cmp_identical internal/llm/adaptertest/mockllm.go=YES
+cmp_identical internal/llm/openaichat/mockllm_integ_test.go=YES
+cmp_identical internal/llm/adaptertest/childjob_windows.go=YES
+cmp_identical internal/llm/adaptertest/childjob_other.go=YES
+7f7c9e701c5eac9eb47cc0bd4b859ddc411146ea40a2053d3bf0d490bff5f56e *.scratch/wisp/probes/304/r1/logs/landed/childjob_other.go
+1df2b14f9722b363728c54c1271cf9e2e6ec09d2305860cf5ebd2a02d54f7aed *.scratch/wisp/probes/304/r1/logs/landed/childjob_windows.go
+cfdc71f5a664bd86afe88aaef88b0f5a739921ae441ce86b71ebe4a2194370ac *.scratch/wisp/probes/304/r1/logs/landed/mockllm.go
+3c5d6034ae5fe4a8bd92841db57f9d8daf9738db25a253898ac919f47316077d *.scratch/wisp/probes/304/r1/logs/landed/mockllm_integ_test.go
+--- worktree sha:
+cfdc71f5a664bd86afe88aaef88b0f5a739921ae441ce86b71ebe4a2194370ac *internal/llm/adaptertest/mockllm.go
+3c5d6034ae5fe4a8bd92841db57f9d8daf9738db25a253898ac919f47316077d *internal/llm/openaichat/mockllm_integ_test.go
+1df2b14f9722b363728c54c1271cf9e2e6ec09d2305860cf5ebd2a02d54f7aed *internal/llm/adaptertest/childjob_windows.go
+7f7c9e701c5eac9eb47cc0bd4b859ddc411146ea40a2053d3bf0d490bff5f56e *internal/llm/adaptertest/childjob_other.go
+guard_marker(2=job step back): internal/llm/adaptertest/mockllm.go:2 internal/llm/openaichat/mockllm_integ_test.go:2 

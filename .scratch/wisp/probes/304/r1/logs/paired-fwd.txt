@@ -1,0 +1,68 @@
+=== paired dir=fwd @ 2026-10-11 18:05:33 +0800 HEAD=a1f84d39
+tree measured = WORKTREE of D:/work/workspace/projects plans/Wisp (dir=fwd); landed bytes = HEAD tree + this leg's edits
+rulers = .scratch/wisp/probes/orch/20261011/mockllm-procs.ps1 (Get-CimInstance Win32_Process Name='mockllm.exe', guard = cmdline like *Wisp\internal\llm\testdata\golden) + this leg's watch-kill.ps1 (observe-and-terminate inside one PowerShell process) + cmdline-dump.ps1 (attribution by the test name in the child's TempDir path)
+spawn points: SP2=internal/llm/openaichat/mockllm_integ_test.go:73 via -run ^TestMockllmGoldenByteIdenticalEvents$ ; SP1=internal/llm/adaptertest/mockllm.go:72 (the helper, reached from an openaichat test) via -run ^TestMockllmSharedFaultSuite$
+caps: -timeout 3s sized by p1 (SP2 4.924s test / 7s wall, SP1 3.798s test / 5s wall) => the panic has to land mid-flight
+start: count_total=0 count_repo_golden=0 pids=[]
+compile_test_exe_rc=0 exe_bytes=14066688
+--- SHAPE(b) SP2 : go test -timeout 3s ; the same test reaches its own end at ~4-5s (see p1)
+before: count_total=0 count_repo_golden=0 pids=[]
+world_constructed t=3x0.5s: go test still in flight (bash kill-0 held on wrapper pid=15211) ; count_total=1 count_repo_golden=1 pids=[23872]
+  count_total=0 count_repo_golden=0 temp_test_dirs=38
+  repo_golden_pids=[]
+  test-binary_pid= present_at_that_instant=  (Windows pid => the presence check is valid; bash MSYS pids are not Windows pids)
+rc=1  timeout_panic_lines=1  panic_lines=1
+  bad-world-evidence: panic: test timed out after 3s
+after: count_total=0 count_repo_golden=0 pids=[]
+  count_total=0 count_repo_golden=0 temp_test_dirs=38
+  repo_golden_pids=[]
+  attribution of the residue in this shot:
+  count_repo_golden=0
+VERDICT-b-SP2: world_constructed=1 (t=3) ; count_total=0 count_repo_golden=0 pids=[]
+  clean: nothing-to-clean 
+--- SHAPE(c) SP2 : run the compiled test exe, then watch-kill.ps1 (single PowerShell process) observes a live mockllm.exe child OF THAT PID and TerminateProcess-es exactly that pid
+before: count_total=0 count_repo_golden=0 pids=[]
+test-exe-roster: name=paired.test.exe count=1 pids=[22852] (bash wrapper pid=15276; Windows pids are the ones in pids=[])
+  watch-kill: world_constructed: child pid=28320 ppid=22852 start=2026-10-11 18:05:48 cmdline_has_repo_golden=YES
+  watch-kill: parent_present_before_stop=True
+  watch-kill: terminate_issued pid=22852 (the only pid this script stops)
+  watch-kill: parent_present_after_stop=False
+exe_wait_rc=127 (TerminateProcess exit code is what Stop-Process -Force sets; not used as the judgement)
+after: count_total=0 count_repo_golden=0 pids=[]
+  count_total=0 count_repo_golden=0 temp_test_dirs=39
+  repo_golden_pids=[]
+  attribution of the residue in this shot:
+  count_repo_golden=0
+VERDICT-c-SP2: world_constructed=1 terminate_issued=1 target_pid=22852 ; count_total=0 count_repo_golden=0 pids=[]
+  clean: nothing-to-clean 
+--- SHAPE(b) SP1 : go test -timeout 3s ; the same test reaches its own end at ~4-5s (see p1)
+before: count_total=0 count_repo_golden=0 pids=[]
+world_constructed t=3x0.5s: go test still in flight (bash kill-0 held on wrapper pid=15316) ; count_total=1 count_repo_golden=1 pids=[26912]
+  count_total=0 count_repo_golden=0 temp_test_dirs=40
+  repo_golden_pids=[]
+  test-binary_pid= present_at_that_instant=  (Windows pid => the presence check is valid; bash MSYS pids are not Windows pids)
+rc=1  timeout_panic_lines=1  panic_lines=1
+  bad-world-evidence: panic: test timed out after 3s
+after: count_total=0 count_repo_golden=0 pids=[]
+  count_total=0 count_repo_golden=0 temp_test_dirs=40
+  repo_golden_pids=[]
+  attribution of the residue in this shot:
+  count_repo_golden=0
+VERDICT-b-SP1: world_constructed=1 (t=3) ; count_total=0 count_repo_golden=0 pids=[]
+  clean: nothing-to-clean 
+--- SHAPE(c) SP1 : run the compiled test exe, then watch-kill.ps1 (single PowerShell process) observes a live mockllm.exe child OF THAT PID and TerminateProcess-es exactly that pid
+before: count_total=0 count_repo_golden=0 pids=[]
+test-exe-roster: name=paired.test.exe count=1 pids=[31584] (bash wrapper pid=15381; Windows pids are the ones in pids=[])
+  watch-kill: world_constructed: child pid=20436 ppid=31584 start=2026-10-11 18:06:05 cmdline_has_repo_golden=YES
+  watch-kill: parent_present_before_stop=True
+  watch-kill: terminate_issued pid=31584 (the only pid this script stops)
+  watch-kill: parent_present_after_stop=False
+exe_wait_rc=127 (TerminateProcess exit code is what Stop-Process -Force sets; not used as the judgement)
+after: count_total=0 count_repo_golden=0 pids=[]
+  count_total=0 count_repo_golden=0 temp_test_dirs=41
+  repo_golden_pids=[]
+  attribution of the residue in this shot:
+  count_repo_golden=0
+VERDICT-c-SP1: world_constructed=1 terminate_issued=1 target_pid=31584 ; count_total=0 count_repo_golden=0 pids=[]
+  clean: nothing-to-clean 
+=== end dir=fwd 18:06:10  final: count_total=0 count_repo_golden=0 pids=[]

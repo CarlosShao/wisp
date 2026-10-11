@@ -1,0 +1,4 @@
+world_constructed: child pid=20436 ppid=31584 start=2026-10-11 18:06:05 cmdline_has_repo_golden=YES
+parent_present_before_stop=True
+terminate_issued pid=31584 (the only pid this script stops)
+parent_present_after_stop=False
