@@ -1,0 +1,14 @@
+HEAD:internal/audio/gate.go:24:// captured BEFORE the TTS started (<= 192ms, D38d) and are not self-echo;
+HEAD:internal/audio/gate.go:97:// source is NOT started; SetMuted(false)/SetSpeaking(false) will start it
+HEAD:internal/audio/gate.go:103:		return fmt.Errorf("gate: already started")
+HEAD:internal/audio/gate_test.go:170:// started muted captures nothing until the user unmutes.
+HEAD:internal/audio/gate_test.go:196:	if err := gate.Stop(); err != nil { // never started
+HEAD:internal/audio/wasapimic_windows.go:78:		return fmt.Errorf("wasapi-mic: already started")
+HEAD:internal/audio/wasapimic_windows.go:87:	started := make(chan error, 1)
+HEAD:internal/audio/wasapimic_windows.go:96:		m.run(loopCtx, buf, started)
+HEAD:internal/audio/wasapimic_windows.go:98:	return <-started
+HEAD:internal/audio/wasapimic_windows.go:159:func (m *WASAPIMicrophone) run(ctx context.Context, buf chan<- []byte, started chan<- error) {
+HEAD:internal/audio/wasapimic_windows.go:180:		started <- err
+HEAD:internal/audio/wasapimic_windows.go:188:		started <- err
+HEAD:internal/audio/wasapimic_windows.go:192:	started <- nil
+HEAD:internal/audio/wavinjector.go:88:		return fmt.Errorf("wav-injector: already started")

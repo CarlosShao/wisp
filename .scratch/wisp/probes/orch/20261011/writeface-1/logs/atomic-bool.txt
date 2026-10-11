@@ -1,0 +1,5 @@
+HEAD:cmd/wisp/panel_host_windows_test.go:42:	stopping atomic.Bool
+HEAD:cmd/wisp/panel_resident_windows.go:136:	stopRequested atomic.Bool
+HEAD:internal/audio/hotplug_test.go:85:	closed atomic.Bool
+HEAD:internal/ball/ball_windows.go:132:	closed     atomic.Bool
+HEAD:internal/ball/live_guard_windows_test.go:69:	subclassActive atomic.Bool
