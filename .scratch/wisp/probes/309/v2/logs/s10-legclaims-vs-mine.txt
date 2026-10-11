@@ -1,0 +1,50 @@
+=== (a) leg-reported final gates vs my own
+r2/logs/final-build.log tail: rc_build=0 | mine rc line: .scratch/wisp/probes/309/v2/logs/gate-build.log:rc_build=0 .scratch/wisp/probes/309/v2/logs/gate-d22scan.log:rc_d22scan=0 .scratch/wisp/probes/309/v2/logs/gate-pathlen.log:rc_pathlen=0 .scratch/wisp/probes/309/v2/logs/gate-vet.log:rc_vet=0 
+r2/logs/final-vet.log tail: rc_vet=0 | mine rc line: .scratch/wisp/probes/309/v2/logs/gate-build.log:rc_build=0 .scratch/wisp/probes/309/v2/logs/gate-d22scan.log:rc_d22scan=0 .scratch/wisp/probes/309/v2/logs/gate-pathlen.log:rc_pathlen=0 .scratch/wisp/probes/309/v2/logs/gate-vet.log:rc_vet=0 
+r2/logs/final-d22scan.log tail: rc_d22scan=0 | mine rc line: .scratch/wisp/probes/309/v2/logs/gate-build.log:rc_build=0 .scratch/wisp/probes/309/v2/logs/gate-d22scan.log:rc_d22scan=0 .scratch/wisp/probes/309/v2/logs/gate-pathlen.log:rc_pathlen=0 .scratch/wisp/probes/309/v2/logs/gate-vet.log:rc_vet=0 
+r2/logs/final-pathlen.log tail: rc_pathlen=0 | mine rc line: .scratch/wisp/probes/309/v2/logs/gate-build.log:rc_build=0 .scratch/wisp/probes/309/v2/logs/gate-d22scan.log:rc_d22scan=0 .scratch/wisp/probes/309/v2/logs/gate-pathlen.log:rc_pathlen=0 .scratch/wisp/probes/309/v2/logs/gate-vet.log:rc_vet=0 
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_1865280573/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_23331022231/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel548953931/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared1699555282/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li549146914/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+    scan_test.go:2363: rc=0 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_04274076004/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+=== (b) what product .go did the 309 legs touch
+internal/tools/assessorfor_taint_instrument_309_test.go
+internal/tools/bridge.go
+internal/tools/toolrequest_nail_309_test.go
+---
+internal/tools/bridge.go
+internal/tools/toolrequest_nail_309_test.go
+=== (c) forbidden faces touched anywhere in 309's range? (must be empty)
+internal/risk/pathresolver_anchor_spelling_windows_test.go
+internal/risk/pathresolver_junction_windows_test.go
+internal/risk/pathresolver_volumeless_spelling_308_test.go
+internal/risk/syncdirs.go
+internal/risk/syncdirs_alias_307_windows_test.go
+internal/risk/syncdirs_test.go
+(end)
+=== (d) all non-test .go changed in 309's range:
+.scratch/wisp/probes/307/v1/logs/pristine-v1-syncdirs.go
+.scratch/wisp/probes/309/a1/logs/assessor.go
+.scratch/wisp/probes/309/a1/logs/bridge.go
+.scratch/wisp/probes/309/a1/logs/loop.go
+.scratch/wisp/probes/309/a1/logs/panel_assets.go
+.scratch/wisp/probes/309/a1/logs/provenance.go
+.scratch/wisp/probes/309/a1/logs/subagent_197.go
+.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-296-test.go
+.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-bridge.go
+.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-resident_audio_windows.go
+.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-resident_windows.go
+cmd/wisp/config_readers_255.go
+cmd/wisp/panel_host_windows.go
+cmd/wisp/resident_audio_windows.go
+cmd/wisp/resident_ball_windows.go
+cmd/wisp/resident_windows.go
+internal/audio/captureopt.go
+internal/audio/wasapi_windows.go
+internal/audio/wasapimic_windows.go
+internal/audio/wavinjector.go
+internal/panel/subagent_roster_197.go
+internal/risk/syncdirs.go
+internal/tools/bridge.go

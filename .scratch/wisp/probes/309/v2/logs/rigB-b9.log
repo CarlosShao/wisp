@@ -1,0 +1,8 @@
+time=2026-10-11T16:07:41.423+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309ToolRequestProductionConstructionNail
+    toolrequest_nail_309_test.go:303: 枚数钉分母不可信：只解析了 0 枚非测试生产源（roots=[]，每 root=）。分母接近零＝这枚扫根本没读到树，报绿是假绿
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.038s
+FAIL
+rc_B9-empty-roots=1

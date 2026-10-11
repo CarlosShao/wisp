@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# 309-v2 rig group D: the production CALL SITE, not the helper.
+# AC#1's instrument drives assessorFor() directly. Nothing in the ticket's text says the
+# seam from Execute (bridge.go:297 `verdict := b.assessorFor(req.TaskID)`) is covered.
+# This rig decouples them the way a one-line commit would and asks: does anything ring?
+set -u
+TREE="$1"; LOGS="$2"
+BRIDGE="$TREE/internal/tools/bridge.go"
+BAK="$TREE/.rigbakD"; mkdir -p "$BAK"; cp "$BRIDGE" "$BAK/bridge.orig"
+ORIG=$(sha256sum "$BAK/bridge.orig" | cut -d' ' -f1)
+OUT="$LOGS/rigD-callsite.log"; : > "$OUT"
+restore() {
+  cp "$BAK/bridge.orig" "$BRIDGE"
+  if cmp -s "$BAK/bridge.orig" "$BRIDGE"; then
+    echo "RESTORE cmp: byte-identical OK sha=$(sha256sum "$BRIDGE" | cut -d' ' -f1) match=$([ "$(sha256sum "$BRIDGE" | cut -d' ' -f1)" = "$ORIG" ] && echo YES || echo NO)" >> "$OUT"
+  else echo "RESTORE cmp: DIFFERS -- STOP" >> "$OUT"; fi
+}
+trap restore EXIT
+run() {
+  ( cd "$TREE" && GOFLAGS= go test ./internal/tools/ -count=1 -v > "$LOGS/rigD-$2.log" 2>&1; echo "rc=$?" >> "$LOGS/rigD-$2.log" )
+  echo "### $1 : rc=$(grep -o 'rc=[0-9]*' "$LOGS/rigD-$2.log" | tail -1) topFAIL=$(grep -cE '^--- FAIL' "$LOGS/rigD-$2.log") topPASS=$(grep -cE '^--- PASS' "$LOGS/rigD-$2.log")" >> "$OUT"
+  echo "   309 instrument under this mutation: $(grep -E '^(--- )(PASS|FAIL): Test309AssessorFor' "$LOGS/rigD-$2.log" | head -1)" >> "$OUT"
+  grep -E '^--- FAIL' "$LOGS/rigD-$2.log" | head -12 >> "$OUT"
+  restore
+}
+echo "=== D0 pristine whole-package positive control (1 known red: TestTicket252R1AlignmentAddsNoAuthorization)" >> "$OUT"
+run "D0-pristine" "0-pristine"
+
+python - "$BRIDGE" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,"
+new="verdict := b.assessorFor(\"\").Assess(req.Name, params,"
+assert s.count(old)==1, s.count(old)
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("D1 mutated: Execute stops handing its task id to assessorFor (always empty id)")
+PY
+run "D1-callsite-forces-empty-id" "d1"
+
+python - "$BRIDGE" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,"
+new="verdict := b.assessorFor(req.CorrelationID).Assess(req.Name, params,"
+assert s.count(old)==1, s.count(old)
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("D2 mutated: the call site binds the WRONG id (ticket 242's per-call corr instead of the task id)")
+PY
+run "D2-callsite-wrongs-id" "d2"
+echo "=== final sha (tree) vs repo HEAD blob of bridge.go (must match) ===" >> "$OUT"
+sha256sum "$BRIDGE" >> "$OUT"
+( cd "D:/work/workspace/projects plans/Wisp" && git show f6067e5d:internal/tools/bridge.go | sha256sum ) >> "$OUT"

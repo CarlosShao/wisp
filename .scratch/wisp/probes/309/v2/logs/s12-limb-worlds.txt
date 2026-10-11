@@ -1,0 +1,11 @@
+=== R359-4 census re-run by 309-v2: Options field named Assessor write points
+internal/tools/bridge.go:132:	injected bool // assess came from Options.Assessor: do not rebuild per call
+internal/tools/ticket90_test.go:366:		b := New(Options{Registry: reg, Gate: gate, Modes: &t90Modes{m: m}, Assessor: assessor})
+(non-test hits above; total incl tests:)
+2
+internal/tools/ticket90_test.go:366:		b := New(Options{Registry: reg, Gate: gate, Modes: &t90Modes{m: m}, Assessor: assessor})
+=== bridges built WITHOUT a Provenance in tests (the prov==nil world)
+24
+20
+=== does any tools test set Options.Assessor (the injected world)?
+internal/tools/ticket90_test.go:366:		b := New(Options{Registry: reg, Gate: gate, Modes: &t90Modes{m: m}, Assessor: assessor})

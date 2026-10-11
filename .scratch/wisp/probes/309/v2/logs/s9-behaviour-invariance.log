@@ -1,0 +1,15 @@
+=== C2 fix: control rows in the nail at HEAD (awk, tab-safe)
+6
+=== behaviour invariance: pre-309 base bd124b2a -> HEAD f6067e5d, bridge.go
+70
+^= changed lines that ARE comments
+0
+^= changed lines that are NOT comments (must be 0)
+  854 /tmp/v2-base-nocomment.go
+  854 /tmp/v2-head-nocomment.go
+ 1708 total
+cmp stripped(base,HEAD): IDENTICAL
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 */tmp/v2-base-nocomment.go
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 */tmp/v2-head-nocomment.go
+=== the guard line, verbatim count at HEAD
+1

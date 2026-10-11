@@ -1,0 +1,15 @@
+=== A5/A6 top-level FAIL ruler (^\-\-\- FAIL only, subtests excluded), with pristine as baseline
+rigA-1-pristine-package.log toplevelFAIL=1 toplevelPASS=210
+rigA-a5.log toplevelFAIL=1 toplevelPASS=210
+rigA-a6.log toplevelFAIL=17 toplevelPASS=194
+=== delta vs pristine (252's known fixture-missing red is in every run):
+=== A5 does the 309 instrument still PASS?
+rigA-a5.log:--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+rigA-a5.log:--- PASS: Test309ToolRequestProductionConstructionNail (0.17s)
+rigA-a6.log:--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+rigA-a6.log:--- PASS: Test309ToolRequestProductionConstructionNail (0.18s)
+=== A6 first failure reason sample (noise check):
+--- FAIL: TestToolConcurrencyCeilingIsFour (0.00s)
+=== RUN   TestPerToolTimeoutHonoredViaContext
+    bridge_test.go:276: text = "L2 审批通道尚未接入（票 21），已拒绝执行", want the structured TOOL_TIMEOUT wording
+--- FAIL: TestPerToolTimeoutHonoredViaContext (0.00s)

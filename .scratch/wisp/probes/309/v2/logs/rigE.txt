@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# 309-v2 rig group E: 309-v1's AC#2 condition #1 was "the nail misses the declaration-plus-
+# assignment shape and the type-alias shape". r2 proved those only with in-memory controls.
+# This group puts each shape on DISK in a file the nail really parses, and re-runs.
+# Placement rule: the var-decl and elided-nested shapes go under cmd/ (parsed by the nail,
+# never in the compile graph of `go test ./internal/tools/`), so a rig cannot fail for a
+# reason that has nothing to do with the claim (import cycles).
+set -u
+TREE="$1"; LOGS="$2"
+OUT="$LOGS/rigE-shapes-on-disk.log"; : > "$OUT"
+RIGCMD="$TREE/cmd/llmrecord/rig309v2e.go"
+RIGAGENT="$TREE/internal/agent/rig309v2e.go"
+drop() { rm -f "$RIGCMD" "$RIGAGENT"; }
+run() {
+  ( cd "$TREE" && GOFLAGS= go test ./internal/tools/ -run 'Test309ToolRequestProductionConstructionNail' -count=1 -v > "$LOGS/rigE-$2.log" 2>&1; echo "rc=$?" >> "$LOGS/rigE-$2.log" )
+  echo "### $1 : rc=$(grep -o 'rc=[0-9]*' "$LOGS/rigE-$2.log" | tail -1)" >> "$OUT"
+  grep -oE '生产构造点=[0-9]+（[^）]*）|名册=[^。]*' "$LOGS/rigE-$2.log" | head -2 >> "$OUT"
+  grep -E '^--- (PASS|FAIL)' "$LOGS/rigE-$2.log" | head -2 >> "$OUT"
+  drop
+}
+drop
+
+printf 'package main\n\nimport "github.com/CarlosShao/wisp/internal/agent"\n\nvar rig309v2Decl agent.ToolRequest\n\nfunc rig309v2Assign() { rig309v2Decl.TaskID = ""; _ = rig309v2Decl }\n' > "$RIGCMD"
+cp "$RIGCMD" "$LOGS/rigE-file1-var-decl.code"
+run "E1-var-decl-then-field-assignment-on-disk" "e1"
+
+printf 'package agent\n\ntype rig309v2Alias = ToolRequest\n\nfunc rig309v2AliasPoint() rig309v2Alias { return rig309v2Alias{TaskID: ""} }\n' > "$RIGAGENT"
+cp "$RIGAGENT" "$LOGS/rigE-file2-alias-in-agent.code"
+run "E2-file-level-alias-then-literal-inside-internal-agent" "e2"
+
+printf 'package main\n\nimport "github.com/CarlosShao/wisp/internal/agent"\n\ntype rig309v2Nested = []agent.ToolRequest\n\nfunc rig309v2Elided() { _ = rig309v2Nested{{TaskID: ""}} }\n' > "$RIGCMD"
+cp "$RIGCMD" "$LOGS/rigE-file3-elided-nested.code"
+run "E3-elided-inner-literal-in-a-slice-shape-named-blind" "e3"
+echo "E3 expectation: the nail stays green -- this rig is the reading for a named blind shape, not for a condition" >> "$OUT"
+
+echo "=== word ruler over the E3 tree (the fake count the AST ruler refuses; E3 file present again below)" >> "$OUT"
+cp "$LOGS/rigE-file3-elided-nested.code" "$RIGCMD"
+( cd "$TREE" && grep -rn 'ToolRequest{' internal cmd --include=*.go | awk -F: '$1 !~ /_test\.go$/' | wc -l ) >> "$OUT"
+run "E4-word-ruler-vs-ast-ruler-on-the-same-file" "e4"
+drop
+echo "=== tree back to pristine for the two targets:" >> "$OUT"
+for n in toolrequest_nail_309_test.go loop.go; do
+  case "$n" in
+    toolrequest_nail_309_test.go) t="$TREE/internal/tools/$n" ;; loop.go) t="$TREE/internal/agent/$n" ;;
+  esac
+  cmp "$TREE/.rigbakB/$n.orig" "$t" && echo "cmp $n identical" >> "$OUT"
+done

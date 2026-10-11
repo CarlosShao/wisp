@@ -1,0 +1,9 @@
+time=2026-10-11T16:05:22.589+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309AssessorForEmptyTaskIDDropsTaintDetector
+    assessorfor_taint_instrument_309_test.go:64: 空 task id 竟判出了 R4（rules=[R4]）：assessorFor 的 `taskID == ""` 那一肢被摘掉／改成"空 id 也挂探测器"时才会这样（空 id 撞 unbound-scope fail-closed）。② 这一腿的存在就是为了：恒真形（守卫被削弱）必须在这里红
+    assessorfor_taint_instrument_309_test.go:70: 两向没有拉开（空/非空同为 [R4] 或同不为 R4）：这枚仪器对"探测器挂没挂"是瞎的
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.047s
+FAIL
+rc_A1-drop-empty-limb=1

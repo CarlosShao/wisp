@@ -1,0 +1,15 @@
+=== R-4-1: the ruler bridge.go:878-884 writes, run verbatim on the WORKTREE
+71
+--- by filename suffix _test.go:
+69
+--- non-test by FILENAME field:
+internal/agent/loop.go:675:		req := ToolRequest{
+internal/tools/bridge.go:882:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+--- non-test by filename = count:
+2
+--- then drop lines whose TEXT begins with // :
+[req ]:= ToolRequest{
+--- that count:
+1
+=== R-4-1b: shorthand | grep -v _test.go (the trap this leg warns about)
+2

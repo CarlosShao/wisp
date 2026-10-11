@@ -1,0 +1,171 @@
+=== PRISTINE control (must be GREEN): -run Test309AssessorForEmptyTaskIDDropsTaintDetector
+### pristine-instrument
+--- red/green key lines (0-pristine):
+--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.041s
+1
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+A1 mutated: struck `|| taskID == ""` from assessorFor
+### A1-drop-empty-limb
+--- red/green key lines (a1):
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.047s
+FAIL
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.047s
+FAIL
+0
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+A2 mutated: attach branch -> WithTaintDetector(nil)
+### A2-detector-nil
+--- red/green key lines (a2):
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.046s
+FAIL
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.046s
+FAIL
+0
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+A3 mutated: whole guard off (if false)
+### A3-guard-off
+--- red/green key lines (a3):
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.042s
+FAIL
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.042s
+FAIL
+0
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+A4 mutated: taskID limb inverted
+### A4-limb-inverted
+--- red/green key lines (a4):
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.045s
+FAIL
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.045s
+FAIL
+0
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+A5 mutated: struck `b.injected ||` (WHOLE PACKAGE run follows)
+### A5-strike-injected
+--- red/green key lines (a5):
+--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+--- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile (0.67s)
+--- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute (0.09s)
+--- PASS: TestBridgeWritesNothingThroughARealJunction (0.37s)
+--- PASS: TestJunctionInsideAnAllowedRootCannotReachAnAListFile (0.08s)
+--- PASS: TestBridgeRefusesTheRealShortNameOfAnAListFile (0.01s)
+--- PASS: TestShortNameSpellingGetsTheSameVerdictAsTheLongOne (0.01s)
+--- PASS: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.14s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	14.823s
+FAIL
+278
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+A5 top-level FAIL count:
+1
+A5 FAIL names:
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+A6 mutated: struck `b.prov == nil ||` (WHOLE PACKAGE run follows)
+### A6-strike-provnil
+--- red/green key lines (a6):
+--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+--- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile (0.52s)
+--- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute (0.10s)
+--- PASS: TestBridgeWritesNothingThroughARealJunction (0.36s)
+--- PASS: TestJunctionInsideAnAllowedRootCannotReachAnAListFile (0.07s)
+--- PASS: TestBridgeRefusesTheRealShortNameOfAnAListFile (0.02s)
+--- PASS: TestShortNameSpellingGetsTheSameVerdictAsTheLongOne (0.02s)
+--- PASS: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.15s)
+--- FAIL: TestToolConcurrencyCeilingIsFour (0.00s)
+--- FAIL: TestPerToolTimeoutHonoredViaContext (0.00s)
+--- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L0_passes_and_no_gate_is_consulted (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L1_uses_the_pending-window_callback (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L1_window_timeout_means_execute (0.00s)
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+--- FAIL: TestTicket224LiveGrantStopsTheL1Question (0.01s)
+--- FAIL: TestTicket224PartialPathCoverageStillAsks (0.03s)
+--- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking (0.01s)
+    --- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking/reports_that_it_could_not_look (0.00s)
+    --- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking/panics_mid-lookup (0.00s)
+--- FAIL: TestTicket224PathlessCallIsNeverGranted (0.00s)
+--- FAIL: TestTicket224GrantedCallBooksAllowSessionGrantWithItsRow (0.01s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+--- FAIL: TestMissingArgsAndUnwiredRoster (0.00s)
+--- FAIL: TestTicket224GrantIDColumnRoundTripsThroughTheRealStore (0.07s)
+--- FAIL: TestTicket90ModeReachesRoutingAsParameter (0.00s)
+--- FAIL: TestTicket90TwoBridgesDoNotShareOneMode (0.00s)
+--- FAIL: TestTicket90UnwiredModeSourceIsTheStrictestMode (0.00s)
+--- FAIL: TestTicket90ModeCarriesNoAllowAuthority (0.00s)
+--- FAIL: TestLoopPassesDeclaredL1WriteThroughTheGate (10.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	21.337s
+FAIL
+257
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+A6 top-level FAIL count:
+22
+A6 FAIL names:
+--- FAIL: TestToolConcurrencyCeilingIsFour (0.00s)
+--- FAIL: TestPerToolTimeoutHonoredViaContext (0.00s)
+--- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L0_passes_and_no_gate_is_consulted (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L1_uses_the_pending-window_callback (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L1_window_timeout_means_execute (0.00s)
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+--- FAIL: TestTicket224LiveGrantStopsTheL1Question (0.01s)
+--- FAIL: TestTicket224PartialPathCoverageStillAsks (0.03s)
+--- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking (0.01s)
+    --- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking/reports_that_it_could_not_look (0.00s)
+    --- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking/panics_mid-lookup (0.00s)
+--- FAIL: TestTicket224PathlessCallIsNeverGranted (0.00s)
+--- FAIL: TestTicket224GrantedCallBooksAllowSessionGrantWithItsRow (0.01s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+--- FAIL: TestMissingArgsAndUnwiredRoster (0.00s)
+--- FAIL: TestTicket224GrantIDColumnRoundTripsThroughTheRealStore (0.07s)
+--- FAIL: TestTicket90ModeReachesRoutingAsParameter (0.00s)
+--- FAIL: TestTicket90TwoBridgesDoNotShareOneMode (0.00s)
+--- FAIL: TestTicket90UnwiredModeSourceIsTheStrictestMode (0.00s)
+--- FAIL: TestTicket90ModeCarriesNoAllowAuthority (0.00s)
+--- FAIL: TestLoopPassesDeclaredL1WriteThroughTheGate (10.06s)
+A6 does any FAIL name speak to this limb (prov/assessorFor/taint/309)?
+0
+=== PRISTINE whole-package control (documented 1 red = TestTicket252R1AlignmentAddsNoAuthorization)
+### pristine-package
+--- red/green key lines (1-pristine-package):
+--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+--- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile (0.46s)
+--- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute (0.07s)
+--- PASS: TestBridgeWritesNothingThroughARealJunction (0.31s)
+--- PASS: TestJunctionInsideAnAllowedRootCannotReachAnAListFile (0.07s)
+--- PASS: TestBridgeRefusesTheRealShortNameOfAnAListFile (0.01s)
+--- PASS: TestShortNameSpellingGetsTheSameVerdictAsTheLongOne (0.01s)
+--- PASS: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.13s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	14.462s
+FAIL
+278
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+pristine whole-package top-level FAIL count:
+1
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+FINAL sha of bridge.go in tree:
+995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba */tmp/wisp309v2tree.Vvd7/internal/tools/bridge.go
+repo HEAD untouched check:
+0
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES

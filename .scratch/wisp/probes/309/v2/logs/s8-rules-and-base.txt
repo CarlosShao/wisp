@@ -1,0 +1,18 @@
+=== which risk rules read ctx.taint (the STRUCTURALLY-still-reached claim)
+9:func ruleDeclared(ctx *assessCtx) *contribution {
+32:func rulePathAllowlist(ctx *assessCtx) *contribution {
+60:func ruleSensitivePath(ctx *assessCtx) *contribution {
+101:func ruleTaint(ctx *assessCtx) *contribution {
+102:	if ctx.taint == nil {
+105:	source, hit := ctx.taint.TaintHit(ctx.params)
+=== count of rules in the fused set
+4
+=== bridge.go history for the behaviour-invariance base
+d75db9ee 309-r2 code: narrow the nail to a named single point, widen roots, teach it three shapes
+16e86bae feat(309-r1): 形Ⓑ注释(bridge.go assessorFor 少报写明) + AC#3 内容锚/枚数重述 + AC#1 恒真形仪器 + AC#2 枚数钉
+bd124b2a 242-corrland-1 落地：loop 每次工具调用铸独立 corr（callCorr=taskID#callID，任务级溯源仍走 taskID）＋loop.go:363 注释按 C18 原文重判＋loop_approval_test.go:213 唯一等值断言具名重判（非空且前缀路由回本任务且≠taskID）＋新用例 TestCorrPerCallTwoAsksSameTask242（同任务并发两问⇒两 corr 不同且各自命中自己的调用）。连带越格自报：tools 任务级身份改读 TaskID(ctx)（cancel.go 新访问器/bridge 样章/subagent_197:262/task.go:708），防 per-call corr 把调用 id 当任务 id（D21/D22）。靶向 rc：agent 新用例 0；tools loop_approval 两枚 0；tools 197/221/222 21 枚 0。⛔ 未 push
+5413f46d 212-r2 修码：ban #9 缩写形排除（裁 ⓐ）＋symRefRe 自述改实话＋三处半假诚实化（票 212 第 66 行清单①②③）
+5e8748b3 212-r1＋258-r1 编排者代笔收尾（两枚写腿死于服务错误/150 轮帽，按 A544 预授权代笔；AC 框零碰）
+3b78c246 feat(224): 给「本次会话内允许」这一档装上执行者——宿主铸造会话身份＋只读 seam＋原生记账路
+bfc55b5b 票 222-r1 产码（丙形：等孩子的这段时间不占桥的执行许可）：bridge.go 新增包内载体 inFlightSlot（take/giveBack 走 sync.Once，run 的 defer 与工具的提前交还共用同一枚 once，绝不双扣空信号量）＋withInFlightSlot/giveBackWhileWaiting（挂在调用自己的 ctx 上，与 177 的 hostPathBox 同形：零新增导出名、零新契约字段、SubagentDeps 仍是 5 枚字段所以 197 的 Test197SubagentHasNoSelfApprovalOutlet 那枚字段枚举守卫照旧绿），subagent_197.go 在 child.RunAsync 之后、两条"已派生"文案之前交还许可（放在这两行之前是有意的：读数 len(bridge.sem) 于是在"父已到等待点"这一刻确定无疑，票 222 的用例不靠超时判定）；⛔ 不动 MaxToolConcurrency=4、不动 MaxConcurrentSubagents=4、不动 PLAN.md:2849/SPEC-01:134/:26/SPEC-05:70 一字，交还后不重新取得（重新排队会把父任务放回它刚离开的那条队，等待结束时只会复制出同一处阻塞的更隐蔽版本；等待之后剩下的只有名册行、C25 盖戳、journal 行三件簿记，不是能力执行，所以"同时执行的工具调用数≤4"这条逐字仍然为真）。新增 internal/tools/subagent_222_test.go 三枚用例，第一次给这形上尺：孩子的工具面走真桥（ParentTools 就是 h.bridge，即 run.go:581 的生产形状；197 的台件给孩子的是 fake197Dir，A420 第 7 环因此全仓看不见）——Test222WaitingParentHoldsNoBridgeSlot 读 len(bridge.sem)＝等待中的父任务占几枚（修前 0.00s 红："占着 4 枚桥位，want 0"；修后 0.00s 绿，另钉 cap(bridge.sem)＝4 的字面读数与池内占位仍＝4）；Test222CeilingStillCapsExecutedCallsWhileParentsWait 反控（4 枚许可同时在跑、第 5/6 枚宿主调用排队、探针自记起跑时已返回的父任务数修前 3/4 枚修后 0 枚、终态 len(sem)＝0 兼作"许可被扣两次"那形的尺）；Test222SpawnConclusionArrivesThroughRealBridgeChildren 判内容（修前 3.00s 红在正文：四枚父任务全收到"工具 task.spawn 超时（3000ms），已协作式中止"、四枚孩子的结论各自出现 0 次；修后绿且第 4 枚孩子的探针起跑时 len(sem)＝4＝四枚孩子同时跑在四枚许可上）。门：PATH 带 sherpa/build，go build ./... 净；go test ./internal/tools ./cmd/wisp -count=1＝ok 12.730s／ok 77.622s；gofumpt v0.12.0 对三枚文件空输出；scripts/d22scan.sh 阳性对照 34 PASS/0 FAIL 后实扫 clean（internal/tools 22 枚生产文件在册）；-list 现跑 161 枚（158 枚原有＋3 枚新增，原 158 逐名未动一字断言）。按现读更正票面与 A420 一处：父任务收到的字面不是"父任务这一侧已经不等了"，而是 bridge.go:475-483 在 Execute 返回后先查 ectx 的 DeadlineExceeded 把工具自己写的文本换成桥的超时文案（形状仍是 IsError、父侧拿不到结论）。未做并已具名交回：AC#3 甲（立即返回句柄）等 owner、乙（等待不受 per-tool 超时约束）撞 C22 契约面不自裁、AC#4 属票 221 同文件串行、AC#5 只交定性不抬池值。
+b6c34d34 票 179 AC#6：两枚过期指针改成实话（只改指向与枚数，产码行为一字节未动）

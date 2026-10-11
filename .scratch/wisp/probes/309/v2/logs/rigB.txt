@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+# 309-v2 rig group B: the AC#2 count-nail (mutates ONLY inside an OUT-OF-TREPO export
+# tree at f6067e5d; every target file is restored and proven byte-identical per rig).
+# Usage: bash rigB.txt <tree-dir> <logs-dir>
+set -u
+TREE="$1"; LOGS="$2"
+NAIL="$TREE/internal/tools/toolrequest_nail_309_test.go"
+LOOP="$TREE/internal/agent/loop.go"
+BAK="$TREE/.rigbakB"; mkdir -p "$BAK"
+for f in "$NAIL" "$LOOP"; do cp "$f" "$BAK/$(basename "$f").orig"; done
+OUT="$LOGS/rigB-nail.log"; : > "$OUT"
+RIGN=0
+
+restore_all() {
+  for b in "$BAK"/*.orig; do
+    n=$(basename "$b" .orig)
+    case "$n" in
+      toolrequest_nail_309_test.go) cp "$b" "$NAIL" ;;
+      loop.go) cp "$b" "$LOOP" ;;
+    esac
+  done
+  for p in "$TREE"/internal/tools/rig309v2* "$TREE"/internal/agent/rig309v2* \
+           "$TREE"/tools/rig309v2root "$TREE"/scripts/rig309v2root "$TREE"/internal/perm/rig309v2*; do
+    [ -e "$p" ] && rm -rf "$p"
+  done
+  local ok=1
+  for n in toolrequest_nail_309_test.go loop.go; do
+    case "$n" in
+      toolrequest_nail_309_test.go) t="$NAIL" ;; loop.go) t="$LOOP" ;;
+    esac
+    if cmp -s "$BAK/$n.orig" "$t"; then :; else ok=0; fi
+  done
+  if [ "$ok" = 1 ]; then
+    echo "RESTORE cmp: byte-identical OK $(basename "$NAIL")=$(sha256sum "$NAIL" | cut -c1-12) $(basename "$LOOP")=$(sha256sum "$LOOP" | cut -c1-12)" >> "$OUT"
+  else
+    echo "RESTORE cmp: DIFFERS -- STOP" >> "$OUT"
+  fi
+}
+trap restore_all EXIT
+
+run() { # $1=rig label  $2=log suffix
+  ( cd "$TREE" && GOFLAGS= go test ./internal/tools/ -run 'Test309ToolRequestProductionConstructionNail' -count=1 -v > "$LOGS/rigB-$2.log" 2>&1; echo "rc_$1=$?" >> "$LOGS/rigB-$2.log" )
+  echo "### $1 -> $(grep -o 'rc_[^=]*=[0-9]*' "$LOGS/rigB-$2.log" | tail -1)" >> "$OUT"
+  grep -E '^(--- )?(FAIL|PASS|ok)|枚数钉|control|root |分母' "$LOGS/rigB-$2.log" | head -6 >> "$OUT"
+  restore_all
+}
+
+echo "=== B0 PRISTINE positive control (must be GREEN)" >> "$OUT"
+run "B0-pristine" "0-pristine"
+
+# B1 attack-1a: a NEW qualified construction point next to the bridge, inside internal/tools.
+RIGN=$((RIGN+1))
+cat > "$TREE/internal/tools/rig309v2second.go" <<'EOF'
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func rig309v2Second() agent.ToolRequest { return agent.ToolRequest{TaskID: ""} }
+EOF
+cp "$TREE/internal/tools/rig309v2second.go" "$LOGS/rigB-file1-qualified.code"
+run "B1-new-point-internal-tools" "b1"
+
+# B2: a second point INSIDE internal/agent (same-package bare name) -- the shape the
+# pre-309-r2 nail was blind to because it skipped that package whole.
+cat > "$TREE/internal/agent/rig309v2bare.go" <<'EOF'
+package agent
+
+func rig309v2Bare() ToolRequest { return ToolRequest{TaskID: ""} }
+EOF
+cp "$TREE/internal/agent/rig309v2bare.go" "$LOGS/rigB-file2-agent-bare.code"
+run "B2-new-point-inside-internal-agent" "b2"
+
+# B3/B4 attack-3: are the two roots 309-r2 added actually live?
+mkdir -p "$TREE/tools/rig309v2root"
+cat > "$TREE/tools/rig309v2root/rig.go" <<'EOF'
+package rig309v2root
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func rig309v2ToolsRoot() agent.ToolRequest { return agent.ToolRequest{TaskID: ""} }
+EOF
+cp "$TREE/tools/rig309v2root/rig.go" "$LOGS/rigB-file3-tools-root.code"
+run "B3-new-point-under-tools-root" "b3"
+
+mkdir -p "$TREE/scripts/rig309v2root"
+cat > "$TREE/scripts/rig309v2root/rig.go" <<'EOF'
+package rig309v2root
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func rig309v2ScriptsRoot() agent.ToolRequest { return agent.ToolRequest{TaskID: ""} }
+EOF
+cp "$TREE/scripts/rig309v2root/rig.go" "$LOGS/rigB-file4-scripts-root.code"
+run "B4-new-point-under-scripts-root" "b4"
+
+# B5 attack-1b: REMOVE the named point through a shape the matcher is documented blind to
+# (starred new(T) plus field assignment). Same semantics, zero counted points.
+python - "$LOOP" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old='\t\treq := ToolRequest{\n\t\t\tTaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),\n\t\t\tCallID: p.call.ID,\n\t\t\tName:   p.call.Name, Args: p.call.Args, Timeout: timeout,\n\t\t}\n'
+new='\t\treq := *new(ToolRequest)\n\t\treq.TaskID, req.CorrelationID, req.CallID = taskID, callCorr(taskID, p.call.ID, i), p.call.ID\n\t\treq.Name, req.Args, req.Timeout = p.call.Name, p.call.Args, timeout\n'
+assert s.count(old)==1, ("anchor count", s.count(old))
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("B5 mutated: loop.go named point rewritten as *new(ToolRequest) (still compiles, still one real point)")
+PY
+run "B5-named-point-removed-invisible-shape" "b5"
+
+# B6 attack-1c: widen the pin's expected count by one notch (wantTotal 1 -> 2).
+python - "$NAIL" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="\t\twantTotal      = 1\n"; new="\t\twantTotal      = 2\n"
+assert s.count(old)==1
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("B6 mutated: wantTotal 1 -> 2 (wider pin) on an UNCHANGED tree")
+PY
+run "B6-widen-wantTotal" "b6"
+
+# B7 attack-1c second half: widen the denominator floor to nothing.
+python - "$NAIL" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="if examined < 200 {"; new="if examined < 1 {"
+assert s.count(old)==1
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("B7 mutated: denominator floor 200 -> 1")
+PY
+run "B7-widen-floor" "b7"
+
+# B8: shrink the root list (drop the two roots 309-r2 just added) -- silently green?
+python - "$NAIL" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old='\t\tfilepath.Join("..", "..", "tools"),\n\t\tfilepath.Join("..", "..", "scripts"),\n'
+assert s.count(old)==1
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,""))
+print("B8 mutated: roots narrowed to cmd + internal only")
+PY
+mkdir -p "$TREE/tools/rig309v2root"
+cp "$LOGS/rigB-file3-tools-root.code" "$TREE/tools/rig309v2root/rig.go"
+run "B8-roots-shorn-plus-a-tools-dir-point-exists" "b8"
+restore_all
+
+# B9 attack-2ii: the empty-loop form -- roots list emptied.
+python - "$NAIL" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old='\t\tfilepath.Join("..", "..", "cmd"),\n\t\tfilepath.Join("..", "..", "internal"),\n\t\tfilepath.Join("..", "..", "tools"),\n\t\tfilepath.Join("..", "..", "scripts"),\n'
+assert s.count(old)==1
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,""))
+print("B9 mutated: roots = [] (walk over nothing)")
+PY
+run "B9-empty-roots" "b9"
+
+# B10: a root that quietly stopped existing.
+python - "$NAIL" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old='filepath.Join("..", "..", "scripts"),'; new='filepath.Join("..", "..", "scripts309v2gone"),'
+assert s.count(old)==1
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("B10 mutated: scripts root renamed to a path that does not exist")
+PY
+run "B10-missing-root" "b10"
+
+# B11 attack-2i: the never-matching-roster form (matcher blinded by a typo in the name).
+python - "$NAIL" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old='e.Sel.Name == "ToolRequest"'; new='e.Sel.Name == "ToolReqest"'
+assert s.count(old)==1
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("B11 mutated: matcher blinded - qualified name typoed")
+PY
+run "B11-matcher-blinded" "b11"
+
+# B12: the catch-all form (matcher counts anything).
+python - "$NAIL" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old='\tswitch e := expr.(type) {\n\tcase *ast.SelectorExpr:'
+new='\tswitch e := expr.(type) {\n\tdefault:\n\t\treturn true\n\tcase *ast.SelectorExpr:'
+assert s.count(old)==1
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("B12 mutated: matcher turned into a catch-all")
+PY
+run "B12-matcher-catchall" "b12"
+
+# B13 attack-3 (fake count): a file whose ONLY ToolRequest{ occurrence lives in a comment.
+cat > "$TREE/internal/perm/rig309v2commentonly.go" <<'EOF'
+package perm
+
+// Rig 309-v2: this file mentions agent.ToolRequest{TaskID: ""} in a comment only.
+// The word ruler `grep -rn 'ToolRequest{'` counts this line; the AST nail must not.
+
+func rig309v2NoPoint() {}
+EOF
+cp "$TREE/internal/perm/rig309v2commentonly.go" "$LOGS/rigB-file5-comment-only.code"
+echo "--- the word ruler on the same tree (shows the fake count the AST ruler must refuse):" >> "$OUT"
+( cd "$TREE" && grep -rn 'ToolRequest{' internal cmd --include=*.go | awk -F: '$1 !~ /_test\.go$/' | wc -l ) >> "$OUT"
+run "B13-comment-only-mention-must-not-count" "b13"
+
+# B14 attack-4: a second REAL construction point the matcher is documented blind to,
+# left in place while the pin stays green -> tests bridge.go's "rings wherever it is written".
+cat > "$TREE/internal/tools/rig309v2blind.go" <<'EOF'
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func rig309v2Blind() *agent.ToolRequest { return new(agent.ToolRequest) }
+EOF
+cp "$TREE/internal/tools/rig309v2blind.go" "$LOGS/rigB-file6-new-blind-shape.code"
+run "B14-second-point-in-blind-shape-new-T" "b14"
+
+echo "=== sha of the two tree targets after the whole run (must equal the .orig backups) ===" >> "$OUT"
+for n in toolrequest_nail_309_test.go loop.go; do
+  case "$n" in
+    toolrequest_nail_309_test.go) t="$NAIL" ;; loop.go) t="$LOOP" ;;
+  esac
+  sha256sum "$BAK/$n.orig" "$t" >> "$OUT"; cmp "$BAK/$n.orig" "$t" && echo "cmp $n: identical" >> "$OUT"
+done
+echo "=== repo worktree untouched under internal cmd:" >> "$OUT"
+( cd "D:/work/workspace/projects plans/Wisp" && git status --porcelain -- internal cmd | wc -l ) >> "$OUT"

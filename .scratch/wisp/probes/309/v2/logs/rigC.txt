@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# 309-v2 rig group C: redo the two rigs that did not land in group B (B12 catch-all
+# mutated invalid Go) plus the behaviour-invariance ruler. Out-of-repo tree only.
+set -u
+TREE="$1"; LOGS="$2"
+NAIL="$TREE/internal/tools/toolrequest_nail_309_test.go"
+BAK="$TREE/.rigbakC"; mkdir -p "$BAK"; cp "$NAIL" "$BAK/nail.orig"
+ORIG=$(sha256sum "$BAK/nail.orig" | cut -d' ' -f1)
+OUT="$LOGS/rigC-controls.log"; : > "$OUT"
+restore() {
+  cp "$BAK/nail.orig" "$NAIL"
+  if cmp -s "$BAK/nail.orig" "$NAIL"; then
+    echo "RESTORE cmp: byte-identical OK sha=$(sha256sum "$NAIL" | cut -d' ' -f1) match=$([ "$(sha256sum "$NAIL" | cut -d' ' -f1)" = "$ORIG" ] && echo YES || echo NO)" >> "$OUT"
+  else echo "RESTORE cmp: DIFFERS -- STOP" >> "$OUT"; fi
+}
+trap restore EXIT
+run() {
+  ( cd "$TREE" && GOFLAGS= go test ./internal/tools/ -run 'Test309ToolRequestProductionConstructionNail' -count=1 -v > "$LOGS/rigC-$2.log" 2>&1; echo "rc_$1=$?" >> "$LOGS/rigC-$2.log" )
+  echo "### $1 -> $(grep -o 'rc_.*=[0-9]*' "$LOGS/rigC-$2.log" | tail -1)" >> "$OUT"
+  grep -E 'control |--- (FAIL|PASS)|枚数钉' "$LOGS/rigC-$2.log" | head -5 >> "$OUT"
+  restore
+}
+# C0: pristine control (green) — group B already proved it, re-stated per the dispatch's
+# "two positive controls" rule so this rig file stands on its own.
+run "C0-pristine" "0-pristine"
+
+# C1 (the B12 redo): matcher turned into a catch-all in a way Go accepts.
+python - "$NAIL" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="\tcase *ast.Ident:\n\t\treturn names[e.Name]"
+new="\tcase *ast.Ident:\n\t\t_ = e\n\t\treturn true"
+assert s.count(old)==1, s.count(old)
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("C1 mutated: bare-name branch counts ANY identifier -> catch-all matcher")
+PY
+run "C1-matcher-catchall" "c1"
+
+# C2 (measured, not reasoned): the control list at HEAD holds six entries, so the
+# "for _, c := range controls" loop is not an empty set today; deleting it silently is a
+# residual shape the pin does not guard, and is why C1 (the catch-all direction) had to be
+# measured instead of assumed.
+echo "=== C2: how many controls does the nail run at HEAD? ===" >> "$OUT"
+grep -c '\t\t{"' "$BAK/nail.orig" >> "$OUT"
+echo "=== C2b: the same ruler on the for-range that consumes them ===" >> "$OUT"
+grep -n 'for _, c := range controls' "$BAK/nail.orig" >> "$OUT"

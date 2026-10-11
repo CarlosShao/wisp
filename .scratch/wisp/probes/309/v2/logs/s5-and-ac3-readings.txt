@@ -1,0 +1,53 @@
+=== S5 checkbox ruler, START of my leg
+checked=3
+unchecked=3
+=== residual absolute loop.go line anchors in bridge.go (AC#3 asks for content anchors)
+113:// consumer-side seam the agent loop already calls (loop.go:563 and
+114:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+230:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+252:// treats non-nil as "the provider broke" (internal/agent/loop.go:692-694) and
+1119:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+(count=5)
+=== absolute anchors in the two 309 test files
+internal/tools/toolrequest_nail_309_test.go:25://     tools/signmodels/main.go:34 逐字 "github.com/CarlosShao/wisp/internal/models"
+=== the AC#3 named segment, verbatim
+// revoke, which the TEXT loop already defers (in internal/agent/loop.go the
+// "defer revokeAdmission()" line that runs right after the AdmitTask hook), so a
+// task that ends takes its taint with it (ticket 151). A caller that dispatches
+// on the bridge outside that boundary - a host-internal call with its own task
+// id - still has no owner here, and stays fail-closed: a task that never closes
+// leaks only its own indexed sources, which is the fail-closed direction, since
+// dropping marks would open R4.
+//
+// WHICH LEGS STILL HAVE NO OWNER HERE - ticket 154, read this before assuming
+// ticket 151 finished the job. 151 put the close on ONE boundary: cmd/wisp's
+// admitTask hook, which the TEXT loop defers. That covers only ids the loop
+// mints itself (Run/RunAsync -> newTaskID: RunAsync's "id := newTaskID()" and
+// Run's "return l.run(ctx, newTaskID(), input)", both in internal/agent/loop.go).
+// So ask one question about your own leg: does the TaskID you dispatch with
+// come from that boundary? If it comes from anywhere else - a panel or ball
+// host inventing its own id, a retry wrapper, a scheduled task carrying one id
+// across turns - nothing in this tree closes it, and no test will tell you so.
+// As measured today (a present count, not a permanent promise; and not a constant either -
+// re-run before quoting: measured at HEAD 6f389389, 2026-10-11 14:4x +08, whose go files are
+// identical to the dispatch anchor 202ed4a5): no production code dispatches on the bridge
+// except loop.go. Ruler: grep -rn
+// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+// _test.go, then drop the lines whose text begins with //, which leaves 1 = the single
+// same-package bare-name construction point in internal/agent/loop.go. Skip that last strip
+// and the same ruler yields 2 lines today, 1 of them a comment in this file - this paragraph
+// quotes the ruler, so it is that one. Plain words: the ruler bites its own tail. Two
+// more traps in it are live: the usual shorthand `| grep -v _test.go` filters on line
+// CONTENT, so a comment carrying both the quoted pattern and the word _test.go disappears
+// from its own roster (this leg measured that false 1, R359-6), and the older 60/59/1 count
+// quoted in toolrequest_nail_309_test.go is stale for the same reason. Or skip the word
+// ruler altogether and use the parser ruler, Test309ToolRequestProductionConstructionNail,
+// which reads the AST over the four roots cmd, internal, tools and scripts, pins the TOTAL
+// number of production construction points to 1 and names internal/agent/loop.go as the one
+// it counts. So being
+// such a caller means being the first one; the gates meant to ring when that
+// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+// this bridge leg, and G5 for a C25 taint scope opened with no paired close in
+// the same file, i.e. the leg that never crosses this bridge at all (G5 is
+// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one

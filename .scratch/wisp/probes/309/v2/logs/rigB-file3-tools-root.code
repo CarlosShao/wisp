@@ -1,0 +1,5 @@
+package rig309v2root
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func rig309v2ToolsRoot() agent.ToolRequest { return agent.ToolRequest{TaskID: ""} }

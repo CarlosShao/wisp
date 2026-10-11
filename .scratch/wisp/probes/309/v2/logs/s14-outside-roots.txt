@@ -1,0 +1,7 @@
+=== outside-the-four-roots non-test .go that are NOT under a dot-directory (Go-buildable, therefore a real coverage hole if >0)
+frontend/embed.go
+count=1
+=== top-level dirs of the repo (which ones hold .go at all)
+.=908 .scratch=614 cmd=40 frontend=1 internal=229 scripts=11 tools=13 
+=== tracked .go files under .scratch (evidence snapshots; Go ignores dot-dirs)
+314

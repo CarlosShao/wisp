@@ -1,0 +1,81 @@
+=== go sources OUTSIDE the nail's four roots (non-test)
+.scratch/.scratch/wisp/probes/222/v1/mutations/asis/bridge.go
+.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go
+.scratch/probes-242-r1/backup/approval.go
+.scratch/probes-242-r1/backup/queue.go
+.scratch/probes-242-r1/backup/ui.go
+.scratch/probes-255-r1c/schema-pristine.go
+.scratch/wisp/probes/151-accept/bridge.shipped.go
+.scratch/wisp/probes/151-accept/run.shipped.go
+.scratch/wisp/probes/151/ac1-probe-source.go
+.scratch/wisp/probes/151/bridge.head.go
+.scratch/wisp/probes/151/run.head.go
+.scratch/wisp/probes/151/run.mut-noclose.go
+.scratch/wisp/probes/156-accept/anchor/slo_report_144.go
+.scratch/wisp/probes/156-accept/anchor/slo_windows.go
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go
+count=615
+=== do any of them mention ToolRequest?
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/bridge.go
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go
+./.scratch/wisp/probes/151/ac1-probe-source.go
+./.scratch/wisp/probes/151/bridge.head.go
+./.scratch/wisp/probes/151-accept/bridge.shipped.go
+./.scratch/wisp/probes/158/accept-r1/bridge.anchor.go
+./.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go
+./.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go
+=== nested go.mod census (roots-ruler re-run)
+./.scratch/wisp/probes/160/c1/go.mod
+./.scratch/wisp/probes/160/r1/ac1-closebyid/go.mod
+./.scratch/wisp/probes/160/r1/ac1/go.mod
+./.scratch/wisp/probes/160/v1/ac1/go.mod
+./.scratch/wisp/probes/160/v1/ac1b/go.mod
+./.scratch/wisp/probes/161/r1/runs/al-overbroad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b1-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/b1-closure-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b1-named-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b1-probe-testfile/go.mod
+./.scratch/wisp/probes/161/r1/runs/b2-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b2-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/b2-probe-alias/go.mod
+./.scratch/wisp/probes/161/r1/runs/b3-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b3-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/b3-probe-structlit/go.mod
+./.scratch/wisp/probes/161/r1/runs/b4-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/b4-sub-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b4-unix-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b5-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b5-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/b6-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b6-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/b6-probe-comment/go.mod
+./.scratch/wisp/probes/161/r1/runs/b7-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/b7-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/b8-comment-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/b8-probe-bands/go.mod
+./.scratch/wisp/probes/161/r1/runs/b8-scope-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/skeleton-clean/go.mod
+./.scratch/wisp/probes/161/r1/runs/unp-bad/go.mod
+./.scratch/wisp/probes/161/r1/runs/unp-hides-bans/go.mod
+./.scratch/wisp/probes/175/r1/go.mod
+./.scratch/wisp/probes/212/v1/fix/r2probe/go.mod
+./.scratch/wisp/probes/228/v1/twobreak/go.mod
+./.scratch/wisp/probes/245/v1/esclistener/go.mod
+./.scratch/wisp/probes/263/r1/src/go.mod
+./.scratch/wisp/probes/263/v1/src/go.mod
+./go.mod
+./scripts/spike/go.mod
+./tools/d22scan/go.mod
+./tools/mockllm/go.mod
+tools/d22scan module line: module github.com/CarlosShao/wisp/tools/d22scan
+tools/mockllm module line: module github.com/CarlosShao/wisp/tools/mockllm
+scripts/spike module line: module github.com/CarlosShao/wisp/scripts/spike
+=== live import of internal/ from nested modules
+  tools/signmodels/main.go:34:	"github.com/CarlosShao/wisp/internal/models"

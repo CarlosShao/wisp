@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# 309-v2 rig group A: the AC#1 instrument (mutates ONLY internal/tools/bridge.go,
+# always inside an OUT-OF-TREPO export tree at f6067e5d, restored after every shape).
+# Usage: bash rigA.txt <tree-dir> <logs-dir>
+set -u
+TREE="$1"; LOGS="$2"
+BRIDGE="$TREE/internal/tools/bridge.go"
+BAK="$TREE/.rigbak"; mkdir -p "$BAK"
+cp "$BRIDGE" "$BAK/bridge.go.orig"
+ORIG_SHA=$(sha256sum "$BAK/bridge.go.orig" | cut -d' ' -f1)
+OUT="$LOGS/rigA-instrument.log"; : > "$OUT"
+
+restore() {
+  cp "$BAK/bridge.go.orig" "$BRIDGE"
+  if cmp -s "$BAK/bridge.go.orig" "$BRIDGE"; then
+    NOW=$(sha256sum "$BRIDGE" | cut -d' ' -f1)
+    echo "RESTORE cmp: byte-identical OK sha=$NOW match=$([ "$NOW" = "$ORIG_SHA" ] && echo YES || echo NO)" >> "$OUT"
+  else
+    echo "RESTORE cmp: DIFFERS -- STOP, this rig did not land clean" >> "$OUT"
+  fi
+}
+trap restore EXIT
+
+run() { # $1=rig name  $2=test pkg arg  $3=log suffix
+  echo "### $1" >> "$OUT"
+  ( cd "$TREE" && GOFLAGS= go test ./internal/tools/ ${2:+-run "$2"} -count=1 -v > "$LOGS/rigA-$3.log" 2>&1; echo "rc_$1=$?" >> "$LOGS/rigA-$3.log" )
+  echo "--- red/green key lines ($3):" >> "$OUT"
+  grep -E '^(--- )?(FAIL|PASS|ok|FAIL[[:space:]])' "$LOGS/rigA-$3.log" | head -8 >> "$OUT"
+  grep -E '^\s*(--- )?FAIL' "$LOGS/rigA-$3.log" | head -25 >> "$OUT"
+  grep -cE '^\s*--- PASS' "$LOGS/rigA-$3.log" >> "$OUT" 2>/dev/null
+  restore
+}
+
+echo "=== PRISTINE control (must be GREEN): -run Test309AssessorForEmptyTaskIDDropsTaintDetector" >> "$OUT"
+run "pristine-instrument" 'Test309AssessorForEmptyTaskIDDropsTaintDetector' "0-pristine"
+
+# A1: weaken the guard exactly the way the AC#1 cell says it must ring: drop `|| taskID == ""`.
+python - "$BRIDGE" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="\tif b.injected || b.prov == nil || taskID == \"\" {"
+new="\tif b.injected || b.prov == nil {"
+assert s.count(old)==1, ("anchor count", s.count(old))
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("A1 mutated: struck `|| taskID == \"\"` from assessorFor")
+PY
+run "A1-drop-empty-limb" 'Test309AssessorForEmptyTaskIDDropsTaintDetector' "a1"
+
+# A2: the attach branch stops attaching (the other direction of the same fact).
+python - "$BRIDGE" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="\t\tWithTaintDetector(b.prov.Detector(taskID))"
+new="\t\tWithTaintDetector(nil)"
+assert s.count(old)==1, ("anchor count", s.count(old))
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("A2 mutated: attach branch -> WithTaintDetector(nil)")
+PY
+run "A2-detector-nil" 'Test309AssessorForEmptyTaskIDDropsTaintDetector' "a2"
+
+# A3: the whole guard off (the ticket's "整枚摘掉守卫" shape).
+python - "$BRIDGE" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="\tif b.injected || b.prov == nil || taskID == \"\" {"
+new="\tif false {"
+assert s.count(old)==1, ("anchor count", s.count(old))
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("A3 mutated: whole guard off (if false)")
+PY
+run "A3-guard-off" 'Test309AssessorForEmptyTaskIDDropsTaintDetector' "a3"
+
+# A4: limb inverted (`== ""` -> `!= ""`), the counter-shape of A1.
+python - "$BRIDGE" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="\tif b.injected || b.prov == nil || taskID == \"\" {"
+new="\tif b.injected || b.prov == nil || taskID != \"\" {"
+assert s.count(old)==1, ("anchor count", s.count(old))
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("A4 mutated: taskID limb inverted")
+PY
+run "A4-limb-inverted" 'Test309AssessorForEmptyTaskIDDropsTaintDetector' "a4"
+
+# A5: strike `b.injected ||` -- the bridge.go comment claims whole-package rc=0.
+python - "$BRIDGE" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="\tif b.injected || b.prov == nil || taskID == \"\" {"
+new="\tif b.prov == nil || taskID == \"\" {"
+assert s.count(old)==1, ("anchor count", s.count(old))
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("A5 mutated: struck `b.injected ||` (WHOLE PACKAGE run follows)")
+PY
+run "A5-strike-injected" '' "a5"
+echo "A5 top-level FAIL count:" >> "$OUT"; grep -cE '^\s*--- FAIL' "$LOGS/rigA-a5.log" >> "$OUT"
+echo "A5 FAIL names:" >> "$OUT"; grep -E '^\s*--- FAIL' "$LOGS/rigA-a5.log" | head -25 >> "$OUT"
+
+# A6: strike `b.prov == nil ||` -- the comment claims rc=1 on 16 top-level plumbing tests.
+python - "$BRIDGE" <<'PY' >> "$OUT" 2>&1
+import io,sys
+p=sys.argv[1]; s=io.open(p,encoding='utf-8',newline='').read()
+old="\tif b.injected || b.prov == nil || taskID == \"\" {"
+new="\tif b.injected || taskID == \"\" {"
+assert s.count(old)==1, ("anchor count", s.count(old))
+io.open(p,'w',encoding='utf-8',newline='').write(s.replace(old,new))
+print("A6 mutated: struck `b.prov == nil ||` (WHOLE PACKAGE run follows)")
+PY
+run "A6-strike-provnil" '' "a6"
+echo "A6 top-level FAIL count:" >> "$OUT"; grep -cE '^\s*--- FAIL' "$LOGS/rigA-a6.log" >> "$OUT"
+echo "A6 FAIL names:" >> "$OUT"; grep -E '^\s*--- FAIL' "$LOGS/rigA-a6.log" | head -25 >> "$OUT"
+echo "A6 does any FAIL name speak to this limb (prov/assessorFor/taint/309)?" >> "$OUT"
+grep -E '^\s*--- FAIL' "$LOGS/rigA-a6.log" | grep -icE 'prov|assessorfor|taint|309' >> "$OUT"
+
+echo "=== PRISTINE whole-package control (documented 1 red = TestTicket252R1AlignmentAddsNoAuthorization)" >> "$OUT"
+run "pristine-package" '' "1-pristine-package"
+echo "pristine whole-package top-level FAIL count:" >> "$OUT"; grep -cE '^\s*--- FAIL' "$LOGS/rigA-1-pristine-package.log" >> "$OUT"
+restore
+echo "FINAL sha of bridge.go in tree:" >> "$OUT"; sha256sum "$BRIDGE" >> "$OUT"
+echo "repo HEAD untouched check:" >> "$OUT"; ( cd "D:/work/workspace/projects plans/Wisp" && git status --porcelain -- internal cmd | wc -l ) >> "$OUT"

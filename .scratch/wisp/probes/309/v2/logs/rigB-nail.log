@@ -1,0 +1,124 @@
+=== B0 PRISTINE positive control (must be GREEN)
+### B0-pristine -> rc_B0-pristine=0
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.19s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.249s
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+### B1-new-point-internal-tools -> rc_B1-new-point-internal-tools=1
+    toolrequest_nail_309_test.go:322: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/rig309v2second.go:5(qualified-literal)。分母=294 枚非测试源（每 root=cmd=40 internal=230 scripts=11 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=294 枚非测试源（每 root=cmd=40 internal=230 scripts=11 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.17s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.209s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+### B2-new-point-inside-internal-agent -> rc_B2-new-point-inside-internal-agent=1
+    toolrequest_nail_309_test.go:322: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/agent/rig309v2bare.go:3(same-package-bare-literal)。分母=294 枚非测试源（每 root=cmd=40 internal=230 scripts=11 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=294 枚非测试源（每 root=cmd=40 internal=230 scripts=11 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.15s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.187s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+### B3-new-point-under-tools-root -> rc_B3-new-point-under-tools-root=1
+    toolrequest_nail_309_test.go:322: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | tools/rig309v2root/rig.go:5(qualified-literal)。分母=294 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=14）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=294 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=14）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.15s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.190s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+### B4-new-point-under-scripts-root -> rc_B4-new-point-under-scripts-root=1
+    toolrequest_nail_309_test.go:322: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | scripts/rig309v2root/rig.go:5(qualified-literal)。分母=294 枚非测试源（每 root=cmd=40 internal=229 scripts=12 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=294 枚非测试源（每 root=cmd=40 internal=229 scripts=12 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.16s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.198s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+B5 mutated: loop.go named point rewritten as *new(ToolRequest) (still compiles, still one real point)
+### B5-named-point-removed-invisible-shape -> rc_B5-named-point-removed-invisible-shape=1
+    toolrequest_nail_309_test.go:322: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 0 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=(空名册)。分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=0（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.16s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.205s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+B6 mutated: wantTotal 1 -> 2 (wider pin) on an UNCHANGED tree
+### B6-widen-wantTotal -> rc_B6-widen-wantTotal=1
+    toolrequest_nail_309_test.go:322: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 1 枚 agent.ToolRequest 生产构造点，票 309 钉的是 2 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal)。分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.15s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.192s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+B7 mutated: denominator floor 200 -> 1
+### B7-widen-floor -> rc_B7-widen-floor=0
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.17s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.210s
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+B8 mutated: roots narrowed to cmd + internal only
+### B8-roots-shorn-plus-a-tools-dir-point-exists -> rc_B8-roots-shorn-plus-a-tools-dir-point-exists=0
+    toolrequest_nail_309_test.go:369: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=269 枚非测试源（每 root=cmd=40 internal=229）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.15s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.196s
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+B9 mutated: roots = [] (walk over nothing)
+### B9-empty-roots -> rc_B9-empty-roots=1
+    toolrequest_nail_309_test.go:303: 枚数钉分母不可信：只解析了 0 枚非测试生产源（roots=[]，每 root=）。分母接近零＝这枚扫根本没读到树，报绿是假绿
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.038s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+B10 mutated: scripts root renamed to a path that does not exist
+### B10-missing-root -> rc_B10-missing-root=1
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.16s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.230s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+B11 mutated: matcher blinded - qualified name typoed
+### B11-matcher-blinded -> rc_B11-matcher-blinded=1
+    toolrequest_nail_309_test.go:366: control "shape 1 qualified literal": matcher counted 0, want 1 — the ruler is blind or a catch-all, so its green over the scanned tree means nothing
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.18s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.239s
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+B12 mutated: matcher turned into a catch-all
+### B12-matcher-catchall -> rc_B12-matcher-catchall=1
+FAIL	github.com/CarlosShao/wisp/internal/tools [build failed]
+FAIL
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+--- the word ruler on the same tree (shows the fake count the AST ruler must refuse):
+4
+### B13-comment-only-mention-must-not-count -> rc_B13-comment-only-mention-must-not-count=0
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=294 枚非测试源（每 root=cmd=40 internal=230 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.15s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.191s
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+### B14-second-point-in-blind-shape-new-T -> rc_B14-second-point-in-blind-shape-new-T=0
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=294 枚非测试源（每 root=cmd=40 internal=230 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.15s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.192s
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2
+=== sha of the two tree targets after the whole run (must equal the .orig backups) ===
+263adc87a25957cd1275adb0e781a1fcf3be9f8cfd564017374af1b8ebbf424c */tmp/wisp309v2treeB.lfdT/.rigbakB/toolrequest_nail_309_test.go.orig
+263adc87a25957cd1275adb0e781a1fcf3be9f8cfd564017374af1b8ebbf424c */tmp/wisp309v2treeB.lfdT/internal/tools/toolrequest_nail_309_test.go
+cmp toolrequest_nail_309_test.go: identical
+cb7f9da7a6d277f341d3b40caee59eecec3bea4e4faee31777b1ad47c3763189 */tmp/wisp309v2treeB.lfdT/.rigbakB/loop.go.orig
+cb7f9da7a6d277f341d3b40caee59eecec3bea4e4faee31777b1ad47c3763189 */tmp/wisp309v2treeB.lfdT/internal/agent/loop.go
+cmp loop.go: identical
+=== repo worktree untouched under internal cmd:
+0
+RESTORE cmp: byte-identical OK toolrequest_nail_309_test.go=263adc87a259 loop.go=cb7f9da7a6d2

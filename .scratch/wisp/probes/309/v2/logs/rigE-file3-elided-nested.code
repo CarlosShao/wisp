@@ -1,0 +1,7 @@
+package main
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+type rig309v2Nested = []agent.ToolRequest
+
+func rig309v2Elided() { _ = rig309v2Nested{{TaskID: ""}} }

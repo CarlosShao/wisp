@@ -1,0 +1,6 @@
+package perm
+
+// Rig 309-v2: this file mentions agent.ToolRequest{TaskID: ""} in a comment only.
+// The word ruler `grep -rn 'ToolRequest{'` counts this line; the AST nail must not.
+
+func rig309v2NoPoint() {}

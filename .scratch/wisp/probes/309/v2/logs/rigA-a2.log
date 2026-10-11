@@ -1,0 +1,9 @@
+time=2026-10-11T16:05:27.039+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309AssessorForEmptyTaskIDDropsTaintDetector
+    assessorfor_taint_instrument_309_test.go:54: 非空 task id 的判级器没判出 R4（level=L0 rules=[]）：assessorFor 的 WithTaintDetector 那一支若被摘掉，R4 就整条不发生；① 这一腿的存在就是为了：探测器真没挂上时这里必须红
+    assessorfor_taint_instrument_309_test.go:70: 两向没有拉开（空/非空同为 [] 或同不为 R4）：这枚仪器对"探测器挂没挂"是瞎的
+--- FAIL: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.046s
+FAIL
+rc_A2-detector-nil=1

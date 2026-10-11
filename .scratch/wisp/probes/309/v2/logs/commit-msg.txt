@@ -1,0 +1,52 @@
+309-v2 非实现者终裁：AC#1 成立／AC#2 成立／AC#3 附条件成立（一枚新条件＝那句 "wherever" 量上不实）
+
+派单＝`.scratch/wisp/probes/orch/20261011/txt/309v2-dispatch.txt`；锚＝`f6067e5d`（现跑 `git rev-parse --short HEAD` 相等）；
+起手 `git -c core.quotePath=false diff --cached --name-only | wc -l`＝**0**（没看到大面积 staged 别家路径、⛔ 清空过）。
+本腿**只**产判语：⛔ 翻框（起手／收尾框数尺同＝`- [x]`**3** ⇄ `- [ ]`**3**）／⛔ 动 `Status:`／⛔ 改名 `-done`／⛔ push（`A813` 一次未用）／
+⛔ 动一枚交付码或测试码字节（`git status --porcelain -- internal cmd tools scripts`＝**0 行**，全程）。
+
+## 四面进攻的答复（逐枚可重跑；尺名＋射程＋provenance 全在裁决表里）
+
+- **① 钉有没有牙**：仪器四形各红、pristine 绿（摘 `|| taskID == ""`／`WithTaintDetector(nil)`／整枚守卫 off／肢取反）；
+  枚数钉加一枚⇒红（`internal/tools`、**`internal/agent` 里同包裸名**、`tools/`、`scripts/`、盘上声明形、盘上别名形＝6 发 `rc=1`）；
+  **移除**被点名那枚⇒红（B5 `名册=(空名册)`＝判据是 `==1` ⛔ `<=1`）；`wantTotal 1→2` 打在⛔ 变的树上⇒**当场红**（B6）。
+  还原纪律＝每形 `RESTORE cmp: byte-identical OK … match=YES`，终局 sha `995c23d2ef6e…`＝`git show f6067e5d:internal/tools/bridge.go` 同一枚。
+- **② 恒真三面**：永红形被正控咬（B11 打瞎⇒`control "shape 1…": counted 0, want 1`；C1 catch-all⇒`control "guard…": counted 1, want 0`＝控制双向）；
+  空循环形⇒红（B9 `roots=[]`、B10 根不存在）；**缺世界**＝`taskID` 那肢世界在（夹具恒写 `Provenance:`、恒⛔ 写 `Assessor:`），
+  `b.injected`／`b.prov == nil` 两肢**输入造得出而断言缺**＝整包摘 `b.injected` 净新增红 **0**、摘 `b.prov == nil` 净新增 **16**（复现腿自报那枚数）
+  且 FAIL 名册里⛔ 一枚讲这一肢、两发 309 仪器全 `--- PASS`。
+- **③ roots**：四根全 live（分母 **293**＝`cmd=40 internal=229 scripts=11 tools=13`，第三方 `find` 尺逐根对得上）；
+  `_test.go` 按路径后缀滤、注释行 AST⛔ 数（B13：钉绿而同树词面尺数到 **4**＝词面尺造假枚）；
+  裁 `Q-309-r2-scripts-roots-admitted-by-prefix-only`＝**⛔ 算 `AC#1` 的欠**（roots 是 `AC#2` 的载荷，scripts 真在射程里）。
+- **④ 三句注释**：自指尺逐字重跑＝**71／69／2／1**（简写形亦＝2）＝注释句句如实；内容锚五枚各 1 命中、点名段内⛔ 绝对 `loop.go:<数字>`；
+  契约声称（`C19/C25/C26`）增删 **0** 行；"行为逐字节不变"＝区间 `bd124b2a⇄f6067e5d` 改动 **70 枚全注释／非注释 0**、两版剥注释 `cmp` **IDENTICAL**（854⇄854）；
+  `Every other gate still runs` 已⛔ 在盘上，替成的射程句如实（`rules_gateway.go` 4 枚规则里只有 `ruleTaint` 读 `ctx.taint`）；`:982` 那句 "Who rings…" 真（签收编排者驳 overclaim 那判）。
+
+## ★本轮唯一新抓＝`AC#3` 的那一枚条件
+
+`bridge.go:959-963` 那句全称"counts **every** production construction point … so a second one rings **wherever** it is written"**量上不成立**：
+B14 往 `internal/tools/` 放一枚**真**第二构造点 `return new(agent.ToolRequest)` ⇒ 钉**绿**（构造点仍 1、分母漂 294），
+而同文件钉头 `:52-63` 自己列着七条漏形＝两句互相矛盾。改法一行（"wherever" 收窄成"三形之内，漏形名册见钉头"）。
+
+## 门禁与台面
+
+四道起手各一发＝`rc_build=0`／`rc_vet=0`／`rc_d22scan=0`／`rc_pathlen=0`，件各显式带 `rc=` 行、⛔ 0 字节；
+写完自家件后再跑两把写面尺＝`rc_d22scan_with_my_files=0`（含 live 那句 `clean - no D22 ban violations`）／`rc_pathlen_with_my_files=0`（`VERDICT GREEN`，`over-budget=57 covered=57 not-in-roster=0`）。
+突变⛔ 落进母仓：两棵仓外导出树（`git archive f6067e5d`，单面 ⇒ 腿的 `Q-309-r2-tree-rigs-mixed-face` 对我这些读数已结）。
+
+## 具名欠账 6 枚（⛔ 我盖章哪格该翻）
+
+`Q-309-v2-1-assembly-limb-blind`／`-2-roots-and-floor-unpinned`（**B8** roots 被一行收成两根而 `tools/` 里真有构造点⇒**绿**；**B7** 分母 floor `200→1`⇒**绿**）／
+`-3-blind-shape-rings-green`（`new(T)`＋省类型嵌套补上实测绿；钉头另三条仍具名⛔ 实测）／`-4-frontend-outside-the-roots`（`frontend/embed.go`＝`go list ./...` 35 枚包里唯一四根外的模块包）／
+`-5-callsite-covered-by-other-tickets`（**D1/D2**：调用点解耦整包净新增 **7**／**3** 枚红，接住的是票 124/175/183/185 那族牙、309 仪器全绿）／
+`-6-legacy-go-snapshots-under-probes`（⛔ 本票账＝`.scratch/**` 下 tracked `.go` 314 枚）。
+
+## ⛔ 我做了／⛔ 我复跑
+
+⛔ 整仓测试名册与格式名册／eol 三把（`AC#4` 已翻勾⛔ 重判）；A6 那 17 枚红的成因只逐字读 2 枚（"全是管道噪声"＝读码推、⛔ 16/16 量过）；
+R359-3／R359-5 ⛔ 重跑只引用。另自抓一把我自己的尺错（`rigC.txt` 的 `grep -c '\t\t{"'` 里 `\t` ⛔ 展开 ⇒ 那枚 `0` 是尺错、真数＝**6**），
+⛔ 改原件、只追加更正件 `logs/rigC-c2-ruler-note.md`。
+
+★承重那句复述：形 Ⓑ 之后**对空 `taskID` 的实际防御仍＝零**；判"成立"⛔ 等于"以后有人递空 id 会有人管"。
+撤销口令＝逐枚「309-v2 撤 `AC#1`」／「309-v2 撤 `AC#2`」／「309-v2 撤 `AC#3`」；改判形 ⓐ 仍用「309 改形 ⓐ」。
+件＝`probes/309/v2/{00,10,90}.md`＋`logs/`＋裁决表 `docs/evidence/s1/309-v2-verdicts.md`；票尾一条 bullet（＋1／−0）。

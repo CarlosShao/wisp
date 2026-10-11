@@ -1,0 +1,20 @@
+### E1-var-decl-then-field-assignment-on-disk : rc=rc=1
+名册=cmd/llmrecord/rig309v2e.go:5(var-decl-no-initializer) | internal/agent/loop.go:675(same-package-bare-literal)
+生产构造点=2（==1，那枚＝internal/agent/loop.go）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.19s)
+### E2-file-level-alias-then-literal-inside-internal-agent : rc=rc=1
+名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/agent/rig309v2e.go:5(alias-literal)
+生产构造点=2（==1，那枚＝internal/agent/loop.go）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.18s)
+### E3-elided-inner-literal-in-a-slice-shape-named-blind : rc=rc=0
+生产构造点=1（==1，那枚＝internal/agent/loop.go）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.20s)
+E3 expectation: the nail stays green -- this rig is the reading for a named blind shape, not for a condition
+=== word ruler over the E3 tree (the fake count the AST ruler refuses; E3 file present again below)
+2
+### E4-word-ruler-vs-ast-ruler-on-the-same-file : rc=rc=0
+生产构造点=1（==1，那枚＝internal/agent/loop.go）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.19s)
+=== tree back to pristine for the two targets:
+cmp toolrequest_nail_309_test.go identical
+cmp loop.go identical

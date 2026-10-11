@@ -1,0 +1,7 @@
+package main
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+var rig309v2Decl agent.ToolRequest
+
+func rig309v2Assign() { rig309v2Decl.TaskID = ""; _ = rig309v2Decl }

@@ -1,0 +1,3 @@
+package agent
+
+func rig309v2Bare() ToolRequest { return ToolRequest{TaskID: ""} }

@@ -1,0 +1,5 @@
+package agent
+
+type rig309v2Alias = ToolRequest
+
+func rig309v2AliasPoint() rig309v2Alias { return rig309v2Alias{TaskID: ""} }

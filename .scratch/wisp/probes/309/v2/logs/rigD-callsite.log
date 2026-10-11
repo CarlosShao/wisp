@@ -1,0 +1,29 @@
+=== D0 pristine whole-package positive control (1 known red: TestTicket252R1AlignmentAddsNoAuthorization)
+### D0-pristine : rc=rc=1 topFAIL=1 topPASS=210
+   309 instrument under this mutation: --- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+D1 mutated: Execute stops handing its task id to assessorFor (always empty id)
+### D1-callsite-forces-empty-id : rc=rc=1 topFAIL=8 topPASS=203
+   309 instrument under this mutation: --- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+--- FAIL: TestFSReadTaintFeedsR4 (0.01s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+--- FAIL: TestPointer183SiblingArtifactInTheSameDirectoryStillHits (0.03s)
+--- FAIL: TestPointer185ForeignFileCarryingTheHostPathStillBlocksTheReread (0.03s)
+--- FAIL: TestPointer185AModelNominatedFileIsNotRostered (0.03s)
+--- FAIL: TestPointer185AnotherTaskCannotBorrowTheRoster (0.04s)
+--- FAIL: TestPointer185SiblingHostArtifactIsNotLaundered (0.04s)
+--- FAIL: TestForeignMentionOfHostPathStillHitsR4OnRealBridge175r2 (0.02s)
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+D2 mutated: the call site binds the WRONG id (ticket 242's per-call corr instead of the task id)
+### D2-callsite-wrongs-id : rc=rc=1 topFAIL=4 topPASS=207
+   309 instrument under this mutation: --- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.01s)
+--- FAIL: TestToolCallRowsAreComplete (0.08s)
+--- FAIL: TestFSReadTaintFeedsR4 (0.01s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+--- FAIL: Test283IdentityChainThroughTheRealLoop (0.08s)
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES
+=== final sha (tree) vs repo HEAD blob of bridge.go (must match) ===
+995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba */tmp/wisp309v2tree.Vvd7/internal/tools/bridge.go
+995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba *-
+RESTORE cmp: byte-identical OK sha=995c23d2ef6ea16c3fd0b2a7e0b5c2c18ea87bb860f5ada1e18e52ebbe464eba match=YES

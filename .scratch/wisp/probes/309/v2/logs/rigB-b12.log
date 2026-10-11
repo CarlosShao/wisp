@@ -1,0 +1,5 @@
+# github.com/CarlosShao/wisp/internal/tools [github.com/CarlosShao/wisp/internal/tools.test]
+internal\tools\toolrequest_nail_309_test.go:149:2: multiple defaults (first at internal\tools\toolrequest_nail_309_test.go:142:2)
+FAIL	github.com/CarlosShao/wisp/internal/tools [build failed]
+FAIL
+rc_B12-matcher-catchall=1

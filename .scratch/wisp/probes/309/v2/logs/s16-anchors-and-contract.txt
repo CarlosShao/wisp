@@ -1,0 +1,13 @@
+=== AC#3 content anchors actually on disk
+loop.go defer revokeAdmission()=1
+loop.go id := newTaskID()=1
+loop.go return l.run(ctx, newTaskID(), input)=1
+rules_gateway.go ctx.taint == nil=1
+provenance.go func scopeMarks=3
+682:// scopeMarks snapshots a scope's taint marks. The second result reports the
+694:func (p *Provenance) scopeMarks(scopeID string) ([]*taintMark, bool) {
+726:	marks, unbound := p.scopeMarks(scopeID)
+bridge.go assessorFor call site=2
+=== contract-claim lines touched in 309's range (must be none removed of a contract sentence)
+=== gate clause G1/G1b/G5 exist in 154's file?
+34

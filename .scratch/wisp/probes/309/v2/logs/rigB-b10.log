@@ -1,0 +1,8 @@
+time=2026-10-11T16:07:47.229+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309ToolRequestProductionConstructionNail
+    toolrequest_nail_309_test.go:301: walk ..\..\scripts309v2gone: GetFileAttributesEx ..\..\scripts309v2gone: The system cannot find the file specified.
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.16s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.230s
+FAIL
+rc_B10-missing-root=1
