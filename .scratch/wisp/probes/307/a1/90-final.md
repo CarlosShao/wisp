@@ -50,3 +50,19 @@
 2. **派单说"同形复制件 `internal/risk/provenance.go:345` 附近那一族"**——现量结果比"附近那一族"更硬：那一枚⛔ 只是复制件，它是**生产面唯一那枚 `home` 赋值点**（两个产码 `NewProvenance` 都传 `NoProbe: true`），而票面点名的 5 枚用例也全走它。⇒ 这一枚要不要算进落点不是"顺手覆盖"的问题，是"⛔ 覆盖它就没有修到生产"的问题。读数交回，⛔ 由我裁。
 3. **派单转述的第三形名字对不上**：派单写"复用 `pathresolver.go` 里既有的 `formsOf`·`anchorForms` 那一族"。现跑：`formsOf` 定义在 `pathresolver.go:345`、`anchorForms` 在 `:391`（⛔ 腐烂，与产码那两枚无关），但**实际消费它们做 `home` 锚点比较的那一族住在 `blacklist.go`**（`:199`、`:214`、`:221` 等 8 枚 `anchorForms(...)` 调用 ＋ `aUnder`/`aEq`/`aRelates`/`uncertainAnchorMiss` 四枚关系函数，`blacklist.go:262-322`）。⇒ 落点若选这形，**改动点在 `syncdirs.go:428` 调 `blacklist.go` 的关系函数**，⛔ 落在 `pathresolver.go` 里。
 4. **票面 §1"乙族那 5 枚"里 `:162` 那一枚的归因**：票面把 5 枚都算作"home 单边折法"的出口（`AC#0` 自己也没预设）。现跑读数：`:162` 所在的 fixture 根 `home\Cloud\NutstoreSync` 从未被创建（`sandbox()` 只建 `home`/`local`/`roaming`，`syncdirs_test.go:15-27/152-163`）⇒ 它同时吃 `:422` 的 `:160` 支。若落点只折 `home`（形 A），〔读码推到〕`:162` 能不能复绿取决于 fallback 是否接住它——**这一枚是本腿唯一"读数可能与票面归因不同"的地方**，具名报回，⛔ 由我改判任何归因。
+
+## 5. 逐笔越界尺（现跑，⛔ 区间尺）
+
+尺＝逐笔 `git show --name-only --format= <sha>`（第 2 笔那批循环输出的原始留档＝`logs/52-commit2.txt`）。
+
+| 笔 | SHA | 名册行数 | 越出 `.scratch/wisp/probes/307/a1/**` 的格 |
+|---|---|---|---|
+| 1 | `08cc614ec1915c76e385ab9e070645512f5861e0` | 4 | **0** |
+| 2 | `4d4c10d4f03cfd29def0713b42dc5bc9078e8445` | 25 | **0** |
+| 3 | 本笔（`90-final.md` ＋ `logs/52-commit2.txt`） | 2 | **0** |
+
+- 新建 `.go`＝**0** 枚、`.out`＝**0** 枚、0 字节件（尺＝`find .scratch/wisp/probes/307/a1 -type f -size 0`，**带 `-type f`**）＝**0** 枚（`logs/51-zero-fix.txt` 现跑：`count_zero=0`、`count_files=27`）。
+- ⚠ **自报一枚自己的缺陷**：第 1 笔带了一枚 0 字节件 `logs/00-anchor-readings.log.2`（那是 `git status --porcelain -- internal cmd` 的**空输出**，读数本身有效＝0 行）。第 2 笔已往该件补了"empty output by design ＋尺名＋rc"说明行 ⇒ **HEAD blob 不再 0 字节**，但**历史那一笔的 blob 确实 0 字节**。⛔ 删（临时件只建不删）、⛔ 改写历史（⛔ `--amend`/`rebase`），要更正就追加——已按"追加"更正。同形的另一枚＝`logs/g-k-crossface.txt.2`（第 2 笔一并补好，故第 2 笔起 count_zero=0）。
+- ⚠ **共享工作树的并发读数（⛔ 本腿的越界）**：`git rev-list --reverse 1eaa91f..HEAD` 里**夹着别家的笔**（`probes/303/v2/**`、`probes/306/orch/**`、`issues/305`/`306`/`307`/`72` 四枚票面、`docs/reports/HANDOVER.md`、`docs/reports/pending-and-issues.md`、`docs/evidence/s1/306-*.md`、`docs/evidence/s1/303-ac3b-ac5-v2.md`）。⇒ 这正是派单"终局自证尺⛔ 用区间尺"的原因：**拿 `1eaa91f..HEAD` 那把区间尺会数出上百行别家路径，看着像本腿越界**。⇒ 逐笔尺才是判据。
+- 台面另有一批别家未跟踪/删除态（`design/**` 16 行 ` D`、`?? -`、`?? .scratch/.scratch/`、`.scratch/commit-msg-*.txt` 等，`logs/50-selfcheck.txt` ruler5 段，尺＝`git status --porcelain | grep -v "^ M" | head -30`）⇒ 本腿**一枚都⛔ 碰、⛔ 删、⛔ 收进自家 commit**（`git add` 只带自家目录那一枚 pathspec，⛔ `-A`/`.`）。
+- push＝**0**（本腿全程只 commit 三笔）。

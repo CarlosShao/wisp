@@ -1,0 +1,45 @@
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/00-anchor-readings.log.2', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/40-alias-probe.ps1', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/40-alias-probe.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/41-alias-world-probe.ps1', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/41-alias-world-probe.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/50-selfcheck.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/51-zero-fix.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/90-commit-msg.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-a-defs.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-b-resolver.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-c-prov.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-d-home.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-e-nails.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-g-noprobe.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-h-prod.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-i-negatives.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-j-misc.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-k-crossface.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/307/a1/logs/g-k-crossface.txt.2', LF will be replaced by CRLF the next time Git touches it
+[dev 4d4c10d4] chore(307-a1): AC#0 折法名册 + 最小落点候选 + 既有钉名册 + ★台面短名现量
+ 24 files changed, 1166 insertions(+)
+ create mode 100644 .scratch/wisp/probes/307/a1/10-fold-roster.md
+ create mode 100644 .scratch/wisp/probes/307/a1/20-landing-shapes.md
+ create mode 100644 .scratch/wisp/probes/307/a1/30-test-nails.md
+ create mode 100644 .scratch/wisp/probes/307/a1/40-machine-alias.md
+ create mode 100644 .scratch/wisp/probes/307/a1/90-final.md
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/40-alias-probe.ps1
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/40-alias-probe.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/41-alias-world-probe.ps1
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/41-alias-world-probe.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/50-selfcheck.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/51-zero-fix.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/90-commit-msg.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-a-defs.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-b-resolver.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-c-prov.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-d-home.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-e-nails.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-g-noprobe.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-h-prod.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-i-negatives.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-j-misc.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-k-crossface.txt
+ create mode 100644 .scratch/wisp/probes/307/a1/logs/g-k-crossface.txt.2
+rc_commit2=0
