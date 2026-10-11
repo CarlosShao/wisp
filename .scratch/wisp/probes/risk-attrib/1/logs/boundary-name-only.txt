@@ -1,0 +1,38 @@
+# risk-attrib/1 越界尺＝逐笔 git show --name-only --format=<hash>（⛔ 区间尺）  Sun Oct 11 08:02:59 CST 2026
+=== commit 63bc6335
+.scratch/wisp/probes/risk-attrib/1/00-anchor.md
+.scratch/wisp/probes/risk-attrib/1/logs/gate-00.txt
+=== commit f4fd71bc
+.scratch/wisp/probes/risk-attrib/1/10-ownership-roster.md
+.scratch/wisp/probes/risk-attrib/1/20-mechanism-per-red.md
+.scratch/wisp/probes/risk-attrib/1/logs/case-00
+.scratch/wisp/probes/risk-attrib/1/logs/case-01
+.scratch/wisp/probes/risk-attrib/1/logs/case-02
+.scratch/wisp/probes/risk-attrib/1/logs/case-03
+.scratch/wisp/probes/risk-attrib/1/logs/case-04
+.scratch/wisp/probes/risk-attrib/1/logs/case-05
+.scratch/wisp/probes/risk-attrib/1/logs/case-06
+.scratch/wisp/probes/risk-attrib/1/logs/case-07
+.scratch/wisp/probes/risk-attrib/1/logs/case-08
+.scratch/wisp/probes/risk-attrib/1/logs/case-09
+.scratch/wisp/probes/risk-attrib/1/logs/case-10
+.scratch/wisp/probes/risk-attrib/1/logs/case-11
+.scratch/wisp/probes/risk-attrib/1/logs/case-12
+.scratch/wisp/probes/risk-attrib/1/logs/shortname-probe.ps1
+.scratch/wisp/probes/risk-attrib/1/logs/t01-local-12.txt
+.scratch/wisp/probes/risk-attrib/1/logs/t02-shorttemp-12.txt
+=== commit 1f9e781f
+.scratch/wisp/probes/risk-attrib/1/30-routing.md
+.scratch/wisp/probes/risk-attrib/1/90-final.md
+=== scoped porcelain（自家路径，现量）
+?? .scratch/wisp/probes/risk-attrib/1/logs/boundary-name-only.txt
+rc=0
+=== 自家四张表的现量行数
+   56 .scratch/wisp/probes/risk-attrib/1/00-anchor.md
+   46 .scratch/wisp/probes/risk-attrib/1/10-ownership-roster.md
+   88 .scratch/wisp/probes/risk-attrib/1/20-mechanism-per-red.md
+   52 .scratch/wisp/probes/risk-attrib/1/30-routing.md
+   52 .scratch/wisp/probes/risk-attrib/1/90-final.md
+  294 total
+=== 自家目录件数
+27
