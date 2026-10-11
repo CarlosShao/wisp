@@ -1,0 +1,7 @@
+收 309-v3b ⇒ 票 309 六格齐（AC#2 措辞修订归我 + AC#3 复跑翻勾）+ A855
+
+- 台账 `A855` 追加 **34 行 / 删 0 行**（前置 `sha256` IDENTICAL）；票 309 `+3 −2`（两条框行 + 一条 append-only bullet），框现量 **6 [x] / 0 [ ]**、`Status:` 文字一字未动、⛔ 改名 `-done`。
+- 我自己复跑的三件：三形牙齿各"红且名册点名形状标签"（`new-of-tool-request`／`make-slice-of-tool-request`／`conversion-to-tool-request`，红句都在 `toolrequest_nail_309_test.go:390:`）+ 还原绿；`bridge.go` 那笔**只动注释**（非注释改动 0 行、剥注释行后 `cmp` IDENTICAL 854⇄854）；HEAD 下钉 PASS（构造点 1 枚）。
+- ★**措辞修订归我**：`AC#2` 原文全称式（"任一 caller"）与钉自己的七枚盲形名册冲突、按原字面任何腿都判不出"成立" ⇒ 按 `309-v3b` 给的两行替换文本改成"七形之内＋四根之内"，盲形写成具名残余（理由全文入 `A855` §3）。
+- 两把我自己的坏尺各记一笔：`sed` 剥注释留空行⇒行数必不同（"differs at line 986" 是我的尺造的）；我写错的探针 `undefined: agent`（包内不能自我限定，⛔ 钉的事）。
+- 门禁 `pathlen_rc=0`（VERDICT GREEN）、`d22scan_rc=0`；⛔ push。

@@ -1,0 +1,14 @@
+Processing -File '' failed: The path is not of a legal form. Specify a valid path for the -File parameter.
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+wk_rc=127
+go_test_rc=0
+Processing -File '' failed: The path is not of a legal form. Specify a valid path for the -File parameter.
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
