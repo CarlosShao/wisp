@@ -1,0 +1,3 @@
+=== RUN   TestSyncSuspectFallbackIsComponentBounded
+    syncdirs_test.go:355: under-profile must be suspect
+--- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.00s)

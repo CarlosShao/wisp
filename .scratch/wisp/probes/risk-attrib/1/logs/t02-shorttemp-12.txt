@@ -1,0 +1,43 @@
+time=2026-10-11T07:56:26.969+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+    pathresolver_anchor_spelling_windows_test.go:57: Resolve("C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestClassifyAnchorSpellingIsNotVerdict3254558111\\001\\profile\\.ssh\\id_testkey") canonical "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestClassifyAnchorSpellingIsNotVerdict3254558111\\001\\profile\\.ssh\\id_testkey": test premise broken (candidate must be the real path)
+--- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.09s)
+=== RUN   TestCanonicalInputGainsNoSecondForm
+    pathresolver_anchor_spelling_windows_test.go:140: canonical "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestCanonicalInputGainsNoSecondForm1382884438\\001\\not-created-yet\\deep.txt" produced 2 comparison forms ["c:\\users\\swq\\tmp\\riskat~1\\runner~1\\testcanonicalinputgainsnosecondform1382884438\\001\\not-created-yet\\deep.txt" "c:\\users\\swq\\tmp\\riskattrib1\\runnertempareaforattribution1\\testcanonicalinputgainsnosecondform1382884438\\001\\not-created-yet\\deep.txt"], want 1 (verdict must not move for a path with one spelling)
+--- FAIL: TestCanonicalInputGainsNoSecondForm (0.01s)
+=== RUN   TestAListWinsWhereBothTablesHit
+    pathresolver_anchor_spelling_windows_test.go:238: B-only control must stay overridable by design: {Allow:false NeedL2:true Class:B Reason:B-list sensitive path; single-file override requires one L2 confirm: id_*}
+--- FAIL: TestAListWinsWhereBothTablesHit (0.02s)
+=== RUN   TestPathResolverShortNameAListDenied
+    pathresolver_junction_windows_test.go:135: short name did not expand to long path: got "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverShortNameAListDenied2263365504\\001\\.git-credentials" want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverShortNameAListDenied2263365504\\001\\.git-credentials"
+--- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+=== RUN   TestPathResolverUNCAListDenied
+    pathresolver_junction_windows_test.go:164: UNC spelling "\\\\?\\UNC\\localhost\\c$\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverUNCAListDenied2077908740\\001\\.git-credentials" normalized to "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverUNCAListDenied2077908740\\001\\.git-credentials", want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverUNCAListDenied2077908740\\001\\.git-credentials"
+--- FAIL: TestPathResolverUNCAListDenied (0.01s)
+=== RUN   TestPathResolverExtendedLengthPrefixAListDenied
+    pathresolver_junction_windows_test.go:182: \\?\ spelling normalized to "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverExtendedLengthPrefixAListDenied3710129158\\001\\.git-credentials", want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverExtendedLengthPrefixAListDenied3710129158\\001\\.git-credentials"
+--- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+=== RUN   TestBListDefaultDenyAndOverride
+    pathresolver_junction_windows_test.go:292: B-list single-file override must allow: {Allow:false NeedL2:true Class:B Reason:B-list sensitive path; single-file override requires one L2 confirm: .env*}
+--- FAIL: TestBListDefaultDenyAndOverride (0.02s)
+=== RUN   TestSyncFixtureFallbackAndMatch
+    syncdirs_test.go:162: write under fixture root must be sync
+--- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+=== RUN   TestSyncFallbackNotDisarmableByWeakRoot
+    syncdirs_test.go:213: source "default": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "fixture": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "options": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "": under-profile fallback must stay armed
+--- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)
+=== RUN   TestSyncUnverifiedRootKeepsFallback
+    syncdirs_test.go:233: suspect fallback must stay armed
+--- FAIL: TestSyncUnverifiedRootKeepsFallback (0.01s)
+=== RUN   TestSyncSuspectFallbackIsComponentBounded
+    syncdirs_test.go:355: under-profile must be suspect
+--- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.00s)
+=== RUN   TestSyncSuspectFallbackWhenUndetectable
+    syncdirs_test.go:402: under-profile path must be sync-suspect, got {Sync:false Root:{Provider: Path: Source:} Why:write target is not under any sync root}
+--- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.249s
+FAIL

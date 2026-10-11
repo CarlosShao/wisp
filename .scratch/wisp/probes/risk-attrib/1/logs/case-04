@@ -1,0 +1,3 @@
+=== RUN   TestPathResolverShortNameAListDenied
+    pathresolver_junction_windows_test.go:135: short name did not expand to long path: got "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverShortNameAListDenied2263365504\\001\\.git-credentials" want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverShortNameAListDenied2263365504\\001\\.git-credentials"
+--- FAIL: TestPathResolverShortNameAListDenied (0.01s)

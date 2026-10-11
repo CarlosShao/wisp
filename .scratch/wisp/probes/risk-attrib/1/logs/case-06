@@ -1,0 +1,3 @@
+=== RUN   TestPathResolverExtendedLengthPrefixAListDenied
+    pathresolver_junction_windows_test.go:182: \\?\ spelling normalized to "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverExtendedLengthPrefixAListDenied3710129158\\001\\.git-credentials", want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverExtendedLengthPrefixAListDenied3710129158\\001\\.git-credentials"
+--- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)

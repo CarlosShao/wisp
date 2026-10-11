@@ -1,0 +1,3 @@
+=== RUN   TestCanonicalInputGainsNoSecondForm
+    pathresolver_anchor_spelling_windows_test.go:140: canonical "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestCanonicalInputGainsNoSecondForm1382884438\\001\\not-created-yet\\deep.txt" produced 2 comparison forms ["c:\\users\\swq\\tmp\\riskat~1\\runner~1\\testcanonicalinputgainsnosecondform1382884438\\001\\not-created-yet\\deep.txt" "c:\\users\\swq\\tmp\\riskattrib1\\runnertempareaforattribution1\\testcanonicalinputgainsnosecondform1382884438\\001\\not-created-yet\\deep.txt"], want 1 (verdict must not move for a path with one spelling)
+--- FAIL: TestCanonicalInputGainsNoSecondForm (0.01s)

@@ -1,0 +1,3 @@
+=== RUN   TestPathResolverUNCAListDenied
+    pathresolver_junction_windows_test.go:164: UNC spelling "\\\\?\\UNC\\localhost\\c$\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverUNCAListDenied2077908740\\001\\.git-credentials" normalized to "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverUNCAListDenied2077908740\\001\\.git-credentials", want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverUNCAListDenied2077908740\\001\\.git-credentials"
+--- FAIL: TestPathResolverUNCAListDenied (0.01s)

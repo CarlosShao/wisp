@@ -1,0 +1,6 @@
+=== RUN   TestSyncSuspectFallbackWhenUndetectable
+    syncdirs_test.go:402: under-profile path must be sync-suspect, got {Sync:false Root:{Provider: Path: Source:} Why:write target is not under any sync root}
+--- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.249s
+FAIL

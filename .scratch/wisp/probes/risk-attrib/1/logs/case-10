@@ -1,0 +1,3 @@
+=== RUN   TestSyncUnverifiedRootKeepsFallback
+    syncdirs_test.go:233: suspect fallback must stay armed
+--- FAIL: TestSyncUnverifiedRootKeepsFallback (0.01s)

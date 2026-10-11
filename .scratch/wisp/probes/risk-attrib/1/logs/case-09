@@ -1,0 +1,6 @@
+=== RUN   TestSyncFallbackNotDisarmableByWeakRoot
+    syncdirs_test.go:213: source "default": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "fixture": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "options": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "": under-profile fallback must stay armed
+--- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)

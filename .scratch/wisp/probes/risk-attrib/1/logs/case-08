@@ -1,0 +1,3 @@
+=== RUN   TestSyncFixtureFallbackAndMatch
+    syncdirs_test.go:162: write under fixture root must be sync
+--- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)

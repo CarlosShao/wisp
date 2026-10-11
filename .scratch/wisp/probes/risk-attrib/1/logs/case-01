@@ -1,0 +1,3 @@
+=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+    pathresolver_anchor_spelling_windows_test.go:57: Resolve("C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestClassifyAnchorSpellingIsNotVerdict3254558111\\001\\profile\\.ssh\\id_testkey") canonical "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestClassifyAnchorSpellingIsNotVerdict3254558111\\001\\profile\\.ssh\\id_testkey": test premise broken (candidate must be the real path)
+--- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.09s)
