@@ -149,7 +149,18 @@ func TestPathResolverUNCAListDenied(t *testing.T) {
 	home := tmpHome(t)
 	long := filepath.Join(home, ".git-credentials")
 	vol := filepath.VolumeName(long) // e.g. C:
-	share := strings.ToLower(vol[:1]) + "$"
+	// ticket 308 guard: the drive letter is taken through driveShare, never an
+	// inline vol[:1]. Every spelling below is a volume-derived UNC form, so with
+	// no drive letter there is nothing to construct. Name the broken premise and
+	// end THIS case with a red verdict -- do NOT panic the binary (that is what
+	// killed the whole package's evaluation in ticket 308) and do NOT t.Skip
+	// (AC#1 forbids skip-for-green). On any volume-qualified temp -- every
+	// reachable surface on this box and on the windows CI gear (裁语 ⓑ) --
+	// haveShare is true and the three spellings below are built exactly as before.
+	share, haveShare := driveShare(vol)
+	if !haveShare {
+		t.Fatalf("ticket 308: filepath.VolumeName(%q)=%q has no drive letter; the three UNC spellings below cannot be constructed", long, vol)
+	}
 	rest := strings.TrimPrefix(long, vol)
 	for _, spelling := range []string{
 		`\\?\UNC\localhost\` + share + rest,

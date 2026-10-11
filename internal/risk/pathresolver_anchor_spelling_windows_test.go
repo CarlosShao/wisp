@@ -11,9 +11,12 @@ import (
 
 // Ticket 72: the A-tier verdict must not depend on the spelling a path
 // arrived in (R17 invariant). These cases sit NEXT TO
-// pathresolver_junction_windows_test.go, which is the failing instrument and
-// is deliberately left byte-for-byte untouched: its expected values, its
-// anchors and its build tags are the measurement, not the thing under edit.
+// pathresolver_junction_windows_test.go, which is the failing instrument.
+// Ticket 308 does not edit that junction file's fixtures here: read its
+// expected values, anchors and build tags as the measurement, not as a frozen
+// guarantee -- commit f278c57f (ticket 72 甲族 #5/#6/#7) already changed that
+// file (+36 -7), so "deliberately left byte-for-byte untouched" was a claim
+// that stopped holding the moment that commit landed.
 //
 // Nothing here needs 8.3 short names, admin rights or a CI environment to
 // reproduce the defect: the runner's RUNNER~1-vs-runneradmin discrepancy is
@@ -99,20 +102,17 @@ func TestClassifyAnchorSpellingIsNotVerdict(t *testing.T) {
 func TestClassifySpellingInvariance(t *testing.T) {
 	home := tmpHome(t)
 	long := filepath.Join(home, ".ssh", "id_testkey")
-	vol := filepath.VolumeName(long)
-	share := strings.ToLower(vol[:1]) + "$"
-	rest := strings.TrimPrefix(long, vol)
 
-	spellings := map[string]string{
-		"long":           long,
-		"upper":          strings.ToUpper(long),
-		"lower":          strings.ToLower(long),
-		"extended":       `\\?\` + long,
-		"unc-admin":      `\\localhost\` + share + rest,
-		"unc-extended":   `\\?\UNC\localhost\` + share + rest,
-		"slashes":        strings.ReplaceAll(long, `\`, "/"),
-		"dot-and-dotdot": filepath.Join(home, ".", ".ssh", "..", ".ssh", "id_testkey"),
-		"not-yet-there":  filepath.Join(home, ".ssh", "brand-new-key"),
+	// ticket 308 guard: the drive letter is taken through driveShare, never an
+	// inline vol[:1]. On a volume-less temp the two UNC spellings cannot be
+	// built, so volumeInvariantSpellings drops them BY NAME and the remaining
+	// seven volume-free spellings still run -- the case ends with a verdict, it
+	// does NOT panic the binary and does NOT t.Skip (AC#1; the old inline
+	// strings.ToLower(vol[:1]) panicked "slice bounds out of range [:1] with
+	// length 0" and took every other case in the package's evaluation with it).
+	spellings, dropped := volumeInvariantSpellings(home, long)
+	if len(dropped) > 0 {
+		t.Logf("ticket 308: filepath.VolumeName(%q) has no drive letter; dropped the two volume-derived spellings by name %v; %d volume-free spellings still evaluated", long, dropped, len(spellings))
 	}
 	if s := getShortPath(t, filepath.Join(home, ".ssh", "id_testkey")); s != "" {
 		spellings["8.3-short"] = s
@@ -154,7 +154,8 @@ func TestClassifySpellingInvariance(t *testing.T) {
 // caller the verdict is the pre-ticket-72 verdict (.ssh/** and
 // .git-credentials still A, everything here still None), and it is that
 // verdict under EVERY comparison form the path has, 1 or 2. certain() stays
-// exactly as it was. See probes/72/r1/20-canonical-form-choice.md for why the
+// exactly as it was. See probes/72/r1/10-class-a-expected-side.md (section #2,
+// TestCanonicalInputGainsNoSecondForm) for why the
 // count itself is no longer assertable without either a production change
 // (make Resolve expand missing leaves: out of ticket 72's scope, it feeds
 // Actable/syncdirs/internal-tools) or a test-side oracle that would be
