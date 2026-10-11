@@ -1,0 +1,2 @@
+.scratch/wisp/probes/303/v2/logs/zero-byte-check.txt
+rc=0
