@@ -1,0 +1,7 @@
+anchor=fa24aa78
+staged=0
+porcelain_internal_cmd_tools_scripts=0
+ticket_done_boxes=4
+ticket_todo_boxes=2
+commits_since_dispatch_anchor=2
+rc=0
