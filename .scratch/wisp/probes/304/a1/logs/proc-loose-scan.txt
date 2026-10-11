@@ -1,1 +1,13 @@
+尺（逐字，PowerShell 经 `powershell -NoProfile -Command`，内联⛔ `$_`）：
 
+    Get-CimInstance Win32_Process | Where-Object Name -match "mockllm|wisp|balldebug|test\.exe" | Format-Table ProcessId,ParentProcessId,CreationDate,Name -AutoSize | Out-String -Width 300
+
+读数＝**0 行命中**（`-match` 在 PowerShell 里默认⛔ 分大小写，故这一把同时打 `mockllm.exe`／`MockLlm.exe`／`wisp*.exe`／`balldebug*.exe`／任意 `*.test.exe` 五形）。`rc=0`（尺本身跑成功，命中为空）。
+
+★**0 命中⛔ 等于"没有问题"，这一把尺看不见的东西（具名）**：
+1. **改名的同一族**：`go build -o <tmp>/anything-else.exe` 起出来的假大脑⛔ 叫 mockllm ⇒ 这把尺打⛔ 着（本票真源＝`internal/llm/adaptertest/mockllm.go:64` 那句 `filepath.Join(t.TempDir(), "mockllm"+exeSuffix())`，名字是拼出来的）。
+2. **⛔ `.exe` 的那一支**：ubuntu CI（`ci.yml:420`/`:487 --scope=core`，而 `internal/llm/…` 在 core pin＝`scripts/portable-tests.sh:172-176`）上同一枚夹具叫 `mockllm`（无后缀）⇒ 这台 Windows 机器的名册天然看不着它。
+3. **已经在退出路上但还没没掉的**：`Format-Table` 那一刻不在 ⇒ 表② (c) 那一形要的是"那一发的子进程还在不在"＝⛔ 一枚快照能替（＝`Q-304-a1-A`）。
+4. **孙代**：`mockllm` 自己⛔ 再生子进程（`tools/mockllm/main.go` 现读＝只 listen→Serve），但 `wisp.exe` 那一支会带 `msedgewebview2.exe` 子孙 ⇒ 名字尺⛔ 追树，追树得用父链尺（见 `proc-4fam-cmdline.txt`＋`10-residual.md` §2 那三棵×6）。
+
+⇒ 与同一场盘上另两把尺并排看：`proc-4fam-list.txt`（严格名册，同样 0 枚 mockllm/wisp/balldebug，18 枚 `msedgewebview2`）与 `proc-parents-and-snapshot.txt`（逐枚 PID：票面快照那两枚 20904/25660 都⛔ 在，`11724` 现＝`RuntimeBroker.exe`＝PID 复用）。**三把尺都放行"0 枚"这一读数 ⇒ 按派单 §4，凭据⛔ 是"三把都报 0"，而是票面 `:17` 那笔具名 `Stop-Process -Id` 处置（守卫三条）已经在立案时发生过。**
