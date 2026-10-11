@@ -1,0 +1,70 @@
+SUBJ 0d87a681 2026-10-02T09:03:15+08:00 ticket248(248-r1 产码)：设置那条路从入向请求修到磁盘——AC#1 名册真扩（config.get/config.set 进 bridge.go 白名单与 ParseComposerRequest 守卫、进 ComposerDispatch 派发表并新增 Config 槽）；AC#2 快照那一维进 composer 段（credentialState/credentialKnown，reader 未接就报 unknown/false）＋哨兵零命中常驻用例与其正控；AC#3 只走现成 secret.NewStore/DPAPI（值只由 cmd/wisp 的只写形状绑定，共用封套不声明那枚键，config.toml 只落 dpapi: 引用）；AC#7 validate() 落在新增导出 setter 内、进 mergeWrite 之前（种非法值⇒磁盘逐字节不变）；AC#11 逐枚键各一发受保护写＋回执报实际落盘键路径（⛔ 未用 SaveFile、未改 mergeWrite 本体）；AC#8 回执带 tier 且重启文案到 Handle 返回串（console 支与票 33 那侧的 bind 回执面都可见），全文无"保存即生效"；冻结件 l2_grant_boundary_test.go 只动 A487 具名解冻的 :2051/:2139 两枚锚，改法＝能力形（名册双向全等）＋自带正控，未删钉未放宽。票面 AC 框一枚未碰；internal/secret 一字未改；AC#4 本腿不做不勾。
+diff --git a/cmd/wisp/panel_inbound.go b/cmd/wisp/panel_inbound.go
+@@ -44,3 +44,5 @@ package main
+-//   - it is not the reply path (H10). Handle returns the refusal sentence; this
+-//     leg prints it on the console. A page still gets nothing back, and the
+-//     sentence a user sees in the panel stays ticket 35's host's to render.
++//   - it is not the reply path (H10). Handle returns the refusal sentence and,
++//     since ticket 248, the settings receipt; this leg prints both on the console.
++//     A page still gets nothing back from THIS process - the WebView2 host hands
++//     Handle's return value to the awaiting binding (panel_host_windows.go's bind
++//     closure), and that host is ticket 33's, not this leg's.
+@@ -52 +54,2 @@ package main
+-//   - it answers ONE of the four whitelisted methods. workspace/attachment/
++//   - it answers two of the six whitelisted methods. The mode write is ticket
++//     114's leg and the settings read/write is ticket 248's; workspace/attachment/
+@@ -72,0 +76 @@ import (
++	"github.com/CarlosShao/wisp/internal/secret"
+@@ -169,4 +173,11 @@ func cmdPanelInbound(args []string, s panelInboundIO) int {
+-		// An accepted request returns no text on purpose (slice A: the router must
+-		// not become the second voice in the room), so the receipt line is this
+-		// leg's own and says exactly which hop happened - not what the page will
+-		// show, because there is no page attached (H10 is open).
++		// An accepted request returns no text on purpose for the four doors slice A
++		// shipped (the router must not become the second voice in the room), so the
++		// receipt line below is this leg's own and says exactly which hop happened.
++		// A settings request does return a sentence, and ticket 248 AC#8 is why: which
++		// key paths landed, and that a restart is required, must reach the surface the
++		// user reads instead of only the log. Printing Handle's own words keeps this leg
++		// a pipe rather than an author.
++		if reply != "" {
++			fmt.Fprintf(s.stdout, "wisp panel-inbound: 第 %d 行回执：%s\n", lineNo+1, reply)
++			continue
++		}
+@@ -244,0 +256,15 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string)
++	// Ticket 248 AC#1/AC#3: the settings leg. It writes through the SAME Manager
++	// object as the mode chain above (one truth, no second loader) and through the
++	// one secret store this repository has (internal/secret, DPAPI), so this route
++	// creates no second place a key could live. A store-directory failure is an
++	// assembly failure here, not a degraded settings page that quietly accepts
++	// writes it cannot persist.
++	secrets, err := secret.NewStore(dir)
++	if err != nil {
++		return nil, fmt.Errorf("凭据存储不可用（%s）：%w", dir, err)
++	}
++	configWrites := &panel.ConfigWriteHandler{
++		Store: newConfigStore(mgr, secrets, auditf, actor),
++		Audit: auditf,
++		Actor: actor,
++	}
+@@ -252 +278,3 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string)
+-		Audit:      auditf,
++		// Ticket 248's two settings doors are answered by the leg above.
++		Config: configWrites,
++		Audit:  auditf,
+diff --git a/internal/panel/bridge.go b/internal/panel/bridge.go
+@@ -45,0 +46,22 @@ const (
++	// MethodConfigGet and MethodConfigSet are ticket 248 AC#1's two settings
++	// routes. Three facts about the naming, because each one is a decision
++	// somebody could later "fix" by accident:
++	//
++	//   - The names are NOT invented here. They are the two spellings the
++	//     product spec already carries (docs/specs/SPEC-08-ui-ball-panel.md:168,
++	//     read-only for this leg), so this file follows a document rather than
++	//     minting a fourth vocabulary.
++	//   - They carry no `panel.` prefix on purpose, and that is load-bearing
++	//     twice over: ticket 181's anti-drift nail in this package counts the
++	//     `panel.*` literals of this file (git_test.go's whitelistMethodsFromSource
++	//     extractor), and the frozen grant-boundary instrument assembles its
++	//     approval-shaped-name grid from `panel*` namespaces. Both readings were
++	//     re-measured when this route landed; the census for it is in

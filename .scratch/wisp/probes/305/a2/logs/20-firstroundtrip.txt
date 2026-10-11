@@ -1,0 +1,61 @@
+// What this proves and what it does NOT (orchestrator ruling P2, 10-01 13:12):
+// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+// body of the binding, which happens before any reply has to travel back, so this
+// function is NOT evidence for AC#14 - 33-p1 §A measured a run where ECHO_CALLS=3
+// (page to Go, arrived) and the awaited replies all stayed unresolved in the same
+// process. AC#14's receipt hop has its own ruler, whose assertion is made of what
+// the PAGE reports back, and a second one for Go-side Eval push; the two are
+// separate dimensions and stay separate tests.
+//
+// The probe page it shows is transient by design and, since AC#13 was fixed, is no
+// longer the last word: bringUp runs this BEFORE serveEntry, so the user ends on the
+// embedded entry. It takes m.mu itself, so a caller must not hold it (33-r11).
+func (m *PanelManager) firstRoundTrip(ctx context.Context, t0 time.Time) float64 {
+	m.mu.Lock()
+	w := m.w
+	m.mu.Unlock()
+	if w == nil {
+		return -1
+	}
+
+	done := make(chan struct{}, 1)
+	// A second, one-shot binding the probe page calls; its Go side just signals
+	// the round trip completed. Using a binding keeps the probe on the same
+	// WebView2 channel the real door uses.
+	if err := w.Bind("wispProbeRT", func() string {
+		select {
+		case <-done:
+		default:
+			close(done)
+		}
+		return "ok"
+	}); err != nil {
+		return -1
+	}
+
+	// A page that immediately calls the probe. SetHtml of a tiny document keeps
+	// this offline and independent of the (ticket 34/36-40) real page.
+	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"></head><body>` +
+		`<script>if(window.wispProbeRT)window.wispProbeRT();</script></body></html>`)
+
+	deadline := t0.Add(5 * time.Second)
+	for {
+		pnlPumpOnce()
+		select {
+		case <-done:
+			return float64(time.Since(t0).Microseconds()) / 1000.0
+		default:
+		}
+		if ctx != nil {
+			if err := ctx.Err(); err != nil {
+				return -1
+			}
+		}
+		if time.Now().After(deadline) {
+			return -1
+		}
+	}
+}
+
+// pnlPumpOnce drains whatever window messages are queued for this thread. The
+// WebView2 control delivers bindings and resource completion as window messages,

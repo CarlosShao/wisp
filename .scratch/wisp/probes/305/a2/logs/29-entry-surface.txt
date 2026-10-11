@@ -1,0 +1,37 @@
+## entry (untracked dist) title/id census — working-tree file, NOT in git at either window end
+<title>Wisp</title>
+id="root"
+rc(grep-title-id)=0
+## sha256 + bytes + mtime of that drifting file
+9b7856b949d639898832bbdc9a46734a17c57d8c0c4c1611fe10db45de07074f *frontend/dist/index.html
+1044
+2026-10-10 08:51:10.506316400 +0800
+## entryIDProbes body
+func entryIDProbes(t *testing.T) []string {
+	t.Helper()
+	assets, err := panel.BuiltinAssets()
+	if err != nil {
+		return nil
+	}
+	data, _, err := assets.Resolve(panel.EntryFile)
+	if err != nil {
+		t.Logf("Resolve(entry): %v", err)
+		return nil
+	}
+	seen := map[string]bool{}
+	var out []string
+	for _, m := range entryIDRe.FindAllStringSubmatch(string(data), -1) {
+		id := m[1]
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
+		out = append(out, id)
+		if len(out) >= 8 {
+			break
+		}
+	}
+	t.Logf("AC#13 probes from the resolved entry (%d bytes): %d id(s) %v", len(data), len(out), out)
+	return out
+}
+

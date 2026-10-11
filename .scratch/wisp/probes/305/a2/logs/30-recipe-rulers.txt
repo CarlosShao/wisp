@@ -1,0 +1,28 @@
+## ordered candidate set (the尺 published in 30)
+f7d28ef0 2026-10-01
+7a0236b3 2026-10-01
+0d87a681 2026-10-02
+480b970d 2026-10-03
+4658dbb6 2026-10-03
+cf95c799 2026-10-03
+32e74479 2026-10-05
+## merges in window
+0
+## first-parent path contains?
+963
+## sherpa tracked?
+0
+onnxruntime.dll
+sherpa-onnx-c-api.dll
+sherpa-onnx-cxx-api.dll
+## build dir tracked?
+0
+33p1-receipt.exe
+33p1-reentry.exe
+33p1q1.exe
+33p1q2.exe
+33p1q3.exe
+## dlls present in build
+build/onnxruntime.dll
+build/sherpa-onnx-c-api.dll
+build/sherpa-onnx-cxx-api.dll

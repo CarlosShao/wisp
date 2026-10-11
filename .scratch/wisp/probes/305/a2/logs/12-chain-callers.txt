@@ -1,0 +1,18 @@
+## chain-callers
+cmd/wisp/panel_geometry_255_winlive_test.go:107:	if err := hh.bringUp(mgr, ctx); err != nil {
+cmd/wisp/panel_host_windows.go:318:func (m *PanelManager) bringUp(ctx context.Context) error {
+cmd/wisp/panel_host_windows.go:421:	rtMs := m.coldStartPageHandover(ctx, t0)
+cmd/wisp/panel_host_windows.go:447:func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
+cmd/wisp/panel_host_windows.go:450:	if err := m.serveEntry(); err != nil {
+cmd/wisp/panel_host_windows.go:472:func (m *PanelManager) serveEntry() error {
+cmd/wisp/panel_host_windows.go:512:		if err := m.bringUp(ctx); err != nil {
+cmd/wisp/panel_host_windows_live_test.go:48:	if err := hh.bringUp(mgr, ctx); err != nil {
+cmd/wisp/panel_host_windows_test.go:110:func (hh *hostThreadHarness) bringUp(mgr *PanelManager, ctx context.Context) error {
+cmd/wisp/panel_host_windows_test.go:111:	return hh.runOnThread(func() error { return mgr.bringUp(ctx) })
+cmd/wisp/panel_host_windows_test.go:641:	if err := hh.bringUp(mgr, ctx); err != nil {
+cmd/wisp/panel_locked_naming_33r11_windows_test.go:360:func (m *roundTripHost) firstRoundTripLocked() float64 {
+cmd/wisp/panel_pageover_33r10_windows_test.go:254:	rtMs := m.coldStartPageHandover(context.Background(), time.Now())
+cmd/wisp/panel_resident_windows_test.go:472:		o.err = mgr.bringUp(context.Background())
+cmd/wisp/panel_resident_windows_test.go:552:		if err := mgr.bringUp(context.Background()); err != nil {
+cmd/wisp/panel_resident_windows_test.go:560:		o.err = mgr2.bringUp(context.Background())
+cmd/wisp/panel_transport_live_35v2_windows_test.go:210:		if err := mgr.bringUp(ctx); err != nil {

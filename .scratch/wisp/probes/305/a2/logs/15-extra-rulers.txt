@@ -1,0 +1,138 @@
+##尺A Navigate non-test (my own rerun)
+rc(navigate-rerun)=1
+##尺B chain symbols: which files define/consume them (HEAD, all dirs)
+cmd/wisp/config_readers_255.go
+cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go
+cmd/wisp/panel_geometry_255_test.go
+cmd/wisp/panel_geometry_255_winlive_test.go
+cmd/wisp/panel_host_windows.go
+cmd/wisp/panel_host_windows_live_test.go
+cmd/wisp/panel_host_windows_test.go
+cmd/wisp/panel_inbound_guards_35r3_test.go
+cmd/wisp/panel_locked_naming_33r11_windows_test.go
+cmd/wisp/panel_pageover_33r10_windows_test.go
+cmd/wisp/panel_reshow_255r1_windows_test.go
+cmd/wisp/panel_resident_windows.go
+cmd/wisp/panel_resident_windows_test.go
+cmd/wisp/panel_transport_35r1_test.go
+cmd/wisp/panel_transport_35r2_test.go
+cmd/wisp/panel_transport_live_35v2_windows_test.go
+##尺C pickaxe whole window all paths
+-- -SSetHtml --
+0f0fdaf2 35-a3 交件：页面读字段 × Go 侧真字段逐枚对账（field-reconciliation.md＋29 枚现量件）——41 枚同名同义／15 枚 Go 有页面不读／4 枚页面读 Go 没有；出向…
+663a176d 收四枚腿（275-a1／274-r1／35-a2／273-a3）＋台账 A663..A666：★我票面两处归因被字节尺推翻
+f88144b3 probe(35-a2): deliver the transport-cost survey for ticket 35's bridge AC
+ccb9f0df probe(35-a2): land opening anchor gate for the transport-cost survey
+3c8ac14e 台账 A662＋票 35 收 35-a1：★★它顶回我三句都算它对（入向只对 Go 半截／出向原语在但零 Eval 调用者／我那把尺拼错了名字），同时它页面那半的行号引在分支上＝dev 上不存在，已按 …
+8976ffab 35-a1 S4+S5: page-side bridge surface and cost table (findings: page never names window.wispDispatch …
+cdffb610 35-a1 S1: host + library capability surface (findings: outbound channel is Dispatch->Eval, already li…
+ae6c010e 普查(只读) 273-a1：D43 副作用名现量 50 枚、真收件人 0 枚、出货链今天只有 1 枚真投进空罐
+99489cda 普查(只读) bundle-1：出货链里没有"生成前端产物"那一步——本机 build.ps1:74 只 Write-Host、CI 三枚产 exe 的 job 零 node、npm build 只在 …
+5a14f0c7 普查(只读) panel-resident-1：常驻腿→面板六跳逐跳量清
+c3dbece8 probes(expired-premises-7b2 交件): 「生产调用者零枚」类过期票面语句逐枚定位置清＋票 194 末尾追加更正
+2822ee04 probes(代提三枚死腿盘上遗产 23 份小件)：同一波服务故障 19:10 连杀三枚零 go 只读腿
+a999754b 255-c2 deliver: spike ancestor of 420x260 (S1.4), section roster, delivery anchor re-check at HEAD 47…
+4eb228ef ledger(A558)＋票253 §8：收两枚只读交件并改裁一处。★253 AC#2 改走形ⓐ＝不需 owner 批准、不解冻任何枚——推翻我 A555 里"必撞 want-4 须具名解冻"那句（原话…
+fae59004 253-p4 预检：填 §1 两把尺现数 + §2 AC#2 两形批准判语 + §3 AC#1 零件名册与复认
+5fd50da6 probe(253-r3)：只读预检交件（零 Go 命令、零产码、frontend/design 零读，锚 0ce6cb91）。三问答满：①词面钉逐枚 9 行全录——"页面必须走 postMessage…
+7a956604 probe(33-p1) 第二轮三问真跑交件：①同STA第二实例＝真建成第二扇窗（q1两发：615/679与536/561ms，hwnd各异、绑定各自回话、零panic零静默失败）②Go→页回执＝出货R…
+2652926a probes(ci223-1): 只读取证 TestTicket223HandEditedFsLooseningCostsAnL2Card 的基线PASS→CI新发FAIL
+8ae4c23e docs(evidence): 33-r9 收尾代提——腿在 18:04 提交产码后死在最后一步，证据件与台件留在未提交态（编排者代提，只提交它自己写好的字，⛔ 没替它填任何一格判语）
+eeaded86 docs(evidence): 33-v2 verdicts for all 13 unchecked ticket-33 boxes
+rc(pickaxe-SetHtml)=0
+-- -SEntryFile --
+83badb67 274-v3 起手锚：commit-first（票 274 AC#11 数组对拉复核，非实现者腿）
+188c4b94 274-v2 裁决表：AC#10 闸门五格全射程——三形反形红在 :204（含 r2 没测的 npm 只写 node_modules／同名重写不同字节）、真 npm run build 一发绿且换名、真…
+46a242dd 274-r2 收 AC#10 判据与读数：定向突变打死 v1 §2 的 M-iii-2（桩 npm 一字不写＝rc 1＋具名红因）
+0f0fdaf2 35-a3 交件：页面读字段 × Go 侧真字段逐枚对账（field-reconciliation.md＋29 枚现量件）——41 枚同名同义／15 枚 Go 有页面不读／4 枚页面读 Go 没有；出向…
+f88144b3 probe(35-a2): deliver the transport-cost survey for ticket 35's bridge AC
+58f1df8e 274-r1: evidence logs and sections 1-7 for ticket 274
+35633445 274-r1: build.ps1 step 2 now builds the page and fails if it cannot (form B-1)
+ccb9f0df probe(35-a2): land opening anchor gate for the transport-cost survey
+c558aa9c 274-a1 终笔（§4/§5）：甲/乙/丙三形落点普查——needs: 全 ci.yml 0 枚（乙要新加 job 依赖边）、download-artifact 跟踪语料 0 枚（乙的新依赖）、丙的 …
+29f87d4a 274-a1 第二笔（§2/§3+§1补测格钉死）：三发 dev run 名册——npm run build 步在 37545246395/37406757402/37406422380 的 lint-…
+15699a2f 预演(乙)+立票274：★我预演§3那句"没有门看得见空bundle"一小时内被我自己推翻——AC#12 那把尺确实在跑，真缺口是"它两种形状都放行"
+99489cda 普查(只读) bundle-1：出货链里没有"生成前端产物"那一步——本机 build.ps1:74 只 Write-Host、CI 三枚产 exe 的 job 零 node、npm build 只在 …
+8ae4c23e docs(evidence): 33-r9 收尾代提——腿在 18:04 提交产码后死在最后一步，证据件与台件留在未提交态（编排者代提，只提交它自己写好的字，⛔ 没替它填任何一格判语）
+644b01ff docs(probes): pushpreflight-1 CI colour census - all 6 go-test steps fatal on SKIP, one proven new un…
+rc(pickaxe-EntryFile)=0
+-- -SwispDispatch --
+f718e9b6 35-r1 起手锚：票 35 AC#6(:52) 页面↔宿主传输落 Go 侧，记录 go vet 起手持数 rc=0、date/log/porcelain 现量、本格射程与既有红 composer_te…
+0f0fdaf2 35-a3 交件：页面读字段 × Go 侧真字段逐枚对账（field-reconciliation.md＋29 枚现量件）——41 枚同名同义／15 枚 Go 有页面不读／4 枚页面读 Go 没有；出向…
+663a176d 收四枚腿（275-a1／274-r1／35-a2／273-a3）＋台账 A663..A666：★我票面两处归因被字节尺推翻
+f88144b3 probe(35-a2): deliver the transport-cost survey for ticket 35's bridge AC
+ccb9f0df probe(35-a2): land opening anchor gate for the transport-cost survey
+3c8ac14e 台账 A662＋票 35 收 35-a1：★★它顶回我三句都算它对（入向只对 Go 半截／出向原语在但零 Eval 调用者／我那把尺拼错了名字），同时它页面那半的行号引在分支上＝dev 上不存在，已按 …
+8976ffab 35-a1 S4+S5: page-side bridge surface and cost table (findings: page never names window.wispDispatch …
+95b1bb0c 35-a1 S2+S3: assembly line and STA constraints (finding: the resident process that owns PanelManager …
+53d46242 145-f1: field-map first cut (anchors + page PanelSnapshot roster + Go Snapshot six fields + delivery-…
+5a14f0c7 普查(只读) panel-resident-1：常驻腿→面板六跳逐跳量清
+c3dbece8 probes(expired-premises-7b2 交件): 「生产调用者零枚」类过期票面语句逐枚定位置清＋票 194 末尾追加更正
+69a65cc0 pool-validity 4f: sections 2, 3, 4, 5 land (15 tickets graded, seven unframed tickets judged AC by AC…
+3b8873c9 chore(probes/pool-validity/4b): 交件——八枚全判完（4 仍成立／2 差翻勾／2 量不到）＋§3 心虚 6 枚＋§4 歧义 6 处
+4eb228ef ledger(A558)＋票253 §8：收两枚只读交件并改裁一处。★253 AC#2 改走形ⓐ＝不需 owner 批准、不解冻任何枚——推翻我 A555 里"必撞 want-4 须具名解冻"那句（原话…
+f79c3a0b 253-p4 预检：填 §4 自我对抗 + §5 量不到 + §6 交件判语，占位符清零
+fae59004 253-p4 预检：填 §1 两把尺现数 + §2 AC#2 两形批准判语 + §3 AC#1 零件名册与复认
+941805d0 ledger(A555)：253-r3 交件收档（5fd50da6，130 行占位 0；抽验 bridge_test.go:161 计数尺与 panelMethodRe 真身 git_test.go:3…
+5fd50da6 probe(253-r3)：只读预检交件（零 Go 命令、零产码、frontend/design 零读，锚 0ce6cb91）。三问答满：①词面钉逐枚 9 行全录——"页面必须走 postMessage…
+7a956604 probe(33-p1) 第二轮三问真跑交件：①同STA第二实例＝真建成第二扇窗（q1两发：615/679与536/561ms，hwnd各异、绑定各自回话、零panic零静默失败）②Go→页回执＝出货R…
+0781ac70 probe(e2e-recensus-1)：H1-H14 逐跳三态复核交件（只读普查，零 Go 命令，锚 19b63425/f17b1165）——六节齐：差集＝H11/H13 从「不通」升「半闭」（fa…
+4a9851d6 e2e-panel-1 起手：§0 锚＋§4/§5 先写满并落第一发 commit
+ebe2945a ledger(A520)：252-p1 结档——AC#1 判死（先失配的是词法那段 paths.go:140，resolvedForm 反而宽容、两段对同一物理路径给相反答复）＋我票面两句因果被推翻＋A…
+211b2b5a ledger(A519)：198-r1 主链链首落地（首建只挂 wisp run、internal/config 一字未碰）＋33-r8b 把死腿那 106 行接上线（我"未验证半成品"那句太轻——re…
+981f08b2 census(114-a2)：七节交齐——§5 选乙(档位已接到磁盘、只欠 newComposerDispatchChain 两枚 Confirm nil 的来源；附件归票92/工作区归票186 且接了…
+f5f9cc34 census(114-a2)：§1 调用者名册＋§2 逐格三态交齐——ParseComposerRequest 生产调用者=1(composer_dispatch.go:155)且 Handle 有两枚…
+0c1ec3a2 ledger(A512)：三枚只读交件结档——我那句"推下去红名集合只多 1 枚"预测错了 6 枚（实测 6 枚测试名＋2 枚新 SKIP＋1 枚作业级；机制只对一半：11 枚 FAIL 先走 rc≠0…
+d6aac497 evidence(ci-delta-1): 只读取证腿交件——8ae4c23e 对 0589fd9c 的 CI 红名册差算清了
+8ae4c23e docs(evidence): 33-r9 收尾代提——腿在 18:04 提交产码后死在最后一步，证据件与台件留在未提交态（编排者代提，只提交它自己写好的字，⛔ 没替它填任何一格判语）
+rc(pickaxe-wispDispatch)=0
+-- -SExecuteScript --
+f88144b3 probe(35-a2): deliver the transport-cost survey for ticket 35's bridge AC
+89114888 35-a1 S6+S7: final self-proof and correction (probe verdict logs DO exist at probes/33/p1/logs; Eval …
+cdffb610 35-a1 S1: host + library capability surface (findings: outbound channel is Dispatch->Eval, already li…
+ef8266db ledger(A571)：收 261-v1（门有牙）⇒ 票 261 五格全翻；firstrun 缺键新钉 ⇒ 261-r2 裁 Ⓑ+Ⓐ；137/251 结案、125 按住；212-a2 撞 150 轮帽…
+8387a8c8 ledger(A550)：33-p1 交件收档（7a956604，117 行 census＋3 探针＋14 日志；msedgewebview2 终态 12＝起手同值、wisp 进程 0＝零残留，我 20…
+7a956604 probe(33-p1) 第二轮三问真跑交件：①同STA第二实例＝真建成第二扇窗（q1两发：615/679与536/561ms，hwnd各异、绑定各自回话、零panic零静默失败）②Go→页回执＝出货R…
+0781ac70 probe(e2e-recensus-1)：H1-H14 逐跳三态复核交件（只读普查，零 Go 命令，锚 19b63425/f17b1165）——六节齐：差集＝H11/H13 从「不通」升「半闭」（fa…
+41bea161 e2e-panel-1 正身：§1 十四跳跳表＋§2 调用点尺读＋§3 逐环归票＋§6 复认＋§7 六跳
+rc(pickaxe-ExecuteScript)=0
+-- -ScurrentWindow --
+0f0fdaf2 35-a3 交件：页面读字段 × Go 侧真字段逐枚对账（field-reconciliation.md＋29 枚现量件）——41 枚同名同义／15 枚 Go 有页面不读／4 枚页面读 Go 没有；出向…
+f88144b3 probe(35-a2): deliver the transport-cost survey for ticket 35's bridge AC
+95b1bb0c 35-a1 S2+S3: assembly line and STA constraints (finding: the resident process that owns PanelManager …
+cdffb610 35-a1 S1: host + library capability surface (findings: outbound channel is Dispatch->Eval, already li…
+d6aac497 evidence(ci-delta-1): 只读取证腿交件——8ae4c23e 对 0589fd9c 的 CI 红名册差算清了
+8ae4c23e docs(evidence): 33-r9 收尾代提——腿在 18:04 提交产码后死在最后一步，证据件与台件留在未提交态（编排者代提，只提交它自己写好的字，⛔ 没替它填任何一格判语）
+rc(pickaxe-currentWindow)=0
+##尺D assets/Built defs
+internal/panel/assets.go:28:// EntryFile is what the host loads for the panel's root URL.
+internal/panel/assets.go:29:const EntryFile = "index.html"
+internal/panel/assets.go:56:	if _, err := fs.Stat(tree, EntryFile); err == nil {
+internal/panel/assets.go:65:func (a *Assets) Built() bool { return a != nil && a.built }
+internal/panel/assets.go:75:func (a *Assets) Resolve(requestPath string) ([]byte, string, error) {
+internal/panel/assets.go:81:		name = EntryFile
+internal/panel/assets.go:138:	entry, _, err := a.Resolve(EntryFile)
+internal/panel/assets.go:155:			return served, fmt.Errorf("panel: %s references %q but the embedded bundle cannot serve it", EntryFile, ref)
+##尺E currentWindow def
+// currentWindow returns the live control handle (nil before creation and after
+// Destroy). The resident panel thread publishes exactly this value to decide where
+// a request goes: while it is nil the thread's own channel is the route, once it is
+// set the library's Dispatch queue (which only Run() drains) is. Reading it under
+// the manager lock is what keeps "the window exists" and "the pump can be reached"
+// from being two different instants.
+func (m *PanelManager) currentWindow() webview2.WebView {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.w
+}
+
+// bringUp creates the ONE window on the calling thread and returns once the
+// control is alive and the entry bytes have been handed to it. It must run on a
+// thread that will pump the window's messages (ui-sta in the resident process, a
+// locked OS thread for the standalone harness).
+//
+// Cold latency = window create + first browser round trip (the same "usable"
+// point the S0 spike measured with NewWithOptions + SetHtml + a dispatch round
+// trip; here the round trip is the JS binding proving the WebView2 message
+// channel is live). It is a monotonic-clock measurement (Go's time.Since carries
+// the monotonic reading), never a wall-clock timeout.

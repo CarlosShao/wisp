@@ -1,0 +1,115 @@
+func (m *PanelManager) bringUp(ctx context.Context) error {
+	t0 := time.Now()
+	m.mu.Lock()
+	if m.created {
+		m.mu.Unlock()
+		return nil
+	}
+	m.mu.Unlock()
+
+	// PRECONDITION (33-r7): the thread that creates the panel window must have
+	// nothing left to dispatch. This is not belt-and-braces wording - it is the one
+	// thing four measured shapes agree on. Planting "a live window this thread owns
+	// plus one undispatched WM_CLOSE for it" on ONE locked thread and then running
+	// the product's own bringUp gives, three runs each
+	// (.scratch/wisp/probes/33/r7/modes-grid.txt, docs/evidence/s1/33-panel-host-c27-r7.md ①):
+	//   - remove only WM_QUIT before create (the 33-r6 narrow form, kept below): PANIC 3/3.
+	//     The close is dispatched by the create's own pump, the library posts the quit
+	//     it generates, and the quit is not yet visible to the filtered peek
+	//     (measured: removed=0, filtered found=false, next GetMessageW returns WM_QUIT).
+	//   - dispatch the close, then run that same quit drain: PANIC 3/3, same reading.
+	//   - purge the WHOLE queue without dispatching (the 33-r6 wide form, 4be1d3f1):
+	//     the prior owner's window stays alive (thread windows 3 -> 4, an unbounded
+	//     leak per create) and 1 of 3 runs HUNG in Embed's GetMessageW until the test
+	// The one inbound door. JS -> Go via a bound function over the WebView2
+	// message channel; the returned string is the receipt that reaches the page.
+	// No new inbound method name is invented here: the raw envelope is parsed by
+	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+	// four existing methods (bridge.go:42-45, ticket 248 owns config methods).
+	// The binding AND the page->host transport forwarding are installed together
+	// by installPanelTransport, split out of bringUp so the shipping wiring can be
+	// driven headlessly (ticket 35 AC#6).
+	if bindErr := m.installPanelTransport(w, ctx); bindErr != nil {
+		w.Destroy()
+		return fmt.Errorf("panel host: bind dispatch door: %w", bindErr)
+	}
+
+	m.mu.Lock()
+	m.w = w
+	m.hwnd = hwnd
+	m.created = true
+	m.mu.Unlock()
+
+	// AC#13's order lives in coldStartPageHandover (33-r10 moved it out verbatim:
+	// same statements, same order, nothing added or dropped). Read the reason there.
+	rtMs := m.coldStartPageHandover(ctx, t0)
+
+	m.mu.Lock()
+	m.lastColdMs = rtMs
+	m.mu.Unlock()
+	return nil
+}
+
+// coldStartPageHandover is AC#13's order, and it is the whole fix: prove the
+// message channel first, hand the page over LAST. firstRoundTrip shows a
+// case that ever asked the question, TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+// (panel_resident_windows_test.go), buys a real browser and in a fresh checkout
+// skips for lack of a bundle. Splitting the tail out is the same move
+// installPanelTransport already made for the same reason (ticket 35 AC#6, see the
+// comment at that call): it moves zero behaviour, holds no lock across the call,
+// and gives AC#13's content assertion a headless way to reach the shipping order.
+// That reach is what TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe needs.
+func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
+	rtMs := m.firstRoundTrip(ctx, t0)
+
+	if err := m.serveEntry(); err != nil {
+		m.serveNotBuiltNotice()
+	}
+	return rtMs
+}
+
+// serveNotBuiltNotice replaces the page with an explicit offline notice when the
+// embed carries no bundle: a SetHtml this host writes, so the user never ends on
+// the round-trip probe page, and it opens no socket and loads nothing from the network.
+// It takes m.mu itself, so callers must not hold it (33-r11 dropped the Locked suffix).
+func (m *PanelManager) serveNotBuiltNotice() {
+	m.mu.Lock()
+	w := m.w
+	m.mu.Unlock()
+	if w == nil {
+		return
+	}
+	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
+		`</head><body><p>panel assets unavailable: the embedded bundle is not built.</p></body></html>`)
+}
+
+// serveEntry resolves the embedded index.html and pushes it into the control.
+func (m *PanelManager) serveEntry() error {
+	if m.assets == nil || !m.assets.Built() {
+		return fmt.Errorf("panel host: embedded bundle not built (only the tracked placeholder is present)")
+	}
+	data, _, err := m.assets.Resolve(panel.EntryFile)
+	if err != nil {
+		return err
+	}
+	m.mu.Lock()
+	w := m.w
+	m.mu.Unlock()
+	if w == nil {
+		return fmt.Errorf("panel host: no window to serve into")
+	}
+	w.SetHtml(string(data))
+	return nil
+}
+
+// Show reveals the window (creating it on first use) and returns focus
+// bookkeeping. The caller must be on the window's message-pumping thread.
+//
+// AC#4's whole hop depends on the ORDER of two statements here: the prior
+// foreground window is sampled BEFORE bringUp runs, because bringing the control
+// up already takes the foreground (measured by 33-r4: in every run the value read
+// after creation was the panel's own HWND, so Hide handed focus back to the window
+// it had just hidden). The sampled value goes through setPriorFocusLocked, which
+// refuses to record the panel itself or one of its own child windows.
+//
+// The two branches below answer "did this Show create the window, or reveal one

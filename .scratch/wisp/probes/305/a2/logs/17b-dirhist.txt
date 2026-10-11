@@ -1,0 +1,14 @@
+   3224 .scratch
+     49 cmd/wisp
+     20 docs
+     18 internal/agent
+     17 logs
+     17 internal/panel
+     14 internal/config
+     13 internal/tools
+     10 internal/ball
+      7 scripts
+      4 tools
+      3 internal/llm
+      2 internal/risk
+      1 .github

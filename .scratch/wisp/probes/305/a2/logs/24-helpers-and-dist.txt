@@ -1,0 +1,23 @@
+## helper defs
+cmd/wisp/panel_host_windows.go:302:func (m *PanelManager) currentWindow() webview2.WebView {
+cmd/wisp/panel_host_windows.go:918:func pnlPumpOnce() {
+cmd/wisp/panel_resident_windows.go:259:func (rp *residentPanel) loop(ctx context.Context) {
+cmd/wisp/panel_resident_windows.go:324:	w := rp.mgr.currentWindow()
+cmd/wisp/panel_resident_windows.go:349:func (rp *residentPanel) post(fn func()) bool {
+cmd/wisp/panel_resident_windows.go:467:			w = rp.mgr.currentWindow()
+cmd/wisp/panel_resident_windows_test.go:59:func startPanelForTest(t *testing.T) (*residentPanel, *PanelManager) {
+cmd/wisp/panel_resident_windows_test.go:104:func showAndWait(t *testing.T, rp *residentPanel) {
+cmd/wisp/panel_resident_windows_test.go:170:		w := rp.mgr.currentWindow()
+cmd/wisp/panel_resident_windows_test.go:215:func awaitReport(t *testing.T, h *recordingModeHandler, requestID, what string) string {
+cmd/wisp/panel_resident_windows_test.go:250:func reportJSEnv(requestID, payload string) string {
+cmd/wisp/panel_resident_windows_test.go:265:func entryIDProbes(t *testing.T) []string {
+cmd/wisp/panel_transport_live_35v2_windows_test.go:215:		wv := mgr.currentWindow()
+## dist file state
+1044 frontend/dist/index.html
+2026-10-10 08:51:10.506316400 +0800 1044 frontend/dist/index.html
+fatal: path 'frontend/dist/index.html' exists on disk, but not in 'HEAD'
+rc(cat-file-head-dist)=128
+frontend/dist/.gitkeep
+## dist blob in window ends
+rc(416d-dist)=128
+rc(f718-dist)=128

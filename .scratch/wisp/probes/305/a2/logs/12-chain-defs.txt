@@ -1,0 +1,8 @@
+## chain-func-defs
+cmd/wisp/panel_host_windows.go:213:func NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPath string, opts ...panelHostOption) *PanelManager {
+cmd/wisp/panel_host_windows.go:318:func (m *PanelManager) bringUp(ctx context.Context) error {
+cmd/wisp/panel_host_windows.go:447:func (m *PanelManager) coldStartPageHandover(ctx context.Context, t0 time.Time) float64 {
+cmd/wisp/panel_host_windows.go:460:func (m *PanelManager) serveNotBuiltNotice() {
+cmd/wisp/panel_host_windows.go:472:func (m *PanelManager) serveEntry() error {
+cmd/wisp/panel_host_windows.go:867:func (m *PanelManager) firstRoundTrip(ctx context.Context, t0 time.Time) float64 {
+cmd/wisp/panel_resident_windows.go:211:func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel.ComposerDispatch, error) {

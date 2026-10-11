@@ -1,0 +1,13 @@
+## eval-sites
+cmd/wisp/panel_inbound_guards_35r3_test.go:24:// w.Eval("window.wispDispatch(...)") (that is N6, the test playing the page, zero
+cmd/wisp/panel_resident_windows_test.go:175:		w.Eval(js)
+cmd/wisp/panel_transport_35r1_test.go:18:// edge) and does NOT run w.Eval("window.wispDispatch(...)") (that is N6, the test
+cmd/wisp/panel_transport_live_35v2_windows_test.go:42:// w.Eval("window.wispDispatch(...)") as evidence: there the test plays the page *at the
+cmd/wisp/panel_transport_live_35v2_windows_test.go:159:		wv.Dispatch(func() { wv.Eval(script) })
+## eval-defs
+cmd/wisp/panel_resident_windows_test.go:855:func TestAC14GoSideEvalPushReachesThePage(t *testing.T) {
+cmd/wisp/panel_transport_35r2_test.go:452:func jsEval(n jsNode, env *jsEnv) jsValue {
+cmd/wisp/panel_transport_35r2_test.go:532:func jsBinaryEval(e *jsBinary, env *jsEnv) jsValue {
+cmd/wisp/panel_transport_35r2_test.go:596:func jsEvalCall(e *jsCallNode, env *jsEnv) jsValue {
+internal/ball/tokens_table_test.go:812:func c21EvalClaim(claim string) (Color, error) {
+internal/ball/tokens_table_test.go:1542:func c21EvalCSSColor(v string) (Color, error) {

@@ -1,0 +1,162 @@
+--- 7a0236b3 hunks on resident test file (compact) ---
+SUBJ 7a0236b3 feat(panel-host): give the named pre-create refusal an exit (33-r9, form A)
+@@ -31,0 +32 @@ import (
++	"errors"
+@@ -589,0 +591,179 @@ func TestAC13BringUpRefusesAThreadWithAQueuedClose(t *testing.T) {
++// ---------------------------------------------------------------------------
++// AC#13, the fifth shape's OUTLET (leg 33-r9, ticket 33 / 33-v2 问① and 问②)
++// ---------------------------------------------------------------------------
++
++var (
++	// t33r9NailPostMessage posts a WM_CLOSE at a live window without dispatching it:
++	// exactly the plant 33-v2 问② says the four-shape grid left out.
++	t33r9NailPostMessage = pnlModUser32.NewProc("PostMessageW")
++	// t33r9NailIsWindow asks user32 whether a handle is still a window. Read from the
++	// reporting goroutine, which is legal: IsWindow takes no thread affinity.
++	t33r9NailIsWindow = pnlModUser32.NewProc("IsWindow")
++)
++
++// refusalSettleBudget is how long this case lets the panel thread get as far as it
++// will on its own before it reads the verdicts below. It is an INSTRUMENT bound, not
++// a product threshold, and nothing asserts on it: the reason it is short and the
++// reason the assertions are named is the same reason - the defect being fixed is that
++// a refusal here reads as fifteen seconds of silence (33-v2 §6, §9.1), so this case
++// must not add a second shape where the red IS a timeout. Delete 甲's one line and
++// the case goes red on the first named assertion, not on a deadline.
++const refusalSettleBudget = 5 * time.Second
++
++func isLiveWindow(h uintptr) bool {
++	r, _, _ := t33r9NailIsWindow.Call(h)
++	return r != 0
++}
++
++// TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever is the outlet for
++// the named refusal, planted in the shape 33-v2 问② asked to have measured before
++// anyone was allowed to call a recovery "found": the thread owns a window that is
++// STILL ALIVE with a live Go owner, and the only message on it is one posted WM_CLOSE.
++//
++// 33-r9 ① measured that shape against the product's own check (.scratch/wisp/probes/
++// 33/r9/01-fifth-shape-1.txt, three runs per form): the check refuses it and names
++// the LIVE window's own handle ("staleCloseQueued=true hwnd=0x1E10E00 (owner hwnd
++// 0x1E10E00, same=true)"), the window survives the refusal ("AFTER the refusal:
++// IsWindow(owner ...)=true owner.IsCreated=true ... close still queued true ...
++// thread windows=3"), and its owner's own Show still works ("Show on the LIVE owner:
++// ok"). The comparison form - the same window, but its owner Destroyed it and this
++// thread dispatched that close itself - reads clean and creates fine ("PRE-CREATE
++// CHECK: staleCloseQueued=false ... bringUp#2 err=<nil> created=true in 928ms"). So
++// the two forms are distinguishable to this check, and bringUp may not resolve them
++// by pumping: pumping is what kills a live window (①'s plain-window carrier, released
++// after the readings: "dispatched 7 ... IsWindow(0x780F3C)=false").
++//
++// The outlet this case pins is therefore the thread's, not the queue's: a show request
++// refused by name marks the thread fatal, which is the one consequence
++// cmd/wisp/panel_resident_windows.go already has a channel for (the same startUp the
++// CoInitializeEx guard uses). Post() then answers false on the spot, loop retires
++// through its existing teardown, and statusLine names the reason. What stays asserted
++// the other way round is that nothing was eaten: the refused manager has no window,
++// and this case never pumps or purges to make that true.
++//
++// Reverse control: delete the errors.Is branch in showOnThread and assertions 1-3
++// below go red on the spot, by name.
++func TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever(t *testing.T) {
+--- pump.go HEAD defs ---
+3:// The snapshot pump: the first place production BUILDS the packet the panel is
+18:// must not be one. docs/evidence/s1/35-panel-snapshot-pump-r1.md §1.2 measures
+19:// all four. So this pump stops at the byte boundary: Marshal hands out the JSON,
+41:// / fragment / IconClass): a pump that fills a field with a constant to look
+47:// pump_test.go (:111-124, :270-276), which is the sharper of the two guards -
+55:// pump CAN fill from live objects is named in the evidence file with a
+98:func (v NativeVerdict) CardView() ApprovalCardView {
+132:// PumpSources is the live native state a snapshot is assembled from. Each field
+138:type PumpSources struct {
+146:	// is a reader, not a value, so a pump assembled without one reports
+160:	// STATE: the pump never asks for, holds or renders a credential value, and a
+172:	// key at all, and that is the shape pump_test's byte nails pin. A reader that
+182:	// value the caller shapes is a value the pump cannot be trusted about - and a
+186:	// tools.TaskOutput.StateAnswer and this pump carries the three halves through
+193:	// copies of ids the gate already filed, and the pump does not get to decide
+217:// SnapshotPump assembles and emits the panel's packet.
+218:type SnapshotPump struct {
+219:	src PumpSources
+225:// NewSnapshotPump wires a pump to its sources. The result is never nil; a zero
+226:// PumpSources is legal and produces a snapshot whose composer section says
+229:func NewSnapshotPump(src PumpSources) *SnapshotPump {
+230:	return &SnapshotPump{src: src}
+234:func (p *SnapshotPump) Snapshot() Snapshot {
+271:		// AC#4 through the pump: a mode nobody read is reported as unknown, and
+311:		// Same rule one line down: a pump with a roster reader always sends the
+335:// between). It owns no state, so two pumps - or two goroutines on one pump -
+337:func (p *SnapshotPump) Marshal() ([]byte, error) {
+348:func (p *SnapshotPump) Publish() (Snapshot, []byte, error) {
+350:		return Snapshot{}, nil, fmt.Errorf("panel: no pump attached, the snapshot was not built")
+370:// Publishes reports how many snapshots this pump has put through its exit,
+372:// notices the pump is assembled but never driven.
+373:func (p *SnapshotPump) Publishes() int {
+382:func (p *SnapshotPump) count() {
+394:// honest version of a field the pump must fill; a made-up id would be the packet
+443:func (st *streamKept) absorb(delta []rune) int {
+457:func (st *streamKept) render() string {
+466:	// DefaultStreamKeys is how many concurrent result streams a pump tracks at
+504:func SubagentStreamKey(taskID string) string {
+509:func NewStreamLog(maxKeys int) *StreamLog {
+518:func (s *StreamLog) Append(key, text string) {
+--- pump.go callers in cmd/wisp ---
+cmd/wisp/panel_resident_windows.go:21:// Why the library's Run(). webview.Dispatch only appends a closure to the
+cmd/wisp/panel_resident_windows.go:22:// library's private queue and posts a thread message, and Run() is that queue's
+cmd/wisp/panel_resident_windows.go:25:// hand pump and arriving in ~107ms with Run(). Run() occupies the thread, so this
+cmd/wisp/panel_resident_windows.go:134:	// that reaches Run() after a stop was already asked would otherwise pump
+cmd/wisp/panel_resident_windows.go:293:		// is about to start, so ask it to end before it begins. Run() then returns
+cmd/wisp/panel_resident_windows.go:299:	w.Run()
+cmd/wisp/panel_resident_windows.go:318:// webview.Dispatch, which Run() drains) and takes one final channel drain under
+cmd/wisp/panel_resident_windows.go:450:// stop ends the thread: Terminate posts WM_QUIT so Run() returns and the teardown
+cmd/wisp/panel_resident_windows.go:477:		// panel thread never sees a quit, Run() keeps pumping, and the process hangs
+cmd/wisp/panel_host_windows.go:35://   - Because the resident thread hands the pump over to the library's own Run(),
+cmd/wisp/panel_host_windows.go:38://     reader is Run(). A host that pumps by hand instead never drains it, so the
+cmd/wisp/panel_host_windows.go:143:// hands the pump to the library's Run(). Earlier wording here pointed at a
+cmd/wisp/panel_host_windows.go:299:// set the library's Dispatch queue (which only Run() drains) is. Reading it under
+cmd/wisp/panel_host_windows.go:897:		pnlPumpOnce()
+cmd/wisp/panel_host_windows.go:914:// pnlPumpOnce drains whatever window messages are queued for this thread. The
+cmd/wisp/panel_host_windows.go:918:func pnlPumpOnce() {
+--- resident loop 259-360 ---
+func (rp *residentPanel) loop(ctx context.Context) {
+	defer close(rp.finished)
+
+	runtime.LockOSThread()
+	if r, _, _ := pnlCoInitializeEx.Call(0, coinitApartmentThreaded); r != 0 && r != uintptr(sFalse) {
+		rp.setStartUp(fmt.Errorf("panel thread: CoInitializeEx(COINIT_APARTMENTTHREADED) returned %#x - refusing to create a WebView2 window on an apartment that is not STA", r))
+		slog.Error("panel thread: refusing to bring up the panel window", "err", rp.startUpErr())
+		return
+	}
+
+	for {
+		rp.drainTasks()
+		if rp.isCreated() || rp.startUpErr() != nil {
+			break
+		}
+		select {
+		case <-ctx.Done():
+			rp.teardown("context cancelled before the panel window existed")
+			return
+		case <-rp.stopNow:
+			rp.teardown("stop requested before the panel window existed")
+			return
+		case fn := <-rp.tasks:
+			fn()
+		}
+	}
+
+	w := rp.handOverPump()
+	if w == nil {
+		rp.teardown("no window to pump")
+		return
+	}
+	if rp.stopRequested.Load() {
+		// A stop that arrived while the thread was still inside bring-up: the pump
+		// is about to start, so ask it to end before it begins. Run() then returns
+		// on the first GetMessageW, and the teardown below is the same one.
+		w.Terminate()
+	}
+	// The library pump. It returns on WM_QUIT, which Terminate posts - the exit
+	// this thread is designed around (see the header).
+	w.Run()
+	rp.teardown("the library pump returned")

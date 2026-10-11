@@ -1,0 +1,166 @@
+### eval-helper 160-200
+// exists to avoid) and returns once the pump has taken the request.
+//
+// Eval returns no value, and that is on purpose in this file's argument: "Eval did
+// not error" is one of the three readings ruling P2 refuses as evidence. Waiting
+// here only proves the request reached the owning thread; whether the page saw
+// anything is answered by the page, below.
+func evalOnPanelThread(t *testing.T, rp *residentPanel, js string) {
+	t.Helper()
+	done := make(chan error, 1)
+	posted := rp.post(func() {
+		w := rp.mgr.currentWindow()
+		if w == nil {
+			done <- fmt.Errorf("no window on the panel thread")
+			return
+		}
+		w.Eval(js)
+		done <- nil
+	})
+	if !posted {
+		t.Fatalf("the panel thread refused the Eval request (startUp error: %v)", rp.startUpErr())
+	}
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("Eval on the panel thread: %v", err)
+		}
+	case <-time.After(panelThreadWait):
+		t.Fatalf("the panel thread never ran the Eval request within %v", panelThreadWait)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// How the page talks back in this file, and why it is the door that already exists.
+//
+// Every verdict below is built from a string the PAGE sent, per ruling P2. What the
+// page does NOT need is a new binding: registering one means creating a fresh document
+// after the Bind, and a ruler that re-creates the document can no longer tell what a
+// COLD START ended on. 33-r5 found this out by running its own reverse control (swap
+// the two SetHtml calls in bringUp) against a ruler that stayed GREEN - the re-serve
+// was covering the mutation. So the reports ride window.wispDispatch, the product's own
+// inbound door, as real composer envelopes the test's recording handler reads back.
+### AC13 290-345
+	return out
+}
+
+// probeJS asks the live document, id by id, whether the entry's elements are there, and
+// posts the answer bitmap back through the door that is already in the page.
+func probeJS(ids []string) string {
+	parts := make([]string, 0, len(ids)+2)
+	parts = append(parts, "var b='';")
+	for _, id := range ids {
+		parts = append(parts, fmt.Sprintf("b += (document.getElementById(%q) ? '1' : '0');", id))
+	}
+	parts = append(parts, "window.wispDispatch("+reportJSEnv("ac13-probe", "b")+");")
+	return "(function(){ " + strings.Join(parts, " ") + " })();"
+}
+
+// TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe is ticket 33 AC#13's ruler: after a
+// real cold start the document in the window must be the embedded page, not the
+// round-trip probe the host shows while it checks the message channel.
+//
+// The question goes to the live document and the document answers: does it carry the
+// entry's own elements? That form is what gives this instrument teeth against the exact
+// defect - swapping the two SetHtml calls flips the answer from every-id-present to
+// none-present - where "SetHtml was called" or "the entry bytes were read" would tell
+// the two orders apart just as little as the old t.Logf did.
+func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
+	probes := entryIDProbes(t)
+	if len(probes) == 0 {
+		t.Skipf("AC#13 has no subject in this tree: the embed resolves no entry, so there is no page content that could be covered. Named skip; the working-tree reading is the one that ran, recorded in docs/evidence/s1/33-panel-host-c27-r5.md")
+	}
+	rp, mgr := startPanelForTest(t)
+	showAndWait(t, rp)
+	h := mgr.disp.Mode.(*recordingModeHandler)
+
+	evalOnPanelThread(t, rp, probeJS(probes))
+
+	answer := awaitReport(t, h, "ac13-probe", "AC#13")
+	present := strings.Count(answer, "1")
+	t.Logf("AC#13 page answer (head %s): %q - %d of %d probe id(s) present in the live document",
+		gitHeadShortForTest(t), answer, present, len(probes))
+	if present == 0 {
+		t.Errorf("after a real cold start the live document contains NONE of the %d element ids the embedded entry declares (the page itself answered %q). That is ticket 33 AC#13: the round-trip probe page is the last document shown, so the user sees a stub instead of the panel. Product side: bringUp must hand the entry over AFTER the probe - the probe stays, because it is where cold usable is decided", len(probes), answer)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// AC#13's order-dependent red, root cause, nailed DETERMINISTICALLY (leg 33-r6)
+// ---------------------------------------------------------------------------
+
+// postQuitProc reaches the same user32 PostQuitMessage go-webview2's Terminate is
+// (webview.go:381-383), so this test plants exactly the message the library plants.
+var postQuitProc = pnlModUser32.NewProc("PostQuitMessage")
+
+var t33r7EnumThreadWindows = pnlModUser32.NewProc("EnumThreadWindows")
+
+// t33r7WindowCount is the tally the EnumThreadWindows callback bumps. It is a
+// package-scope counter because the callback handle must outlive the call and
+### nail2 840-905
+		if strings.HasPrefix(req.RequestID, prefix) {
+			n++
+		}
+	}
+	return n
+}
+
+// ---------------------------------------------------------------------------
+// AC#14, nail 2: the Go -> page Eval push (a DIFFERENT dimension, its own nail)
+// ---------------------------------------------------------------------------
+
+// TestAC14GoSideEvalPushReachesThePage is the second nail and stays a separate test:
+// 33-p1 §A measured the push dimension arriving (R27, 907ms) while the reply dimension
+// did not (R25) in the same process, and ticket 33's own wording forbids blending the
+// two into one sentence.
+func TestAC14GoSideEvalPushReachesThePage(t *testing.T) {
+	rp, mgr := startPanelForTest(t)
+	showAndWait(t, rp)
+	h := mgr.disp.Mode.(*recordingModeHandler)
+
+	// A value the page can only know if Go's push landed. This nail never awaits a
+	// binding, so nothing here can be satisfied by the reply hop, and vice versa.
+	const pushed = "PUSHED-33R5-OK"
+	evalOnPanelThread(t, rp, fmt.Sprintf("document.title = %q;", pushed))
+	evalOnPanelThread(t, rp, "window.wispDispatch("+reportJSEnv("ac14-push", "document.title")+");")
+
+	answer := awaitReport(t, h, "ac14-push", "AC#14's push hop")
+	t.Logf("AC#14 nail 2 (Eval push hop), page's own words: title=%q", answer)
+	if answer != pushed {
+		t.Errorf("Go's Eval push did not reach the document: the page reports its title as %q, want %q. This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other", answer, pushed)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// P1 / P3: the thread itself
+// ---------------------------------------------------------------------------
+
+// TestPanelThreadIsSTAAndExitsCleanly nails the two shapes ruling P1/P3 asked for:
+// the thread asks for COINIT_APARTMENTTHREADED by name (and refuses to create a
+// window otherwise), and Run() does not trap the process - stop() ends it, and the
+// end is observable.
+func TestPanelThreadIsSTAAndExitsCleanly(t *testing.T) {
+	rp, _ := startPanelForTest(t)
+	if err := rp.startUpErr(); err != nil {
+		t.Fatalf("the panel thread failed before it was asked for anything: %v", err)
+	}
+	if rp.isCreated() {
+		t.Errorf("starting the panel thread created a window: the panel must appear when the user asks (a gesture or a test), not at boot")
+	}
+	showAndWait(t, rp)
+	hwnd := rp.mgr.windowHandle()
+	if hwnd == 0 {
+		t.Fatalf("created but HWND is 0")
+	}
+	if !rp.mgr.IsShown() {
+		t.Errorf("IsShown false right after the show request ran on the panel thread")
+	}
+	rp.stop()
+
+	select {
+	case <-rp.finished:
+	case <-time.After(panelThreadExitBudget + 5*time.Second):
+		t.Fatalf("the panel thread did not exit after stop(): Run() has no way out in this shape, which is exactly what ruling P1 required a shipping path to have")
+	}
+	if rp.mgr.IsCreated() {
+		t.Errorf("the panel thread exited with the window still marked created - teardown did not run on the owning thread")

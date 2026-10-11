@@ -1,0 +1,37 @@
+8d30a862 验 5g2-v1（非实现者只读腿·第 1 笔）：装配腿 head -3 外推坐实——m25-ac.tsv 52 行票号在首列、m25-tokens.txt 52 行票号在行尾、两份号集均＝roster52；但 acc_ACset 52 枚全 0＝退化列，故甲 10／待定 41 一枚都不改。乙=0 换第二把尺（名下件自陈实现程）复量＝0 枚，站住。★抓到 §2.0:170『署名从 logs 读不出』对 21 枚为假：m32-who.tsv＋m32.sh 在盘，79/83 行 1 逐字『编排者亲自复跑』。43 vs 21 差在扩展名（.tsv 21＋.txt 22＝43），且 .tsv 件其实是竖线分隔。§4.2:119『落在本名册的是 11、63』与甲档 7 枚编排者署名相矛盾，:255 指的 R4 编号空挂。241 凭据引的是自陈实现方的 -r1 件，真裁决件 -v1 未引。
+3d9b8374 probes(232-r2 收尾代提): 写腿撞 150 轮帽但产码与证件全在盘上，编排者只代提未代判
+42e89896 票 231 AC#3 收尾 · 测试侧注释也别抄 cause=invalid 的原句
+c5040ea7 票 231 AC#2 收尾 · 注释不再抄既有句的原文（保住那把"零枚测试钉"的尺）
+a16d1ff7 票 231 AC#3＋同批名册 · 常驻钉加一行，cause=newer-build 进两张互斥名册
+290dca87 票 231 AC#2 · 给"版本更高"一条自己的出口（cause=newer-build）
+9a941965 票 268 落地（268-r1 第 2 步）：常驻腿把"配置缺失"与"配置被拒"分成两枚具名 provenance，被拒那一支另给一行 stdout
+16901acb 票 181 AC#7 生产侧落地（181-r3 第 2 笔，产码＋判据）：改写账户的生产者从"留零值"换成"C26 的读数"
+7c644bb0 票 257-r2b 交件（写面＝回执文案＋两枚同包测试）：形 ⓒ 的四发干净机真跑、八枚突变全响、四门读数齐、证据件 §5-§10 写满
+3f0c4fff probes(268-a2): 独立复核初版——AC#0 四问复跑判定＋err 透传四支链证真
+32e74479 267-r2 种子迁移（出口甲，凭 A611 具名解冻）：cmd/wisp 五枚 _test.go 的 12 枚带外 confirm_timeout_sec 喂值点抬进带内＝run_mode101_test.go:110（1 到 40，同一行 l1_window_sec = 1 一字未动）／panel_pump_test.go:136（2 到 31）／approval_reply_201_test.go:202/:272/:350/:504/:578 与 approval_seam_201_test.go:50/:138 与 ticket224_assembly_test.go:81/:234（各 20 到 40，先例＝approval_always_201_test.go:122/:164 与 config_reload_223_test.go 那批今天就用 40 做同一件事）／approval_reply_201_test.go:439（2 到 31＝让 C18 提示仍能武装的最小值，lead = 31 - 30 = 1s > 0）★配套件＝panel_pump_test.go:112 那枚 executeOn145 的 30s ctx 抬到 45s，否则种子抬到 31s 后 ctx 先响、观察对象从「C18 超时」搬家成「上下文已结束」★票 267 AC#2 那半格落地＝TestUnansweredL2CardTimesOutIntoRejectNeverExecution 新增一枚正向读数（只新增、既有断言一字未改）：种 31 时那句「[warning] 审批将在 30 秒后自动拒绝，请尽快确认」真的到达控制台可读面（链＝gate.go:528 武装 warn、gate.go:557-566 发 EventWarning、run.go:611 装配 consoleApprovalUI、run.go:1394 逐字打印）；单发实测 10:09:44 PASS(32.85s)
+7883f855 265-r1c §6：门禁五读数全绿（带时刻）——d22scan rc=0 零 finding（先修 :38 phantom-citation→internal/panel/pump.go，只改注释）／路径长度 VERDICT GREEN／gofumpt 本腿写面空（models.go 既有账不碰）／go vet 双绿含 winlive／定向 test 红名册既有=空
+a04a095f 265-r1c 收编：前任 265-r1 遗留的 ⓐ-Ⅰ 产码四枚原样入库（收编，非新产）
+79c579e2 260-r4 落地：卡片那行通道标签改成读取时求值（拼法由装配根注入，不新开 approval→ball 依赖边）
+170e0459 260-r3 收尾一处形：:584 的 slog 句把键名放回句子里（AC#4 ① 的零漂移按句子级判）
+2ae018be 260-r3 落地：票 260 条件②的 Esc 人看文案，九枚改成说实话（第十枚停手上报）
+2a10134e 256-r1 落地：常驻那条腿的审批门改吃 [risk] 两枚配置（形ⓐ 签名不加参）
+cbece45e 258-r2 写码：档位词跟着集合说真话（节缺失印 defaults）＋两枚 winlive 尺子修形状
+d9bce7ce 258-v1 残件入库：v1 探针文件（§8-2 归编排者裁＝保留，因它是 AC#1 正控的载体）＋9 枚读数档
+bd5c049f 258-v1 验收补 commit（R1★）：6 枚主判据＋4 枚 winlive 尺 untracked 入库＋判决书与读数档——v1 判语 AC#1/AC#2 成立但带条件（措辞裁定点＋两枚 winlive 尺子格式缺陷）、AC#3 成立；恒真四突变 M1 红 2 枚/M0-M3 默认档绿＝判据覆盖洞具名；自写正控首发 W 键占用真红＝AC#3 语义意外实测
+5e8748b3 212-r1＋258-r1 编排者代笔收尾（两枚写腿死于服务错误/150 轮帽，按 A544 预授权代笔；AC 框零碰）
+9bab468f 票 261 · 261-r2：22 枚 fixture 缺 enabled 键回归归位＋Ⓑ 拒句指路＋Ⓐ firstrun 引导带 enabled
+cf95c799 test(255-r5): 把 TestPanelHostRealWindowHopAndLifecycle 的树内计数等值尺换成浏览器宿主 pid 同一尺（判据换形，产码零动）
+4658dbb6 255-r3（编排者代提·死腿半成品·未验证）：面板尺寸取值闭包已落码＋票 255 自己的两枚判据同批改了
+67ab595d 255-r2（编排者代提·死腿尾部那一格落定）：restartTierKeys 那句"由测试兜住"今天真有测试了
+480b970d 220-r1: 名册那一格改成 corr 与 taskID 双查，并把同任务第二张卡接回来
+13dd60b4 票 255 r2 · 证据件终值 + 台账两句从产品流里 log 出来
+17ff058d 票 255 r2 · 名册测试格式化（gofumpt -l 归零）
+87bc6aca 253-r5: 票 253 AC#2 落地（形ⓐ）—— 另立一枚"全量入向名册"尺，⛔ 未改 bridge.go 一字
+a4906b6c 票 255 r2 · 回执逐名加方括号 + 句子装配的确定性钉
+ae60a87c 票 255 r2 · AC#1 回执只说真话 + AC#3 [app] 键级补尺
+fa5593c0 test(198-r2) 四格落地：AC#2 装上牙（期望侧只读 schema 的 default 标签、与盘上文件逐字节比，自带八枚"种下必红"的正控）＋AC#5 失败支补上用例（secrets 被普通文件占位＝winsec 拒密封，钉响亮句／不留半份／仍退码 2）＋AC#4 的"去哪儿补"改成走得通的那条路（wisp secret set 进 DPAPI、文件里补的是名字不是明文；模型只有改这份文件一条路，wisp providers 读它不写它）＋J1 落点收回本票自己的仪器（两枚同样干净的空目录：组装根不建、run 入口建）——新增 cmd/wisp/firstrun_198r2_test.go 五枚用例，产码只动 firstrun.go 的回执文案；AC 勾选框一枚未碰
+613606c0 feat(run)〔198-r1〕：wisp run 首建 config.toml 只挂 runTextTask 这一条用户明确发起的入口（J1/账 A514，⛔ 不进 assembleRuntime）——落点=现成判定者 secret.NewStore→PrivateDirAll、值与权限=现成通路 SaveFile(NewDefaults()) 一次调用零新表零模板；回执另起一句不复用 cause=missing；退码 2 一路一字未放宽（三发全是 2）；6 枚用例含三段式正控＋目录形/四句归因/腿表相等性三枚变异读数（M1 推翻 N5 因果链：目录形被 atomicWrite 的 rename 天然挡住，真正被"装载失败就建"绕过的是 存储损坏/版本不认识）；两枚常驻钉未碰、d22scan clean、gofumpt 零命中；证据件 .scratch/wisp/probes/198/r1/verdict.md（AC#2/AC#4 归 198-r2，cmd/wisp 整包与 N2 真件=待编排者验证窗口）
+b644d310 ticket248(248-r1 死腿收尾代提)：撞 150 轮帽（167 次工具调用／46 分钟），产码 0d87a681 已在库，尾部增量留在未提交态 ⇒ 编排者只代提它自己写好的两枚路径
+0d87a681 ticket248(248-r1 产码)：设置那条路从入向请求修到磁盘——AC#1 名册真扩（config.get/config.set 进 bridge.go 白名单与 ParseComposerRequest 守卫、进 ComposerDispatch 派发表并新增 Config 槽）；AC#2 快照那一维进 composer 段（credentialState/credentialKnown，reader 未接就报 unknown/false）＋哨兵零命中常驻用例与其正控；AC#3 只走现成 secret.NewStore/DPAPI（值只由 cmd/wisp 的只写形状绑定，共用封套不声明那枚键，config.toml 只落 dpapi: 引用）；AC#7 validate() 落在新增导出 setter 内、进 mergeWrite 之前（种非法值⇒磁盘逐字节不变）；AC#11 逐枚键各一发受保护写＋回执报实际落盘键路径（⛔ 未用 SaveFile、未改 mergeWrite 本体）；AC#8 回执带 tier 且重启文案到 Handle 返回串（console 支与票 33 那侧的 bind 回执面都可见），全文无"保存即生效"；冻结件 l2_grant_boundary_test.go 只动 A487 具名解冻的 :2051/:2139 两枚锚，改法＝能力形（名册双向全等）＋自带正控，未删钉未放宽。票面 AC 框一枚未碰；internal/secret 一字未改；AC#4 本腿不做不勾。
+7a0236b3 feat(panel-host): give the named pre-create refusal an exit (33-r9, form A)
+f7d28ef0 fix(33-r7 面板建窗的线程前提)：owner 侧把还池的线程派到空；bringUp 只检查、只具名拒绝，不动别人的队列

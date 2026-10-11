@@ -1,0 +1,183 @@
+C 8d30a862
+
+cmd/wisp/config_reload_223_test.go
+C 3d9b8374
+
+cmd/wisp/config_reload_223_test.go
+C 42e89896
+
+cmd/wisp/config_sentences_223r2_test.go
+C c5040ea7
+
+cmd/wisp/config_reload.go
+C a16d1ff7
+
+cmd/wisp/config_reload_223_test.go
+cmd/wisp/config_reload_perm_223_windows_test.go
+cmd/wisp/config_sentences_223r2_test.go
+C 290dca87
+
+cmd/wisp/config_reload.go
+C 9a941965
+
+cmd/wisp/resident_approval_risk_268_windows_test.go
+cmd/wisp/resident_approval_windows.go
+C 16901acb
+
+internal/panel/git.go
+internal/panel/git_test.go
+internal/panel/instructions_200.go
+internal/panel/workspace.go
+internal/panel/workspace_account_181r3_test.go
+internal/panel/workspace_test.go
+C 7c644bb0
+
+cmd/wisp/firstrun_257_nonpreset_test.go
+C 3f0c4fff
+
+cmd/wisp/firstrun.go
+cmd/wisp/firstrun_257_test.go
+C 32e74479
+
+cmd/wisp/approval_reply_201_test.go
+cmd/wisp/approval_seam_201_test.go
+cmd/wisp/panel_pump_test.go
+cmd/wisp/run_mode101_test.go
+cmd/wisp/ticket224_assembly_test.go
+C 7883f855
+
+cmd/wisp/resident_approval_windows.go
+C a04a095f
+
+cmd/wisp/resident_approval_risk_256_windows_test.go
+cmd/wisp/resident_approval_windows.go
+cmd/wisp/resident_grant_writer_265_windows_test.go
+cmd/wisp/resident_task_source_windows.go
+C 79c579e2
+
+cmd/wisp/resident_approval_windows.go
+cmd/wisp/resident_cancel_key_label_260r4_windows_test.go
+C 170e0459
+
+cmd/wisp/resident_approval_windows.go
+C 2ae018be
+
+cmd/wisp/resident_approval_windows.go
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go
+cmd/wisp/resident_task_source_live_246_windows_test.go
+C 2a10134e
+
+cmd/wisp/resident_approval_risk_256_windows_test.go
+cmd/wisp/resident_approval_windows.go
+cmd/wisp/resident_windows.go
+C cbece45e
+
+cmd/wisp/config_readers_255.go
+cmd/wisp/resident_ball_windows.go
+cmd/wisp/resident_hotkey_258_test.go
+cmd/wisp/resident_hotkey_258_windows_test.go
+cmd/wisp/resident_hotkey_live_258_windows_test.go
+cmd/wisp/resident_windows.go
+C d9bce7ce
+
+cmd/wisp/resident_hotkey_v1probe_test.go
+C bd5c049f
+
+cmd/wisp/resident_hotkey_258_windows_test.go
+cmd/wisp/resident_hotkey_live_258_windows_test.go
+C 5e8748b3
+
+cmd/wisp/config_readers_255.go
+cmd/wisp/models.go
+cmd/wisp/resident_approval_246_windows_test.go
+cmd/wisp/resident_approval_live_246_windows_test.go
+cmd/wisp/resident_ball_windows.go
+cmd/wisp/resident_hotkey_258_seam_windows.go
+cmd/wisp/resident_hotkey_258_test.go
+cmd/wisp/resident_windows.go
+C 9bab468f
+
+cmd/wisp/approval_reply_201_test.go
+cmd/wisp/firstrun.go
+cmd/wisp/panel_config_248_test.go
+cmd/wisp/providers_test.go
+cmd/wisp/resident_task_source_live_246_windows_test.go
+cmd/wisp/run_mode101_test.go
+cmd/wisp/run_test.go
+cmd/wisp/secret_test.go
+C cf95c799
+
+cmd/wisp/panel_host_windows_test.go
+C 4658dbb6
+
+cmd/wisp/config_readers_255.go
+cmd/wisp/config_receipt_255_test.go
+cmd/wisp/panel_geometry_255_test.go
+cmd/wisp/panel_geometry_255_winlive_test.go
+cmd/wisp/panel_host_windows.go
+cmd/wisp/panel_resident_windows.go
+C 67ab595d
+
+cmd/wisp/config_reload.go
+cmd/wisp/restart_tier_keys_255r2_test.go
+C 480b970d
+
+internal/panel/pump.go
+internal/panel/subagent_blocked_220_test.go
+internal/panel/subagent_roster_197.go
+C 13dd60b4
+
+cmd/wisp/config_receipt_255_test.go
+C 17ff058d
+
+cmd/wisp/config_receipt_255_test.go
+C 87bc6aca
+
+internal/panel/inbound_roster_253_test.go
+C a4906b6c
+
+cmd/wisp/config_readers_255.go
+cmd/wisp/config_receipt_255_test.go
+cmd/wisp/config_reload.go
+C ae60a87c
+
+cmd/wisp/config_readers_255.go
+cmd/wisp/config_receipt_255_test.go
+cmd/wisp/config_reload.go
+cmd/wisp/config_reload_223_test.go
+C fa5593c0
+
+cmd/wisp/firstrun.go
+cmd/wisp/firstrun_198r2_test.go
+C 613606c0
+
+cmd/wisp/firstrun.go
+cmd/wisp/firstrun_198_test.go
+cmd/wisp/firstrun_acl_198_windows_test.go
+cmd/wisp/run.go
+C b644d310
+
+cmd/wisp/panel_config_248_test.go
+C 0d87a681
+
+cmd/wisp/panel_config_248_test.go
+cmd/wisp/panel_config_store.go
+cmd/wisp/panel_inbound.go
+cmd/wisp/run.go
+internal/panel/bridge.go
+internal/panel/composer.go
+internal/panel/composer_dispatch.go
+internal/panel/composer_dispatch_test.go
+internal/panel/config_handlers.go
+internal/panel/config_route_248_test.go
+internal/panel/l2_grant_boundary_test.go
+internal/panel/pump.go
+C 7a0236b3
+
+cmd/wisp/panel_host_windows.go
+cmd/wisp/panel_resident_windows.go
+cmd/wisp/panel_resident_windows_test.go
+C f7d28ef0
+
+cmd/wisp/panel_host_windows.go
+cmd/wisp/panel_resident_windows_test.go

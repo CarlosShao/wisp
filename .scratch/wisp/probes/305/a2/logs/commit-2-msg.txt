@@ -1,0 +1,6 @@
+305-a2 表①②③落盘（窗口候选名册／文档交接与 Eval 链／判死配方）
+
+表①＝窗口 416d9d56..f718e9b6 内 cmd/wisp+internal/panel 的 37 枚候选笔，分级带 diff 内容锚。
+表②＝三枚 SetHtml 装配序＋Eval 那一路的调用链；生产面 Navigate 与 Eval 调用者各自 0 行（我独立复跑）。
+表③＝9 点二分名册＋三根台面轴（母仓/clone、未跟踪 dist 漂移、★干净 clone 缺 third_party 与 build 两枚未跟踪 DLL 目录）。
+本腿零 Go 编译面、零真窗、零产码。

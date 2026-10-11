@@ -1,0 +1,14 @@
+## what config_readers_255.go names from the chain set
+18:// create call inside bringUp spelled its geometry as the literals `Width: 420` /
+22:// block has moved twice since (its tail went into coldStartPageHandover in 33-r5,
+158:	// create block inside bringUp spelled it as the literals `Width: 420` /
+## the 5 chain files at HEAD: which window commits touch them
+C cf95c799 2026-10-03 test(255-r5): 把 TestPanelHostRealWindowHopAndLifecycle 的树内计数等值尺换成浏览器宿主 pid 同一尺（判据换形，产码零动）
+C 4658dbb6 2026-10-03 255-r3（编排者代提·死腿半成品·未验证）：面板尺寸取值闭包已落码＋票 255 自己的两枚判据同批改了
+C 7a0236b3 2026-10-01 feat(panel-host): give the named pre-create refusal an exit (33-r9, form A)
+C f7d28ef0 2026-10-01 fix(33-r7 面板建窗的线程前提)：owner 侧把还池的线程派到空；bringUp 只检查、只具名拒绝，不动别人的队列
+## window commits touching frontend/**
+0
+## AC box counts in ticket 305 (must stay 1 checked / 5 unchecked)
+1
+5
