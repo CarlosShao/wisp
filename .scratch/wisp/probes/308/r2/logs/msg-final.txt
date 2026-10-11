@@ -1,0 +1,6 @@
+308-r2: final artefacts plus one append-only ticket bullet
+
+Adds probes/308/r2/90-final.md and the ticket bullet file, and appends exactly
+one line to issue 308 (numstat 1/0: no checkbox touched, no Status line
+touched, no -done rename). Delivery was already committed at 4c63d3b2
+(comment lines only).
