@@ -1,0 +1,84 @@
+t05 — 72-a2 逐笔卫生尺合账（前五笔；本件＝第 6 笔，自指那一格⛔ 填，⛔ 假装量过）
+尺＝git show --name-only --format= <sha> | tr -d '\r'   （先 tr 再数：这台机器的 git 输出行尾带 \r，行尾锚会静默归 0）
+生成时刻＝Sun Oct 11 11:06:05 CST 2026  HEAD 此刻＝3b16319a
+
+== commit 7db4db4b ==
+   .scratch/wisp/probes/72/a2/00-anchor.md
+   new_go=0
+   outside_writeface=0
+   issues_touch=0
+== commit 493f2cb8 ==
+   .scratch/wisp/probes/72/a2/10-seven-cases.md
+   .scratch/wisp/probes/72/a2/logs/ac5-byte-ruler.txt
+   .scratch/wisp/probes/72/a2/logs/aliased-7named.txt
+   .scratch/wisp/probes/72/a2/logs/default-7named.txt
+   new_go=0
+   outside_writeface=0
+   issues_touch=0
+== commit a6267fbb ==
+   .scratch/wisp/probes/72/a2/20-answer-A-cause.md
+   .scratch/wisp/probes/72/a2/logs/aliased-all16-bothfiles.txt
+   .scratch/wisp/probes/72/a2/logs/t03-broken-surface-note.txt
+   new_go=0
+   outside_writeface=0
+   issues_touch=0
+== commit 25189588 ==
+   .scratch/wisp/probes/72/a2/30-answer-B-line.md
+   .scratch/wisp/probes/72/a2/40-nails-that-would-break.md
+   new_go=0
+   outside_writeface=0
+   issues_touch=0
+== commit 3b16319a ==
+   .scratch/wisp/probes/72/a2/50-what-i-did-not-measure.md
+   .scratch/wisp/probes/72/a2/90-handoff.md
+   new_go=0
+   outside_writeface=0
+   issues_touch=0
+
+合账（前五笔之和；尺＝逐笔 grep -c 再 awk 求和，⛔ 用 bc——这台机器⛔ bc，本腿第一版踩过）：
+   new_go_total=0
+   outside_total=0
+   issues_total=0
+   commits_72a2=5
+   zero_byte_files=0   # 尺带 -type f
+   out_files=0
+   internal_cmd_dirty=0
+
+★共树脏面（⛔ 本腿造的、⛔ 本腿账，只登记；两把尺并列，第一把⛔ 成立）：
+   尺ⓐ＝git status --porcelain | awk '{print $2}' | grep -v '/'  ← ⛔ 成立：那把尺⛔ 吃引号路径与含空格名，
+        把 CJK 名按字节拆开数出 50 枚，**其中前 3 枚（.gitignore／go.mod／-）根本不是未跟踪件而是被误读的 ' M' 行**。作废。
+   尺ⓑ＝git ls-files --others --exclude-standard | grep -v '/' | wc -l ＝**48** 枚（仓库根、深度 1、未跟踪）
+        逐名（前 22 枚是 ASCII 名，其余是 CJK 名，git 默认 core.quotePath 把它们转八进制）：
+               1	-
+               2	.zcodeignore
+               3	1
+               4	2026-09-24
+               5	2379
+               6	397
+               7	4
+               8	agent
+               9	core-after.A-evaluated.txt
+              10	core-after.A-fail.txt
+              11	core-after.A-pass.txt
+              12	core-after.A-skip.txt
+              13	core-after.B-evaluated.txt
+              14	g-f-83fixtures.txt
+              15	part1-state1-fixed.txt
+              16	part1-state1-pristine.txt
+              17	part1-state2-fixed.txt
+              18	part1-state2-pristine.txt
+              19	part2-nog6-fixed.txt
+              20	part2-nog6-pristine.txt
+              21	part3-stale-fixed.txt
+              22	part3-stale-pristine.txt
+   ⇒ 形状＝part1-state{1,2}-{fixed,pristine}.txt / part2-nog6-*.txt / part3-stale-*.txt / core-after.{A,B}-*.txt / g-f-83fixtures.txt
+     一族**变异对拉件直接躺在共享仓根**，撞 AGENTS §1.4/票面规矩里
+     「临时件只建不删、从一开始就落自家 logs/、⛔ 落仓库根」那一条（票 307 追加节 §3 记的两枚同族教训在前）。
+   ⇒ ⛔ 属 72-a2：本腿五笔 outside_writeface 全 0；⛔ 删它们（⛔ 我的件，且'只建不删'）。
+   [原第 78 行是一枚 shell 报错 "/usr/bin/bash: line 72: 1: command not found"，
+    成因＝本腿这条生成尺里把 ``1 1`` 与 ``git log --oneline -1`` 写成了反引号，被当命令替换执行；
+    ⛔ 删那行、改成这一条具名自报——定式＝**往件里落长文本时，正文里的反引号串⛔ 出现在双引号内**，
+    否则要么被执行、要么像本次这样把报错混进读数。下面那两行是改正后的正文。]
+   ⇒ 另：工作树 go.mod 有 1 处 tracked 改动（numstat 1 加 1 删）——那一枚编排者自己在 A837 已经落账
+     （HEAD 那批 c6fc78f0→f6f4eca8 的 commit 标题逐字含"A837 末尾追加 §5 …第二枚⛔ 我名、⛔ 我提交的 tracked 改动＝工作树 go.mod"），
+     ⛔ 本腿新读数，指过去即可。本腿⛔ 动它（⛔ 射程、且⛔ 碰别人的活）。
