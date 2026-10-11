@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# 309-v3 rig: AC#2 teeth pairs for the three shapes 309-r3 widened into range,
+# plus one constructed BLIND shape (decode into a struct field).
+# Every mutation is on an OUT-OF-REPO export tree, one fresh tree per rig.
+# Invoke: bash .scratch/wisp/probes/309/v3/logs/rig-shapes.txt
+set -u
+REPO="D:/work/workspace/projects plans/Wisp"
+L="$REPO/.scratch/wisp/probes/309/v3/logs"
+TEST="./internal/tools/"
+RUN_RE='^Test309ToolRequestProductionConstructionNail$'
+HARNESS_RE='walk |GetFileAttributesEx|build failed|no test files|cannot find the file|FAIL\t.*\[setup error\]|undefined:'
+
+tree_new() { # $1 = tag
+  local T
+  T=$(mktemp -d /d/tmp/wisp-309v3-"$1"-XXXXXX) || { echo "mktemp_failed"; return 1; }
+  ( cd "$REPO" && git archive HEAD go.mod go.sum internal cmd tools scripts ) | tar -x -C "$T"
+  local n
+  n=$(find "$T" -name '*.go' | wc -l)
+  { echo "tree=$T"; echo "go_files=$n"; echo "scripts_dir=$( [ -d "$T/scripts" ] && echo yes || echo NO )" ; echo "cmd_dir=$( [ -d "$T/cmd" ] && echo yes || echo NO )"; echo "tools_dir=$( [ -d "$T/tools" ] && echo yes || echo NO )"; echo "internal_dir=$( [ -d "$T/internal" ] && echo yes || echo NO )"; echo "gomod=$( [ -f "$T/go.mod" ] && echo yes || echo NO )"; } >> "$L/00-trees.txt"
+  if [ "$n" -lt 600 ]; then echo "tree=$T nonempty_check=FAILED go_files=$n -> rig void"; return 1; fi
+  echo "$T"
+}
+
+shot() { # $1 tag  $2 injected-file-name  $3 heredoc-body-file  $4 expect(ring|green)
+  :
+}
+
+run_test() { # $1 tree  $2 logfile
+  local T="$1" F="$2"
+  ( cd "$T" && GOFLAGS= go test "$TEST" -run "$RUN_RE" -count=1 -v ) > "$F" 2>&1
+  echo "rc=$?" >> "$F"
+}
+
+classify() { # $1 logfile -> prints one line
+  local F="$1"
+  local rc line harn res
+  rc=$(grep -oE 'rc=[0-9]+' "$F" | tail -1)
+  line=$(grep -nE '^(    )?--- (FAIL|PASS): Test309ToolRequestProductionConstructionNail' "$F" | head -1 | cut -c1-200)
+  harn=$(grep -cE "$HARNESS_RE" "$F" || true)
+  if grep -q '枚数钉响' "$F"; then res="RANG(shape-roster below)"; elif grep -qE '^(ok|\s*--- PASS)' "$F"; then res="GREEN"; else res="OTHER"; fi
+  echo "$rc | verdict=$res | harness_error_lines=$harn | testverdictline: $line"
+}
+
+start_staged=$( cd "$REPO" && git status --porcelain -- internal cmd tools scripts | wc -l )
+echo "start_repo_clean_rows=$start_staged" > "$L/00-start.txt"
+
+for S in new make conv blind; do
+  T=$(tree_new "$S") || { echo "tree creation failed for $S"; continue; }
+  G="$L/p-$S"
+  # nail file identity: must equal HEAD blob (single face)
+  ( cd "$REPO" && git show HEAD:internal/tools/toolrequest_nail_309_test.go ) | sha256sum | cut -c1-64 > "$G-nailsha-repo.txt"
+  sha256sum "$T/internal/tools/toolrequest_nail_309_test.go" | cut -c1-64 > "$G-nailsha-tree.txt"
+  # 1 pristine control
+  run_test "$T" "$G-pristine.log"
+  # 2 inject
+  case "$S" in
+    new)  cat > "$T/internal/agent/z309v3probe_new.go" <<'EOF'
+package agent
+
+func z309v3newProbe() *ToolRequest { return new(ToolRequest) }
+EOF
+      ;;
+    make) cat > "$T/internal/agent/z309v3probe_make.go" <<'EOF'
+package agent
+
+func z309v3makeProbe(n int) []ToolRequest { return make([]ToolRequest, n) }
+EOF
+      ;;
+    conv) cat > "$T/internal/agent/z309v3probe_conv.go" <<'EOF'
+package agent
+
+type z309v3Defined ToolRequest
+
+func z309v3convProbe(x z309v3Defined) ToolRequest { return ToolRequest(x) }
+EOF
+      ;;
+    blind) cat > "$T/internal/agent/z309v3probe_blind.go" <<'EOF'
+package agent
+
+import "encoding/json"
+
+type z309v3Holder struct{ Req ToolRequest }
+
+func z309v3decodeProbe(data []byte) (z309v3Holder, error) {
+	var h z309v3Holder
+	err := json.Unmarshal(data, &h)
+	return h, err
+}
+EOF
+      ;;
+  esac
+  ls -l "$T/internal/agent/"z309v3probe_*.go > "$G-injected.txt" 2>&1
+  run_test "$T" "$G-injected.log"
+  # 3 restore by renaming the injected file OUT of the tree roots (never delete)
+  mkdir -p "$T/off-root"
+  mv "$T/internal/agent/z309v3probe_$S.go" "$T/off-root/"
+  run_test "$T" "$G-restored.log"
+  cmp "$G-restored.log" /dev/null > /dev/null 2>&1
+  {
+    echo "== shape rig $S =="
+    echo "tree=$T"
+    echo "nail_sha_repo=$(cat $G-nailsha-repo.txt)"
+    echo "nail_sha_tree=$(cat $G-nailsha-tree.txt)"
+    echo "PRISTINE : $(classify "$G-pristine.log")"
+    echo "INJECTED : $(classify "$G-injected.log")"
+    echo "RESTORED : $(classify "$G-restored.log")"
+    echo "--- roster line(s) from INJECTED log ---"
+    grep -hE '枚数钉响|构造点=|分母=' "$G-injected.log" | cut -c1-300
+    echo "--- restored injected file still on disk? ---"
+    ls -l "$T/off-root" | tail -2
+    echo "injected_file_present_in_root=$( [ -f "$T/internal/agent/z309v3probe_$S.go" ] && echo YES || echo NO-moved-aside )"
+  } >> "$L/10-rig-summary.txt" 2>&1
+done
+
+end_staged=$( cd "$REPO" && git status --porcelain -- internal cmd tools scripts | wc -l )
+echo "end_repo_clean_rows=$end_staged" >> "$L/00-start.txt"
+echo "done"

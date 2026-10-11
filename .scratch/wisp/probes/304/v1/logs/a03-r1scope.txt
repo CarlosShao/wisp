@@ -1,0 +1,62 @@
+=== R1 commits only: file lists and foreign (outside R1 allowed surfaces) ===
+R1COMMIT b9f37892 files=1 foreign=0
+R1COMMIT e875f00f files=10 foreign=0
+R1COMMIT bd123485 files=56 foreign=0
+R1COMMIT 27f7b197 files=3 foreign=0
+R1COMMIT 04f2ecbc files=1 foreign=0
+=== R1 surfaces: internal/llm files touched (whole range, per commit) ===
+-- b9f37892
+-- e875f00f
+   internal/llm/adaptertest/childjob_other.go
+   internal/llm/adaptertest/childjob_windows.go
+   internal/llm/adaptertest/mockllm.go
+   internal/llm/openaichat/mockllm_integ_test.go
+-- bd123485
+-- 27f7b197
+-- 04f2ecbc
+=== 304-r1 0-byte artefacts (ruler: find -size 0) ===
+ZERO_BYTE .scratch/wisp/probes/304/r1/logs/build-1.txt
+ZERO_BYTE .scratch/wisp/probes/304/r1/logs/vet-1.txt
+ZERO_BYTE .scratch/wisp/probes/304/r1/logs/vet-reverse.txt
+zero_byte_count=3
+total_files_in_r1=64
+=== which R1 logs carry rc= ===
+14
+=== gate-name -> rc-bearing file mapping ===
+-- build
+     bullet.txt bytes=6419 rc_line=build_rc=0
+     g-build.txt bytes=11 rc_line=build_rc=0
+     g-census-after.txt bytes=3440 rc_line=rc=0
+     g-census-before.txt bytes=3441 rc_line=rc=0
+     g-d22scan.txt bytes=23099 rc_line=rc=1
+     childjob_other.go bytes=894 rc_line=
+     childjob_windows.go bytes=2098 rc_line=
+     mockllm.go bytes=13898 rc_line=
+     mockllm_integ_test.go bytes=14267 rc_line=
+-- vet
+     bullet.txt bytes=6419 rc_line=rc=0
+     g-vet.txt bytes=9 rc_line=vet_rc=0
+-- d22scan
+     bullet.txt bytes=6419 rc_line=rc=0
+     g-d22scan.txt bytes=23099 rc_line=rc=1
+-- pathlen
+     bullet.txt bytes=6419 rc_line=rc=0
+     g-pathlen.txt bytes=2547 rc_line=pathlen_rc=0
+     pathlen-1.txt bytes=2547 rc_line=pathlen_rc=0
+-- census
+     bullet.txt bytes=6419 rc_line=rc=0
+     g-census-after.txt bytes=3440 rc_line=census_after_rc=0
+     g-census-before.txt bytes=3441 rc_line=census_before_rc=0
+     g-summary.txt bytes=462 rc_line=
+-- gofumpt
+     bullet.txt bytes=6419 rc_line=rc=0
+     g-format-headblob.txt bytes=140 rc_line=rc=0
+     g-format-worktree.txt bytes=225 rc_line=rc=0
+-- fmt
+     mockllm.go bytes=13898 rc_line=
+     mockllm_integ_test.go bytes=14267 rc_line=
+-- portable
+     bullet.txt bytes=6419 rc_line=rc=0
+     g-census-after.txt bytes=3440 rc_line=rc=0
+     g-census-before.txt bytes=3441 rc_line=rc=0
+rc_marker=done

@@ -1,0 +1,3 @@
+ruler=GOFLAGS= go build ./internal/... ./cmd/... ./tools/... ;台面=shared worktree @04f2ecbc
+build_rc=0
+build stdout+stderr bytes=0 (0 = nothing printed = clean build)

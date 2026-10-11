@@ -1,0 +1,14 @@
+=== 304-r1 commits b9f37892..04f2ecbc (author-subject) ===
+04f2ecbc|10-11 18:41|304-r1: correct the over-reach roster (a foreign commit hash had been printed in my own log)
+715f63cb|10-11 18:40|309-r3: final readings, 90-final and the one ticket bullet Closes out this leg: 90-final.md (readin
+27f7b197|10-11 18:39|304-r1: final readings page, over-reach roster and one append-only ticket bullet
+c7887eca|10-11 18:36|编排者代笔票 304 `AC#4`／`AC#4b` 的编队闸门名册（落点＝正典文本，⛔ 改五�
+6fed247e|10-11 18:35|309-r3: evidence for the widened nail range and the narrowed comment
+bd123485|10-11 18:31|304-r1: AC#2 paired readings and AC#3 gate artefacts for the job-object landing
+a1f84d39|10-11 18:00|309-r3 (B): narrow bridge.go every/wherever to the nail measured range The doc block above assessor
+df8d517d|10-11 17:55|309-r3 (A): widen the nail matcher to new()/make([]T,n)/defined-type conversion Adds three statical
+e875f00f|10-11 17:44|304-r1: land job-object guard on both mockllm spawn points (AC#1, shape A)
+2a6f11a5|10-11 17:38|编排者 A850/A851 落账＋两格翻勾（都由我自己现量，不认腿的自报）
+b9f37892|10-11 17:24|304-r1: anchor readings at leg start (HEAD 3974ab4d, dev, index clean)
+=== all commits touching internal/llm since b9f37892 ===
+e875f00f 304-r1: land job-object guard on both mockllm spawn points (AC#1, shape A)

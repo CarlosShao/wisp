@@ -1,0 +1,18 @@
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/msg-90.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/my-files.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/final-d22scan-body.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/final-nail-309.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/final-pathlen-body.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/msg-90.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/my-files.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/selfref-ruler-final.log', LF will be replaced by CRLF the next time Git touches it
+[dev 715f63cb] 309-r3: final readings, 90-final and the one ticket bullet Closes out this leg: 90-final.md (readings table with ruler, scope and face per row, plus six named debts Q-309-r3-*), the self-referential word-face ruler re-run, the final gate round taken with every leg file on disk (rc_build=0 rc_vet=0 rc_d22scan=0 rc_pathlen=0 VERDICT GREEN rc_test309=0 gofmt listed=0 worktree clean=0 rows) and one append-only bullet at the foot of ticket 309 (1 added / 0 deleted; no box touched - census now 4 checked / 2 unchecked because the orchestrator flipped AC#1 at 17:1x, which this leg re-ran rather than copied).
+ 9 files changed, 410 insertions(+)
+ create mode 100644 .scratch/wisp/probes/309/r3/90-final.md
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/final-d22scan-body.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/final-gofmt.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/final-nail-309.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/final-pathlen-body.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/msg-90.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/my-files.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/selfref-ruler-final.log

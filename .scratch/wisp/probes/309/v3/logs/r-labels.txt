@@ -1,0 +1,20 @@
+== matcher shape labels (ruler: grep -oE 'return "[a-z0-9-]+"' on nail file, sort -u) ==
+return "alias-literal"
+return "conversion-to-tool-request"
+return "literal"
+return "make-slice-of-tool-request"
+return "new-of-tool-request"
+return "qualified-literal"
+return "same-package-bare-literal"
+hits=7 grep_rc=0
+== stderr of that ruler ==
+rc=0
+== label string literals anywhere in file ==
+176:		return "qualified-literal"
+179:			return "same-package-bare-literal"
+181:		return "alias-literal"
+183:		return "literal"
+200:		return "conversion-to-tool-request", true
+209:			return "new-of-tool-request", true
+216:			return "make-slice-of-tool-request", true
+260:						shape: "var-decl-no-initializer",

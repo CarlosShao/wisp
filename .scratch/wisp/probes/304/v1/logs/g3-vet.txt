@@ -1,0 +1,4 @@
+ruler=GOFLAGS= go vet ./internal/llm/... ./internal/proc/ ;台面=shared worktree @04f2ecbc
+vet_rc=0
+vet stdout+stderr bytes=0 (vet prints nothing when clean) - denominator: 3 package patterns matched, see next line
+packages_under_vet=7

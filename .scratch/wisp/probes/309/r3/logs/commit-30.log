@@ -1,0 +1,112 @@
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge-855-900.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge-930-1000.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge-comment-scope-2.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge-comment-scope.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge-head-nocomment.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge-head-stripped.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge-work-nocomment.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge-work-stripped.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/bridge.go.at-commit.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/commit-00.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/commit-bridge.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/commit-code.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/fail-after.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/fail-before.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/gate-assertions.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/gate-build-mid.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/gate-d22scan-with-my-files.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/gate-d22scan.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/gate-fmt.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/gate-pathlen-with-my-files.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/gate-pathlen.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/gate-vet.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/h.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/msg-00.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/msg-30.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/msg-bridge.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/msg-code.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/nail-after-worktree.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-conv-add.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-conv-del.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-make-add.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-make-del.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-new-add.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-new-del.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-pristine.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-shapes.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/rig-shapes.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-added.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-after.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-after.names', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-after.sorted', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-before.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-before.names', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-before.sorted', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-control.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-control.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/roster-removed.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/toolrequest_nail_309_test.go.at-commit.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/tree-conv.dir', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/tree-make.dir', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/tree-new.dir', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/309/r3/logs/tree-pristine.dir', LF will be replaced by CRLF the next time Git touches it
+[dev 6fed247e] 309-r3: evidence for the widened nail range and the narrowed comment
+ 58 files changed, 10867 insertions(+)
+ create mode 100644 .scratch/wisp/probes/309/r3/10-matcher-and-comment.md
+ create mode 100644 .scratch/wisp/probes/309/r3/20-teeth.md
+ create mode 100644 .scratch/wisp/probes/309/r3/30-gates.md
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge-855-900.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge-930-1000.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge-comment-scope-2.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge-comment-scope.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge-head-nocomment.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge-head-stripped.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge-work-nocomment.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge-work-stripped.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/bridge.go.at-commit.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/commit-00.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/commit-bridge.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/commit-code.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/fail-after.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/fail-before.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/fail-new.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/fmt-nail.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/gate-assertions.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/gate-build-mid.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/gate-d22scan-with-my-files.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/gate-d22scan.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/gate-fmt.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/gate-pathlen-with-my-files.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/gate-pathlen.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/gate-vet.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/h.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/msg-00.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/msg-30.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/msg-bridge.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/msg-code.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/nail-after-worktree.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-conv-add.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-conv-del.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-make-add.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-make-del.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-new-add.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-new-del.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-pristine.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-shapes.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/rig-shapes.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-added.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-after.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-after.names
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-after.sorted
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-before.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-before.names
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-before.sorted
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-control.log
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-control.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/roster-removed.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/st.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/toolrequest_nail_309_test.go.at-commit.txt
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/tree-conv.dir
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/tree-make.dir
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/tree-new.dir
+ create mode 100644 .scratch/wisp/probes/309/r3/logs/tree-pristine.dir
