@@ -1,0 +1,9 @@
+308-r2: hand-in readings (fourth commit, fourth d22scan reading)
+
+Adds logs/final-readings.txt, logs/gate-d22scan-run4.txt and its rc line,
+logs/closing-note.md, and section 8 of 90-final.md. Delivery files are
+untouched: strip-comments cmp against the 202ed4a5 blobs is still
+IDENTICAL for both, production sha256 unchanged, internal/risk worktree
+clean. Fourth d22scan reading is still rc=1 from two phantom citations in
+internal/tools/bridge.go (309-r2 in-flight, line numbers moved again);
+zero findings in internal/risk.

@@ -1,0 +1,24 @@
+=== HAND-IN READINGS 2026-10-11 14:49 +08 ===
+git rev-parse --short HEAD = c30b7abe   (起手 = 202ed4a5)
+git status -- internal/risk rows = 0
+git status -- internal/tools rows = 2 (309-r2 in flight)
+ticket boxes: checked=6 unchecked=0
+
+--- strip-cmp re-check vs 202ed4a5 (comment lines deleted) ---
+pathresolver_anchor_spelling_windows_test.go: IDENTICAL md5=fb351a9cf96b689864b1a2a3fb0f461b
+pathresolver_volumeless_spelling_308_test.go: IDENTICAL md5=c113a6ec09dd0dca7b567aeeaffcc9a4
+
+--- production sha256 ---
+c347e1cfc5401f096153d527e57933ee61680f732b6314b2fe68f53925cb422b *internal/risk/pathresolver.go
+1dcf0640ceb4b79c847d2fe601dd7b0c1d79987cc440b5de15aa75ecd4816771 *internal/risk/pathresolver_windows.go
+
+--- gates ---
+go build ./... rc=0
+go vet ./internal/risk/ rc=0
+path-length rc=0 verdict=VERDICT GREEN
+d22scan.sh rc=1 (4th reading)
+internal/tools/bridge.go:892: [phantom-citation] comment cites repo path "cmd/internal/tools/sc
+internal/tools/bridge.go:975: [phantom-citation] comment cites repo path ".scratch/wisp/probes/
+scan_test.go:269: repo HEAD violates: internal/tools/bridge.go:892: [phantom-citation] comment 
+scan_test.go:269: repo HEAD violates: internal/tools/bridge.go:975: [phantom-citation] comment 
+d22scan findings hitting internal/risk = 0

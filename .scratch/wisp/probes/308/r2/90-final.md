@@ -57,3 +57,13 @@ leg＝`308-r2`（窄落地腿，**只改注释行**）· 票＝`.scratch/wisp/is
 ## 7. 我⛔ 做的事（口径边界）
 
 ⛔ 翻框、⛔ 碰 `Status:`、⛔ 改票名 `-done`、⛔ 宣布任何格"成立"、⛔ 动产码／helper 逻辑／用例逻辑、⛔ 加删用例、⛔ 引 `t.Skip`、⛔ 放宽任何断言、⛔ 造 `--- SKIP`。本腿的全部交付＝**三处注释**＋证据＋票尾一条。
+
+## 8. 收尾读数（★⛔ 覆盖 §0/§1 那行的"交回＝`1da192e9`"，那枚是第三笔之时）
+
+交回 HEAD＝**`c30b7abe`**（第四笔＝本件＋票尾一条；`git log --oneline` 里我这四笔＝`6f389389`→`4c63d3b2`→`1da192e9`→`c30b7abe`，起手＝`202ed4a5`）。收尾又现跑一遍（件＝`logs/final-readings.txt`、`logs/gate-d22scan-run4.txt`＋`.rc.txt`、`logs/closing-note.md`）：
+
+- `git status -- internal/risk`＝**0 行**（我的两枚已入库）；`git status -- internal/tools`＝**2 行**（309-r2 仍在飞）。
+- 剥整行注释后 `cmp` ⇄ `202ed4a5` blob：两枚**各 IDENTICAL**（md5 `fb351a9c…`／`c113a6ec…` 与 §4 同值）；产码两枚 sha256 仍＝`c347e1cf…`／`1dcf0640…`。
+- 门禁第四发＝build **rc0**、vet **rc0**、长度门 **rc0**（`VERDICT GREEN`）、`sh scripts/d22scan.sh` **rc1**：两枚 finding 仍在 `internal/tools/bridge.go`，行号第三⇄第四发之间又从 `892/971` 漂到 **`892/975`** ⇒ "别腿在飞态"这一判读第四次复现；命中 `internal/risk` 的 finding＝**0**。⛔ 由我消、⛔ 由我盖（归编排者复跑认账＝`Q-308-r2-D`）。
+- 票框现跑＝`- [x]` **6**／`- [ ]` **0**（＝起手值，⛔ 我翻）。
+
