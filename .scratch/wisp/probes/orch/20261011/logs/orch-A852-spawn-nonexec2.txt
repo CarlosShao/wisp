@@ -1,0 +1,26 @@
+ts=2026-10-11 18:08:16 HEAD=a1f84d39  尺=grep -rn --include='*.go' -E（只读，⛔ 跑 Go）  射程=internal cmd tools scripts
+分母＝同一射程里的 .go 枚数：
+  go_files=682
+pattern=os\.StartProcess hits=0 grep_stderr="none"
+pattern=syscall\.StartProcess hits=0 grep_stderr="none"
+pattern=CreateProcess hits=1 grep_stderr="none"
+pattern=ShellExecute hits=0 grep_stderr="none"
+pattern=syscall\.Exec hits=0 grep_stderr="none"
+pattern=exec\.Command hits=74 grep_stderr="none"
+pattern=exec\.CommandContext hits=3 grep_stderr="none"
+pattern="build" hits=9 grep_stderr="none"
+pattern="-o" hits=6 grep_stderr="none"
+--- exec\.Command 逐枚落点前 10 行（分母＝上面 hits）:
+internal/agent/spill_acl_windows_test.go:79:	cmd := exec.Command("icacls", path)
+internal/config/c26_seam_posix_125_test.go:174:	cmd := exec.Command(os.Args[0],
+internal/config/private_acl_windows_test.go:204:	cmd := exec.Command("icacls", args...)
+internal/llm/adaptertest/mockllm.go:65:	build := exec.Command(goBin, "build", "-o", exe, ".")
+internal/llm/adaptertest/mockllm.go:72:	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+internal/llm/openaichat/mockllm_integ_test.go:66:	build := exec.Command(goBin, "build", "-o", exe, ".")
+internal/llm/openaichat/mockllm_integ_test.go:74:	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+internal/memory/artifacts_junction_tripwire_windows_test.go:39:	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, outside).CombinedOutput()
+internal/memory/concurrent_test.go:230:	cmd := exec.Command(os.Args[0], "-test.run=^TestSubprocessCrashWriter$", "-test.timeout=60s")
+internal/models/acl_sid_121_windows_test.go:65:	cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", script)
+--- 非 os/exec 的直调形（若 hits>0 才逐枚列）:
+cmd/wisp/slo_exit_os_156_windows_test.go:335:// own, handed over by CreateProcess), and opening one without SYNCHRONIZE is not
+done_rc=0

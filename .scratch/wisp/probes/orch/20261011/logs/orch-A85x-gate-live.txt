@@ -1,0 +1,11 @@
+ts=2026-10-11 17:55:08  HEAD=e875f00f  branch=dev
+ruler=tasklist //FI "IMAGENAME eq <name>" //FO CSV  (命中行数 = 去掉表头的行数)
+
+wisp.exe count=0 tasklist_rc=0 first_line="INFO: No tasks are running which match t"
+balldebug.exe count=0 tasklist_rc=0 first_line="INFO: No tasks are running which match t"
+mockllm.exe count=0 tasklist_rc=0 first_line="INFO: No tasks are running which match t"
+wisp.test.exe count=0 tasklist_rc=0 first_line="INFO: No tasks are running which match t"
+
+msedgewebview2.exe count=18  （只看枚数，归属另按 --webview-exe-name= 逐树指，⛔ 由裸枚数生成停法账）
+TEMP Test* 目录 count=29
+gate_rc=0  （0＝每一把尺都取到了数字读数；非 0＝有尺空手，具名看上面哪一行缺数）

@@ -1,0 +1,12 @@
+编排者代笔票 304 `AC#4`／`AC#4b` 的编队闸门名册（落点＝正典文本，⛔ 改五枚历史快照）＋`Q-304-a1-I` 由我补的读数
+
+- 为什么落在编队侧：`AC#4` 要的是"起手闸门该数哪些进程名定下来"，而这段文本一直是我每次派单现写的，散在五枚历史拷贝里
+  （`2026-10-09-live-window-runsheet.md:45`、`296-ac3-runsheet.md:7`、`a793-append.md:7`、`handover-40as.md:4`、`handover-40at.md:4`）。
+  那五枚是"当时说过什么"的记录，⛔ 回头改＝造假 ⇒ 定一份正典 `probes/orch/gate-roster-304.md`：名册加 `mockllm.exe`＋`wisp.test.exe`，
+  并把 `AC#4b` 那三问（谁起的／父 PID 在不在⛔ 当归属、只当旁证／本腿认下哪几枚）与"每枚非零计数指到一棵树，指不到写归属不明"写死。
+- 用它当场跑的一发（`gate_rc=0`）：`wisp.exe`／`balldebug.exe`／`mockllm.exe`／`wisp.test.exe` 各 **0 枚**（四把尺的 `first_line` 都落盘＝⛔ 拿"没跑"冒充"0 枚"），
+  `msedgewebview2.exe` **18 枚**（只记枚数，归属另按树），`%TEMP%` 的 `Test*` 目录 **29 枚** ⇄ 票面 21 ⇄ 我今天两轮实测 22→23 ⇒ **这一族确实在长**。
+- `Q-304-a1-I`（有没有绕开 `os/exec` 的直调起子进程）销账：`os.StartProcess`／`syscall.StartProcess`／`ShellExecute`／`syscall.Exec` 各 **0**，
+  `CreateProcess` **1** 且那一枚是注释行 ⇒ 甲形两枚 spawn 点同批改完⛔ 留第三支泄漏源。⚠ 我第一发把裸 `(` 放进 ERE，`grep` 报错被 `2>/dev/null` 吞掉 ⇒ 盘上留了一枚**假 0**，
+  那件⛔ 删、具名留在 `logs/orch-A852-spawn-nonexec.txt`，重跑件 `spawn-nonexec2.sh`／`...-nonexec2.txt` 每行并排落 `grep_stderr=`。
+- 门禁：`pathlen_rc=0`（VERDICT GREEN）、`d22scan_rc=0`；本笔⛔ 动产码⛔ 翻任何框（`AC#4`/`AC#4b` 的判语归非实现者），⛔ push。

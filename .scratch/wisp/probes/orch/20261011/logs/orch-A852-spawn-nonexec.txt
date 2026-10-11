@@ -1,0 +1,11 @@
+ts=2026-10-11 17:56:56 HEAD=df8d517d  尺=grep -rn（只读，⛔ 跑 Go）  射程=全仓 .go（含 _test.go）
+pattern=os\.StartProcess hits=0
+pattern=syscall\.StartProcess hits=0
+pattern=CreateProcess hits=1
+pattern=ShellExecute hits=0
+pattern=syscall\.Exec hits=0
+pattern=exec\.Command( hits=0
+pattern=go build -o hits=0
+--- 非 os/exec 那三类的逐枚落点（若有）:
+cmd/wisp/slo_exit_os_156_windows_test.go:335:// own, handed over by CreateProcess), and opening one without SYNCHRONIZE is not
+grep_done_rc=0
