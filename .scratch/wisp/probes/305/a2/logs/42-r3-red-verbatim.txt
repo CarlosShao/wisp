@@ -1,0 +1,10 @@
+size: 2407 bytes / 24 lines
+5:--- SKIP: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.00s)
+12:--- PASS: TestAC14AwaitedBindingReplyReachesThePage (1.26s)
+17:    panel_resident_windows_test.go:869: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other
+20:--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.54s)
+21:FAIL
+22:FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.939s
+23:FAIL
+24:rc=1
+rc(grep-r3)=0

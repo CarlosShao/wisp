@@ -1,0 +1,48 @@
+== commit a3560d6b ==
+.scratch/wisp/probes/305/a2/00-anchor.md
+.scratch/wisp/probes/305/a2/logs/00-branch.txt
+.scratch/wisp/probes/305/a2/logs/00-date.txt
+.scratch/wisp/probes/305/a2/logs/00-git-log-1.txt
+.scratch/wisp/probes/305/a2/logs/00-head.txt
+.scratch/wisp/probes/305/a2/logs/00-scoped-porcelain.txt
+.scratch/wisp/probes/305/a2/logs/commit-1-msg.txt
+rc(nameonly-a3560d6b)=0
+   new_go=0  dot_out=0  files_outside_own_dir=0
+== commit 05b37976 ==
+.scratch/wisp/probes/305/a2/10-window-roster.md
+.scratch/wisp/probes/305/a2/20-handover-and-eval-chain.md
+.scratch/wisp/probes/305/a2/30-deciding-run-recipe.md
+.scratch/wisp/probes/305/a2/logs/10-revlist-count-total.txt
+.scratch/wisp/probes/305/a2/logs/10-roster-dated.txt
+.scratch/wisp/probes/305/a2/logs/10-roster-oneline.txt
+.scratch/wisp/probes/305/a2/logs/11-roster-names-ctdate.txt
+.scratch/wisp/probes/305/a2/logs/11-roster-names.txt
+.scratch/wisp/probes/305/a2/logs/12-chain-callers.txt
+.scratch/wisp/probes/305/a2/logs/12-chain-defs.txt
+.scratch/wisp/probes/305/a2/logs/12-eval-sites.txt
+.scratch/wisp/probes/305/a2/logs/13-candidate-diffs.txt
+.scratch/wisp/probes/305/a2/logs/13b-candidate-diffs-tail.txt
+.scratch/wisp/probes/305/a2/logs/13c-candidate-diffs-tail2.txt
+.scratch/wisp/probes/305/a2/logs/14-testfile-hunks.txt
+.scratch/wisp/probes/305/a2/logs/15-extra-rulers.txt
+.scratch/wisp/probes/305/a2/logs/16-0d87a681-door.txt
+.scratch/wisp/probes/305/a2/logs/17-window-touchpaths.txt
+.scratch/wisp/probes/305/a2/logs/17b-dirhist.txt
+.scratch/wisp/probes/305/a2/logs/17c-cmd-others.txt
+.scratch/wisp/probes/305/a2/logs/17d-frontend.txt
+.scratch/wisp/probes/305/a2/logs/18-window-allpaths.txt
+.scratch/wisp/probes/305/a2/logs/19-symbol-census-two-ends.txt
+.scratch/wisp/probes/305/a2/logs/20-bringup-chain.txt
+.scratch/wisp/probes/305/a2/logs/20-dirty-cmd-internal.txt
+.scratch/wisp/probes/305/a2/logs/20-firstroundtrip.txt
+.scratch/wisp/probes/305/a2/logs/22-test-segments.txt
+.scratch/wisp/probes/305/a2/logs/24-helpers-and-dist.txt
+.scratch/wisp/probes/305/a2/logs/26-pump-and-residentloop.txt
+.scratch/wisp/probes/305/a2/logs/27-transport-and-post.txt
+.scratch/wisp/probes/305/a2/logs/28-final-rulers.txt
+.scratch/wisp/probes/305/a2/logs/29-entry-surface.txt
+.scratch/wisp/probes/305/a2/logs/30-recipe-rulers.txt
+.scratch/wisp/probes/305/a2/logs/31-pnlpumponce-sites.txt
+.scratch/wisp/probes/305/a2/logs/commit-2-msg.txt
+rc(nameonly-05b37976)=0
+   new_go=0  dot_out=0  files_outside_own_dir=0

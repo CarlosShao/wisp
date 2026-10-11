@@ -1,0 +1,14 @@
+## green-point anchors re-run by me
+201:--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.97s)
+205:--- PASS: TestAC14GoSideEvalPushReachesThePage (0.50s)
+241:--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.11s)
+245:--- PASS: TestAC14GoSideEvalPushReachesThePage (0.55s)
+277:--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.97s)
+281:--- PASS: TestAC14GoSideEvalPushReachesThePage (0.45s)
+rc(green-anchors)=0
+## evidence file identity line
+10:- HEAD：`416d9d56977a89a070e29e23391b1a2f02bdc9b5`（标题 `docs(33-r6 收尾两枚落盘)：A504＋它表尾的编排者标注……`）
+## my leg commits (re-anchor)
+05b37976 2026-10-11T08:00:50+08:00
+f4fd71bc 2026-10-11T08:00:30+08:00
+b55a3ff6 2026-10-11T07:57:20+08:00
