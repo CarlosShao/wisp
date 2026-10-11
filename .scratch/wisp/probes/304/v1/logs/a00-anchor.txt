@@ -1,0 +1,24 @@
+HEAD=04f2ecbc
+FULL=04f2ecbc9764408f001ddb9b8d9bc6689f4b05e8
+BRANCH=dev
+STAGED_COUNT=0
+TREE_DIRTY_COUNT=0
+--- log ---
+04f2ecbc|10-11 18:41|304-r1: correct the over-reach roster (a foreign commit hash had been printed in my own log)
+715f63cb|10-11 18:40|309-r3: final readings, 90-final and the one ticket bullet Closes out this leg: 90-final.md (readings table with ruler, scope and face per row, plus six named debts Q-309-r3-*), the self-referential word-face ruler re-run, the final gate round taken with every leg file on disk (rc_build=0 rc_vet=0 rc_d22scan=0 rc_pathlen=0 VERDICT GREEN rc_test309=0 gofmt listed=0 worktree clean=0 rows) and one append-only bullet at the foot of ticket 309 (1 added / 0 deleted; no box touched - census now 4 checked / 2 unchecked because the orchestrator flipped AC#1 at 17:1x, which this leg re-ran rather than copied).
+27f7b197|10-11 18:39|304-r1: final readings page, over-reach roster and one append-only ticket bullet
+c7887eca|10-11 18:36|编排者代笔票 304 `AC#4`／`AC#4b` 的编队闸门名册（落点＝正典文本，⛔ 改五枚历史快照）＋`Q-304-a1-I` 由我补的读数
+6fed247e|10-11 18:35|309-r3: evidence for the widened nail range and the narrowed comment
+bd123485|10-11 18:31|304-r1: AC#2 paired readings and AC#3 gate artefacts for the job-object landing
+a1f84d39|10-11 18:00|309-r3 (B): narrow bridge.go every/wherever to the nail measured range The doc block above assessorFor claimed that Test309ToolRequestProductionConstructionNail "counts every production construction point of that type ... so a second one rings wherever it is written". 309-v2 B14 and the orchestrator A851 section 2 falsified that against the nail own register. The sentence now names the seven shape labels the matcher recognises after part (A), names the shapes that ring nothing today (reflection or decode, cross-package and function-body aliases, renamed and dot imports, elided nested element), and points at that register. Comment lines only: noncomment_changed=0, both blobs with full-line comments deleted are cmp IDENTICAL at 854 lines, sha256 496ed6d683e8e070, CR=0, guard limb and WithTaintDetector argument byte counts unchanged. No contract claim touched.
+df8d517d|10-11 17:55|309-r3 (A): widen the nail matcher to new()/make([]T,n)/defined-type conversion Adds three statically recognisable shapes to internal/tools/toolrequest_nail_309_test.go so the AC#2 universal claim has fewer in-register counterexamples: new(agent.ToolRequest), make([]agent.ToolRequest, n) (including the make(..., 0) length form) and the conversion agent.ToolRequest(x) written after a defined type. go/ast and parser only - no go/types, so the head comment line "no type-level perfection" stays verbatim and the missed shapes stay named by item: cross-package alias, function-body alias, renamed and dot import, reflection/decode construction, elided nested element, bare name gated on the package clause. 12 new controls, both directions, two of them pinning that a still-blind shape really counts 0. No assertion weakened, no SKIP, no production byte touched. rc=0 on the nail alone with the tree count still 1.
+e875f00f|10-11 17:44|304-r1: land job-object guard on both mockllm spawn points (AC#1, shape A)
+2a6f11a5|10-11 17:38|编排者 A850/A851 落账＋两格翻勾（都由我自己现量，不认腿的自报）
+b9f37892|10-11 17:24|304-r1: anchor readings at leg start (HEAD 3974ab4d, dev, index clean)
+f4920906|10-11 17:22|309-r3: land start anchor (HEAD 3974ab4d, worktree clean, staged 0)
+3974ab4d|10-11 16:56|309-v2 非实现者终裁：AC#1 成立／AC#2 成立／AC#3 附条件成立（一枚新条件＝那句 "wherever" 量上不实）
+93de4b4a|10-11 16:30|304-a1 追加：把 0 字节那一枚尺件补成自解释件（0 命中⛔ 等于没问题）
+--- zero-byte in 304/r1 ---
+3
+--- rc-bearing in 304/r1/logs ---
+14
