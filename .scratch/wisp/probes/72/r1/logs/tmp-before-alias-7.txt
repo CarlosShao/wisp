@@ -1,0 +1,25 @@
+time=2026-10-11T11:33:27.778+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+    pathresolver_anchor_spelling_windows_test.go:57: Resolve("C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestClassifyAnchorSpellingIsNotVerdict2588272801\\001\\profile\\.ssh\\id_testkey") canonical "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestClassifyAnchorSpellingIsNotVerdict2588272801\\001\\profile\\.ssh\\id_testkey": test premise broken (candidate must be the real path)
+--- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.10s)
+=== RUN   TestCanonicalInputGainsNoSecondForm
+    pathresolver_anchor_spelling_windows_test.go:140: canonical "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestCanonicalInputGainsNoSecondForm2554072809\\001\\not-created-yet\\deep.txt" produced 2 comparison forms ["c:\\users\\swq\\tmp\\riskat~1\\runner~1\\testcanonicalinputgainsnosecondform2554072809\\001\\not-created-yet\\deep.txt" "c:\\users\\swq\\tmp\\riskattrib1\\runnertempareaforattribution1\\testcanonicalinputgainsnosecondform2554072809\\001\\not-created-yet\\deep.txt"], want 1 (verdict must not move for a path with one spelling)
+--- FAIL: TestCanonicalInputGainsNoSecondForm (0.01s)
+=== RUN   TestAListWinsWhereBothTablesHit
+    pathresolver_anchor_spelling_windows_test.go:238: B-only control must stay overridable by design: {Allow:false NeedL2:true Class:B Reason:B-list sensitive path; single-file override requires one L2 confirm: id_*}
+--- FAIL: TestAListWinsWhereBothTablesHit (0.02s)
+=== RUN   TestPathResolverShortNameAListDenied
+    pathresolver_junction_windows_test.go:135: short name did not expand to long path: got "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverShortNameAListDenied861964285\\001\\.git-credentials" want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverShortNameAListDenied861964285\\001\\.git-credentials"
+--- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+=== RUN   TestPathResolverUNCAListDenied
+    pathresolver_junction_windows_test.go:164: UNC spelling "\\\\?\\UNC\\localhost\\c$\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverUNCAListDenied1314236453\\001\\.git-credentials" normalized to "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverUNCAListDenied1314236453\\001\\.git-credentials", want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverUNCAListDenied1314236453\\001\\.git-credentials"
+--- FAIL: TestPathResolverUNCAListDenied (0.01s)
+=== RUN   TestPathResolverExtendedLengthPrefixAListDenied
+    pathresolver_junction_windows_test.go:182: \\?\ spelling normalized to "C:\\Users\\swq\\tmp\\riskattrib1\\RunnerTempAreaForAttribution1\\TestPathResolverExtendedLengthPrefixAListDenied3261845900\\001\\.git-credentials", want "C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestPathResolverExtendedLengthPrefixAListDenied3261845900\\001\\.git-credentials"
+--- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+=== RUN   TestBListDefaultDenyAndOverride
+    pathresolver_junction_windows_test.go:292: B-list single-file override must allow: {Allow:false NeedL2:true Class:B Reason:B-list sensitive path; single-file override requires one L2 confirm: .env*}
+--- FAIL: TestBListDefaultDenyAndOverride (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.245s
+FAIL

@@ -1,0 +1,44 @@
+time=2026-10-11T11:33:33.907+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+--- PASS: TestClassifyAnchorSpellingIsNotVerdict (0.07s)
+=== RUN   TestClassifySpellingInvariance
+--- PASS: TestClassifySpellingInvariance (0.02s)
+=== RUN   TestCanonicalInputGainsNoSecondForm
+--- PASS: TestCanonicalInputGainsNoSecondForm (0.01s)
+=== RUN   TestOverrideOnlyAcceptsTheResolvedForm
+--- PASS: TestOverrideOnlyAcceptsTheResolvedForm (0.06s)
+=== RUN   TestAListWinsWhereBothTablesHit
+--- PASS: TestAListWinsWhereBothTablesHit (0.01s)
+=== RUN   TestClassifyFailClosedWhenSpellingUnprovable
+--- PASS: TestClassifyFailClosedWhenSpellingUnprovable (0.09s)
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 359954 ns/op = 0.360 ms/op (budget 1.000 ms, 2872 samples)
+--- PASS: TestResolvePerCallBudget (1.11s)
+=== RUN   TestPathResolverJunctionWindows
+--- PASS: TestPathResolverJunctionWindows (0.07s)
+=== RUN   TestPathResolverShortNameAListDenied
+--- PASS: TestPathResolverShortNameAListDenied (0.01s)
+=== RUN   TestPathResolverUNCAListDenied
+--- PASS: TestPathResolverUNCAListDenied (0.01s)
+=== RUN   TestPathResolverExtendedLengthPrefixAListDenied
+--- PASS: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+=== RUN   TestPathResolverCaseAndDotMixDenied
+--- PASS: TestPathResolverCaseAndDotMixDenied (0.01s)
+=== RUN   TestReparseExceptionExplicitPathOnly
+--- PASS: TestReparseExceptionExplicitPathOnly (0.20s)
+=== RUN   TestAListDenyAndUnoverridable
+--- PASS: TestAListDenyAndUnoverridable (0.02s)
+=== RUN   TestBListDefaultDenyAndOverride
+--- PASS: TestBListDefaultDenyAndOverride (0.01s)
+=== RUN   TestResolveIdempotent
+--- PASS: TestResolveIdempotent (0.01s)
+=== RUN   TestResolveExpansion
+--- PASS: TestResolveExpansion (0.01s)
+=== RUN   TestResolveCanonicalIsPlatformShaped
+--- PASS: TestResolveCanonicalIsPlatformShaped (0.01s)
+=== RUN   TestResolveKeepsSeparatorsOutOfPosixNames
+--- PASS: TestResolveKeepsSeparatorsOutOfPosixNames (0.00s)
+=== RUN   TestOverrideKeyKeepsPosixBackslashesDistinct
+--- PASS: TestOverrideKeyKeepsPosixBackslashesDistinct (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	1.766s
