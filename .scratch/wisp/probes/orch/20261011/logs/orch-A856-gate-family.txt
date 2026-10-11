@@ -1,0 +1,24 @@
+ts=2026-10-11 21:50:52 HEAD=db1694bd
+ruler=Get-CimInstance Win32_Process where Name -like '*.test.exe'（家族尺，2026-10-11 20:1x 补进正典 §1）
+family_rc=0
+--- 对照：四条精确名 tasklist 各一发
+wisp.exe count=0
+balldebug.exe count=0
+mockllm.exe count=0
+wisp.test.exe count=0
+--- 补：家族尺带计数（⛔ 拿空输出当 0）
+count=0
+names=At line:1 char:121
++ ... like "*.test.exe" } | Select-Object -ExpandProperty Name) -join \",\"
++                                                                    ~
+You must provide a value expression following the '-join' operator.
+At line:1 char:122
++ ... like "*.test.exe" } | Select-Object -ExpandProperty Name) -join \",\"
++                                                                     ~~~~~
+Unexpected token '\",\"' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+count_rc=0
+count=0
+count_rc=0

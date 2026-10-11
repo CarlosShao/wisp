@@ -16,6 +16,15 @@ tasklist //FI "IMAGENAME eq mockllm.exe"       # 命中行数＝枚数（票 304
 tasklist //FI "IMAGENAME eq wisp.test.exe"     # 命中行数＝枚数（`go test -c` 的产物，同理会留）
 ```
 
+⚠ **`//FI` 只认精确名**，所以上面那行**只覆盖 `wisp.test.exe` 一枚**，漏掉兄弟名 `<包>.test.exe`（如 `tools.test.exe`／`llm.test.exe`）。
+⇒ **家族另用一条宽松尺**（票 304 `AC#4` 的条件，2026-10-11 20:1x 由 `304-v1b` 判出、编排者落进本条；⛔ 拿精确名冒充家族）：
+
+```
+powershell -NoProfile -Command 'Get-CimInstance Win32_Process | Where-Object { $_.Name -like "*.test.exe" } | Select-Object ProcessId,ParentProcessId,Name,CommandLine | Format-List'
+```
+
+⚠ 这条尺**命中 0 时也要落盘**（把命令的 stderr 与 RC 一起写进名册，⛔ 用"空输出"当"0 枚"；在 bash 里请用**单引号**包住整条 PS 命令，否则 `$_` 会被外壳吃掉）。
+
 **数到 ≠ 归我**。任何一枚非零计数，动手之前先答三问，答不全就**停下来上报**，⛔ 不许停：
 
 1. **谁起的**——它的命令行里那个具名路径是什么（`Get-CimInstance Win32_Process -Filter "ProcessId=<pid>" | Select CommandLine`；
