@@ -1,0 +1,47 @@
+
+## A849｜2026-10-11 15:3x｜★`309-r2` **死于 150 轮上限**（两笔已在库＋九枚遗产我代提＝`f6067e5d`，断流体内报的 `5058f914` **整枚不存在**）＋**共享索引被扫进 1759 枚别家路径（含 `.gitignore`/`go.mod`/`design/**`＝机主那批"⛔ 我提交"的件），我核完"逐枚在盘上"之后用 `git restore --staged` 归位**＋派 `309-v2` 裁三格＋补票 304 只读＋**我自己又踩第二次 `grep -c` 截断链**
+
+### 1. `309-r2`：死了，但活干到哪一格要分开算
+
+| 件 | 盘上尺 | 读数 |
+|---|---|---|
+| 断流通知自称的 HEAD | `git cat-file -t 5058f914` | **`Not a valid object name`** ⇒ 假号（本会话又一枚"通知里的号整枚不存在"） |
+| 真在库的两笔 | `git log --oneline --grep='309-r2'` | `d75db9ee`（产码：`bridge.go`＋`toolrequest_nail_309_test.go`）、`9d3f9da7`（证据＋票尾 **＋1/−0**） |
+| 死时留在**索引**里的遗产 | `git diff --cached --name-only` 逐枚 `wc -c` | 9 枚＝`r2/10-roots-and-pin.md` 4692 B、`r2/90-final.md` 追加段 **＋272/−0**、`logs/final-build.log`＝`rc_build=0`、`final-vet.log`＝`rc_vet=0`、`final-d22scan.log` 23099 B（末行 `rc_d22scan=0`＋clean）、`final-pathlen.log` 2547 B（`tracked=10657 over=57 roster=57 not-in-roster=0`、worst 228、GREEN）、`logs/staged-all-d75db9ee.txt`、`staged-not-mine.txt`、`v1/logs/pathlen2.log` |
+| 代提那笔 | `git show --name-only --format='' f6067e5d` | 枚数 **9**、越界 **0**、⛔ 含 `.go` |
+| 票 309 现态 | `grep -cE '^[[:space:]]*- \[x\]'` ⇄ `- [ ]` | **3 勾／3 未勾**（未勾＝`AC#1`/`AC#2`/`AC#3`，归 `309-v2`）；腿⛔ 翻框（`9d3f9da7` 只加了一行日期 bullet） |
+
+★判语边界＝**这 9 枚全部标〔腿自报、编排者未复跑〕**。我⛔ 在本笔里给任何格盖章；四把 `final-*.log` 我也没重跑（重跑归我，但排在 `309-v2` 交回之后，⛔ 两枚腿同时占 Go 面）。
+⚠ 具名一枚归属未定＝`probes/309/**v1/logs/pathlen2.log**` 落在**上一枚腿的目录**里而不是 `r2/`，我随代提一起收（⛔ 判给谁、⛔ 删）。
+
+### 2. ★共享索引事件：1759 枚别家路径，⛔ 归因人（我定不了是谁）
+
+**时间线（每步都是现跑）**
+- `15:07:33` 我 A848 那把卫生尺＝`staged_total=27`、`foreign_staged=0`、`zero_byte_staged=3` ⇒ **当时索引基本干净**。
+- `15:2x` 我准备代提 309-r2 遗产，`git add -- .scratch/wisp/probes/309` 之后数到 **`staged_now=1759`**，其中可见 `.gitignore`、`design/doubao/**`、`design/old/**`、`.scratch/.scratch/wisp/probes/222/v1/mutations/asis/bridge.go`（★**枚数必写"整族还是抽样"：我这把尺是全索引，不是抽样**）。
+- `15:31:32` 索引最后被写过（`ls -l .git/index`）；期间⛔ 新 commit（`git log` 顶端一直是我 `15:27:21` 的 `d1e84a05`）⇒ **扫进来的一直没被提交**。
+
+**分类与归因（⛔ 我定不了是谁，三条都在盘上）**
+- 形状＝`1725 A` ＋ `18 M` ＋ `16 R100` ⇒ 是一次**等价于 `git add -A` 的宽射程 add**（把历代死腿留下的未跟踪遗留件全扫成 `A`），⛔ 是我做的（我全程只带显式 pathspec：`probes/orch/20261011`、两枚 reports、票 308、`probes/309`）。
+- 候选只有两枚：**`309-r2`**（它 `9d3f9da7` 之前自报"索引已带着 **27** 枚别家路径"⇒ 它那时候还是 27，不是它扫的）**或 `304-a1`**（15:0x 起手，唯一在飞的腿；它的 10 枚自家文件同时出现在索引里）。★**我⛔ 定罪**，因为归属尺要的是"谁敲的那条命令"，而我没有那条命令的记录。
+- **最坏后果是什么形状**（⛔ 把这事写成"安全事件"）＝任何一枚腿**裸 `git commit`**（不带 pathspec）就会把 1725 枚遗留件＋机主那批**明确不许我提交**的本地改动（`.gitignore`／`go.mod`／`design/**`）一次性写进历史。★实测：**这一波六笔 commit 里 `design/**` 命中＝0、`.gitignore` 命中＝0**（尺＝逐笔 `git show --name-only | grep -c`）⇒ **没发生**，只是"随时可能发生"。
+
+**我怎么归位的（可复跑、⛔ 破坏内容）**
+1. 先跑前提尺：`while read f; do [ -e "$f" ] || echo MISSING; done` 逐枚数 **`missing_total=0`** ⇒ **每一枚 staged 路径在工作树里都有本体**，取消暂存＝零内容损失（⚠ 前提不成立时⛔ 动，这就是"改前必证"那一味）。
+2. `git restore --staged -- .`（★这条⛔ 在我禁的那串里：禁的是 `reset`／`stash`／`checkout .`／`clean`，它们会**丢工作树字节**；`restore --staged` 只把索引退回工作树状态，字节⛔ 动）。
+3. 立刻 `git add -- .scratch/wisp/probes/309` 重新只取我自己那 9 枚 ⇒ 索引回到 `staged=9`、全是我的代提射程，然后 `f6067e5d` 落库。
+4. 复核：`git diff --cached --name-only | wc -l`＝**0**；`.gitignore`／`go.mod` 回到 ` M`（＝派单以来一直没被碰的那个状态）。
+
+★**派单模板两枚新条款（归所有后续腿，已写进 `309-v2` 与 `304-a1` 的补令）**：①**`git commit` 也要带显式 pathspec**（`git commit -F <msg> -- <paths>`；⛔ 裸 commit）——我原模板只禁了 `git add -A`，**漏了这一半**，而共享索引一旦脏，漏的那一半才是真杀手；②起手数一把**全索引 staged 枚数**，若发现大面积别家路径＝**⛔ 自己清空**，只在自报里具名"看到 N 枚、我没动"（清空＝越权改别人的暂存态，那是编排者的活）。
+
+### 3. 队列与编队
+
+在飞＝**`309-v2`**（锚 `f6067e5d`；裁 `AC#1`/`AC#2`/`AC#3`，四面进攻＝钉的反形敏感度／恒真三面／roots 覆盖／`bridge.go` 三句注释逐枚现跑）∥ **`304-a1`**（只读普查，⛔ Go 编译面；★它的派单锚 `daa2f9be` 在我落笔前就过期了，我改成 `d75db9ee` 并具名"309-r2 产码笔已落、编译面按有人占着处理"）。
+按住的我自己两笔＝`298-v2`（要 `cmd/wisp` 静默窗口，⛔ 与 `309-v2` 同跑）→ `296-r2` → `295-r1` → `294-r1` → `294-v1`（串行；撤销口令「294 295 改并发」）。
+欠账新增（归我）＝`Q-309-r2-*` 六枚我还没逐枚复跑（`nail`/`pinned`/`prov`/`scripts`/`tree`/`word`，见 `9d3f9da7` 的 `90-final`）；`304-a1` 的 ② 三形实测＝我选的派单形状造成的欠，⛔ 算腿账；`A813` 推送授权仍一次未用 ⇒ 三组"跑机 CI 色"（`Q-308-v1-A`／票 300/303/111／票 72 AC#4 runner 半边）继续同批攒着。
+
+### 4. 我自己这轮又踩的两把尺（⛔ 记在腿账上）
+
+1. **`grep -c` 退码截断链——第二次**：`git diff --name-only … | grep -c 'probes.*\.go$'` 命中 0 时 rc＝1，把 `&&` 后面"越界名册"那把尺整段跳掉，我第一发把"没跑完"当成了"越界 0"。⇒ 定式＝凡"某枚计数应当为 0"的链一律 `N=$(… || true)` ＋把"empty above＝0 枚"写进件里。
+2. **给已删除的路径做 `git add`**＝`git add -- <票的旧名>` 在 `git mv` 之后报 `fatal: pathspec … did not match any files`（exit 128）＝**整条 add 一起失败**，我第一发以为暂存成功了。⇒ `git mv` 之后只 add 新路径（旧路径那一半由 `git mv` 自己带进索引）。
+3. **一发就定性**＝代提那笔我第一发 `git log --oneline -2` 顶端仍是 `d1e84a05`，据此以为 commit 没落；再量一次 `git rev-parse --short HEAD`＝**`f6067e5d`** ⇒ commit 真落了。这次侥幸方向是"我以为失败、其实成功"，反过来（以为成功、其实失败）就更危险 ⇒ **同一条尺重跑第二把才算数**。

@@ -1,0 +1,15 @@
+309-r2 死在 150 轮帽：编排者代提它的最后九枚件〔未复跑，判语归 309-v2〕
+
+**为什么代提**＝`309-r2`（把"数构造点"那枚钉补上三种写法＋扩根＋三句注释说实话）在交完两笔之后**撞到轮次上限断流**（`d75db9ee` 产码笔＋`9d3f9da7` 证据笔已在库）。
+它留下的**九枚件里 8 枚已 staged、1 枚未 staged**，正躺在**共享索引**里 ⇒ 别按"⛔ 提交别人在飞态"停手不管，也不⛔ 删（临时件只建不删，`issues/README` 规则 8）。本笔＝**原样代提，一字不补、判语不代填**。
+
+代提射程（显式 pathspec＝`.scratch/wisp/probes/309/**`，⛔ 动票面、⛔ 动产码、⛔ 动框）
+- `r2/10-roots-and-pin.md`（4692 B，新根与钉点那一节的正文件）
+- `r2/90-final.md` 的**追加段**（＋272 行／−0 行，含四把终局门禁日志逐字）
+- `r2/logs/final-build.log`＝`rc_build=0`／`final-vet.log`＝`rc_vet=0`／`final-d22scan.log`（23099 B，末行 `rc_d22scan=0`＋"clean"）／`final-pathlen.log`（2547 B，`tracked=10657 over-budget=57 roster=57 not-in-roster=0`、worst 228、VERDICT GREEN）
+- `r2/logs/staged-all-d75db9ee.txt`／`staged-not-mine.txt`（它自己那把共享索引越界尺的原始名册）
+- `v1/logs/pathlen2.log`（⚠ 落点在 `309/v1/` 而**不是** `r2/`＝归属未定，随本笔一起收、⛔ 判给谁）
+
+★**这九枚全部是〔腿自报、编排者未复跑〕**＝四把"final"门禁我没重跑、`90-final` 追加段我还没逐枚读。判语与"有牙没有"归**非实现者** `309-v2`（本笔同时把它派出去），我⛔ 在本笔里盖任何格。
+★**具名一枚假号**＝断流通知正文自称 `HEAD=5058f914`；`git cat-file -t 5058f914` ＝ `Not a valid object name`，真 HEAD 当时＝`9d3f9da7`/`d75db9ee`（本会话第 N 次"通知里的号整枚不存在"，一律当未验证）。
+⛔ push（`A813` 授权仍一次未用）；本笔⛔ 含任何 `.go`。
