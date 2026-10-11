@@ -1,0 +1,52 @@
+# 编排者欠读数①＝SyncRoots() 到底谁在吃（10:2x 现跑）
+# 射程＝工作树 internal cmd tools（⛔ .scratch/**：那里有 22 枚 tracked 变异拷贝会冒充命中）；含注释行。
+# ⚠ 前一发把 git grep 的 --include 与 pathspec magic 混用＝打空，且管道退码取的是 sed ⇒ 那次读数作废（⛔ 删件，本发是正身）。
+
+## 尺1 SyncRoots( 非测试面（剥注释）
+internal/risk/syncdirs.go:454:func (p *Provenance) SyncRoots() []SyncRoot {
+rc1=0
+
+## 尺2 SyncRoots( 全命中枚数（含测试含注释）
+10
+rc2=0
+
+## 尺3 注释声称的那两句
+internal/risk/provenance.go:644:// TaintInfo is the introspection view for the panel Security page (ticket 40).
+internal/risk/syncdirs.go:182:// panel Security page, ticket 40). rawPath is canonicalized through C26,
+rc3=0
+
+## 尺4 包外（⛔ internal/risk）谁调 IsSyncPath/SyncRoots/SyncDetectionComplete 非测试
+rc4=1
+
+## 尺5 ChSyncWrite 链（面板/门那侧真正吃的）
+internal/risk/provenance.go:124:	ChSyncWrite Channel = "fs.write.syncdir"
+internal/risk/provenance.go:140:	"fs.write":        {ChSyncWrite, nil}, // special: content only when path is a sync dir
+internal/risk/provenance.go:756:	if def, ok := channelTable[tool]; ok && def.ch == ChSyncWrite {
+internal/risk/provenance.go:910:	if named && def.ch != ChSyncWrite {
+internal/risk/provenance.go:918:			return true, ChSyncWrite
+internal/risk/provenance.go:929:			return true, ChSyncWrite
+internal/risk/provenance.go:940:			return true, ChSyncWrite
+internal/risk/provenance.go:944:	return false, ChSyncWrite // every target confirmed non-sync: not an exfil channel
+rc5=0
+
+HEAD blob syncdirs.go=57f8598550b8b8a17d029d6310c742bbbad6c4b5 台面=249753a4
+
+## ★更正（同一次 10:2x，第二发）：上面那发的「尺5」少报了 6 行
+我这发重跑逐字尺＝grep -rn ChSyncWrite internal/risk（⛔ 再套 grep -v），命中 provenance.go 的 8 行：
+124:	ChSyncWrite Channel = "fs.write.syncdir"
+140:	"fs.write":        {ChSyncWrite, nil}, // special: content only when path is a sync dir
+756:	if def, ok := channelTable[tool]; ok && def.ch == ChSyncWrite {
+910:	if named && def.ch != ChSyncWrite {
+918:			return true, ChSyncWrite
+929:			return true, ChSyncWrite
+940:			return true, ChSyncWrite
+944:	return false, ChSyncWrite // every target confirmed non-sync: not an exfil channel
+rc_rerun=0
+⇒ 上面那发只出 2 行的原因＝我把 grep 串在管道里、而那一拍跑的时刻正是别家 307-r1 在写同一棵树的瞬间（git status 现量 M internal/risk/syncdirs.go，17 加 3 删）。
+⇒ 定式收下（记我账上，⛔ 算腿的欠账）：**有一枚写腿在飞时，任何 grep -r 级读数都不许当凭据，一律从 HEAD blob 取**（git show HEAD:<path> | grep）。
+
+## 结论两枚（重跑后仍成立的那两条）
+① SyncRoots() 非测试面＝只有定义那一枚（syncdirs.go:454），包外调用者 0 ⇒ 注释里那句『panel Security page 吃这枚判定』指的是 IsSyncPath 那条链（provenance.go:928 → ChSyncWrite），⛔ 是 SyncRoots()。
+② 生产调用者确在＝internal/risk/provenance.go:928 逐字：
+928:		if p.IsSyncPath(t).Sync {
+rc_final=0

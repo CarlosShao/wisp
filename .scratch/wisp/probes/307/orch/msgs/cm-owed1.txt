@@ -1,0 +1,8 @@
+307 编排者欠读数①②交件：SyncRoots() 包外调用者 0、生产调用者＝provenance.go:928（重跑具名）
+
+- 件 probes/307/orch/logs/orch-syncroots-consumers.txt（自落 rc 行，⛔ 0 字节、⛔ .out、只建不删）。
+- ★第一发的尺5 少报 6 行，具名更正记我：我把 grep 串在管道里，而那一拍正好撞上别家 307-r1 在写同一棵树（git status 现量 M internal/risk/syncdirs.go）。
+  ⇒ 定式：有一枚写腿在飞时，grep -r 级读数⛔ 当凭据，一律从 HEAD blob 取（git show HEAD:<path> | grep）。
+- 读数两条：① SyncRoots() 非测试面只有定义那一枚、包外调用者 0 ⇒ 注释那句 panel Security page 指的是 IsSyncPath 那条链 ⛔ 是 SyncRoots()；
+  ② 生产调用者确在＝provenance.go:928 逐字 if p.IsSyncPath(t).Sync。
+- 本笔零 push、写面只我自家 probes/307/orch/**（⛔ 碰 internal/**，那枚 M 是别家 307-r1 的在飞改动）。
