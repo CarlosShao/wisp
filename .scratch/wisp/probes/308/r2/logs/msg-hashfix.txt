@@ -1,0 +1,6 @@
+308-r2: drop the stale self-count from the hand-in hash note
+
+logs/handin-hash.md claimed "5 commits" while being itself a later commit;
+the note now names only the first four hashes and gives the ruler
+(git log --grep=308-r2) instead. No delivery file, no ticket line
+touched by this commit.
