@@ -1,0 +1,15 @@
+date=2026-10-11 14:13:40 +0800 HEAD=6b4005e5
+sha_before=f2c0130702384bfd0c60749cd3163d7492fd5351f64ca32ce4529ca04897070e (与 308-r1 记的 f2c01307… 对拉＝f2c01307)
+--- pristine rc=0
+    panic_line=ABSENT
+    topPASS=1 topFAIL=0 skip=0
+    pkg_eval=1 终态=ok  	github.com/CarlosShao/wisp/internal/risk	0.041s
+landed_check_guard_lines_left=0 delta_vs_backup=3
+--- pulled rc=1
+    panic_line=panic: runtime error: slice bounds out of range [:1] with length 0 [recovered, repanicked]
+    topPASS=0 topFAIL=1 skip=0
+    pkg_eval=0 终态=panic: runtime error: slice bounds out of range [:1] with length 0 [recovered, repanicked]
+--- restored rc=0
+    panic_line=ABSENT
+    topPASS=1 topFAIL=0 skip=0
+    pkg_eval=1 终态=ok  	github.com/CarlosShao/wisp/internal/risk	0.039s

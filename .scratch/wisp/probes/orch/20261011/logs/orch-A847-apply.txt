@@ -1,0 +1,30 @@
+date=2026-10-11 14:18:58 +0800 HEAD=6b4005e5
+=== 框普查（尺＝含缩进那一把） ===
+  309: checked=3 unchecked=3
+  308: checked=6 unchecked=0
+  298: checked=4 unchecked=2
+=== 前缀必须⛔ 被动过（＝只追加的证明） ===
+  prefix_ledger=IDENTICAL (16317 行)
+  prefix_handover=IDENTICAL (2770 行)
+  ledger_lines=16378 (HEAD=16317)   handover_lines=2787 (HEAD=2770)
+=== 删除行必须＝翻框枚数（⛔ 别的删除） ===
+  numstat_309=39	2	.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md 
+  numstat_308=50	5	.scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume.md 
+  numstat_ledger=61	0	docs/reports/pending-and-issues.md 
+  numstat_handover=17	0	docs/reports/HANDOVER.md 
+=== 逐枚删除行原文（人眼过一遍：应全是框行的 - [ ] 形式） ===
+-- [ ] **`AC#1` 加一枚守卫**：判据＝无卷标那一形下，这枚用例**以可解释的颜色结束**（⛔ panic、⛔ 整枚二进制没了）；★**守卫的落点⛔ 是"把整枚用例 `t.Skip` 掉"**——那正是它守的不变量还剩下长/大写/小写/扩展长度几种拼法照跑，只有 `unc-admin` 那一枚拼法在⛔ 卷标的 temp 上无法构造（可具名去掉**那一项**，⛔ 去掉整枚）。硬约束＝⛔ 改任何判级逻辑、⛔ 动 `pathresolver.go`／`pathresolver_windows.go`、⛔ 把 `t.TempDir()` 换成手写常量（票 72 `:201` 那条禁线同形）。
+-- [ ] **`AC#2` 反形敏感（⛔ 只交"改⇒绿"）**：必须各交一发凭据＝(a) 守卫**拔掉** ⇒ 无卷标台面那一发**回到 panic**（红句逐字）；(b) `cmp`／`sha256` 逐字节还原 ⇒ 复绿；(c) ★**别名台面颜色⛔ 因这枚守卫而变**（改前⇄改后逐名同集合）——否则"守卫"其实是把用例关掉了。
+-- [ ] **`AC#3` 分母与档位**：两枚件都带 `//go:build windows` ⇒ 具名回答"CI 哪一档真跑它们、`windows` tag 在 `test-windows` 里求不求值"（先例＝票 301 包级 guard D、票 111 那 12 枚的"从未求值"）；⛔ 用"本机跑过"顶替 CI 色；拿不到 CI 色就具名登记欠读数（⛔ 由落地腿自己盖章）。
+-- [ ] **`AC#4` 门禁与越界**：`GOFLAGS= go build ./...`／`go vet ./internal/risk/`／`sh scripts/d22scan.sh` 各 `rc=0` 且**每把件自落一行 `rc=N`**；格式名册**两把并排且各写射程**（⚠ 本轮刚又实证一次：射程 `internal/risk` 工作树＝1 枚 CRLF 假枚、放宽到 `internal cmd`＝5 枚，见 `A839` §1 末行）；`git show --name-only --format=` **逐笔**量越界；⛔ push；commit 显式 pathspec；写面＝自家 `probes/308/**` ＋裁决表 `docs/evidence/s1/**` ＋本票末尾 bullet（⛔ 再拿"只落 `probes/**`"那把窄尺误报，见 `A838` §4／`A839` §0）。
+-- [ ] **`AC#5` 对账**：⛔ 翻票 72 与票 307 任何一格；本票与票 72 的关系＝**同一枚文件、不同件事**（票 72 管"期望侧写死了 temp 拼法"，本票管"崩点让整包零求值"）；⛔ 扩票 307（它已 `-done`，残余见 `A839` §3）。
+-- [ ] **`AC#4` 门禁与越界**：`GOFLAGS= go build ./...`／`go vet ./internal/tools/`／`sh scripts/d22scan.sh` 各 rc=0 且**门禁件自己落一行 `rc=N`**（⛔ 0 字节件＝那格没交）；格式名册两把并排（工作树⇄HEAD blob）新增 0 枚并写射程；每笔 commit 带显式 pathspec，commit 前 `git diff --cached --name-only` 数一遍；写面⛔ 出 `internal/tools/**`＋`probes/309/**`＋本票末尾一条 append-only bullet（1 加／0 删）。
+-- [ ] **`AC#5` 三本账对账（⛔ 同一件事记两次）**：具名写清本票与 **票 307**（已 `-done`，那枚是折法不对称、成因⛔ 同）、**票 40**（面板 Security 页零消费者，归口见 `A838` §3）、**票 197**（`subagent_197.go` 那支拒绝形的出处）、**票 242**（correlation id 改每调用一枚，正是 `:920-923` 那句"per scope, hence per task"的前因）四家的分工；台账 `A838` §3 那枚"新抓具名欠读数"⇒ **由 `A842` 结掉**，⛔ 在本票再记一遍。
+=== 暂存名册卫生（⛔ 关 quotePath，A846 那把假指控就是这么修的） ===
+  staged_total=29 staged_go=0 foreign=0
+  zero_byte_staged=1
+  worktree_dirty_internal_cmd=0
+=== 0 字节件具名（A846 §5 那把新尺：⛔ 拿空件当凭据；这里逐枚点名它是不是凭据） ===
+  ZERO: .scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-progress.txt.tmp ＝第一发脚本留下的空临时件，⛔ 读数件、⛔ 任何格的凭据；按'临时件只建不删'留在盘上随批入库
+  本轮真凭据件⛔ 一枚 0 字节：teeth＝779 B、progress 主件＝1197 B、名册＝22784 B、apply＝4628 B
+  另四枚既有 0 字节件（tmp-build*.txt／tmp-vet*.txt，＝'门禁输出为空＝无诊断'那一族）⛔ 本批新造、已随 A846 入库

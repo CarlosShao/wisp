@@ -1,0 +1,29 @@
+date=2026-10-11 13:46:26 +0800 HEAD=0d2260eb  尺＝HEAD blob 层（⛔ 工作树：两枚验收腿在写票尾）
+roster_lines=296  (tab 分列：state  checked  unchecked  file)
+=== 分桶（开放票） ===
+open_total=185
+open_零框（⛔ 判据格⛔ 算进度）=1
+open_全勾待收口（u==0 且 c>0）=0
+open_一格未动（c==0 且 u>0）=102
+open_部分勾（c>0 且 u>0）=82
+=== 分桶（已结案票） ===
+done_total=111
+done_零框=0
+done_仍有未勾框（乙类）=3
+=== 格数合计（两把尺并排，⛔ 混用） ===
+全库 checked=877 unchecked=864 total=1741 => 50.4%
+开放票 checked=289 unchecked=860 total=1149 => 25.2%
+=== 全勾待收口名册（若⛔ 0 枚就写空） ===
+=== 开放票里未勾格最多的 12 枚（＝最重的在飞面） ===
+  13  33-panel-host-c27.md
+  11  228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md
+   9  187-the-model-and-thinking-tier-in-the-composer-row-must-be-changeable-not-just-displayed.md
+   9  186-the-composer-area-should-detect-git-and-let-the-user-switch-between-local-worktree-and-branch.md
+   9  114-composer-request-has-no-production-caller-and-the-real-gate-must-be-native.md
+   8  40-security-privacy-cost-pages.md
+   8  200-nothing-reads-the-projects-instructions-for-ai-although-all-five-harnesses-do.md
+   7  60-c32-realtime-engine.md
+   7  59-p15-aec-spike.md
+   7  26-tts-output.md
+   7  249-the-resident-process-installs-no-panic-sink-so-a-real-crash-leaves-no-stack-on-disk.md
+   7  245-the-bare-esc-cancel-default-is-a-global-hotkey-so-the-resident-process-steals-esc-from-every-other-app.md

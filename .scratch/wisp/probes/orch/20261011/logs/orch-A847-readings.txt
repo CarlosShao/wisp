@@ -1,0 +1,17 @@
+date=2026-10-11 13:40:30 +0800 HEAD=0d2260eb
+# A847 预置读数（编排者现跑，⛔ 依赖腿自报）
+## 1) 309-r1 的 commit 链（票面 bullet 与停车点 §4.0ck 都只列到 8ffa61c6，第八笔我漏计）
+16e86bae 13:13 feat(309-r1): 形Ⓑ注释(bridge.go assessorFor 少报写明) + AC#3 内容锚/枚数重述 + AC#1 恒真形仪器 + AC#2 枚数钉
+## 2) final-suite.log 我自己重数（混合层级那把尺的口径）
+lines=1145 topRUN=286 anyRUN=286 topPASS=211 anyPASS=286 subPASS=75 topFAIL=0 anyFAIL=0 anySKIP=0
+口径＝211 顶层 PASS ＋ 75 子测试 PASS ＝ 286 枚 PASS 行（腿写的 211/75/0/0 与我对得上）；终态行 ok internal/tools 15.127s
+## 3) 恒等尺：211＝基线 209 ＋ 本票新增 2 枚（assessorfor 仪器＋toolrequest 枚数钉）
+4
+## 4) 更正上面 §1 那把尺的射程与那句第八笔（口径⛔ 是我随手写的，落账前自己改对）
+正解＝309-r1 一共 5 笔：
+  1cd57ec1 12:57 chore(309-r1): 锚件（commit-first；写面声明）
+  16e86bae 13:13 feat(309-r1): 形Ⓑ注释(bridge.go assessorFor 少报写明) + AC#3 内容锚/枚数重述 + AC#1 恒真形仪器 + AC#2 枚数钉
+  b2dd7fb2 13:18 chore(309-r1): 证据件(10/20/30/40/90.md)+logs(基线/改后名册、突变与枚数Rig读数、d22scan与gates rc)+票309末尾1条bullet(1加0删)
+  8ffa61c6 13:18 chore(309-r1): 补交正文引用的 logs/staged-evidence.txt（commit3 暂存清册，逐 pathspec）
+  8bbffc50 13:19 chore(309-r1): 收口全量测试名册读数(final-suite.log, 211/75/0/0, 两枚236载体PASS)
+⇒ 我在票面 bullet 与停车点 §4.0ck 的队列句里只列到 8ffa61c6＝漏计第五笔 8bbffc50（那笔只是收口读数件，⛔ 产码）；处置＝⛔ 改原句，在 A847／§4.0cl 追加更正

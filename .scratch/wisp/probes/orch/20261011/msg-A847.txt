@@ -1,0 +1,12 @@
+A847 记账＋盖章：两枚"来挑我毛病"的终裁腿交回，十枚＋五枚欠账逐枚复跑后签收（309 翻两格按住三格／308 翻五格但⛔ 随即改名）
+
+- 309：我自己复跑六把承重尺（分母 245＝269−24／eol 三把＝CR=0 与 i/lf w/lf attr/text eol=lf／三门禁 rc 各 0 且先排掉"门禁件只装自测输出"那枚疑点＝live 那句 clean 在场／票 197 那句 0 命中而产码 1 命中／注释自指尺 3⇄1／154 先例件在场）⇒ 翻 AC#4＋AC#5，AC#1/AC#2/AC#3＝附条件成立⛔ 翻（枚数钉只认限定名字面量：声明＋赋值、别名两形实测绿；排除支⛔ 整包 internal/agent；注释自称 1 而它那把尺真跑是 3）
+- ★我自己差点误关一枚真欠账：nail-roots-miss-tools-dir 我本想按"独立模块⛔ 能 import internal"关掉——现跑 tools/d22scan/go.mod 的 module 前缀（在 internal 父亲那一截之内）＋活例 tools/signmodels/main.go:34 真 import internal/models ⇒ 改判"要管"。定式＝凡"按规则这条路走不通"的结论，落笔前先跑两把尺（模块名前缀＋同类活例），⛔ 拿记忆当尺
+- 308：AC#2 那三件凭据我整条自己跑（pristine 绿 rc=0 ⇒ 拔守卫 rc=1 且逐字 panic: slice bounds out of range [:1] ⇒ 还原 cmp identical、sha256=f2c01307… 与腿同一枚、收尾 internal/cmd 0 行脏）；产码两枚件 1270e36e blob⇄工作树逐字节 SAME；t.Skip 代码形＝既有那一枚（票 18 允许），新增三行全在注释；core 档射程名册逐字含 ./internal/risk/...（⛔ tag 的新件从此进 linux 档）；docker linux 那发先验真才签收（件 26178 B、顶层 108 PASS、终态 ok 2.331s）⇒ 翻 AC#1–AC#5（6 勾／0 未勾）
+- ★票 308 六格全勾但本笔⛔ 改名 -done：三处注释假句（"every other spelling is unconditional"现于所有台面为假＝顶回我票面那句只说 vol==""；"still run"是 helper 推到用例的外推，windows-tagged 那一支到达数 0＝缺世界；"single place"缺射程）在 308-r2 手里；⛔ 看到结案两字就以为零残余
+- A846 那枚章里两处漏看，只追加⛔ 改原话：308-r1 提交名册少写两笔（真身五笔 79242df7/1270e36e）；TMP=/ 补的是当前盘符 C:\ 而非钉死 D:（结论⛔ 变、理由改）；另收 Q-308-v1-D＝两把⛔ 能证其事的尺（空白件／拿 ls 当已结案凭据）＝我复跑时只核读数没核尺，记我
+- 派单模板一句被纠正：⛔(U+26D4) 本身也在 d22scan ban #8 扫的 U+2600–U+27BF 段内（注释豁免、字符串不豁免），我原句只列了 ≈ ✓ ≤；已按主源码 emojiRe 与 Q-46(c) 那段自证后改正
+- 驳一枚：Q-309-v1-who-rings-overclaim（原句主语是 this limb、同段自陈 states the debt, not a guarantee ⇒ ⛔ 算 overclaim；但它逼出的 prov==nil 那肢瞎仍收）
+- 顺手回机主"完成票进度"那把尺（HEAD blob 层、含缩进那一把）：结案 111/296＝37.5%；格 877/1741＝50.4%、只算开放票 289/1149＝25.2%；开放分桶 102 未动／82 部分／0 全勾待收口／1 ⛔ 带判据格（票 196＝尺的盲区具名）；已结案 3 枚仍带未勾框（票 07/92/115）；趋势 10-02→今天 34.7→37.5%，分母＋51 结案＋26
+- 卫生：三门禁 rc 自落行（d22scan 0／lenbudget 0 VERDICT GREEN 57=57）、暂存⛔ 关 quotePath（foreign=0、⛔ .go=0、⛔ .out=0）、那枚 0 字节件具名＝脚本空临时件⛔ 任何凭据、前缀逐字节 IDENTICAL（16317／2770）
+- 机主侧零变化：⛔ 推送、⛔ 新窗口、⛔ 网络动作，一行会跑的产品代码都没改

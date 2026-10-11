@@ -1,0 +1,21 @@
+date=2026-10-11 13:43:07 +0800  HEAD=0d2260eb  尺＝HEAD blob 层
+== 分母 ==
+ticket_files_including_README=297
+README=1  =>  tickets=296
+done=111   open=185
+== 框（判据格） ==
+ALL tickets      : checked=877 unchecked=864 total=1741
+OPEN tickets only: checked=289 unchecked=860 total=1149
+== 百分比（保留一位小数；手算，标明算式） ==
+P1 结案票占比 = 111/296 = 37.5%
+P2 格已勾占比（全库） = 877/1741 = 50.4%
+P3 格已勾占比（只算开放票） = 289/1149 = 25.2%
+P4 开放票里零未勾格（＝能收口） = 1/185 = 0.5%
+残  已 -done 却仍有未勾框（乙类） = 3/111 = 2.7%
+== 甲类名册（开放票、未勾格=0 => 只差收口动作） ==
+-- 甲类（开放票、未勾格=0 ⇒ 只差收口动作）--
+  196-two-task-state-vocabularies-already-coexist-and-the-schema-has-no-check-so-the-d43-names-are-not-the-ones-in-use.md  checked=0
+-- 乙类（已 -done 却仍有未勾框）--
+  07-ball-state-machine-core-done.md  checked=2 unchecked=1
+  115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md  checked=3 unchecked=2
+  92-panel-composer-mode-attachments-workspace-done.md  checked=5 unchecked=1

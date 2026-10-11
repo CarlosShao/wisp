@@ -1,0 +1,16 @@
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/A847.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/A847-308-guard-backup.go.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-308-teeth.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-308-teeth.txt.pristine.raw', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-308-teeth.txt.pulled.raw', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-308-teeth.txt.raw', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-308-teeth.txt.restored.raw', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-readings.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-cells.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-cells.txt.tmp.cells', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-cells.txt.tmp.paths', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-progress-b.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-progress.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-progress.txt.tmp.jia', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-progress.txt.tmp.names', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261011/logs/orch-A847-ticket-progress.txt.tmp.yi', LF will be replaced by CRLF the next time Git touches it

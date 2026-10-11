@@ -1,0 +1,22 @@
+time=2026-10-11T14:13:43.249+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestVolumeInvariantSpellingsVolumeLess308
+--- FAIL: TestVolumeInvariantSpellingsVolumeLess308 (0.00s)
+panic: runtime error: slice bounds out of range [:1] with length 0 [recovered, repanicked]
+
+goroutine 8 [running]:
+testing.tRunner.func1.2({0x7ff756c8a578, 0x17e285d225d0})
+	D:/work/base/go/src/testing/testing.go:2123 +0x239
+testing.tRunner.func1()
+	D:/work/base/go/src/testing/testing.go:2126 +0x329
+panic({0x7ff756c8a578?, 0x17e285d225d0?})
+	D:/work/base/go/src/runtime/panic.go:859 +0x125
+github.com/CarlosShao/wisp/internal/risk.driveShare(...)
+	D:/work/workspace/projects plans/Wisp/internal/risk/pathresolver_volumeless_spelling_308_test.go:24
+github.com/CarlosShao/wisp/internal/risk.TestVolumeInvariantSpellingsVolumeLess308(0x17e285d0c400)
+	D:/work/workspace/projects plans/Wisp/internal/risk/pathresolver_volumeless_spelling_308_test.go:80 +0x8b4
+testing.tRunner(0x17e285d0c400, 0x7ff756c99e20)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.043s
+FAIL
