@@ -1,0 +1,4 @@
+--- appended by 306-v1 ---
+cmd=gofmt -l internal/audio  (worktree, recursive)
+rc=0
+unformatted_count=0

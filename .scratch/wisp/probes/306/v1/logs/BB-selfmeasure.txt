@@ -1,0 +1,14 @@
+=== Z1 my own deliverable roster ===
+md=5 files_in_v1=98 zero_byte_after_append=1 dot_out=0
+zero_list:
+.scratch/wisp/probes/306/v1/logs/D9redo-roster-diff.txt
+=== Z2 ticket state right now ===
+1
+5
+139 .scratch/wisp/issues/306-inline-authoritative-format-tag-literals-in-wavinjector-go-have-no-ruler-at-all.md
+=== Z3 HEAD now ===
+a458114b3497c3d0a7d7ddbc902e66712075e436
+=== Z4 internal/audio untouched by me (interval rulers at explicit SHAs) ===
+rc_z4=0
+0
+rc_outer=0

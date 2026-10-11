@@ -1,0 +1,3 @@
+--- appended by 306-v1 ---
+cmd=GOFLAGS= go build ./...  (OUT-OF-REPO export tree, git archive e4740e35; NOT the shared worktree)
+rc=0

@@ -1,0 +1,3 @@
+--- appended by 306-v1 (self-certifying line; reading above is the raw command output, empty output IS the reading) ---
+cmd=GOFLAGS= go vet ./internal/audio/  (shared worktree)
+rc=0

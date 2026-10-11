@@ -1,0 +1,5 @@
+--- appended by 306-v1 (an empty diff IS the reading) ---
+cmd=diff logs/sens/B1-roster.txt logs/sens/B2-roster.txt
+rc=0
+rosters_identical=yes  (each roster = 1 line: "--- SKIP: TestLiveWasapiSmoke"; pre-existing at 5480434f in internal/audio/hotplug_test.go)
+note=the earlier flawed attempt is kept untouched at logs/D9-b1-b2-roster-diff.txt (its rc line was sed-s rc, and it looked in the wrong dir)

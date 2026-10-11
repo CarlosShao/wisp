@@ -1,0 +1,3 @@
+--- appended by 306-v1 ---
+cmd=GOFLAGS= go vet ./internal/audio/  (export tree)
+rc=0

@@ -1,0 +1,5 @@
+--- appended by 306-v1 ---
+cmd=gofmt -l <blob dir exported from 5480434f internal/audio>
+rc=0
+unformatted_count=0
+total_go_files_in_scope=21
