@@ -1,0 +1,8 @@
+
+
+### 5. 同一次普查里抓到的**第二枚⛔ 我名、⛔ 我提交的 tracked 改动**＝工作树里的 `go.mod`（§2 那一族的另一枚）
+
+- 尺＝`git diff --numstat -- go.mod`＝**`1 1`**；内容＝`github.com/jchv/go-webview2` 从 `// indirect` 那一段挪进直接 `require` 段（一增一删，改的是注释位）；件 mtime＝**`2026-10-10 22:28`** ⇒ **⛔ 今天这批腿（10:3x 之后）造的**，是谁夜里跑过 `go mod tidy` 我⛔ 查、⛔ 归因。
+- 它想修的那件事我现量过＝**HEAD 的 `go.mod` 那枚 `// indirect` 标注确实过期**：非测试面直接 import 枚数尺＝`grep -rn --include=*.go "jchv/go-webview2" internal cmd`（再滤掉 `_test.go`）＝**2 行**（`cmd/wisp/panel_host_windows.go:64`／`cmd/wisp/panel_resident_windows.go:73`，两处都写作 `webview2 "github.com/jchv/go-webview2"`）。
+- ⚠ 一条⛔ 许越过我的定性：`// indirect` **只是注释**，⛔ 改变 `go build`／`go vet` 的颜色 ⇒ 这一条**是账面漂移、⛔ 是缺陷票**，本笔只记"它存在且⛔ 是我名下"，⛔ 顺手开票、⛔ 顺手 tidy、⛔ revert。
+- 真正的危险形状＝**共享工作树里谁用 `git add -A`／`git commit -a` 就会把这行带进自己那笔**（正是我记过的那种吞别人改动的事故形）⇒ 定式再钉一枚：**每笔 commit 前先 `git diff --cached --name-only` 数一遍**（本轮我自己已在用；这条⛔ 是新的，是从 `A813` 那批推送里就立过的口径，这里只补"工作树现存两枚⛔ 我名的 tracked 改动"这枚事实）。
