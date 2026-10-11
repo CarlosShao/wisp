@@ -1,0 +1,5 @@
+ruler: git diff --quiet a04d3e2 HEAD -- internal/risk/pathresolver_junction_windows_test.go
+purpose: ticket 72 AC#5 (issue line 82) cites this exact command as its evidence
+rc=0  (0 = byte-identical, i.e. the pin still holds at HEAD f6f4eca8)
+ruler2: git diff --quiet a04d3e2 HEAD -- internal/risk/pathresolver_anchor_spelling_windows_test.go
+rc2=1  (1 = this file HAS changed since a04d3e2, as expected: ticket 72 authored it after that commit)
