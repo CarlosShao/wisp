@@ -1,0 +1,10 @@
+
+ProcessId ParentProcessId CreationDate        Name                
+--------- --------------- ------------        ----                
+     9004            1640 2026/10/7 8:36:28   SearchHost.exe      
+    16852            4996 2026/10/7 8:36:53   wetype_update.exe   
+     8548           28568 2026/10/10 18:30:46 clipsync-desktop.exe
+    11724            1640 2026/10/11 7:22:36  RuntimeBroker.exe   
+
+
+

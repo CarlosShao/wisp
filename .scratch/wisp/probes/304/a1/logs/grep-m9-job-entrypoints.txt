@@ -1,0 +1,7 @@
+internal/proc/jobscope_windows.go:89:func (j *JobScope) Assign(p *os.Process) error {
+internal/proc/jobscope_windows.go:110:func (j *JobScope) StartInJob(cmd *exec.Cmd) (*os.Process, error) {
+internal/proc/jobscope_windows.go:117:	if err := j.Assign(cmd.Process); err != nil {
+internal/proc/jobscope_windows_test.go:41:		if _, err := job.StartInJob(cmd); err != nil {
+internal/proc/jobscope_windows_test.go:42:			t.Fatalf("StartInJob(%s): %v", mode, err)
+internal/proc/jobscope_windows_test.go:207:	if _, err := job.StartInJob(cmd); err == nil {
+cmd/wisp/slo_windows.go:500:	p, err := rt.Job.StartInJob(cmd)

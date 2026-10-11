@@ -1,0 +1,51 @@
+internal/agent/spill_acl_windows_test.go:81:	if err := cmd.Run(); err != nil {
+internal/config/c26_seam_posix_125_test.go:178:	out, err := cmd.CombinedOutput()
+internal/config/private_acl_windows_test.go:206:	if err := cmd.Run(); err != nil {
+internal/llm/openaichat/mockllm_integ_test.go:67:	if out, err := build.CombinedOutput(); err != nil {
+internal/memory/artifacts_junction_tripwire_windows_test.go:39:	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, outside).CombinedOutput()
+internal/models/acl_sid_121_windows_test.go:67:	err := cmd.Run()
+internal/models/assembly_reachability_121_test.go:271:	if err := cmd.Run(); err != nil {
+internal/models/no_seal_ruling_windows_test.go:87:	if err := cmd.Run(); err != nil {
+internal/proc/crossvet_test.go:71:	out, err := cmd.CombinedOutput()
+internal/risk/pathresolver_junction_windows_test.go:50:	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput()
+internal/tools/bridge_a18_kill_windows_test.go:121:			_, _ = exec.Command("taskkill", "/F", "/PID", fmt.Sprint(pid)).CombinedOutput()
+internal/tools/bridge_a18_kill_windows_test.go:141:	out, err := exec.Command("taskkill", "/F", "/PID", fmt.Sprint(pid)).CombinedOutput()
+internal/tools/bridge_junction_windows_test.go:52:	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput()
+internal/tools/fs_edit_ac4b_kill_windows_test.go:138:			_, _ = exec.Command("taskkill", "/F", "/PID", fmt.Sprint(pid)).CombinedOutput()
+internal/tools/fs_edit_ac4b_kill_windows_test.go:157:	out, err := exec.Command("taskkill", "/F", "/PID", fmt.Sprint(pid)).CombinedOutput()
+internal/tools/fs_staging_windows_test.go:331:		_, _ = exec.Command("taskkill", "/F", "/PID", fmt.Sprint(proc.Process.Pid)).CombinedOutput()
+internal/tools/fs_staging_windows_test.go:349:	out, err := exec.Command("taskkill", "/F", "/PID", fmt.Sprint(proc.Process.Pid)).CombinedOutput()
+internal/tools/fs_staging_windows_test.go:398:			_, _ = exec.Command("taskkill", "/F", "/PID", fmt.Sprint(cmd.Process.Pid)).CombinedOutput()
+internal/tools/paths_ticket107b_probes_test.go:31:		out, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput()
+internal/tools/paths_workspace_test.go:203:	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, outside).CombinedOutput()
+internal/tools/task_output_pointer_notice_test.go:406:	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput()
+internal/winsec/acl_windows_test.go:40:	if err := cmd.Run(); err != nil {
+internal/winsec/inherited_narrow_notice_104_windows_test.go:51:	if err := cmd.Run(); err != nil {
+internal/winsec/reparse_windows_test.go:27:	if err := cmd.Run(); err != nil {
+internal/winsec/resolve_windows_test.go:192:	if err := cmd.Run(); err != nil {
+internal/winsec/seam_guard_windows_test.go:105:	out, err := cmd.CombinedOutput()
+cmd/wisp/config_reload_perm_223_windows_test.go:56:	err := cmd.Run()
+cmd/wisp/dataroot_128_windows_test.go:134:	err := cmd.Run()
+cmd/wisp/early_log_nail_130_windows_test.go:126:	if err := cmd.Run(); err != nil {
+cmd/wisp/leg_dispatch_gate_133_test.go:1582:	out, err := cmd.CombinedOutput()
+cmd/wisp/logsink_windows_test.go:115:	if err := cmd.Run(); err != nil {
+cmd/wisp/panel_host_gate_test.go:310:	out, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
+cmd/wisp/panel_host_gate_test.go:322:	out, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
+cmd/wisp/panel_host_gate_test.go:340:	out, err := exec.Command("git", "rev-parse", "--short", "HEAD").Output()
+cmd/wisp/panel_host_gate_test.go:356:	out, err := cmd.Output()
+cmd/wisp/panel_host_gate_test.go:396:	blob, err := archive.Output()
+cmd/wisp/panel_host_gate_test.go:410:	out, err := build.CombinedOutput()
+cmd/wisp/panel_transport_live_35v2_windows_test.go:37:// The steady-state pump is the library's own WebView.Run() - the same call the resident
+cmd/wisp/panel_transport_live_35v2_windows_test.go:220:		wv.Run() // the library pump, exactly like panel_resident_windows.go:299
+cmd/wisp/resident_approval_live_246_windows_test.go:421:	if err := cmd.Run(); err != nil {
+cmd/wisp/resident_audio_247_live_windows_test.go:217:		out, err := exec.Command("tasklist.exe", "/FI", "IMAGENAME eq "+name).Output()
+cmd/wisp/secret_argv_windows_test.go:178:	if err := cmd.Run(); err != nil {
+cmd/wisp/secret_argv_windows_test.go:374:	err := cmd.Run()
+cmd/wisp/slo_exit_os_156_windows_test.go:13:// loop a child it had ALREADY reaped (`dead.Run()` fills ProcessState before the
+cmd/wisp/slo_report_144_windows_test.go:882:	_ = dead.Run() // a non-zero exit is the fixture, not a failure of this test
+tools/d22scan/scan_test.go:1390:	if err := cmd.Run(); err != nil {
+tools/d22scan/scan_test.go:2150:		if err := cmd.Run(); err != nil {
+tools/d22scan/scan_test.go:2258:	if out, err := build.CombinedOutput(); err != nil {
+tools/d22scan/scan_test.go:2354:			err := cmd.Run()
+tools/d22scan/selftest_test.go:183:	if out, err := build.CombinedOutput(); err != nil {
+tools/d22scan/selftest_test.go:194:		err := cmd.Run()

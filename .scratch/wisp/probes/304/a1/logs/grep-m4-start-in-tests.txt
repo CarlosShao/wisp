@@ -1,0 +1,17 @@
+internal/llm/openaichat/mockllm_integ_test.go:80:	if err := proc.cmd.Start(); err != nil {
+internal/memory/concurrent_test.go:236:	if err := cmd.Start(); err != nil {
+internal/proc/jobscope_windows_test.go:45:		if err := cmd.Start(); err != nil {
+internal/proc/singleinstance_windows_test.go:40:	if err := cmd.Start(); err != nil {
+internal/tools/bridge_a18_kill_windows_test.go:114:	if err := cmd.Start(); err != nil {
+internal/tools/fs_edit_ac4b_kill_windows_test.go:131:	if err := cmd.Start(); err != nil {
+internal/tools/fs_staging_windows_test.go:52:	if err := cmd.Start(); err != nil {
+internal/tools/fs_staging_windows_test.go:388:	if err := cmd.Start(); err != nil {
+cmd/wisp/resident_approval_live_246_windows_test.go:457:	if err := cmd.Start(); err != nil {
+cmd/wisp/resident_audio_247_live_windows_test.go:240:	if err := cmd.Start(); err != nil {
+cmd/wisp/resident_sink_nail_127_windows_test.go:230:	if err := cmd.Start(); err != nil {
+cmd/wisp/resident_task_source_246_windows_test.go:463:	if err := cmd.Start(); err != nil {
+cmd/wisp/resident_task_source_live_246_windows_test.go:507:	if err := cmd.Start(); err != nil {
+cmd/wisp/secret_argv_windows_test.go:246:	if err := cmd.Start(); err != nil {
+cmd/wisp/secret_argv_windows_test.go:344:		if err := cmd.Start(); err != nil {
+cmd/wisp/secret_argv_windows_test.go:460:	if err := cmd.Start(); err != nil {
+cmd/wisp/slo_exit_os_156_windows_test.go:326:	if err := cmd.Start(); err != nil {

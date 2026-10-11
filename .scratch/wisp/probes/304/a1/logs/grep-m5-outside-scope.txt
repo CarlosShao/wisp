@@ -1,0 +1,17 @@
+./.scratch/wisp/probes/152/accept-r1/zz152acc1_windows_test.go:68:	cmd := exec.Command(os.Args[0], "-test.run=^TestAcc152Helper$", "-test.timeout=60s")
+./.scratch/wisp/probes/152/zz152bprobe_windows_test.go:48:	cmd := exec.Command(os.Args[0], "-test.run=^TestP152BWaitReadyProbe$", "-test.timeout=180s")
+./.scratch/wisp/probes/152/zz152probe_windows_test.go:21:// spawns a real child process (exec.Command(os.Args[0], ...), a real pid, a real
+./.scratch/wisp/probes/152/zz152probe_windows_test.go:119:	cmd := exec.Command(os.Args[0],
+./.scratch/wisp/probes/156/zz156probe_windows_test.go:24:// Every cell spawns a REAL child (exec.Command(os.Args[0], ...) re-entering this
+./.scratch/wisp/probes/156/zz156probe_windows_test.go:135:	cmd := exec.Command(os.Args[0], "-test.run=^TestP156SubjectDeathProbe$", "-test.timeout=180s")
+./.scratch/wisp/probes/156-accept/anchor/slo_exit_os_156_test.go:322:	cmd := exec.Command(os.Args[0], "-test.run=^TestSLO156FixtureChildrenDoWhatTheirNamesSay$",
+./.scratch/wisp/probes/156-accept/anchor/slo_report_144.go:881:	dead := exec.Command("cmd.exe", "/c", "exit", "7")
+./.scratch/wisp/probes/156-accept/anchor/slo_windows.go:492:	cmd := exec.Command(exe, args...)
+./.scratch/wisp/probes/163/a1/main.go:68:	c1 := exec.Command("cmd.exe", "/c", "cd /d C:\\Windows & cd")
+./.scratch/wisp/probes/163/a1/main.go:71:	c2 := exec.Command("cmd.exe", "/c", "cd")
+./.scratch/wisp/probes/163/a1/main.go:78:	c3 := exec.Command("cmd.exe", "/c", "exit 7")
+./.scratch/wisp/probes/163/a1/main.go:86:	c4 := exec.Command("cmd.exe", "/c", "echo exit 1")
+./.scratch/wisp/probes/174/r3/mut/test-flipped.go:406:	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput()
+./.scratch/wisp/probes/228/v1/twobreak/main.go:83:	cmd := exec.Command(exe)
+./scripts/spike/webview2-latency/main.go:283:	cmd := exec.Command(exe, "-mode", "coldonly", "-datapath", dataPath)
+./scripts/spike/webview2-latency/main.go:294:	cmd := exec.Command(exe, "-mode", "full", "-datapath", dataPath)

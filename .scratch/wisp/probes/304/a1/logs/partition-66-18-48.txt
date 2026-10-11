@@ -1,0 +1,55 @@
+尺＝集合差，可逐字重跑：
+  cut -d: -f1,2 logs/grep-m1-testonly.txt | sort > m1
+  <18 枚 Start 档 file:line 名册> | sort > start
+  comm -23 m1 start > sync48
+枚数 m1=66 start=18 sync=48（comm 作差两向皆空：start 名册⛔ 有一枚⛔ 在 m1 里）
+
+=== 48 枚同步档（逐枚 file:line） ===
+cmd/wisp/config_reload_perm_223_windows_test.go:52
+cmd/wisp/dataroot_128_windows_test.go:128
+cmd/wisp/early_log_nail_130_windows_test.go:121
+cmd/wisp/leg_dispatch_gate_133_test.go:1580
+cmd/wisp/logsink_windows_test.go:112
+cmd/wisp/panel_host_gate_test.go:310
+cmd/wisp/panel_host_gate_test.go:322
+cmd/wisp/panel_host_gate_test.go:340
+cmd/wisp/panel_host_gate_test.go:354
+cmd/wisp/panel_host_gate_test.go:394
+cmd/wisp/panel_host_gate_test.go:407
+cmd/wisp/resident_approval_live_246_windows_test.go:417
+cmd/wisp/resident_audio_247_live_windows_test.go:217
+cmd/wisp/secret_argv_windows_test.go:174
+cmd/wisp/secret_argv_windows_test.go:369
+cmd/wisp/slo_report_144_windows_test.go:881
+internal/agent/spill_acl_windows_test.go:79
+internal/config/c26_seam_posix_125_test.go:174
+internal/config/private_acl_windows_test.go:204
+internal/llm/openaichat/mockllm_integ_test.go:65
+internal/memory/artifacts_junction_tripwire_windows_test.go:39
+internal/models/acl_sid_121_windows_test.go:65
+internal/models/assembly_reachability_121_test.go:265
+internal/models/no_seal_ruling_windows_test.go:85
+internal/proc/crossvet_test.go:67
+internal/risk/pathresolver_junction_windows_test.go:50
+internal/tools/bridge_a18_kill_windows_test.go:121
+internal/tools/bridge_a18_kill_windows_test.go:141
+internal/tools/bridge_junction_windows_test.go:52
+internal/tools/fs_edit_ac4b_kill_windows_test.go:138
+internal/tools/fs_edit_ac4b_kill_windows_test.go:157
+internal/tools/fs_staging_windows_test.go:331
+internal/tools/fs_staging_windows_test.go:349
+internal/tools/fs_staging_windows_test.go:398
+internal/tools/paths_ticket107b_probes_test.go:31
+internal/tools/paths_workspace_test.go:203
+internal/tools/task_output_pointer_notice_test.go:406
+internal/winsec/acl_windows_test.go:38
+internal/winsec/inherited_narrow_notice_104_windows_test.go:49
+internal/winsec/reparse_windows_test.go:25
+internal/winsec/resolve_windows_test.go:190
+internal/winsec/seam_guard_windows_test.go:104
+tools/d22scan/scan_test.go:1386
+tools/d22scan/scan_test.go:2146
+tools/d22scan/scan_test.go:2256
+tools/d22scan/scan_test.go:2351
+tools/d22scan/selftest_test.go:181
+tools/d22scan/selftest_test.go:190

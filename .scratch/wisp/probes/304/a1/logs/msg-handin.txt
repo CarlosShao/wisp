@@ -1,0 +1,45 @@
+304-a1 census: mockllm residue is 0 now, the spawn roster is 66+6 with an 18/48 cut, and 甲 already has an instrument in-repo
+
+Ticket 304 `AC#0` 的一格（只读普查腿 `304-a1`）。本腿**只新建** `.scratch/wisp/probes/304/a1/**`
+（5 枚 `.md` ＋ 16 枚 `logs/*.txt` ＋ 本消息件）＋**票尾纯 ＋1 行 −0 行**一枚 Progress log bullet。
+⛔ 产码 ⛔ 测试码 ⛔ 翻框 ⛔ 改票面原句 ⛔ 碰 `Status:` ⛔ 改名 `-done` ⛔ push。
+
+锚点（现跑）：`git rev-parse --short HEAD` = `d75db9ee`（与派单相符）；
+`git status --porcelain -- internal cmd tools` = 0 行；branch `dev`；时刻 2026-10-11 15:1x-15:3x。
+
+硬边界（派单 §0.3）：全程 ⛔ 任何 Go 编译面/运行面命令 — 没跑过 go build/vet/test、没跑过任何 .exe、
+没跑 scripts/d22scan.sh、没跑 scripts/portable-tests.sh；连 go env / go list 也一枚没用。
+⇒ 凡依赖跑 Go 的读数一律登记成具名欠账（Q-304-a1-A..J，见 probes/304/a1/90-final.md §3），
+⛔ 一件用"读文档/读码推"冒充实测。
+
+交了什么：
+- (A) 残留名册重量：mockllm.exe 现量 0 枚 ⇄ 派单快照 2 枚（pid 20904/25660 现量都不在）⇄ 票面 :17
+  立案后自量 0；wisp.exe/balldebug.exe = 0/0；msedgewebview2.exe = 18 枚 = 3 棵 ×6，逐枚命令行
+  --webview-exe-name= 背书（SearchHost / wetype_update / clipsync-desktop 三枚父全在，wisp 系 0）
+  ⇄ 票面 :17 的 24（magpie 本人还在 pid 24208，名下 0 枚）；%TEMP% 的 Test* 目录 21 枚 ⇄ 票面 :16 同值。
+  ⛔ 停过任何进程。新学一条尺的可靠性：11724 现为 RuntimeBroker.exe（10-11 07:22 起）= PID 会复用。
+- 表① 全名册：R2 全 scope .go = 72 枚 spawn 语句 = R1 的 _test.go 66 枚 + 非测试文件 6 枚；66 用
+  集合差切成 18 枚"父不等它" + 48 枚同步 inline（logs/partition-66-18-48.txt，两向作差皆空）。
+  两枚 mockllm 源 = internal/llm/adaptertest/mockllm.go:72（_test.go 那把尺整档看不见它）+
+  internal/llm/openaichat/mockllm_integ_test.go:73；回收形逐枚标 t.Cleanup / defer / 体内内联 / Job，
+  其中 defer 那一类（3 枚）就是外力 TerminateProcess 下一行都不跑的缺陷面，单独标出。
+- 表③ 三形代价 + 必答两问：甲 = 仪器与验收本仓已有（internal/proc/jobscope_windows.go:71-181 +
+  jobscope_windows_test.go 那句 "helper survived for %v after Job close"），代价 = 两枚 spawn 同批 +
+  一枚新 import 边 + ubuntu 那一支不受它保护；乙 = mockllm 零自退路（main.go:49-66 只 listen→Serve，
+  control.go 8 枚端点无 shutdown）、flag 现量 4 枚、仓内父 PID helper 现量 0 命中、且 tools/mockllm
+  是 无 require/无 replace/无 go.work 的独立 stdlib-only 模块 ⇒ 用不到 observe.NewTimeout；
+  丙 = 票面 :45 明写合法，代价具名 = CI 那侧零进程计数（grep -cE "tasklist|IMAGENAME|Get-CimInstance"
+  .github/workflows/ci.yml 现量 0）。一处票面已过期：起手闸实践已在数 mockllm.exe
+  （HANDOVER.md:2431/:2455/:2466/:2474/:2490），仍只列两名的模板件具名到行 ⇒ 那是 AC#4 的落点，本腿⛔ 改。
+- 必答 (I)：交〔读码级〕分层名册（job 只有 Assign/StartInJob 两枚入口 ⇒ 只端显式成员；
+  CreateJobObject(nil,nil) ⇒ 句柄不可继承；hosted windows-latest 已在跑 ./internal/proc/
+  ⇒ portable-tests.sh:249-251 + ci.yml:534/:797），"CI 色"那一层 = Q-304-a1-B（需真机）。
+- 必答 (II)：仪器字面只认 \.Sub\(time\.Now\(\)\)（main.go:166，应用点 :781-792，注释豁免代码不豁免）
+  + 第二支 time.Now().Unix*( 与 timeout|deadline|expire|ttl|budget|until 同行；存在性轮询 / time.After /
+  time.Now().Add+After / observe.NewTimeout+Expired() 全不在射程（仓内四件先例逐枚具名）。
+  规格侧"存在性轮询算不算超时实现"无判例 = Q-304-a1-D，归人工拍。
+
+欠读数具名 = Q-304-a1-A（表② 三形实测整格，归编排者在 Go 面空出后补）、-B（hosted job 成员关系/CI 色）、
+-C（乙形候选写法的 d22scan rc）、-D（规格侧解释）、-E（resident_audio_247_live 那枚 powershell 的 CI 色）、
+-F（票面 :10 那两枚孤儿的占用/Listen 读数随进程没掉）、-G（24→18 那 6 枚的成因）、-H（21 枚 Test* 目录逐枚归属）、
+-I（不走 os/exec 的直调形名册）、-J（compose 那枚 mock-llm 算不算本票射程，需一句裁定）。
