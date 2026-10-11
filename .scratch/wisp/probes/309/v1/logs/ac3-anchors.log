@@ -1,0 +1,43 @@
+=== A1: defer revokeAdmission() in loop.go ===
+373:	revokeAdmission := func() {}
+376:			revokeAdmission = r
+379:	defer revokeAdmission()
+--- context 372..384:
+	// admitted id cannot outlive the task that earned it.
+	revokeAdmission := func() {}
+	if l.opt.AdmitTask != nil {
+		if r := l.opt.AdmitTask(taskID); r != nil {
+			revokeAdmission = r
+		}
+	}
+	defer revokeAdmission()
+	guard := NewGuard(l.guard)
+	cost := Cost{Currency: l.opt.Config.Currency}
+	res := Result{TaskID: taskID, Status: StatusCompleted}
+
+	l.append(userMessage(input))
+
+=== A2: newTaskID call/mint sites ===
+329:	id := newTaskID()
+340:	return l.run(ctx, newTaskID(), input)
+1153:func newTaskID() string {
+
+=== A3: func Run / func RunAsync lines ===
+328:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+339:func (l *Loop) Run(ctx context.Context, input string) Result {
+
+=== A4: newTaskID body (36 chars?) ===
+internal/agent/loop.go:1153:func newTaskID() string {
+internal/agent/loop.go-1154-	var b [16]byte
+internal/agent/loop.go-1155-	if _, err := rand.Read(b[:]); err != nil {
+internal/agent/loop.go-1156-		// Entropy source unavailable: fall back to a clock-derived unique id.
+internal/agent/loop.go-1157-		n := time.Now().UnixNano()
+internal/agent/loop.go-1158-		for i := range b {
+internal/agent/loop.go-1159-			b[i] = byte(n >> (8 * uint(i%8)))
+internal/agent/loop.go-1160-		}
+internal/agent/loop.go-1161-	}
+internal/agent/loop.go-1162-	b[6] = (b[6] & 0x0f) | 0x40
+internal/agent/loop.go-1163-	b[8] = (b[8] & 0x3f) | 0x80
+internal/agent/loop.go-1164-	h := hex.EncodeToString(b[:])
+internal/agent/loop.go-1165-	return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:]
+internal/agent/loop.go-1166-}

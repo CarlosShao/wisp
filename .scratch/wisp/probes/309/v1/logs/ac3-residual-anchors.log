@@ -1,0 +1,24 @@
+### residual absolute loop.go anchors in bridge.go, checked against loop.go today
+--- bridge.go:113 claims loop.go:563
+	})
+--- bridge.go:114 claims loop.go:696-700
+
+	// Terminal tool_call rows are forensics of how the task ended, so this
+	// loop's writes run under a ctx detached from cancellation (see
+	// terminalWriteCtx): a task cancelled mid-execution must still book its
+	// in-flight calls instead of leaving them pending forever.
+--- bridge.go:230 claims loop.go:783-806 = decideRisk
+}
+
+// decideRisk resolves what the LOOP may decide on its own, and books the
+// decision column. It is not the risk verdict: ToolInfo.RiskLevel carries the
+813:func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info ToolInfo) (ok, unbooked bool, why string) {
+--- bridge.go:252 claims loop.go:692-694
+			// A recovered panic (D37b) is a tool failure, not a dead task.
+			l.log().Warn("agent: tool goroutine panic recovered", "err", perr)
+		}
+--- bridge.go:1084 claims loop.go:585
+	rowID    int64
+### journal.go:70-93 (bridge.go:1084)
+	defer t.mu.Unlock()
+// decide books the gate decision for a row.

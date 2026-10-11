@@ -1,0 +1,25 @@
+=== 票 307 title + first 8 lines ===
+# 票 307 — `syncdirs` 那道"写在用户资料目录下 ⇒ 当同步可疑"的兜底**只折一边**：候选走 C26 解析器折成长形，`home` 只小写留短形 ⇒ 资料目录下的写读成"不落在任何同步根"（**fail-open**，方向与票 252 相反）
+
+**立票**：2026-10-11 08:0x 编排者（来路＝只读归因腿 `risk-red-attrib-1` 的表②乙族＋**我自己的两发复跑**，件 `probes/risk-attrib/orch/logs/orch-aliased.txt`／`orch-control.txt`；台账 `A817` §5 那句"归口另待一枚普查腿定射程"由这一程结掉，`A831`）
+**性质**★：**缺陷票**，方向＝**少报**（该被当外逃通道看的写被放行），⛔ 仪器票、⛔ 文档票。
+**为什么要紧（用户可见形状）**：这条链是"宿主写文件之前那道风险判定"的一个输入。它现在只在**拼法恰好对得上**的时候才响——如果用户目录那一侧的拼写带着 8.3 短名（或任何解析器会折长、而 `normPath` 不折的形状），那一次写就**不会被标成 sync-suspect**，⇒ 后面那道"要不要问用户"的门少了一枚输入。⚠ **这不是"有人入侵了这台机器"**：现象出现在**测试与风险判定的字符串比较层**，本机没有第二条真账号、没有实测被绕过的生产写（见"射程与⛔ 射程"）。
+
+## 现量（每条带尺；⛔ 引用前先重跑，行号一律当快照）
+
+
+=== 票 40 head + any '零消费者' line ===
+# 40 — Security/Privacy/Cost pages: grants, blacklist status, memory ops, cost summary
+
+**Status:** ready-for-agent
+**Claimed by:** —
+**Last update:** 2026-09-19
+**Blocked by:** 29-memory-l1l2, 35-panel-bridge-c17, 44-costmeter-c23
+
+=== 票 197: refuse-shape ownership (empty parent id) ===
+
+=== 票 242: correlation id per call ===
+14:| ⚠ **造不出"两张不同名"的卡**（现成的载具缺陷） | `cmd/wisp/subagent_selfapproval_197_test.go:109` 逐字 `TaskID: taskID, CorrelationID: taskID` ⇒ 同一次跑里两张卡**共用同一个 correlation id** | `197-v1` §1.3 第 2 点：13 发读数里三枚 id 逐次全等（例 `child=corr1=corr2=45ce09d5-…`）；⇒ 那条 `:466` 的"跨卡借证"实际测的是**新鲜度** |
+19:  ⛔ **前置是本票自己的活**：先把载具的 `CorrelationID` 从 `taskID` 改成真正的 corr（`subagent_selfapproval_197_test.go:109`），否则两枚卡同名、这一发**构造不出来**（上面那行读数就是证据）。
+67:**载具前置仍未做**：`cmd/wisp/subagent_selfapproval_197_test.go:109` 现量逐字 `TaskID: taskID, CorrelationID: taskID,`（我 09:3x `grep -n` 复认）＝票面 AC#1 那句"两枚同时活着、correlation id 不同"的前提**在盘上不成立**；该文件写面 `cmd/wisp` 此刻被 `255-r2` 占着 ⇒ 归票 259 AC#4 串行。
+74:- **`:14` 那行"造不出两张不同名的卡"（以及 `:19` 那句前置"两枚卡同名、构造不出来"）在盘上已过期**：载具早被拆过——现量 `cmd/wisp/subagent_selfapproval_197_test.go:116` 逐字 `TaskID: taskID, CorrelationID: corrID,`，两枚 corr 各自吃 `childID+"-corr-1"`／`childID+"-corr-2"`（`:396`／`:463`），跨卡那一发在 `:473`。⇒ 拆它的是**票 259 §12 那笔 `77150dcc`**；票 259 面上自己写的载具行 `:109` 也已漂到 `:116`。本格从此**不再有"构造不出来"这个借口**。

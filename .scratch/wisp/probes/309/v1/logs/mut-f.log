@@ -1,0 +1,6 @@
+time=2026-10-11T13:40:08.214+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309AssessorForEmptyTaskIDDropsTaintDetector
+--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.042s
+rc=0

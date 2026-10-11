@@ -1,0 +1,24 @@
+=== (a) gofumpt in GOPATH/bin ===
+gofumpt.exe
+staticcheck.exe
+=== (b) git status --porcelain -- internal cmd ===
+0
+=== (c) repo-wide gofmt roster split ===
+995
+total flagged=26
+  under .scratch=22
+  NOT .scratch=4
+cmd/wisp/models.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+=== (d) absolute loop.go:N anchors still in bridge.go ===
+113:// consumer-side seam the agent loop already calls (loop.go:563 and
+114:// loop.go:696-700), so there is no second dispatch path to forget to secure.
+230:// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+252:// treats non-nil as "the provider broke" (internal/agent/loop.go:692-694) and
+1084:// (loop.go:585 and journal.go:70-93). When a Bridge is composed under a Loop,
+=== (e) assessor.go TaintDetector exact lines ===
+167:type TaintDetector interface {
+168-	TaintHit(params map[string]any) (source string, hit bool)
+169-}

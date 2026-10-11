@@ -1,0 +1,9 @@
+=== gofumpt worktree internal/tools ===
+0
+=== gofumpt worktree widened internal cmd ===
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+5

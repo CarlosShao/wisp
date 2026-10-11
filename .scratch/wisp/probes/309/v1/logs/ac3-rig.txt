@@ -1,0 +1,66 @@
+#!/bin/sh
+# 309-v1 AC#3: prove 16e86bae's bridge.go edit is comment-only and that no code line moved.
+LOGS=.scratch/wisp/probes/309/v1/logs
+BR=internal/tools/bridge.go
+OUT=$LOGS/ac3-comment-only.log
+: > "$OUT"
+
+echo "########## (1) RULER the dispatch asked for: git diff -w --numstat ##########" >> "$OUT"
+echo "expectation in my brief was '0'. Measured value:" >> "$OUT"
+git diff -w --numstat 16e86bae^ 16e86bae -- "$BR" >> "$OUT" 2>&1
+echo "rc=$? >> -w cannot zero 29 net NEW comment lines: it only ignores whitespace inside changed lines." >> "$OUT"
+echo "(reading: 32 added / 3 deleted == -w reports the same as --numstat; the 'expect 0' premise is wrong.)" >> "$OUT"
+
+echo >> "$OUT"
+echo "########## (2) every +/- line in the hunk is a Go comment line ##########" >> "$OUT"
+git show --format='' -U0 16e86bae -- "$BR" \
+  | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \
+  | sed -E 's/^(.)[[:space:]]*/\1 /' > "$LOGS/ac3-changed-lines.txt"
+tot=$(wc -l < "$LOGS/ac3-changed-lines.txt")
+noncomment=$(grep -vE '^[+-] //' "$LOGS/ac3-changed-lines.txt" | wc -l)
+echo "changed lines total=$tot ; lines that are NOT '//'-comment=$noncomment" >> "$OUT"
+grep -vE '^[+-] //' "$LOGS/ac3-changed-lines.txt" >> "$OUT" 2>&1
+echo "rc_of_grep_v(noncomment filter, 1 == nothing found)=$?" >> "$OUT"
+echo "VERDICT ruler (2): $([ "$noncomment" -eq 0 ] && echo 'ALL changed lines are comment lines' || echo 'NON-COMMENT CHANGES PRESENT')" >> "$OUT"
+
+echo >> "$OUT"
+echo "########## (3) code-identity: strip full-line comments + blanks from both blobs, cmp ##########" >> "$OUT"
+git show 16e86bae^:"$BR" > "$LOGS/ac3-before.go.txt"
+git show 16e86bae:"$BR" > "$LOGS/ac3-after.go.txt"
+for f in before after; do
+  grep -vE '^[[:space:]]*//' "$LOGS/ac3-$f.go.txt" | grep -vE '^[[:space:]]*$' > "$LOGS/ac3-$f-code.txt"
+done
+echo "before code lines=$(wc -l < $LOGS/ac3-before-code.txt)  after code lines=$(wc -l < $LOGS/ac3-after-code.txt)" >> "$OUT"
+if cmp -s "$LOGS/ac3-before-code.txt" "$LOGS/ac3-after-code.txt"; then
+  echo "cmp(code-only before,after): IDENTICAL -> zero code lines changed" >> "$OUT"; rc3=0
+else
+  echo "cmp(code-only before,after): DIFFER" >> "$OUT"; rc3=1; cmp "$LOGS/ac3-before-code.txt" "$LOGS/ac3-after-code.txt" >> "$OUT"
+fi
+echo "rc=$rc3" >> "$OUT"
+
+echo >> "$OUT"
+echo "########## (4) whitespace-stripped cmp of the two blobs (as the brief asked) ##########" >> "$OUT"
+tr -d '[:space:]' < "$LOGS/ac3-before.go.txt" > "$LOGS/ac3-before-nosw.txt"
+tr -d '[:space:]' < "$LOGS/ac3-after.go.txt"  > "$LOGS/ac3-after-nosw.txt"
+if cmp -s "$LOGS/ac3-before-nosw.txt" "$LOGS/ac3-after-nosw.txt"; then
+  echo "cmp(no-whitespace blobs): IDENTICAL" >> "$OUT"; rc4=0
+else
+  echo "cmp(no-whitespace blobs): DIFFER (expected: 29 net comment lines were ADDED, so identity here is NOT the right test)" >> "$OUT"; rc4=1
+  cmp "$LOGS/ac3-before-nosw.txt" "$LOGS/ac3-after-nosw.txt" >> "$OUT"
+fi
+echo "rc=$rc4" >> "$OUT"
+
+echo >> "$OUT"
+echo "########## (5) the guard boolean expression itself, before vs after (the AC#0 'do not touch' line) ##########" >> "$OUT"
+echo "before: $(git show 16e86bae^:$BR | grep -n 'if b.injected ||' )" >> "$OUT"
+echo "after : $(git show 16e86bae:$BR  | grep -n 'if b.injected ||' )" >> "$OUT"
+echo "byte-identical attach branch:" >> "$OUT"
+git show 16e86bae^:"$BR" | grep -c 'WithTaintDetector(b.prov.Detector(taskID))' >> "$OUT"
+git show 16e86bae:"$BR"  | grep -c 'WithTaintDetector(b.prov.Detector(taskID))' >> "$OUT"
+
+echo >> "$OUT"
+echo "########## (6) worktree file == HEAD blob (nobody moved it since) ##########" >> "$OUT"
+sha256sum "$BR" | tee -a "$OUT"
+git show HEAD:"$BR" | sha256sum | tee -a "$OUT"
+
+cat "$OUT"

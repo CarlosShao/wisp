@@ -1,0 +1,7 @@
+# 309-v1 AC#4 gates (HEAD 0d2260eb10243df10fc925d766edbc64bedf98e8)  2026-10-11T13:45:09+08:00
+## gate 1: GOFLAGS= go build ./...
+rc_build=0
+## gate 2: go vet ./internal/tools/
+rc_vet=0
+## gate 3: sh scripts/d22scan.sh
+rc_d22scan=0

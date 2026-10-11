@@ -1,0 +1,7 @@
+time=2026-10-11T13:42:25.029+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309ToolRequestProductionConstructionNail
+    toolrequest_nail_309_test.go:132: AC#2 枚数钉：internal/agent 之外 agent.ToolRequest 生产构造点=0（==0），分母=245 枚非测试源
+--- PASS: Test309ToolRequestProductionConstructionNail (0.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.153s
+rc=0

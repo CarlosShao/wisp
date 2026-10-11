@@ -1,0 +1,29 @@
+=== R1: the ruler quoted verbatim in bridge.go:879-881, re-run today ===
+$ grep -rn 'ToolRequest{' internal cmd --include=*.go | grep -v _test.go
+internal/agent/loop.go:675:		req := ToolRequest{
+internal/tools/bridge.go:879:// dispatches on the bridge except loop.go. Ruler: grep -rn 'ToolRequest{' internal
+internal/tools/bridge.go:940://     empty); Test309ToolRequestProductionConstructionNail pins `agent.ToolRequest{`
+hits_minus_test=3   (comment claims 'the single internal/agent/loop.go point' = 1)
+
+=== R2: same ruler excluding comment lines (first non-space char == //) ===
+1
+
+=== R3: ticket '现量' correction item 3 roster: grep -rn 'assessorFor' internal cmd --include=*.go ===
+internal/risk/assessor.go:30:// New and assessorFor; cmd/wisp/panel_assets.go for the C25 detector); where an
+internal/tools/assessorfor_taint_instrument_309_test.go:3:// 票 309 AC#1 —— "Bridge.assessorFor 的 taskID == \"\" 那一肢把 R4 探测器静默摘掉"
+internal/tools/assessorfor_taint_instrument_309_test.go:8://   ① 非空 task id：assessorFor 走 WithTaintDetector 那一支 ⇒ 对同一句敏感文本必须
+internal/tools/assessorfor_taint_instrument_309_test.go:11://   ② 空 task id：assessorFor 命中 `taskID == ""` 那一肢、返回 b.assess（⛔ 探测器）⇒
+internal/tools/assessorfor_taint_instrument_309_test.go:17:// 这件事实上：现成可观察面＝经 assessorFor 拿回的判级器对同一句污点文本的 R4 差异。
+internal/tools/assessorfor_taint_instrument_309_test.go:18:// ⛔ 新造导出 API、⛔ 加字段；只在包内直接驱动 assessorFor+Assess（无新增生产可达路径）。
+internal/tools/assessorfor_taint_instrument_309_test.go:52:	gotTainted := b.assessorFor(taintedTask).Assess("notify", params, risk.Facts{})
+internal/tools/assessorfor_taint_instrument_309_test.go:55:			"assessorFor 的 WithTaintDetector 那一支若被摘掉，R4 就整条不发生；"+
+internal/tools/assessorfor_taint_instrument_309_test.go:62:	gotEmpty := b.assessorFor("").Assess("notify", params, risk.Facts{})
+internal/tools/assessorfor_taint_instrument_309_test.go:64:		t.Errorf("空 task id 竟判出了 R4（rules=%v）：assessorFor 的 `taskID == \"\"` 那一肢"+
+internal/tools/bridge.go:297:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+internal/tools/bridge.go:926:// assessorFor returns the assessor whose R4 input is bound to this task's
+internal/tools/bridge.go:951:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+internal/tools/toolrequest_nail_309_test.go:110:			"构造点（接线事实）；若有人新写一条生产构造点，它可能递进空 TaskID 让 assessorFor 静默摘掉 "+
+cmd/wisp/panel_assets.go:60:		// assessorFor): a bare assessor plus the C25 engine bound to one scope.
+cmd/wisp/panel_assets.go:227:// assessorFor). Returns nil when no source was declared, which is the caller's
+cmd/wisp/panel_assets_143_test.go:7:// assessorFor), so a demo machine and a real machine judged by different rules.
+total=17 (correction says 7 = 1 call + 1 decl + 5 comment)

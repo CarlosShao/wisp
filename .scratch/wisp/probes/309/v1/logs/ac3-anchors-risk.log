@@ -1,0 +1,76 @@
+=== B1: enclosing func of rules_gateway.go:102 ===
+80: 				rules:  []RuleID{R3},
+81: 				level:  Deny,
+82: 				reason: fmt.Sprintf("R3: 命中 A 档敏感路径，拒绝（不可豁免）: %s", canonical),
+83: 			}
+84: 		case TierB:
+85: 			if worst == nil || worst.level < L2 {
+86: 				worst = &contribution{
+87: 					rules:  []RuleID{R3},
+88: 					level:  L2,
+89: 					reason: fmt.Sprintf("R3: 命中 B 档敏感路径（可单文件豁免）: %s", canonical),
+90: 				}
+91: 			}
+92: 		}
+93: 	}
+94: 	return worst
+95: }
+96: 
+97: // ruleTaint implements R4: an exfil channel parameter carrying a
+98: // sensitive-source fragment -> L2, and the verdict is never overridable by a
+99: // D45 session authorization (SPEC-06 §8.3). Dormant until ticket 19 wires the
+100: // TaintDetector.
+101: func ruleTaint(ctx *assessCtx) *contribution {
+102: 	if ctx.taint == nil {
+103: 		return nil
+104: 	}
+105: 	source, hit := ctx.taint.TaintHit(ctx.params)
+106: 	if !hit {
+107: 		return nil
+108: 	}
+109: 	return &contribution{
+110: 		rules:            []RuleID{R4},
+
+=== B2: any func named ruleTaint? ===
+internal/risk/assessor.go:269:	ruleTaint,
+internal/risk/rules_gateway.go:97:// ruleTaint implements R4: an exfil channel parameter carrying a
+internal/risk/rules_gateway.go:101:func ruleTaint(ctx *assessCtx) *contribution {
+
+=== B3: scopeMarks in provenance.go ===
+682:// scopeMarks snapshots a scope's taint marks. The second result reports the
+694:func (p *Provenance) scopeMarks(scopeID string) ([]*taintMark, bool) {
+726:	marks, unbound := p.scopeMarks(scopeID)
+827:	marks, unbound := p.scopeMarks(scopeID)
+
+=== B4: unbound branch body ===
+// that closed its own scope, or a call that never opened one. A foreign close
+// cannot land here any more — it is refused by Scope.Close before it touches
+// the map, which is the difference between "already closed by you" and "closed
+// by somebody else" that this ledger could not express before.
+func (p *Provenance) scopeMarks(scopeID string) ([]*taintMark, bool) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	reg := p.scopes[scopeID]
+	if reg != nil && len(reg.marks) > 0 {
+		return reg.marks[:len(reg.marks):len(reg.marks)], false // snapshot (append never mutates the shared prefix)
+	}
+	if reg != nil {
+		return nil, false // opened and empty: this session read nothing tainted
+	}
+	for _, r := range p.scopes {
+		if len(r.marks) > 0 {
+			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+			return nil, true
+		}
+	}
+	return nil, false
+}
+
+// Inspect checks one outgoing call against the scope's taints. tool is the
+// D34 name ("" = unknown, forces the conservative generic scan). Returns the
+// first hit in deterministic order (channel keys in table order, remaining
+
+=== B5: Detector/CheckText unbound sites ===
+678:	SrcUnboundScope     = "unbound-scope"     // Inspect on a scope that was never opened / already closed
+729:			ScopeID: scopeID, Channel: ChUnknown, SrcTool: SrcUnboundScope,
+830:			ScopeID: scopeID, Channel: ch, SrcTool: SrcUnboundScope,

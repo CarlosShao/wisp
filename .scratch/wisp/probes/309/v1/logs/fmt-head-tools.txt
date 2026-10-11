@@ -1,0 +1,1 @@
+0 rows == 无第二档（gofmt HEAD-blob 导出树 internal/tools 干净）；尺=gofmt -l $D/internal/tools

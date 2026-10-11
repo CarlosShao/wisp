@@ -1,0 +1,19 @@
+=== does 309 or r1 re-book other tickets' debts? (grep for 154 / want_n / 298 / 72 / 259) ===
+.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md: 票 154 `gate-clauses.sh` 的 **G1** 那格登记 `want_n 0` 今日对得上。★**范本⛔ 去 `cmd/wisp` 找，本包就有两枚现成的**：`paths_twocontainments_252_r2_test.go:195-206`（`os.ReadDir(".")` 排除 `_test.go` 后 `parser.ParseFile`）与 `task_state_188_test.go:243-265`（`WalkDir`＋把 `examined` 当返回值，注释逐字 *"a scan whose denominator is zero reports clean for a tree it never read"*）⇒ **新钉必须自带分母**，⛔ 交一枚"扫了 0 个文件然后报绿"。
+.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md: 票 308 只读普查）正在读 `internal/risk` 的台面颜色；两枚交完才派。⚠ 别把"裁完形"读成"可以开工"。
+.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md: 票 154 那一族，⛔ 在 309 里重登记 `want_n`）。
+.scratch/wisp/probes/309/r1/20-count-nail.md: 票 154 `gate-clauses.sh` 的 **G1** 登记 `want_n 0`，今日对得上（⛔ 在 309 重登记 want_n）。
+.scratch/wisp/probes/309/a1/90-final.md:24:8. **`AC#2` 有料可交**：仓里已有**四族零接线尺形**（形 A 枚数钉 `gate-clauses.sh` 的 `want_n`、形 B `go/parser` 源码头文件如 `panel_assets_143_test.go:267`／`firstrun_257_test.go:430`、形 C 入口拒绝（今天就被 2 枚测试载体可达）、形 D reflect API 钉 `grant_test.go:509`／`ticket90_test.go:454`），三类未来候选者的半成品现量＝候选者 1 有（②本身；生产 `.Execute(` 非桥命中 1 枚＝`subagent_197.go:581` 的纯转发）、候选者 2 有形状无 id 语义（同那枚装饰器）、候选者 3 只有 `scheduler/doc.go` 零实现。
+.scratch/wisp/probes/309/a1/90-final.md:33:| U-4 | 今日 `gate-clauses.sh` 的 G1/G1b/G3 命中行数 vs 登记 `want_n`（静态等价尺给 G1b＝1 vs 登记 0） | `bash .scratch/wisp/probes/154/gate-clauses.sh` |
+
+=== -done suffixes of the four ===
+197-the-panel-must-show-each-subagents-state-and-click-through-to-its-own-streaming-work-page-but-go-side-has-zero-subagent-entity.md
+242-the-grant-binding-layer-and-the-panel-facing-read-surface-both-have-zero-rulers-done.md
+307-syncdirs-home-stays-short-while-candidate-folds-long-profile-write-reads-not-sync-done.md
+40-security-privacy-cost-pages.md
+
+=== A844 §3 欠读数归口 (does it own U-3/U-4 etc.) ===
+30:### 3. 欠读数归口（腿具名 7 枚，我逐枚派事⛔ 代答）
+32:- **U-1／U-2**（`internal/tools` 整包色、`cmd/wisp` 面板侧族钉）＝归 `309-r1` 落地腿现跑，判据写进派单。**U-3＝★我这发结掉，且结出的与腿的猜测相反**：尺＝`git grep -nE "ReadFile|ParseFile" HEAD -- internal/tools`＝**43 命中**，其中**运行时读生产源码**的钉⛔ 止一枚＝**至少 4 枚**（`task_cancel_221_legs_test.go:224 os.ReadFile("task.go")`／`tasklist_deferred_236r3_teeth_test.go:203` 同一形／`paths_twocontainments_252_r2_test.go:206` 走 `os.ReadDir(".")` 排除 `_test.go` 后 `parser.ParseFile`／`task_state_188_test.go:261` 走 `filepath.WalkDir(root…)`）⇒ **`go/parser` 那族钉在本包就有现成范本**（腿只找到 `cmd/wisp` 那 5 枚＝射程⛔ 到 `internal/tools`）。★顺手拿到一枚比我预期更好的东西：`task_state_188_test.go` 那位的注释逐字写着 *"a scan whose denominator is zero reports clean for a tree it never read"*，且它把 `examined` 当返回值＝**枚数钉必须自带分母**这条规矩在本仓已有同包先例 ⇒ 写进 `309-r1` 的判据。⛔ 这⛔ 意味着有钉读 `bridge.go` 的文档块（名册尺 7 命中里测试只有 `panel_assets_143_test.go:7` 一枚注释行，逐枚复看过）⇒ 形 Ⓑ 的注释编辑仍⛔ 撞文字钉。
+33:- **U-4（我自己这发就地结掉一半，⛔ 跑整脚本）**：尺＝按 `gate-clauses.sh` 的 G1b 那格**原样排除项**手工复现（`:430-432` 逐字排除＝':!*_test.go' ':!internal/agent/loop.go' ':!internal/tools/bridge.go'，⛔ 排除整目录）⇒ 今日真命中 **1 枚**＝`internal/tools/subagent_197.go:581 return p.inner.Execute(ctx, req)`，而该格登记 `want_n 0` ⇒ **那把尺今天会响**（成因⛔ 是本票：那枚装饰器转发是票 197 后来的产物）。⛔ 我跑整脚本＝它会把 tracked 日志写脏并抢别腿的面试图（记忆里 flip 那族同形）。归口＝**门自己那一票**（票 154 族），⛔ 顺手在 309 里重登记 `want_n`。同尺顺带对上 G1（`ToolRequest\{` 排 `_test.go` 与 `internal/agent/*`）＝今日 **0 命中**＝与登记一致，⇒ **形 B 那枚新钉的基线＝0 有第二家尺背书**。
+34:- **U-5**（`bridge.go:861` 那句 `loop.go:366` 行号）＝归 `AC#3` 那一格（只做行号→内容锚，⛔ 改契约声称）。**U-6**（票 143 对 ② 的覆盖度）＝归 `AC#1` 仪器选型。**U-7**（参数化载体全部调用点有没有别的空 id）＝归 `309-r1` 起手第一发（尺＝`git grep -n 'cancel(t, ""'` 现量 1 命中，腿与我一致）。

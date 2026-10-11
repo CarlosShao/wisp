@@ -1,0 +1,9 @@
+time=2026-10-11T13:42:20.691+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test309ToolRequestProductionConstructionNail
+    toolrequest_nail_309_test.go:108: 枚数钉响：internal/agent 之外发现了 1 枚 `agent.ToolRequest{` 生产构造点 (分母=245 枚解析源，roots=["..\\..\\cmd" "..\\..\\internal"])。票 309 的保证＝今天非空只靠 loop.go 那枚 newTaskID() 构造点（接线事实）；若有人新写一条生产构造点，它可能递进空 TaskID 让 assessorFor 静默摘掉 R4 探测器（见 assessorfor_taint_instrument_309_test.go 的 ②）。要么给它接上非空 id，要么把它放进被 309 AC#1 仪器覆盖的入口
+    toolrequest_nail_309_test.go:132: AC#2 枚数钉：internal/agent 之外 agent.ToolRequest 生产构造点=1（==0），分母=245 枚非测试源
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.14s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.185s
+FAIL
+rc=1

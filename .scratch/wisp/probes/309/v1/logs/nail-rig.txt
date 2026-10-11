@@ -1,0 +1,48 @@
+#!/bin/sh
+# 309-v1 AC#2 nail rigs. Transient mutations of internal/tools/bridge.go ONLY
+# (the granted face); restore unconditional via trap; byte identity by cmp + sha256sum.
+REPO=$(pwd)
+BR=internal/tools/bridge.go
+LOGS=.scratch/wisp/probes/309/v1/logs
+PRIST=$LOGS/bridge.go.pristine
+T=Test309ToolRequestProductionConstructionNail
+
+restore() {
+  cp "$PRIST" "$BR"
+  if cmp -s "$PRIST" "$BR"; then echo "RESTORE cmp: byte-identical OK"; else echo "RESTORE cmp: MISMATCH ***"; fi
+  sha256sum "$BR" "$PRIST"
+}
+trap restore EXIT
+
+run() {
+  GOFLAGS= go test ./internal/tools/ -count=1 -run "$T" -v > "$1" 2>&1
+  echo "rc=$?" | tee -a "$1"
+  sed -n '1,25p' "$1"
+}
+
+echo "########## RIG-0 baseline: nail as shipped -> expect GREEN, denominator printed ##########"
+run "$LOGS/nail-0-baseline.log"
+
+# RIG-1: the literal composite-literal spelling, appended to a file the nail really scans.
+printf '\nfunc rig309v1Literal() agent.ToolRequest {\n\treturn agent.ToolRequest{TaskID: "", Name: "fs.read"}\n}\n' >> "$BR"
+echo; echo "########## RIG-1 literal 'agent.ToolRequest{TaskID: \"\"}' added to internal/tools/bridge.go -> expect RED ##########"
+echo "--- landed? tail of file:"; tail -5 "$BR"
+run "$LOGS/nail-1-literal.log"
+restore
+
+# RIG-2: the declaration+field-assignment shape (no composite literal).
+printf '\nvar rig309v1Decl agent.ToolRequest\n\nfunc rig309v1Assign() agent.ToolRequest {\n\trig309v1Decl.TaskID = ""\n\trig309v1Decl.Name = "fs.read"\n\treturn rig309v1Decl\n}\n' >> "$BR"
+echo; echo "########## RIG-2 'var req agent.ToolRequest' + field assignment -> prediction: nail STAYS GREEN (blind) ##########"
+echo "--- landed? tail of file:"; tail -8 "$BR"
+run "$LOGS/nail-2-decl.log"
+restore
+
+# RIG-3: the alias shape.
+printf '\ntype rig309v1Alias = agent.ToolRequest\n\nfunc rig309v1Aliased() rig309v1Alias {\n\treturn rig309v1Alias{TaskID: "", Name: "fs.read"}\n}\n' >> "$BR"
+echo; echo "########## RIG-3 type alias then composite literal -> prediction: nail STAYS GREEN (blind) ##########"
+echo "--- landed? tail of file:"; tail -7 "$BR"
+run "$LOGS/nail-3-alias.log"
+restore
+
+echo; echo "########## FINAL STATE ##########"
+git status --porcelain -- "$BR"; echo "(empty == clean)"

@@ -1,0 +1,12 @@
+=== commits touching bridge.go after 16e86bae ===
+(empty == none)
+=== git show --numstat 16e86bae ===
+73	0	internal/tools/assessorfor_taint_instrument_309_test.go
+32	3	internal/tools/bridge.go
+134	0	internal/tools/toolrequest_nail_309_test.go
+=== git show -w --numstat (bridge.go only) ===
+32	3	internal/tools/bridge.go
+=== git diff -w --numstat 16e86bae^..16e86bae (all paths) ===
+73	0	internal/tools/assessorfor_taint_instrument_309_test.go
+32	3	internal/tools/bridge.go
+134	0	internal/tools/toolrequest_nail_309_test.go

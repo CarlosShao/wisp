@@ -1,0 +1,35 @@
+#!/bin/sh
+# 309-v1: same-台面 before/after roster via two out-of-repo export trees.
+#   BEFORE = 1ad48333 (= 16e86bae^, the tree immediately before the 309 code commit)
+#   AFTER  = HEAD      (0d2260eb)
+# Each tree is a fresh mktemp -d; nothing is written inside the repo except logs.
+LOGS=$(pwd)/.scratch/wisp/probes/309/v1/logs
+
+build_tree() { # $1 = rev, $2 = tag
+  D=$(mktemp -d "${TMPDIR:-/tmp}/wisp309v1-$2.XXXXXX") || { echo "mktemp failed"; return 1; }
+  git archive "$1" | tar -x -C "$D" || { echo "archive failed for $1"; return 1; }
+  echo "TAG=$2 REV=$1 DIR=$D"
+  echo "  go.mod present: $(test -f "$D/go.mod" && echo yes || echo NO)"
+  echo "  tracked .go in tree (proves non-empty): $(find "$D" -name '*.go' | wc -l)"
+  echo "  .go under internal/tools: $(find "$D/internal/tools" -name '*.go' | wc -l)"
+  ( cd "$D" && GOFLAGS= go test ./internal/tools/ -count=1 -v > "$LOGS/suite-$2.log" 2>&1; echo "rc=$?" >> "$LOGS/suite-$2.log" )
+  echo "  suite log rc line: $(tail -1 "$LOGS/suite-$2.log")"
+  grep -E '^--- (PASS|FAIL|SKIP)' "$LOGS/suite-$2.log" | sed -E 's/^--- [A-Z]+: ([^ ]+).*/\1/' | sort > "$LOGS/suite-$2-passnames.txt"
+  echo "  top-level PASS/FAIL/SKIP name lines: $(grep -cE '^--- ' "$LOGS/suite-$2.log")"
+  echo "  --- PASS top=$(grep -c '^--- PASS' "$LOGS/suite-$2.log") --- FAIL top=$(grep -c '^--- FAIL' "$LOGS/suite-$2.log") --- SKIP top=$(grep -c '^--- SKIP' "$LOGS/suite-$2.log")"
+  echo "  sub-test PASS=$(grep -c '^    --- PASS' "$LOGS/suite-$2.log") SKIP=$(grep -c '^    --- SKIP' "$LOGS/suite-$2.log")"
+  echo "  TREE_DIR=$D"
+}
+
+build_tree 1ad48333 before
+echo "-----"
+build_tree "$(git rev-parse HEAD)" after
+echo "-----"
+comm -13 "$LOGS/suite-before-passnames.txt" "$LOGS/suite-after-passnames.txt" > "$LOGS/suite-added.txt"
+comm -23 "$LOGS/suite-before-passnames.txt" "$LOGS/suite-after-passnames.txt" > "$LOGS/suite-removed.txt"
+echo "name-set ADDED   = $(wc -l < "$LOGS/suite-added.txt")"; cat "$LOGS/suite-added.txt"
+echo "name-set REMOVED = $(wc -l < "$LOGS/suite-removed.txt")"; cat "$LOGS/suite-removed.txt"
+echo "the two 236 empty-id carriers, BEFORE tree:"
+grep -E 'Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID|Test236R2TaskCancelRefusesWhenHostGaveNoCallerID' "$LOGS/suite-before.log" | grep -E '^ *--- ' | head
+echo "the two 236 empty-id carriers, AFTER tree:"
+grep -E 'Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID|Test236R2TaskCancelRefusesWhenHostGaveNoCallerID' "$LOGS/suite-after.log" | grep -E '^ *--- ' | head

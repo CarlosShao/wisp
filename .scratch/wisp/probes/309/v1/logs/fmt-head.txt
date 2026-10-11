@@ -1,0 +1,11 @@
+HEAD-blob export dir=/tmp/wisp309v1-fmt.6UzvBo
+=== .go files in export (proves non-empty) ===
+651
+=== gofmt -l on HEAD blob, internal/tools ===
+tee: .scratch/wisp/probes/309/v1/logs/fmt-head-tools.txt: No such file or directory
+count=0
+=== gofmt -l on HEAD blob, widened internal cmd ===
+/usr/bin/bash: line 1: .scratch/wisp/probes/309/v1/logs/fmt-head-wide.txt: No such file or directory
+/usr/bin/bash: line 1: .scratch/wisp/probes/309/v1/logs/fmt-head-wide.txt: No such file or directory
+count=
+cat: .scratch/wisp/probes/309/v1/logs/fmt-head-wide.txt: No such file or directory

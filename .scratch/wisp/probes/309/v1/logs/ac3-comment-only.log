@@ -1,0 +1,31 @@
+########## (1) RULER the dispatch asked for: git diff -w --numstat ##########
+expectation in my brief was '0'. Measured value:
+32	3	internal/tools/bridge.go
+rc=0 >> -w cannot zero 29 net NEW comment lines: it only ignores whitespace inside changed lines.
+(reading: 32 added / 3 deleted == -w reports the same as --numstat; the 'expect 0' premise is wrong.)
+
+########## (2) every +/- line in the hunk is a Go comment line ##########
+changed lines total=35 ; lines that are NOT '//'-comment=0
+rc_of_grep_v(noncomment filter, 1 == nothing found)=1
+VERDICT ruler (2): ALL changed lines are comment lines
+
+########## (3) code-identity: strip full-line comments + blanks from both blobs, cmp ##########
+before code lines=768  after code lines=768
+cmp(code-only before,after): IDENTICAL -> zero code lines changed
+rc=0
+
+########## (4) whitespace-stripped cmp of the two blobs (as the brief asked) ##########
+cmp(no-whitespace blobs): DIFFER (expected: 29 net comment lines were ADDED, so identity here is NOT the right test)
+.scratch/wisp/probes/309/v1/logs/ac3-before-nosw.txt .scratch/wisp/probes/309/v1/logs/ac3-after-nosw.txt differ: byte 29474, line 1
+rc=1
+
+########## (5) the guard boolean expression itself, before vs after (the AC#0 'do not touch' line) ##########
+before: 925:	if b.injected || b.prov == nil || taskID == "" {
+after : 954:	if b.injected || b.prov == nil || taskID == "" {
+byte-identical attach branch:
+1
+1
+
+########## (6) worktree file == HEAD blob (nobody moved it since) ##########
+cb86eaa7053a0f00758d642c59a8f22b881bb606abe954e9a8c03ee2d4291167 *internal/tools/bridge.go
+cb86eaa7053a0f00758d642c59a8f22b881bb606abe954e9a8c03ee2d4291167 *-

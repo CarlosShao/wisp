@@ -1,0 +1,77 @@
+=== C1: 'if unbound {' sites in provenance.go (ticket correction cites :727 and :828) ===
+727:	if unbound {
+828:	if unbound {
+--- provenance.go last touched by:
+5e8748b3 2026-10-03 212-r1＋258-r1 编排者代笔收尾（两枚写腿死于服务错误/150 轮帽，按 A544 预授权代笔；AC 框零碰）
+
+=== C2: four-way same-shape roster (taskID == "" style guards) ===
+internal/memory/models.go:161:	if tc.TaskID == "" {
+internal/tools/bridge.go:642:	if b.prov == nil || dec.TaskID == "" || !risk.IsSensitiveSource(dec.Tool) {
+internal/tools/bridge.go:848:	if b.prov == nil || taskID == "" {
+internal/tools/bridge.go:904:	if b.prov == nil || taskID == "" {
+internal/tools/bridge.go:931:// The `taskID == ""` limb is on purpose, and it UNDER-REPORTS rather than refuses:
+internal/tools/bridge.go:952:	// `taskID == ""` here is deliberate and under-reports (R4 silently dropped for
+internal/tools/bridge.go:954:	if b.injected || b.prov == nil || taskID == "" {
+internal/tools/bridge.go:1132:	if b.j == nil || req.TaskID == "" {
+internal/tools/subagent_197.go:263:	if parentID == "" {
+internal/tools/subagent_197.go:474:	case parentID == "":
+internal/tools/task.go:216:	if r == nil || taskID == "" {
+internal/tools/task.go:225:		if o.ParentTaskID == "" {
+internal/tools/task.go:249:	if r == nil || taskID == "" {
+internal/tools/task.go:269:	if r == nil || taskID == "" {
+internal/tools/task.go:306:	if r == nil || taskID == "" {
+internal/tools/task.go:421:	if r == nil || taskID == "" || cancel == nil {
+internal/tools/task.go:448:	if r == nil || taskID == "" {
+internal/tools/task.go:709:	if caller == "" {
+internal/tools/task.go:726:	if rec.ParentTaskID == "" {
+internal/tools/task_backfill.go:109:	case taskID == "":
+cmd/wisp/resident_approval_windows.go:643:	if c.TaskID == "" || c.Reason == "" {
+cmd/wisp/run.go:969:	if rt == nil || taskID == "" {
+
+=== C3: ①bridge silent limb ===
+func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+	// `taskID == ""` here is deliberate and under-reports (R4 silently dropped for
+	// this call); see the doc block above and Test309AssessorForEmptyTaskIDDropsTaintDetector.
+	if b.injected || b.prov == nil || taskID == "" {
+		return b.assess
+	}
+=== C4: ②panel_assets self-naming ===
+	}
+	return out
+}
+
+// taintSourceScopeID is the C25 scope this command opens for its one card. In
+// the product the scope id is a task id owned by the agent loop (ticket 19's
+// DEFERRED(C25-loop-wiring) item 1); a CLI probe has no task, so it names one
+// and closes nothing - the engine lives and dies inside this process.
+//
+// Ticket 160 left that behavior exactly as written and changed what the code
+// has to admit: OpenScope now hands back the *Scope that owns the close, and
+// this call throws it away on purpose. What can no longer be written here is
+// closing somebody ELSE's scope - there is no by-id close left to reach for.
+// "Nobody ever closed this one" stays G5's job in
+// .scratch/wisp/probes/154/gate-clauses.sh, not the compiler's, which lets the
+=== C5: ③subagent_197 refuse ===
+	// minted per call (C18 routes approval replies by it), so it can no longer
+	// name a task; the roster is keyed by task ids.
+	parentID := TaskID(ctx)
+	if parentID == "" {
+		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，" +
+			"就没法登记父子关系，也没法把结论盖戳进父任务的 C25 作用域）", IsError: true}, nil
+	}
+	if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {
+		return Result{Text: fmt.Sprintf(
+			"拒绝派生：深度上限是 %d，而派生者 %s 自己就是一枚子代理（父 kind=%s）。"+
+				"子代理不许再派子代理。", MaxSubagentDepth, parentID, rec.Kind), IsError: true}, nil
+=== C6: ④task.go refuse ===
+	// id went per-call in ticket 242 and no longer names a task), so a model
+	// cannot name whose child it is by editing parameters. Same source
+	// task.spawn uses to fill in ParentTaskID, which is what makes the two
+	// sides agree by construction.
+	caller := TaskID(ctx)
+	if caller == "" {
+		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）", IsError: true}, nil
+	}
+	rec, known := t.d.Roster.Look(target)
+	if !known {
+		return Result{Text: fmt.Sprintf(

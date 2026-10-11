@@ -1,0 +1,27 @@
+=== subagent_197.go:581 (forwarding caller, 票 197's decorator) ===
+			Text: fmt.Sprintf("拒绝执行：子代理不能再派生子代理（深度上限 %d），"+
+				"task.spawn 也不在你的工具目录里。", MaxSubagentDepth),
+			IsError: true,
+		}, nil
+	}
+	return p.inner.Execute(ctx, req)
+}
+=== production .Execute( sites outside internal/agent (bridge dispatch) ===
+internal/agent/loop.go:760:		return l.opt.Tools.Execute(ctx, req)
+internal/agent/loop.go:764:	out, err := l.opt.Tools.Execute(tctx, req)
+internal/tools/bridge.go:545:	res, err := entry.Tool.Execute(ectx, req.Args, onUpdate)
+internal/tools/subagent_197.go:581:	return p.inner.Execute(ctx, req)
+
+=== gate-clauses.sh G1 clause (登记 want_n) ===
+1:# 票 154 AC#1 —— 触发门的读数生成器（可复算）。G1／G1b／G2／G3／G4 出自票 154；
+2:# G5（OpenScope↔CloseScope 成对普查）由票 158 r1 新增，其形状照 G1–G4，另带正控与负一负两腿。
+9:#   ① AC#2＝枚数进判据：新增 want_n <基线枚数>，pair 腿的响由「空／非空」变成「实测枚数 vs 基线枚数」；
+11:#     pair() 没拿到 want_n 就直接死（rc=4）——不让下一程新加一枚腿又把 AC#2 那枚洞开回去。
+17:#   ③ 票 171 r1 的形制一字未动：pair 腿仍然「实测 > 基线才 BAD」、拿不到 want_n 直接死（rc=4）。
+19:#   ① AC#7＝枚数进 run() 那一族腿：G1／G1b／G2／G3／G4 从此也登记 want_n（run 腿的枚数＝命中行数），
+35:#   ② 分子口径变了 ⇒ 十四腿的 want_n 基线在同一次改动里逐枚复算（票面 AC#8 那条"谁改口径就在同一格
+36:#     把 want_n 核下来，别留 SHR 当默认"的规矩）；ring/quiet 若因新分子换位，也一并现量重登。
+55:#   want_n <枚数>                   —— 紧跟 want 登记【基线枚数】。票 171 AC#2 时它只管 pair 腿
+81:LEGS_EXPECT='G1 G1b G2 G3 G4 G5 G5pos G5neg G6 G6pos G6neg G7 G7pos G7neg'
+111:# want_n（票 171 AC#2，票 171 AC#7 起两族腿都管）：基线枚数。放在 want 之后、腿之前＝「开跑前先登记」这条没破。
+115:want_n() { # $1 基线枚数

@@ -1,0 +1,35 @@
+- // revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
++ // revoke, which the TEXT loop already defers (in internal/agent/loop.go the
++ // "defer revokeAdmission()" line that runs right after the AdmitTask hook), so a
+- // mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
++ // mints itself (Run/RunAsync -> newTaskID: RunAsync's "id := newTaskID()" and
++ // Run's "return l.run(ctx, newTaskID(), input)", both in internal/agent/loop.go).
+- // Today no production code dispatches on the bridge except loop.go, so being
++ // As measured today (a present count, not a permanent promise): no production code
++ // dispatches on the bridge except loop.go. Ruler: grep -rn 'ToolRequest{' internal
++ // cmd --include=*.go minus _test.go yields the single internal/agent/loop.go point;
++ // Test309ToolRequestProductionConstructionNail pins points outside internal/agent to
++ // 0. So being
++ //
++ // The `taskID == ""` limb is on purpose, and it UNDER-REPORTS rather than refuses:
++ // an empty task id falls through to `return b.assess`, which holds no TaintDetector,
++ // so ruleTaint short-circuits on its `if ctx.taint == nil` guard
++ // (internal/risk/rules_gateway.go) and the R4 branch never fires for that call - no
++ // error, no trace. Every other gate still runs; only R4 is dropped, silently.
++ //
++ // Two things keep that sentence honest, both checkable now:
++ //   - No production caller reaches the limb today. Dispatch funnels through the one
++ //     `newTaskID()` construction point in internal/agent/loop.go (id 36 chars, never
++ //     empty); Test309ToolRequestProductionConstructionNail pins `agent.ToolRequest{`
++ //     construction points outside internal/agent to 0.
++ //   - Removing the limb to look stricter is not correctness: scopeMarks in
++ //     internal/risk/provenance.go fail-closes an unregistered scope to R4 whenever a
++ //     DIFFERENT scope still holds marks, so with the limb gone an empty id trades this
++ //     silent under-report for a conditional false-positive storm, not for a check.
++ //
++ // Who rings if this limb's shape changes is Test309AssessorForEmptyTaskIDDropsTaintDetector:
++ // it fails if a weakened guard attaches the detector for the empty id, and fails if the
++ // attach branch stops attaching the detector for a real id. The compiler guards nothing
++ // here - that test is the only instrument, and this comment states the debt, not a guarantee.
++ // `taskID == ""` here is deliberate and under-reports (R4 silently dropped for
++ // this call); see the doc block above and Test309AssessorForEmptyTaskIDDropsTaintDetector.

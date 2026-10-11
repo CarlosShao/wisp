@@ -1,0 +1,55 @@
+#!/bin/sh
+# 309-v1 AC#1 teeth rig. Transient mutations of internal/tools/bridge.go ONLY.
+# Restore is unconditional via trap; byte-identity proven by cmp + sha256sum.
+# Run from repo root: sh .scratch/wisp/probes/309/v1/logs/mut-rig.txt
+REPO=$(pwd)
+BR=internal/tools/bridge.go
+LOGS=.scratch/wisp/probes/309/v1/logs
+PRIST=$LOGS/bridge.go.pristine
+T=Test309AssessorForEmptyTaskIDDropsTaintDetector
+
+restore() {
+  cp "$PRIST" "$BR"
+  if cmp -s "$PRIST" "$BR"; then echo "RESTORE cmp: byte-identical OK"; else echo "RESTORE cmp: MISMATCH ***"; fi
+  sha256sum "$BR" "$PRIST"
+  cd "$REPO" 2>/dev/null
+}
+trap restore EXIT
+
+say() { echo; echo "########## $* ##########"; }
+
+say "BASELINE (pristine, no mutation) -> expect GREEN"
+GOFLAGS= go test ./internal/tools/ -run "$T" -v > "$LOGS/mut-0-pristine.log" 2>&1
+rc=$?; echo "rc=$rc" | tee -a "$LOGS/mut-0-pristine.log"; sed -n '1,40p' "$LOGS/mut-0-pristine.log"
+
+say "MUT-A: pull the '|| taskID == \"\"' limb -> expect RED on the empty-id leg"
+perl -i -pe 's/b\.injected \|\| b\.prov == nil \|\| taskID == ""/b.injected || b.prov == nil/' "$BR"
+echo "--- landed? guard line now reads:"; grep -n 'if b.injected' "$BR"
+GOFLAGS= go test ./internal/tools/ -run "$T" -v > "$LOGS/mut-a.log" 2>&1
+rc=$?; echo "rc=$rc" | tee -a "$LOGS/mut-a.log"; sed -n '1,60p' "$LOGS/mut-a.log"
+restore
+
+say "MUT-B: detector not attached (WithTaintDetector(nil)) -> expect RED on the non-empty leg"
+perl -i -pe 's/WithTaintDetector\(b\.prov\.Detector\(taskID\)\)/WithTaintDetector(nil)/' "$BR"
+echo "--- landed? attach line now reads:"; grep -n 'WithTaintDetector' "$BR"
+GOFLAGS= go test ./internal/tools/ -run "$T" -v > "$LOGS/mut-b.log" 2>&1
+rc=$?; echo "rc=$rc" | tee -a "$LOGS/mut-b.log"; sed -n '1,60p' "$LOGS/mut-b.log"
+restore
+
+say "MUT-C: whole guard switched off (if false) -> expect RED on the empty-id leg"
+perl -i -pe 's/if b\.injected \|\| b\.prov == nil \|\| taskID == "" \{/if false \{/' "$BR"
+echo "--- landed? guard line now reads:"; grep -n 'if false {\|if b.injected' "$BR"
+GOFLAGS= go test ./internal/tools/ -run "$T" -v > "$LOGS/mut-c.log" 2>&1
+rc=$?; echo "rc=$rc" | tee -a "$LOGS/mut-c.log"; sed -n '1,60p' "$LOGS/mut-c.log"
+restore
+
+say "MUT-D: limb inverted (taskID != \"\") -> expect RED on the non-empty leg (also teeth)"
+perl -i -pe 's/b\.injected \|\| b\.prov == nil \|\| taskID == ""/b.injected || b.prov == nil || taskID != ""/' "$BR"
+echo "--- landed? guard line now reads:"; grep -n 'if b.injected' "$BR"
+GOFLAGS= go test ./internal/tools/ -run "$T" -v > "$LOGS/mut-d.log" 2>&1
+rc=$?; echo "rc=$rc" | tee -a "$LOGS/mut-d.log"; sed -n '1,60p' "$LOGS/mut-d.log"
+restore
+
+say "FINAL STATE"
+git status --porcelain -- "$BR"; echo "porcelain rows for bridge.go above (empty == clean)"
+git diff --stat -- "$BR"

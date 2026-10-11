@@ -1,0 +1,35 @@
+#!/bin/sh
+# 309-v1 AC#1 teeth rig, part 2: the two limbs the delivered instrument does NOT name.
+# Q: is the instrument blind to mutations of `b.prov == nil` and `b.injected`?
+# Restore unconditional via trap; byte-identity proven by cmp + sha256sum.
+REPO=$(pwd)
+BR=internal/tools/bridge.go
+LOGS=.scratch/wisp/probes/309/v1/logs
+PRIST=$LOGS/bridge.go.pristine
+T=Test309AssessorForEmptyTaskIDDropsTaintDetector
+
+restore() {
+  cp "$PRIST" "$BR"
+  if cmp -s "$PRIST" "$BR"; then echo "RESTORE cmp: byte-identical OK"; else echo "RESTORE cmp: MISMATCH ***"; fi
+  sha256sum "$BR" "$PRIST"
+}
+trap restore EXIT
+
+say() { echo; echo "########## $* ##########"; }
+
+say "MUT-E: drop the 'b.prov == nil' limb (fixture has prov != nil) -> prediction: instrument STAYS GREEN (blind)"
+perl -i -pe 's/b\.injected \|\| b\.prov == nil \|\| taskID == ""/b.injected || taskID == ""/' "$BR"
+echo "--- landed? guard line now reads:"; grep -n 'if b.injected' "$BR"
+GOFLAGS= go test ./internal/tools/ -run "$T" -v > "$LOGS/mut-e.log" 2>&1
+echo "rc=$?" | tee -a "$LOGS/mut-e.log"; sed -n '1,30p' "$LOGS/mut-e.log"
+restore
+
+say "MUT-F: drop the 'b.injected' limb (fixture has injected == false) -> prediction: instrument STAYS GREEN (blind)"
+perl -i -pe 's/b\.injected \|\| b\.prov == nil \|\| taskID == ""/b.prov == nil || taskID == ""/' "$BR"
+echo "--- landed? guard line now reads:"; grep -n 'if b.injected\|if b.prov' "$BR"
+GOFLAGS= go test ./internal/tools/ -run "$T" -v > "$LOGS/mut-f.log" 2>&1
+echo "rc=$?" | tee -a "$LOGS/mut-f.log"; sed -n '1,30p' "$LOGS/mut-f.log"
+restore
+
+say "FINAL STATE"
+git status --porcelain -- "$BR"; echo "(empty == clean)"
