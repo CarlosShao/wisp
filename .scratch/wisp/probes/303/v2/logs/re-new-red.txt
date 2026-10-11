@@ -1,0 +1,8 @@
+# 303-v2 自取证：AC#3b 需求③「整包名册改前/改后各两发同台面取交集」的新增红
+# 尺（本腿自跑，非 go test，只对腿件 303-v1 的原始 stdout 逐发红名册 names-*.txt 做 comm）：
+#   comm -13 <(sort re-before-intersect) <(sort re-after-intersect)
+# 台面：仓外干净 clone ~/wisp-303-v1（303-v1 的四发全在此 clone，只差一次 git checkout --detach）
+# 读数：新增红 = 0 枚 ⇒ 本文件名册正文为空（空集＝判语「稳定新增红 0 枚」成立的形状）。
+#       为不交 0 字节件（门禁尺 find -type f -size 0），本头注释即"正文空＝0 枚"的自证。
+# 被这把交集尺藏住的单发红（必具名报出、⛔ 归本票修复）见 re-after-single-shot-red.txt：
+#   TestTicket223HandEditedFsLooseningCostsAnL2Card（只在 after-1 红，4 发里 1 发；FS/L2 时序一族）

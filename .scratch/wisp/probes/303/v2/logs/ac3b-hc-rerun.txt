@@ -1,0 +1,39 @@
+### 区间端点存在性: cf46c24a(改前父) e3341368+807497c1(修复两笔)
+cf46c24a cf46c24a
+e3341368 e3341368
+807497c1 807497c1
+### HC① 零删行: git diff cf46c24a 807497c1 | grep -c '^-[^-]'
+0
+### HC①/④ 名册: git diff --name-only cf46c24a 807497c1
+.scratch/wisp/probes/303/r1/31-package-after.txt
+.scratch/wisp/probes/303/r1/40-transport-after.txt
+.scratch/wisp/probes/303/r1/42-ac3-fix-rationale.md
+.scratch/wisp/probes/303/r1/50-revert-red.txt
+.scratch/wisp/probes/303/r1/51-restore-green.txt
+.scratch/wisp/probes/303/r1/52-restore-analysis-and-topback.md
+.scratch/wisp/probes/303/r1/60-gates-vet-gofmt.txt
+.scratch/wisp/probes/303/r1/61-gates-d22scan.txt
+.scratch/wisp/probes/303/r1/99-final-anchor.md
+.scratch/wisp/probes/303/r1/msg-ac3.txt
+cmd/wisp/panel_host_windows.go
+### HC① 唯一产码文件 numstat: git show --numstat --format= e3341368 (非.scratch那枚)
+2104	0	.scratch/wisp/probes/303/r1/31-package-after.txt
+2	0	.scratch/wisp/probes/303/r1/40-transport-after.txt
+23	0	.scratch/wisp/probes/303/r1/42-ac3-fix-rationale.md
+27	0	.scratch/wisp/probes/303/r1/50-revert-red.txt
+29	0	.scratch/wisp/probes/303/r1/51-restore-green.txt
+24	0	.scratch/wisp/probes/303/r1/52-restore-analysis-and-topback.md
+9	0	.scratch/wisp/probes/303/r1/60-gates-vet-gofmt.txt
+252	0	.scratch/wisp/probes/303/r1/61-gates-d22scan.txt
+24	0	.scratch/wisp/probes/303/r1/msg-ac3.txt
+27	0	cmd/wisp/panel_host_windows.go
+### HC③ scripts/portable-tests.sh 在该区间零字节?
+0
+### HC③ internal/observe/thresholds.go 该区间零字节?
+0
+### AC#3/AC#3b 承重: 判据本体测试件从 cc315261..HEAD 改动枚数(应0)
+cmd/wisp/panel_resident_windows_test.go=0
+cmd/wisp/panel_host_windows_test.go=0
+### HC② diff 里 t.Skip/SKIP/budget/1500/thresholds 命中(应0)
+0
+rc=1

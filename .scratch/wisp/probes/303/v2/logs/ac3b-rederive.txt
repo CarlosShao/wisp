@@ -1,0 +1,12 @@
+re-before-intersect=18
+re-after-intersect=16
+re-new-red=0
+re-fixed-red=2
+re-after-single-shot-red=1
+--- re-new-red 内容 ---
+--- re-fixed-red 内容 ---
+TestAC14AwaitedBindingReplyReachesThePage
+TestPanelHostRealWindowHopAndLifecycle
+--- re-after-single-shot-red 内容 ---
+TestTicket223HandEditedFsLooseningCostsAnL2Card
+rc=0
