@@ -1,0 +1,367 @@
+//go:build windows
+
+package risk
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+// Ticket 72: the A-tier verdict must not depend on the spelling a path
+// arrived in (R17 invariant). These cases sit NEXT TO
+// pathresolver_junction_windows_test.go, which is the failing instrument.
+// Ticket 308 does not edit that junction file's fixtures here: read its
+// expected values, anchors and build tags as the measurement, not as a frozen
+// guarantee -- commit f278c57f (ticket 72 甲族 #5/#6/#7) already changed that
+// file (+36 -7), so "deliberately left byte-for-byte untouched" was a claim
+// that stopped holding the moment that commit landed.
+//
+// Nothing here needs 8.3 short names, admin rights or a CI environment to
+// reproduce the defect: the runner's RUNNER~1-vs-runneradmin discrepancy is
+// the general shape "anchor spelling != handle-resolved spelling", and a
+// junction as the profile spelling produces that shape on any volume.
+
+// namesSameFile answers the ONE question about spelling a ticket-72 case is
+// allowed to ask: do these two strings name the same file? The answer comes
+// from the package's own form family (formsOf, i.e. the handle pipeline), so
+// it is true on a volume that generates 8.3 names and on one that does not --
+// unlike strings.EqualFold against a path the test joined itself, which pinned
+// whichever spelling t.TempDir() happened to hand back (甲族 #1/#4/#5/#6: the
+// expectation side was the bug, the resolver's long expanded answer was right).
+//
+// Ticket 72 invariant: a verdict (and a premise, which is a verdict about the
+// fixture) may not depend on spelling. real == "" means this side cannot be
+// proven expanded, which is never "same file".
+func namesSameFile(a, b string) bool {
+	fa, fb := formsOf(a), formsOf(b)
+	return fa.real != "" && fb.real != "" && strings.EqualFold(fa.real, fb.real)
+}
+
+// TestClassifyAnchorSpellingIsNotVerdict seeds a real profile tree, points
+// USERPROFILE at it through a junction (so the anchor's spelling is not the
+// handle's spelling), and classifies the handle-resolved canonical. Every A
+// rule must still win. Pre-fix, all four of these degrade: ~/.ssh/** to B
+// (id_*), ~/.git-credentials, ~/.aws/credentials and ~/.kube/config to
+// ClassNone (Allow, no confirm at all).
+func TestClassifyAnchorSpellingIsNotVerdict(t *testing.T) {
+	root := t.TempDir()
+	profile := filepath.Join(root, "profile")
+	alias := filepath.Join(root, "alias")
+	if err := os.MkdirAll(profile, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	mkJunction(t, alias, profile)
+
+	t.Setenv("USERPROFILE", alias)
+	t.Setenv("HOME", alias)
+	t.Setenv("APPDATA", filepath.Join(alias, "AppData", "Roaming"))
+	t.Setenv("LOCALAPPDATA", filepath.Join(alias, "AppData", "Local"))
+
+	targets := []string{
+		filepath.Join(".ssh", "id_testkey"), // ~/.ssh/** (prefix rule) AND id_*
+		".git-credentials",                  // exact rule
+		filepath.Join(".aws", "credentials"),
+		filepath.Join(".kube", "config"),
+	}
+	for _, rel := range targets {
+		p := filepath.Join(profile, rel)
+		mustWrite(t, p, "secret")
+		res, err := Resolve(p, nil)
+		if err != nil {
+			t.Fatalf("Resolve(%q): %v", p, err)
+		}
+		// Premise, restated in the shape the ticket-72 invariant demands. It
+		// used to be strings.EqualFold(res.Canonical, p): a comparison against
+		// the spelling THIS test joined from t.TempDir(), which on a volume
+		// with 8.3 generation aborts here with the resolver having answered
+		// correctly (the long form), so Classify and Gate below were never
+		// reached on the aliased surface. Same file, decided by the handle
+		// pipeline instead of by a string, keeps the premise a premise -- and
+		// it still fails closed (t.Fatalf) when the candidate is not the real
+		// path, which is what AC#3 (1) names as this case's mutation target.
+		if !namesSameFile(res.Canonical, p) {
+			t.Fatalf("Resolve(%q) canonical %q: test premise broken (candidate must be the real path)", p, res.Canonical)
+		}
+		if got := Classify(res.Canonical); got != ClassA {
+			t.Errorf("A-list miss for %q: canonical %q classified %v under USERPROFILE=%q, want ClassA",
+				rel, res.Canonical, got, alias)
+		}
+		if d := Gate(res.Canonical, nil); d.Allow || d.NeedL2 {
+			t.Errorf("A-list %q through a junction-spelled anchor became approvable: %+v", rel, d)
+		}
+	}
+}
+
+// TestClassifySpellingInvariance states the invariant directly: one and the
+// same file, classified through every spelling the OS accepts, yields one
+// class. The 8.3 spelling is only folded in when this volume generates short
+// names (same probe the ticket-18 case uses); every other spelling is
+// unconditional, so the test never quietly stops measuring.
+func TestClassifySpellingInvariance(t *testing.T) {
+	home := tmpHome(t)
+	long := filepath.Join(home, ".ssh", "id_testkey")
+
+	// ticket 308 guard: the drive letter is taken through driveShare, never an
+	// inline vol[:1]. On a volume-less temp the two UNC spellings cannot be
+	// built, so volumeInvariantSpellings drops them BY NAME and the remaining
+	// seven volume-free spellings still run -- the case ends with a verdict, it
+	// does NOT panic the binary and does NOT t.Skip (AC#1; the old inline
+	// strings.ToLower(vol[:1]) panicked "slice bounds out of range [:1] with
+	// length 0" and took every other case in the package's evaluation with it).
+	spellings, dropped := volumeInvariantSpellings(home, long)
+	if len(dropped) > 0 {
+		t.Logf("ticket 308: filepath.VolumeName(%q) has no drive letter; dropped the two volume-derived spellings by name %v; %d volume-free spellings still evaluated", long, dropped, len(spellings))
+	}
+	if s := getShortPath(t, filepath.Join(home, ".ssh", "id_testkey")); s != "" {
+		spellings["8.3-short"] = s
+	}
+	for name, sp := range spellings {
+		cands := []string{sp}
+		if res, err := Resolve(sp, nil); err == nil {
+			cands = append(cands, res.Canonical)
+		}
+		for _, c := range cands {
+			if got := Classify(c); got != ClassA {
+				t.Errorf("spelling %s: %q classified %v, want ClassA (classification may not depend on spelling)", name, c, got)
+			}
+		}
+	}
+	// Control in the same shape: a non-listed file must stay ClassNone under
+	// both spellings, or the loop above would only be proving "everything is A".
+	for _, sp := range []string{
+		filepath.Join(home, "plain.txt"),
+		strings.ToUpper(filepath.Join(home, "plain.txt")),
+		filepath.Join(home, "no-such-dir", "notes.txt"),
+	} {
+		if got := Classify(sp); got != ClassNone {
+			t.Errorf("control %q classified %v, want ClassNone", sp, got)
+		}
+	}
+}
+
+// TestCanonicalInputGainsNoSecondForm bounds the blast radius of ticket 72.
+// It used to read "formsOf(Resolve(p)) yields exactly one comparison form",
+// a count hard-coded to 1 -- and on a volume that generates 8.3 names the
+// path Resolve returns for a NOT-YET-EXISTING leaf is still spelled with the
+// short form of its ancestors (Resolve expands what it can open), so that
+// path genuinely has two spellings and the count was the wrong question: the
+// resolver was right, the expectation was the bug.
+//
+// What this case pins now is the sentence AC#5 was actually promising, in the
+// shape the invariant allows: for the paths Resolve hands to every production
+// caller the verdict is the pre-ticket-72 verdict (.ssh/** and
+// .git-credentials still A, everything here still None), and it is that
+// verdict under EVERY comparison form the path has, 1 or 2. certain() stays
+// exactly as it was. See probes/72/r1/10-class-a-expected-side.md (section #2,
+// TestCanonicalInputGainsNoSecondForm) for why the
+// count itself is no longer assertable without either a production change
+// (make Resolve expand missing leaves: out of ticket 72's scope, it feeds
+// Actable/syncdirs/internal-tools) or a test-side oracle that would be
+// formsOf wearing a different hat.
+func TestCanonicalInputGainsNoSecondForm(t *testing.T) {
+	home := tmpHome(t)
+	for _, tc := range []struct {
+		path string
+		want Class
+	}{
+		{filepath.Join(home, ".ssh", "id_testkey"), ClassA},
+		{filepath.Join(home, ".git-credentials"), ClassA},
+		{filepath.Join(home, "plain.txt"), ClassNone},
+		{home, ClassNone},
+		{filepath.Join(home, "not-created-yet", "deep.txt"), ClassNone},
+	} {
+		res, err := Resolve(tc.path, nil)
+		if err != nil {
+			t.Fatalf("Resolve(%q): %v", tc.path, err)
+		}
+		f := formsOf(res.Canonical)
+		fs := f.spellings()
+		if len(fs) == 0 {
+			t.Fatalf("canonical %q produced no comparison form at all", res.Canonical)
+		}
+		if !f.certain() {
+			t.Errorf("canonical %q is not certain: root=%q real=%q partial=%v", res.Canonical, f.root, f.real, f.partial)
+		}
+		if got := Classify(fs[0]); got != tc.want {
+			t.Errorf("canonical %q: form %q classified %v, want %v (this ticket may not move a verdict)", res.Canonical, fs[0], got, tc.want)
+		}
+		// The same verdict from every form, or the blast radius is not bounded.
+		for _, sp := range fs[1:] {
+			if got := Classify(sp); got != tc.want {
+				t.Errorf("canonical %q: forms %q and %q classify differently (%v vs %v, want %v): the verdict may not depend on spelling",
+					res.Canonical, fs[0], sp, Classify(fs[0]), got, tc.want)
+			}
+			base := Gate(fs[0], nil)
+			d := Gate(sp, nil)
+			if d.Allow != base.Allow || d.NeedL2 != base.NeedL2 || d.Class != base.Class {
+				t.Errorf("canonical %q: forms %q and %q gate differently (%+v vs %+v)", res.Canonical, fs[0], sp, base, d)
+			}
+		}
+	}
+}
+
+// TestOverrideOnlyAcceptsTheResolvedForm pins the asymmetry the deny side does
+// NOT share (编排者插单 2026-09-21 10:08): classification may walk every
+// spelling because a miss there downgrades A to B, but a B-tier single-file
+// override is an ALLOW and may only be satisfied by the one form the OS
+// vouches for. The alias here is a junction, i.e. exactly the "one spelling,
+// two files" shape an 8.3 short name can take on a busy volume.
+//
+// Its mutation ("let the override walk all forms again") must go red on the
+// first assertion below.
+func TestOverrideOnlyAcceptsTheResolvedForm(t *testing.T) {
+	root := t.TempDir()
+	profile := filepath.Join(root, "profile")
+	alias := filepath.Join(root, "alias")
+	mustWrite(t, filepath.Join(profile, "proj", "id_demo.txt"), "secret")
+	mkJunction(t, alias, profile)
+
+	res, err := Resolve(filepath.Join(profile, "proj", "id_demo.txt"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	canonical := res.Canonical                              // the resolved spelling
+	viaAlias := filepath.Join(alias, "proj", "id_demo.txt") // a second spelling of it
+	if strings.EqualFold(canonical, viaAlias) {
+		t.Fatalf("test premise broken: alias %q must be spelled differently from %q", viaAlias, canonical)
+	}
+	if got := Classify(viaAlias); got != ClassB {
+		t.Fatalf("alias spelling classified %v, want ClassB (premise)", got)
+	}
+
+	// (1) the override was granted for the ALIAS spelling itself: not a form
+	// the OS vouches for, so it must not unlock anything.
+	if d := Gate(viaAlias, map[string]bool{strings.ToLower(viaAlias): true}); d.Allow {
+		t.Errorf("override recorded on a non-resolved spelling unlocked the file: %+v", d)
+	}
+	// (2) an override recorded for the resolved path, asked through a
+	// different spelling: confirm again, do not wave it through on a string.
+	if d := Gate(viaAlias, map[string]bool{strings.ToLower(canonical): true}); d.Allow {
+		t.Errorf("non-canonical spelling was allowed on the strength of a canonical override: %+v", d)
+	}
+	// (3) the reverse: the canonical path presented with an override recorded
+	// against some other spelling stays denied.
+	if d := Gate(canonical, map[string]bool{strings.ToLower(viaAlias): true}); d.Allow {
+		t.Errorf("canonical path unlocked by an override for a different spelling: %+v", d)
+	}
+	// (4) control, so this is a rule and not a blanket deny: canonical override
+	// + canonical path is exactly the L2-confirmed single file the tier allows.
+	d := Gate(canonical, map[string]bool{strings.ToLower(canonical): true})
+	if !d.Allow || d.Class != ClassB {
+		t.Fatalf("canonical override for the canonical path must allow: %+v", d)
+	}
+}
+
+// TestAListWinsWhereBothTablesHit is AC#3's A∩B shape: one path that matches
+// an A rule and a B rule at once must classify A, and B's single-file
+// override must not unlock it. The control proves the A verdict comes from the
+// anchor and not from the whole tree being denied.
+func TestAListWinsWhereBothTablesHit(t *testing.T) {
+	home := tmpHome(t)
+	both := []string{
+		filepath.Join(home, ".ssh", "id_bothkey"),            // ~/.ssh/**  +  id_*
+		filepath.Join(home, ".ssh", "prod-credentials.json"), // ~/.ssh/**  +  *credentials*.json
+		filepath.Join(home, ".ssh", "deep", "server.pem"),    // ~/.ssh/**  +  *.pem
+	}
+	for _, p := range both {
+		mustWrite(t, p, "secret")
+		res, err := Resolve(p, nil)
+		if err != nil {
+			t.Fatalf("Resolve(%q): %v", p, err)
+		}
+		for _, sp := range []string{p, res.Canonical} {
+			if got := Classify(sp); got != ClassA {
+				t.Fatalf("%q classified %v, want ClassA (A must win wherever both tables hit)", sp, got)
+			}
+			d := Gate(sp, map[string]bool{strings.ToLower(sp): true})
+			if d.Allow || d.NeedL2 {
+				t.Fatalf("A-list override attempt succeeded for %q: %+v", sp, d)
+			}
+			if d.Class != ClassA {
+				t.Fatalf("%q decision lost its A class: %+v", sp, d)
+			}
+		}
+	}
+
+	// Control: the very same B patterns outside the A tree stay B (approvable
+	// after one L2 confirm), and an ordinary file stays ClassNone.
+	//
+	// The override is now asked the way production asks it (internal/tools
+	// mode.go: confirmations -> Canonicalize -> risk.Gate): the file exists,
+	// and the spelling handed to Gate -- and recorded as the key -- is the ONE
+	// form the OS vouches for. The old control keyed the override on the
+	// string tmpHome(t) had joined, which on an aliased volume is the 8.3
+	// short form; overrideApplies deliberately refuses to unlock anything that
+	// is not the handle-resolved spelling (编排者插单 10:08: an ALLOW rests on
+	// a narrower basis than a DENY), so the control was failing for a spelling
+	// reason while asserting nothing about the rule. Deleting this control is
+	// not an option either -- it is the only proof that the narrow rule is a
+	// rule and not a blanket deny (see TestOverrideOnlyAcceptsTheResolvedForm
+	// assertion (4)).
+	out := filepath.Join(home, "proj", "id_bothkey")
+	mustWrite(t, out, "secret")
+	resOut, err := Resolve(out, nil)
+	if err != nil {
+		t.Fatalf("Resolve(%q): %v", out, err)
+	}
+	if got := Classify(out); got != ClassB {
+		t.Fatalf("B-only control %q classified %v, want ClassB", out, got)
+	}
+	if d := Gate(resOut.Canonical, map[string]bool{strings.ToLower(resOut.Canonical): true}); !d.Allow {
+		t.Fatalf("B-only control must stay overridable by design: %+v", d)
+	}
+	if got := Classify(filepath.Join(home, "proj", "main.go")); got != ClassNone {
+		t.Fatalf("ordinary file classified %v, want ClassNone", got)
+	}
+}
+
+// TestClassifyFailClosedWhenSpellingUnprovable covers R17's other half: when a
+// side cannot be PROVEN expanded, the answer is A, never "looks clean". The
+// instrument is a dangling junction — it exists (Lstat sees the reparse
+// point) but refuses to open (its target is gone), so no handle can tell us
+// what the path routed through it really is called.
+func TestClassifyFailClosedWhenSpellingUnprovable(t *testing.T) {
+	home := tmpHome(t)
+	dangling := filepath.Join(home, "dangling")
+	target := filepath.Join(home, "dangling-target")
+	mustWrite(t, filepath.Join(target, "here.txt"), "x")
+	mkJunction(t, dangling, target)
+	if err := os.RemoveAll(target); err != nil {
+		t.Fatalf("orphan the junction: %v", err)
+	}
+	if _, err := os.Lstat(dangling); err != nil {
+		t.Fatalf("junction must still be there for the walk to be fooled: %v", err)
+	}
+	if _, ok := resolveHandle(dangling); ok {
+		t.Fatal("test premise broken: a junction whose target is gone must not yield a handle real path")
+	}
+	if _, err := Resolve(dangling, nil); err == nil {
+		t.Fatal("test premise broken: Resolve must still refuse the reparse traversal by default")
+	}
+
+	cand := filepath.Join(dangling, "sub", "anything.txt")
+	if got := Classify(cand); got != ClassA {
+		t.Fatalf("%q classified %v, want ClassA: an unprovable expansion may not fail open", cand, got)
+	}
+	d := Gate(cand, map[string]bool{strings.ToLower(cand): true})
+	if d.Allow || d.NeedL2 || d.Class != ClassA {
+		t.Fatalf("unprovable path became approvable through the gate: %+v", d)
+	}
+
+	// Controls: the same volume, fully explicable paths, keep their classes.
+	for _, tc := range []struct {
+		path string
+		want Class
+	}{
+		{filepath.Join(home, "plain.txt"), ClassNone},
+		{filepath.Join(home, "no-such-dir", "notes.txt"), ClassNone},
+		{filepath.Join(home, "proj", "id_testkey"), ClassB},
+		{filepath.Join(home, ".ssh", "id_testkey"), ClassA},
+	} {
+		if got := Classify(tc.path); got != tc.want {
+			t.Errorf("control %q classified %v, want %v", tc.path, got, tc.want)
+		}
+	}
+}

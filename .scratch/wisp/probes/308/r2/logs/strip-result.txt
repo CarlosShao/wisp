@@ -1,0 +1,4 @@
+STRIP-CMP pathresolver_anchor_spelling_windows_test.go : IDENTICAL (rc=0)
+   code-only lines head=251 work=251 | md5 head=fb351a9cf96b689864b1a2a3fb0f461b work=fb351a9cf96b689864b1a2a3fb0f461b
+STRIP-CMP pathresolver_volumeless_spelling_308_test.go : IDENTICAL (rc=0)
+   code-only lines head=78 work=78 | md5 head=c113a6ec09dd0dca7b567aeeaffcc9a4 work=c113a6ec09dd0dca7b567aeeaffcc9a4

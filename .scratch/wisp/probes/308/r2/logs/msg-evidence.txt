@@ -1,0 +1,16 @@
+308-r2: evidence for the three comment fixes (denominators, strip-cmp, gates)
+
+Artefacts in .scratch/wisp/probes/308/r2:
+- 00-anchor.md was the anchor commit; this adds 10-three-sentences.md (old
+  sentence -> new sentence -> the ruler and reading behind each claim, plus the
+  two figures in the accepted proposal I could not reproduce),
+  20-proof-code-unchanged.md (strip-comments cmp IDENTICAL, diff -U0, numstat,
+  production sha256) and 30-gates.md (four gates, format rosters on two
+  surfaces with CR counts, full-package name roster diff before/after).
+- logs/: before run taken in an out-of-repo git archive tree of 202ed4a5
+  (995 go files, go.mod/go.sum present), alias-surface run, out-of-repo
+  denominator probe output, d22scan three readings plus an isolated-tree scan,
+  strip artefacts, rc lines for every gate.
+
+No new .go file inside the repository: the denominator probe lives only in an
+out-of-repo export tree.

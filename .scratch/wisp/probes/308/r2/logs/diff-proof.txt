@@ -1,0 +1,63 @@
+=== git diff --numstat (worktree vs HEAD) ===
+26	6	internal/risk/pathresolver_anchor_spelling_windows_test.go
+9	1	internal/risk/pathresolver_volumeless_spelling_308_test.go
+
+=== changed lines that are NOT whole-line comments (expect 0) ===
+pathresolver_anchor_spelling_windows_test.go: non-comment changed lines = 0
+pathresolver_volumeless_spelling_308_test.go: non-comment changed lines = 0
+
+=== git diff -U0 head/tail of hunks ===
+diff --git a/internal/risk/pathresolver_anchor_spelling_windows_test.go b/internal/risk/pathresolver_anchor_spelling_windows_test.go
+index 52c8fd44..708fe6af 100644
+--- a/internal/risk/pathresolver_anchor_spelling_windows_test.go
++++ b/internal/risk/pathresolver_anchor_spelling_windows_test.go
+@@ -100,2 +100,13 @@ func TestClassifyAnchorSpellingIsNotVerdict(t *testing.T) {
+-// names (same probe the ticket-18 case uses); every other spelling is
+-// unconditional, so the test never quietly stops measuring.
++// names (same probe the ticket-18 case uses). Since ticket 308 the two UNC
++// spellings are conditional too: driveShare reports no drive letter on a
++// volume-less path, volumeInvariantSpellings drops those two BY NAME, and this
++// case logs the kept count and the dropped names when that happens. The
++// denominator measured here is therefore 9 spellings on a volume-qualified
++// temp, 10 when the 8.3 slot fills -- measured 2026-10-11 on both reachable
++// temp surfaces (default temp and the 8.3 alias temp, both volume-qualified;
++// probes/308/r2/logs/probe-denominator*.txt). The volume-less figure, 7, is
++// measured on the INPUT face by TestVolumeInvariantSpellingsVolumeLess308,
++// never by an env shape; on that input the 8.3 slot measures empty too
++// (getShortPath returned "" in the same probe run), so it is 7, not 8.
++// "Never quietly stops measuring" holds because a drop is NAMED and LOGGED,
++// not because the spellings are unconditional.
+@@ -107,4 +118,5 @@ func TestClassifySpellingInvariance(t *testing.T) {
+-	// inline vol[:1]. On a volume-less temp the two UNC spellings cannot be
+-	// built, so volumeInvariantSpellings drops them BY NAME and the remaining
+-	// seven volume-free spellings still run -- the case ends with a verdict, it
+-	// does NOT panic the binary and does NOT t.Skip (AC#1; the old inline
++	// inline vol[:1]. What is pinned, and where: volumeInvariantSpellings, fed a
++	// volume-less literal as INPUT, returns instead of panicking, drops the two
++	// UNC spellings BY NAME and keeps the seven volume-free spellings in the map
++	// -- TestVolumeInvariantSpellingsVolumeLess308 asserts that selection half
++	// (AC#1's carrier; this file holds zero t.Skip calls, and the old inline
+@@ -112,0 +125,8 @@ func TestClassifySpellingInvariance(t *testing.T) {
++	// What no fixture pins: THIS windows-tagged case's len(dropped) > 0 branch.
++	// tmpHome(t) came back volume-qualified on both surfaces measured here (the
++	// default temp and the 8.3 alias temp), so the t.Logf sentinel below was
++	// measured hitting 0 times in the full-package run of each (HEAD export tree,
++	// probes/308/r2/logs/pre-head-full*.txt), and under GOOS=linux this file is
++	// not part of ./internal/risk/'s test set at all (go list: 22 test files
++	// windows / 17 linux). Q-308-v1-B: the guard's teeth are on the input face,
++	// not in this branch.
+diff --git a/internal/risk/pathresolver_volumeless_spelling_308_test.go b/internal/risk/pathresolver_volumeless_spelling_308_test.go
+index 7dc18b3a..0afe622b 100644
+--- a/internal/risk/pathresolver_volumeless_spelling_308_test.go
++++ b/internal/risk/pathresolver_volumeless_spelling_308_test.go
+@@ -19 +19,9 @@ import (
+-// This is the single place the drive letter is taken. 编排者裁语 ⓑ/ⓒ: the
++// Within this test surface this is the single place the drive letter is taken.
++// The repo takes it in one other place, guarded and outside this ticket:
++// production internal/risk/pathresolver.go (normalizeLocalUNC) checks
++// len(drive) == 2 && drive[1] == '$' before its drive[:1], and
++// internal/tools/volume_windows.go reads filepath.VolumeName (volumeID,
++// volumeRootOf) without slicing it at all. Census 2026-10-11, scope
++// `internal cmd tools`: drive-letter slice evaluation sites = 2 (that
++// production line and this helper), the other 5 lines matching the same
++// pattern are comments. 编排者裁语 ⓑ/ⓒ: the

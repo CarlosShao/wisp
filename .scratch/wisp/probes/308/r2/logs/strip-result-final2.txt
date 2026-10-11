@@ -1,0 +1,2 @@
+pathresolver_anchor_spelling_windows_test.go : STRIP-CMP(dispatch blob vs final2) IDENTICAL rc=0 | code-lines=251 md5=fb351a9cf96b689864b1a2a3fb0f461b | non-comment-changed=0 | numstat=27+/6- | gofmt=0 gofmt_plain=0 | CR=0
+pathresolver_volumeless_spelling_308_test.go : STRIP-CMP(dispatch blob vs final2) IDENTICAL rc=0 | code-lines=78 md5=c113a6ec09dd0dca7b567aeeaffcc9a4 | non-comment-changed=0 | numstat=9+/1- | gofmt=0 gofmt_plain=0 | CR=0

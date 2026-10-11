@@ -1,0 +1,120 @@
+package risk
+
+import (
+	"path/filepath"
+	"sort"
+	"strings"
+	"testing"
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+func driveShare(vol string) (share string, ok bool) {
+	if len(vol) == 0 {
+		return "", false
+	}
+	return strings.ToLower(vol[:1]) + "$", true
+}
+
+
+
+
+
+
+
+
+
+func volumeInvariantSpellings(home, long string) (keep map[string]string, dropped []string) {
+	keep = map[string]string{
+		"long":           long,
+		"upper":          strings.ToUpper(long),
+		"lower":          strings.ToLower(long),
+		"extended":       `\\?\` + long,
+		"slashes":        strings.ReplaceAll(long, `\`, "/"),
+		"dot-and-dotdot": filepath.Join(home, ".", ".ssh", "..", ".ssh", "id_testkey"),
+		"not-yet-there":  filepath.Join(home, ".ssh", "brand-new-key"),
+	}
+	vol := filepath.VolumeName(long)
+	share, ok := driveShare(vol)
+	if !ok {
+		return keep, []string{"unc-admin", "unc-extended"}
+	}
+	rest := strings.TrimPrefix(long, vol)
+	keep["unc-admin"] = `\\localhost\` + share + rest
+	keep["unc-extended"] = `\\?\UNC\localhost\` + share + rest
+	return keep, nil
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+func TestVolumeInvariantSpellingsVolumeLess308(t *testing.T) {
+	home := "/tmp/wisp-308-no-volume"
+	long := filepath.Join(home, ".ssh", "id_testkey")
+
+
+
+
+	if vol := filepath.VolumeName(long); vol != "" {
+		t.Fatalf("premise broken: filepath.VolumeName(%q)=%q, want the volume-less shape \"\"", long, vol)
+	}
+
+
+	share, ok := driveShare(filepath.VolumeName(long))
+	if ok {
+		t.Fatalf("driveShare(\"\") returned ok=true share=%q: a volume-less path must report not-ok, never fabricate a share", share)
+	}
+	if share != "" {
+		t.Errorf("driveShare(\"\") share=%q, want empty string", share)
+	}
+
+
+
+	keep, dropped := volumeInvariantSpellings(home, long)
+	sort.Strings(dropped)
+	if len(dropped) != 2 || dropped[0] != "unc-admin" || dropped[1] != "unc-extended" {
+		t.Fatalf("dropped=%v, want exactly [unc-admin unc-extended]", dropped)
+	}
+	for _, name := range []string{"unc-admin", "unc-extended"} {
+		if _, present := keep[name]; present {
+			t.Errorf("keep still holds %q with no volume: the guard failed to drop it", name)
+		}
+	}
+	volumeFree := []string{"long", "upper", "lower", "extended", "slashes", "dot-and-dotdot", "not-yet-there"}
+	for _, name := range volumeFree {
+		if _, present := keep[name]; !present {
+			t.Errorf("volume-free spelling %q went missing: only the two volume-derived UNC spellings may be dropped (AC#1)", name)
+		}
+	}
+
+
+
+
+	got := make([]string, 0, len(keep))
+	for name := range keep {
+		got = append(got, name)
+	}
+	sort.Strings(got)
+	t.Logf("ticket 308 guard on volume-less input %q: %d volume-free spellings still evaluated %v; %d UNC spellings dropped by name %v",
+		long, len(keep), got, len(dropped), dropped)
+}

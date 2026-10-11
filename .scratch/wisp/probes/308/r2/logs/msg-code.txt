@@ -1,0 +1,23 @@
+308-r2: fix three false comment sentences in the ticket-308 test surface
+
+Comment lines only. Two files in internal/risk:
+- pathresolver_anchor_spelling_windows_test.go: drop the "every other spelling
+  is unconditional / never quietly stops measuring" pillar, state the
+  measured denominators instead (9 volume-qualified, 10 with the 8.3 slot,
+  7 on the volume-less INPUT face -- not 8); narrow "seven spellings still
+  run / the case ends with a verdict" to what is actually pinned, naming the
+  zero-reachability of the windows-tagged drop branch.
+- pathresolver_volumeless_spelling_308_test.go: scope "the single place the
+  drive letter is taken" to this test surface and name the two other readers.
+
+Proof: with whole-line comments deleted, both files cmp byte-identical to the
+202ed4a5 blobs (code md5 fb351a9c... / c113a6ec...); git diff -U0 has zero
+non-comment changed lines; production pathresolver.go / pathresolver_windows.go
+sha256 unchanged. Gates: build 0, vet 0, path-length 0 (GREEN), d22scan 0 on
+the first run and 1 on the next two -- both findings are phantom citations in
+internal/tools/bridge.go, another leg's in-flight file; a scan of a HEAD export
+tree carrying only these two files is clean (rc=0). Full-package name+colour
+roster diff before/after: empty.
+
+Refs: .scratch/wisp/issues/308-...md section 4 (items 1-3, orchestrator 14:2x).
+No checkbox, no Status line, no -done rename, no push.

@@ -1,0 +1,55 @@
+tool check: gofmt=/d/work/base/go/bin/gofmt gofumpt=MISSING
+
+=== SURFACE A: worktree (after edits) ===
+-- gofmt -l internal/risk :
+internal\risk\provenance.go
+   rows=1
+-- gofmt -l internal cmd tools :
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+cmd\wisp\models.go
+   rows=4
+-- gofumpt -l internal/risk :
+/usr/bin/bash: line 1: gofumpt: command not found
+   rows=0
+-- gofumpt -l internal cmd tools :
+/usr/bin/bash: line 1: gofumpt: command not found
+   rows=0
+
+=== SURFACE B: HEAD export tree (before edits, /tmp/tmp.ltoRBO7i0R) ===
+-- gofmt -l internal/risk :
+   rows=0
+-- gofmt -l internal cmd tools :
+   rows=0
+-- gofumpt -l internal/risk :
+/usr/bin/bash: line 1: gofumpt: command not found
+   rows=0
+-- gofumpt -l internal cmd tools :
+/usr/bin/bash: line 1: gofumpt: command not found
+   rows=0
+
+=== CR counts of files the narrow ruler flags (worktree) ===
+internal\risk\provenance.go CR=1115 bytes=47723
+gofumpt path=D:\work\base\gopath/bin/gofumpt.exe  version=v0.12.0 (go1.27.1)
+
+=== worktree: gofumpt -l internal/risk ===
+internal\risk\provenance.go
+rows=1
+=== worktree: gofumpt -l internal cmd tools ===
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+rows=5
+=== worktree: gofumpt -l <my two files> ===
+rows=0
+
+=== HEAD export tree (/tmp/tmp.ltoRBO7i0R): gofumpt -l internal/risk ===
+rows=0
+=== HEAD export tree: gofumpt -l internal cmd tools ===
+cmd\wisp\panel_transport_35r2_test.go
+rows=1
+
+=== git status of the 4 gofmt rows (in-flight by other legs?) ===

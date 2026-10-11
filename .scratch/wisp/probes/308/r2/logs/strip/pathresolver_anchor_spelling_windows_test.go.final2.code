@@ -1,0 +1,251 @@
+
+package risk
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+
+func namesSameFile(a, b string) bool {
+	fa, fb := formsOf(a), formsOf(b)
+	return fa.real != "" && fb.real != "" && strings.EqualFold(fa.real, fb.real)
+}
+
+func TestClassifyAnchorSpellingIsNotVerdict(t *testing.T) {
+	root := t.TempDir()
+	profile := filepath.Join(root, "profile")
+	alias := filepath.Join(root, "alias")
+	if err := os.MkdirAll(profile, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	mkJunction(t, alias, profile)
+
+	t.Setenv("USERPROFILE", alias)
+	t.Setenv("HOME", alias)
+	t.Setenv("APPDATA", filepath.Join(alias, "AppData", "Roaming"))
+	t.Setenv("LOCALAPPDATA", filepath.Join(alias, "AppData", "Local"))
+
+	targets := []string{
+		filepath.Join(".ssh", "id_testkey"), // ~/.ssh/** (prefix rule) AND id_*
+		".git-credentials",                  // exact rule
+		filepath.Join(".aws", "credentials"),
+		filepath.Join(".kube", "config"),
+	}
+	for _, rel := range targets {
+		p := filepath.Join(profile, rel)
+		mustWrite(t, p, "secret")
+		res, err := Resolve(p, nil)
+		if err != nil {
+			t.Fatalf("Resolve(%q): %v", p, err)
+		}
+		if !namesSameFile(res.Canonical, p) {
+			t.Fatalf("Resolve(%q) canonical %q: test premise broken (candidate must be the real path)", p, res.Canonical)
+		}
+		if got := Classify(res.Canonical); got != ClassA {
+			t.Errorf("A-list miss for %q: canonical %q classified %v under USERPROFILE=%q, want ClassA",
+				rel, res.Canonical, got, alias)
+		}
+		if d := Gate(res.Canonical, nil); d.Allow || d.NeedL2 {
+			t.Errorf("A-list %q through a junction-spelled anchor became approvable: %+v", rel, d)
+		}
+	}
+}
+
+func TestClassifySpellingInvariance(t *testing.T) {
+	home := tmpHome(t)
+	long := filepath.Join(home, ".ssh", "id_testkey")
+
+	spellings, dropped := volumeInvariantSpellings(home, long)
+	if len(dropped) > 0 {
+		t.Logf("ticket 308: filepath.VolumeName(%q) has no drive letter; dropped the two volume-derived spellings by name %v; %d volume-free spellings still evaluated", long, dropped, len(spellings))
+	}
+	if s := getShortPath(t, filepath.Join(home, ".ssh", "id_testkey")); s != "" {
+		spellings["8.3-short"] = s
+	}
+	for name, sp := range spellings {
+		cands := []string{sp}
+		if res, err := Resolve(sp, nil); err == nil {
+			cands = append(cands, res.Canonical)
+		}
+		for _, c := range cands {
+			if got := Classify(c); got != ClassA {
+				t.Errorf("spelling %s: %q classified %v, want ClassA (classification may not depend on spelling)", name, c, got)
+			}
+		}
+	}
+	for _, sp := range []string{
+		filepath.Join(home, "plain.txt"),
+		strings.ToUpper(filepath.Join(home, "plain.txt")),
+		filepath.Join(home, "no-such-dir", "notes.txt"),
+	} {
+		if got := Classify(sp); got != ClassNone {
+			t.Errorf("control %q classified %v, want ClassNone", sp, got)
+		}
+	}
+}
+
+func TestCanonicalInputGainsNoSecondForm(t *testing.T) {
+	home := tmpHome(t)
+	for _, tc := range []struct {
+		path string
+		want Class
+	}{
+		{filepath.Join(home, ".ssh", "id_testkey"), ClassA},
+		{filepath.Join(home, ".git-credentials"), ClassA},
+		{filepath.Join(home, "plain.txt"), ClassNone},
+		{home, ClassNone},
+		{filepath.Join(home, "not-created-yet", "deep.txt"), ClassNone},
+	} {
+		res, err := Resolve(tc.path, nil)
+		if err != nil {
+			t.Fatalf("Resolve(%q): %v", tc.path, err)
+		}
+		f := formsOf(res.Canonical)
+		fs := f.spellings()
+		if len(fs) == 0 {
+			t.Fatalf("canonical %q produced no comparison form at all", res.Canonical)
+		}
+		if !f.certain() {
+			t.Errorf("canonical %q is not certain: root=%q real=%q partial=%v", res.Canonical, f.root, f.real, f.partial)
+		}
+		if got := Classify(fs[0]); got != tc.want {
+			t.Errorf("canonical %q: form %q classified %v, want %v (this ticket may not move a verdict)", res.Canonical, fs[0], got, tc.want)
+		}
+		for _, sp := range fs[1:] {
+			if got := Classify(sp); got != tc.want {
+				t.Errorf("canonical %q: forms %q and %q classify differently (%v vs %v, want %v): the verdict may not depend on spelling",
+					res.Canonical, fs[0], sp, Classify(fs[0]), got, tc.want)
+			}
+			base := Gate(fs[0], nil)
+			d := Gate(sp, nil)
+			if d.Allow != base.Allow || d.NeedL2 != base.NeedL2 || d.Class != base.Class {
+				t.Errorf("canonical %q: forms %q and %q gate differently (%+v vs %+v)", res.Canonical, fs[0], sp, base, d)
+			}
+		}
+	}
+}
+
+func TestOverrideOnlyAcceptsTheResolvedForm(t *testing.T) {
+	root := t.TempDir()
+	profile := filepath.Join(root, "profile")
+	alias := filepath.Join(root, "alias")
+	mustWrite(t, filepath.Join(profile, "proj", "id_demo.txt"), "secret")
+	mkJunction(t, alias, profile)
+
+	res, err := Resolve(filepath.Join(profile, "proj", "id_demo.txt"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	canonical := res.Canonical                              // the resolved spelling
+	viaAlias := filepath.Join(alias, "proj", "id_demo.txt") // a second spelling of it
+	if strings.EqualFold(canonical, viaAlias) {
+		t.Fatalf("test premise broken: alias %q must be spelled differently from %q", viaAlias, canonical)
+	}
+	if got := Classify(viaAlias); got != ClassB {
+		t.Fatalf("alias spelling classified %v, want ClassB (premise)", got)
+	}
+
+	if d := Gate(viaAlias, map[string]bool{strings.ToLower(viaAlias): true}); d.Allow {
+		t.Errorf("override recorded on a non-resolved spelling unlocked the file: %+v", d)
+	}
+	if d := Gate(viaAlias, map[string]bool{strings.ToLower(canonical): true}); d.Allow {
+		t.Errorf("non-canonical spelling was allowed on the strength of a canonical override: %+v", d)
+	}
+	if d := Gate(canonical, map[string]bool{strings.ToLower(viaAlias): true}); d.Allow {
+		t.Errorf("canonical path unlocked by an override for a different spelling: %+v", d)
+	}
+	d := Gate(canonical, map[string]bool{strings.ToLower(canonical): true})
+	if !d.Allow || d.Class != ClassB {
+		t.Fatalf("canonical override for the canonical path must allow: %+v", d)
+	}
+}
+
+func TestAListWinsWhereBothTablesHit(t *testing.T) {
+	home := tmpHome(t)
+	both := []string{
+		filepath.Join(home, ".ssh", "id_bothkey"),            // ~/.ssh/**  +  id_*
+		filepath.Join(home, ".ssh", "prod-credentials.json"), // ~/.ssh/**  +  *credentials*.json
+		filepath.Join(home, ".ssh", "deep", "server.pem"),    // ~/.ssh/**  +  *.pem
+	}
+	for _, p := range both {
+		mustWrite(t, p, "secret")
+		res, err := Resolve(p, nil)
+		if err != nil {
+			t.Fatalf("Resolve(%q): %v", p, err)
+		}
+		for _, sp := range []string{p, res.Canonical} {
+			if got := Classify(sp); got != ClassA {
+				t.Fatalf("%q classified %v, want ClassA (A must win wherever both tables hit)", sp, got)
+			}
+			d := Gate(sp, map[string]bool{strings.ToLower(sp): true})
+			if d.Allow || d.NeedL2 {
+				t.Fatalf("A-list override attempt succeeded for %q: %+v", sp, d)
+			}
+			if d.Class != ClassA {
+				t.Fatalf("%q decision lost its A class: %+v", sp, d)
+			}
+		}
+	}
+
+	out := filepath.Join(home, "proj", "id_bothkey")
+	mustWrite(t, out, "secret")
+	resOut, err := Resolve(out, nil)
+	if err != nil {
+		t.Fatalf("Resolve(%q): %v", out, err)
+	}
+	if got := Classify(out); got != ClassB {
+		t.Fatalf("B-only control %q classified %v, want ClassB", out, got)
+	}
+	if d := Gate(resOut.Canonical, map[string]bool{strings.ToLower(resOut.Canonical): true}); !d.Allow {
+		t.Fatalf("B-only control must stay overridable by design: %+v", d)
+	}
+	if got := Classify(filepath.Join(home, "proj", "main.go")); got != ClassNone {
+		t.Fatalf("ordinary file classified %v, want ClassNone", got)
+	}
+}
+
+func TestClassifyFailClosedWhenSpellingUnprovable(t *testing.T) {
+	home := tmpHome(t)
+	dangling := filepath.Join(home, "dangling")
+	target := filepath.Join(home, "dangling-target")
+	mustWrite(t, filepath.Join(target, "here.txt"), "x")
+	mkJunction(t, dangling, target)
+	if err := os.RemoveAll(target); err != nil {
+		t.Fatalf("orphan the junction: %v", err)
+	}
+	if _, err := os.Lstat(dangling); err != nil {
+		t.Fatalf("junction must still be there for the walk to be fooled: %v", err)
+	}
+	if _, ok := resolveHandle(dangling); ok {
+		t.Fatal("test premise broken: a junction whose target is gone must not yield a handle real path")
+	}
+	if _, err := Resolve(dangling, nil); err == nil {
+		t.Fatal("test premise broken: Resolve must still refuse the reparse traversal by default")
+	}
+
+	cand := filepath.Join(dangling, "sub", "anything.txt")
+	if got := Classify(cand); got != ClassA {
+		t.Fatalf("%q classified %v, want ClassA: an unprovable expansion may not fail open", cand, got)
+	}
+	d := Gate(cand, map[string]bool{strings.ToLower(cand): true})
+	if d.Allow || d.NeedL2 || d.Class != ClassA {
+		t.Fatalf("unprovable path became approvable through the gate: %+v", d)
+	}
+
+	for _, tc := range []struct {
+		path string
+		want Class
+	}{
+		{filepath.Join(home, "plain.txt"), ClassNone},
+		{filepath.Join(home, "no-such-dir", "notes.txt"), ClassNone},
+		{filepath.Join(home, "proj", "id_testkey"), ClassB},
+		{filepath.Join(home, ".ssh", "id_testkey"), ClassA},
+	} {
+		if got := Classify(tc.path); got != tc.want {
+			t.Errorf("control %q classified %v, want %v", tc.path, got, tc.want)
+		}
+	}
+}
