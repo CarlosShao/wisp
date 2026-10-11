@@ -1,0 +1,27 @@
+307-a1 收档：A833 落账＋票 307 AC#0 翻勾＋AC#1 落点我裁（换比较函数、两处出口同换、⛔ 动存值）＋§4.0cd
+
+- 票 307 末尾追加「编排者收 307-a1」一节并在第 25 行把 AC#0 那一枚框从 [ ] 翻成 [x]（尺＝
+  grep -cE '^[[:space:]]*- \[[ x]\]' 改前 0 勾／6 未勾、改后 1 勾／5 未勾；全票 diff＝那一行改
+  加纯追加，前 60 行与备份逐字节 IDENTICAL，原句一字未动）。
+- 承重读数我这一发逐条自己重跑（⛔ 抄腿）：真值行号 422／428（票面 :425/:429 已腐烂，入账方式
+  ＝内容锚）；home 两枚赋值点 0 枚过 Resolve；e.canon 三枚中 :160 连 lexCanonical 都没过；
+  生产两枚 NewProvenance 调用者都 NoProbe:true 且 SyncRoots:/SyncFixturePath: 非测试各 0 命中
+  ⇒ finalize 在 0 枚根上 ⇒ complete 恒 false ⇒ :422 生产零次迭代；那 5 枚用例全走
+  provenance.go:345、无一枚走 syncdirs.go:88。
+- 我自己补三枚腿没写的读数：① aRelates 跳过空形 ⇒ 形 B 的空串陷阱在"换比较"这一支不存在；
+  ② :422 那个根循环不受 !s.complete 保护 ⇒ 换它会波及"已检出确认根"台面，判据交两台面现量；
+  ③ fixture 根从未创建＋Resolve 对缺失叶子走词汇回退 ⇒ 只折 home 那形会让 :162 从 :428 拿到
+  Sync:true＝为错误的原因绿 ⇒ 单折 home 不接受，AC#2 第三形判据据此改写（必交中间形）。
+- 裁语四条理由：复用⛔ 新造（blacklist.go 那 8 处早拿这族比 home 锚）／单调朝 fail-closed
+  （spellings 注释原话）／⛔ 空串陷阱／⛔ 碰 finalize 与 canonical 分级（complete 是测试可见
+  的契约，13 枚调用点里 8 枚是前置闸）。撤销口令「307 落点改形 B」。
+- 登记三枚⛔ 进本票：:431 把比较形当 Root.Path 报出、SyncRoots() 消费面（归我车道只读尺）、
+  逐卷短名状态需提权（具名欠读数、⛔ 算腿的欠账）。
+- 记我派单两处写错：把生产唯一 home 赋值点 provenance.go:345 说成"同形复制件"；把第三形说成
+  住 pathresolver.go（真身那一族住 blacklist.go）。
+- A833 落账。§4.0cd 落停车点（大白话版，含"本机全绿是假的"那一件与票 303 永久未勾那格的解释）。
+- 编队＝1 枚（307-r1 在飞，写面 internal/risk/** ＋ probes/307/r1/**）；它动 cmd/wisp 的导入图，
+  故它落笔期间我⛔ 在母仓跑票 305 那六发。CI 38103274181 于 10:01 仍 in_progress ⇒ ⛔ 再推、⛔
+  写任何"CI 绿/红"。
+
+本笔零 push。

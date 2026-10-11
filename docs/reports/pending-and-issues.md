@@ -15802,3 +15802,45 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 - 现态（10:0x 尺＝`grep -cE '^[[:space:]]*- \[[ x]\]' <票面>` 逐票现量，⛔ 引旧账）＝**票 306 6 勾／0 未勾、⛔ `-done`**（欠 core 档 CI 色）；**票 303 6 勾／1 未勾、⛔ `-done`**（`AC#3`＝永久未勾，第 2 节）；票 305 **1 勾／5 未勾**；票 307 **0 勾／6 未勾**；票 300 **6 勾／1 未勾**；票 298 **0 勾／5 未勾**（料齐等 `298-v1`）；票 72 **4 勾／2 未勾**。
 - 在飞＝**0 枚**（写面／读面都空）。⚠ 本节原句写的是"`307-a1` 在飞"——那是这份草稿 08:4x 落笔时的台面，**它已于 09:5x 交回四笔 `08cc614e`→`4d4c10d4`→`205ce69f`→`293a4d34`**（件 `probes/307/a1/**`，越界 0／新 `.go` 0／`.out` 0／0 字节件 0／⛔ push，我逐笔 `git show --name-only` 重跑过）。它的裁定与派单**另落 `A833`**，⛔ 混进本账。
 - next＝① 收 `307-a1` ⇒ 我裁票 307 落点形状 ⇒ 派 `307-r1`；② 取这一批 CI 色 → 票 306 改名 `-done`＋更新索引＋回填票 300／303／111；③ 我在 `cmd/wisp` 车道跑票 305 那六发（件 `probes/305/a2/30-deciding-run-recipe.md`；发 0 台面自检、PATH 写母仓绝对 `/d/…`、非单调即逐枚全跑）→ 裁落点归属 → 派 `305-r1`；④ 补票 300 `AC#4` 那半；⑤ 队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。⛔ 动依赖面、⛔ 动泵形状、⛔ 动 `Q-84`（未答＝默认不做）、⛔ 动 D32 那枚 `1500`。
+
+
+## A833｜2026-10-11 10:1x｜收 `307-a1`（只读普查，四笔 `08cc614e`→`4d4c10d4`→`205ce69f`→`293a4d34`）⇒ **票 307 `AC#0` 翻勾＋`AC#1` 落点形状我裁＝换比较函数、两处出口同换、⛔ 动任何存值**＋`307-r1` 已派（在飞）＋★记我自己派单两处写错
+
+### 1. 越界与台面（⛔ 抄腿自陈，我这发逐笔重跑）
+
+- 尺＝逐笔 `git show --name-only --format=` 四笔 ⇒ 名册每行都在 `.scratch/wisp/probes/307/a1/**` 之内，**写面外＝0 格**；新建 `.go`＝**0**、`.out`＝**0**、0 字节件＝**0**（尺＝`find .scratch/wisp/probes/307/a1 -type f -size 0`，**带 `-type f`**）。件＝`00-anchor`／`10-fold-roster`／`20-landing-shapes`／`30-test-nails`／`40-machine-alias`／`90-final`＝393 行＋`logs/**` 27 枚。
+- ⚠ 腿自报两枚自己的缺陷，我复核**处置正确、记为格式面⛔ 读数面**：第 1 笔里 `logs/00-anchor-readings.log.2`、`logs/g-k-crossface.txt.2` 当时 0 字节——**那两把尺的空输出本身就是有效读数**（`git status --porcelain -- internal cmd`＝0 行；跨面 grep＝0 命中 rc=1）。它⛔ 删、⛔ `--amend`，在第 2 笔往件里补了"empty by design＋尺名＋rc"说明行 ⇒ **HEAD blob 上不再 0 字节、历史那一笔的 blob 确实 0 字节**。⇒ **定式收下（我的账，⛔ 派单里已有这一条）**：⛔ 把任何尺的 stdout 单独落成件之前先想"空输出是不是读数"，是就**同一拍里**把尺名＋rc 一起写进去。
+- 编译面：腿自陈 Go 面发数＝**0**（连派单允许的 `go env`／`go list` 都没用）。我复核它的五件里**没有任何"我跑过 test"的声称**、凡后果逐条标〔读码推到〕⇒ **⛔ 欠账**，本票的颜色读数由 `307-r1`＋验收腿两台面各取（`A832` 第 6 节那条队列同形）。
+
+### 2. ★`AC#0` 的读数我逐条自己重跑（每条带尺，行号＝10:0x 快照），全条成立
+
+- 尺①（行号腐烂对照）＝`grep -n "isUnder(cand" internal/risk/syncdirs.go` ⇒ **`:422`**（`isUnder(cand, e.canon)`）＋**`:428`**（`!s.complete && s.home != "" && isUnder(cand, s.home)`）⇒ **票面那句"`:425` 那一支"已腐烂**（真值 422／−3 行），而同段 `:88`／`:197`／`blacklist.go:133`／`:169`／`provenance.go:345`／`:928` 与测试侧 `:162/:213/:233/:355/:402` 我逐枚 `sed` 对过＝**全部同号未腐烂** ⇒ **入账方式＝内容锚**（与 `A831` 对 `gate.go` 的定式同形；票面原句⛔ 改，更正记在本节）。
+- 尺②＝`grep -rn --include=*.go "home: normPath" internal` ⇒ 两枚赋值点**正文逐字同形**（`provenance.go:345`＋`syncdirs.go:88`），**0 枚过 `Resolve`**；`normPath`（`blacklist.go:133`）我 `sed -n '126,145p'` 复看＝`ToLower`＋`unifySeparators`＋剥尾分隔符 ⇒ **⛔ 折 8.3**。
+- 尺③＝`grep -n "c\.canon" internal/risk/syncdirs.go` ⇒ 三枚（`:152`/`:156`/`:160`）；★`:160` 正文＝`normPath(expandInput(r.Path))`——**连 `lexCanonical` 都没过**（而 `syncdirs.go:82` 那句注释 `canon string // normPath(Resolve(Path))` 只对 `:156` 成立 ⇒ "⛔ 按注释读"这一条派单要求正中它）。
+- 尺④（**决定落点枚数的那一把**，生产可达性）＝我这发逐环跑：`NewProvenance(` 非测试调用者＝**2 枚**且 `cmd/wisp/run.go:743`／`cmd/wisp/panel_assets.go:239` **都传 `ProvOptions{NoProbe: true}`**；`"SyncRoots:"` 与 `"SyncFixturePath:"` 非测试命中各 **0 行**；`NoProbe` 分支只 `add` 这两路 ⇒ `finalize()`（`sed -n '118,138p'`：`complete` 只在"canonical ＋ gradeConfirmed"的根上置真）在 0 枚根上 ⇒ `complete` 恒 false ⇒ **生产唯一阳性出口＝`:428`；`:422` 那个循环在生产面零次迭代**。
+- 尺⑤＝那 5 枚用例逐枚取体内的 `NewProvenance(ProvOptions{…})` ⇒ **五枚全带 `NoProbe: true`** ⇒ 全走 `provenance.go:345`，**无一枚走 `:88`**；唯一吃 `:88` 的 fold 断言＝`syncdirs_test.go:501`（`ProvOptions{}` live env，且前置 `if p.SyncDetectionComplete()` ⇒ 天然属"可能静悄悄不执行"那一族）。
+
+### 3. ★我自己补的两枚读数（腿⛔ 写，而它改变了我的裁形）
+
+1. **`aRelates` 会跳过空形**（`blacklist.go:270-287`：双层循环里 `if c == "" { continue }`、`if a == "" { continue }`）⇒ 腿给形 B 算的那枚最坏陷阱（`e.canon==""` ⇒ `isUnder(path, "")`＝`HasPrefix(path, sepStr)`⇒ POSIX 每条绝对路径全命中，我另尺复看 `blacklist.go:167-172` 确认陷阱本身**成真**）**在"换比较函数"这一支上不存在**——这是我不采形 B、采形 C 的主因之一。
+2. **`:422` 那个根循环⛔ 受 `!s.complete` 保护**（`sed -n '421,429p'`：循环在 `if !s.complete && …` **之前且无该条件**）⇒ 换 `:422` 的比较函数会波及"已检出确认根"的台面，而 `uncertainAnchorMiss`（`blacklist.go:314-322`，需两侧 `root` 非空且互为祖先）有可能把某枚"⛔ 是 sync"翻成"是 sync"。⇒ **本格⛔ 由我读码推定颜色**，判据已写进派单：`307-r1` **必在两枚台面各 ≥2 发取交集**、单发红具名报出。先例＝票 303 `AC#3b` 第③件"⛔ 让交集尺藏住单发红"。
+3. ★**第三枚是我把两环接起来的那一条**：fixture 根 `home\Cloud\NutstoreSync` **从未创建**（`sandbox()` 只建 `profile`/`local`/`roaming`，`syncdirs_test.go:15-27`），而 `Resolve` 对缺失叶子走 `pathresolver.go:127-140` 的词汇回退（`Resolved=false`；`Rewritten＝len(kinds)>0` 在这里也＝false，因输入已是绝对路径）⇒ 落 `:160` ⇒ **只折 `home` 那一形（形 A）会让 `:162` 那枚用例从 `:428`（`suspect-fallback`）拿到 `Sync:true`，而它的标题写的是"under fixture root must be sync"＝根成员判定** ⇒ **为错误的原因绿**；能区分两支的既有断言只有 `syncdirs_other_test.go:99`（`Root.Source=="suspect-fallback"`），而它在 `//go:build !windows` 档。⇒ 后果＝**单折 `home` 我不接受**，`AC#1` 落点必须两处出口同换，且 `AC#2` 的第三形判据被这一条改写（见票面追加节第 4 节）。
+
+### 4. 裁语（`AC#1` 落点形状＝形 C 的"换比较、⛔ 动存值"那一支；撤销口令**「307 落点改形 B」**）
+
+四条可驳理由（正文在票 307 追加节第 3 节）：① **复用⛔ 新造**＝`AC#1`① 的字面要求，且 `blacklist.go:199-:221` 那 8 处**早就在拿这族比 `home` 锚**，票 72 不变量原话（`blacklist.go:189-193`）"the verdict must not depend on the spelling a path arrived in"；② **单调朝 fail-closed**＝`pathresolver.go:330-337` 注释逐字"only ever turn a miss into a deny, never remove one"，而本票的病是**少报**，方向天生对；③ **⛔ 空串陷阱**（第 3 节第 1 枚）；④ **⛔ 碰 `finalize()`／`canonical`**＝`complete` 对包外不可观测（非测试调用者 0，我复核）却**是测试可见的契约**（13 枚调用点里 8 枚是前置闸）⇒ 换比较⛔ 动分级，红⛔ 渗进那批闸；形 B 改的是"哪枚根算已确认"＝顺手改 P12 安全网能不能被卸掉，与票面"⛔ 顺手把 `allowed_dirs` 做成硬边界"同族。
+⇒ 登记三枚⛔ 进本票：`:431` 把比较形当 `Root.Path` 报出去（与 `blacklist.go:128-132` 那句 ticket 75 相抵，换形会改变它报出的拼法，⛔ 顺手"改对"）；`SyncRoots()` 消费面（`syncdirs.go:181-182` 注释声称面板 Security page 吃它，腿按注释读⛔ 采信）＝**归我车道一发只读尺**；逐卷短名状态（`fsutil 8dot3name query C:`＝`Error 5`，需提权）＝**具名欠读数、⛔ 算腿的欠账**。
+
+### 5. ★记我自己两处派单错（腿⛔ 采纳我的转述、以盘上为准，处置正确）
+
+1. 我把 `provenance.go:345` 说成**"同形复制件"**＝**说轻了**：它是**生产面唯一那枚 `home` 赋值点**（两个产码调用者都 `NoProbe:true`，我现量），且那 5 枚用例全走它 ⇒ "要不要一起算进落点"⛔ 是覆盖问题，是**"⛔ 覆盖它就没修到生产"**的问题。
+2. 我把第三形说成**住在 `pathresolver.go`**＝**说错了地方**：`formsOf`/`anchorForms` 定义在 `pathresolver.go:345`/`:391`，而**做 `home` 锚点比较那一族住在 `blacklist.go`**（8 处 `anchorForms(...)` ＋ `aUnder`/`aEq`/`aRelates`/`uncertainAnchorMiss`）⇒ 改动点在 `syncdirs.go:422`/`:428`。
+3. ⚠ 另一枚**同族第三枚**记在 `A832` 第 1 节（我把别家腿的锚笔算成 `303-v2` 的首笔）⇒ **定式＝派单里凡"几笔／几枚／哪一枚"这类枚数与署名句，落笔前逐枚 `git log -1 --format=%s <号>` 读标题**，⛔ 按"我看到它出现的顺序"排。
+4. 腿报"票面把 5 枚都算作 `home` 单边折法的出口，而 `:162` 同时吃 `:422` 的 `:160` 支"＝**票面归因不完整，我认**（第 3 节第 3 枚把它证成了），票面追加节第 5 节第 4 条就是把那半句补齐的地方。
+
+### 6. 现态与 next
+
+- 现态（尺＝逐票 `grep -cE '^[[:space:]]*- \[[ x]\]' <票面>`，10:1x 现量）＝**票 307 `AC#0` 翻勾 ⇒ 1 勾／5 未勾**（改前 0／6，我只动那一枚框，`diff` 全票＝1 行改＋纯追加）；票 306 6 勾／0 未勾⛔ `-done`（欠 core 档 CI 色）；票 303 6 勾／1 未勾⛔ `-done`（`AC#3`＝永久未勾，`A832`）；票 305 1 勾／5 未勾；票 300 6 勾／1 未勾；票 298 0 勾／5 未勾；票 72 4 勾／2 未勾。
+- 在飞＝**`307-r1`**（落地腿，写面＝`internal/risk/**` ＋ `probes/307/r1/**`）。⚠ **车道约束具名**：它动的是 `cmd/wisp` 的导入图 ⇒ **它落笔期间我⛔ 在母仓跑票 305 那六发**（那六发要跨 9 枚 commit 作差，混进别家源码改动＝整批发废），改在它交完之后跑。本轮**编队＝1 枚**（⛔ 加派：cmd/wisp 车道与 internal/risk 写面同一时间只能各一枚）。
+- CI 色＝`38103274181`（`headSha 2c764c04…`）**10:01 那把尺仍 `status=in_progress`** ⇒ 票 300／303／306／111 那批欠的 CI 色**继续挂着**，⛔ 写任何"CI 绿/红"。本地未推＝4 枚（现量 10:0x，`git rev-list --count origin/dev..HEAD`）。⛔ 再推（`A813` 允许，但我⛔ 在这一发 CI 回来之前再推＝自启第二发 `slo-full` 抢机主 CPU 且新色叠旧色读不干净）。
+- next＝① 收 `307-r1` → 我自己重跑两台面名册 → 派 `307-v1`（非实现者终裁，`AC#1`/`AC#2`/`AC#3` 的判语⛔ 由实现腿自勾）；② 取 38103274181 的 CI 色 → 票 306 `-done`＋更新索引＋回填票 300／303／111；③ 我跑票 305 那六发（件 `probes/305/a2/30-deciding-run-recipe.md`；发 0 台面自检、PATH 写母仓绝对 `/d/…`、非单调即逐枚全跑）；④ 补票 300 `AC#4` 那半；⑤ 我那两枚欠读数＝`SyncRoots()` 消费面＋`:431` 报出的拼法；⑥ 队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。⛔ 动依赖面、⛔ 动泵形状、⛔ 动 `Q-84`（未答＝默认不做、⛔ 催）、⛔ 动 D32 那枚 `1500`。
