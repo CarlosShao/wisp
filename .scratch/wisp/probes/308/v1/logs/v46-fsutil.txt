@@ -1,0 +1,9 @@
+### ruler: fsutil 8dot3name query C: (needs admin on this box) ###
+Failed to open the volume.
+Error 5: Access is denied.
+rc=1
+### same for D: ###
+Failed to open the volume.
+Error 5: Access is denied.
+rc=1
+### reading: the 8.3 alias surface DOES exist on C: (both names present), but this leg cannot read the volume flag without elevation => CI windows-latest 8.3 state stays unmeasured ###

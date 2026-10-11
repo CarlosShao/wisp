@@ -1,0 +1,34 @@
+=== baseline : unset=[] set=[]
+env TMP=[C:\Users\swq\AppData\Local\Temp] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="C:\\Users\\swq\\AppData\\Local\\Temp" MkdirTemp="C:\\Users\\swq\\AppData\\Local\\Temp\\V1PROBE1011564510" abs="C:\\Users\\swq\\AppData\\Local\\Temp\\V1PROBE1011564510" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMPDIR_only : unset=[-u TMP -u TEMP] set=[TMPDIR=/tmp]
+env TMP=[] TEMP=[] TMPDIR=[C:\Users\swq\AppData\Local\Temp]
+os.TempDir()="C:\\Users\\swq" MkdirTemp="C:\\Users\\swq\\V1PROBE1605497867" abs="C:\\Users\\swq\\V1PROBE1605497867" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMP_slash : unset=[] set=[TMP=/]
+env TMP=[C:\Users\swq\.qoder-cn\bin\git] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="C:\\Users\\swq\\.qoder-cn\\bin\\git" MkdirTemp="C:\\Users\\swq\\.qoder-cn\\bin\\git\\V1PROBE86005481" abs="C:\\Users\\swq\\.qoder-cn\\bin\\git\\V1PROBE86005481" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMP_backslash : unset=[] set=[TMP=\]
+env TMP=[C:\] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="C:\\" MkdirTemp="C:\\V1PROBE358261013" abs="C:\\V1PROBE358261013" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMP_and_TEMP_slash : unset=[] set=[TMP=/ TEMP=/ ]
+env TMP=[C:\Users\swq\.qoder-cn\bin\git] TEMP=[C:\Users\swq\.qoder-cn\bin\git] TMPDIR=[]
+os.TempDir()="C:\\Users\\swq\\.qoder-cn\\bin\\git" MkdirTemp="C:\\Users\\swq\\.qoder-cn\\bin\\git\\V1PROBE2060748536" abs="C:\\Users\\swq\\.qoder-cn\\bin\\git\\V1PROBE2060748536" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMP_doubleslash : unset=[] set=[TMP=//tmp]
+env TMP=[\\tmp] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="\\\\tmp" MkdirTemp="" abs="ERR" err=mkdir \\tmp\V1PROBE618473564: The network path was not found.
+VolumeName="" volumeLess=true cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+=== all_unset : unset=[-u TMP -u TEMP -u TMPDIR] set=[]
+env TMP=[] TEMP=[] TMPDIR=[]
+os.TempDir()="C:\\Users\\swq" MkdirTemp="C:\\Users\\swq\\V1PROBE2094701670" abs="C:\\Users\\swq\\V1PROBE2094701670" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>

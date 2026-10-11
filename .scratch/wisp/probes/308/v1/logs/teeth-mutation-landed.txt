@@ -1,0 +1,6 @@
+post_mutation_guard_lines=0
+23:func driveShare(vol string) (share string, ok bool) {
+24-	return strings.ToLower(vol[:1]) + "$", true
+25-}
+26-
+27-// volumeInvariantSpellings is the spelling-selection half of

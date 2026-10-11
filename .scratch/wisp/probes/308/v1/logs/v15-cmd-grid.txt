@@ -1,0 +1,28 @@
+### via cmd.exe, TMP set to each shape (MSYS path conversion bypassed) ###
+=== TMP=[/]
+env TMP=[/] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="C:\\" MkdirTemp="C:\\V1PROBE462135131" abs="C:\\V1PROBE462135131" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMP=[\]
+env TMP=[\] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="C:\\" MkdirTemp="C:\\V1PROBE2080917508" abs="C:\\V1PROBE2080917508" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMP=[C:\Users\swq\tmp\RISKAT~1\RUNNER~1]
+env TMP=[C:\Users\swq\tmp\RISKAT~1\RUNNER~1] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1" MkdirTemp="C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\V1PROBE4214298799" abs="C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\V1PROBE4214298799" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMP=[D:\tmp]
+env TMP=[D:\tmp] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="D:\\tmp" MkdirTemp="D:\\tmp\\V1PROBE767167001" abs="D:\\tmp\\V1PROBE767167001" err=<nil>
+VolumeName="D:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>
+=== TMP unset entirely (cmd default) ===
+TMP=C:\Users\swq\AppData\Local\Temp
+TEMP=C:\Users\swq\AppData\Local\Temp
+env TMP=[C:\Users\swq\AppData\Local\Temp] TEMP=[C:\Users\swq\AppData\Local\Temp] TMPDIR=[]
+os.TempDir()="C:\\Users\\swq\\AppData\\Local\\Temp" MkdirTemp="C:\\Users\\swq\\AppData\\Local\\Temp\\V1PROBE3384698973" abs="C:\\Users\\swq\\AppData\\Local\\Temp\\V1PROBE3384698973" err=<nil>
+VolumeName="C:" volumeLess=false cwd="C:\\Users\\swq\\AppData\\Local\\Temp\\tmp.vD08jII461"
+CLEANUP=<nil>

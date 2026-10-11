@@ -1,0 +1,1 @@
+rc_vet=0 (0 bytes of stdout IS the pass shape; this line is the reading)

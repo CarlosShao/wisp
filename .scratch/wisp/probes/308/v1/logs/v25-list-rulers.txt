@@ -1,0 +1,11 @@
+### ruler: go test ./internal/risk/ -list '<pat>' (no execution) ###
+--- pat=TestPathResolverJunctionWindows (what ci.yml:813 -run names) ---
+TestPathResolverJunctionWindows
+ok  	github.com/CarlosShao/wisp/internal/risk	0.050s
+--- pat=TestClassifySpellingInvariance|TestPathResolverUNCAListDenied|TestVolumeInvariantSpellingsVolumeLess308 ---
+TestClassifySpellingInvariance
+TestPathResolverUNCAListDenied
+TestVolumeInvariantSpellingsVolumeLess308
+ok  	github.com/CarlosShao/wisp/internal/risk	0.031s
+--- total top-level: pat='.' ---
+136

@@ -1,0 +1,8 @@
+time=2026-10-11T13:57:25.480+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV1ProbeSpellingDenominator
+    zz_v1_denominator_probe_test.go:15: V1PROBE surface: long="C:\\Users\\swq\\AppData\\Local\\Temp\\TestV1ProbeSpellingDenominator766467045\\001\\.ssh\\id_testkey" VolumeName="C:"
+    zz_v1_denominator_probe_test.go:22: V1PROBE volume-qualified: keep=9 [dot-and-dotdot extended long lower not-yet-there slashes unc-admin unc-extended upper] dropped=[]
+    zz_v1_denominator_probe_test.go:31: V1PROBE volume-less-literal: keep=7 [dot-and-dotdot extended long lower not-yet-there slashes upper] dropped=[unc-admin unc-extended]
+--- PASS: TestV1ProbeSpellingDenominator (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.032s

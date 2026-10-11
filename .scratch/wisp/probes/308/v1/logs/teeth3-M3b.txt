@@ -1,0 +1,8 @@
+time=2026-10-11T13:58:38.445+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestVolumeInvariantSpellingsVolumeLess308
+    pathresolver_volumeless_spelling_308_test.go:105: volume-free spelling "lower" went missing: only the two volume-derived UNC spellings may be dropped (AC#1)
+    pathresolver_volumeless_spelling_308_test.go:117: ticket 308 guard on volume-less input "\\tmp\\wisp-308-no-volume\\.ssh\\id_testkey": 6 volume-free spellings still evaluated [dot-and-dotdot extended long not-yet-there slashes upper]; 2 UNC spellings dropped by name [unc-admin unc-extended]
+--- FAIL: TestVolumeInvariantSpellingsVolumeLess308 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.034s
+FAIL

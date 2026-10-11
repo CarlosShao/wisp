@@ -1,0 +1,67 @@
+### ruler: git show --numstat --format= <sha>  (unit: added/deleted TAB path) ###
+== 510c95ca ==
+510c95ca 308-r1: anchor + commit-first for spelling-invariant volume guard landing
+
+39	0	.scratch/wisp/probes/308/r1/00-anchor.md
+-- outside-my-scope files (expect none) --
+rc_outside=1
+== 1ad48333 ==
+1ad48333 308-r1: guard the two spelling-invariance [:1] sites via driveShare helper
+
+18	17	internal/risk/pathresolver_anchor_spelling_windows_test.go
+12	1	internal/risk/pathresolver_junction_windows_test.go
+120	0	internal/risk/pathresolver_volumeless_spelling_308_test.go
+-- outside-my-scope files (expect none) --
+rc_outside=1
+== ee0a93e4 ==
+ee0a93e4 308-r1: delivery probes AC#1-AC#5 + evidence logs
+
+58	0	.scratch/wisp/probes/308/r1/10-guard-landing.md
+60	0	.scratch/wisp/probes/308/r1/20-anti-form.md
+50	0	.scratch/wisp/probes/308/r1/30-comment-fixes-A843.md
+55	0	.scratch/wisp/probes/308/r1/40-tags-and-gates.md
+1	0	.scratch/wisp/probes/308/r1/logs/anti-a-mutation-broken.rc.txt
+22	0	.scratch/wisp/probes/308/r1/logs/anti-a-mutation-broken.txt
+120	0	.scratch/wisp/probes/308/r1/logs/anti-b-restored-good.go.txt
+1	0	.scratch/wisp/probes/308/r1/logs/anti-b-restored-green.rc.txt
+6	0	.scratch/wisp/probes/308/r1/logs/anti-b-restored-green.txt
+1	0	.scratch/wisp/probes/308/r1/logs/gate-build.rc.txt
+0	0	.scratch/wisp/probes/308/r1/logs/gate-build.txt
+1	0	.scratch/wisp/probes/308/r1/logs/gate-d22scan.rc.txt
+251	0	.scratch/wisp/probes/308/r1/logs/gate-d22scan.txt
+1	0	.scratch/wisp/probes/308/r1/logs/gate-vet.rc.txt
+0	0	.scratch/wisp/probes/308/r1/logs/gate-vet.txt
+0	0	.scratch/wisp/probes/308/r1/logs/gofmt-my-three.txt
+2	0	.scratch/wisp/probes/308/r1/logs/gofmt-scope-internal-risk.rc.txt
+1	0	.scratch/wisp/probes/308/r1/logs/gofmt-scope-internal-risk.txt
+28	0	.scratch/wisp/probes/308/r1/logs/gofmt-tracked-all.rc.txt
+27	0	.scratch/wisp/probes/308/r1/logs/gofmt-tracked-all.txt
+1	0	.scratch/wisp/probes/308/r1/logs/post-alias-full.rc.txt
+433	0	.scratch/wisp/probes/308/r1/logs/post-alias-full.txt
+133	0	.scratch/wisp/probes/308/r1/logs/post-alias-names.txt
+1	0	.scratch/wisp/probes/308/r1/logs/post-default-full.rc.txt
+433	0	.scratch/wisp/probes/308/r1/logs/post-default-full.txt
+133	0	.scratch/wisp/probes/308/r1/logs/post-default-names.txt
+1	0	.scratch/wisp/probes/308/r1/logs/post-restored-default-full.rc.txt
+433	0	.scratch/wisp/probes/308/r1/logs/post-restored-default-full.txt
+133	0	.scratch/wisp/probes/308/r1/logs/post-restored-default-names.txt
+1	0	.scratch/wisp/probes/308/r1/logs/pre-alias-full.rc.txt
+430	0	.scratch/wisp/probes/308/r1/logs/pre-alias-full.txt
+132	0	.scratch/wisp/probes/308/r1/logs/pre-alias-names.txt
+1	0	.scratch/wisp/probes/308/r1/logs/pre-default-full.rc.txt
+430	0	.scratch/wisp/probes/308/r1/logs/pre-default-full.txt
+132	0	.scratch/wisp/probes/308/r1/logs/pre-default-names.txt
+-- outside-my-scope files (expect none) --
+rc_outside=1
+== 79242df7 ==
+79242df7 308-r1: 90-final delivery ledger
+
+59	0	.scratch/wisp/probes/308/r1/90-final.md
+-- outside-my-scope files (expect none) --
+rc_outside=1
+== 1270e36e ==
+1270e36e 308-r1: correct AC#5 ticket-bullet note to reflect shared-index concurrency
+
+1	1	.scratch/wisp/probes/308/r1/40-tags-and-gates.md
+-- outside-my-scope files (expect none) --
+rc_outside=1

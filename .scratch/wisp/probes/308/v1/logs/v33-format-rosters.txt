@@ -1,0 +1,15 @@
+### SCOPE 1: narrow = internal/risk (worktree) ###
+internal\risk\provenance.go
+rc_gofmt_narrow=0
+### CR byte census for each hit + the three 308 files ###
+internal/risk/provenance.go cr_bytes=1115 eol=i/lf w/crlf attr/text eol=lf 	internal/risk/provenance.go
+internal/risk/pathresolver_anchor_spelling_windows_test.go cr_bytes=0 eol=i/lf w/lf attr/text eol=lf 	internal/risk/pathresolver_anchor_spelling_windows_test.go
+internal/risk/pathresolver_junction_windows_test.go cr_bytes=0 eol=i/lf w/lf attr/text eol=lf 	internal/risk/pathresolver_junction_windows_test.go
+internal/risk/pathresolver_volumeless_spelling_308_test.go cr_bytes=0 eol=i/lf w/lf attr/text eol=lf 	internal/risk/pathresolver_volumeless_spelling_308_test.go
+### SCOPE 2: wide = all tracked *.go ###
+26
+wide_hits_nonscratch=4
+cmd/wisp/models.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
