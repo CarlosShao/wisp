@@ -1,0 +1,25 @@
+## A835｜2026-10-11 10:3x｜★票 306 收口 `-done`：按住它的那一枚欠读数（新测试文件在 **CI core 档那一发的颜色**）我自己现取到正读数＋该 run 整体 `failure` 的三档逐因**具名归他处**（⛔ 一处都不算本票、⛔ 顺手修）
+
+**背景一句**：票 306 给 `internal/audio/wavinjector.go` 那三枚"行内权威字面量"装上了会响的尺，六格早已全勾、1:1 裁决表也建好（`docs/evidence/s1/306-inline-literals-v1.md`），但我在 `A831`/票面 §4 里把它⛔ 按住收口，理由＝"新文件在 CI 两档可见"那一格当时**只有间接读数**（`portable-tests.sh:242` 的 core scope 字面含 audio＋新文件首行 `package audio`＋linux `go vet` rc=0）。⇒ 本笔把那一枚换成**具名用例的 `--- PASS` 行**。
+
+### 1. 尺与读数（`gh` 取，先落盘再 grep，⛔ 把 MB 级原始日志读进对话）
+
+- 台面＝run **`38103274181`**（`--json status,conclusion,headSha` 逐字＝`completed`／`failure`／`2c764c04…`），六档 job：`lint` failure、`test-core` failure、`test-windows` failure、`slo-full`／`slo-smoke`／`lint-frontend` success。
+- **前提两把**（证"这一发的树里带着本票的新文件"）：三枚文件 `git cat-file -e 2c764c04:<路径>` 各 **YES**；把它们加进来的那笔＝`1b34e475`，`git merge-base --is-ancestor 1b34e475 2c764c04` ⇒ **`rc=0`**。
+- 原始 log＝`gh run view 38103274181 --log-failed` 落 `C:/Users/swq/tmp/ci-38103274181-failed.log`（**9896 行／2360647 字节**，⛔ 入库、⛔ 删；⚠ 证据件按根 `.gitignore` 第 8 行⛔ 叫 `.out`，且⛔ 落仓库根），再按 job 前缀切两把名册尺：`core.log`＝**5430 行**／`win.log`＝**4341 行**。
+- **core 档（ubuntu）**：`ok github.com/CarlosShao/wisp/internal/audio 4.150s` ＋哨兵行 `portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/audio`；逐名 `grep -c -- '--- PASS: <名>'`＝`TestWavInjectorExtensibleFloat32306` **1**、`TestParseWavExtensibleFloat32306` **1** ⇒ 那枚⛔ 带 `_windows` 后缀的新文件在 linux 档**真编译、真跑、真绿**。
+- **windows 档**：`ok github.com/CarlosShao/wisp/internal/audio 16.196s` ＋同包哨兵行；`TestWavInjectorExtensibleFloat32306` **1**、`TestParseWavExtensibleFloat32306` **1**、`TestParseWaveFormatSubFormatOffset300` **5**。
+- ⚠ 具名一枚"看着像漏跑"的读数：`TestParseWaveFormatSubFormatOffset300` 在 **core 档 0 命中**＝**预期**（它住在 `parse_wave_format_300_windows_test.go`，文件名后缀使 linux ⛔ 编译），⛔ 写成"CI 漏了这一枚"。
+
+### 2. 该 run 整体 `failure` 的三档逐因（⛔ 归本票，⛔ 在本票里动）
+
+- **`lint`**＝`##[error] .scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1: imports must appear before other declarations`。那枚文件**是跟踪件且在 HEAD 上仍在**（`git ls-files --error-unmatch` 命中、`git cat-file -e HEAD:…` 命中；入库那笔＝`4813567e`，别家票 185 的一枚刻意突变夹具）。⇒ **⛔ 新事、⛔ 归我顺手修**：这件事已有三枚在开的票各自名下＝**票 236 `AC#6`**、**票 269**、**票 275**（尺＝`grep -rn "fs_broken" .scratch/wisp/issues/` 命中那三枚票面若干行，含票 236 `:14`/`:31` 与票 275 `:23`）。我⛔ 动它（改名换绿正是那三枚票要裁的形状，先例＝票 306-v1 收尾那两枚 `.go`→`.txt` 是**它自己票面要求的动作**，⛔ 是我拿它当通用解法）。
+- **`test-core`／`test-windows`**＝`FAIL` 包逐名去重只有三包：`cmd/wisp`、`internal/panel`、`internal/risk`（尺＝`grep -oE 'FAIL[[:space:]]+github[^ ]*' | sort -u`），**⛔ `internal/audio`**；两档 top-level 计数逐字＝core `PASS=1100 FAIL=6 SKIP=1, === RUN=1623, '[no tests to run]'=0`、windows `PASS=430 FAIL=12 SKIP=1, === RUN=633`。成因归处：`internal/risk`＝票 72 甲族＋票 307 乙族（乙族那 5 枚的绿在 `51a0a0f2`，**⛔ 在本 run 的树里**⇒ 这一档要等下一次推送才变色）；`cmd/wisp`／`internal/panel`＝票 302／303 那一族。
+- ⚠ 一句射程边界（⛔ 让它腐烂成"CI 现状"）：以上全是 **run 38103274181 这一枚 headSha** 的读数。`lint` 那一枚红在**最近 8 发 run 里发发如此**（`gh run list --workflow ci --limit 8` 的 `conclusion` 全＝`failure`，最老 `38043392486`／`cf46c24a`），⛔ 等于"永远会红"。
+
+### 3. 现态与 next
+
+- 现态＝**票 306 本笔收口**：`Status: done` 写在票面追加节里＋同笔 `git mv` 加 `-done`。⚠ **`-done` ⛔ 等于零残余**（README 原话）：两笔具名残余⛔ 挂本票（① 块 `194.6,195.1` 与裸 `tag=3` 那一形零执行者＝票面 §边界明写⛔ 买；② `AC#2b` 字面那发＝`panic` 形已降为可达性正控留档，本格凭据取甲形）。
+- 在飞＝**`307-v1`**（票 307 五格非实现者终裁）；`307-r1` 五笔已交、我的复跑与它的账逐枚同数（见 `A834`）。
+- next＝① 收 `307-v1` ⇒ 翻格或退回；② 我票 305 那六发（前提动摇，先量"哪一枚变量"）；③ 推送⛔ 排（`A813` 未过期仍⛔ 用；`51a0a0f2` 起 `internal/risk` 那批 CI 色要同批作差）；④ 队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。
+- ★**记我自己一枚测量陷阱（与 `A834` §2 同形，两处都踩）**：凡以**行尾锚**取名字的 git／log 尺，这台机器输出带 `\r` ⇒ 必须先 `tr -d '\r'`；"0 枚"这种全称读数落笔前必有一把把原始名册逐行打印的尺对拉。（本笔里那三枚 `grep -c` 我先在**已按 job 前缀切过、逐行看过**的两份名册上跑，⛔ 裸跑计数。）

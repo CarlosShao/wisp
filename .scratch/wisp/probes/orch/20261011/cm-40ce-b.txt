@@ -1,0 +1,8 @@
+票 306 收口 -done：按住它的最后一枚欠账（新测试文件在 CI core 档那一发的颜色）我自己现取到正读数＋A835 落账＋§4.0ce 停车点
+
+- 正读数（run 38103274181／headSha 2c764c04；log 先落仓外 C:/Users/swq/tmp/ci-38103274181-failed.log，9896 行/2360647 字节，⛔ 入库⛔ 删，再按 job 前缀切两把名册尺 core.log=5430 行/win.log=4341 行）：core 档 audio＝ok ... 4.150s ＋哨兵行 ok (own line)，TestWavInjectorExtensibleFloat32306 与 TestParseWavExtensibleFloat32306 逐名 --- PASS 各 1 行；windows 档 audio＝ok ... 16.196s，三枚逐名 PASS（300 那枚 5 行）。前提两把它自己跑：三枚新文件 git cat-file -e 2c764c04:<路径> 各 YES，加法笔 1b34e475 是 2c764c04 的祖先（git merge-base --is-ancestor rc=0）。
+- ⚠ 具名一枚看着像漏跑其实⛔ 的：TestParseWaveFormatSubFormatOffset300 在 core 档 0 命中＝预期（它住在 *_windows_test.go，linux ⛔ 编译）。
+- 该 run 整体 failure 的三档逐因⛔ 归本票⛔ 在本票里动：lint＝.scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1（跟踪件、HEAD 上仍在，入库笔 4813567e；已开票 236 AC#6／269／275 各自名下，我⛔ 动、⛔ 顺手改名换绿）；test-core/test-windows＝cmd/wisp／internal/panel／internal/risk 三包（⛔ audio），internal/risk 的乙 5 枚绿在 51a0a0f2、⛔ 在本 run 的树里。
+- ★记我一枚提交分组错：A835 那条正文随上一笔 a4fb152f 一起入库了，而那笔主题只写 A834 ⇒ 分组与实际内容不符，⛔ amend（已推送纪律＋共享工作树），在这里具名更正。
+- ★另一枚现量事实具名：sh scripts/check-path-length-budget.sh 现在本机 VERDICT RED，点名的是 303（相对 125／名 104）与 304（相对 137／名 116）两枚**我 10-10 立的票名超了 README 规矩 9 的 100 字符帽**且⛔ 在名册里（count guard＝名册 57 ⇄ 树上 59）；我这笔的 306-done 相对 112，⛔ 在点名清单里（grep 306 命中 0）⇒ 我没把它弄红，但**那两枚红是我造的**，归下一笔处理（改短名，先例 A584）。
+- 票 306 现态＝六格全勾、Status: done、改名 -done done；两笔残余具名⛔ 装（194.6,195.1 与裸 tag=3 零执行者＝票面⛔ 买；AC#2b 字面那发降为可达性正控留档）。push 0。
