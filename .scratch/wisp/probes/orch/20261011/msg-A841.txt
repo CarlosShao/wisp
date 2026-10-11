@@ -1,0 +1,10 @@
+台账 A841＝车队卫生第二笔：台账引的 275 枚证据件名里 12 枚只在盘上从未提交＋2 枚"查无此件"逐枚具名（⛔ 删 ⛔ 搬 ⛔ 补提交别人的件）
+
+- 尺①（射程＝HEAD 的台账 blob）＝`git show HEAD:docs/reports/pending-and-issues.md | grep -oE 'probes/[A-Za-z0-9_./-]+\.(md|txt|sh)' | sed 's|^|.scratch/wisp/|' | sort -u`＝**275** 枚；
+  尺②逐枚两问（`git cat-file -e HEAD:<p>` ⇄ `[ -e <p> ]`）＝**at_head 261／只在盘上从未提交 12（合计 1,945,966 B）／两处都查无 2**。件＝`logs/orch-cited-paths-check.txt`＋`.roster`，脚本 `cited-paths-check.sh`。
+- 12 枚按归属分两堆＝腿名下 4（`201/r2`、`222/r1`、`223/r2`、`300/r1`）／编排者名下 8（`orch/296-ac3-runsheet.md`、`235/orch-rerun/full.txt`、`293/orch/…`、`300/orch/…`、`orchestrator/33r5`/`33r6`/`33r7`/`r9`）；
+  其中 6 枚 ≥100 KB＝既定"MB 级日志⛔ 入库也⛔ 删"那一族，另 6 枚 ≤6 KB＝当时只写不提交。⛔ 补提交 ⛔ 删（规矩 8＋⛔ 动别人的件），只落"它是什么＋归谁"。
+- ★两枚"查无此件"都⛔ 是假账，成因⛔ 同一枚：`292/v1/22-changed-lines.md`＝**我这把正则尺造的假发现**（台账 `A789` 原文写的是带 `.tmp` 的那枚，540 B 真在盘上，我的 `(md|txt|sh)` 在 `.md` 处截断了后缀）；
+  `35/v4/countershape-v4.sh`＝**台账 `A695` 的路径笔误**（少一段 `scripts/`，真件在盘＝`35/v4/scripts/countershape-v4.sh`，同族共 **5** 枚）。`A695`/`A789` 原句⛔ 改，只在这里更正。
+- ⇒ 定式（⛔ 新立仪器票）：凡引台账里的件名当凭据，先跑尺②那一发；不中就把那句凭据的性质改写成〔只在盘上／从未入库〕。
+- 台账 numstat＝`25 0`（append-only）；票 307 `-done`、票 72 4 勾／2 未勾、票 308 6 枚框全未勾——本笔⛔ 翻任何一枚框。

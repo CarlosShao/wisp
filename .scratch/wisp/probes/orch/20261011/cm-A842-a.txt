@@ -1,0 +1,16 @@
+票 309 新立＝`assessorFor` 空任务号那一肢静默摘掉 R4 探测器（六格全未勾，AC#0 未裁形之前⛔ 派落地腿）＋本轮编排者件与门禁读数
+
+收 `taskid-a1`（一笔 `93643a29`）⇒ `A838` §3 我自己登记那枚欠读数结掉，正文＝台账 `A842`。
+
+- 现量（我这发独立复跑，⛔ 抄腿）：
+  - `internal/tools/bridge.go:925` 逐字三枚前提 `if b.injected || b.prov == nil || taskID == "" {` ⇒ `:926 return b.assess`（不挂探测器），`:931` 才是 `WithTaintDetector(b.prov.Detector(taskID))`。
+  - `assessorFor` 生产调用点＝**1 枚**（`bridge.go:297`，尺＝`grep -rn 'assessorFor' internal cmd --include=*.go` 滤 `_test.go`＝6 命中，剥定义行与注释行）。
+  - `ToolRequest{` 生产构造点＝**1 枚**（`internal/agent/loop.go:675`），实参来自 `newTaskID()`（`:1153`，恒 36 字符；熵失败那支退化到 `time.Now().UnixNano()` 派生仍非空）⇒ **空 id 今天不可达**。
+  - 定性＝**接线事实⛔ 结构保证**；同一种"宿主没给任务 id"三处三种处置：① `bridge.go:925` 静默摘探测器 ② `cmd/wisp/panel_assets.go:164` 自命名并写明 ③ `internal/tools/subagent_197.go:262-263` fail-closed 拒绝（三枚文案逐字对过）。
+  - 仪器面：点名 `assessorFor` 的用例 **0 枚**，但空 id 被经过过（`internal/tools/failclosed_236_teeth_test.go:288` 真喂 `TaskID: ""` 进 `Execute`，断言只看 `IsError`／字面量／`roster.Count()`）⇒ 口径写**被经过、未被观测**（⛔ 写"零仪器经过"，这条是腿顶回我派单里的预设、它顶对了）。
+- 票 309 六格：`AC#0` 归口与两形代价（ⓐ入口拒绝⇄ⓑ写明故意，两形都⛔ 是"删掉那一肢"）／`AC#1` 给三枚前提装仪器（恒真形必须响）／`AC#2` 结构保证那一问／`AC#3` 注释行号腐烂换内容锚（`loop.go` 现量 `RunAsync :328`／铸造 `:329`、`Run :339`／`:340`，注释逐字写的 `:332/:321` 两枚号全漂）／`AC#4` 门禁与越界／`AC#5` 与票 307／40／197／242 对账。
+- ★边界里逐字禁的那支＝⛔ "删掉那枚开关显得更严"：`provenance.go:727` 对未开 scope 无条件 hit（`SrcUnboundScope`，逐字 `Origin: "scope is not open …"`）⇒ 摘肢＝每次写都报＝误报风暴。
+- 名 63 字符＜规矩 9 那枚 100 帽；长度门现跑 GREEN（正控 PASSED、`over-budget 57＝roster 57`、`not in roster=0`、`worst full path=228`、`in the wall interval=0`）。⚠ 分母两枚读数都记：`A842` 正文那发＝**tracked 9923**（票 309 刚落盘、还没进 index），本批暂存后端上再跑＝**9932**，差 **9＝我这一批暂存的 9 枚新件**（尺＝`git ls-files | grep -c ''`，⛔ 把两枚数当同一次运行）。
+- 本批＝docs-only：暂存名册 `.go` 枚数＝**0**（尺＝`git diff --cached --name-only | grep -c '\.go$'`，读数逐行落在 `logs/orch-A842-gates.txt`，每格自带 `rc=`/计数行）⇒ gofmt/build/vet 的分母⛔ 被我改动；`go build`／`go test` 这一程由在飞的 `72-r1` 独占，我⛔ 抢。
+- ⛔ 动 `72-r1` 在飞的三枚工作树改动（`pathresolver_anchor_spelling_windows_test.go`／`pathresolver_junction_windows_test.go`／`syncdirs_test.go`）；⛔ 动 `.gitignore`／`go.mod`（⛔ 我名下）；⛔ push（`A813` 仍未用）。
+- 那枚第一版门禁脚本草稿 `A842-gates.sh` 里我把 awk 写在双引号串里（`$1`/`$2` 会被 shell 抢走）＝失效草稿，按"临时件只建不删"留在盘上、⛔ 删；正解＝`precommit-gates-A842.sh`。

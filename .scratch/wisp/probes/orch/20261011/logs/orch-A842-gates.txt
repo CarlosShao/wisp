@@ -1,0 +1,7 @@
+d22scan_rc=0
+lenbudget_rc=0
+staged_total=9 staged_go=0
+ledger_numstat=31	0	docs/reports/pending-and-issues.md
+handover_numstat=30	0	docs/reports/HANDOVER.md
+ticket_numstat=49	0	.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md
+worktree_dirty_lines=854
