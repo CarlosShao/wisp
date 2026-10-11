@@ -1,0 +1,26 @@
+t03 — 作废那发的原始读数（本腿把同一枚件名 aliased-all16-bothfiles.txt 用了两遍：第 3 发写进去的那份被第 4 发覆盖，
+     故在这里逐字保一份，⛔ 让那发变成"没发生过"。规则＝临时件只建不删，本腿承认覆盖这一步做得⛔ 好。）
+
+命令原文（第 3 发）＝
+  REG='^(TestAListDenyAndUnoverridable|…|TestResolveIdempotent)$'
+  go test ./internal/risk/ -count=1 -v -run "$REG"
+缺陷＝那一发**没设任何 temp env**（工具跨命令⛔ 保留 shell 状态），Go 从 Git Bash 继承的 TMPDIR 是无卷标的 POSIX 形。
+
+那一发的四数（当时 stdout 原样）＝
+  rc=1
+  RUN=0 FAIL=2 SKIP=0     ← 注意：PASS=0 而⛔ 代表"全红"，是**测试二进制在第 2 枚就 panic 死了**
+那一发的名册行（当时 grep 原样）＝
+  2:=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+  3:    pathresolver_anchor_spelling_windows_test.go:57: Resolve("\\TestClassifyAnchorSpellingIsNotVerdict2959863629\\001\\profile\\.ssh\\id_testkey") canonical "D:\\TestClassifyAnchorSpellingIsNotVerdi…
+  4:--- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.05s)
+  5:=== RUN   TestClassifySpellingInvariance
+  6:--- FAIL: TestClassifySpellingInvariance (0.00s)
+  7:panic: runtime error: slice bounds out of range [:1] with length 0 [recovered, repanicked]
+  22:FAIL	github.com/CarlosShao/wisp/internal/risk	0.085s
+  23:FAIL
+  24:rc=1
+件总行数＝24（wc -l 现量）
+
+⇒ 两处对下一枚腿有用的话：
+  ① 崩点＝anchor_spelling:78 `share := strings.ToLower(vol[:1]) + "$"`，`filepath.VolumeName` 返回 "" 时零守卫；
+  ② 凡拿这族用例当凭据，**先断言名册行数＝16**（⛔ 要看 rc），否则 panic 会给你一枚"0 枚过"的假绿／假红。
