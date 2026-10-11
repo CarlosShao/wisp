@@ -15977,3 +15977,110 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 - 它想修的那件事我现量过＝**HEAD 的 `go.mod` 那枚 `// indirect` 标注确实过期**：非测试面直接 import 枚数尺＝`grep -rn --include=*.go "jchv/go-webview2" internal cmd`（再滤掉 `_test.go`）＝**2 行**（`cmd/wisp/panel_host_windows.go:64`／`cmd/wisp/panel_resident_windows.go:73`，两处都写作 `webview2 "github.com/jchv/go-webview2"`）。
 - ⚠ 一条⛔ 许越过我的定性：`// indirect` **只是注释**，⛔ 改变 `go build`／`go vet` 的颜色 ⇒ 这一条**是账面漂移、⛔ 是缺陷票**，本笔只记"它存在且⛔ 是我名下"，⛔ 顺手开票、⛔ 顺手 tidy、⛔ revert。
 - 真正的危险形状＝**共享工作树里谁用 `git add -A`／`git commit -a` 就会把这行带进自己那笔**（正是我记过的那种吞别人改动的事故形）⇒ 定式再钉一枚：**每笔 commit 前先 `git diff --cached --name-only` 数一遍**（本轮我自己已在用；这条⛔ 是新的，是从 `A813` 那批推送里就立过的口径，这里只补"工作树现存两枚⛔ 我名的 tracked 改动"这枚事实）。
+
+## A838｜2026-10-11 10:5x｜编排者**结掉票 307 登记②那枚欠读数**（"`SyncRoots()` 到底谁在吃"）＝★`IsSyncPath` **有牙**（六跳逐跳我自己量）／`SyncRoots()`＋`SyncDetectionComplete()` 生产调用者＝**0** ⇒ 那两处注释把**一枚还没建的页面**写成现在的消费者；归口＝**票 40**，⛔ 扩⛔ 降票 307
+
+**来路**＝`A834`（收 `307-a1`）第 3 节末尾我自己登记的那句"②`SyncRoots()` 的消费面（`syncdirs.go:181-182` 注释声称面板 Security page 吃这枚判定）腿只按注释读、⛔ 复核 ⇒ 归我车道一发只读尺"。本笔＝那一发。
+**台面**＝取读数时 HEAD `f6f4eca8`，落笔时 HEAD `94c2808c`（`307-v1` 的更正笔，它自抓两枚数位）；两枚腿之间的笔⛔ 动 `internal cmd`＝尺 `git diff --stat f6f4eca8..HEAD -- internal cmd`＝**0 行** ⇒ 本笔所有行号落笔时仍然同号；**⛔ 碰 Go 编译面**（本轮我一枚 `go build`／`go test` 都没跑，全部是 `grep`／`sed`／`awk` 只读尺＋一枚 `git grep <ref>`）；行号一律当 10:5x 快照。
+
+### 1. ★`IsSyncPath` 到门那一跳的六环，我逐环自量（每环都带 `file:行`＋正文）
+
+| 环 | 位置（现量） | 正文（逐字摘） |
+|---|---|---|
+| ① 装配 | `internal/tools/bridge.go:931` | `WithTaintDetector(b.prov.Detector(taskID))` |
+| ② 造探测器 | `internal/risk/provenance.go:858` | `func (p *Provenance) Detector(scopeID string) TaintDetector { return boundDetector{p, scopeID} }` |
+| ③ 接口那一面 | `internal/risk/assessor.go:168` | `TaintHit(params map[string]any) (source string, hit bool)`（C19 冻结缝） |
+| ④ 规则吃它 | `internal/risk/rules_gateway.go:105` | `source, hit := ctx.taint.TaintHit(ctx.params)` ⇒ `:109` `rules: []RuleID{R4}` |
+| ⑤ 进 Inspect | `internal/risk/provenance.go:867`→`:868` | `func (d boundDetector) TaintHit(...)` 里 `h, ok := d.p.Inspect(d.scope, "", params)` |
+| ⑥ 走到 sync 判定 | `provenance.go:725 Inspect` → `:755 p.writeGate(tool, params)` → `:908 func writeGate` → **`:928`** `if p.IsSyncPath(t).Sync { return true, ChSyncWrite }`；`IsSyncPath` 本体＝`syncdirs.go:187` `return p.sync.match(rawPath)` | 这一环正是票 307 的落点（`match` 里 `:422`／`:428` 那两处折法） |
+
+- 尺（可逐字重跑）＝`grep -rnE --include=*.go '\.(Inspect|OpenScope|Scan|IsSyncPath|SyncRoots|SyncDetectionComplete|Complete|Decide|Check)\(' internal cmd`（滤 `_test.go`、滤 `^internal/risk/`）＝**30 行**，⚠ **这 30 行绝大多数是同名噪声**（`sql.Rows.Scan`、`bus.Complete`、`assets.Check`、`r.Check`）⇒ 我按语义变体另扫一把＝`grep -rn --include=*.go '\.Detector(' internal cmd`（滤测试、滤 risk 包）＝**2 枚**（`bridge.go:931`＋`cmd/wisp/panel_assets.go:247`）⇒ 上面那张表才连得起来。
+- ⇒ **裁**：票 307 的前提（"这条链是宿主写文件前那道风险判定的输入，`Sync:false` 会让那次写⛔ 被当同步写"）**成立且这道判定有牙**；⛔ 我在此把它说成"建了没接"，⛔ 借它给票 307 降级。
+
+### 2. ★但那两处注释声称的**页面消费者**＝零枚（这才是登记②问的那件事）
+
+- `SyncRoots()`（定义＝`syncdirs.go:454`）：尺＝`grep -rn --include=*.go '\.SyncRoots()' internal cmd`（滤 `_test.go`）＝**0 行**。同族宽一把＝`grep -rn --include=*.go 'SyncRoots' internal cmd`＝**43 行**、非测试 **6 行**，那 6 行我逐枚看过＝字段 `ProvOptions.SyncRoots`（`provenance.go:219`/`:221`/`:346`、`syncdirs.go:108`）＋**两枚注释**（`:452`、`:471`）⇒ **方法本身生产面零调用者**；消费者全在测试面（尺＝`grep -rn --include=*_test.go '\.SyncRoots()' internal cmd`＝**8 行**，分布在 **4 个文件**：`syncdirs_test.go` 3、`syncdirs_ancestor_actable_leg_116_test.go` 2、`syncdirs_redteam_windows_test.go` 2、`syncdirs_ancestor_reparse_ticket105_windows_test.go` 1）。
+- `SyncDetectionComplete()`（`syncdirs.go:472`）：非测试命中 **2 行＝注释＋定义自己** ⇒ **零枚调用者**。
+- 注释原文逐字（两枚，`sed` 复现）＝`syncdirs.go:181-182`"IsSyncPath is the exported P12 check used by the fs.write channel **(and the panel Security page, ticket 40)**"；`:452-453`"Roots returns the detected roots **(panel/debug view)**"。
+- 页面那一侧我也查了，⛔ 停在"读码推"：本分支 `internal/panel`＋`cmd/wisp` 非测试面 `-i sync`＝**38 行**，逐枚看过**全是 Go 的 `sync` 包**（`Mutex`/`Once`/`atomic`）＋一枚注释（`cmd/wisp/panel_assets.go:233`，它说的正是"这条路径⛔ 是写目标，所以这道 sync 门⛔ 会被咨询"）；前端那条分支 `git grep -in 'sync' dsh/feat/frontend-p0-v2 -- 'frontend/src'`＝**4 行**，逐枚看过全是 `async`／"keeping them in sync" 这类散文，**零枚** sync-root 消费者；`git ls-tree -r --name-only dsh/feat/frontend-p0-v2`（**2520 枚**）里 `secur|privacy|cost` 的页面源件＝**0 枚** ⇒ Security 页在 fe 分支上也还没建（设计原型只有 `design/screens/security.html`，HEAD 跟踪，工作树里正被删的那批之一是它，⛔ 本轮动）。
+- ★**判语要分成两格写**（我记过的"降级是对的"⇄"降级是允许的"那一族）：ⓐ**今天没有任何 UI 读 `SyncRoots()`**——这句**成立**；ⓑ这**⛔ 等于**"那枚防护是空的"——⛔ 成立，因为判定走 `ChSyncWrite` 进 R4（第 1 节那张表），⛔ 经页面。⛔ 把 ⓐ 写成 ⓑ。
+
+### 3. 归口与处置（⛔ 同一件事记两次）
+
+- **归口＝票 40**（`.scratch/wisp/issues/40-security-privacy-cost-pages.md`；现尺＝框 **8** 枚／未勾 **8**，`grep -cE '^[[:space:]]*- \[[ x]\]'`）。那句"and the panel Security page, ticket 40" 是**票 40 自己该兑现的承诺**：兑现那天注释里"used by"那枚现在时才算说实话，⛔ 留"声称已有消费者"的形。本轮⛔ 动票 40 一枚框、⛔ 改它原句，只在这里落"它的下一程要读这一节"。
+- ⛔ 并入票 307（三条理由）：① 307 的病是**折法不对称**，本笔是**注释写了未来消费者**，两枚成因⛔ 同；② 307 票面那句"生产调用者＝有，一枚"我这一发复核**仍然成立**（且往外还有 4 跳到门），本笔⛔ 改它的射程；③ 立成新一枚＝把"页面还没建"这件已登记在票 40 的事再记一次。
+- ⚠ **定式再涨一枚（进记忆）**：`A813` 那批以来我写过"注释／引用里的**测试名**一律当待验断言"（本轮已中三枚）；这一枚是同族更广的一支——**注释里"谁消费这枚判定"的声称一律当待验断言**，判据＝`grep '\.方法名(' ` 数非测试调用者＋按语义变体名再扫一把（`Detector(` 那发才是 30 行同名噪声里唯一连得起链的一枚）。
+- ⚠ **本笔⛔ 结掉的欠读数只有一枚**（登记②）。仍欠的三枚（本笔⛔ 动它们）：`:431` 仍把 `normPath` 的比较形当 `Root.Path` 报出去（`A834` 已登记、本轮⛔ 修）；`fsutil 8dot3name query C:` 需提权（`Error 5`）＝⛔ 我取得到；★**新抓一枚具名欠读数**＝`bridge.go:925` 那三枚前提 `if b.injected || b.prov == nil || taskID == ""` 里，**真跑时 `taskID==""` 会不会发生**（发生 ⇒ R4 探测器整枚不挂＝"少报"的第二条形，成因与 307 无关）＝本轮⛔ 答、⛔ 算 307 的欠账，⛔ 我自己车道下一发只读尺。
+
+### 4. 现态与 next
+
+- 现态＝票 307 **1 勾／5 未勾**（框尺 6／未勾 5，10:5x 重跑；`307-v1` 已交 AC#1＋AC#2 判语＝`ed1d2bad`，⛔ 由我翻，等它五格齐）；票 40 **0 勾／8 未勾**（本轮⛔ 动框）；票 306 `-done`；长度门本机 **GREEN**（`c6fc78f0`）。
+- 在飞＝**`307-v1`**（除 AC#1＋AC#2 外已交 `50-ac5.md` 与 `90-final.md`，正在收口）∥ **`72-a2`**。两枚腿的越界尺我自己逐笔重跑＝`c04ced26` 1 枚文件／落在自家外 **0**、`ed1d2bad` 27／**0**、`7db4db4b` 1／**0**、`94c2808c` 4／**1**——那 **1** 枚＝`docs/evidence/s1/acceptance.md`，⛔ 算越界：AGENTS **§1.5**「交付物落点」逐字规定"裁决表：`docs/evidence/s1/`"⇒ 裁决腿写那里是**规定动作**；我把这条写在这儿，是因为我自己派单里那句"只许落 `probes/<票>/<腿>/**`"这把尺**打得比规矩宽**，⛔ 让下一位拿它误报一枚合规件。突变还原尺＝`git status --porcelain -- internal cmd`＝**0 行**。
+- next＝收两枚腿 ⇒ 我逐格翻或退回 → 我自己那发只读尺答 `taskID==""` 那问 → 我跑票 305 那六发（⚠ 先量变量、⛔ bisect、要编队静的窗口）→ 补票 300 `AC#4` → 推送（⛔ 排，`A813` 仍⛔ 用）。队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。
+- ⛔ push；⛔ 动别人的件；⛔ 改票 40／票 307 一句原话。
+
+## A839｜2026-10-11 11:0x｜★收 `307-v1`（非实现者终裁腿五笔 `c04ced26`→`ed1d2bad`→`b2fb50e9`→`aebceb5e`→`94c2808c`，裁决表 1:1 六行 `docs/evidence/s1/ticket307-307-r1-accept-v1.md`）⇒ **票 307 六格全有判语、我翻 `AC#1`–`AC#5` 五格并收口 `-done`**＋`A817` 欠账⑥**结掉**＋三枚 caveat 跟勾走
+
+**为什么要紧（大白话）**：这条链是"程序要往你用户目录里写文件之前，先问一句这地方是不是同步盘"。修之前它只在两边**拼法恰好对得上**时才响；现在两边用同一把折法，`票 307` 那 5 枚在带短名别名的台面上从红变绿，而**本机颜色没被动过**。⚠ 这不是"有人入侵了这台机器"：现象在测试与字符串比较层，本机没有第二真账号、没有实测被绕过的生产写（腿与我都这么写）。
+
+### 1. 我自己重跑的尺（⛔ 抄腿；每条带尺名＋射程＋工作树/blob/仓外三态）
+
+| 腿的读数 | 我这发的独立复跑 |
+|---|---|
+| 落地＝形 C（两处出口同换、存值⛔ 动） | `sed -n '415,450p' internal/risk/syncdirs.go`（HEAD）⇒ `:433 candForms := formsOf(cand)`（★只算一次）、`:434 aUnder(candForms, anchorForms(e.canon))`、`:442 !s.complete && s.home != "" && aUnder(candForms, anchorForms(s.home))`；`grep -n 'home: normPath' internal/risk/*.go`＝**2 行逐字未变**（`provenance.go:345`＋`syncdirs.go:88`）⇒ **存值⛔ 动成立**；`s.home != ""` 守卫原地留着＝我裁的第 4 点 |
+| 两台面八发：别名 `200/192/**7**/1`、默认 `200/199/0/1` | ★**我自己四发**（同一份 HEAD 码**导出到仓外树**、`go test ./internal/risk/ -count=1 -timeout 600s -v`，只差 `TEMP/TMP/TMPDIR`）＝别名台面 **`rc=1`／`PASS=192`／`FAIL=7`／`SKIP=1`**（七枚红**逐名**全部＝票 72 甲族，乙族 5 枚已 FAIL→PASS）、默认台面 **`rc=0`／`PASS=199`／`FAIL=0`／`SKIP=1`**；⚠ 口径差具名＝我这把尺只数 `--- PASS/FAIL/SKIP` 行（192／199），腿报的第一枚是 `RUN`（200＝192＋7＋1）⇒ **同一次运行两种打印**；件＝`probes/orch/20261011/logs/orch-307-twosurface.txt`＋两枚 `*.tmp-*` 原始件 |
+| 四形变异（(a) 兜底支 (b) 还原 (c) 根成员支 (d) 恒真形） | ★**我自己三发**，全在仓外树、每发还原＋`sha256sum` 自证：形 A（**两支同退**＝把修复整个挪开）`PASS=185`／**`FAIL=14`**＝甲 7＋乙族指名 5＋**新夹具 2**；形 C（**只退 `:434`**）`FAIL=8`，其中 **sync 族唯一那一枚红＝`TestSync307AliasShortRootMembership`**、乙族那 5 枚在这一形下**全绿** ⇒ ★根成员判定今天**由这一枚新夹具单独钉住**（与腿报的"`FAIL=1`＝`…alias_307…:120`"同结论，⚠ 射程不同：腿打名册档、我打整包档）；正控 pristine＝`FAIL=7`＝甲族那 7 枚 ⇒ 我的红⛔ 是噪声；★**互证**＝我这发还原后的 `sha256(syncdirs.go)`＝`aa4779bb5270…`，**与腿报的前缀逐字同**（它用 `Get-FileHash`、我用 `sha256sum`）⇒ 两只手摸到同一份件 |
+| 夹具⛔ 依赖机器形状（`//go:build windows`、`t.Skip`0、`t.Fatal*`15） | 同一把词面尺我复跑＝**逐枚同数**（141 行／`t.Skip`＝**0**／`t.Fatal*`＝**15**／`tryShortPath`＝2／带逃逸口的 `shortPathOf`＝**0**／`getShortPath`＝**0**）；另读正文 `:100-130`：它**显式**把 `st.Root.Source == "suspect-fallback"` 判成 `t.Fatalf("verdict must come from ROOT MEMBERSHIP, not from the fallback…")` ⇒ 形 C 唯一响的那枚就是它，机制自洽 |
+| 门禁三把各 `rc=0` | ★我自己三把：`GOFLAGS= go build ./...`＝**0**、`go vet ./internal/risk/`＝**0**、`sh scripts/d22scan.sh`＝**0**（件＝`logs/orch-307-gates.txt`，三行 `rc=` 自落、无 0 字节件） |
+| 格式名册"工作树 1 枚 ⇄ HEAD blob 0 枚" | ⚠ **我把这格改写成带射程的两句**：射程 `internal/risk` 工作树＝**1 枚**（`provenance.go`）⇄ `gofmt -l internal cmd`（射程放宽）＝**5 枚**（`pending_read.go`/`tools.go`/`provenance.go`/`bridge.go`/`models.go`），逐枚 `git ls-files --eol`＝**全 `i/lf w/crlf attr/text eol=lf`**＋`git status --porcelain -- internal cmd`＝**0 行** ⇒ **五枚全 CRLF 假枚、零真编辑**；blob 侧我自己跑（`git show HEAD:internal/risk/provenance.go > f && gofmt -l f`）＝**空** ⇒ "blob 0 枚"成立。⇒ 这是"引数必带射程"那族口径的**第四枚实例**（前三枚记在 `A817`／`A825` 那一族里） |
+| 生产面：`IsSyncPath` 1 枚、两枚 `NewProvenance` 全 `NoProbe:true`、`.SyncRoots()` 0 | 同形复现（尺逐枚写在正文）⇒ 腿那句"这台机器今天在生产上观测不到颜色差别"我认；⛔ ⛔ **读成"没接"**——我这发把这枚判定往门外追了**四跳**（`internal/tools/bridge.go:931 WithTaintDetector(b.prov.Detector(taskID))` → `internal/risk/assessor.go:168`（C19 冻结缝）→ `internal/risk/rules_gateway.go:105 ctx.taint.TaintHit(ctx.params)` ⇒ `R4` → `provenance.go:725 Inspect` → `:755/:908 writeGate` → `:928 IsSyncPath`），全表在 **`A838` §1** |
+| 越界：五笔⛔ 出授权面 | ⚠ 逐笔我自己重跑（`git show --name-only --format=`）＝`c04ced26` 1／0、`ed1d2bad` 27／0、`b2fb50e9` 6／**1**（`docs/evidence/s1/…`＝AGENTS **§1.5** 逐字规定的裁决表落点）、`aebceb5e` 2／**1**（本票末尾 bullet，`1 加／0 删`）、`94c2808c` 4／**1** ⇒ **⛔ 算越界**；⚠ **记我派单两处**：我给验收腿那句"只落 `probes/307/v1/**`"这把尺**比规矩窄**（同一条我在 `A838` §4 刚记过第二遍）⇒ 模板改成"自家 `probes/**` ＋ `docs/evidence/s1/**` ＋本票末尾 bullet" |
+
+### 2. ★裁语（谁翻哪格、三枚 caveat 跟勾走）
+
+- **翻** 票 307 `AC#1`／`AC#2`／`AC#3`／`AC#4`／`AC#5` ⇒ **6 勾／0 未勾**（尺＝`grep -cE '^[[:space:]]*- \[[ x]\]'`＝6、`- \[ \]`＝0；裁决者＝`307-v1`、⛔ 实现者；票上 numstat＝`57 加／5 删`，那 5 删＝五枚框的字面改动、⛔ 改原句）。
+- **`AC#1` 的勾带一句**：凭据性质＝**测试台面凭据**（生产今天观测不到差别），⛔ 只写"修复生效"。
+- **`AC#2` 的欠账另挂**＝`syncdirs_test.go:209`/`:212`/`:216`＋`:229`/`:232` 那两枚⛔ 负向钉（恒真形下它们绿）⇒ **裁归票 72 的下一程**（同文件、同族成因、甲族期望侧本就归它）；⛔ 塞回票 307（票面"边界"第 1 条禁的就是动那 7 枚的期望侧）、⛔ 票 302（只管档位／搬运）；撤销口令**「307 负向钉另立一票」**。⚠ 本轮⛔ 动票 72 一枚框（`72-a2` 在飞，票面写面归它）。
+- **`AC#3` 的两枚欠读数照记**：`alias307Pair` 的 `t.Fatalf` 分支本机从未执行（需一台⛔ 别名机器）；新夹具在 POSIX 档⛔ 求值（`//go:build windows`＝票面授权形状，票 301 guard D）。
+- **`AC#4` 那枚⛔ 可证的格认**（`git add` 命令行本身⛔ 入库，只能靠"五笔名册⛔ 一枚落在授权外"旁证）。
+- ★**代价值那一问裁＝⛔ 立仪器票**：`formsOf(cand)` 那次祖先走步的成本，腿与落地腿两把尺都量不出来（只剩结构性上界"每查询 O(1)＋锚侧有缓存"）⇒ **记成永久欠读数**（⛔ 因量不出来就说代价为零），撤销口令**「307 补 bench 尺」**。
+- **`A817` 欠账⑥结掉**＝"12 枚〔待归因〕"由**票 307（乙 5）＋票 72（甲 7）**合起来销；凭据＝腿的红名册文案层对拉（改前⇄改后只剩时长与 `t.TempDir()` 随机后缀）＋**我这发逐名独立取的同集合** ⇒ 分家成立。⚠ 台账正文⛔ 改 `A817` 原句，结欠在这一笔。
+- **收口**＝`Status: done`＋`git mv` 加 `-done`（尺后：`307-…-not-sync-done.md`，长度门我自己前后各一发＝**GREEN**、`worst=228`、`in the wall interval=0`、`roster=57` 前后同数 ⇒ 这枚改名⛔ 需要新登记豁免）。⛔ `-done` 说成"零残余"：残余六枚逐枚落在 §3。
+
+### 3. 残余（六枚，各有归宿，⛔ 一件记两次）
+
+① 甲族 7 枚仍红＝票 72 的活（`72-a2` 在飞，已交 `493f2cb8`／`a6267fbb`）；② 负向钉两枚⇒票 72 下一程（§2 那枚裁语）；③ `:431` 仍报 `normPath` 形为 `Root.Path`（`A834` 登记①，本轮⛔ 修）；④ `SyncRoots()`／`SyncDetectionComplete()` 生产调用者＝0、注释按一枚未建的 Security page 写现在时⇒**票 40**（`A838` §2/§3）；⑤ `bridge.go:925` 的 `taskID == ""` 真跑时会不会发生⇒**我车道下一发只读尺**（`A838` 新抓）；⑥ `formsOf` 代价＝永久欠读数（§2）。另：逐卷 `fsutil 8dot3name query C:` 需提权＝⛔ 我取得到。
+
+### 4. 现态与 next
+
+- 现态＝**票 307 `-done`（6 勾／0 未勾）**；票 72 **4 勾／2 未勾**（⛔ 我动框）；票 305 **1／5**、票 303 **6／1**＋规则 6 那道闸、票 302 **1／4**、票 252 **4／2**；长度门 **GREEN**；`internal/risk` 别名台面剩 **7 枚红**（全＝票 72 甲族）。
+- 在飞＝**`72-a2`**（只读普查，最后一笔 10:5x）。⛔ 新写腿进 `internal/risk`（等它交件）。
+- next＝收 `72-a2` ⇒ 派**票 72 写腿**（甲族期望侧＋那两枚负向钉同批）→ 我那发只读尺答 `taskID==""` → 票 305 那六发（要编队静的窗口、⛔ bisect）→ 补票 300 `AC#4` → 推送与 CI 色同批（`@{u}`＝`cnb/dev` 落后 **1032**，`A813` 未过期、我仍⛔ 用＝一推就自启 `slo-full` 抢机主 CPU）。队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。
+
+## A840｜2026-10-11 11:1x｜收 `72-a2`（只读普查腿七笔 `7db4db4b`→`493f2cb8`→`a6267fbb`→`25189588`→`3b16319a`→`c4d8428e`→`c6d410c1`，件 `probes/72/a2/**`）⇒ ★**甲族那 7 枚红的是一枚闸、⛔ 是判级**：7 枚全住在这两枚测试文件自己体内（四形），判级一枚都没被证伪；⛔ 放写腿进去之前**必须先换掉票 72 `AC#5` 的取证尺**（它拿"那枚文件逐字节不变"当凭据，而 4 枚红就住在那枚文件里）＝**我裁**（追加一节、⛔ 翻框），撤销口令**「72 取证尺换回逐字节」**
+
+**为什么要紧（大白话）**：上一笔（`A839`）把票 307 那 5 枚修好了，别名台面上还剩 7 枚红。这一程查清：**那 7 枚红⛔ 是安全判定错了**，是**测试自己把"临时目录的拼法"写死在期望值里**——解析器给出的完全展开长形其实是对的。⇒ 修它们＝改测试，⛔ 改判级；而且有一条"省事改法"是票面早就作废过的放宽，必须挡住。
+
+### 1. 我这发自己复跑的尺（⛔ 抄腿；每条带尺名＋射程）
+
+| 腿的读数 | 我这发的独立复跑 |
+|---|---|
+| 票 72＝4 勾／2 未勾，且自锚点以来**逐字节未变** | `t72=72-atble-classification-runner.md`；尺＝`grep -cE '^[[:space:]]*- \[[ x]\]'`＝**6**、`- \[ \]`＝**2**；`git diff --quiet c6fc78f0 HEAD -- <票72>`＝**rc 0** ⇒ 成立，腿⛔ 翻一枚框、⛔ 改原句 ✓ |
+| 七笔写面⛔ 出 `probes/72/a2/**` | 逐笔我自己重跑（`git show --name-only --format=`）＝`7db4db4b` 1／外 **0**、`493f2cb8` 4／**0**、`a6267fbb` 3／**0**、`25189588` 2／**0**、`3b16319a` 2／**0**、`c4d8428e` 1／**0**、`c6d410c1` 1／**0**；件面七枚 `.md`＋`logs/` 6 枚都在盘上 ✓ |
+| ★票面 `:245-247` 那句"非测试面 `Gate(` 只有定义自己 ⇒ 今天⛔ 生产 caller 传 override 表"**已过期** | `sed -n '88,99p' internal/tools/mode.go` ⇒ `:91` `overrides := b.confirmations()`、`:93` `c, err := b.paths.Canonicalize(p)`、`:98` `d := risk.Gate(c, overrides)` ⇒ **成立**（一枚真生产 caller 拿着授权表喂 `Gate`）⇒ ⚠ **后果比"文案过期"重**：动 `overrideApplies` **会改生产分档**，⛔ 再是"只动测试"；这条我原句⛔ 改票面、只在这里落"它的下一程要读这一节" |
+| 别名台面 7 枚全红、本机台面 7 枚全绿；四形红位逐枚点名 | ★**我自己读了腿的原始件**（`logs/aliased-7named.txt`，`grep -E '^\s*--- FAIL|\.go:[0-9]+:'`）⇒ 七枚红句的 `file:行` 逐枚＝`anchor_spelling:57`／`:140`／`:238`＋`junction:135`／`:164`／`:182`／`:292`，**与它给的四形逐枚对得上**（II 前提位 `t.Fatalf`＝`:57` 那句 `test premise broken (candidate must be the real path)`；III 计数＝`:140` 那句 `produced 2 comparison forms …, want 1`；I `want` 字面量＝`:135/:164/:182` 三句 `short name did not expand to long path: got "<长形>" want "<短形>"`⇒ **got 那侧确实是完全展开的长形＝解析器干对了**；IV＝`:292` 那句 `B-list single-file override must allow`）；⛔ 我自己重跑这两把 `go test`（同一次跑抢机主 CPU 不值），但**同一份 7 枚名册我上一笔已独立取过**＝`A839` §1 那发整包别名台面的红名册，逐名同集合 ⇒ 枚数与名字两枚手对得上。`logs/` 共 **6** 枚、七枚 `.md` 全在盘上 |
+| 仓库根 48 枚未跟踪件（深度 1）撞"临时件⛔ 落仓库根" | 尺＝`git ls-files --others --exclude-standard` 再滤掉含 `/` 的＝**48**（我这发现跑，与腿同数）⇒ 具名登记，⛔ 删、⛔ 属我（含仓根那枚文件名是 `-` 的 0 字节件，`A837` §3 已复查过一次） |
+| 共享 index 里曾躺着别家 staged rename | 我这发尺＝`git diff --cached --name-only`＝**0 行**、`git status --porcelain -- .scratch/wisp/issues`＝**0 行** ⇒ 该风险面随 `f68d21f6` 落地已消；⚠ 定式再钉一枚：**写腿落笔前 `git diff --cached --name-only` 数一遍**（腿本轮自己用了这把尺并证明它那笔只含自家件） |
+
+### 2. ★裁语（一枚闸、四条禁线、一处归口）
+
+- **闸（先换尺再放腿）**＝票 72 已勾的 `AC#5` 用"那枚测试文件逐字节不变"做取证尺，而甲族 7 枚里 **4 枚（#4/#5/#6/#7）就住在 `pathresolver_junction_windows_test.go`** ⇒ 写腿⛔ 自裁这格（它一动就把自己票上已勾的凭据打红）。**裁＝我在票 72 末尾追加一节，把取证方式换成"两台面各一发（7 枚名册＋两文件全量 16 枚）＋红位集合⛔ 变小"**，再放腿；撤销口令**「72 取证尺换回逐字节」**。理由＝另一支交不出票 72 `AC#4` 的 runner 半边，且"逐字节不变"这枚尺当初是为了防"顺手放宽断言"，换形后那件防的事由**"红位集合⛔ 变小"＋腿的假绿名册**接手（同一件事记两次那条⛔ 违反：我只记在票面追加的一节里，⛔ 另开仪器票）。
+- **四条禁线（写腿的派单里逐字给）**：① ⛔ 动 `overrideApplies` 让它遍历全部形＝票面 `:95` 逐字写过"作废，那正是被指出来的放宽"，且 `TestOverrideOnlyAcceptsTheResolvedForm` 是它的正钉（⚠ 且按 §1 第 3 行，今天它**连着生产分档**）；② ⛔ 把 `t.TempDir()` 换成手写常量＝票面 `:201` 逐字禁止的"在测试里复刻 bug"；③ #1 那枚⛔ 把 `t.Fatalf` 降级（它搬走 `AC#3①` 的变异靶）；④ #2 ⛔ 删那枚尚不存在的叶子或改成 `want<=2`（那会悄悄缩小 `AC#5` 的爆炸半径承诺）。
+- **归口**：票 307 追加给我的那枚**负向钉**欠账（`syncdirs_test.go:209`/`:212`/`:216`＋`:229`/`:232` 体内只有正向断言）⇒ **与本票写腿同批**（同一族"期望侧⛔ 负向钉"，`A839` §2 已裁、口令「307 负向钉另立一票」）。
+- **⛔ 属 72 射程那一问裁**＝`TestClassifySpellingInvariance`（`pathresolver_anchor_spelling_windows_test.go:78`）对 `filepath.VolumeName` 返回值零守卫、`os.TempDir()` 无卷标时 panic 掉整个测试二进制：**立票**（票 308）——它是"夹具在缺世界时把整枚二进制带走"那一族（先例＝记忆第 9／10 条"缺世界"与 `0xc0000135` 零 `--- FAIL` 那形），⛔ 塞进 72（本票射程＝期望侧拼写）。⚠ 票名⛔ 超 100 字符（腿点名提醒，长度门＝票 262 那把尺）。
+
+### 3. 现态与 next
+
+- 现态＝票 307 **`-done`**（6 勾／0 未勾，`f68d21f6`）；票 72 **4 勾／2 未勾**；`internal/risk` 别名台面剩 7 枚红＝票 72 甲族；长度门 **GREEN**（`worst=228`、`roster=57`）；在飞＝**0 枚**（两枚腿都交了）。
+- next＝① 我在票 72 追加"取证尺换形"一节 → ② 派 **72-r1 写腿**（甲族 7 枚期望侧按四形逐枚改＋那两枚负向钉同批；写面＝`internal/risk/pathresolver_*_test.go` 与 `syncdirs_test.go`，⛔ 产码、⛔ 动 `overrideApplies`）→ ③ 我那发只读尺答 `taskID==""` 那问（`A838` §3）→ ④ 票 305 那六发（要编队静的窗口、⛔ bisect）→ ⑤ 补票 300 `AC#4` → ⑥ 推送与 CI 色同批（`@{u}`＝`cnb/dev` 落后 1032，`A813` 我仍⛔ 用＝一推就自启 `slo-full` 抢机主 CPU）。队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。
+

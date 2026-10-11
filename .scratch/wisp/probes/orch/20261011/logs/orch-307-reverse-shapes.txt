@@ -1,0 +1,46 @@
+# orchestrator reverse-shape reruns start 11:02:47 tree=/c/Users/swq/tmp/wisp-307-orch-tree pristine_sha256=aa4779bb52704f4333a286c1a8396868579daa8d0c26634022ef9a8830ff2d36
+== shape A: BOTH branches back to isUnder (pre-fix single-sided fold) ==
+hits_roots=1 hits_home=1
+rc=1
+PASS=185 FAIL=14 SKIP=1
+    --- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.06s)
+    --- FAIL: TestCanonicalInputGainsNoSecondForm (0.01s)
+    --- FAIL: TestAListWinsWhereBothTablesHit (0.02s)
+    --- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+    --- FAIL: TestPathResolverUNCAListDenied (0.01s)
+    --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+    --- FAIL: TestBListDefaultDenyAndOverride (0.01s)
+    --- FAIL: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+    --- FAIL: TestSync307AliasShortRootMembership (0.01s)
+    --- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+    --- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.03s)
+    --- FAIL: TestSyncUnverifiedRootKeepsFallback (0.01s)
+    --- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.00s)
+    --- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.00s)
+== restore ==
+sha_restored=aa4779bb52704f4333a286c1a8396868579daa8d0c26634022ef9a8830ff2d36 equal=yes
+== shape C: ONLY the root-membership branch back to isUnder (:434) ==
+hits_roots=1 hits_home=0
+rc=1
+PASS=191 FAIL=8 SKIP=1
+    --- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.09s)
+    --- FAIL: TestCanonicalInputGainsNoSecondForm (0.01s)
+    --- FAIL: TestAListWinsWhereBothTablesHit (0.02s)
+    --- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+    --- FAIL: TestPathResolverUNCAListDenied (0.01s)
+    --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+    --- FAIL: TestBListDefaultDenyAndOverride (0.01s)
+    --- FAIL: TestSync307AliasShortRootMembership (0.01s)
+== restore ==
+sha_restored=aa4779bb52704f4333a286c1a8396868579daa8d0c26634022ef9a8830ff2d36 equal=yes
+== positive control: pristine tree, aliased surface ==
+rc=1
+PASS=192 FAIL=7 SKIP=1
+    --- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.06s)
+    --- FAIL: TestCanonicalInputGainsNoSecondForm (0.01s)
+    --- FAIL: TestAListWinsWhereBothTablesHit (0.03s)
+    --- FAIL: TestPathResolverShortNameAListDenied (0.05s)
+    --- FAIL: TestPathResolverUNCAListDenied (0.01s)
+    --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+    --- FAIL: TestBListDefaultDenyAndOverride (0.02s)
+# done 11:03:03

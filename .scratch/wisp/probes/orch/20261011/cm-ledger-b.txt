@@ -1,0 +1,17 @@
+台账 A838／A839／A840 三笔落账＋停车点 §4.0cf＋本轮编排者件与门禁读数（append-only，⛔ 改任何一句前文）
+
+- `A838`＝结掉我自己登记的欠读数"`SyncRoots()` 到底谁在吃"：`IsSyncPath` 到批准门那六跳逐跳自量（`bridge.go:931`
+  → `provenance.go:858` → `assessor.go:168` → `rules_gateway.go:105` ⇒ R4 → `Inspect:725` → `writeGate:755/:908` → `:928`）
+  ⇒ **判定有牙**；`SyncRoots()`／`SyncDetectionComplete()` 非测试调用者＝**0**，那两处注释把⛔ 存在的 Security page 写成现在时
+  ⇒ 归口**票 40**（框 8／未勾 8，⛔ 动框）。⛔ 读成"建了没接"，两格判语分开写。
+- `A839`＝收 `307-v1`（五笔 `c04ced26`→`94c2808c`，裁决表 `docs/evidence/s1/ticket307-307-r1-accept-v1.md`）：
+  我自己四发两台面（别名 `192/7/1`⇄默认 `199/0/1`）＋三发仓外反形（两支同退 `FAIL=14`／只退 `:434` 那支时 sync 族唯一红＝新夹具
+  ／pristine `FAIL=7`）＋还原 `sha256` 前缀与腿互核同值 ⇒ 翻 `AC#1`–`AC#5`，票 307 `-done`（6 勾／0 未勾）；
+  `A817` 欠账⑥结掉＝甲 7→票 72／乙 5→票 307；`formsOf` 代价＝**永久欠读数**（口令「307 补 bench 尺」）。
+- `A840`＝收 `72-a2`（七笔 `7db4db4b`→`c6d410c1`）：甲族 7 枚红是**一枚闸**⛔ 是判级，四形红位逐枚自读腿原始件对得上；
+  ⛔ 票面 `:245-247` 那句"今天⛔ 生产 caller 传 override 表"已过期（`internal/tools/mode.go:91/:93/:98` 是真生产 caller）
+  ⇒ 动 `overrideApplies` 会改**生产分档**；裁＋四条禁线＋票 308 立票理由在此笔 §2。
+- 停车点 §4.0cf（大白话六行＋车道与队列，`34 0` append-only，⛔ 动上面各节原句）。
+- 本轮我自己那把门禁尺（只动 `.md`，产码面 diff＝0 行）落 `logs/orch-precommit-gates.txt`＝69 字节／六行自落
+  （`build_rc=0`／`vet_rc=0`／`d22scan_rc=0`／`gofmt_rc=0 gofmt_n=5`＝与 `A839` 那次同数的 CRLF 假枚名册／`go_side_diff=0`／件自身字节数）。
+  ⚠ 同目录两枚 0 字节件具名＝`tmp-build.txt`／`tmp-vet.txt`＝`go build`／`go vet` 干净时本就零输出，退码由上面那两行承担（⛔"0 字节＝那格没交"那把尺不适用）。

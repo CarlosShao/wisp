@@ -1,0 +1,6 @@
+build_rc=0
+vet_rc=0
+d22scan_rc=0
+gofmt_rc=0 gofmt_n=5
+go_side_diff=0
+69 .scratch/wisp/probes/orch/20261011/logs/orch-precommit-gates.txt

@@ -1,0 +1,7 @@
+A837 末尾追加 §5（append-only，前四节原句一字未动，numstat 8 加／0 删＋台账 9 加／0 删）：同一把车队卫生尺抓到的**第二枚⛔ 我名、⛔ 我提交的 tracked 改动**＝工作树 `go.mod`（`1 1`，mtime 10-10 22:28＝⛔ 今天这批腿造的，谁夜里 tidy 过⛔ 查⛔ 归因）
+
+- 它想修的那件事我现量＝HEAD 的 `go.mod` 那枚 `// indirect` 标注过期：非测试面直接 import `jchv/go-webview2` ＝**2 行**（`cmd/wisp/panel_host_windows.go:64`／`cmd/wisp/panel_resident_windows.go:73`）。
+- ⛔ 定性越过证据：`// indirect` 只是注释、⛔ 改 `go build`／`go vet` 的颜色 ⇒ **账面漂移、⛔ 缺陷票**；处置＝⛔ 提交⛔ revert⛔ 改⛔ 顺手 tidy，只记它存在（同 §2 那枚 `.gitignore` 的九行）。
+- 危险形状＝共享工作树里谁用 `git add -A`／`git commit -a` 会把这行带进自己那笔 ⇒ 定式再钉：每笔 commit 前先 `git diff --cached --name-only` 数一遍（我本轮两笔都在用，`982f6236` 那笔的尺读数＝2 枚、正是我自己两枚）。
+- 现态⛔ 变：票 307 **1 勾／5 未勾**（框⛔ 由我翻，等 `307-v1` 五格齐）；两枚在飞腿的越界尺我自己逐笔重跑（`git show --name-only --format=`，尺＝名册里落在自家 `probes/<票>/<腿>/**` 之外的行数）＝`c04ced26` **1 枚文件／越界 0**、`ed1d2bad` **27／0**、`7db4db4b` **1／0** ⇒ 两枚腿的**提交写面全部只在自家 `probes/**` 内**（产码／测试文件⛔ 进任何一笔）；四形突变的还原尺＝`git status --porcelain -- internal cmd`＝**0 行**（⛔ 把坏码留在跟踪文件里，这条我自己踩过的那形本轮没踩）。⛔ push。
+- 本笔三枚文件＝台账＋`A837.txt`（追加后 36 行）＋`A837-5.txt`（§5 的原文件，⛔ 只建不删、一起入库免得盘上多一枚无名件）。

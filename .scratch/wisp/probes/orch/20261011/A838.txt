@@ -1,0 +1,40 @@
+## A838｜2026-10-11 10:5x｜编排者**结掉票 307 登记②那枚欠读数**（"`SyncRoots()` 到底谁在吃"）＝★`IsSyncPath` **有牙**（六跳逐跳我自己量）／`SyncRoots()`＋`SyncDetectionComplete()` 生产调用者＝**0** ⇒ 那两处注释把**一枚还没建的页面**写成现在的消费者；归口＝**票 40**，⛔ 扩⛔ 降票 307
+
+**来路**＝`A834`（收 `307-a1`）第 3 节末尾我自己登记的那句"②`SyncRoots()` 的消费面（`syncdirs.go:181-182` 注释声称面板 Security page 吃这枚判定）腿只按注释读、⛔ 复核 ⇒ 归我车道一发只读尺"。本笔＝那一发。
+**台面**＝取读数时 HEAD `f6f4eca8`，落笔时 HEAD `94c2808c`（`307-v1` 的更正笔，它自抓两枚数位）；两枚腿之间的笔⛔ 动 `internal cmd`＝尺 `git diff --stat f6f4eca8..HEAD -- internal cmd`＝**0 行** ⇒ 本笔所有行号落笔时仍然同号；**⛔ 碰 Go 编译面**（本轮我一枚 `go build`／`go test` 都没跑，全部是 `grep`／`sed`／`awk` 只读尺＋一枚 `git grep <ref>`）；行号一律当 10:5x 快照。
+
+### 1. ★`IsSyncPath` 到门那一跳的六环，我逐环自量（每环都带 `file:行`＋正文）
+
+| 环 | 位置（现量） | 正文（逐字摘） |
+|---|---|---|
+| ① 装配 | `internal/tools/bridge.go:931` | `WithTaintDetector(b.prov.Detector(taskID))` |
+| ② 造探测器 | `internal/risk/provenance.go:858` | `func (p *Provenance) Detector(scopeID string) TaintDetector { return boundDetector{p, scopeID} }` |
+| ③ 接口那一面 | `internal/risk/assessor.go:168` | `TaintHit(params map[string]any) (source string, hit bool)`（C19 冻结缝） |
+| ④ 规则吃它 | `internal/risk/rules_gateway.go:105` | `source, hit := ctx.taint.TaintHit(ctx.params)` ⇒ `:109` `rules: []RuleID{R4}` |
+| ⑤ 进 Inspect | `internal/risk/provenance.go:867`→`:868` | `func (d boundDetector) TaintHit(...)` 里 `h, ok := d.p.Inspect(d.scope, "", params)` |
+| ⑥ 走到 sync 判定 | `provenance.go:725 Inspect` → `:755 p.writeGate(tool, params)` → `:908 func writeGate` → **`:928`** `if p.IsSyncPath(t).Sync { return true, ChSyncWrite }`；`IsSyncPath` 本体＝`syncdirs.go:187` `return p.sync.match(rawPath)` | 这一环正是票 307 的落点（`match` 里 `:422`／`:428` 那两处折法） |
+
+- 尺（可逐字重跑）＝`grep -rnE --include=*.go '\.(Inspect|OpenScope|Scan|IsSyncPath|SyncRoots|SyncDetectionComplete|Complete|Decide|Check)\(' internal cmd`（滤 `_test.go`、滤 `^internal/risk/`）＝**30 行**，⚠ **这 30 行绝大多数是同名噪声**（`sql.Rows.Scan`、`bus.Complete`、`assets.Check`、`r.Check`）⇒ 我按语义变体另扫一把＝`grep -rn --include=*.go '\.Detector(' internal cmd`（滤测试、滤 risk 包）＝**2 枚**（`bridge.go:931`＋`cmd/wisp/panel_assets.go:247`）⇒ 上面那张表才连得起来。
+- ⇒ **裁**：票 307 的前提（"这条链是宿主写文件前那道风险判定的输入，`Sync:false` 会让那次写⛔ 被当同步写"）**成立且这道判定有牙**；⛔ 我在此把它说成"建了没接"，⛔ 借它给票 307 降级。
+
+### 2. ★但那两处注释声称的**页面消费者**＝零枚（这才是登记②问的那件事）
+
+- `SyncRoots()`（定义＝`syncdirs.go:454`）：尺＝`grep -rn --include=*.go '\.SyncRoots()' internal cmd`（滤 `_test.go`）＝**0 行**。同族宽一把＝`grep -rn --include=*.go 'SyncRoots' internal cmd`＝**43 行**、非测试 **6 行**，那 6 行我逐枚看过＝字段 `ProvOptions.SyncRoots`（`provenance.go:219`/`:221`/`:346`、`syncdirs.go:108`）＋**两枚注释**（`:452`、`:471`）⇒ **方法本身生产面零调用者**；消费者全在测试面（尺＝`grep -rn --include=*_test.go '\.SyncRoots()' internal cmd`＝**8 行**，分布在 **4 个文件**：`syncdirs_test.go` 3、`syncdirs_ancestor_actable_leg_116_test.go` 2、`syncdirs_redteam_windows_test.go` 2、`syncdirs_ancestor_reparse_ticket105_windows_test.go` 1）。
+- `SyncDetectionComplete()`（`syncdirs.go:472`）：非测试命中 **2 行＝注释＋定义自己** ⇒ **零枚调用者**。
+- 注释原文逐字（两枚，`sed` 复现）＝`syncdirs.go:181-182`"IsSyncPath is the exported P12 check used by the fs.write channel **(and the panel Security page, ticket 40)**"；`:452-453`"Roots returns the detected roots **(panel/debug view)**"。
+- 页面那一侧我也查了，⛔ 停在"读码推"：本分支 `internal/panel`＋`cmd/wisp` 非测试面 `-i sync`＝**38 行**，逐枚看过**全是 Go 的 `sync` 包**（`Mutex`/`Once`/`atomic`）＋一枚注释（`cmd/wisp/panel_assets.go:233`，它说的正是"这条路径⛔ 是写目标，所以这道 sync 门⛔ 会被咨询"）；前端那条分支 `git grep -in 'sync' dsh/feat/frontend-p0-v2 -- 'frontend/src'`＝**4 行**，逐枚看过全是 `async`／"keeping them in sync" 这类散文，**零枚** sync-root 消费者；`git ls-tree -r --name-only dsh/feat/frontend-p0-v2`（**2520 枚**）里 `secur|privacy|cost` 的页面源件＝**0 枚** ⇒ Security 页在 fe 分支上也还没建（设计原型只有 `design/screens/security.html`，HEAD 跟踪，工作树里正被删的那批之一是它，⛔ 本轮动）。
+- ★**判语要分成两格写**（我记过的"降级是对的"⇄"降级是允许的"那一族）：ⓐ**今天没有任何 UI 读 `SyncRoots()`**——这句**成立**；ⓑ这**⛔ 等于**"那枚防护是空的"——⛔ 成立，因为判定走 `ChSyncWrite` 进 R4（第 1 节那张表），⛔ 经页面。⛔ 把 ⓐ 写成 ⓑ。
+
+### 3. 归口与处置（⛔ 同一件事记两次）
+
+- **归口＝票 40**（`.scratch/wisp/issues/40-security-privacy-cost-pages.md`；现尺＝框 **8** 枚／未勾 **8**，`grep -cE '^[[:space:]]*- \[[ x]\]'`）。那句"and the panel Security page, ticket 40" 是**票 40 自己该兑现的承诺**：兑现那天注释里"used by"那枚现在时才算说实话，⛔ 留"声称已有消费者"的形。本轮⛔ 动票 40 一枚框、⛔ 改它原句，只在这里落"它的下一程要读这一节"。
+- ⛔ 并入票 307（三条理由）：① 307 的病是**折法不对称**，本笔是**注释写了未来消费者**，两枚成因⛔ 同；② 307 票面那句"生产调用者＝有，一枚"我这一发复核**仍然成立**（且往外还有 4 跳到门），本笔⛔ 改它的射程；③ 立成新一枚＝把"页面还没建"这件已登记在票 40 的事再记一次。
+- ⚠ **定式再涨一枚（进记忆）**：`A813` 那批以来我写过"注释／引用里的**测试名**一律当待验断言"（本轮已中三枚）；这一枚是同族更广的一支——**注释里"谁消费这枚判定"的声称一律当待验断言**，判据＝`grep '\.方法名(' ` 数非测试调用者＋按语义变体名再扫一把（`Detector(` 那发才是 30 行同名噪声里唯一连得起链的一枚）。
+- ⚠ **本笔⛔ 结掉的欠读数只有一枚**（登记②）。仍欠的三枚（本笔⛔ 动它们）：`:431` 仍把 `normPath` 的比较形当 `Root.Path` 报出去（`A834` 已登记、本轮⛔ 修）；`fsutil 8dot3name query C:` 需提权（`Error 5`）＝⛔ 我取得到；★**新抓一枚具名欠读数**＝`bridge.go:925` 那三枚前提 `if b.injected || b.prov == nil || taskID == ""` 里，**真跑时 `taskID==""` 会不会发生**（发生 ⇒ R4 探测器整枚不挂＝"少报"的第二条形，成因与 307 无关）＝本轮⛔ 答、⛔ 算 307 的欠账，⛔ 我自己车道下一发只读尺。
+
+### 4. 现态与 next
+
+- 现态＝票 307 **1 勾／5 未勾**（框尺 6／未勾 5，10:5x 重跑；`307-v1` 已交 AC#1＋AC#2 判语＝`ed1d2bad`，⛔ 由我翻，等它五格齐）；票 40 **0 勾／8 未勾**（本轮⛔ 动框）；票 306 `-done`；长度门本机 **GREEN**（`c6fc78f0`）。
+- 在飞＝**`307-v1`**（除 AC#1＋AC#2 外已交 `50-ac5.md` 与 `90-final.md`，正在收口）∥ **`72-a2`**。两枚腿的越界尺我自己逐笔重跑＝`c04ced26` 1 枚文件／落在自家外 **0**、`ed1d2bad` 27／**0**、`7db4db4b` 1／**0**、`94c2808c` 4／**1**——那 **1** 枚＝`docs/evidence/s1/acceptance.md`，⛔ 算越界：AGENTS **§1.5**「交付物落点」逐字规定"裁决表：`docs/evidence/s1/`"⇒ 裁决腿写那里是**规定动作**；我把这条写在这儿，是因为我自己派单里那句"只许落 `probes/<票>/<腿>/**`"这把尺**打得比规矩宽**，⛔ 让下一位拿它误报一枚合规件。突变还原尺＝`git status --porcelain -- internal cmd`＝**0 行**。
+- next＝收两枚腿 ⇒ 我逐格翻或退回 → 我自己那发只读尺答 `taskID==""` 那问 → 我跑票 305 那六发（⚠ 先量变量、⛔ bisect、要编队静的窗口）→ 补票 300 `AC#4` → 推送（⛔ 排，`A813` 仍⛔ 用）。队列 `298-v1`→`296-r2`→`295-r1`→`294-r1`→`294-v1`。
+- ⛔ push；⛔ 动别人的件；⛔ 改票 40／票 307 一句原话。

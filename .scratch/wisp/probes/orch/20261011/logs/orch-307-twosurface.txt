@@ -1,0 +1,32 @@
+# orchestrator two-surface rerun start 10:59:01 HEAD=a6267fbb
+rm_rf_rc=0 (target is this script's own out-of-repo tree /c/Users/swq/tmp/wisp-307-orch-tree)
+archive_rc=0
+cmd go.mod go.sum internal 
+tree_go_files=648
+=== identity check tree vs repo (cmp -s, 3 files) ===
+SAME internal/risk/syncdirs.go
+SAME internal/risk/blacklist.go
+DIFF internal/risk/provenance.go
+=== internal/cmd dirty in repo (should be 0) ===
+dirty=0
+=== surface A: ALIASED TEMP (C:\Users\swq\tmp\RISKAT~1\RUNNER~1) ===
+aliased_rc=1
+aliased PASS=192
+aliased FAIL=7
+aliased SKIP=1
+aliased fail names:
+  --- FAIL: TestClassifyAnchorSpellingIsNotVerdict (0.08s)
+  --- FAIL: TestCanonicalInputGainsNoSecondForm (0.01s)
+  --- FAIL: TestAListWinsWhereBothTablesHit (0.01s)
+  --- FAIL: TestPathResolverShortNameAListDenied (0.01s)
+  --- FAIL: TestPathResolverUNCAListDenied (0.01s)
+  --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+  --- FAIL: TestBListDefaultDenyAndOverride (0.01s)
+=== surface B: default TEMP (no alias on this machine) ===
+default_rc=0
+default PASS=199
+default FAIL=0
+default SKIP=1
+default fail names:
+alias short path used exists: yes
+# done 10:59:13

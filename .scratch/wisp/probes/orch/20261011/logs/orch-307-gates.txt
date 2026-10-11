@@ -1,0 +1,8 @@
+# gates rerun by orchestrator 10:57 HEAD=94c2808c
+build_rc=0
+vet_rc=0
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 528 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=229, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=528, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 528 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included
+d22scan_rc=0
