@@ -1,0 +1,22 @@
+== fresh tree: /d/tmp/wisp-304v1b-fmt-dBEb8e ==
+== gofumpt ==
+-rwxr-xr-x 1 swq 197609 5028352 Oct  7 14:17 D:\work\base\gopath/bin/gofumpt.exe
+v0.12.0 (go1.27.1)
+ver_rc=0
+== worktree roster (r1 four files, worktree at 3b8066a2) ==
+fmt_worktree_rc=0
+== blob roster (git show HEAD:path) ==
+extract_rc=0
+fmt_blob_rc=0
+cmp b1 OK
+cmp b2 OK
+cmp b3 OK
+cmp b4 OK
+cmp_rc=0
+== pathlen worst line ==
+6:check-path-length-budget.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+12:check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+15:check-path-length-budget.sh: denominator: tracked paths=11022  over-budget=57  covered by roster=57  not in roster=0
+17:check-path-length-budget.sh: worst full path on the self-hosted runner=228 chars (hat budget 165, wall open interval (206,217])
+19:check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+rc=0

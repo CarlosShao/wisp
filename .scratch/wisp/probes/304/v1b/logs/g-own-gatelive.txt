@@ -1,0 +1,8 @@
+== own live gate, four names per canonical gate-roster-304.md S1 ==
+name=wisp.exe rows=0 tasklist_rc=0
+name=balldebug.exe rows=0 tasklist_rc=0
+name=mockllm.exe rows=0 tasklist_rc=0
+name=wisp.test.exe rows=0 tasklist_rc=0
+gate_rc=0
+== attribution dump (four families only) ==
+attr_rc=0

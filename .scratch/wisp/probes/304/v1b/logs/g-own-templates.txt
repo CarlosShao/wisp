@@ -1,0 +1,18 @@
+== five historical template copies: last commit touching each (expect pre-304) ==
+-- .scratch/wisp/probes/orch/2026-10-09-live-window-runsheet.md --
+75620005 2026-10-09 腿 livewin-1 第 3 笔（终态）：§10 补 path-length 尺的原样 rc 与 RED 归因�
+log_rc=0
+mockllm mentions: 0
+-- .scratch/wisp/probes/orch/296-ac3-runsheet.md --
+2576b915 2026-10-11 台账 A845＝派 `writeface-1`（只读，⛔ Go 编译面，锚笔 `5f2289e3`）去量"�
+log_rc=0
+mockllm mentions: 0
+-- .scratch/wisp/probes/orch/a793-append.md --
+log_rc=0
+mockllm mentions: 0
+-- .scratch/wisp/probes/orch/handover-40as.md --
+log_rc=0
+mockllm mentions: 0
+-- .scratch/wisp/probes/orch/handover-40at.md --
+log_rc=0
+mockllm mentions: 0
