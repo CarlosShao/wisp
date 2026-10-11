@@ -1,0 +1,3 @@
+[dev f4920906] 309-r3: land start anchor (HEAD 3974ab4d, worktree clean, staged 0)
+ 1 file changed, 27 insertions(+)
+ create mode 100644 .scratch/wisp/probes/309/r3/00-anchor.md

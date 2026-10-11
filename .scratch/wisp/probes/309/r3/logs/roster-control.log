@@ -1,0 +1,26 @@
+BEFORE=3974ab4d5b4991a9152985afce7701c3cf5bbfbc  AFTER=a1f84d39a9296f42c801ba9320a581049ab2e57a
+commits between (code only): 6
+  changed .go: internal/llm/adaptertest/childjob_other.go
+  changed .go: internal/llm/adaptertest/childjob_windows.go
+  changed .go: internal/llm/adaptertest/mockllm.go
+  changed .go: internal/llm/openaichat/mockllm_integ_test.go
+  changed .go: internal/tools/bridge.go
+  changed .go: internal/tools/toolrequest_nail_309_test.go
+== before dir=/tmp/wisp309r3-roster-before.9jqqKz  non-test .go under four roots=293
+  roster lines=279 top=211 sub=68 FAIL=1 SKIP=0 (empty above == 0)
+  rc line: rc=1
+== after dir=/tmp/wisp309r3-roster-after.sWAuOh  non-test .go under four roots=295
+  roster lines=279 top=211 sub=68 FAIL=1 SKIP=0 (empty above == 0)
+  rc line: rc=1
+
+########## diff: names present in AFTER but not BEFORE (added) ##########
+added_count=1
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/wisp309r3-roster-after.sWAuOh
+########## diff: names present in BEFORE but not AFTER (removed) ##########
+removed_count=1
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/wisp309r3-roster-before.9jqqKz
+########## newly RED (FAIL in after, not FAIL in before) ##########
+newly_red_count=0 (empty above == 0 == no newly red)
+fail_before_count=1  fail_after_count=1
+rc_final=0
+rc_roster_script=0

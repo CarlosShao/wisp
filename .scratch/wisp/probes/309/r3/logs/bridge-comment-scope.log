@@ -1,0 +1,25 @@
+== B1 changed lines that are NOT comment lines (expect 0, empty above=0)
+noncomment_changed=0
+== numstat
+14	4	internal/tools/bridge.go
+== B2 CR count in worktree file (expect 0)
+0
+== B3 strip full-line comments: HEAD blob vs worktree, cmp
+.scratch/wisp/probes/309/r3/logs/bridge-head-stripped.txt .scratch/wisp/probes/309/r3/logs/bridge-work-stripped.txt differ: byte 15847, line 986
+1348
+1358
+320d0d6922d8cfcf28b205690664dc941576d13fca8e4811f98d552334155e42 *.scratch/wisp/
+1e4f60ffd6f31d2e757bf4d6a852d5e355a3ea46a1627740122db817feaa5fa3 *.scratch/wisp/
+== B4 guard limb byte check
+1
+1
+1
+== B5 shape label count ruler
+7
+"alias-literal"
+"conversion-to-tool-request"
+"make-slice-of-tool-request"
+"new-of-tool-request"
+"qualified-literal"
+"same-package-bare-literal"
+"var-decl-no-initializer"

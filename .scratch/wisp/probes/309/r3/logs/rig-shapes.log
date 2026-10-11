@@ -1,0 +1,115 @@
+REV=a1f84d39a9296f42c801ba9320a581049ab2e57a
+anchor-of-this-leg-HEAD=a1f84d39
+########## pristine control: untouched archive -> expect GREEN ##########
+TAG=pristine DIR=/tmp/wisp309r3-pristine.G3ieTw
+  go.mod present: yes
+  .go in tree: 997
+  non-test .go under the four roots: 295
+  rc=0  named_lines:
+    === RUN   Test309ToolRequestProductionConstructionNail
+        toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=295 
+    --- PASS: Test309ToolRequestProductionConstructionNail (0.21s)
+    rc=0
+
+########## RIG (new) ADD -> expect RED on Test309ToolRequestProductionConstructionNail ##########
+TAG=new DIR=/tmp/wisp309r3-new.vfkrrb
+  go.mod present: yes
+  .go in tree: 997
+  non-test .go under the four roots: 295
+  added file: internal/tools/zz309r3new.go
+  landed bytes: 139  sha256[:16]=078bace59e060fde
+  file content verbatim:
+    package tools
+    
+    import "github.com/CarlosShao/wisp/internal/agent"
+    
+    func rig309r3New() *agent.ToolRequest { return new(agent.ToolRequest) }
+  rc=1  named_lines:
+    === RUN   Test309ToolRequestProductionConstructionNail
+        toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 interna
+        toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=296 
+    --- FAIL: Test309ToolRequestProductionConstructionNail (0.23s)
+    rc=1
+########## RIG (new) REMOVE -> expect GREEN on the SAME nail ##########
+  removed? still present count: NO
+  tree non-test .go count now: 295
+  rc=0  named_lines:
+    === RUN   Test309ToolRequestProductionConstructionNail
+        toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=295 
+    --- PASS: Test309ToolRequestProductionConstructionNail (0.23s)
+    rc=0
+  restore proof: nail test + bridge.go byte-identical to the archive commit
+    cmp internal/tools/toolrequest_nail_309_test.go: IDENTICAL
+    sha256[:16] tree=c4aa3d46a6daf3d8  commit=c4aa3d46a6daf3d8
+    cmp internal/tools/bridge.go: IDENTICAL
+    sha256[:16] tree=e6c685da6bfbcfdf  commit=e6c685da6bfbcfdf
+
+########## RIG (make) ADD -> expect RED on Test309ToolRequestProductionConstructionNail ##########
+TAG=make DIR=/tmp/wisp309r3-make.xeVIjF
+  go.mod present: yes
+  .go in tree: 997
+  non-test .go under the four roots: 295
+  added file: internal/agent/zz309r3make.go
+  landed bytes: 83  sha256[:16]=099425cc8a58b9e0
+  file content verbatim:
+    package agent
+    
+    func rig309r3Make() []ToolRequest { return make([]ToolRequest, 0) }
+  rc=1  named_lines:
+    === RUN   Test309ToolRequestProductionConstructionNail
+        toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 interna
+        toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=296 
+    --- FAIL: Test309ToolRequestProductionConstructionNail (0.21s)
+    rc=1
+########## RIG (make) REMOVE -> expect GREEN on the SAME nail ##########
+  removed? still present count: NO
+  tree non-test .go count now: 295
+  rc=0  named_lines:
+    === RUN   Test309ToolRequestProductionConstructionNail
+        toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=295 
+    --- PASS: Test309ToolRequestProductionConstructionNail (0.19s)
+    rc=0
+  restore proof: nail test + bridge.go byte-identical to the archive commit
+    cmp internal/tools/toolrequest_nail_309_test.go: IDENTICAL
+    sha256[:16] tree=c4aa3d46a6daf3d8  commit=c4aa3d46a6daf3d8
+    cmp internal/tools/bridge.go: IDENTICAL
+    sha256[:16] tree=e6c685da6bfbcfdf  commit=e6c685da6bfbcfdf
+
+########## RIG (conv) ADD -> expect RED on Test309ToolRequestProductionConstructionNail ##########
+TAG=conv DIR=/tmp/wisp309r3-conv.eJ2gDS
+  go.mod present: yes
+  .go in tree: 997
+  non-test .go under the four roots: 295
+  added file: internal/tools/zz309r3conv.go
+  landed bytes: 182  sha256[:16]=4cd38fe571f279d7
+  file content verbatim:
+    package tools
+    
+    import "github.com/CarlosShao/wisp/internal/agent"
+    
+    type rig309r3X agent.ToolRequest
+    
+    func rig309r3Conv(x rig309r3X) agent.ToolRequest { return agent.ToolRequest(x) }
+  rc=1  named_lines:
+    === RUN   Test309ToolRequestProductionConstructionNail
+        toolrequest_nail_309_test.go:390: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 interna
+        toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=296 
+    --- FAIL: Test309ToolRequestProductionConstructionNail (0.21s)
+    rc=1
+########## RIG (conv) REMOVE -> expect GREEN on the SAME nail ##########
+  removed? still present count: NO
+  tree non-test .go count now: 295
+  rc=0  named_lines:
+    === RUN   Test309ToolRequestProductionConstructionNail
+        toolrequest_nail_309_test.go:478: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=295 
+    --- PASS: Test309ToolRequestProductionConstructionNail (0.15s)
+    rc=0
+  restore proof: nail test + bridge.go byte-identical to the archive commit
+    cmp internal/tools/toolrequest_nail_309_test.go: IDENTICAL
+    sha256[:16] tree=c4aa3d46a6daf3d8  commit=c4aa3d46a6daf3d8
+    cmp internal/tools/bridge.go: IDENTICAL
+    sha256[:16] tree=e6c685da6bfbcfdf  commit=e6c685da6bfbcfdf
+
+########## the shared worktree is untouched by this script ##########
+(empty above == 0 rows == clean)
+rc_worktree_dirty_count=0

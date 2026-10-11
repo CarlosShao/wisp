@@ -1,0 +1,5 @@
+== B3-redo: DELETE full-line comments (same ruler 309-v2 used: 854<->854)
+cmp IDENTICAL (comments deleted)
+head_lines=854 work_lines=854
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scr
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scr

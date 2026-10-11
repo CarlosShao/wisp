@@ -1,0 +1,9 @@
+== unchanged assertion constants (ruler: git diff 3974ab4d a1f84d39 -- nail test, grep want/floor)
+assertion_lines_changed=0 (empty above == 0)
+== control count
+18
+== status of forbidden faces
+(empty above == 0 rows)
+== go files under my probes dir
+0
+rc=0

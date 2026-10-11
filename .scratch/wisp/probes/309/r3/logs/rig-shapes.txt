@@ -1,0 +1,89 @@
+#!/bin/sh
+# 309-r3 teeth: for EACH of the three shapes 309-r3 added to the nail matcher, one shot that
+# adds a REAL construction point to a tree (expect the named nail RED), one shot that removes
+# that same point again (expect the SAME nail GREEN). Nothing is mutated in the shared worktree.
+#   RIG-7  new(agent.ToolRequest)                 -> internal/tools/zz309r3new.go   (package tools)
+#   RIG-8  make([]ToolRequest, 0)                 -> internal/agent/zz309r3make.go  (package agent,
+#            bare name + the make(..., 0) length form, in the package the pre-309-r2 nail skipped)
+#   RIG-9  type X agent.ToolRequest + conversion  -> internal/tools/zz309r3conv.go
+# Trees come from `git archive <this leg's commit>` only (single face: the nail and bridge.go
+# read in the tree ARE the committed bytes, no cp of uncommitted files = no mixed face).
+REV=$(git rev-parse HEAD)
+LOGS=$(pwd)/.scratch/wisp/probes/309/r3/logs
+T=Test309ToolRequestProductionConstructionNail
+echo "REV=$REV"
+echo "anchor-of-this-leg-HEAD=$(git rev-parse --short HEAD)"
+
+build_tree() { # $1 = tag
+  D=$(mktemp -d "${TMPDIR:-/tmp}/wisp309r3-$1.XXXXXX") || return 1
+  git archive --format=tar "$REV" | tar -x -C "$D"
+  echo "TAG=$1 DIR=$D"
+  echo "  go.mod present: $(test -f "$D/go.mod" && echo yes || echo NO)"
+  echo "  .go in tree: $(find "$D" -name '*.go' | wc -l)"
+  echo "  non-test .go under the four roots: $(find "$D/cmd" "$D/internal" "$D/tools" "$D/scripts" -name '*.go' -not -name '*_test.go' | wc -l)"
+  echo "$D" > "$LOGS/tree-$1.dir"
+}
+
+run_nail() { # $1 = tree dir, $2 = log basename
+  ( cd "$1" && GOFLAGS= go test ./internal/tools/ -count=1 -run "$T" -v > "$LOGS/$2.log" 2>&1 )
+  RC=$?
+  echo "rc=$RC" >> "$LOGS/$2.log"
+  echo "  rc=$RC  named_lines:"
+  grep -E "^(--- |=== RUN|rc=)|枚数钉响|生产构造点=" "$LOGS/$2.log" | sed 's/^/    /' | cut -c1-230
+}
+
+echo "########## pristine control: untouched archive -> expect GREEN ##########"
+build_tree pristine
+run_nail "$(cat "$LOGS/tree-pristine.dir")" rig-pristine
+
+for SHAPE in new make conv; do
+  case "$SHAPE" in
+    new)  FILE=internal/tools/zz309r3new.go
+          BODY='package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+func rig309r3New() *agent.ToolRequest { return new(agent.ToolRequest) }
+' ;;
+    make) FILE=internal/agent/zz309r3make.go
+          BODY='package agent
+
+func rig309r3Make() []ToolRequest { return make([]ToolRequest, 0) }
+' ;;
+    conv) FILE=internal/tools/zz309r3conv.go
+          BODY='package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+type rig309r3X agent.ToolRequest
+
+func rig309r3Conv(x rig309r3X) agent.ToolRequest { return agent.ToolRequest(x) }
+' ;;
+  esac
+  echo
+  echo "########## RIG ($SHAPE) ADD -> expect RED on $T ##########"
+  build_tree "$SHAPE"
+  D=$(cat "$LOGS/tree-$SHAPE.dir")
+  printf '%s' "$BODY" > "$D/$FILE"
+  echo "  added file: $FILE"
+  echo "  landed bytes: $(wc -c < "$D/$FILE")  sha256[:16]=$(sha256sum "$D/$FILE" | cut -c1-16)"
+  echo "  file content verbatim:"; sed 's/^/    /' "$D/$FILE"
+  run_nail "$D" "rig-$SHAPE-add"
+  echo "########## RIG ($SHAPE) REMOVE -> expect GREEN on the SAME nail ##########"
+  rm "$D/$FILE"
+  echo "  removed? still present count: $(test -e "$D/$FILE" && echo YES || echo NO)"
+  echo "  tree non-test .go count now: $(find "$D/cmd" "$D/internal" "$D/tools" "$D/scripts" -name '*.go' -not -name '*_test.go' | wc -l)"
+  run_nail "$D" "rig-$SHAPE-del"
+  echo "  restore proof: nail test + bridge.go byte-identical to the archive commit"
+  for F in internal/tools/toolrequest_nail_309_test.go internal/tools/bridge.go; do
+    git show "$REV:$F" > "$LOGS/$(basename "$F").at-commit.txt"
+    cmp "$LOGS/$(basename "$F").at-commit.txt" "$D/$F" && echo "    cmp $F: IDENTICAL"
+    echo "    sha256[:16] tree=$(sha256sum "$D/$F" | cut -c1-16)  commit=$(sha256sum "$LOGS/$(basename "$F").at-commit.txt" | cut -c1-16)"
+  done
+done
+
+echo
+echo "########## the shared worktree is untouched by this script ##########"
+git status --porcelain -- internal cmd tools scripts
+echo "(empty above == 0 rows == clean)"
+echo "rc_worktree_dirty_count=$(git status --porcelain -- internal cmd tools scripts | grep -c '' || true)"

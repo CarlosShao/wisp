@@ -1,0 +1,47 @@
+#!/bin/sh
+# 309-r3 positive control (dispatch brief section 2 item 4): the WHOLE package
+# `go test ./internal/tools/ -count=1` per-name roster, once from the dispatch anchor commit
+# (before this leg's two code changes) and once from this leg's code commit (after), on the
+# SAME face: both trees come from `git archive <rev>` so neither reading is the shared
+# worktree and no other leg's in-flight file can join either one.
+# The roster diff must show 0 newly red. Elapsed-time column stripped before diffing
+# (sed -E 's/ \([0-9.]+s\)$//'), otherwise the diff is dozens of false lines.
+LOGS=$(pwd)/.scratch/wisp/probes/309/r3/logs
+BEFORE=$(git rev-parse 3974ab4d)
+AFTER=$(git rev-parse HEAD)
+echo "BEFORE=$BEFORE  AFTER=$AFTER"
+echo "commits between (code only): $(git log --oneline $BEFORE..$AFTER | wc -l)"
+git diff --name-only $BEFORE $AFTER -- '*.go' | sed 's/^/  changed .go: /'
+
+for TAG in before after; do
+  case $TAG in before) REV=$BEFORE;; after) REV=$AFTER;; esac
+  D=$(mktemp -d "${TMPDIR:-/tmp}/wisp309r3-roster-$TAG.XXXXXX")
+  git archive --format=tar "$REV" | tar -x -C "$D"
+  echo "== $TAG dir=$D  non-test .go under four roots=$(find "$D/cmd" "$D/internal" "$D/tools" "$D/scripts" -name '*.go' -not -name '*_test.go' | wc -l)"
+  ( cd "$D" && GOFLAGS= go test ./internal/tools/ -count=1 -v > "$LOGS/roster-$TAG.log" 2>&1; echo "rc=$?" >> "$LOGS/roster-$TAG.log" )
+  grep -E '^(    )*--- (PASS|FAIL|SKIP): ' "$LOGS/roster-$TAG.log" \
+    | sed -E 's/ \([0-9.]+s\)$//' > "$LOGS/roster-$TAG.names"
+  echo "  roster lines=$(wc -l < "$LOGS/roster-$TAG.names")" \
+       "top=$(grep -c '^--- ' "$LOGS/roster-$TAG.names" || true)" \
+       "sub=$(grep -c '^    --- ' "$LOGS/roster-$TAG.names" || true)" \
+       "FAIL=$(grep -c 'FAIL:' "$LOGS/roster-$TAG.names" || true)" \
+       "SKIP=$(grep -c 'SKIP:' "$LOGS/roster-$TAG.names" || true)" \
+       "(empty above == 0)"
+  echo "  rc line: $(grep -E '^rc=' "$LOGS/roster-$TAG.log")"
+done
+
+echo
+echo "########## diff: names present in AFTER but not BEFORE (added) ##########"
+sort "$LOGS/roster-before.names" > "$LOGS/roster-before.sorted"; sort "$LOGS/roster-after.names" > "$LOGS/roster-after.sorted"
+comm -13 "$LOGS/roster-before.sorted" "$LOGS/roster-after.sorted" > "$LOGS/roster-added.txt"
+echo "added_count=$(wc -l < "$LOGS/roster-added.txt")"; cat "$LOGS/roster-added.txt"
+echo "########## diff: names present in BEFORE but not AFTER (removed) ##########"
+comm -23 "$LOGS/roster-before.sorted" "$LOGS/roster-after.sorted" > "$LOGS/roster-removed.txt"
+echo "removed_count=$(wc -l < "$LOGS/roster-removed.txt")"; cat "$LOGS/roster-removed.txt"
+echo "########## newly RED (FAIL in after, not FAIL in before) ##########"
+grep 'FAIL:' "$LOGS/roster-after.names" | sort > "$LOGS/fail-after.txt"
+grep 'FAIL:' "$LOGS/roster-before.names" | sort > "$LOGS/fail-before.txt"
+comm -13 "$LOGS/fail-before.txt" "$LOGS/fail-after.txt" > "$LOGS/fail-new.txt"
+echo "newly_red_count=$(wc -l < "$LOGS/fail-new.txt") (empty above == 0 == no newly red)"; cat "$LOGS/fail-new.txt"
+echo "fail_before_count=$(wc -l < "$LOGS/fail-before.txt")  fail_after_count=$(wc -l < "$LOGS/fail-after.txt")"
+echo "rc_final=0"

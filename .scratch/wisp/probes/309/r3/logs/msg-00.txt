@@ -1,0 +1,8 @@
+309-r3: land start anchor (HEAD 3974ab4d, worktree clean, staged 0)
+
+Write leg for ticket 309 round 3. This commit carries only the start anchor
+file so the git readings above are on disk before any code is touched.
+
+Rulers: git rev-parse --short HEAD; git status --porcelain -- internal cmd
+tools scripts; git diff --cached --name-only with core.quotePath=false.
+Scope: own pathspecs only. No push. No index sweep from other legs touched.

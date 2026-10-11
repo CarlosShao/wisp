@@ -1,0 +1,279 @@
+--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector
+--- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile
+    --- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/overwrite_branch_target_keeps_every_old_byte
+    --- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/new_file_branch_target_never_appears
+    --- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/the_next_write_reclaims_the_staging_residue
+--- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute
+    --- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute/fs.read_through_a_real_junction
+    --- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute/fs.list_through_a_real_junction
+--- PASS: TestBridgeWritesNothingThroughARealJunction
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.write_over_the_junctioned_target
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.write_a_new_file_through_the_junction
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.trash_through_the_junction
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.move_through_the_junction
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.delete_through_the_junction
+--- PASS: TestJunctionInsideAnAllowedRootCannotReachAnAListFile
+--- PASS: TestBridgeRefusesTheRealShortNameOfAnAListFile
+--- PASS: TestShortNameSpellingGetsTheSameVerdictAsTheLongOne
+    --- PASS: TestShortNameSpellingGetsTheSameVerdictAsTheLongOne/an_approved_out_of_scope_short_name_reads_the_file_the_card_named
+--- PASS: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing
+--- PASS: TestRealToolCallWritesRewriteAccountIntoAudit
+--- PASS: TestUnusableRootIsVisibleInTheAuditRecord
+--- PASS: TestAccountRecordIsWrittenEvenWithNothingToReport
+--- PASS: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope
+--- PASS: TestC1ToolContract
+--- PASS: TestToolConcurrencyCeilingIsFour
+--- PASS: TestPerToolTimeoutHonoredViaContext
+--- PASS: TestCapabilitySetIsFrozen
+--- PASS: TestUndeclaredCapabilityHardRejects
+--- PASS: TestC4SlotsWithoutAnImplementationAreNotSilent
+--- PASS: TestC4RegistryRejectsBadDeclarations
+--- PASS: TestRiskDecisionRoutesEachLevelToItsBranch
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L0_passes_and_no_gate_is_consulted
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L1_uses_the_pending-window_callback
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L1_window_timeout_means_execute
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L1_veto_returns_a_failure_to_the_model,_not_to_the_user
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L2_uses_the_pending-approval_callback
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L2_approval_timeout_auto-rejects
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/NoGate_fails_closed_above_L0
+--- PASS: TestDeclaredRiskIsOnlyAFloor
+--- PASS: TestToolCallRowsAreComplete
+--- PASS: TestBridgeIsTheLoopToolProvider
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+--- PASS: Test236R2TaskCancelRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID
+--- PASS: TestFSEditKeepsABOMItWasNotAskedToTouch
+--- PASS: TestFSEditOnACRLFFileRefusesAnLFSpelledOld
+--- PASS: TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF
+--- PASS: TestFSEditDoesNotRewriteAnLFFilesLineEndings
+--- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/crlf_file_lf_spelled_old
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/cr_only_file_lf_spelled_old
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_crlf_line_lf_spelled
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_lf_line_crlf_spelled
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/lf_file_crlf_spelled_old
+--- PASS: TestFSEditSilentShapeChangesLandToday
+    --- PASS: TestFSEditSilentShapeChangesLandToday/an_old_that_carries_the_bom_is_refused_r3
+    --- PASS: TestFSEditSilentShapeChangesLandToday/an_lf_spelled_new_in_a_crlf_file_is_refused_r3
+--- PASS: TestFSEditKilledMidWriteLeavesTheTargetByteIdentical
+--- PASS: TestFSEditWithoutTheStagedWriterWouldCorruptTheTarget
+--- PASS: TestFSEditRefusesAnOldThatSwallowsTheFileBOM
+--- PASS: TestFSEditStillLandsAnOldStartingAtByteZeroWithoutABOM
+--- PASS: TestFSEditCannotBeFedAPartialBOMThroughJSON
+--- PASS: TestFSEditRefusesALFSpelledNewInAPureCRLFFile
+--- PASS: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak
+    --- PASS: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/lf_file_lands_an_lf_spelled_new
+    --- PASS: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/mixed_file_is_not_refused
+--- PASS: TestFSEditLeavesNeitherTheCRLFNorTheBareLFOfAMixedFileRewritten
+--- PASS: TestFSEditRealTaskkillLeavesTheTargetWholeAndNamesTheStagingResidue
+--- PASS: TestFSEditAndFSWriteShareTheOutOfScopeVerdict
+--- PASS: TestFSEditRoutesToApprovalNotTheL1Window
+--- PASS: TestFSEditOutOfScopeIsJudgedFromTheDeclaredPathNotTheToolWord
+--- PASS: TestFSEditRefusesAPathC26CannotCanonicalize
+--- PASS: TestFSEditWriteReclaimsADeadWritersOrphan
+--- PASS: TestFSEditRefusesANonLiteralOld
+--- PASS: TestFSEditRefusesAnAmbiguousOldIsADistinctError
+--- PASS: TestFSEditRefusesAnEmptyOldIsAWholeFileInsert
+--- PASS: TestFSEditIsAllOrNothingAcrossABatch
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/empty_batch
+--- PASS: TestFSEditAppliesABatchOnDisk
+--- PASS: TestSweepReclaimsOnlyItsOwnStagingFiles
+--- PASS: TestSweepNamingSchemeRejectsNearMisses
+--- PASS: TestSweepNeverDeletesThroughARealJunction
+--- PASS: TestSweepSparesATempFileHeldByAnotherProcess
+--- PASS: TestFSReadReturnsTheFileAndTaintsIt
+--- PASS: TestFSReadTaintFeedsR4
+--- PASS: TestFSListSummarizesADirectory
+--- PASS: TestFSListHonoursItsCap
+--- PASS: TestEmptyAllowlistAuthorizesNothing
+--- PASS: TestSensitiveFileIsDeniedNotEscalated
+--- PASS: TestFSRegistrationIsTheD34Roster
+--- PASS: TestDeleteEnabledAddsFSDelete
+--- PASS: TestToolsDirectoryShape
+--- PASS: TestD34WriteMatrix
+    --- PASS: TestD34WriteMatrix/read_inside_allowlist_is_L0
+    --- PASS: TestD34WriteMatrix/read_out_of_allowlist_is_L2_and_is_a_verdict_not_a_dormant_rule
+    --- PASS: TestD34WriteMatrix/list_out_of_allowlist_is_L2
+    --- PASS: TestD34WriteMatrix/write_new_file_is_L1
+    --- PASS: TestD34WriteMatrix/write_over_existing_is_L2_via_R8
+    --- PASS: TestD34WriteMatrix/write_out_of_allowlist_is_L2
+    --- PASS: TestD34WriteMatrix/trash_is_L1_because_the_bin_can_give_it_back
+    --- PASS: TestD34WriteMatrix/move_same_volume_new_destination_is_L1
+    --- PASS: TestD34WriteMatrix/move_over_existing_destination_is_L2
+    --- PASS: TestD34WriteMatrix/move_across_volumes_is_L2
+    --- PASS: TestD34WriteMatrix/delete_when_enabled_is_L2
+--- PASS: TestCrossVolumeRuleIsR8
+--- PASS: TestOverwriteDetectionFollowsTheCanonicalPath
+--- PASS: TestAtomicWriteKillsMidWrite
+    --- PASS: TestAtomicWriteKillsMidWrite/overwrite_target_keeps_its_old_bytes
+    --- PASS: TestAtomicWriteKillsMidWrite/new_file_target_does_not_appear_at_all
+    --- PASS: TestAtomicWriteKillsMidWrite/a_clean_write_lands_and_round_trips
+--- PASS: TestWriteRefusesABodyOverTheCap
+--- PASS: TestFSTrashGoesToTheRecycleBin
+--- PASS: TestFSTrashNeverFallsBackToAnUnlink
+--- PASS: TestDeleteIsAbsentFromTheRosterWhenTheFlagIsOff
+--- PASS: TestDeleteEnabledRegistersItAsL2
+    --- PASS: TestDeleteEnabledRegistersItAsL2/refused_by_the_gate_it_writes_nothing
+    --- PASS: TestDeleteEnabledRegistersItAsL2/approved_it_deletes_and_says_it_is_permanent
+--- PASS: TestFSMoveSameVolume
+--- PASS: TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop
+--- PASS: TestVetoAfterWorkStartedProducesAppliedSteps
+--- PASS: TestCancelBusIsNotWiredMeansNoVetoChannel
+--- PASS: TestFSWriteSilentLossIsNotReported
+--- PASS: TestTicket224LiveGrantStopsTheL1Question
+--- PASS: TestTicket224PartialPathCoverageStillAsks
+--- PASS: TestTicket224SessionGrantNeverCoversL2
+--- PASS: TestTicket224SessionGrantNeverCoversDeny
+--- PASS: TestTicket224GrantSourceThatCannotAnswerMeansAsking
+    --- PASS: TestTicket224GrantSourceThatCannotAnswerMeansAsking/reports_that_it_could_not_look
+    --- PASS: TestTicket224GrantSourceThatCannotAnswerMeansAsking/panics_mid-lookup
+--- PASS: TestTicket224PathlessCallIsNeverGranted
+--- PASS: TestTicket224GrantedCallBooksAllowSessionGrantWithItsRow
+--- PASS: TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority
+--- PASS: TestPathCanonicalizerAccountsForRewrittenRoots
+--- PASS: TestTicket252P1AllowlistLegs
+    --- PASS: TestTicket252P1AllowlistLegs/Q1_roots=LONG_asked=SHORT+missing-leaf
+    --- PASS: TestTicket252P1AllowlistLegs/Q2_roots=SHORT_asked=LONG+missing-leaf
+    --- PASS: TestTicket252P1AllowlistLegs/P1_roots=LONG_asked=LONG+missing-leaf
+    --- PASS: TestTicket252P1AllowlistLegs/P2_roots=LONG_asked=SHORT_of_an_EXISTING_dir
+    --- PASS: TestTicket252P1AllowlistLegs/P3_roots=SHORT_asked=SHORT_of_an_EXISTING_dir
+    --- PASS: TestTicket252P1AllowlistLegs/Q3b_roots=SHORT_asked=SHORT+missing-leaf
+--- PASS: TestTicket252P1OwnerMachineReachability
+--- PASS: TestTicket252P1EnvSpellingCensus
+--- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A1_roots=LONG_asked=SHORT+missing-leaf
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A2_roots=SHORT_asked=LONG+missing-leaf
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A3_roots=SHORT_asked=SHORT+missing-leaf
+    --- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized/A4_roots=LONG_asked=LONG+missing-leaf
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/wisp309r3-roster-after.sWAuOh
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/docs
+    --- PASS: TestTicket252R1BothSpellingsAnswerTheSame/tools
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree
+--- PASS: TestTicket107AllowlistJudgmentTwoShapes
+--- PASS: TestTicket107AllowlistBoundaryIsComponentWise
+--- PASS: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing
+--- PASS: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside
+--- PASS: TestTicket107bProbeBJudgedTreeIsTheOpenedTree
+--- PASS: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses
+--- PASS: TestTicket252R2BothContainmentsReachable
+--- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses
+    --- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf
+    --- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B2_short-of-existing-tree_itself
+--- PASS: TestWorkspaceRootAnswersWithTheAccountThatProducedTheNarrowing
+--- PASS: TestWorkspaceRootReportsARealRewrittenAccountRecordedByC26
+    --- PASS: TestWorkspaceRootReportsARealRewrittenAccountRecordedByC26/the_refusal_leg_is_untouched
+    --- PASS: TestWorkspaceRootReportsARealRewrittenAccountRecordedByC26/a_recorded_account_comes_back_as_written
+--- PASS: TestSetWorkspaceRootRefusesAnAccountAboutAnotherTree
+--- PASS: TestClearWorkspaceDropsTheAccountWithTheRoot
+--- PASS: TestWorkspaceSwitchNarrowsWhatTheAssessorJudges
+--- PASS: TestWorkspaceSwitchRefusesOutOfScopeAndMissingPaths
+--- PASS: TestWorkspaceSwitchRefusesAnExpandedSpelling
+    --- PASS: TestWorkspaceSwitchRefusesAnExpandedSpelling/leading_tilde
+    --- PASS: TestWorkspaceSwitchRefusesAnExpandedSpelling/environment_variable
+--- PASS: TestWorkspaceSwitchRefusesAJunctionToOutside
+--- PASS: TestCanonicalizeReturnsAPathTheOSCanOpen
+--- PASS: TestCanonicalizeAgreesWithTheOSName
+--- PASS: TestFoldPathKeepsPosixBackslashesDistinct
+--- PASS: TestDirOfBaseOfCutOnThePlatformSeparator
+--- PASS: TestPointer183BackfilledArtifactRereadStaysClean
+--- PASS: TestPointer183SiblingArtifactInTheSameDirectoryStillHits
+--- PASS: TestPointer185SecondRereadOfTheSameArtifactStaysClean
+--- PASS: TestPointer185PagedRereadsKeepWorking
+--- PASS: TestPointer185ForeignFileCarryingTheHostPathStillBlocksTheReread
+--- PASS: TestPointer185AModelNominatedFileIsNotRostered
+--- PASS: TestPointer185AnotherTaskCannotBorrowTheRoster
+--- PASS: TestPointer185SiblingHostArtifactIsNotLaundered
+--- PASS: TestRecycleBinStructLayoutMatchesWin32
+--- PASS: TestShellTrashLeavesARecycleBinEntryTheOSCanEnumerate
+--- PASS: TestShellTrashRefusesAMissingPathWithoutDeletingAnything
+--- PASS: Test197SpawnPublishesIdentityRow
+--- PASS: Test197RowExistsBeforeFirstChildModelCall
+--- PASS: Test197SubagentPoolNeverExceedsBridgeCeiling
+--- PASS: Test197SpawnDescriptionNamesTheRealPoolCap
+--- PASS: Test197SubagentPoolCapsAtBridgeCeiling
+--- PASS: Test197FullPoolRefusesNextSpawnWithReadableReason
+--- PASS: Test197ChildCannotDeriveSubagent
+--- PASS: Test197ConclusionCarriesTaskOutputTaint
+--- PASS: Test197CancelIsPerRowAndNeverCascades
+--- PASS: Test197SubagentHasNoSelfApprovalOutlet
+--- PASS: Test197StreamKeyShapeIsLiteral
+--- PASS: Test222SpawnConclusionArrivesThroughRealBridgeChildren
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot
+--- PASS: Test222CeilingStillCapsExecutedCallsWhileParentsWait
+--- PASS: Test221TaskCancelIsRegisteredAtItsFrozenLevel
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked
+--- PASS: Test221SpawnDescriptionPromisesOnlyWhatIsTrue
+--- PASS: Test221ParentStopsItsOwnChildRowAndStreamSettle
+--- PASS: Test221SubagentCannotStopSiblingOrItself
+--- PASS: Test221ParentCancellationStillDoesNotCascade
+--- PASS: Test221TaskCancelUnderNoGateStopsAtTheWindow
+--- PASS: Test221EveryPromisedTaskNameIsRegistered
+--- PASS: TestTaskOutputAC2BeforeLegIsUnreachable
+--- PASS: TestCanonicalizeFailureFailsClosedInReply174
+--- PASS: TestCanonicalizeFailureIsNotTheUnwiredArm174
+--- PASS: TestTaskOutputAC2AfterLegIsReachable
+--- PASS: TestUnknownTaskIDIsLoudNotEmpty
+--- PASS: TestMissingArgsAndUnwiredRoster
+--- PASS: TestLongOutputPointerRecoversEveryByte
+--- PASS: TestTruncationShapeIsTheD15Triple
+--- PASS: TestTruncationBudgetsAreRead
+--- PASS: TestNoCopyFileAnnouncesLoss
+--- PASS: TestPointerPast256KiBIsNotFullyReadable
+--- PASS: TestRosterIsNotAPathSurface
+--- PASS: TestPointerOutsideAuthorizedRootSpeaks
+--- PASS: TestPointerToMissingCopyFileSpeaks
+--- PASS: TestPointerToNonRegularPathSpeaks
+--- PASS: TestHealthyPointerStaysSilent
+--- PASS: TestUnwiredJudgeFailsClosedInReply
+--- PASS: TestBothPointerDefectsAreReportedSeparately
+--- PASS: TestPointerNoticeKeepsTheD153StubShape
+--- PASS: TestHealthyReplyStillMatchesThePreFixTemplate
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+--- PASS: TestLeakProbeTokenOnALegalPathStaysSilent174r3
+--- PASS: TestPointerAuthorityFollowsC26NotTheSpelling174r4
+--- PASS: TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4
+--- PASS: TestPointerCheckWritesNothing174r4
+--- PASS: TestTaskState188AC2VocabularyIsD43Only
+--- PASS: TestTaskState188AC2ValueComesFromTheRoster
+--- PASS: TestTaskState188AC2BackfillIsTheGoSideProducer
+--- PASS: TestTaskState188AC3PanelHasNoWriteLeg
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+--- PASS: TestTaskOutputStampedOnRealBridge175r2
+--- PASS: TestNonContentResultStaysUnmarked175r2
+--- PASS: TestForeignMentionOfHostPathStillHitsR4OnRealBridge175r2
+--- PASS: TestHostMintedPointerRereadStaysCleanOnRealBridge175r2
+--- PASS: TestEveryRegisteredToolIsClassifiedForMarking175r2
+--- PASS: TestBackfillFilesTheRealSpilledArtifact176r1
+--- PASS: TestTaskArtifactKeyStaysOutOfTheCallIDNamespace176r1
+--- PASS: TestNoRosterWriteAfterCancel176r1
+--- PASS: TestTerminalWriteCarrierStaysOutOfScope176r1
+--- PASS: TestTicket224GrantIDColumnRoundTripsThroughTheRealStore
+--- PASS: TestTicket224BridgeGrantChannelIsOneSeamWithNoSetter
+--- PASS: Test283TaskIDAccessorIsTheTaskIDNotTheCorr
+--- PASS: Test283IdentityChainThroughTheRealLoop
+--- PASS: Test285RosterRowsCarryDistinctCorrPerCall
+--- PASS: TestTicket90ModeReachesRoutingAsParameter
+--- PASS: TestTicket90TwoBridgesDoNotShareOneMode
+--- PASS: TestTicket90UnwiredModeSourceIsTheStrictestMode
+--- PASS: TestTicket90IrreversibleStillAsksInEveryMode
+--- PASS: TestTicket90TaintEscalationNeverSilenced
+--- PASS: TestTicket90TierADenySurvivesEveryMode
+--- PASS: TestTicket90ModeCarriesNoAllowAuthority
+--- PASS: TestTicket90BlacklistGateIsCalledOnLivePath
+--- PASS: Test309ToolRequestProductionConstructionNail
+--- PASS: TestLoopPassesDeclaredL1WriteThroughTheGate
+--- PASS: TestLoopStillRefusesL1WhenNoGateIsRegistered
+--- PASS: TestL1WriteGoesThroughTheRealBlockWindow
+--- PASS: TestVetoInsideTheWindowWritesNothing
+--- PASS: TestLateVetoRendersTheApprovalLayersAppliedStepsReport
+--- PASS: TestApprovedL2ThatStopsMidWriteIsNotRenderedAsNeverStarted
+--- PASS: TestFSReadOnlyNeverOpensACard

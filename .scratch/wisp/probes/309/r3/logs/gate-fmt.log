@@ -1,0 +1,10 @@
+== fmt ruler 1: worktree face, scope internal/tools
+gofmt_l_worktree=0
+gofumpt_l_worktree=0
+(empty above == 0 files listed)
+== fmt ruler 2: HEAD blob face (each tracked .go under internal/tools exported to a temp dir)
+gofmt_l_headblob=0
+gofumpt_l_headblob=0
+headblob_go_count=78
+== fmt ruler 3: repo-wide context (not mine to fix, named only)
+gofmt_l_repo_worktree=37

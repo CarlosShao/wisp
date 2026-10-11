@@ -1,0 +1,10 @@
+309-r3: evidence for the widened nail range and the narrowed comment
+
+Adds the leg artefacts 10-matcher-and-comment.md (file line by line, the seven
+shape labels the matcher now recognises, and the missed shapes kept named with
+their original register line numbers) and 20-teeth.md (six teeth shots: each of
+the three new shapes gains a real construction point in an out-of-repo export
+tree and the named nail goes red, then the point is removed and the same nail
+goes green, each with cmp plus sha256 restore proof), plus 30-gates.md and the
+rulers under logs/. No assertion relaxed, no SKIP created, no gate disabled.
+Worktree stayed clean for internal cmd tools scripts throughout.
