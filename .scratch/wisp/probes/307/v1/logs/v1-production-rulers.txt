@@ -1,0 +1,48 @@
+=== P1 生产 IsSyncPath 调用者 ===
+internal/risk/provenance.go:928:		if p.IsSyncPath(t).Sync {
+=== P2 非测试 NewProvenance 调用者 ===
+internal/risk/provenance.go:293:func NewProvenance(o ProvOptions) *Provenance {
+cmd/wisp/panel_assets.go:226:// (risk.NewProvenance(...).Detector(taskID), see internal/tools/bridge.go's
+cmd/wisp/panel_assets.go:239:	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+cmd/wisp/run.go:743:	c25 := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+=== P3 两枚调用者传的 ProvOptions（各取 6 行）===
+	// (risk.SrcTaskOutput). Handing the spawner a second engine would split the
+	// taint index the R4 checks read.
+	c25 := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+	rt.c25 = c25
+	rt.bridge = tools.New(tools.Options{
+		Registry: reg,
+		Paths:    rt.paths,
+		Gate:     rt.gate,
+---
+		return nil
+	}
+	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+	// Discarded on purpose, and named so: the handle OpenScope hands back is
+	// this scope's only closer, and a process-lifetime probe has no boundary to
+	// close it on. `_ =` says out loud what the old bare statement hid.
+	_ = prov.OpenScope(taintSourceScopeID)
+	for _, s := range f.sources {
+=== P4 SyncRoots:/SyncFixturePath: 非测试命中 ===
+0
+0
+=== P5 syncdirs.go add() 三枚 canon 赋值点（blob 行号）===
+88:	s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+152:		c.canon, c.canonical = normPath(res.Canonical), false
+156:		c.canon, c.canonical = normPath(res.Canonical), true
+160:		c.canon, c.canonical = normPath(expandInput(r.Path)), false
+163:		if e.canon == c.canon {
+=== P6 home 赋值点全集 ===
+internal/risk/provenance.go:345:		s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+internal/risk/syncdirs.go:88:	s := &syncSet{home: normPath(orDefault(o.HomeDir, userHomeDir())), excs: o.ReparseExceptions}
+=== P7 本机 profile 链有无别名（COM ShortPath 逐段）===
+=== P7 本机 profile 链 SHORT vs LONG（COM GetFolder().ShortPath）===
+USERPROFILE=[:USERPROFILE]
+long=C:\Users\swq
+short=C:\Users\swq
+long2=C:\Users\swq
+short2=C:\Users\swq
+appdata_long=C:\Users\swq\AppData\Roaming
+appdata_short=C:\Users\swq\AppData\Roaming
+rc_com_short=0
+=== P8 dir /X C:\Users （短名列）===
