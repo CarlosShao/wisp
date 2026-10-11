@@ -1,0 +1,1 @@
+rc=0 hits=0  (models.go 的 HEAD blob 不落 gofmt 名册＝假枚成立的 blob 侧读数；空即命中为零)

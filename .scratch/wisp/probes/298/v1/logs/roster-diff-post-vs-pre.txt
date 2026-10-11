@@ -1,0 +1,4 @@
+2a3
+> FAIL: TestAC228ExitRequestDuringBootStillLeavesThroughD38E
+36d36
+< PASS: TestAC228ExitRequestDuringBootStillLeavesThroughD38E

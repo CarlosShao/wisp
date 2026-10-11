@@ -1,0 +1,38 @@
+COMMIT 24ae75b7
+.scratch/wisp/probes/298/r1/00-anchor.md
+.scratch/wisp/probes/298/r1/logs/commit-msg-1.txt
+rc=0
+COMMIT 18d43f8e
+cmd/wisp/panel_inbound_guards_35r3_test.go
+cmd/wisp/panel_transport_35r2_test.go
+rc=0
+COMMIT c14fd204
+.scratch/wisp/probes/298/r1/10-ac0-dirt-shape.md
+.scratch/wisp/probes/298/r1/20-ac2-ac3-annotation-and-wording.md
+.scratch/wisp/probes/298/r1/logs/ac1-diff-U0.txt
+.scratch/wisp/probes/298/r1/logs/ac1-numstat.txt
+.scratch/wisp/probes/298/r1/logs/ac3-blob-wide-ruler.txt
+.scratch/wisp/probes/298/r1/logs/ac3-four-rulers.txt
+.scratch/wisp/probes/298/r1/logs/ac3-wide-ruler-fixed.txt
+.scratch/wisp/probes/298/r1/logs/blob-gofmt-d-35r2-transport.diff.txt
+.scratch/wisp/probes/298/r1/logs/blob-gofmt-d-35r3-inbound-guards.diff.txt
+.scratch/wisp/probes/298/r1/logs/commit-msg-2.txt
+.scratch/wisp/probes/298/r1/logs/commit-msg-3.txt
+.scratch/wisp/probes/298/r1/logs/d22scan-name-level-pre-vs-post.diff.txt
+.scratch/wisp/probes/298/r1/logs/first-commit-blob-rulers.txt
+.scratch/wisp/probes/298/r1/logs/gofumpt-residue-pre-vs-post.diff.txt
+.scratch/wisp/probes/298/r1/logs/post-blob-rulers.txt
+.scratch/wisp/probes/298/r1/logs/post-d22scan.txt
+.scratch/wisp/probes/298/r1/logs/post-gofumpt-d-35r2.txt
+.scratch/wisp/probes/298/r1/logs/post-rulers.txt
+.scratch/wisp/probes/298/r1/logs/pre-build.txt
+.scratch/wisp/probes/298/r1/logs/pre-d22scan.txt
+.scratch/wisp/probes/298/r1/logs/pre-gofumpt-d-35r2blob.txt
+.scratch/wisp/probes/298/r1/logs/pre-gofumpt.txt
+rc=0
+COMMIT 1b311587
+.scratch/wisp/issues/298-two-gofmt-dirty-test-files-at-head-and-one-crlf-fake-cell.md
+.scratch/wisp/probes/298/r1/30-gates.md
+.scratch/wisp/probes/298/r1/logs/commit-msg-4.txt
+rc=0
+rc=1 hits=0-violation  (grep 计数 0＝越界 0 行；grep 无命中故退 1，那是尺的口径非失败)

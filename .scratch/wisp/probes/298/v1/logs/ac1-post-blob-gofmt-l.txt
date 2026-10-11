@@ -1,0 +1,1 @@
+rc=0 count=0  (18d43f8e blob 两枚 gofmt -l 无命中＝空即达成)

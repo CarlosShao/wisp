@@ -1,0 +1,1 @@
+rc=0 count=0  (cmd/wisp 全部 114 枚 HEAD blob 展开后 gofmt -l 空)

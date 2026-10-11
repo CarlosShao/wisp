@@ -1,0 +1,5 @@
+i/lf    w/crlf  attr/text eol=lf      	cmd/wisp/models.go
+i/lf    w/crlf  attr/text eol=lf      	internal/agent/approval/pending_read.go
+i/lf    w/crlf  attr/text eol=lf      	internal/agent/tools.go
+i/lf    w/crlf  attr/text eol=lf      	internal/risk/provenance.go
+i/lf    w/crlf  attr/text eol=lf      	internal/tools/bridge.go
