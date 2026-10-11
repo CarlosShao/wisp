@@ -1,0 +1,6 @@
+== own kill of the residual (three guards) ==
+hit pid=24372 ppid=32404 parent=GONE cmd=C:\Users\swq\AppData\Local\Temp\TestMockllmGoldenByteIdenticalEvents3278041641\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir D:\tmp\wisp-304v1b-rev-qCcWkx\internal\llm\testdata\golden
+count_tree=1
+killed pid=24372 guards=name=mockllm.exe+tree-path+parent-gone
+count_tree_after_kill=0
+kill_rc=0

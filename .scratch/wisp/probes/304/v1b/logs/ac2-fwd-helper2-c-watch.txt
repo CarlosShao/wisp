@@ -1,0 +1,3 @@
+hit pid=15888 ppid=32744 parent=ac2t.exe cmd=C:\Users\swq\AppData\Local\Temp\TestFailoverAfterPrimaryExhaustion435554173\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir D:\tmp\wisp-304v1b-fwd-UtGhQF\internal\llm\testdata\golden
+watch_child_seen=1 t_poll=2
+watch_child_seen=1

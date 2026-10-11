@@ -1,0 +1,16 @@
+== golden diff, range b9f37892..HEAD ==
+rc=0
+== observe/slo156/tools-mockllm diff ==
+rc=0
+== ci/ledger/allowlist diff ==
+rc=0
+== spawn/guard lines now ==
+internal/llm/adaptertest/mockllm.go:65:	build := exec.Command(goBin, "build", "-o", exe, ".")
+internal/llm/adaptertest/mockllm.go:72:	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+internal/llm/adaptertest/mockllm.go:83:	// StartChildGuarded on a non-Windows platform is a plain Start and
+internal/llm/adaptertest/mockllm.go:85:	if err := StartChildGuarded(t, proc.cmd); err != nil {
+internal/llm/openaichat/mockllm_integ_test.go:66:	build := exec.Command(goBin, "build", "-o", exe, ".")
+internal/llm/openaichat/mockllm_integ_test.go:74:	proc.cmd = exec.Command(exe, "-addr", "127.0.0.1:0", "-print-addr",
+internal/llm/openaichat/mockllm_integ_test.go:85:	// adaptertest.StartChildGuarded on a non-Windows platform is a plain Start
+internal/llm/openaichat/mockllm_integ_test.go:87:	if err := adaptertest.StartChildGuarded(t, proc.cmd); err != nil {
+rc=0

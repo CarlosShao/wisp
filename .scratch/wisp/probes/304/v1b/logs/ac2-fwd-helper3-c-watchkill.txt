@@ -1,0 +1,5 @@
+world=CONSTRUCTED child_pids=31768 t=0.9
+kill_testbinary pid=11408 parent_alive_at_kill=YES
+wk_rc=0
+go_test_rc=127
+count_tree=0

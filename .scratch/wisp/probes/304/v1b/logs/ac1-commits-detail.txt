@@ -1,0 +1,168 @@
+== e875f00f file list ==
+.scratch/wisp/probes/304/r1/logs/build-1.txt
+.scratch/wisp/probes/304/r1/logs/p1-shape-a.txt
+.scratch/wisp/probes/304/r1/logs/pathlen-1.txt
+.scratch/wisp/probes/304/r1/logs/vet-1.txt
+.scratch/wisp/probes/304/r1/p1-shape-a.sh
+.scratch/wisp/probes/304/r1/paired.sh
+internal/llm/adaptertest/childjob_other.go
+internal/llm/adaptertest/childjob_windows.go
+internal/llm/adaptertest/mockllm.go
+internal/llm/openaichat/mockllm_integ_test.go
+rc=0
+== e875f00f stat ==
+ .scratch/wisp/probes/304/r1/logs/build-1.txt    |  0
+ .scratch/wisp/probes/304/r1/logs/p1-shape-a.txt | 19 ++++++
+ .scratch/wisp/probes/304/r1/logs/pathlen-1.txt  | 20 ++++++
+ .scratch/wisp/probes/304/r1/logs/vet-1.txt      |  0
+ .scratch/wisp/probes/304/r1/p1-shape-a.sh       | 33 +++++++++
+ .scratch/wisp/probes/304/r1/paired.sh           | 90 +++++++++++++++++++++++++
+ internal/llm/adaptertest/childjob_other.go      | 24 +++++++
+ internal/llm/adaptertest/childjob_windows.go    | 54 +++++++++++++++
+ internal/llm/adaptertest/mockllm.go             |  8 ++-
+ internal/llm/openaichat/mockllm_integ_test.go   |  9 ++-
+ 10 files changed, 255 insertions(+), 2 deletions(-)
+rc=0
+== e875f00f spawn diff excerpts ==
+commit e875f00f406b1a4bf2edbb0c628695546e827757
+Author: CarlosShao <1933942520@qq.com>
+Date:   Sun Oct 11 17:44:20 2026 +0800
+
+    304-r1: land job-object guard on both mockllm spawn points (AC#1, shape A)
+    
+    Both spawn points now start mockllm through adaptertest.StartChildGuarded, which on Windows opens the in-repo C30 proc.JobScope (KILL_ON_JOB_CLOSE), assigns
+    
+    Includes this leg's anchor, the path-length gate reading (rc=0 GREEN) and the shape (a) timing probe that sizes the later -timeout caps.
+
+diff --git a/internal/llm/adaptertest/mockllm.go b/internal/llm/adaptertest/mockllm.go
+index f48d3873..6a8b4eb9 100644
+--- a/internal/llm/adaptertest/mockllm.go
++++ b/internal/llm/adaptertest/mockllm.go
+@@ -76,7 +76,13 @@ func StartMockllm(t *testing.T) *Mockllm {
+ 		t.Fatal(err)
+ 	}
+ 	proc.cmd.Stderr = os.Stderr
+-	if err := proc.cmd.Start(); err != nil {
++	// Ticket 304: the child starts as an explicit member of a
++	// KILL_ON_JOB_CLOSE job (Windows) so the OS reaps it even when this test
++	// binary dies before t.Cleanup runs - a `go test -timeout` panic or an
++	// external TerminateProcess used to leave one mockllm.exe per death.
++	// StartChildGuarded on a non-Windows platform is a plain Start and
++	// protects nothing; that branch is named as still leaking.
++	if err := StartChildGuarded(t, proc.cmd); err != nil {
+ 		t.Fatalf("start mockllm: %v", err)
+ 	}
+ 	// Cleanup is registered before the readiness wait so every failure path
+diff --git a/internal/llm/openaichat/mockllm_integ_test.go b/internal/llm/openaichat/mockllm_integ_test.go
+index 4ddf87dc..51d3d724 100644
+--- a/internal/llm/openaichat/mockllm_integ_test.go
++++ b/internal/llm/openaichat/mockllm_integ_test.go
+@@ -17,6 +17,7 @@ import (
+ 
+ 	"github.com/CarlosShao/wisp/internal/config"
+ 	"github.com/CarlosShao/wisp/internal/llm"
++	"github.com/CarlosShao/wisp/internal/llm/adaptertest"
+ 	"github.com/CarlosShao/wisp/internal/llm/golden"
+ 	"github.com/CarlosShao/wisp/internal/observe"
+ )
+@@ -77,7 +78,13 @@ func startMockllm(t *testing.T) *mockllmProc {
+ 		t.Fatal(err)
+ 	}
+ 	proc.cmd.Stderr = os.Stderr
+-	if err := proc.cmd.Start(); err != nil {
++	// Ticket 304, the SECOND spawn point (both are changed in the same batch,
++	// otherwise this file stays the second leak source): the child starts as an
++	// explicit member of a KILL_ON_JOB_CLOSE job (Windows) so the OS reaps it
++	// even when this test binary dies before the t.Cleanup below runs.
++	// adaptertest.StartChildGuarded on a non-Windows platform is a plain Start
++	// and protects nothing; that branch is named as still leaking.
++	if err := adaptertest.StartChildGuarded(t, proc.cmd); err != nil {
+ 		t.Fatalf("start mockllm: %v", err)
+ 	}
+ 
+rc=0
+== per-commit forbidden-path check, r1 four commits ==
+-- e875f00f --
+outside_surface_lines_above rc=1
+-- bd123485 --
+outside_surface_lines_above rc=1
+-- 27f7b197 --
+.scratch/wisp/issues/304-external-killed-test-binaries-orphan-mockllm-exe.md
+outside_surface_lines_above rc=0
+-- 04f2ecbc --
+outside_surface_lines_above rc=1
+== all names of the four ==
+-- e875f00f --
+.scratch/wisp/probes/304/r1/logs/build-1.txt
+.scratch/wisp/probes/304/r1/logs/p1-shape-a.txt
+.scratch/wisp/probes/304/r1/logs/pathlen-1.txt
+.scratch/wisp/probes/304/r1/logs/vet-1.txt
+.scratch/wisp/probes/304/r1/p1-shape-a.sh
+.scratch/wisp/probes/304/r1/paired.sh
+internal/llm/adaptertest/childjob_other.go
+internal/llm/adaptertest/childjob_windows.go
+internal/llm/adaptertest/mockllm.go
+internal/llm/openaichat/mockllm_integ_test.go
+-- bd123485 --
+.scratch/wisp/probes/304/r1/10-impl.md
+.scratch/wisp/probes/304/r1/20-paired-readings.md
+.scratch/wisp/probes/304/r1/30-gates.md
+.scratch/wisp/probes/304/r1/cmdline-dump.ps1
+.scratch/wisp/probes/304/r1/gates.sh
+.scratch/wisp/probes/304/r1/logs/cmdline-fwd-b-SP1.txt
+.scratch/wisp/probes/304/r1/logs/cmdline-fwd-b-SP2.txt
+.scratch/wisp/probes/304/r1/logs/cmdline-fwd-c-SP1.txt
+.scratch/wisp/probes/304/r1/logs/cmdline-fwd-c-SP2.txt
+.scratch/wisp/probes/304/r1/logs/cmdline-rev-b-SP1.txt
+.scratch/wisp/probes/304/r1/logs/cmdline-rev-b-SP2.txt
+.scratch/wisp/probes/304/r1/logs/cmdline-rev-c-SP1.txt
+.scratch/wisp/probes/304/r1/logs/cmdline-rev-c-SP2.txt
+.scratch/wisp/probes/304/r1/logs/construct-fwd-b-SP1.txt
+.scratch/wisp/probes/304/r1/logs/construct-fwd-b-SP2.txt
+.scratch/wisp/probes/304/r1/logs/construct-rev-b-SP1.txt
+.scratch/wisp/probes/304/r1/logs/construct-rev-b-SP2.txt
+.scratch/wisp/probes/304/r1/logs/construct-rev-c-SP1.txt
+.scratch/wisp/probes/304/r1/logs/construct-rev-c-SP2.txt
+.scratch/wisp/probes/304/r1/logs/g-build.txt
+.scratch/wisp/probes/304/r1/logs/g-census-after.txt
+.scratch/wisp/probes/304/r1/logs/g-census-before.txt
+.scratch/wisp/probes/304/r1/logs/g-d22scan.txt
+.scratch/wisp/probes/304/r1/logs/g-format-headblob.txt
+.scratch/wisp/probes/304/r1/logs/g-format-worktree.txt
+.scratch/wisp/probes/304/r1/logs/g-header.txt
+.scratch/wisp/probes/304/r1/logs/g-pathlen.txt
+.scratch/wisp/probes/304/r1/logs/g-summary.txt
+.scratch/wisp/probes/304/r1/logs/g-vet.txt
+.scratch/wisp/probes/304/r1/logs/head-during-reverse.txt
+.scratch/wisp/probes/304/r1/logs/landed-sha256.txt
+.scratch/wisp/probes/304/r1/logs/landed/childjob_other.go
+.scratch/wisp/probes/304/r1/logs/landed/childjob_windows.go
+.scratch/wisp/probes/304/r1/logs/landed/mockllm.go
+.scratch/wisp/probes/304/r1/logs/landed/mockllm_integ_test.go
+.scratch/wisp/probes/304/r1/logs/msg-00.txt
+.scratch/wisp/probes/304/r1/logs/msg-impl.txt
+.scratch/wisp/probes/304/r1/logs/over-reach.txt
+.scratch/wisp/probes/304/r1/logs/paired-fwd.txt
+.scratch/wisp/probes/304/r1/logs/paired-rev.txt
+.scratch/wisp/probes/304/r1/logs/restore-verify.txt
+.scratch/wisp/probes/304/r1/logs/roster-fwd-b-SP1.txt
+.scratch/wisp/probes/304/r1/logs/roster-fwd-b-SP2.txt
+.scratch/wisp/probes/304/r1/logs/roster-fwd-c-SP1.txt
+.scratch/wisp/probes/304/r1/logs/roster-fwd-c-SP2.txt
+.scratch/wisp/probes/304/r1/logs/roster-rev-b-SP1.txt
+.scratch/wisp/probes/304/r1/logs/roster-rev-b-SP2.txt
+.scratch/wisp/probes/304/r1/logs/roster-rev-c-SP1.txt
+.scratch/wisp/probes/304/r1/logs/roster-rev-c-SP2.txt
+.scratch/wisp/probes/304/r1/logs/vet-reverse.txt
+.scratch/wisp/probes/304/r1/logs/watch-fwd-c-SP1.txt
+.scratch/wisp/probes/304/r1/logs/watch-fwd-c-SP2.txt
+.scratch/wisp/probes/304/r1/logs/watch-rev-c-SP1.txt
+.scratch/wisp/probes/304/r1/logs/watch-rev-c-SP2.txt
+.scratch/wisp/probes/304/r1/paired.sh
+.scratch/wisp/probes/304/r1/watch-kill.ps1
+-- 27f7b197 --
+.scratch/wisp/issues/304-external-killed-test-binaries-orphan-mockllm-exe.md
+.scratch/wisp/probes/304/r1/90-final.md
+.scratch/wisp/probes/304/r1/logs/over-reach.txt
+-- 04f2ecbc --
+.scratch/wisp/probes/304/r1/logs/over-reach.txt

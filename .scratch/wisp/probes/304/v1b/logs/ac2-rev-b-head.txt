@@ -1,0 +1,19 @@
+== ac2.sh shape=b pkg=./internal/llm/openaichat test=TestMockllmGoldenByteIdenticalEvents tree=/d/tmp/wisp-304v1b-rev-qCcWkx ==
+== compile: go test -c ==
+compile_rc=0
+== pre roster ==
+count_tree=0
+pre_rc=0
+go_test_rc=2
+== watch (world-construction evidence) ==
+hit pid=24372 ppid=32404 parent=ac2t.exe cmd=C:\Users\swq\AppData\Local\Temp\TestMockllmGoldenByteIdenticalEvents3278041641\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir D:\tmp\wisp-304v1b-rev-qCcWkx\internal\llm\testdata\golden
+watch_child_seen=1 t_poll=2
+watch_child_seen=1
+== panic lines count ==
+1
+== panic/timeout context (first 6) ==
+8:panic: test timed out after 3s
+== post roster (own tree only) ==
+hit pid=24372 ppid=32404 parent=GONE cmd=C:\Users\swq\AppData\Local\Temp\TestMockllmGoldenByteIdenticalEvents3278041641\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir D:\tmp\wisp-304v1b-rev-qCcWkx\internal\llm\testdata\golden
+count_tree=1
+post_rc=0

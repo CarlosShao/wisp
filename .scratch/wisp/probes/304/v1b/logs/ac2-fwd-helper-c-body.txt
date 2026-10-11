@@ -1,0 +1,14 @@
+time=2026-10-11T21:39:02.747+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFaultClassIsAdapterIndependent
+time=2026-10-11T21:39:03.815+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+=== RUN   TestFaultClassIsAdapterIndependent/5xx
+2026/10/11 21:39:03 mockllm: serving on http://127.0.0.1:56967 (golden dir D:\tmp\wisp-304v1b-fwd-UtGhQF\internal\llm\testdata\golden)
+=== RUN   TestFaultClassIsAdapterIndependent/429
+=== RUN   TestFaultClassIsAdapterIndependent/401
+=== RUN   TestFaultClassIsAdapterIndependent/402-quota
+--- PASS: TestFaultClassIsAdapterIndependent (1.11s)
+    --- PASS: TestFaultClassIsAdapterIndependent/5xx (0.01s)
+    --- PASS: TestFaultClassIsAdapterIndependent/429 (0.00s)
+    --- PASS: TestFaultClassIsAdapterIndependent/401 (0.00s)
+    --- PASS: TestFaultClassIsAdapterIndependent/402-quota (0.00s)
+PASS

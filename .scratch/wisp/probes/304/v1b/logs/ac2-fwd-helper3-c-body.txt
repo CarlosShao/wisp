@@ -1,0 +1,4 @@
+time=2026-10-11T21:46:05.197+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFailoverAfterPrimaryExhaustion
+time=2026-10-11T21:46:06.254+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/11 21:46:06 mockllm: serving on http://127.0.0.1:58858 (golden dir D:\tmp\wisp-304v1b-fwd-UtGhQF\internal\llm\testdata\golden)

@@ -1,0 +1,7 @@
+time=2026-10-11T21:37:17.890+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestMockllmGoldenByteIdenticalEvents
+=== RUN   TestMockllmGoldenByteIdenticalEvents/tool-call
+2026/10/11 21:37:19 mockllm: serving on http://127.0.0.1:60678 (golden dir D:\tmp\wisp-304v1b-fwd-UtGhQF\internal\llm\testdata\golden)
+=== RUN   TestMockllmGoldenByteIdenticalEvents/max-tokens
+=== RUN   TestMockllmGoldenByteIdenticalEvents/usage-multichunk
+=== RUN   TestMockllmGoldenByteIdenticalEvents/long-text

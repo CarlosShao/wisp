@@ -1,0 +1,16 @@
+== T2=/d/tmp/wisp-304v1b-rev-qCcWkx (guard removed world) ==
+archive_rc=0
+restore1_rc=0
+restore2_rc=0
+== go count ==
+682
+== guard presence in T2 spawn files (want 0 0) ==
+/d/tmp/wisp-304v1b-rev-qCcWkx/internal/llm/adaptertest/mockllm.go:0
+/d/tmp/wisp-304v1b-rev-qCcWkx/internal/llm/openaichat/mockllm_integ_test.go:0
+grep_rc=1
+== pre-guard spawn calls present ==
+/d/tmp/wisp-304v1b-rev-qCcWkx/internal/llm/adaptertest/mockllm.go:79:	if err := proc.cmd.Start(); err != nil {
+/d/tmp/wisp-304v1b-rev-qCcWkx/internal/llm/openaichat/mockllm_integ_test.go:80:	if err := proc.cmd.Start(); err != nil {
+== diff T2 vs HEAD for the two files (expect nonempty = removed) ==
+-- internal/llm/adaptertest/mockllm.go --
+-- internal/llm/openaichat/mockllm_integ_test.go --

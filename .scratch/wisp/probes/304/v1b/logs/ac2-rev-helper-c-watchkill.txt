@@ -1,0 +1,8 @@
+world=CONSTRUCTED child_pids=1852 t=1.58
+kill_testbinary pid=18428 parent_alive_at_kill=YES
+wk_rc=0
+go_test_rc=127
+hit pid=1852 ppid=18428 parent=GONE cmd=C:\Users\swq\AppData\Local\Temp\TestFailoverAfterPrimaryExhaustion3970703700\001\mockllm.exe -addr 127.0.0.1:0 -print-addr -golden-dir D:\tmp\wisp-304v1b-rev-qCcWkx\internal\llm\testdata\golden
+count_tree=1
+killed pid=1852 guards=name=mockllm.exe+tree-path+parent-gone
+count_tree_after_kill=0

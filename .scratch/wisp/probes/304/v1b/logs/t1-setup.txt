@@ -1,0 +1,32 @@
+== T1=/d/tmp/wisp-304v1b-fwd-UtGhQF ==
+archive_rc=0
+== go file count in T1 ==
+682
+find_rc=0
+== T1 top-level ==
+cmd
+go.mod
+go.sum
+internal
+scripts
+tools
+== guard files present ==
+-rw-r--r-- 1 swq 197609  894 Oct 11 21:32 /d/tmp/wisp-304v1b-fwd-UtGhQF/internal/llm/adaptertest/childjob_other.go
+-rw-r--r-- 1 swq 197609 2098 Oct 11 21:32 /d/tmp/wisp-304v1b-fwd-UtGhQF/internal/llm/adaptertest/childjob_windows.go
+== openaichat test names ==
+183:func TestMockllmGoldenByteIdenticalEvents(t *testing.T) {
+280:func TestMockllmFaultInjection429RetryAfter(t *testing.T) {
+307:func TestMockllmFaultInjection5xxExhausted(t *testing.T) {
+330:func TestMockllmFaultInjection401NoRetry(t *testing.T) {
+353:func TestMockllmLatencyInjectionRespected(t *testing.T) {
+375:func TestMockllmTruncateIsMidStreamDisconnect(t *testing.T) {
+406:func TestMockllmDiscoverModels(t *testing.T) {
+== helper startMockllm callers (head) ==
+internal/llm/adaptertest/registry_test.go
+internal/llm/anthropic/cache_test.go
+internal/llm/enabled_reach_261_test.go
+internal/llm/fallback_test.go
+internal/llm/matrix_14_2_test.go
+internal/llm/openairesponses/protocol_test.go
+internal/llm/probe_health_test.go
+== TestUnansweredL2 card site ==

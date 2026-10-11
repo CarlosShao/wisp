@@ -1,0 +1,193 @@
+time=2026-10-11T21:37:56.004+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestMockllmGoldenByteIdenticalEvents
+=== RUN   TestMockllmGoldenByteIdenticalEvents/tool-call
+2026/10/11 21:37:57 mockllm: serving on http://127.0.0.1:54720 (golden dir D:\tmp\wisp-304v1b-rev-qCcWkx\internal\llm\testdata\golden)
+=== RUN   TestMockllmGoldenByteIdenticalEvents/max-tokens
+=== RUN   TestMockllmGoldenByteIdenticalEvents/usage-multichunk
+=== RUN   TestMockllmGoldenByteIdenticalEvents/long-text
+panic: test timed out after 3s
+	running tests:
+		TestMockllmGoldenByteIdenticalEvents (3s)
+		TestMockllmGoldenByteIdenticalEvents/long-text (1s)
+
+goroutine 85 [running]:
+testing.(*M).startAlarm.func1()
+	D:/work/base/go/src/testing/testing.go:2959 +0x34a
+created by time.goFunc
+	D:/work/base/go/src/time/sleep.go:182 +0x2d
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0x240901dee000, {0x7ff7c091e2cc?, 0x240901d15aa8?}, 0x7ff7c0d65660)
+	D:/work/base/go/src/testing/testing.go:2266 +0x4d2
+testing.runTests.func1(0x240901dee000)
+	D:/work/base/go/src/testing/testing.go:2742 +0x37
+testing.tRunner(0x240901dee000, 0x240901d15bc8)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+testing.runTests({0x7ff7c091668f, 0x1a}, {0x7ff7c0926c22, 0x32}, 0x240901dbe018, {0x7ff7c0dc8718, 0x10, 0x10}, {0xc2ab022dc05a4e5c, 0xb37da8e5, ...})
+	D:/work/base/go/src/testing/testing.go:2740 +0x505
+testing.(*M).Run(0x240901da6140)
+	D:/work/base/go/src/testing/testing.go:2600 +0x6af
+main.main()
+	_testmain.go:76 +0x9b
+
+goroutine 18 [chan receive]:
+testing.(*T).Run(0x240901dee200, {0x7ff7c090acd2?, 0x7ff7c04d27e0?}, 0x240902016400)
+	D:/work/base/go/src/testing/testing.go:2266 +0x4d2
+github.com/CarlosShao/wisp/internal/llm/openaichat.TestMockllmGoldenByteIdenticalEvents(0x240901dee200)
+	D:/tmp/wisp-304v1b-rev-qCcWkx/internal/llm/openaichat/mockllm_integ_test.go:181 +0xa5
+testing.tRunner(0x240901dee200, 0x7ff7c0d65660)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+
+goroutine 62 [IO wait]:
+internal/poll.runtime_pollWait(0x2a8f5430e00, 0x72)
+	D:/work/base/go/src/runtime/netpoll.go:351 +0x85
+internal/poll.(*pollDesc).wait(0x7ff7c055a101?, 0x7ff700000001?, 0x0)
+	D:/work/base/go/src/internal/poll/fd_poll_runtime.go:84 +0x27
+internal/poll.(*FD).waitIO(0x24090203c540, 0x240901cf2de0)
+	D:/work/base/go/src/internal/poll/fd_windows.go:233 +0x3d
+internal/poll.(*FD).execIO(0x24090203c540, 0x72, 0x240901f9d3f0, {0x240901f9d3b0, 0x1, 0x240901f669b0?})
+	D:/work/base/go/src/internal/poll/fd_windows.go:310 +0x27e
+internal/poll.(*FD).Read(0x24090203c540, {0x240902196000, 0x1000, 0x1000})
+	D:/work/base/go/src/internal/poll/fd_windows.go:611 +0x21f
+net.(*netFD).Read(0x24090203c540, {0x240902196000?, 0x240901f7cf00?, 0x240901f9d660?})
+	D:/work/base/go/src/net/fd_posix.go:68 +0x25
+net.(*conn).Read(0x24090201a160, {0x240902196000?, 0x240901f75a20?, 0x240901f9d590?})
+	D:/work/base/go/src/net/net.go:196 +0x45
+net/http.(*persistConn).Read(0x24090201dcc0, {0x240902196000?, 0x1?, 0x1000?})
+	D:/work/base/go/src/net/http/transport.go:2300 +0x47
+bufio.(*Reader).fill(0x2409020324e0)
+	D:/work/base/go/src/bufio/bufio.go:113 +0x103
+bufio.(*Reader).ReadSlice(0x2409020324e0, 0xa)
+	D:/work/base/go/src/bufio/bufio.go:377 +0x29
+net/http/internal.readChunkLine(0x240902194110?)
+	D:/work/base/go/src/net/http/internal/chunked.go:156 +0x1c
+net/http/internal.(*chunkedReader).beginChunk(0x2409021940f0)
+	D:/work/base/go/src/net/http/internal/chunked.go:49 +0x1f
+net/http/internal.(*chunkedReader).Read(0x2409021940f0, {0x24090219e0ac?, 0x240901f88d80?, 0x240901f9d6f0?})
+	D:/work/base/go/src/net/http/internal/chunked.go:125 +0x131
+net/http.(*body).readLocked(0x2409020068c0, {0x24090219e0ac?, 0x101f7c0938058?, 0x2a8f5488518?})
+	D:/work/base/go/src/net/http/transfer.go:857 +0x3b
+net/http.(*body).Read(0x240901f9d7e8?, {0x24090219e0ac?, 0x580?, 0x0?})
+	D:/work/base/go/src/net/http/transfer.go:849 +0x109
+net/http.(*bodyEOFSignal).Read(0x240902002700, {0x24090219e0ac, 0x4d4, 0x4d4})
+	D:/work/base/go/src/net/http/transport.go:3238 +0x13c
+io.ReadAll({0x7ff7c0d61550, 0x240902002700})
+	D:/work/base/go/src/io/io.go:722 +0x10d
+github.com/CarlosShao/wisp/internal/llm/openaichat.(*mockllmProc).rawGolden(0x240901f0c018, 0x240902058200, {0x7ff7c090acd2, 0x9})
+	D:/tmp/wisp-304v1b-rev-qCcWkx/internal/llm/openaichat/mockllm_integ_test.go:162 +0x213
+github.com/CarlosShao/wisp/internal/llm/openaichat.TestMockllmGoldenByteIdenticalEvents.func1(0x240902058200)
+	D:/tmp/wisp-304v1b-rev-qCcWkx/internal/llm/openaichat/mockllm_integ_test.go:200 +0x5f8
+testing.tRunner(0x240902058200, 0x240902016400)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 18
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+
+goroutine 30 [IO wait]:
+internal/poll.runtime_pollWait(0x2a8f5431000, 0x72)
+	D:/work/base/go/src/runtime/netpoll.go:351 +0x85
+internal/poll.(*pollDesc).wait(0x240901df9a01?, 0x7ff700000001?, 0x0)
+	D:/work/base/go/src/internal/poll/fd_poll_runtime.go:84 +0x27
+internal/poll.(*FD).waitIO(0x240901ee01c0, 0x2409020000c0)
+	D:/work/base/go/src/internal/poll/fd_windows.go:233 +0x3d
+internal/poll.(*FD).execIO(0x240901ee01c0, 0x72, 0x240901df9bf8, {0x240901df9bb8, 0x1, 0x0?})
+	D:/work/base/go/src/internal/poll/fd_windows.go:310 +0x27e
+internal/poll.(*FD).Read(0x240901ee01c0, {0x240902126000, 0x1000, 0x1000})
+	D:/work/base/go/src/internal/poll/fd_windows.go:611 +0x21f
+net.(*netFD).Read(0x240901ee01c0, {0x240902126000?, 0x7ff7c04c593c?, 0x7ff7c0cd73f0?})
+	D:/work/base/go/src/net/fd_posix.go:68 +0x25
+net.(*conn).Read(0x240901d82148, {0x240902126000?, 0x240901ef4ba0?, 0x7ff7c0cd6d08?})
+	D:/work/base/go/src/net/net.go:196 +0x45
+net/http.(*persistConn).Read(0x240901dd9680, {0x240902126000?, 0x7ff7c0d60df0?, 0x7ff7c0db4320?})
+	D:/work/base/go/src/net/http/transport.go:2300 +0x47
+bufio.(*Reader).fill(0x240901da42a0)
+	D:/work/base/go/src/bufio/bufio.go:113 +0x103
+bufio.(*Reader).Peek(0x240901da42a0, 0x1)
+	D:/work/base/go/src/bufio/bufio.go:152 +0x52
+net/http.(*persistConn).readLoop(0x240901dd9680)
+	D:/work/base/go/src/net/http/transport.go:2483 +0x172
+created by net/http.(*Transport).dialConn in goroutine 29
+	D:/work/base/go/src/net/http/transport.go:2123 +0x1da5
+
+goroutine 31 [select]:
+net/http.(*persistConn).writeLoop(0x240901dd9680)
+	D:/work/base/go/src/net/http/transport.go:2810 +0xe6
+created by net/http.(*Transport).dialConn in goroutine 29
+	D:/work/base/go/src/net/http/transport.go:2124 +0x1e05
+
+goroutine 83 [select]:
+net/http.(*persistConn).readLoop(0x24090201dcc0)
+	D:/work/base/go/src/net/http/transport.go:2603 +0xc2f
+created by net/http.(*Transport).dialConn in goroutine 98
+	D:/work/base/go/src/net/http/transport.go:2123 +0x1da5
+
+goroutine 51 [IO wait]:
+internal/poll.runtime_pollWait(0x2a8f5430c00, 0x72)
+	D:/work/base/go/src/runtime/netpoll.go:351 +0x85
+internal/poll.(*pollDesc).wait(0x240901df5a01?, 0x7ff700000001?, 0x0)
+	D:/work/base/go/src/internal/poll/fd_poll_runtime.go:84 +0x27
+internal/poll.(*FD).waitIO(0x24090203c000, 0x240901cf2db0)
+	D:/work/base/go/src/internal/poll/fd_windows.go:233 +0x3d
+internal/poll.(*FD).execIO(0x24090203c000, 0x72, 0x240901df5bf8, {0x240901df5bb8, 0x1, 0x0?})
+	D:/work/base/go/src/internal/poll/fd_windows.go:310 +0x27e
+internal/poll.(*FD).Read(0x24090203c000, {0x24090203e000, 0x1000, 0x1000})
+	D:/work/base/go/src/internal/poll/fd_windows.go:611 +0x21f
+net.(*netFD).Read(0x24090203c000, {0x24090203e000?, 0x7ff7c04c593c?, 0x7ff7c0cd73f0?})
+	D:/work/base/go/src/net/fd_posix.go:68 +0x25
+net.(*conn).Read(0x24090201a038, {0x24090203e000?, 0x24090200c420?, 0x7ff7c0cd6d08?})
+	D:/work/base/go/src/net/net.go:196 +0x45
+net/http.(*persistConn).Read(0x24090201c780, {0x24090203e000?, 0x7ff7c0d60df0?, 0x7ff7c0db4320?})
+	D:/work/base/go/src/net/http/transport.go:2300 +0x47
+bufio.(*Reader).fill(0x2409020320c0)
+	D:/work/base/go/src/bufio/bufio.go:113 +0x103
+bufio.(*Reader).Peek(0x2409020320c0, 0x1)
+	D:/work/base/go/src/bufio/bufio.go:152 +0x52
+net/http.(*persistConn).readLoop(0x24090201c780)
+	D:/work/base/go/src/net/http/transport.go:2483 +0x172
+created by net/http.(*Transport).dialConn in goroutine 50
+	D:/work/base/go/src/net/http/transport.go:2123 +0x1da5
+
+goroutine 52 [select]:
+net/http.(*persistConn).writeLoop(0x24090201c780)
+	D:/work/base/go/src/net/http/transport.go:2810 +0xe6
+created by net/http.(*Transport).dialConn in goroutine 50
+	D:/work/base/go/src/net/http/transport.go:2124 +0x1e05
+
+goroutine 61 [select]:
+net/http.(*persistConn).writeLoop(0x24090201d680)
+	D:/work/base/go/src/net/http/transport.go:2810 +0xe6
+created by net/http.(*Transport).dialConn in goroutine 59
+	D:/work/base/go/src/net/http/transport.go:2124 +0x1e05
+
+goroutine 60 [IO wait]:
+internal/poll.runtime_pollWait(0x2a8f5430a00, 0x72)
+	D:/work/base/go/src/runtime/netpoll.go:351 +0x85
+internal/poll.(*pollDesc).wait(0x240902069a01?, 0x7ff700000001?, 0x0)
+	D:/work/base/go/src/internal/poll/fd_poll_runtime.go:84 +0x27
+internal/poll.(*FD).waitIO(0x24090203c2a0, 0x240901f02960)
+	D:/work/base/go/src/internal/poll/fd_windows.go:233 +0x3d
+internal/poll.(*FD).execIO(0x24090203c2a0, 0x72, 0x240902069bf8, {0x240902069bb8, 0x1, 0x0?})
+	D:/work/base/go/src/internal/poll/fd_windows.go:310 +0x27e
+internal/poll.(*FD).Read(0x24090203c2a0, {0x240901f82000, 0x1000, 0x1000})
+	D:/work/base/go/src/internal/poll/fd_windows.go:611 +0x21f
+net.(*netFD).Read(0x24090203c2a0, {0x240901f82000?, 0x7ff7c04c593c?, 0x7ff7c0cd73f0?})
+	D:/work/base/go/src/net/fd_posix.go:68 +0x25
+net.(*conn).Read(0x24090201a128, {0x240901f82000?, 0x24090200d650?, 0x7ff7c0cd6d08?})
+	D:/work/base/go/src/net/net.go:196 +0x45
+net/http.(*persistConn).Read(0x24090201d680, {0x240901f82000?, 0x7ff7c0d60df0?, 0x7ff7c0db4320?})
+	D:/work/base/go/src/net/http/transport.go:2300 +0x47
+bufio.(*Reader).fill(0x240902032360)
+	D:/work/base/go/src/bufio/bufio.go:113 +0x103
+bufio.(*Reader).Peek(0x240902032360, 0x1)
+	D:/work/base/go/src/bufio/bufio.go:152 +0x52
+net/http.(*persistConn).readLoop(0x24090201d680)
+	D:/work/base/go/src/net/http/transport.go:2483 +0x172
+created by net/http.(*Transport).dialConn in goroutine 59
+	D:/work/base/go/src/net/http/transport.go:2123 +0x1da5
+
+goroutine 84 [select]:
+net/http.(*persistConn).writeLoop(0x24090201dcc0)
+	D:/work/base/go/src/net/http/transport.go:2810 +0xe6
+created by net/http.(*Transport).dialConn in goroutine 98
+	D:/work/base/go/src/net/http/transport.go:2124 +0x1e05
