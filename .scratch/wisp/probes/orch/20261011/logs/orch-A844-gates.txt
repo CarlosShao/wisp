@@ -1,0 +1,15 @@
+d22scan_rc=0
+lenbudget_rc=0
+staged_total=9 staged_go=0 staged_dot_out=0 foreign_staged=0
+worktree_dirty_internal_cmd=0
+numstat_ledger=44	0	docs/reports/pending-and-issues.md
+numstat_handover=34	0	docs/reports/HANDOVER.md
+numstat_ticket309=30	1	.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md
+prefix_ledger_vs_head=IDENTICAL
+prefix_handover_vs_head=IDENTICAL
+lines_ledger=16218 head_lines_ledger=16174
+lines_handover=2718 head_lines_handover=2684
+handover_4_0c_headers=9  # BRE-safe ruler (the '?' bug is recorded in logs/orch-A843-gates-b.txt)
+ledger_A84x_headers=5
+ticket309_checked=1 ticket309_unchecked=5
+ticket309_name_len=64  # wc -c counts the newline too => subtract 1

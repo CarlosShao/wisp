@@ -1,0 +1,9 @@
+.scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md
+.scratch/wisp/probes/orch/20261011/A844.txt
+.scratch/wisp/probes/orch/20261011/HANDOVER-4.0ci.md
+.scratch/wisp/probes/orch/20261011/cm-A844.txt
+.scratch/wisp/probes/orch/20261011/logs/d22scan-A844.txt
+.scratch/wisp/probes/orch/20261011/logs/lenbudget-A844.txt
+.scratch/wisp/probes/orch/20261011/precommit-gates-A844.sh
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
