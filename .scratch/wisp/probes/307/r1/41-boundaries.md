@@ -43,7 +43,21 @@
 `TestSyncUnverifiedRootKeepsFallback (0.01s)` / `TestSyncSuspectFallbackIsComponentBounded (0.01s)` / `TestSyncSuspectFallbackWhenUndetectable (0.01s)`。
 ⇒ 与 §1–§3 各件里"改后"那一发**逐字同集合同计数**（三发同台面交集⛔ 空）。
 
-## 3. 本票欠着的读数（具名，⛔ 掩）
+## 3. ★共享工作树的脏面（本腿⛔ 制造、⛔ 提交，具名为编排者的越界审计存档）
+
+起手锚只量了 `git status --porcelain -- internal cmd`（＝0 行，本腿车道），收口时本腿另用**全工作树**尺看了一遍，
+盘上现量＝工作树里躺着**别家的**未提交改动，本腿⛔ 写过一枚、⛔ 提交过一枚：
+
+- ` M .gitignore`（新增 `.worktrees/` 一段）、` M go.mod`（`go-webview2` 从 `// indirect` 升成直接依赖那一族改写）、
+  ` D design/**`（十余枚删除）、` M .scratch/wisp/probes/152|161|242|268/**`、以及根目录一堆 `??` 未跟踪件
+  （`.scratch/commit-msg-*.txt`、`.scratch/ci-logs/**`、`-` 之类）。
+- 尺＝`for c in c6691756 51a0a0f2 183032c1 fb6a171e; do git show --name-only --format= $c; done | grep -E '^(go\.mod|go\.sum|\.gitignore)$' | wc -l` ⇒ **0**
+  ⇒ 本腿四笔**没把任何一枚别家脏件带进 commit**（每笔都带显式 pathspec，且 pathspec 写在 `$( … )` 之外）。
+- ⚠ 一枚⛔ 得⛔ 解释的向：本腿跑过 `GOFLAGS= go build ./...` 与 `go vet ./internal/risk/`，
+  Go ≥1.16 默认 `-mod=readonly`（改写 go.mod 会**报错**⛔ 静默改），且那枚 `go.mod` diff 的形状＝`go mod tidy` 的产物⛔ 是 build 的产物
+  ⇒ 判读＝**先于本腿存在**；本腿交的是"⛔ 在我这手里变过"这一枚**推理**，⛔ 是"实测过它在我进场时已脏"（起手⛔ 量全工作树，那一格是本腿的尺缺陷，具名认）。
+
+## 4. 本票欠着的读数（具名，⛔ 掩）（＝`msg-04` 里我写的那节"§3"，本节落定后renumber 成 §4，具名报回）
 
 1. `AC#2(d)` 那两枚⛔ 响的指名用例（`TestSyncFallbackNotDisarmableByWeakRoot`、`TestSyncUnverifiedRootKeepsFallback`）＝枚级无负向钉，本票⛔ 动其期望侧。
 2. `alias307Pair` 的 `t.Fatalf`（无别名即 Fatal）分支在本机从未被执行（需关卷的 8.3 生成＝改机器配置，⛔ 授权）。
