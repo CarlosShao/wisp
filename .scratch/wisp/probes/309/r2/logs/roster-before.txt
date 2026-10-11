@@ -1,0 +1,26 @@
+#!/bin/sh
+# 309-r2: full-package roster BEFORE, taken from an out-of-repo export tree of the
+# dispatch HEAD (202ed4a5), NOT from the shared worktree (go.mod there carries another
+# leg's in-flight edit). Fresh mktemp -d per tree; nothing is written inside the repo
+# except logs.
+set -e
+cd "D:/work/workspace/projects plans/Wisp"
+LOGS=$(pwd)/.scratch/wisp/probes/309/r2/logs
+REV=202ed4a5
+D=$(mktemp -d "${TMPDIR:-/tmp}/wisp309r2-before.XXXXXX")
+echo "TAG=before REV=$REV DIR=$D" | tee "$LOGS/tree-before.dir"
+git archive --format=tar "$REV" | tar -x -C "$D"
+test -f "$D/go.mod" && test -f "$D/go.sum" && echo "go.mod+go.sum present: yes"
+echo "all .go in tree (proves the archive is not empty): $(find "$D" -name '*.go' | wc -l)"
+echo ".go under internal/tools: $(find "$D/internal/tools" -name '*.go' | wc -l)"
+echo "non-test .go under cmd+internal+tools+scripts: $(find "$D/cmd" "$D/internal" "$D/tools" "$D/scripts" -name '*.go' -not -name '*_test.go' | wc -l)"
+(
+  cd "$D"
+  GOFLAGS= go test ./internal/tools/ -count=1 -v > "$LOGS/suite-before.log" 2>&1
+  echo "rc=$?" >> "$LOGS/suite-before.log"
+)
+tail -1 "$LOGS/suite-before.log"
+grep -E '^--- ' "$LOGS/suite-before.log" | sed -E 's/^--- [A-Z]+: ([^ ]+).*/\1/' | sort > "$LOGS/suite-before-passnames.txt"
+echo "top-level PASS=$(grep -c '^--- PASS' "$LOGS/suite-before.log") FAIL=$(grep -c '^--- FAIL' "$LOGS/suite-before.log") SKIP=$(grep -c '^--- SKIP' "$LOGS/suite-before.log")"
+echo "any-depth PASS=$(grep -cE '^[[:space:]]*--- PASS' "$LOGS/suite-before.log") FAIL=$(grep -cE '^[[:space:]]*--- FAIL' "$LOGS/suite-before.log") SKIP=$(grep -cE '^[[:space:]]*--- SKIP' "$LOGS/suite-before.log")"
+echo "TREE_DIR=$D" >> "$LOGS/tree-before.dir"

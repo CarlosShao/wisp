@@ -1,0 +1,49 @@
+#!/bin/sh
+# 309-r2 tree rigs (two more, each in its own out-of-repo export tree):
+#   RIG-4b = a SECOND construction point written inside internal/agent itself, same-package
+#            bare name. The pre-309-r2 nail skipped that package wholesale, so this is the
+#            shape the rewrite exists to catch. EXPECT RED.
+#   RIG-6  = the named cross-package alias blind spot: `type Mid = agent.ToolRequest` in
+#            package tools, then `tools.Mid{...}` from package main. EXPECT GREEN (rc=0) -
+#            the nail's head comment lists this shape as missed, and this log is the reading
+#            behind that sentence (no claim of full coverage).
+# Trees come from `git archive <rev>` (never the shared worktree for the "before" face), and
+# this leg's uncommitted nail is copied in so the tree runs the code under test. Nothing is
+# written inside the repo except logs.
+REV=$(git rev-parse HEAD)
+LOGS=$(pwd)/.scratch/wisp/probes/309/r2/logs
+T=Test309ToolRequestProductionConstructionNail
+echo "REV=$REV"
+
+build_tree() { # $1 = tag
+  D=$(mktemp -d "${TMPDIR:-/tmp}/wisp309r2-$1.XXXXXX") || return 1
+  git archive --format=tar "$REV" | tar -x -C "$D"
+  cp internal/tools/toolrequest_nail_309_test.go "$D/internal/tools/"
+  cp internal/tools/bridge.go "$D/internal/tools/"
+  echo "TAG=$1 DIR=$D"
+  echo "  go.mod/go.sum present: $(test -f "$D/go.mod" && test -f "$D/go.sum" && echo yes || echo NO)"
+  echo "  .go in tree (proves the archive is not empty): $(find "$D" -name '*.go' | wc -l)"
+  echo "  non-test .go under the four roots: $(find "$D/cmd" "$D/internal" "$D/tools" "$D/scripts" -name '*.go' -not -name '*_test.go' | wc -l)"
+  echo "$D" > "$LOGS/tree-$1.dir"
+}
+
+echo "########## RIG-4b second construction point INSIDE internal/agent (same-package bare name) -> expect RED ##########"
+build_tree second
+D=$(cat "$LOGS/tree-second.dir")
+printf 'package agent\n\nfunc rig309r2Second() ToolRequest {\n\treturn ToolRequest{TaskID: "", Name: "fs.read"}\n}\n' > "$D/internal/agent/zz309r2second.go"
+echo "--- landed?"; tail -5 "$D/internal/agent/zz309r2second.go"
+( cd "$D" && GOFLAGS= go test ./internal/tools/ -count=1 -run "$T" -v > "$LOGS/nail-rig-4b-second-in-agent.log" 2>&1; echo "rc=$?" >> "$LOGS/nail-rig-4b-second-in-agent.log" )
+grep -E '枚数钉|^(--- |rc=)' "$LOGS/nail-rig-4b-second-in-agent.log" | head -6
+
+echo; echo "########## RIG-6 cross-package alias (named blind spot) -> expect GREEN, rc=0 ##########"
+build_tree alias
+D=$(cat "$LOGS/tree-alias.dir")
+printf 'package tools\n\nimport "github.com/CarlosShao/wisp/internal/agent"\n\ntype Mid = agent.ToolRequest\n' > "$D/internal/tools/zz309r2mid.go"
+echo "--- landed in package tools:"; cat "$D/internal/tools/zz309r2mid.go"
+printf 'package main\n\nimport "github.com/CarlosShao/wisp/internal/tools"\n\nfunc rig309r2Use() {\n\t_ = tools.Mid{TaskID: "", Name: "fs.read"}\n}\n' > "$D/cmd/wisp/zz309r2use.go"
+echo "--- landed in package main (the construction is written through the alias, one package away from where the alias resolves to agent.ToolRequest):"; cat "$D/cmd/wisp/zz309r2use.go"
+( cd "$D" && GOFLAGS= go test ./internal/tools/ -count=1 -run "$T" -v > "$LOGS/nail-rig-6-crosspkg-alias.log" 2>&1; echo "rc=$?" >> "$LOGS/nail-rig-6-crosspkg-alias.log" )
+grep -E '枚数钉|^(--- |rc=)' "$LOGS/nail-rig-6-crosspkg-alias.log" | head -6
+
+echo; echo "########## the shared worktree is untouched by this script ##########"
+git status --porcelain -- internal cmd tools scripts; echo "(empty above == clean)"

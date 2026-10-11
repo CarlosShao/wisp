@@ -1,0 +1,11 @@
+########## R359-6 the word ruler, both口径, at 2026-10-11 14:47:22 +0800 HEAD=1da192e9 ##########
+grep -rn 'ToolRequest{' internal cmd --include=*.go
+TOTAL=71
+lines whose FILENAME ends in _test.go = 69
+lines whose FILENAME does not         = 2
+-- the non-test roster (by filename field):
+internal/agent/loop.go:675:		req := ToolRequest{
+internal/tools/bridge.go:882:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+-- after dropping lines whose TEXT begins with // : 1
+-- same ruler with tools+scripts in the roots:
+TOTAL=71

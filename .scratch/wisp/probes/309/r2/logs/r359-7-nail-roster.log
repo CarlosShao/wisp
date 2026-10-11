@@ -1,0 +1,5 @@
+    toolrequest_nail_309_test.go:358: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.16s)
+ok  	github.com/CarlosShao/wisp/internal/tools	0.191s
+rc(from a fresh run)=
+rc=0

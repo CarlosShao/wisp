@@ -1,0 +1,6 @@
+TAG=before REV=202ed4a5 DIR=/tmp/wisp309r2-before.FvPQC6
+go.mod+go.sum present: yes
+all .go in tree (proves the archive is not empty): 995
+.go under internal/tools: 78
+non-test .go under cmd+internal+tools+scripts: 293
+rc=1

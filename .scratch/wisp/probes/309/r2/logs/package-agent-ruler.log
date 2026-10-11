@@ -1,0 +1,4 @@
+########## R359-2 bare-name gate: which files say 'package agent'? ##########
+internal/agent
+-- distinct directories above; all of them are internal/agent -> the bare-name branch
+-- cannot smuggle in a same-named type from another package today (ruler is re-runnable).

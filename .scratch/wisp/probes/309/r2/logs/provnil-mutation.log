@@ -1,0 +1,145 @@
+time=2026-10-11T14:44:21.296+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-11T14:44:22.247+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing2304208942\003\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:22.253+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:22Z duration_ms=6
+time=2026-10-11T14:44:22.260+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing2304208942\003\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:22.265+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:22Z duration_ms=4
+time=2026-10-11T14:44:22.268+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:22.271+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestToolConcurrencyCeilingIsFour (0.00s)
+    bridge_test.go:225: observed concurrency 0: the test never ran two at once, so it proves nothing
+--- FAIL: TestPerToolTimeoutHonoredViaContext (0.00s)
+    bridge_test.go:276: text = "L2 审批通道尚未接入（票 21），已拒绝执行", want the structured TOOL_TIMEOUT wording
+--- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L0_passes_and_no_gate_is_consulted (0.00s)
+        bridge_test.go:488: out={Text:L2 审批未通过，已拒绝执行 IsError:true RiskLevel:L2 ErrorClass:user_rejected Truncated:false AppliedSteps:[]} err=<nil>
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L1_uses_the_pending-window_callback (0.00s)
+        bridge_test.go:507: an allowed L1 call must execute: {Text:L2 审批未通过，已拒绝执行 IsError:true RiskLevel:L2 ErrorClass:user_rejected Truncated:false AppliedSteps:[]}
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L1_window_timeout_means_execute (0.00s)
+        bridge_test.go:533: SPEC-06 §2: an unopposed L1 window expires INTO execution
+time=2026-10-11T14:44:22.354+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete709944356\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:22.361+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:22Z duration_ms=7
+time=2026-10-11T14:44:22.367+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete709944356\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:22.372+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:22Z duration_ms=5
+time=2026-10-11T14:44:22.376+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:22.378+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-11T14:44:22.400+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-56f16c30-e6d3-427d-b959-ed0f61e5e960 owner=tools
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+    failclosed_236_teeth_test.go:156: task.go:699 那一支的完整字面量没被原样说出（got "本用例不带 L2 队列", want "任务名册未接线（fail-closed：拒绝停掉任何任务——名册才是唯一的停法）"）——若 got 是「查不到这个任务」那一支，说明 Roster == nil 的拒绝分支已经不在了
+time=2026-10-11T14:44:24.046+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported2455235961\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:24.053+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:24Z duration_ms=6
+time=2026-10-11T14:44:24.061+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported2455235961\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:24.065+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:24Z duration_ms=4
+time=2026-10-11T14:44:24.069+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:24.071+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestTicket224LiveGrantStopsTheL1Question (0.01s)
+    grant_test.go:207: with no grant source the L1 window ran 0 times, want 1: the control half is broken, so a zero below would prove nothing
+--- FAIL: TestTicket224PartialPathCoverageStillAsks (0.02s)
+    grant_test.go:271: a call with one ungranted path asked 0 windows, want 1: partial coverage must not read as coverage
+    grant_test.go:285: after all three paths were covered the call asked 0 windows in total, want still 1 (no new question)
+--- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking (0.01s)
+    --- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking/reports_that_it_could_not_look (0.00s)
+        grant_test.go:411: a grant source that reports that it could not look left the call asking 0 windows, want 1
+    --- FAIL: TestTicket224GrantSourceThatCannotAnswerMeansAsking/panics_mid-lookup (0.00s)
+        grant_test.go:411: a grant source that panics mid-lookup left the call asking 0 windows, want 1
+--- FAIL: TestTicket224PathlessCallIsNeverGranted (0.00s)
+    grant_test.go:434: pathless L1 call asked 0 windows, want 1
+--- FAIL: TestTicket224GrantedCallBooksAllowSessionGrantWithItsRow (0.01s)
+    grant_test.go:466: booked decision = "allow", want "allow_session_grant": a remembered authorization and a click on this card must not land on the same value
+    grant_test.go:470: booked grant_id = <nil>, want the covering row's 4242
+time=2026-10-11T14:44:24.987+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-66ac7fc6-ad7f-4b38-81b7-d7a413623b80 owner=tools
+time=2026-10-11T14:44:24.988+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-79d28230-96cc-4eb8-b3f9-f3b4c398e631 owner=tools
+time=2026-10-11T14:44:24.988+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b0cc724f-3fc3-4450-a656-417115cb5b88 owner=tools
+time=2026-10-11T14:44:24.988+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2a1b84be-de87-4773-bd8b-07e51f28f701 owner=tools
+time=2026-10-11T14:44:24.988+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4be19828-b1bb-4983-bdc3-9a04616be563 owner=tools
+time=2026-10-11T14:44:24.988+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-67cbbacb-8806-4532-957d-78377a271baa owner=tools
+time=2026-10-11T14:44:24.989+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4bb51543-5c51-469f-8e3e-4f2a2c3367ea owner=tools
+time=2026-10-11T14:44:24.989+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f4a6d3d3-6f8b-4d2e-aa94-9b956cdc29aa owner=tools
+time=2026-10-11T14:44:24.989+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8fe16977-b15d-4064-9e03-2f132b599c3e owner=tools
+time=2026-10-11T14:44:24.989+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b5834021-6982-4fea-8245-d1f70a2ee175 owner=tools
+time=2026-10-11T14:44:24.989+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3b20b017-d976-47f8-b954-afda66bd3447 owner=tools
+time=2026-10-11T14:44:24.989+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d362a223-a2ab-4b1d-b167-d0f3be620cc6 owner=tools
+time=2026-10-11T14:44:24.990+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-894b0831-c111-48e1-a86e-7d9edb1e72a5 owner=tools
+time=2026-10-11T14:44:24.990+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d283c6d4-6ef4-4480-9743-0156d267c009 owner=tools
+time=2026-10-11T14:44:24.990+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-89d7dcc9-9b59-48f1-8544-b4803902d76a owner=tools
+time=2026-10-11T14:44:24.990+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-752fd31c-21a5-445a-99e1-71dd123f14f1 owner=tools
+time=2026-10-11T14:44:24.990+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9e5d8cd5-b4a8-463b-934b-726f712df76a owner=tools
+time=2026-10-11T14:44:24.990+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8e56d2c7-9d84-4fe5-b54c-4df6d3f315df owner=tools
+time=2026-10-11T14:44:24.990+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-15e9452b-3c7e-4ff7-ae86-a83353ca1beb owner=tools
+time=2026-10-11T14:44:24.991+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9abc301c-40f4-4b6b-86b9-45d54cd33507 owner=tools
+time=2026-10-11T14:44:24.991+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-26776d08-15e2-4dcc-bf40-444ba2b447d2 owner=tools
+time=2026-10-11T14:44:24.991+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d35ff63f-606c-4736-8712-5413110ee16c owner=tools
+time=2026-10-11T14:44:24.991+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c96aa104-1444-48cf-b451-a17f925941c0 owner=tools
+time=2026-10-11T14:44:24.991+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5493f7fa-f419-4989-8a6b-1cade1d776bc owner=tools
+time=2026-10-11T14:44:24.991+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-835bbb7d-db2d-4b42-82b3-aaa3c1a4e743 owner=tools
+time=2026-10-11T14:44:24.991+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-cb2d5d8c-9d1a-4fba-9744-080f279681b5 owner=tools
+time=2026-10-11T14:44:24.991+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-949303d2-aa23-48c8-b297-6ed2ca2f0678 owner=tools
+time=2026-10-11T14:44:24.992+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c1f60fd8-dc33-44d2-94b2-f9362cfdce18 owner=tools
+time=2026-10-11T14:44:25.012+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle1258537883\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:25.020+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:25Z duration_ms=7
+time=2026-10-11T14:44:25.026+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle1258537883\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:25.032+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:25Z duration_ms=5
+time=2026-10-11T14:44:25.036+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:25.039+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-11T14:44:25.042+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-08bacf58-dab7-4b43-8f0b-ae2baf129add owner=tools
+time=2026-10-11T14:44:25.054+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9533dadb-cd21-4f52-b1d2-0495b4b8c63f owner=tools
+time=2026-10-11T14:44:25.054+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d1bc0b8b-a830-4efb-9d2e-4b61ca396580 owner=tools
+time=2026-10-11T14:44:25.054+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-7c6d0c3e-c39a-4a27-8679-8dc1cf012c1a owner=tools
+--- FAIL: TestMissingArgsAndUnwiredRoster (0.00s)
+    task_output_leg_test.go:137: an unwired roster must fail closed, got {Text:L2 审批通道尚未接入（票 21），已拒绝执行 IsError:true RiskLevel:L2 ErrorClass:user_rejected Truncated:false AppliedSteps:[]}
+time=2026-10-11T14:44:25.470+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore2120459671\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:25.476+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:25Z duration_ms=5
+time=2026-10-11T14:44:25.483+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore2120459671\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:25.489+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:25Z duration_ms=5
+time=2026-10-11T14:44:25.493+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:25.495+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestTicket224GrantIDColumnRoundTripsThroughTheRealStore (0.06s)
+    ticket224_grantid_column_test.go:128: tool_call.decision on disk = "allow", want "allow_session_grant"
+    ticket224_grantid_column_test.go:131: tool_call.grant_id on disk is NULL for a call a live grant covered: the column the frozen DDL has carried since SPEC-02 §3 is still never filled in practice ({ID:1 TaskID:t224-r2 Seq:1 Tool:t224.write ArgsJSON:{"path":"C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore2120459671\\001\\notes.txt"} RiskLevel:L2 Decision:allow DecidedAt:<nil> StartedAt:<nil> EndedAt:<nil> Outcome:success ErrorClass: CorrelationID:grant-on-disk GrantID:<nil>})
+time=2026-10-11T14:44:25.529+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test283IdentityChainThroughTheRealLoop156287542\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:25.536+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:25Z duration_ms=7
+time=2026-10-11T14:44:25.544+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test283IdentityChainThroughTheRealLoop156287542\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:25.549+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:25Z duration_ms=4
+time=2026-10-11T14:44:25.553+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:25.556+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-11T14:44:25.559+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-96d1aa82-3ab1-4eca-afd9-be55c1366ab6 owner=tools
+time=2026-10-11T14:44:25.587+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test285RosterRowsCarryDistinctCorrPerCall479658610\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:25.593+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:25Z duration_ms=5
+time=2026-10-11T14:44:25.600+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test285RosterRowsCarryDistinctCorrPerCall479658610\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:25.605+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:25Z duration_ms=4
+time=2026-10-11T14:44:25.610+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:25.612+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-11T14:44:25.616+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4dc2b897-09ae-4f15-a994-02a5c8b2ccb6 owner=tools
+--- FAIL: TestTicket90ModeReachesRoutingAsParameter (0.00s)
+    ticket90_test.go:236: mode=ask_every_step: L1 windows opened = 0, want 1
+    ticket90_test.go:250: mode=ask_every_step: booked level = L2, want the ASSESSED L1 (a mode may not rewrite what the judge concluded; that is what tool_call.risk_level means)
+    ticket90_test.go:243: mode=ask_high_risk: decision carries no ModeSilenced mark; the audit trail would not be able to tell a silenced call from an unjudged one
+    ticket90_test.go:250: mode=ask_high_risk: booked level = L2, want the ASSESSED L1 (a mode may not rewrite what the judge concluded; that is what tool_call.risk_level means)
+    ticket90_test.go:243: mode=auto_approve: decision carries no ModeSilenced mark; the audit trail would not be able to tell a silenced call from an unjudged one
+    ticket90_test.go:250: mode=auto_approve: booked level = L2, want the ASSESSED L1 (a mode may not rewrite what the judge concluded; that is what tool_call.risk_level means)
+--- FAIL: TestTicket90TwoBridgesDoNotShareOneMode (0.00s)
+    ticket90_test.go:283: strict bridge asked 0 times, want 1 (mode value leaked across bridges)
+--- FAIL: TestTicket90UnwiredModeSourceIsTheStrictestMode (0.00s)
+    ticket90_test.go:305: windowless composition opened 0 L1 windows, want 1 (fail-closed = ask)
+--- FAIL: TestTicket90ModeCarriesNoAllowAuthority (0.00s)
+    ticket90_test.go:479: silenced call consulted the gate (0 windows, 1 approvals); want 0/0
+time=2026-10-11T14:44:25.818+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate4268330835\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:25.827+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:25Z duration_ms=9
+time=2026-10-11T14:44:25.836+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate4268330835\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:25.841+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:25Z duration_ms=5
+time=2026-10-11T14:44:25.846+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:25.849+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-11T14:44:35.854+08:00 level=WARN msg="agent: tool timeout" tool=fs.write task=125408ed-36e3-4480-8dc9-d8b54630e6bb timeout_ms=10000
+--- FAIL: TestLoopPassesDeclaredL1WriteThroughTheGate (10.07s)
+    loop_approval_test.go:189: card = L2 fs.write, want L1 fs.write
+    loop_approval_test.go:192: the gate never reported the handoff to execution
+    loop_approval_test.go:196: the write did not land through the window: open C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate4268330835\001\loop-written.txt: The system cannot find the file specified. ""
+time=2026-10-11T14:44:35.879+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered2758101202\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-11T14:44:35.889+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-11T06:44:35Z duration_ms=9
+time=2026-10-11T14:44:35.897+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered2758101202\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-11T14:44:35.903+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-11T06:44:35Z duration_ms=5
+time=2026-10-11T14:44:35.908+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-11T14:44:35.911+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	20.757s
+FAIL
+rc=1

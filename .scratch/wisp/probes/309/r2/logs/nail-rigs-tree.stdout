@@ -1,0 +1,47 @@
+REV=6f3893896d13d18d8e80adfed3230e9b0570e23e
+########## RIG-4b second construction point INSIDE internal/agent (same-package bare name) -> expect RED ##########
+TAG=second DIR=/tmp/wisp309r2-second.5EjiSC
+  go.mod/go.sum present: yes
+  .go in tree (proves the archive is not empty): 995
+  non-test .go under the four roots: 293
+--- landed?
+package agent
+
+func rig309r2Second() ToolRequest {
+	return ToolRequest{TaskID: "", Name: "fs.read"}
+}
+    toolrequest_nail_309_test.go:309: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/agent/zz309r2second.go:4(same-package-bare-literal)。分母=294 枚非测试源（每 root=cmd=40 internal=230 scripts=11 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:358: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=294 枚非测试源（每 root=cmd=40 internal=230 scripts=11 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.28s)
+rc=1
+
+########## RIG-6 cross-package alias (named blind spot) -> expect GREEN, rc=0 ##########
+TAG=alias DIR=/tmp/wisp309r2-alias.Gljfv5
+  go.mod/go.sum present: yes
+  .go in tree (proves the archive is not empty): 995
+  non-test .go under the four roots: 293
+--- landed in package tools:
+package tools
+
+import "github.com/CarlosShao/wisp/internal/agent"
+
+type Mid = agent.ToolRequest
+--- landed in package main (the construction is written through the alias, one package away from where the alias resolves to agent.ToolRequest):
+package main
+
+import "github.com/CarlosShao/wisp/internal/tools"
+
+func rig309r2Use() {
+	_ = tools.Mid{TaskID: "", Name: "fs.read"}
+}
+    toolrequest_nail_309_test.go:358: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=295 枚非测试源（每 root=cmd=41 internal=230 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.19s)
+rc=0
+
+########## the shared worktree is untouched by this script ##########
+ M internal/risk/pathresolver_anchor_spelling_windows_test.go
+ M internal/risk/pathresolver_volumeless_spelling_308_test.go
+ M internal/tools/bridge.go
+ M internal/tools/toolrequest_nail_309_test.go
+(empty above == clean)
+rc=0

@@ -1,0 +1,19 @@
+########## R359-14 hand-in consolidated reading ##########
+# 2026-10-11 15:05:21 +0800  HEAD=d75db9ee  start HEAD was 202ed4a5
+-- word ruler (internal cmd):
+   TOTAL=71  in-test-by-filename=69  non-test-by-filename=2  stripped=1
+   all-roots TOTAL=71
+   per-file then(202ed4a5)/now: nail=7/10  bridge=2/1
+-- nail self-run:
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.14s)
+ok  	github.com/CarlosShao/wisp/internal/tools	0.181s
+-- gate rcs from the consolidated run (see behaviour-and-gates.stdout):
+rc_build=0
+rc_vet=0
+rc_d22scan=0
+rc_pathlen=0
+rc_build=0
+-- .go files inside my probes (want 0): 0
+-- write face status (want only my probes + ticket):
+0

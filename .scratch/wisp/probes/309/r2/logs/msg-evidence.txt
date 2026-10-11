@@ -1,0 +1,32 @@
+309-r2 evidence: rigs, rulers, six new debt readings, one append-only bullet
+
+Artefacts for the five items of the orchestrator ruling (ticket 309, section 4):
+probes/309/r2/{00,10,20,30,40,50,90}.md plus the logs directory holding every
+ruler as a re-runnable .txt script and its raw reading (.log / .stdout, no .out
+names, no .go file left under probes/ - the one that appeared mid-run was
+renamed to .go.txt in the same session and the export path moved to /tmp).
+
+What the load-bearing readings are, in one place:
+- roots decision: three nested go.mod prefixes sit inside github.com/CarlosShao/wisp/
+  and one live import of internal/ exists in tools/, so scripts enters the roots on
+  the same ruler, not on a remembered language rule.
+- nail: construction points 1, denominator 293 (cmd 40 / internal 229 / tools 13 /
+  scripts 11), matched by an independent find ruler; per-root empty roster is now a
+  t.Fatalf instead of a green.
+- shapes: qualified literal, var declaration plus field assignment, same-file alias,
+  and a second bare-name point inside internal/agent each ring (rc=1); the two named
+  blind spots each stay green (rc=0) so the head comment can list what is missed.
+- word ruler: 71 / 69 / 2, 1 after stripping leading-slash comment lines, plus the
+  content-versus-filename filter hole this leg was bitten by, demonstrated out of repo.
+- behaviour unchanged: 44 added / 9 removed changed lines all start with //, and the
+  comment-stripped blobs of bridge.go at 202ed4a5 and at this leg's code commit are
+  byte-identical (sha 496ed6d6...), guard line 1 to 1.
+- gates: build / vet / d22scan / path budget each rc=0 with its own log line; d22scan
+  went red twice on this leg's own phantom citations and was fixed by rewording, no
+  allowlist edit.
+- prov limb: whole-package face disagrees with the instrument-scoped face (rc=1 with
+  16 plumbing-coloured failures instead of the expected rc=0); registered as
+  Q-309-r2-prov-limb-colour-discrepancy rather than silently overriding the ruling.
+
+Ticket 309 gets one append-only bullet (1 added / 0 deleted); no checkbox moved,
+no Status line touched, no verdict claimed. Nothing pushed.

@@ -1,0 +1,61 @@
+#!/bin/sh
+# 309-r2 behaviour proof + gates. One script, one log per ruler, every reading lands in
+# .scratch/wisp/probes/309/r2/logs/. Nothing is written inside the repo except these logs.
+L=.scratch/wisp/probes/309/r2/logs
+BR=internal/tools/bridge.go
+NAIL=internal/tools/toolrequest_nail_309_test.go
+GOFU=$(go env GOPATH)/bin/gofumpt
+
+echo "########## B1 changed lines of bridge.go must ALL be comment lines (git diff -U0) ##########"
+git diff -U0 -- "$BR" > "$L/behaviour-diff-bridge.txt"
+ADDED=$(grep -c '^+[^+]' "$L/behaviour-diff-bridge.txt")
+ADDED_COMMENT=$(grep '^+[^+]' "$L/behaviour-diff-bridge.txt" | grep -c '^+//')
+REMOVED=$(grep -c '^-[^-]' "$L/behaviour-diff-bridge.txt")
+REMOVED_COMMENT=$(grep '^-[^-]' "$L/behaviour-diff-bridge.txt" | grep -c '^-//')
+echo "added lines=$ADDED of which start with // = $ADDED_COMMENT (want equal)" | tee -a "$L/behaviour-bridge.txt"
+echo "removed lines=$REMOVED of which start with // = $REMOVED_COMMENT (want equal)" | tee -a "$L/behaviour-bridge.txt"
+echo "non-comment changed lines = $((ADDED - ADDED_COMMENT + REMOVED - REMOVED_COMMENT)) (want 0)" | tee -a "$L/behaviour-bridge.txt"
+
+echo; echo "########## B2 strip full-line comments from HEAD blob and from the worktree, then cmp ##########"
+git show HEAD:"$BR" > "$L/bridge-head.go.txt"
+sed '/^[[:space:]]*\/\//d' "$L/bridge-head.go.txt" > "$L/bridge-head.stripped"
+sed '/^[[:space:]]*\/\//d' "$BR" > "$L/bridge-work.stripped"
+echo "HEAD stripped bytes=$(wc -c < "$L/bridge-head.stripped") lines=$(wc -l < "$L/bridge-head.stripped")" | tee -a "$L/behaviour-bridge.txt"
+echo "work stripped bytes=$(wc -c < "$L/bridge-work.stripped") lines=$(wc -l < "$L/bridge-work.stripped")" | tee -a "$L/behaviour-bridge.txt"
+cmp "$L/bridge-head.stripped" "$L/bridge-work.stripped" && echo "cmp after stripping: IDENTICAL" | tee -a "$L/behaviour-bridge.txt" || echo "cmp after stripping: DIFFERENT ***" | tee -a "$L/behaviour-bridge.txt"
+echo "sha256 of the two stripped blobs:" | tee -a "$L/behaviour-bridge.txt"
+sha256sum "$L/bridge-head.stripped" "$L/bridge-work.stripped" | tee -a "$L/behaviour-bridge.txt"
+
+echo; echo "########## B3 the guard itself, byte for byte, unchanged ##########"
+git show HEAD:"$BR" | grep -n 'if b.injected || b.prov == nil || taskID == "" {' > "$L/guard-head.txt"
+grep -n 'if b.injected || b.prov == nil || taskID == "" {' "$BR" > "$L/guard-work.txt"
+echo "HEAD occurrences=$(wc -l < "$L/guard-head.txt") worktree occurrences=$(wc -l < "$L/guard-work.txt")"
+sed -E 's/^ *[0-9]+://' "$L/guard-head.txt" > "$L/guard-head.body"
+sed -E 's/^ *[0-9]+://' "$L/guard-work.txt" > "$L/guard-work.body"
+cmp "$L/guard-head.body" "$L/guard-work.body" && echo "guard text: IDENTICAL (only the line number may have moved)" || echo "guard text: DIFFERENT ***"
+
+echo; echo "########## B4 line endings (the trap 309-r1 fell into) ##########"
+echo "CR bytes in bridge.go = $(tr -dc '\r' < "$BR" | wc -c) (want 0)"
+echo "CR bytes in the nail  = $(tr -dc '\r' < "$NAIL" | wc -c) (want 0)"
+git ls-files --eol -- "$BR" "$NAIL"
+
+echo; echo "########## G1 gates ##########"
+GOFLAGS= go build ./... > "$L/gate-build.log" 2>&1; echo "rc_build=$?" | tee -a "$L/gate-build.log" | tail -1
+GOFLAGS= go vet ./internal/tools/ > "$L/gate-vet.log" 2>&1; echo "rc_vet=$?" | tee -a "$L/gate-vet.log" | tail -1
+sh scripts/d22scan.sh > "$L/gate-d22scan.log" 2>&1; echo "rc_d22scan=$?" | tee -a "$L/gate-d22scan.log" | tail -1
+sh scripts/check-path-length-budget.sh --with-self-test > "$L/gate-pathlen.log" 2>&1; echo "rc_pathlen=$?" | tee -a "$L/gate-pathlen.log" | tail -1
+grep -c 'clean - no D22 ban violations' "$L/gate-d22scan.log" | sed 's/^/live-gate sentence present (count)=/'
+
+echo; echo "########## G2 format rosters, two rulers side by side, each with its range ##########"
+echo "-- gofmt -l, worktree face, whole repo:"; gofmt -l . > "$L/fmt-gofmt-worktree.txt" 2>&1; echo "   entries=$(wc -l < "$L/fmt-gofmt-worktree.txt")"; cat "$L/fmt-gofmt-worktree.txt"
+echo "-- gofmt -l, worktree face, internal/tools:"; gofmt -l internal/tools > "$L/fmt-gofmt-tools.txt" 2>&1; echo "   entries=$(wc -l < "$L/fmt-gofmt-tools.txt")"; cat "$L/fmt-gofmt-tools.txt"
+echo "-- gofumpt -l, worktree face, whole repo:"; "$GOFU" -l . > "$L/fmt-gofumpt-worktree.txt" 2>&1; echo "   entries=$(wc -l < "$L/fmt-gofumpt-worktree.txt")"; cat "$L/fmt-gofumpt-worktree.txt"
+echo "-- gofumpt -l, worktree face, internal/tools:"; "$GOFU" -l internal/tools > "$L/fmt-gofumpt-tools.txt" 2>&1; echo "   entries=$(wc -l < "$L/fmt-gofumpt-tools.txt")"; cat "$L/fmt-gofumpt-tools.txt"
+echo "-- HEAD blob face (export OUTSIDE the repo - a .go copy under probes/ would move"
+echo "-- 别家 gofumpt/d22scan 的分母 - then format-check them, CRLF-safe):"
+HB=$(mktemp -d "${TMPDIR:-/tmp}/wisp309r2-headblob.XXXXXX")
+echo "   headblob dir=$HB"
+git show HEAD:"$BR" > "$HB/bridge.go"
+git show HEAD:"$NAIL" > "$HB/toolrequest_nail_309_test.go"
+echo "   gofmt -l on HEAD blobs:"; gofmt -l "$HB" > "$L/fmt-gofmt-headblob.txt" 2>&1; echo "     entries=$(wc -l < "$L/fmt-gofmt-headblob.txt")"; cat "$L/fmt-gofmt-headblob.txt"
+echo "   gofumpt -l on HEAD blobs:"; "$GOFU" -l "$HB" > "$L/fmt-gofumpt-headblob.txt" 2>&1; echo "     entries=$(wc -l < "$L/fmt-gofumpt-headblob.txt")"; cat "$L/fmt-gofumpt-headblob.txt"

@@ -1,0 +1,47 @@
+pristine snapshot sha: 069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+cmp against the snapshot the nail rigs restored from: same-byte
+guard line present before any mutation: 1
+########## MUT-0 unmutated full package (worktree face; doubles as the after roster) ##########
+rc=0
+  top-level: PASS=211 FAIL=0 SKIP=0
+  any-depth: PASS=286 FAIL=0 SKIP=0
+
+########## MUT-E strike the prov == nil limb -> does anything in the package ring? ##########
+LANDS: old form still present (want 0) = 0  new form present (want 1) = 1
+984:	if b.injected || taskID == "" {
+rc=1
+--- FAIL: TestToolConcurrencyCeilingIsFour (0.00s)
+--- FAIL: TestPerToolTimeoutHonoredViaContext (0.00s)
+--- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L0_passes_and_no_gate_is_consulted (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L1_uses_the_pending-window_callback (0.00s)
+    --- FAIL: TestRiskDecisionRoutesEachLevelToItsBranch/L1_window_timeout_means_execute (0.00s)
+--- FAIL: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+--- FAIL: TestTicket224LiveGrantStopsTheL1Question (0.01s)
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+ M internal/tools/bridge.go
+
+########## MUT-F strike the injected limb -> does anything in the package ring? ##########
+LANDS: old form still present (want 0) = 0  new form present (want 1) = 3
+848:	if b.prov == nil || taskID == "" {
+915:	if b.prov == nil || taskID == "" {
+984:	if b.prov == nil || taskID == "" {
+rc=0
+ok  	github.com/CarlosShao/wisp/internal/tools	13.719s
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+ M internal/tools/bridge.go
+
+########## FINAL: guard restored, named status of the whole write face ##########
+984:	if b.injected || b.prov == nil || taskID == "" {
+ M internal/risk/pathresolver_anchor_spelling_windows_test.go
+ M internal/risk/pathresolver_volumeless_spelling_308_test.go
+ M internal/tools/bridge.go
+ M internal/tools/toolrequest_nail_309_test.go
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+ M internal/tools/bridge.go

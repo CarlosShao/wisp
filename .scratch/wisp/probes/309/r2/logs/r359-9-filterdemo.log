@@ -1,0 +1,13 @@
+fixture dir=/tmp/wisp309r2-filterdemo.K3Q4C0 (relative face: grep -rn ... .)
+-- roster as grep -rn prints it:
+./harness.go:3:// Ruler: grep -rn ToolRequest{ internal cmd --include=*.go minus _test.go yields one point.
+./loop.go:4:	req := ToolRequest{TaskID: ""}
+-- A) drop by FILENAME field (the ruler this leg now prescribes):  count=2
+--    both planted lines are in non-test files, so 2 is the honest roster.
+-- B) drop by whole-line CONTENT (the shorthand everyone types):    count=1
+--    roster that survives the shorthand:
+./loop.go:4:	req := ToolRequest{TaskID: ""}
+-- verdict: the content filter eats 1 line that the filename field keeps,
+-- and the eaten line is precisely the COMMENT quoting the ruler: the roster reports
+-- 1 where 2 are on disk - the word ruler under-counts by hiding its own quote.
+rc=0

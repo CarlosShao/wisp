@@ -1,0 +1,58 @@
+#!/bin/sh
+# 309-r2 measurement pass: every number this leg publishes into a comment is taken here,
+# so a reader can re-run one script and get the same set. Nothing is written inside the
+# repo except these logs.
+L=.scratch/wisp/probes/309/r2/logs
+NOW=$(date '+%Y-%m-%d %H:%M:%S %z')
+REV=$(git rev-parse HEAD)
+SHORT=$(git rev-parse --short HEAD)
+
+echo "########## R359-6 the word ruler, both口径, at $NOW HEAD=$SHORT ##########" | tee "$L/r359-6-wordruler.log"
+grep -rn 'ToolRequest{' internal cmd --include=*.go > "$L/r359-6-roster.txt"
+TOTAL=$(wc -l < "$L/r359-6-roster.txt")
+INTH=$(cut -d: -f1 "$L/r359-6-roster.txt" | grep -c '_test.go$')
+NONTEST=$(cut -d: -f1 "$L/r359-6-roster.txt" | grep -v '_test.go$' | wc -l)
+echo "grep -rn 'ToolRequest{' internal cmd --include=*.go" >> "$L/r359-6-wordruler.log"
+echo "TOTAL=$TOTAL" >> "$L/r359-6-wordruler.log"
+echo "lines whose FILENAME ends in _test.go = $INTH" >> "$L/r359-6-wordruler.log"
+echo "lines whose FILENAME does not         = $NONTEST" >> "$L/r359-6-wordruler.log"
+echo "-- the non-test roster (by filename field):" >> "$L/r359-6-wordruler.log"
+grep -rn 'ToolRequest{' internal cmd --include=*.go | grep -v '_test\.go:' >> "$L/r359-6-wordruler.log"
+STRIPPED=$(grep -rn 'ToolRequest{' internal cmd --include=*.go | grep -v '_test\.go:' | grep -vE ':[0-9]+: *//' | wc -l)
+echo "-- after dropping lines whose TEXT begins with // : $STRIPPED" >> "$L/r359-6-wordruler.log"
+echo "-- same ruler with tools+scripts in the roots:" >> "$L/r359-6-wordruler.log"
+echo "TOTAL=$(grep -rn 'ToolRequest{' internal cmd tools scripts --include=*.go | wc -l)" >> "$L/r359-6-wordruler.log"
+cat "$L/r359-6-wordruler.log"
+
+echo; echo "########## R359-7 the nail's own AST roster (parse ruler) ##########"
+GOFLAGS= go test ./internal/tools/ -count=1 -run Test309ToolRequestProductionConstructionNail -v 2>&1 | grep -E '枚数钉|^(--- |ok|FAIL)' | tee "$L/r359-7-nail-roster.log"
+echo "rc(from a fresh run)=" >> "$L/r359-7-nail-roster.log"
+GOFLAGS= go test ./internal/tools/ -count=1 -run Test309ToolRequestProductionConstructionNail > /dev/null 2>&1
+echo "rc=$?" >> "$L/r359-7-nail-roster.log"
+tail -1 "$L/r359-7-nail-roster.log"
+
+echo; echo "########## R359-1 module prefix ruler (why tools AND scripts enter the roots) ##########" | tee "$L/roots-rulers.log"
+for f in go.mod scripts/spike/go.mod tools/d22scan/go.mod tools/mockllm/go.mod; do
+  echo "$f :: $(grep -m1 '^module ' $f)" >> "$L/roots-rulers.log"
+done
+echo "-- the three nested modules all sit INSIDE github.com/CarlosShao/wisp/ -> go's internal/" >> "$L/roots-rulers.log"
+echo "-- visibility rule (prefix on the import path) admits them, so they enter the roots." >> "$L/roots-rulers.log"
+grep -rn "CarlosShao/wisp/internal" tools scripts --include=*.go >> "$L/roots-rulers.log"
+echo "-- R359-3 live example ruler above: 1 hit = tools/signmodels/main.go importing internal/models;" >> "$L/roots-rulers.log"
+echo "--   scripts itself has 0 such imports today, which changes nothing about the prefix rule." >> "$L/roots-rulers.log"
+cat "$L/roots-rulers.log"
+
+echo; echo "########## R359-2 bare-name gate: which files say 'package agent'? ##########" | tee "$L/package-agent-ruler.log"
+grep -rl '^package agent$' cmd internal tools scripts --include=*.go | sed 's#/[^/]*$##' | sort -u >> "$L/package-agent-ruler.log"
+echo "-- distinct directories above; all of them are internal/agent -> the bare-name branch" >> "$L/package-agent-ruler.log"
+echo "-- cannot smuggle in a same-named type from another package today (ruler is re-runnable)." >> "$L/package-agent-ruler.log"
+cat "$L/package-agent-ruler.log"
+
+echo; echo "########## R359-4 write-point census for the Options field named Assessor ##########" | tee "$L/assessor-census.log"
+echo "grep -rn 'Assessor:' internal cmd tools --include=*.go" >> "$L/assessor-census.log"
+grep -rn 'Assessor:' internal cmd tools --include=*.go >> "$L/assessor-census.log"
+echo "count=$(grep -rn 'Assessor:' internal cmd tools --include=*.go | wc -l)" >> "$L/assessor-census.log"
+echo "of which test files=$(grep -rn 'Assessor:' internal cmd tools --include=*.go | grep -c '_test\.go:')" >> "$L/assessor-census.log"
+echo "-- the single non-test hit is bridge.go's own inline comment on the injected field;" >> "$L/assessor-census.log"
+echo "-- the only write is internal/tools/ticket90_test.go (a test). Production writes = 0." >> "$L/assessor-census.log"
+cat "$L/assessor-census.log"

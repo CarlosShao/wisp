@@ -1,0 +1,25 @@
+#!/bin/sh
+# R359-9: a re-runnable demonstration of the grep-口径 hole this leg got bitten by.
+# The fixture lives OUTSIDE the repo (a .go file under probes/ would move another leg's
+# gofumpt/d22scan denominator). Two planted lines: one real construction point in loop.go,
+# and one COMMENT line in harness.go that carries both the quoted pattern and the word
+# _test.go - exactly the shape of the bridge.go paragraph before 309-r2 split it over two
+# lines. Paths are taken relative to the fixture dir so the filename field has no drive
+# letter in it (that drive-letter prefix is what makes a naive cut -d: eat the whole line).
+D=$(mktemp -d "${TMPDIR:-/tmp}/wisp309r2-filterdemo.XXXXXX")
+printf 'package agent\n\nfunc f() {\n\treq := ToolRequest{TaskID: ""}\n\t_ = req\n}\n' > "$D/loop.go"
+printf 'package p\n\n// Ruler: grep -rn ToolRequest{ internal cmd --include=*.go minus _test.go yields one point.\n' > "$D/harness.go"
+cd "$D" || exit 1
+echo "fixture dir=$D (relative face: grep -rn ... .)"
+echo "-- roster as grep -rn prints it:"
+grep -rn 'ToolRequest{' .
+CORRECT=$(grep -rn 'ToolRequest{' . | sed 's/:.*//' | grep -v '_test.go$' | wc -l)
+NAIVE=$(grep -rn 'ToolRequest{' . | grep -v '_test.go' | wc -l)
+echo "-- A) drop by FILENAME field (the ruler this leg now prescribes):  count=$CORRECT"
+echo "--    both planted lines are in non-test files, so 2 is the honest roster."
+echo "-- B) drop by whole-line CONTENT (the shorthand everyone types):    count=$NAIVE"
+echo "--    roster that survives the shorthand:"
+grep -rn 'ToolRequest{' . | grep -v '_test.go'
+echo "-- verdict: the content filter eats $((CORRECT - NAIVE)) line that the filename field keeps,"
+echo "-- and the eaten line is precisely the COMMENT quoting the ruler: the roster reports"
+echo "-- $NAIVE where $CORRECT are on disk - the word ruler under-counts by hiding its own quote."

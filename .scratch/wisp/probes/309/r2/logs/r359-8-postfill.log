@@ -1,0 +1,13 @@
+########## R359-8 post-fill re-measure of the word ruler (must equal what the comments publish) ##########
+# 2026-10-11 14:49:11 +0800 HEAD=c30b7abe
+TOTAL=71
+in_test_by_filename=69
+nontest_by_filename=2
+-- nontest roster:
+internal/agent/loop.go:675:		req := ToolRequest{
+internal/tools/bridge.go:882:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+-- stripped of comment-text lines: 1
+per-file then/now (202ed4a5 tracked vs worktree):
+  internal/tools/toolrequest_nail_309_test.go then=7 now=10
+  internal/tools/bridge.go then=2 now=1
+all-roots TOTAL=71

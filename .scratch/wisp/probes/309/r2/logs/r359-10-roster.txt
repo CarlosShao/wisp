@@ -1,0 +1,71 @@
+internal/agent/approval/fakes_test.go:445:	return agent.ToolRequest{
+internal/agent/loop.go:675:		req := ToolRequest{
+internal/perm/ticket90_persist_test.go:122:	if _, err := b.Execute(context.Background(), agent.ToolRequest{
+internal/tools/bridge.go:882:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+internal/tools/bridge_scope_open_ticket158_test.go:38:	return agent.ToolRequest{
+internal/tools/bridge_test.go:148:	return agent.ToolRequest{
+internal/tools/failclosed_236_teeth_test.go:144:	out, err := bare.Execute(t.Context(), agent.ToolRequest{
+internal/tools/failclosed_236_teeth_test.go:287:	res, err := h.bridge.Execute(t.Context(), agent.ToolRequest{
+internal/tools/grant_test.go:264:	if _, err := b.Execute(context.Background(), agent.ToolRequest{
+internal/tools/grant_test.go:278:	if _, err := b.Execute(context.Background(), agent.ToolRequest{
+internal/tools/grant_test.go:509:	rTyp := reflect.TypeOf(agent.ToolRequest{})
+internal/tools/pointer_183_cli_seam_test.go:126:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/pointer_185_cli_seam_test.go:119:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/subagent_197_test.go:216:	out, err := h.bridge.Execute(ctx, agent.ToolRequest{
+internal/tools/subagent_197_test.go:654:	out, err := childDir.Execute(t.Context(), agent.ToolRequest{
+internal/tools/subagent_222_test.go:331:			out, err := h.bridge.Execute(t.Context(), agent.ToolRequest{
+internal/tools/subagent_222_test.go:566:			if _, err := h.bridge.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_cancel_221_legs_test.go:118:	out, err := x.h.bridge.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_ac2_before_test.go:41:	req := agent.ToolRequest{
+internal/tools/task_output_leg_test.go:60:	r := agent.ToolRequest{
+internal/tools/task_output_leg_test.go:91:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:116:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:130:	out2, err := bare.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:180:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:212:	reread, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:251:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:297:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:321:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:358:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:373:	head, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:395:	if r, err := b.Execute(context.Background(), agent.ToolRequest{
+internal/tools/task_output_leg_test.go:415:		out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/task_output_pointer_notice_test.go:68:	out, err := b.Execute(context.Background(), agent.ToolRequest{
+internal/tools/task_output_pointer_notice_test.go:82:	out, err := b.Execute(context.Background(), agent.ToolRequest{
+internal/tools/ticket175r2_stamp_live_test.go:94:	out, err := b.Execute(t.Context(), agent.ToolRequest{
+internal/tools/ticket224_grantid_column_test.go:74:	return agent.ToolRequest{
+internal/tools/ticket90_test.go:155:	return agent.ToolRequest{
+internal/tools/ticket90_test.go:454:	rTyp := reflect.TypeOf(agent.ToolRequest{})
+internal/tools/toolrequest_nail_309_test.go:39://   `grep -rn 'ToolRequest{' internal cmd --include=*.go`＝总 71 行／文件名以 _test.go 结尾
+internal/tools/toolrequest_nail_309_test.go:48://   一枚同时带 `ToolRequest{` 与 `_test.go` 两个字样的注释行会被这把尺自己吞掉（这腿先就被它
+internal/tools/toolrequest_nail_309_test.go:55://   · 改名 import（import ag "…/internal/agent" 后 ag.ToolRequest{...}）与 dot-import ＝漏；
+internal/tools/toolrequest_nail_309_test.go:58://   · 省了类型的嵌套元素 []agent.ToolRequest{{TaskID: ""}} 的内层 {...}＝漏（外层那枚是 ArrayType，
+internal/tools/toolrequest_nail_309_test.go:61://     ToolRequest{} 会进分子（今天尺＝grep -rl '^package agent$' cmd internal tools scripts
+internal/tools/toolrequest_nail_309_test.go:172:// included) without ever writing a literal. `var req = agent.ToolRequest{...}` is counted
+internal/tools/toolrequest_nail_309_test.go:341:			"func f() { _ = agent.ToolRequest{TaskID: \"\"} }\n"},
+internal/tools/toolrequest_nail_309_test.go:351:			"func f() { req := ToolRequest{TaskID: \"\"}; _ = req }\n"},
+internal/tools/toolrequest_nail_309_test.go:354:			"func f() { _ = ToolRequest{TaskID: \"\"} }\n"},
+internal/tools/toolrequest_nail_309_test.go:357:			"var rig = agent.ToolRequest{TaskID: \"\"}\n"},
+internal/tools/wiring_test.go:319:	return agent.ToolRequest{
+cmd/wisp/approval_always_201_test.go:101:			out, err := rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/approval_reply_201_test.go:220:			out, execErr = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/approval_reply_201_test.go:291:			out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/approval_reply_201_test.go:368:			out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/approval_reply_201_test.go:452:			out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/approval_reply_201_test.go:539:				out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/approval_reply_201_test.go:624:				out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/approval_seam_201_test.go:67:			out, execErr = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/approval_seam_201_test.go:156:			out, execErr = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/logsink_windows_test.go:247:		out, err := rt.bridge.Execute(ctx, agent.ToolRequest{
+cmd/wisp/panel_pump_test.go:114:	return rt.bridge.Execute(ctx, agent.ToolRequest{
+cmd/wisp/resident_task_source_246_windows_test.go:111:	out, err := ar.bridge.Execute(ctx, agent.ToolRequest{
+cmd/wisp/run_mode101_test.go:195:	res, err := rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/run_test.go:264:		out, err := rt.bridge.Execute(ctx, agent.ToolRequest{
+cmd/wisp/run_test.go:276:		out2, err2 := rt.bridge.Execute(ctx, agent.ToolRequest{
+cmd/wisp/run_test.go:350:		out0, err0 := rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/run_test.go:363:		out, err := rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/subagent_carrier_197_test.go:172:		out, eerr := rt.bridge.Execute(ctx, agent.ToolRequest{
+cmd/wisp/subagent_selfapproval_197_test.go:115:		out, e := rt.bridge.Execute(ctx, agent.ToolRequest{
+cmd/wisp/task_scope_close_151_test.go:38:	return agent.ToolRequest{
+cmd/wisp/ticket224_assembly_test.go:108:			out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
+cmd/wisp/ticket224_assembly_test.go:344:	out, err := rt.bridge.Execute(context.Background(), agent.ToolRequest{

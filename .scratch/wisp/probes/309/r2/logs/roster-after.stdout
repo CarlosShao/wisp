@@ -1,0 +1,27 @@
+TAG=after REV=d75db9ee DIR=/tmp/wisp309r2-after.fTM2ys
+  go.mod present: yes
+  go.sum present: yes
+  all .go in tree (proves the archive is not empty): 995
+  .go under internal/tools: 78
+  non-test .go under the four roots: 293
+rc=1
+top-level name lines: 211
+  top-of-line PASS=210 FAIL=1 SKIP=0
+  any-depth PASS=278 FAIL=1 SKIP=0
+  FAIL names:
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+-----
+name-set ADDED   = 0
+name-set REMOVED = 0
+----- the two ticket-236 carriers that really feed an empty TaskID, both trees:
+  [before]
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+  [after]
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+----- 309's own two instruments in the after tree:
+--- PASS: Test309AssessorForEmptyTaskIDDropsTaintDetector (0.01s)
+--- PASS: Test309ToolRequestProductionConstructionNail (0.37s)
+----- worktree side reading (carries another leg's in-flight go.mod, NOT the comparison face):
+--- PASS: TestApprovedL2ThatStopsMidWriteIsNotRenderedAsNeverStarted (0.01s)
+=== RUN   TestFSReadOnlyNeverOpensACard
+--- PASS: TestFSReadOnlyNeverOpensACard (0.01s)

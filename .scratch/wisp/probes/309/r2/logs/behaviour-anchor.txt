@@ -1,0 +1,7 @@
+added=44 starting with // =44 | removed=9 starting with // =9
+non-comment changed lines = 0 (want 0)
+anchor    bytes=22233 lines=854
+codecommit bytes=22233 lines=854
+cmp after stripping comments: IDENTICAL
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-at-anchor.stripped
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-at-codecommit.stripped

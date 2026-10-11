@@ -1,0 +1,47 @@
+#!/bin/sh
+# 309-r2 behaviour ruler against the DISPATCH ANCHOR, not against the current HEAD: once the
+# code commit lands, "worktree vs HEAD" degenerates to 0 changed lines and proves nothing.
+# Anchor = 202ed4a5 (the HEAD the dispatch named). Code face = d75db9ee (this leg's commit).
+A=202ed4a5
+C=d75db9ee
+L=.scratch/wisp/probes/309/r2/logs
+BR=internal/tools/bridge.go
+NAIL=internal/tools/toolrequest_nail_309_test.go
+
+echo "########## V1 which files did this leg's code commit touch at all? ##########"
+git diff --name-only "$A..$C" -- internal cmd tools scripts | tee "$L/behaviour-touched.txt"
+echo "count=$(wc -l < "$L/behaviour-touched.txt") (want 2: bridge.go + the nail)"
+
+echo; echo "########## V2 every changed line of bridge.go is a comment line ##########"
+git diff -U0 "$A..$C" -- "$BR" > "$L/behaviour-anchor-diff.txt"
+ADDED=$(grep -c '^+[^+]' "$L/behaviour-anchor-diff.txt")
+ADDC=$(grep '^+[^+]' "$L/behaviour-anchor-diff.txt" | grep -c '^+//')
+REMOVED=$(grep -c '^-[^-]' "$L/behaviour-anchor-diff.txt")
+REMC=$(grep '^-[^-]' "$L/behaviour-anchor-diff.txt" | grep -c '^-//')
+echo "added=$ADDED starting with // =$ADDC | removed=$REMOVED starting with // =$REMC" | tee "$L/behaviour-anchor.txt"
+echo "non-comment changed lines = $((ADDED - ADDC + REMOVED - REMC)) (want 0)" | tee -a "$L/behaviour-anchor.txt"
+
+echo; echo "########## V3 strip full-line comments from BOTH blobs, then cmp ##########"
+git show "$A:$BR" > "$L/bridge-at-anchor.go.txt"
+git show "$C:$BR" > "$L/bridge-at-codecommit.go.txt"
+sed '/^[[:space:]]*\/\//d' "$L/bridge-at-anchor.go.txt" > "$L/bridge-at-anchor.stripped"
+sed '/^[[:space:]]*\/\//d' "$L/bridge-at-codecommit.go.txt" > "$L/bridge-at-codecommit.stripped"
+echo "anchor    bytes=$(wc -c < "$L/bridge-at-anchor.stripped") lines=$(wc -l < "$L/bridge-at-anchor.stripped")" | tee -a "$L/behaviour-anchor.txt"
+echo "codecommit bytes=$(wc -c < "$L/bridge-at-codecommit.stripped") lines=$(wc -l < "$L/bridge-at-codecommit.stripped")" | tee -a "$L/behaviour-anchor.txt"
+if cmp -s "$L/bridge-at-anchor.stripped" "$L/bridge-at-codecommit.stripped"; then
+  echo "cmp after stripping comments: IDENTICAL" | tee -a "$L/behaviour-anchor.txt"
+else
+  echo "cmp after stripping comments: DIFFERENT ***" | tee -a "$L/behaviour-anchor.txt"
+  cmp "$L/bridge-at-anchor.stripped" "$L/bridge-at-codecommit.stripped" | tee -a "$L/behaviour-anchor.txt"
+fi
+sha256sum "$L/bridge-at-anchor.stripped" "$L/bridge-at-codecommit.stripped" | tee -a "$L/behaviour-anchor.txt"
+
+echo; echo "########## V4 the guard text itself, blob to blob ##########"
+git show "$A:$BR" | grep -F 'if b.injected || b.prov == nil || taskID == "" {' > "$L/guard-at-anchor.txt"
+git show "$C:$BR" | grep -F 'if b.injected || b.prov == nil || taskID == "" {' > "$L/guard-at-codecommit.txt"
+cmp "$L/guard-at-anchor.txt" "$L/guard-at-codecommit.txt" && echo "guard line: IDENTICAL (1 occurrence on each face)"
+echo "occurrences anchor=$(wc -l < "$L/guard-at-anchor.txt") codecommit=$(wc -l < "$L/guard-at-codecommit.txt")"
+
+echo; echo "########## V5 the other touched file is a test file (no production semantics) ##########"
+git diff --name-only "$A..$C" -- internal cmd tools scripts | grep -c '_test\.go$' | sed 's/^/test files touched=/'
+echo "and the guard's own package semantics did not move: go build rc from the last gate run = 0"

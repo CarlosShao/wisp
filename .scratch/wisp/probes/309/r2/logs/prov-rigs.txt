@@ -1,0 +1,54 @@
+#!/bin/sh
+# 309-r2 R359-5: is the instrument blind to the OTHER two limbs of the assessorFor guard?
+# Step 1 = the unmutated full-package run in the worktree (this is also this leg's "after"
+# roster reading, worktree face). Step 2 = strike `b.prov == nil ||` out of the guard and run
+# the same package again; step 3 = strike `b.injected ||` out. Each mutation is restored in
+# the same run (trap + cmp + sha256sum), nothing is left on disk and nothing is left overnight.
+# If a mutation stays green, the package has no instrument for that limb - which is what the
+# bridge.go comment has to say, and what ticket 309 AC#0 refused to pay a second fixture for.
+BR=internal/tools/bridge.go
+LOGS=.scratch/wisp/probes/309/r2/logs
+PRIST=$LOGS/bridge-309r2.go.pristine
+ORIG_LINE='if b.injected || b.prov == nil || taskID == "" {'
+cp "$BR" "$PRIST"
+echo "pristine snapshot sha: $(sha256sum "$PRIST")"
+echo "cmp against the snapshot the nail rigs restored from: $(cmp -s "$PRIST" "$LOGS/bridge-309r2.go.pristine" && echo same-byte || echo DIFFERENT)"
+restore() {
+  cp "$PRIST" "$BR"
+  if cmp -s "$PRIST" "$BR"; then echo "RESTORE cmp: byte-identical OK"; else echo "RESTORE cmp: MISMATCH ***"; fi
+  sha256sum "$BR" "$PRIST"
+  git status --porcelain -- "$BR"
+}
+trap restore EXIT
+
+echo "guard line present before any mutation: $(grep -c "$ORIG_LINE" "$BR")"
+
+echo "########## MUT-0 unmutated full package (worktree face; doubles as the after roster) ##########"
+GOFLAGS= go test ./internal/tools/ -count=1 -v > "$LOGS/suite-after-worktree.log" 2>&1
+echo "rc=$?" >> "$LOGS/suite-after-worktree.log"
+tail -1 "$LOGS/suite-after-worktree.log"
+echo "  top-level: PASS=$(grep -c '^--- PASS' "$LOGS/suite-after-worktree.log") FAIL=$(grep -c '^--- FAIL' "$LOGS/suite-after-worktree.log") SKIP=$(grep -c '^--- SKIP' "$LOGS/suite-after-worktree.log")"
+echo "  any-depth: PASS=$(grep -cE '^[[:space:]]*--- PASS' "$LOGS/suite-after-worktree.log") FAIL=$(grep -cE '^[[:space:]]*--- FAIL' "$LOGS/suite-after-worktree.log") SKIP=$(grep -cE '^[[:space:]]*--- SKIP' "$LOGS/suite-after-worktree.log")"
+grep -E '^--- ' "$LOGS/suite-after-worktree.log" | sed -E 's/^--- [A-Z]+: ([^ ]+).*/\1/' | sort > "$LOGS/suite-after-worktree-passnames.txt"
+
+echo; echo "########## MUT-E strike the prov == nil limb -> does anything in the package ring? ##########"
+sed -i 's#if b.injected || b.prov == nil || taskID == "" {#if b.injected || taskID == "" {#' "$BR"
+echo "LANDS: old form still present (want 0) = $(grep -c "$ORIG_LINE" "$BR")  new form present (want 1) = $(grep -c 'if b.injected || taskID == "" {' "$BR")"
+grep -n 'if b.injected || taskID == "" {' "$BR"
+GOFLAGS= go test ./internal/tools/ -count=1 > "$LOGS/provnil-mutation.log" 2>&1
+echo "rc=$?" | tee -a "$LOGS/provnil-mutation.log"
+grep -E 'FAIL|panic|^ok ' "$LOGS/provnil-mutation.log" | head -8
+restore
+
+echo; echo "########## MUT-F strike the injected limb -> does anything in the package ring? ##########"
+sed -i 's#if b.injected || b.prov == nil || taskID == "" {#if b.prov == nil || taskID == "" {#' "$BR"
+echo "LANDS: old form still present (want 0) = $(grep -c "$ORIG_LINE" "$BR")  new form present (want 1) = $(grep -c 'if b.prov == nil || taskID == "" {' "$BR")"
+grep -n 'if b.prov == nil || taskID == "" {' "$BR"
+GOFLAGS= go test ./internal/tools/ -count=1 > "$LOGS/injected-mutation.log" 2>&1
+echo "rc=$?" | tee -a "$LOGS/injected-mutation.log"
+grep -E 'FAIL|panic|^ok ' "$LOGS/injected-mutation.log" | head -8
+restore
+
+echo; echo "########## FINAL: guard restored, named status of the whole write face ##########"
+grep -n "$ORIG_LINE" "$BR"
+git status --porcelain -- internal/tools internal/risk cmd

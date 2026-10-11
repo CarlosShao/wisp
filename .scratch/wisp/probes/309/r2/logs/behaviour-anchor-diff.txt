@@ -1,0 +1,61 @@
+diff --git a/internal/tools/bridge.go b/internal/tools/bridge.go
+index 7f9865b9..8a0a32a2 100644
+--- a/internal/tools/bridge.go
++++ b/internal/tools/bridge.go
+@@ -878,5 +878,17 @@ func (b *Bridge) OpenTask(taskID string) {
+-// As measured today (a present count, not a permanent promise): no production code
+-// dispatches on the bridge except loop.go. Ruler: grep -rn 'ToolRequest{' internal
+-// cmd --include=*.go minus _test.go yields the single internal/agent/loop.go point;
+-// Test309ToolRequestProductionConstructionNail pins points outside internal/agent to
+-// 0. So being
++// As measured today (a present count, not a permanent promise; and not a constant either -
++// re-run before quoting: measured at HEAD 6f389389, 2026-10-11 14:4x +08, whose go files are
++// identical to the dispatch anchor 202ed4a5): no production code dispatches on the bridge
++// except loop.go. Ruler: grep -rn
++// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
++// _test.go, then drop the lines whose text begins with //, which leaves 1 = the single
++// same-package bare-name construction point in internal/agent/loop.go. Skip that last strip
++// and the same ruler yields 2 lines today, 1 of them a comment in this file - this paragraph
++// quotes the ruler, so it is that one. Plain words: the ruler bites its own tail. Two
++// more traps in it are live: the usual shorthand `| grep -v _test.go` filters on line
++// CONTENT, so a comment carrying both the quoted pattern and the word _test.go disappears
++// from its own roster (this leg measured that false 1, R359-6), and the older 60/59/1 count
++// quoted in toolrequest_nail_309_test.go is stale for the same reason. Or skip the word
++// ruler altogether and use the parser ruler, Test309ToolRequestProductionConstructionNail,
++// which reads the AST over the four roots cmd, internal, tools and scripts, pins the TOTAL
++// number of production construction points to 1 and names internal/agent/loop.go as the one
++// it counts. So being
+@@ -935 +947,8 @@ func (b *Bridge) CloseTask(taskID string) {
+-// error, no trace. Every other gate still runs; only R4 is dropped, silently.
++// error, no trace. Read the next sentence as scope, not as coverage: the guard only picks
++// WHICH assessor answers the one `verdict := b.assessorFor(req.TaskID).Assess(...)` line, and
++// the fallback b.assess is a full assessor minus the detector (New builds it with the
++// canonicalizer and the sensitive classifier), so the other rules are STRUCTURALLY still
++// reached on that path - and nothing in ticket 309 asserts it. This file instruments one
++// fact: whether a detector is attached. The other gates belong to each rule's own teeth
++// tests (the two ticket-236 carriers that really feed an empty TaskID into Execute assert
++// the refusal, not the rules); only R4 is dropped here, silently.
+@@ -939,3 +958,5 @@ func (b *Bridge) CloseTask(taskID string) {
+-//     `newTaskID()` construction point in internal/agent/loop.go (id 36 chars, never
+-//     empty); Test309ToolRequestProductionConstructionNail pins `agent.ToolRequest{`
+-//     construction points outside internal/agent to 0.
++//     `newTaskID()` construction point in internal/agent/loop.go (id 36 chars, never empty);
++//     Test309ToolRequestProductionConstructionNail counts every production construction
++//     point of that type across the four roots cmd, internal, tools and scripts from the AST
++//     and pins the TOTAL to 1, named as that file - so a second one rings wherever it is
++//     written, including inside internal/agent, which the pre-309-r2 version skipped whole.
+@@ -946,0 +968,14 @@ func (b *Bridge) CloseTask(taskID string) {
++// The other two limbs of that guard - `b.injected` and `b.prov == nil` - are the
++// assembly-is-wrong family, and NEITHER has an instrument that names it. Measured at HEAD
++// 6f389389, 2026-10-11 14:4x +08, whole package (ruler and readings:
++// .scratch/wisp/probes/309/r2/logs/prov-rigs.stdout): striking `b.injected` out leaves it
++// rc=0 - nothing rings anywhere - while striking `b.prov == nil` out leaves it rc=1 on 16
++// top-level tests that are
++// plumbing noise (a nil *Provenance reaching Detector(), calls answering L2), not a test about
++// that limb; 309-v1's rc=0 pair was scoped to the 309 instrument, which stays green for both.
++// `injected` is inert in production because nothing writes the Options field named Assessor
++// (write-point census R359-4, .scratch/wisp/probes/309/r2/30-comments.md). Ticket 309 AC#0
++// ruled shape B and refused a second fixture for this family, so these lines are the register,
++// not a guarantee: whoever first wires that field - or relies on prov being non-nil - owns the
++// test that has to ring.
++//

@@ -1,0 +1,10 @@
+########## R359-1 module prefix ruler (why tools AND scripts enter the roots) ##########
+go.mod :: module github.com/CarlosShao/wisp
+scripts/spike/go.mod :: module github.com/CarlosShao/wisp/scripts/spike
+tools/d22scan/go.mod :: module github.com/CarlosShao/wisp/tools/d22scan
+tools/mockllm/go.mod :: module github.com/CarlosShao/wisp/tools/mockllm
+-- the three nested modules all sit INSIDE github.com/CarlosShao/wisp/ -> go's internal/
+-- visibility rule (prefix on the import path) admits them, so they enter the roots.
+tools/signmodels/main.go:34:	"github.com/CarlosShao/wisp/internal/models"
+-- R359-3 live example ruler above: 1 hit = tools/signmodels/main.go importing internal/models;
+--   scripts itself has 0 such imports today, which changes nothing about the prefix rule.

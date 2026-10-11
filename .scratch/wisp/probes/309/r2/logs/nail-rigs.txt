@@ -1,0 +1,58 @@
+#!/bin/sh
+# 309-r2 AC#2 nail rigs. Shapes 1/2/3 must RING ("add one construction -> red");
+# shapes 5/6 are the named residual blind spots and are expected to STAY GREEN so the
+# head comment can say "this is not full coverage" with a reading behind it.
+# Transient mutations of internal/tools/bridge.go ONLY (this leg's write face); restored
+# unconditionally by the trap; byte identity proved with cmp + sha256sum.
+REPO=$(pwd)
+BR=internal/tools/bridge.go
+LOGS=.scratch/wisp/probes/309/r2/logs
+PRIST=$LOGS/bridge-309r2.go.pristine
+T=Test309ToolRequestProductionConstructionNail
+
+cp "$BR" "$PRIST"
+echo "pristine snapshot: $(sha256sum "$BR")"
+
+restore() {
+  cp "$PRIST" "$BR"
+  if cmp -s "$PRIST" "$BR"; then echo "RESTORE cmp: byte-identical OK"; else echo "RESTORE cmp: MISMATCH ***"; fi
+  sha256sum "$BR" "$PRIST"
+}
+trap restore EXIT
+
+run() { # $1 = logfile
+  GOFLAGS= go test ./internal/tools/ -count=1 -run "$T" -v > "$1" 2>&1
+  echo "rc=$?" >> "$1"
+  grep -E '枚数钉|^(--- )?(PASS|FAIL|ok|rc=)' "$1" | head -12
+}
+
+echo "########## RIG-0 baseline: nail as rewritten -> expect GREEN, denominator 293 printed ##########"
+run "$LOGS/nail-rig-0-baseline.log"
+restore
+
+echo; echo "########## RIG-1 shape 1 (qualified literal) added to a file the nail really scans -> expect RED ##########"
+printf '\nfunc rig309r2Literal() agent.ToolRequest {\n\treturn agent.ToolRequest{TaskID: "", Name: "fs.read"}\n}\n' >> "$BR"
+echo "--- landed? tail -4:"; tail -4 "$BR"
+run "$LOGS/nail-rig-1-literal.log"
+restore
+
+echo; echo "########## RIG-2 shape 2 (var declaration + field assignment, NO literal) -> expect RED (was green before 309-r2) ##########"
+printf '\nvar rig309r2Decl agent.ToolRequest\n\nfunc rig309r2DeclCall() agent.ToolRequest {\n\trig309r2Decl.TaskID = ""\n\trig309r2Decl.Name = "fs.read"\n\treturn rig309r2Decl\n}\n' >> "$BR"
+echo "--- landed? tail -8:"; tail -8 "$BR"
+run "$LOGS/nail-rig-2-decl.log"
+restore
+
+echo; echo "########## RIG-3 shape 3 (file-level type alias, then aliased literal) -> expect RED (was green before 309-r2) ##########"
+printf '\ntype rig309r2Alias = agent.ToolRequest\n\nfunc rig309r2Aliased() rig309r2Alias {\n\treturn rig309r2Alias{TaskID: "", Name: "fs.read"}\n}\n' >> "$BR"
+echo "--- landed? tail -7:"; tail -7 "$BR"
+run "$LOGS/nail-rig-3-alias.log"
+restore
+
+echo; echo "########## RIG-5 named blind spot: elided inner literal []agent.ToolRequest{{...}} -> EXPECT GREEN (rc=0), the head comment names this shape as missed ##########"
+printf '\nfunc rig309r2Elided() []agent.ToolRequest {\n\treturn []agent.ToolRequest{{TaskID: "", Name: "fs.read"}}\n}\n' >> "$BR"
+echo "--- landed? tail -4:"; tail -4 "$BR"
+run "$LOGS/nail-rig-5-elided.log"
+restore
+
+echo; echo "########## FINAL STATE (must be clean) ##########"
+git status --porcelain -- "$BR"; echo "(empty above == clean)"

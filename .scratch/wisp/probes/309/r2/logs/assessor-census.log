@@ -1,0 +1,8 @@
+########## R359-4 write-point census for the Options field named Assessor ##########
+grep -rn 'Assessor:' internal cmd tools --include=*.go
+internal/tools/bridge.go:132:	injected bool // assess came from Options.Assessor: do not rebuild per call
+internal/tools/ticket90_test.go:366:		b := New(Options{Registry: reg, Gate: gate, Modes: &t90Modes{m: m}, Assessor: assessor})
+count=2
+of which test files=1
+-- the single non-test hit is bridge.go's own inline comment on the injected field;
+-- the only write is internal/tools/ticket90_test.go (a test). Production writes = 0.

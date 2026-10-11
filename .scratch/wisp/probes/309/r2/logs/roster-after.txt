@@ -1,0 +1,40 @@
+#!/bin/sh
+# 309-r2: the "after" face of the full-package roster, from an out-of-repo export tree of
+# this leg's code commit (d75db9ee), so it is comparable with the "before" tree (202ed4a5)
+# taken by roster-before.txt. Same台面 rule as 309-v1: the shared worktree carries another
+# leg's in-flight go.mod, so it is only a side reading (suite-after-worktree.log).
+LOGS=$(pwd)/.scratch/wisp/probes/309/r2/logs
+REV=d75db9ee
+D=$(mktemp -d "${TMPDIR:-/tmp}/wisp309r2-after.XXXXXX") || exit 1
+echo "TAG=after REV=$REV DIR=$D" | tee "$LOGS/tree-after.dir"
+git archive --format=tar "$REV" | tar -x -C "$D"
+echo "  go.mod present: $(test -f "$D/go.mod" && echo yes || echo NO)"
+echo "  go.sum present: $(test -f "$D/go.sum" && echo yes || echo NO)"
+echo "  all .go in tree (proves the archive is not empty): $(find "$D" -name '*.go' | wc -l)"
+echo "  .go under internal/tools: $(find "$D/internal/tools" -name '*.go' | wc -l)"
+echo "  non-test .go under the four roots: $(find "$D/cmd" "$D/internal" "$D/tools" "$D/scripts" -name '*.go' -not -name '*_test.go' | wc -l)"
+(
+  cd "$D"
+  GOFLAGS= go test ./internal/tools/ -count=1 -v > "$LOGS/suite-after.log" 2>&1
+  echo "rc=$?" >> "$LOGS/suite-after.log"
+)
+tail -1 "$LOGS/suite-after.log"
+grep -E '^--- ' "$LOGS/suite-after.log" | sed -E 's/^--- [A-Z]+: ([^ ]+).*/\1/' | sort > "$LOGS/suite-after-passnames.txt"
+echo "top-level name lines: $(wc -l < "$LOGS/suite-after-passnames.txt")"
+echo "  top-of-line PASS=$(grep -c '^--- PASS' "$LOGS/suite-after.log") FAIL=$(grep -c '^--- FAIL' "$LOGS/suite-after.log") SKIP=$(grep -c '^--- SKIP' "$LOGS/suite-after.log")"
+echo "  any-depth PASS=$(grep -cE '^[[:space:]]*--- PASS' "$LOGS/suite-after.log") FAIL=$(grep -cE '^[[:space:]]*--- FAIL' "$LOGS/suite-after.log") SKIP=$(grep -cE '^[[:space:]]*--- SKIP' "$LOGS/suite-after.log")"
+echo "  FAIL names:"; grep -E '^(    )*--- FAIL' "$LOGS/suite-after.log" | head
+echo "-----"
+comm -13 "$LOGS/suite-before-passnames.txt" "$LOGS/suite-after-passnames.txt" > "$LOGS/suite-added.txt"
+comm -23 "$LOGS/suite-before-passnames.txt" "$LOGS/suite-after-passnames.txt" > "$LOGS/suite-removed.txt"
+echo "name-set ADDED   = $(wc -l < "$LOGS/suite-added.txt")"; cat "$LOGS/suite-added.txt"
+echo "name-set REMOVED = $(wc -l < "$LOGS/suite-removed.txt")"; cat "$LOGS/suite-removed.txt"
+echo "----- the two ticket-236 carriers that really feed an empty TaskID, both trees:"
+for tag in before after; do
+  echo "  [$tag]"
+  grep -E '^(--- |    --- )(PASS|FAIL|SKIP): Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID|.*Test236R2TaskCancelRefusesWhenHostGaveNoCallerID' "$LOGS/suite-$tag.log" | grep -E 'Test236R2(TaskSpawnRefusesWhenHostGaveNoTaskID|CancelRefusesWhenHostGaveNoCallerID)' | head -4
+done
+echo "----- 309's own two instruments in the after tree:"
+grep -E '^--- (PASS|FAIL|SKIP): Test309' "$LOGS/suite-after.log"
+echo "----- worktree side reading (carries another leg's in-flight go.mod, NOT the comparison face):"
+tail -6 "$LOGS/suite-after-worktree.log" | head -3

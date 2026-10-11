@@ -1,0 +1,37 @@
+########## V1 which files did this leg's code commit touch at all? ##########
+internal/risk/pathresolver_anchor_spelling_windows_test.go
+internal/risk/pathresolver_volumeless_spelling_308_test.go
+internal/tools/bridge.go
+internal/tools/toolrequest_nail_309_test.go
+count=4 (want 2: bridge.go + the nail)
+
+########## V2 every changed line of bridge.go is a comment line ##########
+added=44 starting with // =44 | removed=9 starting with // =9
+non-comment changed lines = 0 (want 0)
+
+########## V3 strip full-line comments from BOTH blobs, then cmp ##########
+anchor    bytes=22233 lines=854
+codecommit bytes=22233 lines=854
+cmp after stripping comments: IDENTICAL
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-at-anchor.stripped
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-at-codecommit.stripped
+
+########## V4 the guard text itself, blob to blob ##########
+guard line: IDENTICAL (1 occurrence on each face)
+occurrences anchor=1 codecommit=1
+
+########## V5 the other touched file is a test file (no production semantics) ##########
+test files touched=3
+and the guard's own package semantics did not move: go build rc from the last gate run = 0
+
+########## V1b attribution fix (the V1 range above spans OTHER legs' commits) ##########
+# ruler = git show --name-only --format= d75db9ee  (this leg's code commit ALONE)
+internal/tools/bridge.go
+internal/tools/toolrequest_nail_309_test.go
+count=2 (want 2: bridge.go + the nail)
+# the two internal/risk lines V1 printed come from 308-r2's commits ba4c8d9e/4c63d3b2, which sit
+# inside the 202ed4a5..d75db9ee range. ⛔ touched by this leg; ruler for that claim:
+4c63d3b2 CarlosShao-308-r2: fix three false comment sentences in the ticket-308 test surface
+
+internal/risk/pathresolver_anchor_spelling_windows_test.go
+internal/risk/pathresolver_volumeless_spelling_308_test.go

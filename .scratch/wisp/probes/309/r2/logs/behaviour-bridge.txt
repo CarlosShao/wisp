@@ -1,0 +1,27 @@
+added lines=42 of which start with // = 42 (want equal)
+removed lines=9 of which start with // = 9 (want equal)
+non-comment changed lines = 0 (want 0)
+HEAD stripped bytes=22233 lines=854
+work stripped bytes=22233 lines=854
+cmp after stripping: IDENTICAL
+sha256 of the two stripped blobs:
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-head.stripped
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-work.stripped
+added lines=44 of which start with // = 44 (want equal)
+removed lines=9 of which start with // = 9 (want equal)
+non-comment changed lines = 0 (want 0)
+HEAD stripped bytes=22233 lines=854
+work stripped bytes=22233 lines=854
+cmp after stripping: IDENTICAL
+sha256 of the two stripped blobs:
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-head.stripped
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-work.stripped
+added lines=0 of which start with // = 0 (want equal)
+removed lines=0 of which start with // = 0 (want equal)
+non-comment changed lines = 0 (want 0)
+HEAD stripped bytes=22233 lines=854
+work stripped bytes=22233 lines=854
+cmp after stripping: IDENTICAL
+sha256 of the two stripped blobs:
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-head.stripped
+496ed6d683e8e070c92410dde1c6a6d39e14a069d1773a9b35980a2d040e32c2 *.scratch/wisp/probes/309/r2/logs/bridge-work.stripped

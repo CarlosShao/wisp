@@ -1,0 +1,4 @@
+internal/risk/pathresolver_anchor_spelling_windows_test.go
+internal/risk/pathresolver_volumeless_spelling_308_test.go
+internal/tools/bridge.go
+internal/tools/toolrequest_nail_309_test.go

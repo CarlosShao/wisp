@@ -1,0 +1,91 @@
+pristine snapshot: 069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+########## RIG-0 baseline: nail as rewritten -> expect GREEN, denominator 293 printed ##########
+    toolrequest_nail_309_test.go:358: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.13s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.167s
+rc=0
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+
+########## RIG-1 shape 1 (qualified literal) added to a file the nail really scans -> expect RED ##########
+--- landed? tail -4:
+
+func rig309r2Literal() agent.ToolRequest {
+	return agent.ToolRequest{TaskID: "", Name: "fs.read"}
+}
+    toolrequest_nail_309_test.go:309: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/bridge.go:1346(qualified-literal)。分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:358: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.14s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.177s
+FAIL
+rc=1
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+
+########## RIG-2 shape 2 (var declaration + field assignment, NO literal) -> expect RED (was green before 309-r2) ##########
+--- landed? tail -8:
+
+var rig309r2Decl agent.ToolRequest
+
+func rig309r2DeclCall() agent.ToolRequest {
+	rig309r2Decl.TaskID = ""
+	rig309r2Decl.Name = "fs.read"
+	return rig309r2Decl
+}
+    toolrequest_nail_309_test.go:309: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/bridge.go:1345(var-decl-no-initializer)。分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:358: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.16s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.201s
+FAIL
+rc=1
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+
+########## RIG-3 shape 3 (file-level type alias, then aliased literal) -> expect RED (was green before 309-r2) ##########
+--- landed? tail -7:
+)
+
+type rig309r2Alias = agent.ToolRequest
+
+func rig309r2Aliased() rig309r2Alias {
+	return rig309r2Alias{TaskID: "", Name: "fs.read"}
+}
+    toolrequest_nail_309_test.go:309: 枚数钉响：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里数到 2 枚 agent.ToolRequest 生产构造点，票 309 钉的是 1 枚且那枚落在 internal/agent/loop.go（the one newTaskID() dispatch, id always 36 chars, never empty）。名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/tools/bridge.go:1348(alias-literal)。分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）。新写一条构造点的人：要么让它接上非空 id，要么把它放进 309 AC#1 那枚仪器覆盖的入口——空 TaskID 走到 assessorFor 会静默摘掉 R4 探测器，见 assessorfor_taint_instrument_309_test.go 的 ②
+    toolrequest_nail_309_test.go:358: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=2（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- FAIL: Test309ToolRequestProductionConstructionNail (0.15s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.185s
+FAIL
+rc=1
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+
+########## RIG-5 named blind spot: elided inner literal []agent.ToolRequest{{...}} -> EXPECT GREEN (rc=0), the head comment names this shape as missed ##########
+--- landed? tail -4:
+
+func rig309r2Elided() []agent.ToolRequest {
+	return []agent.ToolRequest{{TaskID: "", Name: "fs.read"}}
+}
+    toolrequest_nail_309_test.go:358: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.12s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.158s
+rc=0
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+
+########## FINAL STATE (must be clean) ##########
+ M internal/tools/bridge.go
+(empty above == clean)
+RESTORE cmp: byte-identical OK
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *internal/tools/bridge.go
+069cb275dc03b8051c46e4c11baad9c4037d62561371defb99aa78a1599e9715 *.scratch/wisp/probes/309/r2/logs/bridge-309r2.go.pristine
+rc=0

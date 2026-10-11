@@ -1,0 +1,15 @@
+########## R359-12 the two ticket-236 empty-id carriers, both export trees ##########
+[before]
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+[after]
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+
+########## R359-13 roster arithmetic (two rulers, both named) ##########
+[before] top-of-line: PASS=210 FAIL=1 SKIP=0 name-lines=211
+        any-depth : PASS=278 FAIL=1 SKIP=0 name-lines=279
+[after] top-of-line: PASS=210 FAIL=1 SKIP=0 name-lines=211
+        any-depth : PASS=278 FAIL=1 SKIP=0 name-lines=279
+worktree side reading (not the comparison face): top PASS=211 FAIL=0 SKIP=0
+added=0 removed=0

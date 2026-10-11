@@ -1,0 +1,17 @@
+########## R359-10 final re-measure of the word ruler after all comment edits ##########
+# 2026-10-11 14:54:39 +0800 HEAD=daa2f9be
+TOTAL=71
+in_test_by_filename=69
+nontest_by_filename=2
+-- nontest roster:
+internal/agent/loop.go:675:		req := ToolRequest{
+internal/tools/bridge.go:882:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+-- stripped of comment-text lines: 1
+all-roots TOTAL=71
+naive content filter = 2
+  internal/tools/toolrequest_nail_309_test.go then=7 now=10
+  internal/tools/bridge.go then=2 now=1
+-- nail self-run:
+    toolrequest_nail_309_test.go:371: AC#2 枚数钉：roots=["..\\..\\cmd" "..\\..\\internal" "..\\..\\tools" "..\\..\\scripts"] 里 agent.ToolRequest 生产构造点=1（==1，那枚＝internal/agent/loop.go），分母=293 枚非测试源（每 root=cmd=40 internal=229 scripts=11 tools=13）
+--- PASS: Test309ToolRequestProductionConstructionNail (0.16s)
+ok  	github.com/CarlosShao/wisp/internal/tools	0.199s

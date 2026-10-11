@@ -1,0 +1,43 @@
+309-r2 code: narrow the nail to a named single point, widen roots, teach it three shapes
+
+Ticket 309, the five conditions 309-v1 attached to AC#1/AC#2/AC#3, per the
+orchestrator ruling in section 4 of the ticket. Behaviour is unchanged: every
+bridge.go edit is a comment line (proof in probes/309/r2/logs, B1-B3 of
+behaviour-and-gates: 44 added / 9 removed changed lines all start with //, and
+the comment-stripped blob is byte-identical to HEAD, sha 496ed6d6...).
+
+internal/tools/toolrequest_nail_309_test.go
+- roots widen from cmd+internal to cmd+internal+tools+scripts. Decision ruler,
+  not memory: nested go.mod module paths sit inside github.com/CarlosShao/wisp/
+  (tools/d22scan, tools/mockllm, scripts/spike), so go's internal/ visibility
+  rule admits them, and a live example already reaches into internal/
+  (tools/signmodels/main.go:34 imports internal/models). scripts is therefore
+  in too; the same reasoning that admits tools admits it.
+- the exclusion branch (skip whole internal/agent package, 24 unparseable
+  sources) becomes a named pin: total production construction points == 1 and
+  that one is in internal/agent/loop.go, so a second point written inside the
+  agent package rings. Rig in an export tree: add one same-package bare
+  construction there and the nail reports 2, rc=1.
+- matcher learns the two shapes 309-v1 measured green: var declaration plus
+  field assignment (no composite literal), and a file-level type alias
+  resolving to agent.ToolRequest. Same-package bare names count only when the
+  file's own package clause says agent, guarded by a control that counts 0 for
+  a foreign ToolRequest. Six controls, both directions, no t.Run.
+- denominator stays printed, re-measured at 293 (cmd 40, internal 229, tools
+  13, scripts 11), plus a per-root floor that fails on an empty roster.
+- head comment carries today's word-ruler readings with HEAD and timestamp,
+  states that they are not constants, and names every shape still missed.
+
+internal/tools/bridge.go (comments only)
+- the self-referencing ruler sentence now prescribes the filename-field filter
+  plus the strip-comment step, says in plain words that it bites its own tail,
+  and reports the second hole this leg fell into: grep -v _test.go filters line
+  CONTENT, so a comment quoting both the pattern and that word vanishes from
+  its own roster (demo in logs/r359-9-filterdemo.log).
+- the stale 60/59/1 restatement becomes 71/69/2 stripped to 1.
+- "Every other gate still runs" becomes a scope sentence: the guard only picks
+  which assessor answers, the fallback is a full assessor minus the detector,
+  and nothing in ticket 309 asserts coverage of the other rules.
+- the b.prov == nil limb gets the register line instead of an instrument
+  (AC#0 ruled shape B), naming what is measured, what stays blind and who owns
+  the test. No new fixture.
