@@ -1,0 +1,65 @@
+HEAD:internal/risk/provenance.go:926:	// open — IsSyncPath fail-closes on all of those.
+HEAD:internal/risk/provenance.go:928:		if p.IsSyncPath(t).Sync {
+HEAD:internal/risk/provenance_syncdirs_other_test.go:97:			if st := p.IsSyncPath(tc.path); st.Root.Source != "registry" {
+HEAD:internal/risk/provenance_syncdirs_windows_test.go:78:			if !p.IsSyncPath(tc.path).Sync {
+HEAD:internal/risk/provenance_syncdirs_windows_test.go:79:				t.Errorf("IsSyncPath(%q) = not sync, although the channel fired: the two verdicts must "+
+HEAD:internal/risk/provenance_test.go:487:	if p.IsSyncPath(plain).Sync {
+HEAD:internal/risk/provenance_test.go:627:	if p.IsSyncPath(plain2).Sync {
+HEAD:internal/risk/syncdirs.go:181:// IsSyncPath is the exported P12 check used by the fs.write channel (and the
+HEAD:internal/risk/syncdirs.go:187:func (p *Provenance) IsSyncPath(rawPath string) SyncStatus { return p.sync.match(rawPath) }
+HEAD:internal/risk/syncdirs_alias_307_windows_test.go:69:	st := p.IsSyncPath(filepath.Join(longHome, "Documents", "report.txt"))
+HEAD:internal/risk/syncdirs_alias_307_windows_test.go:75:	if st := p.IsSyncPath(filepath.Join(shortHome, "Documents", "report.txt")); !st.Sync {
+HEAD:internal/risk/syncdirs_alias_307_windows_test.go:81:	if st := p.IsSyncPath(filepath.Join(longEvil, "x.txt")); st.Sync {
+HEAD:internal/risk/syncdirs_alias_307_windows_test.go:84:	if st := p.IsSyncPath(filepath.Join(base, "nowhere", "x.txt")); st.Sync {
+HEAD:internal/risk/syncdirs_alias_307_windows_test.go:118:	st := p.IsSyncPath(target)
+HEAD:internal/risk/syncdirs_alias_307_windows_test.go:130:	if st := p.IsSyncPath(filepath.Join(shortRoot, "out", "secret.md")); !st.Sync || st.Root.Source == "suspect-fallback" {
+HEAD:internal/risk/syncdirs_alias_307_windows_test.go:138:	if st := p.IsSyncPath(plain); st.Sync {
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:40:// genuinely errors. That is the leg, live, reached through IsSyncPath.
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:209:	if st := p.IsSyncPath(filepath.Join(moved, hiddenLeaf)); st.Sync {
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:212:	if st := p.IsSyncPath(filepath.Join(filepath.Dir(tree), plainDir, hiddenLeaf)); st.Sync {
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:217:	st := p.IsSyncPath(raw)
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:220:		t.Errorf("IsSyncPath(%q) = Sync:false (why=%q): the ancestor's spelling resolved onto %q, which is "+
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:255:	st := ticket116Engine(t, tree).IsSyncPath(raw)
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:257:		t.Errorf("IsSyncPath(%q) = %+v: a legitimate percent-env rewrite onto another tree must stay a loudly "+
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:292:	st := p.IsSyncPath(raw)
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:294:		t.Errorf("IsSyncPath(%q) = %+v: a ~-spelled write target must stay a refused sync-suspect verdict", raw, st)
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:326:	st := ticket116Engine(t, tree).IsSyncPath(raw)
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:328:		t.Errorf("IsSyncPath(%q) = Sync:false (why=%q): a new file inside the registered sync tree must still be "+
+HEAD:internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:89:	st := p.IsSyncPath(written)
+HEAD:internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:91:		t.Errorf("IsSyncPath(%q) = Sync:false (why=%q): the ancestor leg did not anchor this write "+
+HEAD:internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:105:	if direct := p.IsSyncPath(filepath.Join(notes, "new.md")); !direct.Sync ||
+HEAD:internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:107:		t.Errorf("IsSyncPath(direct spelling) = %+v, want a match on %q", direct, target)
+HEAD:internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:122:	st := p.IsSyncPath(filepath.Join(link, "Notes", "new.md"))
+HEAD:internal/risk/syncdirs_other_test.go:74:		st := p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md"))
+HEAD:internal/risk/syncdirs_other_test.go:88:	if st := e.p.IsSyncPath(e.syncTarget); !st.Sync || st.Root.Source != "registry" {
+HEAD:internal/risk/syncdirs_other_test.go:91:	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
+HEAD:internal/risk/syncdirs_other_test.go:99:	if st := e.p.IsSyncPath(filepath.Join(e.home, "Documents", "x.txt")); !st.Sync || st.Root.Source != "suspect-fallback" {
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:114:			st := p.IsSyncPath(c.target)
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:162:		st := p.IsSyncPath(target)
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:179:	if !p.IsSyncPath(filepath.Join(root, "Notes", "x.md")).Sync {
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:194:		st := p.IsSyncPath(target)
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:243:		st := p.IsSyncPath(target)
+HEAD:internal/risk/syncdirs_test.go:86:	if st := e.p.IsSyncPath(e.syncTarget); !st.Sync || st.Root.Source == "suspect-fallback" {
+HEAD:internal/risk/syncdirs_test.go:89:	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
+HEAD:internal/risk/syncdirs_test.go:161:	if !p.IsSyncPath(filepath.Join(syncRoot, "out", "secret.md")).Sync {
+HEAD:internal/risk/syncdirs_test.go:174:	if !p.IsSyncPath(filepath.Join(home, "LocalOnly", "a.txt")).Sync {
+HEAD:internal/risk/syncdirs_test.go:178:	if p.IsSyncPath(outOfProfile(t, home)).Sync {
+HEAD:internal/risk/syncdirs_test.go:216:		if !p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
+HEAD:internal/risk/syncdirs_test.go:220:		if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
+HEAD:internal/risk/syncdirs_test.go:229:		if st := p.IsSyncPath(outside); st.Sync {
+HEAD:internal/risk/syncdirs_test.go:245:	if !p.IsSyncPath(filepath.Join(home, "Documents", "x.md")).Sync {
+HEAD:internal/risk/syncdirs_test.go:253:	if st := p.IsSyncPath(filepath.Join(filepath.Dir(home), "not-a-sync-tree", "x.md")); st.Sync {
+HEAD:internal/risk/syncdirs_test.go:290:	if st := p.IsSyncPath(filepath.Join(root, "Notes", "new.md")); !st.Sync || st.Root.Source != "env" {
+HEAD:internal/risk/syncdirs_test.go:375:	if !p.IsSyncPath(filepath.Join(home, "Documents", "x.txt")).Sync {
+HEAD:internal/risk/syncdirs_test.go:378:	if p.IsSyncPath(filepath.Join(sibling, "x.txt")).Sync {
+HEAD:internal/risk/syncdirs_test.go:396:	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
+HEAD:internal/risk/syncdirs_test.go:421:	st := p.IsSyncPath(filepath.Join(home, "Documents", "report.txt"))
+HEAD:internal/risk/syncdirs_test.go:426:	if p.IsSyncPath(outOfProfile(t, home)).Sync {
+HEAD:internal/risk/syncdirs_test.go:438:	if !p.IsSyncPath("").Sync {
+HEAD:internal/risk/syncdirs_test.go:468:	if st := e.p.IsSyncPath(folded); st.Sync {
+HEAD:internal/risk/syncdirs_test.go:471:	st := e.p.IsSyncPath(raw)
+HEAD:internal/risk/syncdirs_test.go:522:		if !p.IsSyncPath(filepath.Join(home, "Documents", "x.txt")).Sync {
+HEAD:internal/risk/syncdirs_test.go:527:		if !p.IsSyncPath(filepath.Join(od, "anything.txt")).Sync {
+HEAD:internal/risk/syncdirs_windows_test.go:54:		if p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
+HEAD:internal/risk/syncdirs_windows_test.go:58:		if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
+HEAD:internal/risk/syncdirs_windows_test.go:92:	if st := p.IsSyncPath(inside); st.Sync {
