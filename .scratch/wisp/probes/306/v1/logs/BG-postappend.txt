@@ -1,0 +1,10 @@
+after_lines=140
+1	0	.scratch/wisp/issues/306-inline-authoritative-format-tag-literals-in-wavinjector-go-have-no-ruler-at-all.md
+--- checkbox lines changed? (expect zero output) ---
+rc_grep=1 (1=零命中=⛔ 动框)
+--- box census after append ---
+1
+5
+--- my bullet is a list item at the right indent? ---
+  - [2026-10-11 08:2x +0800] agent=**`306-v1`（非实现者
+rc_outer=0

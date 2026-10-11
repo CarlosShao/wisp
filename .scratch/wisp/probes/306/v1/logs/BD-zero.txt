@@ -1,0 +1,2 @@
+.scratch/wisp/probes/306/v1/logs/BD-zero.txt
+rc=0
