@@ -1,0 +1,37 @@
+# 续程派单 · `304-v1b`（接 `304-v1` 的遗产，裁票 304 五格）
+
+**你接的是一枚死腿。** 死因逐字＝`You've reached your daily usage limit for Chat. Come back tomorrow to continue working with me.`，
+用量＝**23 次调用／166 万 token**；它**只交了起手锚**（`c27928d6`）＋一批未提交的门禁原始输出，**判语一条都没有**。
+
+## 0. 你的两条指令来源（都要读）
+
+1. 原派单（仍然全部有效，含纪律条款全文）：`.scratch/wisp/probes/orch/20261011/txt/304v1-dispatch.txt` —— **逐字读完再动**。
+2. 这份续程（只讲"从哪儿接"）。
+
+**锚（我写这份之前现跑）**：`git rev-parse --short HEAD`＝**`3b8066a2`**，`staged=0`（我原样写在下面，⚠ 号会动 ⇒ **你自己重取并用自己的号当锚**）。
+
+## 1. 它已经做完的（⛔ 重扫，先用 `wc -l`／`head -3` 摸口径，只补缺的那几把尺）
+
+- `probes/304/v1/00-anchor.md`＝起手锚；`logs/a00-anchor.txt`／`a01-commits.txt`／`a02-scope.txt`／`a03-r1scope.txt`＝它自己量的越界条目。
+- `probes/304/v1/15-gates-ac13.md`＋`logs/g1-*`（census／d22scan／pathlen 的**原始输出**）／`g3-build.txt`、`g3-vet.txt`。
+- ⚠ 4 枚 0 字节件（`logs/g2-fmt-worktree.txt`、`g3-build-body.txt`、`g3-vet-body.txt`、`labels.stderr`）＝**那几格它没交**，⛔ 删、你补。
+- ⚠ **它的 logs ⛔ 是判语**：你可以引用它的**读数**（并注明"取自死腿的 logs"，第 108(c) 条），但**每一格结论必须你自己复跑过再写**。
+
+## 2. 还缺什么（就做这几件，做完就交）
+
+1. **`AC#2` 成对两发**（本票最关键，原派单 §1 写全了攻击面）：正向＝HEAD 下把"坏世界"（超时 panic 或外力掐父）造出来，同批落"孩子确实活过"的证据行；反向＝**仓外成对导出树**摘掉守卫 ⇒ 残留回得来。
+2. 五格判语（`AC#1`／`AC#2`／`AC#3`／`AC#4`／`AC#4b`）＋`docs/evidence/s1/<短名>.md` 裁决表＋本票末尾**一条** bullet。
+3. ⛔ 别忘了两条我自己埋的对照（原派单 §1 具名）：我那两发"没起世界"的读数**作废**（`probes/orch/20261011/verify-304r1-309r3.md` §1），以及 `304/r1/logs` 里那 3 枚 0 字节件。
+
+## 3. 硬规矩（照抄，逐条自证）
+
+- 第 3～5 次调用内 commit 起手锚，之后每约 8 次一笔；目标调用数 **≤60**（原派单里 45／70 那两道仍作数）。
+- ⛔ 大输出读进对话；原始输出先落文件；回报只给 `wc -l`／`head -3`／`cut -c1-160` 级摘要。
+- `git add` **与** `git commit` **两处都带显式 pathspec**（`git commit -F <msg> -- <path>`）；⛔ `git add -A`／`git add .`／整目录扫（共享索引）。
+- ⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 仓内 worktree；⛔ `git push`。
+- 写面三件套＝自家 `probes/304/v1b/**`／`docs/evidence/s1/**`／本票末尾 1 条 bullet（1 加／0 删、⛔ 碰框、⛔ 碰 `Status:`）。
+- 证据件 `.md`／`.txt`；⛔ `.out`；⛔ `probes/**` 下建 `.go`；件名短、⛔ 带 `§`；每把门禁件自落 `rc=N`；0 字节⛔ 当读数。
+- 突变只在**仓外**导出树：`T=$(mktemp -d /d/tmp/wisp-304v1b-XXXXXX) && git archive HEAD go.mod go.sum internal cmd tools scripts | tar -x -C "$T"`（**六件套**，缺 `scripts` 会造假红），先数非空；每棵树各自 `mktemp -d`。
+- 杀进程只停自己起的，归属＝命令行具名路径（⛔ 枚数／⛔ 父 PID 存在性当归属）；⛔ 动 `msedgewebview2.exe`。
+- 数为 0 时同批落 **stderr**（今天有假 0 的事故）；"红了"要写清是**哪一行**红的，含 `walk`／`build failed`／`no test files` ⇒ 判台面故障。
+- 与票面原文字面冲突时**以票面为准并具名报回**。

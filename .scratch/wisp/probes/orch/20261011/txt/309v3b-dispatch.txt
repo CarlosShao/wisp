@@ -1,0 +1,38 @@
+# 续程派单 · `309-v3b`（接 `309-v3` 的遗产，裁票 309 剩两格）
+
+**你接的是一枚死腿。** 死因逐字＝`You've reached your daily usage limit for Chat. Come back tomorrow to continue working with me.`，
+用量＝**13 次调用／109 万 token**；它只交了起手锚（`cf627625`）＋几枚取数日志，**判语一条都没有**。
+
+## 0. 你的两条指令来源（都要读）
+
+1. 原派单（仍然全部有效）：`.scratch/wisp/probes/orch/20261011/txt/309v3-dispatch.txt` —— **逐字读完再动**。
+2. 这份续程。
+
+**锚（我写这份之前现跑）**：`git rev-parse --short HEAD`＝**`3b8066a2`**，`staged=0`（⚠ 号会动 ⇒ **你自己重取并用自己的号当锚**）。
+
+## 1. 它已经做完的（⛔ 重扫，只补缺的那几把尺）
+
+- `probes/309/v3/00-anchor.md`／`logs/anchor-state.txt`／`ancestry.txt`／`gitlog.txt`（它的锚与谱系）。
+- `probes/309/v3/logs/r-labels.txt`（形状标签那把尺的原始输出）＋`labels.stderr`（**0 字节**＝那把尺的 stderr 没落，你补）。
+- `probes/309/v3/logs/rig-shapes.txt`（它起的台件读数，**未提交时我已代提**，`3b8066a2`）。
+- ⚠ **它的 logs ⛔ 是判语**；读数可引（注明取自死腿 logs），**结论必须你自己复跑**。
+
+## 2. 还缺什么（做完就交）
+
+1. **`AC#2` 的牙齿成对**：至少三枚形状（`new`／`make([]T,n)`／转换形）各一发"该**红**真的红＋红句原文是哪一行"＋pristine 绿控＋还原双证（`mv` 挪开⛔ 删＋`cmp`／`sha256sum`）。
+2. **`AC#3`**：`(B)` 那笔是否只动注释（我现量＝非注释改动 **0 行**，请换一把尺独立复）＋注释那句与 matcher 标签集的"七个"是否同一组（我判不了，归你）＋**`309/r3/logs` 那 4 枚 0 字节件**（含"该红那一发"的 `fail-new.txt`）自己重打。
+3. 两格判语（成立／附条件成立带具名条件／不成立）＋`docs/evidence/s1/<短名>.md`＋本票末尾**一条** bullet。
+4. ⛔ 若按原文全称式判不出"成立"，就照实写"原文与钉自己的盲册冲突"并给两行建议文本，**但⛔ 你自己改票面**（改票面归我）。
+
+## 3. 硬规矩（照抄，逐条自证）
+
+- 第 3～5 次调用内 commit 起手锚，之后每约 8 次一笔；目标调用数 **≤60**（45／70 两道仍作数）。
+- ⛔ 大输出读进对话；原始输出先落文件；回报只给 `wc -l`／`head -3`／`cut -c1-160` 级摘要。
+- `git add` **与** `git commit` **两处都带显式 pathspec**（`git commit -F <msg> -- <path>`）；⛔ `git add -A`／`git add .`／整目录扫（共享索引）。
+- ⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 仓内 worktree；⛔ `git push`。
+- 写面三件套＝自家 `probes/309/v3b/**`／`docs/evidence/s1/**`／本票末尾 1 条 bullet（1 加／0 删、⛔ 碰框、⛔ 碰 `Status:`）。
+- 证据件 `.md`／`.txt`；⛔ `.out`；⛔ `probes/**` 下建 `.go`；件名短、⛔ 带 `§`；每把门禁件自落 `rc=N`；0 字节⛔ 当读数。
+- 突变只在**仓外**导出树：`T=$(mktemp -d /d/tmp/wisp-309v3b-XXXXXX) && git archive HEAD go.mod go.sum internal cmd tools scripts | tar -x -C "$T"`（**六件套**，缺 `scripts` 会让钉报 `walk … cannot find the file` ＝**假红**），先数非空；每棵树各自 `mktemp -d`。
+- ⛔ 动 `internal/risk/**` 判级、⛔ 删 `assessorFor` 空 id 那一支、⛔ 改 `lit236*`、⛔ 给 `agent.ToolRequest` 加字段、⛔ 碰 `ci.yml`／`.github/**`。
+- 数为 0 时同批落 **stderr**；"红了"要写清是**哪一行**红的，含 `walk`／`build failed`／`no test files` ⇒ 判台面故障、⛔ 计入牙。
+- 与票面原文字面冲突时**以票面为准并具名报回**。
