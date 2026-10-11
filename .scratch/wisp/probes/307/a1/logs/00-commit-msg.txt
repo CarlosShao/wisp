@@ -1,0 +1,9 @@
+chore(307-a1): anchor — HEAD 1eaa91f +台面读数第 1 笔
+
+只读普查腿 307-a1 进场第 1 笔（在任何长跑命令之前落笔）。
+
+- HEAD = 1eaa91f66502fdf56c33f220d2c5911d6182bbb3，分支 dev
+- `git status --porcelain -- internal cmd` = 0 行
+- `frontend/dist/index.html` = 1044 字节，mtime 2026-10-10 08:51:10 +0800
+
+写面仅 .scratch/wisp/probes/307/a1/**，产码零字节。
