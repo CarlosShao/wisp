@@ -1,0 +1,23 @@
+date=2026-10-11 13:06:34 +0800  HEAD=510c95ca
+本发改的三处坏尺（a 发读数⛔ 删，逐字留在 logs/orch-A846-readings.txt）
+### 2b) 298-v1 件上'内容行 12'那把尺：三把明尺并排复量它自己的原件
+  35r3 件=.scratch/wisp/probes/298/v1/logs/ac0-gofmt-d-35r3-preblob.txt 存在=YES wc_l=14 尺A'[+-]'=6 尺B'[+-][^+-]'=4 尺C'^-'=3 尺D'^+'=3
+  35r2 件=.scratch/wisp/probes/298/v1/logs/ac0-gofmt-d-35r2-preblob.txt 存在=YES wc_l=14 尺A'[+-]'=6 尺B'[+-][^+-]'=4 尺C'^-'=3 尺D'^+'=3
+  结论＝14 行拆成【3 枚路径头 ＋ 1 枚 hunk 头 ＋ 10 枚正文】，真变化行＝2 删 ＋ 2 加 ＝ 4 枚；'12'⛔ 出自这三把任何一把
+### 4b) 口径句两处逐字
+  实现腿件（r1/20-…）：
+  实现腿件逐字行：> **碰 Go 面的票在写 `gofmt -l`（或 `gofumpt -l`）那一格时，必须同时写明三件事：
+  票面逐字行：      > **可复用判据：碰 Go 面的票在写 `gofmt -l`（或 `gofumpt -l`）那一格时，必须同时写明四件事——① 射程目录（`cmd/w
+- [2026-10-11 12:44:44 +08] agent=298-v1（非实现者验收腿）did=五格逐格独立复跑完并交裁决表（件＝`probes/298/v1/{00-anchor,10
+### 5b) 三棵各自独立的导出树（尺＝git archive --format=tar <sha> | tar -x -C <仓外目录>，同一枚 gofumpt/gofmt）
+  pre(48e7b0a4) 件数=115 gofmt_hits=2 gofumpt_hits=2 gofumpt件名=cmd\wisp\panel_inbound_guards_35r3_test.go cmd\wisp\panel_transport_35r2_test.go 
+  post(18d43f8e) 件数=115 gofmt_hits=0 gofumpt_hits=1 gofumpt件名=cmd\wisp\panel_transport_35r2_test.go 
+  head(510c95ca) 件数=115 gofmt_hits=0 gofumpt_hits=1 gofumpt件名=cmd\wisp\panel_transport_35r2_test.go 
+### 7) CRLF 假枚名册的四种尺（单位名逐把写明）
+  尺1 窄域 tracked（cmd internal tools，全扩展名）=5
+readings-A846b.sh: line 45: .go: command not found
+  尺2 窄域 tracked ＝5
+  尺3 全仓 tracked（⛔ 剥 .scratch，全扩展名）=334
+  尺4 全仓 tracked 剥 .scratch 后=22
+readings-A846b.sh: line 48: .go: command not found
+  尺4 里 ＝5（件名＝cmd/wisp/models.go internal/agent/approval/pending_read.go internal/agent/tools.go internal/risk/provenance.go internal/tools/bridge.go ）

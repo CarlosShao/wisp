@@ -1,0 +1,9 @@
+date=2026-10-11 13:07:33 +0800  HEAD=510c95ca
+### 7-c) CRLF 假枚名册四把尺，射程＋单位名逐把写明（这条⛔ 带反引号）
+  尺1  射程=cmd internal tools      单位=件(全扩展名) = 5
+  尺2  射程=cmd internal tools      单位=.go 件       = 5
+  尺3  射程=全仓 tracked            单位=件(⛔剥 .scratch) = 334
+  尺4  射程=全仓 tracked 剥 .scratch 单位=件           = 22
+  尺4b 射程=全仓 tracked 剥 .scratch 单位=.go 件        = 5
+  尺4b 件名 = cmd/wisp/models.go internal/agent/approval/pending_read.go internal/agent/tools.go internal/risk/provenance.go internal/tools/bridge.go 
+  尺4 全 22 枚件名 = cmd/wisp/models.go deps.toml design/doubao/demo/app.js design/doubao/demo/styles.css docs/evidence/s1/141-q46c-accept-r1.md docs/evidence/s1/147-offset-naming-r1-accept-r1.md docs/evidence/s1/66/66-full-subset-slo-report.json docs/evidence/s1/82-adversarial-acceptance.md docs/evidence/s1/ci-read-a1fd5bf-r1.md docs/reports/survey-2026-09-28-dsh-ui-packages.md frontend/scripts/gen-tokens.mjs frontend/scripts/render-composer.tsx frontend/src/components/composer.tsx frontend/src/components/harness/app-harness.tsx frontend/src/lib/panel.ts frontend/src/main.tsx frontend/src/styles/theme.css frontend/src/styles/tokens.generated.css internal/agent/approval/pending_read.go internal/agent/tools.go internal/risk/provenance.go internal/tools/bridge.go 

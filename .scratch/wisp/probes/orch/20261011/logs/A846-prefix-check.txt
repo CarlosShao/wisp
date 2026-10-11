@@ -1,0 +1,20 @@
+date=2026-10-11 13:17:29 +0800 HEAD=ee0a93e4
+inflight_dirty_internal=
+issues_dirty_before= M .scratch/wisp/issues/298-two-gofmt-dirty-test-files-at-head-and-one-crlf-fake-cell.md| M .scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume.md| M .scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md|
+docs_reports_dirty_before=0
+docs/reports/pending-and-issues.md prefix_vs_HEAD=IDENTICAL head_lines=16247
+A846_new_lines=47
+docs/reports/HANDOVER.md prefix_vs_HEAD=IDENTICAL head_lines=2748
+ticket .scratch/wisp/issues/298-two-gofmt-dirty-test-files-at-head-and-one-crlf-fake-cell.md 追加前=117 追加后=141 新增=24
+ticket .scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume.md 追加前=40 追加后=78 新增=38
+ticket .scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md 追加前=62 追加后=79 新增=17
+ticket .scratch/wisp/issues/295-ra-started-bare-bool-written-off-thread.md 追加前=45 追加后=56 新增=11
+ticket .scratch/wisp/issues/296-hotkey-reload-source-skips-applyhotkeydefaults-keys-die-1s-after-boot.md 追加前=101 追加后=114 新增=13
+box_census_298=x 4 open 2
+box_census_308=x 1 open 5
+box_census_294=x 1 open 5
+box_census_295=x 0 open 6
+box_census_296=x 4 open 2
+handover_4_0c_headers=11  last=### 4.0ck 停车点（**2026-10-11 13:1x
+ledger_A84x_headers=7  last=## A846｜2026-10-11 13:1x｜�
+zero_byte_files_in_D=4  dot_out_in_D=0

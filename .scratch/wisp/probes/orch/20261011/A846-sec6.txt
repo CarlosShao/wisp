@@ -1,0 +1,8 @@
+
+### 6. ★车队卫生第五笔（同一族＝探针件的名字挪动别人的尺；这次挪的是**长度门**）：`writeface-1` 那枚 HEAD blob 拷贝件名⛔ 过帽 ⇒ 门禁 `check-path-length-budget.sh` 整仓 **RED**，我改判＝**只改名、⛔ 加长程豁免**
+
+- 现象（尺＝`sh scripts/check-path-length-budget.sh --with-self-test`，件 `logs/lenbudget-A846.txt`，**rc=1**）＝`denominator: tracked paths=10194 over-budget=58 covered by roster=57 not in roster=1` ⇒ 三门正控全过（"那枚帽⛔ 是坏的"被它自己的植入件证了），红因**逐枚点名**＝`.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-296-hotkey-reload-source-skips-applyhotkeydefaults-keys-die-1s-after-boot.md`（相对 **133** 字符 ⇄ 帽 **121**；runner 全路径 **177** ⇄ 预算 **165**）。
+- ★成因⛔ 是它写坏了：那枚件＝票 296 的 **HEAD blob 拷贝**，它按 `head-<整枚票名>.md` 的家族命名法取名，而票 296 那串本来就顶着帽。同批四枚同族件（294/295/298/309）都⛔ 过帽 ⇒ **只有这一枚撞上**（`writeface-1` 自报它⛔ 跑过长度门＝§④ 那行 `0 / 0`，所以它自己没看见）。
+- 处置＝`git mv` 改名 `head-ticket-296.md`，⛔ 删内容、**⛔ 给豁免加第 58 条**（那条路＝把"随时能改短的名字"永久写成历史债，帽会被这样一寸寸放宽）。内容自证两把：`cmp` ⇄ HEAD 那枚**旧名 blob**＝**IDENTICAL rc=0**、⇄ HEAD 的**票 296 全文**＝**IDENTICAL rc=0**（49531 字节）。改名后尺复跑＝`logs/lenbudget-A846-after-rename.txt`，**rc=0**、`over-budget=57 ⇄ roster=57 ⇄ not-in-roster=0`、`VERDICT GREEN`。件＝`hygiene-A846-lenbudget.sh`＋`logs/orch-A846-hygiene-lenbudget.txt`。
+- ⚠ **我自己那把"谁引用过旧名"的尺要按规矩点名⛔ 只报数**：它回 **2** 枚，逐枚看＝① 我自己那枚 RED 读数件（`lenbudget-A846.txt` 里那条点名行）② 我自己那枚改名脚本（变量里写着旧名）⇒ **真引用＝0 枚**，改名⛔ 造出悬空指针（同族先例＝`A841` 那枚"路径笔误＝少写一段 `scripts/`"，那次是⛔ 存在，这次是⛔ 有人引）。
+- ★定式（第三条同一族）：**探针里凡 `head-<路径名>` 式拷贝件，名字一律用短代号（`head-ticket-296.md` 形），⛔ 内嵌整枚长路径**；同族前两枚＝`.go` 副本挪 tracked `.go` 分母（`writeface-1` §⑤-5、我自己现场那枚）、`probes/**` 的 `.go` 分母还给别家的尺（`1eaa91f6`）。⇒ **本程起给所有写腿的派单模板加一句**："落 `head-*` 拷贝件请短名；长名会撞长度门（帽＝相对 121 / 全路径 165），且长度门⛔ 认豁免当解法。"

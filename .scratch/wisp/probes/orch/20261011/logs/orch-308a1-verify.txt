@@ -1,0 +1,28 @@
+date=2026-10-11 12:58:38 +0800 HEAD=1cd57ec1
+ruler=编排者自己两发 env 台面（答 308-a1 那句『无卷标台面本机造不出吗』）
+--- A) TMPDIR=/tmp（Go 在 Windows 不读 TMPDIR）
+=== RUN   TestClassifySpellingInvariance
+--- PASS: TestClassifySpellingInvariance (0.03s)
+=== RUN   TestPathResolverUNCAListDenied
+--- PASS: TestPathResolverUNCAListDenied (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/risk	0.081s
+rcA=0
+--- B) TMP=/tmp TEMP=/tmp（Go 在 Windows 只认这两个）
+=== RUN   TestClassifySpellingInvariance
+--- PASS: TestClassifySpellingInvariance (0.02s)
+=== RUN   TestPathResolverUNCAListDenied
+--- PASS: TestPathResolverUNCAListDenied (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/risk	0.070s
+rcB=0
+--- C) 产码那处 [:1] 的守卫（崩点⛔ 在产码）
+				drive, rest := share[:i], share[i+1:]
+				if len(drive) == 2 && drive[1] == '$' && drive[0] >= 'a' && drive[0] <= 'z' || len(drive) == 2 && drive[1] == '$' && drive[0] >= 'A' && drive[0] <= 'Z' {
+					return strings.ToUpper(drive[:1]) + `:\` + rest
+				}
+--- D) t.TempDir 是不是崩点的取值源
+func tmpHome(t *testing.T) string {
+	t.Helper()
+	home := t.TempDir()
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("HOME", home)
+	t.Setenv("APPDATA", filepath.Join(home, "AppData", "Roaming"))

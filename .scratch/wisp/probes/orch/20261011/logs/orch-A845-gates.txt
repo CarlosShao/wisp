@@ -1,0 +1,17 @@
+d22scan_rc=0
+lenbudget_rc=0
+staged_total=18 staged_go=0 staged_dot_out=0 foreign_staged=0
+inflight_writeface1_also_staged=0  # ⛔ 我这批的账；commit pathspec 用 :(exclude) 剥掉
+worktree_dirty_internal_cmd=0
+numstat_ledger=29	0	docs/reports/pending-and-issues.md
+numstat_handover=30	0	docs/reports/HANDOVER.md
+prefix_ledger_vs_head=IDENTICAL
+prefix_handover_vs_head=IDENTICAL
+lines_ledger=16247 head_lines_ledger=16218
+lines_handover=2748 head_lines_handover=2718
+handover_4_0c_headers_ERE=10
+handover_last_header=### 4.0cj 停车点（**
+ledger_A84x_headers=6
+ledger_last=## A845｜2026-1
+ev1_bytes=3352 ev2_bytes=3205
+staged_outside_own_dirs=0

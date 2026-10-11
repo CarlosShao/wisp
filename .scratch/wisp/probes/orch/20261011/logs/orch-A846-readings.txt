@@ -1,0 +1,28 @@
+date=2026-10-11 13:05:19 +0800  HEAD=510c95ca
+⛔ 本件⛔ 跑 go build/vet/test（Go 编译面此刻由 309-r1＋308-r1 两枚写腿持有）
+### 1) 两枚件 18d43f8e ⇄ HEAD 同一性＋工作树脏度
+  UNMOVED cmd/wisp/panel_inbound_guards_35r3_test.go rc=0 (18d43f8e == HEAD)
+  UNMOVED cmd/wisp/panel_transport_35r2_test.go rc=0 (18d43f8e == HEAD)
+  git status --porcelain -- cmd/wisp 行数=0
+### 2) 腿件自带的改前 blob gofmt -d 原件，三把明尺并排
+  件⛔ 在 .scratch/wisp/probes/298/v1/logs/ac0-gofmt-d-panel_inbound_guards_35r3-preblob.txt
+  件⛔ 在 .scratch/wisp/probes/298/v1/logs/ac0-gofmt-d-panel_transport_35r2-preblob.txt
+  腿声称的'内容行 12'⛔ 可从上述任一把复现；12 那枚数出自它自己那件文件名写歪的失败尝试件（1,11d0 ＋ 11 行 < 前缀）
+### 3) CRLF 假枚名册三档射程（上一发我把'非 .scratch'那把尺打成了全仓名册＝标签坏，这发改对）
+  档1 窄域（cmd internal tools）：5 枚
+  档1 件名：cmd/wisp/models.go internal/agent/approval/pending_read.go internal/agent/tools.go internal/risk/provenance.go internal/tools/bridge.go 
+  档2 全仓 tracked 命中=334
+  档3 全仓剥 .scratch 后=22 枚：cmd/wisp/models.go deps.toml design/doubao/demo/app.js design/doubao/demo/styles.css docs/evidence/s1/141-q46c-accept-r1.md docs/evidence/s1/147-offset-naming-r1-accept-r1.md docs/evidence/s1/66/66-full-subset-slo-report.json docs/evidence/s1/82-adversarial-acceptance.md docs/evidence/s1/ci-read-a1fd5bf-r1.md docs/reports/survey-2026-09-28-dsh-ui-packages.md frontend/scripts/gen-tokens.mjs frontend/scripts/render-composer.tsx frontend/src/components/composer.tsx frontend/src/components/harness/app-harness.tsx frontend/src/lib/panel.ts frontend/src/main.tsx frontend/src/styles/theme.css frontend/src/styles/tokens.generated.css internal/agent/approval/pending_read.go internal/agent/tools.go internal/risk/provenance.go internal/tools/bridge.go 
+  core.autocrlf（只读）=true
+### 4) 口径句在两处的逐字（票面 ⇄ 腿凭据件）
+  票面：
+grep: .scratch/wisp/probes/298/v1/20-*.md: No such file or directory
+  腿件：
+### 5) gofumpt 那枚残留的 减前⇄减后（两棵导出树，同一把尺）
+  pre(48e7b0a4) archive_rc=0 gofumpt_blob_hits=2 件名=cmd\wisp\panel_inbound_guards_35r3_test.go cmd\wisp\panel_transport_35r2_test.go 
+  post(18d43f8e) archive_rc=0 gofumpt_blob_hits=1 件名=cmd\wisp\panel_transport_35r2_test.go 
+  head(510c95ca) archive_rc=0 gofumpt_blob_hits=1 件名=cmd\wisp\panel_transport_35r2_test.go 
+  同两棵树的 gofmt 尺：pre=0 post=0
+### 6) temp env 台面在场尺（Go 只认 TMP/TEMP；TMPDIR 在 windows 档⛔ 读）
+  （这枚⛔ 编译＝本件只列在场尺读过的 env 形；实跑读数见 logs/orch-308a1-verify.txt 与 probes/308/a1/logs/probe-*.txt）
+  编排者自纠：verify 那两发（TMPDIR=/tmp；TMP=/tmp TEMP=/tmp）都在'带盘符'一侧 ⇒ 我那是【两写法一把台面】，⛔ 等于票面要的'无卷标台面'那一发

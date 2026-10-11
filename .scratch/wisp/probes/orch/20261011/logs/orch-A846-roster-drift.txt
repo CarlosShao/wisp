@@ -1,0 +1,6 @@
+date=13:26:17 HEAD=1270e36e
+tracked .go 总数=995
+gofmt -l 命中=26 其中 .scratch=22 非 .scratch=4
+非 .scratch 件名=cmd/wisp/models.go internal/agent/approval/pending_read.go internal/agent/tools.go internal/risk/provenance.go 
+gofmt -l internal/risk=internal\risk\provenance.go 
+bridge.go 是否又变 CRLF：i/lf    w/lf    attr/text eol=lf      	internal/tools/bridge.go

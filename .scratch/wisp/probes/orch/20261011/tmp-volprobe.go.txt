@@ -1,0 +1,13 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+)
+
+func main() {
+	d, err := os.MkdirTemp("", "VOLPROBE")
+	fmt.Printf("TMP=%q TEMP=%q TMPDIR=%q\n", os.Getenv("TMP"), os.Getenv("TEMP"), os.Getenv("TMPDIR"))
+	fmt.Printf("MkdirTemp=%q err=%v VolumeName=%q len=%d\n", d, err, filepath.VolumeName(d), len(filepath.VolumeName(d)))
+}

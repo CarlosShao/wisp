@@ -1,0 +1,22 @@
+date=2026-10-11 12:53:27 +0800  HEAD=d744f73d
+ruler_form_fixed=git archive --format=tar <sha> | tar -x -C <仓外目录>（v1 那把⛔ 语法对，导出树空＝假清洁）
+### 3-fix) 改前两枚 blob 的 gofmt -d 脏形（hunk 头／行数／退码）
+  导出 48e7b0a4 件数=976
+  panel_inbound_guards_35r3 rc=1 hunks=1 头=@@ -63,8 +63,8 @@ 总行=14 内容行=5
+  panel_transport_35r2 rc=1 hunks=1 头=@@ -804,8 +804,8 @@ 总行=14 内容行=5
+  同目录 gofmt -l（改前那棵树 cmd/wisp）命中=2 件名=UsersswqAppDataLocalTemptmp.W9pOslyr75cmdwisppanel_inbound_guards_35r3_test.go UsersswqAppDataLocalTemptmp.W9pOslyr75cmdwisppanel_transport_35r2_test.go 
+### 4-fix) HEAD blob 那两枚件＋整个 cmd/wisp 的格式三把尺
+  HEAD 导出件数=992  gofmt -l cmd/wisp 命中=0 件名=
+  HEAD 导出树 gofumpt -l cmd/wisp 命中=1 件名=C:\Users\swq\AppData\Local\Temp\tmp.1kimxXLUCl\cmd\wisp\panel_transport_35r2_test.go 
+  改后笔 18d43f8e 导出树 gofmt -l 命中=0
+### 6-fix) 归因链两枚首笔（v1 缺的枚数与 hunk，这发补齐；⛔ bc 用 \0）
+  cmd/wisp/panel_inbound_guards_35r3_test.go 首笔=7f9d6e40 行数 首笔171 ⇄ 改前171（差 0）字节 首笔9759 ⇄ 改前9759
+    首笔那版 gofmt -d hunk 头=@@ -63,8 +63,8 @@ rc=1
+  cmd/wisp/panel_transport_35r2_test.go 首笔=286a7f30 行数 首笔1824 ⇄ 改前2142（差 318）字节 首笔52759 ⇄ 改前73476
+    首笔那版 gofmt -d hunk 头=@@ -772,8 +772,8 @@ rc=1
+### 7-fix) 两枚红的名字在 HEAD 的定义处（具名）＋本票射程文件枚数
+  TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe 定义处=HEAD:cmd/wisp/panel_resident_windows_test.go 
+  TestAC14GoSideEvalPushReachesThePage 定义处=HEAD:cmd/wisp/panel_resident_windows_test.go 
+### 8) 298-v1 那把 '27＝22＋5' 的尺我复跑（stdout/stderr 分离）
+  rc=123 总命中=27 .scratch=22 非.scratch=5
+  非 .scratch 的件名=cmd/wisp/models.go internal/agent/approval/pending_read.go internal/agent/tools.go internal/risk/provenance.go internal/tools/bridge.go 

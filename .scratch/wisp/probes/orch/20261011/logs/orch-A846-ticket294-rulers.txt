@@ -1,0 +1,80 @@
+date=2026-10-11 13:08:27 +0800  HEAD=510c95ca
+### 1) 测试直调 attachMuteGate 的枚数（票面裁定节写 3／腿报 5）
+cmd/wisp/resident_ball_windows.go:475:// attachMuteGate hands this host the executor that turns a mute gesture into a
+cmd/wisp/resident_ball_windows.go:478:func (rb *residentBall) attachMuteGate(fn muteGestureFunc) {
+cmd/wisp/resident_ball_windows.go:502:// after attachMuteGate, and it is the only writer.
+cmd/wisp/resident_mute_290_windows_test.go:93:	rb.attachMuteGate(ra.toggleMute)
+cmd/wisp/resident_mute_290_windows_test.go:206:	rb.attachMuteGate(ra.toggleMute)
+cmd/wisp/resident_mute_290_windows_test.go:235:	nilBall.attachMuteGate(func() (string, bool) { return "", false })
+cmd/wisp/resident_tray_mute_293_windows_test.go:213:	rb.attachMuteGate(ra.toggleMute)
+cmd/wisp/resident_tray_mute_293_windows_test.go:293:	rb.attachMuteGate(nilLeg.toggleMute)
+cmd/wisp/resident_windows.go:342:	rb.attachMuteGate(raudio.toggleMute)
+  计数（含产码与注释）=9
+  --- 分行名册（下一位可逐枚点）：直调那一把＝剥掉定义/注释后的 _test.go 命中
+  测试件内命中=5
+  测试件内剥注释行=5
+  产码命中=4
+### 2) 手搓 &residentBall{ 的枚数（票面写 13／腿报 16）
+  尺=git grep -n '&residentBall{' HEAD -- cmd/wisp 命中=16
+  其中 _test.go=15  剥注释=15
+  逐枚件名计数=HEAD:cmd/wisp/resident_approval_246_windows_test.go:4 HEAD:cmd/wisp/resident_ball_windows.go:1 HEAD:cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:2 HEAD:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:4 HEAD:cmd/wisp/resident_mute_290_windows_test.go:3 HEAD:cmd/wisp/resident_tray_mute_293_windows_test.go:2 
+### 3) 两枚行号锚（票面 :336 生产挂载 / :472 定义）现在在哪
+  attachMuteGate 产码行=cmd/wisp/resident_mute_290_windows_test.go:93:	rb.attachMuteGate(ra.toggleMute)
+cmd/wisp/resident_mute_290_windows_test.go:206:	rb.attachMuteGate(ra.toggleMute)
+cmd/wisp/resident_tray_mute_293_windows_test.go:213:	rb.attachMuteGate(ra.toggleMute)
+cmd/wisp/resident_tray_mute_293_windows_test.go:293:	rb.attachMuteGate(nilLeg.toggleMute)
+cmd/wisp/resident_windows.go:342:	rb.attachMuteGate(raudio.toggleMute)
+  attachMuteGate 定义行=cmd/wisp/resident_ball_windows.go:478:func (rb *residentBall) attachMuteGate(fn muteGestureFunc) {
+### 4) ★那枚'恒绿假钉'的颜色：票面 AC#1 ⓐ 逐字要的是什么
+5:⚠ 腿一度把这条写重了（写成"仓里没有能造生产形状的仪器"），现跑后它自己更正：仓里**有两件现成仪器**，290 只是没用（本票的台件写法因此⛔ 不需要新造 seam，见 AC#1/AC#2）。
+22:- [ ] **AC#1 装配根那一跳的形钉（读 AST、不需要跑 `runResident`）**：照 `resident_hotkey_258_test.go:25-68` 的走查形状加一枚用例，断言**三件事**：ⓐ `runResident` 体内 `callExpr` 里 `id.Name == "attachMuteGate"` 的次数 **== 1**（不是 0、不是 2）；ⓑ 它的接收者是 `startResidentBall` 那枚返回值 `rb`、实参点名是 `raudio.toggleMute`（**不接受"任意函数值"**）；ⓒ 它在体内的位置**晚于** `startResidentAudio` 那一次调用（时序是这条链成立的前提：`:217` 建球 < `:278` 建门 < `:303` 挂载）。⚠ 硬约束：走查尺的锚要落在**形状**上（`callExpr`/selector 链），⛔ 不许写成"某行必须存在"的行号锚（本仓实测：夹具一插就把行号锚打死）。
+31:- ⛔ 不许为了"走到 `case hkMute:`"去 `PostMessage` 真热键或 press 键盘（AC#2 用 `HotkeyReport` 现读，AC#1 用 AST）；真按键那一形若要做＝归机主在场的真机窗口，⛔ 不在本票。
+### 5) SelectorExpr 那把尺（我说'必须加一层'，同包是否早有范本）
+  git grep -c 'ast.SelectorExpr' HEAD -- cmd/wisp：命中总数=41  件数=13
+cmd/wisp/leg_dispatch_gate_133_test.go:418:func qualifiedName133(sel *ast.SelectorExpr) string {
+cmd/wisp/leg_dispatch_gate_133_test.go:431:	case *ast.SelectorExpr:
+cmd/wisp/leg_dispatch_gate_133_test.go:537:	sel, ok := star.X.(*ast.SelectorExpr)
+cmd/wisp/leg_dispatch_gate_133_test.go:603:	case *ast.Ident, *ast.SelectorExpr:
+cmd/wisp/leg_dispatch_gate_133_test.go:683:	case *ast.SelectorExpr:
+cmd/wisp/leg_dispatch_gate_133_test.go:775:	case *ast.SelectorExpr:
+cmd/wisp/leg_dispatch_gate_133_test.go:1021:		if sel, ok := rhs.(*ast.SelectorExpr); ok && qualifiedName133(sel) == "os.Args" {
+cmd/wisp/leg_sink_gate_131_test.go:769:		case *ast.SelectorExpr:
+cmd/wisp/leg_sink_gate_131_test.go:907:	case *ast.SelectorExpr:
+cmd/wisp/leg_sink_gate_131_test.go:1109:			case *ast.SelectorExpr:
+cmd/wisp/leg_sink_gate_131_test.go:1207:		case *ast.SelectorExpr:
+cmd/wisp/leg_sink_gate_131_test.go:1322:	case *ast.SelectorExpr:
+cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:176:	sel, ok := call.Fun.(*ast.SelectorExpr)
+cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:203:			sel, ok := call.Fun.(*ast.SelectorExpr)
+cmd/wisp/panel_geometry_255_test.go:227:			if sel, ok := node.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "NewWithOptions" {
+cmd/wisp/panel_geometry_255_test.go:257:		sel, ok := call.Fun.(*ast.SelectorExpr)
+cmd/wisp/panel_geometry_255_test.go:397:	sel, ok := e.(*ast.SelectorExpr)
+cmd/wisp/panel_geometry_255r6_range_windows_test.go:91:			sel, ok := call.Fun.(*ast.SelectorExpr)
+cmd/wisp/panel_host_gate_test.go:252:				case *ast.SelectorExpr:
+cmd/wisp/panel_host_gate_test.go:264:			sel, ok := call.Fun.(*ast.SelectorExpr)
+cmd/wisp/panel_host_gate_test.go:289:	case *ast.SelectorExpr:
+cmd/wisp/panel_inbound_33_test.go:305:			se, ok := ce.Fun.(*ast.SelectorExpr)
+cmd/wisp/panel_inbound_33_test.go:343:	se, ok := e.(*ast.SelectorExpr)
+cmd/wisp/panel_locked_naming_33r11_windows_test.go:121:			sel, ok := call.Fun.(*ast.SelectorExpr)
+cmd/wisp/panel_locked_naming_33r11_windows_test.go:157:	case *ast.SelectorExpr:
+cmd/wisp/panel_reshow_255r1_windows_test.go:398:			if sel, ok := call.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "SetSize" {
+cmd/wisp/panel_reshow_255r1_windows_test.go:466:			if sel, ok := call.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == methodName {
+cmd/wisp/panel_reshow_255r1_windows_test.go:482:		case *ast.SelectorExpr:
+cmd/wisp/panel_reshow_255r1_windows_test.go:487:			if sel, ok := x.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == methodName {
+cmd/wisp/panel_reshow_255r1_windows_test.go:508:		sel, ok := call.Fun.(*ast.SelectorExpr)
+cmd/wisp/panel_reshow_255r1_windows_test.go:523:	sel, ok := e.(*ast.SelectorExpr)
+cmd/wisp/panel_reshow_255r1_windows_test.go:532:	if sel, ok := e.(*ast.SelectorExpr); ok {
+cmd/wisp/panel_reshow_255r1_windows_test.go:556:	case *ast.SelectorExpr:
+cmd/wisp/resident_approval_risk_256_windows_test.go:349:		sel, ok := lit.Type.(*ast.SelectorExpr)
+cmd/wisp/resident_approval_risk_256_windows_test.go:550:				if sel, ok := call.Args[0].(*ast.SelectorExpr); ok && sel.Sel != nil && sel.Sel.Name == "DataDir" {
+cmd/wisp/resident_approval_risk_268_windows_test.go:246:			sel, ok := node.Fun.(*ast.SelectorExpr)
+cmd/wisp/resident_approval_risk_268_windows_test.go:256:				if arg, ok := node.Args[1].(*ast.SelectorExpr); ok && arg.Sel != nil && arg.Sel.Name == "ErrNotExist
+cmd/wisp/resident_ball_228_test.go:115:				sel, ok := call.Fun.(*ast.SelectorExpr)
+cmd/wisp/resident_ball_228_test.go:261:		if sel, ok := d.Call.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "stop" {
+cmd/wisp/resident_ball_228_test.go:293:			if sel, ok := lit.Type.(*ast.SelectorExpr); !ok || sel.Sel.Name != "Events" {
+cmd/wisp/resident_grant_writer_265_windows_test.go:695:	case *ast.SelectorExpr:
+### 6) executed ⇄ started 零耦合那把尺（串行约束的真身）
+  executed 在 cmd/wisp 命中=19
+  executed 与 started 同现于一枚行？=0
+  唯一断言那一行=cmd/wisp/resident_mute_290_windows_test.go:197:	if executed {
+  started 在 internal/audio 命中（各件）=HEAD:internal/audio/gate.go:3 HEAD:internal/audio/gate_test.go:2 HEAD:internal/audio/wasapimic_windows.go:8 HEAD:internal/audio/wavinjector.go:1 
+  started 在 cmd/wisp 命中=11

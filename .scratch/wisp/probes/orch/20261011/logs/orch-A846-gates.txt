@@ -1,0 +1,20 @@
+d22scan_rc=0
+lenbudget_rc=0
+staged_total=48 staged_go=0 staged_dot_out=0 foreign_staged=1 inflight_staged=0 zero_byte_staged=1
+worktree_dirty_internal_cmd_after_stage=0  # 剩下这些⛔ 我的
+numstat_ledger=56	0	docs/reports/pending-and-issues.md 
+numstat_handover=22	0	docs/reports/HANDOVER.md 
+numstat_ticket_298=28	4	.scratch/wisp/issues/298-two-gofmt-dirty-test-files-at-head-and-one-crlf-fake-cell.md 
+numstat_ticket_308=41	1	.scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume.md 
+numstat_ticket_294=17	0	.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md 
+numstat_ticket_295=11	0	.scratch/wisp/issues/295-ra-started-bare-bool-written-off-thread.md 
+numstat_ticket_296=13	0	.scratch/wisp/issues/296-hotkey-reload-source-skips-applyhotkeydefaults-keys-die-1s-after-boot.md 
+prefix_ledger_vs_head=IDENTICAL
+prefix_handover_vs_head=IDENTICAL
+lines_ledger=16303 head_lines_ledger=16247
+lines_handover=2770 head_lines_handover=2748
+handover_4_0c_headers=11  last=4.0ck 停车点（**2026-1
+ledger_A84x_headers=7
+box_298=4/2 box_308=1/5 box_294=1/5 box_295=0/6 box_296=4/2
+d22scan_tail=d22scan: scope ban #8 internal/         examined 531 Go files, comments and _test.go included|d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included|d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=229, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=531, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 531 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included|
+lenbudget_tail=check-path-length-budget.sh: bands: over the hat=57  of which in the 122..180 middle=56  past the old debt line(180)=1  in the wall interval=0  roster entries=57|check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree|check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units|

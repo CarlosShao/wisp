@@ -1,0 +1,16 @@
+date=2026-10-11 13:31:09 +0800 HEAD=1270e36e
+staged_total=52 staged_go=0 staged_dot_out=0 foreign_staged=0 inflight_staged=0 zero_byte_staged=0
+对照上一发（同一名册、⛔ 关 quotePath）＝foreign_staged=1 zero_byte_staged=1 ⇒ 两枚都是尺坏⛔ 码坏，本发改对
+numstat_ledger=56	0	docs/reports/pending-and-issues.md 
+numstat_handover=22	0	docs/reports/HANDOVER.md 
+numstat_298=28	4	.scratch/wisp/issues/298-two-gofmt-dirty-test-files-at-head-and-one-crlf-fake-cell.md 
+numstat_308=43	1	.scratch/wisp/issues/308-spelling-invariance-test-panics-when-temp-has-no-volume.md 
+numstat_294=17	0	.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md 
+numstat_295=11	0	.scratch/wisp/issues/295-ra-started-bare-bool-written-off-thread.md 
+numstat_296=13	0	.scratch/wisp/issues/296-hotkey-reload-source-skips-applyhotkeydefaults-keys-die-1s-after-boot.md 
+prefix_ledger=IDENTICAL
+prefix_handover=IDENTICAL
+box_298=4/2 box_308=1/5 box_309=1/5 box_294=1/5 box_295=0/6 box_296=4/2
+bullet_308=2  # 我那一枚＋代提的 308-r1 那一枚
+worktree_dirty_internal_cmd=0
+ticket309_staged_by_me=0  # 应为 0＝那枚腿的票面增量⛔ 由我提交
