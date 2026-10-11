@@ -14,3 +14,11 @@ COUNTS name=full2 table=aliased tag=post rc=1 RUN=200 PASS=192 FAIL=7 SKIP=1 sec
 COUNTS name=syncrun table=default tag=post rc=0 RUN=38 PASS=37 FAIL=0 SKIP=1 seconds=1.15
 COUNTS name=syncrun table=aliased tag=post rc=0 RUN=38 PASS=37 FAIL=0 SKIP=1 seconds=1.05
 ==== end tag=post at 2026-10-11 10:14:46
+==== begin tag=final at 2026-10-11 10:26:06
+COUNTS name=full table=default tag=final rc=0 RUN=200 PASS=199 FAIL=0 SKIP=1 seconds=4.51
+COUNTS name=full2 table=default tag=final rc=0 RUN=200 PASS=199 FAIL=0 SKIP=1 seconds=3.43
+COUNTS name=full table=aliased tag=final rc=1 RUN=200 PASS=192 FAIL=7 SKIP=1 seconds=4.56
+COUNTS name=full2 table=aliased tag=final rc=1 RUN=200 PASS=192 FAIL=7 SKIP=1 seconds=3.68
+COUNTS name=syncrun table=default tag=final rc=0 RUN=38 PASS=37 FAIL=0 SKIP=1 seconds=2.46
+COUNTS name=syncrun table=aliased tag=final rc=0 RUN=38 PASS=37 FAIL=0 SKIP=1 seconds=1.26
+==== end tag=final at 2026-10-11 10:26:26

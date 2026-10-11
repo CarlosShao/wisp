@@ -1,0 +1,91 @@
+# 307-r1 逐笔越界尺 (git show --name-only --format= per commit, NOT a range)
+Sun Oct 11 10:25:43 CST 2026
+183032c157fc75908f5d41858cd57d9fc2d73127
+
+## worktree hygiene
+git status --porcelain -- internal cmd = 0 lines
+git status --porcelain -- .scratch/wisp/issues docs = 0 lines
+
+## process gate (3 rulers, all must be 0)
+0
+0
+0
+--- commit c6691756 CarlosShao ---
+.scratch/wisp/probes/307/r1/00-anchor.md
+.scratch/wisp/probes/307/r1/logs/msg-01.md
+--- commit 249753a4 CarlosShao ---
+.scratch/wisp/issues/307-syncdirs-home-stays-short-while-candidate-folds-long-profile-write-reads-not-sync.md
+.scratch/wisp/probes/307/orch/msgs/A833.txt
+.scratch/wisp/probes/307/orch/msgs/cm-A833.txt
+.scratch/wisp/probes/307/orch/msgs/handover-40cd.md
+.scratch/wisp/probes/307/orch/msgs/ticket307-ruling.md
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+--- commit 858ee7f4 CarlosShao ---
+.scratch/wisp/probes/307/orch/logs/orch-syncroots-consumers.txt
+.scratch/wisp/probes/307/orch/msgs/cm-owed1.txt
+--- commit 51a0a0f2 CarlosShao ---
+.scratch/wisp/probes/307/r1/10-ac1-colours.md
+.scratch/wisp/probes/307/r1/logs/counts-summary.txt
+.scratch/wisp/probes/307/r1/logs/env-full-aliased-post.txt
+.scratch/wisp/probes/307/r1/logs/env-full-aliased-pre.txt
+.scratch/wisp/probes/307/r1/logs/env-full-default-post.txt
+.scratch/wisp/probes/307/r1/logs/env-full-default-pre.txt
+.scratch/wisp/probes/307/r1/logs/env-full2-aliased-post.txt
+.scratch/wisp/probes/307/r1/logs/env-full2-aliased-pre.txt
+.scratch/wisp/probes/307/r1/logs/env-full2-default-post.txt
+.scratch/wisp/probes/307/r1/logs/env-full2-default-pre.txt
+.scratch/wisp/probes/307/r1/logs/env-syncrun-aliased-post.txt
+.scratch/wisp/probes/307/r1/logs/env-syncrun-aliased-pre.txt
+.scratch/wisp/probes/307/r1/logs/env-syncrun-default-post.txt
+.scratch/wisp/probes/307/r1/logs/env-syncrun-default-pre.txt
+.scratch/wisp/probes/307/r1/logs/full-aliased-post.txt
+.scratch/wisp/probes/307/r1/logs/full-aliased-pre.txt
+.scratch/wisp/probes/307/r1/logs/full-default-post.txt
+.scratch/wisp/probes/307/r1/logs/full-default-pre.txt
+.scratch/wisp/probes/307/r1/logs/full2-aliased-post.txt
+.scratch/wisp/probes/307/r1/logs/full2-aliased-pre.txt
+.scratch/wisp/probes/307/r1/logs/full2-default-post.txt
+.scratch/wisp/probes/307/r1/logs/full2-default-pre.txt
+.scratch/wisp/probes/307/r1/logs/msg-02.md
+.scratch/wisp/probes/307/r1/logs/run-roster.ps1
+.scratch/wisp/probes/307/r1/logs/syncrun-aliased-post.txt
+.scratch/wisp/probes/307/r1/logs/syncrun-aliased-pre.txt
+.scratch/wisp/probes/307/r1/logs/syncrun-default-post.txt
+.scratch/wisp/probes/307/r1/logs/syncrun-default-pre.txt
+internal/risk/syncdirs.go
+internal/risk/syncdirs_alias_307_windows_test.go
+--- commit 183032c1 CarlosShao ---
+.scratch/wisp/probes/307/r1/20-ac2-shapes.md
+.scratch/wisp/probes/307/r1/30-ac3-fixture.md
+.scratch/wisp/probes/307/r1/40-ac4-gates.md
+.scratch/wisp/probes/307/r1/50-ac5-ledgers.md
+.scratch/wisp/probes/307/r1/logs/gates.txt
+.scratch/wisp/probes/307/r1/logs/msg-03.md
+.scratch/wisp/probes/307/r1/logs/mut-a-aliased.txt
+.scratch/wisp/probes/307/r1/logs/mut-c-aliased.txt
+.scratch/wisp/probes/307/r1/logs/mut-d-aliased.txt
+.scratch/wisp/probes/307/r1/logs/mut-fullrevert-aliased.txt
+.scratch/wisp/probes/307/r1/logs/mut-fullrevert-default.txt
+.scratch/wisp/probes/307/r1/logs/mut-pristine-aliased.txt
+.scratch/wisp/probes/307/r1/logs/mut-pristine-default.txt
+.scratch/wisp/probes/307/r1/logs/run-mutation.ps1
+
+## self-list of the closing commit (proxy ruler, taken before the commit exists)
+.scratch/wisp/probes/307/r1/logs/counts-summary.txt
+.scratch/wisp/probes/307/r1/41-boundaries.md
+.scratch/wisp/probes/307/r1/logs/commit-bounds.txt
+.scratch/wisp/probes/307/r1/logs/env-full-aliased-final.txt
+.scratch/wisp/probes/307/r1/logs/env-full-default-final.txt
+.scratch/wisp/probes/307/r1/logs/env-full2-aliased-final.txt
+.scratch/wisp/probes/307/r1/logs/env-full2-default-final.txt
+.scratch/wisp/probes/307/r1/logs/env-syncrun-aliased-final.txt
+.scratch/wisp/probes/307/r1/logs/env-syncrun-default-final.txt
+.scratch/wisp/probes/307/r1/logs/full-aliased-final.txt
+.scratch/wisp/probes/307/r1/logs/full-default-final.txt
+.scratch/wisp/probes/307/r1/logs/full2-aliased-final.txt
+.scratch/wisp/probes/307/r1/logs/full2-default-final.txt
+.scratch/wisp/probes/307/r1/logs/msg-04.md
+.scratch/wisp/probes/307/r1/logs/syncrun-aliased-final.txt
+.scratch/wisp/probes/307/r1/logs/syncrun-default-final.txt
+out-of-lane in that list = 0
