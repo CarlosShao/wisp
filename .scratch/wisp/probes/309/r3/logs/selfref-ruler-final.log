@@ -1,0 +1,19 @@
+== self-referential word-face ruler, re-run at 309-r3 (same two filters as bridge.go:878-890 teaches)
+-- A: total
+72
+-- B: lines whose FILE NAME does not end in _test.go
+2
+-- C: short form | grep -v _test.go (whole-line filter, the one the comment warns about)
+2
+-- D: after stripping leading //
+1
+-- roster of the non-test hits:
+internal/agent/loop.go:675:		req := ToolRequest{
+internal/tools/bridge.go:882:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+== new-shape word faces in production (must stay 0 today)
+new\(agent\.ToolRequest -> 0
+make\(\[\]agent\.ToolRequest -> 0
+agent\.ToolRequest\( -> 0
+(0 above == no production point in the three new shapes)
+== worktree nail re-run (side witness)
+rc_nail_worktree=0
