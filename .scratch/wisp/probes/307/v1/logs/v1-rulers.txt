@@ -1,0 +1,30 @@
+== R1 filepath.Clean|Abs, internal/risk, 非测试面, HEAD blob 与 pre blob ==
+ref=858ee7f4 hits=5 (尺=逐 HEAD/pre blob grep, 射程=internal/risk/*.go 排除 *_test.go, 不含注释专门排除)
+ref=HEAD hits=5 (尺=逐 HEAD/pre blob grep, 射程=internal/risk/*.go 排除 *_test.go, 不含注释专门排除)
+== R2 fail-closed 两句 blob 对拉 (pre 858ee7f4 vs HEAD) ==
+rc_diff_failclosed_lines=0 (行号与正文逐字相同)
+== R3 allowed_dirs / finalize / 存值点 在 diff 里的命中 ==
+20
+1
+== R4 三枚冻结件+thresholds+allowlist 在腿四笔里是否出现 ==
+0
+== R5 越界判定: 腿五笔里不在 internal/risk/** 或 probes/307/r1/** 的行数 ==
+0
+== R6 .out 与 0 字节 ==
+0
+0
+0
+== R7 push 尺 ==
+1032
+== R8 票面/台账/HANDOVER 在腿五笔里 ==
+0
+307-syncdirs-home-stays-short-while-candidate-folds-long-profile-write-reads-not-sync.md ref=858ee7f4 勾=1 未勾=5
+307-syncdirs-home-stays-short-while-candidate-folds-long-profile-write-reads-not-sync.md ref=HEAD 勾=1 未勾=5
+ ref=858ee7f4 勾=0 未勾=0
+ ref=HEAD 勾=0 未勾=0
+252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md ref=858ee7f4 勾=4 未勾=2
+252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md ref=HEAD 勾=4 未勾=2
+302-page-reply-instruments-run-in-the-ci-cli-tier-and-can-never-get-a-reply.md ref=858ee7f4 勾=1 未勾=4
+302-page-reply-instruments-run-in-the-ci-cli-tier-and-can-never-get-a-reply.md ref=HEAD 勾=1 未勾=4
+票72 72-atble-classification-runner.md ref=858ee7f4 勾=4 未勾=2
+票72 72-atble-classification-runner.md ref=HEAD 勾=4 未勾=2

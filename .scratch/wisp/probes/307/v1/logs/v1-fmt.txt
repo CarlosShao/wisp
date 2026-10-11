@@ -1,0 +1,7 @@
+rc_gofmt_worktree=0
+1
+internal\risk\provenance.go
+rc_gofmt_blob=0
+0
+i/lf    w/crlf  attr/text eol=lf      	internal/risk/provenance.go
+i/lf    w/lf    attr/text eol=lf      	internal/risk/syncdirs.go

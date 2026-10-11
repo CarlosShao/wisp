@@ -1,0 +1,4 @@
+GATES 2026-10-11T10:37:37+08:00 HEAD=c04ced26
+rc_go_build_all=0
+rc_go_vet_risk=0
+rc_d22scan=0

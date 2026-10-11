@@ -1,0 +1,34 @@
+﻿MUTATION=a anchor_changed=True
+TABLE=aliased TMPDIR=[C:\Users\swq\tmp\RISKAT~1\RUNNER~1] TEMP=[C:\Users\swq\tmp\RISKAT~1\RUNNER~1] TMP=[C:\Users\swq\tmp\RISKAT~1\RUNNER~1] TREE=C:\Users\swq\tmp\wisp-307-v1-tree RUN=[TestSyncFixtureFallbackAndMatch|TestSyncFallbackNotDisarmableByWeakRoot|TestSyncUnverifiedRootKeepsFallback|TestSyncSuspectFallbackIsComponentBounded|TestSyncSuspectFallbackWhenUndetectable|TestSync307Alias]
+
+time=2026-10-11T10:36:12.157+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSync307AliasHomeUnderProfileStaysSuspect
+    syncdirs_alias_307_windows_test.go:71: ticket 307 fail-open: write under an alias-homed profile read as not-sync, home="C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TESTSY~1\\001\\THIRTY~1" got {Sync:false Root:{Provider: Path: Source:} Why:write target is not under any sync root}
+--- FAIL: TestSync307AliasHomeUnderProfileStaysSuspect (0.01s)
+=== RUN   TestSync307AliasShortRootMembership
+--- PASS: TestSync307AliasShortRootMembership (0.01s)
+=== RUN   TestSyncFixtureFallbackAndMatch
+    syncdirs_test.go:175: under-profile write must stay sync-suspect while no confirmed root exists
+--- FAIL: TestSyncFixtureFallbackAndMatch (0.01s)
+=== RUN   TestSyncFallbackNotDisarmableByWeakRoot
+    syncdirs_test.go:213: source "default": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "fixture": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "options": under-profile fallback must stay armed
+    syncdirs_test.go:213: source "": under-profile fallback must stay armed
+--- FAIL: TestSyncFallbackNotDisarmableByWeakRoot (0.01s)
+=== RUN   TestSyncUnverifiedRootKeepsFallback
+    syncdirs_test.go:233: suspect fallback must stay armed
+--- FAIL: TestSyncUnverifiedRootKeepsFallback (0.00s)
+=== RUN   TestSyncSuspectFallbackIsComponentBounded
+    syncdirs_test.go:355: under-profile must be suspect
+--- FAIL: TestSyncSuspectFallbackIsComponentBounded (0.00s)
+=== RUN   TestSyncSuspectFallbackWhenUndetectable
+    syncdirs_test.go:402: under-profile path must be sync-suspect, got {Sync:false Root:{Provider: Path: Source:} Why:write target is not under any sync root}
+--- FAIL: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.090s
+FAIL
+restored_sha_tree=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36 sha_pristine=AA4779BB52704F4333A286C1A8396868579DAA8D0C26634022EF9A8830FF2D36 equal=True
+
+---- tag=mut-a-aliased table=aliased mutation=a rc=1 RUN=7 PASS=1 FAIL=6 SKIP=0
+

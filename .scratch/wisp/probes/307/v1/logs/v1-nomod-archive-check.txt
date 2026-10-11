@@ -1,0 +1,2 @@
+go: go.mod file not found in current directory or any parent directory; see 'go help modules'
+rc_nomod_gotest=1
