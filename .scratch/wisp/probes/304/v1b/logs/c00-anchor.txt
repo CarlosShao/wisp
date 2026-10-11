@@ -1,0 +1,17 @@
+cmd: git rev-parse --short HEAD (v1b own anchor, 2026-10-11)
+3b8066a2
+rc=0
+cmd: git diff --cached --name-only | wc -l
+0
+rc=0
+cmd: git status --porcelain -- internal cmd tools scripts | wc -l
+0
+rc=0
+cmd: find .scratch/wisp/probes/304 -type f -size 0 (zero-byte census)
+.scratch/wisp/probes/304/r1/logs/build-1.txt
+.scratch/wisp/probes/304/r1/logs/vet-1.txt
+.scratch/wisp/probes/304/r1/logs/vet-reverse.txt
+.scratch/wisp/probes/304/v1/logs/g2-fmt-worktree.txt
+.scratch/wisp/probes/304/v1/logs/g3-build-body.txt
+.scratch/wisp/probes/304/v1/logs/g3-vet-body.txt
+rc=0
