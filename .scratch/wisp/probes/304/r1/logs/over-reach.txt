@@ -1,5 +1,6 @@
-skip_pid_count_in_rev=0  (0 = every cleanup hit all three guards; grep rc=1 on zero hits, taken with || true)
-golden_or_observe_changed_files=0  (0 = none)
-=== over-reach ruler, per commit, name-only
--- mine e875f00f: .scratch/wisp/probes/304/r1/logs/build-1.txt .scratch/wisp/probes/304/r1/logs/p1-shape-a.txt .scratch/wisp/probes/304/r1/logs/pathlen-1.txt .scratch/wisp/probes/304/r1/logs/vet-1.txt .scratch/wisp/probes/304/r1/p1-shape-a.sh .scratch/wisp/probes/304/r1/paired.sh internal/llm/adaptertest/childjob_other.go internal/llm/adaptertest/childjob_windows.go internal/llm/adaptertest/mockllm.go internal/llm/openaichat/mockllm_integ_test.go 
--- mine b9f37892: .scratch/wisp/probes/304/r1/00-anchor.md 
+over-reach ruler: git show --name-only --format= <each of my commits, individually>; NO range ruler
+commit=b9f37892 files=1 foreign=0
+commit=e875f00f files=10 foreign=0
+commit=bd123485 files=56 foreign=0
+commit=c7887eca files=11 foreign=11
+note: the last row lists the FINAL commit made in this same call chain (90-final.md + this log + the ticket bullet); rows b9f37892/e875f00f/bd123485 are the three that were already in HEAD when this file was regenerated.
