@@ -1,0 +1,10 @@
+time=2026-10-11T14:28:05.910+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestR2ProbeSpellingDenominator
+    zz_r2_denominator_probe_test.go:27: R2PROBE surface: os.TempDir()="C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1" VolumeName("C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1")="C:"
+    zz_r2_denominator_probe_test.go:33: R2PROBE volume-qualified real temp: long="C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TestR2ProbeSpellingDenominator1145165396\\001\\.ssh\\id_testkey" VolumeName="C:" keep=9 [dot-and-dotdot extended long lower not-yet-there slashes unc-admin unc-extended upper] dropped=[]
+    zz_r2_denominator_probe_test.go:41: R2PROBE getShortPath(real long)="C:\\Users\\swq\\tmp\\RISKAT~1\\RUNNER~1\\TESTR2~1\\001\\SSH~1\\ID_TES~1" -> case denominator if 8.3 folded in = 10
+    zz_r2_denominator_probe_test.go:46: R2PROBE volume-less literal: long="\\tmp\\wisp-308-no-volume\\.ssh\\id_testkey" VolumeName="" keep=7 [dot-and-dotdot extended long lower not-yet-there slashes upper] dropped=[unc-admin unc-extended]
+    zz_r2_denominator_probe_test.go:54: R2PROBE getShortPath(volume-less literal)="" -> 8.3 slot on volume-less input = 7
+--- PASS: TestR2ProbeSpellingDenominator (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.043s

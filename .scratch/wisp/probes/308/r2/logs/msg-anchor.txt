@@ -1,0 +1,6 @@
+308-r2: anchor artefacts (before-run in export tree, denominators, tier ruler)
+
+Only evidence files. No delivery code touched yet.
+HEAD at dispatch re-run = 202ed4a5 (matches the dispatch value).
+Before run is taken in an out-of-repo git archive tree of 202ed4a5,
+never in the shared worktree (ticket 308-r2 hard rule).
