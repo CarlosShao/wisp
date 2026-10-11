@@ -1,0 +1,4 @@
+.scratch/wisp/probes/orch/taskid-a1/00-findings.md
+.scratch/wisp/probes/orch/taskid-a1/logs/a838-raw.txt
+.scratch/wisp/probes/orch/taskid-a1/logs/assessorfor-callers.txt
+.scratch/wisp/probes/orch/taskid-a1/logs/taskid-all.txt

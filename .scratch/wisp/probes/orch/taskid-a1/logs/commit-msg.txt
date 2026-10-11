@@ -1,0 +1,9 @@
+probe(taskid-a1): read-only census of the empty-taskID limb at bridge.go:925
+
+Answers ledger A838 open reading: taskID=="" has no production birthplace today
+(all three wired branches converge on agent.newTaskID, which cannot return
+an empty string); the panel route builds its own assessor and the scheduler
+package is a doc-only stub. If a future host mints its own id on the bridge,
+assessorFor returns the bare assessor, so R4 rings silent for that write and
+mark/OpenTask stay inert for the same id: under-report, not over-report.
+No go build/vet/test run this leg.

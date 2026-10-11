@@ -1,0 +1,384 @@
+internal/agent/approval/fakes_test.go:298:		TaskID:        testTask,
+internal/agent/approval/fakes_test.go:446:		TaskID: testTask, CorrelationID: corr, CallID: "call-" + corr,
+internal/agent/approval/gate.go:253:	if err := g.admitCheck(d.TaskID); err != nil {
+internal/agent/approval/gate.go:254:		g.logf("approval: L1 refused by D47 guard task=%q tool=%s: %v", d.TaskID, d.Tool, err)
+internal/agent/approval/gate.go:281:	corr := orDefaultText(d.CorrelationID, d.TaskID)
+internal/agent/approval/gate.go:282:	w := &window{ctx: ctx, corr: corr, tool: d.Tool, taskID: d.TaskID, vetoes: make(chan Veto, len(allChannels)+1)}
+internal/agent/approval/gate.go:503:	if err := g.admitCheck(d.TaskID); err != nil {
+internal/agent/approval/gate.go:504:		g.logf("approval: L2 refused by D47 guard task=%q tool=%s: %v", d.TaskID, d.Tool, err)
+internal/agent/approval/gate.go:521:	incoming := orDefaultText(d.CorrelationID, d.TaskID)
+internal/agent/approval/gate.go:600:		TaskID:        d.TaskID,
+internal/agent/approval/gate.go:763:	d.TaskID = taskID
+internal/agent/approval/pending_read_test.go:32:		TaskID:                 "task-" + corr,
+internal/agent/approval/pending_read_test.go:67:	if d.CorrelationID != want.CorrelationID || d.TaskID != want.TaskID {
+internal/agent/approval/pending_read_test.go:69:			want.CorrelationID, d.CorrelationID, d.TaskID)
+internal/agent/approval/queue.go:39:	// cancels by orDefault(CorrelationID, TaskID)). Ticket 87: a card that is
+internal/agent/approval/queue.go:177:	it.bind = bindDigest(corr, d.TaskID, d.Tool, d.LevelString(), q.seq, d.Args)
+internal/agent/approval/queue.go:182:		corr, d.TaskID, d.Tool, len(q.pending))
+internal/agent/approval/queue.go:191:	for _, n := range []string{d.CorrelationID, d.TaskID} {
+internal/agent/approval/queue_test.go:301:		CorrelationID: corr, TaskID: testTask, CallID: "call-replay",
+internal/agent/approval/replies.go:72:	TaskID        string
+internal/agent/approval/replies.go:176:		TaskID:        p.TaskID,
+internal/agent/approval/replies_201_test.go:27:		TaskID:        "task-" + corr,
+internal/agent/approval/report.go:23:	TaskID        string
+internal/agent/approval/report.go:95:	corr := orDefaultText(d.CorrelationID, d.TaskID)
+internal/agent/approval/report.go:97:		Tool: d.Tool, CorrelationID: corr, TaskID: d.TaskID, Level: d.LevelString(),
+internal/agent/approval/ticket146_liveapprovals_backing_test.go:70:		TaskID:                 "task-backing",
+internal/agent/approval/ticket220_l1_window_read_test.go:186:		TaskID:        task,
+internal/agent/approval/ticket220_l1_window_read_test.go:255:	if w.CorrelationID != "corr-220" || w.TaskID != "task-220" || w.Tool != "fs.write" {
+internal/agent/approval/ticket220_l1_window_read_test.go:358:	if want := []string{"CorrelationID", "TaskID", "Tool"}; !reflect.DeepEqual(names, want) {
+internal/agent/approval/ticket242_binding_test.go:77:		Tool: "shell.run", TaskID: "task-1", Args: []byte(`{"cmd":"a"}`),
+internal/agent/approval/ticket242_binding_test.go:87:	want := bindDigest(itA.Corr, d.TaskID, d.Tool, d.LevelString(), itA.Seq, d.Args)
+internal/agent/approval/ticket242_binding_test.go:133:		Tool: "shell.run", TaskID: "task-1", Args: []byte(`{"cmd":"a"}`),
+internal/agent/approval/ticket242_binding_test.go:140:		Tool: "fs.write", TaskID: "task-2", Args: []byte(`{"path":"b"}`),
+internal/agent/approval/ticket259_denial_rulers_test.go:86:		Tool: tool, TaskID: taskID, CorrelationID: corr, Level: 2,
+internal/agent/approval/ticket87_veto_l2_test.go:135:	d.TaskID = "task-87-host-key"
+internal/agent/approval/ticket87_veto_l2_test.go:169:		d.TaskID = sharedTask
+internal/agent/approval/ticket97_alias_direction_test.go:55:	d.TaskID = alias
+internal/agent/approval/ui.go:29:	TaskID        string
+internal/agent/approval/window_read.go:38:// per orDefaultText at gate.go:275); TaskID is the task the call belongs to, so a
+internal/agent/approval/window_read.go:45:	TaskID        string
+internal/agent/approval/window_read.go:73:		out = append(out, L1Window{CorrelationID: w.corr, TaskID: w.taskID, Tool: w.tool})
+internal/agent/compress.go:142:// TestCompressionTraceNeverInventsATaskID. Today the only non-test caller is
+internal/agent/compress.go:159:// traceTaskID is the read side: "" when the caller tagged nothing.
+internal/agent/compress.go:160:func traceTaskID(ctx context.Context) string {
+internal/agent/compress.go:237:		if task := traceTaskID(ctx); task != "" {
+internal/agent/compress_trace_test.go:474:// (the same string Result.TaskID and every Event of that task carry - not a
+internal/agent/compress_trace_test.go:478:func TestCompressionTraceCarriesTheOwningTaskID(t *testing.T) {
+internal/agent/compress_trace_test.go:513:	if task != res.TaskID {
+internal/agent/compress_trace_test.go:514:		t.Errorf("trace task = %q, want the Result's own %q", task, res.TaskID)
+internal/agent/compress_trace_test.go:524:	// The shape check is not decoration: newTaskID mints a 36-char uuid-shaped
+internal/agent/compress_trace_test.go:527:		t.Errorf("trace task = %q, want the uuid-shaped id newTaskID mints (36 chars, 4 dashes)", task)
+internal/agent/compress_trace_test.go:534:func TestCompressionTraceNeverInventsATaskID(t *testing.T) {
+internal/agent/compress_trace_test.go:557:	idA, idB := newTaskID(), newTaskID()
+internal/agent/compress_trace_test.go:559:		t.Fatalf("setup: newTaskID returned the same id twice (%q)", idA)
+internal/agent/control_test.go:180:				s.Publish(Event{Kind: kind, TaskID: "t", Text: "x"})
+internal/agent/corr_percall_242_test.go:139:	if !strings.HasPrefix(c1, res.TaskID) || !strings.HasPrefix(c2, res.TaskID) {
+internal/agent/corr_percall_242_test.go:140:		t.Errorf("corrs %q/%q do not route back to task %q", c1, c2, res.TaskID)
+internal/agent/corr_percall_242_test.go:142:	if c1 == res.TaskID || c2 == res.TaskID {
+internal/agent/declared_l0_risk_179_test.go:91:	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+internal/agent/declared_l0_risk_179_test.go:161:	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+internal/agent/forensics_test.go:38:	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+internal/agent/forensics_test.go:123:	tl, err := store.TaskLogByID(ctx, res.TaskID)
+internal/agent/forensics_test.go:138:	rows, err := store.ListToolCallsByTask(ctx, res.TaskID)
+internal/agent/guard_test.go:188:	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+internal/agent/guard_test.go:259:	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+internal/agent/journal.go:76:		TaskID:        t.taskID,
+internal/agent/loop.go:83:	TaskID string
+internal/agent/loop.go:329:	id := newTaskID()
+internal/agent/loop.go:340:	return l.run(ctx, newTaskID(), input)
+internal/agent/loop.go:382:	res := Result{TaskID: taskID, Status: StatusCompleted}
+internal/agent/loop.go:468:			l.publish(Event{Kind: EvError, TaskID: taskID, Text: msg, Stop: turn.Stop})
+internal/agent/loop.go:487:				Kind: EvReminder, TaskID: taskID, Text: rem.Text,
+internal/agent/loop.go:492:					Kind: EvStuck, TaskID: taskID,
+internal/agent/loop.go:518:	l.publish(Event{Kind: EvControl, TaskID: taskID, Verb: verb, Text: utterance})
+internal/agent/loop.go:524:	res := Result{TaskID: taskID, Status: StatusControl}
+internal/agent/loop.go:558:			l.publish(Event{Kind: EvTextDelta, TaskID: taskID, Text: ev.Text})
+internal/agent/loop.go:560:			l.publish(Event{Kind: EvReasoningDelta, TaskID: taskID, Text: ev.Text})
+internal/agent/loop.go:676:			TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),
+internal/agent/loop.go:747:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+internal/agent/loop.go:774:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+internal/agent/loop.go:886:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+internal/agent/loop.go:921:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+internal/agent/loop.go:933:		Kind: EvStuck, TaskID: res.TaskID, Text: msg,
+internal/agent/loop.go:944:	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err})
+internal/agent/loop.go:982:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+internal/agent/loop.go:985:		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+internal/agent/loop.go:1151:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+internal/agent/loop.go:1153:func newTaskID() string {
+internal/agent/loop_golden_test.go:76:	wantCorr := res.TaskID + "#call_e1"
+internal/agent/loop_golden_test.go:77:	if call.Req.TaskID != res.TaskID ||
+internal/agent/loop_golden_test.go:78:		!strings.HasPrefix(call.Req.CorrelationID, res.TaskID) ||
+internal/agent/loop_golden_test.go:79:		strings.TrimPrefix(call.Req.CorrelationID, res.TaskID+"#") != "call_e1" ||
+internal/agent/loop_golden_test.go:80:		call.Req.CorrelationID == res.TaskID {
+internal/agent/loop_golden_test.go:81:		t.Errorf("call identity = %+v, want task %s and correlation id %s (task id prefix + this call's own id, never the bare task id)", call.Req, res.TaskID, wantCorr)
+internal/agent/loop_golden_test.go:326:	tl, err := store.TaskLogByID(ctx, res.TaskID)
+internal/agent/loop_golden_test.go:344:	rows, err := store.ListToolCallsByTask(ctx, res.TaskID)
+internal/agent/loop_golden_test.go:352:	if row.Tool != "echo" || row.CorrelationID != res.TaskID {
+internal/agent/sink.go:46:	TaskID    string
+internal/agent/ticket285_corr_distinct_rulers_test.go:116:	if first.TaskID != res.TaskID || second.TaskID != res.TaskID {
+internal/agent/ticket285_corr_distinct_rulers_test.go:117:		t.Fatalf("request task ids = %q/%q, want the run's task id %q", first.TaskID, second.TaskID, res.TaskID)
+internal/agent/ticket285_corr_distinct_rulers_test.go:119:	if first.CorrelationID == res.TaskID || second.CorrelationID == res.TaskID {
+internal/agent/ticket285_corr_distinct_rulers_test.go:121:			first.CorrelationID, second.CorrelationID, res.TaskID)
+internal/agent/ticket285_corr_distinct_rulers_test.go:132:		if !strings.HasPrefix(req.CorrelationID, res.TaskID) {
+internal/agent/ticket285_corr_distinct_rulers_test.go:133:			t.Errorf("call %s corr = %q, want the task id %q as prefix", req.CallID, req.CorrelationID, res.TaskID)
+internal/agent/ticket285_corr_distinct_rulers_test.go:136:		if suffix := strings.TrimPrefix(req.CorrelationID, res.TaskID+"#"); suffix != req.CallID {
+internal/agent/tools.go:55:	TaskID        string
+internal/agent/truncation_test.go:74:	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+internal/memory/dao_test.go:312:		TaskID: "task-a", Seq: 1, Tool: "fs.read",
+internal/memory/dao_toolcall.go:27:			tc.TaskID, tc.Seq, tc.Tool, tc.ArgsJSON, tc.RiskLevel,
+internal/memory/dao_toolcall.go:166:	if err := scan(&tc.ID, &tc.TaskID, &tc.Seq, &tc.Tool, &tc.ArgsJSON, &tc.RiskLevel,
+internal/memory/models.go:76:	TaskID        string
+internal/memory/models.go:161:	if tc.TaskID == "" {
+internal/memory/privacy_test.go:38:		TaskID: "task-p1", Seq: 1, Tool: "app.launch", ArgsJSON: "{}",
+internal/panel/pump.go:129:	TaskID        string
+internal/panel/pump.go:393:// TaskID, and Event has no per-chunk id of its own) - naming that here is the
+internal/panel/subagent_blocked_220_test.go:57:			TaskID: "root-1", Label: "总结这份笔记", Kind: "root",
+internal/panel/subagent_blocked_220_test.go:61:			TaskID: "child-1", ParentTaskID: "root-1", Label: "读三份文件",
+internal/panel/subagent_blocked_220_test.go:151:	data := blockedPacket(t, nil, []L1WindowWait{{CorrelationID: "corr-host-9", TaskID: "child-1"}})
+internal/panel/subagent_blocked_220_test.go:157:	data = blockedPacket(t, nil, []L1WindowWait{{CorrelationID: "child-1", TaskID: ""}})
+internal/panel/subagent_blocked_220_test.go:187:		[]L1WindowWait{{CorrelationID: "corr-root", TaskID: "root-1"}})
+internal/panel/subagent_roster_197.go:52:	// TaskID is the row's own id, minted by the loop that runs it
+internal/panel/subagent_roster_197.go:53:	// (agent.newTaskID), not by this carrier.
+internal/panel/subagent_roster_197.go:54:	TaskID string
+internal/panel/subagent_roster_197.go:55:	// ParentTaskID is the task that derived this one. Empty means a root row.
+internal/panel/subagent_roster_197.go:56:	// The entity leg files the deriving call's task id (TaskID(ctx),
+internal/panel/subagent_roster_197.go:59:	ParentTaskID string
+internal/panel/subagent_roster_197.go:76:	// root - see cmd/wisp's consoleSink, which appends under e.TaskID).
+internal/panel/subagent_roster_197.go:107:	TaskID       string `json:"taskId"`
+internal/panel/subagent_roster_197.go:110:	ParentTaskID string `json:"parentTaskId"`
+internal/panel/subagent_roster_197.go:220:		indexWaitingKey(waiting, w.TaskID)
+internal/panel/subagent_roster_197.go:228:			TaskID:            row.TaskID,
+internal/panel/subagent_roster_197.go:231:			ParentTaskID:      row.ParentTaskID,
+internal/panel/subagent_roster_197.go:236:			BlockedOnApproval: row.TaskID != "" && waiting[row.TaskID],
+internal/panel/subagent_roster_197.go:253:	sort.Slice(sect.Rows, func(i, j int) bool { return sect.Rows[i].TaskID < sect.Rows[j].TaskID })
+internal/panel/subagent_roster_197_test.go:49:	TaskID            string `json:"taskId"`
+internal/panel/subagent_roster_197_test.go:52:	ParentTaskID      string `json:"parentTaskId"`
+internal/panel/subagent_roster_197_test.go:86:		if r.TaskID == taskID {
+internal/panel/subagent_roster_197_test.go:118:						TaskID: "root-1", Label: "总结这份笔记", Kind: "root",
+internal/panel/subagent_roster_197_test.go:122:						TaskID: "child-1", ParentTaskID: "root-1", Label: "读三份文件",
+internal/panel/subagent_roster_197_test.go:139:	if sect.Rows[0].TaskID > sect.Rows[1].TaskID {
+internal/panel/subagent_roster_197_test.go:142:			sect.Rows[0].TaskID, sect.Rows[1].TaskID)
+internal/panel/subagent_roster_197_test.go:146:	if child.ParentTaskID != "root-1" {
+internal/panel/subagent_roster_197_test.go:147:		t.Errorf("parentTaskId = %q, want the task that derived it", child.ParentTaskID)
+internal/panel/subagent_roster_197_test.go:263:			TaskID: string(s), Status: string(s), StatusKnown: statemachine.Valid(s),
+internal/panel/subagent_roster_197_test.go:280:			t.Errorf("row %q carries status %q, which is not one of D43's 20 names", r.TaskID, r.Status)
+internal/panel/subagent_roster_197_test.go:288:			TaskID: "x-1", Kind: "subagent", Status: "running", StatusKnown: false,
+internal/panel/subagent_roster_197_test.go:310:		return TaskRosterState{Rows: []TaskRow{{TaskID: "x-2", Kind: "root"}}}
+internal/panel/subagent_roster_197_test.go:373:						TaskID: "big", Kind: "subagent", Status: "Thinking", StatusKnown: true,
+internal/panel/subagent_roster_197_test.go:378:						TaskID: "small", Kind: "subagent", Status: "Thinking", StatusKnown: true,
+internal/perm/ticket90_persist_test.go:123:		TaskID: "t90-persist", CorrelationID: "t90-persist", CallID: "c1",
+internal/tools/bridge.go:270:		req.CorrelationID = req.TaskID
+internal/tools/bridge.go:297:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+internal/tools/bridge.go:376:		TaskID: req.TaskID, CallID: req.CallID,
+internal/tools/bridge.go:528:		corr: orDefault(req.CorrelationID, req.TaskID), taskID: req.TaskID, bus: b.cancel,
+internal/tools/bridge.go:536:		defer b.cancel.Complete(orDefault(req.CorrelationID, req.TaskID))
+internal/tools/bridge.go:600:		if kind == OutcomeKindError && b.cancel.Vetoed(orDefault(dec.CorrelationID, dec.TaskID)) {
+internal/tools/bridge.go:642:	if b.prov == nil || dec.TaskID == "" || !risk.IsSensitiveSource(dec.Tool) {
+internal/tools/bridge.go:649:	b.OpenTask(dec.TaskID)
+internal/tools/bridge.go:650:	if !b.prov.MarkWithHostPath(dec.TaskID, dec.Tool, origin, res.Text, hostPath) {
+internal/tools/bridge.go:782:	corr := orDefault(dec.CorrelationID, dec.TaskID)
+internal/tools/bridge.go:871:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+internal/tools/bridge.go:872:// So ask one question about your own leg: does the TaskID you dispatch with
+internal/tools/bridge.go:1081:		kind, req.TaskID, orDefault(req.CorrelationID, req.TaskID), req.Name,
+internal/tools/bridge.go:1099:			req.TaskID, req.Name, len(roots),
+internal/tools/bridge.go:1103:	if b.j == nil || req.TaskID == "" {
+internal/tools/bridge.go:1116:		TaskID:        req.TaskID,
+internal/tools/bridge.go:1117:		Seq:           b.nextSeq(req.TaskID),
+internal/tools/bridge.go:1124:		CorrelationID: orDefault(req.CorrelationID, req.TaskID),
+internal/tools/bridge.go:1131:		b.log("tools: tool_call insert failed task=%s tool=%s: %v", req.TaskID, req.Name, err)
+internal/tools/bridge_scope_open_ticket158_test.go:6:// b.OpenTask(dec.TaskID)，本包 115/79/0/0 零枚红；同一发变异换到 cmd/wisp 才红
+internal/tools/bridge_scope_open_ticket158_test.go:39:		TaskID: task, CorrelationID: task, CallID: "call-" + task,
+internal/tools/bridge_test.go:149:		TaskID: "task-1", CorrelationID: "corr-1", CallID: "call-1",
+internal/tools/bridge_test.go:671:		rq.TaskID, rq.CorrelationID = "task-1", fmt.Sprintf("corr-%d", i)
+internal/tools/bridge_test.go:686:	rq.TaskID, rq.CorrelationID = "task-1", "corr-l1"
+internal/tools/cancel.go:62:// TaskID returns the id of the task the running call belongs to, or "" when
+internal/tools/cancel.go:67:func TaskID(ctx context.Context) string {
+internal/tools/failclosed_236_teeth_test.go:91:	lit236CancelNoHostTaskID = "这条调用没有宿主给的任务 id（fail-closed：不知道是谁要停，只能拒）"
+internal/tools/failclosed_236_teeth_test.go:98:	lit236SpawnNoHostTaskID = "这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，" +
+internal/tools/failclosed_236_teeth_test.go:103:// (bridge.go:269-271 only falls back CorrelationID -> TaskID, so passing both
+internal/tools/failclosed_236_teeth_test.go:115:	target := x.h.childRow(t).TaskID
+internal/tools/failclosed_236_teeth_test.go:122:	if callerUnknown.Text != lit236CancelNoHostTaskID {
+internal/tools/failclosed_236_teeth_test.go:125:			callerUnknown.Text, lit236CancelNoHostTaskID)
+internal/tools/failclosed_236_teeth_test.go:142:	// TaskID non-empty so the caller check is satisfied and the roster branch is
+internal/tools/failclosed_236_teeth_test.go:145:		TaskID: "caller-236r2", CorrelationID: "caller-236r2", CallID: "call-236r2-cancel-no-roster",
+internal/tools/failclosed_236_teeth_test.go:244:func Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID(t *testing.T) {
+internal/tools/failclosed_236_teeth_test.go:250:	res := spawnWithoutHostTaskID(t, h)
+internal/tools/failclosed_236_teeth_test.go:257:	if res.Text != lit236SpawnNoHostTaskID {
+internal/tools/failclosed_236_teeth_test.go:260:			res.Text, lit236SpawnNoHostTaskID)
+internal/tools/failclosed_236_teeth_test.go:265:	// deliberately has no full-table read port (Descendants walks ParentTaskID
+internal/tools/failclosed_236_teeth_test.go:275:// spawnWithoutHostTaskID dispatches one task.spawn exactly as production does
+internal/tools/failclosed_236_teeth_test.go:277:// bridge.go:269-271's only fall-back is CorrelationID -> TaskID. Package-unexported,
+internal/tools/failclosed_236_teeth_test.go:280:func spawnWithoutHostTaskID(t *testing.T, h *sub197Harness) (out Result) {
+internal/tools/failclosed_236_teeth_test.go:288:		TaskID: "", CorrelationID: "", CallID: "call-236r2-spawn-no-parent",
+internal/tools/fs_write_test.go:752:	return stubReport{d: d, res: res, vetoed: f.Vetoed(orDefault(d.CorrelationID, d.TaskID))}
+internal/tools/gate.go:50:	TaskID        string
+internal/tools/grant_test.go:265:		TaskID: "t224", CorrelationID: "t224-corr", CallID: "t224-call",
+internal/tools/grant_test.go:279:		TaskID: "t224", CorrelationID: "t224-corr2", CallID: "t224-call2",
+internal/tools/loop_approval_test.go:202:	rows := f.rows(t, res.TaskID)
+internal/tools/loop_approval_test.go:219:	if r.CorrelationID == "" || r.CorrelationID == res.TaskID ||
+internal/tools/loop_approval_test.go:220:		!strings.HasPrefix(r.CorrelationID, res.TaskID) {
+internal/tools/loop_approval_test.go:222:			r.CorrelationID, res.TaskID)
+internal/tools/loop_approval_test.go:254:	if rows := f.rows(t, res.TaskID); len(rows) != 1 ||
+internal/tools/pointer_183_cli_seam_test.go:59:	// agent.newTaskID() gives in production (task_backfill.go's doc block names
+internal/tools/pointer_183_cli_seam_test.go:64:	r183SiblingTaskID = "c66c0635183r2b2c"
+internal/tools/pointer_183_cli_seam_test.go:127:		TaskID: taskID, CorrelationID: taskID, CallID: "call-" + taskID + "-" + tool,
+internal/tools/pointer_183_cli_seam_test.go:235:		Backfill(context.Background(), r183SiblingTaskID, r183Payload(""))
+internal/tools/pointer_185_cli_seam_test.go:120:		TaskID: taskID, CorrelationID: taskID, CallID: "call-" + taskID + "-" + tool,
+internal/tools/subagent_197.go:262:	parentID := TaskID(ctx)
+internal/tools/subagent_197.go:332:	// The child loop's task id is minted by the loop itself (agent.newTaskID,
+internal/tools/subagent_197.go:429:		ParentTaskID: parentID, Label: label, Kind: TaskKindSubagent,
+internal/tools/subagent_197.go:529:		s.d.Stream.Append(SubagentStreamKey(e.TaskID), e.Text)
+internal/tools/subagent_197.go:531:		if key := SubagentStreamKey(e.TaskID); key != "" {
+internal/tools/subagent_197_test.go:217:		TaskID: parent197, CorrelationID: parent197, CallID: "call-197-spawn-" + label,
+internal/tools/subagent_197_test.go:253:	return TaskRecord{TaskID: id, Out: out}
+internal/tools/subagent_197_test.go:308:	if row.Out.ParentTaskID != parent197 {
+internal/tools/subagent_197_test.go:309:		t.Errorf("ParentTaskID = %q, want %q", row.Out.ParentTaskID, parent197)
+internal/tools/subagent_197_test.go:327:	key := SubagentStreamKey(row.TaskID)
+internal/tools/subagent_197_test.go:328:	if key != "subagent:"+row.TaskID {
+internal/tools/subagent_197_test.go:329:		t.Errorf("流键 = %q, want subagent:%s", key, row.TaskID)
+internal/tools/subagent_197_test.go:655:		TaskID: "child-197", Name: "task.spawn",
+internal/tools/subagent_197_test.go:679:	if grand := h.roster.Descendants(rows[0].TaskID); len(grand) != 0 {
+internal/tools/subagent_197_test.go:761:			childID = r.TaskID
+internal/tools/subagent_197_test.go:870:	childID := h2.childRow(t).TaskID
+internal/tools/subagent_222_test.go:332:				TaskID: parent222, CorrelationID: parent222, CallID: fmt.Sprintf("call-222-parent-%d", i),
+internal/tools/subagent_222_test.go:567:				TaskID: parent222, CorrelationID: parent222, CallID: fmt.Sprintf("call-222-host-%d", i),
+internal/tools/task.go:131:	// ParentTaskID is the task that derived this one; empty means this row is a
+internal/tools/task.go:133:	ParentTaskID string
+internal/tools/task.go:209:// The one exception is identity (ticket 197): ParentTaskID / Label / Kind are
+internal/tools/task.go:225:		if o.ParentTaskID == "" {
+internal/tools/task.go:226:			o.ParentTaskID = prev.ParentTaskID
+internal/tools/task.go:295:	TaskID string
+internal/tools/task.go:302:// It walks ParentTaskID only; a row with no parent is a root and is never
+internal/tools/task.go:318:				if o.ParentTaskID != parent || seen[id] {
+internal/tools/task.go:322:				out = append(out, TaskRecord{TaskID: id, Out: o})
+internal/tools/task.go:329:		if out[i].TaskID == out[j].TaskID {
+internal/tools/task.go:330:			return out[i].TaskID < out[j].TaskID
+internal/tools/task.go:332:		return out[i].TaskID < out[j].TaskID
+internal/tools/task.go:342:func (r *TaskRoster) PublishSubagent(taskID, parentTaskID, label string) {
+internal/tools/task.go:344:		ParentTaskID: parentTaskID, Label: label, Kind: TaskKindSubagent,
+internal/tools/task.go:473:	TaskID string `json:"task_id"`
+internal/tools/task.go:511:	if strings.TrimSpace(a.TaskID) == "" {
+internal/tools/task.go:517:	rec, ok := t.d.Roster.Look(a.TaskID)
+internal/tools/task.go:521:				"这是「没有这条记录」，不是「任务没有输出」。", a.TaskID), IsError: true}, nil
+internal/tools/task.go:614:	TaskID string `json:"task_id"`
+internal/tools/task.go:695:	target := strings.TrimSpace(a.TaskID)
+internal/tools/task.go:703:	// the dispatching TASK's id into the call context (TaskID; the correlation
+internal/tools/task.go:706:	// task.spawn uses to fill in ParentTaskID, which is what makes the two
+internal/tools/task.go:708:	caller := TaskID(ctx)
+internal/tools/task.go:726:	if rec.ParentTaskID == "" {
+internal/tools/task.go:732:	if rec.ParentTaskID != caller {
+internal/tools/task.go:736:			target, rec.ParentTaskID, caller), IsError: true}, nil
+internal/tools/task.go:768:					target, final.Label, target, rec.ParentTaskID, string(st), rec.ParentTaskID, caller, target),
+internal/tools/task.go:780:		target, ctx.Err(), rec.ParentTaskID, caller), IsError: true}, nil
+internal/tools/task_backfill.go:38:// model-supplied. agent.newTaskID() is a plain lowercase hex uuid, so a bare
+internal/tools/task_cancel_221_legs_test.go:119:		TaskID: callerID, CorrelationID: callerID, CallID: "call-221-cancel-" + callerID + "-" + targetID,
+internal/tools/task_cancel_221_legs_test.go:153:			return r.TaskID, done
+internal/tools/task_cancel_221_legs_test.go:211:	late := x.cancel(t, parent197, row.TaskID)
+internal/tools/task_cancel_221_legs_test.go:333:	if rec.Out.ParentTaskID != parent197 || rec.Out.Kind != TaskKindSubagent || rec.Out.Label != label197 {
+internal/tools/task_cancel_221_legs_test.go:335:			rec.Out.ParentTaskID, rec.Out.Kind, rec.Out.Label)
+internal/tools/task_cancel_221_legs_test.go:380:			if r.TaskID != parent197 {
+internal/tools/task_cancel_221_legs_test.go:381:				t.Errorf("tool_call 行的调用者是 %q, want %q", r.TaskID, parent197)
+internal/tools/task_cancel_221_legs_test.go:476:			childID = r.TaskID
+internal/tools/task_output_ac2_before_test.go:42:		TaskID: "164-ac2-before",
+internal/tools/task_output_leg_test.go:61:		TaskID: "164-ac2-after",
+internal/tools/task_output_leg_test.go:83:// TestUnknownTaskIDIsLoud pins ticket 164 ruling 2: v1 keeps no roster across
+internal/tools/task_output_leg_test.go:87:func TestUnknownTaskIDIsLoudNotEmpty(t *testing.T) {
+internal/tools/task_output_leg_test.go:92:		TaskID: "164-r2", CallID: "c1", Name: "task.output",
+internal/tools/task_output_leg_test.go:117:		TaskID: "a", CallID: "c", Name: "task.output", Args: json.RawMessage(`{}`),
+internal/tools/task_output_leg_test.go:131:		TaskID: "b", CallID: "c", Name: "task.output", Args: json.RawMessage(`{"task_id":"x"}`),
+internal/tools/task_output_leg_test.go:181:		TaskID: "164-ac3", CallID: "c1", Name: "task.output",
+internal/tools/task_output_leg_test.go:213:		TaskID: "164-ac3", CallID: "c2", Name: "fs.read",
+internal/tools/task_output_leg_test.go:252:		TaskID: "shape", CallID: "c1", Name: "task.output",
+internal/tools/task_output_leg_test.go:298:		TaskID: "scaled", CallID: "c1", Name: "task.output",
+internal/tools/task_output_leg_test.go:322:		TaskID: "noloss", CallID: "c1", Name: "task.output",
+internal/tools/task_output_leg_test.go:359:		TaskID: "big", CallID: "c1", Name: "task.output",
+internal/tools/task_output_leg_test.go:374:		TaskID: "big", CallID: "c2", Name: "fs.read",
+internal/tools/task_output_leg_test.go:396:		TaskID: "big", CallID: "c3", Name: "fs.read",
+internal/tools/task_output_leg_test.go:416:			TaskID: "evil", CallID: "c1", Name: "task.output",
+internal/tools/task_output_pointer_notice_test.go:69:		TaskID: "174-r1", CallID: "c-" + id, Name: "task.output",
+internal/tools/task_output_pointer_notice_test.go:83:		TaskID: "174-r1", CallID: "c-read", Name: "fs.read",
+internal/tools/ticket175r2_stamp_live_test.go:95:		TaskID: taskID, CorrelationID: taskID, CallID: "call-" + taskID + "-" + tool,
+internal/tools/ticket224_grantid_column_test.go:75:		TaskID: "t224-r2", CorrelationID: corr, CallID: "call-" + corr,
+internal/tools/ticket283_corr_identity_rulers_test.go:5:// 盲区一（回退形无仪器）：票 242 把任务身份挪到 TaskID(ctx) 之后，
+internal/tools/ticket283_corr_identity_rulers_test.go:6:// cancel.go 的 TaskID 支若被种回 h.corr，既有用例全绿——它们的派发 fixture
+internal/tools/ticket283_corr_identity_rulers_test.go:7:// 一律 TaskID == CorrelationID（bridge.go 的 orDefault 回落也让缺 corr 的
+internal/tools/ticket283_corr_identity_rulers_test.go:12:// TaskID(ctx) 前后，同一形状用例双双全绿——它们都经直接 bridge.Execute
+internal/tools/ticket283_corr_identity_rulers_test.go:16:// TaskID(ctx) 定位名册行。尺二 = 真 loop → 真 bridge → 真 task.spawn /
+internal/tools/ticket283_corr_identity_rulers_test.go:35:// --- 尺一：handle 的 corr 与 taskID 不同时，TaskID 必须答 taskID --------
+internal/tools/ticket283_corr_identity_rulers_test.go:37:func Test283TaskIDAccessorIsTheTaskIDNotTheCorr(t *testing.T) {
+internal/tools/ticket283_corr_identity_rulers_test.go:39:	if got := TaskID(ctx); got != "task-283" {
+internal/tools/ticket283_corr_identity_rulers_test.go:40:		t.Fatalf("TaskID = %q, want the task id: a handle whose corr differs from its task id must not answer with the corr", got)
+internal/tools/ticket283_corr_identity_rulers_test.go:50:	if got := TaskID(loose); got != "" {
+internal/tools/ticket283_corr_identity_rulers_test.go:51:		t.Fatalf("TaskID = %q, want \"\": a handle with no task id stamped must answer empty, not fall back onto the corr", got)
+internal/tools/ticket283_corr_identity_rulers_test.go:187:	// res.TaskID），不是这次调用的 per-call corr。种坏 subagent_197.go 的
+internal/tools/ticket283_corr_identity_rulers_test.go:188:	// 身份读点、或 cancel.go 的 TaskID 访问器，这条先红。
+internal/tools/ticket283_corr_identity_rulers_test.go:193:	if rec.ParentTaskID != res.TaskID {
+internal/tools/ticket283_corr_identity_rulers_test.go:194:		t.Errorf("子代理行的 ParentTaskID = %q, want 宿主 task id %q（task.spawn 读的是 TaskID(ctx)，不是 per-call corr）",
+internal/tools/ticket283_corr_identity_rulers_test.go:195:			rec.ParentTaskID, res.TaskID)
+internal/tools/ticket283_corr_identity_rulers_test.go:214:	rows, err := x.mem.ListToolCallsByTask(t.Context(), res.TaskID)
+internal/tools/ticket283_corr_identity_rulers_test.go:222:		if r.CorrelationID == "" || r.CorrelationID == res.TaskID || !strings.HasPrefix(r.CorrelationID, res.TaskID) {
+internal/tools/ticket283_corr_identity_rulers_test.go:224:				r.Tool, r.CorrelationID, res.TaskID)
+internal/tools/ticket285_corr_rows_rulers_test.go:11:// 夹具前置（票面 AC#4 那句）：TaskID 与 CorrelationID 必须是两枚值，否则两发
+internal/tools/ticket285_corr_rows_rulers_test.go:59:	rows, err := x.mem.ListToolCallsByTask(t.Context(), res.TaskID)
+internal/tools/ticket285_corr_rows_rulers_test.go:72:		if r.CorrelationID == res.TaskID {
+internal/tools/ticket285_corr_rows_rulers_test.go:75:		if !strings.HasPrefix(r.CorrelationID, res.TaskID) {
+internal/tools/ticket285_corr_rows_rulers_test.go:76:			t.Errorf("tool %s 的行 corr = %q, want 以 task id %q 为前缀", r.Tool, r.CorrelationID, res.TaskID)
+internal/tools/ticket90_test.go:156:		TaskID: "t90", CorrelationID: "t90-corr", CallID: "t90-call",
+internal/tools/wiring_test.go:320:		TaskID: "task-wire-1", CorrelationID: "corr-wire-1", CallID: "call-1",
+cmd/wisp/approval_always.go:64:	allowWidenTaskID = "host:fs-allow-widen"
+cmd/wisp/approval_always.go:113:	revoke := s.rt.gate.AdmitTextTask(allowWidenTaskID)
+cmd/wisp/approval_always.go:116:		TaskID: allowWidenTaskID,
+cmd/wisp/approval_always_201_test.go:102:				TaskID: taskID, CorrelationID: corr, CallID: "a1",
+cmd/wisp/approval_reply_201_test.go:221:				TaskID: "t201-allow", CorrelationID: "t201-allow-corr", CallID: "a1",
+cmd/wisp/approval_reply_201_test.go:292:				TaskID: "t201-reject", CorrelationID: "t201-reject-corr", CallID: "r1",
+cmd/wisp/approval_reply_201_test.go:369:				TaskID: "t201-panel", CorrelationID: corr, CallID: "p1",
+cmd/wisp/approval_reply_201_test.go:453:				TaskID: "t201-timeout", CorrelationID: "t201-timeout-corr", CallID: "x1",
+cmd/wisp/approval_reply_201_test.go:540:					TaskID: "t201-l1-console", CorrelationID: corr, CallID: "v1",
+cmd/wisp/approval_reply_201_test.go:625:					TaskID: "t201-l1-veto", CorrelationID: corr, CallID: "v2",
+cmd/wisp/approval_seam_201_test.go:68:				TaskID: "t201-seam", CorrelationID: "t201-seam-corr", CallID: "a1",
+cmd/wisp/approval_seam_201_test.go:157:				TaskID: "t201-seam-panel", CorrelationID: "t201-seam-panel-corr", CallID: "a1",
+cmd/wisp/config_reload.go:89:	configReloadTaskID = "host:config-reload"
+cmd/wisp/config_reload.go:276:	revoke := rt.gate.AdmitTextTask(configReloadTaskID)
+cmd/wisp/config_reload.go:284:		TaskID: configReloadTaskID,
+cmd/wisp/logsink_windows_test.go:248:			TaskID: "host-audit-task", CorrelationID: "host-audit-corr", CallID: "c1",
+cmd/wisp/panel_pump.go:52:// tree records one for a live call - tools.Decision has TaskID/CallID/Provider
+cmd/wisp/panel_pump.go:133:// Every value is read, never shaped: Kind / Label / ParentTaskID come out of the
+cmd/wisp/panel_pump.go:141:// to it), a root under its bare task id (consoleSink's Append(e.TaskID, ...)).
+cmd/wisp/panel_pump.go:157:		if _, dup := rows[rec.TaskID]; dup {
+cmd/wisp/panel_pump.go:160:		key := rec.TaskID
+cmd/wisp/panel_pump.go:162:			key = panel.SubagentStreamKey(rec.TaskID)
+cmd/wisp/panel_pump.go:173:		rows[rec.TaskID] = panel.TaskRow{
+cmd/wisp/panel_pump.go:174:			TaskID:            rec.TaskID,
+cmd/wisp/panel_pump.go:175:			ParentTaskID:      rec.Out.ParentTaskID,
+cmd/wisp/panel_pump.go:189:			add(tools.TaskRecord{TaskID: id, Out: out})
+cmd/wisp/panel_pump_test.go:115:		TaskID: taskID, CorrelationID: corr, CallID: callID,
+cmd/wisp/resident_approval_246_windows_test.go:98:		TaskID: "host:246-no-window",
+cmd/wisp/resident_approval_246_windows_test.go:162:		TaskID: "host:246-after-shutdown", Tool: residentCardTool, Level: risk.L1,
+cmd/wisp/resident_approval_live_246_windows_test.go:116:			TaskID: "host:live246-esc",
+cmd/wisp/resident_approval_live_246_windows_test.go:221:			TaskID: "host:live246-exit",
+cmd/wisp/resident_approval_live_246_windows_test.go:312:			TaskID: "host:live246-exit-l1", Tool: residentCardTool, Level: risk.L1,
+cmd/wisp/resident_approval_windows.go:626:	TaskID string
+cmd/wisp/resident_approval_windows.go:643:	if c.TaskID == "" || c.Reason == "" {
+cmd/wisp/resident_approval_windows.go:667:	revoke := ra.gate.AdmitTextTask(c.TaskID)
+cmd/wisp/resident_approval_windows.go:671:		TaskID: c.TaskID,
+cmd/wisp/resident_grant_writer_265_windows_test.go:244:		TaskID:        grant265Task,
+cmd/wisp/resident_task_source_246_windows_test.go:112:		TaskID: "host:246-one-gate", CorrelationID: "host-corr-1", CallID: "w1",
+cmd/wisp/run.go:845:		TaskID: taskID,
+cmd/wisp/run.go:1090:	//   ① id 仍由环路铸（RunningTask.ID / res.TaskID）。组合根自造 id 直接上桥
+cmd/wisp/run.go:1110:	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+cmd/wisp/run.go:1124:			ID: res.TaskID, State: state, QueryText: task,
+cmd/wisp/run.go:1135:		if err := rt.store.FinishTaskLog(c, res.TaskID, state, summary,
+cmd/wisp/run.go:1145:		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+cmd/wisp/run.go:1266:			c.stream.Append(e.TaskID, e.Text)
+cmd/wisp/run.go:1293:			c.stream.Close(e.TaskID)
+cmd/wisp/run_mode101_test.go:196:		TaskID: task, CorrelationID: corr, CallID: fmt.Sprintf("t101-call-%d", n),
+cmd/wisp/run_test.go:265:			TaskID: "host-task", CorrelationID: "host-corr", CallID: "c1",
+cmd/wisp/run_test.go:277:			TaskID: "host-task-2", CorrelationID: "host-corr-2", CallID: "c2",
+cmd/wisp/run_test.go:351:			TaskID: "gate-task", CorrelationID: "gate-corr-0", CallID: "w0",
+cmd/wisp/run_test.go:364:			TaskID: "gate-task", CorrelationID: "gate-corr", CallID: "w1",
+cmd/wisp/subagent_blocked_197_test.go:121:				TaskID: id, CorrelationID: id, Tool: blocked197Tool,
+cmd/wisp/subagent_blocked_197_test.go:236:		row.TaskID, row.Status, row.StreamKey, snap.Pending[0].Tool, len(snap.Pending),
+cmd/wisp/subagent_carrier_197_test.go:20:// bridge with the fixture's OWN ids (TaskID == CorrelationID at :173), which is
+cmd/wisp/subagent_carrier_197_test.go:74:	TaskID            string `json:"taskId"`
+cmd/wisp/subagent_carrier_197_test.go:77:	ParentTaskID      string `json:"parentTaskId"`
+cmd/wisp/subagent_carrier_197_test.go:127:		if r.TaskID == taskID {
+cmd/wisp/subagent_carrier_197_test.go:173:			TaskID: rootID, CorrelationID: rootID, CallID: fmt.Sprintf("spawn-197-%02d", i),
+cmd/wisp/subagent_carrier_197_test.go:203:			if row.Kind == tools.TaskKindRoot && row.TaskID != "" {
+cmd/wisp/subagent_carrier_197_test.go:204:				return row.TaskID, nil
+cmd/wisp/subagent_carrier_197_test.go:218:		if row.Kind == tools.TaskKindSubagent && row.ParentTaskID == rootID {
+cmd/wisp/subagent_carrier_197_test.go:219:			kids = append(kids, row.TaskID)
+cmd/wisp/subagent_carrier_197_test.go:283:		if sect.Rows[i-1].TaskID > sect.Rows[i].TaskID {
+cmd/wisp/subagent_carrier_197_test.go:286:				sect.Rows[i-1].TaskID, sect.Rows[i].TaskID)
+cmd/wisp/subagent_carrier_197_test.go:294:	if child.ParentTaskID != rootID {
+cmd/wisp/subagent_carrier_197_test.go:295:		t.Errorf("parentTaskId = %q, want the root this run ran (%q)", child.ParentTaskID, rootID)
+cmd/wisp/subagent_carrier_197_test.go:381:			child.TaskID, child.Status, sect.InFlightSlots)
+cmd/wisp/subagent_carrier_197_test.go:409:		if row.TaskID == taskID {
+cmd/wisp/subagent_carrier_197_test.go:579:			t.Errorf("row %s's page carries the root's prompt", row.TaskID)
+cmd/wisp/subagent_carrier_197_test.go:584:				row.TaskID, row.StreamTruncated, row.StreamElidedRunes, row.StreamDropped, live)
+cmd/wisp/subagent_selfapproval_197_test.go:41://     bridge in the child's own identity (TaskID == the roster's subagent row) -
+cmd/wisp/subagent_selfapproval_197_test.go:116:			TaskID: taskID, CorrelationID: corrID,
+cmd/wisp/subagent_selfapproval_197_test.go:138:			if c.TaskID == taskID && c.Level == "L2" {
+cmd/wisp/task_scope_close_151_test.go:39:		TaskID: task, CorrelationID: task, CallID: "call-" + task,
+cmd/wisp/ticket224_assembly_test.go:109:				TaskID: task, CorrelationID: corr, CallID: "v1",
+cmd/wisp/ticket224_assembly_test.go:345:		TaskID: "t224r2-read", CorrelationID: corr, CallID: "call-" + corr,

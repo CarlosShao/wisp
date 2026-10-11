@@ -1,0 +1,73 @@
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:274:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:848:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:852:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/151/bridge.head.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/151/bridge.head.go:659:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/151/bridge.head.go:663:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/151-accept/bridge.shipped.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/151-accept/bridge.shipped.go:672:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/151-accept/bridge.shipped.go:676:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:701:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:705:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:701:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:705:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:700:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:704:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:701:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:705:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:700:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:704:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:701:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:705:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:701:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:705:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/mut/bridge.canary.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/mut/bridge.canary.go:697:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/mut/bridge.canary.go:701:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/mut/bridge.noopentask.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/mut/bridge.noopentask.go:696:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/mut/bridge.noopentask.go:700:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:701:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:705:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:700:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:704:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:743:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:747:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:712:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:716:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/175/r2/bak1-bridge.go:272:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/175/r2/bak1-bridge.go:770:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/175/r2/bak1-bridge.go:774:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:274:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:848:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:852:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:274:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:846:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:850:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:274:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:848:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:852:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:274:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:841:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:845:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:274:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:847:// assessorFor returns the assessor whose R4 input is bound to this task's
+./.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:851:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
+./cmd/wisp/panel_assets.go:60:		// assessorFor): a bare assessor plus the C25 engine bound to one scope.
+./cmd/wisp/panel_assets.go:227:// assessorFor). Returns nil when no source was declared, which is the caller's
+./cmd/wisp/panel_assets_143_test.go:7:// assessorFor), so a demo machine and a real machine judged by different rules.
+./internal/risk/assessor.go:30:// New and assessorFor; cmd/wisp/panel_assets.go for the C25 detector); where an
+./internal/tools/bridge.go:297:	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+./internal/tools/bridge.go:920:// assessorFor returns the assessor whose R4 input is bound to this task's
+./internal/tools/bridge.go:924:func (b *Bridge) assessorFor(taskID string) *risk.RiskAssessor {
