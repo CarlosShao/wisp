@@ -1,0 +1,1 @@
+298-v1 起手锚件：锚 27059960／两枚目标件 porcelain 0 行／tasklist 0-0／共享索引 20 枚＝编排者暂存件⛔动／工作树 gofmt=1 枚（models.go 假枚）／gofumpt.exe 全路径在场
