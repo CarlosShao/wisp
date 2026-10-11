@@ -1,0 +1,6 @@
+== CreateJobObject sites outside internal/proc (want 0) ==
+rc=1
+== all CreateJobObject sites ==
+internal/proc/jobscope_windows.go:72:	h, err := windows.CreateJobObject(nil, nil)
+internal/proc/jobscope_windows.go:74:		return nil, fmt.Errorf("proc: CreateJobObject: %w", err)
+rc=0

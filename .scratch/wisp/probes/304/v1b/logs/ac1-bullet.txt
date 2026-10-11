@@ -1,0 +1,15 @@
+== 27f7b197 ticket-file stat (expect 1 add / 0 del) ==
+ .../wisp/issues/304-external-killed-test-binaries-orphan-mockllm-exe.md  | 1 +
+ 1 file changed, 1 insertion(+)
+rc=0
+== checkbox lines now ==
+22:- [x] **`AC#0` 只读普查（这一格⛔ 任何产码�
+26:- [ ] **`AC#1` 落地形（只在 `AC#0` 交出代价、�
+27:- [ ] **`AC#2` 反恒真那一格**：交付含**成对�
+28:- [ ] **`AC#3` 门禁与越界**：`sh scripts/d22scan.sh
+29:- [ ] **`AC#4` 起手闸门名册的具名更正**（无�
+30:- [ ] **`AC#4b` 终态锚那一侧的同一条尺（★�
+48:- [2026-10-11 15:3x] agent=`304-a1` did=票 304 `AC#0` �
+49:- [2026-10-11 17:0x] agent=`编排者`（翻勾＋裁形�
+50:- [2026-10-11 18:2x] agent=`304-r1`（**实现者**，⛔
+rc=0
