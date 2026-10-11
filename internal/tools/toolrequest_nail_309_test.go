@@ -11,9 +11,12 @@ package tools
 //	(1) 射程：roots 从 cmd＋internal 扩到 cmd＋internal＋tools＋scripts；排除支从
 //	    strings.Contains(rel,"internal/agent/") 换成"合计 == 1 ＋具名那枚在 loop.go"。
 //	(2) matcher：旧形只认 *ast.CompositeLit 且 Type 是 agent.ToolRequest 那枚 SelectorExpr，
-//	    于是另外两形今天绿（309-v1 实测各 rc=0＝假阴性）。现在认三形：字面量（限定名＋同包裸名）／
+//	    于是另外两形今天绿（309-v1 实测各 rc=0＝假阴性）。309-r2 认三形：字面量（限定名＋同包裸名）／
 //	    可解析到 agent.ToolRequest 的 var 声明（声明＋逐字段赋值那一形，没有复合字面量）／
 //	    同文件类型别名指向同一限定名之后再写字面量。
+//	    309-r3 再接三形（`new`／`make` 那枚 built-in 调用形、与定义型的那枚转换），现在共认**六形**，
+//	    每形在 controls 里有双向控制码、在盘上各有一发"加一枚即红／拿掉即绿"（逐枚 shape 名与
+//	    读数＝下面那段射程登记，红句逐字＝.scratch/wisp/probes/309/r3/20-teeth.md）。
 //
 // roots 那两把尺（现量 HEAD 202ed4a5，2026-10-11 14:3x +08；R359-1 读数在
 // .scratch/wisp/probes/309/r2/logs/roots-rulers.log）：
@@ -49,17 +52,31 @@ package tools
 //   骗过一次，读出"非测试 1 枚"的假数；读数 R359-6 两把口径并排）。⇒ 结论照旧（生产构造点
 //   1 枚），但那句"带尺重述"要按这两把口径读，⛔ 只抄一个数。
 //
-// ★这把尺**仍⛔ 是全覆盖**。下面这些写法今天抓不住，具名列出，⛔ 抄成"全覆盖"：
-//   · 别名再套一层落到**别的包**（pkg q 里 type Y = agent.ToolRequest，第三方写 q.Y{...}）＝漏；
+// ★这把尺**仍⛔ 是全覆盖**。
+//
+//   309-r3 接进射程的三形（各一发"往树里加一枚真构造点⇒这枚钉红"＋各一发"把那枚拿掉⇒同一枚绿"，
+//   台件＝.scratch/wisp/probes/309/r3/logs/rig-shapes.txt，逐字红句＝同目录 20-teeth.md）：
+//     · new(agent.ToolRequest)（含同包裸名 new(ToolRequest) 与别名 new(T)）＝ shape=new-of-tool-request
+//     · make([]agent.ToolRequest, n) 与 make([]…, 0) 那枚长度写法＝ shape=make-slice-of-tool-request
+//     · 定义型 type X agent.ToolRequest（⛔ 别名）之后再写 agent.ToolRequest(x) 那枚转换
+//       ＝ shape=conversion-to-tool-request
+//
+//   下面这些写法仍抓不住，逐枚具名，⛔ 抄成"全覆盖"：
+//   · 别名再套一层落到**别的包**（pkg q 里 type Y = agent.ToolRequest，第三方写 q.Y{...}）＝漏
+//     （实测绿读数＝RIG-6，.scratch/wisp/probes/309/r2/logs/nail-rig-6-crosspkg-alias.log，rc=0）；
 //   · 函数体内声明的别名（本 matcher 只读文件级 type 声明）＝漏；
 //   · 改名 import（import ag "…/internal/agent" 后 ag.ToolRequest{...}）与 dot-import ＝漏；
-//   · new(agent.ToolRequest)／make([]agent.ToolRequest, n)／反射或解码构造（json.Unmarshal 进结构体）＝漏；
-//   · 定义型 type X agent.ToolRequest（⛔ 别名）再 agent.ToolRequest(x) 那枚转换＝漏；
+//   · ★反射或解码构造（json.Unmarshal 进结构体／reflect.New 造值）＝漏，而且**没有静态尺抓得住**
+//     ⇒ 这是真实残余（票 309「编排者复跑＋裁定」§1 末行与台账 A851 §2 同一条），处置＝留在名册里，
+//     ⛔ 由任何一程宣布它被覆盖；要不要为它另立一枚运行时闸门归编排者摆（⛔ 重开 AC#0 的形 Ⓑ）；
 //   · 省了类型的嵌套元素 []agent.ToolRequest{{TaskID: ""}} 的内层 {...}＝漏（外层那枚是 ArrayType，
 //     同样⛔ 计）⇒ 这一形实测两向都计 0，见 .scratch/wisp/probes/309/r2/logs/nail-rig-5-elided.log；
 //   · 裸名那一支按 **package 子句**放行⛔ 按目录放行 ⇒ 别处真有一枚叫 agent 的包时，它自己的
 //     ToolRequest{} 会进分子（今天尺＝grep -rl '^package agent$' cmd internal tools scripts
 //     全部落在 internal/agent/ 内，读数 R359-2）。
+//   · ★309-r3 自陈新增一枚：转换那一支是**句法**判定（Fun 解析得到 agent.ToolRequest 且实参一枚），
+//     所以一枚恰好同名、同包、又只吃一枚实参的**函数**调用也会被计进分子；区分类型与函数要引
+//     go/types ⇒ 按末句口径留在名册里，⛔ 装成类型级判定。
 //   ⇒ 判据是"恒真形必须响"，⛔ 类型级完美（那要引 go/types，本票⛔ 装那个复杂度）。
 //
 // "加一枚即红"的六发 Rig（⛔ 一次跑完，每发当场还原 bridge.go，cmp＋sha256 留证；脚本与读数
@@ -111,8 +128,10 @@ func toolRequestNamesIn309(file *ast.File) map[string]bool {
 	}
 	// Aliases may chain within one file, so resolve to a fixpoint. Only `type X = T`
 	// (ts.Assign is a valid position) is an alias; `type X agent.ToolRequest` creates a
-	// NEW type that reaches agent.ToolRequest only through a conversion, and that shape is
-	// named in the head comment as a residual blind spot rather than silently counted.
+	// NEW type, so the type itself never appears in this name set - what reaches
+	// agent.ToolRequest from it is the conversion `agent.ToolRequest(x)`, and 309-r3
+	// counts THAT (callShape309), while an alias defined in ANOTHER package stays a named
+	// blind spot in the head comment.
 	for changed := true; changed; {
 		changed = false
 		for _, decl := range file.Decls {
@@ -165,12 +184,50 @@ func literalShape309(expr ast.Expr, pkgIsAgent bool) string {
 	}
 }
 
-// findToolRequestPoints309 returns the construction points in one parsed file. Two shapes
-// count: a composite literal whose type denotes agent.ToolRequest, and a var declaration
-// that gives a variable that type with NO initializer - the "var req agent.ToolRequest"
-// followed by "req.TaskID = ”" shape, which creates a zero-valued struct (empty TaskID
-// included) without ever writing a literal. `var req = agent.ToolRequest{...}` is counted
-// once, by its literal, so this number means "construction points", not "syntax nodes".
+// callShape309 labels the three CALL-shaped construction forms 309-r3 added to the range,
+// and reports false for every other call so the walk over a real tree stays quiet. These
+// are syntactic tests on go/ast only (no go/types): new and make are recognised by the
+// built-in's own name in function position, the conversion by a Fun that resolves to
+// agent.ToolRequest through this file's name set plus exactly one argument. The head
+// comment names what that buys and what it costs: a same-named one-argument FUNCTION would
+// be counted as a conversion, and reflection or json decoding into the struct is invisible
+// to any static ruler at all.
+func callShape309(call *ast.CallExpr, names map[string]bool) (string, bool) {
+	// Conversion form: agent.ToolRequest(x), T(x) for an in-file alias, or the bare
+	// ToolRequest(x) inside package agent. This is how the DEFINED type shape
+	// (type X agent.ToolRequest, which is not an alias) reaches a real value of the type.
+	if len(call.Args) == 1 && denotesToolRequest309(call.Fun, names) {
+		return "conversion-to-tool-request", true
+	}
+	fn, ok := call.Fun.(*ast.Ident)
+	if !ok || len(call.Args) == 0 {
+		return "", false
+	}
+	switch fn.Name {
+	case "new":
+		if denotesToolRequest309(call.Args[0], names) {
+			return "new-of-tool-request", true
+		}
+	case "make":
+		// A slice TYPE (Len == nil) whose element denotes agent.ToolRequest. The length
+		// argument is not read, so make(..., 0) and make(..., n) are the same shape.
+		if arr, isArr := call.Args[0].(*ast.ArrayType); isArr && arr.Len == nil &&
+			denotesToolRequest309(arr.Elt, names) {
+			return "make-slice-of-tool-request", true
+		}
+	}
+	return "", false
+}
+
+// findToolRequestPoints309 returns the construction points in one parsed file. Six shapes
+// count (three since 309-r2, three more since 309-r3): a composite literal whose type
+// denotes agent.ToolRequest; a var declaration that gives a variable that type with NO
+// initializer - the "var req agent.ToolRequest" followed by "req.TaskID = ”" shape, which
+// creates a zero-valued struct (empty TaskID included) without ever writing a literal; an
+// alias then a literal; new(agent.ToolRequest); make([]agent.ToolRequest, n); and the
+// conversion agent.ToolRequest(x). `var req = agent.ToolRequest{...}` is counted once, by
+// its literal, so this number means "construction points", not "syntax nodes". The shapes
+// this still misses are listed in the head comment, by name.
 func findToolRequestPoints309(fset *token.FileSet, file *ast.File) []nail309Point {
 	names := toolRequestNamesIn309(file)
 	pkgIsAgent := file.Name != nil && file.Name.Name == "agent"
@@ -204,6 +261,17 @@ func findToolRequestPoints309(fset *token.FileSet, file *ast.File) []nail309Poin
 					})
 				}
 			}
+		case *ast.CallExpr:
+			shape, ok := callShape309(n, names)
+			if !ok {
+				return true
+			}
+			pos := fset.Position(n.Pos())
+			out = append(out, nail309Point{
+				file:  pos.Filename,
+				line:  pos.Line,
+				shape: shape,
+			})
 		}
 		return true
 	})
@@ -355,6 +423,45 @@ func Test309ToolRequestProductionConstructionNail(t *testing.T) {
 		{"no double count: var initialised by a literal", 1, "package p\n" +
 			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
 			"var rig = agent.ToolRequest{TaskID: \"\"}\n"},
+		{"shape 4 new of the qualified type", 1, "package p\n" +
+			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+			"func f() { _ = new(agent.ToolRequest) }\n"},
+		{"shape 4b new through a same-package bare name", 1, "package agent\n" +
+			"func f() { _ = new(ToolRequest) }\n"},
+		{"shape 4c new through an in-file alias", 1, "package p\n" +
+			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+			"type T = agent.ToolRequest\n" +
+			"func f() { _ = new(T) }\n"},
+		{"shape 5 make of a slice of the qualified type", 1, "package p\n" +
+			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+			"func f(n int) { _ = make([]agent.ToolRequest, n) }\n"},
+		{"shape 5b make with an explicit zero length", 1, "package p\n" +
+			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+			"func f() { _ = make([]agent.ToolRequest, 0) }\n"},
+		{"shape 6 defined type then conversion back", 1, "package p\n" +
+			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+			"type X agent.ToolRequest\n" +
+			"func f(x X) { _ = agent.ToolRequest(x) }\n"},
+		{"no double count: var initialised by new", 1, "package p\n" +
+			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+			"var rig = new(agent.ToolRequest)\n"},
+		{"guard: new of an unrelated type", 0, "package p\n" +
+			"type Other struct{ ID string }\n" +
+			"func f() { _ = new(Other) }\n"},
+		{"guard: make of a foreign same-named type in a NON-agent package", 0, "package p\n" +
+			"type ToolRequest struct{ TaskID string }\n" +
+			"func f(n int) { _ = make([]ToolRequest, n) }\n"},
+		{"guard: a slice of an unrelated element type", 0, "package p\n" +
+			"func f(n int) { _ = make([]string, n) }\n"},
+		// The two entries below are the REGISTER, not a pass: they pin that the shapes the
+		// head comment still declares missed really do count 0 today, so the comment cannot
+		// quietly drift into claiming coverage it does not have.
+		{"named blind spot stays 0: elided nested element", 0, "package p\n" +
+			"import \"github.com/CarlosShao/wisp/internal/agent\"\n" +
+			"func f() { _ = []agent.ToolRequest{{TaskID: \"\"}} }\n"},
+		{"named blind spot stays 0: cross-package alias use", 0, "package p\n" +
+			"type Y struct{ TaskID string }\n" +
+			"func f() { _ = Y{TaskID: \"\"} }\n"},
 	}
 	for _, c := range controls {
 		fset := token.NewFileSet()
