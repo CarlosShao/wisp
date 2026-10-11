@@ -1,6 +1,7 @@
 over-reach ruler: git show --name-only --format= <each of my commits, individually>; NO range ruler
-commit=b9f37892 files=1 foreign=0
-commit=e875f00f files=10 foreign=0
-commit=bd123485 files=56 foreign=0
-commit=c7887eca files=11 foreign=11
-note: the last row lists the FINAL commit made in this same call chain (90-final.md + this log + the ticket bullet); rows b9f37892/e875f00f/bd123485 are the three that were already in HEAD when this file was regenerated.
+self-report: the first version of this file listed one FOREIGN commit (c7887eca, another leg's, 11 files) in its last row, because the last commit's hash was captured before that commit existed. Corrected below; the foreign commit was read, never touched.
+commit=b9f37892 files=1 foreign=0 subject=304-r1: anchor readings at leg start (HEAD 3974ab4d, dev, index clean)
+commit=e875f00f files=10 foreign=0 subject=304-r1: land job-object guard on both mockllm spawn points (AC#1, shape A)
+commit=bd123485 files=56 foreign=0 subject=304-r1: AC#2 paired readings and AC#3 gate artefacts for the job-object landing
+commit=27f7b197 files=3 foreign=0 subject=304-r1: final readings page, over-reach roster and one append-only ticket bullet
+wrote-this-file-at=715f63cb
