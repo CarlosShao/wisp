@@ -198,6 +198,10 @@ func TestSyncFixtureFallbackAndMatch(t *testing.T) {
 func TestSyncFallbackNotDisarmableByWeakRoot(t *testing.T) {
 	home, _, _ := sandbox(t)
 	root := filepath.Join(home, "OneDrive")
+	// A tree that is neither under the fake profile nor under the injected
+	// root. It lives one level up (sandbox's home is <base>\profile), so no
+	// membership test and no under-profile fallback may reach it.
+	outside := filepath.Join(filepath.Dir(home), "not-a-sync-tree", "notes.md")
 	if err := os.MkdirAll(root, 0o755); err != nil { // confirmed roots are real dirs
 		t.Fatal(err)
 	}
@@ -216,6 +220,15 @@ func TestSyncFallbackNotDisarmableByWeakRoot(t *testing.T) {
 		if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
 			t.Errorf("source %q: writes under the injected root must be sync", src)
 		}
+		// NEGATIVE NAIL (ticket 307 AC#2 debt, handed to ticket 72 乙组): the
+		// three assertions above are all of the shape "this must be Sync:true",
+		// so a detector that answered Sync:true for every write on the volume
+		// passed all three. The fallback is a BOUNDED net under the profile,
+		// not a blanket deny -- pinning the miss is what makes "not disarmable"
+		// a claim about a rule instead of a claim about a constant.
+		if st := p.IsSyncPath(outside); st.Sync {
+			t.Errorf("source %q: %q is outside the profile and outside the injected root, must NOT be sync: %+v", src, outside, st)
+		}
 	}
 }
 
@@ -231,6 +244,14 @@ func TestSyncUnverifiedRootKeepsFallback(t *testing.T) {
 	}
 	if !p.IsSyncPath(filepath.Join(home, "Documents", "x.md")).Sync {
 		t.Fatal("suspect fallback must stay armed")
+	}
+	// NEGATIVE NAIL (ticket 307 AC#2 debt, ticket 72 乙组): armed is not the
+	// same word as everywhere. A target outside the profile and outside the
+	// unverified root must still read Sync:false, or this case would also be
+	// satisfied by a detector that flags every write it is asked about -- the
+	// shape that keeps both assertions above green.
+	if st := p.IsSyncPath(filepath.Join(filepath.Dir(home), "not-a-sync-tree", "x.md")); st.Sync {
+		t.Fatalf("a write outside the profile and outside the unverified root must not be flagged: %+v", st)
 	}
 }
 
