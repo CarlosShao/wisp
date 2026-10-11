@@ -1,0 +1,76 @@
+# 派单 · `304-v1`＝票 304 的**非实现者验收腿**（裁 `AC#1`／`AC#2`／`AC#3`／`AC#4`／`AC#4b` 五格）
+
+编排者 2026-10-11 18:5x 写。**这份⛔ 产码、⛔ 改测试断言**——你是裁判，做代码的人已经做完了。
+**锚（我写这份派单之前现跑）**：`git rev-parse --short HEAD`＝**`04f2ecbc`**，`git diff --cached --name-only`＝**0 行**，
+`git status --porcelain -- internal cmd tools scripts`＝**0 行**。⚠ **这枚号会动**（另两枚腿可能已交件、我可能落账）⇒
+**你起手必须自己再跑一次并把自己的号当锚**，每张表表头写"出自哪一号"；两号不同就具名重跑并把两次读数都留下。
+
+## 0. 你是谁、谁在等你
+
+- 立票＝`AGENTS.md §0.3`／`SPEC-12 §4.3`：**裁决者⛔ 实现者**。本票的实现腿有两枚：`304-a1`（只读普查）与 `304-r1`（甲形落地），
+  **另有一格是我（编排者）自己代笔的**＝`AC#4`/`AC#4b`（编队闸门名册，件 `.scratch/wisp/probes/orch/gate-roster-304.md`）⇒ 那两格**更要你来裁**，⛔ 我盖章。
+- 判据原文＝`.scratch/wisp/issues/304-external-killed-test-binaries-orphan-mockllm-exe.md`（六格框：现在 `AC#0` 已勾，其余五格未勾）。
+  **先看原文再动尺**：若我这单里任何一句与票面 AC 原文冲突，**以票面为准**，并把它**具名写进你的回报**（这条是老规矩，我被自己的转述绊倒过两次）。
+- 你的产出＝**一张裁决表**（落 `docs/evidence/s1/`，AGENTS §1.5 规定的位置）＋**本票末尾一条 append-only Progress bullet** ＋自己的 `probes/304/v1/**`。
+  ⛔ 翻任何框、⛔ 动 `Status:`、⛔ 把文件改名 `-done`、⛔ push（翻框由我执行，且只在我复跑过你的读数之后）。
+
+## 1. 要裁的五格，以及每格我要求的攻击面
+
+- **`AC#1`（甲形落地）**：两枚 spawn 点是否**同批**改到（`internal/llm/adaptertest/mockllm.go:85` 与 `internal/llm/openaichat/mockllm_integ_test.go:87`，行号自己现量）；
+  复用是不是真的落在既有 `internal/proc` 的 `JobScope`（`KILL_ON_JOB_CLOSE`／`StartInJob`／`Close`）而⛔ 新造第二套 job 包装；
+  **五条硬约束逐条核**：⛔ 放宽断言／⛔ 动 `internal/llm/testdata/golden/**` 一字节／⛔ 改 mockllm 响应语义／⛔ 碰 `Q-57`·票 156·`internal/observe` 语义／⛔ 动档·tag·ledger·`ci.yml`。
+  尺要新：`git show --name-only --format=` **逐笔**量 `b9f37892`→`04f2ecbc` 里 `304-r1` 的每一笔越界（⛔ 用区间尺一把扫，区间尺会把别人的 commit 算进来——这是我今天自己踩过的形）。
+- **`AC#2`（反恒真那一格，本票最关键）**：腿交的是成对读数（撤掉新手段 ⇒ 该形测到残留；还原 ⇒ 测不到）。
+  **你要自己复打，至少两发**：① 正向＝HEAD 状态下跑"坏世界"，同批必须带上**坏世界真的被造出来**的那半句证据（`test timed out after` 命中数／孩子 PID 在父还活着时存在）；
+  ② 反向＝在**仓外成对导出树**里把守卫摘掉再跑，看残留回不回得来。⛔ 在共享工作树里改产码做突变。⛔ 拿"跑完名册是空的"当绿——我今天就有两发被判成"没起世界＝读数作废"（见 `probes/orch/20261011/verify-304r1-309r3.md` §1 那两行 ⛔ 标）。
+- **`AC#3`（门禁与越界）**：`sh scripts/d22scan.sh` rc=0；`sh scripts/check-path-length-budget.sh --with-self-test` rc=0（现量基线＝over-budget **57** ⇄ 名册 **57**，worst full path 228）；
+  `bash scripts/portable-tests.sh --scope=census` 的 totals 行**逐字未变**（基线 `packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`）；
+  格式名册**两把并排**（工作树 ⇄ `git show HEAD:<文件>` blob，写清射程目录）；**每把门禁件自落一行 `rc=N`**。
+  ★**我现量到的一件事请你处理**：`304-r1/logs/` 里有 **3 枚 0 字节件**（`build-1.txt`、`vet-1.txt`、`vet-reverse.txt`）。
+  按编队定式那是"那格没交"，⛔ 我替你判——**你查同一格里是否另有带 `rc=` 的件**，有就写"读数在别处、这几枚是空壳"，没有就把 `AC#3` 判成**附条件成立**并具名缺哪把尺。
+- **`AC#4`／`AC#4b`（★这两格是我代笔的，请尤其按原文核）**：正典＝`.scratch/wisp/probes/orch/gate-roster-304.md`；
+  用它当场跑的一发＝`probes/orch/20261011/logs/orch-A85x-gate-live.txt`（四枚名册各 0 枚＋`tasklist_rc=0`＋`gate_rc=0`）。
+  要裁的三件：① 名册该数的进程名定得够不够（我加了 `mockllm.exe` 与 `wisp.test.exe`——后者是我加的，票面只说"由 `AC#0` ① 的名册决定"，⚠ 你可以判我越界）；
+  ② "数到≠归我"那三问有没有写死、并且**父 PID 那一问被我降级成旁证**（理由＝PID 复用现量：票面 `:10` 说查不到的 `11724` 现在是 `RuntimeBroker.exe`）；
+  ③ `AC#4b` 要的"每枚非零计数指到一棵树，指不到写归属不明"是否真被 `AC#4b` 原文覆盖。
+  ⚠ 我的一个**自作主张请裁**：票面列的五枚模板拷贝（`2026-10-09-live-window-runsheet.md:45`、`296-ac3-runsheet.md:7`、`a793-append.md:7`、`handover-40as.md:4`、`handover-40at.md:4`）我**一字没改**，
+  理由是它们是"当时说过什么"的历史记录，回头改＝造假；我把正典另立了一份。这算满足 `AC#4` 还是绕开 `AC#4`，**归你裁**。
+- **附送必答（⛔ 由腿自答，是我要的答案形状）**：`Q-304-r1-2`（`go build -o` 那枚孩子⛔ 在任何 job 里）与
+  `Q-304-a1-B`／`Q-304-r1-4`（托管 runner 上 job 的射程／`StartInJob` 若 `Assign` 失败会 `t.Fatalf`＝**把"静默泄漏"换成"整枚用例硬红"**那一形）。
+  两问都要"能不能本机证／证不了就具名标〔需真机或需 CI 色〕"，⛔ 用读码推冒充读数。
+
+## 2. 台面与资源（今天的有效约束）
+
+- 你是**当下唯一被授权跑 Go 编译面**的腿；另两枚写腿（`304-r1`/`309-r3`）**已交件**。若你起手发现 `internal cmd tools scripts` 工作树⛔ 干净，先具名报回再决定。
+- **⛔ 别在共享工作树里做任何突变**；突变一律用仓外成对导出树，模板（★六件套缺一不可，今天实测）：
+  `T=$(mktemp -d /d/tmp/wisp-304v1-XXXXXX) && git archive HEAD go.mod go.sum internal cmd tools scripts | tar -x -C "$T"`，
+  然后**先数非空**（`find "$T" -name '*.go' | wc -l`，今天读数＝682）再动手；**每棵树各自 `mktemp -d`，⛔ 复用**。
+- 杀进程：只停本腿自己起的、且必须先做归属取证（**命令行里的具名路径 ＞ 枚数 ＞ 时间相邻**；父 PID 只当旁证，理由见上）。
+  ⛔ 动 `msedgewebview2.exe` 那 18 枚（别家三棵树）。我的现成尺：`probes/orch/20261011/mockllm-procs.ps1`（`-Quick`／`-Names`／`-CleanIds` 三档，`-CleanIds` 内含三条守卫）。
+- **⛔ 任何 `git push`**。
+
+## 3. 编队硬规矩（每条都是事故换来的，逐条自证）
+
+1. **第 3～5 次调用之内**把起手锚件写出来并 commit（`probes/304/v1/00-anchor.md`）；之后**每约 8 次调用补一笔**。⛔ 攒到最后一起交——前面死掉的腿全死在"还没落笔"。
+2. ⛔ 把上百行原文读进对话：每一把尺的**原始输出先落文件**，回报里只允许 `wc -l`／`head -3`／`cut -c1-160` 级摘要。危险活点名：读 CI 日志、`grep -rn` 全仓、整包 `-v` 测试输出、MB 级文件。
+3. `git add` **与** `git commit` **两处都要带显式 pathspec**（`git commit -F <msg> -- <path>`），⛔ `git add -A`／`git add .`／整目录扫——**你看不到别人的 staged 区**，即使当下只有你一枚腿。
+4. ⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout 别的分支。
+5. 写面＝三件套：① 自家 `.scratch/wisp/probes/304/v1/**`；② `docs/evidence/s1/**`（裁决表，AGENTS §1.5 明文规定的落点，⛔ 当越界）；③ 本票末尾**一条** Progress bullet（numstat **1 加／0 删**、⛔ 碰框、⛔ 碰 `Status:`）。⛔ 别的任何路径一字节。
+6. 证据件一律 **`.md`／`.txt`**；⛔ `.out`（根 `.gitignore` 第 8 行是全仓 `*.out`，会被静默跳过）；⛔ 在 `probes/**` 下新建 `.go`（那会挪别家 `gofumpt`／d22scan 的 tracked 分母）；件名**短**（相对 ≤121、末段 ≤100、全路径 ≤165）且**⛔ 带 `§`**。临时件只建⛔ 删。
+7. **任何 rc／名册读数要自己落一行 `rc=N`**；⛔ 0 字节件当读数（这条今天又抓到 7 枚，见 §1）。
+8. 数必带**三件套**口径：哪把尺＋射程目录＋量的是工作树还是 blob 还是仓外树；名册枚数要写"整族还是抽样"；两两名册作差前先剥掉耗时字段（`(0.12s)`）。
+9. ⛔ 引用我这单或票面里的任何**枚数**前先重跑——票面自己就写着"⛔ 引用前先重跑"。
+10. **凡一把尺报"0 命中"，同批把它的 stderr 并排落进名册**（`grep_stderr="…"` 那一列）。今天编排者自己造过一枚**假 0**：
+    把裸 `(` 放进 ERE ⇒ `grep` 当场报错，而那句 `2>/dev/null` 把报错吞干净 ⇒ 盘上留下一枚看着像读数的 0。报 0 旁边还要站着**分母**。
+11. 目标调用数 **≤60**；到 45 次先把"判不动那节＋起手锚"写满并 commit，到 70 次无条件 commit 当前件。
+
+## 4. 交付形状（我要的东西，按这个顺序排，最贵的取数放最前）
+
+1. `00-anchor.md`（起手锚＋工作树名册＋`staged=`）——第 3～5 次调用内。
+2. `10-self-ran-shapes.md`：§1 `AC#2` 那**至少两发**你自己的读数（正向 HEAD＋反向仓外摘守卫），每发同批带"坏世界被造出来"的证据行。
+3. `20-cells.md`：五格逐格判语（成立／附条件成立／不成立），每格带凭据件路径＋尺名＋射程＋台面。⛔ 复述腿的原句当判据。
+4. `docs/evidence/s1/<按 s1 现有命名风格起一个短名>.md`：裁决表本体。
+5. 票尾一条 bullet（正文归你，我只在核对后落勾）。
+6. 加分项（被掐了也不可惜）：`Q-304-r1-2`／`-4` 那两问的本机可证部分。
+
+**回报给我**：不超过 400 字——五格各一句、你自己跑过的每一发是哪一发、以及**具名欠账清单**。别把结论写重（"修好了／从此不会再有残留"这种话只有在你的读数撑得住时才许写）。

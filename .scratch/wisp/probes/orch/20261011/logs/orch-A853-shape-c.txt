@@ -1,0 +1,11 @@
+=== shape (c) via one-process watcher @ 2026-10-11 18:51:28 HEAD=04f2ecbc
+before: count_total=0 count_repo_golden=0 pids=[]
+c2-spawnpoint2 parent=17396 started
+c2-spawnpoint2 world=NOT-CONSTRUCTED child=none parent_alive_now=0  �?读数作废
+rc_c2=2
+c1-spawnpoint1 parent=29904 started
+c1-spawnpoint1 world=CONSTRUCTED child=15836 (confirmed alive while parent ran)
+c1-spawnpoint1 external_kill_issued
+c1-spawnpoint1 child_after_kill=GONE=reaped repo_golden_now=0
+rc_c1=0
+after: count_total=0 count_repo_golden=0 pids=[]

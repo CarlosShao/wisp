@@ -1,0 +1,41 @@
+
+## A853｜2026-10-11 19:0x｜收 `309-r3`（matcher 加宽＋`bridge.go` 那句改实话，五笔 `f4920906`→`715f63cb`）＋**我自己打的三发（含我自抓的一枚假红）**＋派 `309-v3`
+
+### 1. 腿的写面（逐笔现量）
+
+`f4920906` 锚（纯 probes）／`df8d517d`＝`internal/tools/toolrequest_nail_309_test.go`（**120 加 13 删**）／
+`a1f84d39`＝`internal/tools/bridge.go`（**14 加 4 删**）／`6fed247e`＝58 枚证据件／`715f63cb`＝`90-final`＋门禁＋票面一条 bullet（腿自报 `1 0`、⛔ 碰框）。
+★我自己那把"只动注释"的尺（⛔ 抄腿的数）＝`git show a1f84d39 -- internal/tools/bridge.go` 里**非注释改动行数＝0**
+（尺＝`grep -E '^[-+][^-+]'` 再剔掉 `^[-+][[:space:]]*//`）。生产语义那两条也核了：守卫那一行与 `WithTaintDetector(...)` 实参**1⇄1**（腿报的，我⛔ 逐字复，归 `309-v3`）。
+框现状我自己数＝**4 勾／2 未勾**（尺＝`grep -cE '^- \[[ x]\]'`），未勾的是 `AC#2`、`AC#3`＝正是派给 `309-v3` 的两格。
+
+### 2. ★我在仓外成对导出树打的三发（正控制式齐），以及**我第一发是坏的**
+
+- ⚠⚠ **假红那一发（记我，⛔ 记腿）**：我按老模板 `git archive HEAD go.mod go.sum internal cmd tools` 建树（**缺 `scripts`**），
+  那枚钉的四个 root 里有 `..\..\scripts` ⇒ 尺打出逐字 `toolrequest_nail_309_test.go:369: walk ..\..\scripts: GetFileAttributesEx ..\..\scripts: The system cannot find the file specified.` 并 **FAIL**。
+  **这枚 FAIL 长得像"牙响了"，其实是台面缺东西**；作废件留在 `/d/tmp/wisp-orch-20261011/t309-3LjYoE`（⛔ 删，当反面样）。
+  ⇒ **模板再补一件**：钉／普查类仪器的 root 若是相对路径，导出树**必须六件套齐**（`go.mod go.sum` ＋ `internal cmd tools scripts` 四 root）；
+  并且**任何"红"要先落一句"这枚红的原文是哪一行"**，凡红句含 `walk`／`GetFileAttributesEx`／`build failed`／`no test files` ⇒ 判台面故障、⛔ 计入牙。
+- 补正后的同一棵树（`go_files=682`、`scripts_dir=yes`）三发：**① pristine＝`ok`（绿控）**；
+  **② 注入** `internal/agent/z309probe.go`（包内**裸名** `new(ToolRequest)`，正是 r2 那版⛔ 认得的形）＝**FAIL**，
+  红句逐字（`cut -c1-300`）：`枚数钉响：… 数到 2 枚 …名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/agent/z309probe.go:4(new-of-tool-request)。分母=296 枚非测试源（每 root=cmd=40 internal=232 scripts=11 tools=13）`
+  ⇒ **不只响了，还把新增那枚按形状名报出来**＝`309-r3` 那条加宽是真的；**③ 把注入件 `mv` 成 `.off`（⛔ 删）再跑＝`ok`**。三发同树同台面。
+- 共享工作树全程 0 脏行（我自己那把 `git status --porcelain -- internal cmd tools scripts` 在派发前后各一发＝0）。
+- matcher 的形状标签我自己数＝**7 枚**（尺＝`grep -oE 'return "[a-z0-9-]+"' … | sort -u`）。
+  ⚠ 但**注释那句"seven named shape labels"与代码那 7 枚⛔ 是同一组**（代码那组里含一枚 `literal`，注释那组列的是 `var-decl-no-initializer`）⇒ 这一问原样交给 `309-v3`，⛔ 我替他判。
+- ★**门禁件 0 字节 4 枚**：`309/r3/logs/fail-new.txt`、`final-gofmt.txt`、`fmt-nail.txt`、`st.txt`。
+  其中 **`fail-new.txt` 是"该红那一发"的日志却是空的**＝最该有字的那一枚没字。派单里已写死：`309-v3` 自己重打，⛔ 拿空文件当红。
+
+### 3. 我与前一枚验收腿的分歧（现状陈述，⛔ 追认⛔ 推翻）
+
+`309-v2` 判 `AC#2` 成立／`AC#3` 附条件成立，**我没照它翻勾**（理由已写在 `A851`）：那两格原文是全称式许诺，而这枚钉的头注释自认有一张盲册（反射／`json.Unmarshal` 那两支静态尺看不见）。
+`309-r3` 之后又长出第二形分歧：**加宽了射程（`new`／`make`／转换形进了范围），但盲册还在**，而 `bridge.go` 那句已经改成说实话。
+⇒ 本轮把两格一次性交给**第三枚非实现者腿** `309-v3`，并在派单里写死三种允许的判语（成立／附条件成立带具名条件／不成立）＋**若原文全称式⛔ 可能被判定，就照实写"原文与盲册冲突"并给两行建议文本，但⛔ 他自己改票面**（改票面归我、且要入台账）。
+派单存档＝`probes/orch/20261011/txt/309v3-dispatch.txt`（发出前 grep 自证 `为准=1 add-A-ban=1 commit-F=1 out=1 rcN=1 push=1 evidence-s1=2 tree6=1 grep_stderr=1`）。
+
+### 4. 欠账归位（⛔ 混进腿账）
+
+`Q-309-r3-1..6`（腿自报，含反射／解码那一支的真残余、转换形⛔ 台件、三枚盲形无盘上绿发、名册区间不纯）＝**归 `309-v3` 逐条判**；
+我自己新记两枚：**`Q-309-orch-A`**＝转换形／`make` 两形我只打了 `new`（三对里我只证了一对，⛔ 说我"复了 AC#2"）；
+**`Q-309-orch-B`**＝`bridge.go` 里 `WithTaintDetector` 实参枚数那把尺我没独立复（只复了"非注释改动＝0 行"）。
+在飞＝`304-v1` ∥ `309-v3`（都⛔ 产码、都⛔ 翻框）；⛔ 零 push、⛔ `git add -A`、⛔ `--amend`；本笔记＝纯追加。

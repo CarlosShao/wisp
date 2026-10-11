@@ -1,0 +1,36 @@
+=== postfix shape (b)+(c) @ 2026-10-11 18:46:51  HEAD=04f2ecbc
+before: count_total=0 count_repo_golden=0 pids=[]
+--- (b)#1 go test ./internal/llm/ -count=1 -timeout 8s
+(b)#1 rc=1 max_child_seen_while_in_flight=0 pids=[]
+(b)#1 panic_fired=1  (>=1 ＝坏世界真被造出来)
+(b)#1 after: count_total=0 count_repo_golden=0 pids=[]
+--- (b)#2 go test ./internal/llm/openaichat/ -run '^TestMockllmGoldenByteIdenticalEvents$' -timeout 3s
+(b)#2 rc=1 max_child_seen_while_in_flight=1 pids=[33708]
+(b)#2 panic_fired=1
+(b)#2 after: count_total=0 count_repo_golden=0 pids=[]
+--- (c) build test binaries
+(c) build_rc openaichat=0 internal_llm=0
+(c)#2 parent_test_pid=18192 child_seen= after_polls=30  (⛔ child ⇒ 这一发没起世界，读数作废)
+Stop-Process : Cannot find a process with the process identifier 18192.
+At line:1 char:1
++ Stop-Process -Id 18192 -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (18192:Int32) [Stop-Process], ProcessCommandException
+    + FullyQualifiedErrorId : NoProcessFoundForGivenId,Microsoft.PowerShell.Commands.StopProcessCommand
+ 
+(c)#2 child_state_after_external_kill=
+(c)#2 after: count_total=0 count_repo_golden=0 pids=[]
+(c)#1 parent_test_pid=18351 child_seen= after_polls=40
+Stop-Process : Cannot find a process with the process identifier 18351.
+At line:1 char:1
++ Stop-Process -Id 18351 -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (18351:Int32) [Stop-Process], ProcessCommandException
+    + FullyQualifiedErrorId : NoProcessFoundForGivenId,Microsoft.PowerShell.Commands.StopProcessCommand
+ 
+(c)#1 child_state_after_external_kill=
+(c)#1 after: count_total=0 count_repo_golden=0 pids=[]
+final: count_total=0 count_repo_golden=0 pids=[]
+count_total=0 count_repo_golden=0 temp_test_dirs=43
+repo_golden_pids=[]
+script_rc=0

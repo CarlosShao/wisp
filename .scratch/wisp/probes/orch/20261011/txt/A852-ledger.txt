@@ -1,0 +1,47 @@
+
+## A852｜2026-10-11 18:5x｜收 `304-r1`（甲形落地，五笔 `b9f37892`→`04f2ecbc`）＋**我自己复量四发（两发算数、两发作废）**＋裁"派验收腿"⇒ `304-v1` 在飞（锚 `04f2ecbc`）
+
+### 1. 腿交了什么（逐笔现量越界，⛔ 区间尺——区间尺会把别人的 commit 算进来，今天我自己踩过）
+
+尺＝`git show --name-only --format= <号>` 逐笔，过滤掉自家 `probes/304/r1/` 后剩下的就是它的写面：
+
+| 笔 | 写面（去掉自家 probes 后） |
+|---|---|
+| `b9f37892` | 空（纯锚件） |
+| `e875f00f` | `internal/llm/adaptertest/childjob_other.go`（新 24 行）／`childjob_windows.go`（新 54 行）／`mockllm.go`（**7 加 1 删**）／`openaichat/mockllm_integ_test.go`（**8 加 1 删**） |
+| `bd123485` | 空（读数＋门禁件） |
+| `27f7b197` | 票面 `.scratch/wisp/issues/304-…md` 一条 bullet（腿自报 numstat `1 0`；我没替他核这条，框⛔ 碰＝我另尺量） |
+| `04f2ecbc` | 空（改正自己的越界名册） |
+
+边界复量（同一把尺，`git diff --name-only b9f37892~1..04f2ecbc` 会串进我的与别家腿的笔，故按路径分别问）：
+`internal/llm/testdata/golden`＝**0 枚**；`internal/observe`＋`cmd/wisp`＝**0 枚**；`docs/**`＋`scripts/**`＋`.github/**`＋`AGENTS.md`＝**0 枚**。
+⇒ 票面 `AC#1` 那五条硬约束里，**我能本机证的三条成立**（⛔ 动 golden／⛔ 碰产码子进程路／⛔ 动档·CI），另两条（⛔ 放宽断言／⛔ 改 mockllm 响应语义）归 `304-v1`。
+工作树现状：`git status --porcelain -- internal cmd tools scripts`＝**0 行**、`staged=0`。
+
+落地的形状（读码级，〔读码〕标签）：两枚 spawn 点各改成调一枚共用的 `adaptertest.StartChildGuarded(t, cmd)`；
+Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`CreateJobObject(nil,nil)`＋`KILL_ON_JOB_CLOSE`）→ `StartInJob`（起＋塞，塞失败当场 `Kill`＋`Wait`）→ `t.Cleanup(job.Close)`；
+`!windows` 那一支＝普通 `cmd.Start()`，注释自己写明"这一支⛔ 保护任何东西"。⇒ **⛔ 新造第二套 job 包装**，甲形要的"复用既有仪器"这条做到了。
+
+### 2. ★我自己跑的四发（同一台面、同批带"坏世界真被造出来"的那半句）
+
+尺＝`probes/orch/20261011/mockllm-procs.ps1 -Quick`（归属＝命令行含本仓 golden 目录）＋`postfix-shapes.sh`＋`shape-c-orch.ps1`。
+件＝`logs/orch-A853-postfix-shapes.txt`、`logs/orch-A853-shape-c.txt`、正文汇总＝`probes/orch/20261011/verify-304r1-309r3.md`。
+
+- **算数**：(b) `-timeout 3s` 打 spawn point **#2** ⇒ 同批 `max_child_seen_while_in_flight=1 pids=[33708]` ＋ `panic_fired=1` ⇒ 之后 **0 枚**。
+- **算数**：(c) 外力 `Stop-Process` 打 spawn point **#1** ⇒ `world=CONSTRUCTED child=15836`（父活着时确认存在）→ 杀父 → `child_after_kill=GONE=reaped`、`repo_golden_now=0`（`rc_c1=0`）。
+- **作废（我在件里就预置了这条判据，⛔ 事后找补）**：(b) 整包 8s 帽那一发 `max_child_seen=0`＝孩子还没起来就 panic ⇒ 这一发⛔ 证明任何事；
+  (c) 打 #2 那一发 `world=NOT-CONSTRUCTED`＝我用 bash↔PS 往返轮询（一发 0.5–1 s）错过了 1–2 s 的窗口 ⇒ `rc_c2=2`。
+- **改前基线是同一台面上我今天更早取的**：同形 (b) 留过 **pid 7816**、同形 (c) 留过 **pid 8980**（件 `orch-A850-shape-b2.txt`／`orch-A850-shapes.txt`）⇒ "修前留、修后不留"在**两枚 spawn 点各有一发真读数**，但**⛔ 对称四格都齐**（#1 缺 (b)、#2 缺 (c)）＝**`Q-304-orch-A`，记我名下**。
+- `msedgewebview2.exe` 全程 **18 枚⛔ 动过**。
+
+### 3. 三件新学／三笔欠账
+
+- ★**新事实（读码级，后果很重）**：`StartInJob` 在 `Assign` 失败那一支是 `Kill`＋`Wait`＋**返回 error**，而 `StartChildGuarded` 把 error 交给调用方的 `t.Fatalf`
+  ⇒ **甲形把"静默泄漏"换成了"整枚用例硬红"**。本机今天不会撞上（两发都绿），**托管 runner 上会不会撞上⛔ 得靠 CI 色**＝`Q-304-a1-B`／`Q-304-r1-4` 仍欠，归推送批次。
+- ★**甲形只端进程，⛔ 端目录**：`%TEMP%` 的 `Test*` 目录今天序列＝票面立案 **21** → 我 17:3x **22** → 17:5x **23** → 17:55 **29** → 19:0x **43**（同一把尺 `Get-ChildItem -Directory -like 'Test*'`）。
+  这一族**票 304 从没裁要修**⇒ 不是"没修好"，是**没在射程里**；要不要另立一票归我与 `304-v1` 判＝`Q-304-orch-B`。
+- `go build -o` 那枚孩子（`mockllm.go:65` 先编译再起 exe）**⛔ 在任何 job 里**＝腿自己具名的 `Q-304-r1-2`；我没复，⛔ 替他判。
+- ★**门禁件里有 0 字节**：`304/r1/logs/` 三枚（`build-1.txt`、`vet-1.txt`、`vet-reverse.txt`，`HEAD` blob 同样 0 字节）。
+  同目录 51 枚里 14 枚带 `rc=` ⇒ 可能"读数在别处"，也可能"那格没交"——**这条我⛔ 替他判，原样交给 `304-v1`**。
+- 派单存档＝`probes/orch/20261011/txt/304v1-dispatch.txt`（发出去前 grep 自证：`为准=1 add-A-ban=1 commit-F=1 out=1 rcN=2 push=1 evidence-s1=3 tree6=1 grep_stderr=1`）。
+- ⛔ 翻任何框（`AC#1`–`AC#4b` 五格现在还是未勾）、⛔ 动 `Status:`、⛔ push；本笔记＝纯追加。

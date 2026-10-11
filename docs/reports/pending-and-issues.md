@@ -16581,3 +16581,91 @@ origin/dev 的 tip 在 10-06 停在 `cc315261`，今天第一推一次带了 **7
 3. **我把腿的一句引用读成另一种尺**（"`:92-104` 是用例"）差点判它引错；现读那句判据在 `:99`、用例在 `:106` ⇒ 定式：**判对方引错之前先读原文那几行**。
 4. **第一发 (b) 形整枚假读数**（帽 14s、用例 4.112s 就完了＝panic 从未触发）——由我埋的 marker 行抓住，具名作废重打。⇒ 已写进 `A850` §2#3 与记忆（"坏世界必现形"那一类夹具，件里必同行落"坏世界真被造出来了"的证据行；**"0"⛔ 是读数**）。
 
+
+## A852｜2026-10-11 18:5x｜收 `304-r1`（甲形落地，五笔 `b9f37892`→`04f2ecbc`）＋**我自己复量四发（两发算数、两发作废）**＋裁"派验收腿"⇒ `304-v1` 在飞（锚 `04f2ecbc`）
+
+### 1. 腿交了什么（逐笔现量越界，⛔ 区间尺——区间尺会把别人的 commit 算进来，今天我自己踩过）
+
+尺＝`git show --name-only --format= <号>` 逐笔，过滤掉自家 `probes/304/r1/` 后剩下的就是它的写面：
+
+| 笔 | 写面（去掉自家 probes 后） |
+|---|---|
+| `b9f37892` | 空（纯锚件） |
+| `e875f00f` | `internal/llm/adaptertest/childjob_other.go`（新 24 行）／`childjob_windows.go`（新 54 行）／`mockllm.go`（**7 加 1 删**）／`openaichat/mockllm_integ_test.go`（**8 加 1 删**） |
+| `bd123485` | 空（读数＋门禁件） |
+| `27f7b197` | 票面 `.scratch/wisp/issues/304-…md` 一条 bullet（腿自报 numstat `1 0`；我没替他核这条，框⛔ 碰＝我另尺量） |
+| `04f2ecbc` | 空（改正自己的越界名册） |
+
+边界复量（同一把尺，`git diff --name-only b9f37892~1..04f2ecbc` 会串进我的与别家腿的笔，故按路径分别问）：
+`internal/llm/testdata/golden`＝**0 枚**；`internal/observe`＋`cmd/wisp`＝**0 枚**；`docs/**`＋`scripts/**`＋`.github/**`＋`AGENTS.md`＝**0 枚**。
+⇒ 票面 `AC#1` 那五条硬约束里，**我能本机证的三条成立**（⛔ 动 golden／⛔ 碰产码子进程路／⛔ 动档·CI），另两条（⛔ 放宽断言／⛔ 改 mockllm 响应语义）归 `304-v1`。
+工作树现状：`git status --porcelain -- internal cmd tools scripts`＝**0 行**、`staged=0`。
+
+落地的形状（读码级，〔读码〕标签）：两枚 spawn 点各改成调一枚共用的 `adaptertest.StartChildGuarded(t, cmd)`；
+Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`CreateJobObject(nil,nil)`＋`KILL_ON_JOB_CLOSE`）→ `StartInJob`（起＋塞，塞失败当场 `Kill`＋`Wait`）→ `t.Cleanup(job.Close)`；
+`!windows` 那一支＝普通 `cmd.Start()`，注释自己写明"这一支⛔ 保护任何东西"。⇒ **⛔ 新造第二套 job 包装**，甲形要的"复用既有仪器"这条做到了。
+
+### 2. ★我自己跑的四发（同一台面、同批带"坏世界真被造出来"的那半句）
+
+尺＝`probes/orch/20261011/mockllm-procs.ps1 -Quick`（归属＝命令行含本仓 golden 目录）＋`postfix-shapes.sh`＋`shape-c-orch.ps1`。
+件＝`logs/orch-A853-postfix-shapes.txt`、`logs/orch-A853-shape-c.txt`、正文汇总＝`probes/orch/20261011/verify-304r1-309r3.md`。
+
+- **算数**：(b) `-timeout 3s` 打 spawn point **#2** ⇒ 同批 `max_child_seen_while_in_flight=1 pids=[33708]` ＋ `panic_fired=1` ⇒ 之后 **0 枚**。
+- **算数**：(c) 外力 `Stop-Process` 打 spawn point **#1** ⇒ `world=CONSTRUCTED child=15836`（父活着时确认存在）→ 杀父 → `child_after_kill=GONE=reaped`、`repo_golden_now=0`（`rc_c1=0`）。
+- **作废（我在件里就预置了这条判据，⛔ 事后找补）**：(b) 整包 8s 帽那一发 `max_child_seen=0`＝孩子还没起来就 panic ⇒ 这一发⛔ 证明任何事；
+  (c) 打 #2 那一发 `world=NOT-CONSTRUCTED`＝我用 bash↔PS 往返轮询（一发 0.5–1 s）错过了 1–2 s 的窗口 ⇒ `rc_c2=2`。
+- **改前基线是同一台面上我今天更早取的**：同形 (b) 留过 **pid 7816**、同形 (c) 留过 **pid 8980**（件 `orch-A850-shape-b2.txt`／`orch-A850-shapes.txt`）⇒ "修前留、修后不留"在**两枚 spawn 点各有一发真读数**，但**⛔ 对称四格都齐**（#1 缺 (b)、#2 缺 (c)）＝**`Q-304-orch-A`，记我名下**。
+- `msedgewebview2.exe` 全程 **18 枚⛔ 动过**。
+
+### 3. 三件新学／三笔欠账
+
+- ★**新事实（读码级，后果很重）**：`StartInJob` 在 `Assign` 失败那一支是 `Kill`＋`Wait`＋**返回 error**，而 `StartChildGuarded` 把 error 交给调用方的 `t.Fatalf`
+  ⇒ **甲形把"静默泄漏"换成了"整枚用例硬红"**。本机今天不会撞上（两发都绿），**托管 runner 上会不会撞上⛔ 得靠 CI 色**＝`Q-304-a1-B`／`Q-304-r1-4` 仍欠，归推送批次。
+- ★**甲形只端进程，⛔ 端目录**：`%TEMP%` 的 `Test*` 目录今天序列＝票面立案 **21** → 我 17:3x **22** → 17:5x **23** → 17:55 **29** → 19:0x **43**（同一把尺 `Get-ChildItem -Directory -like 'Test*'`）。
+  这一族**票 304 从没裁要修**⇒ 不是"没修好"，是**没在射程里**；要不要另立一票归我与 `304-v1` 判＝`Q-304-orch-B`。
+- `go build -o` 那枚孩子（`mockllm.go:65` 先编译再起 exe）**⛔ 在任何 job 里**＝腿自己具名的 `Q-304-r1-2`；我没复，⛔ 替他判。
+- ★**门禁件里有 0 字节**：`304/r1/logs/` 三枚（`build-1.txt`、`vet-1.txt`、`vet-reverse.txt`，`HEAD` blob 同样 0 字节）。
+  同目录 51 枚里 14 枚带 `rc=` ⇒ 可能"读数在别处"，也可能"那格没交"——**这条我⛔ 替他判，原样交给 `304-v1`**。
+- 派单存档＝`probes/orch/20261011/txt/304v1-dispatch.txt`（发出去前 grep 自证：`为准=1 add-A-ban=1 commit-F=1 out=1 rcN=2 push=1 evidence-s1=3 tree6=1 grep_stderr=1`）。
+- ⛔ 翻任何框（`AC#1`–`AC#4b` 五格现在还是未勾）、⛔ 动 `Status:`、⛔ push；本笔记＝纯追加。
+
+## A853｜2026-10-11 19:0x｜收 `309-r3`（matcher 加宽＋`bridge.go` 那句改实话，五笔 `f4920906`→`715f63cb`）＋**我自己打的三发（含我自抓的一枚假红）**＋派 `309-v3`
+
+### 1. 腿的写面（逐笔现量）
+
+`f4920906` 锚（纯 probes）／`df8d517d`＝`internal/tools/toolrequest_nail_309_test.go`（**120 加 13 删**）／
+`a1f84d39`＝`internal/tools/bridge.go`（**14 加 4 删**）／`6fed247e`＝58 枚证据件／`715f63cb`＝`90-final`＋门禁＋票面一条 bullet（腿自报 `1 0`、⛔ 碰框）。
+★我自己那把"只动注释"的尺（⛔ 抄腿的数）＝`git show a1f84d39 -- internal/tools/bridge.go` 里**非注释改动行数＝0**
+（尺＝`grep -E '^[-+][^-+]'` 再剔掉 `^[-+][[:space:]]*//`）。生产语义那两条也核了：守卫那一行与 `WithTaintDetector(...)` 实参**1⇄1**（腿报的，我⛔ 逐字复，归 `309-v3`）。
+框现状我自己数＝**4 勾／2 未勾**（尺＝`grep -cE '^- \[[ x]\]'`），未勾的是 `AC#2`、`AC#3`＝正是派给 `309-v3` 的两格。
+
+### 2. ★我在仓外成对导出树打的三发（正控制式齐），以及**我第一发是坏的**
+
+- ⚠⚠ **假红那一发（记我，⛔ 记腿）**：我按老模板 `git archive HEAD go.mod go.sum internal cmd tools` 建树（**缺 `scripts`**），
+  那枚钉的四个 root 里有 `..\..\scripts` ⇒ 尺打出逐字 `toolrequest_nail_309_test.go:369: walk ..\..\scripts: GetFileAttributesEx ..\..\scripts: The system cannot find the file specified.` 并 **FAIL**。
+  **这枚 FAIL 长得像"牙响了"，其实是台面缺东西**；作废件留在 `/d/tmp/wisp-orch-20261011/t309-3LjYoE`（⛔ 删，当反面样）。
+  ⇒ **模板再补一件**：钉／普查类仪器的 root 若是相对路径，导出树**必须六件套齐**（`go.mod go.sum` ＋ `internal cmd tools scripts` 四 root）；
+  并且**任何"红"要先落一句"这枚红的原文是哪一行"**，凡红句含 `walk`／`GetFileAttributesEx`／`build failed`／`no test files` ⇒ 判台面故障、⛔ 计入牙。
+- 补正后的同一棵树（`go_files=682`、`scripts_dir=yes`）三发：**① pristine＝`ok`（绿控）**；
+  **② 注入** `internal/agent/z309probe.go`（包内**裸名** `new(ToolRequest)`，正是 r2 那版⛔ 认得的形）＝**FAIL**，
+  红句逐字（`cut -c1-300`）：`枚数钉响：… 数到 2 枚 …名册=internal/agent/loop.go:675(same-package-bare-literal) | internal/agent/z309probe.go:4(new-of-tool-request)。分母=296 枚非测试源（每 root=cmd=40 internal=232 scripts=11 tools=13）`
+  ⇒ **不只响了，还把新增那枚按形状名报出来**＝`309-r3` 那条加宽是真的；**③ 把注入件 `mv` 成 `.off`（⛔ 删）再跑＝`ok`**。三发同树同台面。
+- 共享工作树全程 0 脏行（我自己那把 `git status --porcelain -- internal cmd tools scripts` 在派发前后各一发＝0）。
+- matcher 的形状标签我自己数＝**7 枚**（尺＝`grep -oE 'return "[a-z0-9-]+"' … | sort -u`）。
+  ⚠ 但**注释那句"seven named shape labels"与代码那 7 枚⛔ 是同一组**（代码那组里含一枚 `literal`，注释那组列的是 `var-decl-no-initializer`）⇒ 这一问原样交给 `309-v3`，⛔ 我替他判。
+- ★**门禁件 0 字节 4 枚**：`309/r3/logs/fail-new.txt`、`final-gofmt.txt`、`fmt-nail.txt`、`st.txt`。
+  其中 **`fail-new.txt` 是"该红那一发"的日志却是空的**＝最该有字的那一枚没字。派单里已写死：`309-v3` 自己重打，⛔ 拿空文件当红。
+
+### 3. 我与前一枚验收腿的分歧（现状陈述，⛔ 追认⛔ 推翻）
+
+`309-v2` 判 `AC#2` 成立／`AC#3` 附条件成立，**我没照它翻勾**（理由已写在 `A851`）：那两格原文是全称式许诺，而这枚钉的头注释自认有一张盲册（反射／`json.Unmarshal` 那两支静态尺看不见）。
+`309-r3` 之后又长出第二形分歧：**加宽了射程（`new`／`make`／转换形进了范围），但盲册还在**，而 `bridge.go` 那句已经改成说实话。
+⇒ 本轮把两格一次性交给**第三枚非实现者腿** `309-v3`，并在派单里写死三种允许的判语（成立／附条件成立带具名条件／不成立）＋**若原文全称式⛔ 可能被判定，就照实写"原文与盲册冲突"并给两行建议文本，但⛔ 他自己改票面**（改票面归我、且要入台账）。
+派单存档＝`probes/orch/20261011/txt/309v3-dispatch.txt`（发出前 grep 自证 `为准=1 add-A-ban=1 commit-F=1 out=1 rcN=1 push=1 evidence-s1=2 tree6=1 grep_stderr=1`）。
+
+### 4. 欠账归位（⛔ 混进腿账）
+
+`Q-309-r3-1..6`（腿自报，含反射／解码那一支的真残余、转换形⛔ 台件、三枚盲形无盘上绿发、名册区间不纯）＝**归 `309-v3` 逐条判**；
+我自己新记两枚：**`Q-309-orch-A`**＝转换形／`make` 两形我只打了 `new`（三对里我只证了一对，⛔ 说我"复了 AC#2"）；
+**`Q-309-orch-B`**＝`bridge.go` 里 `WithTaintDetector` 实参枚数那把尺我没独立复（只复了"非注释改动＝0 行"）。
+在飞＝`304-v1` ∥ `309-v3`（都⛔ 产码、都⛔ 翻框）；⛔ 零 push、⛔ `git add -A`、⛔ `--amend`；本笔记＝纯追加。
