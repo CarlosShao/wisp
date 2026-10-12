@@ -1,0 +1,91 @@
+now=2026-10-12 13:57:42 +08
+## 尺① 逐笔名册：git show --name-only --format= 5552567c
+.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md
+.scratch/wisp/probes/311/a1/00-anchor.md
+.scratch/wisp/probes/311/a1/10-acl-before-after.md
+.scratch/wisp/probes/311/a1/20-red-sentence.md
+.scratch/wisp/probes/311/a1/30-cleanup-failure.md
+.scratch/wisp/probes/311/a1/90-final.md
+.scratch/wisp/probes/311/a1/logs/00-runids.txt
+.scratch/wisp/probes/311/a1/logs/05-gate-start.txt
+.scratch/wisp/probes/311/a1/logs/10-acl-inherit-baseline.txt
+.scratch/wisp/probes/311/a1/logs/11-acl-before-fresh-dir-both-roots.txt
+.scratch/wisp/probes/311/a1/logs/12-plant2-probe.txt
+.scratch/wisp/probes/311/a1/logs/13-acl-after-plant2-both-roots.txt
+.scratch/wisp/probes/311/a1/logs/14-residue-deep-list-both-roots.txt
+.scratch/wisp/probes/311/a1/logs/15-residue-roster-both-roots.txt
+.scratch/wisp/probes/311/a1/logs/16-acl-after-residue-tree-B.txt
+.scratch/wisp/probes/311/a1/logs/17-residue-census-two-rulers.txt
+.scratch/wisp/probes/311/a1/logs/18-acl-after-residue-leaves-B.txt
+.scratch/wisp/probes/311/a1/logs/19-plant-probe-both-roots.txt
+.scratch/wisp/probes/311/a1/logs/19b-acl-after-plantprobe-both-roots.txt
+.scratch/wisp/probes/311/a1/logs/19c-acl-after-guests-leaf-B.txt
+.scratch/wisp/probes/311/a1/logs/20-gotest-rootA-localappdata.txt
+.scratch/wisp/probes/311/a1/logs/21-gotest-rootB-dtmp.txt
+.scratch/wisp/probes/311/a1/logs/30-gate-end.txt
+.scratch/wisp/probes/311/a1/logs/31-residue-final-both-roots.txt
+.scratch/wisp/probes/311/a1/logs/40-length-gate.txt
+.scratch/wisp/probes/311/a1/logs/41-my-path-lengths.txt
+.scratch/wisp/probes/311/a1/logs/42-write-surface-before.txt
+.scratch/wisp/probes/311/a1/ps1/deep-list.ps1
+.scratch/wisp/probes/311/a1/ps1/dump-acl.ps1
+.scratch/wisp/probes/311/a1/ps1/gate-roster.ps1
+.scratch/wisp/probes/311/a1/ps1/plant-probe.ps1
+.scratch/wisp/probes/311/a1/ps1/residue-roster.ps1
+names_count=32
+越界枚数(名册里不属于本腿两件套的)=0
+## 尺② numstat：票面那枚必须 1 add / 0 del
+1	0	.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md
+## 尺③ stat 末行
+ .scratch/wisp/probes/311/a1/ps1/residue-roster.ps1 |   18 +
+ 32 files changed, 5171 insertions(+)
+## 尺④ commit 后台面：邻居在飞件仍⛔ 被本腿碰（应仍逐字是 M）
+ M .gitignore
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+ M go.mod
+ M scripts/winsec-tests.sh
+ M scripts/wisp-cli-tests.sh
+ M tools/d22scan/runtests.sh
+?? design/doubao/01-ball-states.jpg
+?? design/doubao/demo/lib/
+?? design/doubao/demo/rb-files.js
+?? design/doubao/demo/rb-plugins.js
+?? design/doubao/demo/rb-review.js
+?? design/doubao/demo/rb-terminal.js
+?? design/doubao/demo/rightbar.js
+?? design/doubao/demo/screens/home.js
+?? design/doubao/demo/screenshots/
+?? design/doubao/demo/sidebar.js
+?? design/old/
+## 尺⑤ 本腿两件套 commit 后应⛔ 再有未提交件（logs/43 除外，它就是本笔的第二 commit）
+?? .scratch/wisp/probes/311/a1/logs/43-commit-names.txt
+## 尺⑥ HEAD 与父
+5552567c 2026-10-12 13:57:29 +0800 ticket 311 (311-a1): AC#0 read-only attribution (which SID differs) + the AC#3 verdic
+af5179dd 2026-10-12 13:29:58 +0800 派 311-a1（票 311 AC#0 只读归因）＋编排者 13:2x 名册现量：59 枚残�
+names_rc=0
+## 尺⑦ commit 之后的名册与残留现读（件 32-/33-）
+TEMP_top_TestRoster_count=59 (起手 59 ⇄ 交件前 59 ⇄ commit 后 59；本腿零新增、零动)
+testexe_family_count=0 正控 svchost=84 / *.exe=344 (同行落，⛔ 空输出冒充 0 枚)
+rootA_dir_count_excluding_root=5 (全为本腿探针，测试残留=0)
+rootB_dir_count_excluding_root=20 (测试残留 15 枚，其中锁死叶 6 枚)
+rootA_enumerate_denied=1 (plant2-runner) rootB_enumerate_denied=7 (6 枚测试锁死叶 + plant2-runner)
+本笔第二 commit 只带 logs/32-…txt / logs/33-…txt / logs/43-…txt 三枚读数件，⛔ 新结论、⛔ 碰票面、⛔ push
