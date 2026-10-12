@@ -119,6 +119,77 @@ if [ -z "$pkgpath" ]; then
     exit 2
 fi
 
+# ---- TICKET 311 AC#1 (shape B, the orchestrator's ruling "B + C"; shape A was
+# refused): the VOLUME this run's test temp root sits on is part of this gate's
+# verdict, so a root that names a volume other than %LOCALAPPDATA%'s is REFUSED HERE,
+# on the exit code, instead of reaching the log as a gate that quietly changed colour.
+# Measured, not theorized (ticket 311 census, reproduced by leg 311-a1 and by the
+# orchestrator the same day): ONE unchanged internal/winsec tree reads
+# PASS=58 FAIL=0 rc=0 from a %LOCALAPPDATA% (C:) root and PASS=56 FAIL=2 rc=1 from a
+# D:/tmp root, and those two reds are Go's own t.TempDir cleanup failing
+# (testing.go:1617 "TempDir RemoveAll cleanup: ... Access is denied"), not an
+# assertion - which is why this is a refusal here rather than a fixture change there.
+# This block adds NO assertion, touches no threshold, golden or file under
+# internal/winsec, and none may be touched to make it green (ticket 311 forbidden
+# list; D22). Shape A is refused by that same reading: what moved between the two
+# shots was the cleanup, not the gate's judgement, so no fixture changes here.
+#
+# PLACEMENT IS LOAD-BEARING, AND MEASURED: the ticket-310 root block of this entry
+# runs BEFORE its guard chain (that is where the DEGRADED line comes from, measured
+# by the orchestrator at A862 and re-measured by this leg), so this guard sits AFTER
+# the whole guard chain above and BEFORE the delegated run below, and one trip reads,
+# in order: [310 DEGRADED/GOTMPDIR line] -> [311 GUARD line] -> [no test process at
+# all]. Ordering readings: .scratch/wisp/probes/311/r1/logs/23-order-degraded-then-guard.txt
+# and .scratch/wisp/probes/311/r1/logs/24-order-guard-after-guard1.txt.
+#
+# THREE SHAPES THIS MUST NOT BREAK, each with its own reading on the ticket:
+# WISP_TEST_GOTMP_ROOT unset (the factory default), a root on the SAME volume under a
+# different directory, and anything where `go env GOOS` is not windows or
+# %LOCALAPPDATA% is empty - that last branch is the one ticket 310 made LOUD, and this
+# guard stays silent there too (no line, no exit code). Everything else about this
+# branch is deliberately NOT that precedent: it fires on the exit code on purpose
+# (ruling B; revocation phrase "311 撤乙"). A value's volume is its drive letter, read
+# in both the Windows form (C:/x and C:\x) and the form this shell prints (/c/x); a
+# value neither form can judge (UNC, bare relative) prints an INCONCLUSIVE line and
+# leaves the exit code alone - undecided shape, registered as debt Q-311-r1-1. What
+# this guard cannot reach at all is a caller that skips these entries and runs
+# `go test` directly (leg 311-a1 did exactly that), which is why shape C stayed in
+# force beside it (.scratch/wisp/probes/orch/gate-roster-304.md section 1).
+if [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
+    wisp_311_volume_of() {
+        wisp_311_arg=${1//\\//}
+        case $wisp_311_arg in
+            [A-Za-z]:*) printf '%.1s' "$wisp_311_arg" | tr 'a-z' 'A-Z' ;;
+            /[A-Za-z]/*) printf '%.1s' "${wisp_311_arg#/}" | tr 'a-z' 'A-Z' ;;
+            *) printf '' ;;
+        esac
+    }
+    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+    wisp_311_ref_vol=$(wisp_311_volume_of "$wisp_311_ref_path")
+    wisp_311_cross=''
+    for wisp_311_probe in "GOTMPDIR=${GOTMPDIR:-}" "WISP_TEST_GOTMP_ROOT=${WISP_TEST_GOTMP_ROOT:-}"; do
+        wisp_311_name=${wisp_311_probe%%=*}
+        wisp_311_value=${wisp_311_probe#*=}
+        if [ -z "$wisp_311_value" ]; then
+            continue
+        fi
+        wisp_311_vol=$(wisp_311_volume_of "$wisp_311_value")
+        if [ -z "$wisp_311_vol" ] || [ -z "$wisp_311_ref_vol" ]; then
+            echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+            continue
+        fi
+        if [ "$wisp_311_vol" != "$wisp_311_ref_vol" ]; then
+            wisp_311_cross="$wisp_311_cross $wisp_311_name=$wisp_311_value(volume $wisp_311_vol)"
+        fi
+    done
+    if [ -n "$wisp_311_cross" ]; then
+        echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+        echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+        echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+        exit 2
+    fi
+fi
+
 echo "winsec-tests.sh: platform=$goos gate=internal/winsec scope=[${scope[*]}] package=$pkgpath"
 
 capture=$(mktemp 2>/dev/null || echo "$root/.winsec-tests.$$.log")

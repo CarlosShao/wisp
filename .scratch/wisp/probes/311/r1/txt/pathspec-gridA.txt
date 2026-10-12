@@ -1,0 +1,11 @@
+.scratch/wisp/probes/311/r1/10-entry-census.md
+.scratch/wisp/probes/311/r1/ps1/roster.ps1
+.scratch/wisp/probes/311/r1/logs/00-start-roster.txt
+.scratch/wisp/probes/311/r1/logs/01-entry-census.txt
+.scratch/wisp/probes/311/r1/logs/02-head-move.txt
+.scratch/wisp/probes/311/r1/logs/10-pre-build.txt
+.scratch/wisp/probes/311/r1/logs/11-pre-gate-d22-len.txt
+.scratch/wisp/probes/311/r1/logs/12-pre-census.txt
+.scratch/wisp/probes/311/r1/logs/13-pre-winsec-run1.txt
+.scratch/wisp/probes/311/r1/logs/14-pre-winsec-run2.txt
+.scratch/wisp/probes/311/r1/logs/15-pre-shape3.txt
