@@ -7,7 +7,10 @@
 |---|---|---|---|
 | 代码（三枚 shell） | `78782c20` | 3 | `scripts/winsec-tests.sh`／`scripts/wisp-cli-tests.sh`／`tools/d22scan/runtests.sh`＝**3 枚，名册外 0** |
 | 票面 bullet | `5ef679b5` | 1 | 票 310 一枚＝**1 枚**（`git show --numstat`＝1/0，纯追加） |
-| 证据件 `probes/310/r2/**` | 下一笔（含本 90） | 逐枚列（清单 `logs/commit-list-evidence.txt`） | 全在 `.scratch/wisp/probes/310/r2/**`；本笔自身越界读数随后一笔 `logs/40-postcommit-nameonly-evidence.txt` 具名（⛔ 自指） |
+| 证据件 `probes/310/r2/**` | `a2b5a8f4` | 124 | 全在 `.scratch/wisp/probes/310/r2/**`，名册外 **0** |
+| 逐笔越界读数（自指补笔） | `6709b0fc` | 2 | `logs/40-postcommit-nameonly-evidence.txt`＋`logs/commit-list-evidence2.txt`，名册外 **0** |
+
+★逐笔 `git show --name-only` 越界读数（⛔ 区间尺）＝`logs/40-postcommit-nameonly-evidence.txt`；总越界尺＝`git diff --name-only 27176c2c..6709b0fc -- .github internal cmd *_test.go thresholds.go allowlist.txt scripts/slo-check.ps1`＝**0 枚**（件 `logs/42-forbidden-audit.txt`），`'*.go'` 越界＝**0 枚**（件 `logs/42-gochg.txt`），别家未提交（`.gitignore`/`go.mod`/`design/**`）进我任何一笔＝**0 枚**。
 
 - 允许清单（派单 §4）＝`probes/310/r2/**` ＋票面 bullet ＋ `scripts/portable-tests.sh`／`scripts/winsec-tests.sh`／`scripts/wisp-cli-tests.sh`／`tools/d22scan/runtests.sh`。
 - ★`scripts/portable-tests.sh` 本腿 **0/0 未改**（它 r1 起就带 windows+空-LOCALAPPDATA 的 `else`，早已"说实话"，是这一形的参照；blob 未变），⛔ 越出允许清单、⛔ 为凑"改了四枚"去动它。
