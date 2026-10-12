@@ -96,6 +96,75 @@ if [ ! -f "$strict" ]; then
     exit 2
 fi
 
+# ---- TICKET 310 AC#1 (shape A-G): the test temp family gets a dedicated root.
+#
+# WHAT THIS BUYS, MEASURED. A test binary that dies without running its cleanup
+# leaves its `t.TempDir()` directory on disk: the census leg (310-a1 20-shapes.md)
+# and the orchestrator (probes/orch/20261012/logs/orch-310-recheck-b.txt) each
+# measured exactly one new directory per death, twice over, for the `go test
+# -timeout` panic and for an external TerminateProcess. On this host those
+# directories piled up at the top of %TEMP% (21 -> 44 in one day, 55 registered at
+# the time of this writing), which is why the fleet's starting gate now counts them
+# (probes/orch/gate-roster-304.md section 1). Redirecting the family moves WHERE the
+# residue lands; it does not collect it - ticket 310's own rule is that deleting a
+# directory is irreversible and needs a per-directory roster plus a non-implementer
+# review, so this step names the root and deletes nothing.
+#
+# WHY GOTMPDIR AND NOT TMP/TEMP. testing's makeTempDir calls
+# os.MkdirTemp(os.Getenv("GOTMPDIR"), pattern) (this host's GOROOT,
+# src/testing/testing.go:1613), so GOTMPDIR moves exactly the t.TempDir()/
+# os.CreateTemp family. os.TempDir() on Windows goes through Win32 GetTempPath and
+# does NOT read GOTMPDIR, so a test that reads os.TempDir() literally keeps its
+# answer. Redirecting TMP/TEMP instead would move those answers too - that is the
+# A-T variant ticket 310 ruled against (12 test files plus the live-window ones).
+#
+# WHY THE ROOT IS NOT UNDER %TEMP%. The census leg measured that shape and named
+# the trap: a root inside %TEMP% leaves the non-recursive
+# `Get-ChildItem $env:TEMP -Directory` roster reading "0 new" while the residue is
+# simply out of the ruler's reach. So the default root is a SIBLING of %TEMP% -
+# under %LOCALAPPDATA%, outside the OS temp dir - not a directory inside it.
+#
+# WHY %LOCALAPPDATA% AND NOT "THE REPO'S VOLUME", MEASURED TODAY. The first draft
+# of this step put the root on the repo's volume (`D:/tmp/...`) and the winsec tier
+# went 58 PASS / 0 FAIL to 56 PASS / 2 FAIL on this host:
+# TestGateJudgesThePrivateSetByResolvedSID (both sub-tests) and
+# TestSealNarrowsAndNamesThePrincipalItRemovedBySID judge the ACL set they seal,
+# and an inherited set from another volume is not the same set. The same scope run
+# against a %LOCALAPPDATA%-sibling root came back 58/0, identical to the unredirected
+# run. So the location of the root is NOT a free choice, and the value below is the
+# one that was measured to leave every colour alone.
+#
+# WHY WINDOWS ONLY. The ticket, the roster row and every measurement behind both
+# are about this host's %TEMP%. The ubuntu leg is left exactly as it is because
+# this leg cannot run CI to measure what a redirected temp root does to those
+# steps (registered as a debt on ticket 310, not silently assumed safe).
+if [ -z "${GOTMPDIR:-}" ]; then
+    if [ "$(go env GOOS)" = windows ]; then
+        if [ -n "${LOCALAPPDATA:-}" ]; then
+            gotmp_base=${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}
+            gotmp_run="$gotmp_base/portable-$(date +%Y%m%d-%H%M%S)-$$"
+            if mkdir -p "$gotmp_run" 2>/dev/null; then
+                export GOTMPDIR="$gotmp_run"
+                echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+                    "t.TempDir() family lands here. Nothing deletes it: ticket 310 requires a" \
+                    "per-directory roster plus a non-implementer review before any removal."
+            else
+                echo "portable-tests.sh: ticket 310 AC#1: DEGRADED - cannot create" \
+                    "$gotmp_run, so GOTMPDIR stays unset and a test binary that dies will" \
+                    "leave its temp dir in the OS temp root again. Not a silent fallback:" \
+                    "this line is the finding." >&2
+            fi
+        else
+            echo "portable-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so" \
+                "this step has no measured-safe root to build (a root on another volume turns" \
+                "the winsec seal cases red, see the note above). GOTMPDIR stays unset." >&2
+        fi
+    else
+        echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR left as-is on GOOS=$(go env GOOS)" \
+            "(the ticket's measurement surface is the Windows host's temp root)."
+    fi
+fi
+
 # The scopes CI runs, stated once, here - ci.yml names a scope, it does not carry
 # a package list. That move is ticket 111 AC#2's: a workflow line naming a package
 # is not evidence the package was tested, and the guard that makes deleting one
