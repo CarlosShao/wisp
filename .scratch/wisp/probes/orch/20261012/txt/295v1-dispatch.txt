@@ -32,3 +32,9 @@
 - ⛔ 删任何目录/文件（`%TEMP%` 顶层 59 枚在册残渣、两枚专用根里的运行目录一律不动）；临时件**只建不删**；证据件⛔ `.out`、⛔ `probes/**` 下⛔ `.go`、⛔ 件名带 `§`、⛔ 长名（相对 ≤121／末段 ≤100／全路径 ≤165，新建前跑长度门）。
 - git：只 commit ⛔ push；`git add` 与 `git commit` **两处都带显式 pathspec**；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内建 worktree。
 - 输出预算：≤ 6 枚件、每件 ≤ 200 行；判语在前、尺在中、件名在后。跑读数前 `tasklist` 现跑 `wisp.exe`／`balldebug.exe`＝0，`*.test.exe` 家族读数随行（归属靠命令行里的具名根路径＋父 PID，⛔ 把别腿的进程记成自己的残留）。
+
+## 5. 我（编排者）交给你之前自己已经跑完的，加三条更正（15:5x–16:0x）
+
+- ★**我这一发整包台面读数**（工作树 @`421469b7`，件＝`.scratch/wisp/probes/orch/20261012/logs/orch-295r1-cmdwisp-shot1.txt`）：逐字 `FAIL github.com/CarlosShao/wisp/cmd/wisp 391.536s` ⇄ `ok github.com/CarlosShao/wisp/internal/audio 16.379s`，`rc=1`；四数（含子测试那把尺）＝`RUN=456 PASS=450 FAIL=3 SKIP=2`；红名册**恰好三枚**、逐名 `TestAC4FocusReturnToPriorWindowGap33r5`／`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC14GoSideEvalPushReachesThePage`＝台账 `docs/reports/pending-and-issues.md:14768` 那族既有真窗红。⇒ **本格我不需要你重复这一发**；要你判的是第 1 节那三件（尤其 ⓔ-2 那句"其余 7 枚读点对变异不敏感"**从没被任何人跑过**）。
+- ⚠**我把第 1 节第 1 条写重了，具名收回一半**：我核过 `1c1d7df3` 那笔只动了 `cmd/wisp/resident_audio_windows.go` 一枚文件里的**注释高度**（`git show --name-only`＝1 枚文件、`git diff --numstat 0615c6c9..HEAD`＝10/10 净零），测试件的断言字节⛔ 动 ⇒ M1 的凭据⛔ 是"形状变了所以可疑"，而是**"变异台件当时用的是 `-run` 定向发、没交整包差集"**。⇒ 你要的那一发照旧跑（成本＝一次定向发＋一次整包作差），但判语⛔ 写成"腿作假"，写成"缺一把差集尺"。
+- ⚠**归属那把尺我自己用错过形**：`wisp.test.exe` 的**专用根名在 `ExecutablePath` 里、⛔ 在 `CommandLine` 里**（`GOTMPDIR` 是环境变量）；且 PowerShell 单条对象上 `.Count` 会打**空串**（看着像 0）。⇒ 你交进程名册时用 `@(Get-CimInstance …)` 再取 `.Count`，分母行⛔ 空白。件＝`ps1/attrib-test-exe.ps1`（我已改过，可直接抄）。
