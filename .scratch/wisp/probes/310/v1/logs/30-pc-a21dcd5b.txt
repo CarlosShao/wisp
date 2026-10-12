@@ -1,0 +1,5 @@
+.scratch/wisp/probes/310/r1/00-anchor.md
+.scratch/wisp/probes/310/r1/logs/00-gate-310r1.err
+.scratch/wisp/probes/310/r1/logs/00-gate-310r1.txt
+.scratch/wisp/probes/310/r1/logs/00-temp-roster-start.txt
+.scratch/wisp/probes/310/r1/logs/msg-310r1-anchor.txt

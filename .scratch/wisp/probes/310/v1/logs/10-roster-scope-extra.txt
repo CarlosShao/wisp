@@ -1,0 +1,10 @@
+.github/workflows/ci.yml:76:        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+.github/workflows/ci.yml:418:  # `grep -nE 'portable-tests|go test|internal/audio' scripts/slo-check.ps1`.
+.github/workflows/ci.yml:448:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+.github/workflows/ci.yml:455:        # and no threshold changed): it sat below a step that bare `go test` lets
+.github/workflows/ci.yml:465:        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+.github/workflows/ci.yml:717:        # runs `go env GOOS` and `go list` only, never `go test`, never a build, no
+.github/workflows/ci.yml:764:        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+.github/workflows/ci.yml:779:        # design) or a false green (bare `go test` prints `ok`) - which is the
+.github/workflows/ci.yml:784:        # `go test -list` and prints the row with its class and reason in this
+.github/workflows/ci.yml:802:        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`

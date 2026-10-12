@@ -1,0 +1,10 @@
+exact_name=wisp.exe rc=0 hit_lines=0 stdout_bytes=64 stderr_bytes=0 positive_control_svchost=83
+  name=wisp.exe empty above = 0 枚（hit_lines 由 grep -c 自证，stderr_bytes 同行，空输出不当 0）
+exact_name=balldebug.exe rc=0 hit_lines=0 stdout_bytes=64 stderr_bytes=0 positive_control_svchost=83
+  name=balldebug.exe empty above = 0 枚（hit_lines 由 grep -c 自证，stderr_bytes 同行，空输出不当 0）
+exact_name=mockllm.exe rc=0 hit_lines=0 stdout_bytes=64 stderr_bytes=0 positive_control_svchost=83
+  name=mockllm.exe empty above = 0 枚（hit_lines 由 grep -c 自证，stderr_bytes 同行，空输出不当 0）
+exact_name=wisp.test.exe rc=0 hit_lines=0 stdout_bytes=64 stderr_bytes=0 positive_control_svchost=83
+  name=wisp.test.exe empty above = 0 枚（hit_lines 由 grep -c 自证，stderr_bytes 同行，空输出不当 0）
+exact_name=svchost.exe rc=0 hit_lines=83 stdout_bytes=6632 stderr_bytes=0 positive_control_svchost=83
+tl_done=1

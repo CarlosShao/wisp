@@ -1,0 +1,31 @@
+ticket 310 (310-v1): non-implementer verdicts for AC#1/AC#2/AC#3 + my own readings
+
+票 310 三格判语（验收腿 `310-v1`，实现腿＝`310-r1`）＋支撑它的读数件。
+本笔⛔ 翻任何框、⛔ 动 Status:、⛔ 改票名、⛔ push、⛔ 删任何目录或件。
+
+交付件（五枚）：
+- 00-anchor.md（起手锚 618d984c/dev、六枚射程目录 porcelain=0、暂存区 0 枚、全仓 842 行别家未提交改动我一枚没动）
+  ＋起手名册（四条精确名各 0 枚同行正控 svchost=83＋stderr 字节；家族尺 canonical_count=0 计数在 PS Inside 算、
+  正控 svchost=83/*.exe=343；`%TEMP%` 下 Test*=58 未再长）＋名册三问（本腿认下 0 枚进程、0 枚目录）
+  ＋自抓一笔：把四条 tasklist 放进 .ps1 跑＝PowerShell 不认 bash 的 //FI 拼法，正控一起报 0＝一枚假 0，
+  已挪回 bash 重跑并具名记 Q-310-v1-0。
+- 10-ac1-verdicts.md：AC#1 判成立（按已裁射程落干净），三问逐问现跑——① 腿的 5 枚"跑过"读数件全带
+  GOTMPDIR= 行且那 5 个根名逐枚在盘上；两行都缺的 8 枚全是改前发/反控发/单行摘录；DEGRADED 那支腿 0 命中，
+  我自己造出一发（只设 WISP_TEST_GOTMP_ROOT，脚本一字没动）逐字响、整发 rc 仍 0。
+  ② 非 Windows 支=portable:163 打 left as-is 且那一支不设值；ubuntu 仍会漏盘上可核（:138 具名）。
+  ③ 名册两把我自己的尺（scripts+tools 30 hits/7 files；.github+cmd+internal+frontend 10 hits 全在 ci.yml）
+  ⇒ 名册外唯一真起点=tools/d22scan/runtests.sh:75＝第五枚，"四枚"不是全量但不动摇 AC#1。
+- 20-ac2-paired.md：AC#2 判成立——我自己仓外导出树复跑那一发（go_files=682 先证非空，六件套齐，
+  不在共享工作树跑改前那发）：(a) 撤步子 58→59、comm -13 差集逐字一枚
+  TestRoundTripLoadMarshalLoad4222770164（同行 panic: test timed out after 2s + created=12:48:51.544 仍在盘上）
+  ⇄ (b) 那一步在位顶层 0 新增、残渣逐字在同卷专用根里。腿四发逐发复核（作废两发作废得对）；
+  专攻名字那一形：腿 a3 写的 2236627062 在 0 枚名册件里出现，那一毫秒在盘上的是 1721168370
+  （created=11:49:06.507 vs 击杀时刻 11:49:06.508）⇒ 具名来路错、枚数与结论成立；CreationTime 正典句判=够硬。
+- 30-ac3-gates.md：AC#3 判成立——四把门禁逐把我自己跑（d22scan rc=0/pathlen rc=0/census 跑前⇄跑后
+  totals 逐字相同 diff rc=0/winsec rc=0 且 RUN=101 PASS=58 FAIL=0 SKIP=0）；拼写雷另量一发 rc=2 并发现
+  那一发在被 GUARD 打回前已建好根；格式名册两把并排（工作树 4 枚 vs 导出树 0 枚、gofumpt NOT_FOUND），
+  新量出 Q-310-r1-4 的归因方向写反（CR_bytes worktree=334/head_blob=0/git_archive_tree=0）；
+  7 枚 0 字节件两类分开（合法的空 6 枚／那格没交 1 枚=10c-run.run.txt）；逐笔越界尺十笔 74 枚路径、
+  按派单字面清单越界 1 枚=本票票面 bullet（按交付件清单 0 枚）；第三种死法归口=票 311 AC#3。
+- 90-final.md：三格判语一页＋欠的读数 12 枚 Q-310-v1-0..11 逐字定义。
+台件（8 枚 .sh/.ps1）与 logs/**（读数件，⛔ 任何一枚叫 .out）同批入库；临时件只建不删。

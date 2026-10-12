@@ -1,0 +1,18 @@
+go_env_GOOS=windows
+block_bounds_as_read_by_me (start=the TICKET 310 comment line, end=the closing fi of that block):
+block=scripts/portable-tests.sh lines=68 bytes=4381 export_GOTMPDIR_lines=1 DEGRADED_lines=2 left_as_is_lines=1
+block=scripts/winsec-tests.sh lines=21 bytes=1349 export_GOTMPDIR_lines=1 DEGRADED_lines=1 left_as_is_lines=0
+block=scripts/wisp-cli-tests.sh lines=20 bytes=1298 export_GOTMPDIR_lines=1 DEGRADED_lines=1 left_as_is_lines=0
+non_windows_branch_reads:
+                "the winsec seal cases red, see the note above). GOTMPDIR stays unset." >&2
+        fi
+    else
+        echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR left as-is on GOOS=$(go env GOOS)" \
+            "(the ticket's measurement surface is the Windows host's temp root)."
+    fi
+fi
+winsec_block_condition_line=if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
+cli_block_condition_line=if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
+cli_pre_existing_non_windows_guard_at=if [ "$(go env GOOS)" != windows ]; then (present in the pre-leg blob too: grep count was 1)
+ubuntu_leg_named_on_disk=138:# are about this host's %TEMP%. The ubuntu leg is left exactly as it is because
+block_bytes_done=1

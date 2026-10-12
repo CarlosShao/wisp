@@ -1,0 +1,17 @@
+file=cmd/wisp/models.go worktree_CR_bytes=334 archive_CR_bytes=0 blob_CR_bytes=0 gofmt_flags_worktree=[cmd/wisp/models.go] gofmt_flags_archive=[]
+file=internal/agent/approval/pending_read.go worktree_CR_bytes=131 archive_CR_bytes=0 blob_CR_bytes=0 gofmt_flags_worktree=[internal/agent/approval/pending_read.go] gofmt_flags_archive=[]
+file=internal/agent/tools.go worktree_CR_bytes=225 archive_CR_bytes=0 blob_CR_bytes=0 gofmt_flags_worktree=[internal/agent/tools.go] gofmt_flags_archive=[]
+file=internal/risk/provenance.go worktree_CR_bytes=1115 archive_CR_bytes=0 blob_CR_bytes=0 gofmt_flags_worktree=[internal/risk/provenance.go] gofmt_flags_archive=[]
+gitattributes_exists=yes
+gitattributes_eol_lines=9
+core_autocrlf=true core_eol=unset
+gofmt_d_first8:
+diff internal/agent/tools.go.orig internal/agent/tools.go
+--- internal/agent/tools.go.orig
++++ internal/agent/tools.go
+@@ -1,225 +1,225 @@
+-package agent
+-
+-import (
+-	"context"
+crlf_check_done=1

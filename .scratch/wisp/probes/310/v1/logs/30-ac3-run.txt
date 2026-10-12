@@ -1,0 +1,21 @@
+census_before_rc=0 gotmpdir_line=1 degraded_line=0 err_bytes=0
+census_before_totals=portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+census_before_totals_matches_ticket_baseline=NO
+d22scan_rc=0 out_lines=251 err_bytes=0 gotmpdir_hits=0 degraded_hits=0
+d22scan_tail=d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included|d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=231, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=533, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 533 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included|
+pathlen_rc=0 out_lines=17 err_bytes=327
+pathlen_verdict=check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+winsec_rc=0 err_bytes=0
+winsec_four_numbers=portable-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+winsec_gotmpdir_line=ticket 310 AC#1: GOTMPDIR=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-125118-1774
+winsec_tempdir_removeall=0  (the companion ruler added to the canonical roster; empty above = 0 lines = self-cleanup never refused on this root shape)
+winsec_err_first=
+wrongspelling_rc=2 (expect 2 = its own GUARD 1 rejects it; the --scope= layer belongs to portable-tests.sh)
+wrongspelling_err=winsec-tests.sh: GUARD 1 - the package list for this step does not name ./internal/winsec/; it is [--scope=winsec].|winsec-tests.sh: this step IS the internal/winsec gate (ticket 110 AC#2/AC#3). Removing the package from the list must fail the step, not shorten it.|
+census_after_rc=0 gotmpdir_line=1 err_bytes=0
+census_after_totals=portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+census_totals_diff_rc=0 diff_bytes=0 empty above = 0 bytes = the totals row did not move
+root=/c/Users/swq/AppData/Local/wisp-test-gotmp child_dirs=11 my_v1_child_dirs=1
+root=/d/tmp/wisp-test-gotmp child_dirs=8 my_v1_child_dirs=0
+roster_end_rc=0 count=count=59 err_bytes=0
+ac3_done=1

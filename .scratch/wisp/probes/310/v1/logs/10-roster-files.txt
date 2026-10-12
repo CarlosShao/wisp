@@ -1,0 +1,7 @@
+scripts/d22scan.sh
+scripts/portable-tests-selftest.sh
+scripts/portable-tests.sh
+scripts/slo-check.ps1
+scripts/winsec-tests.sh
+scripts/wisp-cli-tests.sh
+tools/d22scan/runtests.sh

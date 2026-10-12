@@ -1,0 +1,11 @@
+D:/tmp/wisp-test-gotmp/probe-114728-128:
+TestRoundTripLoadMarshalLoad2086954487
+C: portable-20261012-115401-2013:
+TestRoundTripLoadMarshalLoad1761995879
+D:/tmp/wisp-test-gotmp/shapec-115000:
+TestRoundTripLoadMarshalLoad489708636
+D:/tmp/wisp-test-gotmp/winsec-20261012-122119-659:
+TestGateJudgesThePrivateSetByResolvedSID2872432645
+TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2948749545
+TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju3713951561
+TestSealNarrowsAndNamesThePrincipalItRemovedBySID3143495113

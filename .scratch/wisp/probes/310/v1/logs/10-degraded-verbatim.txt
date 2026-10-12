@@ -1,0 +1,1 @@
+portable-tests.sh: ticket 310 AC#1: DEGRADED - cannot create D:/work/workspace/projects plans/Wisp/go.mod/nope/portable-20261012-125524-657, so GOTMPDIR stays unset and a t

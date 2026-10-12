@@ -1,0 +1,20 @@
+scripts/portable-tests.sh:142:    if [ "$(go env GOOS)" = windows ]; then
+scripts/portable-tests.sh:147:                export GOTMPDIR="$gotmp_run"
+scripts/portable-tests.sh:148:                echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+scripts/portable-tests.sh:152:                echo "portable-tests.sh: ticket 310 AC#1: DEGRADED - cannot create" \
+scripts/portable-tests.sh:158:            echo "portable-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so" \
+scripts/portable-tests.sh:163:        echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR left as-is on GOOS=$(go env GOOS)" \
+scripts/portable-tests.sh:350:goos=$(go env GOOS)
+scripts/portable-tests.sh:352:    echo "portable-tests.sh: go env GOOS came back empty" >&2
+scripts/winsec-tests.sh:54:if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
+scripts/winsec-tests.sh:57:        export GOTMPDIR="$gotmp_run"
+scripts/winsec-tests.sh:58:        echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+scripts/winsec-tests.sh:61:        echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+scripts/winsec-tests.sh:89:goos=$(go env GOOS)
+scripts/winsec-tests.sh:91:    echo "winsec-tests.sh: go env GOOS came back empty" >&2
+scripts/wisp-cli-tests.sh:67:if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
+scripts/wisp-cli-tests.sh:70:        export GOTMPDIR="$gotmp_run"
+scripts/wisp-cli-tests.sh:71:        echo "wisp-cli-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+scripts/wisp-cli-tests.sh:74:        echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+scripts/wisp-cli-tests.sh:80:if [ "$(go env GOOS)" != windows ]; then
+scripts/wisp-cli-tests.sh:86:        "GOOS=$(go env GOOS). See the header for the ubuntu reading; do not relax this line." >&2

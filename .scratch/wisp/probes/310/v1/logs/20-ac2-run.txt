@@ -1,0 +1,27 @@
+localappdata_unix=/c/Users/swq/AppData/Local
+temp_unix=/tmp
+export_tree=/d/tmp/310v1-tree.UcNNmC
+archive_rc=0
+go_files_in_tree=682  (proof the tree is NOT empty before any zero reading)
+six_components_present=6 (must be 6)
+ticket310_step_lines_in_export_tree=4 (HEAD already carries the leg's step; my shots below drive go test directly, so GOTMPDIR is mine to set or unset - see the judgement file for what this does and does not prove)
+warm_rc=0 warm_tail=1
+roster a-before rc=0 names=58 meta_count=count=58 err_bytes=0
+a2_shot_rc=1
+a2_evidence_line=panic: test timed out after 2s
+a2_run_lines=0 a2_pass_lines=0
+roster a-after rc=0 names=59 meta_count=count=59 err_bytes=0
+a2_top_level_new=1 names_in_diff=TestRoundTripLoadMarshalLoad4222770164 
+empty above = a count, zero here means the death leaked nothing (it did not, see names)
+b_root=/c/Users/swq/AppData/Local/wisp-test-gotmp/v1-20261012-124853-148 mkdir_rc=0
+roster b-before rc=0 names=59 meta_count=count=59 err_bytes=0
+b_shot_rc=1
+b_evidence_line=panic: test timed out after 2s
+b_run_lines=0
+roster b-after rc=0 names=59 meta_count=count=59 err_bytes=0
+b_top_level_new=0 empty above = 0 枚 means the OS temp root gained nothing
+b_root_entries=1 b_root_names=TestRoundTripLoadMarshalLoad3712892429 
+b_root_full_paths:
+  /c/Users/swq/AppData/Local/wisp-test-gotmp/v1-20261012-124853-148/TestRoundTripLoadMarshalLoad3712892429
+final_roster_rc=0 final_count=count=59
+run_done=1

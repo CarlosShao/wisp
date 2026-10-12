@@ -1,0 +1,1 @@
+scripts/wisp-cli-tests.sh

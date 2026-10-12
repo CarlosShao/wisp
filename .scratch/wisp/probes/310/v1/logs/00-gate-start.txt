@@ -1,0 +1,85 @@
+== 1) four exact tasklist names (each shot carries its own positive control) ==
+exact_name=wisp.exe count=0 positive_control_same_ruler=svchost.exe:0
+exact_name=balldebug.exe count=0 positive_control_same_ruler=svchost.exe:0
+exact_name=mockllm.exe count=0 positive_control_same_ruler=svchost.exe:0
+exact_name=wisp.test.exe count=0 positive_control_same_ruler=svchost.exe:0
+== 2) family ruler, verbatim canonical form (count computed PS-Inside) ==
+canonical_count=0
+family_positive_control_svchost=83 family_positive_control_all_exe=343
+== 3) %TEMP% Test* census (the ticket-310 AC#4 roster line) ==
+C:\Users\swq\AppData\Local\Temp
+temp_root=C:\Users\swq\AppData\Local\Temp\ test_count=58 positive_control_all_temp_dirs=2807
+  name=Test221ParentStopsItsOwnChildRowAndStreamSettle3871214707 created=2026-10-08 20:08:20
+  name=TestAC1ResidentLegOutlivesItsOwnLogFailure1462165283 created=2026-10-09 15:35:46
+  name=TestAC2RealProcessRefusesOnEveryLegWithoutAppData1281963646102 created=2026-10-03 17:04:22
+  name=TestComposedGateBlocksAWriteForTwoSeconds1996183427 created=2026-09-23 18:44:49
+  name=TestConfirmLockedRunsOutsideTheManagerLock1562080786 created=2026-10-02 19:39:40
+  name=TestDoubleFailureKeepsTaskContextAndIsResumable481691178 created=2026-10-11 18:47:00
+  name=TestFailoverAfterPrimaryExhaustion2419959198 created=2026-10-11 21:46:05
+  name=TestFailoverAfterPrimaryExhaustion3970703700 created=2026-10-11 21:46:12
+  name=TestFailoverAfterPrimaryExhaustion455177940 created=2026-10-11 18:53:04
+  name=TestGateJudgesThePrivateSetByResolvedSID2396759740 created=2026-09-21 18:40:11
+  name=TestGateJudgesThePrivateSetByResolvedSID2459073988 created=2026-09-21 18:40:36
+  name=TestGateJudgesThePrivateSetByResolvedSID2986811054 created=2026-09-21 18:40:05
+  name=TestMockllmGoldenByteIdenticalEvents1101711636 created=2026-10-11 17:52:31
+  name=TestMockllmGoldenByteIdenticalEvents1385547188 created=2026-10-11 21:37:17
+  name=TestMockllmGoldenByteIdenticalEvents1415189317 created=2026-10-11 17:49:25
+  name=TestMockllmGoldenByteIdenticalEvents1524086492 created=2026-10-11 16:53:41
+  name=TestMockllmGoldenByteIdenticalEvents1904824687 created=2026-10-11 17:56:15
+  name=TestMockllmGoldenByteIdenticalEvents2997322679 created=2026-10-11 21:37:03
+  name=TestMockllmGoldenByteIdenticalEvents3039020949 created=2026-10-11 21:34:10
+  name=TestMockllmGoldenByteIdenticalEvents3140925201 created=2026-10-11 18:01:49
+  name=TestMockllmGoldenByteIdenticalEvents3161225382 created=2026-10-11 17:52:19
+  name=TestMockllmGoldenByteIdenticalEvents3233152004 created=2026-10-11 17:56:27
+  name=TestMockllmGoldenByteIdenticalEvents3278041641 created=2026-10-11 21:37:56
+  name=TestMockllmGoldenByteIdenticalEvents3292549456 created=2026-10-11 18:02:05
+  name=TestMockllmGoldenByteIdenticalEvents3666715146 created=2026-10-11 18:47:06
+  name=TestMockllmGoldenByteIdenticalEvents4011121267 created=2026-10-11 16:54:25
+  name=TestMockllmGoldenByteIdenticalEvents696038329 created=2026-10-11 18:05:38
+  name=TestMockllmGoldenByteIdenticalEvents718009555 created=2026-10-11 17:49:18
+  name=TestMockllmGoldenByteIdenticalEvents973367927 created=2026-10-11 18:05:47
+  name=TestMockllmSharedFaultSuite1562417226 created=2026-10-11 17:56:48
+  name=TestMockllmSharedFaultSuite1603513437 created=2026-10-11 18:02:32
+  name=TestMockllmSharedFaultSuite222012253 created=2026-10-11 17:52:40
+  name=TestMockllmSharedFaultSuite2329949686 created=2026-10-11 18:05:55
+  name=TestMockllmSharedFaultSuite2868402985 created=2026-10-11 18:02:16
+  name=TestMockllmSharedFaultSuite3458740087 created=2026-10-11 17:56:35
+  name=TestMockllmSharedFaultSuite3784017352 created=2026-10-11 17:49:34
+  name=TestMockllmSharedFaultSuite959708402 created=2026-10-11 18:06:04
+  name=TestPanelHostRealWindowHopAndLifecycle537087969 created=2026-10-01 10:04:05
+  name=TestProbeStepByStep3843095677 created=2026-09-21 18:40:57
+  name=TestRollingWriterRetentionSweep3198295670 created=2026-09-25 08:32:26
+  name=TestRollingWriterRetentionSweep3638913217 created=2026-09-25 08:34:09
+  name=TestRollingWriterRetentionSweep3835089158 created=2026-09-25 08:34:11
+  name=TestRollingWriterRetentionSweep3838303947 created=2026-09-25 08:34:24
+  name=TestRoundTripLoadMarshalLoad1039208776 created=2026-10-12 11:04:41
+  name=TestRoundTripLoadMarshalLoad1721168370 created=2026-10-12 11:49:06
+  name=TestRoundTripLoadMarshalLoad2289939324 created=2026-10-12 10:46:42
+  name=TestRoundTripLoadMarshalLoad2461500944 created=2026-10-12 11:43:24
+  name=TestRoundTripLoadMarshalLoad2836872785 created=2026-10-12 10:47:25
+  name=TestRoundTripLoadMarshalLoad3863116526 created=2026-10-12 11:05:29
+  name=TestRoundTripLoadMarshalLoad725496612 created=2026-10-12 10:45:38
+  name=TestRoundTripLoadMarshalLoad826293033 created=2026-10-12 11:50:03
+  name=TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780 created=2026-10-08 11:35:28
+  name=TestSLO144LoopGiveUpSentencesOnRealFiles2237962421 created=2026-09-25 20:36:08
+  name=TestTicket101SessionGrantDoesNotCrossRestart2995253497 created=2026-10-07 18:23:32
+  name=TestTicket223PermissionDeniedSitsInItsOwnSentence1318611284 created=2026-10-05 23:25:51
+  name=TestTicket223R2FailureSentenceRoutingÉùÃ÷¾É°æ_»µ±íÍ·_A2_3165385141 created=2026-10-03 17:01:11
+  name=TestTicket223TighteningRaisesNoCard3267158827 created=2026-10-03 17:09:55
+  name=TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599 created=2026-10-08 08:42:20
+== 4) the two dedicated GOTMPDIR roots (present on disk, I do NOT touch them) ==
+root=C:\Users\swq\AppData\Local\wisp-test-gotmp exists=1 child_dirs=6
+    child=cli-20261012-115545-1029 entries=0 created=2026-10-12 11:55:45
+    child=portable-20261012-115401-2013 entries=1 created=2026-10-12 11:54:01
+    child=portable-20261012-122621-196 entries=0 created=2026-10-12 12:26:21
+    child=probe-115234 entries=0 created=2026-10-12 11:52:34
+    child=winsec-20261012-115521-883 entries=0 created=2026-10-12 11:55:21
+    child=winsec-20261012-122147-814 entries=0 created=2026-10-12 12:21:47
+root=D:\tmp\wisp-test-gotmp exists=1 child_dirs=6
+    child=portable-20261012-114637-408 entries=0 created=2026-10-12 11:46:37
+    child=probe-114728-128 entries=1 created=2026-10-12 11:47:28
+    child=shapec-115000 entries=1 created=2026-10-12 11:50:00
+    child=winsec-20261012-115046-1584 entries=4 created=2026-10-12 11:50:46
+    child=winsec-20261012-122026-451 entries=0 created=2026-10-12 12:20:26
+    child=winsec-20261012-122119-659 entries=4 created=2026-10-12 12:21:19
+ps_done=1

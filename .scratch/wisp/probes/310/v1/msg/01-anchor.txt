@@ -1,0 +1,12 @@
+310-v1 起手锚：HEAD 618d984c/dev，六枚射程目录 porcelain=0，暂存区 0 枚
+
+票 310 非实现者验收腿 `310-v1` 的第一笔＝派单 §0 要求只交 `00-anchor.md`。
+
+内容＝起手锚（HEAD/分支/六枚射程 porcelain/全仓 842 行别家未提交改动我看见了、一枚没动）
+＋起手名册三条（四条精确名 tasklist 各 0 枚同行带正控 svchost=83 与 stderr 字节；家族尺
+canonical_count=0 计数在 PS Inside 算、正控 svchost=83/*.exe=343；`%TEMP%` 下 Test*=58，
+正典现量序列未再长）＋名册三问（本腿认下 0 枚进程、0 枚目录，两枚专用根只数不动）
+＋自抓一笔：最初把 tasklist 放进 .ps1 里跑，PowerShell 不认 bash 的 //FI 拼法，正控一起报 0
+＝一枚假 0 台面，已挪回 bash 重跑并具名记 `Q-310-v1-0`。
+
+实现腿 `310-r1` 的落点/numstat/在册枚数一律未采信，等我自己现跑。

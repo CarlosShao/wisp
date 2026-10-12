@@ -1,0 +1,3 @@
+69	0	scripts/portable-tests.sh
+21	0	scripts/winsec-tests.sh
+20	0	scripts/wisp-cli-tests.sh

@@ -1,0 +1,27 @@
+file=cmd/wisp/models.go CR_bytes worktree=334 head_blob=0 git_archive_tree=0
+file=internal/agent/approval/pending_read.go CR_bytes worktree=131 head_blob=0 git_archive_tree=0
+file=internal/agent/tools.go CR_bytes worktree=225 head_blob=0 git_archive_tree=0
+file=internal/risk/provenance.go CR_bytes worktree=1115 head_blob=0 git_archive_tree=0
+gitattributes_content:
+* text=auto
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.go text eol=lf
+*.md text eol=lf
+# Shell entry points (scripts/d22scan.sh) run under sh on both the ubuntu CI
+# runner and local Git Bash; CRLF would break the shebang and `set -eu`.
+*.sh text eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
+*.onnx binary
+ruler_selfcheck_this_leg_worktree_files_CR=0
+eol_done=1
+=== ticket bullet commit 3122306e paths ===
+.scratch/wisp/issues/310-test-binary-deaths-leave-temp-test-dirs-accumulating.md
+=== r1 zero-byte classification: does the citing md line carry a count ===
+.scratch/wisp/probes/310/r1/20-paired-readings.md:31:| b1 | 超时 panic，第一稿的根（仓所在卷 `D:`） | `D:/tmp/wisp-test-gotmp/probe-114728-128` | 56→56 | **0 枚** | `D:\tmp\wisp-test-gotmp\probe-114728-128\TestRoundTripLoadMarshalLoad2086954487` | `panic: test timed out after 2s`（`logs/10b-shot.txt:1669`）＋`run_lines=417`／`pass_lines=416` | `shot_rc=1` | `logs/10b-shot.txt`＋`10b-root-entries.txt`＋`10b-new.txt`（空） |
+=== the two files the leg wrote INSIDE the D: dedicated root ===
+    0 /d/tmp/wisp-test-gotmp/shapec-115000-c2_redirected.run.txt
+35458 /d/tmp/wisp-test-gotmp/shapec-115000-c2_redirected.run.txt.err
+35458 total

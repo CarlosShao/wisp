@@ -1,0 +1,5 @@
+winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=D:/tmp/wisp-test-gotmp/winsec-20261012-115046-1584 - this run's t.TempDir() family lands here; nothing deletes it.
+winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-115521-883 - this run's t.TempDir() family lands here; nothing deletes it.
+wisp-cli-tests.sh: ticket 310 AC#1: GOTMPDIR=C:/Users/swq/AppData/Local/wisp-test-gotmp/cli-20261012-115545-1029 - this run's t.TempDir() family lands here; nothing deletes it.
+portable-tests.sh: ticket 310 AC#1: GOTMPDIR=D:/tmp/wisp-test-gotmp/portable-20261012-114637-408 - this run's t.TempDir() family lands here. Nothing deletes it: ticket 310 requires a per-directory roster plus a non-implementer review before any removal.
+portable-tests.sh: ticket 310 AC#1: GOTMPDIR=C:/Users/swq/AppData/Local/wisp-test-gotmp/portable-20261012-115401-2013 - this run's t.TempDir() family lands here. Nothing deletes it: ticket 310 requires a per-directory roster plus a non-implementer review before any removal.

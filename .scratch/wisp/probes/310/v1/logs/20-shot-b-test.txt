@@ -1,0 +1,54 @@
+time=2026-10-12T12:48:55.426+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+panic: test timed out after 2s
+	running tests:
+		TestRoundTripLoadMarshalLoad (0s)
+
+goroutine 333 [running]:
+testing.(*M).startAlarm.func1()
+	D:/work/base/go/src/testing/testing.go:2959 +0x34a
+created by time.goFunc
+	D:/work/base/go/src/time/sleep.go:182 +0x2d
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0x1f20115dd200, {0x7ff70a9a9891?, 0x1f2011895aa8?}, 0x7ff70adf97a0)
+	D:/work/base/go/src/testing/testing.go:2266 +0x4d2
+testing.runTests.func1(0x1f20115dd200)
+	D:/work/base/go/src/testing/testing.go:2742 +0x37
+testing.tRunner(0x1f20115dd200, 0x1f2011895bc8)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+testing.runTests({0x7ff70a9a83e1, 0x1a}, {0x7ff70a9b1d81, 0x2a}, 0x1f2011372378, {0x7ff70ae6d350, 0x60, 0x60}, {0xc2ab378e5993e16c, 0x77a5b2bd, ...})
+	D:/work/base/go/src/testing/testing.go:2740 +0x505
+testing.(*M).Run(0x1f20113f2e60)
+	D:/work/base/go/src/testing/testing.go:2600 +0x6af
+main.main()
+	_testmain.go:238 +0x9b
+
+goroutine 312 [syscall]:
+syscall.syscalln(0x0?, 0x0?, {0x1f2011807ce0?, 0x7ff70adb8d58?, 0x0?})
+	D:/work/base/go/src/runtime/syscall_windows.go:427 +0x48
+syscall.SyscallN(0x1f201162fea0?, {0x1f2011807ce0?, 0x1f201151bc00?, 0xffffffffffffffff?})
+	D:/work/base/go/src/syscall/dll_windows.go:99 +0x1e
+syscall.CreateDirectory(0x1f201162fea0?, 0x6c?)
+	D:/work/base/go/src/syscall/zsyscall_windows.go:490 +0x6d
+syscall.Mkdir({0x1f201162fea0?, 0x1f201162e5b0?}, 0x6c?)
+	D:/work/base/go/src/syscall/syscall_windows.go:628 +0x45
+os.Mkdir.func1(...)
+	D:/work/base/go/src/os/file.go:330
+os.ignoringEINTR(...)
+	D:/work/base/go/src/os/file_posix.go:263
+os.Mkdir({0x1f201162fea0, 0x6c}, 0x1ff)
+	D:/work/base/go/src/os/file.go:329 +0xb9
+testing.(*common).makeTempDir(0x1f20115dd400)
+	D:/work/base/go/src/testing/testing.go:1634 +0x2ef
+testing.(*common).TempDir(0x1f20115dd400)
+	D:/work/base/go/src/testing/testing.go:1577 +0x29
+github.com/CarlosShao/wisp/internal/config.sealableTempDir124(0x1f20115dd400)
+	D:/tmp/310v1-tree.UcNNmC/internal/config/tempdir_resolved_124_test.go:33 +0x25
+github.com/CarlosShao/wisp/internal/config.TestRoundTripLoadMarshalLoad(0x1f20115dd400)
+	D:/tmp/310v1-tree.UcNNmC/internal/config/boundary_test.go:188 +0x39
+testing.tRunner(0x1f20115dd400, 0x7ff70adf97a0)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/config	2.037s
+FAIL

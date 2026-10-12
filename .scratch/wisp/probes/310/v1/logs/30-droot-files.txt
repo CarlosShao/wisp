@@ -1,0 +1,2 @@
+/d/tmp/wisp-test-gotmp/shapec-115000-c2_redirected.run.txt
+/d/tmp/wisp-test-gotmp/shapec-115000-c2_redirected.run.txt.err

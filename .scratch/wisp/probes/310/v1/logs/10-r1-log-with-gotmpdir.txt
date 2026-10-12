@@ -1,0 +1,5 @@
+11-winsec.txt size=245734 gotmpdir_hits=1 degraded_hits=0
+12-cli-shipped.txt size=344191 gotmpdir_hits=1 degraded_hits=0
+12-winsec-shipped.txt size=239847 gotmpdir_hits=1 degraded_hits=0
+30-census-postpatch.txt size=3676 gotmpdir_hits=1 degraded_hits=0
+30-census-postpatch2.txt size=3697 gotmpdir_hits=1 degraded_hits=0

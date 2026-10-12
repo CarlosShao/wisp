@@ -1,0 +1,10 @@
+3122306e ticket 310: append-only progress bullet for leg 310-r1
+c5131048 ticket 310 (310-r1): reading files behind the four deliverables (gate, paired shots, format rosters, entry runs)
+381bbc44 ticket 310 (310-r1): deliverable 90-final.md
+369a9e17 ticket 310 (310-r1): deliverable 30-gates.md
+e0218be4 ticket 310 (310-r1): deliverable 20-paired-readings.md
+92333974 ticket 310 (310-r1): deliverable 10-impl.md
+14af45be ticket 310 AC#1 (310-r1): send the test temp family to a dedicated GOTMPDIR root - wisp-cli-tests.sh
+2c0a0666 ticket 310 AC#1 (310-r1): send the test temp family to a dedicated GOTMPDIR root - winsec-tests.sh
+6a8f537a ticket 310 AC#1 (310-r1): send the test temp family to a dedicated GOTMPDIR root - portable-tests.sh
+a21dcd5b ticket 310 AC#1 (leg 310-r1): starting anchor + canonical gate readings

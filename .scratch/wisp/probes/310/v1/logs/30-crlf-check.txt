@@ -1,0 +1,4 @@
+cmd/wisp/models.go worktree_CR_lines=334 blob_CR_lines=334 autocrlf=true
+internal/agent/approval/pending_read.go worktree_CR_lines=131 blob_CR_lines=131 autocrlf=true
+internal/agent/tools.go worktree_CR_lines=225 blob_CR_lines=225 autocrlf=true
+internal/risk/provenance.go worktree_CR_lines=1115 blob_CR_lines=1115 autocrlf=true

@@ -1,0 +1,10 @@
+round=a-before temp_root=C:\Users\swq\AppData\Local\Temp\ filter=Test* count=58 positive_control_all_temp_dirs=2812 stderr_channel=separate_file
+  roundtrip_name=TestRoundTripLoadMarshalLoad725496612 created=2026-10-12 10:45:38.031
+  roundtrip_name=TestRoundTripLoadMarshalLoad2289939324 created=2026-10-12 10:46:42.368
+  roundtrip_name=TestRoundTripLoadMarshalLoad2836872785 created=2026-10-12 10:47:25.122
+  roundtrip_name=TestRoundTripLoadMarshalLoad1039208776 created=2026-10-12 11:04:41.484
+  roundtrip_name=TestRoundTripLoadMarshalLoad3863116526 created=2026-10-12 11:05:29.031
+  roundtrip_name=TestRoundTripLoadMarshalLoad2461500944 created=2026-10-12 11:43:24.391
+  roundtrip_name=TestRoundTripLoadMarshalLoad1721168370 created=2026-10-12 11:49:06.507
+  roundtrip_name=TestRoundTripLoadMarshalLoad826293033 created=2026-10-12 11:50:03.330
+roster_done=1
