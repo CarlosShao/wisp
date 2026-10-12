@@ -17013,3 +17013,35 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 `AC#4` 翻 ⇒ 本票现尺＝**5 勾 / 1 未勾**，残余＝`AC#5`（一枚件的 `gofumpt` 残留，纯格式面，逐字节尺复用 `AC#1` 那把 `tr -d '[:space:]' | cmp`）⇒ 写面＝`cmd/wisp`，**⛔ 与在飞的 `295-r1` 同波**（"每波只交一枚 `./cmd/wisp/` 色"，`A846` ③ 我自己定的），排它交完之后。⛔ `-done`（残余未清）。⚠ 推送类欠账继续押着；⛔ 本程 push、⛔ 删任何目录（`%TEMP%` 顶层复跑仍 **59** 枚）。
 
 **next**＝等 `295-r1`／`311-r1` 交回逐枚复跑收口 ⇒ 派 `298 AC#5` 的小落地腿 ⇒ `294-r1`／`294-v1` ⇒ `296-r2`。
+
+## A864｜2026-10-12 15:1x｜落地腿 `311-r1` **死于模型连接中断**⇒死腿遗产**代提＝`3b857e53`，标〔未验证半成品〕**（两条"没验完"逐枚具名：①那段注释指名的两枚读数件**盘上根本不存在**，②四枚入口只落了一枚）＋★**我自己两发取证**（换卷⇒`rc=2` 且**一个测试进程都没起** ⇄ 出厂默认⇒守卫**一声不响**、`58/0` 照旧）＋**`Q-311-r1-1` 由我登记进票面**（⛔ 让一段注释继续指着一条不存在的账）＋另派 `311-r1b` 接手（派单存档＝`119154e0`）；⚠ 同日 `295-r1` 途中那笔 `1c1d7df3`＝**行号锚台件又咬人**，它的处置形我复认
+
+### 1 死腿怎么死的、留下了什么（尺都现跑）
+
+- 通知＝`af07f2b5…` 报 `failed / The connection to the model service was interrupted`，40 次工具调用、1 笔提交 `07e2eba5`（入口普查＋改前基线）。⚠ **通知一律当未验证**⇒ 盘上尺＝`git show --name-only 07e2eba5`（11 枚件全在她自家 `probes/311/r1/**`，⛔ 越界）。
+- ★**工作树上躺着一枚未提交的改动**＝`scripts/winsec-tests.sh`（尺＝`git status --porcelain -- scripts`＝1 行；`git diff --numstat`＝**+71 / −0**）。⇒ 按本仓规矩⛔ 丢弃、⛔ 回退，**代提并标〔未验证半成品〕**＝`3b857e53`。
+
+### 2 为什么它⛔ 能当成品（两条，都是盘上尺）
+
+- ①**注释指空件**：那段里逐字写着 `logs/23-order-degraded-then-guard.txt` 与 `logs/24-order-guard-after-guard1.txt`，而 `ls .scratch/wisp/probes/311/r1/logs/` 现量只到 `15-pre-shape3.txt`＝**两枚不存在**（先例＝注释里的测试名/件名一律当待验断言，与通知里的提交号同级）。
+- ②**射程只到一枚入口**：尺＝`git grep -l 'GOTMPDIR' HEAD -- scripts tools` ⇒ `scripts/portable-tests.sh`／`scripts/winsec-tests.sh`／`scripts/wisp-cli-tests.sh` ＋ `tools/d22scan/runtests.sh`＝**四枚**，而块只在其中一枚里（`grep -rl 'ticket 311 AC#1'` 现量＝`winsec-tests.sh` **1 枚**）。
+- ⚠ 那条注释还写"registered as debt **Q-311-r1-1** on ticket 311"——盘上⛔ 有这条号。⇒ **本条 A864 把它落成在册欠账**（内容＝"读不出卷形的拼法（UNC、裸相对名）那支打 `INCONCLUSIVE` 行、⛔ 改退码＝未定案"），并由我在票 311 末尾那条 bullet 里同批登记；⛔ 由落地腿顺手扩那一支。
+
+### 3 我自己两发（⛔ 引用她的话，尺＝现跑，件名带全路径）
+
+- ⓐ 换卷一发：`WISP_TEST_GOTMP_ROOT=/d/tmp/wisp-test-gotmp/orch-311probe-150233 bash scripts/winsec-tests.sh ./internal/winsec/` ⇒ **`rcA=2`**、stderr 逐字 `ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%`、并且**同时点名两枚 offender**（`GOTMPDIR(volume D)`＝票 310 那块自己导出的 ⇄ `WISP_TEST_GOTMP_ROOT(volume D)`＝操作员给的）、**stdout 里 `=== RUN` 命中 0＝测试进程根本没起**。件＝`.scratch/wisp/probes/orch/20261012/logs/orch-311salvage-A-crossvol.txt`。⚠ 顺带把"顺序"这条读了＝同发行序 `[310 的 GOTMPDIR 行] → [311 的 GUARD 行] → [零测试]`，**这正是她注释里那枚不存在件想买的读数**（只覆盖 winsec 一枚入口；其余三枚归 `311-r1b`）。
+- ⓑ 出厂默认一发：两枚变量都不设 ⇒ **`rcB=0`**、`ticket 311` 命中 **0**（分母同行＝脚本自己那行逐字 `=== RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0`）⇒ 守卫在默认形状下**一声不响**。件＝`.../orch-311salvage-B-defaultenv.txt`。
+- ⚠⚠ **记我一处（我这发的第二把尺是坏的）**：同一件尾部我另 appended 了一段 `RUN=104 / PASS=103 / FAIL=2 / SKIP=3`——那把尺**对着整份日志数**，把脚本自己那行汇总和 `t.Logf` 里的字样也数了进去＝**假数、⛔ 引用**。权威读数只有脚本那行四数（`RUN=101 PASS=58 FAIL=0 SKIP=0`）。定式＝**"四数"只认脚本自落那行，我另加的第二把尺必须写清射程，⛔ 两件并排却不标哪把作数**。
+- ⚠ 我这发也在 `D:` 根留下 1 枚运行目录（`orch-311probe-150233`）＝预期残留，⛔ 删（归口＝下面 §5 的盘上账）。
+
+### 4 `311-r1b` 已派出（派单存档＝`119154e0`，件＝`probes/orch/20261012/txt/311r1b-dispatch.txt`）
+
+写面收成三枚文件＋票尾 1 条 bullet（⛔ `internal/winsec/**`、⛔ `cmd/wisp/**`＝295-r1 在飞）；复制插入点＝死腿普查表（`10-entry-census.md` §2）那三行、要求她**进场逐枚现跑复认**；★**牙那一格我写死了"摘除正控"**＝只把守卫拿掉必须回到 `56/2`，否则这段守卫＝装饰、那格⛔ 算交；⛔ 破坏三形（默认／同卷不同目录／非 windows 或空 `LOCALAPPDATA`）；门禁四数照票面，⚠ **`sh scripts/d22scan.sh` 必须在仓外导出树上跑**（共享工作树此刻被 `cmd/wisp` 的在飞态污染＝A863 那条定式兑现第二次）。
+
+### 5 `295-r1` 途中那笔 `1c1d7df3`＝**行号锚台件第三次咬人**（我复认它的处置形）
+
+她的 AC#1 把两组注释加高（净＋19 行）⇒ 把票 255 那枚 `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` 打成**新增红**（红句逐字＝`row "audio" cites cmd/wisp/resident_audio_windows.go:256 for "c.Audio.MicMutedDefault", that line now reads "// and [audio] are read off the file rather than held." - the evidence drifted, so re-adjudicate this row`；成因链＝`cmd/wisp/config_readers_255.go` 的 `hotRowClaims` 按**行号**引用同一枚文件里两行）。★她的处置形＝**把注释压回原行数（净零增行）＋⛔ 动那两枚 255 的文件＋⛔ 让回执迁就漂移**，并交回行号复归读数（`:105/:168/:323/:379`＝票面现量那四枚，改后仍成立）⇒ **我复认＝形对**（⛔ 放宽断言那一支她没走，走的是"我这边的增量⛔ 该动那枚钉"）。⚠ **留一枚待我收口时判的问题**：她的 `AC#2` 反形读数（件 `295/r1/logs/30..33`）是在**压回之前**那一形上取的⇒ 交件时我要她（或我自己）在**最终形状**上把"删写⇒指名那枚断言必须红"那一发重跑一次，⛔ 拿旧形状的变异凭据当终形的凭据。⚠ **另一枚由她替我量出的既有脆性**：仓里存在"按行号引用同包另一枚文件"的台件（票 255 那把），**任何注释增量都会把它打红**＝后续任何写 `cmd/wisp` 的派单都要预先具名（我这条转进派单模板，下一枚 `294-r1` 起手就带）。
+
+盘上账：`D:\tmp\wisp-test-gotmp` 运行目录 10→**11**（我这发那枚）；`%TEMP%` 顶层 `Test*` 我这发⛔ 重跑（⛔ 拿旧数当基线，`311-r1b` 或我下一轮现量）。⛔ 零 push、⛔ 零删目录。
+
+**next**＝收 `295-r1`（AC#1..AC#5 逐枚复跑，含上面那枚"最终形状重跑变异"）⇒ 翻她的格 ⇒ 派 `294-r1`（派单起手带"票 255 行号锚"那条具名警告）；`311-r1b` 交回后我复跑 ⓐⓑⓒⓓ 四发再定 `AC#2`/`AC#4`；`298 AC#5` 仍按在 `cmd/wisp` 色放之后。
