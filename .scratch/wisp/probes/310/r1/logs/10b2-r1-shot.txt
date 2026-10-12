@@ -1,0 +1,539 @@
+time=2026-10-12T11:54:51.706+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.02s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.02s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.02s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.02s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripLoadMarshalLoad
+panic: test timed out after 2s
+	running tests:
+		TestRoundTripLoadMarshalLoad (0s)
+
+goroutine 311 [running]:
+testing.(*M).startAlarm.func1()
+	D:/work/base/go/src/testing/testing.go:2959 +0x34a
+created by time.goFunc
+	D:/work/base/go/src/time/sleep.go:182 +0x2d
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0x1d8726c96000, {0x7ff69def9891?, 0x1d8726d21aa8?}, 0x7ff69e349ab0)
+	D:/work/base/go/src/testing/testing.go:2266 +0x4d2
+testing.runTests.func1(0x1d8726c96000)
+	D:/work/base/go/src/testing/testing.go:2742 +0x37
+testing.tRunner(0x1d8726c96000, 0x1d8726d21bc8)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+testing.runTests({0x7ff69def83e1, 0x1a}, {0x7ff69df01d81, 0x2a}, 0x1d8726888378, {0x7ff69e3bd350, 0x60, 0x60}, {0xc2ab34636a3df4a8, 0x77c7f2b5, ...})
+	D:/work/base/go/src/testing/testing.go:2740 +0x505
+testing.(*M).Run(0x1d8726980dc0)
+	D:/work/base/go/src/testing/testing.go:2600 +0x6af
+main.main()
+	_testmain.go:238 +0x9b
+
+goroutine 296 [runnable]:
+github.com/pelletier/go-toml/v2/unstable.(*Parser).scanIntOrFloat(0x1d8726d385a0, {0x1d8726d50611, 0x1056, 0x1057})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unstable/parser.go:1122 +0xabe
+github.com/pelletier/go-toml/v2/unstable.(*Parser).parseIntOrFloatOrDateTime(0x1d8726d385a0?, {0x1d8726d50611?, 0x1056?, 0x1057?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unstable/parser.go:1053 +0x586
+github.com/pelletier/go-toml/v2/unstable.(*Parser).parseVal(0x1d8726d385a0, {0x1d8726d50611?, 0x7ffa7dc66eb0?, 0x1?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unstable/parser.go:430 +0x925
+github.com/pelletier/go-toml/v2/unstable.(*Parser).parseKeyval(0x1d8726d385a0, {0x1d8726d50600, 0x1067, 0x1068})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unstable/parser.go:343 +0x2a7
+github.com/pelletier/go-toml/v2/unstable.(*Parser).parseExpression(0x1d8726d385a0, {0x1d8726d50600?, 0x1d8726d71bd0?, 0x7ff69da89a45?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unstable/parser.go:234 +0x87
+github.com/pelletier/go-toml/v2/unstable.(*Parser).NextExpression(0x1d8726d385a0)
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unstable/parser.go:120 +0xdd
+github.com/pelletier/go-toml/v2.(*decoder).nextExpr(...)
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:198
+github.com/pelletier/go-toml/v2.(*decoder).fromParser(0x1d8726d385a0, {0x7ff69e2ed6c0?, 0x1d8726c79188?, 0x1d87269eb008?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:252 +0x57
+github.com/pelletier/go-toml/v2.(*decoder).FromParser(0x1d8726d385a0, {0x7ff69e2d84e8?, 0x1d8726c79188?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:238 +0x145
+github.com/pelletier/go-toml/v2.Unmarshal({0x1d8726d50600, 0x1067, 0x1068}, {0x7ff69e2d84e8, 0x1d8726c79188})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:26 +0x96
+github.com/CarlosShao/wisp/internal/config.peekSchemaVersion({0x1d8726d50600, 0x1067, 0x1068})
+	D:/work/workspace/projects plans/Wisp/internal/config/loader.go:153 +0x50
+github.com/CarlosShao/wisp/internal/config.readConfigFile({0x1d8726c12780, 0x7f})
+	D:/work/workspace/projects plans/Wisp/internal/config/loader.go:83 +0x185
+github.com/CarlosShao/wisp/internal/config.LoadFile({0x1d8726c12780?, 0x7f?}, {0x0, 0x0})
+	D:/work/workspace/projects plans/Wisp/internal/config/loader.go:42 +0x25
+github.com/CarlosShao/wisp/internal/config.TestRoundTripLoadMarshalLoad(0x1d8726c96600)
+	D:/work/workspace/projects plans/Wisp/internal/config/boundary_test.go:193 +0xd9
+testing.tRunner(0x1d8726c96600, 0x7ff69e349ab0)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/config	2.041s
+FAIL

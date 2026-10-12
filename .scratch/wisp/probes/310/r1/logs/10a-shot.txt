@@ -1,0 +1,26 @@
+time=2026-10-12T11:42:49.342+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+panic: test timed out after 2s
+	running tests:
+		TestRoundTripLoadMarshalLoad (0s)
+
+goroutine 231 [running]:
+testing.(*M).startAlarm.func1()
+	D:/work/base/go/src/testing/testing.go:2959 +0x34a
+created by time.goFunc
+	D:/work/base/go/src/time/sleep.go:182 +0x2d
+
+goroutine 1 [runnable]:
+testing.(*T).Run(0x1d0049b0cc00, {0x7ff708dd9891?, 0x1d0049df1aa8?}, 0x7ff709229ab0)
+	D:/work/base/go/src/testing/testing.go:2266 +0x4d2
+testing.runTests.func1(0x1d0049b0cc00)
+	D:/work/base/go/src/testing/testing.go:2742 +0x37
+testing.tRunner(0x1d0049b0cc00, 0x1d0049df1bc8)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+testing.runTests({0x7ff708dd83e1, 0x1a}, {0x7ff708de1d81, 0x2a}, 0x1d004995a378, {0x7ff70929d350, 0x60, 0x60}, {0xc2ab33aed48a3658, 0x77b6b4a5, ...})
+	D:/work/base/go/src/testing/testing.go:2740 +0x505
+testing.(*M).Run(0x1d00499dae60)
+	D:/work/base/go/src/testing/testing.go:2600 +0x6af
+main.main()
+	_testmain.go:238 +0x9b
+FAIL	github.com/CarlosShao/wisp/internal/config	2.039s
+FAIL

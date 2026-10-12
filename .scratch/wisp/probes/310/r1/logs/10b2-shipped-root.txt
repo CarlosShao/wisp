@@ -1,0 +1,1 @@
+shipped_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/portable-20261012-115401-2013

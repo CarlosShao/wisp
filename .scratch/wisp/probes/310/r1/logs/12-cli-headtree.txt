@@ -1,0 +1,1 @@
+wisp-cli-tests.sh: GUARD - /d/tmp/310r1-tree2.dieduj/third_party/sherpa-onnx does not exist. The windows job stages it (actions/cache on the deps.toml key, then scripts/build.ps1 -> fetch-deps.ps1). Without it the step below would die at process load with 0xc0000135 and look like a broken package. This is ticket 98's hole, named.

@@ -1,0 +1,7 @@
+c2_redirected watch_root=D:/tmp/wisp-test-gotmp/shapec-115000 pid=29408 dirs_before=0
+c2_redirected world=CONSTRUCTED dir=T
+c2_redirected guard_name_is_test_exe=True guard_cmdline_has_workdir=True guard_parent_is_this_leg=True
+c2_redirected external_kill_issued at=11:50:06.324
+c2_redirected after_kill target_pid_still_present=0 dirs_before=0 dirs_after=1 leaked_count=1 leaked_names=[TestRoundTripLoadMarshalLoad489708636]
+c2_redirected os_temp_test_star_now=58
+c2_redirected verdict=DIR-LEAKED-in-watch-root shape_c_reproduced

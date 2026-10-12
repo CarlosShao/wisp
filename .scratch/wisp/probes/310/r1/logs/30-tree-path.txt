@@ -1,0 +1,5 @@
+tree=/d/tmp/310r1-tree2.dieduj
+archive_rc=0
+go_files=683
+patch_hits_prepatch_tree=0
+prepatch_rc=0

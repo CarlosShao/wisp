@@ -1,0 +1,10 @@
+shapec10c_noredirect started pid=28972 name=config-310r1.test at=11:49:05.703
+shapec10c_noredirect world=CONSTRUCTED dir=TestRoundTripLoadMarshalLoad2236627062 dir_creation=11:49:05.932
+shapec10c_noredirect target_name=config-310r1.test.exe pid=28972 ppid=33324 this_ps_pid=33324
+shapec10c_noredirect cmdline="D:\tmp\310r1-shapec\config-310r1.test.exe" -test.run ^TestRoundTripLoadMarshalLoad$ -test.count 4000 
+shapec10c_noredirect guard_name_is_test_exe=True guard_cmdline_has_export_tree=True guard_parent_is_this_leg=True
+shapec10c_noredirect external_kill_issued at=11:49:06.508
+shapec10c_noredirect at_kill_mine_dirs=7 at_kill_names=TestRoundTripLoadMarshalLoad1039208776,TestRoundTripLoadMarshalLoad1721168370,TestRoundTripLoadMarshalLoad2289939324,TestRoundTripLoadMarshalLoad2461500944,TestRoundTripLoadMarshalLoad2836872785,TestRoundTripLoadMarshalLoad3863116526,TestRoundTripLoadMarshalLoad725496612
+shapec10c_noredirect after_kill target_pid_still_present=0 mine_dirs_after=7 leaked_names=[] leaked_count=0 test_star_dirs_now=57
+shapec10c_noredirect watched_dir_now_exists=0
+shapec10c_noredirect verdict=NO-LEAK
