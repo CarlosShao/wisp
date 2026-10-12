@@ -1,0 +1,29 @@
+### dc2-R13 ledger lines carrying Q-304-orch / Q-309-orch
+16617:- **改前基线是同一台面上我今天更早取的**：同形 (b) 留过 **pid 7816**、同形 (c) 留过 **pid 8980**（件 `orch-A850-shape-b2.txt`／`orch-A850-shapes.txt`）⇒ "修前留、修后不留"在**两枚 spawn 点各有一发真读数
+16625:  这一族**票 304 从没裁要修**⇒ 不是"没修好"，是**没在射程里**；要不要另立一票归我与 `304-v1` 判＝`Q-304-orch-B`。
+16669:我自己新记两枚：**`Q-309-orch-A`**＝转换形／`make` 两形我只打了 `new`（三对里我只证了一对，⛔ 说我"复了 AC#2"）；
+16670:**`Q-309-orch-B`**＝`bridge.go` 里 `WithTaintDetector` 实参枚数那把尺我没独立复（只复了"非注释改动＝0 行"）。
+16688:- 票 304 五格／票 309 两格**仍未勾**（等非实现者判语）；我名下欠账 `Q-304-orch-A`（#1 缺 (b)、#2 缺 (c) 两格读数）／`-B`（`Test*` 临时目录 21→43 那一族⛔ 在本票射程）／`-C`／`Q-309-orch-A`／`-B` **�
+16749:在飞＝无（两枚续程腿都已收）；我名下欠账原样挂着：`Q-304-orch-A`（#1 缺 (b)、#2 缺 (c) 两格读数）／`-B`（`Test*` 目录族已立票 310，`next` gating 在本条之后可解：**判定"归 304"被 `AC#0`–`AC#4b` 的�
+
+### verdict tables present for 304/309
+-rw-r--r-- 20 swq 197609  30948 Sep 26 13:44 157-record-level-cleanup-r1-accept-r1.md
+-rw-r--r--  1 swq 197609   8878 Oct 11 14:03 309-v1-verdict.md
+-rw-r--r--  1 swq 197609  18034 Oct 11 16:36 309-v2-verdicts.md
+-rw-r--r--  1 swq 197609   3241 Oct 11 21:42 309-v3b-verdict.md
+-rw-r--r-- 20 swq 197609  37309 Sep 21 15:55 91-os-isolation-memo.md
+-rw-r--r--  1 swq 197609   3595 Oct 11 21:47 ticket304-304-v1-accept-v1.md
+
+### tracked .go under probes/304 and probes/309
+.scratch/wisp/probes/304/r1/logs/landed/childjob_other.go
+.scratch/wisp/probes/304/r1/logs/landed/childjob_windows.go
+.scratch/wisp/probes/304/r1/logs/landed/mockllm.go
+.scratch/wisp/probes/304/r1/logs/landed/mockllm_integ_test.go
+.scratch/wisp/probes/309/a1/logs/assessor.go
+.scratch/wisp/probes/309/a1/logs/bridge.go
+.scratch/wisp/probes/309/a1/logs/failclosed_236_teeth_test.go
+.scratch/wisp/probes/309/a1/logs/loop.go
+.scratch/wisp/probes/309/a1/logs/panel_assets.go
+.scratch/wisp/probes/309/a1/logs/provenance.go
+.scratch/wisp/probes/309/a1/logs/subagent_197.go
+count=11

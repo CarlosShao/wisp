@@ -1,0 +1,15 @@
+### dc2-R9 the cross-leg file: probes/309/v1/logs/pathlen2.log
+2539 .scratch/wisp/probes/309/v1/logs/pathlen2.log
+check-path-length-budget.sh: positive control bench=/tmp/tmp.K2VgQ1QVW0 (kept on disk; this project never deletes temp artifacts)
+warning: in the working copy of 'ok-short-name.md', LF will be replaced by CRLF the next time Git touches it
+check-path-length-budget.sh: control 1/3 ok - bench baseline green, so this gate is not stuck red
+warning: in the working copy of '.scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md', LF will be replaced by CRLF the next time Git touches it
+check-path-length-budget.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+RED - over budget and NOT in the roster: .scratch/wisp/issues/seeded-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-over-the-hat.md  (relative 125 chars, name 104 chars, full path on the self-hosted runner 169 chars, budget 165)
+### does r2 have its own pathlen log?
+final-pathlen.log
+gate-pathlen-final.log
+gate-pathlen.log
+pathlen-start.log
+rc_ls=0
+### v1 dir listing count=60

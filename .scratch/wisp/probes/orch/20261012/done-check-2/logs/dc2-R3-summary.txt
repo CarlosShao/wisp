@@ -1,0 +1,14 @@
+### dc2-R3 AC#4b exercisable? webview count + per-tree attribution (canonical section 2 needs root name + root PID)
+rc=0
+total_hits=10
+
+Count Name                    
+----- ----                    
+    5 SearchHost.exe          
+    4 NO-NAME-FLAG            
+    5 wetype_update.exe       
+    5 clipsync-desktop.exe    
+    5 magpie-windows-amd64.exe
+
+
+stderr_bytes=0

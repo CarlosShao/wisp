@@ -1,0 +1,2 @@
+f6067e5d leg=$ leg OTHERLEGDIR .scratch/wisp/probes/309/v1/logs/pathlen2.log
+rc=0

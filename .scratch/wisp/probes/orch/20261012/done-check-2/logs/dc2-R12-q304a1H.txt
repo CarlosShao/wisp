@@ -1,0 +1,4 @@
+.scratch/wisp/issues/310-test-binary-deaths-leave-temp-test-dirs-accumulating.md:11:- ★**归因三
+.scratch/wisp/issues/310-test-binary-deaths-leave-temp-test-dirs-accumulating.md:27:- ⛔ **`Q-304-a
+.scratch/wisp/probes/orch/20261012/txt/donecheck2-dispatch.txt:28:- ★顺带查一票 310：它的�
+rc=3

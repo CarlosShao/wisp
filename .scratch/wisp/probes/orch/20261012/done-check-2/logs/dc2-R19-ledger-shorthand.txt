@@ -1,0 +1,20 @@
+### A850 region shorthand for -H (lines 16482-16540)
+47:`Q-304-a1-A` **已销**（② 由我实测，读数在 §3）。`-B` CI 颜色层＝归我、推送那批（⛔ 用 `
+rc_hits=0
+### v3b 20-cells debt roster tail
+3. `fmt-nail.txt` and 4. `final-gofmt.txt` re-shot with named rulers and landed rc: `gofmt -l` on the nail file = 0 li
+5. Also resolved: v3's `labels.stderr` (0 bytes) - legacy label ruler re-run with stderr landed: 7 hits, rc=0; plus th
+
+## Debt list (named)
+
+- Q-309-v3b-wording-conflict (new): AC#2's universal sentence vs the nail's register - condition C1, two suggested lin
+- Q-309-v3b-conversion-fp (extends Q-309-r3-conversion-branch-is-syntactic): over-report vector measured (2 ways); liv
+- Q-309-v3b-foreign-agent-spelling (new): matcher is import-path blind for `agent.` selectors and package-clause blind
+- Q-309-v3b-roots-and-floor-unpinned (carried, Q-309-r3-4): narrowing roots to cmd+internal or shrinking the 200 floor
+- Q-309-v3b-blind-shapes-unrigged (carried, Q-309-r3-3): function-body alias / renamed import / dot-import shapes stil
+- Q-309-v3b-frontend-outside-roots (carried, Q-309-v2-4): frontend/embed.go is a module package outside the four roots
+- Q-309-v3b-assembly-limbs (carried, Q-309-r3-6): `b.prov == nil` / `b.injected` uninstrumented by ruling (register on
+- Q-309-v3b-roster-red-absolute (new, minor): r3's "only one red" was tree-content dependent; absolute counts of the f
+- Q-309-v3b-r3-gofmt-commands-unrecorded (new, minor): the original commands behind fmt-nail.txt / final-gofmt.txt wer
+
+Bearing sentence (repeated): shape B leaves the actual empty-id defence at zero; the two on-disk tripwires are the tar

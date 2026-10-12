@@ -1,0 +1,16 @@
+### which commit added the 4 tracked .go under probes/304
+bd123485 .scratch/wisp/probes/304/r1/logs/landed/childjob_other.go
+bd123485 .scratch/wisp/probes/304/r1/logs/landed/childjob_windows.go
+bd123485 .scratch/wisp/probes/304/r1/logs/landed/mockllm.go
+bd123485 .scratch/wisp/probes/304/r1/logs/landed/mockllm_integ_test.go
+
+### file sets of the code commits
+-- e875f00f: internal/llm/adaptertest/childjob_other.go internal/llm/adaptertest/childjob_windows.go internal/llm/adaptertest/mockllm.go internal/llm/openaichat/mockllm_integ_test.go 
+-- 16e86bae: internal/tools/assessorfor_taint_instrument_309_test.go internal/tools/bridge.go internal/tools/toolrequest_nail_309_test.go 
+-- d75db9ee: internal/tools/bridge.go internal/tools/toolrequest_nail_309_test.go 
+-- df8d517d: internal/tools/toolrequest_nail_309_test.go 
+-- a1f84d39: internal/tools/bridge.go 
+
+### orchestrator closing commits file sets
+-- 49153fa8: .scratch/wisp/issues/304-external-killed-test-binaries-orphan-mockllm-exe.md .scratch/wisp/probes/orch/20261011/logs/orch-A856-d22scan.txt .scratch/wisp/probes/orch/20261011/logs/orch-A856-gate-family.txt .scratch/wisp/probes/orch/20261011/logs/orch-A856-pathlen.txt .scratch/wisp/probes/orch/20261011/txt/A856-handover.txt .scratch/wisp/probes/orch/20261011/txt/A856-ledger.txt .scratch/wisp/probes/orch/20261011/txt/A856-t304-bullet.txt .scratch/wisp/probes/orch/20261011/txt/msg-A856.txt .scratch/wisp/probes/orch/gate-roster-304.md docs/reports/HANDOVER.md docs/reports/pending-and-issues.md 
+-- db1694bd: .scratch/wisp/issues/309-assessorfor-empty-taskid-limb-silently-drops-r4-detector.md .scratch/wisp/probes/orch/20261011/logs/orch-A855-d22scan.txt .scratch/wisp/probes/orch/20261011/logs/orch-A855-pathlen2.txt .scratch/wisp/probes/orch/20261011/txt/-watchkill.txt .scratch/wisp/probes/orch/20261011/txt/A855-ledger.txt .scratch/wisp/probes/orch/20261011/txt/A855-t309-bullet.txt .scratch/wisp/probes/orch/20261011/txt/msg-A855.txt docs/reports/pending-and-issues.md 

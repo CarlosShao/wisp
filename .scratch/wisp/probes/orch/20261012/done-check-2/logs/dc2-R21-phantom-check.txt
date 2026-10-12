@@ -1,0 +1,16 @@
+### which file carries each of the three IDs
+-- Q-309-v3b-mixed-face
+./.scratch/wisp/probes/orch/20261012/done-check-2/30-debt-ledger.md
+./.scratch/wisp/probes/orch/20261012/done-check-2/logs/dc2-R20-debt-books.txt
+./.scratch/wisp/probes/orch/20261012/done-check-2/logs/dc2-R21-phantom-check.txt
+-- Q-309-v3b-unrigged
+./.scratch/wisp/probes/orch/20261012/done-check-2/30-debt-ledger.md
+./.scratch/wisp/probes/orch/20261012/done-check-2/logs/dc2-R20-debt-books.txt
+./.scratch/wisp/probes/orch/20261012/done-check-2/logs/dc2-R21-phantom-check.txt
+-- Q-309-v3b-gofmt-rulers-not-recorded
+./.scratch/wisp/probes/orch/20261012/done-check-2/30-debt-ledger.md
+./.scratch/wisp/probes/orch/20261012/done-check-2/logs/dc2-R20-debt-books.txt
+./.scratch/wisp/probes/orch/20261012/done-check-2/logs/dc2-R21-phantom-check.txt
+### does probes/309/v3b/90-final.md exist?
+ls: cannot access '.scratch/wisp/probes/309/v3b/90-final.md': No such file or directory
+rc=2

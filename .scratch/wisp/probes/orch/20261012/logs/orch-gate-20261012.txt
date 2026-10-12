@@ -1,0 +1,9 @@
+=== gate live @ 2026-10-12 10:21:55 HEAD=49153fa8
+wisp.exe count=0
+balldebug.exe count=0
+mockllm.exe count=0
+wisp.test.exe count=0
+--- family ruler (*.test.exe) ---
+--- TEMP Test* dirs ---
+50
+gate_rc=0

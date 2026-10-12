@@ -1,0 +1,1 @@
+done-check-2: section B per-commit over-reach roster (37 leg commits, 1 cross-leg artefact in f6067e5d; own comment-only ruler on 3 bridge.go commits; probes go-snapshot +4)

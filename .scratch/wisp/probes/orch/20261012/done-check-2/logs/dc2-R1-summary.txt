@@ -1,0 +1,6 @@
+### dc2-R1 canonical family ruler verbatim from gate-roster-304.md section 1
+rc=0
+hits=0
+0 .scratch/wisp/probes/orch/20261012/done-check-2/logs/dc2-R1-family.txt
+0 .scratch/wisp/probes/orch/20261012/done-check-2/logs/dc2-R1-family.stderr
+0 total

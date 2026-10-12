@@ -1,0 +1,8 @@
+dc2 ruler: grep -E '(gitignore|go\.mod|^design/|internal/risk/|\.github/)' over 37 per-commit name-only lists
+hits=0 (empty above = 0); stderr none
+docs_hits=4
+docs/evidence/s1/ticket304-304-v1-accept-v1.md
+docs/evidence/s1/309-v3b-verdict.md
+docs/evidence/s1/309-v2-verdicts.md
+docs/evidence/s1/309-v1-verdict.md
+rc=0

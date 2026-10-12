@@ -1,0 +1,1 @@
+done-check-2: anchor at 49153fa8 + verbatim re-copy of dispatch §0.3-4 and §2 star rules

@@ -1,0 +1,8 @@
+label=qualified-literal lines_with_label_and_red_marker=1
+label=same-package-bare-literal lines_with_label_and_red_marker=1
+label=alias-literal lines_with_label_and_red_marker=1
+label=var-decl-no-initializer lines_with_label_and_red_marker=1
+label=new-of-tool-request lines_with_label_and_red_marker=2
+label=make-slice-of-tool-request lines_with_label_and_red_marker=2
+label=conversion-to-tool-request lines_with_label_and_red_marker=2
+rc=0

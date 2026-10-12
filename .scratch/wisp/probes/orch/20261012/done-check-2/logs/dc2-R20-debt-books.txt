@@ -1,0 +1,25 @@
+### v3b top-level files
+00-anchor.md
+10-teeth-pairs.md
+20-cells.md
+logs
+### 20-cells named-debt roster (count + ids)
+9
+Q-309-v3b-assembly-limbs
+Q-309-v3b-blind-shapes-unrigged
+Q-309-v3b-conversion-fp
+Q-309-v3b-foreign-agent-spelling
+Q-309-v3b-frontend-outside-roots
+Q-309-v3b-r3-gofmt-commands-unrecorded
+Q-309-v3b-roots-and-floor-unpinned
+Q-309-v3b-roster-red-absolute
+Q-309-v3b-wording-conflict
+### phantom-ID greps (exact strings, whole repo)
+Q-309-v3b-mixed-face files=1
+Q-309-v3b-unrigged files=1
+Q-309-v3b-gofmt-rulers-not-recorded files=1
+### the nine prose names in the three books
+token=mixed-face 20cells=0 verdict=0 face309=1 ledger=0
+token=unrigged 20cells=1 verdict=1 face309=2 ledger=0
+token=gofmt 20cells=2 verdict=1 face309=2 ledger=1
+rc=0

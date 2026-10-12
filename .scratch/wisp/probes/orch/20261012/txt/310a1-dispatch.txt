@@ -1,0 +1,55 @@
+# 派单 `310-a1`（只读普查腿）＝票 310 `AC#0`＝`%TEMP%` 下 `Test*` 目录的**逐枚归属**＋死亡三形对目录的实测＋三形代价表
+
+你是**只读普查腿**（非实现者、非验收腿）。⛔ 删任何目录（这一程**一枚都不删**，包括你自己那一发留下的）；⛔ 改任何产码／测试码；⛔ 自己翻任何框；⛔ 宣布任何 `AC` 成立；⛔ push（推送永远归编排者，且现在有一枚 `A813` 授权我⛔ 用）。
+
+**授权并期望你顶回我**：票面「现量」与「要建什么」那两节是我写的，里面若有读数过期、尺口径写错、或判据自相矛盾（例如"⛔ 按名字前缀就删"与"名字首段就是测试名"之间的推理缺口），**逐条具名报回**，⛔ 照抄。
+
+## 0. 起手（第 3～5 次调用之内必须做完第 4 步，⛔ 等任何调用数）
+1. `git rev-parse --short HEAD` ＋ `git rev-parse --abbrev-ref HEAD` ＋ `git status --porcelain -- internal cmd tools scripts` 行数，逐枚写进 `00-anchor.md`。**★派单里不写锚号**；盘上与我下面转述冲突 ⇒ **以盘上原文为准并具名报回**。
+2. 起手量一把**全索引**暂存枚数：`git -c core.quotePath=false diff --cached --name-only | grep -c ''`。**发现大面积别家路径＝⛔ 自己清空**（那是在飞态、归属归对方），件里只写"我看到 N 枚、我没动"。**唯一允许的归位动作＝`git restore --staged -- <你自己的路径>`**；⛔ `git reset`／`git stash`／`git checkout .`／`git clean`。
+3. **起手闸门逐字跑一遍**（正典＝`.scratch/wisp/probes/orch/gate-roster-304.md` §1，把那段**逐字抄进**你的 `00-anchor.md` 再跑）：四条 `tasklist //FI "IMAGENAME eq <名>"`（`wisp.exe`／`balldebug.exe`／`mockllm.exe`／`wisp.test.exe`）＋那条家族宽松尺（`Get-CimInstance Win32_Process | Where-Object { $_.Name -like "*.test.exe" }`，**bash 里整条 PS 命令用单引号包住**，否则 `$_` 被外壳吃掉）。⚠ 命中 0 也要落盘（stderr＋rc 并排），⛔ 空输出当"0 枚"。编排者 10-12 10:21:55 那一发的读数在 `probes/orch/20261012/logs/orch-gate-20261012.txt`（四把＝0／家族尺空／`%TEMP%` 下 `Test*`＝**50**），**那是快照，⛔ 当你的读数**。
+4. **第 1 笔 commit 立刻做**：只交 `00-anchor.md`，形式＝`git add -- <显式路径>` 之后 `git commit -F <你自家 logs 里的消息件> -- <同样的显式路径>`。**⛔ 裸 `git commit`**（它提交的是整个 index；add 带 pathspec、commit 也带 pathspec）。⛔ `git add -A`／`git add .`／`git add <目录>` 一把扫。
+
+## 1. 这一票在说什么（背景三句，细节自己读票面）
+票面＝`.scratch/wisp/issues/310-test-binary-deaths-leave-temp-test-dirs-accumulating.md`（必读，`AC#0` 那一段逐字）。人话版本：一枚 Go 测试二进制如果被外力打死（`go test -timeout` panic、或被人 `TerminateProcess`），它 `t.TempDir()` 建在 `%TEMP%` 下的那些目录**留在盘上没人删**；票 304 已经把"子进程赖着不走"修掉了，**同一次死法的"目录赖着"这一半没人管**，今天已累积到几十枚，而且**没有任何闸门在数它**。
+
+## 2. 你要交的三张表（`AC#0` 的原文判据，一格都不许"只交一半"）
+### 表① `10-roster.md`＝逐枚名册（⛔ 只报枚数）
+尺＝`Get-ChildItem -Path $env:TEMP -Directory | Where-Object { $_.Name -like 'Test*' }`。**每枚一行**，五列：目录名／mtime／大小（字节或"空目录"）／它像本仓哪一条 `Test…` 用例（反查尺＝把去掉尾部随机数字后的名字拿去 `git grep -n "func <名>" HEAD -- cmd internal tools scripts`，**命中要给出文件:行**）／**归属三态＝本仓可证／别家／归属不明**。
+- ★每一枚都要落"可证／不可证"的**理由那一列**，⛔ 空。判"别家"要能指出证据（名字在本仓 `git grep` 零命中＝一条；mtime 落在我们的跑测窗口之外＝另一条，**两条各写了什么要说清**）。
+- ★**分母必须同表给出**：`%TEMP%` 下目录总枚数、其中 `Test*` 枚数、其中"本仓可证"枚数（三个数一条链）。⛔ 拿"0 枚"当读数而不同批给分母。
+- ⚠ **名字只是线索、不是证据**：票面 `:12` 自己写了"⛔ 按名字前缀就直接删"。名册的用途是让下一步**按名册逐枚**处置，⛔ 由它生成"可以批量删"的结论。
+
+### 表② `20-shapes.md`＝死亡三形对目录的实测（每一形都要"坏世界真被造出来"的同行证据）
+- 三形＝(a) 测试正常收尾／(b) `go test -timeout` panic／(c) 外力 `TerminateProcess` 打死测试二进制。
+- 每形报：**跑之前**`Test*` 枚数、**跑之后**枚数、**新增目录的具名名册**（目录名逐枚），以及**这一发里"那一形真的发生了"的证据行**（(b) 要 `panic: test timed out after …` 那一行逐字；(c) 要"父 PID 消失"的现量确认行＋被杀进程的名字与命令行）。
+- ⚠⚠ **"0 枚新增"⛔ 是读数**，除非同批发证明**世界被造出来了**：编排者自己踩过（帽设 14s 而用例 4.1s 就完了 ⇒ 那一发量的是一件没发生的事）。所以：跑之前先确认用例**真的在跑**（`-v` 的 `=== RUN` 行）、超时刻度**落在用例运行之中**（先测一次用例真实耗时，再把帽设在那之内）。
+- ⚠ (c) 那一形**必须在同一个进程里"盯＋下手"**：bash↔PowerShell 往返 0.5–1 s，而短命子进程只活 1–2 s，分开两轮会大概率错过窗口（可复用台件＝`probes/orch/20261011/shape-c-orch.ps1` 与 `watch-kill-orch.ps1`，**先 `wc -l`＋`head -3` 摸清口径再用、别重造**）。
+- ⚠ 台件＝**仓外导出树**（共享工作树里⛔ 改任何字节）。导出模板必带**六件套**：`git archive HEAD go.mod go.sum internal cmd tools scripts | tar -x -C "$T"`，**一树一 `mktemp -d`**，量之前先数 `.go` 枚数**证非空**（少带一枚 root ⇒ 仪器会报 `walk …: The system cannot find the file specified.`，那是**台面故障、⛔ 计入牙**）。选一条**只用 `t.TempDir()`、不起子进程、不碰麦/不碰 webview** 的窄用例（例如 `internal/tools` 或 `internal/llm` 里某条纯内存用例），先 `go test -list` 或读源码确认它真调 `t.TempDir()`。
+- ★跑完当场自报：你这几发新增的目录，逐枚写进名册（它们**归你**、可证＝本仓），⛔ 删。
+
+### 表③ `30-costs.md`＝三形代价表（甲／乙／丙，**丙＝不做** 必须真给）
+- 甲＝测试期把 `TMP`/`TEMP` 指到一枚**仓外专用根**，收尾按"本仓可证"处置；乙＝起手清扫（下次跑测试先扫自己上次留下的、按可证归属删旧的）；丙＝**不做**，改成把 `Test*` 目录枚数**登记进编队起手闸门名册**（正典件＝`probes/orch/gate-roster-304.md`，只把那一行补进去）当具名已知残留。
+- 每形必答：**会动哪几枚文件／会不会打红既有钉（点名哪一枚）／用户侧表现／失败模式（最坏情况是什么留在盘上）**。⛔ 用"应该没问题"。
+- ★**必答两问（票面原文）**：(I) 甲形会不会改掉本仓测试里"临时目录在 `$env:TEMP` 下"这条既有假设——**先把逐字读 `os.TempDir()`／`$env:TEMP`／`%TEMP%` 的测试件数出来**（尺要写射程目录＋枚数），⛔ 没数完不许说"不影响"；(II) 乙形"按可证归属删旧"在同机别家用同样命名时怎么保证⛔ 误删——给出**它打算用的判据**（哪个字段能把两家的目录分开？命令行反查？mtime 窗口？仓属根？），并具名说这条判据**什么时候会失效**。
+
+## 3. 硬约束（一条都不许漂）
+1. ⛔ 删任何目录或文件（包括你自己的残渣、包括"看着明显是垃圾"的那些）；⛔ 移动、改名、清空 `%TEMP%` 下任何东西。这一程**只读＋只新建你自己的 `probes/310/a1/**`**。
+2. ⛔ 动任何产码／`*_test.go`；⛔ 改 `ci.yml`／`.github/**`；⛔ 动 `docs/reports/**`／`docs/evidence/s1/**`（裁决表归非实现者）／`AGENTS.md`／`docs/PLAN.md`／`docs/specs/**`。
+3. ⛔ 放宽任何断言、⛔ 造 `--- SKIP` 换绿；⛔ 动 SLO 阈值／golden／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt`／D43 转移表／C1–C32／D1–D47／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。
+4. ⛔ 碰 `msedgewebview2.exe` 那几棵树；⛔ 杀任何不是你起的进程。要停进程只能按三条守卫（名字必须是 `*.test.exe`／`mockllm.exe` ＋ 命令行含你那棵导出树的具名路径 ＋ 父 PID 现量不存在），且逐枚写进件里。
+5. ★**Go 编译面**：编排者 10-12 上午把这一面交给你独占。⛔ 跑整包 `go test ./...`（会把 `cmd/wisp` 那批真窗/音频用例卷进来，读数必假）；只跑你为表② 选的那几条窄用例，并在件里具名"我只跑了这几条"。
+6. ⛔ 在仓内建 worktree／checkout；临时件**只建不删**，只建在你自家 `probes/310/a1/**` 里（导出树在 `mktemp -d`，那是仓外，允许留）。
+
+## 4. 交付件与落点
+- 写面**只有三件套**：① `.scratch/wisp/probes/310/a1/**` ②（⛔ 本轮用不到，裁决表归非实现者）`docs/evidence/s1/**` ③ 票 310 末尾**一条** append-only Progress bullet（`1 加／0 删`；⛔ 动框、⛔ 动 `Status:`、⛔ 改名 `-done`）。
+- 件：`00-anchor.md`／`10-roster.md`／`20-shapes.md`／`30-costs.md`／`90-final.md`（结论一页内＋三张表指回件名＋**结尾具名写你欠的读数**，逐枚编号 `Q-310-a1-…`，至少要含：任何你没跑的一形、任何归属不明的枚数、以及你⛔ 能替编排者答的取舍）。
+- ★**证据件规矩**：⛔ 叫 `.out`（根 `.gitignore` 第 8 行全仓 `*.out`，会被静默跳过）⇒ 一律 `.md`／`.txt`／`.tsv`；⛔ 在 `probes/**` 下新建 `.go`（会挪别家的 gofumpt／d22scan 分母）；件名⛔ 带 `§`、⛔ 长名（相对 ≤121、末段 ≤100、全路径 ≤165；新建前先跑一次 `sh scripts/check-path-length-budget.sh --with-self-test` 那把长度门）。
+- ★**每把读数件自己落一行 `rc=N`**；⛔ 0 字节件（＝那格没交）。若你要引用一枚同伴件确认"它确实是空的、不是没交"，**先 `wc -c` 再写**。
+- ★**尺规矩**：`grep -c` 命中 0 时 rc＝1，会把 `&&` 后面的尺整段跳掉 ⇒ 凡"某枚计数应当为 0"的链一律 `N=$(… || true)`，件里写一行"empty above＝0 枚"；任何"0 命中"的尺，**stderr 要与命中数并排落盘**（一把坏尺＋`2>/dev/null` 会造出像读数的假 0）；引用外部文档/票面原文时标 provenance（HEAD blob／工作树／仓外）。
+- ★**门禁**（本格只要求这三把，逐件自落 rc）：`sh scripts/check-path-length-budget.sh --with-self-test` rc=0；`sh scripts/d22scan.sh` rc=0（纯净树；⛔ 让你的临时件进名册——它只扫跟踪件，所以 commit 前先 `git status --porcelain` 确认你新增件只在你自家目录）；`git show --name-only --format=` 逐笔量你自己的每笔 commit（越出上面三件套＝**直接停手上报**）。⛔ `GOFLAGS= go build ./...`／⛔ 整包 `go test`（那是写腿与编排者的面）。
+
+## 5. 输出预算与死活规矩（⛔ 这三条是别人死换来的）
+- ⛔ 把上百行原文读进对话：大输出**先落你自家 `logs/`**，对话里只允许 `wc -l`／`head -3`／`cut -c1-170` 级摘要。危险活点名：整包 `-v` 输出、全仓 `grep -rn`、CI 日志、`%TEMP%` 全量递归列表（**名册只要 `Test*` 那批，⛔ 递归进目录里数文件**）。
+- 目标调用数 **≤50**；第 40 次之前把 `90-final.md`＋票尾 bullet 写满并 commit；第 60 次无条件先 commit 当前件。前一枚同票腿死于每日额度（额度死了**盘上有的那部分才算交过**）。
+- commit 之后自己 `git show --stat` 逐枚数一遍（"提交成功"≠"我的件在里面"）。

@@ -1,0 +1,36 @@
+### full-ID existence of Q-304-orch-C / -A / -B anywhere
+Q-304-orch-A fullid_hits=4
+Q-304-orch-B fullid_hits=1
+Q-304-orch-C fullid_hits=0
+
+### tracked .go under all probes today
+count=318
+
+### 304 verdict table head
+# Ticket 304 — non-implementer adjudication (leg `304-v1b`), five cells `AC#1`/`AC#2`/`AC#3`/`AC#4`/`AC#4b`
+
+Judge: leg `304-v1b` (continues dead leg `304-v1`; inherits on-disk leftovers only). Date: 2026-10-11 evening.
+Anchor for every table header above: `git rev-parse --short HEAD` = `3b8066a2` (own reading; leg anchor commit `83b1aea9`).
+Nothing here flips a ticket box; the orchestrator reruns these numbers first.
+
+| cell | verdict | basis (my own re-runs) | evidence |
+|---|---|---|---|
+| `AC#1` | HOLDS | per-commit ruler over the four `304-r1` commits (`e875f00f`/`bd123485`/`27f7b197`/`04f2ecbc`): both spawn points in one batch (`mockllm.go:85`, `mockllm_integ_test.go:87`); reuse of `internal/proc.JobScope` only (`KILL_ON_JOB_CLOSE`), no second job wrapper; five hard constraints each = 0 forbidden diffs; ticket bullet 1+/0- | `probes/304/v1b/10-ac1.md`, `logs/ac1-*.txt` |
+| `AC#2` | HOLDS | 5 own shots in out-of-repo trees (6-piece archive, `go_files=682`): FWD (b)/(c) openaichat + FWD/REV helper (c) + REV (b) openaichat; every shot carries world-construction evidence (child PID/cmdline while parent alive; `panic: test timed out after 3s`=1 or `kill_testbinary ... parent_alive_at_kill=YES`); forward post-counts 0; reverse residual count 1 (named pid, parent=GONE) then stopped by three guards, final 0. 2 own void shots named | `probes/304/v1b/15-ac2-shots.md`, `logs/ac2-*` |
+| `AC#3` | HOLDS | own re-runs: `d22scan_rc=0`; `pathlen_rc=0` (over-budget 57 = roster 57, worst full path 228); census totals byte-equal to frozen baseline (`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`); format worktree roster 0 / HEAD-blob roster 0, blobs byte-identical. `304-r1` 0-byte trio = empty shells (readings live in `g-build.txt build_rc=0` / `g-vet.txt vet_rc=0` / `g-summary.txt`) | `probes/304/v1b/20-gates-ac3.md`, `logs/g-own-*` |
+| `AC#4` | HOLDS with one named condition | canonical `probes/orch/gate-roster-304.md`: corrected process-name line (mockllm.exe required, wisp.test.exe added) + three questions with parent-PID demoted to corroborating (PID-reuse case written); my live run of the canonical four names: all 0, `gate_rc=0`, attribution dump empty. Adding wisp.test.exe = NOT overreach (ticket defers `*.test.exe` to the AC#0 roster; that roster's loose ruler already measures the family). Condition: literal `wisp.test.exe` under-covers sibling `<pkg>.test.exe` names. Five historical copies left unchanged = satisfies AC#4 (snapshots; ticket asks for corrected text + live run, both exist) | `probes/304/v1b/30-cells.md`, `logs/g-own-gatelive.txt`, `logs/g-own-templates.txt` |
+| `AC#4b` | HOLDS | canonical S2 covers "every non-zero count points to a tree, else 归属不明", "no bare counts into final anchors", "no stop-debts from bare counts", plus the in-flight-window caveat — matching the ticket text fully. My live run had zero non-zero counts (stated) | `probes/orch/gate-roster-304.md` S2, `logs/g-own-gatelive.txt` |
+
+### 309 v3b table head
+# 309-v3b verdicts - ticket 309 cells AC#2 and AC#3 (non-implementer)
+
+- Judge leg: 309-v3b (continues 309-v3, which died with zero verdicts). Anchor 3b8066a2; commits c9d6eb05, 35dadf0e. Evidence: probes/309/v3b/** (scripts and raw readings rerunnable verbatim).
+- No production byte, test assertion or box touched; no push. The judged blobs (`internal/tools/bridge.go`, `internal/tools/toolrequest_nail_309_test.go`) are byte-identical at HEAD to a1f84d39.
+
+| cell | criterion (ticket) | my readings | verdict |
+|---|---|---|---|
+| AC#2 | any future caller hand-building `ToolRequest` with empty `TaskID` must ring on disk | three own teeth pairs (new / make / conversion): pristine rc=0, injected rc=1 at `toolrequest_nail_309_test.go:390:` with roster shape label, restored rc=0, sha+cmp+fingerprint restore proofs; all seven roster labels seen on disk; void-token count 0 per red | CONDITIONAL-PASS: as-written "any/wherever" conflicts with the nail's own register (7 named blind shapes); condition C1 = narrow the ticket sentence to the recognised seven shapes / four roots (two suggested lines in probes/309/v3b/20-cells.md); condition C2 = carried residual debts stay registered (reflection/decode not statically pinnable; conversion over-report measured; roots+floor unpinned; three blind shapes unrigged) |
+| AC#3 | content anchors for the drifted loop.go refs; ruler-backed restatement of the dispatch claim; no contract-claim text changed | (B) a1f84d39 comments-only by three independent rulers (numstat 14/4; -U0 classify ADDED 14 / REMOVED 4 / NONCOMMENT 0; stripped blobs cmp IDENTICAL 854 vs 854, sha 496ed6d6...; guard/detector lines byte-identical); bridge comment's "seven" = the matcher's seven reachable labels 1:1 (all observed in red rosters); the naive `return "..."` seven differs (unreachable `literal`, misses `var-decl-no-initializer`); wantTotal=1 / wantOwner / floor 200 untouched; bridge's own word-ruler re-run: 72 raw / 2 naive / 1 strict; C19/C25/C26 hits 0; named segment has no absolute loop.go refs (5 pre-existing refs elsewhere, 154/151 family) | PASS (non-blocking observations: outside list enumerates 5 of the register's 7; word-ruler scope vs four roots; dated count snapshot) |
+
+- Zero-byte artefacts re-shot (4 + 1): fail-new.txt (was the roster differ, not the red shot; re-shot, newly_red_count=0; the 4 reds = docs-missing export-tree harness faults, proven by adding docs/ -> 3 pass, remaining one matches r3's record); st.txt = 0 with stderr; fmt-nail.txt = gofmt -l lists 0; final-gofmt.txt = gofmt/gofumpt lists 0; v3's labels.stderr re-run with stderr landed (7 hits + field ruler).
+- Required answers: (I) reflection/decode not statically pinnable; go/types catches only the direct-typed subset at the named cost of type-checking in-test; runtime gate would reopen AC#0 shape. (II) conversion branch over-reports (FP measured, two vectors; live hits today 0) - not an AC#2 gap; stays a registered precision debt.

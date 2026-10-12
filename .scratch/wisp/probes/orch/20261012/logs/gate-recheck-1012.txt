@@ -1,0 +1,56 @@
+=== gate recheck @ 2026-10-12 11:01:27 HEAD=8adcd65e
+Witness: family ruler (verbatim canonical form, no inline -join in the PS command line)
+canonical_count=0
+
+Positive controls (same pipeline, a pattern that MUST be non-zero today):
+pattern=svchost.exe count=85 ids=[864,1364,1524,1564,1640,1804,1856,1916,2096,2112,2176,2228,2268,2280,2288,2292,2380,2444,2564,2624,2688,2724,3064,3200,3244,3308,3408,3480,3584,3616,3780,3884,3892,3940,3948,4000,4008,4140,4148,4264,4272,4464,4512,4684,4808,4812,4832,4900,4916,4924,5272,5656,7108,7232,7752,7872,8080,8616,8668,8708,8888,8976,9324,9672,10204,10344,10380,10756,11556,11668,14372,14396,14556,15512,16068,19464,19772,20124,22612,22864,23120,23916,25232,28060,29280] uniq_names=[svchost.exe]
+pattern=explorer.exe count=1 ids=[9260] uniq_names=[explorer.exe]
+pattern=*.exe count=349 ids=[796,864,1212,1324,1332,1364,1400,1420,1488,1524,1564,1632,1640,1668,1692,1700,1804,1856,191
+
+AC#4b bite test: is there a NON-ZERO surface where 'point to a tree or write unknown' actually bites?
+webview_total=24
+webview_without_webview_exe_name=4
+Method invocation failed because [System.String] does not contain a method named 'Length'.
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\orch\20261012\gate-recheck-1012.ps1:29 char:85
++ ... $x.ParentProcessId) cmdlen=$([string]::Length($x.CommandLine)) cmd=$( ...
++                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : MethodNotFound
+ 
+  pid=12948 ppid=12812 cmdlen= cmd="C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.53\msedgewebview2.exe" --type=crashpad-handler --user-data-dir=C:\Users\swq\AppData\Local\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\LocalState\EBWebView /prefetch:4 /pfhostedapp:7dbcc57e0f994d354684581365ebf4657f94d789 --monitor-self-annotation=ptype=crashpad-handler --database=C:\Users\swq\AppData\Local\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\LocalState\EBWebView\Crashpad --annotation=IsOfficialBuild=1 --annotation=channel= --annotation=chromium-version=154.0.8037.93 "--annotation=exe=C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.53\msedgewebview2.exe" --annotation=plat=Win64 "--annotation=prod=Edge WebView2" --annotation=ver=154.0.4258.53 --initial-client-data=0x174,0x178,0x17c,0x150,0x184,0x7ffa332083e0,0x7ffa332083f0,0x7ffa33208400
+Method invocation failed because [System.String] does not contain a method named 'Length'.
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\orch\20261012\gate-recheck-1012.ps1:29 char:85
++ ... $x.ParentProcessId) cmdlen=$([string]::Length($x.CommandLine)) cmd=$( ...
++                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : MethodNotFound
+ 
+  pid=30272 ppid=28208 cmdlen= cmd="C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --type=crashpad-handler --user-data-dir=C:\Users\swq\AppData\Local\flutter_webview_windows\wetype_update\EBWebView /prefetch:4 /pfhostedapp:86231030c61c56f2b1d5386176a1f00d9b681767 --monitor-self-annotation=ptype=crashpad-handler --database=C:\Users\swq\AppData\Local\flutter_webview_windows\wetype_update\EBWebView\Crashpad --annotation=IsOfficialBuild=1 --annotation=channel= --annotation=chromium-version=154.0.8037.98 "--annotation=exe=C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --annotation=plat=Win64 "--annotation=prod=Edge WebView2" --annotation=ver=154.0.4258.62 --initial-client-data=0x188,0x18c,0x190,0x164,0x198,0x7ff99b1c83e0,0x7ff99b1c83f0,0x7ff99b1c8400
+Method invocation failed because [System.String] does not contain a method named 'Length'.
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\orch\20261012\gate-recheck-1012.ps1:29 char:85
++ ... $x.ParentProcessId) cmdlen=$([string]::Length($x.CommandLine)) cmd=$( ...
++                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : MethodNotFound
+ 
+  pid=34272 ppid=13188 cmdlen= cmd="C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --type=crashpad-handler --user-data-dir=C:\Users\swq\AppData\Local\com.clipsync.desktop\EBWebView /prefetch:4 /pfhostedapp:30772ee6035b08914d5777258b9285198f0059f8 --monitor-self-annotation=ptype=crashpad-handler --database=C:\Users\swq\AppData\Local\com.clipsync.desktop\EBWebView\Crashpad --annotation=IsOfficialBuild=1 --annotation=channel= --annotation=chromium-version=154.0.8037.98 "--annotation=exe=C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --annotation=plat=Win64 "--annotation=prod=Edge WebView2" --annotation=ver=154.0.4258.62 --initial-client-data=0x178,0x17c,0x180,0x154,0x188,0x7ff99b1c83e0,0x7ff99b1c83f0,0x7ff99b1c8400
+Method invocation failed because [System.String] does not contain a method named 'Length'.
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\orch\20261012\gate-recheck-1012.ps1:29 char:85
++ ... $x.ParentProcessId) cmdlen=$([string]::Length($x.CommandLine)) cmd=$( ...
++                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : MethodNotFound
+ 
+  pid=4248 ppid=25352 cmdlen= cmd="C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --type=crashpad-handler --user-data-dir=C:\Users\swq\AppData\Roaming\magpie-windows-amd64.exe\EBWebView /prefetch:4 /pfhostedapp:4b2ffed1da4cac7dd66ef2e6106955004da9eee7 --monitor-self-annotation=ptype=crashpad-handler --database=C:\Users\swq\AppData\Roaming\magpie-windows-amd64.exe\EBWebView\Crashpad --annotation=IsOfficialBuild=1 --annotation=channel= --annotation=chromium-version=154.0.8037.98 "--annotation=exe=C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --annotation=plat=Win64 "--annotation=prod=Edge WebView2" --annotation=ver=154.0.4258.62 --initial-client-data=0x18c,0x190,0x194,0x168,0x19c,0x7ff99b1c83e0,0x7ff99b1c83f0,0x7ff99b1c8400
+webview_parent_already_gone=0
+
+Roots of the webview trees (parent chain one hop up, by name):
+  root_pid=8548 name=clipsync-desktop.exe cmd="target\debug\clipsync-desktop.exe"
+  root_pid=9004 name=SearchHost.exe cmd="C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe" -ServerName:CortanaUI.AppXstmwaab17q5s3y22tp6apqz7a45vwv65.mca
+  root_pid=12812 name=msedgewebview2.exe cmd="C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.53\msedgewebview2.exe" --embedded-browser-webview=1 --webview-exe-name=SearchHost.exe --webview-exe-version=2126.8901.20.0 --user-data-dir="C:\Users\swq\AppData\Local\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\LocalState\EBWebView" --noerrdialogs --disable-features=msSmartScreenProtection --edge-webview-enable-mojo-ipcz --enable-features=msEdgeFluentOverlayScrollbar --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; Cortana 1.18.9.23723; 10.0.0.0.26100.8457) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.26100 IsWebView2/True (WebView2Version 154.0.4258.37)" --lang=en-US --mojo-named-platform-channel-pipe=9004.12756.3562689258902219730 /pfhostedapp:7dbcc57e0f994d354684581365ebf4657f94d789
+  root_pid=13188 name=msedgewebview2.exe cmd="C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --embedded-browser-webview=1 --webview-exe-name=clipsync-desktop.exe --webview-exe-version=0.1.1 --user-data-dir="C:\Users\swq\AppData\Local\com.clipsync.desktop\EBWebView" --noerrdialogs --embedded-browser-webview-dpi-awareness=2 --disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --lang=en-US --mojo-named-platform-channel-pipe=8548.8256.10570048151651370615 /pfhostedapp:30772ee6035b08914d5777258b9285198f0059f8
+  root_pid=16852 name=wetype_update.exe cmd="C:\Program Files\Tencent\WeType\2.1.1.16\wetype_update.exe"
+  root_pid=25352 name=msedgewebview2.exe cmd="C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --embedded-browser-webview=1 --webview-exe-name=magpie-windows-amd64.exe --webview-exe-version=0.1.1188 --user-data-dir="C:\Users\swq\AppData\Roaming\magpie-windows-amd64.exe\EBWebView" --noerrdialogs --embedded-browser-webview-dpi-awareness=2 --disable-features=msSmartScreenProtection --mojo-named-platform-channel-pipe=26144.7804.4016638567826838606 /pfhostedapp:4b2ffed1da4cac7dd66ef2e6106955004da9eee7
+  root_pid=26144 name=magpie-windows-amd64.exe cmd=D:\work\soft\src\magpie-windows-amd64.exe gui providers
+  root_pid=28208 name=msedgewebview2.exe cmd="C:\Program Files (x86)\Microsoft\EdgeWebView\Application\154.0.4258.62\msedgewebview2.exe" --embedded-browser-webview=1 --webview-exe-name=wetype_update.exe --webview-exe-version=2.1.1.16 --user-data-dir="C:\Users\swq\AppData\Local\flutter_webview_windows\wetype_update\EBWebView" --noerrdialogs --disable-web-security --mojo-named-platform-channel-pipe=16852.448.15338615907464202274 /pfhostedapp:86231030c61c56f2b1d5386176a1f00d9b681767
+ps_rc=0

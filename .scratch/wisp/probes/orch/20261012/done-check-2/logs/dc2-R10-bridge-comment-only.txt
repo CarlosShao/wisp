@@ -1,0 +1,4 @@
+commit=16e86bae parent_noncomment_lines=854 cand_noncomment_lines=854 cmp=IDENTICAL total_changed=73/0 32/3 134/0 
+commit=d75db9ee parent_noncomment_lines=854 cand_noncomment_lines=854 cmp=IDENTICAL total_changed=44/9 305/66 
+commit=a1f84d39 parent_noncomment_lines=854 cand_noncomment_lines=854 cmp=IDENTICAL total_changed=14/4 
+rc=0

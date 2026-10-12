@@ -1,0 +1,16 @@
+=== shape(b) re-taken (rig fixed: test output goes to its own file) @ 2026-10-12 11:05:21 HEAD=8adcd65e
+tree=/tmp/tmp.1Ve15Fn2a3
+archive_rc=0
+go_files_in_tree=682
+before=54
+test_rc=1
+panic_lines=1
+panic: test timed out after 2s
+	running tests:
+FAIL	github.com/CarlosShao/wisp/internal/config	2.039s
+FAIL
+after=55
+my_new_dirs=TestRoundTripLoadMarshalLoad1039208776,TestRoundTripLoadMarshalLoad2289939324,TestRoundTripLoadMarshalLoad2836872785,TestRoundTripLoadMarshalLoad3863116526,TestRoundTripLoadMarshalLoad725496612
+stderr_of_powershell_rulers=see_names_above(empty_ok)
+tree_kept=/tmp/tmp.1Ve15Fn2a3
+gate_rc=0

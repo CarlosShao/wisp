@@ -1,0 +1,42 @@
+49153fa8 收 304-v1b ⇒ 票 304 六格齐（含 AC#4 条件由我落政）＋ A856 / §4.0cr
+db1694bd 收 309-v3b ⇒ 票 309 六格齐（AC#2 措辞修订归我 + AC#3 复跑翻勾）+ A855
+b6080266 304-v1b: closing machine-state anchor reading (own trees 0, four-name gate 0)
+7a9d00d7 304-v1b: judge bullet at ticket tail (1 add / 0 del)
+9fe10b73 304-v1b: AC2 five-shot paired readings, AC4/AC4b ruling cells, s1 verdict table
+9404ef3b 309-v3b: verdicts (AC#2 conditional, AC#3 pass) + evidence table + round-2 gates + ticket bullet
+35dadf0e 309-v3b: AC#2 rigs (new/make/conversion pairs, label census, FP shot) + AC#3 rulers + 0-byte reshoots (probes only)
+afd954ed 304-v1b: AC3 own gate re-runs (d22scan/pathlen/census/fmt) + zero-byte trio resolution
+245ab5d3 304-v1b: AC1 re-run cell (own per-commit ruler, reuse, five constraints)
+c9d6eb05 309-v3b: anchor at 3b8066a2 + inherited-leftovers roster (probes only)
+688a1e76 编排者 A854：两枚验收腿死于每日额度 ⇒ 代提遗产＋重试派发成功（304-v1b ∥ 309-v3b 在飞）
+83b1aea9 304-v1b: opening anchor, own HEAD reading (/3b8066a2/), staged=0, scope clean
+cf627625 309-v3: opening anchor, own HEAD reading, write-surface declaration
+c27928d6 304-v1: opening anchor, own HEAD reading and write-surface declaration
+04f2ecbc 304-r1: correct the over-reach roster (a foreign commit hash had been printed in my own log)
+715f63cb 309-r3: final readings, 90-final and the one ticket bullet Closes out this leg: 90-final.md (readings table with ruler, scope and face per row, plus six named debts Q-309-r3-*), the self-referential word-face ruler re-run, the final gate round taken with every leg file on disk (rc_build=0 rc_vet=0 rc_d22scan=0 rc_pathlen=0 VERDICT GREEN rc_test309=0 gofmt listed=0 worktree clean=0 rows) and one append-only bullet at the foot of ticket 309 (1 added / 0 deleted; no box touched - census now 4 checked / 2 unchecked because the orchestrator flipped AC#1 at 17:1x, which this leg re-ran rather than copied).
+27f7b197 304-r1: final readings page, over-reach roster and one append-only ticket bullet
+6fed247e 309-r3: evidence for the widened nail range and the narrowed comment
+bd123485 304-r1: AC#2 paired readings and AC#3 gate artefacts for the job-object landing
+a1f84d39 309-r3 (B): narrow bridge.go every/wherever to the nail measured range The doc block above assessorFor claimed that Test309ToolRequestProductionConstructionNail "counts every production construction point of that type ... so a second one rings wherever it is written". 309-v2 B14 and the orchestrator A851 section 2 falsified that against the nail own register. The sentence now names the seven shape labels the matcher recognises after part (A), names the shapes that ring nothing today (reflection or decode, cross-package and function-body aliases, renamed and dot imports, elided nested element), and points at that register. Comment lines only: noncomment_changed=0, both blobs with full-line comments deleted are cmp IDENTICAL at 854 lines, sha256 496ed6d683e8e070, CR=0, guard limb and WithTaintDetector argument byte counts unchanged. No contract claim touched.
+df8d517d 309-r3 (A): widen the nail matcher to new()/make([]T,n)/defined-type conversion Adds three statically recognisable shapes to internal/tools/toolrequest_nail_309_test.go so the AC#2 universal claim has fewer in-register counterexamples: new(agent.ToolRequest), make([]agent.ToolRequest, n) (including the make(..., 0) length form) and the conversion agent.ToolRequest(x) written after a defined type. go/ast and parser only - no go/types, so the head comment line "no type-level perfection" stays verbatim and the missed shapes stay named by item: cross-package alias, function-body alias, renamed and dot import, reflection/decode construction, elided nested element, bare name gated on the package clause. 12 new controls, both directions, two of them pinning that a still-blind shape really counts 0. No assertion weakened, no SKIP, no production byte touched. rc=0 on the nail alone with the tree count still 1.
+e875f00f 304-r1: land job-object guard on both mockllm spawn points (AC#1, shape A)
+b9f37892 304-r1: anchor readings at leg start (HEAD 3974ab4d, dev, index clean)
+f4920906 309-r3: land start anchor (HEAD 3974ab4d, worktree clean, staged 0)
+3974ab4d 309-v2 非实现者终裁：AC#1 成立／AC#2 成立／AC#3 附条件成立（一枚新条件＝那句 "wherever" 量上不实）
+93de4b4a 304-a1 追加：把 0 字节那一枚尺件补成自解释件（0 命中⛔ 等于没问题）
+b5954339 304-a1 census: mockllm residue is 0 now, the spawn roster is 66+6 with an 18/48 cut, and 甲 already has an instrument in-repo
+5f6323c0 A849 记账：309-r2 死于 150 轮帽（遗产九枚我代提 f6067e5d，断流体内报的 5058f914 整枚不存在）＋★共享索引被扫进 1759 枚别家路径（含 .gitignore/go.mod/design/**＝机主那批"不许我提交"的件），我先证"逐枚在盘上"再用 git restore --staged 归位＋派 309-v2
+f6067e5d 309-r2 死在 150 轮帽：编排者代提它的最后九枚件〔未复跑，判语归 309-v2〕
+9d3f9da7 309-r2 evidence: rigs, rulers, six new debt readings, one append-only bullet
+d75db9ee 309-r2 code: narrow the nail to a named single point, widen roots, teach it three shapes
+597d6a55 309-r2 anchor: declare write face, record start state
+47d3f6da 309-v1: 非实现者终裁五格（AC#1/AC#2/AC#3 附条件成立／AC#4/AC#5 成立）＋十枚具名欠账
+8bbffc50 chore(309-r1): 收口全量测试名册读数(final-suite.log, 211/75/0/0, 两枚236载体PASS)
+8ffa61c6 chore(309-r1): 补交正文引用的 logs/staged-evidence.txt（commit3 暂存清册，逐 pathspec）
+b2dd7fb2 chore(309-r1): 证据件(10/20/30/40/90.md)+logs(基线/改后名册、突变与枚数Rig读数、d22scan与gates rc)+票309末尾1条bullet(1加0删)
+16e86bae feat(309-r1): 形Ⓑ注释(bridge.go assessorFor 少报写明) + AC#3 内容锚/枚数重述 + AC#1 恒真形仪器 + AC#2 枚数钉
+1cd57ec1 chore(309-r1): 锚件（commit-first；写面声明）
+ff301daf probe(309-a1): AC#2 material (four wiring-independent ruler families + half-product census of the three named future callers) + leg final, 7 named unread readings
+27059960 probe(309-a1): AC#0 census - four same-shape dispositions verbatim (bridge.go:925 / panel_assets.go:164 / subagent_197.go:263 / task.go:709) plus shape-a and shape-b static cost
+2a37d612 probe(309-a1): anchor at 7dc753e3, internal/cmd worktree clean (0 porcelain lines), zero go build/vet/test calls
+rc=0

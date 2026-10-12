@@ -1,0 +1,6 @@
+### dc2-R2 positive control: same pipeline, a name that must exist
+rc=0
+count=3
+powershell.exe
+powershell.exe
+stderrbytes=0

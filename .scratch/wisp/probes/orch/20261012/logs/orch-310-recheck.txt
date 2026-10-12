@@ -1,0 +1,62 @@
+time=2026-10-12T11:04:39.483+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+panic: test timed out after 2s
+	running tests:
+		TestRoundTripLoadMarshalLoad (0s)
+
+goroutine 348 [running]:
+testing.(*M).startAlarm.func1()
+	D:/work/base/go/src/testing/testing.go:2959 +0x34a
+created by time.goFunc
+	D:/work/base/go/src/time/sleep.go:182 +0x2d
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0xac0f1e14000, {0x7ff6e9769891?, 0xac0f2007aa8?}, 0x7ff6e9bb9ce0)
+	D:/work/base/go/src/testing/testing.go:2266 +0x4d2
+testing.runTests.func1(0xac0f1e14000)
+	D:/work/base/go/src/testing/testing.go:2742 +0x37
+testing.tRunner(0xac0f1e14000, 0xac0f2007bc8)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+testing.runTests({0x7ff6e97683e1, 0x1a}, {0x7ff6e9771d81, 0x2a}, 0xac0f1abc378, {0x7ff6e9c2d350, 0x60, 0x60}, {0xc2ab31725ce958ec, 0x77a6378d, ...})
+	D:/work/base/go/src/testing/testing.go:2740 +0x505
+testing.(*M).Run(0xac0f1b3cf00)
+	D:/work/base/go/src/testing/testing.go:2600 +0x6af
+main.main()
+	_testmain.go:238 +0x9b
+
+goroutine 182 [syscall]:
+syscall.syscalln(0x0?, 0x0?, {0xac0f1f85800?, 0x7ff6e9c7e540?, 0x0?})
+	D:/work/base/go/src/runtime/syscall_windows.go:427 +0x48
+syscall.SyscallN(0x7ff6e92f577e?, {0xac0f1f85800?, 0x7ff6e92ff07f?, 0xac0f1f85850?})
+	D:/work/base/go/src/syscall/dll_windows.go:99 +0x1e
+syscall.findFirstFile1(0xac0f1ac8500?, 0x2?)
+	D:/work/base/go/src/syscall/zsyscall_windows.go:616 +0x6d
+syscall.FindFirstFile(0xac0f1ebe1f0?, 0xac0f1f85ac4)
+	D:/work/base/go/src/syscall/syscall_windows.go:1257 +0x58
+path/filepath.normBase({0xac0f1ebe1f0?, 0xac0f1ac8500?})
+	D:/work/base/go/src/path/filepath/symlink_windows.go:34 +0x79
+path/filepath.toNorm({0xac0f1ac8500, 0x4a}, 0x7ff6e9bba6f8)
+	D:/work/base/go/src/path/filepath/symlink_windows.go:83 +0x17a
+path/filepath.evalSymlinks({0xac0f1ac83c0?, 0x4a?})
+	D:/work/base/go/src/path/filepath/symlink_windows.go:113 +0x29
+path/filepath.EvalSymlinks(...)
+	D:/work/base/go/src/path/filepath/path.go:148
+github.com/CarlosShao/wisp/internal/proc.SealableRoot({0xac0f1ac83c0, 0x4a})
+	C:/Users/swq/AppData/Local/Temp/tmp.cZ8u4CH5lF/internal/proc/envfork.go:181 +0x236
+github.com/CarlosShao/wisp/internal/config.sealableTempDir124(0xac0f1e14200)
+	C:/Users/swq/AppData/Local/Temp/tmp.cZ8u4CH5lF/internal/config/tempdir_resolved_124_test.go:33 +0x2a
+github.com/CarlosShao/wisp/internal/config.TestRoundTripLoadMarshalLoad(0xac0f1e14200)
+	C:/Users/swq/AppData/Local/Temp/tmp.cZ8u4CH5lF/internal/config/boundary_test.go:188 +0x39
+testing.tRunner(0xac0f1e14200, 0x7ff6e9bb9ce0)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/config	2.036s
+FAIL
+test_rc=1
+after=54
+panic_lines=1
+panic: test timed out after 2s
+FAIL	github.com/CarlosShao/wisp/internal/config	2.036s
+FAIL
+new_dir_names=TestRoundTripLoadMarshalLoad1039208776,TestRoundTripLoadMarshalLoad2289939324,TestRoundTripLoadMarshalLoad2836872785,TestRoundTripLoadMarshalLoad725496612
+tree_kept=/tmp/tmp.cZ8u4CH5lF

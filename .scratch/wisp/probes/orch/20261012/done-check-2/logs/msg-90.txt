@@ -1,0 +1,1 @@
+done-check-2: final three-state verdict - neither ticket 304 nor 309 is -done ready; named cells, owners, and this leg own errors
