@@ -43,6 +43,27 @@ if [ ! -f "$portable" ]; then
     exit 2
 fi
 
+# ---- TICKET 310 AC#1 (shape A-G): claim the dedicated GOTMPDIR root at THIS
+# entry, because this is the file CI names. portable-tests.sh (the one that really
+# starts `go test`, via tools/d22scan/runtests.sh) builds a root only while
+# GOTMPDIR is still empty, so the delegated run inherits this root instead of
+# opening a second one - one root per run, named in this step's own log line. What
+# the root is for, why GOTMPDIR rather than TMP/TEMP, why it is never under the OS
+# temp dir, why it is never deleted here and why the ubuntu leg is left alone: the
+# long note at the top of scripts/portable-tests.sh.
+if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
+    gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/winsec-$(date +%Y%m%d-%H%M%S)-$$"
+    if mkdir -p "$gotmp_run" 2>/dev/null; then
+        export GOTMPDIR="$gotmp_run"
+        echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+            "t.TempDir() family lands here; nothing deletes it."
+    else
+        echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+            "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+            "the OS temp root again. Not a silent fallback: this line is the finding." >&2
+    fi
+fi
+
 # The scope this step exists for, stated once. Extra packages may be appended by
 # hand while debugging; the list can never lose winsec without going red.
 scope=()
