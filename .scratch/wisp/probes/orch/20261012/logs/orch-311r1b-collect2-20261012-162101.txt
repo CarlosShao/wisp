@@ -1,0 +1,21 @@
+T_ALL=/tmp/tmp.oK5Iz5nZ8l go_files=1001
+T_ONE=/tmp/tmp.xtM8gzrfl8 go_files=1001
+strip_all: path=C:/Users/swq/AppData/Local/Temp/tmp.oK5Iz5nZ8l/scripts/winsec-tests.sh blocks=1 lines_removed=71 crlf=False
+strip_all: path=C:/Users/swq/AppData/Local/Temp/tmp.oK5Iz5nZ8l/scripts/portable-tests.sh blocks=1 lines_removed=71 crlf=False
+strip_all: path=C:/Users/swq/AppData/Local/Temp/tmp.oK5Iz5nZ8l/scripts/wisp-cli-tests.sh blocks=1 lines_removed=71 crlf=False
+strip_all: path=C:/Users/swq/AppData/Local/Temp/tmp.oK5Iz5nZ8l/tools/d22scan/runtests.sh blocks=1 lines_removed=71 crlf=False
+strip_one: path=C:/Users/swq/AppData/Local/Temp/tmp.xtM8gzrfl8/scripts/portable-tests.sh blocks=1 lines_removed=71 crlf=False
+blocks_after_T_ALL(winsec)=0 blocks_after_T_ONE(winsec)=1 blocks_after_T_ONE(portable)=0
+d_exist_created=1
+
+=== (a) re-run: portable refusal, offender root really exists ===
+shot=A2b-portable-xvol-existingdir rc=2 bytes=4001 guard=1 run=0 cleanup_fail=0 work_dir_error=0 counts= verdictlines=
+
+=== (b) sensitivity control, roots built by the ticket-310 block on D: ===
+shot=B1b-winsec-xvol-allblocks-stripped rc=1 bytes=267787 guard=0 run=101 cleanup_fail=4 work_dir_error=0 counts= verdictlines=FAIL	github.com/CarlosShao/wisp/internal/winsec	16.901s|
+shot=B2b-portable-xvol-ownblock-stripped rc=2 bytes=5105 guard=1 run=0 cleanup_fail=0 work_dir_error=0 counts= verdictlines=
+shot=B3b-winsec-xvol-blocks-present rc=2 bytes=1390 guard=1 run=0 cleanup_fail=0 work_dir_error=0 counts= verdictlines=
+
+=== (c) same roots, guard removed, DEFAULT (C:) location -- colour must stay 58/0 ===
+shot=B4b-winsec-default-allblocks-stripped rc=0 bytes=241115 guard=0 run=101 cleanup_fail=0 work_dir_error=0 counts= verdictlines=ok  	github.com/CarlosShao/wisp/internal/winsec	11.247s|
+ALL DONE2

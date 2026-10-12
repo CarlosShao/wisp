@@ -1,0 +1,142 @@
+orch-311r1b-collect TS=20261012-161831 head=8ef6b672 localappdata=C:\Users\swq\AppData\Local
+
+=== STEP 0 static block census (provenance = HEAD) ===
+file=scripts/winsec-tests.sh HEAD:scripts/winsec-tests.sh:4 HEAD:scripts/winsec-tests.sh:1
+file=scripts/portable-tests.sh HEAD:scripts/portable-tests.sh:4 HEAD:scripts/portable-tests.sh:1
+file=scripts/wisp-cli-tests.sh HEAD:scripts/wisp-cli-tests.sh:4 HEAD:scripts/wisp-cli-tests.sh:1
+file=tools/d22scan/runtests.sh HEAD:tools/d22scan/runtests.sh:4 HEAD:tools/d22scan/runtests.sh:1
+worktree_dirty_lines_vs_HEAD_scripts_tools=0
+
+=== STEP 1 (a) cross-volume refusal, offender root = D:/tmp/orch-311collect-20261012-161831/* ===
+shot=A1-winsec rc=2 bytes=1091 guard=1 run=0 passdash=0 faildash=0 cleanup=0 summary=
+shot=A2-portable rc=1 bytes=857 guard=0 run=0 passdash=0 faildash=0 cleanup=0 summary=
+shot=A3-cli rc=2 bytes=1077 guard=1 run=0 passdash=0 faildash=0 cleanup=0 summary=
+shot=A4-runtests rc=2 bytes=1085 guard=1 run=0 passdash=0 faildash=0 cleanup=0 summary=
+shot=A5-runtests-gotmpdir-only rc=2 bytes=1099 guard=1 run=0 passdash=0 faildash=0 cleanup=0 summary=
+
+=== STEP 2 export trees (git archive HEAD; worktree untouched) ===
+archive_all_rc=0
+archive_one_rc=0
+T_ALL=/tmp/tmp.es0QjQjpDS go_files=1001 top=15
+T_ONE=/tmp/tmp.ffbEAd24P8 go_files=1001 top=15
+preop tree_all scripts/winsec-tests.sh crlf=0 blocks=1
+preop tree_all scripts/portable-tests.sh crlf=0 blocks=1
+preop tree_all tools/d22scan/runtests.sh crlf=0 blocks=1
+strip_all: path=C:/Users/swq/AppData/Local/Temp/tmp.es0QjQjpDS/scripts/winsec-tests.sh blocks=1 lines_removed=71 crlf=False
+strip_all: path=C:/Users/swq/AppData/Local/Temp/tmp.es0QjQjpDS/scripts/portable-tests.sh blocks=1 lines_removed=71 crlf=False
+strip_all: path=C:/Users/swq/AppData/Local/Temp/tmp.es0QjQjpDS/scripts/wisp-cli-tests.sh blocks=1 lines_removed=71 crlf=False
+strip_all: path=C:/Users/swq/AppData/Local/Temp/tmp.es0QjQjpDS/tools/d22scan/runtests.sh blocks=1 lines_removed=71 crlf=False
+strip_one: path=C:/Users/swq/AppData/Local/Temp/tmp.ffbEAd24P8/scripts/portable-tests.sh blocks=1 lines_removed=71 crlf=False
+poststrip_T_ALL_blocks(winsec,portable,cli,runtests)=0,0,0,0
+poststrip_T_ONE_portable=0 T_ONE_winsec_untouched=1
+worktree_winsec_still_clean=0 sha_worktree=b921d242a3ad596c sha_T_ALL_stripped=b3277562eeeaf3d1
+
+=== STEP 3 (b) sensitivity control: guard removed => the colour must come back ===
+shot=B1-winsec-xvol-allblocks-stripped rc=1 bytes=1508 guard=0 run=0 passdash=0 faildash=0 cleanup=0 summary=
+shot=B2-portable-xvol-ownblock-stripped rc=1 bytes=862 guard=0 run=0 passdash=0 faildash=0 cleanup=0 summary=
+
+=== STEP 4 (c) shapes the guard must not break (present, on HEAD worktree) ===
+shot=C1-winsec-default-env rc=0 bytes=241015 guard=0 run=101 passdash=58 faildash=0 cleanup=0 summary=PASS
+shot=C2-winsec-samevol-other-dir rc=0 bytes=257433 guard=0 run=101 passdash=58 faildash=0 cleanup=0 summary=PASS
+
+=== STEP 5 AC#4 gates ===
+build_rc=0 bytes=0
+d22scan_rc=0 tail=d22scan: scope ban #8 internal/         examined 533 Go files, comments and _test.go included|d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included|d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=231, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=533, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 533 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included|
+gofumpt_rc=0 dirty=0 list=
+tasklist_wisp=0 tasklist_balldebug=0
+
+=== STEP 6 per-commit over-reach ruler (leg 311-r1b's eight commits) ===
+commit=e4e787fb files=1 forbidden=0 nonmd=1
+    nonmd: scripts/winsec-tests.sh
+commit=f8b1f446 files=1 forbidden=0 nonmd=1
+    nonmd: scripts/portable-tests.sh
+commit=10734fbd files=1 forbidden=0 nonmd=1
+    nonmd: scripts/wisp-cli-tests.sh
+commit=0f888a4f files=1 forbidden=0 nonmd=1
+    nonmd: tools/d22scan/runtests.sh
+commit=501af017 files=31 forbidden=0 nonmd=30
+    nonmd: .scratch/wisp/probes/311/r1b/logs/00-head.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/00-len-gate-start.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/01-insertion-points.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/02-start-roster.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/03-tree-pre.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/09-runner-selftest.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/10-winsec-pre-run1.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/10-winsec-pre-run2.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/11-pre-build.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/11-pre-census.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/11-pre-d22scan.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/13-replicate-insert.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/13b-insert-success.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/14-replicate-diff.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/21-strip-proof.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/40-a862-310block-check.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/41-shot-table.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/42-winsec-roster.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/43-format-roster.txt
+    nonmd: .scratch/wisp/probes/311/r1b/ps1/residue.ps1
+    nonmd: .scratch/wisp/probes/311/r1b/ps1/residue2.ps1
+    nonmd: .scratch/wisp/probes/311/r1b/ps1/roster.ps1
+    nonmd: .scratch/wisp/probes/311/r1b/txt/append-rc.sh
+    nonmd: .scratch/wisp/probes/311/r1b/txt/mk-block.sh
+    nonmd: .scratch/wisp/probes/311/r1b/txt/phase-a.sh
+    nonmd: .scratch/wisp/probes/311/r1b/txt/phase-b.sh
+    nonmd: .scratch/wisp/probes/311/r1b/txt/phase-c.sh
+    nonmd: .scratch/wisp/probes/311/r1b/txt/phase-pre-shapes.sh
+    nonmd: .scratch/wisp/probes/311/r1b/txt/run-shot.sh
+    nonmd: .scratch/wisp/probes/311/r1b/txt/summarize.sh
+commit=3b553a2f files=40 forbidden=0 nonmd=39
+    nonmd: .scratch/wisp/probes/311/r1b/logs/20-A1-winsec-xvol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/20-A2-portable-xvol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/20-A3-runtests-xvol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/20-A4-cli-xvol-worktree.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/20-C3-runtests-gotmpdir-only-xvol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/20-C4-cli-gotmpdir-only-xvol-worktree.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/22-B2-portable-xvol-own-guard-removed.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/23-order-degraded-then-guard.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/24-order-guard-after-guard1.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/24b-order-degraded-before-guard1.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/25-C1-runtests-xvol-backslash.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/25-C2-runtests-inconclusive-rel.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/26-B1x-winsec-default-guardremoved.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/26-B1y-portable-default-guardremoved.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/26-B3x-runtests-default-guardremoved.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/26-C1-winsec-samevol-guardremoved.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/26-D1-winsec-samevol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/26-D2-portable-samevol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/26-D3-runtests-samevol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/27-E1-winsec-nolappdata.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/27-E2-runtests-nolappdata.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/27-E3-portable-nolappdata.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/28-F1-winsec-gooslinux.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/28-F2-cli-gooslinux.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/28-F3-runtests-gooslinux.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/29-P1-pre-runtests-nolappdata.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/29-P2-pre-winsec-nolappdata.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/29-P3-pre-runtests-gooslinux.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/29-P4-pre-winsec-gooslinux.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/29-P5-pre-runtests-samevol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/29-P6-pre-portable-nolappdata.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/29-P7-pre-portable-samevol.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/50-end-roster.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/51-residue-raw.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/51-residue.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/52-locked-leaves-raw.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/53-residue-rerun.txt
+commit=07e7a1e0 files=12 forbidden=0 nonmd=11
+    nonmd: .scratch/wisp/probes/311/r1b/logs/30-G1-post-build.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/30-G2-post-census.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/30-G3-post-d22scan.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/30-G4-post-winsec-run1.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/30-G5-post-winsec-run2.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/30-G6-post-census-worktree.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/30-G7-post-len.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/54-head-move.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/55-audit.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/messages-311r1b.txt
+    nonmd: .scratch/wisp/probes/311/r1b/logs/pathspec-311r1b.txt
+commit=8f350a9d files=1 forbidden=0 nonmd=0
+final_worktree_dirty_scripts_tools=0
+ALL DONE

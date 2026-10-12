@@ -1,0 +1,32 @@
+orch-311r1b-collect3 TS=20261012-162559 head=8ef6b672 true_pre=87951fd0
+T_PRE=/tmp/tmp.cm2gm7Z4jF go_files=1001 top=15 blocks=0
+0
+
+=== winsec tier, TRUE PRE side (T_PRE, default env), two shots ===
+label=T_PRE_run1 run=101 pass_top=58 fail_top=0 skip_top=0 pass_incl_sub=101
+pre_run1 rc=0 bytes=240634 summary=winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+label=T_PRE_run2 run=101 pass_top=58 fail_top=0 skip_top=0 pass_incl_sub=101
+pre_run2 rc=0 bytes=240915 summary=winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+
+=== winsec tier, POST side on the worktree @HEAD, two shots ===
+label=WT_run1 run=101 pass_top=58 fail_top=0 skip_top=0 pass_incl_sub=101
+post_run1 rc=0 guard=0 inconclusive=0 bytes=240856 summary=winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+label=WT_run2 run=101 pass_top=58 fail_top=0 skip_top=0 pass_incl_sub=101
+post_run2 rc=0 guard=0 inconclusive=0 bytes=240806 summary=winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+
+=== roster intersection, two rulers side by side (top-level only vs incl. subtests) ===
+roster_pre_names=58 roster_post_names=58
+only_in_pre=0 only_in_post=0
+
+=== census totals line, verbatim, before vs after (ticket baseline string in the ticket) ===
+census tree=/tmp/tmp.cm2gm7Z4jF rc=0 totals=portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+census tree=D:/work/workspace/projects plans/Wisp rc=0 totals=portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+
+=== residue accounting created by my three passes (ticket 310/311 rule: 只建不删) ===
+dtmp_orch_dirs=5
+dtmp_run_roots=5
+temp_top_Test_count=59
+temp_top_all_count=34047
+c_gotmp_root_run_dirs=73
+d_gotmp_root_dirs=15
+ALL DONE3

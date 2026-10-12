@@ -1,0 +1,15 @@
+tag=B3b-winsec-xvol-blocks-present
+workdir=/tmp/tmp.xtM8gzrfl8
+env_assignment=WISP_TEST_GOTMP_ROOT=D:/tmp/orch-311collect2-20261012-162101-b3root
+command_line=bash scripts/winsec-tests.sh ./internal/winsec/
+winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=D:/tmp/orch-311collect2-20261012-162101-b3root/winsec-20261012-162247-2447 - this run's t.TempDir() family lands here; nothing deletes it.
+winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume C (path C:/Users/swq/AppData/Local), offender: GOTMPDIR=D:/tmp/orch-311collect2-20261012-162101-b3root/winsec-20261012-162247-2447(volume D) WISP_TEST_GOTMP_ROOT=D:/tmp/orch-311collect2-20261012-162101-b3root(volume D)
+winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-C root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not.
+winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume C, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green.
+guard_lines=1
+inconclusive=0
+run_lines=0
+cleanup_fail=0
+access_denied=0
+work_dir_error=0
+rc=2

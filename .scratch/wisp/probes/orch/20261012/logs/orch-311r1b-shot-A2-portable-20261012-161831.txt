@@ -1,0 +1,15 @@
+tag=A2-portable
+workdir=D:/work/workspace/projects plans/Wisp
+env_assignment=GOTMPDIR=D:/tmp/orch-311collect-20261012-161831/a2
+command_line=bash scripts/portable-tests.sh ./internal/winsec/
+portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+go: creating work dir: GetFileAttributesEx D:/tmp/orch-311collect-20261012-161831/a2: The system cannot find the file specified.
+portable-tests.sh: go test -list failed for [./internal/winsec/... ./internal/agent/approval/ ./internal/memory/ ./internal/proc/ ./internal/audio/ ./internal/models/ ./internal/risk/ ./internal/tools/] - the ledger cannot be verified against a test binary that does not build.
+guard_lines=0
+inconclusive_lines=0
+run_lines=0
+tempdir_cleanup=0
+access_denied=0
+pass_top=0
+fail_top=0
+rc=1

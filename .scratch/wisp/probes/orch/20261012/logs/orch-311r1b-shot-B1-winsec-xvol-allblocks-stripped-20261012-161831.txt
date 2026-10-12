@@ -1,0 +1,21 @@
+tag=B1-winsec-xvol-allblocks-stripped
+workdir=/tmp/tmp.es0QjQjpDS
+env_assignment=GOTMPDIR=D:/tmp/orch-311collect-20261012-161831/b1
+command_line=bash scripts/winsec-tests.sh ./internal/winsec/
+winsec-tests.sh: platform=windows gate=internal/winsec scope=[./internal/winsec/] package=github.com/CarlosShao/wisp/internal/winsec
+portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+go: creating work dir: GetFileAttributesEx D:/tmp/orch-311collect-20261012-161831/b1: The system cannot find the file specified.
+portable-tests.sh: go test -list failed for [./internal/winsec/... ./internal/agent/approval/ ./internal/memory/ ./internal/proc/ ./internal/audio/ ./internal/models/ ./internal/risk/ ./internal/tools/] - the ledger cannot be verified against a test binary that does not build.
+winsec-tests.sh: GUARD 2 - the run printed NO top-level result line for github.com/CarlosShao/wisp/internal/winsec, so this step tested the package it is named for zero times.
+winsec-tests.sh: a build tag or a rename that empties the package is a red step here (ticket 110 AC#3), not a green short-circuit.
+winsec-tests.sh: winsec result line: <none>
+winsec-tests.sh: four numbers (all from -v output): === RUN=0  --- PASS=0  --- FAIL=0  --- SKIP=0
+winsec-tests.sh: gate is RED (rc=1) for scope=[./internal/winsec/]
+guard_lines=0
+inconclusive_lines=0
+run_lines=0
+tempdir_cleanup=0
+access_denied=0
+pass_top=0
+fail_top=0
+rc=1

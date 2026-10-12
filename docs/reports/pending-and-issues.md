@@ -17077,3 +17077,35 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - ⛔ 零 push（推送类欠账继续押着）；⛔ 零删目录。
 
 **next**＝收 `311-r1b` ⇒ 我复跑 ⓐⓑⓒⓓ 四发再裁票 311 `AC#2`/`AC#4`（顺带替 `A862` 那格补第二双眼）；收 `295-v1` ⇒ 按判语翻票 295 的格 ⇒ 放 `294-r1`；`298 AC#5` 排在 `cmd/wisp` 色空出来之后。
+
+
+## A866｜2026-10-12 16:3x｜收 `311-r1b`（落地腿，接死腿 `311-r1`；八笔 `e4e787fb`→`8f350a9d`，★**死于 150 轮帽但盘上齐**＝四笔产码＋三笔证据＋票尾 1 条 bullet 全入库、`scripts`＋`tools` 工作树对 HEAD **0 行差异**⇒⛔ 代提⛔ 回退）⇒★**我自己三发复尺全认 ⇒ 票 311 `AC#2`／`AC#4` 翻勾（现尺 6 勾／0 未勾），但⛔ `-done`**（新登 **`Q-311-r1b-1`**＝`wisp-cli` 那档的默认形／同卷形／摘除侧**至今零人跑过**）＋**裁掉腿留给我的那一问**（DEGRADED 保持"每档一句"）＋⚠**我自己那把摘除正控的第一发是台面故障**（`GOTMPDIR` 指向不存在的目录 ⇒ `creating work dir`，⛔ 计入牙）
+
+### 1 我自己复跑的东西（尺与件逐枚带；件＝`probes/orch/20261012/logs/orch-311r1b-{collect,collect2,collect3}-*.txt` ⇄ `shot*`）
+
+- **ⓐ 换卷＝起测试之前拒绝**（provenance＝工作树 @`8ef6b672`）⇒ 四枚入口 `rc` 全 **2**、GUARD 行各 **1**、`=== RUN` 各 **0**：`shot-A1-winsec`／`shot2-A2b-portable`（★这枚是第一发那把坏尺的重跑，见 §3）／`shot-A3-cli`／`shot-A4-runtests`／`shot-A5-runtests-gotmpdir-only`。★最硬的一发＝`shot2-B3b`：票 310 那块**真在 `D:` 上建出运行根**（`ls -d` 现量 `…/orch-311collect2-20261012-162101-b3root/winsec-20261012-162247-2447` 在场）⇒ 同发 311 才拒 ⇒ "坏世界被造出来"那行是**脚本落的、⛔ 我编的**。
+- **ⓑ 反形正控＝这格的钱**（★全程仓外导出树，跟踪文件一字⛔ 动：`git diff --numstat HEAD -- scripts tools` 起手与交件都 **0 行**；`sha256` 工作树 `b921d242…` ⇄ 摘后树 `b3277562…`）⇒ `txt/strip311.py` 按内容锚每枚摘 **71 行**（四枚块各 1，摘后锚命中 **0**）：同一枚 `D:` 根逐字回到 `=== RUN=101  --- PASS=56  --- FAIL=2  --- SKIP=0`、`rc=1`、`TempDir RemoveAll cleanup` **4 行**、红名两枚逐字＝`TestGateJudgesThePrivateSetByResolvedSID`＋`TestSealNarrowsAndNamesThePrincipalItRemovedBySID`（`shot2-B1b`）；★**同一棵摘净的树在默认 `C:` 根**＝`PASS=58 FAIL=0 rc=0`＋cleanup **0**（`shot2-B4b`）⇒ **成对那两枚颜色被完整摘回＝这段守卫⛔ 是装饰**（⛔ 只交"摘了仍绿"那一支，两支都交）。单变量复认＝只摘 `portable` 自己那一枚 ⇒ 拒绝**没消失、换了下层具名**，逐字 `runtests.sh: ticket 311 AC#1 shape B: GUARD … offender: GOTMPDIR=D:/t…`（`shot2-B2b`）＝防线分层、⛔ "一次防"。
+- **ⓒ 三形不许破**＝我复跑两形（`shot-C1` 默认根／`shot-C2` 同卷换目录）＝各 `58/0 rc=0`、GUARD 与 INCONCLUSIVE 命中各 **0**（分母＝同发脚本自落那行 `=== RUN=101 --- PASS=58`）；⚠ `LOCALAPPDATA` 为空那形与 `GOOS`⛔ windows 那形**我⛔ 重跑**＝腿交的两发＋改前侧同号，⛔ 算我量过。
+- **`AC#4` 门禁**＝★**我把"改前那一侧"另取了一棵更前的树**：腿的 `T_pre`＝`2567e3a9` **已含**我 15:1x 代提的 winsec 块 ⇒ 那一侧⛔ 是"无守卫改前"；我起 `git archive 87951fd0`（块落地之前）＝`T_TRUE_PRE`，先证非空（`go_files`**1001**、`top`15、块锚 **0**）⇒ 默认根两发 `RUN=101 PASS=58 FAIL=0 SKIP=0 rc=0`×2 ⇄ 工作树改后两发同逐字串×2；名册尺**两把并排**（只顶层 **58⇄58**、含子例 **101⇄101**，⛔ 相加⛔ 互替）＋`comm` 双向＝**新增 0／消掉 0**。另四把：`GOFLAGS= go build ./...` **rc=0**；`sh scripts/d22scan.sh` **rc=0**★同发逐字 `runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77`＋`ticket 311` 命中 **0**＋票 310 那行 `GOTMPDIR=C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261012-162013-3012`＝**块在场、门照旧绿**；长度门 `--with-self-test` **rc=0 `VERDICT GREEN`**（分母 **11987** 枚 tracked、越帽 57 全在册）；`--scope=census` totals 两棵树逐字同＝`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`；`$(go env GOPATH)/bin/gofumpt.exe -l internal/winsec tools/d22scan scripts`＝**0 枚**（本腿 `.go` 命中 0＝那两把尺无对象，⛔ 为凑名册编数）。越界＝逐笔 `git show --name-only --format=` 八笔，十枚禁列命中 **0**，非 `.md` 落件＝四枚入口＋`probes/311/r1b/**`。
+- **跑前跑后的台面尺**：`wisp.exe`／`balldebug.exe`＝**0**（我这批三发都现跑）；`tasklist` 那两枚 0 有分母＝同发 `svchost`/总进程在腿件里，我这发只报 0 并把分母具名在上面件里。
+
+### 2 ★裁掉腿留给我的那一问
+
+`LOCALAPPDATA` 为空时，委派链上**每档各打一行** DEGRADED（腿读数＝winsec 一发里命中 **3**）⇒ **裁＝保持"每档一句"**，口径写成一句能判的话：**名册尺读 DEGRADED 枚数时，枚数＝委派链上的档数，⛔ 当"重复告警"去重**（每档前缀就是它的出处；折成一句会让"哪一档出的"这层信息消失）。⛔ 产码、⛔ 改文案，落点＝票 310 那格"响亮"口径按此收窄读数。口令＝「310 DEGRADED 改每发一句」。
+
+### 3 ⚠ 记我自己两处（⛔ 把坏尺读成读数）
+
+- 第一发把 `GOTMPDIR` 指到**不存在**的目录 ⇒ `go` 先死在 `creating work dir: GetFileAttributesEx … The system cannot find the path specified.` ⇒ `shot-A2`/`shot-B1`/`shot-B2` 三发的 `rc=1`＋`=== RUN` 0 **是台面故障、⛔ 是牙**（尤其 ⓑ 那一支：它当时"看起来像没复现"，差点被我读成"摘了仍全绿＝装饰"）。作废句就地写进件里、原读数⛔ 删；改法＝**先把 offender 根真建出来**＋让票 310 那块在 `D:` 上建运行根，重跑才拿到 `56/2`。★定式＝**凡"摘掉守卫必须回到那对颜色"这类正控，落笔前先证坏世界在盘上**；`rc≠0` 的件里若出现 `creating work dir`／`walk …`／`no test files` ⇒ 判台面故障、⛔ 计入牙（与票 309 那条"扫了 0 个文件然后报绿"同族，颜色相反）。
+- 驱动命令的日志名我写成 `...-$ (date +%H%M%S).txt`（`$` 与 `(` 之间多一枚空格＝替换没发生）⇒ 盘上落了一枚带 `$`／空格／括号的怪名件；已 `mv` 成 `orch-311r1b-collect-driver-misnamed.txt` 并把成因写进件内（⛔ 删＝违"临时件只建不删"）。
+
+### 4 盘上账（⛔ 动、⛔ 删、⛔ chmod、⛔ takeown）
+
+`%TEMP%` 顶层 `Test*`＝**59**（我这三发⛔ 改它；正控同行 `temp_top_all_count`＝**34047**）；`D:/tmp/orch-311collect*` 基根 **5** 枚、其内运行根 **5** 枚；默认根 `C:/Users/swq/AppData/Local/wisp-test-gotmp/*-20261012-*` 运行目录 **49 → 73**；`D:/tmp/wisp-test-gotmp/` 内 **11 → 15**。三棵仓外树（摘净×2＋真改前×1）在 `%LOCALAPPDATA%\Temp\tmp.*`，⛔ 进版本库、⛔ 删。
+
+### 5 排程
+
+- 在飞＝`295-v1`（票 295 六格判语，独占 `./cmd/wisp/` 色）；按住待发＝`294-r1`（派单 `506a5e3c`，★起手带"票 255 行号锚"那条具名警告＋`toggleMute` 瞬态变异⛔ 撞 `295-v1`，撤销口令「294 295 改并发」）∥ `298 AC#5`（纯格式一枚件，排 `cmd/wisp` 色空出之后）。
+- 票 311 **6 勾／0 未勾、⛔ `-done`**：残余三笔＝`Q-311-r1b-1`（我亲跑那一发的墙＝`cmd/wisp` 色 ＋ 导出树 `third_party`＝**0** 枚 tracked）∥ `Q-311-r1-1`（`INCONCLUSIVE` 那支的退码语义未定案）∥ 票 310 那块三方言的盖章人仍＝我（口令「310-r2 补一枚验收腿」）。
+- ⛔ 零 push（推送类欠账继续押着）、⛔ 零删目录。
+
+**next**＝收 `295-v1` ⇒ 按判语翻票 295 的格 ⇒ 放 `294-r1`；`cmd/wisp` 色一空＝我亲跑 `Q-311-r1b-1` 那一发（`bash scripts/wisp-cli-tests.sh` 默认形状，判据＝守卫**一声不响**＋四数行在场；摘除侧⛔ 在本仓形状内做、具名归"够不着"）⇒ 票 311 才谈 `-done`；`298 AC#5` 同批排。
