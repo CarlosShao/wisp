@@ -1,0 +1,1 @@
+internal/tools/paths_shortname_252_probe_test.go:285:	names := []string{"USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP", "CD", "HOME"}

@@ -1,0 +1,7 @@
+cmd/wisp/logsink_windows_test.go:187:	// (ticket 95 measured hosts where %TEMP%'s parent grants BUILTIN\Users),
+cmd/wisp/secret_test.go:492:// %TEMP% would be slow and would fail on unrelated processes' locked files,
+internal/proc/doc.go:15://     WISP_TEST_DATA_DIR or %TEMP%\wisp-test-<pid>), portable-mode override
+internal/proc/envfork.go:15:// (data dir via WISP_TEST_DATA_DIR or %TEMP%\wisp-test-<pid>, no mutex,
+internal/proc/envfork.go:80:		// dir comes from WISP_TEST_DATA_DIR or %TEMP%\wisp-test-<pid>.
+internal/proc/envfork.go:92:// WISP_TEST_DATA_DIR injection when set, else %TEMP%\wisp-test-<pid> (one dir
+internal/proc/envfork_test.go:73:// dir from WISP_TEST_DATA_DIR or %TEMP%\wisp-test-<pid>, no mutex, no endpoint
