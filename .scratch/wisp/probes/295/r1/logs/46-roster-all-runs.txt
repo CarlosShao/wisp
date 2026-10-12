@@ -1,0 +1,56 @@
+# 票 295 · 295-r1 · 六发改前改后的逐名名册与作差（46）
+
+时刻＝2026-10-12 15:2x +08（各发头行自带自己的钟点）。⛔ 绝对行号进件；本件只报名与颜色。
+
+## 0. 台面为什么是两式（⚠ 读作差前必读）
+
+派单 §3 定死"改前那发⛔ 在共享工作树上跑 ⇒ 仓外导出树"。导出树拿不到两样本机才有的东西：
+① `third_party/sherpa-onnx/*.dll`（`git ls-files third_party/sherpa-onnx`＝**0 枚 tracked**，DLL 由 `scripts/fetch-deps.ps1` 取）
+② `frontend/dist`（`git ls-files frontend/dist`＝**1 枚**，即只有锚文件）
+⇒ 导出树里有一族用例是"台面故障形"的红／跳（`no native DLLs in ..\..\third_party\sherpa-onnx`；`entryIDProbes(t)` 空则 `t.Skipf`），**⛔ 计入牙**（同记忆第 23 条：`walk`／`build failed`／`no test files` 那一形）。
+⇒ 因此"新增红 0 枚"这一句**只在成对导出树（A/B ⇄ F/G）里说**；工作树那两发（D/E）是门禁色，另报。
+
+六发一览（全部 `-count=1 -v ./cmd/wisp/ ./internal/audio/`，专用根各一枚、全在 C: 卷）：
+
+| 发 | 台面 | 件 | 计数尺（`grep -c -- '--- PASS'` 含子项） |
+|---|---|---|---|
+| A | 导出树@`0615c6c9`（改前） | `11-pre-runA.txt` | PASS 423／FAIL 22／SKIP 4 |
+| B | 同一棵导出树第 2 发 | `12-pre-runB.txt` | PASS 424／FAIL 22／SKIP 4 |
+| C | 工作树@AC#1 第一版（漂移未销） | `40-post-runC.txt` | PASS 449／FAIL 4／SKIP 2 |
+| F | 导出树@`1c1d7df3`（改后，成对） | `42-post-export-runF.txt` | PASS 424／FAIL 22／SKIP 3 |
+| G | 同一棵改后导出树第 2 发 | `43-post-export-runG.txt` | PASS 425／FAIL 21／SKIP 3 |
+| D | 工作树@`1c1d7df3`（改后） | `44-post-worktree-runD.txt` | PASS 450／FAIL 3／SKIP 2 |
+| E | 工作树第 2 发 | `45-post-worktree-runE.txt` | PASS 449／FAIL 4／SKIP 2 |
+
+（C 发留着＝"我自己造的那枚新增红"的现场：`TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`，成因与销法见 `logs/41` 与 `10-impl.md` 第 5 节。⛔ 拿 C 充当改后凭据。）
+
+## 1. 成对导出树的新增红尺（本票 `AC#4` 那一格的正尺）
+
+名册尺＝`grep -E '^[[:space:]]*--- (PASS|FAIL|SKIP):'` ＋ `sed` 去时长 ＋ `sort`（顶层⇄子项同一把）。
+
+- 改前 A∩B＝**449 行**（两发逐字相同）；作差＝B-only 1 行 `PASS TestAC1AlwaysBranchDoesNotRevertAHandEditedKey`（A 发里这枚没出现在名册＝flake 形，具名落此）
+- 改后 F∩G＝**448 行**；F/G 之差 2 行＝`FAIL`（F）⇄`PASS`（G）`TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card`（40.76s 的审批超时那一形）
+- **新增红（严尺＝post-FAIL 名册里、改前⛔ 是 FAIL 的枚数，含 SKIP→FAIL／PASS→FAIL 两种）＝`comm -13 pre.fail post.fail` ⇒ 0 枚**
+  改前 FAIL 名册 22 枚 ⊃ 改后（F∩G）FAIL 名册 21 枚
+- 反向翻绿 1 枚＝`TestPanelHostRealWindowHopAndLifecycle`（改前 22 里有它，改后成对树里没有＝真窗族，同下面第 3 节那一族，⛔ 我这一发改出来的）
+
+⇒ **`AC#4` 的"新增红 0 枚"＝成立，尺与名册在上面两行；同一发里⛔ 有任何一枚 `started` 相关用例变色**（`TestAC247*`／`TestAC290*` 在 A/B/F/G 四发里逐名逐色相同，尺＝`comm -3` 全量作差只出上面那三行）。
+
+## 2. 工作树那两发（D∩E＝454 行；门禁用色）
+
+- D／E 之差 2 行＝`FAIL`（E）⇄`PASS`（D）`TestTicket223HandEditedFsLooseningCostsAnL2Card`
+  E 发红句逐字＝`config_reload_223_test.go:406: the card does not name the key it is asking about: wisp run: 答复监听已接入（卡片上给了编号）…`＝L2 卡片没弹出来、答复走了控制台监听那一族；该枚在 A/B/F/G/D 五发里全 `PASS` ⇒ **单发 flake，具名登记**，交集尺自动不收。
+- D∩E 的红名册（3 枚，逐名）：
+  - `TestAC4FocusReturnToPriorWindowGap33r5`
+  - `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`
+  - `TestAC14GoSideEvalPushReachesThePage`
+  ⇒ **全是"真窗那一族"**：台账 `docs/reports/pending-and-issues.md:14768` 早就把这三枚（连同 `TestPanelHostRealWindowHopAndLifecycle`／`TestAC14AwaitedBindingReplyReachesThePage`）具名为"同一棵树、相隔约 15 分钟、顶层红枚数按 **4↔5 会漂**"，并写明⛔ 拿一次读数去指控另一次、⛔ 加 `-skip` 变绿。
+  其中 `TestAC13ColdStart…` 的四发去向逐字（尺＝逐发 `grep -oE`）：A/B/F/G＝**SKIP**（导出树无 `frontend/dist` ⇒ `entryIDProbes` 空即 `t.Skipf`，机制在台账 `:10407` 具名）、C/D/E＝**FAIL**（工作树有 dist ⇒ 真跑真窗）＝**台面差，⛔ 我的改动**。
+- `internal/audio` 那包在七发里逐字 `ok github.com/CarlosShao/wisp/internal/audio`（16.0—16.5s）＝**全绿**，0 红 0 跳。
+
+## 3. 计数尺口径（⚠ 别把不带 `-v` 读成全红）
+
+本仓沿用 `grep -c -- '--- PASS'`（含子测试）。同一发另一把尺＝只数顶层 `^--- PASS`：
+以 G 发为例 顶层 **310** ⇄ 含子项 **425**＝差 **115 枚**（尺＝`grep -c '^--- PASS' 43-post-export-runG.txt` ⇄ `grep -c '^[[:space:]]*--- PASS:' …`，本腿现跑）；
+不带 `-v` 时 `--- PASS` 恒 0＝尺的口径，⛔ 读成"全红"。两把都在件里，逐名册只认第一把。
+rc=0  # 本件的逐名册尺重跑：A∩B=449 行、F∩G=448 行、新增红（严尺）=0 枚（15:49:32）

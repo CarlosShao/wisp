@@ -1,0 +1,14 @@
+.scratch/wisp/probes/295/r1/30-gates.md
+.scratch/wisp/probes/295/r1/logs/40-post-runC.txt
+.scratch/wisp/probes/295/r1/logs/42-post-export-runF.txt
+.scratch/wisp/probes/295/r1/logs/43-post-export-runG.txt
+.scratch/wisp/probes/295/r1/logs/44-post-worktree-runD.txt
+.scratch/wisp/probes/295/r1/logs/45-post-worktree-runE.txt
+.scratch/wisp/probes/295/r1/logs/46-roster-all-runs.txt
+.scratch/wisp/probes/295/r1/logs/47-d22scan.txt
+.scratch/wisp/probes/295/r1/logs/50-ac3-over-boundary.txt
+.scratch/wisp/probes/295/r1/logs/60-ac5-race.txt
+.scratch/wisp/probes/295/r1/logs/13-roster-pre.txt
+.scratch/wisp/probes/295/r1/logs/33-ac2-roster-diff.txt
+.scratch/wisp/probes/295/r1/logs/05-pristine-hashes.txt
+.scratch/wisp/probes/295/r1/logs/pathspec-ac34.txt

@@ -18,3 +18,4 @@ FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.154s
 ## M2（恒 true 补充发，⛔ 不是 AC#2 ⓑ 的正控）读到的 #7 输出形状（逐字）
     resident_mute_290_windows_test.go:142: mute-hotkey: capture stayed handed over after muting (open=false started=true)
 花括号尺＝grep -c -e 'started={' -e 'started= {' 31-ac2-m2-alwaystrue-shape.txt ⇒ 0 枚（0＝两个 %t 生效、日志没打成结构体形状）
+rc=0  # 本件的 comm 作差重跑：差行数=2、同名行数=16（15:49:32）

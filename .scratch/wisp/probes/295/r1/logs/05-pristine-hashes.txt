@@ -6,3 +6,8 @@ cc7ac51edff3751b44fa981391ddd48bb83f910b59766e93405d23df20969043 *cmd/wisp/resid
 4097b03a3ab25ea79a4e043599d126dd906c95669811b0f2fdf5e495542cc327  HEAD-blob  cmd/wisp/resident_audio_247_windows_test.go
 cc7ac51edff3751b44fa981391ddd48bb83f910b59766e93405d23df20969043  HEAD-blob  cmd/wisp/resident_audio_247_live_windows_test.go
 2f74d148e4c77aa02e37d79ac9112c4c14e6c7b1ef5612dccc2fbf536f7d68b4  HEAD-blob  cmd/wisp/resident_mute_290_windows_test.go
+rc=0  # 哈希尺重跑（2026-10-12 15:49:33）：注意本件记的是 AC#1 之前的 pristine；AC#1 之后那四枚的号见 32-ac2-restore-and-pristine.txt 与 41 之后（1c1d7df3＝漂移销掉的最终形状）
+a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84 *cmd/wisp/resident_audio_windows.go
+e039066c024d54782a5ba97524c503e593cb7f2b7cff2200f897e003d5d4d6a1 *cmd/wisp/resident_audio_247_windows_test.go
+72d59193e558a54d21f645714f3fff7105c8ae8e8323e7b25023074b4f2c2aa4 *cmd/wisp/resident_audio_247_live_windows_test.go
+f5c4cb72d97a0f16953df15f15a19851f81a128025a3a3c9f0b0283ff49a9a83 *cmd/wisp/resident_mute_290_windows_test.go

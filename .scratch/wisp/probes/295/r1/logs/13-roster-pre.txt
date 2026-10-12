@@ -41,3 +41,12 @@ FAIL TestSecretArgvCarriesNoSecret
 FAIL TestSecretRealBinaryRefusesValueFlag
 FAIL TestTicket255RosterStillMatchesTheActualReadSites
 红枚数=22  交集内红枚数=22
+# ---- 本件的自落 rc（派生尺那几枚也要带，⛔ 0 字节／⛔ 无名册）captured 2026-10-12 15:49:31 +0800
+本件的尺逐枚重跑一遍的退出码：git grep rc=1；comm 交集行数=449
+rc=0
+# ---- 更正上一条自落行（2026-10-12 15:49:52 +0800，本腿现跑）
+上一条里那把 'git grep rc=1' ⛔ 是读数：它是在 .scratch/wisp/probes/295/r1/logs 目录内跑的， 是相对 cwd 的路径 ⇒ 射程空 ⇒ 假 0 命中（同族坑＝尺跑错目录给的 0 不是 0）。
+改正＝回仓根跑同一把尺：11 枚命中，rc=0（0＝有命中），分母＝ⓓ 清单声明的 11 枚点
+rc=0
+补一句免得上一行读不通：那把尺逐字＝'git grep -n \.started -- cmd/wisp'（'-- cmd/wisp' 是从 cwd 往下解析的相对路径 ⇒ 在 logs 目录内跑＝射程为空）；仓根重跑＝11 枚命中、rc=0。上一条里的反引号被 shell 当命令替换吃掉了，那半句因此不通，读数⛔ 受影响。
+rc=0

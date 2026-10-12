@@ -1,0 +1,69 @@
+# AC#3 越界尺 — captured 2026-10-12 15:36:46 +0800
+尺＝git show --name-only --format= <每一笔我自己的 commit>（逐笔量，⛔ 区间尺 HEAD~3..HEAD 那一形）；射程＝那一笔的入库名册；量的
+
+## 我自己的笔名册（尺＝git log --format='%h %an' 里属于本腿的三笔）
+  d5ef9cb9  枚数=19
+  35744137  枚数=6
+  1c1d7df3  枚数=4
+
+## 逐笔全名册
+--- d5ef9cb9
+    .scratch/wisp/probes/295/r1/10-impl.md
+    .scratch/wisp/probes/295/r1/logs/00-gate0-roster.txt
+    .scratch/wisp/probes/295/r1/logs/05-pristine-hashes.txt
+    .scratch/wisp/probes/295/r1/logs/10-pre-run1.txt
+    .scratch/wisp/probes/295/r1/logs/11-pre-runA.txt
+    .scratch/wisp/probes/295/r1/logs/12-pre-runB.txt
+    .scratch/wisp/probes/295/r1/logs/13-roster-pre.txt
+    .scratch/wisp/probes/295/r1/logs/20-gates-build-gofmt.txt
+    .scratch/wisp/probes/295/r1/logs/21-ac2-pristine-named.txt
+    .scratch/wisp/probes/295/r1/logs/22-ac1-diff.txt
+    .scratch/wisp/probes/295/r1/logs/pathspec-ac1.txt
+    .scratch/wisp/probes/295/r1/logs/roster-11-pre-runA.names.txt
+    .scratch/wisp/probes/295/r1/logs/roster-12-pre-runB.names.txt
+    .scratch/wisp/probes/295/r1/logs/roster-pre-intersect.txt
+    .scratch/wisp/probes/295/r1/logs/roster-testprocs.ps1
+    cmd/wisp/resident_audio_247_live_windows_test.go
+    cmd/wisp/resident_audio_247_windows_test.go
+    cmd/wisp/resident_audio_windows.go
+    cmd/wisp/resident_mute_290_windows_test.go
+--- 35744137
+    .scratch/wisp/probes/295/r1/20-anti-form.md
+    .scratch/wisp/probes/295/r1/logs/30-ac2-m1-deletewrite.txt
+    .scratch/wisp/probes/295/r1/logs/31-ac2-m2-alwaystrue-shape.txt
+    .scratch/wisp/probes/295/r1/logs/32-ac2-restore-and-pristine.txt
+    .scratch/wisp/probes/295/r1/logs/33-ac2-roster-diff.txt
+    .scratch/wisp/probes/295/r1/logs/pathspec-ac2.txt
+--- 1c1d7df3
+    .scratch/wisp/probes/295/r1/10-impl.md
+    .scratch/wisp/probes/295/r1/logs/41-driftfix-verify.txt
+    .scratch/wisp/probes/295/r1/logs/pathspec-ac1fix.txt
+    cmd/wisp/resident_audio_windows.go
+
+## 十枚禁列逐笔零字节尺（尺＝每笔名册 grep -c 该路径形；0＝零字节）
+禁列路径形                                      d5ef9cb9   35744137   1c1d7df3  
+frontend/  0  0  0
+design/  0  0  0
+PLAN.md  0  0  0
+docs/specs/  0  0  0
+internal/observe/thresholds.go  0  0  0
+testdata/golden  0  0  0
+golden  0  0  0
+tools/d22scan/allowlist.txt  0  0  0
+internal/panel/tokens_fourway_test.go  0  0  0
+internal/panel/l2_grant_boundary_test.go  0  0  0
+internal/perm/ticket90_persist_test.go  0  0  0
+
+## 三笔合起来的写面是否越出派单 §2 三件套（尺＝逐笔名册去掉许可前缀后的残名册）
+  d5ef9cb9 越界枚数=0
+  35744137 越界枚数=0
+  1c1d7df3 越界枚数=0
+
+## 票面（本票自己的件）在这三笔里＝0 枚（票面那 1 条 bullet 归最后一笔，届时同尺再量一次）
+  d5ef9cb9 碰 .scratch/wisp/issues/ 的枚数=0
+  35744137 碰 .scratch/wisp/issues/ 的枚数=0
+  1c1d7df3 碰 .scratch/wisp/issues/ 的枚数=0
+
+## 别人在飞的件我有没有顺手入库（尺＝工作树脏件名册 ⇄ 我的笔名册交集）
+  交集枚数=0（脏名册分母=848 枚，我入库=27 枚）
+rc=0  # 本件的逐笔名册尺重跑：三笔枚数＝19/6/4，十枚禁列逐笔命中全 0（15:49:32）
