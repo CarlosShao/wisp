@@ -64,16 +64,29 @@ fi
 # it reuses this one instead of opening a second root. Rationale (GOTMPDIR vs
 # TMP/TEMP, why the root is outside the OS temp dir, why nothing is deleted here,
 # why non-Windows is untouched) is the long note in scripts/portable-tests.sh.
-if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
-    gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/cli-$(date +%Y%m%d-%H%M%S)-$$"
-    if mkdir -p "$gotmp_run" 2>/dev/null; then
-        export GOTMPDIR="$gotmp_run"
-        echo "wisp-cli-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
-            "t.TempDir() family lands here; nothing deletes it."
+#
+# The GOOS=windows + empty-LOCALAPPDATA branch is now LOUD (ticket 310 AC#1, debt
+# Q-310-orch-Q). It used to be the conjunctive form `... && [ -n LOCALAPPDATA ]`,
+# so when %LOCALAPPDATA% was empty the whole block fell through in silence - no
+# GOTMPDIR line, no DEGRADED line, nothing said the redirection did not happen. It
+# is now a finding on stderr, still NOT a fail-closed exit and NOT a refusal to
+# run (orchestrator ruling; revocation phrase "310 改 fail-closed").
+if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
+    if [ -n "${LOCALAPPDATA:-}" ]; then
+        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/cli-$(date +%Y%m%d-%H%M%S)-$$"
+        if mkdir -p "$gotmp_run" 2>/dev/null; then
+            export GOTMPDIR="$gotmp_run"
+            echo "wisp-cli-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+                "t.TempDir() family lands here; nothing deletes it."
+        else
+            echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+                "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+                "the OS temp root again. Not a silent fallback: this line is the finding." >&2
+        fi
     else
-        echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
-            "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
-            "the OS temp root again. Not a silent fallback: this line is the finding." >&2
+        echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no" \
+            "measured-safe root to build (a root on another volume turns the winsec seal cases" \
+            "red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
     fi
 fi
 

@@ -65,6 +65,47 @@ if [ $# -eq 0 ]; then
     exit 2
 fi
 
+# ---- TICKET 310 AC#1 (shape A-G): the test temp family gets a dedicated root.
+# This is the fifth entry that really starts `go test`: scripts/d22scan.sh:51
+# calls `sh tools/d22scan/runtests.sh -C tools/d22scan ./...`, CI's "D22 scanner
+# positive control" step calls the same runner, and the `go test` below is the
+# real process start. The block is copied verbatim from scripts/winsec-tests.sh
+# (only the entry name and the echo prefix change) so all four entries that start
+# tests present ONE shape, not four dialects. The guard keeps the delegation
+# contract: when scripts/portable-tests.sh has already exported GOTMPDIR and then
+# calls this runner, we MUST NOT open a second root - one root per run, named by
+# the outermost entry; the delegated run inherits it. Why GOTMPDIR and not
+# TMP/TEMP, why the root is a SIBLING of %TEMP% (never inside it, where a
+# non-recursive roster would read "0 new" while the residue is simply out of the
+# ruler's reach), why it is not on the repo's volume (a cross-volume root turns
+# the winsec seal cases red - measured, ticket 311), why nothing is deleted here,
+# and why the ubuntu leg is left alone: the long note in scripts/portable-tests.sh.
+#
+# The GOOS=windows + empty-LOCALAPPDATA branch prints one honest line instead of
+# going silent (ticket 310 AC#1, debt Q-310-orch-Q): without it a caller with no
+# %LOCALAPPDATA% falls through to the OS temp root and NOTHING says so, which is
+# the shape 310-v1 registered (Q-310-v1-5). It is a finding printed to stderr,
+# NOT a fail-closed exit and NOT a refusal to run the tests (orchestrator ruling:
+# keep the loud-degradation shape; revocation phrase "310 改 fail-closed").
+if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
+    if [ -n "${LOCALAPPDATA:-}" ]; then
+        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/d22scan-$(date +%Y%m%d-%H%M%S)-$$"
+        if mkdir -p "$gotmp_run" 2>/dev/null; then
+            export GOTMPDIR="$gotmp_run"
+            echo "runtests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+                "t.TempDir() family lands here; nothing deletes it."
+        else
+            echo "runtests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+                "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+                "the OS temp root again. Not a silent fallback: this line is the finding." >&2
+        fi
+    else
+        echo "runtests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has" \
+            "no measured-safe root to build (a root on another volume turns the winsec seal" \
+            "cases red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+    fi
+fi
+
 out=$(mktemp 2>/dev/null || echo "$cwd/.runtests.$$.log")
 cd "$cwd"
 
