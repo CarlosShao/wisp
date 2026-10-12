@@ -1,0 +1,29 @@
+# AC#2 ⓓ 补充读数：M2＝把镜像写换成恒 true（⚠⛔ 这不是 AC#2 ⓑ 的正控＝它测的是'恒真'那一形，不是'手势不写'那一形；本发唯一的用途＝现读 ⓓ-2 #7 那枚 t.Fatalf 的输出形状）— captured 2026-10-12 14:48:57 +0800
+变异内容确认尺＝git grep -nE '\.started\.Store\(' -- cmd/wisp/resident_audio_windows.go（应见 Store(true) 在手势体内）：
+cmd/wisp/resident_audio_windows.go:187:	ra.started.Store(true)
+cmd/wisp/resident_audio_windows.go:342:		ra.started.Store(true)
+变异后 sha256=ece60c4e38de09a48d5143c34739a9c9ce4e1f486283fe8e9b866897ba19b316 md5=4ad4e76bebc714e568cd06abb7864076
+command（逐字）= GOTMPDIR="C:\Users\swq\AppData\Local/wisp-test-gotmp/295r1-20261012-144857-4132-m2" PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:/d/work/workspace/projects plans/Wisp/build:$PATH" go test -count=1 -v -run TestAC290BothMuteGesturesTurnTheGateAndBack ./cmd/wisp/
+start 14:48:57
+time=2026-10-12T14:49:02.248+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC290BothMuteGesturesTurnTheGateAndBack
+time=2026-10-12T14:49:02.259+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144857-4132-m2\TestAC290BothMuteGesturesTurnTheGateAndBack2203252237\001\config.toml path=T
+time=2026-10-12T14:49:02.259+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball mute-hotkey: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T14:49:02.259+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball mute-hotkey: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+    resident_mute_290_windows_test.go:142: mute-hotkey: capture stayed handed over after muting (open=false started=true)
+time=2026-10-12T14:49:02.260+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:49:02.260+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:49:02.260+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:49:02.260+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:49:02.260+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:49:02.260+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:49:02.260+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- FAIL: TestAC290BothMuteGesturesTurnTheGateAndBack (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.088s
+FAIL
+M2_RC=1
+end 14:49:02

@@ -1,0 +1,6 @@
+.scratch/wisp/probes/295/r1/20-anti-form.md
+.scratch/wisp/probes/295/r1/logs/30-ac2-m1-deletewrite.txt
+.scratch/wisp/probes/295/r1/logs/31-ac2-m2-alwaystrue-shape.txt
+.scratch/wisp/probes/295/r1/logs/32-ac2-restore-and-pristine.txt
+.scratch/wisp/probes/295/r1/logs/33-ac2-roster-diff.txt
+.scratch/wisp/probes/295/r1/logs/pathspec-ac2.txt

@@ -1,0 +1,47 @@
+# AC#2 ⓒ 还原校验＋pristine 复跑（同一台面、同一专用根形状）— captured 2026-10-12 14:49:23 +0800
+## 还原后的逐字节校验（尺＝sha256sum/md5sum 对工作树 ⇄ git show HEAD:<path> 对 HEAD blob；HEAD＝d5ef9cb9＝AC#1 那一笔）
+worktree sha256   = 49dd9b13ba189a00b5b1022b2f84735e60029b86423f55672e07f9303d07edcf
+HEAD-blob sha256  = 49dd9b13ba189a00b5b1022b2f84735e60029b86423f55672e07f9303d07edcf
+worktree md5      = 244fb362e105fda6edfbc3b9227e8a4e
+HEAD-blob md5     = 244fb362e105fda6edfbc3b9227e8a4e
+git diff -- cmd/wisp/resident_audio_windows.go 的枚数 = 0（0＝工作树与 HEAD 逐字节相同 ⇒ 变异体没留在树上）
+另三枚测试件同尺：
+  cmd/wisp/resident_audio_247_windows_test.go wt=e039066c024d54782a5ba97524c503e593cb7f2b7cff2200f897e003d5d4d6a1 head=e039066c024d54782a5ba97524c503e593cb7f2b7cff2200f897e003d5d4d6a1 diff行数=0
+  cmd/wisp/resident_audio_247_live_windows_test.go wt=72d59193e558a54d21f645714f3fff7105c8ae8e8323e7b25023074b4f2c2aa4 head=72d59193e558a54d21f645714f3fff7105c8ae8e8323e7b25023074b4f2c2aa4 diff行数=0
+  cmd/wisp/resident_mute_290_windows_test.go wt=f5c4cb72d97a0f16953df15f15a19851f81a128025a3a3c9f0b0283ff49a9a83 head=f5c4cb72d97a0f16953df15f15a19851f81a128025a3a3c9f0b0283ff49a9a83 diff行数=0
+## 形状尺（还原后应回到 3 枚 Store/Load 之外的手势写＝Store(gate.Open())）
+cmd/wisp/resident_audio_windows.go:187:	ra.started.Store(gate.Open())
+cmd/wisp/resident_audio_windows.go:342:		ra.started.Store(true)
+cmd/wisp/resident_audio_windows.go:398:	if !ra.started.Load() {
+## pristine 复跑（命令逐字）= GOTMPDIR="C:\Users\swq\AppData\Local/wisp-test-gotmp/295r1-20261012-144923-4295-m1restore" PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:/d/work/workspace/projects plans/Wisp/build:$PATH" go test -count=1 -v -run TestAC290BothMuteGesturesTurnTheGateAndBack ./cmd/wisp/
+跑前家族尺：
+dotnet-test-family-process-count=1
+pid=28152 name=wisp.test
+start 14:49:25
+time=2026-10-12T14:49:28.295+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC290BothMuteGesturesTurnTheGateAndBack
+time=2026-10-12T14:49:28.307+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144923-4295-m1restore\TestAC290BothMuteGesturesTurnTheGateAndBack1115608372\001\config.toml path=T
+time=2026-10-12T14:49:28.307+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball mute-hotkey: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T14:49:28.307+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball mute-hotkey: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=tray-mute outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball tray-mute: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=tray-mute outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball tray-mute: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:49:28.308+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290BothMuteGesturesTurnTheGateAndBack (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.072s
+PRISTINE_AFTER_RESTORE_RC=0
+end 14:49:28
+跑后家族尺：
+dotnet-test-family-process-count=1
+pid=28152 name=wisp.test

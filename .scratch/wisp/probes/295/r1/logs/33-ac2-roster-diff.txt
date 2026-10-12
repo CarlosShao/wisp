@@ -1,0 +1,20 @@
+# AC#2 ⓒ 两发名册作差（pristine ⇄ M1 删写）— captured 2026-10-12 14:51:12 +0800
+两发同台面（共享工作树・AC#1 改后）、同命令逐字（GOTMPDIR=专用根 PATH=... go test -count=1 -v -run 'TestAC247|TestAC290|TestLive' ./cmd/wisp/）、同一枚专用根形状：pristine＝...-ac2a（21-ac2-pristine-named.txt 的第二发）／M1＝...-m1（30-ac2-m1-deletewrite.txt 的命令 2）
+尺＝grep -E '^[[:space:]]*--- (PASS|FAIL|SKIP):' 抽状态行 + sed 去时长 + sort（逐名一枚行；顶层⇄子项同一把尺，本发里子项 3 枚都在名册内；量的）；中间件＝/tmp/295r1-pristine.names 与 /tmp/295r1-m1.names
+
+名册枚数：pristine=17 行，M1=17 行
+comm -12（两发逐字相同的名）=16 行
+comm -3（只在一边出现＝唯一那枚颜色翻转的两行），归属按 comm 的制表符口径现标：
+  M1-only（变异那一发）:  FAIL TestAC290BothMuteGesturesTurnTheGateAndBack
+  pristine-only（未变异那一发）: PASS TestAC290BothMuteGesturesTurnTheGateAndBack
+⇒ 全场只有一枚用例的颜色被这一发变异翻动＝TestAC290BothMuteGesturesTurnTheGateAndBack（PASS→FAIL）；其余 16 行（含 3 枚子项）逐名逐色不变＝ⓔ-2 那 7 枚读点对此变异不敏感的名册读数（逐枚映射见 20-anti-form.md）
+
+## M1 那一发的红句（逐字；命令 1 与命令 2 各打一枚同句）
+    resident_mute_290_windows_test.go:125: mute-hotkey: the leg's derived mirror says nothing is running while the gate is open
+    resident_mute_290_windows_test.go:125: mute-hotkey: the leg's derived mirror says nothing is running while the gate is open
+## M1 命令 1 的包级行
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.079s
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.154s
+## M2（恒 true 补充发，⛔ 不是 AC#2 ⓑ 的正控）读到的 #7 输出形状（逐字）
+    resident_mute_290_windows_test.go:142: mute-hotkey: capture stayed handed over after muting (open=false started=true)
+花括号尺＝grep -c -e 'started={' -e 'started= {' 31-ac2-m2-alwaystrue-shape.txt ⇒ 0 枚（0＝两个 %t 生效、日志没打成结构体形状）
