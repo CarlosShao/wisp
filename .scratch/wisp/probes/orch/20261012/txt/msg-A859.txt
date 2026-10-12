@@ -1,0 +1,8 @@
+收 310-v1 ⇒ 票 310 三格翻勾（我复跑五把尺全认）＋ A859 / §4.0cu
+
+- 台账 A859：我把自己背书的五把尺逐把重跑（temp=59＋具名残渣 CreationTime 对上／腿件里 GOTMPDIR= 恰 5 枚、DEGRADED 0 枚／那 5 枚专用根逐枚在盘上／DEGRADED 那一支我第一次独立造形且多证出"步子跑在 GUARD 1 之前"／CR 三来路 334-131-225-1115 ⇄ blob 0，验收腿那句 4⇄0 的方向她纠对了）。
+- 票 310：AC#1/AC#2/AC#3 翻勾（凭据写进框里，原句一字未动）；★本格成立⛔ 等于"残渣不再落顶层"⇒ 增量程 310-r2 落第五枚入口（tools/d22scan/runtests.sh:75）与 LOCALAPPDATA 为空的静默分支（欠账 Q-310-orch-P/-Q），⛔ 本票改 -done。
+- 我的两处派单缺陷记我：允许清单漏抄"票面那一条 bullet"⇒ 她那笔"越界 1 枚"记我⛔ 记腿；裁决表文件名我指定了非惯例名 ⇒ 已 git mv 成 ticket310-310-v1-accept-v1.md（内容一字未动，撤销口令「310 裁决表改回派单名」）。
+- 门禁：sh scripts/d22scan.sh rc=0；sh scripts/check-path-length-budget.sh --with-self-test rc=0（VERDICT GREEN，over-hat=57，byte/char 两视同 57 枚）。件 logs/orch-d22scan-1012d.txt＋orch-pathlen-1012d.txt。
+- 名册续一行：现量序列 58→59；★读数件⛔ 写进任何专用根里（她的实测＝Get-ChildItem -Directory=6 ⇄ ls -1=8）。
+- ⛔ push、⛔ 删任何目录（在册 59 枚一枚没动）。

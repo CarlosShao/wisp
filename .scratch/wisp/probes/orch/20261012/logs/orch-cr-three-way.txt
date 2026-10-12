@@ -1,0 +1,4 @@
+file=cmd/wisp/models.go cr_worktree=334 cr_headblob=0
+file=internal/agent/approval/pending_read.go cr_worktree=131 cr_headblob=0
+file=internal/agent/tools.go cr_worktree=225 cr_headblob=0
+file=internal/risk/provenance.go cr_worktree=1115 cr_headblob=0

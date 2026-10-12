@@ -1,0 +1,62 @@
+# 派单 `310-v1`（**非实现者验收腿**）＝票 310 `AC#1`／`AC#2`／`AC#3` 三格的判语（实现者＝`310-r1`，⛔ 你自己是它的续程）
+
+你是**验收者**，不是实现者。⛔ 你自己翻任何框、⛔ 动 `Status:`、⛔ 把票改名 `-done`、⛔ push（推送永远归编排者，且现在有一枚 `A813` 授权我⛔ 用）。判语写进 `docs/evidence/s1/`（AGENTS §1.5 的落点，**这枚目录是你合法写面**，⛔ 当越界自审）＋票尾**一条** append-only bullet。
+
+## 0. 起手（第 3～5 次调用之内做完第 3 步，⛔ 等任何调用数）
+
+1. `git rev-parse --short HEAD`＋`git rev-parse --abbrev-ref HEAD`＋`git status --porcelain -- internal cmd tools scripts docs .scratch/wisp/issues` 的行数，逐枚写进你的 `00-anchor.md`。**★派单里不写锚号**——锚号＝你这一刻的读数；盘上原文与本派单转述冲突时**以盘上为准并具名报回**。
+2. 起手名册（正典＝`.scratch/wisp/probes/orch/gate-roster-304.md` §1，**先读那一节再跑**）：四条精确名 `tasklist` 各一发＋**家族尺**（`Get-CimInstance Win32_Process -Filter "Name like '%.test.exe'"` 形态，计数在 **PS Inside** 里算）＋`%TEMP%` 下 `Test*` 枚数。★**每条 0 读数必须同行带正控**（`svchost.exe` 之类必非零的那枚）与 stderr 字节数；⛔ 拿空输出当 0。⚠ 派单里点名过的形：**PowerShell 一律写成 `.ps1` 件用 `-File` 跑**（⛔ 内联 `-Command` 里放 `$_`、反引号、`-join` 转义——本仓 10-11 那枚假 0 就是这么造的）。
+3. **第 1 笔 commit 立刻做**：只交 `00-anchor.md`，形式＝`git add -- <显式路径>` 之后 `git commit -F <你自家 txt 里的消息件> -- <同样的显式路径>`（**add 带 pathspec、commit 也带 pathspec，两处都带**）。⛔ 裸 `git commit`、⛔ `git add -A`／`.`／整目录扫。
+4. 发现**大面积别家路径在暂存区**＝⛔ 自己清空（那是在飞态，归属归对方），只在件里写"我看到 N 枚、我没动"。⛔ `git reset`／`stash`／`checkout .`／`clean`；唯一允许的归位动作是 `git restore --staged -- <你自己的路径>`。
+
+## 1. 你要判的三格（逐格给"成立／不成立／未证成"＋支持它的那一行逐字读数）
+
+被测件＝`.scratch/wisp/probes/310/r1/**`（实现腿 `310-r1`，十笔 commit，落点＝`scripts/portable-tests.sh`／`scripts/winsec-tests.sh`／`scripts/wisp-cli-tests.sh` 各一段 `GOTMPDIR` 块，`git diff --numstat`＝69/21/20 加、0 删，`*.go` 零枚）。裁形原文＝票 310 的「编排者裁定」节（甲-G＋丙）与台账 **`A857` §4、`A858` 全节**（`A858` 是编排者 10-12 12:3x 收这条腿时落的账，**里面已经写明我自己复跑过什么、错过什么**）。
+
+### `AC#1` 落地形（甲-G）——三个必答题
+
+- **① 这一步真的跑过吗**：每一枚入口件的读数件里**要么出现 `GOTMPDIR=` 那行、要么出现 `DEGRADED` 那行**；**两行都缺＝那一发⛔ 算这一步的凭据**（★这条判据是编排者 10-12 新立的，逐字在 `A858` §6）。请拿这条尺**回头量 `310-r1` 交的每一件**，并具名报"哪几件两行都缺"。
+- **② 跨平台那一支长什么样**：非 Windows 那支应当是**明确不动**（打一行 `left as-is`、⛔ 设值）。判据＝现读那三段块的字节＋`go env GOOS` 一把尺；⚠ **ubuntu 那一支今天仍会漏**这件事必须仍然在盘上可核（件里/注释里具名写着），⛔ 读成"两边都管住了"。
+- **③ ★名册是不是全量**：裁形写的是"**只动那四枚起 `go test` 的入口件**"。实现腿具名顶回：`scripts/d22scan.sh`→`tools/d22scan/runtests.sh:75` 是**第五枚**（`Q-310-r1-2`），而 `scripts/slo-check.ps1` 那枚命中是**注释**（`:336`）。⇒ 本格请**自己现跑两把尺**（⛔ 抄腿的话）：`grep -rn --include=*.sh --include=*.ps1 'go test' scripts/ tools/` 之类的名册尺（**具名射程目录**，并同批落枚数与 stderr），然后裁一句：**"四枚"这枚数如果⛔ 是全量，`AC#1` 算不算成立**（成立＝按已裁射程落干净；不成立＝漏了一枚仍在起 `go test` 的入口）。⚠ 本格⛔ 让你去动第五枚——那是落地活，归下一程。
+
+### `AC#2` 反恒真（成对两发）——重点攻"名字"⛔ 攻"枚数"
+
+- 腿交的四发（a2/a3/a4＋b1/b3/b4）里，**两发它自标〔作废〕**（a1、b2），作废理由写在件里。判"缺一不算凭据"这条**照派单口径复核**：正控两发（撤掉那一步＝当场多一枚；还原＝顶层不多＋残渣在专用根里逐字路径）是否齐。
+- ★**必自己复跑一发**（⛔ 抄 `20-paired-readings.md`）：建议用**仓外导出树**（模板＝`git archive HEAD go.mod go.sum internal cmd tools scripts | tar -x -C "$T"`，六件套一枚⛔ 少；跑之前先数 `.go` 证非空并把枚数落件）。⛔ 在共享工作树里跑"改前那发"。
+- ★**已知缺陷，专攻这一形**：突变台件自报的 `dir=Test…<数字>` **⛔ 等于漏的那枚目录**（同一秒里 `t.TempDir()` 会建了又删）。盘上事实（编排者 12:3x 现量，件 `probes/orch/20261012/logs/orch-roundtrip-times.txt`）＝腿件 §1/§4 写的 a3 那枚 `TestRoundTripLoadMarshalLoad2236627062` **从没存在过**，那一秒活着的是 `…1721168370`。⇒ 本格请裁：**"具名来路错、但枚数与'死亡会漏一枚'的结论仍被两条独立来路支持"这一形，`AC#2` 算不算成立**；并给一条"今后这类凭据必须自带 `CreationTime` 佐证"的判据句（正典 §1 我已落了一行，你要判那一行够不够硬）。
+
+### `AC#3` 门禁与越界——**0 字节件那一格是我要的**
+
+- 门禁四把请**逐把我自己看的复跑**（⛔ 抄腿的 rc）：`sh scripts/d22scan.sh`、`sh scripts/check-path-length-budget.sh --with-self-test`、`bash scripts/portable-tests.sh --scope=census` 的 totals 行对基线（现量基线逐字＝`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`；⚠ **跑之前先取一次、跑之后再取一次作差**，⛔ 拿旧数当基线）、`bash scripts/winsec-tests.sh ./internal/winsec/`。⚠ **拼写雷**（编排者今天踩过，件 `probes/orch/20261012/logs/orch-winsec-dtmp-err.txt` 两行逐字）：`--scope=winsec` 喂给 `winsec-tests.sh` 会被它自己的 **GUARD 1 打回 rc=2**，`--scope=` 那层拼法属于 `portable-tests.sh`。
+- 格式名册**两把并排**（工作树 ⇄ `git show HEAD:`／`git archive` 出来的 blob 树），写清射程目录＋枚数；⚠ 本机**没装 `gofumpt`**（裸跑 rc=127），腿用了代用尺 `gofmt -l` 并具名替换——请判这一支替换算不算⛔ 掩盖，以及"工作树 4 枚 vs HEAD 0 枚"那处差异的归属它怎么说（腿登记成 `Q-310-r1-4`）。
+- ★**0 字节件那一格**：`probes/310/r1/logs/` 里我现数到 **7 枚 0 字节**（`00-gate-310r1.err`／`10b-new.txt`／`10b2-new.txt`／`10b2-r1-new.txt`／`10b2-root.txt`／`10c-run.run.txt`／`12-roster-new.txt`）。逐枚判**两件事分开写**：ⓐ"0 字节＝合法的 stderr 为空／差集为空"——前提是件里**同行**写了 `empty above＝0 枚` 这类自证；ⓑ"0 字节＝那格没交"。⛔ 把两类混成一句"都是空壳"。
+- ★**逐笔越界尺**＝`git show --name-only --format=` 对这十笔各跑一遍（⛔ 区间尺 `A..B`，那会把别家腿的笔算进来）。允许清单＝`.scratch/wisp/probes/310/r1/**` ＋ `scripts/portable-tests.sh`／`winsec-tests.sh`／`wisp-cli-tests.sh`。
+- ★**第三种死法的归口**（`Q-310-orch-N`）：现量＝封过 ACL 的目录在被换成另一枚卷的根时，`t.TempDir()` 的自我收尾**自己被拒**（`grep -c 'TempDir RemoveAll cleanup'`：`D:` 根那发 4 行逐字 `… Access is denied.` ⇄ 默认根那发 0 行）。⇒ 本格只回答一句：**票面现量那句"测试正常跑完 ⇒ 0 残留"要不要加射程、加的话落哪张票**（候选＝票 311 的 `AC#3`；⛔ 顺手实现清理器）。
+
+## 2. 硬约束（一条都不许漂）
+
+1. ⛔ 放宽任何断言；⛔ 造 `--- SKIP` 换绿；⛔ 动 SLO 阈值／golden／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt`／D43 转移表／C1–C32／D1–D47／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。
+2. ★**⛔ 删任何东西**：`%TEMP%` 下在册的 `Test*` 目录（现量 **58 枚**）、`C:/Users/swq/AppData/Local/wisp-test-gotmp/*` 与 `D:/tmp/wisp-test-gotmp/*` 里任何专用根及残渣，一枚都⛔ 动。删＝不可逆，且那枚 `TestProbeStepByStep3843095677` 已裁"归属不明、⛔ 动、**永久**"。你的件里只写"我数到几枚、我没动"。
+3. ⛔ 改 `scripts/**`／`internal/**`／`cmd/**` 任何字节（你是验收腿，产码面⛔ 是你的）；⛔ 动 `ci.yml`／`.github/**`／`AGENTS.md`／`docs/PLAN.md`／`docs/specs/**`／票面上任何人写的原句；⛔ 碰票 304 的 Job Object 面（`internal/proc/jobscope_*`、`internal/llm/adaptertest/childjob_*`、两枚 mockllm spawn 点）。
+4. ⛔ 新造协程（D38(b) 名册零膨胀）、⛔ 裸 `go func(`（ban #1）。
+5. **⛔ `--no-verify` 不算例外**（钩子缺位⛔ 等于许可：本仓 `.git/hooks/` 只有 `post-checkout`／`post-commit`）。
+
+## 3. 交付件（一格都不许"只交一半"）
+
+- `00-anchor.md`（起手锚＋名册三问的答案；⛔ 空手起步）。
+- `10-ac1-verdicts.md`＝上面 `AC#1` 三问逐问判语＋支持它的**我自己现跑**那行的逐字读数。
+- `20-ac2-paired.md`＝你复跑的那一发（正控/反控齐，⛔ 抄件）＋对腿件四发的复核（作废那两发要指名为什么作废得对/不对）。
+- `30-ac3-gates.md`＝四把门禁逐把 `rc=N`＋两把格式名册＋0 字节件那 7 枚的 ⓐ/ⓑ 分类＋逐笔越界枚数。
+- `90-final.md`＝三格判语一页内＋**结尾具名写你欠的读数**（`Q-310-v1-…` 逐枚编号；至少要含：ubuntu 那一支的实测、托管 runner 上 `%LOCALAPPDATA%` 兄弟根可不可写〔⛔ 你能交，那需 CI 色〕、`AC#2` 里任何你没复跑的发）。
+- `docs/evidence/s1/310-ac1-3-verdict.md`＝三格裁决表（**必须出自非实现者**＝你）。
+- 票 310 末尾**一条** append-only Progress bullet（`1 加／0 删`；⛔ 动框、⛔ 动 `Status:`、⛔ 改名 `-done`）。
+
+## 4. 输出预算与死活规矩（⛔ 这三条是别人死换来的）
+
+- 目标调用数 **≤60**；第 45 次之前把 `90-final.md`＋裁决表＋票尾 bullet 写满并 commit；第 70 次无条件先 commit 当前件。**你死了的话，盘上有的那部分才算交过。**
+- ⛔ 把上百行原文读进对话：大输出**先落你自家 `logs/`**，对话里只允许 `wc -l`／`head -3`／`cut -c1-170` 级摘要。⚠ 凡"某枚计数应当为 0"的链一律 `N=$(… || true)`（`grep -c` 命中 0 时 rc＝1 会把 `&&` 后面整段跳掉），并在件里写一行"empty above＝0 枚"。
+- 证据件⛔ 叫 `.out`（根 `.gitignore` 第 8 行是全仓 `*.out`）⇒ 一律 `.md`／`.txt`／`.tsv`。⛔ 在 `probes/**` 下新建 `.go`（会挪别家的 gofumpt/d22scan 分母）。件名⛔ 带 `§`、⛔ 长名（相对 ≤121、末段 ≤100、全路径 ≤165；**新建之前先跑一次长度门**——它会为**别家腿的拷贝件**红，那种红的处置＝把红的那枚具名报我，⛔ 加名册豁免、⛔ 删别家的东西）。临时件**只建不删**，只建在你自家 `.scratch/wisp/probes/310/v1/**`。
+- 你的写面只有三件套：①`.scratch/wisp/probes/310/v1/**` ②`docs/evidence/s1/**`（裁决表，AGENTS §1.5 的落点）③票 310 末尾**一条** bullet。commit 之后自己 `git show --name-only --format=` 逐枚数一遍（"提交成功"≠"我的件在里面"）。
+- ★**凡引用别人的件，路径逐枚写全**（⛔ 只写号），并在引用之前现读那一行；⛔ 拿腿的 logs 当判语抄。
+
+next＝交回之后我按你的判语翻格（`AC#1`/`AC#2`/`AC#3`）或退回；⛔ 你⛔ 我任何一枚框由实现者腿自己勾；⛔ push。

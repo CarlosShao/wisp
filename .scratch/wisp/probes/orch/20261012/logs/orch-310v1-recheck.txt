@@ -1,0 +1,7 @@
+temp_test_star=59 positive_control_all_temp_dirs=2823
+leg_named_leak_present=1 created=2026-10-12 12:48:51
+unowned_probe_still_present=1
+--- roots named by the leg's 5 entry readings ---
+lappdata_roots=11 d_roots=6
+--- residue dirs inside the leg's own roots (named by its report) ---
+TestRoundTripLoadMarshalLoad3712892429 found_in_roots=1

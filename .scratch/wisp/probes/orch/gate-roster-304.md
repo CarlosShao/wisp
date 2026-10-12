@@ -33,8 +33,9 @@ powershell -NoProfile -Command 'Get-CimInstance Win32_Process | Where-Object { $
 powershell -NoProfile -Command '(Get-ChildItem -Path $env:TEMP -Directory | Where-Object { $_.Name -like "Test*" }).Count'   # 枚数＝%TEMP% 下测试临时目录残留数
 ```
 
-- 现量序列（同一把尺）：10-10 立案 **21** → 10-11 19:5x **44** → 10-12 10:2x **50** → 普查腿交件 **53** → 编排者复跑 (b) 两发之后 **55** → `310-r1` 交件 **58** → 编排者复跑 winsec 两发之后**仍是 58**（件 `probes/orch/20261012/logs/orch-gate-20261012.txt`＋`orch-310-recheck-b.txt`＋`orch-310r1-precheck.txt`＋`orch-temp-after-my-shots.txt`）。
+- 现量序列（同一把尺）：10-10 立案 **21** → 10-11 19:5x **44** → 10-12 10:2x **50** → 普查腿交件 **53** → 编排者复跑 (b) 两发之后 **55** → `310-r1` 交件 **58** → 编排者复跑 winsec 两发之后**仍是 58**（件 `probes/orch/20261012/logs/orch-gate-20261012.txt`＋`orch-310-recheck-b.txt`＋`orch-310r1-precheck.txt`＋`orch-temp-after-my-shots.txt`）→ `310-v1` 交件 **59**（多那一枚＝它 `AC#2` (a) 那发的具名残渣 `TestRoundTripLoadMarshalLoad4222770164`，`CreationTime`＝`12:48:51.544`，编排者 13:0x 复跑到盘上仍在＝`logs/orch-310v1-recheck.txt`；归它、⛔ 删）。
 - 这一行买的是"**看见它在长**"，⛔ 买的是"有人收尾"——收尾那半归票 310 的落地腿（`AC#1`）。
+- ★**读数件⛔ 写进任何专用根里**（10-12 由 `310-v1` 现量：往 `D:/tmp/wisp-test-gotmp` 里落了两枚 `.txt` ⇒ 同一格两把尺失配 `Get-ChildItem -Directory`＝6 ⇄ `ls -1`＝8，"根里条目数"从此分不清残渣与文件）。定式＝**专用根只放 `t.TempDir()` 的产物**，读数件一律落 `probes/<票>/<腿>/logs/`；数根里条目时**具名写你用哪一把**（`-Directory` ⇄ `ls -1`）。
 - ⚠ **枚数⛔ 是证据，名字才是；而名字只有"作差"那种来路算数**（10-12 实测：两枚腿把突变台件自报的 `dir=Test…<数字>` 当成漏的那枚抄进了交付件——同一秒里 `t.TempDir()` 会建了又删，台件盯到的那枚往往早已自我收尾；盘上真正活着的那枚是**另一个名字**）。⇒ 定式＝**起进程前的名册 ⇄ 杀完之后的名册作差（`comm -13`）＋逐枚带 `CreationTime`**；⛔ 引用任何"某某目录是我这一发漏的"之前，先用 `Get-ChildItem … | Select Name,CreationTime` 证它**今天还在盘上**。裁决腿⛔ 按交件里的名册盖章（本仓 10-12 两枚腿各栽过一次，见 `A857`／`A858`）。
 
 **专用根落哪一枚卷＝会改闸门颜色的变量（10-12 编排者现量，票 310 `AC#1` 落地腿撞出、我复跑坐实；细节见票 311）**
