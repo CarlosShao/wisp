@@ -1,0 +1,1 @@
+EMPTY-OK: same as 15-nogo.txt (0 .go changed). count=0.

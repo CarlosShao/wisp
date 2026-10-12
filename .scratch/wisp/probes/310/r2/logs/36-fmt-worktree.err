@@ -1,0 +1,1 @@
+EMPTY-OK: gofmt stderr 0 bytes (the 4 worktree hits are on stdout, see 36-fmt-worktree.txt).

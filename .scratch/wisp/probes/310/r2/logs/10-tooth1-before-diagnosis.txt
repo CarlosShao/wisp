@@ -1,0 +1,9 @@
+### runtests.sh HEAD source: does it reference GOTMPDIR/ticket 310 at all? (改前 = expect 0) ###
+runtests_ticket310_hits=0
+runtests_gotmpdir_hits=0
+### export-tree d22scan.sh self-scan FALSE-RED cause (unrelated to temp dirs) ###
+68:--- FAIL: TestScannerSelfScanOfRealRepoIsGreen (1.37s)
+142:--- FAIL: TestScopeReportMatchesRealCoverage (1.11s)
+241:--- FAIL: TestRealRepoLedgerIsHonest (1.17s)
+note: these three FAIL on a 6-piece export tree because they scan the WHOLE repo;
+      GOTMPDIR absence (hits=0) is the tooth signal, NOT rc.

@@ -1,0 +1,1 @@
+EMPTY-OK: grep -nE 'ticket 310|GOTMPDIR|DEGRADED' over BOTH stdout+stderr of the export-tree 改前 winsec LOCALAPPDATA-empty run = 0 matches. hits_count=0 recorded in the same shot; this empty file IS the silent-branch evidence, not a missing reading.

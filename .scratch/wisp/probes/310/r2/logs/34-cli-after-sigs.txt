@@ -1,0 +1,5 @@
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (0.31s)
+--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.70s)
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.40s)
+--- SKIP: TestAC247LiveMicrophoneLevelsReachTheBallSeam (0.00s)
+portable-tests.sh: four numbers (all from -v output): === RUN=398  --- PASS=284  --- FAIL=3  --- SKIP=1

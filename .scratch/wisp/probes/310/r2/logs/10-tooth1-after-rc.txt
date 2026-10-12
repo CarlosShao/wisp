@@ -1,0 +1,3 @@
+tooth1_after_rc=0
+gotmpdir_eq_lines=1
+extracted_root=[C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261012-135432-33]

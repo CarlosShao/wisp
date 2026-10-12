@@ -1,0 +1,2 @@
+portable-tests.sh: explicit scope [./internal/winsec/] IS the winsec tier's own scope - running it as mode=winsec against winsec_pin (ticket 251 AC#1)
+portable-tests.sh: platform=windows scope=[./internal/winsec/...]

@@ -1,0 +1,15 @@
+ticket 310 (310-r2): LOCALAPPDATA-empty branch speaks + 5th go-test entry gets the root step
+
+Two debts only (Q-310-orch-P / Q-310-orch-Q), no scope growth, no CI, no assertion:
+
+- tools/d22scan/runtests.sh: the fifth entry that really starts `go test`
+  (scripts/d22scan.sh:51 -> runtests.sh -C tools/d22scan ./...) now claims the
+  dedicated GOTMPDIR root. Block copied verbatim from scripts/winsec-tests.sh:55-65
+  (only entry name d22scan- + echo prefix change); guard keeps -z ${GOTMPDIR:-} so a
+  delegated run inherits portable-tests.sh's root (one root per run, no second root).
+
+- scripts/winsec-tests.sh / scripts/wisp-cli-tests.sh: the GOOS=windows + empty
+  LOCALAPPDATA case used to fall through in silence (conjunctive && [ -n LOCALAPPDATA ]).
+  Now it prints one honest DEGRADED finding on stderr, byte-identical across all four
+  entries (modulo the file prefix and the file-specific note pointer). NOT fail-closed,
+  NOT a refusal to run (test binary still runs; revocation phrase "310 改 fail-closed").

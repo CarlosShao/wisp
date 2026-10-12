@@ -1,0 +1,1 @@
+EMPTY-OK: gofmt -l on HEAD export tree printed 0 files (tree is clean). Non-empty guard head_tree_go_files=683 in 10-export-tree-path.txt; so 0 here means 'genuinely clean', not 'empty because nothing was taken'.

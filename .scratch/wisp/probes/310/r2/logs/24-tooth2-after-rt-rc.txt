@@ -1,0 +1,2 @@
+rt_after_rc=0 (d22scan tests normally pass=0)
+runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0

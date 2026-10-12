@@ -1,0 +1,25 @@
+cli same-台面 baseline reasoning (why the export-tree run is NOT the baseline):
+
+1. The export-tree `--scope=cli` run (FAIL=18 SKIP=2) is a DIFFERENT 台面: git archive
+   exports only go.mod go.sum internal cmd tools scripts frontend — it omits design/,
+   docs/, .scratch/. cmd/wisp's resident-leg / winlive / checkout tests (TestAC2*,
+   TestAC3*, TestAC228*, TestAC246*, TestAC247*, TestCleanCheckoutBuilds_AC11,
+   TestSecretArgv*) need those trees and false-red without them (the 10-11 accident shape).
+   => NOT a valid "改前" baseline; recorded, attributed to 台面, NOT to this leg.
+
+2. This leg's ONLY runtests.sh change is on the cli path via portable -> `sh $strict`.
+   portable-tests.sh (unchanged by this leg) exports GOTMPDIR first; runtests.sh's new
+   step guard is `[ -z "${GOTMPDIR:-}" ] && ...`, so on this delegated path the guard is
+   FALSE -> runtests.sh emits NO GOTMPDIR/DEGRADED line (proof: runtests.sh ticket-310
+   count = 0 in 34-cli-after). That byte-for-byte equals HEAD's stepless runtests.sh on
+   the same台面 => my change is a provable NO-OP for the cli path.
+
+3. Worktree after-run red family (RUN=398 PASS=284 FAIL=3 SKIP=1):
+   FAIL TestAC4FocusReturnToPriorWindowGap33r5 / TestAC13ColdStartEnds.../ TestAC14GoSideEval...
+   SKIP TestAC247LiveMicrophoneLevels...
+   vs r1 baseline (HEAD 7e6c1579) FAIL=2 SKIP=1 (AC13ColdStart, AC14, SKIP AC247).
+   The extra TestAC4FocusReturn... is a real-window timing red that entered between r1's
+   HEAD and now's HEAD (47 commits); a shell-only change that never touches Go test logic
+   cannot add it. Outside this leg's 射程 and outside this leg's authorship — named, not归因.
+
+[追加] 后又拿"含 design/docs 的更完整导出树"跑改前 --scope=cli 仍 FAIL=19：因工作树本身被别家未提交的 design/** 删除污染，导出树(pristine HEAD)⇄工作树=两枚不同台面；故改用"runtests 在委托路零行输出=no-op"这把台面无关的尺定"没多也没少"，见 38-cli-inertness-verdict.txt。

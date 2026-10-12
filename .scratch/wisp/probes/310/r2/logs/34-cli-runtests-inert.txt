@@ -1,0 +1,2 @@
+.scratch/wisp/probes/310/r2/logs/34-cli-after.out:0
+.scratch/wisp/probes/310/r2/logs/34-cli-after.err:0

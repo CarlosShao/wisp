@@ -1,0 +1,21 @@
+cli "没多也没少" 判定（⛔ 拿两枚不同台面作差当凭据）
+
+事实（本腿现跑，件同目录）：
+- 改前跑 = 仓外导出树 73719706（含 design/docs，仍⛔ 含 .scratch 且 git 状态 pristine）：`--scope=cli` RUN=392 FAIL=19 SKIP=3。
+- 改后跑 = 工作树（73719706 + 本腿 shell 增量 + 别家未提交：design/** 被删、.gitignore/go.mod 被改）：两次
+  shot1(34) RUN=398 PASS=284 FAIL=3 SKIP=1；shot2(38) RUN=398 PASS=283 FAIL=3 SKIP=2。
+=> 导出树⇄工作树是两枚不同台面（工作树被别家的 design/** 删除污染），二者名字作差 = 台面差 + 真窗 flaky，⛔ 能当"本腿有没有多删红"的凭据。
+
+真正台面上成立的判定（本腿改动的净效应）：
+- `--scope=cli` 委托链 = scripts/portable-tests.sh（本腿⛔ 动它一字）-> `sh $strict` -> tools/d22scan/runtests.sh。
+- 本腿唯一可能进这条链的改动 = runtests.sh 那枚根步子，守卫 `-z "${GOTMPDIR:-}"`；而 portable 先 `export GOTMPDIR`，
+  故 runtests 在这条路上守卫恒为假 ⇒ 整块跳过。实测两发都证：
+    runtests.sh ticket-310 行数  改前(stepless)=0   改后(step)=0   （件 34/36/38）
+- 即"带着本腿步子跑 go test"与"HEAD 无步子跑 go test"在这条路上喂给 go test 的 GOTMPDIR 环境变量与命令逐字节相同
+  ⇒ 本腿对 cli 结果为**可证零效应**，⛔ 可能添/削任何一枚红。
+
+红族本身：FAIL=3 那几枚（AC13 ColdStart / AC14 GoSideEval / AC4 FocusReturn↔TestPanelHost 二选一跳）+ SKIP AC247/
+TestPanelHost = 本机既有真窗/真麦/驻留族，⛔ 本腿射程、⛔ 由本腿归因（票 310 编排者 bullet 明写）；两发之间成员会随
+真窗时序翻动＝该族自带 flaky，与本腿 shell 改动无关。
+
+结论：§3 "与改前同一红、同三名" 在"本腿净效应"意义下成立＝没多也没少（no-op 证明），且⛔ 由本腿对既有红族归因。

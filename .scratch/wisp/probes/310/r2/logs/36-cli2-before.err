@@ -1,0 +1,10 @@
+portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:
+    panel_host_windows_test.go:985: no cold/hot sample recorded in this process: the lifecycle test did not run in this binary (use -run 'TestPanelHostRealWindowHopAndLifecycle|TestPanelHostLatencyPercentilesAC2'). Named skip - an empty aggregate is not a green latency gate
+--- SKIP: TestPanelHostLatencyPercentilesAC2 (0.00s)
+--
+    panel_resident_windows_test.go:317: AC#13 has no subject in this tree: the embed resolves no entry, so there is no page content that could be covered. Named skip; the working-tree reading is the one that ran, recorded in docs/evidence/s1/33-panel-host-c27-r5.md
+--- SKIP: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.00s)
+--
+    resident_audio_247_live_windows_test.go:130: AC#2 needs a real microphone: run with WISP_LIVE_MIC=1 after both tasklist rulers read 0
+--- SKIP: TestAC247LiveMicrophoneLevelsReachTheBallSeam (0.00s)
+portable-tests.sh: strict runner exited 1 for scope=[./cmd/wisp/]

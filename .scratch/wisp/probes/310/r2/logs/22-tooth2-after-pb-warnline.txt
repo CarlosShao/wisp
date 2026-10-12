@@ -1,0 +1,1 @@
+portable-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no measured-safe root to build (a root on another volume turns the winsec seal cases red, see the note above). GOTMPDIR stays unset.

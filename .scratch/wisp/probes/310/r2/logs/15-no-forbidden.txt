@@ -1,0 +1,1 @@
+EMPTY-OK: git diff --name-only -- .github internal cmd returned 0 lines => this leg touched ZERO forbidden paths. count=0.

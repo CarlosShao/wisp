@@ -1,0 +1,1 @@
+EMPTY-OK: winsec LOCALAPPDATA-empty run sends its warning to stderr only; stdout is legitimately 0 bytes. rc + stderr in 20-tooth2-after-ws-rc.txt / 20-tooth2-after-ws.err (509B).

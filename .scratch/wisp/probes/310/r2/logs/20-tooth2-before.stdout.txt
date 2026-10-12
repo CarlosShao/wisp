@@ -1,0 +1,1 @@
+EMPTY-OK: export-tree 改前 winsec LOCALAPPDATA-empty stdout empty; rc=2 in 20-tooth2-before-rc.txt, GUARD1 stderr in 20-tooth2-before.err (268B).

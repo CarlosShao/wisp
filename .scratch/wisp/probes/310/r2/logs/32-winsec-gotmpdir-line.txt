@@ -1,0 +1,1 @@
+winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-135756-111 - this run's t.TempDir() family lands here; nothing deletes it.

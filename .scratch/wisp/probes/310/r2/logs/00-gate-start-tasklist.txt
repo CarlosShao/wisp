@@ -1,0 +1,5 @@
+IMG=wisp.exe rc=0 hits=0 stderr_bytes=0
+IMG=balldebug.exe rc=0 hits=0 stderr_bytes=0
+IMG=mockllm.exe rc=0 hits=0 stderr_bytes=0
+IMG=wisp.test.exe rc=0 hits=0 stderr_bytes=0
+POSITIVE_CONTROL_svchost=86

@@ -1,0 +1,1 @@
+EMPTY-OK: git diff --name-only -- '*.go' returned 0 lines => this leg changed ZERO go files. count=0.

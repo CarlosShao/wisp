@@ -1,0 +1,7 @@
+portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:
+    panel_host_windows_test.go:985: no cold/hot sample recorded in this process: the lifecycle test did not run in this binary (use -run 'TestPanelHostRealWindowHopAndLifecycle|TestPanelHostLatencyPercentilesAC2'). Named skip - an empty aggregate is not a green latency gate
+--- SKIP: TestPanelHostLatencyPercentilesAC2 (0.00s)
+--
+    resident_audio_247_live_windows_test.go:130: AC#2 needs a real microphone: run with WISP_LIVE_MIC=1 after both tasklist rulers read 0
+--- SKIP: TestAC247LiveMicrophoneLevelsReachTheBallSeam (0.00s)
+portable-tests.sh: strict runner exited 1 for scope=[./cmd/wisp/]

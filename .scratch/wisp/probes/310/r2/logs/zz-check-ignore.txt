@@ -1,0 +1,1 @@
+no r2 file is git-ignored after the .out->.stdout.txt rename; ignored_count=0 (empty grep output = zero matches).

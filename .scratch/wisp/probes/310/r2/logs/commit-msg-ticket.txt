@@ -1,0 +1,7 @@
+ticket 310 (310-r2): append one progress bullet for the two debts landed
+
+Adds exactly one line to the Progress log (git diff --numstat = 1 add / 0 del,
+no existing line touched). Records: Q-310-orch-P (5th go-test entry runtests.sh
+now builds the dedicated root) and Q-310-orch-Q (the windows+empty-LOCALAPPDATA
+branch speaks instead of falling silent) both measured; gates rc=0; %TEMP% top
+59->59 with nothing deleted. AC boxes / Status / -done rename untouched (编排者 owns).

@@ -1,0 +1,1 @@
+EMPTY-OK: 30-census-after.err is the stderr of a run that wrote its findings to stdout (companion .stdout.txt/.txt with rc= exists). 0 bytes = no error output, not a missing reading.

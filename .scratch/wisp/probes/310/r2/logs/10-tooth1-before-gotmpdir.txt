@@ -1,0 +1,1 @@
+EMPTY-OK: grep GOTMPDIR over export-tree d22scan 改前 output = 0 hits (the ⛔恒真 tooth signal). gotmpdir_hits=0 recorded in 10-tooth1-before-rc.txt / diagnosis in 10-tooth1-before-diagnosis.txt.

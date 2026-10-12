@@ -1,0 +1,5 @@
+ROOT=C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261012-135432-33
+ROOT_EXISTS_DIR=True
+ROOT_FULL=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261012-135432-33
+ROOT_UNDER_TEMP=False
+ROOT_TEMPNAME_IN_TEMP_ROSTER=False

@@ -1,0 +1,1 @@
+worktree_d22scan_preedit_rc=0

@@ -1,0 +1,3 @@
+scripts/winsec-tests.sh
+scripts/wisp-cli-tests.sh
+tools/d22scan/runtests.sh

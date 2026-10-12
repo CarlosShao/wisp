@@ -1,0 +1,1 @@
+EMPTY-OK: 改前 winsec LOCALAPPDATA-empty run printed NOTHING to stdout (the silent branch). rc=2 in 20-tooth2-before-wt-rc.txt; GUARD1 lines in 20-tooth2-before-wt.err (268B). This emptiness is the finding, not a missing reading.

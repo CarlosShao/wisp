@@ -1,0 +1,4 @@
+=== numstat (add/del) for the four scripts ===
+22	9	scripts/winsec-tests.sh
+22	9	scripts/wisp-cli-tests.sh
+41	0	tools/d22scan/runtests.sh
