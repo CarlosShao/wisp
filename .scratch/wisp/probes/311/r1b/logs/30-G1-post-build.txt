@@ -1,0 +1,7 @@
+# ruler=probes/311/r1b/txt/run-shot.sh ; shot taken by leg 311-r1b
+workdir=/d/tmp/311r1b/tpost
+env_assignment=<none: factory default shape>
+command_line=env GOFLAGS= go build ./...
+---- interleaved stdout+stderr follows ----
+---- capture ends ----
+rc=0

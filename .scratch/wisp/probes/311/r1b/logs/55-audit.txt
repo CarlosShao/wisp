@@ -1,0 +1,20 @@
+# 55-audit.txt - 两件交付前自查：totals 逐字作差 ＋ rc=/0 字节覆盖
+--- census totals 三发并排（尺＝grep -m1 那一行，再逐字符 diff）---
+distinct_totals_lines=1 (分母＝3 发) ⇒ 逐字未变
+totals_verbatim=portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+baseline_given_by_dispatch=packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+matches_baseline=yes
+--- 四数行（winsec 档，改前 2 发 ⇄ 改后 2 发 ⇄ 摘除侧）---
+10-winsec-pre-run1 :: winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+10-winsec-pre-run2 :: winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+30-G4-post-winsec-run1 :: winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+30-G5-post-winsec-run2 :: winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0
+22-B1-winsec-xvol-guard-removed :: winsec-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=56  --- FAIL=2  --- SKIP=0
+--- rc= 覆盖与 0 字节件 ---
+log_files_without_rc_line=1 (分母＝log 文件枚数 66)
+zero_byte_files_in_leg_dir=0
+--- 本腿写面 vs HEAD（交件时刻）---
+my_surface_dirty_lines=0
+staged_lines_now=0
+rc=0
+recheck_log_files_without_rc_line=0 (the 1 in the line above was 55-audit.txt counting itself before its own rc= line existed; re-taken after)

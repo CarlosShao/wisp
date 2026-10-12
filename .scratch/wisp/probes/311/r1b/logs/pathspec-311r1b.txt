@@ -1,0 +1,102 @@
+# pathspec-311r1b.txt - 本腿每一笔 commit 的显式 pathspec（⛔ add -A、⛔ add <目录>、⛔ --amend/reset/rebase/stash/checkout . /clean/--no-verify、⛔ push）
+形状＝git add -- <逐枚文件路径> ; git commit -m/-F <消息> -- <同一批逐枚文件路径>；索引自查 git diff --cached --name-only＝0（起手与交件各一次，件 logs/55-audit.txt）
+
+## 产码四笔（一笔一枚文件）
+e4e787fb  git add -- scripts/winsec-tests.sh            ; git commit -- scripts/winsec-tests.sh
+f8b1f446  git add -- scripts/portable-tests.sh          ; git commit -- scripts/portable-tests.sh
+10734fbd  git add -- scripts/wisp-cli-tests.sh          ; git commit -- scripts/wisp-cli-tests.sh
+0f888a4f  git add -- tools/d22scan/runtests.sh          ; git commit -- tools/d22scan/runtests.sh
+逐笔越界尺＝git show --name-only --format= <sha> ＝各 1 枚（件 logs/43-format-roster.txt §1）
+
+## 证据三笔（枚枚显式列名，⛔ 目录 pathspec；清单由 find+sort 生成后逐枚粘给 add，本文件就是那张清单本身）
+### E1 格一（31 枚）
+  .scratch/wisp/probes/311/r1b/10-replicate.md
+  .scratch/wisp/probes/311/r1b/ps1/residue.ps1
+  .scratch/wisp/probes/311/r1b/ps1/residue2.ps1
+  .scratch/wisp/probes/311/r1b/ps1/roster.ps1
+  .scratch/wisp/probes/311/r1b/txt/append-rc.sh
+  .scratch/wisp/probes/311/r1b/txt/mk-block.sh
+  .scratch/wisp/probes/311/r1b/txt/phase-a.sh
+  .scratch/wisp/probes/311/r1b/txt/phase-b.sh
+  .scratch/wisp/probes/311/r1b/txt/phase-c.sh
+  .scratch/wisp/probes/311/r1b/txt/phase-pre-shapes.sh
+  .scratch/wisp/probes/311/r1b/txt/run-shot.sh
+  .scratch/wisp/probes/311/r1b/txt/summarize.sh
+  .scratch/wisp/probes/311/r1b/logs/00-head.txt
+  .scratch/wisp/probes/311/r1b/logs/00-len-gate-start.txt
+  .scratch/wisp/probes/311/r1b/logs/01-insertion-points.txt
+  .scratch/wisp/probes/311/r1b/logs/02-start-roster.txt
+  .scratch/wisp/probes/311/r1b/logs/03-tree-pre.txt
+  .scratch/wisp/probes/311/r1b/logs/09-runner-selftest.txt
+  .scratch/wisp/probes/311/r1b/logs/10-winsec-pre-run1.txt
+  .scratch/wisp/probes/311/r1b/logs/10-winsec-pre-run2.txt
+  .scratch/wisp/probes/311/r1b/logs/11-pre-build.txt
+  .scratch/wisp/probes/311/r1b/logs/11-pre-census.txt
+  .scratch/wisp/probes/311/r1b/logs/11-pre-d22scan.txt
+  .scratch/wisp/probes/311/r1b/logs/13-replicate-insert.txt
+  .scratch/wisp/probes/311/r1b/logs/13b-insert-success.txt
+  .scratch/wisp/probes/311/r1b/logs/14-replicate-diff.txt
+  .scratch/wisp/probes/311/r1b/logs/21-strip-proof.txt
+  .scratch/wisp/probes/311/r1b/logs/40-a862-310block-check.txt
+  .scratch/wisp/probes/311/r1b/logs/41-shot-table.txt
+  .scratch/wisp/probes/311/r1b/logs/42-winsec-roster.txt
+  .scratch/wisp/probes/311/r1b/logs/43-format-roster.txt
+### E2 牙（40 枚）
+  .scratch/wisp/probes/311/r1b/20-teeth.md
+  .scratch/wisp/probes/311/r1b/logs/20-A1-winsec-xvol.txt
+  .scratch/wisp/probes/311/r1b/logs/20-A2-portable-xvol.txt
+  .scratch/wisp/probes/311/r1b/logs/20-A3-runtests-xvol.txt
+  .scratch/wisp/probes/311/r1b/logs/20-A4-cli-xvol-worktree.txt
+  .scratch/wisp/probes/311/r1b/logs/20-C3-runtests-gotmpdir-only-xvol.txt
+  .scratch/wisp/probes/311/r1b/logs/20-C4-cli-gotmpdir-only-xvol-worktree.txt
+  .scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt
+  .scratch/wisp/probes/311/r1b/logs/22-B2-portable-xvol-own-guard-removed.txt
+  .scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt
+  .scratch/wisp/probes/311/r1b/logs/23-order-degraded-then-guard.txt
+  .scratch/wisp/probes/311/r1b/logs/24-order-guard-after-guard1.txt
+  .scratch/wisp/probes/311/r1b/logs/24b-order-degraded-before-guard1.txt
+  .scratch/wisp/probes/311/r1b/logs/25-C1-runtests-xvol-backslash.txt
+  .scratch/wisp/probes/311/r1b/logs/25-C2-runtests-inconclusive-rel.txt
+  .scratch/wisp/probes/311/r1b/logs/26-B1x-winsec-default-guardremoved.txt
+  .scratch/wisp/probes/311/r1b/logs/26-B1y-portable-default-guardremoved.txt
+  .scratch/wisp/probes/311/r1b/logs/26-B3x-runtests-default-guardremoved.txt
+  .scratch/wisp/probes/311/r1b/logs/26-C1-winsec-samevol-guardremoved.txt
+  .scratch/wisp/probes/311/r1b/logs/26-D1-winsec-samevol.txt
+  .scratch/wisp/probes/311/r1b/logs/26-D2-portable-samevol.txt
+  .scratch/wisp/probes/311/r1b/logs/26-D3-runtests-samevol.txt
+  .scratch/wisp/probes/311/r1b/logs/27-E1-winsec-nolappdata.txt
+  .scratch/wisp/probes/311/r1b/logs/27-E2-runtests-nolappdata.txt
+  .scratch/wisp/probes/311/r1b/logs/27-E3-portable-nolappdata.txt
+  .scratch/wisp/probes/311/r1b/logs/28-F1-winsec-gooslinux.txt
+  .scratch/wisp/probes/311/r1b/logs/28-F2-cli-gooslinux.txt
+  .scratch/wisp/probes/311/r1b/logs/28-F3-runtests-gooslinux.txt
+  .scratch/wisp/probes/311/r1b/logs/29-P1-pre-runtests-nolappdata.txt
+  .scratch/wisp/probes/311/r1b/logs/29-P2-pre-winsec-nolappdata.txt
+  .scratch/wisp/probes/311/r1b/logs/29-P3-pre-runtests-gooslinux.txt
+  .scratch/wisp/probes/311/r1b/logs/29-P4-pre-winsec-gooslinux.txt
+  .scratch/wisp/probes/311/r1b/logs/29-P5-pre-runtests-samevol.txt
+  .scratch/wisp/probes/311/r1b/logs/29-P6-pre-portable-nolappdata.txt
+  .scratch/wisp/probes/311/r1b/logs/29-P7-pre-portable-samevol.txt
+  .scratch/wisp/probes/311/r1b/logs/50-end-roster.txt
+  .scratch/wisp/probes/311/r1b/logs/51-residue-raw.txt
+  .scratch/wisp/probes/311/r1b/logs/51-residue.txt
+  .scratch/wisp/probes/311/r1b/logs/52-locked-leaves-raw.txt
+  .scratch/wisp/probes/311/r1b/logs/53-residue-rerun.txt
+### E3 门禁＋本文件＋messages 件（10 枚＋2）
+  .scratch/wisp/probes/311/r1b/30-gates.md
+  .scratch/wisp/probes/311/r1b/logs/30-G1-post-build.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G2-post-census.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G3-post-d22scan.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G4-post-winsec-run1.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G5-post-winsec-run2.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G6-post-census-worktree.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G7-post-len.txt
+  .scratch/wisp/probes/311/r1b/logs/54-head-move.txt
+  .scratch/wisp/probes/311/r1b/logs/55-audit.txt
+  .scratch/wisp/probes/311/r1b/logs/pathspec-311r1b.txt
+  .scratch/wisp/probes/311/r1b/logs/messages-311r1b.txt
+
+## 口径两处
+1) 这三笔证据 commit 自己的 sha ⛔ 写进本文件（自指拿不到），写在票 311 末尾那条 bullet 里；那是唯一一处由外部补齐的号。
+2) 票 311 那一笔＝git add -- .scratch/wisp/issues/311-…md ; git commit -- 同一枚路径，1 加 0 删（只追加 1 条 Progress-log bullet；⛔ 翻框、⛔ 动 Status:、⛔ 改原句、⛔ 加 -done）。
+rc=0

@@ -1,0 +1,11 @@
+# ruler=probes/311/r1b/txt/run-shot.sh ; shot taken by leg 311-r1b
+workdir=/d/work/workspace/projects plans/Wisp
+env_assignment=<none: factory default shape>
+command_line=git diff --name-only 0f888a4f..HEAD -- scripts tools/d22scan
+---- interleaved stdout+stderr follows ----
+---- capture ends ----
+rc=0
+# denominator for that 0-hit reading (same trip, unfiltered):
+all_files_changed_0f888a4f..HEAD=14
+same_range_filtered_to_my_surface=0
+rc=0

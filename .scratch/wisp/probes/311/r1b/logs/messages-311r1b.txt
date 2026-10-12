@@ -1,0 +1,77 @@
+# messages-311r1b.txt - 本腿六笔 commit 的正文（逐字取自 git log --format=%B，⛔ 手抄）
+########## e4e787fb
+2026-10-12 15:27:41 +0800  ticket 311 (311-r1b) AC#1 shape B: the guard block's own comment must not name readings that never landed
+pathspec=scripts/winsec-tests.sh 
+-----
+ticket 311 (311-r1b) AC#1 shape B: the guard block's own comment must not name readings that never landed
+
+The 3b857e53 block pointed at probes/311/r1/logs/23-order-degraded-then-guard.txt and
+-24-order-guard-after-guard1.txt; leg 311-r1 died before running either, so the comment was
+citing evidence that does not exist on disk. Re-taken by 311-r1b into probes/311/r1b/logs/
+(same two names) and the comment now points there, with the dead leg's gap named in place.
+Attribution line also corrected: placement was re-measured per entry by 311-r1b, and
+"the delegated run below" -> "the run below" because tools/d22scan/runtests.sh starts
+go test itself rather than delegating. No behaviour change: comment lines only.
+
+########## f8b1f446
+2026-10-12 15:27:51 +0800  ticket 311 (311-r1b) AC#1 shape B: copy the cross-volume refusal block into scripts/portable-tests.sh
+pathspec=scripts/portable-tests.sh 
+-----
+ticket 311 (311-r1b) AC#1 shape B: copy the cross-volume refusal block into scripts/portable-tests.sh
+
+This is the entry that REALLY starts the tests (it delegates to tools/d22scan/runtests.sh),
+so it is the one a caller reaches without going through winsec-tests.sh. The block is a
+copy, not a re-type: extracted from scripts/winsec-tests.sh by content markers
+(probes/311/r1b/txt/mk-block.sh) and inserted before the unique anchor ^capture=$(mktemp,
+i.e. after the skip-pattern line and after GUARD C / GUARD A / the ledger, and before
+sh "$strict" ever runs. Only the 4 echo-prefix lines differ from the winsec text
+(differing_lines=8 per pair, probes/311/r1b/logs/14-replicate-diff.txt); the "which gate"
+wording was left verbatim on purpose - the only measured colour pair on this host is
+internal/winsec's PASS=58/FAIL=0 vs PASS=56/FAIL=2, and restating it for another tier
+would be an unmeasured claim.
+
+########## 10734fbd
+2026-10-12 15:28:09 +0800  ticket 311 (311-r1b) AC#1 shape B: copy the cross-volume refusal block into scripts/wisp-cli-tests.sh
+pathspec=scripts/wisp-cli-tests.sh 
+-----
+ticket 311 (311-r1b) AC#1 shape B: copy the cross-volume refusal block into scripts/wisp-cli-tests.sh
+
+Same block, same shape, only the 4 echo-prefix lines differ from scripts/winsec-tests.sh
+(copy is done by probes/311/r1b/txt/mk-block.sh, checked by
+probes/311/r1b/logs/14-replicate-diff.txt). Placement re-measured before landing: inserted
+before the unique anchor ^# PATH is handed over, i.e. AFTER the non-windows guard and the
+three DLL-face guards, and BEFORE the entry prints its own scope line or delegates
+bash "$portable" --scope=cli - so a cross-volume root is refused without starting cmd/wisp's
+test binary, which is the heaviest temp-dir user this host has (the reason ticket 310
+claimed the root here in the first place).
+
+########## 0f888a4f
+2026-10-12 15:28:09 +0800  ticket 311 (311-r1b) AC#1 shape B: copy the cross-volume refusal block into tools/d22scan/runtests.sh
+pathspec=tools/d22scan/runtests.sh 
+-----
+ticket 311 (311-r1b) AC#1 shape B: copy the cross-volume refusal block into tools/d22scan/runtests.sh
+
+Fourth entry, same block: only the 4 echo-prefix lines differ (copy instrument + line-diff
+in probes/311/r1b/txt and logs/14-replicate-diff.txt). Placement re-measured before landing:
+inserted before the unique anchor ^out=$(mktemp, i.e. after this runner's own parameter
+guards and after the ticket-310 root block (including its DEGRADED branch), and before
+go test -v -count=1 - the real process start here. This is the entry scripts/d22scan.sh
+delegates through, so the CI "D22 scanner positive control" step now refuses a cross-volume
+root on the exit code instead of printing a re-coloured PASS list.
+
+########## 501af017
+2026-10-12 16:00:19 +0800  ticket 311 (311-r1b) evidence grid 1: the copied refusal block, the four-way line-diff ruler, the instruments, and the section 9 re-read of the ticket 310 block
+pathspec=.scratch/wisp/probes/311/r1b/10-replicate.md .scratch/wisp/probes/311/r1b/logs/00-head.txt .scratch/wisp/probes/311/r1b/logs/00-len-gate-start.txt .scratch/wisp/probes/311/r1b/logs/01-insertion-points.txt .scratch/wisp/probes/311/r1b/logs/02-start-roster.txt .scratch/wisp/probes/311/r1b/logs/03-tree-pre.txt .scratch/wisp/probes/311/r1b/logs/09-runner-selftest.txt .scratch/wisp/probes/311/r1b/logs/10-winsec-pre-run1.txt .scratch/wisp/probes/311/r1b/logs/10-winsec-pre-run2.txt .scratch/wisp/probes/311/r1b/logs/11-pre-build.txt .scratch/wisp/probes/311/r1b/logs/11-pre-census.txt .scratch/wisp/probes/311/r1b/logs/11-pre-d22scan.txt .scratch/wisp/probes/311/r1b/logs/13-replicate-insert.txt .scratch/wisp/probes/311/r1b/logs/13b-insert-success.txt .scratch/wisp/probes/311/r1b/logs/14-replicate-diff.txt .scratch/wisp/probes/311/r1b/logs/21-strip-proof.txt .scratch/wisp/probes/311/r1b/logs/40-a862-310block-check.txt .scratch/wisp/probes/311/r1b/logs/41-shot-table.txt .scratch/wisp/probes/311/r1b/logs/42-winsec-roster.txt .scratch/wisp/probes/311/r1b/logs/43-format-roster.txt .scratch/wisp/probes/311/r1b/ps1/residue.ps1 .scratch/wisp/probes/311/r1b/ps1/residue2.ps1 .scratch/wisp/probes/311/r1b/ps1/roster.ps1 .scratch/wisp/probes/311/r1b/txt/append-rc.sh .scratch/wisp/probes/311/r1b/txt/mk-block.sh .scratch/wisp/probes/311/r1b/txt/phase-a.sh .scratch/wisp/probes/311/r1b/txt/phase-b.sh .scratch/wisp/probes/311/r1b/txt/phase-c.sh .scratch/wisp/probes/311/r1b/txt/phase-pre-shapes.sh .scratch/wisp/probes/311/r1b/txt/run-shot.sh .scratch/wisp/probes/311/r1b/txt/summarize.sh 
+-----
+ticket 311 (311-r1b) evidence grid 1: the copied refusal block, the four-way line-diff ruler, the instruments, and the section 9 re-read of the ticket 310 block
+
+########## 3b553a2f
+2026-10-12 16:00:32 +0800  ticket 311 (311-r1b) evidence teeth: AC#2 (a)(b)(c)(d) - cross-volume refusals per entry, the strip-only-the-guard colour back to PASS=56 FAIL=2 with TempDir cleanup failing, the three shapes present vs absent, the ordering shots
+pathspec=.scratch/wisp/probes/311/r1b/20-teeth.md .scratch/wisp/probes/311/r1b/logs/20-A1-winsec-xvol.txt .scratch/wisp/probes/311/r1b/logs/20-A2-portable-xvol.txt .scratch/wisp/probes/311/r1b/logs/20-A3-runtests-xvol.txt .scratch/wisp/probes/311/r1b/logs/20-A4-cli-xvol-worktree.txt .scratch/wisp/probes/311/r1b/logs/20-C3-runtests-gotmpdir-only-xvol.txt .scratch/wisp/probes/311/r1b/logs/20-C4-cli-gotmpdir-only-xvol-worktree.txt .scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt .scratch/wisp/probes/311/r1b/logs/22-B2-portable-xvol-own-guard-removed.txt .scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt .scratch/wisp/probes/311/r1b/logs/23-order-degraded-then-guard.txt .scratch/wisp/probes/311/r1b/logs/24-order-guard-after-guard1.txt .scratch/wisp/probes/311/r1b/logs/24b-order-degraded-before-guard1.txt .scratch/wisp/probes/311/r1b/logs/25-C1-runtests-xvol-backslash.txt .scratch/wisp/probes/311/r1b/logs/25-C2-runtests-inconclusive-rel.txt .scratch/wisp/probes/311/r1b/logs/26-B1x-winsec-default-guardremoved.txt .scratch/wisp/probes/311/r1b/logs/26-B1y-portable-default-guardremoved.txt .scratch/wisp/probes/311/r1b/logs/26-B3x-runtests-default-guardremoved.txt .scratch/wisp/probes/311/r1b/logs/26-C1-winsec-samevol-guardremoved.txt .scratch/wisp/probes/311/r1b/logs/26-D1-winsec-samevol.txt .scratch/wisp/probes/311/r1b/logs/26-D2-portable-samevol.txt .scratch/wisp/probes/311/r1b/logs/26-D3-runtests-samevol.txt .scratch/wisp/probes/311/r1b/logs/27-E1-winsec-nolappdata.txt .scratch/wisp/probes/311/r1b/logs/27-E2-runtests-nolappdata.txt .scratch/wisp/probes/311/r1b/logs/27-E3-portable-nolappdata.txt .scratch/wisp/probes/311/r1b/logs/28-F1-winsec-gooslinux.txt .scratch/wisp/probes/311/r1b/logs/28-F2-cli-gooslinux.txt .scratch/wisp/probes/311/r1b/logs/28-F3-runtests-gooslinux.txt .scratch/wisp/probes/311/r1b/logs/29-P1-pre-runtests-nolappdata.txt .scratch/wisp/probes/311/r1b/logs/29-P2-pre-winsec-nolappdata.txt .scratch/wisp/probes/311/r1b/logs/29-P3-pre-runtests-gooslinux.txt .scratch/wisp/probes/311/r1b/logs/29-P4-pre-winsec-gooslinux.txt .scratch/wisp/probes/311/r1b/logs/29-P5-pre-runtests-samevol.txt .scratch/wisp/probes/311/r1b/logs/29-P6-pre-portable-nolappdata.txt .scratch/wisp/probes/311/r1b/logs/29-P7-pre-portable-samevol.txt .scratch/wisp/probes/311/r1b/logs/50-end-roster.txt .scratch/wisp/probes/311/r1b/logs/51-residue-raw.txt .scratch/wisp/probes/311/r1b/logs/51-residue.txt .scratch/wisp/probes/311/r1b/logs/52-locked-leaves-raw.txt .scratch/wisp/probes/311/r1b/logs/53-residue-rerun.txt 
+-----
+ticket 311 (311-r1b) evidence teeth: AC#2 (a)(b)(c)(d) - cross-volume refusals per entry, the strip-only-the-guard colour back to PASS=56 FAIL=2 with TempDir cleanup failing, the three shapes present vs absent, the ordering shots
+
+########## E3（＝装着本文件的那一笔）
+正文长在它自己的 commit 上，⛔ 能写进它自己包含的这份文件里；逐字＝/tmp/msgE3.txt 那一行：
+  ticket 311 (311-r1b) evidence gates: AC#4 readings pre vs post on two export trees, d22scan running through the new runtests block, roster intersection, format roster in three states, per-commit boundary audit, pathspec and message records
+rc=0（本尺＝git log --format=%B，六枚号都在 git log 里；第七枚＝本腿的票 bullet，见下面第七节）
