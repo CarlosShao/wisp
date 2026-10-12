@@ -25,10 +25,12 @@
 
 | 处 | 内容锚（改前逐字） | 改后逐字 | 改后行号（现量） |
 |---|---|---|---|
-| 声明 | `	started bool` | `	started atomic.Bool` | `:116` |
-| 写 1（`toggleMute` 体内，★票的正主＝跨线程写） | `	ra.started = gate.Open()` | `	ra.started.Store(gate.Open())` | `:187` |
-| 写 2（`assembleCapture` 的 `default:` 支，boot 线程） | `		ra.started = true` | `		ra.started.Store(true)` | `:342` |
-| 读 1（`posture()` 体内，生产唯一读者） | `	if !ra.started {` | `	if !ra.started.Load() {` | `:398` |
+| 声明 | `	started bool` | `	started atomic.Bool` | `:105` |
+| 写 1（`toggleMute` 体内，★票的正主＝跨线程写） | `	ra.started = gate.Open()` | `	ra.started.Store(gate.Open())` | `:168` |
+| 写 2（`assembleCapture` 的 `default:` 支，boot 线程） | `		ra.started = true` | `		ra.started.Store(true)` | `:323` |
+| 读 1（`posture()` 体内，生产唯一读者） | `	if !ra.started {` | `	if !ra.started.Load() {` | `:379` |
+
+★这四枚行号＝票面"现量"那四枚（`:105`／`:168`／`:323`／`:379`）**一字未动**——不是巧合，是第 5 节那条硬约束的结果（本件必须净零增行，否则票 255 的回执行证会漂）。
 
 `sync/atomic` 本来就在 import 块里（邻居 `levels` 用的就是它），**未新增 import**。
 
@@ -50,23 +52,35 @@
 
 ---
 
-## 3. 注释那两组：措辞说"派生镜像"，再补"为什么这一枚必须原子"
+## 3. 注释那两组：措辞说"派生镜像"，再补"为什么这一枚必须原子"——而且**回到原行数**
 
-ⓓ-1 已具名这两组（声明上方 3 行、`toggleMute` 写点上方 4 行）。原句**一字未删**，只在各组末尾追加一段；追加段落里那句"必须原子"的落点：
+ⓓ-1 已具名这两组（声明上方 3 行、`toggleMute` 写点上方 4 行）。第 5 节那条约束（票 255 的行证按**行号**引本件）⇒ 这两组的新措辞必须**各自还是 3 行／4 行**，⛔ 追加段落。两组都保留了原句的全部claim（"记录门把设备交给了内层 source、采集真在跑"／"posture() 读它，所以建了门却没开过麦克风的腿不能打印 running"／"镜像、不是第二真相源"／"保持最新才不会有后来的读句谎称设备"），并在组末补上为什么这一枚必须原子：
 
-- **声明组**（原首行 `	// started records that the gate handed the device to the inner source and`）
-  新段落 10 行，最后一行逐字＝`	// source (ticket 295 AC#1 "照邻居做").`，它**紧贴在 `	started atomic.Bool` 那行（现量 `:116`）的上一行**。
-  句内点名的三件事：写者＝`toggleMute`（球的手势回调，ui-sta 线程，逐字 `// ball's global hotkeys on the ui-sta thread` 在 `resident_ball_windows.go`）、读者＝`posture()`（boot 线程）、⛔ 仪器看得见（`-race` 不在门禁名册＝票面现量末条）。
-- **写点组**（原首行 `	// started mirrors what the gate now reports. It is derived state, not a`）
-  新段落 8 行，最后一行逐字＝`	// their mirror, stored atomically.`，它**紧贴在 `	ra.started.Store(gate.Open())` 那行（现量 `:187`）的上一行**。
-  这一组还写死"⛔ 自持一份静音状态"：`gate.Open()/gate.Muted() stay the truth; this is only their mirror`（票面禁区①／票 293 禁区同源）。
+- **声明组**（现量 `:102-104`，紧贴 `	started atomic.Bool`（`:105`）的上一行是它自己的第三行）
+  末行逐字＝`	// never opened a mic cannot print "running". ui-sta writes, boot reads: 295.`
+  ⇒ "必须原子"那一枚落点＝**`:104`**，站在 `:105` 的上一行；句里点名的三件事＝写者线程（`ui-sta`）／读者（boot 的 `posture()`）／票号 295。
+- **写点组**（现量 `:164-167`，紧贴 `	ra.started.Store(gate.Open())`（`:168`））
+  末行逐字＝`	// It crosses threads (this body is ui-sta, boot reads it), so it is a Store.`
+  ⇒ "必须原子"那一枚落点＝**`:167`**，站在 `:168` 的上一行；同组第一行仍写死"derived state, not a second truth source"（票面禁区①／票 293 禁区同源：`gate.Open()`/`gate.Muted()` 是主，这枚只是镜像）。
 
-尺（复跑这两句的位置）＝`git grep -n -e 'source (ticket 295 AC#1' -e 'their mirror, stored atomically' -- cmd/wisp/resident_audio_windows.go` ⇒ 2 命中，分别站在 `:116` 与 `:187` 的上一行。
+尺（复跑这两句的位置）＝`git grep -n -e 'ui-sta writes, boot reads: 295' -e 'so it is a Store' -- cmd/wisp/resident_audio_windows.go` ⇒ 2 命中＝`:104` 与 `:167`。
 
 ---
 
 ## 4. 本格的凭据读数（不是"加了 atomic"本身）
 
-- `AC#1` 只负责形状；**牙在 `AC#2`**：删写变异那一发指名红在 `:124` 那枚断言（逐字红句、还原证据、7 枚不敏感逐名＝见 `20-anti-form.md`）。
+- `AC#1` 只负责形状；**牙在 `AC#2`**：删写变异那一发指名红在 `:124` 那枚分支守的断言上（`t.Fatalf` 打在 `:125`，逐字红句、还原证据、7 枚不敏感逐名＝见 `20-anti-form.md`）。
 - 改后 focused 两发全绿（`21-ac2-pristine-named.txt`）：指名用例 `--- PASS: TestAC290BothMuteGesturesTurnTheGateAndBack (0.01s)`；`-run 'TestAC247|TestAC290|TestLive' ./cmd/wisp/` 名册＝**顶层 13 枚 PASS ＋ 1 枚 SKIP ＋ 0 枚 FAIL**（同一发第二把口径含子项＝16 枚 PASS；两把⛔ 相加当一枚数）。SKIP 那枚＝`TestAC247LiveMicrophoneLevelsReachTheBallSeam`＝真机件，改前两发同样 SKIP，⛔ 我这一发改出来的。
 - ⛔ 放宽任何断言：`git diff` 里 4 枚件的 `-` 行 16 枚／`+` 行 35 枚（尺＝`grep -c '^-'`、`grep -c '^+'` 对 `22-ac1-diff.txt`），逐枚可核＝**删的全是被换掉的旧形状与旧 `%v`，无一枚断言被改宽**（diff 全文落 `logs/22-ac1-diff.txt`，7,395 字节）。
+
+---
+
+## 5. ★本格踩到的一枚真回归（已复绿）：本件的**行数**是票 255 回执的引据
+
+`d5ef9cb9`（AC#1 第一版）把两组注释各追加了一段（净 ＋18 行）⇒ 本件 `:256`／`:257` 两行下移 ⇒
+`cmd/wisp/config_readers_255.go` 的 `hotRowClaims` 里 5 枚按行号引本件的行证失配 ⇒
+`TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` 由改前两发的 PASS 翻成 FAIL＝**本腿造成的新增红 1 枚**。
+本件底部自己的注释早就写着这条规矩（逐字）：`// of this file on purpose - ticket 255's config receipt cites lines inside this file by number, so appending here is what keeps those rows from drifting.`
+处置＝**两组注释压回原行数**（本件净零增行，`git diff --numstat 0615c6c9` ⇒ `10	10`），⛔ 动 `config_readers_255.go`／`config_receipt_255_test.go`（⛔ 本票写面），⛔ 让回执迁就漂移（＝放宽断言）。
+复绿读数＝`logs/41-driftfix-verify.txt`：那枚用例逐字 `--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)`，整发 `ok github.com/CarlosShao/wisp/cmd/wisp 8.766s`／`DRIFTFIX_RC=0`（33 枚顶层 PASS＋1 枚 SKIP）。
+⇒ 这一枚已进 `90-final.md` 的欠账名册当**已销**条（成因、尺、复绿三件齐），验收腿要现读那三件。

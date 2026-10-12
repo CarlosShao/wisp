@@ -1,0 +1,325 @@
+# 票 295 · 295-r1 · 行号漂移那一枚新增红的成因、修复与复绿读数（41）
+
+## 成因（量的，⛔ 猜的）
+
+改后 C 发（`logs/40-post-runC.txt`）比改前名册多出的那枚红＝
+`TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`（`cmd/wisp/config_receipt_255_test.go:179`）。
+它在改前两发逐字 `--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)`（`logs/11`、`logs/12`），
+红句逐字（C 发 `:209` 那批，共 5 行）里最关键的一行＝
+
+    row "audio" cites cmd/wisp/resident_audio_windows.go:256 for "c.Audio.MicMutedDefault", that line now reads "// and [audio] are read off the file rather than held." - the evidence drifted, so re-adjudicate this row (and if the reader really moved, the receipt's claim may have moved with it)
+
+链条：AC#1 那一笔（`d5ef9cb9`）在声明组净增 10 行、写点组净增 8 行 ⇒ 本件第 256/257 两行下移 ⇒
+`cmd/wisp/config_readers_255.go` 的 `hotRowClaims` 里 5 枚 `cmd/wisp/resident_audio_windows.go:256`／`:257` 行证失配 ⇒ 那枚用例红。
+本件底部自己的注释就写着这件事（逐字）：`// of this file on purpose - ticket 255's config receipt cites lines inside this file by number, so appending here is what keeps those rows from drifting.`
+**⛔ 改 `config_readers_255.go`／`config_receipt_255_test.go`**（⛔ 本票写面），也**⛔ 让回执自己迁就漂移**（那＝放宽断言）。
+
+## 修复形（同一笔里做，净零增行）
+
+两组注释各回到**原行数**：声明组 3 行、写点组 4 行；"为什么这一枚必须原子"照派单要求写进这两组措辞里，
+只是压进既有的高度，⛔ 新增第四处文字面。尺与读数（本腿现跑，⛔ 手打）：
+
+- `git diff --numstat 0615c6c9 -- cmd/wisp/resident_audio_windows.go` ⇒ `10	10	cmd/wisp/resident_audio_windows.go`（＋枚数＝－枚数 ⇒ 净零）
+- 行数：现 425 行 ⇄ 改前 `0615c6c9` 425 行（相等＝⛔ 任何行下移）
+- 站点行号复归：`:105 started atomic.Bool`｜`:168 ra.started.Store(gate.Open())`｜`:323 ra.started.Store(true)`｜`:379 if !ra.started.Load() {`
+  ⇒ 票面"现量"里那四枚行号（105/168/323/379）在改后**仍然成立**，ⓓ 清单的行号辅注也没腐烂
+- 被引的两行现在读什么（`sed -n '256p;257p'`，去 tab）：
+  - `:256` ⇒ `ra.mutedAtBoot = c.Audio.MicMutedDefault`（含回执要的 token `c.Audio.MicMutedDefault`）
+  - `:257` ⇒ `ra.voiceEnabled = c.Voice.Enabled`（含 token `c.Voice.Enabled`）
+- `gofmt -l`／`gofumpt -l` 对本件 ⇒ 各 0 枚；`GOFLAGS= go build ./...` ⇒ rc=0
+
+## 复绿发（下面的 go test 全文接在本件尾部）
+
+command（逐字，专用根＝`$LOCALAPPDATA/wisp-test-gotmp/295r1-<时间戳>-<pid>-driftfix`，C: 卷）＝
+`GOTMPDIR="<root>" PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v -run 'TestTicket255|TestAC247|TestAC290' ./cmd/wisp/`
+GOTMPDIR=C:\Users\swq\AppData\Local/wisp-test-gotmp/295r1-20261012-150439-777-driftfix
+start 15:04:39
+time=2026-10-12T15:04:44.151+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255SplitOnlyClaimsSectionsWithALiveReader
+--- PASS: TestTicket255SplitOnlyClaimsSectionsWithALiveReader (0.00s)
+=== RUN   TestTicket255HotRowRosterCoversTheRegistry
+--- PASS: TestTicket255HotRowRosterCoversTheRegistry (0.00s)
+=== RUN   TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (0.55s)
+=== RUN   TestTicket255ReceiptOmitsPanelFromTheImmediateSentence
+time=2026-10-12T15:04:45.957+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/12 15:04:45 mockllm: serving on http://127.0.0.1:62318 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-12T15:04:45.983+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence2747801279\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-12T15:04:46.009+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence2747801279\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-12T15:04:46.015+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-12T07:04:46Z duration_ms=5
+time=2026-10-12T15:04:46.022+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptOmitsPanelFromTheImmediateSentence2747801279\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-12T15:04:46.027+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-12T07:04:46Z duration_ms=4
+time=2026-10-12T15:04:46.031+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-12T15:04:46.034+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket255ReceiptOmitsPanelFromTheImmediateSentence (2.36s)
+=== RUN   TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere
+time=2026-10-12T15:04:48.139+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/12 15:04:48 mockllm: serving on http://127.0.0.1:57232 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-12T15:04:48.167+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3582614926\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-12T15:04:48.196+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3582614926\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-12T15:04:48.203+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-12T07:04:48Z duration_ms=6
+time=2026-10-12T15:04:48.212+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere3582614926\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-12T15:04:48.219+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-12T07:04:48Z duration_ms=7
+time=2026-10-12T15:04:48.224+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-12T15:04:48.228+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere (2.19s)
+=== RUN   TestTicket255ReceiptStillNamesTheLiveReadSection
+time=2026-10-12T15:04:50.316+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/12 15:04:50 mockllm: serving on http://127.0.0.1:65384 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-12T15:04:50.337+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptStillNamesTheLiveReadSection3530365876\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-12T15:04:50.361+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptStillNamesTheLiveReadSection3530365876\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-12T15:04:50.369+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-12T07:04:50Z duration_ms=8
+time=2026-10-12T15:04:50.377+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptStillNamesTheLiveReadSection3530365876\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-12T15:04:50.384+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-12T07:04:50Z duration_ms=7
+time=2026-10-12T15:04:50.388+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-12T15:04:50.391+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket255ReceiptStillNamesTheLiveReadSection (2.17s)
+=== RUN   TestTicket255ReceiptSentenceAssemblyIsFiltered
+time=2026-10-12T15:04:52.516+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/12 15:04:52 mockllm: serving on http://127.0.0.1:58995 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-12T15:04:52.535+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptSentenceAssemblyIsFiltered2710031996\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-12T15:04:52.558+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptSentenceAssemblyIsFiltered2710031996\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-12T15:04:52.565+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-12T07:04:52Z duration_ms=6
+time=2026-10-12T15:04:52.573+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255ReceiptSentenceAssemblyIsFiltered2710031996\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-12T15:04:52.578+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-12T07:04:52Z duration_ms=5
+time=2026-10-12T15:04:52.584+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-12T15:04:52.586+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    config_receipt_255_test.go:597: SENTENCES
+          IMMEDIATE "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：[llm]"
+          HONEST    "wisp run: 配置热加载：这些段的值已换进本进程内存，但本宿主没有会按新值做事的读者，本次运行不会因此改变行为（票 255 AC#1：这一半不许说成「已立即生效」；逐段的读者判定见 HOT-RELOAD-READER 行）：[ball] [session] [audio] [agent] [privacy] [memory] [panel] [cost] [models] [observe] [hotkey] [app] [voice]"
+    config_receipt_255_test.go:606: LEDGER [audit] config: HOT-RELOAD-READER section=panel tier_row=[panel] claims=["panel":other-process: cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)], reached from the create at :392); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all]
+    config_receipt_255_test.go:606: LEDGER [audit] config: HOT-RELOAD-READER section=llm tier_row=[llm] claims=["llm":consumed: cmd/wisp/panel_config_store.go:96 [cfg.LLM.Roles.Chat.Model] - configStore.ReadSettings calls s.mgr.Config() per call]
+    config_receipt_255_test.go:606: LEDGER [audit] config: HOT-RELOAD-READER section=app tier_row=[app.theme] claims=["app.theme":no-reader: 扫描零命中：nothing outside internal/config reads cfg.App - manager.go's planApp compares and copies it, and no component re-skins from it]
+    config_receipt_255_test.go:606: LEDGER [audit] config: HOT-RELOAD-READER section=voice tier_row=[voice.punctuation voice.tts.speed voice.wake_word.thresholds voice.wake_word.veto_words] claims=["voice.punctuation":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's only production reader since ticket 247 is cmd/wisp/resident_audio_windows.go:257 [c.Voice.Enabled], which decides whether the capture leg is built at all) - the punctuation switch has no consumer yet | "voice.tts.speed":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's only production reader since ticket 247 is cmd/wisp/resident_audio_windows.go:257 [c.Voice.Enabled], which decides whether the capture leg is built at all) - the TTS knobs are not threaded to the voice path yet | "voice.wake_word.thresholds":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's only production reader since ticket 247 is cmd/wisp/resident_audio_windows.go:257 [c.Voice.Enabled], which decides whether the capture leg is built at all) - the wake-word tunables are not consumed by the KWS path yet | "voice.wake_word.veto_words":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's only production reader since ticket 247 is cmd/wisp/resident_audio_windows.go:257 [c.Voice.Enabled], which decides whether the capture leg is built at all) - the veto list is not consumed by the KWS path yet]
+--- PASS: TestTicket255ReceiptSentenceAssemblyIsFiltered (1.19s)
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/no_source_at_all_keeps_the_host's_own_constants
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/a_config_width_and_height_both_arrive
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/height_0_is_NOT_auto-height:_the_ruling_is_260,_and_schema.go's_PanelSection.Height_carries_no_default_tag_so_0_is_what_a_config_saying_nothing_answers
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/width_0_falls_back_to_the_host_constant,_not_to_a_guess
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/a_negative_answer_is_garbage,_and_garbage_is_not_a_second_spelling_of_auto
+--- PASS: TestTicket255WindowOptionsFollowTheConfigSource (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/no_source_at_all_keeps_the_host's_own_constants (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/a_config_width_and_height_both_arrive (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/height_0_is_NOT_auto-height:_the_ruling_is_260,_and_schema.go's_PanelSection.Height_carries_no_default_tag_so_0_is_what_a_config_saying_nothing_answers (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/width_0_falls_back_to_the_host_constant,_not_to_a_guess (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/a_negative_answer_is_garbage,_and_garbage_is_not_a_second_spelling_of_auto (0.00s)
+=== RUN   TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions
+time=2026-10-12T15:04:52.618+08:00 level=WARN msg="panel host: [panel] geometry source unreadable, sizing at the host's own default" path=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions308141943\001\no-such-dir\config.toml err="config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\295r1-20261012-150439-777-driftfix\\TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions308141943\\001\\no-such-dir\\config.toml: The system cannot find the path specified." default=420x260
+--- PASS: TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions (0.00s)
+=== RUN   TestTicket255PanelHostBuildsItsWindowOptions
+--- PASS: TestTicket255PanelHostBuildsItsWindowOptions (0.02s)
+=== RUN   TestTicket255HostStillDoesNotParseConfigItself
+--- PASS: TestTicket255HostStillDoesNotParseConfigItself (0.00s)
+=== RUN   TestTicket255PanelRosterVerdictIsTheHonestShape
+--- PASS: TestTicket255PanelRosterVerdictIsTheHonestShape (0.00s)
+=== RUN   TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch
+=== RUN   TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/the_configured_pair_goes_out_as_it_stands
+=== RUN   TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/height_0_keeps_the_host's_260,_the_same_rule_the_create_uses
+=== RUN   TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/width_0_falls_back_to_the_host_constant,_not_to_a_guess
+=== RUN   TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/an_unreadable_config_answers_the_host_constants
+=== RUN   TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/a_negative_answer_resolves_the_way_the_create_resolves_it
+=== RUN   TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/a_host_nobody_sized_sends_nothing_at_all
+--- PASS: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch (0.00s)
+    --- PASS: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/the_configured_pair_goes_out_as_it_stands (0.00s)
+    --- PASS: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/height_0_keeps_the_host's_260,_the_same_rule_the_create_uses (0.00s)
+    --- PASS: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/width_0_falls_back_to_the_host_constant,_not_to_a_guess (0.00s)
+    --- PASS: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/an_unreadable_config_answers_the_host_constants (0.00s)
+    --- PASS: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/a_negative_answer_resolves_the_way_the_create_resolves_it (0.00s)
+    --- PASS: TestTicket255r1ReshowSendsTheResolvedPairThroughDispatch/a_host_nobody_sized_sends_nothing_at_all (0.00s)
+=== RUN   TestTicket255r1ShowOnAnExistingWindowSendsTheResize
+--- PASS: TestTicket255r1ShowOnAnExistingWindowSendsTheResize (0.00s)
+=== RUN   TestTicket255r1SinkTellsDispatchFromABareCall
+--- PASS: TestTicket255r1SinkTellsDispatchFromABareCall (0.00s)
+=== RUN   TestTicket255r1ReshowWithNoLiveControlSendsNothing
+--- PASS: TestTicket255r1ReshowWithNoLiveControlSendsNothing (0.00s)
+=== RUN   TestTicket255r1ShowAsksForGeometryOnlyOnTheReshowBranch
+--- PASS: TestTicket255r1ShowAsksForGeometryOnlyOnTheReshowBranch (0.00s)
+=== RUN   TestTicket255r1HostResizeCallSiteAsksForHintNoneAndIsTheOnlyOne
+--- PASS: TestTicket255r1HostResizeCallSiteAsksForHintNoneAndIsTheOnlyOne (0.00s)
+=== RUN   TestAC247LiveMicrophoneLevelsReachTheBallSeam
+    resident_audio_247_live_windows_test.go:130: AC#2 needs a real microphone: run with WISP_LIVE_MIC=1 after both tasklist rulers read 0
+--- SKIP: TestAC247LiveMicrophoneLevelsReachTheBallSeam (0.00s)
+=== RUN   TestAC247ShippedDefaultsAreTheOnesThisLegReads
+--- PASS: TestAC247ShippedDefaultsAreTheOnesThisLegReads (0.00s)
+=== RUN   TestAC247VoiceDisabledBuildsNoCollector
+time=2026-10-12T15:04:52.648+08:00 level=INFO msg="audio: capture leg not built" reason="voice.enabled=false" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC247VoiceDisabledBuildsNoCollector3024864702\001\config.toml
+wisp: 麦克风采集腿未构造（[voice] enabled=false，来源 C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC247VoiceDisabledBuildsNoCollector3024864702\001\config.toml）：球不会收到任何电平，本进程其余部分照常
+time=2026-10-12T15:04:52.649+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.649+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.649+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.649+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-12T15:04:52.649+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.649+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.649+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247VoiceDisabledBuildsNoCollector (0.01s)
+=== RUN   TestAC247DefaultConfigArmsTheGateMutedAndOpensNoDevice
+time=2026-10-12T15:04:52.665+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC247DefaultConfigArmsTheGateMutedAndOpensNoDevice4014211036\001\config.toml path=T
+time=2026-10-12T15:04:52.667+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.667+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.667+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.667+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T15:04:52.667+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.667+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.667+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247DefaultConfigArmsTheGateMutedAndOpensNoDevice (0.02s)
+=== RUN   TestAC247UnmuteReachesTheBallSeam
+time=2026-10-12T15:04:52.672+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC247UnmuteReachesTheBallSeam25537299\001\config.toml path=T
+time=2026-10-12T15:04:52.673+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.673+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.673+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.673+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=2 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=2 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T15:04:52.673+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.673+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.673+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247UnmuteReachesTheBallSeam (0.01s)
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/occupied
+time=2026-10-12T15:04:52.680+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+time=2026-10-12T15:04:52.680+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-10-12T15:04:52.680+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.680+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.680+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.680+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device
+time=2026-10-12T15:04:52.680+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.680+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.680+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/permission_denied
+time=2026-10-12T15:04:52.688+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+time=2026-10-12T15:04:52.688+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-10-12T15:04:52.689+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.689+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.689+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.689+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone
+time=2026-10-12T15:04:52.689+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.689+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.689+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/no_device
+time=2026-10-12T15:04:52.695+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)"
+time=2026-10-12T15:04:52.695+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-10-12T15:04:52.696+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.696+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.696+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.696+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)
+time=2026-10-12T15:04:52.696+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.696+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.696+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss (0.02s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/occupied (0.01s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/permission_denied (0.01s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/no_device (0.01s)
+=== RUN   TestAC247CaptureLegOwnsStepFourOfTheFrozenOrder
+time=2026-10-12T15:04:52.703+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC247CaptureLegOwnsStepFourOfTheFrozenOrder1708788402\001\config.toml path=T
+time=2026-10-12T15:04:52.703+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.703+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.704+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.704+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T15:04:52.704+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.704+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.704+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247CaptureLegOwnsStepFourOfTheFrozenOrder (0.01s)
+=== RUN   TestAC247HandingTheLevelToTheSeamIsNotVisibility
+time=2026-10-12T15:04:52.710+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC247HandingTheLevelToTheSeamIsNotVisibility1174360244\001\config.toml path=T
+    resident_audio_247_windows_test.go:372: AC#10 reading: PrototypeVisualsEnabled()=false levels_reaching_the_ball_seam=1 (a number arriving is not a pixel moving)
+time=2026-10-12T15:04:52.713+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.713+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.713+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.713+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=1 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=1 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T15:04:52.713+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.713+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.713+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247HandingTheLevelToTheSeamIsNotVisibility (0.01s)
+=== RUN   TestAC290BothMuteGesturesTurnTheGateAndBack
+time=2026-10-12T15:04:52.718+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC290BothMuteGesturesTurnTheGateAndBack3635103339\001\config.toml path=T
+time=2026-10-12T15:04:52.718+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball mute-hotkey: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T15:04:52.718+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball mute-hotkey: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+time=2026-10-12T15:04:52.718+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=tray-mute outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball tray-mute: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T15:04:52.718+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=tray-mute outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball tray-mute: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+time=2026-10-12T15:04:52.720+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.720+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.720+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.720+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T15:04:52.720+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.720+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.720+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290BothMuteGesturesTurnTheGateAndBack (0.01s)
+=== RUN   TestAC290OutcomeIsReadOffTheGateNotOffTheRequest
+time=2026-10-12T15:04:52.726+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC290OutcomeIsReadOffTheGateNotOffTheRequest1406998486\001\config.toml path=T
+time=2026-10-12T15:04:52.727+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+time=2026-10-12T15:04:52.727+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音但设备未交接（gate 未 open，错误分类 audio_device）：audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone；球不会收到电平"
+wisp: ball mute-hotkey: 已取消静音但设备未交接（gate 未 open，错误分类 audio_device）：audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone；球不会收到电平
+time=2026-10-12T15:04:52.728+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.728+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.728+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.729+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone
+time=2026-10-12T15:04:52.729+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.729+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.729+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290OutcomeIsReadOffTheGateNotOffTheRequest (0.01s)
+=== RUN   TestAC290NoGateSaysWhichShapeThisProcessIsIn
+time=2026-10-12T15:04:52.735+08:00 level=INFO msg="audio: capture leg not built" reason="voice.enabled=false" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC290NoGateSaysWhichShapeThisProcessIsIn2684158440\001\config.toml
+wisp: 麦克风采集腿未构造（[voice] enabled=false，来源 C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC290NoGateSaysWhichShapeThisProcessIsIn2684158440\001\config.toml）：球不会收到任何电平，本进程其余部分照常
+time=2026-10-12T15:04:52.735+08:00 level=WARN msg="mute gesture found no gate to turn" gesture=mute-hotkey why="采集腿未构造：[voice] enabled=false（配置来源 C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\295r1-20261012-150439-777-driftfix\\TestAC290NoGateSaysWhichShapeThisProcessIsIn2684158440\\001\\config.toml）"
+wisp: ball mute-hotkey: 采集腿未构造：[voice] enabled=false（配置来源 C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC290NoGateSaysWhichShapeThisProcessIsIn2684158440\001\config.toml）
+time=2026-10-12T15:04:52.737+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.737+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.737+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.737+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-12T15:04:52.737+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.737+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.737+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290NoGateSaysWhichShapeThisProcessIsIn (0.01s)
+=== RUN   TestAC290GestureBeforeTheAttachSaysSo
+time=2026-10-12T15:04:52.738+08:00 level=WARN msg="mute gesture arrived before its executor was attached" gesture=mute-hotkey why="no capture leg had been assembled when this key arrived, so there was no gate to turn; the assembly root attaches the mute key to the gate at the end of boot (ticket 290)"
+wisp: ball mute-hotkey: no capture leg had been assembled when this key arrived, so there was no gate to turn; the assembly root attaches the mute key to the gate at the end of boot (ticket 290)
+time=2026-10-12T15:04:52.738+08:00 level=WARN msg="mute gesture arrived before its executor was attached" gesture=tray-mute why="no capture leg had been assembled when this key arrived, so there was no gate to turn; the assembly root attaches the mute key to the gate at the end of boot (ticket 290)"
+wisp: ball tray-mute: no capture leg had been assembled when this key arrived, so there was no gate to turn; the assembly root attaches the mute key to the gate at the end of boot (ticket 290)
+--- PASS: TestAC290GestureBeforeTheAttachSaysSo (0.00s)
+=== RUN   TestAC290MutedDefaultStillDecidesTheBoot
+time=2026-10-12T15:04:52.744+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-150439-777-driftfix\TestAC290MutedDefaultStillDecidesTheBoot3731498158\001\config.toml path=T
+time=2026-10-12T15:04:52.744+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball mute-hotkey: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T15:04:52.745+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T15:04:52.745+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T15:04:52.745+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T15:04:52.745+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T15:04:52.745+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T15:04:52.745+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T15:04:52.745+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290MutedDefaultStillDecidesTheBoot (0.01s)
+=== RUN   TestAC290UnhostedGestureWordingStillSaysTrueThing
+--- PASS: TestAC290UnhostedGestureWordingStillSaysTrueThing (0.00s)
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.language
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.autostart
+=== RUN   TestTicket255RestartTierKeysAreBackedByATest/app.single_instance
+--- PASS: TestTicket255RestartTierKeysAreBackedByATest (0.11s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.language (0.03s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.autostart (0.03s)
+    --- PASS: TestTicket255RestartTierKeysAreBackedByATest/app.single_instance (0.03s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	8.766s
+DRIFTFIX_RC=0
+end 15:04:53

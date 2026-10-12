@@ -1,0 +1,4 @@
+cmd/wisp/resident_audio_windows.go
+.scratch/wisp/probes/295/r1/10-impl.md
+.scratch/wisp/probes/295/r1/logs/41-driftfix-verify.txt
+.scratch/wisp/probes/295/r1/logs/pathspec-ac1fix.txt

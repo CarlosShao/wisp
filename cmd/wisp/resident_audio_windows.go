@@ -100,19 +100,8 @@ type residentAudio struct {
 	voiceEnabled bool
 	mutedAtBoot  bool
 	// started records that the gate handed the device to the inner source and
-	// capture is actually running. posture() reads it so a leg that built a
-	// gate but never opened a microphone cannot print "running".
-	//
-	// It is an atomic.Bool rather than a bare bool because ticket 290 gave this
-	// mirror a second writer on another thread: toggleMute stores it from the
-	// ball's ui-sta thread (its callbacks run inline on that thread, see
-	// resident_ball_windows.go) while posture() reads it from the boot thread a
-	// few milliseconds later, and a plain assignment there is an unsynchronised
-	// read/write pair that nothing in this repository's gates can see, because
-	// -race is not in the roster. The shape is copied from the neighbour in this
-	// same struct - levels has been an atomic.Uint64 all along - and nothing
-	// else was invented for it: no lock, no extra goroutine, no second truth
-	// source (ticket 295 AC#1 "照邻居做").
+	// capture is running. posture() reads it so a leg that built a gate but
+	// never opened a mic cannot print "running". ui-sta writes, boot reads: 295.
 	started atomic.Bool
 
 	// levels is how many scalars this leg handed to the ball seam. It is what
@@ -172,18 +161,10 @@ func (ra *residentAudio) toggleMute() (string, bool) {
 	gate := ra.gate
 	gate.SetMuted(!gate.Muted())
 
-	// started mirrors what the gate now reports. It is derived state, not a
-	// second truth source, and keeping it current is what stops a later reading
-	// of this handle from claiming a device the user just closed (or denying one
-	// the user just opened).
-	//
-	// This is the write that makes the mirror cross threads, so it is a Store
-	// and not an assignment: the body you are in runs on the ball's ui-sta
-	// thread, the only production reader (posture, called from the boot line)
-	// lives on the boot thread, and the two used to overlap inside the first
-	// few milliseconds of a start-up where the user happens to press the mute
-	// key (ticket 295). gate.Open()/gate.Muted() stay the truth; this is only
-	// their mirror, stored atomically.
+	// started mirrors what the gate now reports: derived state, not a second
+	// truth source. Keeping it current stops a later reading of this handle
+	// from claiming a device the user just closed, or denying one they opened.
+	// It crosses threads (this body is ui-sta, boot reads it), so it is a Store.
 	ra.started.Store(gate.Open())
 
 	switch {
