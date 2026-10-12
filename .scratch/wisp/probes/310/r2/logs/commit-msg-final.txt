@@ -1,0 +1,6 @@
+ticket 310 (310-r2): fill in real commit hashes + total over-boundary audit in 90-final
+
+90-final now names the four commit hashes (78782c20 / 5ef679b5 / a2b5a8f4 /
+6709b0fc) and adds the total越界 rulers: git diff .github/internal/cmd/*_test.go/
+thresholds/allowlist/slo-check = 0 files, *.go = 0 files, other legs' uncommitted
+= 0 in any of my commits (logs/42-forbidden-audit.txt, logs/42-gochg.txt).

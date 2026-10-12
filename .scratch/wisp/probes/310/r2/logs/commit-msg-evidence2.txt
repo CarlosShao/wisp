@@ -1,0 +1,5 @@
+ticket 310 (310-r2): post-commit per-commit name-only over-boundary readings
+
+git show --name-only for each of this leg's three commits (code 78782c20 = 3
+files, ticket 5ef679b5 = 1, evidence a2b5a8f4 = 124), all within the dispatch
+allowlist (out_of_allowlist=0 each).

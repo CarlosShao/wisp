@@ -1,0 +1,3 @@
+.scratch/wisp/probes/310/r2/90-final.md
+.scratch/wisp/probes/310/r2/logs/42-forbidden-audit.txt
+.scratch/wisp/probes/310/r2/logs/42-gochg.txt

@@ -1,0 +1,8 @@
+ticket 310 (310-r2): evidence - paired readings, gates, self-report + raw rc files
+
+.probes/310/r2/**: 00-anchor / 10-impl / 20-paired-readings / 30-gates / 90-final
+plus logs/ raw readings (each self-records rc=; former 0-byte streams annotated
+EMPTY-OK with their companion). Covers Q-310-orch-P (runtests.sh 5th go-test
+entry now builds the dedicated GOTMPDIR root; worktree d22scan.sh before/after)
+and Q-310-orch-Q (windows+empty-LOCALAPPDATA branch speaks; winsec/portable/
+runtests before-silent vs after-one-honest-line, rc preserved, NOT fail-closed).
