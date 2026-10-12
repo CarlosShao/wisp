@@ -1,0 +1,18 @@
+收 310-r2 ⇒ 两笔增量欠账就地销（我自己六把尺复跑全认）＋ A862 / 票 310 一条 bullet
+
+销掉的：`Q-310-orch-P`（名册外第五枚真起 go test 的入口＝tools/d22scan/runtests.sh
+现在也走专用根）＋`Q-310-orch-Q`（LOCALAPPDATA 为空那一支不再整块静默）。
+
+我复跑的六把：d22scan rc=0 且 GOTMPDIR 恰 1 行／那一枚根当场在盘上且不在 %TEMP% 里
+（条目 0）／winsec 档颜色逐字未变 RUN=101 PASS=58 FAIL=0 SKIP=0 rc=0／census totals
+逐字未变（这行从今天起＝新基线）／抽干 LOCALAPPDATA 那一发先打 DEGRADED 再照跑
+rc=0 PASS=35＝乙形"响在 stderr 而⛔ 拒跑测试"坐实／portable-tests.sh 最新一笔仍是
+310-r1 的 6a8f537a＝本腿一字未动。
+
+⚠ 两条口径写在我自己账上：① 这一格⛔ 有非实现者腿，盖章人口径＝〔编排者现跑认证〕，
+补派验收腿押给 311-r1（它必须逐字读同一块），口令「310-r2 补一枚验收腿」；
+② 我那把"四枚同形"的形状尺量的是源码行、⛔ 渲染后的整句，渲染同形只实测了 winsec／
+runtests 两枚，cli 那枚是腿的代用尺（Q-310-r2-2）。
+
+★票 310 仍⛔ 改 -done：腿新交出五笔欠账，三笔要 CI 色、一笔要 gofumpt、一笔要台面无关的尺。
+⛔ 零 push、⛔ 零删目录（%TEMP% 顶层复跑仍 59 枚＝⛔ 新增⛔ 消失）。

@@ -1,0 +1,11 @@
+docs/reports/pending-and-issues.md
+.scratch/wisp/issues/310-test-binary-deaths-leave-temp-test-dirs-accumulating.md
+.scratch/wisp/probes/orch/20261012/txt/A862-ledger.txt
+.scratch/wisp/probes/orch/20261012/txt/A862-t310-bullet.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-collect-d22.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-collect-winsec.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-collect-misc.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-collect-runtests-nolappdata.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-warn-shapes.txt
+.scratch/wisp/probes/orch/20261012/txt/msg-A862.txt
+.scratch/wisp/probes/orch/20261012/txt/A862-pathspec-list.txt

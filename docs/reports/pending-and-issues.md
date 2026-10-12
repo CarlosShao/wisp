@@ -16962,3 +16962,34 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - ② **我违反了派给腿的规矩**：`A846` 那条"**每波只交一枚 `./cmd/wisp/` 色**"是我自己写的，而我在 `295-r1`＋`310-r2` 两枚腿正跑 `cmd/wisp` 名册的窗口里插了上面那一发探针。事后归属尺（`Get-CimInstance Win32_Process -Filter "Name like '%.test.exe%'"` 逐枚命令行）：三枚活着的 `wisp.test.exe`＝一枚命令行在我自己的 `orch-298ac4-*` 根下（＝我的 298 台件那一发）、两枚在 `portable-20261012-142516-1728`／`-142524-1762` 两枚根下（＝腿的），**⛔ 一枚是我掐出来的孤儿**；顶层 `Test*` 仍 **59** 枚＝那一发没漏目录。⇒ 并回正典：**探针型的一次性命令也要先过"这一波谁持有那枚包的色"这一问**，⛔ 因为"我只是探一下"就豁免。
 
 **next**＝`310-r2` 交完我复跑收口（第五枚入口＋静默支两笔欠账 `Q-310-orch-P`/`-Q`）⇒ 派 `311-r1`（乙形守卫，派单正文已成稿＝`probes/orch/20261012/txt/311r1-dispatch.txt`）；`295-r1` 交回后翻它的格并派 `294-r1`；我自己那发票 298 `AC#4` 亲跑读数在 `298ac4/` 里，跑完并 A862 落账。⛔ 零 push、⛔ 零删目录。
+
+## A862｜2026-10-12 14:4x｜收 `310-r2`（增量落地腿，八笔 `78782c20`→`23c19afa`）⇒ ★**两笔欠账我自己五把尺复跑全认（`Q-310-orch-P`／`-Q` 就地销）**＋★**票 310 仍⛔ `-done`：它新交出的五笔欠账里三笔要 CI 色、一笔要 `gofumpt`**＋⚠**这一格的盖章人＝编排者本人（⛔ 非实现者腿），具名写在这行**
+
+**来路**＝票 310 `A859` §2 我自己登记的两笔增量欠账（`Q-310-orch-P`＝名册外第五枚真起 `go test` 的入口、`Q-310-orch-Q`＝`LOCALAPPDATA` 为空那一支整块静默）；腿件＝`.scratch/wisp/probes/310/r2/**`（欠账权威落点 `90-final.md` §3）。
+
+### 1. 我复跑的六把（逐把同数才销账）
+
+| # | 腿的读数 | 我这一发（尺＋读数） | 判定 |
+|---|---|---|---|
+| ① | 改后 `sh scripts/d22scan.sh` rc=0 且 `runtests.sh` 恰打一行 `GOTMPDIR=` | 尺＝现跑落件 `logs/orch-310r2-collect-d22.txt` ⇒ 逐字 `d22_rc=0`、`gotmpdir_lines=`**1**，行＝`runtests.sh: ticket 310 AC#1: GOTMPDIR=C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261012-144008-2991 - this run's t.TempDir() family lands here; nothing deletes it.` | **认** |
+| ② | 那枚根当场在盘上、且⛔ 在 `%TEMP%` 里面 | 尺＝`[ -d ]`＋`ls -1 \| wc -l`＋前缀判 ⇒ `root_exists=1 entries=0`（＝这一发自我收尾干净，同票 311 默认根那一形）、`inside_TEMP=no (sibling root)` | **认** |
+| ③ | `winsec` 档颜色未动 | 尺＝现跑 `bash scripts/winsec-tests.sh ./internal/winsec/`（件 `logs/orch-310r2-collect-winsec.txt`）⇒ 逐字 `=== RUN=101 --- PASS=58 --- FAIL=0 --- SKIP=0`、`winsec_rc=0`、GOTMPDIR 恰一行 | **认** |
+| ④ | `--scope=census` totals 逐字未变 | 尺＝现跑 ⇒ 逐字 `packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`、`census_rc=0`（与票 311 `AC#4` 记的基线同数，⛔ 拿旧数当基线那条我这条就是新取的基线） | **认** |
+| ⑤ | 空 `LOCALAPPDATA` 那一支现在**会说话而⛔ 拒跑测试**（乙形＝响在 stderr，不是 fail-closed） | 尺＝`LOCALAPPDATA= sh tools/d22scan/runtests.sh -C tools/d22scan ./...`（件 `logs/orch-310r2-collect-runtests-nolappdata.txt`）⇒ **先**打逐字 `runtests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no measured-safe root to build…`，随后 `runtests_rc=0`、`top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77`；另一形＝`LOCALAPPDATA= bash scripts/winsec-tests.sh --scope=winsec` 先打同一句再由 GUARD 1 收尾 `rc=2`（件 `logs/orch-310r2-branch-check.txt`，我 14:2x 那发） | **认** |
+| ⑥ | 四枚入口同形、`portable-tests.sh` 一字未动 | 尺＝`git log --oneline -3 -- scripts/portable-tests.sh` ⇒ 最新一笔＝`6a8f537a`（**310-r1**），本腿⛔ 碰；形状尺＝`grep -a DEGRADED` 四枚并排（件 `logs/orch-310r2-warn-shapes.txt`）⇒ winsec／cli／runtests 三枚的"空 `LOCALAPPDATA`"句首逐字同（`… so this step has no`），`portable` 那枚沿用旧切行（`cannot create` 换行接 `$gotmp_run,`）且引句写 `see the note above`。⚠ **我这把尺量的是源码行、⛔ 渲染后的整句**——渲染同形只在 winsec／runtests 两枚我实测过（⑤），cli 那一枚是腿的代用尺（`Q-310-r2-2`） | **认，但射程具名收窄** |
+
+其余同行复认：`%TEMP%` 顶层 `Test*`＝**59**（与 14:2x 那发同数，⛔ 新增、⛔ 消失）；`tasklist` 我起手现跑 `wisp.exe`＝0；索引全程清空（我 `git diff --cached --name-only`＝0 之后才动 `git add`）。
+
+### 2. ★票 310 仍⛔ 改 `-done`（"零残余"那枚证明今天还是拿不出）
+
+五格全勾（`A859`）＋两笔增量欠账已销＋**腿新交出的五笔具名欠账**＝`Q-310-r2-1`（非 windows 那一支的实测⛔ 本机可交，要 CI/容器色）、`-2`（cli 的空-`LOCALAPPDATA` 独立实跑⛔ 做，代用尺）、`-3`（真 `gofumpt` 颜色⛔ 交，本机 `NOT_FOUND`，代用 `gofmt -l` 比它松）、`-4`（托管 runner 上 `%LOCALAPPDATA` 兄弟根可不可写⛔ 能交，要 CI 色；与既有 `Q-310-r1-3/-5` 同批）、`-5`（导出树 ⇄ 工作树两枚台面导致 `--scope=cli` 改前假红⛔ 复现到同三名；改以"委托路 0 行输出"那把台面无关的尺定"没多也没少"）⇒ 按 issues/README 那条"`-done`＝零残余证明"，**改名继续押着**，等 CI 色那一批（推送类欠账未解，见 `A813` 之后机主新的一句话）。
+
+### 3. ⚠ 这一格的盖章人＝我，具名
+
+`310-r1`／`310-v1` 那两程有非实现者腿裁过，**这一程（`310-r2`）没有**：判据面只有我这六把复跑＋腿的自报。⇒ 记账口径＝〔编排者现跑认证〕⛔〔非实现者终裁〕。⚠ 我不把它当作缺陷去补派一枚验收腿——理由＝它动的三枚文件与已验收过的 `310-r1` 同形，而 `311-r1`（在飞）**必须逐字读同一块**才能把守卫落对，那枚腿天然是第二双眼睛；若它交回时报出这块形状不一致，本格回退重裁。撤销口令＝**「310-r2 补一枚验收腿」**。
+
+### 4. 腿自报的越格动作，我逐条处置（⛔ 照单追认）
+
+①（三枚告警正文归一对齐）＝**实现派单要求所必需**，我复跑⑤⑥坐实同形，认；②（新增块注释换行复原）＝纯注释面、在它的写面内，认；③（winsec 全档未跑空-`LOCALAPPDATA` 那一发，用 GUARD-reject 窄台代证）＝已收进 `Q-310-r2-2` 同族，认它的"⛔ 是实测"；④（多造专用根与 go-build 缓存只建不删）＝符合本仓铁规矩，认；⑤（票 bullet 首次 append 带行首空格 → 另起一笔 `23c19afa` 改正，1 加 1 删、⛔ `--amend`）＝**处置正确**——`^- \[` 那把计数尺会被行首空格打假，它自己抓到并具名，我复核 `grep -c '^[[:space:]]*- \[x\]'` 未受影响。**没有一条越界**：逐笔越界尺我也现跑过它最新四笔（名册外 0 枚）。
+
+**next**＝`311-r1` 在飞（那枚守卫要落在这同一块形状上，派单＝`probes/orch/20261012/txt/311r1-dispatch.txt`）；`295-r1` 在飞（票 295 落地腿，`cmd/wisp` 四枚文件）；我自己那发票 298 `AC#4` 的成对读数还在跑（改前那发**实测 `--- FAIL` 20 枚／`FAIL=3` 行／426.5 s**＝本机真窗／真麦／驻留族既有红，⛔ 归因于这枚票，判据取"改前⇄改后名册的交集与新增红 0 枚"），交完并 A863。⚠ 推送类欠账继续押着；⛔ 本程 push、⛔ 删任何目录（在册 59 枚一枚没动）。

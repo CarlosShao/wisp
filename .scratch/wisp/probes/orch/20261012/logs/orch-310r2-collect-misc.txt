@@ -1,0 +1,9 @@
+=== census totals ===
+portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+census_rc=0
+=== runtests with LOCALAPPDATA removed (real args) ===
+runtests_rc=0
+runtests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no measured-safe root to build (a root on another volume turns the winsec seal cases red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset.
+runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+=== TEMP top-level Test* ===
+59
