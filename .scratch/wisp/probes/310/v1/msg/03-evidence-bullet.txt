@@ -1,0 +1,10 @@
+ticket 310 (310-v1): three-cell verdict table + one append-only progress bullet
+
+- docs/evidence/s1/310-ac1-3-verdict.md ＝票 310 `AC#1`/`AC#2`/`AC#3` 三格裁决表，出自非实现者腿
+  `310-v1`（AGENTS §1.5 的落点）；三格判语各一句＋支持它的逐字读数＋"你需要做什么"四件（翻格、
+  拍第五枚入口与 a3 更正两枚小板、两处文字更正、正典补那半句）。
+  ⚠ 文件名按派单 §3 指定的 `310-ac1-3-verdict.md`（本仓同批裁决表的命名惯例是
+  `ticketNNN-NNN-vX-accept-vX.md`，如 `ticket304-304-v1-accept-v1.md`）——两处不一致已具名报编排者，
+  本腿按派单原文落名，⛔ 自己改判。
+- 票 310 尾部只追加**一条** Progress bullet（numstat＝1 加／0 删）：⛔ 翻任何框、⛔ 动 `Status:`、
+  ⛔ 改名 `-done`、⛔ 动票面上任何人写的原句、⛔ push。
