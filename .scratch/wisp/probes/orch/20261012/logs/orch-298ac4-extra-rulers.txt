@@ -1,0 +1,24 @@
+=== GOFLAGS= go build ./... ===
+build_rc=0
+=== worktree ruler: gofmt -l cmd/wisp ===
+cmd\wisp\models.go 
+=== worktree ruler: gofumpt -l cmd/wisp ===
+sed: -e expression #1, char 7: unterminated `s' command
+/usr/bin/bash: line 1: /bin/gofumpt.exe: No such file or directory
+
+=== HEAD blob ruler (git archive HEAD cmd/wisp) ===
+go_files=115
+|gofumpt:
+sed: -e expression #1, char 7: unterminated `s' command
+/usr/bin/bash: line 1: /bin/gofumpt.exe: No such file or directory
+
+=== worktree gofumpt -l cmd/wisp (尺＝/d/work/base/gopath/bin/gofumpt.exe) ===
+cmd\wisp\models.go cmd\wisp\panel_transport_35r2_test.go 
+=== worktree gofmt again (same minute, 295-r1 在飞) ===
+cmd\wisp\models.go 
+=== HEAD blob tree ===
+go_files=115
+gofmt:
+
+gofumpt:
+cmd\wisp\panel_transport_35r2_test.go 

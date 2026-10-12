@@ -1,0 +1,23 @@
+runtag=20261012-142231
+gotmp_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/orch-298ac4-20261012-142231
+before_tree=/tmp/tmp.eDzuGELYpr
+after_tree=/tmp/tmp.Q8bD081pyJ
+archive_before_rc=0
+archive_after_rc=0
+go_files_in_tree=976 tree=/tmp/tmp.eDzuGELYpr
+go_files_in_tree=976 tree=/tmp/tmp.Q8bD081pyJ
+before build rc=0
+after build rc=0
+shot=before-1 wispexe_before=0
+shot=before-1 rc=1 ok=0 fail=3 dashfail=20 bytes=222148
+shot=before-2 wispexe_before=0
+shot=before-2 rc=1 ok=0 fail=3 dashfail=19 bytes=220670
+shot=after-1 wispexe_before=0
+shot=after-1 rc=1 ok=0 fail=3 dashfail=19 bytes=220676
+shot=after-2 wispexe_before=0
+shot=after-2 rc=1 ok=0 fail=3 dashfail=19 bytes=220705
+gofmt_l_cmd_wisp tree=before gfn=2 names=[cmd\wisp\panel_inbound_guards_35r3_test.go cmd\wisp\panel_transport_35r2_test.go ]
+gofmt_l_cmd_wisp tree=after gfn=0 names=[]
+gofumpt_l_cmd_wisp tree=before names=[cmd\wisp\panel_inbound_guards_35r3_test.go cmd\wisp\panel_transport_35r2_test.go ]
+gofumpt_l_cmd_wisp tree=after names=[cmd\wisp\panel_transport_35r2_test.go ]
+done at Mon Oct 12 14:50:27 CST 2026
