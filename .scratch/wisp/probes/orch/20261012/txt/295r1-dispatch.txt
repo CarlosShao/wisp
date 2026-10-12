@@ -1,0 +1,56 @@
+# 派单 295-r1（落地腿）— 票 295：把 `cmd/wisp` 那枚裸 `bool` 换成 `atomic.Bool`，并把"手势路径必须写它"这件事现跑出一枚真红的凭据
+
+锚＝HEAD `73719706`（branch `dev`）。你是**实现者**，⛔ 翻框、⛔ 动 `Status:` 行、⛔ 给本票任何一格写"成立"。
+
+## 0. 起手先做三件事（任一不满足 ⇒ 停手报回，⛔ 自己填缝）
+
+1. `git status --porcelain -- cmd/wisp/resident_audio_windows.go cmd/wisp/resident_audio_247_windows_test.go cmd/wisp/resident_audio_247_live_windows_test.go cmd/wisp/resident_mute_290_windows_test.go` ⇒ **必须为空**。非空＝有人正碰这几枚字节，立刻停手上报。
+2. 编队名册三问（跑任何 `go test` 之前）：`tasklist //FI "IMAGENAME eq wisp.exe"` 与 `tasklist //FI "IMAGENAME eq balldebug.exe"` ⇒ **各 0**（这两条⛔ 放进 `.ps1`，PowerShell 不认 `//FI`，必须走 bash）；再来一把家族尺（PowerShell `-File`）：`Get-Process | Where-Object { $_.ProcessName -like '*.test' } | Measure-Object`。答不全就上报，⛔ 不许停。
+3. 落点清单**现读**：`.scratch/wisp/probes/295/a1b/30-landing-and-anti-form.md` 的 ⓓ 节（11 枚点＝生产 4 处含声明＋测试 8 枚读点）与 ⓔ 节（反形正控只有一枚断言宽）。那份件的行号⛔ 照抄——它自己写了"绝对行号不许进派单"，一律用**内容锚**（那列逐字原文）定位。
+
+## 1. 你只做这些格
+
+- **`AC#1` 修法落地**：形状＝照同一枚 struct 里那枚邻居原子的家族来——`started` 那枚裸 `bool` 换 `atomic.Bool`，写点两处改 `Store(...)`、读点改 `Load()`。⛔ 加锁（`sync.Mutex`）；⛔ 新造协程（D38(b) 名册零膨胀）；⛔ 裸 `go func(`（ban #1）；⛔ 改任何默认值／D43 转移表／门的语义；⛔ 把 `started` 改成"自己维护一份静音状态"（`gate.Open()`/`gate.Muted()` 仍是主，这枚是派生镜像——声明上方与 `toggleMute` 写点上方那两组注释的**措辞**要说这件事，改形状时把注释里"裸 bool 才有的那一层"补一句"为什么这一枚必须原子"，并具名落在哪一行旁边）。
+- ⛔ **ⓓ-4 那一节清单之外的东西一律不换形状**：`verdict`（`AC#0` 前件不成立，已复跑）、`rb.b`、`gate`/`mic`/`cancel`/`voiceEnabled`/`mutedAtBoot`。想动＝先报回。
+- **`AC#2` 判据要有牙**（⚠ 本票最难的一格，凭据⛔ 是"加了 atomic"）：
+  - ⓐ 现有读 `started` 的用例**全绿照跑**，⛔ 放宽任何一条断言。
+  - ⓑ **反形正控＝真跑那一发**：把 `toggleMute` 体内那枚镜像写（内容锚 `	ra.started = gate.Open()`）删掉、其余一字不动 ⇒ **指名用例必须红**。指名只许一枚＝`TestAC290BothMuteGesturesTurnTheGateAndBack`（`cmd/wisp/resident_mute_290_windows_test.go`，我 14:2x 现跑 `grep -n 'func TestAC290'` 六枚同名族里只有这一枚读 `started`；`go test -run` 指名到用例级），红必须红在那句 "derived mirror says nothing is running while the gate is open" 那一枚断言上。
+  - ⚠ 同时把 ⓔ-2 那 **7 枚读点逐枚具名标"对此变异不敏感"**（那是恒绿假钉形状，缺口审计会以为有 8 枚在守）。这份"不敏感"必须有**读数**（删写那一发的逐名名册），⛔ 只写"读码推的"。
+  - ⓒ 两把正控缺一不作凭据：pristine（未变异）那一发**要绿**、变异那一发**要红**，两发同台面、同一枚专用根形状，并把还原后的 `sha256sum`/`md5` 与 pristine 逐字节对上的证据同行落盘。⛔ 拿变异体留在树上＝当场作废。
+  - ⓓ `AC#2` ⓓ-2 那一列 **#7＝`t.Fatalf` 格式串参数位**（内容锚里带 `open=%v started=%v`）：`atomic.Bool` 直接丢进 `%v` 会打出 `{true}` 结构体形状、编译过、断言不红，但**失败日志开始撒谎**⇒ 必须 `.Load()`（并把 `%v` 收成 `%t` 更严），验收腿要能现读到那行的输出形状。这一枚是验收腿会逐字查的点。
+- **`AC#3` 越界**：逐笔 `git show --name-only --format=` 量给你自己的每一笔 commit，名册只许含 §2 的写面；`frontend/**`／`design/**`／`PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）⇒ **零字节**。⛔ 用区间尺（`HEAD~3..HEAD` 那种）。
+- **`AC#4` 门禁**（逐字拼写，⛔ 自创缩写）：
+  - `GOFLAGS= go build ./...` rc=0
+  - `$(go env GOPATH)/bin/gofumpt.exe -l cmd/wisp` ⇒ 空（裸 `gofumpt` 不在 PATH＝`rc=127`，具名写出来、⛔ 当成"跳过"）
+  - `gofmt -l cmd/wisp` **改前／改后两把并排**，且**逐枚带射程目录＋"对工作树量还是对 HEAD blob 量"**（本仓实测：工作树那把会多报几枚本机 CRLF 假枚；⛔ 拿两把的差去指控任何人）
+  - `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ ./internal/audio/ -count=1 -v` 改前改后**各 ≥2 发取交集**、逐名作差＝新增红 0 枚（⚠ 计数尺沿用 `grep -c -- '--- PASS'`（含子测试）；不带 `-v` 时 `--- PASS` 恒 0＝那是尺的口径、⛔ 读成"全红"；⚠ **改前那发⛔ 在共享工作树上跑**——用仓外导出树，见 §3）
+  - `sh scripts/d22scan.sh` ⇒ **在你自己的改动之后**跑一次并自落 `rc=`（⛔ 拿"别人在飞态"的红算在你头上，若红具名报回）
+  - 每把门禁件**自落一行 `rc=N`**（⛔ 0 字节件＝那格没交）
+- **`AC#5`（可选，排最后，⛔ 改 CI 一字）**：现跑一次 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -race ./cmd/wisp/ -count=1`，只出**代价表**：墙钟多少、颜色如何、今天会不会因别腿的红而恒红。判"要不要请进门禁"归编排者＋机主，⛔ 你下结论。
+
+## 2. 写面（⛔ 超出＝越界；逐条从本票"写面三件套"原文粘，⛔ 手抄缩写）
+
+1. 产码／测试面（**只有这四枚**）：`cmd/wisp/resident_audio_windows.go`、`cmd/wisp/resident_audio_247_windows_test.go`、`cmd/wisp/resident_audio_247_live_windows_test.go`、`cmd/wisp/resident_mute_290_windows_test.go`
+2. 你自己的证据件目录：`.scratch/wisp/probes/295/r1/**`（日志落 `.../r1/logs/`，⛔ 不落仓根）
+3. 本票 `.scratch/wisp/issues/295-ra-started-bare-bool-written-off-thread.md` 末尾**追加 1 条 progress bullet**（1 加 0 删，⛔ 改上面任何原句、⛔ 动任何 `[ ]` 框）
+
+## 3. 环境口径（本波有两条在飞的邻居，照做）
+
+- ⛔ **用 `scripts/*.sh` 或 `tools/d22scan/runtests.sh` 跑你的测试**：`310-r2` 正在改那三枚入口脚本（工作树里是**在飞态**）。要跑 `go test` 就直接：`GOTMPDIR="<你自己的根>" PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v ./cmd/wisp/`。
+- 专用根＝`$LOCALAPPDATA/wisp-test-gotmp/295r1-$(date +%Y%m%d-%H%M%S)-$$`（**默认那一族**）。⛔ 把根指到仓所在卷 `D:`——票 311 已实测换卷会改另一档的颜色并让 `t.TempDir()` 自我收尾失败；⛔ 为了"仓外好看"换卷。⛔ 把读数件写进任何专用根里（会让"根里条目数"两把尺失配）。
+- 改前那一发＝仓外导出树：`git archive --format=tar <改前那枚 SHA> cmd/wisp internal tools scripts go.mod go.sum | tar -x -C "$(mktemp -d)"`，**先数 `.go` 枚数证非空**（"0"⛔ 是读数；"分母 N 且 0"才是）。⛔ 在共享工作树上跑"改前那发"。
+- ⚠ 一把尺打印 "Binary file … matches" 时它那行的枚数⛔ 算读数——加 `-a`（或 `LC_ALL=C`）重跑并具名写两把的差。
+- ⚠ `Get-ChildItem` 不带 `-ErrorAction SilentlyContinue` 会给你一枚**假 0**。
+- ⚠ 短命子进程必须**同一进程里"盯＋下手"**：bash↔PowerShell 往返 0.5–1 s 而孩子只活 1–2 s，⛔ 把"我没看到"读成"修法成立"。
+
+## 4. git 纪律（⛔ 违反＝退回）
+
+只 commit、⛔ push。`git add` 与 `git commit` **两处都带显式 pathspec**（建议 `--pathspec-from-file`，先把清单写成文件并 `git add --dry-run` 对一遍）。⛔ `add -A`／`add <目录>`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`。仓内⛔ 建 worktree、⛔ 删任何文件/目录（临时件**只建不删**）。⛔ 碰别人在飞的 `go.mod`／`.gitignore`／`design/**`（机主自己的批）。
+
+证据件命名：⛔ 叫 `.out`；⛔ 在 `probes/**` 下建 `.go`；⛔ 文件名带 `§`；⛔ 长名（相对 ≤121／末段 ≤100／全路径 ≤165）——新建前先跑 `sh scripts/check-path-length-budget.sh --with-self-test`。
+
+## 5. 输出预算（⛔ 超＝收不下＝丢件）
+
+交付 4 枚 md，逐枚上限 200 行：`10-impl.md`（逐处内容锚⇄改后行＋注释那一句落点）、`20-anti-form.md`（删写那一发：指名用例红句**逐字**＋那 7 枚逐枚"不敏感"读数＋还原证据）、`30-gates.md`（每条命令逐字＋`rc=`＋改前改后两把并排带射程）、`90-final.md`（欠账名册 `Q-295-r1-*` 逐条，⛔ 用"应该没问题"结案）。日志按把分文件落 `logs/`。正文⛔ 重述票面判据。
+
+交回时给我：每格的**逐字读数行**、越界尺结果、专用根名册（⛔ 引用任何"某某目录是我这一发漏的"之前先用 `Get-ChildItem … | Select Name,CreationTime` 证它今天还在盘上；归属定式＝起进程前的名册 ⇄ 杀完后的名册 `comm -13` 作差＋逐枚 `CreationTime`）。
