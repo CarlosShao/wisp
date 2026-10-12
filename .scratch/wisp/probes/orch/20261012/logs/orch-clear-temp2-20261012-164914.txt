@@ -1,0 +1,202 @@
+clear-temp-residue PASS2 TS=2026-10-12 16:49:14 +0800 scope=%TEMP%/Test* only
+head=a323b149deaf08edca66f87b9357c8bce263284e
+count_before=59
+positive_control_all_top_entries=34055
+
+=== STEP 0 pre-state roster (name + mtime, every Test* dir) ===
+pre dir=Test221ParentStopsItsOwnChildRowAndStreamSettle3871214707 mtime=10-08_20:08 age_h=92
+pre dir=TestAC1ResidentLegOutlivesItsOwnLogFailure1462165283 mtime=10-09_15:35 age_h=73
+pre dir=TestAC2RealProcessRefusesOnEveryLegWithoutAppData1281963646102 mtime=10-03_17:04 age_h=215
+pre dir=TestComposedGateBlocksAWriteForTwoSeconds1996183427 mtime=09-23_18:44 age_h=454
+pre dir=TestConfirmLockedRunsOutsideTheManagerLock1562080786 mtime=10-02_19:39 age_h=237
+pre dir=TestDoubleFailureKeepsTaskContextAndIsResumable481691178 mtime=10-11_18:47 age_h=22
+pre dir=TestFailoverAfterPrimaryExhaustion2419959198 mtime=10-11_21:46 age_h=19
+pre dir=TestFailoverAfterPrimaryExhaustion3970703700 mtime=10-11_21:46 age_h=19
+pre dir=TestFailoverAfterPrimaryExhaustion455177940 mtime=10-11_18:53 age_h=21
+pre dir=TestGateJudgesThePrivateSetByResolvedSID2396759740 mtime=09-21_18:40 age_h=502
+pre dir=TestGateJudgesThePrivateSetByResolvedSID2459073988 mtime=09-21_18:40 age_h=502
+pre dir=TestGateJudgesThePrivateSetByResolvedSID2986811054 mtime=09-21_18:40 age_h=502
+pre dir=TestMockllmGoldenByteIdenticalEvents1101711636 mtime=10-11_17:52 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents1385547188 mtime=10-11_21:37 age_h=19
+pre dir=TestMockllmGoldenByteIdenticalEvents1415189317 mtime=10-11_17:49 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents1524086492 mtime=10-11_16:53 age_h=23
+pre dir=TestMockllmGoldenByteIdenticalEvents1904824687 mtime=10-11_17:56 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents2997322679 mtime=10-11_21:37 age_h=19
+pre dir=TestMockllmGoldenByteIdenticalEvents3039020949 mtime=10-11_21:34 age_h=19
+pre dir=TestMockllmGoldenByteIdenticalEvents3140925201 mtime=10-11_18:01 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents3161225382 mtime=10-11_17:52 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents3233152004 mtime=10-11_17:56 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents3278041641 mtime=10-11_21:37 age_h=19
+pre dir=TestMockllmGoldenByteIdenticalEvents3292549456 mtime=10-11_18:02 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents3666715146 mtime=10-11_18:47 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents4011121267 mtime=10-11_16:54 age_h=23
+pre dir=TestMockllmGoldenByteIdenticalEvents696038329 mtime=10-11_18:05 age_h=22
+pre dir=TestMockllmGoldenByteIdenticalEvents718009555 mtime=10-11_17:49 age_h=23
+pre dir=TestMockllmGoldenByteIdenticalEvents973367927 mtime=10-11_18:05 age_h=22
+pre dir=TestMockllmSharedFaultSuite1562417226 mtime=10-11_17:56 age_h=22
+pre dir=TestMockllmSharedFaultSuite1603513437 mtime=10-11_18:02 age_h=22
+pre dir=TestMockllmSharedFaultSuite222012253 mtime=10-11_17:52 age_h=22
+pre dir=TestMockllmSharedFaultSuite2329949686 mtime=10-11_18:05 age_h=22
+pre dir=TestMockllmSharedFaultSuite2868402985 mtime=10-11_18:02 age_h=22
+pre dir=TestMockllmSharedFaultSuite3458740087 mtime=10-11_17:56 age_h=22
+pre dir=TestMockllmSharedFaultSuite3784017352 mtime=10-11_17:49 age_h=22
+pre dir=TestMockllmSharedFaultSuite959708402 mtime=10-11_18:06 age_h=22
+pre dir=TestPanelHostRealWindowHopAndLifecycle537087969 mtime=10-01_10:04 age_h=270
+pre dir=TestProbeStepByStep3843095677 mtime=09-21_18:40 age_h=502
+pre dir=TestRollingWriterRetentionSweep3198295670 mtime=09-25_08:32 age_h=416
+pre dir=TestRollingWriterRetentionSweep3638913217 mtime=09-25_08:34 age_h=416
+pre dir=TestRollingWriterRetentionSweep3835089158 mtime=09-25_08:34 age_h=416
+pre dir=TestRollingWriterRetentionSweep3838303947 mtime=09-25_08:34 age_h=416
+pre dir=TestRoundTripLoadMarshalLoad1039208776 mtime=10-12_11:04 age_h=5
+pre dir=TestRoundTripLoadMarshalLoad1721168370 mtime=10-12_11:49 age_h=5
+pre dir=TestRoundTripLoadMarshalLoad2289939324 mtime=10-12_10:46 age_h=6
+pre dir=TestRoundTripLoadMarshalLoad2461500944 mtime=10-12_11:43 age_h=5
+pre dir=TestRoundTripLoadMarshalLoad2836872785 mtime=10-12_10:47 age_h=6
+pre dir=TestRoundTripLoadMarshalLoad3863116526 mtime=10-12_11:05 age_h=5
+pre dir=TestRoundTripLoadMarshalLoad4222770164 mtime=10-12_12:48 age_h=4
+pre dir=TestRoundTripLoadMarshalLoad725496612 mtime=10-12_10:45 age_h=6
+pre dir=TestRoundTripLoadMarshalLoad826293033 mtime=10-12_11:50 age_h=4
+pre dir=TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780 mtime=10-08_11:35 age_h=101
+pre dir=TestSLO144LoopGiveUpSentencesOnRealFiles2237962421 mtime=09-25_20:36 age_h=404
+pre dir=TestTicket101SessionGrantDoesNotCrossRestart2995253497 mtime=10-07_18:23 age_h=118
+pre dir=TestTicket223PermissionDeniedSitsInItsOwnSentence1318611284 mtime=10-05_23:25 age_h=161
+pre dir=TestTicket223R2FailureSentenceRouting声明旧版_坏表头_A2_3165385141 mtime=10-03_17:01 age_h=215
+pre dir=TestTicket223TighteningRaisesNoCard3267158827 mtime=10-03_17:09 age_h=215
+pre dir=TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599 mtime=10-08_08:42 age_h=104
+
+=== STEP 1 live-binary check (a running test could still own a fresh dir) ===
+wisp_test_exe_now=0
+audio_test_exe_now=0
+
+=== STEP 2 attribution + KEEP-by-name ===
+ATTRIB=Test221ParentStopsItsOwnChildRowAndStreamSettle3871214707 <- 'Test221ParentStopsItsOwnChildRowAndStreamSettle' in 1 file(s) at HEAD
+ATTRIB=TestAC1ResidentLegOutlivesItsOwnLogFailure1462165283 <- 'TestAC1ResidentLegOutlivesItsOwnLogFailure' in 1 file(s) at HEAD
+ATTRIB=TestAC2RealProcessRefusesOnEveryLegWithoutAppData1281963646102 <- 'TestAC2RealProcessRefusesOnEveryLegWithoutAppData' in 2 file(s) at HEAD
+ATTRIB=TestComposedGateBlocksAWriteForTwoSeconds1996183427 <- 'TestComposedGateBlocksAWriteForTwoSeconds' in 1 file(s) at HEAD
+ATTRIB=TestConfirmLockedRunsOutsideTheManagerLock1562080786 <- 'TestConfirmLockedRunsOutsideTheManagerLock' in 1 file(s) at HEAD
+ATTRIB=TestDoubleFailureKeepsTaskContextAndIsResumable481691178 <- 'TestDoubleFailureKeepsTaskContextAndIsResumable' in 1 file(s) at HEAD
+ATTRIB=TestFailoverAfterPrimaryExhaustion2419959198 <- 'TestFailoverAfterPrimaryExhaustion' in 1 file(s) at HEAD
+ATTRIB=TestFailoverAfterPrimaryExhaustion3970703700 <- 'TestFailoverAfterPrimaryExhaustion' in 1 file(s) at HEAD
+ATTRIB=TestFailoverAfterPrimaryExhaustion455177940 <- 'TestFailoverAfterPrimaryExhaustion' in 1 file(s) at HEAD
+ATTRIB=TestGateJudgesThePrivateSetByResolvedSID2396759740 <- 'TestGateJudgesThePrivateSetByResolvedSID' in 1 file(s) at HEAD
+ATTRIB=TestGateJudgesThePrivateSetByResolvedSID2459073988 <- 'TestGateJudgesThePrivateSetByResolvedSID' in 1 file(s) at HEAD
+ATTRIB=TestGateJudgesThePrivateSetByResolvedSID2986811054 <- 'TestGateJudgesThePrivateSetByResolvedSID' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents1101711636 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents1385547188 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents1415189317 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents1524086492 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents1904824687 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents2997322679 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents3039020949 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents3140925201 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents3161225382 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents3233152004 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents3278041641 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents3292549456 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents3666715146 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents4011121267 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents696038329 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents718009555 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmGoldenByteIdenticalEvents973367927 <- 'TestMockllmGoldenByteIdenticalEvents' in 1 file(s) at HEAD
+ATTRIB=TestMockllmSharedFaultSuite1562417226 <- 'TestMockllmSharedFaultSuite' in 3 file(s) at HEAD
+ATTRIB=TestMockllmSharedFaultSuite1603513437 <- 'TestMockllmSharedFaultSuite' in 3 file(s) at HEAD
+ATTRIB=TestMockllmSharedFaultSuite222012253 <- 'TestMockllmSharedFaultSuite' in 3 file(s) at HEAD
+ATTRIB=TestMockllmSharedFaultSuite2329949686 <- 'TestMockllmSharedFaultSuite' in 3 file(s) at HEAD
+ATTRIB=TestMockllmSharedFaultSuite2868402985 <- 'TestMockllmSharedFaultSuite' in 3 file(s) at HEAD
+ATTRIB=TestMockllmSharedFaultSuite3458740087 <- 'TestMockllmSharedFaultSuite' in 3 file(s) at HEAD
+ATTRIB=TestMockllmSharedFaultSuite3784017352 <- 'TestMockllmSharedFaultSuite' in 3 file(s) at HEAD
+ATTRIB=TestMockllmSharedFaultSuite959708402 <- 'TestMockllmSharedFaultSuite' in 3 file(s) at HEAD
+ATTRIB=TestPanelHostRealWindowHopAndLifecycle537087969 <- 'TestPanelHostRealWindowHopAndLifecycle' in 2 file(s) at HEAD
+KEEP_UNRESOLVED=TestProbeStepByStep3843095677 tried=[TestProbeStepByStep|TestProbeStepByStep] files_naming_it=0
+ATTRIB=TestRollingWriterRetentionSweep3198295670 <- 'TestRollingWriterRetentionSweep' in 1 file(s) at HEAD
+ATTRIB=TestRollingWriterRetentionSweep3638913217 <- 'TestRollingWriterRetentionSweep' in 1 file(s) at HEAD
+ATTRIB=TestRollingWriterRetentionSweep3835089158 <- 'TestRollingWriterRetentionSweep' in 1 file(s) at HEAD
+ATTRIB=TestRollingWriterRetentionSweep3838303947 <- 'TestRollingWriterRetentionSweep' in 1 file(s) at HEAD
+SKIP_RECENT=TestRoundTripLoadMarshalLoad1039208776 mtime=10-12_11:04
+SKIP_RECENT=TestRoundTripLoadMarshalLoad1721168370 mtime=10-12_11:49
+ATTRIB=TestRoundTripLoadMarshalLoad2289939324 <- 'TestRoundTripLoadMarshalLoad' in 1 file(s) at HEAD
+SKIP_RECENT=TestRoundTripLoadMarshalLoad2461500944 mtime=10-12_11:43
+ATTRIB=TestRoundTripLoadMarshalLoad2836872785 <- 'TestRoundTripLoadMarshalLoad' in 1 file(s) at HEAD
+SKIP_RECENT=TestRoundTripLoadMarshalLoad3863116526 mtime=10-12_11:05
+SKIP_RECENT=TestRoundTripLoadMarshalLoad4222770164 mtime=10-12_12:48
+ATTRIB=TestRoundTripLoadMarshalLoad725496612 <- 'TestRoundTripLoadMarshalLoad' in 1 file(s) at HEAD
+SKIP_RECENT=TestRoundTripLoadMarshalLoad826293033 mtime=10-12_11:50
+ATTRIB=TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780 <- 'TestRunPacketCarriesTheSubagentItsRosterRowFed' in 2 file(s) at HEAD
+ATTRIB=TestSLO144LoopGiveUpSentencesOnRealFiles2237962421 <- 'TestSLO144LoopGiveUpSentencesOnRealFiles' in 1 file(s) at HEAD
+ATTRIB=TestTicket101SessionGrantDoesNotCrossRestart2995253497 <- 'TestTicket101SessionGrantDoesNotCrossRestart' in 1 file(s) at HEAD
+ATTRIB=TestTicket223PermissionDeniedSitsInItsOwnSentence1318611284 <- 'TestTicket223PermissionDeniedSitsInItsOwnSentence' in 2 file(s) at HEAD
+ATTRIB=TestTicket223R2FailureSentenceRouting声明旧版_坏表头_A2_3165385141 <- 'TestTicket223R2FailureSentenceRouting' in 3 file(s) at HEAD
+ATTRIB=TestTicket223TighteningRaisesNoCard3267158827 <- 'TestTicket223TighteningRaisesNoCard' in 1 file(s) at HEAD
+ATTRIB=TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599 <- 'TestUnansweredL2CardTimesOutIntoRejectNeverExecution' in 1 file(s) at HEAD
+attributed=58 kept_unresolved=1 skipped_recent=6 candidates=52
+
+=== STEP 3 delete, one by one, logging each ===
+OK=Test221ParentStopsItsOwnChildRowAndStreamSettle3871214707
+OK=TestAC1ResidentLegOutlivesItsOwnLogFailure1462165283
+OK=TestAC2RealProcessRefusesOnEveryLegWithoutAppData1281963646102
+OK=TestComposedGateBlocksAWriteForTwoSeconds1996183427
+OK=TestConfirmLockedRunsOutsideTheManagerLock1562080786
+OK=TestDoubleFailureKeepsTaskContextAndIsResumable481691178
+OK=TestFailoverAfterPrimaryExhaustion2419959198
+OK=TestFailoverAfterPrimaryExhaustion3970703700
+OK=TestFailoverAfterPrimaryExhaustion455177940
+OK=TestGateJudgesThePrivateSetByResolvedSID2396759740
+OK=TestGateJudgesThePrivateSetByResolvedSID2459073988
+OK=TestGateJudgesThePrivateSetByResolvedSID2986811054
+OK=TestMockllmGoldenByteIdenticalEvents1101711636
+OK=TestMockllmGoldenByteIdenticalEvents1385547188
+OK=TestMockllmGoldenByteIdenticalEvents1415189317
+OK=TestMockllmGoldenByteIdenticalEvents1524086492
+OK=TestMockllmGoldenByteIdenticalEvents1904824687
+OK=TestMockllmGoldenByteIdenticalEvents2997322679
+OK=TestMockllmGoldenByteIdenticalEvents3039020949
+OK=TestMockllmGoldenByteIdenticalEvents3140925201
+OK=TestMockllmGoldenByteIdenticalEvents3161225382
+OK=TestMockllmGoldenByteIdenticalEvents3233152004
+OK=TestMockllmGoldenByteIdenticalEvents3278041641
+OK=TestMockllmGoldenByteIdenticalEvents3292549456
+OK=TestMockllmGoldenByteIdenticalEvents3666715146
+OK=TestMockllmGoldenByteIdenticalEvents4011121267
+OK=TestMockllmGoldenByteIdenticalEvents696038329
+OK=TestMockllmGoldenByteIdenticalEvents718009555
+OK=TestMockllmGoldenByteIdenticalEvents973367927
+OK=TestMockllmSharedFaultSuite1562417226
+OK=TestMockllmSharedFaultSuite1603513437
+OK=TestMockllmSharedFaultSuite222012253
+OK=TestMockllmSharedFaultSuite2329949686
+OK=TestMockllmSharedFaultSuite2868402985
+OK=TestMockllmSharedFaultSuite3458740087
+OK=TestMockllmSharedFaultSuite3784017352
+OK=TestMockllmSharedFaultSuite959708402
+OK=TestPanelHostRealWindowHopAndLifecycle537087969
+OK=TestRollingWriterRetentionSweep3198295670
+OK=TestRollingWriterRetentionSweep3638913217
+OK=TestRollingWriterRetentionSweep3835089158
+OK=TestRollingWriterRetentionSweep3838303947
+OK=TestRoundTripLoadMarshalLoad2289939324
+OK=TestRoundTripLoadMarshalLoad2836872785
+OK=TestRoundTripLoadMarshalLoad725496612
+OK=TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780
+OK=TestSLO144LoopGiveUpSentencesOnRealFiles2237962421
+OK=TestTicket101SessionGrantDoesNotCrossRestart2995253497
+OK=TestTicket223PermissionDeniedSitsInItsOwnSentence1318611284
+OK=TestTicket223R2FailureSentenceRouting声明旧版_坏表头_A2_3165385141
+OK=TestTicket223TighteningRaisesNoCard3267158827
+OK=TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599
+deleted_ok=52 denied_left_in_place=0 other_failures=0
+
+=== STEP 4 post-state ===
+count_after=7
+post_roster:
+post dir=TestProbeStepByStep3843095677 mtime=09-21_18:40
+post dir=TestRoundTripLoadMarshalLoad1039208776 mtime=10-12_11:04
+post dir=TestRoundTripLoadMarshalLoad1721168370 mtime=10-12_11:49
+post dir=TestRoundTripLoadMarshalLoad2461500944 mtime=10-12_11:43
+post dir=TestRoundTripLoadMarshalLoad3863116526 mtime=10-12_11:05
+post dir=TestRoundTripLoadMarshalLoad4222770164 mtime=10-12_12:48
+post dir=TestRoundTripLoadMarshalLoad826293033 mtime=10-12_11:50
+positive_control_all_top_entries_after=34002
+untouched_default_gotmp_dirs=79
+untouched_d_tmp_gotmp_dirs=13
+wb_exe_and_balldebug_present=1
+rc=0

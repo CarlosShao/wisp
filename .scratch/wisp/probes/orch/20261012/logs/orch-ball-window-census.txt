@@ -1,0 +1,19 @@
+alive=yes
+main_window_handle=69732866
+main_window_title=[Wisp]
+windows_visible=True
+Unable to find type [U+W+EnumWindowsProc].
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\orch\20261012\txt\ball-window-census.ps1:20 char:8
++ $cb = [U+W+EnumWindowsProc]{
++        ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (U+W+EnumWindowsProc:TypeName) [], RuntimeException
+    + FullyQualifiedErrorId : TypeNotFound
+ 
+Unable to find type [U+W].
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\orch\20261012\txt\ball-window-census.ps1:35 char:1
++ [U+W]::EnumWindows($cb, [IntPtr]::Zero) | Out-Null
++ ~~~~~
+    + CategoryInfo          : InvalidOperation: (U+W:TypeName) [], RuntimeException
+    + FullyQualifiedErrorId : TypeNotFound
+ 
+window_count=0
