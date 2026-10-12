@@ -136,11 +136,12 @@ fi
 #
 # PLACEMENT IS LOAD-BEARING, AND MEASURED: the ticket-310 root block of this entry
 # runs BEFORE its guard chain (that is where the DEGRADED line comes from, measured
-# by the orchestrator at A862 and re-measured by this leg), so this guard sits AFTER
-# the whole guard chain above and BEFORE the delegated run below, and one trip reads,
+# by the orchestrator at A862 and re-measured per entry by leg 311-r1b), so this guard
+# sits AFTER the whole guard chain above and BEFORE the run below, and one trip reads,
 # in order: [310 DEGRADED/GOTMPDIR line] -> [311 GUARD line] -> [no test process at
-# all]. Ordering readings: .scratch/wisp/probes/311/r1/logs/23-order-degraded-then-guard.txt
-# and .scratch/wisp/probes/311/r1/logs/24-order-guard-after-guard1.txt.
+# all]. Ordering readings: .scratch/wisp/probes/311/r1b/logs/23-order-degraded-then-guard.txt
+# and .scratch/wisp/probes/311/r1b/logs/24-order-guard-after-guard1.txt - the two files
+# this comment used to name sat under probes/311/r1/ and never landed (leg 311-r1 died).
 #
 # THREE SHAPES THIS MUST NOT BREAK, each with its own reading on the ticket:
 # WISP_TEST_GOTMP_ROOT unset (the factory default), a root on the SAME volume under a
