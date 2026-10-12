@@ -1,0 +1,10 @@
+scripts/winsec-tests.sh      block_start=122    test_start=200    before=YES
+scripts/portable-tests.sh    block_start=760    test_start=836    before=YES
+scripts/wisp-cli-tests.sh    block_start=134    test_start=218    before=YES
+tools/d22scan/runtests.sh    block_start=109    test_start=2      before=NO
+scripts/winsec-tests.sh      first_GOTMPDIR_block=55
+scripts/portable-tests.sh    first_GOTMPDIR_block=148
+scripts/wisp-cli-tests.sh    first_GOTMPDIR_block=68
+runtests.sh block=109 go_test_invocation=188 before=YES
+--- 具名作废：上面前四行里 runtests.sh 那行 before=NO ＝我这把尺坏了（'go test' 先命中文件头第 2 行的注释），末行用 'go test -v' 重测＝before=YES；其余三行的 test_start 号取自委派行（bash "$portable" / sh "$strict"），⛔ 别腿的行别当我的读数 ---
+--- 三枚 scripts 入口另有一把尺：块起始行号 > 票 310 根块行号（55/148/68）＝块在守卫链里、在起测试之前，逐枚见上 ---

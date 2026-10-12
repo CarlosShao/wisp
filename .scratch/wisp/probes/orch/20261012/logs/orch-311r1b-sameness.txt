@@ -1,0 +1,28 @@
+scripts/winsec-tests.sh: block_lines=159 hits=4
+scripts/portable-tests.sh: block_lines=150 hits=4
+scripts/wisp-cli-tests.sh: block_lines=85 hits=4
+tools/d22scan/runtests.sh: block_lines=115 hits=4
+<             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be r
+>             echo "portable-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOT
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of t
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPD
+>         echo "portable-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names AN
+>         echo "portable-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of
+>         echo "portable-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTM
+<             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be r
+>             echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOT
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of t
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPD
+>         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names AN
+>         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of
+>         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTM
+<             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be r
+>             echo "runtests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read 
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOT
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of t
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPD
+>         echo "runtests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER 
+>         echo "runtests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that 
+>         echo "runtests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) 
