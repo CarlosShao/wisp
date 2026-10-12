@@ -1,0 +1,5 @@
+ticket 310 (310-r2): commit the remaining helper lists, messages and evidence out-of-dir check
+
+40-evidence-outside.txt = the "any staged file outside probes/310/r2" reading (0).
+The commit-list-* / commit-msg-* files are kept in-repo so the add/commit pathspec
+and message for each of this leg's commits can be recomputed.

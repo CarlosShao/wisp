@@ -1,0 +1,5 @@
+.scratch/wisp/probes/310/r2/logs/40-evidence-outside.txt
+.scratch/wisp/probes/310/r2/logs/commit-list-final.txt
+.scratch/wisp/probes/310/r2/logs/commit-msg-evidence.txt
+.scratch/wisp/probes/310/r2/logs/commit-msg-evidence2.txt
+.scratch/wisp/probes/310/r2/logs/commit-msg-final.txt
