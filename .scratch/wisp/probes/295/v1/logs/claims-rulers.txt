@@ -1,0 +1,63 @@
+# 295-v1 · 注释里三句事实主张的现跑尺（10-12 16:2x +08，起手 HEAD=a92cd10f→腿在飞期间 HEAD 漂到 8ef6b672；`git diff a92cd10f..HEAD -- cmd/wisp`＝0 行，见本件末条）
+
+★先落一件口径事（派单 §1 第 3 条的前提需要更正，⛔ 我改注释、只报）：
+派单说"`105` 那组新注释逐字声称 …"。那三句话**逐字存在于 `d5ef9cb9`（AC#1 第一笔）的 blob**，
+而 `1c1d7df3`（15:06 的漂移修复）把两组注释压回原行数时**把它们删掉了**（1 枚文件、＋0/−18 行）。
+⇒ HEAD 的工作树里，`:102-104`／`:164-167` 只剩 `ui-sta writes, boot reads: 295.` 与
+`It crosses threads (this body is ui-sta, boot reads it), so it is a Store.`（尺＝下面 R0）。
+所以下面三判的射程＝**"落地腿当时写下的主张真不真"**，⛔ 是"HEAD 注释里现在还有没有这句话"。
+
+## R0 这两组注释在 HEAD ⇄ d5ef9cb9 的逐字对拉（尺＝git show + grep -n -c）
+
+- HEAD 声明组（现量）：`:102` `// started records that the gate handed the device to the inner source and`
+  ／`:103` `// capture is running. posture() reads it so a leg that built a gate but`
+  ／`:104` `// never opened a mic cannot print "running". ui-sta writes, boot reads: 295.`
+- HEAD 写点组：`:164-167`，末行逐字 `// It crosses threads (this body is ui-sta, boot reads it), so it is a Store.`
+- `d5ef9cb9` 的两组各多 9 行／10 行（尺①＝`git show 1c1d7df3 -- cmd/wisp/resident_audio_windows.go` 的 `--numstat`＝**6/25**、净 −19；
+  尺②＝三枚 blob 的行数 `0615c6c9`=**425** ⇄ `d5ef9cb9`=**444** ⇄ HEAD=**425** ⇒ 第一版净 **＋19 行**），
+  ⚠ **腿的修复笔自述"AC#1 第一版净增 18 行"少报 1 枚**（`d5ef9cb9 --numstat`＝**23/4**＝＋19）＝尺口径笔误、⛔ 伤实质（回执引的是 `:256`／`:257` 两枚行号，偏 19 与偏 18 都失配）。
+  那一版里逐字有：`-race is not in the roster`／`levels has been an atomic.Uint64 all along`／`see resident_ball_windows.go`。
+- 枚数尺（两把并排，⛔ 相加）：`-e 'ui-sta writes, boot reads: 295' -e 'so it is a Store'`
+  在 HEAD＝**2 命中**（`:104`、`:167`）；同尺在 `d5ef9cb9`＝**1 命中**（`:180` 那半句 `…so it is a Store` 已在，`ui-sta writes, boot reads: 295` 那一枚⛔ 存在）。
+- ★这两枚行号在 HEAD 仍然守得住（正控）＝`cmd/wisp/config_readers_255.go` 里按行号引本件 **5 枚**（`:256` ×1、`:257` ×4），
+  现量 `:256`＝`	ra.mutedAtBoot = c.Audio.MicMutedDefault`、`:257`＝`	ra.voiceEnabled = c.Voice.Enabled` ⇒ token 逐枚在场；
+  ⇒ 我的两枚变异**各自保持 425 行、逐字节同高**（尺＝`wc -l` 三枚 425/425/425），所以那枚"按行号取证"的旧仪器⛔ 会被我的变异打红（真红的话＝台面故障，⛔ 计入牙）。
+
+## 主张① "`-race` is not in the roster" ⇒ **成立**
+
+- 尺①（票面原尺，逐字）＝`grep -rn --include=*.sh --include=*.ps1 --include=*.yml -e '-race' scripts/ .github/`
+  ⇒ **0 命中**，`rc=1`（grep 自己的"无匹配"退出码），**stderr 0 行**（我先看了 stderr 才敢报 0）。分母＝该尺射程内 **15 枚**件（`find scripts/ .github/ -type f \( -name '*.sh' -o -name '*.ps1' -o -name '*.yml' -o -name '*.yaml' \)` 逐名已列，`ci.yml`／`slo-fresh.yml`／`d22scan.sh`／`winsec-tests.sh`／`portable-tests.sh`／`wisp-cli-tests.sh`… 全在其中）。
+- 正控①＝同一把尺把模式换成 `go test` ⇒ 命中 **7 枚**件 ⇒ 尺不是哑的。
+- 正控②（票面那句"不加 --include 只命中七枚二进制"复跑）＝`grep -rn -e '-race' scripts/ .github/` ⇒ **7 枚**，逐名全是 `scripts/spike/bin/*.exe`（goja-caps／model-residency／shell-baseline／speech-baseline／webview2-latency／xy-verdict-nocgo／xy-verdict）⇒ 二进制串，⛔ "有人在跑 race"。
+- 尺②（我把射程扩到派单⛔ 覆盖的那枚 CI 真正调用的测试入口）＝`grep -n -e '-race' tools/d22scan/runtests.sh` ⇒ **0 命中 rc=1**（该件 **223 行**；CI `run:` 第 82 行逐字 `bash tools/d22scan/runtests.sh -C tools/d22scan ./...` ⇒ 它确实在名册里）。
+- 尺③（防"用变量偷偷加 race"）＝`grep -rn GOFLAGS .github/workflows/*.yml scripts/*.sh scripts/*.ps1 tools/d22scan/runtests.sh` ⇒ **0 命中**；`grep -rniw race` 同射程 ⇒ **0 命中**（词级，⛔ 只查 `-race` 那一形）。
+- 尺④（名册到底有哪些发）＝`.github/workflows/ci.yml` 的 `run:` 步骤 **37 枚**，其中含 test 字样 **13 枚**，逐枚看：`runtests.sh`／`go run . -self-test`／`portable-tests.sh --scope=core|census|windows`／`winsec-tests.sh`／`wisp-cli-tests.sh`／`portable-tests-selftest.sh`／`slo-check.ps1`／`docker compose`——**一枚都⛔ 带 race**。
+- ⇒ "今天没有任何仪器看得见这枚跨线程读写"这句**成立**（且⛔ 因此可以不修，票面自己写了）。
+
+## 主张② "neighbour `levels` has been an atomic.Uint64 all along" ⇒ **成立**
+
+- 射程＝`cmd/wisp/resident_audio_windows.go` 的**全部 8 个 blob**（尺＝`git log --follow --format=%H -- <件>` ⇒ 8 枚，从引入笔 `5d407e77`（票 247-r1）到 `1c1d7df3`；⛔ 抽样）。
+- 逐枚尺＝`git show <c>:<件> | grep -nE '^	levels '` ⇒ **8/8 枚**都逐字是 `	levels atomic.Uint64`（行号 100／103／103／110／110／110／110／121 随注释高度漂，声明⛔ 漂）。
+- 反向尺＝`git log -S 'levels uint64' --oneline -- <件>` ⇒ **输出 0 行**（git rc=0，⛔ 是"无匹配"码，所以我只报行数＝0）。
+- 同族先例尺＝`atomic.Bool` 在改前锚 `0615c6c9` 的 `internal cmd` 射程＝**5 处**（panel_host_windows_test.go:42／panel_resident_windows.go:136／internal/audio/hotplug_test.go:85／internal/ball/ball_windows.go:132／live_guard_windows_test.go:69），HEAD＝**6 处**＝5＋本票那一枚 ⇒ 票面"全仓已有 5 处在用、照邻居做⛔ 新造规矩"**成立**。
+
+## 主张③ "toggleMute 跑在球的 ui-sta 线程上（see resident_ball_windows.go）" ⇒ **成立**（票面那几个**行号**已过期，句子本体逐字在）
+
+- 指路件真身：`cmd/wisp/resident_ball_windows.go` 里 `ui-sta` 命中 **8 行**（尺＝`grep -c ui-sta`）。逐字现量（HEAD）：
+  `:251-252` `// ball's global hotkeys on the ui-sta thread internal/ball owns (that thread is`／`// the ball's own Registry.Spawn with the frozen D38b resident name "ui-sta",`
+  `:488` `// ui-sta thread can never see a half-written handoff.`
+  `:525` `// Threading: callers are the boot goroutine and muteGesture, which runs ON the`（下一行接 ui-sta）
+  `:579` `// Threading, because it is not free: callbacks run ON the ui-sta thread and`
+  `:625` `// Callbacks run ON the ui-sta thread (Ball.fire calls them inline, and its`
+  ⇒ **票面"现量"节写的 `:245-246`／`:482`／`:501`／`:542` 全部过期**（同一把内容尺现量到 HEAD 的落点＝`:251-252`／`:488`／`:579`／`:625`，分别偏 **+6／+6／+78／+83** 行，别家腿在 295 立票之后动过那枚文件）。票面自己第一行就写了"⛔ 引用前先重跑，行号是快照"⇒ 我按内容锚判：**主张成立、行号过期**，具名给编排者（⛔ 我改票面一字）。
+- 机制链（⛔ 只信注释，三段都现跑）：
+  ① 注册＝`resident_ball_windows.go:327` `OnMuteHotkey: func() { rb.muteGesture("mute-hotkey") },` 与 `:331` `OnTrayMute: func() { rb.muteGesture("tray-mute") },`（＝两枚手势都进 `muteGesture`）。
+  ② `muteGesture`（`:593`）**同步**调那枚 fn＝`:605` `outcome, executed := fn()` ⇒ 没有换线程、没有起协程。
+  ③ 那枚 fn 就是 `raudio.toggleMute`＝`cmd/wisp/resident_windows.go:342` `rb.attachMuteGate(raudio.toggleMute)`（setter 本体 `resident_ball_windows.go:478`）。
+  ④ 线程归属在 `internal/ball` 侧：`internal/ball/ball_windows.go:170` `b.sta.handle = opts.Registry.Spawn("ui-sta", "ball", nil, func(_ context.Context) {` ⇒ `ui-sta` 是那枚冻结的 resident 名（D38b）；`fire` 定义在 `ball_windows.go:728`。
+- 与"boot 读"的**先后**（票面时序主张的复跑）：挂载＝`resident_windows.go:342`，唯一生产读＝`resident_windows.go:385` `fmt.Printf("wisp: 采集腿：%s\n", raudio.posture())`（⛔ 票面那两个号 `:303`／`:320` 亦过期，同一把内容尺现量）⇒ **342 早于 385** ⇒ "那几毫秒里有人按键就是未同步读写"在 HEAD 仍成立。
+
+## R9 台面归属（本腿自己的件，⛔ 记到别腿头上）
+
+- `git diff a92cd10f..HEAD -- cmd/wisp` ＝**0 行**（起手 HEAD `a92cd10f`，腿在飞期间别的腿入库到 `f1155198`／`d164e50e`／`8ef6b672`，全⛔ 碰 `cmd/wisp`）⇒ 我三发的代码面自始至终＝票 295 的最终形状。
+- 四枚件 工作树 sha256 ⇄ `git show HEAD:<件>` sha256 逐枚相等（尺见 gates 件），CR＝0/0/0/0 ⇒ 本腿⛔ 动过任何一字节（变异走 `-overlay`，仓外副本）。

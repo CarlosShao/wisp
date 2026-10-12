@@ -1,0 +1,47 @@
+# 295-v1 · 台面／还原／作废账（每一件自落 rc；⛔ 0 字节件）· 2026-10-12 16:4x +08
+
+## 1. 还原证明（变异走 `-overlay`，仓内字节⛔ 动过一根）
+
+- `git status --porcelain -- cmd/wisp` ⇒ **0 行**（16:04 起手／16:25 中途／16:44 收尾各一遍，三遍同值；rc 用 `rows=$(… | wc -l)` 落，⛔ 用管道尾的码）
+- 四枚件 工作树 sha256 ⇄ `git show HEAD:<件>` sha256（16:44 收尾现跑，逐枚相等）：
+  - `resident_audio_windows.go`＝`a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84`（⇄ HEAD 同值）
+  - `resident_mute_290_windows_test.go`＝`f5c4cb72d97a0f16953df15f15a19851f81a128025a3a3c9f0b0283ff49a9a83`（与腿 `logs/32` 记的同号 ⇒ 断言字节自 `d5ef9cb9` 起未再动）
+  - `resident_audio_247_windows_test.go`＝`e039066c024d54782a5ba97524c503e593cb7f2b7cff2200f897e003d5d4d6a1`（同号）
+  - `resident_audio_247_live_windows_test.go`＝`72d59193e558a54d21f3f…` 全号 `72d59193e558a54d21f645714f3fff7105c8ae8e8323e7b25023074b4f2c2aa4`（同号）
+- pristine 复跑（⛔ 变异后必须再来一发绿的）＝`focused-pristine3.txt` ⇒ 逐字 `--- PASS: TestAC290BothMuteGesturesTurnTheGateAndBack (0.01s)`／`ok github.com/CarlosShao/wisp/cmd/wisp 0.102s`，`rc=0`；整包那一发（`full-p.txt`）＝红名册与腿的 D 发**逐字同三枚**（见 `roster-diff-m1-p-m2.txt` §4）。
+
+## 2. 定向三发（快发，为差集提供"红在哪一行"的落点）
+
+| 发 | 台件（内容锚） | 逐字命令尾段 | 红句／绿句 | rc |
+|---|---|---|---|---|
+| focused pristine | 未变异 | `go test -count=1 -v -run TestAC290BothMuteGesturesTurnTheGateAndBack ./cmd/wisp/` | `--- PASS …(0.01s)`、`ok … 0.102s` | `rc=0` |
+| focused M1 | `_ = gate.Open()` | 同上 ＋ `-overlay=<根>/ov-m1.json` | `resident_mute_290_windows_test.go:125: … derived mirror says nothing is running while the gate is open`、`--- FAIL` | `RC=1` |
+| focused M2 | `ra.started.Store(true)` | 同上 ＋ `-overlay=<根>/ov-m2.json` | `resident_mute_290_windows_test.go:142: … (open=false started=true)`、`--- FAIL` | `RC=1` |
+
+⇒ 这两枚定向发同时是 AC#2 ⓑ（"手势不写"⇒ 指名红）与派单 §1 第 2 问（"恒真"⇒ 也红）的答案：**那枚断言⛔ 是恒真的假钉**。
+
+## 3. 〔作废〕具名（⛔ 把"我没看到"写成"跑过了"）
+
+1. **16:10:52 那一族三发〔作废〕**＝`focused-pristine.txt`／`focused-m1.txt`／`focused-m2.txt`：`GOTMPDIR` 指了**尚未存在的目录** ⇒ `go: creating work dir: GetFileAttributesEx …: The system cannot find the file specified.`，`RC=1`×3。那是**台面故障长得像红**，⛔ 计入任何一格；改因＝每发先 `mkdir -p` 专用根（此后各发件头都写 `mkdir -p before the shot`）。
+2. **16:11:11 那一族三发〔作废〕**（`focused-pristine2.txt` 留着逐字证据；另两枚件名 `focused-m1b.txt`／`focused-m2b.txt` 被 16:12 的有效重跑**覆盖**，所以那一形的作废只能凭本件记述＋pristine2 一枚件坐实）：PATH 我写成了 `D:/work/…` 正斜杠形 ⇒ 测试二进制起不来，逐字 `exit status 0xc0000135`（DLL 找不到），`RC=1`×3、包级行照打 `FAIL github.com/CarlosShao/wisp/cmd/wisp 0.059s`＝**台面故障长得像红**。改因＝换成 MSYS 形 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`（腿与编排者用的那一形），随后 `focused-pristine3.txt` 回到 `rc=0`。⚠ 两枚作废合起来是本腿自己踩的台面坑，⛔ 反映落地腿的读数。
+3. **16:13:01–16:20 那一族整包发〔作废〕**＝`logs/full-.txt`（39,882 字节残留，⛔ 删）：驱动脚本把 `local tag=… raw="…$tag…"` 写在同一行 ⇒ `$tag` 在 `local` 里**尚未生效**，三发共用一个件名互相截断；且那次的包装 bash 被我 `Stop-Process` 后子进程（`go test`/`wisp.test.exe`）继续活了一段，归属尺靠 `ExecutablePath` 里的 `…\295v1-20261012-160949-1256\w-…\b001\wisp.test.exe` 认出＝**我自己的**，逐 `pid`（12636→28360/26324）具名停掉。⇒ 那一族的色**⛔ 用作任何判语**；三发重跑＝本件 §4。
+4. **`git diff-tree -r --name-only --no-renames` 一次传四枚 commit**〔作废〕＝输出 **0 行**（那把尺在多功能参数下是哑的），改回逐笔循环后得到 19/6/4/15 枚名册（见 `20-review-cells.md` AC#3）。
+5. **`Get-CimInstance -Filter` 内联形**〔作废〕＝bash 的单引号被吃掉 ⇒ PowerShell 报 `Invalid query` 而 `.Count` 仍打 **0**＝**假 0**（stderr 明写在打架）；改成品名册脚本 `-File` 形（`procnames.ps1`，留专用根，⛔ 进仓因它带机器路径），随后的 0 才有分母。
+6. **`git grep … | cat; echo $?`**〔作废〕＝那枚 `rc` 是 `cat` 的（恒 0），⛔ 是 grep 的；改正为 `git grep … > 文件 2>错误文件; rc=$?` ⇒ 裸赋值尺＝`rc=1 stdout 0 行 stderr 0 行`。
+
+## 4. 三发整包（重跑后的有效三发）
+
+| 发 | 起止（`date` stdout） | HEAD 起⇄止 | 包级逐字 | GO_TEST_RC |
+|---|---|---|---|---|
+| M1 整包 | 16:20:55 → 16:28:04 | `8ef6b672` ⇄ `8ef6b672` | `FAIL … cmd/wisp 426.067s` ⇄ `ok … internal/audio 16.349s` | 1 |
+| pristine 整包 | 16:28:04 → 16:34:44 | `8ef6b672` ⇄ `8ef6b672` | `FAIL … cmd/wisp 396.871s` ⇄ `ok … internal/audio 16.549s` | 1 |
+| M2 整包 | 16:34:45 → 16:41:30 | `8ef6b672` ⇄ `a323b149` | `FAIL … cmd/wisp 402.673s` ⇄ `ok … internal/audio 16.003s` | 1 |
+
+⚠ 时长（396.871s／426.067s／402.673s）⛔ 当凭据（同屏别腿在跑 `./internal/winsec/…`，编排者自己那一发 391.536s）；凭的只有名册与红句。
+码面同一性尺＝`git diff --numstat 8ef6b672..HEAD -- cmd/wisp`＝0 行、`git diff --numstat a323b149..HEAD -- cmd/wisp`＝0 行、`git diff --numstat 421469b7..HEAD -- cmd/wisp`＝0 行。
+
+## 5. 家族尺（读数前后各一遍）
+
+- 跑前（16:11 现跑，正控分母同批）：`wisp.exe`＝**0**、`balldebug.exe`＝**0**（`tasklist //FI "IMAGENAME eq …"` 逐字 `INFO: No tasks are running…`）、`@(Get-CimInstance …).Count` 形＝`testexe_count=0`／`goexe_count=0`，分母 `denom_all=350`（另一次 `all_process_count=349`、`with_executablepath_count=184`）。
+- 中途（我停掉自己那枚作废发时）：`goexe_count=1/2/3` 逐名带命令行，归属＝命令行里的具名根 `295v1-…` ⇄ 别腿的 `orch-298ac4-…`／`./internal/winsec/…`（⛔ 记成我的残留、⛔ 抢那一格 `cmd/wisp` 色）。
+- 收尾（16:44）：`git status --porcelain -- cmd/wisp`＝0 行；专用根里三发原始日志与两枚变异体副本**只建不删**。

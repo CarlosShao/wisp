@@ -1,0 +1,82 @@
+# 295-v1 · 整包红名册差集（pristine ⇄ M1 删写 ⇄ M2 恒真）· 三发同台面同码面 · 2026-10-12 16:4x +08
+
+## 0. 三发是什么（⛔ 绝对行号当锚，全部用内容锚）
+
+台件＝`cmd/wisp/resident_audio_windows.go` 工作树未动一字，变异走 `go test -overlay`（副本在仓外专用根）。
+两枚变异体各自**保持 425 行**（与 pristine 同高），逐字节只差那一枚语句 ⇒ 票 255 那把"按行号取证"的旧仪器三发全绿（见 §4）。
+
+| 发 | 内容锚（`toggleMute` 体内那一枚镜像写） | 逐字命令（三发只差 overlay 与专用根名） | rc |
+|---|---|---|---|
+| pristine | `	ra.started.Store(gate.Open())`（未变异） | `GOTMPDIR="<根>/w-p" PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v ./cmd/wisp/ ./internal/audio/` | `GO_TEST_RC=1` |
+| M1 删写 | 同一枚换成 `	_ = gate.Open() // 295-v1 MUT-M1 …`（＝票面 ⓑ 那一形：boot 写过、手势路径不再更新） | 同上 ＋ `-overlay="<根>/ov-m1.json"` | `GO_TEST_RC=1` |
+| M2 恒真 | 同一枚换成 `	ra.started.Store(true) // 295-v1 MUT-M2 …` | 同上 ＋ `-overlay="<根>/ov-m2.json"` | `GO_TEST_RC=1` |
+
+- 专用根＝`C:\Users\swq\AppData\Local\wisp-test-gotmp\295v1-20261012-160949-1256`（**C: 卷**，⛔ 换卷；每发先 `mkdir -p` 再指 `GOTMPDIR`）
+- 三发的码面同一性＝`8ef6b672`（m1/p 全程）⇄ `a323b149`（m2 收尾）；尺＝`git diff --numstat 8ef6b672..HEAD -- cmd/wisp`＝**0 行**、`git diff --numstat a323b149..HEAD -- cmd/wisp`＝**0 行**、`git diff --numstat 421469b7..HEAD -- cmd/wisp`＝**0 行** ⇒ 三发量的都是票 295 落地那四笔的**最终形状**（`421469b7` 那版），⛔ 掺别家的 `cmd/wisp` 改动。
+- 变异体哈希（留档可复核，⛔ 与还原后的号相同）：M1 sha256=`53d0caf0616e6175d72393069f5d75f58c5955ce6e567694c947158a812d7507`（425 行）／M2 sha256=`a6369dd72d2366db6af21aec0aaed244021312e5e2daca867fff507fd593c6a1`（425 行）／pristine sha256=`a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84`（425 行）。
+- 原始日志（在专用根，⛔ 进仓因体量；行数与哈希在此可核）：`logs/full-p.txt` 2,257 行 sha256=`2c04b15b…d4be6f19`／`logs/full-m1.txt` 2,252 行 sha256=`a2dbc51f…c11b0185a`／`logs/full-m2.txt` 2,255 行 sha256=`83a41432…ad55b513`。
+
+## 1. 两把名册尺并排（⛔ 相加、⛔ 互替）
+
+| 发 | A 尺＝含子测试的状态行（`grep -E '^[[:space:]]*--- (PASS\|FAIL\|SKIP): '`，stderr 0 行） | 本仓口径计数（`grep -c -- '--- PASS'` 等） | B 尺＝只数顶层（行首无缩进） | 包级逐字行 |
+|---|---|---|---|---|
+| pristine | **455 行** | PASS=450 FAIL=3 SKIP=2 RUN=456 | PASS=328 **FAIL=3** SKIP=2（子项 122 行） | `FAIL github.com/CarlosShao/wisp/cmd/wisp 396.871s` ⇄ `ok github.com/CarlosShao/wisp/internal/audio 16.549s` |
+| M1 | **455 行** | PASS=450 FAIL=3 SKIP=2 RUN=456 | PASS=328 **FAIL=3** SKIP=2（子项 122 行） | `FAIL … cmd/wisp 426.067s` ⇄ `ok … internal/audio 16.349s` |
+| M2 | **455 行** | PASS=448 FAIL=5 SKIP=2 RUN=456 | PASS=326 **FAIL=5** SKIP=2（子项 122 行） | `FAIL … cmd/wisp 402.673s` ⇄ `ok … internal/audio 16.003s` |
+
+⚠ 两把尺的总数一样（455）而"红了几枚"不一样（顶层那把 3/3/5＝本仓那三枚真窗红都在顶层；含子测试那把同值是因为本票翻动的那两枚也都在顶层）⇒ 报"几枚红"必须同时说哪把尺。
+
+## 2. ★票面 ⓔ-2 那句"其余 7 枚读点对这枚变异不敏感"＝**第一次被跑，而不是被读码推**
+
+逐名状态（同一发里取，三发并排；`NONE` 本表未出现）：
+
+| 读点（ⓓ-2 编号＝腿的名册） | 承载它的用例 | pristine | M1 删写 | M2 恒真 |
+|---|---|---|---|---|
+| #1 | `TestAC247VoiceDisabledBuildsNoCollector` | PASS | PASS | PASS |
+| #2 | `TestAC247DefaultConfigArmsTheGateMutedAndOpensNoDevice` | PASS | PASS | PASS |
+| #3 | `TestAC247DeviceFailureShapesStillBootAndSayTheLoss`（＋子项 `/occupied` `/permission_denied` `/no_device`） | PASS／3 子项全 PASS | PASS／3 子项全 PASS | PASS／3 子项全 PASS |
+| #4 | `TestAC247LiveMicrophoneLevelsReachTheBallSeam` | **SKIP** | **SKIP** | **SKIP** |
+| #5 #6 #7 | `TestAC290BothMuteGesturesTurnTheGateAndBack` | PASS | **FAIL** | **FAIL** |
+| #8 | `TestAC290OutcomeIsReadOffTheGateNotOffTheRequest` | PASS | PASS | **FAIL** |
+| （不占读点） | `TestAC290MutedDefaultStillDecidesTheBoot` | PASS | PASS | PASS |
+
+⇒ **M1 那一发翻色的只有 #5/#6/#7 那一枚用例**＝"其余 7 枚读点不敏感"**成立**（6 枚实测同色 ＋ #4 那一枚仍⛔ 读数＝SKIP，理由逐字＝`resident_audio_247_live_windows_test.go:130: AC#2 needs a real microphone: run with WISP_LIVE_MIC=1 after both tasklist rulers read 0`；本腿⛔ 设 `WISP_LIVE_MIC`（真机归机主）⇒ 腿的欠账 `Q-295-r1-live-skip` **照旧成立、本腿没销掉它**）。
+⇒ **★新读数（腿没量到过的）：#8 对"恒真"那一形有牙。** 腿的 M2 只跑了 `-run TestAC290BothMuteGestures…` 定向发 ⇒ `TestAC290OutcomeIsReadOffTheGateNotOffTheRequest` 在恒真下也**会红**（逐字红句 `resident_mute_290_windows_test.go:175: the leg's derived mirror says capture is running over a refused device`）这一条历史上无人跑过。⇒ "守 `started` 的用例实际只有 1 枚有牙"这句**只对"删写"方向成立**；对"恒真"方向是 **2 枚**。
+
+## 3. 名册作差（同行落盘；尺＝抽 `--- (PASS|FAIL|SKIP): 名` 去时长、sort，再 `diff`／`comm -3`）
+
+pristine(455) ⇄ M1(455) 的逐行差＝**4 行**（＝两枚用例翻了色，⛔ 更多）：
+
+```
+3c3
+< FAIL TestAC4FocusReturnToPriorWindowGap33r5      (pristine)
+> FAIL TestAC290BothMuteGesturesTurnTheGateAndBack (M1)
+81d80
+< PASS TestAC290BothMuteGesturesTurnTheGateAndBack (pristine)
+134a134
+> PASS TestAC4FocusReturnToPriorWindowGap33r5      (M1)
+```
+
+- 由 M1 **翻红**的＝1 枚＝`TestAC290BothMuteGesturesTurnTheGateAndBack`；逐字红句（`logs/full-m1.txt` 第 1,369 行）＝
+  `    resident_mute_290_windows_test.go:125: mute-hotkey: the leg's derived mirror says nothing is running while the gate is open`
+  ⇒ 与腿在 `d5ef9cb9` 形状上量到的那枚断言**同一枚**（内容锚＝`if !ra.started.Load() {` 的下一行 `t.Fatalf`）⇒ ⓔ-1 的预判在**最终形状**上复现。
+- 由 M1 **翻绿**的＝1 枚＝`TestAC4FocusReturnToPriorWindowGap33r5`＝台账 `docs/reports/pending-and-issues.md:14768` 具名的"真窗族按 4↔5 会漂"那一枚（腿自己 D/E 两发的红名册差就是它，编排者那一发也在）⇒ **与变异⛔ 相关＝本仓既有 flake**，⛔ 计入牙、⛔ 算新增红。
+- pristine ⇄ M2 的逐行差＝**4 行**＝翻红 2 枚（`TestAC290Both…` 红在 `:142`；`TestAC290Outcome…` 红在 `:175`）＋ pristine 侧的 PASS 行 2 枚；M2 里 `:142` 逐字＝`mute-hotkey: capture stayed handed over after muting (open=false started=true)`＝**⛔ 恒真：这一枚断言真的会红**（本票最该被抓的那枚"假钉"**没抓到，因为它不成立**）；两枚布尔打成裸 `true`/`false`、花括号尺 `grep -c -e 'started={' -e 'started= {' logs/full-m2.txt`＝**0 命中**（分母 2,255 行）⇒ `%t` 参数位那处（ⓓ-2 #7）成立。
+
+## 4. 三发红名册（逐名；这就是 AC#4 的色）
+
+```
+pristine(3)：TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+             TestAC14GoSideEvalPushReachesThePage
+             TestAC4FocusReturnToPriorWindowGap33r5
+M1(3)      ：TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+             TestAC14GoSideEvalPushReachesThePage
+             TestAC290BothMuteGesturesTurnTheGateAndBack          ← 变异翻红
+M2(5)      ：TestAC13ColdStart…  TestAC14GoSideEvalPush…  TestAC4FocusReturnToPriorWindowGap33r5
+             TestAC290BothMuteGesturesTurnTheGateAndBack          ← 变异翻红
+             TestAC290OutcomeIsReadOffTheGateNotOffTheRequest     ← 变异翻红（腿未量过）
+```
+
+- 对腿交的工作树两发（`logs/44-post-worktree-runD.txt`＝顶层 FAIL 3／`logs/45-post-worktree-runE.txt`＝4）：本腿 pristine 那三枚**逐字＝D 那一发的三枚**（多 0 枚、少 0 枚）；E 多的那一枚 `TestTicket223HandEditedFsLooseningCostsAnL2Card` 本腿三发**全 PASS**＝腿自己 §2 具名的审批卡片 flake（`config_reload_223_test.go:406`）。⇒ AC#4 的色**与腿与编排者三方面一致**。
+- `internal/audio` 三发逐字 `ok … 16.003s—16.549s`＝0 红 0 跳 ⇒ 签名级回归那半也闭合（⛔ 本票写面，票面 `AC#4` 原样维持）。
+- 票 255 的行证仪器三发全绿：`grep -cE '^[[:space:]]*--- FAIL: TestTicket255' ` 对三发＝**0/0/0**（0 旁边站分母＝名册 455 行里 `TestTicket255*` 有**顶层 20 枚／含子项 34 行**，全部 PASS），含那枚按行号引本件的 `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim`。⇒ 我的等高变异形⛔ 惊动它（腿在 `d5ef9cb9` 那版净 +19 行时它红过＝腿的 `1c1d7df3` 已销，见 `20-review-cells.md`）。
