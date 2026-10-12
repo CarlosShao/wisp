@@ -1,0 +1,55 @@
+# 派单存档：`299-r1`（票 299 `AC#1` 落地＝让面板页面的 js/css 在运行时取得到）｜2026-10-13 08:0x｜编排者
+
+## 0. 一句话任务
+
+**让面板窗口里那张页面真的能取到自己的 `./assets/*.js` 与 `./assets/*.css`。** 今天它取不到：页面按相对 URL 发请求，宿主上没有任何注册方 ⇒ 屏上**纯白**（票 299 `AC#1` 那句完成判据逐字＝"截图里要出现页面自己的文本节点"，今天不满足）。
+
+## 1. ★今天（2026-10-13 07:5x）我自己现读的五条——旧账说"对象拿不到"，今天量出来的是**它拿得到的路在另一枚包里**
+
+| # | 读数（逐字带位置） | 尺 |
+|---|---|---|
+| ① | 依赖＝`github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808` | `grep -n webview go.mod`＝`:8`；`go list -m all` 同一行 |
+| ② | 注册所需的**回调字段是导出的**：`WebResourceRequestedCallback func(request *ICoreWebView2WebResourceRequest, args *ICoreWebView2WebResourceRequestedEventArgs)` | module cache `pkg/edge/chromium.go:42`；它的调用点 `:286-287`（handler `:281`） |
+| ③ | 注册方法也是导出的：`func (e *Chromium) AddWebResourceRequestedFilter(filter string, ctx COREWEBVIEW2_WEB_RESOURCE_CONTEXT)` | 同件 `:292` |
+| ④ | **`Chromium` 有导出构造函数**：`func NewChromium() *Chromium`；`Embed(hwnd uintptr) bool` 会把消息泵到"环境＋controller 都建好"才返回（我读过它体内那个 `for { GetMessage… }` 循环 `:96-111`）；另有导出的 `Navigate`／`NavigateToString`／`Init`／`Eval`／`Show`／`Hide`／`Focus`／`GetController`／`Environment`／`NotifyParentWindowPositionChanged` | 同件 `:47`／`:72-113`／`:116-160`／`:299`／`:328` |
+| ⑤ | ⚠ **包装层不交出那枚对象**：`type webview struct`（非导出）把 `*edge.Chromium` 存在**非导出字段** `browser browser` 里（`NewWithOptions` 里 `chromium := edge.NewChromium(); … w.browser = chromium`），14 枚导出方法里没有 getter | module cache `webview.go:49-60`／`:97-110`／`:263-478` 全表读过 |
+
+⇒ **结论（本派单的形状由此而定）**：旧账"甲形不可达"**只对"走包装层注册"这一支成立**；**`pkg/edge` 那一层全导出**，所以甲形今天**走得通**，代价是**面板宿主自己驱动 WebView2**（自建窗＋自泵＋自带桥），⛔ 不动 `go.mod`、⛔ 不动依赖、⛔ 不用任何语言层手段绕封装。
+
+## 2. 要落成什么形状（甲′，逐条都是硬要求）
+
+1. **面板宿主自己建窗、自己嵌 controller**：把现在 `webview2.NewWithOptions(...)` 那一跳换成"自己 `CreateWindowEx` 一个窗 → `c := edge.NewChromium()` → `c.MessageCallback = …` → `c.Embed(hwnd)`"。窗口类/WndProc/`WM_CLOSE`/`WM_APP` 那一族按今天现读的语义**等价**搬（⛔ 丢行为）。
+2. ★**必须把页面导航到一枚"合成源"URL，⛔ 只挂过滤器**：今天的供页是 `w.SetHtml(bytes)` ⇒ 文档基＝`about:blank`（票面现量第 5 条已录），而**相对 URL 在 `about:blank` 基上根本解析不出请求** ⇒ 光注册过滤器什么都拦不到。落地形＝`c.AddWebResourceRequestedFilter("https://wisp.panel/*", edge.COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL)` ＋ 回调里**按前缀把所有请求都从内存喂回去** ＋ `c.Navigate("https://wisp.panel/index.html")`。⚠ 这**不是**起 HTTP 服务：没有 listener、没有端口，请求在进程内被过滤器应答（D29 逐字禁的"localhost HTTP 服务"那条⛔ 碰）。
+3. **字节的唯一来源**＝`internal/panel` 现有的 `Assets.Resolve(requestPath)`（第二返回值就是 content type）＋它的 `contentTypeOf`。⛔ 自己拼 content type、⛔ 新造第二枚资源真相源、⛔ 改 `Assets.Check()` 的语义。
+4. **供页次序⛔ 动**（票 33 `AC#13` 已落地那一发：冷启动探测页 → 真页面的交接次序）；**Go→页面投递语义⛔ 破**（票 33 `AC#14`：`Dispatch` 队列只有泵能 drain ⇒ 你自建的那枚泵必须把队列 drain 到，⛔ 只投不用 `Eval` 就算完）。
+5. **对外行为等价**：`PanelManager` 现有一切方法（`IsCreated`／`IsShown`／`LastColdMs`／`LastHotMs`／`SetSize`／`Show`／`Hide`／窗口句柄／`bringUp` 的冷启动计时口径）**签名与语义⛔ 变**；同包测试里那些行号/内容锚（票 255 那把"按行号取证"的仪器）⛔ 让它们红——**改完先跑一遍 `cmd/wisp` 整包**看有没有既有红增多。
+6. **先把便宜的路验一次**（一枚 grep 的成本）：`grep -n 'func (w \*webview)' <module cache>/webview.go` 里**有没有**任何一枚把 chromium/controller 交出来的导出方法（我读的表里没有；如果你找到了一枚，走那枚＝更省，但要在判语里把它的逐字签名与行号落下来）。
+
+## 3. 判据（⛔ 拿"注册被调用过"当凭据）
+
+- **`AC#2` ⓐ 由页面自己报**："我的 js 与 css 都到了"必须来自**页面**（先例＝票 33 `AC#14` 的页面自报形、账 `A502`），断言的是**页面报回来的内容**。
+- **`AC#2` ⓑ 反控**：把注册那一跳**摘掉**（或注释掉）⇒ 同一条判据必须**回到白屏/变红**。⚠ 先证"坏世界真被造出来"（票 311 那条定式的反面用法：反控那发的坏世界＝没有过滤器 ⇒ 页面取不到资源），⛔ 拿"没红"当"防住了"。
+- **`AC#4` 门禁**：`GOFLAGS= go build ./...` rc=0；`sh scripts/d22scan.sh` rc=0；`sh scripts/check-path-length-budget.sh --with-self-test` GREEN；格式两把尺并排（工作树＋**仓外** blob，新增 0 枚）；`go test ./cmd/wisp/ ./internal/panel/ -count=1` 的**红名册差集**（逐名，改前⇄改后）——既有那几枚真窗红⛔ 增多。
+- **长跑注意**：`go test ./cmd/wisp/` 整包**约 6.5–7 分钟**一发；本仓有一枚用例会在"同会话里已有开发版 `wisp.exe` 在跑"时红（先例 `A784`）⇒ 跑前 `tasklist` 现查 `wisp.exe`／`wisp.test.exe`／`balldebug.exe`＝0，跑完再查一遍并把两把读数写进件里。
+
+## 4. 禁区（一条违反＝退回）
+
+- ⛔ 动 `go.mod`／`go.sum`／`.gitignore`／`design/**`／`frontend/**` 一字（含那枚冻结的 CSP `<meta>`）；⛔ 给依赖打 fork／`replace`；⛔ 用 `unsafe` 反射读私有字段（这条我单独点名：那条路今天存在，但它是"绕封装"，⛔ 采）。
+- ⛔ 起 HTTP listener／开端口；⛔ 连网；⛔ 新造协程（D38(b) 名册零膨胀）；⛔ 裸 `go func(`（ban #1）。
+- ⛔ 碰 `internal/winsec/**`、⛔ 动 SLO 阈值/golden/`thresholds.go`/`allowlist.txt`/D43／C1–C32／D1–D47、⛔ 动三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。
+- ⛔ 翻任何票框、⛔ 碰 `Status:` 行、⛔ 给票改名；⛔ 动 `.scratch/wisp/issues/**` 除票尾那一刻（见下）。
+- git：只 commit ⛔ push；`add` 与 `commit` **两处都带显式 pathspec**；⛔ `add -A`／`add <目录>`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内建 worktree；临时件只建⛔ 删（只建在自己 `probes/299/r1/**`）。
+- 证据件⛔ 叫 `.out`；⛔ 在 `probes/**` 下建 `.go`；件名⛔ 带 `§`⛔ 长名（相对 ≤121／末段 ≤100／全路径 ≤165，新建前先跑长度门）；⛔ 提交任何 `.png`（本仓公开，整屏图里带机主别的窗口）。
+
+## 5. 写面与并发
+
+- 写面＝`cmd/wisp/panel_host_windows.go`（＋同包新文件，若拆）＋`cmd/wisp/*_test.go`（同包测试）＋自家 `.scratch/wisp/probes/299/r1/**`＋票 299 末尾**恰好 1 条** Progress-log bullet（1 加／0 删）。
+- ★**此刻编排者本人正在跑一枚整包复跑**（`./cmd/wisp/ ./internal/audio/` 三发，约 25 分钟，`wisp.test.exe` 会在盘上出现）⇒ **你开工先读码、设计、写判语骨架**；要跑整包时先 `tasklist` 现查 `wisp.test.exe`＝0 再跑，⛔ 与我的那三发并发（会互相拖慢 + 时序敏感用例会假红）。
+- ⛔ 起 `wisp.exe`／`balldebug.exe` 长驻（你的测试自己要起子进程是测试的事；⛔ 手工起）。
+
+## 6. 交件与输出预算
+
+- 判语件 **4 枚**（自家目录）：`10-reachability.md`（§1 五条你自己重跑一遍＋那枚 getter grep 的结论）、`20-design.md`（§2 六条的落地设计：窗口/泵/合成源/过滤器/桥/收尾，逐条写你**实际**怎么落的）、`30-teeth.md`（`AC#2` ⓐⓑ 两发＋红句逐字＋反控那一发）、`40-gates.md`（`AC#4` 全表，每把尺自带 `rc=` 行）。
+- `logs/` 每发仪器件逐字自带 `workdir=`／`command_line=`／尾行 `rc=N`；0 字节件＝那格没交；`grep -c` 命中 0 会截断 `&&` ⇒ `N=$(… || true)`。
+- 每个"0 命中"旁站**分母**；每个数带**尺名＋射程＋provenance**（工作树 ⇄ `git show HEAD:` blob ⇄ module cache）。
+- **120 轮上限**；撞帽之前把已量到的落盘＋commit。⛔ 为了"写完"把没跑过的写成跑过——本仓最重的一种错。
