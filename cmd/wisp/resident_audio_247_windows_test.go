@@ -110,7 +110,7 @@ func TestAC247VoiceDisabledBuildsNoCollector(t *testing.T) {
 	if ra.gate != nil || ra.mic != nil {
 		t.Fatal("voice.enabled=false still built a capture stack")
 	}
-	if ra.started {
+	if ra.started.Load() {
 		t.Fatal("a leg with no collector reports itself running")
 	}
 	if tap.count() != 0 {
@@ -152,7 +152,7 @@ func TestAC247DefaultConfigArmsTheGateMutedAndOpensNoDevice(t *testing.T) {
 	if ra.gate.Open() {
 		t.Fatal("the gate handed the device to the capture thread at the default")
 	}
-	if ra.started {
+	if ra.started.Load() {
 		t.Fatal("posture claims a running capture leg with the gate muted")
 	}
 	if st := ra.mic.Stats(); st.FramesSent != 0 || st.BytesSent != 0 {
@@ -253,7 +253,7 @@ func TestAC247DeviceFailureShapesStillBootAndSayTheLoss(t *testing.T) {
 			if ra.gate == nil {
 				t.Fatal("a failed device stopped the assembly from returning")
 			}
-			if ra.started {
+			if ra.started.Load() {
 				t.Fatal("posture claims the capture leg is running over a failed device")
 			}
 			if !strings.Contains(ra.verdict, tc.wantClass) {

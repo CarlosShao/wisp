@@ -1,0 +1,212 @@
+# AC#2 ⓐ/ⓒ pristine（未变异）那一发 — captured 2026-10-12 14:44:18 +0800
+台面＝共享工作树（改后），GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a（C: 卷）
+尺＝跑前家族尺：
+dotnet-test-family-process-count=1
+pid=28152 name=wisp.test
+command 1（逐字）= GOTMPDIR="C:\Users\swq\AppData\Local/wisp-test-gotmp/295r1-20261012-144418-3908-ac2a" PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:/d/work/workspace/projects plans/Wisp/build:$PATH" go test -count=1 -v -run TestAC290BothMuteGesturesTurnTheGateAndBack ./cmd/wisp/
+start 14:44:18
+time=2026-10-12T14:44:24.343+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC290BothMuteGesturesTurnTheGateAndBack
+time=2026-10-12T14:44:24.357+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC290BothMuteGesturesTurnTheGateAndBack1308125789\001\config.toml path=T
+time=2026-10-12T14:44:24.357+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball mute-hotkey: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T14:44:24.357+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball mute-hotkey: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+time=2026-10-12T14:44:24.357+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=tray-mute outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball tray-mute: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T14:44:24.357+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=tray-mute outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball tray-mute: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+time=2026-10-12T14:44:24.358+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:24.358+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:24.358+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:24.358+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:44:24.358+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:24.358+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:24.358+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290BothMuteGesturesTurnTheGateAndBack (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.087s
+GO_TEST_RC=0
+--- 第二发：started 全部读点的用例族（ⓐ 全绿照跑）
+command 2（逐字）= GOTMPDIR="C:\Users\swq\AppData\Local/wisp-test-gotmp/295r1-20261012-144418-3908-ac2a" ... go test -count=1 -v -run 'TestAC247|TestAC290|TestLive' ./cmd/wisp/
+time=2026-10-12T14:44:27.281+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC247LiveMicrophoneLevelsReachTheBallSeam
+    resident_audio_247_live_windows_test.go:130: AC#2 needs a real microphone: run with WISP_LIVE_MIC=1 after both tasklist rulers read 0
+--- SKIP: TestAC247LiveMicrophoneLevelsReachTheBallSeam (0.00s)
+=== RUN   TestAC247ShippedDefaultsAreTheOnesThisLegReads
+--- PASS: TestAC247ShippedDefaultsAreTheOnesThisLegReads (0.00s)
+=== RUN   TestAC247VoiceDisabledBuildsNoCollector
+time=2026-10-12T14:44:27.295+08:00 level=INFO msg="audio: capture leg not built" reason="voice.enabled=false" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC247VoiceDisabledBuildsNoCollector3543811102\001\config.toml
+wisp: 麦克风采集腿未构造（[voice] enabled=false，来源 C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC247VoiceDisabledBuildsNoCollector3543811102\001\config.toml）：球不会收到任何电平，本进程其余部分照常
+time=2026-10-12T14:44:27.296+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.296+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.296+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.296+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-12T14:44:27.296+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.296+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.296+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247VoiceDisabledBuildsNoCollector (0.01s)
+=== RUN   TestAC247DefaultConfigArmsTheGateMutedAndOpensNoDevice
+time=2026-10-12T14:44:27.315+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC247DefaultConfigArmsTheGateMutedAndOpensNoDevice4137045569\001\config.toml path=T
+time=2026-10-12T14:44:27.316+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.316+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.316+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.316+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:44:27.316+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.316+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.316+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247DefaultConfigArmsTheGateMutedAndOpensNoDevice (0.02s)
+=== RUN   TestAC247UnmuteReachesTheBallSeam
+time=2026-10-12T14:44:27.321+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC247UnmuteReachesTheBallSeam588378131\001\config.toml path=T
+time=2026-10-12T14:44:27.322+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.322+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.322+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.322+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=2 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=2 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:44:27.322+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.322+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.322+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247UnmuteReachesTheBallSeam (0.01s)
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/occupied
+time=2026-10-12T14:44:27.328+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+time=2026-10-12T14:44:27.328+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-10-12T14:44:27.328+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.328+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.328+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.328+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device
+time=2026-10-12T14:44:27.328+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.328+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.328+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/permission_denied
+time=2026-10-12T14:44:27.334+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+time=2026-10-12T14:44:27.334+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-10-12T14:44:27.334+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.334+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.334+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.334+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Built-in Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone
+time=2026-10-12T14:44:27.334+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.334+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.334+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+=== RUN   TestAC247DeviceFailureShapesStillBootAndSayTheLoss/no_device
+time=2026-10-12T14:44:27.341+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)"
+time=2026-10-12T14:44:27.341+08:00 level=ERROR msg="audio: capture device unavailable" class=audio_device err="audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)" posture="boot continues, no state pushed"
+wisp: 麦克风不可用（错误分类 audio_device）：audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)
+wisp: 这一条不推状态、也不拒绝启动：D43 的 EvAudioDeviceLost 只有从 Listening 出发的合法边，启动期没有；票 128 只定了「没有数据根」这一种拒绝启动
+time=2026-10-12T14:44:27.341+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.341+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.341+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.341+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Gone Headset (0x88890004): device invalidated (unplugged or disabled)
+time=2026-10-12T14:44:27.341+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.341+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.341+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss (0.02s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/occupied (0.01s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/permission_denied (0.01s)
+    --- PASS: TestAC247DeviceFailureShapesStillBootAndSayTheLoss/no_device (0.01s)
+=== RUN   TestAC247CaptureLegOwnsStepFourOfTheFrozenOrder
+time=2026-10-12T14:44:27.346+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC247CaptureLegOwnsStepFourOfTheFrozenOrder850976668\001\config.toml path=T
+time=2026-10-12T14:44:27.346+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.346+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.346+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.346+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:44:27.346+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.346+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.346+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247CaptureLegOwnsStepFourOfTheFrozenOrder (0.01s)
+=== RUN   TestAC247HandingTheLevelToTheSeamIsNotVisibility
+time=2026-10-12T14:44:27.353+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC247HandingTheLevelToTheSeamIsNotVisibility2308940282\001\config.toml path=T
+    resident_audio_247_windows_test.go:372: AC#10 reading: PrototypeVisualsEnabled()=false levels_reaching_the_ball_seam=1 (a number arriving is not a pixel moving)
+time=2026-10-12T14:44:27.354+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.354+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.354+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.354+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=1 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=1 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:44:27.354+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.354+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.354+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC247HandingTheLevelToTheSeamIsNotVisibility (0.01s)
+=== RUN   TestAC290BothMuteGesturesTurnTheGateAndBack
+time=2026-10-12T14:44:27.359+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC290BothMuteGesturesTurnTheGateAndBack2594907923\001\config.toml path=T
+time=2026-10-12T14:44:27.359+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball mute-hotkey: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T14:44:27.359+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball mute-hotkey: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+time=2026-10-12T14:44:27.359+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=tray-mute outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball tray-mute: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T14:44:27.359+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=tray-mute outcome=已静音：采集已关闭，设备未打开（再按一次取消静音）
+wisp: ball tray-mute: 已静音：采集已关闭，设备未打开（再按一次取消静音）
+time=2026-10-12T14:44:27.360+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.360+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.360+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.360+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:44:27.360+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.360+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.360+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290BothMuteGesturesTurnTheGateAndBack (0.01s)
+=== RUN   TestAC290OutcomeIsReadOffTheGateNotOffTheRequest
+time=2026-10-12T14:44:27.366+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC290OutcomeIsReadOffTheGateNotOffTheRequest600369828\001\config.toml path=T
+time=2026-10-12T14:44:27.367+08:00 level=ERROR msg="audio source failed" source=gate-T error="audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+time=2026-10-12T14:44:27.367+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音但设备未交接（gate 未 open，错误分类 audio_device）：audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone；球不会收到电平"
+wisp: ball mute-hotkey: 已取消静音但设备未交接（gate 未 open，错误分类 audio_device）：audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone；球不会收到电平
+time=2026-10-12T14:44:27.369+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.369+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.369+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.369+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0 last_error=audio_device: capture open on device Blocked Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone
+time=2026-10-12T14:44:27.369+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.369+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.369+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290OutcomeIsReadOffTheGateNotOffTheRequest (0.01s)
+=== RUN   TestAC290NoGateSaysWhichShapeThisProcessIsIn
+time=2026-10-12T14:44:27.373+08:00 level=INFO msg="audio: capture leg not built" reason="voice.enabled=false" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC290NoGateSaysWhichShapeThisProcessIsIn4285550741\001\config.toml
+wisp: 麦克风采集腿未构造（[voice] enabled=false，来源 C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC290NoGateSaysWhichShapeThisProcessIsIn4285550741\001\config.toml）：球不会收到任何电平，本进程其余部分照常
+time=2026-10-12T14:44:27.373+08:00 level=WARN msg="mute gesture found no gate to turn" gesture=mute-hotkey why="采集腿未构造：[voice] enabled=false（配置来源 C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\295r1-20261012-144418-3908-ac2a\\TestAC290NoGateSaysWhichShapeThisProcessIsIn4285550741\\001\\config.toml）"
+wisp: ball mute-hotkey: 采集腿未构造：[voice] enabled=false（配置来源 C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC290NoGateSaysWhichShapeThisProcessIsIn4285550741\001\config.toml）
+time=2026-10-12T14:44:27.375+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.375+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.375+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.375+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-12T14:44:27.375+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.375+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.375+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290NoGateSaysWhichShapeThisProcessIsIn (0.01s)
+=== RUN   TestAC290GestureBeforeTheAttachSaysSo
+time=2026-10-12T14:44:27.376+08:00 level=WARN msg="mute gesture arrived before its executor was attached" gesture=mute-hotkey why="no capture leg had been assembled when this key arrived, so there was no gate to turn; the assembly root attaches the mute key to the gate at the end of boot (ticket 290)"
+wisp: ball mute-hotkey: no capture leg had been assembled when this key arrived, so there was no gate to turn; the assembly root attaches the mute key to the gate at the end of boot (ticket 290)
+time=2026-10-12T14:44:27.376+08:00 level=WARN msg="mute gesture arrived before its executor was attached" gesture=tray-mute why="no capture leg had been assembled when this key arrived, so there was no gate to turn; the assembly root attaches the mute key to the gate at the end of boot (ticket 290)"
+wisp: ball tray-mute: no capture leg had been assembled when this key arrived, so there was no gate to turn; the assembly root attaches the mute key to the gate at the end of boot (ticket 290)
+--- PASS: TestAC290GestureBeforeTheAttachSaysSo (0.00s)
+=== RUN   TestAC290MutedDefaultStillDecidesTheBoot
+time=2026-10-12T14:44:27.380+08:00 level=INFO msg="audio: capture armed but muted at boot; device not opened" config_source=C:\Users\swq\AppData\Local\wisp-test-gotmp\295r1-20261012-144418-3908-ac2a\TestAC290MutedDefaultStillDecidesTheBoot520424255\001\config.toml path=T
+time=2026-10-12T14:44:27.380+08:00 level=INFO msg="mute gesture turned this process's capture gate" gesture=mute-hotkey outcome="已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+wisp: ball mute-hotkey: 已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）
+time=2026-10-12T14:44:27.381+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-12T14:44:27.381+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-12T14:44:27.381+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-12T14:44:27.381+08:00 level=INFO msg="audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0"
+wisp: audio capture leg stopped: levels_delivered=0 frames_sent=0 frames_dropped=0 reopens=0
+time=2026-10-12T14:44:27.381+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-12T14:44:27.381+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-12T14:44:27.381+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+--- PASS: TestAC290MutedDefaultStillDecidesTheBoot (0.01s)
+=== RUN   TestAC290UnhostedGestureWordingStillSaysTrueThing
+--- PASS: TestAC290UnhostedGestureWordingStillSaysTrueThing (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.161s
+GO_TEST_RC2=0
+end 14:44:27
+尺＝跑后家族尺：
+dotnet-test-family-process-count=1
+pid=28152 name=wisp.test

@@ -1,0 +1,55 @@
+# 295-r1 起手三闸（gate-0）名册 — captured 2026-10-12 14:24:40 +0800
+# 尺口径逐条标注：哪把尺 + 射程目录 + 量的(measured)/算的(computed)
+
+## 闸 1：写面四枚 go 件是否被人碰着
+尺 = git status --porcelain -- <4 paths>；射程 = 仓工作树 cmd/wisp 那四枚；量的
+命中枚数 = 0  ⇒ 0 = PASS
+
+## 闸 1 附：锚与 HEAD
+HEAD = 0615c6c996b623cd2ebc55c48a4752cf80f91f09
+dispatch anchor 73719706 是 HEAD 的祖先 = yes
+锚之后的笔（都不碰 cmd/wisp）:
+0615c6c9 派 295-r1（票 295 落地腿：started 换 atomic.Bool＋反形正控只许指名那一枚断言）的派单正文
+78782c20 ticket 310 (310-r2): LOCALAPPDATA-empty branch speaks + 5th go-test entry gets the root step
+cmd/wisp 在 anchor..HEAD 的漂移行数 = 0 ⇒ 0 = 四枚字节与锚一致
+
+## 闸 2：编队名册三问
+尺 2a = tasklist //FI 'IMAGENAME eq wisp.exe'（bash，⛔ .ps1）
+INFO: No tasks are running which match the specified criteria.
+rc=0  行口径：只那一句 'No tasks are running' = 0 枚
+尺 2b = tasklist //FI 'IMAGENAME eq balldebug.exe'（bash，⛔ .ps1）
+INFO: No tasks are running which match the specified criteria.
+rc=0
+尺 2c = 家族尺 PowerShell -File（件 .scratch/wisp/probes/295/r1/logs/roster-testprocs.ps1）
+首跑（14:24:41）结果：见下方 8 连拍，计数恒 1，枚名＝wisp.test
+dotnet-test-family-process-count=1
+pid=22704 name=wisp.test
+rc=0
+
+尺 2c 附：那枚进程的归属（同一进程里现查）
+
+
+ProcessId       : 22704
+ParentProcessId : 27824
+CreationDate    : 2026/10/12 14:23:10
+CommandLine     : C:\Users\swq\AppData\Local\wisp-test-gotmp\orch-298ac4-20261012-142231\go-build2872581835\b001\wisp.t
+                  est.exe -test.paniconexit0 -test.timeout=10m0s -test.count=1
+
+
+
+
+## 闸 3：落点清单现读（ⓓ 11 枚点 / ⓔ 一枚断言宽）＝件 .scratch/wisp/probes/295/a1b/30-landing-and-anti-form.md，已逐字读，行号⛔ 照抄
+
+## .started 名册复跑：尺 = git grep -n "\.started" -- cmd/wisp；射程 = cmd/wisp（含 _test.go）；量的
+cmd/wisp/resident_audio_247_live_windows_test.go:148:	if !ra.started {
+cmd/wisp/resident_audio_247_windows_test.go:113:	if ra.started {
+cmd/wisp/resident_audio_247_windows_test.go:155:	if ra.started {
+cmd/wisp/resident_audio_247_windows_test.go:256:			if ra.started {
+cmd/wisp/resident_audio_windows.go:168:	ra.started = gate.Open()
+cmd/wisp/resident_audio_windows.go:323:		ra.started = true
+cmd/wisp/resident_audio_windows.go:379:	if !ra.started {
+cmd/wisp/resident_mute_290_windows_test.go:124:		if !ra.started {
+cmd/wisp/resident_mute_290_windows_test.go:141:		if ra.gate.Open() || ra.started {
+cmd/wisp/resident_mute_290_windows_test.go:142:			t.Fatalf("%s: capture stayed handed over after muting (open=%v started=%v)", gesture, ra.gate.Open(), ra.started)
+cmd/wisp/resident_mute_290_windows_test.go:174:	if ra.started {
+命中枚数 = 11  （分母＝ⓓ 清单声明的 11 枚＝生产 3〔2 写 + 1 读〕＋测试 8〔全读〕；声明行 '	started bool' 不含点号，另计＝ⓓ-1 第 4 处）

@@ -1,0 +1,43 @@
+# 改前两发的逐名名册与交集 — captured 2026-10-12 14:40:41 +0800
+尺 = grep -E '^[[:space:]]*--- (PASS|FAIL|SKIP):' <log> | sed -E 's/^[[:space:]]*--- (PASS|FAIL|SKIP): /\1 /; s/ \(.*$//' | sort（射程＝那一发的 -v 全文；量的；顶层与子项同尺，故两把口径都打印）
+
+## A 发（11-pre-runA.txt）逐名状态行
+11-pre-runA.txt: 行数=449
+12-pre-runB.txt: 行数=450
+
+## 两把口径：顶层（^---）与含子项（^[[:space:]]*---）
+11-pre-runA.txt 顶层枚数=333 含子项枚数=449
+12-pre-runB.txt 顶层枚数=334 含子项枚数=450
+
+## 交集（同名同状态两发都有＝稳定名册）
+交集行数=449
+
+## 两发之差（作差＝A 有 B 无 / B 有 A 无）
+A-only:
+B-only:
+PASS TestAC1AlwaysBranchDoesNotRevertAHandEditedKey
+
+## 改前红名册（B 发，逐名）
+FAIL TestAC14GoSideEvalPushReachesThePage
+FAIL TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink
+FAIL TestAC1ResidentLegInstallsItsLogListenerOnDisk
+FAIL TestAC1ResidentLegOutlivesItsOwnLogFailure
+FAIL TestAC228ExitRequestDuringBootStillLeavesThroughD38E
+FAIL TestAC228ResidentLegReportsAndBooksItsBall
+FAIL TestAC246DevLegIgnoresTheTestTaskInjection
+FAIL TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline
+FAIL TestAC246ShippedResidentLegWithoutConsoleRefusesItsTaskEntry
+FAIL TestAC246ShippedResidentProcessOwnsItsCancelStep
+FAIL TestAC2AC3DegradedLegsStillDeliverTheirVerdict
+FAIL TestAC2AC3DegradedLegsStillDeliverTheirVerdict/models
+FAIL TestAC2ModelsLegBooksItsHandOffVerdictOnDisk
+FAIL TestAC2RealProcessRefusesOnEveryLegWithoutAppData128
+FAIL TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord
+FAIL TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot
+FAIL TestAC4FocusReturnToPriorWindowGap33r5
+FAIL TestCleanCheckoutBuilds_AC11
+FAIL TestPanelHostRealWindowHopAndLifecycle
+FAIL TestSecretArgvCarriesNoSecret
+FAIL TestSecretRealBinaryRefusesValueFlag
+FAIL TestTicket255RosterStillMatchesTheActualReadSites
+红枚数=22  交集内红枚数=22

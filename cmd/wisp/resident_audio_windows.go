@@ -102,7 +102,18 @@ type residentAudio struct {
 	// started records that the gate handed the device to the inner source and
 	// capture is actually running. posture() reads it so a leg that built a
 	// gate but never opened a microphone cannot print "running".
-	started bool
+	//
+	// It is an atomic.Bool rather than a bare bool because ticket 290 gave this
+	// mirror a second writer on another thread: toggleMute stores it from the
+	// ball's ui-sta thread (its callbacks run inline on that thread, see
+	// resident_ball_windows.go) while posture() reads it from the boot thread a
+	// few milliseconds later, and a plain assignment there is an unsynchronised
+	// read/write pair that nothing in this repository's gates can see, because
+	// -race is not in the roster. The shape is copied from the neighbour in this
+	// same struct - levels has been an atomic.Uint64 all along - and nothing
+	// else was invented for it: no lock, no extra goroutine, no second truth
+	// source (ticket 295 AC#1 "照邻居做").
+	started atomic.Bool
 
 	// levels is how many scalars this leg handed to the ball seam. It is what
 	// makes "the level path is live" a reading instead of a comment; the exit
@@ -165,7 +176,15 @@ func (ra *residentAudio) toggleMute() (string, bool) {
 	// second truth source, and keeping it current is what stops a later reading
 	// of this handle from claiming a device the user just closed (or denying one
 	// the user just opened).
-	ra.started = gate.Open()
+	//
+	// This is the write that makes the mirror cross threads, so it is a Store
+	// and not an assignment: the body you are in runs on the ball's ui-sta
+	// thread, the only production reader (posture, called from the boot line)
+	// lives on the boot thread, and the two used to overlap inside the first
+	// few milliseconds of a start-up where the user happens to press the mute
+	// key (ticket 295). gate.Open()/gate.Muted() stay the truth; this is only
+	// their mirror, stored atomically.
+	ra.started.Store(gate.Open())
 
 	switch {
 	case gate.Muted():
@@ -320,7 +339,7 @@ func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
 		ra.verdict = "采集腿在跑但设备未交接（gate 未 open）：球不会收到电平"
 		slog.Warn("audio: gate reports not open without a device error", "posture", ra.verdict)
 	default:
-		ra.started = true
+		ra.started.Store(true)
 		ra.verdict = fmt.Sprintf("采集腿在跑：真麦克风 PCM 进，%s 每帧一枚 float32 交给球（路径 %s）",
 			audio.FrameDuration.String(), string(gate.Path()))
 		slog.Info("audio: capture leg running", "path", string(gate.Path()), "frame", audio.FrameDuration.String())
@@ -376,7 +395,7 @@ func (ra *residentAudio) posture() string {
 	if ra == nil {
 		return "采集腿未装配：本进程没有任何麦克风路径"
 	}
-	if !ra.started {
+	if !ra.started.Load() {
 		return ra.unrunningClaim()
 	}
 	return ra.verdict + "；帧消费侧（ASR/KWS，internal/speech 一块没写）不属于本票，" +

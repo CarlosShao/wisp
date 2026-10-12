@@ -1,0 +1,31 @@
+# AC#4 门禁逐条 — captured 2026-10-12 14:43:15 +0800
+
+## g1: GOFLAGS= go build ./...
+尺＝该命令逐字；射程＝全仓工作树；量的
+rc=0
+
+## g2: gofumpt（裸名不在 PATH 的具名读数 + GOPATH/bin 那把）
+which: no gofumpt in (/c/Users/swq/.qoder-cn/bin:/d/work/soft/Qoder CN/resources/extensions/qoder.computer-control/dist/cli/computerUseWindows/bin:/c/Users/swq/.qoder-cn/plugins/cache/qoderapp-bundler/qoder-context/1.0.72.34cf9e2f/bin:/c/Users/swq/bin:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/mingw64/bin:/usr/bin:/c/Users/swq/bin:/c/Users/swq/.qoder-cn/bin:/c/Users/swq/AppData/Roaming/npm:/c/Users/swq/AppData/Local/pnpm:/c/Users/swq/.bun/bin:/c/Users/swq/.cargo/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Windows/System32/OpenSSH:/d/work/server/flutter/flutter/bin:/d/work/base/openjdk17U/bin:/d/work/base/Android/Sdk/cmdline-tools/latest/bin:/d/work/base/Android/Sdk/platform-tools:/d/work/soft/Microsoft VS Code/bin:/d/work/soft/Git/cmd:/d/work/tools/fd-v10.4.2:/c/Program Files/GitHub CLI:/c/Program Files/PowerShell/7:/c/Program Files/Docker/Docker/resources/bin:/d/work/soft/Yan Agent:/e/work/data/AI/user data/minimax code/.minimax/bin:/c/Users/swq/.minimax/bin:/c/Users/swq/.meituan-catpaw/bin:/c/Users/swq/.kimi-code/bin:/c/Users/swq/AppData/Local/hermes/hermes-agent/venv/Scripts:/c/Users/swq/AppData/Local/hermes/bin:/d/work/soft/Trae CN/bin:/c/Users/swq/AppData/Local/Programs/Python/Python312/Scripts:/c/Users/swq/AppData/Local/Programs/Python/Python312:/c/Users/swq/AppData/Local/Programs/Python/Launcher:/c/Users/swq/.local/bin:/d/work/server/node14/node_global:/c/Users/swq/.trae-cn/tools/trae-gopls/current:/c/Users/swq/.trae-cn/sdks/workspaces/f4e3de91/versions/node/current:/c/Users/swq/.trae-cn/sdks/versions/node/current:/d/work/soft/Git/bin:/c/Users/swq/AppData/Local/Microsoft/WindowsApps:/c/Users/swq/AppData/Local/Programs/Microsoft VS Code/bin:/d/soft_home/cpolar:/d/work/soft/TRAE SOLO CN/resources/app/bin/lib:/d/work/soft/TRAE SOLO CN/resources/app/node_modules/@vscode/ripgrep/bin:/d/work/server/node14:/d/work/soft/Lingma/bin:/d/work/soft/Qoder/bin:/c/users/swq/appdata/roaming/python/python312/scripts:/c/Users/swq/AppData/Local/Microsoft/WinGet/Links:/c/Users/swq/AppData/Local/Programs/Cua/cua-driver/bin:/d/work/soft/CodeBuddy CN/bin:/d/work/soft/Hermes/hermes-agent/venv/Scripts:/c/Users/swq/AppData/Local/Programs/orca/resources/bin:/c/Users/swq/.trae-cn/plugins/trae-remote-official/lark/1.0.3/bin:/d/work/AI/tools:/d/work/workspace/tools/bin:/d/work/soft/Qoder CN IDE/bin:/d/work/base/go/bin:/e/work/base/msys64/mingw64/bin:/d/work/AI/tools/step code:/c/Users/swq/.stepcode/agent/bin:/usr/bin/vendor_perl:/usr/bin/core_perl)
+which gofumpt rc=1
+/usr/bin/bash: line 1: gofumpt: command not found
+裸 gofumpt rc=127
+尺＝"D:\work\base\gopath/bin/gofumpt.exe" -l cmd/wisp（工作树口径）
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+rc=0  枚数=2
+
+## g3: gofmt 改前/改后并排（三把口径）
+尺＝gofmt -l <dir>；口径标注如下
+改前・工作树字节口径（重建树＝cp -r cmd/wisp + 4 枚还原成 git show HEAD 版）:
+C:\Users\swq\AppData\Local\Temp\tmp.iHqJyGdzNC\cmdwisp-pre\models.go
+  枚数=1 rc=0
+改后・工作树口径（当前 cmd/wisp）:
+cmd\wisp\models.go
+  枚数=1 rc=0
+改前・HEAD blob（LF 导出树口径）:
+  枚数=0 rc=0
+CR 字节尺（同一把 tr -cd '\r' | wc -c，对工作树量）:
+  cmd/wisp/models.go CR=334
+  cmd/wisp/resident_audio_windows.go CR=0
+  cmd/wisp/resident_mute_290_windows_test.go CR=0
+结论：两把之差＝本机 CRLF 假枚（models.go 那枚我没碰），⛔ 拿差去指控任何人；本改动净增 gofmt 命中 0 枚

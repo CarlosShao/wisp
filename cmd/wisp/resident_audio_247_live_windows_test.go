@@ -145,7 +145,7 @@ func TestAC247LiveMicrophoneLevelsReachTheBallSeam(t *testing.T) {
 	router.set(quietA)
 
 	ra := assembleCapture(rt, dir, router.route, newRealCaptureSource)
-	if !ra.started {
+	if !ra.started.Load() {
 		t.Fatalf("the live capture leg did not come up on this machine: %s", ra.posture())
 	}
 	mic := ra.mic.(*audio.WASAPIMicrophone)

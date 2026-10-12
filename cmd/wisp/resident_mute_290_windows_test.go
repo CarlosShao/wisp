@@ -121,7 +121,7 @@ func TestAC290BothMuteGesturesTurnTheGateAndBack(t *testing.T) {
 		if !ra.gate.Open() {
 			t.Fatalf("%s: the gate is unmuted but never handed the device over: %q", gesture, outcome)
 		}
-		if !ra.started {
+		if !ra.started.Load() {
 			t.Fatalf("%s: the leg's derived mirror says nothing is running while the gate is open", gesture)
 		}
 		if !strings.Contains(outcome, "已取消静音") || !strings.Contains(outcome, "设备已交接") {
@@ -138,8 +138,8 @@ func TestAC290BothMuteGesturesTurnTheGateAndBack(t *testing.T) {
 		if !ra.gate.Muted() {
 			t.Fatalf("%s: the second press did not put the gate back to muted: %q", gesture, outcome)
 		}
-		if ra.gate.Open() || ra.started {
-			t.Fatalf("%s: capture stayed handed over after muting (open=%v started=%v)", gesture, ra.gate.Open(), ra.started)
+		if ra.gate.Open() || ra.started.Load() {
+			t.Fatalf("%s: capture stayed handed over after muting (open=%t started=%t)", gesture, ra.gate.Open(), ra.started.Load())
 		}
 		if !strings.Contains(outcome, "已静音") || !strings.Contains(outcome, "设备未打开") {
 			t.Fatalf("%s: the muted outcome is not the gate's state: %q", gesture, outcome)
@@ -171,7 +171,7 @@ func TestAC290OutcomeIsReadOffTheGateNotOffTheRequest(t *testing.T) {
 	if ra.gate.Open() {
 		t.Fatal("the gate claims it handed a refused device over")
 	}
-	if ra.started {
+	if ra.started.Load() {
 		t.Fatal("the leg's derived mirror says capture is running over a refused device")
 	}
 	if !strings.Contains(outcome, "设备未交接") {
