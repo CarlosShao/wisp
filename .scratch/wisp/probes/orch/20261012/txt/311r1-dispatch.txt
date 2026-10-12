@@ -1,0 +1,46 @@
+# 派单 311-r1（落地腿）— 票 311 `AC#1` 已裁＝**乙形**（承认"测试临时根落在哪一枚卷"是判据的一部分，并给它装上一把**响在退码上**的守卫）＋`AC#3` 那一形归口已定（票 310 追加节）
+
+锚＝你要在起手自己现跑（`git rev-parse --short HEAD`）。你是**实现者**：⛔ 翻任何 `[ ]` 框、⛔ 动 `Status:` 行、⛔ 宣布任何一格成立。
+
+## 0. 起手三件（任一不满足 ⇒ 停手报回，⛔ 自己填缝）
+
+1. **写面必须先是干净的**：`git status --porcelain -- scripts tools/d22scan` ⇒ **必须为空**。这一族文件刚刚被另一枚腿（`310-r2`）改过；它**没交完之前你⛔ 开工**（非空＝它还在飞，停手上报，另派）。
+2. **先读它刚落地的形状**，⛔ 凭本派单的转述动手：`git log --oneline -5 -- scripts tools/d22scan` 找出 `310-r2` 那一笔，然后逐枚现读那几枚脚本里的 GOTMPDIR 块（内容锚逐字），并具名回答：**今天一共有几枚入口会设 `GOTMPDIR`？**（我 10-12 现量的候选＝`scripts/winsec-tests.sh`、`scripts/wisp-cli-tests.sh`、`scripts/portable-tests.sh`、`tools/d22scan/runtests.sh`；枚数以你现跑为准，⛔ 用我这个数交差）
+3. ⚠ **守卫的顺序知识（本仓今天量到的）**：那枚 `DEGRADED`（根建不出来）的分支**跑在脚本自己的 GUARD 之前**——实测形态＝先打 `DEGRADED` 那两行，随后才是 GUARD 1 的两行、`rc=2`。⇒ 你那条新守卫**必须落在守卫链之后、真正起 `go test` 之前**，并在件里自证"它在 DEGRADED 之后、在 `go test` 之前"（用一次造形把三行读数按顺序打出来）。
+
+## 1. 你要建的（＝票面 `AC#1` 乙形，判据原文在票面，⛔ 自己扩射程）
+
+**乙**：`WISP_TEST_GOTMP_ROOT`（或直接喂进来的 `GOTMPDIR`）若指向**与 `%TEMP%`／`%LOCALAPPDATA%` 不同一枚卷** ⇒ **具名报错并 `rc≠0`**，而不是"换了卷、门静悄悄变红"（今天的行为＝静悄悄 `PASS=58 FAIL=0` ⇄ `PASS=56 FAIL=2`）。
+- 落点＝§0.2 现量出来的那几枚入口脚本（同形一处一份，⛔ 方言化：四处形状必须逐字同形，只差入口名与 echo 前缀——这是 `310` 那一族已经定下的口径）。
+- ⛔ **fail-open 的旧例不许照抄**：本票这一格按票面写的做（响在退码上）。撤销口令＝「311 改 fail-open」，你⛔ 自己决定要不要用。
+- ⚠ 三个必须放行、⛔ 误伤的形状，逐枚带读数：① 不设 `WISP_TEST_GOTMP_ROOT`（出厂默认）⇒ 照旧绿；② 设成**同卷另一目录**（例如 `%LOCALAPPDATA%` 下别的路径）⇒ 照旧跑、⛔ 报错；③ 非 Windows（`GOOS!=windows`）或 `LOCALAPPDATA` 为空那一支 ⇒ 你的守卫⛔ 改变它的退码。
+- ⛔ 动 `internal/winsec/**` 一个字节（那枚 `甲` 形已被我裁掉：⛔ 甲）。⛔ 改任何断言／SLO 阈值／golden／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt`／D43 表／C1–C32／D1–D47。⛔ 动 `ci.yml`／`.github/**`（托管 runner 上兄弟根可不可写＝另一枚欠账 `Q-310-r1-3/-5`，随 CI 色那一批一起取）。⛔ 动票 304 的 Job Object 面（`internal/proc/jobscope_*`、`internal/llm/adaptertest/childjob_*`、两枚 mockllm spawn 点）。⛔ 删任何目录（含专用根里那 59 枚在册残渣与那枚"归属不明、⛔ 动、永久"的 `TestProbeStepByStep3843095677`）。
+
+## 2. 牙（票面 `AC#2` 原文，⛔ 只交"换卷也绿"这种半句）
+
+- ⓐ **成对两发**＝默认根 ⇄ 另一枚卷的根，落地之后第二发**具名报错 `rc≠0`**（乙形判据）。两发都要同行落"这一发用的是哪一枚根"的逐字读数。
+- ⓑ **反形正控**＝把你新加的那条守卫**摘掉**（只摘它），同两发必须回到 `58/0` ⇄ `56/2` 那对差异——⛔ 摘掉仍全绿＝那个步骤对这件事不敏感，⛔ 算凭据（本仓 `A` 系列反复栽过这一形）。摘除体⛔ 留在树上：还原后与 pristine 逐字节对上（`sha256sum`/`cmp`）并把两把 hash 同行落盘。
+- ⓒ 两发都同行落**"坏世界真被造出来"**的证据行（那几行 `TempDir RemoveAll cleanup: … Access is denied`，或你的守卫那句具名报错原文），⛔ 拿"0 枚"当读数。
+- ⚠ `winsec` 那一档的正确拼写＝`bash scripts/winsec-tests.sh ./internal/winsec/`。⛔ `--scope=winsec` 喂给 `winsec-tests.sh`——它会被自己的 GUARD 1 打回 `rc=2`（本仓 10-12 踩过，具名两行在 `logs/orch-winsec-dtmp-err.txt`）。
+
+## 3. 门禁（票面 `AC#4`，逐字拼写）
+
+`GOFLAGS= go build ./...` rc=0；`sh scripts/d22scan.sh` rc=0；`sh scripts/check-path-length-budget.sh --with-self-test` rc=0；`bash scripts/portable-tests.sh --scope=census` 的 totals 行**跑前取一次、跑后再取一次作差**（⛔ 拿旧数当基线；我 10-12 现量的旧基线逐字＝`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`，只作对照不作判据）；`bash scripts/winsec-tests.sh ./internal/winsec/` 改前改后各两发（同卷默认根那一枚）；格式名册**两把并排**（工作树 ⇄ `git show HEAD:` blob，写清射程目录＋枚数）；**每把门禁件自落一行 `rc=N`**（⛔ 0 字节件＝那格没交）；越界尺逐笔量＝`git show --name-only --format=`（⛔ 区间尺）。
+
+## 4. 写面三件套（⛔ 超出＝越界；逐条原文粘，⛔ 手抄缩写）
+
+1. 落点文件＝§0.2 你现量出来的那几枚入口脚本（预期＝`scripts/winsec-tests.sh`、`scripts/wisp-cli-tests.sh`、`scripts/portable-tests.sh`、`tools/d22scan/runtests.sh`；枚数以现跑为准，多一枚少一枚都要在件里具名写）
+2. 你自己的证据件＝`.scratch/wisp/probes/311/r1/**`（日志落 `.../r1/logs/`，⛔ 不落仓根、⛔ 不落任何专用根里）
+3. 票面 `.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md` 末尾**追加 1 条 progress bullet**（1 加 0 删；钟点由 `date` 的 stdout 插值，⛔ 手打）
+
+## 5. 环境与 git（最容易踩的几条）
+
+- 跑 `go test` 直接 `GOTMPDIR="<你自己的根>" go test ...`；专用根＝`$LOCALAPPDATA/wisp-test-gotmp/311r1-$(date +%Y%m%d-%H%M%S)-$$`。**这一票的实验本质就是换卷**，所以你⛔ 只在 `AC#2` ⓐⓑ 那两发里换卷，其余读数一律用默认那一枚根（改前/改后必须同一根形状）。
+- 起手/收手名册三问：`tasklist //FI "IMAGENAME eq wisp.exe"`（走 bash）＋一把家族尺（PowerShell `-File`：`Get-Process | Where-Object { $_.ProcessName -like '*.test' }`）；归属定式＝**起进程前的名册 ⇄ 杀完后的名册 `comm -13` 作差＋逐枚 `CreationTime`**，⛔ 把突变台件自报的 `dir=` 当成"我这一发漏的那枚"。
+- 每个读数带**哪把尺＋射程目录＋量的还是算的**；0 旁边站着分母或正控；一把尺打印 "Binary file … matches" 时它那行的枚数⛔ 算读数（加 `-a` 重跑并写两把的差）；`Get-ChildItem` 不带 `-ErrorAction SilentlyContinue` 会读出假 0。
+- git：只 commit、⛔ push；`git add` 与 `git commit` **两处都带显式 pathspec**（建议 `--pathspec-from-file`＋先 `--dry-run`）；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；仓内⛔ 建 worktree；临时件**只建不删**；证据件⛔ 叫 `.out`、⛔ 在 `probes/**` 下建 `.go`、⛔ 文件名带 `§`、⛔ 长名（相对 ≤121／末段 ≤100／全路径 ≤165，新建前先跑长度门）。
+- ⛔ 新造协程（D38(b) 名册零膨胀）、⛔ 裸 `go func(`（ban #1）。⛔ 碰 `go.mod`／`.gitignore`／`design/**`／别人的 probes（机主自己的在飞批）。
+
+## 6. 输出预算
+
+4 枚 md，逐枚 ≤200 行：`10-entry-census.md`（§0.2 现量：哪几枚入口、内容锚逐字、守卫落在它们各自的哪一步之前/之后）、`20-guard.md`（守卫本体逐字＋三枚必须放行的形状各带读数）、`30-teeth.md`（ⓐⓑⓒ：成对两发＋摘除反形＋还原 hash 对）、`90-final.md`（欠账名册 `Q-311-r1-*` 逐条；零欠账就明写"零枚"并给尺）。每完成一格就 commit 一次，⛔ 把所有事攒到最后一次写大文件。

@@ -1,0 +1,16 @@
+=== winsec (LOCALAPPDATA empty + bad scope) ===
+winsec-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no measured-safe root to build (a root on another volume turns the winsec seal cases red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset.
+winsec-tests.sh: GUARD 1 - the package list for this step does not name ./internal/winsec/; it is [--scope=winsec].
+winsec-tests.sh: this step IS the internal/winsec gate (ticket 110 AC#2/AC#3). Removing the package from the list must fail the step, not shorten it.
+rc=2
+=== cli (LOCALAPPDATA empty) ===
+wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no measured-safe root to build (a root on another volume turns the winsec seal cases red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset.
+wisp-cli-tests.sh: scope=./cmd/wisp/ dll_dir=/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx (pinned: onnxruntime.dll sherpa-onnx-c-api.dll sherpa-onnx-cxx-api.dll )
+wisp-cli-tests.sh: handing the verdict to portable-tests.sh --scope=cli
+portable-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no measured-safe root to build (a root on another volume turns the winsec seal cases red, see the note above). GOTMPDIR stays unset.
+portable-tests.sh: platform=windows scope=[./cmd/wisp/]
+portable-tests.sh: 11 ledger entries, 7 accounted on this platform:
+rc=141
+=== runtests (LOCALAPPDATA empty, no args => its own usage rc) ===
+runtests.sh: no packages given; pass e.g. ./internal/proc/ -run TestX
+rc=2

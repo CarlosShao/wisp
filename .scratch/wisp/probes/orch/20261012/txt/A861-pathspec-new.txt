@@ -1,0 +1,12 @@
+.scratch/wisp/probes/orch/20261012/txt/A861-ledger.txt
+.scratch/wisp/probes/orch/20261012/txt/A861-t304-bullet.txt
+.scratch/wisp/probes/orch/20261012/txt/311r1-dispatch.txt
+.scratch/wisp/probes/orch/20261012/txt/run-298ac4.sh
+.scratch/wisp/probes/orch/20261012/logs/orch-roster-temp-1012c.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-roster-temp-1012c-err.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-branch-check.txt
+.scratch/wisp/probes/orch/20261012/txt/msg-A861.txt
+docs/reports/pending-and-issues.md
+.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md
+.scratch/wisp/issues/304-external-killed-test-binaries-orphan-mockllm-exe.md
+.scratch/wisp/probes/orch/20261012/txt/A861-pathspec-new.txt

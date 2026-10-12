@@ -1,0 +1,19 @@
+
+## A861｜2026-10-12 14:2x｜票 311 `AC#5` 归口完成（＝编排者侧那格，⛔ 落地腿）：`Q-304-a1-H` 那笔**由票 310 的 `CreationTime` 尺销**＋⚠⚠ **我自己踩了两把尺**（一次 `cmd | head` 取到 head 的退码、一次在别腿正跑 `./cmd/wisp/` 名册的窗口里插了探针）
+
+**来路**＝票 311 `AC#5` 原文（`.scratch/wisp/issues/311-*.md` 第 35 行那枚框）："`Q-304-a1-H` 那笔逐枚归属今天按名册已能答一半 ⇒ 由我在台账把该笔**销掉并注明'由票 310 的 `CreationTime` 尺销'**；⛔ 任何腿删任何目录"。
+
+### 1. 销账凭据（两把尺，我自己现跑）
+
+- 名册尺＝`powershell -File probes/orch/20261012/roster-temp-1012.ps1`，14:2x 现跑（件 `probes/orch/20261012/logs/orch-roster-temp-1012c.txt`，stderr **0 字节**）⇒ 逐字 `temp_test_star_count=59`、正控同行 `temp_all_dirs_positive_control=2869`（13:0x 那发＝2823，＋46＝编队正常进出，⛔ 解读成"有人清了目录"）。
+- 分桶尺＝件 `probes/orch/20261012/roster-1012.md` §1：59 枚逐枚带 `CreationTime`，六桶 44＋单枚前缀 15＝**59**（那把尺⛔ 用默认 locale：`grep '^Test'` 会把件判成 binary 而少算一枚，改正＝`grep -a`，10-12 已并回正典）。
+- ⇒ **"这 59 枚各是谁哪一程留下的"从今天起是可答的**（尺在件里、逐枚可复跑），所以 10-11 挂着的 `Q-304-a1-H`（"逐枚归属"那笔欠账）就地**销**，销法＝**注明尺名＋件路径**，⛔ 不是"我判它没问题"。
+- ⚠ **一处假指针已在前批纠正过，本笔⛔ 重复记**：`grep -rn 'Q-304-a1-H' docs/reports/pending-and-issues.md`＝**台账 0 命中**，权威落点＝票 304 的两枚 bullet（`15:3x` 与 `17:0x` 那两条），票 310 `:27` 那句"去票 304 台账里销掉"里的"台账"指的就是那两枚 bullet ⇒ 本次销账写在**票 304 末尾追加 1 条 bullet**（1 加 0 删，⛔ 改原句）。
+- ★**盘上事实**：`C:/Users/swq/AppData/Local/wisp-test-gotmp` 运行目录 **31** 枚（13:2x＝11，⛔ 没被删过、只增）、`D:/tmp/wisp-test-gotmp` **10** 枚；那枚"归属不明、⛔ 动、永久"的 `TestProbeStepByStep3843095677` 仍在原处。**⛔ 任何目录被删过、⛔ 本程会删**。
+
+### 2. ⚠⚠ 两处记我（都是我自己这半小时里干的）
+
+- ① **`cmd | head; echo $?` 那把老雷我又踩了一次**：我为了验 `310-r2` 刚落地的"空 `LOCALAPPDATA` 那一支现在会说话"，跑了 `LOCALAPPDATA= bash scripts/wisp-cli-tests.sh --scope=nope 2>&1 | head -6` ⇒ 那 **`rc=141` 是 `head` 的退码（128＋SIGPIPE），⛔ 是脚本的退码**，而且 `head` 一关管道就把一发**真的 `./cmd/wisp/` 测试**拦腰掐了。正确读数（件 `logs/orch-310r2-branch-check.txt` 逐字两行）＝`winsec-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty…` 先打、随后 GUARD 1 两行、`rc=2`；`runtests.sh` 那一发无参 ⇒ 自落 usage、`rc=2`。**结论没受影响**（那一支确实开始说话了），受影响的是"我这发的退码⛔ 是它的退码"。
+- ② **我违反了派给腿的规矩**：`A846` 那条"**每波只交一枚 `./cmd/wisp/` 色**"是我自己写的，而我在 `295-r1`＋`310-r2` 两枚腿正跑 `cmd/wisp` 名册的窗口里插了上面那一发探针。事后归属尺（`Get-CimInstance Win32_Process -Filter "Name like '%.test.exe%'"` 逐枚命令行）：三枚活着的 `wisp.test.exe`＝一枚命令行在我自己的 `orch-298ac4-*` 根下（＝我的 298 台件那一发）、两枚在 `portable-20261012-142516-1728`／`-142524-1762` 两枚根下（＝腿的），**⛔ 一枚是我掐出来的孤儿**；顶层 `Test*` 仍 **59** 枚＝那一发没漏目录。⇒ 并回正典：**探针型的一次性命令也要先过"这一波谁持有那枚包的色"这一问**，⛔ 因为"我只是探一下"就豁免。
+
+**next**＝`310-r2` 交完我复跑收口（第五枚入口＋静默支两笔欠账 `Q-310-orch-P`/`-Q`）⇒ 派 `311-r1`（乙形守卫，派单正文已成稿＝`probes/orch/20261012/txt/311r1-dispatch.txt`）；`295-r1` 交回后翻它的格并派 `294-r1`；我自己那发票 298 `AC#4` 亲跑读数在 `298ac4/` 里，跑完并 A862 落账。⛔ 零 push、⛔ 零删目录。
