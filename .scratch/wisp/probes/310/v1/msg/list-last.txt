@@ -1,0 +1,6 @@
+.scratch/wisp/probes/310/v1/logs/99-roster-final.err
+.scratch/wisp/probes/310/v1/logs/99-roster-final.txt
+.scratch/wisp/probes/310/v1/logs/99-roster-final2.err
+.scratch/wisp/probes/310/v1/logs/99-roster-final2.txt
+.scratch/wisp/probes/310/v1/logs/99-roster-final2.txt.meta
+.scratch/wisp/probes/310/v1/msg/list-last.txt
