@@ -1,0 +1,13 @@
+# 311-r1 starting roster, taken 2026-10-12 14:49:40 +0800 at anchor d5ef9cb9
+## ruler 1: tasklist //FI (bash, 射程=whole machine)
+INFO: No tasks are running which match the specified criteria.
+## ruler 2: wisp.exe exact-count via findstr (positive control: svchost)
+wisp_tasklist_lines=0
+svchost_tasklist_lines=84
+## ruler 3: powershell -File ps1/roster.ps1
+temp_test_star=59
+temp_all_dirs_positive_control=2880
+family_test_exe=1
+svchost_positive_control=84
+all_processes_positive_control=369
+family_pid=28152 name=wisp.test started=2026-10-12 14:43:52

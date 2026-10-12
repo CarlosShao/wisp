@@ -1,0 +1,48 @@
+# 311-r1 HEAD moved after the leg started; ruler: does the new traffic touch my write surface?
+run=2026-10-12 14:57:42 +0800
+## ruler: git diff --name-only 23c19afa..HEAD (射程=repo, counted)
+.scratch/wisp/issues/310-test-binary-deaths-leave-temp-test-dirs-accumulating.md
+.scratch/wisp/probes/295/r1/10-impl.md
+.scratch/wisp/probes/295/r1/20-anti-form.md
+.scratch/wisp/probes/295/r1/logs/00-gate0-roster.txt
+.scratch/wisp/probes/295/r1/logs/05-pristine-hashes.txt
+.scratch/wisp/probes/295/r1/logs/10-pre-run1.txt
+.scratch/wisp/probes/295/r1/logs/11-pre-runA.txt
+.scratch/wisp/probes/295/r1/logs/12-pre-runB.txt
+.scratch/wisp/probes/295/r1/logs/13-roster-pre.txt
+.scratch/wisp/probes/295/r1/logs/20-gates-build-gofmt.txt
+.scratch/wisp/probes/295/r1/logs/21-ac2-pristine-named.txt
+.scratch/wisp/probes/295/r1/logs/22-ac1-diff.txt
+.scratch/wisp/probes/295/r1/logs/30-ac2-m1-deletewrite.txt
+.scratch/wisp/probes/295/r1/logs/31-ac2-m2-alwaystrue-shape.txt
+.scratch/wisp/probes/295/r1/logs/32-ac2-restore-and-pristine.txt
+.scratch/wisp/probes/295/r1/logs/33-ac2-roster-diff.txt
+.scratch/wisp/probes/295/r1/logs/pathspec-ac1.txt
+.scratch/wisp/probes/295/r1/logs/pathspec-ac2.txt
+.scratch/wisp/probes/295/r1/logs/roster-11-pre-runA.names.txt
+.scratch/wisp/probes/295/r1/logs/roster-12-pre-runB.names.txt
+.scratch/wisp/probes/295/r1/logs/roster-pre-intersect.txt
+.scratch/wisp/probes/295/r1/logs/roster-testprocs.ps1
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-collect-d22.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-collect-misc.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-collect-runtests-nolappdata.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-collect-winsec.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-310r2-warn-shapes.txt
+.scratch/wisp/probes/orch/20261012/txt/A862-ledger.txt
+.scratch/wisp/probes/orch/20261012/txt/A862-pathspec-list.txt
+.scratch/wisp/probes/orch/20261012/txt/A862-t310-bullet.txt
+.scratch/wisp/probes/orch/20261012/txt/msg-A862.txt
+cmd/wisp/resident_audio_247_live_windows_test.go
+cmd/wisp/resident_audio_247_windows_test.go
+cmd/wisp/resident_audio_windows.go
+cmd/wisp/resident_mute_290_windows_test.go
+docs/reports/pending-and-issues.md
+diff_file_count=36
+## ruler: same list filtered to my write surface (射程=scripts tools/d22scan)
+0
+## ruler: git status --porcelain -- scripts tools/d22scan (must be empty)
+write_surface_lines=0
+## ruler: git log --oneline 23c19afa..HEAD
+35744137 ticket 295 (295-r1) AC#2: 删写变异真跑＝指名那一枚断言红，其余 7 枚读点逐枚记账"不敏感"
+d5ef9cb9 ticket 295 (295-r1) AC#1: ra.started 换 atomic.Bool，逐处照邻居 levels 那一族
+ef8d16b3 收 310-r2 ⇒ 两笔增量欠账就地销（我自己六把尺复跑全认）＋ A862 / 票 310 一条 bullet
