@@ -1,0 +1,40 @@
+===== ROOT=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594
+CREATED=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant-runner
+Unable to find type [System.Security.AccessControl.SecurityDescriptorSections].
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\plant-probe.ps1:19 char:46
++ ... Form($sddl, [System.Security.AccessControl.SecurityDescriptorSections ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Security...criptorSections:TypeName) [], RuntimeException
+    + FullyQualifiedErrorId : TypeNotFound
+ 
+planted_rc=True
+CREATED=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant-la
+Unable to find type [System.Security.AccessControl.SecurityDescriptorSections].
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\plant-probe.ps1:19 char:46
++ ... Form($sddl, [System.Security.AccessControl.SecurityDescriptorSections ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Security...criptorSections:TypeName) [], RuntimeException
+    + FullyQualifiedErrorId : TypeNotFound
+ 
+planted_rc=True
+===== ROOT=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594
+CREATED=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant-runner
+Unable to find type [System.Security.AccessControl.SecurityDescriptorSections].
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\plant-probe.ps1:19 char:46
++ ... Form($sddl, [System.Security.AccessControl.SecurityDescriptorSections ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Security...criptorSections:TypeName) [], RuntimeException
+    + FullyQualifiedErrorId : TypeNotFound
+ 
+planted_rc=True
+CREATED=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant-la
+Unable to find type [System.Security.AccessControl.SecurityDescriptorSections].
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\plant-probe.ps1:19 char:46
++ ... Form($sddl, [System.Security.AccessControl.SecurityDescriptorSections ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Security...criptorSections:TypeName) [], RuntimeException
+    + FullyQualifiedErrorId : TypeNotFound
+ 
+planted_rc=True
+ps_errors=4
+ps_rc=0

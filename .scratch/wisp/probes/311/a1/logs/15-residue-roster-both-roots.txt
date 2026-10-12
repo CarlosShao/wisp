@@ -1,0 +1,28 @@
+now=2026-10-12 13:34:10
+===== ROOT=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594
+count_top_Directory=1
+count_recursive_Directory=1
+count_top_all_entries=1
+DIR|depth=1|creation=2026-10-12 13:30:40.912|C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\aclprobe
+===== ROOT=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594
+count_top_Directory=5
+count_recursive_Directory=16
+count_top_all_entries=5
+DIR|depth=1|creation=2026-10-12 13:30:40.913|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\aclprobe
+DIR|depth=1|creation=2026-10-12 13:31:53.203|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964
+DIR|depth=1|creation=2026-10-12 13:31:54.750|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538
+DIR|depth=1|creation=2026-10-12 13:31:53.203|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932
+DIR|depth=1|creation=2026-10-12 13:31:58.657|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198
+DIR|depth=2|creation=2026-10-12 13:31:53.203|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001
+DIR|depth=3|creation=2026-10-12 13:31:53.203|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001\la
+DIR|depth=2|creation=2026-10-12 13:31:54.750|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001
+DIR|depth=3|creation=2026-10-12 13:31:54.750|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\named
+DIR|depth=3|creation=2026-10-12 13:31:54.751|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\numeric
+DIR|depth=2|creation=2026-10-12 13:31:53.204|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001
+DIR|depth=3|creation=2026-10-12 13:31:53.204|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001\runner
+DIR|depth=2|creation=2026-10-12 13:31:58.659|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002
+DIR|depth=2|creation=2026-10-12 13:31:58.659|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003
+DIR|depth=3|creation=2026-10-12 13:31:58.659|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002\la
+DIR|depth=3|creation=2026-10-12 13:31:58.660|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003\la
+ps_errors=6
+ps_rc=0

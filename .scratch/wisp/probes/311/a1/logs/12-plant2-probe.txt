@@ -1,0 +1,12 @@
+===== ROOT=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594
+CREATED=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant2-runner
+plant_threw=False
+CREATED=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant2-la
+plant_threw=False
+===== ROOT=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594
+CREATED=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant2-runner
+plant_threw=False
+CREATED=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant2-la
+plant_threw=False
+ps_errors=0
+ps_rc=0

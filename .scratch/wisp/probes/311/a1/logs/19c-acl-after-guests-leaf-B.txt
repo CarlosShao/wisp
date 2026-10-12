@@ -1,0 +1,38 @@
+now=2026-10-12 13:44:52
+FileSystemRightsEnumNames=ListDirectory,ReadData,WriteData,CreateFiles,CreateDirectories,AppendData,ReadExtendedAttributes,WriteExtendedAttributes,Traverse,ExecuteFile,DeleteSubdirectoriesAndFiles,ReadAttributes,WriteAttributes,Write,Delete,ReadPermissions,Read,ReadAndExecute,Modify,ChangePermissions,TakeOwnership,Synchronize,FullControl
+Delete=65536
+maskbit ListDirectory=1
+maskbit Traverse=32
+maskbit CreateFiles=2
+maskbit CreateDirectories=4
+maskbit Delete=65536
+maskbit ReadPermissions=131072
+maskbit ChangePermissions=262144
+maskbit TakeOwnership=524288
+maskbit Synchronize=1048576
+maskbit FullControl=2032127
+maskbit Modify=197055
+maskbit DeleteSubdirectoriesAndFiles=64
+maskbit Write=278
+maskbit Read=131209
+maskbit ReadAndExecute=131241
+maskbit Modify=197055
+maskbit FullControl=2032127
+maskbit ExecuteFile=32
+maskbit ListDirectory=1
+Modify_has_0x40=False
+FullControl_has_0x40=True
+0x1301BF_has_0x40=False
+0x1F01FF_has_0x40=True
+===== PATH=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003\la
+owner=DESKTOP-LVS7839\swq
+dacl_protected_flag=True
+sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:PAI(A;;FA;;;BG)
+ACE[0] type=Allow sid=S-1-5-32-546 who=BUILTIN\Guests rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=False
+ace_count=1
+--- icacls_verbatim:
+ICACLS| D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003\la BUILTIN\Guests:(F)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+ps_errors=0
+ps_rc=0

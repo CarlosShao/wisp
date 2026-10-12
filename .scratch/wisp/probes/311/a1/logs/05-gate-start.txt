@@ -1,0 +1,34 @@
+now=2026-10-12 13:27:58
+temp_env=C:\Users\swq\AppData\Local\Temp
+temp_top_all_count=2834
+temp_top_TestRoster_count=59
+testexe_family_count=0
+positive_control_svchost_count=83
+positive_control_all_exe_count=339
+token_name=DESKTOP-LVS7839\swq
+token_user_sid=S-1-5-21-1228170099-895614386-1166154857-1001
+token_group_sid=S-1-1-0
+token_group_sid=S-1-5-21-1228170099-895614386-1166154857-1003
+token_group_sid=S-1-5-32-545
+token_group_sid=S-1-5-4
+token_group_sid=S-1-2-1
+token_group_sid=S-1-5-11
+token_group_sid=S-1-5-15
+token_group_sid=S-1-11-96-3623454863-58364-18864-2661722203-1597581903-781403061-734960882-2201021826-971820858-510315859
+token_group_sid=S-1-5-113
+token_group_sid=S-1-2-0
+token_group_sid=S-1-5-64-36
+localaccount_count=11
+LOCALACCOUNT name=Administrator sid=S-1-5-21-1228170099-895614386-1166154857-500 rid=500 disabled=True
+LOCALACCOUNT name=CarlosShao sid=S-1-5-21-1228170099-895614386-1166154857-1004 rid=1004 disabled=False
+LOCALACCOUNT name=CodexSandboxOffline sid=S-1-5-21-1228170099-895614386-1166154857-1006 rid=1006 disabled=False
+LOCALACCOUNT name=CodexSandboxOnline sid=S-1-5-21-1228170099-895614386-1166154857-1007 rid=1007 disabled=False
+LOCALACCOUNT name=DefaultAccount sid=S-1-5-21-1228170099-895614386-1166154857-503 rid=503 disabled=True
+LOCALACCOUNT name=Guest sid=S-1-5-21-1228170099-895614386-1166154857-501 rid=501 disabled=False
+LOCALACCOUNT name=shaowq sid=S-1-5-21-1228170099-895614386-1166154857-1008 rid=1008 disabled=False
+LOCALACCOUNT name=swq sid=S-1-5-21-1228170099-895614386-1166154857-1001 rid=1001 disabled=False
+LOCALACCOUNT name=WDAGUtilityAccount sid=S-1-5-21-1228170099-895614386-1166154857-504 rid=504 disabled=True
+LOCALACCOUNT name=WsiAccount sid=S-1-5-21-1228170099-895614386-1166154857-1002 rid=1002 disabled=True
+LOCALACCOUNT name=zaiuser1 sid=S-1-5-21-1228170099-895614386-1166154857-1009 rid=1009 disabled=False
+ps_failed=0
+ps_rc=0

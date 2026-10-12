@@ -1,0 +1,26 @@
+now=2026-10-12 13:38:53
+## ruler bash find -type d (absolute count incl. root)
+ROOT=C:/Users/swq/AppData/Local/wisp-test-gotmp/311a1-A-20261012-133040-1594
+find_type_d_total_counting_root=2
+  C:/Users/swq/AppData/Local/wisp-test-gotmp/311a1-A-20261012-133040-1594/aclprobe
+  ls_1_top=1
+ROOT=D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594
+find_type_d_total_counting_root=17
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/aclprobe
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSID3972594964
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSID3972594964/001
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSID3972594964/001/la
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538/001
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538/001/named
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538/001/numeric
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932/001
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932/001/runner
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198/002
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198/002/la
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198/003
+  D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594/TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198/003/la
+  ls_1_top=5
+find_rc=0

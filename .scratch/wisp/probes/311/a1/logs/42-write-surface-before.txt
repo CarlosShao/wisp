@@ -1,0 +1,21 @@
+now=2026-10-12 13:56:05 +08  （本件＝commit 前重跑一次，含锚漂移读数）
+起手锚(派单)=8e3cb370  HEAD_now=af5179dd
+## 锚在跑动期间被编排者推进了一笔（⛔ 我造的）：
+af5179dd 派 311-a1（票 311 AC#0 只读归因）＋编排者 13:2x 名册现量：59 枚残渣分桶＋D 根那 12 枚'进得去名字、进不去内容'的封存目录 ★自抓一处尺的假数（默认 locale 那把严格尺报 58＝GBK 字节流，成因我第一版写歪已改正）
+## 那一笔⛔ 碰 internal/winsec ⇄ 工作树里 winsec 干净 ⇒ 本腿两发吃的仍是同一份码：
+winsec_diff_lines_8e3cb370..HEAD=0
+winsec_worktree_dirty=0
+## 在飞的邻居（本腿⛔ 提交⛔ revert⛔ 修改，两发对照也⛔ 借它们跑）：
+ M scripts/winsec-tests.sh
+ M scripts/wisp-cli-tests.sh
+ M tools/d22scan/runtests.sh
+## 全量计数（⛔ 本腿名下的都在里面）
+全量_改动行数=846  已跟踪改动=37  未跟踪=809
+## 本腿两件套（显式 pathspec）
+ M .scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md
+?? .scratch/wisp/probes/311/a1/
+## 票面 numstat（必须 1 add / 0 del）
+1	0	.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md
+## 本腿⛔ 碰过的写面反证
+internal_scripts_github_docs_tools_lines=3  （上面那三枚邻居在飞件已具名，⛔ 本腿名下）
+surface_rc=0

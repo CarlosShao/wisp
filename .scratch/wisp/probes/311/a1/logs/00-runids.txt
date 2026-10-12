@@ -1,0 +1,5 @@
+TS=20261012-133040-1594
+rc_after_mkdir=0
+ROOTA=C:\Users\swq\AppData\Local/wisp-test-gotmp/311a1-A-20261012-133040-1594
+ROOTB=D:/tmp/wisp-test-gotmp/311a1-B-20261012-133040-1594
+TS=20261012-133040-1594

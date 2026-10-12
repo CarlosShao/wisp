@@ -1,0 +1,42 @@
+now=2026-10-12 13:50:28
+===== ROOT=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594
+DIR|creation=2026-10-12 13:30:40.912|C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\aclprobe
+DIR|creation=2026-10-12 13:40:02.398|C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant-la
+DIR|creation=2026-10-12 13:40:02.270|C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant-runner
+DIR|creation=2026-10-12 13:41:30.690|C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant2-la
+DIR|creation=2026-10-12 13:41:30.636|C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant2-runner
+CANNOT_ENUMERATE=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant2-runner err=UnauthorizedAccessException: Access to the path 'C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant2-runner' is denied.
+dir_count_excluding_root=5
+enumerate_denied_count=1
+===== ROOT=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594
+DIR|creation=2026-10-12 13:30:40.913|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\aclprobe
+DIR|creation=2026-10-12 13:40:02.416|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant-la
+DIR|creation=2026-10-12 13:40:02.408|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant-runner
+DIR|creation=2026-10-12 13:41:30.700|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant2-la
+DIR|creation=2026-10-12 13:41:30.695|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant2-runner
+DIR|creation=2026-10-12 13:31:53.203|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964
+DIR|creation=2026-10-12 13:31:54.750|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538
+DIR|creation=2026-10-12 13:31:53.203|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932
+DIR|creation=2026-10-12 13:31:58.657|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198
+CANNOT_ENUMERATE=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant2-runner err=UnauthorizedAccessException: Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\plant2-runner' is denied.
+DIR|creation=2026-10-12 13:31:53.203|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001
+DIR|creation=2026-10-12 13:31:54.750|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001
+DIR|creation=2026-10-12 13:31:53.204|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001
+DIR|creation=2026-10-12 13:31:58.659|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002
+DIR|creation=2026-10-12 13:31:58.659|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003
+DIR|creation=2026-10-12 13:31:53.203|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001\la
+DIR|creation=2026-10-12 13:31:54.750|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\named
+DIR|creation=2026-10-12 13:31:54.751|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\numeric
+DIR|creation=2026-10-12 13:31:53.204|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001\runner
+DIR|creation=2026-10-12 13:31:58.659|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002\la
+DIR|creation=2026-10-12 13:31:58.660|D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003\la
+CANNOT_ENUMERATE=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001\la err=UnauthorizedAccessException: Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001\la' is denied.
+CANNOT_ENUMERATE=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\named err=UnauthorizedAccessException: Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\named' is denied.
+CANNOT_ENUMERATE=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\numeric err=UnauthorizedAccessException: Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\numeric' is denied.
+CANNOT_ENUMERATE=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001\runner err=UnauthorizedAccessException: Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001\runner' is denied.
+CANNOT_ENUMERATE=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002\la err=UnauthorizedAccessException: Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002\la' is denied.
+CANNOT_ENUMERATE=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003\la err=UnauthorizedAccessException: Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003\la' is denied.
+dir_count_excluding_root=20
+enumerate_denied_count=7
+ps_errors=8
+ps_rc=0

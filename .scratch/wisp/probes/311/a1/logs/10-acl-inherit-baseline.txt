@@ -1,0 +1,354 @@
+now=2026-10-12 13:30:48
+FileSystemRightsEnumNames=ListDirectory,ReadData,WriteData,CreateFiles,CreateDirectories,AppendData,ReadExtendedAttributes,WriteExtendedAttributes,Traverse,ExecuteFile,DeleteSubdirectoriesAndFiles,ReadAttributes,WriteAttributes,Write,Delete,ReadPermissions,Read,ReadAndExecute,Modify,ChangePermissions,TakeOwnership,Synchronize,FullControl
+Delete=65536
+maskbit ListDirectory=1
+maskbit Traverse=32
+maskbit CreateFiles=2
+maskbit CreateDirectories=4
+maskbit Delete=65536
+maskbit ReadPermissions=131072
+maskbit ChangePermissions=262144
+maskbit TakeOwnership=524288
+maskbit Synchronize=1048576
+maskbit FullControl=2032127
+maskbit Modify=197055
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+Cannot find an overload for "Parse" and the argument count: "1".
+At D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\311\a1\ps1\dump-acl.ps1:15 char:5
++     $byname[[int]([System.Security.AccessControl.FileSystemRights]::P ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest
+ 
+name_for_0x40=
+===== PATH=D:\
+owner=NT AUTHORITY\SYSTEM
+dacl_protected_flag=False
+sddl=O:SYG:SYD:(A;OICIIO;SDGXGWGR;;;AU)(A;;0x1301bf;;;AU)(A;;FA;;;SY)(A;OICIIO;GA;;;SY)(A;OICIIO;GA;;;BA)(A;;FA;;;BA)(A;;0x1200a9;;;BU)(A;OICIIO;GXGR;;;BU)
+ACE[0] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=-536805376 mask=0xE0010000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=False
+ACE[1] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=Modify, Synchronize mask=0x1301BF inh=None prop=None isinherited=False
+ACE[2] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=False
+ACE[3] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=False
+ACE[4] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=False
+ACE[5] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=False
+ACE[6] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=ReadAndExecute, Synchronize mask=0x1200A9 inh=None prop=None isinherited=False
+ACE[7] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=-1610612736 mask=0xA0000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=False
+ace_count=8
+--- icacls_verbatim:
+ICACLS| D:\ BUILTIN\Administrators:(F)
+ICACLS|     BUILTIN\Administrators:(OI)(CI)(IO)(F)
+ICACLS|     NT AUTHORITY\SYSTEM:(F)
+ICACLS|     NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F)
+ICACLS|     NT AUTHORITY\Authenticated Users:(M)
+ICACLS|     NT AUTHORITY\Authenticated Users:(OI)(CI)(IO)(M)
+ICACLS|     BUILTIN\Users:(RX)
+ICACLS|     BUILTIN\Users:(OI)(CI)(IO)(GR,GE)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+===== PATH=D:\tmp
+owner=NT AUTHORITY\SYSTEM
+dacl_protected_flag=False
+sddl=O:SYG:SYD:(A;ID;FA;;;BA)(A;OICIIOID;GA;;;BA)(A;ID;FA;;;SY)(A;OICIIOID;GA;;;SY)(A;ID;0x1301bf;;;AU)(A;OICIIOID;SDGXGWGR;;;AU)(A;ID;0x1200a9;;;BU)(A;OICIIOID;GXGR;;;BU)
+ACE[0] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=True
+ACE[1] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[2] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=True
+ACE[3] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[4] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=Modify, Synchronize mask=0x1301BF inh=None prop=None isinherited=True
+ACE[5] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=-536805376 mask=0xE0010000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[6] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=ReadAndExecute, Synchronize mask=0x1200A9 inh=None prop=None isinherited=True
+ACE[7] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=-1610612736 mask=0xA0000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ace_count=8
+--- icacls_verbatim:
+ICACLS| D:\tmp BUILTIN\Administrators:(I)(F)
+ICACLS|        BUILTIN\Administrators:(I)(OI)(CI)(IO)(F)
+ICACLS|        NT AUTHORITY\SYSTEM:(I)(F)
+ICACLS|        NT AUTHORITY\SYSTEM:(I)(OI)(CI)(IO)(F)
+ICACLS|        NT AUTHORITY\Authenticated Users:(I)(M)
+ICACLS|        NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+ICACLS|        BUILTIN\Users:(I)(RX)
+ICACLS|        BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+===== PATH=D:\tmp\wisp-test-gotmp
+owner=DESKTOP-LVS7839\swq
+dacl_protected_flag=False
+sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:(A;ID;FA;;;BA)(A;OICIIOID;GA;;;BA)(A;ID;FA;;;SY)(A;OICIIOID;GA;;;SY)(A;ID;0x1301bf;;;AU)(A;OICIIOID;SDGXGWGR;;;AU)(A;ID;0x1200a9;;;BU)(A;OICIIOID;GXGR;;;BU)
+ACE[0] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=True
+ACE[1] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[2] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=True
+ACE[3] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[4] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=Modify, Synchronize mask=0x1301BF inh=None prop=None isinherited=True
+ACE[5] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=-536805376 mask=0xE0010000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[6] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=ReadAndExecute, Synchronize mask=0x1200A9 inh=None prop=None isinherited=True
+ACE[7] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=-1610612736 mask=0xA0000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ace_count=8
+--- icacls_verbatim:
+ICACLS| D:\tmp\wisp-test-gotmp BUILTIN\Administrators:(I)(F)
+ICACLS|                        BUILTIN\Administrators:(I)(OI)(CI)(IO)(F)
+ICACLS|                        NT AUTHORITY\SYSTEM:(I)(F)
+ICACLS|                        NT AUTHORITY\SYSTEM:(I)(OI)(CI)(IO)(F)
+ICACLS|                        NT AUTHORITY\Authenticated Users:(I)(M)
+ICACLS|                        NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+ICACLS|                        BUILTIN\Users:(I)(RX)
+ICACLS|                        BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+===== PATH=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594
+owner=DESKTOP-LVS7839\swq
+dacl_protected_flag=False
+sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:(A;ID;FA;;;BA)(A;OICIIOID;GA;;;BA)(A;ID;FA;;;SY)(A;OICIIOID;GA;;;SY)(A;ID;0x1301bf;;;AU)(A;OICIIOID;SDGXGWGR;;;AU)(A;ID;0x1200a9;;;BU)(A;OICIIOID;GXGR;;;BU)
+ACE[0] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=True
+ACE[1] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[2] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=True
+ACE[3] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[4] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=Modify, Synchronize mask=0x1301BF inh=None prop=None isinherited=True
+ACE[5] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=-536805376 mask=0xE0010000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[6] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=ReadAndExecute, Synchronize mask=0x1200A9 inh=None prop=None isinherited=True
+ACE[7] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=-1610612736 mask=0xA0000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ace_count=8
+--- icacls_verbatim:
+ICACLS| D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594 BUILTIN\Administrators:(I)(F)
+ICACLS|                                                     BUILTIN\Administrators:(I)(OI)(CI)(IO)(F)
+ICACLS|                                                     NT AUTHORITY\SYSTEM:(I)(F)
+ICACLS|                                                     NT AUTHORITY\SYSTEM:(I)(OI)(CI)(IO)(F)
+ICACLS|                                                     NT AUTHORITY\Authenticated Users:(I)(M)
+ICACLS|                                                     NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+ICACLS|                                                     BUILTIN\Users:(I)(RX)
+ICACLS|                                                     BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+===== PATH=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\aclprobe
+owner=DESKTOP-LVS7839\swq
+dacl_protected_flag=False
+sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:(A;ID;FA;;;BA)(A;OICIIOID;GA;;;BA)(A;ID;FA;;;SY)(A;OICIIOID;GA;;;SY)(A;ID;0x1301bf;;;AU)(A;OICIIOID;SDGXGWGR;;;AU)(A;ID;0x1200a9;;;BU)(A;OICIIOID;GXGR;;;BU)
+ACE[0] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=True
+ACE[1] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[2] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=None prop=None isinherited=True
+ACE[3] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=268435456 mask=0x10000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[4] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=Modify, Synchronize mask=0x1301BF inh=None prop=None isinherited=True
+ACE[5] type=Allow sid=S-1-5-11 who=NT AUTHORITY\Authenticated Users rights=-536805376 mask=0xE0010000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ACE[6] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=ReadAndExecute, Synchronize mask=0x1200A9 inh=None prop=None isinherited=True
+ACE[7] type=Allow sid=S-1-5-32-545 who=BUILTIN\Users rights=-1610612736 mask=0xA0000000 inh=ContainerInherit, ObjectInherit prop=InheritOnly isinherited=True
+ace_count=8
+--- icacls_verbatim:
+ICACLS| D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\aclprobe BUILTIN\Administrators:(I)(F)
+ICACLS|                                                              BUILTIN\Administrators:(I)(OI)(CI)(IO)(F)
+ICACLS|                                                              NT AUTHORITY\SYSTEM:(I)(F)
+ICACLS|                                                              NT AUTHORITY\SYSTEM:(I)(OI)(CI)(IO)(F)
+ICACLS|                                                              NT AUTHORITY\Authenticated Users:(I)(M)
+ICACLS|                                                              NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+ICACLS|                                                              BUILTIN\Users:(I)(RX)
+ICACLS|                                                              BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+===== PATH=C:\Users\swq\AppData\Local
+owner=DESKTOP-LVS7839\swq
+dacl_protected_flag=False
+sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-513D:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;S-1-5-21-1228170099-895614386-1166154857-1001)
+ACE[0] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ACE[1] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ACE[2] type=Allow sid=S-1-5-21-1228170099-895614386-1166154857-1001 who=DESKTOP-LVS7839\swq rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ace_count=3
+--- icacls_verbatim:
+ICACLS| C:\Users\swq\AppData\Local NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+ICACLS|                            BUILTIN\Administrators:(I)(OI)(CI)(F)
+ICACLS|                            DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+===== PATH=C:\Users\swq\AppData\Local\wisp-test-gotmp
+owner=DESKTOP-LVS7839\swq
+dacl_protected_flag=False
+sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;S-1-5-21-1228170099-895614386-1166154857-1001)
+ACE[0] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ACE[1] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ACE[2] type=Allow sid=S-1-5-21-1228170099-895614386-1166154857-1001 who=DESKTOP-LVS7839\swq rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ace_count=3
+--- icacls_verbatim:
+ICACLS| C:\Users\swq\AppData\Local\wisp-test-gotmp NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+ICACLS|                                            BUILTIN\Administrators:(I)(OI)(CI)(F)
+ICACLS|                                            DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+===== PATH=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594
+owner=DESKTOP-LVS7839\swq
+dacl_protected_flag=False
+sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;S-1-5-21-1228170099-895614386-1166154857-1001)
+ACE[0] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ACE[1] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ACE[2] type=Allow sid=S-1-5-21-1228170099-895614386-1166154857-1001 who=DESKTOP-LVS7839\swq rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ace_count=3
+--- icacls_verbatim:
+ICACLS| C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594 NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+ICACLS|                                                                         BUILTIN\Administrators:(I)(OI)(CI)(F)
+ICACLS|                                                                         DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+===== PATH=C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\aclprobe
+owner=DESKTOP-LVS7839\swq
+dacl_protected_flag=False
+sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;S-1-5-21-1228170099-895614386-1166154857-1001)
+ACE[0] type=Allow sid=S-1-5-18 who=NT AUTHORITY\SYSTEM rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ACE[1] type=Allow sid=S-1-5-32-544 who=BUILTIN\Administrators rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ACE[2] type=Allow sid=S-1-5-21-1228170099-895614386-1166154857-1001 who=DESKTOP-LVS7839\swq rights=FullControl mask=0x1F01FF inh=ContainerInherit, ObjectInherit prop=None isinherited=True
+ace_count=3
+--- icacls_verbatim:
+ICACLS| C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\aclprobe NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+ICACLS|                                                                                  BUILTIN\Administrators:(I)(OI)(CI)(F)
+ICACLS|                                                                                  DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+ICACLS| 
+ICACLS| Successfully processed 1 files; Failed processing 0 files
+ps_errors=23
+ps_rc=0

@@ -1,0 +1,10 @@
+budget: rel<=121 leaf<=100 abs<=165 (abs = repo根 + rel, repo根长=38 含尾斜杠前)
+72 rel / 39 leaf / 19b-acl-after-plantprobe-both-roots.txt
+71 rel / 38 leaf / 11-acl-before-fresh-dir-both-roots.txt
+68 rel / 35 leaf / 14-residue-deep-list-both-roots.txt
+67 rel / 34 leaf / 13-acl-after-plant2-both-roots.txt
+66 rel / 33 leaf / 18-acl-after-residue-leaves-B.txt
+65 rel / 32 leaf / 20-gotest-rootA-localappdata.txt
+total_files=29
+abs_prefix=/d/work/workspace/projects plans/Wisp
+len_rc=0
