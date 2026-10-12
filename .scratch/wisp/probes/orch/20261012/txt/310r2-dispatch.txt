@@ -1,0 +1,79 @@
+# 派单 `310-r2`（票 310 增量程落地腿）
+
+你是**实现腿**（写码者）。锚＝HEAD `27176c2c`（工作树 `D:\work\workspace\projects plans\Wisp`，分支 `dev`）。
+先读 `.scratch/wisp/issues/README.md` 的派单规矩与「Hard global constraints」，再读本票
+`.scratch/wisp/issues/310-test-binary-deaths-leave-temp-test-dirs-accumulating.md`（**全文读**，含 12:3x 与 13:1x 两条编排者 bullet），
+再读 `.scratch/wisp/probes/orch/gate-roster-304.md`（正典名册）与 `.scratch/wisp/probes/310/r1/10-impl.md`（前一程落地的步子原文）。
+
+## 1. 本程只做两笔欠账（编排者已裁，⛔ 扩大射程）
+
+- **`Q-310-orch-P`＝名册外那第五枚起 `go test` 的入口今天照旧漏**：
+  `scripts/d22scan.sh:51` 调 `sh "$root/tools/d22scan/runtests.sh" -C tools/d22scan ./...`，
+  而 `tools/d22scan/runtests.sh:75` 那一行 `go test -v -count=1 "$@" >"$out" 2>&1` 就是真的起测试进程的地方。
+  ⇒ 在那枚文件里补上**与前四枚同一形**的专用根步子（现形＝`scripts/winsec-tests.sh:55-65` 那一块，逐字照形，只换 `<entry>` 名与 echo 前缀）。
+  ⛔ 改变它的委托语义：`portable-tests.sh` / `winsec-tests.sh` / `wisp-cli-tests.sh` 已经在 `GOTMPDIR` 非空时**不另开第二枚根**，
+  所以你这一步的守卫必须仍带 `-z "${GOTMPDIR:-}"`（一次运行只一枚根，被委托的那发继承上层那枚）。
+- **`Q-310-orch-Q`＝`LOCALAPPDATA` 为空那一支整块静默**：现在那块 `if` 三条件任一不成立就直接跳过——⛔ `GOTMPDIR=` 行、⛔ `DEGRADED` 行。
+  ⇒ 让它**说实话**：只在「`GOOS`＝windows 且 `LOCALAPPDATA` 为空」这一形打一行具名告警（前缀同形：`<文件>: ticket 310 AC#1: ...`），
+  ⛔ 改成 fail-closed（⛔ 退非 0、⛔ 拒绝跑测试；撤销口令＝「310 改 fail-closed」），⛔ 动非 windows 那两支的行为（ubuntu 腿那一支今天不动，见票 310 `Q-310-v1-2`）。
+  ⇒ 四枚文件（`scripts/portable-tests.sh`／`scripts/winsec-tests.sh`／`scripts/wisp-cli-tests.sh`／`tools/d22scan/runtests.sh`）**同一形**，⛔ 只改一枚（形不一致＝下一程又要猜）。
+
+**判据的牙（⛔ 恒真）**：本程两形都必须被现量咬到——
+① 改前：`sh scripts/d22scan.sh` 的任何读数里⛔ 出现 `GOTMPDIR=`（腿自己现跑取证）；改后：同一入口出现**恰一行** `GOTMPDIR=`，
+且那一行的根**当场在盘上存在**（`[ -d ]` 逐条，或 `Get-ChildItem -Directory` 具名）＋名册尺证它⛔ 落在 `%TEMP%` 顶层。
+② 改前：把 `LOCALAPPDATA` 抽掉那一发**什么行都不打**（把这一发的完整 stdout/stderr 落盘，⛔ 用"没输出"当证据，要带 `rc=`）；
+改后：同一台面同一抽法必须打出那行新告警，且 `GOTMPDIR` 仍未设、`rc` 与改前同数。
+⛔ 造不出世界＝本格作废：任何"应当为 0"的链一律 `|| true` 并把 stderr 与命中数并排落盘。
+
+## 2. 台面（⛔ 拿旧数当基线，⛔ 拿共享工作树跑"改前那一发"）
+
+改前那一发**必须**在仓外导出树里用 HEAD 原文跑，模板逐字（六件套少一枚就会造一枚**假红**，10-11 事故：`walk …: cannot find the file specified` 长得像"牙响了"）：
+
+```
+tree=$(mktemp -d) && git -C "D:/work/workspace/projects plans/Wisp" archive HEAD go.mod go.sum internal cmd tools scripts frontend | tar -x -C "$tree"
+find "$tree" -name '*.go' | wc -l        # 先证取出的东西非空（今天这台面上应为 683 枚上下；"0"⛔ 是读数，"分母 N 且 0"才是）
+```
+改后那一发在**工作树**跑，两发⛔ 用不同卷／不同根形状（改前改后必同台面）。
+★专用根默认落 `${LOCALAPPDATA}/wisp-test-gotmp/<entry>-<时间>-<pid>`，⛔ 换卷（换到 `D:/tmp` 会把 `internal/winsec` 那道门从
+`RUN=101 PASS=58 FAIL=0 SKIP=0` 打成 `PASS=56 FAIL=2`＝票 311 的射程，⛔ 在本程归因、⛔ 由你顺手放宽任何断言）。
+⛔ 把 `WISP_TEST_GOTMP_ROOT` 指进仓内目录；造 `DEGRADED` 那形时指到一枚**文件**下面（如 `$PWD/go.mod/nope`，`mkdir -p` 必失败且⛔ 建出任何东西）。
+
+## 3. 门禁与读数（每件自落 `rc=N`，⛔ 0 字节尺件；0 字节＝没交，先找同格带 `rc=` 的同伴件）
+
+- `sh scripts/d22scan.sh` ⇒ `rc=0`（本程动了它的调用链，这一发**同时是** §1① 的改后凭据）。
+- `sh scripts/check-path-length-budget.sh --with-self-test` ⇒ `rc=0`。
+- `bash scripts/portable-tests.sh --scope=census` ⇒ totals 行**逐字未变**：
+  `packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`。
+- `bash scripts/winsec-tests.sh ./internal/winsec/` ⇒ 颜色**逐字未变** `RUN=101 PASS=58 FAIL=0 SKIP=0`（⛔ 写 `--scope=winsec`：GUARD 1 会用 rc=2 拒掉，这是已知坑，别再撞）。
+- `bash scripts/portable-tests.sh --scope=cli` ⇒ 与改前**同一红、同三名**（本机既有红／真窗／真麦那一族⛔ 你的射程、⛔ 由你归因；你只需证"没多也没少"）。
+- `%TEMP%` 顶层名册尺（一把）：`powershell -NoProfile -Command '(Get-ChildItem -Path $env:TEMP -Directory | Where-Object { $_.Name -like "Test*" }).Count'`
+  ⇒ 起跑前／交件后各一发，**逐枚带 `CreationTime` 的名册作差**（`comm -13`）；编排者 13:0x 现量＝**59 枚**（⛔ 你和任何人删任何一枚）。
+- ★**读数件⛔ 写进任何专用根里**（一律落你自己的 `logs/`；数根里条目时具名写你用哪一把尺：`Get-ChildItem -Directory` ⇄ `ls -1` 会差枚数）。
+- 四枚 `tasklist`（在 **bash** 里跑，⛔ 放进 `.ps1`：PowerShell ⛔ 认 `//FI`，会连正控一起报 0＝假 0）＋家族尺
+  （PowerShell 一律走 `-File`，⛔ 内联 `$_`；命中 0 也要落盘，⛔ 用空输出当"0 枚"）。
+
+## 4. 写面（只有这三件套，逐字照办；⛔ 越界、⛔ 顺手清别家的东西）
+
+1. `.scratch/wisp/probes/310/r2/**`（你自己的件；⛔ 长名、⛔ 文件名带 `§`、⛔ `.out`、⛔ 目录里放 `.go`）
+2. 票 310 `.scratch/wisp/issues/310-test-binary-deaths-leave-temp-test-dirs-accumulating.md` **末尾追加一条 bullet**（1 add / 0 del，⛔ 改任何既有行）
+3. 上面 §1 点名的四枚 `scripts/**` + `tools/d22scan/runtests.sh`
+
+⛔ 翻任何 `AC` 框、⛔ 碰 `Status:` 行、⛔ 把票改名 `-done`（那笔归编排者）；
+⛔ 动 `.github/workflows/ci.yml` 与 `.github/**`、⛔ 动任何 `*_test.go` 的断言、⛔ 动 `internal/**` 生产分级、
+⛔ 动票 304 的 Job Object 面（`internal/proc/**` 等）、⛔ 动票 311 的归因、⛔ 动 SLO 阈值／golden／`thresholds.go`；
+共享工作树里机主/别家那批未提交改动（`.gitignore`／`go.mod`／`design/**`／别人的 `probes/**`）**⛔ 提交、⛔ revert、⛔ 修改、⛔ 进你任何一笔**。
+
+## 5. commit 纪律（⛔ push）
+
+只 commit、⛔ push、⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`。
+**`git add` 与 `git commit` 都要带显式 pathspec**（逐枚列路径；⛔ `git add -A`／`git add .`／整目录扫）。
+建议逐笔：先写改动 → 跑门禁 → 落件 → 用 `--pathspec-from-file=<你的清单.txt>` 提交（清单本身也入库，便于复算越界）。
+交件后自报越界：`git show --name-only --format=` 逐笔数，并把每笔读数写进 `90-final.md`。
+⚠ 提交完把索引清空（⛔ 让共享索引跨腿窗口挂着别人的东西）。
+
+## 6. 交回什么（输出预算：⛔ 复述票面全文、⛔ 把日志正文抄进交付件）
+
+件（各 ≤120 行）：`00-anchor.md`（锚＋本程只做那两笔的复述）／`10-impl.md`（四枚文件的步子原文与逐枚差异数）／
+`20-paired-readings.md`（§1 两形的改前⇄改后成对读数，每行带件名与 `rc=`）／`30-gates.md`（§3 逐把尺）／`90-final.md`（越界逐笔、欠账名册、自报）。
+回报正文只给：提交号列表、每笔 pathspec 枚数、§1 两形各自"响在哪一行"、你⛔ 做到的与代用的尺（如某工具本机没有）、以及**你自报的越格动作**（做了超过本派单范围的一切，⛔ 自己盖章说"没影响"）。
+⛔ 引用任何"某某目录是我这一发漏的"之前，先用名册作差＋`CreationTime` 证它今天还在盘上（突变台件自报的 `dir=` ⛔ 算凭据，前两程各栽过一次）。
