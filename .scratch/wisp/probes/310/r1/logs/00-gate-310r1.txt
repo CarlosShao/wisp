@@ -1,0 +1,18 @@
+# 310-r1 起手闸门（正典 gate-roster-304.md §1 逐字）ts=2026-10-12 11:41:19+0800
+tasklist wisp.exe rc=0 hits=0
+tasklist balldebug.exe rc=0 hits=0
+tasklist mockllm.exe rc=0 hits=0
+tasklist wisp.test.exe rc=0 hits=0
+--- family ruler (canonical verbatim) ---
+family_verbatim_rc=0
+family_count=0
+family_count_form_rc=0
+--- positive control (same pipeline, must be non-zero) ---
+posctl_svchost_count=85
+posctl_rc=0
+--- TEMP Test* roster row (ticket 310 AC#4 line) ---
+temp_test_count=55
+temp_all_dir_count=2783
+temp_rc=0
+roster_rc=0
+roster_bytes=2615 .scratch/wisp/probes/310/r1/logs/00-temp-roster-start.txt

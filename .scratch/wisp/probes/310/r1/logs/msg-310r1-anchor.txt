@@ -1,0 +1,12 @@
+ticket 310 AC#1 (leg 310-r1): starting anchor + canonical gate readings
+
+Writes the leg's 00-anchor.md: the dispatch's 310-r1 0 step 3-4, 2 item 5 and the
+starred 3 lines copied back verbatim (proof it was read), the anchor readings
+(HEAD 7e6c1579, branch dev, clean scripts/internal/cmd/tools status, empty index),
+the verbatim gate-roster-304.md 1 rulers with their readings (all four tasklist
+hits 0, family ruler 0 with the same-pipeline positive control svchost.exe=85 on
+the same line, %TEMP% Test* roster = 55 = the registered stock this leg will not
+touch), and the two premises of the dispatch that the disk contradicts:
+scripts/slo-check.ps1 has zero "go test" call sites, and scripts/d22scan.sh is a
+fifth entry that starts "go test" but is not in the named roster (not touched,
+registered as a debt instead).
