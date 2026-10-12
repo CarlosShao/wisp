@@ -1,0 +1,80 @@
+票 311 落地腿 `311-r1b`（接死腿 `311-r1`）——把已入库的那枚"换卷拒绝块"复制到其余三枚入口，并把 AC#2 的牙跑齐
+
+## 0. 你是谁、从哪儿接（先读这段）
+
+- 你是**落地腿**（写码），不是验收腿。票面＝`.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md`，先通读，尤其"编排者裁形"那一节（裁＝**乙＋丙**，⛔ 甲；撤销口令「311 改裁甲」）。
+- 你的前一枚 `311-r1` **死于模型连接中断**（15:0x，40 次工具调用，1 笔提交 `07e2eba5`＝入口普查＋改前基线）。它留下的**半件事我已代提入库＝`3b857e53`**：`scripts/winsec-tests.sh` 里那段换卷拒绝块（71 行，位置在守卫链之后、起测试之前）。**该笔标的是〔未验证半成品〕**，因为它注释里指名的两枚件（`logs/23-order-degraded-then-guard.txt`／`24-order-guard-after-guard1.txt`）**盘上根本不存在**＝死腿没跑那两发。⇒ 你要么把它们真跑出来，要么改写那段注释，⛔ 让注释继续指名不存在的东西（本仓有先例：注释里的凭据一律当待验断言）。
+- 我（编排者）已经替它跑过两发，件在 `.scratch/wisp/probes/orch/20261012/logs/orch-311salvage-A-crossvol.txt`／`...-B-defaultenv.txt`：
+  - ⓐ 换卷（`WISP_TEST_GOTMP_ROOT=/d/tmp/...`）⇒ **`rc=2`**、逐字打出 `ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%`、并且**一个测试进程都没起**（那发里没有任何 `=== RUN`）。同一行里它还并列点名两枚 offender（`GOTMPDIR`＝310 那块自己导出的、`WISP_TEST_GOTMP_ROOT`＝操作员手给的）。
+  - ⓑ 出厂默认（两枚变量都不设）⇒ 块**一声不响**（`ticket 311` 命中 0）、`rc=0`、脚本自己那行四数逐字 `=== RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0`。
+  ⇒ **入口 1（winsec）的形状已被这两发证明可用**；你买的是其余三枚＋下面 AC#2 那几发成对读数。
+
+## 1. 锚点与"树会呼吸"
+
+- 起手先记自己的 HEAD 并落一件 `logs/00-head.txt`（`git log -1 --format='%H %ad %s'` 逐字）。
+- ⚠ **`cmd/wisp/resident_audio_windows.go` 此刻在共享工作树里是脏的＝另一枚腿 `295-r1` 正在写**。⇒ 本波 `./cmd/wisp/` 那一包的颜色归它，**你⛔ 跑 `go test ./cmd/wisp/`、⛔ 动 `cmd/wisp/**`**。任何"改前/改后"的对比⛔ 用共享工作树跑（历史那侧回不去），一律 `git archive` 成**仓外导出树**，且**量之前先数 `.go` 枚数证非空**（"0"⛔ 是读数，"分母 N 且 0 枚"才是）。
+- 凡引用枚数/行号：尺＋射程目录＋provenance（工作树 ⇄ HEAD blob ⇄ 导出树）三态写清；行号只作定位辅注，判据一律**内容锚**。
+
+## 2. 你的写面（只有这三样，别的一律越界）
+
+1. `.scratch/wisp/probes/311/r1b/**` —— 你自己的件（⛔ 往别腿目录写，⛔ 往 `probes/311/r1/` 追加）。
+2. `scripts/portable-tests.sh`／`scripts/wisp-cli-tests.sh`／`tools/d22scan/runtests.sh` —— **只有这三枚文件允许改**（外加 `scripts/winsec-tests.sh` 里那段注释，若你选择改注释而不是补读数）。
+3. 票 311 末尾 **1 条** Progress-log bullet（1 add / 0 del；⛔ 翻任何框、⛔ 动 `Status:` 那一行、⛔ 改上面任何一节的原句、⛔ 加 `-done`）。
+
+⛔ `internal/winsec/**` 一字（票面禁区：AC#1 之前⛔ 动它的写面；本腿是门禁面，同样⛔）。⛔ `cmd/wisp/**`（295-r1 在飞）。⛔ `tools/d22scan/allowlist.txt`、`internal/observe/thresholds.go`、golden、D43 转移表、C1–C32、D1–D47、三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。⛔ `.github/**`／`ci.yml`。⛔ 新造协程（D38(b)）、⛔ 裸 `go func(`。⛔ 为变绿放宽任何断言／改阈值。⛔ 把根**换卷**当顺手优化。
+
+## 3. AC#1 落点：把那枚块复制进其余三枚入口（插入点现量已由死腿量过，你复跑再落）
+
+死腿件 `.scratch/wisp/probes/311/r1/10-entry-census.md` §2 那张表（我复读过，形状与 `3b857e53` 实际落点相符）。**你进场先逐枚现跑复认插入点**（行号会随任何提交腐烂），内容锚如下：
+
+| 入口 | 插在"哪一步之后" | 插在"哪一步之前" | 之后才起测试 |
+|---|---|---|---|
+| `scripts/portable-tests.sh` | 打出 skip pattern 那一行（死腿量到 `:758`） | `capture=$(mktemp ...)` 那一枚赋值 | `sh "$strict"` 那一委派 |
+| `scripts/wisp-cli-tests.sh` | 非 windows / DLL 面那几段守卫的 `fi`（`:132`） | 那段 PATH staging 的注释开头 | `bash "$portable" --scope=cli` |
+| `tools/d22scan/runtests.sh` | 310 根块（含 `DEGRADED` 分支）的收尾 `fi`（`:107`） | `out=$(mktemp ...)` | `go test -v -count=1 "$@"` |
+
+硬性要求：
+- **逐字复制 `3b857e53` 里 winsec 那一段**，只换两样＝入口名前缀（`winsec-tests.sh:` → 该脚本自己的前缀）与"哪枚 gate"的措辞；⛔ 顺手分叉出第四种拼法（先例＝票 310 那块在四枚里"同形"是判据，`A862` 已具名我核的是**源行比较**）。复制完自己交一把尺：四枚文件的块**逐行 diff 只有前缀那几行不同**，把尺与差集并排落件。
+- 判据语义⛔ 动：命中换卷＝**打到 stderr 的具名 GUARD 行＋`exit 2`**（裁形＝乙，故意吃退码；撤销口令「311 撤乙」）；读不出卷形（UNC、裸相对名、`/c/x` 之外的拼法）＝**INCONCLUSIVE 行、⛔ 不改退码**，这一支票面已登记为欠账 `Q-311-r1-1`，⛔ 由你顺手扩。
+- ⛔ 破坏三形（出厂默认两枚变量都不设／同卷不同目录的根／`go env GOOS` 非 windows 或 `%LOCALAPPDATA%` 为空＝那一支必须**继续只有 310 那句 DEGRADED、⛔ 多出一行也⛔ 少一行**）。每形一发、逐形具名落件，且**"命中 0"旁边必须有分母**（同一发里那行 gate 自己的四数或 `rc=0` 站在旁边）。
+
+## 4. AC#2 牙（这一格是本票的钱，⛔ 拿"我加了守卫"当凭据）
+
+- ⓐ **换卷一发（每枚入口一发）**：`WISP_TEST_GOTMP_ROOT` 指到 **`D:` 上的目录** ⇒ 该入口必须在**起测试之前**拒绝：`rc≠0`、stderr 逐字带具名 GUARD 行、stdout 里 `=== RUN` 命中 **0**（旁边站分母：那一发的 `rc=N` 行）。winsec 那发我交过了（`orch-311salvage-A-crossvol.txt`），你复跑一次并另跑其余三枚。
+- ⓑ **敏感性正控（★ 没这一发＝那格没交）**：**只**把守卫块摘掉（其余一字不动）⇒ 同一枚入口、同一个 `D:` 根必须回到票 311 现量那句颜色＝winsec **`PASS=56 FAIL=2`、红句里逐字含 `TempDir RemoveAll cleanup`＋`Access is denied`**；换句话说守卫**买的是"从这发红里把结论救回来"**。做法＝仓外备份＋`sha256sum` 还原证明（本仓先例＝`296-v1`），⛔ 裸改跟踪文件后不还原。**摘除 ⇄ 复原两发的名册/四数并排落件。**
+- ⓒ 三形不许破（上面第 3 节末条）＝**每形一发成对**：守卫在场 ⇄ 守卫摘除，两发的**颜色必须一样**（这三形守卫本来就不该说话）；不一样＝你把守卫写到了会误伤默认形状的地方，回来问我。
+- ⓓ 顺序那一发（补死腿没跑的那两枚件，或改注释）：同发内按行序读出 `[310 的 GOTMPDIR/DEGRADED 行] → [311 的 GUARD 行] → [零测试进程]`，具名件回指注释。
+- 每一发都要**自带"坏世界真被造出来"那一行**（`A860` 的定式）：读不到那行＝当场标〔作废〕并落**非零 rc**，⛔ 把"我没看到"写成"修法成立"。
+
+## 5. AC#4 门禁（改前基线已在 `07e2eba5` 的 `logs/1x-pre-*.txt`，⛔ 拿旧数当基线＝再跑一次现量）
+
+- `GOFLAGS= go build ./...` rc=0。
+- `sh scripts/d22scan.sh` ⇒ **⛔ 在共享工作树上跑**（此刻 `cmd/wisp` 脏）。做法＝把**你自己的提交**`git archive` 到仓外导出树再跑，六件套⛔ 少一枚（`go.mod go.sum internal cmd tools scripts`）；导出后**先数 `.go` 证非空**。凡红要先判"是不是台面故障"：件名里带 `walk ... The system cannot find the file specified.`／`build failed`／`no test files` 一律⛔ 计入牙，具名写"是哪一行红的"。
+- `sh scripts/check-path-length-budget.sh --with-self-test` rc=0（`VERDICT GREEN`）。
+- `bash scripts/portable-tests.sh --scope=census` totals 行**逐字未变**（改前先取、改后再取，作差；现量基线逐字＝`packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0`）。⚠ 你改的正是 portable 那枚入口，这一发**同时**是"守卫不误伤默认形状"的证据。
+- `bash scripts/winsec-tests.sh ./internal/winsec/` 改前改后各 ≥2 发，取**交集**并逐名作差；⛔ 那串 `--scope=winsec` 的拼写（会撞 GUARD 1 `rc=2`）。
+- ⚠ `sh scripts/d22scan.sh` 现在**自己会穿过你写进 `runtests.sh` 的那段守卫**——默认形状必须照旧 rc=0，这一发请把"块在 runtests 里、门仍绿"写成一格具名读数。
+- 每枚门禁件**自落一行 `rc=N`**；⛔ 0 字节件当"那格交了"（0 字节只有"同伴件里那行 `rc=0`"能背书时才可用）。
+- ⛔ `cmd | head; echo $?`（那取到的是 head 的退码）；⛔ 用区间尺量越界，逐笔 `git show --name-only --format=`。
+
+## 6. 存量与残留（⛔ 归你）
+
+- ⛔ 删任何目录/文件（票 310 的铁规矩原样适用；专用根里的残渣、`%TEMP%` 顶层那族、`TestProbeStepByStep3843095677` 一律不动）。
+- ⛔ 在 `probes/**` 下建 `.go`；证据件⛔ 叫 `.out`、⛔ 件名带 `§`、⛔ 长名（相对 ≤121／末段 ≤100／全路径 ≤165，新建前先跑长度门）。
+- 你的每发换卷 shot 会在 `D:` 根留下一枚运行目录＝**预期残留**，把根名逐枚列进件里（`CreationTime` 尺），⛔ 动、⛔ 删，归我入账。
+
+## 7. 输出预算与交件形状
+
+- 件数 ≤ **8**：`10-replicate.md`（四枚同形对拉尺）／`20-teeth.md`（ⓐⓑⓒⓓ 判语）／`30-gates.md`（门禁四数）＋ `logs/**` 原始读数 ＋ 最后两枚 pathspec/message 件。每件 ≤ 200 行；判语一句＋尺一行＋件名，⛔ 复述票面。
+- 分笔提交（每枚入口一笔、牙一笔、门禁一笔也行），**`git add` 与 `git commit` 两处都带显式 pathspec**；⛔ `add -A`／`add <目录>`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ push；⛔ 在仓内建 worktree。
+- 交件时在最后一节**自报哪些格没做完**（⛔ 把没跑的读数写成跑过）。我收你的件时会逐把尺复跑，⛔ 你自报的数当数。
+
+## 8. 三枚本仓踩过的老雷（⛔ 再踩）
+
+- 跑读数前 `tasklist` 现跑 `wisp.exe`／`balldebug.exe`＝**0**，并把"哪几枚 `*.test.exe` 是我的"用**归属尺**（命令行里的具名根路径＋父 PID 在不在）写进件——⛔ 把"N 枚测试进程"直接当自己的残留（本仓实测过整笔假账）。名册尺**两把并排**（`--- PASS` 含子测试 ⇄ 只数顶层），⛔ 相加、⛔ 互替。
+- ⛔ 动 `go.mod`／`.gitignore`／`design/**`——机主在那三面有在飞的活（本票一寸都不需要碰）。
+- 一把尺报"0 命中"之前先看它的 **stderr**（裸括号的 `grep -E` 会报错、`2>/dev/null` 会把报错吞成假 0）；stderr 与命中数并排落盘。`grep -c` 命中 0 时退码＝1，⛔ 让它截断你的 `&&` 链（写成 `N=$(... || true)`）。
+
+## 9. 顺手一件（不买格）：`scripts/winsec-tests.sh` 里**票 310 那块**（`3b857e53` 之上仍原样）请读一遍并具名一句"我同意／我不同意台账 `A862` 里'四枚同形＋跑在 GUARD 之前'那句"——我是盖章人那一格的第二双眼就是为你这枚腿留的。
+
+**Status 口径**：⛔ 翻框。你交完，我复跑 AC#1/AC#2/AC#4 的尺再定翻哪几格。⛔ 零 push、⛔ 零删目录。
