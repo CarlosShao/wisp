@@ -1,0 +1,34 @@
+票 295 非实现者验收腿 `295-v1`（落地腿 `295-r1` 交完四笔，我来请你把它的凭据**逐枚重跑**再定翻哪几格）
+
+## 0. 角色与来路（先读这段）
+
+- 你是**验收腿＝非实现者**（AGENTS §0.3、SPEC-12 §4.3 那枚"裁决者≠实现者"）。⛔ 写生产码、⛔ 改判据、⛔ 翻任何 AC 框、⛔ 动 `Status:`、⛔ 加 `-done`；你交**判语**，翻框归我。
+- 被验的落地腿＝`295-r1`（死于 150 轮帽，但四笔已入库）：`d5ef9cb9`（AC#1 形状）→ `35744137`（AC#2 反形）→ `1c1d7df3`（AC#1 修复：注释压回原行数）→ `421469b7`（AC#3 越界＋AC#4 门禁＋AC#5 race 代价表）。它的件＝`.scratch/wisp/probes/295/r1/**`（`10-impl.md`／`20-anti-form.md`／`30-gates.md`＋`logs/**`）。票面＝`.scratch/wisp/issues/295-ra-started-bare-bool-written-off-thread.md`（含 10-10、10-11 两节我的裁定/更正，⚠ 里面若干枚数已过期，一律以你自己现跑为准）。
+- 我已经自己复跑过的（⛔ 你再跑一遍同样的、把精力放在我没覆盖的面上）：`.started` 形状名册＝**Store 2／Load 9／声明 1／裸赋值 0**；`git diff --numstat 0615c6c9..HEAD -- cmd/wisp/resident_audio_windows.go`＝**10/10、行数 425⇄425（净零）**；逐笔越界只碰它派单那 4 枚 `cmd/wisp` 件；`go build ./...` rc=0；`gofumpt -l cmd/wisp` 工作树＝2 枚既有（`models.go` CRLF 假枚＋`panel_transport_35r2_test.go`＝票 298 残余）；`gofmt -l cmd/wisp`＝1 枚；`sh scripts/d22scan.sh` rc=0（分母 `internal/=231 cmd/=39`、ban#8 `internal/=533 cmd/=119`）；长度门 `VERDICT GREEN`（分母 11894）。
+
+## 1. ★你这枚腿的主菜：三处**只有你能回答**的问题
+
+1. **AC#2 的牙是在"旧形状"上量的**（尺＝件头时刻：`logs/30-ac2-m1-deletewrite.txt`＝**14:48:22**，而把注释压回原行数那笔 `1c1d7df3`＝**15:06**）⇒ **删写变异必须在最终形状上重跑一次**：把 `toggleMute` 体内那枚 `ra.started.Store(gate.Open())` 删掉，指名用例 `TestAC290BothMuteGesturesTurnTheGateAndBack` 必须红；还原后再一发必须绿。**变异做法二选一（都在本仓有先例）**＝`-overlay`（`298-v1`）或仓外备份＋`sha256sum` 还原证明（`296-v1`）；⛔ 裸改跟踪文件后不还原。★**同批必须交"红名册差集"**：同一枚台件下整包 `-v` 两发（变异 ⇄ pristine）作差，证明**只有那一枚**红＝票面 ⓔ-2 那句"其余 7 枚读点对这枚变异不敏感"今天是**读码推的、腿没跑过**，你是第一个跑它的人。
+2. **那枚形状改的是"存储形状"、⛔ 语义**——请独立攻这一句：把 `Store(gate.Open())` 换成 `Store(true)`（⛔ 删、⛔ 加行）⇒ 按 ⓓ-2/ⓔ-3 的预判它应当**也红**（红在第二轮 `ra.gate.Open() || started` 那枚断言）；若**全绿**，说明那枚断言其实是恒真，那是本票最该被抓出来的缺陷（先例＝台账 `A710`：我代笔的仪器被判没牙）。⚠ 顺手核 ⓓ-2 #7 那枚 `t.Fatalf`：`started=%t` 用的是 `.Load()` 还是把 `atomic.Bool` 丢进 `%v`（后者编译过、断言不变红、但失败日志开始撒谎＝`{true}`）。
+3. **注释里的断言⛔ 算凭据**：`105` 那组新注释逐字声称"`-race` is not in the roster"、"neighbour `levels` has been an atomic.Uint64 all along"、以及 `resident_ball_windows.go` 里 ui-sta 线程那几处指路。**逐枚现跑尺**判真假（尺例：`grep -rn --include=*.sh --include=*.ps1 --include=*.yml -e '-race' scripts/ .github/`；`git grep -n 'levels atomic.Uint64' HEAD -- cmd/wisp`；注释里指名的件/行是否真在那枚件里）。**有任何一条不成立 ⇒ 具名报我，别自己改注释。**
+
+## 2. 其余格：复核即可（⛔ 重复它的活，把差集与尺口径挑毛病）
+
+- **AC#1**：核它是否**只**动了 ⓓ 那 11 枚点（内容锚逐枚对拉，⛔ 行号）；★另外判一句我没判的：`posture()` 之外有没有第二枚生产读者被漏（尺＝`git grep -n 'posture()' HEAD -- cmd/wisp`）；`verdict` 那枚是否确实**没**被顺手改（票面 `AC#0` 裁的是"手势路径⛔ 写 verdict"）。
+- **AC#3**：它交的是逐笔 `git show --name-only --format=`；你换一把尺复算（`git diff-tree -r --name-only --no-renames` 对四笔）并过票面那十枚禁列路径。
+- **AC#4**：⛔ 重跑七发（贵且无新信息）。请跑**两发**就够：① 整包 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ ./internal/audio/ -count=1 -v` 一发，拿它的红名册去对腿交的红名册（`logs/44`/`logs/45`＝工作树 D/E 那两发），逐名判"我这发多出来或少掉的那几枚，是不是它已具名的真窗族/flake"；② `-race` ⛔ 你跑（它已交代价表，你只判那张表的**结论句**是否越界——见第 3 条）。⚠ **成对树口径**：腿自己声明它的导出树⛔ 用六件套、加了 `frontend` 才跑起来（否则 `cmd/wisp` [setup failed]，欠账 `Q-295-r1-archive-set`）⇒ 你若跑导出树，六件套⛔ 少一枚，且**量之前先数 `.go` 证非空**。
+- **AC#5**：那张 race 代价表的**判语层**请你攻：它写"23 块 DATA RACE 栈顶全在 `auditf()`、与本票那枚 `started` ⛔ 相关（`grep -c 'resident_audio' = 0`）"⇒ 复核这把尺（件 `logs/60-ac5-race.txt`），并单独答一句：**有没有任何一块 race 栈里出现 `resident_audio`/`toggleMute`/`posture`**。这一问是"改形状这件事到底被仪器看得见吗"的唯一直接证据。
+
+## 3. 判语格式（我要能直接照着翻框）
+
+每格一行：**成立／不成立／部分成立**＋一句判据＋尺（命令逐字＋射程＋provenance）＋件名。⚠ 三条口径硬要求：① "0 命中"旁边必须站着分母或一行正控；② 报 0 之前先看 stderr（裸括号 `grep -E` 那形会造假 0）；③ 名册尺**两把并排**（含子测试 ⇄ 只数顶层），⛔ 相加、⛔ 互替。⛔ 把"我没看到"写成"修法成立"；哪发没跑成就当场标〔作废〕并落非零 `rc=`。
+
+## 4. 写面与纪律
+
+- 写面三件套＝`.scratch/wisp/probes/295/v1/**`（件＋`logs/**`）＋`docs/evidence/s1/**`（裁决表，AGENTS §1.5 的落点，⛔ 当越界）＋票 295 末尾 **1 条** bullet（1 add / 0 del）。
+- ⛔ 改任何生产/测试码（变异只允许**瞬态**＋当场还原证明）；⛔ 动 `scripts/**`（`311-r1b` 在飞那批）、⛔ 动 `cmd/wisp` 那 4 枚件的字节、⛔ `config_readers_255.go`／`config_receipt_255_test.go`（票 255 那枚按行号取证的旧仪器）；⛔ `frontend/**`、`design/**`、`PLAN.md`、`docs/specs/**`、`thresholds.go`、golden、`allowlist.txt`、D43、C1–C32、D1–D47、三枚冻结件、`.github/**`。
+- ★**起手三问**（本仓"每波只交一枚 `./cmd/wisp/` 色"）：`git status --porcelain -- cmd/wisp` 是否空？有没有别腿正在跑那一包？编排者（我）自己的读数发是否在跑？⇒ 有任一非空/在跑，**先等**，别抢台面。
+- 专用根⛔ 换卷：`GOTMPDIR` 只指 `%LOCALAPPDATA%` 那一卷（C:）下的 `wisp-test-gotmp/295v1-<时间戳>-<pid>`；⛔ `D:`（票 311 现量：换卷改颜色）。
+- ⛔ 删任何目录/文件（`%TEMP%` 顶层 59 枚在册残渣、两枚专用根里的运行目录一律不动）；临时件**只建不删**；证据件⛔ `.out`、⛔ `probes/**` 下⛔ `.go`、⛔ 件名带 `§`、⛔ 长名（相对 ≤121／末段 ≤100／全路径 ≤165，新建前跑长度门）。
+- git：只 commit ⛔ push；`git add` 与 `git commit` **两处都带显式 pathspec**；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内建 worktree。
+- 输出预算：≤ 6 枚件、每件 ≤ 200 行；判语在前、尺在中、件名在后。跑读数前 `tasklist` 现跑 `wisp.exe`／`balldebug.exe`＝0，`*.test.exe` 家族读数随行（归属靠命令行里的具名根路径＋父 PID，⛔ 把别腿的进程记成自己的残留）。
