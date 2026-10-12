@@ -1,0 +1,7 @@
+token_user=DESKTOP-LVS7839\swq
+token_user_sid=S-1-5-21-1228170099-895614386-1166154857-1001
+token_groups_count=11
+group_sid=S-1-5-11
+BA_resolves=S-1-5-32-544
+deny_only_check: BA present in token above? 0
+whoami_ps_rc=0

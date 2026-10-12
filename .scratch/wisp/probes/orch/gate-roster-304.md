@@ -44,6 +44,8 @@ powershell -NoProfile -Command '(Get-ChildItem -Path $env:TEMP -Directory | Wher
 - ⛔ 把 `WISP_TEST_GOTMP_ROOT`（或直接 `GOTMPDIR`）指到**仓所在卷 `D:`** 再跑 winsec／cli 档：`bash scripts/winsec-tests.sh ./internal/winsec/` 在 `D:` 根＝**PASS=56 FAIL=2**（`TestGateJudgesThePrivateSetByResolvedSID` 两枚子例＋`TestSealNarrowsAndNamesThePrincipalItRemovedBySID`），在默认 `%LOCALAPPDATA%` 兄弟根＝**PASS=58 FAIL=0**；同台面同码，只差那一枚卷。⇒ 改前／改后两发**必须用同一枚根形状**（默认那枚），⛔ 为了"仓外"好看把根挪卷。
 - ⛔ 这一档的命令拼写＝`bash scripts/winsec-tests.sh ./internal/winsec/`。`--scope=winsec` 是 `portable-tests.sh` 那一层的拼法，喂给 `winsec-tests.sh` 会被它自己的 GUARD 1 打回 **rc=2**（10-12 编排者踩过，件 `logs/orch-winsec-dtmp-err.txt` 逐字两行）。
 - 新增一把同行尺（⛔ 单独当判据）：`grep -c 'TempDir RemoveAll cleanup'`——`t.TempDir()` 的**自我收尾本身会失败**（10-12 现量：`D:` 根那发 4 行逐字 `… \la: Access is denied.`，`%LOCALAPPDATA%` 根那发 **0** 行，件 `logs/orch-winsec-A-dtmp.txt`／`-B-lappdata.txt`）⇒ 残渣⛔ 只来自"进程被杀"这一种死法。
+- ★**这一族换卷改颜色的成因今天量到了，措辞要照它写**（10-12 `311-a1` 取证＋编排者六把复跑，件 `probes/311/a1/logs/**`＋`probes/orch/20261012/logs/orch-311a1-recheck-{A,B}.txt`）：差的⛔ 是判据、是**清理器能不能删**。默认根的父链给本账号 `swq:(I)(OI)(CI)(F)`（含 delete-child）⇒ 封存后的叶删得掉；`D:` 卷的父链只给 `Authenticated Users:(I)(M)`＋`Users:(I)(RX)`（Modify ⛔ 含 delete-child）⇒ 夹具封出的 protected DACL 叶（逐字 `D:PAI(A;;FA;;;LA)`，`LA`＝`…-500`＝**已禁用的内置管理员**）谁都不给访问 ⇒ 自我收尾必失败、**并把用例判红**。尺＝`icacls` 逐层＋`Get-Acl`；⚠ 三句判据（`gate accepted a descriptor`／`gate refused a descriptor`／`seal left a foreign grant`）四发各 **0 命中** ⇒ **今后任何人把这一族写成"判据不稳／判据依赖夹具位置"＝过期说法**（我 12:2x 就写过一次，更正见 `A860` §3）。
+- ⚠ **令牌／SID 那类读数⛔ 用 `whoami` 走 bash**：10-12 编排者连坏三把（coreutils `whoami` 把 `/user` 当多余参数；MSYS 把 `/groups` 改写成 `C:/Users/…/git/groups`；`cmd //c "whoami /groups …"` 报"too many arguments"）⇒ 正形＝PowerShell 走 `-File`，里面 `[System.Security.Principal.WindowsIdentity]::GetCurrent()` 取令牌、`Get-LocalUser` 取账号状态、`Get-Acl` 取叶的 SDDL。⚠⚠ 同一条上我今天还犯了一次**"坏尺报的 0 当读数"**：`whoami_user_sid=` 那行是空的＝尺坏、⛔ 是"这台机没那枚 SID"。
 
 **数到 ≠ 归我**。任何一枚非零计数，动手之前先答三问，答不全就**停下来上报**，⛔ 不许停：
 
@@ -53,6 +55,8 @@ powershell -NoProfile -Command '(Get-ChildItem -Path $env:TEMP -Directory | Wher
    Windows 会**复用 PID**（票 304 现量：曾被判"已不存在"的 `11724` 后来查得到＝`RuntimeBroker.exe`，只是同号换了人）。
    ⇒ 归属只认**命令行里的具名路径**；路径认不出来的＝**归属不明**，⛔ 归本腿。
 3. **本腿认下哪几枚**——逐枚写 PID＋来路；写不出来的那几枚在报告里标"别家的，⛔ 动"。
+4. ★**派单里只要让一枚腿跑 `go test`，而编队里有另一枚腿正在改 `scripts/**`／`tools/d22scan/runtests.sh`，就要具名写"⛔ 走那三枚入口、直接 `GOTMPDIR=<你的根> go test -v -count=1 ./<包>/`"**（10-12 实测编队：`310-r2` 在改入口、`311-a1` 在取证，两件事撞在同一批文件上；今天没撞坏是靠派单里那句"别用那三枚脚本"，⛔ 靠运气）。
+5. ★**名册尺的枚数要与计数尺逐字对得上；对不上先怀疑尺、⛔ 报数**（10-12 编排者自抓：同一格第一发读到 **58**、真值 **59**，成因＝一枚**带中文的测试临时目录名**经 PowerShell→bash 重定向落成 **GBK 字节流**（件内 NUL＝0、`utf-8` 解码在 offset 1192 失败）⇒ UTF-8 locale 下 `grep` 整件判 binary 且严格正则**整行漏掉那一枚**。定式＝**数行一律 `LC_ALL=C` 或 `grep -a`**；⚠ 我第一版把成因写成"长行触发误判"＝⛔，成因也从"哪把尺少报一枚"倒推不出来（同族错＝`A858` §4／`A860` §6）。
 
 ## 2. 终态锚那一侧（`99-final-anchor.md`／停车点里那句进程计数）
 

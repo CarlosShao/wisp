@@ -1,0 +1,4 @@
+/usr/bin/whoami: extra operand ‘/user’
+Try '/usr/bin/whoami --help' for more information.
+/usr/bin/whoami: extra operand ‘/groups’
+Try '/usr/bin/whoami --help' for more information.

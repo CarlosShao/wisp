@@ -1,0 +1,22 @@
+收 311-a1 ⇒ 票 311 三格翻勾（AC#0/AC#1/AC#3，凭据＝我自己复跑六把尺）＋ A860 / §4.0cv
+
+★归因结论（纠正票面原来的说法）：那两枚红用例**判据不随换卷变**，
+变的是 `t.TempDir()` 的自我收尾——`D:` 卷的父链只给 `Authenticated Users:(I)(M)`
+（无删除子项权），`%LOCALAPPDATA%` 的父链给 `swq:(I)(OI)(CI)(F)`；
+被封叶子带受保护 DACL `D:PAI(A;;FA;;;LA)`，`LA`＝本机已禁用的 Administrator。
+⇒ 我 `AC#1` 裁 **乙＋丙、⛔ 甲**（甲要动 `internal/winsec` 判据层，本票不许）。
+`AC#2/AC#4/AC#5` 三格未勾（乙还没落地）。
+
+编排者侧复跑六把：两发成对 `go test`（默认根 58/0 ⇄ `D:` 根 56/2，我这次先修好自己
+把根写重复的那枚台面故障再取数）、封存叶子逐枚 DACL、我的令牌 SID 三来路（`whoami`
+在 Git Bash 三种拼法全废，改用 PowerShell `-File` + `[WindowsIdentity]::GetCurrent()`）、
+名册 58→59 复认、门禁两把（d22scan rc=0 / 长度门 VERDICT GREEN over-hat=57）。
+
+新增三条正典进 `gate-roster-304.md`：⛔ 把 `whoami` 当令牌尺；`Get-ChildItem` 不带
+`-ErrorAction SilentlyContinue` 会读出一枚假 0；编队里只要有人改入口脚本，
+要跑 `go test` 的腿⛔ 用那些脚本、直接 `GOTMPDIR=<根> go test -v -count=1 ./<包>/`。
+
+⚠ 两处记我：票面与 Status 把「五格」写错（实际 6 格，同族第三次）；
+我这批台账正文里又踩了一次「双引号串内反引号」＝真执行，抓到后当场截断重写，
+细节在 A860 §6。⛔ push、⛔ 删任何目录（在册 59 枚残渣一枚没动）。
+在飞＝310-r2（那三枚入口脚本是它的写面，本笔⛔ 碰）。

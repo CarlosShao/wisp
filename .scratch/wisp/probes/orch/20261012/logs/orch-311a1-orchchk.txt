@@ -1,0 +1,53 @@
+whoami_user_sid=
+group_BA_line=
+group_SY_present=False
+localadmin_500 name=Administrator enabled=False sid=S-1-5-21-1228170099-895614386-1166154857-500
+chain_A dir=C:\Users\swq\AppData\Local\wisp-test-gotmp\orchchk-A-140248 Dc_present=False
+   ace: C:\Users\swq\AppData\Local\wisp-test-gotmp\orchchk-A-140248 NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+   ace: DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+chain_A dir=C:\Users\swq\AppData\Local\wisp-test-gotmp Dc_present=False
+   ace: C:\Users\swq\AppData\Local\wisp-test-gotmp NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+   ace: DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+chain_A dir=C:\Users\swq\AppData\Local Dc_present=False
+   ace: C:\Users\swq\AppData\Local NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+   ace: DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+root_A owner=DESKTOP-LVS7839\swq protected=False
+chain_B dir=D:\tmp\wisp-test-gotmp\orchchk-B-140248 Dc_present=False
+   ace: NT AUTHORITY\Authenticated Users:(I)(M)
+   ace: NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+   ace: BUILTIN\Users:(I)(RX)
+   ace: BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+chain_B dir=D:\tmp\wisp-test-gotmp Dc_present=False
+   ace: NT AUTHORITY\Authenticated Users:(I)(M)
+   ace: NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+   ace: BUILTIN\Users:(I)(RX)
+   ace: BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+chain_B dir=D:\tmp Dc_present=False
+   ace: NT AUTHORITY\Authenticated Users:(I)(M)
+   ace: NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+   ace: BUILTIN\Users:(I)(RX)
+   ace: BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+root_B owner=DESKTOP-LVS7839\swq protected=False
+orchchk_rc=0
+ps_rc=0
+=== 正形尺＝/c/Windows/System32/whoami.exe（上一发坏尺＝coreutils whoami 吞掉 /user，stderr 见 orch-311a1-orchchk-err.txt 190 字节）
+user: desktop-lvs7839\swq
+ERROR: Invalid argument/option - 'C:/Users/swq/.qoder-cn/bin/git/user'.
+Type "WHOAMI /?" for usage.
+sid: 
+--- groups 里 BA 那行逐字：
+ERROR: Invalid argument/option - 'C:/Users/swq/.qoder-cn/bin/git/groups'.
+Type "WHOAMI /?" for usage.
+
+ERROR: Invalid argument/option - 'C:/Users/swq/.qoder-cn/bin/git/groups'.
+Type "WHOAMI /?" for usage.
+--- SY 在不在：0
+=== 第三把尺（cmd //c 形；前两把坏的：coreutils whoami 吞 /user、裸路径被 MSYS 改写）
+error: too many arguments. Expected 1 argument but got 2.
+--- BA 行：
+error: too many arguments. Expected 1 argument but got 2.
+
+error: too many arguments. Expected 1 argument but got 2.
+--- SY 枚数：0
+error: too many arguments. Expected 1 argument but got 2.
+--- AU 枚数：0

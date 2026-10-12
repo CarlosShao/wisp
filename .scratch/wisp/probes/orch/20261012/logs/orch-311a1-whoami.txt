@@ -1,0 +1,8 @@
+=== 我这发的 whoami 正形尺（⛔ ConvertFrom-Csv 那把，上一发它报空＝尺坏）
+swq
+whoami: extra operand ‘/user’
+Try 'whoami --help' for more information.
+-- groups 里 BA/SY/AU 三行逐字：
+whoami: extra operand ‘/groups’
+Try 'whoami --help' for more information.
+whoami_rc=1

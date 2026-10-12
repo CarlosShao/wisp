@@ -1,0 +1,16 @@
+leaf_present=1 owner=DESKTOP-LVS7839\swq protected=True sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:PAI(A;;FA;;;LA)
+  path=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002\la
+  can_list_inside=0 err=Exception calling "GetFiles" with "1" argument(s): "Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002\la' is denied."
+leaf_present=1 owner=DESKTOP-LVS7839\swq protected=True sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:PAI(A;;FA;;;LA)
+  path=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001\la
+  can_list_inside=0 err=Exception calling "GetFiles" with "1" argument(s): "Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001\la' is denied."
+leaf_present=1 owner=DESKTOP-LVS7839\swq protected=True sddl=O:S-1-5-21-1228170099-895614386-1166154857-1001G:S-1-5-21-1228170099-895614386-1166154857-1001D:PAI(A;;FA;;;SY)(A;OICIIO;GA;;;SY)(A;;FA;;;BA)(A;OICIIO;GA;;;BA)(A;;FA;;;LA)(A;OICIIO;GA;;;LA)
+  path=D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001\runner
+  can_list_inside=0 err=Exception calling "GetFiles" with "1" argument(s): "Access to the path 'D:\tmp\wisp-test-gotmp\311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001\runner' is denied."
+ba_row=
+sy_row_present=False
+root=C:\Users\swq\AppData\Local\wisp-test-gotmp run_dirs=24 entry_dirs_sum=0
+root=D:\tmp\wisp-test-gotmp run_dirs=10 entry_dirs_sum=0
+temp_test_star=59
+temp_all_dirs_positive_control=2850
+leafcheck_rc=0
