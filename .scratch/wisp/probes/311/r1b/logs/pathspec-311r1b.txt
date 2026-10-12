@@ -100,3 +100,24 @@ f8b1f446  git add -- scripts/portable-tests.sh          ; git commit -- scripts/
 1) 这三笔证据 commit 自己的 sha ⛔ 写进本文件（自指拿不到），写在票 311 末尾那条 bullet 里；那是唯一一处由外部补齐的号。
 2) 票 311 那一笔＝git add -- .scratch/wisp/issues/311-…md ; git commit -- 同一枚路径，1 加 0 删（只追加 1 条 Progress-log bullet；⛔ 翻框、⛔ 动 Status:、⛔ 改原句、⛔ 加 -done）。
 rc=0
+
+## 补记（本文件自身由 E3 交出，之后又落了三笔，逐枚补在这儿；这把尺＝git show --name-only --format= 逐笔，非区间）
+commit=07e7a1e0 files=12
+  .scratch/wisp/probes/311/r1b/30-gates.md
+  .scratch/wisp/probes/311/r1b/logs/30-G1-post-build.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G2-post-census.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G3-post-d22scan.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G4-post-winsec-run1.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G5-post-winsec-run2.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G6-post-census-worktree.txt
+  .scratch/wisp/probes/311/r1b/logs/30-G7-post-len.txt
+  .scratch/wisp/probes/311/r1b/logs/54-head-move.txt
+  .scratch/wisp/probes/311/r1b/logs/55-audit.txt
+  .scratch/wisp/probes/311/r1b/logs/messages-311r1b.txt
+  .scratch/wisp/probes/311/r1b/logs/pathspec-311r1b.txt
+commit=8f350a9d files=1
+  .scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md
+commit=f10583ab files=2（＝logs/30-G8-final-d22scan-tfinal.txt＋logs/30-G9-final-len-worktree.txt，两枚静态门在最终 commit 的树上重跑）
+本笔（补记这一行自己）＝改 logs/pathspec-311r1b.txt 一枚文件、pathspec 逐枚同上
+票 bullet 那笔的 numstat 自查＝加1 删0（＝1 加 / 0 删；⛔ 翻框＝勾/未勾枚数交这笔前后不变：尺＝grep -c '^[[:space:]]*- [ ]'＝2 未勾、grep -c '^[[:space:]]*- \[x\]'＝4 已勾）
+rc=0
