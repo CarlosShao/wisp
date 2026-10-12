@@ -33,3 +33,5 @@ At line:1 char:31
     + FullyQualifiedErrorId : NamedParameterNotFound,Microsoft.PowerShell.Commands.GetChildItemCommand
  
 0  (交件时现量，⛔ 删任何一枚)
+### 更正上一行的假读数 0：那把尺嵌在双引号里被转义弄坏了（尺故障＝台面故障，⛔ 计入读数）。现量重跑（独立一次 powershell 调用，⛔ 嵌套引号）：test_dirs_at_handoff=53
+handoff_rc=0
