@@ -1,0 +1,7 @@
+commit=f10583ab files=2 forbidden=0 nonmd=2
+    .scratch/wisp/probes/311/r1b/logs/30-G8-final-d22scan-tfinal.txt
+    .scratch/wisp/probes/311/r1b/logs/30-G9-final-len-worktree.txt
+commit=f1155198 files=1 forbidden=0 nonmd=1
+    .scratch/wisp/probes/311/r1b/logs/pathspec-311r1b.txt
+commit=d164e50e files=1 forbidden=0 nonmd=1
+    .scratch/wisp/probes/311/r1b/logs/51-residue.txt
