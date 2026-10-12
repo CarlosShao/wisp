@@ -1,0 +1,70 @@
+# 51-residue.txt - 本腿留在盘上的东西，逐枚具名（⛔ 删、⛔ chmod、⛔ takeown；票 310 铁规矩原样适用）
+尺＝ps1/residue.ps1（根与条目数＋CreationTime）⇄ ps1/residue2.ps1（锁死叶递归到 6 层，带正控）；原始读数＝51-residue-raw.txt / 52-locked-leaves-raw.txt
+--- 1. D: 根：本腿那枚换卷基根（每发 ⓐ 拒绝之前 310 那块已经把根建出来了＝预期残留）---
+base=D:/tmp/wisp-test-gotmp/311r1b-xvol created=2026-10-12 15:30:02 child_dir_count=9
+  run_dir=cli-20261012-153216-987 created=2026-10-12 15:32:16 subdirs=0
+  run_dir=d22scan-20261012-153216-967 created=2026-10-12 15:32:16 subdirs=0
+  run_dir=d22scan-20261012-154042-1761 created=2026-10-12 15:40:42 subdirs=4
+  run_dir=portable-20261012-153201-879 created=2026-10-12 15:32:01 subdirs=0
+  run_dir=portable-20261012-154030-1620 created=2026-10-12 15:40:30 subdirs=0
+  run_dir=winsec-20261012-153120-830 created=2026-10-12 15:31:20 subdirs=0
+  run_dir=winsec-20261012-153200-857 created=2026-10-12 15:32:00 subdirs=0
+  run_dir=winsec-20261012-153218-1028 created=2026-10-12 15:32:18 subdirs=0
+  run_dir=winsec-20261012-153915-1179 created=2026-10-12 15:39:15 subdirs=4
+  run_dir=d22scan-20261012-153303-1490 created=2026-10-12 15:33:03 subdirs=0
+  run_dir=portable-20261012-153243-1284 created=2026-10-12 15:32:43 subdirs=0
+  run_dir=portable-20261012-154315-2322 created=2026-10-12 15:43:15 subdirs=0
+  run_dir=winsec-20261012-153220-1094 created=2026-10-12 15:32:20 subdirs=0
+  run_dir=winsec-20261012-154251-2169 created=2026-10-12 15:42:51 subdirs=0
+  run_dir=d22scan-20261012-153800-875 created=2026-10-12 15:38:00 subdirs=0
+--- 2. C: 同卷不同目录的两枚基根（形②用）---
+samevol path=C:\Users\swq\AppData\Local\311r1b-samevol kind=dir created=2026-10-12 15:32:20
+samevol child_dir_count=5
+samevol_pre path=C:\Users\swq\AppData\Local\311r1b-samevol-pre kind=dir created=2026-10-12 15:38:00
+samevol_pre child_dir_count=1
+--- 3. 锁死叶（本腿自造，逐枚具名；⛔ 本机进不去）---
+  root=311r1b-xvol created=2026-10-12 15:30:02 unreadable_leaves=12
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestGateJudgesThePrivateSetByResolvedSID478705078\001\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2741356468\001\named :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2741356468\001\numeric :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1312225176\001\runner :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2957489375\002\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2957489375\003\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestGateJudgesThePrivateSetByResolvedSID2238090202\001\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_80797984\001\named :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_80797984\001\numeric :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju539505741\001\runner :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2859173643\002\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2859173643\003\la :: UnauthorizedAccessException
+--- 4. 同一把尺在**别腿的根**上读到东西＝这把尺能看见（正控，⛔ 拿本腿的 0 当没有锁死叶）---
+  root=311a1-B-20261012-133040-1594 created=2026-10-12 13:30:40 unreadable_leaves=7
+  root=orch-B-140142 created=2026-10-12 14:01:42 unreadable_leaves=6
+  root=winsec-20261012-115046-1584 created=2026-10-12 11:50:46 unreadable_leaves=6
+  root=winsec-20261012-122119-659 created=2026-10-12 12:21:19 unreadable_leaves=6
+  root=311a1-A-20261012-133040-1594 created=2026-10-12 13:30:40 unreadable_leaves=1
+--- 5. 仓外导出树与备份（本腿建的，⛔ 删）---
+trees=backup tpost tpre tstrip 
+tpost_relbare_dir=yes  ← 25-C2 那发 INCONCLUSIVE 支里 mkdir 真建出来的（相对 GOTMPDIR）
+planted_files=D:/tmp/311r1b-notadir (file) D:/tmp/311r1b-notadir-file (file)  ← 造 DEGRADED 支那一发用的夹具，⛔ 删
+--- 6. 默认根与 %TEMP% 顶层（⛔ 动、只量）---
+temp_test_star: 起手=59 ⇄ 交件=59 (票面在册 59)
+default_base_child_dir_count=66
+rc=0
+--- 7. 上面两张清单的对齐说明＋一把被作废的读数（⛔ 留在结论链，具名）---
+§1 那 15 行 run_dir 是同一把尺的一次遍历按顺序切的：前 **9** 行属 D: 基根（child_dir_count=9），中间 **5** 行属 C:/311r1b-samevol（=5），末 **1** 行属 C:/311r1b-samevol-pre（=1）⇒ 9+5+1=15 对得上
+⚠ **ps1/residue.ps1 第一版那行 unreadable_leaf_count=0 是假阴性**：它只往下探三层（根/用例名/NNN），而清理器删不掉的是第四层（…\002\la）。作废它、改用 ps1/residue2.ps1（递归 6 层＋同一发里在别腿的根上读到东西＝正控）。原 0 号读数留在 51-residue-raw.txt，⛔ 删件
+--- 8. 默认根（%LOCALAPPDATA%\wisp-test-gotmp）里本腿能逐枚指认是自己的那些 ---
+尺＝从 41 号件那列 GOTMPDIR= 里取默认根那几枚（别腿也用同名前缀，所以⛔ 拿枚数当整根都是我的）
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261012-152406-1626
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261012-153442-2483
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261012-154100-1791
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/portable-20261012-152347-1235
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/portable-20261012-153428-2048
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/portable-20261012-153544-3154
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/portable-20261012-154008-1469
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-152255-804
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-152322-974
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-153502-2790
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-153523-2958
+  my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-153946-1323
+  default_base_total_child_dirs=66（含别腿与编排者今天在飞的根；票 Status: 那句 24 枚是 15:0x 的快照，⛔ 是我的数、也⛔ 是我的账）

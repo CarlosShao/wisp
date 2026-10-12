@@ -1,0 +1,15 @@
+# 50-end-roster.txt - the same two rulers as logs/02-start-roster.txt, re-run at交件 time
+--- tasklist wisp.exe / balldebug.exe ---
+wisp_tasklist_lines=0 (分母: 同发 svchost 尺=85)
+balldebug_tasklist_lines=0
+--- powershell roster ---
+all_processes_positive_control=353
+svchost_positive_control=85
+family_test_exe=0
+wisp_or_balldebug_exe=0
+temp_root=C:\Users\swq\AppData\Local\Temp
+temp_test_star=59
+temp_all_dirs_positive_control=2900
+--- *.test processes still alive (attribution: cmdline names whose root; 295-r1 owns wisp.test) ---
+family_test_exe=0
+rc=0

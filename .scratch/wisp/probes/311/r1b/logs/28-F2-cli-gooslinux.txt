@@ -1,0 +1,8 @@
+# ruler=probes/311/r1b/txt/run-shot.sh ; shot taken by leg 311-r1b
+workdir=/d/tmp/311r1b/tpost
+env_assignment=GOOS=linux
+command_line=bash scripts/wisp-cli-tests.sh
+---- interleaved stdout+stderr follows ----
+wisp-cli-tests.sh: GUARD - this is the windows leg of the cmd/wisp gate, GOOS=linux. See the header for the ubuntu reading; do not relax this line.
+---- capture ends ----
+rc=2

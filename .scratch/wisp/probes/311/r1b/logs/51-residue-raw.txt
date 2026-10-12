@@ -1,0 +1,35 @@
+xvol_base path=D:\tmp\wisp-test-gotmp\311r1b-xvol kind=dir created=2026-10-12 15:30:02
+xvol_base child_dir_count=9
+  root=cli-20261012-153216-987 created=2026-10-12 15:32:16 subdirs=0
+  root=d22scan-20261012-153216-967 created=2026-10-12 15:32:16 subdirs=0
+  root=d22scan-20261012-154042-1761 created=2026-10-12 15:40:42 subdirs=4
+    sub=TestGateJudgesThePrivateSetByResolvedSID478705078 created=2026-10-12 15:40:44
+    sub=TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2741356468 created=2026-10-12 15:40:46
+    sub=TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1312225176 created=2026-10-12 15:40:44
+    sub=TestSealNarrowsAndNamesThePrincipalItRemovedBySID2957489375 created=2026-10-12 15:40:49
+  root=portable-20261012-153201-879 created=2026-10-12 15:32:01 subdirs=0
+  root=portable-20261012-154030-1620 created=2026-10-12 15:40:30 subdirs=0
+  root=winsec-20261012-153120-830 created=2026-10-12 15:31:20 subdirs=0
+  root=winsec-20261012-153200-857 created=2026-10-12 15:32:00 subdirs=0
+  root=winsec-20261012-153218-1028 created=2026-10-12 15:32:18 subdirs=0
+  root=winsec-20261012-153915-1179 created=2026-10-12 15:39:15 subdirs=4
+    sub=TestGateJudgesThePrivateSetByResolvedSID2238090202 created=2026-10-12 15:39:31
+    sub=TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_80797984 created=2026-10-12 15:39:33
+    sub=TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju539505741 created=2026-10-12 15:39:31
+    sub=TestSealNarrowsAndNamesThePrincipalItRemovedBySID2859173643 created=2026-10-12 15:39:36
+samevol path=C:\Users\swq\AppData\Local\311r1b-samevol kind=dir created=2026-10-12 15:32:20
+samevol child_dir_count=5
+  root=d22scan-20261012-153303-1490 created=2026-10-12 15:33:03 subdirs=0
+  root=portable-20261012-153243-1284 created=2026-10-12 15:32:43 subdirs=0
+  root=portable-20261012-154315-2322 created=2026-10-12 15:43:15 subdirs=0
+  root=winsec-20261012-153220-1094 created=2026-10-12 15:32:20 subdirs=0
+  root=winsec-20261012-154251-2169 created=2026-10-12 15:42:51 subdirs=0
+samevol_pre path=C:\Users\swq\AppData\Local\311r1b-samevol-pre kind=dir created=2026-10-12 15:38:00
+samevol_pre child_dir_count=1
+  root=d22scan-20261012-153800-875 created=2026-10-12 15:38:00 subdirs=0
+default_base path=C:\Users\swq\AppData\Local\wisp-test-gotmp kind=dir created=2026-10-12 11:52:34
+planted_notadir=True planted_notadir_file=True
+export_trees_top=4
+leaf_dirs_scanned=10
+unreadable_leaf_count=0
+rc=0 (powershell -File exit code captured in the same trip as logs/53-residue-rerun.txt; note this ruler was SUPERSEDED by ps1/residue2.ps1 - its unreadable_leaf_count=0 is a false negative, see 51-residue.txt section 7)

@@ -1,0 +1,51 @@
+BASE D:\tmp\wisp-test-gotmp
+  top_root_dir_count=13
+  root=311a1-B-20261012-133040-1594 created=2026-10-12 13:30:40 unreadable_leaves=7
+  root=311r1b-xvol created=2026-10-12 15:30:02 unreadable_leaves=12
+  root=orch-B-140142 created=2026-10-12 14:01:42 unreadable_leaves=6
+  root=winsec-20261012-115046-1584 created=2026-10-12 11:50:46 unreadable_leaves=6
+  root=winsec-20261012-122119-659 created=2026-10-12 12:21:19 unreadable_leaves=6
+BASE C:\Users\swq\AppData\Local\wisp-test-gotmp
+  top_root_dir_count=66
+  root=311a1-A-20261012-133040-1594 created=2026-10-12 13:30:40 unreadable_leaves=1
+dirs_listed_ok=160
+unreadable_leaf_total=38
+LEAF 311a1-B-20261012-133040-1594 :: 311a1-B-20261012-133040-1594\plant2-runner :: UnauthorizedAccessException
+LEAF 311a1-B-20261012-133040-1594 :: 311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSID3972594964\001\la :: UnauthorizedAccessException
+LEAF 311a1-B-20261012-133040-1594 :: 311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\named :: UnauthorizedAccessException
+LEAF 311a1-B-20261012-133040-1594 :: 311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2711238538\001\numeric :: UnauthorizedAccessException
+LEAF 311a1-B-20261012-133040-1594 :: 311a1-B-20261012-133040-1594\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1386323932\001\runner :: UnauthorizedAccessException
+LEAF 311a1-B-20261012-133040-1594 :: 311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\002\la :: UnauthorizedAccessException
+LEAF 311a1-B-20261012-133040-1594 :: 311a1-B-20261012-133040-1594\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1250499198\003\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestGateJudgesThePrivateSetByResolvedSID478705078\001\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2741356468\001\named :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2741356468\001\numeric :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1312225176\001\runner :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2957489375\002\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\d22scan-20261012-154042-1761\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2957489375\003\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestGateJudgesThePrivateSetByResolvedSID2238090202\001\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_80797984\001\named :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_80797984\001\numeric :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju539505741\001\runner :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2859173643\002\la :: UnauthorizedAccessException
+LEAF 311r1b-xvol :: 311r1b-xvol\winsec-20261012-153915-1179\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2859173643\003\la :: UnauthorizedAccessException
+LEAF orch-B-140142 :: orch-B-140142\TestGateJudgesThePrivateSetByResolvedSID400457061\001\la :: UnauthorizedAccessException
+LEAF orch-B-140142 :: orch-B-140142\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_4080642028\001\named :: UnauthorizedAccessException
+LEAF orch-B-140142 :: orch-B-140142\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_4080642028\001\numeric :: UnauthorizedAccessException
+LEAF orch-B-140142 :: orch-B-140142\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju3101285498\001\runner :: UnauthorizedAccessException
+LEAF orch-B-140142 :: orch-B-140142\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1147809017\002\la :: UnauthorizedAccessException
+LEAF orch-B-140142 :: orch-B-140142\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1147809017\003\la :: UnauthorizedAccessException
+LEAF winsec-20261012-115046-1584 :: winsec-20261012-115046-1584\TestGateJudgesThePrivateSetByResolvedSID2097073293\001\la :: UnauthorizedAccessException
+LEAF winsec-20261012-115046-1584 :: winsec-20261012-115046-1584\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2674464811\001\named :: UnauthorizedAccessException
+LEAF winsec-20261012-115046-1584 :: winsec-20261012-115046-1584\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2674464811\001\numeric :: UnauthorizedAccessException
+LEAF winsec-20261012-115046-1584 :: winsec-20261012-115046-1584\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1189509836\001\runner :: UnauthorizedAccessException
+LEAF winsec-20261012-115046-1584 :: winsec-20261012-115046-1584\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1684605740\002\la :: UnauthorizedAccessException
+LEAF winsec-20261012-115046-1584 :: winsec-20261012-115046-1584\TestSealNarrowsAndNamesThePrincipalItRemovedBySID1684605740\003\la :: UnauthorizedAccessException
+LEAF winsec-20261012-122119-659 :: winsec-20261012-122119-659\TestGateJudgesThePrivateSetByResolvedSID2872432645\001\la :: UnauthorizedAccessException
+LEAF winsec-20261012-122119-659 :: winsec-20261012-122119-659\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2948749545\001\named :: UnauthorizedAccessException
+LEAF winsec-20261012-122119-659 :: winsec-20261012-122119-659\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_2948749545\001\numeric :: UnauthorizedAccessException
+LEAF winsec-20261012-122119-659 :: winsec-20261012-122119-659\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju3713951561\001\runner :: UnauthorizedAccessException
+LEAF winsec-20261012-122119-659 :: winsec-20261012-122119-659\TestSealNarrowsAndNamesThePrincipalItRemovedBySID3143495113\002\la :: UnauthorizedAccessException
+LEAF winsec-20261012-122119-659 :: winsec-20261012-122119-659\TestSealNarrowsAndNamesThePrincipalItRemovedBySID3143495113\003\la :: UnauthorizedAccessException
+LEAF 311a1-A-20261012-133040-1594 :: C:\Users\swq\AppData\Local\wisp-test-gotmp\311a1-A-20261012-133040-1594\plant2-runner :: UnauthorizedAccessException
+rc=0 (powershell -File exit code re-taken verbatim through txt/run-shot.sh into logs/53-residue-rerun.txt, which carries rc= and the same readings)

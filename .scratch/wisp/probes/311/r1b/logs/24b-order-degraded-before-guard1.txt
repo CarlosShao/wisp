@@ -1,0 +1,11 @@
+# ruler=probes/311/r1b/txt/run-shot.sh ; shot taken by leg 311-r1b
+workdir=/d/tmp/311r1b/tpost
+env_assignment=LOCALAPPDATA=
+env_assignment=WISP_TEST_GOTMP_ROOT=
+command_line=bash scripts/winsec-tests.sh --scope=winsec
+---- interleaved stdout+stderr follows ----
+winsec-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no measured-safe root to build (a root on another volume turns the winsec seal cases red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset.
+winsec-tests.sh: GUARD 1 - the package list for this step does not name ./internal/winsec/; it is [--scope=winsec].
+winsec-tests.sh: this step IS the internal/winsec gate (ticket 110 AC#2/AC#3). Removing the package from the list must fail the step, not shorten it.
+---- capture ends ----
+rc=2

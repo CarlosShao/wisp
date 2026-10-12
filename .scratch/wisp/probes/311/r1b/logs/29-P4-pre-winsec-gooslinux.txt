@@ -1,0 +1,8 @@
+# ruler=probes/311/r1b/txt/run-shot.sh ; shot taken by leg 311-r1b
+workdir=/d/tmp/311r1b/tpre
+env_assignment=GOOS=linux
+command_line=bash scripts/winsec-tests.sh ./internal/winsec/
+---- interleaved stdout+stderr follows ----
+winsec-tests.sh: GUARD - this step is the windows leg of the winsec gate, GOOS=linux. Fix the job it is wired into (ticket 110 AC#5); do not relax this line.
+---- capture ends ----
+rc=2

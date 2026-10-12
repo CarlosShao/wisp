@@ -1,0 +1,11 @@
+# ruler=probes/311/r1b/txt/run-shot.sh ; shot taken by leg 311-r1b
+workdir=/d/tmp/311r1b/tpre
+env_assignment=GOOS=linux
+command_line=sh tools/d22scan/runtests.sh -C tools/d22scan ./...
+---- interleaved stdout+stderr follows ----
+fork/exec C:\Users\swq\AppData\Local\Temp\go-build1131192481\b001\d22scan.test: %1 is not a valid Win32 application.
+FAIL	github.com/CarlosShao/wisp/tools/d22scan	0.001s
+FAIL
+runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=0 FAIL=0 SKIP=0, === RUN=0, '[no tests to run]'=0
+---- capture ends ----
+rc=1

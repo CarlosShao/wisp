@@ -1,0 +1,12 @@
+# ruler=probes/311/r1b/txt/run-shot.sh ; shot taken by leg 311-r1b
+workdir=/d/tmp/311r1b/tpost
+env_assignment=WISP_TEST_GOTMP_ROOT=311r1b-relbare
+command_line=sh tools/d22scan/runtests.sh -C tools/d22scan ./...
+---- interleaved stdout+stderr follows ----
+runtests.sh: ticket 310 AC#1: GOTMPDIR=311r1b-relbare/d22scan-20261012-153219-1058 - this run's t.TempDir() family lands here; nothing deletes it.
+runtests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from GOTMPDIR=311r1b-relbare/d22scan-20261012-153219-1058 (reference %LOCALAPPDATA%=C:/Users/swq/AppData/Local), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311.
+runtests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from WISP_TEST_GOTMP_ROOT=311r1b-relbare (reference %LOCALAPPDATA%=C:/Users/swq/AppData/Local), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311.
+go: creating work dir: GetFileAttributesEx 311r1b-relbare/d22scan-20261012-153219-1058: The system cannot find the path specified.
+runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=0 FAIL=0 SKIP=0, === RUN=0, '[no tests to run]'=0
+---- capture ends ----
+rc=1
