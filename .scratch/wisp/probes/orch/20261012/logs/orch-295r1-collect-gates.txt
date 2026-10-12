@@ -1,0 +1,20 @@
+=== orchestrator re-run of 295-r1 gates @15:54:01 ===
+--- g1 GOFLAGS= go build ./... ---
+build_rc=0
+--- g2b gofumpt -l cmd/wisp (worktree) ---
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+gofumpt_rc=0
+--- g3 gofmt -l cmd/wisp (worktree) ---
+cmd\wisp\models.go
+gofmt_rc=0
+--- g5 sh scripts/d22scan.sh (tail) ---
+d22_rc=0
+d22scan: scope ban #8 internal/         examined 533 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 119 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=231, bans #1-5 cmd/=39, ban #6 frontend/=85, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=533, ban #8 cmd/=119; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 533 Go files, comments and _test.go included; cmd/ 119 Go files, comments and _test.go included
+--- len gate ---
+len_rc=0
+check-path-length-budget.sh: denominator read: 11894 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=11894  over-budget=57  covered by roster=57  not in roster=0
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree

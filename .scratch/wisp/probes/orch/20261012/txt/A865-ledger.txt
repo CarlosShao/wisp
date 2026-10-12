@@ -1,0 +1,32 @@
+
+## A865｜2026-10-12 16:0x｜收 `295-r1`（四笔 `d5ef9cb9`→`421469b7`，**死于 150 轮帽、票尾那 1 条没来得及留**）⇒★我自己复跑六把尺全认＋**一整发整包台面读数替他补上**（`cmd/wisp` 红名册**恰好三枚**＝台账早具名的真窗族、`internal/audio` 0 红）＋⚠**本格凭据缺口具名＝票面 ⓔ-2 那句"其余 7 枚读点对变异不敏感"历史上⛔ 任何人没跑过**（⛔ 我此前把缺口说成"形状变了所以可疑"，那一半我收回）⇒ 已派 `295-v1`（派单＝`a92cd10f`）；⛔ 本票六格一枚不翻
+
+### 1 我复跑了什么（⛔ 拿他的数当我的数；尺逐把）
+
+- **形状名册**（尺＝`git grep -h -E 'started\.(Store|Load)\(' HEAD -- cmd/wisp | wc -l`，provenance＝HEAD `421469b7` 对象层）⇒ **`Store=2`／`Load=9`／声明 `atomic.Bool=1`／⛔ 一枚裸赋值剩下（`^\s*ra\.started = `＝0）**＝与 ⓓ 那 11 枚点（写 2＋读 9）逐枚对上，⛔ 漏改。
+- **净零行**（尺＝`git diff --numstat 0615c6c9..HEAD -- cmd/wisp/resident_audio_windows.go`＝**10/10**；行数 `425 ⇄ 425`）⇒ 他那处"把注释压回原行数"的修复**成立**，票 255 那枚按行号取证的旧仪器⛔ 再被这条链打红。
+- **越界**（尺＝逐笔 `git show --name-only --format=`）⇒ 四笔里进产/测试码的只有派单那 4 枚 `cmd/wisp` 件（`resident_audio_windows.go`＋290/247/247live 三枚测试件），其余全是 `probes/295/r1/**`。
+- **四枚门禁**⇒ `GOFLAGS= go build ./...` `rc=0`；`gofumpt -l cmd/wisp` 工作树＝**2 枚既有**（`models.go`＝CRLF 假枚、`panel_transport_35r2_test.go`＝票 298 残余）⇒ **他那 4 枚净增 0 枚**；`gofmt -l cmd/wisp`＝1 枚（同 `models.go`）；`sh scripts/d22scan.sh` `rc=0`（分母 `internal/=231 cmd/=39`、ban#8 `internal/=533 cmd/=119`＝与我今早同一数）；长度门 `VERDICT GREEN`（分母 **11894** 枚 tracked）。
+- **★我替他补的那一发**（件＝`probes/orch/20261012/logs/orch-295r1-cmdwisp-shot1.txt`，台面＝工作树 @`421469b7`，根在 C: 卷）⇒ 逐字 `FAIL github.com/CarlosShao/wisp/cmd/wisp 391.536s` ⇄ `ok github.com/CarlosShao/wisp/internal/audio 16.379s`，`rc=1`；四数（含子测试那把尺）＝**`RUN=456 PASS=450 FAIL=3 SKIP=2`**；红名册**恰好三枚**、逐名 `TestAC4FocusReturnToPriorWindowGap33r5`／`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`／`TestAC14GoSideEvalPushReachesThePage`＝`pending-and-issues.md:14768` 已具名那族真窗红 ⇒ **"新增红 0 枚"这一句我今天有第二双眼了**（⚠ 我这一发⛔ 能当"改前 vs 改后"的成对——历史那侧回不去，那根轴仍归他的导出树 A/B ⇄ F/G 与 `295-v1`）。
+- **`-race` 代价表那三枚数我自己重数**（尺＝对件 `logs/60-ac5-race.txt` 现跑）⇒ `WARNING: DATA RACE`＝**23**、栈顶帧逐字 `bytes.(*Buffer).Write()` ⇄ `cmd/wisp.(*agentRuntime).auditf()` `run.go:933` ⇄ `config_reload.go:144`；`resident_audio`＝**0**、`toggleMute`＝**0** ⇒ **295 那枚 `started` 今天确实没有任何仪器看得见**（这句从"腿说"升成"我数过"）。⚠ 我自己那把 `posture` 词面尺＝**6 命中**——但那 6 行全是日志载荷里的 `posture=` 字样（件行 86/87/89/530/542/554），⛔ 栈帧 ⇒ **两把尺射程不同，⛔ 拿 6 去推翻 0**。
+
+### 2 ⚠ 凭据缺口的正确形状（我先把话说重了，具名收回一半）
+
+- 我 15:1x 在 `A864` 写的是"他 AC#2 的变异是在**旧形状**上取的 ⇒ ⛔ 当终形凭据"。★**这一半我收回**：我核过 `1c1d7df3` 那笔**只动一枚文件里的注释高度**（`--name-only`＝1、`--numstat`＝10/10 净零），三枚测试件的断言字节⛔ 动，而 M1 删的那行 `ra.started.Store(gate.Open())` 在最终形状里逐字还在 ⇒ 变异凭据⛔ 因"形状换了"而失效。
+- ★**真的缺口是另一件**：他那发 M1 用的是**定向 `-run`**（件里 `M1_COMMAND1_RC=1`／`M1_COMMAND2_RC=1`、红名册只有 `TestAC290BothMuteGesturesTurnTheGateAndBack`、红句逐字 `resident_mute_290_windows_test.go:125: mute-hotkey: the leg's derived mirror says nothing is running while the gate is open`）⇒ 它证明了"指名那一枚会红"，但⛔ 证明"其余 7 枚读点对这枚变异不敏感"——票面 ⓔ-2 那半句是**读码推的、至今没人跑过整包作差**。这缺口归 `295-v1`（连同"换成 `Store(true)` 到底红不红"那枚恒真攻击）。
+
+### 3 `311-r1b`（在飞，我中途替自己复了三把尺，件已入库 `cfadebaa`）
+
+- **同形尺**（逐枚 `git show` 抽块后与 winsec 那枚 `diff`）⇒ 其余三枚各**差 8 行**、★**8 行全是入口名前缀那几行 echo**，⛔ 语义分叉。
+- **插入点尺**（判据＝块起始行 < 起测试行）⇒ `winsec` 122⇄200、`portable` 760⇄836、`wisp-cli` 134⇄218、`runtests` 109⇄188＝**四枚都在起测试之前**；且块都在票 310 那枚根块（55/148/68）之后 ⇒ 顺序口径照我派的形落地。
+- ⚠**我自己的尺坏过一次、当场具名**：第一把我用 `grep 'go test'` 找 `runtests.sh` 的起测试行，命中了文件**第 2 行的注释** ⇒ 报出一条假的 `before=NO`；换 `'go test -v'` 重测＝`before=YES`。作废记录留在件里⛔ 删（那条 `NO` ⛔ 是读数）。
+- ★**死腿那两枚"注释指空件"的账已被这枚腿补实**：块注释现在指 `probes/311/r1b/logs/23-order-*`／`24-order-*`，盘上尺＝两枚**都在**（`exists=YES`）⇒ `A864` 第 2 节①那笔〔未验证半成品〕的头一条已消；⛔ 我这程盖章，等它自己交 `AC#2` 的摘除正控。
+- ⚠**写本节时它已交完**（盘上到 `8f350a9d`＝票尾那条 **1 加／0 删**，前面三笔证据件 `501af017`／`3b553a2f`／`07e7a1e0`）⇒ 它的 `AC#2` ⓐⓑⓒⓓ 与 `AC#4` 两棵导出树的读数**我一个都还没复跑**，⛔ 拿它的句当我的数；裁决与翻框归下一程（`A864` 那笔〔未验证半成品〕的第二条"四枚入口只落了一枚"＝**已由我 `cfadebaa` 那两把尺销**，同形＋插入点都是我自己量的）。
+
+### 4 排程与盘上账
+
+- 在飞＝`295-v1`（票 295 六格判语，独占 `./cmd/wisp/` 色）；`311-r1b` **已交回、待我复尺再裁**（见上节末条）；按住待发＝`294-r1`（派单＝`506a5e3c`，★起手带"票 255 行号锚"那条具名警告＋`toggleMute` 瞬态变异⛔ 撞 `295-v1`）∥ `298 AC#5`（纯格式一枚件）。⛔ `294-r1` 与 `295-v1` 同波。
+- 盘上＝`%TEMP%` 顶层 `Test*` 15:1x 现量仍 **59**（正控同发 `temp_all_dirs=2894`）；`C:` 专用根运行目录 **49**、`D:` 根 **11**（含我 15:0x 那发 `orch-311probe-150233`）＋ `295-v1`/`311-r1b` 会继续加，⛔ 动、⛔ 删。⚠ 我这发的归属尺自己踩了两枚洞（专用根名在 `ExecutablePath` 而⛔ 在 `CommandLine`；PS 单对象 `.Count` 打空串像 0），已改进件与定式。
+- ⛔ 零 push（推送类欠账继续押着）；⛔ 零删目录。
+
+**next**＝收 `311-r1b` ⇒ 我复跑 ⓐⓑⓒⓓ 四发再裁票 311 `AC#2`/`AC#4`（顺带替 `A862` 那格补第二双眼）；收 `295-v1` ⇒ 按判语翻票 295 的格 ⇒ 放 `294-r1`；`298 AC#5` 排在 `cmd/wisp` 色空出来之后。
