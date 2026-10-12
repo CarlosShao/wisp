@@ -1,0 +1,63 @@
+票 294 落地腿 `294-r1`（三格装仪器：装配根那一跳的 AST 形钉／球侧注册那一跳的真窗现读／`executed` 的另一半）
+
+## 0. 你是谁、从哪儿接
+
+- **落地腿（写码＋自己跑门禁＋自己 commit）**，腿名 `294-r1`。票面＝`.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md`，**先通读三节**：`AC#0..AC#5`、2026-10-09 21:1x 我的裁定节、以及 **2026-10-11 13:1x 那节追加更正**（那节把我裁定节里三处现量更正过，⛔ 你按裁定节旧数上路）。
+- 这枚票**只给既有链路加仪器**：⛔ 不改任何生产语义、⛔ 不新开 seam、⛔ 不动默认值、⛔ 不碰 D43 表、⛔ 不改球侧那两支闭包的行为。
+- 起手落 `logs/00-head.txt`（`git log -1 --format='%H %ad %s'` 逐字）。**下面那张落点表的枚数/行号是在 `2567e3a9` 上量的，只作定位辅注 ⇒ 进场逐枚现跑复认**（行号会随任何提交腐烂；本仓实测第三次：`1c1d7df3`）。
+
+## 1. ★起手必读的两枚"前人踩过的坑"（这次专门为你量）
+
+1. **★按行号取证的旧检查会把"注释变高"打红**（本仓 10-12 15:0x 实测，另一枚腿刚踩过）：尺＝现读 `cmd/wisp/config_readers_255.go` 的 `hotRowClaims`，它**按行号**引用 `cmd/wisp/resident_audio_windows.go` 的两行（`sed -n '256p;257p'` 现读＝`ra.mutedAtBoot = c.Audio.MicMutedDefault`／`ra.voiceEnabled = c.Voice.Enabled`）；任何让那两行**下移**的净增行都会把 `TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` 打成红（红句逐字含 `the evidence drifted, so re-adjudicate this row`）。
+   ⇒ 给你的两条硬约束：ⓐ 你**新增**的用例一律放进**你自己的新件**里（下面 §2），⛔ 往 `resident_audio_windows.go` 追加注释；ⓑ AC#3 那枚反形变异**只做同行改字**（把 `, true` 改成 `, false`），⛔ 变异时顺手加解释行。
+2. **★AST 走查⛔ 新造遍历**：同包已有现成 helper＝`cmd/wisp/resident_hotkey_258_test.go` 的 `runResidentBody258(t) (*ast.BlockStmt, string)`（⚠ 件名无 `_windows` 后缀 ⇒ 全平台可用），`Test258AssemblyRootWiresTheChainAndTheBridge` 就是照它写的。你**复用**它，⛔ 复制一份遍历。
+   ⚠ 一处纯照抄会造**永远红**的瞎尺：258 那把尺匹配的是 `call.Fun.(*ast.Ident)`，而生产那一行是**方法调用**（现量逐字 `rb.attachMuteGate(raudio.toggleMute)`）⇒ `call.Fun` 是 `*ast.SelectorExpr`。同包现成形＝`resident_ball_228_test.go:261` 逐字 `if sel, ok := d.Call.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "stop" {`（⛔ 让腿新造层）。
+
+## 2. 你的写面（逐枚点名，别的一律越界）
+
+- `cmd/wisp/resident_mute_294_test.go`（**新建**；AC#1 的 AST 形钉，可跨平台跑）。
+- `cmd/wisp/resident_mute_294_windows_test.go`（**新建**；AC#2 真窗现读＋AC#3 的 `executed==true`）。
+- `.scratch/wisp/probes/294/r1/**`（你自己的件）。
+- 票 294 末尾 **1 条** Progress-log bullet（1 add / 0 del）。
+- ⛔ 以上之外的任何文件都不许进你的 commit。⛔ 尤其：`cmd/wisp/resident_audio_windows.go`（只允许在 AC#3 的**瞬态变异**里改、且必须当场还原＋还原凭据）、`config_readers_255.go`／`config_receipt_255_test.go`（§1 那枚旧检查）、`resident_mute_290_windows_test.go`／`resident_tray_mute_293_windows_test.go`（既有仪器）、`internal/**` 一字、`scripts/**`（311-r1b 在飞那批）、`frontend/**`、`design/**`、`PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）、`.github/**`／`ci.yml`。
+
+## 3. AC#1 装配根那一跳的形钉（读 AST，⛔ 跑 `runResident`）
+
+断言**三件事、共用同一枚计数、且 `==1` 单独成断言**（票面 `AC#1` ⓐⓑⓒ；★我 10-11 更正过：一枚恒 0 命中的尺配 `==1` ＝**永远红**，而"对找到的每一枚检查 X"那种空集通过＝**永远绿假钉**，两形都要避开）：
+- ⓐ `runResident` 体内 `attachMuteGate` 那枚方法调用**计数 == 1**（⛔ 0、⛔ 2）。
+- ⓑ 接收者点名＝`startResidentBall` 那枚返回值（球柄），实参点名＝`raudio.toggleMute`（★⛔ 接受"任意函数值"——票面原话）。
+- ⓒ 它在体内的位置**晚于** `startResidentAudio` 那一次调用（时序＝这条链的前提；判据要写在 AST 顺序上，⛔ 行号锚）。
+- 交件时**自带一次"红形"演示**（⛔ 只交绿的仪器）：至少把 ⓐ 计数改成 `== 2` 或把 ⓑ 的实参名放宽成"任意"，指名它必须怎样红、并跑给你自己看（读数落 `logs/`）。
+
+## 4. AC#2 球侧注册那一跳的真窗现读（★本机⛔ 用 skip 交差）
+
+- 复用真球窗形状＝`cmd/wisp/resident_hotkey_258_windows_test.go` 里 `startResidentBall(observe.NewRegistry(), nil, src, src)` 那族；读 `rb.b.HotkeyReport()` 的注册表，对 **mute 那一枚 id** 现读 `IsLive`（现量先例＝同件里对 `hkSummon258` 的那行 `if !boot.IsLive(hkSummon258) {`；`internal/ball/ball_windows.go` 的 `case hkMute:` 那边另有 `internal/ball/hotkey_live_test.go:404` 读过一次）。
+- ⚠ **缺口具名（腿替我量出来的，现跑复认）**：`hkMute` 是 `internal/ball/hotkey_windows.go` 的**非导出**常量（现量逐字 `hkMute   = 2`），而 `cmd/wisp` 侧只镜像了 `hkSummon258 = 1`／`hkPanel258 = 4`（件＝`resident_hotkey_258_windows_test.go` 那两枚 const），**mute=2 零镜像** ⇒ 你要在自家新件里加一枚本地镜像常量；★同时**必须**在件里写清"这是手抄的第二枚真相源，抄错会怎样"，并交一把**同源尺**（现读 `internal/ball` 那侧的值，证明镜像值 == 源值；⛔ 只写注释）。
+- ⚠ 那枚 SKIP-LOUD 退路是给 headless 的；**本机有真窗**（这台机器今天就在跑真窗），⇒ 若它 skip 了那＝**本格没交**，具名报给我并写清是哪一支拦的，⛔ 把 skip 读成过。
+
+## 5. AC#3 `executed` 的另一半（M2 那一格）
+
+- happy path 必须有一枚断言 **`executed == true`**（门真被拧了那一条路）。现量：全仓唯一那枚 `executed` 断言＝`resident_mute_290_windows_test.go` 里 `if executed {`，它断的是**假**那一支（无门的腿不许声称拧过门）。
+- ★**反形正控**＝把 `toggleMute` 里"门真被拧了"那几支的返回从 `, true` 改成 `, false` ⇒ **你新那枚用例必须红**。⚠ 现量形状是**三支** `, true`（`case gate.Muted():`／`case gate.Open():`／`default:` 那条 `return fmt.Sprintf(...)` 尾部）——**先现读你那枚夹具真走哪一支**，再只翻那一支，并把"翻的是哪一行"逐字写进件（⛔ 拿票面旧行号当现量：票面写的 `:172/:174` 早已过期）。
+- 变异做法二选一，两枚都在本仓有先例：`-overlay`（`298-v1`）／仓外备份＋`sha256sum` 还原证明（`296-v1`）。**⛔ 裸改跟踪文件后不还原**；还原后必须一发证明"用例回到绿"。
+- ⛔ 判据⛔ 改成"读返回值里的字样"（票 290 的 M1 已证读返回值会被"句子里写了成功"骗过去）＝判据锚只能是门自己的读数（`gate.Muted()`/`gate.Open()`）＋这枚 `executed`。
+
+## 6. AC#4 越界 ＋ AC#5 门禁（票面逐字，一条⛔ 少）
+
+- 越界尺＝**逐笔** `git show --name-only --format=<commit>`（⛔ 区间尺），过票面那十枚禁列路径。
+- `GOFLAGS= go build ./...` rc=0。
+- `$(go env GOPATH)/bin/gofumpt.exe -l cmd/wisp` **空**（⛔ 裸 `gofumpt`＝`rc=127`，具名不掩盖；机主这台上的绝对路径＝`/d/work/base/gopath/bin/gofumpt.exe`，`go env GOPATH`＝`/d/work/base/gopath`）。⚠ 现量脏名册两枚（`cmd\wisp\models.go`⇄工作树 CRLF 那族、`cmd\wisp\panel_transport_35r2_test.go`＝票 298 残余）⇒ **你的尺必须写射程**（工作树 ⇄ HEAD blob 两把并排），⛔ 把别人的既有脏算成你的、也⛔ 让你的新增混进那两枚里。
+- `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -v` **改前⇄改后各 ≥2 发取交集**并逐名作差；⛔ 单发名册当可靠尺；计数命令逐字用 `grep -c -- '--- PASS'`（含子测试那一把）与只数顶层那把**并排**，⛔ 相加／⛔ 互替。⚠ **改前那发⛔ 用共享工作树跑**（历史那侧回不去）＝一律 `git archive` 仓外导出树，六件套⛔ 少一枚（`go.mod go.sum internal cmd tools scripts`），导出后**先数 `.go` 枚数证非空**。
+- `sh scripts/d22scan.sh` ⇒ 纯净树 rc=0（同样用仓外导出树跑，⛔ 借别腿在飞的工作树当台面）。
+- 跑读数前 `tasklist` 现跑 `wisp.exe`／`balldebug.exe`＝0；⛔ `cmd | head; echo $?`；`grep -c` 命中 0 ⇒ rc=1 会截断 `&&`（写 `N=$(... || true)`）；一把尺报 0 之前先看 stderr。
+- 每枚门禁件**自落一行 `rc=N`**（0 字节件＝那格没交，除非同格同伴件里有那行 `rc=0`）。
+- ⚠ 专用根⛔ 换卷：`GOTMPDIR` 若要设，指 **`%LOCALAPPDATA%` 那一卷（C:）** 下 `wisp-test-gotmp/294r1-<时间戳>-<pid>`；⛔ 设到 `D:`（票 311 现量：换卷会让既有门变色，且 `311-r1b` 正在装"换卷即拒跑"的守卫，两枚会互相打死）。
+
+## 7. 排他与排程（⛔ 你一个人不算排程）
+
+- ★**起手机械问三问**：① 此刻有没有别的腿正在写 `cmd/wisp/**`（尺＝`git status --porcelain -- cmd/wisp`）② `./cmd/wisp/` 那一包的"颜色"归谁（**每波只交一枚**，这是我 10-11 定的）③ 若 ①非空 ⇒ **停下问我**，⛔ 自己开工。
+- 与票 295 串行那条**理由已换成真的**（⛔ "同写一枚文件"——`executed`⇄`started` 同现一枚行＝0；真约束＝两枚都要对同一段 `toggleMute` 做瞬态变异，谁先落地都会把另一位的锚位打死）。⇒ **`295-r1` 必须先交完**；撤销口令「294 295 改并发」。
+- ⛔ 翻任何 AC 框、⛔ 动 `Status:` 那一行、⛔ 加 `-done`、⛔ 改票面任何原句；你只追加票尾 1 条 bullet。
+- git：只 commit ⛔ push；`git add` 与 `git commit` **两处都带显式 pathspec**；⛔ `add -A`／`add <目录>`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内建 worktree。
+- 件纪律：⛔ `.out`；⛔ 在 `probes/**` 下建 `.go`；⛔ 件名带 `§`；⛔ 长名（相对 ≤121／末段 ≤100／全路径 ≤165，新建前先跑 `sh scripts/check-path-length-budget.sh --with-self-test`）。临时件**只建不删**（只建在你自家 `probes/294/r1/**`）；⛔ 删任何目录（含 `%TEMP%` 顶层那 59 枚在册残渣）。
+- 输出预算：**≤ 6 枚件**，每件 ≤ 200 行；判语一句＋尺一行＋件名，⛔ 复述票面。交件时最后一节**具名自报哪格没做完**——我会逐把尺复跑，⛔ 你自报的数当数。
