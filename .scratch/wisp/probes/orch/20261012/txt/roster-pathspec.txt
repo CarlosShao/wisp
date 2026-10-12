@@ -1,0 +1,12 @@
+.scratch/wisp/probes/orch/20261012/txt/311a1-dispatch.txt
+.scratch/wisp/probes/orch/20261012/roster-temp-1012.ps1
+.scratch/wisp/probes/orch/20261012/roster-1012.md
+.scratch/wisp/probes/orch/gate-roster-304.md
+.scratch/wisp/probes/orch/20261012/logs/orch-roster-temp-1012.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-roster-temp-1012-err.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-sealed-dirs-1012.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-d22scan-postcommit1012d.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-pathlen-postcommit1012d.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-d22scan-1012e.txt
+.scratch/wisp/probes/orch/20261012/logs/orch-pathlen-1012e.txt
+.scratch/wisp/probes/orch/20261012/txt/roster-pathspec.txt

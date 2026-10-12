@@ -1,0 +1,10 @@
+ruler=find -type f (递归) 射程=D:/tmp/wisp-test-gotmp + LOCALAPPDATA 根
+perm_denied_dirs_unreachable=12
+files_in_d_root=3
+files_in_c_root=1
+c_root_file=/c/Users/swq/AppData/Local/wisp-test-gotmp/portable-20261012-115401-2013/TestRoundTripLoadMarshalLoad1761995879/001/config.toml
+d_root_top_level_entries=8
+positive_control_same_ruler_on_known_dir=1
+note=那些进不去的目录名本身可列（Get-ChildItem -Directory 能数到），descend 被拒＝winsec 封存用例把创建者自己的访问也拿走了；成因哪一枚 SID⛔ 我判，归 311-a1 AC#0
+find_rc_note=grep -c 命中 0 会退 1，本链已 || true 化
+roster_rc=0

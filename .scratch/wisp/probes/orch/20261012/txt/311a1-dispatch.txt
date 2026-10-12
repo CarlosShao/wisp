@@ -1,0 +1,49 @@
+# 派单 `311-a1`（票 311 `AC#0` 只读归因＋`AC#3` 那一问）
+
+你是**只读取证腿**（⛔ 产码、⛔ 动判据、⛔ 翻框）。锚＝HEAD `8e3cb370`（工作树 `D:\work\workspace\projects plans\Wisp`，分支 `dev`）。
+先整份读：`.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md`（**全文**，尤其「现量」那五条与「要建什么」的 `AC#0`／`AC#3`），
+再读 `.scratch/wisp/probes/orch/gate-roster-304.md`（编队正典：名册尺、⛔ 换卷那条、读数件⛔ 写进专用根那条）。
+
+## 1. 本程只回答两问（票 311 `AC#0`＋`AC#3`），⛔ 扩大射程
+
+- **`AC#0` 三问**：同一枚夹具在**两枚根**上各跑一次（① 出厂默认 `%LOCALAPPDATA%\wisp-test-gotmp\...`，② 另一枚卷如 `D:/tmp/...`），
+  把**封之前／封之后**的 DACL **逐 ACE** 打出来，具名回答：
+  ① 两枚根的**继承集合**差哪几枚 trustee（逐枚 SID＋掩码）；
+  ② `TestGateJudgesThePrivateSetByResolvedSID` 的红句里那枚"解析出来却⛔ 在集合内"的 SID 是什么；
+  ③ 那 4 行 `Access is denied` 发生在哪一步（封之后自我锁死 ⇄ 根本身拒 `WRITE_DAC`）。
+  判据＝三问各带**逐字读数行**，且每一句成因必须标〔读码推的〕或〔真机量的〕；⛔ 由本程改任何字节。
+- **`AC#3` 那一问**：`TempDir RemoveAll cleanup: … Access is denied`＝**正常收尾也漏目录**——它算不算票 310 现量"死亡三形"之外的**第四形**？
+  算的话落点该写在哪张票（票 310 追加节 ⇄ 票 311），并把**触发条件**写成一句能判的话。⛔ 顺手实现任何清理器。
+
+## 2. 跑法（⚠ 有一条硬约束，别撞在飞的邻居）
+
+⛔ 用 `scripts/*.sh` 那三枚入口跑你的对照（`310-r2` 落地腿此刻正在改 `scripts/portable-tests.sh`／`scripts/winsec-tests.sh`／`scripts/wisp-cli-tests.sh`／`tools/d22scan/runtests.sh`，
+你借它跑＝拿别人的在飞态当台面）。⇒ 你的两发对照**直接** `go test`：自己 `export GOTMPDIR=<那枚根>` 再
+`go test -v -count=1 ./internal/winsec/`（⛔ `-count=0`、⛔ 靠缓存；`GOFLAGS=` 前缀按需）。
+- 相关夹具现读锚：`internal/winsec/private_set_sid_windows_test.go:128/:134`（`TestGateJudgesThePrivateSetByResolvedSID`，`filepath.Join(t.TempDir(), "runner")`）
+  与 `:270/:277`（`TestSealNarrowsAndNamesThePrincipalItRemovedBySID`，`root := filepath.Join(t.TempDir(), "store")`＋`PrivateDirAll(root, 0o700)`）。
+- 逐 ACE 取证可用 `Get-Acl`（PowerShell **一律走 `-File`**，⛔ 内联 `$_`——那条会把 `$_` 被 bash 吃掉、机主屏幕会弹"选择一个应用打开"），
+  ⛔ 动任何既有目录的 ACL（只在**你自己新建**的两枚根里做实验；⛔ 拿 `%TEMP%` 顶层或别人那 59 枚当实验台）。
+- ⚠ 已知坑：`bash scripts/winsec-tests.sh --scope=winsec` 会被它自己的 GUARD 1 打回 `rc=2`（正确形＝`./internal/winsec/`）——你本程⛔ 用那枚脚本，但把这条抄进你的件里留给后续程。
+
+## 3. 名册与残留（⛔ 删任何东西）
+
+- 起跑前／交件后各一发 `%TEMP%` 顶层名册尺（编排者 13:0x 现量＝**59 枚**）＋家族尺 `*.test.exe`（PowerShell 走 `-File`；命中 0 也要落盘，⛔ 拿空输出当"0 枚"，⛔ 拿"计数 0"当"没东西"——同行要有正控，如 `svchost.exe` 枚数）。
+- **你这一程必然会在 `D:` 那枚根里留下删不掉的目录**（那 4 行 `Access is denied` 就是它）。⇒ 逐枚**具名落册**（全路径＋`CreationTime`＋哪一发留的），⛔ 删、⛔ chmod、⛔ 交回前不管它；
+  ★**读数件⛔ 写进任何专用根里**（一律落你自己的 `probes/311/a1/logs/`；数条目时具名写用哪把尺：`Get-ChildItem -Directory` ⇄ `ls -1` 会差枚数）。
+- ⛔ 碰 `msedgewebview2.exe` 那几棵树；⛔ 杀任何不是你起的进程；真要杀自己起的，先 `Get-CimInstance Win32_Process` 看命令行具名归属并落盘。
+
+## 4. 写面（三件套，⛔ 越界）
+
+1. `.scratch/wisp/probes/311/a1/**`（⛔ 长名／⛔ 文件名带 `§`／⛔ `.out`／⛔ 目录里放 `.go`；⛔ 0 字节尺件——每件自落一行 `rc=N`，⛔ 链被 `grep -c` 的退码截断，"应当为 0"的尺一律 `|| true` 并把 stderr 与命中数并排落盘）
+2. 票 311 `.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md` **末尾追加一条 bullet**（1 add / 0 del，⛔ 改任何既有行）
+3. ⛔ 除此之外⛔ 一个字都不动（⛔ `internal/winsec/**`、⛔ `scripts/**`、⛔ `.github/**`、⛔ `docs/reports/**`、⛔ 翻框、⛔ 碰 `Status:`、⛔ 改名 `-done`）
+
+共享工作树里机主/别家那批未提交改动（`.gitignore`／`go.mod`／`design/**`／别人的 `probes/**`）⛔ 提交、⛔ revert、⛔ 修改、⛔ 进你任何一笔。
+
+## 5. 交付件与回报（输出预算：⛔ 复述票面、⛔ 把日志正文抄进交付件）
+
+件：`00-anchor.md`（锚＋本程两问）／`10-acl-before-after.md`（两枚根各自封前封后逐 ACE 名册，⛔ 只给结论不给读数）／
+`20-red-sentence.md`（那两枚红用例的红句**逐字**＋那枚 SID）／`30-cleanup-failure.md`（4 行 `Access is denied` 逐字＋它锁在哪一步）／`90-final.md`（`AC#3` 那一问的答复＋残留名册＋自报）。
+回报正文只给：三问各自的答案（每问一行"支持它的那一行读数"＋标〔读码推〕/〔真机量〕）、`AC#3` 一句话答复、你留下的残留目录逐枚全路径、越界逐笔读数（`git show --name-only --format=`）、
+以及**你自报的越格动作**（做了超过本派单范围的一切，⛔ 自己盖章说"没影响"）。本机缺某工具就**具名写出代用尺**，⛔ 沉默跳过。只 commit、⛔ push；commit 带**显式 pathspec**（`add` 与 `commit` 两处都带）。全程中文写件。
