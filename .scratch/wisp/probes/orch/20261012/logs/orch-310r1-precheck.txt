@@ -1,0 +1,16 @@
+ts=2026-10-12 12:20:01
+--- positive control (roster 1: never read an empty output as 0) ---
+svchost_count=86
+all_exe_count=353
+--- four exact names, tasklist each one shot ---
+exact wisp.exe count=0
+exact balldebug.exe count=0
+exact mockllm.exe count=0
+exact wisp.test.exe count=0
+--- family ruler (canonical verbatim form, Get-CimInstance) ---
+family_count=0
+--- temp rosters ---
+temp_test_star=58
+TEMP_root=C:\Users\swq\AppData\Local\Temp
+localappdata_wisp_test_gotmp_roots=4
+d_tmp_wisp_test_gotmp_roots=4

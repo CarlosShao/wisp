@@ -33,8 +33,15 @@ powershell -NoProfile -Command 'Get-CimInstance Win32_Process | Where-Object { $
 powershell -NoProfile -Command '(Get-ChildItem -Path $env:TEMP -Directory | Where-Object { $_.Name -like "Test*" }).Count'   # 枚数＝%TEMP% 下测试临时目录残留数
 ```
 
-- 现量序列（同一把尺）：10-10 立案 **21** → 10-11 19:5x **44** → 10-12 10:2x **50** → 普查腿交件 **53** → 编排者复跑 (b) 两发之后 **55**（件 `probes/orch/20261012/logs/orch-gate-20261012.txt`＋`orch-310-recheck-b.txt`）。
+- 现量序列（同一把尺）：10-10 立案 **21** → 10-11 19:5x **44** → 10-12 10:2x **50** → 普查腿交件 **53** → 编排者复跑 (b) 两发之后 **55** → `310-r1` 交件 **58** → 编排者复跑 winsec 两发之后**仍是 58**（件 `probes/orch/20261012/logs/orch-gate-20261012.txt`＋`orch-310-recheck-b.txt`＋`orch-310r1-precheck.txt`＋`orch-temp-after-my-shots.txt`）。
 - 这一行买的是"**看见它在长**"，⛔ 买的是"有人收尾"——收尾那半归票 310 的落地腿（`AC#1`）。
+- ⚠ **枚数⛔ 是证据，名字才是；而名字只有"作差"那种来路算数**（10-12 实测：两枚腿把突变台件自报的 `dir=Test…<数字>` 当成漏的那枚抄进了交付件——同一秒里 `t.TempDir()` 会建了又删，台件盯到的那枚往往早已自我收尾；盘上真正活着的那枚是**另一个名字**）。⇒ 定式＝**起进程前的名册 ⇄ 杀完之后的名册作差（`comm -13`）＋逐枚带 `CreationTime`**；⛔ 引用任何"某某目录是我这一发漏的"之前，先用 `Get-ChildItem … | Select Name,CreationTime` 证它**今天还在盘上**。裁决腿⛔ 按交件里的名册盖章（本仓 10-12 两枚腿各栽过一次，见 `A857`／`A858`）。
+
+**专用根落哪一枚卷＝会改闸门颜色的变量（10-12 编排者现量，票 310 `AC#1` 落地腿撞出、我复跑坐实；细节见票 311）**
+
+- ⛔ 把 `WISP_TEST_GOTMP_ROOT`（或直接 `GOTMPDIR`）指到**仓所在卷 `D:`** 再跑 winsec／cli 档：`bash scripts/winsec-tests.sh ./internal/winsec/` 在 `D:` 根＝**PASS=56 FAIL=2**（`TestGateJudgesThePrivateSetByResolvedSID` 两枚子例＋`TestSealNarrowsAndNamesThePrincipalItRemovedBySID`），在默认 `%LOCALAPPDATA%` 兄弟根＝**PASS=58 FAIL=0**；同台面同码，只差那一枚卷。⇒ 改前／改后两发**必须用同一枚根形状**（默认那枚），⛔ 为了"仓外"好看把根挪卷。
+- ⛔ 这一档的命令拼写＝`bash scripts/winsec-tests.sh ./internal/winsec/`。`--scope=winsec` 是 `portable-tests.sh` 那一层的拼法，喂给 `winsec-tests.sh` 会被它自己的 GUARD 1 打回 **rc=2**（10-12 编排者踩过，件 `logs/orch-winsec-dtmp-err.txt` 逐字两行）。
+- 新增一把同行尺（⛔ 单独当判据）：`grep -c 'TempDir RemoveAll cleanup'`——`t.TempDir()` 的**自我收尾本身会失败**（10-12 现量：`D:` 根那发 4 行逐字 `… \la: Access is denied.`，`%LOCALAPPDATA%` 根那发 **0** 行，件 `logs/orch-winsec-A-dtmp.txt`／`-B-lappdata.txt`）⇒ 残渣⛔ 只来自"进程被杀"这一种死法。
 
 **数到 ≠ 归我**。任何一枚非零计数，动手之前先答三问，答不全就**停下来上报**，⛔ 不许停：
 

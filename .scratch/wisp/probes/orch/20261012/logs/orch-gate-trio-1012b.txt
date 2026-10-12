@@ -1,0 +1,4 @@
+portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
+d22scan_rc=0
+pathlen_rc=0
+census_rc=0

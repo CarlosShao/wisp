@@ -16791,3 +16791,68 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 
 `AC#0` 已翻 ⇒ 可派 **`310-r1`**（甲-G 那四枚脚本件＋`AC#2` 反恒真成对两发＋`AC#3` 门禁；禁区＝⛔ 动 CI／⛔ 删存量／⛔ 碰票 304 的 Job Object 面）。同轮**排在我的安静窗口那几把还没跑**：票 298 `AC#4`（改前⇄改后各 ≥2 发、导出树同台面）→ `296-r2`（`cmd/wisp/resident_windows.go` 注释面那三处过头话）→ `295-r1` → `294-r1` → `294-v1`；票 305 那 6 发要真窗（机主在场）。推送类欠账（`Q-304-a1-B`／`-E`、票 300/303/111 的 CI 色、票 72 那半）仍**并成一批**、⛔ 未经机主再一句话就用 `A813`。⚠**同轮一笔代提（记我核档、⛔ 算腿的欠账）**：`done-check-2` 交完五枚 `.md` 之后，它那 **41 枚 `logs/*` 读数件留在盘上⛔ 入库**（它没死、也不会再回来补），腿件里那些尺名（`dc2-R1`…`dc2-R21`）全靠这批件支撑 ⇒ 编排者按"死腿遗产代提"那条例补交，件⛔ 删。⛔ 零 push。
 
+
+## A858｜2026-10-12 12:3x｜收 `310-r1`（票 310 `AC#1` 落地腿，十笔 `a21dcd5b`→`3122306e`）⇒ ★**我自己复跑坐实"专用根换卷会改 `winsec` 档的颜色"⇒ `A857` §4 那句裁形根据⛔ 成立，我错了**＋★**新落票 311**＋⚠**腿件里一枚具名目录⛔ 曾在盘上存在**＋⚠**我自己上午那把 `my_new_dirs=` 尺⛔ 是名册⛔ 是差集**（记我）＋代提 `310-a1` 五枚遗产 `a0d3b521`
+
+**来路**＝票 310 落地腿 `310-r1` 交件（件 `.scratch/wisp/probes/310/r1/{00-anchor,10-impl,20-paired-readings,30-gates,90-final}.md`＋`logs/**` 66 枚读数件）。它具名顶回我裁形里**没写的两件事**（一枚名册件⛔ 适用、一枚名册外第五枚入口），并申报"**根落哪枚卷⛔ 是自由变量**"这条代价。⛔ 我照它的表盖章：下面每一把都我自己现跑。
+
+### 1. 我复跑的成对两发（这一条是本案的**核心**，⛔ 采信任何转述）
+
+台面＝**同一枚工作树**（HEAD `a0d3b521`，含票 310 已入库的三枚 `scripts/*.sh` 增量），两发只差那一枚根；起手名册尺同批跑（件 `probes/orch/20261012/logs/orch-310r1-precheck.txt`：`svchost.exe`＝**86**／`*.exe`＝**353** 正控同行、四条精确名各 **0**、家族尺 `*.test.exe`＝**0**、那发 stderr **0 字节**）。
+
+| 发 | 根（逐字） | 四数（逐字） | rc | 红名册（逐枚） | 件 |
+|---|---|---|---|---|---|
+| A | `D:/tmp/wisp-test-gotmp/winsec-20261012-122119-659`（靠 `WISP_TEST_GOTMP_ROOT` 覆盖＝**仓所在卷**） | `=== RUN=101  --- PASS=56  --- FAIL=2  --- SKIP=0` | **1** | `--- FAIL: TestGateJudgesThePrivateSetByResolvedSID (4.80s)`＋子例 `…/runner_descriptor_is_judged_by_what_it_resolves_to (1.82s)`／`…/a_name_spelling_cannot_change_the_verdict (1.19s)`＋`--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (2.01s)` | `logs/orch-winsec-A-dtmp.txt`＋汇总 `orch-winsec-placement.txt` |
+| B | `C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-122147-814`（出厂默认＝`%TEMP%` 的**兄弟根**） | `=== RUN=101  --- PASS=58  --- FAIL=0  --- SKIP=0` | **0** | 无 | `logs/orch-winsec-B-lappdata.txt` |
+
+⇒ **腿那句"换卷会把 `58/0` 打成 `56/2`"我独立复现，红名册逐枚同名字、四数逐字同数**（腿自己的两发＝`probes/310/r1/logs/11-winsec.txt`／`12-winsec-shipped.txt`）。同批我把那两枚用例的输入读回（`internal/winsec/private_set_sid_windows_test.go:134` `dir := filepath.Join(t.TempDir(), "runner")`／`:277` `root := filepath.Join(t.TempDir(), "store")`）⇒ 这两枚判的确实是"这枚临时目录**继承来**的那套 DACL"，落点换了输入就换。〔**差在哪一枚 SID＝⛔ 我知道**，归票 311 `AC#0`〕
+
+### 2. ★`A857` §4 的更正（原句一字不改，这一节是更正）
+
+`A857` §4 我给甲-G 写的凭据里有这一句：**"那 17 枚逐字读 `os.TempDir()` 的答案不变，⛔ 打红'临时目录在 `%TEMP%`'那一族既有假设"**。
+- ⚠**"词面答案不变"这半句对**：Windows 上 `os.TempDir()` 走 Win32 `GetTempPath`、⛔ 读 `GOTMPDIR`（腿 M2 那行，读的是 GOROOT `os/file_windows.go`；我 12:21 那发也证了——两发的 `%TEMP%` 顶层都⛔ 多目录，残渣全进了各自的专用根）。
+- ✗**由它推"⛔ 打红既有钉"这一支⛔ 成立**：钉里有一族判据吃的是**物理位置的继承 ACL**，物理位置一换就改颜色，实测＝上面 §1 那两发。**我裁形时把"机制推理"当成了"已测"**，正是本仓反复栽的那一形（"能测"⛔"已测"、"词面"⛔"物理"）。
+- ⇒ **现在的说法**＝甲-G **仍是对的形**（它治"落在哪儿"、且⛔ 动任何断言），但它的**射程要加一句边界**："根必须与 `%TEMP%` 同卷同 ACL 族"是**判据的一部分**，⛔ 换卷；这条边界已由我落进编队正典（下面 §7），而"该⛔ 不该把根钉死在一枚卷上"这一问**没消失**，它变成票 311 的 `AC#1` 三形。撤销口令＝**「A857 裁形没错」**（用了就是把 §1 那两发当没测过）。
+
+### 3. ⚠ 腿件里一枚具名目录**⛔ 曾在盘上存在**（`310-r1` `20-paired-readings.md` §1 的 a3 与 §4 第 3 行）
+
+- 腿写：a3 那发（外力杀，11:49:06）漏的那枚＝`TestRoundTripLoadMarshalLoad2236627062`。
+- 尺＝`Get-ChildItem $env:TEMP -Directory | ? Name -like 'TestRoundTrip*'` 带 `CreationTime`（12:3x 现量，读数件＝`probes/orch/20261012/logs/orch-roundtrip-times.txt`，`rows=8`＋逐枚 `created=`＋`ps_rc=0`；两把 stderr 件 `orch-roundtrip-times-err.txt`／`-err2.txt` 各 **0  字节**）：**那枚名字⛔ 在盘上**；`grep -rl '2236627062' .scratch/wisp/probes/` 只命中腿自己写的三枚件（`20-paired-readings.md`／`90-final.md`／`logs/10c-watch.txt`）。而**那一秒真正活着的是 `TestRoundTripLoadMarshalLoad1721168370`（`CreationTime`＝`11:49:06`）**。
+- 来路＝腿抄了突变台件自报的 `dir=` 字段；那个字段盯的是"那一瞬间看到的任一枚"，而 `t.TempDir()` 在同一秒里会建了又删。⚠ **同一形态 `310-a1` 昨天上午撞过、还在 `20-shapes.md` §3.3 具名认过**（它自报的 `3749761498`／`1350067340` 同样⛔ 存在），并且它**为此换了差集尺**——腿复用了它的台件原形，却把它的**旧自报名**一起抄了。
+- ⚠ **动摇的是那枚名字，⛔ 是结论**：`%TEMP%` 顶层 55→58 那三枚的 `CreationTime`（`11:43:24`／`11:49:06`／`11:50:03`）都落在腿的射击窗内、且都⛔ 属于别的腿 ⇒ "**死亡形当场漏一枚**"照旧成立。
+- ⇒ **定式（已写进正典 §1）**：⛔ 引用任何"某某目录是我这一发漏的"之前，先用 `CreationTime` 那把尺**证它今天还在盘上**；名字只认"起进程前名册 ⇄ 杀完后名册 `comm -13`"那种来路；裁决腿⛔ 按交件名册盖章。
+
+### 4. ⚠⚠ 记我两笔（同一族：**我的尺口径没写清**）
+
+- ① **`my_new_dirs=`⛔ 是差集，是名册**：我上午那件 `probes/orch/20261012/logs/orch-310-recheck-b.txt` 里 `before=54`／`after=55` 两行**对**，但同一件那行 `my_new_dirs=` 打的是**全量 `TestRoundTrip*` 名册**（里面既有 `310-a1` 的三枚、也有我自己的两枚），我把它写成了"我这一发新增的那枚"。⇒ 那件里"具名"那一格〔⛔ 成立〕，"计数"那一格〔成立〕。今后这类行一律**先 `comm -13` 再打印**，并把两枚输入名册一起落盘。
+- ② **票面那枚名被我 `cut` 截短了**：票 310 `:12` 与我 11:1x 那句写的 `TestRoundTripLoadMarshalLoad38631165` ⛔ 是真名（真名＝`TestRoundTripLoadMarshalLoad3863116526`，`CreationTime`＝`11:05:29`，今天仍在盘上）。⚠ **票面原句⛔ 回头改**，更正记本节＋票 310 尾部新 bullet。⇒ 定式并回：**凡带"逐字"二字的名字⛔ 过 `cut -c`**，要截就另起一行写"完整名见件 X"。
+- ③ 附：我那两发（11:04:41／11:05:29）也是**在册 58 枚里的两枚**，归属＝**编排者自己**，⛔ 删、⛔ 让任何腿顺手清；它们在 `310-r1` 的起手名册里就已是存量（它⛔ 认它们＝对）。
+
+### 5. ★第三种死法：**正常跑完也漏**，因为 `t.TempDir()` 的自我收尾自己被拒（尺＝`grep -c 'TempDir RemoveAll cleanup'` 同行落盘）
+
+- `D:` 根那发＝**4 行**，逐字如 `testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/winsec-20261012-122119-659\TestSealNarrowsAndNamesThePrincipalItRemovedBySID3143495113\002\la: Access is denied.`（`logs/orch-winsec-A-dtmp.txt:140,143,145,152`）；`%LOCALAPPDATA%` 根那发＝**0 行**（同尺，件 `orch-winsec-B-lappdata.txt`）。
+- 同批两枚根的条目数（`Get-ChildItem … | Measure-Object`，件 `logs/orch-temp-after-my-shots.txt`）＝`winsec-20261012-122119-659 entries=`**4** ⇄ `winsec-20261012-122147-814 entries=`**0**。
+- ⇒ ⚠ **票 310 现量那句"测试正常跑完 ⇒ 0 残留"要加射程**："**只在默认那枚根上成立**"。残渣⛔ 只来自"进程被杀"这一种死法；封过 ACL 的目录在另一枚卷上**连主人都删不掉**。这一格**归票 311 `AC#3` 具名处置**（⛔ 塞进票 310 的 `AC#2` 成对两发里）。
+
+### 6. 待裁项已答：**建不出根＝响在嘴上、⛔ 响在退码上**，这一支我裁"保留降级句"
+
+腿 §2 第 4 条自加的判断（`mkdir` 失败或 `LOCALAPPDATA` 为空 ⇒ 往 stderr 打一行具名 `DEGRADED`、GOTMPDIR 保持不设、**⛔ 把闸门翻红**），并点名"若裁决者认为这里该 fail-closed，这是第一个要改的点"。
+- **裁＝保留降级形**（撤销口令＝**「310 改 fail-closed」**）。理由三条：① 这一步买的是"残渣别堆在 `%TEMP%` 顶层"，⛔ 一条安全判据；它没生效＝**回到今天已知的状态**（票 310 的整张名册仍然看得见它），⛔ 是"假装受保护"；② fail-closed 会把一枚**我⛔ 能在本机看见的形状**（托管 runner 上 `%LOCALAPPDATA%` 兄弟根可不可写）变成一道恒红闸门，而恒红闸门在本仓的下游效果＝后来者为变绿去放宽断言（明令禁）；③ "⛔ 静默降级"这一条腿已经做到了——那行字面在 stderr 里具名写了"GOTMPDIR 保持不设，残渣还会落回 OS 临时根"。
+- ⚠ **附带一条新要求（归验收腿 `310-v1` 的格，⛔ 由我勾）**：`DEGRADED` 那行必须**同批被名册尺抓到**——即任何跑这三枚入口件的读数件里，要么出现 `GOTMPDIR=` 那行、要么出现 `DEGRADED` 那行，**两行都缺＝那发⛔ 证明这一步跑过**（今天这台机上我把那行现量到了，件 `orch-winsec-A-dtmp.txt:1`／`-B-lappdata.txt:1`）。
+- 另：它说"派单点名的 `probes/orch/20261011/shape-c-orch.ps1` ⛔ 适用本票"＝**我派单错**（那枚台件的"坏世界"判据是 mockllm 那一族的进程形状，本票的用例⛔ 起子进程）；`scripts/d22scan.sh → tools/d22scan/runtests.sh:75` 是名册**第五枚**起 `go test` 的入口＝**我的名册漏**（两把尺我都现跑复认：`grep -c -i 'go test' scripts/slo-check.ps1`＝1＝`:336` 那行注释；`grep -n 'go test' tools/d22scan/runtests.sh` 命中）。⇒ 票 310 `AC#1` 的"四枚入口件"这枚数**当时⛔ 是全量**，欠账 `Q-310-r1-2`（第五枚要不要一起落＝功能决策，归 `310-v1`＋我）。
+
+### 7. ★落票 **311**（现象已证、成因未定）＋正典 §1 新增一节
+
+- 票面＝`.scratch/wisp/issues/311-winsec-gate-colour-depends-on-which-volume-the-test-temp-root-sits-on.md`（五格全未勾、Status 未开工；现量＝上面 §1/§5 那批件＋腿件；三形择一＝甲"让判据⛔ 依赖继承"／乙"把根的位置钉成会响的守卫"／丙"不做，登记成具名已知边界"，**我按丙先行落政**）。
+- 正典＝`probes/orch/gate-roster-304.md` §1 新增"专用根落哪一枚卷＝会改闸门颜色的变量"那一节：⛔ 换卷跑 winsec／cli 档；改前改后**同根形状**；正确拼写 `bash scripts/winsec-tests.sh ./internal/winsec/`（⛔ 我踩过的 `--scope=winsec` ⇒ 被 GUARD 1 打回 **rc=2**，逐字两行在 `logs/orch-winsec-dtmp-err.txt`）；新增同行尺 `grep -c 'TempDir RemoveAll cleanup'`；现量序列续到 **58**（我两发之后仍 58）。
+- ⚠ 本票⛔ 翻票 310 任何格：`AC#1`/`AC#2`/`AC#3` 的判语归**非实现者腿**（`310-v1`，下一步派）。票 310 今天仍是 2 勾（`AC#0`/`AC#4`）／3 未勾。
+
+### 8. 代提 `310-a1` 五枚遗产＝`a0d3b521`（只建不删＋死腿遗产代提条例）
+
+`probes/310/a1/logs/30-temp-env-census.txt.{%TEMP%,GOTMPDIR,GetTempPath,＂TEMP＂,＂TMP＂}.txt` 五枚未入库读数件由我代提（`git add`／`git commit` 两处都走 `--pathspec-from-file`，路径逐枚显式，枚数＝5、越界＝0）。★**其中两枚文件名里带 U+FF02（全角引号 ＂）**＝那腿台件里 `"$TEMP"` 那串⛔ 被外壳展开留下的字节；⛔ 就地改名（那是别人的交付件原样，改名＝我替它写历史），成因记这一句＋票尾 bullet。⚠ 名字⛔ 过长度门红（长度门现跑 rc=0，见 §10）。
+
+### 9. 欠账归口（按票 309 `AC#5` 那条定式：权威落点＝腿件，本条只当指针）
+
+`Q-310-r1-1..8` 的**逐字定义**在 `probes/310/r1/90-final.md`（⛔ 在本节重述）；本节只登记**新欠的三枚编排者侧账**：`Q-310-orch-L`＝§3 那枚具名错的目录名，已由我用 `CreationTime` 尺改正，**若日后重跑三形射击需重取名册**；`Q-310-orch-M`＝§4② 那枚被 `cut` 截短的名在票面 310 `:12` 的⛔ 改（更正只落本节）；`Q-310-orch-N`＝§5 那形"正常跑完也漏"的**射程句要写进票 310 现量节**，落点交 `310-v1` 定（⛔ 我替非实现者判）。
+
+**next**＝派 `310-v1`（非实现者验收 `AC#1`/`AC#2`/`AC#3`，含我 §6 那两条：DEGRADED 必被抓到＋第五枚入口件的归口），交回后我按判语翻格；同批之后回到队列 `298`（`AC#4` 成对改前/改后）→ `296-r2` → `295-r1` → `294-r1`/`294-v1`。⚠ 推送类欠账继续押着（⛔ 用 `A813`，等机主新的一句话）。⛔ 本程 push、⛔ 删任何目录。

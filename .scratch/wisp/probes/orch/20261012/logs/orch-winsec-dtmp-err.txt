@@ -1,0 +1,2 @@
+winsec-tests.sh: GUARD 1 - the package list for this step does not name ./internal/winsec/; it is [--scope=winsec].
+winsec-tests.sh: this step IS the internal/winsec gate (ticket 110 AC#2/AC#3). Removing the package from the list must fail the step, not shorten it.

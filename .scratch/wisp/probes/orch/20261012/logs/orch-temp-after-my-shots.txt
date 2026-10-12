@@ -1,0 +1,15 @@
+temp_test_star=58
+lappdata_roots=6
+root=cli-20261012-115545-1029 entries=0
+root=portable-20261012-115401-2013 entries=1
+root=portable-20261012-122621-196 entries=0
+root=probe-115234 entries=0
+root=winsec-20261012-115521-883 entries=0
+root=winsec-20261012-122147-814 entries=0
+d_roots=6
+root=portable-20261012-114637-408 entries=0
+root=probe-114728-128 entries=1
+root=shapec-115000 entries=1
+root=winsec-20261012-115046-1584 entries=4
+root=winsec-20261012-122026-451 entries=0
+root=winsec-20261012-122119-659 entries=4

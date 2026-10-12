@@ -1,0 +1,5 @@
+.scratch/wisp/probes/310/a1/logs/30-temp-env-census.txt.%TEMP%.txt
+.scratch/wisp/probes/310/a1/logs/30-temp-env-census.txt.GOTMPDIR.txt
+.scratch/wisp/probes/310/a1/logs/30-temp-env-census.txt.GetTempPath.txt
+.scratch/wisp/probes/310/a1/logs/30-temp-env-census.txt.TEMP.txt
+.scratch/wisp/probes/310/a1/logs/30-temp-env-census.txt.TMP.txt

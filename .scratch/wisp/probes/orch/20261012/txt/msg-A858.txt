@@ -1,0 +1,16 @@
+收 310-r1 ⇒ 我自己复跑坐实"专用根换卷会改 winsec 档的颜色"（A857 §4 的根据错了）＋新立票 311
+
+- 台账 A858：成对两发（D:/tmp 根 56 PASS/2 FAIL ⇄ LOCALAPPDATA 根 58/0，红名册逐枚）＋A857 §4 更正
+  ＋腿件 a3 那枚具名目录 2236627062 在盘上从没存在过（真名 …1721168370，CreationTime 尺）
+  ＋我自己两笔（my_new_dirs= 是名册非差集；票面那枚名被我 cut 截短）
+  ＋第三种死法（TempDir RemoveAll cleanup: Access is denied，4 行 ⇄ 0 行）
+  ＋待裁项已答（保留响亮降级、⛔ fail-closed，口令「310 改 fail-closed」；新增"GOTMPDIR=/DEGRADED 两行都缺＝那发无凭据"）
+- 票 311 新立（五格全未勾、Status 未开工；三形择一，我按丙今天先落政）
+- 票 310 尾部一条 append-only bullet（1 加/0 删，六格⛔ 动）
+- 正典 gate-roster-304.md §1：⛔ 换卷跑 winsec/cli、改前改后同根形状、winsec-tests.sh 的正确拼写
+  （--scope=winsec 会被 GUARD 1 打回 rc=2，我今天踩过）、新同行尺 'TempDir RemoveAll cleanup'、现量续到 58
+- HANDOVER §4.0ct（大白话版，结尾"你需要做什么：没有"＋可选的「清」字口令）
+- 本程读数件：logs/orch-winsec-A-dtmp.txt／-B-lappdata.txt／orch-winsec-placement.txt／
+  orch-roundtrip-times.txt／orch-310r1-precheck.txt／orch-gate-trio-1012b.txt 等，门禁 d22scan_rc=0、pathlen_rc=0
+
+⛔ push、⛔ 删任何目录（在册 58 枚一枚没动）
