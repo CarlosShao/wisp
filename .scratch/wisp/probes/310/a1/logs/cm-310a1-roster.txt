@@ -1,0 +1,12 @@
+310-a1: 表① 逐枚名册（50 枚＝本仓可证 49／别家不可证 1／归属不明 0）＋ 锚件 §10 机制自纠
+
+- 10-roster.md：尺＝TEMP 全量 2754 → Test* 50 → 本仓可证 49（三形同试：exact 47／digits_in_name 1／subtest 1）；
+  每枚带 目录名／mtime／内层枚数与字节／命中用例＋文件:行／归属三态／理由列（⛔ 空理由）。
+  第二根棍子＝mtime ≥ 命中文件本仓首提交（after_firstadd 49／BEFORE 0／no_firstadd 1）。
+  那枚不可证的＝TestProbeStepByStep3843095677（HEAD／工作树／全历史 -S 三把尺零命中，mtime 落在我方窗口内 ⇒ 名字尺失效，⛔ 指不出哪家）＝Q-310-a1-1。
+  总量尺：416,656,144 B（≈397 MB）／内层 145 文件／空目录 10 枚；最大单枚 31,092,893 B。
+- 00-anchor.md §10（append-only 更正）：撤回 §8 那句"第一次调用不带尾数／counter>0 才追加"（错），
+  并更正"子测试把 / 与空格换成 _"（真相：removeSymbolsExcept 删掉白名单外符号、空格保留、另有 64 字节截断），
+  provenance＝仓外 GOROOT testing.go:1556-1566,1584-1633 ＋ os/tempfile.go:22-24,86-104，GOVERSION go1.27.1。
+- logs/：闸门现量、路径长度门、50 枚原始读数、1686 行用例全表、逐枚归属 TSV、19 枚文件首提交。
+本程⛔ 删任何目录／文件，⛔ 动产码与 *_test.go，未 push。

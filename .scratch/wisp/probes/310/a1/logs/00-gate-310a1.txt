@@ -1,0 +1,27 @@
+# 起手闸门现量（尺＝gate-roster-304.md §1 逐字四条 tasklist ＋ 家族宽松尺 ＋ TEMP Test* 计数）
+run_started_utc=2026-10-12 02:26:30  run_started_local=2026-10-12 10:26:30 +0800
+### tasklist //FI "IMAGENAME eq wisp.exe"
+INFO: No tasks are running which match the specified criteria.
+tasklist_rc=0
+hit_lines=0   (empty above＝0 枚)
+### tasklist //FI "IMAGENAME eq balldebug.exe"
+INFO: No tasks are running which match the specified criteria.
+tasklist_rc=0
+hit_lines=0   (empty above＝0 枚)
+### tasklist //FI "IMAGENAME eq mockllm.exe"
+INFO: No tasks are running which match the specified criteria.
+tasklist_rc=0
+hit_lines=0   (empty above＝0 枚)
+### tasklist //FI "IMAGENAME eq wisp.test.exe"
+INFO: No tasks are running which match the specified criteria.
+tasklist_rc=0
+hit_lines=0   (empty above＝0 枚)
+### family loose ruler: Get-CimInstance Win32_Process | Where-Object { $_.Name -like "*.test.exe" }
+
+ps_family_rc=0
+family_named_lines=0   (empty above＝0 枚)
+### TEMP Test* count
+total=2754
+test=50
+temp=C:\Users\swq\AppData\Local\Temp
+temp_count_rc=0

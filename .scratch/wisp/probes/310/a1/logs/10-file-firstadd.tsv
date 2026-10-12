@@ -1,0 +1,19 @@
+-	
+cmd/wisp/approval_reply_201_test.go	2026-09-29
+cmd/wisp/config_reload_223_test.go	2026-09-29
+cmd/wisp/config_reload_perm_223_windows_test.go	2026-09-29
+cmd/wisp/config_sentences_223r2_test.go	2026-09-29
+cmd/wisp/dataroot_128_windows_test.go	2026-09-23
+cmd/wisp/panel_host_windows_test.go	2026-10-01
+cmd/wisp/resident_sink_nail_127_windows_test.go	2026-09-22
+cmd/wisp/run_mode101_test.go	2026-09-21
+cmd/wisp/run_test.go	2026-09-20
+cmd/wisp/slo_report_144_windows_test.go	2026-09-25
+cmd/wisp/subagent_carrier_197_test.go	2026-09-28
+internal/config/manager_223_test.go	2026-09-29
+internal/llm/anthropic/suite_test.go	2026-09-20
+internal/llm/fallback_test.go	2026-09-20
+internal/llm/openaichat/mockllm_integ_test.go	2026-09-19
+internal/observe/logging_test.go	2026-09-20
+internal/tools/task_cancel_221_legs_test.go	2026-09-29
+internal/winsec/private_set_sid_windows_test.go	2026-09-21
