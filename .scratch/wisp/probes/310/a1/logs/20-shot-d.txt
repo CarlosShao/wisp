@@ -1,0 +1,56 @@
+time=2026-10-12T10:47:30.561+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+panic: test timed out after 2s
+	running tests:
+		TestRoundTripLoadMarshalLoad (0s)
+
+goroutine 280 [running]:
+testing.(*M).startAlarm.func1()
+	D:/work/base/go/src/testing/testing.go:2959 +0x34a
+created by time.goFunc
+	D:/work/base/go/src/time/sleep.go:182 +0x2d
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0x868c729a200, {0x7ff64bfd9891?, 0x868c71d7aa8?}, 0x7ff64c429d90)
+	D:/work/base/go/src/testing/testing.go:2266 +0x4d2
+testing.runTests.func1(0x868c729a200)
+	D:/work/base/go/src/testing/testing.go:2742 +0x37
+testing.tRunner(0x868c729a200, 0x868c71d7bc8)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+testing.runTests({0x7ff64bfd83e1, 0x1a}, {0x7ff64bfe1d81, 0x2a}, 0x868c7122378, {0x7ff64c49d350, 0x60, 0x60}, {0xc2ab30712198af64, 0x77c06d51, ...})
+	D:/work/base/go/src/testing/testing.go:2740 +0x505
+testing.(*M).Run(0x868c71a2f00)
+	D:/work/base/go/src/testing/testing.go:2600 +0x6af
+main.main()
+	_testmain.go:238 +0x9b
+
+goroutine 323 [syscall]:
+syscall.syscalln(0x0?, 0x0?, {0x868c72b7988?, 0x868c72b7990?, 0x0?})
+	D:/work/base/go/src/runtime/syscall_windows.go:427 +0x48
+syscall.SyscallN(0x23718782b01?, {0x868c72b7988?, 0x7ff64bd1f949?, 0x23718782b70?})
+	D:/work/base/go/src/syscall/dll_windows.go:99 +0x1e
+golang.org/x/sys/windows.convertSecurityDescriptorToStringSecurityDescriptor(0x0?, 0x1, 0xff, 0x868c72b7a00?, 0x237189c2e88?)
+	D:/work/base/gopath/pkg/mod/golang.org/x/sys@v0.48.0/windows/zsyscall_windows.go:667 +0xb4
+golang.org/x/sys/windows.(*SECURITY_DESCRIPTOR).String(0x868c713d884?)
+	D:/work/base/gopath/pkg/mod/golang.org/x/sys@v0.48.0/windows/security_windows.go:1312 +0x45
+github.com/CarlosShao/wisp/internal/winsec.readDACL({0x868c713d884?, 0x78?})
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/winsec/winsec_windows.go:243 +0x66
+github.com/CarlosShao/wisp/internal/winsec.foreignPrincipals({0x868c713d884?, 0x868c72b7dc0?})
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/winsec/winsec_windows.go:165 +0x2a
+github.com/CarlosShao/wisp/internal/winsec.applyDescriptorWindows({0x868c713d884, 0x78}, 0x0)
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/winsec/winsec_windows.go:295 +0x36
+github.com/CarlosShao/wisp/internal/winsec.sealFile(...)
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/winsec/winsec_windows.go:580
+github.com/CarlosShao/wisp/internal/winsec.SealFile({0x868c713d680?, 0x1500?})
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/winsec/winsec.go:141 +0x42
+github.com/CarlosShao/wisp/internal/config.atomicWrite({0x868c74e3980, 0x68}, {0x868c7226a00, 0x1067, 0x1500})
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/config/parse.go:215 +0x1ae
+github.com/CarlosShao/wisp/internal/config.SaveFile({0x868c74e3980, 0x68}, 0x7ff64baf2220?)
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/config/loader.go:262 +0x65
+github.com/CarlosShao/wisp/internal/config.TestRoundTripLoadMarshalLoad(0x868c729a400)
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/config/boundary_test.go:190 +0x7d
+testing.tRunner(0x868c729a400, 0x7ff64c429d90)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/config	2.039s
+FAIL

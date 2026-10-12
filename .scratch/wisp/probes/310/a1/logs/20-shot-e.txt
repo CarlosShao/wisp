@@ -1,0 +1,76 @@
+time=2026-10-12T10:49:32.054+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+panic: test timed out after 2s
+	running tests:
+		TestRoundTripLoadMarshalLoad (0s)
+
+goroutine 299 [running]:
+testing.(*M).startAlarm.func1()
+	D:/work/base/go/src/testing/testing.go:2959 +0x34a
+created by time.goFunc
+	D:/work/base/go/src/time/sleep.go:182 +0x2d
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0x1982fb00cc00, {0x7ff746f39891?, 0x1982fb1a7aa8?}, 0x7ff747389d90)
+	D:/work/base/go/src/testing/testing.go:2266 +0x4d2
+testing.runTests.func1(0x1982fb00cc00)
+	D:/work/base/go/src/testing/testing.go:2742 +0x37
+testing.tRunner(0x1982fb00cc00, 0x1982fb1a7bc8)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+testing.runTests({0x7ff746f383e1, 0x1a}, {0x7ff746f41d81, 0x2a}, 0x1982fac96378, {0x7ff7473fd350, 0x60, 0x60}, {0xc2ab308f835b21e4, 0x77b6e961, ...})
+	D:/work/base/go/src/testing/testing.go:2740 +0x505
+testing.(*M).Run(0x1982fad16e60)
+	D:/work/base/go/src/testing/testing.go:2600 +0x6af
+main.main()
+	_testmain.go:238 +0x9b
+
+goroutine 298 [runnable]:
+reflect.valueInterface({0x7ff747349648?, 0x7ff746f737e8?, 0x81?}, 0x0?)
+	D:/work/base/go/src/reflect/value.go:1493 +0x137
+reflect.Value.assignTo({0x7ff747349648?, 0x7ff746f737e8?, 0x0?}, {0x7ff746f2f01b, 0xb}, 0x7ff74734e0c8, 0x1982fb07e110)
+	D:/work/base/go/src/reflect/value.go:3243 +0x109
+reflect.Value.Set({0x7ff74734e0c8?, 0x1982fb07e110?, 0x3?}, {0x7ff747349648?, 0x7ff746f737e8?, 0x1982facfdd88?})
+	D:/work/base/go/src/reflect/value.go:2171 +0xe6
+github.com/pelletier/go-toml/v2.(*decoder).unmarshalBool(0x1982fafccc30?, 0x1982fafd6cb0?, {0x7ff74734e0c8?, 0x1982fb07e110?, 0x7ff746ac60cf?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:888 +0x8e
+github.com/pelletier/go-toml/v2.(*decoder).handleValue(0x1982fafccc30, 0x1982fafd6cb0, {0x7ff74734e0c8?, 0x1982fb07e110?, 0x1982fb05d570?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:693 +0x1a5
+github.com/pelletier/go-toml/v2.(*decoder).handleKeyValueInner(0x7ff747306b70?, {0x1, 0x0}, 0x7ff747349248?, {0x7ff74734e0c8?, 0x1982fb07e110?, 0x0?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:1059 +0x7c
+github.com/pelletier/go-toml/v2.(*decoder).handleKeyValuePart(0x1982fafccc30, {0x1, 0x1982fafd6c78}, 0x1982fafd6cb0, {0x7ff74732ca68?, 0x1982fb11c070?, 0x0?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:1142 +0x2be
+github.com/pelletier/go-toml/v2.(*decoder).handleKeyValueInner(0x1982fafcccd8?, {0x1, 0x1982fafd6c78}, 0x1982fb05d770?, {0x7ff74732ca68?, 0x1982fb11c070?, 0x1982fafd6c40?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:1055 +0x65
+github.com/pelletier/go-toml/v2.(*decoder).handleKeyValue(0x1982fafccc30, 0x1982fafd6c40, {0x7ff74732ca68?, 0x1982fb11c070?, 0x1982fae4cd98?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:1041 +0x95
+github.com/pelletier/go-toml/v2.(*decoder).handleKeyValues(0x1982fafccc30, {0x7ff74732ca68?, 0x1982fb11c070?, 0x7ff7473666d0?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:619 +0x132
+github.com/pelletier/go-toml/v2.(*decoder).handleTable(0x1982fb05da28?, {0x1, 0x0}, {0x7ff74732ca68?, 0x1982fb11c070?, 0x1982fb05d8f8?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:596 +0x1a5
+github.com/pelletier/go-toml/v2.(*decoder).handleKeyPart(0x1982fafccc30, {0x1, 0x1982fafd6c78}, {0x1982facc81e0?, 0x1982fb11bb88?, 0x7ff746c32c30?}, 0x1982fb05da60, 0x7ff74738a910)
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:529 +0x7ab
+github.com/pelletier/go-toml/v2.(*decoder).handleTablePart(...)
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:645
+github.com/pelletier/go-toml/v2.(*decoder).handleTable(0x1982fafcccd8?, {0x1, 0x1982fafd6c78}, {0x1982facc81e0?, 0x1982fb11bb88?, 0x1067?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:592 +0x18f
+github.com/pelletier/go-toml/v2.(*decoder).handleRootExpression(0x1982fafccc30, 0x1982fafd6c40, {0x1982facc81e0?, 0x1982fb11bb88?, 0x7ff746a5d4d4?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:292 +0xee
+github.com/pelletier/go-toml/v2.(*decoder).fromParser(0x1982fafccc30, {0x1982facc81e0?, 0x1982fb11bb88?, 0x1982fae00808?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:253 +0x9a
+github.com/pelletier/go-toml/v2.(*decoder).FromParser(0x1982fafccc30, {0x1982fae28080?, 0x1982fb11bb88?})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:238 +0x145
+github.com/pelletier/go-toml/v2.(*Decoder).Decode(0x1982fb119ca0, {0x1982fae28080, 0x1982fb11bb88})
+	D:/work/base/gopath/pkg/mod/github.com/pelletier/go-toml/v2@v2.2.4/unmarshaler.go:131 +0x188
+github.com/CarlosShao/wisp/internal/config.decodeStrict({0x1982fb121300, 0x1067, 0x1068}, 0x1982fb11b608)
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/config/parse.go:73 +0x21f
+github.com/CarlosShao/wisp/internal/config.readConfigFile({0x1982fafbcc00, 0x6a})
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/config/loader.go:132 +0x33e
+github.com/CarlosShao/wisp/internal/config.LoadFile({0x1982fafbcc00?, 0x6a?}, {0x0, 0x0})
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/config/loader.go:42 +0x25
+github.com/CarlosShao/wisp/internal/config.TestRoundTripLoadMarshalLoad(0x1982fb00ce00)
+	C:/Users/swq/AppData/Local/Temp/310a1-tree.vMLB73/internal/config/boundary_test.go:200 +0x199
+testing.tRunner(0x1982fb00ce00, 0x7ff747389d90)
+	D:/work/base/go/src/testing/testing.go:2193 +0xc3
+created by testing.(*T).Run in goroutine 1
+	D:/work/base/go/src/testing/testing.go:2258 +0x4b4
+FAIL	github.com/CarlosShao/wisp/internal/config	2.043s
+FAIL

@@ -1,0 +1,10 @@
+shapec2 started pid=21336 name=config310a1.test at=10:47:24.263
+shapec2 world=CONSTRUCTED dir=TestRoundTripLoadMarshalLoad1350067340 dir_creation=10:47:24.525
+shapec2 target_name=config310a1.test.exe pid=21336 ppid=22952 this_ps_pid=22952
+shapec2 cmdline="C:\Users\swq\AppData\Local\Temp\310a1-tree.vMLB73\config310a1.test.exe" -test.run ^TestRoundTripLoadMarshalLoad$ -test.count 4000 
+shapec2 guard_name_is_test_exe=True guard_cmdline_has_export_tree=True guard_parent_is_this_leg=True
+shapec2 external_kill_issued at=10:47:25.129
+shapec2 at_kill_mine_dirs=3 at_kill_names=TestRoundTripLoadMarshalLoad2289939324,TestRoundTripLoadMarshalLoad2836872785,TestRoundTripLoadMarshalLoad725496612
+shapec2 after_kill target_pid_still_present=0 mine_dirs_after=3 leaked_names=[] leaked_count=0 test_star_dirs_now=53
+shapec2 watched_dir_now_exists=0
+shapec2 verdict=NO-LEAK

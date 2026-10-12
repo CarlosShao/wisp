@@ -1,0 +1,5 @@
+time=2026-10-12T10:44:41.535+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	0.053s

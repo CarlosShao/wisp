@@ -1,0 +1,23 @@
+time=2026-10-12T10:49:06.999+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.05s)
+=== RUN   TestRoundTripBytes
+--- PASS: TestRoundTripBytes (0.00s)
+=== RUN   TestResolvedNeverPersists
+--- PASS: TestResolvedNeverPersists (0.01s)
+=== RUN   TestLoadFileMergesDefaultsAndOverrides
+--- PASS: TestLoadFileMergesDefaultsAndOverrides (0.02s)
+=== RUN   TestSaveFileRoundTripsThroughLoad
+--- PASS: TestSaveFileRoundTripsThroughLoad (0.01s)
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/empty_file
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected
+--- PASS: TestUnwiredGuardLeavesHonestConfigsAlone (0.02s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/empty_file (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads (0.01s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	0.163s

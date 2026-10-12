@@ -1,0 +1,8 @@
+shapec started pid=7980 name=config310a1.test at=10:46:41.487
+shapec world=CONSTRUCTED dir=TestRoundTripLoadMarshalLoad3749761498 dir_creation=10:46:41.776
+shapec target_name=config310a1.test.exe pid=7980 ppid=880 this_ps_pid=880
+shapec cmdline="C:\Users\swq\AppData\Local\Temp\310a1-tree.vMLB73\config310a1.test.exe" -test.run ^TestRoundTripLoadMarshalLoad$ -test.count 4000 
+shapec guard_name_is_test_exe=True guard_cmdline_has_export_tree=True guard_parent_is_this_leg=True
+shapec external_kill_issued at=10:46:42.368
+shapec after_kill target_pid_still_present=0 dir_still_on_disk=0 test_star_dirs_now=52
+shapec verdict=NO-LEAK

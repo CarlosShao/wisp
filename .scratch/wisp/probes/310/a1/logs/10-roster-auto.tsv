@@ -1,0 +1,50 @@
+Test221ParentStopsItsOwnChildRowAndStreamSettle3871214707	2026-10-08 20:08:20	3	208896	digits	Test221ParentStopsItsOwnChildRowAndStreamSettle	 internal/tools/task_cancel_221_legs_test.go:287	1	3871214707
+TestAC1ResidentLegOutlivesItsOwnLogFailure1462165283	2026-10-09 15:35:46	0	0	digits	TestAC1ResidentLegOutlivesItsOwnLogFailure	 cmd/wisp/resident_sink_nail_127_windows_test.go:520	1	1462165283
+TestAC2RealProcessRefusesOnEveryLegWithoutAppData1281963646102	2026-10-03 17:04:22	1	31092893	digits	TestAC2RealProcessRefusesOnEveryLegWithoutAppData128	 cmd/wisp/dataroot_128_windows_test.go:49	1	1963646102
+TestComposedGateBlocksAWriteForTwoSeconds1996183427	2026-09-23 18:44:49	1	10094592	digits	TestComposedGateBlocksAWriteForTwoSeconds	 cmd/wisp/run_test.go:334	1	1996183427
+TestConfirmLockedRunsOutsideTheManagerLock1562080786	2026-10-02 19:39:40	1	198	digits	TestConfirmLockedRunsOutsideTheManagerLock	 internal/config/manager_223_test.go:55	1	1562080786
+TestDoubleFailureKeepsTaskContextAndIsResumable481691178	2026-10-11 18:47:00	1	10094592	digits	TestDoubleFailureKeepsTaskContextAndIsResumable	 internal/llm/fallback_test.go:140	1	481691178
+TestFailoverAfterPrimaryExhaustion2419959198	2026-10-11 21:46:05	2	20188160	digits	TestFailoverAfterPrimaryExhaustion	 internal/llm/fallback_test.go:86	1	2419959198
+TestFailoverAfterPrimaryExhaustion3970703700	2026-10-11 21:46:14	2	20188160	digits	TestFailoverAfterPrimaryExhaustion	 internal/llm/fallback_test.go:86	1	3970703700
+TestFailoverAfterPrimaryExhaustion455177940	2026-10-11 18:53:05	2	20189184	digits	TestFailoverAfterPrimaryExhaustion	 internal/llm/fallback_test.go:86	1	455177940
+TestGateJudgesThePrivateSetByResolvedSID2396759740	2026-09-21 18:40:11	0	0	digits	TestGateJudgesThePrivateSetByResolvedSID	 internal/winsec/private_set_sid_windows_test.go:128	1	2396759740
+TestGateJudgesThePrivateSetByResolvedSID2459073988	2026-09-21 18:40:36	0	0	digits	TestGateJudgesThePrivateSetByResolvedSID	 internal/winsec/private_set_sid_windows_test.go:128	1	2459073988
+TestGateJudgesThePrivateSetByResolvedSID2986811054	2026-09-21 18:40:05	0	0	digits	TestGateJudgesThePrivateSetByResolvedSID	 internal/winsec/private_set_sid_windows_test.go:128	1	2986811054
+TestMockllmGoldenByteIdenticalEvents1101711636	2026-10-11 17:52:31	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	1101711636
+TestMockllmGoldenByteIdenticalEvents1385547188	2026-10-11 21:37:17	1	10094080	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	1385547188
+TestMockllmGoldenByteIdenticalEvents1415189317	2026-10-11 17:49:25	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	1415189317
+TestMockllmGoldenByteIdenticalEvents1524086492	2026-10-11 16:53:41	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	1524086492
+TestMockllmGoldenByteIdenticalEvents1904824687	2026-10-11 17:56:15	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	1904824687
+TestMockllmGoldenByteIdenticalEvents2997322679	2026-10-11 21:37:03	1	10094080	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	2997322679
+TestMockllmGoldenByteIdenticalEvents3039020949	2026-10-11 21:34:10	1	10094080	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	3039020949
+TestMockllmGoldenByteIdenticalEvents3140925201	2026-10-11 18:01:49	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	3140925201
+TestMockllmGoldenByteIdenticalEvents3161225382	2026-10-11 17:52:19	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	3161225382
+TestMockllmGoldenByteIdenticalEvents3233152004	2026-10-11 17:56:27	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	3233152004
+TestMockllmGoldenByteIdenticalEvents3278041641	2026-10-11 21:37:56	1	10094080	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	3278041641
+TestMockllmGoldenByteIdenticalEvents3292549456	2026-10-11 18:02:05	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	3292549456
+TestMockllmGoldenByteIdenticalEvents3666715146	2026-10-11 18:47:06	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	3666715146
+TestMockllmGoldenByteIdenticalEvents4011121267	2026-10-11 16:54:25	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	4011121267
+TestMockllmGoldenByteIdenticalEvents696038329	2026-10-11 18:05:38	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	696038329
+TestMockllmGoldenByteIdenticalEvents718009555	2026-10-11 17:49:18	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	718009555
+TestMockllmGoldenByteIdenticalEvents973367927	2026-10-11 18:05:47	1	10094592	digits	TestMockllmGoldenByteIdenticalEvents	 internal/llm/openaichat/mockllm_integ_test.go:183	1	973367927
+TestMockllmSharedFaultSuite1562417226	2026-10-11 17:56:48	1	10094592	digits	TestMockllmSharedFaultSuite	 internal/llm/anthropic/suite_test.go:42 internal/llm/openaichat/harness_golden_test.go:128 internal/llm/openairesponses/suite_test.go:42	3	1562417226
+TestMockllmSharedFaultSuite1603513437	2026-10-11 18:02:32	1	10094592	digits	TestMockllmSharedFaultSuite	 internal/llm/anthropic/suite_test.go:42 internal/llm/openaichat/harness_golden_test.go:128 internal/llm/openairesponses/suite_test.go:42	3	1603513437
+TestMockllmSharedFaultSuite222012253	2026-10-11 17:52:40	1	10094592	digits	TestMockllmSharedFaultSuite	 internal/llm/anthropic/suite_test.go:42 internal/llm/openaichat/harness_golden_test.go:128 internal/llm/openairesponses/suite_test.go:42	3	222012253
+TestMockllmSharedFaultSuite2329949686	2026-10-11 18:05:55	1	10094592	digits	TestMockllmSharedFaultSuite	 internal/llm/anthropic/suite_test.go:42 internal/llm/openaichat/harness_golden_test.go:128 internal/llm/openairesponses/suite_test.go:42	3	2329949686
+TestMockllmSharedFaultSuite2868402985	2026-10-11 18:02:16	1	10094592	digits	TestMockllmSharedFaultSuite	 internal/llm/anthropic/suite_test.go:42 internal/llm/openaichat/harness_golden_test.go:128 internal/llm/openairesponses/suite_test.go:42	3	2868402985
+TestMockllmSharedFaultSuite3458740087	2026-10-11 17:56:35	1	10094592	digits	TestMockllmSharedFaultSuite	 internal/llm/anthropic/suite_test.go:42 internal/llm/openaichat/harness_golden_test.go:128 internal/llm/openairesponses/suite_test.go:42	3	3458740087
+TestMockllmSharedFaultSuite3784017352	2026-10-11 17:49:34	1	10094592	digits	TestMockllmSharedFaultSuite	 internal/llm/anthropic/suite_test.go:42 internal/llm/openaichat/harness_golden_test.go:128 internal/llm/openairesponses/suite_test.go:42	3	3784017352
+TestMockllmSharedFaultSuite959708402	2026-10-11 18:06:04	1	10094592	digits	TestMockllmSharedFaultSuite	 internal/llm/anthropic/suite_test.go:42 internal/llm/openaichat/harness_golden_test.go:128 internal/llm/openairesponses/suite_test.go:42	3	959708402
+TestPanelHostRealWindowHopAndLifecycle537087969	2026-10-01 10:04:05	70	810867	digits	TestPanelHostRealWindowHopAndLifecycle	 cmd/wisp/panel_host_windows_test.go:614	1	537087969
+TestProbeStepByStep3843095677	2026-09-21 18:40:57	0	0	NOMATCH	-	-
+TestRollingWriterRetentionSweep3198295670	2026-09-25 08:32:26	0	0	digits	TestRollingWriterRetentionSweep	 internal/observe/logging_test.go:188	1	3198295670
+TestRollingWriterRetentionSweep3638913217	2026-09-25 08:34:09	0	0	digits	TestRollingWriterRetentionSweep	 internal/observe/logging_test.go:188	1	3638913217
+TestRollingWriterRetentionSweep3835089158	2026-09-25 08:34:11	0	0	digits	TestRollingWriterRetentionSweep	 internal/observe/logging_test.go:188	1	3835089158
+TestRollingWriterRetentionSweep3838303947	2026-09-25 08:34:24	0	0	digits	TestRollingWriterRetentionSweep	 internal/observe/logging_test.go:188	1	3838303947
+TestRunPacketCarriesTheSubagentItsRosterRowFed4174395780	2026-10-08 11:35:29	9	10337094	digits	TestRunPacketCarriesTheSubagentItsRosterRowFed	 cmd/wisp/subagent_carrier_197_test.go:231	1	4174395780
+TestSLO144LoopGiveUpSentencesOnRealFiles2237962421	2026-09-25 20:36:08	0	0	digits	TestSLO144LoopGiveUpSentencesOnRealFiles	 cmd/wisp/slo_report_144_windows_test.go:221	1	2237962421
+TestTicket101SessionGrantDoesNotCrossRestart2995253497	2026-10-07 18:23:33	8	10313209	digits	TestTicket101SessionGrantDoesNotCrossRestart	 cmd/wisp/run_mode101_test.go:391	1	2995253497
+TestTicket223PermissionDeniedSitsInItsOwnSentence1318611284	2026-10-05 23:25:53	9	10340275	digits	TestTicket223PermissionDeniedSitsInItsOwnSentence	 cmd/wisp/config_reload_perm_223_windows_test.go:60	1	1318611284
+TestTicket223R2FailureSentenceRouting声明旧版_坏表头_A2_3165385141	2026-10-03 17:01:11	1	35	NOMATCH	-	-
+TestTicket223TighteningRaisesNoCard3267158827	2026-10-03 17:09:55	1	10094592	digits	TestTicket223TighteningRaisesNoCard	 cmd/wisp/config_reload_223_test.go:503	1	3267158827
+TestUnansweredL2CardTimesOutIntoRejectNeverExecution2689719599	2026-10-08 08:42:21	9	10340645	digits	TestUnansweredL2CardTimesOutIntoRejectNeverExecution	 cmd/wisp/approval_reply_201_test.go:434	1	2689719599

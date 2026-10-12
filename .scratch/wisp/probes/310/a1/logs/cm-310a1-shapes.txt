@@ -1,0 +1,13 @@
+310-a1: 表② 死亡三形实测＋表③ 甲乙丙代价表＋必答 (I)(II)＋90-final（AC#0 普查腿交件）
+
+20-shapes.md（台件＝仓外导出树 git archive 六件套，go_files=682 证非空）：
+  (a) 正常收尾 0 枚新增（同发 252 遍各删各的）；(b) -timeout panic 漏 1 枚（panic: test timed out after 2s 逐字＋run 253/pass 252）；
+  (c) 外力 TerminateProcess 漏 1 枚×两发（同进程盯＋下手，target_pid_still_present=0 现量，三守卫全 True）；
+  (d) GOTMPDIR 变体＋(e) TMP/TEMP 变体：%TEMP% 顶层 0 新增、残渣各 1 枚落进重定向根 ⇒ 甲形治"落在哪"不治"没人收尾"。
+  ★自报本腿新增 5 枚（顶层 3＋两枚根里各 1），逐枚名册，⛔ 删。
+  ⚠ 具名自抓：第 1／2 发 (c) 台件判据建错对象（拿"盯到的那枚"判存在性），脚本自报 NO-LEAK 读反，真相由外部 comm 尺给出。
+30-costs.md：甲（GOTMPDIR 与 TMP/TEMP 两变体分开算，动 4 枚跑测脚本、⛔ 上 CI）／乙（唯一真减枚数，但名册被同一刀吃掉）／丙（一枚文本件、零风险、枚数继续涨）四问逐格；
+  必答 (I) 尺已数完：os.TempDir() 16 文件（测试 12）／"TEMP"|"TMP" 2（全测试）／%TEMP%|$env:TEMP 6（测试 3）／GOTMPDIR 0／t.TempDir 446 行 163 文件／*_test.go 分母 387／func TestMain 0；结论＝甲-G ⛔ 改既有假设、甲-T 会改（11 枚受影响件我⛔ 跑＝欠账 Q-310-a1-3）。
+  必答 (II)：名字／mtime／命令行三个字段单独都分不开两家，乙须"自己上轮具名册 ∩ 仍可证本仓 ∩ 不在活着的名下"三条同成立，失效窗口四条具名。
+90-final.md：三表结论各一句＋欠的读数九枚 Q-310-a1-1..9（含三态口径那一枚、没跑的一形清单、我自己造的 5 枚残渣、票面枚数过期、Q-304-a1-H 销账归编排者）。
+票 310 尾部一条 append-only Progress bullet（1 加／0 删），⛔ 翻框、⛔ 动 Status、⛔ 改名。
