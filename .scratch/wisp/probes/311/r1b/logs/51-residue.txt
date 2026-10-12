@@ -68,3 +68,10 @@ rc=0
   my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-153523-2958
   my_default_root=C:/Users/swq/AppData/Local/wisp-test-gotmp/winsec-20261012-153946-1323
   default_base_total_child_dirs=66（含别腿与编排者今天在飞的根；票 Status: 那句 24 枚是 15:0x 的快照，⛔ 是我的数、也⛔ 是我的账）
+
+## 9. 补账（本件交出之后又建/又落的东西，逐枚具名；⛔ 删、⛔ chmod、⛔ takeown）
+第四棵仓外导出树＝D:/tmp/311r1b/tfinal（尺＝git archive 8f350a9d | tar -x；证非空＝find -name '*.go' | wc -l = 1001；它装着本腿 83 枚已入库证据件，那把 d22scan 就是跑在它上面的＝件 30-G8）
+现在本腿在 D:/tmp 下的东西逐枚＝311r1b/{tpre,tpost,tstrip,backup,tfinal}（五枚目录）＋311r1b-notadir（file）＋311r1b-notadir-file（file）＋wisp-test-gotmp/311r1b-xvol（9 枚运行目录，内含 12 枚锁死叶）；C: 侧＝%LOCALAPPDATA%/311r1b-samevol（5）＋-pre（1）＋默认根内可指认 12 枚（§8）＋tpost/311r1b-relbare/（INCONCLUSIVE 那发的 mkdir 真建物）
+补完这两笔之后本腿共 10 笔 commit＝产码 4（e4e787fb f8b1f446 10734fbd 0f888a4f）＋证据 5（501af017 3b553a2f 07e7a1e0 f10583ab f1155198）＋票 bullet 1（8f350a9d，1 加/0 删）；逐笔越界尺重跑＝91 枚文件、写面外 0 枚（分母＝同一列法）
+⚠ 一处我自己写窄了的句子：30-gates.md §5 那句『证据 3 笔 31/40/12』写的是 E1..E3，其后又落了两笔（f10583ab 两枚、本笔）；那张账的权威落点＝logs/pathspec-311r1b.txt 的补记节，本件这条是第二处具名。
+rc=0
