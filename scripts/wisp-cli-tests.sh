@@ -57,6 +57,26 @@ if [ ! -f "$portable" ]; then
     exit 2
 fi
 
+# ---- TICKET 310 AC#1 (shape A-G): claim the dedicated GOTMPDIR root at THIS
+# entry, before the PATH-staging guard below can short-circuit, because cmd/wisp is
+# the package whose test binary is the heaviest temp-dir user this host has. The
+# delegated portable-tests.sh builds a root only while GOTMPDIR is still empty, so
+# it reuses this one instead of opening a second root. Rationale (GOTMPDIR vs
+# TMP/TEMP, why the root is outside the OS temp dir, why nothing is deleted here,
+# why non-Windows is untouched) is the long note in scripts/portable-tests.sh.
+if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ] && [ -n "${LOCALAPPDATA:-}" ]; then
+    gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/cli-$(date +%Y%m%d-%H%M%S)-$$"
+    if mkdir -p "$gotmp_run" 2>/dev/null; then
+        export GOTMPDIR="$gotmp_run"
+        echo "wisp-cli-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+            "t.TempDir() family lands here; nothing deletes it."
+    else
+        echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+            "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+            "the OS temp root again. Not a silent fallback: this line is the finding." >&2
+    fi
+fi
+
 if [ "$(go env GOOS)" != windows ]; then
     # Not a skip and not a pass: this step is wired into the job whose runner has
     # the shared DLLs. On linux cmd/wisp builds and runs but 19 cases are red
