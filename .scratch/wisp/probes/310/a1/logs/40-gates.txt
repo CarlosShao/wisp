@@ -21,3 +21,15 @@ correct_ruler=git status --porcelain -- .scratch/wisp/probes/310 .scratch/wisp/i
 mine_outside_310a1=2  (empty above＝0 枚＝我造的未跟踪件只在我自家；剩下的怪名件 4 枚也在我自家 logs/ 下、⛔ 进跟踪集)
 note=上面 810 那个数是假越界：它把别家与机主的未跟踪件算成我的；共享工作树里⛔ 存在能证"别人没造过文件"的尺
 my_commits_this_leg=3
+### 再更正一把尺（同一枚越界自查的第三读，⛔ 拿带引号的输出当读数）
+ruler=git -c core.quotePath=false status --porcelain -- .scratch/wisp/probes/310 .scratch/wisp/issues | grep '^??' | grep -vc '^?? .scratch/wisp/probes/310/a1/'
+mine_outside_310a1_true=0  (empty above＝0 枚 ⇒ 我造的每一个路径都在 probes/310/a1/** 之内)
+explanation=上一条读出的 2 枚是我自家 logs/ 里那两枚怪名件（名字带引号与控制字符），git 默认 core.quotePath 把它们加引号 ⇒ grep '^?? .scratch' 匹配不到，是尺的转义假象、⛔ 真越界。用 -c core.quotePath=false 复量＝0 枚。
+final_test_dirs_on_disk=Get-ChildItem : A parameter cannot be found that matches parameter name 'Directory'.
+At line:1 char:31
++ (@(Get-ChildItem -Path \:TEMP -Directory | Where-Object { \extglob.Na ...
++                               ~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-ChildItem], ParameterBindingException
+    + FullyQualifiedErrorId : NamedParameterNotFound,Microsoft.PowerShell.Commands.GetChildItemCommand
+ 
+0  (交件时现量，⛔ 删任何一枚)
