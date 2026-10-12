@@ -1,0 +1,2 @@
+.scratch/wisp/probes/310/r2/logs/40-postcommit-nameonly-evidence.txt
+.scratch/wisp/probes/310/r2/logs/commit-list-evidence2.txt

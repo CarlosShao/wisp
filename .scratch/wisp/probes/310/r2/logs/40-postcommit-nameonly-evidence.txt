@@ -1,0 +1,8 @@
+# 40-postcommit-nameonly-evidence.txt — 本腿各笔 git show --name-only 逐笔读数（⛔ 区间尺，逐笔现跑）
+
+commit 78782c20 : files=3 out_of_allowlist=0
+commit 5ef679b5 : files=1 out_of_allowlist=0
+commit a2b5a8f4 : files=124 out_of_allowlist=0
+
+说明: 允许清单=probes/310/r2/** + 票310一枚 + winsec/cli/runtests 三枚 shell。out_of_allowlist 三笔均=0。
+本件 40-* 属随后一笔(evidence-part2)，故其所在笔的 name-only 自指读数=该笔 files=1（本件），越界=0。
