@@ -7,7 +7,7 @@
   - `resident_audio_windows.go`＝`a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84`（⇄ HEAD 同值）
   - `resident_mute_290_windows_test.go`＝`f5c4cb72d97a0f16953df15f15a19851f81a128025a3a3c9f0b0283ff49a9a83`（与腿 `logs/32` 记的同号 ⇒ 断言字节自 `d5ef9cb9` 起未再动）
   - `resident_audio_247_windows_test.go`＝`e039066c024d54782a5ba97524c503e593cb7f2b7cff2200f897e003d5d4d6a1`（同号）
-  - `resident_audio_247_live_windows_test.go`＝`72d59193e558a54d21f3f…` 全号 `72d59193e558a54d21f645714f3fff7105c8ae8e8323e7b25023074b4f2c2aa4`（同号）
+  - `resident_audio_247_live_windows_test.go`＝`72d59193e558a54d21f645714f3fff7105c8ae8e8323e7b25023074b4f2c2aa4`（同号）
 - pristine 复跑（⛔ 变异后必须再来一发绿的）＝`focused-pristine3.txt` ⇒ 逐字 `--- PASS: TestAC290BothMuteGesturesTurnTheGateAndBack (0.01s)`／`ok github.com/CarlosShao/wisp/cmd/wisp 0.102s`，`rc=0`；整包那一发（`full-p.txt`）＝红名册与腿的 D 发**逐字同三枚**（见 `roster-diff-m1-p-m2.txt` §4）。
 
 ## 2. 定向三发（快发，为差集提供"红在哪一行"的落点）

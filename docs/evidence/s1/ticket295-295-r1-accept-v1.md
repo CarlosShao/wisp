@@ -28,7 +28,7 @@
 ## 本腿自报：哪件没做完（⛔ 把"我没看到"写成"跑过了"）
 
 - ⛔ 跑 `-race` 那一发（派单 §2 明令⛔ 我跑，只判腿的结论句）；⛔ 重跑 AC#4 的另五发与两棵导出树（派单只我要两发，我只跑整包一发＝pristine；腿声明的导出树七项欠账 `Q-295-r1-archive-set` 归编排者）。
-- ⛔ 复跑 `go build`／`gofmt`／`gofumpt`／`d22scan`／长度门的色（派单 §0 已由编排者现跑，本腿⛔ 重复；我只跑了一次 `sh scripts/check-path-length-budget.sh` 为**我自己的新件名**把关＝`VERDICT GREEN`、分母 **11,996** 枚 tracked 路径、rc=0，落在我 add 之前）。
+- ⚠ 上一条本腿**部分自反**（诚实记账）：我确实另跑了两把便宜门禁，但只为**我自己的写面**把关＝`sh scripts/check-path-length-budget.sh`（add 前⇄add 后各一遍，两遍 `VERDICT GREEN`、`rc=0`、分母 **11,996** 枚 tracked 路径）与 `sh scripts/d22scan.sh`（`rc=0` clean，分母逐字与编排者那遍同值＝bans #1-5 `internal/=231 cmd/=39`、ban #8 `cmd/=119 internal/=533`）⇒ 这只证"本腿的 `.md`/`.txt` 零影响"，⛔ 替腿的门禁读数背书、⛔ 算我复跑了 AC#4 那四数；`go build`／`gofmt`／`gofumpt` 三把我⛔ 跑（派单 §0 已由编排者现跑）。
 - ⛔ 判 `AC#0` 的名册本体（那是 `295-a1b`＋编排者的活），只复跑了它的两枚前件（见表首行）。
 - ⛔ 造"两线程对拉＋自带正控"那枚用例（那是生产码/测试面，⛔ 验收腿写面；我在 `AC#5` 那行只把"要不要造"这一问题连同那句越界结论**报回**给编排者裁）。
 - 台面坑具名（⛔ 记账到腿的读数上，全〔作废〕＋落非零 `rc=`，见 `logs/gates-restore-proof.txt` §3 六条）：`GOTMPDIR` 指向未创建目录（×3 发）、PATH 写成 `D:/…` 正斜杠形致 `exit status 0xc0000135`（×3 发）、驱动脚本 `local tag=… raw="…$tag…"` 同语句展开令三发共用一件名（那一族整包发〔作废〕，含 39,882 字节残留件 `full-.txt` 只建⛔ 删）、`git diff-tree` 一次传四枚＝哑尺、`Get-CimInstance -Filter` 内联引号被吃＝假 0、`git grep … | cat; echo $?` 拿错 rc。
