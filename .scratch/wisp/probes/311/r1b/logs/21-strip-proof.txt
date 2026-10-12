@@ -1,0 +1,66 @@
+=== pristine baseline (tstrp copied from tpost; backup made) ===
+sha_pristine_tpost:
+  b921d242a3ad596c6feaed198c583314c590988307496318633760dd3ff99e84 *scripts/winsec-tests.sh
+  0ce9a964b19ab8a17c79e62a6f88c1d094535fd3916eca9dbcb01ad2cf80c528 *scripts/portable-tests.sh
+  b62a0184bbefb3a1c32baa0770528a024a0a2d4f6364724e450a8c7fe73c1a04 *scripts/wisp-cli-tests.sh
+  6d87d33cecfaf08d9c5343f12db19bfed53f33c5185b056c7b141b5284d31969 *tools/d22scan/runtests.sh
+sha_pristine_tstrip_before_any_strip:
+  b921d242a3ad596c6feaed198c583314c590988307496318633760dd3ff99e84 *scripts/winsec-tests.sh
+  0ce9a964b19ab8a17c79e62a6f88c1d094535fd3916eca9dbcb01ad2cf80c528 *scripts/portable-tests.sh
+  b62a0184bbefb3a1c32baa0770528a024a0a2d4f6364724e450a8c7fe73c1a04 *scripts/wisp-cli-tests.sh
+  6d87d33cecfaf08d9c5343f12db19bfed53f33c5185b056c7b141b5284d31969 *tools/d22scan/runtests.sh
+sha_backup:
+  b921d242a3ad596c6feaed198c583314c590988307496318633760dd3ff99e84 *scripts/winsec-tests.sh
+  0ce9a964b19ab8a17c79e62a6f88c1d094535fd3916eca9dbcb01ad2cf80c528 *scripts/portable-tests.sh
+  b62a0184bbefb3a1c32baa0770528a024a0a2d4f6364724e450a8c7fe73c1a04 *scripts/wisp-cli-tests.sh
+  6d87d33cecfaf08d9c5343f12db19bfed53f33c5185b056c7b141b5284d31969 *tools/d22scan/runtests.sh
+block_present_tstrip_before=scripts/winsec-tests.sh:1 scripts/portable-tests.sh:1 scripts/wisp-cli-tests.sh:1 tools/d22scan/runtests.sh:1 
+=== B1: strip ALL FOUR guard blocks (only the blocks) ===
+strip_removed_lines=71
+strip_removed_lines=71
+strip_removed_lines=71
+strip_removed_lines=71
+block_present_tstrip_after_strip4=scripts/winsec-tests.sh:0 scripts/portable-tests.sh:0 scripts/wisp-cli-tests.sh:0 tools/d22scan/runtests.sh:0 
+restored_from_backup; sha_tstrip_now:
+  b921d242a3ad596c6feaed198c583314c590988307496318633760dd3ff99e84 *scripts/winsec-tests.sh
+  0ce9a964b19ab8a17c79e62a6f88c1d094535fd3916eca9dbcb01ad2cf80c528 *scripts/portable-tests.sh
+  b62a0184bbefb3a1c32baa0770528a024a0a2d4f6364724e450a8c7fe73c1a04 *scripts/wisp-cli-tests.sh
+  6d87d33cecfaf08d9c5343f12db19bfed53f33c5185b056c7b141b5284d31969 *tools/d22scan/runtests.sh
+restore_equals_pristine=yes
+=== B2: strip ONLY scripts/portable-tests.sh ===
+strip_removed_lines=71
+block_present_after_strip_portable=scripts/winsec-tests.sh:1 scripts/portable-tests.sh:0 scripts/wisp-cli-tests.sh:1 tools/d22scan/runtests.sh:1 
+restored_from_backup; sha_tstrip_now:
+  b921d242a3ad596c6feaed198c583314c590988307496318633760dd3ff99e84 *scripts/winsec-tests.sh
+  0ce9a964b19ab8a17c79e62a6f88c1d094535fd3916eca9dbcb01ad2cf80c528 *scripts/portable-tests.sh
+  b62a0184bbefb3a1c32baa0770528a024a0a2d4f6364724e450a8c7fe73c1a04 *scripts/wisp-cli-tests.sh
+  6d87d33cecfaf08d9c5343f12db19bfed53f33c5185b056c7b141b5284d31969 *tools/d22scan/runtests.sh
+restore_equals_pristine=yes
+=== B3: strip ONLY tools/d22scan/runtests.sh ===
+strip_removed_lines=71
+block_present_after_strip_runtests=scripts/winsec-tests.sh:1 scripts/portable-tests.sh:1 scripts/wisp-cli-tests.sh:1 tools/d22scan/runtests.sh:0 
+restored_from_backup; sha_tstrip_now:
+  b921d242a3ad596c6feaed198c583314c590988307496318633760dd3ff99e84 *scripts/winsec-tests.sh
+  0ce9a964b19ab8a17c79e62a6f88c1d094535fd3916eca9dbcb01ad2cf80c528 *scripts/portable-tests.sh
+  b62a0184bbefb3a1c32baa0770528a024a0a2d4f6364724e450a8c7fe73c1a04 *scripts/wisp-cli-tests.sh
+  6d87d33cecfaf08d9c5343f12db19bfed53f33c5185b056c7b141b5284d31969 *tools/d22scan/runtests.sh
+restore_equals_pristine=yes
+=== final: tstrip back to pristine, tpost untouched throughout ===
+sha_tpost_final:
+  b921d242a3ad596c6feaed198c583314c590988307496318633760dd3ff99e84 *scripts/winsec-tests.sh
+  0ce9a964b19ab8a17c79e62a6f88c1d094535fd3916eca9dbcb01ad2cf80c528 *scripts/portable-tests.sh
+  b62a0184bbefb3a1c32baa0770528a024a0a2d4f6364724e450a8c7fe73c1a04 *scripts/wisp-cli-tests.sh
+  6d87d33cecfaf08d9c5343f12db19bfed53f33c5185b056c7b141b5284d31969 *tools/d22scan/runtests.sh
+sha_tstrip_final:
+  b921d242a3ad596c6feaed198c583314c590988307496318633760dd3ff99e84 *scripts/winsec-tests.sh
+  0ce9a964b19ab8a17c79e62a6f88c1d094535fd3916eca9dbcb01ad2cf80c528 *scripts/portable-tests.sh
+  b62a0184bbefb3a1c32baa0770528a024a0a2d4f6364724e450a8c7fe73c1a04 *scripts/wisp-cli-tests.sh
+  6d87d33cecfaf08d9c5343f12db19bfed53f33c5185b056c7b141b5284d31969 *tools/d22scan/runtests.sh
+=== C1: strip ALL FOUR again (for the shape-2 guard-absent side) ===
+strip_removed_lines=71
+strip_removed_lines=71
+strip_removed_lines=71
+strip_removed_lines=71
+c1_block_present_after_strip=scripts/winsec-tests.sh:0 scripts/portable-tests.sh:0 scripts/wisp-cli-tests.sh:0 tools/d22scan/runtests.sh:0 
+c1_restored_sha_match=yes
+rc=0 (generators txt/phase-b.sh and txt/phase-c.sh each printed their -finished marker; per-strip codes are the strip_removed_lines=71 lines and restore_equals_pristine=yes / c1_restored_sha_match=yes in this file)

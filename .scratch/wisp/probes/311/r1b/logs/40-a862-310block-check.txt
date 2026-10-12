@@ -1,0 +1,224 @@
+# 40-a862-310block-check.txt - section 9 item: is A862's '四枚同形＋跑在 GUARD 之前' statement about the TICKET 310 block right? second pair of eyes.
+射程=working tree at 0f888a4f (scripts/winsec-tests.sh scripts/portable-tests.sh scripts/wisp-cli-tests.sh tools/d22scan/runtests.sh)
+--- 1. is the 310 block in winsec-tests.sh still exactly what 310-r2 delivered? ---
+numstat_3b857e53(added deleted file)=71	0	scripts/winsec-tests.sh
+hunk_3b857e53=@@ -121,0 +122,71 @@ fi
+blob_23c19afa=31f64e0c4d2504fd51c26dca45d6d8e2e42c94db blob_3b857e53parent=31f64e0c4d2504fd51c26dca45d6d8e2e42c94db equal=yes
+(a pure insertion with 0 deletions cannot recolour an existing line; the two blob hashes are the stronger form of the same claim)
+--- 2. four-way line diff of the 310 blocks (one instrument, marker moved) ---
+file=scripts/winsec-tests.sh block_lines=33
+file=scripts/portable-tests.sh block_lines=68
+file=scripts/wisp-cli-tests.sh block_lines=32
+file=tools/d22scan/runtests.sh block_lines=40
+=== diff winsec-310-block vs portable-tests.sh-310-block ===
+1,8c1
+< # ---- TICKET 310 AC#1 (shape A-G): claim the dedicated GOTMPDIR root at THIS
+< # entry, because this is the file CI names. portable-tests.sh (the one that really
+< # starts `go test`, via tools/d22scan/runtests.sh) builds a root only while
+< # GOTMPDIR is still empty, so the delegated run inherits this root instead of
+< # opening a second one - one root per run, named in this step's own log line. What
+< # the root is for, why GOTMPDIR rather than TMP/TEMP, why it is never under the OS
+< # temp dir, why it is never deleted here and why the ubuntu leg is left alone: the
+< # long note at the top of scripts/portable-tests.sh.
+---
+> # ---- TICKET 310 AC#1 (shape A-G): the test temp family gets a dedicated root.
+10,22c3,58
+< # The GOOS=windows + empty-LOCALAPPDATA branch is now LOUD (ticket 310 AC#1, debt
+< # Q-310-orch-Q). It used to be the conjunctive form `... && [ -n LOCALAPPDATA ]`,
+< # so when %LOCALAPPDATA% was empty the whole block fell through in silence - no
+< # GOTMPDIR line, no DEGRADED line, nothing said that the redirection did not
+< # happen. It is now a finding on stderr, still NOT a fail-closed exit and NOT a
+< # refusal to run (orchestrator ruling; revocation phrase "310 改 fail-closed").
+< if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
+<     if [ -n "${LOCALAPPDATA:-}" ]; then
+<         gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/winsec-$(date +%Y%m%d-%H%M%S)-$$"
+<         if mkdir -p "$gotmp_run" 2>/dev/null; then
+<             export GOTMPDIR="$gotmp_run"
+<             echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+<                 "t.TempDir() family lands here; nothing deletes it."
+---
+> # WHAT THIS BUYS, MEASURED. A test binary that dies without running its cleanup
+> # leaves its `t.TempDir()` directory on disk: the census leg (310-a1 20-shapes.md)
+> # and the orchestrator (probes/orch/20261012/logs/orch-310-recheck-b.txt) each
+> # measured exactly one new directory per death, twice over, for the `go test
+> # -timeout` panic and for an external TerminateProcess. On this host those
+> # directories piled up at the top of %TEMP% (21 -> 44 in one day, 55 registered at
+> # the time of this writing), which is why the fleet's starting gate now counts them
+> # (probes/orch/gate-roster-304.md section 1). Redirecting the family moves WHERE the
+> # residue lands; it does not collect it - ticket 310's own rule is that deleting a
+> # directory is irreversible and needs a per-directory roster plus a non-implementer
+> # review, so this step names the root and deletes nothing.
+> #
+> # WHY GOTMPDIR AND NOT TMP/TEMP. testing's makeTempDir calls
+> # os.MkdirTemp(os.Getenv("GOTMPDIR"), pattern) (this host's GOROOT,
+> # src/testing/testing.go:1613), so GOTMPDIR moves exactly the t.TempDir()/
+> # os.CreateTemp family. os.TempDir() on Windows goes through Win32 GetTempPath and
+> # does NOT read GOTMPDIR, so a test that reads os.TempDir() literally keeps its
+> # answer. Redirecting TMP/TEMP instead would move those answers too - that is the
+> # A-T variant ticket 310 ruled against (12 test files plus the live-window ones).
+> #
+> # WHY THE ROOT IS NOT UNDER %TEMP%. The census leg measured that shape and named
+> # the trap: a root inside %TEMP% leaves the non-recursive
+> # `Get-ChildItem $env:TEMP -Directory` roster reading "0 new" while the residue is
+> # simply out of the ruler's reach. So the default root is a SIBLING of %TEMP% -
+> # under %LOCALAPPDATA%, outside the OS temp dir - not a directory inside it.
+> #
+> # WHY %LOCALAPPDATA% AND NOT "THE REPO'S VOLUME", MEASURED TODAY. The first draft
+> # of this step put the root on the repo's volume (`D:/tmp/...`) and the winsec tier
+> # went 58 PASS / 0 FAIL to 56 PASS / 2 FAIL on this host:
+> # TestGateJudgesThePrivateSetByResolvedSID (both sub-tests) and
+> # TestSealNarrowsAndNamesThePrincipalItRemovedBySID judge the ACL set they seal,
+> # and an inherited set from another volume is not the same set. The same scope run
+> # against a %LOCALAPPDATA%-sibling root came back 58/0, identical to the unredirected
+> # run. So the location of the root is NOT a free choice, and the value below is the
+> # one that was measured to leave every colour alone.
+> #
+> # WHY WINDOWS ONLY. The ticket, the roster row and every measurement behind both
+> # are about this host's %TEMP%. The ubuntu leg is left exactly as it is because
+> # this leg cannot run CI to measure what a redirected temp root does to those
+> # steps (registered as a debt on ticket 310, not silently assumed safe).
+> if [ -z "${GOTMPDIR:-}" ]; then
+>     if [ "$(go env GOOS)" = windows ]; then
+>         if [ -n "${LOCALAPPDATA:-}" ]; then
+>             gotmp_base=${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}
+>             gotmp_run="$gotmp_base/portable-$(date +%Y%m%d-%H%M%S)-$$"
+>             if mkdir -p "$gotmp_run" 2>/dev/null; then
+>                 export GOTMPDIR="$gotmp_run"
+>                 echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+>                     "t.TempDir() family lands here. Nothing deletes it: ticket 310 requires a" \
+>                     "per-directory roster plus a non-implementer review before any removal."
+>             else
+>                 echo "portable-tests.sh: ticket 310 AC#1: DEGRADED - cannot create" \
+>                     "$gotmp_run, so GOTMPDIR stays unset and a test binary that dies will" \
+>                     "leave its temp dir in the OS temp root again. Not a silent fallback:" \
+>                     "this line is the finding." >&2
+>             fi
+24,26c60,62
+<             echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+<                 "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+<                 "the OS temp root again. Not a silent fallback: this line is the finding." >&2
+---
+>             echo "portable-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so" \
+>                 "this step has no measured-safe root to build (a root on another volume turns" \
+>                 "the winsec seal cases red, see the note above). GOTMPDIR stays unset." >&2
+29,31c65,66
+<         echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no" \
+<             "measured-safe root to build (a root on another volume turns the winsec seal cases" \
+<             "red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+---
+>         echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR left as-is on GOOS=$(go env GOOS)" \
+>             "(the ticket's measurement surface is the Windows host's temp root)."
+differing_lines=89
+=== diff winsec-310-block vs wisp-cli-tests.sh-310-block ===
+2,8c2,7
+< # entry, because this is the file CI names. portable-tests.sh (the one that really
+< # starts `go test`, via tools/d22scan/runtests.sh) builds a root only while
+< # GOTMPDIR is still empty, so the delegated run inherits this root instead of
+< # opening a second one - one root per run, named in this step's own log line. What
+< # the root is for, why GOTMPDIR rather than TMP/TEMP, why it is never under the OS
+< # temp dir, why it is never deleted here and why the ubuntu leg is left alone: the
+< # long note at the top of scripts/portable-tests.sh.
+---
+> # entry, before the PATH-staging guard below can short-circuit, because cmd/wisp is
+> # the package whose test binary is the heaviest temp-dir user this host has. The
+> # delegated portable-tests.sh builds a root only while GOTMPDIR is still empty, so
+> # it reuses this one instead of opening a second root. Rationale (GOTMPDIR vs
+> # TMP/TEMP, why the root is outside the OS temp dir, why nothing is deleted here,
+> # why non-Windows is untouched) is the long note in scripts/portable-tests.sh.
+13,15c12,14
+< # GOTMPDIR line, no DEGRADED line, nothing said that the redirection did not
+< # happen. It is now a finding on stderr, still NOT a fail-closed exit and NOT a
+< # refusal to run (orchestrator ruling; revocation phrase "310 改 fail-closed").
+---
+> # GOTMPDIR line, no DEGRADED line, nothing said the redirection did not happen. It
+> # is now a finding on stderr, still NOT a fail-closed exit and NOT a refusal to
+> # run (orchestrator ruling; revocation phrase "310 改 fail-closed").
+18c17
+<         gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/winsec-$(date +%Y%m%d-%H%M%S)-$$"
+---
+>         gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/cli-$(date +%Y%m%d-%H%M%S)-$$"
+21c20
+<             echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+---
+>             echo "wisp-cli-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+24c23
+<             echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+---
+>             echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+29c28
+<         echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no" \
+---
+>         echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no" \
+differing_lines=27
+=== diff winsec-310-block vs runtests.sh-310-block ===
+1,8c1,15
+< # ---- TICKET 310 AC#1 (shape A-G): claim the dedicated GOTMPDIR root at THIS
+< # entry, because this is the file CI names. portable-tests.sh (the one that really
+< # starts `go test`, via tools/d22scan/runtests.sh) builds a root only while
+< # GOTMPDIR is still empty, so the delegated run inherits this root instead of
+< # opening a second one - one root per run, named in this step's own log line. What
+< # the root is for, why GOTMPDIR rather than TMP/TEMP, why it is never under the OS
+< # temp dir, why it is never deleted here and why the ubuntu leg is left alone: the
+< # long note at the top of scripts/portable-tests.sh.
+---
+> # ---- TICKET 310 AC#1 (shape A-G): the test temp family gets a dedicated root.
+> # This is the fifth entry that really starts `go test`: scripts/d22scan.sh:51
+> # calls `sh tools/d22scan/runtests.sh -C tools/d22scan ./...`, CI's "D22 scanner
+> # positive control" step calls the same runner, and the `go test` below is the
+> # real process start. The block is copied verbatim from scripts/winsec-tests.sh
+> # (only the entry name and the echo prefix change) so all four entries that start
+> # tests present ONE shape, not four dialects. The guard keeps the delegation
+> # contract: when scripts/portable-tests.sh has already exported GOTMPDIR and then
+> # calls this runner, we MUST NOT open a second root - one root per run, named by
+> # the outermost entry; the delegated run inherits it. Why GOTMPDIR and not
+> # TMP/TEMP, why the root is a SIBLING of %TEMP% (never inside it, where a
+> # non-recursive roster would read "0 new" while the residue is simply out of the
+> # ruler's reach), why it is not on the repo's volume (a cross-volume root turns
+> # the winsec seal cases red - measured, ticket 311), why nothing is deleted here,
+> # and why the ubuntu leg is left alone: the long note in scripts/portable-tests.sh.
+10,15c17,22
+< # The GOOS=windows + empty-LOCALAPPDATA branch is now LOUD (ticket 310 AC#1, debt
+< # Q-310-orch-Q). It used to be the conjunctive form `... && [ -n LOCALAPPDATA ]`,
+< # so when %LOCALAPPDATA% was empty the whole block fell through in silence - no
+< # GOTMPDIR line, no DEGRADED line, nothing said that the redirection did not
+< # happen. It is now a finding on stderr, still NOT a fail-closed exit and NOT a
+< # refusal to run (orchestrator ruling; revocation phrase "310 改 fail-closed").
+---
+> # The GOOS=windows + empty-LOCALAPPDATA branch prints one honest line instead of
+> # going silent (ticket 310 AC#1, debt Q-310-orch-Q): without it a caller with no
+> # %LOCALAPPDATA% falls through to the OS temp root and NOTHING says so, which is
+> # the shape 310-v1 registered (Q-310-v1-5). It is a finding printed to stderr,
+> # NOT a fail-closed exit and NOT a refusal to run the tests (orchestrator ruling:
+> # keep the loud-degradation shape; revocation phrase "310 改 fail-closed").
+18c25
+<         gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/winsec-$(date +%Y%m%d-%H%M%S)-$$"
+---
+>         gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/d22scan-$(date +%Y%m%d-%H%M%S)-$$"
+21c28
+<             echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+---
+>             echo "runtests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+24c31
+<             echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+---
+>             echo "runtests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+29,31c36,38
+<         echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no" \
+<             "measured-safe root to build (a root on another volume turns the winsec seal cases" \
+<             "red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+---
+>         echo "runtests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has" \
+>             "no measured-safe root to build (a root on another volume turns the winsec seal" \
+>             "cases red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+differing_lines=47
+--- 3. placement: 310 block vs the entry's own refusing guards vs the test start ---
+file=scripts/winsec-tests.sh line310_marker=46 first_GUARD_echo_line=95 exit2_lines_BEFORE_310=43,
+file=scripts/portable-tests.sh line310_marker=99 first_GUARD_echo_line=179 exit2_lines_BEFORE_310=96,
+file=scripts/wisp-cli-tests.sh line310_marker=60 first_GUARD_echo_line=98 exit2_lines_BEFORE_310=57,
+file=tools/d22scan/runtests.sh line310_marker=68 first_GUARD_echo_line=174 exit2_lines_BEFORE_310=46,51,61,65,
+--- 4. rendered-shape trips that this leg actually re-ran (see the named shots) ---
+winsec LOCALAPPDATA-empty + bad scope: logs/24-order-guard-after-guard1.txt (DEGRADED line printed BEFORE GUARD 1 killed the step)
+runtests LOCALAPPDATA-empty: logs/27-E2-runtests-nolappdata.txt
+portable LOCALAPPDATA-empty: logs/27-E3-portable-nolappdata.txt
+cli LOCALAPPDATA-empty / same-vol / default: NOT run by this leg (would start cmd/wisp's suite; 295-r1 owns that colour) - see 20-teeth.md section 6
+rc=0

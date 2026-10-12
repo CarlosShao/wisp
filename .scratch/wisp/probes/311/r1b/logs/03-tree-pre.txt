@@ -1,0 +1,16 @@
+# 03-tree-pre.txt - pre-side export tree, ruler: git archive 2567e3a9 | tar -x into D:/tmp/311r1b/tpre (OUT of the repo; the shared working tree is NOT used for the historical side)
+tree_dir=/d/tmp/311r1b/tpre
+go_files_in_tree=1001
+piece[go.mod]_exists=yes go_count=n/a
+piece[go.sum]_exists=yes go_count=n/a
+piece[internal]_exists=yes go_count=533
+piece[cmd]_exists=yes go_count=120
+piece[tools]_exists=yes go_count=18
+piece[scripts]_exists=yes go_count=11
+winsec_go=32
+scripts_sh=7
+guard_block_present_in_winsec=1
+guard_block_present_in_portable=0
+guard_block_present_in_cli=0
+guard_block_present_in_runtests=0
+rc=0

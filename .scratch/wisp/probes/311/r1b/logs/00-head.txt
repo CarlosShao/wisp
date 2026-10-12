@@ -1,0 +1,7 @@
+# 00-head.txt - 311-r1b anchor, ruler: git log -1 --format='%H %ad %s' (run from repo root, working tree)
+2567e3a9702510c72ff91c0e1055240f7ee35b19 Mon Oct 12 15:10:56 2026 +0800 收 311-r1 死腿：代提〔未验证半成品〕＋我自己两发＋登记 Q-311-r1-1＋派 311-r1b ／ A864 / §4.0cx
+abbrev=2567e3a9
+---WRITE SURFACE RECHECK (ruler: git status --porcelain -- <4 files>)---
+write_surface_lines=0
+head_move_since_3b857e53_touching_scripts_or_tools=0
+rc=0

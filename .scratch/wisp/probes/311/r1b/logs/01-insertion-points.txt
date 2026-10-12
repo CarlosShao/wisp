@@ -1,0 +1,64 @@
+# 01-insertion-points.txt - re-measured insertion anchors, ruler=grep -n (content anchors) on the WORKING TREE at HEAD 2567e3a9; working tree == HEAD blob for these 4 files (see 00-head.txt write_surface_lines=0)
+=== scripts/portable-tests.sh (total lines 837) ===
+148:                echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+152:                echo "portable-tests.sh: ticket 310 AC#1: DEGRADED - cannot create" \
+158:            echo "portable-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so" \
+163:        echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR left as-is on GOOS=$(go env GOOS)" \
+758:echo "portable-tests.sh: -skip pattern built from the ledger: $skip_pattern"
+760:capture=$(mktemp 2>/dev/null || echo "$root/.portable-tests.$$.log")
+764:sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern" 2>&1 | tee "$capture" || rc=$?
+=== scripts/wisp-cli-tests.sh (total lines 146) ===
+68:# The GOOS=windows + empty-LOCALAPPDATA branch is now LOUD (ticket 310 AC#1, debt
+79:            echo "wisp-cli-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+82:            echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+87:        echo "wisp-cli-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no" \
+145:echo "wisp-cli-tests.sh: handing the verdict to portable-tests.sh --scope=cli"
+146:bash "$portable" --scope=cli
+=== tools/d22scan/runtests.sh (total lines 151) ===
+85:# going silent (ticket 310 AC#1, debt Q-310-orch-Q): without it a caller with no
+95:            echo "runtests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+98:            echo "runtests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+103:        echo "runtests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has" \
+109:out=$(mktemp 2>/dev/null || echo "$cwd/.runtests.$$.log")
+116:go test -v -count=1 "$@" >"$out" 2>&1
+=== scripts/winsec-tests.sh (total lines 279) ===
+55:# The GOOS=windows + empty-LOCALAPPDATA branch is now LOUD (ticket 310 AC#1, debt
+66:            echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+69:            echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - cannot create $gotmp_run," \
+74:        echo "winsec-tests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has no" \
+186:        echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+193:echo "winsec-tests.sh: platform=$goos gate=internal/winsec scope=[${scope[*]}] package=$pkgpath"
+195:capture=$(mktemp 2>/dev/null || echo "$root/.winsec-tests.$$.log")
+=== anchor-by-anchor, portable ===
+758:echo "portable-tests.sh: -skip pattern built from the ledger: $skip_pattern"
+760:capture=$(mktemp 2>/dev/null || echo "$root/.portable-tests.$$.log")
+764:sh "$strict" "${scope[@]}" -count=1 -skip "$skip_pattern" 2>&1 | tee "$capture" || rc=$?
+=== anchor-by-anchor, wisp-cli ===
+145:echo "wisp-cli-tests.sh: handing the verdict to portable-tests.sh --scope=cli"
+142:export PATH="$dll_dir:$PATH"
+134:# PATH is handed over in the form the loader accepts, which is NOT the form you
+=== anchor-by-anchor, runtests ===
+109:out=$(mktemp 2>/dev/null || echo "$cwd/.runtests.$$.log")
+116:go test -v -count=1 "$@" >"$out" 2>&1
+=== which fi closes the 310 block / the dll guards (context ruler: awk on line ranges) ===
+if [ -n "$missing" ]; then
+    echo "wisp-cli-tests.sh: GUARD - pinned DLL(s) absent from $dll_dir:$missing" >&2
+    echo "wisp-cli-tests.sh: cmd/wisp's test binary links the sherpa cgo import library, so a" >&2
+    echo "wisp-cli-tests.sh: missing DLL fails at LOAD time (0xc0000135) before any test runs." >&2
+    echo "wisp-cli-tests.sh: this is a setup failure of the step ahead of it, not a package bug." >&2
+    exit 1
+fi
+
+# PATH is handed over in the form the loader accepts, which is NOT the form you
+# would guess. Both were measured on this host at this HEAD:
+#   `pwd -W` form (D:/work/.../third_party/sherpa-onnx) -> exit status 0xc0000135,
+--- runtests 103,110 ---
+        echo "runtests.sh: ticket 310 AC#1: DEGRADED - LOCALAPPDATA is empty, so this step has" \
+            "no measured-safe root to build (a root on another volume turns the winsec seal" \
+            "cases red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+    fi
+fi
+
+out=$(mktemp 2>/dev/null || echo "$cwd/.runtests.$$.log")
+cd "$cwd"
+rc=0

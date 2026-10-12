@@ -1,0 +1,21 @@
+# 13-replicate-insert.txt - ruler: anchor uniqueness (grep -c) then mk-block.sh insert (copy, not retype)
+--- anchor uniqueness BEFORE insert (working tree at HEAD 2567e3a9 + this leg's comment edit) ---
+portable_anchor_capture_lines=1
+cli_anchor_pathcomment_lines=1
+runtests_anchor_out_lines=1
+block_present_before[winsec]=1 block_present_before[portable]=0 block_present_before[cli]=0 block_present_before[runtests]=0
+--- the three inserts ---
+unknown mode: scripts
+awk: cmd. line:2: (FILENAME=scripts/winsec-tests.sh FNR=1) fatal: invalid regexp: Unmatched ( or \(: /^# ---- TICKET 311 AC#1 (shape B/
+insert_target=scripts/portable-tests.sh entry_prefix=portable-tests.sh anchor=^capture= block_lines=0 prefixed_echo_lines=0
+awk: cmd. line:2: (FILENAME=scripts/winsec-tests.sh FNR=1) fatal: invalid regexp: Unmatched ( or \(: /^# ---- TICKET 311 AC#1 (shape B/
+insert_target=scripts/wisp-cli-tests.sh entry_prefix=wisp-cli-tests.sh anchor=^# PATH is handed over block_lines=0 prefixed_echo_lines=0
+awk: cmd. line:2: (FILENAME=scripts/winsec-tests.sh FNR=1) fatal: invalid regexp: Unmatched ( or \(: /^# ---- TICKET 311 AC#1 (shape B/
+insert_target=tools/d22scan/runtests.sh entry_prefix=runtests.sh anchor=^out= block_lines=0 prefixed_echo_lines=0
+--- syntax check (bash -n) + block presence AFTER ---
+bash_n[scripts/portable-tests.sh]_rc=0 stderr= block=0
+bash_n[scripts/wisp-cli-tests.sh]_rc=0 stderr= block=0
+bash_n[tools/d22scan/runtests.sh]_rc=0 stderr= block=0
+bash_n[scripts/winsec-tests.sh]_rc=0 stderr= block=1
+insert_rc=0
+rc=not-captured-for-that-first-trip (the trip written above FAILED at the regex layer and landed nothing but one blank line per target; those blank lines were reverted by content - proof: git diff for the three targets = 0 lines, see 10-replicate.md section 5. The corrected instrument then refused LOUDLY, verbatim "REFUSED: extracted block is only 0 lines" above, exit rc=97. The SUCCESSFUL inserts are the three insert_target= lines in logs/13b-insert-success.txt.)

@@ -1,0 +1,19 @@
+# 13b-insert-success.txt - the state AFTER the three successful inserts (that trip's stdout went to the console, not to a file; this is the same ruler re-run against the committed state, so the reading is fresh and attributable)
+尺＝mk-block.sh has / bash -n / wc -l / grep -c，台面＝工作树（== HEAD 421469b7，见 logs/43 那把三态尺）
+file=scripts/portable-tests.sh block=1 block_start=760 lines=909 bash_n=0 shapeB=4
+    line_before_block=[]
+    line_after_block=[capture=$(mktemp 2>/dev/null || echo "$root/.portable-tests.$$.log")]
+file=scripts/wisp-cli-tests.sh block=1 block_start=134 lines=218 bash_n=0 shapeB=4
+    line_before_block=[]
+    line_after_block=[# PATH is handed over in the form the loader accepts, which is NOT the form you]
+file=tools/d22scan/runtests.sh block=1 block_start=109 lines=223 bash_n=0 shapeB=4
+    line_before_block=[]
+    line_after_block=[out=$(mktemp 2>/dev/null || echo "$cwd/.runtests.$$.log")]
+file=scripts/winsec-tests.sh block=1 block_start=122 lines=280 bash_n=0 shapeB=4
+    line_before_block=[]
+    line_after_block=[echo "winsec-tests.sh: platform=$goos gate=internal/winsec scope=[${scope[*]}] package=$pkgpath"]
+rc=0
+--- 两处口径补注（同一把尺现跑）---
+line_before_block=[] 是**分隔空行**（插块时我固定留一行空行隔开），不是少了一行；块前那枚**内容**行逐字＝portable: 'echo "portable-tests.sh: -skip pattern built from the ledger: …"' / cli: 'fi'（DLL 面收尾）/ runtests: 'fi'（310 那块收尾）/ winsec: 'fi'（go list 守卫收尾），四枚都在 logs/14 的 diff 射程里
+树会呼吸一处：这把尺跑的时候 HEAD 已经从 0f888a4f 走到 421469b7（＝别腿 295-r1 的取证笔）。尺＝git diff --name-only 0f888a4f..HEAD -- scripts tools/d22scan 命中 **0 枚**（件 logs/54-head-move.txt）⇒ 没碰本腿写面；本腿那四枚文件 vs HEAD 仍 0 行脏（my_surface_dirty=0，见 43 号件）
+rc=0

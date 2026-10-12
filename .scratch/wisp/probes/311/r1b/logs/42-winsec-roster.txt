@@ -1,0 +1,32 @@
+# 42-winsec-roster.txt - name roster: two rulers side by side, never added, never interchanged
+ruler A (sub-tests included) = grep -c '^ *--- PASS' ; ruler B (top-level only) = grep -c '^--- PASS'
+top_names = grep -cE '^--- (PASS|FAIL|SKIP): ' (denominator for a name roster row)
+self-correction: the first trip of THIS sub-ruler used \| inside an ERE, which matched nothing and printed a fake top_names=0; fixed here, and the corrected value is printed next to its denominator.
+10-winsec-pre-run1: A_pass=101 B_pass=58 A_fail=0 B_fail=0 top_names=58 TDcleanup=0
+10-winsec-pre-run2: A_pass=101 B_pass=58 A_fail=0 B_fail=0 top_names=58 TDcleanup=0
+30-G4-post-winsec-run1: A_pass=101 B_pass=58 A_fail=0 B_fail=0 top_names=58 TDcleanup=0
+30-G5-post-winsec-run2: A_pass=101 B_pass=58 A_fail=0 B_fail=0 top_names=58 TDcleanup=0
+26-D1-winsec-samevol: A_pass=101 B_pass=58 A_fail=0 B_fail=0 top_names=58 TDcleanup=0
+22-B1-winsec-xvol-guard-removed: A_pass=97 B_pass=56 A_fail=4 B_fail=2 top_names=58 TDcleanup=4
+    FAILNAME TestGateJudgesThePrivateSetByResolvedSID
+    FAILNAME TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+22-B3-runtests-xvol-guard-removed: A_pass=97 B_pass=56 A_fail=4 B_fail=2 top_names=58 TDcleanup=4
+    FAILNAME TestGateJudgesThePrivateSetByResolvedSID
+    FAILNAME TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+--- pre(2 shots) vs post(2 shots) PASS-name sets: intersection + per-name diff ---
+pre_names_run1=58 pre_names_run2=58 pre_intersection=58
+post_names_run1=58 post_names_run2=58 post_intersection=58
+--- red-name roster on the cross-volume, guard-removed shots (AC#2 (c) evidence) ---
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt:    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/311r1b-xvol/
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt:    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/311r1b-xvol/
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt:    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/311r1b-xvol/
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt:--- FAIL: TestGateJudgesThePrivateSetByResolvedSID (5.04s)
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt:    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/311r1b-xvol/
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B1-winsec-xvol-guard-removed.txt:--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (1.72s)
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt:    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/311r1b-xvo
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt:    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/311r1b-xvo
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt:    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/311r1b-xvo
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt:--- FAIL: TestGateJudgesThePrivateSetByResolvedSID (5.34s)
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt:    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp-test-gotmp/311r1b-xvo
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/311/r1b/logs/22-B3-runtests-xvol-guard-removed.txt:--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (1.93s)
+rc=0 (generator txt/summarize.sh printed summarize-finished)

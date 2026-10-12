@@ -1,0 +1,8 @@
+# ruler=probes/311/r1b/txt/run-shot.sh ; shot taken by leg 311-r1b
+workdir=/d/tmp/311r1b/tpre
+env_assignment=<none: factory default shape>
+command_line=pwd
+---- interleaved stdout+stderr follows ----
+/d/tmp/311r1b/tpre
+---- capture ends ----
+rc=0

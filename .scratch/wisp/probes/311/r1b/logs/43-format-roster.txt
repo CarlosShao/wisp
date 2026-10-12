@@ -1,0 +1,24 @@
+# 43-format-roster.txt - 格式名册两把并排（工作树 ⇄ HEAD blob ⇄ 仓外导出树），射程＝本腿写面那四枚 shell 入口
+射程目录＝scripts/ + tools/d22scan/ 中本腿实际改动的四枚文件；判据＝bash -n（shell 的语法/格式尺），⛔ gofmt/gofumpt 对这四枚无对象
+--- 1. 本腿逐笔越界尺（git show --name-only --format=，逐笔、⛔ 区间尺）---
+commit=e4e787fb files=1 go_files=0
+    scripts/winsec-tests.sh
+commit=f8b1f446 files=1 go_files=0
+    scripts/portable-tests.sh
+commit=10734fbd files=1 go_files=0
+    scripts/wisp-cli-tests.sh
+commit=0f888a4f files=1 go_files=0
+    tools/d22scan/runtests.sh
+leg_total_files=4 (4 枚入口脚本，⛔ 别的)
+leg_go_files_touched=0 (分母＝上面那 4 枚；0 枚 .go ⇒ gofmt/gofumpt 名册本腿无对象，⛔ 为它编一枚)
+--- 2. bash -n 三态并排 ---
+file=scripts/winsec-tests.sh bash_n_worktree_rc=0 bash_n_HEADblob_rc=0 bash_n_exporttree_rc=0 wt_eq_blob_lines=0 blob_eq_tree_lines=0 crlf_bytes_in_wt=0
+file=scripts/portable-tests.sh bash_n_worktree_rc=0 bash_n_HEADblob_rc=0 bash_n_exporttree_rc=0 wt_eq_blob_lines=0 blob_eq_tree_lines=0 crlf_bytes_in_wt=0
+file=scripts/wisp-cli-tests.sh bash_n_worktree_rc=0 bash_n_HEADblob_rc=0 bash_n_exporttree_rc=0 wt_eq_blob_lines=0 blob_eq_tree_lines=0 crlf_bytes_in_wt=0
+file=tools/d22scan/runtests.sh bash_n_worktree_rc=0 bash_n_HEADblob_rc=0 bash_n_exporttree_rc=0 wt_eq_blob_lines=0 blob_eq_tree_lines=0 crlf_bytes_in_wt=0
+--- 3. 四枚块的 ticket-311 行枚数三态（同一把尺跑三遍）---
+file=scripts/winsec-tests.sh wt=4 blob=4 tree=4
+file=scripts/portable-tests.sh wt=4 blob=4 tree=4
+file=scripts/wisp-cli-tests.sh wt=4 blob=4 tree=4
+file=tools/d22scan/runtests.sh wt=4 blob=4 tree=4
+rc=0

@@ -1,0 +1,83 @@
+# 14-replicate-diff.txt - ruler: extract each entry's block by content markers (mk-block.sh extract) then diff against winsec's block (the 3b857e53 text, with this leg's comment-path fix). Expect: only the entry-prefix echo lines differ.
+射程=working tree at HEAD 2567e3a9 + 311-r1b edits; four files: scripts/winsec-tests.sh scripts/portable-tests.sh scripts/wisp-cli-tests.sh tools/d22scan/runtests.sh
+--- block line-number span per file (locator only; judgement is content-anchored) ---
+file=scripts/winsec-tests.sh block_start_line=122 block_lines=71
+file=scripts/portable-tests.sh block_start_line=760 block_lines=71
+file=scripts/wisp-cli-tests.sh block_start_line=134 block_lines=71
+file=tools/d22scan/runtests.sh block_start_line=109 block_lines=71
+--- diff winsec-block vs each other block (verbatim diff output follows) ---
+=== diff /tmp/b-ref.txt vs /tmp/b-portable-tests.sh.txt ===
+58c58
+<             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+---
+>             echo "portable-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+66,68c66,68
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+---
+>         echo "portable-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+>         echo "portable-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+>         echo "portable-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+differing_lines=8
+=== diff /tmp/b-ref.txt vs /tmp/b-wisp-cli-tests.sh.txt ===
+58c58
+<             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+---
+>             echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+66,68c66,68
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+---
+>         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+>         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+>         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+differing_lines=8
+=== diff /tmp/b-ref.txt vs /tmp/b-runtests.sh.txt ===
+58c58
+<             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+---
+>             echo "runtests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+66,68c66,68
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+<         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+---
+>         echo "runtests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+>         echo "runtests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+>         echo "runtests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+differing_lines=8
+--- the only differing lines, side by side (pair check) ---
+### portable-tests.sh
+WINSEC  <             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+ENTRY   >             echo "portable-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+ENTRY   >         echo "portable-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+ENTRY   >         echo "portable-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+ENTRY   >         echo "portable-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+### wisp-cli-tests.sh
+WINSEC  <             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+ENTRY   >             echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+ENTRY   >         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+ENTRY   >         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+ENTRY   >         echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+### runtests.sh
+WINSEC  <             echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+ENTRY   >             echo "runtests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+WINSEC  <         echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+ENTRY   >         echo "runtests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+ENTRY   >         echo "runtests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+ENTRY   >         echo "runtests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+--- prefix sanity: each entry's own 310 block uses the same prefix token ---
+file=scripts/portable-tests.sh prefix310= prefix311=portable-tests.sh:
+file=scripts/wisp-cli-tests.sh prefix310= prefix311=wisp-cli-tests.sh:
+file=tools/d22scan/runtests.sh prefix310= prefix311=runtests.sh:
+rc=0
