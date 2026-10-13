@@ -1,0 +1,22 @@
+票 173 验收腿 `173-v1` —— 非实现者验收（攻三态改动的牙＋逐格判语；2026-10-13 23:0x 编排者现写）
+
+## 0. 你是什么
+- 验收腿（**非实现者**：未写过票 173 的任何件）。攻"判据真假"：每枚新判据要有独立"弄坏必须红"证明；空集通过/恒绿/恒红都算没牙。
+- 输入：票面 `.scratch/wisp/issues/173-….md`（54 行）；交件 `ec2f0864`（`internal/tools/bridge.go` 45+/9-＋新件 `internal/tools/audit_allowlist_scope_173_test.go`）＋`0f8114db`（票尾 bullet＋读数件；⚠ 编排者已把该腿误落根 `probes/` 的整树 `git mv` 进 canon 树）；先读 `.scratch/wisp/probes/173/r1/logs/{00-head,01-unfixed-run,03-mutations,05,06}`。
+- 起手落 `.scratch/wisp/probes/173/v1/logs/00-head.txt`。
+- 编排者已收件复跑（前置）：两枚用例全绿。你仍须自跑并做下述攻击。
+
+## 1. 攻哪几处（每格＝裁决一行＋尺一行＋件名）
+1) **未修读数复现**：overlay 回 HEAD（`ec2f0864^`）`bridge.go` 跑两枚"未判定"子用例 ⇒ 必须红且逐字含 `in_allowlist_scope=true`（先例 `01-unfixed-run.txt`）；修后 ⇒ `=unknown`。
+2) **自造同族突变**（⛔ 别抄 `03-mutations.txt` 的三支）：如把 `scopeVerdictOf` 的 unjudged 分支改回 `scopeIn`、或 `token()` 的 unknown 字面改错 ⇒ 红在指名用例＋sha256 还原证。
+3) **对照不许放宽**：真在范围仍 `=true`、真越界仍 `=false`（各一发）；核"修前修后一字不变"。
+4) **消费面**：`grep -rn "in_allowlist_scope" --include=*.go` 找下游——核没有解析器把 `unknown` 按 `true/false` 二分消费（有 ⇒ 具名报告）。
+5) **AC#4"不改"裁定复核**：核 `PLAN.md:2790` D37 表把"审批拒绝/超时"归同一 `user_rejected`（分两枚＝改 D37＝须人批准）；核"超时一味三处可读"抽一处现跑。
+6) **AC#3 复核**：`in_allowlist_scope` 在 `SPEC-02 §3`/`PLAN.md`/`docs/specs/**` 零命中（自跑）；"逐字渲染"许诺不覆盖此行使 ⇒ "非契约面"成立否。
+7) **产出裁决表** `docs/evidence/s1/ticket173-173-r1-accept-v1.md`：AC#1..#5 逐格判语＋翻框建议＋"哪格没牙/没跑"具名。
+
+## 2. 纪律
+- 写面：**`.scratch/wisp/probes/173/v1/**`（全路径）**＋裁决表 1 枚＋票 173 尾 1 bullet；⛔ 改票面原句／⛔ 翻框／⛔ 动 `bridge.go`（除 overlay 瞬态）、新件、`.scratch/wisp/probes/173/r1/**`（只读）。
+- 变异一律 `-overlay` 或仓外备份＋sha256 还原证；只 commit ⛔ push；显式 pathspec；件纪律（⛔ `.out`／⛔ probes 下 `.go`／⛔ 件名带 `§`；≤6 件 ≤200 行——交件方 7 件超 1（00-head 为派单硬令件）不扣格）。
+- 跑前 `tasklist` 自证（并行腿 `186-r1` 写 cmd/wisp+panel、`queue-verify-2` 只读）；`./internal/tools` 重包错峰；`GOTMPDIR` 只许 C: 卷。
+- 交件自报哪格没做完。
