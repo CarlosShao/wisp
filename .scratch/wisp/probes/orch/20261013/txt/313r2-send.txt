@@ -1,0 +1,5 @@
+派腿 `313-r2` —— 发送时补记（2026-10-13 23:14:51 +08，编排者现写）
+
+派单正文＝`.scratch/wisp/probes/orch/20261013/txt/313r2-dispatch.txt`（先存档后发，笔 `044b9066`）。
+1. 无变化：写存与发送之间无新提交、无面冲突（`186-r1` 已收工、worktree clean）。
+2. 发送时刻现场：CPU 平均 32%（发前现跑）；`wisp.exe`/`balldebug.exe`＝0；本波并行腿：`186-v1`（验收·overlay 突变 internal/panel）、`172-r1`（写 internal/tools）。

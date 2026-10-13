@@ -17492,3 +17492,10 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **173 收口**：`173-v1` 五格全"成立"（收件三把尺过：`d3e367bb`／裁决表 52 行＋6 读数件／编排者复跑 `ok`）⇒ `AC#1`..`AC#5` 全翻、改名 `-done`。自造四株突变（`unknown`→`"false"`／`scopeOut`→`"true"`／守卫收窄／`scopeIn`→`"yes"`）覆盖四个子用例 ⇒ 牙在。非阻断发现已随票登记：① `fs_edit_ac5_gate_r4_test.go:350-356` 旧注释腐烂（写 `=true` 实测 `=unknown`）——下次 touching 改一行② r1 日志行号 ±1（溯源注记）。
 - **放 `172-r1`**（派单 `probes/orch/20261013/txt/172r1-dispatch.txt`；tools 面刚空出）：造"冻结文本档位 ⇄ 机器实际档位"一致性尺——**先钉未修读数**（改文档零枚红）→ 尺必红（改副本必红／摘代码声明必红）→ **分母＝整张带档位工具行**（枚数＋名册现量）→ 默认不接 CI。关键约束已写进派单：尺须**可指外部副本**（否则红形演示会逼你动真 `PLAN.md`）；`-overlay` 对读盘型尺结构性不可见（236 的仪器事实）。
 - **在飞（2）**：`186-r1`（写 cmd/wisp+panel）／`172-r1`（写 tools）。⛔ 未 push。
+
+
+## A892｜2026-10-13 23:14:51 +08｜★`186-r1`"死而功成"（ECONNRESET 90min；`341ca42e` 全落盘＋票尾 22:3x 完整交件记录）⇒ 收件三把尺过＋放 `186-v1`（验收）＋★放 `313-r2`（配模型落地·`A881` 两裁定已备）
+
+- **186-r1 遗产核**：9 枚文件提交干净（含**具名超 §5 预算 2 枚**：`composer_dispatch.go` 过期注释 3 处、`git.go` `GitSwitchBlockedReason` 字面语义）；旧守卫重写为 `TestThePanelSwitchCapabilityRidesOneWhitelistedRoute`（panel 红 6→5）；三仪器编排者复跑 `ok`；**具名欠账 2**（"新建工作树无方法"[须新 C17 枚＋跑外部 git]／"成功回执＋常驻腿快照推送＝H10 最后一跳"）⇒ 交 `186-v1` 按票面 AC 判。
+- **`313-r2` 放行**＝配模型主线的 `cmd/wisp` 收口：落点包两处（`panel_config_store.go:96` 扩 `SettingsView` 六味／`:112-114` 换 `modelNames` 排序切片）＋`ApplySetting` 六 case＋`splitChainValue` 助手＋**A881 条件复核**（ⓐ第一表/248 钉零动现证 ⓑ单一 accessor ⓒ并集等值钉补/核）＋端到端用例（照 248 样式）。
+- **在飞（3）**：`172-r1`（写 tools）／`186-v1`（验收）／`313-r2`（写 cmd/wisp）。CPU 32%（发前现跑）。⛔ 未 push。
