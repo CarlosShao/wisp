@@ -1,0 +1,102 @@
+| 120 | open | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 122 | open | [面:未声明] | 2026-09-23 22:2x +08 | x0/e7 | (无写面行) |
+| 123 | open | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 124 | open | [面:未声明] | 无 | x2/e6 | (无写面行) |
+| 130 | open | [面:未声明] | 无 | x2/e2 | (无写面行) |
+| 132 | ready-for-agent | [面:未声明] | 2026-09-23 09:4x +08 | x0/e5 | (无写面行) |
+| 133 | ready-for-agent | [面:未声明] | 2026-09-23 20:0x +08 | x1/e5 | (无写面行) |
+| 135 | ready-for-agent | [面:未声明] | 2026-09-24 13:3x +08 | x1/e7 | (无写面行) |
+| 136 | ready-for-agent | [面:未声明] | 2026-09-24 20:2x +08 | x8/e7 | (无写面行) H=1 |
+| 139 | ready-for-agent | [面:cmd/wisp] | 2026-09-26 09:0x | x2/e2 | - **今天可派三格＝H3／H6／"没折的四种真相分不开"**，⚠ 三格写面都碰 `cmd/wisp`（此刻 `255-r2` 在飞）⇒ **按住**；`AC#1` 那格（读数格）我**不翻**——它得等非实现者判语，且它的前半判据"零 H=1 |
+| 140 | 未派 | [面:未声明] | 无 | x0/e4 | (无写面行) |
+| 15 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 16 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 160 | ready-for-agent | [面:tools] | 2026-09-27 12:4x | x3/e2 | ① **owner 批准动 `internal/risk`**（一句话即可，撤销口令写进票面进度）；② 票 158 结案（同片写面：`bridge.go` 注释面＋门本体）；③ 编队空（要跑 `internal/tools` 与 `in H=1 |
+| 171 | ready-for-agent | [面:其它] | 2026-09-27 19:1x | x5/e4 | - Status: **ready-for-agent**（写面＝`probes/**` 的尺本体与 `.github/workflows/ci.yml` 的**新增步骤**；不碰 `internal/**`、`cmd/**`、`too |
+| 172 | ready-for-agent | [面:其它] | 2026-09-27 18:2x | x0/e5 | - Status: **ready-for-agent**（写面＝一枚新尺＋它的用例；**读** `docs/PLAN.md`／`docs/specs/**` 可以，**改它们一字都不许**；若要进 CI 只能新增步骤，动触发表＝契约级 |
+| 173 | ready-for-agent | [面:tools] S:tools | 2026-09-27 20:3x | x0/e5 | - Status: **ready-for-agent**（写面＝`internal/tools/bridge.go` 那一味 + 它的用例；⚠ 若判"审计行格式属冻结契约"⇒ 停手上报，见 AC#3） |
+| 174 | ready-for-agent | [面:tools] S:tools | 无 | x3/e6 | - Status: **ready-for-agent**（写面＝`internal/tools/**` 与 `internal/agent/spill.go` 的**回执文案/断言**侧；⚠ 本票**不碰** `[fs]` 的默认值、 H=2 |
+| 175 | ready-for-agent | [面:tools] | 无 | x4/e1 | - Status: **ready-for-agent**（写面＝`internal/risk/provenance.go` 的名册**或** `internal/tools/bridge.go` 的 `mark` 判定形，**两枚都属 |
+| 178 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 179 | ready-for-agent | [面:其它] | 无 | x6/e4 | > **09-28 12:2x 编排者附注（勾是照 `179-v1` 的判读翻的，这一格改到位了，但指针本身又漂了一次）**：本格改出来的那枚自指现在写作 `run.go:358`「…the line below in this sam |
+| 180 | ready-for-agent | [面:其它] | 无 | x1/e5 | - 09-28 17:5x 编排者收 `180-a1`（只读普查，两枚 commit `cb14a8b2`／`35abbc40` 只动票面与它自己证据件）：`AC#1` 勾（我复跑对格）。**排程结论（这一条比表更重要）**：面板尺寸这 |
+| 181 | ready-for-agent | [面:其它] | 无 | x6/e1 | - [x] **AC#7（09-28 17:1x 由 `181-r2` 的现量新立，编排者写；⚠ 本格不是 AC#1-5 的缺陷，是修复之后新暴露的一格）**：⚠⚠ **今天这枚"消费改写账户"在结构上是空转的**——`panel.Wo H=2 |
+| 182 | ready-for-agent | [面:其它] | 无 | x1/e6 | ⚠ **一处前提可能对不上代码，具名报回不替裁**：任务书 §E 说状态维写面在 `internal/memory/**` 的 `Record`， |
+| 186 | ready-for-agent | [面:其它] | 2026-10-13 18:0x ★近 | x0/e10 | - [ ] **AC#9 界面那一半不在本票写面**：`frontend/**`／`design/**` 归另一枚会话（owner 09-25 决定）。⇒ 本票只交 **Go 侧的读面＋请求腿＋快照字段**，并把"面板要画哪几枚控件、点 |
+| 187 | ready-for-agent | [面:其它] | 无 | x0/e9 | - [ ] **AC#9 界面那一半不在本票写面**：`frontend/**`／`design/**` 归另一枚会话。⇒ 本票只交 Go 侧的读面＋写腿＋快照字段，另出一张"面板要画哪几枚控件、点下去发哪条请求"的需求表（`docs/ H=1 |
+| 188 | ready-for-agent | [面:tools] | 无 | x1/e5 | ① **写面与票面 现量 不重合**——本票 现量 与 `AC#2` 点名的 `Record` 是 `*tools.TaskRoster` 的方法（`internal/tools/task.go:123`，票面行号段 `110-152` |
+| 189 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 190 | ready-for-agent | [面:未声明] | 无 | x1/e5 | (无写面行) H=1 |
+| 191 | ready-for-agent | [面:未声明] | 无 | x1/e6 | (无写面行) |
+| 192 | ready-for-agent | [面:未声明] | 无 | x1/e5 | (无写面行) |
+| 193 | ready-for-agent | [面:其它] | 无 | x1/e7 | - [ ] **AC#5 界面那半不在本票写面**：`frontend/**`／`design/**` 归另一枚会话——本票只交 Go 侧字段＋生效链＋门禁清单，**开关的 UI 由前端会话画**，我把清单转过去。 H=2 |
+| 194 | ready-for-agent | [面:其它] | 无 | x0/e8 | - **门禁四数（`A363`：不充当结案凭据）**：`ban #8 internal/`＝**438**（与基线同值＝零漂移，`cmd/`＝45）；`gate-clauses.sh` 红腿名册＝**只 `G6neg`**（与在册一致， |
+| 196 | 未派 | [面:其它] | 无 | x0/e0 | - 禁区：`PLAN.md`／`docs/specs/**` 一字不动；`frontend/**`／`design/**` 零写面；**不许顺手把 `TaskLog.State` 改成 D43 名**（那会洗掉现有生产者写入的四个词，是 H=1 |
+| 21 | open | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 213 | 待派 | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 214 | 待派 | [面:未声明] | 无 | x0/e7 | (无写面行) |
+| 215 | 待派 | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 216 | 待派 | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 219 | 接单 | [面:未声明] | 无 | x0/e7 | (无写面行) |
+| 22 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 220 | 待派 | [面:其它] | 无 | x0/e5 | `frontend/**`／`design/**` 零写面（连内容都不转述）；`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／C17 白名单既有名字一字不 |
+| 224 | 待派 | [面:未声明] | 无 | x6/e5 | (无写面行) |
+| 225 | 待派 | [面:未声明] | 无 | x0/e4 | (无写面行) H=1 |
+| 23 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 232 | 待派 | [面:其它] S:cmd/wisp | 2026-10-06T19:3x+08 ★近 | x5/e3 | - [2026-10-06T13:06+08] agent=232-r2 did=AC#1-AC#6 交读数：起手锚 HEAD `590fb855`、三把尺原文（第 3/4 行零 WITHDRAWN/撤/作废、scoped porcel |
+| 233 | 待派 | [面:未声明] | 2026-09-29 17:5x +08 | x0/e6 | (无写面行) |
+| 236 | 待派 | [面:其它] | 无 | x3/e4 | - 交件＝`.scratch/wisp/probes/236/r2/evidence.md`（五节全实、占位 0；另 `logs/overlay/*.json`＋`logs/diff/*.diff`＋`logs/mut/*.txt` 八 |
+| 237 | 待派 | [面:tools] | 无 | x0/e3 | 零产码（`internal/tools/**` 的判定分支、`bridge.go` 一条都不许动，只动 `_test.go`）；不动 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`a |
+| 238 | 待派 | [面:未声明] | 2026-09-30 12:0x +0800 | x0/e5 | (无写面行) |
+| 239 | 待派 | [面:未声明] | 无 | x4/e1 | (无写面行) |
+| 24 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 244 | 未派 | [面:未声明] | 无 | x1/e8 | (无写面行) |
+| 246 | 未派 | [面:未声明] | 2026-09-30 18:2x +08 | x8/e1 | (无写面行) |
+| 247 | open | [面:cmd/wisp] | 2026-10-09 18:45:25 +08 ★近 | x8/e2 | - [2026-10-09 13:20:47 +08] agent=247-r1 did=写码落地腿交件。**AC#1 尺 0→1**（唯一新增 importer＝`cmd/wisp/resident_audio_windows.go` H=2 |
+| 248 | open | [面:未声明] | 2026-10-01 12:04:14 +08 | x7/e5 | (无写面行) H=3 |
+| 25 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 26 | ready-for-agent | [面:未声明] | 无 | x0/e7 | (无写面行) |
+| 27 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 270 | 未派 | [面:未声明] | 无 | x0/e7 | (无写面行) |
+| 271 | 未派 | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 272 | 未派 | [面:未声明] | 无 | x5/e2 | (无写面行) |
+| 275 | 未派 | [面:未声明] | 无 | x6/e1 | (无写面行) H=1 |
+| 28 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 287 | 未开工 | [面:panel][面:tools] | 无 | x1/e3 | - [ ] **AC#4 边界与门禁**：写面只许 `internal/tools/**`（夹具＋用例）；⛔ 不碰 `internal/agent/loop.go` 的 `callCorr`、⛔ 不碰 `approval/gate.go |
+| 288 | 未开工 | [面:cmd/wisp] S:cmd/wisp | 无 | x0/e3 | - [ ] **AC#1 只改那一处对齐**：写面**只许** `cmd/wisp/panel_inbound_guards_35r3_test.go`；尺＝改前后各跑 `gofmt -d <该件>` 两列并排（前＝14 行、后＝**0 |
+| 29 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 30 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 31 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 314 | 已立未派 ✎ | [面:cmd/wisp] | 2026-10-13 17:22:56 +08 ★近 | x0/e5 | - 写面（未来落地腿）：`probes/314/**`＋必要时 `cmd/wisp/*_test.go`（夹具 profile 名一处）；⛔ 本票⛔ 动 `.github/**` 一字。 |
+| 32 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 33 | ready-for-agent | [面:其它] | 无 | x1/e13 | 普查件＝`.scratch/wisp/probes/33/h1/census.md`（**367 行／74,999 字节**，占位符现量 **0**，70 枚编号尺，三枚 commit 写面只有这一路径；我按三把尺复认过行数与零占位符） H=4 |
+| 34 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 35 | ready-for-agent | [面:其它] | 无 | x4/e7 | **6. 排程**：本票**仍按住**，且它的解锁条件比从前更清楚了——① 票 274（出货 exe 带页面字节）② 票 33 的常驻接线（`NewPanelManager` 已进常驻腿，但"面板能不能真开出来"owner 10-07  H=6 |
+| 36 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 37 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 38 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 39 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 40 | ready-for-agent | [面:未声明] | 无 | x0/e8 | (无写面行) |
+| 41 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 42 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 43 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 44 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 45 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 46 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 47 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 48 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 49 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 50 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 51 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 52 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 53 | ready-for-agent | [面:未声明] | 无 | x0/e4 | (无写面行) |
+| 54 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 55 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 56 | ready-for-agent | [面:未声明] | 无 | x0/e5 | (无写面行) |
+| 57 | ready-for-agent | [面:未声明] | 无 | x0/e3 | (无写面行) |
+| 58 | ready-for-agent | [面:未声明] | 无 | x0/e4 | (无写面行) |
+| 59 | ready-for-agent | [面:未声明] | 无 | x0/e7 | (无写面行) |
+| 60 | ready-for-agent | [面:未声明] | 无 | x0/e7 | (无写面行) |
+| 61 | ready-for-agent | [面:未声明] | 无 | x0/e6 | (无写面行) |
+| 91 | open | [面:未声明] | 无 | x0/e4 | (无写面行) |
+| 98 | open | [面:未声明] | 无 | x0/e5 | (无写面行) |

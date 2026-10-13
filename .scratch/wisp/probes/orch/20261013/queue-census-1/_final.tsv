@@ -1,0 +1,187 @@
+100	B	RESERVED	
+103	B	退回待修	✎
+107	B	退回待修	✎
+108	B	退回待修	✎
+109	B	退回待修	✎
+111	C	a6b交件/部分翻勾	✎
+112	C	review	
+114	C	in-progress	
+12	C	review	
+120	A	open	
+122	A	open	
+123	A	open	
+124	A	open	
+128	C	in-progress	
+130	A	open	
+132	A	ready-for-agent	
+133	A	ready-for-agent	
+135	A	ready-for-agent	
+136	A	ready-for-agent	
+138	B	blocked	
+139	A	ready-for-agent	
+140	A	未派	
+145	B	按住	
+148	B	blocked	
+15	A	ready-for-agent	
+150	B	blocked	
+158	B	立而不派	
+159	B	立而不派	
+16	A	ready-for-agent	
+160	A	ready-for-agent	
+163	B	立而不派	
+164	B	立而不派	
+165	B	立而不派	
+166	C	r1落地今日	✎
+167	B	立而不派	
+168	B	立而不派	
+169	B	不派	
+170	B	立而不派	
+171	A	ready-for-agent	
+172	A	ready-for-agent	
+173	A	ready-for-agent	
+174	A	ready-for-agent	
+175	A	ready-for-agent	
+176	B	立而不派	
+177	B	按住	
+178	A	ready-for-agent	
+179	A	ready-for-agent	
+180	A	ready-for-agent	
+181	A	ready-for-agent	
+182	A	ready-for-agent	
+185	B	按住	
+186	A	ready-for-agent	
+187	A	ready-for-agent	
+188	A	ready-for-agent	
+189	A	ready-for-agent	
+190	A	ready-for-agent	
+191	A	ready-for-agent	
+192	A	ready-for-agent	
+193	A	ready-for-agent	
+194	A	ready-for-agent	
+195	B	blocked	
+196	A	未派	
+197	C	在派	
+20	C	review	
+200	C	在派	
+201	C	在派	
+21	A	open	
+211	C	在派	
+213	A	待派	
+214	A	待派	
+215	A	待派	
+216	A	待派	
+219	A	接单	
+22	A	ready-for-agent	
+220	A	待派	
+222	C	产码已交	
+223	C	交件待验	✎
+224	A	待派	
+225	A	待派	
+226	C	产码已交	
+227	B	等票/排队	
+228	C	a1-a5/部分翻勾	✎
+229	B	等票/排队	
+23	A	ready-for-agent	
+230	B	等票/排队	
+232	A	待派	
+233	A	待派	
+234	B	按住	
+236	A	待派	
+237	A	待派	
+238	A	待派	
+239	A	待派	
+24	A	ready-for-agent	
+244	A	未派	
+245	C	r1落地/部分结案	✎
+246	A	未派	
+247	A	open	
+248	A	open	
+249	B	撤并	
+25	A	ready-for-agent	
+252	C	部分结案	✎
+253	C	等验收腿	✎
+255	C	写腿交件	✎
+256	C	归口265	✎
+26	A	ready-for-agent	
+260	C	r4交件	✎
+262	C	部分+遗留	✎
+264	B	等owner	✎
+266	B	未派+按住	✎
+269	B	撤并	
+27	A	ready-for-agent	
+270	A	未派	
+271	A	未派	
+272	A	未派	
+273	B	等面快照	✎
+274	C	多轮交件	✎
+275	A	未派	
+276	B	已裁不做	✎
+279	B	等随批	✎
+28	A	ready-for-agent	
+284	B	等随批	✎
+287	A	未开工	
+288	A	未开工	
+29	A	ready-for-agent	
+290	C	格未闭	
+291	C	格未闭	
+293	C	格未闭	
+294	C	格未闭	
+296	C	部分翻勾	✎
+297	C	a1交件/待裁	✎
+298	C	r1+v1/近结	✎
+30	A	ready-for-agent	
+300	C	在飞(状态陈旧)	✎
+301	C	在飞	✎
+302	B	按住等303	✎
+303	C	6勾/1未勾	✎
+304	C	全勾待结	✎
+305	C	1勾/5未勾	✎
+309	C	在飞(状态陈旧)	✎
+31	A	ready-for-agent	
+310	C	全勾待并	✎
+311	C	格未闭	
+312	B	按住不派	✎
+313	C	10-13交件	✎
+314	A	已立未派	✎
+32	A	ready-for-agent	
+33	A	ready-for-agent	
+34	A	ready-for-agent	
+35	A	ready-for-agent	
+36	A	ready-for-agent	
+37	A	ready-for-agent	
+38	A	ready-for-agent	
+39	A	ready-for-agent	
+40	A	ready-for-agent	
+41	A	ready-for-agent	
+42	A	ready-for-agent	
+43	A	ready-for-agent	
+44	A	ready-for-agent	
+45	A	ready-for-agent	
+46	A	ready-for-agent	
+47	A	ready-for-agent	
+48	A	ready-for-agent	
+49	A	ready-for-agent	
+50	A	ready-for-agent	
+51	A	ready-for-agent	
+52	A	ready-for-agent	
+53	A	ready-for-agent	
+54	A	ready-for-agent	
+55	A	ready-for-agent	
+56	A	ready-for-agent	
+57	A	ready-for-agent	
+58	A	ready-for-agent	
+59	A	ready-for-agent	
+60	A	ready-for-agent	
+61	A	ready-for-agent	
+62	C	review	
+64	C	review	
+65	B	blocked	
+68	B	blocked	
+70	B	blocked	
+71	C	in-progress	
+72	C	review	
+77	B	blocked	
+85	B	等票/排队	
+86	B	等票/排队	
+91	A	open	
+98	A	open	
