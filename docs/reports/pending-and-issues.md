@@ -17392,3 +17392,13 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **`229-r1` 派单要点**（存档 `orch/20261013/txt/229r1-dispatch.txt`）：修法**只许甲形**（spawn 名换进名册内形状；乙形＝动 D38b 须人工批准、停手上报）；AC#3 正控（真·名册外名字照样 WARN）；AC#4 全仓同类普查；AC#6 终态含 `./cmd/wisp` ⇒ **与 `294-r1b` 的重包按 tasklist 现查错峰**（等 60s×≤12，等待具名落 logs）。
 - **`queue-census-1` 要点**（只读，存档同上目录）：产 `.scratch/wisp/probes/orch/20261013/queue-census-1/queue-ready.md`＝全票池 Status 现量 + 写面标签 + **本波/下波可派短名单**；零 go 命令（Go 编译面被 `294-r1b`/`229-r1` 用着）。
 - **件**：`orch/20261013/txt/{229r1-dispatch.txt,229r1-send.txt,queue-census-1-dispatch.txt,queue-census-1-send.txt}`。⛔ 未 push（HEAD 将含本笔）。
+
+
+## A880｜2026-10-13 21:23:23 +08｜第二波收件：`294-r1b`（链 `ca777e8f→ff384b3d→b3959665→95708485`）/`229-r1`（`32bba42c`）三把尺全过＋派两枚验收腿 `294-v1`/`229-v1`＋★票 314"机主在场"对照 5/5 照死＋普查腿回执丢失（件在盘、nudge 收尾中）
+
+- **收件（编排者复跑）**：`-run TestAC294` 4 PASS（真窗读数非 skip）；`-run Test229` 3 PASS；改名行 `internal/tools/subagent_197.go:394` 现读；两票尾 bullet 齐；面净。
+- **`294-r1b` 要点**：三格复核不回归（三发 overlay 红形各红在指名行＋还原绿＋产码 sha256 与前任逐字同）；AC#5 用同树 overlay-stub 对：**稳定名册 122=122 `cmp` 逐字节相同、唯一差＝4 枚新名**；⚠ prescribed 5 发**全撞 314 死区**（157.2–174.4s，死点 4 枚具名：AC14／AC13BringUpSurvivesAReusedThreadQuit×2／PanelThreadIsSTA／ProvidersProbe）；定向 `-run TestAC29` 2+2 补尺；三红逐因（255＝A878 两侧同红抵消；AC4focus 本时段全绿＝族漂色；AC14 一发红即死）；AC#4 越界 0；四门 rc=0。**自报未完成＝AC#5 prescribed 全包覆盖**（待 314 定/修后重跑同形 2+2）。
+- **★314 数据点**：r1b 的 prescribed 5/5 全死且**机主全程在机器旁**（20:4x–21:1x）⇒"在场"不足以压住死区（已追记票 314 尾）。
+- **`229-r1` 要点**：甲形一行改动（⛔ 未动 D38b 表）；AC#4 全仓普查（AST 289 枚/19 站点）→ 不在册 5 名 5 站点＝修 1＋有意 4（`panel-sta`→cmd/wisp/panel 或 D38b 批准；`balldebug-*`×2→票 66；`mockllm-stdout-reader`→票 67）；AC#3 正控（假名照响）；AC#5 安静期 Count 1→1／PerTask 0→1／Unknown 清空、WARN 36→0；**新量 `internal/session TestSessionListByWorkspace` 间歇红（安静 5 发里 2）→ 交回 166 侧**。
+- **普查腿**：终回执空、`queue-ready.md` 未落、25 枚件未提交（`_master2/3` 等在盘）⇒ 已 nudge（落主件＋commit）；再失联即按死腿代提。
+- **本波在飞（3）**：`294-v1`＋`229-v1`（验收）＋`queue-census-1`（收尾中）。next＝收两 v（裁决表→编排者翻框收口 294/229）→ 313 收尾链亲裁 → 照普查表补位。⛔ 未 push。

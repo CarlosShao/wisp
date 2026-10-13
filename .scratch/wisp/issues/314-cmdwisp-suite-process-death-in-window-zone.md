@@ -44,3 +44,5 @@
 （追加式；每条 `- [YYYY-MM-DD HH:MM:SS +08] agent=… did=… next=…`，钟点由 `date` 的 stdout 插值，不手打。）
 
 - [2026-10-13 17:22:56 +08] agent=编排者 did=立票即连发 5 枚（q1–q5）**全部整进程死亡**（174.0–211.6s；死点仅 2 枚测试：3×`TestAC13BringUpSurvivesAReusedThreadQuit`＋2×`TestAC14GoSideEvalPushReachesThePage`）；排除面＝wrapper（q3 直发照死）／单包与 `-skip`（q4 两包无 skip 照死）／共享 user-data 夹（q5 挪夹重生成照死）；对照＝16:22–16:50 同形 4/4 全活 ⇒ 边界＝机主 16:50 最后交互前后（候选 (a) 桌面会话状态，现最强、未验）next=机主在场时复跑同形一发（便宜实验）；`AC#0`（直跑测试二进制取退出码）随下一枚能占 `cmd/wisp` 色的腿走；原始日志 `orch311-q-20261013/logs/{qshot-default,qshot-default-2,qshot-direct,q4-two-package,qshot-shape2}.txt`（⛔ 入仓，同根另存）
+
+- [2026-10-13 21:23 +08] agent=编排者 did=★"机主在场"对照数据入档：`294-r1b` 的 prescribed-form 整包 **5/5 全死**（157.2–174.4s；死点 4 枚具名＝`TestAC14GoSideEvalPushReachesThePage`／`TestAC13BringUpSurvivesAReusedThreadQuit`×2／`TestPanelThreadIsSTAAndExitsCleanly`；覆盖边界＝`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`；r1b 件 `probes/294/r1b/**`），且机主 20:4x–21:1x **全程在机器旁** ⇒ "桌面会话状态"候选不因在场消解 next=等 314 定/修后按 AC#5 重跑同形 2+2
