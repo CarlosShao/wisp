@@ -1,0 +1,42 @@
+2026-10-13 22:3x +0800  173-v1 攻点3：对照两发（真在范围/真越界）修前修后一字不变（重跑修正 -run 为 judged_ 精确子集＋pipefail 真 rc）
+跑前时间 2026-10-13 22:34:42 +0800
+== tasklist ==
+（无 go/panel/wisp/d22scan 进程）
+== A) 修后（现树）对照两枚（-run .../judged_ 只选 judged_in_range / judged_out_of_range）==
+time=2026-10-13T22:34:44.194+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range2015017691\\002\\out.txt"
+--- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.051s
+A rc=0
+== B) overlay 回 HEAD 未修码 同两枚 ==
+time=2026-10-13T22:34:45.446+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range2677312735\\002\\out.txt"
+--- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.049s
+B rc=0
+== C) 归一化（仅把 t.TempDir 随机数字换 NUM）后对对照两行 diff：期望空 ==
+--- fixed 对照两行 ---
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_rangeNUM\\002\\out.txt"
+--- HEAD  对照两行 ---
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_rangeNUM\\002\\out.txt"
+diff rc=0（0=修前修后一字不变）
+PASS：AC#2 对照两发逐字不变
+== D) sha256 还原证（源件两跑期间盘上零写入）==
+e07b6692b8f287c3954c44083000fe40059e228f1ef406bf5913c490d7de9d94 *internal/tools/bridge.go
+（internal/tools 脏行应为空）

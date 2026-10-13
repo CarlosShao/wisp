@@ -1,0 +1,159 @@
+2026-10-13 22:4x +0800  173-v1 攻点2：自造同族突变三株（与 r1 的 m1/m2/m3 不同支）＋逐株红点名＋sha256 还原证
+粒：变异全在仓外副本（C: 卷 temp），overlay 注入；源件零写入
+跑前时间 2026-10-13 22:35:55 +0800
+== tasklist ==
+go.exe                       28276 Console                    1     41,380 K
+== 源件 sha256 before ==
+e07b6692b8f287c3954c44083000fe40059e228f1ef406bf5913c490d7de9d94 *internal/tools/bridge.go
+
+==== m1-unknown-to-false : v1-m1: token() 的 unknown 字面 -> "false"（票面明确拒绝的第二句假话形）: perl s/return "unknown"/return "false"/ ====
+b47195acac28ebab84f0df5d17e37fec841f5ab71ed28f6a4814b46995b4cb82 *C:/Users/swq/AppData/Local/Temp/wisp173-v1/bridge.m1-unknown-to-false.go
+overlay JSON 合法
+time=2026-10-13T22:35:59.513+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge
+    audit_allowlist_scope_173_test.go:70: AC#1 读数（空白 path）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=false grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:75: the no-judgment state must render as unknown, got: tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=false grant_id=0 reason="R1: 工具声明为下界（L2）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all
+    audit_allowlist_scope_173_test.go:92: AC#1 读数（无 path 参数工具）：tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=false grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:97: the no-judgment state must render as unknown, got: tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=false grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range2474258495\\002\\out.txt"
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+=== RUN   Test173ApprovalTimeoutKeepsTheTimeoutFlavor
+    audit_allowlist_scope_173_test.go:174: AC#4 第二枚读数（超时）：class="user_rejected" 回执="审批超时未确认，已自动拒绝" 审计行=tools: call kind=approval-timeout task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=timeout outcome=error rules_hit=[R1] in_allowlist_scope=false grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:175: AC#4 第二枚读数（人工拒）：class="user_rejected" 回执="L2 审批未通过，已拒绝执行" 审计行=tools: call kind=refused task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=reject outcome=error rules_hit=[R1] in_allowlist_scope=false grant_id=0 reason="R1: 工具声明为下界（L2）"
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.064s
+FAIL
+m1-unknown-to-false rc=1
+--- m1-unknown-to-false 红/绿点名 ---
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.00s)
+
+==== m2-out-to-true : v1-m2: token() 的 scopeOut 字面 -> "true"（越界被翻成在范围）: perl -0777 s/(case scopeOut:\n\t\treturn )"false"/${1}"true"/ ====
+5d4590a754728326ad8efb41bc35f0c9fdd13c46cc165802c1c45de1d617c02f *C:/Users/swq/AppData/Local/Temp/wisp173-v1/bridge.m2-out-to-true.go
+overlay JSON 合法
+time=2026-10-13T22:36:02.804+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge
+    audit_allowlist_scope_173_test.go:70: AC#1 读数（空白 path）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all
+    audit_allowlist_scope_173_test.go:92: AC#1 读数（无 path 参数工具）：tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=unknown grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=true grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range3308687293\\002\\out.txt"
+    audit_allowlist_scope_173_test.go:135: a judged out-of-range path must keep saying false: tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=true grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range3308687293\\002\\out.txt"
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+=== RUN   Test173ApprovalTimeoutKeepsTheTimeoutFlavor
+    audit_allowlist_scope_173_test.go:174: AC#4 第二枚读数（超时）：class="user_rejected" 回执="审批超时未确认，已自动拒绝" 审计行=tools: call kind=approval-timeout task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=timeout outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:175: AC#4 第二枚读数（人工拒）：class="user_rejected" 回执="L2 审批未通过，已拒绝执行" 审计行=tools: call kind=refused task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=reject outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.066s
+FAIL
+m2-out-to-true rc=1
+--- m2-out-to-true 红/绿点名 ---
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.00s)
+
+==== m3-guard-narrow : v1-m3: 守卫收窄 b.paths==nil || len(dec.Paths)==0 -> b.paths==nil（空路径行从未判定漏回"在范围"）: perl s/if b.paths == nil || len(dec.Paths) == 0 {/if b.paths == nil {/ ====
+64e58cde3c9ae0b03d65588dc7d7947436b819ade890b19d5269c0b21f3cc491 *C:/Users/swq/AppData/Local/Temp/wisp173-v1/bridge.m3-guard-narrow.go
+overlay JSON 合法
+time=2026-10-13T22:36:06.124+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge
+    audit_allowlist_scope_173_test.go:70: AC#1 读数（空白 path）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:72: nothing was judged about a path, yet the line claims scope=true: tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:75: the no-judgment state must render as unknown, got: tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all
+    audit_allowlist_scope_173_test.go:92: AC#1 读数（无 path 参数工具）：tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:94: a tool whose declaration has no path parameter cannot be in scope: tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:97: the no-judgment state must render as unknown, got: tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range2119083559\\002\\out.txt"
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+=== RUN   Test173ApprovalTimeoutKeepsTheTimeoutFlavor
+    audit_allowlist_scope_173_test.go:174: AC#4 第二枚读数（超时）：class="user_rejected" 回执="审批超时未确认，已自动拒绝" 审计行=tools: call kind=approval-timeout task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=timeout outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:175: AC#4 第二枚读数（人工拒）：class="user_rejected" 回执="L2 审批未通过，已拒绝执行" 审计行=tools: call kind=refused task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=reject outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.066s
+FAIL
+m3-guard-narrow rc=1
+--- m3-guard-narrow 红/绿点名 ---
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.00s)
+
+== 源件 sha256 after ＋ 仓内零写入 ==
+e07b6692b8f287c3954c44083000fe40059e228f1ef406bf5913c490d7de9d94 *internal/tools/bridge.go
+（internal/tools 脏行应为空）
+
+==== m4-in-token-broken : v1-m4 补株（对照①给牙）: token() 的 scopeIn 字面 -> "yes": perl -0777 s/(case scopeIn:\n\t\treturn )"true"/${1}"yes"/ ====
+（r1 的 m3 是 scopeIn→scopeOut 换分支；本株只在 token 层写字面，覆盖面=AC#2①）
+84c10628ea985a7dd085e0f8fb74ce7340c92f43ce4073e9eb9351f6f061fe2a *C:/Users/swq/AppData/Local/Temp/wisp173-v1/bridge.m4-in-token-broken.go
+overlay JSON 合法
+time=2026-10-13T22:43:16.069+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge
+    audit_allowlist_scope_173_test.go:70: AC#1 读数（空白 path）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all
+    audit_allowlist_scope_173_test.go:92: AC#1 读数（无 path 参数工具）：tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=unknown grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=yes grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:113: a path the judge vouched for must keep saying true: tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=yes grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range4219033910\\002\\out.txt"
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+=== RUN   Test173ApprovalTimeoutKeepsTheTimeoutFlavor
+    audit_allowlist_scope_173_test.go:174: AC#4 第二枚读数（超时）：class="user_rejected" 回执="审批超时未确认，已自动拒绝" 审计行=tools: call kind=approval-timeout task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=timeout outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:175: AC#4 第二枚读数（人工拒）：class="user_rejected" 回执="L2 审批未通过，已拒绝执行" 审计行=tools: call kind=refused task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=reject outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.060s
+FAIL
+m4-in-token-broken rc=1
+--- m4 红/绿点名 ---
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.00s)
+--- 源件 sha256 after（第四株跑完再钉一次）---
+e07b6692b8f287c3954c44083000fe40059e228f1ef406bf5913c490d7de9d94 *internal/tools/bridge.go
+（internal/tools 脏行应为空）

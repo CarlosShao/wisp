@@ -1,0 +1,48 @@
+2026-10-13 22:5x +0800  173-v1：修后自跑（两枚新用例 / 同族旧用例的旁证行 / 全包 / gofumpt）
+跑时间 2026-10-13 22:41:44 +0800
+== tasklist ==
+（无 go/panel/wisp/d22scan 进程）
+== sha256 before ==
+e07b6692b8f287c3954c44083000fe40059e228f1ef406bf5913c490d7de9d94 *internal/tools/bridge.go
+f1b4622da203dd1c4ad6e43e91acbbdb17a02fdc915f9a21b754f9c2a5755eb5 *internal/tools/audit_allowlist_scope_173_test.go
+== A) 修后：两枚新用例全绿（含 AC#1 两发 =unknown、AC#2 对照、AC#4 超时一味活体复跑）==
+time=2026-10-13T22:41:46.354+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge
+    audit_allowlist_scope_173_test.go:70: AC#1 读数（空白 path）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all
+    audit_allowlist_scope_173_test.go:92: AC#1 读数（无 path 参数工具）：tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=unknown grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true
+    audit_allowlist_scope_173_test.go:111: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false
+    audit_allowlist_scope_173_test.go:133: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\wisp173-v1\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range1493900721\\002\\out.txt"
+--- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict (0.03s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+=== RUN   Test173ApprovalTimeoutKeepsTheTimeoutFlavor
+    audit_allowlist_scope_173_test.go:174: AC#4 第二枚读数（超时）：class="user_rejected" 回执="审批超时未确认，已自动拒绝" 审计行=tools: call kind=approval-timeout task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=timeout outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:175: AC#4 第二枚读数（人工拒）：class="user_rejected" 回执="L2 审批未通过，已拒绝执行" 审计行=tools: call kind=refused task=task-1 corr=corr-1 tool=probe.irrev risk=L2 decision=reject outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+--- PASS: Test173ApprovalTimeoutKeepsTheTimeoutFlavor (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.073s
+A rc=0
+== B) 旁证：既有同族旧用例 TestFSEditRefusesAPathC26CannotCanonicalize 的审计行（同一空白 path 夹具）==
+time=2026-10-13T22:41:47.602+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSEditRefusesAPathC26CannotCanonicalize
+    fs_edit_ac5_gate_r4_test.go:384: 读数（未修码即响）：空白 path ⇒ IsError=true class="tool" 回执="缺少 path 参数"
+    fs_edit_ac5_gate_r4_test.go:389: 审计行：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+--- PASS: TestFSEditRefusesAPathC26CannotCanonicalize (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.041s
+B rc=0
+== C) 全包 go test -count=1 ./internal/tools/ ==
+ok  	github.com/CarlosShao/wisp/internal/tools	13.110s
+C rc=0
+== D) gofumpt -l internal/tools（空=净）==
+gofumpt 未安装（跳过；r1 已跑，本腿不依赖）
+== E) sha256 after ＋ 仓内零写入 ==
+e07b6692b8f287c3954c44083000fe40059e228f1ef406bf5913c490d7de9d94 *internal/tools/bridge.go
+f1b4622da203dd1c4ad6e43e91acbbdb17a02fdc915f9a21b754f9c2a5755eb5 *internal/tools/audit_allowlist_scope_173_test.go
+（internal/tools 脏行应为空）

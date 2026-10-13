@@ -1,0 +1,43 @@
+2026-10-13 22:3x +0800  173-v1 攻点1：未修读数复现（overlay 回 ec2f0864^ 的 bridge.go）＋修后对照
+跑前时间 2026-10-13 22:31:49 +0800
+== tasklist 自证（并行腿 186-r1 写 cmd/wisp+panel；queue-verify-2 只读）==
+（无 go/panel/wisp/d22scan 进程）
+== overlay 源件＝仓外副本（git show ec2f0864^:internal/tools/bridge.go）sha256 ==
+e6c685da6bfbcfdfbfd0415ad50e52234b4bab4cddcf338797288c029f77b611 *C:/Users/swq/AppData/Local/Temp/wisp173-v1/bridge.head173.go
+overlay JSON 合法
+== 仓内源件 sha256 before ==
+e07b6692b8f287c3954c44083000fe40059e228f1ef406bf5913c490d7de9d94 *internal/tools/bridge.go
+== A) 修后（现树）未判定两枚子用例：期望绿、in_allowlist_scope=unknown ==
+time=2026-10-13T22:31:51.242+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge
+    audit_allowlist_scope_173_test.go:70: AC#1 读数（空白 path）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason="R1: 工具声明为下界（L2）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all
+    audit_allowlist_scope_173_test.go:92: AC#1 读数（无 path 参数工具）：tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=unknown grant_id=0 reason="无规则命中（L0 直接执行）"
+--- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.044s
+A rc=0
+== B) overlay 回 HEAD 未修码 同两枚：期望红、逐字含 in_allowlist_scope=true ==
+time=2026-10-13T22:31:54.353+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge
+    audit_allowlist_scope_173_test.go:70: AC#1 读数（空白 path）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:72: nothing was judged about a path, yet the line claims scope=true: tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:75: the no-judgment state must render as unknown, got: tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all
+    audit_allowlist_scope_173_test.go:92: AC#1 读数（无 path 参数工具）：tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:94: a tool whose declaration has no path parameter cannot be in scope: tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:97: the no-judgment state must render as unknown, got: tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.01s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.042s
+FAIL
+B rc=1
+== C) 仓内源件 sha256 after（overlay 只读仓外副本，盘上零写入）==
+e07b6692b8f287c3954c44083000fe40059e228f1ef406bf5913c490d7de9d94 *internal/tools/bridge.go
+（internal/tools 脏行应为空）

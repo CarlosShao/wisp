@@ -1,0 +1,131 @@
+2026-10-13 22:5x +0800  173-v1 攻点4＋6＋5（消费面普查 / AC#3 契约面 / AC#4 D37 与超时一味）
+跑时间 2026-10-13 22:40:59 +0800
+
+=========== 攻点4：消费面普查 ===========
+== A) 生产面（cmd internal tools scripts，去 _test.go；排除 probes 归档，probes 不在编译单元）==
+internal\tools\bridge.go:1154:		"outcome=%s rules_hit=%v in_allowlist_scope=%s grant_id=%d reason=%q",
+internal\tools\bridge.go:1221:// scopeVerdict is the audit line's in_allowlist_scope as THREE states, because
+A rc=0
+（唯一命中＝写方 bridge.go:1154 与它的注释 1221；无第二生产读者）
+== B) 测试面消费者（全部；核有没有把 unknown 按 true/false 二分消费）==
+internal\tools\audit_allowlist_scope_173_test.go:3:// Ticket 173 — the audit line's `in_allowlist_scope` field is a THREE-state
+internal\tools\audit_allowlist_scope_173_test.go:10:// `in_allowlist_scope=true`. "Nothing was judged" was rendered as "judged, and
+internal\tools\audit_allowlist_scope_173_test.go:30:// `in_allowlist_scope` appears in NO frozen artifact - not the SPEC-02 §3
+internal\tools\audit_allowlist_scope_173_test.go:71:		if strings.Contains(line, "in_allowlist_scope=true") {
+internal\tools\audit_allowlist_scope_173_test.go:74:		if !strings.Contains(line, "in_allowlist_scope=unknown") {
+internal\tools\audit_allowlist_scope_173_test.go:93:		if strings.Contains(line, "in_allowlist_scope=true") {
+internal\tools\audit_allowlist_scope_173_test.go:96:		if !strings.Contains(line, "in_allowlist_scope=unknown") {
+internal\tools\audit_allowlist_scope_173_test.go:112:		if !strings.Contains(line, "in_allowlist_scope=true") {
+internal\tools\audit_allowlist_scope_173_test.go:134:		if !strings.Contains(line, "in_allowlist_scope=false") {
+internal\tools\fs_edit_ac5_gate_r4_test.go:204:	// it with in_allowlist_scope=false.
+internal\tools\fs_edit_ac5_gate_r4_test.go:206:		line := r4AuditLine(t, audit, tool, "risk=L2", "R2", "in_allowlist_scope=false")
+internal\tools\fs_edit_ac5_gate_r4_test.go:305:// in_allowlist_scope=false all disappear - which is precisely the shape AC#5
+internal\tools\fs_edit_ac5_gate_r4_test.go:335:	r4AuditLine(t, audit, "fs.edit", "rules_hit=[", "R2", "in_allowlist_scope=false")
+internal\tools\fs_edit_ac5_gate_r4_test.go:353:// in_allowlist_scope=true, which is "nothing was judged about a path", NOT
+== C) 非 Go 面全仓（排除 .git/.scratch/docs/node_modules）==
+C rc=0
+（空＝无外部读者）
+== D) 交叉解析形状（parse/strconv/unmarshal/split/fields/bool 与 allowlist_scope 同行）==
+D rc=1
+== E) 审计淹径是写方非解析器 ==
+129:	// agentRuntime.auditf books the audit trail through it so the ledger lands
+130-	// on disk without the same sentence reaching the console twice.
+131-	sink *logSink
+536:func (ra *residentApproval) residentAuditf(format string, args ...any) {
+537-	line := fmt.Sprintf(format, args...)
+538-	slog.Info("audit: " + line)
+539-	fmt.Printf("wisp: [audit] %s\n", line)
+540-}
+541-
+542-// bindBallHost hands the ball to the injected UI and, with it, loads the one
+
+=========== 攻点6：AC#3 契约面自查（自跑）===========
+== F) 冻结面零命中 ==
+F rc=1（1＝零命中）
+== G) docs/ 全部命中（应只剩 evidence/reports；无 spec/PLAN）==
+docs/\evidence\s1\162-fs-edit-r1.md
+docs/\evidence\s1\162-risk-tier-and-contract-axis-r4.md
+docs/\evidence\s1\179-declared-l0-refused-accept-v1.md
+docs/\evidence\s1\179-cli-reread-r2.md
+docs/\evidence\s1\183-pointer-exemption-r1.md
+docs/\evidence\s1\162-risk-tier-accept-v3.md
+docs/\evidence\s1\252-allowlist-sameform-v1.md
+docs/\reports\HANDOVER.md
+docs/\reports\pending-and-issues.md
+== H) 审计行/该字段在冻结面有没有'逐字'许诺 ==
+H1 rc=0
+H2 rc=0（rules_hit 在冻结面同样零命中）
+（'renders it verbatim' 只存在于 bridge.go:1136-1140 的代码注释，指 Decision 的规则列表进卡片；冻结面没有这句话）
+== I) SPEC-02 §3 tool_call DDL 的列（该字段与 rules_hit 都不是列）==
+CREATE TABLE tool_call (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  task_id        TEXT NOT NULL REFERENCES task_log(id),
+  seq            INTEGER NOT NULL,
+  tool           TEXT NOT NULL,
+  args_json      TEXT NOT NULL,          -- 长字符串截断（§5.1 脱敏规则）
+  risk_level     TEXT NOT NULL,          -- 'L0'|'L1'|'L2'
+  decision       TEXT,                   -- 'allow'|'allow_session_grant'|'reject'|'timeout'|'batch_aggregated'
+  decided_at     INTEGER,
+  started_at     INTEGER,
+  ended_at       INTEGER,
+  outcome        TEXT,                   -- 'success'|'error'|'cancelled'|'truncated'
+  error_class    TEXT,
+  correlation_id TEXT NOT NULL,          -- C18 路由与取证
+  grant_id       INTEGER                 -- 关联 approval_grant（D45）
+);
+
+=========== 攻点5：AC#4 '不改' 裁决复核 ===========
+== J) PLAN.md:2790 D37(a) 枚举把'审批拒绝/超时'定义在同一枚 user_rejected ==
+| `user_rejected` | 审批拒绝/超时 | 「已取消」 | `Settling` | 否（但可一键重放） |
+2776:**必须是枚举，不得自由字符串** —— 自由字符串会让统计与告警全部失效）：
+== K) 生产码里两路共用同一枚 class 实参 ==
+func (k OutcomeKind) errorClass() string {
+	switch k {
+	case OutcomeKindSuccess:
+		return ""
+	case OutcomeKindCapability, OutcomeKindDenied:
+		return string(observe.ClassPermissionDenied)
+	case OutcomeKindRefused, OutcomeKindApprovalTimeout:
+		return string(observe.ClassUserRejected)
+	case OutcomeKindCancelled:
+		return string(observe.ClassCancelled)
+	default:
+		return string(observe.ClassTool)
+	}
+}
+-- 超时支设置 decision 列 + 回执文案（bridge.go:463-471）--
+		case AnswerTimeout:
+			// The queue never waits forever: an unanswered L2 auto-REJECTS
+			// (ticket 21), deliberately the opposite polarity from L1.
+			dec.DecisionColumn = agent.DecisionTimeout
+			return false, orDefault(why, "审批超时未确认，已自动拒绝")
+		default:
+			dec.DecisionColumn = agent.DecisionReject
+			return false, orDefault(why, "L2 审批未通过，已拒绝执行")
+		}
+-- dispositionOf 把 timeout 与 refused 分成两枚 kind（bridge.go:480-489）--
+// dispositionOf names a refused call's disposition for the audit line.
+func dispositionOf(dec Decision) OutcomeKind {
+	if dec.Level == risk.Deny {
+		return OutcomeKindDenied
+	}
+	if dec.DecisionColumn == agent.DecisionTimeout {
+		return OutcomeKindApprovalTimeout
+	}
+	return OutcomeKindRefused
+}
+== L) 三处可读的后两处已有旧尺（非本票所造）==
+506-	}
+507-	row := toolCallByCorr187(t, h, "t201-timeout-corr")
+508:	if row.Decision != agent.DecisionTimeout {
+509-		t.Errorf("tool_call row = %+v, want decision=%s (the C18 auto-reject, not an allow)",
+510-			row, agent.DecisionTimeout)
+511-	}
+（超时'一味'活体复跑见 05 文件；此处为静态核对）
+
+== H 修正：上一节 rc 取的是 head 的管道 rc；改用计数重钉（0＝零命中）==
+审计行 在冻结面行数=0
+rules_hit 在冻结面行数=0
+仓库非 Go/非 docs/非 probes 面命中行数=0
+解析形状交叉命中行数=0
+AC#3 冻结面（PLAN.md+specs）命中行数=0（0＝零命中，非契约面成立）

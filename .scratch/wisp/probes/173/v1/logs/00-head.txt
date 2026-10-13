@@ -1,0 +1,11 @@
+173-v1 起手（非实现者验收腿）
+2026-10-13 22:29:45 +0800
+工作目录: D:/work/workspace/projects plans/Wisp
+分支: dev
+HEAD: 68c294f35bb4789b9d8ea8336ca0680a98963e57 2026-10-13 22:27:07 +0800 编排者：173-v1 发送补记＋台账 A888（173 收件；根 probes 迁 canon；全路径派单钉重申）
+被验提交: ec2f0864(代码+用例) 0f8114db(票尾/probes) 编排者迁树: 1e842d63 / 68c294f3
+== tasklist 自证（go.exe 家族 + panel/wisp）==
+cargo.exe                    25488 Console                    1      8,916 K
+cargo.exe                    28568 Console                    1     16,600 K
+（无 go/panel/wisp 进程则本行为空；并行腿 186-r1 写 cmd/wisp+panel、queue-verify-2 只读）
+GOTMPDIR=C:/Users/swq/AppData/Local/Temp/wisp173-v1（C: 卷）
