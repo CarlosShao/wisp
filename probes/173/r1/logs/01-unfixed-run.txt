@@ -1,0 +1,28 @@
+2026-10-13 22:05:59 +0800
+== 前置：tasklist 自查（go test 二进制家族）==
+cargo.exe                    25488 Console                    1      8,916 K
+cargo.exe                    28568 Console                    1     16,600 K
+== 未修码读数：跑新用例（期望红：AC#1）==
+time=2026-10-13T22:06:03.573+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge
+    audit_allowlist_scope_173_test.go:69: AC#1 读数（空白 path）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:71: nothing was judged about a path, yet the line claims scope=true: tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+    audit_allowlist_scope_173_test.go:74: the no-judgment state must render as unknown, got: tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true grant_id=0 reason="R1: 工具声明为下界（L2）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all
+    audit_allowlist_scope_173_test.go:91: AC#1 读数（无 path 参数工具）：tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:93: a tool whose declaration has no path parameter cannot be in scope: tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+    audit_allowlist_scope_173_test.go:96: the no-judgment state must render as unknown, got: tools: call kind=success task=task-1 corr=corr-1 tool=probe.nopath risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true
+    audit_allowlist_scope_173_test.go:110: AC#2① 读数（真在范围内）：tools: call kind=success task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+=== RUN   TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false
+    audit_allowlist_scope_173_test.go:132: AC#2② 读数（真越界，R2 族）：tools: call kind=refused task=task-1 corr=corr-1 tool=fs.read risk=L2 decision=reject outcome=error rules_hit=[R2] in_allowlist_scope=false grant_id=0 reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAuditAllowlistScopeDoesNotInventAVerdictjudged_out_of_range1528011315\\002\\out.txt"
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.06s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.01s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_tool_with_no_path_parameter_at_all (0.01s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_in_range_stays_true (0.03s)
+    --- PASS: TestAuditAllowlistScopeDoesNotInventAVerdict/judged_out_of_range_stays_false (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.126s
+FAIL
+rc=1

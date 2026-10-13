@@ -1,0 +1,46 @@
+2026-10-13 22:15:34 +0800
+== tasklist ==
+cargo.exe                    25488 Console                    1      8,916 K
+cargo.exe                    28568 Console                    1     16,600 K
+== A) 改前全包（overlay: HEAD bridge.go + 摘掉本票新用例）==
+ok  	github.com/CarlosShao/wisp/internal/tools	13.276s
+A rc=0
+== B) 改后全包（现树，含本票新用例）==
+ok  	github.com/CarlosShao/wisp/internal/tools	13.805s
+B rc=0
+== C) gofumpt -l internal/tools（空=净）==
+C rc=0
+== D) 长度门 ==
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 12396 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=12396  over-budget=57  covered by roster=57  not in roster=0
+check-path-length-budget.sh: longest=184 chars relative (.scratch/wisp/issues/261-the-model-enabled-key-promises-removal-from-discovery-and-selection-but-no-production-code-reads-it-while-the-default-true-tag-is-inert-for-map-entries-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=228 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=57  of which in the 122..180 middle=56  past the old debt line(180)=1  in the wall interval=0  roster entries=57
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+D rc=0
+
+2026-10-13 22:18:40 +0800
+== 追加：AC#4 普查读数（overlay 注入的仓外探针，树内零文件）==
+# github.com/CarlosShao/wisp/internal/tools [github.com/CarlosShao/wisp/internal/tools.test]
+C:\Users\swq\AppData\Local\Temp\wisp173-mut\zz_census173_probe_test.go:21:30: cannot use l (variable of type string) as []risk.RuleID value in argument to contains
+C:\Users\swq\AppData\Local\Temp\wisp173-mut\zz_census173_probe_test.go:27:6: contains redeclared in this block
+	internal\tools\bridge_test.go:745:6: other declaration of contains
+FAIL	github.com/CarlosShao/wisp/internal/tools [build failed]
+FAIL
+census rc=1
+
+2026-10-13 22:21:06 +0800
+== 重跑：AC#4 普查读数（overlay 注入的仓外探针，树内零文件）==
+time=2026-10-13T22:21:09.751+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestZzCensus173NeverJudged
+    zz_census173_probe_test.go:25: CENSUS173: tools: call kind=not-found task=task-1 corr=corr-1 tool=fs.nope risk=L0 decision=reject outcome=error rules_hit=[] in_allowlist_scope=unknown grant_id=0 reason="未知工具 fs.nope，可用工具见 list_tools"
+    zz_census173_probe_test.go:25: CENSUS173: tools: call kind=bad-args task=task-1 corr=corr-1 tool=fs.read risk=L0 decision=reject outcome=error rules_hit=[] in_allowlist_scope=unknown grant_id=0 reason="参数不是合法的 JSON 对象：invalid character 'o' in literal null (expecting 'u')"
+--- PASS: TestZzCensus173NeverJudged (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.038s
+census rc=0
