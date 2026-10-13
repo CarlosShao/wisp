@@ -1,0 +1,41 @@
+# A881 三条件现读（313-r2 落地腿现跑）
+
+=== A881 a: first table + frozen pin untouched by this leg ===
+-- git diff HEAD over both files (expect empty) --
+(rc=0)
+-- last commit touching the frozen pin --
+0d87a681 ticket248(248-r1 产码)：设置那条路从入向请求修到磁盘——AC#1 名册真扩（config.get/config.set 进 bridge.go 白名单与 ParseComposerRequest 守卫、进 ComposerDispatch 派发表并新增 Config 槽）；AC#2 快照那一维进 composer 段（credentialState/credentialKnown，reader 未接就报 unknown/false）＋哨兵零命中常驻用例与其正控；AC#3 只走现成 secret.NewStore/DPAPI（值只由 cmd/wisp 的只写形状绑定，共用封套不声明那枚键，config.toml 只落 dpapi: 引用）；AC#7 validate() 落在新增导出 setter 内、进 mergeWrite 之前（种非法值⇒磁盘逐字节不变）；AC#11 逐枚键各一发受保护写＋回执报实际落盘键路径（⛔ 未用 SaveFile、未改 mergeWrite 本体）；AC#8 回执带 tier 且重启文案到 Handle 返回串（console 支与票 33 那侧的 bind 回执面都可见），全文无"保存即生效"；冻结件 l2_grant_boundary_test.go 只动 A487 具名解冻的 :2051/:2139 两枚锚，改法＝能力形（名册双向全等）＋自带正控，未删钉未放宽。票面 AC 框一枚未碰；internal/secret 一字未改；AC#4 本腿不做不勾。
+-- 313-r1 commit stat for the pin file (expect nothing) --
+-- pin region current read --
+271:	want := []string{
+	want := []string{
+		FieldModelContextWindow, FieldModelPriceIn, FieldModelPriceOut,
+		FieldProviderAPIKeyRef, FieldProviderBaseURL, FieldProviderCredential, FieldRoleChatModel,
+	}
+
+=== A881 a (cont): allWritableFields block, 248 commit vs HEAD ===
+diff rc=0 (byte-identical block)
+
+=== A881 b: one union accessor, no third roster ===
+internal/\panel\config_write_313.go:101:// acceptedWritableFields is the union of both rosters, sorted, for the refusal
+internal/\panel\config_write_313.go:104:func acceptedWritableFields() []string {
+cmd/\wisp\panel_config_313_test.go:17://      acceptedWritableFields); the door's refusal text is its only externally
+cmd/\wisp\panel_config_313_test.go:215:// A881 condition c: one pin over the union. 313-r1 shipped acceptedWritableFields
+internal/\panel\config_handlers.go:364:			ErrConfigFieldRefused, strings.Join(acceptedWritableFields(), "/"), req.RequestID)
+internal/\panel\config_handlers.go:376:			ErrConfigFieldRefused, field, strings.Join(acceptedWritableFields(), "/"), req.RequestID)
+-- knownWritableField --
+425:func knownWritableField(field string) bool {
+426-	return listedWritableField(field) || additionalWritableField(field)
+427-}
+428-
+429-// listedWritableField is the ticket-248 table's own lookup, unchanged in shape.
+-- union concatenation sites --
+internal/\panel\config_write_313.go:85:func AdditionalWritableFields() []string {
+internal/\panel\config_write_313.go:105:	out := append(WritableFields(), AdditionalWritableFields()...)
+
+=== A881 c: r1 had no union pin; it lives in the landing leg's new file ===
+-- r1's panel test file, union references (expect none) --
+(rc=1 => 1 means absent)
+-- the pin, live pass --
+221:func Test313WritableUnionEqualsTheTwoRosters(t *testing.T) {
+--- PASS: Test313WritableUnionEqualsTheTwoRosters (0.00s)

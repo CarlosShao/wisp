@@ -1,0 +1,5 @@
+7be9573ac1996035bffcc07170342b03a0696c02 Tue Oct 13 23:14:51 2026 +0800 编排者：A892（186-r1 死而功成收件＋放 186-v1/313-r2）＋两枚发送补记
+2026-10-13 23:16:09 +0800
+branch=dev
+--- panel_config_store.go last commit ---
+0d87a681 ticket248(248-r1 产码)：设置那条路从入向请求修到磁盘——AC#1 名册真扩（config.get/config.set 进 bridge.go 白名单与 ParseComposerRequest 守卫、进 ComposerDispatch 派发表并新增 Config 槽）；AC#2 快照那一维进 composer 段（credentialState/credentialKnown，reader 未接就报 unknown/false）＋哨兵零命中常驻用例与其正控；AC#3 只走现成 secret.NewStore/DPAPI（值只由 cmd/wisp 的只写形状绑定，共用封套不声明那枚键，config.toml 只落 dpapi: 引用）；AC#7 validate() 落在新增导出 setter 内、进 mergeWrite 之前（种非法值⇒磁盘逐字节不变）；AC#11 逐枚键各一发受保护写＋回执报实际落盘键路径（⛔ 未用 SaveFile、未改 mergeWrite 本体）；AC#8 回执带 tier 且重启文案到 Handle 返回串（console 支与票 33 那侧的 bind 回执面都可见），全文无"保存即生效"；冻结件 l2_grant_boundary_test.go 只动 A487 具名解冻的 :2051/:2139 两枚锚，改法＝能力形（名册双向全等）＋自带正控，未删钉未放宽。票面 AC 框一枚未碰；internal/secret 一字未改；AC#4 本腿不做不勾。

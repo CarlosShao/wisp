@@ -1,0 +1,54 @@
+# 313-r2 门禁汇总（改前⇄改后）——原始大日志留盘（12-/43- 不入库），此处是 rc 与失败名单
+
+## 编译
+build-pre  rc=0   (1 行输出)
+build-post rc=0
+
+## gofumpt（我动过处）
+cmd/wisp/panel_config_store.go + cmd/wisp/panel_config_313_test.go：-l 输出空 rc=0
+
+## go test -count=1 ./internal/panel/ ./internal/config/
+pre  rc=1：
+  --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+  --- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.07s)
+  --- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.57s)
+  --- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+  --- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+post rc=1：
+  --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+  --- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.12s)
+  --- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.59s)
+  --- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+  --- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+  => 改后失败集 == 改前失败集（同一 5 枚既有红；internal/config 两发都 ok）
+
+## go test -count=1 ./cmd/wisp/（PATH=third_party/sherpa-onnx + build）
+pre  rc=1 (250.851s)：
+  --- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.59s)
+  --- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.08s)
+  --- FAIL: TestAC14GoSideEvalPushReachesThePage (0.35s)
+post rc=1 (281.447s)：
+  --- FAIL: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+  --- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.65s)
+  --- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.06s)
+  => 逐因：AC14=真窗族漂色（改前红、改后绿，A878 族）；255 两枚=见 00-anchor 具名段。
+
+## 本腿新用例
+=== RUN   Test313EmptyConfigToStepfunRowChainAndPair
+--- PASS: Test313EmptyConfigToStepfunRowChainAndPair (0.09s)
+=== RUN   Test313WritableUnionEqualsTheTwoRosters
+--- PASS: Test313WritableUnionEqualsTheTwoRosters (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.070s
+newtests rc=0
+
+## d22scan
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=236, bans #1-5 cmd/=40, ban #6 frontend/=107, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=107, ban #8 internal/=549, ban #8 cmd/=124; ban #8 emoji coverage: design/ 39 text files; frontend/ 107 text files; internal/ 549 Go files, comments and _test.go included; cmd/ 124 Go files, comments and _test.go included
+sh scripts/d22scan.sh rc=0
+
+## 长度门（sh scripts/check-path-length-budget.sh）
+rc=1 VERDICT RED——红因非本腿：
+  check-path-length-budget.sh: RED - over budget and NOT in the roster: .scratch/wisp/issues/173-the-audit-line-prints-in-allowlist-scope-true-when-nothing-was-judged-blank-path-both-meanings-one-field-done.md  (relative 137 chars, name 116 chars, full path on the self-hosted runner 181 chars, budget 165)
+  check-path-length-budget.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/173-the-audit-line-prints-in-allowlist-scope-true-when-nothing-was-judged-blank-path-both-meanings-one-field.md
+  check-path-length-budget.sh: VERDICT RED
+  红件由 2a8ab9c4（票 173 收口，22:58，先于本腿）改名引入；本腿新件（cmd/wisp/panel_config_313_test.go、probes/313/r2/**）无一在超预算名单里。
