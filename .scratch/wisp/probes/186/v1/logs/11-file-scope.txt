@@ -1,0 +1,29 @@
+== 341ca42e scope audit (v1 现跑 2026-10-13 23:26:20) ==
+-- name-status:
+M	.scratch/wisp/issues/186-the-composer-area-should-detect-git-and-let-the-user-switch-between-local-worktree-and-branch.md
+A	.scratch/wisp/probes/186/r1/logs/00-head.txt
+A	.scratch/wisp/probes/186/r1/logs/01-ac1-ac2-recheck.txt
+A	.scratch/wisp/probes/186/r1/logs/02-three-readings.txt
+A	.scratch/wisp/probes/186/r1/logs/03-ac6-five-surfaces.txt
+A	.scratch/wisp/probes/186/r1/logs/04a-panel-config-verbose.txt
+A	.scratch/wisp/probes/186/r1/logs/04b-cmdwisp-verbose.txt
+M	cmd/wisp/panel_inbound.go
+M	cmd/wisp/panel_resident_windows.go
+M	cmd/wisp/resident_task_source_windows.go
+M	cmd/wisp/resident_windows.go
+A	docs/evidence/s1/186-panel-ask.md
+M	internal/panel/composer_dispatch.go
+M	internal/panel/composer_test.go
+M	internal/panel/git.go
+A	internal/panel/workspace_handlers.go
+A	internal/panel/workspace_handlers_test.go
+
+-- counts: total paths | ticket | r1 logs | non-log | non-log-non-ticket-non-evidence(code)
+17
+1
+6
+11
+9
+
+-- frozen-path scan: NONE (see above); frontend/design scan:
+NONE

@@ -1,0 +1,4 @@
+== M6: instrument scope blind-spot probe (2026-10-13 23:31:04) ==
+-- plant a 4th production file in the package with a spawn shape:
+ok  	github.com/CarlosShao/wisp/internal/panel	0.062s
+rc=0

@@ -1,0 +1,17 @@
+== TestAC2SealNoticeLandsInTheRunLegLogFile isolated re-run (v1 2026-10-13 23:33:10, GOTMPDIR=C:/tmp/gotmp186v1) ==
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.761s
+FAIL
+
+== addendum: -count=3 with PATH prefix (2026-10-13 23:37:21) ==
+=== RUN   TestAC2SealNoticeLandsInTheRunLegLogFile
+    logsink_windows_test.go:175: records naming "winsec: seal cleared principals that stood on this object" = 2, want 1; 
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.07s)
+=== RUN   TestAC2SealNoticeLandsInTheRunLegLogFile
+    logsink_windows_test.go:175: records naming "winsec: seal cleared principals that stood on this object" = 2, want 1; 
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.06s)
+=== RUN   TestAC2SealNoticeLandsInTheRunLegLogFile
+    logsink_windows_test.go:175: records naming "winsec: seal cleared principals that stood on this object" = 2, want 1; 
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.05s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.198s
+FAIL

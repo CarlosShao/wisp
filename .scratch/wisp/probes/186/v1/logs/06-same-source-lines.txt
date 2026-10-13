@@ -1,0 +1,124 @@
+=== AC#3(ii) same-source line evidence (v1 现跑 2026-10-13 23:22:52) ===
+
+-- [1] the ONE canonicalizer of a run (assembleRuntime):
+501:	rt.paths = tools.NewPathCanonicalizer(allowed, cfg.FS.ReparsePointExceptions)
+-- [2] the fs-tool entries judge with the same field:
+516:		Paths:         rt.paths,
+544:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
+-- [3] the tools bridge judges with the same field:
+	rt.bridge = tools.New(tools.Options{
+		Registry: reg,
+		Paths:    rt.paths,
+		Gate:     rt.gate,
+-- [4] snapshot pump's display readers are that runtime's own methods:
+	rt.pump = panel.NewSnapshotPump(panel.PumpSources{
+		Verdicts:  rt.liveVerdicts,
+		Mode:      rt.modes.PermissionMode,
+		Workspace: rt.workspaceView,
+		Git:       rt.gitView,
+		Model:     rt.currentModel,
+-- [5] display reads rt.paths.WorkspaceRoot():
+func (rt *agentRuntime) workspaceView() panel.WorkspaceView {
+	if rt == nil || rt.paths == nil {
+		return panel.UnsetWorkspaceView()
+	}
+	return panel.WorkspaceViewFromRoot(rt.paths.WorkspaceRoot())
+}
+
+-- [6] holder created once and handed to the chain:
+func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel.ComposerDispatch, *panel.WorkspaceScopeHolder, error) {
+	// Said once per start, same posture the CLI seam takes: name the tier that was
+	// not taken rather than leave the operator to infer it.
+	auditf("%s", residentPanelHotReloadNote)
+	scope := panel.NewWorkspaceScopeHolder()
+	disp, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope)
+	if err != nil {
+		return nil, nil, err
+	}
+	return disp, scope, nil
+-- [7] same holder returned by the manager builder:
+func newResidentPanelManager(dataDir string) (*PanelManager, *panel.WorkspaceScopeHolder, error) {
+	auditf := func(format string, args ...any) {
+		line := fmt.Sprintf(format, args...)
+		slog.Info("panel host: " + line)
+		fmt.Printf("wisp: %s\n", line)
+	}
+	disp, workspaceScope, err := newResidentComposerDispatch(dataDir, auditf)
+	if err != nil {
+-- [8] same holder flows: resident_windows.go receives and passes it:
+	rp, panelScope, rpErr := newResidentPanelManager(rt.Layout.DataDir)
+	src := startResidentTaskSource(rt, ra, panelScope)
+-- [9] Bind writes the holder's field to run.paths (pointer):
+	src.run = run
+	// Ticket 186 AC#3(ii): the panel's workspace switch is bound to THIS run's
+	// path scope, which is the same object the bridge and the fs tools judge with
+	// (run.go:501-516) and the same one the snapshot's workspace/git sections read
+	// (cmd/wisp/panel_pump.go). The bind is the whole of the write side here, and
+	// it has to sit on this line: src.run is the first moment the object exists,
+	// and every earlier line is a process whose panel would have to narrow a tree
+	// nobody uses. A bind failure is printed and leaves the handler refusing by
+	// name, which is the honest state of a build where the panel and the pipeline
+	// disagree - never a silent second canonicalizer.
+	if ws != nil && run != nil {
+		if bErr := ws.Bind(run.paths); bErr != nil {
+-- [10] handler hands the holder to the one switch leg:
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if _, err := RequestWorkspaceSwitch(h.Scope, req.Path, h.Audit); err != nil {
+		// Returned verbatim: RequestWorkspaceSwitch already prefixes its own
+		// sentence, and a second prefix here would make the reader parse two
+		// layers to find one fact.
+		return err
+	}
+-- [11] the binder's identity check is interface equality; concrete type is a pointer:
+func (h *WorkspaceScopeHolder) Bind(scope PathScope) error {
+	if scope == nil {
+		return fmt.Errorf("panel: 拒绝把工作区范围绑定到 nil")
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.scope != nil && h.scope != scope {
+		return fmt.Errorf("panel: 工作区范围已经绑定过另一枚 scope，拒绝替换（换树必须是收窄，不是换一根管子）")
+	}
+	h.scope = scope
+	return nil
+}
+65:func NewPathCanonicalizer(allowedDirs, reparseExceptions []string) *PathCanonicalizer {
+-- [12] the one switch leg narrows through scope.SetWorkspaceRoot:
+		if actable, aErr := res.Actable(); aErr != nil {
+			err = aErr
+		} else if sErr := scope.SetWorkspaceRoot(actable, res); sErr != nil {
+			err = sErr
+		}
+
+-- [13] holder's read/narrow delegate to the bound scope (same object) under its own lock:
+func (h *WorkspaceScopeHolder) ResolveWorkspace(input string) (risk.Result, error) {
+	if h == nil {
+		return risk.Result{}, fmt.Errorf("%w: 持有者为 nil", ErrNoWorkspaceScope)
+	}
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	if h.scope == nil {
+		return risk.Result{}, fmt.Errorf("%w: 本进程还没有装配任务管线，没有可换的工作区范围", ErrNoWorkspaceScope)
+	}
+	return h.scope.ResolveWorkspace(input)
+}
+func (h *WorkspaceScopeHolder) SetWorkspaceRoot(root string, acc risk.Result) error {
+	if h == nil {
+		return fmt.Errorf("%w: 持有者为 nil", ErrNoWorkspaceScope)
+	}
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	if h.scope == nil {
+		return fmt.Errorf("%w: 本进程还没有装配任务管线，没有可换的工作区范围", ErrNoWorkspaceScope)
+	}
+	return h.scope.SetWorkspaceRoot(root, acc)
+}
+
+-- [14] no reassignment of rt.paths anywhere in cmd/wisp production (only the one write at run.go:501):
+cmd/wisp/run.go:501:	rt.paths = tools.NewPathCanonicalizer(allowed, cfg.FS.ReparsePointExceptions)
+
+-- [15] newComposerDispatchChain call sites: only two, nil for CLI / holder for resident:
+cmd/wisp/panel_inbound.go:223:	return newComposerDispatchChain(dir, auditf, panelInboundActor, nil)
+cmd/wisp/panel_inbound.go:240:func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder) (*panel.ComposerDispatch, error) {
+cmd/wisp/panel_resident_windows.go:227:	disp, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope)

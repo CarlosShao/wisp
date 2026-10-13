@@ -1,0 +1,6 @@
+time=2026-10-13T23:24:04.955+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestThePanelSwitchCapabilityRidesOneWhitelistedRoute (0.00s)
+    composer_test.go:318: composer_dispatch.go has 2 case labels for MethodWorkspaceRequest, want exactly 1 - the route is routed once, through the one router
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.035s
+FAIL

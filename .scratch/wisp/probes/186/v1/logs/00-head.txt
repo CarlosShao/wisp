@@ -1,0 +1,26 @@
+== ticket186 v1 acceptance leg head ==
+2026-10-13 23:13:14 +0800
+HEAD=044b9066ae16630efeb198d5580724275bc2f616
+044b9066 编排者：186-v1/313-r2 派单存档（先存档后发；186-r1 死而功成收件过）
+aea0dd0b 编排者：172-r1 发送补记
+0a33a1cd 编排者：A891（173 收口 + 放 172-r1）＋172 派单存档（先存档后发）
+--- branch:
+dev
+--- ticket186 worktree paths:
+a1
+r1
+v1
+--- r1 logs:
+00-head.txt
+01-ac1-ac2-recheck.txt
+02-three-readings.txt
+03-ac6-five-surfaces.txt
+04a-panel-config-verbose.txt
+04b-cmdwisp-verbose.txt
+05-gate-clauses.txt
+06-final-cmdwisp.txt
+--- a1:
+A-git-read-face.md
+B-ticket-tail-recheck.md
+C-connected-surfaces.md
+D-frontend-switcher.md

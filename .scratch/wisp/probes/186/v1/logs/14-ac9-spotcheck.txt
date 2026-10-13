@@ -1,0 +1,19 @@
+== AC#9 spot checks (v1 现跑 2026-10-13 23:28:59) ==
+-- page-issued routes (ask table claims 4):
+frontend/src/lib/panel.ts:246:  sendRequest("panel.mode.request", { to });
+frontend/src/lib/panel.ts:255:  sendRequest("panel.workspace.request", { path });
+frontend/src/lib/panel.ts:272:  sendRequest("panel.attachment.add", {
+frontend/src/lib/panel.ts:300:  sendRequest("panel.message.send", { text, attachments });
+
+-- C17 whitelist still 4 panel.* methods:
+35:// "panel.*" literal the Go side does not answer; that nail's own positive
+42:	MethodModeRequest      = "panel.mode.request"
+43:	MethodWorkspaceRequest = "panel.workspace.request"
+44:	MethodAttachmentAdd    = "panel.attachment.add"
+45:	MethodMessageSend      = "panel.message.send"
+
+-- git-branch.tsx exists (page body, not ours):
+frontend/src/components/git-branch.tsx 9366 bytes
+
+-- commit touches frontend/design:
+NONE

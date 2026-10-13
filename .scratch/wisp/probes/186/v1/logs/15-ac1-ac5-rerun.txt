@@ -1,0 +1,18 @@
+== AC#1/AC#5 own re-run (v1 2026-10-13 23:30:28) ==
+-- AC#1 i) HEAD file read:
+ref: refs/heads/dev
+
+dev
+-- worktrees dirs + porcelain count:
+2
+3
+-- branches recursive vs git branch:
+4
+4
+-- packed-refs:
+NO
+
+-- AC#5 exec.Command("git") non-test count:
+0
+-- AC#5 anti-drift test:
+ok  	github.com/CarlosShao/wisp/internal/panel	0.036s

@@ -1,0 +1,9 @@
+== backups taken 2026-10-13 23:17:46 ==
+1419e6e17f21973c42f4ecf9fb672acaa62a626f1d416e16269ff6a7db9ec3fc *internal/panel/git.go
+0330e416a3b256efc907be17ba8246b824120e49b34c47b2403487f340a45e44 *internal/panel/workspace.go
+2ea25cd237ca273f20c1f6a297639f8b84444537adfdfb8fe085996a63b36b8c *internal/panel/workspace_handlers.go
+-- git diff vs HEAD (want empty):
+
+== restore proof rerun 2026-10-13 23:18:31 ==
+ok  	github.com/CarlosShao/wisp/internal/panel	0.078s
+rc=0

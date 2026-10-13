@@ -1,0 +1,7 @@
+== two registered GitSwitchBlockedReason non-empty assertions (v1 现跑 2026-10-13 23:25:45) ==
+=== RUN   TestReadGitSyntheticSymrefRepo
+--- PASS: TestReadGitSyntheticSymrefRepo (0.01s)
+=== RUN   TestReadGitNonRepoSaysSoOutLoud
+--- PASS: TestReadGitNonRepoSaysSoOutLoud (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/panel	0.048s
+rc=0

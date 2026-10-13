@@ -1,0 +1,27 @@
+== AC#6 spot re-check (v1 现跑 2026-10-13 23:27:30; 抽 ③ C25 名册 / ⑤ 预算) ==
+-- ③ C25 roster key: dec.TaskID / scope id = taskID:
+-- does anything in the roster know the tree?
+
+-- ⑤ budgets keyed by model window (not tree):
+		window = info.MaxContextWindow
+	}
+	b := BudgetsFor(window)
+	if opt.Config.MaxRounds <= 0 {
+		opt.Config.MaxRounds = 50
+// (0) is treated as the reference window: the frozen numbers then apply
+// verbatim, which is the documented behaviour of the 128k baseline.
+func BudgetsFor(ctxWindow int) Budgets {
+	if ctxWindow <= 0 || ctxWindow > ReferenceContextWindow {
+		ctxWindow = ReferenceContextWindow
+	}
+85:func BudgetsFor(ctxWindow int) Budgets {
+
+-- ② artifacts dir (assembly-time, not under workspace root):
+			Model:         info.Model,
+			ContextWindow: ep.ContextWindow,
+			ArtifactsDir:  filepath.Join(rt.spec.dataDir, "artifacts"),
+			PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) *
+	_, why := (tools.TaskBackfill{
+		Roster: rt.tasks,
+		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)

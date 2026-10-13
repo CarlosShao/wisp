@@ -1,0 +1,6 @@
+time=2026-10-13T23:17:56.976+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTheWorkspaceSwitchLegCannotMutateARepo (0.03s)
+    workspace_handlers_test.go:241: the workspace switch leg now contains a repo-mutating shape (git.go:582: var plantedWrite186 = os.WriteFile): Q-64 asked for "which tree am I scoped to", and a spawn or a write here is how the 09-27 incident (HANDOVER §4.0u / A328) is reproduced. If a future leg really needs it, that is a ruling to write down here, not a line to add quietly
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.070s
+FAIL

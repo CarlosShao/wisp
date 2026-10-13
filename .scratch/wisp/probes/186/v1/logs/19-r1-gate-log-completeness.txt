@@ -1,0 +1,15 @@
+== r1 gate-log completeness probe (2026-10-13 23:36:20) ==
+-- files under r1/logs:
+00-head.txt
+01-ac1-ac2-recheck.txt
+02-three-readings.txt
+03-ac6-five-surfaces.txt
+04a-panel-config-verbose.txt
+04b-cmdwisp-verbose.txt
+05-gate-clauses.txt
+06-final-cmdwisp.txt
+-- '04-gates' anywhere in commit or tree:
+NOT IN COMMIT
+-- d22scan / gate-clauses mentions in 04a+04b:
+-- r1 tail pointer line:
+82:- [2026-10-13 22:3x] agent=186-r1 did=落地腿（Go 侧）交件，⛔ 零翻 AC 框／⛔ 未动 Status：**认 git＋列可去处＝票 181 已落，本腿复认**（`.git/HEAD` 回溯／`.git/worktrees/`2＋主＝3／递归 `refs/heads`＝4、无 packed-refs，与 `186-a1` 逐枚同；`exec.Command("git")` 全仓非 test＝0）；**切过去＝本腿新交**：`panel.workspace.request`（已在册的名字，⛔ 未新增 C17 枚——白名单现读仍 4 枚 `panel.*`）→ 新 `internal/panel/workspace_handlers.go` 的 `WorkspaceWriteHandler` → `RequestWorkspaceSwitch`（C26＋102 账户＋两形审计，⛔ 未绕过、未自写第二份）；装配＝常驻腿（`cmd/wisp/panel_resident_windows.go` 建 `WorkspaceScopeHolder`，`resident_task_source_windows.go` 在 `src.run = run` 那行 `ws.Bind(run.paths)`）⇒ **AC#3(ii) 同源＝面板切的就是任务管线那一枚 scope**；CLI `panel-inbound` 无任务管线仍按名拒绝（33 号判据②保持绿，未破）。**AC#3(i) 选"照切"＋判据**：这条腿改不了任何树/分支（不跑进程、不写盘、不 checkout——常驻仪器 `TestTheWorkspaceSwitchLegCannotMutateARepo` 两向：真腿零命中＋种一枚 `exec.Command("git","checkout")` 的副本必红），切的是"以后判定用的范围"（R2/R3 per-call），scope 互斥量下见旧或见新、不见半枚，且只许收窄。**10-08 19:1x 三读数（同一落地笔）**：①`workspace.go:141` 填充点所在 `RequestWorkspaceSwitch` 的非 test 调用者 **0→1**（本 handler，尺 `grep -rn 'RequestWorkspaceSwitch(' internal/ cmd/ \| grep -v _test.go`）；②`:120` `Actable()` 闸**还挡**（机制 `risk.Result.Actable()` 于 `Rewritten` 返 `ErrRewrittenPath`；在册仪器 `workspace_test.go:99` 手喂 rewritten 账户仍拒⇒绿）；③该支**仍不可达**：成功路径的 `Rewritten` 值域单点 `{false}`——真解析器先拒 rewritten（本腿新增行为读数 `TestTheRealSwitchLegReachesTheSuccessPathWithACleanAccount`：真 `tools.PathCanonicalizer` 上干净切换达成功路径、`%VAR%` 指向同一棵已授权树仍以 `ErrRewrittenPath` 被拒）⇒ **不装两向仪器**（要造"填 true"只能靠绕过解析器，按 10-08 裁定 A 形不做）。**A874 旧守卫已按 Q-64 重写**（⛔ 非静默删）：`TestNoGitSwitchCapabilityInThePanelSurface`（92 AC#7 词汇扫描）→ `TestThePanelSwitchCapabilityRidesOneWhitelistedRoute`（结构三读：能力只许走 C17 那条／包内无自造 `panel.*` 字面量／收窄腿只一处）；`internal/panel` 红枚 **6→5**（少的正是这枚，其余 5 枚＝既有红）⇒ 不再有本票新增红。**AC#6 五样现跑复核（全"保留"）**：授权根（`SetWorkspaceRoot`/`inRoots`/`ClearWorkspace`，`:120/:142/:152`）／产物目录（`run.go:1013/1109`、`loop.go:245`、`spill.go:51`）／C25 名册（键＝`dec.TaskID`，`provenance.go:460/558`）／会话历史（进程内 `loop.go:263/1046`；⚠ `internal/session/` 今 8 枚，仍会话身份/授权）／预算（`budgets.go:85`、`loop.go:222`）——**换树不换名册**这条风险逐枚坐实、未变。**AC#9**＝`docs/evidence/s1/186-panel-ask.md`（页面 ask 表：7 枚控件＋逐字信封＋四条口径＋4 条具名缺口；⚠ 页面本体已就绪待接线，⛔ 未动 `frontend/**`）。⚠ 具名偏差：本腿实际动 **9 枚文件**（超 §5 的 7 枚上限 2 枚）：除新件 2＋证据 1 外，`composer_dispatch.go` 只改 3 处**过期注释**（"workspace 无处理器"已不成立）、`git.go` 改 `GitSwitchBlockedReason` 的**字面语义**（该文件自述"改这句话是票 186 的活"；只影响该字段文本，两枚在册判据只断言非空，已复跑绿）。⚠ 具名欠账："新建工作树"无方法（须新 C17 枚＋跑外部 `git`＝新宿主能力，先入档再写）；成功回执与常驻腿快照推送＝H10 最后一跳，本票未做。门禁读数见 `logs/04-gates.txt`；⛔ 未 push。

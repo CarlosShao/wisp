@@ -1,0 +1,3 @@
+== M7: evasive write shape probe (2026-10-13 23:31:30) ==
+ok  	github.com/CarlosShao/wisp/internal/panel	0.055s
+rc=0 (green here = the regex does not see os.CreateTemp)

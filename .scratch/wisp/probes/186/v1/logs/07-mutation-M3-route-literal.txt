@@ -1,0 +1,6 @@
+time=2026-10-13T23:23:21.823+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestThePanelSwitchCapabilityRidesOneWhitelistedRoute (0.01s)
+    composer_test.go:337: workspace_handlers.go spells the route "panel.worktree.switch", which bridge.go does not declare: a second door the C17 negotiation never reviewed
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.039s
+FAIL

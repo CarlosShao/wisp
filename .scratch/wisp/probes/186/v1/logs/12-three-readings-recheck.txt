@@ -1,0 +1,30 @@
+== three readings spot re-check (v1 现跑 2026-10-13 23:26:56) ==
+-- ① RequestWorkspaceSwitch non-test callers (grep -rn, _test excluded):
+internal/\panel\workspace.go:111:func RequestWorkspaceSwitch(scope PathScope, input string, audit AuditFunc) (WorkspaceView, error) {
+internal/\panel\workspace_handlers.go:125:	if _, err := RequestWorkspaceSwitch(h.Scope, req.Path, h.Audit); err != nil {
+callers=1
+
+-- ② Actable() still blocks + registered instrument:
+internal/risk/pathresolver.go:93:func (r Result) Actable() (string, error) {
+internal/risk/pathresolver.go-94-	if r.Rewritten {
+internal/risk/pathresolver.go-95-		return "", fmt.Errorf("%w: %s expands to %s (%s); act on the expanded tree only if you asked for it by name",
+internal/risk/pathresolver.go-96-			ErrRewrittenPath, r.Spelling, r.Canonical, strings.Join(r.Rewrites, "+"))
+internal/risk/pathresolver.go-97-	}
+internal/risk/pathresolver.go-98-	return r.Canonical, nil
+internal/risk/pathresolver.go-99-}
+instrument:
+=== RUN   TestTheRealSwitchLegReachesTheSuccessPathWithACleanAccount
+--- PASS: TestTheRealSwitchLegReachesTheSuccessPathWithACleanAccount (0.01s)
+=== RUN   TestWorkspaceSwitchRefusesARewrittenAccountEvenIfTheResolverSaysOK
+--- PASS: TestWorkspaceSwitchRefusesARewrittenAccountEvenIfTheResolverSaysOK (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/panel	0.050s
+
+-- ③ success-path value domain: line-numbered fill points in workspace.go:
+72:// This is the producer side of WorkspaceView.Rewritten. Before this ticket the
+91:		Reparse: res.Reparse, Rewritten: res.Rewritten,
+94:	if res.Rewritten {
+136:			previous.Canonical, res.Canonical, res.Spelling, res.Reparse, res.Rewritten,
+141:		Reparse: res.Reparse, Rewritten: res.Rewritten,
+144:	if res.Rewritten {
+172:		a.Reparse == b.Reparse && a.Rewritten == b.Rewritten &&
+181:		res.Reparse, res.Rewritten, strings.Join(res.Rewrites, "+"), res.Spelling)

@@ -1,0 +1,6 @@
+time=2026-10-13T23:24:16.850+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestThePanelSwitchCapabilityRidesOneWhitelistedRoute (0.01s)
+    composer_test.go:356: non-test SetWorkspaceRoot call sites in internal/panel = [git.go workspace.go workspace_handlers.go], want [workspace.go workspace_handlers.go]: the narrowing must go through RequestWorkspaceSwitch (which reads the C26 account and writes both audit lines); a third site is a second narrowing leg, and the holder is allowed only because it delegates the same call to the scope it was bound to
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.051s
+FAIL

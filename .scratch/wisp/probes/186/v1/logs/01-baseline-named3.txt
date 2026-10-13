@@ -1,0 +1,9 @@
+time=2026-10-13T23:16:35.309+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestThePanelSwitchCapabilityRidesOneWhitelistedRoute
+--- PASS: TestThePanelSwitchCapabilityRidesOneWhitelistedRoute (0.01s)
+=== RUN   TestTheRealSwitchLegReachesTheSuccessPathWithACleanAccount
+--- PASS: TestTheRealSwitchLegReachesTheSuccessPathWithACleanAccount (0.00s)
+=== RUN   TestTheWorkspaceSwitchLegCannotMutateARepo
+--- PASS: TestTheWorkspaceSwitchLegCannotMutateARepo (0.03s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.085s
