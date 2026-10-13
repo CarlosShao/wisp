@@ -17517,3 +17517,11 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **修名册**：我 173 `-done` 改名引发的长度门漂移（脚本 B 档守卫正为此设）——名册条目换新名＋理由改实况；门 GREEN 复核（`worst=228`、`VERDICT GREEN`）。
 - **放 `172-v1`**（派单 `2fe8410a`＋send；先存档后发）。两条"未覆盖"（D34 升级条款／覆盖支归因）交验收判是否落票面射程。
 - 在飞（2）：`313-r2`（写 cmd/wisp）／`172-v1`（验收）。⛔ 未 push。
+
+
+## A895｜2026-10-13 23:45:59 +08｜★票 186 收口（`186-v1` 判 AC#1–#7/#9 成立、AC#8 附条件 ⇒ 前置已补后**九格全翻**）＋代提两枚遗漏读数件＋三条非 186 红归账
+
+- **裁决要点**：牙全在（自造两向突变各红＋指针级同源链 `run.go:501→:516/:747→panel_pump.go:87→resident_task_source:300/311→workspace.go:122` 唯一收窄点＋`workspace.go` 零字节改动＋`composer_dispatch.go` 逐行核＝纯注释）；具名残差 2 不改判（常驻仪器射程 3 枚具名文件——第 4 枚带 `exec.Command` 仍绿；regex 漏 `os.CreateTemp` 族）。
+- **AC#8 前置（编排者补）**：① 代提 `05-gate-clauses.txt`＋`06-final-cmdwisp.txt` 两枚遗漏读数件（186-r1 未入库；`commit` 同批）；② 三条非 186 红归账＝`TestAC2SealNoticeLandsInTheRunLegLogFile`（`GOTMPDIR=C:\tmp` 环境形、`%TEMP%` 下绿＝非真红）／`TestTicket223ModeLoosening…`＋158.8s 死（票 314 死区）／`G1b` 声明漂移（票 197 面）。
+- **两枚欠账判语**："新建工作树"＝合规"先报不做"形（后续做需新 C17 名先落 `A##`）；"H10 回执＋快照推送"＝不属本票 AC。
+- 在飞（2）：`313-r2`（写 cmd/wisp）／`172-v1`（验收）。⛔ 未 push。
