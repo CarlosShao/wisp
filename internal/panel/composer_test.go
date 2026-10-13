@@ -18,9 +18,13 @@ package panel
 //	   it through - which is the argument for hanging the rest of the shape on a
 //	   second door rather than pretending one regex covers a permission input.
 //
-// AC#7 is the negative criterion owner asked for: the git branch/repo switcher
-// was cut from the product, so "nothing in the panel surface can switch a
-// repository" is checked here as a fact rather than remembered as a decision.
+// AC#7 was the negative criterion of ITS day: owner had cut the git branch/repo
+// switcher, so "nothing in the panel surface can switch a repository" was checked
+// here as a fact. Q-64 (09-28, verbatim in ledger A368) changed that to "do", and
+// ticket 186 replaced the vocabulary scan with a structural one - the capability
+// rides the one C17-whitelisted route and there is no second way in. See
+// TestThePanelSwitchCapabilityRidesOneWhitelistedRoute below for what the two
+// scans were and why the old one could no longer tell a display from a door.
 
 import (
 	"encoding/json"
@@ -260,68 +264,114 @@ func TestUnknownModeNeverRendersAsASafeOne(t *testing.T) {
 	}
 }
 
-// ------------------------------------------------- AC#7: no git switching, ever
+// ------------------------- AC#7 rewritten: one route, and no second way in
 
-// gitSwitchCapabilityRe names the cut feature's entry points. Owner cut git
-// branch/repository switching from the product (R20/M5), so this is a checkable
-// negative rather than a sentence in a ticket.
-var gitSwitchCapabilityRe = regexp.MustCompile(
-	`\bgit\s+checkout\b|\bgit\s+switch\b|\bswitchBranch\b|\bcheckoutBranch\b|\bchangeRepo(?:sitory)?\b|` +
-		`\brepoPicker\b|\bbranchSelect(or)?\b|\bworktree\b|\bgit\.branch\b|\bgit\.repo\b|\bvcs\.switch\b`)
-
-// TestNoGitSwitchCapabilityInThePanelSurface greps the two trees this ticket
-// owns. Production files only (see the header of this test file for why _test.go
-// is skipped: the patterns live in this file, and a self-match would make the
-// instrument unreadable rather than wrong).
-func TestNoGitSwitchCapabilityInThePanelSurface(t *testing.T) {
+// WHY THE OLD TEST IS GONE, and what replaced it. The guard that stood here
+// (TestNoGitSwitchCapabilityInThePanelSurface) scanned frontend/ and
+// internal/panel/ for the cut feature's VOCABULARY - "git checkout", "worktree",
+// "branchSelect" - because owner's R20/M5 had cut branch/repository switching
+// from the product. That premise is gone: owner's 09-28 ruling changed it to
+// "do" (Q-64, verbatim in ledger A368, landing ticket 186), the frontend tree
+// merged on 10-13 ships the switcher UI (frontend/src/components/git-branch.tsx),
+// and ticket 181's read face names worktrees by design (internal/panel/git.go).
+// A vocabulary scan would therefore have gone red on the DISPLAY half of the very
+// feature the owner asked for - and stayed green on a page that had grown a
+// second door, which is the failure mode that matters.
+//
+// WHAT IS CHECKED INSTEAD is the structure ticket 186's dispatch named: the
+// capability rides the one C17-whitelisted route, and nobody may build a second
+// way in. Three readings, all off the sources rather than off the constants:
+//
+//  1. the entrance is the whitelisted name: declared in bridge.go, answered by
+//     knownComposerMethod's own case list, routed by composer_dispatch.go;
+//  2. no fifth route name exists anywhere in this package's production files -
+//     every "panel.*" literal must be one bridge.go declares;
+//  3. there is one narrowing leg: the only calls to SetWorkspaceRoot in this
+//     package are workspace.go's RequestWorkspaceSwitch (which reads the C26
+//     account and audits) and the holder's pass-through in workspace_handlers.go.
+//     A handler that called it directly would be exactly the "绕过
+//     RequestWorkspaceSwitch 自己写一份" shape AC#3(ii) forbids.
+//
+// The repo-mutating half ("this is a scope narrowing, not a checkout") is
+// measured by workspace_handlers_test.go's TestTheWorkspaceSwitchLegCannotMutateARepo.
+func TestThePanelSwitchCapabilityRidesOneWhitelistedRoute(t *testing.T) {
 	root := panelRepoRoot(t)
-	var violations []string
-	scan := func(dir string, accept func(string) bool) {
-		err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() {
-				switch d.Name() {
-				case "node_modules", ".git", "dist", "fixtures":
-					return fs.SkipDir
-				}
-				return nil
-			}
-			if !accept(p) {
-				return nil
-			}
-			if hits := reMatchesInFile(gitSwitchCapabilityRe, p); len(hits) > 0 {
-				rel, _ := filepath.Rel(root, p)
-				violations = append(violations, rel+": "+hits[0])
-			}
-			return nil
-		})
+	pkgDir := filepath.Join(root, "internal", "panel")
+	read := func(name string) string {
+		t.Helper()
+		data, err := os.ReadFile(filepath.Join(pkgDir, name))
 		if err != nil {
-			t.Fatalf("walk %s: %v", dir, err)
+			t.Fatalf("read internal/panel/%s: %v", name, err)
+		}
+		return string(data)
+	}
+
+	// 1. The only entrance is the whitelisted route.
+	bridgeSrc := read("bridge.go")
+	if !strings.Contains(bridgeSrc, `MethodWorkspaceRequest = "panel.workspace.request"`) {
+		t.Error("bridge.go no longer declares MethodWorkspaceRequest as panel.workspace.request: the page's one route and the Go-side name have to stay the same spelling")
+	}
+	if body := funcBody(bridgeSrc, "func knownComposerMethod"); !strings.Contains(body, "MethodWorkspaceRequest") {
+		t.Errorf("knownComposerMethod's own case list no longer answers MethodWorkspaceRequest: %s", body)
+	}
+	if n := strings.Count(read("composer_dispatch.go"), "case MethodWorkspaceRequest:"); n != 1 {
+		t.Errorf("composer_dispatch.go has %d case labels for MethodWorkspaceRequest, want exactly 1 - the route is routed once, through the one router", n)
+	}
+
+	// 2. No route name invented in this package.
+	declared := map[string]bool{}
+	for _, m := range panelMethodRe.FindAllStringSubmatch(bridgeSrc, -1) {
+		declared[m[1]] = true
+	}
+	entries, err := os.ReadDir(pkgDir)
+	if err != nil {
+		t.Fatalf("read package dir: %v", err)
+	}
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".go") || strings.HasSuffix(e.Name(), "_test.go") {
+			continue
+		}
+		for _, hit := range reMatchesInFile(panelMethodRe, filepath.Join(pkgDir, e.Name())) {
+			lit := panelMethodRe.FindStringSubmatch(hit)
+			if len(lit) > 1 && !declared[lit[1]] {
+				t.Errorf("%s spells the route %q, which bridge.go does not declare: a second door the C17 negotiation never reviewed", e.Name(), lit[1])
+			}
 		}
 	}
-	scan(filepath.Join(root, "frontend"), func(p string) bool {
-		if strings.HasSuffix(p, "_test.go") || strings.HasSuffix(p, ".test.ts") || strings.HasSuffix(p, ".test.tsx") {
-			return false
+
+	// 3. One narrowing leg, and the holder is a pass-through next to it.
+	var setCallSites []string
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".go") || strings.HasSuffix(e.Name(), "_test.go") {
+			continue
 		}
-		// AC#7's file set is deliberately NOT widened to .js/.mjs: the acceptance
-		// round's R-92-1 is about the mode-write door, and measuring this very
-		// predicate with rendererSourceFile(p) went red on
-		// frontend/scripts/vendor-shadcn.mjs:2, a build script whose comment only
-		// mentions "git checkout". Capability entry points are pinned structurally
-		// by TestTheRendererHoldsExactlyOneDoorToTheHost, not by more prose surface.
-		return strings.HasSuffix(p, ".ts") || strings.HasSuffix(p, ".tsx") ||
-			strings.HasSuffix(p, ".css") || strings.HasSuffix(p, ".html")
-	})
-	scan(filepath.Join(root, "internal", "panel"), func(p string) bool {
-		return strings.HasSuffix(p, ".go") && !strings.HasSuffix(p, "_test.go")
-	})
-	if len(violations) > 0 {
-		t.Errorf("a git branch/repository switcher exists in the panel surface; owner cut it from the product (票 92 AC#7):%s",
-			strings.Join(violations, "\n"))
+		hits := reMatchesInFile(regexp.MustCompile(`\.SetWorkspaceRoot\(`), filepath.Join(pkgDir, e.Name()))
+		for range hits {
+			setCallSites = append(setCallSites, e.Name())
+		}
 	}
-	t.Logf("AC#7 negative criterion held: no git switch entry point in frontend/ or internal/panel/ (production files)")
+	sort.Strings(setCallSites)
+	want := []string{"workspace.go", "workspace_handlers.go"}
+	if !equalStrings(setCallSites, want) {
+		t.Errorf("non-test SetWorkspaceRoot call sites in internal/panel = %v, want %v: %v",
+			setCallSites, want,
+			"the narrowing must go through RequestWorkspaceSwitch (which reads the C26 account and writes both audit lines); a third site is a second narrowing leg, and the holder is allowed only because it delegates the same call to the scope it was bound to")
+	}
+}
+
+// funcBody returns the source of a top-level function, from its declaration to
+// the first line that is exactly "}" - enough for a case list, which never
+// nests a brace at column zero.
+func funcBody(src, decl string) string {
+	i := strings.Index(src, decl)
+	if i < 0 {
+		return "(function not found: " + decl + ")"
+	}
+	rest := src[i:]
+	if j := strings.Index(rest, "\n}"); j >= 0 {
+		return rest[:j]
+	}
+	return rest
 }
 
 // --------------------------------------------------------------- walk helpers

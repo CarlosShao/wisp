@@ -183,7 +183,13 @@ func runResident() {
 	// runs AFTER rb.stop() above registers - LIFO, so the panel thread ends last
 	// and the frozen D38(e) ten-step order (internal/proc/shutdown.go) is not
 	// touched: no new step, no new hook name on that closed roster.
-	rp, rpErr := newResidentPanelManager(rt.Layout.DataDir)
+	// Ticket 186: the second return value is the holder the panel's
+	// panel.workspace.request narrows once the task pipeline exists. It is handed
+	// to the task source below, which is the only object that owns the runtime's
+	// path scope; a boot whose panel did not come up passes nil, and the task
+	// source then binds nothing (its switches are refused by name rather than
+	// narrowing a scope no panel can reach).
+	rp, panelScope, rpErr := newResidentPanelManager(rt.Layout.DataDir)
 	var panel *residentPanel
 	if rpErr != nil {
 		slog.Error("panel host: this process has no panel", "err", rpErr)
@@ -290,7 +296,11 @@ func runResident() {
 	// It runs after bindBallHost so the veto channel this leg advertises is
 	// already the honest one, and before the report below so the step roster the
 	// report prints includes whatever this registered.
-	src := startResidentTaskSource(rt, ra)
+	//
+	// panelScope (ticket 186) rides in with it: the pipeline this call assembles
+	// owns the ONE path scope the panel's workspace request may narrow, and the
+	// bind happens inside, on the first line where that object exists.
+	src := startResidentTaskSource(rt, ra, panelScope)
 
 	// Ticket 247 AC#1/AC#5: the capture leg. This is the line that makes
 	// internal/audio have a non-test importer - before it the whole stack

@@ -88,6 +88,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/agent/approval"
 	"github.com/CarlosShao/wisp/internal/buildinfo"
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/proc"
 )
 
@@ -225,7 +226,12 @@ func redactTaskTextForLine(s string) string {
 // this process has a task entry at all, assembles the pipeline through the ONE
 // assembly root with ra's gate injected, and puts a reader on that entry. Every
 // return of nil is printed by the path that produced it.
-func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval) *residentTaskSource {
+//
+// ws is ticket 186's holder, and nil means this boot has no panel to serve: the
+// pipeline is still assembled and the task entry still works, because the panel
+// is an input device, not a precondition (the same posture every other degraded
+// branch here takes).
+func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval, ws *panel.WorkspaceScopeHolder) *residentTaskSource {
 	// The single console gate (ruling 2.1). No second test of "is this a
 	// terminal" may appear anywhere in this file.
 	console := interactiveStdin()
@@ -292,6 +298,22 @@ func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval) *residentTa
 		return src
 	}
 	src.run = run
+	// Ticket 186 AC#3(ii): the panel's workspace switch is bound to THIS run's
+	// path scope, which is the same object the bridge and the fs tools judge with
+	// (run.go:501-516) and the same one the snapshot's workspace/git sections read
+	// (cmd/wisp/panel_pump.go). The bind is the whole of the write side here, and
+	// it has to sit on this line: src.run is the first moment the object exists,
+	// and every earlier line is a process whose panel would have to narrow a tree
+	// nobody uses. A bind failure is printed and leaves the handler refusing by
+	// name, which is the honest state of a build where the panel and the pipeline
+	// disagree - never a silent second canonicalizer.
+	if ws != nil && run != nil {
+		if bErr := ws.Bind(run.paths); bErr != nil {
+			slog.Error("task source: 面板的工作区切换腿未接上本进程的路径范围",
+				"err", bErr, "effect", "panel.workspace.request 会按名字拒绝，直到本进程重启")
+			fmt.Printf("wisp: 面板的工作区切换腿未接上（%v）：本进程里该请求会被具名拒绝\n", bErr)
+		}
+	}
 	// Ticket 265 (form ⓐ-Ⅰ, orchestrator ruling A601 §4): the session ledger this
 	// assembly just minted is bound into the holder ra.gate was built with, HERE
 	// and not a line later - src.run is the first moment a card could be answered

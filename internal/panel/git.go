@@ -15,9 +15,11 @@ package panel
 // would be a contract change, not a display feature - so nothing here is
 // registered in internal/tools and nothing here is reachable from a model call.
 // TestGitDimensionHasNoModelCallableTool nails that. It is also not the inbound
-// half: "switch branch / switch tree" needs the page -> Go hop (a postMessage
-// receiver plus a router), and that hop does not exist in this tree, which is why
-// SwitchBlocked below is a constant sentence rather than a computed verdict.
+// half: the switch request is ticket 186's (workspace_handlers.go, reached
+// through the C17 route the router already serves) and it narrows a scope rather
+// than touching this file - which is why SwitchBlocked below is still a sentence
+// about the PROCESS that produced the packet, not a computed verdict about the
+// product.
 //
 // NO EXTERNAL PROCESS. Everything is os.Stat / os.ReadFile / os.ReadDir. The
 // census §② took this repository's own three shapes as live data and concluded
@@ -69,21 +71,25 @@ const (
 	GitKindUnreadable       = "unreadable"
 )
 
-// GitSwitchBlockedReason is the snapshot's standing statement about the two
-// actions this ticket does NOT implement. It is not a policy call and it is not
-// a refusal to be worked around: the inbound channel that a switch would arrive
-// on (the WebView2 host of ticket 33, its postMessage receiver, and a router for
-// ComposerRequest) has since landed in code - the C27 host, the postMessage
-// transport and the composer router are in this tree (cmd/wisp/panel_host_windows.go,
-// internal/panel/composer_dispatch.go), and the router has production callers on
-// the host and stdin legs. What is still not built is the switching dimension
-// itself - ticket 186's work, gated on Q-69 - so a panel that drew a working
-// switcher on top would still be a button wired to nothing.
+// GitSwitchBlockedReason is the snapshot's standing statement about the one
+// action this packet's PROCESS cannot perform. It is not a policy call and it is
+// not a refusal to be worked around: the switch itself now exists in this tree -
+// ticket 186 attached workspace_handlers.go's WorkspaceWriteHandler to the
+// resident leg's panel.workspace.request, and that handler narrows the running
+// task pipeline's own path scope (the C27 host, the postMessage transport and the
+// composer router all landed before it: cmd/wisp/panel_host_windows.go,
+// internal/panel/composer_dispatch.go).
 //
-// The constant's own hop sentence is now stale (it still says 无 postMessage
-// 接收器、无 router、无 WebView2 宿主); re-wording it is ticket 186's call, not
-// this file's.
-const GitSwitchBlockedReason = "切换分支／切换工作树今天不可用：网页到宿主的那一跳还没有落地（无 postMessage 接收器、无 router、无 WebView2 宿主），面板只有快照这一条出向通道"
+// What is true here is narrower, and it is a fact about the producer rather than
+// about the product: a `wisp run` books its packet to its own ledger and holds no
+// panel host, so nothing in THIS process can carry a switch - and an empty value
+// would read as "switchable", which is the lie this field exists to prevent.
+//
+// It stays a constant until an assembly exists that both owns a panel door and
+// produces a packet. Filling it from a process-local reading today would be a
+// field with no reader, which is the shape ticket 145 refuses (ledger A408); the
+// line to change when that assembly lands is cmd/wisp/panel_pump.go:gitView.
+const GitSwitchBlockedReason = "本进程不持有面板宿主，无法执行工作区切换：切换由持有面板的常驻腿按其 panel.workspace.request 收窄它自己的范围；本快照的 git 这一维在本进程里只读"
 
 // gitNoWorkspaceReason is the honest answer when nothing was narrowed. It is a
 // separate sentence from "not a repo" because there was no directory to look at.
@@ -144,7 +150,8 @@ type GitView struct {
 	// packed-refs, loose winning on a name clash.
 	Branches []string `json:"branches"`
 	// SwitchBlocked is the status field, not git data: empty would mean
-	// "switchable", which is false in this tree, so it carries the reason.
+	// "switchable by the process that produced this packet", and that is false
+	// for every producer in this tree, so it carries the reason.
 	SwitchBlocked string `json:"switchBlocked"`
 }
 

@@ -1,0 +1,29 @@
+=== 10-08 19:1x 钉入三读数（落地后现跑，2026-10-13 22:21）===
+
+-- ① workspace.go:141 Rewritten: 填充点所在函数 RequestWorkspaceSwitch 的非 test 调用者 --
+尺: grep -rn 'RequestWorkspaceSwitch(' --include=*.go internal/ cmd/ | grep -v _test.go
+internal/\panel\workspace_handlers.go:125:	if _, err := RequestWorkspaceSwitch(h.Scope, req.Path, h.Audit); err != nil {
+internal/\panel\workspace.go:111:func RequestWorkspaceSwitch(scope PathScope, input string, audit AuditFunc) (WorkspaceView, error) {
+
+行号复核（填充点）:
+91:		Reparse: res.Reparse, Rewritten: res.Rewritten,
+94:	if res.Rewritten {
+120:		if actable, aErr := res.Actable(); aErr != nil {
+141:		Reparse: res.Reparse, Rewritten: res.Rewritten,
+144:	if res.Rewritten {
+
+-- ② :120 Actable() 闸还挡不挡：机制＋在册仪器 --
+93:func (r Result) Actable() (string, error) {
+94-	if r.Rewritten {
+95-		return "", fmt.Errorf("%w: %s expands to %s (%s); act on the expanded tree only if you asked for it by name",
+96-			ErrRewrittenPath, r.Spelling, r.Canonical, strings.Join(r.Rewrites, "+"))
+97-	}
+98-	return r.Canonical, nil
+99-}
+在册仪器（手喂 rewritten 账户仍拒）:
+99:func TestWorkspaceSwitchRefusesARewrittenAccountEvenIfTheResolverSaysOK(t *testing.T) {
+
+-- ③ 该支可达性：成功路径上 res.Rewritten 的值域 --
+tools.ResolveWorkspace 先读一次 Actable()（拒 rewritten），RequestWorkspaceSwitch 再读一次；
+95:	if _, aErr := res.Actable(); aErr != nil {
+120:		if actable, aErr := res.Actable(); aErr != nil {

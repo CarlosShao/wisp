@@ -1,0 +1,34 @@
+=== AC#6 五样现跑（2026-10-13 22:27）===
+-- ① 授权根 --
+120:func (p *PathCanonicalizer) SetWorkspaceRoot(root string, acc risk.Result) error {
+142:func (p *PathCanonicalizer) ClearWorkspace() {
+152:func (p *PathCanonicalizer) inRoots(canonical string) bool {
+-- ② 产物目录 --
+internal/agent/spill.go:51:func NewSpiller(dir string, b Budgets) *Spiller { return &Spiller{dir: dir, b: b} }
+cmd/wisp/run.go:1013:			ArtifactsDir:  filepath.Join(rt.spec.dataDir, "artifacts"),
+cmd/wisp/run.go:1109:		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+internal/agent/loop.go:121:	// ArtifactsDir is the memory store's artifacts directory (spill writes
+internal/agent/loop.go:123:	ArtifactsDir string
+internal/agent/loop.go:245:		sp:       NewSpiller(opt.Config.ArtifactsDir, b).WithPointerJudge(opt.Config.PointerJudge),
+-- ③ C25 名册 --
+460:func (p *Provenance) OpenScope(scopeID string) *Scope {
+558:func (p *Provenance) MarkWithHostPath(scopeID, tool, origin, content, hostPath string) bool {
+650:	if !b.prov.MarkWithHostPath(dec.TaskID, dec.Tool, origin, res.Text, hostPath) {
+856:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+-- ④ 会话历史 --
+263:func (l *Loop) History() []llm.Message {
+1046:func (l *Loop) replaceHistory(hist []llm.Message) {
+doc.go
+grants.go
+grants_test.go
+manage.go
+manage_test.go
+session.go
+ticket224_pattern_dialect_test.go
+-- ⑤ 预算 --
+internal/agent/loop.go:222:	b := BudgetsFor(window)
+internal/agent/budgets.go:85:func BudgetsFor(ctxWindow int) Budgets {
+
+=== 切树本身能写什么（上界）===
+134:	p.workspace = f
+135:	p.workspaceAccount = acc

@@ -217,7 +217,10 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 	// and says it once per start instead of leaving the operator to infer it from
 	// an edit that never lands.
 	auditf("%s", hotReloadDisabledPanelInbound)
-	return newComposerDispatchChain(dir, auditf, panelInboundActor)
+	// nil: this seam owns no task pipeline, so there is no tree to narrow and the
+	// workspace route keeps refusing by name (ticket 186 left that refusal in
+	// place on purpose - see newComposerDispatchChain's own note).
+	return newComposerDispatchChain(dir, auditf, panelInboundActor, nil)
 }
 
 // newComposerDispatchChain is the five-constructor body behind
@@ -226,7 +229,15 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 // the resident panel must not sign itself as the CLI seam (ticket 33's resident
 // wiring passes "resident-panel"). Every other property of the chain is unchanged,
 // including the two nils that keep a widening request from reaching Store.Set.
-func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string) (*panel.ComposerDispatch, error) {
+//
+// ws is ticket 186's socket parameter: the assembly that owns a task pipeline
+// hands in the holder its runtime scope is bound into, and the panel's
+// panel.workspace.request then narrows THAT scope (AC#3(ii): one object, so the
+// tree the panel shows and the tree the tools judge with cannot diverge). nil is
+// not an oversight and not a stub - the CLI seam has no pipeline, and the router's
+// ErrNoHandlerAttached is the honest answer there rather than a handler wired to
+// a tree that does not exist.
+func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder) (*panel.ComposerDispatch, error) {
 	cfgPath := filepath.Join(dir, configFileName)
 	mgr, err := config.NewManager(cfgPath, nil)
 	if err != nil {
@@ -269,11 +280,20 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string) 
 		Audit: auditf,
 		Actor: actor,
 	}
+	// Ticket 186's leg, attached only where a runtime scope was handed over (see
+	// the signature note). The interface is left nil rather than holding a typed
+	// nil pointer, because the router's refusal is decided by a nil interface
+	// test and a typed nil would slip past it.
+	var workspace panel.WorkspaceRequestHandler
+	if ws != nil {
+		workspace = &panel.WorkspaceWriteHandler{Scope: ws, Audit: auditf, Actor: actor}
+	}
 	return &panel.ComposerDispatch{
 		Mode: modeWrites,
-		// Untouched by this slice, and refused by name when they arrive:
-		// workspace = ticket 186, attachment = ticket 92, message = ticket 35.
-		Workspace:  nil,
+		// Workspace is ticket 186's and answers where a holder was passed in;
+		// attachment = ticket 92, message = ticket 35, both still refused by name
+		// when they arrive.
+		Workspace:  workspace,
 		Attachment: nil,
 		Message:    nil,
 		// Ticket 248's two settings doors are answered by the leg above.

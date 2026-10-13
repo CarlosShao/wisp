@@ -1,0 +1,28 @@
+=== AC#1 复认：三支尺（本仓真 git 树，2026-10-13 21:56）===
+-- 认 git --
+ref: refs/heads/dev
+dev
+-- 工作树 --
+worktrees dirs=2
+3
+-- 分支 --
+4
+4
+packed-refs NO
+=== AC#2 复认：白名单枚 ===
+35:// "panel.*" literal the Go side does not answer; that nail's own positive
+42:	MethodModeRequest      = "panel.mode.request"
+43:	MethodWorkspaceRequest = "panel.workspace.request"
+44:	MethodAttachmentAdd    = "panel.attachment.add"
+45:	MethodMessageSend      = "panel.message.send"
+=== AC#2 复认：RequestWorkspaceSwitch 调用者（非 test）===
+internal/\panel\bridge.go:17:// (ModeRequest.Parse / DecodeAttachmentPayload / RequestWorkspaceSwitch), so
+internal/\panel\composer_dispatch.go:76:// call exists (workspace.go's RequestWorkspaceSwitch); the handler in front of it
+internal/\panel\git.go:272:// safety property rather than the old gap: RequestWorkspaceSwitch reads
+internal/\panel\instructions_200.go:112:// panel's own door: RequestWorkspaceSwitch still refuses a rewritten spelling
+internal/\panel\workspace.go:80:// The reason sentence differs from the one RequestWorkspaceSwitch writes on a
+internal/\panel\workspace.go:105:// RequestWorkspaceSwitch performs one workspace switch and audits it.
+internal/\panel\workspace.go:111:func RequestWorkspaceSwitch(scope PathScope, input string, audit AuditFunc) (WorkspaceView, error) {
+cmd/\wisp\panel_pump.go:80:// reparse/rewrite account live on the request path (RequestWorkspaceSwitch),
+=== exec.Command("git") 全仓非 test ===
+0

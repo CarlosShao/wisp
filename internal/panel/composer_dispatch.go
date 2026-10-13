@@ -33,8 +33,9 @@ package panel
 // not been taught it, which is the failure that would otherwise be silent: a
 // whitelisted name that nobody handles is a request the user made and no one
 // answered. Same for a listed name with no handler attached in this assembly
-// (workspace / attachment / message have no handler in this tree yet - see
-// unattached). Fail-closed is the only state that costs nothing to add.
+// (attachment and message have no handler in this tree yet, and the workspace
+// socket is nil in assemblies with no task pipeline to narrow - see unattached).
+// Fail-closed is the only state that costs nothing to add.
 //
 // ATTRIBUTION IS NOT THIS FILE'S TO TOUCH. The source and requestId inside an
 // envelope are how the audit trail says who asked; a router that "helpfully"
@@ -72,9 +73,11 @@ type ModeRequestHandler interface {
 	HandleModeRequest(ctx context.Context, req ComposerRequest) error
 }
 
-// WorkspaceRequestHandler answers one workspace request. The native leg it will
-// call exists (workspace.go's RequestWorkspaceSwitch); the handler in front of it
-// is ticket 186's work, so this file declares the socket and nothing more.
+// WorkspaceRequestHandler answers one workspace request. Ticket 186 filled this
+// socket with workspace_handlers.go's WorkspaceWriteHandler, which calls
+// workspace.go's RequestWorkspaceSwitch - the same leg, not a second copy of it,
+// so the narrowing, the C26 account read and both audit lines have one owner.
+// This file still declares the shape and nothing more.
 type WorkspaceRequestHandler interface {
 	HandleWorkspaceRequest(ctx context.Context, req ComposerRequest) error
 }
@@ -124,7 +127,8 @@ type ComposerDispatch struct {
 	// Mode answers the mode request. In production this is the *ModeWriteHandler
 	// that cmd/wisp assembles with the real write leg attached.
 	Mode ModeRequestHandler
-	// Workspace answers the workspace request. Untouched by this slice.
+	// Workspace answers the workspace request. Attached by the assembly that owns
+	// a task pipeline (ticket 186); nil in assemblies with no tree to narrow.
 	Workspace WorkspaceRequestHandler
 	// Attachment answers the attachment request. Untouched by this slice.
 	Attachment AttachmentRequestHandler

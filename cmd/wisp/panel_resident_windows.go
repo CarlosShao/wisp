@@ -208,11 +208,27 @@ func panelGeometrySource(dataDir string) func() (width, height int) {
 	}
 }
 
-func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel.ComposerDispatch, error) {
+// newResidentComposerDispatch builds the resident panel's chain and attaches
+// ticket 186's workspace socket to a holder this function also returns.
+//
+// WHY A HOLDER AND NOT THE SCOPE ITSELF. The scope this panel must narrow is the
+// TASK PIPELINE's tools.PathCanonicalizer, and that object does not exist yet at
+// panel-host bring-up: the pipeline is assembled later, by the task source
+// (startResidentTaskSource -> assembleRuntime, run.go:501). The holder crosses that
+// ordering without inventing a second canonicalizer (AC#3(ii)) and without a field
+// write that would race the page's own dispatch goroutine. Until the task source
+// binds it, the handler refuses by name - this process has no tree to switch to
+// yet, and saying so beats narrowing a scope nothing else uses.
+func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel.ComposerDispatch, *panel.WorkspaceScopeHolder, error) {
 	// Said once per start, same posture the CLI seam takes: name the tier that was
 	// not taken rather than leave the operator to infer it.
 	auditf("%s", residentPanelHotReloadNote)
-	return newComposerDispatchChain(dataDir, auditf, residentPanelActor)
+	scope := panel.NewWorkspaceScopeHolder()
+	disp, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope)
+	if err != nil {
+		return nil, nil, err
+	}
+	return disp, scope, nil
 }
 
 // newResidentPanelManager is the assembly the resident leg uses. The chain is the
@@ -225,15 +241,19 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel
 //
 // The actor is named for what actually drives it, so the audit line cannot be read
 // as the CLI seam's.
-func newResidentPanelManager(dataDir string) (*PanelManager, error) {
+//
+// The returned holder is ticket 186's: the caller hands it to the task source,
+// which binds this process's runtime scope into it. The panel host itself keeps
+// knowing nothing about paths - it only remembers which object to bind.
+func newResidentPanelManager(dataDir string) (*PanelManager, *panel.WorkspaceScopeHolder, error) {
 	auditf := func(format string, args ...any) {
 		line := fmt.Sprintf(format, args...)
 		slog.Info("panel host: " + line)
 		fmt.Printf("wisp: %s\n", line)
 	}
-	disp, err := newResidentComposerDispatch(dataDir, auditf)
+	disp, workspaceScope, err := newResidentComposerDispatch(dataDir, auditf)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	assets, aerr := panel.BuiltinAssets()
 	if aerr != nil {
@@ -250,7 +270,7 @@ func newResidentPanelManager(dataDir string) (*PanelManager, error) {
 	// it per window creation rather than holding it. Said once per start, in the
 	// same posture as the hot-reload note above.
 	auditf("%s", residentPanelGeometryNote)
-	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), nil
+	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), workspaceScope, nil
 }
 
 // loop is the panel thread. Registry.Spawn owns the recover and the panic sink,

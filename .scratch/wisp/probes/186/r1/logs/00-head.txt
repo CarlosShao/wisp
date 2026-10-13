@@ -1,0 +1,20 @@
+186-r1 起手自证 2026-10-13 21:38:38 +0800
+== git log --oneline -6 ==
+8cfd7b1b 229-v1 验收（非实现者，抽核形）：AC#1..#6 六格全成立、判语见 docs/evidence/s1/ticket229-229-r1-accept-v1.md。自跑 -run Test229 三枚 rc=0。两向变异：overlay 把 :394 改回 "subagent-finish-"+bg.ID ⇒ 真路尺红（红句逐字 CountByName("agent-task-<id>")=0；Total=1 PerTask=0 Unknown=[subagent-finish-<id>]）；普查尺对 overlay 免疫（运行时读磁盘源码）⇒ 仓外备份＋落盘变异 ⇒ 普查尺红（Spawn 首参不是字符串字面量（"subagent-finish-"+bg.ID）且没有复审记录），还原 sha256=5b0ca5e2303b6619f80dac2c57524a3ff1c7bb71c059a55f2ae73c5937aa7c2b 逐字同、复跑绿。正控反-反：overlay 把 WARN 降 DEBUG／删两行 ⇒ 正控红「名册外的名字没让漏哨响，日志=""：WARN 被调轻或删掉了？」（另两尺不受影响；WARN 行磁盘零动）。普查尺空集形两闸真咬：根弄窄 tools/（13 枚）红、case "Spawn" 清空（289 枚/0 站点）红。5 名逐枚现跑：panel-sta=cmd/wisp/panel_resident_windows.go:154、balldebug×2=main.go:251/432、mockllm-stdout-reader=mockllm.go:92、修掉=:394；交件 32bba42c 无 cmd/wisp/adaptertest/goroutine.go/thresholds/golden ⇒ 只登记未动属实；独立第二把尺（自写 grep+分类器）19 站点、名册外字面量仅 mockllm 1 枚与尺同集。AC#5：Count()=1/PerTask=1/Unknown=[]（改前态变异复得 Total=1/PerTask=0/Unknown=[旧名]）；thresholds/goroutine.go/golden 三 blob 与 HEAD SAME。AC#6 抽核：cmd/wisp TestTicket255 红句同句（A878/89b3b550 归因成立）；internal/session -count=5 三发 1/5、3/5、3/5 红（机制 ORDER BY updated_at DESC,id DESC＋期望创建序）；承重两包复跑绿 internal/tools ok 13.565s/internal/observe ok 3.499s。具名瑕疪： panel-sta 登记窗口 :80-84 引文实起 :78-81；mockllm 票67 登记跨文件（balldebug:42）。具名欠账：整包 ./cmd/wisp ./internal/... 未独立重跑。建议六格全翻。件：docs/evidence/s1/ticket229-229-r1-accept-v1.md＋probes/229/v1/logs/ 11 枚。⛔ 零翻框、⛔ 未 push。
+c184075c 编排者：A883 收队列表普查＋放 186-r1（口径弱点登记：面标需逐票现读）
+5bbe3205 编排者：186-r1 发送补记（发放条件已满足；本波并行腿/已知红/314 死区现量）
+3b8df61c queue-census-1 交件：只读普查收口——队列现量表（ⓐ102/ⓑ42/ⓒ43；主件 queue-ready.md＋第二枚 queue-rest.md）＋尺的射程/5 枚复核/猜与没读到自报；⛔ 未 push
+79a84350 记我：313 票尾 bullet 误落幽灵文件名（猜名创建）→补进真件+git rm 幽灵件+台账 A882；幽灵存活 ed45d16e→本笔（未 push）
+ed45d16e 编排者：313 收尾链两枚裁定落地（台账 A881：role_chat_pair 成立/二表并查成立，各带三条件与撤销口令）
+== git status --porcelain -- cmd/wisp internal/panel ==
+(空=无在飞件)
+== branch/HEAD ==
+dev
+8cfd7b1be6aa352ccf9ad66a12974f8fd54f6502
+== 313-r1 交件 ==
+89b3b550 票 313 落地腿 313-r1（Go 侧）：模型配置的读面载荷＋语音/建行的可写面，⛔ 未动被钉住的票 248 表
+== tasklist 相关 ==
+cargo.exe                    25488 Console                    1      8,916 K
+cargo.exe                    28568 Console                    1     16,600 K
+== CPU 平均 ==
+wmic n/a
