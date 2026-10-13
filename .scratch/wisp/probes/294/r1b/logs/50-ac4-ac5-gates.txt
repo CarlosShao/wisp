@@ -56,3 +56,12 @@ forbidden-hits=0
 non-r1b paths in commit:
 .scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md
 ticket-in-commit numstat: 2	0	.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md
+=== ca777e8f ===
+58
+forbidden-hits=0
+=== ff384b3d ===
+1
+forbidden-hits=0
+=== b3959665 ===
+1
+forbidden-hits=0
