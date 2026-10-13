@@ -1,0 +1,5 @@
+合并 dsh/feat/frontend-p0-v2 进 dev（机主 2026-10-13 09:4x 授权："尽快把 worktree 的新版屏接进来……能合并就合并了"）
+
+预演三把尺（全部在合并前现跑）：① git merge-tree --write-tree dev dsh/feat/frontend-p0-v2 ⇒ rc=0（零冲突，结果树 058ba4e2）② dev 自分叉点 c1b10089 起动过 frontend 的提交＝0 笔 ③ 两侧改动文件集交集＝空集；该分支改动面＝43 枚文件、全在 frontend/**（源件/样式/组件/脚本+lock）
+
+合并后动作：出厂链重建 build/wisp.exe ⇒ 面板里那张页面从旧版换成这棵树的版本（票 299 的管道昨天已通，这正是它要接的东西）

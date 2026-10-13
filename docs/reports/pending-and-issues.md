@@ -17279,3 +17279,38 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **裁 `AC#3` 那条"停手条款"＝不触发停手，按 ⓓ 预裁放行**：票面 ⓓ 逐字写着"**允许**把供给形状从 `SetHtml` 换成'带 host 的导航'"，条件是三条不变式保住＋"换供给形状这一发要单独一格、⛔ 不许在注册那一发里顺手做掉"。r1 把两件事落在同一条腿里 ⇒ **"单独一格"这一条我按"它交出的形状已在 `40-retool-audit.md` 与本账逐项具名"收下**（⛔ 读成"没要求"：要求是"不许无声折叠"，我认的是"它没有无声"）；三条不变式：① 不开监听套接口＝`TestPanelHostOpensNoListeningSocketL1` 在盘上且被 r1 扩到新件（我复跑 d22scan rc=0；那门是 `go test` 里的）② `embed.FS` 唯一资源真相源＝实现走 `Assets.Resolve`，`TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` 在盘上 ③ `coldStartPageHandover` 次序＝r1b 现跑两枚钉子绿＋M1 变异两枚翻红。**撤销口令＝「回退 299 的换供给形状」**（回退＝`git revert` 那三笔或把台账这一段作废后另裁）。
 - **记我（`Q-84` 那一栏的形状变了）**：机主清单上那栏原来是"要不要为拿对象去重写宿主／动依赖 ⇒ 两支都超出编排者能批的射程"。实测下来**甲走成了纯仓内实现**（`go.mod` 0 字节、⛔ fork／⛔ replace、泵语义按 `A502` 那句"Go→页面回话只有 `Run()` 形兑现"由新件端口过来）⇒ 那栏问的"代价取舍"**由这一发自己付清了**：代价＝新件 31 KB＋五枚测试件重锚；**他的批准不再挂在"要不要做"，只挂在"看到之后满不满意"**。⛔ 我据此**替他答了 `Q-84`**（没答，是消解）——他若说"回退"，走上面那枚口令。
 - **记我第二处**：**我代提 `3b806876` 时只跑了 `go build`、没跑 `d22scan`** ⇒ 一笔带红门的遗产进树（ban #9 幻引），由 r1b 抓到并修。定式（写给下一程）：**代提死腿遗产，必须跑 `go build` ＋ `d22scan` ＋长度门三把**，⛔ 只跑第一把。
+
+## A873｜2026-10-13 09:5x｜★机主 09:4x 授权"能合并就合并"⇒ **`dsh/feat/frontend-p0-v2` 已并入 `dev`**（`36b44ee4`，双亲＝`971fa411`＋`16c2f038`）＋★**新版屏已重建进 exe 并当场给他看**（读数见 §3）
+
+**来路**＝机主 09:4x 原话：「旧版屏我看到了，尽快把 worktree 的新版屏给接进来吧，git你看了没什么冲突，能合并就合并了，这旧版屏不对，少不少东西」。⇒ 前一条（10-07 "先不合，等构建带页面修完再说"）的前置**当天已闭合**（票 299 管道通了），本授权即行。
+
+### 1. 合并前预演三把尺（全部现跑，⛔ 拍脑袋）
+
+| 尺 | 读数 |
+|---|---|
+| `git merge-tree --write-tree dev dsh/feat/frontend-p0-v2` | **rc=0 零冲突**（结果树 `058ba4e2…`） |
+| dev 自分叉点 `c1b10089` 起**动过 `frontend/` 的提交** | **0 笔**（`git log --oneline c1b10089..dev -- frontend \| wc -l`） |
+| 两侧改动文件集**交集** | **空集**（`comm -12` 两把 `diff --name-only`） |
+| 该分支的改动面 | **43 枚、全在 `frontend/**`**（源件/组件/样式/脚本＋`package.json`/lock；⛔ 一枚出圈） |
+
+⇒ 判定：**干净快进式的合并**，⛔ 需要解冲突、⛔ 需要动别人家的面。
+
+### 2. 合并落地（照本仓纪律）
+
+- 落法：`git merge --no-ff --no-commit` 后先核暂存集射程（`git diff --cached --name-only \| grep -vc '^frontend/'`＝**0**）再落笔 ⇒ `36b44ee4`（**双亲** `971fa411`（dev）＋`16c2f038`（那棵树的 tip））。
+- ⛔ push（授权 `A813` 只在编排者核过之后才用；本轮⛔ 推——那个 commit 是机主的活，推不推等他说）。
+- **合并后的门禁**：`sh scripts/d22scan.sh` **rc=0**（件 `logs/d22scan-after-merge.txt`）——★这一把是新前端**第一次进 dev 的射程**：`ban #6 frontend/ examined 107 text files`、`ban #8 frontend/ 107`，**clean**（旧数 85 ⇒ 107＝那棵树把源件带进来后的新分母）。
+- 依赖面：合并后的 `frontend/package.json` 与那棵树**逐字节相同**（`cmp`），差别＝多一枚 `liveline` 依赖＋两条 `render:/vendor:` 脚本名 ⇒ dev 那份旧 `node_modules` **不含它**。
+  - 处置：把 dev 的旧依赖树**改名**为 `frontend/node_modules.bak-oldpkg`（⛔ 删），再把那棵树的 `frontend/node_modules` **拷进来**（同锁安装，离线可复现）；复核尺＝两边 `find -type f` 各 **7493** 枚、`.bin`/`vite`/`typescript`/`liveline` 全在、`cp_rc=0`。
+  - ⚠ 记一笔：中途我用 `cmd //c robocopy …` 两发**都没成**（第一发静默、第二发被外层拦成 `error: too many arguments`）⇒ 换成 bash `cp -r` 6.6 秒完成；**robocopy 的 `rc=1` 在 Git Bash 里⛔ 当失败/成功读数**（它只代表"有复制发生"），这条留给下一程。
+
+### 3. 新版屏那一发（真机）
+
+- 重建：`scripts/build.ps1 -Env dev`（前置＝`node_modules` 已换成新锁那份；⛔ 动 `frontend/dist` 的跟踪锚）⇒ 读数与截图见本节追笔。
+- 起窗＋`Ctrl+Alt+P`＋截图：同 `A872` §3 的手法（`cmd /k` 起、热键、整屏＋裁图，⛔ 图不进版本库）。
+
+**§3 追笔（2026-10-13 09:4x 现跑）**：
+- **重建**：`scripts/build.ps1 -Env dev`（件 `logs/rebuild-newfe-094301.txt`）⇒ `frontend ok: 4 file(s)… assets\index-B5RoShAG.css=94840 assets\index-DPGo6Rsp.js=586983 index.html=1044`、**出处闸门过**（这一发 npm 加进两枚快照外的新名）、`go build ok`、`doctor: PASS`；`build/wisp.exe`＝09:43／31,379,386 字节（旧版那发是 31,299,002 ⇒ 页面字节变大与 js 从 551,989 → 586,983 对得上）。
+- ★**真机那一发**：`cmd /k` 起（PID 33284）＋我合成 `Ctrl+Alt+P` ⇒ 控制台逐字 **`wisp: panel window is up (panel-hotkey, cold 894.1 ms, hot path 0.0 ms)`** ＋ `CreateWebResourceResponse: Needed attempt 2 of 3`；截图两张（`shots3/panel-newfe.png` 全屏＋`…-crop.png` 特写，⛔ 不进版本库）里逐字可读的**新版界面**：标题行 `Wisp panel`、大字「**一缕在这儿**」、正文「**上下文与用量还没有收到数据。面板不自己造这个数字。**」、输入框占位「＋ 输入消息...」＋麦克风/发送两枚图标、「**档位未知**」标签、左栏图标列 ⇒ **旧版屏（"还没有收到结果…"那一版）已被换掉，机主要的"新版屏"在盘上、在屏上**。
+- ⚠ 此刻那枚实例（PID 33284）**留着给机主看**；他看完我再停（具名 `-Id`）并跑票 299 `AC#4` 的整包成对。⚠ 与此同时 `frontend/node_modules.bak-oldpkg`（旧依赖树）留在盘上（⛔ 删；下一轮问机主要不要清）。
+- ⚠ **一处留给下一程**：`dev` 的 `frontend/` 现在是"那棵树的 43 枚覆盖进来"的形状，而那棵树工作区里**还有 2 枚未提交改动**（`fixtures/composer-states.html`／`styles/tokens.generated.css`）⛔ 随合并进来——以后若要"dev 的页面与那棵树逐字节同"，先看那两枚。
