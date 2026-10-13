@@ -1151,10 +1151,10 @@ func (b *Bridge) book(ctx context.Context, req agent.ToolRequest, dec Decision,
 	grantID int64, kind OutcomeKind,
 ) {
 	b.log("tools: call kind=%s task=%s corr=%s tool=%s risk=%s decision=%s "+
-		"outcome=%s rules_hit=%v in_allowlist_scope=%v grant_id=%d reason=%q",
+		"outcome=%s rules_hit=%v in_allowlist_scope=%s grant_id=%d reason=%q",
 		kind, req.TaskID, orDefault(req.CorrelationID, req.TaskID), req.Name,
 		dec.LevelString(), dec.DecisionColumn, kind.outcomeColumn(),
-		dec.RulesHit, b.inScope(dec), grantID, dec.Reason)
+		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Reason)
 
 	// Ticket 105 AC#2: this is the production reader of ticket 102's rewrite
 	// account. Until here the only consumers of Roots()/RewrittenRoots()/
@@ -1218,19 +1218,55 @@ func (b *Bridge) pathAccount() (roots, rewritten, unusable []string) {
 	return b.paths.Roots(), b.paths.RewrittenRoots(), b.paths.UnusableRoots()
 }
 
-// inScope reports whether every judged path landed inside [fs] allowed_dirs -
-// the audit line's cheap answer to "did the gate wave this through or did it
-// actually belong here".
-func (b *Bridge) inScope(dec Decision) bool {
+// scopeVerdict is the audit line's in_allowlist_scope as THREE states, because
+// two states were one field carrying two meanings (ticket 173).
+//
+// scopeIn / scopeOut mean the judge DID look at paths and answered; the old
+// booleans were fine there and stay one word each. scopeUnjudged means no path
+// ever reached the judge - a blank path is dropped by pathArgs before C19 sees
+// it, a tool may declare no path parameter at all, or the call was refused
+// before C19 ran - so the line must not render the absence as a verdict.
+//
+// The third value is `false`'s opposite, not its cousin: the old cheap `true`
+// ("judged, and in range") and the tempting replacement `false` ("judged, and
+// out of range") are BOTH false sentences about a call nobody judged; the
+// second one would additionally paint every pathless call as out-of-bounds and
+// drown the field's real signal (票面原话). `unknown` ("no verdict exists")
+// is the only one of the three that is true here.
+type scopeVerdict int
+
+const (
+	scopeUnjudged scopeVerdict = iota
+	scopeIn
+	scopeOut
+)
+
+// token renders one verdict as the audit line's field value.
+func (v scopeVerdict) token() string {
+	switch v {
+	case scopeIn:
+		return "true"
+	case scopeOut:
+		return "false"
+	default:
+		return "unknown"
+	}
+}
+
+// scopeVerdictOf reports what C19 actually judged about this call's paths.
+// b.paths == nil or an empty decision path list is the shape a call has before
+// (or without) any scope judgment; anything else was handed to the judge, and
+// the same two answers as before are returned.
+func (b *Bridge) scopeVerdictOf(dec Decision) scopeVerdict {
 	if b.paths == nil || len(dec.Paths) == 0 {
-		return true
+		return scopeUnjudged
 	}
 	for _, p := range dec.Paths {
 		if strings.Contains(p, "无法规范化") || !b.paths.InAllowlist(p) {
-			return false
+			return scopeOut
 		}
 	}
-	return true
+	return scopeIn
 }
 
 // nextSeq allocates one task's monotonic tool_call.seq.
