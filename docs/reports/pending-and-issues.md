@@ -17409,3 +17409,10 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **裁定① `role_chat_pair`（一字段写两键）＝成立**。理由：`roles.chat` 的**两种半态都被 `validateRoles` 拒**（β 两枚独立键在结构上不存在）⇒ "每方法恰一 key path" 纪律的**意图**（防一方法乱写多组无关键、防回执含糊）不因"单个语义单元的最小原子组"被违背；A877① 的「⛔ α 单字段 pair」**只辖实时段**（那里 β 可行），本裁定不是它的反例。**三条件**：ⓐ 组内键**逐一枚举、恰两枚**（`roles.chat.provider`＋`roles.chat.model`），落第二张可写表时两枚 dotted path 都列明；ⓑ **原子**（全成或全败；失败＝文件逐字节不变——落地腿已有该断言）；ⓒ 回执**两名键都报**（沿用票 248 回执纪律）。**撤销口令**「313 role_chat_pair 不留」。
 - **裁定② 第二张可写表（`config_write_313.go`）＋门两表并查＝成立**。理由：票 248 冻结钉（`config_route_248_test.go:271-277`）钉的是**第一张表**；"只许追加、⛔ 改既有断言"下的唯一合法形＝**新表＋并集门**（改既有表＝动冻结断言，须另一场批准）。**三条件**：ⓐ 第一张表与那枚钉**一字未动**（落地腿 `git diff` 现证 0）；ⓑ 并集由**单一 accessor** 计算，⛔ 不许第三处列名册；ⓒ 落地腿补一枚**并集等值钉**（union == 表1∪表2 的现读断言），防将来单边丢字段。**撤销口令**「313 二表并查改回一表」。
 - **连带**：落地腿（落点包 `probes/313/r1/10-cmdwisp-landing-package.md`）**待 `294-v1` 收口后放行**（面互斥：294 工作流的 `cmd/wisp` 相位未闭）；页面规格件 `docs/evidence/s1/313-panel-ask.md` 的转交＝**机主动作**（本波汇报已给"件在哪"）。⛔ 未 push。
+
+
+## A882｜2026-10-13 21:29:01 +08｜【记我】313 票尾 bullet 一度误落"幽灵文件名"（`313-model-config-in-panel-and-ui.md`——我猜测件名时 `open(...,'a')` 把不存在的路径直接创建了）；已修正：bullet 补进真件 `313-default-provider-stepfun-and-model-config-stays-in-the-ui.md`、幽灵件 `git rm`、账目留档
+
+- **经过**：A881 落笔时我用错文件名（真件名见上），commit `ed45d16e` 把 bullet 写进**新建**的 `313-model-config-in-panel-and-ui.md`（幽灵票 ⇒ 会污染票池计数）。**本轮自查现跑**发现（`git show ed45d16e --stat`＝`create mode`），同轮修正：真件补同一 bullet＋幽灵件删除＋本账。**幽灵存活窗口＝`ed45d16e`→本笔（未 push、未出本机、未进任何名册/普查口径）**。
+- **同轮外查**：`314` 的 bullet 核对为**改真件**（`4cf3a09c` stat＝修改非新建 ✓）；其余本会话我触碰的票文件（294×3 笔）均为真件追加。**教训钉**：⛔ 再不用"猜的件名"直开 append——落笔前 `ls .scratch/wisp/issues/ | grep '^NNN'` 现查。
+- ⛔ 未 push。
