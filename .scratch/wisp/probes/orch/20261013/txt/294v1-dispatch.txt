@@ -1,0 +1,23 @@
+票 294 验收腿 `294-v1` —— 非实现者验收（攻三枚判据的牙＋逐格判语；2026-10-13 21:2x 编排者现写）
+
+## 0. 你是什么
+- 验收腿（**非实现者**：你未写过票 294 的任何产码/测试件）。你的活＝攻"判据真假"：恒红/恒绿/空集通过/"诚实的降级检测器"都算没牙；每枚仪器要有"把判据弄坏必须红"的独立证明。
+- 输入：票面 `.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md`（AC#1..#5＋2026-10-09 裁定节＋2026-10-11 更正节）；仪器＝`cmd/wisp/resident_mute_294_test.go`＋`cmd/wisp/resident_mute_294_windows_test.go`（代提 `e480e15b`→续腿复核 `ca777e8f`）；前任原件 `probes/294/r1/logs/**`（**只读**）；续腿件 `probes/294/r1b/**`（**只读**）。
+- 起手落 `probes/294/v1/logs/00-head.txt`（`git log -1 --format='%H %ad %s'`＋date 逐字）。
+- 编排者已收件复跑：现树 `-run TestAC294` 四枚全 PASS（前置读数）；你仍须自跑并做下述变异对拉。
+
+## 1. 攻哪几处（每格＝裁决一行＋尺一行＋件名）
+1) **AC#1（AST 形钉）**：自造**第三种**变异（⛔ 别抄 r1 的 D1/D2）：如 overlay 把生产行 `rb.attachMuteGate(raudio.toggleMute)` 的接收者/实参换掉、或把走查的 SelectorExpr 层去掉——**两个方向都看**（变红算牙在；若变恒 0/恒绿＝假钉，具名）。红/绿＋还原证明（`-overlay` 或仓外备份＋sha256）。
+2) **AC#2（真窗 mute 注册）**：复跑 `-run TestAC294MuteHotkeyRegistersLiveOnARealBallWindow`；把镜像常量 `hkMute294` 改假（overlay）⇒ 必须红（同源尺的牙）；核 SKIP-LOUD 未触发（有桌面的机子上 skip＝没交读数）。
+3) **AC#3（executed==true＋M2 反形）**：自造**不抄 r1** 的变异（如翻 `case gate.Muted():` 支；或把断言改成"读句子"——后者必须红＝证明它没在读句面）。还原证明。
+4) **AC#5 交集口径**：核 r1b 的"同树 overlay-stub 对"方法学（稳定名册 122=122 `cmp`、唯一差＝4 枚新名）＋"死区降格"具名（prescribed 5 发全死 157.2–174.4s、死点 4 枚）；抽一发定向复跑 `-run TestAC29`（⛔ 别撞整包死区）。
+5) **AC#4 越界**：逐笔 `git show --name-only` 过 `e480e15b`＋`ca777e8f`＋中间账，十枚禁列路径 0 命中。
+6) **产出裁决表** `docs/evidence/s1/ticket294-294-v1-accept-v1.md`：AC#1..#5 逐格「成立/不成立＋一句判语＋复跑尺一行」＋"哪里没牙/哪里没跑"具名＋**翻框建议**（翻框归编排者）。
+- ⚠ 已知 HEAD 级红（⛔ 别算 294 的账、⛔ 修）：`TestTicket255RosterStillMatchesTheActualReadSites`（台账 A878＝313-r1 引入）；真窗族（AC14/AC4Focus）颜色随会话漂；票 314 死区（整包 157–215s 整进程死）。
+
+## 2. 纪律
+- 写面：`probes/294/v1/**`＋裁决表 1 枚＋票 294 尾 **1 条** bullet；⛔ 改票面原句／⛔ 翻框／⛔ 动产码与两枚仪器件、`probes/294/r1/**`、`r1b/**`（全只读）。
+- 变异**一律** `-overlay` 或仓外备份＋sha256 还原证；⛔ 裸改跟踪文件不还原。
+- 只 commit ⛔ push；`git add`/`commit` 显式 pathspec；件纪律（⛔ `.out`／⛔ `probes/**` 下 `.go`／⛔ 件名带 `§`／长名先跑 `sh scripts/check-path-length-budget.sh --with-self-test`）；输出预算 ≤6 件、每件 ≤200 行。
+- 跑 `./cmd/wisp` 重包前 `tasklist` 自证（并行腿 `229-v1` 只跑 `internal/tools`，不撞）；`GOTMPDIR` 只许 C: 卷。
+- 交件自报**哪格没做完**。

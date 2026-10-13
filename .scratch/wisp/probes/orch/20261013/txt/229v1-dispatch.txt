@@ -1,0 +1,21 @@
+票 229 验收腿 `229-v1` —— 非实现者验收（2026-10-13 21:2x 编排者现写）
+
+## 0. 你是什么
+- 验收腿（**非实现者**）。输入：票面 `.scratch/wisp/issues/229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md`；交件 `32bba42c`；仪器＝`internal/tools/spawn_finish_watcher_229_test.go`＋`internal/tools/spawn_roster_census_229_test.go`；证据 `probes/229/r1/{evidence-229-r1.md,logs/}`（**只读**）。
+- 起手落 `probes/229/v1/logs/00-head.txt`。
+- 编排者已收件复跑：`-run Test229` 三枚 PASS；改名行 `internal/tools/subagent_197.go:394` 现读。你仍须自跑并做下述攻击。
+
+## 1. 攻哪几处（每格＝裁决一行＋尺一行＋件名）
+1) **改名两向**：overlay 把 `:394` 改回 `"subagent-finish-"` ⇒ 真路尺＋普查尺必须红（具名哪枚、红句逐字）；还原回绿（sha256 证）。
+2) **正控的反-反（本票验收核心）**：overlay 把 `internal/observe/goroutine.go` 的 WARN 行挪走/改弱 ⇒ `Test229UnknownNameStillRingsLeakAlarm` 必须红（证明正控真咬 WARN 行）。
+3) **普查尺射程/空集形**：读 `spawn_roster_census_229_test.go` 判它扫什么（声称 289 枚/19 站点/14 标签）；自造一发"扫描根弄窄/命中清空"变异看它是否仍能红（空集通过＝假钉，具名）。
+4) **"不在册 5 名"逐枚现跑复认**：`panel-sta`（`cmd/wisp/panel_resident_windows.go:154`）、`balldebug-*`×2（`cmd/balldebug/main.go:251/432`）、`mockllm-stdout-reader`（`internal/llm/adaptertest/mockllm.go:92`）——file:line 与"码里逐字理由"逐枚核；判"只登记未动"属实（`git show 32bba42c --name-only` 现读）。
+5) **AC#5 口径**：安静期 `Count()/PerTask/Unknown` 独立复跑一枚；`thresholds.go`/golden/`goroutine.go` 三张表成员零动核。
+6) **AC#6 归因抽核**：抽 2 枚它归因的"历史红"（255 名册＝A878；`internal/session TestSessionListByWorkspace` 间歇红）现跑复认归因句。
+7) **产出裁决表** `docs/evidence/s1/ticket229-229-r1-accept-v1.md`：AC#1..#6 逐格判语＋翻框建议。
+
+## 2. 纪律
+- 写面：`probes/229/v1/**`＋裁决表 1 枚＋票 229 尾 **1 条** bullet；⛔ 改票面原句／⛔ 翻框／⛔ 动 `internal/tools/subagent_197.go`、两枚仪器件、`probes/229/r1/**`（只读）。
+- 变异一律 `-overlay` 或仓外备份＋sha256 还原证；只 commit ⛔ push；显式 pathspec；件纪律与输出预算同 `294-v1`（≤6 件 ≤200 行）。
+- 跑 `./internal/tools` 前 `tasklist` 自证（并行腿 `294-v1` 跑 `cmd/wisp`，不撞）；`GOTMPDIR` 只许 C: 卷。
+- 交件自报哪格没做完。
