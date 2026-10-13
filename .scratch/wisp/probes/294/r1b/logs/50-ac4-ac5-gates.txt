@@ -36,4 +36,23 @@
 - 件名长度门（新建件前先跑）：`sh scripts/check-path-length-budget.sh --with-self-test` ⇒ rc=**0**（VERDICT GREEN，原件 `00-head.txt` 末节）。
 
 ## 3. 本腿提交（commit 后追加本节；同一把 AC#4 尺）
-（待提交后补：commit hash／件数／十枚禁列逐枚命中／`forbidden-hits`）
+（已补：本腿提交笔 ca777e8f＝58 件＝57 枚 r1b 件＋票面本件；十枚禁列逐枚 0、forbidden-hits=0；票面 +2/-0；见下节）
+
+== 本腿提交 ==
+commit=ca777e8fa7a35cfcdbae7ce40c6cad01b3b51140 2026-10-13 21:14:53 +0800 294-r1b（续腿·票 294）：三格复核不回归（4 PASS＋三发红形指名行）＋AC#5 交集（覆盖区 122=122 零差／resident 区落 314 死区具名、定向 TestAC29 2+2 补尺＝4 枚新名）＋三红逐因＋AC#4 逐笔 0 命中＋四门 rc=0；⛔ 未 push
+files=58
+--- forbidden-path sweep (10 items) ---
+  frontend/ => 0
+  design/ => 0
+  PLAN.md => 0
+  docs/specs/ => 0
+  internal/observe/thresholds.go => 0
+  golden => 0
+  tools/d22scan/allowlist.txt => 0
+  internal/panel/tokens_fourway_test.go => 0
+  internal/panel/l2_grant_boundary_test.go => 0
+  internal/perm/ticket90_persist_test.go => 0
+forbidden-hits=0
+non-r1b paths in commit:
+.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md
+ticket-in-commit numstat: 2	0	.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md
