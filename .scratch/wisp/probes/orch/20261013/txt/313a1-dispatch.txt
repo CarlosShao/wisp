@@ -1,0 +1,33 @@
+票 313 只读普查腿 `313-a1`：界面里配模型——**Go 侧今天真有什么、缺什么、页面侧要做什么**（四张现读表＋判据草案）
+
+## 0. 你是谁、从哪儿接
+
+- **只读腿**（⛔ 写任何产码／测试码一个字节；⛔ `go build`／`go test`／`go vet`／任何编译；`go list` 也别跑——本波编排者另有测试在飞，CPU 要安静。纯文件读取＋`grep`／`git grep`／`git show` 对象层）。腿名 `313-a1`，起手落 `logs/00-head.txt`（`git log -1 --format='%H %ad %s'` 逐字）。
+- 票面＝`.scratch/wisp/issues/313-default-provider-stepfun-and-model-config-stays-in-the-ui.md`，**先通读完**（含机主两段原话与三格 AC）。
+- 背景一句：机主 2026-10-13 定死「**模型与密钥全部在界面上配、⛔ 不走 CLI**；默认供应商＝stepfun（文本走其套餐）；语音 audio3 免费但仅 API ⇒ 语音那条也得有 API 配置面」。前置（面板能显示＋新版前端树已进 exe）＝**均已满足**（票 299 已 `-done`；`36b44ee4` 合并、`44f5bce9` 重建 exe、机主看过新版屏）。本腿＝落地前最后一块料。
+- ★**归属硬规矩**（09-28 现行口径）：`frontend/**` 页面本体归**机主自己的另一枚 agent**；本编队**不写**页面（读已放开）。你的交件里凡"页面侧要做什么"一律写成**可整段转交的规格**（控件/方法名/字段/载荷/规则），⛔ 写成"我去改页面"。
+- ⛔ 先静置到 16:56 之后才动任何命令？——不，现在是纯读，直接开读即可；上面那条"⛔ 编译"是全程硬规矩。
+
+## 1. 你要交的四张现读表（每行＝结论＋尺＋件行号快照；引用前重跑）
+
+**表 A｜`config.get` 今天真读到什么**：`internal/panel/config_handlers.go` 的读 handler → 谁填 `ProviderSettings`／`Credential` → `cmd/wisp` 侧那枚 store leg（现读点名，疑＝`cmd/wisp/panel_config_store.go`）→ 真源（`internal/config` 哪个文件）**逐跳读通**；逐字段列出今天页面能拿到的（含凭据状态是不是只有"已配置/未配置＋引用名"、⛔ 值）。★两问必答：① 被列出的 provider 行**来自哪张表**（catalog？presets？）⇒ "stepfun 在不在今天的行里"现读回答；② 页面那句 waiting"面板没有一个字段能列出「有哪些模型可选」"——**现读判真伪**，模型清单今天从哪张表来（`internal/config/catalog.go` 现读）。
+
+**表 B｜`config.set` 可写面 vs 313 的缺口**：把 `config_handlers.go` 的字段白名单逐枚抄出（建议 `sed -n` 抄原文）＋每枚落到 `config.toml` 哪条真路径（出处现读）；★**缺口点名**：313 `AC#2` 要"语音链（ASR／TTS／实时段）的 provider＋model 也能在界面改"——今天有没有对应可写字段？没有 ⇒ 列**要新增哪几枚字段名**（形状建议＋为什么这个名）、每枚的校验（成对写、provider 须在 catalog、model 须在该 provider 下——`catalog.go` 那三条分支现读逐字）、以及"新增可写字段＝契约变更"要落哪张台账（⛔ 你自己写账，只点名规矩出处）。
+
+**表 C｜"默认＝stepfun"的落点候选**：现读 `internal/config/defaults.go`＋`internal/config/schema.go`＋`catalog.go`，回答：① 今天 roles（chat／ASR／TTS…）没配时行为逐字是什么（降级？哪句）；② "默认选中"今天代码里有没有承载物（role 默认值？preset？——⛔ 把票面那句当现量）；③ 列 **2-3 个候选落点＋每个的代价**＋"用户改过以用户为准"怎么保；④ stepfun 名下今天 catalog 里有哪些 model 可写（逐名抄；⛔ 编名）。
+
+**表 D｜页面侧现状与待办**：现读 `frontend/src/components/harness/settings-page.tsx`（"模型"分类 waiting 文案逐字）＋`frontend/src/components/config-screen.tsx`（"活着的两行"逐行是什么）＋`frontend/src/lib/panel.ts`（声明面：今天是不是只有四枚 `panel.*`、`config.*` 零调用——现跑复认）⇒ 交一张**"页面侧待办"清单**（≤15 行：渲染什么控件、调用哪个方法、数据从哪来、密钥永不回显的写法），写成**可直接整段转交机主外部 agent** 的规格段落。
+
+## 2. 判据草案（313 `AC#1..AC#3` 哪些能 Go 侧自测、哪些必须页面/真机）
+
+每格一行：判据形状＋落在哪个包/件＋"今天能不能自动判"。
+
+## 3. 写面与禁区
+
+- 写面＝`.scratch/wisp/probes/313/a1/**`（新建）＋票 313 尾 **1 条** bullet（1 add／0 del）。
+- ⛔ 改 `internal/**`、`cmd/**`、`frontend/**`、`design/**` 任何文件；⛔ 动 `go.mod`；⛔ 翻任何 AC 框、⛔ 动 Status、⛔ `-done`、⛔ 碰票面原句。
+- ⛔ 起任何窗／任何进程；⛔ 碰 `wisp.exe`／`balldebug.exe`；⛔ 仓内建 worktree；⛔ 删任何目录。
+- git：只 commit ⛔ push；`git add` 与 `git commit` **两处**都带**显式 pathspec**；⛔ `add -A`／`add <目录>`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`。
+- 件纪律：⛔ `.out` 件；⛔ 在 `probes/**` 下建 `.go`；件名短、⛔ 带 `§`；临时件只建不删。
+- 输出预算：**≤5 枚件**、每件 ≤200 行；判语一句＋尺一行＋件名，⛔ 复述票面。
+- 交件时最后一节**具名自报哪格没做完**——编排者会逐把尺复跑。

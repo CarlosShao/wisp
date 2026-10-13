@@ -1,0 +1,13 @@
+票 294 落地腿 `294-r1` —— 发送时补记（2026-10-13 16:3x，编排者现写）
+
+派单正文＝`506a5e3c` 的 `.scratch/wisp/probes/orch/20261012/txt/294r1-dispatch.txt`（逐字照读，那 63 行是主文）。
+本文件只记"从 10-12 15:13 按下到 10-13 16:3x 发送"之间变了的前提；冲突时以本文件为准。
+
+1. 派单 §7 那条前置「`295-r1` 必须先交完」＝**已满足**：295 落地四笔（`d5ef9cb9`→`35744137`→`1c1d7df3`→`421469b7`）已交；非实现者 `295-v1` 已判、六格判语全"成立"（件 `docs/evidence/s1/ticket295-295-r1-accept-v1.md`，两笔 `950aac46`／`9a0c1c9e`）；编排者 10-13 16:5x 收口（收口读数走 `-overlay` 成对尺、仓内字节零动）。⇒ 那段 `toggleMute` 的瞬态变异锚位现在归你。⛔ 忘派单 §7 的起手三问：开工前先跑 `git status --porcelain -- cmd/wisp`（应为 0 行）。
+2. 位点漂移：派单里落点表量于 `2567e3a9`；此刻 HEAD＝**28b083d4**（其间落了票 299 面板宿主大改＋`dsh/feat/frontend-p0-v2` 合并＋票 299 收口改名等）。**⛔ 信任何行号，进场逐枚现跑复认**（派单原文已写死）。两条可复跑的定心数（也⛔ 直接信，进场现跑）：
+   - `git diff --numstat 421469b7..HEAD -- cmd/wisp/resident_audio_windows.go`＝**空** ⇒ 你要瞬态变异的那枚文件自 295 落地后零动。
+   - `git log --oneline 421469b7..HEAD -- cmd/wisp/resident_audio_windows.go`＝**空** ⇒ 无中间提交。
+   - ⚠ 299 期间动过的是 `cmd/wisp/panel_*.go` 那 8 枚（与你的写面无关）。
+3. 盘上既存脏件（⛔ 你的账、⛔ 进你的 commit）：`design/` 下 16 枚"被删除"（别人的，F9 待拍）／`.gitignore`（09-27 起脏）／`go.mod`（10-10 22:28 起脏，`go-webview2` direct/indirect 标记那笔）／根目录几枚散落 `*.txt`／`.scratch/wisp/probes/161/r6/logs/flip-*.txt` 等别家 probe 脏件。你的 `git add` 与 `git commit` **两处**都带**显式 pathspec**、只指派单 §2 那五枚写面。
+4. 其余逐字照旧：§1（票 255 行号锚：⛔ 往 `resident_audio_windows.go` 追加注释；AC#3 反形只做**同行改字**）／§6（gofumpt 两枚既存脏名册＝`models.go` CRLF 假枚＋`panel_transport_35r2_test.go`；导出树六件套一件⛔ 少；`GOTMPDIR` 只许 `C:` 卷；`tasklist` 清零；每枚门禁件自落 `rc=N`）／§7（起手三问；⛔ 翻框⛔ push；输出预算 ≤6 件、每件 ≤200 行；最后自报哪格没做完）。
+5. 发送时刻现场（编排者 16:3x 现跑，供你对表）：`cmd/wisp` 面无别的腿（编排者 295 收口的四发成对尺已跑完，`GOTMPDIR` 全在 `C:` 卷专用根、零残留）；`wisp.exe`／`balldebug.exe`＝0。
