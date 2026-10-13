@@ -1,0 +1,7 @@
+票 313 落地腿 `313-r1a` —— 发送时补记（2026-10-13 18:0x；主文＝`313r1-dispatch.txt`，冲突以本补记为准）
+
+1. **`cmd/wisp` 面此刻归腿 `294-r1`**（它在跑整包门禁）⇒ 本程**只做**：`internal/config/**`、`internal/panel/**`（字段表/读回执/新测试）、`.scratch/wisp/probes/313/r1/**`、`docs/evidence/s1/313-panel-ask.md`。`cmd/wisp/panel_config_store.go` 的 switch 腿（census `b-set.md` B4 第 2 处）**只写成"精确落点包"**（文件＋行＋要加什么）放自家件里，⛔ 动它——归接续腿。
+2. **只许追加**：新增一律做成新字段／新分支／新测试；⛔ 改 `config.get` 既有那两句散文的形状、⛔ 改任何既有断言。动前先量 `grep -n 'SettingsView\|配置可读' cmd/wisp/*_test.go internal/panel/*_test.go`；若判"不 reshape 既有形状就做不成" ⇒ **停手报回**（原因：`294-r1` 的整包门禁在跑，串了读数两边都白干）。
+3. **树在任何时刻必须可编译**：每完成一小步先小射程 `go build ./internal/config/ ./internal/panel/` 再继续。
+4. 其余照主文与 `A877` 四裁定（语音链两枚字段＋显式建行能力〔形状腿裁、边界照 A877②〕＋"默认 stepfun"只做读面半＋读面结构化载荷自由裁）；⛔ 新 C17 方法；⛔ 编模型名（UI 手填退路；真 id 查得到才预置）；⛔ 跑 `./cmd/wisp/` 整包测试。
+5. 台面：门禁照主文 §3（每件自落 `rc=N`；`GOTMPDIR` 只许 C: 卷；`tasklist` 清零）；git 照 §4（两处显式 pathspec、⛔ push、票尾 1 条 bullet、⛔ 翻框/动 Status/-done）；≤6 件、每件 ≤200 行；最后具名自报"哪格没做完"。

@@ -1,0 +1,10 @@
+票 186 只读普查腿 `186-a1`（派单存档 2026-10-13 18:0x；实发内容与本文一致）
+
+- 角色：**只读普查腿**（⛔ 写产码/测试码；⛔ 编译/go 命令；⛔ 不会返回的命令；⛔ 二进制读；grep 限射程；`frontend/**` 只读）。
+- 读：票 186 全 80 行（末两节必读）＋`docs/evidence/s1/181-186-git-detection-census-c1.md`。
+- 交四节（每行＝结论＋尺＋读数）：
+  - **A｜AC#1 三支现跑**（本仓真 git 树、3 worktree）：① `.git/HEAD` 祖先回溯；② `.git/worktrees/` 目录法拿"路径+分支"（拿不到才列 `git worktree list --porcelain` 候选）；③ `refs/heads/`＋`packed-refs` 合并逐名；④ 结论＝不跑 `git` 二进制能不能读全；必须跑 ⇒ 具名报回归 `allowlist.txt`/d22scan 哪条管。
+  - **B｜复量票尾 10-06 节四条子断言**（仍成立/已过期）。
+  - **C｜AC#6 五样连带面刷新**（授权根/产物/C25 名册/会话历史/预算）。
+  - **D｜前端切换器现读**（dev `frontend/src/**` 只读：组件在哪、发什么请求）——给 186-r1 写 ask 表用。
+- 件＝`probes/186/a1/**`（≤4 件、每件 ≤200 行）＋票 186 尾 1 条 bullet；commit 显式 pathspec ⛔ push。
