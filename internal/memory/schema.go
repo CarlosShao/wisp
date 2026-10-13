@@ -132,8 +132,8 @@ CREATE TABLE plugin_state (
 //	     v3 through the same 2->3 step old databases do, so the two paths
 //	     cannot fork on which side creates which table (ticket 166 AC#3).
 //
-// ⚠ D35 is a frozen contract (AGENTS.md §1.1) and docs/specs/SPEC-02 §3 still
-// lists nine tables; this v3 roster extension carries a spec-note debt that
+// ⚠ D35 is a frozen contract (AGENTS.md §1.1) and SPEC-02 §3 still lists nine
+// tables; this v3 roster extension carries a spec-note debt that
 // ticket 166's progress note names for the owner (per AGENTS.md §0 "改契约＝
 // 人工批准" and probes/166/a2 §H).
 const SchemaVersionTarget = 3
