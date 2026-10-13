@@ -2,7 +2,15 @@
 
 package main
 
-// Ticket 33 AC#13 item 2, leg 33-r10.
+// Ticket 33 AC#13 item 2, leg 33-r10. RETOOLED BY 299-r1 (2026-10-13): the entry
+// handover is a NAVIGATION to the entry's synthetic origin URL now
+// (cmd/wisp/panel_host_windows.go serveEntry -> panelEntryURL), not a SetHtml of
+// the entry bytes, because ticket 299 AC#1 had to give the document an origin its
+// relative ./assets/* references can resolve against. The three questions below
+// are the same three AC#13 asked; the third moved one seam out, onto the exact
+// lookup the resource filter answers with (panelAssetLookup), so "the final
+// handover carries the entry's own content" is still checked against the bytes
+// the product serves, not against a call having been made.
 //
 // What this file is: the ruler AC#13 asks for that runs WITHOUT a window. Until
 // now the only case that asked "which document does a cold start end on" was
@@ -13,30 +21,32 @@ package main
 // was pinned by nothing that CI can run. This file pins it on the shipped
 // handover sequence itself (PanelManager.coldStartPageHandover, split out of
 // bringUp by this leg for exactly that reason), against a control that records
-// every document it is handed.
+// every handover act, in order.
 //
-// What the assertions ask - capabilities of the FINAL document, never "how many
+// What the assertions ask - capabilities of the FINAL handover, never "how many
 // times was SetHtml called":
 //
-//	(a) the last document the control was handed is not the document the host's
-//	    own probe step writes. The probe document is CAPTURED AT RUNTIME by
-//	    calling firstRoundTrip against a throwaway sink, not copied from a
-//	    literal in this file, so rewriting the probe page's markup cannot quiet the
-//	    ruler (a content anchor, not a line-number anchor and not a string the
-//	    product could drift away from unnoticed).
-//	(b) the last document carries something a person could look at: after the
-//	    scripts are stripped, its body still holds an element or text. The probe
-//	    page's body is one inline script and nothing else, so a handover that ends
-//	    there is red here too - a second, independent tooth.
-//	(c) when the embed really resolves an entry, the last document carries that
-//	    entry's own bytes and at least one of the element ids parsed out of it.
-//	    That is the "最终文档里含 embed 入口的真内容" half, asked of the resolved
-//	    entry through the same Go seam the product serves from (panel.Assets).
+//	(a) the LAST act handed to the control is a navigation to the entry's
+//	    synthetic URL (panelEntryURL), not a document. The probe document is
+//	    CAPTURED AT RUNTIME by calling firstRoundTrip against a throwaway sink,
+//	    not copied from a literal in this file, so rewriting the probe page's
+//	    markup cannot quiet the ruler (a content anchor, not a line-number anchor
+//	    and not a string the product could drift away from unnoticed).
+//	(b) the probe document is still the FIRST act: cold "usable" is decided on
+//	    the round trip, and AC#13's fix is the ORDER (probe first, entry last),
+//	    not the probe's removal.
+//	(c) the entry URL the final act navigates to is answered, by the filter's own
+//	    lookup, with the resolved entry's bytes: status 200, the entry's content
+//	    type, lookable body content, and at least one of the entry's own element
+//	    ids. That is the "最终交付里含 embed 入口的真内容" half, asked of the
+//	    resolved entry through the same Go seam the product serves from
+//	    (panel.Assets + panelAssetLookup).
 //
 // Deliberately absent: no count of SetHtml calls, no line numbers, no ordering
 // read out of the source text, no real window, no -tags winlive.
 
 import (
+	"bytes"
 	"context"
 	"regexp"
 	"strings"
@@ -49,15 +59,25 @@ import (
 	webview2 "github.com/jchv/go-webview2"
 )
 
-// docSink33r10 is a webview2.WebView that keeps every document it is handed. It
-// also stands in for the engine's one behaviour the cold probe depends on: the
-// inline script of a freshly shown document runs the moment it is shown, so a
-// bound no-argument function (the shape firstRoundTrip registers) is called
-// there. That is modelling, not measuring - no assertion below reads anything but
-// the recorded documents and the embed's own bytes.
+// docAct33r10 is one handover act, in the order the control received it: a
+// document (SetHtml) or a navigation (Navigate). 299-r1 added the ordered log
+// because the entry handover is a navigation now, and "which act was last" is
+// the question AC#13's order fix is measured on.
+type docAct33r10 struct {
+	kind    string // "doc" | "nav"
+	payload string
+}
+
+// docSink33r10 is a webview2.WebView that keeps every document and navigation it
+// is handed, in order. It also stands in for the engine's one behaviour the cold
+// probe depends on: the inline script of a freshly shown document runs the moment
+// it is shown, so a bound no-argument function (the shape firstRoundTrip
+// registers) is called there. That is modelling, not measuring - no assertion
+// below reads anything but the recorded acts and the embed's own bytes.
 type docSink33r10 struct {
 	mu        sync.Mutex
 	docs      []string
+	acts      []docAct33r10
 	initJS    []string
 	evalJS    []string
 	navs      []string
@@ -72,6 +92,7 @@ func newDocSink33r10() *docSink33r10 {
 func (c *docSink33r10) SetHtml(html string) {
 	c.mu.Lock()
 	c.docs = append(c.docs, html)
+	c.acts = append(c.acts, docAct33r10{kind: "doc", payload: html})
 	var pageCalls []func() string
 	for _, f := range c.bindings {
 		if g, ok := f.(func() string); ok {
@@ -110,6 +131,7 @@ func (c *docSink33r10) Navigate(url string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.navs = append(c.navs, url)
+	c.acts = append(c.acts, docAct33r10{kind: "nav", payload: url})
 }
 
 func (c *docSink33r10) Destroy() {
@@ -129,15 +151,6 @@ func (c *docSink33r10) Window() unsafe.Pointer               { return nil }
 func (c *docSink33r10) SetTitle(title string)                {}
 func (c *docSink33r10) SetSize(w, h int, hint webview2.Hint) {}
 
-func (c *docSink33r10) lastDoc() (string, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if len(c.docs) == 0 {
-		return "", false
-	}
-	return c.docs[len(c.docs)-1], true
-}
-
 func (c *docSink33r10) firstDoc() (string, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -145,6 +158,13 @@ func (c *docSink33r10) firstDoc() (string, bool) {
 		return "", false
 	}
 	return c.docs[0], true
+}
+
+// actLog returns every handover act, in order.
+func (c *docSink33r10) actLog() []docAct33r10 {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return append([]docAct33r10(nil), c.acts...)
 }
 
 // attachSink33r10 points a manager at a recorded control the way bringUp does
@@ -231,13 +251,15 @@ func captureProbeDoc33r10(t *testing.T, assets *panel.Assets) string {
 // TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe is ticket 33 AC#13's
 // window-free content ruler. It drives the shipped cold-start handover
 // (coldStartPageHandover, which is bringUp's tail verbatim) against a control that
-// records documents, then asks of the LAST document: is it the probe's own
-// document (it must not be), does it carry lookable content (it must), and does it
-// carry the resolved entry's bytes and element ids (it must, when a bundle exists).
+// records every handover act in order, then asks of the LAST act: is it the probe
+// document's own SetHtml (it must not be), is it the navigation to the entry's
+// synthetic URL, and is that URL answered with the resolved entry's own bytes and
+// element ids (it must be, when a bundle exists). The probe-first half is asked
+// too, because AC#13 fixes an ORDER, not the probe's existence.
 //
-// AC#13's mutation is exactly the first two questions: put firstRoundTrip
-// back after serveEntry and the last document becomes the probe page - different
-// content, no lookable body - so the case is red rather than merely reordered.
+// AC#13's mutation is exactly the last-act question: put firstRoundTrip back after
+// serveEntry and the last act becomes the probe's SetHtml - wrong kind, wrong
+// payload - so the case is red rather than merely reordered.
 func TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe(t *testing.T) {
 	assets, err := panel.BuiltinAssets()
 	if err != nil {
@@ -252,35 +274,53 @@ func TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe(t *testing.T) {
 	attachSink33r10(m, sink)
 
 	rtMs := m.coldStartPageHandover(context.Background(), time.Now())
-	last, ok := sink.lastDoc()
-	if !ok {
-		t.Fatalf("the cold-start handover handed no document to the control at all (rtMs=%v): nothing was served, AC#13's subject moved", rtMs)
+	acts := sink.actLog()
+	if len(acts) == 0 {
+		t.Fatalf("the cold-start handover handed the control nothing at all (rtMs=%v): nothing was served, AC#13's subject moved", rtMs)
 	}
+	last := acts[len(acts)-1]
+	t.Logf("AC#13 33-r10 read: %d handover act(s), first=%s:%q last=%s:%q rtMs=%v entryOK=%v",
+		len(acts), acts[0].kind, head33r10(acts[0].payload), last.kind, head33r10(last.payload), rtMs, entryOK)
 
-	if last == probeDoc {
-		t.Errorf("after a cold start the LAST document handed to the control is byte-for-byte the document the round-trip probe step writes (%d byte(s)). That is ticket 33 AC#13: the user ends on the probe page instead of the panel. Product side: the probe stays - it is where cold usable is decided - but coldStartPageHandover must hand the entry over AFTER it", len(probeDoc))
-	}
-	if !hasLookableContent(last) {
-		t.Errorf("after a cold start the last document carries nothing a user could look at: with its scripts stripped its body is empty (head %q). The panel was never handed over, so the panel window would show a shell. Ticket 33 AC#13 item 2 asks the final document about its content, not about whether a call was made", head33r10(last))
-	}
 	if entryOK {
-		if !strings.Contains(last, string(entryBytes)) {
-			t.Errorf("after a cold start the last document does not carry the embedded entry's own %d byte(s): ticket 33 AC#13's 'final document contains the real embed entry content' is not met", len(entryBytes))
+		if last.kind != "nav" || last.payload != panelEntryURL {
+			t.Errorf("after a cold start the LAST handover act is %s:%q, want a navigation to panelEntryURL %q (ticket 299 AC#1's supply shape: the page's relative ./assets/* references need the synthetic origin, so the entry is navigated to, not SetHtml'd). A last act that is a document is ticket 33 AC#13: the user ends on the probe page instead of the panel.",
+				last.kind, head33r10(last.payload), panelEntryURL)
+		}
+		if acts[0].kind != "doc" || acts[0].payload != probeDoc {
+			t.Errorf("the FIRST handover act is no longer the round-trip probe document (%s:%q) - the probe stays, it is where cold 'usable' is decided, and AC#13's fix is the ORDER (probe first, entry last), not the probe's removal",
+				acts[0].kind, head33r10(acts[0].payload))
+		}
+
+		// The bytes the final act's URL is served from: the resource filter's own
+		// lookup, asked the same question a request under panelOrigin asks.
+		data, ctype, status, reason := panelAssetLookup(assets, panelEntryURL)
+		t.Logf("AC#13 33-r10 serving seam: panelAssetLookup(%q) = status %d %q, %d byte(s), content-type %q", panelEntryURL, status, reason, len(data), ctype)
+		if status != 200 {
+			t.Errorf("the entry URL the final handover navigates to is answered %d %q by the filter's own lookup: the navigation would land on nothing", status, reason)
+		}
+		if !strings.Contains(strings.ToLower(ctype), "text/html") {
+			t.Errorf("the entry URL resolves as content type %q, want an html document", ctype)
+		}
+		if !bytes.Equal(data, entryBytes) {
+			t.Errorf("the entry URL serves %d byte(s) that are not the resolved entry's own %d byte(s): the final handover does not carry the embed's entry content", len(data), len(entryBytes))
+		}
+		if !hasLookableContent(string(data)) {
+			t.Errorf("the bytes the entry URL serves carry nothing a user could look at: with the scripts stripped the body is empty. The panel window would show a shell")
 		}
 		hits := 0
 		for _, id := range entryIDs {
-			if strings.Contains(last, `id="`+id+`"`) || strings.Contains(last, `id='`+id+`'`) {
+			if strings.Contains(string(data), `id="`+id+`"`) || strings.Contains(string(data), `id='`+id+`'`) {
 				hits++
 			}
 		}
 		if len(entryIDs) > 0 && hits == 0 {
-			t.Errorf("after a cold start the last document contains NONE of the %d element id(s) the resolved entry declares %v (head %q): the document in the window is not the panel page", len(entryIDs), entryIDs, head33r10(last))
+			t.Errorf("the entry URL serves content containing NONE of the %d element id(s) the resolved entry declares %v: the URL is not serving the panel page", len(entryIDs), entryIDs)
 		}
-		t.Logf("AC#13 33-r10 read: last document %d byte(s), %d of %d entry id(s) present, entry bytes carried=%v",
-			len(last), hits, len(entryIDs), strings.Contains(last, string(entryBytes)))
+		t.Logf("AC#13 33-r10 read: last act navigates to the entry URL and that URL serves %d of %d entry id(s), lookable=%v, bytes-equal-to-resolved-entry=%v",
+			hits, len(entryIDs), hasLookableContent(string(entryBytes)), bytes.Equal(data, entryBytes))
 	} else {
-		t.Logf("AC#13 33-r10 read: this tree's embed resolves no entry, so the entry-content question has no subject here; the last document is %d byte(s) and carries lookable content=%v; it is not the probe document=%v",
-			len(last), hasLookableContent(last), last != probeDoc)
+		t.Logf("AC#13 33-r10 read: this tree's embed resolves no entry, so the entry-content question has no subject here; the last handover act is %s:%q (the not-built notice branch)", last.kind, head33r10(last.payload))
 	}
 }
 

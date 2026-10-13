@@ -23,23 +23,32 @@ import (
 	"github.com/CarlosShao/wisp/internal/panel"
 )
 
+// panelHostL1Files are the panel host's production sources, as sources: the one
+// file this gate was born reading (panel_host_windows.go) plus the file ticket
+// 299 AC#1 added with the window/pump/registration machinery it brought
+// (panel_control_windows.go). Widened by 299-r1 because the machinery that could
+// open a listener moved there; the claim - the panel host cannot import a
+// listener - covers every file the host is made of.
+var panelHostL1Files = []string{"panel_host_windows.go", "panel_control_windows.go"}
+
 // TestPanelHostOpensNoListeningSocketL1 is AC#3's L1 half: the host production
-// file must not import net or net/http (no listener can be built without them).
+// files must not import net or net/http (no listener can be built without them).
 // The L2 half - reading GetExtendedTcpTable and filtering dwState==LISTEN - runs
 // only on the desktop box (winlive has no CI job) in panel_host_windows_test.go.
 func TestPanelHostOpensNoListeningSocketL1(t *testing.T) {
-	src := filepath.Join("panel_host_windows.go")
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, src, nil, parser.ImportsOnly)
-	if err != nil {
-		t.Fatalf("parse host source %s: %v", src, err)
-	}
 	forbidden := []string{"net", "net/http", "net/netip", "net/mail", "net/tcp"}
-	for _, imp := range f.Imports {
-		path := strings.Trim(imp.Path.Value, `"`)
-		for _, bad := range forbidden {
-			if path == bad || strings.HasPrefix(path, bad+"/") {
-				t.Errorf("panel host imports %q, which can open a listening socket; D29/AC#3 forbid a localhost server", path)
+	for _, src := range panelHostL1Files {
+		fset := token.NewFileSet()
+		f, err := parser.ParseFile(fset, src, nil, parser.ImportsOnly)
+		if err != nil {
+			t.Fatalf("parse host source %s: %v", src, err)
+		}
+		for _, imp := range f.Imports {
+			path := strings.Trim(imp.Path.Value, `"`)
+			for _, bad := range forbidden {
+				if path == bad || strings.HasPrefix(path, bad+"/") {
+					t.Errorf("panel host source %s imports %q, which can open a listening socket; D29/AC#3 forbid a localhost server", src, path)
+				}
 			}
 		}
 	}

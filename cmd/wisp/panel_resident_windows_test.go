@@ -292,6 +292,14 @@ func entryIDProbes(t *testing.T) []string {
 
 // probeJS asks the live document, id by id, whether the entry's elements are there, and
 // posts the answer bitmap back through the door that is already in the page.
+//
+// RETOOLED BY 299-r1's READING SHAPE (not this probe's body): the entry handover is
+// a real NAVIGATION to the entry's synthetic origin since ticket 299 AC#1 (the page's
+// relative ./assets/* references need a base URI a SetHtml cannot give them), so the
+// document is replaced asynchronously - ~0.5s after Show returns on this box - and a
+// single probe fired at the old timing reads the still-current about:blank page and
+// honestly answers "0". awaitEntryReport below re-asks, bounded; this probe stays a
+// single-shot bitmap so "the ids are present" remains the document's own answer.
 func probeJS(ids []string) string {
 	parts := make([]string, 0, len(ids)+2)
 	parts = append(parts, "var b='';")
@@ -302,15 +310,86 @@ func probeJS(ids []string) string {
 	return "(function(){ " + strings.Join(parts, " ") + " })();"
 }
 
+// latestReport returns the LAST report recorded under requestID, so a re-asked
+// probe's answer is the one read.
+func latestReport(h *recordingModeHandler, requestID string) (string, bool) {
+	var out string
+	found := false
+	for _, req := range h.all() {
+		if req.RequestID == requestID {
+			out = req.To
+			found = true
+		}
+	}
+	return out, found
+}
+
+// reportCount counts the reports recorded under requestID.
+func reportCount(h *recordingModeHandler, requestID string) int {
+	n := 0
+	for _, req := range h.all() {
+		if req.RequestID == requestID {
+			n++
+		}
+	}
+	return n
+}
+
+// awaitEntryReport re-asks the live document, bounded, until a report carries at
+// least one present id - or returns the last report the budget produced, which the
+// caller judges. The budget is panelThreadWait (a monotonic deadline; each attempt
+// waits at most probeAttemptSettle for its own answer before re-asking). This keeps
+// ticket 33 AC#13's verdict exactly where it was - the ids must be present in the
+// LIVE document, answered by the page itself - while tolerating the asynchronous
+// handover 299-r1 introduced; when the entry never arrives, the bounded loop ends
+// and the caller's assertion reddens on the last "0".
+func awaitEntryReport(t *testing.T, rp *residentPanel, h *recordingModeHandler, probes []string) string {
+	t.Helper()
+	deadline := time.Now().Add(panelThreadWait)
+	attempts := 0
+	var last string
+	for time.Now().Before(deadline) {
+		attempts++
+		seen := reportCount(h, "ac13-probe")
+		evalOnPanelThread(t, rp, probeJS(probes))
+		settle := time.Now().Add(probeAttemptSettle)
+		for time.Now().Before(settle) && time.Now().Before(deadline) {
+			if reportCount(h, "ac13-probe") > seen {
+				if got, ok := latestReport(h, "ac13-probe"); ok {
+					last = got
+					if strings.Contains(got, "1") {
+						t.Logf("AC#13 entry-id report arrived on probe attempt %d: %q", attempts, got)
+						return got
+					}
+				}
+				break
+			}
+			time.Sleep(20 * time.Millisecond)
+		}
+	}
+	t.Logf("AC#13 no probe attempt over %d attempt(s) saw a present id; last report: %q", attempts, last)
+	return last
+}
+
+// probeAttemptSettle bounds how long one re-ask waits for its own answer before the
+// next attempt. It is an instrument bound on a monotonic clock, never a product
+// threshold, and a slow attempt is reported through the final reading, not retried
+// forever.
+const probeAttemptSettle = 2 * time.Second
+
 // TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe is ticket 33 AC#13's ruler: after a
 // real cold start the document in the window must be the embedded page, not the
 // round-trip probe the host shows while it checks the message channel.
 //
 // The question goes to the live document and the document answers: does it carry the
 // entry's own elements? That form is what gives this instrument teeth against the exact
-// defect - swapping the two SetHtml calls flips the answer from every-id-present to
-// none-present - where "SetHtml was called" or "the entry bytes were read" would tell
-// the two orders apart just as little as the old t.Logf did.
+// defect - putting the probe step back after the entry handover flips the answer from
+// every-id-present to none-present (the re-ask budget in awaitEntryReport spends its
+// whole wait on the probe page in that world) - where "SetHtml was called" or "the
+// entry bytes were read" would tell the two orders apart just as little as the old
+// t.Logf did. 299-r1 retooled the reading shape, not the question: the handover is a
+// navigation now, so the probe is re-asked within a bounded, monotonic budget instead
+// of fired once.
 func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
 	probes := entryIDProbes(t)
 	if len(probes) == 0 {
@@ -320,14 +399,12 @@ func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
 	showAndWait(t, rp)
 	h := mgr.disp.Mode.(*recordingModeHandler)
 
-	evalOnPanelThread(t, rp, probeJS(probes))
-
-	answer := awaitReport(t, h, "ac13-probe", "AC#13")
+	answer := awaitEntryReport(t, rp, h, probes)
 	present := strings.Count(answer, "1")
 	t.Logf("AC#13 page answer (head %s): %q - %d of %d probe id(s) present in the live document",
 		gitHeadShortForTest(t), answer, present, len(probes))
 	if present == 0 {
-		t.Errorf("after a real cold start the live document contains NONE of the %d element ids the embedded entry declares (the page itself answered %q). That is ticket 33 AC#13: the round-trip probe page is the last document shown, so the user sees a stub instead of the panel. Product side: bringUp must hand the entry over AFTER the probe - the probe stays, because it is where cold usable is decided", len(probes), answer)
+		t.Errorf("after a real cold start the live document contains NONE of the %d element ids the embedded entry declares (the page itself answered %q). That is ticket 33 AC#13: the document in the window is not the embedded entry. Since 299-r1 the entry arrives through a navigation plus the resource filter, so this reading is red either when the order is wrong (the round-trip probe page keeping the last word - the defect AC#13 fixed) or when the entry navigation delivers nothing; the fix AC#13 names is the ORDER: bringUp must hand the entry over AFTER the probe - the probe stays, because it is where cold usable is decided", len(probes), answer)
 	}
 }
 

@@ -28,9 +28,13 @@ package main
 //     the first number both times and this case would go red.
 //  3. TestTicket255PanelHostBuildsItsWindowOptions - the consumption half, and
 //     the reason ruler 1 is not enough: this package's production sources carry
-//     exactly ONE webview2.NewWithOptions call site, it lives in the host file, it
-//     takes its WindowOptions from a call to windowOptions, and no int literal may
-//     sit in a WindowOptions block outside that function. Ruler 1 alone is blind.
+//     exactly ONE window-create call site, it lives in the host file, it takes
+//     its geometry from a call to windowOptions, and no int literal may sit in
+//     a WindowOptions block outside that function. Ruler 1 alone is blind.
+//     RETOOLED BY 299-r1: the create call it counts is newPanelControl (the
+//     host stopped going through webview2.NewWithOptions when ticket 299 AC#1
+//     made it drive pkg/edge itself); the claim - one create, fed by
+//     windowOptions - is the one 票 255 AC#4 landed and is unchanged.
 //  4. TestTicket255HostStillDoesNotParseConfigItself +
 //     TestTicket255PanelRosterVerdictIsTheHonestShape - the two things AC#4 was
 //     NOT allowed to break: no config import and no disk read inside the host
@@ -199,11 +203,15 @@ func writePanelConfig255(t *testing.T, dir string, width, height int) {
 // --- ruler 3: the create site actually consumes it -----------------------------
 
 // TestTicket255PanelHostBuildsItsWindowOptions is the wiring ruler: it reads the
-// host's source and demands that the geometry reaching webview2.NewWithOptions is
-// a CALL to windowOptions, that this package's production sources hold exactly one
-// NewWithOptions site and that it is this host file's, and that no int literal sits
-// in a WindowOptions block outside windowOptions' own body. Ruler 1 measures a
-// function; this one measures the create built from it - 255-r6 widened the count.
+// host's source and demands that the geometry reaching the ONE window create is a
+// CALL to windowOptions, that this package's production sources hold exactly one
+// create site and that it is this host file's, and that no int literal sits in a
+// WindowOptions block outside windowOptions' own body. Ruler 1 measures a
+// function; this one measures the create built from it - 255-r6 widened the count,
+// and 299-r1 followed the create site itself: the host creates through
+// newPanelControl now (cmd/wisp/panel_control_windows.go), not through
+// webview2.NewWithOptions, and the call hands windowOptions' answer as its first
+// argument.
 func TestTicket255PanelHostBuildsItsWindowOptions(t *testing.T) {
 	src := readHostFileForGeometry255(t, filepath.Join(hostPkgDir255(t), "panel_host_windows.go"))
 	fset := token.NewFileSet()
@@ -212,7 +220,7 @@ func TestTicket255PanelHostBuildsItsWindowOptions(t *testing.T) {
 		t.Fatalf("parse cmd/wisp/panel_host_windows.go: %v", err)
 	}
 
-	var newWithOptions []*ast.CallExpr
+	var createSites []*ast.CallExpr
 	var windowOptionsBodies []*ast.FuncDecl
 	windowsOptionsLits := map[*ast.CompositeLit]*ast.FuncDecl{} // literal -> enclosing func
 	var inFunc *ast.FuncDecl
@@ -224,8 +232,8 @@ func TestTicket255PanelHostBuildsItsWindowOptions(t *testing.T) {
 				windowOptionsBodies = append(windowOptionsBodies, node)
 			}
 		case *ast.CallExpr:
-			if sel, ok := node.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "NewWithOptions" {
-				newWithOptions = append(newWithOptions, node)
+			if calleeName299r1(node) == panelCreateCall299r1 {
+				createSites = append(createSites, node)
 			}
 		case *ast.CompositeLit:
 			if isWindowOptionsLit255(node.Type) {
@@ -234,36 +242,29 @@ func TestTicket255PanelHostBuildsItsWindowOptions(t *testing.T) {
 		}
 		return true
 	})
-	sites255 := newWithOptionsSitesInPackage255r6(t, fset, hostPkgDir255(t))
-	if len(newWithOptions) != 1 || len(sites255) != 1 {
-		t.Fatalf("cmd/wisp production sources carry %d webview2.NewWithOptions call sites [%s] and cmd/wisp/panel_host_windows.go itself carries %d, want 1 and 1: AC#4's claim is about the geometry THIS create takes, and a second create anywhere in this package's shipped code - not just in this file - would be a second answer to check", len(sites255), strings.Join(sites255, " "), len(newWithOptions))
+	sites255 := createSitesInPackage299r1(t, fset, hostPkgDir255(t))
+	if len(createSites) != 1 || len(sites255) != 1 {
+		t.Fatalf("cmd/wisp production sources carry %d %s call sites [%s] and cmd/wisp/panel_host_windows.go itself carries %d, want 1 and 1: AC#4's claim is about the geometry THIS create takes, and a second create anywhere in this package's shipped code - not just in this file - would be a second answer to check", len(sites255), panelCreateCall299r1, strings.Join(sites255, " "), len(createSites))
 	}
 	if len(windowOptionsBodies) != 1 {
 		t.Fatalf("found %d declarations of windowOptions, want 1", len(windowOptionsBodies))
 	}
 
-	// The create's argument block must name windowOptions for its geometry.
-	foundGeometryCall := false
-	ast.Inspect(newWithOptions[0], func(n ast.Node) bool {
-		kv, ok := n.(*ast.KeyValueExpr)
-		if !ok || !isIdent255(kv.Key, "WindowOptions") {
-			return true
-		}
-		call, ok := kv.Value.(*ast.CallExpr)
-		if !ok {
-			t.Errorf("the create's WindowOptions field is a %T, not a call: the geometry is not being resolved at create time", kv.Value)
-			return false
-		}
-		sel, ok := call.Fun.(*ast.SelectorExpr)
-		if !ok || sel.Sel.Name != "windowOptions" {
-			t.Errorf("the create's WindowOptions comes from %s, want a call to windowOptions - AC#4's whole shape is that ONE function answers the window size", exprText255(fset, call.Fun, src))
-			return false
-		}
-		foundGeometryCall = true
-		return false
-	})
-	if !foundGeometryCall {
-		t.Errorf("the one NewWithOptions call has no WindowOptions field fed by windowOptions(); the number measured in ruler 1 never reaches the create")
+	// The create's FIRST argument must be the windowOptions call: that argument
+	// is the geometry the create block consumes (299-r1 made it an argument
+	// instead of a WindowOptions key, because the control is this package's own
+	// now and does not build a webview2.WebViewOptions literal).
+	create := createSites[0]
+	if len(create.Args) == 0 {
+		t.Fatalf("the one create call passes no arguments at all; the number measured in ruler 1 has nowhere to go")
+	}
+	geom, ok := create.Args[0].(*ast.CallExpr)
+	if !ok {
+		t.Errorf("the create's first argument is a %T, not a call: the geometry is not being resolved at create time", create.Args[0])
+	} else if sel, ok := geom.Fun.(*ast.SelectorExpr); !ok || sel.Sel.Name != "windowOptions" {
+		t.Errorf("the create's first argument comes from %s, want a call to windowOptions - AC#4's whole shape is that ONE function answers the window size", exprText255(fset, geom.Fun, src))
+	} else {
+		t.Logf("255 ruler 3: the one create site is %s at %d, fed by %s", panelCreateCall299r1, fset.Position(create.Pos()).Line, exprText255(fset, geom, src))
 	}
 
 	// No int literal may size a window anywhere except inside windowOptions,

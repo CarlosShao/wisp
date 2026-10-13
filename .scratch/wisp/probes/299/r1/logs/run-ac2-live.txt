@@ -1,0 +1,10 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test ./cmd/wisp/ -count=1 -v -run '^TestPanelPageFetchesItsOwnAssets299$'  (attempt 2, after browser-before-window fix)
+time=2026-10-13T08:26:05.858+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelPageFetchesItsOwnAssets299
+time=2026-10-13T08:26:06.544+08:00 level=INFO msg="panel host: https://wisp.panel/index.html: CreateWebResourceResponse: An attempt was made to reference a token that does not exist."
+    panel_assets_299_windows_test.go:217: 299 AC#2 page report (head 05b5f11f, 2 attempt(s)): "href=https://wisp.panel/index.html;base=https://wisp.panel/index.html;ready=complete;sheets=1;rules=97;root=yes;roottext=100;resjs=1;rescss=1;" | href="https://wisp.panel/index.html" base="https://wisp.panel/index.html" ready="complete" sheets=1 rules=97 root="yes" roottext=100 resjs=1 rescss=1
+--- PASS: TestPanelPageFetchesItsOwnAssets299 (3.08s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.154s
+rc=0

@@ -32,24 +32,24 @@ package main
 //     panic; the nil dereference needs a FORCED WM_QUIT during create (R37) or an
 //     MTA-initialised thread (R32/R39). A test harness still owns its own locked
 //     thread for the local measurements; that harness is not the shipping topology.
-//   - Because the resident thread hands the pump over to the library's own Run(),
-//     a Go->page reply is actually delivered: webview.Dispatch only appends to the
-//     library's private queue and posts a thread message, and the queue's only
-//     reader is Run(). A host that pumps by hand instead never drains it, so the
-//     page's awaited binding reply does not arrive (33-p1 §A, R25 vs R26).
+//   - Because the resident thread hands the pump over to this host's OWN Run()
+//     (cmd/wisp/panel_control_windows.go, ticket 299 AC#1), a Go->page reply is
+//     actually delivered: Dispatch only appends to that queue and posts a thread
+//     message, and the queue's only reader is Run(). A host that pumps by hand
+//     instead never drains it, so the page's awaited reply never arrives.
 
 // What is NOT a library gap (this paragraph was wrong before and is corrected
-// here, ticket 33 AC#13's stop-and-report): AddWebResourceRequestedFilter is
-// exported by pkg/edge, and the claim that a caller cannot size a controller
-// because ICoreWebView2Controller.PutBounds takes go-webview2's INTERNAL w32.Rect
-// does not block anything - (*edge.Chromium).Resize() (pkg/edge/
-// chromium_amd64.go:12) is exported, sizes the controller from its own
-// GetClientRect, and is what the high-level wrapper already calls after a
-// successful Embed (webview.go:343). So "many files served through a resource
-// request filter" is a product-shape decision, not a dependency boundary.
-// What is still NOT proven, and is not claimed here: whether that path gives the
-// panel the 420x260 size this host asks WindowOptions for. Today serving goes
-// through SetHtml over embedded bytes (still offline, still no listener).
+// here, ticket 33 AC#13's stop-and-report), and what ticket 299-r1 landed: the
+// whole resource-filter path is exported by pkg/edge - NewChromium (:47), the
+// WebResourceRequestedCallback arm (:42, checked at :286),
+// AddWebResourceRequestedFilter (:292) - and the host now drives that layer
+// itself (cmd/wisp/panel_control_windows.go). The page is served from the
+// embedded bundle through that filter, at a synthetic origin this process
+// answers in memory: still offline, still no listener, still no port. The
+// about:blank document a SetHtml produced could not resolve the page's
+// relative ./assets/* references, so the entry is NAVIGATED TO at panelEntryURL
+// now - the shape D29 names. Still NOT proven here: whether the on-screen size
+// follows WindowOptions; that is a winlive reading, not a claim this makes.
 
 import (
 	"context"
@@ -383,19 +383,24 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 		return fmt.Errorf("%w: this thread still has an undispatched WM_CLOSE queued for hwnd 0x%X. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message", errPanelRefusedThread, closedHwnd)
 	}
 
-	w := webview2.NewWithOptions(webview2.WebViewOptions{
-		Debug:     false,
-		DataPath:  m.dataPath,
-		AutoFocus: false,
-		// One call, one read: the geometry the window is born with is what this
-		// host's source answers RIGHT NOW (票 255 AC#4). See windowOptions.
-		WindowOptions: m.windowOptions(),
-	})
-	if w == nil {
-		return fmt.Errorf("panel host: WebView2 window creation returned nil (runtime missing or blocked)")
+	// Ticket 299 AC#1: the create is this package's own now (newPanelControl,
+	// cmd/wisp/panel_control_windows.go) - the wrapper's create was the one
+	// layer that could not hand out the *edge.Chromium the resource filter
+	// needs. The geometry still comes from ONE call to windowOptions (票 255
+	// AC#4), read as the OUTER FRAME the CreateWindowEx it feeds reads it as.
+	c, cerr := newPanelControl(m.windowOptions(), m.dataPath)
+	if cerr != nil {
+		return cerr
 	}
 
-	hwnd := windows.HWND(w.Window())
+	// The registration hop (299 AC#1): every request under panelEntryURL is
+	// answered from the embed by the filter this installs. It must run before
+	// the first navigation that can request a resource - i.e. before
+	// coldStartPageHandover's serveEntry - and the probe step below cannot be
+	// affected by it (it shows an about:blank document). Dropping this call is
+	// the measured bad world of 299-r1's counter-control: the page then cannot
+	// fetch its own js/css, because no filter matches the request.
+	c.installAssetFilter(m.assets)
 
 	// The one inbound door. JS -> Go via a bound function over the WebView2
 	// message channel; the returned string is the receipt that reaches the page.
@@ -405,14 +410,14 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 	// The binding AND the page->host transport forwarding are installed together
 	// by installPanelTransport, split out of bringUp so the shipping wiring can be
 	// driven headlessly (ticket 35 AC#6).
-	if bindErr := m.installPanelTransport(w, ctx); bindErr != nil {
-		w.Destroy()
+	if bindErr := m.installPanelTransport(c, ctx); bindErr != nil {
+		c.Destroy()
 		return fmt.Errorf("panel host: bind dispatch door: %w", bindErr)
 	}
 
 	m.mu.Lock()
-	m.w = w
-	m.hwnd = hwnd
+	m.w = c
+	m.hwnd = c.hwnd
 	m.created = true
 	m.mu.Unlock()
 
@@ -468,13 +473,21 @@ func (m *PanelManager) serveNotBuiltNotice() {
 		`</head><body><p>panel assets unavailable: the embedded bundle is not built.</p></body></html>`)
 }
 
-// serveEntry resolves the embedded index.html and pushes it into the control.
+// serveEntry hands the control the entry of the embedded bundle. Since ticket
+// 299 AC#1 that handover is a NAVIGATION to the synthetic origin the resource
+// filter answers from memory (panelEntryURL), not a SetHtml of the bytes: a
+// document's relative ./assets/* references resolve against its base URI, and
+// the about:blank base a SetHtml produces cannot resolve one (measured
+// 2026-10-13: the page never asks, so nothing is intercepted and the window
+// stays white). The Resolve below therefore reads the entry for its PRESENCE
+// only, and failing it keeps the old verdict (the not-built notice); the bytes
+// the page gets still come from the same Assets.Resolve, at request time,
+// through installAssetFilter's callback.
 func (m *PanelManager) serveEntry() error {
 	if m.assets == nil || !m.assets.Built() {
 		return fmt.Errorf("panel host: embedded bundle not built (only the tracked placeholder is present)")
 	}
-	data, _, err := m.assets.Resolve(panel.EntryFile)
-	if err != nil {
+	if _, _, err := m.assets.Resolve(panel.EntryFile); err != nil {
 		return err
 	}
 	m.mu.Lock()
@@ -483,7 +496,7 @@ func (m *PanelManager) serveEntry() error {
 	if w == nil {
 		return fmt.Errorf("panel host: no window to serve into")
 	}
-	w.SetHtml(string(data))
+	w.Navigate(panelEntryURL)
 	return nil
 }
 
