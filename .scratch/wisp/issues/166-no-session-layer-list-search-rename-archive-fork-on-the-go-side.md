@@ -36,3 +36,5 @@
 ## 派单前置条件
 
 票 158 验收交完＋票 161 结案（同一批 `cmd/wisp` 测试写面，避免读数互污）。
+
+- [2026-10-13 18:12 +08] 166-r1（Go 侧会话层，落地腿）：AC#1 量到"列不出"（盘上无会话实体、无列会话出口，`probes/166/r1/ac1-census.txt`）；AC#2 四件出口落 `internal/session/manage.go`（List/Search/Rename/Archive+Unarchive）＋ `internal/memory/dao_session.go`；AC#3 `ddlV3`（{2,3} 步）崩溃原子性＋可重放＋新老库同走一步；AC#4 Fork 复制轮次、不吞原件（变异逐位比对）；AC#5 零字节名册 diff 空。commit `427c62d0`＋`24e36406`＋`e1192509`，⛔ 未 push；读数件在 `.scratch/wisp/probes/166/r1/`。⚠ 具名报回两处：(1) 契约债——本腿动 D35 表名册（schema 2→3，只加不减、未删未放宽任何断言），SPEC-02 §3 prose 仍九表＋`session` 表名撞 SPEC-05「会话」词义，须 owner 拍（见 `probes/166/a2` H1/H2）；(2) 偏离——AC#3 逐字说"加列"，本程交的是"加表"（理由见 `ac3-migration.txt`）。
