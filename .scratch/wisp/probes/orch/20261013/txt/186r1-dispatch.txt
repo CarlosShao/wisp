@@ -1,0 +1,40 @@
+票 186 落地腿 `186-r1`（聊天框那排的 git 识别与"本地／工作树／分支"切换·Go 侧；★页面本体归机主外部 agent）
+
+## 0. 你是谁、从哪儿接
+
+- **落地腿**（写码＋自跑门禁＋自己 commit）。票面＝`.scratch/wisp/issues/186-the-composer-area-should-detect-git-and-let-the-user-switch-between-local-worktree-and-branch.md`（**通读全 80 行**：三样交付、9 格 AC、`AC#2`/`AC#3`/`AC#9` 是重点，末两节"编排者记 10-06""编排者钉入 10-08"必读）。
+- ★**发放条件（编排者在派发时已核）**：`cmd/wisp`＋`internal/panel` 面在 `313-r1` 交件之后才放你开工——起手 `git log --oneline -6`＋`git status --porcelain -- cmd/wisp internal/panel` 现读；有别人的在飞件 ⇒ 停下报回，⛔ 抢跑。
+- 支撑件（先通读）：`docs/evidence/s1/181-186-git-detection-census-c1.md`（09-28 普查，**含票面随后被更正过的两条**——以票尾 10-06 节为准）；`docs/evidence/s1/181-r2-*.md`（若在，改写账户三处消费者修复）。起手落 `logs/00-head.txt`。
+
+## 1. 三条已裁/已钉的东西（照做，⛔ 自行改判）
+
+- **方法名（AC#2 的方向）**：普查结论＝**复用已在册的 `panel.workspace.request`**（把目标当 `input` 走同一枚 `RequestWorkspaceSwitch`＋C26），**不新增 C17 白名单枚**。⚠ 你仍要自己现跑复认这个结论；若量出"必须新增名字" ⇒ **停下报回**（C17 定稿是契约面，编排者落 `A##` 之后再写）。
+- **`A874` 归你的那条旧守卫**：`internal/panel/composer_test.go:272` 的 `TestNoGitSwitchCapabilityInThePanelSurface` 现在**红着**——它的前提（"机主砍掉了 git 切换"）被机主 09-28 `Q-64` 改判（＝做）推翻 ⇒ **改写作废权归本票**：按新契约**重写成结构判据**（切换能力只许走 C17 白名单方法／⛔ 面板自造第二条路），或删除并写明"被 `Q-64` 作废（原话入账 `A368`）"；⛔ 静默删、⛔ 为变绿放宽其它任何断言。
+- **`10-08 19:1x` 钉入的三件读数**（票尾节）：把 handler 接上之后，在**同一个落地笔**里量 ①`workspace.go:141` 那个 `Rewritten:` 填充点的调用者 0→? ②`:120` `Actable()` 闸还挡不挡 ③该支可达性；三读数齐了才评估仪器（要放宽任何断言 ⇒ 停手报回）。
+
+## 2. 交付形状（三样，AC#1-AC#6 逐格照票面）
+
+- **认 git**：读 `.git/HEAD`（祖先目录回溯）→ 报"分支／detached／仓库根"；**非 git 目录显式说人话**（AC#4，⛔ 空、⛔ 点了没反应的按钮）。
+- **列可去处**：工作树清单＋分支清单——**AC#1 三支现跑定读法**（`.git/HEAD` 文件法／`.git/worktrees/` 目录法／`refs/heads/`＋`packed-refs` 合并）；⚠ **跑 `git` 二进制＝一枚新的宿主能力**（全仓今天零次）——要么给出"不跑也能读全"的证据，要么具名报回它归 `allowlist.txt`／`d22scan` 哪条管。
+- **切过去**：in-course＝按 `AC#3` 三问各带判据：(i) 有程在飞时怎么摆（选一支：拒／排队／照切——**选一支并给判据**）；(ii) 显示的那棵树与真用的那棵树**同源**（⛔ 绕过 `RequestWorkspaceSwitch` 自己写一份）；(iii) 审计行必写（现成 `AuditFunc` 腿，⛔ 吞）。**AC#6** 五样连带面（授权根／产物目录／会话历史／污染名册／预算）逐枚答"保留／重建／作废"＋尺——普查已给四样现读（全"保留、不随树走"），你要么坐实要么推翻。
+- 快照字段：git 那维进面板快照（形状你裁；注意 `Snapshot` 在 `internal/panel/composer.go`，填充在 `cmd/wisp/panel_pump.go`——两处都行，但⛔ 动 `frontend/**`）。
+- **AC#9**：把"面板要画哪几枚控件、点下去发哪条请求"写成 `docs/evidence/s1/186-panel-ask.md`（**给编排者转交机主 agent**；⚠ 新前端树里那个切换器 UI 已存在——把它当"页面已就绪"来写规格，⛔ 你去动它）。
+- 票尾追加 **1 条** bullet（1 add／0 del）；⛔ 翻 AC 框、⛔ 动 Status、⛔ `-done`。
+
+## 3. 禁区（票面 AC#5/AC#7 逐字＋本波占面）
+
+- ⛔ 产出任何**模型可调用的 `git.*` 工具**、⛔ 动 `docs/PLAN.md` 的 D34 表、⛔ 把切换塞进 `internal/tools/` 执行面（AC#5 要一枚常驻判据钉住这一点）。
+- ⛔ `frontend/**`、`design/**` 一字；⛔ `docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`thresholds.go`／golden／`internal/risk/**` 零字节；⛔ 动 `go.mod`；⛔ `internal/panel/workspace.go` 既有语义只许**追加**不许改写（带着票 92/102 的裁决）。
+- ⛔ 碰 `probes/161/r6/flip-*.sh`；⛔ 重跑别家台件（就地覆盖型 sink 会洗掉别人的读数）。
+
+## 4. 门禁（自跑、每件自落 `rc=N`）
+
+- `GOFLAGS= go build ./...` rc=0；`gofumpt -l` 你动过的目录空。
+- `go test -count=1 ./internal/panel/ ./internal/config/ -v`（`./internal/risk/` 若碰，**单跑**——并发假红有先例）；`cmd/wisp` 那侧按票面 AC#8：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v ./cmd/wisp/`——⚠ **票 314 已知**：整包在真窗测试区有整进程死亡（5/5 连发、无 panic、无 `--- FAIL` 行）；撞上按〔台面故障〕具名（对票 314 死点两枚测试名）、⛔ 计入牙、补一发再判。
+- `sh scripts/d22scan.sh`＝纯净树 rc=0（`git archive HEAD` 仓外导出树；基线 `ban #8 internal/`=433，多一枚少一枚具名解释）；`bash .scratch/wisp/probes/154/gate-clauses.sh` **比红腿名册不比退码**（今天在册红腿＝`G6neg`）；终态读数取在**你最后一枚 commit 之后**。
+- `tasklist` 清零再跑读数；`GOTMPDIR` 只许 C: 卷；`grep -c` 0 命中会截断 `&&`（`N=$(… || true)`）。
+
+## 5. git 与预算
+
+- git 纪律照抄 `166r1-dispatch.txt` §4（两处显式 pathspec、⛔ push、⛔ `add -A`/目录/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`）。
+- 预算：**≤7 枚件**、每件 ≤200 行；件名短、⛔ 带 `§`；一程做不完 ⇒ 最小增量分笔 commit＋具名报回"哪格没做完"。
