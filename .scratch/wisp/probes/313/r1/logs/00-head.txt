@@ -1,0 +1,16 @@
+commit 39f6341d42657a141a932e0e4a21e51778404253
+Author: CarlosShao <1933942520@qq.com>
+Date:   Tue Oct 13 18:09:28 2026 +0800
+
+    probe(197-a2): 子代理可见性落地前料刷新 — 五格现状逐格现读＋已有落地件盘点＋缺料清单＋最小切法
+    
+    票面「Go 侧零子代理实体」现跑复认已过期（非测试 9 枚＋中文 3 枚）；五枚未勾格
+    （AC#0/1/2/3/6）无一格欠新产码：实体 run.go:780 有生产调用者且常驻
+    resident_task_source_windows.go:462 共用 run.execute；状态 subagent_197.go:99-104
+    四枚＝D43；流 subagent_stream_197_test.go:57 不并流；AC#6 停止出口已由票 221 落
+    task.go:742。缺的是非实现者裁决料（docs/evidence/s1/ 只有 AC#5/AC#4 两枚）。
+    真欠 Go 产码三块：票 229 goroutine 名（internal/ 内，零 cmd/wisp 写面）、票 220
+    （cmd/wisp/panel_pump.go＋gate.go L1 枚举口）、197-r3 尺修 C1-C3（cmd/wisp，spawnText
+    仍零赋值）。⚠ 界面那一跳仍红（panel.ts PanelSnapshot 缺 tasks?/instructions?）。
+    件 .scratch/wisp/probes/197/a2/** 四枚；票 197 尾追加 1 条 bullet（1 add/0 del）。
+    ⛔ 零翻框、零 Status 改动、零产码、零 go 命令、未 push。
