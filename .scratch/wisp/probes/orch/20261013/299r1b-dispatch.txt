@@ -1,0 +1,33 @@
+# 派单存档：`299-r1b`（票 299 `AC#1` 接续腿：修 AC#13 回归＋补反控与门禁＋交件）｜2026-10-13 08:5x｜编排者
+
+## 0. 你来接的是谁的活
+
+上一枚 `299-r1` **死于 150 轮帽、零提交**，它的产码我已**代提**为 `3b806876`（commit message 里标了〔未验证半成品〕）。**那批码不是废码**——它做成了本票最难的一跳：
+
+- 新件 `cmd/wisp/panel_control_windows.go`（31 KB）＝面板宿主自己驱动 `pkg/edge`：窗类／消息泵／RPC 管／**资源过滤器**，注释里逐段标了每段语义从 `go-webview2` 的哪一行搬来。
+- ★**好消息（它的日志在 `probes/299/r1/logs/run-ac2-live.txt`，逐字）**：`TestPanelPageFetchesItsOwnAssets299` **PASS**，且**由页面自报**逐字 `href=https://wisp.panel/index.html;base=https://wisp.panel/index.html;ready=complete;sheets=1;rules=97;root=yes;roottext=100;resjs=1;rescss=1;` ⇒ **页面真的取到了自己的 js 与 css、真的渲染出来了**（票 299 要的就是这件事）。
+- ⚠ **两处没做完，就是你的活**：
+  1. **`AC#13` 被撞红**（日志 `logs/run-realon-rulers.txt` 尾）：真窗那一发 `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` FAIL，逐字 `AC#13 page answer: "0" - 0 of 1 probe id(s) present in the live document` ⇒ **冷启动之后落在窗口里的是探测页、不是真页面**。这是票 33 `AC#13` 已落地的那条次序（`coldStartPageHandover`，见 `panel_host_windows.go:429-456` 的注释），你的新泵必须把它原样保住。
+  2. 新件注释里点名了一枚件 `logs/vet-unsafepointer.txt`，**那枚件不在盘上**（悬空引用）⇒ 要么真跑那发 vet 并把件写下来，要么把注释改成不指空。
+
+## 1. 你要做完的四件（按优先级，⛔ 别扩写）
+
+- **① 修 `AC#13` 次序**（唯一的功能性缺口）：冷启动时"探测页→真页面"的交接次序必须与旧实现等价——判据＝`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` 与 `TestAC13BringUpSurvivesAReusedThreadQuit` 都要绿（后者上一发也红在同一批）。⛔ 不许把判据放宽：那两枚用例是票 33 的钉子，你要让**实现**回到它们的语义，不是让它们适应你的实现。
+- **② 补 `AC#2` ⓑ 反控**（它的日志里只有正发）：把资源过滤器的注册那一跳**摘掉**（临时，⛔ 别提交那个形状）⇒ 页面自报必须**回到白屏/变红**；把那一发的读数落进判语件，然后**复原并证明复原**（blob 逐字节或 sha256 对拉）。
+- **③ 门禁**：`GOFLAGS= go build ./...` rc=0；`sh scripts/d22scan.sh` rc=0；`sh scripts/check-path-length-budget.sh --with-self-test` GREEN；格式两把尺并排（工作树＋**仓外** blob，新增 0 枚）；跑前跑后各查一次 `tasklist` 的 `wisp.exe`／`wisp.test.exe`／`balldebug.exe`＝0，两把读数写进件里。
+- **④ 收尾五枚测试件的"重锚"要说清**：上一发改了 `panel_geometry_255_test.go`／`panel_geometry_255r6_range_windows_test.go`／`panel_host_gate_test.go`／`panel_pageover_33r10_windows_test.go`／`panel_resident_windows_test.go`。它自称是"跟着建窗调用点改名重锚、并把 L1 门**扩宽**到新件（非放宽）"——**逐枚复看并具名回答**：每一处删掉的断言有没有等价的替代（⛔ "看起来没问题"不算），并在判语里给逐枚结论。
+
+## 2. 硬约束（照旧，一条违反＝退回）
+
+- ⛔ 动 `go.mod`／`go.sum`／`.gitignore`／`design/**`／`frontend/**` 一字（含冻结的 CSP `<meta>`）；⛔ 给依赖打 fork／`replace`；⛔ 用 `unsafe` 反射读私有字段（新件里现有那处 `unsafe` 用法要能自证是必要的——若那处正是 vet 报的 `possible misuse of unsafe.Pointer`，按它注释里写的处置来做并留下读数）。
+- ⛔ 起 HTTP listener／开端口；⛔ 新造协程之外的东西照旧（D38(b) 零膨胀、ban #1 裸 `go func(`）。
+- ⛔ 碰 `internal/winsec/**`、SLO 阈值／golden／`thresholds.go`／`allowlist.txt`／D43／C1–C32／D1–D47、三枚冻结件。
+- ⛔ 翻任何 `AC` 框、⛔ 碰 `Status:` 行、⛔ 动 `docs/evidence/s1/**`。
+- git：只 commit ⛔ push；`add` 与 `commit` **两处显式 pathspec**；⛔ `add -A`／`--amend`／`reset`／`stash`／`checkout .`／`clean`／`--no-verify`。
+- 写面＝`cmd/wisp/**`（面板那一族）＋自家 `.scratch/wisp/probes/299/r1b/**`＋**票 299 末尾恰好 1 条** Progress-log bullet（1 加／0 删）。⛔ 提交 `.png`（公开仓）。
+- ★**Go 面此刻是空的**（我这边的整包复跑已收尾）——但下手前仍先 `tasklist` 现查一次；跑完再查一次。
+
+## 3. 交件格式
+
+判语件 **4 枚**（自家目录）：`10-ac13-fix.md`（红→绿两发＋逐字）、`20-ac2-reverse.md`（反控那一发＋复原证明）、`30-gates.md`（每把尺自带 `rc=` 行）、`40-retool-audit.md`（五枚测试件逐枚结论）。`logs/` 仪器件逐字自带 `workdir=`／`command_line=`／`rc=`；0 字节件＝那格没交；"0 命中"旁边站分母。
+**上限 120 轮**（上一枚死在 150）：撞帽前把已完成的落盘＋commit，⛔ 把没跑过的写成跑过。交件时告诉我：改了哪几枚文件、四枚判语件路径＋字节、票尾 bullet 的 commit、以及"⛔ 做完的有哪些"（具名）。
