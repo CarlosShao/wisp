@@ -17372,3 +17372,14 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **裁定③（"默认 stepfun"落点）**：走**候选①（界面预选：零已配置行时模型控件默认高亮 stepfun，不点保存不落盘）**；Go 侧交付＝预设清单＋"是否已配置"＋模型清单**推到页面**（读面）。候选②（首建写入）**⛔**——触 198 钉（"⛔ 为让默认值生效去放宽断言"正是 313 禁区）＋需真模型名（仓内零枚）；候选③（default 标签/运行时兜底）**⛔**——catalog 缺行即拒载＋与 run 退 2 的钉冲突。"用户改过以用户为准"由①的只读高亮天然成立。
 - **裁定④（读面形状）**：config.get 今天**零消费者**（现量 0）⇒ 落地腿可**自由在其回执里加结构化载荷**（预设清单／每 provider 的模型名集合／当前选中／已配置标记；JSON 或分节由腿裁）；⛔ 新 C17 方法；"读不到=说实话"的性质不变（两句先例照旧）。**模型 id⛔ 编名**——UI 须带"手填模型 id"退路；真实 id 若查得到（stepfun 公开文档/清单）可预置，查不到就停手报回。
 - **排程**：313 落地腿**按住到 `294-r1` 交件**（`cmd/wisp` 色＋`internal/panel` 编译面归它）；派单草稿＝`probes/orch/20261013/txt/313r1-dispatch.txt`（⛔ 未发）。
+
+
+## A878｜2026-10-13 20:36:27 +08｜★新编排者接手（换宿主后第一波；旧会话已证停手）＋现量核对全对齐＋294-r1 死腿处置（代提 `e480e15b`＋放 `294-r1b`）＋★★`TestTicket255RosterStillMatchesTheActualReadSites` 漂移定位（＝`89b3b550`/313-r1 引入、非 294）
+
+- **现量核对**（我 20:23 现跑，与交接文档逐条对表）：`HEAD=1b6eb740`（＝交接文档那笔，19:16，⛔ 未推）／`origin/dev=2c764c04`／**未推 249**（＝248＋交接笔）／票池 **302・结案 114**／工作树 848 处（815 未跟踪，含 `design/` 16 枚删除态等既有"别碰"件）／`cmd/wisp` 面上仅 294 两枚未跟踪件（现已被代提）／`wisp.exe`・`balldebug.exe`＝0。**旧会话死亡核**：19:06 后除交接文档本身外**零文件活动**（`find -newermt` 现跑）；294-r1 最后落笔 18:32。
+- **294-r1 判死 ⇒ 死腿处置（骨架 §7.4）**：产物代提 `e480e15b`〔未验证半成品〕〔死腿遗产〕＝两枚新件＋41 枚 logs（提交信息存档 `orch/20261013/txt/294r1-commit-msg.txt`）；★**只跑了四门**（build rc=0／gofumpt 两新件干净／长度门 GREEN／d22scan 工作树 clean）＋**sha256 三核对全中**（`7b20b7f8…`／`ede84f7a…`／`a841f522…`＝腿的绿读记录值）。★核到 **r1 三格其实已做完**（AC#1 绿＋红形 D1/D2＋还原证；AC#2 真窗实读 `id=2 name="mute" binding="Ctrl+Alt+X" status="live" vk=0x58` 非 skip；AC#3 绿＋同行变异红〔句面不改〕＋还原绿＋仓内零动）⇒ 续腿只欠：AC#5 名册交集（原死因格）、post 三红逐因、AC#4 越界核。放行 `294-r1b`（派单 `orch/20261013/txt/294r1b-dispatch.txt` 笔 `2a62f96c`＋send；发送现场＝CPU 37%、面净、进程零）。
+- **★★255 roster 漂移（我定位；非 294、非"新件扰动行号钉"）**：红句逐字＝`section "voice" (field Voice) is read by [cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] in production, the roster names [cmd/wisp/resident_audio_windows.go]`。**因果三证**：① `git log -- internal/panel/config_handlers.go` 末笔＝`89b3b550`（313-r1，18:20:18，就是它的读面载荷 `Voice VoiceSettingsView`＋`v.Voice.CloudASRChain`）；② 时段对表：`28b083d4`（17:5x 295 收口四发）该枚**绿**、pre 六发（树@`0e5253fe` 时代）全绿、post（18:26，含 313-r1）首红；③ 红句自证"in production"。⇒ **HEAD 级欠账**（294-r1b 两侧都会带上它；派单已明令它⛔碰、具名归账）。**处置**＝归 **313 收尾链或 255-r2** 重裁定名册（把新读者补进 `cmd/wisp/config_readers_255.go` 的 voice 行＋按 255 机制补 receipt 行）；**⛔ push 前必须清**。我⛔ 亲自动（非我写面）。
+- **另两红归族**：`TestAC14GoSideEvalPushReachesThePage`（页面自报 title 空）＋`TestAC4FocusReturnToPriorWindowGap33r5`（foreground 未夺取）＝真窗族"颜色随会话漂"（A875 先例＋`diff-pre1-vs-pre4-env.txt` 内部翻色），r1b 按交集法处置。
+- **停车点**：§4.0de 已写（大白话版给机主）。
+- **件**：`orch/20261013/txt/{294r1-commit-msg.txt, 294r1b-dispatch.txt, 294r1b-send.txt}`。
+- **next**＝收 `294-r1b` → `294-v1`（非实现者，攻三格牙＋翻框判语）；候补＝亲裁 313 收尾链 #1 两枚裁定（材料 `probes/313/r1/00-anchor-and-gates.md`）→ 313 落地腿（等 `cmd/wisp` 面空）→ 186 → 197/145 → 314（机主在场对照，窗口开中）→ 推送（推前过 §8.1 门）。⛔ 未 push（249 在仓）。

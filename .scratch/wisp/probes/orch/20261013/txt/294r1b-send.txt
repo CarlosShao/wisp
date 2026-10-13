@@ -1,0 +1,9 @@
+票 294 落地腿 `294-r1b` —— 发送时补记（2026-10-13 20:36:27 +08，编排者现写）
+
+派单正文＝`.scratch/wisp/probes/orch/20261013/txt/294r1b-dispatch.txt`（54 行，先存档后发，笔 `2a62f96c`）。
+本文件只记"从写派单到发送之间变了的前提"；冲突时以本文件为准。
+
+1. 无变化：写存与发送之间（约 10 分钟）`cmd/wisp` 面无其他腿；无新提交（HEAD 仍 `e480e15b`）。
+2. 发送时刻现场（编排者现跑）：CPU 平均 37%（≤70% 补位线内）；`wisp.exe`＝0；`balldebug.exe`＝0；
+   `git status --porcelain -- cmd/wisp`＝0 行；`go build ./...` rc=0；d22scan 工作树 clean；长度门 GREEN。
+3. 附：机主 20:2x 仍在机器旁（票 314"机主在场"窗口开启中）——294-r1b 的 prescribed-form 整包跑＝免费对照数据点。
