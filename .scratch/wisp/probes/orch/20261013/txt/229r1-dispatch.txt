@@ -1,0 +1,37 @@
+票 229 落地腿 `229-r1` —— 修"子代理收尾协程名不在 D38 名册"（小活；2026-10-13 20:5x 编排者现写）
+
+## 0. 你是谁、先读什么
+- 落地腿（写码＋自跑门禁＋commit），腿名 `229-r1`。
+- 票面＝`.scratch/wisp/issues/229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md` 先通读（现量表/后果/判据 AC#1–#6/禁列）。
+- 来源件＝`.scratch/wisp/probes/228/a1/cost-table.md` §8 末节（`subagent-finish-` 那一条）——只读那一节即可。
+- 起手落 `logs/00-head.txt`（`git log -1 --format='%H %ad %s'` 逐字）。⚠ 票面行号/枚数是快照：进场**逐条现跑复算**。
+
+## 1. 你的活（票面 AC#1–#6 为判据；这里只补口径）
+- **AC#2 修法只许"甲"**：把 spawn 名换成**名册内已有形状**（票面倾向每任务前缀那一族——收尾协程本就是任务派生；具体挑哪个前缀由你按语义定并写清）。**乙形（往名册加 `subagent-finish-`）＝动 D38b 表＝须人工批准**：⛔ 你不许自己加。若现量显示甲形不成立 ⇒ **停手上报**（两形利弊写清）。
+  ⛔ 第三支（把 WARN 调轻/删掉）＝削弱仪器，直接判失败。
+- **AC#3 正控必须做**：修后仍要有判据证明"真·不在名册的名字照样 WARN/照样 CategoryUnknown"（种一枚假名字断它响）。
+- **AC#4 全仓普查**（主要价值）：全仓每枚 `observe.Default.Spawn(...)`/`NewRoot(...)` 首参名字逐枚对名册，交"不在册还有几枚、file:line 具名清单 or 零枚读数"。⛔ 只修撞见那一枚＝不合格。
+- **AC#5**：SLO 协程总数口径改前/改后各一枚读数（安静期）具名；`thresholds.go`/golden 一字节⛔动。
+- **AC#6 终态**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1` 到终态＋逐名比红名册（历史在册：`internal/ball` 1＋`internal/panel` 4 属别人地界⛔顺手修；`internal/risk TestResolvePerCallBudget`＝争用型假红，安静 `-count=3` 复量为准）。
+
+## 2. 本波并行与互斥（新增口径）
+- **本波并行腿＝`294-r1b`（在飞，写 `cmd/wisp` 两枚测试件、密集跑 `./cmd/wisp`）**。写面零交集；但 **`./cmd/wisp` 整包同一时刻只许一个在跑**——你每次跑重包/整发前：`tasklist` 现查有无别的 go test 测试二进制在飞（`wisp.exe`/`balldebug.exe`＝0，另查 `.test.exe`/`go.exe` 家族），**有就等 60s 再看（≤12 次），每次等待具名落 logs**（⛔ 并发抢跑）。`./internal/...` 单独跑不受限（CPU 高时也等一下）。
+- 与票 228／197 续腿的串行照票面（起手现查证其在否——按编排者知识**都不在飞**）。
+- 机主现在机器旁、`cmd/wisp` 真窗族颜色可能随桌面活动漂——终态比红名册时按票面"历史在册"口径处理。
+
+## 3. 写面（逐枚点名；其余一律越界）
+- `internal/tools/subagent_197.go`（改名那处，最小 diff）。
+- `internal/observe/goroutine.go` —— **仅当** AC#4 需要补一行说明注释时（⛔ 不改三张表成员/语义；加表成员＝乙形＝须批准）。
+- 你自己新建的测试件（同包 `internal/tools/*_test.go`，命名带 `229`）。
+- `.scratch/wisp/probes/229/r1/**` ＋票 229 末尾 **1 条** Progress-log bullet。
+- ⛔ 其余一律越界：`cmd/wisp/**` 一字（只"跑"不"改"）、`internal/panel/**`、`frontend/**`、`design/**`、`PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结件、别家 probe。
+
+## 4. 门禁
+- `GOFLAGS= go build ./...` rc=0；`$(go env GOPATH)/bin/gofumpt.exe -l`（射程两把并排：工作树 vs HEAD blob；既有脏名册⛔算你的）；`sh scripts/d22scan.sh` rc=0（不纯净时逐枚归因）；`go test ./internal/tools/... ./internal/observe/...` 改前⇄改后各 ≥1 发（重包照 §2 错峰）；每枚门禁件自落 `rc=N`。
+- 跑读数前 `tasklist` 现跑 `wisp.exe`/`balldebug.exe`＝0；`grep -c` 命中 0 ⇒ rc=1 截断 `&&`（`N=$(… || true)`）；报 0 前先看 stderr。
+
+## 5. 件与 git
+- 件纪律：⛔ `.out`；⛔ `probes/**` 下 `.go`；⛔ 件名带 `§`；长名先跑 `sh scripts/check-path-length-budget.sh --with-self-test`；临时件只建不删。
+- git：只 commit ⛔ push；`git add`/`git commit` **两处显式 pathspec**；⛔ `add -A`／amend／reset／rebase／stash／`checkout .`／clean。
+- ⛔ 翻 AC 框／⛔ 动 `Status:`／⛔ 加 `-done`／⛔ 改票面原句；只追加票尾 1 条 bullet（钟点 `date` 插值）。
+- 输出预算：≤6 件、每件 ≤200 行；判语一句＋尺一行＋件名；交件自报**哪格没做完**。
