@@ -17499,3 +17499,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **186-r1 遗产核**：9 枚文件提交干净（含**具名超 §5 预算 2 枚**：`composer_dispatch.go` 过期注释 3 处、`git.go` `GitSwitchBlockedReason` 字面语义）；旧守卫重写为 `TestThePanelSwitchCapabilityRidesOneWhitelistedRoute`（panel 红 6→5）；三仪器编排者复跑 `ok`；**具名欠账 2**（"新建工作树无方法"[须新 C17 枚＋跑外部 git]／"成功回执＋常驻腿快照推送＝H10 最后一跳"）⇒ 交 `186-v1` 按票面 AC 判。
 - **`313-r2` 放行**＝配模型主线的 `cmd/wisp` 收口：落点包两处（`panel_config_store.go:96` 扩 `SettingsView` 六味／`:112-114` 换 `modelNames` 排序切片）＋`ApplySetting` 六 case＋`splitChainValue` 助手＋**A881 条件复核**（ⓐ第一表/248 钉零动现证 ⓑ单一 accessor ⓒ并集等值钉补/核）＋端到端用例（照 248 样式）。
 - **在飞（3）**：`172-r1`（写 tools）／`186-v1`（验收）／`313-r2`（写 cmd/wisp）。CPU 32%（发前现跑）。⛔ 未 push。
+
+
+## A893｜2026-10-13 23:30:46 +08｜★机主问"文档里有没有告诉前端 agent 切到 dev"⇒ 核＋修正：① `313-panel-ask.md` 头部仍钉旧 worktree（**已加⚠更正注，原句保留**）② worktree **零未合并提交**⇒ 可安全退役 ③ 我的转交粘贴块与两份项目记忆同步改口
+
+- **核（现跑）**：`git worktree list`＝主仓@`dev`＋`D:/tmp/wisp136instr-r1/wt-head`（别家残留 detached）＋`D:/wt/fe`@`dsh/feat/frontend-p0-v2`（**落后 dev 2562 笔**）；worktree tip `16c2f038`（9-28 10:18）**已并入 dev**、`HEAD..该分支`＝**0** ⇒ **无未合并工作，切 dev 零代价**。
+- **修正**：`313-panel-ask.md` 头部加更正注——**页面工作直接在主仓 `dev` 上继续，`D:/wt/fe` 退役**（原句为 10-13 合并前快照）。给前端 agent 的转交粘贴块同步补这句（机主手动转交）。
+- **备注（两说并存，以本账为准）**：handoff §3.4（"源树＝worktree，再有改动要再并一次"）与 §6.7（"前端 agent 会在同一条 dev 上提"）本就两说 ⇒ 现统一为 **dev 直作**。**worktree 只建不删**（退役＝不再用，不删目录；`D:/wt/fe` 留作参考）。
+- **撤销口令**：「**前端回 worktree**」。
+- ⛔ 未 push。
