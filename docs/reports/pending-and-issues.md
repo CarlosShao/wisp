@@ -17525,3 +17525,13 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **AC#8 前置（编排者补）**：① 代提 `05-gate-clauses.txt`＋`06-final-cmdwisp.txt` 两枚遗漏读数件（186-r1 未入库；`commit` 同批）；② 三条非 186 红归账＝`TestAC2SealNoticeLandsInTheRunLegLogFile`（`GOTMPDIR=C:\tmp` 环境形、`%TEMP%` 下绿＝非真红）／`TestTicket223ModeLoosening…`＋158.8s 死（票 314 死区）／`G1b` 声明漂移（票 197 面）。
 - **两枚欠账判语**："新建工作树"＝合规"先报不做"形（后续做需新 C17 名先落 `A##`）；"H10 回执＋快照推送"＝不属本票 AC。
 - 在飞（2）：`313-r2`（写 cmd/wisp）／`172-v1`（验收）。⛔ 未 push。
+
+
+## A896｜2026-10-13 23:54:59 +08｜313-r2 收件（三把尺＋编排者抽核过）＋186 收口兑现（`ad2dadd3`）＋派 255-r2（A878 推前必清欠账）＋本波面矩阵具名（单写腿是面饱和，⛔ 非保守）
+
+- **313-r2 收件（三把尺过）**：尺①两笔 commit 在＝`2f8964b9`（产码 2 件：`cmd/wisp/panel_config_store.go` +50/−3、`panel_config_313_test.go` 新 263 行）／`9e3013e4`（交付 6 件：锚＋4 枚日志＋票尾 bullet）；尺②件齐（probes/313/r2 12 枚日志）；尺③**编排者抽核**＝落点现读（`:96` 六味字面量＋`names` 排序切片＋`ApplySetting` 六 case）与声称逐字对上；`go test -count=1 -run 'Test313' ./cmd/wisp/` ＝**ok 3.2s**、`./internal/panel/ ./internal/config/` 同形 ok。★编排者踩坑具名并传递：cmd/wisp 测试须 `third_party/sherpa-onnx` 上 PATH 且用 **MSYS 形状**（盘符形状 `D:/...` 撞 `0xc0000135`）——已写进 255-r2 派单，后续 cmd/wisp 腿照此。
+- **186 收口兑现**：`b052918e`（代提 05/06 两读数件）＋`ad2dadd3`（九格全翻＋Status 留档＋`git mv -done`；A895 在笔内）。票池 -1。
+- **★A878 两处红的具体面（本腿落地使其重裁面扩大；已派 255-r2 清）**：① voice 行读者集需补两枚（`internal/panel/config_handlers.go`＝313-r1；`cmd/wisp/panel_config_store.go`＝313-r2）；② llm 证据行 `panel_config_store.go:96` token 因落点 1 插行漂到 `:98`。⚠ **push 前必须清**（与 AC#6 内容锚改造同批）。
+- **派 255-r2**（写腿；面＝cmd/wisp 两件：`config_readers_255.go`＋`config_receipt_255_test.go`）：AC#6（行号引用→内容锚，token 唯一命中当判据）＋A878 两处重裁；派单存档 `orch/20261013/txt/255r2-dispatch.txt`＋send 记录在盘；⛔ 不翻框（判语归非实现者）。
+- **本波面矩阵具名（单写腿＝面饱和，⛔ 非保守）**：`cmd/wisp` 面＝255-r2 占（写）；`internal/tools`＝172-v1 验收·**突变在跑**（其日志 23:46–23:52 活跃）⇒ 237（-race/突变族）与 313-v（突变验收）按"突变腿绝不并发"排队；`internal/ball`＝260-v2 保持按住（A619"测量互斥"＋突变串行）；`internal/config`＝267-v1 同样按住。CPU 28.6% 有余而**面元可派**——本刻阵容＝写腿 1＋验收 1，172-v1 收口即补位（237→tools；313-v→panel/config/cmdwisp）。
+- **313-v 排队顺位**：255-r2 交件 ⇒ 立刻放 313-v（验收 313-r1+r2 整包；⛔ 与 255-r2 不并发理由＝313 面突变要读 `panel_config_store.go`，与 255 名册引用同文件）。页面侧转交＝机主动作（`docs/evidence/s1/313-panel-ask.md` 已备好，含"直接在 dev 上干"口径）。⛔ 未 push（未推约 305）。

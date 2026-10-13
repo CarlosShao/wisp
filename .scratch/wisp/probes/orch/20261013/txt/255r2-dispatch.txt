@@ -1,0 +1,54 @@
+# 255-r2 派单（票 255 AC#6＋A878 名册重裁；写腿；面＝cmd/wisp）
+
+发送时刻：2026-10-14 00:0x +08。编排者派发。HEAD 现量 `ad2dadd3`。
+你 = Wisp 流水线的落地腿 **255-r2**。身份＝实现者（AC#6 的判语归后续非实现者腿，⛔ 你不翻框）。
+
+## 票与目标
+
+- 票：`.scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md`
+  （通读全文；重点＝票尾 10-10 那节的 `AC#6` 逐字＋边界、以及"禁区"段）
+- 两件事，同一批 commit 落地：
+
+### 一、AC#6：名册里剩下的行号引用逐枚降级为内容锚
+
+- 判据逐字（票面 10-10 节）：**token 唯一命中当判据，行号只当读数**。
+- **能力形两形配对（缺一不许算凭据）**：
+  - ⓐ **在同一枚被引文件里插一行、token 原样保住 ⇒ 这套尺⛔ 不许变红**（今天一定会红＝这就是本格的缺陷面）；
+  - ⓑ **把被引那一行的 token 改掉 ⇒ 必须红且逐名点到那一行**。
+- 现量（编排者 10-14 00:0x 现跑，你引用前自己复跑一遍）：
+  - 名册 `cmd/wisp/config_readers_255.go`：`path:LINE` 命中 **27 枚**（同行重复，去重后 20 枚不同组合）；`:LINE [token]` 形状 **23 枚／22 行**。
+  - 测试侧 `cmd/wisp/config_receipt_255_test.go` 另有 **4 行**带 `.go:数字` 引用。
+  - ⚠ 行号会漂，⛔ 别照抄；一律现跑现读。
+- 边界（票面逐字，逐条照办）：
+  - ⛔ 不许为了"ⓐ 不红"把行号读数整枚删掉＝摘尺（仓内定式：**摘尺不许当修尺**）——行号可作为条目里的**读数字段**保留，但**断言不许再依赖行号**。
+  - ⛔ 不许顺手扩到别的按行号引产码的仪器（各自立格）。
+  - ⛔ 不动三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）、⛔ 不动 `internal/observe/thresholds.go`、⛔ 不放宽任何既有断言、⛔ 不动 `docs/PLAN.md`／`docs/specs/**`。
+
+### 二、A878 两处重裁（313-r1/r2 落地把这两行打红；⛔ push 前必须清）
+
+1. **voice 行读者集**：`TestTicket255RosterStillMatchesTheActualReadSites` 红句形如
+   `section "voice" (field Voice) is read by [cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go cmd/wisp/panel_config_store.go] in production, the roster names [cmd/wisp/resident_audio_windows.go]`
+   （⚠ 集合以你现跑为准）。来路：313-r1（`89b3b550`）加了 `internal/panel/config_handlers.go` 读者；313-r2（`2f8964b9`）加了 `cmd/wisp/panel_config_store.go` 读者 ⇒ 名册 voice 行按名册自己的机制（hotRowClaims 与 sectionReadSites 两面都查）补上这两枚。
+2. **llm 证据行**：名册里引 `panel_config_store.go:96` 的那行 token 因 313-r2 落点 1 插入两行漂到 `:98`（`TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` 因此红）⇒ 随内容锚改造一并重裁（内容锚形下 token 仍在且唯一即绿；读数字段更新为现读数）。
+- 同族先例（票面 10-10 节，你照它的判语纪律办）：`293-r1` 插行后实现者把 `resident_ball_windows.go:316` 改指 `:322`（token 一字未动），`293-v1` 判"⛔ 退回、⛔ 不算改松保绿"。你要做的方向＝让这类行漂**不再打红**（ⓐ），同时 token 真改**必红**（ⓑ）。
+
+## 写面与禁区
+
+- 写面＝**只许** `cmd/wisp/config_readers_255.go` ＋ `cmd/wisp/config_receipt_255_test.go` 两枚（＋你的证据件目录 `.scratch/wisp/probes/255/r2/`）。
+- ⛔ 零产码语义变更（本腿是仪器/名册面）；⛔ 不动 313 面在飞/刚落件（`internal/panel/config_handlers.go`／`config_write_313.go`／`config_313_test.go`／`internal/config/settings_313.go`／`settings_313_test.go`／`cmd/wisp/panel_config_store.go`／`cmd/wisp/panel_config_313_test.go`）——只许**读到**它们；ⓐ/ⓑ 突变探针若挑被引文件，**优先挑非 313 的稳定件**（如 `cmd/wisp/run.go`／`panel_host_windows.go`／`resident_audio_windows.go`），无论挑哪枚，**还原后 sha256 逐字节证**。
+- 共享工作树里别人的脏件别动（现树有 `design/**` 删除态、`go.mod`、`.gitignore`、`?? -` 等既有脏件，全不归你）。
+
+## 纪律（十条，照办）
+
+1. **只 commit、⛔ 不 push**。`git add` 与 `git commit` **都带显式 pathspec**（逐文件列名）；⛔ `git add -A`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 不在仓内建 worktree；临时件**只建不删**。
+2. 台面净：读数前 `tasklist` 查 `wisp.exe`／`balldebug.exe` 无遗留；`GOTMPDIR` ⛔ 只 C: 卷（你自己的例 `C:\tmp\wisp255r2gotmp`）。
+3. **cmd/wisp 测试环境**：`go test` 前把 `third_party/sherpa-onnx` 上 PATH，用 **MSYS 形状**：`PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`；盘符形状（`D:/...`）会撞 `exit status 0xc0000135`（＝DLL 环境红，⛔ 不当被测物）。
+4. **整包 `go test ./cmd/wisp/` 有 314 死区**（157–215s 进程死，5/5）⇒ ⛔ 不许拿整包当判据。判据用 `-run 'TestTicket255'` 全名册（rc=0）＋必要的 `-run` 小射程。
+5. 门禁（每件自落 rc）：`GOFLAGS= go build ./...` rc=0；`gofumpt -l` 动过的两件＝空；`go test -count=1 -run 'TestTicket255' ./cmd/wisp/` rc=0（ⓐ/ⓑ 两形读数在内）；`sh scripts/d22scan.sh` clean；长度门 `sh scripts/check-path-length-budget.sh`（现树理论 GREEN；若 RED 逐字报）。
+6. 突变方法论：ⓐ/ⓑ 用真改文件形时＝**仓外备份＋sha256 改前改后逐字节证**；突变窗口的起止时刻逐枚报出（先例＝`probes/260/r5/evidence.md` §3.3）——现在有他腿在飞，窗口报时刻是纪律。
+7. 票面：只许在票尾 Progress-log **追加 1 条 bullet**（`- [2026-10-14 HH:MM +08] agent=255-r2 did=… next=…`）；⛔ `- [ ]` 框不翻（AC#6 判语归非实现者）；⛔ `Status:`／票名一字不动。
+8. 产出预算：交件 ≤7 枚、新增文本 ≤200 行——`probes/255/r2/00-anchor-and-gates.md`（锚＋现量＋门禁 rc 表＋两形读数＋具名没做）＋`probes/255/r2/logs/` 若干（大原始日志留盘不入库，件里点名路径与字节数）。
+9. **未定义即停**：碰到票面没覆盖的形（某枚引用无处转内容锚、token 在文件里不唯一、名册两半对不上等）⇒ **停手上报**，⛔ 不自己裁一个形硬干。
+10. 回执格式：结论先行（干没干成／红绿）＋两笔 commit 短 sha（产码＋交付件分开）＋每件路径＋门禁 rc＋具名红与没做的格＋下一位要点。
+
+发送时刻现量：HEAD `ad2dadd3`；在飞他腿＝`172-v1`（internal/tools 验收·突变，与你的面零重叠）；CPU 28%（三发均值口径）。
