@@ -10,10 +10,10 @@ import (
 )
 
 // A REAL v1 database (schema_version=1, with seed data written through the
-// normal write path) must migrate to v2 on reopen: provider_health appears,
-// the seed data survives, and the pre-migration backup exists. This is the
-// upgrade path every existing Wisp installation takes when the binary moves
-// from the ticket-04 schema to the ticket-09 schema.
+// normal write path) must migrate to the CURRENT target on reopen:
+// provider_health and the v3 session tables appear, the seed data survives, and
+// the pre-migration backups exist. This is the upgrade path every existing Wisp
+// installation takes when the binary moves past the ticket-04 schema.
 
 func TestMigrateSeededV1DatabaseToV2(t *testing.T) {
 	dir := filepath.Join(sealableTempDir124(t), "data")
@@ -53,10 +53,10 @@ func TestMigrateSeededV1DatabaseToV2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 2. Reopen at the production target (2): the 1->2 step must run.
+	// 2. Reopen at the production target: the 1->2 and 2->3 steps must run.
 	fresh, err := Open(dir)
 	if err != nil {
-		t.Fatalf("reopen (migrate v1->v2): %v", err)
+		t.Fatalf("reopen (migrate v1->v3): %v", err)
 	}
 	defer fresh.Close()
 
@@ -65,8 +65,8 @@ func TestMigrateSeededV1DatabaseToV2(t *testing.T) {
 		`SELECT value FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != "2" {
-		t.Errorf("schema_version = %q, want 2", v)
+	if v != "3" {
+		t.Errorf("schema_version = %q, want 3", v)
 	}
 
 	// 3. provider_health now exists with the v2 shape and is usable.
@@ -97,17 +97,19 @@ func TestMigrateSeededV1DatabaseToV2(t *testing.T) {
 		t.Errorf("memory rows after migration = %d, want 1", memories)
 	}
 
-	// 5. The pre-migration backup for the 1->2 step exists (SPEC-02 §7);
-	// the dir also holds the 0->1 backup from CREATING the v1 database, and
-	// nothing else.
+	// 5. The pre-migration backups for BOTH steps exist (SPEC-02 §7); the dir
+	// also holds the 0->1 backup from CREATING the v1 database, and nothing else.
 	if _, err := os.Stat(filepath.Join(dir, "backup", "wisp.db.bak-1-2")); err != nil {
 		t.Errorf("pre-migration backup missing: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "backup", "wisp.db.bak-2-3")); err != nil {
+		t.Errorf("pre-migration backup for the v3 step missing: %v", err)
 	}
 	entries, err := os.ReadDir(filepath.Join(dir, "backup"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	wantBackups := []string{"wisp.db.bak-0-1", "wisp.db.bak-1-2"}
+	wantBackups := []string{"wisp.db.bak-0-1", "wisp.db.bak-1-2", "wisp.db.bak-2-3"}
 	if len(entries) != len(wantBackups) {
 		t.Errorf("backup dir = %v, want %v", namesOf(entries), wantBackups)
 	}

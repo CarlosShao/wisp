@@ -126,7 +126,17 @@ CREATE TABLE plugin_state (
 //	v2 - provider_health (2026-09-19 LLM access supplement, SPEC-03 §3.1 /
 //	     SPEC-02 §3 note; ticket 09): per provider+model runtime observation
 //	     state (probe results, last error, latency, quota state).
-const SchemaVersionTarget = 2
+//	v3 - session management (ticket 166): the cross-restart conversation
+//	     entity (`session`) plus its turns (`session_turn`). Added as its own
+//	     migration step so NO text of ddlV1/ddlV2 changes: new databases reach
+//	     v3 through the same 2->3 step old databases do, so the two paths
+//	     cannot fork on which side creates which table (ticket 166 AC#3).
+//
+// ⚠ D35 is a frozen contract (AGENTS.md §1.1) and docs/specs/SPEC-02 §3 still
+// lists nine tables; this v3 roster extension carries a spec-note debt that
+// ticket 166's progress note names for the owner (per AGENTS.md §0 "改契约＝
+// 人工批准" and probes/166/a2 §H).
+const SchemaVersionTarget = 3
 
 // ddlV2 appends the provider_health table (SPEC-02 §3 note, schema v2). The
 // DDL below mirrors the ```sql block in docs/specs/SPEC-02-data-storage.md
@@ -168,6 +178,7 @@ type txExec interface {
 var migrationChain = []migrationStep{
 	{from: 0, to: 1, apply: applyV1},
 	{from: 1, to: 2, apply: applyV2},
+	{from: 2, to: 3, apply: applyV3},
 }
 
 // applyV1 creates the eight D35 tables + indexes and seeds schema_version=1.
@@ -183,6 +194,56 @@ func applyV1(tx txExec) error {
 // applyV2 creates the provider_health table (ticket 09 primitive).
 func applyV2(tx txExec) error {
 	for _, stmt := range splitSQLStatements(ddlV2) {
+		if _, err := tx.ExecContext(context.Background(), stmt); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ddlV3 adds the session-management tables (ticket 166): the persisted
+// conversation the ticket makes listable / searchable / renameable /
+// archive-able / forkable, plus its turns (the "正文" the search reads).
+//
+// Why its own const and not an edit of ddlV1: a new database reaches v3 through
+// the 2->3 step exactly like an existing one, so there is never a shape where a
+// fresh table comes from CREATE and an upgraded one from ALTER - the divergence
+// ticket 166 AC#3's second half exists to prevent.
+//
+// Naming: the entity carries SPEC-05 §5's word "会话", which there means the
+// WITHIN-BOOT voice session (唤醒 → 90s 空闲). A cross-restart conversation
+// sharing that word is an open naming question (probes/166/a2 §H1), so this DDL
+// uses the table name `session` (the name the ticket and the a2 census both
+// use) and leaves the vocabulary ruling to the owner rather than inventing a
+// second term here.
+const ddlV3 = `-- 会话管理（schema v3：票 166，跨重启的对话）
+CREATE TABLE session (
+  id          TEXT PRIMARY KEY,          -- 会话 id（crypto/rand 铸，非派生；与 C31 的 session.ID 同形）
+  title       TEXT NOT NULL,             -- 用户可见标题；改名写这里，不动任何 id
+  workspace   TEXT NOT NULL DEFAULT '',  -- 工作区标签；'' = 未归属
+  created_at  INTEGER NOT NULL,
+  updated_at  INTEGER NOT NULL,
+  archived_at INTEGER,                   -- NULL = 活动；归档 = 写时间戳；撤销 = 置回 NULL
+  forked_from TEXT                       -- NULL = 原件；分叉出的新会话指回原件 id
+);
+CREATE INDEX idx_session_updated ON session(updated_at);
+CREATE INDEX idx_session_workspace ON session(workspace, updated_at);
+
+-- 会话轮次（"正文"）：搜索的正文面。改名/归档/分叉都不动这些行
+-- ⇒ 原会话历史逐字仍在（票 166 AC#4）。
+CREATE TABLE session_turn (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  session_id TEXT NOT NULL REFERENCES session(id),
+  seq        INTEGER NOT NULL,
+  role       TEXT NOT NULL,              -- 'user' | 'assistant' | …
+  content    TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX idx_session_turn_session ON session_turn(session_id, seq);`
+
+// applyV3 creates the session tables (ticket 166).
+func applyV3(tx txExec) error {
+	for _, stmt := range splitSQLStatements(ddlV3) {
 		if _, err := tx.ExecContext(context.Background(), stmt); err != nil {
 			return err
 		}

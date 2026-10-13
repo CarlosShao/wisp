@@ -1,0 +1,13 @@
+# 166-r1 — AC#1 未修码读数：今天能不能列出历史会话
+
+判语：**量不到**（本票成立）。盘上既没有"会话"这个持久实体，也没有任何"列会话"的出口。
+尺（三把，均限射程、只读）：
+  1. `grep -c 'CREATE TABLE' internal/memory/schema.go` ⇒ **9**（schema_meta/profile/memory/task_log/tool_call/approval_grant/cost_daily/plugin_state/provider_health）
+  2. `grep -rn 'CREATE TABLE session' internal/memory/*.go` ⇒ **0 命中**（无会话表；对话本体只在 `internal/agent/loop.go` 的内存 `history []llm.Message` 里）
+  3. `grep -rn 'ListSessions|list_sessions|session.list|ListConversations' cmd internal --include='*.go'` ⇒ **0 命中**
+  4. `grep -n 'case "' cmd/wisp/main.go` ⇒ CLI 十枚子命令：run/providers/doctor/secret/models/slo/panel-assets/panel-inbound/version/help —— **无一枚列历史**
+  5. `grep -rn 'ListTaskLogs' cmd internal --include='*.go' | grep -v _test` ⇒ **3 行**，全是 `internal/memory` 自家（`:92` 注释、`:93` 定义、`privacy.go:76`、`privacy.go:214`）⇒ 包外生产调用者 0
+
+命令面一条：`wisp <子命令>` 十枚名册里没有列会话的入口（尺 4）。
+API 面一条：全仓无 `ListSessions` 一类出口（尺 3）；连最近邻的 `ListTaskLogs` 也只有 privacy.go 自家在叫（尺 5）。
+⇒ 结论：AC#1 成立 —— "今天列不出历史会话"不是"应该做不到"，是**盘上没有实体、没有出口**两件事同时成立。
