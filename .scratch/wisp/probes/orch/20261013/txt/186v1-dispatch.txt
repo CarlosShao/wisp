@@ -1,0 +1,25 @@
+票 186 验收腿 `186-v1` —— 非实现者验收（Go 侧：git 识别/清单/切换接线＋旧守卫重写＋页面 ask 表）（2026-10-13 23:5x 编排者现写）
+
+## 0. 你是什么
+- 验收腿（**非实现者**）。攻"判据真假"：每枚仪器"弄坏必须红"；空集通过/恒绿/恒红都算没牙。
+- 输入：票面 `.scratch/wisp/issues/186-the-composer-area-should-detect-git-and-let-the-user-switch-between-local-worktree-and-branch.md`（80 行，末两节必读）；交件 `341ca42e`（⛔ 该腿死于 ECONNRESET，但工作全落盘＋票尾 22:3x 有完整交件记录）；证据 `.scratch/wisp/probes/186/r1/logs/{00-head,01-ac1-ac2-recheck,02-three-readings,03-ac6-five-surfaces,04a,04b}`＋普查 `.scratch/wisp/probes/186/a1/{A,B,C,D}*.md`＋`docs/evidence/s1/186-panel-ask.md`；台账 `A874`（旧守卫归因）、`A877`。
+- 起手落 `.scratch/wisp/probes/186/v1/logs/00-head.txt`。
+- 编排者已收件复跑（前置）：`-run 'TestThePanelSwitchCapabilityRidesOneWhitelistedRoute|TestTheWorkspaceSwitchLegCannotMutateARepo|TestTheRealSwitchLegReachesTheSuccessPathWithACleanAccount' ./internal/panel/`＝`ok`。
+
+## 1. 攻哪几处（每格＝裁决一行＋尺一行＋件名）
+1) **AC#3(i)"照切"的常驻仪器的牙**：`TestTheWorkspaceSwitchLegCannotMutateARepo` 声称两向（真腿零命中＋种 `exec.Command("git","checkout")` 的副本必红）——**自造第三向**（如种 `os.WriteFile`/`exec.Command("git","reset")` 变体）⇒ 红＋还原证。
+2) **AC#3(ii) 同源**：读 `cmd/wisp/panel_resident_windows.go`＋`resident_task_source_windows.go` 的 `WorkspaceScopeHolder.Bind(run.paths)` 接线——核"面板切的就是任务管线那一枚 scope"（⛔ 只信注释：找同一枚指针/同一枚 struct 的行证）。
+3) **重写守卫的牙**：`TestThePanelSwitchCapabilityRidesOneWhitelistedRoute`——自造突变（如造一枚自造 `panel.*` 字面量／第二条路由）⇒ 必红（⛔ 别抄交件里的形）；还原证。
+4) **九枚文件偏差复核**：逐笔 `git show --name-only 341ca42e` 核范围；`composer_dispatch.go` 三处过期注释改动、`git.go` `GitSwitchBlockedReason` 字面语义改动的两枚在册判据（只断言非空）各现跑一发；核**零冻结件**（`PLAN.md`/specs/`allowlist`/`thresholds`/golden/三冻结件/frontend/design）命中。
+5) **三读数抽核**：`02-three-readings` 的 0→1／`Actable()` 仍挡／成功路径值域 `{false}`——抽一发现跑复认。
+6) **AC#6 五样抽核**：抽 2 样（建议 C25 名册 `dec.TaskID`、预算两处行号）现跑复认"保留"。
+7) **AC#9 复核**：`186-panel-ask.md`＝页面规格（7 控件＋信封＋缺口），⛔ 未动 `frontend/**`（现跑核）。
+8) **两枚具名欠账按票面 AC 判**："新建工作树无方法"／"成功回执＋常驻腿快照推送＝H10 最后一跳未做"——逐条判"属本票 AC 内？"（属⇒不成立/附条件；不属⇒登记）。
+9) **产出裁决表** `docs/evidence/s1/ticket186-186-r1-accept-v1.md`：AC#1..AC#9 逐格判语＋翻框建议＋"哪格没牙/没跑"具名。
+
+## 2. 纪律
+- 写面：**`.scratch/wisp/probes/186/v1/**`（全路径）**＋裁决表 1 枚＋票 186 尾 1 bullet；⛔ 改票面原句／⛔ 翻框／⛔ 动产码（除 overlay 瞬态）、`probes/186/r1`、`probes/186/a1`（只读）。
+- 变异一律 `-overlay` 或仓外备份＋sha256 还原证；只 commit ⛔ push；显式 pathspec；件纪律（⛔ `.out`／⛔ probes 下 `.go`／件名⛔ `§`；≤6 件 ≤200 行）。
+- 并行腿：`313-r2`（写 `cmd/wisp/panel_config_store.go`＋用例）、`172-r1`（写 `internal/tools`）——**树会呼吸**：锚点引 HEAD 对象层；跑前 `tasklist` 自证、`./cmd/wisp` 重包错峰、等待具名落 logs；`GOTMPDIR` 只许 C: 卷。
+- 已知红（⛔ 别算 186 的账）：panel 5 枚既有红（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestC21DesignTokensFourWayAgree`／`TestComposerContractTypesMatchFrontend`／`TestStreamLogDroppedNamingLedgerIsNotBounded35r8`／`TestStreamLogFloodBelowKeyBoundIsNotBounded35r8`）＋`cmd/wisp TestTicket255Roster…`（A878）＋`internal/session` 间歇＋`internal/risk` 争用假红＋票 314 死区（157–215s）。
+- 交件自报哪格没做完。

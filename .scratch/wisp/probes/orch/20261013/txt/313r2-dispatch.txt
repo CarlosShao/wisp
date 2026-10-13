@@ -1,0 +1,30 @@
+票 313 落地腿 `313-r2` —— 执行"cmd/wisp 精确落点包"（配模型·Go 侧收口）（2026-10-13 23:5x 编排者现写）
+
+## 0. 你是谁、先读什么
+- 落地腿（写码＋自跑门禁＋commit），腿名 `313-r2`（前任 `313-r1` 已交 Go 侧半：读面载荷＋第二张可写表＋六枚 setter，见 `89b3b550`）。
+- **逐字照读**：`.scratch/wisp/probes/313/r1/10-cmdwisp-landing-package.md`（93 行，落点 1/落点 2＋助手＋"顺手做的一件事"逐条）＋票面 `.scratch/wisp/issues/313-default-provider-stepfun-and-model-config-stays-in-the-ui.md`＋台账 `A881`（两枚裁定的**三条件**）＋`A877`（四枚落地前裁定）。
+- 起手落 `.scratch/wisp/probes/313/r2/logs/00-head.txt`（`git log -1` 逐字＋date；⚠ 落点包行号量于 `39f6341d`——**逐枚现跑复认，别信行号**）。
+
+## 1. 你的活（落点包逐字为判据；偏离先停手）
+- **落点 1**：`cmd/wisp/panel_config_store.go` 的 `ReadSettings`——`:96` 扩 `SettingsView`（Presets/PresetsKnown/ChatProvider/Configured/ConfiguredKnown/Voice 六味，逐字照抄）；`:112-114` 计数改 `modelNames` 排序切片（`sort`/`config` 已在位）。
+- **落点 2**：`ApplySetting` switch 在 `FieldProviderCredential` 前追加六 case（逐字）；文件尾加 `splitChainValue` 助手（逐字）。
+- ⛔ 不动的三处（落点包明令）：不可读支 `:94`／`res.Tier=EffectiveRestart`（`:228`）／`credentialValue` 那条路——一字不动。
+- **A881 条件复核（落地腿须现证）**：ⓐ 第一张表与票 248 冻结钉**一字未动**（`git diff` 现跑 0）；ⓑ 并集由**单一 accessor** 计算（无第三处列名册）；ⓒ **补一枚"并集等值钉"**（union == 表1∪表2 的现读断言）——若 `313-r1` 已放，现跑核；缺则你补（放你的新件）。
+- **顺手做**：照 `cmd/wisp/panel_config_248_test.go` 样式补一发端到端用例（空配置→建 stepfun 行→写云链→写 pair）；⛔ 改任何既有断言（`config_route_248_test.go:271-277` 那枚钉一字不许动）。
+- 完成判据：六枚 case 各有一发"落到真 setter"的证据＋端到端用例绿＋A881 三条件各一条现读。
+
+## 2. 写面（逐枚点名；其余越界）
+- `cmd/wisp/panel_config_store.go`（落点包两处＋助手）；你新建的用例件（带 `313`，同包 `cmd/wisp/`）。
+- `.scratch/wisp/probes/313/r2/**`（**全路径**）＋票 313 尾 **1 条** bullet。
+- ⛔ 其余越界：`internal/panel/config_write_313.go`／`config_handlers.go`／`internal/config/settings_313.go`（313-r1 已交，除必要的**只读核**）、`PLAN.md`、`docs/specs/**`、`allowlist.txt`、`thresholds.go`、golden、三冻结件、`frontend/**`、`design/**`、`go.mod`、别家 probes。
+
+## 3. 本波并行与互斥
+- 并行腿：`186-v1`（验收，overlay 突变 `internal/panel` 若干件）＋`172-r1`（写 `internal/tools`）——**树会呼吸**：锚点引 HEAD；跑前 `tasklist` 自证、`./cmd/wisp` 重包错峰（等待具名落 logs）；`GOTMPDIR` 只许 C: 卷。
+- 已知红（⛔ 别算你的账）：panel 5 枚既有红＋`cmd/wisp TestTicket255Roster…`（A878）＋`internal/session` 间歇＋票 314 死区（157–215s，撞上按〔台面故障〕具名、不计牙）。
+
+## 4. 门禁（每件自落 `rc=N`）
+- `GOFLAGS= go build ./...` rc=0；gofumpt 你动过处空；`go test -count=1 ./internal/panel/ ./internal/config/` 与 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 ./cmd/wisp/` 改前⇄改后各 ≥1 发；`sh scripts/d22scan.sh` rc=0；长度门先跑。
+- 变异（如用）：`-overlay` 或仓外备份＋sha256 还原证；⛔ 裸改不还原。
+
+## 5. git 与预算
+- 只 commit ⛔ push；`git add`/`commit` 两处显式 pathspec；⛔ `add -A`/目录/amend/reset/rebase/stash/clean；件名短⛔ `§`；输出预算 ≤6 件、每件 ≤200 行；交件自报**哪格没做完**。
