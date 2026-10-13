@@ -1,0 +1,30 @@
+票 173 落地腿 `173-r1` —— 审计行 `in_allowlist_scope` 两态字段装两种意思（2026-10-13 22:1x 编排者现写）
+
+## 0. 你是谁、先读什么
+- 落地腿（写码＋自跑门禁＋commit），腿名 `173-r1`。
+- 票面＝`.scratch/wisp/issues/173-the-audit-line-prints-in-allowlist-scope-true-when-nothing-was-judged-blank-path-both-meanings-one-field.md`（54 行，通读：主项＋追加同族第二枚＋AC#1–#5＋推荐＋"本票不解决"＋派单前置）。
+- 来源件：`docs/evidence/s1/162-risk-tier-accept-v3.md` §14 第 (c) 条（可只读该节）＋台账 `A339`。
+- 起手落 `probes/173/r1/logs/00-head.txt`（`git log -1` 逐字＋date）。
+
+## 1. 你的活（票面 AC#1–#5 逐格；只补口径）
+- **AC#1**：先钉"未修"读数——造"路径空白、无任何路径被判定过"的调用（先例＝票 162 验收程的 `ping`/`memory.search` 那族）⇒ 未修码审计行今天写 `in_allowlist_scope=true`（可复算）；修后该栏**不得再是 `true`**。
+- **AC#2**：对照两发一字不变——真在范围内→`true`；真越界（R2 族）→`false`；摘掉任一分支对应用例必须红。
+- **AC#3（未定义即停）**：查这一栏字面格式是否属冻结契约（`SPEC-02 §3` `tool_call` DDL／审计行逐字渲染许诺族）。**若属契约面 ⇒ 停手上报**，⛔ 自行改规格文本。
+- **AC#4（主价值）**：全仓"没有任何判定却照样落判定值"的审计/取证字段逐枚点名；**含票面追加的第二枚同族**（`bridge.go:397-404` 审批超时 `ErrorClass` 与人工拒共用 `user_rejected`——分两枚 class 或回执带"超时"一味，选一形并给判据）；已知候选＝票 147 offset 恒 0、`risk=L1/2` 斜杠拼接读法。修不修分别给理由，⛔ 只修手里这一枚。
+- **AC#5**：⛔ 动 `PLAN.md`/`docs/specs/**`/`tools/d22scan/**`/`allowlist.txt`/`thresholds.go`/golden/`frontend/**`/`design/**`；⛔ 新增豁免。
+- **推荐形＝三态**（`true`/`false`/不写或 `unknown`，选一形写明理由）；⛔ 图省事改成"更保守的 false"（票面原话：那只是换一句假话，且会把 `ping` 这类无路径调用全打成"越界"，比现在更糟）。
+
+## 2. 本波并行与互斥
+- 本波并行腿：`186-r1`（写 `cmd/wisp`＋`internal/panel`）、`queue-verify-1`（只读）＋你；另 `294-v1` 收尾中（跑 `./cmd/wisp` 定向）。
+- **你的写面＝`internal/tools/bridge.go` 那一味＋它的用例**（新件命名带 `173`）；成对/突变/`-race` 类读数与在飞腿**错峰**：跑前 `tasklist` 自证无别的 go test 二进制（含 `.test.exe` 家族）；有就等 60s×≤12，等待具名落 logs。⛔ 并发跑突变。
+- ⛔ 动 `internal/tools/subagent_197.go` 与 `spawn_finish_watcher_229_test.go`／`spawn_roster_census_229_test.go`（票 229 刚落的产物）；⛔ 在 `probes/154/**`／`probes/161/r6/**` 被别程改时跑那两把尺（票面前置②）。
+- 前置①复核：起手 `git status --porcelain -- internal/tools` 现读＋交代；前置③台件 gofumpt 干净。
+
+## 3. 门禁
+- `GOFLAGS= go build ./...` rc=0；`$(go env GOPATH)/bin/gofumpt.exe -l` 你动过的目录空；`go test -count=1 ./internal/tools/...` 改前⇄改后各 ≥1 发（重包错峰）；`sh scripts/d22scan.sh` rc=0；每件自落 `rc=N`。
+- 变异：`-overlay` 或仓外备份＋sha256 还原证；⛔ 裸改不还原。
+- 已知 HEAD 级红（⛔ 别算你的账）：`internal/risk TestResolvePerCallBudget` 争用假红（安静 `-count=3`）；`cmd/wisp TestTicket255Roster…`（A878）。
+
+## 4. 件与 git
+- 写面：票面点名那两处（`bridge.go` 那一味＋用例）＋`probes/173/r1/**`＋票 173 尾 **1 条** bullet；⛔ 其余越界。只 commit ⛔ push；`git add`/`commit` 两处显式 pathspec；件纪律（⛔ `.out`／⛔ `probes/**` 下 `.go`／⛔ 件名带 `§`／长度门先跑）；输出预算 ≤6 件 ≤200 行。
+- 交件自报**哪格没做完**。
