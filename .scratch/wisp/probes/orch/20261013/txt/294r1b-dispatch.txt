@@ -1,0 +1,54 @@
+票 294 落地腿 `294-r1b` —— 续程（接死腿 `294-r1` 的遗产；2026-10-13 20:3x 编排者现写）
+
+**正文＝`.scratch/wisp/probes/orch/20261012/txt/294r1-dispatch.txt` 主文（63 行）＋`20261013/txt/294r1-send.txt` 补记，逐字承袭**
+（含 §1 两坑／§2 写面／§3–§5 三格判据／§6 门禁／§7 排他）。
+**固定十条款全部承袭主文**（身份·写面逐枚点名·起手机械三问·⛔翻框⛔Status⛔-done⛔改原句·git 全套〔只 commit ⛔push／
+两处显式 pathspec／禁列〕·件纪律·门禁清单·输出预算／自报缺口·变异先例·"你自报的数不当数"）。
+**本文件只记变的前提与覆写，冲突时以本文件为准。**
+
+## 0. 你接的是什么（先读再动手）
+- 前任 `294-r1` 死于**旧会话整体废弃**（非 314 死区、非轮帽）：最后落笔 `probes/294/r1/logs/` 18:32；未 commit、票尾无 bullet。
+- 它的产物已由编排者**代提**为 checkpoint：commit `e480e15b`〔未验证半成品〕〔死腿遗产〕：
+  - `cmd/wisp/resident_mute_294_test.go` ＋ `cmd/wisp/resident_mute_294_windows_test.go` ＝ **你的写面（可改）**；
+  - `.scratch/wisp/probes/294/r1/logs/**`（41 枚原件）＝ **只读**（引用可，⛔ 改删）；你的件放新的 `probes/294/r1b/**`。
+- ★**前任其实把三格干完了**（编排者已核、sha256 逐字对上：`7b20b7f8…`／`ede84f7a…`／`a841f522…`）：
+  AC#1 绿＋红形 D1/D2；AC#2 真窗实读 `id=2 name="mute" binding="Ctrl+Alt+X" status="live" vk=0x58`（非 skip）；
+  AC#3 绿＋同行变异红（句面不改）＋还原绿＋仓内字节零动。
+  ⇒ 你的活＝**复核三格不回归** ＋ **收尾最后一格**；⛔ 不要重造仪器。
+
+## 1. 你的活（按序；判据/命令照主文 §3–§6）
+1) **三格复核**：现树 `go test ./cmd/wisp/ -count=1 -run 'TestAC294' -v` 应四枚全绿（绿读先例＝
+   `probes/294/r1/logs/raw-ac294-green-final.txt`）；再各跑一发**红形牙复核**：D1/D2 与 AC#3 变异按
+   `logs/ov-ac1-d1.json`／`ov-ac1-d2.json`／`ov-ac3.json` 现挂（`-overlay`），应各红在指名行，去挂回绿。
+   读数落 `probes/294/r1b/logs/`。
+2) **★AC#5 名册交集（前任死在的最后一格）**：改前⇄改后**各 ≥2 发取交集、逐名作差**。二选一（具名写清用哪个）：
+   ⓐ **同树 overlay-stub 对（推荐）**：改后＝现树不挂；改前＝把**你那两枚件** overlay 到空 stub
+     （`package main` 两行，**存 `.txt`**——`probes/**` 下⛔ `.go`），其余路径不动 ⇒ 唯一差＝两枚件的存在；
+   ⓑ 导出树对：`git archive 1b6eb740`（代提前）⇄ `git archive e480e15b`（六件套与 MSYS path 形、`.go` 枚数证非空、
+     `C:` 卷 `GOTMPDIR`——主文 §6 逐字）。
+   计数两把并排（`grep -c -- '--- PASS'` 含子测试／只数顶层），⛔ 相加⛔ 互替；单发名册⛔ 当可靠尺（A875 先例）。
+   **死区降格（主文已赦）**：撞 174–215s 整进程死 ⇒ 不无限重跑，具名标"死区未覆盖"＋死点测试名。
+3) **post 三红逐因**（前任未写完的半）：
+   ① `TestAC14GoSideEvalPushReachesThePage`（页面自报 title 空）② `TestAC4FocusReturnToPriorWindowGap33r5`
+   （foreground 未夺取）＝**真窗族"颜色随会话漂"**（台账 A875 先例：同族在 295 四发里两侧同红；
+   `diff-pre1-vs-pre4-env.txt` 同族在 pre 内部也翻色）⇒ 交集法：两发交集仍红即标"本时段环境红"；
+   ③ `TestTicket255RosterStillMatchesTheActualReadSites`＝★**编排者已定位、非你的**：`89b3b550`（313-r1）在
+   `internal/panel/config_handlers.go` 新增 Voice 读面（`Voice VoiceSettingsView`＋`v.Voice.CloudASRChain`），
+   255 名册只列 `cmd/wisp/resident_audio_windows.go` ⇒ roster 漂移（红句逐字含 `internal/panel/config_handlers.go`）。
+   已记台账 A878、归 313 收尾链/255-r2 重裁；**你的两侧都会带上它**，照常具名归"HEAD 级欠账、非本腿"，⛔ 碰（在你禁列）。
+4) **AC#4 逐笔越界**：`git show --name-only --format=<commit>` 逐笔过你的提交与代提笔 `e480e15b`，核十枚禁列路径。
+5) **门禁四数＋票尾 1 bullet＋commit**（显式 pathspec 两处）。每枚门禁件自落 `rc=N`。
+
+## 2. 口径附注（其余照主文）
+- `probes/294/r1/**`＝只读；`resident_audio_windows.go` 只许**瞬态** overlay 变异＋还原证；
+  `config_readers_255.go`/`config_receipt_255_test.go`/`internal/**` 一字⛔。
+- 起手机械三问照主文 §7（①`git status --porcelain -- cmd/wisp` 应为空——你那两件已入 HEAD ②`./cmd/wisp/` 色每波一枚＝你
+  ③非空停手报我）。
+- **314 附记**：你若按 prescribed form 不挂 skip 跑整包——**活过 180s 或死在 174–215s 都记时长与死点**：
+  机主现在在机器旁，这一发就是票 314 的"机主在场"对照数据点（⛔ 当噪音丢掉）。
+- git：只 commit ⛔ push；件纪律与输出预算照主文 §7（⛔ `.out`／⛔ `probes` 下 `.go`／⛔ 件名 `§`／长度门先跑／
+  ≤6 件≤200 行）；最后**自报哪格没做完**。
+
+## 3. 发送时现量（编排者现跑，供对表）
+- HEAD＝`e480e15b`（＝`1b6eb740`＋代提一笔）；`cmd/wisp` 面＝空；`wisp.exe`/`balldebug.exe`＝0；
+  `go build ./...` rc=0；d22scan 工作树 clean；长度门 GREEN。
