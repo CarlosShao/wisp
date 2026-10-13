@@ -1,0 +1,42 @@
+票 166 落地腿 `166-r1`（会话层 Go 侧：列／搜／改名／归档带撤销／分叉——⛔ 界面）
+
+## 0. 你是谁、从哪儿接
+
+- **落地腿**（写码＋自跑门禁＋自己 commit）。票面＝`.scratch/wisp/issues/166-no-session-layer-list-search-rename-archive-fork-on-the-go-side.md`（**先通读全 38 行**：硬约束三条、五格 AC、"本票不解决"、派单前置）。
+- ★**派单前置已满足**（票面那两枚：票 158 验收已交、票 161 已结案——两票 Status 现读）⇒ 票面那句"立而不派"的按住理由作废，**本程开工**。起手落 `logs/00-head.txt`（`git log -1 --format='%H %ad %s'` 逐字）。
+- 本票是**功能票**：建 Go 侧会话管理层（在 `D35` SQLite 模型之上）。界面归 owner 委托的会话 ⇒ `skipped=frontend(owner-delegated)`，⛔ 你在 `frontend/**` 落任何一个字节（落一个 ⇒ 整段停手上报）。
+
+## 1. 本仓此刻的三条"占面"硬约束（⛔ 越）
+
+1. ★`cmd/wisp/**` **此刻被落地腿 `294-r1` 占着**（它的整包测试色＋瞬态变异锚）⇒ **你的实现不落 `cmd/wisp`**。若你盘出"不动它做不完"（例：CLI 子命令、常驻接线），**停下、把精确落点（文件＋行号＋为什么）报回编排者**，⛔ 自己动一格。
+2. `internal/panel/**` **零字节**（票面 AC#5 逐字）——快照/出向面**不是**本票写面（那是票 145/186 的地界）。
+3. 票面 AC#5 那张零字节名册逐枚复查：`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/agent/approval/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**`。
+- **你的写面**＝新建/改 `internal/session/**`＋它真需要的存储落点（先读 `D35` 与既有 `wisp.db` 的代码，**现读点名**存储包与迁移写法；⛔ 新造第二种存储）＋自家 `.scratch/wisp/probes/166/r1/**`＋票 166 尾 **1 条** bullet。⛔ 动 `go.mod`（真要新依赖 ⇒ 停下报回）。
+
+## 2. 五格 AC（票面逐字为准；每格都要"这一发在未修码上响不响"那一问）
+
+- **AC#1 未修码读数（先做）**：现量"今天能不能列出历史会话"（命令／API 各一条；量不到＝本票成立）；
+- **AC#2 四件最小出口**：列（按时间/按工作区）、搜（标题与正文）、改名、**归档带撤销**；
+- **AC#3 迁移那一格（硬）**：加列的迁移交**崩溃原子性**证据——中途被杀之后重开＝"要么全成要么全不成"，不许"表里有半列"；先读本仓既有迁移（`wisp.db` 那族）的写法照做；
+- **AC#4 分叉不吞原件**：拿一发"分叉时顺手清理"的**变异**证——原件历史逐字仍在；
+- **AC#5 契约轴复查**（§1 第 3 条名册逐枚 diff＝零）。
+
+## 3. 门禁（自己跑；每枚读数件自落一行 `rc=N`；⛔ 0 字节件＝那格没交）
+
+- `GOFLAGS= go build ./...` rc=0；
+- `$(go env GOPATH)/bin/gofumpt.exe -l internal/session <你的存储目录>` **空**（⛔ 裸 `gofumpt`＝rc=127，具名不掩盖；机主这台＝`/d/work/base/gopath/bin/gofumpt.exe`）；
+- `go test -count=1 -v ./internal/session/... <你的存储包>` **⛔ 跑 `./cmd/wisp/` 整包**（色归 `294-r1`；且那是票 314 已知会**整进程死亡**的形状）；
+- `sh scripts/d22scan.sh`＝**纯净树** rc=0（照本仓先例：`git archive HEAD` 仓外导出树跑，六件套⛔ 少；⚠ 工作树现带既存脏件〔`design/` 16 枚未提删除、`go.mod`/`.gitignore` 脏〕⛔ 你的账、⛔ 进你的 commit）；
+- 跑读数前 `tasklist` 现跑 `wisp.exe`／`balldebug.exe`＝0；`GOTMPDIR` 若要设**只许 C: 卷**专用根（`%LOCALAPPDATA%\wisp-test-gotmp\166r1-<时间戳>` 一族）；
+- ⛔ 碰 `probes/161/r6/flip-*.sh`；⛔ 重跑别家台件（就地覆盖型 sink 会洗掉别人的读数）。
+
+## 4. git 纪律
+
+- 只 commit ⛔ push；`git add` 与 `git commit` **两处**都带显式 pathspec；⛔ `add -A`／`add <目录>`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；仓内不删文件、不建 worktree。
+- 票面只追加票尾 **1 条** Progress-log bullet（1 add／0 del）；⛔ 翻任何 AC 框、⛔ 动 `Status:` 行、⛔ 加 `-done`、⛔ 改票面任何原句。
+
+## 5. 交件与预算
+
+- **≤6 枚件**、每件 ≤200 行；件名短、⛔ 带 `§`；判语一句＋尺一行＋件名。
+- 先读码再估工：**若一程做不完**（"归档撤销＋迁移原子性"最吃时间）⇒ 按"能合上的最小增量"分笔 commit，把没做完的那一格**具名报回**（⛔ 留半成品不报、⛔ 把"我没看到"写成"跑过了"）。
+- 交件时最后一节**具名自报哪格没做完**——编排者会逐把尺复跑，⛔ 你自报的数当数。
