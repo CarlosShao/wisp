@@ -17458,3 +17458,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **两枚具名欠账（已写进票面 done Status）**：① `AC#1`(c) 反序变异未取独立红形；② `AC#5` prescribed 全包覆盖待票 314 定/修后同形 2+2。
 - 〔观察〕**根 `probes/` 曾被外部清掉**（非腿删；腿改落 `.scratch/wisp/probes/294/v1/`；现跑根 `probes/` 存在但 `git ls-files probes`＝**0**＝从未入库）⇒ **派单写面今后一律写全路径 `.scratch/wisp/probes/<票>/...`**（不带 `.scratch/wisp/` 的简写＝歧义源，本会话多次派单犯过，记我）；本事件无 tracked 件受损。
 - **在飞（3）**：`186-r1`（写）／`173-r1`（写）／`queue-verify-2`（只读）。⛔ 未 push。
+
+
+## A888｜2026-10-13 22:27:07 +08｜收 `173-r1`（`ec2f0864`＋`0f8114db`；三态 `unknown` 落地／AC#3 非契约面／AC#4 第二枚"不改"＋同族登记）＋根 `probes/173` 整树迁回 canon＋放 `173-v1`
+
+- **收件三把尺**：二笔提交在／新件 `audit_allowlist_scope_173_test.go` 193 行在／编排者复跑两枚用例 `ok`。
+- **要点**：`bridge.go` 45+/9-（`scopeVerdict` 三态＋`scopeVerdictOf`＋`token()`，审计行 `%v`→`%s`）；未判定不再印 `true`（红读先钉、修后 `=unknown`）；**AC#3 判"非契约面"**（`in_allowlist_scope` 在 `SPEC-02 §3` DDL/`PLAN.md`/specs **零命中**；"逐字渲染"许诺只覆盖卡片渲染）；**AC#4 第二枚判"不改"**（分两枚 class＝改 D37 枚举须人批准；"超时一味"已三处可读＋新用例 `Test173ApprovalTimeoutKeepsTheTimeoutFlavor` 钉）+逐枚登记（未过 C19 照印 `risk=L0`、`risk=` 混两来源、`grant_id=0`、C25 关行 `dropped=0` 等，只登记不修）；件数 7 超 1（00-head 硬令件）不扣格。
+- **根 `probes/173` 整树迁回 canon**：该腿误落根 `probes/`（简写歧义**第三次**）⇒ `git mv` 进 `.scratch/wisp/probes/173/`（rename 笔 `1e842d63`；canon 依据＝`orchestrator-handoff-20261013.md` §9 文件地图）。**派单写面钉重申＝一律全路径 `.scratch/wisp/probes/<票>/...`**。
+- **放** `173-v1`（派单 `1e842d63`＋send；先存档后发）。
+- **在飞（3）**：`186-r1`（写 cmd/wisp+panel）／`queue-verify-2`（只读）／`173-v1`（验收）。⛔ 未 push。

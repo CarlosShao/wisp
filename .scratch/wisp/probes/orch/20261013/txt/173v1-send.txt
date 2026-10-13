@@ -1,0 +1,5 @@
+派腿 `173-v1` —— 发送时补记（2026-10-13 22:27:07 +08，编排者现写）
+
+派单正文＝`.scratch/wisp/probes/orch/20261013/txt/173v1-dispatch.txt`（先存档后发，笔 `1e842d63`）。
+1. 变化一条：173-r1 的读数件已由编排者从误落的根 `probes/` 整树迁入 canon 树 `.scratch/wisp/probes/173/`（rename 笔同 `1e842d63`）——你按派单 §0 的全路径读即可。
+2. 发送时刻现场：CPU 平均 26%；`wisp.exe`/`balldebug.exe`＝0；本波并行腿：`186-r1`（写 cmd/wisp+panel）、`queue-verify-2`（只读）＋你。
