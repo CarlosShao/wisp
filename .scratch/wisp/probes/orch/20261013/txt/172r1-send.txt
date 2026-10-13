@@ -1,0 +1,5 @@
+派腿 `172-r1` —— 发送时补记（2026-10-13 23:01:07 +08，编排者现写）
+
+派单正文＝`.scratch/wisp/probes/orch/20261013/txt/172r1-dispatch.txt`（先存档后发，笔 `0a33a1cd`）。
+1. 无变化：写存与发送之间无新提交、无面冲突（`173-v1` 已收口、tools 面净）。
+2. 发送时刻现场：CPU 平均 41%；`wisp.exe`/`balldebug.exe`＝0；本波并行腿：`186-r1`（写 cmd/wisp+panel）＋你。
