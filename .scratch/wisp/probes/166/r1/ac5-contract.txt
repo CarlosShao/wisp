@@ -1,0 +1,17 @@
+# 166-r1 AC#5 — 契约轴复查
+
+尺：git diff --name-only 1cba3948a33d86d05316a168a7c2b0f6327524ff..HEAD --
+      docs/PLAN.md docs/specs internal/risk internal/panel internal/agent/approval
+      internal/memory/thresholds.go '**/golden/**' '**/allowlist.txt' frontend design
+读数：**空**（零命中）⇒ 名册逐枚零字节。
+
+本程两枚 commit（427c62d0 / 24e36406；dev，⛔ 未 push）只动：
+  internal/memory/schema.go, schema_test.go, migrate_v1seed_test.go, dao_session.go*, dao_session_test.go*
+  internal/session/manage.go*, manage_test.go*
+  .scratch/wisp/probes/166/r1/logs/00-head.txt*, ac1-census.txt*      （* = 新建）
+
+⚠ 一处契约债（具名报回，非本腿自行拍板）：AC#2/#3 要落会话存储 ⇒ 必动 D35 的表名册（schema 2→3）。
+  按 AGENTS.md §1.1「契约变更须人工批准」，本程只做**只加不减**的名册扩写
+  （contractTableOrder/contractSpec 各加两枚、版本值 2→3、备份名册加 2-3、withTestMigration 锚 2->3→3->4），
+  **未删 / 未放宽任何一枚断言**。SPEC-02 §3 的 prose 仍写九表，该 spec note 债
+  和表名（session 撞 SPEC-05 的「会话」词义）须 owner 拍 —— 见 probes/166/a2 §H1/H2。

@@ -1,0 +1,15 @@
+# 166-r1 AC#4 — 分叉不许吞原件（含"分叉时顺手清理"变异证）
+
+落点：Manager.Fork（manage.go）→ Store.ForkSession（dao_session.go）。
+实现只做两件写事：(1) INSERT 新 session 行，forked_from=父 id；(2) INSERT ... SELECT 把父的 session_turn
+  轮次**复制**成新行（新 rowid）。父的行、父的轮次一个字节不碰。
+
+变异证（"分叉时顺手清理"那一形）：
+  internal/session/manage_test.go::TestSessionForkDoesNotSwallowOriginal
+  先存父的两枚轮次并记下 before（id/seq/content），Fork 后逐位复读父的轮次 after：
+    - len(after) != len(before) ⇒ 判 "the fork swallowed history"（"移走"变异当场红）；
+    - before[i].ID/Seq/Content 与 after[i] 逐位不等 ⇒ 判原件被改（"改写"变异红）；
+    - 父行 title / forked_from 变了 ⇒ 判父行被改。
+  再钉分叉侧是**复制**不是**借用**：forkTurns[i].Content == before[i].Content 且 forkTurns[i].ID != before[i].ID
+  （后者专防"把父的行改个 session_id 就当归分叉"那一形）。
+⇒ 一枚"顺手删/移父轮次"的变异会立刻红在逐位比对上；原件历史逐字仍在。

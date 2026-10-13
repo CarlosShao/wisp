@@ -1,0 +1,18 @@
+# 166-r1 门禁读数（dev；本程两枚 commit 427c62d0 / 24e36406；⛔ 未 push）
+
+rc=0  GOFLAGS= go build ./...
+rc=0  /d/work/base/gopath/bin/gofumpt.exe -l internal/session internal/memory   （输出为空＝干净）
+rc=0  GOTMPDIR=C:/Users/swq/AppData/Local/Temp/wisp-test-gotmp/166r1-1 go test -count=1 ./internal/memory/ ./internal/session/
+        ok  github.com/CarlosShao/wisp/internal/memory   14.323s
+        ok  github.com/CarlosShao/wisp/internal/session   2.213s
+rc=0  sh scripts/d22scan.sh   （照本仓先例：git archive HEAD 仓外导出树
+        C:/Users/swq/AppData/Local/Temp/wisp-d22-166r1b，无 .git ⇒ 全扫并响亮自陈）
+        d22scan: clean - no D22 ban violations
+        runtests 正控 top-level: PASS=35 FAIL=0
+
+⚠ 首跑（427c62d0 那棵树）d22scan rc=1：本程新增的一枚 ban #9 幻影引用命中
+  internal/memory/schema.go:135 「docs/specs/SPEC-02 不是盘上路径」——改成简写形 SPEC-02 后 24e36406 上 rc=0。
+  这是本程自己引进又自己修的红，记账在此。
+
+前置：tasklist 现跑 wisp.exe / balldebug.exe ⇒ 0 枚。
+⛔ 本程未跑 ./cmd/wisp/ 整包、⛔ 未跑 go test ./...。

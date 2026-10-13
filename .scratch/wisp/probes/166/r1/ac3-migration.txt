@@ -1,0 +1,26 @@
+# 166-r1 AC#3 — 迁移那一格（硬）：崩溃原子性 ＋ 新库/老库各缺什么
+
+落点：internal/memory/schema.go 的 ddlV3 ＋ 迁移链 {2,3,applyV3}；SchemaVersionTarget 2→3。
+既有写法（照做）：applyMigrationStep（open.go）＝单事务里「先 step.apply，再 UPSERT schema_version，再 Commit」；
+  migrate() 每步前先关连接、先写整库备份 backup/wisp.db.bak-<from>-<to>；ddlV1/ddlV2 一个字未改。
+
+证据（internal/memory/dao_session_test.go::TestSessionMigrationCrashAtomicAndReplay）：
+  a) 造真 v2 库（withSchemaTarget(2)）⇒ 自省无 session 表（前提成立）；
+  b) 故障注入：把 2->3 那步替成"跑真 ddlV3，再故意 INSERT 违 NOT NULL(title)"，Open 返回错误（模拟中途被杀）；
+  c) 复读：schema_version 仍 = 2、session/session_turn **两表都不存在**（没有一枚半表）、
+     backup/wisp.db.bak-2-3 在 ⇒ "要么全成要么全不成"，不是"表里有半列"；
+  d) 恢复生产链再 Open ⇒ 2->3 整体重放，两表齐全且可写（InsertSession 成功）⇒ 可重放。
+另：schema_test.go 的 TestMigrationFailedStepIsAtomic（本程把测试锚 2->3 改到 3->4）证明"前一步 2->3 已整体提交、
+  后一步 3->4 失败回滚"——步与步之间也是每步 all-or-nothing（旧断言只认 2->3，本程改成认 3 已提交）。
+
+新库 / 老库各缺什么（AC#3 后半句）：
+  - 新库：0->1(ddlV1) -> 1->2(ddlV2) -> 2->3(ddlV3) ⇒ 会话两表由 2->3 建出；
+  - 老 v1 库：1->2 -> 2->3 ⇒ 同上（migrate_v1seed_test.go 断 schema_version=3 ＋ bak-2-3 在）；
+  - 老 v2 库：只跳 2->3。
+  ⇒ 三形都经由**同一步**拿到同两枚表：没有任何一形靠 ddlV1 的 CREATE、另一形靠 ALTER
+    ⇒ 不存在"新库有、老库缺"（或反之）那一形。ddlV1 仍 15 句、ddlV2 仍 1 句，另加 ddlV3=5 句。
+
+⚠ 偏离（具名报回）：AC#3 逐字写"加列的迁移"，本程交的是**加表**（session/session_turn），不是给既有表加列。
+  理由：给 task_log 加 session_id 列会连带 dao_tasklog/models/privacy/schema 约 10 枚生产文件
+  （probes/166/a2 §A 逐枚量过），超本腿预算；加表是本票 a2 §B 判定的、不碰既有 DAO 的自足形。
+  崩溃原子性 / 可重放 / 新老库推理这三件与"加列"同形地证完（上面 a–d）。

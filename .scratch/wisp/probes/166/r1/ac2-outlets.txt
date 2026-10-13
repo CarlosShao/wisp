@@ -1,0 +1,18 @@
+# 166-r1 AC#2 — 四件最小出口 ＋ 每件"这一发在未修码上响不响"
+
+落点：internal/session/manage.go（Manager，五枚出口）＋ internal/memory/dao_session.go（存储原语）。
+用例：internal/session/manage_test.go（各一件）＋ internal/memory/dao_session_test.go（转义）。
+
+1) 列（按时间）  TestSessionListByTime        List() 按 updated_at DESC，最新在前
+   列（按工作区） TestSessionListByWorkspace   List(Workspace:"wk1") 只回 wk1 两枚
+2) 搜（标题+正文） TestSessionSearchTitleAndBody  Search() 命中 title 与 session_turn.content
+   补充         TestSessionSearchEscapesWildcards  查询里的 LIKE 通配符按字面处理（不放大射程）
+3) 改名          TestSessionRenameAndArchiveUndo  Rename() 只写 title 一列（trim），正文轮次逐字不动
+4) 归档带撤销     TestSessionRenameAndArchiveUndo  Archive() 后默认 List 隐去、IncludeArchived 可见；
+                 Unarchive() 后恢复且 ArchivedAt 回 nil；行与轮次一行不删
+
+"这一发在未修码上响不响"（逐件）：⛔ 全部响不了。
+  未修码上 internal/memory/schema.go 只有 9 张表、无 session/session_turn（AC#1 尺 1/2）；
+  全仓无 ListSessions 一类出口（AC#1 尺 3）；CLI 十枚子命令无一枚列历史（AC#1 尺 4）。
+  ⇒ 四件出口今天连"被调用的对象"都不存在；落码后由上面用例钉住（未修码上跑必红：无表、无 API）。
+  ⇒ 本票因此成立，且四件出口是**新建**而非"改写既有"。
