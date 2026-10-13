@@ -1,0 +1,8 @@
+派腿 `queue-census-1` —— 发送时补记（2026-10-13 20:46:09 +08，编排者现写）
+
+派单正文＝`.scratch/wisp/probes/orch/20261013/txt/queue-census-1-dispatch.txt`（先存档后发，笔 `5f513c61`）。
+本文件只记"从写派单到发送之间变了的前提"；冲突时以本文件为准。
+
+1. 无变化：写存与发送之间（约 3 分钟）无新提交（HEAD 仍 `5f513c61`）；无别的腿入场面。
+2. 发送时刻现场（编排者现跑）：CPU 平均 30%；`wisp.exe`/`balldebug.exe`＝0；
+   `git status --porcelain -- internal/tools internal/observe`＝0 行；本波并行腿：`294-r1b`（cmd/wisp 测试面，在飞）＋`229-r1`↔本枚（互不撞面）。

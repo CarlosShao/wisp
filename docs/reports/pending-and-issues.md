@@ -17383,3 +17383,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **停车点**：§4.0de 已写（大白话版给机主）。
 - **件**：`orch/20261013/txt/{294r1-commit-msg.txt, 294r1b-dispatch.txt, 294r1b-send.txt}`。
 - **next**＝收 `294-r1b` → `294-v1`（非实现者，攻三格牙＋翻框判语）；候补＝亲裁 313 收尾链 #1 两枚裁定（材料 `probes/313/r1/00-anchor-and-gates.md`）→ 313 落地腿（等 `cmd/wisp` 面空）→ 186 → 197/145 → 314（机主在场对照，窗口开中）→ 推送（推前过 §8.1 门）。⛔ 未 push（249 在仓）。
+
+
+## A879｜2026-10-13 20:46:09 +08｜第二波开闸：派 `229-r1`（甲形约束，写面 `internal/tools`）＋`queue-census-1`（只读队列普查）——本波在飞 **3 腿**；★记我：机主点名"比 qoder 还保守"（接手第一波只放 1 腿）
+
+- **记我＋常态钉**：机主 10-13 20:4x 原话"你怎么就派发了一个子代理，你比 qoder 还要保守啊"⇒ 我认账：冷启动那波只放了 `294-r1b` 1 腿。**常态口径钉死＝CPU ≤70% 就补位、**写腿 ≥2 条在飞**（本波达成 3：`294-r1b`＋`229-r1`＋`queue-census-1`）**；只读腿可作第三枚补位但不许只放只读。
+- **面占用表（本波现刻）**：`cmd/wisp`＝`294-r1b` 占（写测试面＋密集跑整包）；`internal/tools`＋`internal/observe`＝`229-r1` 占（起手现查＝0 行，净）；`internal/panel`/`cmd/wisp/panel_*.go`＝空但属共享编译面，`313 落地`/`186`/`145`/`252 残余`/`220` 全压在它后面 ⇒ 下波并行度主要从"非 panel 面＋只读腿"榨。
+- **`229-r1` 派单要点**（存档 `orch/20261013/txt/229r1-dispatch.txt`）：修法**只许甲形**（spawn 名换进名册内形状；乙形＝动 D38b 须人工批准、停手上报）；AC#3 正控（真·名册外名字照样 WARN）；AC#4 全仓同类普查；AC#6 终态含 `./cmd/wisp` ⇒ **与 `294-r1b` 的重包按 tasklist 现查错峰**（等 60s×≤12，等待具名落 logs）。
+- **`queue-census-1` 要点**（只读，存档同上目录）：产 `.scratch/wisp/probes/orch/20261013/queue-census-1/queue-ready.md`＝全票池 Status 现量 + 写面标签 + **本波/下波可派短名单**；零 go 命令（Go 编译面被 `294-r1b`/`229-r1` 用着）。
+- **件**：`orch/20261013/txt/{229r1-dispatch.txt,229r1-send.txt,queue-census-1-dispatch.txt,queue-census-1-send.txt}`。⛔ 未 push（HEAD 将含本笔）。
