@@ -1,0 +1,14 @@
+pass2 TS=2026-10-13 08:12:09 +0800
+guard_refusals=0
+OK=/c/Users/swq/wisp-303-steps kind=dir size_before=1MB
+OK=/c/Users/swq/wisp-301-r2-tmp kind=dir size_before=1MB
+OK=/c/Users/swq/wisp35v7mut kind=dir size_before=1MB
+OK=/c/Users/swq/wisp-303-r1-fixed.go kind=file size_before=1MB
+OK=/c/Users/swq/wisp-303-v1-clone.log kind=file size_before=1MB
+OK=/c/Users/swq/wisp91-probe-read-sess91a7c3.txt kind=file size_before=1MB
+OK=/c/Users/swq/wisp91-probe-write-sess91a7c3.txt kind=file size_before=1MB
+deleted_ok=7 absent_or_skipped=0
+
+=== left after pass2 (name contains wisp, depth 1) ===
+left_count=0
+rc=0

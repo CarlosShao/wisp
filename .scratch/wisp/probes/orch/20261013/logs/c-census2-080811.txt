@@ -1,0 +1,58 @@
+=== 候选（用户目录�?wisp-*/wisp*）逐枚：大小、子项数、最深层有无不可读件 ===
+C:\Users\swq\wisp-301-r2-tmp | sizeMB=0.1 | files=2 | subdirs=0
+     new.yml | 62 KB
+     head.yml | 60.7 KB
+C:\Users\swq\wisp-303-bisect | sizeMB=298 | files=10738 | subdirs=1401
+     pack-0575ad7bca44c84e24f3b121c122c3cb71f497c4.pack | 16672 KB
+     pack-611159059f6feb532fa3fd5b7bc803648d0e035c.pack | 14510.3 KB
+     pack-d7205005b9bfa13aa854c07b0832064b4d962b86.pack | 13744.5 KB
+C:\Users\swq\wisp-303-steps | sizeMB=0 | files=24 | subdirs=0
+     bisect-run.out | 11.7 KB
+     bisect-log.txt | 9.1 KB
+     index.tsv | 1.9 KB
+C:\Users\swq\wisp-303-v1 | sizeMB=270.3 | files=9542 | subdirs=1162
+     pack-0575ad7bca44c84e24f3b121c122c3cb71f497c4.pack | 16672 KB
+     pack-611159059f6feb532fa3fd5b7bc803648d0e035c.pack | 14510.3 KB
+     pack-d7205005b9bfa13aa854c07b0832064b4d962b86.pack | 13744.5 KB
+C:\Users\swq\wisp-303-v1-blob | sizeMB=160.6 | files=9312 | subdirs=1137
+     pending-and-issues.md | 4181.1 KB
+     ledger.md | 4150.9 KB
+     classified.tsv | 3309 KB
+C:\Users\swq\wisp-303-v1-mut-base | sizeMB=160.6 | files=9312 | subdirs=1137
+     pending-and-issues.md | 4181.1 KB
+     ledger.md | 4150.9 KB
+     classified.tsv | 3309 KB
+C:\Users\swq\wisp-303-v1-mut-M1 | sizeMB=160.6 | files=9312 | subdirs=1137
+     pending-and-issues.md | 4181.1 KB
+     ledger.md | 4150.9 KB
+     classified.tsv | 3309 KB
+C:\Users\swq\wisp-303-v1-mut-M2 | sizeMB=160.6 | files=9312 | subdirs=1137
+     pending-and-issues.md | 4181.1 KB
+     ledger.md | 4150.9 KB
+     classified.tsv | 3309 KB
+C:\Users\swq\wisp-303-v1-mut-M3 | sizeMB=160.6 | files=9312 | subdirs=1137
+     pending-and-issues.md | 4181.1 KB
+     ledger.md | 4150.9 KB
+     classified.tsv | 3309 KB
+C:\Users\swq\wisp-303-v1-mut-M4 | sizeMB=189.9 | files=9313 | subdirs=1137
+     wisp.exe | 30041.9 KB
+     pending-and-issues.md | 4181.1 KB
+     ledger.md | 4150.9 KB
+C:\Users\swq\wisp35v7mut | sizeMB=0 | files=2 | subdirs=0
+     drive.py | 3.2 KB
+     drive2.py | 2.1 KB
+C:\Users\swq\wisp84-snap | sizeMB=8.4 | files=779 | subdirs=91
+     66-full-subset-slo-report.json | 630.4 KB
+     PLAN.md | 313.3 KB
+     yilv-classA-15hits.png | 198.5 KB
+
+=== 专用�?82 枚里：有内容的（>0.05MB）逐枚�?===
+295v1-20261012-160949-1256 | sizeMB=10.8 | mtime=10-12_16:51
+orch295-20261013-075707 | sizeMB=42.5 | mtime=10-13_08:04
+
+=== 专用根里 0MB 的抽三枚，看里面到底有没有东西（含隐�?不可读）===
+--- 295r1-20261012-142530-1793-pre1 ---
+--- 295r1-20261012-142656-2119-preA ---
+--- 295r1-20261012-143327-2427-preB ---
+
+rc=0

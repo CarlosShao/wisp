@@ -1,0 +1,29 @@
+c-clean TS=2026-10-13 08:09:51 +0800 scope=explicit allowlist (ticket 303 / 84 out-of-repo scratch)
+free_before=51168 MB free on C:
+
+=== STEP 1 guard: every path must match the allowlist shape, else abort ===
+guard_refusals=0
+
+=== STEP 2 in-use check (no process may hold these) ===
+wisp_test_exe=1
+go_exe=1
+
+=== STEP 3 delete one by one ===
+OK=/c/Users/swq/wisp-303-bisect size_before=322MB
+OK=/c/Users/swq/wisp-303-v1 size_before=292MB
+OK=/c/Users/swq/wisp-303-v1-blob size_before=181MB
+OK=/c/Users/swq/wisp-303-v1-mut-base size_before=181MB
+OK=/c/Users/swq/wisp-303-v1-mut-M1 size_before=181MB
+OK=/c/Users/swq/wisp-303-v1-mut-M2 size_before=181MB
+OK=/c/Users/swq/wisp-303-v1-mut-M3 size_before=181MB
+OK=/c/Users/swq/wisp-303-v1-mut-M4 size_before=211MB
+OK=/c/Users/swq/wisp84-snap size_before=11MB
+deleted_ok=9 failed=0
+
+=== STEP 4 after ===
+free_after=52560 MB free on C:
+leftovers_kept_check:
+  gotmp_root_total=82 roots
+  temp_wisp33=4
+  unattributable=1
+rc=0

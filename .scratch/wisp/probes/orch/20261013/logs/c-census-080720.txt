@@ -1,0 +1,186 @@
+=== A. 应用自己的数据目录（不是测试残留�?==
+C:\Users\swq\AppData\Local\wisp-test-gotmp | sizeMB=43.5 | child_dirs=82
+C:\Users\swq\AppData\Local\wisp | ABSENT
+C:\Users\swq\AppData\Roaming\wisp | sizeMB=0 | child_dirs=1
+C:\Users\swq\AppData\Roaming\wisp-dev | sizeMB=29.2 | child_dirs=3
+C:\Users\swq\AppData\Local\Temp\wisp-test-gotmp | ABSENT
+
+=== B. wisp-test-gotmp 专用根：每一枚运行根的名�?时间/大小（前 100�?==
+probe-115234 | mtime=10-12_11:52 | sizeMB=0
+portable-20261012-115401-2013 | mtime=10-12_11:54 | sizeMB=0
+winsec-20261012-115521-883 | mtime=10-12_11:55 | sizeMB=0
+cli-20261012-115545-1029 | mtime=10-12_12:02 | sizeMB=0
+winsec-20261012-122147-814 | mtime=10-12_12:22 | sizeMB=0
+portable-20261012-122621-196 | mtime=10-12_12:26 | sizeMB=0
+v1-20261012-124853-148 | mtime=10-12_12:48 | sizeMB=0
+portable-20261012-125038-1212 | mtime=10-12_12:50 | sizeMB=0
+winsec-20261012-125118-1774 | mtime=10-12_12:51 | sizeMB=0
+winsec-20261012-125140-1926 | mtime=10-12_12:51 | sizeMB=0
+portable-20261012-125141-1936 | mtime=10-12_12:51 | sizeMB=0
+d22scan-probe-slash-test | mtime=10-12_13:39 | sizeMB=0
+PROBE-20261012-134018-1780 | mtime=10-12_13:40 | sizeMB=0
+PROBE-20261012-134018-1783 | mtime=10-12_13:40 | sizeMB=0
+311a1-A-20261012-133040-1594 | mtime=10-12_13:41 | sizeMB=0
+d22scan-20261012-135432-33 | mtime=10-12_13:54 | sizeMB=0
+portable-20261012-135716-1949 | mtime=10-12_13:57 | sizeMB=0
+portable-20261012-135730-2338 | mtime=10-12_13:57 | sizeMB=0
+winsec-20261012-135756-111 | mtime=10-12_13:58 | sizeMB=0
+orch-A-140122 | mtime=10-12_14:01 | sizeMB=0
+orch-A-140142 | mtime=10-12_14:01 | sizeMB=0
+orchchk-A-140248 | mtime=10-12_14:02 | sizeMB=0
+portable-20261012-135839-389 | mtime=10-12_14:04 | sizeMB=0
+portable-20261012-140429-824 | mtime=10-12_14:11 | sizeMB=0
+d22scan-20261012-141558-1482 | mtime=10-12_14:16 | sizeMB=0
+d22scan-20261012-141815-153 | mtime=10-12_14:18 | sizeMB=0
+295r1-20261012-142530-1793-pre1 | mtime=10-12_14:26 | sizeMB=0
+portable-20261012-142516-1728 | mtime=10-12_14:31 | sizeMB=0
+portable-20261012-142524-1762 | mtime=10-12_14:32 | sizeMB=0
+295r1-20261012-142656-2119-preA | mtime=10-12_14:33 | sizeMB=0
+295r1-20261012-143327-2427-preB | mtime=10-12_14:38 | sizeMB=0
+d22scan-20261012-143846-2824 | mtime=10-12_14:39 | sizeMB=0
+295r1-20261012-143446-2476-preB2 | mtime=10-12_14:40 | sizeMB=0
+d22scan-20261012-144008-2991 | mtime=10-12_14:40 | sizeMB=0
+winsec-20261012-144044-3070 | mtime=10-12_14:41 | sizeMB=0
+portable-20261012-144118-3229 | mtime=10-12_14:41 | sizeMB=0
+295r1-20261012-144418-3908-ac2a | mtime=10-12_14:44 | sizeMB=0
+295r1-20261012-144813-4079-m1 | mtime=10-12_14:48 | sizeMB=0
+295r1-20261012-144857-4132-m2 | mtime=10-12_14:49 | sizeMB=0
+295r1-20261012-144923-4295-m1restore | mtime=10-12_14:49 | sizeMB=0
+orch-298ac4-20261012-142231 | mtime=10-12_14:50 | sizeMB=0
+d22scan-20261012-145106-193 | mtime=10-12_14:51 | sizeMB=0
+portable-20261012-145155-633 | mtime=10-12_14:51 | sizeMB=0
+winsec-20261012-145224-556 | mtime=10-12_14:52 | sizeMB=0
+winsec-20261012-145253-1850 | mtime=10-12_14:53 | sizeMB=0
+295r1-20261012-145349-2084-postC | mtime=10-12_15:00 | sizeMB=0
+winsec-20261012-150312-924 | mtime=10-12_15:03 | sizeMB=0
+295r1-20261012-150439-777-driftfix | mtime=10-12_15:04 | sizeMB=0
+295r1-20261012-150740-241-postF | mtime=10-12_15:13 | sizeMB=0
+295r1-20261012-151434-1647-postG | mtime=10-12_15:20 | sizeMB=0
+winsec-20261012-152255-804 | mtime=10-12_15:23 | sizeMB=0
+winsec-20261012-152322-974 | mtime=10-12_15:23 | sizeMB=0
+portable-20261012-152347-1235 | mtime=10-12_15:23 | sizeMB=0
+d22scan-20261012-152406-1626 | mtime=10-12_15:24 | sizeMB=0
+295r1-20261012-152042-753-postD | mtime=10-12_15:27 | sizeMB=0
+295r1-20261012-152755-731-postE | mtime=10-12_15:34 | sizeMB=0
+portable-20261012-153428-2048 | mtime=10-12_15:34 | sizeMB=0
+d22scan-20261012-153442-2483 | mtime=10-12_15:34 | sizeMB=0
+winsec-20261012-153502-2790 | mtime=10-12_15:35 | sizeMB=0
+winsec-20261012-153523-2958 | mtime=10-12_15:35 | sizeMB=0
+portable-20261012-153544-3154 | mtime=10-12_15:35 | sizeMB=0
+d22scan-20261012-153550-3256 | mtime=10-12_15:36 | sizeMB=0
+winsec-20261012-153946-1323 | mtime=10-12_15:40 | sizeMB=0
+portable-20261012-154008-1469 | mtime=10-12_15:40 | sizeMB=0
+d22scan-20261012-154100-1791 | mtime=10-12_15:41 | sizeMB=0
+295r1-20261012-153711-583-race | mtime=10-12_15:46 | sizeMB=0
+d22scan-20261012-155406-535 | mtime=10-12_15:54 | sizeMB=0
+orch-295r1-collect-155455-910 | mtime=10-12_16:01 | sizeMB=0
+d22scan-20261012-160749-1786 | mtime=10-12_16:08 | sizeMB=0
+winsec-20261012-161914-2580 | mtime=10-12_16:19 | sizeMB=0
+d22scan-20261012-162013-3012 | mtime=10-12_16:20 | sizeMB=0
+winsec-20261012-162249-2499 | mtime=10-12_16:23 | sizeMB=0
+winsec-20261012-162611-2863 | mtime=10-12_16:26 | sizeMB=0
+winsec-20261012-162641-3047 | mtime=10-12_16:27 | sizeMB=0
+winsec-20261012-162705-3248 | mtime=10-12_16:27 | sizeMB=0
+winsec-20261012-162731-3471 | mtime=10-12_16:27 | sizeMB=0
+portable-20261012-162758-3723 | mtime=10-12_16:27 | sizeMB=0
+portable-20261012-162814-4126 | mtime=10-12_16:28 | sizeMB=0
+295v1-20261012-160949-1256 | mtime=10-12_16:51 | sizeMB=10.8
+d22scan-20261012-165419-1709 | mtime=10-12_16:54 | sizeMB=0
+d22scan-20261012-165518-1500 | mtime=10-12_16:55 | sizeMB=0
+orch295-20261013-075707 | mtime=10-13_08:04 | sizeMB=32.7
+total_roots=82
+
+=== C. %TEMP% 顶层：名字里�?wisp / Test / go-build �?===
+TestProbeStepByStep3843095677 | type=dir | mtime=09-21_18:40 | sizeMB=0
+wisp-33r1-panel-profile | type=dir | mtime=10-13_07:59 | sizeMB=12.8
+wisp-33r5-panel-profile | type=dir | mtime=10-13_08:00 | sizeMB=29.1
+wisp-33r6-reused-thread-quit | type=dir | mtime=10-13_08:00 | sizeMB=4.7
+wisp-33r7-queued-close | type=dir | mtime=10-13_08:00 | sizeMB=4.7
+
+=== D. 用户目录下名字带 wisp 的目�?文件（深�?2�?==
+C:\Users\swq\wisp-301-r2-tmp | dir=True | mtime=10-10_15:43
+C:\Users\swq\wisp-303-bisect | dir=True | mtime=10-10_18:07
+C:\Users\swq\wisp-303-steps | dir=True | mtime=10-10_17:17
+C:\Users\swq\wisp-303-v1 | dir=True | mtime=10-10_20:45
+C:\Users\swq\wisp-303-v1-blob | dir=True | mtime=10-10_20:45
+C:\Users\swq\wisp-303-v1-mut-base | dir=True | mtime=10-10_20:46
+C:\Users\swq\wisp-303-v1-mut-M1 | dir=True | mtime=10-10_20:47
+C:\Users\swq\wisp-303-v1-mut-M2 | dir=True | mtime=10-10_20:47
+C:\Users\swq\wisp-303-v1-mut-M3 | dir=True | mtime=10-10_20:48
+C:\Users\swq\wisp-303-v1-mut-M4 | dir=True | mtime=10-10_20:58
+C:\Users\swq\wisp35v7mut | dir=True | mtime=10-08_11:48
+C:\Users\swq\wisp84-snap | dir=True | mtime=09-21_13:00
+C:\Users\swq\wisp-303-r1-fixed.go | dir=False | mtime=10-10_17:54
+C:\Users\swq\wisp-303-v1-clone.log | dir=False | mtime=10-10_19:54
+C:\Users\swq\wisp91-probe-read-sess91a7c3.txt | dir=False | mtime=09-21_14:15
+C:\Users\swq\wisp91-probe-write-sess91a7c3.txt | dir=False | mtime=09-21_14:54
+C:\Users\swq\.dsh\sessions\--D-work-workspace-projects~0020plans-Wisp-- | dir=True | mtime=09-26_14:45
+C:\Users\swq\.qoder-cn\projects\D--work-workspace-projects-plans-Wisp | dir=True | mtime=10-12_10:13
+C:\Users\swq\.qoder-cn\tmp\D--work-workspace-projects-plans-Wisp | dir=True | mtime=10-12_10:13
+C:\Users\swq\.qodersec\state\Wisp-793ba4 | dir=True | mtime=10-02_18:59
+C:\Users\swq\AppData\Local\wisp-test-gotmp | dir=True | mtime=10-13_07:57
+C:\Users\swq\AppData\Roaming\wisp | dir=True | mtime=10-07_09:33
+C:\Users\swq\AppData\Roaming\wisp-dev | dir=True | mtime=10-12_16:52
+C:\Users\swq\tmp\wisp-306-orch-20261011-0821 | dir=True | mtime=10-11_08:21
+C:\Users\swq\tmp\wisp-306-orch-shelf-20261011-0822 | dir=True | mtime=10-11_08:23
+C:\Users\swq\tmp\wisp-307-orch-tree | dir=True | mtime=10-11_10:59
+C:\Users\swq\tmp\wisp-307-r1-blob | dir=True | mtime=10-11_10:21
+C:\Users\swq\tmp\wisp-307-r1-tree-main | dir=True | mtime=10-11_10:17
+C:\Users\swq\tmp\wisp-307-v1-blob | dir=True | mtime=10-11_10:39
+C:\Users\swq\tmp\wisp-307-v1-nomod | dir=True | mtime=10-11_10:41
+C:\Users\swq\tmp\wisp-307-v1-pre | dir=True | mtime=10-11_10:32
+C:\Users\swq\tmp\wisp-307-v1-tree | dir=True | mtime=10-11_10:32
+C:\Users\swq\tmp\wisp-72r1-orch-tree | dir=True | mtime=10-11_11:54
+C:\Users\swq\tmp\wisp111v | dir=True | mtime=10-08_09:08
+C:\Users\swq\tmp\wisp-307-r1-pristine-syncdirs.go | dir=False | mtime=10-11_10:17
+C:\Users\swq\tmp\wisp-commit-273374375.txt | dir=False | mtime=10-07_12:27
+C:\Users\swq\tmp\wisp-commit-a663.txt | dir=False | mtime=10-07_12:26
+C:\Users\swq\tmp\wisp-commit-a667.txt | dir=False | mtime=10-07_12:44
+C:\Users\swq\tmp\wisp-load-check.ps1 | dir=False | mtime=10-07_12:11
+C:\Users\swq\tmp\275-a1-head-content\cmd_wisp_models.go | dir=False | mtime=10-07_11:52
+C:\Users\swq\wisp-303-bisect\.scratch\wisp | dir=True | mtime=10-10_17:07
+C:\Users\swq\wisp-303-bisect\cmd\wisp | dir=True | mtime=10-10_18:29
+C:\Users\swq\wisp-303-bisect\scripts\wisp-cli-tests.sh | dir=False | mtime=10-10_17:07
+C:\Users\swq\wisp-303-v1\.scratch\wisp | dir=True | mtime=10-10_19:54
+C:\Users\swq\wisp-303-v1\cmd\wisp | dir=True | mtime=10-10_20:45
+C:\Users\swq\wisp-303-v1\scripts\wisp-cli-tests.sh | dir=False | mtime=10-10_19:54
+C:\Users\swq\wisp-303-v1-blob\.scratch\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-blob\cmd\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-blob\scripts\wisp-cli-tests.sh | dir=False | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-base\.scratch\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-base\cmd\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-base\scripts\wisp-cli-tests.sh | dir=False | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M1\.scratch\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M1\cmd\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M1\scripts\wisp-cli-tests.sh | dir=False | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M2\.scratch\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M2\cmd\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M2\scripts\wisp-cli-tests.sh | dir=False | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M3\.scratch\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M3\cmd\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M3\scripts\wisp-cli-tests.sh | dir=False | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M4\wisp.exe | dir=False | mtime=10-10_20:58
+C:\Users\swq\wisp-303-v1-mut-M4\.scratch\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M4\cmd\wisp | dir=True | mtime=10-10_20:37
+C:\Users\swq\wisp-303-v1-mut-M4\scripts\wisp-cli-tests.sh | dir=False | mtime=10-10_20:37
+C:\Users\swq\wisp84-snap\.scratch\wisp | dir=True | mtime=09-21_12:58
+C:\Users\swq\wisp84-snap\cmd\wisp | dir=True | mtime=09-21_12:58
+
+=== E. 两枚应用数据目录里的文件清单（名�?大小，前 40 枚最大）===
+--- C:\Users\swq\AppData\Roaming\wisp ---
+logs\wisp-20261007-001.jsonl | sizeMB=0.01 | mtime=10-07_09:35
+--- C:\Users\swq\AppData\Roaming\wisp-dev ---
+panel-webview2\EBWebView\GrShaderCache\data_3 | sizeMB=4.01 | mtime=10-09_17:37
+panel-webview2\EBWebView\Subresource Filter\Indexed Rules\38\10.34.0.84\Ruleset Data | sizeMB=3.8 | mtime=10-09_17:42
+panel-webview2\EBWebView\Speech Recognition\1.15.0.1\Microsoft.CognitiveServices.Speech.core.dll | sizeMB=2.57 | mtime=03-08_10:00
+panel-webview2\EBWebView\Subresource Filter\Unindexed Rules\10.34.0.84\Filtering Rules-AA | sizeMB=2.28 | mtime=04-11_01:22
+panel-webview2\EBWebView\component_crx_cache\720517793663c90e0dbd77cb42709bac49af733f83f73320ba89859d9b0310e0 | sizeMB=2.28 | mtime=04-11_03:21
+panel-webview2\EBWebView\Subresource Filter\Unindexed Rules\10.34.0.84\Filtering Rules | sizeMB=2.05 | mtime=04-11_01:22
+panel-webview2\EBWebView\BrowserMetrics-spare.pma | sizeMB=1.25 | mtime=10-12_17:02
+panel-webview2\EBWebView\Subresource Filter\Unindexed Rules\10.34.0.84\Part-RU | sizeMB=1.16 | mtime=04-11_01:22
+panel-webview2\EBWebView\component_crx_cache\00af3f07b5abb71f6d30337e1eef62fa280f06ef19485c0cf6b72171f92ccc0a | sizeMB=1.04 | mtime=11-06_09:23
+panel-webview2\EBWebView\component_crx_cache\a81d1959892ae4180554347df1b97834abba2e1a5e6b9aeba000ecea26eabecc | sizeMB=0.93 | mtime=03-08_10:44
+panel-webview2\EBWebView\Subresource Filter\Unindexed Rules\10.34.0.84\Part-ZH | sizeMB=0.67 | mtime=04-11_01:22
+panel-webview2\EBWebView\Subresource Filter\Unindexed Rules\10.34.0.84\Part-FR | sizeMB=0.52 | mtime=04-11_01:22
+
+rc=0
