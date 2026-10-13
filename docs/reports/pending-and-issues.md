@@ -17440,3 +17440,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - 落点①（项目记忆＝ZCode `memories/projects/wisp-*/`，`MEMORY.md` 索引同步）：`wisp-subagent-pipeline-discipline.md` 重写扩写＝并发≤70%补位/十条款派单模板/先存档后发/三把尺与幽灵催收/死腿代提四门/面互斥与读数卫生（`tasklist`/`GOTMPDIR` C: 卷/`grep -c` 假 0）/deadline-pause；**新建** `wisp-orchestrator-ironlaws.md`＝冻结件清单/零 emoji 射程/前端与凭据边界/机主使用说明 12 条/汇报格式/高危陷阱（314 死区、255 行号钉、树会呼吸、假 0、宿主弹窗）/证据纪律。
 - 落点②（repo）：`AGENTS.md` 顶部新块＝指向 `HANDOVER.md §4`／台账／`orchestrator-handoff-20261013.md`＋运行铁律速记（推 origin/dev A813、腿只 commit、显式 pathspec、面互斥、三把尺、frontend 零写面、先存档后发、写腿≥2/CPU≤70%）——与本文件"薄索引、不新造规矩"的自述一致。
 - ⛔ 未 push。
+
+
+## A886｜2026-10-13 22:09:13 +08｜收 `queue-verify-1`（`57094846`，40 枚读真⇒**可立即派 24／需前置 6／需人批 4／建议不派 6**；纠普查三处错标）＋放 `queue-verify-2`（清老存根 40＋无 Status 行，存档制）
+
+- **收件**：commit/件（`verified-shortlist.md` 97 行）过；抽核一条纠错（186 真写面含 `workspace.go`＝申报含 `internal/panel`，普查标"其它"属实漏报）。
+- **验面关键纠错（已登记，点将前必读此表）**：① `186`/`220` 真写面含 `internal/panel`（普查漏报）② `232` 前置消解（231 已 done ⇒ cmd/wisp test-only 可派）③ `314` 末 bullet 应为 10-13 21:23（普查过期）④ 老存根抽 3（15/16/21）＝死票（引仓内不存在的交付物）。
+- **可立即派 24 的分布**：tools 族 6（`173` 在飞，余 `237/287/174/175` 串行）· internal/其它 2（`179/139`）· probes＋CI 2+2（`171/172/182/236` 限格）· cmd/wisp 5（`186` 在飞，余 `232/288/233/180/272` 串行）· panel 族 6（`186` 在飞，余串行）。**需人批 4**：`160/193/196/239`（+220 AC#2 甲支）；**需前置**：`314/248/33/275/244/188`。
+- **新放** `queue-verify-2`（只读）：清 A 段老存根 40＋B 段无 Status 行组 ⇒ 产"死票终表"防误点将。
+- **在飞（4）**：`186-r1`／`173-r1`／`queue-verify-2`／`294-v1`（催收中）。⛔ 未 push。

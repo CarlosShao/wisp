@@ -1,0 +1,5 @@
+派腿 `queue-verify-2` —— 发送时补记（2026-10-13 22:09:13 +08，编排者现写）
+
+派单正文＝`.scratch/wisp/probes/orch/20261013/txt/queue-verify-2-dispatch.txt`（先存档后发）。
+1. 无变化：写存与发送之间无新提交、无面冲突。
+2. 发送时刻现场：CPU 平均 27%；`wisp.exe`/`balldebug.exe`＝0；本波并行腿：`186-r1`（写 cmd/wisp+panel）、`173-r1`（写 internal/tools）、`294-v1`（催收中）＋你。
