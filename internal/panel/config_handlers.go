@@ -36,6 +36,7 @@ package panel
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
@@ -139,6 +140,14 @@ func refusedLockedFamily(field string) (family string, why string) {
 // references and enum states. It carries no credential value and no
 // partially-redacted value either - not the last four characters, which is the
 // CLI terminal's tool (internal/secret's RedactSecret), not a page field.
+//
+// TICKET 313'S ADDITIONS (fields below the rule) are what the model picker needs
+// and ticket 248's read side did not carry: the built-in provider preset list,
+// each provider's model NAMES (248 carried a count only), the provider half of
+// the chat selection, whether the user has configured anything at all (the flag
+// the page's default highlight reads), and the voice chain. They are additive
+// fields: every one of them zero-values to "the leg did not answer", and the two
+// sentences ticket 248's renderer produces are untouched (313r1a-send §2).
 type SettingsView struct {
 	// Readable is the "配置是否可读" half: the leg read config.toml and got a
 	// config back. False is a state of its own, never folded into "empty".
@@ -153,6 +162,41 @@ type SettingsView struct {
 	// ChatModelKnown=false means the leg never answered it.
 	ChatModel      string
 	ChatModelKnown bool
+
+	// ---- ticket 313 read-side additions ----
+
+	// Presets is the built-in provider preset list (it includes stepfun), the
+	// provider picker's data source. nil = the leg did not answer it.
+	Presets []string
+	// PresetsKnown says the leg answered Presets. An empty Presets payload with
+	// this true is "asked, and there are none"; false is "nobody asked", and the
+	// page must not render those two the same way.
+	PresetsKnown bool
+	// Configured says this config already names something the user chose (a
+	// provider row or a chat role pair). It is the "改过以用户为准" flag: the page
+	// default-highlights stepfun only while this is false (A877 ruling 3).
+	Configured bool
+	// ConfiguredKnown says the leg answered Configured.
+	ConfiguredKnown bool
+	// ChatProvider is the provider half of llm.roles.chat; "" = unset or not
+	// answered.
+	ChatProvider string
+	// Voice is the voice-chain half of the read side (ticket 313 AC#2).
+	Voice VoiceSettingsView
+}
+
+// VoiceSettingsView is the voice half of the read side: the two cloud chains and
+// the realtime head. It carries names and ids only - never the realtime head's
+// api_key_ref value (that is a reference, and the schema keeps it a reference).
+type VoiceSettingsView struct {
+	// CloudASRChain / CloudTTSChain are the cloud fallback chains in file order.
+	CloudASRChain []string
+	CloudTTSChain []string
+	// RealtimeEnabled / RealtimeProvider / RealtimeModel describe the realtime
+	// head; the pair is meaningful only when Enabled is true (catalog.go).
+	RealtimeEnabled  bool
+	RealtimeProvider string
+	RealtimeModel    string
 }
 
 // ProviderSettings is one provider's row. APIKeyRef is a reference (dpapi:<id> /
@@ -169,6 +213,10 @@ type ProviderSettings struct {
 	// CredentialError says the blob could not be checked (an env: ref, or an
 	// unreadable store). It is a state, not a swallowed failure.
 	CredentialError string
+	// Models is the model NAMES this provider's catalog lists (ticket 313: the
+	// page's model picker needs the names, 248's ModelCount could only say how
+	// many there were). nil = the leg did not answer this half.
+	Models []string
 }
 
 // CredentialState is the read side's whole vocabulary about credentials.
@@ -299,7 +347,12 @@ func (h *ConfigWriteHandler) read(ctx context.Context, req ComposerRequest) (str
 	if !view.Readable {
 		h.record(req, fmt.Errorf("panel: 配置不可读（requestId=%q），已按状态回报而不是空值", req.RequestID), "unreadable")
 	}
-	return renderSettingsView(view), nil
+	// The two sentences renderSettingsView produces are the answer ticket 248
+	// froze and they are NOT reshaped here; ticket 313's structured payload is
+	// appended after them on its own line (A877 ruling 4: config.get has zero
+	// consumers today, so the payload shape is this leg's to choose, and the
+	// page reads the marker line instead of parsing the prose).
+	return renderSettingsView(view) + "\n" + renderSettingsPayload(view), nil
 }
 
 // write is config.set's gate: name the field, check it against the table, refuse
@@ -308,7 +361,7 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 	field := strings.TrimSpace(req.ConfigField)
 	if field == "" {
 		err := fmt.Errorf("%w: 设置写入必须点名一枚字段；可写的只有 %s（requestId=%q）",
-			ErrConfigFieldRefused, strings.Join(WritableFields(), "/"), req.RequestID)
+			ErrConfigFieldRefused, strings.Join(acceptedWritableFields(), "/"), req.RequestID)
 		h.record(req, err, "no-field")
 		return "", err
 	}
@@ -320,18 +373,18 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 	}
 	if !knownWritableField(field) {
 		err := fmt.Errorf("%w: %q 不在可写名册内；可写的只有 %s（requestId=%q）",
-			ErrConfigFieldRefused, field, strings.Join(WritableFields(), "/"), req.RequestID)
+			ErrConfigFieldRefused, field, strings.Join(acceptedWritableFields(), "/"), req.RequestID)
 		h.record(req, err, "unlisted-field")
 		return "", err
 	}
 	provider := strings.TrimSpace(req.ConfigProvider)
-	if fieldNeedsProvider[field] && provider == "" {
+	if needsProviderFor(field) && provider == "" {
 		err := fmt.Errorf("%w: 字段 %q 必须指名服务商（requestId=%q）", ErrConfigFieldRefused, field, req.RequestID)
 		h.record(req, err, "no-provider")
 		return "", err
 	}
 	model := strings.TrimSpace(req.ConfigModel)
-	if fieldNeedsModel[field] && model == "" {
+	if needsModelFor(field) && model == "" {
 		err := fmt.Errorf("%w: 字段 %q 必须指名目录里的模型（requestId=%q）", ErrConfigFieldRefused, field, req.RequestID)
 		h.record(req, err, "no-model")
 		return "", err
@@ -346,7 +399,7 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 		return renderCredentialReceipt(res), nil
 	}
 	value := req.ConfigValue
-	if fieldTakesValue[field] && strings.TrimSpace(value) == "" {
+	if takesValueFor(field) && strings.TrimSpace(value) == "" {
 		err := fmt.Errorf("%w: 字段 %q 需要一个值，空值不会被写成默认（requestId=%q）",
 			ErrConfigFieldRefused, field, req.RequestID)
 		h.record(req, err, "empty-value")
@@ -364,8 +417,17 @@ func (h *ConfigWriteHandler) write(ctx context.Context, req ComposerRequest, raw
 	return renderSettingReceipt(res), nil
 }
 
-// knownWritableField asks the table, not a copy of it.
+// knownWritableField asks the roster, not a copy of it. Since ticket 313 there
+// are two rosters (the ticket-248 table here and the 313 additions in
+// config_write_313.go) and this is the one place the door asks both: a field is
+// writable when either table carries it, and the frozen 248 pin keeps describing
+// the 248 table alone.
 func knownWritableField(field string) bool {
+	return listedWritableField(field) || additionalWritableField(field)
+}
+
+// listedWritableField is the ticket-248 table's own lookup, unchanged in shape.
+func listedWritableField(field string) bool {
 	for _, f := range allWritableFields {
 		if f == field {
 			return true
@@ -479,6 +541,96 @@ func recordedWord(p ProviderSettings) string {
 	default:
 		return "未录入"
 	}
+}
+
+// SettingsPayloadMarker starts ticket 313's structured read payload. The payload
+// is ONE line beginning with this token, appended after renderSettingsView's
+// prose in the config.get reply: the page finds the line by the marker and parses
+// what follows it as JSON, and it never has to parse the prose (A877 ruling 4
+// chose "自由裁" for this shape because config.get has no consumers yet).
+//
+// The token carries no `panel.` prefix and no dot on purpose - the drift
+// instruments in this package both key on `panel.*` literals and this is neither a
+// method name nor a route.
+const SettingsPayloadMarker = "wisp-config-view:"
+
+// renderSettingsPayload is the read side's machine half. It carries the same
+// facts the prose carries plus ticket 313's additions (preset list, model names,
+// the chat provider half, the configured flag, the voice chain) and NOTHING else:
+// no credential value and no partially-redacted value, exactly like the prose
+// (the canary test in config_313_test.go points a key-shaped string at the
+// view's only credential-bearing field and requires this line to stay clean).
+func renderSettingsPayload(v SettingsView) string {
+	payload := struct {
+		Readable        bool              `json:"readable"`
+		Credential      CredentialState   `json:"credential"`
+		PresetsKnown    bool              `json:"presetsKnown"`
+		Presets         []string          `json:"presets"`
+		ConfiguredKnown bool              `json:"configuredKnown"`
+		Configured      bool              `json:"configured"`
+		ChatProvider    string            `json:"chatProvider"`
+		ChatModel       string            `json:"chatModel"`
+		ChatModelKnown  bool              `json:"chatModelKnown"`
+		Providers       []providerPayload `json:"providers"`
+		Voice           voicePayload      `json:"voice"`
+	}{
+		Readable:        v.Readable,
+		Credential:      v.Credential,
+		PresetsKnown:    v.PresetsKnown,
+		Presets:         v.Presets,
+		ConfiguredKnown: v.ConfiguredKnown,
+		Configured:      v.Configured,
+		ChatProvider:    v.ChatProvider,
+		ChatModel:       v.ChatModel,
+		ChatModelKnown:  v.ChatModelKnown,
+		Voice: voicePayload{
+			CloudASRChain:    v.Voice.CloudASRChain,
+			CloudTTSChain:    v.Voice.CloudTTSChain,
+			RealtimeEnabled:  v.Voice.RealtimeEnabled,
+			RealtimeProvider: v.Voice.RealtimeProvider,
+			RealtimeModel:    v.Voice.RealtimeModel,
+		},
+	}
+	for _, p := range v.Providers {
+		payload.Providers = append(payload.Providers, providerPayload{
+			Name:            p.Name,
+			APIKeyRef:       p.APIKeyRef,
+			HasBaseURL:      p.HasBaseURL,
+			ModelCount:      p.ModelCount,
+			Models:          p.Models,
+			CredentialSet:   p.CredentialSet,
+			CredentialError: p.CredentialError,
+		})
+	}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		// A struct of strings and slices cannot fail to marshal; if a later
+		// addition ever makes that untrue, the page is told rather than handed a
+		// silently empty line.
+		return fmt.Sprintf("%s{\"payloadError\":%q}", SettingsPayloadMarker, err.Error())
+	}
+	return SettingsPayloadMarker + string(data)
+}
+
+// providerPayload / voicePayload are the wire shapes of one provider row and the
+// voice half. They are separate types from the read view so a field added to
+// ProviderSettings does not silently change the page's JSON contract.
+type providerPayload struct {
+	Name            string   `json:"name"`
+	APIKeyRef       string   `json:"apiKeyRef"`
+	HasBaseURL      bool     `json:"hasBaseURL"`
+	ModelCount      int      `json:"modelCount"`
+	Models          []string `json:"models"`
+	CredentialSet   bool     `json:"credentialSet"`
+	CredentialError string   `json:"credentialError"`
+}
+
+type voicePayload struct {
+	CloudASRChain    []string `json:"cloudASRChain"`
+	CloudTTSChain    []string `json:"cloudTTSChain"`
+	RealtimeEnabled  bool     `json:"realtimeEnabled"`
+	RealtimeProvider string   `json:"realtimeProvider"`
+	RealtimeModel    string   `json:"realtimeModel"`
 }
 
 func (h *ConfigWriteHandler) actor() string {
