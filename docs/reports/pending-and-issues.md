@@ -17432,3 +17432,11 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **★`294-v1` 幽灵交件**：收官回执空＋盘上三查全不过（`probes/294/v1/**` 零件、无裁决表、票尾无 bullet、无 commit）；只遗 `probes/orch/t294-log.md`（10-09 旧日志誊抄件，1972B）。已按轻量协议催收（补三件 or 回"需重派"）；294 收口顺延。
 - **新派两腿**（CPU 33% 现跑、三面净）：`173-r1`＝审计字段 `in_allowlist_scope` 两态装两义＋同族普查（写面 `internal/tools/bridge.go` 一味＋用例；与 229 产物零交集；突变/race 与在飞腿错峰）＋`queue-verify-1`＝只读验面（把普查表不可信的面标逐票读真，≤40 枚，产已验可派单）。
 - **在飞（4）**：`186-r1`／`173-r1`／`queue-verify-1`／`294-v1`（催收中）。⛔ 未 push。
+
+
+## A885｜2026-10-13 22:06:39 +08｜应机主要求**把铁律与派发规则持久化**：① 项目记忆两份（`wisp-subagent-pipeline-discipline` 扩写＋新建 `wisp-orchestrator-ironlaws`）② repo 侧 `AGENTS.md` 顶部新增"当前时代规程索引"块（只指路、⛔ 未动其正文与 D 表）
+
+- 机主原话（本轮）：「把这些规则铁律什么的，也就是交接文档里记录的，包括我一直强调的子代理这些派发规则，都持久化记录下来……最起码得搞成项目记忆」。
+- 落点①（项目记忆＝ZCode `memories/projects/wisp-*/`，`MEMORY.md` 索引同步）：`wisp-subagent-pipeline-discipline.md` 重写扩写＝并发≤70%补位/十条款派单模板/先存档后发/三把尺与幽灵催收/死腿代提四门/面互斥与读数卫生（`tasklist`/`GOTMPDIR` C: 卷/`grep -c` 假 0）/deadline-pause；**新建** `wisp-orchestrator-ironlaws.md`＝冻结件清单/零 emoji 射程/前端与凭据边界/机主使用说明 12 条/汇报格式/高危陷阱（314 死区、255 行号钉、树会呼吸、假 0、宿主弹窗）/证据纪律。
+- 落点②（repo）：`AGENTS.md` 顶部新块＝指向 `HANDOVER.md §4`／台账／`orchestrator-handoff-20261013.md`＋运行铁律速记（推 origin/dev A813、腿只 commit、显式 pathspec、面互斥、三把尺、frontend 零写面、先存档后发、写腿≥2/CPU≤70%）——与本文件"薄索引、不新造规矩"的自述一致。
+- ⛔ 未 push。
