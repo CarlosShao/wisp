@@ -1,0 +1,9 @@
+# orch299ac4 evidence manifest (logs live OUTSIDE the repo; hashes for cross-checking)
+root=/c/Users/swq/AppData/Local/wisp-test-gotmp/orch299ac4-20261013-114815
+2444d9f0de2eb4a893f34501de532dafe51b86d9fa5350cd09cd295e96b4cec0  full-before-1.txt  lines=508
+10d5dc11e042662a968fa681aa68f5a20c8df30aec5afd7a6f2e5f2fc165eac3  full-before-2.txt  lines=508
+bd56f516b0c5efceca1a1591142f72aa8667b564785680b9c49b5b1dc6927c42  full-after-1.txt  lines=502
+3a099fc29cc33d3c3feb9a03647f5a8f1ced6f16fe7e8c311376eaacc1ee0187  full-after-2.txt  lines=502
+2abd68a162d559f90c81d04797b4520fbcc6d2b21664db13c50b6cc6cc5eefc5  full-before-3.txt  lines=508
+44cce6d4114c57473a2c8dc2c0a208289dbad89c946044a4e56f68f61e22432b  full-before-4.txt  lines=508
+1b7e2cd50e364eff119357fbe27df2187c74e1ec30a04e2239a5080bfa7eff7d  premerge-targeted.txt  lines=27

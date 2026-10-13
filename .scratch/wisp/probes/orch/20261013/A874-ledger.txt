@@ -1,0 +1,33 @@
+## A874｜2026-10-13 12:1x｜★票 299 `AC#4` 的整包成对跑完并**逐枚归因**：**299 修复本身＝新增红 0**；合并带来的 1 枚新增红**具名且判据已作废**（票 92 旧守卫 ⛔ 机主 09-28 改判不作数了）⇒ 票 299 **七格全勾、改名 `-done`**；⚠ 我自己在这一发里又踩两枚仪器坑（都当场抓住、都具名在下面）
+
+### 1. 台面与读数（件＝`C:/Users/swq/AppData/Local/wisp-test-gotmp/orch299ac4-20261013-114815/logs/**`）
+
+- 设计：**改前**＝`git archive 6985de48`（299 修复落地前那一笔）＋`frontend/dist` 三枚旧产物（从 `D:/tmp/wisp-distbak2-…` 拷回）；**改后**＝共享工作树 HEAD；各 **两发**整包 `go test ./cmd/wisp/ ./internal/panel/ -count=1 -v`，名册只取名字、两发取交集。
+- 读数：**改前 9 红／改后 6 红**（两侧两发完全同色＝无 flake）；名册各 204 行、除下节 5 枚外逐行相同。
+- ⚠ **记我第一处仪器缺陷（口径类）**：我第一版比较脚本把名册行写成 `^FAIL ` 去 grep——而真行的形状是 `--- FAIL TestX` ⇒ **两个空名单相减＝假的"新增红 0"**；当场用正确形状重算 ⇒ 真读数 1 枚新增。定式：**"0 命中"旁边必须先证明分母非空**（我就是靠"9 红 vs 6 红却 0 差异"这个矛盾才抓到的）。
+- ⚠ **记我第二处（台面类，正是我自己的记忆第 160 条）**：定向归因那一发 `GOTMPDIR` 指到没 `mkdir` 的目录 ⇒ `go: creating work dir: … cannot find the path specified.`（长得像"用例根本没跑"）——同发日志单行、抓得干净，建目录重跑即得真读数。
+
+### 2. ★那 5 枚差异逐枚归因（尺＝合并前那棵树 `971fa411` 上**定向复跑**，件 `logs/premerge-targeted.txt`）
+
+| 用例 | 改前 6985de48 | 合并前 971fa411 | 改后 HEAD | 归因 |
+|---|---|---|---|---|
+| `TestNoGitSwitchCapabilityInThePanelSurface` | PASS | **PASS** | **FAIL** | ★**合并带的新增红**（⛔ 299 的账） |
+| `TestComposerRenderFixtureTellsTheTruth` | FAIL | FAIL | PASS | 合并**清掉**（旧前端没跟上 Go 侧） |
+| `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme` | FAIL | FAIL | PASS | 同上 |
+| `TestGitDimensionHasNoModelCallableTool` | FAIL | FAIL | PASS | 同上 |
+| `TestReadGitOnThisRepositoryIsSelfConsistent` | FAIL | FAIL | PASS | 同上 |
+
+⇒ **票 299 的 `AC#4`（"新增红 0 枚"）成立**：除这 5 枚（全部由前端**内容**驱动、与 299 的管道改动作无关）外，两棵树的名册逐行相同；而 299 自己的新用例在改前侧根本不存在、在改后侧全绿。
+
+### 3. 那枚新增红的裁（⛔ 放宽断言，是**判据前提被机主自己作废了**）
+
+- 该用例在 `internal/panel/composer_test.go:272`，断言逐字：`a git branch/repository switcher exists in the panel surface; owner cut it from the product (票 92 AC#7)`。
+- **机主 2026-09-28 的 `Q-64` 改判＝做**（原话入账 `A368`）："聊天框那排的 git/模型/档位"要能改 ⇒ 我当天拆开立了 **票 186**（`the composer area should detect git and let the user switch between local worktree and branch`）与票 187（模型/档位）。
+- 那棵前端树按机主 10-12 的源头指令带着这个切换器（面板截图里 `D:\work\workspace\projects plans\Wisp` 那行＋切换入口就是它）⇒ **守卫的前提("owner cut it")已被机主后来的话推翻**，红得"对历史的、错在当下"。
+- **我的裁**：① ⛔ 在这张票里删/放宽它（那才叫为变绿放宽）；② **它的改写作废权归票 186**——票 186 落地腿必须把这条守卫**按 Q-64 的新契约重写**（⛔ 静默删：要么删得在票面上写明"被 Q-64 作废"，要么换成新契约的结构判据，如"切换能力只能走 C17 白名单方法"）；③ 在那之前，这枚红**登记成具名已知红**（记在票 186 尾与本账，⛔ 让下一程当"莫名红"去修）。
+- ⇒ 这一枚**记在票 186 账上**，⛔ 记在 299 头上。
+
+### 4. 票 299 收口
+
+- `AC#4` 翻勾（凭据＝§1–§2）；**七格全勾** ⇒ 改名 `-done`（`git mv`；⛔ 内容一字不动）。
+- 残余（⛔ 藏）：`frontend/node_modules.bak-oldpkg`（旧依赖树，留着待机主发话再清）；票 299 尾的 Status 与本节并列（⛔ 改旧行）。
