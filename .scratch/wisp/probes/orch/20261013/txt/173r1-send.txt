@@ -1,0 +1,9 @@
+派腿 `173-r1` —— 发送时补记（2026-10-13 21:55:11 +08，编排者现写）
+
+派单正文＝`.scratch/wisp/probes/orch/20261013/txt/173r1-dispatch.txt`（先存档后发，笔 `a58c2ea2`）。
+本文件只记"从写派单到发送之间变了的前提"；冲突时以本文件为准。
+
+1. 无变化：写存与发送之间无新提交；无别的腿入同面。
+2. 发送时刻现场（编排者现跑）：CPU 平均 33%；`wisp.exe`/`balldebug.exe`＝0；
+   `git status --porcelain -- internal/tools cmd/wisp internal/panel`＝0 行（起手仍自证）。
+3. 本波并行腿：`186-r1`（写 cmd/wisp+internal/panel）、`queue-verify-1`（只读）、`294-v1`（催收中）。
