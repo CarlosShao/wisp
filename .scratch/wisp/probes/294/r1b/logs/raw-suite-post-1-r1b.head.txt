@@ -1,0 +1,14 @@
+tag=post-1 (改后=现树不挂 overlay; prescribed form)
+date=2026-10-13 20:44:38 +0800
+pwd=/d/work/workspace/projects plans/Wisp
+cmd=PATH=third_party/sherpa-onnx:build go test ./cmd/wisp/ -count=1 -v
+pre-tasklist-hits=0
+rc=1
+wall=177s
+end=2026-10-13 20:47:36 +0800
+last-run==== RUN   TestAC14GoSideEvalPushReachesThePage
+runner-lines: RUN=176 PASS-oneline=125 FAIL-oneline=1
+tail:
+time=2026-10-13T20:47:35.952+08:00 level=INFO msg="MARK299 wndproc hwnd=0x79f0948 msg=0x6 known=true"
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	174.374s
+FAIL

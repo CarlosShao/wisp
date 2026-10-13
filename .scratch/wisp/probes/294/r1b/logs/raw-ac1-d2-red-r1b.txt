@@ -1,0 +1,7 @@
+time=2026-10-13T20:40:35.421+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC294AssemblyRootAttachesTheMuteGateByShape
+    resident_mute_294_test.go:133: AC#1(b) RED: the attach argument is "raudio.toggleMute", want raudio.toggleMute (the capture leg's own executor - any other function value is the defect this pin exists to catch)
+--- FAIL: TestAC294AssemblyRootAttachesTheMuteGateByShape (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.066s
+FAIL

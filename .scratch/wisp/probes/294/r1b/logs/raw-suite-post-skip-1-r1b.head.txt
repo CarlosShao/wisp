@@ -1,0 +1,17 @@
+tag=post-skip-1 (改后=现树; skip-form companion for AC#5 full coverage; ⛔ 非 prescribed form)
+date=2026-10-13 21:00:52 +0800
+pwd=/d/work/workspace/projects plans/Wisp
+cmd=go test ./cmd/wisp/ -count=1 -v -skip 'TestAC13|TestAC14'
+pre-tasklist-hits=0
+rc=1
+wall=165s
+end=2026-10-13 21:03:37 +0800
+last-run==== RUN   TestProvidersProbeRecordsMeasuredThinkingFalse
+counts: with-subtests=183 top-only=134 top-FAIL=1 top-SKIP=0
+TestAC294 runs=0
+FAIL lines:
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.53s)
+tail:
+=== RUN   TestProvidersProbeRecordsMeasuredThinkingFalse
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	158.932s
+FAIL

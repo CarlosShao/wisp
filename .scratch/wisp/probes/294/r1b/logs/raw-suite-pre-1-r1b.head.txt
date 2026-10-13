@@ -1,0 +1,18 @@
+tag=pre-1 (改前=同树+两枚件 overlay 到空 stub; 唯一差=两枚件的存在)
+date=2026-10-13 20:51:28 +0800
+pwd=/d/work/workspace/projects plans/Wisp
+cmd=PATH=... go test ./cmd/wisp/ -count=1 -v -overlay .scratch/wisp/probes/294/r1b/logs/ov-stub-pair.json
+pre-tasklist-hits=0
+rc=1
+wall=163s
+end=2026-10-13 20:54:11 +0800
+last-run==== RUN   TestAC13BringUpSurvivesAReusedThreadQuit
+runner-lines: RUN=172 PASS-oneline=121 FAIL-oneline=1
+FAIL lines:
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.49s)
+TestAC294 check (expect none):
+0
+tail:
+time=2026-10-13T20:54:10.582+08:00 level=INFO msg="MARK299 wndproc hwnd=0x29d110e msg=0x6 known=true"
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	159.877s
+FAIL

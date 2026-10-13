@@ -1,0 +1,5 @@
+tag=post-target-2 (改后=现树; targeted full-package roster for the resident_mute_29x region the full suite dies before reaching)
+date=2026-10-13 21:05:37 +0800
+cmd=go test ./cmd/wisp/ -count=1 -v -run 'TestAC29'
+rc=0
+counts: with-subtests=17 top-only=17 top-FAIL=0

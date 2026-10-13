@@ -1,0 +1,44 @@
+# 294-r1b AC#5 套件发次读数 —— prescribed 2+2（ⓐ 同树 overlay-stub 对）+ 一发宽跳companion + 定向补尺 2+2
+
+- 时刻 2026-10-13 20:44–21:06 +08；锚 HEAD `084a6656`；pwd＝worktree `/d/work/workspace/projects plans/Wisp`。
+- 判语一句：**改前⇄改后各 ≥2 发、逐名作差 ⇒ 稳定名册交集逐字节相同（122=122，diff 空）**；
+  ⚠ 但 prescribed 形态 5/5 整进程死（票 314 死区），死前覆盖只到 `TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` 一带，
+  **`resident_*` 区（含本腿 4 枚 `TestAC294*`）在死区之后、未被任何整包发次覆盖**（另见 `30-roster-intersection.txt` 的定向补尺）。
+
+## 1. 五发整包（每发均：跑前 `tasklist` 现跑 `wisp.exe`/`balldebug.exe`＝0；PATH 前缀＝`third_party/sherpa-onnx:build`）
+| tag | 形 | overlay | 起 | rc | wall | go test 报时长 | 死点（最后 `=== RUN`，⛔ 无结果行） | 计数（含子测试／只顶层） | `--- FAIL` 名 |
+|---|---|---|---|---|---|---|---|---|---|
+| post-1 | prescribed 不挂 skip | 无 | 20:44:38 | 1 | 177s | 174.374s | `TestAC14GoSideEvalPushReachesThePage` | 174／125 | 255 名册 |
+| post-2 | prescribed 不挂 skip | 无 | 20:48:11 | 1 | 165s | 161.518s | `TestAC13BringUpSurvivesAReusedThreadQuit` | 170／121 | 255 名册 |
+| pre-1 | prescribed 不挂 skip | 空 stub 对 | 20:51:28 | 1 | 163s | 159.877s | `TestAC13BringUpSurvivesAReusedThreadQuit` | 170／121 | 255 名册 |
+| pre-2 | prescribed 不挂 skip | 空 stub 对 | 20:54:35 | 1 | 160s | 157.188s | `TestPanelThreadIsSTAAndExitsCleanly` | 174／125 | 255 名册＋`TestAC14GoSideEvalPushReachesThePage` |
+| post-skip-1 | 宽跳 companion（⛔ 非 prescribed） | 无 | 21:00:52 | 1 | 165s | 158.932s | `TestProvidersProbeRecordsMeasuredThinkingFalse` | 183／134 | 255 名册 |
+
+- 计数两把并排＝`grep -c -- '--- PASS'`（含子测试）／`grep -c -- '^--- PASS'`（只顶层），⛔ 相加⛔ 互替；原始件＝`raw-suite-<tag>-r1b.txt`＋`.head.txt`。
+- 死法签名（5/5 同形）：无 Go panic、无 `exit status` 行、死点测试**无 `--- PASS/FAIL` 结果行**，只有 `FAIL github.com/CarlosShao/wisp/cmd/wisp <Xs>`＋`FAIL`。
+- ★票 314「机主在场」对照数据点（⛔ 当噪音丢）：派单记机主 20:3x 在机器旁，而本腿 20:44–21:03 的 **5/5 发照死不误**（157.2–174.4s）
+  ⇒ 若归因候选 (a)「桌面/会话状态」，则"机主在旁"本身**不足以**压住它（⛔ 未定性，只交读数）；死点 4 枚不同测试（AC14 push／AC13 两枚／PanelThread／Providers probe）＝⛔ 单一测试假说。
+- 一枚记它（前任原件）：`raw-suite-pre-5.txt` 里 `TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe` 仍 `=== RUN`＋`PASS`
+  ⇒ **前任 pre-5 声称的宽跳 `TestAC13|TestAC14` 未生効**（其"宽跳也死"读数不可作"宽跳无用"的结论）；本腿 post-skip-1 的同一宽跳确生効（`TestAC13/14` 零命中）却仍在 158.9s 死。
+
+## 2. 定向补尺 2+2（⛔ 非 prescribed 的替代，只为覆盖死区之后的 resident 区；具名"补充尺"）
+cmd：`go test ./cmd/wisp/ -count=1 -v -run 'TestAC29'`（命中 17 枚：`TestAC290*` 6＋`TestAC293*` 7＋`TestAC294*` 4）
+| tag | 形 | overlay | rc | 结果 |
+|---|---|---|---|---|
+| post-target-1 | 现树 | 无 | 0 | 17 PASS（原件 `raw-target-post-target-1-r1b.txt`） |
+| post-target-2 | 现树 | 无 | 0 | 17 PASS |
+| pre-target-1 | 改前 | 空 stub 对 | 0 | 13 PASS（4 枚 `TestAC294*` 不存在） |
+| pre-target-2 | 改前 | 空 stub 对 | 0 | 13 PASS |
+
+- 两侧稳定名册（各 2 发交集）：post 17 枚＝pre 13 枚＋**恰 4 枚 `TestAC294*`**（diff 逐字见 `diff-target-pre-vs-post-r1b.txt`；唯一几何差 `13a14,17`）。
+- 邻枚族（290／293）两侧逐名同色（13 PASS），零漂。
+
+## 3. 空 stub 对机制预演（先证后用）
+- stub 件＝`stub-294-test.txt`／`stub-294-windows-test.txt`（各两行 `package main`＋空行，`.txt`；`probes/**` 下 `.go` 零新增）；
+  overlay 件＝`ov-stub-pair.json`（只映射本腿两枚件，其余路径不动 ⇒ 唯一差＝两枚件的存在）。
+- 烟测（`raw-stub-smoke.txt`）：`-run 'TestAC294' -overlay ov-stub-pair.json` ⇒ `no tests to run` rc=0；同 filter 不挂 overlay ⇒ 4 PASS
+  ⇒ 映射确实只作用在本腿两枚件上。
+
+## 4. 本轮用掉的写面/读数约束复核
+- 每发都在 worktree 跑，`git status --porcelain -- cmd/wisp` 全程空（变异全走 `-overlay`，产码字节零动；见 `10-ac294-recheck.txt` §3）。
+- `GOTMPDIR`／`WISP_TEST_GOTMP_ROOT` 全程未设（起手两值皆空）；⛔ 未换卷、⛔ 未设 D: 卷临时根。

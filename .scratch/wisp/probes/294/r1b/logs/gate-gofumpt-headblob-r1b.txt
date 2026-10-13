@@ -1,0 +1,10 @@
+--- HEAD:cmd/wisp/models.go ---
+rc=0
+--- HEAD:cmd/wisp/panel_transport_35r2_test.go ---
+<standard input>
+rc=0
+--- HEAD:my two files ---
+--- HEAD:cmd/wisp/resident_mute_294_test.go ---
+rc=0
+--- HEAD:cmd/wisp/resident_mute_294_windows_test.go ---
+rc=0

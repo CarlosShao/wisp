@@ -1,0 +1,5 @@
+tag=pre-target-1 (改前=同树+两枚件 overlay 到空 stub; targeted)
+date=2026-10-13 21:05:43 +0800
+cmd=go test ./cmd/wisp/ -count=1 -v -run 'TestAC29' -overlay .scratch/wisp/probes/294/r1b/logs/ov-stub-pair.json
+rc=0
+counts: with-subtests=13 top-only=13 top-FAIL=0

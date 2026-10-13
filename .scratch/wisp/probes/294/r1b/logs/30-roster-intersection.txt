@@ -1,0 +1,36 @@
+# 294-r1b AC#5 名册交集 —— 改前⇄改后逐名作差（ⓐ 同树 overlay-stub 对；具名：用 ⓐ，⛔ 未用 ⓑ 导出树）
+
+- 时刻 2026-10-13 20:44–21:07 +08；锚 HEAD `084a6656`；发次表见 `20-suite-runs.txt`（逐发 rc／死点／计数）。
+- 判语一句：**两发交集仍逐名作差 ⇒ 稳定名册 `cmp` 逐字节相同（122=122，diff 空）**；
+  ⚠ **覆盖洞具名**：prescribed 五发全死在票 314 死区 ⇒ 交集只覆盖死点之前的区段（边界见 §2），
+  `resident_*` 区（含本腿 4 枚 `TestAC294*`）在死区之后、整包名册零命中 ⇒ 用 §3 的定向补尺补证，⛔ 具名为补充、⛔ 互替。
+
+## 1. 方法与原始件
+- 射程：`grep -E '^--- (PASS|FAIL|SKIP):'` ＋ `sed` 取 `PASS|FAIL|SKIP <名>` ＋ `sort -u`（**只数顶层**，子测试被 `^---` 锚排除）。
+- 计数的两把并排（⛔ 相加／⛔ 互替）：`grep -c -- '--- PASS'`（含子测试）／`grep -c -- '^--- PASS'`（只顶层）＝见 `20-suite-runs.txt` 表。
+- 单发名册⛔ 当可靠尺（A875）：每侧 2 发取交集；**逐名作差**＝两侧稳定名册 `diff`。
+- 原件：`roster-post-1-r1b.txt`／`roster-post-2-r1b.txt`／`roster-pre-1-r1b.txt`／`roster-pre-2-r1b.txt`；
+  交集＝`stable-post-r1b.txt`／`stable-pre-r1b.txt`；单侧间不齐＝`unstable-post-r1b.txt`／`unstable-pre-r1b.txt`；差＝`diff-stable-pre-vs-post-r1b.txt`。
+
+## 2. 结果（prescribed 2+2）
+- 稳定名册：`stable-post` 122 行、`stable-pre` 122 行；`cmp -s` ⇒ **IDENTICAL（rc=0）**；`diff` 输出 **0 行（rc=0）**。
+  ⇒ 覆盖到的区段内，**两枚件的存在未使任何一枚其他测试改色／改名**。
+- 单侧不齐（＝被死区截断区，两边都列全）：post 侧 4 名、pre 侧 4 名＋pre-2 独有的 `FAIL TestAC14GoSideEvalPushReachesThePage`；
+  逐字见 `unstable-post-r1b.txt`／`unstable-pre-r1b.txt`（全是 `TestAC13*`／`TestAC14*` 族）。
+- **覆盖边界**（post-1 运行序里稳定名册的最后一名）：`PASS TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`。
+  边界之后（运行序后续＋全部 `resident_*`／`risk`／`run` 区）＝**死区未覆盖**；证：稳定名册里 `TestAC290|TestAC294` 命中＝**0／0**。
+- 死点（5 发并集）：`TestAC14GoSideEvalPushReachesThePage`／`TestAC13BringUpSurvivesAReusedThreadQuit`／`TestPanelThreadIsSTAAndExitsCleanly`／`TestProvidersProbeRecordsMeasuredThinkingFalse`（⚠ 前任 18:32 那发死点＝`TestPanelThreadIsSTAAndExitsCleanly`）。
+- 死区降格（主文已赦）：⛔ 不无限重跑；本腿 prescribed 4 发＋宽跳 companion 1 发＝5 发，全死即停手改补尺。
+
+## 3. 定向补尺（补充，⛔ 不替代 prescribed 尺）：`-run 'TestAC29'` 2+2
+- 两侧稳定名册：post 17 枚（`TestAC290*` 6＋`TestAC293*` 7＋`TestAC294*` 4）⇄ pre 13 枚（无 4 枚 `TestAC294*`）；
+  `diff` 逐字（`diff-target-pre-vs-post-r1b.txt`）＝唯一几何差 `13a14,17`，四条新增行逐字：
+  `PASS TestAC294AssemblyRootAttachesTheMuteGateByShape`／`PASS TestAC294HkMuteMirrorMatchesInternalBallSource`／
+  `PASS TestAC294MuteHotkeyRegistersLiveOnARealBallWindow`／`PASS TestAC294ToggleMuteExecutedTrueOnTheHappyPath`。
+- ⇒ 死区之后那段里，**唯一差也恰是这 4 枚新名**；邻枚族（290／293）两侧逐名同色（13 PASS），零漂。
+
+## 4. ⛔ 缺口具名（本格没做完的部分）
+- **prescribed 形态无法覆盖 `resident_*` 区**（死区在 `panel_*` 区先落地，`resident_*` 在其后约 90 枚）：
+  因此"两枚件的存在只在名册里新增 4 枚名"这句的 prescribed 直接读数＝**未取得**；本腿交的是
+  ① 覆盖区内逐名零差（122=122）＋② 定向补尺的 4 枚新增名＋③ 4 枚名的独立绿读（`10-ac294-recheck.txt`）。
+- 若编排者要 prescribed 形态的完整覆盖：需 §4 死区被票 314 定性／修掉后再跑同形 2+2（本腿⛔ 无限重跑）。

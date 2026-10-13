@@ -1,0 +1,80 @@
+=== commit e480e15b ===
+commit=e480e15bb72479a365290ff4f85a69050defc704
+subject=294-r1 死腿遗产代提〔未验证半成品〕〔死腿遗产〕（旧会话废弃、腿停在"名册交集"最后一格）
+date=2026-10-13 20:32:50 +0800
+.scratch/wisp/probes/294/r1/logs/00-head.txt
+.scratch/wisp/probes/294/r1/logs/10-ac1-astpin.txt
+.scratch/wisp/probes/294/r1/logs/20-ac2-window.txt
+.scratch/wisp/probes/294/r1/logs/30-ac3-executed.txt
+.scratch/wisp/probes/294/r1/logs/diff-pre1-vs-pre4-env.txt
+.scratch/wisp/probes/294/r1/logs/mut-ac1-test-argrb.txt
+.scratch/wisp/probes/294/r1/logs/mut-ac1-test-count2.txt
+.scratch/wisp/probes/294/r1/logs/mut-ac3-audio-openfalse.txt
+.scratch/wisp/probes/294/r1/logs/ov-ac1-d1.json
+.scratch/wisp/probes/294/r1/logs/ov-ac1-d2.json
+.scratch/wisp/probes/294/r1/logs/ov-ac3.json
+.scratch/wisp/probes/294/r1/logs/ov-smoke-backing.txt
+.scratch/wisp/probes/294/r1/logs/ov-smoke-out.txt
+.scratch/wisp/probes/294/r1/logs/ov-smoke.json
+.scratch/wisp/probes/294/r1/logs/raw-ac1-d1-red.txt
+.scratch/wisp/probes/294/r1/logs/raw-ac1-d2-red.txt
+.scratch/wisp/probes/294/r1/logs/raw-ac294-green-1.txt
+.scratch/wisp/probes/294/r1/logs/raw-ac294-green-final.txt
+.scratch/wisp/probes/294/r1/logs/raw-ac3-mut-red-final.txt
+.scratch/wisp/probes/294/r1/logs/raw-ac3-mut-red.txt
+.scratch/wisp/probes/294/r1/logs/raw-ac3-restored-green-final.txt
+.scratch/wisp/probes/294/r1/logs/raw-ac3-restored-green.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-post-1.head.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-post-1.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-1.head.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-1.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-2.head.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-2.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-3.head.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-3.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-4.head.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-4.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-5.head.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-5.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-6.head.txt
+.scratch/wisp/probes/294/r1/logs/raw-suite-pre-6.txt
+.scratch/wisp/probes/294/r1/logs/roster-pre-1.txt
+.scratch/wisp/probes/294/r1/logs/roster-pre-2.txt
+.scratch/wisp/probes/294/r1/logs/roster-pre-4.txt
+.scratch/wisp/probes/294/r1/logs/roster-pre-6.txt
+.scratch/wisp/probes/294/r1/logs/tmp-roster-smoke.txt
+.scratch/wisp/probes/orch/20261013/txt/294r1-commit-msg.txt
+cmd/wisp/resident_mute_294_test.go
+cmd/wisp/resident_mute_294_windows_test.go
+files=44
+--- forbidden-path sweep (10 items) ---
+  frontend/ => 0
+  design/ => 0
+  PLAN.md => 0
+  docs/specs/ => 0
+  internal/observe/thresholds.go => 0
+  golden => 0
+  tools/d22scan/allowlist.txt => 0
+  internal/panel/tokens_fourway_test.go => 0
+  internal/panel/l2_grant_boundary_test.go => 0
+  internal/perm/ticket90_persist_test.go => 0
+forbidden-hits=0
+
+=== commit 084a6656 ===
+commit=084a6656bdf4af6cd271be527d716c6c69617d30
+subject=编排者：记我——修正 294 票尾 bullet 时间戳笔误（+08 重复）
+date=2026-10-13 20:37:04 +0800
+.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md
+files=1
+--- forbidden-path sweep (10 items) ---
+  frontend/ => 0
+  design/ => 0
+  PLAN.md => 0
+  docs/specs/ => 0
+  internal/observe/thresholds.go => 0
+  golden => 0
+  tools/d22scan/allowlist.txt => 0
+  internal/panel/tokens_fourway_test.go => 0
+  internal/panel/l2_grant_boundary_test.go => 0
+  internal/perm/ticket90_persist_test.go => 0
+forbidden-hits=0

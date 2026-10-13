@@ -1,0 +1,42 @@
+# 294-r1b 三格复核读数 —— 绿读 + 三发红形牙复核（共 5 发；⛔ 未重造仪器，overlay 件引前任 r1/logs）
+
+- 时刻 2026-10-13 20:39–20:43 +08；锚 HEAD `084a6656`；尺件 sha256 与代提笔 e480e15b 核对值逐字一致
+  （`resident_mute_294_test.go` = `7b20b7f8…cfde49`／`resident_mute_294_windows_test.go` = `ede84f7a…6969229`）。
+- 判语一句：三格全部**不回归** —— 绿读四枚全 PASS（非 skip），三发红形各自红在指名行、字面与前任读数一致，还原后回绿。
+
+## 1. 绿读（rc=0；四枚全 PASS；`--- SKIP` 零命中）
+cmd: `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -run 'TestAC294' -v`
+原件 = `raw-ac294-green-r1b.txt`
+```
+--- PASS: TestAC294AssemblyRootAttachesTheMuteGateByShape (0.00s)
+--- PASS: TestAC294HkMuteMirrorMatchesInternalBallSource (0.00s)
+--- PASS: TestAC294MuteHotkeyRegistersLiveOnARealBallWindow (0.30s)
+--- PASS: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.349s
+```
+- AC#2 真窗现读逐字（raw-ac294-green-r1b.txt 内日志行；本机有真窗、未走 SKIP-LOUD）：
+  `AC#2 reading: id=2 name="mute" binding="Ctrl+Alt+X" status="live" vk=0x58`
+
+## 2. 三发红形牙复核（各 rc=1、各红在指名行；⛔ 判据只看红句行）
+| 发 | overlay 件（引前任 r1/logs，只读） | 原件 | 红句逐字 |
+|---|---|---|---|
+| D1 | `ov-ac1-d1.json`（计数 want=2） | `raw-ac1-d1-red-r1b.txt` | `resident_mute_294_test.go:117: AC#1(a) RED: runResident (resident_windows.go) contains 1 rb.attachMuteGate call(s), want exactly 2 - the mute hop is not attached (or attached twice)` |
+| D2 | `ov-ac1-d2.json`（期望实参名改 rb.toggleMute） | `raw-ac1-d2-red-r1b.txt` | `resident_mute_294_test.go:133: AC#1(b) RED: the attach argument is "raudio.toggleMute", want raudio.toggleMute (the capture leg's own executor - any other function value is the defect this pin exists to catch)` |
+| AC#3 | `ov-ac3.json`（采集支 `, true`→`, false`，同行改字） | `raw-ac3-mut-red-r1b.txt` | `resident_mute_294_windows_test.go:143: AC#3 RED: the happy path answered executed=false while the gate DID turn (muted=false open=true): "已取消静音：设备已交接，采集线程在跑；…"` |
+
+- D1 红句把生产真值现读为 **1**（判据承重：要 2 即红）；D2 红句把生产实参拼写现读为 `"raudio.toggleMute"`（比较是活的）；
+- AC#3 句面一字节未变（仍是"已取消静音：设备已交接…"）而 gate 真翻（muted=false open=true）、executed=false
+  ⇒ 读句面会被骗过、判据锚在 gate 自读＋这枚 bool 上，复现前任 M1 教训。
+
+## 3. 还原绿 + 仓内字节零动
+- 去 overlay 复跑整 filter（`raw-ac3-restored-green-r1b.txt`）：rc=0，四枚再全 PASS。
+- sha256 产码两枚复核前后未动、且与前任读数逐字相同：
+  `resident_audio_windows.go` = `a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84`；
+  `resident_windows.go` = `72fcee7ac202b17df2b74b061fa0ffdd3559547d77e765baa1082fe897891509`；
+  尺件两枚 sha256 同值（见首节）。
+- `git status --porcelain -- cmd/wisp` = 空（rc=0）；`probes/294/**` 下 `.go` = 0（变异体一律 `.txt`）。
+
+## 4. 一枚坑复现（记我，防下一位再踩）
+- 不带 `PATH=third_party/sherpa-onnx:build` 前缀直跑 go test ⇒ `exit status 0xc0000135`（DLL 缺失）＋rc=1：
+  我第一发三枚 overlay 跑全是这个死法，**rc=1 本身不是红形读数**；已全部带 PATH 重跑（即上表原件）。
+  ⇒ 红形判据 = 红句出现在指名行；⛔ 不许拿 rc=1 当"仪器有牙"。

@@ -1,0 +1,30 @@
+# 294-r1b post 三红逐因 + 票 314 死区读数（本腿 20:44–21:06 现跑；⛔ 引前任件处已具名）
+
+- 锚 HEAD `084a6656`；发次与死点见 `20-suite-runs.txt`；本件只做**逐因**：哪一枚是谁的账、交集法怎么读。
+- 判语一句：三枚红里 **255 名册＝HEAD 级欠账（两发交集稳定红、两侧同红 ⇒ 非本腿）**；AC14 push／AC4 focus ＝**真窗族"颜色随会话漂"**（本腿窗口内：AC4 四发全绿、AC14 无两发一致读数）；AC14 同时落在死区。
+
+## ① `TestAC14GoSideEvalPushReachesThePage`（页面自报 title 空）
+- 本腿读数（⛔ 无两发交集一致的"红"）：post-1 **死在它身上**（无结果行）／post-2 未达／pre-1 未达／pre-2 **FAIL 0.40s**。
+- pre-2 红句逐字（`raw-suite-pre-2-r1b.txt`）：
+  `panel_resident_windows_test.go:944: AC#14 nail 2 (Eval push hop), page's own words: title=""` ＋
+  `:946: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other`
+- 前任 post-1（18:32）同题红、同句（`:944 title=""`，0.33s）；票 314 q1/q4 死点也落在它 ⇒ **它是死区与大红窗的同一格**。
+- 判：**交集法不给"本时段环境红"**（无两发一致）⇒ 具名标 **"死区未覆盖＋一发红（pre-2）／前任一发红"**，⛔ 归因署"非本腿"（它本身属真窗族 A875 漂色 + 死区）。
+
+## ② `TestAC4FocusReturnToPriorWindowGap33r5`（foreground 未夺取）
+- 本腿四发**全绿**：post-1 0.54s／post-2 0.51s／pre-1 0.43s／pre-2 0.43s（两侧各两发一致）。
+- 前任 post-1（18:32）＝**FAIL 0.49s**；前任 pre 内部也翻色（`probes/294/r1/logs/diff-pre1-vs-pre4-env.txt` 同族逐字节在场）⇒ 台账 A875 先例复现。
+- 判：**本时段环境绿**（非"本时段环境红"）；⛔ 非本腿账，⛔ 不许拿前任那一发当"仍红"。
+
+## ③ `TestTicket255RosterStillMatchesTheActualReadSites` ＝★HEAD 级欠账、非本腿
+- 本腿四发**全红且两侧同红**（post-1 0.58s／post-2 0.56s／pre-1 0.49s／pre-2 0.50s）⇒ 交集法：**本时段稳定红**。
+- 红句逐字（`raw-suite-post-1-r1b.txt:161`）：
+  `config_receipt_255_test.go:245: section "voice" (field Voice) is read by [cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] in production, the roster names [cmd/wisp/resident_audio_windows.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated`
+- 归因（编排者已定位，本腿复认逐字含 `internal/panel/config_handlers.go`）：`89b3b550`（313-r1）新增 Voice 读面 ⇒ 名册漂移；台账 `A878`，归 313 收尾链／255-r2 重裁。
+- 处置：**⛔ 碰**（`config_readers_255.go`／`internal/**` 在本腿禁列）；两侧各发都带上它 ⇒ 在"改前⇄改后"里**两侧同红、自然抵消**（`30-roster-intersection.txt` 的 122=122 里它是一枚 FAIL 行，两边同字面）。
+
+## ④ 票 314 死区读数（本腿现跑，供 314 对照；⛔ 当噪音丢）
+- 5/5 整进程死：20:44–21:03 五发，`go test` 报时长 157.188／158.932／159.877／161.518／174.374s；wall 160–177s。
+- 死点并集 4 枚：`TestAC14GoSideEvalPushReachesThePage`（1）／`TestAC13BringUpSurvivesAReusedThreadQuit`（2）／`TestPanelThreadIsSTAAndExitsCleanly`（1）／`TestProvidersProbeRecordsMeasuredThinkingFalse`（1，宽跳发）。
+- ★"机主在场"对照：派单记机主 20:3x 在机器旁 ⇒ **候选 (a)「桌面/会话状态」下，"在旁"本身不足以压住死亡**（5/5 照死；⛔ 未定性，"在用"与"在旁"未分）。
+- 死法签名同前任：无 panic、无 `exit status`、死点测试无结果行，只剩 `FAIL … <Xs>`＋`FAIL`。

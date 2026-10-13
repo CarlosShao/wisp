@@ -1,0 +1,7 @@
+time=2026-10-13T20:40:32.645+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC294AssemblyRootAttachesTheMuteGateByShape
+    resident_mute_294_test.go:117: AC#1(a) RED: runResident (resident_windows.go) contains 1 rb.attachMuteGate call(s), want exactly 2 - the mute hop is not attached (or attached twice)
+--- FAIL: TestAC294AssemblyRootAttachesTheMuteGateByShape (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.070s
+FAIL

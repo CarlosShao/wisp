@@ -1,0 +1,16 @@
+tag=post-2 (改后=现树不挂 overlay; prescribed form)
+date=2026-10-13 20:48:11 +0800
+pwd=/d/work/workspace/projects plans/Wisp
+cmd=PATH=third_party/sherpa-onnx:build go test ./cmd/wisp/ -count=1 -v
+pre-tasklist-hits=0
+rc=1
+wall=165s
+end=2026-10-13 20:50:57 +0800
+last-run==== RUN   TestAC13BringUpSurvivesAReusedThreadQuit
+runner-lines: RUN=172 PASS-oneline=121 FAIL-oneline=1
+FAIL lines:
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.56s)
+tail:
+time=2026-10-13T20:50:57.425+08:00 level=INFO msg="MARK299 wndproc hwnd=0xa040cca msg=0x6 known=true"
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	161.518s
+FAIL

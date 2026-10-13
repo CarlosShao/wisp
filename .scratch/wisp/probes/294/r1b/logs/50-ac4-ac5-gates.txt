@@ -1,0 +1,39 @@
+# 294-r1b AC#4 越界 ＋ AC#5 门禁四数（每枚自落 rc=N；锚 HEAD 084a6656，除注明外都跑在 worktree）
+
+- 判语一句：**AC#4 逐笔过十枚禁列＝0 命中；四门＝build rc=0／gofumpt 两把尺（既有两枚脏、本腿零混入）／套件 2+2 交集 diff 空／d22scan 工作树 rc=0；跑前 tasklist 清零。**
+- ⚠ d22scan 的"仓外导出树"形**结构性不成立**（实测 rc=1，见 §2.4）⇒ 交工作树形（与编排者发送时现量"d22scan 工作树 clean"同形），具名不掩盖。
+
+## 1. AC#4 逐笔越界（尺＝`git show --name-only --format=<commit>`，⛔ 区间尺；十枚禁列逐枚 grep -c）
+- 逐笔原件＝`50-ac4-bounds-r1b.txt`（含文件全列与逐枚 0/1）。
+- `e480e15b`（代提笔）＝44 件：41 logs＋2 尺件＋1 commit-msg；十枚禁列（`frontend/`／`design/`／`PLAN.md`／`docs/specs/`／`internal/observe/thresholds.go`／`golden`／`tools/d22scan/allowlist.txt`／`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）逐枚 **0**；`forbidden-hits=0`。
+- `084a6656`（编排者票尾笔误修正）＝1 件（票面本件）；十枚 **0**。
+- 本腿提交笔：见本件末（`== 本腿提交 ==` 节，commit 后追加；同一把尺同一十枚）。
+
+## 2. AC#5 门禁四数
+### 2.1 `GOFLAGS= go build ./...`
+- rc=**0**（原件 `gate-build-r1b.txt`，末行 `build-rc=0`）。
+
+### 2.2 gofumpt（绝对路径 `/d/work/base/gopath/bin/gofumpt.exe`；⛔ 裸 `gofumpt`＝rc=127，未掩盖）
+- 射程①工作树：`gofumpt -l cmd/wisp` ⇒ 恰两枚**既有**脏名：`cmd\wisp\models.go`、`cmd\wisp\panel_transport_35r2_test.go`（rc=0，输出即两行；**本腿两枚件零混入**）。原件 `gate-gofumpt-worktree-r1b.txt`。
+- 射程②HEAD blob（同两枚＋本腿两枚并排，`git show HEAD:<f> | gofumpt -l`）：原件 `gate-gofumpt-headblob-r1b.txt`。
+  - `HEAD:cmd/wisp/models.go` ⇒ **无输出**（blob 净）⇒ 工作树那枚＝CRLF 族假枚（⛔ 非内容脏、⛔ 非本腿）；
+  - `HEAD:cmd/wisp/panel_transport_35r2_test.go` ⇒ `<standard input>`（**blob 也脏**）⇒ 票 298 残余已在 HEAD 里，⛔ 非本腿；
+  - `HEAD:cmd/wisp/resident_mute_294_test.go`／`..._windows_test.go` ⇒ 两枚都净。
+
+### 2.3 套件改前⇄改后各 ≥2 发取交集、逐名作差
+- 见 `20-suite-runs.txt`／`30-roster-intersection.txt`：稳定名册 122=122、`cmp` 相同、`diff` 0 行；计数两把并排（含子测试／只顶层）逐发在位。
+- ⚠ 覆盖洞（`resident_*` 区在死区之后）与定向补尺的 4 枚新增名，见 `30-` §2–§4；⛔ 本件不重复。
+
+### 2.4 `sh scripts/d22scan.sh`
+- 工作树形：rc=**0**（`d22scan: clean - no D22 ban violations`；正控 `top-level: PASS=35 FAIL=0 SKIP=0`）。原件 `gate-d22scan-worktree-r1b.txt`（末行 `d22scan-worktree-rc=0`）。
+- 仓外导出树形（`git archive HEAD go.mod go.sum internal cmd tools scripts frontend design`）：rc=**1**，原件 `gate-d22scan-export-r1b.txt`。
+  - 死因＝**结构性**：导出树漏 `.scratch/` ⇒ `cmd/wisp/slo_windows.go` 三处**真存在**的注释引路在导出树里成幻影（ban #9 phantom-citation 判在"被扫根"上），46 枚 finding ⇒ 两枚真仓自省测试（`TestScannerSelfScanOfRealRepoIsGreen`／`TestRealRepoLedgerIsHonest`，属正控步骤）红。
+  - 判：⛔ 产码回归（同一份 HEAD 字节，工作树形净）；⇒ 本格交工作树形读数，⛔ 不把导出树红算成"仓里脏"。
+  - ⚠ 顺记：导出树没有 `.git` ⇒ 扫描器"问不到 git 就不跳过任何路径"（loud over-coverage，见 `gitignore.go` 注），分母与工作树形不可比 —— 两枚数不并排、不互替。
+
+### 2.5 跑读数前的 `tasklist`（每发套件前＋门禁现跑）
+- `tasklist | grep -icE 'wisp\.exe|balldebug\.exe'` ⇒ **0**（各 `.head.txt` 里 `pre-tasklist-hits=0`；门禁现场同 0）。
+- 件名长度门（新建件前先跑）：`sh scripts/check-path-length-budget.sh --with-self-test` ⇒ rc=**0**（VERDICT GREEN，原件 `00-head.txt` 末节）。
+
+## 3. 本腿提交（commit 后追加本节；同一把 AC#4 尺）
+（待提交后补：commit hash／件数／十枚禁列逐枚命中／`forbidden-hits`）
