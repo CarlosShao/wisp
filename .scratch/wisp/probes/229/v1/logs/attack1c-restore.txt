@@ -1,0 +1,8 @@
+=== 攻1c: 还原 21:28:19 ===
+还原后 :394 = 	observe.Default.Spawn("agent-task-"+bg.ID, "tools", watchRoot, func(c context.Context) {
+还原后 sha256 = 5b0ca5e2303b6619f80dac2c57524a3ff1c7bb71c059a55f2ae73c5937aa7c2b
+变异前 sha256 = 5b0ca5e2303b6619f80dac2c57524a3ff1c7bb71c059a55f2ae73c5937aa7c2b
+git diff vs HEAD: 0 行（0＝与 HEAD 一致）
+--- 还原后复跑（应绿） ---
+ok  	github.com/CarlosShao/wisp/internal/tools	0.192s
+rc=0

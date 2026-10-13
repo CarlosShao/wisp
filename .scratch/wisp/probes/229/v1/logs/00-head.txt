@@ -1,0 +1,33 @@
+=== head 229-v1 (非实现者验收腿) ===
+2026-10-13 21:24:31 +0800
+HEAD: 4cf3a09ce0a8d1e0d1cd1a4e7d7d66605a187a23  branch: dev
+交件 32bba42c 时代: 2026-10-13 21:14:28 +0800
+落点: .scratch/wisp/probes/229/v1/  裁决表: docs/evidence/s1/ticket229-229-r1-accept-v1.md
+--- 我起手前的 git status（探针相关） ---
+?? .scratch/wisp/probes/229/v1/
+--- 票面 diff（32bba42c）应只有追加 1 条 bullet ---
+commit 32bba42c0dfc4927ecbb38166e41c0f372ddf467
+Author: CarlosShao <1933942520@qq.com>
+Date:   Tue Oct 13 21:14:28 2026 +0800
+
+    229-r1 甲形落地：子代理收尾协程 spawn 名 "subagent-finish-"+bg.ID -> "agent-task-"+bg.ID（internal/tools/subagent_197.go:394，最小 diff：一行字符串＋一段说明；root 标签不动；乙形＝往 D38b 表加名＝须人工批准，本腿没加、没改任何表成员）。票 229 判据逐格现跑：AC#1 名册三张表现读（goroutine.go:40/43/48/52/57）＋grep -n subagent internal/observe/goroutine.go＝0 行 rc=1；AC#3 正控（种假名 229-probe-not-in-any-roster-table ⇒ 照样 WARN＋CategoryUnknown＋Unknown 有它，改前/改后两发都绿）；AC#4 全仓普查（新尺 internal/tools/spawn_roster_census_229_test.go：AST 扫生产 .go 289 枚/19 Spawn 站点/14 根标签；不在册共 5 名 5 站点＝本票修掉 1 枚＋4 枚有意且码里逐字写了理由：cmd/wisp panel-sta 归 cmd/wisp/panel 或 D38b 批准、cmd/balldebug 两枚归票 66、internal/llm/adaptertest mockllm-stdout-reader 归票 67——只登记未动 cmd/wisp 一字、未往名册加名）；AC#5 安静期读数（孩子被 C5 假 provider 按住）：observe.Default.Count()（＝sampler.go:365 口径）1->1 不变、PerTask 0->1、Unknown [subagent-finish-<id>]->[]，thresholds.go/golden 零动；漏哨噪声：整包 internal/tools WARN 36 行->0 行。门禁：GOFLAGS= go build ./... 改前/改后 rc=0；gofumpt 两把尺（工作树 5 枚既有脏名 vs HEAD blob 1 枚，我这 3 枚空输出）；sh scripts/d22scan.sh rc=0 clean；go test ./internal/tools/... ./internal/observe/... 改前 rc=1（唯一红＝Test229 真路尺 5.00s＋普查尺红）→ 改后 rc=0（ok 15.953s/ok 3.803s）。AC#6 终态 PATH=… go test ./cmd/wisp ./internal/... -count=1 rc=1：internal/tools ok 19.205s、internal/observe ok 3.933s；红名逐枚归因（本腿新增红 0 枚）：cmd/wisp TestTicket255RosterStillMatchesTheActualReadSites（台账 A878：89b3b550/313-r1 引入，单跑复现同句）、internal/ball 1＋internal/panel 6（design/ 16 枚删除态族＋35-r8 两枚有意红灯）、internal/risk TestResolvePerCallBudget（争用假红，安静 -count=3 rc=0）、新量到 internal/session TestSessionListByWorkspace 间歇红（安静 -count=5 里 2 发；updated_at 秒粒度并列＋ORDER BY id DESC，交回 166 侧）。件：probes/229/r1/evidence-229-r1.md＋logs/ 9 枚原始读数＋logs/00-head.txt。⛔ 未 push
+
+diff --git a/.scratch/wisp/issues/229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md b/.scratch/wisp/issues/229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md
+index 56627ed5..5120efce 100644
+--- a/.scratch/wisp/issues/229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md
++++ b/.scratch/wisp/issues/229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md
+@@ -33,3 +33,7 @@
+ ## 禁区
+ 
+ 不动 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`；三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）一字不动；`frontend/**`／`design/**` 零读零写零转述；不新增 C17 方法名；新增导出名要先落 `A##`；⛔ **不许用"把 WARN 降级成 DEBUG／删掉那行"**来交差；⚠ 与票 **228** 同撞 `cmd/wisp`＋常驻拓扑、与票 **197 续腿**同撞 `internal/tools/subagent_197.go` ⇒ **串行**，跑门前自证没有别的 `go test` 在飞。
++
++## Progress log
++
++- **2026-10-13 21:13 腿 `229-r1`（落地腿，甲形）**：收尾协程 spawn 名 `"subagent-finish-"+bg.ID` → `"agent-task-"+bg.ID`（`internal/tools/subagent_197.go:394`，最小 diff：一行字符串＋一段说明为何这名字进名册；root 标签不动＝根标签不参与名册判定。乙形＝往 D38b 表加名＝须人工批准，本腿⛔ 未加，⛔ 未改任何表成员）。判据：**AC#1** 名册三张表现读（`internal/observe/goroutine.go:40/43/48/52/57`）＋`grep -n subagent internal/observe/goroutine.go`＝**0 行 rc=1**；**AC#2** 甲形落地、乙形具名判死（另立 §）；**AC#3** 正控两发都绿（种假名 `229-probe-not-in-any-roster-table` ⇒ 照样 WARN＋`CategoryUnknown`＋`RosterReport.Unknown` 有它）；**AC#4** 全仓普查（新尺 `internal/tools/spawn_roster_census_229_test.go`，AST 扫生产 .go **289 枚**／Spawn 站点 **19** 个／根标签 **14** 个）：**不在册共 5 名 5 站点＝本票修掉 1 枚＋4 枚有意且码里逐字写了理由**（`cmd/wisp/panel_resident_windows.go:154` 的 `panel-sta` 归 cmd/wisp/panel 或 D38b 批准；`cmd/balldebug` 两枚归票 66；`internal/llm/adaptertest/mockllm.go:92` 归票 67）——⛔ 只登记、未动 `cmd/wisp/**`、未往名册加名；噪声读数＝整包 `internal/tools` 的漏哨 WARN **36 行→0 行**；**AC#5** 安静期（新起 test 二进制、孩子被 C5 假 provider 按住）：`observe.Default.Count()`（＝`sampler.go:365` 同一口径）**1→1 不变**、PerTask **0→1**、Unknown **`[subagent-finish-<id>]`→`[]`**，`thresholds.go`／golden 零动；**AC#6** `PATH=… go test ./cmd/wisp ./internal/... -count=1` **rc=1**：`internal/tools` **ok 19.205s**／`internal/observe` **ok 3.933s**；红名逐枚归因＝`cmd/wisp TestTicket255RosterStillMatchesTheActualReadSites`（台账 **A878** 已定位：`89b3b550`/313-r1 引入，单跑复现同句）＋`internal/ball` 1 与 `internal/panel` 6（design/ 16 枚删除态族＋**35-r8 两枚有意红灯**，台账 13950/14050）＋`internal/risk TestResolvePerCallBudget`（争用假红，安静单跑 `-count=3` **rc=0**）＋**新量到 `internal/session TestSessionListByWorkspace` 间歇红**（安静 `-count=5` 里 **2 发**红；`updated_at` 秒粒度并列＋`ORDER BY … id DESC`，期望序假设创建序 ⇒ 交回 166 侧，⛔ 不在本腿写面）⇒ **本腿新增红 0 枚**。门禁：`GOFLAGS= go build ./...` 改前/改后 **rc=0**；gofumpt 两把尺（工作树 5 枚脏名 vs HEAD blob 1 枚，我这 3 枚空输出）；`sh scripts/d22scan.sh` **rc=0** `clean`。件：`probes/229/r1/evidence-229-r1.md`＋`logs/` 9 枚原始读数。⛔ 未 push。
+--- 翻框核：AC 框现读 ---
+26:- [ ] **AC#1 名册先现读一遍**：三张表逐枚抄出（带 `file:line`），并现跑 `grep -n "subagent" internal/observe/goroutine.go` 证"不匹配"。**不许引本票这张表**。
+27:- [ ] **AC#2 两支修法选一，另一支具名判死**：**甲＝换 spawn 名**到名册内已有的形状（每任务前缀那一族最贴：收尾协程本来就是任务派生）；**乙＝往每任务前缀表加 `subagent-finish-`**——⚠ 那**是动 D38b 那张表**，须先落一条 `A##` 批准记录并摆给 owner，⛔ 不许 agent 自己加完再说"表里本来就该有"。
+28:- [ ] **AC#3 正控：门不许被拆**。修法落地后**必须仍有一发判据**证明"真·不在名册的名字照样打 WARN／照样被归 `CategoryUnknown`"（种一枚假名字进去断它响）。⚠ 本票最容易犯的错就是**为了消噪把那行警告改轻**——那＝削弱仪器，验收直接判失败。
+29:- [ ] **AC#4 全仓同类普查（这一格才是本票的主要价值）**：把**全仓每一枚 `observe.Default.Spawn(...)`／`NewRoot(...)` 的首参名字**逐枚对名册，交回"不在册的还有几枚、分别在哪枚 `file:line`"的**具名清单或'零枚'的读数**。⛔ 只修自己撞见的那一枚就宣称这类已清＝不合格。⚠ 顺带复核票 228 的 `228-a1` §8 里那句"口径只到 `cmd/wisp` 这一层"——**这一次要扫到全仓**。
+30:- [ ] **AC#5 SLO 口径要说一句话**：名册外协程计入总数那一支（`sampler.go:365`）在修法落地后读数变化具名写清（改前／改后各一枚，安静期）。⛔ `thresholds.go`／golden 一字节不许动。
+31:- [ ] **AC#6 整包终态**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1` 到终态＋**逐名比红名册**（历史在册 `internal/ball` 1＋`internal/panel` 4 属别人地界，不算本票新增、不许顺手修；`internal/risk TestResolvePerCallBudget` 是争用型假红，安静 `-count=3` 复量为准）。

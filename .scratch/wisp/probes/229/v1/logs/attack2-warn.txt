@@ -1,0 +1,24 @@
+=== 攻2: WARN 行改弱/挪走（overlay internal/observe/goroutine.go） 21:28:54 ===
+[A] 改弱：slog.Warn -> slog.Debug（overlay）
+=== RUN   Test229UnknownNameStillRingsLeakAlarm
+    spawn_finish_watcher_229_test.go:142: 名册外的名字没让漏哨响，日志=""：WARN 被调轻或删掉了？
+--- FAIL: Test229UnknownNameStillRingsLeakAlarm (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.036s
+FAIL
+rcA=1
+
+[B] 挪走：删掉 WARN 两行（overlay）
+=== RUN   Test229UnknownNameStillRingsLeakAlarm
+    spawn_finish_watcher_229_test.go:142: 名册外的名字没让漏哨响，日志=""：WARN 被调轻或删掉了？
+--- FAIL: Test229UnknownNameStillRingsLeakAlarm (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.045s
+FAIL
+rcB=1
+
+--- 对照：同两发 overlay 下另两枚（真路尺/普查尺）应不受影响 ---
+ok  	github.com/CarlosShao/wisp/internal/tools	0.216s
+rc=0
+--- 磁盘 goroutine.go 未被碰（sha256 前后同） ---
+42da5ce50c79795373c483e9b4a15acbafe8dc98c610d8c54c2c3a65dfc230b2 *internal/observe/goroutine.go

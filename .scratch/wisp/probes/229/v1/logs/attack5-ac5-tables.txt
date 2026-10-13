@@ -1,0 +1,14 @@
+=== 攻5: AC#5 口径与三张表零动 21:31:59 ===
+[安静期读数·我这发]（自跑 selfrun-three.txt:4，逐字）
+observe.Default.Count()=1 —— 与 SLO 同一口径（sampler.go:365 读 s.reg.Count()，生产里 reg=observe.Default）；RosterReport：Resident=0 OnDemand=0 PerTask=1 Temporary=0 Unknown=[]；CountByName("agent-task-7613cbd0-c7d5-438b-8db9-2f0bee27d1bd")=1；CountByName("subagent-finish-7613cbd0-c7d5-438b-8db9-2f0bee27d1bd")=0
+[改前态·我这发]（攻击 1b 变异下真路尺红句里的现读）
+Total=1 PerTask=0 Unknown=[subagent-finish-42264bd8-27e8-4076-b27b-222c2cb135a9]
+[三张表/阈值零动] git diff 5f513c61..32bba42c 具名件:
+  （空＝零动）
+[golden/阈值 blob 与 HEAD 一致]
+  internal/observe/thresholds.go work=e2677b11b5a5adff8b4eb87c36d31286a274471d head=e2677b11b5a5adff8b4eb87c36d31286a274471d SAME
+  internal/observe/goroutine.go work=becbccc9d7cf975e762a3926f9f0382566f22b88 head=becbccc9d7cf975e762a3926f9f0382566f22b88 SAME
+  internal/llm/golden work=3f3f2db6688dab5d18a82680b75fb131d5c6185a head=3f3f2db6688dab5d18a82680b75fb131d5c6185a SAME
+[thresholds.go 最近一次被改的提交]
+  00bbb76f 2026-09-20 slo(66): read the D32 CPU row out of the measured tree (AC#3)
+[r1 三张表成员逐枚 vs 我 AC#1 现读] 一致（见 ac1-roster.txt）

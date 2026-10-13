@@ -1,0 +1,75 @@
+=== AC#1: 名册三张表现读（不许引票面） 21:25:04 ===
+--- grep -n subagent internal/observe/goroutine.go ---
+rc=1
+--- 三张表成员（goroutine.go:40..60） ---
+const ResidentBaseline = 6
+
+// ResidentNames are the 6 resident roster names (D38b), in table order.
+var ResidentNames = []string{
+	"ui-sta", "audio-capture", "hotkey-listener", "db-writer", "watchdog", "log-flusher",
+}
+
+// OnDemandNames are state-gated goroutines (D38b).
+var OnDemandNames = []string{"kws-infer"}
+
+// PerTaskPrefixes are the per-task roster entries (D38b): agent-task-<id>
+// holds the task root ctx; tool-exec-<id> and approval-waiter derive from it.
+var PerTaskPrefixes = []string{"agent-task-", "tool-exec-", "approval-waiter"}
+
+// TemporaryNames are DisposalScope-scoped goroutines (D38b). disposal-worker
+// is the C11 per-fn disposal runner (ticket 03); it is bookkeeping, not a
+// product goroutine, and lives inside whichever scope is disposing.
+var TemporaryNames = []string{
+	"asr-infer", "tts-infer", "panel-host", "retention-job", "model-downloader",
+	"memory-extract", "disposal-worker",
+}
+--- ClassifyGoroutine 与 WARN 行 :64..82 / :262..283 ---
+func ClassifyGoroutine(name string) GoroutineCategory {
+	if slices.Contains(ResidentNames, name) {
+		return CategoryResident
+	}
+	if slices.Contains(OnDemandNames, name) {
+		return CategoryOnDemand
+	}
+	for _, p := range PerTaskPrefixes {
+		// approval-waiter is the roster name itself (no per-instance id);
+		// agent-task-/tool-exec- carry the task id as suffix.
+		if strings.HasPrefix(name, p) {
+			return CategoryPerTask
+		}
+	}
+	if slices.Contains(TemporaryNames, name) {
+		return CategoryTemporary
+	}
+	return CategoryUnknown
+}
+func (r *Registry) Spawn(name, owner string, root *Root, fn func(ctx context.Context)) *Handle {
+	h := &Handle{done: make(chan struct{}), errc: make(chan error, 1)}
+	if fn == nil {
+		h.errc <- New(ClassInternal, "Spawn called with nil fn")
+		close(h.done)
+		return h
+	}
+	cat := ClassifyGoroutine(name)
+	if cat == CategoryUnknown {
+		slog.Warn("goroutine outside the D38 roster (leak symptom)",
+			"goroutine", name, "owner", owner)
+	}
+
+	r.mu.Lock()
+	r.live[gkey{name, owner}]++
+	r.totalStarted++
+	r.mu.Unlock()
+	root.addPending(1)
+
+	go r.run(h, name, owner, root, fn)
+	return h
+}
+--- 5 名站点 grep -n ---
+cmd/balldebug/main.go:45:	goroutineHotkeyBridge = "balldebug-hotkey-bridge"
+cmd/balldebug/main.go:46:	goroutineLevelFeeder  = "balldebug-level-feeder"
+cmd/balldebug/main.go:251:		bridgeHandle := observe.Default.Spawn(goroutineHotkeyBridge, "balldebug", bridgeRoot, func(ctx context.Context) {
+cmd/balldebug/main.go:432:	h := observe.Default.Spawn(goroutineLevelFeeder, "balldebug", root, func(ctx context.Context) {
+internal/llm/adaptertest/mockllm.go:92:	h := mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot,
+cmd/wisp/panel_resident_windows.go:82:	panelSTAName  = "panel-sta"
+cmd/wisp/panel_resident_windows.go:154:	rp.thread = reg.Spawn(panelSTAName, panelSTAOwner, root, rp.loop)

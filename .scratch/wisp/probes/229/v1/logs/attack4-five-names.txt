@@ -1,0 +1,95 @@
+=== 攻4: 不在册 5 名逐枚现跑复认 21:29:48 ===
+--- (1) panel-sta: cmd/wisp/panel_resident_windows.go:78-92 逐字理由 ---
+	// panelSTAName is this thread's registry name. It is deliberately NOT one of
+	// observe.ResidentNames' six frozen resident names: adding a name there is a
+	// contract change (D38b), so a leg that needs one asks instead of renaming. An
+	// unlisted name is classified CategoryUnknown, which logs and does not fail.
+	panelSTAName  = "panel-sta"
+	panelSTAOwner = "panel host (ticket 33)"
+
+	// coinitApartmentThreaded is COINIT_APARTMENTTHREADED. internal/ball spells the
+	// same value (win32_windows.go) for its own ui-sta; that constant is package
+	// private, so this file spells it too rather than reaching into internal/ball.
+	coinitApartmentThreaded = 0x2
+	// sFalse is what CoInitializeEx returns when the thread already has an
+	// apartment; S_OK (0) and S_FALSE (1) both mean "this thread is STA now".
+	sFalse = 1
+
+
+--- (2)(3) balldebug: cmd/balldebug/main.go:33-47 逐字理由（含票 66/67 登记） ---
+// Roster names for this harness's own goroutines (D38b).
+//
+// They are deliberately NOT borrowed from the product roster: R16#5 forbids
+// reusing an existing roster name to slip past the leak check, and borrowing
+// "hotkey-listener" or "asr-infer" would make these three debug goroutines
+// look like accounted-for residents. They are not - they are balldebug's, and
+// the honest consequence is one "goroutine outside the D38 roster" WARN per
+// spawn plus an entry in RosterReport.Unknown. Suppressing that WARN needs a
+// TemporaryNames entry in internal/observe/goroutine.go, which is ticket 66's
+// file (and ticket 67's mockllm loose end); it is NOT this ticket's call, so
+// the noise stays and the leak check keeps its sight on these sites.
+const (
+	goroutineHotkeyBridge = "balldebug-hotkey-bridge"
+	goroutineLevelFeeder  = "balldebug-level-feeder"
+)
+
+--- (4) mockllm-stdout-reader: internal/llm/adaptertest/mockllm.go:84-95 逐字理由 ---
+	// protects nothing; that branch is named as still leaking.
+	if err := StartChildGuarded(t, proc.cmd); err != nil {
+		t.Fatalf("start mockllm: %v", err)
+	}
+	// Cleanup is registered before the readiness wait so every failure path
+	// below still reaps the child and joins the reader spawn.
+	spawnRoot := observe.NewRoot("adaptertest:mockllm")
+	ready := make(chan error, 1)
+	h := mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot,
+		func(_ context.Context) {
+			sc := bufio.NewScanner(stdout)
+			for sc.Scan() {
+
+--- (5) 交件只登记未动: 32bba42c --name-only（含 cmd/wisp?） ---
+grep rc=1 （1＝交件里没有这些路径）
+--- 32bba42c 四枚文件是否在交件里（正查） ---
+  .scratch/wisp/issues/229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md
+  .scratch/wisp/probes/229/r1/evidence-229-r1.md
+  .scratch/wisp/probes/229/r1/logs/ac1-roster.txt
+  .scratch/wisp/probes/229/r1/logs/ac4-census-raw.txt
+  .scratch/wisp/probes/229/r1/logs/ac6-attribution.txt
+  .scratch/wisp/probes/229/r1/logs/ac6-full.txt
+  .scratch/wisp/probes/229/r1/logs/gates.txt
+  .scratch/wisp/probes/229/r1/logs/post-229-tests.txt
+  .scratch/wisp/probes/229/r1/logs/post-gate-two-pkgs.txt
+  .scratch/wisp/probes/229/r1/logs/pre-229-tests.txt
+  .scratch/wisp/probes/229/r1/logs/pre-gate-two-pkgs-overlay.txt
+  internal/tools/spawn_finish_watcher_229_test.go
+  internal/tools/spawn_roster_census_229_test.go
+  internal/tools/subagent_197.go
+  logs/00-head.txt
+  File "<stdin>", line 18
+    p=os.path.join(dp,f).replace('\','/')
+                                       ^
+SyntaxError: unterminated string literal (detected at line 18)
+[独立 grep 交叉核对] 生产 .go 里 .Spawn( 站点=20（AST 尺报 19）；字面量首参=13
+[独立 grep] 名册外字面量首参 1 枚：
+  internal/llm/adaptertest/mockllm.go:92 mockllm-stdout-reader
+cmd/balldebug/main.go:251 bridgeHandle := observe.Default.Spawn(goroutineHotkeyBridge, "balldebug", bridgeRoot, func(ctx context.Context
+cmd/balldebug/main.go:432 h := observe.Default.Spawn(goroutineLevelFeeder, "balldebug", root, func(ctx context.Context) {
+cmd/wisp/approval_always.go:99 observe.Default.Spawn("approval-waiter", "approval", root, func(ctx context.Context) {
+cmd/wisp/approval_reply.go:456 rt.replyHandle = observe.Default.Spawn("approval-waiter", "approval", rt.replyRoot,
+cmd/wisp/config_reload.go:123 rt.reloadHandle = observe.Default.Spawn("watchdog", "config", rt.reloadRoot, rt.configReloadTick)
+cmd/wisp/panel_resident_windows.go:154 rp.thread = reg.Spawn(panelSTAName, panelSTAOwner, root, rp.loop)
+cmd/wisp/resident_ball_windows.go:361 bridgeHandle := reg.Spawn("hotkey-listener", "ball", bridgeRoot, func(ctx context.Context) {
+cmd/wisp/resident_task_source_windows.go:347 src.handle = observe.Default.Spawn(taskSourceConsoleGoroutine, "agent", src.root,
+cmd/wisp/resident_task_source_windows.go:454 observe.Default.Spawn(taskSourceGoroutinePrefix+fmt.Sprint(seq), "agent", root,
+internal/agent/loop.go:331 t.h = l.reg.Spawn("agent-task-"+id, "agent", t.root, func(c context.Context) {
+internal/agent/loop.go:680 h := l.reg.Spawn("tool-exec-"+taskID, "agent", root, func(c context.Context) {
+internal/audio/audio.go:181 return registry.Spawn("audio-capture", "audio", nil, run)
+internal/ball/ball_windows.go:170 b.sta.handle = opts.Registry.Spawn("ui-sta", "ball", nil, func(_ context.Context) {
+internal/llm/adaptertest/mockllm.go:92 h := mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot,
+internal/memory/writer.go:79 q.reg.Spawn("db-writer", "memory", nil, func(ctx context.Context) {
+internal/observe/logging.go:96 h := reg.Spawn("log-flusher", "observe", p.root, w.flushLoop)
+internal/plugin/disposal.go:233 return s.reg.Spawn(name, "scope:"+s.name, root, func(ctx context.Context) {
+internal/plugin/disposal.go:296 h := s.reg.Spawn("disposal-worker", "scope:"+s.name, nil, func(context.Context) {
+internal/tools/subagent_197.go:394 observe.Default.Spawn("agent-task-"+bg.ID, "tools", watchRoot, func(c context.Context) {
+internal/tools/task_backfill.go:33 // reg.Spawn("agent-task-"+id, "agent", ...)).
+tools/d22scan/selftestsamples.go:61 "func schedule(reg interface{ Spawn(func()) }) {\n\treg.Spawn(work)\n}\n" +

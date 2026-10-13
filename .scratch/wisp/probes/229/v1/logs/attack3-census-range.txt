@@ -1,0 +1,23 @@
+=== 攻3: 普查尺射程/空集形（overlay 仪器件自身，磁盘不动） 21:29:22 ===
+[M3a] 扫描根弄窄：{"cmd","internal","tools","frontend"} -> {"tools"}（仓里 tools/ 生产 .go＝13 枚 < 50 闸）
+=== RUN   Test229SpawnNamesAreRosterShaped
+    spawn_roster_census_229_test.go:181: 229 census 汇总：生产 .go 13 枚（解析跳过 0 枚）、Spawn 站点 0 个、根标签 0 个；名册外有登记 0 枚、未复审 0 枚
+    spawn_roster_census_229_test.go:185: 只扫到 13 枚生产 .go，仓布局变了？
+--- FAIL: Test229SpawnNamesAreRosterShaped (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.046s
+FAIL
+rcM3a=1
+
+[M3b] 命中清空：case "Spawn" -> 永不匹配的标签（文件数仍 289、Spawn 站点 0）
+=== RUN   Test229SpawnNamesAreRosterShaped
+    spawn_roster_census_229_test.go:181: 229 census 汇总：生产 .go 289 枚（解析跳过 0 枚）、Spawn 站点 0 个、根标签 14 个；名册外有登记 0 枚、未复审 0 枚
+    spawn_roster_census_229_test.go:188: 只扫到 0 个 Spawn 站点，扫描器坏了？
+--- FAIL: Test229SpawnNamesAreRosterShaped (0.17s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.205s
+FAIL
+rcM3b=1
+
+--- 仪器件磁盘 sha256（overlay 未碰盘） ---
+e8c45843c025af222d1b6cb2d7fecb8216ecb63609228164d20f91940251ef60 *internal/tools/spawn_roster_census_229_test.go

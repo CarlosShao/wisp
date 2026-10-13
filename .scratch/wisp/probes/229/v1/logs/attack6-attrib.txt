@@ -1,0 +1,7 @@
+--- 两包复跑（AC#6 承重包）21:33:53 ---
+ok  	github.com/CarlosShao/wisp/internal/tools	13.565s
+ok  	github.com/CarlosShao/wisp/internal/observe	3.499s
+rc=0
+--- r1 理由① 现读（孩子私有 registry） ---
+297:	opt.Registry = observe.NewRegistry()
+385:	// registry (opt.Registry above), so this is the only observe.Default row
