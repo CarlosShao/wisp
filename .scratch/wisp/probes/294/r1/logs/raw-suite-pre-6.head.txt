@@ -1,0 +1,6 @@
+date=2026-10-13 18:20:54 +0800
+pwd=/d/work/workspace/projects plans/wisp-294r1-pre
+wide-skip form: -skip 'TestAC13|TestAC14' (pre-5 died at neighbor TestAC13BringUpRefusesAThreadWithAQueuedClose despite skip of the 2 seen names)
+cmd=go test ./cmd/wisp/ -count=1 -v -skip 'TestAC13|TestAC14'
+INFO: No tasks are running which match the specified criteria.
+INFO: No tasks are running which match the specified criteria.

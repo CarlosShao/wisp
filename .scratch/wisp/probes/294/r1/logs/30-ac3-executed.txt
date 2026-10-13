@@ -1,0 +1,40 @@
+# 294-r1 AC#3 读数原件 — executed 的另一半（M2 那一格）+ 反形正控
+# 时刻 2026-10-13 17:30-17:50 +08；锚 HEAD 0e5253fe6894b6f13fe91def5dd88586b087f9a7
+
+## 1. 夹具先现读走哪一支（派单 §5 要求，行号为本日现量）
+- 夹具 rig = 290 的 muteRig（真 HalfDuplexGate + capture seam；开测姿态 = muted at boot，mic_muted_default=true）
+- 第一压 ra.toggleMute()：gate.SetMuted(!gate.Muted()) -> 门真 open -> switch 命中 `case gate.Open():`（resident_audio_windows.go 现量 :173），返回行 = :174
+- :174 逐字（改前）:
+    return "已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）", true
+- 第二压（回静音）命中 :171 `case gate.Muted():` / :172 的 `, true` —— 两压都被本用例的断言覆盖（:142 与 :151）。
+
+## 2. 变异体（同行改字，只翻夹具真走的那一支 :174 的 true；行数不变 => 票 255 行号锚零伤）
+- 法 = -overlay（298-v1 先例）；变体 = logs/mut-ac3-audio-openfalse.txt（sha256 cbbebbb37d163ddc7d4da63a07f11284f3758dc805e75391a87ba5427ba5350c）
+- diff cmd/wisp/resident_audio_windows.go <变体> 逐字 = 唯一一行 `174c174`：`, true` -> `, false`（同一行改字，无任何插入/删除）
+- overlay 件 = logs/ov-ac3.json（把 cmd/wisp/resident_audio_windows.go 映射到变体）
+- 禁区遵守：未裸改跟踪文件（-overlay 全程只作用编译输入；见第 4 条零改动凭据）；未加解释行。
+
+## 3. 红读（判据 = gate 读数 + executed；⛔ 不读句面）
+cmd: go test ./cmd/wisp/ -count=1 -run 'TestAC294ToggleMuteExecutedTrueOnTheHappyPath' -v -overlay logs/ov-ac3.json
+  （原件 logs/raw-ac3-mut-red-final.txt）
+rc=1
+红句逐字:
+    resident_mute_294_windows_test.go:143: AC#3 RED: the happy path answered executed=false while the gate DID turn (muted=false open=true): "已取消静音：设备已交接，采集线程在跑；电平按票 247 的链路交给球（球屏上会不会呼吸是票 68 那一格，本票不声称）"
+判读：句面一个字节没变（仍是"已取消静音：设备已交接……"），而 executed=false、门真被拧（muted=false open=true）
+  —— 正是 M1 的教训复现：读句面会被"句子里写了成功"骗过；本用例能红，靠的就是 gate 自读 + 这枚 executed。
+
+## 4. 还原证明（仓内字节零动 + 回到绿）
+- sha256 cmd/wisp/resident_audio_windows.go 全程（跑红前后）同为 a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84
+- `git diff --stat -- cmd/wisp/resident_audio_windows.go cmd/wisp/resident_windows.go` 空（rc=0，零行输出）
+- `git status --porcelain -- cmd/wisp` = 只有本腿两枚新建件（?? 开头），无 M 行
+- 回到绿：去掉 -overlay 复跑同用例 rc=0
+    --- PASS: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.02s)   （原件 logs/raw-ac3-restored-green-final.txt）
+
+## 5. 本格本体（happy path 的 executed==true）
+- 件 resident_mute_294_windows_test.go：:142 第一压 `if !executed`、:151 第二压 `if !executed`，两处都把 gate 读数同报
+  （:145/:154 的 gate.Open()/gate.Muted() 断言与 executed 同发）
+- 与票 290 的另一半（resident_mute_290_windows_test.go:197 `if executed {`，断 false 那一支）互为补全；
+  与 290 一样复用其 rig（muteRig 在 290 件内，本件直调——同包夹具，未新造）
+- 绿读：raw-ac294-green-final.txt（rc=0，四枚 PASS，其中本用例 0.01s）
+- 第三段（:163 附近）只判"gesture 到没到门"（读 gate），不判句面 —— 因为 muteGesture 把 executed 吞掉了，
+  句面不可作判据；executed 的判据只在直调 toggleMute 的两处（:142/:151）。

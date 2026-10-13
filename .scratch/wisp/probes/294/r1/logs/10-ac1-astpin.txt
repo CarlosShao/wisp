@@ -1,0 +1,50 @@
+# 294-r1 AC#1 读数原件 — 装配根那一跳的 AST 形钉
+# 时刻 2026-10-13 17:30-17:45 +08；锚 HEAD 0e5253fe6894b6f13fe91def5dd88586b087f9a7
+# 尺件 = cmd/wisp/resident_mute_294_test.go（新建，全平台；sha256 7b20b7f8d4a8b07b834036e32189a4f01ef055ab2f7daf4792b32efc07cfde49）
+# 形状来源：复用 runResidentBody258（resident_hotkey_258_test.go:25，同包唯一抽体器，未新造遍历）；
+#   SelectorExpr 层取同包先例 resident_ball_228_test.go:261；生产行现量 cmd/wisp/resident_windows.go:342
+#   rb.attachMuteGate(raudio.toggleMute)（:250 建球 rb := startResidentBall(...)，:311 raudio := startResidentAudio(...)）。
+# 三件事共用同一枚计数（walk 里 attach），==1 单独成断言（:116）；(b) 在 ==1 之后才跑，(c) 为 AST 前序位次比较，无行号锚。
+
+## 1. 绿读（最终件版本）
+cmd: PATH="<worktree>/third_party/sherpa-onnx:<worktree>/build:$PATH" go test ./cmd/wisp/ -count=1 -run 'TestAC294' -v
+  （原件 .scratch/wisp/probes/294/r1/logs/raw-ac294-green-final.txt）
+rc=0
+--- PASS: TestAC294AssemblyRootAttachesTheMuteGateByShape (0.00s)
+--- PASS: TestAC294HkMuteMirrorMatchesInternalBallSource (0.00s)
+--- PASS: TestAC294MuteHotkeyRegistersLiveOnARealBallWindow (0.30s)
+--- PASS: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+
+## 2. 红形演示 D1（派单 §3 点名的形：把 (a) 计数改成 == 2）
+变体 = logs/mut-ac1-test-count2.txt（sha256 66a15efd0c3212472e0a1e41ec9fb62ef92a7f8f0e80f5cd02f3872acd24ff59）
+  diff <尺件> <变体> 逐字 = 唯一一行 `32c32`：`const wantAttachCalls294 = 1` -> `const wantAttachCalls294 = 2`
+机制 = -overlay（logs/ov-ac1-d1.json 把 cmd/wisp/resident_mute_294_test.go 映射到变体；未见任何 .go 落在 probes 下）
+cmd: go test ./cmd/wisp/ -count=1 -run 'TestAC294AssemblyRootAttachesTheMuteGateByShape' -v -overlay logs/ov-ac1-d1.json
+  （原件 logs/raw-ac1-d1-red.txt）
+rc=1
+红句逐字:
+    resident_mute_294_test.go:117: AC#1(a) RED: runResident (resident_windows.go) contains 1 rb.attachMuteGate call(s), want exactly 2 - the mute hop is not attached (or attached twice)
+指名它必须这样红：红在 (a) 行、且红句现读的生产真值 = 1 —— 走查确实从生产读到了 1，==1 这枚断言是承重的（要求 2 即红）。
+
+## 3. 红形演示 D2（补足 (b) 实参行的牙）
+变体 = logs/mut-ac1-test-argrb.txt（sha256 b34b351def406c4660b180dd4de058778e9fe06e9e35499e830cf9487467e38d）
+  diff 逐字 = 唯一一行 `132c132`：`if attachArg != "raudio.toggleMute" {` -> `if attachArg != "rb.toggleMute" {`
+cmd: go test ./cmd/wisp/ -count=1 -run 'TestAC294AssemblyRootAttachesTheMuteGateByShape' -v -overlay logs/ov-ac1-d2.json
+  （原件 logs/raw-ac1-d2-red.txt）
+rc=1
+红句逐字:
+    resident_mute_294_test.go:133: AC#1(b) RED: the attach argument is "raudio.toggleMute", want raudio.toggleMute (the capture leg's own executor - any other function value is the defect this pin exists to catch)
+指名它必须这样红：红在 (b) 实参行，且红句把生产行的实参拼写逐字现读出来（"raudio.toggleMute"）—— 比较是活的，输入是生产字节串而非默认；期望值一动即红。
+
+## 4. 没做"生产文件侧"变异，具名防读成漏做
+- cmd/wisp/resident_windows.go 不在派单 §2 写面（只读解析，不许改）；且 -overlay 只作用编译输入、作用不到本用例的运行时读盘
+  （runResidentBody258 从 CWD 的 ./resident_windows.go 现读），对生产文件做 overlay 对本形钉无效。
+- 因此红形演示只做测试侧变异 —— 正是派单 §3 的两种点名形之一（(a) 计数改 == 2）；另有 (b) 行演示见上。
+- 生产文件零改动凭据：sha256 cmd/wisp/resident_windows.go 演示前后同为 72fcee7ac202b17df2b74b061fa0ffdd3559547d77e765baa1082fe897891509；
+  `git diff --stat -- cmd/wisp/resident_windows.go` 空；`git status --porcelain -- cmd/wisp` 仅两枚新建件（?? 行）。
+
+## 5. -overlay 机制预演（先证后用的那一步）
+- 先跑一朵烟测试：ov-smoke-backing.txt（resident_hotkey_258_test.go 的拷贝，函数改名 TestOverlaySmoke294）经 ov-smoke.json 映射回原路径；
+  `-run TestOverlaySmoke294 -overlay ...` rc=0、`=== RUN   TestOverlaySmoke294` / `--- PASS`（原件 logs/ov-smoke-out.txt）
+  => go 工具接受"非 .go 备件文件"的映射，且映射生效（跑的是改名后的用例）。
+- 全部变体件/overlay 件都建在本腿 probes/294/r1/logs/ 下（只建不删），repo 内无新增 .go 于 probes。

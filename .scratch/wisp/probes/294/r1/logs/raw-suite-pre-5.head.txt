@@ -1,0 +1,6 @@
+date=2026-10-13 18:15:17 +0800
+pwd=/d/work/workspace/projects plans/wisp-294r1-pre
+skip-form pair run 2 (pre-4 completed 376.1s)
+cmd=go test ./cmd/wisp/ -count=1 -v -skip 'TestAC13BringUpSurvivesAReusedThreadQuit|TestAC14GoSideEvalPushReachesThePage'
+INFO: No tasks are running which match the specified criteria.
+INFO: No tasks are running which match the specified criteria.

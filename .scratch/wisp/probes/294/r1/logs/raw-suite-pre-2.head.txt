@@ -1,0 +1,6 @@
+date=2026-10-13 17:53:16 +0800
+pwd=/d/work/workspace/projects plans/wisp-294r1-pre
+tree=git archive HEAD go.mod go.sum internal cmd tools scripts frontend + worktree dist copy + third_party/sherpa-onnx + models (env-match enrich; lean-tree run raw-suite-pre-1.txt named separately)
+cmd=go test ./cmd/wisp/ -count=1 -v
+INFO: No tasks are running which match the specified criteria.
+INFO: No tasks are running which match the specified criteria.

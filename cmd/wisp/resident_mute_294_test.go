@@ -1,0 +1,150 @@
+package main
+
+// Ticket 294 AC#1: the shape pin for the assembly root's mute hop.
+//
+// The hop measured here is "who hangs the executor on the ball handle" - the
+// one production caller of residentBall.attachMuteGate. No test can call
+// runResident (resident_ball_228_test.go:17 names why: it never returns), so
+// the reading is taken off the AST the way Test258AssemblyRootWiresTheChainAnd-
+// TheBridge does, reusing runResidentBody258 as the package's ONE runResident
+// body extractor instead of growing a second walker.
+//
+// What the first ruling on this ticket got wrong, and what this file is
+// written against (the orchestrator's own correction, 2026-10-11 13:1x): a
+// ruler that matches `call.Fun.(*ast.Ident)` finds nothing here, because the
+// production call is a METHOD call (rb.attachMuteGate(raudio.toggleMute), so
+// call.Fun is a *ast.SelectorExpr). A copied 258 ruler would count 0 - and
+// paired with "count == 1" that is a FOREVER-RED instrument, while a "check
+// every found call" form over the same empty set is a forever-green fake. So
+// the three clauses below share one count, the ==1 assertion stands alone, and
+// the SelectorExpr layer is the shape resident_ball_228_test.go:261 already
+// carries in this package (no new traversal layer was invented).
+
+import (
+	"go/ast"
+	"go/token"
+	"testing"
+)
+
+// wantAttachCalls294 is the single number all three AC#1 clauses share. 0 and
+// 2 are the two ways the chain silently breaks (never attached / attached
+// twice), so exactly 1 is the reading.
+const wantAttachCalls294 = 1
+
+// TestAC294AssemblyRootAttachesTheMuteGateByShape pins the assembly root's
+// mute hop: (a) runResident contains exactly one attachMuteGate method call,
+// (b) its receiver is the handle startResidentBall returned and its argument is
+// the capture leg's own raudio.toggleMute (the ticket's wording: not "any
+// function value"), and (c) it sits AFTER the startResidentAudio call - the
+// time order that makes the chain possible (ball at :250, gate at :311, attach
+// at :342 in the tree this was written on; the ruler reads AST order, never
+// those line numbers).
+func TestAC294AssemblyRootAttachesTheMuteGateByShape(t *testing.T) {
+	body, file := runResidentBody258(t)
+	if body == nil {
+		t.Fatalf("no runResident found in resident_windows.go (the instrument, not the code)")
+	}
+
+	// One walk, all readings. node is a preorder counter; the order clause is
+	// an AST-position comparison precisely so that inserting a fixture or a
+	// comment cannot move it (ticket 294: no line-number anchors).
+	attach := 0
+	attachPos := -1
+	attachRecv := ""
+	attachArg := ""
+	ballVar := ""
+	audioVar := ""
+	audioPos := -1
+	node := 0
+	ast.Inspect(body, func(n ast.Node) bool {
+		node++
+		switch d := n.(type) {
+		case *ast.AssignStmt:
+			// Which identifier holds the two handles: rb := startResidentBall(...)
+			// and raudio := startResidentAudio(...). Recorded so clause (b) can
+			// check the receiver IS that return value, not merely that it is
+			// spelled rb.
+			if d.Tok != token.DEFINE || len(d.Lhs) != 1 || len(d.Rhs) != 1 {
+				return true
+			}
+			call, ok := d.Rhs[0].(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+			id, ok := call.Fun.(*ast.Ident)
+			if !ok {
+				return true
+			}
+			lhs, ok := d.Lhs[0].(*ast.Ident)
+			if !ok {
+				return true
+			}
+			switch id.Name {
+			case "startResidentBall":
+				ballVar = lhs.Name
+			case "startResidentAudio":
+				audioVar = lhs.Name
+			}
+		case *ast.CallExpr:
+			// The audio leg's call is an Ident-layer call (the 258 shape); the
+			// attach is a SelectorExpr-layer method call (the 228 shape).
+			if id, ok := d.Fun.(*ast.Ident); ok && id.Name == "startResidentAudio" {
+				audioPos = node
+				return true
+			}
+			sel, ok := d.Fun.(*ast.SelectorExpr)
+			if !ok || sel.Sel.Name != "attachMuteGate" {
+				return true
+			}
+			attach++
+			attachPos = node
+			if recv, ok := sel.X.(*ast.Ident); ok {
+				attachRecv = recv.Name
+			}
+			if len(d.Args) == 1 {
+				if arg, ok := d.Args[0].(*ast.SelectorExpr); ok {
+					if x, ok := arg.X.(*ast.Ident); ok {
+						attachArg = x.Name + "." + arg.Sel.Name
+					}
+				}
+			}
+		}
+		return true
+	})
+
+	// (a) the count, its own assertion (ticket 294 AC#1 (a)): not 0, not 2.
+	if attach != wantAttachCalls294 {
+		t.Fatalf("AC#1(a) RED: runResident (%s) contains %d rb.attachMuteGate call(s), want exactly %d - the mute hop is not attached (or attached twice)", file, attach, wantAttachCalls294)
+	}
+	// (b) receiver and argument, named (ticket 294 AC#1 (b)). These run only
+	// after the count above; a "for every found call" form here would pass on
+	// the empty set, which is the always-green fake the ticket's 2026-10-11
+	// correction names.
+	if ballVar != "rb" {
+		t.Errorf("AC#1(b) RED: runResident (%s) binds startResidentBall's return to %q, want rb - the receiver clause cannot be true without the ball handle", file, ballVar)
+	}
+	if attachRecv != "rb" {
+		t.Errorf("AC#1(b) RED: the attach receiver is %q, want rb (the value startResidentBall returned)", attachRecv)
+	}
+	if audioVar != "raudio" {
+		t.Errorf("AC#1(b) RED: runResident (%s) binds startResidentAudio's return to %q, want raudio - the argument clause cannot be true without the capture leg handle", file, audioVar)
+	}
+	if attachArg != "raudio.toggleMute" {
+		t.Errorf("AC#1(b) RED: the attach argument is %q, want raudio.toggleMute (the capture leg's own executor - any other function value is the defect this pin exists to catch)", attachArg)
+	}
+	// (c) order (ticket 294 AC#1 (c)): attached after the leg it belongs to
+	// exists. Judged on AST position, never on line numbers.
+	if audioPos < 0 {
+		t.Fatalf("AC#1(c) RED: runResident (%s) no longer calls startResidentAudio at all - the chain this pin describes is gone", file)
+	}
+	if attachPos <= audioPos {
+		t.Fatalf("AC#1(c) RED: the attach call sits at AST position %d, startResidentAudio at %d - the executor is hung before the leg it belongs to exists", attachPos, audioPos)
+	}
+}
+
+// The red-form demos that prove this ruler has teeth live in the leg's probes
+// (.scratch/wisp/probes/294/r1/logs/10-ac1-astpin.txt): a -overlay variant with
+// wantAttachCalls294=2 stays red on the shipped tree, and a variant whose
+// argument is wrapped in a local variable reddens clause (b). Both mutate the
+// MEASURED side only; the shipped files are byte-identical after them (sha256
+// proofs in the same file).

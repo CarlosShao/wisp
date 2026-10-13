@@ -1,0 +1,6 @@
+date=2026-10-13 18:29:06 +0800
+pwd=/d/work/workspace/projects plans/Wisp
+post-1 prescribed form attempt (worktree with the leg's two new test files)
+cmd=go test ./cmd/wisp/ -count=1 -v
+INFO: No tasks are running which match the specified criteria.
+INFO: No tasks are running which match the specified criteria.

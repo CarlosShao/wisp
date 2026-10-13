@@ -1,0 +1,56 @@
+17d16
+< PASS TestAC13BringUpSurvivesAReusedThreadQuit
+22d20
+< FAIL TestAC14GoSideEvalPushReachesThePage
+30,32c28,30
+< FAIL TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink
+< FAIL TestAC1ResidentLegInstallsItsLogListenerOnDisk
+< FAIL TestAC1ResidentLegOutlivesItsOwnLogFailure
+---
+> PASS TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink
+> PASS TestAC1ResidentLegInstallsItsLogListenerOnDisk
+> PASS TestAC1ResidentLegOutlivesItsOwnLogFailure
+36c34
+< FAIL TestAC228ExitRequestDuringBootStillLeavesThroughD38E
+---
+> PASS TestAC228ExitRequestDuringBootStillLeavesThroughD38E
+38c36
+< FAIL TestAC228ResidentLegReportsAndBooksItsBall
+---
+> PASS TestAC228ResidentLegReportsAndBooksItsBall
+43c41
+< FAIL TestAC246DevLegIgnoresTheTestTaskInjection
+---
+> PASS TestAC246DevLegIgnoresTheTestTaskInjection
+48,50c46,48
+< FAIL TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline
+< FAIL TestAC246ShippedResidentLegWithoutConsoleRefusesItsTaskEntry
+< FAIL TestAC246ShippedResidentProcessOwnsItsCancelStep
+---
+> PASS TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline
+> PASS TestAC246ShippedResidentLegWithoutConsoleRefusesItsTaskEntry
+> PASS TestAC246ShippedResidentProcessOwnsItsCancelStep
+75c73
+< FAIL TestAC2AC3DegradedLegsStillDeliverTheirVerdict
+---
+> PASS TestAC2AC3DegradedLegsStillDeliverTheirVerdict
+80,81c78,79
+< FAIL TestAC2ModelsLegBooksItsHandOffVerdictOnDisk
+< FAIL TestAC2RealProcessRefusesOnEveryLegWithoutAppData128
+---
+> PASS TestAC2ModelsLegBooksItsHandOffVerdictOnDisk
+> PASS TestAC2RealProcessRefusesOnEveryLegWithoutAppData128
+92,93c90,91
+< FAIL TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord
+< FAIL TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot
+---
+> PASS TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord
+> PASS TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot
+182c180
+< FAIL TestSecretArgvCarriesNoSecret
+---
+> PASS TestSecretArgvCarriesNoSecret
+189c187
+< FAIL TestSecretRealBinaryRefusesValueFlag
+---
+> PASS TestSecretRealBinaryRefusesValueFlag

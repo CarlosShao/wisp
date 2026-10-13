@@ -1,0 +1,39 @@
+# 294-r1 AC#2 读数原件 — 球侧 mute 注册那一跳的真窗现读
+# 时刻 2026-10-13 17:30-17:45 +08；锚 HEAD 0e5253fe6894b6f13fe91def5dd88586b087f9a7
+# 尺件 = cmd/wisp/resident_mute_294_windows_test.go（新建；sha256 ede84f7a80237fba3fb47d3dc9696e20c394c6f18ec91f2864e9fcb924969229）
+
+## 1. 缺口复认（进场现跑，非信票面）
+- `grep -n hkMute internal/ball/hotkey_windows.go` 现量 -> `37:\thkMute   = 2`（非导出常量）
+- cmd/wisp 侧既有镜像只有 hkSummon258=1 / hkPanel258=4（resident_hotkey_258_windows_test.go:73-76）；
+  mute=2 零镜像（复认）——本件加本地镜像常量 hkMute294。
+- 件内注释写清"手抄的第二枚真相源，抄错会怎样"：1=summon 会读成假绿；3=cancel 是 idle standby（会因错理由红）；
+  4=panel 指向另一枚键 —— 所以镜像不由名字背书，由同源尺背书。
+
+## 2. 同源尺（不是注释）
+- TestAC294HkMuteMirrorMatchesInternalBallSource：go/parser 现读 ../../internal/ball/hotkey_windows.go 的整数常量 hkMute，
+  与 hkMute294 相等才绿；解析不到即 Fatalf（"the id table moved, re-adjudicate this row"）。
+- rc=0 的 PASS 见第 4 条四枚 PASS 中的第二枚。
+
+## 3. 真窗现读（本机有真窗；SKIP-LOUD 退路未触发）
+- 夹具 = 258 族形状：writeConfig258 播非默认 mute = "Ctrl+Alt+X"（默认是 Ctrl+Alt+M），
+  src := func() ball.HotkeyConfig { return loadHotkey258(t, dir) }，rb := startResidentBall(observe.NewRegistry(), nil, src, src)
+- 现读逐字（raw-ac294-green-final.txt:121）:
+    resident_mute_294_windows_test.go:121: AC#2 reading: id=2 name="mute" binding="Ctrl+Alt+X" status="live" vk=0x58
+- 该用例 --- PASS: TestAC294MuteHotkeyRegistersLiveOnARealBallWindow (0.30s)，NOT skip（`--- SKIP` 零命中）
+- 判读：mute 那枚 id（镜像 2）在真注册表 IsLive=true，VK=0x58=='X'（== 配置文件播的值）=> 本格交的是读数，不是 skip。
+  本格红/跳口径：若 IsLive 假会以 `boot.Bindings()` 全表红句 Fatalf；若 headless 才走 SKIP-LOUD（本机未走）。
+- 禁区遵守：未 PostMessage 真热键、未 press 键盘（AC#2 只读 HotkeyReport）。
+
+## 4. 命令与 rc
+cmd: PATH="<worktree>/third_party/sherpa-onnx:<worktree>/build:$PATH" go test ./cmd/wisp/ -count=1 -run 'TestAC294' -v
+  （原件 logs/raw-ac294-green-final.txt）
+rc=0
+--- PASS: TestAC294AssemblyRootAttachesTheMuteGateByShape (0.00s)
+--- PASS: TestAC294HkMuteMirrorMatchesInternalBallSource (0.00s)
+--- PASS: TestAC294MuteHotkeyRegistersLiveOnARealBallWindow (0.30s)
+--- PASS: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+
+## 5. 与既有仪器的位置关系（防重）
+- 既有先例：internal/ball/hotkey_live_test.go:404 已对 hkMute 读过一次（internal/ball 侧）；
+  resident_hotkey_258_windows_test.go:290 只对 hkSummon258 读 IsLive。本件是 cmd/wisp 侧对 mute id 的第一次现读。
+- 本件未动球侧两支闭包（resident_ball_windows.go 的 OnMuteHotkey/OnTrayMute 零改动，行为零改）。

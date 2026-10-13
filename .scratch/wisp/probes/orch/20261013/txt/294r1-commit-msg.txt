@@ -1,0 +1,19 @@
+294-r1 死腿遗产代提〔未验证半成品〕〔死腿遗产〕（旧会话废弃、腿停在"名册交集"最后一格）
+
+来源：294-r1（派单 506a5e3c＋10-13 16:3x 补记）死于旧会话停手（最后落笔 18:32；非 314 死区、非轮帽），
+未 commit、未票尾 bullet。按骨架 §7.4 由编排者代提。
+
+包含：
+- cmd/wisp/resident_mute_294_test.go（AC#1 装配根那一跳 AST 形钉：SelectorExpr 层＋三事共用一枚计数＋
+  ==1 独立断言；红形 D1〔计数改 2〕/D2〔实参放宽〕已在件内注释与 logs 演示）
+- cmd/wisp/resident_mute_294_windows_test.go（AC#2 真窗 mute 注册实读 IsLive=true、vk=0x58='X'、非 skip＋
+  镜像同源尺；AC#3 executed==true：同行变异红〔句面不改〕＋还原绿＋sha256 三核对全中）
+- .scratch/wisp/probes/294/r1/logs/** 41 枚原件（红绿读数／变异体／overlay 件／6 发改前名册与
+  1 发 post〔死于 175.6s＝票 314 死区〕）
+
+★只跑了四道门（编排者现跑）：go build ./... rc=0；gofumpt -l 两新件干净；长度门 GREEN；
+d22scan 工作树 clean rc=0。sha256 三核对全中（7b20b7f8…／ede84f7a…／a841f522…）。
+⚠ 未验证：整包名册交集（AC#5）未完成。留给续腿 294-r1b：
+① 三格复跑复核＋红形牙复核；② AC#5 交集两发对（overlay-stub 或 1b6eb740↔本笔导出对；死区按降格规则）；
+③ post 三红逐因（AC14/AC4Focus＝真窗族随会话漂；255 roster＝313-r1 新读者漂移〔89b3b550 在
+internal/panel/config_handlers.go 新增 Voice 读面〕、编排者已定位、非本腿、另记台账）；④ AC#4 逐笔越界核。

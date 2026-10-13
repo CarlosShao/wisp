@@ -1,0 +1,7 @@
+date=2026-10-13 17:45:35 +0800
+pwd=/d/work/workspace/projects plans/wisp-294r1-pre
+export-shape=git archive HEAD go.mod go.sum internal cmd tools scripts frontend (+worktree dist copy); .go count=685
+path-form=/d/... MSYS form (D:/... form dies at load 0xc0000135)
+cmd=go test ./cmd/wisp/ -count=1 -v
+INFO: No tasks are running which match the specified criteria.
+INFO: No tasks are running which match the specified criteria.
