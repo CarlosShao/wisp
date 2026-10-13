@@ -93,7 +93,23 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 	if cfg == nil {
 		return panel.SettingsView{Readable: false, Credential: panel.CredentialConfigUnreadable}, nil
 	}
-	view := panel.SettingsView{Readable: true, ChatModel: cfg.LLM.Roles.Chat.Model, ChatModelKnown: strings.TrimSpace(cfg.LLM.Roles.Chat.Model) != ""}
+	view := panel.SettingsView{
+		Readable:       true,
+		ChatModel:      cfg.LLM.Roles.Chat.Model,
+		ChatModelKnown: strings.TrimSpace(cfg.LLM.Roles.Chat.Model) != "",
+		// 票 313：选择器的数据源 ＋ "用户配过没有" 那一枚旗。
+		Presets: config.PresetNames(), PresetsKnown: true,
+		ChatProvider:    cfg.LLM.Roles.Chat.Provider,
+		Configured:      len(cfg.LLM.Providers) > 0 || strings.TrimSpace(cfg.LLM.Roles.Chat.Provider) != "",
+		ConfiguredKnown: true,
+		Voice: panel.VoiceSettingsView{
+			CloudASRChain:    cfg.Voice.CloudASRChain,
+			CloudTTSChain:    cfg.Voice.CloudTTSChain,
+			RealtimeEnabled:  cfg.Voice.Realtime.Enabled,
+			RealtimeProvider: cfg.Voice.Realtime.Provider,
+			RealtimeModel:    cfg.Voice.Realtime.Model,
+		},
+	}
 
 	names := make([]string, 0, len(cfg.LLM.Providers))
 	for name := range cfg.LLM.Providers {
@@ -109,9 +125,13 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 			APIKeyRef:  p.APIKeyRef,
 			HasBaseURL: strings.TrimSpace(p.BaseURL) != "",
 		}
-		for range p.Models {
-			row.ModelCount++
+		modelNames := make([]string, 0, len(p.Models))
+		for id := range p.Models {
+			modelNames = append(modelNames, id)
 		}
+		sort.Strings(modelNames)
+		row.ModelCount = len(modelNames)
+		row.Models = modelNames
 		ref := strings.TrimSpace(p.APIKeyRef)
 		if ref != "" {
 			declared++
@@ -215,6 +235,18 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		written, err = s.mgr.SetModelPriceOut(w.Provider, w.Model, f)
 	case panel.FieldRoleChatModel:
 		written, err = s.mgr.SetRoleChatModel(w.Value)
+	case panel.FieldVoiceCloudASRChain:
+		written, err = s.mgr.SetVoiceCloudASRChain(splitChainValue(w.Value))
+	case panel.FieldVoiceCloudTTSChain:
+		written, err = s.mgr.SetVoiceCloudTTSChain(splitChainValue(w.Value))
+	case panel.FieldVoiceRealtimeProvider:
+		written, err = s.mgr.SetVoiceRealtimeProvider(w.Value)
+	case panel.FieldVoiceRealtimeModel:
+		written, err = s.mgr.SetVoiceRealtimeModel(w.Value)
+	case panel.FieldProviderRowCreate:
+		written, err = s.mgr.CreateProviderRow(w.Provider, w.Model)
+	case panel.FieldRoleChatPair:
+		written, err = s.mgr.SetRoleChatPair(w.Provider, w.Model)
 	case panel.FieldProviderCredential:
 		return panel.SettingWriteResult{Field: w.Field, Tier: panel.EffectiveNotApplied},
 			fmt.Errorf("凭据值不走这条写入路径（它只写不回显，必须走 StoreCredential），字段 %q 未落盘", w.Field)
@@ -288,4 +320,16 @@ func (s *configStore) credentialStatus() panel.CredentialState {
 		return panel.CredentialConfigUnreadable
 	}
 	return view.Credential
+}
+
+// splitChainValue turns the panel's comma-separated chain value into the element
+// slice config's setter takes. The panel's own gate refuses an empty value for
+// these fields, so this never has to decide what "" means.
+func splitChainValue(v string) []string {
+	parts := strings.Split(v, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		out = append(out, strings.TrimSpace(p))
+	}
+	return out
 }
