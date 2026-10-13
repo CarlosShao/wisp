@@ -1,0 +1,38 @@
+票 313 落地腿 `313-r1`（界面配模型·Go 侧；★页面本体归机主外部 agent，⛔ `frontend/**` 一字）
+
+## 0. 你是谁、从哪儿接
+
+- **落地腿**（写码＋自跑门禁＋自己 commit）。票面＝`.scratch/wisp/issues/313-default-provider-stepfun-and-model-config-stays-in-the-ui.md`（**先通读**：机主两段原话、三格 AC、禁区、`AC#4` 顺带项）。
+- ★**发放条件（编排者在派发时已核）**：`cmd/wisp` 面在 `294-r1` 交件之后才放你开工——你起手先跑 `git log --oneline -6` ＋ `git status --porcelain -- cmd/wisp` 现读；若 `cmd/wisp` 下还有别人的在飞件 ⇒ **停下报回**，⛔ 抢跑。
+- 普查料（四表，逐行带尺，**先通读**）＝`.scratch/wisp/probes/313/a1/{a-get.md,b-set.md,c-default.md,d-page.md}`；**裁定账＝`docs/reports/pending-and-issues.md` 的 `A877`**（五条，逐字照做，含三条 ⛔）。起手落 `logs/00-head.txt`（`git log -1` 逐字）。
+
+## 1. 你交什么（三格 AC 的 Go 侧；★判据分三类：Go 可自测／必须页面／必须真机——页面与真机那两类⛔ 你判）
+
+- **甲｜读面（config.get 结构化载荷）**：把「预设清单（`PresetNames()`，含 stepfun）／每 provider 的模型名集合／当前选中（`roles.chat` 那对＋语音段）／已配置标记」推进 `config.get` 的回执（`A877` 裁定④：该口今天**零消费者** ⇒ 形状自由裁；⛔ 新 C17 方法名；"读不到=说实话"两句先例照旧）。**⛔ 编模型名**——页面侧必须带「手填模型 id」退路（census `d-page.md` #4）；真实 id 若查得到（stepfun 公开文档/清单）可预置，查不到就停手报回。
+- **乙｜写面（新可写字段＋显式建行）**：①按 `A877` 裁定①新增 `voice_cloud_asr_chain`／`voice_cloud_tts_chain`（+实时 β 两枚，若做）；②按裁定②做**显式建 provider 行**能力——先量清 catalog 的 provider/model 来源（`internal/config/catalog.go` 现读），再裁落点（预计四处：`internal/panel/config_handlers.go` 字段表 ／ `cmd/wisp/panel_config_store.go` 的 switch 腿 ／ `internal/config/settings.go` setter＋校验 ／ `catalog` 行存在性），**形状你裁、自带判据、边界照裁定②五条**；③`roles.chat` 的 provider 半对写口缺口（`d-page.md` #5）与成对写纪律（`catalog.go` "set both or neither"）一并处理。
+- **丙｜"默认 stepfun"（Go 侧那半）**：按裁定③＝**只做**"预设清单＋是否已配置"到页面这条读面；⛔ 首建写入（198 钉）、⛔ default 标签/运行时兜底（catalog 拒载＋run 退 2 钉）。
+- **交付给页面的接口规格**：把 `d-page.md` 那 15 行待办按你**最终形状**改写成一枚 `docs/evidence/s1/313-panel-ask.md`（给编排者转交机主 agent 用；⛔ 动 `frontend/**` 任何件）。
+- 票尾追加 **1 条** Progress-log bullet（1 add／0 del）；⛔ 翻任何 AC 框、⛔ 动 Status、⛔ 加 `-done`。
+
+## 2. 禁区（逐条）
+
+- ⛔ `frontend/**`、`design/**` 一字；⛔ 动 `go.mod`（真要新依赖 ⇒ 停手报回）；⛔ 起新 C17 方法名；⛔ 放宽任何既有断言（313 票面禁区：`internal/config` 成对/可知性用例照旧）；⛔ 改 `settings.go:36-39` 那句 "page does not mint" 守卫**本身**（`A877` 裁定②④⑤——若你量出"必须改它"⇒ 停手报回）。
+- 凭据路径照旧：值只走 `credentialValue` 键（`cmd/wisp/panel_config_store.go:53`、`:59-66`）；⛔ 回显／日志／argv／模型文本（票 63/117/131 那一族既有钉逐枚照旧）。
+- ⛔ 碰 `probes/161/r6/flip-*.sh`；⛔ 重跑别家台件；⛔ 在 `probes/**` 下建 `.go`。
+
+## 3. 门禁（自跑；每枚件自落一行 `rc=N`；⛔ 0 字节件＝那格没交）
+
+- `GOFLAGS= go build ./...` rc=0；`$(go env GOPATH)/bin/gofumpt.exe -l <你动过的目录>` 空（⛔ 裸 `gofumpt`＝rc=127；绝对路径先 `go env GOPATH` 现读）。
+- `go test -count=1 -v ./internal/panel/ ./internal/config/`（你动过哪个包测哪个；⚠ `./internal/risk/` 若碰，单跑——并发会假红）。
+- `cmd/wisp` 那侧（`294-r1` 交件后你才动它）：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -v ./cmd/wisp/`——⚠ **票 314 已知**：整包在真窗测试区有**整进程死亡**（5/5 连发、无 panic、无 `--- FAIL` 行）；撞上时＝按〔台面故障〕具名（对票 314 的死点两枚测试名）、⛔ 计入你的牙、补一发再判。
+- `sh scripts/d22scan.sh`＝**纯净树** rc=0（`git archive HEAD` 仓外导出树跑；⚠ 工作树既存脏件⛔ 你的账）。
+- 跑读数前 `tasklist` 现跑 `wisp.exe`／`balldebug.exe`＝0；`GOTMPDIR` 若要设只许 C: 卷专用根；⛔ `cmd | head; echo $?`；`grep -c` 0 命中 ⇒ rc=1 截断 `&&`（写 `N=$(… || true)`）。
+
+## 4. git 纪律（照抄 166 派单 §4）
+
+- 只 commit ⛔ push；`git add` 与 `git commit` **两处**都带显式 pathspec；⛔ `add -A`／`add <目录>`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；仓内不删文件、不建 worktree。
+
+## 5. 交件与预算
+
+- **≤6 枚件**、每件 ≤200 行；件名短、⛔ 带 `§`；判语一句＋尺一行＋件名。
+- 一程做不完 ⇒ 按"能合上的最小增量"分笔 commit，没做完的格子**具名报回**；最后具名自报"哪格没做完"——编排者会逐把尺复跑，⛔ 你自报的数当数。
