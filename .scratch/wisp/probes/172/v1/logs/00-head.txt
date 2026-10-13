@@ -1,0 +1,63 @@
+172-v1 非实现者验收腿 head
+2026-10-13 23:42:59 +0800
+cwd=/d/work/workspace/projects plans/Wisp
+branch=dev
+HEAD=def36d0f004f6d3b8f33a34f575ea55c473e4b53 编排者：172-v1 发送补记＋A894（172 收件；task.spawn 契约缺口待裁；长度门名册修复）
+git status --porcelain:
+ M .gitignore
+ M .scratch/wisp/probes/152/my152.py
+ M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+ M .scratch/wisp/probes/242/r3/logs/probe-routed.txt
+ M .scratch/wisp/probes/268/v1/evidence.md
+ M cmd/wisp/panel_config_store.go
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+
+=== 172-v1 env/toolchain ===
+go version go1.27.1 windows/amd64
+go1.27.1
+C:/Users/swq/AppData/Local/Temp/172-v1/gotmp
+E:\work\data\caches\go-build
+
+
+=== tasklist (go/.test/compile) ===
+cargo.exe                    25488 Console                    1      8,916 K
+cargo.exe                    28568 Console                    1     16,600 K
+
+=== sha256 BEFORE (key files) ===
+c38d859ad7efc43a492511ad3d620098a4d26abf27de75d92f1975c5cc054537 *docs/PLAN.md
+a8de888fde0ffdd97d38c46f0d2d965b8771291e3582c5d618dd19e99c9ad3f6 *docs/specs/SPEC-07-tools-and-plugins.md
+a65637f2fbc4cd3860d27a8e83866ca49d4fec9e069ec7b9a137c5599b687108 *internal/tools/tier_consistency_172_ruler_test.go
+b7d9e1e4c4fd8e5388da1603bf4a78664a73d27d0e6a5d278d77323831bce190 *internal/tools/tier_consistency_172_machine_test.go
+cffe296b0061826ee93d78870e425e78e254a54bace1134e1636cd26ddda6ef6 *internal/tools/tier_consistency_172_cases_test.go
+e5ff2e6f5d9e1d321e733da05167217e8667babeb01e47dff90b808cb8e69669 *internal/tools/fs_write.go
+7efedfffa504337b0f5fae07e31a7707f8111eefc57aac4ed34862bcfdbb2779 *internal/tools/fs_edit.go
+5b0ca5e2303b6619f80dac2c57524a3ff1c7bb71c059a55f2ae73c5937aa7c2b *internal/tools/subagent_197.go
+
+=== git status --porcelain slices ===
+-- internal/tools:
+-- docs .github tools/d22scan:
+-- the three ruler files at HEAD:
+8509e52e 172-r1：给「冻结文本档位 ⇄ 机器实际档位」造一致性尺（D34 表解析＋走桥判定路径的机器探针，分母＝整张表 40 枚工具）

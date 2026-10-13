@@ -1,0 +1,73 @@
+=== AC#1 (v1 self-made): doc copy lies, fs.trash L1->L2, via WISP172_TIER_DOC ===
+2026-10-13 23:47:37 +0800
+ad2dadd3 编排者：票 186 收口——九格全勾（凭据 186-v1；AC#8 前置已补）＋Status 留档＋git mv -done；A895（三红归账）
+copy = C:/Users/swq/AppData/Local/Temp/172-v1/mut/PLAN.172.doclie-trash.md (sha256 d620a4ed379ce8f1bdee4716d8a0638afaa372dde3dd7d8edd8f4e324939ba78; exactly one line vs docs/PLAN.md line 2538: fs.trash cell **L1** -> **L2**)
+cmd: WISP172_TIER_DOC=<copy> GOFLAGS= go test -count=1 -run Test172 -v ./internal/tools/
+
+rc=1
+
+--- load-bearing lines (grepped verbatim) ---
+=== RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+--- PASS: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+=== RUN   Test172FrozenTierMatchesTheTierTheGateGives
+--- FAIL: Test172FrozenTierMatchesTheTierTheGateGives (0.03s)
+=== RUN   Test172DocCopyThatLiesReddensTheRuler
+--- PASS: Test172DocCopyThatLiesReddensTheRuler (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.127s
+FAIL
+    tier_consistency_172_cases_test.go:127: fs.trash：文档写 L2、机器给 L1（探针：移入回收站 -> L1）—— 冻结文本与门给的档位不一致，两边必须由同一个 ticket 改齐
+    tier_consistency_172_cases_test.go:127: 分母 40 枚工具：对得上 8，对不上 1，未落地 31；机器有而契约无 [task.spawn]
+
+--- count of red sentences mentioning 文档写 ---
+1
+--- lines naming fs.trash with 文档写 ---
+1
+
+sha256(docs/PLAN.md after AC#1 run)=c38d859ad7efc43a492511ad3d620098a4d26abf27de75d92f1975c5cc054537
+
+=== AC#2 (v1 self-made): machine lies, overlay fs_move FSMoveDecl Declared L1->L2 (fs_write.go:739, 1 line) ===
+2026-10-13 23:48:02 +0800
+ad2dadd3 编排者：票 186 收口——九格全勾（凭据 186-v1；AC#8 前置已补）＋Status 留档＋git mv -done；A895（三红归账）
+overlay copy sha256=c6f77b5502757f934cb87679f2e9544cb330ab99901e2e41ddc2429328fdf3aa ; source sha256 before=e5ff2e6f5d9e1d321e733da05167217e8667babeb01e47dff90b808cb8e69669
+cmd: GOFLAGS= go test -count=1 -overlay=<overlay-fsmove.json> -run Test172 -v ./internal/tools/
+
+rc=1
+
+--- load-bearing lines (grepped verbatim) ---
+=== RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+--- PASS: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+=== RUN   Test172FrozenTierMatchesTheTierTheGateGives
+--- FAIL: Test172FrozenTierMatchesTheTierTheGateGives (0.03s)
+=== RUN   Test172DocCopyThatLiesReddensTheRuler
+--- FAIL: Test172DocCopyThatLiesReddensTheRuler (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.095s
+FAIL
+    tier_consistency_172_cases_test.go:127: fs.move：文档写 L1、机器给 L2（探针：同卷内重命名 -> L2）—— 冻结文本与门给的档位不一致，两边必须由同一个 ticket 改齐
+    tier_consistency_172_cases_test.go:127: 分母 40 枚工具：对得上 8，对不上 1，未落地 31；机器有而契约无 [task.spawn]
+    tier_consistency_172_cases_test.go:161: 对照组：尺在没改过的真文本上就红了（[fs.move]），红形演示无从归属
+
+--- count of 文档写 red sentences ---
+1
+--- which tools named in 文档写 lines ---
+fs.move
+
+sha256(internal/tools/fs_write.go after run)=e5ff2e6f5d9e1d321e733da05167217e8667babeb01e47dff90b808cb8e69669
+git status --porcelain -- internal/tools:
+(end)
+
+=== AC#2b (v1 self-made): overlay removes the fs.move REGISTRATION from BuiltinFSWriteEntries (fs_write.go, 1 line deleted) ===
+cmd: GOFLAGS= go test -count=1 -overlay=<overlay-nomove.json> -run Test172 -v ./internal/tools/ ; rc=1
+    === RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+    --- PASS: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+    === RUN   Test172FrozenTierMatchesTheTierTheGateGives
+        tier_consistency_172_cases_test.go:125: ruler: probe for fs.move but it is not registered
+    --- FAIL: Test172FrozenTierMatchesTheTierTheGateGives (0.02s)
+    === RUN   Test172DocCopyThatLiesReddensTheRuler
+        tier_consistency_172_cases_test.go:158: ruler: probe for fs.move but it is not registered
+    --- FAIL: Test172DocCopyThatLiesReddensTheRuler (0.03s)
+    FAIL
+    FAIL	github.com/CarlosShao/wisp/internal/tools	0.089s
+    FAIL
+sha256(internal/tools/fs_write.go after run)=e5ff2e6f5d9e1d321e733da05167217e8667babeb01e47dff90b808cb8e69669 (== before)

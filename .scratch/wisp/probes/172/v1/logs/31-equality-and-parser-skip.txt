@@ -1,0 +1,56 @@
+=== 172-v1 point 3: equality criterion demos + parser-skip overlays (read of implementation: tier172Mismatched uses slices.Equal on sorted deduped sets => set equality both directions) ===
+date: 2026-10-14 00:0x +0800 ; HEAD ad2dadd3 ; all reads via -run Test172 -v
+
+--- run C: WISP172_TIER_DOC = taskoutput.superset.md (doc cell **L0** -> **L0** / **L1**, exactly 1 line; doc has EXTRA tier) ---
+cmd: WISP172_TIER_DOC=<copy> GOFLAGS= go test -count=1 -run Test172 -v ./internal/tools/   ; rc=1
+    === RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+    --- PASS: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+    === RUN   Test172FrozenTierMatchesTheTierTheGateGives
+        tier_consistency_172_cases_test.go:127: task.output：文档写 L0/L1、机器给 L0（探针：读一枚不存在的任务行 -> L0）—— 冻结文本与门给的档位不一致，两边必须由同一个 ticket 改齐
+        tier_consistency_172_cases_test.go:127: 分母 40 枚工具：对得上 8，对不上 1，未落地 31；机器有而契约无 [task.spawn]
+    --- FAIL: Test172FrozenTierMatchesTheTierTheGateGives (0.04s)
+    === RUN   Test172DocCopyThatLiesReddensTheRuler
+    --- PASS: Test172DocCopyThatLiesReddensTheRuler (0.08s)
+
+--- run D: WISP172_TIER_DOC = PLAN.172.docflip-edit.md (doc fs.edit **L2** -> **L1**, exactly 1 line; doc MISSING tier; r1's original shape, reproduced) ---
+cmd: same, rc=1
+    === RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+    --- PASS: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+    === RUN   Test172FrozenTierMatchesTheTierTheGateGives
+        tier_consistency_172_cases_test.go:127: fs.edit：文档写 L1、机器给 L2（探针：替换授权目录里既有文件的一小段 -> L2）—— 冻结文本与门给的档位不一致，两边必须由同一个 ticket 改齐
+        tier_consistency_172_cases_test.go:127: 分母 40 枚工具：对得上 8，对不上 1，未落地 31；机器有而契约无 [task.spawn]
+    --- FAIL: Test172FrozenTierMatchesTheTierTheGateGives (0.04s)
+    === RUN   Test172DocCopyThatLiesReddensTheRuler
+    --- PASS: Test172DocCopyThatLiesReddensTheRuler (0.06s)
+
+--- run M1: -overlay replaces tier_consistency_172_ruler_test.go with a parser that silently drops the fs.trash row (LANDED row; 3 added lines, 1 hunk) ---
+cmd: GOFLAGS= go test -count=1 -overlay=<M1 json> -run Test172 -v ./internal/tools/   ; rc=1
+    === RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+        tier_consistency_172_cases_test.go:91: PLAN.md D34 的 (工具, 档位) 条数 40，现量钉住的是 41 —— 这张表是冻结契约，条数变了一枚就该有人知道
+        tier_consistency_172_cases_test.go:93: SPEC-07 §3 的 (工具, 档位) 条数 40，现量钉住的是 41 —— 这张表是冻结契约，条数变了一枚就该有人知道
+        tier_consistency_172_cases_test.go:99: D34 去重工具名 39 枚，现量钉住的是 40 枚
+    --- FAIL: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+    === RUN   Test172FrozenTierMatchesTheTierTheGateGives
+        tier_consistency_172_cases_test.go:127: 分母 39 枚工具：对得上 8，对不上 0，未落地 31；机器有而契约无 [fs.trash task.spawn]
+        tier_consistency_172_cases_test.go:139: 落地（两边都有读数）的工具从 [fs.delete fs.edit fs.list fs.move fs.read fs.trash fs.write task.cancel task.output] 变成 [fs.delete fs.edit fs.list fs.move fs.read fs.write task.cancel task.output]：少一枚就等于有一行契约文本不再被对账，多一枚就得多一行分母
+    --- FAIL: Test172FrozenTierMatchesTheTierTheGateGives (0.04s)
+    === RUN   Test172DocCopyThatLiesReddensTheRuler
+    --- PASS: Test172DocCopyThatLiesReddensTheRuler (0.08s)
+
+--- run M2: same overlay shape, parser silently drops the web.fetch row (UNLANDED row; 3 added lines, 1 hunk) ---
+cmd: same with M2 json, rc=1
+    === RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+        tier_consistency_172_cases_test.go:91: PLAN.md D34 的 (工具, 档位) 条数 40，现量钉住的是 41 —— 这张表是冻结契约，条数变了一枚就该有人知道
+        tier_consistency_172_cases_test.go:93: SPEC-07 §3 的 (工具, 档位) 条数 40，现量钉住的是 41 —— 这张表是冻结契约，条数变了一枚就该有人知道
+        tier_consistency_172_cases_test.go:99: D34 去重工具名 39 枚，现量钉住的是 40 枚
+    --- FAIL: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+    === RUN   Test172FrozenTierMatchesTheTierTheGateGives
+        tier_consistency_172_cases_test.go:127: 分母 39 枚工具：对得上 9，对不上 0，未落地 30；机器有而契约无 [task.spawn]
+    --- PASS: Test172FrozenTierMatchesTheTierTheGateGives (0.18s)
+    === RUN   Test172DocCopyThatLiesReddensTheRuler
+    --- PASS: Test172DocCopyThatLiesReddensTheRuler (0.16s)
+
+--- restore proofs ---
+sha256(internal/tools/tier_consistency_172_ruler_test.go) before==after: a65637f2fbc4cd3860d27a8e83866ca49d4fec9e069ec7b9a137c5599b687108
+sha256(docs/PLAN.md) before==after: c38d859ad7efc43a492511ad3d620098a4d26abf27de75d92f1975c5cc054537
+git status --porcelain -- internal/tools docs/PLAN.md  => (empty)

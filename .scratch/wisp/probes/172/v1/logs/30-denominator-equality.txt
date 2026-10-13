@@ -1,0 +1,69 @@
+=== 172-v1 point 2: denominator integrity, independent parser (v1-written) ===
+date: 2026-10-13 23:5x +0800 ; HEAD ad2dadd3
+
+docs/PLAN.md: markdown rows=37  (tool,tier) entries=41  unique tools=40
+  multi-name rows (3):
+    ['reminder.set', 'reminder.list', 'reminder.cancel'] -> tiers ['L1', 'L0', 'L1']
+    ['memory.save', 'memory.recall'] -> tiers ['L1', 'L0']
+    ['task.list', 'task.cancel'] -> tiers ['L0', 'L1']
+docs/specs/SPEC-07-tools-and-plugins.md: markdown rows=37  (tool,tier) entries=41  unique tools=40
+  multi-name rows (3):
+    ['reminder.set', 'reminder.list', 'reminder.cancel'] -> tiers ['L1', 'L0', 'L1']
+    ['memory.save', 'memory.recall'] -> tiers ['L1', 'L0']
+    ['task.list', 'task.cancel'] -> tiers ['L0', 'L1']
+folded PLAN == folded SPEC : True
+folded spot: fs.write=['L1', 'L2'] fs.read=['L0', 'L2'] fs.list=['L0', 'L2'] task.output=['L0'] task.cancel=['L1']
+
+=== unlanded spot-check (contract row verbatim + machine live scan of non-test .go) ===
+-- shell.exec --
+   contract docs/PLAN.md:432  | **③ 单个工具结果（硬上限）** | **> 1MB 原始输出** | **直接截断到 1MB 再走上一行**，并标 `truncated=true`。防止一次 `search.content` 命中巨型文件打爆内存（`shell.exec` 与 D46 `command` 的 stdout 上限同为 1MB） |
+   contract docs/PLAN.md:2031  | 10 | ~~**邮件 / 日历 / IM 明确 REJECTED**~~ → ✅ **已定案（2026-09-18）** | **用户选定：「插件路径，核心不内置」** | **定案内容**：① **核心永不内置**邮件/日历/IM —— 不引入 OAuth、不存第三方凭据、不做应用注册与审核，D17「零现金支出」与 D16 隐私边界都不必为此扩张 ② **能力走插件**：本机已有认证好的 `lark-cli`（飞书邮件/日历/IM/任务/多维表格），写成 **Tier-1 声明式插件**即可接入 ③ 这直接牵出**新决策 D46「Tier-1 外部命令插件（CLI 包装）」**（§16.5.6）—— 因为要包 CLI 就必须有受约束的子进程执行通道，而 **D14 把 `shell.exec` 默认禁用了，不能为接一个 CLI 就打开整个 shell**。D46 用「**固定可执行文件 + 哈希钉死 + argv 模板（不经 shell）+ 参数 schema + 声明式输出提取 + 环境白名单**」解决，风险级仍由 C19 中心推断（**发送类动作自动 L2**，插件作者无法自降）④ **D46 不只服务飞书**：同一条通道让 `git`/`gh`/`ffmpeg`/`docker`/`pandoc` 等任何本机 CLI 都能零 Go 代码接入，**是本方案能力面扩展的主路径，优先级高于写内置工具** ⑤ **`lark-cli` 包装插件作为 S7 的"真插件跑起来"验收用例**（不另造玩具插件）；**示例可进仓库，凭据/令牌绝不进仓库**。<br>⚠ §7 的 REJECTED 条目须据此改写为「**核心内置** REJECTED + **插件路径已采纳（D46）**」，不得只写 REJECTED（否则后续 agent 会以为整个能力面被否决） |
+   contract docs/PLAN.md:2568  | `shell.exec` | 任意命令 | **L2**（白名单命中 → L1） | `shell` | S3 | **默认禁用**（D14 结论保留）；**argv 向量强制**（D33） |
+   contract docs/specs/SPEC-07-tools-and-plugins.md:74  | `shell.exec` | 任意命令 | L2（白名单命中 → L1） | shell | S3 | **默认禁用**；argv 向量强制 |
+   machine non-test Go hits: 0  => not registered
+-- web.search --
+   contract docs/PLAN.md:787  | `web.search` | L0 | 搜索引擎（待定：抓结果页 vs 搜索 API） |
+   contract docs/PLAN.md:2019  | 3 | **`web.search` 的实现路径** —— 抓搜索结果页（免费但脆、易被封）vs 用搜索 API（稳定但要 Key 且可能收费） | **S3 前** |
+   contract docs/PLAN.md:2464  | `web.search` 的 **query 串** | 把敏感内容当搜索词发出去，等于发给搜索引擎 |
+   contract docs/PLAN.md:2546  | `web.search` | 网页搜索 | L0，**但 query 含 taint → L2** | `net` | S3 | 实现路径仍待确认（§15 第 3 条） |
+   contract docs/PLAN.md:3126  | **② 信息查询与研究** | `web.search` `web.fetch` `web.open` `doc.read` `screen.capture` | **S3** | **第 11 条**：5 条（"查一下 X 最新版本"/"打开这个链接给我总结"/"看看我屏幕上这个报错"/"读一下这个 PDF 的第三章"…） |
+   contract docs/PLAN.md:3229  | 7 | **`web.search` 的实现路径** | 抓结果页（免费但脆、易被封）vs 搜索 API（稳定但要 Key、可能收费）—— §15 第 3 条，仍未定 | **S3 前** |
+   contract docs/specs/SPEC-07-tools-and-plugins.md:52  | `web.search` | 网页搜索 | L0（query 含 taint → L2） | net | S3 | 实现路径【OPEN：抓结果页 vs API，S3 前】 |
+   machine hit internal/risk/provenance.go:137  "web.search":      {ChWebSearch, []string{"query"}},
+-- reminder.list --
+   machine non-test Go hits: 0  => not registered
+
+=== task.spawn two-way live read ===
+-- machine side --
+   machine hit internal/tools/subagent_197.go:187  func (subagentSpawn) Name() string { return "task.spawn" }
+   machine hit internal/tools/subagent_197.go:563  const subagentHiddenTool = "task.spawn"
+   subagent_197.go:215-231 TaskSpawnDecl block, verbatim:
+     216: // assessor and the same approval queue as the parent's, so declaring a capability
+     217: // here would be a second, redundant grant surface. C19 still owns the verdict.
+     218: func TaskSpawnDecl() Decl {
+     219: 	return Decl{
+     220: 		Capabilities: nil,
+     221: 		Needs:        nil,
+     222: 		Declared:     risk.L0,
+     223: 		PathParams:   nil,
+     224: 		Resident:     true,
+     225: 		Provider:     KindBuiltin,
+     226: 	}
+     227: }
+     228: 
+     229: // BuiltinSubagentEntries returns the ticket 197 spawn entry. It is a separate
+     230: // function from BuiltinTaskEntries because that one's registration shape is
+     231: // pinned by ticket 164's tests as the task.output-only family; nothing here
+     232: // re-pins or loosens those legs.
+   run.go:780  for _, e := range tools.BuiltinSubagentEntries(tools.SubagentDeps{
+-- contract side: literal task.spawn occurrences in the two frozen texts --
+   docs/PLAN.md: 0 occurrence(s)
+   docs/specs/SPEC-07-tools-and-plugins.md: 0 occurrence(s)
+
+=== CORRECTION APPEND (v1): reminder.list contract row printed verbatim (shorthand row names not substring-matched) ===
+   contract docs/PLAN.md:2562  | **`reminder.set/list/cancel`** | 一次性提醒（**只发通知**） | L1 / L0 / L1 | `notify` | **S4** | ⭐ **对 D12 的部分推翻**，见 16.5.4 |
+   contract docs/specs/SPEC-07-tools-and-plugins.md:68  | `reminder.set/list/cancel` | 一次性提醒（只发通知） | L1 / L0 / L1 | notify | **S4** | D12 窄例外：不做周期性/触发执行/跨重启补发/OS 级调度 |
+   note: machine scan for literal "reminder.list"/"reminder.set"/"reminder.cancel" in non-test Go: 0 hits (same scan as section above)
+=== doc-superset copy for equality direction (extra tier on doc side) ===
+   copy C:/Users/swq/AppData/Local/Temp/172-v1/mut/taskoutput.superset.md = real docs/PLAN.md with task.output cell **L0** -> **L0** / **L1** (exactly 1 line)
+   sha256(copy)=be7513592727c0f97d4480a50eb10092a8efc6562a74388b63ae4ebdbb10b0b0

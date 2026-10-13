@@ -1,0 +1,69 @@
+=== 172-v1 points 4+5: seam checks and AC#5 (CI) ===
+date: 2026-10-13 23:5x-2026-10-14 00:0x +0800 ; HEAD ad2dadd3
+
+--- (a) env seam WISP172_TIER_DOC is live: point it at a nonexistent path; the frozen test must die on the read ---
+cmd: WISP172_TIER_DOC=C:/no/such/PLAN.172.md GOFLAGS= go test -count=1 -run Test172 -v ./internal/tools/ ; rc=1
+    === RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+    --- PASS: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+    === RUN   Test172FrozenTierMatchesTheTierTheGateGives
+        tier_consistency_172_cases_test.go:118: read C:/no/such/PLAN.172.md: open C:/no/such/PLAN.172.md: The system cannot find the path specified.
+    --- FAIL: Test172FrozenTierMatchesTheTierTheGateGives (0.00s)
+    === RUN   Test172DocCopyThatLiesReddensTheRuler
+    --- PASS: Test172DocCopyThatLiesReddensTheRuler (0.07s)
+    FAIL
+    FAIL	github.com/CarlosShao/wisp/internal/tools	0.144s
+    FAIL
+
+--- (b) -overlay of docs/PLAN.md is invisible to the disk-reading ruler (no env set; overlay replaces docs/PLAN.md with the fs.edit L2->L1 copy) ---
+cmd: GOFLAGS= go test -count=1 -overlay=<overlay-plandoc.json> -run Test172 -v ./internal/tools/ ; rc=0
+    === RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+    --- PASS: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+    === RUN   Test172FrozenTierMatchesTheTierTheGateGives
+        tier_consistency_172_cases_test.go:127: 分母 40 枚工具：对得上 9，对不上 0，未落地 31；机器有而契约无 [task.spawn]
+    --- PASS: Test172FrozenTierMatchesTheTierTheGateGives (0.04s)
+    === RUN   Test172DocCopyThatLiesReddensTheRuler
+    --- PASS: Test172DocCopyThatLiesReddensTheRuler (0.07s)
+    ok  	github.com/CarlosShao/wisp/internal/tools	0.149s
+    (denominator line verbatim above: 对得上 9 / 对不上 0 => the ruler read the REAL docs/PLAN.md, not the overlay)
+
+--- (c) real frozen files zero change (this leg, whole session) ---
+sha256 BEFORE (00-head) == AFTER:
+    docs/PLAN.md                              c38d859ad7efc43a492511ad3d620098a4d26abf27de75d92f1975c5cc054537
+    docs/specs/SPEC-07-tools-and-plugins.md    a8de888fde0ffdd97d38c46f0d2d965b8771291e3582c5d618dd19e99c9ad3f6
+git diff -- docs/PLAN.md            => empty ; git diff -- docs/specs => empty
+git status --porcelain -- docs/PLAN.md docs/specs tools/d22scan .github internal/tools => empty
+
+--- (d) AC#5: .github untouched and no CI step references the ruler ---
+git status --porcelain -- .github     => empty
+git diff HEAD --stat -- .github       => empty
+grep -rn 'Test172|WISP172|tier_consistency' .github => 0 hits
+.github/workflows = ci.yml slo-fresh.yml (untouched; no new step)
+
+--- (e) AC#4 extras: allowlist / writer surface / default text side ---
+tools/d22scan/allowlist.txt lines=7 ; fs.edit hits in allowlist=0
+only write in the three ruler files is to t.TempDir():
+    internal/tools/tier_consistency_172_cases_test.go:151  os.WriteFile(filepath.Join(t.TempDir(), "PLAN-172-copy.md"), ...)
+default text side (tier_consistency_172_machine_test.go:85-92) and its in-test guard (cases:117-121):
+    -- allowlist:
+    7 tools/d22scan/allowlist.txt
+    0
+    -- ruler writes only to TempDir:
+    internal/tools/tier_consistency_172_cases_test.go:151:	if err := os.WriteFile(filepath.Join(t.TempDir(), "PLAN-172-copy.md"),
+    -- default text side cite:
+    func tier172TextAt(t *testing.T, root string) (string, string) {
+    	t.Helper()
+    	path := filepath.Join(root, "docs", "PLAN.md")
+    	if p := os.Getenv(tier172DocEnv); p != "" {
+    		path = p
+    	}
+    	return tier172Read(t, path), path
+    }
+    -- guard cite:
+    	root := tier172RepoRoot(t)
+    	text, docPath := tier172TextAt(t, root)
+    	if os.Getenv(tier172DocEnv) == "" && docPath != filepath.Join(root, "docs", "PLAN.md") {
+    		t.Fatalf("default text side must be the tracked docs/PLAN.md, got %s", docPath)
+    	}
+    -- HEAD now:
+    ad2dadd3 编排者：票 186 收口——九格全勾（凭据 186-v1；AC#8 前置已补）＋Status 留档＋git mv -done；A895（三红归账）
+    
