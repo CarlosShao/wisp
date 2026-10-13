@@ -61,7 +61,7 @@
    ============================================================================ */
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, FolderCog, Inbox, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, FolderCog, Inbox, PanelRightOpen, Plus } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ai-native/button";
 import { EntityChip } from "@/components/ai-native/entity-chip";
@@ -119,11 +119,17 @@ export function HarnessMain({
   onPickCommand,
   onPickTask,
   onNewTask,
+  onOpenTab,
   className,
 }: HarnessMainProps) {
   if (view === "session") {
     return session ? (
-      <SessionView composerPlaceholder={composerPlaceholder} className={className} session={session} />
+      <SessionView
+        className={className}
+        composerPlaceholder={composerPlaceholder}
+        onOpenTab={onOpenTab}
+        session={session}
+      />
     ) : (
       <EmptyView className={className} hint={emptyHint} onNewTask={onNewTask} />
     );
@@ -266,10 +272,12 @@ function NewTaskView({
 function SessionView({
   session,
   composerPlaceholder,
+  onOpenTab,
   className,
 }: {
   session: HarnessSession;
   composerPlaceholder: string;
+  onOpenTab?: HarnessMainProps["onOpenTab"];
   className?: string;
 }) {
   // 演示页允许本地 state：模型选择为受控演示值。
@@ -310,7 +318,7 @@ function SessionView({
                 </p>
               </div>
             ) : (
-              <AssistantBlock key={msg.id} msg={msg} />
+              <AssistantBlock key={msg.id} msg={msg} onOpenTab={onOpenTab} />
             ),
           )}
         </div>
@@ -536,7 +544,13 @@ function ElapsedRow({ elapsed }: { elapsed: string }) {
 }
 
 /* 助手块：thinking / 工具条 / 正文流式 / 成本行，字段缺省即不渲染。 */
-function AssistantBlock({ msg }: { msg: HarnessAssistantMessage }) {
+function AssistantBlock({
+  msg,
+  onOpenTab,
+}: {
+  msg: HarnessAssistantMessage;
+  onOpenTab?: HarnessMainProps["onOpenTab"];
+}) {
   return (
     <div className="flex flex-col gap-2.5">
       {msg.thinking ? (
@@ -573,6 +587,24 @@ function AssistantBlock({ msg }: { msg: HarnessAssistantMessage }) {
               <span className="shrink-0 tabular-nums text-ink-3">{s.duration}</span>
             </div>
           ))}
+        </div>
+      ) : null}
+      {msg.openTab && onOpenTab ? (
+        // The one place a context tab can appear without you having gone and
+        // opened the rail: the agent needs a tool it does not have, says so in
+        // its own words, and the button is yours to press. It does NOT open the
+        // tab on its own - a panel that appears unbidden is how you lose track
+        // of what the app is showing you.
+        <div className="flex items-center gap-2 rounded-control border border-line bg-surface px-3 py-2">
+          <PanelRightOpen aria-hidden="true" className="size-3.5 shrink-0 text-ink-3" strokeWidth={1.8} />
+          <span className="min-w-0 flex-1 truncate text-[12px] text-ink-2">{msg.openTab.reason}</span>
+          <button
+            className="flex shrink-0 items-center gap-1 rounded-control border border-line px-2 py-1 text-[11.5px] font-medium text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
+            onClick={() => onOpenTab(msg.openTab!.tab)}
+            type="button"
+          >
+            {msg.openTab.label ?? msg.openTab.tab}
+          </button>
         </div>
       ) : null}
       {msg.costLine ? (

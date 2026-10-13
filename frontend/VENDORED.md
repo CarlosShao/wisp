@@ -104,6 +104,8 @@ Every mount checks `html[data-motion="off"]` (theme.css) **before** rendering an
 | `src/components/react-bits/magnet.tsx` | `src/content/Animations/Magnet/Magnet.jsx` | Magnet | header; JSX→TSX: props interface over `HTMLAttributes<HTMLDivElement>`, typed div ref and MouseEvent param - runtime statements verbatim | **yes** - Showcase 10 磁吸按钮 demo card carrying the 下一步/完成 vocabulary (`padding={60}`). The real first-run action buttons live inside `firstrun-screen.tsx`, which that round's named-file scope did not open - wrap them there when approved. `html[data-motion="off"]` leaves the bare button |
 | `src/components/react-bits/shiny-text.tsx` + `shiny-text.css` | `src/content/TextAnimations/ShinyText/ShinyText.jsx` + `ShinyText.css` | ShinyText | header; JSX→TSX: props interface, typed three refs; **`color`/`shineColor` upstream defaults deleted, both props required** (the zero-literal gate - callers must name both, always as `var()` tokens); stylesheet import re-pointed to the copy's filename, the css copy itself is upstream verbatim (one display rule, zero literals) | NOT mounted - the one label it would replace (the 在装模型 download status) already renders through beautiful-ui's Shimmer in `src/components/firstrun-screen.tsx`; owner rule "beautiful-ui 有的不重复" |
 | `src/components/react-bits/animated-list.tsx` | `src/content/Components/AnimatedList/AnimatedList.jsx` | AnimatedList | header; JSX→TSX: two props interfaces plus four compiler-forced runtime-neutral spots (listed in the file header); **the stylesheet did not enter**: upstream `AnimatedList.css` carries seven colour literals, failed the zero-literal gate, was not copied, and its import was removed - rebuild the skin over C21 tokens before any future mount | NOT mounted - Showcase 01's Follow-ups rows already stagger through beautiful-ui's fade-up (`src/components/ai-native/streaming-text.tsx`); owner rule "beautiful-ui 有的不重复". Upstream's 15 demo-string prop default rides along verbatim; nothing imports the file, so it never reaches a bundle |
+| `src/components/react-bits/line-sidebar.tsx` + `line-sidebar.css` | `src/content/Components/LineSidebar/LineSidebar.jsx` + `LineSidebar.css` | LineSidebar | header, which also records the wrong claim it replaces; JSX→TSX: `LineSidebarProps` plus typed `listRef` / `itemRefs` / `targetsRef` / `currentRef` / `rafRef` / `lastRef`, `Record` on `FALLOFF_CURVES`, and `PointerEvent` on the move handler - runtime statements verbatim including the single rAF lerp. **Three colour literals removed from both files**: upstream's `accentColor` / `textColor` / `markerColor` defaults and the matching `:root` declarations are now `var(--accent)` / `var(--ink-3)` / `var(--line-strong)`, so the component is on-theme in both light and dark. Import re-pointed to the lowercase copy name (Vite resolves it; upstream's capitalised name would break a Linux CI checkout). The stylesheet is otherwise upstream verbatim | **yes** - the multi-turn conversation rail in `src/App.tsx`, mounted only past one turn. Owner 2026-09-28: 「当一个会话出现多轮对话，然后想查看之前的对话，需要有reactbits上的Line Sidebar这种动画效果」. Sizing props are lowered from upstream's showcase defaults (markerLength 60→26, maxShift 30→14, fontSize 1.1→0.8rem) because this panel's column is 720px wide, not a full marketing page |
+| `src/components/turn-rail.tsx` | hand-written, NOT a vendor | - | - | **yes**, but only as a plain static list with no cursor-proximity effect, used where proximity is unwanted. Its header previously claimed react-bits had no Line Sidebar and that this file replaced it; **that claim was wrong** and the header now says so. Do not read the two files as substitutes - `line-sidebar.tsx` is the library component, this one is a static list |
 
 Verification that the ledger covers every trace, runnable at any time:
 
@@ -152,6 +154,56 @@ Every utility class StatusPill names (the `green`/`orange`/`red`/`accent`/`neutr
 tones and their dot colours) resolves through `src/styles/theme.css`'s
 library-vocabulary alias block; nothing was missing at mount time and no alias had
 to be added for it.
+
+### Vendored 2026-09-27 - the primitives, brought in by script
+
+`npm run vendor:beautifului -- <checkout-of-beautiful-ui>` -
+`scripts/vendor-beautifului.mjs`. The owner named this library the BASE one
+(react-bits is only for motion it has no piece for; shadcn is the last resort),
+and nine of its twenty-two primitives were sitting in the local clone unused while
+hand-written stand-ins existed for several of them.
+
+Why a script and not nine hand copies: a hand copy is what this ledger exists to
+prevent. The script applies the mechanical pass (header, `use client` removal,
+import re-pointing, default-to-named, LF, D23 glyph ASCII-izing), applies the
+gate-forced token substitutions as literal `subs` so a re-run REPRODUCES them, and
+**fails loudly** if a substitution stops matching - a silent no-op there is how a
+gate fix gets quietly reverted. Two dests are marked `adapted` and skipped without
+`--force` (GlideMenu, FilterTable): both had their markup hand-wrapped so their
+rows take the panel's one hover treatment.
+
+| File here | Component | Mounted? |
+|---|---|---|
+| `glide-menu.tsx` | GlideMenu (hover layer) | **yes** - sidebar (both blocks), command palette, right rail (launcher cards / review rows / scope menu / file tree), task monitor popover, workspace picker, approval queue, task list |
+| `search-list.tsx` | SearchList | no - it owns its query, the sidebar's field is page-controlled |
+| `filter-table.tsx` | FilterTable | no - its columns are not the task screen's columns |
+| `fine-tune-card.tsx` | FineTuneCard | no - it is a scrub-to-change inspector; the settings rows are read-mostly |
+| `chat-composer.tsx` | ChatComposer | no - it is a scripted demo chat; the real one is the session view |
+| `recommendation-card.tsx` | RecommendationCard | no - wants a "pick one and decide" surface we do not have |
+| `agent-screen.tsx` | AgentScreen | no - it wants a live screen capture, which the panel has no source for |
+| `flowchart.tsx` | Flowchart | no - it draws a task graph, and nothing produces one yet |
+| `insight-cards.tsx` | InsightCards | no - the cost/context meters are its place, and those wait on ticket 167 |
+| `records-table.tsx` | RecordsTable | no - the history view is its place, and that is ticket 166 |
+
+**Not vendored, and why** - two primitives import a SECOND icon library, which is
+a decision rather than a transformation:
+
+- `SidebarNav` pulls 13 icons from `@central-icons-react/...`
+- `SelectionActions` pulls from `iconoir-react`, and one of them is an icon
+  literally named `EmojiSatisfied`
+
+This tree draws with lucide (D29 picked it; the zero-emoji rule is satisfied by
+stroke icons). Vendoring either would mean adding a second icon set for a handful
+of glyphs, or mapping each one by hand. Both are in the local clone and can be
+vendored the moment that mapping is agreed.
+
+**Cost, measured rather than assumed**: the nine pieces add **0 bytes to the
+bundle** - nothing imports them yet, verified by grepping the built JS for their
+demo strings (`Restock mango sorbet`, `Forecast summer demand`, `Snow Cone`,
+`Liveline`: all absent). `liveline`, the npm package InsightCards needs, is 310 KB
+on disk and likewise absent from the bundle. A vendored-but-unmounted piece costs
+source, not runtime; the number changes the moment one is mounted, which is why it
+is written down here rather than left to be discovered.
 
 ## Gate notes for this tree (AC#4)
 

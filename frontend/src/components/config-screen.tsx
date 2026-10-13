@@ -43,27 +43,15 @@ import { Chip } from "@/components/ai-native/chip";
 import { ProgressRing } from "@/components/ai-native/progress-ring";
 import { SegmentedControl } from "@/components/ai-native/segmented-control";
 import { cn } from "@/lib/cn";
+import {
+  MOTION_TIERS,
+  applyMotionTier,
+  readMotionTier,
+  type MotionTier,
+} from "@/lib/motion";
 
 /** The knob the frost reads. Kept as one name so nothing else can drift. */
 const ALPHA_VAR = "--panel-alpha";
-
-/** The animation switch, owner 2026-09-26: 「动画该装就装…让用户自己选择是
-    多一点性能开销还是选择更轻量」. "off" is what theme.css's
-    [data-motion="off"] block listens for; removing the attribute is full
-    motion. Memory-only, exactly like the alpha knob. */
-const MOTION_ATTR = "data-motion";
-type MotionTier = "全开" | "关闭";
-
-/** SegmentedControl 的泛型实参：两档就是全部档位（「降低」档等真需求出现再说）。 */
-const MOTION_TIERS: readonly MotionTier[] = ["全开", "关闭"];
-
-function applyMotionTier(tier: MotionTier) {
-  if (tier === "关闭") {
-    document.documentElement.setAttribute(MOTION_ATTR, "off");
-  } else {
-    document.documentElement.removeAttribute(MOTION_ATTR);
-  }
-}
 
 /**
  * The default comes from the generated token table, not from a number typed
@@ -120,9 +108,23 @@ function EffectBadge({ live }: { live: boolean }) {
   );
 }
 
-export function ConfigScreen() {
+export function ConfigScreen({
+  heading = "设置",
+  lede = "外观一节的八行键。能动的只有面板不透明度和界面动画两行，其余各行今天没有数据源，所以它们不显示数字。",
+}: {
+  /** The heading this screen prints for itself. Defaults to 设置 because that
+      is what it says standalone (?harness=2 and the render harnesses). The
+      settings PAGE passes its category name instead - owner 2026-09-28: the
+      page already says 设置 in its own bar, and two 设置 headings stacked on
+      each other is a layout bug, not a title. */
+  heading?: string;
+  /** The sentence under the heading. Same reason: the page has its own lede. */
+  lede?: string;
+}) {
   const [alpha, setAlpha] = useState<number | null>(() => readPanelAlpha());
-  const [motion, setMotion] = useState<MotionTier>("全开");
+  // Read the tier back off the document rather than mirroring it: a tier set
+  // anywhere (a test, a future bridge field) is the tier the control shows.
+  const [motion, setMotion] = useState<MotionTier>(() => readMotionTier());
 
   function moveAlpha(next: number) {
     document.documentElement.style.setProperty(ALPHA_VAR, `${next}%`);
@@ -136,10 +138,8 @@ export function ConfigScreen() {
 
   return (
     <section aria-label="设置" className="flex min-w-0 flex-col gap-1">
-      <h2 className="text-[15px] font-semibold text-ink">设置</h2>
-      <p className="text-[12.5px] text-ink-2">
-        外观一节的八行键。能动的只有面板不透明度和界面动画两行，其余各行今天没有数据源，所以它们不显示数字。
-      </p>
+      <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
+      <p className="text-[12.5px] text-ink-2">{lede}</p>
 
       <div className="mt-1 flex flex-col">
         {APPEARANCE_ROWS.map((row) => {
@@ -210,7 +210,11 @@ export function ConfigScreen() {
       </p>
 
       <div className="mt-2 flex flex-col gap-1 text-[11px] leading-[1.6] text-ink-3">
-        <span>通用 / 语音 / 大模型 / 安全 / 隐私 / 成本 六节还没有对应实现。</span>
+        {/* The six other sections are no longer "not implemented, sorry" - they
+            are real rows on the settings page's own category rail, each saying
+            what feed it is waiting for. Pointing at them beats repeating a
+            paragraph here that the page contradicts. */}
+        <span>其余各类在左边那一列上，各自写着它在等哪个数据源。</span>
         <span>设置项里没有一格能改变权限档位或工作区，那是面板的边界（P9）。</span>
       </div>
     </section>

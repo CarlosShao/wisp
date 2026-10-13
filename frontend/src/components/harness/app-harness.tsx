@@ -22,14 +22,14 @@
    none of it reaches the bridge. The product panel (App) stays stateless.
    ============================================================================ */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Activity, Command, Moon, PanelRight, PanelRightClose, Sun } from "lucide-react";
 import { EntityChip } from "@/components/ai-native/entity-chip";
 import { PaletteScreen } from "@/components/palette-screen";
 import { FirstrunOverlay, RB_FIRSTRUN } from "@/components/harness/firstrun-overlay";
 import { HarnessMain } from "@/components/harness/main";
-import { HarnessSidebar } from "@/components/harness/sidebar";
-import { RightRail } from "@/components/harness/right-rail";
+import { HarnessSidebar, SESSION_SEARCH_ID } from "@/components/harness/sidebar";
+import { RightRail, type RailOpenRequest, type RailTabKey } from "@/components/harness/right-rail";
 import { SettingsModal } from "@/components/harness/settings-modal";
 import { ToastStack, RB_TOASTS } from "@/components/harness/toast";
 import { MonitorPopover, RB_MONITOR } from "@/components/harness/monitor-popover";
@@ -53,7 +53,14 @@ export function AppHarness() {
   // view state: which main column mode, which session, which overlays.
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [railOpen, setRailOpen] = useState(true);
+  // The context rail is COLLAPSED until something asks for it. It used to start
+  // open with three tabs already up, which is a shape nobody ships: a panel
+  // that is busy before you asked says nothing about whether you opened it. You
+  // open it with the header toggle and land on its launcher, or the agent asks
+  // for a tab and it comes up on its own.
+  const [railOpen, setRailOpen] = useState(false);
+  const [railRequest, setRailRequest] = useState<RailOpenRequest | null>(null);
+  const railNonce = useRef(0);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [paletteQuery, setPaletteQuery] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -70,12 +77,26 @@ export function AppHarness() {
   }
 
   // Ctrl+K opens the command palette - the one keyboard verb every harness
-  // shares. Esc closes whichever overlay is up, topmost first.
+  // shares. "/" focuses the sidebar's session search, which is what the kbd
+  // chip beside that field has always claimed. Esc closes whichever overlay is
+  // up, topmost first.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPaletteOpen((v) => !v);
+        return;
+      }
+      if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        // Never take the key from wherever the user is already typing.
+        const el = document.activeElement;
+        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) return;
+        const box = document.getElementById(SESSION_SEARCH_ID);
+        if (box instanceof HTMLInputElement) {
+          e.preventDefault();
+          box.focus();
+          box.select();
+        }
         return;
       }
       if (e.key === "Escape") {
@@ -95,8 +116,47 @@ export function AppHarness() {
     setFirstrunOpen(false);
   }
 
+  // The agent asks for a tab. Opening the rail is implied: a tab the user
+  // cannot see is not an opened tab. The nonce is bumped every time so asking
+  // twice for the same tab still works.
+  function openRailTab(tab: RailTabKey) {
+    railNonce.current += 1;
+    setRailOpen(true);
+    setRailRequest({ tab, nonce: railNonce.current });
+  }
+
+  // Palette rows used to be buttons with no handler: the legend said Enter
+  // runs a command and nothing ran. Three of the fixture's rows name something
+  // this page can actually do, and those are wired. The rest (fs.delete on the
+  // recycle bin, re-reading config.toml, browsing a file) belong to the native
+  // side and stay inert here - the banner already says the values are demo
+  // data, and a row that visibly does nothing is better than one that fakes a
+  // result. Dropping to a comment rather than a stub keeps that honest.
+  function runPaletteCommand(item: { label: string }) {
+    switch (item.label) {
+      case "打开设置":
+        setSettingsOpen(true);
+        break;
+      case "切换明暗主题":
+        toggleTheme();
+        break;
+      case "查看最近任务":
+        setSessionId(SESSIONS[0]?.id ?? null);
+        break;
+      default:
+        // 打开审批中心 has no destination in this page yet: the approval centre
+        // is a product-panel view, and the harness has no equivalent route.
+        return;
+    }
+    setPaletteOpen(false);
+  }
+
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-page text-ink">
+    // h-full, not h-screen: main.tsx makes the document a flex column for this
+    // page (?harness=1) so the demo banner can be a real row, and #root has
+    // already been given the height left over by that row. h-screen here would
+    // ask for a second full viewport and push the composer out of the window.
+    <div className="flex h-full w-full overflow-hidden bg-page text-ink">
       <HarnessSidebar
         activeSessionId={sessionId}
         automations={AUTOMATIONS}
@@ -180,6 +240,7 @@ export function AppHarness() {
             emptyHint={EMPTY_HINT}
             greeting={GREETING}
             onNewTask={newTask}
+            onOpenTab={openRailTab}
             onPickCommand={() => setPaletteOpen(true)}
             onPickTask={() => setSessionId(SESSIONS[0]?.id ?? null)}
             onPickWorkspace={() => setPickerOpen(true)}
@@ -189,25 +250,26 @@ export function AppHarness() {
             view={activeSession ? "session" : "new"}
             workspace={WORKSPACE_NOW}
           />
-          {railOpen && (
-            <RightRail />
-          )}
+          {railOpen && <RightRail openRequest={railRequest ?? undefined} />}
         </div>
       </div>
 
       {/* 浮层族：命令面板 / 工作区选择 / 设置 / 首启 / Toast */}
       {paletteOpen && (
         <div
+          aria-label="命令面板"
+          aria-modal="true"
           className="fixed inset-0 z-40 flex items-start justify-center bg-black/35 pt-[12vh]"
           onClick={(e) => {
             if (e.target === e.currentTarget) setPaletteOpen(false);
           }}
-          role="presentation"
+          role="dialog"
         >
           <div className="w-[560px] overflow-hidden rounded-card border border-line bg-surface shadow-overlay" style={{ animation: "fade-up 200ms var(--ease-out-strong) both" }}>
             <PaletteScreen
               groups={SHOWCASE_PALETTE_GROUPS}
               onQueryChange={setPaletteQuery}
+              onSelect={runPaletteCommand}
               query={paletteQuery}
             />
           </div>

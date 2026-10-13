@@ -63,7 +63,7 @@
   --stop: var(--danger);  /* render-l2 钉死的拼法 */
   --success: var(--green);  /* 冻结行语义名→库的 green */
   --success-soft: var(--green-tint);
-  --panel-alpha: 100%;  /* 设置屏滑杆的旋钮，作用于 .wisp-shell */
+  --panel-alpha: 100%;  /* 设置屏滑杆的旋钮，经 @theme inline 接到 bg-page / bg-surface；100% 为出厂值 */
   --font-sans-stack: Inter, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;  /* 库主题用 Inter（next/font）；我们无网打包，同族回退 */
   --font-mono-stack: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;  /* 库的 --font-mono 回退族 */
 }
@@ -109,7 +109,7 @@
   --stop: var(--danger);  /* render-l2 钉死的拼法 */
   --success: var(--green);  /* 冻结行语义名→库的 green */
   --success-soft: var(--green-tint);
-  --panel-alpha: 100%;  /* 设置屏滑杆的旋钮，作用于 .wisp-shell */
+  --panel-alpha: 100%;  /* 设置屏滑杆的旋钮，经 @theme inline 接到 bg-page / bg-surface；100% 为出厂值 */
   --font-sans-stack: Inter, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;  /* 库主题用 Inter（next/font）；我们无网打包，同族回退 */
   --font-mono-stack: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;  /* 库的 --font-mono 回退族 */
 }

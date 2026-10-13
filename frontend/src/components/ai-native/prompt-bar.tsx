@@ -46,6 +46,23 @@ export interface PromptModel {
   tag?: string;
 }
 
+/** The permission tiers the native side offers. The panel may ASK for one and
+    may never record the answer (D20/R20: switching into the tier that stops
+    asking costs an L2 strong confirmation on the native side). */
+export interface PromptPermission {
+  key: string;
+  name: string;
+  /** True for tiers whose switch needs the native strong confirmation. */
+  gated?: boolean;
+}
+
+/** Reasoning effort. A model that cannot think harder says so by simply not
+    being offered a level - which is why this is a prop and not a constant. */
+export interface PromptEffort {
+  key: string;
+  name: string;
+}
+
 export interface PromptAttachment {
   key: string;
   name: string;
@@ -59,6 +76,15 @@ export interface PromptBarProps {
   models?: readonly PromptModel[];
   model?: string;
   onModelChange?: (key: string) => void;
+  /** Permission tiers, and the switch request. Empty renders no tier control -
+      a panel that cannot ask must not draw a knob that goes nowhere. */
+  permissions?: readonly PromptPermission[];
+  permission?: string;
+  onPermissionChange?: (key: string) => void;
+  /** Reasoning effort for the current model. */
+  efforts?: readonly PromptEffort[];
+  effort?: string;
+  onEffortChange?: (key: string) => void;
   attachments?: readonly PromptAttachment[];
   onRemoveAttachment?: (key: string) => void;
   onAttach?: () => void;
@@ -91,6 +117,12 @@ export function PromptBar({
   models = [],
   model,
   onModelChange,
+  permissions = [],
+  permission,
+  onPermissionChange,
+  efforts = [],
+  effort,
+  onEffortChange,
   attachments = [],
   onRemoveAttachment,
   onAttach,
@@ -106,6 +138,8 @@ export function PromptBar({
   const [menu, setMenu] = useState<MenuKind | null>(null);
   const [active, setActive] = useState(0);
   const [modelOpen, setModelOpen] = useState(false);
+  const [effortOpen, setEffortOpen] = useState(false);
+  const [permissionOpen, setPermissionOpen] = useState(false);
   const [listening, setListening] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -125,6 +159,8 @@ export function PromptBar({
   ).map((r) => ({ key: r.key, name: r.name, desc: "desc" in r ? (r as { desc?: string }).desc ?? "" : "" }));
 
   const activeModel = models.find((m) => m.key === model) ?? models[0];
+  const activePermission = permissions.find((p) => p.key === permission);
+  const activeEffort = efforts.find((e) => e.key === effort) ?? efforts[0];
 
   /* Move wrapped text above the controls, then grow to a compact maximum -
      upstream's measure logic, trimmed to the height part. */
@@ -154,6 +190,8 @@ export function PromptBar({
   const closeMenus = () => {
     setMenu(null);
     setModelOpen(false);
+    setEffortOpen(false);
+    setPermissionOpen(false);
   };
 
   const pick = (row: { key: string; name: string }) => {
@@ -233,6 +271,71 @@ export function PromptBar({
               <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink">{m.name}</span>
               <span className="shrink-0 text-[11px] text-ink-3">{m.tag}</span>
               <span className={cn("shrink-0 text-ink", m.key === activeModel?.key ? "" : "invisible")}>
+                <Check aria-hidden="true" size={13} strokeWidth={2.5} />
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── effort menu：思考强度挂在模型右侧，跟模型一起选 ────────────── */}
+      {effortOpen && efforts.length > 0 && (
+        <div
+          className="absolute right-0 bottom-full z-10 mb-2 w-40 rounded-card bg-surface p-1 shadow-raised"
+          style={{ animation: "pop-in 180ms var(--ease-out-strong) both", transformOrigin: "bottom right" }}
+        >
+          <p className="px-1.5 pb-0.5 pt-1 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
+            思考强度
+          </p>
+          {efforts.map((e) => (
+            <button
+              key={e.key}
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                onEffortChange?.(e.key);
+                setEffortOpen(false);
+                inputRef.current?.focus();
+              }}
+              className="flex h-7.5 w-full items-center gap-2 rounded-chip px-2 text-left hover:bg-hover"
+            >
+              <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink">{e.name}</span>
+              <span className={cn("shrink-0 text-ink", e.key === activeEffort?.key ? "" : "invisible")}>
+                <Check aria-hidden="true" size={13} strokeWidth={2.5} />
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── permission menu：权限档。切换是「请求」，不是「决定」 ─────────── */}
+      {permissionOpen && permissions.length > 0 && (
+        <div
+          className="absolute left-0 bottom-full z-10 mb-2 w-56 rounded-card bg-surface p-1 shadow-raised"
+          style={{ animation: "pop-in 180ms var(--ease-out-strong) both", transformOrigin: "bottom left" }}
+        >
+          <p className="px-1.5 pb-0.5 pt-1 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
+            权限档
+          </p>
+          {permissions.map((p) => (
+            <button
+              key={p.key}
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                onPermissionChange?.(p.key);
+                setPermissionOpen(false);
+                inputRef.current?.focus();
+              }}
+              className="flex w-full items-center gap-2 rounded-chip px-2 py-1.5 text-left hover:bg-hover"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[12.5px] font-medium text-ink">{p.name}</span>
+                {p.gated ? (
+                  <span className="mt-0.5 block text-[10.5px] text-warn">切过去要原生侧强确认</span>
+                ) : null}
+              </span>
+              <span className={cn("shrink-0 text-ink", p.key === activePermission?.key ? "" : "invisible")}>
                 <Check aria-hidden="true" size={13} strokeWidth={2.5} />
               </span>
             </button>
@@ -362,6 +465,8 @@ export function PromptBar({
               aria-label="选择模型"
               onClick={() => {
                 setMenu(null);
+                setEffortOpen(false);
+                setPermissionOpen(false);
                 setModelOpen((current) => !current);
               }}
               className={cn(
@@ -373,6 +478,32 @@ export function PromptBar({
               {activeModel?.name}
               <span className="text-ink-3">
                 <ChevronDown aria-hidden="true" size={11} strokeWidth={2.4} />
+              </span>
+            </button>
+          )}
+
+          {/* 思考强度：只在真的有档位时出现。没有档位的模型画一个「思考强度」按钮，
+              点了没反应，比不画更糟。 */}
+          {efforts.length > 0 && (
+            <button
+              type="button"
+              aria-expanded={effortOpen}
+              aria-label="思考强度"
+              onClick={() => {
+                setMenu(null);
+                setModelOpen(false);
+                setPermissionOpen(false);
+                setEffortOpen((current) => !current);
+              }}
+              className={cn(
+                "flex h-7 shrink-0 items-center gap-1 px-1.5 text-[12px] font-medium transition-colors duration-150",
+                effortOpen ? "bg-hover text-ink" : "text-ink-2 hover:bg-hover hover:text-ink",
+                pill ? "rounded-full" : "rounded-[8px]",
+              )}
+            >
+              {activeEffort?.name}
+              <span className="text-ink-3">
+                <ChevronDown aria-hidden="true" size={10} strokeWidth={2.4} />
               </span>
             </button>
           )}
@@ -439,6 +570,40 @@ export function PromptBar({
           </button>
         </div>
       </div>
+
+      {/* 权限档行：贴在输入框下面，和 harness 的 pill 行同一个位置。切换是
+          「请求」——点了只是把意愿递给原生侧，结果要等下一份快照，所以这里
+          不做任何乐观更新（那会让面板显示一个自己编的档位）。 */}
+      {permissions.length > 0 ? (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 px-0.5">
+          {permissions.map((p) => {
+            const on = p.key === activePermission?.key;
+            return (
+              <button
+                key={p.key}
+                type="button"
+                aria-pressed={on}
+                title={p.gated ? "切到这一档要原生侧强确认" : p.name}
+                onClick={() => {
+                  setPermissionOpen(false);
+                  onPermissionChange?.(p.key);
+                }}
+                className={cn(
+                  "inline-flex h-6 items-center gap-1 rounded-full px-2.5 text-[11px] font-medium transition-colors duration-100",
+                  on
+                    ? p.gated
+                      ? "bg-warn-soft text-warn"
+                      : "bg-accent-tint text-accent-ink"
+                    : "bg-inset text-ink-2 hover:bg-hover",
+                )}
+              >
+                {p.name}
+                {on && p.gated ? <span className="text-[10px]">需强确认</span> : null}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

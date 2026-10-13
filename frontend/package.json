@@ -13,7 +13,8 @@
     "tokens:check": "node scripts/gen-tokens.mjs --check",
     "render:l2": "vite build --ssr scripts/render-l2.tsx --outDir node_modules/.tmp/l2render --logLevel warn && node node_modules/.tmp/l2render/render-l2.js",
     "render:composer": "vite build --ssr scripts/render-composer.tsx --outDir node_modules/.tmp/composerrender --logLevel warn && node node_modules/.tmp/composerrender/render-composer.js",
-    "vendor:beautifului": "node scripts/vendor.mjs",
+    "vendor:ainative": "node scripts/vendor.mjs",
+    "vendor:beautifului": "node scripts/vendor-beautifului.mjs",
     "vendor:shadcn": "node scripts/vendor-shadcn.mjs",
     "render:stream": "vite build --ssr scripts/render-stream.tsx --outDir node_modules/.tmp/streamrender --logLevel warn && node node_modules/.tmp/streamrender/render-stream.js",
     "render:nav": "vite build --ssr scripts/render-nav.tsx --outDir node_modules/.tmp/navrender --logLevel warn && node node_modules/.tmp/navrender/render-nav.js"
@@ -21,6 +22,7 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "liveline": "^0.0.7",
     "lucide-react": "^1.47.0",
     "motion": "^13.4.4",
     "radix-ui": "^1.6.7",

@@ -14,6 +14,7 @@
    命令 row is fed:false for exactly that reason).
    ============================================================================ */
 
+import { useEffect, useState, type KeyboardEvent } from "react";
 import {
   FilePen,
   FolderInput,
@@ -24,6 +25,8 @@ import {
   Trash,
   type LucideIcon,
 } from "lucide-react";
+import { GlideMenu } from "@/components/ai-native/glide-menu";
+import { cn } from "@/lib/cn";
 
 export interface PaletteItem {
   label: string;
@@ -61,10 +64,15 @@ export function PaletteScreen({
   query,
   onQueryChange,
   groups,
+  onSelect,
 }: {
   query: string;
   onQueryChange: (next: string) => void;
   groups: readonly PaletteGroup[];
+  /** Fired when a row is chosen, by click or by Enter. Omit it and the palette
+      is a read-only browser: the keyboard model still works and the highlighted
+      row still moves, but nothing is dispatched. */
+  onSelect?: (item: PaletteItem) => void;
 }) {
   const q = query.trim().toLowerCase();
   const shown = groups
@@ -76,6 +84,40 @@ export function PaletteScreen({
     }))
     .filter((group) => group.items.length > 0);
   const empty = q.length > 0 && shown.length === 0;
+
+  // One flat list behind the grouped render, so the keyboard can walk it
+  // without re-deriving a position per group. The footer used to promise
+  // "up down to move, Enter to run" while this component had no key handler at
+  // all - a key legend is a promise, and an unkept one teaches people to stop
+  // reading the legends.
+  const flat = shown.flatMap((group) => group.items);
+  const [active, setActive] = useState(0);
+  const cursor = flat.length === 0 ? 0 : Math.min(active, flat.length - 1);
+
+  // A new query can leave fewer rows behind; drop the cursor back in range.
+  useEffect(() => {
+    setActive((current) => (flat.length === 0 ? 0 : Math.min(current, flat.length - 1)));
+  }, [flat.length]);
+
+  function onKey(e: KeyboardEvent<HTMLInputElement>) {
+    if (flat.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive((current) => (current + 1) % flat.length);
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((current) => (current - 1 + flat.length) % flat.length);
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onSelect?.(flat[cursor]);
+    }
+  }
+
+  let seen = 0;
 
   return (
     <div className="flex w-full flex-col items-stretch">
@@ -97,8 +139,10 @@ export function PaletteScreen({
           </svg>
           <input
             aria-label="搜索命令"
+            aria-activedescendant={flat.length > 0 ? `palette-row-${cursor}` : undefined}
             className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-3"
             onChange={(event) => onQueryChange(event.target.value)}
+            onKeyDown={onKey}
             placeholder="输入命令或问题…"
             value={query}
           />
@@ -148,31 +192,57 @@ export function PaletteScreen({
             <span className="text-[12px] text-ink-3">换个说法再试一次</span>
           </div>
         ) : (
-          <div className="p-1.5">
+          /* Two channels, the same split the sidebar uses after the GlideMenu
+             swap: the MOUSE highlight is the library's glide layer (it follows
+             the pointer and leaves when the pointer leaves), and the KEYBOARD
+             cursor is a fixed accent bar that does not get dragged away when
+             you move the mouse. Painting both as a background wash meant the
+             two fought over one visual slot - hover the list and you lost track
+             of where Enter would land. */
+          <GlideMenu className="p-1.5" highlightClassName="inset-x-1.5 rounded-[6px] bg-hover" rowSelector="[data-menu-row]">
             {shown.map((group) => (
               <div className="flex flex-col" key={group.name}>
                 <p className="px-2 pb-1 pt-2 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
                   {group.name}
                 </p>
-                {group.items.map((item) => (
-                  <button
-                    className="flex h-9 w-full items-center gap-2.5 rounded-[6px] px-2 text-left transition-colors duration-100 hover:bg-hover"
-                    key={item.label}
-                    style={{ animation: "fade-in 200ms ease-out both" }}
-                    type="button"
-                  >
-                    <ItemIcon icon={item.icon} />
-                    <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
-                      {item.label}
-                    </span>
-                    {item.hint && (
-                      <span className="shrink-0 text-[11px] text-ink-3">{item.hint}</span>
-                    )}
-                  </button>
-                ))}
+                {group.items.map((item) => {
+                  const index = seen++;
+                  const on = index === cursor;
+                  return (
+                    <button
+                      aria-selected={on}
+                      className={cn(
+                        "relative flex h-9 w-full items-center gap-2.5 rounded-[6px] py-0 pr-2 pl-2.5 text-left transition-colors duration-100",
+                        on ? "text-ink" : "text-ink-2 hover:text-ink",
+                      )}
+                      data-menu-row
+                      id={`palette-row-${index}`}
+                      key={item.label}
+                      onClick={() => onSelect?.(item)}
+                      onMouseEnter={() => setActive(index)}
+                      role="option"
+                      style={{ animation: "fade-in 200ms ease-out both" }}
+                      type="button"
+                    >
+                      {on ? (
+                        <span
+                          aria-hidden="true"
+                          className="absolute bottom-1.5 left-0.5 top-1.5 w-[2px] rounded-full bg-accent"
+                        />
+                      ) : null}
+                      <ItemIcon icon={item.icon} />
+                      <span className="min-w-0 flex-1 truncate text-[13px]">
+                        {item.label}
+                      </span>
+                      {item.hint && (
+                        <span className="shrink-0 text-[11px] text-ink-3">{item.hint}</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             ))}
-          </div>
+          </GlideMenu>
         )}
 
         {/* the palette's keyboard vocabulary, as kbd hints */}

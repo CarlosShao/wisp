@@ -19,10 +19,24 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ---------- Tailwind namespaces: the library's own mapping ----------------- */
+
+/* The one translucency knob (设置屏「面板背景不透明度」, ticket 128-era row).
+   It used to live on `.wisp-shell`, a class NOBODY ever mounted, so dragging
+   the slider changed one custom property and nothing on screen - the knob was
+   live in the DOM and dead to the eye. The window's own background is read
+   through the two utilities every surface actually uses (bg-page / bg-surface),
+   so one property now reaches all of them.
+
+   100% is an identity: color-mix(in srgb, C 100%, transparent) === C, so the
+   shipped look is byte-identical until the user drags the slider. Below 100%
+   the window goes translucent - but whether anything is VISIBLE through it is
+   the host's call, not this page's: WebView2 only composites a transparent
+   desktop when the Go side hands it one (ticket 33 / C27). Do not add a
+   backdrop-filter here hoping to fake it: there is nothing to blur yet. */
 @theme inline {
-  --color-page: var(--page);
+  --color-page: color-mix(in srgb, var(--page) var(--panel-alpha), transparent);
+  --color-surface: color-mix(in srgb, var(--surface) var(--panel-alpha), transparent);
   --color-canvas: var(--canvas);
-  --color-surface: var(--surface);
   --color-inset: var(--inset);
   --color-hover: var(--hover);
   --color-hover-2: var(--hover-2);
@@ -86,21 +100,36 @@
   --stop: var(--danger);
 }
 
-/* ---------- the panel shell ------------------------------------------------
-   Minimal and solid: page behind, surface window, hairline edges. The one
-   transparency knob is --panel-alpha (settings screen), applied to the window
-   surface itself; 100% is the shipped default. */
-.wisp-shell {
-  background: color-mix(in srgb, var(--surface) var(--panel-alpha), transparent);
-  color: var(--ink);
-  font-family: var(--font-sans-stack);
+/* ---------- the host document ----------------------------------------------
+   Normally <body> is a plain block and every app root carries h-screen, so the
+   product path is exactly as it was. The attribute is set by main.tsx for the
+   app-shaped harness ONLY (?harness=1), and it turns the document into a flex
+   column so the demo banner can be a real row instead of a position:fixed lid
+   over the top bar. Nothing here runs on the product path. */
+html[data-harness-banner="row"],
+html[data-harness-banner="row"] body {
+  height: 100%;
 }
-.wisp-window {
-  border-radius: var(--radius-card);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-overlay);
+html[data-harness-banner="row"] body {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
+html[data-harness-banner="row"] #root {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---------- the panel shell ------------------------------------------------
+   RETIRED 2026-09-27: `.wisp-shell` / `.wisp-window` are gone, and that is the
+   fix, not a cleanup. Both were dead - no component ever put either class on
+   anything - and the settings screen's one live control was wired to a property
+   only `.wisp-shell` read, so the transparency slider moved a number that
+   nothing consumed. The knob now rides the two utilities the window actually
+   paints with (see the @theme inline block above), so there is exactly one
+   mechanism and it cannot be unmounted again.
+
+   Minimal and solid: page behind, surface window, hairline edges. */
 
 /* ---------- keyframes the adapted library components reference by name -----
    Verbatim names from beautiful-ui globals.css (MIT) - adapted components
@@ -234,15 +263,68 @@
   }
 }
 
-/* --- the animation switch (owner 2026-09-26: 动画该装就装，但要有一个
-   关闭/降低动画的设置项，让用户自己在性能开销和轻量之间选) -------------------
-   Two tiers today: full (default) and off. html[data-motion="off"] is the same
-   0.01ms floor as prefers-reduced-motion - one selector, every keyframe in the
-   tree goes still, including the two PLAN-frozen loops (the caret breath and
-   the L2 ball ring): a user preference to stop motion outranks a visual spec
-   the same way prefers-reduced-motion does. The panel is stateless
-   (PLAN.md:1044), so the switch lives in memory only; ticket 145's snapshot
-   field is what makes it survive a WebView restart. */
+/* ============================================================================
+   Motion tiers (owner 2026-09-27: 动画该装就装，但要有档位，不能只有「用不用」)
+   ----------------------------------------------------------------------------
+   The vocabulary lives in src/lib/motion.ts; this is where it bites.
+
+     full  (no attribute, or data-motion="full")  everything runs. The default:
+            a panel that never moves is a screenshot, not a product.
+     lite  (data-motion="lite")  only the CPU hogs stop.
+     off   (data-motion="off")   everything stops.
+
+   WHY LITE IS "JUMP TO THE LAST FRAME" AND NOT "animation: none"
+   ------------------------------------------------------------------
+   The expensive half of this tree's motion is loops (`infinite` never lets the
+   compositor idle) and filter animations (a blur repaints every frame). Those
+   live inside vendored beautiful-ui files as inline `animation:` styles, and
+   vendored files are not hand-edited - the next re-vendor reverts them, and a
+   tier that only works until the next vendor run is not a tier.
+
+   So lite does not reach inside them. It compresses time instead: the
+   animation is 1ms long, undelayed, played once, and holds its last frame.
+   What you see is the FINISHED state of every entrance (fade-up lands fully
+   visible, stream-in lands with no blur, the spin lands a full turn) and a
+   still frame for every loop. That is strictly better than freezing: with
+   `animation: none` a loop stops wherever the clock happened to catch it, and
+   three of ours would stop in a state you cannot read - the L2 ball ring lands
+   at opacity 0.2, the pixel loaders at 0.15, the mic bars squashed to 0.35.
+   Those three are corrected immediately below.
+
+   Cost of the approach: one extra composite frame per animation, once, and
+   then nothing. Hover transitions are untouched - they only cost when they
+   fire.
+   ============================================================================ */
+
+/* tier: lite - compress time; everything lands on its final frame */
+[data-motion="lite"] *,
+[data-motion="lite"] *::before,
+[data-motion="lite"] *::after {
+  animation-duration: 1ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: forwards !important;
+}
+
+/* The three whose last frame is unreadable get a readable one instead.
+   The selector is the animation NAME inside the inline style - that is the
+   only handle these vendored elements offer, and it is greppable, so a new
+   vendored loop with the same problem is one grep away from being caught. */
+[data-motion="lite"] .l2-ball-ring {
+  opacity: 1 !important;
+  transform: none !important;
+}
+[data-motion="lite"] [style*="pixel-on"] {
+  opacity: 1 !important;
+}
+[data-motion="lite"] [style*="eq-bounce"] {
+  transform: scaleY(1) !important;
+}
+
+/* tier: off - the floor. One selector, every keyframe in the tree goes still,
+   including the two PLAN-frozen loops (the caret breath and the L2 ball ring):
+   a user preference to stop motion outranks a visual spec the same way
+   prefers-reduced-motion does. */
 [data-motion="off"] *,
 [data-motion="off"] *::before,
 [data-motion="off"] *::after {
@@ -250,13 +332,12 @@
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
-[data-motion="off"] .nav-glide {
-  transition: none;
+[data-motion="off"] .nav-glide,
+[data-motion="off"] .m-glide {
+  transition: none !important;
 }
 [data-motion="off"] .screen-enter {
   animation: none;
 }
-[data-motion="off"] .l2-ball-ring,
-[data-motion="off"] .stream-caret.is-streaming {
-  animation: none;
-}
+
+

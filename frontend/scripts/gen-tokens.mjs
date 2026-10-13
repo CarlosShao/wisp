@@ -86,9 +86,11 @@ const TOKENS = [
   { name: "--stop", light: "var(--danger)", dark: "var(--danger)", note: "render-l2 钉死的拼法" },
   { name: "--success", light: "var(--green)", dark: "var(--green)", note: "冻结行语义名→库的 green" },
   { name: "--success-soft", light: "var(--green-tint)", dark: "var(--green-tint)" },
-  // 设置屏唯一的活控制（owner 2026-09-25：「设置里要能调透明度」）。极简纯面
-  // 设计下它调的是窗口本体的不透明度，默认全实。
-  { name: "--panel-alpha", light: "100%", dark: "100%", note: "设置屏滑杆的旋钮，作用于 .wisp-shell" },
+  // 设置屏唯一的活控制（owner 2026-09-25：「设置里要能调透明度」）。它经由
+  // theme.css 的 @theme inline 接到 bg-page / bg-surface 两个真正被画的工具类上。
+  // 注意 2026-09-27：这一行原先的 note 写着「作用于 .wisp-shell」，而那个 class
+  // 全仓无人挂载 ⇒ 旋钮是活的、屏上是死的。改机制不动默认值，100% 仍是出厂观感。
+  { name: "--panel-alpha", light: "100%", dark: "100%", note: "设置屏滑杆的旋钮，经 @theme inline 接到 bg-page / bg-surface；100% 为出厂值" },
   // 字体栈：库用 Inter；中文落到 PingFang/雅黑，Windows 首选 Segoe UI。
   { name: "--font-sans-stack", light: "Inter, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif", dark: "Inter, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif", note: "库主题用 Inter（next/font）；我们无网打包，同族回退" },
   { name: "--font-mono-stack", light: "ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace", dark: "ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace", note: "库的 --font-mono 回退族" },
