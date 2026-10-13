@@ -1,0 +1,34 @@
+票 172 落地腿 `172-r1` —— 给"冻结文本档位 ⇄ 机器实际档位"造一致性尺（2026-10-13 23:3x 编排者现写）
+
+## 0. 你是谁、先读什么
+- 落地腿（写码＋自跑门禁＋commit），腿名 `172-r1`。
+- 票面＝`.scratch/wisp/issues/172-no-ruler-links-the-frozen-tier-in-plan-md-to-the-tier-the-gate-actually-gives-a-zero-tests-go-red.md`（42 行，通读：人话/后果/推荐/AC#1–#5/"本票不解决"/前置）。
+- 来源件：`docs/evidence/s1/162-risk-tier-accept-v3.md` §14 第 (b) 条＋其 §4 第②条/§5 筛法（可只读相关节）；台账 `A339`。先例教训：票 171 AC#2「只钉一枚＝私货尺」族；`236` 的仪器事实「**读盘型尺（os.ReadFile）对 `-overlay` 结构性不可见**——测它的牙必须 overlay 替换读路径并配正控」。
+- 起手落 `.scratch/wisp/probes/172/r1/logs/00-head.txt`（`git log -1` 逐字＋date）。
+
+## 1. 你的活（票面 AC#1–#5 为判据；只补口径）
+- **先设计"可指副本"**（关键）：尺必须能从**指定路径**读冻结文本（PLAN.md 或副本）＋从机器侧取每枚工具的实际档位 ⇒ 红形演示才可能在**不动真 `PLAN.md`** 的前提下做（票面 AC#4 禁改真件；AC#1 要求在副本上做）。
+- **AC#1**：先钉"未修"读数（162-v3 已坐实：改文档那行 ⇒ **全仓零枚红**——你按 §5 筛法自己复跑一发取证），再让新尺**必须红**（改副本里某工具档位 ⇒ 红）。
+- **AC#2**：摘掉代码侧那味档位声明（票面给落点 `internal/tools/fs_edit.go:390` 一带，**行号你自己现量**；变异走 `-overlay` 或仓外备份＋sha256 还原证）⇒ **同一把尺必须红**，且红句要指名"文档写 L2、机器给 L1"是哪一枚工具。⛔ 不许做成"只比字符串相等"的空心检。
+- **AC#3（分母＝本票主要价值）**：**整张带档位工具行**进分母（枚数＋名册现量，⛔ 别信票面数字）；逐枚给"对得上／对不上"读数；今天就对不上的**如实登记**，⛔ 不许为让尺变绿去放宽解析或跳过某枚。
+- **AC#4（契约轴）**：只读 `docs/PLAN.md`／`docs/specs/**`（一字不许改）；⛔ 动 `tools/d22scan/**`／`allowlist.txt`；无新豁免。
+- **AC#5**：**默认不接 CI**（先出读数）；若接只许**新增步骤**；动触发表/并发组/既有步骤＝**停手上报**（票 134 地界）。
+- ⛔ 不裁"哪一档才是对的"（档位属冻结契约，改它要 owner 批准）；⛔ 不动 `fs.edit` 行为；⛔ 不碰审计行字段（归票 173，已收口）。
+
+## 2. 写面（逐枚点名；其余一律越界）
+- **新尺件＋它的用例**（你自命名，带 `172`；建议同包 `internal/tools/fs_tier_consistency_172_test.go` 或等价——一处新件优先；如确需拆两件：尺件＋用例件，都带 `172`）。
+- `.scratch/wisp/probes/172/r1/**`（**全路径**）+ 票 172 尾 **1 条** bullet。
+- ⛔ 其余越界：既有 `_test.go`/产码（除 AC#2 的瞬态 overlay 变异）、`subagent_197.go`、`spawn_*_229_test.go`、`bridge.go`（票 173 刚落）、`docs/PLAN.md`、`docs/specs/**`、`tools/d22scan/**`、`allowlist.txt`、`thresholds.go`、golden、三枚冻结件、`frontend/**`、`design/**`、`go.mod`。
+- 前置自证：起手 `git status --porcelain -- internal/tools` 现读；台件落盘 `gofumpt` 干净（**本仓"自家台件撞全仓门"返工过三次**）；⛔ 在 `probes/154/**`/`probes/161/r6/**` 被别程改时跑那两把尺。
+
+## 3. 本波并行与互斥
+- 并行腿：`186-r1`（写 `cmd/wisp`＋`internal/panel`）＋你；`internal/tools` 面**唯一写腿**。
+- 跑前 `tasklist` 自证无别的 go test 二进制（含 `.test.exe`）；有就等 60s×≤12、等待具名落 logs；`GOTMPDIR` 只许 C: 卷。
+
+## 4. 门禁（每件自落 `rc=N`）
+- `GOFLAGS= go build ./...` rc=0；gofumpt 你动过处空；`go test -count=1 ./internal/tools/...` 改前⇄改后各 ≥1 发（重包错峰）；`sh scripts/d22scan.sh` rc=0；长度门先跑。
+- 已知红（⛔ 别算你的账）：`internal/risk TestResolvePerCallBudget` 争用假红（安静 `-count=3`）。
+- 变异一律 `-overlay` 或仓外备份＋sha256 还原证；⛔ 裸改跟踪文件不还原。
+
+## 5. git 与预算
+- 只 commit ⛔ push；`git add`/`commit` 两处显式 pathspec；⛔ `add -A`/目录/amend/reset/rebase/stash/clean；件名短⛔ `§`；输出预算 ≤6 件、每件 ≤200 行；交件自报**哪格没做完**。
