@@ -34,13 +34,16 @@ package main
 // `(*w32.MinMaxInfo)(unsafe.Pointer(lParam))` (webview.go:244-251), and
 // `go vet -tags winlive ./cmd/wisp/` - the CI step that type-checks this package
 // on Windows (.github/workflows/ci.yml:672) - flags exactly that uintptr-to-
-// Pointer conversion as "possible misuse of unsafe.Pointer" (measured, reading
-// in .scratch/wisp/probes/299/r1/logs/vet-unsafepointer.txt). The case below
-// therefore returns 0 with no write, which is byte-for-byte what the library did
-// in THIS product: its two fields are only ever set by SetSize with HintMin /
-// HintMax, and the only SetSize caller in this tree (requestGeometryOnReshow)
-// passes webview2.HintNone. SetSize still records the pair (its body is the
-// library's), but nothing reads the two fields now.
+// Pointer conversion as "possible misuse of unsafe.Pointer" WHEN THE PORT
+// CARRIES THE WRITE. Measured by the 299-r1b reverse control: a mutant carrying
+// the write above is flagged at the arm
+// (.scratch/wisp/probes/299/r1b/logs/vet-unsafepointer.txt, rc=1), while this
+// tree's port reads rc=0 (vet-clean.txt beside it). The case below therefore
+// returns 0 with no write, which is byte-for-byte what the library did in THIS
+// product: its two fields are only ever set by SetSize with HintMin / HintMax,
+// and the only SetSize caller in this tree (requestGeometryOnReshow) passes
+// webview2.HintNone. SetSize still records the pair (its body is the library's),
+// but nothing reads the two fields now.
 //
 // WHY A SYNTHETIC ORIGIN. The page's entry references its bundle relatively
 // (frontend/vite.config.ts:23 `base: "./"`, so `./assets/index-*.js` and
@@ -94,8 +97,8 @@ var (
 )
 
 // Constants of the ported shapes. The numeric values are the ones the library's
-// own w32 package carries (internal/w32/w32.go:55-120); the pair spelled here so
-// this file reads without that module open.
+// own internal w32 package carries (that module's w32/w32.go:55-120); the pair
+// spelled here so this file reads without that module open.
 const (
 	// ctlWindowClassName is this host's class. Deliberately NOT the library's
 	// "webview": a later reader can tell which create made a window.
@@ -601,10 +604,10 @@ func (c *panelControl) Destroy() {
 // Returning the handle as a pointer is a uintptr-to-unsafe.Pointer conversion,
 // and `go vet -tags winlive ./cmd/wisp/` - the CI step that type-checks this
 // package on Windows - flags exactly that shape (measured:
-// probes/299/r1/logs/vet-unsafepointer.txt); the library only gets away with it
-// because a dependency's body is never vetted. The host never goes through this
-// door: it brings the window up, sizes it and tears it down through
-// panelControl.hwnd, and before ticket 299-r1 the only caller of
+// .scratch/wisp/probes/299/r1b/logs/vet-unsafepointer.txt); the library only
+// gets away with it because a dependency's body is never vetted. The host
+// never goes through this door: it brings the window up, sizes it and tears it
+// down through panelControl.hwnd, and before ticket 299-r1 the only caller of
 // (*webview2.WebView).Window() in this tree was that same bringUp line this
 // ticket replaced. A caller that still reaches the method gets nil - "0, no
 // window" - a named, safe answer rather than a punned pointer.

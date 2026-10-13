@@ -31,7 +31,8 @@ package main
 // with the AddWebResourceRequestedFilter call dropped - the repo untouched), this
 // same case must fail with the page reporting it never got its js/css, or with
 // no report arriving at all because the navigation cannot be answered. The
-// transcript is in .scratch/wisp/probes/299/r1/30-teeth.md; "no red" is not
+// transcript is in .scratch/wisp/probes/299/r1b/20-ac2-reverse.md (raw run:
+// .scratch/wisp/probes/299/r1b/logs/run-m2-ac2-filter-drop.txt); "no red" is not
 // treated as "controlled for".
 //
 // A BUNDLE IS THE SUBJECT. In a checkout whose embed carries only the tracked
