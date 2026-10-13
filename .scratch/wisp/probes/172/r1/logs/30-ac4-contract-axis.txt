@@ -1,0 +1,26 @@
+=== AC#4 契约轴：一字未改 + 变异未落盘 ===
+Tue Oct 13 23:33:28 CST 2026
+
+--- 1. fs_edit.go 变异前后 sha256（overlay 只喂编译器，盘上文件不许变）---
+7efedfffa504337b0f5fae07e31a7707f8111eefc57aac4ed34862bcfdbb2779 *internal/tools/fs_edit.go
+7efedfffa504337b0f5fae07e31a7707f8111eefc57aac4ed34862bcfdbb2779 *internal/tools/fs_edit.go
+
+--- 2. 契约轴文件的工作树改动（应为空）---
+$ git status --porcelain -- docs/PLAN.md docs/specs tools/d22scan
+(空=零改动)
+
+--- 3. 本票写面现状（只应有本票三枚新件 + probes）---
+$ git status --porcelain -- internal/tools .scratch/wisp/probes/172
+?? .scratch/wisp/probes/172/
+?? internal/tools/tier_consistency_172_cases_test.go
+?? internal/tools/tier_consistency_172_machine_test.go
+?? internal/tools/tier_consistency_172_ruler_test.go
+
+--- 4. 新增豁免/allowlist（应为 7 行、无 fs.edit）---
+7 tools/d22scan/allowlist.txt
+0
+grep fs.edit = 0 命中
+
+--- 5. 判据文本两处现量在位（fs.edit 行）---
+2537:| **`fs.edit`** | **字面定位替换已存在文件里的一小段** | **L2** | `fs.write` | S3 | 票 162（2026-09-27 owner 批准新增）。定位＝**字面子串**且必须**唯一命中**；匹不上／多处命中＝硬错且**绝不落盘**；写走 temp＋原子 rename（与 `:1176` 同规）；**R8 覆盖已存在 → L2**，与上面 `fs.write` 覆盖行**同级** |
+43:| **`fs.edit`** | 字面定位替换已存在文件里的一小段 | **L2** | fs.write | S3 | 票 162 新增，镜像 `PLAN.md` D34；字面子串唯一命中才落盘，temp＋原子 rename |

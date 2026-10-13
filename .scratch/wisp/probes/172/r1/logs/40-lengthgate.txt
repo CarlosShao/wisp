@@ -1,0 +1,17 @@
+=== 长度门（先跑）===
+Tue Oct 13 23:33:43 CST 2026
+cmd: sh scripts/check-path-length-budget.sh
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 12429 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=12429  over-budget=57  covered by roster=56  not in roster=1
+check-path-length-budget.sh: longest=184 chars relative (.scratch/wisp/issues/261-the-model-enabled-key-promises-removal-from-discovery-and-selection-but-no-production-code-reads-it-while-the-default-true-tag-is-inert-for-map-entries-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=228 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=57  of which in the 122..180 middle=56  past the old debt line(180)=1  in the wall interval=0  roster entries=57
+check-path-length-budget.sh: RED - over budget and NOT in the roster: .scratch/wisp/issues/173-the-audit-line-prints-in-allowlist-scope-true-when-nothing-was-judged-blank-path-both-meanings-one-field-done.md  (relative 137 chars, name 116 chars, full path on the self-hosted runner 181 chars, budget 165)
+check-path-length-budget.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/173-the-audit-line-prints-in-allowlist-scope-true-when-nothing-was-judged-blank-path-both-meanings-one-field.md
+check-path-length-budget.sh: VERDICT RED
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 57 paths on this tree, recomputed just now in both units
+rc=1

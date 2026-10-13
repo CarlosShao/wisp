@@ -1,0 +1,11 @@
+=== gates part 1 ===
+Tue Oct 13 23:34:16 CST 2026
+
+--- GOFLAGS= go build ./... ---
+rc=0
+
+--- gofumpt -l <本票三枚新件>（列出=不干净）---
+rc=0
+
+--- gofumpt -l <internal/tools 全部 .go>（本仓'自家台件撞全仓门'）---
+rc=0

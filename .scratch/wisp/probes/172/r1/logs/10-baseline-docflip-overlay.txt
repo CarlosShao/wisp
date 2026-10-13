@@ -1,0 +1,9 @@
+=== cmd ===
+GOFLAGS= go test -count=1 -overlay=C:/Users/swq/AppData/Local/Temp/172-r1/mut/overlay-docflip.json ./internal/tools/...
+=== pre-change HEAD ===
+044b9066 2026-10-13 23:11:10 +0800 编排者：186-v1/313-r2 派单存档（先存档后发；186-r1 死而功成收件过）
+=== date ===
+Tue Oct 13 23:12:53 CST 2026
+=== run ===
+ok  	github.com/CarlosShao/wisp/internal/tools	13.635s
+rc=0

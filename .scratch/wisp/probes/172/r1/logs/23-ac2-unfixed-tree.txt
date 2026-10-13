@@ -1,0 +1,98 @@
+=== AC#2 的'未修码'读数：同一发 -overlay 变异，把本票三枚新件 overlay 删掉（模拟改前树）===
+cmd: GOFLAGS= go test -count=1 -overlay=<fs_edit L2->L1 + 本票三枚新件删除> ./internal/tools/...
+Tue Oct 13 23:32:52 CST 2026
+=== run ===
+time=2026-10-13T23:32:56.024+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict (0.02s)
+    --- FAIL: TestAuditAllowlistScopeDoesNotInventAVerdict/unjudged:_a_blank_path_never_reaches_the_judge (0.00s)
+        audit_allowlist_scope_173_test.go:69: wanted an audit line for fs.edit carrying [risk=L2], got none in ["tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L1 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason=\"R1: 工具声明为下界（L1）\""]
+time=2026-10-13T23:32:56.848+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing1719411184\003\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:32:56.854+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:32:56Z duration_ms=6
+time=2026-10-13T23:32:56.860+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing1719411184\003\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:32:56.865+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:32:56Z duration_ms=4
+time=2026-10-13T23:32:56.871+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing1719411184\003\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:32:56.876+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:32:56Z duration_ms=5
+time=2026-10-13T23:32:56.881+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:32:56.883+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-13T23:32:57.055+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestToolCallRowsAreComplete59578327\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:32:57.061+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:32:57Z duration_ms=6
+time=2026-10-13T23:32:57.069+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestToolCallRowsAreComplete59578327\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:32:57.074+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:32:57Z duration_ms=5
+time=2026-10-13T23:32:57.081+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestToolCallRowsAreComplete59578327\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:32:57.089+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:32:57Z duration_ms=8
+time=2026-10-13T23:32:57.094+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:32:57.096+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestFSEditRoutesToApprovalNotTheL1Window (0.02s)
+    fs_edit_ac5_gate_r4_test.go:261: fs.edit must reach the approval channel and never the L1 window: window=2 approval=0 (want 1/1 cumulative)
+--- FAIL: TestFSEditRefusesAPathC26CannotCanonicalize (0.00s)
+    fs_edit_ac5_gate_r4_test.go:384: 读数（未修码即响）：空白 path ⇒ IsError=true class="tool" 回执="缺少 path 参数"
+    fs_edit_ac5_gate_r4_test.go:388: wanted an audit line for fs.edit carrying [risk=L2], got none in ["tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L1 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=unknown grant_id=0 reason=\"R1: 工具声明为下界（L1）\""]
+--- FAIL: TestFSEditAppliesABatchOnDisk (0.01s)
+    fs_edit_test.go:318: 对照读数：26 字节 / 4 行 → fs.edit 已改写 C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestFSEditAppliesABatchOnDisk638759348\001\ok.txt：2 枚编辑全部生效，26 字节 / 4 行 → 32 字节 / 5 行（临时文件+原子重命名）
+    fs_edit_test.go:319: 对照读数：AppliedSteps=["在 C:\\Users\\swq\\AppData\\Local\\Temp\\172-r1\\gotmp\\TestFSEditAppliesABatchOnDisk638759348\\001 创建临时文件 .wisp-tmp-86ee3ca8-31752-417803319" "向临时文件写入 32 字节" "临时文件已落盘并关闭" "原子重命名 .wisp-tmp-86ee3ca8-31752-417803319 → C:\\Users\\swq\\AppData\\Local\\Temp\\172-r1\\gotmp\\TestFSEditAppliesABatchOnDisk638759348\\001\\ok.txt（目标此刻起为新内容）"]
+    fs_edit_test.go:325: fs.edit must reach the L2 approval channel exactly once: window=1 approval=0
+    fs_edit_test.go:329: fs.edit was judged at L0, want the D34 declared L2 floor
+--- FAIL: TestFSRegistrationIsTheD34Roster (0.00s)
+    fs_test.go:213: fs.edit declared L1, want L2 (D34)
+--- FAIL: TestToolsDirectoryShape (0.00s)
+    fs_test.go:279: fs.edit directory level = "L1", want the declared "L2"
+time=2026-10-13T23:32:58.627+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestFSWriteSilentLossIsNotReported3186462989\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:32:58.634+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:32:58Z duration_ms=6
+time=2026-10-13T23:32:58.641+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestFSWriteSilentLossIsNotReported3186462989\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:32:58.646+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:32:58Z duration_ms=5
+time=2026-10-13T23:32:58.656+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestFSWriteSilentLossIsNotReported3186462989\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:32:58.662+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:32:58Z duration_ms=5
+time=2026-10-13T23:32:58.666+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:32:58.667+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-13T23:32:59.565+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test221ParentStopsItsOwnChildRowAndStreamSettle249112355\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:32:59.572+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:32:59Z duration_ms=7
+time=2026-10-13T23:32:59.578+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test221ParentStopsItsOwnChildRowAndStreamSettle249112355\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:32:59.584+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:32:59Z duration_ms=5
+time=2026-10-13T23:32:59.591+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test221ParentStopsItsOwnChildRowAndStreamSettle249112355\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:32:59.597+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:32:59Z duration_ms=5
+time=2026-10-13T23:32:59.601+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:32:59.603+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-13T23:32:59.972+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore1174402723\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:32:59.978+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:32:59Z duration_ms=6
+time=2026-10-13T23:32:59.985+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore1174402723\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:32:59.989+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:32:59Z duration_ms=4
+time=2026-10-13T23:32:59.997+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestTicket224GrantIDColumnRoundTripsThroughTheRealStore1174402723\002\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:33:00.002+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:32:59Z duration_ms=5
+time=2026-10-13T23:33:00.007+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:33:00.009+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-13T23:33:00.052+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test283IdentityChainThroughTheRealLoop2879024863\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:33:00.059+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:33:00Z duration_ms=7
+time=2026-10-13T23:33:00.066+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test283IdentityChainThroughTheRealLoop2879024863\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:33:00.071+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:33:00Z duration_ms=4
+time=2026-10-13T23:33:00.079+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test283IdentityChainThroughTheRealLoop2879024863\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:33:00.085+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:33:00Z duration_ms=5
+time=2026-10-13T23:33:00.090+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:33:00.091+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-13T23:33:00.128+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test285RosterRowsCarryDistinctCorrPerCall773070510\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:33:00.135+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:33:00Z duration_ms=6
+time=2026-10-13T23:33:00.142+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test285RosterRowsCarryDistinctCorrPerCall773070510\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:33:00.148+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:33:00Z duration_ms=6
+time=2026-10-13T23:33:00.156+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\Test285RosterRowsCarryDistinctCorrPerCall773070510\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:33:00.161+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:33:00Z duration_ms=5
+time=2026-10-13T23:33:00.166+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:33:00.169+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-13T23:33:00.362+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestLoopPassesDeclaredL1WriteThroughTheGate2013064482\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:33:00.368+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:33:00Z duration_ms=5
+time=2026-10-13T23:33:00.376+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestLoopPassesDeclaredL1WriteThroughTheGate2013064482\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:33:00.381+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:33:00Z duration_ms=4
+time=2026-10-13T23:33:00.387+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestLoopPassesDeclaredL1WriteThroughTheGate2013064482\001\db\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:33:00.392+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:33:00Z duration_ms=4
+time=2026-10-13T23:33:00.398+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:33:00.400+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-13T23:33:03.451+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestLoopStillRefusesL1WhenNoGateIsRegistered3862316233\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-13T23:33:03.463+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-13T15:33:03Z duration_ms=12
+time=2026-10-13T23:33:03.471+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestLoopStillRefusesL1WhenNoGateIsRegistered3862316233\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-13T23:33:03.476+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-13T15:33:03Z duration_ms=4
+time=2026-10-13T23:33:03.486+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\172-r1\gotmp\TestLoopStillRefusesL1WhenNoGateIsRegistered3862316233\001\db\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-13T23:33:03.491+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-13T15:33:03Z duration_ms=4
+time=2026-10-13T23:33:03.497+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-13T23:33:03.499+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	13.588s
+FAIL
+rc=1

@@ -1,0 +1,121 @@
+=== §5 筛法复跑 (162-v3 §4②): 有没有 Go 码在运行时读契约文本 ===
+Tue Oct 13 23:12:53 CST 2026
+
+--- A. git grep 'ReadFile|os.Open|go:embed|ParseFS|ReadDir' 限 internal/tools/**/*_test.go, internal/risk/** ---
+internal/risk/pathresolver_rewrite_account_test.go:235:		f, err := os.Open(path)
+internal/risk/pathresolver_rewrite_account_test.go:277:	b, err := os.ReadFile(path)
+internal/risk/syncdirs.go:602:	b, err := os.ReadFile(path)
+internal/risk/syncdirs.go:620:	b, err := os.ReadFile(path)
+internal/risk/syncdirs.go:637:	b, err := os.ReadFile(path)
+internal/tools/bridge_a18_kill_windows_test.go:160:	des, err := os.ReadDir(dir)
+internal/tools/bridge_a18_kill_windows_test.go:162:		t.Fatalf("ReadDir(%s): %v", dir, err)
+internal/tools/bridge_a18_kill_windows_test.go:195:		got, err := os.ReadFile(existing)
+internal/tools/bridge_a18_kill_windows_test.go:255:		got, err := os.ReadFile(existing)
+internal/tools/bridge_junction_windows_test.go:99:	des, err := os.ReadDir(dir)
+internal/tools/bridge_junction_windows_test.go:101:		t.Fatalf("ReadDir(%s): %v", dir, err)
+internal/tools/bridge_junction_windows_test.go:108:		b, err := os.ReadFile(filepath.Join(dir, e.Name()))
+internal/tools/bridge_junction_windows_test.go:110:			t.Fatalf("ReadFile(%s): %v", filepath.Join(dir, e.Name()), err)
+internal/tools/bridge_junction_windows_test.go:161:	got, err := os.ReadFile(filepath.Join(f.junction, "victim.txt"))
+internal/tools/bridge_junction_windows_test.go:431:	if got, err := os.ReadFile(filepath.Join(link, "id_ed25519_import_key")); err != nil ||
+internal/tools/bridge_path_account_ticket105_test.go:48:		data, err := os.ReadFile(path)
+internal/tools/failclosed_236_teeth_test.go:72:// COMPILER sees, while os.ReadFile (e.g. task_cancel_221_legs_test.go:224)
+internal/tools/fs_edit_ac34_test.go:553:	f, oerr := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+internal/tools/fs_edit_ac4b_kill_windows_test.go:205:	got, err := os.ReadFile(target)
+internal/tools/fs_edit_ac4b_kill_windows_test.go:237:		b, rerr := os.ReadFile(p)
+internal/tools/fs_edit_ac4b_kill_windows_test.go:239:			t.Fatalf("ReadFile(%s): %v", p, rerr)
+internal/tools/fs_edit_ac5_gate_r4_test.go:214:	if data, err := os.ReadFile(target); err != nil {
+internal/tools/fs_edit_ac5_gate_r4_test.go:391:	entries, err := os.ReadDir(root)
+internal/tools/fs_staging_windows_test.go:165:		got, err := os.ReadFile(p)
+internal/tools/fs_staging_windows_test.go:233:	got, err := os.ReadFile(filepath.Join(link, "victim.txt"))
+internal/tools/fs_staging_windows_test.go:248:	after, err := os.ReadFile(victim)
+internal/tools/fs_staging_windows_test.go:359:		f, err := os.OpenFile(held, os.O_RDONLY, 0o600)
+internal/tools/fs_write_test.go:100:	b, err := os.ReadFile(p)
+internal/tools/fs_write_test.go:102:		t.Fatalf("ReadFile(%s): %v", p, err)
+internal/tools/fs_write_test.go:121:	des, err := os.ReadDir(dir)
+internal/tools/loop_approval_test.go:194:	body, err := os.ReadFile(f.target)
+internal/tools/paths_ticket107b_probes_test.go:112:	if body, err := os.ReadFile(via); err != nil || string(body) != "TOPSECRET" {
+internal/tools/paths_ticket107b_probes_test.go:175:	if body, err := os.ReadFile(via); err != nil || string(body) != "TOPSECRET" {
+internal/tools/paths_ticket107b_probes_test.go:206:	if body, err := os.ReadFile(via); err != nil || string(body) != "TOPSECRET" {
+internal/tools/paths_twocontainments_252_r2_test.go:194:	entries, err := os.ReadDir(".")
+internal/tools/paths_twocontainments_252_r2_test.go:196:		t.Fatalf("os.ReadDir(.): %v", err)
+internal/tools/pathshape_portable_test.go:69:	body, err := os.ReadFile(canon)
+internal/tools/pointer_183_cli_seam_test.go:179:	want, err := os.ReadFile(rec.ArtifactPath)
+internal/tools/pointer_185_cli_seam_test.go:150:	want, err := os.ReadFile(rec.ArtifactPath)
+internal/tools/recycle_windows_test.go:76:		body, err := os.ReadFile(filepath.Join(bin, rel))
+hits(A)=26
+
+--- B. 上列命中里提到 PLAN|SPEC|docs 的 ---
+hits(B)=0
+
+--- C. 全仓非测试 Go 码里读 docs/PLAN.md 或 SPEC 的 ---
+.scratch/wisp/probes/162/r3/mut/base/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/r3/mut/base/fs_edit.go:256:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/r3/mut/m3/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/r3/mut/m3/fs_edit.go:382:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/r3/mut/m4/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/r3/mut/m4/fs_edit.go:395:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/mut/m1/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v1/mut/m1/fs_edit.go:254:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/mut/m2/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v1/mut/m2/fs_edit.go:256:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/mut/m3/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v1/mut/m3/fs_edit.go:256:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v1/mut/m4/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v1/mut/m4/fs_edit.go:269:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/162/v2/mut/t1/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+.scratch/wisp/probes/162/v2/mut/t1/fs_edit.go:382:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+.scratch/wisp/probes/174/r3/mut/task-MUTA.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/174/r3/mut/task-MUTB.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/174/r3/mut/task-MUTB2.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/174/r4/pristine-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/183/a1/mut/loop.go:768://     (docs/PLAN.md:127-129) fixes that tier as "只读，无副作用 - 直接执行，
+.scratch/wisp/probes/221/r1/mutations/m1-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/r1/mutations/m2-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/r1/mutations/m3-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/control-task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m1-cancel-unregistered.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m13-list-marker-lifted.go:114:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m14-cancel-marked-again.go:116:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m2-no-parent-check.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m3-no-selfstop-check.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m4-no-empty-caller-guard.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m5-no-nil-roster-guard.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m6-cancel-before-refusal.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/221/v1/mutations/m7-level-l0.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+.scratch/wisp/probes/309/a1/logs/loop.go:366:	// id (docs/PLAN.md:1368). Since ticket 242 the loop mints one correlation
+.scratch/wisp/probes/309/a1/logs/loop.go:597:// it (docs/PLAN.md:1368). The queue keys every card by this value, so two
+.scratch/wisp/probes/309/a1/logs/loop.go:798://     (docs/PLAN.md:127-129) fixes that tier as "只读，无副作用 - 直接执行，
+.scratch/wisp/probes/33/p1/receipt/main.go:7:// Ticket 33 AC#14 / docs/PLAN.md C17 ("Go -> front-end event push; replies must
+internal/agent/loop.go:366:	// id (docs/PLAN.md:1368). Since ticket 242 the loop mints one correlation
+internal/agent/loop.go:597:// it (docs/PLAN.md:1368). The queue keys every card by this value, so two
+internal/agent/loop.go:798://     (docs/PLAN.md:127-129) fixes that tier as "只读，无副作用 - 直接执行，
+internal/memory/schema.go:11:// ```sql blocks of docs/specs/SPEC-02-data-storage.md §3 (including
+internal/memory/schema.go:142:// DDL below mirrors the ```sql block in docs/specs/SPEC-02-data-storage.md
+internal/panel/bridge.go:51:	//     product spec already carries (docs/specs/SPEC-08-ui-ball-panel.md:168,
+internal/panel/git.go:14:// (docs/PLAN.md §D34) carries no git row, and giving the model a `git.*` tool
+internal/tools/fs_edit.go:14:// The D34 row ticket 162 adds (docs/PLAN.md 的 D34 表，2026-09-27 owner 批准):
+internal/tools/fs_edit.go:382:// (docs/PLAN.md 的 D34 表 fs.edit 那一行)，and it is why no Facts hook is
+internal/tools/task.go:115:	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+hits(C)=34
+
+--- D. 谁在读 docs/PLAN.md (含测试) ---
+.scratch/wisp/probes/183/r1/mut-freq/zz183freq_test.go:37:		"docs/PLAN.md",
+.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/222/v1/mutations/m3-child-on-fake-dir/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/224/v1/probe_a_prod_test.go:25://     cover (SPEC-06 §8.3 bullet 1 / PLAN.md:2148 D45-3) - so it cannot either.
+.scratch/wisp/probes/235/r1/mut-ac3prereadoff-m3/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/r1/mut-m3-afterfix/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/r1/mut-m3-original/subagent_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/m3-afterfix_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/m3-beforefix_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/parenttoolsonly_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/pre235-222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/prereadoff-m3_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/235/v1/mut/toolsonly_222_test.go:42://     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
+.scratch/wisp/probes/252/v1/overlay/paths_252v1_probe_test.go:72:	probe252v1(t, pc, short+pathSep+"docs"+pathSep+"q252v1-never-created.txt",
+.scratch/wisp/probes/252/v1/overlay/paths_252v1_probe_test.go:75:	probe252v1(t, pc, root+pathSep+"docs"+pathSep+"q252v1-never-created.txt",
+.scratch/wisp/probes/309/a1/logs/failclosed_236_teeth_test.go:49:// task.cancel is frozen at L1 (task.go:662, D34 row PLAN.md:2564), so a call
+cmd/wisp/approval_always_201_test.go:6:// PLAN.md:1645-1646 freezes the sentence these two cases are built on: 热加载放宽
+cmd/wisp/approval_always_201_test.go:182:		t.Fatalf("config.toml gained an allowlist entry the second card refused (PLAN.md:1645-1646: 不得静默生效):\n%s", text)

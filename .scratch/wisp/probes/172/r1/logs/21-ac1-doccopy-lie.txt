@@ -1,0 +1,59 @@
+=== cmd ===
+WISP172_TIER_DOC=C:/Users/swq/AppData/Local/Temp/172-r1/mut/PLAN.172.docflip.md GOFLAGS= go test -count=1 -run Test172 -v ./internal/tools/
+（副本＝真 PLAN.md 的逐字拷贝，只把 D34 表里 fs.edit 那行的 RiskLevel 格 L2 改成 L1；真件 sha256 见 30-ac4-*.txt）
+=== HEAD/date ===
+1c1cac46 2026-10-13 23:30:46 +0800 编排者：A893（前端切 dev 口径统一）＋313-panel-ask 头部更正注（worktree 退役；原句保留）
+Tue Oct 13 23:32:07 CST 2026
+=== run ===
+time=2026-10-13T23:32:08.393+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test172RulerReadsBothFrozenTablesAndTheyMirror
+--- PASS: Test172RulerReadsBothFrozenTablesAndTheyMirror (0.00s)
+=== RUN   Test172FrozenTierMatchesTheTierTheGateGives
+    tier_consistency_172_cases_test.go:127: [未落地] app.launch         文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] clipboard.read     文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] clipboard.write    文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] doc.read           文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] file.open          文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [对得上] fs.delete          文本 [L2] 机器 [L2]
+    tier_consistency_172_cases_test.go:127: fs.edit：文档写 L1、机器给 L2（探针：替换授权目录里既有文件的一小段 -> L2）—— 冻结文本与门给的档位不一致，两边必须由同一个 ticket 改齐
+    tier_consistency_172_cases_test.go:127: [对得上] fs.list            文本 [L0 L2] 机器 [L0 L2]
+    tier_consistency_172_cases_test.go:127: [对得上] fs.move            文本 [L1] 机器 [L1]
+    tier_consistency_172_cases_test.go:127: [对得上] fs.read            文本 [L0 L2] 机器 [L0 L2]
+    tier_consistency_172_cases_test.go:127: [对得上] fs.trash           文本 [L1] 机器 [L1]
+    tier_consistency_172_cases_test.go:127: [对得上] fs.write           文本 [L1 L2] 机器 [L1 L2]
+    tier_consistency_172_cases_test.go:127: [未落地] input.type         文本 [L1 L2] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] list_tools         文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] media.control      文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] memory.recall      文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] memory.save        文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] notify             文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] plan.present       文本 [L2] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] reminder.cancel    文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] reminder.list      文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] reminder.set       文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] screen.capture     文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] search.apps        文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] search.content     文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] search.files       文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] shell.exec         文本 [L1 L2] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] shell.session      文本 [L2] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] system.get         文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] system.power       文本 [L2] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] system.set         文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [对得上] task.cancel        文本 [L1] 机器 [L1]
+    tier_consistency_172_cases_test.go:127: [未落地] task.list          文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [对得上] task.output        文本 [L0] 机器 [L0]
+    tier_consistency_172_cases_test.go:127: [未落地] web.fetch          文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] web.open           文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] web.search         文本 [L0 L2] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] window.focus       文本 [L1] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] window.list        文本 [L0] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: [未落地] window.manage      文本 [L1 L2] 机器 无名册（未注册为 C4 工具）
+    tier_consistency_172_cases_test.go:127: 分母 40 枚工具：对得上 8，对不上 1，未落地 31；机器有而契约无 [task.spawn]
+--- FAIL: Test172FrozenTierMatchesTheTierTheGateGives (0.03s)
+=== RUN   Test172DocCopyThatLiesReddensTheRuler
+--- PASS: Test172DocCopyThatLiesReddensTheRuler (0.05s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.122s
+FAIL
+rc=1

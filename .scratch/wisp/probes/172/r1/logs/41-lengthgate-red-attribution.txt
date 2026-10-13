@@ -1,0 +1,13 @@
+=== 长度门红因归属核查（不是本票的三枚新件）===
+Tue Oct 13 23:34:02 CST 2026
+
+--- 长度门的进出：它读的是 git 跟踪路径，本票三枚新件还是 untracked ---
+error: pathspec 'internal/tools/tier_consistency_172_ruler_test.go' did not match any file(s) known to git
+Did you forget to 'git add'?
+
+--- 它点名的那个文件：谁改的 ---
+
+--- 该红是否本票造成：本票写面（internal/tools 三枚新件 + probes/172/** + 票面 1 条 bullet）与它无交集 ---
+1c1cac46 2026-10-13 23:30:46 +0800 编排者：A893（前端切 dev 口径统一）＋313-panel-ask 头部更正注（worktree 退役；原句保留）
+最近动的票 173 文件的提交（另一程）:
+2a8ab9c4 2026-10-13 22:58:07 +0800 编排者：票 173 收口——五格全勾（凭据 173-v1 裁决表）+ Status 留档 + git mv -done
